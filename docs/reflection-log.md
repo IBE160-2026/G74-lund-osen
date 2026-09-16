@@ -76,6 +76,48 @@ Neste steg er å vurdere de to prosjektideene nærmere før vi låser valget. Et
 ### Tekniske utfordringer
 Under oppsettet oppstod blant annet problemer med npm i PowerShell, WSL2/Docker og innlogging i Claude Code. Problemene ble løst underveis ved hjelp av KI-veiledning og kontroll av installasjonene.
 
+
+## 16.09.2026 – Marian
+
+### Fase
+Prosjektvurdering og testing av datakilder
+
+### Hva gjorde vi?
+Vi undersøkte om aksjeideen er realistisk før vi bestemmer prosjektvalg. Målet var å finne ut om vi faktisk kan hente nok data til en løsning som analyserer Oslo Børs og samtidig bruker globale markeder som støtteinformasjon.
+
+Alpha Vantage ble først testet på 10 norske selskaper. Selskapene ble funnet, men Oslo Børs-noteringene kom ikke tydelig frem. Alpha Vantage ble derfor vurdert som lite egnet som hovedkilde for norske aksjer.
+
+EODHD ble deretter testet. Frontline ble testet først, og etter at dette fungerte ble ytterligere ni selskaper testet. Alle 10 Oslo Børs-aksjene ga historiske data med open, high, low, close og volum. Det ble også testet data for OSEBX, Frontline i USA og USD/NOK.
+
+Globale datakilder ble videre testet for Brent, naturgass, Bitcoin, gull og sølv. Gull og sølv fungerte gjennom Alpha Vantage, mens de øvrige ble testet gjennom EODHD. Brent og naturgass hadde historiske data, men lå noen dager etter dagens dato. Det ble derfor sendt en forespørsel til Barchart om tilgang til ferskere futuresdata.
+
+Euronext sin finanskalender ble også undersøkt. En CSV med fremtidige finanshendelser kunne lastes ned og inneholdt blant annet rapportdatoer, selskapsnavn og hendelsestype. Kalenderen kan derfor brukes til å varsle om kommende kvartalsrapporter og andre viktige hendelser.
+
+Det ble sendt forespørsel til EODHD om 50 % studentrabatt på historiske data.
+
+### KI-verktøy brukt
+ChatGPT ble brukt til å planlegge testene, lage lokale PowerShell-script, tolke API-resultater og vurdere hvilke datakilder som var egnet.
+
+### Viktige valg eller problemer
+Testene ble holdt lokalt og API-nøklene ble lagret i `.env`. Både `.env` og `local-tests/` ble lagt i `.gitignore` slik at API-nøkler og testfiler ikke lastes opp til GitHub.
+
+En viktig erfaring var at det ikke er nok at en dataleverandør sier at den dekker globale aksjer. Dette må testes på de konkrete markedene prosjektet skal bruke. Alpha Vantage fungerte godt for gull og sølv, men EODHD fungerte bedre for Oslo Børs.
+
+Det ble også tydelig at historiske data og ferske markedsdata ikke nødvendigvis bør komme fra samme leverandør.
+
+### Hva fant vi ut / lærte?
+Datatilgangen ser foreløpig god nok ut til at aksjeprosjektet fortsatt er realistisk. Vi har bekreftet at EODHD kan hente data for de norske aksjene vi testet, og at globale signaler som valuta, råvarer, Bitcoin og utenlandske noteringer også kan hentes.
+
+Finanskalenderen fra Euronext ser også brukbar ut. Den største datakilden som fortsatt må undersøkes nærmere er selskapsmeldinger og nyheter.
+
+Prosjektet er fortsatt ikke endelig valgt, men datatestene har redusert usikkerheten rundt aksjeideen betydelig.
+
+### Git / dokumentasjon
+Testfiler og API-nøkler beholdes foreløpig lokalt og skal ikke lastes opp til GitHub. Resultatene og vurderingene dokumenteres i refleksjonsloggen.
+
+
+
+
 ---
 
 ## Mal for neste arbeidsøkt
