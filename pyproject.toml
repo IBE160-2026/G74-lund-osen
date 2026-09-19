@@ -1,0 +1,10 @@
+[project]
+name = "ose-signal"
+version = "0.1.0"
+description = "OSE Signal - markedsoversikt for Oslo Bors"
+requires-python = ">=3.13"
+dependencies = [
+    "flask>=3.0",
+    "requests>=2.32",
+    "python-dotenv>=1.0",
+]

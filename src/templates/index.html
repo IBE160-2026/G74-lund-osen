@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="utf-8">
+  <title>OSE Signal</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; max-width: 40rem; }
+    h1 { font-size: 1.4rem; margin-bottom: 0.2rem; }
+    p.meta { color: #666; font-size: 0.9rem; margin-top: 0; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { text-align: left; padding: 0.5rem 0.75rem; border-bottom: 1px solid #ddd; }
+    th { font-weight: 600; }
+    td.tall { text-align: right; font-variant-numeric: tabular-nums; }
+    .opp { color: #0a7d32; }
+    .ned { color: #b3261e; }
+  </style>
+</head>
+<body>
+  <h1>OSE Signal</h1>
+
+  {% if rader %}
+    <p class="meta">Sluttkurser Oslo Børs · hentet {{ hentet }}</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Selskap</th>
+          <th class="tall">Sluttkurs</th>
+          <th class="tall">Endring</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rad in rader %}
+          <tr>
+            <td>{{ rad.navn }}</td>
+            <td class="tall">{{ "%.2f"|format(rad.sluttkurs) }}</td>
+            <td class="tall {% if rad.endring_prosent and rad.endring_prosent > 0 %}opp{% elif rad.endring_prosent %}ned{% endif %}">
+              {% if rad.endring_prosent is not none %}
+                {{ "%+.2f"|format(rad.endring_prosent) }} %
+              {% else %}
+                –
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Ingen data. Kjør <code>uv run src/fetch_prices.py</code> først.</p>
+  {% endif %}
+</body>
+</html>

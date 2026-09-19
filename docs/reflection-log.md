@@ -380,7 +380,7 @@ i noen branch, og filen har aldri vært sporet. Forskjellen på «vi la den i gi
 «ingen treff i historikken» er den samme forskjellen som gikk igjen hele økten — antatt mot
 målt.
 
-**Neste steg er bygging, ikke flere dokumenter.** Prosjektet har nå fire
+**Neste steg er å bygge før vi skriver mer.** Prosjektet har nå fire
 planleggingsdokumenter og ingen kjørende kode. Den tynne vertikale skiva — fem aksjer,
 kurser fra EODHD, én skjerm, ingen KI — bør bygges før PRD skrives. Fem aksjer er fem kall,
 så den kan kjøres flere ganger daglig uten å nærme seg kvoten.
@@ -400,3 +400,28 @@ sjekkedatoer, og `_bmad-output/planning-artifacts/prd-notater.md` med arkitektur
 ble flyttet ut av briefen. Product Brief er oppdatert til 1 215 ord og består sluttsjekken
 i emnets mal. Duplikatregelen for `.env` i `.gitignore` ble fjernet, og det ble verifisert
 at filen fortsatt er ignorert etterpå.
+
+### Plan for neste økt: en tynn vertikal skive
+
+Vi starter med det minste som går hele veien gjennom systemet — fra datakilde til skjerm —
+i stedet for å bygge ett lag ferdig om gangen. Motsatsen er å bygge lagvis: først all
+datahenting, så logikken, så grensesnittet. Da virker ingenting før helt til slutt, og
+integrasjonsfeilene dukker opp altfor sent.
+
+Konkret: hent sluttkurser for fem aksjer fra EODHD, lagre dem lokalt, og vis dem på én
+webside med navn, kurs og endring i prosent. Ingen KI, ingen børsmeldinger, ingen kalender,
+ingen indikatorer, ingen graf. Fem rader i en tabell.
+
+Det ser for lite ut, og det er poenget. Når den virker, er det bevist at API-nøkkelen
+fungerer, at data kan lagres og leses tilbake, at webserveren kjører, og at de tre delene
+snakker sammen. Fem aksjer er fem API-kall, så skiva kan kjøres flere ganger daglig uten å
+nærme seg kvoten på 20.
+
+Rekkefølgen videre: flere aksjer → kursgraf → indikatorer og signalstyrke → børsmeldinger
+fra NewsWeb → KI-laget → kalender. Ett steg om gangen, der hvert steg gir noe som fortsatt
+virker.
+
+**Dette er ikke en omvei rundt PRD-en.** BMAD-kjeden går Brief → PRD → UX → Arkitektur, og
+emnet lærer bort den metoden; å hoppe over et ledd kan koste ved sensur. Poenget er å ikke
+skrive PRD-en blindt. Når skiva er bygget, vet vi hvordan dataene faktisk ser ut når
+kravene skal beskrives. Det tar en kveld, og PRD-en blir bedre av det.

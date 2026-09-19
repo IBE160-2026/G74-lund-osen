@@ -60,3 +60,5 @@ Thumbs.db
 *.swo
 *~
 local-tests/
+# Lokale raadata fra API-kall
+data/
