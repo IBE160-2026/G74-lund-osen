@@ -29,6 +29,17 @@ Rådata lagres fra første kjøring, slik at prosjektet ikke står tomhendt om e
 endres. Dette er en reell risiko: NewsWeb-API-et er udokumentert backend for Oslo
 Børs' egen nettside.
 
+### Krav: merking av justert kurs i grensesnittet
+
+Markedsoversikten viser `close`, mens endringen i prosent regnes på `adjusted_close`.
+Det er riktig — et ordinært utbytte skal ikke se ut som et kursfall — men det har en
+synlig konsekvens: på en utbyttedag stemmer ikke differansen mellom to viste sluttkurser
+med den viste prosenten. En bruker som regner etter vil se det som en feil.
+
+Kravet er derfor at utbyttedager merkes i grensesnittet, slik at avviket er forklart
+i stedet for å se ut som en bug. Dette må være på plass før demonstrasjonen.
+Observert under bygging av den vertikale skiva 20.09.2026.
+
 Historiske sammenligninger bruker utbyttejusterte kurser, slik at et ordinært utbytte
 ikke feiltolkes som kursfall.
 
