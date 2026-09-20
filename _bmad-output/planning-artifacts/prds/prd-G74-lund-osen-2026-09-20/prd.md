@@ -746,6 +746,7 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 | 11 | **Meldepliktig handel for primærinnsidere** justeres hvis den viser seg å være i hovedsak opsjonsutøvelse | | Etter én ukes drift |
 | 12 | **Bekrefte horisont og hendelsestyper** i FR-302, som i dag er antatt | | Før implementasjon |
 | 13 | **Datoer for demonstrasjon og prosjektinnlevering** | | Snarest |
+| 14 | **Hver story leveres med test.** Føres inn som krav i arkitekturfasen. Testene skal kunne kjøres uten API-kall, slik signalberegningen og meldingsfilteret gjør det | | Ved oppstart av arkitekturfasen |
 
 **Punkt 1 er det eneste som kan velte datagrunnlaget**, og det vil i så fall
 velte to ting samtidig: meldingsdelen hvis NewsWeb-vilkårene ikke holder, og
