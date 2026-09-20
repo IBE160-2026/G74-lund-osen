@@ -671,6 +671,7 @@ publiseres og hva som blir liggende lokalt: `docs/kilder-og-rettigheter.md`.
 | EODHD `/api/eod` | Sluttkurser | 1 kall per symbol, 15 i døgnet |
 | Oslo Børs NewsWeb | Børsmeldinger | Nei |
 | Euronext finanskalender | Kommende hendelser | Nei |
+| EODHD `/api/news` | Relevanseksperimentet, én engangsinnsamling | Ett ticker per kall, ~80 kall fra bonuskvoten. Ikke daglig drift — se åpent punkt 5 |
 
 To forbehold hører til PRD-en fordi de kan velte krav: **NewsWeb-vilkårene er
 ikke kontrollert**, og API-et er udokumentert backend for Oslo Børs' egen

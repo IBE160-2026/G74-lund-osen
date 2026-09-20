@@ -26,7 +26,7 @@ korreksjonsrunden. Resultatet:
 |---|---|---|
 | 1.1 | Alpha Vantage-beslutningen | Lukket ved henvisning. Beslutningen med begrunnelse står i `docs/kilder-og-rettigheter.md`; PRD §6 sier nå eksplisitt at forkastede kilder ligger der, og punkt 9 i §8 fører vilkårskontrollen |
 | 1.2 | Bulk-endepunktet, 100 kall flatt | Skrevet inn i NFR-01 som begrunnelsen for ett kall per symbol, og gjentatt i `begrunnelser.md` |
-| 1.3 | EODHDs nyhets-API som kilde for relevanseksperimentet | Lukket i `begrunnelser.md` §7, som navngir API-et, fører 5–10 kall per ticker, anslaget på ~80 kall fra bonuskvoten, og som løser opp motsetningen i 2.4: «for dyrt» gjaldt daglig drift. `malinger.md` §0 navngir samme kilde. Står fortsatt ikke som rad i kildetabellen i `prd.md` §6 |
+| 1.3 | EODHDs nyhets-API som kilde for relevanseksperimentet | Lukket i `begrunnelser.md` §7, som navngir API-et, fører 5–10 kall per ticker, anslaget på ~80 kall fra bonuskvoten, og som løser opp motsetningen i 2.4: «for dyrt» gjaldt daglig drift. `malinger.md` §0 navngir samme kilde, og kildetabellen i `prd.md` §6 har fått en fjerde rad for API-et |
 | 1.4 | Signalstyrke for hele universet | Dekket i substans: FR-101 krever signalstyrke for alle 15 i markedsoversikten, og NFR-01 fører daglig drift som 15 kall — beregningen koster ingen kvote |
 | 1.5 | Regelanalysen styrer hvor KI-laget arbeider | Bortfalt ved beslutning, ikke ved forglemmelse. FR-705 sier nå at terskelen styrer visning og sortering, ikke hentingen, og at meldinger hentes for alle 15 hver dag. Begrunnelsen står i `begrunnelser.md`: begrensningen manglet grunnlag siden NewsWeb er gratis, og motsa FR-404 og FR-203 |
 | 1.6 | Behovsstyrt henting for aksjer uten utslag | Bortfalt av samme grunn. Når alle 15 hentes daglig, finnes ikke tilfellet kravet skulle dekke |
@@ -36,9 +36,11 @@ notatene sier at nyheter bare hentes for selskaper med utslag, PRD-en sier det
 motsatte. Fila er slettet 2026-09-20 etter denne kontrollen. Innholdet finnes i
 git-historikken og i dokumentene tabellen peker på.
 
-Den ene resten er 1.3: kildetabellen i `prd.md` §6 har tre rader, og EODHDs
-nyhets-API er ikke en av dem. En leser av bare `prd.md` ser ikke hvilket API
-relevanseksperimentet henter fra.
+Én rest står igjen under 1.3, arvet fra motsetning 2.4: `docs/kilder-og-rettigheter.md`
+fører «ett ticker per kall, 5–10 kall per forespørsel», mens `begrunnelser.md` §7
+leser det som 5–10 kall per ticker. Raden i §6 fører bare det de to er enige om —
+ett ticker per kall — og anslaget på ~80 kall. Tallet må avklares når EODHDs
+vilkår kontrolleres, jf. åpent punkt 1.
 
 ---
 
