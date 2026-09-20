@@ -7,6 +7,11 @@ være etterprøvbare, ikke bare dokumentert som «vi fant data».
 **Premiss for v1:** applikasjonen kjøres lokalt i undervisningssammenheng og
 publiseres ikke. Vurderingen gjelder derfor ikke-kommersiell, pedagogisk bruk.
 
+**Men repoet er offentlig.** Kildekoden og planleggingsdokumentene ligger i
+`IBE160-2026/G74-lund-osen`, som er åpent tilgjengelig. Applikasjonen er altså
+ikke publisert, men arbeidet med den er. Skillet mellom hva som deles og hva som
+blir liggende lokalt er derfor et valg vi må ta bevisst — se neste avsnitt.
+
 Sist oppdatert: 2026-09-20
 
 ---
@@ -72,6 +77,41 @@ støyen, og da til å forklare innholdet på norsk.
 
 ---
 
+## Hva vi publiserer, og hva vi ikke publiserer
+
+Besluttet 2026-09-20, da det ble bekreftet at repoet er offentlig i
+IBE160-organisasjonen.
+
+Skillet går mellom **aggregert statistikk utledet av en kilde** og **selve
+datasettet**.
+
+| Publiseres i repoet | Blir liggende lokalt |
+|---|---|
+| Median daglig omsetning per symbol | Kursseriene fra EODHD |
+| Kategorifordelinger i meldingsbildet | Meldingene fra NewsWeb |
+| Kalltall, kvoteforbruk og måleresultater | Alt innhold i `data/` |
+| Metodebeskrivelser og konklusjoner | |
+
+`data/` ligger i `.gitignore`, sammen med `.env`. Rådata og API-nøkler er derfor
+ikke eksponert.
+
+**Begrunnelsen:** sammendragsstatistikk er ikke databasen. At medianomsetningen
+for et symbol var 34,7 MNOK over en gitt periode, er et resultat vi har regnet
+ut — det gjenskaper ikke kursserien det er regnet på, og det setter ingen i
+stand til å omgå kildens egne vilkår. Det samme gjelder at en kategori utgjorde
+28,9 % av meldingene i en måleperiode.
+
+**Dette er en forsvarlig posisjon, men den skal stå som et bevisst valg.**
+Slik det er nå, følger skillet av at `data/` tilfeldigvis ble gitignorert tidlig
+i prosjektet. Det er ikke godt nok som begrunnelse. Regelen er herved skrevet
+ned, og den gjelder også for filer vi lager senere: et måleresultat kan
+publiseres, et datasett kan det ikke.
+
+Posisjonen er ikke en erstatning for vilkårskontrollen. Den sier hva vi gjør i
+mellomtiden, ikke at vilkårene tillater det.
+
+---
+
 ## Å følge opp
 
 - [ ] **Euronext samlet:** kontrollere bruksvilkårene for NewsWeb-data og for
@@ -80,3 +120,6 @@ støyen, og da til å forklare innholdet på norsk.
 - [ ] Kontrollere Alpha Vantage sine vilkår for ikke-kommersiell bruk
 - [ ] Lese EODHDs fullstendige ToS, ikke bare prissiden
 - [ ] Vurdere vilkårene på nytt dersom applikasjonen skal publiseres
+- [ ] **Kontrollere at skillet over holder mot EODHDs og NewsWebs faktiske
+      vilkår.** Posisjonen «sammendragsstatistikk er ikke databasen» er vår egen
+      vurdering, ikke noe kildene har sagt. Tas i samme runde, frist 2026-09-27

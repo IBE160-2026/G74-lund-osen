@@ -495,3 +495,223 @@ er åpenbart hvilken side som har rett.
 Product Brief oppdatert til «prosjektinnlevering» tre steder i Success Criteria. README
 utvidet med mappestruktur og begrunnelsen for skillet mellom `docs/` og `_bmad-output/`.
 Eksportene ligger utenfor repoet, i nedlastingsmappen.
+
+---
+
+## 20.09.2026 – Tilbakemelding fra faglærer, og en uformell inspection gate
+
+### Dato / deltaker(e)
+
+20.09.2026. Joakim Lund og Marian Osen. Tilbakemelding mottatt fra faglærer i IBE160.
+
+### Fase
+
+Overgangen fra Planning til Solutioning. PRD-arbeidet pågikk da tilbakemeldingen kom.
+
+### Hva gjorde vi?
+
+Mottok skriftlig tilbakemelding på Product Brief. Gjengitt ordrett:
+
+> Jeg har sett gjennom briefen, og dette ser veldig bra ut. Dere har en tydelig ide, et
+> fornuftig omfang og et godt skille mellom hva som løses med vanlig kode og hva KI faktisk
+> skal brukes til.
+>
+> Når det gjelder Product Brief, trenger dere ikke presse inn alle detaljer der. Malen er
+> ment som en fleksibel struktur, så det er helt greit å holde briefen overordnet og legge
+> mer tekniske detaljer, datakilder, API-begrensninger og begrunnelser i PRD-en. Den ekstra
+> delen deres om data og kilder passer også veldig naturlig inn.
+>
+> Formatet ser også helt fint ut. Det viktigste er innholdet og at strukturen er tydelig.
+>
+> Repoet deres er allerede offentlig i IBE160-organisasjonen, så det er også i orden.
+
+### Hva tilbakemeldingen lukker
+
+**Omfanget er bekreftet fornuftig.** Det åpne spørsmålet om ambisjonsnivå er lukket av
+faglærer, ikke av oss selv. Det er en forskjell som betyr noe: vi har brukt tid på å
+vurdere om universet på 15 aksjer og de to skjermbildene var for lite eller for mye.
+
+**Fordelingen mellom brief og PRD er godkjent eksplisitt**, inkludert vår egen seksjon
+«Data og kilder» som ikke står i malen. Det var den beslutningen som kunne kostet mest å ta
+feil på — hele skillet mellom briefen som overordnet dokument og PRD-en som bærer tekniske
+detaljer, datakilder, API-begrensninger og begrunnelser hviler på den. Hadde den vært feil,
+måtte begge dokumentene skrives om.
+
+**Formatkrav: ingen.** Det åpne punktet om forside, sidetall og skrifttype kan lukkes.
+Innhold og tydelig struktur er det som teller.
+
+**Repoet er offentlig i IBE160-organisasjonen.** Dette motsa antakelsen vår om et privat
+repo under egen konto, og ble derfor kontrollert.
+
+### Kontroll av repo-antakelsen
+
+Antakelsen var feil, men ikke slik vi trodde. Det finnes ikke to repoer.
+
+| Kontroll | Resultat |
+|---|---|
+| `git remote -v` | Ett remote: `IBE160-2026/G74-lund-osen` |
+| GitHub API, uautentisert | `private: false`, `visibility: public` |
+| Er `data/` sporet? | Nei — ligger i `.gitignore` |
+| Er `.env` sporet? | Nei — ligger i `.gitignore` |
+| Er `_bmad-output/` sporet? | Ja |
+
+Rådata fra EODHD og API-nøkler er altså ikke eksponert. Det som er offentlig, er koden og
+planleggingsdokumentene.
+
+Men funnet har en konsekvens for PRD-en. Vi skrev inn i går at utløseren for å vurdere
+bruksvilkårene på nytt er **publisering, ikke kommersialisering**. Koden er publisert. Selve
+applikasjonen kjører fortsatt bare lokalt, og rådata er ikke videreformidlet, så vurderingen
+er ikke utløst av datadeling. Men formuleringen i PRD-en forutsetter et repo som ikke er
+offentlig, og den forutsetningen holder ikke. Dette må avklares i samme runde som den
+øvrige vilkårskontrollen, med frist 27.09.
+
+### Dette var en inspection gate
+
+Det er verdt å kalle tilbakemeldingen det den var: en **inspection gate mellom Planning og
+Solutioning**, slik BMAD beskriver dem — bare uformell. Den har alle kjennetegnene. Den kom
+mellom to faser. Den ble gitt av noen utenfor arbeidet. Den bekreftet at grunnlaget holder
+før neste fase bygger videre på det. Og den lukket fire spørsmål som ellers ville fulgt med
+inn i arkitekturarbeidet som antakelser.
+
+Forskjellen fra en formell gate er bare at vi ikke hadde planlagt den, og ikke bedt om den
+på et bestemt tidspunkt. Det er tilfeldig at den kom nå.
+
+### Refleksjon
+
+Tre av de fire punktene bekreftet noe vi allerede trodde. Det fjerde motsa oss, og var det
+mest verdifulle. Slik er det ofte med bekreftelse utenfra: verdien ligger ikke i de tre som
+stemte, men i den ene som ikke gjorde det — og i at den kom før arkitekturarbeidet i stedet
+for etter.
+
+Verdt å merke seg at antakelsen om privat repo aldri ble skrevet ned noe sted. Den lå i
+hodene våre, og styrte likevel en formulering i PRD-en. En antakelse som ikke er skrevet
+ned, kan ikke etterprøves — den kan bare vise seg å være feil på et ubeleilig tidspunkt.
+
+**Dette er speilbildet av de seks tapte kravene.** De seks var innhold som *var* skrevet
+ned, og som forsvant i omskriving. Denne var innhold som *aldri ble* skrevet ned, og som
+styrte en beslutning likevel. De to feilene ser motsatte ut, men har samme mekanisme:
+ingen av dem finnes i en fil noen kan kontrollere. Et krav som er borte fra dokumentet, og
+en antakelse som aldri kom inn i det, er begge usynlige for den samme sjekken.
+
+Det har en praktisk konsekvens for tiltaket vi innførte tidligere samme dag. Diff mot
+forrige versjon fanger den første typen. Den fanger ikke den andre — en antakelse som
+aldri har vært i filen, dukker ikke opp som en forskjell mellom to versjoner. Skal den
+fanges, må den skrives ned først, og da er den allerede halvveis løst.
+
+Regelen som følger: når en beslutning hviler på noe vi tror om omgivelsene — at et repo er
+privat, at en kilde er stabil, at en frist ligger der vi tror — skrives antakelsen ned
+sammen med beslutningen, ikke bare beslutningen. Det er billigere enn å oppdage den når
+den ryker.
+
+### Git / dokumentasjon
+
+Ingen filendringer utløst direkte av tilbakemeldingen. Det åpne punktet om formatkrav
+lukkes. Spørsmålet om offentlig repo mot publiseringsutløseren tas inn i vilkårskontrollen
+med frist 27.09.
+
+---
+
+## 20.09.2026 – Seks krav berget fra utkastmappa, og to måter å miste dem på
+
+### Dato / deltaker(e)
+
+20.09.2026. Joakim Lund og Marian Osen, under arbeidet med PRD-en.
+
+### Fase
+
+Planning, PRD-arbeid.
+
+### Hva gjorde vi?
+
+Under PRD-arbeidet dukket det opp et krav som ikke fantes i den leverte Product
+Brief, men som stod i tre av utkastene. Det utløste en systematisk gjennomgang av
+hele utkastmappa mot de leverte dokumentene.
+
+### Mønsteret: seks detaljer
+
+Dette var sjette gang substansielt innhold måtte hentes tilbake fra
+`docs/ai-prompts/product-brief/`. De fem første ble berget i commit `270026d`:
+
+| # | Detalj | Berget |
+|---|---|---|
+| 1 | Euronext-kalenderen oppgir ikke ticker eller ISIN — hendelser må kobles via oppslagstabell | `270026d` |
+| 2 | Alpha Vantage forkastet som beslutning, ikke bare «brukt i tidlige tester» | `270026d` |
+| 3 | Kategorifeltet skiller ikke en kontraktstildeling fra et sponsorat | `270026d` |
+| 4 | Relevanseksperimentet bruker restkvoten på nyhets-API-et én gang | `270026d` |
+| 5 | Usikkerhet måles også på om mange selskaper nevnes likeverdig i samme sak | `270026d` |
+| 6 | «…uten at systemet tvinger frem et resultat» | 20.09 |
+
+Ingen av dem er pynt. Detalj 6 styrer et konkret designvalg — kravet om
+nøytralsone i trendsjekken, FR-702. Detalj 3 er hele begrunnelsen for at KI
+brukes til relevansvurdering i det hele tatt.
+
+Den umiddelbare lærdommen var at **når man leser for språk, leser man ikke for
+hva som mangler.** Tiltaket ble en vane: etter hver omskriving, kjør en diff mot
+forrige versjon og se spesifikt etter *krav som er borte*, ikke bare etter
+formuleringer som er endret.
+
+### To mekanismer, ikke én
+
+Senere samme dag viste en grundigere gjennomgang at tapene har **to ulike
+mekanismer**, og at tiltaket over bare fanger den ene.
+
+**Mekanisme 1 — språkvask.** Kravet stod i alle fire utkast og falt i siste steg,
+fra endelig kandidat til levert brief. En omskriving som skulle stramme inn, tok
+med seg innhold. Hit hører kravet om dager uten tydelige signaler, kravet om at
+dagens vurderinger lagres automatisk, og suksesskriteriet om grensesnitt og
+stabilitet.
+
+**Mekanisme 2 — byttet premiss.** Kravet ble ikke strammet bort. Det mistet
+konteksten da kilden byttet fra medienyheter til NewsWeb, og ble aldri oversatt
+til den nye kilden. Hit hører den tredelte relevansskalaen, kravet om at KI
+identifiserer hendelsestype, og rådataene bak medietesten 17.09.
+
+Forskjellen har en praktisk konsekvens: **en diff mot forrige versjon fanger bare
+mekanisme 1.** Et krav som mistet premisset sitt, ser i diffen ut som et krav som
+med rette ble fjernet — fordi konteksten det hang på, også er borte.
+
+Mekanisme 2 krever et annet tiltak: når et premiss byttes — en datakilde, en
+brukergruppe, en plattform — gjennomgås kravene som hang på det gamle premisset
+**ett for ett**, og hvert av dem får en eksplisitt avgjørelse: oversatt til det
+nye premisset, eller bevisst forkastet. Ingen skal falle ut ved taushet.
+
+**En tredje observasjon, om formen:** de tyngste utelatelsene er setninger som er
+kortet **bakfra**. Hovedpoenget overlevde, den kvalifiserende halen ikke.
+«For et shippingselskap var bildet motsatt» er en slik hale — og det er nettopp
+den som bærer poenget om at symbolstøyen varierer med selskapet, og som styrer
+hvordan testsettet på 50 artikler må settes sammen.
+
+### Vanen ble prøvd samme dag
+
+Diff-vanen ble innført og tatt i bruk på den første omskrivingen etter at den ble
+vedtatt: splittingen av PRD-en i et kravregister og et begrunnelsesdokument. Av
+39 nummererte krav og 66 normative setninger fanget kontrollen **to reelle tap** —
+dokumentets egen formålsetning, og en setning om at KI-laget skal behandle noen
+få meldinger om dagen. Begge ble gjenopprettet.
+
+To av 66 er ikke mye. Men uten kontrollen ville de vært borte, og ingen ville
+merket det før kravet manglet i implementasjonen.
+
+### Refleksjon
+
+«KI-assistert omskriving strammer språket og mister krav» er en presis
+observasjon om arbeidsmåten, ikke en generell betraktning om KI. Den har seks
+dokumenterte eksempler fra dette prosjektet, hvert med en identifiserbar kilde i
+utkastmappa og en identifiserbar konsekvens.
+
+Det mest nyttige er likevel grensen vi fant for vårt eget tiltak: diff-vanen er
+riktig, men den dekker bare halvparten av problemet, og vi vet nå hvilken
+halvpart. Et tiltak man kjenner grensen til, er bedre enn et tiltak man tror
+dekker alt.
+
+Se også oppføringen om faglærertilbakemeldingen samme dag, der speilbildet dukket
+opp: en antakelse som aldri ble skrevet ned, men som likevel styrte en
+formulering i PRD-en.
+
+### Git / dokumentasjon
+
+Tre korreksjoner utført i Product Brief: rentejusteringseksempelet erstattet med
+den målte støyen for vårt eget univers, rad om robusthet på stille dager lagt inn
+i Success Criteria, og Scope-setningen om publisering omformulert til å skille
+mellom publisering av kode og videreformidling av børsdata. Arbeidsnotatet
+`korreksjon-til-brief.md` er slettet etter at alle tre var utført.
