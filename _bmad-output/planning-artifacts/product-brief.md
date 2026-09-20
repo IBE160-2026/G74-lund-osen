@@ -61,12 +61,12 @@ Vi er selv i målgruppen og bruker løsningen gjennom prosjektperioden. Vi har i
 
 | Signal | Hva vi måler | Mål | Når |
 |---|---|---|---|
-| Brukerutfall | Person utenfor gruppen gjennomfører hovedflyten og forklarer uoppfordret hvorfor en aksje skiller seg ut | Minst 1 person, under 5 minutter, uten hjelp | Før innlevering |
+| Brukerutfall | Person utenfor gruppen gjennomfører hovedflyten og forklarer uoppfordret hvorfor en aksje skiller seg ut | Minst 1 person, under 5 minutter, uten hjelp | Før prosjektinnlevering |
 | Adopsjon | Gruppen bruker løsningen på egne aksjer og logger feil | Minst 4 av 5 børsdager fra første fungerende versjon | Løpende |
 | Kvalitet | Daglig henting fullfører innenfor API-kvoten; ved kildefeil vises siste kjente data med tidsstempel | Ingen manuelle steg, ingen stopp ved manglende data | Ukentlig |
 | KI-bidrag i drift | Hvilke meldinger KI-laget forklarte eller omklassifiserte som regelfilteret alene ikke skilte | Dokumentert eksempelsett fra minst én ukes drift | Før demonstrasjon (est. uke 45) |
 | Relevanseksperiment | Testsett på 50 medieartikler merket manuelt, kjørt mot både symbolmatching og KI-klassifisering | Eksperimentet gjennomført og tallene dokumentert — ikke at KI kommer best ut | Est. uke 41 |
-| Fortsatt bruk | Om vi bruker løsningen frivillig etter at utviklingen er ferdig, ikke bare for å teste den | Brukt minst tre dager i uka de to siste ukene før innlevering, loggført | Ved innlevering |
+| Fortsatt bruk | Om vi bruker løsningen frivillig etter at utviklingen er ferdig, ikke bare for å teste den | Brukt minst tre dager i uka de to siste ukene før prosjektinnlevering, loggført | Ved prosjektinnlevering |
 
 Relevanseksperimentet er et avgrenset delprosjekt, ikke en del av driften. Viser målingen liten forskjell, er det også et funn: eksperimentet skal avgjøre påstanden, ikke bekrefte den. Vi setter ikke mål for hvor godt signalene treffer markedet. Ukenumrene er planestimater som fastsettes endelig i PRD og sprintplan.
 
