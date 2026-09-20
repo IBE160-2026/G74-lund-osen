@@ -267,6 +267,13 @@ vinduet er for kort til å avgjøre spørsmålet.
 
 | Måling | Formål | Kostnad |
 |---|---|---|
-| Signaltest mot ~200 handelsdager | Låse terskel, volumfaktor og nøytralsonebredde | 15 kall |
+| Nyhetstest mot én `.OL`-ticker | Avgjøre om `/api/news` svarer på gratisnivå i det hele tatt | 10 kall, mandag 2026-09-21 |
+| Signaltest mot ~200 handelsdager | Låse terskel, volumfaktor og nøytralsonebredde | 15 kall, tirsdag 2026-09-22 |
 | Vilkårskontroll NewsWeb + Euronext | Avgjøre om datagrunnlaget holder | 0 kall, frist 2026-09-27 |
 | Relevanseksperiment, 50 medieartikler | Symbolmatching mot KI-klassifisering | Restkvoten én gang, uke 41 |
+
+**Rekkefølgen er bestemt av kvoten, ikke av prioritet.** Nyhetstesten koster 10
+kall og signaltesten 15; dagsgrensen er 20, så de kan ikke kjøres samme dag.
+Nyhetstesten går først fordi et negativt svar velter relevanseksperimentet, og
+det må oppdages tidlig. Signaltesten kan vente et døgn uten at noe annet
+stopper. Kvoten nullstilles midnatt GMT.
