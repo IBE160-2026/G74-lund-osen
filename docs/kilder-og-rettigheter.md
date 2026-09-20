@@ -7,7 +7,7 @@ være etterprøvbare, ikke bare dokumentert som «vi fant data».
 **Premiss for v1:** applikasjonen kjøres lokalt i undervisningssammenheng og
 publiseres ikke. Vurderingen gjelder derfor ikke-kommersiell, pedagogisk bruk.
 
-Sist oppdatert: 2026-09-19
+Sist oppdatert: 2026-09-20
 
 ---
 
@@ -23,7 +23,7 @@ Sist oppdatert: 2026-09-19
 | E24 RSS | — (forkastet) | 2026-09-19 | Forbyr eksplisitt LLM-input. Se under. |
 | NRK RSS | — (vurdert) | Ikke kontrollert | Feeder virker, men generelle nyheter uten finansfokus. |
 | Euronext | Finanskalender | Ikke kontrollert | Eneste gratis vei til kalender etter at EODHD falt bort. |
-| Alpha Vantage | Gull og sølv | Ikke kontrollert | Brukt i tidlige tester. |
+| Alpha Vantage | — (forkastet som hovedkilde) | Ikke kontrollert | Testet mot Oslo Børs, men symbolene var ikke pålitelige nok. Brukt i tidlige tester på gull og sølv. |
 
 ---
 
