@@ -4,9 +4,8 @@
 resonnementet: hvorfor grensene går der de går, hvilke alternativer som ble
 forkastet, og hva som ville gått galt med det opplagte valget.
 
-Skillet er det samme som mellom Product Brief og `prd-notater.md`, og mellom
-PRD-en og `malinger.md`. Et kravregister og et begrunnelsesdokument er to
-forskjellige lesninger, og de leses best hver for seg.
+Skillet er det samme som mellom PRD-en og `malinger.md`. Et kravregister og et
+begrunnelsesdokument er to forskjellige lesninger, og de leses best hver for seg.
 
 Målinger med metode og rådata: `malinger.md`.
 
@@ -270,8 +269,9 @@ manuell testing.
 
 ### Hvorfor OSEBX er holdt utenfor v1
 
-`prd-notater.md` nevner indeksen fordi den ble hentet i tidlige tester, men ingen
-av kravene i PRD-en bruker den. Å hente den ville kostet et sekstende kall og
+OSEBX ble hentet i de tidlige datakildetestene — se `docs/reflection-log.md` —
+og ble med videre i planleggingsnotatene av den grunn. Ingen av kravene i PRD-en
+bruker den. Å hente den ville kostet et sekstende kall og
 redusert marginen til fire, og en ubrukt datakilde er bare én ting til som kan
 feile.
 

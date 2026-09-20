@@ -3,8 +3,8 @@
 Alle tall PRD-en bygger på, med metode og dato, slik at de kan etterprøves eller
 kjøres på nytt. PRD-en beholder konklusjonene; detaljene ligger her.
 
-Samme grep som skillet mellom Product Brief og `prd-notater.md`: lesestrømmen
-skal ikke bære tallene, men tallene skal finnes.
+Grepet er at lesestrømmen ikke skal bære tallene, men at tallene skal finnes og
+kunne kontrolleres.
 
 Alle målinger er gjort 2026-09-20.
 
