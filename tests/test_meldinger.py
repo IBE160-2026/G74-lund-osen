@@ -6,15 +6,20 @@ koden vaar.
 """
 
 from meldinger import (
+    ENGELSK,
     FILTRERES_BORT,
     KI_AVGJOER,
+    NORSK,
     SLIPPER_GJENNOM,
+    UAVKLART,
     UKJENT,
     UTBYTTEMERKING,
     Melding,
     boette,
     dedupliser,
     filtrer,
+    gjett_spraak,
+    til_ki_vurdering,
 )
 
 
@@ -146,3 +151,72 @@ class TestFilterSortering:
         resultat = filtrer(dedupliser([norsk, engelsk]))
 
         assert [m.id for m in resultat[SLIPPER_GJENNOM]] == ["no-1"]
+
+
+class TestSpraakgjetning:
+    """FR-501 sier «behold den norske». Uten en spraakkode fra NewsWeb er
+    kravet uimplementerbart som skrevet, og heuristikken paa tittelen er det
+    som faktisk lar seg bygge. Om NewsWeb har et spraakfelt, kontrolleres
+    21.09 - det koster ingen kvote."""
+
+    def test_ae_oe_aa_avgjoer_alene(self):
+        assert gjett_spraak("Innkalling til ekstraordinær generalforsamling") == NORSK
+        assert gjett_spraak("Tildeling av kontrakt i Nordsjøen") == NORSK
+        assert gjett_spraak("Årsresultat 2026") == NORSK
+
+    def test_norske_ord_uten_saertegn_gjenkjennes(self):
+        assert gjett_spraak("Resultat for tredje kvartal") == NORSK
+        assert gjett_spraak("Utbytte vedtatt av styret") == NORSK
+
+    def test_engelske_titler_gjenkjennes(self):
+        assert gjett_spraak("Notice of annual general meeting") == ENGELSK
+        assert gjett_spraak("Results for the third quarter") == ENGELSK
+
+    def test_tittel_uten_holdepunkter_er_uavklart(self):
+        """Vi gjetter ikke naar vi ikke vet. Da gjelder foerstemann-regelen."""
+        assert gjett_spraak("Q3 2026") == UAVKLART
+        assert gjett_spraak("EQNR ASA") == UAVKLART
+
+
+class TestDedupliseringUtenSpraakkode:
+    """Samme regel som over, men gjennom dedupliseringen."""
+
+    def test_norsk_tittel_vinner_over_engelsk(self):
+        norsk = melding(id="no-1", tittel="Tildeling av kontrakt i Nordsjøen", spraak="")
+        engelsk = melding(id="en-1", tittel="Contract awarded in the North Sea", spraak="")
+
+        assert dedupliser([engelsk, norsk])[0].id == "no-1"
+
+    def test_spraakkoden_gaar_foran_tittelen(self):
+        """Finnes feltet, er det feltet som gjelder - ikke gjetningen."""
+        norsk = melding(id="no-1", tittel="Q3 2026", spraak="no")
+        engelsk = melding(id="en-1", tittel="Resultat for tredje kvartal", spraak="en")
+
+        assert dedupliser([engelsk, norsk])[0].id == "no-1"
+
+    def test_uavklart_beholder_foerstemann(self):
+        foerste = melding(id="a", tittel="Q3 2026", spraak="")
+        andre = melding(id="b", tittel="EQNR ASA", spraak="")
+
+        assert dedupliser([foerste, andre])[0].id == "a"
+
+
+class TestUkjentKategoriGaarIkkeTilKi:
+    """Prompten er skrevet for samlekategorien. En ukjent kategori ville blitt
+    gjettet paa av en modell som ikke er kalibrert for den."""
+
+    def test_ukjent_kategori_havner_ikke_i_ki_boetta(self):
+        sortert = filtrer([melding(kategori="Noe helt nytt fra boersen")])
+
+        assert til_ki_vurdering(sortert) == []
+        assert len(sortert[UKJENT]) == 1
+
+    def test_bare_samlekategorien_gaar_til_ki(self):
+        meldinger = [
+            melding(id="a", kategori="Ikke-informasjonspliktige pressemeldinger"),
+            melding(id="b", kategori="Innsideinformasjon"),
+            melding(id="c", kategori="Noe helt nytt fra boersen"),
+            melding(id="d", kategori="Renteregulering"),
+        ]
+
+        assert [m.id for m in til_ki_vurdering(filtrer(meldinger))] == ["a"]

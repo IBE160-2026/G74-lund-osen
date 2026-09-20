@@ -389,6 +389,23 @@ publiseringsminutt.
 beholdes den. Språkvalget er eksplisitt fordi grensesnittet er norsk, og fordi
 KI-forklaringen skal gis på norsk.
 
+**Hvordan språket avgjøres.** Kravet sa opprinnelig bare «behold den norske»,
+og det er ikke implementerbart uten å vite hvilket språk en melding er på.
+NewsWeb-målingene dokumenterer feltene `issuerSign`, `issuerName`, `category`,
+`publishedTime` og `title` — ingen språkindikator. Regelen er derfor:
+
+1. **Språkkoden fra NewsWeb**, hvis feltet finnes. `[ANTAKELSE]` At det finnes,
+   er ikke verifisert. Kontrollen koster ingen kvote og står på lista til
+   2026-09-21.
+2. **Ellers heuristikk på tittelen.** Æ, ø eller å avgjør alene — de finnes
+   ikke i engelske titler. Ellers telles kjente norske ord mot kjente engelske.
+3. **Er det uavklart, beholdes den første.** Vi gjetter ikke når vi ikke vet.
+   Et vilkårlig valg forkledd som en regel er verre enn en åpen
+   førstemann-regel.
+
+Heuristikken er et kompromiss, ikke et ideal. Finnes språkkoden, erstatter den
+punkt 2 som hovedregel, og heuristikken blir liggende som reserve.
+
 **Rekkefølge:** dedupliseringen kjøres **før** kategorifilteret, ikke etter.
 
 #### FR-502 — Kategorifilter i tre bøtter
@@ -413,6 +430,17 @@ meldingene.
 | Eks.dato | 3 | Vises ikke som melding — se FR-503 |
 
 Begrunnelsen for hver bøtte står i `begrunnelser.md`.
+
+**Kategorier som ikke står i tabellen** går i en egen bøtte. De vises for
+brukeren merket **«ukjent kategori»** og føres i loggen, men de sendes **ikke**
+til KI-laget: prompten er skrevet for samlekategorien og ville gitt en
+vurdering den ikke er kalibrert for. Et svar som ser like sikkert ut som de
+andre, men som kommer fra en modell utenfor sitt område, er verre enn ingen
+vurdering.
+
+Bøtta er en mellomstasjon, ikke en endestasjon. Etter en ukes drift vet vi
+hvilke kategorier som faktisk dukket opp, og plasserer dem bevisst — se åpent
+punkt 15.
 
 #### FR-503 — Eks.dato som datakilde for utbyttemerking
 
@@ -747,6 +775,7 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 | 12 | **Bekrefte horisont og hendelsestyper** i FR-302, som i dag er antatt | | Før implementasjon |
 | 13 | **Datoer for demonstrasjon og prosjektinnlevering** | | Snarest |
 | 14 | **Hver story leveres med test.** Føres inn som krav i arkitekturfasen. Testene skal kunne kjøres uten API-kall, slik signalberegningen og meldingsfilteret gjør det | | Ved oppstart av arkitekturfasen |
+| 15 | **Plassér kategoriene som havnet i «ukjent»** i riktig bøtte. Krever en ukes drift for å vite hvilke som faktisk dukker opp | | Etter én ukes drift |
 
 **Punkt 1 er det eneste som kan velte datagrunnlaget**, og det vil i så fall
 velte to ting samtidig: meldingsdelen hvis NewsWeb-vilkårene ikke holder, og

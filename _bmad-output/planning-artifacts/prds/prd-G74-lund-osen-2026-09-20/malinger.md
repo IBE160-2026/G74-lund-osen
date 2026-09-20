@@ -268,6 +268,7 @@ vinduet er for kort til å avgjøre spørsmålet.
 | Måling | Formål | Kostnad |
 |---|---|---|
 | Nyhetstest mot én `.OL`-ticker | Avgjøre om `/api/news` svarer på gratisnivå i det hele tatt | 10 kall, mandag 2026-09-21 |
+| Har NewsWeb et språkfelt? | Avgjør om FR-501 kan bruke språkkode eller må bygge på heuristikk | 0 kall, mandag 2026-09-21 |
 | Signaltest mot ~200 handelsdager | Låse terskel, volumfaktor og nøytralsonebredde | 15 kall, tirsdag 2026-09-22 |
 | Vilkårskontroll NewsWeb + Euronext | Avgjøre om datagrunnlaget holder | 0 kall, frist 2026-09-27 |
 | Relevanseksperiment, 50 medieartikler | Symbolmatching mot KI-klassifisering | Restkvoten én gang, uke 41 |

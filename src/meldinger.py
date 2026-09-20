@@ -33,7 +33,57 @@ BOETTER: dict[str, str] = {
     "EKS.DATO": UTBYTTEMERKING,
 }
 
+NORSK = "no"
+ENGELSK = "en"
+UAVKLART = ""
+
 NORSKE_SPRAAKKODER = {"no", "nb", "nn", "nor", "norsk"}
+ENGELSKE_SPRAAKKODER = {"en", "eng", "engelsk", "en-gb", "en-us"}
+
+# Heuristikken under brukes bare naar meldingen ikke baerer en spraakkode.
+NORSKE_BOKSTAVER = set("æøåÆØÅ")
+
+NORSKE_ORD = {
+    "aksjer",
+    "aksjonaerer",
+    "egne",
+    "emisjon",
+    "finansiell",
+    "generalforsamling",
+    "handel",
+    "innkalling",
+    "kvartal",
+    "kvartalsrapport",
+    "melding",
+    "meldeplikt",
+    "og",
+    "resultat",
+    "selskapet",
+    "styret",
+    "tildeling",
+    "utbytte",
+    "vedtak",
+}
+
+ENGELSKE_ORD = {
+    "and",
+    "announces",
+    "awarded",
+    "board",
+    "contract",
+    "dividend",
+    "general",
+    "meeting",
+    "notice",
+    "of",
+    "quarter",
+    "quarterly",
+    "report",
+    "results",
+    "shares",
+    "the",
+    "trading",
+}
 
 
 @dataclass(frozen=True)
@@ -58,7 +108,7 @@ def _normaliser(kategori: str) -> str:
 
 
 def _minutt(tidspunkt: str) -> str:
-    """Kutter sekunder og finere oppløsning bort.
+    """Kutter sekunder og finere opploesning bort.
 
     Dublettkjennetegnet er samme publiseringsminutt (FR-501). To oversettelser
     av samme melding legges ut samtidig, men ikke noedvendigvis i samme
@@ -67,8 +117,52 @@ def _minutt(tidspunkt: str) -> str:
     return tidspunkt[:16]
 
 
+def _ord(tittel: str) -> set[str]:
+    renset = "".join(tegn.lower() if tegn.isalpha() else " " for tegn in tittel)
+    return set(renset.split())
+
+
+def gjett_spraak(tittel: str) -> str:
+    """Gjetter spraak ut fra tittelen. Returnerer NORSK, ENGELSK eller UAVKLART.
+
+    Brukes bare naar meldingen ikke baerer en spraakkode fra NewsWeb.
+
+    AE, OE og AA avgjoer alene - de finnes ikke i engelske titler. Ellers
+    telles kjente ord mot hverandre. Staar det likt, eller finnes ingen
+    holdepunkter, er svaret UAVKLART, og da gjetter vi ikke.
+    """
+    if any(bokstav in NORSKE_BOKSTAVER for bokstav in tittel):
+        return NORSK
+
+    ord = _ord(tittel)
+    norske = len(ord & NORSKE_ORD)
+    engelske = len(ord & ENGELSKE_ORD)
+
+    if norske > engelske:
+        return NORSK
+    if engelske > norske:
+        return ENGELSK
+    return UAVKLART
+
+
+def spraak(melding: Melding) -> str:
+    """Spraakkoden fra NewsWeb naar den finnes, ellers gjetning paa tittelen.
+
+    [ANTAKELSE] At NewsWeb i det hele tatt leverer en spraakkode, er ikke
+    verifisert mot et ekte svar. Feltene vi har dokumentert, er issuerSign,
+    issuerName, category, publishedTime og title. Kontrollen koster ingen
+    kvote og staar paa lista til 21.09.
+    """
+    kode = melding.spraak.strip().lower()
+    if kode in NORSKE_SPRAAKKODER:
+        return NORSK
+    if kode in ENGELSKE_SPRAAKKODER:
+        return ENGELSK
+    return gjett_spraak(melding.tittel)
+
+
 def er_norsk(melding: Melding) -> bool:
-    return melding.spraak.strip().lower() in NORSKE_SPRAAKKODER
+    return spraak(melding) == NORSK
 
 
 def dedupliser(meldinger: list[Melding]) -> list[Melding]:
@@ -79,10 +173,9 @@ def dedupliser(meldinger: list[Melding]) -> list[Melding]:
     Den norske beholdes naar begge finnes, fordi grensesnittet og
     KI-forklaringene er paa norsk. Finnes bare en av dem, beholdes den.
 
-    [ANTAKELSE] Spraaket leses av feltet `spraak`. Hvilket felt NewsWeb
-    faktisk bruker, er ikke verifisert mot et ekte svar. Det koster ingen
-    kvote aa kontrollere. Uten spraakinformasjon beholdes den foerste, slik at
-    ingen melding forsvinner stille.
+    Kan ingen av dem avgjoeres som norske, beholdes den foerste. Da har vi
+    ikke grunnlag for aa velge, og et vilkaarlig valg forkledd som en regel
+    er verre enn en aapen foerstemann-regel.
     """
     beholdt: dict[tuple[str, str, str], Melding] = {}
     rekkefolge: list[tuple[str, str, str]] = []
@@ -105,10 +198,11 @@ def dedupliser(meldinger: list[Melding]) -> list[Melding]:
 def boette(melding: Melding) -> str:
     """Hvilken av boettene i FR-502 kategorien hoerer til.
 
-    Ukjente kategorier gaar til UKJENT, ikke til bortfiltrering. En kategori
-    vi ikke har sett foer, kan vaere en ny meldingstype paa boersen, og den
-    skal oppdages - ikke forsvinne. Hvor den skal ende, er ikke avgjort i
-    PRD-en.
+    Ukjente kategorier gaar til UKJENT. De vises for brukeren merket «ukjent
+    kategori» og loggfoeres, men de sendes ikke til KI-laget: prompten er
+    skrevet for samlekategorien og ville gjettet paa noe den ikke er
+    kalibrert for. Etter en ukes drift plasseres kategoriene som faktisk
+    dukket opp - aapent punkt 15.
     """
     return BOETTER.get(_normaliser(melding.kategori), UKJENT)
 
@@ -130,3 +224,13 @@ def filtrer(meldinger: list[Melding]) -> dict[str, list[Melding]]:
     for melding in meldinger:
         resultat[boette(melding)].append(melding)
     return resultat
+
+
+def til_ki_vurdering(sortert: dict[str, list[Melding]]) -> list[Melding]:
+    """Meldingene KI-laget skal relevansvurdere: bare samlekategorien.
+
+    Egen funksjon fordi regelen er lett aa bryte ved et uhell. Ukjente
+    kategorier ser ut som en naturlig kandidat - de er jo nettopp det vi ikke
+    vet hva er - men de skal ikke dit.
+    """
+    return list(sortert[KI_AVGJOER])
