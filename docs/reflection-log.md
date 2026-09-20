@@ -425,3 +425,73 @@ virker.
 emnet lærer bort den metoden; å hoppe over et ledd kan koste ved sensur. Poenget er å ikke
 skrive PRD-en blindt. Når skiva er bygget, vet vi hvordan dataene faktisk ser ut når
 kravene skal beskrives. Det tar en kveld, og PRD-en blir bedre av det.
+
+---
+
+## 20.09.2026 – Eksport av Product Brief, og et problem som aldri fantes
+
+**KI-verktøy:** Claude Code (Opus 5), i samspill med en annen KI-assistent i en parallell økt
+**Tema:** Eksport av Product Brief til Word og PDF, mappestruktur i README, og to feil som
+oppsto i arbeidsflyten mellom to KI-assistenter
+
+### Dato / deltaker(e)
+
+20.09.2026 – Marian, i arbeidsøkt med Claude Code.
+
+### Fase
+
+Ferdigstilling av Product Brief før BMAD-leveransen 27.09.
+
+### Hva gjorde vi?
+
+Briefen skulle eksporteres for innsending. Claude Code laget først en PDF på fire sider fra
+markdown-filen, med eget oppsett. Den andre økten hadde laget en Word-fil på to sider med
+samme tekst. Forskjellen var ren typografi — skrifttype, marger, linjeavstand — men den
+betydde noe, fordi BMAD-malens sluttsjekk har «1–2 pages» som eget punkt.
+
+Underveis ble det oppdaget at Word-filen lå én commit bak repoet: den sa fortsatt «ingen
+teknisk moat», formuleringen som var byttet ut i commit `aeb667b`. Word-filen ble rettet mot
+repoversjonen, og PDF-en bygget fra Word-filen, slik at sideantallet fulgte med.
+
+I README ble det lagt inn et avsnitt om mappestruktur, som forklarer hvorfor `docs/` og
+`_bmad-output/` er skilt: prosessen i den ene, produktdokumentene i den andre.
+
+### To feil, begge i arbeidsflyten — ikke i filene
+
+**Den første var et problem som aldri fantes.** Etter README-endringen viste Claude Code
+resultatet med `tail -14`, altså bare de siste linjene. Utskriften begynte midt i filen, på
+`## Medlemmer`. Den andre økten leste den avkortede utskriften som om den var hele filen,
+konkluderte med at overskriften sto to ganger og at en setning var klippet inn i
+mappestrukturen, og ba om opprydding. Filen var hel hele tiden. Samme økt meldte også at to
+innliminger i Success Criteria hadde feilet; begge lå inne, i commit `59895e6`.
+
+Tre ting ble bedt sjekket. Ingen av dem var feil i filene.
+
+**Den andre feilen var reell, og gikk motsatt vei.** Word-filen skrev «prosjektinnlevering»
+tre steder der repoet skrev «innlevering». Claude Code behandlet repoet som fasit og rettet
+Word-filen etter det. Men presiseringen var bevisst: briefen har frist 27.09, mens de
+kriteriene peker på prosjektets sluttinnlevering. Rettingen fjernet altså en presisering som
+var satt med hensikt. Retningen ble snudd: repoet er oppdatert til «prosjektinnlevering», og
+Word og PDF er bygget på nytt fra den versjonen.
+
+### Refleksjon
+
+Erfaringen er konkret nok til å ta med videre: to KI-assistenter som leser hverandres
+utskrifter i stedet for filene, kan produsere et problem som ikke finnes — og bruke tid på å
+fikse det. En `tail`-utskrift ser ut som en fil. Den er det ikke.
+
+Den andre feilen har samme form, men på innholdssiden. «Repoet er kilden» er en god regel,
+og den gjelder fortsatt. Men den sier ingenting om hvilken vei et avvik skal rettes. Der
+Word-filen var nyere på ett punkt og repoet nyere på et annet, måtte begge avvik vurderes
+hver for seg, og det krevde kunnskap ingen av assistentene hadde: at de to fristene er
+forskjellige. Den kunnskapen fantes bare hos oss.
+
+Begge feilene ble funnet fordi noe ble etterprøvd mot filene. Det er rutinen som er verdt å
+ta med: be om hele filen, ikke referatet av den — og spør før et avvik rettes, når det ikke
+er åpenbart hvilken side som har rett.
+
+### Git / dokumentasjon
+
+Product Brief oppdatert til «prosjektinnlevering» tre steder i Success Criteria. README
+utvidet med mappestruktur og begrunnelsen for skillet mellom `docs/` og `_bmad-output/`.
+Eksportene ligger utenfor repoet, i nedlastingsmappen.
