@@ -278,14 +278,17 @@ feile.
 ### Hvorfor «for dyrt» ikke gjelder relevanseksperimentet
 
 `docs/kilder-og-rettigheter.md` fører EODHDs nyhets-API som «forkastet — for
-dyrt». Den vurderingen gjaldt *daglig drift*, der 5–10 kall per ticker hver dag
-er uholdbart mot en kvote på 20. For én engangsinnsamling er regnestykket et
-annet.
+dyrt». Den vurderingen gjaldt *daglig drift*, der 10 kall per ticker hver dag er
+uholdbart mot en kvote på 20. For én engangsinnsamling er regnestykket et annet.
 
-Anslag fra gruppen: omtrent 50 artikler fra åtte selskaper koster rundt 80 kall,
-dekket av bonuskvoten for nye kontoer. Innsamlingen gjøres i uke 39 eller 40,
-mens bonuskvoten finnes. Tallene er gruppens egne og er ikke kontrollert mot
-faktisk kontosaldo.
+Kostnaden er dokumentert 2026-09-20: 5 kall per forespørsel pluss 5 kall per
+ticker, altså 10 for én ticker.
+
+Åtte selskaper à 10 kall er 80 kall, som er anslaget gruppen kom fram til —
+riktig tall, men av en annen grunn enn den gruppen la til grunn. Innsamlingen
+gjøres i uke 39 eller 40, mens bonuskvoten finnes. At bonuskvoten dekker 80 kall
+er ikke kontrollert mot faktisk kontosaldo, og det er heller ikke verifisert at
+gratisnivået gir tilgang til nyhets-API-et for `.OL`-tickere i det hele tatt.
 
 **Innsamlingen skjer først etter at EODHDs bruksvilkår er kontrollert.**
 Spørsmålet er om vilkårene tillater at innholdet brukes som input til en

@@ -671,7 +671,7 @@ publiseres og hva som blir liggende lokalt: `docs/kilder-og-rettigheter.md`.
 | EODHD `/api/eod` | Sluttkurser | 1 kall per symbol, 15 i døgnet |
 | Oslo Børs NewsWeb | Børsmeldinger | Nei |
 | Euronext finanskalender | Kommende hendelser | Nei |
-| EODHD `/api/news` | Relevanseksperimentet, én engangsinnsamling | Ett ticker per kall, ~80 kall fra bonuskvoten. Ikke daglig drift — se åpent punkt 5 |
+| EODHD `/api/news` | Relevanseksperimentet, én engangsinnsamling | 10 kall per ticker (5 per forespørsel + 5 per ticker), ~80 kall for åtte selskaper. Ikke daglig drift — se åpent punkt 5 |
 
 To forbehold hører til PRD-en fordi de kan velte krav: **NewsWeb-vilkårene er
 ikke kontrollert**, og API-et er udokumentert backend for Oslo Børs' egen
@@ -737,7 +737,7 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 
 | # | Punkt | Eier | Frist |
 |---|---|---|---|
-| 5 | **Samle inn testsettet til relevanseksperimentet** — ~50 artikler fra åtte selskaper, ~80 kall fra bonuskvoten. Kan ikke startes før punkt 1 er besvart | | Uke 39 eller 40 |
+| 5 | **Samle inn testsettet til relevanseksperimentet** — ~50 artikler fra åtte selskaper, ~80 kall fra bonuskvoten. Kan ikke startes før punkt 1 er besvart. Det er heller ikke verifisert at `/api/news` svarer for `.OL`-tickere på gratisnivå; én testforespørsel avgjør | | Uke 39 eller 40 |
 | 6 | **Usikkerhetskriteriene er skrevet for medieartikler.** Kjennetegn 1 bærer svakt når utstederen selv er avsender | | Før KI-laget implementeres |
 | 7 | **Låsing av signalparametre** mot ~200 handelsdager. Koster 15 kall | | Før signalet låses |
 | 8 | **Oppstart av tilbakekjøpsprogram** er ekte nyhet, men filtreres bort sammen med de ukentlige statusrapportene | | Før innlevering |

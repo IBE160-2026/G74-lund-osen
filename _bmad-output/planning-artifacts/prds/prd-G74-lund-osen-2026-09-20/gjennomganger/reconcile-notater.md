@@ -36,11 +36,11 @@ notatene sier at nyheter bare hentes for selskaper med utslag, PRD-en sier det
 motsatte. Fila er slettet 2026-09-20 etter denne kontrollen. Innholdet finnes i
 git-historikken og i dokumentene tabellen peker på.
 
-Én rest står igjen under 1.3, arvet fra motsetning 2.4: `docs/kilder-og-rettigheter.md`
-fører «ett ticker per kall, 5–10 kall per forespørsel», mens `begrunnelser.md` §7
-leser det som 5–10 kall per ticker. Raden i §6 fører bare det de to er enige om —
-ett ticker per kall — og anslaget på ~80 kall. Tallet må avklares når EODHDs
-vilkår kontrolleres, jf. åpent punkt 1.
+Resten under 1.3 er lukket 2026-09-20. Spriket mellom «ett ticker per kall» og
+«5–10 kall per forespørsel» var vår egen lesefeil i begge retninger:
+dokumentasjonen sier 5 kall per forespørsel pluss 5 kall per ticker, altså 10
+for én ticker. Rettet i `prd.md` §6 og `begrunnelser.md` §7, med sitat og dato i
+`docs/kilder-og-rettigheter.md`.
 
 ---
 
