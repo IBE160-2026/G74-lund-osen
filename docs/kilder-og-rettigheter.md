@@ -314,6 +314,26 @@ datasettet**.
 `data/` ligger i `.gitignore`, sammen med `.env`. Rådata og API-nøkler er derfor
 ikke eksponert.
 
+**Kontrollert 20.09.2026.** Hele repoet ble gjennomgått for kildedata som ligger
+slik de kom fra leverandøren:
+
+- Ingen fil under `data/` har noen gang vært sporet — ikke i HEAD, og ikke i noen
+  commit i historikken. Kontrollert på objektnivå, ikke bare mot filnavn.
+- Ingen sporet fil inneholder rålinjer fra EODHD eller NewsWeb: ingen
+  `issuerSign`, `publishedTime` eller `adjusted_close`, og ingen JSON-blokker i
+  dokumentene.
+- Det som ligger offentlig av målinger, er utledede tall med metode og dato —
+  medianomsetning per symbol i `malinger.md` §1, kategorifordelinger i §4,
+  kalltall i §2.
+
+Det betyr at en historikkomskriving ikke er nødvendig. Det finnes ingenting å
+fjerne, og ingen commit å skrive om.
+
+Mønsteret som gjorde dette mulig, er verdt å notere: `data/` ble gitignorert før
+den første målingen ble kjørt. Rådata har aldri vært innom en commit, og da
+trengs ingen opprydding. `.gitignore` er utvidet med mønstre for rådatafiler som
+måtte havne utenfor `data/`.
+
 **Begrunnelsen:** sammendragsstatistikk er ikke databasen. At medianomsetningen
 for et symbol var 34,7 MNOK over en gitt periode, er et resultat vi har regnet
 ut — det gjenskaper ikke kursserien det er regnet på, og det setter ingen i

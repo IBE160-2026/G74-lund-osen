@@ -62,3 +62,12 @@ Thumbs.db
 local-tests/
 # Lokale raadata fra API-kall
 data/
+
+# Raadatafiler som havner utenfor data/. Repoet er offentlig, og EODHDs
+# vilkaar om videreformidling er uavklarte, saa kildedata skal ikke kunne
+# spores ved et uhell. Merk at git add -f overstyrer dette.
+*-raa-*.json
+*-raw-*.json
+raadata-*.json
+newsweb-*.json
+
