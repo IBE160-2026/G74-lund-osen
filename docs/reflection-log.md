@@ -715,3 +715,75 @@ den målte støyen for vårt eget univers, rad om robusthet på stille dager lag
 i Success Criteria, og Scope-setningen om publisering omformulert til å skille
 mellom publisering av kode og videreformidling av børsdata. Arbeidsnotatet
 `korreksjon-til-brief.md` er slettet etter at alle tre var utført.
+
+
+## 20.09.2026 – En test som var grønn av feil grunn
+
+### Dato / deltaker(e)
+
+20.09.2026. Joakim Lund og Marian Osen, under arbeidet med signalberegningen.
+
+### Fase
+
+Implementasjon. Første modul som ble bygget med tester ved siden av koden.
+
+### Hva gjorde vi?
+
+Signalberegningen (FR-701 til FR-705) ble skrevet sammen med tester på
+håndlagde kursserier — serier der vi vet svaret på forhånd, fordi en feil i
+signalet ikke gir en krasj, men et tall som ser plausibelt ut.
+
+Testen for det enkleste tilfellet skulle gi signalstyrke 1: kursen over MA50,
+dagens endring innenfor det normale, volum på medianen. Serien var laget slik:
+tolv dager som steg nøyaktig 2 % hver dag, og en trettende dag som steg 0,2 %.
+
+Den ga styrke 2. Bevegelsessjekken slo ut på 0,2 %.
+
+### Hvorfor
+
+Bevegelsessjekken måler dagens endring mot standardavviket til de foregående
+dagene. En serie som stiger nøyaktig like mye hver dag har **standardavvik
+null**. Da er enhver bevegelse større enn null, og sjekken slår ut på
+ingenting.
+
+Feilen lå ikke i koden. Koden gjorde nøyaktig det FR-701 beskriver. Feilen lå i
+testdataene: de var så regelmessige at de ikke lignet på noe en børs kan
+produsere, og de traff en degenerert grensetilstand i stedet for tilfellet
+testen het at den testet.
+
+### Hva vi gjorde med det
+
+Vi rettet **dataene, ikke forventningen**. Serien stiger nå ujevnt — 1,5 %,
+2,5 %, 1,8 %, 2,2 % — og standardavviket ble 0,4 %. Testen er grønn av riktig
+grunn, og forklaringsteksten sjekken gir ut, `+0.2 % mot 0.4 % standardavvik`,
+kan leses og kontrolleres.
+
+At vi rettet dataene og ikke forventningen, er poenget. Forventningen kom fra
+kravet. Hadde vi justert den til 2, ville testen vært grønn og kravet stille
+endret — samme mekanisme som de seks kravene som forsvant i språkvask, bare på
+et annet sted i kjeden.
+
+### Refleksjon
+
+**Syntetiske testdata kan være så rene at de tester noe annet enn du tror.**
+Et datasett laget for å være enkelt å regne på for hånd, er også et datasett
+uten variasjonen den ekte verdenen har, og statistiske sjekker oppfører seg
+annerledes i grensetilfellene. Null varians, null volum, to identiske verdier
+— alle er lovlige inndata som får terskler til å forsvinne.
+
+Dette er et argument for håndlagde testdata *med* variasjon, ikke for hentede
+testdata. Hentede data ville skjult feilen på en annen måte: de ville vært
+grønne fordi tallene tilfeldigvis passet den dagen vi hentet dem.
+
+Vi legger til en vane, ikke bare en rettelse: **når en test er grønn, sjekk
+hva den faktisk regnet ut, ikke bare at den ble grønn.** Sjekkene i
+signalberegningen bærer derfor en forklaringstekst med tallene de sammenlignet
+— den er skrevet for grensesnittet (FR-706), men den gjør også testene
+etterprøvbare.
+
+### Git / dokumentasjon
+
+`src/signalberegning.py` og `src/meldinger.py` med 41 tester i `tests/`, som er
+sporet i git til forskjell fra `local-tests/`. Kjøres med `uv run pytest`, og
+bruker ingen API-kall. Kravet om at hver story leveres med test er ført inn som
+punkt 14 i PRD §8, slik at det følger med inn i arkitekturfasen.
