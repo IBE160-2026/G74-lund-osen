@@ -787,3 +787,86 @@ etterprøvbare.
 sporet i git til forskjell fra `local-tests/`. Kjøres med `uv run pytest`, og
 bruker ingen API-kall. Kravet om at hver story leveres med test er ført inn som
 punkt 14 i PRD §8, slik at det følger med inn i arkitekturfasen.
+
+
+## 20.09.2026 – To påstander om repoet, fra en økt uten tilgang til det
+
+**KI-verktøy:** Claude Code (Opus 5) med repotilgang, i samspill med en
+rådgivningsøkt uten
+**Tema:** Hvordan indirekte referanser blir til påstander om tilstand
+
+### Dato / deltaker(e)
+
+20.09.2026. Marian, i arbeidsøkt med Claude Code.
+
+### Fase
+
+Ferdigstilling og opprydding, samme kveld som signalberegningen ble bygget.
+
+### Hva gjorde vi?
+
+To oppgaver kom inn fra rådgivningsøkta, begge formulert som tiltak som skulle
+settes i gang:
+
+1. **Rådata skulle ryddes ut av det offentlige repoet.**
+   `data/volumsjekk-raa-2026-09-20.json` skulle fjernes fra sporing, og det ble
+   reist spørsmål om historikken måtte skrives om mens Joakim ennå ikke hadde
+   klonet.
+2. **En patch skulle ha truffet feil overskrift** i
+   `docs/kilder-og-rettigheter.md`, slik at EODHD-tekst lå under E24-overskriften
+   og en linje sto to ganger.
+
+### Ingen av dem stemte
+
+`data/` ble gitignorert før den første målingen ble kjørt. Ingen fil under
+`data/` har noen gang vært sporet — kontrollert på objektnivå ved å liste alle
+blobs i historikken, ikke bare mot filnavn. Det fantes ingenting å fjerne og
+ingen historikk å skrive om.
+
+Overskriftene var riktige. Hver overskrift i dokumentet ble listet sammen med
+teksten under seg, og ingen identiske nabolinjer finnes i fila. Adressen
+`support@eodhistoricaldata.com` står tre steder med ulik tekst rundt, og to av
+dem ligger fire linjer fra hverandre med en mellomoverskrift imellom.
+
+### Hva grunnlaget faktisk var
+
+Begge påstandene bygde på en **indirekte referanse**, ikke på filene:
+
+| Påstand | Grunnlag | Hva det faktisk var |
+|---|---|---|
+| Rådata ligger eksponert | En linje i memloggen om at rådatafila «beholdes som tidsstemplet øyeblikksbilde» | En beslutning om å ikke slette fila lokalt — den sa ingenting om sporing |
+| En patch traff feil overskrift | Et avkortet diff-utdrag | Utdraget viste en overskrift og tekst som lå i hver sin del av diffen |
+
+Dette er samme mønster som i oppføringen «Eksport av Product Brief, og et
+problem som aldri fantes» tidligere samme dag: en `tail -14`-utskrift ble lest
+som hele filen, og tre ting ble bedt rettet som ikke var feil.
+
+### Refleksjon
+
+**En økt uten tilgang til repoet kan ikke uttale seg om repoets tilstand — bare
+om det den har blitt fortalt.** Det er ikke en svakhet ved rådgivningen; en
+memlog-linje om at en fil «beholdes» er en rimelig ting å bli bekymret av. Feilen
+oppstår i overgangen, når en rimelig bekymring formuleres som et konstatert
+faktum og pakkes som et tiltak.
+
+Kostnaden er ikke bare bortkastet tid. Begge tiltakene var **inngripende**: det
+ene ville fjernet filer fra sporing, det andre ville endret tekst under en
+overskrift som var riktig. Historikkomskrivingen som ble vurdert, ville gitt nye
+SHA-er for hele repoet og tvunget fram en ny kloning — for å fjerne noe som
+aldri lå der.
+
+Tiltaket er billig: **påstander om repotilstand verifiseres i økta som har
+tilgang, før et tiltak settes i gang.** Det tok to kommandoer å avkrefte begge.
+
+Det motsatte gjelder også, og er verdt å holde fast ved: rådgivningsøkta har
+tatt riktige avgjørelser denne dagen som arbeidsøkta ikke ville tatt alene —
+plan B for relevanseksperimentet, og at e-posten til EODHD skulle inneholde ett
+spørsmål og ikke fire. Det er arbeidsdelingen som virker, med verifisering lagt
+der tilgangen er.
+
+### Git / dokumentasjon
+
+Kontrollen av repoet er ført i `docs/kilder-og-rettigheter.md` under regelen om
+hva som publiseres, og `.gitignore` er utvidet med mønstre for rådatafiler som
+måtte havne utenfor `data/`. Materiale til refleksjonsrapportens avsnitt om å
+arbeide med to KI-økter i parallell.
