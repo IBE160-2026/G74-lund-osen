@@ -41,7 +41,7 @@ Universet er satt til omtrent 15 aksjer fordi EODHD på gratisnivå gir 20 API-k
 
 ## What Makes This Different
 
-Vi har ingen teknisk moat, og skal ikke påstå at vi har det. Datakildene er åpne eller kommersielt tilgjengelige for alle.
+Vi har ingen teknisk fordel andre ikke kan kopiere, og skal ikke påstå at vi har det. Datakildene er åpne eller kommersielt tilgjengelige for alle.
 
 | Alternativ i dag | Hvorfor det tolereres | Hvorfor vår løsning er bedre |
 |---|---|---|
