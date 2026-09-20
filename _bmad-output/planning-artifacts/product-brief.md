@@ -17,7 +17,7 @@ Den som følger 10–30 norske aksjer ved siden av jobb eller studier har ikke e
 
 Støyen er målbar, og den har to former. I vår egen test 17.09 leste vi manuelt de ti siste nyhetstreffene for et utvalg selskaper. For et stort finansselskap handlet flertallet i realiteten om andre selskaper; det var bare ett av mange symboler i artikkelen. For et shippingselskap var bildet motsatt. En løsning kan altså ikke anta at en nyhet knyttet til et symbol handler om det selskapet.
 
-Den andre formen finnes i selskapenes egne børsmeldinger. Et tilfeldig døgn ga 102 meldinger fra 73 utstedere, men 31 av dem var rene rentejusteringer — formelt pliktige, uten betydning for en sparer. Mengden er ikke problemet. Sorteringen er.
+Den andre formen finnes i selskapenes egne børsmeldinger. Vi målte fire uker for de selskapene løsningen faktisk skal dekke: 121 meldinger, drøyt fire i døgnet. Mengden er ikke problemet. Sorteringen er — og støyen har to hovedformer. Nær 29 % er ukentlige statusrapporter om tilbakekjøp av egne aksjer, med samme ordlyd hver gang. Drøyt 26 % er samme melding publisert to ganger, på norsk og på engelsk. Til sammen er over halvparten av meldingene noe brukeren ikke trenger å lese.
 
 I tillegg kommer forklaringsproblemet. Gratis markedsoversikter viser at en aksje er opp 4 %, men ikke hvorfor. Å koble kursbevegelse, meldingsbilde og kommende hendelser er jobben som tar tid en tirsdag morgen.
 
@@ -67,6 +67,7 @@ Vi er selv i målgruppen og bruker løsningen gjennom prosjektperioden. Vi har i
 | KI-bidrag i drift | Hvilke meldinger KI-laget forklarte eller omklassifiserte som regelfilteret alene ikke skilte | Dokumentert eksempelsett fra minst én ukes drift | Før demonstrasjon (est. uke 45) |
 | Relevanseksperiment | Testsett på 50 medieartikler merket manuelt, kjørt mot både symbolmatching og KI-klassifisering | Eksperimentet gjennomført og tallene dokumentert — ikke at KI kommer best ut | Est. uke 41 |
 | Fortsatt bruk | Om vi bruker løsningen frivillig etter at utviklingen er ferdig, ikke bare for å teste den | Brukt minst tre dager i uka de to siste ukene før prosjektinnlevering, loggført | Ved prosjektinnlevering |
+| Robusthet på stille dager | Manglende data, feilende kilder og dager uten tydelige signaler håndteres uten at hovedflyten stopper eller systemet tvinger frem et resultat | Ingen stopp, og «ingen tydelige signaler» er et gyldig svar løsningen faktisk gir | Løpende |
 
 Relevanseksperimentet er et avgrenset delprosjekt, ikke en del av driften. Viser målingen liten forskjell, er det også et funn: eksperimentet skal avgjøre påstanden, ikke bekrefte den. Vi setter ikke mål for hvor godt signalene treffer markedet. Ukenumrene er planestimater som fastsettes endelig i PRD og sprintplan.
 
@@ -76,7 +77,9 @@ Relevanseksperimentet er et avgrenset delprosjekt, ikke en del av driften. Viser
 
 **Utenfor v1:** brukerkontoer, innlogging og personlig portefølje; varsler, betaling, mobiltilpasning og meglerintegrasjon; flere børser og flere språk; fundamental- og verdimodell, intradag og sanntidsdata; statistisk studie av om signalene slår markedet.
 
-Første versjon kjører lokalt og publiseres ikke. Vurderingen av videreformidlingsrett er derfor utsatt til en eventuell kommersiell versjon.
+Første versjon kjører lokalt som applikasjon. Kode og dokumentasjon er derimot offentlig tilgjengelig i emnets GitHub-organisasjon, mens børsdataene selv blir liggende lokalt — vi publiserer aggregert statistikk utledet av kildene, ikke datasettene.
+
+Tre vurderinger er utsatt til løsningen eventuelt publiseres som tjeneste: videreformidlingsrett, personvern, og regelverket som gjelder når en tjeneste presenterer finansielle signaler. Utløseren er publisering, ikke kommersialisering.
 
 ## Vision
 
