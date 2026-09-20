@@ -789,7 +789,7 @@ bruker ingen API-kall. Kravet om at hver story leveres med test er ført inn som
 punkt 14 i PRD §8, slik at det følger med inn i arkitekturfasen.
 
 
-## 20.09.2026 – To påstander om repoet, fra en økt uten tilgang til det
+## 20.09.2026 – Tre ganger på ett døgn: påstander om repoet fra en økt uten tilgang
 
 **KI-verktøy:** Claude Code (Opus 5) med repotilgang, i samspill med en
 rådgivningsøkt uten
@@ -837,9 +837,36 @@ Begge påstandene bygde på en **indirekte referanse**, ikke på filene:
 | Rådata ligger eksponert | En linje i memloggen om at rådatafila «beholdes som tidsstemplet øyeblikksbilde» | En beslutning om å ikke slette fila lokalt — den sa ingenting om sporing |
 | En patch traff feil overskrift | Et avkortet diff-utdrag | Utdraget viste en overskrift og tekst som lå i hver sin del av diffen |
 
-Dette er samme mønster som i oppføringen «Eksport av Product Brief, og et
-problem som aldri fantes» tidligere samme dag: en `tail -14`-utskrift ble lest
-som hele filen, og tre ting ble bedt rettet som ikke var feil.
+### Dette er tredje gang, ikke andre
+
+| # | Når | Påstanden | Hva kontrollen viste |
+|---|---|---|---|
+| 1 | Natt til 20.09.2026 | Brief-utkastene «finnes i repoet med historikk» | Seks av sju filer lå ikke der. Kontrollert med md5 |
+| 2 | 20.09.2026, formiddag | Overskriften står to ganger, og en setning er klippet inn i mappestrukturen i README | Filen var hel. En `tail -14`-utskrift var lest som hele filen |
+| 3 | 20.09.2026, kveld | Rådata ligger eksponert, og en patch traff feil overskrift | Verken rådata eller feilplassert tekst fantes |
+
+**Datering av tilfelle 1.** Utkastene ble lagt inn i repoet i commit `50d72d1`,
+2026-09-20 kl. 00:31. Før den lå det bare `README.md` og
+`prompt-log-template.md` i `docs/ai-prompts/`, uendret siden 15.09. Påstanden om
+at utkastene fantes «med historikk» kan derfor ikke ha vært sann før `50d72d1`,
+og md5-kontrollen hører hjemme i natten mellom 19. og 20. september. Selve
+kontrollen er ikke loggført; kilden er at feilen ble erkjent i rådgivningsøkta.
+
+### Den andre delen av funnet: erkjennelsen som ikke ble skrevet ned
+
+Tilfelle 1 ble erkjent i samtalen, men bare muntlig. Det ble aldri ført i
+loggen, og derfor førte det ikke til noe tiltak.
+
+Mønsteret var altså **synlig allerede første gang**. Hadde erkjennelsen blitt
+skrevet ned den natten, ville tilfelle 2 og 3 vært gjenkjennelige med én gang —
+og tiltaket, som koster to kommandoer, ville vært på plass før den første av dem.
+
+Det er verdt å si rett ut, fordi det generaliserer: **en feil som bare innrømmes
+i samtalen, forsvinner.** Den etterlater ingen spor noen kan lese, ingen teller
+som viser at det er tredje gang, og ingen regel som hindrer fjerde. Det er samme
+mekanisme som de seks kravene som falt ut i språkvask, og som antakelsen om et
+privat repo som aldri ble skrevet ned — ingen av dem finnes i en fil noen kan
+kontrollere.
 
 ### Refleksjon
 
@@ -868,5 +895,9 @@ der tilgangen er.
 
 Kontrollen av repoet er ført i `docs/kilder-og-rettigheter.md` under regelen om
 hva som publiseres, og `.gitignore` er utvidet med mønstre for rådatafiler som
-måtte havne utenfor `data/`. Materiale til refleksjonsrapportens avsnitt om å
-arbeide med to KI-økter i parallell.
+måtte havne utenfor `data/`. Tilfelle 2 er ført i oppføringen «Eksport av
+Product Brief, og et problem som aldri fantes» tidligere samme dag. Tilfelle 1
+har ingen egen oppføring og er ført her, i ettertid.
+
+Materiale til refleksjonsrapportens avsnitt om å arbeide med to KI-økter i
+parallell.
