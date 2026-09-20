@@ -54,7 +54,9 @@ enkeltdager med ekstrem omsetning ellers løfter et symbol som til vanlig
 omsettes tynt.
 
 **Rådata.** `data/volumsjekk-raa-2026-09-20.json` — tidsstemplet øyeblikksbilde,
-skrives aldri om (jf. FR-406).
+skrives aldri om (jf. FR-406). Fila finnes **bare lokalt** og er ikke sporet i
+git; skillet mellom utledede tall som publiseres og datasett som blir liggende,
+står i `docs/kilder-og-rettigheter.md`.
 
 | # | Symbol | Selskap | Sektor | Median volum | Median omsetning | Andel av median |
 |---|---|---|---|---:|---:|---:|
