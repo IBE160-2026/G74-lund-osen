@@ -13,8 +13,8 @@ relevanseksperimentet.
 sitat, på samme måte som E24-klausulen. Svaret er belegg og skal siteres, ikke
 refereres.
 
-**Fyll inn før sending:** navn og institusjon i signaturen. Ikke legg ved
-API-nøkkelen.
+**Fyll inn før sending:** avsenderadressen, i e-postklienten. Den trenger ikke
+ligge i repoet. Ikke legg ved API-nøkkelen.
 
 ---
 
@@ -22,10 +22,10 @@ Subject: Terms of use questions — non-commercial student project, free plan
 
 Hello,
 
-We are a student group at a Norwegian university, building a small application
-as coursework (course code IBE160). The application is run locally, is not
-published or sold, and will be demonstrated once to our teacher and fellow
-students. We use the free plan.
+We are a student group at Molde University College (Høgskolen i Molde), Norway,
+building a small application as coursework for the course IBE160. The
+application is run locally, is not published or sold, and will be demonstrated
+once to our teacher and fellow students. We use the free plan.
 
 We have read the Terms and Conditions at
 https://eodhd.com/financial-apis/terms-conditions in full, and four questions
@@ -69,5 +69,6 @@ in our project documentation.
 Thank you for your help.
 
 Best regards,
-‹navn›
-‹institusjon›, course IBE160
+Joakim Lund and Marian Osen
+Group G74, course IBE160
+Molde University College, Norway
