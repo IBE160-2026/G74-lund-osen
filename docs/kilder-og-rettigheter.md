@@ -26,9 +26,11 @@ Sist oppdatert: 2026-09-20
 | EODHD `/api/calendar` | — (utilgjengelig) | 2026-09-19 | HTTP 403: «Only EOD data allowed for free users». |
 | Oslo Børs NewsWeb | Selskapsmeldinger | **Ikke kontrollert** | Åpent JSON-API, ferdig tagget med utsteder. Vilkår må sjekkes. |
 | E24 RSS | — (forkastet) | 2026-09-19 | Forbyr eksplisitt LLM-input. Se under. |
-| NRK RSS | — (vurdert) | Ikke kontrollert | Feeder virker, men generelle nyheter uten finansfokus. |
+| NRK RSS | — (forkastet) | 2026-09-20 | Avviser automatisert henting med HTTP 403. Generelle nyheter uten finansfokus. |
 | Euronext | Finanskalender | Ikke kontrollert | Eneste gratis vei til kalender etter at EODHD falt bort. |
 | Alpha Vantage | — (forkastet som hovedkilde) | Ikke kontrollert | Testet mot Oslo Børs, men symbolene var ikke pålitelige nok. Brukt i tidlige tester på gull og sølv. |
+
+Mediekilder vurdert til relevanseksperimentet står i egen seksjon lenger nede, ikke i tabellen over.
 
 ---
 
@@ -169,11 +171,103 @@ avgjør det, og koster 10 kall.
 Åpent punkt 1 kan ikke lukkes på grunnlag av lesningen alene.
 
 Det som må til for å gjøre svaret til ja eller nei, er et skriftlig svar fra
-`support@eodhistoricaldata.com`. Det koster ingen API-kall og bør sendes nå, med
-tre spørsmål: om nyhetsinnhold kan brukes som input til en språkmodell i et
-ikke-kommersielt studentprosjekt, om «displaying» rammer en demonstrasjon i
-undervisning, og om aggregert statistikk utledet av dataene kan ligge i et
-offentlig kodelager.
+`support@eodhistoricaldata.com`.
+
+### Spørsmålet er sendt
+
+**E-post sendt 20.09.2026** til `support@eodhistoricaldata.com`, med **ett**
+spørsmål: om artikkeltekst fra `/api/news` kan sendes til en tredjeparts
+språkmodell for klassifisering, i et ikke-kommersielt studentprosjekt der
+resultatet ikke publiseres eller videreformidles.
+
+**Svar avventes. Frist satt til fredag 2026-09-25.**
+
+De tre øvrige spørsmålene i utkastet ble ikke sendt: om «displaying» rammer en
+demonstrasjon i undervisning, om aggregert statistikk i et offentlig repo er
+Informasjonen «in repackaged form», og om gratisnivået gir tilgang til
+`/api/news` for `.OL`-tickere. De to første står fortsatt ubesvart og gjelder
+demonstrasjonen og publiseringsskillet. Det tredje avgjøres av nyhetstesten i
+stedet, som koster 10 kall.
+
+---
+
+## Mediekilder vurdert for relevanseksperimentet
+
+**Sjekket 20.09.2026.** Relevanseksperimentet skulle måle symbolmatching mot
+KI-klassifisering på omtrent 50 medieartikler. Det forutsetter en mediekilde vi
+har lov til å sende inn i en språkmodell. Seks kilder er vurdert.
+
+| Kilde | Status | Hvorfor |
+|---|---|---|
+| E24 | **Avvist** | Åpen RSS med børsstoff, men feeden forbyr eksplisitt bruk som input til språkmodeller |
+| Finansavisen / Hegnar | **Avvist** | Ingen lisensvilkår oppgitt, og stoffet ligger i hovedsak bak betalingsmur |
+| NRK | **Avvist** | Avviser automatisert henting med HTTP 403 |
+| NTB Kommunikasjon | **Avvist** | Ingen vilkår eller API dokumentert, og det er pressemeldinger — ikke medieartikler |
+| finans.no | **Avvist** | Åpen RSS uten synlige restriksjoner, men dekker privatøkonomi, ikke børsnoterte selskaper |
+| Feedly | **Avvist** | API-vilkårene forbyr masseimport og -eksport uten eksplisitt tillatelse |
+
+### E24
+
+Åpen RSS på `https://e24.no/feed/rss/`, med børsstoff. Feeden inneholder i sitt
+eget `<description>`-felt en klausul som forbyr bruk av innholdet — overskrifter,
+sammendrag, lenker, fulltekst og metadata — som input til store språkmodeller og
+generative KI-systemer. Klausulen er sitert ordrett i seksjonen «E24: forbud mot
+KI-bruk» over.
+
+Lisenshenvendelser går til `nyhetssjefer@e24.no`. Kilden er altså ikke stengt for
+alltid, men den er stengt for oss uten en avtale vi ikke har tid til å inngå før
+uke 41.
+
+### Finansavisen / Hegnar
+
+`hegnar.no` omdirigerer til `finansavisen.no`. `robots.txt` har ingen
+KI-spesifikke regler og oppgir `crawl-delay` på 10 sekunder. Ingen lisensvilkår
+er oppgitt noe sted.
+
+**Fraværet av et forbud er ikke en tillatelse.** `robots.txt` regulerer
+høflighet i henting, ikke hva innholdet kan brukes til etterpå, og den er ikke
+en lisens. Dette er samme resonnement som ble brukt på EODHD i seksjonen over:
+taushet er ikke tillatelse. Stoffet ligger dessuten i hovedsak bak betalingsmur,
+så spørsmålet om lovlig henting kommer før spørsmålet om lovlig bruk.
+
+### NRK
+
+Avviser automatisert henting med HTTP 403. Spørsmålet om vilkår ble derfor aldri
+aktuelt — kilden svarer ikke.
+
+### NTB Kommunikasjon
+
+Publiserer pressemeldinger åpent, men ingen vilkår og intet API er dokumentert
+på nettstedet.
+
+Viktigere er sjangeren: dette er **pressemeldinger, ikke medieartikler**. Det er
+samme sjanger som NewsWeb allerede gir oss gratis og med avklart
+utstederkobling. Kilden ville ikke gitt eksperimentet det det mangler.
+
+### finans.no
+
+Åpen RSS uten synlige restriksjoner — den eneste av de seks som ikke stoppes av
+vilkår. Men den dekker privatøkonomi: lån, sparing og forbruk, ikke
+børsnoterte selskaper. Feil type kilde til dette formålet.
+
+### Feedly
+
+API-vilkårene forbyr masseimport eller -eksport av innhold uten eksplisitt
+tillatelse, og en innsamling av 50 artikler er nøyaktig det.
+
+Feedly ville dessuten lagt **en andre usikker lisens oppå utgiverens**. En
+aggregator gir ikke rettigheter utgiveren ikke har gitt, så vi ville sittet med
+to vilkårssett å svare for i stedet for ett.
+
+### Konklusjon
+
+**Det ble ikke funnet noen norsk mediekilde med åpen feed og vilkår som tillater
+å sende innholdet inn i en språkmodell.**
+
+De seks kildene faller på fire forskjellige grunner — eksplisitt forbud,
+manglende vilkår, teknisk avvisning og feil sjanger — og det er verdt å merke
+seg at bare én av dem, E24, faktisk har tatt stilling til spørsmålet. De andre
+har ikke sagt nei; de har ikke sagt noe.
 
 ---
 
@@ -245,10 +339,12 @@ mellomtiden, ikke at vilkårene tillater det.
 - [ ] Kontrollere Alpha Vantage sine vilkår for ikke-kommersiell bruk
 - [x] ~~Lese EODHDs fullstendige ToS, ikke bare prissiden~~ — gjort 2026-09-20,
       se seksjonen «EODHD: hva de fullstendige vilkårene sier». Svaret er uklart
-- [ ] **Spørre `support@eodhistoricaldata.com` skriftlig** om språkmodellbruk,
-      om «displaying» rammer en demonstrasjon i undervisning, og om aggregert
-      statistikk kan ligge i et offentlig repo. Eneste vei fra «uklart» til ja
-      eller nei. Koster ingen kall. Frist 2026-09-27
+- [x] ~~Spørre `support@eodhistoricaldata.com` skriftlig om språkmodellbruk~~ —
+      **sendt 20.09.2026**, svar avventes, frist 2026-09-25
+- [ ] **De to gjenstående spørsmålene til EODHD ble ikke sendt:** om «displaying»
+      rammer en demonstrasjon i undervisning, og om aggregert statistikk i et
+      offentlig repo er Informasjonen «in repackaged form». Begge gjelder ting vi
+      gjør allerede. Koster ingen kall. Frist 2026-09-27
 - [ ] Verifisere om `/api/news` svarer for `.OL`-tickere på gratisnivå.
       Én testforespørsel, 10 kall
 - [ ] Vurdere vilkårene på nytt dersom applikasjonen skal publiseres
