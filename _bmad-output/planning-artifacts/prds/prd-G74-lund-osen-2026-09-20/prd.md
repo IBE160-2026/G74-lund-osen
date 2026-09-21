@@ -756,7 +756,7 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 
 | # | Punkt | Eier | Frist | Blokkerer |
 |---|---|---|---|---|
-| 1 | **Vilkårskontroll i tre deler:** NewsWeb, Euronext finanskalender, og om EODHDs vilkår tillater nyhetsinnhold som input til en språkmodell. Fristen kan ikke skyves: holder ikke vilkårene, må hele meldingsdelen omdisponeres, og det må oppdages mens det er tid | *‹fylles inn›* | **2026-09-27** | Meldingsdelen og relevanseksperimentet |
+| 1 | **Vilkårskontroll — to av tre deler lukket 2026-09-21.** *Lukket:* EODHD har svart skriftlig ja til språkmodellbruk, med fire betingelser, og kontrollen av NewsWeb og Euronext er gjennomført. *Åpent:* kontrollen ga et **uttrykkelig forbud** mot automatisert henting uten tillatelse på forhånd. Forespørsel sendt 21.09, svar avventes. Holder ikke unntaket, må meldingsdelen omdisponeres | Marian Osen | **2026-09-28** | Meldingsdelen |
 | 2 | **KI-terskelen i samlekategorien** — hvor grensen mellom «kan påvirke» og «lite relevant» skal gå. Kan ikke avgjøres på papir; relevanseksperimentet er input. Foreløpig regel står i FR-606 | *‹fylles inn›* | Etter uke 41 | Kalibrering av FR-606 |
 | 3 | **Hvilken kilde gir handelskalenderen?** FR-402 hviler på «forventet børsdag», men ingen kilde er utpekt for hvilke dager Oslo Børs er åpen | *‹fylles inn›* | Før implementasjon | FR-402 |
 | 4 | **Hvordan utledes eks.dato?** FR-407 og FR-503 forutsetter at utbyttedager kan identifiseres, men regelen er ikke skrevet | *‹fylles inn›* | Før demonstrasjonen | FR-407, FR-503 |
@@ -765,7 +765,7 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 
 | # | Punkt | Eier | Frist |
 |---|---|---|---|
-| 5 | **Samle inn testsettet til relevanseksperimentet** — ~50 artikler fra åtte selskaper, ~80 kall fra bonuskvoten. Kan ikke startes før punkt 1 er besvart. Det er heller ikke verifisert at `/api/news` svarer for `.OL`-tickere på gratisnivå; én testforespørsel avgjør | | Uke 39 eller 40 |
+| 5 | **Samle inn testsettet til relevanseksperimentet** — ~50 artikler fra åtte selskaper, fra bonuskvoten (`extraLimit` 485). **Begge sperrene er borte 21.09:** `/api/news` svarer for `.OL` (målt), og språkmodellbruken er skriftlig klarert. Kalltallet er under retting — 5 kall per ticker er målt, så anslaget ~80 er trolig ~40, se `malinger.md` §7.2 | | Uke 39 eller 40 |
 | 6 | **Usikkerhetskriteriene er skrevet for medieartikler.** Kjennetegn 1 bærer svakt når utstederen selv er avsender | | Før KI-laget implementeres |
 | 7 | **Låsing av signalparametre** mot ~200 handelsdager. Koster 15 kall | | Før signalet låses |
 | 8 | **Oppstart av tilbakekjøpsprogram** er ekte nyhet, men filtreres bort sammen med de ukentlige statusrapportene | | Før innlevering |
@@ -777,8 +777,15 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 | 14 | **Hver story leveres med test.** Føres inn som krav i arkitekturfasen. Testene skal kunne kjøres uten API-kall, slik signalberegningen og meldingsfilteret gjør det | | Ved oppstart av arkitekturfasen |
 | 15 | **Plassér kategoriene som havnet i «ukjent»** i riktig bøtte. Krever en ukes drift for å vite hvilke som faktisk dukker opp | | Etter én ukes drift |
 
-**Punkt 1 er det eneste som kan velte datagrunnlaget**, og det vil i så fall
-velte to ting samtidig: meldingsdelen hvis NewsWeb-vilkårene ikke holder, og
-relevanseksperimentet hvis EODHDs vilkår forbyr språkmodellbruk.
+**Punkt 1 er fortsatt det eneste som kan velte datagrunnlaget**, men det velter
+nå bare én ting, ikke to.
 
-Ingen av punktene har eier ennå.
+*Oppdatert 2026-09-21.* EODHD-halvdelen er lukket: språkmodellbruken er
+skriftlig godkjent, og `/api/news` er målt til å svare for `.OL`-tickere.
+Relevanseksperimentet kjøres derfor på plan A og deler ikke lenger kilde med
+meldingsdelen. Det som står igjen, er Euronext: vilkårene som dekker NewsWeb
+forbyr uttrykkelig automatisert henting uten tillatelse på forhånd, og
+forespørselen om tillatelse ble sendt 21.09 med frist 28.09. Fullstendig
+gjennomgang med sitater i `docs/kilder-og-rettigheter.md`.
+
+Punkt 1 har fått eier. De øvrige har det ennå ikke.

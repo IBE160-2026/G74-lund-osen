@@ -22,7 +22,7 @@ Sist oppdatert: 2026-09-21
 |---|---|---|---|
 | EODHD `/api/eod` | Sluttkurser | **2026-09-20, fullstendig** | Gratisnivå dekker EOD for alle tickere, men bare ett år tilbake. 1 kall per symbol. |
 | EODHD `/api/real-time` | — (forkastet) | 2026-09-19 | Virker, men prissiden sier gratisnivået ikke har det. Ikke bygg på. |
-| EODHD `/api/news` | Relevanseksperimentet, én gang | **2026-09-20, fullstendig** | **Svarer for `.OL` på gratisnivå — testet 2026-09-21.** Forkastet for daglig drift: 5 kall per ticker, altså 75 for de 15 mot en dagsgrense på 20. Språkmodellbruk er **uklart** — se egen seksjon. |
+| EODHD `/api/news` | Relevanseksperimentet, én gang | **2026-09-21, med skriftlig svar** | **Svarer for `.OL` på gratisnivå** (testet 21.09). **Språkmodellbruk er klarert med betingelser** — skriftlig godkjenning 21.09, se egen seksjon. Betingelsene er ikke oppfylt før modelltjenestens treningsvilkår er dokumentert. Forkastet for daglig drift: 5 kall per ticker, altså 75 for de 15 mot en dagsgrense på 20. |
 | EODHD `/api/calendar` | — (utilgjengelig) | 2026-09-19 | HTTP 403: «Only EOD data allowed for free users». |
 | Oslo Børs NewsWeb | Selskapsmeldinger | **2026-09-21, fullstendig** | Åpent JSON-API, ferdig tagget med utsteder. **Euronexts vilkår dekker `newsweb.oslobors.no` ved navn og forbyr automatisert henting uten skriftlig tillatelse.** Se egen seksjon. |
 | E24 RSS | — (forkastet) | 2026-09-19 | Forbyr eksplisitt LLM-input. Se under. |
@@ -178,13 +178,16 @@ og ti artikler. Gratisnivået gir `/api/news` for norske tickere, og 403-svaret
 på `/api/calendar` kan ikke generaliseres til de andre endepunktene. Måling og
 rådatareferanse: `malinger.md` §7.2.
 
-### Konklusjon
+### Konklusjon på lesningen: uklart — men spørsmålet er nå besvart
 
-**Uklart.** Vilkårene forbyr ikke språkmodellbruk, og de tillater den ikke.
-Åpent punkt 1 kan ikke lukkes på grunnlag av lesningen alene.
+**Lesningen alene ga uklart.** Vilkårene forbyr ikke språkmodellbruk, og de
+tillater den ikke. Det som måtte til for å gjøre svaret til ja eller nei, var et
+skriftlig svar fra `support@eodhistoricaldata.com`.
 
-Det som må til for å gjøre svaret til ja eller nei, er et skriftlig svar fra
-`support@eodhistoricaldata.com`.
+**Det svaret foreligger nå.** Se «EODHDs skriftlige svar: ja, med betingelser»
+under. Avsnittene over står uendret, fordi de dokumenterer hva selve vilkårene
+sier — og det er fortsatt ingenting. Godkjenningen er en tillatelse gitt oss,
+ikke en endring i vilkårsteksten.
 
 ### Spørsmålet er sendt
 
@@ -193,7 +196,8 @@ spørsmål: om artikkeltekst fra `/api/news` kan sendes til en tredjeparts
 språkmodell for klassifisering, i et ikke-kommersielt studentprosjekt der
 resultatet ikke publiseres eller videreformidles.
 
-**Svar avventes. Frist satt til fredag 2026-09-25.**
+**Besvart 2026-09-21**, fire dager før fristen 25.09. Svaret er ja, med
+betingelser — se seksjonen under.
 
 De tre øvrige spørsmålene i utkastet ble ikke sendt: om «displaying» rammer en
 demonstrasjon i undervisning, om aggregert statistikk i et offentlig repo er
@@ -201,6 +205,97 @@ Informasjonen «in repackaged form», og om gratisnivået gir tilgang til
 `/api/news` for `.OL`-tickere. De to første står fortsatt ubesvart og gjelder
 demonstrasjonen og publiseringsskillet. Det tredje er avgjort av nyhetstesten
 2026-09-21: gratisnivået dekker `/api/news` for `.OL`.
+
+---
+
+## EODHDs skriftlige svar: ja, med betingelser
+
+**Mottatt 2026-09-21** fra Alejandro C., EOD Support Team,
+`support@eodhistoricaldata.com`. Svar på e-posten sendt 20.09.
+
+### Svaret, ordrett
+
+> Hello Marian,
+>
+> Yes, we approve the limited use you described: sending headlines and article
+> text obtained through our News API to a third-party language model solely to
+> classify company relevance for your private, non-commercial course project.
+>
+> This approval is subject to the conditions you outlined: the output stays
+> local, the project is not publicly deployed, and the data is not published,
+> redistributed, resold, or used to train any model. Please ensure that your
+> chosen LLM service does not use the submitted content for training either.
+>
+> Bien Cordialement,
+>
+> Alejandro C.
+>
+> EOD Support Team
+
+### Spørsmålet som ble stilt, ordrett
+
+Fra `docs/epost-til-eodhd.md`, sendt 20.09. E-posten inneholdt **bare dette ene
+spørsmålet** — de tre øvrige i utkastet ble holdt tilbake med vilje, fordi
+support erfaringsmessig svarer på det letteste når flere stilles samtidig:
+
+> **Language models.** May article content retrieved from the news API
+> (`/api/news`) be used as input to a large language model, in order to
+> classify how relevant an article is to a given company and to generate a
+> short explanation in Norwegian? The output would be shown only inside our
+> locally run application. We ask because another provider we evaluated
+> prohibits this explicitly in their feed terms, and your Terms and Conditions
+> do not mention language models in either direction.
+
+### Hvem svaret kommer fra
+
+**Avsenderen er EOD Support Team, ikke en juridisk avdeling.** Det er verdt å
+føre, fordi det avgjør hvor mye vekt svaret tåler:
+
+- Det er **skriftlig**, fra leverandørens egen supportadresse, og det gjengir
+  bruken vår presist nok til at det ikke kan misforstås hva som er godkjent.
+  Det er belegg, og det er mer enn vi hadde.
+- Det er **ikke** en endring i vilkårene, og ikke et juridisk bindende
+  dokument. Vilkårsteksten sier fortsatt ingenting om språkmodeller.
+
+Vi behandler det som en tillatelse gitt til dette prosjektet, i dette omfanget,
+i dette semesteret. Ikke som en generell regel, og ikke som noe som overlever en
+endring i hva vi gjør.
+
+### De fire betingelsene
+
+Svaret er ikke ubetinget. Ordrett er godkjenningen «subject to the conditions
+you outlined», og deretter legges én ny til:
+
+| # | Betingelse | Status hos oss |
+|---|---|---|
+| 1 | «the output stays local» | Oppfylt. Resultatet vises bare i applikasjonen, som kjører lokalt |
+| 2 | «the project is not publicly deployed» | Oppfylt. Applikasjonen publiseres ikke |
+| 3 | «the data is not published, redistributed, resold, or used to train any model» | Oppfylt for artiklene selv — `data/` er gitignorert. Merk at dette er **artiklene**, ikke de utledede tallene; publiseringsskillet lenger ned gjelder fortsatt |
+| 4 | «Please ensure that your chosen LLM service does not use the submitted content for training either» | **Ikke oppfylt.** Se under |
+
+**Betingelse 4 er en plikt EODHD har lagt på oss, ikke en de har oppfylt.**
+Godkjenningen er ikke innfridd før vi har slått opp modelltjenestens faktiske
+vilkår og sitert setningen som sier at innhold sendt gjennom API-et ikke brukes
+til trening — med lenke og dato, på samme måte som alt annet i dette dokumentet.
+
+Det kan ikke gjøres ennå, fordi **ingen modelltjeneste er valgt**. Verken
+`prd.md`, `begrunnelser.md` eller noe annet dokument navngir en. FR-605 sier at
+promptversjon og modell skal lagres med hver vurdering, men ikke hvilken modell.
+Valget er dermed første steg, ikke oppslaget.
+
+Ført som oppfølgingspunkt med eier nederst i dokumentet.
+
+### Hva dette betyr for relevanseksperimentet
+
+Beslutningen fra 20.09 sa at eksperimentet kjøres på medieartikler bare hvis
+EODHD svarer skriftlig ja innen 25.09 **og** `/api/news` viser seg å dekke
+`.OL`. Begge forutsetningene er innfridd 21.09, fire dager før fristen.
+
+**Plan A gjelder.** Plan B — 50 børsmeldinger fra NewsWebs samlekategori —
+beholdes som dokumentert alternativ, men er ikke lenger nødvendig. Det er en
+vesentlig forbedring av risikobildet: eksperimentet deler ikke lenger kilde med
+meldingsdelen, og et negativt svar fra Euronext velter derfor ikke begge deler
+samtidig.
 
 ---
 
@@ -631,7 +726,8 @@ uimotsagt» over.
 - [x] ~~Lese EODHDs fullstendige ToS, ikke bare prissiden~~ — gjort 2026-09-20,
       se seksjonen «EODHD: hva de fullstendige vilkårene sier». Svaret er uklart
 - [x] ~~Spørre `support@eodhistoricaldata.com` skriftlig om språkmodellbruk~~ —
-      **sendt 20.09.2026**, svar avventes, frist 2026-09-25
+      sendt 20.09.2026, **besvart 21.09.2026: ja, med fire betingelser.** Se
+      «EODHDs skriftlige svar: ja, med betingelser»
 - [ ] **De to gjenstående spørsmålene til EODHD ble ikke sendt:** om «displaying»
       rammer en demonstrasjon i undervisning, og om aggregert statistikk i et
       offentlig repo er Informasjonen «in repackaged form». Begge gjelder ting vi
@@ -644,6 +740,12 @@ uimotsagt» over.
       selskaper, bygget på det doble tallet. Med 5 per ticker blir det ~40.
       Målingen dekker bare én ticker; 5 per ticker for flere er utledet av
       EODHDs eget eksempel, ikke målt. Koster ingen kall å rette
+- [ ] **Dokumentere at modelltjenesten ikke trener på innholdet.** Betingelse 4
+      i EODHDs godkjenning av 21.09, og godkjenningen er ikke oppfylt før den er
+      ført. To steg: (a) velge modelltjeneste — ingen er navngitt i noe dokument
+      i dag; (b) slå opp tjenestens faktiske vilkår, sitere setningen ordrett og
+      føre lenke og dato her. Koster ingen API-kall. **Eier: Joakim Lund.**
+      Frist: før første KI-kall kjøres
 - [ ] Vurdere vilkårene på nytt dersom applikasjonen skal publiseres
 - [ ] **Kontrollere at skillet over holder mot EODHDs og NewsWebs faktiske
       vilkår.** Posisjonen «sammendragsstatistikk er ikke databasen» er vår egen
