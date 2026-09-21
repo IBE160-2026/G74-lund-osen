@@ -461,3 +461,86 @@ et undervisningseksempel ville vært mest verdt.
 **Vi tar den kostnaden bevisst.** Det som ville vært uforsvarlig, er å ta den
 uten å vite om den — eller å oppdage i november at vi hadde valgt bort hjelpen
 uten å ha tenkt på at vi gjorde det.
+
+---
+
+## 11. Utbyttemerkingen kobler seg fra NewsWeb
+
+**Funnet 2026-09-21**, da markedsoversikten ble bygget og FR-407 møtte en skjerm.
+
+### Problemet kravet beskriver
+
+FR-101 viser `close`, mens endringen i prosent regnes på `adjusted_close`. På en
+utbyttedag spriker de to: kursen faller med utbyttet, men den justerte serien
+gjør det ikke. En bruker som regner etter, leser det som en feil. FR-407 krever
+derfor at dagen merkes.
+
+For å merke den, må den identifiseres. Og `/api/eod` har **intet utbyttefelt** —
+svaret har `date`, `open`, `high`, `low`, `close`, `adjusted_close` og `volume`,
+og ikke mer.
+
+### Veien vi trodde vi måtte gå
+
+FR-503 slo fast at `EKS.DATO`-meldinger fra NewsWeb skulle være datakilden. Den
+kategorien vises ikke som melding, men føres som grunnlag for utbyttemerkingen.
+
+**Det bandt FR-407 til NewsWeb**, og dermed til kilden som siden 2026-09-21
+ligger under et uttrykkelig forbud mot automatisert henting — åpent punkt 1.
+Svarer ikke Euronext, eller svarer de nei, faller ikke bare meldingsdelen bort:
+utbyttemerkingen faller med den, og markedsoversikten står igjen med to
+kolonner som motsier hverandre uten forklaring.
+
+### Veien som finnes
+
+Justeringen etterlater et spor i kursserien selv. Regner man dagens endring to
+ganger — én gang på `close` og én gang på `adjusted_close` — er de to like på en
+vanlig dag og ulike på dagen justeringen slo inn.
+
+**Målt over hele vinduet** (15 symboler, 249 handelsdager, 3 720 dagovergangner):
+
+| Terskel | Hendelser funnet |
+|---|---:|
+| over 0,01 pp | 39 |
+| over 0,05 pp | 38 |
+| over 0,1 pp | 38 |
+| over 0,2 pp | 38 |
+| over 0,5 pp | 38 |
+| over 1,0 pp | 32 |
+
+Tallet står stille på 38 gjennom en hel størrelsesorden. **Det er et rent
+skille**, og det betyr at terskelen kan begrunnes i stedet for å velges — i
+motsetning til signalparametrene, som måtte sveipes fordi de ikke hadde noen
+slik gruppering.
+
+38 hendelser på 15 selskaper over ti måneder er 2,5 per selskap per år, som er
+den kadensen norske utbytter faktisk har. Alle 15 hadde minst én.
+
+### Hva dette endrer
+
+**FR-407 er ikke lenger avhengig av FR-503, og dermed ikke av NewsWeb.**
+Utbyttemerkingen kan leses ut av EODHD-serien applikasjonen allerede henter, og
+koster null ekstra kall.
+
+Det kobler kravet fra åpent punkt 1. Et nei fra Euronext velter fortsatt
+meldingsdelen, men det velter ikke lenger markedsoversikten i tillegg.
+
+FR-503 mister dermed sin begrunnelse som *datakilde*. Den kan beholdes som
+kontroll — to uavhengige veier til samme dag er verdt noe — men den er ikke
+lenger det kravet henger på.
+
+### Forbeholdene, som hører med
+
+1. **Metoden ser justeringer, ikke utbytter.** En aksjesplitt gir samme utslag.
+   For FR-407 er det uten betydning: kravet er å forklare hvorfor de to
+   kolonnene spriker, og en splitt er en like gyldig forklaring som et utbytte.
+   Skal merkingen si *utbytte* med ord, må kilden si det.
+2. **Den er etterpåklok, ikke varslende.** Dagen kan identifiseres når den har
+   skjedd, ikke før. FR-407 trenger bare det. Kommende eks.datoer hører til
+   FR-301–FR-303 og finanskalenderen.
+3. **Den krever to dager på rad.** Første rad i en serie kan ikke vurderes.
+4. **Terskelen er målt på ett vindu.** 0,05 til 0,5 pp gir samme svar her. Et
+   selskap med et svært lite utbytte kan i prinsippet legge seg under, og det
+   ville ikke vært synlig i denne målingen.
+
+Regelen er ikke skrevet inn som krav ennå — den hører til åpent punkt 4, som nå
+har en målt vei i stedet for et åpent spørsmål.
