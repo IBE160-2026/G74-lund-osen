@@ -12,7 +12,7 @@ publiseres ikke. Vurderingen gjelder derfor ikke-kommersiell, pedagogisk bruk.
 ikke publisert, men arbeidet med den er. Skillet mellom hva som deles og hva som
 blir liggende lokalt er derfor et valg vi må ta bevisst — se neste avsnitt.
 
-Sist oppdatert: 2026-09-20
+Sist oppdatert: 2026-09-21
 
 ---
 
@@ -22,7 +22,7 @@ Sist oppdatert: 2026-09-20
 |---|---|---|---|
 | EODHD `/api/eod` | Sluttkurser | **2026-09-20, fullstendig** | Gratisnivå dekker EOD for alle tickere, men bare ett år tilbake. 1 kall per symbol. |
 | EODHD `/api/real-time` | — (forkastet) | 2026-09-19 | Virker, men prissiden sier gratisnivået ikke har det. Ikke bygg på. |
-| EODHD `/api/news` | Relevanseksperimentet, én gang | **2026-09-20, fullstendig** | Forkastet for daglig drift: 10 kall for én ticker (5 per forespørsel + 5 per ticker). Språkmodellbruk er **uklart** — se egen seksjon. |
+| EODHD `/api/news` | Relevanseksperimentet, én gang | **2026-09-20, fullstendig** | **Svarer for `.OL` på gratisnivå — testet 2026-09-21.** Forkastet for daglig drift: 5 kall per ticker, altså 75 for de 15 mot en dagsgrense på 20. Språkmodellbruk er **uklart** — se egen seksjon. |
 | EODHD `/api/calendar` | — (utilgjengelig) | 2026-09-19 | HTTP 403: «Only EOD data allowed for free users». |
 | Oslo Børs NewsWeb | Selskapsmeldinger | **Ikke kontrollert** | Åpent JSON-API, ferdig tagget med utsteder. Vilkår må sjekkes. |
 | E24 RSS | — (forkastet) | 2026-09-19 | Forbyr eksplisitt LLM-input. Se under. |
@@ -144,10 +144,19 @@ Hentet 2026-09-20 fra `/financial-apis/financial-news-api` og
 > Each request consumes 5 API calls and 5 API calls per ticker. E.g: 10 API
 > calls for one request with two tickers
 
-Nyhets-API-et koster altså **10 kall for én ticker** — 5 for forespørselen og 5
-for tickeren. Ikke ett kall per ticker, som notatene våre har sagt. For åtte
-selskaper blir det 80 kall, som er tallet gruppen anslo, men av en annen grunn
-enn den vi trodde.
+**Rettet 2026-09-21 etter måling.** Setningen ble 20.09 lest som «10 kall for
+én ticker — 5 for forespørselen og 5 for tickeren». Den lesningen stemmer ikke
+med eksempelet i setningen selv, som sier 10 kall for *to* tickere; med 5 pluss
+5 per ticker skulle to kostet 15.
+
+Målingen avgjorde det: én forespørsel med én ticker flyttet `apiRequests` fra 0
+til 5. **5 kall per ticker**, med forespørselen selv som gulv. Målemetode og
+tall står i `malinger.md` §7.2.
+
+For åtte selskaper blir det ~40 kall, ikke 80. Anslaget på 80 står fortsatt i
+`prd.md` og `begrunnelser.md` og er ikke rettet der — se punktet nederst.
+Konklusjonen om daglig drift endres ikke: 15 tickere er 75 kall mot en
+dagsgrense på 20.
 
 > Free plan — 20 API calls per day. Enough to try the endpoints out, not to run
 > an application.
@@ -160,10 +169,14 @@ Og om hva gratisnivået faktisk gir tilgang til:
 
 Alle datatyper er tilgjengelige **bare for seks demo-tickere** (AAPL.US, TSLA.US,
 VTI.US, AMZN.US, BTC-USD.CC, EURUSD.FOREX). Sammenholdt med HTTP 403-svaret vi
-selv målte på `/api/calendar` — «Only EOD data allowed for free users» — peker
-dette mot at nyhets-API-et ikke svarer for `.OL`-tickere på gratisnivå i det
-hele tatt. **Det er ikke verifisert.** Én testforespørsel mot en norsk ticker
-avgjør det, og koster 10 kall.
+selv målte på `/api/calendar` — «Only EOD data allowed for free users» — pekte
+dette mot at nyhets-API-et ikke svarte for `.OL`-tickere på gratisnivå i det
+hele tatt.
+
+**Testet 2026-09-21: det stemte ikke.** Én forespørsel på `DNB.OL` ga HTTP 200
+og ti artikler. Gratisnivået gir `/api/news` for norske tickere, og 403-svaret
+på `/api/calendar` kan ikke generaliseres til de andre endepunktene. Måling og
+rådatareferanse: `malinger.md` §7.2.
 
 ### Konklusjon
 
@@ -186,8 +199,8 @@ De tre øvrige spørsmålene i utkastet ble ikke sendt: om «displaying» rammer
 demonstrasjon i undervisning, om aggregert statistikk i et offentlig repo er
 Informasjonen «in repackaged form», og om gratisnivået gir tilgang til
 `/api/news` for `.OL`-tickere. De to første står fortsatt ubesvart og gjelder
-demonstrasjonen og publiseringsskillet. Det tredje avgjøres av nyhetstesten i
-stedet, som koster 10 kall.
+demonstrasjonen og publiseringsskillet. Det tredje er avgjort av nyhetstesten
+2026-09-21: gratisnivået dekker `/api/news` for `.OL`.
 
 ---
 
@@ -365,8 +378,14 @@ mellomtiden, ikke at vilkårene tillater det.
       rammer en demonstrasjon i undervisning, og om aggregert statistikk i et
       offentlig repo er Informasjonen «in repackaged form». Begge gjelder ting vi
       gjør allerede. Koster ingen kall. Frist 2026-09-27
-- [ ] Verifisere om `/api/news` svarer for `.OL`-tickere på gratisnivå.
-      Én testforespørsel, 10 kall
+- [x] ~~Verifisere om `/api/news` svarer for `.OL`-tickere på gratisnivå~~ —
+      **gjort 2026-09-21. Ja:** HTTP 200 og ti artikler for `DNB.OL`. Testen
+      kostet 5 kall, ikke 10. Se `malinger.md` §7.2
+- [ ] Rette kalltallet for nyhets-API-et der det er ført videre: `prd.md` og
+      `begrunnelser.md` anslår ~80 kall for relevanseksperimentets åtte
+      selskaper, bygget på det doble tallet. Med 5 per ticker blir det ~40.
+      Målingen dekker bare én ticker; 5 per ticker for flere er utledet av
+      EODHDs eget eksempel, ikke målt. Koster ingen kall å rette
 - [ ] Vurdere vilkårene på nytt dersom applikasjonen skal publiseres
 - [ ] **Kontrollere at skillet over holder mot EODHDs og NewsWebs faktiske
       vilkår.** Posisjonen «sammendragsstatistikk er ikke databasen» er vår egen

@@ -269,17 +269,21 @@ vinduet er for kort til å avgjøre spørsmålet.
 
 | Måling | Formål | Kostnad |
 |---|---|---|
-| Nyhetstest mot én `.OL`-ticker | Avgjøre om `/api/news` svarer på gratisnivå i det hele tatt | 10 kall, mandag 2026-09-21 |
+| ~~Nyhetstest mot én `.OL`-ticker~~ | ~~Avgjøre om `/api/news` svarer på gratisnivå i det hele tatt~~ | **Gjort 2026-09-21, se §7.2. Kostet 5 kall, ikke 10. Svaret er ja** |
 | Har NewsWeb et språkfelt? | Avgjør om FR-501 kan bruke språkkode eller må bygge på heuristikk | 0 kall, mandag 2026-09-21 |
 | Signaltest mot ~200 handelsdager | Låse terskel, volumfaktor og nøytralsonebredde | 15 kall, tirsdag 2026-09-22 |
 | Vilkårskontroll NewsWeb + Euronext | Avgjøre om datagrunnlaget holder | 0 kall, frist 2026-09-27 |
 | Relevanseksperiment, 50 medieartikler | Symbolmatching mot KI-klassifisering | Restkvoten én gang, uke 41 |
 
-**Rekkefølgen er bestemt av kvoten, ikke av prioritet.** Nyhetstesten koster 10
-kall og signaltesten 15; dagsgrensen er 20, så de kan ikke kjøres samme dag.
-Nyhetstesten går først fordi et negativt svar velter relevanseksperimentet, og
-det må oppdages tidlig. Signaltesten kan vente et døgn uten at noe annet
-stopper. Kvoten nullstilles midnatt GMT.
+**Rekkefølgen er bestemt av kvoten, ikke av prioritet.** Nyhetstesten var
+budsjettert til 10 kall og signaltesten til 15; dagsgrensen er 20, så de kunne
+ikke kjøres samme dag. Nyhetstesten gikk først fordi et negativt svar velter
+relevanseksperimentet, og det måtte oppdages tidlig. Signaltesten kunne vente
+et døgn uten at noe annet stoppet. Kvoten nullstilles midnatt GMT.
+
+*Rettet 2026-09-21: nyhetstesten kostet 5 kall, ikke 10 (§7.2). Rekkefølgen
+ville vært den samme, men premisset om at de to ikke får plass samme dag holdt
+ikke.*
 
 ---
 
@@ -322,3 +326,97 @@ nyhetstesten i 7.2 kunne kjøres.
 observert, ikke testet — vi vet ikke om det er den kvoten
 relevanseksperimentet er tenkt å bruke, og det er ikke kontrollert mot
 dokumentasjonen.
+
+### 7.2 Nyhetstesten mot en `.OL`-ticker
+
+**Dato:** 2026-09-21, kl. 17:38 lokal tid (15:38 UTC). **Kostnad: 5 kall** —
+se avsnittet om kalltallet under.
+
+**Formål.** Avgjøre om EODHDs `/api/news` svarer for norske tickere på
+gratisnivå i det hele tatt. Hypotesen fra 20.09 var at det ikke gjør det:
+`/api/calendar` svarte HTTP 403 med «Only EOD data allowed for free users», og
+prissiden sier at alle datatyper er tilgjengelige bare for seks demo-tickere.
+
+**Metode.** Én forespørsel, én ticker:
+
+```
+GET https://eodhd.com/api/news?s=DNB.OL&limit=10&api_token=…&fmt=json
+```
+
+DNB fordi det er selskapet medietesten 17.09 brukte (§0). Ingen kall etterpå
+utenom gratiskontroller mot `/api/user`.
+
+**Rådata.** `data/nyhetstest-raa-2026-09-21.json` — 33 738 byte, tidsstemplet
+øyeblikksbilde. Fila finnes bare lokalt og er ikke sporet i git, jf. skillet i
+`docs/kilder-og-rettigheter.md`.
+
+#### Utfall: endepunktet svarer
+
+**HTTP 200, ti artikler.** Hypotesen er avkreftet. Gratisnivået gir `/api/news`
+for `.OL`-tickere, og 403-svaret på `/api/calendar` kan ikke generaliseres til
+de andre endepunktene.
+
+| Forhold | Målt |
+|---|---|
+| HTTP-status | 200 |
+| Artikler returnert | 10 av `limit=10` |
+| Datospenn | 2026-06-07 til 2026-09-11 |
+| Felter per artikkel | `date`, `title`, `content`, `link`, `symbols`, `tags`, `sentiment` |
+| Artikler med `content` | 10 av 10 |
+| Artikler med `tags` | 9 av 10 |
+| Språkfelt | Finnes ikke |
+
+To ting å merke seg ved siden av hovedspørsmålet. Nyeste artikkel er
+2026-09-11, ti dager gammel på målingsdagen — ti treff strekker seg over tre
+måneder for DNB. Og `sentiment` følger med som ferdig beregnet objekt
+(`polarity`, `neg`, `neu`, `pos`), uten at noe krav ber om det.
+
+#### Kalltallet: 5, ikke 10
+
+`/api/user` viste 0 kall brukt før forespørselen (7.1) og `apiRequests: 5`
+umiddelbart etter, kontrollert to ganger med 37 sekunders mellomrom. **Én
+forespørsel med én ticker koster 5 kall.**
+
+`docs/kilder-og-rettigheter.md` har siden 20.09 sagt 10, lest ut av denne
+setningen i EODHDs dokumentasjon:
+
+> Each request consumes 5 API calls and 5 API calls per ticker. E.g: 10 API
+> calls for one request with two tickers
+
+Eksempelet i setningen sier 10 kall for **to** tickere. Lest som «5 for
+forespørselen pluss 5 per ticker» skulle to tickere kostet 15, ikke 10. Den
+lesningen som passer både eksempelet og målingen, er 5 per ticker, med
+forespørselen selv som gulvet. Målingen avgjør spørsmålet for én ticker; for
+flere er 5 per ticker fortsatt utledet av eksempelet, ikke målt.
+
+**Konsekvens for relevanseksperimentet:** anslaget på ~80 kall for åtte
+selskaper bygger på det doble kalltallet. Med 5 per ticker blir det ~40. Tallet
+er ikke rettet i `prd.md` eller `begrunnelser.md` her, fordi det avhenger av
+den utledede delen. Ført som eget punkt i `docs/kilder-og-rettigheter.md`.
+
+#### Sidefunn: relevansen i de ti treffene
+
+Dette var ikke formålet med testen, og koster ingen ekstra kall å notere. §0
+sier at medietesten 17.09 mangler nøyaktig hvor mange av de ti som var
+feiltreff. De ti treffene fra i dag, vurdert på tittel og innledning:
+
+| Vurdering | Antall | Artikler |
+|---|---:|---|
+| Handler om DNB | 3 | Q2-resultatpresentasjon, to analysenotater om verdsettelsen |
+| DNB er part i hendelsen, men saken er en annens | 2 | OTP Bank kjøper Luminor av blant andre DNB; Infosys-kontrakt der DNB er kunde |
+| Nevner DNB uten å handle om selskapet | 5 | Europeiske aksjer generelt (24 symboler), SalMars tilbakekjøp, to saker om Cadeler, Infosys' AI-kontrakter |
+
+Mønsteret fra 17.09 gjenfinnes: Infosys og «europeiske aksjer generelt» dukker
+opp begge ganger. **Dette er ikke en gjentakelse av medietesten.** Én leser har
+vurdert ti titler med innledning, ikke blindt og ikke mot et forhåndsdefinert
+kriterium, og det er ingen motprøve med Frontline. Mangelen §0 beskriver står
+derfor fortsatt åpen. Det dette gir, er et tidsstemplet råmateriale som en
+ordentlig kjøring kan bygge på.
+
+#### Kvotestatus etter testen
+
+5 av 20 brukt, **15 igjen**. Signaltesten koster 15 og kunne i prinsippet
+kjørts i dag på restkvoten, siden nyhetstesten ble halvparten så dyr som
+budsjettert. Den er ikke kjørt — den står til 22.09 etter avtale, og å bruke
+hele resten av dagskvoten ville fjernet muligheten til å kontrollere noe som
+helst mer i dag.
