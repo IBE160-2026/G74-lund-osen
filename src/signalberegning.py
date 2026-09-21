@@ -6,21 +6,27 @@ kan testes i sin helhet uten aa bruke av kvoten.
 Alle beregninger bruker utbyttejustert kurs (FR-701), slik at et ordinaert
 utbytte ikke feiltolkes som kursfall.
 
-Parametrene under er merket FORELOEPIG i PRD-en. De er testet mot bare 15
-handelsdager fordi MA50 spiser 50 av de 65 vi hadde kvote til aa hente.
-De laases mot ca 200 handelsdager foer signalet er ferdig - aapent punkt 7.
+Terskel, volumfaktor og noytralsone er LAAST 21.09.2026, etter en test mot
+199 handelsdager - 2985 aksjedager - der alle tre verdiene holdt uendret.
+Metode og tall i malinger.md §7.4.
+
+Vinduene paa 20 dager i bevegelse og interesse er IKKE testet. De staar
+fortsatt som foreloepige og er merket der de defineres.
 """
 
 from dataclasses import dataclass
 from statistics import median, stdev
 
-# [FORELOEPIG] Verdiene som skal laases mot ~200 handelsdager.
 MA_VINDU = 50
-NOYTRALSONE = 0.02
+
+# Laast 21.09.2026 mot 199 handelsdager, se malinger.md §7.4.
+NOYTRALSONE = 0.02   # +/-1 % gir bare 5,6 % styrke 0, +/-4 % gir 25,7 %
+VOLUMFAKTOR = 1.5    # 1,25x utloeser nesten alltid, 2,0x toemmer terskel 3
+TERSKEL = 2          # gir 4,6 av 15 per dag; terskel 3 gir 1,1 og 87 tomme dager
+
+# [FORELOEPIG] Disse to var ikke med i testen 21.09. De staar til de maales.
 VOLATILITET_VINDU = 20
 VOLUM_VINDU = 20
-VOLUMFAKTOR = 1.5
-TERSKEL = 2
 
 POSITIV = "Positiv"
 NEGATIV = "Negativ"

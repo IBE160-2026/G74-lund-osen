@@ -554,9 +554,13 @@ Hvor grensen faktisk bør gå, er ikke avgjort og kan ikke avgjøres på papir. 
 
 ### 4.7 Signalstyrke og retning
 
-> **Foreløpige parametre.** Alle terskler og vinduer i denne seksjonen er merket
-> `[FORELØPIG]` og bygger på en test over **15 handelsdager**. Testen kjøres på
-> nytt mot omtrent 200 handelsdager, og først da låses verdiene.
+> **Parametrene er låst 2026-09-21.** Terskel, volumfaktor og nøytralsonebredde
+> er testet mot **199 handelsdager** (2025-12-01 til 2026-09-18, 2 985
+> aksjedager) og beholdt uendret. Metode og tall: `malinger.md` §7.4.
+>
+> **To vinduer er fortsatt `[FORELØPIG]`:** de 20 dagene i bevegelsessjekken og
+> de 20 i interessesjekken. De var ikke med i testen, som låste tre parametre og
+> ikke fem. De er merket hver for seg under.
 
 Kravet til signalet er **forklarbarhet, ikke treffsikkerhet**. Vi lover ikke
 bedre signaler enn andre, men at brukeren alltid kan se hva som ga utslaget.
@@ -568,9 +572,9 @@ sjekk, ingen vekting og ingen skjult formel.
 
 | # | Sjekk | Måler | Gir utslag når |
 |---|---|---|---|
-| 1 | **Trend** | Sluttkurs mot 50-dagers glidende snitt | Kursen ligger mer enn `[FORELØPIG] 2 %` over eller under snittet |
+| 1 | **Trend** | Sluttkurs mot 50-dagers glidende snitt | Kursen ligger mer enn **2 %** over eller under snittet |
 | 2 | **Bevegelse** | Dagens endring mot aksjens egen volatilitet | Endringen overstiger ett standardavvik av siste `[FORELØPIG] 20` dagers endringer |
-| 3 | **Interesse** | Dagens volum mot eget medianvolum | Volumet overstiger `[FORELØPIG] 1,5 ×` medianen siste `[FORELØPIG] 20` dager |
+| 3 | **Interesse** | Dagens volum mot eget medianvolum | Volumet overstiger **1,5 ×** medianen siste `[FORELØPIG] 20` dager |
 
 Fortegnet på **interesse** følger dagens kursendring: høyt volum på en dag med
 oppgang gir +1, høyt volum på en dag med nedgang gir −1. Volum har ingen retning
@@ -581,15 +585,18 @@ feiltolkes som kursfall.
 
 #### FR-702 — Nøytralsone i trendsjekken
 
-Trendsjekken skal ha en nøytralsone på `[FORELØPIG] ±2 %` rundt det glidende
-snittet. Innenfor sonen gir sjekken 0.
+Trendsjekken skal ha en nøytralsone på **±2 %** rundt det glidende snittet.
+Innenfor sonen gir sjekken 0.
 
 Uten nøytralsonen kan signalstyrke 0 ikke forekomme: en aksje ligger alltid
-enten over eller under sitt eget snitt, så trendsjekken slår alltid ut. Målingen
-viste at 64 % av alle aksjedager da havner på styrke 1. Oversikten kan dermed
-aldri si at det ikke skjer noe, og det bryter målet «Dager uten signal».
+enten over eller under sitt eget snitt, så trendsjekken slår alltid ut. Målt
+over 2 985 aksjedager er andelen med styrke 0 da **0,0 %**, og 63,9 % havner på
+styrke 1. Oversikten kan dermed aldri si at det ikke skjer noe, og det bryter
+målet «Dager uten signal».
 
-Med nøytralsonen får `[FORELØPIG] 11,1 %` av aksjedagene styrke 0.
+Med nøytralsonen får **12,7 %** av aksjedagene styrke 0. Bredden er valgt mot
+målte alternativer: ±1 % gir bare 5,6 %, ±4 % gir 25,7 % og spiser seks
+prosentpoeng av styrke 2 og 3 til sammen. Se `malinger.md` §7.4.
 
 #### FR-703 — Signalstyrke
 
@@ -597,9 +604,10 @@ Signalstyrke er summen av absoluttverdiene til de tre sjekkene, altså et helt
 tall fra 0 til 3. Styrken sier hvor kraftig sjekkene slår ut — ikke hvor
 sannsynlig en kursbevegelse er, og ikke om aksjen bør kjøpes eller selges.
 
-Målt fordeling `[FORELØPIG]`: styrke 0 hos 11,1 %, styrke 1 hos 57,8 %, styrke 2
-hos 22,7 %, styrke 3 hos 8,4 % av aksjedagene. Testoppsett og følsomhet for
-volumfaktoren: `malinger.md`, seksjon 5.
+Målt fordeling over 199 handelsdager og 2 985 aksjedager: styrke 0 hos
+**12,7 %**, styrke 1 hos **56,3 %**, styrke 2 hos **23,9 %**, styrke 3 hos
+**7,0 %**. Testoppsett og følsomhet for volumfaktoren: `malinger.md` §7.4. Den
+første målingen over 15 dager står i §5 til sammenligning.
 
 #### FR-704 — Retning
 
@@ -618,7 +626,11 @@ det.
 
 #### FR-705 — Terskel for at en aksje skiller seg ut
 
-En aksje skiller seg ut den dagen signalstyrken er `[FORELØPIG] 2` eller høyere.
+En aksje skiller seg ut den dagen signalstyrken er **2** eller høyere.
+
+Målt over 199 dager gir terskel 2 i snitt 4,6 av de 15 aksjene per dag, og bare
+5 dager av 199 helt uten utslag. Terskel 3 ville gitt 1,1 i snitt og 87 tomme
+dager — nær annenhver dag uten noe å vise.
 
 Terskelen styrer **visningen og sorteringen**, ikke hentingen.
 **Meldinger hentes for alle 15 selskapene hver dag.** KI-kostnaden er omtrent
