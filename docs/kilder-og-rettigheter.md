@@ -291,16 +291,21 @@ https://api3.oslo.oslobors.no/v1/newsreader/list?category=&issuer=&fromDate=ÅÅ
 ```
 
 Offisielle børsmeldinger. Ett døgn (15.09.2026) ga 102 meldinger fra 73 utstedere.
-Hver melding har `issuerSign`, `issuerName`, `category`, `publishedTime` og `title`.
+Meldingsobjektet har 20 felter — blant dem `issuerSign`, `issuerName`,
+`category`, `publishedTime` og `title`, men **ikke noe språkfelt**. Hele
+feltlista er målt 2026-09-21 og står i `malinger.md` §7.3.
 
-Tre forbehold vi må følge opp:
+Tre forbehold, to av dem nå avklart:
 
-1. **Vilkårene er ikke kontrollert.** API-et er udokumentert og er backend-en til
-   Oslo Børs' egen nettside, ikke et publisert utvikler-API.
+1. ~~**Vilkårene er ikke kontrollert.**~~ **Kontrollert 2026-09-21** — se
+   seksjonen under. API-et er fortsatt udokumentert og er backend-en til Oslo
+   Børs' egen nettside, ikke et publisert utvikler-API, men vilkårene for
+   nettstedet dekker det.
 2. **Ingen garanti for stabilitet.** Det kan endres eller stenges uten varsel.
-   Vi lagrer derfor rådata lokalt fra første henting.
-3. **Oslo Børs eies av Euronext.** Vilkårene for NewsWeb og for finanskalenderen
-   henger derfor trolig sammen, og må kontrolleres under ett.
+   Vi lagrer derfor rådata lokalt fra første henting. *Merk at lagringen selv
+   er berørt av vilkårene — se seksjonen under.*
+3. ~~**Oslo Børs eies av Euronext.** Vilkårene henger derfor trolig sammen~~ —
+   **bekreftet 2026-09-21.** Begge domenene er navngitt i samme dokument.
 
 Meldingene er allerede knyttet til utsteder. Det betyr at KI ikke brukes til å
 avgjøre hvilket selskap en melding gjelder — den jobben gjør `issuerSign`. KI
