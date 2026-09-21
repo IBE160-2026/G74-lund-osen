@@ -670,19 +670,26 @@ Den vurderingen var bygget på **EODHDs ordlyd alene**, der det eneste som
 trekker mot oss er ordet «repackaged» i en klausul som ellers handler om å gi
 andre tilgang.
 
-Etter Euronext-funnet har posisjonen «sammendragsstatistikk er ikke databasen»
-ordlyd mot seg i **to** kilder, ikke én:
+Etter Euronext-funnet hadde posisjonen «sammendragsstatistikk er ikke
+databasen» ordlyd mot seg i **tre** tekster. **Én av dem er nå avklart skriftlig
+i vår favør**, de to andre står:
 
-| Kilde | Ordlyden som trekker mot posisjonen |
-|---|---|
-| EODHD | «…whether in its original or repackaged form» |
-| Euronext | «Distribution outside the classroom … requires express written permission» |
-| NewsWeb / Åndsverkloven § 43 | «enerett til å råde over hele eller **vesentlige deler** av databasens innhold» |
+| Kilde | Ordlyden som trekker mot posisjonen | Status |
+|---|---|---|
+| EODHD | «…whether in its original or repackaged form» | **Avklart 2026-09-21.** EODHD bekrefter skriftlig at egne sammendragstall ikke er Informasjonen «in repackaged form» |
+| Euronext | «Distribution outside the classroom … requires express written permission» | **Står.** Forespørselen er ubesvart |
+| NewsWeb / Åndsverkloven § 43 | «enerett til å råde over hele eller **vesentlige deler** av databasens innhold» | **Står.** Hva som utgjør en «vesentlig del», er ikke noe vi kan avgjøre selv |
 
-Posisjonen er ikke omgjort — en median er fortsatt ikke en kursserie, og en
-kategorifordeling er ikke en meldingsdatabase. Men den er ikke lenger en
-vurdering uten motstand, og hva som utgjør en «vesentlig del» av en database er
-ikke noe vi kan avgjøre selv.
+**Avklaringen rekker bare så langt som EODHDs egne data.** Den dekker
+medianomsetning per symbol, som er regnet ut av EODHD-kurser. Den dekker ikke
+kategorifordelingene i `malinger.md` §4, som er utledet av NewsWeb-meldinger og
+ligger under de to tekstene som står igjen. Se «Oppfølgingen samme kveld: begge
+bekreftet».
+
+Posisjonen er altså delt i to. For EODHD-tallene er den ikke lenger vår egen
+vurdering, men noe leverandøren har bekreftet skriftlig. For NewsWeb-tallene
+står den som før: en forsvarlig posisjon med ordlyd mot seg i to tekster, og en
+median er fortsatt ikke en kursserie.
 
 **Konsekvensen er praktisk:** brevet til Euronext nevner derfor det offentlige
 repoet **eksplisitt**, i stedet for å holde det utenfor og be om tillatelse bare
@@ -791,12 +798,14 @@ publiseres, et datasett kan det ikke.
 Posisjonen er ikke en erstatning for vilkårskontrollen. Den sier hva vi gjør i
 mellomtiden, ikke at vilkårene tillater det.
 
-**Oppdatert 2026-09-21.** Vilkårskontrollen er nå gjort, og posisjonen har
+**Oppdatert 2026-09-21.** Vilkårskontrollen er nå gjort, og posisjonen hadde
 ordlyd mot seg i tre tekster — «repackaged form» hos EODHD, «distribution
 outside the classroom» hos Euronext, og «vesentlige deler» i Åndsverkloven § 43
-via NewsWebs egen rettighetserklæring. Den er ikke omgjort, men den er ikke
-lenger uimotsagt. Se «Vurderingen av det offentlige repoet står ikke lenger
-uimotsagt» over.
+via NewsWebs egen rettighetserklæring. **EODHD har senere samme dag bekreftet
+skriftlig at våre egne sammendragstall ikke er deres Informasjon «in repackaged
+form».** Det avklarer EODHD-tallene. De to andre tekstene står, og de gjelder
+tallene utledet av NewsWeb. Se «Vurderingen av det offentlige repoet står ikke
+lenger uimotsagt» over.
 
 ---
 
