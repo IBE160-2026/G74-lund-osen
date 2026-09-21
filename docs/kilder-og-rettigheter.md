@@ -270,7 +270,7 @@ you outlined», og deretter legges én ny til:
 |---|---|---|
 | 1 | «the output stays local» | Oppfylt. Resultatet vises bare i applikasjonen, som kjører lokalt |
 | 2 | «the project is not publicly deployed» | Oppfylt. Applikasjonen publiseres ikke |
-| 3 | «the data is not published, redistributed, resold, or used to train any model» | Oppfylt for artiklene selv — `data/` er gitignorert. Merk at dette er **artiklene**, ikke de utledede tallene; publiseringsskillet lenger ned gjelder fortsatt |
+| 3 | «the data is not published, redistributed, resold, or used to train any model» | Oppfylt. Artiklene selv: `data/` er gitignorert. De utledede tallene: EODHD bekreftet skriftlig samme kveld at egne sammendragstall ikke er deres Informasjon «in repackaged form» — se «Oppfølgingen samme kveld». Forbeholdet som sto her, er dermed innfridd for EODHDs data |
 | 4 | «Please ensure that your chosen LLM service does not use the submitted content for training either» | **Ikke oppfylt.** Se under |
 
 **Betingelse 4 er en plikt EODHD har lagt på oss, ikke en de har oppfylt.**
