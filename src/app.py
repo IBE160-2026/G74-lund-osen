@@ -10,8 +10,10 @@ resultatet til malen - byttes fila ut med en database i arkitekturfasen, er
 det bare linjen under som endres.
 """
 
-from flask import Flask, render_template
+from flask import Flask, abort, render_template
 
+from aksjedetalj import bygg_detalj, finn_aksje
+from graf import bygg_graf
 from kursdata import AKSJEUNIVERS, SnapshotKilde, nyeste_snapshot
 from markedsoversikt import bygg_oversikt
 
@@ -39,6 +41,33 @@ def markedsoversikt():
         rader=rader,
         hentet=kilde.tidsstempel(),
         mangler=mangler,
+    )
+
+
+@app.route("/aksje/<symbol>")
+def aksjedetalj(symbol: str):
+    """Forklaringsdelen av aksjedetaljen.
+
+    Meldinger, KI-forklaring og kommende hendelser mangler med vilje - de
+    krever kilder som ligger bak aapent punkt 1 og punkt 16.
+    """
+    aksje = finn_aksje(symbol, AKSJEUNIVERS)
+    if aksje is None:
+        abort(404)
+
+    kilde = hent_kilde()
+    if kilde is None:
+        abort(404)
+
+    detalj = bygg_detalj(aksje, kilde)
+    if detalj is None:
+        abort(404)
+
+    return render_template(
+        "aksje.html",
+        detalj=detalj,
+        graf=bygg_graf(detalj.punkter),
+        hentet=kilde.tidsstempel(),
     )
 
 

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="utf-8">
+  <title>{{ detalj.aksje.navn }} — OSE Signal</title>
+  <style>
+    :root {
+      --tekst: #1a1a1a;
+      --dempet: #666;
+      --strek: #e0e0e0;
+      --opp: #0a7d32;
+      --ned: #b3261e;
+      --blandet: #8a5a00;
+      --kurs: #1a56b8;
+      --ma50: #b36b00;
+    }
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 2rem auto;
+      max-width: 54rem;
+      padding: 0 1rem;
+      color: var(--tekst);
+    }
+    a.tilbake { color: var(--dempet); font-size: 0.9rem; text-decoration: none; }
+    a.tilbake:hover { text-decoration: underline; }
+    h1 { font-size: 1.4rem; margin: 0.6rem 0 0.2rem; }
+    p.meta { color: var(--dempet); font-size: 0.9rem; margin-top: 0; }
+
+    .sammendrag { display: flex; gap: 2rem; margin: 1.2rem 0; flex-wrap: wrap; }
+    .noekkeltall .etikett { color: var(--dempet); font-size: 0.8rem; display: block; }
+    .noekkeltall .verdi { font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+
+    h2 { font-size: 1.05rem; margin: 1.8rem 0 0.5rem; }
+    figure { margin: 0; }
+    svg { width: 100%; height: auto; display: block; }
+    .rute { stroke: var(--strek); stroke-width: 1; }
+    .rutetekst { fill: var(--dempet); font-size: 10px; }
+    .kurslinje { fill: none; stroke: var(--kurs); stroke-width: 1.8; }
+    .ma50linje { fill: none; stroke: var(--ma50); stroke-width: 1.5; stroke-dasharray: 5 3; }
+    figcaption { color: var(--dempet); font-size: 0.85rem; margin-top: 0.4rem; }
+    .tegnforklaring { display: flex; gap: 1.2rem; font-size: 0.85rem; margin: 0.4rem 0; }
+    .prikk { display: inline-block; width: 1.6rem; height: 0; vertical-align: middle;
+             border-top-width: 2px; margin-right: 0.35rem; }
+    .prikk.kurs { border-top: 2px solid var(--kurs); }
+    .prikk.ma50 { border-top: 2px dashed var(--ma50); }
+
+    table { border-collapse: collapse; width: 100%; }
+    th, td { text-align: left; padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--strek); }
+    th { font-weight: 600; font-size: 0.85rem; color: var(--dempet); }
+    td.fortegn { text-align: center; font-variant-numeric: tabular-nums;
+                 font-weight: 700; width: 4rem; }
+    tr.bidro td { background: #fafafa; }
+    .opp { color: var(--opp); }
+    .ned { color: var(--ned); }
+    .blandet { color: var(--blandet); }
+    .ingen, .ukjent { color: var(--dempet); }
+    .regnestykke { font-variant-numeric: tabular-nums; }
+    p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
+    .mangler { color: var(--dempet); font-style: italic; }
+  </style>
+</head>
+<body>
+  <a class="tilbake" href="/">← Markedsoversikt</a>
+
+  <h1>{{ detalj.aksje.navn }}</h1>
+  <p class="meta">
+    {{ detalj.aksje.ticker }} · {{ detalj.aksje.sektor }} · {{ detalj.dato }}
+    {% if hentet %}· data hentet {{ hentet[:10] }}{% endif %}
+  </p>
+
+  <div class="sammendrag">
+    <div class="noekkeltall">
+      <span class="etikett">Sluttkurs</span>
+      <span class="verdi">{{ "%.2f"|format(detalj.sluttkurs) }}</span>
+    </div>
+    <div class="noekkeltall">
+      <span class="etikett">Signalstyrke</span>
+      <span class="verdi">
+        {% if detalj.styrke is not none %}{{ detalj.styrke }} av 3{% else %}–{% endif %}
+      </span>
+    </div>
+    <div class="noekkeltall">
+      <span class="etikett">Retning</span>
+      <span class="verdi {{ detalj.retning.klasse }}">
+        <span aria-hidden="true">{{ detalj.retning.symbol }}</span> {{ detalj.retning.tekst }}
+      </span>
+    </div>
+  </div>
+
+  <h2>Kursutvikling, seks måneder</h2>
+  {% if graf %}
+    <figure>
+      <svg viewBox="0 0 {{ graf.bredde }} {{ graf.hoyde }}" role="img"
+           aria-label="Kursutvikling for {{ detalj.aksje.navn }} med 50-dagers glidende snitt">
+        {% for linje in graf.rutenett %}
+          <line class="rute" x1="0" y1="{{ "%.1f"|format(linje.y) }}"
+                x2="{{ graf.bredde }}" y2="{{ "%.1f"|format(linje.y) }}"></line>
+          <text class="rutetekst" x="2" y="{{ "%.1f"|format(linje.y - 3) }}">
+            {{ "%.0f"|format(linje.verdi) }}
+          </text>
+        {% endfor %}
+        {% if graf.ma50linje %}
+          <polyline class="ma50linje" points="{{ graf.ma50linje }}"></polyline>
+        {% endif %}
+        <polyline class="kurslinje" points="{{ graf.kurslinje }}"></polyline>
+      </svg>
+
+      <div class="tegnforklaring">
+        <span><span class="prikk kurs"></span>Utbyttejustert kurs</span>
+        {% if graf.har_ma50 %}
+          <span><span class="prikk ma50"></span>50-dagers snitt (sjekk 1)</span>
+        {% endif %}
+      </div>
+
+      <figcaption>
+        {{ graf.forste_dato }} til {{ graf.siste_dato }}.
+        Begge linjene er tegnet på utbyttejustert kurs, så de ligger på samme
+        skala. Sjekk 2 og 3 tegnes ikke — de står som tall under.
+      </figcaption>
+    </figure>
+  {% else %}
+    <p class="mangler">For få kursdager til å tegne en graf.</p>
+  {% endif %}
+
+  <h2>Hvorfor signalet ble {% if detalj.styrke is not none %}{{ detalj.styrke }}{% else %}ukjent{% endif %}</h2>
+
+  {% if detalj.sjekker %}
+    <table>
+      <thead>
+        <tr>
+          <th>Sjekk</th>
+          <th class="fortegn">Ga</th>
+          <th>Målt mot</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sjekk in detalj.sjekker %}
+          <tr {% if sjekk.bidro %}class="bidro"{% endif %}>
+            <td>{{ sjekk.navn }}</td>
+            <td class="fortegn {{ sjekk.klasse }}">{{ sjekk.fortegn }}</td>
+            <td class="regnestykke">{{ sjekk.maaling }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <p class="fotnote">
+      Signalstyrken er summen av tallene uten fortegn:
+      {{ detalj.bidragsytere|length }} av 3 sjekker ga utslag, så styrken er
+      {{ detalj.styrke }}. Retningen leses av fortegnene til de sjekkene som ga
+      utslag — er de ikke enige, er retningen blandet.
+      Ingen vekting og ingen skjult formel.
+    </p>
+  {% else %}
+    <p class="mangler">
+      Signalet kunne ikke regnes: {{ detalj.mangler }}.
+      Kursen vises likevel.
+    </p>
+  {% endif %}
+
+  <p class="fotnote">
+    Børsmeldinger, KI-forklaring og kommende finansielle hendelser er ikke med
+    ennå. De krever kilder som fortsatt er under avklaring.
+  </p>
+</body>
+</html>

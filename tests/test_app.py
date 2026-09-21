@@ -107,3 +107,83 @@ def test_ruta_gjoer_ingen_nettverkskall(klient, monkeypatch):
     monter(monkeypatch, MinneKilde({"EQNR": serie([100.0] * 60 + [101.0])}))
 
     assert klient.get("/").status_code == 200
+
+
+class TestAksjedetalj:
+    """Ruta /aksje/<symbol>. Egen kilde montert, aldri data/."""
+
+    def test_ukjent_symbol_gir_404(self, klient, monkeypatch):
+        monter(monkeypatch, MinneKilde({"EQNR": serie([100.0] * 60)}))
+        assert klient.get("/aksje/FINNESIKKE").status_code == 404
+
+    def test_ticker_er_ikke_gyldig_i_ruta(self, klient, monkeypatch):
+        """Ruta bruker vaart symbol, ikke EODHDs ticker."""
+        monter(monkeypatch, MinneKilde({"EQNR": serie([100.0] * 60)}))
+        assert klient.get("/aksje/EQNR.OL").status_code == 404
+
+    def test_kjent_symbol_uten_data_gir_404(self, klient, monkeypatch):
+        monter(monkeypatch, MinneKilde({}))
+        assert klient.get("/aksje/EQNR").status_code == 404
+
+    def test_uten_kilde_gir_404(self, klient, monkeypatch):
+        monter(monkeypatch, None)
+        assert klient.get("/aksje/EQNR").status_code == 404
+
+    def test_viser_de_tre_sjekkene_ved_navn(self, klient, monkeypatch):
+        """FR-706: alle tre skal staa der, ogsaa de som ga 0."""
+        monter(monkeypatch, MinneKilde({"EQNR": serie([100.0] * 60 + [104.0])}))
+
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+
+        for navn in ("Trend", "Bevegelse", "Interesse"):
+            assert navn in html
+
+    def test_viser_maalingen_bak_hvert_fortegn(self, klient, monkeypatch):
+        """Det som gjoer signalet etterproevbart: ikke bare +1, men mot hva."""
+        monter(monkeypatch, MinneKilde({"EQNR": serie([100.0] * 60 + [104.0])}))
+
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+
+        assert "mot MA50" in html
+        assert "standardavvik" in html
+        assert "median" in html
+
+    def test_tegner_baade_kurs_og_ma50(self, klient, monkeypatch):
+        monter(monkeypatch, MinneKilde({"EQNR": serie([100.0 + i for i in range(80)])}))
+
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+
+        assert "kurslinje" in html
+        assert "ma50linje" in html
+        assert "<polyline" in html
+
+    def test_kort_serie_viser_kurs_men_sier_at_signalet_mangler(self, klient, monkeypatch):
+        monter(monkeypatch, MinneKilde({"EQNR": serie([100.0, 101.0, 102.0])}))
+
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+
+        assert klient.get("/aksje/EQNR").status_code == 200
+        assert "kunne ikke regnes" in html
+
+    def test_sier_hva_som_mangler_i_skjermbildet(self, klient, monkeypatch):
+        """Meldinger og KI er ikke med enda. Det skal staa, ikke bare utebli."""
+        monter(monkeypatch, MinneKilde({"EQNR": serie([100.0] * 60 + [104.0])}))
+
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+
+        assert "Børsmeldinger" in html
+        assert "ikke med" in html
+
+    def test_oversikten_lenker_til_detaljen(self, klient, monkeypatch):
+        monter(monkeypatch, MinneKilde({"EQNR": serie([100.0] * 60 + [104.0])}))
+
+        html = klient.get("/").data.decode("utf-8")
+
+        assert 'href="/aksje/EQNR"' in html
+
+    def test_detaljen_lenker_tilbake(self, klient, monkeypatch):
+        monter(monkeypatch, MinneKilde({"EQNR": serie([100.0] * 60 + [104.0])}))
+
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+
+        assert 'href="/"' in html
