@@ -299,6 +299,87 @@ samtidig.
 
 ---
 
+### Oppfølgingen samme kveld: begge bekreftet
+
+**Mottatt 2026-09-21** fra Lana A., EOD Support Team,
+`supportlevel1@eodhistoricaldata.com`. Svar på oppfølgingen sendt samme dag
+kl. 19:33, i samme tråd som godkjenningen over.
+
+#### Svaret, ordrett
+
+> Hello,
+>
+> Yes, we confirm both.
+>
+> Bien Cordialement,
+>
+> Lana A.
+>
+> EOD Support Team
+
+#### De to spørsmålene, ordrett slik de ble sendt
+
+Fra `docs/epost-til-eodhd.md`, oppfølgingen sendt 21.09. Dette er spørsmål 2 og
+3 fra det opprinnelige utkastet, holdt tilbake 20.09 til språkmodellspørsmålet
+var besvart:
+
+> 1. **"Displaying" in an educational setting.** The Personal Use section
+>    states that Non-Professional Users are prohibited from "selling, reselling,
+>    retransmitting, redistributing, displaying, or granting access to the
+>    Information or Services, whether in its original or repackaged form". Does
+>    "displaying" cover showing our application, with EODHD price data visible
+>    on screen, in a single classroom demonstration to a teacher and fellow
+>    students? We read the clause as being about giving others access to the
+>    data, but we would rather ask than assume.
+
+> 2. **Aggregated statistics in a public repository.** Our source code and
+>    planning documents are in a public GitHub repository, while the downloaded
+>    datasets themselves are kept local and excluded from version control. The
+>    repository does contain summary statistics we computed from your data — for
+>    example the median daily turnover in NOK for a ticker over a three-month
+>    period, and the share of exchange announcements falling in a given category.
+>    Does such aggregated, derived statistics count as the Information "in
+>    repackaged form", or is it outside the scope of the clause?
+
+> To be concrete about the second question: what is published is a table of
+> fifteen tickers with one median turnover figure each, computed over 65 trading
+> days, plus percentage shares per announcement category. The underlying price
+> series and announcements are not published and are excluded from version
+> control. If that distinction is not one your terms recognise, we would like to
+> know now rather than later.
+
+#### Hva svaret dekker
+
+Svaret er kort, men det er ikke uklart: begge spørsmålene er stilt som ja/nei
+med vår egen lesning oppgitt, og «we confirm both» bekrefter den lesningen.
+Konkret:
+
+| # | Spørsmål | Bekreftet |
+|---|---|---|
+| 1 | Demonstrasjonen for lærer og klasse er del av det ikke-kommersielle studieprosjektet, ikke offentlig drift | Ja |
+| 2 | Egne sammendragstall i et offentlig kodelager er vårt eget resultat, ikke Informasjonen «in repackaged form» | Ja |
+
+#### Hva svaret ikke dekker
+
+**Det gjelder EODHD og EODHDs data.** Det er den eneste rekkevidden en
+leverandør kan gi: de kan si hva de aksepterer med sine egne data, ikke med
+andres.
+
+Det har en presis konsekvens her. Spørsmål 2 nevnte **to** typer tall — median
+daglig omsetning per symbol, som er utledet av EODHD-kurser, og
+kategorifordelinger i meldingsbildet, som er utledet av NewsWeb-meldinger.
+Bekreftelsen rekker bare over den første. **Kategorifordelingene i
+`malinger.md` §4 ligger under Euronexts vilkår**, og de er ikke avklart av
+dette svaret. At begge sto i samme spørsmål, gjør ikke at ett svar dekker
+begge.
+
+**Avsenderen er igjen support, ikke en juridisk avdeling** — og en annen person
+enn den som svarte om språkmodeller. Samme forbehold gjelder som over: dette er
+belegg for hva leverandøren aksepterer, ikke en endring i vilkårsteksten.
+Vilkårene sier fortsatt det de sa.
+
+---
+
 ## Mediekilder vurdert for relevanseksperimentet
 
 **Sjekket 20.09.2026.** Relevanseksperimentet skulle måle symbolmatching mot
