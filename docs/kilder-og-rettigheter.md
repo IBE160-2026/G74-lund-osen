@@ -835,10 +835,13 @@ lenger uimotsagt» over.
 - [x] ~~Spørre `support@eodhistoricaldata.com` skriftlig om språkmodellbruk~~ —
       sendt 20.09.2026, **besvart 21.09.2026: ja, med fire betingelser.** Se
       «EODHDs skriftlige svar: ja, med betingelser»
-- [ ] **De to gjenstående spørsmålene til EODHD ble ikke sendt:** om «displaying»
-      rammer en demonstrasjon i undervisning, og om aggregert statistikk i et
-      offentlig repo er Informasjonen «in repackaged form». Begge gjelder ting vi
-      gjør allerede. Koster ingen kall. Frist 2026-09-27
+- [x] ~~**De to gjenstående spørsmålene til EODHD ble ikke sendt:** om
+      «displaying» rammer en demonstrasjon i undervisning, og om aggregert
+      statistikk i et offentlig repo er Informasjonen «in repackaged form»~~ —
+      **sendt 2026-09-21 kl. 19:33 og besvart samme kveld: begge bekreftet.**
+      Svaret er ført ordrett i «Oppfølgingen samme kveld: begge bekreftet».
+      Merk at bekreftelsen gjelder EODHDs egne data; kategorifordelingene
+      utledet av NewsWeb ligger fortsatt under Euronexts vilkår
 - [x] ~~Verifisere om `/api/news` svarer for `.OL`-tickere på gratisnivå~~ —
       **gjort 2026-09-21. Ja:** HTTP 200 og ti artikler for `DNB.OL`. Testen
       kostet 5 kall, ikke 10. Se `malinger.md` §7.2
@@ -854,6 +857,9 @@ lenger uimotsagt» over.
       føre lenke og dato her. Koster ingen API-kall. **Eier: Gruppen.**
       Frist: før første KI-kall kjøres
 - [ ] Vurdere vilkårene på nytt dersom applikasjonen skal publiseres
-- [ ] **Kontrollere at skillet over holder mot EODHDs og NewsWebs faktiske
-      vilkår.** Posisjonen «sammendragsstatistikk er ikke databasen» er vår egen
-      vurdering, ikke noe kildene har sagt. Tas i samme runde, frist 2026-09-27
+- [ ] **Kontrollere at skillet over holder mot NewsWebs faktiske vilkår.**
+      EODHD-halvdelen er lukket 2026-09-21: leverandøren har skriftlig bekreftet
+      at våre sammendragstall ikke er deres Informasjon «in repackaged form».
+      For NewsWeb er posisjonen fortsatt vår egen vurdering, med «distribution
+      outside the classroom» og «vesentlige deler» mot seg. Henger sammen med
+      Euronext-svaret. **Eier: Gruppen.** Frist 2026-09-28
