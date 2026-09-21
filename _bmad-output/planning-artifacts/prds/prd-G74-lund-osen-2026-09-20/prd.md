@@ -756,7 +756,7 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 
 | # | Punkt | Eier | Frist | Blokkerer |
 |---|---|---|---|---|
-| 1 | **Vilkårskontroll — to av tre deler lukket 2026-09-21.** *Lukket:* EODHD har svart skriftlig ja til språkmodellbruk, med fire betingelser, og kontrollen av NewsWeb og Euronext er gjennomført. *Åpent:* kontrollen ga et **uttrykkelig forbud** mot automatisert henting uten tillatelse på forhånd. Forespørsel sendt 21.09, svar avventes. Holder ikke unntaket, må meldingsdelen omdisponeres | Marian Osen | **2026-09-28** | Meldingsdelen |
+| 1 | **Vilkårskontroll — to av tre deler lukket 2026-09-21.** *Lukket:* EODHD har svart skriftlig ja til språkmodellbruk, med fire betingelser, og kontrollen av NewsWeb og Euronext er gjennomført. *Åpent:* kontrollen ga et **uttrykkelig forbud** mot automatisert henting uten tillatelse på forhånd. Forespørsel sendt 21.09, svar avventes. Holder ikke unntaket, må meldingsdelen omdisponeres | Gruppen | **2026-09-28** | Meldingsdelen |
 | 2 | **KI-terskelen i samlekategorien** — hvor grensen mellom «kan påvirke» og «lite relevant» skal gå. Kan ikke avgjøres på papir; relevanseksperimentet er input. Foreløpig regel står i FR-606 | *‹fylles inn›* | Etter uke 41 | Kalibrering av FR-606 |
 | 3 | **Hvilken kilde gir handelskalenderen?** FR-402 hviler på «forventet børsdag», men ingen kilde er utpekt for hvilke dager Oslo Børs er åpen | *‹fylles inn›* | Før implementasjon | FR-402 |
 | 4 | **Hvordan utledes eks.dato?** FR-407 og FR-503 forutsetter at utbyttedager kan identifiseres, men regelen er ikke skrevet | *‹fylles inn›* | Før demonstrasjonen | FR-407, FR-503 |
@@ -789,3 +789,9 @@ forespørselen om tillatelse ble sendt 21.09 med frist 28.09. Fullstendig
 gjennomgang med sitater i `docs/kilder-og-rettigheter.md`.
 
 Punkt 1 har fått eier. De øvrige har det ennå ikke.
+
+**Om eierfeltet.** «Gruppen» er et bevisst valg, ikke en tom rubrikk: vi er to,
+og fordelingen gjøres internt etter hva som passer når punktet skal tas. Det
+eierfeltet skal sikre, er at punktet har en frist og noen som svarer for den —
+ikke at navnet er låst på forhånd. Punkter som fortsatt står tomme, har ingen av
+delene.

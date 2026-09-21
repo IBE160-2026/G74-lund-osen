@@ -721,7 +721,7 @@ uimotsagt» over.
       krever tillatelse på forhånd, og vi henter allerede. Alternativene er å
       stoppe hentingen, fortsette bevisst under undervisningsunntaket, eller
       bygge meldingsdelen om. Skal avgjøres og skrives ned, ikke bli stående
-      fordi ingen tok det opp. **Eier: Marian Osen.** Frist 2026-09-28
+      fordi ingen tok det opp. **Eier: Gruppen.** Frist 2026-09-28
 - [ ] Kontrollere Alpha Vantage sine vilkår for ikke-kommersiell bruk
 - [x] ~~Lese EODHDs fullstendige ToS, ikke bare prissiden~~ — gjort 2026-09-20,
       se seksjonen «EODHD: hva de fullstendige vilkårene sier». Svaret er uklart
@@ -744,7 +744,7 @@ uimotsagt» over.
       i EODHDs godkjenning av 21.09, og godkjenningen er ikke oppfylt før den er
       ført. To steg: (a) velge modelltjeneste — ingen er navngitt i noe dokument
       i dag; (b) slå opp tjenestens faktiske vilkår, sitere setningen ordrett og
-      føre lenke og dato her. Koster ingen API-kall. **Eier: Joakim Lund.**
+      føre lenke og dato her. Koster ingen API-kall. **Eier: Gruppen.**
       Frist: før første KI-kall kjøres
 - [ ] Vurdere vilkårene på nytt dersom applikasjonen skal publiseres
 - [ ] **Kontrollere at skillet over holder mot EODHDs og NewsWebs faktiske
