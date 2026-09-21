@@ -4,48 +4,112 @@
   <meta charset="utf-8">
   <title>OSE Signal</title>
   <style>
-    body { font-family: system-ui, sans-serif; margin: 2rem; max-width: 40rem; }
+    :root {
+      --tekst: #1a1a1a;
+      --dempet: #666;
+      --strek: #e0e0e0;
+      --opp: #0a7d32;
+      --ned: #b3261e;
+      --blandet: #8a5a00;
+    }
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 2rem auto;
+      max-width: 54rem;
+      padding: 0 1rem;
+      color: var(--tekst);
+    }
     h1 { font-size: 1.4rem; margin-bottom: 0.2rem; }
-    p.meta { color: #666; font-size: 0.9rem; margin-top: 0; }
+    p.meta { color: var(--dempet); font-size: 0.9rem; margin-top: 0; }
     table { border-collapse: collapse; width: 100%; }
-    th, td { text-align: left; padding: 0.5rem 0.75rem; border-bottom: 1px solid #ddd; }
-    th { font-weight: 600; }
+    th, td { text-align: left; padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--strek); }
+    th { font-weight: 600; font-size: 0.85rem; color: var(--dempet); }
     td.tall { text-align: right; font-variant-numeric: tabular-nums; }
-    .opp { color: #0a7d32; }
-    .ned { color: #b3261e; }
+    tr.utslag td { background: #fafafa; }
+    td.selskap { font-weight: 500; }
+
+    /* FR-103: tekst, symbol og farge samtidig. Teksten baerer alene hvis
+       fargen faller bort, og symbolet staar ved siden av teksten - ikke
+       i stedet for den. */
+    .retning { white-space: nowrap; }
+    .retning .symbol { margin-right: 0.35rem; font-weight: 700; }
+    .opp { color: var(--opp); }
+    .ned { color: var(--ned); }
+    .blandet { color: var(--blandet); }
+    .ingen, .ukjent { color: var(--dempet); }
+
+    .styrke { font-variant-numeric: tabular-nums; }
+    .mangler { color: var(--dempet); font-style: italic; font-size: 0.85rem; }
+    p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
   </style>
 </head>
 <body>
   <h1>OSE Signal</h1>
 
   {% if rader %}
-    <p class="meta">Sluttkurser Oslo Børs · hentet {{ hentet }}</p>
+    <p class="meta">
+      Oslo Børs · {{ rader[0].dato }} · {{ rader|length }} aksjer
+      {% if hentet %}· data hentet {{ hentet[:10] }}{% endif %}
+    </p>
+
     <table>
       <thead>
         <tr>
           <th>Selskap</th>
           <th class="tall">Sluttkurs</th>
           <th class="tall">Endring</th>
+          <th class="tall">Signalstyrke</th>
+          <th>Retning</th>
         </tr>
       </thead>
       <tbody>
         {% for rad in rader %}
-          <tr>
-            <td>{{ rad.navn }}</td>
+          <tr {% if rad.skiller_seg_ut %}class="utslag"{% endif %}>
+            <td class="selskap">{{ rad.aksje.navn }}</td>
+
             <td class="tall">{{ "%.2f"|format(rad.sluttkurs) }}</td>
-            <td class="tall {% if rad.endring_prosent and rad.endring_prosent > 0 %}opp{% elif rad.endring_prosent %}ned{% endif %}">
+
+            <td class="tall {% if rad.endring_prosent is not none %}{{ 'opp' if rad.endring_prosent > 0 else 'ned' if rad.endring_prosent < 0 else '' }}{% endif %}">
               {% if rad.endring_prosent is not none %}
                 {{ "%+.2f"|format(rad.endring_prosent) }} %
               {% else %}
                 –
               {% endif %}
             </td>
+
+            <td class="tall styrke">
+              {% if rad.styrke is not none %}
+                {{ rad.styrke }}
+              {% else %}
+                <span class="mangler" title="{{ rad.mangler }}">–</span>
+              {% endif %}
+            </td>
+
+            <td class="retning {{ rad.retning.klasse }}">
+              <span class="symbol" aria-hidden="true">{{ rad.retning.symbol }}</span>{{ rad.retning.tekst }}
+            </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
+
+    {% if mangler %}
+      <p class="fotnote">
+        Uten data i denne kilden: {{ mangler|join(", ") }}.
+      </p>
+    {% endif %}
+
+    <p class="fotnote">
+      Sluttkursen er den ujusterte kursen aksjen omsettes til. Endringen er
+      regnet på utbyttejustert kurs, slik at et ordinært utbytte ikke ser ut
+      som et kursfall. Signalstyrken er 0–3 og sier hvor kraftig de tre
+      sjekkene slår ut — ikke om aksjen bør kjøpes eller selges.
+    </p>
   {% else %}
-    <p>Ingen data. Kjør <code>uv run src/fetch_prices.py</code> først.</p>
+    <p>
+      Ingen kursdata funnet i <code>data/</code>.
+      Kjør <code>uv run src/fetch_prices.py</code> først.
+    </p>
   {% endif %}
 </body>
 </html>

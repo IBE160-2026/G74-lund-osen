@@ -3,59 +3,43 @@
 Leser kun fra data/. Denne filen gjoer aldri API-kall, saa en
 nettleseroppdatering kan ikke bruke av kvoten. Nye kurser hentes ved
 aa kjoere fetch_prices.py.
-"""
 
-import json
-from pathlib import Path
+Alt av regning ligger i markedsoversikt.py, og all lesing gaar gjennom
+Kurskilde. Denne fila velger bare hvilken kilde som skal brukes og sender
+resultatet til malen - byttes fila ut med en database i arkitekturfasen, er
+det bare linjen under som endres.
+"""
 
 from flask import Flask, render_template
 
-from fetch_prices import AKSJER
-
-PROSJEKTROT = Path(__file__).resolve().parent.parent
-DATAFIL = PROSJEKTROT / "data" / "sluttkurser.json"
+from kursdata import AKSJEUNIVERS, SnapshotKilde, nyeste_snapshot
+from markedsoversikt import bygg_oversikt
 
 app = Flask(__name__)
 
 
-def beregn_rad(symbol: str, rader: list[dict]) -> dict:
-    """Siste sluttkurs og endring fra dagen foer.
-
-    Endringen regnes paa utbyttejustert kurs, slik at et ordinaert utbytte
-    ikke ser ut som et kursfall. Sluttkursen vi viser er den ujusterte,
-    fordi det er den kursen aksjen faktisk omsettes til.
-    """
-    siste = rader[-1]
-    forrige = rader[-2] if len(rader) > 1 else None
-
-    endring_prosent = None
-    if forrige:
-        fra = forrige.get("adjusted_close") or forrige["close"]
-        til = siste.get("adjusted_close") or siste["close"]
-        if fra:
-            endring_prosent = (til - fra) / fra * 100
-
-    return {
-        "symbol": symbol,
-        "navn": AKSJER.get(symbol, symbol),
-        "dato": siste["date"],
-        "sluttkurs": siste["close"],
-        "endring_prosent": endring_prosent,
-    }
+def hent_kilde() -> SnapshotKilde | None:
+    """Nyeste oeyeblikksbilde i data/, eller None hvis ingen finnes."""
+    fil = nyeste_snapshot()
+    return SnapshotKilde.fra_fil(fil) if fil else None
 
 
 @app.route("/")
 def markedsoversikt():
-    if not DATAFIL.exists():
-        return render_template("index.html", rader=[], hentet=None)
+    kilde = hent_kilde()
+    if kilde is None:
+        return render_template("index.html", rader=[], hentet=None, mangler=[])
 
-    lagret = json.loads(DATAFIL.read_text(encoding="utf-8"))
-    rader = [
-        beregn_rad(symbol, kursrader)
-        for symbol, kursrader in lagret["aksjer"].items()
-        if kursrader
-    ]
-    return render_template("index.html", rader=rader, hentet=lagret.get("hentet"))
+    rader = bygg_oversikt(kilde)
+    vist = {rad.aksje.symbol for rad in rader}
+    mangler = [a.navn for a in AKSJEUNIVERS if a.symbol not in vist]
+
+    return render_template(
+        "index.html",
+        rader=rader,
+        hentet=kilde.tidsstempel(),
+        mangler=mangler,
+    )
 
 
 if __name__ == "__main__":
