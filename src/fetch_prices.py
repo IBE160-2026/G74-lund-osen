@@ -1,36 +1,51 @@
 """Henter sluttkurser for OSE Signal sitt aksjeunivers fra EODHD.
 
 Dette scriptet er det eneste stedet i prosjektet som bruker API-kvote.
-Ett kall per symbol. Gratisnivaaet gir 20 kall i doegnet, saa kjoer det
-bevisst - ikke i loekke, og ikke fra websiden.
+Ett kall per symbol, 15 symboler, altsaa 15 kall per kjoering. Gratisnivaaet
+gir 20 kall i doegnet, saa det er plass til EN kjoering per dag og litt til.
+Kjoer det bevisst - ikke i loekke, og aldri fra websiden.
 
-Raadata lagres slik de kom fra API-et, saa vi kan analysere paa nytt uten
-aa bruke flere kall.
+Hvert kall henter et helt aar. Det koster noeyaktig det samme som aa hente
+fjorten dager - ett kall per symbol uansett intervallengde, maalt og foert i
+malinger.md §2 - og MA50 trenger 51 handelsdager foer signalet i det hele tatt
+kan regnes. Aa hente kort ville derfor kostet like mye og gitt en tom
+signalkolonne.
+
+Resultatet skrives som et tidsstemplet oeyeblikksbilde som aldri skrives om
+(FR-406, NFR-07), i samme format som kursdata.SnapshotKilde leser.
 """
 
 import json
 import os
 import sys
-from datetime import date, timedelta
+from dataclasses import dataclass, field
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+from typing import Callable
 
 import requests
 from dotenv import load_dotenv
 
-# Fem likvide aksjer fra ulike sektorer. Navnene er hardkodet fordi
-# /api/eod ikke returnerer selskapsnavn, og et oppslag for aa hente dem
-# ville kostet ekstra kall uten aa gi noe vi ikke allerede vet.
-AKSJER = {
-    "EQNR.OL": "Equinor",
-    "DNB.OL": "DNB Bank",
-    "TEL.OL": "Telenor",
-    "YAR.OL": "Yara International",
-    "NHY.OL": "Norsk Hydro",
-}
+from kursdata import AKSJEUNIVERS, DATA_KATALOG, PROSJEKTROT
 
-PROSJEKTROT = Path(__file__).resolve().parent.parent
-DATA_KATALOG = PROSJEKTROT / "data"
 BASE_URL = "https://eodhd.com/api/eod"
+
+# Gratisnivaaet gir ett aars historikk. 364 dager holder seg innenfor med en
+# dags margin - det var intervallet som faktisk svarte 2026-09-21, og det ga
+# 249 handelsdager per symbol.
+DAGER_TILBAKE = 364
+
+# MA50 spiser 50 dager. Under dette kan ingen aksje faa et signal.
+MINST_HANDELSDAGER = 51
+
+
+@dataclass
+class Resultat:
+    """Hva en kjoering endte med. Kallene telles uansett om de lyktes."""
+
+    serier: dict[str, list[dict]] = field(default_factory=dict)
+    feil: dict[str, str] = field(default_factory=dict)
+    kall_brukt: int = 0
 
 
 def hent_api_nokkel() -> str:
@@ -41,58 +56,108 @@ def hent_api_nokkel() -> str:
     return nokkel
 
 
-def hent_ett_symbol(symbol: str, api_nokkel: str) -> list[dict]:
-    """Ett API-kall. Henter de siste ukene, ikke hele historikken."""
-    fra_dato = date.today() - timedelta(days=14)
+def bygg_intervall(i_dag: date | None = None) -> tuple[str, str]:
+    """Fra- og til-dato for hentingen. Begge inklusive, jf. malinger.md §2."""
+    i_dag = i_dag or date.today()
+    return (i_dag - timedelta(days=DAGER_TILBAKE)).isoformat(), i_dag.isoformat()
+
+
+def hent_ett_symbol(ticker: str, api_nokkel: str, fra: str, til: str) -> list[dict]:
+    """Ett API-kall. Eneste funksjonen i prosjektet som roerer nettet."""
     svar = requests.get(
-        f"{BASE_URL}/{symbol}",
+        f"{BASE_URL}/{ticker}",
         params={
             "api_token": api_nokkel,
             "fmt": "json",
             "period": "d",
-            "from": fra_dato.isoformat(),
+            "from": fra,
+            "to": til,
         },
-        timeout=30,
+        timeout=60,
     )
     svar.raise_for_status()
     return svar.json()
+
+
+def hent_universet(
+    api_nokkel: str,
+    fra: str,
+    til: str,
+    hent: Callable[[str, str, str, str], list[dict]] = hent_ett_symbol,
+    skriv: Callable[[str], None] = print,
+) -> Resultat:
+    """Ett kall per aksje i universet. Stopper aldri paa en enkelt feil.
+
+    Hentingen er injisert saa testene kan kjoere hele loekka uten nett.
+
+    Et symbol som feiler gir ingen ny sjanse - det ville kostet et kall til,
+    og kvoten er for liten til aa brenne kall paa en feil vi ikke har
+    forstaatt. De andre symbolene hentes likevel: en halv oversikt er bedre
+    enn ingen, og NFR-03 sier at manglende data for en aksje ikke skal stoppe
+    hovedflyten.
+    """
+    resultat = Resultat()
+
+    for aksje in AKSJEUNIVERS:
+        try:
+            rader = hent(aksje.ticker, api_nokkel, fra, til)
+            resultat.kall_brukt += 1
+        except Exception as feil:  # noqa: BLE001 - alt som feiler har kostet kallet
+            resultat.kall_brukt += 1
+            resultat.feil[aksje.symbol] = f"{type(feil).__name__}: {feil}"
+            skriv(f"  {aksje.symbol}: FEIL {feil}")
+            continue
+
+        if not rader:
+            resultat.feil[aksje.symbol] = "tomt svar"
+            skriv(f"  {aksje.symbol}: ingen data")
+            continue
+
+        resultat.serier[aksje.symbol] = rader
+        merknad = "" if len(rader) >= MINST_HANDELSDAGER else "  ← for kort for MA50"
+        skriv(f"  {aksje.symbol}: {len(rader)} dager, siste {rader[-1]['date']}{merknad}")
+
+    return resultat
+
+
+def lag_oyeblikksbilde(resultat: Resultat, fra: str, til: str, naa: str) -> dict:
+    """Formatet kursdata.SnapshotKilde leser. Skrives aldri om etterpaa."""
+    return {
+        "hentet": naa,
+        "from": fra,
+        "to": til,
+        "kilde": "EODHD /api/eod",
+        "serier": resultat.serier,
+        "feil": resultat.feil,
+    }
+
+
+def filnavn(i_dag: date | None = None) -> str:
+    """Datoen staar i navnet, saa oeyeblikksbilder aldri overskriver hverandre."""
+    return f"kurser-raa-{(i_dag or date.today()).isoformat()}.json"
 
 
 def main() -> None:
     api_nokkel = hent_api_nokkel()
     DATA_KATALOG.mkdir(exist_ok=True)
 
-    kall_brukt = 0
-    resultat: dict[str, list[dict]] = {}
+    fra, til = bygg_intervall()
+    print(f"Henter {len(AKSJEUNIVERS)} symboler, {fra} til {til}.")
+    print(f"Dette koster {len(AKSJEUNIVERS)} av dagskvoten paa 20.\n")
 
-    for symbol in AKSJER:
-        try:
-            rader = hent_ett_symbol(symbol, api_nokkel)
-            kall_brukt += 1
-        except requests.HTTPError as feil:
-            # Stopp heller enn aa proeve paa nytt - kvoten er for liten
-            # til aa brenne kall paa en feil vi ikke har forstaatt.
-            sys.exit(f"{symbol} feilet: {feil}. Stopper etter {kall_brukt} kall.")
+    resultat = hent_universet(api_nokkel, fra, til)
 
-        if not rader:
-            print(f"  {symbol}: ingen data")
-            continue
-
-        resultat[symbol] = rader
-        print(f"  {symbol}: {len(rader)} dager, siste {rader[-1]['date']}")
-
-    fil = DATA_KATALOG / "sluttkurser.json"
+    naa = datetime.now(timezone.utc).isoformat()
+    fil = DATA_KATALOG / filnavn()
     fil.write_text(
-        json.dumps(
-            {"hentet": date.today().isoformat(), "aksjer": resultat},
-            indent=2,
-            ensure_ascii=False,
-        ),
+        json.dumps(lag_oyeblikksbilde(resultat, fra, til, naa), ensure_ascii=False),
         encoding="utf-8",
     )
 
     print(f"\nLagret {fil.relative_to(PROSJEKTROT)}")
-    print(f"API-kall brukt: {kall_brukt}")
+    print(f"API-kall brukt: {resultat.kall_brukt}")
+    if resultat.feil:
+        print(f"Symboler uten data: {', '.join(sorted(resultat.feil))}")
 
 
 if __name__ == "__main__":

@@ -12,6 +12,7 @@ Ingen funksjon her gjoer API-kall. Kvoten brukes bare av fetch_prices.py.
 """
 
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
@@ -118,10 +119,27 @@ class SnapshotKilde:
         return self.serier.get(symbol, [])
 
 
-def nyeste_snapshot(katalog: Path = DATA_KATALOG) -> Path | None:
-    """Sist skrevne signaltest-oeyeblikksbilde, eller None hvis ingen finnes.
+# Oeyeblikksbilder heter <noe>-raa-<ÅÅÅÅ-MM-DD>.json. fetch_prices skriver
+# kurser-raa-, signaltesten skrev signaltest-raa-. Begge leses likt.
+_SNAPSHOT_MONSTER = re.compile(r"-raa-(\d{4}-\d{2}-\d{2})\.json$")
 
-    Filnavnet baerer datoen, saa alfabetisk sortering er kronologisk.
+
+def nyeste_snapshot(katalog: Path = DATA_KATALOG) -> Path | None:
+    """Oeyeblikksbildet med nyeste dato i navnet, eller None hvis ingen finnes.
+
+    Datoen leses ut av filnavnet, ikke av filtidsstempelet. Et oeyeblikksbilde
+    som kopieres eller sjekkes ut paa nytt, faar ny mtime, men datoen i navnet
+    er den som gjelder - det er den dagen dataene er fra.
+
+    Prefikset sorteres bevisst IKKE med: "kurser-" kommer foer "signaltest-"
+    alfabetisk, saa alfabetisk sortering ville valgt feil fil.
     """
-    treff = sorted(katalog.glob("signaltest-raa-*.json"))
-    return treff[-1] if treff else None
+    if not katalog.is_dir():
+        return None
+
+    datert = [
+        (treff.group(1), sti)
+        for sti in katalog.glob("*-raa-*.json")
+        if (treff := _SNAPSHOT_MONSTER.search(sti.name))
+    ]
+    return max(datert)[1] if datert else None
