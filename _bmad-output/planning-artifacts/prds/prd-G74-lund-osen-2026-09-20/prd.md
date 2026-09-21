@@ -334,6 +334,30 @@ Aksjedetaljen viser i tillegg:
   av (FR-602)
 - Kommende finansielle hendelser fra Euronext
 
+#### FR-204 — Aksjedetaljen for en aksje uten gyldig signal
+
+Signalet krever 51 handelsdager (FR-701). Har en aksje kortere historikk, eller
+hull i serien, kan det ikke regnes.
+
+**Aksjedetaljen skal da svare som vanlig, ikke feile:**
+
+| Del | Hva som skjer |
+|---|---|
+| Svaret | 200, ikke 404 |
+| Kursgrafen | Tegnes, så langt dataene rekker. MA50-linjen utelates hvis snittet ikke finnes |
+| De tre sjekkene | Utelates — det finnes ingen verdier å vise |
+| I stedet | En beskjed om at signalet ikke kunne regnes, med grunnen |
+
+**Kursen finnes selv om snittet ikke kan regnes**, og da skal den vises.
+
+Begrunnelsen er den samme som FR-101 fikk: en 404 forteller brukeren at aksjen
+ikke finnes. En side med graf og en beskjed forteller at den finnes og at vi
+ikke kunne vurdere den. Bare det andre er sant, og NFR-03 sier at manglende
+data for én aksje ikke skal stoppe hovedflyten.
+
+**404 er forbeholdt to tilfeller:** et symbol som ikke er i aksjeuniverset, og
+en aksje kilden ikke har en eneste kursrad for.
+
 ---
 
 ### 4.3 Kommende finansielle hendelser
