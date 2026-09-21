@@ -324,6 +324,8 @@ kurser først, deretter meldinger. Hentingen kjører som bakgrunnsoppgave.
 Brukeren venter aldri på den og ser siste kjente data med tidsstempel mens den
 pågår.
 
+**Hvor langt tilbake hver henting går, er fastsatt i FR-406.**
+
 #### FR-402 — Kontroll mot forventet børsdag, ikke mot klokkeslett
 
 Hentingen skal ikke anta at data er ferske fordi klokka har passert et
@@ -393,6 +395,31 @@ betingelsen i FR-401 er oppfylt. Kravet her gjelder *hva* en henting gjør når
 den først skjer: den laster ned hele serien på nytt i stedet for å skjøte nye
 rader på en lagret serie. Starter applikasjonen flere ganger samme dag, hentes
 ingenting etter første vellykkede henting.
+
+##### Minste historikk: 175 handelsdager
+
+Hver henting skal dekke **minst 175 handelsdager** per symbol. Tallet er ikke
+valgt, det er summen av to krav som må oppfylles samtidig:
+
+| Kilde til kravet | Handelsdager |
+|---|---:|
+| Grafvinduet i FR-201 — seks måneder | 125 |
+| MA50 må finnes allerede på grafens *første* punkt (FR-202) | 50 |
+| **Sum** | **175** |
+
+Uten de 50 ekstra dagene finnes ikke det glidende snittet for den første delen
+av grafen, og MA50-linjen ville startet midt inne i bildet uten at noe feilet.
+Sjekk 1 ville da vært usynlig nettopp i den perioden brukeren ser først.
+
+**I praksis hentes et helt år.** Ett kall koster det samme uansett
+intervallengde — målt og ført i `malinger.md` §2 — så et kortere intervall ville
+kostet nøyaktig like mye og gitt mindre. Gratisnivået gir ett års historikk, og
+det er derfor taket, ikke et valg.
+
+*Skrevet inn 2026-09-21.* Kravet manglet. `fetch_prices.py` hentet 364 dager,
+og det var tilstrekkelig — men det var en egenskap ved implementasjonen, ikke
+noe noe krav ba om. En senere endring som kortet ned intervallet for å «spare»,
+ville ødelagt grafen uten å bryte et eneste krav.
 
 Uten denne presiseringen ville 15 kall gått med ved hver oppstart, og oppstart
 nummer to samme dag ville sprengt kvoten på 20.
