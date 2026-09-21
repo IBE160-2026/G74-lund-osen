@@ -323,7 +323,10 @@ støyen, og da til å forklare innholdet på norsk.
 2. `https://www.euronext.com/en/terms-use` — Euronexts «Legal notices and terms
    and conditions of use», sist oppdatert 29. april 2021 ifølge dokumentet selv.
 
-Alt som er sitert under, er ordrett fra de to.
+Alt som er sitert under, er ordrett fra de to. Der noe er uthevet i et sitat, er
+uthevingen vår og er merket som det.
+
+Funnet er uavhengig verifisert 2026-09-21 mot samme kilde.
 
 ### De to kildene deler vilkår — det er ikke lenger en antakelse
 
@@ -331,7 +334,8 @@ Forbeholdet fra 20.09 sa at vilkårene for NewsWeb og for finanskalenderen
 «trolig henger sammen» fordi Oslo Børs eies av Euronext. Det er nå bekreftet på
 to måter.
 
-Euronexts vilkår lister opp hvilke nettsteder de gjelder for, og begge står der:
+Euronexts vilkår lister opp hvilke nettsteder de gjelder for, og begge står der
+(uthevingen er vår):
 
 > This website, euronext.com, and the websites connect.euronext.com,
 > **live.euronext.com**, ise.ie, interbolsa.pt, corporateservices.euronext.com,
@@ -349,9 +353,12 @@ til nettopp `euronext.com/en/terms-use`. Kontrollert 2026-09-21.
 Én vilkårskontroll dekker altså begge kildene, slik oppfølgingspunktet la opp
 til.
 
-### Automatisert henting: forbudt uten skriftlig tillatelse på forhånd
+### De tre klausulene som rammer oss
 
-Dette er ikke en kilde som tier:
+Dette er ikke en kilde som tier. Tre klausuler, sitert ordrett og uten
+utheving.
+
+**1. Automatisert henting — forbudt uten skriftlig tillatelse på forhånd:**
 
 > Except if we give you prior written permission, use of any Web browsers
 > (other than generally available third-party browsers), engines, software,
@@ -359,17 +366,12 @@ Dette er ikke en kilde som tier:
 > navigate, search or determine the Euronext Website is strictly prohibited.
 
 «Software … or other devices or mechanisms to navigate, search or determine»
-beskriver det vi gjør. Vi henter fra `api3.oslo.oslobors.no` med en programmert
-forespørsel, ikke med en alminnelig nettleser, så unntaket i parentesen —
-«generally available third-party browsers» — treffer ikke.
+beskriver det vi gjør. Vi henter med en programmert forespørsel, ikke med en
+alminnelig nettleser, så unntaket i parentesen — «generally available
+third-party browsers» — treffer ikke.
 
-Forespørsler om tillatelse skal ifølge samme avsnitt sendes skriftlig til
-Euronext, Legal Department, Copyright Agent, Beursplein 5, 1012 JW Amsterdam,
-eller til `copyrightpermissionsEurope@euronext.com`.
-
-### Videreformidling: forbudt, med ett unntak for klasserommet
-
-Hovedregelen:
+**2. Systematisk uttrekk til en samling — forbudt uten skriftlig tillatelse.**
+Klausulen står inne i en lengre oppramsing:
 
 > You further acknowledge and agree that, unless Euronext, its applicable
 > affiliate, and/or the applicable Third Party Provider give you prior written
@@ -377,24 +379,54 @@ Hovedregelen:
 > download, upload, transmit, distribute, disseminate, publicly display,
 > publicly perform, publish, edit, adapt, compile or create derivative works
 > from any Content or materials (including, without limitation, through framing
-> or **systematic retrieval to create collections, compilations, databases or
-> directories**) or otherwise transfer any of the Content to any third person
+> or systematic retrieval to create collections, compilations, databases or
+> directories) or otherwise transfer any of the Content to any third person
 > (including, without limitation, others in your company or organisation).
 
 «Systematic retrieval to create collections, compilations, databases or
 directories» er en presis beskrivelse av det lokale meldingslageret i FR-406.
 Også `download` og `copy` står på lista.
 
-Unntaket står i avsnittet etter:
+**3. Hva én bruker faktisk har lov til.** Dette er den klausulen en
+tillatelsesforespørsel må forholde seg til, fordi den definerer hva som er
+tillatt uten avtale — og dermed hvor mye mer vi ber om:
 
 > You may print or download a single, unaltered, permanent copy or one
-> temporary copy in a single computer's memory of any Content for your
+> temporary copy in a single computer’s memory of any Content for your
 > personal, non-commercial use only, provided you keep intact all trademark,
-> copyright and other proprietary notices. **Educational institutions may
-> download and reproduce Content on the Euronext Website for distribution in
-> the classroom solely for educational purposes. Distribution outside the
-> classroom or for other than solely educational purposes requires express
-> written permission** in accordance with the above provisions.
+> copyright and other proprietary notices.
+
+Rammen er **én kopi**, til **personlig, ikke-kommersiell** bruk. Et daglig
+uttrekk for femten utstedere som bygger seg opp over tid, er noe annet enn én
+kopi, uansett hvor privat bruken er. Det er avstanden mellom denne setningen og
+det vi gjør, forespørselen til Euronext må dekke.
+
+### Undervisningsunntaket
+
+Unntaket står i avsnittet rett etter klausul 3, og er den eneste åpningen vi
+har funnet i noen kilde i dette prosjektet:
+
+> Educational institutions may download and reproduce Content on the Euronext
+> Website for distribution in the classroom solely for educational purposes.
+> Distribution outside the classroom or for other than solely educational
+> purposes requires express written permission in accordance with the above
+> provisions.
+
+**Tre spenninger som ikke lar seg løse ved å lese videre:**
+
+1. **Unntaket tillater nedlasting, forbudet rammer midlene.** Klausulen sier
+   utdanningsinstitusjoner *kan* «download and reproduce Content». Forbudet mot
+   software, roboter og verktøy for å navigere nettstedet har intet tilsvarende
+   unntak. Den ene setningen tillater resultatet, den andre forbyr veien dit. Vi
+   vet ikke hvordan Euronext leser de to sammen.
+2. **«Educational institutions» — er det oss?** Klausulen er skrevet om
+   institusjoner, ikke om studenter. Høgskolen i Molde er en
+   utdanningsinstitusjon; en studentgruppe som kjører et prosjekt lokalt er ikke
+   åpenbart det samme, og ikke åpenbart noe annet.
+3. **Et offentlig repo er «distribution outside the classroom».** Det vi
+   publiserer fra NewsWeb er utledet statistikk — kategorifordelingene i
+   `malinger.md` §4 — ikke meldingene. Men unntaket er uttrykkelig avgrenset til
+   klasserommet, og alt utenfor krever «express written permission».
 
 ### NewsWebs egen rettighetserklæring, i tillegg
 
@@ -422,58 +454,96 @@ Ansvarsdelen er ren fraskrivelse og sier ingenting om bruk:
 > kravene i verdipapirhandelloven § 5-12. Oslo Børs har ikke ansvar for feil
 > eller unøyaktigheter i informasjonen.
 
+### Hvor vi henter fra, og hvorfor det ikke er et forsvar
+
+**Faktum:** hentingen skjer fra `api3.oslo.oslobors.no`, og det vertsnavnet
+står **ikke** i vilkårenes liste over nettsteder. Lista navngir
+`newsweb.oslobors.no`, som er nettstedet API-et er backend for.
+
+**Dette brukes ikke som forsvar.** Innholdet er det samme — de samme
+børsmeldingene, fra den samme databasen. Og klausulen om «systematic retrieval
+to create collections, compilations, databases or directories» rammer
+*handlingen*, ikke vertsnavnet den utføres mot. Vilkårene definerer dessuten
+«the Euronext Website» vidt: «the web pages of Euronext available to the general
+public, including any linked pages owned and operated by Euronext».
+
+Vi legger til grunn at API-et er dekket. Å bygge på at det ikke er navngitt,
+ville vært å lete etter et smutthull, ikke etter et svar — og et smutthull er
+ikke noe vi kan sitere i en innlevering.
+
 ### Hva dette betyr for oss
 
 | Spørsmål | Svar i vilkårene |
 |---|---|
 | Sier de noe om automatisert henting? | **Ja, uttrykkelig.** Forbudt uten skriftlig tillatelse på forhånd |
 | Sier de noe om videreformidling? | **Ja, uttrykkelig.** Forbudt uten skriftlig tillatelse, med ett unntak for utdanningsinstitusjoners bruk i klasserommet |
+| Hva er tillatt uten avtale? | Én kopi, til personlig og ikke-kommersiell bruk |
 | Er undervisningsbruk regulert? | Ja. Dette er den eneste kilden vi har undersøkt som har en uttrykkelig undervisningsklausul |
-| Skiller de på kommersiell og ikke-kommersiell bruk? | Ja. «Personal, non-commercial use» for enkeltkopien, «solely for educational purposes» for klasserommet |
+| Skiller de på kommersiell og ikke-kommersiell bruk? | Ja, i begge klausulene over |
 
 Dette er motsatt situasjon av EODHD. Der var problemet taushet. Her er problemet
 ordlyd.
 
-**Tre spenninger som ikke lar seg løse ved å lese videre:**
+### Vurderingen av det offentlige repoet står ikke lenger uimotsagt
 
-1. **Klasseromsunntaket mot robotforbudet.** Unntaket tillater
-   utdanningsinstitusjoner å «download and reproduce Content … for distribution
-   in the classroom». Forbudet mot software og verktøy for å navigere
-   nettstedet har intet tilsvarende unntak. Den ene setningen tillater
-   resultatet, den andre forbyr midlene. Vi vet ikke hvordan Euronext leser de
-   to sammen.
-2. **«Educational institutions» — er det oss?** Klausulen er skrevet om
-   institusjoner, ikke om studenter. Høgskolen er en utdanningsinstitusjon; en
-   studentgruppe som kjører et prosjekt lokalt er ikke åpenbart det samme, og
-   ikke åpenbart noe annet.
-3. **Det offentlige repoet.** «Distribution outside the classroom … requires
-   express written permission.» Det vi publiserer fra NewsWeb er utledet
-   statistikk — kategorifordelingene i `malinger.md` §4 — ikke meldingene. Men
-   posisjonen «sammendragsstatistikk er ikke databasen» har nå en ordlyd mot seg
-   her også, på samme måte som «repackaged form» hos EODHD. Åndsverkloven § 43
-   verner dessuten «hele eller vesentlige deler» av databasen, og hva som er en
-   vesentlig del er ikke noe vi kan avgjøre selv.
+**Rådgivningsøkta 2026-09-21 kl. 18:28** vurderte de aggregerte tallene i det
+offentlige repoet — medianomsetning per symbol, kategorifordelinger, kalltall —
+som **lav risiko**.
 
-**Én presisering om rekkevidde.** Domenelista nevner `newsweb.oslobors.no`, men
-ikke `api3.oslo.oslobors.no`, som er det vi faktisk henter fra. API-et er
-backend-en til newsweb-nettstedet, og vilkårene definerer «the Euronext Website»
-vidt — «the web pages of Euronext available to the general public, including any
-linked pages owned and operated by Euronext». Vi legger til grunn at API-et er
-dekket. Å bygge på at det ikke er nevnt ved navn, ville vært å lete etter et
-smutthull, ikke etter et svar.
+Den vurderingen var bygget på **EODHDs ordlyd alene**, der det eneste som
+trekker mot oss er ordet «repackaged» i en klausul som ellers handler om å gi
+andre tilgang.
+
+Etter Euronext-funnet har posisjonen «sammendragsstatistikk er ikke databasen»
+ordlyd mot seg i **to** kilder, ikke én:
+
+| Kilde | Ordlyden som trekker mot posisjonen |
+|---|---|
+| EODHD | «…whether in its original or repackaged form» |
+| Euronext | «Distribution outside the classroom … requires express written permission» |
+| NewsWeb / Åndsverkloven § 43 | «enerett til å råde over hele eller **vesentlige deler** av databasens innhold» |
+
+Posisjonen er ikke omgjort — en median er fortsatt ikke en kursserie, og en
+kategorifordeling er ikke en meldingsdatabase. Men den er ikke lenger en
+vurdering uten motstand, og hva som utgjør en «vesentlig del» av en database er
+ikke noe vi kan avgjøre selv.
+
+**Konsekvensen er praktisk:** brevet til Euronext nevner derfor det offentlige
+repoet **eksplisitt**, i stedet for å holde det utenfor og be om tillatelse bare
+til hentingen. Å be om tillatelse til én ting mens man gjør to, gir et svar man
+ikke kan bruke.
+
+### Forespørsel om skriftlig tillatelse er sendt
+
+**Sendt 2026-09-21** til `copyrightpermissionsEurope@euronext.com` — adressen
+vilkårene selv oppgir for slike forespørsler, sammen med postadressen til
+Euronext, Legal Department, Copyright Agent, Beursplein 5, 1012 JW Amsterdam.
+
+Forespørselen beskriver det vi faktisk gjør:
+
+- ikke-kommersielt studentprosjekt, høstsemesteret 2026
+- **ett uttrekk per døgn** for ca. 15 utstedere
+- applikasjonen kjører lokalt og publiseres ikke
+- ingen videreformidling av meldingene
+- **men kildekode og planleggingsdokumenter ligger i et offentlig repo**, med
+  utledet statistikk og uten meldinger — ført eksplisitt, jf. avsnittet over
+- samme spørsmål stilt for **finanskalenderen på `live.euronext.com`**, siden
+  begge domenene ligger under de samme vilkårene
+
+**Frist for svar: 2026-09-28.** Faglærer er varslet samme dag, 21.09.
+
+Uteblir svaret, er det en beslutning som må tas — ikke noe som skal bli stående
+fordi ingen tok det opp. Ført som oppfølgingspunkt med eier nederst i dokumentet.
 
 ### Konklusjon
 
-**Nei — dokumentert, med et unntak som kan gjelde oss.** Dette er den første
-kilden i prosjektet som både forbyr uttrykkelig *og* har en undervisningsklausul.
-Spørsmålet er ikke lenger om vilkårene sier noe, men om unntaket rekker over det
-vi gjør, og hvem det gjelder for.
+**Nei — dokumentert, med et unntak som kan gjelde oss, og en forespørsel ute.**
+Dette er den første kilden i prosjektet som både forbyr uttrykkelig *og* har en
+undervisningsklausul. Spørsmålet er ikke lenger om vilkårene sier noe, men om
+unntaket rekker over det vi gjør, og hvem det gjelder for.
 
-Det som må til for å gjøre svaret til ja eller nei, er en skriftlig henvendelse
-til `copyrightpermissionsEurope@euronext.com` — adressen vilkårene selv oppgir.
-Henvendelsen bør beskrive det vi faktisk gjør: programmert henting fra
-`api3.oslo.oslobors.no` for de 15 utstederne, lokal lagring, visning i
-undervisning, og et offentlig repo med utledet statistikk, men uten meldinger.
+Børsmeldinger er kjernen i produktet, og det er denne kilden som leverer dem.
+Svaret fra Euronext er derfor prosjektets største åpne risiko.
 
 ---
 
@@ -530,6 +600,13 @@ publiseres, et datasett kan det ikke.
 Posisjonen er ikke en erstatning for vilkårskontrollen. Den sier hva vi gjør i
 mellomtiden, ikke at vilkårene tillater det.
 
+**Oppdatert 2026-09-21.** Vilkårskontrollen er nå gjort, og posisjonen har
+ordlyd mot seg i tre tekster — «repackaged form» hos EODHD, «distribution
+outside the classroom» hos Euronext, og «vesentlige deler» i Åndsverkloven § 43
+via NewsWebs egen rettighetserklæring. Den er ikke omgjort, men den er ikke
+lenger uimotsagt. Se «Vurderingen av det offentlige repoet står ikke lenger
+uimotsagt» over.
+
 ---
 
 ## Å følge opp
@@ -539,15 +616,17 @@ mellomtiden, ikke at vilkårene tillater det.
       begge domenene står navngitt i samme dokument. Se seksjonen «Oslo Børs
       NewsWeb og Euronext: hva vilkårene sier». Svaret er nei, med et
       undervisningsunntak som må avklares
-- [ ] **Skrive til `copyrightpermissionsEurope@euronext.com`** om programmert
-      henting fra `api3.oslo.oslobors.no` i et studentprosjekt, og om
-      klasseromsunntaket rekker over det. Adressen står i vilkårene selv.
-      Koster ingen kall. Dette er nå punktet som kan velte meldingsdelen, og
-      det står svakere enn EODHD-spørsmålet gjorde: der manglet det ordlyd, her
-      finnes den
-- [ ] **Avgjøre hva som gjøres i mellomtiden.** Vilkårene krever tillatelse på
-      forhånd, og vi henter allerede. Det skal være en beslutning gruppen tar
-      bevisst, ikke noe som blir stående fordi ingen tok det opp
+- [x] ~~**Skrive til `copyrightpermissionsEurope@euronext.com`**~~ — **sendt
+      2026-09-21.** Programmert henting fra `api3.oslo.oslobors.no`, ett uttrekk
+      per døgn for ca. 15 utstedere, lokal kjøring, offentlig repo med utledet
+      statistikk, og samme spørsmål for finanskalenderen på
+      `live.euronext.com`. **Svar avventes, frist 2026-09-28.** Faglærer varslet
+      samme dag
+- [ ] **Beslutning hvis Euronext ikke svarer innen 2026-09-28.** Vilkårene
+      krever tillatelse på forhånd, og vi henter allerede. Alternativene er å
+      stoppe hentingen, fortsette bevisst under undervisningsunntaket, eller
+      bygge meldingsdelen om. Skal avgjøres og skrives ned, ikke bli stående
+      fordi ingen tok det opp. **Eier: Marian Osen.** Frist 2026-09-28
 - [ ] Kontrollere Alpha Vantage sine vilkår for ikke-kommersiell bruk
 - [x] ~~Lese EODHDs fullstendige ToS, ikke bare prissiden~~ — gjort 2026-09-20,
       se seksjonen «EODHD: hva de fullstendige vilkårene sier». Svaret er uklart
