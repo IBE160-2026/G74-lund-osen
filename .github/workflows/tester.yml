@@ -1,0 +1,39 @@
+name: tester
+
+# Kjoerer paa hver push og hver pull request mot main. Emnets vurdering ber om
+# dokumentasjon paa hvordan koden er kvalitetssikret, og en groenn kjoering paa
+# hver commit er det billigste beviset vi kan gi.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Ingen hemmeligheter er tilgjengelige for jobben, og ingen skal vaere det.
+# Alle testene gaar uten nett - conftest.py sperrer utgaaende tilkoblinger -
+# saa denne workflowen kan ikke bruke av EODHD-kvoten paa 20 kall i doegnet.
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Hent koden
+        uses: actions/checkout@v4
+
+      - name: Sett opp uv og Python 3.13
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.13"
+          enable-cache: true
+
+      - name: Installer avhengigheter fra uv.lock
+        # --locked feiler hvis uv.lock ikke stemmer med pyproject.toml.
+        # Da skal kjoeringen stoppe, ikke stille loese det opp.
+        run: uv sync --locked
+
+      - name: Kjoer testene
+        # Samme kommando som lokalt, jf. README.
+        run: uv run pytest -q
