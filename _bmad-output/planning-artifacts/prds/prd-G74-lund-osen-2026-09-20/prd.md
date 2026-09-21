@@ -260,7 +260,11 @@ stedet for å se ut som en feil. Kravet må være oppfylt før demonstrasjonen.
 #### FR-201 — Kursgraf med seks måneders historikk
 
 Kursgrafen viser seks måneders historikk, fast i v1. Perioden er lang nok til at
-50-dagers snittet har kontekst, og kort nok til å være lesbar.
+50-dagers snittet har kontekst, og kort nok til å være lesbar. Det gir omtrent
+125 handelsdager; kravet til hvor mye kilden må inneholde, står i FR-406.
+
+**Grafen tegnes på `adjusted_close`**, ikke på `close`. Det gjelder både
+kurslinjen og MA50-linjen i FR-202.
 
 Flere valgbare tidsperioder hører til «hvis vi rekker».
 
@@ -268,6 +272,39 @@ Flere valgbare tidsperioder hører til «hvis vi rekker».
 
 Grafen tegner 50-dagers glidende snitt som en linje oppå kursen. Det gjør
 **sjekk 1, trend**, direkte synlig.
+
+**Begge linjene tegnes på samme serie: `adjusted_close`.**
+
+Begrunnelsen er at aksjedetaljen finnes for å forklare signalet. MA50 regnes på
+utbyttejustert kurs etter FR-701. Tegner grafen en annen serie enn den signalet
+bruker, forklarer skjermbildet noe annet enn det som faktisk skjedde — og
+avviket ville vært systematisk, ikke tilfeldig.
+
+**Målt i grafvinduet 2026-09-21**, som avstand mellom `close` og
+`adjusted_close`:
+
+| Symbol | Avstand |
+|---|---:|
+| FRO | 8,93 % |
+| DNB | 5,84 % |
+| GJF | 5,64 % |
+| **Median over de 15** | **3,72 %** |
+
+Avstanden er størst for aksjene som betaler mest utbytte. En kurslinje på
+`close` mot et snitt på `adjusted_close` ville altså ligget mest feil nettopp
+der utbyttet betyr mest.
+
+**Markedsoversikten og aksjedetaljen viser derfor bevisst ulike serier:**
+
+| Skjermbilde | Hva som vises | Hvorfor |
+|---|---|---|
+| Markedsoversikten (FR-101) | `close` | Det er kursen aksjen faktisk omsettes til |
+| Aksjedetaljen (FR-201) | `adjusted_close` | Det er serien signalet er regnet på |
+
+Det er en reell forskjell brukeren kan oppdage, og den skal forklares der den
+oppstår: **tegnforklaringen i grafen skal si at linjene viser utbyttejustert
+kurs.** Uten det vil en bruker som sammenligner de to skjermbildene, lese
+forskjellen som en feil.
 
 **Sjekk 2 (bevegelse) og sjekk 3 (interesse) vises bare som tall** i lista over
 de tre sjekkene, jf. FR-706. Volatilitetsbånd og volumsøyler tegnes ikke i v1.
