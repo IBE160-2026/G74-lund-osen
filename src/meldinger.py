@@ -148,10 +148,16 @@ def gjett_spraak(tittel: str) -> str:
 def spraak(melding: Melding) -> str:
     """Spraakkoden fra NewsWeb naar den finnes, ellers gjetning paa tittelen.
 
-    [ANTAKELSE] At NewsWeb i det hele tatt leverer en spraakkode, er ikke
-    verifisert mot et ekte svar. Feltene vi har dokumentert, er issuerSign,
-    issuerName, category, publishedTime og title. Kontrollen koster ingen
-    kvote og staar paa lista til 21.09.
+    MAALT 21.09.2026: NewsWeb leverer IKKE en spraakkode. Meldingsobjektet
+    har 20 felter og ingen av dem er et spraakfelt. Gjetningen er derfor
+    eneste vei, ikke en reserve. Maaling i malinger.md §7.3.
+
+    Kodegrenen for spraakkode er likevel beholdt, fordi den ikke koster noe
+    og fordi et felt som dukker opp senere da tas i bruk uten en endring.
+
+    KJENT FEIL, ikke rettet: gjett_spraak lar ae/oe/aa avgjoere alene, og
+    engelske titler som begynner med "Euronext Oslo Boers - ..." blir derfor
+    lest som norske. Foert i memloggen 21.09 som forslag til gruppen.
     """
     kode = melding.spraak.strip().lower()
     if kode in NORSKE_SPRAAKKODER:

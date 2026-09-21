@@ -270,7 +270,7 @@ vinduet er for kort til å avgjøre spørsmålet.
 | Måling | Formål | Kostnad |
 |---|---|---|
 | ~~Nyhetstest mot én `.OL`-ticker~~ | ~~Avgjøre om `/api/news` svarer på gratisnivå i det hele tatt~~ | **Gjort 2026-09-21, se §7.2. Kostet 5 kall, ikke 10. Svaret er ja** |
-| Har NewsWeb et språkfelt? | Avgjør om FR-501 kan bruke språkkode eller må bygge på heuristikk | 0 kall, mandag 2026-09-21 |
+| ~~Har NewsWeb et språkfelt?~~ | ~~Avgjør om FR-501 kan bruke språkkode eller må bygge på heuristikk~~ | **Gjort 2026-09-21, se §7.3. Svaret er nei — heuristikken må beholdes** |
 | Signaltest mot ~200 handelsdager | Låse terskel, volumfaktor og nøytralsonebredde | 15 kall, tirsdag 2026-09-22 |
 | Vilkårskontroll NewsWeb + Euronext | Avgjøre om datagrunnlaget holder | 0 kall, frist 2026-09-27 |
 | Relevanseksperiment, 50 medieartikler | Symbolmatching mot KI-klassifisering | Restkvoten én gang, uke 41 |
@@ -420,3 +420,69 @@ kjørts i dag på restkvoten, siden nyhetstesten ble halvparten så dyr som
 budsjettert. Den er ikke kjørt — den står til 22.09 etter avtale, og å bruke
 hele resten av dagskvoten ville fjernet muligheten til å kontrollere noe som
 helst mer i dag.
+
+### 7.3 Har NewsWeb et språkfelt?
+
+**Dato:** 2026-09-21. **Kostnad: 0 EODHD-kall** — NewsWeb koster ingen kvote.
+
+**Metode.** Ett døgn hentet og alle feltnavn i svaret listet opp:
+
+```
+GET https://api3.oslo.oslobors.no/v1/newsreader/list?category=&issuer=&fromDate=2026-09-18&toDate=2026-09-18
+```
+
+HTTP 200, 86 meldinger, `overflow: false`. **Rådata:**
+`data/newsweb-felter-raa-2026-09-21.json` — bare lokalt, ikke sporet i git.
+
+#### Svaret: nei
+
+Meldingsobjektet har 20 felter, og ingen av dem er et språkfelt:
+
+| | Felter |
+|---|---|
+| Identitet | `id`, `messageId`, `newsId`, `clientAnnouncementId` |
+| Utsteder | `issuerId`, `issuerSign`, `issuerName` |
+| Instrument | `instrId`, `instrumentName`, `instrumentFullName`, `markets` |
+| Innhold | `title`, `category`, `numbAttachments` |
+| Korreksjon | `correctionForMessageId`, `correctedByMessageId` |
+| Øvrig | `publishedTime`, `test`, `infoRequired`, `oamMandatory` |
+
+Ingen feltnavn inneholder *lang*, *locale*, *culture* eller *språk*. Antakelsen
+i `src/meldinger.py` — at NewsWeb kanskje bærer en språkkode — er dermed
+avkreftet. FR-501 må bygge på kjennetegn, ikke på et felt.
+
+#### Tre sidefunn
+
+**1. `category` er tospråklig, men det er kategorinavnet, ikke meldingen.**
+Feltet er en liste med ett objekt: `{id, category_no, category_en}`. Alle 86
+meldingene har nøyaktig én kategori. Begge språkversjonene av samme melding får
+samme kategoriobjekt, så feltet skiller dem ikke — men `category_no` er en
+stabil nøkkel å slå opp bøttene i FR-502 på, i stedet for en fritekststreng.
+
+**2. Ingen felles nøkkel binder en språkdublett sammen.** `id`, `messageId`,
+`newsId` og `clientAnnouncementId` er alle unike — 86 av 86. Equinor-paret
+denne dagen har `newsId` 635211 og 635212: naboer, men ikke like. Det finnes
+altså ikke noe eksakt ID-par som kunne erstattet kjennetegnet i FR-501.
+
+**3. Kjennetegnet i FR-501 traff 8 av 11 riktig denne dagen.** Utsteder +
+kategori + publiseringsminutt slår sammen 11 grupper. Åtte er ekte
+språkdubletter. Tre er det ikke:
+
+| Utsteder | Hva som skjedde | Følge |
+|---|---|---|
+| NOKO | To ulike rentefastsettelser, begge norske, 11:39:37 og 11:39:50 | Harmløs — `RENTEREGULERING` filtreres bort uansett |
+| PARB | Samme mønster, 11:38:45 og 11:38:48 | Harmløs, samme grunn |
+| GOD | «Notice of Extraordinary General Meeting» og «Key information relating to the proposed supplemental cash dividend» — to *forskjellige* meldinger, begge engelske, samme minutt og kategori | **Reelt tap.** Kategorien slipper gjennom filteret, så den ene meldingen ville forsvunnet |
+
+Ingen av de tre gjelder de 15 selskapene i universet. Equinor-paret samme dag er
+en ekte dublett og håndteres riktig. Én dag er ikke grunnlag for en rate.
+
+**4. `gjett_spraak` tar feil på Euronext-meldingene.** Funksjonen i
+`src/meldinger.py` lar æ, ø og å avgjøre alene. Fire engelske titler denne dagen
+begynner med «Euronext Oslo Børs – …» og blir derfor klassifisert som norske.
+For FROKO, STBYG og NANKO betyr det at den engelske versjonen beholdes der
+regelen sier den norske skal vinne. Feilen ligger i heuristikken, ikke i
+kjennetegnet, og den ville ikke blitt oppdaget av en test på våre 15 selskaper —
+de sender ikke meldinger som bærer børsens eget navn i tittelen.
+
+Ingen kravtekst er endret på grunnlag av dette. Vurderingen står i memloggen.
