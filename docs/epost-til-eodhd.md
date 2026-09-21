@@ -13,12 +13,22 @@ relevanseksperimentet.
 sitat, på samme måte som E24-klausulen. Svaret er belegg og skal siteres, ikke
 refereres.
 
-> **Status 2026-09-21.** Spørsmål 1 er sendt og **besvart: ja, med fire
-> betingelser.** Svaret er ført ordrett i `kilder-og-rettigheter.md`, seksjonen
-> «EODHDs skriftlige svar: ja, med betingelser». Spørsmål 4 er avgjort av
-> nyhetstesten i stedet — gratisnivået dekker `/api/news` for `.OL`-tickere.
-> Spørsmål 2 og 3 står fortsatt ubesvart; utkastet til oppfølging ligger nederst
-> i denne fila.
+> **Status 2026-09-21. Alle fire spørsmålene er avklart.**
+>
+> - **Spørsmål 1** sendt 20.09, **besvart 21.09: ja, med fire betingelser.**
+>   Ført ordrett i `kilder-og-rettigheter.md`, seksjonen «EODHDs skriftlige
+>   svar: ja, med betingelser».
+> - **Spørsmål 2 og 3** holdt tilbake til det første var besvart, **sendt
+>   21.09 kl. 19:33 og besvart samme kveld: «Yes, we confirm both».** Ført
+>   ordrett i «Oppfølgingen samme kveld: begge bekreftet». Bekreftelsen
+>   gjelder EODHDs egne data — kategorifordelingene utledet av NewsWeb ligger
+>   under Euronexts vilkår og er ikke avklart av dette svaret.
+> - **Spørsmål 4** ble ikke sendt. Nyhetstesten 21.09 avgjorde det i stedet:
+>   gratisnivået dekker `/api/news` for `.OL`-tickere.
+>
+> Det som gjenstår av godkjenningen, er ikke et spørsmål til EODHD, men en
+> plikt de la på oss: betingelse 4 om at modelltjenesten ikke trener på
+> innholdet vi sender inn.
 
 **Fyll inn før sending:** avsenderadressen, i e-postklienten. Den trenger ikke
 ligge i repoet. Ikke legg ved API-nøkkelen.
@@ -85,7 +95,10 @@ Molde University College, Norway
 
 # Utkast: oppfølging i samme tråd
 
-**Skrevet 2026-09-21. IKKE SENDT — Marian sender selv.**
+**Skrevet 2026-09-21. SENDT samme dag kl. 19:33 av Marian, og besvart samme
+kveld.** Svaret — «Yes, we confirm both», fra Lana A., EOD Support Team — er
+ført ordrett i `kilder-og-rettigheter.md`. Teksten under står slik den ble
+sendt, fordi det er ordlyden i spørsmålet som avgjør hvor langt svaret rekker.
 
 **Hvorfor nå.** Beslutningen 20.09 var å holde spørsmål 2 og 3 tilbake til
 språkmodellspørsmålet var besvart, fordi support erfaringsmessig svarer på det
