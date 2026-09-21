@@ -271,7 +271,7 @@ vinduet er for kort til å avgjøre spørsmålet.
 |---|---|---|
 | ~~Nyhetstest mot én `.OL`-ticker~~ | ~~Avgjøre om `/api/news` svarer på gratisnivå i det hele tatt~~ | **Gjort 2026-09-21, se §7.2. Kostet 5 kall, ikke 10. Svaret er ja** |
 | ~~Har NewsWeb et språkfelt?~~ | ~~Avgjør om FR-501 kan bruke språkkode eller må bygge på heuristikk~~ | **Gjort 2026-09-21, se §7.3. Svaret er nei — heuristikken må beholdes** |
-| Signaltest mot ~200 handelsdager | Låse terskel, volumfaktor og nøytralsonebredde | 15 kall, tirsdag 2026-09-22 |
+| ~~Signaltest mot ~200 handelsdager~~ | ~~Låse terskel, volumfaktor og nøytralsonebredde~~ | **Gjort 2026-09-21, se §7.4. 15 kall, 199 dager. Alle tre verdiene holdt** |
 | Vilkårskontroll NewsWeb + Euronext | Avgjøre om datagrunnlaget holder | 0 kall, frist 2026-09-27 |
 | Relevanseksperiment, 50 medieartikler | Symbolmatching mot KI-klassifisering | Restkvoten én gang, uke 41 |
 
@@ -486,3 +486,118 @@ kjennetegnet, og den ville ikke blitt oppdaget av en test på våre 15 selskaper
 de sender ikke meldinger som bærer børsens eget navn i tittelen.
 
 Ingen kravtekst er endret på grunnlag av dette. Vurderingen står i memloggen.
+
+### 7.4 Signaltesten mot 199 handelsdager
+
+**Dato:** 2026-09-21. **Kostnad: 15 kall** — hele restkvoten for døgnet.
+
+**Formål.** Låse de tre parametrene som siden 20.09 har stått merket
+`[FORELØPIG]` i `src/signalberegning.py` og i FR-701/FR-702: terskel,
+volumfaktor og nøytralsonebredde. Målingen i §5 var gjort mot 15 handelsdager,
+fordi MA50 spiste 50 av de 65 vi da hadde hentet.
+
+**Metode.** Ett `/api/eod`-kall per symbol, 15 totalt, med
+`from=2025-09-22&to=2026-09-18` — så nær ett års historikk som gratisnivået
+tillater. 249 handelsdager per symbol, identisk datoserie for alle 15
+(kontrollert). MA50 spiser de første 50, så **199 dager gir gyldig signal:
+2025-12-01 til 2026-09-18.**
+
+Modellen er `src/signalberegning.py` kjørt uendret. Alle beregninger på
+`adjusted_close`. Hver kombinasjon er regnet på nytt over alle 199 × 15 =
+2 985 aksjedager.
+
+**Rådata.** `data/signaltest-raa-2026-09-21.json` — tidsstemplet øyeblikksbilde,
+bare lokalt, ikke sporet i git.
+
+#### Terskel mot volumfaktor
+
+| Volumfaktor | Terskel ≥2: snitt / mest / minst | Terskel ≥3: snitt / mest / minst | Dager uten noen på ≥3 | Dager uten noen på ≥2 |
+|---|---|---|---|---|
+| 1,25× | 5,6 / 15 / 0 | 1,7 / 9 / 0 | 56 av 199 (28 %) | 1 av 199 (0,5 %) |
+| **1,5× (valgt)** | **4,6 / 13 / 0** | 1,1 / 7 / 0 | 87 av 199 (44 %) | **5 av 199 (2,5 %)** |
+| 2,0× | 4,0 / 12 / 0 | 0,5 / 5 / 0 | 143 av 199 (72 %) | 7 av 199 (3,5 %) |
+
+#### Nøytralsonens bredde
+
+Andel av alle 2 985 aksjedager:
+
+| Sone | Styrke 0 | Styrke 1 | Styrke 2 | Styrke 3 | Positiv | Negativ | Blandet | Ingen |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Uten sone | 0,0 % | 63,9 % | 27,3 % | 8,8 % | 56,8 % | 30,5 % | 12,7 % | 0,0 % |
+| ±1 % | 5,6 % | 60,5 % | 25,8 % | 8,1 % | 54,7 % | 28,6 % | 11,1 % | 5,6 % |
+| **±2 % (valgt)** | **12,7 %** | 56,3 % | 23,9 % | 7,0 % | 52,4 % | 25,8 % | 9,1 % | 12,7 % |
+| ±3 % | 19,1 % | 52,7 % | 22,0 % | 6,2 % | 49,4 % | 24,0 % | 7,5 % | 19,1 % |
+| ±4 % | 25,7 % | 49,0 % | 19,7 % | 5,6 % | 46,0 % | 22,2 % | 6,0 % | 25,7 % |
+
+Uten nøytralsone er styrke 0 fortsatt umulig — 0,0 % over 2 985 aksjedager, ikke
+bare over 225. FR-702 er dermed bekreftet mot et vindu som er tretten ganger
+større.
+
+#### Hva som endret seg fra det korte vinduet
+
+| Forhold | 15 dager (§5) | 199 dager | Vurdering |
+|---|---|---|---|
+| Terskel ≥2, snitt ved 1,5× | 5,4 | 4,6 | Samme størrelsesorden |
+| Terskel ≥3, snitt ved 1,5× | 1,6 | 1,1 | Samme størrelsesorden |
+| Dager uten noen på ≥3 (1,5×) | 7 av 15 (47 %) | 87 av 199 (44 %) | **Bekreftet.** Terskel 3 er tom annenhver dag |
+| Styrke 0 ved ±2 % | 11,1 % | 12,7 % | Bekreftet |
+| Retning positiv | 65,3 % | 52,4 % | **Vesentlig lavere.** Se under |
+| Dager med ≥10 av 15 over terskel 2 | 2 av 15 (13 %) | 14 av 199 (7,0 %) | Lavere, og fortsatt lavt |
+
+#### Skjevfordelingen er mindre enn det korte vinduet viste
+
+Åpent punkt 10 sa at 68 % positiv retning skulle vurderes mot året, ikke mot
+femten dager. Det er nå gjort.
+
+Målt over 199 dager er **60,0 % av aksjedagene med utslag positive**, mot 29,5 %
+negative og 10,5 % blandede. Det korte vinduet fra august–september 2026 lå
+altså i en oppgangsperiode og overdrev skjevheten.
+
+Årsaken som ble antatt 20.09 holder likevel — trend er en vedvarende tilstand
+mens de to andre er hendelser:
+
+| Sjekk | +1 | 0 | −1 |
+|---|---:|---:|---:|
+| Trend | 55,3 % | 19,7 % | 25,0 % |
+| Bevegelse | 16,7 % | 69,9 % | 13,4 % |
+| Interesse | 8,0 % | 85,1 % | 6,9 % |
+
+Trend gir utslag fire av fem dager; de to andre gir utslag sjelden. Retningen
+blir derfor i hovedsak trendens fortegn, og aksjene lå over MA50 oftere enn under
+i denne perioden. En skjevhet på 60/30 over ti måneder er en egenskap ved
+markedet i perioden, ikke ved modellen.
+
+#### Samvariasjon
+
+14 av 199 dager (7,0 %) hadde ti eller flere av de femten over terskel 2. På de
+dagene er retningen sjelden entydig: 2026-03-04 hadde elleve aksjer over terskel,
+men åtte av dem blandet. Den klareste fellesdagen er **2026-09-18 med 13 av 15,
+sju av dem negative** — samme dag som pekte seg ut i det korte vinduet.
+
+Fordelingen er ensidig mot få: 113 av 199 dager har fire eller færre aksjer over
+terskel. Frykten for at signalet mest måler «markedet beveget seg» er dermed
+ikke bekreftet i et vindu som er langt nok til å svare på spørsmålet.
+
+#### Konklusjon: parametrene holder
+
+Alle tre foreløpige verdiene overlever det brede vinduet, og de låses derfor
+uendret:
+
+| Parameter | Verdi | Belegg fra denne målingen |
+|---|---|---|
+| **Terskel** | **2** | Gir 4,6 av 15 aksjer per dag i snitt, og bare 5 av 199 dager helt uten utslag. Terskel 3 ville gitt 1,1 i snitt og 87 tomme dager |
+| **Volumfaktor** | **1,5×** | 1,25× gjør signalet nesten alltid utløst (1 tom dag av 199); 2,0× tømmer terskel 3 på 72 % av dagene. 1,5× ligger mellom |
+| **Nøytralsone** | **±2 %** | Gir styrke 0 på 12,7 % av aksjedagene. ±1 % gir bare 5,6 %, ±4 % spiser 6 prosentpoeng av styrke 2 og 3 til sammen |
+
+**De to bekymringene fra §5 er avklart hver sin vei.** Risikoen for en tom
+demonstrasjon gjaldt terskel 3, ikke terskel 2 — på terskel 2 er bare 2,5 % av
+dagene tomme, og de fem tomme dagene er nettopp de stille dagene briefens
+kriterium om robusthet ber om at systemet skal kunne vise. Skjevfordelingen er
+reell, men mindre enn fryktet, og forklares av at trend er en tilstand og ikke
+en hendelse.
+
+**Dette er en måling, ikke en optimalisering.** Vi har ikke søkt etter
+parameterne som gir penest fordeling; vi har kontrollert om de valgte holder
+mot et vindu som er langt nok. Det gjør de. En søking ville dessuten hatt et
+annet problem: vi har ingen fasit å optimere mot, og modellen skal beskrive hva
+som skjedde, ikke forutsi hva som skjer.
