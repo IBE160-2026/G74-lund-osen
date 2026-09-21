@@ -167,10 +167,44 @@ Sluttkursen vises som `close`, mens prosenten regnes på `adjusted_close`. På
 utbyttedager gir det et synlig avvik mellom de to kolonnene, og dagen skal da
 merkes etter FR-407.
 
+**Aksjer uten gyldig signal vises likevel.** Signalet krever 51 handelsdager
+fordi MA50 spiser 50 av dem. En nynotert aksje, eller en serie med hull, gir
+derfor ingen signalverdi. Raden skal da vises med:
+
+| Kolonne | Innhold når signalet mangler |
+|---|---|
+| Selskap, Sluttkurs, Endring | Som vanlig, hvis dataene finnes |
+| Signalstyrke | Tom |
+| Retning | **Ukjent** |
+
+«Ukjent» er ikke en femte retning i FR-704 — det er fraværet av en vurdering.
+Skillet betyr noe: *Ingen* sier at de tre sjekkene ble regnet og ingen slo ut,
+*Ukjent* sier at de ikke kunne regnes.
+
+Begrunnelsen er NFR-03: manglende data for én aksje skal ikke stoppe
+hovedflyten. En rad som forsvinner, forteller brukeren at aksjen ikke finnes.
+En rad med tom styrke forteller at den finnes og at vi ikke kunne vurdere den.
+Bare det andre er sant.
+
+Aksjer kilden ikke har en eneste kursrad for, faller ut av tabellen, men skal
+navngis under den, slik at brukeren vet at oversikten er ufullstendig.
+
 #### FR-102 — Standard sortering
 
 Sortering er **signalstyrke fallende**, med **absolutt kursendring** som
 sekundærkriterium ved lik styrke.
+
+Absolutt, ikke fortegn: et stort fall skal ikke havne bakerst fordi det er
+negativt.
+
+**Aksjer uten gyldig signal sorteres sist**, uansett kursendring. En rad vi
+ikke kunne vurdere, skal ikke legge seg foran en vi kunne vurdere.
+
+Merk at styrken bare har fire verdier fordelt på femten rader, så lik styrke er
+normalen og ikke unntaket. Målingen 2026-09-21 viste 13 av 15 aksjer på styrke
+2 eller høyere for 2026-09-18. **Sekundærkriteriet gjør derfor mesteparten av
+sorteringsarbeidet**, og det er verdt å vite når rekkefølgen skal forklares i
+en demonstrasjon.
 
 At brukerens egne aksjer havner tilfeldig i lista, er akseptert i v1.
 Favorittmerking hører til «hvis vi rekker».
