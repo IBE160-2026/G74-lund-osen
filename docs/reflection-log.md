@@ -1066,6 +1066,67 @@ endret.
 
 ---
 
+## 21.09.2026 – To svar fra EODHD på under ett døgn, for prisen av én e-post
+
+### Dato / deltaker(e)
+
+21.09.2026. Marian Osen. Oppfølging til EODHD sendt kl. 19:33, besvart samme
+kveld.
+
+### Hva ble gjort eller foreslått?
+
+Beslutningen 20.09 var å sende **ett** spørsmål til EODHD, ikke fire. Support
+svarer erfaringsmessig på det letteste når flere stilles samtidig, og
+språkmodellspørsmålet var det som blokkerte mest. De tre andre ble holdt
+tilbake med vilje.
+
+Da svaret kom 21.09 — ja, med fire betingelser — ble spørsmål 2 og 3 sendt i
+samme tråd. Spørsmål 4 var da allerede avgjort av nyhetstesten, så det ble
+aldri sendt.
+
+### Hva førte det til?
+
+Begge ble bekreftet samme kveld: «Yes, we confirm both». **To skriftlige svar
+på under ett døgn, begge for prisen av én e-post.**
+
+Det avklarte to ting vi allerede gjorde: demonstrasjonen for lærer og klasse,
+og de aggregerte tallene i det offentlige repoet. Posisjonen
+«sammendragsstatistikk er ikke databasen» gikk fra å ha ordlyd mot seg i tre
+tekster til to.
+
+### Refleksjon
+
+**Bekymringen som ikke slo til.** Argumentet mot å sende en runde til var at
+den kunne få EODHD til å tenke seg om og snevre inn det svaret vi allerede
+hadde. Det skjedde ikke. Men det var ikke en dum bekymring — den var grunnen
+til at spørsmålene ble sendt i riktig rekkefølge, med det viktigste først og
+alene. Rekkefølgen var forsiktigheten; å utsette den andre runden i tillegg
+ville bare vært utsettelse.
+
+**Det svaret ikke dekker, er verdt like mye som det det dekker.** Spørsmål 2
+nevnte to typer tall i samme setning — medianomsetning fra EODHD-kurser, og
+kategorifordelinger fra NewsWeb-meldinger. «We confirm both» bekrefter to
+*spørsmål*, ikke alle tallene nevnt i dem. EODHD kan uttale seg om sine egne
+data og ikke om Euronexts. Hadde vi ført svaret som «de aggregerte tallene er
+klarert», ville vi gitt oss selv en tillatelse ingen har gitt oss — og det på
+den kilden som er prosjektets største åpne risiko.
+
+**Det som gjenstår, er ikke noe EODHD skal svare på.** Betingelse 4 i
+godkjenningen — at modelltjenesten ikke trener på innholdet vi sender inn — er
+en plikt de la på oss. Den kan ikke lukkes med en e-post til dem, bare ved å
+velge en modelltjeneste og sitere dens vilkår. Den står fortsatt åpen, fordi
+ingen modell er valgt ennå.
+
+### Git / dokumentasjon
+
+Svaret er ført ordrett i `docs/kilder-og-rettigheter.md`, seksjonen
+«Oppfølgingen samme kveld: begge bekreftet», sammen med begge spørsmålene slik
+de ble sendt. De to oppfølgingspunktene om «displaying» og «repackaged form» er
+lukket, og `docs/epost-til-eodhd.md` er oppdatert med at spørsmål 2 og 3 er
+sendt og besvart. Hver sin commit.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
