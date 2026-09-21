@@ -772,6 +772,7 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 | 2 | **KI-terskelen i samlekategorien** — hvor grensen mellom «kan påvirke» og «lite relevant» skal gå. Kan ikke avgjøres på papir; relevanseksperimentet er input. Foreløpig regel står i FR-606 | *‹fylles inn›* | Etter uke 41 | Kalibrering av FR-606 |
 | 3 | **Hvilken kilde gir handelskalenderen?** FR-402 hviler på «forventet børsdag», men ingen kilde er utpekt for hvilke dager Oslo Børs er åpen | *‹fylles inn›* | Før implementasjon | FR-402 |
 | 4 | **Hvordan utledes eks.dato?** FR-407 og FR-503 forutsetter at utbyttedager kan identifiseres, men regelen er ikke skrevet | *‹fylles inn›* | Før demonstrasjonen | FR-407, FR-503 |
+| 16 | **Språkgjenkjenningen slår systematisk feil for Vår Energi.** `gjett_spraak` lar ett norsk tegn avgjøre alene, og `VAR` heter *Vår Energi ASA*. Hver engelsk melding derfra bærer «å» i sitt eget firmanavn og leses som norsk, så FR-501 vil beholde den engelske versjonen hver gang selskapet sender et meldingspar. Dette er ikke en kantsituasjon — det er hver gang, for én av de femten, og det vises i en norsk applikasjon. **To forsvarlige veier:** bygge om språkregelen, eller la den stå og forklare avviket i demonstrasjonen. Det som ikke er forsvarlig er at valget tas ved at ingen tar det opp | Gruppen | **Før UI-arbeidet starter** | FR-501, demonstrasjonen |
 
 ### Må følges opp
 
@@ -801,6 +802,12 @@ forespørselen om tillatelse ble sendt 21.09 med frist 28.09. Fullstendig
 gjennomgang med sitater i `docs/kilder-og-rettigheter.md`.
 
 Punkt 1 har fått eier. De øvrige har det ennå ikke.
+
+**Om nummereringen.** Numrene følger rekkefølgen punktene ble opprettet i, ikke
+rekkefølgen i tabellene. Punkt 16 står derfor over sammen med de andre som må
+avgjøres, selv om numrene 5–15 ligger i tabellen under. Det er gjort for at
+kryssreferanser fra `malinger.md` og gjennomgangene skal forbli gyldige — et
+punkt som renummereres, mister sporet tilbake til målingen som begrunnet det.
 
 **Om eierfeltet.** «Gruppen» er et bevisst valg, ikke en tom rubrikk: vi er to,
 og fordelingen gjøres internt etter hva som passer når punktet skal tas. Det
