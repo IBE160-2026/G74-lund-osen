@@ -1063,3 +1063,44 @@ veier virker. Den som ikke virker, er å la den stå.
 Tilbakemeldingen er ført her ordrett. De tre første punktene er ført i `prd.md`
 og `begrunnelser.md` som vist i tabellen over, med hver sin commit. Ingen kode er
 endret.
+
+---
+
+# Joakims oppføringer
+
+Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
+
+**Hvorfor den finnes.** Oppføringene over er ført av Marian eller av en
+KI-økt. Joakim har bidratt med ideer som har formet prosjektet — men det har
+skjedd utenfor de øktene som ble loggført, og derfor finnes bidragene ikke i
+noen fil. Loggen viser hvem som *førte* oppføringene; den viser ikke hvem som
+bidro.
+
+Det er et dokumentasjonsproblem, ikke et deltakelsesproblem. Men konsekvensen
+er reell: en refleksjonsrapport om gruppens prosess kan ikke vise fram noe som
+ikke står skrevet.
+
+**Hva som bør føres.** Samme struktur som de øvrige oppføringene:
+
+## DD.MM.2026 – kort tittel
+
+### Dato / deltaker(e)
+
+### Hva ble gjort eller foreslått?
+
+### Hva førte det til?
+
+Hva forslaget endret — i produktet, i en beslutning, eller i retningen
+arbeidet tok. Det er koblingen mellom idé og utfall som gjør en oppføring
+brukbar i rapporten. Et forslag som ble forkastet, er også verdt å føre; da
+hører begrunnelsen med.
+
+### Refleksjon
+
+Valgfritt. Hva som var vanskelig, hva som overrasket, hva du ville gjort
+annerledes.
+
+---
+
+*Det er lettere å skrive dette nå enn i desember. Oppføringer som skrives i
+ettertid, blir til det man husker — ikke til det som skjedde.*
