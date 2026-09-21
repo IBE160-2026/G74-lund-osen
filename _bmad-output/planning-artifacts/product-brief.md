@@ -67,7 +67,7 @@ Vi er selv i målgruppen og bruker løsningen gjennom prosjektperioden. Vi har i
 | Adopsjon | Gruppen bruker løsningen på egne aksjer og logger feil | Minst 4 av 5 børsdager fra første fungerende versjon | Løpende |
 | Kvalitet | Daglig henting fullfører innenfor API-kvoten; ved kildefeil vises siste kjente data med tidsstempel | Ingen manuelle steg, ingen stopp ved manglende data | Ukentlig |
 | KI-bidrag i drift | Hvilke meldinger KI-laget forklarte eller omklassifiserte som regelfilteret alene ikke skilte | Dokumentert eksempelsett fra minst én ukes drift | Før demonstrasjon (est. uke 45) |
-| Relevanseksperiment | Testsett på 50 medieartikler merket manuelt, kjørt mot både symbolmatching og KI-klassifisering | Eksperimentet gjennomført og tallene dokumentert — ikke at KI kommer best ut | Est. uke 41 |
+| Relevanseksperiment | Testsett på 50 medieartikler merket manuelt, kjørt mot både symbolmatching og KI-klassifisering | Eksperimentet gjennomført og tallene dokumentert — ikke at KI kommer best ut | Innsamling og merking uke 39–40; KI-kjøringen når KI-laget finnes |
 | Fortsatt bruk | Om vi bruker løsningen frivillig etter at utviklingen er ferdig, ikke bare for å teste den | Brukt minst tre dager i uka de to siste ukene før prosjektinnlevering, loggført | Ved prosjektinnlevering |
 | Robusthet på stille dager | Manglende data, feilende kilder og dager uten tydelige signaler håndteres uten at hovedflyten stopper eller systemet tvinger frem et resultat | Ingen stopp, og «ingen tydelige signaler» er et gyldig svar løsningen faktisk gir | Løpende |
 
