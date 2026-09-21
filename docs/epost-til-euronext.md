@@ -121,6 +121,31 @@ Det er verdt å ha i bakhodet når svaret kommer: **et ja til «Retrieval» er i
 automatisk et ja til «Storage».** Sier svaret bare noe om henting, står lagringen
 fortsatt ubesvart, og det må i så fall følges opp.
 
+#### Håndteringen er bevisst: ingen tilleggse-post nå
+
+**Besluttet 2026-09-21**, samme dag som brevet gikk.
+
+Det nærliggende var å sende et tillegg med klausulen sitert. Det gjør vi ikke,
+og grunnen er den samme som ble skrevet ned i EODHD-saken 20.09: **support
+svarer på det letteste når flere spørsmål stilles samtidig.** Et tillegg til en
+forespørsel som er én time gammel gjør nøyaktig det samme som å legge fire
+spørsmål i én e-post — det gir mottakeren flere tråder å velge mellom, og det
+svakeste spørsmålet trekker svaret ned til seg.
+
+Der ble begrunnelsen brukt til å sende **ett** spørsmål og holde tre tilbake.
+Svaret kom på under ett døgn og gjaldt nøyaktig det vi spurte om. Samme
+begrunnelse gjelder her, og da skal den brukes likt — ellers er den ikke en
+regel, bare noe vi sa én gang.
+
+**Dette er derfor ikke ført som en mangel som skal rettes ved å skrive på nytt.
+Det er ført som noe å se etter i svaret.** Sjekklista står under «Hva svaret
+dekker, og hva det ikke dekker».
+
+Kommer svaret og dekker bare hentingen, er *det* tidspunktet å stille
+oppfølgingsspørsmålet — i samme tråd, med klausulen sitert, og med et svar å
+bygge på. Det er samme rekkefølge som de to gjenstående EODHD-spørsmålene
+følger.
+
 ## Hvorfor NewsWeb ikke er skrevet til separat
 
 `newsweb.oslobors.no` har sin egen rettighetserklæring på
