@@ -63,14 +63,18 @@ def test_viser_selskapsnavn_og_de_fem_kolonnene(klient, monkeypatch):
 
 
 def test_retningen_vises_med_baade_tekst_og_symbol(klient, monkeypatch):
-    """FR-103: symbolet staar ved siden av teksten, ikke i stedet for den."""
+    """FR-103: symbolet staar ved siden av teksten, ikke i stedet for den.
+
+    Teksten er FR-704s ord uendret - Positiv, ikke Opp.
+    """
     stigende = serie([100.0] * 60 + [110.0])
     monter(monkeypatch, MinneKilde({"EQNR": stigende}))
 
     html = klient.get("/").data.decode("utf-8")
 
-    assert "Opp" in html
+    assert "Positiv" in html
     assert "↑" in html
+    assert ">Opp<" not in html
 
 
 def test_symbolet_er_skjult_for_skjermlesere(klient, monkeypatch):

@@ -37,16 +37,30 @@ class Retningsvisning:
     klasse: str
 
 
-# FR-704 navngir retningene Positiv, Negativ, Blandet og Ingen. FR-103 viser
-# dem som Opp, Ned, Blandet og Ingen utslag. Det er to ordforraad for det
-# samme, og oversettelsen hoerer hjemme her - i visningen - ikke i modellen.
-RETNINGSVISNING: dict[str, Retningsvisning] = {
-    POSITIV: Retningsvisning("Opp", "↑", "opp"),
-    NEGATIV: Retningsvisning("Ned", "↓", "ned"),
-    BLANDET: Retningsvisning("Blandet", "↔", "blandet"),
-    INGEN: Retningsvisning("Ingen utslag", "–", "ingen"),
+# Visningen bruker FR-704s ordforraad uendret. Det fantes en oversettelse her
+# - Positiv ble vist som "Opp" - og den er fjernet, ikke dokumentert.
+#
+# Grunnen: "Opp" og "Ned" staar rett ved siden av kolonnen Endring og inviterer
+# til aa lese pilen som kursbevegelse. Retningen sier noe annet - hva de tre
+# sjekkene peker mot. Briefen slaar fast at signalstyrke ikke er en anbefaling
+# om kjoep eller salg, og Opp/Ned lener seg mot nettopp den lesningen.
+#
+# Teksten bygges derfor AV konstanten, ikke ved siden av den. Da kan de to
+# ikke drive fra hverandre senere.
+_SYMBOL_OG_KLASSE: dict[str, tuple[str, str]] = {
+    POSITIV: ("↑", "opp"),
+    NEGATIV: ("↓", "ned"),
+    BLANDET: ("↔", "blandet"),
+    INGEN: ("–", "ingen"),
 }
 
+RETNINGSVISNING: dict[str, Retningsvisning] = {
+    retning: Retningsvisning(retning, symbol, klasse)
+    for retning, (symbol, klasse) in _SYMBOL_OG_KLASSE.items()
+}
+
+# Ikke en retning, men fravaeret av en vurdering. Se FR-101 og FR-102 om
+# aksjer uten gyldig signal.
 UKJENT_RETNING = Retningsvisning("Ukjent", "–", "ukjent")
 
 

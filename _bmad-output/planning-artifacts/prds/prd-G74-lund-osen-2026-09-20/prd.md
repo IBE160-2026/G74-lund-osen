@@ -177,18 +177,29 @@ Favorittmerking hører til «hvis vi rekker».
 
 #### FR-103 — Retning vises i tre redundante kanaler
 
-Retningen vises som tekst, symbol og farge samtidig:
+Retningen vises som tekst, symbol og farge samtidig.
 
-| Retning | Visning |
-|---|---|
-| Positiv | Opp ↑ |
-| Negativ | Ned ↓ |
-| Blandet | Blandet ↔ |
-| Ingen | Ingen utslag |
+**Visningen bruker FR-704s ordforråd uendret.** Teksten på skjermen er den
+samme strengen som modellen produserer — ingen oversettelse mellom de to:
+
+| Retning (FR-704) | Tekst på skjermen | Symbol |
+|---|---|---|
+| Positiv | Positiv | ↑ |
+| Negativ | Negativ | ↓ |
+| Blandet | Blandet | ↔ |
+| Ingen | Ingen | – |
+
+*Endret 2026-09-21.* Kravet sa tidligere «Opp» og «Ned». De ordene sto rett ved
+siden av kolonnen Endring og inviterte til å lese pilen som kursbevegelse,
+mens retningen sier noe annet: hva de tre sjekkene peker mot. Briefen slår fast
+at signalstyrke ikke er en anbefaling om kjøp eller salg, og «Opp/Ned» lener
+seg mot nettopp den lesningen. Oversettelsen er fjernet, ikke dokumentert.
 
 Alle tre kanalene er obligatoriske. Farge alene utelukker fargeblinde brukere,
 og «blandet» lar seg ikke uttrykke lesbart i farge i det hele tatt. Teksten er
-den bærende kanalen; symbol og farge er forsterkninger.
+den bærende kanalen; symbol og farge er forsterkninger. Symbolet står ved siden
+av teksten, ikke i stedet for den, og skjules for skjermlesere så pilen ikke
+leses opp i tillegg til ordet.
 
 #### FR-407 — Merking av utbyttedager
 

@@ -99,17 +99,24 @@ class TestRetningsvisning:
             assert retning in RETNINGSVISNING
 
     @pytest.mark.parametrize(
-        "retning,tekst,symbol",
-        [
-            (POSITIV, "Opp", "↑"),
-            (NEGATIV, "Ned", "↓"),
-            (BLANDET, "Blandet", "↔"),
-            (INGEN, "Ingen utslag", "–"),
-        ],
+        "retning,symbol",
+        [(POSITIV, "↑"), (NEGATIV, "↓"), (BLANDET, "↔"), (INGEN, "–")],
     )
-    def test_tekst_og_symbol_foelger_fr_103(self, retning, tekst, symbol):
-        assert RETNINGSVISNING[retning].tekst == tekst
+    def test_symbolet_foelger_fr_103(self, retning, symbol):
         assert RETNINGSVISNING[retning].symbol == symbol
+
+    @pytest.mark.parametrize("retning", [POSITIV, NEGATIV, BLANDET, INGEN])
+    def test_teksten_er_fr_704s_ord_uendret(self, retning):
+        """Visningen oversetter ikke. Staar det Positiv i modellen, staar det
+        Positiv paa skjermen."""
+        assert RETNINGSVISNING[retning].tekst == retning
+
+    def test_ingen_retning_vises_som_opp_eller_ned(self):
+        """Opp/Ned inviterer til aa lese pilen som kursbevegelse, og briefen
+        slaar fast at signalet ikke er en anbefaling om kjoep eller salg."""
+        tekster = {v.tekst for v in RETNINGSVISNING.values()}
+        assert "Opp" not in tekster
+        assert "Ned" not in tekster
 
     def test_de_tre_kanalene_er_forskjellige_per_retning(self):
         """Tekst, symbol og klasse skal skille retningene hver for seg.
