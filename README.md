@@ -39,20 +39,24 @@ applikasjonen skal fungere uten det.
 **Utenfor versjonskontroll, og derfor ikke i repoet:** API-nøkkel (`.env`), hentede
 rådata (`data/`) og lokale testskript (`local-tests/`).
 
-## Kjøre applikasjonen
+## Kom i gang
 
 ```
-uv sync
-uv run python src/app.py
+git clone https://github.com/IBE160-2026/G74-lund-osen.git
+cd G74-lund-osen
+uv sync                                  # installerer avhengighetene fra uv.lock
+cp .env.example .env                     # fyll inn EODHD_API_KEY
+uv run python src/fetch_prices.py        # henter kurser, bruker 15 API-kall
+uv run python src/app.py                 # http://localhost:5000
 ```
 
-Applikasjonen kjører lokalt på `http://localhost:5000` og leser bare fra `data/`.
-Den gjør aldri API-kall selv, så en nettleseroppdatering kan ikke bruke av kvoten.
-Uten hentede data starter den med tom oversikt.
+Applikasjonen leser bare fra `data/` og gjør aldri API-kall selv, så en
+nettleseroppdatering kan ikke bruke av kvoten. `fetch_prices.py` er det eneste
+stedet i prosjektet som bruker kvote: 15 kall av de 20 EODHDs gratisnivå gir i
+døgnet, altså én full henting per dag.
 
-Nye sluttkurser hentes med `uv run python src/fetch_prices.py`. Det er det eneste
-stedet i prosjektet som bruker kvote — 15 kall av de 20 EODHDs gratisnivå gir i
-døgnet — og det krever `EODHD_API_KEY` i `.env`.
+Hopper du over hentesteget, starter applikasjonen likevel — med tom oversikt og
+beskjed om at `data/` er tom. Testene under krever verken nøkkel eller data.
 
 ## Tester
 
