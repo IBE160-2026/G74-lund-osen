@@ -39,7 +39,7 @@ Kursdata hentes fra EODHD, børsmeldinger fra Oslo Børs' NewsWeb der hver meldi
 
 NewsWeb og Euronext ligger under de samme bruksvilkårene, og de krever skriftlig tillatelse på forhånd til automatisert henting. Forespørselen er sendt 21.09. Foreligger det ikke svar innen 28.09, tar vi stilling til meldingsdelen uten.
 
-Universet er satt til omtrent 15 aksjer fordi EODHD på gratisnivå gir 20 API-kall i døgnet og kurser koster ett kall per symbol; NewsWeb og Euronext koster ingen kall. Tallet er utledet av kvoten, ikke valgt etter skjønn. Målingene og bruksvilkårene vi har sjekket er dokumentert i `docs/kilder-og-rettigheter.md`. Oppdateringsmekanikk og lagring hører til PRD og arkitektur.
+Universet er satt til omtrent 15 aksjer fordi EODHD på gratisnivå gir 20 API-kall i døgnet og kurser koster ett kall per symbol; NewsWeb og Euronext bruker ingen av kallene. Tallet er utledet av kvoten, ikke valgt etter skjønn. Målingene og bruksvilkårene vi har sjekket er dokumentert i `docs/kilder-og-rettigheter.md`. Oppdateringsmekanikk og lagring hører til PRD og arkitektur.
 
 ## What Makes This Different
 
