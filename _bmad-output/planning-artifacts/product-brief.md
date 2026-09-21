@@ -15,7 +15,7 @@ Prosjektet er mulig nå fordi KI-assistert utvikling gjør det realistisk for to
 
 Den som følger 10–30 norske aksjer ved siden av jobb eller studier har ikke et informasjonsproblem, men et sorteringsproblem. Kursene, meldingene og rapportdatoene finnes, men ligger på ulike steder og i ulikt format, og det meste er irrelevant akkurat i dag.
 
-Støyen er målbar, og den har to former. I vår egen test 17.09 leste vi manuelt de ti siste nyhetstreffene for et utvalg selskaper. For et stort finansselskap handlet flertallet i realiteten om andre selskaper; det var bare ett av mange symboler i artikkelen. For et shippingselskap var bildet motsatt. En løsning kan altså ikke anta at en nyhet knyttet til et symbol handler om det selskapet.
+Støyen er målbar, og den har to former. I vår egen test 17.09 leste vi manuelt de ti siste nyhetstreffene for et utvalg selskaper. For et stort finansselskap handlet flertallet i realiteten om andre selskaper; det var bare ett av mange symboler i artikkelen. For et shippingselskap var bildet motsatt. En løsning kan altså ikke anta at en nyhet knyttet til et symbol handler om det selskapet. En kjøring 21.09 mot det samme finansselskapet ga samme mønster, denne gangen med tidsstempel og rådata bak.
 
 Den andre formen finnes i selskapenes egne børsmeldinger. Vi målte fire uker for de selskapene løsningen faktisk skal dekke: 121 meldinger, drøyt fire i døgnet. Mengden er ikke problemet. Sorteringen er — og støyen har to hovedformer. Nær 29 % er ukentlige statusrapporter om tilbakekjøp av egne aksjer, med samme ordlyd hver gang. Drøyt 26 % er samme melding publisert to ganger, på norsk og på engelsk.
 
