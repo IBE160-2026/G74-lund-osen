@@ -388,3 +388,76 @@ ikke.
 kravet uten å røre en premiss vi nettopp har brukt to dager på å få skriftlig.
 Beslutningen er likevel ikke tatt her — den hører til arkitekturfasen, og står
 som åpent punkt 17 med eier Gruppen.
+
+---
+
+## 10. Teknologivalget: Python og Flask, som et bevisst avvik
+
+**Dette er ikke en beslutning som tas her — den er allerede tatt.** Seksjonen
+skriver den ned som det den er: et avvik fra det faglærer anbefaler, valgt med
+åpne øyne, med en kostnad vi skal bære selv.
+
+### Hva faglærer sa
+
+Gruppen står fritt til å velge Python, TypeScript eller en kombinasjon. Men det
+er **«en klar fordel å bruke omtrent samme teknologistack som Bård Inge bruker i
+undervisningen»**, og undervisningen bruker Node.js.
+
+Det er altså ikke et krav. Det er en anbefaling med en begrunnelse, og
+begrunnelsen er god.
+
+### Hva vi har valgt, og hva som allerede er bygget
+
+Python 3.13 med Flask. Avhengighetene er `flask`, `requests` og `python-dotenv`,
+med `pytest` som utviklingsavhengighet.
+
+Per 2026-09-21 finnes det **1 098 linjer kode** i repoet:
+
+| Fil | Linjer | Hva den gjør |
+|---|---:|---|
+| `src/signalberegning.py` | 211 | Hele signalmodellen, FR-701 til FR-705 |
+| `src/meldinger.py` | 254 | Deduplisering og kategorifilter, FR-501 til FR-503 |
+| `src/fetch_prices.py` | 99 | Datahentingen |
+| `src/app.py` | 62 | Flask-applikasjonen |
+| `src/templates/index.html` | 51 | Markedsoversikten |
+| `tests/` | 421 | **41 tester**, alle grønne, ingen av dem bruker API-kall |
+
+Begge kjernemodulene er ren logikk uten nettverk og uten filer, og de er testet i
+sin helhet uten å bruke av kvoten. Det er ikke et skall — det er den delen av
+prosjektet som er vanskeligst å få riktig, og den er ferdig.
+
+### Hvorfor vi likevel ikke bytter
+
+Et bytte til Node.js nå ville kostet en omskriving av signalmodellen,
+meldingsfilteret og de 41 testene. Den koden er den eneste delen av prosjektet
+som *ikke* er usikker: parametrene er låst mot 199 handelsdager, og
+kategorifilteret er målt mot 121 meldinger.
+
+Vi står samtidig foran arkitekturfasen med to uavklarte punkter som faktisk
+betyr noe for resultatet — database (punkt 17) og Dockerfile (punkt 18) — og ett
+som kan velte hele meldingsdelen (punkt 1, Euronext). **Å bruke tiden på å
+skrive om kode som virker, i stedet for på de tre, er feil prioritering.**
+
+Dockerkravet er dessuten språkuavhengig. Det trekker ikke i noen retning.
+
+### Kostnaden, som skal stå her og ikke bortforklares
+
+Anbefalingen fra faglærer har en reell begrunnelse, og ved å gå mot den betaler
+vi to ting:
+
+1. **Mindre overlapp med undervisningseksemplene.** Det som vises i forelesning
+   kan ikke kopieres inn eller leses som en mal. Hvert mønster må oversettes
+   selv, og oversettelsen er en kilde til feil som gruppen som følger stacken
+   ikke har.
+2. **Vanskeligere å få hjelp når noe står fast.** Spør vi faglærer eller
+   medstudenter om et konkret problem, er svaret formet for en annen stack.
+   Det gjør hjelpen tregere og mindre presis — og det treffer oss verst
+   nøyaktig når vi trenger den mest, altså når vi allerede sitter fast.
+
+Den andre kostnaden er den alvorligste, fordi den slår inn i arkitekturfasen der
+vi har minst erfaring: database, migrasjoner og containerisering er nettopp der
+et undervisningseksempel ville vært mest verdt.
+
+**Vi tar den kostnaden bevisst.** Det som ville vært uforsvarlig, er å ta den
+uten å vite om den — eller å oppdage i november at vi hadde valgt bort hjelpen
+uten å ha tenkt på at vi gjorde det.
