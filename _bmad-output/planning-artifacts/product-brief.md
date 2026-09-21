@@ -17,7 +17,7 @@ Den som følger 10–30 norske aksjer ved siden av jobb eller studier har ikke e
 
 Støyen er målbar, og den har to former. I vår egen test 17.09 leste vi manuelt de ti siste nyhetstreffene for et utvalg selskaper. For et stort finansselskap handlet flertallet i realiteten om andre selskaper; det var bare ett av mange symboler i artikkelen. For et shippingselskap var bildet motsatt. En løsning kan altså ikke anta at en nyhet knyttet til et symbol handler om det selskapet.
 
-Den andre formen finnes i selskapenes egne børsmeldinger. Vi målte fire uker for de selskapene løsningen faktisk skal dekke: 121 meldinger, drøyt fire i døgnet. Mengden er ikke problemet. Sorteringen er — og støyen har to hovedformer. Nær 29 % er ukentlige statusrapporter om tilbakekjøp av egne aksjer, med samme ordlyd hver gang. Drøyt 26 % er samme melding publisert to ganger, på norsk og på engelsk. Til sammen er over halvparten av meldingene noe brukeren ikke trenger å lese.
+Den andre formen finnes i selskapenes egne børsmeldinger. Vi målte fire uker for de selskapene løsningen faktisk skal dekke: 121 meldinger, drøyt fire i døgnet. Mengden er ikke problemet. Sorteringen er — og støyen har to hovedformer. Nær 29 % er ukentlige statusrapporter om tilbakekjøp av egne aksjer, med samme ordlyd hver gang. Drøyt 26 % er samme melding publisert to ganger, på norsk og på engelsk.
 
 I tillegg kommer forklaringsproblemet. Gratis markedsoversikter viser at en aksje er opp 4 %, men ikke hvorfor. Å koble kursbevegelse, meldingsbilde og kommende hendelser er jobben som tar tid en tirsdag morgen.
 
