@@ -789,15 +789,17 @@ bruker ingen API-kall. Kravet om at hver story leveres med test er ført inn som
 punkt 14 i PRD §8, slik at det følger med inn i arkitekturfasen.
 
 
-## 20.09.2026 – Tre ganger på ett døgn: påstander om repoet fra en økt uten tilgang
+## 20.09–21.09.2026 – Fire ganger på to døgn: påstander fra en økt uten tilgang til kilden
 
 **KI-verktøy:** Claude Code (Opus 5) med repotilgang, i samspill med en
 rådgivningsøkt uten
-**Tema:** Hvordan indirekte referanser blir til påstander om tilstand
+**Tema:** Hvordan indirekte referanser blir til påstander om tilstand — og i
+tilfelle 4 til et sitat som ikke fantes
 
 ### Dato / deltaker(e)
 
 20.09.2026. Marian, i arbeidsøkt med Claude Code.
+Tilfelle 4 lagt til 21.09.2026, i samme arbeidsform.
 
 ### Fase
 
@@ -837,13 +839,16 @@ Begge påstandene bygde på en **indirekte referanse**, ikke på filene:
 | Rådata ligger eksponert | En linje i memloggen om at rådatafila «beholdes som tidsstemplet øyeblikksbilde» | En beslutning om å ikke slette fila lokalt — den sa ingenting om sporing |
 | En patch traff feil overskrift | Et avkortet diff-utdrag | Utdraget viste en overskrift og tekst som lå i hver sin del av diffen |
 
-### Dette er tredje gang, ikke andre
+### Dette er fjerde gang
+
+*Ført som «tredje gang, ikke andre» 20.09. Tilfelle 4 kom dagen etter.*
 
 | # | Når | Påstanden | Hva kontrollen viste |
 |---|---|---|---|
 | 1 | Natt til 20.09.2026 | Brief-utkastene «finnes i repoet med historikk» | Seks av sju filer lå ikke der. Kontrollert med md5 |
 | 2 | 20.09.2026, formiddag | Overskriften står to ganger, og en setning er klippet inn i mappestrukturen i README | Filen var hel. En `tail -14`-utskrift var lest som hele filen |
 | 3 | 20.09.2026, kveld | Rådata ligger eksponert, og en patch traff feil overskrift | Verken rådata eller feilplassert tekst fantes |
+| 4 | 21.09.2026, kl. 18:40 | En klausul fra Euronexts vilkår, oppgitt i anførselstegn | Setningen var ikke lest i kilden. Den var rekonstruert fra en avkortet linje i et referat |
 
 **Datering av tilfelle 1.** Utkastene ble lagt inn i repoet i commit `50d72d1`,
 2026-09-20 kl. 00:31. Før den lå det bare `README.md` og
@@ -868,10 +873,73 @@ mekanisme som de seks kravene som falt ut i språkvask, og som antakelsen om et
 privat repo som aldri ble skrevet ned — ingen av dem finnes i en fil noen kan
 kontrollere.
 
+
+### Tilfelle 4: et sitat som ikke fantes
+
+**21.09.2026 kl. 18:40.** Rådgivningsøkta oppga denne klausulen i
+anførselstegn, til innføring i `docs/kilder-og-rettigheter.md`:
+
+> Distribution outside the classroom or for other than solely educational
+> purposes requires written permission.
+
+**Setningen var ikke lest i kilden.** Den var rekonstruert fra en avkortet linje
+i arbeidsøktas eget referat, der ordene var klippet midt i.
+
+Faktisk ordlyd, kontrollert mot `https://www.euronext.com/en/terms-use`:
+
+> Distribution outside the classroom or for other than solely educational
+> purposes requires **express** written permission **in accordance with the
+> above provisions**.
+
+Arbeidsøkta kontrollerte mot kilden og rettet før innføring.
+
+#### Hvorfor dette er verre enn de tre foregående
+
+De tre første var **påstander om repotilstand**. De var etterprøvbare, og de lot
+seg motbevise med to kommandoer. Her ble **ordlyden i et rettighetsdokument
+oppdiktet, til bruk i et rettighetsdokument** — og den kunne ha endt i et brev
+til rettighetshaveren, siden forespørselen til Euronext ble sendt samme dag.
+
+Uten kontrollen ville et oppdiktet sitat stått som belegg. Det er den verste
+formen feilen kan ta i dette prosjektet, fordi hele vilkårsarbeidet hviler på at
+sitater er sitater: `kilder-og-rettigheter.md` skiller gjennomgående mellom hva
+en kilde *sier* og hva vi *slutter*, og skillet er verdiløst hvis sitatsiden ikke
+holder.
+
+Det er heller ikke en tilfeldig detalj som forsvant. «Express» er nettopp det
+ordet som gjør kravet strengere, og «in accordance with the above provisions»
+binder unntaket til klausulene over det. En avkortet gjengivelse gjorde
+forpliktelsen mildere enn den er — i vår favør.
+
+#### Mønsteret var forutsagt i denne oppføringen
+
+Avsnittet over, skrevet 20.09, sier at en feil som bare innrømmes i samtalen
+etterlater «ingen teller som viser at det er tredje gang, og ingen regel som
+hindrer fjerde».
+
+Den fjerde kom under ett døgn senere. Telleren fantes denne gangen — den står i
+tabellen over — og det er trolig grunnen til at kontrollen ble gjort før
+innføring og ikke etterpå. Tiltaket virket. Det som manglet, var en regel som
+dekket *denne* varianten, for tiltaket fra 20.09 gjelder påstander om
+repotilstand, og et sitat fra et nettsted er ikke det.
+
+#### Skjerpet tiltak
+
+I tillegg til det som allerede står:
+
+**Rådgivningsøkta skal ikke produsere ordrette sitater fra dokumenter den ikke
+har lest selv i samme økt.** Der kilden mangler, skal det sies — ikke fylles.
+
+Det generaliserer tiltaket fra 20.09 fra *repotilstand* til *kildeinnhold*:
+påstander om hva en kilde inneholder, verifiseres i økta som har kilden, før de
+føres. Et referat er ikke en kilde, og en avkortet linje i et referat er ikke et
+sitat.
+
 ### Refleksjon
 
-**En økt uten tilgang til repoet kan ikke uttale seg om repoets tilstand — bare
-om det den har blitt fortalt.** Det er ikke en svakhet ved rådgivningen; en
+**En økt uten tilgang til kilden kan ikke uttale seg om hva kilden inneholder —
+bare om det den har blitt fortalt.** Det gjelder repoet i tilfelle 1–3 og et
+nettsted i tilfelle 4; mekanismen er den samme. Det er ikke en svakhet ved rådgivningen; en
 memlog-linje om at en fil «beholdes» er en rimelig ting å bli bekymret av. Feilen
 oppstår i overgangen, når en rimelig bekymring formuleres som et konstatert
 faktum og pakkes som et tiltak.
@@ -898,6 +966,10 @@ hva som publiseres, og `.gitignore` er utvidet med mønstre for rådatafiler som
 måtte havne utenfor `data/`. Tilfelle 2 er ført i oppføringen «Eksport av
 Product Brief, og et problem som aldri fantes» tidligere samme dag. Tilfelle 1
 har ingen egen oppføring og er ført her, i ettertid.
+
+Tilfelle 4 er ført her 21.09. Den korrigerte ordlyden står i
+`docs/kilder-og-rettigheter.md`, seksjonen «Undervisningsunntaket», og rettingen
+er omtalt i commit-meldingen som førte klausulen inn.
 
 Materiale til refleksjonsrapportens avsnitt om å arbeide med to KI-økter i
 parallell.
