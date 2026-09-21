@@ -829,6 +829,29 @@ lenger uimotsagt» over.
       stoppe hentingen, fortsette bevisst under undervisningsunntaket, eller
       bygge meldingsdelen om. Skal avgjøres og skrives ned, ikke bli stående
       fordi ingen tok det opp. **Eier: Gruppen.** Frist 2026-09-28
+
+      **Huskeregel når svaret kommer** — den gjelder uansett om det kommer før
+      eller etter fristen: *les hva brevet faktisk spurte om før du avgjør hvor
+      langt svaret rekker.* EODHD-svaret 21.09 viste hvorfor. Spørsmål 2 nevnte
+      to typer tall i samme setning — medianomsetning fra EODHD-kurser og
+      kategorifordelinger fra NewsWeb-meldinger — og «Yes, we confirm both»
+      bekreftet to *spørsmål*, ikke alle tallene nevnt i dem. Rekkevidden var
+      tvetydig fordi spørsmålet selv blandet to kilder.
+
+      Brevet til Euronext har samme form, bare større: det ber om tillatelse
+      til fire ting i én forespørsel, med hver sin overskrift i brevet —
+      **Retrieval** (ett uttrekk per døgn), **Storage** (lokal lagring av
+      metadata og titler), **Display** (demonstrasjonen i undervisning) og
+      **Source code** (det offentlige repoet med utledede tall og siterte
+      titler). I tillegg spør brevet om samme svar gjelder finanskalenderen på
+      `live.euronext.com`.
+
+      Kommer det et kort svar, skal det derfor ikke føres som ja eller nei.
+      **Før hvilke av de fire delene som er dekket og hvilke som ikke er det**,
+      og om kalenderen er besvart. Et ja til «Retrieval» er ikke automatisk et
+      ja til «Storage» — det står allerede i `docs/epost-til-euronext.md`,
+      seksjonen «En klausul brevet ikke nevner ved navn», og huskeregelen her
+      utvider det til alle fire.
 - [ ] Kontrollere Alpha Vantage sine vilkår for ikke-kommersiell bruk
 - [x] ~~Lese EODHDs fullstendige ToS, ikke bare prissiden~~ — gjort 2026-09-20,
       se seksjonen «EODHD: hva de fullstendige vilkårene sier». Svaret er uklart
