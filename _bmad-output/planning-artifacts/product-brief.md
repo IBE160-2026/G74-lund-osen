@@ -51,7 +51,7 @@ Vi har ingen teknisk fordel andre ikke kan kopiere, og skal ikke påstå at vi h
 | Profesjonelle verktøy | Dekker alt | Dekker det en sparer faktisk bruker, uten å kreve opplæring |
 | Bare lese overskrifter | Koster ingen tid | Overskrifter sier ikke hva som gjelder egne aksjer |
 
-Den viktigste forskjellen er at kode og KI holdes fra hverandre: regler sorterer, KI forklarer, og grensen er synlig i grensesnittet — ikke bare i koden. Vi lover ikke bedre signaler enn andre, men at brukeren alltid kan se hva som ga utslaget.
+Den viktigste forskjellen er at kode og KI holdes fra hverandre: regler sorterer, KI forklarer, og grensen er synlig i grensesnittet — ikke bare i koden. Grensen er dessuten testbar: KI-laget kan slås av, og løsningen skal fortsatt fungere med den regelbaserte analysen alene. Vi lover ikke bedre signaler enn andre, men at brukeren alltid kan se hva som ga utslaget.
 
 ## Who This Serves
 
