@@ -973,3 +973,93 @@ er omtalt i commit-meldingen som førte klausulen inn.
 
 Materiale til refleksjonsrapportens avsnitt om å arbeide med to KI-økter i
 parallell.
+
+---
+
+## 21.09.2026 – Faglærer om rammene: database, docker, stack og rapportens plass
+
+### Dato / deltaker(e)
+
+21.09.2026. Joakim Lund og Marian Osen. Svar fra faglærer i IBE160 på spørsmål om
+rammene for prosjektet.
+
+### Fase
+
+Slutten av planleggingsfasen, dagen før arkitekturarbeidet skal begynne. Samme
+dag som vilkårskontrollen og signaltesten ble gjennomført.
+
+### Hva faglærer sa
+
+Fire ting, sitert ordrett der ordlyden betyr noe.
+
+**1. Database er i praksis et krav.**
+
+> Hvis du ikke har behov for en database, så er prosjektet ditt for enkelt, noe
+> som vil gjenspeile karakter. Vi har tre nivå: Enkel, Medium, Vanskelig. Alle
+> tre nivåene innebærer database, så uten database vil dette påvirke karakteren
+> hardt.
+
+Supabase ble nevnt som eksempel, ikke som krav. Valget skal begrunnes i
+applikasjonens behov.
+
+**2. Innleveringen er «kildekode og docker fil».** Repoet har ingen Dockerfile.
+
+**3. Teknologistacken er fri, men med en anbefaling.** Gruppen kan velge Python,
+TypeScript eller en kombinasjon, men det er «en klar fordel å bruke omtrent
+samme teknologistack som Bård Inge bruker i undervisningen», og undervisningen
+bruker Node.js.
+
+**4. Refleksjonsrapporten har ingenting med Product Brief å gjøre.**
+
+> refleksjonsrapporten skal dere skrive ETTER dere har gjennomført prosjektet,
+> og har ingenting med product brief å gjøre.
+
+### Hvor de tre første er ført
+
+| Punkt | Ført som |
+|---|---|
+| Database | Åpent punkt 17 i `prd.md`, eier Gruppen, frist ved oppstart av arkitekturfasen. Vurdering av hvilke krav som peker mot relasjonell lagring: `begrunnelser.md` §9 |
+| Dockerfile | Åpent punkt 18 i `prd.md`, samme eier og frist |
+| Teknologivalget | `begrunnelser.md` §10, skrevet ned som et bevisst avvik med kostnaden ført |
+
+### Punkt 4: hva avklaringen endrer, og hva den ikke endrer
+
+**Den endrer ingenting i det vi har gjort.** `docs/reflection-log.md` — denne
+fila — er **råmateriale til rapporten, ikke rapporten**. Den er ført løpende
+siden 13.09 fordi materiale som ikke skrives ned mens det skjer, ikke kan
+gjenskapes i november. Den påvirkes ikke av avklaringen.
+
+Det som er verdt å merke seg, er at vi hadde bygget en kobling som ikke finnes.
+To steder i planleggingsdokumentene står det at en begrunnelse «hører også hjemme
+i refleksjonsrapporten» — `begrunnelser.md` §1 og memloggen. Det er fortsatt
+riktig som en notis om hva materialet kan brukes til. Men det var på vei til å
+bli lest som at rapporten skulle *speile* PRD-en og briefen, og det skal den
+ikke. Rapporten handler om **hvordan vi arbeidet**, skrevet i ettertid, ikke om
+hva produktet ble.
+
+**Rekkefølgen er dermed presisert:** brief → PRD → arkitektur → implementasjon →
+demonstrasjon → *deretter* rapport. Rapporten er ikke et parallellspor som skal
+holdes oppdatert underveis, og den er ikke et vedlegg til briefen.
+
+### Refleksjon
+
+Tre av fire punkter var rammer vi ikke hadde spurt om, og to av dem — database og
+Dockerfile — er ting som ville blitt oppdaget i arkitekturfasen uansett. Men de
+ville blitt oppdaget *da*, med mindre tid til å handle på dem.
+
+Det fjerde er det mest nyttige, selv om det ikke krevde noen handling: **en
+kobling vi hadde antatt, fantes ikke.** Ingen hadde bestemt at rapporten hang
+sammen med briefen. Det hadde bare vokst fram av at begge er innleveringer i
+samme emne, og av at vi skrev «hører hjemme i refleksjonsrapporten» i margen på
+ting vi arbeidet med.
+
+Det er samme mekanisme som antakelsen om et privat repo, ført 20.09: **en
+antakelse som aldri ble skrevet ned, og som likevel styrte hvordan vi tenkte.**
+Forskjellen er at denne ble oppdaget ved å spørre, ikke ved å kontrollere. Begge
+veier virker. Den som ikke virker, er å la den stå.
+
+### Git / dokumentasjon
+
+Tilbakemeldingen er ført her ordrett. De tre første punktene er ført i `prd.md`
+og `begrunnelser.md` som vist i tabellen over, med hver sin commit. Ingen kode er
+endret.
