@@ -6,7 +6,7 @@ kjøres på nytt. PRD-en beholder konklusjonene; detaljene ligger her.
 Grepet er at lesestrømmen ikke skal bære tallene, men at tallene skal finnes og
 kunne kontrolleres.
 
-Alle målinger er gjort 2026-09-20.
+Målingene i §0–§6 er gjort 2026-09-20. §7 er fra 2026-09-21.
 
 ---
 
@@ -280,3 +280,45 @@ kall og signaltesten 15; dagsgrensen er 20, så de kan ikke kjøres samme dag.
 Nyhetstesten går først fordi et negativt svar velter relevanseksperimentet, og
 det må oppdages tidlig. Signaltesten kan vente et døgn uten at noe annet
 stopper. Kvoten nullstilles midnatt GMT.
+
+---
+
+## 7. Målinger 2026-09-21
+
+Seksjonen ligger etter §6 og ikke foran den, for at §1–§6 skal beholde numrene
+sine — de er kryssreferert fra `prd.md` og fra gjennomgangene.
+
+### 7.1 Kvotekontroll før nyhetstesten
+
+**Dato:** 2026-09-21, kl. 17:36 lokal tid (15:36 UTC). **Kostnad: 0 kall.**
+
+**Metode.** `GET https://eodhd.com/api/user?api_token=…&fmt=json`. Endepunktet
+koster ingenting; EODHDs `/financial-apis/api-limits/` sier om det at «it does
+not cost an API call — you can poll it safely from your own monitoring».
+
+**Svar, nøkkelfeltene:**
+
+| Felt | Verdi |
+|---|---|
+| `apiRequests` | 15 |
+| `apiRequestsDate` | 2026-09-20 |
+| `dailyRateLimit` | 20 |
+| `extraLimit` | 485 |
+
+**Tolkning.** De 15 kallene gjelder 2026-09-20 — det er volumsjekken i §1.
+`apiRequestsDate` står på gårsdagen fordi teller og dato henger igjen til første
+kall etter nullstillingen. EODHDs brukerdokumentasjon, hentet 2026-09-21:
+
+> Please note, that the number of API requests resets at midnight GMT, but you
+> will see the limit for the previous day until an API request is made after
+> the reset.
+
+Klokka var 15:36 UTC den 21., altså godt etter nullstillingen midnatt GMT.
+
+**Brukt i dag: 0 av 20. Igjen: 20.** Grensen på ti er ikke i nærheten, og
+nyhetstesten i 7.2 kunne kjøres.
+
+`extraLimit: 485` er en egen bonuskvote ved siden av dagsgrensen. Feltet er
+observert, ikke testet — vi vet ikke om det er den kvoten
+relevanseksperimentet er tenkt å bruke, og det er ikke kontrollert mot
+dokumentasjonen.
