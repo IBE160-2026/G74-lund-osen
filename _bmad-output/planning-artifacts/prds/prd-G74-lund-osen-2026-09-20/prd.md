@@ -189,6 +189,19 @@ Bare det andre er sant.
 Aksjer kilden ikke har en eneste kursrad for, faller ut av tabellen, men skal
 navngis under den, slik at brukeren vet at oversikten er ufullstendig.
 
+##### Navigasjon til aksjedetaljen
+
+**Selskapsnavnet i første kolonne er lenken til aksjedetaljen** (FR-201 til
+FR-203). Aksjedetaljen skal ha en synlig vei tilbake til markedsoversikten.
+
+Kravet stod ikke skrevet før 2026-09-21. De to skjermbildene var spesifisert
+hver for seg, og ingenting sa at det ene fører til det andre — de hang
+uforbundet i kravregisteret selv om hovedflyten forutsetter begge.
+
+Navnet er valgt som lenke framfor en egen kolonne med knapp, fordi femte
+kolonne allerede er brukt opp: FR-101 sier nøyaktig fem kolonner, og en sjette
+ville brutt kravet for å løse et navigasjonsproblem.
+
 #### FR-102 — Standard sortering
 
 Sortering er **signalstyrke fallende**, med **absolutt kursendring** som
@@ -313,7 +326,9 @@ de tre sjekkene, jf. FR-706. Volatilitetsbånd og volumsøyler tegnes ikke i v1.
 
 Aksjedetaljen viser i tillegg:
 
-- De tre sjekkene ved navn med verdien hver av dem ga (FR-706)
+- En synlig vei tilbake til markedsoversikten, jf. navigasjonskravet i FR-101
+- De tre sjekkene ved navn, med verdien hver av dem ga og målingen bak den
+  (FR-706)
 - Børsmeldinger som passerte filteret, med lenke til originalen på NewsWeb
 - KI-forklaring per melding når KI-laget er på, eller «ikke vurdert» når det er
   av (FR-602)
