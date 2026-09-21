@@ -625,10 +625,24 @@ Forespørselen beskriver det vi faktisk gjør:
 - samme spørsmål stilt for **finanskalenderen på `live.euronext.com`**, siden
   begge domenene ligger under de samme vilkårene
 
-**Frist for svar: 2026-09-28.** Faglærer er varslet samme dag, 21.09.
+**Frist for svar: 2026-09-28.**
 
-Uteblir svaret, er det en beslutning som må tas — ikke noe som skal bli stående
-fordi ingen tok det opp. Ført som oppfølgingspunkt med eier nederst i dokumentet.
+### Beslutningen gruppen har tatt i mellomtiden
+
+Hentingen fortsetter mens forespørselen er ubesvart. Det er et valg, ikke en
+forglemmelse, og det skal stå som et valg.
+
+**Faglærer er ikke varslet om funnet, og skal ikke varsles.** Det er besluttet
+av gruppen 2026-09-21. Vi fører det her fordi det hører til beslutningen: det er
+gruppen selv som bærer ansvaret for å fortsette hentingen mens rettighetshaveren
+ikke har svart, uten å ha lagt spørsmålet fram for faglærer først.
+
+Grunnlaget vi bygger på i mellomtiden, er undervisningsunntaket og det at
+forespørselen faktisk er sendt — ikke at vilkårene tillater hentingen. De gjør
+de ikke, og det står dokumentert over.
+
+Uteblir svaret innen 28.09, er det en ny beslutning som må tas. Ført som
+oppfølgingspunkt med eier nederst i dokumentet.
 
 ### Konklusjon
 
@@ -715,8 +729,10 @@ uimotsagt» over.
       2026-09-21.** Programmert henting fra `api3.oslo.oslobors.no`, ett uttrekk
       per døgn for ca. 15 utstedere, lokal kjøring, offentlig repo med utledet
       statistikk, og samme spørsmål for finanskalenderen på
-      `live.euronext.com`. **Svar avventes, frist 2026-09-28.** Faglærer varslet
-      samme dag
+      `live.euronext.com`. **Svar avventes, frist 2026-09-28.** Brevet er
+      arkivert ordrett i `docs/epost-til-euronext.md`. Faglærer er *ikke*
+      varslet — besluttet av gruppen, se «Beslutningen gruppen har tatt i
+      mellomtiden»
 - [ ] **Beslutning hvis Euronext ikke svarer innen 2026-09-28.** Vilkårene
       krever tillatelse på forhånd, og vi henter allerede. Alternativene er å
       stoppe hentingen, fortsette bevisst under undervisningsunntaket, eller
