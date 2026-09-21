@@ -1,0 +1,168 @@
+# Forespørsel om skriftlig tillatelse — Euronext / Oslo Børs
+
+**Status: SENDT 2026-09-21. Svar avventes, frist 2026-09-28.**
+
+| | |
+|---|---|
+| **Mottaker** | `copyrightpermissionsEurope@euronext.com` |
+| **Emne** | Request for written permission — student course project, Oslo Børs announcement data |
+| **Sendt** | 2026-09-21 |
+| **Avsender** | Marian Osen og Joakim Lund, gruppe G74, IBE160 |
+| **Frist satt til** | 2026-09-28 |
+
+**Hvorfor:** vilkårskontrollen 2026-09-21 viste at Euronexts Terms of Use dekker
+`newsweb.oslobors.no` ved navn og krever skriftlig tillatelse på forhånd for
+automatisert henting. Se `kilder-og-rettigheter.md`, seksjonen «Oslo Børs
+NewsWeb og Euronext: hva vilkårene sier». Dette er ikke en kilde som tier, og
+lesningen alene kan derfor ikke lukke spørsmålet.
+
+**Brevet er bevismateriale på linje med svaret.** Det er arkivert ordrett her av
+samme grunn som EODHD-svaret er sitert ordrett: når vi senere skal si hva vi
+fikk tillatelse til, er det ordlyden i spørsmålet som avgjør hvor langt svaret
+rekker.
+
+**Når svaret kommer:** før det ordrett i `kilder-og-rettigheter.md` med dato og
+avsender, på samme måte som EODHD-svaret, og noter om avsenderen er juridisk
+avdeling eller support. Fyll også inn seksjonen «Svaret» nederst i denne fila.
+
+---
+
+## Brevet, ordrett
+
+Subject: Request for written permission — student course project, Oslo Børs
+announcement data
+
+Hello,
+
+We are two students at Molde University College in Norway. As part of the course
+IBE160, we are building a non-commercial web application that shows price
+development and exchange announcements for about 15 companies listed on Oslo
+Børs.
+
+Your Terms of Use apply by name to oslobors.no, newsweb.oslobors.no and
+live.euronext.com, and require prior written permission for automated retrieval.
+We are therefore asking rather than assuming.
+
+We also note the educational exception in the same document:
+
+Educational institutions may download and reproduce Content on the Euronext
+Website for distribution in the classroom solely for educational purposes.
+
+Our question is whether our use falls within that exception, and if it does not,
+whether you will grant written permission for it. Concretely, this is what we
+do:
+
+Retrieval. One programmatic request per day to the newsreader endpoint at
+api3.oslo.oslobors.no, limited to approximately 15 issuers. We assume this
+endpoint is covered by your terms as the backend of the website; we are not
+looking for a loophole.
+
+Storage. Announcement metadata and titles are stored locally on our own machines
+for the duration of the course.
+
+Display. The application runs locally and is not publicly deployed. It is
+demonstrated to our teacher and class as part of the assessment.
+
+Source code. Our code is in a public repository, as the course requires. It
+contains no announcement archive. It does contain our own summary figures — for
+example how many announcements fell into each category over a four-week period —
+and a small number of announcement titles quoted in our documentation to show
+what we measured.
+
+Duration. Autumn semester 2026. No redistribution, no commercial use.
+
+We would also like to know whether the same answer applies to the financial
+calendar on live.euronext.com, which appears in the same list.
+
+If another department handles this, we would be grateful if you could forward
+our request.
+
+Thank you,
+
+Marian Osen and Joakim Lund
+Group G74, IBE160, Molde University College (Høgskolen i Molde)
+
+---
+
+## Hva det er bedt om
+
+To spørsmål, i denne rekkefølgen:
+
+1. **Faller bruken inn under undervisningsunntaket?**
+2. **Hvis ikke — vil dere gi skriftlig tillatelse til den?**
+
+Og et tredje som gjelder rekkevidde:
+
+3. **Gjelder samme svar for finanskalenderen på `live.euronext.com`?**
+
+Forespørselen legger fram fem forhold, alle navngitt i brevet: henting, lagring,
+visning, kildekode og varighet. Den sier uttrykkelig at vi antar `api3` er dekket
+av vilkårene, og at vi ikke leter etter et smutthull.
+
+## Klausulene forespørselen viser til
+
+Alle tre er sitert ordrett i `kilder-og-rettigheter.md`, seksjonen «Oslo Børs
+NewsWeb og Euronext: hva vilkårene sier».
+
+| Klausul | Hvordan brevet bruker den |
+|---|---|
+| **Domenelista** — `oslobors.no`, `newsweb.oslobors.no` og `live.euronext.com` er navngitt som Euronext-nettsteder | Brevet viser til den for å fastslå at vilkårene i det hele tatt gjelder, og for å be om at svaret dekker finanskalenderen |
+| **Forbudet mot automatisert henting** — «software, spiders, robots … or other devices or mechanisms to navigate, search or determine the Euronext Website is strictly prohibited» uten skriftlig tillatelse på forhånd | Det er denne som utløser hele forespørselen. Brevet gjengir kravet, ikke klausulen ordrett |
+| **Undervisningsunntaket** — «Educational institutions may download and reproduce Content … for distribution in the classroom solely for educational purposes» | Sitert ordrett i brevet. Det er den eneste klausulen som er gjengitt direkte |
+
+### En klausul brevet ikke nevner ved navn
+
+Klausulen om **«systematic retrieval to create collections, compilations,
+databases or directories»** er ikke sitert i brevet. Avsnittet «Storage» beskriver
+det vi faktisk gjør — lokal lagring av metadata og titler — men uten å knytte det
+til den klausulen som rammer nettopp det.
+
+Det er verdt å ha i bakhodet når svaret kommer: **et ja til «Retrieval» er ikke
+automatisk et ja til «Storage».** Sier svaret bare noe om henting, står lagringen
+fortsatt ubesvart, og det må i så fall følges opp.
+
+## Hvorfor NewsWeb ikke er skrevet til separat
+
+`newsweb.oslobors.no` har sin egen rettighetserklæring på
+`newsweb.oslobors.no/disclaimer`, med Åndsverkloven § 43 som grunnlag. Det er
+likevel ikke sendt en egen henvendelse dit, og det er et bevisst valg:
+
+- **`newsweb.oslobors.no` er navngitt i Euronexts egne vilkår**, i samme
+  domeneliste som `oslobors.no` og `live.euronext.com`.
+- **Oslo Børs' egen side «Ansvar og rettigheter»** videresender til
+  `euronext.com/en/terms-use`. Kontrollert 2026-09-21.
+- **Brevet dekker begge domenene** — det navngir `api3.oslo.oslobors.no` som
+  hentepunkt og ber uttrykkelig om at svaret også gjelder `live.euronext.com`.
+
+**Åndsverkloven § 43 er et rettsgrunnlag, ikke en egen mottaker.** Bestemmelsen
+gir databaseprodusenten enerett; den peker ikke på noen andre å spørre enn
+rettighetshaveren, og rettighetshaveren er Euronext. En egen henvendelse til
+NewsWeb ville gått til samme konsern om det samme forholdet.
+
+---
+
+## Svaret
+
+*Ikke mottatt per 2026-09-21. Fylles inn når det kommer.*
+
+| | |
+|---|---|
+| **Mottatt** | — |
+| **Fra** | — |
+| **Avdeling** | — *(noter om det er juridisk avdeling eller support — det avgjør hvor mye vekt svaret tåler, jf. EODHD-svaret)* |
+
+### Svaret, ordrett
+
+> *Fylles inn.*
+
+### Hva svaret dekker, og hva det ikke dekker
+
+*Fylles inn. Sjekk særlig: dekker svaret lagringen, eller bare hentingen? Gjelder
+det finanskalenderen? Er det gitt til gruppen, til høgskolen, eller generelt? Og
+er det tidsbegrenset til semesteret slik brevet ba om?*
+
+### Uteblir svaret
+
+Fristen er 2026-09-28. Beslutningen som da må tas, står som oppfølgingspunkt i
+`kilder-og-rettigheter.md` med eier Gruppen: stoppe hentingen, fortsette bevisst
+under undervisningsunntaket, eller bygge meldingsdelen om.
