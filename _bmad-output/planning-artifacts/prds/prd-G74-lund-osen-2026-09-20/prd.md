@@ -769,13 +769,36 @@ Hvorfor terskel 2 og ikke 3: se `begrunnelser.md`.
 
 #### FR-706 — Synlig begrunnelse i aksjedetaljen
 
-Aksjedetaljen skal liste de tre sjekkene ved navn med verdien hver av dem ga den
-dagen — ikke bare den samlede styrken. Brukeren skal kunne lese at trend ga +1,
-bevegelse 0 og interesse −1, og selv se hvorfor styrken ble 2 og retningen
-blandet.
+Aksjedetaljen skal liste de tre sjekkene ved navn, med **tre ting per sjekk**:
 
+| Del | Eksempel |
+|---|---|
+| Navn | Trend |
+| Verdien den ga | +1 |
+| **Målingen bak verdien** | +3,1 % mot MA50 |
+
+Brukeren skal kunne lese at trend ga +1, bevegelse −1 og interesse −1, se at
+styrken derfor ble 3, og se hva hvert fortegn ble målt mot.
+
+**Alle tre sjekkene vises, også de som ga 0.** En sjekk uten utslag er også en
+forklaring — den sier at akkurat den tingen ikke skjedde.
+
+##### Hvorfor målingen må med
+
+*Skjerpet 2026-09-21.* Kravet ba tidligere bare om navn og verdi. Det er ikke
+nok til å oppfylle kravets eget formål: «Trend +1» kan ikke etterprøves uten å
+vite hvor mye over snittet kursen lå. Brukeren ville sett et fortegn og måttet
+tro på det — altså nøyaktig den skjulte formelen kravet finnes for å unngå.
+
+Med målingen kan brukeren regne etter:
+
+> Trend +1 (+3,1 % mot MA50) · Bevegelse −1 (−3,5 % mot 1,1 % standardavvik) ·
+> Interesse −1 (volum 3 975 318 mot median 802 964) → styrke 3, retning blandet
+
+De tre tallene til høyre er grunnlaget. De to til venstre er utledet av dem.
 Ingen vekting og ingen skjult formel. Dette er kravet som gjør signalet
-forklarbart, og det er ikke valgfritt.
+forklarbart, og det er ikke valgfritt — og da kan heller ikke grunnlaget være
+det.
 
 ---
 
