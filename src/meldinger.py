@@ -155,9 +155,21 @@ def spraak(melding: Melding) -> str:
     Kodegrenen for spraakkode er likevel beholdt, fordi den ikke koster noe
     og fordi et felt som dukker opp senere da tas i bruk uten en endring.
 
-    KJENT FEIL, ikke rettet: gjett_spraak lar ae/oe/aa avgjoere alene, og
-    engelske titler som begynner med "Euronext Oslo Boers - ..." blir derfor
-    lest som norske. Foert i memloggen 21.09 som forslag til gruppen.
+    KJENT BEGRENSNING, ikke lukket: gjett_spraak lar ae/oe/aa avgjoere alene.
+    Engelske titler som begynner med "Euronext Oslo Boers - ..." blir lest som
+    norske - fire tilfeller maalt 18.09. Men mekanismen er ikke bundet til
+    boersens navn: ETT norsk tegn hvor som helst i tittelen avgjoer.
+
+    Eksempelet som ligger i vaart eget univers er VAR - Vaar Energi ASA. En
+    engelsk melding derfra baerer "aa" i sitt eget firmanavn:
+
+        "Vaar Energi ASA: Third quarter 2026 results"  ->  lest som norsk
+
+    (skrevet med aa her; i virkeligheten med bokstaven som utloeser feilen)
+
+    En retting som ser bort fra boersens navn fjerner de fire kjente
+    tilfellene, men ikke svakheten. Skal den bort, maa regelen bygges om.
+    Foert i memloggen og i malinger.md §7.3.
     """
     kode = melding.spraak.strip().lower()
     if kode in NORSKE_SPRAAKKODER:

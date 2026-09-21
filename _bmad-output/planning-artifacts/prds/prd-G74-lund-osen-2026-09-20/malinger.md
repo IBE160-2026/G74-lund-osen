@@ -390,9 +390,21 @@ forespørselen selv som gulvet. Målingen avgjør spørsmålet for én ticker; f
 flere er 5 per ticker fortsatt utledet av eksempelet, ikke målt.
 
 **Konsekvens for relevanseksperimentet:** anslaget på ~80 kall for åtte
-selskaper bygger på det doble kalltallet. Med 5 per ticker blir det ~40. Tallet
-er ikke rettet i `prd.md` eller `begrunnelser.md` her, fordi det avhenger av
-den utledede delen. Ført som eget punkt i `docs/kilder-og-rettigheter.md`.
+selskaper bygger på det doble kalltallet. Med 5 per ticker blir det ~40.
+
+**[UTLEDET] Tallet ~40 er ikke målt.** Det som er målt, er én forespørsel med
+én ticker: 5 kall. At åtte tickere koster 5 hver, følger av EODHDs eget
+eksempel — «10 API calls for one request with two tickers» — og ikke av noe vi
+har kjørt. Samme merking som anslagene per kategori etter deduplisering i §4,
+der dublettandelen er målt samlet og ikke per kategori.
+
+**Verifiseringen koster 5 kall** og kan tas sammen med innsamlingen til
+relevanseksperimentet: kontroller `apiRequests` før og etter den første
+forespørselen med to tickere. Er differansen 10, holder utledningen. Er den 15,
+er den opprinnelige lesningen riktig likevel, og budsjettet må dobles.
+
+Tallet er ikke rettet i `prd.md` eller `begrunnelser.md` her, nettopp fordi det
+er utledet. Ført som eget punkt i `docs/kilder-og-rettigheter.md`.
 
 #### Sidefunn: relevansen i de ti treffene
 
@@ -482,10 +494,54 @@ en ekte dublett og håndteres riktig. Én dag er ikke grunnlag for en rate.
 begynner med «Euronext Oslo Børs – …» og blir derfor klassifisert som norske.
 For FROKO, STBYG og NANKO betyr det at den engelske versjonen beholdes der
 regelen sier den norske skal vinne. Feilen ligger i heuristikken, ikke i
-kjennetegnet, og den ville ikke blitt oppdaget av en test på våre 15 selskaper —
-de sender ikke meldinger som bærer børsens eget navn i tittelen.
+kjennetegnet.
 
-Ingen kravtekst er endret på grunnlag av dette. Vurderingen står i memloggen.
+*Rettet 2026-09-21:* her sto det først at feilen «ikke ville blitt oppdaget av
+en test på våre 15 selskaper — de sender ikke meldinger som bærer børsens eget
+navn i tittelen». **Den påstanden var for trang.** Mekanismen er ikke bundet til
+børsens navn, men til at ett eneste norsk tegn hvor som helst i tittelen
+avgjør — og **`VAR` er Vår Energi ASA**. Enhver engelsk melding fra det selskapet
+bærer «å» i sitt eget firmanavn og blir lest som norsk.
+
+Kontrollert på funksjonen med konstruerte titler, siden det ene døgnet vi har
+hentet ikke inneholder meldinger fra Vår Energi:
+
+| Tittel | `gjett_spraak` gir |
+|---|---|
+| `Vår Energi ASA: Third quarter 2026 results` | **norsk** — feil |
+| `Vår Energi ASA - Notice of Extraordinary General Meeting` | **norsk** — feil |
+| `Equinor ASA: Share buy-back programme third tranche` | uavklart |
+
+At Vår Energi faktisk skriver firmanavnet i titlene sine er utledet av mønsteret
+hos de andre — Equinors meldinger 18.09 begynner alle med «Equinor ASA: …» —
+ikke målt på selskapets egne meldinger.
+
+**Begrensningen er kjent, ikke lukket.** En retting som ser bort fra børsens navn
+fjerner de fire tilfellene fra 18.09, men ikke svakheten: én tegnklasse avgjør
+fortsatt alene, og eksempelet over ligger i vårt eget univers. Skal svakheten
+fjernes, må regelen bygges om — ikke lappes på.
+
+### Hva dette betyr for FR-501
+
+Funnene over peker samme vei, og formuleres derfor som ett prinsipp, ikke som et
+unntak for GOD-tilfellet:
+
+> **Kjennetegnet slår sammen bare når det finnes positivt grunnlag for at det er
+> samme melding. Ved tvil beholdes begge.**
+
+Begrunnelsen er at de to feilene ikke koster det samme:
+
+| Feil | Hva brukeren ser | Kostnad |
+|---|---|---|
+| En dublett slipper gjennom | Samme melding to ganger, på hvert sitt språk | Kosmetikk. Brukeren ser det og forstår det |
+| En ekte melding slås sammen bort | Ingenting | **Tap av data.** Brukeren vet ikke at noe mangler, og kan ikke oppdage det |
+
+Asymmetrien avgjør hvilken vei tvilen skal falle. Det henger sammen med
+kriteriet i briefen om at **systemet ikke skal tvinge fram et resultat**: en
+regel som slår sammen på svakt grunnlag, produserer en ren liste ved å skjule at
+grunnlaget var svakt.
+
+Prinsippet er ikke skrevet inn i kravteksten. Vurderingen står i memloggen.
 
 ### 7.4 Signaltesten mot 199 handelsdager
 
