@@ -625,7 +625,8 @@ Forespørselen beskriver det vi faktisk gjør:
 - samme spørsmål stilt for **finanskalenderen på `live.euronext.com`**, siden
   begge domenene ligger under de samme vilkårene
 
-**Frist for svar: 2026-09-28.**
+**Frist: 2026-09-28.** Den er vår egen — brevet ber ikke om svar innen noen dato,
+og Euronext har ikke lovet noe.
 
 ### Beslutningen gruppen har tatt i mellomtiden
 
@@ -729,7 +730,7 @@ uimotsagt» over.
       2026-09-21.** Programmert henting fra `api3.oslo.oslobors.no`, ett uttrekk
       per døgn for ca. 15 utstedere, lokal kjøring, offentlig repo med utledet
       statistikk, og samme spørsmål for finanskalenderen på
-      `live.euronext.com`. **Svar avventes, frist 2026-09-28.** Brevet er
+      `live.euronext.com`. **Svar avventes. Egen beslutningsfrist 2026-09-28.** Brevet er
       arkivert ordrett i `docs/epost-til-euronext.md`. Faglærer er *ikke*
       varslet — besluttet av gruppen, se «Beslutningen gruppen har tatt i
       mellomtiden»

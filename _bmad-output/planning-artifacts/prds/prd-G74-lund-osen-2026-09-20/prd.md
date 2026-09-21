@@ -976,7 +976,9 @@ skriftlig godkjent, og `/api/news` er målt til å svare for `.OL`-tickere.
 Relevanseksperimentet kjøres derfor på plan A og deler ikke lenger kilde med
 meldingsdelen. Det som står igjen, er Euronext: vilkårene som dekker NewsWeb
 forbyr uttrykkelig automatisert henting uten tillatelse på forhånd, og
-forespørselen om tillatelse ble sendt 21.09 med frist 28.09. Fullstendig
+forespørselen om tillatelse ble sendt 21.09 og er ubesvart. Fristen 28.09 er vår
+egen frist for å ta stilling uten svar, ikke en dato Euronext har lovet.
+Fullstendig
 gjennomgang med sitater i `docs/kilder-og-rettigheter.md`.
 
 Punkt 1 har fått eier. De øvrige har det ennå ikke.

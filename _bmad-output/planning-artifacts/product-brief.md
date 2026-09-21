@@ -37,7 +37,7 @@ Signalstyrke er ikke en anbefaling om kjøp eller salg, og presenteres ikke som 
 
 Kursdata hentes fra EODHD, børsmeldinger fra Oslo Børs' NewsWeb der hver melding allerede er knyttet til utsteder og kategori, og finansielle hendelser fra Euronext.
 
-NewsWeb og Euronext ligger under de samme bruksvilkårene, og de krever skriftlig tillatelse på forhånd til automatisert henting. Forespørselen er sendt 21.09, og svar avventes innen 28.09.
+NewsWeb og Euronext ligger under de samme bruksvilkårene, og de krever skriftlig tillatelse på forhånd til automatisert henting. Forespørselen er sendt 21.09. Foreligger det ikke svar innen 28.09, tar vi stilling til meldingsdelen uten.
 
 Universet er satt til omtrent 15 aksjer fordi EODHD på gratisnivå gir 20 API-kall i døgnet og kurser koster ett kall per symbol; NewsWeb og Euronext koster ingen kall. Tallet er utledet av kvoten, ikke valgt etter skjønn. Målingene og bruksvilkårene vi har sjekket er dokumentert i `docs/kilder-og-rettigheter.md`. Oppdateringsmekanikk og lagring hører til PRD og arkitektur.
 
@@ -81,7 +81,7 @@ Relevanseksperimentet er et avgrenset delprosjekt, ikke en del av driften. Viser
 
 Første versjon kjører lokalt som applikasjon. Kode og dokumentasjon er derimot offentlig tilgjengelig i emnets GitHub-organisasjon, mens børsdataene selv blir liggende lokalt — vi publiserer aggregert statistikk utledet av kildene, ikke datasettene.
 
-To vurderinger er utsatt til løsningen eventuelt publiseres som tjeneste: personvern, og regelverket som gjelder når en tjeneste presenterer finansielle signaler. Videreformidlingsretten er derimot kontrollert nå: Euronext forbyr automatisert henting uttrykkelig, EODHD har gitt skriftlig godkjenning med betingelser, og brevet til Euronext har svarfrist 28.09.
+To vurderinger er utsatt til løsningen eventuelt publiseres som tjeneste: personvern, og regelverket som gjelder når en tjeneste presenterer finansielle signaler. Videreformidlingsretten er derimot kontrollert nå: Euronext forbyr automatisert henting uttrykkelig, EODHD har gitt skriftlig godkjenning med betingelser, og forespørselen til Euronext er fortsatt ubesvart.
 
 ## Vision
 

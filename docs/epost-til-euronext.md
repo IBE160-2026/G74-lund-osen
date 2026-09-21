@@ -1,6 +1,6 @@
 # Forespørsel om skriftlig tillatelse — Euronext / Oslo Børs
 
-**Status: SENDT 2026-09-21. Svar avventes, frist 2026-09-28.**
+**Status: SENDT 2026-09-21. Svar avventes. Egen beslutningsfrist 2026-09-28.**
 
 | | |
 |---|---|
@@ -8,7 +8,7 @@
 | **Emne** | Request for written permission — student course project, Oslo Børs announcement data |
 | **Sendt** | 2026-09-21 |
 | **Avsender** | Marian Osen og Joakim Lund, gruppe G74, IBE160 |
-| **Frist satt til** | 2026-09-28 |
+| **Egen beslutningsfrist** | 2026-09-28 — satt av oss. Brevet ber ikke om svar innen noen dato |
 
 **Hvorfor:** vilkårskontrollen 2026-09-21 viste at Euronexts Terms of Use dekker
 `newsweb.oslobors.no` ved navn og krever skriftlig tillatelse på forhånd for
@@ -188,6 +188,8 @@ er det tidsbegrenset til semesteret slik brevet ba om?*
 
 ### Uteblir svaret
 
-Fristen er 2026-09-28. Beslutningen som da må tas, står som oppfølgingspunkt i
+Fristen er vår egen: 2026-09-28. Brevet ber ikke om svar innen noen dato, så det
+finnes ingen frist Euronext har oversittet. Beslutningen som da må tas, står som
+oppfølgingspunkt i
 `kilder-og-rettigheter.md` med eier Gruppen: stoppe hentingen, fortsette bevisst
 under undervisningsunntaket, eller bygge meldingsdelen om.
