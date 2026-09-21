@@ -1288,6 +1288,102 @@ sendt og besvart. Hver sin commit.
 
 ---
 
+## 21.09.2026 – Kvelden: seks rettinger i briefen, repoet som kart, og en dato ingen hadde flyttet
+
+**KI-verktøy:** Claude Code (Opus 5) med repotilgang  
+**Tema:** Dokumentene innhentet dagens funn — og to ting som hadde stått uendret
+fordi ingen tok dem opp
+
+### Dato / deltaker(e)
+
+21.09.2026, kveld. Marian Osen med Claude Code.
+
+### Fase
+
+Etter at vilkårskontrollen, målingene og EODHD-svarene var i havn. Ingen ny
+undersøkelse; arbeidet var å få dokumentene til å si det dagen hadde vist.
+
+### Hva ble gjort eller foreslått?
+
+**Briefen, seks endringer i seks commits.** Scope sa at videreformidlingsretten
+var utsatt til eventuell publisering — en setning som forutsatte et privat repo,
+og som var uriktig etter at kontrollen faktisk var gjort. NewsWeb sto omtalt som
+en avklart kilde. Setningen «Til sammen er over halvparten av meldingene noe
+brukeren ikke trenger å lese» summerte to grupper som overlapper, så tallet var
+udokumentert selv om begge leddene er målt. Medietesten 17.09, som hele
+problemformuleringen hviler på, fikk kjøringen 21.09 som belegg. To
+«to-delinger» rett etter hverandre ble skilt fra hverandre. Og av/på-bryteren
+for KI-laget, som er den mest uvanlige påstanden i briefen, sto bare i The
+Solution og ikke der forskjellene beskrives.
+
+**Repoet ble kjørbart for en som ikke har vært med å bygge det.** README er
+skrevet om til et kart: hva prosjektet er, hvor Product Brief og PRD ligger,
+hvilke mapper som er våre mot hvilke som fulgte med BMAD-rammeverket, og
+oppstart i fem steg. `.env.example` er lagt til, så den som kloner ikke må gjette
+hvilke miljøvariabler som mangler — kun `EODHD_API_KEY` leses av koden,
+kontrollert med søk over `src/` og `tests/`.
+
+**Oppstartsinstruksjonen ble kontrollert mot et ferskt klon** i en midlertidig
+katalog, uten `data/` og uten `.env`. `uv sync` gikk gjennom, tom nøkkel ga
+beskjeden «EODHD_API_KEY mangler. Legg den i .env i prosjektroten», appen svarte
+200 med «Ingen kursdata funnet i `data/`», og 162 tester passerte uten nøkkel og
+uten data. `fetch_prices` ble ikke kjørt — dagskvoten var brukt opp.
+
+**Signaltesten mot 199 handelsdager holdt.** Terskel, volumfaktor og
+nøytralsonebredde ble låst mot et vindu tretten ganger større enn de 15 dagene
+de opprinnelig ble satt på, og alle tre verdiene sto.
+
+**Relevanseksperimentet ble flyttet fram og delt i to.**
+
+### Hva førte det til?
+
+Briefen sier nå det kildene sier, og den kan leses av en sensor uten at noe må
+tas på tro. Repoet kan klones og kjøres av en som ikke har vært med.
+
+Den mest lærerike enkeltendringen er den siste. **Uke 41 ble satt mens
+eksperimentet var blokkert av to ting** — om vilkårene tillot språkmodellbruk,
+og om `/api/news` svarte for `.OL`. Begge ble avklart 21.09. **Datoen ble aldri
+flyttet etterpå.** Den sto igjen i tre uker som en frist ingen lenger hadde
+grunn til, helt til noen spurte hvorfor den var der.
+
+Eksperimentet er nå delt: del 1 — utvalgskriterier, innsamling og manuell
+merking — kan gjøres nå og er satt som neste oppgave etter arkitekturfasens to
+første punkter. Del 2, KI-klassifiseringen, kan ikke: KI-laget finnes ikke som
+kode, ingen modelltjeneste er valgt, og betingelse 4 i EODHDs godkjenning er
+udokumentert.
+
+### Refleksjon
+
+**En blokkering som forsvinner, flytter ingen dato av seg selv.** Det er den
+samme mekanismen som gjorde at hull 3 ble stående feil formulert, og som lå bak
+alle fem tilfellene i oppføringen over: en tilstand endrer seg, men teksten som
+beskrev den gjør det ikke. Forskjellen her er at ingen tok feil av noe — datoen
+var riktig da den ble satt. Den ble bare aldri stilt spørsmål ved etterpå.
+
+Det er verdt å merke seg at det billigste tiltaket mot dette ikke er en regel,
+men et spørsmål: *hva var grunnen til denne datoen, og gjelder den fortsatt?*
+Det tok ett spørsmål å oppdage at svaret var nei.
+
+**Å merke tidlig er metodisk sterkere enn å merke senere.** Testsettet skal
+merkes manuelt før KI-vurderingen sees. Gjøres merkingen uker før KI-laget i det
+hele tatt finnes, er den forutsetningen umulig å bryte i stedet for bare lovet.
+Det er samme grep som nettsperra i `conftest.py`: gjør påstanden etterprøvbar
+der den står, i stedet for å love den.
+
+**Kontrollen mot et ferskt klon er det samme grepet en tredje gang.** README
+hadde kunnet si «klon og kjør» uten at noen hadde prøvd det. Det tok noen
+minutter å faktisk gjøre det, og forskjellen er mellom en instruksjon som *ser*
+riktig ut og en som er kjørt.
+
+### Git / dokumentasjon
+
+Seks commits på briefen, én på README som kart, én på `.env.example`, én på
+oppstartsinstruksjonen, og én på relevanseksperimentet som berører
+`product-brief.md`, `prd.md`, `malinger.md` og memloggen. Beslutningen om
+eksperimentet er ført, ikke utført — utvalgskriteriene er ikke skrevet.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
