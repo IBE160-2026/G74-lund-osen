@@ -71,3 +71,8 @@ data/
 raadata-*.json
 newsweb-*.json
 
+
+# Privat arbeidsmappe. Utkast som formes foer de blir til noe som kan leses
+# av andre. Repoet er offentlig, og aerlige vurderinger skrives daarligere
+# naar de leses av medstudenter mens de blir til.
+_privat/
