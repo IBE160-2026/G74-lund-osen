@@ -310,3 +310,81 @@ leverte versjonen. De er berget og skrevet inn:
 
 Fullstendig oversikt over mønsteret, de to tapsmekanismene og tiltaket:
 `docs/reflection-log.md`, oppføringen 20.09.2026.
+
+---
+
+## 9. Lagringen: filer i dag, database i arkitekturfasen
+
+**Åpent punkt 17.** Dette er en vurdering av grunnlaget, ikke en beslutning.
+
+### Hva faglærer sa, ordrett
+
+> Hvis du ikke har behov for en database, så er prosjektet ditt for enkelt, noe
+> som vil gjenspeile karakter. Vi har tre nivå: Enkel, Medium, Vanskelig. Alle
+> tre nivåene innebærer database, så uten database vil dette påvirke karakteren
+> hardt.
+
+Supabase ble nevnt som eksempel, ikke som krav. Valget skal begrunnes i
+applikasjonens behov.
+
+### Dagens beslutning dekker ikke dette
+
+FR-406 fastsetter **to lagre**: beregningsgrunnlaget som lastes ned i sin helhet
+ved hver henting, og rådata som tidsstemplede øyeblikksbilder som aldri skrives
+om. Begge er i dag tenkt som filer, og `data/` er gitignorert.
+
+Den beslutningen ble tatt for å løse et *kvoteproblem* — at serien aldri skal
+skjøtes på, fordi EODHD regner `adjusted_close` om bakover ved hvert utbytte.
+Den ble ikke tatt som et svar på hvordan applikasjonen skal lagre noe som helst
+annet. Det spørsmålet er ikke stilt før nå.
+
+### Hvilke krav peker mot relasjonell lagring
+
+| Krav | Hva det krever | Peker mot database? |
+|---|---|---|
+| **FR-408** — dagens vurdering per aksje per dag | Nøkkel `(dato, aksje)` med signalstyrke, retning, tre sjekkverdier, kurs og hvilke meldinger som ble vist. Spørsmålet kravet selv stiller er «hva sa løsningen om EQNR for to uker siden?» | **Ja, sterkest.** Det er et oppslag på nøkkel og et intervall over tid. En fil per dag gjør dette til en katalogskanning |
+| **FR-604 / FR-605** — KI-logg med promptversjon og modell | Hver vurdering skal bære promptversjon og modell, og eksempelsettet i uke 45 skal vise *hva KI-laget skilte* — altså en sammenstilling av regelfilterets utfall mot KI-vurderingen, filtrert på promptversjon | **Ja.** Det er en spørring med filter og sammenstilling, ikke en filoperasjon |
+| **FR-407** — merking av utbyttedager | Kursraden for en dato må kobles mot `EKS.DATO`-meldinger for samme utsteder og dato (FR-503) | **Ja.** Det er en join mellom to datasett på `(utsteder, dato)` |
+| **FR-405** — avkorting og deling av intervaller | Når et intervall deles og hentes på nytt, kommer de samme meldingene tilbake i flere svar. De må skrives idempotent | **Delvis.** Et unikt `messageId` som primærnøkkel løser det; i filer må det løses for hånd |
+| **FR-606** — relevansskalaen | Tre verdier lagret per melding | Marginalt. Det er én kolonne |
+| **FR-406** — beregningsgrunnlaget | Lastes ned i sin helhet og erstattes | Nøytralt. Passer like godt som tabell som lastes på nytt, og som fil |
+| **NFR-07 / FR-406** — rådata som uforanderlige øyeblikksbilder | Skrives aldri om, skal kunne leses om ti år uten applikasjonen | **Nei — taler imot.** Et tidsstemplet JSON-øyeblikksbilde *er* formatet. En database legger et lag mellom dokumentasjonen og den som skal etterprøve den |
+
+**Konklusjonen på behovsspørsmålet:** behovet er reelt, og det er ikke konstruert
+for å tilfredsstille et karakterkrav. FR-408 og FR-604/605 er begge
+tidsserie- og spørringsproblemer som ble skrevet inn lenge før faglærer uttalte
+seg, og FR-407 er en join. Det som *ikke* hører hjemme i en database, er
+rådatalageret — det skal fortsatt være filer.
+
+### SQLite mot Postgres/Supabase
+
+| Hensyn | SQLite | Postgres / Supabase |
+|---|---|---|
+| Applikasjonen kjører lokalt, én bruker | Passer. Ingen server, ingen port, ingen oppstartsrekkefølge | Krever en server som kjører ved siden av — eller en sky-instans |
+| Del av Python-standardbiblioteket | Ja, `sqlite3`. Ingen ny avhengighet | Nei. Driver, tilkoblingsstreng og hemmeligheter |
+| Demonstrasjonen | Filen følger med. Ingenting å sette opp foran klassen | Én ting til som kan feile i rommet |
+| Læringsverdi og «nivå» | SQL, skjema, nøkler, joins og migrasjoner — alt som er poenget med kravet | Det samme, pluss drift |
+| Backup og etterprøvbarhet | Én fil, kopieres. Ligger under `data/`, altså utenfor git | Dump må eksporteres |
+| **Vilkårene fra 21.09** | **Ingenting forlater maskinen** | **Se under — dette er den avgjørende forskjellen** |
+
+**Vilkårene begrenser valget, og det er nytt siden i går.**
+
+Supabase er en *hostet* tjeneste. Å legge børsmeldinger fra NewsWeb og kursdata
+fra EODHD i en Supabase-instans er å overføre innholdet til en tredjepart. Det
+treffer to ting vi nettopp har dokumentert:
+
+- **EODHDs godkjenning av 21.09** er uttrykkelig betinget av at «the output
+  stays local, the project is not publicly deployed, and the data is not
+  published, redistributed, resold». En hostet database er ikke «local».
+- **Euronexts vilkår** forbyr å «otherwise transfer any of the Content to any
+  third person». Klausulen er sitert i `docs/kilder-og-rettigheter.md`.
+
+Det betyr ikke at Supabase er utelukket — tjenesten kan kjøres selvhostet, og
+faglærer nevnte den som eksempel, ikke som krav. Men **velges en hostet database,
+må vilkårsarbeidet gjøres om igjen**, og godkjenningen vi fikk 21.09 dekker det
+ikke.
+
+**Vurderingen peker mot SQLite**, fordi den gir hele det faglige innholdet i
+kravet uten å røre en premiss vi nettopp har brukt to dager på å få skriftlig.
+Beslutningen er likevel ikke tatt her — den hører til arkitekturfasen, og står
+som åpent punkt 17 med eier Gruppen.
