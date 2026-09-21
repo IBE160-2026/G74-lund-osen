@@ -79,10 +79,10 @@ Relevanseksperimentet er et avgrenset delprosjekt, ikke en del av driften. Viser
 
 Første versjon kjører lokalt som applikasjon. Kode og dokumentasjon er derimot offentlig tilgjengelig i emnets GitHub-organisasjon, mens børsdataene selv blir liggende lokalt — vi publiserer aggregert statistikk utledet av kildene, ikke datasettene.
 
-Tre vurderinger er utsatt til løsningen eventuelt publiseres som tjeneste: videreformidlingsrett, personvern, og regelverket som gjelder når en tjeneste presenterer finansielle signaler. Utløseren er publisering, ikke kommersialisering.
+To vurderinger er utsatt til løsningen eventuelt publiseres som tjeneste: personvern, og regelverket som gjelder når en tjeneste presenterer finansielle signaler. Videreformidlingsretten er derimot kontrollert nå: Euronext forbyr automatisert henting uttrykkelig, EODHD har gitt skriftlig godkjenning med betingelser, og brevet til Euronext har svarfrist 28.09.
 
 ## Vision
 
 Hvis første versjon fungerer, går veien fra generell oversikt til personlig oppfølging: favorittaksjer, egne lister og mer historikk. Neste steg er brukerens egen portefølje — legger man inn aksjene man faktisk eier, følger løsningen opp nettopp disse selskapene. Da går OSE Signal fra markedsoversikt til personlig markedsassistent.
 
-På lengre sikt kan løsningen dekke flere børser og flere språk. En kommersiell versjon vil kreve egne vurderinger av videreformidlingsrett, personvern og regelverket som gjelder når en tjeneste presenterer finansielle signaler.
+På lengre sikt kan løsningen dekke flere børser og flere språk. En kommersiell versjon vil kreve egne vurderinger av personvern og regelverket som gjelder når en tjeneste presenterer finansielle signaler.
