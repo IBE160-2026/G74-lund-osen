@@ -789,7 +789,7 @@ bruker ingen API-kall. Kravet om at hver story leveres med test er ført inn som
 punkt 14 i PRD §8, slik at det følger med inn i arkitekturfasen.
 
 
-## 20.09–21.09.2026 – Fire ganger på to døgn: påstander fra en økt uten tilgang til kilden
+## 20.09–21.09.2026 – Fem ganger på to døgn: påstander fra en økt uten tilgang til kilden
 
 **KI-verktøy:** Claude Code (Opus 5) med repotilgang, i samspill med en
 rådgivningsøkt uten
@@ -839,9 +839,10 @@ Begge påstandene bygde på en **indirekte referanse**, ikke på filene:
 | Rådata ligger eksponert | En linje i memloggen om at rådatafila «beholdes som tidsstemplet øyeblikksbilde» | En beslutning om å ikke slette fila lokalt — den sa ingenting om sporing |
 | En patch traff feil overskrift | Et avkortet diff-utdrag | Utdraget viste en overskrift og tekst som lå i hver sin del av diffen |
 
-### Dette er fjerde gang
+### Dette er femte gang
 
-*Ført som «tredje gang, ikke andre» 20.09. Tilfelle 4 kom dagen etter.*
+*Ført som «tredje gang, ikke andre» 20.09. Tilfelle 4 kom dagen etter,
+tilfelle 5 samme kveld.*
 
 | # | Når | Påstanden | Hva kontrollen viste |
 |---|---|---|---|
@@ -849,6 +850,7 @@ Begge påstandene bygde på en **indirekte referanse**, ikke på filene:
 | 2 | 20.09.2026, formiddag | Overskriften står to ganger, og en setning er klippet inn i mappestrukturen i README | Filen var hel. En `tail -14`-utskrift var lest som hele filen |
 | 3 | 20.09.2026, kveld | Rådata ligger eksponert, og en patch traff feil overskrift | Verken rådata eller feilplassert tekst fantes |
 | 4 | 21.09.2026, kl. 18:40 | En klausul fra Euronexts vilkår, oppgitt i anførselstegn | Setningen var ikke lest i kilden. Den var rekonstruert fra en avkortet linje i et referat |
+| 5 | 21.09.2026, kl. 21:15 | «Joakims perspektiv finnes ikke i loggen» — lest som at han ikke hadde deltatt | Loggen viser hvem som *førte* oppføringene, ikke hvem som bidro. Kilden var et menneske, ikke en fil |
 
 **Datering av tilfelle 1.** Utkastene ble lagt inn i repoet i commit `50d72d1`,
 2026-09-20 kl. 00:31. Før den lå det bare `README.md` og
@@ -935,11 +937,41 @@ påstander om hva en kilde inneholder, verifiseres i økta som har kilden, før 
 føres. Et referat er ikke en kilde, og en avkortet linje i et referat er ikke et
 sitat.
 
+
+### Tilfelle 5: en tilstand sluttet av et tomrom, og kilden var et menneske
+
+**21.09.2026, kl. 21:15.** Kartleggingen av refleksjonsrapporten førte opp tre
+hull. Hull 3 sa: *«Joakims perspektiv finnes ikke i loggen.»* Formuleringen ble
+lest som at han ikke hadde deltatt.
+
+**Det stemmer ikke.** Joakim har bidratt med ideer som har formet prosjektet.
+Det har skjedd utenfor de øktene som ble loggført, og derfor finnes bidragene
+ikke i noen fil.
+
+Grunnlaget for påstanden var at alle 14 oppføringene i loggen er ført av Marian
+eller av en KI-økt. Men **loggen viser hvem som *førte* oppføringene; den viser
+ikke hvem som bidro.** Et tomrom i en fil ble lest som en tilstand i verden —
+nøyaktig samme feiltype som de fire over, der en avkortet utskrift, en
+memlog-linje og et referat ble lest som kilden selv.
+
+**Kilden er her et menneske og ikke en fil, og det gjør feilen verre, ikke
+bedre.** De fire første gjaldt repotilstand, og tiltaket ble formulert deretter:
+kontroller mot kilden. Dette tilfellet viser at regelen også gjelder slutninger
+om mennesker — og at spørsmålet «hvor står det?» ikke er nok når svaret er «det
+står ingen steder». Da er neste spørsmål hvem som vet det, ikke hvilken fil som
+sier det.
+
+Hullet er skrevet om til det det er: gruppens ene medlem har bidrag som ikke
+finnes i noen fil. Det er et **dokumentasjonsproblem**, ikke et
+deltakelsesproblem. Forskjellen er hele poenget — det første kan rettes, det
+andre ville vært noe helt annet. Tiltaket er en egen seksjon nederst i denne
+fila, som Joakim fyller ut selv.
+
 ### Refleksjon
 
 **En økt uten tilgang til kilden kan ikke uttale seg om hva kilden inneholder —
-bare om det den har blitt fortalt.** Det gjelder repoet i tilfelle 1–3 og et
-nettsted i tilfelle 4; mekanismen er den samme. Det er ikke en svakhet ved rådgivningen; en
+bare om det den har blitt fortalt.** Det gjelder repoet i tilfelle 1–3, et
+nettsted i tilfelle 4 og et menneske i tilfelle 5; mekanismen er den samme. Det er ikke en svakhet ved rådgivningen; en
 memlog-linje om at en fil «beholdes» er en rimelig ting å bli bekymret av. Feilen
 oppstår i overgangen, når en rimelig bekymring formuleres som et konstatert
 faktum og pakkes som et tiltak.
