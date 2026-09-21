@@ -182,6 +182,11 @@ NewsWeb ville gått til samme konsern om det samme forholdet.
 
 ### Hva svaret dekker, og hva det ikke dekker
 
+**Les huskeregelen først.** Den står ved beslutningspunktet 28.09 i
+`docs/kilder-og-rettigheter.md`: før hvilke av brevets fire deler — Retrieval,
+Storage, Display og Source code — svaret dekker, i stedet for å føre det som ja
+eller nei.
+
 *Fylles inn. Sjekk særlig: dekker svaret lagringen, eller bare hentingen? Gjelder
 det finanskalenderen? Er det gitt til gruppen, til høgskolen, eller generelt? Og
 er det tidsbegrenset til semesteret slik brevet ba om?*
