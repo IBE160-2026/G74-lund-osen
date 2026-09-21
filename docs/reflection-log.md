@@ -976,6 +976,135 @@ parallell.
 
 ---
 
+## 21.09.2026 – Euronext forbyr det vi gjør, og vi fortsetter mens vi venter på svar
+
+**KI-verktøy:** Claude Code (Opus 5) med repotilgang  
+**Tema:** Vilkårskontrollen som gjorde prosjektets kjernekilde til dets største
+åpne risiko — og beslutningen om å fortsette i mellomtiden
+
+### Dato / deltaker(e)
+
+21.09.2026, ettermiddag og kveld. Joakim Lund og Marian Osen. Kontrollen kostet
+null API-kall.
+
+### Fase
+
+Slutten av planleggingsfasen. Vilkårskontrollen sto som åpent punkt 1 i PRD-en,
+med merknad om at et negativt svar velter meldingsdelen.
+
+### Hva ble gjort eller foreslått?
+
+To dokumenter ble lest i sin helhet, ikke forsidene: `newsweb.oslobors.no/disclaimer`
+og `euronext.com/en/terms-use`.
+
+**Antakelsen fra 20.09 ble bekreftet:** de to kildene deler vilkår. Euronexts
+domeneliste navngir både `oslobors.no`, `newsweb.oslobors.no` og
+`live.euronext.com`, og Oslo Børs' egen side om ansvar og rettigheter
+videresender nå til `euronext.com/en/terms-use`. Én kontroll dekket altså både
+meldingene og finanskalenderen.
+
+**Kilden tier ikke.** Tre klausuler treffer oss direkte, og den første er den
+avgjørende:
+
+> Except if we give you prior written permission, use of any Web browsers
+> (other than generally available third-party browsers), engines, software,
+> spiders, robots, avatars, agents, tools or other devices or mechanisms to
+> navigate, search or determine the Euronext Website is strictly prohibited.
+
+Det er en beskrivelse av det vi gjør. Vi henter med en programmert forespørsel,
+ikke med en alminnelig nettleser, så unntaket i parentesen treffer ikke. I
+tillegg forbys «systematic retrieval to create collections, compilations,
+databases or directories» — en presis beskrivelse av meldingslageret i FR-406 —
+og det som er tillatt uten avtale er «a single, unaltered, permanent copy» til
+personlig, ikke-kommersiell bruk.
+
+NewsWebs egen erklæring legger et norskrettslig lag oppå: databasen er vernet av
+Åndsverkloven § 43, og erklæringen definerer selv nedlasting og lagring på
+datamaskin som eksemplarfremstilling.
+
+**Undervisningsunntaket** er den eneste åpningen vi har funnet i noen kilde i
+hele prosjektet:
+
+> Educational institutions may download and reproduce Content on the Euronext
+> Website for distribution in the classroom solely for educational purposes.
+> Distribution outside the classroom or for other than solely educational
+> purposes requires express written permission in accordance with the above
+> provisions.
+
+**Men det er ikke opplagt at det dekker oss**, og det er tre grunner til det,
+ikke én. Unntaket tillater nedlasting, mens forbudet rammer *midlene* — det
+finnes intet tilsvarende unntak for software og verktøy, så den ene setningen
+tillater resultatet og den andre forbyr veien dit. Klausulen er skrevet om
+*institusjoner*: Høgskolen i Molde er en utdanningsinstitusjon, en studentgruppe
+som kjører et prosjekt lokalt er ikke åpenbart det samme, og ikke åpenbart noe
+annet. Og et offentlig repo er «distribution outside the classroom», selv når
+det vi publiserer er utledet statistikk og ikke meldingene.
+
+**En forespørsel om skriftlig tillatelse ble sendt samme dag** til
+`copyrightpermissionsEurope@euronext.com`, adressen vilkårene selv oppgir. Den
+beskriver fire ting med hver sin overskrift — henting, lagring, visning i
+undervisning og det offentlige repoet — og spør om samme svar gjelder
+finanskalenderen. Brevet er arkivert ordrett i `docs/epost-til-euronext.md`.
+
+### Hva førte det til?
+
+**Risikobildet byttet plass.** Fram til i dag var EODHD den usikre kilden, fordi
+vilkårene der tier om språkmodellbruk. Den usikkerheten ble oppklart i dag — ja,
+med betingelser. Euronext gikk motsatt vei: fra antatt uproblematisk til
+uttrykkelig forbud. Børsmeldinger er kjernen i produktet. Det er dem KI-laget
+skal forklare, og det er dem FR-501 til FR-503 og FR-601 til FR-606 handler om.
+**Svaret fra Euronext er nå prosjektets største åpne risiko.**
+
+**Beslutningen gruppen tok, ordrett slik den står i `kilder-og-rettigheter.md`:
+hentingen fortsetter mens forespørselen er ubesvart, og faglærer varsles ikke.**
+
+Begrunnelsen er todelt. Grunnlaget vi bygger på i mellomtiden er
+undervisningsunntaket og det at forespørselen faktisk er sendt — ikke at
+vilkårene tillater hentingen. Det gjør de ikke, og det står dokumentert. Og
+uttrekket er ett per døgn for femten utstedere i et semesterlangt studieprosjekt;
+å stoppe nå ville lammet meldingsdelen i den uken det er tid til å bygge den.
+
+**Det den koster, skal stå like tydelig.** Vi henter fra en kilde som krever
+tillatelse *på forhånd*, og vi har ikke fått den. Kommer det et nei 28.09, har
+vi hentet i en uke uten hjemmel, og det er en uke vi selv valgte. At faglærer
+ikke er spurt, betyr at ingen utenfor gruppen har veid dette — vi har verken
+fått medhold eller blitt stoppet, og begge deler hadde vært verdt noe. Ansvaret
+ligger dermed helt og holdent hos oss to, og det er ikke en formulering som
+mykner hvis svaret blir nei.
+
+Uteblir svaret innen 28.09, er det en ny beslutning som må tas: stoppe
+hentingen, fortsette bevisst under undervisningsunntaket, eller bygge
+meldingsdelen om. Den er ført som oppfølgingspunkt med eier, nettopp for at den
+ikke skal bli tatt ved at ingen tar den opp.
+
+### Refleksjon
+
+**Å lese vilkår er billigere enn å anta dem, og det er ikke i nærheten.**
+Kontrollen kostet null API-kall og en kveld. Alternativet var å bygge hele
+meldingsdelen ferdig og oppdage forbudet i desember, når det ikke lenger finnes
+tid til å bygge om.
+
+**Det ubehagelige funnet er det mest verdifulle.** Fem kilder er nå kontrollert,
+og Euronext er den eneste som både forbyr uttrykkelig *og* har et unntak som
+kanskje gjelder oss. Et klart nei ville vært enklere å håndtere enn dette, fordi
+et nei ikke krever en beslutning hver dag det står ubesvart.
+
+**Vi valgte å skrive ned at vi ikke varsler faglærer.** Det hadde vært lettere å
+la det være uskrevet — da ville det ikke vært en beslutning, bare noe som ikke
+skjedde. Det er samme mekanisme som de fire tilfellene i oppføringen over: det
+som ikke føres, etterlater ingen spor noen kan lese. Forskjellen her er at vi så
+den mens den skjedde, og førte den mens den var ubehagelig.
+
+### Git / dokumentasjon
+
+Vilkårskontrollen med alle sitater står i `docs/kilder-og-rettigheter.md`,
+seksjonen «Oslo Børs NewsWeb og Euronext: hva vilkårene sier». Brevet er
+arkivert ordrett i `docs/epost-til-euronext.md`. Beslutningen står i «Beslutningen
+gruppen har tatt i mellomtiden», og oppfølgingspunktet for 28.09 nederst i samme
+fil, med eier Gruppen. Hver sin commit.
+
+---
+
 ## 21.09.2026 – Faglærer om rammene: database, docker, stack og rapportens plass
 
 ### Dato / deltaker(e)
