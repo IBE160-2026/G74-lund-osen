@@ -1582,6 +1582,69 @@ ingen rutine som skiller dem.
 
 ---
 
+## 22.09.2026 – Formen var fullstendig, innholdet ikke
+
+Flere innlimte instruksjoner ble kuttet underveis i løpet av dagen. To ble
+fanget med én gang. Én ble ikke.
+
+### Hva ble gjort eller foreslått?
+
+De to som ble fanget, stoppet begge **der et nytt punkt skulle begynt** — «fordi
+hentingen» midt i en begrunnelse, og et trinn 2 som aldri kom. Da var hullet
+synlig: setningen manglet en slutt, og neste overskrift uteble.
+
+Den tredje stoppet **inne i en liste som allerede var halvveis fylt ut.**
+Spørsmålet gjaldt tidssone og hadde tre alternativer. Svaret behandlet
+alternativ 1 ferdig, forkastet alternativ 2 med full begrunnelse, og endte så på
+«Alternativ 3 ble forkastet fordi det gjør filnavn og».
+
+### Hva førte det til?
+
+`AD-20` i arkitekturspinen ble skrevet med ett forkastet alternativ i stedet for
+to. Memloggen fikk samme mangel. Ingen av stedene sa at noe manglet — de så
+fullstendige ut, fordi et avsnitt med ett forkastelsespunkt ikke *ser* ufullendt
+ut.
+
+Forkastelsen er nå ført, 17:14, merket i memloggen som noe som kom etter, med
+grunnen til at den kom etter.
+
+### Refleksjon
+
+**Det som gjorde avkortingen usynlig, var at formen var fullstendig selv om
+innholdet ikke var det.** De to første kuttene etterlot en setning uten slutt —
+en formfeil, som er lett å se. Det tredje etterlot et velformet avsnitt som
+manglet ett av tre punkter. Formen bar ingen spor av hullet.
+
+Det er samme lærdom som `NFR-02` ga tidligere samme dag, fra en annen kant: der
+var kravet riktig i utfall og feil i mekanisme, og alle kontrollene sjekket
+utfallet. Her var teksten riktig i form og ufullstendig i innhold, og det finnes
+ingen kontroll som leser form. I begge tilfellene besto noe en prøve som ikke
+målte det som var galt.
+
+**Den ble ikke oppdaget av noen kontroll.** Den ble oppdaget av at brukeren sa
+fra om at innliming kuttes, og ba om en systematisk gjennomgang av alt som var
+skrevet på grunnlag av innlimt tekst. Uten det ville `AD-20` stått med to av tre
+alternativer behandlet på ubestemt tid — og forskjellen ville først dukket opp
+den dagen noen lurte på hvorfor alternativ 3 ikke var vurdert.
+
+**Tiltaket er en sluttmarkør.** Instruksjoner avsluttes nå med en linje som sier
+at instruksjonen er slutt. Ser den ikke ut, er teksten avkortet, og arbeidet
+stopper i stedet for å bli delvis utført. Det flytter kontrollen fra *å lese
+innholdet og vurdere om det virker helt* — som ikke virket — til *å se etter én
+bestemt linje*, som enten er der eller ikke er der.
+
+Det er verdt å merke at tiltaket ikke oppdager hva som mangler. Det oppdager at
+noe mangler, og det er nok: et arbeid som stopper, kan gjenopptas. Et arbeid som
+fortsetter med et hull, fører hullet videre inn i dokumentene.
+
+### Git / dokumentasjon
+
+`ARCHITECTURE-SPINE.md` `AD-20` har nå begge forkastelsene. Memloggen fører den
+sene oppføringen som egen linje med tidsstempel og med grunnen til at den kom
+etter — loggen er append-only, så den gamle rekkefølgen står.
+
+---
+
 ## DD.MM.2026 – kort tittel
 
 ### Dato / deltaker(e)

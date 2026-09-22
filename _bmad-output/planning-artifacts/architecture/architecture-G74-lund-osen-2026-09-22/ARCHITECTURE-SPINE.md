@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-22T16:38'
+updated: '2026-09-22T17:14'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -225,6 +225,7 @@ prosjektmodul. De er løvnoder, og skal forbli det.
 - **Prevents:** at tid leses som tekst uten at noen vet hvilken sone teksten er i. Det er to steder i koden i dag, samme feilklasse: `fetch_prices.main` navngir fila med `date.today()` og stempler innholdet med `datetime.now(timezone.utc)`, så mellom midnatt og 02:00 norsk tid peker de på hver sin dag; og `meldinger._minutt` returnerer `tidspunkt[:16]` uten å gå via et tidsobjekt. Det siste er verst fordi det er **stille** — `[:16]` gir alltid en streng, så to representasjoner av samme øyeblikk blir to ulike dublettnøkler og FR-501 slutter å deduplisere uten at noe feiler
 - **Rule:** hvilken dag en sluttkurs tilhører, avgjøres av **norsk kalenderdato** — det er Oslo Børs dataene kommer fra. Tidsstempler for *når* noe ble hentet, forblir **UTC med offset**, så de kan sammenliknes på tvers av sommertid. Filnavn og `hentet` utledes av **samme øyeblikk**.
 - **Forkastet:** alt i UTC. «Dagens sluttkurs» ville fått feil dag for alle hentinger mellom midnatt og 02:00, og FR-402 ville bommet i samme vindu. Det er ikke færre omregninger, bare en omregning flyttet dit den ikke synes.
+- **Forkastet:** å rette bare feilen og utsette regelen. Det gjør filnavn og tidsstempel konsistente uten å si hva de skal være konsistente med. To verdier kan være enige og begge være feil. Da er symptomet borte mens spørsmålet står åpent, og det kommer tilbake når FR-402 skal avgjøre hva «forventet børsdag» betyr — på et tidspunkt der ingen lenger husker at det var det samme spørsmålet.
 
 ## Consistency Conventions
 
