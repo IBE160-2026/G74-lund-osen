@@ -839,10 +839,12 @@ Begge påstandene bygde på en **indirekte referanse**, ikke på filene:
 | Rådata ligger eksponert | En linje i memloggen om at rådatafila «beholdes som tidsstemplet øyeblikksbilde» | En beslutning om å ikke slette fila lokalt — den sa ingenting om sporing |
 | En patch traff feil overskrift | Et avkortet diff-utdrag | Utdraget viste en overskrift og tekst som lå i hver sin del av diffen |
 
-### Dette er femte gang
+### Dette er sjette gang
 
 *Ført som «tredje gang, ikke andre» 20.09. Tilfelle 4 kom dagen etter,
-tilfelle 5 samme kveld.*
+tilfelle 5 samme kveld, og tilfelle 6 den 22.09. Tellingen er revidert tre
+ganger — registeret er ført videre i stedet for å dateres om, fordi et mønster
+som telles feil ser mindre ut enn det er.*
 
 | # | Når | Påstanden | Hva kontrollen viste |
 |---|---|---|---|
@@ -851,6 +853,7 @@ tilfelle 5 samme kveld.*
 | 3 | 20.09.2026, kveld | Rådata ligger eksponert, og en patch traff feil overskrift | Verken rådata eller feilplassert tekst fantes |
 | 4 | 21.09.2026, kl. 18:40 | En klausul fra Euronexts vilkår, oppgitt i anførselstegn | Setningen var ikke lest i kilden. Den var rekonstruert fra en avkortet linje i et referat |
 | 5 | 21.09.2026, kl. 21:15 | «Joakims perspektiv finnes ikke i loggen» — lest som at han ikke hadde deltatt | Loggen viser hvem som *førte* oppføringene, ikke hvem som bidro. Kilden var et menneske, ikke en fil |
+| 6 | 22.09.2026, ettermiddag | «AD-20 har nå to Prevents-punkter som sier det samme» — med instruks om å slette det ene | Det var ett. Kilden var en diff-visning, der den gamle linjen står over den nye. Arbeidsøkta talte punktene i fila i stedet for å gjøre som instruksen sa |
 
 **Datering av tilfelle 1.** Utkastene ble lagt inn i repoet i commit `50d72d1`,
 2026-09-20 kl. 00:31. Før den lå det bare `README.md` og
@@ -1399,6 +1402,110 @@ er reell: en refleksjonsrapport om gruppens prosess kan ikke vise fram noe som
 ikke står skrevet.
 
 **Hva som bør føres.** Samme struktur som de øvrige oppføringene:
+
+## 22.09.2026 – To svar som så gyldige ut og ikke kunne svare
+
+### Dato / deltaker(e)
+
+2026-09-22, formiddag og ettermiddag. Marian, med Claude som arbeidsøkt.
+
+### Fase
+
+Arkitekturfasen: første kurshenting, `nyeste_snapshot`-rettingen, spinen med
+gjennomgangsport, og til slutt målingen av de to `[FORELØPIG]`-vinduene.
+
+### Hva ble gjort eller foreslått?
+
+Dagen ga to tilfeller av samme type, ett fra hver side av bordet. Begge ser ut
+som gyldige svar. Ingen av dem kunne svare på spørsmålet som ble stilt.
+
+**1. Målingen som ikke kunne svare.** Spørsmålet var om `VOLATILITET_VINDU = 20`
+og `VOLUM_VINDU = 20` er et valg eller en tilfeldighet. Målet som ble bestilt
+var: *hvor mange av de 2 985 aksjedagene får et annet signal enn med 20?*
+
+Det målet er **0 ved 20 per konstruksjon**. Det måler avstand fra 20 og
+forutsetter at 20 er referansen. Det ga tall for ni vindustørrelser, tallene var
+riktige, og kurven så informativ ut — den var U-formet rundt 20, noe som ved
+første øyekast ser ut som at 20 er et bunnpunkt. Det er det ikke. Det er
+nullpunktet til en avstandsmåling.
+
+Feilen ble oppdaget ved å **kjøre målet og se på resultatet**, ikke ved å lese
+forslaget. Hverken den som bestilte eller den som skrev koden så det på papiret.
+
+**2. Påstanden om to Prevents-punkter.** Senere samme dag kom instruksen: AD-20
+har to Prevents-punkter som sier det samme, slett det ene. Det var ett. Kilden
+var en **diff-visning**, der den gamle linjen står over den nye — den var lest
+som to levende punkter i fila. Arbeidsøkta talte punktene i fila i stedet for å
+gjøre som instruksen sa.
+
+### Hva førte det til?
+
+Målet ble byttet ut med to som er **iboende** og ikke forutsetter noe om 20:
+
+| Metrikk | Egenskap |
+|---|---|
+| **Utslagsrate** | Hvor ofte sjekken gir noe annet enn 0, ved et gitt vindu. Sier noe om vinduet alene |
+| **Nabostabilitet** | Hvor mange aksjedager som skifter verdi mellom *w* og *w*−5. Sier noe om hvor mye valget betyr i det området |
+| ~~Avstand fra 20~~ | Relativ til tallet som skulle testes. Kan per konstruksjon ikke si om det tallet er spesielt |
+
+Skillet er hele poenget: **de to første måler en egenskap ved vinduet, den
+forkastede målte en egenskap ved forholdet til 20.** Et mål som har svaret
+innebygd i referansepunktet sitt, kan ikke brukes til å prøve referansepunktet.
+
+De nye målene ga et svar som det første aldri kunne gitt: utslagsraten er
+monoton i begge vinduene, men i **motsatt retning** — bevegelse faller fra
+37,0 % til 27,3 %, interesse stiger fra 14,1 % til 17,5 %. Og 20 er ikke et
+optimum. Alt mellom 15 og 30 oppfører seg tilnærmet likt. Begrunnelsen for å
+låse 20 ble derfor ikke «20 er best», men «20 ligger klar av det ustabile
+området under 15». Det er en svakere påstand, og den er sann.
+
+Påstanden om Prevents-punktene førte ikke til noe, nettopp fordi den ble
+kontrollert. Den er ført som tilfelle 6 i registeret over.
+
+### Refleksjon
+
+De to henger sammen, og det er derfor de står i samme oppføring.
+
+**Begge har en kilde som ser ut som en tilstand, men er en framstilling av en.**
+En diff-visning er en framstilling av en fil — den viser den gamle og den nye
+linjen samtidig, og fila har bare den nye. En avstandsmetrikk er en framstilling
+av en parameter — den viser hvordan alt annet skiller seg fra 20, og sier
+ingenting om 20. I begge tilfellene bærer framstillingen informasjon som ikke
+finnes i det den framstiller.
+
+Det er samme mekanisme som tilfelle 2 i registeret, der en `tail -14`-utskrift
+ble lest som hele filen. Tiltaket derfra — *les hele filen, ikke utskriften av
+den* — viser seg å gjelde bredere enn filer: **les tilstanden, ikke visningen av
+den.**
+
+**Men de skiller seg på ett punkt, og det er det nyttigste.** Tilfelle 6 ble
+fanget av en kontroll som allerede var innarbeidet: økta sjekket fila. Målingen
+ble ikke fanget av noen kontroll — den ble fanget av at noen så på resultatet og
+syntes kurven var mistenkelig pen. Vi har en vane for det første og ingen for
+det andre.
+
+En metode kan ikke kontrolleres mot en kilde slik en påstand kan. Den må
+kontrolleres mot **spørsmålet den skal svare på**, og det finnes ingen fil å
+slå opp i. Det nærmeste vi kom en regel i dag var: *hva ville dette målet vist
+hvis svaret var det motsatte?* Et mål som gir samme utslag uansett, måler ikke
+det vi tror.
+
+**Verdt å merke for rapporten:** det var den som bestilte målingen som stilte
+spørsmålet skarpt nok til at feilen ble synlig — «er 20 et valg eller en
+tilfeldighet» tåler ikke et svar som forutsetter 20. Et vagere spørsmål, som
+«virker 20?», ville den forkastede metrikken besvart utmerket. Og feil.
+
+### Git / dokumentasjon
+
+Målingen: `malinger.md` §9, med det forkastede målet og begrunnelsen for å
+forkaste det ført i paragrafen — ikke fjernet. `[FORELØPIG]` fjernet i
+`signalberegning.py` og `prd.md` §4.7. PRD-en satt til `status: final` da alle
+fire punktene i utgangsbetingelsen var innfridd.
+
+Tilfelle 6 ført i registeret over. Arkitekturspinen `AD-20` står med ett
+Prevents-punkt, som den alltid har gjort.
+
+---
 
 ## DD.MM.2026 – kort tittel
 

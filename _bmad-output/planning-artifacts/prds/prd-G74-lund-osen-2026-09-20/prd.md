@@ -7,7 +7,7 @@ created: 2026-09-20
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
 updated: 2026-09-22T16:07
 #
-# Hvorfor status fortsatt er draft — og hva som skal til for å endre den.
+# Hvorfor status var draft, og hva som avsluttet den.
 #
 # «draft» er IKKE en påstand om at dokumentet er uferdig. Det har vært gjennom
 # fem gjennomganger og en sjekkliste, og kravene er nummererte og begrunnet.
