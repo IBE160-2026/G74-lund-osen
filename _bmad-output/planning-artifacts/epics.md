@@ -261,9 +261,12 @@ navngitt kontroll.
 
 ```
 Epic 1 (lagring) ──> Epic 2 (henting) ──> Epic 3 (leveranse)
-                 └─> Epic 4.2+ (KI-logg)
-Epic 4.1 (papirarbeid) ──────────────────> parallelt fra dag én
-Epic 6 (meldinger) 🔒 ──> Epic 5 (KI i drift) 🔒 ──> krever også Epic 4.1
+                 └─> Epic 4.3 (SQLite-adapter for KILogg)
+
+Epic 4.1 (papirarbeid)  ─┐  ingen avhengighet —
+Epic 4.2 (port + minne) ─┘  parallelt med Epic 1 fra dag én
+
+Epic 6 (meldinger) 🔒 ──> Epic 5 (KI i drift) 🔒 <── Epic 4.1
 Epic 7 (hendelser) 🔒
 ```
 
@@ -273,8 +276,11 @@ Epic 7 (hendelser) 🔒
   hentekommandoen (`AD-10`). Den må finnes før den kan pakkes.
 - **Epic 4.1 er parallell fra dag én.** Det er papirarbeid uten kodeavhengighet,
   og det er dette som gjør «KI tidlig» mulig i det hele tatt.
-- **Epic 4.2 og utover etter Epic 1:** `KILogg` er en port, og porten trenger
-  databasen.
+- **Bare Epic 4.3 venter på Epic 1.** Porten `KILogg` er en `Protocol` og vet
+  ikke om lagringsformen — det er hele poenget med `AD-3`. Den kan defineres og
+  prøves i sin helhet mot en minneimplementasjon, slik `MinneKilde` alt gjør i
+  35 testreferanser over fire testfiler. Bare **SQLite-adapteren** trenger
+  databasen. To av Epic 4s tre deler kan derfor kjøre parallelt med Epic 1.
 - **Epic 5 etter både Epic 4.1 og Epic 6.** Se avhengighetsvarselet under.
 
 ### Epic 1: Dataene overlever en omstart, og historikken kan leses tilbake
@@ -314,11 +320,18 @@ bygges til slutt.
 
 **FR-er:** FR-604, FR-605
 
-Story 4.1 er *velg modelltjeneste og dokumentér betingelse 4*, med tre svar per
-kandidat: brukes innsendte data til trening, kan det slås av, og står det i
-**vilkårene** eller bare i markedsføringen. **Betingelse 4 må være ført før
-artikkeltekst sendes inn i en modell** — en story som sender inn tekst er
-*blokkert av* 4.1, ikke anbefalt etter den.
+Epicen deler seg i tre, med hver sin avhengighet:
+
+| Del | Innhold | Avhengig av |
+|---|---|---|
+| **4.1** | Velg modelltjeneste, dokumentér betingelse 4 | **Ingenting.** Papirarbeid, fra dag én |
+| **4.2** | `KILogg` som `Protocol` + minneimplementasjon + tester | **Ingenting.** Porten vet ikke om lagringsformen |
+| **4.3** | SQLite-adapter for `KILogg` | **Epic 1** |
+
+Story 4.1 krever tre svar per kandidat: brukes innsendte data til trening, kan
+det slås av, og står det i **vilkårene** eller bare i markedsføringen.
+**Betingelse 4 må være ført før artikkeltekst sendes inn i en modell** — en
+story som sender inn tekst er *blokkert av* 4.1, ikke anbefalt etter den.
 
 ### Epic 5: KI-laget i drift 🔒
 
