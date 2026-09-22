@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-22T17:14'
+updated: '2026-09-22T20:44'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -139,6 +139,7 @@ prosjektmodul. De er løvnoder, og skal forbli det.
 - **Rule:** `Vurderingslager` og `KILogg` har **bare** `skriv` og lesemetoder. Ingen `slett`, ingen `endre`. **Fraværet er invarianten.** Mønsteret er utvidet, ikke oppfunnet: `SnapshotKilde` har allerede «med vilje ingen skrivemetode».
 - **Skjerpet:** fraværet alene holder ikke, fordi AD-17 krever at `skriv` er idempotent på `(symbol, dato)` — og en upsert *endrer* raden hvis den finnes. Derfor bærer **formen** regelen: `skriv` tar imot datoen og **avviser enhver dato som ikke er inneværende børsdag**. Dagens rad kan skrives om så mange ganger man vil; en eldre rad er utilgjengelig gjennom porten. Ingen behøver å huske forskjellen. Dette er en skjerping av AD-7, ikke et unntak fra den.
 - **Merk:** skillet mellom gjenoppbyggbart og uerstattelig går **tvers gjennom databasen**, ikke mellom base og fil. `kurs` er gjenoppbyggbar; `vurdering` og `ki_logg` er det ikke.
+- **Konsekvensen er tilsiktet:** en dag ingen kjørte hentekommandoen, kan ikke etterfylles med en vurdering. `FR-403` fyller hull i kursserien fordi en kurs for 12.09 er den samme uansett når den hentes; en vurdering er det ikke. Dagen vises som manglende, ikke som tom — `FR-409`.
 
 ### AD-8 — Nettverk er sperret i testkjøringen `[ADOPTED 2026-09-21]`
 
@@ -155,7 +156,7 @@ prosjektmodul. De er løvnoder, og skal forbli det.
 
 ### AD-10 — Webserveren starter aldri en henting
 
-- **Binds:** FR-401 *(konflikt — se Deferred)*
+- **Binds:** FR-401, FR-408, FR-409
 - **Prevents:** at kvoten brennes av at noen starter containeren. En container startes på nytt hver gang, så «ved oppstart» betyr noe helt annet i Docker enn i en applikasjon som starter én gang. To `docker run` samme dag = 30 kall mot en grense på 20
 - **Rule:** `docker run` starter Flask og koster **null** API-kall, alltid. Er basen tom, vises tom-tilstand med melding om hvordan man henter. Henting er en egen kommando mot samme image, altså en bevisst handling og ikke en bivirkning av at noe startet.
 
@@ -176,7 +177,7 @@ prosjektmodul. De er løvnoder, og skal forbli det.
 - **Binds:** FR-701..FR-705
 - **Prevents:** at en parameter justeres til den gir et penere bilde. Modellen skal beskrive hva som skjedde, ikke forutsi hva som skjer
 - **Rule:** `TERSKEL=2`, `VOLUMFAKTOR=1.5`, `NOYTRALSONE=0.02` er låst mot 199 handelsdager og 2 985 aksjedager. Hver konstant bærer målingen i kommentaren ved siden av seg. En endring krever ny måling ført i `malinger.md`, ikke en begrunnelse i en commit-melding.
-- **Uprøvd:** `VOLATILITET_VINDU=20` og `VOLUM_VINDU=20` er merket `[FORELØPIG]` og er **ikke** målt.
+- **Målt 2026-09-22** mot de samme 2 985 aksjedagene, `malinger.md` §9. Begge låst på 20. Målingen peker ikke ut 20 som et optimum — alt mellom 15 og 30 oppfører seg tilnærmet likt — men 20 ligger klar av det ustabile området under 15, der valget ville båret vekt det ikke kan forsvare.
 
 ### AD-14 — Deduplisering før kategorifilter `[ADOPTED 2026-09-20]`
 
@@ -200,10 +201,54 @@ prosjektmodul. De er løvnoder, og skal forbli det.
 
 ### AD-17 — Hentekommandoen skriver dagens vurdering
 
-- **Binds:** FR-408, AD-7, AD-10
-- **Prevents:** at ingen er utpekt til å fylle `vurdering`, slik at AD-7 ender med å verne en tom tabell
-- **Rule:** `docker run … hent` henter kursene, kaller `erstatt_serie`, og regner deretter ut og skriver dagens vurdering for alle femten **i samme kjøring**. Én utløser, ett tidspunkt. `skriv` er idempotent på `(symbol, dato)`.
-- **Forkastet:** lat skriving ved sidevisning — en dag ingen åpner siden, blir aldri lagret, og FR-408 forutsetter at dagen finnes selv om ingen så på den. Egen tredje kommando — den kan glemmes, og kravet sier *automatisk*.
+**Tatt opp igjen 2026-09-22.** Konklusjonen står, men på en annen grunn. Den
+opprinnelige står bevart nederst i blokken.
+
+- **Binds:** FR-408, FR-409, AD-5, AD-7, AD-10
+- **Prevents:** at vurderingen regnes av en **annen serie** enn den som lå der da den ble skrevet
+- **Rule:** `docker run … hent` henter kursene, kaller `erstatt_serie`, og regner deretter ut og skriver dagens vurdering for alle femten **i samme kjøring**. Én utløser, ett øyeblikk, ett par som hører sammen. `skriv` er idempotent på `(symbol, dato)`.
+
+**Begrunnelsen.** Vurderingen regnes av kursene som ble lagret i samme kjøring.
+`AD-5` sier at `erstatt_serie` bytter ut **hele** symbolets serie ved hver
+henting. Skrives vurderingen et annet sted eller på et annet tidspunkt, kan den
+derfor regnes av et annet grunnlag enn det som lå der da hentingen skjedde — og
+da lagrer den ikke lenger «hva løsningen mente om *disse* dataene».
+
+Argumentet rammer begge de forkastede alternativene, og låner ingenting fra
+FR-401:
+
+| Forkastet | Hvorfor |
+|---|---|
+| **Lat skriving ved sidevisning** | Vurderingen regnes av det som ligger der når noen ser på siden, ikke av det som lå der da hentingen skjedde. To samtidige visninger blir dessuten to skrivere mot samme rad |
+| **Egen tredje kommando** | Samme problem, bare med et annet mellomrom. Kjøres den etter en ny henting, er grunnlaget byttet ut |
+
+**Konsekvensen er avgjort, ikke stilltiende:** en dag ingen kjører kommandoen,
+får ingen vurdering, og den kan ikke etterfylles. Det følger av `AD-7` og er
+**riktig** — en vurdering skrevet i ettertid ville vært dagens parametres svar,
+ikke datidens. Skillet mot `FR-403`, som *fyller* hull i kursserien, står i
+FR-408. At dagen mangler, skal vises eksplisitt: `FR-409`.
+
+> **Den opprinnelige begrunnelsen, 2026-09-22 tidligere samme dag.** Bevart
+> fordi beslutningen overlevde at grunnen falt bort, og det er ikke det samme
+> som at den ble reddet.
+>
+> *«Prevents: at ingen er utpekt til å fylle `vurdering`, slik at AD-7 ender med
+> å verne en tom tabell. Forkastet: lat skriving ved sidevisning — en dag ingen
+> åpner siden, blir aldri lagret, og FR-408 forutsetter at dagen finnes selv om
+> ingen så på den. Egen tredje kommando — den kan glemmes, og kravet sier
+> automatisk.»*
+>
+> **Hva som falt.** «Kravet sier automatisk» hvilte på FR-408s ordlyd, og den
+> ordlyden var selv en rest fra modellen der applikasjonen hentet ved oppstart.
+> Da FR-401 ble skrevet om, ble begrunnelsen sirkulær.
+>
+> **Og hva som var galt uavhengig av det.** «En dag ingen åpner siden, blir
+> aldri lagret» rammer AD-17s egen løsning like hardt: en dag ingen kjører
+> kommandoen, blir heller ikke lagret. Argumentet skilte ikke alternativene —
+> det beskrev en egenskap alle tre deler.
+>
+> Den nye begrunnelsen skiller dem, fordi den handler om *hvilket grunnlag*
+> vurderingen regnes av, ikke om hvem som må huske noe.
 
 ### AD-18 — Vurderingen kopierer kursen, uten fremmednøkkel
 
@@ -341,13 +386,11 @@ G74-lund-osen/
 
 | Utsatt | Hvorfor det kan vente |
 |---|---|
-| **FR-401 må skrives om** | AD-10 motsier kravets første setning. Spinen skal ikke stilltiende overstyre PRD-en — endringen gjøres i `prd.md`, ikke her |
 | **Nøyaktig Docker-baseimage** | Må verifiseres mot gjeldende tagger når Dockerfilen skrives. Bindingen er at Python-versjonen matcher CI (3.13), ikke en bestemt tag |
 | **KI-laget (FR-601..606)** | Modelltjeneste er ikke valgt, og betingelse 4 i EODHDs godkjenning — at tjenesten ikke trener på innholdet — er udokumentert. Den må føres **før** artikkeltekst sendes inn |
 | **Kilde for handelskalenderen** | Åpent punkt 3. FR-402 hviler på «forventet børsdag», men ingen kilde er utpekt |
-| **De to `[FORELØPIG]`-vinduene** | Åpent punkt; utgjør punkt 4 i utgangsbetingelsen for PRD-ens draft-status |
 | **NewsWeb-hentingen** | Åpent punkt 1. Euronext forbyr automatisert henting uten tillatelse; forespørselen er ubesvart. Arkitekturen låser seg derfor **ikke** til at meldingsdelen finnes |
-| **FR-301..303, kommende hendelser** | Hele PRD §4.3 var taus i første utkast av denne spinen. Det er en **tredje nettkilde** (Euronexts finanskalender) og et eid datasett uten port. `app.py` sier selv at «kommende hendelser mangler med vilje» — de ligger bak åpent punkt 1 og 16. Får sin port og sin AD når kilden er avklart, og **ikke før** |
+| **FR-301..303, kommende hendelser** | Hele PRD §4.3 var taus i første utkast av denne spinen. Det er en **tredje nettkilde** (Euronexts finanskalender) og et eid datasett uten port. `app.py` sier selv at «kommende hendelser mangler med vilje» — de ligger bak åpent punkt 1, 3 og 12. Får sin port og sin AD når kilden er avklart, og **ikke før** |
 | **Hvem kjører migrasjonene, og når** | AD-16 sier at de finnes, ikke hvem som anvender dem. Med to `docker run`-varianter (AD-10) er både web, henting og en tredje kommando forsvarlige svar. Avgjøres når Dockerfilen skrives |
 | **Kjøremåte i containeren** | `app.py` har ingen WSGI-oppføring, og de flate importene virker i dag bare via `pythonpath = ["src"]` i pytest-konfigurasjonen. Begge må løses i Dockerfile-storyen |
 | **Skjemaendring på et uerstattelig lager** | SQLite krever `DROP TABLE` for de fleste formendringer. AD-7 forbyr sletting gjennom porten, men sier ikke om en migrasjon er unntatt. Må avgjøres før første migrasjon som rører `vurdering` |

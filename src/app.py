@@ -49,7 +49,7 @@ def aksjedetalj(symbol: str):
     """Forklaringsdelen av aksjedetaljen.
 
     Meldinger, KI-forklaring og kommende hendelser mangler med vilje - de
-    krever kilder som ligger bak aapent punkt 1 og punkt 16.
+    krever kilder som ligger bak aapent punkt 1, 3 og 12.
     """
     aksje = finn_aksje(symbol, AKSJEUNIVERS)
     if aksje is None:

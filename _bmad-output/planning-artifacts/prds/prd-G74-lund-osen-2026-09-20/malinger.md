@@ -805,6 +805,7 @@ aldri ha svart på spørsmålet, og er byttet ut med de to over.
 | 30 | 15,6 % | 1,9 % |
 | 40 | 17,0 % | 1,6 % |
 | 50 | 17,2 % | 1,2 % |
+| 60 | **17,5 %** | 0,7 % |
 | 65 | 17,4 % | 1,2 % |
 
 **Aksjedager som faller ut: null**, for hvert vindu til og med 49. Grunnen er at
@@ -908,9 +909,9 @@ Målt på de ti DNB-artiklene:
 | Forhold | Målt |
 |---|---|
 | Språk | **Engelsk, 10 av 10.** Ingen norske saker |
-| Tekstens form | Utdrag, ikke hel artikkel. 394–3 131 tegn; den korteste ender på «Continue Reading» |
-| Utgiverfelt | **Finnes ikke.** Feltene er `date`, `title`, `content`, `link`, `symbols`, `tags`, `sentiment`. `tags` er tom |
-| Kategori | **Finnes ikke** |
+| Tekstens form | Utdrag, ikke hel artikkel. 394–4 719 tegn; den korteste ender på «Continue Reading» |
+| Utgiverfelt | **Finnes ikke.** Feltene er `date`, `title`, `content`, `link`, `symbols`, `tags`, `sentiment` — ingen av dem navngir utgiveren |
+| Kategori | **Tematisk, ikke regulatorisk.** 31 unike `tags` over ti artikler, 9 av 10 har minst én. Ingen motsvarighet til NewsWebs meldepliktkategorier |
 | Saker med selskapet i tittelen | **4 av 10** |
 | Ytterpunktet | Én sak bærer `DNB.OL` blant **24 symboler** og nevner DNB **null ganger** i teksten |
 
@@ -926,13 +927,28 @@ erstatter ikke et testsett, men den er ikke lenger uten tall.
 Spørsmålet var om FR-601..606 kan skrives om til denne kilden uten at kravene
 endrer karakter. **Det kan de ikke**, og grunnen er ikke språket eller formatet:
 
-PRD-ens bærende prinsipp er at **«regler sorterer, KI forklarer»**, og
-regelfilteret sorterer på NewsWebs kategoritaksonomi (FR-502, tre bøtter).
-EODHDs nyheter **har ingen kategorier** — `tags` er tom. Da har reglene ingen
-jobb, og FR-604 mister feltet «hva regelfilteret alene gjorde med den», som
-kravet selv begrunner slik: *«Uten dette finnes ingen kontrast å måle
-KI-bidraget mot.»* Suksessmålet «KI-bidrag i drift» måles i nettopp den
-kontrasten.
+Regelfilteret sorterer på NewsWebs **regulatoriske** kategoritaksonomi
+(FR-502, tre bøtter): hvilken meldeplikt meldingen oppfyller.
+
+EODHDs nyheter har tagger — **31 unike over ti artikler, 9 av 10 har minst én** —
+men de er **tematiske**: `SHARE-BUYBACK`, `EARNINGS`, `M-A`, `VALUATION`. De
+sier hva saken handler om, ikke hvilken meldeplikt den oppfyller.
+
+Forskjellen er ikke akademisk. `SHARE-BUYBACK` skiller ikke den ukentlige
+statusrapporten under «Utsteders meldeplikt ved handel i egne aksjer» — som
+FR-502 filtrerer bort, 35 av 121 meldinger — fra oppstarten av et nytt program,
+som er ekte nyhet. Det er nøyaktig skillet **åpent punkt 8** handler om, og
+EODHDs taksonomi kan ikke uttrykke det. **FR-502s bøtter kan ikke utledes av
+den**, og måtte bygges om fra grunnen.
+
+*Rettet 2026-09-22 etter kontroll.* Paragrafen sa opprinnelig at `tags` er tom
+og at reglene derfor ikke har noen jobb. Det var feil: kontrollen så på artikkel
+1, som er den ene av ti uten tagger, og §7.2 i denne filen sier det riktige.
+Konklusjonen står, men på et annet og bedre grunnlag — og **påstanden om at
+kilden ikke *kan* brukes, var for sterk.** Et regelfilter kunne bygges på disse
+taggene; det ville bare ikke vært FR-502, og kontrasten FR-604 måler ville
+måttet defineres på nytt. Det som faktisk stenger kilden for drift, er
+rettighetene og kvoten — og de er uavhengige av taksonomien.
 
 Videre sier seksjonsingressen i §4.6: *«KI-laget brukes ikke til å avgjøre
 hvilket selskap en melding gjelder — den jobben gjør `issuerSign` bedre og

@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-22T17:26
+updated: 2026-09-22T20:44
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -565,7 +565,8 @@ på nytt: se `begrunnelser.md`.
 
 #### FR-408 — Dagens vurdering lagres per aksje
 
-For hver aksje, hver dag, lagres vurderingen slik den var:
+For hver aksje, **hver dag kommandoen kjøres**, lagres vurderingen slik den
+var:
 
 | Felt | Innhold |
 |---|---|
@@ -576,11 +577,67 @@ For hver aksje, hver dag, lagres vurderingen slik den var:
 | Relevante meldinger | Hvilke meldinger som ble vist for aksjen den dagen |
 | Kurs | `close` og `adjusted_close` |
 
-Lagringen skjer automatisk, fra første kjøring. Uten den kan spørsmålet «hva sa
-løsningen om EQNR for to uker siden?» ikke besvares.
+**Lagringen skjer automatisk innenfor en kjøring** — ingen skal måtte be om
+vurderingen separat. Den skjer **ikke** automatisk i tid: ingenting utløses av
+seg selv, jf. FR-401. Kjøres kommandoen, skrives vurderingen; kjøres den ikke,
+skrives ingenting.
+
+Uten lagringen kan spørsmålet «hva sa løsningen om EQNR for to uker siden?»
+ikke besvares.
 
 Dette er et tredje lager, med et annet formål enn de to i FR-406: de lagrer
 *data fra kilden*, dette lagrer *hva løsningen mente om dem*.
+
+##### Vurderinger etterfylles ikke, og det er med vilje
+
+FR-403 fyller hull i **kursserien** etter dager uten kjøring. Vurderinger
+behandles motsatt, og forskjellen følger av hva de to er:
+
+| | Kan etterfylles? | Hvorfor |
+|---|---|---|
+| **Kurs** for 12.09 | **Ja** | Den er den samme uansett når den hentes |
+| **Vurdering** for 12.09 | **Nei** | En vurdering skrevet i dag for 12.09 ville vært *dagens* parametres svar, ikke datidens |
+
+Det er nettopp det dette kravet finnes for å hindre. Lageret skal vise hva
+løsningen mente den dagen — og en dag ingen kjørte kommandoen, mente løsningen
+ingenting. Da skal det stå at den ikke sa noe.
+
+Håndhevet av arkitekturspinen `AD-7`: `Vurderingslager.skriv` avviser enhver
+dato som ikke er inneværende børsdag. En eldre rad er utilgjengelig gjennom
+porten, også for skriving.
+
+*Presisert 2026-09-22.* Kravet sa «for hver aksje, hver dag» og «lagringen skjer
+automatisk». Begge deler kunne leses som at systemet skriver av seg selv hver
+dag, og det motsier FR-401 etter omskrivingen samme dag. Skillet mellom kurser
+som etterfylles og vurderinger som ikke gjør det, var ikke skrevet ned før nå.
+
+#### FR-409 — Dager uten vurdering vises som det de er
+
+En dag uten vurdering skal vises **eksplisitt**, ikke som en tom rad eller et
+hopp i historikken:
+
+> **Ingen vurdering — kommandoen ble ikke kjørt denne dagen.**
+
+Skillet er mellom tre forskjellige ting som alle ser like tomme ut hvis de ikke
+skilles:
+
+| Tilstand | Hva brukeren skal se |
+|---|---|
+| Vurdering finnes, signalstyrke 0 | Styrke 0 med de tre sjekkene — **et gyldig svar**, ikke et fravær |
+| Ingen vurdering, kommandoen ikke kjørt | «Ingen vurdering — kommandoen ble ikke kjørt denne dagen» |
+| Ingen vurdering, ikke en børsdag | Dagen vises ikke i historikken |
+
+Uten dette blir en dag vi ikke kjørte, umulig å skille fra en dag uten utslag.
+Det første er et hull i vår egen drift; det andre er et funn. De skal ikke se
+like ut.
+
+**Dette er ikke dekket av FR-204.** Det kravet gjelder en aksje som ikke kan
+vurderes *nå* — for kort historikk eller hull i serien — og svarer med graf og
+beskjed. FR-409 gjelder den historiske raden for en dag som allerede har
+passert.
+
+*Skrevet inn 2026-09-22*, da `AD-17` ble tatt opp igjen og konsekvensen av
+`AD-7` ble avgjort eksplisitt i stedet for å bli stående som en stille mangel.
 
 ---
 
@@ -1011,12 +1068,10 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 
 | # | Punkt | Eier | Frist | Blokkerer |
 |---|---|---|---|---|
-| 1 | **Vilkårskontroll — to av tre deler lukket 2026-09-21.** *Lukket:* EODHD har svart skriftlig ja til språkmodellbruk, med fire betingelser, og kontrollen av NewsWeb og Euronext er gjennomført. *Åpent:* kontrollen ga et **uttrykkelig forbud** mot automatisert henting uten tillatelse på forhånd. Forespørsel sendt 21.09, **purret 22.09 i samme tråd** — purringen dekker både de fire opprinnelige delene og overføring til en modelltjeneste (punkt 19), og tilbyr et smalere alternativ. Svar avventes. Holder ikke unntaket, må meldingsdelen omdisponeres. **Kontrollert 22.09: EODHDs `/api/news` er ikke en reservekilde** — den koster 75 kall i døgnet for universet mot en kvote på 20, innholdet er syndikert fra tredjepart via Yahoo, og den har ingen kategorier, så regelfilteret mister jobben sin og FR-604 mister kontrasten den måler KI-bidraget mot. Vurderingen med tall i `malinger.md` §10. Et nei tar derfor hele KI-laget med seg | Gruppen | **2026-09-28** | Meldingsdelen |
+| 1 | **Vilkårskontroll — to av tre deler lukket 2026-09-21.** *Lukket:* EODHD har svart skriftlig ja til språkmodellbruk, med fire betingelser, og kontrollen av NewsWeb og Euronext er gjennomført. *Åpent:* kontrollen ga et **uttrykkelig forbud** mot automatisert henting uten tillatelse på forhånd. Forespørsel sendt 21.09, **purret 22.09 i samme tråd** — purringen dekker både de fire opprinnelige delene og overføring til en modelltjeneste (punkt 19), og tilbyr et smalere alternativ. Svar avventes. Holder ikke unntaket, må meldingsdelen omdisponeres. **Kontrollert 22.09: EODHDs `/api/news` er ikke en reservekilde** — den koster 75 kall i døgnet for universet mot en kvote på 20, innholdet er syndikert fra tredjepart via Yahoo, og taksonomien er **tematisk og ikke regulatorisk**, så FR-502s tre bøtter måtte bygges om fra grunnen. Vurderingen med tall i `malinger.md` §10. Et nei tar derfor hele KI-laget med seg | Gruppen | **2026-09-28** | Meldingsdelen |
 | 2 | **KI-terskelen i samlekategorien** — hvor grensen mellom «kan påvirke» og «lite relevant» skal gå. Kan ikke avgjøres på papir; relevanseksperimentet er input. Foreløpig regel står i FR-606 | *‹fylles inn›* | Etter del 2 av relevanseksperimentet | Kalibrering av FR-606 |
 | 3 | **Hvilken kilde gir handelskalenderen?** FR-402 hviler på «forventet børsdag», men ingen kilde er utpekt for hvilke dager Oslo Børs er åpen | *‹fylles inn›* | Før implementasjon | FR-402 |
 | 4 | **Hvordan utledes eks.dato?** FR-407 og FR-503 forutsetter at utbyttedager kan identifiseres. **En målt vei finnes, funnet 2026-09-21:** avviket mellom close-endringen og `adjusted_close`-endringen peker ut dagen justeringen skjedde. 38 hendelser over 3 720 dagovergangner, og antallet står stille fra 0,05 til 0,5 prosentpoeng — et rent skille, så terskelen kan begrunnes i stedet for velges. **Konsekvensen er større enn kravet:** FR-407 blir da uavhengig av EKS.DATO-meldinger, og dermed av NewsWeb og punkt 1. Se `begrunnelser.md` §11 | Gruppen | Før demonstrasjonen | FR-407, FR-503 |
-| 17 | **Database.** Faglærer: «Alle tre nivåene innebærer database, så uten database vil dette påvirke karakteren hardt.» Dagens lagringsbeslutning i FR-406 er filbasert og ble tatt for å løse et kvoteproblem, ikke lagringsspørsmålet. Behovet er reelt og uavhengig av karakterkravet: FR-408 og FR-604/605 er tidsserie- og spørringsproblemer, FR-407 er en join. Rådatalageret skal fortsatt være filer. **Valget av database er begrenset av vilkårene:** en hostet tjeneste bryter EODHDs betingelse «the output stays local» og Euronexts forbud mot å overføre innhold til tredjepart. Vurdering: `begrunnelser.md` §9 | Gruppen | **Ved oppstart av arkitekturfasen** | FR-408, FR-604, FR-605, FR-407 |
-| 18 | **Dockerfile mangler.** Innleveringen er «kildekode og docker fil» ifølge faglærer, og repoet har ingen Dockerfile — kontrollert 2026-09-21, ingen treff på `Dockerfile` eller `docker-compose` noe sted. Henger sammen med punkt 17: hva som skal med i imaget avhenger av om lagringen blir en fil i `data/` eller en databasetjeneste, og `data/` er gitignorert og skal ikke inn i imaget | Gruppen | **Ved oppstart av arkitekturfasen** | Innleveringen |
 | 16 | **Språkgjenkjenningen slår systematisk feil for Vår Energi.** `gjett_spraak` lar ett norsk tegn avgjøre alene, og `VAR` heter *Vår Energi ASA*. Hver engelsk melding derfra bærer «å» i sitt eget firmanavn og leses som norsk, så FR-501 vil beholde den engelske versjonen hver gang selskapet sender et meldingspar. Dette er ikke en kantsituasjon — det er hver gang, for én av de femten, og det vises i en norsk applikasjon. **To forsvarlige veier:** bygge om språkregelen, eller la den stå og forklare avviket i demonstrasjonen. Det som ikke er forsvarlig er at valget tas ved at ingen tar det opp | Gruppen | **Før UI-arbeidet starter** | FR-501, demonstrasjonen |
 | 19 | **Forespørselen til Euronext ba aldri om å sende innhold til en modelltjeneste.** Vilkårene forbyr å «otherwise transfer any of the Content to any third person», og parentesen strekker det til «others in your company or organisation» — altså svært bredt. Å sende meldingstekst inn i en språkmodell er en slik overføring. Brevet 21.09 beskriver fire ting — Retrieval, Storage, Display, Source code — og **ingen av dem nevner en modelltjeneste**; kontrollert 22.09, null treff på «language model», «LLM», «third person» og «third party» i hele brevet. Manuell innsamling løser klausul 1 om automatisert henting, men **ikke** overføringsklausulen. **Konsekvens: selv et fullt ja på alle fire delene lukker ikke dette.** Det må stilles som eget spørsmål. Kalenderspørsmålet i samme brev hjelper ikke: det ber om «the same answer» og arver dermed de fire overskriftenes rekkevidde, inkludert utelatelsen. **Purret 22.09, og purringen dekker begge deler** — de fire opprinnelige og overføringen — så et kort svar kan ikke lenger se fullstendig ut mens det bare dekker det ene. Purringen tilbyr også et smalere alternativ: et lite, manuelt innsamlet utvalg brukt én gang. Ordrett i `docs/epost-til-euronext.md` | Gruppen | **Sammen med punkt 1, 2026-09-28** | Plan B for relevanseksperimentet; KI-laget over NewsWeb-innhold |
 
@@ -1027,18 +1082,29 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 | 5 | **Relevanseksperimentet, del 1: utvalgskriterier, innsamling og manuell merking.** Flyttet fram fra uke 41 den 2026-09-21. Uke 41 ble satt mens eksperimentet var blokkert av to ting — om vilkårene tillot språkmodellbruk, og om `/api/news` svarte for `.OL`. **Begge ble avklart 21.09**, men datoen ble aldri flyttet etterpå. Rekkefølge: (a) utvalgskriteriene skriftlig — hvilke åtte selskaper, hvor mange artikler per selskap, og hva som teller som at en artikkel handler om selskapet; (b) innsamlingen, med kalltall-kontrollen som **første** forespørsel: to tickere, og se om `apiRequests` flytter seg 10 eller 15, så kostnaden for resten er kjent før den brukes. Tas fra bonuskvoten `extraLimit` 485 — men den er observert, ikke testet, se `malinger.md` §7.1 | Gruppen | Etter punkt 17 og 18 |
 | 5b | **Relevanseksperimentet, del 2: KI-klassifiseringen.** Kan ikke gjøres ennå, og det er tre grunner, ikke én: KI-laget finnes ikke som kode, ingen modelltjeneste er valgt, og **betingelse 4 i EODHDs godkjenning — at modelltjenesten ikke trener på innholdet — er udokumentert.** Den må være ført før artikkeltekst sendes inn i en modell, se `docs/kilder-og-rettigheter.md` | Gruppen | Når KI-laget finnes |
 | 6 | **Usikkerhetskriteriene er skrevet for medieartikler.** Kjennetegn 1 bærer svakt når utstederen selv er avsender | | Før KI-laget implementeres |
-| 7 | **Låsing av signalparametre** mot ~200 handelsdager. Koster 15 kall | | Før signalet låses |
 | 8 | **Oppstart av tilbakekjøpsprogram** er ekte nyhet, men filtreres bort sammen med de ukentlige statusrapportene | | Før innlevering |
 | 9 | **Kontrollere Alpha Vantages vilkår** for ikke-kommersiell bruk | | Før innlevering |
 | 10 | **Skjevfordeling mot positiv retning**, 68 % i testen. Vurderes mot året, ikke mot femten dager | | Etter utvidet test |
 | 11 | **Meldepliktig handel for primærinnsidere** justeres hvis den viser seg å være i hovedsak opsjonsutøvelse | | Etter én ukes drift |
 | 12 | **Bekrefte horisont og hendelsestyper** i FR-302, som i dag er antatt | | Før implementasjon |
 | 13 | **Datoer for demonstrasjon og prosjektinnlevering** | | Snarest |
-| 14 | **Hver story leveres med test.** Føres inn som krav i arkitekturfasen. Testene skal kunne kjøres uten API-kall, slik signalberegningen og meldingsfilteret gjør det | | Ved oppstart av arkitekturfasen |
 | 15 | **Plassér kategoriene som havnet i «ukjent»** i riktig bøtte. Krever en ukes drift for å vite hvilke som faktisk dukker opp | | Etter én ukes drift |
 
-**Punkt 1 er fortsatt det eneste som kan velte datagrunnlaget**, men det velter
-nå bare én ting, ikke to.
+### Lukket
+
+Punkter som er avgjort. De står igjen med hva som lukket dem, ikke slettet —
+uten det kan ingen se at de var åpne, eller hva som måtte til.
+
+| # | Punkt | Lukket av | Dato |
+|---|---|---|---|
+| 7 | **Låsing av signalparametre** mot ~200 handelsdager | `malinger.md` §7.4 låste terskel, volumfaktor og nøytralsone mot 199 handelsdager; §9 låste de to vinduene mot de samme 2 985 aksjedagene. **Punktet anslo 15 kall. Det kostet 0** — begge målingene ble gjort mot lagrede øyeblikksbilder | 21.09 og 22.09 |
+| 14 | **Hver story leveres med test**, kjørbar uten API-kall | Skrevet inn som `AD-8` i arkitekturspinen. Praksisen var allerede innført: `tests/conftest.py` sperrer `socket.connect`, og CI kjører uten hemmeligheter | 22.09 |
+| 17 | **Database** | SQLite besluttet i arkitekturfasen — spinen `AD-3` til `AD-7`, `AD-16`, `AD-18`, `AD-19`. Rådata forblir filer. **Kontrollert med faglærerstaben 22.09** og bekreftet av assisterende hjelpelærer: «Slik dere beskriver bruken […] bruker dere SQLite som en ordentlig database, ikke bare som enkel fillagring. […] Så ut fra det vi vet nå mener jeg dette er helt innenfor.» Svaret kom ikke fra emneansvarlig og bærer sitt eget forbehold | 22.09 |
+| 18 | **Dockerfile** | Arkitekturen besluttet: `AD-9` (ingen data i imaget), `AD-10` (webserveren henter aldri), `AD-11` (to volumer), `AD-12` (hemmeligheter fra miljøet). **Merk at selve filen ikke er skrevet** — punktet gjaldt beslutningen, og bygget står i `docs/innlevering.md` | 22.09 |
+
+**Punkt 1 og 19 er de to som kan velte datagrunnlaget.** Punkt 1 velter nå bare
+én ting, ikke to. Punkt 19 kom til 22.09 og treffer meldingsdelen og KI-laget
+sammen.
 
 *Oppdatert 2026-09-21.* EODHD-halvdelen er lukket: språkmodellbruken er
 skriftlig godkjent, og `/api/news` er målt til å svare for `.OL`-tickere.
@@ -1050,7 +1116,7 @@ egen frist for å ta stilling uten svar, ikke en dato Euronext har lovet.
 Fullstendig
 gjennomgang med sitater i `docs/kilder-og-rettigheter.md`.
 
-Punkt 1 har fått eier. De øvrige har det ennå ikke.
+Punkt 1, 4, 5, 5b, 16, 17, 18 og 19 har eier. Punkt 2, 3 og 6–15 mangler det.
 
 **Om nummereringen.** Numrene følger rekkefølgen punktene ble opprettet i, ikke
 rekkefølgen i tabellene. Punkt 16 står derfor over sammen med de andre som må
@@ -1061,5 +1127,4 @@ punkt som renummereres, mister sporet tilbake til målingen som begrunnet det.
 **Om eierfeltet.** «Gruppen» er et bevisst valg, ikke en tom rubrikk: vi er to,
 og fordelingen gjøres internt etter hva som passer når punktet skal tas. Det
 eierfeltet skal sikre, er at punktet har en frist og noen som svarer for den —
-ikke at navnet er låst på forhånd. Punkter som fortsatt står tomme, har ingen av
-delene.
+ikke at navnet er låst på forhånd. Punkt 6–15 har frist, men mangler eier.

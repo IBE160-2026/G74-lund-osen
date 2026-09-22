@@ -95,6 +95,7 @@ krever tre konkrete svar per kandidat:
 - **FR-405** — Avkorting ved lange meldingsintervaller
 - **FR-406** — To lagre for kursdata, med hvert sitt ansvar
 - **FR-408** — Dagens vurdering lagres per aksje
+- **FR-409** — Dager uten vurdering vises som det de er *(ny 22.09)*
 
 **4.5 Meldingsfilter og deduplisering**
 
@@ -120,7 +121,8 @@ krever tre konkrete svar per kandidat:
 - **FR-705** — Terskel for at en aksje skiller seg ut
 - **FR-706** — Synlig begrunnelse i aksjedetaljen
 
-**33 FR-er i alt.**
+**34 FR-er i alt.** FR-409 kom til 22.09, da konsekvensen av `AD-7` ble
+avgjort eksplisitt i stedet for å bli stående som en stille mangel.
 
 ### NonFunctional Requirements
 
@@ -220,9 +222,16 @@ hente ut, og ingen er oppfunnet for å fylle seksjonen.
 
 | FR | Levert i |
 |---|---|
-| FR-101, FR-102, FR-103 | `markedsoversikt.py`, commit `706720f` |
-| FR-201, FR-202, FR-204 | `aksjedetalj.py` `076bb12`, `graf.py` `b6ba9d8` |
-| FR-701 – FR-706 | `signalberegning.py`, commit `01af1a5` |
+| FR-101, FR-102 | `markedsoversikt.py`, commit `706720f` |
+| FR-103 | `markedsoversikt.py` + `index.html`. **`706720f` inneholdt bruddet** — den hadde `Retningsvisning("Opp", "↑", "opp")`, mens kravet krever modellens egen streng. Oppfylt av den senere commiten som fjernet oversettelsen |
+| FR-201 | `aksjedetalj.py` `076bb12`, `graf.py` `b6ba9d8` |
+| FR-202, FR-204 | Samme, **pluss `app.py` og `src/templates/`** — tegnforklaring, 200-svar og «kunne ikke regnes»-beskjed ligger der |
+| FR-701 – FR-705 | `signalberegning.py`, commit `01af1a5` |
+| FR-706 | `aksjedetalj.py` (`076bb12`) + `aksje.html`. **Ikke `signalberegning.py`** — kravet gjelder aksjedetaljen |
+
+**Merk at tabellen er skrevet fra kjernemodulene.** `app.py` og
+`src/templates/` bærer halvparten av fem av disse kravene, og sto ikke nevnt før
+kontrollen 22.09 fant det.
 
 **Fordelt på epics — 21 FR-er.**
 
@@ -232,13 +241,13 @@ hente ut, og ingen er oppfunnet for å fylle seksjonen.
 | FR-301, FR-302, FR-303 | Epic 7 🔒 |
 | FR-401, FR-402, FR-403 | Epic 2 |
 | FR-404, FR-405 | Epic 6 🔒 |
-| FR-406, FR-408 | Epic 1 |
+| FR-406, FR-408, FR-409 | Epic 1 |
 | FR-407 | Epic 2 |
 | FR-501, FR-502, FR-503 | Epic 6 🔒 |
 | FR-601, FR-602, FR-603, FR-606 | Epic 5 🔒 |
 | FR-604, FR-605 | Epic 4 |
 
-**12 + 21 = 33.** Alle FR-er er plassert.
+**12 + 22 = 34.** Alle FR-er er plassert.
 
 ### NFR Coverage Map
 
@@ -249,7 +258,7 @@ hente ut, og ingen er oppfunnet for å fylle seksjonen.
 | **NFR-03** Manglende data | **Tverrgående.** Delvis levert: `hent_universet` fortsetter ved feil (`352e3a2`), `app.py` tåler `kilde=None`, FR-204 finnes. **Kontroll på hver story:** en test for den tomme eller manglende stien |
 | **NFR-04** KI tar ikke ned hovedflyten | **Eid av Epic 5.** Bortfaller hvis Epic 5 strykes |
 | **NFR-05** Norsk | **Tverrgående, levert i alt som finnes.** **Kontroll på hver visningsstory:** all brukervendt tekst er norsk |
-| **NFR-06** Ikke investeringsråd | **Tverrgående.** Søk i `src/templates/` og `src/*.py` ga null treff på forbeholdstekst — men kravet ber ikke om en tekst. Det sier at *ingen del* skal formuleres som anbefaling, altså et forbud oppfylt ved fravær. **Kontroll på hver visningsstory:** ordlyden leses mot NFR-06 |
+| **NFR-06** Ikke investeringsråd | **Tverrgående.** Forbeholdstekst finnes: `src/templates/index.html:108` sier «Signalstyrken er 0–3 og sier hvor kraftig de tre sjekkene slår ut — *ikke om aksjen bør kjøpes eller selges*». Kravet er likevel et **forbud**, ikke et tekstkrav: ingen del av grensesnittet skal formuleres som anbefaling. **Kontroll på hver visningsstory:** ordlyden leses mot NFR-06 |
 | **NFR-07** Rådata bevares | **Eid av Epic 1** (`AD-6`). Delvis levert: `fetch_prices` skriver tidsstemplede øyeblikksbilder (`352e3a2`) |
 
 **Alle sju NFR-er er plassert:** tre eid av en epic, fire tverrgående med
@@ -288,7 +297,7 @@ Epic 7 (hendelser) 🔒
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
 løsningen om EQNR for to uker siden?» får et svar.
 
-**FR-er:** FR-406, FR-408 · **NFR-07** · **AD-er:** 3, 4, 5, 6, 7, 16, 18, 19
+**FR-er:** FR-406, FR-408, FR-409 · **NFR-07** · **AD-er:** 3, 4, 5, 6, 7, 16, 17, 18, 19
 
 `AD-19` binder rekkefølgen inne i epicen: `Kursrad` innføres i **samme endring**
 som SQLite-adapteren. Konsumentene — `markedsoversikt`, `aksjedetalj`, `graf`,
@@ -361,7 +370,7 @@ story som sender inn tekst er *blokkert av* 4.1, ikke anbefalt etter den.
 
 | Felt | |
 |---|---|
-| **Blokkert av** | Åpent punkt 1 og 16 |
+| **Blokkert av** | Åpent punkt 1 (Euronext), 3 (kilde for handelskalenderen) og 12 (horisont og hendelsestyper) |
 | **Eier** | Gruppen |
 | **Avgjøres** | Samme frist som Epic 6 |
 | **Ved nei** | Strykes. Tar ingenting med seg ned — ingen annen epic leser kalenderen. Krever dessuten en manuelt vedlikeholdt oppslagstabell, siden kalenderen verken oppgir ticker eller ISIN |

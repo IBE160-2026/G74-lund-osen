@@ -5,7 +5,7 @@ akkurat som markedsoversikten.
 
 Avgrenset til forklaringsdelen. Boersmeldinger (FR-203), KI-forklaring
 (FR-602) og kommende hendelser (FR-301) mangler med vilje: de krever kilder
-som ligger bak aapent punkt 1 og punkt 16.
+som ligger bak aapent punkt 1, 3 og 12.
 
 Forklarbarhet er hele poenget. En bruker skal kunne lese seg fram til hvorfor
 styrken ble 2 og ikke 1, uten aa kjenne formelen paa forhaand. Derfor baerer

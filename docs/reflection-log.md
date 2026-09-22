@@ -1666,6 +1666,84 @@ bare hva vi ikke fikk vite. Brukt før, endrer den hva vi spør om.
 
 ---
 
+## 22.09.2026 – En beslutning som overlevde at grunnen falt bort
+
+`AD-17` sier at hentekommandoen skriver dagens vurdering i samme kjøring. Den
+ble tatt tidlig 22.09 med to begrunnelser. Begge viste seg å ikke holde.
+
+### Hva som falt
+
+**«Kravet sier automatisk.»** Den hvilte på FR-408s ordlyd — «Lagringen skjer
+automatisk, fra første kjøring». Men den ordlyden var selv en rest fra modellen
+der applikasjonen hentet ved oppstart, og da FR-401 ble skrevet om samme dag,
+ble begrunnelsen sirkulær: AD-17 begrunnet seg med et krav som beskrev en
+verden FR-401 nettopp hadde avskaffet.
+
+**«En dag ingen åpner siden, blir aldri lagret.»** Denne var verre, og den falt
+av en annen grunn: **den rammer AD-17s egen løsning like hardt.** En dag ingen
+kjører hentekommandoen, blir heller ikke lagret. Argumentet skilte ikke
+alternativene fra hverandre — det beskrev en egenskap alle tre delte, og ble
+likevel brukt til å forkaste ett av dem.
+
+### Hvorfor konklusjonen likevel står
+
+Den nye begrunnelsen kommer fra `AD-5`: `erstatt_serie` bytter ut **hele**
+symbolets serie ved hver henting. Vurderingen regnes av kursene som lå der da.
+Skrives den et annet sted eller på et annet tidspunkt, kan grunnlaget være
+byttet ut — og da lagrer den ikke lenger «hva løsningen mente om *disse*
+dataene».
+
+Det argumentet **skiller** alternativene, fordi det handler om hvilket grunnlag
+vurderingen regnes av, ikke om hvem som må huske noe.
+
+### Forskjellen mellom å overleve og å bli reddet
+
+Dette er poenget som er verdt plass i rapporten.
+
+Den enkle veien var å skrive om FR-408 slik at «automatisk» igjen betydde noe
+som passet, og la AD-17 stå urørt. Konklusjonen ville vært den samme, og ingen
+ville sett noe. **Det ville vært å redde beslutningen** — å justere premisset
+til det bar vekten det allerede var pålagt.
+
+Det som ble gjort i stedet: begrunnelsen ble prøvd på nytt fra en annen kant, og
+den holdt. Forskjellen er ikke synlig i resultatet — AD-17 sier det samme nå som
+før — men den er synlig i **hvorfor**, og den gamle begrunnelsen står bevart og
+datert i spinen så forskjellen kan leses.
+
+En beslutning som overlever at begrunnelsen faller, er sterkere enn før. En
+beslutning som får begrunnelsen justert til å passe, er svakere, og ser
+identisk ut.
+
+### Hullet som ble avgjort i stedet for å bli lappet
+
+Underveis viste det seg at `AD-7` og `FR-403` er i strid: kursserien etterfylles
+etter dager uten kjøring, men `skriv` avviser enhver dato som ikke er
+inneværende børsdag, så vurderingene kan ikke.
+
+**Det er ikke en defekt.** En kurs for 12.09 er den samme uansett når den
+hentes. En vurdering er det ikke — en vurdering skrevet i dag for 12.09 ville
+vært dagens parametres svar, ikke datidens, og det er nettopp det FR-408 finnes
+for å hindre. En dag ingen kjørte kommandoen, sa løsningen ingenting.
+
+Det som manglet, var at dette sto noe sted. Nå gjør det det, og `FR-409` krever
+at dagen vises som «ingen vurdering — kommandoen ble ikke kjørt denne dagen» i
+stedet for som en tom rad. Ellers blir et hull i vår egen drift umulig å skille
+fra en dag uten utslag — det første er en mangel, det andre er et funn.
+
+### To rettelser fra samme kontroll
+
+**F8.** `epics.md` sa at søk etter forbeholdstekst ga «null treff».
+`src/templates/index.html:108` sier «ikke om aksjen bør kjøpes eller selges».
+Søket lette etter fire ordformer, og ingen av dem står der. **Et tomt søk
+beviser at ordene ikke er der, ikke at saken ikke er der.**
+
+**F4.** `epics.md` førte FR-103 på commit `706720f`. Den commiten hadde
+`Retningsvisning("Opp", "↑", "opp")` — nøyaktig oversettelsen kravet forbyr.
+**Det er mulig å føre et krav på commiten som brøt det**, hvis man leser
+filnavnet og ikke diffen.
+
+---
+
 ## DD.MM.2026 – kort tittel
 
 ### Dato / deltaker(e)
