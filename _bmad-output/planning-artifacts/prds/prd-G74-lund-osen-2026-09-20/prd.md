@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-22T20:57
+updated: 2026-09-22T21:00
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1034,7 +1034,7 @@ på vilkår, og andre norske finansmedier publiserer ikke lenger åpen RSS. Se
 |---|---|---|---|
 | Brukerutfall | En person utenfor gruppen gjennomfører hovedflyten og forklarer uoppfordret hvorfor en aksje skiller seg ut | Minst 1 person, under 5 minutter, uten hjelp | Før prosjektinnlevering |
 | Adopsjon | Gruppen bruker løsningen på egne aksjer og logger feil | Minst 4 av 5 børsdager fra første fungerende versjon | Løpende |
-| Drift | Daglig henting fullfører innenfor kvoten; ved kildefeil vises siste kjente data med tidsstempel | Ingen manuelle steg, ingen stopp ved manglende data | Ukentlig |
+| Drift | Én henting fullfører innenfor kvoten; ved kildefeil vises siste kjente data med tidsstempel | **Én kommando gjør hele hentingen.** Ingen skjulte steg, ingenting som må huskes utenom den — **migrasjoner er uttrykkelig ikke et eget steg**. Ingen stopp ved manglende data | Ukentlig |
 | Dager uten signal | Dager uten tydelige signaler håndteres uten at hovedflyten stopper eller systemet tvinger frem et resultat | Signalstyrke 0 forekommer og vises korrekt | Løpende |
 | KI-bidrag i drift | Hvilke meldinger KI-laget forklarte eller omklassifiserte som regelfilteret alene ikke klarte å skille | Dokumentert eksempelsett fra minst én ukes drift | Før demonstrasjonen, est. uke 45 |
 | Relevanseksperiment | Testsett på ~50 medieartikler fra åtte selskaper, merket manuelt, kjørt mot både symbolmatching og KI-klassifisering | Eksperimentet gjennomført og tallene dokumentert — ikke at KI kommer best ut | **Del 1** innsamling og merking, uke 39–40. **Del 2** KI-kjøringen, når KI-laget finnes |
@@ -1048,6 +1048,25 @@ måler denne flyten.
 
 **Bundet til datoer som ikke er fastsatt:** FR-407, FR-601 og FR-408, og målene
 «KI-bidrag i drift» og «Grensesnitt og stabilitet». Se åpent punkt 13.
+
+*Endret 2026-09-22.* Terskelen sa «Ingen manuelle steg». Den målte **to**
+egenskaper, og FR-401 har skilt dem fra hverandre:
+
+| | Status |
+|---|---|
+| Ingenting utløses av et menneske | **Gitt opp. Det var et valg.** En container startes på nytt hver gang, så «ved oppstart» ville betydd 15 kall per `docker run` mot en dagskvote på 20 — to kjøringer samme dag hadde brukt opp dagen. FR-401 og `AD-10` |
+| Når hentingen først er utløst, må ingenting annet huskes | **Beholdt.** Det er denne halvdelen terskelen nå måler, og `AD-17` finnes for å sikre den: vurderingen skrives i samme kjøring, så det ikke oppstår et steg to |
+
+Målet er omformulert og ikke strøket, fordi den andre halvdelen er ønsket og
+ikke måles noe annet sted. Men **den første halvdelen er oppgitt, ikke myknet
+opp** — det skal stå, ellers ser omformuleringen ut som at målet ble justert til
+å passe det vi bygde.
+
+**Hva som mest sannsynlig bryter terskelen:** at migrasjonene blir en egen
+kommando. Arkitekturspinen fører «Hvem kjører migrasjonene, og når» som utsatt —
+`AD-16` sier at de finnes, ikke hvem som anvender dem. Et svar som deler dem ut
+i `docker run … migrer` ville sett ut som ryddig ansvarsdeling og brutt målet.
+**Det skal leses når Dockerfilen skrives.**
 
 ### Motmål
 
