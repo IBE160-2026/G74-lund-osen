@@ -1809,6 +1809,31 @@ i egne kontekstvinduer.
 
 ---
 
+## 22.09.2026 – En ren kontroll, og grensen skrevet ned samtidig
+
+`local-tests/` ble kontrollert for lekkede API-nøkler. Utfallet var rent: alle
+tre skriptene leser nøkkelen fra `.env`, katalogen er gitignorert, og et søk
+gjennom alle 138 commits i alle grener fant **null** stier under `local-tests/`
+og ingen treff på nøkkelmønsteret.
+
+**Poenget er ikke at kontrollen var ren. Det er at renheten er avgrenset.**
+Søket dekket ett mønster — `api_token=` etterfulgt av en verdi — altså den
+formen disse tre skriptene faktisk bruker. En nøkkel som hadde ligget som
+`KEY = "..."` eller i en JSON-verdi, ville ikke nødvendigvis truffet. Og
+`git rev-list` ser bare dette repoet: en nøkkel limt inn i en chatlogg, et
+skjermbilde eller en e-post er usynlig for den.
+
+Det er **samme form som funn F8** tidligere i dag, der «null treff» på fire
+søkeord ble skrevet ned som at teksten ikke fantes. Forskjellen er når grensen
+kom: F8 ble funnet av en kontroll i etterkant, mens denne står i svaret fra
+første stund.
+
+Det er billigere å skrive ned hva et søk *ikke* dekket, enn å oppdage det
+senere — og det er den eneste forskjellen mellom de to tilfellene. Metoden er
+like begrenset begge steder.
+
+---
+
 ## DD.MM.2026 – kort tittel
 
 ### Dato / deltaker(e)
