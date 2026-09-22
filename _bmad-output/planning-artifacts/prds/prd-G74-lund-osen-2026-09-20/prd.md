@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-22T21:00
+updated: 2026-09-22T21:15
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -611,33 +611,39 @@ automatisk». Begge deler kunne leses som at systemet skriver av seg selv hver
 dag, og det motsier FR-401 etter omskrivingen samme dag. Skillet mellom kurser
 som etterfylles og vurderinger som ikke gjør det, var ikke skrevet ned før nå.
 
-#### FR-409 — Dager uten vurdering vises som det de er
+#### FR-409 — De tre tilstandene skal være skillbare i lageret
 
-En dag uten vurdering skal vises **eksplisitt**, ikke som en tom rad eller et
-hopp i historikken:
+Vurderingslageret skal kunne skille tre tilstander fra hverandre **entydig**.
+De ser alle tomme ut hvis de ikke skilles:
 
-> **Ingen vurdering — kommandoen ble ikke kjørt denne dagen.**
-
-Skillet er mellom tre forskjellige ting som alle ser like tomme ut hvis de ikke
-skilles:
-
-| Tilstand | Hva brukeren skal se |
+| Tilstand | Hva det betyr |
 |---|---|
-| Vurdering finnes, signalstyrke 0 | Styrke 0 med de tre sjekkene — **et gyldig svar**, ikke et fravær |
-| Ingen vurdering, kommandoen ikke kjørt | «Ingen vurdering — kommandoen ble ikke kjørt denne dagen» |
-| Ingen vurdering, ikke en børsdag | Dagen vises ikke i historikken |
+| Rad finnes, signalstyrke 0 | **Et gyldig svar.** Sjekkene ga ingen utslag den dagen |
+| Ingen rad, og dagen var en børsdag | **Kommandoen ble ikke kjørt.** Et hull i vår egen drift |
+| Ingen rad, og dagen var ikke en børsdag | Dagen finnes ikke, og skal ikke telles som noe |
 
-Uten dette blir en dag vi ikke kjørte, umulig å skille fra en dag uten utslag.
-Det første er et hull i vår egen drift; det andre er et funn. De skal ikke se
-like ut.
+Uten skillet blir en dag vi ikke kjørte, umulig å skille fra en dag uten utslag.
+Det første er en mangel hos oss; det andre er et funn om markedet. De skal ikke
+kunne forveksles.
 
-**Dette er ikke dekket av FR-204.** Det kravet gjelder en aksje som ikke kan
-vurderes *nå* — for kort historikk eller hull i serien — og svarer med graf og
-beskjed. FR-409 gjelder den historiske raden for en dag som allerede har
-passert.
+**Kravet gjelder lageret, ikke en skjerm.** Det finnes ingen visning av
+vurderingshistorikk i v1 — se åpent punkt 20. Skillet må likevel finnes nå,
+fordi det ikke kan gjenskapes i ettertid: mangler raden, finnes det ingen måte å
+vite om kommandoen ble kjørt den dagen.
+
+**Bindingen gjelder videre.** Enhver visning, kommando eller spørring som senere
+leser denne historikken, **skal bevare skillet** — ikke gjengi «ingen rad» og
+«styrke 0» som samme tilstand. Står ikke dette her, er grunnen til at kravet
+finnes glemt den dagen visningen bygges.
+
+**Ikke dekket av FR-204.** Det kravet gjelder en aksje som ikke kan vurderes
+*nå* — for kort historikk eller hull i serien. FR-409 gjelder den lagrede raden
+for en dag som allerede har passert.
 
 *Skrevet inn 2026-09-22*, da `AD-17` ble tatt opp igjen og konsekvensen av
-`AD-7` ble avgjort eksplisitt i stedet for å bli stående som en stille mangel.
+`AD-7` ble avgjort eksplisitt. *Rettet samme kveld:* kravet var først formulert
+som et visningskrav og lovet at dagen ikke skulle se ut som «et hopp i
+historikken» — i en historikkvisning som ikke er spesifisert noe sted.
 
 ---
 
@@ -1099,6 +1105,7 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 | 3 | **Hvilken kilde gir handelskalenderen?** FR-402 hviler på «forventet børsdag», men ingen kilde er utpekt for hvilke dager Oslo Børs er åpen | *‹fylles inn›* | Før implementasjon | FR-402 |
 | 4 | **Hvordan utledes eks.dato?** FR-407 og FR-503 forutsetter at utbyttedager kan identifiseres. **En målt vei finnes, funnet 2026-09-21:** avviket mellom close-endringen og `adjusted_close`-endringen peker ut dagen justeringen skjedde. 38 hendelser over 3 720 dagovergangner, og antallet står stille fra 0,05 til 0,5 prosentpoeng — et rent skille, så terskelen kan begrunnes i stedet for velges. **Konsekvensen er større enn kravet:** FR-407 blir da uavhengig av EKS.DATO-meldinger, og dermed av NewsWeb og punkt 1. Se `begrunnelser.md` §11 | Gruppen | Før demonstrasjonen | FR-407, FR-503 |
 | 16 | **Språkgjenkjenningen slår systematisk feil for Vår Energi.** `gjett_spraak` lar ett norsk tegn avgjøre alene, og `VAR` heter *Vår Energi ASA*. Hver engelsk melding derfra bærer «å» i sitt eget firmanavn og leses som norsk, så FR-501 vil beholde den engelske versjonen hver gang selskapet sender et meldingspar. Dette er ikke en kantsituasjon — det er hver gang, for én av de femten, og det vises i en norsk applikasjon. **To forsvarlige veier:** bygge om språkregelen, eller la den stå og forklare avviket i demonstrasjonen. Det som ikke er forsvarlig er at valget tas ved at ingen tar det opp | Gruppen | **Før UI-arbeidet starter** | FR-501, demonstrasjonen |
+| 20 | **Hvordan skal FR-408s eget spørsmål kunne stilles?** Kravet begrunner seg med «hva sa løsningen om EQNR for to uker siden?», men ingen visning, kommando eller spørring i v1 svarer på det. Historikken er da **lagret, men ikke besvarbar**. Tre veier: en visning i aksjedetaljen, en egen kommando, eller en direkte spørring mot basen under demonstrasjonen. FR-409 binder alle tre til å bevare skillet mellom «ingen rad» og «styrke 0» | Gruppen | **Før demonstrasjonen** | FR-408s begrunnelse |
 | 19 | **Forespørselen til Euronext ba aldri om å sende innhold til en modelltjeneste.** Vilkårene forbyr å «otherwise transfer any of the Content to any third person», og parentesen strekker det til «others in your company or organisation» — altså svært bredt. Å sende meldingstekst inn i en språkmodell er en slik overføring. Brevet 21.09 beskriver fire ting — Retrieval, Storage, Display, Source code — og **ingen av dem nevner en modelltjeneste**; kontrollert 22.09, null treff på «language model», «LLM», «third person» og «third party» i hele brevet. Manuell innsamling løser klausul 1 om automatisert henting, men **ikke** overføringsklausulen. **Konsekvens: selv et fullt ja på alle fire delene lukker ikke dette.** Det må stilles som eget spørsmål. Kalenderspørsmålet i samme brev hjelper ikke: det ber om «the same answer» og arver dermed de fire overskriftenes rekkevidde, inkludert utelatelsen. **Purret 22.09, og purringen dekker begge deler** — de fire opprinnelige og overføringen — så et kort svar kan ikke lenger se fullstendig ut mens det bare dekker det ene. Purringen tilbyr også et smalere alternativ: et lite, manuelt innsamlet utvalg brukt én gang. Ordrett i `docs/epost-til-euronext.md` | Gruppen | **Sammen med punkt 1, 2026-09-28** | Plan B for relevanseksperimentet; KI-laget over NewsWeb-innhold |
 
 ### Må følges opp

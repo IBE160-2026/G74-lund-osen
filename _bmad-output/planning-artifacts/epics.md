@@ -1,5 +1,5 @@
 ---
-stepsCompleted: [1, 2]
+stepsCompleted: [1, 2, 3]
 inputDocuments:
   - _bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md
   - _bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md
@@ -374,3 +374,538 @@ story som sender inn tekst er *blokkert av* 4.1, ikke anbefalt etter den.
 | **Eier** | Gruppen |
 | **Avgjøres** | Samme frist som Epic 6 |
 | **Ved nei** | Strykes. Tar ingenting med seg ned — ingen annen epic leser kalenderen. Krever dessuten en manuelt vedlikeholdt oppslagstabell, siden kalenderen verken oppgir ticker eller ISIN |
+
+---
+
+# Stories
+
+30 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
+den, hva kontrollen faktisk ser etter, og om den kan gjøres ferdig i én økt.
+
+**«Ville feilet hvis» er kontrollen.** Resten er beskrivelse. En story uten den
+linjen er ikke ferdig spesifisert.
+
+---
+
+## Epic 1: Dataene overlever en omstart
+
+Rekkefølgen inne i epicen er bundet av `AD-19`.
+
+### Story 1.1: Migrasjonsløperen og `skjema_versjon`
+
+Som **utvikler på laget**, vil jeg ha én vei å endre skjemaet på, så vi to ikke
+bygger hver vår `ALTER TABLE` og basen slutter å være den samme hos begge.
+
+**Oppfyller:** — *(infrastruktur for FR-406, FR-408)* · **Begrenses av:** `AD-16`, `AD-4`
+
+**Kontroll — hva testen ser etter:**
+- En tom base kjøres opp til nyeste versjon, og `skjema_versjon` viser riktig tall
+- Samme migrasjon kjørt to ganger endrer ingenting andre gang
+- En migrasjon som feiler midtveis lar **verken** skjemaet **eller** `skjema_versjon` være halvveis oppdatert
+- **Ville feilet hvis:** løperen brukte `executescript()`, som gjør en implisitt `COMMIT` først — da er migrasjonen ikke atomisk sammen med versjonsraden, og en halvveis migrasjon blir usynlig
+
+**Én økt:** ja.
+
+### Story 1.2: `Kursrad` og `Kurslager`-porten
+
+Som **utvikler**, vil jeg at kursrader har navngitte norske felt, så en
+feilstavet nøkkel blir en feil i stedet for `None`.
+
+**Oppfyller:** — *(grunnlag for FR-406)* · **Begrenses av:** `AD-19`, `AD-3`, `AD-1`
+
+**Kontroll — hva testen ser etter:**
+- `Kursrad` har `dato`, `slutt`, `justert_slutt`, `volum` og avviser å bli konstruert uten dem
+- `Kurslager`-protokollen har `erstatt_serie` og `serie`, og **ingen** `legg_til_rad`
+- En minneimplementasjon oppfyller protokollen og brukes av testene
+- **Ville feilet hvis:** porten returnerte `list[dict]` med EODHDs engelske nøkler — da kunne en ny kilde bare passe inn ved å etterligne EODHDs feltnavn, og porten ville ikke lenger vært en port
+
+**Én økt:** ja.
+
+### Story 1.3: SQLite-adapteren og `kurs`-tabellen
+
+Som **bruker**, vil jeg at kursene finnes etter at maskinen har vært av, så
+oversikten ikke er tom hver morgen.
+
+**Oppfyller:** FR-406 · **Begrenses av:** `AD-4`, `AD-5`, `AD-16`, `AD-3`
+
+**Kontroll — hva testen ser etter:**
+- `erstatt_serie` på et symbol med eksisterende rader gir **nøyaktig** de nye radene, ikke de gamle pluss de nye
+- Slettingen og innsettingen skjer i **én** transaksjon: en feil midtveis lar den gamle serien stå urørt
+- `erstatt_serie` på ett symbol rører ikke de andre fjorten
+- **Ville feilet hvis:** adapteren skjøtet på i stedet for å erstatte. Da ville `adjusted_close` blandet to justeringsgrunnlag etter første utbytte — og ingenting ville feilet, tallene ville bare vært gale
+
+**Én økt:** ja.
+
+### Story 1.4: Konsumentene leser `Kursrad`
+
+Som **utvikler**, vil jeg at kjernen slutter å røre `dict`-nøkler, så `AD-19`
+gjelder hele veien og ikke bare ved porten.
+
+**Oppfyller:** — *(fullfører FR-406)* · **Begrenses av:** `AD-19`, `AD-1`
+
+**Kontroll — hva testen ser etter:**
+- `signalberegning`, `markedsoversikt`, `aksjedetalj` og `graf` tar `Kursrad`
+- **Alle 166 testene er grønne etter endringen** — tallet kontrolleres, ikke antas
+- Ingen av de fire importerer `sqlite3` eller `pathlib`
+- **Ville feilet hvis:** en konsument beholdt oppslaget som faller tilbake fra justert til ujustert kurs. Den linjen bryter FR-701 stille, uten at noen test feiler
+
+**Én økt: nei, dette er den største.** Fem moduler og deler av testsettet.
+
+**Hva som gikk tapt ved delingen:** `AD-19` ville at `Kursrad` innføres i samme
+endring som adapteren, slik at konsumentene røres **én** gang. Med 1.2–1.4 som
+tre steg røres de fortsatt bare i 1.4, så intensjonen overlever. Men mellom 1.2
+og 1.4 finnes en tilstand der porten lover `Kursrad` mens `SnapshotKilde`
+fortsatt gir `dict`. Den tilstanden er grunnen til at 1.2–1.4 ikke bør ligge i
+hver sin uke.
+
+### Story 1.5: `SnapshotKilde` ut av `kursdata.py`
+
+Som **utvikler**, vil jeg at portmodulen slutter å lese filer, så laginndelingen
+i spinen beskriver koden og ikke bare ønsket.
+
+**Oppfyller:** NFR-07 · **Begrenses av:** `AD-6`, `AD-2`, `AD-1`
+
+**Kontroll — hva testen ser etter:**
+- `kursdata.py` importerer verken `json` eller `pathlib`
+- `app.py` kaller ikke `nyeste_snapshot()` direkte — den går gjennom en port
+- `nyeste_snapshot` velger fortsatt på dato alene, og `KURSPREFIKS` vinner ved lik dato
+- **Ville feilet hvis:** flyttingen tok med seg sammenligningen over tuplene `(dato, sti)`. Den falt tilbake på stien ved lik dato, og da vant `signaltest-` over `kurser-`
+
+**Én økt:** ja.
+
+### Story 1.6: `Vurderingslager` med datoavvisning
+
+Som **utvikler på laget**, vil jeg ha et `Vurderingslager` som **nekter** å
+skrive en eldre dato, så historikken ikke kan skrives om i ettertid uten at noen
+har bestemt det.
+
+**Oppfyller:** FR-408 · **Begrenses av:** `AD-3`, `AD-7`, `AD-18`, `AD-20`
+
+**Kontroll — hva testen ser etter:**
+- `skriv` med gårsdagens dato **reiser** — den logger ikke og hopper ikke stille over
+- `skriv` to ganger med samme `(symbol, dato)` gir **én** rad, og den siste vinner
+- Porten har **ingen** `slett` og **ingen** `endre` — kontrollert på protokollen, ikke på implementasjonen
+- En `vurdering` overlever `erstatt_serie` på samme symbol: kursverdiene i raden er uendret etterpå
+- **Ville feilet hvis:** noen la til en `oppdater`-metode «for migrasjoner», eller hvis datogrensen ble regnet i UTC — da ville en kjøring 23:30 norsk tid skrevet på gårsdagen
+
+**Én økt:** ja.
+
+### Story 1.7: De tre tilstandene skilles
+
+Som **gruppe som skal forsvare tallene**, vil jeg kunne skille en dag uten
+utslag fra en dag vi ikke kjørte, så et hull i vår egen drift ikke blir lest som
+et funn om markedet.
+
+**Oppfyller:** FR-409 · **Begrenses av:** `AD-7`, `AD-20`
+
+**Kontroll — hva testen ser etter:**
+- En rad med styrke 0 leses som **et svar**, ikke som fravær
+- En manglende rad på en børsdag leses som «kommandoen ble ikke kjørt»
+- En manglende rad på en ikke-børsdag leses som «dagen finnes ikke»
+- De tre returnerer **tre forskjellige** verdier, ikke to og en `None`
+- **Ville feilet hvis:** lageret svarte `None` både for «ikke kjørt» og «ikke børsdag». Da er de to umulige å skille, og skillet kan ikke gjenskapes i ettertid
+
+**Én økt:** ja.
+
+---
+
+## Epic 2: Ferske data uten at kvoten sprenges
+
+### Story 2.1: Børsdag i Oslo, tidsstempel i UTC
+
+Som **utvikler**, vil jeg at «dagen» betyr én ting, så to verdier ikke kan være
+enige og begge være feil.
+
+**Oppfyller:** — *(grunnlag for FR-402, FR-408)* · **Begrenses av:** `AD-20`
+
+**Kontroll — hva testen ser etter:**
+- Filnavn og `hentet` i samme øyeblikksbilde utledes av **samme** øyeblikk
+- En kjøring 00:30 norsk tid gir filnavn og tidsstempel som peker på samme dag
+- `meldinger._minutt` går via et tidsobjekt, ikke en tegnavkorting
+- To representasjoner av samme øyeblikk gir **samme** dublettnøkkel
+- **Ville feilet hvis:** rettingen bare gjorde filnavn og tidsstempel konsistente uten å si hvilken sone de er i. To verdier kan være enige og begge være feil
+
+**Én økt:** ja. Retter de to kjente feilene fra `AD-20`.
+
+### Story 2.2: Hentekommandoen som egen inngang
+
+Som **sensor som kjører containeren**, vil jeg at oppstart ikke bruker et eneste
+API-kall, så jeg ikke brenner gruppens dagskvote ved å se på løsningen.
+
+**Oppfyller:** FR-401 · **Begrenses av:** `AD-10`, `AD-2`, `AD-12`
+
+**Kontroll — hva testen ser etter:**
+- Å starte webserveren utløser **null** nettkall, også når basen er tom
+- Tom base gir tom-tilstand med beskjed om hvordan man henter, ikke en feilside
+- Hentekommandoen er en egen inngang mot samme kodebase
+- Nøkkelen leses fra miljøet, ikke fra en fil i imaget
+- **Ville feilet hvis:** noen la hentingen i en oppstartskrok «for at det skal virke ut av boksen». To kjøringer samme dag hadde da brukt 30 av 20 kall
+
+**Én økt:** ja.
+
+### Story 2.3: Børsdagskontroll før kvoten brukes
+
+Som **gruppe med 20 kall i døgnet**, vil jeg at kommandoen sjekker om vi
+allerede har dagens data, så en kjøring nummer to ikke koster 15 kall til.
+
+**Oppfyller:** FR-402 · **Begrenses av:** `AD-20`, `AD-10`, NFR-01
+
+**Kontroll — hva testen ser etter:**
+- Er lagrede data fra siste forventede børsdag, hentes **ingenting** og kalltelleren er uendret
+- Er de eldre, hentes det
+- Er nyeste dato i svaret ikke forventet børsdag, vises siste kjente data med tidsstempel
+- Kontrollen regner børsdag i **norsk** kalenderdato
+- **Ville feilet hvis:** kontrollen lå i webserveren. Den kan ikke handle på utfallet, og da ville sjekken vært pynt
+
+**Én økt:** ja.
+
+### Story 2.4: Etterfylling av hull i kursserien
+
+Som **bruker som ikke åpnet løsningen på en uke**, vil jeg at grafen er hel når
+jeg kommer tilbake, så hullet ikke ser ut som en kursbevegelse.
+
+**Oppfyller:** FR-403 · **Begrenses av:** `AD-5`, NFR-01
+
+**Kontroll — hva testen ser etter:**
+- Fire dagers opphold fylles ved neste henting
+- Etterfyllingen koster **15 kall**, ikke 15 per manglende dag
+- Serien erstattes i sin helhet, den skjøtes ikke
+- **Ville feilet hvis:** noen etterfylte vurderinger på samme måte. Kurser kan etterfylles; vurderinger kan ikke, og `AD-7` skal stoppe forsøket
+
+**Én økt:** ja.
+
+### Story 2.5: Vurderingen skrives i samme kjøring
+
+Som **gruppe**, vil jeg at vurderingen regnes av kursene som nettopp ble lagret,
+så den ikke kan regnes av en serie som er byttet ut siden.
+
+**Oppfyller:** FR-408 · **Begrenses av:** `AD-17`, `AD-5`, `AD-7`
+
+**Kontroll — hva testen ser etter:**
+- Én kjøring skriver kurser **og** vurderinger for alle femten
+- Vurderingen er regnet av de radene kjøringen selv lagret
+- Kjøres kommandoen to ganger samme dag, finnes fortsatt én vurdering per aksje
+- **Ville feilet hvis:** vurderingen ble skrevet av en egen kommando. Kjøres den etter en ny henting, er grunnlaget byttet ut — og raden ville lagret hva løsningen mente om *andre* data enn de som lå der
+
+**Én økt:** ja.
+
+### Story 2.6: Utbyttedager merkes
+
+Som **bruker som regner etter**, vil jeg vite når en kurs falt på grunn av
+utbytte, så avviket mellom vist kurs og vist prosent ikke ser ut som en feil.
+
+**Oppfyller:** FR-407 · **Begrenses av:** `AD-5`, `AD-19`
+
+**Kontroll — hva testen ser etter:**
+- En dag der endringen i ujustert og justert kurs spriker, merkes
+- Merkingen leses av **kursserien alene** — ingen avhengighet til NewsWeb
+- En vanlig dag merkes ikke
+- **Ville feilet hvis:** merkingen hentet eks.dato fra `melding`-tabellen. Da ville Epic 2 hvilt på Epic 6, som kan strykes 28.09
+
+**Én økt:** ja. **Merk:** kilden er ikke endelig valgt — åpent punkt 4. Storyen
+forutsetter den målte veien.
+
+---
+
+## Epic 3: Løsningen kan kjøres av andre enn oss
+
+### Story 3.1: Dockerfile med to innganger
+
+Som **sensor**, vil jeg kunne bygge og kjøre løsningen fra repoet alene, så
+vurderingen ikke avhenger av at gruppens maskin er i rommet.
+
+**Oppfyller:** **ingen FR — se merknad** · **Begrenses av:** `AD-9`, `AD-10`, `AD-12`, `AD-16`
+
+**Kontroll — hva testen ser etter:**
+- Imaget bygges fra et rent utsjekk og inneholder **ingen** rådatafiler og ingen base
+- Å starte webserveren gjør null nettkall
+- Hentekommandoen kjører hentingen
+- Python-versjonen i imaget er **3.13**, samme som CI
+- Migrasjoner kjøres **uten** et eget kommandosteg
+- **Ville feilet hvis:** migrasjonene ble lagt i en egen kommando. Det ville sett ut som ryddig ansvarsdeling og brutt suksessmålet «Drift»
+
+**Én økt:** ja.
+
+> **Denne storyen har ingen FR bak seg, og det er ikke storyens mangel.**
+> Ingen av de sju NFR-ene dekker at løsningen skal kunne bygges og kjøres av
+> andre — kontrollert 2026-09-22. PRD-en har altså ikke med selve leveransen,
+> mens faglærer navngir «kildekode og docker fil» som innleveringen. Ført som
+> spørsmål til gruppen, ikke rettet.
+
+### Story 3.2: To volumer, og ingenting uerstattelig i imaget
+
+Som **gruppe**, vil jeg at rådataøyeblikksbildene ligger utenfor alt som kan
+slettes ved et uhell, så det som ikke kan hentes på nytt, overlever.
+
+**Oppfyller:** NFR-07 · **Begrenses av:** `AD-11`, `AD-6`, `AD-9`
+
+**Kontroll — hva testen ser etter:**
+- `ose-db` og `ose-raa` er atskilte volumer
+- Å fjerne basevolumet lar øyeblikksbildene stå
+- Imaget kjører uten at noen av volumene finnes fra før
+- **Ville feilet hvis:** ett volum dekket hele `data/`. Da tar én kommando med seg både det gjenoppbyggbare og det uerstattelige — og `vurdering` er uerstattelig selv om den ligger i basen
+
+**Én økt:** ja.
+
+---
+
+## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
+
+### Story 4.1: Velg modelltjeneste og dokumentér betingelse 4
+
+Som **gruppe**, vil jeg ha modelltjenestens egne vilkår sitert og datert, så vi
+kan sende artikkeltekst inn uten å bryte godkjenningen vi fikk.
+
+**Oppfyller:** — *(lukker betingelse 4 i EODHDs godkjenning)* · **Begrenses av:** ingen AD-er
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- Tre kandidater vurdert, med tre svar hver: brukes innsendte data til trening, kan det slås av, og står det i **vilkårene** eller bare i markedsføringen
+- Den valgte tjenesten har setningen sitert **ordrett**, med lenke og dato, i `docs/kilder-og-rettigheter.md`
+- **Ville feilet hvis:** svaret ble hentet fra en produktside i stedet for vilkårene. En markedsføringspåstand kan endres uten varsel; en vilkårsklausul kan siteres
+
+**Én økt:** ja. Papirarbeid, ingen kode.
+
+> **Ingen AD-er begrenser denne — og den er ikke triviell.** Den er en
+> beslutning om noe utenfor systemet, og spinen fikser bare det som holder
+> delene av systemet fra å sprike. **Enhver story som sender artikkeltekst inn i
+> en modell, er blokkert av denne.** Ikke anbefalt etter: blokkert.
+
+### Story 4.2: `KILogg`-porten med minneimplementasjon
+
+Som **utvikler**, vil jeg definere KI-loggen som en port før modellen finnes, så
+arbeidet ikke venter på et valg som ikke er tatt.
+
+**Oppfyller:** FR-604, FR-605 · **Begrenses av:** `AD-3`, `AD-7`
+
+**Kontroll — hva testen ser etter:**
+- Porten lagrer meldings-id, utsteder, kategori, publiseringstidspunkt, regelfilterets utfall, KI-vurdering, forklaring, usikkerhetsmerke, promptversjon og modell
+- Porten har **ingen** `slett` og **ingen** `endre`
+- Hele porten prøves mot minneimplementasjonen, uten database
+- **Ville feilet hvis:** promptversjon og modell var utelatt fra raden. Justeres prompten i oktober, blir eksempelsettet en blanding av flere systemer som ser ut som ett
+
+**Én økt:** ja. **Ingen avhengighet til Epic 1** — porten vet ikke om
+lagringsformen.
+
+### Story 4.3: SQLite-adapter for `KILogg`
+
+Som **gruppe**, vil jeg at KI-loggen overlever en omstart, så eksempelsettet fra
+én ukes drift finnes når det skal brukes.
+
+**Oppfyller:** FR-604 · **Begrenses av:** `AD-4`, `AD-7`, `AD-16`
+
+**Kontroll — hva testen ser etter:**
+- `ki_logg`-tabellen opprettes av en nummerert migrasjon
+- En skrevet rad finnes etter omstart
+- Ingen vei gjennom adapteren kan slette eller endre en eldre rad
+- **Ville feilet hvis:** tabellen ble opprettet utenfor migrasjonsløperen. Da har to utviklere hvert sitt skjema, og `AD-16` er brutt av den første som kjørte
+
+**Én økt:** ja. **Avhenger av Epic 1.**
+
+---
+
+## Epic 5: KI-laget i drift 🔒
+
+> **Blokkert.** Av åpent punkt 5b (betingelse 4, løses av story 4.1) **og**
+> åpent punkt 1 og 19 (Euronext). Et nei 28.09 stryker hele epicen, fordi alle
+> FR-6xx handler om meldinger.
+>
+> Storyene er skrevet likevel. En blokkert epic uten stories ser billigere ut
+> enn den er, og da blir et nei vanskeligere å vurdere.
+
+### Story 5.1: Av/på-bryteren i grensesnittet 🔒
+
+Som **person som ser demonstrasjonen**, vil jeg se KI-laget slås av og på mens
+jeg ser på, så bidraget er noe jeg kan kontrollere og ikke noe jeg må tro på.
+
+**Oppfyller:** FR-601 · **Begrenses av:** NFR-04
+
+**Kontroll — hva testen ser etter:**
+- Bryteren finnes i grensesnittet, ikke i en konfigurasjonsfil
+- Med laget av svarer markedsoversikten like raskt
+- En treg eller utilgjengelig modell stopper ikke hovedflyten
+- **Ville feilet hvis:** bryteren var et miljøvariabelflagg. Da kan bidraget ikke vises fram under demonstrasjonen, som er hele grunnen til at kravet finnes
+
+**Én økt:** ja.
+
+### Story 5.2: Visningen når laget er av 🔒
+
+Som **bruker**, vil jeg at meldingene fortsatt vises når KI er av, merket «ikke
+vurdert», så av og på er sammenlignbart.
+
+**Oppfyller:** FR-602 · **Begrenses av:** NFR-04, NFR-05
+
+**Kontroll — hva testen ser etter:**
+- Samlekategorien vises med laget av, merket «ikke vurdert»
+- Antallet meldinger er **det samme** av og på
+- **Ville feilet hvis:** meldingene forsvant når laget slås av. Da blander visningen sammen «færre meldinger» og «uforklarte meldinger», og sammenligningen blir meningsløs
+
+**Én økt:** ja.
+
+### Story 5.3: Usikkerhet som forbehold 🔒
+
+Som **bruker**, vil jeg se at en vurdering er usikker der den står, så jeg ikke
+må gjette hvorfor noe er sortert ned.
+
+**Oppfyller:** FR-603 · **Begrenses av:** NFR-04, NFR-06
+
+**Kontroll — hva testen ser etter:**
+- Usikkerhet avledes av de tre observerbare kjennetegnene, ikke av en score fra modellen
+- En usikker vurdering vises **der den står**, ikke lenger ned i lista
+- **Ville feilet hvis:** usikkerhet ble håndtert ved å sortere meldingen ned. Da er informasjonen borte, og brukeren ser en rekkefølge uten å vite hvorfor
+
+**Én økt:** ja. **Merk:** kjennetegn 1 bærer svakt når utstederen selv er
+avsender — åpent punkt 6.
+
+### Story 5.4: Relevansskalaen med tre verdier 🔒
+
+Som **bruker**, vil jeg at samlekategorien sorteres i tre nivåer med det laveste
+skjult men ikke borte, så jeg kan kontrollere hva som ble sortert vekk.
+
+**Oppfyller:** FR-606 · **Begrenses av:** `AD-7`
+
+**Kontroll — hva testen ser etter:**
+- De tre verdiene er de samme som relevanseksperimentet bruker
+- «Lite relevant» er skjult bak en bryter, ikke fjernet
+- Hver vurdering lagres med promptversjon og modell
+- **Ville feilet hvis:** skalaen fikk andre nivåer enn eksperimentet. Da kan resultatene ikke sammenlignes, og eksperimentet mister sin funksjon
+
+**Én økt:** ja. **Merk:** hvor grensen går, er åpent punkt 2 og kan ikke avgjøres
+på papir.
+
+---
+
+## Epic 6: Børsmeldinger i oversikten 🔒
+
+> **Blokkert av åpent punkt 1 og 19.** Euronext forbyr automatisert henting uten
+> tillatelse, og punkt 19 gjelder om innhold i det hele tatt kan sendes til en
+> modelltjeneste.
+>
+> **Et nei stryker epicen i sin helhet — og tar Epic 5 med seg ned.**
+> Logikken i `meldinger.py` er allerede bygget og testet; den blir liggende som
+> kode uten datakilde.
+
+### Story 6.1: Meldingskilden som port 🔒
+
+Som **utvikler**, vil jeg at meldingene nås gjennom en port, så resten av
+systemet ikke vet hvor de kom fra.
+
+**Oppfyller:** — *(grunnlag for FR-404)* · **Begrenses av:** `AD-3`, `AD-2`
+
+**Kontroll — hva testen ser etter:**
+- `Meldingskilde` har én skriver, og lesere går gjennom porten
+- Hele porten prøves mot en minneimplementasjon
+- **Ville feilet hvis:** meldingshentingen kalte nettet fra en modul utenfor skallet. `AD-2` krever én hentefunksjon per kilde, i sin egen skallfil
+
+**Én økt:** ja.
+
+### Story 6.2: Etterfylling med avkortingsvakt 🔒
+
+Som **gruppe**, vil jeg at en avkortet henting stopper i stedet for å levere et
+halvt resultat, så vi ikke bygger et meldingslager med usynlige hull.
+
+**Oppfyller:** FR-404, FR-405 · **Begrenses av:** `AD-2`, `AD-20`
+
+**Kontroll — hva testen ser etter:**
+- `overflow: true` i svaret stopper hentingen og rapporterer feilen
+- Et intervall som deles og hentes på nytt gir ikke dubletter i lageret
+- `messageId` er primærnøkkel, så gjentatte svar er idempotente
+- **Ville feilet hvis:** koden stolte på antall meldinger i stedet for `overflow`. Taket ligger mellom 557 og 601, og API-et returnerer HTTP 200 uten feilmelding når det kutter
+
+**Én økt:** ja.
+
+### Story 6.3: Deduplisering av språkdubletter 🔒
+
+Som **bruker**, vil jeg se hver melding én gang, så den norske og engelske
+versjonen ikke fyller lista med det samme.
+
+**Oppfyller:** FR-501 · **Begrenses av:** `AD-14`, `AD-20`, NFR-05
+
+**Kontroll — hva testen ser etter:**
+- Dedupliseringen skjer **før** kategorifilteret
+- To oversettelser av samme melding gir én rad, og den norske vinner
+- Dublettnøkkelen tåler at tidsstemplene kommer i ulik representasjon
+- **Ville feilet hvis:** rekkefølgen ble snudd. Da telles dubletter som passerer filteret to ganger — og `AD-14` finnes nettopp for det
+
+**Én økt:** ja. **Merk:** `gjett_spraak` slår systematisk feil for Vår Energi,
+åpent punkt 16. Storyen må ikke arve feilen.
+
+### Story 6.4: Kategorifilteret i tre bøtter 🔒
+
+Som **bruker**, vil jeg at rutinemeldinger sorteres bort av regler, så KI-laget
+bare får det reglene ikke kan skille.
+
+**Oppfyller:** FR-502 · **Begrenses av:** `AD-14`, `AD-1`
+
+**Kontroll — hva testen ser etter:**
+- Hver kategori havner i nøyaktig én bøtte
+- En ukjent kategori vises merket «ukjent kategori» og sendes **ikke** til KI
+- Filteret er ren logikk uten I/O
+- **Ville feilet hvis:** ukjente kategorier ble sendt til KI-laget likevel. Prompten er skrevet for samlekategorien, og et svar som ser like sikkert ut men kommer fra en modell utenfor sitt område, er verre enn ingen vurdering
+
+**Én økt:** ja.
+
+### Story 6.5: Meldinger i aksjedetaljen 🔒
+
+Som **bruker**, vil jeg se meldingene som gjelder aksjen der jeg leser om den,
+så jeg slipper å lete et annet sted.
+
+**Oppfyller:** FR-503, del av FR-203 · **Begrenses av:** `AD-1`, NFR-05
+
+**Kontroll — hva testen ser etter:**
+- Meldingene vises i aksjedetaljen, filtrert etter FR-502
+- Eks.dato vises ikke som melding, men som merking
+- **Ville feilet hvis:** utbyttemerkingen tok eks.dato herfra i stedet for fra kursserien. Da hviler FR-407 på en epic som kan strykes
+
+**Én økt:** ja.
+
+---
+
+## Epic 7: Kommende finansielle hendelser 🔒
+
+> **Blokkert av åpent punkt 1 (Euronext), 3 (kilde for handelskalenderen) og 12
+> (horisont og hendelsestyper).**
+>
+> **Et nei stryker epicen, men tar ingenting med seg ned** — ingen annen epic
+> leser kalenderen.
+
+### Story 7.1: Kalenderkilden og koblingen til selskap 🔒
+
+Som **utvikler**, vil jeg koble kalenderhendelser til våre femten aksjer, så
+hendelsene kan vises på riktig aksje.
+
+**Oppfyller:** FR-301 · **Begrenses av:** `AD-2`, `AD-3`
+
+**Kontroll — hva testen ser etter:**
+- Koblingen skjer gjennom en oppslagstabell som vedlikeholdes manuelt
+- En hendelse uten treff i tabellen forkastes ikke stille, men føres
+- **Ville feilet hvis:** koblingen antok at kalenderen oppgir ticker eller ISIN. Den gjør ikke det, og det er grunnen til at tabellen må finnes
+
+**Én økt:** ja.
+
+### Story 7.2: Hendelser innenfor horisonten 🔒
+
+Som **bruker**, vil jeg se hva som er på vei for aksjen, så jeg vet om det
+kommer noe før jeg handler.
+
+**Oppfyller:** FR-302, del av FR-203 · **Begrenses av:** `AD-1`, NFR-05
+
+**Kontroll — hva testen ser etter:**
+- Bare hendelser innenfor horisonten vises
+- Hendelsestypene er de kalenderen oppgir
+- **Ville feilet hvis:** horisonten ble hardkodet uten at åpent punkt 12 var avgjort. Tallet står i dag som `[FORELØPIG] 90` og er antatt
+
+**Én økt:** ja.
+
+### Story 7.3: Når kalenderen ikke svarer 🔒
+
+Som **bruker**, vil jeg at resten av siden virker selv om kalenderen er nede, så
+én kilde ikke tar ned aksjedetaljen.
+
+**Oppfyller:** FR-303 · **Begrenses av:** NFR-03, `AD-15`
+
+**Kontroll — hva testen ser etter:**
+- Kalenderfeil gir en beskjed i seksjonen, ikke en feilside
+- Signalet, grafen og meldingene vises som vanlig
+- **Ville feilet hvis:** kalenderkallet lå i samme try-blokk som resten av siden. Da tar én kilde ned hele detaljen, stikk i strid med NFR-03
+
+**Én økt:** ja.
