@@ -26,7 +26,7 @@ from typing import Callable
 import requests
 from dotenv import load_dotenv
 
-from kursdata import AKSJEUNIVERS, DATA_KATALOG, PROSJEKTROT
+from kursdata import AKSJEUNIVERS, DATA_KATALOG, KURSPREFIKS, PROSJEKTROT
 
 BASE_URL = "https://eodhd.com/api/eod"
 
@@ -133,8 +133,13 @@ def lag_oyeblikksbilde(resultat: Resultat, fra: str, til: str, naa: str) -> dict
 
 
 def filnavn(i_dag: date | None = None) -> str:
-    """Datoen staar i navnet, saa oeyeblikksbilder aldri overskriver hverandre."""
-    return f"kurser-raa-{(i_dag or date.today()).isoformat()}.json"
+    """Datoen staar i navnet, saa oeyeblikksbilder aldri overskriver hverandre.
+
+    Prefikset kommer fra kursdata og skrives ikke av her. nyeste_snapshot lar
+    nettopp dette prefikset vinne ved lik dato, saa de to maa ikke kunne gli
+    fra hverandre.
+    """
+    return f"{KURSPREFIKS}-raa-{(i_dag or date.today()).isoformat()}.json"
 
 
 def main() -> None:

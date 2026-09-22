@@ -119,8 +119,11 @@ class SnapshotKilde:
         return self.serier.get(symbol, [])
 
 
-# Oeyeblikksbilder heter <noe>-raa-<ÅÅÅÅ-MM-DD>.json. fetch_prices skriver
-# kurser-raa-, signaltesten skrev signaltest-raa-. Begge leses likt.
+# Oeyeblikksbilder heter <prefiks>-raa-<ÅÅÅÅ-MM-DD>.json. fetch_prices skriver
+# KURSPREFIKS; eksperimentene skrev signaltest-, volumsjekk-, nyhetstest-.
+# Alle leses likt, men ved lik dato vinner kursfila - se nyeste_snapshot.
+KURSPREFIKS = "kurser"
+
 _SNAPSHOT_MONSTER = re.compile(r"-raa-(\d{4}-\d{2}-\d{2})\.json$")
 
 
@@ -131,8 +134,18 @@ def nyeste_snapshot(katalog: Path = DATA_KATALOG) -> Path | None:
     som kopieres eller sjekkes ut paa nytt, faar ny mtime, men datoen i navnet
     er den som gjelder - det er den dagen dataene er fra.
 
-    Prefikset sorteres bevisst IKKE med: "kurser-" kommer foer "signaltest-"
-    alfabetisk, saa alfabetisk sortering ville valgt feil fil.
+    **Datoen avgjoer alene.** Prefikset er aldri med i sammenligningen av
+    datoer. Det var feilen her foer: valget var `max` over tuplene
+    (dato, sti), og ved LIK dato falt `max` tilbake paa stien - da vant
+    "signaltest-" over "kurser-" fordi s kommer etter k. Docstringen lovet at
+    prefikset ikke ble sortert med, og det holdt saa lenge datoene var ulike.
+
+    **Ved lik dato gjelder denne regelen:** fila fetch_prices skriver
+    (KURSPREFIKS) vinner over alle andre prefikser. De andre er engangsuttrekk
+    fra maalingene - signaltest, volumsjekk, nyhetstest - og skal ikke kunne
+    fortrenge dagens kurser. Er ingen av dem kursfila, velges den alfabetisk
+    foerste, slik at svaret er det samme hver gang og ikke avhenger av hvilken
+    rekkefoelge katalogen leses i.
     """
     if not katalog.is_dir():
         return None
@@ -142,4 +155,11 @@ def nyeste_snapshot(katalog: Path = DATA_KATALOG) -> Path | None:
         for sti in katalog.glob("*-raa-*.json")
         if (treff := _SNAPSHOT_MONSTER.search(sti.name))
     ]
-    return max(datert)[1] if datert else None
+    if not datert:
+        return None
+
+    nyeste_dato = max(dato for dato, _ in datert)
+    return min(
+        (sti for dato, sti in datert if dato == nyeste_dato),
+        key=lambda sti: (not sti.name.startswith(f"{KURSPREFIKS}-raa-"), sti.name),
+    )
