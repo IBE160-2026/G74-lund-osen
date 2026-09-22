@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-22T21:15
+updated: 2026-09-22T22:58
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1120,7 +1120,7 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 | 10 | **Skjevfordeling mot positiv retning**, 68 % i testen. Vurderes mot året, ikke mot femten dager | | Etter utvidet test |
 | 11 | **Meldepliktig handel for primærinnsidere** justeres hvis den viser seg å være i hovedsak opsjonsutøvelse | | Etter én ukes drift |
 | 12 | **Bekrefte horisont og hendelsestyper** i FR-302, som i dag er antatt | | Før implementasjon |
-| 13 | **Datoer for demonstrasjon og prosjektinnlevering** | | Snarest |
+| 13 | **Datoer for demonstrasjon og prosjektinnlevering.** Spørsmål sendt faglærer i Teams 2026-09-22, sammen med spørsmål om leveranselista er fullstendig og om noen BMAD-dokumenter skal leveres inn. Åtte suksessmål i §7 er bundet til disse datoene, og «est. uke 45» er vår egen estimering — ikke en oppgitt dato | Marian | **Spørsmål sendt 22.09, svar avventes** |
 | 15 | **Plassér kategoriene som havnet i «ukjent»** i riktig bøtte. Krever en ukes drift for å vite hvilke som faktisk dukker opp | | Etter én ukes drift |
 
 ### Lukket

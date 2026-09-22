@@ -149,6 +149,23 @@ faglærer før den brukes til å planlegge.
 
 ---
 
+## Spørsmål sendt faglærer 2026-09-22
+
+Sendt i Teams av Marian. Tre spørsmål, alle om ting denne lista ikke kan
+kontrollere mot en kilde:
+
+| # | Spørsmål | Hvilke punkter det treffer |
+|---|---|---|
+| 1 | **Er leveranselista fullstendig?** Altså: er «kildekode og docker fil» pluss refleksjonsrapporten alt, eller finnes det mer | Hele dokumentet. Svaret avgjør om delen «Antatt, ikke bekreftet» kan tømmes |
+| 2 | **Hvilke datoer gjelder for demonstrasjon og prosjektinnlevering?** | Punkt C og D under. Åpent punkt 13 i `prd.md` |
+| 3 | **Skal noen BMAD-dokumenter leveres inn?** | Punkt E under, og BMAD-fristen 27.09 i §7 |
+
+**Svar avventes.** Spørsmål 2 og 3 er de to eldste ubesvarte i prosjektet —
+spørsmålet om hvilke BMAD-artefakter som er innleveringskrav ble stilt i
+`reflection-log.md` allerede 20.09 og har stått siden.
+
+---
+
 ## Antatt, ikke bekreftet
 
 Dette er ting vi arbeider som om de gjelder, **uten at det finnes en ordrett
