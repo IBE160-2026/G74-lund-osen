@@ -1,11 +1,11 @@
 ---
 title: "PRD — OSE Signal"
-status: draft
+status: final
 created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-22T15:27
+updated: 2026-09-22T16:07
 #
 # Hvorfor status fortsatt er draft — og hva som skal til for å endre den.
 #
@@ -22,6 +22,13 @@ updated: 2026-09-22T15:27
 #   4. De to gjenstående [FORELØPIG]-vinduene i §4.7 er målt: de 20 dagene i
 #      bevegelsessjekken og de 20 i interessesjekken. De var ikke med i testen
 #      i malinger.md §7.4, som låste tre parametre og ikke fem
+#
+# INNFRIDD 2026-09-22T16:07 — alle fire. Betingelsen står igjen slik den ble
+# formulert, ikke slettet: den viser hva som skulle til, og refleksjonsrapporten
+# skal kunne lese det. 1 og 2 ble besluttet i arkitekturfasen (spinen AD-3..AD-5,
+# AD-9..AD-11). 3 ble skrevet inn samme dag. 4 ble målt mot de 2 985
+# aksjedagene, malinger.md §9 — og målingen måtte bytte metrikk underveis, fordi
+# den første målte avstand fra 20 og var 0 ved 20 per konstruksjon.
 #
 # Betingelsen står her fordi en status uten utgangsbetingelse blir stående til
 # noen tilfeldigvis tar den opp — samme mekanisme som datoen på
@@ -547,6 +554,12 @@ ville ødelagt grafen uten å bryte et eneste krav.
 Uten denne presiseringen ville 15 kall gått med ved hver oppstart, og oppstart
 nummer to samme dag ville sprengt kvoten på 20.
 
+> *Merknad 2026-09-22.* Resonnementet over er bevart slik det ble skrevet.
+> Utløseren det beskriver — henting ved oppstart — finnes ikke lenger etter
+> omskrivingen av FR-401. Kvoteregnestykket står seg: 15 symboler mot en
+> dagskvote på 20 er fortsatt grunnen til at minstehistorikk-kravet ser ut som
+> det gjør. Det er ordet «oppstart» som er foreldet, ikke regnestykket.
+
 Rådatalageret svarer på et annet behov, se NFR-07. Hvorfor serien må lastes ned
 på nytt: se `begrunnelser.md`.
 
@@ -758,9 +771,10 @@ Hvor grensen faktisk bør gå, er ikke avgjort og kan ikke avgjøres på papir. 
 > er testet mot **199 handelsdager** (2025-12-01 til 2026-09-18, 2 985
 > aksjedager) og beholdt uendret. Metode og tall: `malinger.md` §7.4.
 >
-> **To vinduer er fortsatt `[FORELØPIG]`:** de 20 dagene i bevegelsessjekken og
-> de 20 i interessesjekken. De var ikke med i testen, som låste tre parametre og
-> ikke fem. De er merket hver for seg under.
+> **Alle fem parametrene er nå låst.** De to vinduene — de 20 dagene i
+> bevegelsessjekken og de 20 i interessesjekken — var ikke med i testen 21.09,
+> som låste tre parametre og ikke fem. De ble målt 2026-09-22 mot de samme
+> 2 985 aksjedagene; metode og tall i `malinger.md` §9.
 
 Kravet til signalet er **forklarbarhet, ikke treffsikkerhet**. Vi lover ikke
 bedre signaler enn andre, men at brukeren alltid kan se hva som ga utslaget.
@@ -773,8 +787,8 @@ sjekk, ingen vekting og ingen skjult formel.
 | # | Sjekk | Måler | Gir utslag når |
 |---|---|---|---|
 | 1 | **Trend** | Sluttkurs mot 50-dagers glidende snitt | Kursen ligger mer enn **2 %** over eller under snittet |
-| 2 | **Bevegelse** | Dagens endring mot aksjens egen volatilitet | Endringen overstiger ett standardavvik av siste `[FORELØPIG] 20` dagers endringer |
-| 3 | **Interesse** | Dagens volum mot eget medianvolum | Volumet overstiger **1,5 ×** medianen siste `[FORELØPIG] 20` dager |
+| 2 | **Bevegelse** | Dagens endring mot aksjens egen volatilitet | Endringen overstiger ett standardavvik av siste **20** dagers endringer |
+| 3 | **Interesse** | Dagens volum mot eget medianvolum | Volumet overstiger **1,5 ×** medianen siste **20** dager |
 
 Fortegnet på **interesse** følger dagens kursendring: høyt volum på en dag med
 oppgang gir +1, høyt volum på en dag med nedgang gir −1. Volum har ingen retning

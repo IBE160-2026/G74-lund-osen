@@ -6,7 +6,7 @@ kjøres på nytt. PRD-en beholder konklusjonene; detaljene ligger her.
 Grepet er at lesestrømmen ikke skal bære tallene, men at tallene skal finnes og
 kunne kontrolleres.
 
-Målingene i §0–§6 er gjort 2026-09-20, §7 er fra 2026-09-21 og §8 fra 2026-09-22.
+Målingene i §0–§6 er gjort 2026-09-20, §7 er fra 2026-09-21, og §8 og §9 fra 2026-09-22.
 
 ---
 
@@ -742,3 +742,112 @@ testet».
 bestemt hva svaret skal brukes til.
 
 **Brukt i dag: 16 av 20. Igjen: 4.**
+
+---
+
+## 9. De to `[FORELØPIG]`-vinduene, målt
+
+**Dato:** 2026-09-22. **Kostnad: 0 kall** — alt er regnet mot
+`data/kurser-raa-2026-09-22.json`, øyeblikksbildet fra §8.1.
+
+`VOLATILITET_VINDU` og `VOLUM_VINDU` var de to eneste signalparametrene uten
+måling bak seg. §7.4 låste terskel, volumfaktor og nøytralsone mot 199
+handelsdager, men testen dekket tre parametre og ikke fem. Vinduene sto merket
+`[FORELØPIG]` i `signalberegning.py` og i `prd.md` §4.7, og de utgjorde punkt 4
+i utgangsbetingelsen for PRD-ens `draft`-status.
+
+**Spørsmålet var ikke om 20 virker, men om 20 er et valg eller en tilfeldighet.**
+
+### Metode
+
+Samme datagrunnlag som §7.4: **2 985 aksjedager** — 15 symboler × 199
+handelsdager. Grensen på 199 følger av at MA50 krever 50 dager pluss dagen som
+måles, altså 51 av seriens 249.
+
+Hvert vindu ble kjørt over spennet 5–65 dager. To mål ble tatt, og det andre
+kom til fordi det første ikke kunne svare:
+
+| Mål | Hva det viser |
+|---|---|
+| **Utslagsrate** | Hvor ofte sjekken gir noe annet enn 0. Samme metrikk §7.4 brukte på trend/bevegelse/interesse |
+| **Nabostabilitet** | Hvor mange aksjedager som skifter verdi mellom vindu *w* og *w−5*. Flat kurve betyr at tallet ikke bærer vekt; bratt kurve betyr at det gjør det |
+
+**Et mål som ble forkastet underveis, og hvorfor.** Først ble «hvor mange
+aksjedager får et annet signal enn med 20» målt. Den metrikken er **0 ved 20 per
+konstruksjon** — den måler avstand fra 20, ikke om 20 er spesiell. Den kunne
+aldri ha svart på spørsmålet, og er byttet ut med de to over.
+
+### Resultat
+
+**Bevegelse (`VOLATILITET_VINDU`):**
+
+| Vindu | Utslagsrate | Endring mot *w*−5 |
+|---:|---:|---:|
+| 5 | 37,0 % | — |
+| 10 | 32,1 % | 11,2 % |
+| 15 | 30,8 % | 6,7 % |
+| **20** | **30,2 %** | **4,7 %** |
+| 25 | 29,7 % | 3,5 % |
+| 30 | 29,0 % | 2,9 % |
+| 40 | 28,4 % | 2,1 % |
+| 50 | 27,7 % | 1,3 % |
+| 65 | 27,3 % | 1,2 % |
+
+**Interesse (`VOLUM_VINDU`):**
+
+| Vindu | Utslagsrate | Endring mot *w*−5 |
+|---:|---:|---:|
+| 5 | 14,1 % | — |
+| 10 | 14,2 % | 5,5 % |
+| 15 | 14,4 % | 3,5 % |
+| **20** | **14,8 %** | **3,1 %** |
+| 25 | 15,3 % | 2,0 % |
+| 30 | 15,6 % | 1,9 % |
+| 40 | 17,0 % | 1,6 % |
+| 50 | 17,2 % | 1,2 % |
+| 65 | 17,4 % | 1,2 % |
+
+**Aksjedager som faller ut: null**, for hvert vindu til og med 49. Grunnen er at
+`_nodvendige_dager` tar det lengste vinduet, og MA50 krever allerede 50 dager.
+Først ved vindu 50 begynner vinduet å koste dekning: 15 aksjedager ved 50, og
+165 ved 60. **Et lengre vindu er gratis helt til det passerer MA50.**
+
+### Tre funn
+
+**1. Utslagsraten er monoton i begge — men i motsatt retning.** Bevegelse faller
+(37,0 → 27,3 %) mens interesse stiger (14,1 → 17,5 %). Et langt vindu gjør
+volatilitetsterskelen høyere og medianvolumet lavere. **Det finnes derfor ingen
+vindulengde som er best for begge**, og det er et argument for å holde dem like
+på en nøytral verdi framfor å stille hver for seg.
+
+**2. Knekkpunktet ligger på stabiliteten, ikke på 20.** Nabostabiliteten faller
+bratt under 15 og flater ut fra rundt 25. Under 15 bærer tallet reell vekt;
+over 25 gjør det nesten ingenting.
+
+**3. 20 ligger på skulderen.** Like over det ustabile området og like under
+platået. Målingen peker ikke ut 20 som noe optimum — **alt mellom 15 og 30
+oppfører seg tilnærmet likt**.
+
+### Konklusjon: 20 låses, og begrunnelsen er målt
+
+Begge vinduene låses på **20**, og `[FORELØPIG]` fjernes.
+
+Begrunnelsen er ikke at 20 er best, for det viser målingen ikke. Den er at **20
+ligger i et område der modellen ikke er følsom for valget** — nabostabiliteten
+er 3–5 % ved 20 og faller videre — samtidig som den ligger klar av det ustabile
+området under 15, der valget ville båret vekt det ikke kan forsvare. Et tall
+plukket under 15 måtte vært begrunnet; et tall i platået kunne vært hva som
+helst.
+
+At vinduet er gratis i dekning opp til 49 er verdt å merke, men det er ikke et
+argument for å øke: utslagsratene beveger seg i hver sin retning, så et lengre
+vindu kjøper stabilitet i bevegelse på bekostning av at interesse slår ut
+oftere.
+
+**Dette er en måling, ikke en optimalisering** — samme forbehold som §7.4. Vi
+har ikke søkt etter vinduene som gir penest fordeling; vi har kontrollert om det
+arvede tallet ligger et sted der det kan forsvares. Det gjør det, og nå står det
+et sted som viser hvorfor.
+
+**Med dette er alle fem signalparametrene målt.** §7.4 låste terskel,
+volumfaktor og nøytralsone; denne paragrafen låser de to vinduene.
