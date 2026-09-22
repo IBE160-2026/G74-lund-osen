@@ -186,20 +186,22 @@ finnes ikke skrevet ned noe sted.
 
 ### C. Dato for prosjektinnlevering
 
-Ukjent. Ført som **åpent punkt 13** i `prd.md`, med frist «Snarest» og uten
-eier. Åtte suksessmål i PRD §7 er bundet til den, blant annet «Før
-prosjektinnlevering» og «Ved prosjektinnlevering».
+Ukjent. Ført som **åpent punkt 13** i `prd.md` — eier **Marian**, status
+«spørsmål sendt 22.09, svar avventes». Åtte suksessmål i PRD §7 er bundet til
+den, blant annet «Før prosjektinnlevering» og «Ved prosjektinnlevering».
 
 ### D. Dato for demonstrasjonen
 
-Ukjent, samme åpne punkt 13. PRD §7 fører «Før demonstrasjonen, est. uke 45» —
-og «est.» er vår egen estimering, ikke en oppgitt dato. Målene «KI-bidrag i
-drift» og «Grensesnitt og stabilitet» henger på den.
+Ukjent, samme åpne punkt 13, samme eier og status. PRD §7 fører «Før
+demonstrasjonen, est. uke 45» — og «est.» er vår egen estimering, ikke en
+oppgitt dato. Målene «KI-bidrag i drift» og «Grensesnitt og stabilitet» henger
+på den.
 
 ### E. Om PRD og arkitekturdokument er innleveringskrav i seg selv
 
 Faglærer har godkjent fordelingen mellom brief og PRD, men det er ikke det samme
-som at PRD-en skal leveres. Spørsmålet ble stilt i loggen 20.09 og er ubesvart.
+som at PRD-en skal leveres. Spørsmålet ble stilt i loggen 20.09 og **stilt på
+nytt i Teams 22.09** — se over.
 
 ### F. Formkrav til refleksjonsrapporten
 
