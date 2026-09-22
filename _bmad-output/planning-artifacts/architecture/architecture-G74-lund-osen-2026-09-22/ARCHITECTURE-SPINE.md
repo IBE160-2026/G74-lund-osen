@@ -5,7 +5,7 @@ purpose: build-substrate
 altitude: feature
 paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all lagring'
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
-status: draft
+status: final
 created: '2026-09-22'
 updated: '2026-09-22'
 binds:
@@ -136,6 +136,7 @@ prosjektmodul. De er løvnoder, og skal forbli det.
 - **Binds:** FR-408, FR-604, FR-605
 - **Prevents:** at historikken over *hva løsningen mente* går tapt eller skrives om. Den kan ikke regnes ut på nytt: en omregning gir dagens parametres svar, ikke datidens — og da er FR-408s eget spørsmål, «hva sa løsningen om EQNR for to uker siden?», ubesvarlig
 - **Rule:** `Vurderingslager` og `KILogg` har **bare** `skriv` og lesemetoder. Ingen `slett`, ingen `endre`. **Fraværet er invarianten.** Mønsteret er utvidet, ikke oppfunnet: `SnapshotKilde` har allerede «med vilje ingen skrivemetode».
+- **Skjerpet:** fraværet alene holder ikke, fordi AD-17 krever at `skriv` er idempotent på `(symbol, dato)` — og en upsert *endrer* raden hvis den finnes. Derfor bærer **formen** regelen: `skriv` tar imot datoen og **avviser enhver dato som ikke er inneværende børsdag**. Dagens rad kan skrives om så mange ganger man vil; en eldre rad er utilgjengelig gjennom porten. Ingen behøver å huske forskjellen. Dette er en skjerping av AD-7, ikke et unntak fra den.
 - **Merk:** skillet mellom gjenoppbyggbart og uerstattelig går **tvers gjennom databasen**, ikke mellom base og fil. `kurs` er gjenoppbyggbar; `vurdering` og `ki_logg` er det ikke.
 
 ### AD-8 — Nettverk er sperret i testkjøringen `[ADOPTED 2026-09-21]`
@@ -196,13 +197,42 @@ prosjektmodul. De er løvnoder, og skal forbli det.
 - **Merk:** dette er en **ny** beslutning, ikke ADOPTED. Den følger av AD-7, men ingen kode viser den ennå.
 - **To SQLite-forhold migrasjonene må ta hensyn til, begge verifisert:** `executescript()` kjører en implisitt `COMMIT` først, så den nærliggende måten å kjøre en `.sql`-fil på er **ikke** atomisk med oppdateringen av `skjema_versjon` — migrasjonsløperen må styre transaksjonen selv. Og SQLites `ALTER TABLE` dekker bare rename/add/drop column; typeendring, `UNIQUE`, `CHECK` og fremmednøkler krever tabellbytte med `DROP TABLE`. **For `vurdering` og `ki_logg` kolliderer det med AD-7** — se åpent punkt under.
 
+### AD-17 — Hentekommandoen skriver dagens vurdering
+
+- **Binds:** FR-408, AD-7, AD-10
+- **Prevents:** at ingen er utpekt til å fylle `vurdering`, slik at AD-7 ender med å verne en tom tabell
+- **Rule:** `docker run … hent` henter kursene, kaller `erstatt_serie`, og regner deretter ut og skriver dagens vurdering for alle femten **i samme kjøring**. Én utløser, ett tidspunkt. `skriv` er idempotent på `(symbol, dato)`.
+- **Forkastet:** lat skriving ved sidevisning — en dag ingen åpner siden, blir aldri lagret, og FR-408 forutsetter at dagen finnes selv om ingen så på den. Egen tredje kommando — den kan glemmes, og kravet sier *automatisk*.
+
+### AD-18 — Vurderingen kopierer kursen, uten fremmednøkkel
+
+- **Binds:** FR-408, AD-5, AD-7
+- **Prevents:** at `erstatt_serie` river grunnen under historikken. Med `RESTRICT` ville hver henting fra dag to feilet for alle femten; med `CASCADE` ville historikk blitt slettet uten at noen kalte `slett`, altså AD-7 omgått på SQL-nivå av en AD-5-lydig handling
+- **Rule:** `vurdering` lagrer `close` og `adjusted_close` som **verdier**, ikke som peker. Ingen fremmednøkkel fra `vurdering` til `kurs`.
+- **Merk:** fraværet av fremmednøkkel er ikke en forenkling — det **følger av kravet**. FR-408 ber om et øyeblikksbilde, og et øyeblikksbilde som peker på en rad som endres, er ikke et øyeblikksbilde. At lagret kurs og dagens omregnede kurs spriker etter et utbytte, er to forskjellige spørsmål, og begge svarene skal kunne leses.
+
+### AD-19 — Porten returnerer en typet norsk rad
+
+- **Binds:** alle konsumenter av `Kurslager`
+- **Prevents:** at EODHDs engelske nøkler blir en udokumentert kontrakt. En feilstavet nøkkel i en `dict` gir `None` i stedet for en feil, og `None` forplanter seg inn i signalberegningen som et tall som *mangler* — ikke som noe som stopper
+- **Rule:** porten returnerer `list[Kursrad]` med `dato`, `slutt`, `justert_slutt`, `volum`. Adapteren oversetter fra kildens feltnavn. En ny kilde skal ikke måtte etterligne EODHD for å passe inn.
+- **Når:** innføres i **samme endring** som SQLite-adapteren, ikke som egen runde — adapteren må uansett røre dette laget. Rekkefølge: (1) `Kursrad` defineres, (2) protokollen, `SnapshotKilde` og SQLite-adapteren oppdateres i samme omgang, (3) konsumentene. **Testene kjøres i sin helhet mellom hvert steg**, ikke bare til slutt.
+
+### AD-20 — Børsdager i Europe/Oslo, tidsstempler i UTC
+
+- **Binds:** FR-401, FR-402, FR-406, FR-408, AD-6
+- **Prevents:** at «dagen» betyr to ting. I dag navngir `fetch_prices.main` fila med `date.today()` og stempler innholdet med `datetime.now(timezone.utc)` — mellom midnatt og 02:00 norsk tid peker de på hver sin dag
+- **Rule:** hvilken dag en sluttkurs tilhører, avgjøres av **norsk kalenderdato** — det er Oslo Børs dataene kommer fra. Tidsstempler for *når* noe ble hentet, forblir **UTC med offset**, så de kan sammenliknes på tvers av sommertid. Filnavn og `hentet` utledes av **samme øyeblikk**.
+- **Forkastet:** alt i UTC. «Dagens sluttkurs» ville fått feil dag for alle hentinger mellom midnatt og 02:00, og FR-402 ville bommet i samme vindu. Det er ikke færre omregninger, bare en omregning flyttet dit den ikke synes.
+
 ## Consistency Conventions
 
 | Hensyn | Konvensjon |
 |---|---|
 | Navn | Norsk i kode og kommentarer, som i resten av prosjektet. Porter navngis `<Datasett>lager` (skriver) eller `<Datasett>kilde` (leser) |
 | Symbol mot ticker | `symbol` er NewsWeb-formen (`EQNR`), `ticker` er EODHD-formen (`EQNR.OL`). De blandes aldri; `Aksje` er raden som binder dem |
-| Datoer | `YYYY-MM-DD` som tekst, overalt. Tidsstempler er ISO 8601 med UTC-offset. Datoen i et filnavn er dataenes dag — aldri filens mtime |
+| Datoer | `YYYY-MM-DD` som tekst. En børsdato er en **norsk** kalenderdato (AD-20); et tidsstempel er ISO 8601 med UTC-offset. Datoen i et filnavn er dataenes dag — aldri filens mtime |
+| Kursrader | `Kursrad` med norske felt (AD-19). Kildens feltnavn stopper i adapteren |
 | Kurs | Beregning bruker `adjusted_close` (FR-701). Markedsoversikten viser `close`. Forskjellen er tilsiktet og dokumentert |
 | Feil | En manglende aksje er en rad i `feil`, ikke et unntak som bobler opp (AD-15) |
 | Tester | Hver story leveres med test. Testen kjører uten nett (AD-8). Kjerne testes direkte; skall testes med port-dobler som `MinneKilde` |
@@ -297,7 +327,7 @@ G74-lund-osen/
 | Aksjedetalj og graf (FR-201..204) | `aksjedetalj.py`, `graf.py` | AD-1, AD-3 |
 | Henting og kvote (FR-401..405) | `fetch_prices.py` | AD-2, AD-5, AD-10, AD-15 |
 | To lagre (FR-406) | `lagring_sqlite.py`, `data/raa/` | AD-5, AD-6, AD-11 |
-| Dagens vurdering (FR-408) | `Vurderingslager` | AD-3, AD-7, AD-16 |
+| Dagens vurdering (FR-408) | `Vurderingslager`, skrevet av hentekommandoen | AD-3, AD-7, AD-16, AD-17, AD-18 |
 | Meldingsfilter (FR-501..503) | `meldinger.py` | AD-1, AD-14 |
 | Utbyttemerking (FR-407) | *ikke plassert* | AD-4 — **kilde ikke valgt**, se åpent punkt 4 |
 | Kommende hendelser (FR-301..303) | *finnes ikke* | **Ingen** — se Deferred |
