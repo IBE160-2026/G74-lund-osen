@@ -19,7 +19,7 @@ excludedDocuments:
 Nedbryting av OSE Signal i epics og stories, fra en PRD og en arkitekturspine
 som begge står som `final` per 2026-09-22.
 
-**Tre føringer gjelder hele nedbrytingen:**
+**Fire føringer gjelder hele nedbrytingen:**
 
 1. **Hver story leveres med test som kan kjøres uten API-kall.** Åpent punkt 14,
    og allerede bindende som `AD-8`. `tests/conftest.py` sperrer `socket.connect`,
