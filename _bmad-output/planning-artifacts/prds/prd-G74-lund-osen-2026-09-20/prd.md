@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-22T10:50
+updated: 2026-09-22T15:27
 #
 # Hvorfor status fortsatt er draft — og hva som skal til for å endre den.
 #
@@ -416,15 +416,27 @@ Dette følger NFR-03.
 
 ### 4.4 Datahenting og oppdatering
 
-#### FR-401 — Oppstartsutløst henting
+#### FR-401 — Henting utløses eksplisitt, aldri av en oppstart
 
-Henting utløses når applikasjonen starter, ikke av en planlagt jobb med fast
-klokkeslett. Er lagrede data eldre enn siste børsslutt, hentes nye data da —
-kurser først, deretter meldinger. Hentingen kjører som bakgrunnsoppgave.
-Brukeren venter aldri på den og ser siste kjente data med tidsstempel mens den
-pågår.
+Henting er en egen, bevisst handling — verken en bivirkning av at noe startet
+eller en planlagt jobb med fast klokkeslett.
+
+**Webserveren henter aldri.** Den starter alltid uten å bruke et eneste
+API-kall, og viser siste kjente data med tidsstempel. Finnes ingen data ennå,
+vises en tom tilstand som forklarer hvordan henting gjøres — ikke en feil.
+
+Hentekommandoen kontrollerer først om lagrede data er eldre enn siste
+børsslutt (FR-402). Er de ikke det, hentes ingenting og ingen kvote brukes.
+Skal det hentes, skjer det i denne rekkefølgen: kurser, deretter meldinger, og
+til slutt dagens vurdering per aksje (FR-408).
 
 **Hvor langt tilbake hver henting går, er fastsatt i FR-406.**
+
+*Endret 2026-09-22.* Kravet sa opprinnelig at henting utløses når applikasjonen
+starter. Det var skrevet for en applikasjon som starter én gang. En container
+startes på nytt hver gang, så «ved oppstart» ville betydd 15 kall per
+`docker run` mot en dagskvote på 20 — to kjøringer ville brukt opp dagen.
+Arkitekturspinen AD-10 og AD-17.
 
 #### FR-402 — Kontroll mot forventet børsdag, ikke mot klokkeslett
 
@@ -432,15 +444,19 @@ Hentingen skal ikke anta at data er ferske fordi klokka har passert et
 tidspunkt. Den skal kontrollere at nyeste `date` i svaret er forventet børsdag.
 
 Er nyeste `date` ikke forventet børsdag, vises siste kjente data med
-tidsstempel, og hentingen prøves igjen ved neste oppstart. Applikasjonen skal
-aldri presentere gårsdagens tall som dagens.
+tidsstempel, og hentingen prøves igjen ved neste kjøring av hentekommandoen.
+Applikasjonen skal aldri presentere gårsdagens tall som dagens.
+
+Kontrollen eies av hentekommandoen alene — webserveren henter ikke, og kan
+derfor ikke handle på utfallet. «Forventet børsdag» regnes i norsk
+kalenderdato; se arkitekturspinen AD-20.
 
 EODHD dokumenterer ingen publiseringstid for Oslo Børs; se `begrunnelser.md`.
 
 #### FR-403 — Etterfylling av kurser etter dager uten bruk
 
-Åpner ingen applikasjonen på flere dager, oppstår hull i serien. Hullene skal
-fylles ved neste oppstart uten ekstra kostnad i kvote.
+Kjører ingen hentekommandoen på flere dager, oppstår hull i serien. Hullene
+skal fylles ved neste henting uten ekstra kostnad i kvote.
 
 `/api/eod` tar `from` og `to`, begge inklusive, og **ett kall koster det samme
 uansett hvor langt intervallet er**. Etterfylling av 15 symboler koster derfor
@@ -481,19 +497,26 @@ Delingen har en nedre grense på ett døgn. Gir ett enkelt døgn fortsatt
 `overflow: true`, skal hentingen stoppe og feilen rapporteres i stedet for å
 dele videre.
 
-#### FR-406 — To lagre med hvert sitt ansvar
+#### FR-406 — To lagre for kursdata, med hvert sitt ansvar
 
 Kursdata lagres i to atskilte lagre som aldri blandes:
 
 | Lager | Innhold | Regel |
 |---|---|---|
-| **Beregningsgrunnlag** | Serien som signalberegningen leser | Lastes ned i sin helhet **ved hver henting**. Skjøtes aldri på. |
+| **Beregningsgrunnlag** | Serien som signalberegningen leser — `kurs`-tabellen i databasen | Erstattes i sin helhet **ved hver henting**, per symbol, i én transaksjon. Skjøtes aldri på. |
 | **Rådata** | Øyeblikksbilder med tidsstempel per henting | Skrives aldri om. Dokumentasjon og sikkerhetsnett, ikke beregningskilde. |
 
+De to lagrene ligger nå i hvert sitt medium: beregningsgrunnlaget i databasen,
+rådata som filer. **Regelen var aldri fil mot base.** Den var at serien aldri
+skjøtes på, fordi EODHD regner `adjusted_close` om bakover ved hvert nytt
+utbytte. Den regelen holdes i databasen ved at hver henting erstatter symbolets
+rader i sin helhet. Se arkitekturspinen AD-5 og AD-6.
+
 **Merk at dette ikke er et krav om å hente oftere.** En henting utløses bare når
-betingelsen i FR-401 er oppfylt. Kravet her gjelder *hva* en henting gjør når
+noen kjører hentekommandoen, og bare hvis betingelsen i FR-401 er oppfylt.
+Kravet her gjelder *hva* en henting gjør når
 den først skjer: den laster ned hele serien på nytt i stedet for å skjøte nye
-rader på en lagret serie. Starter applikasjonen flere ganger samme dag, hentes
+rader på en lagret serie. Kjøres hentekommandoen flere ganger samme dag, hentes
 ingenting etter første vellykkede henting.
 
 ##### Minste historikk: 175 handelsdager

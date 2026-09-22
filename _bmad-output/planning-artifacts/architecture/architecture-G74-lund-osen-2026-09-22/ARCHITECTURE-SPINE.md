@@ -221,7 +221,7 @@ prosjektmodul. De er løvnoder, og skal forbli det.
 ### AD-20 — Børsdager i Europe/Oslo, tidsstempler i UTC
 
 - **Binds:** FR-401, FR-402, FR-406, FR-408, AD-6
-- **Prevents:** at «dagen» betyr to ting. I dag navngir `fetch_prices.main` fila med `date.today()` og stempler innholdet med `datetime.now(timezone.utc)` — mellom midnatt og 02:00 norsk tid peker de på hver sin dag
+- **Prevents:** at tid leses som tekst uten at noen vet hvilken sone teksten er i. Det er to steder i koden i dag, samme feilklasse: `fetch_prices.main` navngir fila med `date.today()` og stempler innholdet med `datetime.now(timezone.utc)`, så mellom midnatt og 02:00 norsk tid peker de på hver sin dag; og `meldinger._minutt` returnerer `tidspunkt[:16]` uten å gå via et tidsobjekt. Det siste er verst fordi det er **stille** — `[:16]` gir alltid en streng, så to representasjoner av samme øyeblikk blir to ulike dublettnøkler og FR-501 slutter å deduplisere uten at noe feiler
 - **Rule:** hvilken dag en sluttkurs tilhører, avgjøres av **norsk kalenderdato** — det er Oslo Børs dataene kommer fra. Tidsstempler for *når* noe ble hentet, forblir **UTC med offset**, så de kan sammenliknes på tvers av sommertid. Filnavn og `hentet` utledes av **samme øyeblikk**.
 - **Forkastet:** alt i UTC. «Dagens sluttkurs» ville fått feil dag for alle hentinger mellom midnatt og 02:00, og FR-402 ville bommet i samme vindu. Det er ikke færre omregninger, bare en omregning flyttet dit den ikke synes.
 
