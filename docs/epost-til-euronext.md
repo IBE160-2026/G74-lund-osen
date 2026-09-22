@@ -166,9 +166,80 @@ NewsWeb ville gått til samme konsern om det samme forholdet.
 
 ---
 
+## Purringen 2026-09-22, ordrett
+
+Sendt som svar i samme tråd som forespørselen 21.09, slik at den opprinnelige
+henvendelsen står rett over. Ingen sendt kopi finnes lokalt; teksten er ført
+slik den ble gjengitt.
+
+Subject: Follow-up to our request of 21 September — Oslo Børs company announcements (student project)
+
+Dear Euronext,
+
+I am following up on my request of 21 September regarding the use of company
+announcements from newsweb.oslobors.no in a non-commercial student project at
+Molde University College.
+
+That request covered Retrieval, Storage, Display and Source code. It left out
+one point I should have included: our project sends announcement titles and text
+to a third-party language model, which processes them to judge company relevance
+and produce a short plain-language explanation. Your terms cover transfers to
+third parties, so I would like to ask about it explicitly.
+
+Two questions:
+
+1. Can the permission requested on 21 September be granted, and does the same
+   answer apply to the financial calendar on live.euronext.com?
+
+2. May we send announcement titles and text to a third-party language model for
+   the purpose above? The output stays local, nothing is published, and the
+   project is neither publicly deployed nor commercial.
+
+If the full request cannot be granted, would a narrower use be acceptable — a
+small set of announcements collected manually and used once for a documented
+classification experiment?
+
+We are about to settle the scope of the project, so a quick reply would be a
+great help — even a brief yes or no.
+
+Kind regards,
+Marian Osen
+Høgskolen i Molde — group G74 (Marian Osen and Joakim Lund)
+IBE160 Programmering med KI
+
+### Hva som skiller de to brevene
+
+| | Forespørselen 21.09 | Purringen 22.09 |
+|---|---|---|
+| Hva det spørres om | Retrieval, Storage, Display, Source code | De samme fire, **pluss overføring til en modelltjeneste** |
+| Modelltjeneste | **Ikke nevnt.** Null treff på «language model», «LLM», «third person» og «third party» i hele brevet, kontrollert 22.09 | Eget spørsmål, med formålet beskrevet: vurdere selskapsrelevans og lage en kort forklaring på vanlig språk |
+| Reservealternativ | Ingen | **Et smalere alternativ tilbys:** et lite, manuelt innsamlet utvalg brukt **én gang** til et dokumentert klassifiseringseksperiment |
+| Kalenderen | Egen setning: gjelder samme svar for `live.euronext.com`? | Samme spørsmål, nå som del av spørsmål 1 |
+
+Overføringsklausulen er grunnen til at punktet måtte etter: vilkårene forbyr å
+«otherwise transfer any of the Content to any third person», og parentesen
+strekker det til «others in your company or organisation». Å sende meldingstekst
+inn i en språkmodell er en slik overføring, og den sto utenfor alt de fire
+overskriftene beskrev.
+
+### Purringen setter bevisst ingen dato
+
+Tidspresset er uttrykt — «we are about to settle the scope of the project» — men
+uten frist.
+
+Grunnen er at et brev som sier at vi klarer oss uten hvis de ikke svarer, gir
+mottakeren en ferdig løsning og en grunn til å la være. En oppgitt frist gjør
+det samme: den forteller at det finnes et tidspunkt der saken løser seg selv.
+
+**Vår egen frist 2026-09-28 står uendret internt.** Den er vår beslutningsdato,
+ikke noe Euronext har fått vite om eller kan oversitte. Dette er samme linje som
+forespørselen 21.09 la seg på.
+
+---
+
 ## Svaret
 
-*Ikke mottatt per 2026-09-21. Fylles inn når det kommer.*
+*Ikke mottatt per 2026-09-22. Fylles inn når det kommer.*
 
 | | |
 |---|---|

@@ -1645,6 +1645,27 @@ etter — loggen er append-only, så den gamle rekkefølgen står.
 
 ---
 
+## 22.09.2026 – Mangelen ble funnet i vårt eget brev, ikke i et svar
+
+Forespørselen til Euronext 21.09 ba om fire ting: Retrieval, Storage, Display og
+Source code. Den nevnte ikke at prosjektet sender meldingstitler og -tekst til en
+tredjeparts språkmodell — og vilkårene forbyr uttrykkelig å «otherwise transfer
+any of the Content to any third person». Purringen 22.09 dekker begge deler.
+
+**Mangelen ble ikke funnet ved å lese et svar.** Svaret er ikke kommet. Den ble
+funnet ved å lese vårt eget brev og spørre hva det faktisk ba om — og se at
+lista over fire ting ikke inneholdt den ene handlingen vilkårene navngir.
+
+Det er samme huskeregel som EODHD-saken ga 21.09: *et svar rekker ikke lenger
+enn spørsmålet det besvarte.* Der ble regelen lært av et svar som dekket mindre
+enn vi først leste det som. Her er den brukt **på forhånd** — på vårt eget
+spørsmål, før svaret finnes, mens det ennå går an å utvide det.
+
+Verdt å merke: regelen er nyttigst før svaret kommer. Brukt etterpå forteller den
+bare hva vi ikke fikk vite. Brukt før, endrer den hva vi spør om.
+
+---
+
 ## DD.MM.2026 – kort tittel
 
 ### Dato / deltaker(e)
