@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-22T20:44
+updated: 2026-09-22T20:57
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -904,10 +904,17 @@ Målt over 199 dager gir terskel 2 i snitt 4,6 av de 15 aksjene per dag, og bare
 dager — nær annenhver dag uten noe å vise.
 
 Terskelen styrer **visningen og sorteringen**, ikke hentingen.
-**Meldinger hentes for alle 15 selskapene hver dag.** KI-kostnaden er omtrent
-1,25 forklaringer og 0,5 relevansvurderinger i døgnet.
+**Meldinger hentes for alle 15 selskapene ved hver henting**, uavhengig av om
+aksjen kommer over terskelen. KI-kostnaden er omtrent 1,25 forklaringer og 0,5
+relevansvurderinger per henting.
 
 Hvorfor terskel 2 og ikke 3: se `begrunnelser.md`.
+
+*Endret 2026-09-22.* Setningen sa «hver dag» og «i døgnet». Det var en
+frekvensgaranti fra modellen der applikasjonen hentet ved oppstart, og den
+motsier FR-401 etter omskrivingen samme dag. Poenget setningen gjør, er
+**omfanget per henting** — at terskelen ikke begrenser hva som hentes — og det
+er uendret.
 
 #### FR-706 — Synlig begrunnelse i aksjedetaljen
 
