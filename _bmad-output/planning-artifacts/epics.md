@@ -1,5 +1,5 @@
 ---
-stepsCompleted: [1]
+stepsCompleted: [1, 2]
 inputDocuments:
   - _bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md
   - _bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md
@@ -215,8 +215,140 @@ hente ut, og ingen er oppfunnet for å fylle seksjonen.
 
 ### FR Coverage Map
 
-{{requirements_coverage_map}}
+**Levert før nedbrytingen — 12 FR-er.** Bygget som ren logikk med tester. De
+*berøres* av Epic 1 gjennom `Kursrad`, men leverer ingen ny brukerverdi der.
+
+| FR | Levert i |
+|---|---|
+| FR-101, FR-102, FR-103 | `markedsoversikt.py`, commit `706720f` |
+| FR-201, FR-202, FR-204 | `aksjedetalj.py` `076bb12`, `graf.py` `b6ba9d8` |
+| FR-701 – FR-706 | `signalberegning.py`, commit `01af1a5` |
+
+**Fordelt på epics — 21 FR-er.**
+
+| FR | Epic |
+|---|---|
+| FR-203 | **Epic 5, 6 og 7 — delt.** «Øvrig innhold» er meldinger *pluss* KI-forklaring *pluss* hendelser. `aksjedetalj.py` sier selv at alle tre mangler med vilje. Å mappe den til én epic ville vært feil |
+| FR-301, FR-302, FR-303 | Epic 7 🔒 |
+| FR-401, FR-402, FR-403 | Epic 2 |
+| FR-404, FR-405 | Epic 6 🔒 |
+| FR-406, FR-408 | Epic 1 |
+| FR-407 | Epic 2 |
+| FR-501, FR-502, FR-503 | Epic 6 🔒 |
+| FR-601, FR-602, FR-603, FR-606 | Epic 5 🔒 |
+| FR-604, FR-605 | Epic 4 |
+
+**12 + 21 = 33.** Alle FR-er er plassert.
+
+### NFR Coverage Map
+
+| NFR | Dekning |
+|---|---|
+| **NFR-01** Kvote | **Eid av Epic 2.** Tverrgående støtte: `AD-8` gjør at ingen test kan bruke kvote |
+| **NFR-02** Venter aldri | **Eid av Epic 2** (`AD-10`). Brødteksten rettet 22.09 fordi den lovet en mekanisme som ikke finnes |
+| **NFR-03** Manglende data | **Tverrgående.** Delvis levert: `hent_universet` fortsetter ved feil (`352e3a2`), `app.py` tåler `kilde=None`, FR-204 finnes. **Kontroll på hver story:** en test for den tomme eller manglende stien |
+| **NFR-04** KI tar ikke ned hovedflyten | **Eid av Epic 5.** Bortfaller hvis Epic 5 strykes |
+| **NFR-05** Norsk | **Tverrgående, levert i alt som finnes.** **Kontroll på hver visningsstory:** all brukervendt tekst er norsk |
+| **NFR-06** Ikke investeringsråd | **Tverrgående.** Søk i `src/templates/` og `src/*.py` ga null treff på forbeholdstekst — men kravet ber ikke om en tekst. Det sier at *ingen del* skal formuleres som anbefaling, altså et forbud oppfylt ved fravær. **Kontroll på hver visningsstory:** ordlyden leses mot NFR-06 |
+| **NFR-07** Rådata bevares | **Eid av Epic 1** (`AD-6`). Delvis levert: `fetch_prices` skriver tidsstemplede øyeblikksbilder (`352e3a2`) |
+
+**Alle sju NFR-er er plassert:** tre eid av en epic, fire tverrgående med
+navngitt kontroll.
 
 ## Epic List
 
-{{epics_list}}
+**Rekkefølge.** Pilene er harde avhengigheter, ikke anbefalinger.
+
+```
+Epic 1 (lagring) ──> Epic 2 (henting) ──> Epic 3 (leveranse)
+                 └─> Epic 4.2+ (KI-logg)
+Epic 4.1 (papirarbeid) ──────────────────> parallelt fra dag én
+Epic 6 (meldinger) 🔒 ──> Epic 5 (KI i drift) 🔒 ──> krever også Epic 4.1
+Epic 7 (hendelser) 🔒
+```
+
+- **Epic 1 før Epic 2:** hentingen skriver gjennom `Kurslager`, som Epic 1
+  oppretter. Uten porten har Epic 2 ingenting å skrive til.
+- **Epic 2 før Epic 3:** Dockerfilen pakker to kommandoer, og den ene er
+  hentekommandoen (`AD-10`). Den må finnes før den kan pakkes.
+- **Epic 4.1 er parallell fra dag én.** Det er papirarbeid uten kodeavhengighet,
+  og det er dette som gjør «KI tidlig» mulig i det hele tatt.
+- **Epic 4.2 og utover etter Epic 1:** `KILogg` er en port, og porten trenger
+  databasen.
+- **Epic 5 etter både Epic 4.1 og Epic 6.** Se avhengighetsvarselet under.
+
+### Epic 1: Dataene overlever en omstart, og historikken kan leses tilbake
+
+Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
+løsningen om EQNR for to uker siden?» får et svar.
+
+**FR-er:** FR-406, FR-408 · **NFR-07** · **AD-er:** 3, 4, 5, 6, 7, 16, 18, 19
+
+`AD-19` binder rekkefølgen inne i epicen: `Kursrad` innføres i **samme endring**
+som SQLite-adapteren. Konsumentene — `markedsoversikt`, `aksjedetalj`, `graf`,
+`signalberegning` — oppdateres her, med full testkjøring mellom hvert steg. Det
+er også her `kursdata.py` sitt I/O-brudd lukkes og `app.py` slutter å lese
+snapshot utenom porten.
+
+### Epic 2: Ferske data uten at kvoten sprenges
+
+Brukeren kan hente nye kurser bevisst, og kan ikke ved uhell brenne dagskvoten.
+
+**FR-er:** FR-401, FR-402, FR-403, FR-407 · **NFR-01, NFR-02** · **AD-er:** 2, 10, 17, 20
+
+De to kjente `AD-20`-feilene rettes her: `fetch_prices.main` som blander lokal
+dato og UTC, og `meldinger._minutt` som kutter på tegn 16. FR-407 ligger her
+fordi deteksjonen — avviket mellom `close`- og `adjusted_close`-endringen —
+skjer på serien under henting, og den veien gjør kravet uavhengig av NewsWeb.
+
+### Epic 3: Løsningen kan kjøres av andre enn oss
+
+Sensor kan bygge og kjøre den, uten vår nøkkel og uten våre data.
+
+**FR-er:** ingen · **AD-er:** 9, 11, 12 · Dekker åpent punkt 18
+
+### Epic 4: KI kan tas i bruk uten å bryte godkjenningen
+
+Låser opp KI-laget, og gjør at det kan være i drift over tid i stedet for å
+bygges til slutt.
+
+**FR-er:** FR-604, FR-605
+
+Story 4.1 er *velg modelltjeneste og dokumentér betingelse 4*, med tre svar per
+kandidat: brukes innsendte data til trening, kan det slås av, og står det i
+**vilkårene** eller bare i markedsføringen. **Betingelse 4 må være ført før
+artikkeltekst sendes inn i en modell** — en story som sender inn tekst er
+*blokkert av* 4.1, ikke anbefalt etter den.
+
+### Epic 5: KI-laget i drift 🔒
+
+**FR-er:** FR-601, FR-602, FR-603, FR-606, del av FR-203 · **NFR-04**
+
+| Felt | |
+|---|---|
+| **Blokkert av** | Åpent punkt 5b (betingelse 4) **og åpent punkt 1 (Euronext)** |
+| **Eier** | Gruppen |
+| **Avgjøres** | Punkt 5b av Epic 4.1, som er ublokkert. Punkt 1 av Euronext — 28.09 er vår egen frist |
+| **Ved nei fra Euronext** | **Epicen strykes i sin helhet.** Alle seks FR-6xx er om meldinger — FR-602 «meldingene i samlekategorien», FR-604 «for hver melding», FR-606 «melding i samlekategorien». Uten Epic 6 finnes ikke datagrunnlaget. **Da bortfaller også NFR-04**, og suksessmålet «KI-bidrag i drift» kan ikke nås, fordi PRD-en måler det i hvilke *meldinger* laget forklarte. Det som overlever er relevanseksperimentet, som henter fra EODHDs nyhets-API og ikke fra NewsWeb — KI kan da demonstreres, men ikke vises i drift |
+
+### Epic 6: Børsmeldinger i oversikten 🔒
+
+**FR-er:** FR-404, FR-405, FR-501, FR-502, FR-503, del av FR-203
+
+| Felt | |
+|---|---|
+| **Blokkert av** | Åpent punkt 1 — Euronext forbyr automatisert henting uten tillatelse på forhånd |
+| **Eier** | Gruppen |
+| **Avgjøres** | Forespørsel sendt 21.09, ubesvart. **28.09** er vår egen frist for å ta stilling uten svar |
+| **Ved nei** | Strykes i sin helhet — **og tar Epic 5 med seg ned.** Det er ikke en fri strykning: den koster hele KI-laget, NFR-04, to av tre deler av FR-203, og suksessmålet «KI-bidrag i drift». Logikken i `meldinger.py` er bygget og testet fra før, og blir liggende som kode uten datakilde |
+
+### Epic 7: Kommende finansielle hendelser 🔒
+
+**FR-er:** FR-301, FR-302, FR-303, del av FR-203
+
+| Felt | |
+|---|---|
+| **Blokkert av** | Åpent punkt 1 og 16 |
+| **Eier** | Gruppen |
+| **Avgjøres** | Samme frist som Epic 6 |
+| **Ved nei** | Strykes. Tar ingenting med seg ned — ingen annen epic leser kalenderen. Krever dessuten en manuelt vedlikeholdt oppslagstabell, siden kalenderen verken oppgir ticker eller ISIN |
