@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-22'
+updated: '2026-09-22T16:38'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -118,6 +118,7 @@ prosjektmodul. De er løvnoder, og skal forbli det.
 - **Prevents:** at lagringsvalget drar inn en tjeneste som bryter vilkårene, eller en oppstartsrekkefølge som kan feile under demonstrasjonen
 - **Rule:** `sqlite3` fra standardbiblioteket. Basefila ligger under `data/`, som er gitignorert. Ingen hostet database — EODHDs godkjenning krever at *«the output stays local»*, og Euronext forbyr å *«otherwise transfer any of the Content to any third person»*.
 - **Omgjøres av:** flere samtidige skrivere, eller at applikasjonen flytter av én maskin. Ingen av delene er i v1. Skjer det, **byttes motoren — ikke designet**; det er nettopp derfor AD-3 ligger der den ligger.
+- **Bekreftet 2026-09-22** av assisterende hjelpelærer: *«Slik dere beskriver bruken, strukturert lagring over tid, relasjoner mellom data, joins, migrasjoner og logging av KI-vurderinger, bruker dere SQLite som en ordentlig database, ikke bare som enkel fillagring. […] Så ut fra det vi vet nå mener jeg dette er helt innenfor.»* Svaret bærer to begrensninger som ikke skal skrives bort: det kom ikke fra emneansvarlig, og det sier *«ut fra det vi vet nå»*.
 
 ### AD-5 — Serien skjøtes aldri på
 
@@ -345,7 +346,6 @@ G74-lund-osen/
 | **Kilde for handelskalenderen** | Åpent punkt 3. FR-402 hviler på «forventet børsdag», men ingen kilde er utpekt |
 | **De to `[FORELØPIG]`-vinduene** | Åpent punkt; utgjør punkt 4 i utgangsbetingelsen for PRD-ens draft-status |
 | **NewsWeb-hentingen** | Åpent punkt 1. Euronext forbyr automatisert henting uten tillatelse; forespørselen er ubesvart. Arkitekturen låser seg derfor **ikke** til at meldingsdelen finnes |
-| **Om SQLite godtas** | Sendt faglærer 22.09, ubesvart. Kommer et nei, byttes motoren — ikke designet |
 | **FR-301..303, kommende hendelser** | Hele PRD §4.3 var taus i første utkast av denne spinen. Det er en **tredje nettkilde** (Euronexts finanskalender) og et eid datasett uten port. `app.py` sier selv at «kommende hendelser mangler med vilje» — de ligger bak åpent punkt 1 og 16. Får sin port og sin AD når kilden er avklart, og **ikke før** |
 | **Hvem kjører migrasjonene, og når** | AD-16 sier at de finnes, ikke hvem som anvender dem. Med to `docker run`-varianter (AD-10) er både web, henting og en tredje kommando forsvarlige svar. Avgjøres når Dockerfilen skrives |
 | **Kjøremåte i containeren** | `app.py` har ingen WSGI-oppføring, og de flate importene virker i dag bare via `pythonpath = ["src"]` i pytest-konfigurasjonen. Begge må løses i Dockerfile-storyen |

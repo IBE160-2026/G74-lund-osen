@@ -1507,6 +1507,52 @@ Prevents-punkt, som den alltid har gjort.
 
 ---
 
+## 22.09.2026 – Databasevalget ble godtatt, og det var beskrivelsen som bar det
+
+### Dato / deltaker(e)
+
+2026-09-22, ettermiddag. Marian.
+
+### Hva ble gjort eller foreslått?
+
+SQLite-valget fra arkitekturfasen ble sendt faglærerstaben med spørsmål om det
+er innenfor kravet, eller om en klient/server-database forventes. Svar kom samme
+dag, fra **assisterende hjelpelærer** — ikke fra emneansvarlig.
+
+### Hva førte det til?
+
+Valget står. Forbeholdet i arkitekturspinen — «sendt faglærer 22.09, ubesvart;
+kommer det et nei, byttes motoren» — er bortfalt og erstattet med svaret.
+
+### Refleksjon
+
+**Det som bar svaret var ikke at SQLite er enkelt.** Det var at bruken ble
+beskrevet konkret: strukturert lagring over tid, relasjoner mellom data, joins,
+migrasjoner og logging av KI-vurderinger.
+
+Hjelpelæreren bruker **den samme oppramsingen tilbake** som begrunnelse for at
+det er innenfor — «bruker dere SQLite som en ordentlig database, ikke bare som
+enkel fillagring». Spørsmålet ble besvart slik det ble stilt. Hadde vi spurt
+«holder det med SQLite?», ville svaret måttet vurdere verktøyet i seg selv. Vi
+spurte om bruken, og fikk bruken vurdert.
+
+Det er samme lærdom som EODHD-saken 21.09, fra motsatt kant: der handlet den om
+at et svar ikke rekker lenger enn spørsmålet det besvarte. Her rekker svaret
+nøyaktig så langt som beskrivelsen — og beskrivelsen var god fordi tallene og
+kravene bak den allerede fantes i `malinger.md` og PRD-en.
+
+**To begrensninger som ikke skal skrives bort.** Svaret kom ikke fra
+emneansvarlig, og det sier selv «ut fra det vi vet nå». Det er et kvalifisert ja
+fra en som ikke er endelig myndighet. Restrisikoen er liten, men den er ikke
+null, og den står ført i arkitekturmemloggen.
+
+### Git / dokumentasjon
+
+Spinen `AD-4` har svaret ordrett med begge begrensningene. Deferred-raden «Om
+SQLite godtas» er fjernet — den var utsatt, ikke lenger.
+
+---
+
 ## DD.MM.2026 – kort tittel
 
 ### Dato / deltaker(e)
