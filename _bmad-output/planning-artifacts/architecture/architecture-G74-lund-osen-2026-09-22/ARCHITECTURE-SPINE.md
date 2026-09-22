@@ -11,6 +11,7 @@ updated: '2026-09-22'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
+  - FR-301..FR-303
   - FR-401..FR-408
   - FR-501..FR-503
   - FR-604, FR-605, FR-606
@@ -40,8 +41,15 @@ HTML.»* Spinen navngir det og gjør det bindende.
 | Lag | Filer | Regel |
 |---|---|---|
 | **Kjerne** | `signalberegning.py`, `meldinger.py`, `markedsoversikt.py`, `aksjedetalj.py`, `graf.py` | Ingen import av `requests`, `sqlite3`, `pathlib`, `flask` |
-| **Porter** | `kursdata.py` | Bare `Protocol`-definisjoner og verdityper. Ingen implementasjon som rører I/O |
+| **Porter** | `kursdata.py` | Bare `Protocol`-definisjoner og verdityper |
 | **Skall** | `app.py` (HTTP), `fetch_prices.py` (nett), lagringsadapteren (SQLite) | Eneste lag som kjenner teknologi |
+
+**`kursdata.py` oppfyller ikke portregelen i dag, og det skal stå her til den
+gjør det.** Fila importerer `json` og `pathlib`; `SnapshotKilde.fra_fil` leser
+fil og `nyeste_snapshot` globber katalogen. `app.py` kaller `nyeste_snapshot()`
+direkte, altså utenom enhver port. Utskillingen til `lagring_sqlite.py` og
+`lagring_fil.py` er en **gjenstående endring**, ikke en beskrivelse av dagens
+kode.
 
 ## Invariants & Rules
 
@@ -94,8 +102,8 @@ prosjektmodul. De er løvnoder, og skal forbli det.
 
 - **Binds:** FR-401, FR-403, FR-404, hele kvotehåndteringen
 - **Prevents:** at to moduler hver for seg begynner å kalle EODHD, og at en kvote på 20 kall brennes uten at noen ser hvor
-- **Rule:** `fetch_prices.hent_ett_symbol` er eneste sted `requests` brukes. Andre moduler som trenger henting, får den injisert som funksjonsargument — slik `hent_universet` allerede gjør.
-- **Opphav:** commit `352e3a2` (21.09); står som påstand i filens egen docstring
+- **Rule:** nettkall skjer **bare i skallet**, med **én hentefunksjon per kilde**, og funksjonen injiseres til den som bruker den — slik `hent_universet(..., hent=hent_ett_symbol)` allerede gjør. I dag er EODHD eneste kilde; FR-404 (NewsWeb) og FR-301 (finanskalenderen) får hver sin, i hver sin skallfil.
+- **Opphav:** commit `352e3a2` (21.09). *Regelen er omformulert i gjennomgangen: «eneste sted `requests` brukes» kunne ikke overleve FR-404 og FR-301, og ville blitt stilltiende brutt.*
 
 ### AD-3 — Én port per eid datasett
 
@@ -186,6 +194,7 @@ prosjektmodul. De er løvnoder, og skal forbli det.
 - **Prevents:** at vi to endrer skjemaet hver vår vei, og at en skjemaendring løses med «slett basen og bygg den på nytt» — noe AD-7 gjør umulig for `vurdering` og `ki_logg`
 - **Rule:** migrasjoner er nummererte SQL-filer som kjøres i rekkefølge; anvendt versjon står i en `skjema_versjon`-tabell. Ingen `ALTER TABLE` utenfor en migrasjonsfil.
 - **Merk:** dette er en **ny** beslutning, ikke ADOPTED. Den følger av AD-7, men ingen kode viser den ennå.
+- **To SQLite-forhold migrasjonene må ta hensyn til, begge verifisert:** `executescript()` kjører en implisitt `COMMIT` først, så den nærliggende måten å kjøre en `.sql`-fil på er **ikke** atomisk med oppdateringen av `skjema_versjon` — migrasjonsløperen må styre transaksjonen selv. Og SQLites `ALTER TABLE` dekker bare rename/add/drop column; typeendring, `UNIQUE`, `CHECK` og fremmednøkler krever tabellbytte med `DROP TABLE`. **For `vurdering` og `ki_logg` kolliderer det med AD-7** — se åpent punkt under.
 
 ## Consistency Conventions
 
@@ -201,16 +210,18 @@ prosjektmodul. De er løvnoder, og skal forbli det.
 
 ## Stack
 
-Seed — sannhet ved kaldstart, eid av koden når den finnes. Versjonene er lest
-fra `pyproject.toml` og CI-arbeidsflyten, ikke antatt.
+Seed — sannhet ved kaldstart, eid av koden når den finnes. Venstre kolonne er
+**faktisk låst versjon** fra `uv.lock`; gulvet fra `pyproject.toml` står i
+parentes. Skillet er ikke pedantisk: pytest kjører på **9.1.1** mens gulvet sier
+`>= 8.0`, altså et helt hovedversjonssteg ingen har besluttet.
 
 | Navn | Versjon |
 |---|---|
 | Python | 3.13 (`requires-python = ">=3.13"`, CI pinner 3.13) |
-| Flask | >= 3.0 |
-| requests | >= 2.32 |
-| python-dotenv | >= 1.0 |
-| pytest | >= 8.0 |
+| Flask | 3.1.3 (gulv `>= 3.0`) |
+| requests | 2.34.2 (gulv `>= 2.32`) |
+| python-dotenv | 1.2.3 (gulv `>= 1.0`) |
+| pytest | **9.1.1** (gulv `>= 8.0`) |
 | sqlite3 | standardbiblioteket — ingen ny avhengighet |
 | uv | `uv.lock`, CI kjører `uv sync --locked` |
 
@@ -247,10 +258,16 @@ erDiagram
     AKSJE ||--o{ MELDING : utsteder
     AKSJE ||--o{ VURDERING : vurderes
     VURDERING ||--o{ KI_LOGG : forklares_av
-    KURS }o--o| MELDING : "eks.dato (utsteder, dato)"
+    KURS }o--o| MELDING : "eks.dato — se merknad"
 ```
 
 `kurs` er gjenoppbyggbar. `vurdering` og `ki_logg` er det ikke (AD-7).
+
+**Utbyttemerkingen (FR-407) er ikke låst til NewsWeb.** Kravet sier selv at
+«datakilden er ikke lenger avhengig av NewsWeb — justeringsdagen kan leses ut av
+kursserien alene», målt 21.09 til 38 hendelser over 3 720 dagovergangner. Joinen
+mot `melding` er derfor en *mulig* kilde, ikke den bindende. Valget ligger i
+åpent punkt 4 og skal tas der, ikke her.
 
 ```text
 G74-lund-osen/
@@ -266,8 +283,8 @@ G74-lund-osen/
     graf.py              # ren regning
     app.py               # HTTP og HTML
   data/                  # gitignorert — to volumer i Docker
-    raa/                 # uforanderlige øyeblikksbilder
-    db/ose.db
+    raa/                 # uforanderlige øyeblikksbilder      [flyttes hit]
+    db/ose.db            #                                    [ny]
   tests/                 # conftest.py sperrer nett
   Dockerfile             # [ny]
 ```
@@ -282,6 +299,8 @@ G74-lund-osen/
 | To lagre (FR-406) | `lagring_sqlite.py`, `data/raa/` | AD-5, AD-6, AD-11 |
 | Dagens vurdering (FR-408) | `Vurderingslager` | AD-3, AD-7, AD-16 |
 | Meldingsfilter (FR-501..503) | `meldinger.py` | AD-1, AD-14 |
+| Utbyttemerking (FR-407) | *ikke plassert* | AD-4 — **kilde ikke valgt**, se åpent punkt 4 |
+| Kommende hendelser (FR-301..303) | *finnes ikke* | **Ingen** — se Deferred |
 | KI-logg (FR-604..606) | `KILogg` | AD-3, AD-7 — *resten utsatt* |
 | Signalet (FR-701..706) | `signalberegning.py` | AD-1, AD-13 |
 | Leveransen | `Dockerfile` | AD-9, AD-10, AD-11, AD-12 |
@@ -297,3 +316,7 @@ G74-lund-osen/
 | **De to `[FORELØPIG]`-vinduene** | Åpent punkt; utgjør punkt 4 i utgangsbetingelsen for PRD-ens draft-status |
 | **NewsWeb-hentingen** | Åpent punkt 1. Euronext forbyr automatisert henting uten tillatelse; forespørselen er ubesvart. Arkitekturen låser seg derfor **ikke** til at meldingsdelen finnes |
 | **Om SQLite godtas** | Sendt faglærer 22.09, ubesvart. Kommer et nei, byttes motoren — ikke designet |
+| **FR-301..303, kommende hendelser** | Hele PRD §4.3 var taus i første utkast av denne spinen. Det er en **tredje nettkilde** (Euronexts finanskalender) og et eid datasett uten port. `app.py` sier selv at «kommende hendelser mangler med vilje» — de ligger bak åpent punkt 1 og 16. Får sin port og sin AD når kilden er avklart, og **ikke før** |
+| **Hvem kjører migrasjonene, og når** | AD-16 sier at de finnes, ikke hvem som anvender dem. Med to `docker run`-varianter (AD-10) er både web, henting og en tredje kommando forsvarlige svar. Avgjøres når Dockerfilen skrives |
+| **Kjøremåte i containeren** | `app.py` har ingen WSGI-oppføring, og de flate importene virker i dag bare via `pythonpath = ["src"]` i pytest-konfigurasjonen. Begge må løses i Dockerfile-storyen |
+| **Skjemaendring på et uerstattelig lager** | SQLite krever `DROP TABLE` for de fleste formendringer. AD-7 forbyr sletting gjennom porten, men sier ikke om en migrasjon er unntatt. Må avgjøres før første migrasjon som rører `vurdering` |
