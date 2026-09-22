@@ -6,7 +6,7 @@ kjøres på nytt. PRD-en beholder konklusjonene; detaljene ligger her.
 Grepet er at lesestrømmen ikke skal bære tallene, men at tallene skal finnes og
 kunne kontrolleres.
 
-Målingene i §0–§6 er gjort 2026-09-20, §7 er fra 2026-09-21, og §8 og §9 fra 2026-09-22.
+Målingene i §0–§6 er gjort 2026-09-20, §7 er fra 2026-09-21, og §8–§10 fra 2026-09-22.
 
 ---
 
@@ -851,3 +851,97 @@ et sted som viser hvorfor.
 
 **Med dette er alle fem signalparametrene målt.** §7.4 låste terskel,
 volumfaktor og nøytralsone; denne paragrafen låser de to vinduene.
+
+---
+
+## 10. Kan EODHDs nyhetsendepunkt bære KI-laget?
+
+**Dato:** 2026-09-22. **Kostnad: 0 kall** — alt er lest av
+`data/nyhetstest-raa-2026-09-21.json`, øyeblikksbildet fra §7.2, og av vår egen
+korrespondanse.
+
+**Formål.** Avgjøre om `/api/news` kan erstatte NewsWeb som driftskilde for
+KI-laget hvis Euronext svarer nei 28.09 (åpent punkt 1). Spørsmålet ble stilt i
+to trinn, der trinn 1 — rettighetene — ikke skulle koste kall.
+
+### Rettighetene
+
+**Godkjenningen dekker nyhetsendepunktet eksplisitt.** Spørsmålet som ble
+besvart «ja, med fire betingelser» navnga `/api/news`, og svaret gjentar det:
+
+> Yes, we approve the limited use you described: **sending headlines and article
+> text obtained through our News API** to a third-party language model solely to
+> classify company relevance for your private, non-commercial course project.
+
+*Til sammenligning* gjaldt «Yes, we confirm both» fra samme kveld de **to andre**
+spørsmålene — «displaying» i undervisning og sammendragsstatistikk i et
+offentlig repo. Ikke nyhetene.
+
+**Men EODHD eier ikke innholdet.** Alle ti artiklene i øyeblikksbildet peker til
+`finance.yahoo.com`, og `content` er syndikert utdrag — den første ender på
+«Continue Reading» etter 394 tegn. EODHD er et mellomledd.
+
+Det er strukturelt samme forhold som hos Euronext: en leverandør gir tillatelse
+over innhold den distribuerer, ikke eier. Prosjektet har presedensen fra før —
+E24-klausulen i `docs/kilder-og-rettigheter.md` forbyr uttrykkelig å bruke
+«article headlines, summaries, links, full-text, images, metadata or other
+elements» som input til språkmodeller, og den kilden ble forkastet av nettopp
+den grunnen.
+
+Det som taler den andre veien: EODHD visste hva API-et returnerer da de
+godkjente «article text obtained through our News API». Men svaret er fra EOD
+Support Team, og `kilder-og-rettigheter.md` fører det selv som «belegg for hva
+leverandøren aksepterer, ikke en tolkning av vilkårene som binder dem».
+
+### Kvoten
+
+Målingen i §7.2: **én forespørsel med én ticker koster 5 kall.** Daglig drift
+for universet blir 15 × 5 = **75 kall per dag**, mot en dagskvote på 20.
+Bonuskvoten på 485 ville holdt i seks dager.
+
+Som *driftskilde* er det derfor utelukket uavhengig av rettighetsspørsmålet.
+
+### Hva kilden faktisk inneholder
+
+Målt på de ti DNB-artiklene:
+
+| Forhold | Målt |
+|---|---|
+| Språk | **Engelsk, 10 av 10.** Ingen norske saker |
+| Tekstens form | Utdrag, ikke hel artikkel. 394–3 131 tegn; den korteste ender på «Continue Reading» |
+| Utgiverfelt | **Finnes ikke.** Feltene er `date`, `title`, `content`, `link`, `symbols`, `tags`, `sentiment`. `tags` er tom |
+| Kategori | **Finnes ikke** |
+| Saker med selskapet i tittelen | **4 av 10** |
+| Ytterpunktet | Én sak bærer `DNB.OL` blant **24 symboler** og nevner DNB **null ganger** i teksten |
+
+**Dette lukker delvis hullet i §0.** Medietesten 17.09 sa «flere av dem handlet i
+realiteten om Infosys, om europeiske aksjer generelt», og §0 noterer selv at
+«flere av dem» ikke er et tall. Tallet for DNB er **6 av 10 uten selskapet i
+tittelen**, og mønsteret §0 beskrev — Infosys, europeiske aksjer generelt —
+gjenfinnes ordrett i titlene. Målingen gjelder ti artikler for ett selskap og
+erstatter ikke et testsett, men den er ikke lenger uten tall.
+
+### Konklusjon: det er et annet produkt
+
+Spørsmålet var om FR-601..606 kan skrives om til denne kilden uten at kravene
+endrer karakter. **Det kan de ikke**, og grunnen er ikke språket eller formatet:
+
+PRD-ens bærende prinsipp er at **«regler sorterer, KI forklarer»**, og
+regelfilteret sorterer på NewsWebs kategoritaksonomi (FR-502, tre bøtter).
+EODHDs nyheter **har ingen kategorier** — `tags` er tom. Da har reglene ingen
+jobb, og FR-604 mister feltet «hva regelfilteret alene gjorde med den», som
+kravet selv begrunner slik: *«Uten dette finnes ingen kontrast å måle
+KI-bidraget mot.»* Suksessmålet «KI-bidrag i drift» måles i nettopp den
+kontrasten.
+
+Videre sier seksjonsingressen i §4.6: *«KI-laget brukes ikke til å avgjøre
+hvilket selskap en melding gjelder — den jobben gjør `issuerSign` bedre og
+gratis.»* EODHDs nyheter har ingen `issuerSign`, og 6 av 10 saker er ikke om
+selskapet. KI-oppgaven ville dermed blitt **nettopp den oppgaven PRD-en sier den
+ikke skal ha**.
+
+Det er relevanseksperimentets oppgave, ikke driftsoppgaven. **Relevanseksperimentet
+står urørt** og kjøres på plan A som planlagt — ~50 artikler, én gang, lokalt,
+rundt 40 kall.
+
+*Dette er en vurdering, ikke en beslutning.* Den er lagt under åpent punkt 1.
