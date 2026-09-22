@@ -1553,6 +1553,35 @@ SQLite godtas» er fjernet — den var utsatt, ikke lenger.
 
 ---
 
+## 22.09.2026 – NFR-02: et krav som var riktig i utfall og feil i mekanisme
+
+Femte krav truffet av FR-401-omskrivingen, og det eneste som overlevde alt vi
+har av kontroller.
+
+NFR-02 het «Brukeren venter aldri på en henting», og det var sant hele veien —
+etter omskrivingen er det sannere enn før, siden webserveren nå aldri henter i
+det hele tatt. Brødteksten lovet noe annet: *«Henting og KI-behandling skjer som
+bakgrunnsoppgave […] Mens en henting pågår, vises siste kjente data.»* Den
+mekanismen finnes ikke lenger, og en utvikler som oppfylte kravet ordrett ville
+bygget en bakgrunnsjobb i webserveren — som `AD-10` forbyr.
+
+**Kravet overlevde fem gjennomganger, en sjekkliste og en gjennomgangsport
+fordi det var riktig i utfall.** Alt som kontrollerte det, kontrollerte
+påstanden «venter brukeren?» — og svaret var nei, hver gang. Ingen leste det som
+en påstand om *mekanisme* før en nedbryting skulle bygge etter det.
+
+Funnet kom ikke fra en kontroll. Det kom fra å lese kravet med et annet
+spørsmål: **hva ville en utvikler faktisk gjøre med denne setningen?** FR-402 og
+FR-403 ble funnet ved å greppe på ordet «oppstart»; NFR-02 inneholder ikke det
+ordet og ville aldri dukket opp i det søket.
+
+Det er samme form som funnet om målingen tidligere samme dag: en kontroll som
+sjekker om noe er sant, fanger ikke at det er sant av feil grunn. Vi har nå tre
+eksempler på at riktig svar og riktig resonnement er to forskjellige ting — og
+ingen rutine som skiller dem.
+
+---
+
 ## DD.MM.2026 – kort tittel
 
 ### Dato / deltaker(e)

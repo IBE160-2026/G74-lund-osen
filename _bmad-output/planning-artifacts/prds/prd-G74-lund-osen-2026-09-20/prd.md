@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-22T16:07
+updated: 2026-09-22T16:52
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -904,8 +904,14 @@ Relevanseksperimentet er en engangsinnsamling og inngår ikke i daglig drift; se
 
 ### NFR-02 — Brukeren venter aldri på en henting
 
-Henting og KI-behandling skjer som bakgrunnsoppgave, ikke når en side vises.
-Mens en henting pågår, vises siste kjente data med tidsstempel.
+Henting skjer i en **egen kommando, i en egen prosess** — aldri i webserveren,
+og aldri når en side vises. Webserveren viser **alltid** siste kjente data med
+tidsstempel: ikke fordi en henting pågår, men fordi den aldri henter.
+
+*Endret 2026-09-22.* Kravet lovet opprinnelig en bakgrunnsoppgave med samtidig
+visning. Utfallet er uendret — brukeren venter fortsatt aldri — men mekanismen
+finnes ikke lenger etter omskrivingen av FR-401, og et krav som beskriver en
+bakgrunnsjobb i webserveren, ville ført en utvikler til å bryte AD-10.
 
 ### NFR-03 — Manglende data stopper ikke hovedflyten
 
