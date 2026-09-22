@@ -2,7 +2,31 @@
 title: "PRD — OSE Signal"
 status: draft
 created: 2026-09-20
-updated: 2026-09-20
+# updated settes fra klokka, aldri for hånd:
+#   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
+# Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
+updated: 2026-09-22T10:50
+#
+# Hvorfor status fortsatt er draft — og hva som skal til for å endre den.
+#
+# «draft» er IKKE en påstand om at dokumentet er uferdig. Det har vært gjennom
+# fem gjennomganger og en sjekkliste, og kravene er nummererte og begrunnet.
+# Det står som draft fordi ARKITEKTURFASEN KOMMER TIL Å ENDRE KRAV DET
+# INNEHOLDER — først og fremst FR-406.
+#
+# Statusen endres når alle fire er innfridd. Dette er en betingelse, ikke en
+# dato; ingen frist løser den ut:
+#   1. Åpent punkt 17 (database) er besluttet
+#   2. Åpent punkt 18 (Dockerfile) er besluttet
+#   3. FR-406 er oppdatert i tråd med 1 og 2
+#   4. De to gjenstående [FORELØPIG]-vinduene i §4.7 er målt: de 20 dagene i
+#      bevegelsessjekken og de 20 i interessesjekken. De var ikke med i testen
+#      i malinger.md §7.4, som låste tre parametre og ikke fem
+#
+# Betingelsen står her fordi en status uten utgangsbetingelse blir stående til
+# noen tilfeldigvis tar den opp — samme mekanisme som datoen på
+# relevanseksperimentet, som ble stående i uke 41 etter at det som blokkerte
+# det var avklart.
 ---
 
 # PRD — OSE Signal
