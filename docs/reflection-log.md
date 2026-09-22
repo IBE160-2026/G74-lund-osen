@@ -1744,6 +1744,71 @@ filnavnet og ikke diffen.
 
 ---
 
+## 22.09.2026 – Formiddagen: en teller, et bortkastet kall, og en feil beviset ikke kunne nå
+
+Kvotetelleren sto på 20 av 20, datert i går, klokka 08:32 UTC. Den late
+nullstillingen — at telleren ruller ved første betalbare kall og ikke ved
+midnatt — sto allerede dokumentert i `malinger.md` §7.1, med sitat fra EODHD.
+Jeg brukte likevel et API-kall på å finne det ut. **Forsiktigheten var riktig,
+metoden ikke:** svaret var gratis å lese, og kvoten er 20 i døgnet.
+
+Senere samme formiddag ble sorteringsfeilen i `nyeste_snapshot` funnet — ved å
+lese koden *etter* at rettingen var bevist mot ekte filer. Beviset holdt: appen
+valgte riktig fil. Feilen lå i tiebreaket ved lik dato, som de ekte filene aldri
+utløste. **En retting som virker, er ikke det samme som en feil man har
+forstått.**
+
+---
+
+## 22.09.2026 – Kontrollen: seks feil som alle var sanne om en delmengde
+
+Fire uavhengige lenser gikk gjennom alt som ble endret i løpet av dagen. 35
+funn.
+
+Seks av dem hadde samme form: **en korrekt observasjon av en delmengde, skrevet
+ned som en påstand om helheten.** `tags` var tom — i artikkel 1, av ti.
+Tegnspennet var 394–3 131 — i de tre første. «Null treff på forbeholdstekst» —
+for fire bestemte ordformer.
+
+Ingen av dem ble funnet ved å lese teksten på nytt, for teksten er velformet og
+den underliggende observasjonen er sann. Det som fant dem, var å spørre **hva
+påstanden ble lest av.** Ikke «stemmer dette?», men «hvor mye ble faktisk sett
+på?».
+
+---
+
+## 22.09.2026 – Leveranselista kan ikke kontrolleres mot en kilde
+
+`docs/innlevering.md` ble bygget på kilder i stedet for hukommelse. Underveis
+kom funnet som betyr mest: **alt vi vet om hva som skal leveres, kommer fra
+e-post og samtaler.** Det finnes ingen eksamenstekst, oppgavetekst eller
+Canvas-materiale gjengitt noe sted i repoet.
+
+Konsekvensen er konkret: lista kan ikke etterprøves mot et dokument — bare mot
+svar vi ber om. Derfor står seks punkter under «Antatt, ikke bekreftet», blant
+dem begge datoene og spørsmålet om PRD og arkitekturdokument i det hele tatt er
+innleveringskrav.
+
+---
+
+## 22.09.2026 – Gjennomgangsporten: lesere som ikke hadde skrevet det
+
+Tre uavhengige lenser gikk gjennom arkitekturspinen, hver i sitt eget
+kontekstvindu. De fant hver sin ting økta som skrev den, hadde snakket seg forbi:
+
+- en **ambisjon skrevet i beskrivende form** — lagtabellen sa at `kursdata.py`
+  ikke rører I/O, mens fila leser fil og globber katalog
+- **FR-301..303 som var helt taus** — en tredje nettkilde og et eid datasett
+  uten port, ikke i `binds`, ikke i kartet, ikke i Deferred
+- **AD-2 som ikke kunne overleve sine egne krav** — «eneste sted `requests`
+  brukes» holder ikke sammen med FR-404 og FR-301
+
+Ingen av dem ble funnet ved å lese dokumentet én gang til. De ble funnet av
+lesere som ikke hadde skrevet det — og det er hele grunnen til at porten kjøres
+i egne kontekstvinduer.
+
+---
+
 ## DD.MM.2026 – kort tittel
 
 ### Dato / deltaker(e)
