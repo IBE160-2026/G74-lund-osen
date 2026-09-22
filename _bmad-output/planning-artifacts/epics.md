@@ -401,8 +401,25 @@ bygger hver vår `ALTER TABLE` og basen slutter å være den samme hos begge.
 **Kontroll — hva testen ser etter:**
 - En tom base kjøres opp til nyeste versjon, og `skjema_versjon` viser riktig tall
 - Samme migrasjon kjørt to ganger endrer ingenting andre gang
-- En migrasjon som feiler midtveis lar **verken** skjemaet **eller** `skjema_versjon` være halvveis oppdatert
-- **Ville feilet hvis:** løperen brukte `executescript()`, som gjør en implisitt `COMMIT` først — da er migrasjonen ikke atomisk sammen med versjonsraden, og en halvveis migrasjon blir usynlig
+- **En migrasjon som feiler midtveis etterlater `skjema_versjon` uendret.** Testen skriver en migrasjon som med vilje feiler etter første setning, kjører den, og leser versjonsraden: den skal stå på tallet fra før. Skjemaet skal heller ikke være halvveis endret
+- Løperen kan kalles **to ganger fra samme prosess** uten å endre oppførsel
+- **Ville feilet hvis:** løperen brukte `executescript()`. Den gjør en implisitt `COMMIT` før den kjører noe, så den nærliggende måten å kjøre en `.sql`-fil på er **ikke** atomisk sammen med oppdateringen av `skjema_versjon`. Feilen er stille: skjemaet er halvveis endret mens versjonsraden sier at ingenting skjedde, og neste kjøring prøver den samme migrasjonen på nytt mot en base som alt er delvis migrert
+
+**To ting storyen ikke skal avgjøre:**
+
+| Åpent | Hvorfor 1.1 ikke lukker det | Hva som lukker det |
+|---|---|---|
+| **Hvem kjører migrasjonene, og når** | Storyen bygger løperen, ikke kalleren. `AD-16` sier at migrasjonene finnes, ikke hvem som anvender dem | **Story 3.1**, når Dockerfilen skrives. Merk at suksessmålet «Drift» krever at én kommando gjør hele hentingen — en egen `migrer`-kommando ville brutt det |
+| **Skjemaendring på et uerstattelig lager** | 1.1 rører ikke `vurdering`. SQLite krever `DROP TABLE` for de fleste formendringer, og `AD-7` forbyr sletting gjennom porten uten å si om en migrasjon er unntatt | **Første migrasjon som rører `vurdering`** — tidligst etter story 1.6. Beslutningen tas da, ikke nå |
+
+**Derfor skal løperen kunne kalles fra både hentekommandoen og webserverens
+oppstart, uten å endres.** Den tar en tilkobling og en katalog med migrasjoner,
+og gjør resten. Hvem som kaller den, er et valg Dockerfilen tar — ikke et valg
+denne storyen tar ved å gjøre det ene enklere enn det andre.
+
+**Og løperen skal ikke inneholde noe som foregriper det andre spørsmålet:** ingen
+`DROP TABLE`-hjelpefunksjon, ingen «rebuild table»-mekanikk, ingen unntaksvei
+for lagre `AD-7` verner. Trengs det, er det en beslutning som skal tas synlig.
 
 **Én økt:** ja.
 
