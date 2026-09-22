@@ -6,7 +6,7 @@ kjøres på nytt. PRD-en beholder konklusjonene; detaljene ligger her.
 Grepet er at lesestrømmen ikke skal bære tallene, men at tallene skal finnes og
 kunne kontrolleres.
 
-Målingene i §0–§6 er gjort 2026-09-20. §7 er fra 2026-09-21.
+Målingene i §0–§6 er gjort 2026-09-20, §7 er fra 2026-09-21 og §8 fra 2026-09-22.
 
 ---
 
@@ -658,3 +658,87 @@ parameterne som gir penest fordeling; vi har kontrollert om de valgte holder
 mot et vindu som er langt nok. Det gjør de. En søking ville dessuten hatt et
 annet problem: vi har ingen fasit å optimere mot, og modellen skal beskrive hva
 som skjedde, ikke forutsi hva som skjer.
+
+---
+
+## 8. Målinger 2026-09-22
+
+### 8.1 Første kjøring av `fetch_prices.py`, med kvotekontroll rundt
+
+**Dato:** 2026-09-22, kl. 10:32–10:34 lokal tid (08:32–08:34 UTC).
+**Kostnad: 16 kall** — 15 for universet, pluss ett diagnosekall som ikke burde
+vært brukt. Se under.
+
+**Formål.** Kjøre den rettede `fetch_prices.py` for første gang, og måle om
+bonuskvoten `extraLimit` tappes automatisk når dagskvoten brukes.
+
+**Metode.** `/api/user` lest før og etter kjøringen. Endepunktet er gratis, og
+det er nå målt og ikke bare dokumentert: fire lesninger på rad flyttet ikke
+`apiRequests` med ett eneste hakk.
+
+**Lesningen før kjøringen:**
+
+| Felt | Verdi |
+|---|---|
+| `apiRequests` | 20 |
+| `apiRequestsDate` | 2026-09-21 |
+| `dailyRateLimit` | 20 |
+| `extraLimit` | 485 |
+
+Telleren sto på 20 av 20 klokka 08:32 UTC, altså over åtte timer etter
+nullstillingen midnatt GMT. Det er den late nullstillingen §7.1 allerede har
+dokumentert med sitat: telleren henger igjen til første kall etter midnatt.
+
+**Diagnosekallet — et kall som ikke burde vært brukt.** Lesningen ble likevel
+behandlet som et mulig brudd på premisset om 20 ledige kall, og ett kall mot
+`/api/eod/EQNR.OL` ble brukt for å avgjøre saken. Telleren gikk til
+`apiRequests: 1`, `apiRequestsDate: 2026-09-22`, og `extraLimit` sto urørt.
+Svaret var riktig, men det sto i §7.1 fra før. Kallet var overflødig, og er ført
+opp her fordi kvoten er liten nok til at et bortkastet kall skal være synlig.
+
+**Kjøringen.** `uv run python src/fetch_prices.py`, intervall 2025-09-23 til
+2026-09-22.
+
+| Forhold | Resultat |
+|---|---|
+| Symboler hentet | 15 av 15 |
+| Feil | ingen |
+| Handelsdager per symbol | 249, likt for alle 15 |
+| Siste handelsdag i serien | 2026-09-21 (mandag) |
+| Fil | `data/kurser-raa-2026-09-22.json` |
+| `hentet` | `2026-09-22T08:33:34.919997+00:00` |
+
+249 dager er samme tall som signaltesten fikk 21.09 på et vindu forskjøvet én
+dag, slik §7.4 forutsatte.
+
+**Siste handelsdag er i går, ikke i dag.** Kjøringen skjedde 10:33 lokal tid,
+mens Oslo Børs fortsatt var åpen, så tirsdagens sluttkurs fantes ikke ennå.
+Vinduet er dermed flyttet én *handelsdag* i forhold til gårsdagens
+øyeblikksbilde, som endte fredag 2026-09-18. Dette er publiseringstiden i §2
+sett i praksis, og bekrefter at FR-402 må kontrollere mot forventet børsdag og
+ikke mot dagens dato.
+
+**Lesningen etter kjøringen:**
+
+| Felt | Verdi |
+|---|---|
+| `apiRequests` | 16 |
+| `apiRequestsDate` | 2026-09-22 |
+| `dailyRateLimit` | 20 |
+| `extraLimit` | 485 |
+
+**Tolkning — og hva målingen ikke svarer på.** 16 = 1 diagnosekall + 15 for
+universet. `extraLimit` er uendret på 485.
+
+Spørsmålet var om bonuskvoten tappes automatisk når dagskvoten brukes. **Det er
+ikke besvart.** Vi brukte 16 av 20, så dagskvoten ble aldri oppbrukt. Det
+målingen viser, er det svakere utsagnet: bonuskvoten tappes ikke så lenge det er
+dagskvote igjen. Hva som skjer ved kall nummer 21 — om det gir HTTP 402, om det
+trekkes fra `extraLimit`, eller om `extraLimit` må aktiveres først — er fortsatt
+åpent, og er det samme forbeholdet §7.1 tok da feltet ble «observert, ikke
+testet».
+
+Å svare krever fire kall til i dag, og de kallene tar vi ikke uten at det er
+bestemt hva svaret skal brukes til.
+
+**Brukt i dag: 16 av 20. Igjen: 4.**
