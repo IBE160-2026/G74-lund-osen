@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-23T17:48'
+updated: '2026-09-23T17:58'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -34,14 +34,17 @@ I/O; alt som rører nett, disk eller HTTP ligger i skallet. Lagring nås bare
 gjennom porter — `typing.Protocol` — slik at kjernen aldri vet om en serie kom
 fra en fil, en database eller en test.
 
-Paradigmet er ikke valgt her. Det ble bygget 20.–21.09 og står ordrett i hver
-kjernemodul sin docstring: *«Ren logikk. Ingen API-kall, ingen filer, ingen
-HTML.»* Spinen navngir det og gjør det bindende.
+Paradigmet er ikke valgt her. Det ble bygget 20.–21.09 og står i hver
+kjernemodul sin docstring, med ulik ordlyd. Fire av fem åpner med «Ren logikk»
+(`signalberegning.py`, `meldinger.py`, `markedsoversikt.py`, `aksjedetalj.py`),
+mens `graf.py` åpner med «Ren regning». Bare `aksjedetalj.py` har setningen
+*«Ren logikk. Ingen API-kall, ingen filer, ingen HTML.»* ordrett. Spinen navngir
+mønsteret og gjør det bindende.
 
 | Lag | Filer | Regel |
 |---|---|---|
 | **Kjerne** | `signalberegning.py`, `meldinger.py`, `markedsoversikt.py`, `aksjedetalj.py`, `graf.py` | Ingen import av `requests`, `sqlite3`, `pathlib`, `flask` |
-| **Porter** | `kursdata.py` | Bare `Protocol`-definisjoner og verdityper |
+| **Porter** | `kursdata.py` | Protokoller, verdityper og minneimplementasjonene testene bruker (`MinneKilde`, `MinneKurslager`). Ingen I/O — brytes i dag, se under |
 | **Skall** | `app.py` (HTTP), `fetch_prices.py` (nett), lagringsadapteren (SQLite) | Eneste lag som kjenner teknologi |
 
 **`kursdata.py` oppfyller ikke portregelen i dag, og det skal stå her til den
