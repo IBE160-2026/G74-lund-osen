@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-23T19:40
+updated: 2026-09-23T19:44
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1179,3 +1179,29 @@ punkt som renummereres, mister sporet tilbake til målingen som begrunnet det.
 og fordelingen gjøres internt etter hva som passer når punktet skal tas. Det
 eierfeltet skal sikre, er at punktet har en frist og noen som svarer for den —
 ikke at navnet er låst på forhånd. Punkt 2, 3, 6, 8–12 og 15 har frist, men mangler eier.
+
+### v1.1 — vurderes etter at v1 er kontrollert
+
+*Lagt til 2026-09-23.* Dette er ideer, ikke krav og ikke stories. Ingen av dem
+tas før v1 er kontrollert og virker, jf. prioriteringen 23.09. Hver står med det
+den avhenger av.
+
+| Idé | Avhenger av | Forbehold |
+|---|---|---|
+| **Sektorvisning:** endring per sektor for dag, uke og måned | Ingenting nytt. Sektor finnes i `AKSJEUNIVERS`, og tallene regnes fra kursserien | 15 aksjer gir få per sektor: 8 sektorer, der Energi har 4, fire har 2 og **tre har bare én** (Industri, Telekom, Konsum). En «sektor» med én aksje er aksjen selv. Vurderes etter brukertesten (story 8.1) |
+| **Større aksjeunivers enn 15** | Målingen av `extraLimit` 23.09 (`malinger.md` §11): bonuskvoten trer inn ved kall 21, men den er på 485 og tar slutt | Se regnestykket under. Det skal stå før idéen vurderes |
+| **Navigasjon mellom flere skjermbilder** | Story 8.2, som skal si hvordan et tredje skjermbilde ville passet inn, uten å bygge det | — |
+
+**Regnestykket for et større univers.** Det er regnet 23.09 fra målte tall: én
+henting per døgn, ett kall per symbol (§2), dagskvote 20, og bonus 484 etter
+kall 21. **Det forutsettes at bonusen ikke fylles på. Det er ikke kjent.**
+
+| Symboler | Kall per henting | Fra bonus per døgn | Bonusen varer |
+|---:|---:|---:|---|
+| 15 | 15 | 0 | Urørt. Margin 5 kall per døgn |
+| 20 | 20 | 0 | Urørt, men **margin 0**: hver ekstra kjøring tar fra bonus |
+| 25 | 25 | 5 | 96 døgn (484 / 5) |
+| 30 | 30 | 10 | 48 døgn (484 / 10) |
+
+**Antall rader per skjermbilde avgjøres ikke her.** 15 er valgt av kvoten, ikke
+av skjermen. Om oversikten er for tett, er et spørsmål til brukertesten (story 8.1).
