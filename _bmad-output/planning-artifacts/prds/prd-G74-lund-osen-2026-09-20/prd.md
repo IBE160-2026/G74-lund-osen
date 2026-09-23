@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-23T18:40
+updated: 2026-09-23T19:06
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1112,7 +1112,7 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 
 | # | Punkt | Eier | Frist |
 |---|---|---|---|
-| 5 | **Relevanseksperimentet, del 1: utvalgskriterier, innsamling og manuell merking.** Flyttet fram fra uke 41 den 2026-09-21. Uke 41 ble satt mens eksperimentet var blokkert av to ting — om vilkårene tillot språkmodellbruk, og om `/api/news` svarte for `.OL`. **Begge ble avklart 21.09**, men datoen ble aldri flyttet etterpå. Rekkefølge: (a) utvalgskriteriene skriftlig — hvilke åtte selskaper, hvor mange artikler per selskap, og hva som teller som at en artikkel handler om selskapet; (b) innsamlingen, med kalltall-kontrollen som **første** forespørsel: to tickere, og se om `apiRequests` flytter seg 10 eller 15, så kostnaden for resten er kjent før den brukes. Tas fra bonuskvoten `extraLimit` 485 — men den er observert, ikke testet, se `malinger.md` §7.1 | Gruppen | Etter punkt 17 og 18 |
+| 5 | **Relevanseksperimentet, del 1: utvalgskriterier, innsamling og manuell merking.** Flyttet fram fra uke 41 den 2026-09-21. Uke 41 ble satt mens eksperimentet var blokkert av to ting — om vilkårene tillot språkmodellbruk, og om `/api/news` svarte for `.OL`. **Begge ble avklart 21.09**, men datoen ble aldri flyttet etterpå. Rekkefølge: (a) utvalgskriteriene skriftlig — hvilke åtte selskaper, hvor mange artikler per selskap, og hva som teller som at en artikkel handler om selskapet; (b) innsamlingen, med kalltall-kontrollen som **første** forespørsel: to tickere, og se om `apiRequests` flytter seg 10 eller 15, så kostnaden for resten er kjent før den brukes. Tas fra bonuskvoten `extraLimit`. *Prøvd 2026-09-23, `malinger.md` §11:* kall nummer 21 lyktes og trakk fra bonuskvoten (485 → 484), så den brukes automatisk når dagskvoten er tom. Kalltallet per ticker er fortsatt utledet, ikke målt | Gruppen | Etter punkt 17 og 18 |
 | 5b | **Relevanseksperimentet, del 2: KI-klassifiseringen.** Kan ikke gjøres ennå, og det er tre grunner, ikke én: KI-laget finnes ikke som kode, ingen modelltjeneste er valgt, og **betingelse 4 i EODHDs godkjenning — at modelltjenesten ikke trener på innholdet — er udokumentert.** Den må være ført før artikkeltekst sendes inn i en modell, se `docs/kilder-og-rettigheter.md` | Gruppen | Når KI-laget finnes |
 | 6 | **Usikkerhetskriteriene er skrevet for medieartikler.** Kjennetegn 1 bærer svakt når utstederen selv er avsender | | Før KI-laget implementeres |
 | 8 | **Oppstart av tilbakekjøpsprogram** er ekte nyhet, men filtreres bort sammen med de ukentlige statusrapportene | | Før innlevering |

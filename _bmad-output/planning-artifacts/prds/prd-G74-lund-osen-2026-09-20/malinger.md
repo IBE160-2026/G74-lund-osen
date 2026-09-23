@@ -6,7 +6,7 @@ kjøres på nytt. PRD-en beholder konklusjonene; detaljene ligger her.
 Grepet er at lesestrømmen ikke skal bære tallene, men at tallene skal finnes og
 kunne kontrolleres.
 
-Målingene i §0–§6 er gjort 2026-09-20, §7 er fra 2026-09-21, og §8–§10 fra 2026-09-22.
+Målingene i §0–§6 er gjort 2026-09-20, §7 er fra 2026-09-21, §8–§10 fra 2026-09-22, og §11 fra 2026-09-23.
 
 ---
 
@@ -327,6 +327,9 @@ nyhetstesten i 7.2 kunne kjøres.
 observert, ikke testet — vi vet ikke om det er den kvoten
 relevanseksperimentet er tenkt å bruke, og det er ikke kontrollert mot
 dokumentasjonen.
+
+*Besvart 2026-09-23, §11:* kall nummer 21 lyktes og trakk fra `extraLimit`
+(485 → 484). Bonuskvoten brukes automatisk når dagskvoten er tom.
 
 ### 7.2 Nyhetstesten mot en `.OL`-ticker
 
@@ -738,6 +741,9 @@ trekkes fra `extraLimit`, eller om `extraLimit` må aktiveres først — er fort
 åpent, og er det samme forbeholdet §7.1 tok da feltet ble «observert, ikke
 testet».
 
+*Besvart 2026-09-23, §11:* HTTP 200, og `extraLimit` sank fra 485 til 484.
+Ingen aktivering trengs.
+
 Å svare krever fire kall til i dag, og de kallene tar vi ikke uten at det er
 bestemt hva svaret skal brukes til.
 
@@ -981,3 +987,111 @@ står urørt** og kjøres på plan A som planlagt — ~50 artikler, én gang, lo
 rundt 40 kall.
 
 *Dette er en vurdering, ikke en beslutning.* Den er lagt under åpent punkt 1.
+
+---
+
+## 11. Kvoten brukt opp med vilje, og gjentatt henting samme dag
+
+**Dato:** 2026-09-23, kl. 19:03–19:05 lokal tid (17:03–17:05 UTC).
+**Kostnad: 21 kall** — 20 av dagskvoten og ett fra bonuskvoten. Kallene var avtalt
+på forhånd og hadde tre spørsmål:
+
+1. Hva `/api/user` viser etter en full henting.
+2. Om to hentinger samme dag gir samme data.
+3. Hva som skjer med kall nummer 21.
+
+**Metode.** `/api/user` ble lest før og etter hvert steg. Endepunktet er gratis,
+jf. §7.1. Bare kvotefeltene er ført her. Svaret inneholder også navn og e-post,
+og de er ikke skrevet ned noe sted. Rådata ligger i `data/`, som er gitignorert:
+
+| Fil | Innhold |
+|---|---|
+| `kurser-raa-2026-09-23.json` | Steg 1, alle 15, skrevet av `fetch_prices.py` |
+| `gjentak-raa-2026-09-23.json` | Steg 2, fem symboler hentet på nytt |
+| `kall21-raa-2026-09-23.json` | Steg 3, HTTP-status, rate-limit-headere og hele responsen |
+
+Ingen kode i repoet ble endret. Steg 2 og 3 brukte skript utenfor repoet som kaller
+den eksisterende `hent_ett_symbol`, eller `BASE_URL` direkte.
+
+### Kall for kall
+
+| Tid (UTC) | Steg | `apiRequests` | `apiRequestsDate` | `extraLimit` |
+|---|---|---:|---|---:|
+| 17:03:50 | Før alt | 16 | 2026-09-22 | 485 |
+| 17:04:12 | Etter steg 1, 15 kall | 15 | 2026-09-23 | 485 |
+| 17:04:31 | Etter steg 2, 5 kall | 20 | 2026-09-23 | 485 |
+| 17:05:07 | Før kall 21 | 20 | 2026-09-23 | 485 |
+| 17:05:09 | Etter kall 21 | **20** | 2026-09-23 | **484** |
+
+**Før alt:** telleren sto på 16 med datoen 22.09, altså gårsdagens telling. Den
+blir hengende til første betalte kall etter midnatt GMT (§7.1). Brukt 23.09 før
+målingen: **0**.
+
+### Steg 1 — full henting, 15 kall
+
+`uv run python src/fetch_prices.py`, intervall 2025-09-24 til 2026-09-23. Alle
+15 svarte med 249 handelsdager. **Siste dag er 2026-09-22 for alle** — kl. 19:04
+lokal tid var 23.09 ikke publisert ennå, jf. publiseringstiden i §2. Telleren
+gikk fra «16 i går» til 15 i dag. `extraLimit` sto urørt.
+
+### Steg 2 — fem hentet på nytt, 5 kall
+
+EQNR, DNB, KOG, AKRBP og NHY, med samme intervall som steg 1. **Alle fem er
+identiske med steg 1**, felt for felt i alle 249 rader. Telleren gikk til 20.
+
+**Hva dette prøver, og hva det ikke prøver.** AD-5 bygger på at EODHD regner
+`adjusted_close` om bakover når det kommer et nytt utbytte. To hentinger med to
+minutters mellomrom, uten noe nytt utbytte imellom, viser at hentingen gir samme
+svar hver gang. De prøver ikke premisset.
+
+**En prøve som kommer nærmere, uten kostnad:** i går (`kurser-raa-2026-09-22.json`,
+hentet 22.09 kl. 10:33 lokal tid) og i dag har 248 felles datoer for hvert av de
+15 symbolene. Sammenlikningen viser:
+
+| Felt | Ulike verdier over 15 × 248 |
+|---|---:|
+| `close` | 0 |
+| `adjusted_close` | 0 |
+| `volume` | **1** |
+
+**Ingen `adjusted_close` ble regnet om mellom 22.09 og 23.09.** AD-5-premisset
+er dermed verken bekreftet eller avkreftet, fordi ingen av de 15 hadde nytt
+utbytte i vinduet. Det ene avviket er MOWI 2026-09-21: `volume` 1 386 194 i går
+og **1 374 994** i dag (−11 200), med `close` uendret på 193,7. 21.09 var den
+**siste** raden i gårsdagens øyeblikksbilde. Den ble hentet mens børsen var åpen,
+dagen etter. Den nyeste raden kan altså bli korrigert i etterkant. Det er en
+annen grunn enn utbyttet til at serien aldri skjøtes på (AD-5): en skjøtet serie
+ville beholdt det foreløpige tallet. Ett tilfelle er ikke en rate.
+
+### Steg 3 — kall nummer 21
+
+Ett `/api/eod`-kall for EQNR.OL etter at dagskvoten var brukt opp.
+
+**Utfall: kallet lykkes, og `extraLimit` synker.** HTTP 200, hele serien
+(249 rader, 28 701 tegn), identisk med EQNR fra steg 1. `apiRequests` står fortsatt
+på 20, og `extraLimit` gikk fra 485 til 484.
+
+Rå respons, starten av teksten. Hele svaret ligger i
+`data/kall21-raa-2026-09-23.json`:
+
+```
+[{"date":"2025-09-24","open":250,"high":256.4,"low":248,"close":254.9,"adjusted_close":242.6449,"volume":3345801},{"date":"2025-09-25", …
+```
+
+Svaret hadde headerne `X-RateLimit-Limit: 1200` og `X-RateLimit-Remaining: 1198`.
+Det er en annen grense enn dagskvoten, og den er ikke tolket her.
+
+### Hva dette avgjør
+
+**Spørsmålet fra §7.1 og §8.1 er besvart: bonuskvoten tappes automatisk når
+dagskvoten er brukt opp.** Den trenger ikke aktiveres, og kall 21 gir ingen
+feilkode. To konsekvenser:
+
+- **Relevanseksperimentet kan trekke fra `extraLimit`** (åpent punkt 5). Kalltallet
+  per ticker (§7.2, «~40 kall») er fortsatt utledet og ikke målt.
+- **En henting for mye tar ikke stopp, den koster bonuskvote.** NFR-01 og
+  FR-402-kontrollen er det som hindrer at 485 bonuskall går tapt stille. Hentes det
+  to ganger om dagen, stopper det ikke ved 20. Det tærer på bonusen.
+
+Det målingen **ikke** avgjør: om det finnes noe tak når `extraLimit` når 0.
+Det er ikke prøvd, og det skal ikke prøves.
