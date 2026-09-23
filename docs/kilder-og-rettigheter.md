@@ -716,6 +716,17 @@ Forespørselen beskriver det vi faktisk gjør:
 **Frist: 2026-09-28.** Den er vår egen — brevet ber ikke om svar innen noen dato,
 og Euronext har ikke lovet noe.
 
+**Purring sendt 2026-09-22**, i samme tråd. Den spør om forespørselen 21.09 kan
+innvilges og om svaret også gjelder finanskalenderen (spørsmål 1). Den stiller
+dessuten et spørsmål det første brevet ikke hadde med: om meldingstitler og
+-tekst kan sendes til en tredjeparts språkmodell (spørsmål 2). Det er
+overføringsklausulen, *«otherwise transfer any of the Content to any third
+person»*. Purringen tilbyr også et smalere alternativ: et lite, manuelt innsamlet
+utvalg, brukt én gang til et dokumentert klassifiseringseksperiment. Brevet
+setter ingen dato, og vår frist 2026-09-28 står uendret internt. Teksten er ført
+i `docs/epost-til-euronext.md`, men ingen sendt kopi finnes lokalt, så
+ordlyden er slik den ble gjengitt.
+
 ### Beslutningen gruppen har tatt i mellomtiden
 
 Hentingen fortsetter mens forespørselen er ubesvart. Det er et valg, ikke en
@@ -820,7 +831,9 @@ lenger uimotsagt» over.
       2026-09-21.** Programmert henting fra `api3.oslo.oslobors.no`, ett uttrekk
       per døgn for ca. 15 utstedere, lokal kjøring, offentlig repo med utledet
       statistikk, og samme spørsmål for finanskalenderen på
-      `live.euronext.com`. **Svar avventes. Egen beslutningsfrist 2026-09-28.** Brevet er
+      `live.euronext.com`. **Svar avventes. Egen beslutningsfrist 2026-09-28.**
+      **Purret 2026-09-22** i samme tråd, med et nytt spørsmål om overføring
+      til en språkmodell og et smalere alternativ. Brevet er
       arkivert ordrett i `docs/epost-til-euronext.md`. Faglærer er *ikke*
       varslet — besluttet av gruppen, se «Beslutningen gruppen har tatt i
       mellomtiden»
@@ -844,10 +857,12 @@ lenger uimotsagt» over.
       metadata og titler), **Display** (demonstrasjonen i undervisning) og
       **Source code** (det offentlige repoet med utledede tall og siterte
       titler). I tillegg spør brevet om samme svar gjelder finanskalenderen på
-      `live.euronext.com`.
+      `live.euronext.com`. Purringen 22.09 la til en femte del: overføring av
+      titler og tekst til en tredjeparts språkmodell. Et ja til de fire første
+      er ikke et ja til den.
 
       Kommer det et kort svar, skal det derfor ikke føres som ja eller nei.
-      **Før hvilke av de fire delene som er dekket og hvilke som ikke er det**,
+      **Før hvilke av de fem delene som er dekket og hvilke som ikke er det**,
       og om kalenderen er besvart. Et ja til «Retrieval» er ikke automatisk et
       ja til «Storage» — det står allerede i `docs/epost-til-euronext.md`,
       seksjonen «En klausul brevet ikke nevner ved navn», og huskeregelen her
