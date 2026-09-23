@@ -1142,6 +1142,12 @@ person, under 5 minutter, uten hjelp | Før prosjektinnlevering».
 - Funnene er ført i `docs/` med dato, sammen med hva som endres og hva som ikke endres
 - **Ville feilet hvis:** personen ble spurt «hvorfor skiller denne seg ut?». Da er forklaringen oppfordret, og testen måler om personen kan svare på et spørsmål, ikke om skjermen forklarer
 
+**Spørsmål testen skal svare på** *(lagt til 2026-09-23)*: **Er oversikten for
+tett med 15 rader?** 15 er valgt av kvoten, ikke av skjermen, og antall rader
+per skjermbilde avgjøres ikke før testen har svart. Svaret observeres, det
+spørres ikke om: stopper personen, scroller tilbake eller mister raden de leste,
+noteres det, med tidspunkt.
+
 **Tidspunkt:** rett etter Epic 2, ikke før innlevering. Suksessmålets frist
 «Før prosjektinnlevering» står fortsatt som ytre grense.
 
@@ -1161,6 +1167,10 @@ inntrykket ikke bare hviler på at logikken er riktig.
 - Et dokument viser at designet ble vurdert, med konkrete forbedringer. Hver forbedring er knyttet til et skjermbilde og et krav
 - Forbedringene som tas inn, blir egne små endringer med test
 - **Ville feilet hvis:** gjennomgangen endte i nye skjermbilder eller ny funksjonalitet. Da er det design fra bunnen og en utvidelse av omfanget, ikke en gjennomgang
+
+**Føring** *(lagt til 2026-09-23, fra v1.1-idéene i `prd.md` §8)*: gjennomgangen
+skal si **hvordan et tredje skjermbilde ville passet inn** i navigasjonen, uten å
+bygge det. Det er et svar på papir, ikke en endring.
 
 **Avhenger av:** 8.1. **Én økt:** ja.
 
