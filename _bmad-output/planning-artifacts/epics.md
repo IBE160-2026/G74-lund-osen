@@ -711,8 +711,9 @@ epicen:
    stille fra bonuskvoten (`extraLimit` 485 → 484). Kontrollen mot forventet
    børsdag i FR-402 er dermed et **kvotevern**, ikke bare en datakontroll.
    Story 2.3 skal prøves mot det: en andre kjøring samme børsdag gjør null kall.
-2. **Siste rad kan endres i etterkant.** MOWI 21.09 fikk volumet korrigert fra
-   1 386 194 til 1 374 994, fordi raden var hentet mens børsen var åpen. Det er
+2. **Siste rad kan endres i etterkant.** MOWI 21.09 fikk volumet justert ned
+   0,8 % ved neste henting, med sluttkursen uendret, fordi raden var hentet mens
+   børsen var åpen. Det er
    en egen grunn til å erstatte i stedet for å skjøte, uavhengig av utbytter
    (AD-5). Det reiser et spørsmål epicen må svare på: **når på døgnet skal
    hentekommandoen kjøres**, når dagens kurs ikke var publisert kl. 19:04? Ført

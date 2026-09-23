@@ -833,6 +833,30 @@ slik de kom fra leverandøren:
 Det betyr at en historikkomskriving ikke er nødvendig. Det finnes ingenting å
 fjerne, og ingen commit å skrive om.
 
+**Avvik, funnet og rettet 2026-09-23.** Rå enkeltverdier fra EODHD — kurs eller
+volum for en bestemt dag — har likevel stått i repoet:
+
+| Kom inn | Commit | Hva | Hvor |
+|---|---|---|---|
+| 20.09, kl. 16:00 | `640c5d1` | DNOs sluttkurs 18.09 | `malinger.md` §1, `begrunnelser.md` |
+| 21.09 | `5e96149` | Aker BPs volum 18.09, i eksempelet til FR-706 | `prd.md`, PRD-memloggen |
+| 23.09 | `80586a6`, `f7f7f8c` | MOWIs volum og sluttkurs 21.09, og én hel rad fra `/api/eod` | `malinger.md` §11, `prd.md` punkt 23, `epics.md`, PRD-memloggen |
+
+**Kontrollen over var riktig om det den så etter, men så ikke etter
+enkeltverdier.** Den ble gjort kl. 21:58 20.09 (`499709f`) og lette etter
+rålinjer og JSON-blokker. DNO-kursen lå der allerede fra kl. 16:00 samme dag.
+
+Alle verdiene er fjernet eller byttet ut 23.09 med tall vi har regnet ut selv —
+prosent og forholdstall — og poenget i hver tekst er beholdt. **De ligger
+fortsatt i git-historikken.** Vi force-pusher ikke (regel 7 i `CLAUDE.md`).
+
+**Regelen presisert:** rå enkeltverdier fra EODHD skal ikke stå i repoet. Tall vi
+har regnet ut selv — medianer, prosenter, forholdstall — kan stå. EODHD
+bekreftet 21.09 at egne utledede tall ikke er deres data («we confirm both», se
+over). Søket 23.09 gikk gjennom alle sporede filer etter alle kurs- og
+volumverdier i `data/`. Utover de over fant det bare medianer (§1) og oppdiktede
+testtall.
+
 Mønsteret som gjorde dette mulig, er verdt å notere: `data/` ble gitignorert før
 den første målingen ble kjørt. Rådata har aldri vært innom en commit, og da
 trengs ingen opprydding. `.gitignore` er utvidet med mønstre for rådatafiler som

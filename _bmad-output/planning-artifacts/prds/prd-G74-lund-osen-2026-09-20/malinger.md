@@ -79,7 +79,7 @@ står i `docs/kilder-og-rettigheter.md`.
 Median for universet: 223,9 MNOK per dag.
 
 **Funnet som avgjorde kriteriet.** DNO omsetter 1 956 182 aksjer per dag — flere
-enn DNB — men til 19,62 kroner blir det 34,7 MNOK mot DNBs 400,4 MNOK. MPCC
+enn DNB — men til en lav aksjekurs blir det 34,7 MNOK mot DNBs 400,4 MNOK. MPCC
 viser samme mønster. Målt på antall aksjer alene ville begge de lavest omsatte
 symbolene sett ut som de hørte hjemme øverst på lista. Derfor måles likviditet i
 kroner, ikke i volum.
@@ -1056,8 +1056,8 @@ hentet 22.09 kl. 10:33 lokal tid) og i dag har 248 felles datoer for hvert av de
 
 **Ingen `adjusted_close` ble regnet om mellom 22.09 og 23.09.** AD-5-premisset
 er dermed verken bekreftet eller avkreftet, fordi ingen av de 15 hadde nytt
-utbytte i vinduet. Det ene avviket er MOWI 2026-09-21: `volume` 1 386 194 i går
-og **1 374 994** i dag (−11 200), med `close` uendret på 193,7. 21.09 var den
+utbytte i vinduet. Det ene avviket er MOWI 2026-09-21: `volume` ble **justert
+ned 0,8 %** ved neste henting, med `close` uendret. 21.09 var den
 **siste** raden i gårsdagens øyeblikksbilde. Den ble hentet mens børsen var åpen,
 dagen etter. Den nyeste raden kan altså bli korrigert i etterkant. Det er en
 annen grunn enn utbyttet til at serien aldri skjøtes på (AD-5): en skjøtet serie
@@ -1071,12 +1071,7 @@ Ett `/api/eod`-kall for EQNR.OL etter at dagskvoten var brukt opp.
 (249 rader, 28 701 tegn), identisk med EQNR fra steg 1. `apiRequests` står fortsatt
 på 20, og `extraLimit` gikk fra 485 til 484.
 
-Rå respons, starten av teksten. Hele svaret ligger i
-`data/kall21-raa-2026-09-23.json`:
-
-```
-[{"date":"2025-09-24","open":250,"high":256.4,"low":248,"close":254.9,"adjusted_close":242.6449,"volume":3345801},{"date":"2025-09-25", …
-```
+Råsvaret ligger lokalt i `data/kall21-raa-2026-09-23.json` og publiseres ikke.
 
 Svaret hadde headerne `X-RateLimit-Limit: 1200` og `X-RateLimit-Remaining: 1198`.
 Det er en annen grense enn dagskvoten, og den er ikke tolket her.

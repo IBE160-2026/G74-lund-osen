@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-23T19:44
+updated: 2026-09-23T21:42
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -963,7 +963,7 @@ tro på det — altså nøyaktig den skjulte formelen kravet finnes for å unng�
 Med målingen kan brukeren regne etter:
 
 > Trend +1 (+3,1 % mot MA50) · Bevegelse −1 (−3,5 % mot 1,1 % standardavvik) ·
-> Interesse −1 (volum 3 975 318 mot median 802 964) → styrke 3, retning blandet
+> Interesse −1 (volum 4,95 × medianen) → styrke 3, retning blandet
 
 De tre tallene til høyre er grunnlaget. De to til venstre er utledet av dem.
 Ingen vekting og ingen skjult formel. Dette er kravet som gjør signalet
@@ -1122,7 +1122,7 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 | 16 | **Språkgjenkjenningen slår systematisk feil for Vår Energi.** `gjett_spraak` lar ett norsk tegn avgjøre alene, og `VAR` heter *Vår Energi ASA*. Hver engelsk melding derfra bærer «å» i sitt eget firmanavn og leses som norsk, så FR-501 vil beholde den engelske versjonen hver gang selskapet sender et meldingspar. Dette er ikke en kantsituasjon — det er hver gang, for én av de femten, og det vises i en norsk applikasjon. **To forsvarlige veier:** bygge om språkregelen, eller la den stå og forklare avviket i demonstrasjonen. Det som ikke er forsvarlig er at valget tas ved at ingen tar det opp | Gruppen | **Før UI-arbeidet starter** | FR-501, demonstrasjonen |
 | 20 | **Hvordan skal FR-408s eget spørsmål kunne stilles?** Kravet begrunner seg med «hva sa løsningen om EQNR for to uker siden?», men ingen visning, kommando eller spørring i v1 svarer på det. Historikken er da **lagret, men ikke besvarbar**. Tre veier: en visning i aksjedetaljen, en egen kommando, eller en direkte spørring mot basen under demonstrasjonen. FR-409 binder alle tre til å bevare skillet mellom «ingen rad» og «styrke 0» | Gruppen | **Før demonstrasjonen** | FR-408s begrunnelse |
 | 19 | **Forespørselen til Euronext ba aldri om å sende innhold til en modelltjeneste.** Vilkårene forbyr å «otherwise transfer any of the Content to any third person», og parentesen strekker det til «others in your company or organisation» — altså svært bredt. Å sende meldingstekst inn i en språkmodell er en slik overføring. Brevet 21.09 beskriver fire ting — Retrieval, Storage, Display, Source code — og **ingen av dem nevner en modelltjeneste**; kontrollert 22.09, null treff på «language model», «LLM», «third person» og «third party» i hele brevet. Manuell innsamling løser klausul 1 om automatisert henting, men **ikke** overføringsklausulen. **Konsekvens: selv et fullt ja på alle fire delene lukker ikke dette.** Det må stilles som eget spørsmål. Kalenderspørsmålet i samme brev hjelper ikke: det ber om «the same answer» og arver dermed de fire overskriftenes rekkevidde, inkludert utelatelsen. **Purret 22.09, og purringen dekker begge deler** — de fire opprinnelige og overføringen — så et kort svar kan ikke lenger se fullstendig ut mens det bare dekker det ene. Purringen tilbyr også et smalere alternativ: et lite, manuelt innsamlet utvalg brukt én gang. Ordrett i `docs/epost-til-euronext.md` | Gruppen | **Sammen med punkt 1, 2026-09-28** | Plan B for relevanseksperimentet; KI-laget over NewsWeb-innhold |
-| 23 | **Når på døgnet skal hentekommandoen kjøres?** Kl. 19:04 lokal tid 2026-09-23 var dagens sluttkurs ikke publisert: alle 15 serier sluttet 22.09 (`malinger.md` §11). Og en rad hentet mens børsen er åpen, kan bli korrigert i etterkant — MOWI 21.09 fikk volumet endret fra 1 386 194 til 1 374 994. EODHD dokumenterer bare «2–3 timer etter at børsen stenger» (§2). Kjøres kommandoen for tidlig, får brukeren gårsdagens data eller en foreløpig rad; kjøres den to ganger, trekkes det stille fra bonuskvoten. Lagt til 2026-09-23 | Gruppen | Før story 2.1 | FR-402, story 2.1–2.3 |
+| 23 | **Når på døgnet skal hentekommandoen kjøres?** Kl. 19:04 lokal tid 2026-09-23 var dagens sluttkurs ikke publisert: alle 15 serier sluttet 22.09 (`malinger.md` §11). Og en rad hentet mens børsen er åpen, kan bli korrigert i etterkant — MOWI 21.09 fikk volumet justert ned 0,8 % ved neste henting, med sluttkursen uendret. EODHD dokumenterer bare «2–3 timer etter at børsen stenger» (§2). Kjøres kommandoen for tidlig, får brukeren gårsdagens data eller en foreløpig rad; kjøres den to ganger, trekkes det stille fra bonuskvoten. Lagt til 2026-09-23 | Gruppen | Før story 2.1 | FR-402, story 2.1–2.3 |
 
 ### Må følges opp
 

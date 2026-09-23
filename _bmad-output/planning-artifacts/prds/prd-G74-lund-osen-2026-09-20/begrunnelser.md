@@ -72,7 +72,7 @@ er laget for.
 ### Hvorfor omsetning i kroner, ikke antall aksjer
 
 Målingen avdekket at det opplagte målet var feil mål. DNO omsetter 1 956 182
-aksjer per dag — flere enn DNB — men til 19,62 kroner blir det 34,7 MNOK mot
+aksjer per dag — flere enn DNB — men til en lav aksjekurs blir det 34,7 MNOK mot
 DNBs 400,4 MNOK. MPCC viser samme mønster. Målt på antall aksjer alene ville
 begge de lavest omsatte symbolene sett ut som de hørte hjemme øverst på lista.
 
