@@ -464,7 +464,7 @@ Ingen feltnavn inneholder *lang*, *locale*, *culture* eller *språk*. Antakelsen
 i `src/meldinger.py` — at NewsWeb kanskje bærer en språkkode — er dermed
 avkreftet. FR-501 må bygge på kjennetegn, ikke på et felt.
 
-#### Tre sidefunn
+#### Fire sidefunn
 
 **1. `category` er tospråklig, men det er kategorinavnet, ikke meldingen.**
 Feltet er en liste med ett objekt: `{id, category_no, category_en}`. Alle 86
