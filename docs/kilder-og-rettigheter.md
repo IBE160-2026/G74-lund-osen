@@ -378,6 +378,34 @@ enn den som svarte om språkmodeller. Samme forbehold gjelder som over: dette er
 belegg for hva leverandøren aksepterer, ikke en endring i vilkårsteksten.
 Vilkårene sier fortsatt det de sa.
 
+### Plan B for KI-laget: dekker svarene utledede kursverdier til en modell?
+
+**Kontrollert 2026-09-23**, mot de to svarene over. Plan B sender *utledede*
+verdier fra EODHD-kurser — fortegn og målinger for de tre sjekkene, styrke og
+retning — til en tredjeparts språkmodell, som skal forklare signalet. Rå
+kursserier sendes ikke.
+
+**Ingen av de to svarene dekker dette direkte.**
+
+| Svar | Hva det dekker, ordrett | Hvorfor det ikke dekker plan B |
+|---|---|---|
+| Alejandro C., 21.09 | «sending headlines and article text obtained through our News API to a third-party language model solely to classify company relevance» | Et annet endepunkt (`/api/news`, ikke `/api/eod`), et annet innhold (artikler, ikke kurser) og et annet formål (relevans, ikke forklaring) |
+| Lana A., 21.09 | «Yes, we confirm both» — egne sammendragstall er ikke Informasjonen «in repackaged form» | Spørsmålet gjaldt å **publisere** utledede tall i repoet, ikke å **sende** dem til en tredjepart |
+
+**Det nærmeste belegget** er det andre svaret: EODHD regner ikke egne utledede
+tall som sine data «in repackaged form». Utledede signalverdier er av samme art.
+Men det er en analogi. Ordlyden sier det ikke.
+
+**Et funn som gjør grensen konkret:** forklaringen til interessesjekken er i dag
+`"volum {dagens_volum} mot median {median_volum}"` (`src/signalberegning.py`).
+Dagens volum er et **rått datapunkt fra EODHD**, ikke en utledet verdi. Sendes
+målingene slik de står, går rådata til modellen. Plan B må sende forholdstallet
+(volum mot median), ikke tallene det er regnet av.
+
+**Betingelse 4 gjelder uansett.** Modelltjenesten skal ikke trene på det som
+sendes, og det må være dokumentert før noe sendes. Om ett spørsmål til EODHD
+skal stilles om plan B, er ført under «Å følge opp».
+
 ---
 
 ## Mediekilder vurdert for relevanseksperimentet
@@ -867,6 +895,12 @@ lenger uimotsagt» over.
       ja til «Storage» — det står allerede i `docs/epost-til-euronext.md`,
       seksjonen «En klausul brevet ikke nevner ved navn», og huskeregelen her
       utvider det til alle fire.
+- [ ] **Plan B for KI-laget: spørre EODHD eller ikke?** Ingen av svarene 21.09
+      dekker at utledede kursverdier sendes til en språkmodell (se «Plan B for
+      KI-laget» over). Alternativene er ett spørsmål til EODHD i samme tråd, eller
+      å legge det andre svaret til grunn som analogi og skrive ned at det er gjort.
+      **Eier: Gruppen.** Frist: før story 5B sender noe til en modell, og uansett
+      etter at betingelse 4 er dokumentert
 - [ ] Kontrollere Alpha Vantage sine vilkår for ikke-kommersiell bruk
 - [x] ~~Lese EODHDs fullstendige ToS, ikke bare prissiden~~ — gjort 2026-09-20,
       se seksjonen «EODHD: hva de fullstendige vilkårene sier». Svaret er uklart
