@@ -355,6 +355,15 @@ enn substansen bærer. Jeg vil anslå **12–13 distinkte feil** i lens 3s områ
 
 ---
 
+### Avgjort 2026-09-23
+
+| | Avgjørelse | Utført |
+|---|---|---|
+| **U1** | Økta følges: rad 60 blir stående. Men da stemmer ikke «monoton». Regnet for hvert vindu 5–65 er ingen av kurvene monoton, og fallet 60→65 er 3 aksjedager, mindre enn svingningen mellom nabovinduer. Funn 1 i §9 er skrevet om | `94fd482` |
+| **U2** | Lukket. Konklusjonen står, men begrunnelsen var upresis: punktene *ble* renummerert 20.09, og regelen mot renummerering kom først 21.09. Det som avgjør, er at kommentaren ble skrevet en time etter at punkt 16 fantes | `3c78c8a` |
+| **U3** | Økta følges, med oppslag først. Hvert ledd i AD-13 og AD-15 er slått opp i koden og ført til commiten som innførte det. Begge holder og er merket oppfylt | `5a056fd` |
+| **U4** | Talt, ikke anslått. **Diagnosen i U4 over var feil:** lens 3 har 18 distinkte funn, og dobbelttellingen ligger mellom lensene. 31 distinkte i alt, ikke 35 | `027866a` |
+
 ## Rekkefølge jeg foreslår i morgen
 
 1. **A1** — den er den eneste som rører en konklusjon, og den er gjengitt to steder
