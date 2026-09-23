@@ -31,3 +31,12 @@ et sitat som ikke fantes».
     er endret.
 14. **PRD-en revideres i samme mappe.** Aldri en ny datostemplet mappe ved
     siden av.
+15. **Kvoten sjekkes ved øktstart.** Første ting i hver økt: les `/api/user`
+    (gratis) og si hvor mange kall som er brukt i dag og hvor mange som er igjen.
+    Kvoten nullstilles ved midnatt GMT, men `/api/user` viser gårsdagens tall til
+    første kall etter det. Står `apiRequestsDate` på en tidligere dato, er det
+    brukt 0 i dag (`malinger.md` §7.1). Ubrukte kall forsvinner. Kall nummer 21
+    og videre trekker fra bonuskvoten `extraLimit` uten å stoppe (§11). Er det
+    kall igjen sent på dagen, foreslå en bruk som svarer på noe åpent: en måling,
+    en test mot ekte data, et øyeblikksbilde Epic 2 trenger. Foreslå, ikke bruk:
+    regel 6 gjelder fortsatt, ingen kall uten avtale.
