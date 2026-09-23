@@ -1851,6 +1851,26 @@ se på helheten. Denne gangen sto den i selve rettingsplanen.
 
 ---
 
+## 23.09.2026 – To «krav» som ikke står på emnesiden
+
+Dockerfile og database har styrt planleggingen i tre dager. De var de to første
+beslutningene i arkitekturfasen (åpent punkt 17 og 18), og `docs/innlevering.md`
+kalte Dockerfilen «halve innleveringen». Hjelpelærer svarte 23.09: «Det står
+derimot ikke på emnesiden jeg har tilgjengelig at Dockerfile eller en bestemt
+type database er et eksplisitt leveransekrav.»
+
+Begge kom fra samtaler med faglærer 21.09, og vi førte dem som krav uten å ha
+kilden. `innlevering.md` sa det allerede 22.09: alt vi vet om innleveringen,
+kommer fra e-post og samtaler. Det var riktig observert og ble likevel ikke
+fulgt. Dette er det første svaret som viser hva det kostet.
+
+Begge gjøres likevel. Databasen er begrunnet i kravene selv, og sensor må kunne
+kjøre løsningen. Men de er nå ført som det de er: sagt i samtale, ikke
+bekreftet på emnesiden. Og den emnesiden vi faktisk hadde tilgang til, sier noe
+vi ikke hadde lest: kvalitetssikringen av koden hører til de 70 prosentene.
+
+---
+
 ## DD.MM.2026 – kort tittel
 
 ### Dato / deltaker(e)
