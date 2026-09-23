@@ -1392,22 +1392,6 @@ eksperimentet er ført, ikke utført — utvalgskriteriene er ikke skrevet.
 
 ---
 
-# Joakims oppføringer
-
-Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
-
-**Hvorfor den finnes.** Oppføringene over er ført av Marian eller av en
-KI-økt. Joakim har bidratt med ideer som har formet prosjektet — men det har
-skjedd utenfor de øktene som ble loggført, og derfor finnes bidragene ikke i
-noen fil. Loggen viser hvem som *førte* oppføringene; den viser ikke hvem som
-bidro.
-
-Det er et dokumentasjonsproblem, ikke et deltakelsesproblem. Men konsekvensen
-er reell: en refleksjonsrapport om gruppens prosess kan ikke vise fram noe som
-ikke står skrevet.
-
-**Hva som bør føres.** Samme struktur som de øvrige oppføringene:
-
 ## 22.09.2026 – To svar som så gyldige ut og ikke kunne svare
 
 ### Dato / deltaker(e)
@@ -1975,6 +1959,22 @@ memloggen beskrev 20.09: når et premiss byttes, må det som hang på det, gås
 gjennom ett for ett.
 
 ---
+
+# Joakims oppføringer
+
+Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
+
+**Hvorfor den finnes.** Oppføringene over er ført av Marian eller av en
+KI-økt. Joakim har bidratt med ideer som har formet prosjektet — men det har
+skjedd utenfor de øktene som ble loggført, og derfor finnes bidragene ikke i
+noen fil. Loggen viser hvem som *førte* oppføringene; den viser ikke hvem som
+bidro.
+
+Det er et dokumentasjonsproblem, ikke et deltakelsesproblem. Men konsekvensen
+er reell: en refleksjonsrapport om gruppens prosess kan ikke vise fram noe som
+ikke står skrevet.
+
+**Hva som bør føres.** Samme struktur som de øvrige oppføringene:
 
 ## DD.MM.2026 – kort tittel
 
