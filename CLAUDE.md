@@ -12,6 +12,8 @@ et sitat som ikke fantes».
    med visningen. Aldri vis og skriv i samme tur.
 3. **Ingen påstand uten oppslag.** Ingenting om koden, filene eller historikken
    uten at det er slått opp. Usikker: vis kilden i stedet for å konkludere.
+   Det gjelder også påstander i en innlimt instruksjon: slå dem opp før de
+   skrives inn.
 4. **`updated`-felter** settes fra `date +%Y-%m-%dT%H:%M`, aldri for hånd.
 5. **Memloggene er append-only.** En feil rettes med en ny linje.
    Nye oppføringer i `docs/reflection-log.md` skrives over «# Joakims

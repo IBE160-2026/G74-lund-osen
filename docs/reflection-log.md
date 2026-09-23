@@ -1856,7 +1856,10 @@ type database er et eksplisitt leveransekrav.»
 Begge kom fra samtaler med faglærer 21.09, og vi førte dem som krav uten å ha
 kilden. Denne loggen sa det allerede 22.09, i oppføringen «Leveranselista kan
 ikke kontrolleres mot en kilde»: «alt vi vet om hva som skal leveres, kommer fra
-e-post og samtaler». *Rettet 2026-09-23.* Det var riktig observert og ble likevel ikke
+e-post og samtaler». *Rettet 2026-09-23. Det har `innlevering.md` aldri gjort —
+`git log -S` finner ingen commit med formuleringen i den fila. Feilen kom fra en
+innlimt instruksjon, og økta skrev den inn uten å slå den opp. Regel 3 i
+`CLAUDE.md` er utvidet etter dette.* Det var riktig observert og ble likevel ikke
 fulgt. Dette er det første svaret som viser hva det kostet.
 
 Begge gjøres likevel. Databasen er begrunnet i kravene selv, og sensor må kunne
