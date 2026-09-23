@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-23T18:26
+updated: 2026-09-23T18:27
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1150,7 +1150,7 @@ egen frist for å ta stilling uten svar, ikke en dato Euronext har lovet.
 Fullstendig
 gjennomgang med sitater i `docs/kilder-og-rettigheter.md`.
 
-Punkt 1, 4, 5, 5b, 16, 17, 18 og 19 har eier. Punkt 2, 3 og 6–15 mangler det.
+Av de åpne punktene har 1, 4, 5, 5b, 13, 16, 19, 20 og 21 eier. Punkt 2, 3, 6, 8–12 og 15 mangler det. Punkt 7, 14, 17 og 18 er lukket. *Rettet 2026-09-23: setningen talte lukkede punkter blant de åpne, og manglet 13, 20 og 21.*
 
 **Om nummereringen.** Numrene følger rekkefølgen punktene ble opprettet i, ikke
 rekkefølgen i tabellene. Punkt 16 står derfor over sammen med de andre som må
@@ -1161,4 +1161,4 @@ punkt som renummereres, mister sporet tilbake til målingen som begrunnet det.
 **Om eierfeltet.** «Gruppen» er et bevisst valg, ikke en tom rubrikk: vi er to,
 og fordelingen gjøres internt etter hva som passer når punktet skal tas. Det
 eierfeltet skal sikre, er at punktet har en frist og noen som svarer for den —
-ikke at navnet er låst på forhånd. Punkt 6–15 har frist, men mangler eier.
+ikke at navnet er låst på forhånd. Punkt 2, 3, 6, 8–12 og 15 har frist, men mangler eier.
