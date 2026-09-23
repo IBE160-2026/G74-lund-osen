@@ -344,7 +344,7 @@ skjer på serien under henting, og den veien gjør kravet uavhengig av NewsWeb.
 
 Sensor kan bygge og kjøre den, uten vår nøkkel og uten våre data.
 
-**FR-er:** ingen · **AD-er:** 9, 11, 12 · Dekker åpent punkt 18
+**FR-er:** FR-401 (tom-tilstanden, story 3.3) · **AD-er:** 9, 10, 11, 12 · Dekker åpent punkt 18
 
 ### Epic 4: KI kan tas i bruk uten å bryte godkjenningen
 
@@ -410,11 +410,19 @@ vurdert, ikke bare arvet fra kravene.
 Egen epic og ikke en del av Epic 3: Epic 3 har ett utfall — at løsningen kan
 bygges og kjøres av andre — og brukertesten skal ikke vente på Dockerfilen.
 
+### Epic 9: Dokumentasjon av prosessen
+
+Sensor kan se hvordan KI ble brukt og hvordan koden er kvalitetssikret, uten å
+lese git-loggen. Emnesiden legger dette under prosjektkoden (70 %): «Dokumentasjon
+må vise hvordan KI ble brukt, og hvordan studentene har kvalitetssikret koden».
+
+**FR-er:** ingen · Avhengigheter: 9.1 etter Epic 1; 9.2 og 9.3 ingen
+
 ---
 
 # Stories
 
-32 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
+36 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
 den, hva kontrollen faktisk ser etter, og om den kan gjøres ferdig i én økt.
 
 **«Ville feilet hvis» er kontrollen.** Resten er beskrivelse. En story uten den
@@ -734,6 +742,31 @@ slettes ved et uhell, så det som ikke kan hentes på nytt, overlever.
 
 **Én økt:** ja.
 
+
+### Story 3.3: README — «Slik kjører du den»
+
+Som **en som ikke er oss**, vil jeg komme fra et rent utsjekk til begge
+skjermbildene med ekte data ved å følge README alene.
+
+**Oppfyller:** FR-401 (tom-tilstanden) · **Begrenses av:** `AD-9`, `AD-10`, `AD-12`
+
+**Kontroll — hva testen og den ferdige storyen ser etter:**
+- README-seksjonen: egen gratisnøkkel fra EODHD (20 kall i døgnet holder til én
+  henting av de 15 symbolene), `.env` fra `.env.example`, bygging av imaget, og
+  de to kommandoene — webserveren og hentingen
+- **Avsnittet «Kom i gang» erstattes helt,** ikke utvides. Det sier i dag
+  «Applikasjonen leser bare fra `data/`», som blir usant etter 1.4 og 1.5
+- **Den tomme siden sier hvordan man henter, med samme kommando som README.**
+  I dag sier den «Ingen kursdata funnet i `data/`. Kjør
+  `uv run python src/fetch_prices.py` først» (`index.html:110–114`). Etter
+  Epic 2 og 3 er det feil kommando og feil sted
+- Kommandoen i tom-tilstanden kommer fra én konstant, og en test krever at den
+  står i den tomme siden
+- **Ville feilet hvis:** README og den tomme siden viste hver sin kommando. Da er
+  det tilfeldig hvilken av dem som stemmer
+
+**Avhenger av:** 3.1. **Én økt:** ja.
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
@@ -1041,3 +1074,84 @@ inntrykket ikke bare hviler på at logikken er riktig.
 - **Ville feilet hvis:** gjennomgangen endte i nye skjermbilder eller ny funksjonalitet. Da er det design fra bunnen og en utvidelse av omfanget, ikke en gjennomgang
 
 **Avhenger av:** 8.1. **Én økt:** ja.
+
+---
+
+## Epic 9: Dokumentasjon av prosessen
+
+### Story 9.1: `docs/kvalitetssikring.md`
+
+Som **sensor**, vil jeg finne i ett dokument hva som er testet, hvordan, og hva
+som ikke er det, så jeg ikke må sette det sammen fra commit-meldinger.
+
+**Oppfyller:** — *(emnesiden, «hvordan studentene har kvalitetssikret koden»)* ·
+**Begrenses av:** `AD-8`
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- Hva som testes og hvordan: antall tester (**telt da dokumentet skrives, ikke
+  kopiert herfra**), CI, nettverkssperren i `tests/conftest.py`, og
+  kontrakttestene som kjøres mot begge lagrene
+- Mutantpraksisen: hva den er, og hver gang den er kjørt, med story, commit,
+  mutant og hvilke tester som fanget den. Den forkastede transaksjonsmutanten
+  fra 1.3 er med
+- Hva kontrollensene 22.09 fant, med henvisning til `docs/kontroll-2026-09-22.md`
+- **Hva som ikke testes**, som egen seksjon. Et eksempel: den ekte
+  `hent_ett_symbol`, som bruker kvote og derfor aldri kjøres i tester
+- **Ville feilet hvis:** dokumentet bare listet det som testes. Da ser et hull
+  ut som dekning
+
+**Tidspunkt:** skrives når Epic 1 er ferdig, og oppdateres ved hver epic.
+**Én økt:** ja.
+
+### Story 9.2: `docs/ai-prompts/bygging/`
+
+Som **gruppe**, vil vi at instruksjonene som styrte byggingen, ligger ordrett i
+repoet, så refleksjonsrapporten kan vise dem i stedet for å gjenfortelle dem.
+
+**Oppfyller:** — *(emnesiden, «hvordan KI ble brukt»)* · **Begrenses av:** regel
+10 og 11 i `CLAUDE.md`
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- Katalogen finnes, og `docs/ai-prompts/README.md` peker på den
+- Én fil per dag, med filnavn etter konvensjonen som alt står i README
+  (`ÅÅÅÅ-MM-DD-navn-tema.md`)
+- Blokkene legges inn **ordrett**, med sluttmarkøren, av Marian. Storyen gjelder
+  strukturen, ikke innholdet
+- **Hver fil leses av Marian eller Joakim før commit, fordi repoet er offentlig.**
+  Det gjelder ikke bare nøkler, men også navn og formuleringer som ikke bør stå
+  offentlig. Blokkene inneholder analyser av svar fra faglærerstaben. Innholdet
+  i svarene står alt i `innlevering.md` og er ikke nytt — lesingen gjelder navn
+  og formuleringer
+- **Ville feilet hvis:** blokkene ble renskrevet eller oppsummert. Da er arkivet
+  et referat, og det er nettopp i omskriving at krav har forsvunnet før (de seks
+  detaljene i `reflection-log.md`)
+
+**Én økt:** ja.
+
+### Story 9.3: Arbeidsmønsteret
+
+Som **sensor**, vil jeg forstå hvem som bestemte hva, så jeg kan vurdere hvordan
+KI ble brukt og ikke bare at den ble brukt.
+
+**Oppfyller:** — *(emnesiden, «hvordan KI ble brukt»)* · **Begrenses av:** ingen AD-er
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- En kort beskrivelse i `docs/ai-prompts/README.md`: en rådgivende KI-økt uten
+  tilgang til repoet, en byggeøkt med tilgang, og et menneske som relé mellom dem
+- En tabell over hva som avgjøres av hvem
+- Hvorfor mønsteret ble valgt
+- **Tilfeller begge veier, med kilde.** Reléet går begge veier, og beskrivelsen
+  skal vise det:
+  - *Rådgivningsøkta tok feil, og feilen ble fanget:* `legal@oslobors.no` som
+    adresse til Euronext (PRD-memloggen, 21.09), og «basen er gjenoppbyggbar»,
+    som ble funnet ved å lese FR-408 helt ut (arkitekturmemloggen, 22.09)
+  - *Rådgivningsøkta korrigerte byggeøkta:* byggeøkta skrev EODHD-utkastet med
+    **fire** spørsmål (`0945818`, 20.09). Rådgivningsøkta avgjorde at det skulle
+    sendes **ett** (`reflection-log.md`, 20.–21.09, «Det motsatte gjelder også»).
+    Svaret kom på under ett døgn. Dette er en rettet vurdering, ikke en rettet
+    faktafeil — et tilfelle der rådgivningsøkta fanget en faktafeil byggeøkta
+    hadde skrevet, er ikke funnet med kilde
+- **Ville feilet hvis:** beskrivelsen bare sa at mønsteret virker. Da mangler
+  gangene det ikke virket, og det er dem refleksjonen trenger
+
+**Én økt:** ja. Kort.
