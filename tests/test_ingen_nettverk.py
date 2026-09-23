@@ -18,10 +18,29 @@ def test_socket_mot_internett_blokkeres():
 
 def test_requests_blokkeres_ogsaa():
     """requests gaar gjennom socket, saa sperren ligger under biblioteket."""
-    with pytest.raises(Exception) as feil:
+    with pytest.raises(NettverkISTest):
         requests.get("https://eodhd.com/api/user", timeout=5)
 
-    assert "blokkert" in str(feil.value) or isinstance(feil.value, NettverkISTest)
+
+def test_proxy_paa_loopback_slipper_ikke_forbi(monkeypatch):
+    """Oppdaget 2026-09-23: med HTTPS_PROXY paa loopback gikk requests forbi
+    sperren og stoppet foerst hos proxyen. Variabelen settes her, inne i
+    testen - etter at fixturen har fjernet den - og requests skal likevel
+    stoppes av sperren, ikke av proxyen."""
+    monkeypatch.setenv("HTTPS_PROXY", "http://127.0.0.1:9")
+
+    with pytest.raises(NettverkISTest):
+        requests.get("https://eodhd.com/api/user", timeout=5)
+
+
+def test_dns_oppslag_blokkeres():
+    """Ingen navneoppslag i testene, saa sperren virker likt med og uten nett."""
+    with pytest.raises(NettverkISTest):
+        socket.getaddrinfo("eodhd.com", 443)
+
+
+def test_dns_for_loopback_slippes_gjennom():
+    assert socket.getaddrinfo("localhost", 80)
 
 
 def test_loopback_slippes_gjennom():
