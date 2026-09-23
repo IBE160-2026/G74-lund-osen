@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-23T19:38
+updated: 2026-09-23T19:40
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -220,6 +220,17 @@ Bare det andre er sant.
 Aksjer kilden ikke har en eneste kursrad for, faller ut av tabellen, men skal
 navngis under den, slik at brukeren vet at oversikten er ufullstendig.
 
+##### Hvor gamle dataene er
+
+*Endret 2026-09-23.* Sidens tidsstempel er det **eldste** `sist_hentet` blant
+symbolene som vises. En rad med eldre tidsstempel enn det nyeste viser sitt
+eget, i selskapscellen under navnet — ikke som en sjette kolonne. Tidsstempler
+vises i norsk tid (lagret i UTC, AD-20).
+
+Begrunnelse: AD-15 lar ett symbol feile og beholde sin gamle serie. Viste siden
+det nyeste tidspunktet, ville en side med én fersk rad og fjorten foreldede sett
+fersk ut.
+
 ##### Navigasjon til aksjedetaljen
 
 **Selskapsnavnet i første kolonne er lenken til aksjedetaljen** (FR-201 til
@@ -243,6 +254,10 @@ negativt.
 
 **Aksjer uten gyldig signal sorteres sist**, uansett kursendring. En rad vi
 ikke kunne vurdere, skal ikke legge seg foran en vi kunne vurdere.
+
+*Endret 2026-09-23.* **Tidsstempelet påvirker ikke sorteringen.** En rad med
+eldre data sorteres etter samme regel som de andre, ikke sist. Sorteringen er
+signalets, ikke ferskhetens, og ferskheten vises på raden (FR-101).
 
 Merk at styrken bare har fire verdier fordelt på femten rader, så lik styrke er
 normalen og ikke unntaket. Målingen 2026-09-21 viste 13 av 15 aksjer på styrke
