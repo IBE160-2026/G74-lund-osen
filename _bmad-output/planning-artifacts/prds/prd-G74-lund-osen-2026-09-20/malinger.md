@@ -815,11 +815,29 @@ Først ved vindu 50 begynner vinduet å koste dekning: 15 aksjedager ved 50, og
 
 ### Tre funn
 
-**1. Utslagsraten er monoton i begge — men i motsatt retning.** Bevegelse faller
-(37,0 → 27,3 %) mens interesse stiger (14,1 → 17,5 %). Et langt vindu gjør
-volatilitetsterskelen høyere og medianvolumet lavere. **Det finnes derfor ingen
-vindulengde som er best for begge**, og det er et argument for å holde dem like
-på en nøytral verdi framfor å stille hver for seg.
+**1. Utslagsraten går i motsatt retning i de to — men ingen av dem er
+monoton.** Bevegelse faller (37,0 → 27,3 %). Interesse stiger til vindu 60
+(14,1 → 17,5 %), og ligger 0,1 prosentpoeng lavere ved 65 (17,4 %). Et langt
+vindu gjør volatilitetsterskelen høyere og medianvolumet lavere. **Det finnes
+derfor ingen vindulengde som er best for begge**, og det er et argument for å
+holde dem like på en nøytral verdi framfor å stille hver for seg.
+
+**De 0,1 prosentpoengene er ikke et skille målingen kan bære.** Det er 3
+aksjedager: 521 mot 518 av 2 985. Regnet for hvert vindu fra 5 til 65, ikke
+bare radene i tabellen, går ingen av kurvene jevnt. Over vindu 15 går interesse
+opptil 5 aksjedager *ned* mellom to nabovinduer, og bevegelse opptil 8
+aksjedager *opp*. Et steg på 3 ligger innenfor den svingningen. Høyeste
+interesse i hele spennet er dessuten vindu 61 (522), ikke 60. Det som er
+reelt, er retningen over hele spennet: interesse +3,3 og bevegelse −9,7
+prosentpoeng. Retningen på ett enkelt steg er ikke reell.
+
+*Rettet 2026-09-23.* Funnet sa «monoton i begge». Det holdt for radene tabellen
+viste, men ikke for tallene bak dem. Hvert vindu 5–65 er regnet på nytt fra
+`kurser-raa-2026-09-22.json` med `interesse()` og `bevegelse()` fra
+`signalberegning.py`, over de siste 199 dagene per symbol og uten dekningskrav.
+Metoden gjenskaper alle ti
+interesseverdiene i tabellen. For bevegelse er fire av ni kontrollert (5, 20,
+50, 65), og alle fire stemmer.
 
 **2. Knekkpunktet ligger på stabiliteten, ikke på 20.** Nabostabiliteten faller
 bratt under 15 og flater ut fra rundt 25. Under 15 bærer tallet reell vekt;
