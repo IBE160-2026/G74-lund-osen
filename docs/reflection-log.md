@@ -1765,6 +1765,10 @@ forstått.**
 Fire uavhengige lenser gikk gjennom alt som ble endret i løpet av dagen. 35
 funn.
 
+*Rettet 2026-09-23:* 35 er summen av det lensene oppga. Telles samme feil én
+gang, også når to lenser fant den, er det **31**. Hvordan det er telt, står i
+`docs/kontroll-2026-09-22.md`.
+
 Seks av dem hadde samme form: **en korrekt observasjon av en delmengde, skrevet
 ned som en påstand om helheten.** `tags` var tom — i artikkel 1, av ti.
 Tegnspennet var 394–3 131 — i de tre første. «Null treff på forbeholdstekst» —
