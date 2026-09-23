@@ -1969,6 +1969,34 @@ gjennom ett for ett.
 
 ---
 
+## 23.09.2026 – En instruksjon er en påstand
+
+Kvelden gikk til kontroller, og de fant noe begge veier.
+
+Instruksjonene fant hull i koden og i repoet. Rå EODHD-verdier hadde stått
+offentlig siden 20.09 (DNO), 21.09 (Aker BP) og 23.09 (MOWI og en hel rad fra
+`/api/eod`). De er byttet med tall vi har regnet ut selv (`0ccb415`).
+Nettsperren hadde to hull, en proxy på loopback og DNS-oppslag. Begge er tettet,
+og hver sperre er prøvd med en mutant (`982b216`). `Kursrad` slapp gjennom NaN
+og uendelig (`60f2f2b`).
+
+Økta fant feil og mangler i instruksjonene. En instruksjon sa at kontrollen
+20.09 «stemte». Den hadde sett etter rålinjer og JSON-blokker, og DNOs
+sluttkurs lå der allerede. Instruksjonen om NaN nevnte ikke at uendelig også ble
+lagret, av begge lagrene. Av fire funn fra kodegjennomgangen var ett verre enn
+beskrevet (en `COMMIT` i migrasjonsfila, med en feilmelding som sa «rullet
+tilbake»), og ett trengte trigger på både `INSERT` og `UPDATE` (`c569831`).
+
+Lærdommen er at en instruksjon er en påstand, ikke et oppslag. Den kan være
+riktig i retning og feil i detalj, akkurat som en rådgivningsøkt. Derfor er
+regel 3 utvidet til å gjelde innlimte instruksjoner (`930f522`).
+
+Og en kontroll beviser bare det den ser etter. Kontrollen 20.09 så ikke etter
+enkeltverdier, og nettsperren var testet, men ikke med proxy. Begge besto en
+prøve som ikke målte det som var galt.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
