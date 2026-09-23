@@ -772,6 +772,22 @@ de ikke, og det står dokumentert over.
 Uteblir svaret innen 28.09, er det en ny beslutning som må tas. Ført som
 oppfølgingspunkt med eier nederst i dokumentet.
 
+*Endret 2026-09-23.* **Det hentes ikke fra NewsWeb før Euronext har svart.**
+Beslutningen over var begrunnet med at en stopp «ville lammet meldingsdelen i
+den uken det er tid til å bygge den» (`docs/reflection-log.md`, 21.09). Den
+grunnen gjelder ikke lenger. 23.09 ble det besluttet at Epic 1–3 bygges først,
+at meldingsdelen (Epic 6) venter på Euronext, og at KI-laget har en plan B
+(Epic 5B) som ikke trenger NewsWeb.
+
+**Beslutningen fra 21.09 ble dessuten aldri satt ut i livet.** Siste henting var
+21.09 kl. 17:42 (`data/newsweb-felter-raa-2026-09-21.json`), før forbudet ble
+lest kl. 18:06, og det er ikke hentet etterpå. Kontrollert på gruppens maskiner
+23.09.
+
+**«Skal ikke varsles» er erstattet:** faglærer er ikke kontaktet direkte.
+Avhengigheten av Euronext, at det ikke hentes, og plan B står i Product Brief,
+som leveres 27.09.
+
 ### Konklusjon
 
 **Nei — dokumentert, med et unntak som kan gjelde oss, og en forespørsel ute.**
@@ -864,12 +880,18 @@ lenger uimotsagt» over.
       til en språkmodell og et smalere alternativ. Brevet er
       arkivert ordrett i `docs/epost-til-euronext.md`. Faglærer er *ikke*
       varslet — besluttet av gruppen, se «Beslutningen gruppen har tatt i
-      mellomtiden»
+      mellomtiden». *23.09: faglærer er ikke kontaktet direkte; avhengigheten,
+      at det ikke hentes, og plan B står i Product Brief.*
 - [ ] **Beslutning hvis Euronext ikke svarer innen 2026-09-28.** Vilkårene
       krever tillatelse på forhånd, og vi henter allerede. Alternativene er å
       stoppe hentingen, fortsette bevisst under undervisningsunntaket, eller
       bygge meldingsdelen om. Skal avgjøres og skrives ned, ikke bli stående
       fordi ingen tok det opp. **Eier: Gruppen.** Frist 2026-09-28
+
+      *23.09:* «vi henter allerede» stemmer ikke. Siste henting var 21.09 kl.
+      17:42, før forbudet var lest, og beslutningen om å fortsette ble aldri
+      satt ut i livet. Det hentes ikke fra NewsWeb før Euronext har svart. Det
+      som avgjøres 28.09, er om plan B (Epic 5B) utløses.
 
       **Huskeregel når svaret kommer** — den gjelder uansett om det kommer før
       eller etter fristen: *les hva brevet faktisk spurte om før du avgjør hvor
