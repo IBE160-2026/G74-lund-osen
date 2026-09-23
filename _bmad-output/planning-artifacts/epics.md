@@ -680,6 +680,21 @@ et funn om markedet.
 
 ## Epic 2: Ferske data uten at kvoten sprenges
 
+**Føringer fra kvotemålingen 2026-09-23** (`malinger.md` §11). De gjelder hele
+epicen:
+
+1. **Hentekommandoen skal nekte å hente to ganger samme børsdag, ikke bare
+   unngå det.** Grunnen er målt: kall nummer 21 stopper ikke, men trekker
+   stille fra bonuskvoten (`extraLimit` 485 → 484). Kontrollen mot forventet
+   børsdag i FR-402 er dermed et **kvotevern**, ikke bare en datakontroll.
+   Story 2.3 skal prøves mot det: en andre kjøring samme børsdag gjør null kall.
+2. **Siste rad kan endres i etterkant.** MOWI 21.09 fikk volumet korrigert fra
+   1 386 194 til 1 374 994, fordi raden var hentet mens børsen var åpen. Det er
+   en egen grunn til å erstatte i stedet for å skjøte, uavhengig av utbytter
+   (AD-5). Det reiser et spørsmål epicen må svare på: **når på døgnet skal
+   hentekommandoen kjøres**, når dagens kurs ikke var publisert kl. 19:04? Ført
+   som **åpent punkt 23** i `prd.md`, med frist før story 2.1.
+
 ### Story 2.1: Børsdag i Oslo, tidsstempel i UTC
 
 Som **utvikler**, vil jeg at «dagen» betyr én ting, så to verdier ikke kan være
