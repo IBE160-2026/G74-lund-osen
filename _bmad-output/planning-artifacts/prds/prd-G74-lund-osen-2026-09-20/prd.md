@@ -192,7 +192,7 @@ Markedsoversikten viser de 15 aksjene i universet med nøyaktig fem kolonner:
 | Sluttkurs | `close` for siste børsdag |
 | Endring | Endring i prosent, regnet på `adjusted_close` |
 | Signalstyrke | 0–3, jf. FR-703 |
-| Retning | Opp, Ned, Blandet eller Ingen, jf. FR-704 |
+| Retning | Positiv, Negativ, Blandet eller Ingen, jf. FR-704 *(rettet 2026-09-23 fra «Opp, Ned»)* |
 
 Sluttkursen vises som `close`, mens prosenten regnes på `adjusted_close`. På
 utbyttedager gir det et synlig avvik mellom de to kolonnene, og dagen skal da
