@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-23T17:58'
+updated: '2026-09-23T18:04'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -380,7 +380,7 @@ G74-lund-osen/
 | Meldingsfilter (FR-501..503) | `meldinger.py` | AD-1, AD-14 |
 | Utbyttemerking (FR-407) | *ikke plassert* | AD-4 — **kilde ikke valgt**, se åpent punkt 4 |
 | Kommende hendelser (FR-301..303) | *finnes ikke* | **Ingen** — se Deferred |
-| KI-logg (FR-604..606) | `KILogg` | AD-3, AD-7 — *resten utsatt* |
+| KI-logg (FR-604..605) | `KILogg` | AD-3, AD-7 — *resten utsatt* |
 | Signalet (FR-701..706) | `signalberegning.py` | AD-1, AD-13 |
 | Leveransen | `Dockerfile` | AD-9, AD-10, AD-11, AD-12 |
 
