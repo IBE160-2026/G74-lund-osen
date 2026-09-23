@@ -265,8 +265,8 @@ kontrollen 22.09 fant det.
 | **NFR-06** Ikke investeringsråd | **Tverrgående.** Forbeholdstekst finnes: `src/templates/index.html:108` sier «Signalstyrken er 0–3 og sier hvor kraftig de tre sjekkene slår ut — *ikke om aksjen bør kjøpes eller selges*». Kravet er likevel et **forbud**, ikke et tekstkrav: ingen del av grensesnittet skal formuleres som anbefaling. **Kontroll på hver visningsstory:** ordlyden leses mot NFR-06 |
 | **NFR-07** Rådata bevares | **Eid av Epic 1** (`AD-6`). Delvis levert: `fetch_prices` skriver tidsstemplede øyeblikksbilder (`352e3a2`) |
 
-**Alle sju NFR-er er plassert:** tre eid av en epic, fire tverrgående med
-navngitt kontroll.
+**Alle sju NFR-er er plassert:** fire eid av en epic (NFR-01, 02, 04, 07), tre
+tverrgående med navngitt kontroll (NFR-03, 05, 06).
 
 ## Epic List
 
