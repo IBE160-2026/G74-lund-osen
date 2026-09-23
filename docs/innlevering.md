@@ -1,5 +1,10 @@
 # Leveranseliste — IBE160, gruppe G74
 
+**Kvalitetssikringsdokumentasjonen — kontrollrapporter, mutanttester,
+memlogger, refleksjonslogg — er del av de 70 prosentene, ikke bare de 30:
+emnesiden legger «hvordan studentene har kvalitetssikret koden» under
+prosjektkoden, ikke under rapporten (se «Eksamen» under).**
+
 **Bygget 2026-09-22 på kilder, ikke på hukommelse.** Hvert punkt bærer sitatet
 det hviler på, og hvor sitatet står. Punkter uten ordrett kilde står nederst,
 under «Antatt, ikke bekreftet» — de er ikke fjernet, men de er ikke blandet inn
@@ -8,9 +13,61 @@ blant det som er belagt.
 Lista er kort med vilje. Et punkt uten kilde er verdt mindre enn ingen punkter,
 fordi det ser like troverdig ut som resten.
 
+*Oppdatert 2026-09-23* etter at emnesiden ble lest i sin helhet og hjelpelærer
+svarte på spørsmålene fra 22.09. **Om kildene:** sitatene fra emnesiden og fra
+svaret er utdrag, gjengitt av Marian i økta 23.09. Verken emnesiden eller
+e-posten er lagt i repoet, så de kan ikke kontrolleres herfra, og utdragene er
+ikke rekonstruert til mer enn det som ble gjengitt. Legg inn fullteksten når
+den finnes.
+
+---
+
+## Eksamen — fra emnesiden
+
+**Kilde:** emnesiden for IBE160, lest i sin helhet 2026-09-23. Utdrag gjengitt
+av Marian samme dag. Tekst i «» er ordrett, resten er referat.
+
+### Mappeinnlevering
+
+**Prosjektkode og funksjonalitet** — «Prosjektkode og funksjonalitet (70%)».
+Gruppevis.
+
+- «Studentene leverer en KI-generert applikasjon»
+- «Dokumentasjon må vise hvordan KI ble brukt, og hvordan studentene har
+  kvalitetssikret koden»
+
+**Refleksjonsrapport** — «Refleksjonsrapport (30%)». Gruppevis.
+
+- «Beskrivelse av utviklingsprosessen, utfordringer og løsninger»
+- «Kritisk vurdering av hvordan KI påvirket sluttresultatet»
+- «Argumentasjon for etiske og teknologiske implikasjoner»
+
+### Arbeidskrav
+
+Product brief i repoet, frist 20. september kl. 23:59 (referat, ikke sitat).
+Fristen ble senere utsatt til 27.09. **Utsettelsen har ingen navngitt kilde i
+repoet.** Det eneste stedet den står, er `docs/reflection-log.md`, oppføringen
+fra 19.–20.09: «Ny innleveringsdato for BMAD-leveransen er satt til søndag
+27.09.2026 (uke 39).» Loggen sier ikke hvem som satte den eller hvor den er
+kunngjort. Se §7.
+
+### Hva emnesiden ikke sier
+
+Emnesiden sier «tre deler», men lister to, og nevner at «delvurdering 3 gir
+anledning til å demonstrere unike bidrag». Hva den tredje delen er, er ikke
+oppgitt. Ført som **åpent punkt 21** i `prd.md`.
+
 ---
 
 ## 1. Kildekode og Dockerfile
+
+**Dockerfile: sagt i samtale av faglærer, ikke bekreftet på emnesiden — gjøres
+likevel.** Kildekoden er belagt på emnesiden («Studentene leverer en
+KI-generert applikasjon»). Dockerfilen er det ikke. Hjelpelærer 23.09: «Det
+står derimot ikke på emnesiden jeg har tilgjengelig at Dockerfile eller en
+bestemt type database er et eksplisitt leveransekrav.» Arkitekturen er besluttet,
+og sensor skal kunne kjøre løsningen, så den bygges uansett. Men den er ikke et
+belagt krav.
 
 > **Innleveringen er «kildekode og docker fil».**
 
@@ -21,7 +78,7 @@ oppføringen «Fire avklaringer fra faglærer», punkt 2. Merk at bare frasen
 | | |
 |---|---|
 | **Status** | **Delvis** |
-| **Ligger i** | `src/` (8 moduler), `tests/` (10 filer, 166 tester), `.github/workflows/`, `pyproject.toml`, `uv.lock` |
+| **Ligger i** | `src/` (10 moduler og `migrasjoner/`), `tests/` (13 filer, 253 tester — telt 2026-09-23), `.github/workflows/`, `pyproject.toml`, `uv.lock` |
 | **Gjenstår** | **Dockerfile finnes ikke.** Kontrollert 21.09 og igjen 22.09: ingen treff på `Dockerfile` eller `docker-compose` noe sted i repoet. Ført som åpent punkt 18 i `prd.md` |
 
 Arkitekturen for den er besluttet 22.09 og ligger i `ARCHITECTURE-SPINE.md`:
@@ -33,6 +90,13 @@ skrevet.
 
 ## 2. Database
 
+**Sagt i samtale av faglærer, ikke bekreftet på emnesiden — gjøres likevel.**
+Samme setning fra hjelpelærer 23.09 som under §1: verken Dockerfile «eller en
+bestemt type database» står som eksplisitt leveransekrav på emnesiden.
+Databasen bygges likevel. Behovet er begrunnet i kravene selv (FR-407, FR-408,
+FR-604/605, se `begrunnelser.md` §9), og faglærerens advarsel om karakter står
+uansett.
+
 > Hvis du ikke har behov for en database, så er prosjektet ditt for enkelt, noe
 > som vil gjenspeile karakter. Vi har tre nivå: Enkel, Medium, Vanskelig. Alle
 > tre nivåene innebærer database, så uten database vil dette påvirke karakteren
@@ -43,9 +107,9 @@ i `begrunnelser.md` §9.
 
 | | |
 |---|---|
-| **Status** | **Mangler** |
-| **Ligger i** | Ingenting er bygget. Beslutningen ligger i `ARCHITECTURE-SPINE.md` `AD-3` til `AD-7`, `AD-16`, `AD-18`, `AD-19` |
-| **Gjenstår** | Hele lagringslaget. `kursdata.py` leser i dag en JSON-fil, og `app.py` leser den direkte utenom porten |
+| **Status** | **Delvis — oppdatert 2026-09-23** |
+| **Ligger i** | `src/migrering.py` (story 1.1), `src/lagring_sqlite.py` og `src/migrasjoner/0001_kurs.sql` (story 1.3). Beslutningen ligger i `ARCHITECTURE-SPINE.md` `AD-3` til `AD-7`, `AD-16`, `AD-18`, `AD-19` |
+| **Gjenstår** | Å koble lagringen til appen (story 1.4–1.5), vurderingslageret (1.6–1.7) og KI-loggen (4.3). *Skrevet 22.09, bevart:* «Hele lagringslaget. `kursdata.py` leser i dag en JSON-fil, og `app.py` leser den direkte utenom porten» |
 
 **Valget er kontrollert med faglærerstaben 22.09** og godkjent av assisterende
 hjelpelærer — ikke av emneansvarlig:
@@ -145,7 +209,7 @@ faglærer før den brukes til å planlegge.
 |---|---|
 | **Status** | **Uavklart hva den omfatter** |
 | **Ligger i** | Product Brief, PRD, arkitekturspine og `epics.md` er alle skrevet |
-| **Gjenstår** | **Hvilke BMAD-artefakter som faktisk er innleveringskrav, er ikke avklart.** Loggen skrev 20.09 at dette burde avklares tidlig i uken; noe svar finnes ikke i repoet |
+| **Gjenstår** | **Besvart 23.09, se under:** BMAD er «fortsatt en sterkt anbefalt arbeidsmetode» — anbefalt, ikke krav — og de sentrale dokumentene «bør derfor ... pushes dit». De ligger allerede i repoet. Emnesiden fører selve arbeidskravet som product brief i repoet (se «Eksamen»). Utsettelsen til 27.09 har fortsatt ingen navngitt kilde |
 
 ---
 
@@ -160,9 +224,34 @@ kontrollere mot en kilde:
 | 2 | **Hvilke datoer gjelder for demonstrasjon og prosjektinnlevering?** | Punkt C og D under. Åpent punkt 13 i `prd.md` |
 | 3 | **Skal noen BMAD-dokumenter leveres inn?** | Punkt E under, og BMAD-fristen 27.09 i §7 |
 
-**Svar avventes.** Spørsmål 2 og 3 er de to eldste ubesvarte i prosjektet —
-spørsmålet om hvilke BMAD-artefakter som er innleveringskrav ble stilt i
-`reflection-log.md` allerede 20.09 og har stått siden.
+*Skrevet 22.09, bevart:* «Svar avventes. Spørsmål 2 og 3 er de to eldste
+ubesvarte i prosjektet — spørsmålet om hvilke BMAD-artefakter som er
+innleveringskrav ble stilt i `reflection-log.md` allerede 20.09 og har stått
+siden.»
+
+### Svaret, 2026-09-23
+
+**Fra:** hjelpelærer i IBE160. Navnet er ikke oppgitt i økta og ikke ført her.
+**Dato:** 2026-09-23. **Form:** de bærende setningene, gjengitt av Marian.
+Fullteksten ligger ikke i repoet.
+
+> Det står derimot ikke på emnesiden jeg har tilgjengelig at Dockerfile eller en
+> bestemt type database er et eksplisitt leveransekrav.
+
+> BMAD er fortsatt en sterkt anbefalt arbeidsmetode
+
+> de sentrale dokumentene som viser hvordan prosjektet er planlagt og utviklet er
+> viktige
+
+> bør derfor ... pushes dit
+
+> Bård Inge vil presisere dette.
+
+| # | Spørsmålet | Svaret |
+|---|---|---|
+| 1 | Er leveranselista fullstendig? | **Delvis.** Emnesiden lister mappeinnlevering (prosjektkode 70 %, refleksjonsrapport 30 %) og arbeidskravet. **Dockerfile og database står ikke der** — de flyttes til «sagt i samtale, ikke bekreftet» i §1 og §2. Emnesiden sier «tre deler» og lister to: åpent punkt 21 |
+| 2 | Datoer for demonstrasjon og prosjektinnlevering? | **Ingen dato finnes ennå.** «Bård Inge vil presisere dette.» Åpent punkt 13 står nå som «avventer Bård Inge» |
+| 3 | Skal BMAD-dokumenter leveres inn? | **Anbefalt, ikke krav.** De sentrale dokumentene er «viktige» og «bør derfor ... pushes dit». De ligger allerede i repoet |
 
 ---
 
@@ -173,10 +262,12 @@ kilde i repoet.** De er ikke gale — de er ubelagte.
 
 ### A. «Emnets vurdering ber om dokumentasjon på hvordan koden er kvalitetssikret»
 
-Står som begrunnelse i `.github/workflows/`-kommentaren og i `README.md`, begge
-uten kilde. Testene og CI-oppsettet er bygget på denne antakelsen. Hvis den
-stemmer, er punktet dekket; hvis den ikke gjør det, har vi bygget noe nyttig av
-feil grunn.
+**Belagt 2026-09-23 — står ikke lenger som antakelse.** Emnesiden:
+«Dokumentasjon må vise hvordan KI ble brukt, og hvordan studentene har
+kvalitetssikret koden», under prosjektkoden (70 %). Se «Eksamen» øverst.
+*Skrevet 22.09, bevart:* antakelsen sto som begrunnelse i
+`.github/workflows/`-kommentaren og i `README.md`, begge uten kilde, og testene
+og CI-oppsettet var bygget på den.
 
 ### B. Hva de tre nivåene krever ut over database
 
@@ -187,21 +278,23 @@ finnes ikke skrevet ned noe sted.
 ### C. Dato for prosjektinnlevering
 
 Ukjent. Ført som **åpent punkt 13** i `prd.md` — eier **Marian**, status
-«spørsmål sendt 22.09, svar avventes». Åtte suksessmål i PRD §7 er bundet til
+**avventer Bård Inge**. Spørsmålet ble stilt 22.09 og besvart 23.09: det finnes
+ingen dato ennå, og «Bård Inge vil presisere dette». Åtte suksessmål i PRD §7 er bundet til
 den, blant annet «Før prosjektinnlevering» og «Ved prosjektinnlevering».
 
 ### D. Dato for demonstrasjonen
 
-Ukjent, samme åpne punkt 13, samme eier og status. PRD §7 fører «Før
+Ukjent, samme åpne punkt 13, samme eier og status — avventer Bård Inge. PRD §7 fører «Før
 demonstrasjonen, est. uke 45» — og «est.» er vår egen estimering, ikke en
 oppgitt dato. Målene «KI-bidrag i drift» og «Grensesnitt og stabilitet» henger
 på den.
 
 ### E. Om PRD og arkitekturdokument er innleveringskrav i seg selv
 
-Faglærer har godkjent fordelingen mellom brief og PRD, men det er ikke det samme
-som at PRD-en skal leveres. Spørsmålet ble stilt i loggen 20.09 og **stilt på
-nytt i Teams 22.09** — se over.
+**Besvart 23.09:** ikke et krav, men de sentrale dokumentene «bør derfor ...
+pushes dit», og BMAD er «fortsatt en sterkt anbefalt arbeidsmetode». De ligger
+allerede i repoet. *Skrevet 22.09, bevart:* spørsmålet ble stilt i loggen 20.09
+og stilt på nytt i Teams 22.09.
 
 ### F. Formkrav til refleksjonsrapporten
 
@@ -223,8 +316,8 @@ skrives.
 
 | Punkt | Merknad |
 |---|---|
-| **Dockerfile** | Navngitt av faglærer som halve innleveringen. Arkitekturen er klar, filen er ikke skrevet |
-| **Databasen** | Besluttet, ikke bygget. Ingen tabell, ingen migrasjon, ingen adapter |
+| **Dockerfile** | Sagt i samtale av faglærer 21.09 («kildekode og docker fil»), ikke bekreftet på emnesiden (hjelpelærer 23.09). Gjøres likevel. Arkitekturen er klar, filen er ikke skrevet |
+| **Databasen** | Sagt i samtale av faglærer 21.09, ikke bekreftet på emnesiden. Gjøres likevel. **Delvis bygget 23.09:** migrasjonsløper (story 1.1, `57a83c5`), `kurs` og `kursserie` med SQLite-adapter (story 1.3, `f4fada0`). Ikke koblet til appen ennå |
 | **Refleksjonsrapporten** | Råmaterialet er ført siden 13.09, men rapporten skal etter faglærers eget svar skrives *etter* prosjektet |
 | **Datoene** | Både prosjektinnlevering og demonstrasjon er ukjente, og åtte suksessmål henger på dem |
 
