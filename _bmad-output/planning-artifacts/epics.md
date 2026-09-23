@@ -436,9 +436,14 @@ feilstavet nøkkel blir en feil i stedet for `None`.
 
 **Kontroll — hva testen ser etter:**
 - `Kursrad` har `dato`, `slutt`, `justert_slutt`, `volum` og avviser å bli konstruert uten dem
-- `Kurslager`-protokollen har `erstatt_serie` og `serie`, og **ingen** `legg_til_rad`
+- `Kurslager`-protokollen har `erstatt_serie`, `serie` og `sist_hentet`, og **ingen** `legg_til_rad`
 - En minneimplementasjon oppfyller protokollen og brukes av testene
 - **Ville feilet hvis:** porten returnerte `list[dict]` med EODHDs engelske nøkler — da kunne en ny kilde bare passe inn ved å etterligne EODHDs feltnavn, og porten ville ikke lenger vært en port
+
+*Endret 2026-09-23, før bygging:*
+- **`sist_hentet(symbol) -> datetime | None`, i UTC (AD-20),** legges i porten nå og ikke i 1.4. Den settes av `erstatt_serie(symbol, rader, hentet)` i samme kall som serien byttes ut, så serie og tidsstempel kommer fra samme øyeblikk. Tidsstempelet er per symbol og ikke globalt, fordi AD-15 lar ett symbol feile og beholde sin gamle serie. Grunnen til å ta det nå: utsettes det, må porten endres to ganger, mens AD-19 sier at kjernen skal røres én gang. «Bare `erstatt_serie` og `serie`» var ment å holde `legg_til_rad` ute, ikke en lesemetode. Hvordan oversikten viser tidsstempelet, avgjøres i 1.4.
+- **`Kursrad.dato` er `datetime.date`, ikke tekst.** En `date` kan ikke være feil formatert, og AD-20 sier at børsdagen er en kalenderdato. Adapteren oversetter.
+- **`Kurskilde` blir stående ved siden av `Kurslager` til 1.4** (valg b). Det er et brudd på AD-3 så lenge det varer. En test hindrer at nye moduler tar `Kurskilde` i bruk.
 
 **Én økt:** ja.
 
