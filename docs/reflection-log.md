@@ -1894,6 +1894,63 @@ Rekkefølgen vi valgte:
 
 ---
 
+## 23.09.2026 – Et bredt utslag er ikke et bevis
+
+Den første transaksjonsmutanten i story 1.3 fjernet `BEGIN`, men beholdt
+`COMMIT`. 17 tester feilet, men alle på «no transaction is active» — altså av
+feil grunn. Den beviste ingenting om transaksjonen. Mutanten ble forkastet og
+laget på nytt, med autocommit per setning. Da feilet nøyaktig én test, den som
+er skrevet for feilen: serien ble `[17.09, 21.09]`. At mange tester feiler, sier
+ikke hva som ble prøvd. Det er *hvilken* test som feiler, og hvorfor, som sier
+det. Ført i `f4fada0` og i arkitekturmemloggen.
+
+---
+
+## 23.09.2026 – En regel uten grunn er ikke en grunn
+
+Før story 1.2 ble det spurt om `Kursrad.dato` skulle være tekst eller `date`. Det
+eneste som talte for tekst, var spinens konvensjonsrad: «Datoer | `YYYY-MM-DD`
+som tekst». Raden oppga ingen begrunnelse, og da den ble lett etter, fantes
+ingen: JSON og SQLite håndteres i adapteren, og kjernen parset allerede teksten
+til `date`. Byttet til `date`, og konvensjonsraden ble rettet (`6abec50`). En
+regel som står skrevet, ser ut som en beslutning, selv når ingen har tatt den.
+
+---
+
+## 23.09.2026 – Et brudd som er navngitt
+
+Valg b i story 1.2 ga to porter for ett datasett, `Kurskilde` og `Kurslager`, fra
+1.2 til 1.4. Det bryter AD-3, og det ble sagt høyt. Bruddet står i docstringen
+til `kursdata.py`, og en test (`TestKurskildeErPaaVeiUt`) hindrer at nye moduler
+tar `Kurskilde` i bruk, så bruddet ikke vokser mens det varer. Det lukkes i 1.4c.
+Forskjellen fra et brudd som bare finnes, er at dette har en grense, en eier og
+en slutt, og at den som leser koden får vite det uten å måtte oppdage det selv.
+
+---
+
+## 23.09.2026 – Regler som bare fantes i ett minne
+
+Fire regler lå som minnefiler på én maskin og ble aldri sett av Joakims økter:
+siter bare det du har lest, tall som spriker, diff etter omskriving, og PRD-en i
+samme mappe. De ble tatt inn i `CLAUDE.md` (`5420595`), sammen med ti andre som
+hadde vært i bruk. Regler som ikke ligger i repoet, er ikke prosjektets regler.
+De er én økts vaner. Én minnefil var dessuten foreldet og ble merket slik, ikke
+slettet.
+
+---
+
+## 23.09.2026 – Kvoten brukt opp med vilje
+
+Dagskvoten brukes eller forsvinner. Én måling kunne bare gjøres ved å bruke hele
+kvoten: hva skjer med kall nummer 21? Svaret var at kallet lyktes og trakk stille
+fra bonuskvoten, 485 → 484 (`malinger.md` §11, `80586a6`). Det endret en føring
+i Epic 2 (`f7f7f8c`): hentekommandoen skal *nekte* å hente to ganger samme
+børsdag, fordi det ellers ikke stopper noe sted. Samme kveld viste den gratis
+sammenlikningen med gårsdagens bilde at siste rad kan bli korrigert i etterkant.
+Det var ikke det målingen skulle finne, men den fant det fordi dataene lå der.
+
+---
+
 ## DD.MM.2026 – kort tittel
 
 ### Dato / deltaker(e)
