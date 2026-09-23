@@ -235,6 +235,9 @@ siden.»
 **Dato:** 2026-09-23. **Form:** de bærende setningene, gjengitt av Marian.
 Fullteksten ligger ikke i repoet.
 
+> Det viktigste er at dere utvikler en applikasjon ved hjelp av KI, og at
+> utviklingsprosessen er synlig og dokumentert.
+
 > Det står derimot ikke på emnesiden jeg har tilgjengelig at Dockerfile eller en
 > bestemt type database er et eksplisitt leveransekrav.
 
