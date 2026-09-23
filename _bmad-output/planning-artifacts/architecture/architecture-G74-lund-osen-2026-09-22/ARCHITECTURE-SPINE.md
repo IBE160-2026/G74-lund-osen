@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-23T18:04'
+updated: '2026-09-23T18:19'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -126,7 +126,7 @@ prosjektmodul. De er løvnoder, og skal forbli det.
 
 - **Binds:** FR-406
 - **Prevents:** at `adjusted_close` blir inkonsistent. EODHD regner serien om bakover ved hvert nytt utbytte, så en påskjøtet serie blander to justeringsgrunnlag
-- **Rule:** `Kurslager.erstatt_serie(symbol, rader, hentet)` sletter symbolets rader og setter inn de nye i **én transaksjon**, sammen med `hentet`, som `sist_hentet(symbol)` leser (UTC, per symbol). Tidspunktet er et argument og leses ikke av lagerets egen klokke, så basen og rådatafila fra samme henting bærer samme øyeblikk. Det finnes ingen `legg_til_rad`. Hver henting dekker minst 175 handelsdager; i praksis et helt år, fordi ett kall koster likt uansett intervallengde.
+- **Rule:** `Kurslager.erstatt_serie(symbol, rader, hentet)` sletter symbolets rader og setter inn de nye i **én transaksjon**, sammen med `hentet`, som `sist_hentet(symbol)` leser (UTC, per symbol). Tidspunktet er et argument og leses ikke av lagerets egen klokke, så basen og rådatafila fra samme henting bærer samme øyeblikk. Det finnes ingen `legg_til_rad`. Hver henting dekker minst 175 handelsdager; i praksis et helt år, fordi ett kall koster likt uansett intervallengde. **En tom serie avvises** (`ValueError`) og endrer ingenting. Ingen lovlig kaller sender tom liste, og en som slapp gjennom ville slettet symbolets historikk og satt et ferskt tidsstempel på ingenting — en feil som ser ut som suksess. Håndheves i `kursdata.kontroller_skriving` for begge lagrene og er prøvd med mutant, story 1.3 (`f4fada0`).
 
 ### AD-6 — Rådata er uforanderlige filer, ikke rader
 
