@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-22T20:44'
+updated: '2026-09-23T17:10'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -177,7 +177,7 @@ prosjektmodul. De er løvnoder, og skal forbli det.
 - **Binds:** FR-701..FR-705
 - **Prevents:** at en parameter justeres til den gir et penere bilde. Modellen skal beskrive hva som skjedde, ikke forutsi hva som skjer
 - **Rule:** `TERSKEL=2`, `VOLUMFAKTOR=1.5`, `NOYTRALSONE=0.02` er låst mot 199 handelsdager og 2 985 aksjedager. Hver konstant bærer målingen i kommentaren ved siden av seg. En endring krever ny måling ført i `malinger.md`, ikke en begrunnelse i en commit-melding.
-- **Målt 2026-09-22** mot de samme 2 985 aksjedagene, `malinger.md` §9. Begge låst på 20. Målingen peker ikke ut 20 som et optimum — alt mellom 15 og 30 oppfører seg tilnærmet likt — men 20 ligger klar av det ustabile området under 15, der valget ville båret vekt det ikke kan forsvare.
+- **Målt 2026-09-22** mot like mange aksjedager, 2 985, men ikke de samme: vinduet går til 21.09, mens §7.4 går til 18.09 — forskjøvet én handelsdag. `malinger.md` §9. Begge låst på 20. Målingen peker ikke ut 20 som et optimum — alt mellom 15 og 30 oppfører seg tilnærmet likt — men 20 ligger klar av det ustabile området under 15, der valget ville båret vekt det ikke kan forsvare.
 
 ### AD-14 — Deduplisering før kategorifilter `[ADOPTED 2026-09-20]`
 

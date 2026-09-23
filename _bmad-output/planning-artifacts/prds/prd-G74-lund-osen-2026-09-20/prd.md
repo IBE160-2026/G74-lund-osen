@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-22T22:58
+updated: 2026-09-23T17:10
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1130,7 +1130,7 @@ uten det kan ingen se at de var åpne, eller hva som måtte til.
 
 | # | Punkt | Lukket av | Dato |
 |---|---|---|---|
-| 7 | **Låsing av signalparametre** mot ~200 handelsdager | `malinger.md` §7.4 låste terskel, volumfaktor og nøytralsone mot 199 handelsdager; §9 låste de to vinduene mot de samme 2 985 aksjedagene. **Punktet anslo 15 kall. Det kostet 0** — begge målingene ble gjort mot lagrede øyeblikksbilder | 21.09 og 22.09 |
+| 7 | **Låsing av signalparametre** mot ~200 handelsdager | `malinger.md` §7.4 låste terskel, volumfaktor og nøytralsone mot 199 handelsdager; §9 låste de to vinduene mot like mange aksjedager, 2 985, forskjøvet én handelsdag. **Punktet anslo 15 kall. Det kostet 0** — begge målingene ble gjort mot lagrede øyeblikksbilder | 21.09 og 22.09 |
 | 14 | **Hver story leveres med test**, kjørbar uten API-kall | Skrevet inn som `AD-8` i arkitekturspinen. Praksisen var allerede innført: `tests/conftest.py` sperrer `socket.connect`, og CI kjører uten hemmeligheter | 22.09 |
 | 17 | **Database** | SQLite besluttet i arkitekturfasen — spinen `AD-3` til `AD-7`, `AD-16`, `AD-18`, `AD-19`. Rådata forblir filer. **Kontrollert med faglærerstaben 22.09** og bekreftet av assisterende hjelpelærer: «Slik dere beskriver bruken […] bruker dere SQLite som en ordentlig database, ikke bare som enkel fillagring. […] Så ut fra det vi vet nå mener jeg dette er helt innenfor.» Svaret kom ikke fra emneansvarlig og bærer sitt eget forbehold | 22.09 |
 | 18 | **Dockerfile** | Arkitekturen besluttet: `AD-9` (ingen data i imaget), `AD-10` (webserveren henter aldri), `AD-11` (to volumer), `AD-12` (hemmeligheter fra miljøet). **Merk at selve filen ikke er skrevet** — punktet gjaldt beslutningen, og bygget står i `docs/innlevering.md` | 22.09 |

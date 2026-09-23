@@ -10,9 +10,10 @@ Terskel, volumfaktor og noytralsone er LAAST 21.09.2026, etter en test mot
 199 handelsdager - 2985 aksjedager - der alle tre verdiene holdt uendret.
 Metode og tall i malinger.md §7.4.
 
-Vinduene paa 20 dager i bevegelse og interesse ble maalt 22.09.2026 mot de
-samme 2985 aksjedagene, se malinger.md §9. Alle fem parametrene er dermed
-laast med maaling bak seg.
+Vinduene paa 20 dager i bevegelse og interesse ble maalt 22.09.2026 mot like
+mange aksjedager, 2985, i et vindu forskjoevet en handelsdag (til og med 21.09,
+ikke 18.09), se malinger.md §9. Alle fem parametrene er dermed laast med
+maaling bak seg.
 """
 
 from dataclasses import dataclass
@@ -25,7 +26,7 @@ NOYTRALSONE = 0.02   # +/-1 % gir bare 5,6 % styrke 0, +/-4 % gir 25,7 %
 VOLUMFAKTOR = 1.5    # 1,25x utloeser nesten alltid, 2,0x toemmer terskel 3
 TERSKEL = 2          # gir 4,6 av 15 per dag; terskel 3 gir 1,1 og 87 tomme dager
 
-# Maalt 22.09.2026 mot de samme 2985 aksjedagene, se malinger.md §9. Alt
+# Maalt 22.09.2026 mot 2985 aksjedager til og med 21.09, se malinger.md §9. Alt
 # mellom 15 og 30 oppfoerer seg tilnaermet likt; under 15 blir valget ustabilt.
 VOLATILITET_VINDU = 20
 VOLUM_VINDU = 20

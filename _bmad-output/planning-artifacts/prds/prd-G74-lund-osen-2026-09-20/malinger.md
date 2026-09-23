@@ -760,8 +760,10 @@ i utgangsbetingelsen for PRD-ens `draft`-status.
 
 ### Metode
 
-Samme datagrunnlag som §7.4: **2 985 aksjedager** — 15 symboler × 199
-handelsdager. Grensen på 199 følger av at MA50 krever 50 dager pluss dagen som
+Like mange aksjedager som §7.4, men ikke de samme: **2 985 aksjedager** — 15
+symboler × 199 handelsdager, 2025-12-02 til 2026-09-21. §7.4 regnet på
+øyeblikksbildet dagen før, 2025-12-01 til 2026-09-18, så vinduene er forskjøvet
+én handelsdag. Grensen på 199 følger av at MA50 krever 50 dager pluss dagen som
 måles, altså 51 av seriens 249.
 
 Hvert vindu ble kjørt over spennet 5–65 dager. To mål ble tatt, og det andre
