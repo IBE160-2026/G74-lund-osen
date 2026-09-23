@@ -1448,6 +1448,11 @@ optimum. Alt mellom 15 og 30 oppfører seg tilnærmet likt. Begrunnelsen for å
 låse 20 ble derfor ikke «20 er best», men «20 ligger klar av det ustabile
 området under 15». Det er en svakere påstand, og den er sann.
 
+*Rettet 2026-09-23:* «monoton i begge vinduene» holder ikke. Regnet for hvert
+vindu fra 5 til 65 er ingen av kurvene monoton. Det som står, er retningen over
+hele spennet. Se rettingen i `malinger.md` §9, funn 1, og PRD-memloggen, linjen
+«OPPFOERINGEN OM MONOTON UTSLAGSRATE (linje 280) HOLDER IKKE».
+
 Påstanden om Prevents-punktene førte ikke til noe, nettopp fordi den ble
 kontrollert. Den er ført som tilfelle 6 i registeret over.
 
@@ -1849,8 +1854,9 @@ derimot ikke på emnesiden jeg har tilgjengelig at Dockerfile eller en bestemt
 type database er et eksplisitt leveransekrav.»
 
 Begge kom fra samtaler med faglærer 21.09, og vi førte dem som krav uten å ha
-kilden. `innlevering.md` sa det allerede 22.09: alt vi vet om innleveringen,
-kommer fra e-post og samtaler. Det var riktig observert og ble likevel ikke
+kilden. Denne loggen sa det allerede 22.09, i oppføringen «Leveranselista kan
+ikke kontrolleres mot en kilde»: «alt vi vet om hva som skal leveres, kommer fra
+e-post og samtaler». *Rettet 2026-09-23.* Det var riktig observert og ble likevel ikke
 fulgt. Dette er det første svaret som viser hva det kostet.
 
 Begge gjøres likevel. Databasen er begrunnet i kravene selv, og sensor må kunne
