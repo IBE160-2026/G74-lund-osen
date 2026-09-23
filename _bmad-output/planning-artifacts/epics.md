@@ -219,6 +219,13 @@ redundante kanaler, FR-201/202 grafen, FR-204 tom-tilstand, FR-706 synlig
 begrunnelse), og NFR-05 dekker språk. Det finnes derfor ingen egne UX-DR-er å
 hente ut, og ingen er oppfunnet for å fylle seksjonen.
 
+*Oppfølging 2026-09-23:* beslutningen står — det finnes fortsatt ingen UX-DR-er,
+og designet ble ikke laget på forhånd. Men `[CU] bmad-ux` kjøres **sent**, som
+en gjennomgang av de to skjermbildene som finnes, ikke som design fra bunnen:
+**story 8.2**. To skjermbilder bærer hele inntrykket, og jo enklere
+applikasjonen er, jo tydeligere må den være. Beslutningen om å hoppe over
+steget er ført i PRD-memloggen 22.09, ikke 20.09 som den senere ble omtalt som.
+
 ### FR Coverage Map
 
 **Levert før nedbrytingen — 12 FR-er.** Bygget som ren logikk med tester. De
@@ -281,7 +288,16 @@ Epic 4.2 (port + minne) ─┘  parallelt med Epic 1 fra dag én
 
 Epic 6 (meldinger) 🔒 ──> Epic 5 (KI i drift) 🔒 <── Epic 4.1
 Epic 7 (hendelser) 🔒
+
+Epic 2 ──> Epic 8.1 (brukertest) ──> Epic 8.2 (UX-gjennomgang)
 ```
+
+**Prioritering, besluttet 2026-09-23:** Epic 1, 2 og 3 først, fordi det er at
+noen utenfor gruppen kan kjøre `docker run`, hente kurser og se begge
+skjermbildene med ekte data. Brukertesten (8.1) kommer rett etter Epic 2, ikke
+før innlevering. UX-gjennomgangen (8.2) kommer sent. Ingen utvidelse av
+omfanget, og forbedringer ut over v1 tas først når dette er kontrollert og
+virker. Begrunnelsen står i PRD-memloggen og i refleksjonsloggen 23.09.
 
 - **Epic 1 før Epic 2:** hentingen skriver gjennom `Kurslager`, som Epic 1
   oppretter. Uten porten har Epic 2 ingenting å skrive til.
@@ -295,6 +311,10 @@ Epic 7 (hendelser) 🔒
   35 testreferanser over fire testfiler. Bare **SQLite-adapteren** trenger
   databasen. To av Epic 4s tre deler kan derfor kjøre parallelt med Epic 1.
 - **Epic 5 etter både Epic 4.1 og Epic 6.** Se avhengighetsvarselet under.
+- **Epic 8.1 rett etter Epic 2, ikke etter Epic 3.** Brukertesten trenger ekte
+  data og begge skjermbildene, ikke Docker. Den kan kjøres på vår egen maskin.
+- **Epic 8.2 etter 8.1.** Funnene fra brukertesten er det viktigste
+  grunnlaget for gjennomgangen.
 
 ### Epic 1: Dataene overlever en omstart, og historikken kan leses tilbake
 
@@ -379,11 +399,22 @@ story som sender inn tekst er *blokkert av* 4.1, ikke anbefalt etter den.
 | **Avgjøres** | Samme frist som Epic 6 |
 | **Ved nei** | Strykes. Tar ingenting med seg ned — ingen annen epic leser kalenderen. Krever dessuten en manuelt vedlikeholdt oppslagstabell, siden kalenderen verken oppgir ticker eller ISIN |
 
+### Epic 8: Tydelig for den som ikke har bygget den
+
+En person utenfor gruppen forstår begge skjermbildene uten hjelp, og designet er
+vurdert, ikke bare arvet fra kravene.
+
+**FR-er:** ingen nye. Prøver FR-101–103, FR-201–204 og FR-706 fra utsiden ·
+**NFR-05, NFR-06** · Oppfyller suksessmålet «Brukerutfall» (PRD §7)
+
+Egen epic og ikke en del av Epic 3: Epic 3 har ett utfall — at løsningen kan
+bygges og kjøres av andre — og brukertesten skal ikke vente på Dockerfilen.
+
 ---
 
 # Stories
 
-30 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
+32 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
 den, hva kontrollen faktisk ser etter, og om den kan gjøres ferdig i én økt.
 
 **«Ville feilet hvis» er kontrollen.** Resten er beskrivelse. En story uten den
@@ -965,3 +996,48 @@ Som **bruker**, vil jeg at resten av siden virker selv om kalenderen er nede, s�
 - **Ville feilet hvis:** kalenderkallet lå i samme try-blokk som resten av siden. Da tar én kilde ned hele detaljen, stikk i strid med NFR-03
 
 **Én økt:** ja.
+
+---
+
+## Epic 8: Tydelig for den som ikke har bygget den
+
+### Story 8.1: Brukertest rett etter Epic 2
+
+Som **gruppe**, vil vi se en person utenfor gruppen bruke løsningen tidlig, så
+vi vet om FR-706 faktisk forklarer før vi bygger mer rundt den.
+
+**Oppfyller:** suksessmålet «Brukerutfall», PRD §7 · **Begrenses av:** FR-706,
+NFR-05, NFR-06
+
+Suksessmålet, ordrett fra `prd.md`: «En person utenfor gruppen gjennomfører
+hovedflyten og forklarer uoppfordret hvorfor en aksje skiller seg ut | Minst 1
+person, under 5 minutter, uten hjelp | Før prosjektinnlevering».
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- Én person utenfor gruppen, uten hjelp, med ekte data fra siste henting og begge skjermbildene
+- Tiden måles fra det første skjermbildet vises til forklaringen er gitt. Terskelen er under 5 minutter
+- Forklaringen personen gir, er notert **ordrett**, ikke referert
+- Funnene er ført i `docs/` med dato, sammen med hva som endres og hva som ikke endres
+- **Ville feilet hvis:** personen ble spurt «hvorfor skiller denne seg ut?». Da er forklaringen oppfordret, og testen måler om personen kan svare på et spørsmål, ikke om skjermen forklarer
+
+**Tidspunkt:** rett etter Epic 2, ikke før innlevering. Suksessmålets frist
+«Før prosjektinnlevering» står fortsatt som ytre grense.
+
+**Én økt:** ja.
+
+### Story 8.2: UX-gjennomgang av de to skjermbildene med `[CU] bmad-ux`
+
+Som **gruppe**, vil vi at de to skjermbildene er vurdert som design, så
+inntrykket ikke bare hviler på at logikken er riktig.
+
+**Oppfyller:** — *(oppfølging av beslutningen 22.09 om å hoppe over `bmad-ux`)* ·
+**Begrenses av:** FR-101–103, FR-201–204, FR-706, NFR-05, NFR-06
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- `[CU] bmad-ux` er kjørt som en **gjennomgang** av skjermbildene som finnes, ikke som design fra bunnen
+- Funnene fra 8.1 er brukt som grunnlag
+- Et dokument viser at designet ble vurdert, med konkrete forbedringer. Hver forbedring er knyttet til et skjermbilde og et krav
+- Forbedringene som tas inn, blir egne små endringer med test
+- **Ville feilet hvis:** gjennomgangen endte i nye skjermbilder eller ny funksjonalitet. Da er det design fra bunnen og en utvidelse av omfanget, ikke en gjennomgang
+
+**Avhenger av:** 8.1. **Én økt:** ja.
