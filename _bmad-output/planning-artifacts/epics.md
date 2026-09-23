@@ -459,6 +459,36 @@ oversikten ikke er tom hver morgen.
 - Slettingen og innsettingen skjer i **én** transaksjon: en feil midtveis lar den gamle serien stå urørt
 - `erstatt_serie` på ett symbol rører ikke de andre fjorten
 - **Ville feilet hvis:** adapteren skjøtet på i stedet for å erstatte. Da ville `adjusted_close` blandet to justeringsgrunnlag etter første utbytte — og ingenting ville feilet, tallene ville bare vært gale
+- `sist_hentet` byttes i samme transaksjon som radene: feiler innsettingen, står både gammel serie og gammel tid
+- Serie og tid overlever at tilkoblingen lukkes og åpnes på nytt
+- **En tom serie avvises** med `ValueError`, i begge lagre, og ingenting endres
+
+*Endret 2026-09-23, før bygging:*
+- **Adapteren er `src/lagring_sqlite.py`, klassen `SqliteKurslager`.** Den tar en
+  `sqlite3.Connection`, ikke en filsti. Hvem som åpner basen og hvor fila ligger,
+  avgjøres i skallet (1.5, 2.2, 3.1). Det er samme grense som for
+  migrasjonsløperen.
+- **1.3 lager den første migrasjonen, `src/migrasjoner/0001_kurs.sql`, og dermed
+  katalogen.** Adapteren kjører ikke migrasjoner selv, og hvem som kaller
+  `migrer`, er fortsatt 3.1s avgjørelse. Testene migrerer en tom base før de
+  bruker adapteren.
+- **`sist_hentet` lagres i en egen tabell, `kursserie(symbol PRIMARY KEY, hentet)`,**
+  med én rad per symbol, skrevet i samme transaksjon som `kurs`-radene byttes
+  ut. Kursradene byttes ut i sin helhet, mens tidsstempelet hører til symbolets
+  serie og ikke til radene. Tabellen heter ikke `aksje`, fordi navn og sektor
+  allerede har ett sted, `AKSJEUNIVERS`.
+- **Adapteren oversetter ved grensen.** `Kursrad.dato` lagres som `YYYY-MM-DD`,
+  og `hentet` som ISO 8601 med UTC-offset. Begge leses tilbake som `date` og
+  `datetime` i UTC. Ingen tekst slipper ut av porten.
+- **Kontrakttestene fra 1.2 kjøres mot både `MinneKurslager` og
+  `SqliteKurslager`,** slik at de to beviselig oppfører seg likt.
+- **En tom serie avvises i porten.** `erstatt_serie(symbol, [], t)` gir
+  `ValueError` i begge lagre, og ingenting endres. AD-5 sier at hver henting
+  dekker minst 175 handelsdager, så ingen lovlig kaller sender en tom liste. Den
+  eneste veien dit er en feil et sted før porten, og da ville porten stille
+  slettet symbolets historikk og satt et ferskt tidsstempel på ingenting. Det er
+  samme feilklasse som AD-15 finnes for: en feil som ser ut som suksess.
+  `MinneKurslager` fra 1.2 endres tilsvarende.
 
 **Én økt:** ja.
 
