@@ -179,9 +179,13 @@ flere av dem er **allerede oppfylt i kode** — de er merket med opphav.
 
 - `AD-8` — Nettverk sperret i testkjøringen *(oppfylt: commit `266e6d9`, 166
   tester grønne)*
-- `AD-13` — Signalparametre er konstanter med måling bak seg
+- `AD-13` — Signalparametre er konstanter med måling bak seg *(oppfylt:
+  `signalberegning.py:23–31`. Terskel, volumfaktor og nøytralsone i commit
+  `8e88ecd`, de to vinduene i `eb7fd9a`)*
 - `AD-14` — Deduplisering før kategorifilter *(oppfylt: commit `9acb55c`)*
-- `AD-15` — En aksje som mangler data stopper ikke hovedflyten
+- `AD-15` — En aksje som mangler data stopper ikke hovedflyten *(oppfylt:
+  hentingen i `fetch_prices.hent_universet`, commit `352e3a2`; visningen i
+  `markedsoversikt.py`, `706720f`, og `app.py` + `index.html`, `f4112fc`)*
 
 **Låste parameterverdier fra `malinger.md`** — en story som rører disse, skal
 stoppe mot målingen, ikke mot hukommelse:
