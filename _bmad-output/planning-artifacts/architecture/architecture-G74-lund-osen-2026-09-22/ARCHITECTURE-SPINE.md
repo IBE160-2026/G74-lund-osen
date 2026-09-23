@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-23T17:39'
+updated: '2026-09-23T17:48'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -124,7 +124,7 @@ prosjektmodul. De er løvnoder, og skal forbli det.
 
 - **Binds:** FR-406
 - **Prevents:** at `adjusted_close` blir inkonsistent. EODHD regner serien om bakover ved hvert nytt utbytte, så en påskjøtet serie blander to justeringsgrunnlag
-- **Rule:** `Kurslager.erstatt_serie(symbol, rader)` sletter symbolets rader og setter inn de nye i **én transaksjon**. Det finnes ingen `legg_til_rad`. Hver henting dekker minst 175 handelsdager; i praksis et helt år, fordi ett kall koster likt uansett intervallengde.
+- **Rule:** `Kurslager.erstatt_serie(symbol, rader, hentet)` sletter symbolets rader og setter inn de nye i **én transaksjon**, sammen med `hentet`, som `sist_hentet(symbol)` leser (UTC, per symbol). Tidspunktet er et argument og leses ikke av lagerets egen klokke, så basen og rådatafila fra samme henting bærer samme øyeblikk. Det finnes ingen `legg_til_rad`. Hver henting dekker minst 175 handelsdager; i praksis et helt år, fordi ett kall koster likt uansett intervallengde.
 
 ### AD-6 — Rådata er uforanderlige filer, ikke rader
 
@@ -278,7 +278,7 @@ FR-408. At dagen mangler, skal vises eksplisitt: `FR-409`.
 |---|---|
 | Navn | Norsk i kode og kommentarer, som i resten av prosjektet. Porter navngis `<Datasett>lager` (skriver) eller `<Datasett>kilde` (leser) |
 | Symbol mot ticker | `symbol` er NewsWeb-formen (`EQNR`), `ticker` er EODHD-formen (`EQNR.OL`). De blandes aldri; `Aksje` er raden som binder dem |
-| Datoer | `YYYY-MM-DD` som tekst. En børsdato er en **norsk** kalenderdato (AD-20); et tidsstempel er ISO 8601 med UTC-offset. Datoen i et filnavn er dataenes dag — aldri filens mtime |
+| Datoer | En børsdato er `datetime.date` inne i systemet (`Kursrad.dato`) og `YYYY-MM-DD` som tekst ved grensene — JSON, SQLite, filnavn. Adapteren oversetter. *Endret 2026-09-23: raden sa «som tekst» uten begrunnelse, og en `date` kan ikke være feil formatert.* En børsdato er en **norsk** kalenderdato (AD-20); et tidsstempel er ISO 8601 med UTC-offset. Datoen i et filnavn er dataenes dag — aldri filens mtime |
 | Kursrader | `Kursrad` med norske felt (AD-19). Kildens feltnavn stopper i adapteren |
 | Kurs | Beregning bruker `adjusted_close` (FR-701). Markedsoversikten viser `close`. Forskjellen er tilsiktet og dokumentert |
 | Feil | En manglende aksje er en rad i `feil`, ikke et unntak som bobler opp (AD-15) |
