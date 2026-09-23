@@ -1871,6 +1871,29 @@ vi ikke hadde lest: kvalitetssikringen av koden hører til de 70 prosentene.
 
 ---
 
+## 23.09.2026 – Prioriteringen etter svaret: samme produkt, annen rekkefølge
+
+To «krav» vi planla etter i tre dager, sto ikke på emnesiden. Det endret ikke
+hva vi bygger, men det endret rekkefølgen. Og det viste at «synlig og
+dokumentert prosess» er det som faktisk vurderes, og at kontrollrapportene,
+mutanttestene og memloggene hører til de 70 prosentene, ikke bare de 30.
+
+Rekkefølgen vi valgte:
+
+1. **Virke først.** Epic 1, 2 og 3: at noen utenfor gruppen kan kjøre
+   `docker run`, hente kurser og se begge skjermbildene med ekte data.
+2. **Design er ikke etterarbeid.** `[CU] bmad-ux` kjøres sent, som en
+   gjennomgang av de to skjermbildene som finnes (story 8.2).
+3. **Brukertesten tidlig**, rett etter Epic 2 (story 8.1). Det er den
+   billigste tilbakemeldingen på designet som finnes, og den avgjør om FR-706
+   faktisk forklarer.
+4. **Ingen utvidelse av omfanget.** Sier Euronext nei, er applikasjonen kurser,
+   signal og forklaring — et helt produkt, som skal være utmerket, ikke et
+   halvferdig større produkt.
+5. **Forbedringer ut over v1** tas først når alt over er kontrollert og virker.
+
+---
+
 ## DD.MM.2026 – kort tittel
 
 ### Dato / deltaker(e)
