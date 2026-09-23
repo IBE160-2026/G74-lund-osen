@@ -290,6 +290,9 @@ Epic 6 (meldinger) 🔒 ──> Epic 5 (KI i drift) 🔒 <── Epic 4.1
 Epic 7 (hendelser) 🔒
 
 Epic 2 ──> Epic 8.1 (brukertest) ──> Epic 8.2 (UX-gjennomgang)
+
+Epic 4.1 + 4.2 ──> Epic 5B (KI forklarer signalet) 🔀 <── Epic 1.4a
+                   utløses av nei eller taushet fra Euronext 28.09
 ```
 
 **Prioritering, besluttet 2026-09-23:** Epic 1, 2 og 3 først, fordi det er at
@@ -298,6 +301,8 @@ skjermbildene med ekte data. Brukertesten (8.1) kommer rett etter Epic 2, ikke
 før innlevering. UX-gjennomgangen (8.2) kommer sent. Ingen utvidelse av
 omfanget, og forbedringer ut over v1 tas først når dette er kontrollert og
 virker. Begrunnelsen står i PRD-memloggen og i refleksjonsloggen 23.09.
+**Epic 4.1 og 4.2 tas parallelt med Epic 1** (plan B, besluttet 23.09). De er
+papirarbeid og en port, og de trengs i både plan A og plan B.
 
 - **Epic 1 før Epic 2:** hentingen skriver gjennom `Kurslager`, som Epic 1
   oppretter. Uten porten har Epic 2 ingenting å skrive til.
@@ -375,7 +380,25 @@ story som sender inn tekst er *blokkert av* 4.1, ikke anbefalt etter den.
 | **Blokkert av** | Åpent punkt 5b (betingelse 4) **og åpent punkt 1 (Euronext)** |
 | **Eier** | Gruppen |
 | **Avgjøres** | Punkt 5b av Epic 4.1, som er ublokkert. Punkt 1 av Euronext — 28.09 er vår egen frist |
-| **Ved nei fra Euronext** | **Epicen strykes i sin helhet.** Alle seks FR-6xx er om meldinger — FR-602 «meldingene i samlekategorien», FR-604 «for hver melding», FR-606 «melding i samlekategorien». Uten Epic 6 finnes ikke datagrunnlaget. **Da bortfaller også NFR-04**, og suksessmålet «KI-bidrag i drift» kan ikke nås, fordi PRD-en måler det i hvilke *meldinger* laget forklarte. Det som overlever er relevanseksperimentet, som henter fra EODHDs nyhets-API og ikke fra NewsWeb — KI kan da demonstreres, men ikke vises i drift |
+| **Ved nei fra Euronext** | **Epicen strykes i sin helhet.** Alle seks FR-6xx er om meldinger — FR-602 «meldingene i samlekategorien», FR-604 «for hver melding», FR-606 «melding i samlekategorien». Uten Epic 6 finnes ikke datagrunnlaget. **Da bortfaller også NFR-04**, og suksessmålet «KI-bidrag i drift» kan ikke nås, fordi PRD-en måler det i hvilke *meldinger* laget forklarte. Det som overlever er relevanseksperimentet, som henter fra EODHDs nyhets-API og ikke fra NewsWeb — KI kan da demonstreres, men ikke vises i drift *Endret 2026-09-23:* med plan B (**Epic 5B**) er KI i drift likevel mulig, men som en forklaring av signalet, ikke av meldinger. Det som strykes, er KI-laget over meldinger. Plan A og B utelukker ikke hverandre: kommer et ja senere, bygges plan A oppå 5B. |
+
+### Epic 5B: KI forklarer signalet (plan B) 🔀
+
+KI legger en forklaring i naturlig språk oppå den regelbaserte forklaringen i
+FR-706, for én aksje om gangen, i aksjedetaljen. Bare utledede verdier fra
+kursdata, ikke innhold fra tredjeparter.
+
+**Bidraget er forståelighet, ikke informasjon.** Med bare kursdata kan KI ikke
+vite noe reglene ikke vet. Den kan si det slik at en person forstår det første
+gang hun leser det. Det er et mindre bidrag enn forklaringen av meldinger ville
+vært, og det skal stå slik.
+
+| Felt | |
+|---|---|
+| **Utløses av** | Nei eller taushet fra Euronext 28.09 (åpent punkt 1 og 19) |
+| **Avhenger av** | Epic 4.1 (betingelse 4 dokumentert), `KILogg` (4.2/4.3), 1.4a (`Kursleser`), og at oppfølgingspunktet om EODHD og plan B er avgjort (`docs/kilder-og-rettigheter.md`) |
+| **Krav** | FR-601..606 skrives ikke om før 28.09. Blir plan B utløst, skrives de om da, med «forståelighet, ikke informasjon» i kravteksten |
+| **Forhold til plan A** | Ikke enten–eller. Kommer et ja senere, bygges plan A oppå 5B, ikke i stedet for |
 
 ### Epic 6: Børsmeldinger i oversikten 🔒
 
@@ -386,7 +409,7 @@ story som sender inn tekst er *blokkert av* 4.1, ikke anbefalt etter den.
 | **Blokkert av** | Åpent punkt 1 — Euronext forbyr automatisert henting uten tillatelse på forhånd |
 | **Eier** | Gruppen |
 | **Avgjøres** | Forespørsel sendt 21.09, ubesvart. **28.09** er vår egen frist for å ta stilling uten svar |
-| **Ved nei** | Strykes i sin helhet — **og tar Epic 5 med seg ned.** Det er ikke en fri strykning: den koster hele KI-laget, NFR-04, to av tre deler av FR-203, og suksessmålet «KI-bidrag i drift». Logikken i `meldinger.py` er bygget og testet fra før, og blir liggende som kode uten datakilde |
+| **Ved nei** | Strykes i sin helhet — **og tar Epic 5 med seg ned.** Det er ikke en fri strykning: den koster hele KI-laget, NFR-04, to av tre deler av FR-203, og suksessmålet «KI-bidrag i drift». Logikken i `meldinger.py` er bygget og testet fra før, og blir liggende som kode uten datakilde *Endret 2026-09-23:* det tar KI-laget **over meldinger** med seg ned, ikke hele KI-laget. Epic 5B står igjen. |
 
 ### Epic 7: Kommende finansielle hendelser 🔒
 
@@ -422,7 +445,7 @@ må vise hvordan KI ble brukt, og hvordan studentene har kvalitetssikret koden»
 
 # Stories
 
-38 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
+42 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
 den, hva kontrollen faktisk ser etter, og om den kan gjøres ferdig i én økt.
 
 **«Ville feilet hvis» er kontrollen.** Resten er beskrivelse. En story uten den
@@ -980,6 +1003,100 @@ skjult men ikke borte, så jeg kan kontrollere hva som ble sortert vekk.
 
 **Én økt:** ja. **Merk:** hvor grensen går, er åpent punkt 2 og kan ikke avgjøres
 på papir.
+
+---
+
+## Epic 5B: KI forklarer signalet (plan B) 🔀
+
+> **Utløses av nei eller taushet fra Euronext 28.09.** 5B.1 kan bygges før
+> det, fordi den ikke sender noe. Plan A og B utelukker ikke hverandre.
+
+### Story 5B.1: Grunnlaget som sendes — bare utledede verdier
+
+Som **gruppe**, vil vi at det som sendes til modellen, er bestemt av én ren
+funksjon, så ingen kan sende rådata ved et uhell.
+
+**Oppfyller:** — *(plan B, punkt 2)* · **Begrenses av:** `AD-1`, betingelse 4
+
+**Kontroll — hva testen ser etter:**
+- `ki_grunnlag(signal)` er ren logikk og gir bare: fortegnet og målingen for hver
+  av de tre sjekkene, styrken og retningen
+- Interessesjekken sendes som **forholdstall** (volum mot median), ikke som de to
+  volumtallene. Forklaringsteksten i dag inneholder rå volumtall
+  (`signalberegning.py:165`)
+- En test krever at ingen kurs og ingen volumverdi fra serien finnes i grunnlaget
+- **Ville feilet hvis:** grunnlaget inneholdt dagens volum eller en kurs. Da
+  sendes et rått datapunkt fra EODHD til en tredjepart, og det har ingen av
+  svarene fra EODHD godkjent
+
+**Én økt:** ja. Kan bygges før 28.09, fordi den ikke sender noe.
+
+### Story 5B.2: Teksten lages i hentekommandoen og lagres i `KILogg`
+
+Som **bruker**, vil jeg at KI-teksten er klar når jeg åpner siden, så jeg aldri
+venter på en modell.
+
+**Oppfyller:** — *(plan B, punkt 1 og 4)* · **Begrenses av:** `AD-2`, `AD-8`,
+`AD-10`, `AD-17`, NFR-02, NFR-04
+
+**Blokkert av:** 4.1 (betingelse 4) og oppfølgingspunktet om EODHD og plan B.
+
+**Kontroll — hva testen ser etter:**
+- Modellen kalles fra én skallfil med én hentefunksjon, og funksjonen er injisert
+  (AD-2). Testene bruker en falsk modell (AD-8)
+- Teksten lages i hentekommandoen, rett etter vurderingen (samme mønster som
+  AD-17), ikke når siden vises
+- Feil eller tidsavbrudd hos modellen stopper ikke hentingen. Aksjen får ingen
+  KI-tekst den dagen, og det logges (NFR-04)
+- `KILogg` får én rad per aksje per dag, med emnet `(symbol, dato)`: hva
+  regelforklaringen sa, hva KI la til, promptversjon og modell (FR-605, story 4.2)
+- **Ville feilet hvis:** KI-kallet lå i webserveren. Da koster hver visning av
+  siden et kall, brukeren venter (NFR-02), og teksten som ble vist, finnes ikke
+  igjen i loggen
+
+**Én økt:** ja.
+
+### Story 5B.3: Visningen i aksjedetaljen
+
+Som **bruker**, vil jeg lese regelforklaringen først og KI-teksten som et tillegg,
+så jeg alltid ser hva signalet faktisk bygger på.
+
+**Oppfyller:** — *(plan B, punkt 1)* · **Begrenses av:** NFR-04, NFR-05, NFR-06
+
+**Kontroll — hva testen ser etter:**
+- Regelforklaringen (FR-706) står først og er alltid synlig
+- KI-teksten står under, merket som laget av KI, med modellnavnet
+- Av/på-bryteren er synlig for brukeren. Med KI av er siden lik den som finnes i
+  dag
+- En dag uten KI-tekst sier det, i stedet for å vise et tomt felt
+- En vakt på vår side: tekst med ord som «kjøp», «selg» eller «anbefal» vises
+  ikke, men logges (NFR-06)
+- **Ville feilet hvis:** KI-teksten erstattet regelforklaringen eller sto før den.
+  Da leses KI som kilden og regelen som en fotnote
+
+**Én økt:** ja.
+
+### Story 5B.4: Måle bidraget — egen brukertest, etter 8.1
+
+Som **gruppe**, vil vi vite om KI-teksten faktisk hjelper, så refleksjonsrapporten
+kan vurdere det kritisk i stedet for å anta det.
+
+**Oppfyller:** suksessmålet «KI-bidrag i drift», tilpasset plan B · **Begrenses
+av:** —
+
+**Egen test, ikke en del av 8.1** *(avgjort 2026-09-23)*. 8.1 måler skjermen
+uten KI. 5B.4 måler KI-tillegget. Blandes de, vet ingen hva som ble målt.
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- Samme person ser samme aksje først med KI av og deretter med KI på. Svarene
+  noteres ordrett
+- `KILogg` over minst én ukes drift: hvor ofte KI-teksten sa noe regelforklaringen
+  ikke sa med ord, og hvor ofte den bare gjentok
+- Et funn om at KI ikke hjelper, føres som funn og ikke som feil
+- **Ville feilet hvis:** personen så KI-versjonen først. Da er det ikke mulig å
+  måle hvordan siden fungerer uten
+
+**Avhenger av:** 8.1 og 5B.3. **Én økt:** ja.
 
 ---
 
