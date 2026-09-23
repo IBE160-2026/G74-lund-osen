@@ -1,4 +1,8 @@
-"""Tester for Kursrad og Kurslager-porten - story 1.2, AD-19 og AD-3.
+"""Tester for Kursrad og Kurslager-porten - story 1.2 og 1.3, AD-19 og AD-3.
+
+Kontrakttestene (fixturen lager) kjoeres mot baade MinneKurslager og
+SqliteKurslager. De to skal oppfoere seg likt; der de ikke gjoer det, tar en
+av dem feil. Det som bare gjelder SQLite, staar i test_lagring_sqlite.py.
 
 Kursrad er raden porten gir ut: norske feltnavn, og ingen av dem kan mangle.
 Poenget er at en feilstavet noekkel blir en feil der dataene kommer inn, i
@@ -13,6 +17,7 @@ fra aa vokse.
 import dataclasses
 import inspect
 import re
+import sqlite3
 import typing
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -20,7 +25,9 @@ from pathlib import Path
 import pytest
 
 import kursdata
-from kursdata import Kurslager, Kursrad, MinneKurslager
+from kursdata import AKSJEUNIVERS, Kurslager, Kursrad, MinneKurslager
+from lagring_sqlite import MIGRASJONSKATALOG, SqliteKurslager
+from migrering import migrer
 
 HENTET = datetime(2026, 9, 22, 8, 33, tzinfo=timezone.utc)
 
@@ -117,56 +124,80 @@ class TestKurslagerProtokollen:
         assert typing.get_type_hints(Kurslager.sist_hentet)["return"] == datetime | None
 
 
-class TestMinneKurslager:
-    def test_oppfyller_protokollen(self):
-        assert isinstance(MinneKurslager(), Kurslager)
+@pytest.fixture(params=["minne", "sqlite"])
+def lager(request, tmp_path):
+    """Hver kontrakttest kjoeres mot begge lagrene. De skal oppfoere seg likt;
+    der de ikke gjoer det, er det en av dem som tar feil."""
+    if request.param == "minne":
+        yield MinneKurslager()
+        return
+    tilkobling = sqlite3.connect(tmp_path / "ose.db")
+    migrer(tilkobling, MIGRASJONSKATALOG)
+    yield SqliteKurslager(tilkobling)
+    tilkobling.close()
+
+
+def datoer(lager, symbol: str = "EQNR") -> list[date]:
+    return [r.dato for r in lager.serie(symbol)]
+
+
+class TestKurslagerKontrakt:
+    def test_oppfyller_protokollen(self, lager):
+        assert isinstance(lager, Kurslager)
         for navn in ("erstatt_serie", "serie", "sist_hentet"):
             assert (
-                inspect.signature(getattr(MinneKurslager, navn))
+                inspect.signature(getattr(type(lager), navn))
                 == inspect.signature(getattr(Kurslager, navn))
             )
 
-    def test_serie_gir_kursrader(self):
-        lager = MinneKurslager()
-        lager.erstatt_serie("EQNR", [rad("2026-09-18"), rad("2026-09-21")], HENTET)
+    def test_serie_gir_kursrader_med_samme_verdier(self, lager):
+        inn = [rad("2026-09-18", 101.5, 99.25, 1234), rad("2026-09-21", 102.0, 100.0, 5678)]
+        lager.erstatt_serie("EQNR", inn, HENTET)
 
         serie = lager.serie("EQNR")
 
-        assert [r.dato for r in serie] == [date(2026, 9, 18), date(2026, 9, 21)]
+        assert serie == inn
         assert all(isinstance(r, Kursrad) for r in serie)
+        assert all(type(r.dato) is date for r in serie)
 
-    def test_ukjent_symbol_gir_tom_liste(self):
-        assert MinneKurslager().serie("EQNR") == []
+    def test_serie_er_kronologisk_uansett_rekkefoelge_inn(self, lager):
+        lager.erstatt_serie("EQNR", [rad("2026-09-21"), rad("2026-09-18")], HENTET)
 
-    def test_erstatt_serie_erstatter_ikke_skjoeter(self):
-        lager = MinneKurslager()
+        assert datoer(lager) == [date(2026, 9, 18), date(2026, 9, 21)]
+
+    def test_ukjent_symbol_gir_tom_liste(self, lager):
+        assert lager.serie("EQNR") == []
+
+    def test_erstatt_serie_erstatter_ikke_skjoeter(self, lager):
+        """Ville feilet hvis adapteren skjoetet paa (AD-5)."""
         lager.erstatt_serie("EQNR", [rad("2026-09-17"), rad("2026-09-18")], HENTET)
 
         lager.erstatt_serie("EQNR", [rad("2026-09-21")], HENTET)
 
-        assert [r.dato for r in lager.serie("EQNR")] == [date(2026, 9, 21)]
+        assert datoer(lager) == [date(2026, 9, 21)]
 
-    def test_erstatt_serie_roerer_ikke_andre_symboler(self):
-        lager = MinneKurslager()
-        lager.erstatt_serie("EQNR", [rad("2026-09-18")], HENTET)
-        lager.erstatt_serie("DNB", [rad("2026-09-18")], HENTET)
+    def test_erstatt_serie_roerer_ikke_de_andre_fjorten(self, lager):
+        for aksje in AKSJEUNIVERS:
+            lager.erstatt_serie(aksje.symbol, [rad("2026-09-18")], HENTET)
+        senere = HENTET + timedelta(days=1)
 
-        lager.erstatt_serie("EQNR", [rad("2026-09-21")], HENTET)
+        lager.erstatt_serie("EQNR", [rad("2026-09-21")], senere)
 
-        assert [r.dato for r in lager.serie("DNB")] == [date(2026, 9, 18)]
+        andre = [a.symbol for a in AKSJEUNIVERS if a.symbol != "EQNR"]
+        assert len(andre) == 14
+        for symbol in andre:
+            assert datoer(lager, symbol) == [date(2026, 9, 18)]
+            assert lager.sist_hentet(symbol) == HENTET
 
-    def test_dict_med_eodhds_noekler_avvises(self):
+    def test_dict_med_eodhds_noekler_avvises(self, lager):
         """Porten slipper ikke inn det gamle formatet bakveien."""
-        lager = MinneKurslager()
-
         with pytest.raises(TypeError):
             lager.erstatt_serie("EQNR", [{"date": "2026-09-21", "close": 100.0,
                                           "adjusted_close": 98.0, "volume": 1000}], HENTET)
 
         assert lager.serie("EQNR") == []
 
-    def test_lagret_serie_foelger_ikke_endringer_i_kallerens_liste(self):
-        lager = MinneKurslager()
+    def test_lagret_serie_foelger_ikke_endringer_i_kallerens_liste(self, lager):
         rader = [rad("2026-09-18")]
         lager.erstatt_serie("EQNR", rader, HENTET)
 
@@ -174,8 +205,7 @@ class TestMinneKurslager:
 
         assert len(lager.serie("EQNR")) == 1
 
-    def test_utlevert_serie_kan_ikke_endre_lageret(self):
-        lager = MinneKurslager()
+    def test_utlevert_serie_kan_ikke_endre_lageret(self, lager):
         lager.erstatt_serie("EQNR", [rad("2026-09-18")], HENTET)
 
         lager.serie("EQNR").append(rad("2026-09-21"))
@@ -183,22 +213,85 @@ class TestMinneKurslager:
         assert len(lager.serie("EQNR")) == 1
 
 
+class TestAvvisningEndrerIngenting:
+    """En avvist skriving etterlater lageret slik det var: gammel serie og
+    gammel tid. For SQLite er det transaksjonen som sikrer det."""
+
+    SENERE = HENTET + timedelta(days=1)
+
+    def _foer(self, lager):
+        lager.erstatt_serie("EQNR", [rad("2026-09-18")], HENTET)
+
+    def _uendret(self, lager):
+        assert datoer(lager) == [date(2026, 9, 18)]
+        assert lager.sist_hentet("EQNR") == HENTET
+
+    def test_tom_serie_avvises(self, lager):
+        """AD-5: hver henting dekker minst 175 dager, saa ingen lovlig kaller
+        sender tom liste. Slapp den gjennom, ville historikken blitt slettet og
+        faatt et ferskt tidsstempel paa ingenting - en feil som ser ut som
+        suksess, samme feilklasse som AD-15."""
+        self._foer(lager)
+
+        with pytest.raises(ValueError):
+            lager.erstatt_serie("EQNR", [], self.SENERE)
+
+        self._uendret(lager)
+
+    def test_tom_serie_avvises_ogsaa_for_nytt_symbol(self, lager):
+        with pytest.raises(ValueError):
+            lager.erstatt_serie("EQNR", [], HENTET)
+
+        assert lager.serie("EQNR") == []
+        assert lager.sist_hentet("EQNR") is None
+
+    def test_to_rader_med_samme_dato_avvises(self, lager):
+        """For SQLite er dette feilen midtveis: DELETE er kjoert og to rader
+        satt inn foer primaernoekkelen stopper den tredje. Ville feilet hvis
+        slettingen og innsettingen ikke laa i samme transaksjon."""
+        self._foer(lager)
+
+        with pytest.raises(ValueError):
+            lager.erstatt_serie(
+                "EQNR",
+                [rad("2026-09-17"), rad("2026-09-21"), rad("2026-09-21")],
+                self.SENERE,
+            )
+
+        self._uendret(lager)
+
+    def test_tid_uten_sone_avvises(self, lager):
+        """Et naivt tidspunkt kan ikke plasseres i UTC (AD-20)."""
+        self._foer(lager)
+
+        with pytest.raises(ValueError):
+            lager.erstatt_serie("EQNR", [rad("2026-09-21")], datetime(2026, 9, 23, 8, 0))
+
+        self._uendret(lager)
+
+    def test_feil_radtype_avvises(self, lager):
+        self._foer(lager)
+
+        with pytest.raises(TypeError):
+            lager.erstatt_serie("EQNR", [{"date": "2026-09-21"}], self.SENERE)
+
+        self._uendret(lager)
+
+
 class TestSistHentet:
     """sist_hentet settes av erstatt_serie i samme kall, per symbol, i UTC."""
 
-    def test_ukjent_symbol_har_ingen_tid(self):
-        assert MinneKurslager().sist_hentet("EQNR") is None
+    def test_ukjent_symbol_har_ingen_tid(self, lager):
+        assert lager.sist_hentet("EQNR") is None
 
-    def test_settes_av_erstatt_serie(self):
-        lager = MinneKurslager()
+    def test_settes_av_erstatt_serie(self, lager):
         lager.erstatt_serie("EQNR", [rad()], HENTET)
 
         assert lager.sist_hentet("EQNR") == HENTET
 
-    def test_er_per_symbol(self):
+    def test_er_per_symbol(self, lager):
         """AD-15: ett symbol kan feile og beholde sin gamle serie - og da ogsaa
         sin gamle tid. Et globalt tidsstempel ville sagt at DNB er fersk."""
-        lager = MinneKurslager()
         lager.erstatt_serie("DNB", [rad()], HENTET)
         senere = HENTET + timedelta(days=1)
 
@@ -207,10 +300,9 @@ class TestSistHentet:
         assert lager.sist_hentet("EQNR") == senere
         assert lager.sist_hentet("DNB") == HENTET
 
-    def test_leveres_i_utc(self):
+    def test_leveres_i_utc(self, lager):
         """AD-20: tidsstempler i UTC. Et tidspunkt med annen sone regnes om,
         ikke kastes - oeyeblikket er det samme."""
-        lager = MinneKurslager()
         oslo = HENTET.astimezone(timezone(timedelta(hours=2)))
 
         lager.erstatt_serie("EQNR", [rad()], oslo)
@@ -218,27 +310,6 @@ class TestSistHentet:
         tid = lager.sist_hentet("EQNR")
         assert tid == HENTET
         assert tid.utcoffset() == timedelta(0)
-
-    def test_tid_uten_sone_avvises_og_ingenting_endres(self):
-        """Et naivt tidspunkt kan ikke plasseres. Avvises foer serien roeres,
-        saa serie og tid aldri kommer fra hvert sitt oeyeblikk."""
-        lager = MinneKurslager()
-        lager.erstatt_serie("EQNR", [rad("2026-09-18")], HENTET)
-
-        with pytest.raises(ValueError):
-            lager.erstatt_serie("EQNR", [rad("2026-09-21")], datetime(2026, 9, 23, 8, 0))
-
-        assert [r.dato for r in lager.serie("EQNR")] == [date(2026, 9, 18)]
-        assert lager.sist_hentet("EQNR") == HENTET
-
-    def test_avvist_serie_endrer_ikke_tiden(self):
-        lager = MinneKurslager()
-        lager.erstatt_serie("EQNR", [rad()], HENTET)
-
-        with pytest.raises(TypeError):
-            lager.erstatt_serie("EQNR", [{"date": "2026-09-21"}], HENTET + timedelta(days=1))
-
-        assert lager.sist_hentet("EQNR") == HENTET
 
 
 class TestKurskildeErPaaVeiUt:

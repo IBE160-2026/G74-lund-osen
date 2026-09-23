@@ -107,8 +107,9 @@ class Kurslager(Protocol):
 
         hentet er oeyeblikket dataene ble hentet, og maa ha tidssone. Det er
         et argument og ikke lagerets egen klokke, saa basen og raadatafila fra
-        samme henting baerer samme tidspunkt. Avvises raden eller tiden,
-        endres ingenting.
+        samme henting baerer samme tidspunkt. En tom serie, en feil radtype,
+        to rader med samme dato eller en tid uten sone avvises, og da endres
+        ingenting.
         """
 
     def serie(self, symbol: str) -> list[Kursrad]:
@@ -122,7 +123,22 @@ class Kurslager(Protocol):
         """
 
 
-def _i_utc(hentet: datetime) -> datetime:
+def kontroller_skriving(rader: list[Kursrad], hentet: datetime) -> datetime:
+    """Felles kontroll for alle Kurslager-implementasjoner. Returnerer hentet i UTC.
+
+    Kjoeres foer noe lagres, saa en avvist skriving etterlater lageret slik
+    det var. Like datoer kontrolleres IKKE her: i SQLite stoppes de av
+    primaernoekkelen midt i transaksjonen, og det er den veien som beviser at
+    slettingen og innsettingen henger sammen.
+    """
+    for rad in rader:
+        if not isinstance(rad, Kursrad):
+            raise TypeError(f"Kurslager tar Kursrad, fikk {type(rad).__name__}")
+    if not rader:
+        # AD-5: hver henting dekker minst 175 handelsdager, saa ingen lovlig
+        # kaller sender tom liste. Slapp den gjennom, ville symbolets historikk
+        # blitt slettet og faatt et ferskt tidsstempel paa ingenting.
+        raise ValueError("Tom serie avvises - en henting gir aldri null rader")
     if not isinstance(hentet, datetime):
         raise TypeError(f"hentet maa vaere datetime, fikk {hentet!r}")
     if hentet.tzinfo is None or hentet.utcoffset() is None:
@@ -142,11 +158,13 @@ class MinneKurslager:
     _hentet: dict[str, datetime] = field(default_factory=dict)
 
     def erstatt_serie(self, symbol: str, rader: list[Kursrad], hentet: datetime) -> None:
-        tid = _i_utc(hentet)
-        for rad in rader:
-            if not isinstance(rad, Kursrad):
-                raise TypeError(f"Kurslager tar Kursrad, fikk {type(rad).__name__}")
-        self._serier[symbol] = tuple(rader)
+        rader = list(rader)
+        tid = kontroller_skriving(rader, hentet)
+        # Samme regel som primaernoekkelen (symbol, dato) i SQLite.
+        datoer = [rad.dato for rad in rader]
+        if len(set(datoer)) != len(datoer):
+            raise ValueError(f"To rader med samme dato for {symbol}")
+        self._serier[symbol] = tuple(sorted(rader, key=lambda rad: rad.dato))
         self._hentet[symbol] = tid
 
     def serie(self, symbol: str) -> list[Kursrad]:
