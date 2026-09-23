@@ -684,6 +684,33 @@ har bestemt det.
 - En `vurdering` overlever `erstatt_serie` på samme symbol: kursverdiene i raden er uendret etterpå
 - **Ville feilet hvis:** noen la til en `oppdater`-metode «for migrasjoner», eller hvis datogrensen ble regnet i UTC — da ville en kjøring 23:30 norsk tid skrevet på gårsdagen
 
+**Forutsetninger før neste migrasjon** *(fra kodegjennomgangen 2026-09-23,
+hver prøvd mot koden samme dag)*. Ingen av dem slår ut i dag, fordi det bare
+finnes én migrasjon. Alle fire må være på plass før `0002` skrives:
+
+- **a) `migrer()` sammenlikner bare antall.** Filnavnene lagres i
+  `skjema_versjon`, men sammenliknes ikke. Prøvd: en base som har kjørt
+  `0002_min.sql`, godtar en katalog med `0002_din.sql`, og `0002_din` kjøres
+  aldri. Løperen skal avvise en katalog der et anvendt nummer har fått nytt
+  filnavn.
+- **b) En `COMMIT` i migrasjonsfila avslutter transaksjonen for tidlig.**
+  Resten av fila kjøres uten den. Prøvd: `CREATE TABLE foer; COMMIT; CREATE
+  TABLE etter; <ugyldig>` etterlater `foer`, `etter` og `skjema_versjon` med
+  versjon 0, **mens feilmeldingen sier «rullet tilbake»**. Neste kjøring stopper
+  på `table foer already exists`. `_kjoer()` skal sjekke `in_transaction` etter
+  hver setning og avvise fila hvis transaksjonen er borte.
+- **c) `SqliteKurslager` godtar en base på versjon 1** selv om katalogen har flere
+  migrasjoner, fordi den bare sjekker `versjon < 1`. Adapteren skal kreve siste
+  versjon.
+- **d) Tilbakerullingen er ikke testet for feil i siste steg,** skrivingen til
+  `kursserie`. Den er bare testet for feil midt i kurs-radene (like datoer).
+  Koden er riktig i dag. Prøvd med trigger: serie og tid står uendret. Men
+  ingen test holder den riktig. Testen bruker `RAISE(ABORT)` i triggere på
+  **både** `INSERT` og `UPDATE` på `kursserie`, fordi `erstatt_serie` gjør
+  `ON CONFLICT DO UPDATE` når symbolet finnes fra før. **Ville feilet hvis:**
+  `COMMIT` lå før skrivingen til `kursserie`. Da får symbolet ny serie med
+  gammel tid.
+
 **Én økt:** ja.
 
 ### Story 1.7: De tre tilstandene skilles
@@ -752,6 +779,13 @@ API-kall, så jeg ikke brenner gruppens dagskvote ved å se på løsningen.
 - Hentekommandoen er en egen inngang mot samme kodebase
 - Nøkkelen leses fra miljøet, ikke fra en fil i imaget
 - **Ville feilet hvis:** noen la hentingen i en oppstartskrok «for at det skal virke ut av boksen». To kjøringer samme dag hadde da brukt 30 av 20 kall
+
+**Forutsetning** *(fra kodegjennomgangen 2026-09-23)*: Flask kjører
+forespørsler i egne tråder (`threaded=True` er standard, `flask/app.py:655`), og
+en `sqlite3`-tilkobling kan som standard ikke deles mellom tråder
+(`check_same_thread`). Prøvd: brukt fra en annen tråd gir den `ProgrammingError`.
+Det avgjøres her hvordan webserveren åpner basen, for eksempel én tilkobling per
+forespørsel. Åpner webserveren basen tidligere, følger forutsetningen dit.
 
 **Én økt:** ja.
 
