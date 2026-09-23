@@ -1093,6 +1093,11 @@ skal forklare, og det er dem FR-501 til FR-503 og FR-601 til FR-606 handler om.
 **Beslutningen gruppen tok, ordrett slik den står i `kilder-og-rettigheter.md`:
 hentingen fortsetter mens forespørselen er ubesvart, og faglærer varsles ikke.**
 
+*23.09: tatt opp på nytt. Det hentes ikke fra NewsWeb før Euronext har svart,
+og beslutningen om å fortsette ble aldri satt ut i livet. Faglærer er ikke
+kontaktet direkte; avhengigheten, at det ikke hentes, og plan B står i Product
+Brief. Se oppføringen 23.09, «En beslutning som mistet grunnen sin samme dag».*
+
 Begrunnelsen er todelt. Grunnlaget vi bygger på i mellomtiden er
 undervisningsunntaket og det at forespørselen faktisk er sendt — ikke at
 vilkårene tillater hentingen. Det gjør de ikke, og det står dokumentert. Og
@@ -1948,6 +1953,26 @@ i Epic 2 (`f7f7f8c`): hentekommandoen skal *nekte* å hente to ganger samme
 børsdag, fordi det ellers ikke stopper noe sted. Samme kveld viste den gratis
 sammenlikningen med gårsdagens bilde at siste rad kan bli korrigert i etterkant.
 Det var ikke det målingen skulle finne, men den fant det fordi dataene lå der.
+
+---
+
+## 23.09.2026 – En beslutning som mistet grunnen sin samme dag
+
+21.09 besluttet vi å fortsette hentingen fra NewsWeb mens Euronext ikke hadde
+svart. Grunnen var at en stopp «ville lammet meldingsdelen i den uken det er tid
+til å bygge den». 23.09 endret planen seg: Epic 1–3 først, meldingsdelen venter,
+og plan B for KI trenger ikke NewsWeb. Grunnen falt bort samme dag, men
+beslutningen ble stående til en gjennomgang tok den opp. Da ble den tatt opp på
+nytt i stedet for å bli liggende: det hentes ikke fra NewsWeb før Euronext har
+svart.
+
+Oppslaget viste noe mer: beslutningen var aldri satt ut i livet. Siste henting
+var 21.09 kl. 17:42, før forbudet var lest, og det er ikke hentet etterpå.
+Kontrollert på gruppens maskiner 23.09. 21.09 sto det: «Kommer det et nei 28.09,
+har vi hentet i en uke uten hjemmel». Det har ikke skjedd. Beslutningen var
+skrevet ned som et valg, men ble ikke utført. Det er samme mekanisme som
+memloggen beskrev 20.09: når et premiss byttes, må det som hang på det, gås
+gjennom ett for ett.
 
 ---
 
