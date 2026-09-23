@@ -904,16 +904,35 @@ kan sende artikkeltekst inn uten å bryte godkjenningen vi fikk.
 
 ### Story 4.2: `KILogg`-porten med minneimplementasjon
 
-Som **utvikler**, vil jeg definere KI-loggen som en port før modellen finnes, så
-arbeidet ikke venter på et valg som ikke er tatt.
+Som **utvikler**, vil jeg definere KI-loggen som én port før modellen finnes, så
+arbeidet ikke venter på et valg som ikke er tatt, og så plan A og plan B logger
+til samme sted.
 
 **Oppfyller:** FR-604, FR-605 · **Begrenses av:** `AD-3`, `AD-7`
 
+*Skrevet om 2026-09-23, før bygging.* Første versjon definerte loggen for
+meldinger alene. Med plan B (Epic 5B) logges også forklaringer av signalet, per
+aksje per dag. **Det er én logg, ikke to:** én port, én tabell. Sammenlikningen
+i refleksjonsrapporten — hva KI bidro med over tid — skal kunne gjøres på tvers
+av begge, og to logger med ulik form ville gjort den til to rapporter.
+
 **Kontroll — hva testen ser etter:**
-- Porten lagrer meldings-id, utsteder, kategori, publiseringstidspunkt, regelfilterets utfall, KI-vurdering, forklaring, usikkerhetsmerke, promptversjon og modell
+- Hver rad har de **felles feltene**: dato, modell, promptversjon, hva regelen
+  sa, og hva KI la til
+- Hver rad har **ett emne**: enten en meldings-id (plan A) eller et
+  `(symbol, dato)`-par (plan B). En rad med begge, eller ingen av dem, avvises
+- Én lesing gir rader av begge slag, ordnet etter dato
 - Porten har **ingen** `slett` og **ingen** `endre`
 - Hele porten prøves mot minneimplementasjonen, uten database
-- **Ville feilet hvis:** promptversjon og modell var utelatt fra raden. Justeres prompten i oktober, blir eksempelsettet en blanding av flere systemer som ser ut som ett
+- **Ville feilet hvis:** promptversjon og modell var utelatt fra raden. Justeres
+  prompten i oktober, blir eksempelsettet en blanding av flere systemer som ser
+  ut som ett
+- **Ville også feilet hvis:** plan B fikk sin egen port eller tabell. Da kan ikke
+  bidraget sammenliknes på tvers, og AD-3 er brutt
+
+**Åpent, avgjøres når plan A bygges:** FR-604 nevner også utsteder, kategori,
+publiseringstidspunkt og usikkerhetsmerke. Om de lagres i loggen eller slås opp
+via meldings-id, avgjøres da. FR-604 står uendret til 28.09.
 
 **Én økt:** ja. **Ingen avhengighet til Epic 1** — porten vet ikke om
 lagringsformen.
