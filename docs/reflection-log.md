@@ -1838,6 +1838,19 @@ like begrenset begge steder.
 
 ---
 
+## 23.09.2026 – Et anslag som pekte feil vei
+
+Rettingsplanen 22.09 mente at lens 3 hadde overtelt, og anslo «12–13
+distinkte» mot lensens 18. Da funnene ble telt 23.09, var alle 18 distinkte.
+Dobbelttellingen var reell, men den lå **mellom** lensene, ikke i lens 3.
+Totalen ble 31 av 35.
+
+Anslaget var ikke bare unøyaktig, det pekte på feil sted. Det er samme mønster
+som kontrollen 22.09 fant seks ganger: en påstand om helheten, skrevet uten å
+se på helheten. Denne gangen sto den i selve rettingsplanen.
+
+---
+
 ## DD.MM.2026 – kort tittel
 
 ### Dato / deltaker(e)
