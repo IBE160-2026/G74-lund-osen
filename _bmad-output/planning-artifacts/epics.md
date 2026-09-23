@@ -422,7 +422,7 @@ må vise hvordan KI ble brukt, og hvordan studentene har kvalitetssikret koden»
 
 # Stories
 
-36 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
+38 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
 den, hva kontrollen faktisk ser etter, og om den kan gjøres ferdig i én økt.
 
 **«Ville feilet hvis» er kontrollen.** Resten er beskrivelse. En story uten den
@@ -531,27 +531,101 @@ oversikten ikke er tom hver morgen.
 
 **Én økt:** ja.
 
-### Story 1.4: Konsumentene leser `Kursrad`
+**Story 1.4 er delt i 1.4a–c.** *Skrevet om 2026-09-23, før bygging.* Den gamle
+teksten var én story merket
+«Én økt: nei». Rettet: testtallet er 253 per 23.09, ikke 166. Mellomtilstanden
+den advarte mot — porten lover `Kursrad` mens `SnapshotKilde` gir `dict` —
+oppstod ikke, fordi valg b i 1.2 holdt `SnapshotKilde` utenfor `Kurslager`.
+«Fem moduler» er erstattet med filene ved navn. Tre ting manglet: hvor appen
+får `Kursrad` fra, fjerningen av `Kurskilde`, og visningen av `sist_hentet`.
+
+### Story 1.4a: Lesegrensen — `Kursleser` og oversetteren fra øyeblikksbildet
+
+Som **utvikler**, vil jeg at konsumentene kan få `Kursrad` fra øyeblikksbildet
+uten at `SnapshotKilde` får en skrivemetode, så 1.4b har noe å lese fra.
+
+**Oppfyller:** — *(grunnlag for FR-406 og FR-101)* · **Begrenses av:** `AD-3`,
+`AD-7`, `AD-19`, `AD-20`
+
+**Kontroll — hva testen ser etter:**
+- `Kursleser` er en `Protocol` med `serie` og `sist_hentet`. `Kurslager` er
+  `Kursleser` pluss `erstatt_serie`. Kontrollert på protokollene
+- `SnapshotLeser` pakker inn `SnapshotKilde` og gir `Kursrad`, og `sist_hentet`
+  i UTC. `SnapshotKilde` får ingen skrivemetode
+- EODHDs feltnavn oversettes ett sted: `kursrad_fra_eodhd(rad)`. Epic 2 bruker den
+  samme funksjonen når hentingen skriver til basen
+- Lese-kontrakttestene kjøres mot tre lagre: `MinneKurslager`, `SqliteKurslager`
+  og `SnapshotLeser`
+- Et symbol med en rad som ikke kan oversettes, behandles som manglende: tom
+  serie og ingen tid, og symbolet navngis for brukeren som manglende (AD-15). De
+  andre symbolene leses som vanlig. Oversetteren tvinger aldri en rad gjennom
+  ved å gjette. Dagens øyeblikksbilde har ingen slike rader: 3 735 rader og null
+  manglende felt, kontrollert 23.09
+- **Ingen konsument røres.** Hele testsettet er grønt, og tallet telles før og
+  etter
+- **Ville feilet hvis:** oversetteren falt tilbake fra `adjusted_close` til
+  `close` når feltet manglet. Det er fallbacken AD-19 finnes for å fjerne: den
+  gir et tall som ser riktig ut, men er regnet på feil serie
+
+**Én økt:** ja.
+
+### Story 1.4b: Konsumentene leser `Kursrad`
 
 Som **utvikler**, vil jeg at kjernen slutter å røre `dict`-nøkler, så `AD-19`
 gjelder hele veien og ikke bare ved porten.
 
-**Oppfyller:** — *(fullfører FR-406)* · **Begrenses av:** `AD-19`, `AD-1`
+**Oppfyller:** — *(fullfører FR-406)* · **Begrenses av:** `AD-19`, `AD-1`, `AD-3`
 
 **Kontroll — hva testen ser etter:**
-- `signalberegning`, `markedsoversikt`, `aksjedetalj` og `graf` tar `Kursrad`
-- **Alle 166 testene er grønne etter endringen** — tallet kontrolleres, ikke antas
-- Ingen av de fire importerer `sqlite3` eller `pathlib`
-- **Ville feilet hvis:** en konsument beholdt oppslaget som faller tilbake fra justert til ujustert kurs. Den linjen bryter FR-701 stille, uten at noen test feiler
+- `signalberegning`, `markedsoversikt` og `aksjedetalj` tar `Kursrad` og leser
+  gjennom `Kursleser`. `graf.py` får `dato` som `date`
+- `app.py` gir konsumentene `SnapshotLeser` i stedet for `SnapshotKilde`
+- Ingen av de fire kjernemodulene importerer `sqlite3`, `pathlib` eller
+  `Kurskilde`
+- Hele testsettet er grønt. Tallet telles før og etter og føres i
+  commit-meldingen, det antas ikke
+- **Ville feilet hvis:** en konsument regnet på `slutt` der den skal regne på
+  `justert_slutt`. Kontrolleres med en serie der de to spriker (et utbytte), og
+  med en mutant som bytter `justert_slutt` med `slutt` i `signalberegning`. Den
+  feilen bryter FR-701 stille
 
-**Én økt: nei, dette er den største.** Fem moduler og deler av testsettet.
+**Omfang, telt 23.09:**
+- 11 `dict`-oppslag: `signalberegning` 2, `markedsoversikt` 3, `aksjedetalj` 6
+- To typeannotasjoner i `graf.py:39–40`, og koblingen i `app.py`
+- I testene: de fire `serie()`-hjelperne og 32 `MinneKilde`-kall (`test_app` 17,
+  `test_aksjedetalj` 8, `test_markedsoversikt` 7). De tre i `test_kursdata`
+  tester `MinneKilde` selv og fjernes i 1.4c
 
-**Hva som gikk tapt ved delingen:** `AD-19` ville at `Kursrad` innføres i samme
-endring som adapteren, slik at konsumentene røres **én** gang. Med 1.2–1.4 som
-tre steg røres de fortsatt bare i 1.4, så intensjonen overlever. Men mellom 1.2
-og 1.4 finnes en tilstand der porten lover `Kursrad` mens `SnapshotKilde`
-fortsatt gir `dict`. Den tilstanden er grunnen til at 1.2–1.4 ikke bør ligge i
-hver sin uke.
+**Kan ikke deles videre.** `beregn_signal` kalles av både
+`markedsoversikt.bygg_rad` og `aksjedetalj` med de samme radene. Endres én av
+dem uten de andre, må det ligge en midlertidig oversettelse fra `dict` til
+`Kursrad` mellom dem. En midlertidig oversettelse er nettopp stedet der en
+fallback fra justert til ujustert kurs kan gjemme seg. Grensen går derfor rundt
+alle tre, pluss `app.py`, som kobler dem til kilden.
+
+**Én økt:** nei, dette er den største. Kodeendringen er liten, testendringen er
+det ikke.
+
+### Story 1.4c: Rydding — `Kurskilde` ut, `sist_hentet` inn
+
+Som **gruppe**, vil vi at bruddet på AD-3 lukkes og at oversikten sier hvor
+gamle dataene er, så ingen leser en foreldet rad som dagens.
+
+**Oppfyller:** FR-101 *(endret 2026-09-23)* · **Begrenses av:** `AD-3`,
+`AD-15`, `AD-20`
+
+**Kontroll — hva testen ser etter:**
+- `Kurskilde`, `MinneKilde` og `TestKurskildeErPaaVeiUt` er fjernet. Det finnes
+  ingen referanse til dem i `src/` eller `tests/`
+- Sidens tidsstempel er det **eldste** `sist_hentet` blant symbolene som vises
+- En rad med eldre `sist_hentet` enn den nyeste viser sitt eget tidsstempel på
+  raden, uten en sjette kolonne
+- Tidsstempler vises i norsk tid (AD-20: lagret i UTC)
+- Spinen og `epics.md` er i takt: AD-3-bruddet er merket lukket, med commit
+- **Ville feilet hvis:** sidens tidsstempel var det nyeste. Da ser en side med én
+  fersk rad og fjorten foreldede ut som fersk
+
+**Én økt:** ja.
 
 ### Story 1.5: `SnapshotKilde` ut av `kursdata.py`
 
