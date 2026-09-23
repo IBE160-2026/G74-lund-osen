@@ -5,17 +5,20 @@ I dag er kilden et tidsstemplet JSON-oeyeblikksbilde i data/. I arkitekturfasen
 blir den etter alt aa doemme en database - aapent punkt 17 - og da skal bare
 denne fila endres.
 
-Derfor gaar all lesing gjennom Kurskilde. Den har to metoder, og ingen av dem
-sier noe om lagringsform.
+Derfor gaar all lesing gjennom en port. I dag er det to: Kurskilde, som
+visningen leser gjennom, og Kurslager (story 1.2), som skal erstatte den.
+Mellom 1.2 og 1.4 har kursdataene altsaa to porter. Det bryter AD-3, og
+bruddet varer til 1.4 flytter konsumentene over og fjerner Kurskilde.
 
 Ingen funksjon her gjoer API-kall. Kvoten brukes bare av fetch_prices.py.
 """
 
 import json
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import date, datetime, timezone
 from pathlib import Path
-from typing import Protocol
+from typing import Protocol, runtime_checkable
 
 PROSJEKTROT = Path(__file__).resolve().parent.parent
 DATA_KATALOG = PROSJEKTROT / "data"
@@ -59,12 +62,108 @@ AKSJEUNIVERS: tuple[Aksje, ...] = (
 )
 
 
+@dataclass(frozen=True)
+class Kursrad:
+    """En handelsdag slik porten gir den ut - AD-19.
+
+    Norske feltnavn, og ingen av dem kan mangle eller vaere None. En
+    feilstavet noekkel gir TypeError her, der dataene kommer inn, i stedet
+    for en None som forplanter seg inn i signalberegningen som et tall som
+    mangler.
+
+    dato er en kalenderdato (AD-20), ikke tekst og ikke et tidspunkt.
+    Adapteren oversetter fra kildens "YYYY-MM-DD".
+    """
+
+    dato: date
+    slutt: float
+    justert_slutt: float
+    volum: int
+
+    def __post_init__(self):
+        # datetime er en underklasse av date, men baerer et klokkeslett, og et
+        # klokkeslett i feil sone kan gi feil boersdag.
+        if not isinstance(self.dato, date) or isinstance(self.dato, datetime):
+            raise TypeError(f"dato maa vaere datetime.date, fikk {self.dato!r}")
+        for navn in ("slutt", "justert_slutt"):
+            verdi = getattr(self, navn)
+            if isinstance(verdi, bool) or not isinstance(verdi, (int, float)):
+                raise TypeError(f"{navn} maa vaere et tall, fikk {verdi!r}")
+        if isinstance(self.volum, bool) or not isinstance(self.volum, int):
+            raise TypeError(f"volum maa vaere et heltall, fikk {self.volum!r}")
+
+
+@runtime_checkable
+class Kurslager(Protocol):
+    """Porten for kursdata - AD-3, AD-5, AD-19. Erstatter Kurskilde i 1.4.
+
+    Bare tre metoder. Det finnes med vilje ingen legg_til_rad: serien skjoetes
+    aldri paa, fordi EODHD regner adjusted_close om bakover ved hvert nytt
+    utbytte (AD-5).
+    """
+
+    def erstatt_serie(self, symbol: str, rader: list[Kursrad], hentet: datetime) -> None:
+        """Bytt ut hele symbolets serie, og sett sist_hentet, i ett.
+
+        hentet er oeyeblikket dataene ble hentet, og maa ha tidssone. Det er
+        et argument og ikke lagerets egen klokke, saa basen og raadatafila fra
+        samme henting baerer samme tidspunkt. Avvises raden eller tiden,
+        endres ingenting.
+        """
+
+    def serie(self, symbol: str) -> list[Kursrad]:
+        """Kronologiske kursrader, nyeste sist. Tom liste hvis vi mangler."""
+
+    def sist_hentet(self, symbol: str) -> datetime | None:
+        """Naar symbolets serie sist ble erstattet, i UTC. None hvis aldri.
+
+        Per symbol og ikke globalt: AD-15 lar ett symbol feile og beholde sin
+        gamle serie, og da ogsaa sin gamle tid.
+        """
+
+
+def _i_utc(hentet: datetime) -> datetime:
+    if not isinstance(hentet, datetime):
+        raise TypeError(f"hentet maa vaere datetime, fikk {hentet!r}")
+    if hentet.tzinfo is None or hentet.utcoffset() is None:
+        raise ValueError(f"hentet maa ha tidssone (AD-20), fikk {hentet!r}")
+    return hentet.astimezone(timezone.utc)
+
+
+@dataclass
+class MinneKurslager:
+    """Kurslager i minnet, for testene. Samme kontrakt som SQLite-adapteren.
+
+    Alt valideres foer noe lagres, saa en avvist skriving etterlater lageret
+    slik det var - samme egenskap som transaksjonen gir i databasen.
+    """
+
+    _serier: dict[str, tuple[Kursrad, ...]] = field(default_factory=dict)
+    _hentet: dict[str, datetime] = field(default_factory=dict)
+
+    def erstatt_serie(self, symbol: str, rader: list[Kursrad], hentet: datetime) -> None:
+        tid = _i_utc(hentet)
+        for rad in rader:
+            if not isinstance(rad, Kursrad):
+                raise TypeError(f"Kurslager tar Kursrad, fikk {type(rad).__name__}")
+        self._serier[symbol] = tuple(rader)
+        self._hentet[symbol] = tid
+
+    def serie(self, symbol: str) -> list[Kursrad]:
+        return list(self._serier.get(symbol, ()))
+
+    def sist_hentet(self, symbol: str) -> datetime | None:
+        return self._hentet.get(symbol)
+
+
 class Kurskilde(Protocol):
     """Det visningen faar lov til aa vite om lagringen.
 
-    To metoder, ingen av dem knyttet til fil eller database. En
-    databaseimplementasjon i arkitekturfasen skal kunne settes inn her uten at
-    markedsoversikt.py eller app.py endres.
+    **PAA VEI UT - fjernes i story 1.4.** Erstattes av Kurslager, som gir
+    Kursrad i stedet for dict. Ikke skriv ny kode mot denne porten;
+    tests/test_kurslager.py feiler hvis en ny modul importerer den.
+
+    To metoder, ingen av dem knyttet til fil eller database.
     """
 
     def tidsstempel(self) -> str | None:
