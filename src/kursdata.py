@@ -14,6 +14,7 @@ Ingen funksjon her gjoer API-kall. Kvoten brukes bare av fetch_prices.py.
 """
 
 import json
+import math
 import re
 from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
@@ -89,6 +90,10 @@ class Kursrad:
             verdi = getattr(self, navn)
             if isinstance(verdi, bool) or not isinstance(verdi, (int, float)):
                 raise TypeError(f"{navn} maa vaere et tall, fikk {verdi!r}")
+            # NaN og uendelig er tall for Python, men ikke kurser. Slapp de
+            # gjennom, ville minnelageret lagret NaN mens SQLite avviste den.
+            if not math.isfinite(verdi):
+                raise ValueError(f"{navn} maa vaere et endelig tall, fikk {verdi!r}")
         if isinstance(self.volum, bool) or not isinstance(self.volum, int):
             raise TypeError(f"volum maa vaere et heltall, fikk {self.volum!r}")
 

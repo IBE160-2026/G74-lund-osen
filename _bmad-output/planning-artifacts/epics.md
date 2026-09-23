@@ -584,6 +584,10 @@ uten at `SnapshotKilde` får en skrivemetode, så 1.4b har noe å lese fra.
   andre symbolene leses som vanlig. Oversetteren tvinger aldri en rad gjennom
   ved å gjette. Dagens øyeblikksbilde har ingen slike rader: 3 735 rader og null
   manglende felt, kontrollert 23.09
+- En EODHD-rad med NaN eller uendelig i `close` eller `adjusted_close` er en rad
+  som ikke kan oversettes, og behandles likt (AD-15). `Kursrad` avviser slike
+  verdier fra 23.09, så oversetteren skal fange `ValueError` fra `Kursrad`, ikke
+  sin egen sjekk
 - **Ingen konsument røres.** Hele testsettet er grønt, og tallet telles før og
   etter
 - **Ville feilet hvis:** oversetteren falt tilbake fra `adjusted_close` til

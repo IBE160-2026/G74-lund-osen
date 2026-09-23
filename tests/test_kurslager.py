@@ -82,6 +82,25 @@ class TestKursrad:
         with pytest.raises(TypeError):
             Kursrad(dato=dato, slutt=100.0, justert_slutt=98.0, volum=1000)
 
+    @pytest.mark.parametrize("felt", ["slutt", "justert_slutt"])
+    @pytest.mark.parametrize("verdi", [float("nan"), float("inf"), float("-inf")],
+                             ids=["nan", "inf", "-inf"])
+    def test_ikke_endelige_tall_avvises(self, felt, verdi):
+        """NaN og uendelig er gyldige float, men ikke kurser. Minnelageret ville
+        lagret NaN mens SQLite avviste den (NOT NULL); uendelig ville begge
+        lagret. Avvises her, der dataene kommer inn."""
+        verdier = {"dato": date(2026, 9, 21), "slutt": 100.0, "justert_slutt": 98.0, "volum": 1000}
+        verdier[felt] = verdi
+
+        with pytest.raises(ValueError):
+            Kursrad(**verdier)
+
+    def test_heltall_godtas_som_kurs(self):
+        """EODHD sender hele kurser som heltall, for eksempel "open":250."""
+        r = Kursrad(dato=date(2026, 9, 21), slutt=250, justert_slutt=250, volum=1000)
+
+        assert r.slutt == 250 and r.justert_slutt == 250
+
     def test_dato_er_date(self):
         assert rad("2026-09-21").dato == date(2026, 9, 21)
 
