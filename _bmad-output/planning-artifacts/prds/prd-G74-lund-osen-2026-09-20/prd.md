@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-23T18:36
+updated: 2026-09-23T18:40
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1123,7 +1123,7 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 | 13 | **Datoer for demonstrasjon og prosjektinnlevering.** Spørsmål sendt faglærer i Teams 2026-09-22, sammen med spørsmål om leveranselista er fullstendig og om noen BMAD-dokumenter skal leveres inn. **Besvart av hjelpelærer 2026-09-23: ingen dato finnes ennå** — «Bård Inge vil presisere dette». Åtte suksessmål i §7 er bundet til disse datoene, og «est. uke 45» er vår egen estimering — ikke en oppgitt dato. Se `docs/innlevering.md` | Marian | **Avventer Bård Inge** (spurt 22.09, besvart 23.09) |
 | 15 | **Plassér kategoriene som havnet i «ukjent»** i riktig bøtte. Krever en ukes drift for å vite hvilke som faktisk dukker opp | | Etter én ukes drift |
 | 21 | **Hva er emnesidens tredje del?** Emnesiden sier «tre deler», men lister to, og nevner at «delvurdering 3 gir anledning til å demonstrere unike bidrag». Hva den tredje delen er, er ikke oppgitt. Spørres Bård Inge sammen med datoene i punkt 13. Se `docs/innlevering.md`, «Eksamen» | Marian | Sammen med punkt 13 |
-| 22 | **Kodegjennomgang som BMAD-steg, én per epic.** `bmad-code-review` kjøres etter hver ferdige epic, første gang etter Epic 1. Emnesiden: «Dokumentasjon må vise hvordan KI ble brukt, og hvordan studentene har kvalitetssikret koden» — en gjennomgang med flere uavhengige lesere er en del av det, i tillegg til testene og mutantene. Lagt til 2026-09-23 | | Etter Epic 1 |
+| 22 | **Kodegjennomgang som BMAD-steg, én per epic.** `bmad-code-review` kjøres etter hver ferdige epic, første gang etter Epic 1. Emnesiden: «Dokumentasjon må vise hvordan KI ble brukt, og hvordan studentene har kvalitetssikret koden» — en gjennomgang med flere uavhengige lesere er en del av det, i tillegg til testene og mutantene. Lagt til 2026-09-23 | Gruppen | Etter Epic 1 |
 
 ### Lukket
 
@@ -1151,7 +1151,7 @@ egen frist for å ta stilling uten svar, ikke en dato Euronext har lovet.
 Fullstendig
 gjennomgang med sitater i `docs/kilder-og-rettigheter.md`.
 
-Av de åpne punktene har 1, 4, 5, 5b, 13, 16, 19, 20 og 21 eier. Punkt 2, 3, 6, 8–12, 15 og 22 mangler det. Punkt 7, 14, 17 og 18 er lukket. *Rettet 2026-09-23: setningen talte lukkede punkter blant de åpne, og manglet 13, 20 og 21.*
+Av de åpne punktene har 1, 4, 5, 5b, 13, 16, 19, 20, 21 og 22 eier. Punkt 2, 3, 6, 8–12 og 15 mangler det. Punkt 7, 14, 17 og 18 er lukket. *Rettet 2026-09-23: setningen talte lukkede punkter blant de åpne, og manglet 13, 20 og 21.*
 
 **Om nummereringen.** Numrene følger rekkefølgen punktene ble opprettet i, ikke
 rekkefølgen i tabellene. Punkt 16 står derfor over sammen med de andre som må
@@ -1162,4 +1162,4 @@ punkt som renummereres, mister sporet tilbake til målingen som begrunnet det.
 **Om eierfeltet.** «Gruppen» er et bevisst valg, ikke en tom rubrikk: vi er to,
 og fordelingen gjøres internt etter hva som passer når punktet skal tas. Det
 eierfeltet skal sikre, er at punktet har en frist og noen som svarer for den —
-ikke at navnet er låst på forhånd. Punkt 2, 3, 6, 8–12, 15 og 22 har frist, men mangler eier.
+ikke at navnet er låst på forhånd. Punkt 2, 3, 6, 8–12 og 15 har frist, men mangler eier.
