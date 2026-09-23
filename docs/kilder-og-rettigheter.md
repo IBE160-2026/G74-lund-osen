@@ -857,6 +857,10 @@ over). Søket 23.09 gikk gjennom alle sporede filer etter alle kurs- og
 volumverdier i `data/`. Utover de over fant det bare medianer (§1) og oppdiktede
 testtall.
 
+**Medianene i §1 står.** Medianen av et oddetall dager er lik én dags verdi, men
+den er regnet ut som et sammendrag, kan ikke knyttes til en dato, og EODHD har
+bekreftet at egne sammendragstall ikke er deres data.
+
 Mønsteret som gjorde dette mulig, er verdt å notere: `data/` ble gitignorert før
 den første målingen ble kjørt. Rådata har aldri vært innom en commit, og da
 trengs ingen opprydding. `.gitignore` er utvidet med mønstre for rådatafiler som
