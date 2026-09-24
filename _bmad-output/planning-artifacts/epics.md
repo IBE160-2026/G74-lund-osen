@@ -649,6 +649,19 @@ dem uten de andre, må det ligge en midlertidig oversettelse fra `dict` til
 fallback fra justert til ujustert kurs kan gjemme seg. Grensen går derfor rundt
 alle tre, pluss `app.py`, som kobler dem til kilden.
 
+**Forutsetning** *(fra gjennomgangen av 23.09, lagt til 2026-09-24)*:
+testhjelperne `serie()` i `test_app.py:23`, `test_markedsoversikt.py:31` og
+`test_signalberegning.py:56` lager datoen som `f"2026-09-{…:02d}"`. En serie
+med mer enn 30 rader gir datoer som «2026-09-31» og høyere. Talt 24.09 ved å
+kjøre testene: `test_app` lager 50 slike datoer (til og med «2026-09-80»),
+`test_signalberegning` 21, `test_markedsoversikt` ingen, fordi ingen av
+seriene der er lengre enn 30. I dag går det bra fordi datoene er tekst:
+`aksjedetalj._innenfor_vindu` (`aksjedetalj.py:121–134`) fanger `ValueError`
+fra `date.fromisoformat` og faller stille tilbake til hele serien eller hopper
+over raden. Når konsumentene leser `Kursrad`, vil de ugyldige datoene feile
+eller behandles som manglende. De tre hjelperne byttes derfor til `date` +
+`timedelta`, slik `test_aksjedetalj.py:20` gjør, i en egen commit før 1.4b.
+
 **Én økt:** nei, dette er den største. Kodeendringen er liten, testendringen er
 det ikke.
 
