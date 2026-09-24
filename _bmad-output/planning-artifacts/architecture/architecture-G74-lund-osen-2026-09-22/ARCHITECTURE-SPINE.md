@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-24T19:09'
+updated: '2026-09-24T19:15'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -111,7 +111,7 @@ prosjektmodul. De er løvnoder, og skal forbli det.
 
 - **Binds:** FR-406, FR-408, FR-501..FR-503, FR-604, FR-605
 - **Prevents:** at to moduler bygger hver sin skrivesti til samme tabell, og at en test må stille opp hele lagringen for å bytte ut ett lager
-- **Rule:** hvert datasett har nøyaktig **én** port og nøyaktig **én** skriver. Lesere går gjennom porten. Portene er `Kurslager`, `Meldingskilde`, `Vurderingslager` og `KILogg` — ikke én felles lagerklasse.
+- **Rule:** hvert datasett har nøyaktig **én** port og nøyaktig **én** skriver. Lesere går gjennom porten. Portene er `Kurslager`, `Meldingslager`, `Vurderingslager` og `KILogg` — ikke én felles lagerklasse. *Omdøpt 2026-09-24: `Meldingskilde` heter `Meldingslager` etter navneregelen, fordi porten har en skriver (story 6.1). Den er ikke bygget.*
 - **Opphav:** mønsteret er utvidet, ikke oppfunnet. `Kurskilde` i `kursdata.py`, commit `be2ba93` (21.09)
 - **Leseside, 2026-09-23:** `Kursleser` (`serie`, `sist_hentet`) er lesesiden av porten for kursdata, og `Kurslager` er `Kursleser` pluss `erstatt_serie`. Det er én port med en leseside, ikke to porter. `Kursleser` er `Kurskilde` født på nytt, med `Kursrad` og tid per symbol.
 
@@ -281,7 +281,7 @@ FR-408. At dagen mangler, skal kunne skilles i lageret: `FR-409`. *Rettet
 
 | Hensyn | Konvensjon |
 |---|---|
-| Navn | Norsk i kode og kommentarer, som i resten av prosjektet. Porter navngis `<Datasett>lager` (skriver) eller `<Datasett>kilde` (leser) |
+| Navn | Norsk i kode og kommentarer, som i resten av prosjektet. Porter navngis etter hva de gjør: `<Datasett>lager` er porten med skrivesiden (én skriver, AD-3), `<Datasett>leser` er lesesiden av samme port, og `<Datasett>logg` er en port som bare legges til (`KILogg`, AD-7). En klasse som bare leser rådata fra fil og aldri skriver, heter `<Noe>kilde` (`SnapshotKilde`). *Endret 2026-09-24: her sto «`<Datasett>lager` (skriver) eller `<Datasett>kilde` (leser)», som ikke passet med `Kursleser` og `KILogg`.* |
 | Symbol mot ticker | `symbol` er NewsWeb-formen (`EQNR`), `ticker` er EODHD-formen (`EQNR.OL`). De blandes aldri; `Aksje` er raden som binder dem |
 | Datoer | En børsdato er `datetime.date` inne i systemet (`Kursrad.dato`) og `YYYY-MM-DD` som tekst ved grensene — JSON, SQLite, filnavn. Adapteren oversetter. *Endret 2026-09-23: raden sa «som tekst» uten begrunnelse, og en `date` kan ikke være feil formatert.* En børsdato er en **norsk** kalenderdato (AD-20); et tidsstempel er ISO 8601 med UTC-offset. Datoen i et filnavn er dataenes dag — aldri filens mtime |
 | Kursrader | `Kursrad` med norske felt (AD-19). Kildens feltnavn stopper i adapteren |
@@ -356,8 +356,8 @@ mot `melding` er derfor en *mulig* kilde, ikke den bindende. Valget ligger i
 G74-lund-osen/
   src/
     kursdata.py          # porter + AKSJEUNIVERS. Ingen I/O
-    lagring_sqlite.py    # adapter: implementerer portene   [ny]
-    migrasjoner/         # nummererte SQL-filer (AD-16)     [ny]
+    lagring_sqlite.py    # adapter: implementerer portene   [bygget i 1.3]
+    migrasjoner/         # nummererte SQL-filer (AD-16)     [bygget i 1.3]
     fetch_prices.py      # eneste nettkall
     signalberegning.py   # ren logikk
     meldinger.py         # ren logikk
