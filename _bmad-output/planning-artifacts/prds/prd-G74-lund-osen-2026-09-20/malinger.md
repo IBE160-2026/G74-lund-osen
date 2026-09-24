@@ -176,10 +176,10 @@ YAR 3.
 32 av 121 meldinger (26,4 %) er samme melding på norsk og engelsk, publisert
 samme minutt fra samme utsteder. To eksempler:
 
-- «Equinor ASA: Share buy-back — third tranche for 2026» og
-  «Equinor ASA: Tilbakekjøp av egne aksjer — tredje transje for 2026»
-- «DNB Bank ASA — status of share buy-back programme after week 34 2026» og
-  «DNB Bank ASA — status for tilbakekjøpsprogram etter uke 34 2026»
+- Equinors melding om en ny transje i tilbakekjøpsprogrammet, på engelsk og norsk
+- DNBs ukentlige statusrapport for tilbakekjøpsprogrammet, på engelsk og norsk
+
+*Titlene er byttet med beskrivelser 2026-09-24 (regel 16 i `CLAUDE.md`). De ligger i historikken.* Kategorien er ikke ført for disse to.
 
 Skrevet inn som FR-501.
 
@@ -190,16 +190,23 @@ reelle hendelser og ren støy, med samme kategorifelt:
 
 | Reell hendelse | Støy |
 |---|---|
-| Aker BP has started production from the Skarv Satellites | Invitation to Hydro's Investor Day, London |
-| KONGSBERG completes Sonatech acquisition | MPCC to present at the Pareto Securities' Energy Conference |
-| Telenor's subsidiary KNL secures framework agreement with the Danish Armed Forces | Gjensidige appoints Berit Nilsen as Head of Investor Relations |
-| Completion of the Telenor Connexion Transaction | Gjensidige hosts its Analyst Day 2026 today |
+| Aker BP: produksjonsstart på et felt | Hydro: invitasjon til en investordag |
+| Kongsberg: et oppkjøp er fullført | MPCC: skal presentere på en investorkonferanse |
+| Telenor: et datterselskap får en rammeavtale med en forsvarskunde | Gjensidige: ny leder for investorrelasjoner |
+| Telenor: en transaksjon er gjennomført | Gjensidige: analytikerdag |
+
+*Titlene er byttet med beskrivelser 2026-09-24 (regel 16 i `CLAUDE.md`). De ligger i historikken.*
 
 ### Tilbakekjøpskategorien — samme problem
 
+Kategorien er `UTSTEDERS MELDEPLIKT VED HANDEL I EGNE AKSJER`
+(`begrunnelser.md` §1).
+
 | Reell hendelse | Rutine |
 |---|---|
-| SalMar — Oppstart for tilbakekjøpsprogram for aksjer | DNB Bank ASA — status for tilbakekjøpsprogram etter uke 34 2026 |
+| SalMar: oppstart av et tilbakekjøpsprogram | DNB: ukentlig statusrapport for tilbakekjøpsprogrammet |
+
+*Titlene er byttet med beskrivelser 2026-09-24 (regel 16 i `CLAUDE.md`). De ligger i historikken.*
 
 Ført som åpent punkt 8 i PRD-en.
 
@@ -510,7 +517,7 @@ bærer «å» i sitt eget firmanavn og blir lest som norsk.
 Kontrollert på funksjonen med konstruerte titler, siden det ene døgnet vi har
 hentet ikke inneholder meldinger fra Vår Energi:
 
-| Tittel | `gjett_spraak` gir |
+| Konstruert tittel | `gjett_spraak` gir |
 |---|---|
 | `Vår Energi ASA: Third quarter 2026 results` | **norsk** — feil |
 | `Vår Energi ASA - Notice of Extraordinary General Meeting` | **norsk** — feil |

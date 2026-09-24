@@ -36,14 +36,14 @@ feil.
 
 **2. Samlekategorien i NewsWeb (måling 2026-09-20).** Kategorien
 `IKKE-INFORMASJONSPLIKTIGE PRESSEMELDINGER` inneholdt over fire uker både
-«Aker BP has started production from the Skarv Satellites» og «Invitation to
-Hydro's Investor Day, London». *Samme kategorifelt, uforenlig betydning.*
+Aker BPs melding om produksjonsstart på et felt og Hydros invitasjon til en
+investordag. *Samme kategorifelt, uforenlig betydning.*
 
 **3. Tilbakekjøpskategorien (måling 2026-09-20).** Kategorien
 `UTSTEDERS MELDEPLIKT VED HANDEL I EGNE AKSJER` inneholdt både SalMars
-«Oppstart for tilbakekjøpsprogram for aksjer» — en reell hendelse — og DNBs
-«status for tilbakekjøpsprogram etter uke 34 2026», en rutinerapport.
-*Samme felt igjen, samme problem.*
+melding om oppstart av et tilbakekjøpsprogram — en reell hendelse — og DNBs
+ukentlige statusrapport for tilbakekjøpsprogrammet, en rutinerapport.
+*Samme felt igjen, samme problem.* *Titlene er byttet med beskrivelser 2026-09-24 (regel 16 i `CLAUDE.md`). De ligger i historikken.*
 
 Tre uavhengige målinger av det samme: **metadata skiller ikke betydning.**
 
@@ -160,8 +160,10 @@ originalen et riktigere utgangspunkt enn en oversettelse av en engelsk tekst.
 Oppstarten av et tilbakekjøpsprogram er ekte nyhet, men ligger i samme kategori
 som de ukentlige statusrapportene:
 
-> SalMar — Oppstart for tilbakekjøpsprogram for aksjer
-> DNB Bank ASA — status for tilbakekjøpsprogram etter uke 34 2026
+- SalMar: oppstart av et tilbakekjøpsprogram
+- DNB: ukentlig statusrapport for tilbakekjøpsprogrammet
+
+*Titlene er byttet med beskrivelser 2026-09-24 (regel 16 i `CLAUDE.md`). De ligger i historikken.*
 
 Med regelen i FR-502 filtreres begge bort, og den første er et tap. Dette er
 samme problem som i samlekategorien — kategorifeltet skiller ikke — og må løses

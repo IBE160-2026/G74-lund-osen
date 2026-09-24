@@ -840,14 +840,18 @@ datasettet**.
 | Kategorifordelinger i meldingsbildet | Meldingene fra NewsWeb |
 | Kalltall, kvoteforbruk og måleresultater | Alt innhold i `data/` |
 | Metodebeskrivelser og konklusjoner | |
-| Noen siterte meldingstitler, som eksempler på hva vi målte | |
+| Meldingstitler: fjernet 2026-09-24 til Euronext har svart. Brevet 21.09 opplyste om dem, og de ligger i historikken | |
 
-*Lagt til 2026-09-24:* raden om meldingstitler manglet. Brevet til Euronext
-21.09 opplyste om «a small number of announcement titles quoted in our
-documentation to show what we measured» (`docs/epost-til-euronext.md`). Talt
-24.09: 13 titler fra NewsWeb står ordrett i `malinger.md` §4, og to av dem også i
-`begrunnelser.md`. De tre titlene i `malinger.md` om språkgjenkjenningen er
-konstruerte, ikke hentet.
+*2026-09-24:* brevet til Euronext 21.09 opplyste om «a small number of
+announcement titles quoted in our documentation to show what we measured»
+(`docs/epost-til-euronext.md`). De 13 titlene fra NewsWeb sto ordrett i
+`malinger.md` §4, og fire av dem også i `begrunnelser.md`. De er byttet med
+korte beskrivelser, samme prinsipp som for EODHD-verdiene (regel 16 i
+`CLAUDE.md`): vilkårene forbyr å gi innholdet videre, svaret er ikke kommet, og
+én av titlene navnga en person. De tre titlene om språkgjenkjenningen i
+`malinger.md` er konstruerte og står. Ingen artikkeltitler eller utdrag fra
+EODHD-nyhetene står ordrett i sporede filer, kontrollert mot
+`data/nyhetstest-raa-2026-09-21.json` samme dag.
 
 `data/` ligger i `.gitignore`, sammen med `.env`. Rådata og API-nøkler er derfor
 ikke eksponert.
