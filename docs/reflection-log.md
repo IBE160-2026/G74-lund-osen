@@ -557,6 +557,8 @@ Antakelsen var feil, men ikke slik vi trodde. Det finnes ikke to repoer.
 
 Rådata fra EODHD og API-nøkler er altså ikke eksponert. Det som er offentlig, er koden og
 planleggingsdokumentene.
+*24.09: gjelder filene. Rå enkeltverdier fra EODHD sto i sporede dokumenter fra
+20.09 kl. 16:00 til 23.09; se «Avvik, funnet og rettet 2026-09-23» i `docs/kilder-og-rettigheter.md` og oppføringen «23.09.2026 – En instruksjon er en påstand».*
 
 Men funnet har en konsekvens for PRD-en. Vi skrev inn i går at utløseren for å vurdere
 bruksvilkårene på nytt er **publisering, ikke kommersialisering**. Koden er publisert. Selve
@@ -824,6 +826,8 @@ settes i gang:
 `data/` har noen gang vært sporet — kontrollert på objektnivå ved å liste alle
 blobs i historikken, ikke bare mot filnavn. Det fantes ingenting å fjerne og
 ingen historikk å skrive om.
+*24.09: gjelder filene under `data/`. Rå enkeltverdier fra EODHD sto likevel i
+sporede dokumenter og ligger fortsatt i historikken; se «Avvik, funnet og rettet 2026-09-23» i `docs/kilder-og-rettigheter.md` og oppføringen «23.09.2026 – En instruksjon er en påstand».*
 
 Overskriftene var riktige. Hver overskrift i dokumentet ble listet sammen med
 teksten under seg, og ingen identiske nabolinjer finnes i fila. Adressen
@@ -850,7 +854,7 @@ som telles feil ser mindre ut enn det er.*
 |---|---|---|---|
 | 1 | Natt til 20.09.2026 | Brief-utkastene «finnes i repoet med historikk» | Seks av sju filer lå ikke der. Kontrollert med md5 |
 | 2 | 20.09.2026, formiddag | Overskriften står to ganger, og en setning er klippet inn i mappestrukturen i README | Filen var hel. En `tail -14`-utskrift var lest som hele filen |
-| 3 | 20.09.2026, kveld | Rådata ligger eksponert, og en patch traff feil overskrift | Verken rådata eller feilplassert tekst fantes |
+| 3 | 20.09.2026, kveld | Rådata ligger eksponert, og en patch traff feil overskrift | Verken rådata eller feilplassert tekst fantes. *24.09: gjelder rådatafilene. Rå enkeltverdier sto i dokumentene, se «Avvik, funnet og rettet 2026-09-23» i `docs/kilder-og-rettigheter.md` og oppføringen «23.09.2026 – En instruksjon er en påstand»* |
 | 4 | 21.09.2026, kl. 18:40 | En klausul fra Euronexts vilkår, oppgitt i anførselstegn | Setningen var ikke lest i kilden. Den var rekonstruert fra en avkortet linje i et referat |
 | 5 | 21.09.2026, kl. 21:15 | «Joakims perspektiv finnes ikke i loggen» — lest som at han ikke hadde deltatt | Loggen viser hvem som *førte* oppføringene, ikke hvem som bidro. Kilden var et menneske, ikke en fil |
 | 6 | 22.09.2026, ettermiddag | «AD-20 har nå to Prevents-punkter som sier det samme» — med instruks om å slette det ene | Det var ett. Kilden var en diff-visning, der den gamle linjen står over den nye. Arbeidsøkta talte punktene i fila i stedet for å gjøre som instruksen sa |
@@ -984,6 +988,7 @@ ene ville fjernet filer fra sporing, det andre ville endret tekst under en
 overskrift som var riktig. Historikkomskrivingen som ble vurdert, ville gitt nye
 SHA-er for hele repoet og tvunget fram en ny kloning — for å fjerne noe som
 aldri lå der.
+*24.09: rådatafilene lå aldri der, men rå enkeltverdier gjorde det; se «Avvik, funnet og rettet 2026-09-23» i `docs/kilder-og-rettigheter.md` og oppføringen «23.09.2026 – En instruksjon er en påstand».*
 
 Tiltaket er billig: **påstander om repotilstand verifiseres i økta som har
 tilgang, før et tiltak settes i gang.** Det tok to kommandoer å avkrefte begge.

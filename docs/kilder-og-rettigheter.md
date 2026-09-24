@@ -270,7 +270,7 @@ you outlined», og deretter legges én ny til:
 |---|---|---|
 | 1 | «the output stays local» | Oppfylt. Resultatet vises bare i applikasjonen, som kjører lokalt |
 | 2 | «the project is not publicly deployed» | Oppfylt. Applikasjonen publiseres ikke |
-| 3 | «the data is not published, redistributed, resold, or used to train any model» | Oppfylt. Artiklene selv: `data/` er gitignorert. De utledede tallene: EODHD bekreftet skriftlig samme kveld at egne sammendragstall ikke er deres Informasjon «in repackaged form» — se «Oppfølgingen samme kveld». Forbeholdet som sto her, er dermed innfridd for EODHDs data |
+| 3 | «the data is not published, redistributed, resold, or used to train any model» | Oppfylt. Artiklene selv: `data/` er gitignorert. De utledede tallene: EODHD bekreftet skriftlig samme kveld at egne sammendragstall ikke er deres Informasjon «in repackaged form» — se «Oppfølgingen samme kveld». Forbeholdet som sto her, er dermed innfridd for EODHDs data. *24.09: gjaldt ikke 20.–23.09, da rå enkeltverdier fra EODHD sto i repoet. Se «Avvik, funnet og rettet 2026-09-23» under «Hva vi publiserer».* |
 | 4 | «Please ensure that your chosen LLM service does not use the submitted content for training either» | **Ikke oppfylt.** Se under |
 
 **Betingelse 4 er en plikt EODHD har lagt på oss, ikke en de har oppfylt.**
@@ -839,6 +839,8 @@ datasettet**.
 
 `data/` ligger i `.gitignore`, sammen med `.env`. Rådata og API-nøkler er derfor
 ikke eksponert.
+*24.09: gjelder filene. Rå enkeltverdier fra EODHD sto likevel i sporede
+dokumenter 20.–23.09. Se «Avvik, funnet og rettet 2026-09-23» under.*
 
 **Kontrollert 20.09.2026.** Hele repoet ble gjennomgått for kildedata som ligger
 slik de kom fra leverandøren:
@@ -854,6 +856,8 @@ slik de kom fra leverandøren:
 
 Det betyr at en historikkomskriving ikke er nødvendig. Det finnes ingenting å
 fjerne, og ingen commit å skrive om.
+*24.09: stemte ikke. Det fantes enkeltverdier å fjerne, og de ligger fortsatt i
+historikken. Se «Avvik, funnet og rettet 2026-09-23» rett under.*
 
 **Avvik, funnet og rettet 2026-09-23.** Rå enkeltverdier fra EODHD — kurs eller
 volum for en bestemt dag — har likevel stått i repoet:
@@ -894,7 +898,8 @@ git-historikken.
 
 Mønsteret som gjorde dette mulig, er verdt å notere: `data/` ble gitignorert før
 den første målingen ble kjørt. Rådata har aldri vært innom en commit, og da
-trengs ingen opprydding. `.gitignore` er utvidet med mønstre for rådatafiler som
+trengs ingen opprydding. *24.09: gjelder rådatafilene. Enkeltverdier har vært
+innom commits, se «Avvik, funnet og rettet 2026-09-23» over.* `.gitignore` er utvidet med mønstre for rådatafiler som
 måtte havne utenfor `data/`.
 
 **Begrunnelsen:** sammendragsstatistikk er ikke databasen. At medianomsetningen
