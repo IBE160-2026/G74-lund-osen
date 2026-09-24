@@ -71,3 +71,13 @@ et sitat som ikke fantes».
     er utført, legges en linje under med commitene og utfallet. Ingen rådata
     eller nøkler (regel 16). Grunnen: emnesiden krever dokumentasjon av hvordan
     KI ble brukt, og instruksjonene er promptene.
+19. **README-en følger repoet.** Når et dokument eller en mappe som README-en
+    nevner, legges til, flyttes, får nytt navn eller slettes, rettes
+    «Dokumentene» og «Mappestruktur» i samme commit. Nye hoveddokumenter under
+    `docs/` og `_bmad-output/planning-artifacts/`, for eksempel en ny
+    kontrollrapport, `docs/kvalitetssikring.md` eller refleksjonsrapporten,
+    føres i «Dokumentene» som lenke. Nye filer i en mappe som allerede er
+    lenket, som `docs/ai-prompts/` og `_bmad-output/implementation-artifacts/`,
+    trenger ikke egen linje. Endres koden slik at noe README-en sier om den,
+    ikke lenger stemmer, rettes README-en i samme commit. `tests/test_readme.py`
+    sjekker at hver lenke i README-en peker på noe som finnes.
