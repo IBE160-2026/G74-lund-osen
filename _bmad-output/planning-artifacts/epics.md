@@ -339,7 +339,9 @@ stilles, er åpent punkt 20 i `prd.md`.
 **FR-er:** FR-406, FR-408, FR-409 · **NFR-07** · **AD-er:** 3, 4, 5, 6, 7, 16, 17, 18, 19
 
 `AD-19` binder rekkefølgen inne i epicen: `Kursrad` innføres i **samme endring**
-som SQLite-adapteren. Konsumentene — `markedsoversikt`, `aksjedetalj`, `graf`,
+som SQLite-adapteren. *Rettet 2026-09-24:* slik ble det ikke. `Kursrad` og porten
+kom i 1.2 (`a796214`), SQLite-adapteren i 1.3 (`f4fada0`) og lesegrensen i 1.4a,
+som i AD-19-rettelsen og spinens «Slik det ble». Konsumentene — `markedsoversikt`, `aksjedetalj`, `graf`,
 `signalberegning` — oppdateres her, med full testkjøring mellom hvert steg. Det
 er også her `kursdata.py` sitt I/O-brudd lukkes og `app.py` slutter å lese
 snapshot utenom porten.
