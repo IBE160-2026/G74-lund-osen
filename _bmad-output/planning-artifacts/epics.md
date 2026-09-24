@@ -725,7 +725,8 @@ har bestemt det.
 
 **Forutsetninger før neste migrasjon** *(fra kodegjennomgangen 2026-09-23,
 hver prøvd mot koden samme dag)*. Ingen av dem slår ut i dag, fordi det bare
-finnes én migrasjon. Alle fire må være på plass før `0002` skrives:
+finnes én migrasjon. Alle åtte må være på plass før `0002` skrives. *e–h lagt
+til 2026-09-24, fra gjennomgangen av 23.09, og prøvd mot koden 24.09:*
 
 - **a) `migrer()` sammenlikner bare antall.** Filnavnene lagres i
   `skjema_versjon`, men sammenliknes ikke. Prøvd: en base som har kjørt
@@ -749,6 +750,30 @@ finnes én migrasjon. Alle fire må være på plass før `0002` skrives:
   `ON CONFLICT DO UPDATE` når symbolet finnes fra før. **Ville feilet hvis:**
   `COMMIT` lå før skrivingen til `kursserie`. Da får symbolet ny serie med
   gammel tid.
+- **e) En kjørt migrasjonsfil som endres i ettertid, oppdages aldri.** Prøvd:
+  en base som har kjørt `0001_a.sql`, godtar samme fil med helt annet innhold,
+  og `migrer()` returnerer 1 uten feil. `skjema_versjon` skal lagre sha256 av
+  filinnholdet, og løperen skal avvise katalogen hvis en kjørt fil er endret.
+  Billigst nå, før noen ekte base finnes.
+- **f) `migrer()` leser versjonen før transaksjonen starter,** og `BEGIN` er
+  utsatt (deferred). Feilmeldingen regner ut versjonen (`nummer - 1`) i stedet
+  for å lese den. Hentekommandoen og webserverens oppstart kan migrere
+  samtidig. Prøvd med to tilkoblinger: A leser versjon 0, B migrerer til 1, og
+  A kjører så `0001` og får «table a already exists … Basen staar paa versjon
+  0», mens basen står på 1. Løperen skal bruke `BEGIN IMMEDIATE` og lese
+  versjonen på nytt inne i transaksjonen.
+- **g) Katalogkontrollen har tre hull.** Prøvd:
+  - `glob("*.sql")` skiller store og små bokstaver på Linux og hopper stille
+    over `0002_ny.SQL`. På Windows tar `glob` den med, og `FILNAVN` avviser
+    den. Samme katalog oppfører seg altså ulikt på de to plattformene
+  - En fil med nummer `0000` gir en villedende melding: `0000` og `0001` gir
+    «Migrasjon 0002 mangler»
+  - En tom katalog gir versjon 0 uten feil
+- **h) To tester lover mer enn de sjekker.** «lar tom base være tom»
+  (`test_migrering.py:174`) bruker `tabeller()`, som filtrerer bort
+  `skjema_versjon`. «umigrert base … får ingen tabeller»
+  (`test_lagring_sqlite.py:119`) sjekker bare versjonen. Begge skal sjekke
+  `count(*)` i `sqlite_master`.
 
 **Én økt:** ja.
 
