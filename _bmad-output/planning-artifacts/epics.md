@@ -285,6 +285,7 @@ tverrgående med navngitt kontroll (NFR-03, 05, 06).
 ## Epic List
 
 **Rekkefølge.** Pilene er harde avhengigheter, ikke anbefalinger.
+Nummereringen er ikke byggerekkefølgen; grafen gjelder. *Lagt til 2026-09-24.*
 
 ```
 Epic 1 (lagring) ──> Epic 2 (henting) ──> Epic 3 (leveranse)
@@ -714,27 +715,18 @@ i spinen beskriver koden og ikke bare ønsket.
 
 **Én økt:** ja.
 
-### Story 1.6: `Vurderingslager` med datoavvisning
+### Story 1.5b: Migrasjonsløperen og SQLite-adapteren herdes
 
-Som **utvikler på laget**, vil jeg ha et `Vurderingslager` som **nekter** å
-skrive en eldre dato, så historikken ikke kan skrives om i ettertid uten at noen
-har bestemt det.
+*Lagt til 2026-09-24.* Kontrollpunktene er forutsetningene a–h, som sto under
+1.6. De er flyttet hit ordrett.
 
-**Oppfyller:** FR-408 · **Begrenses av:** `AD-3`, `AD-7`, `AD-18`, `AD-20`
+Som **utvikler**, vil jeg at løperen og adapteren tåler den neste migrasjonen,
+så `0002` ikke kan kjøres feil, halvveis eller mot en katalog som er endret.
+
+**Oppfyller:** — *(grunnlag for FR-408, som trenger `0002`)* · **Begrenses av:**
+`AD-16`, `AD-5`, `AD-7`
 
 **Kontroll — hva testen ser etter:**
-- `skriv` med en dato før inneværende børsdag **reiser** — den logger ikke og
-  hopper ikke stille over. Testen injiserer klokka, så den ikke avhenger av
-  hvilken dag den kjøres. *Rettet 2026-09-24:* her sto «gårsdagens dato». En
-  lørdag er gårsdagen inneværende børsdag, og regelen i spinen er at `skriv`
-  avviser enhver dato som ikke er inneværende børsdag
-- `skriv` to ganger med samme `(symbol, dato)` gir **én** rad, og den siste vinner
-- Porten har **ingen** `slett` og **ingen** `endre` — kontrollert på protokollen, ikke på implementasjonen
-- En `vurdering` overlever `erstatt_serie` på samme symbol: kursverdiene i raden er uendret etterpå
-- **Ville feilet hvis:** noen la til en `oppdater`-metode «for migrasjoner», eller hvis datogrensen ble regnet i UTC — da ville en kjøring 00:30 norsk tid (22:30 UTC dagen før) skrevet på
-  gårsdagen. *Rettet 2026-09-24:* her sto 23:30. Det er samme dato i UTC og
-  avslører ingenting. Feilvinduet er 00:00–02:00 norsk sommertid (00:00–01:00
-  om vinteren), og 00:30 ligger i begge
 
 **Forutsetninger før neste migrasjon** *(fra kodegjennomgangen 2026-09-23,
 hver prøvd mot koden samme dag)*. Ingen av dem slår ut i dag, fordi det bare
@@ -787,6 +779,40 @@ til 2026-09-24, fra gjennomgangen av 23.09, og prøvd mot koden 24.09:*
   `skjema_versjon`. «umigrert base … får ingen tabeller»
   (`test_lagring_sqlite.py:119`) sjekker bare versjonen. Begge skal sjekke
   `count(*)` i `sqlite_master`.
+
+- **Ville feilet hvis:** `0002` ble skrevet før a–h var på plass. Da kjøres
+  den første migrasjonen på en uerstattelig tabell av en løper som ikke
+  oppdager et nytt filnavn, en endret fil eller en `COMMIT` midt i fila
+
+**Én økt:** ikke vurdert. Åtte kontrollpunkter.
+
+### Story 1.6: `Vurderingslager` med datoavvisning
+
+Som **utvikler på laget**, vil jeg ha et `Vurderingslager` som **nekter** å
+skrive en eldre dato, så historikken ikke kan skrives om i ettertid uten at noen
+har bestemt det.
+
+**Oppfyller:** FR-408 · **Begrenses av:** `AD-3`, `AD-7`, `AD-18`, `AD-20`
+
+**Kontroll — hva testen ser etter:**
+- `skriv` med en dato før inneværende børsdag **reiser** — den logger ikke og
+  hopper ikke stille over. Testen injiserer klokka, så den ikke avhenger av
+  hvilken dag den kjøres. *Rettet 2026-09-24:* her sto «gårsdagens dato». En
+  lørdag er gårsdagen inneværende børsdag, og regelen i spinen er at `skriv`
+  avviser enhver dato som ikke er inneværende børsdag
+- `skriv` to ganger med samme `(symbol, dato)` gir **én** rad, og den siste vinner
+- Porten har **ingen** `slett` og **ingen** `endre` — kontrollert på protokollen, ikke på implementasjonen
+- En `vurdering` overlever `erstatt_serie` på samme symbol: kursverdiene i raden er uendret etterpå
+- `vurdering`-tabellen opprettes av en nummerert migrasjon, `0002`, slik 4.3
+  har for `ki_logg` *(lagt til 2026-09-24)*
+- **Ville feilet hvis:** noen la til en `oppdater`-metode «for migrasjoner», eller hvis datogrensen ble regnet i UTC — da ville en kjøring 00:30 norsk tid (22:30 UTC dagen før) skrevet på
+  gårsdagen. *Rettet 2026-09-24:* her sto 23:30. Det er samme dato i UTC og
+  avslører ingenting. Feilvinduet er 00:00–02:00 norsk sommertid (00:00–01:00
+  om vinteren), og 00:30 ligger i begge
+
+**Forutsetning:** story 1.5b er ferdig. `0002` skrives ikke før
+migrasjonsløperen og SQLite-adapteren er herdet. *Flyttet 2026-09-24:
+forutsetningene a–h sto her og er nå kontrollpunktene i 1.5b.*
 
 **Én økt:** ja.
 
@@ -1012,6 +1038,42 @@ skjermbildene med ekte data ved å følge README alene.
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
 
+### Story 4.0: Nettsperren dekker hele testkjøringen
+
+*Lagt til 2026-09-24.*
+
+Som **gruppe**, vil vi at ingen del av testkjøringen kan nå nettet, så en
+modelltjeneste som tas inn i Epic 4, ikke kan sende noe ut fra en test.
+
+**Oppfyller:** — *(grunnlag for NFR-01)* · **Begrenses av:** `AD-8`
+
+**Grunnen:** sperren i `tests/conftest.py` er en autouse-fixture med
+funksjonsscope, og gjelder bare inne i testfunksjonene. Gruppen prøvde 23.09 en
+fixture med `scope="module"`, som koblet seg til `192.0.2.1` uten
+`NettverkISTest`; det forsøket er ikke ført i repoet. Kontrollert på nytt
+24.09 uten nettkall: i en fixture med `scope="module"` var verken
+`socket.connect` eller `socket.getaddrinfo` sperret, og `gethostbyname` er ikke
+sperret i det hele tatt. Proxyvernet dekker i dag bare `requests` og `urllib`
+(`getproxies`). En SDK for en modelltjeneste kan bruke et annet HTTP-bibliotek,
+for eksempel `httpx`. Hvordan det leser proxyinnstillingene, er ikke
+kontrollert; `httpx` er ikke installert.
+
+**Kontroll — hva testen ser etter:**
+- Socket-sperren settes i `pytest_configure` med `pytest.MonkeyPatch()` og
+  fjernes i `pytest_unconfigure`. Fixturen beholdes for proxyvariablene
+- Loopback slippes bare gjennom til porter som en socket i samme prosess lytter
+  på (`socket.socket.listen` pakkes inn). Da stoppes en proxy på loopback
+  uansett bibliotek
+- `gethostbyname`, `gethostbyname_ex` og `getfqdn` sperres også
+- `getaddrinfo`-erstatningen får signaturen `(host, port, *resten, **navngitt)`,
+  og `AF_UNIX` slippes gjennom
+- Tester for `connect_ex` og for en fixture med `scope="module"`. Docstringen i
+  `test_loopback_slippes_gjennom` rettes: Flask-testklienten bruker ikke socket
+  (kontrollert 24.09: ingen `socket.connect`-kall fra `test_client().get("/")`)
+- **Ville feilet hvis:** en fixture med `scope="module"` kunne nå nettet
+
+**Én økt:** ja.
+
 ### Story 4.1: Velg modelltjeneste og dokumentér betingelse 4
 
 Som **gruppe**, vil jeg ha modelltjenestens egne vilkår sitert og datert, så vi
@@ -1112,9 +1174,11 @@ jeg ser på, så bidraget er noe jeg kan kontrollere og ikke noe jeg må tro på
 Som **bruker**, vil jeg at meldingene fortsatt vises når KI er av, merket «ikke
 vurdert», så av og på er sammenlignbart.
 
-**Oppfyller:** FR-602 · **Begrenses av:** NFR-04, NFR-05
+**Oppfyller:** FR-602, del av FR-203 · **Begrenses av:** NFR-04, NFR-05
 
 **Kontroll — hva testen ser etter:**
+- Med laget på vises KI-forklaringen per melding i aksjedetaljen, og med laget
+  av «ikke vurdert» (FR-203) *(lagt til 2026-09-24)*
 - Samlekategorien vises med laget av, merket «ikke vurdert»
 - Antallet meldinger er **det samme** av og på
 - **Ville feilet hvis:** meldingene forsvant når laget slås av. Da blander visningen sammen «færre meldinger» og «uforklarte meldinger», og sammenligningen blir meningsløs
