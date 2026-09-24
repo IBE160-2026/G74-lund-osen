@@ -7,7 +7,8 @@ gjengitt i anførselstegn uten å være lest. Se refleksjonsloggen, «Tilfelle 4
 et sitat som ikke fantes».
 
 1. **Sluttmarkør.** Innlimte instruksjoner slutter med «SLUTT PÅ INSTRUKSJONEN».
-   Mangler linjen, er teksten avkortet: gjør ingenting, si fra.
+   Markøren godtas også skrevet uten norske bokstaver: «SLUTT PAA
+   INSTRUKSJONEN». Mangler linjen, er teksten avkortet: gjør ingenting, si fra.
 2. **Vis, vent, skriv.** Ber brukeren om å se noe før det skrives, ender turen
    med visningen. Aldri vis og skriv i samme tur.
 3. **Ingen påstand uten oppslag.** Ingenting om koden, filene eller historikken
@@ -16,7 +17,9 @@ et sitat som ikke fantes».
    skrives inn.
 4. **`updated`-felter** settes fra `date +%Y-%m-%dT%H:%M`, aldri for hånd.
 5. **Memloggene er append-only.** En feil rettes med en ny linje.
-   Nye oppføringer i `docs/reflection-log.md` skrives over «# Joakims
+   Unntak: rå kildedata (regel 16) fjernes fra linjen der de står, linjen merkes
+   `[raadata fjernet <dato>]`, og en ny linje nederst sier hvorfor. Brukt i
+   `0ccb415`. Nye oppføringer i `docs/reflection-log.md` skrives over «# Joakims
    oppføringer», ikke nederst i fila.
 6. **Ingen nettverkskall i tester** (AD-8, håndhevet i `tests/conftest.py`).
    **Ingen API-kall uten avtale.** Kostnad måles med `/api/user` før og etter
@@ -44,3 +47,7 @@ et sitat som ikke fantes».
     kall igjen sent på dagen, foreslå en bruk som svarer på noe åpent: en måling,
     en test mot ekte data, et øyeblikksbilde Epic 2 trenger. Foreslå, ikke bruk:
     regel 6 gjelder fortsatt, ingen kall uten avtale.
+16. **Ingen rå enkeltverdier fra kildene i sporede filer.** Rå enkeltverdier fra
+    kildene (kurs, volum eller meldingsinnhold for en bestemt dag) skrives ikke
+    i sporede filer. Tall vi har regnet ut selv, kan stå. Regel 10 dekker bare
+    filer, og MOWI-tallene kom inn 23.09 etter at denne fila fantes.
