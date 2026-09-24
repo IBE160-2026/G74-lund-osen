@@ -2157,6 +2157,51 @@ er ikke en grunn.
 
 ---
 
+## 25.09.2026 – Rekkefølgen i BMAD, og to avvik vi valgte
+
+Planleggingen fulgte rekkefølgen i `_bmad/bmm/module-help.csv`:
+
+| Steg | Dato |
+|---|---|
+| Briefen | 20.09 (`50d72d1`) |
+| PRD-en | fra 20.09 (`640c5d1`) |
+| Arkitekturen | 22.09 (`7e3ed6f`) |
+| Epics og stories, sluttkontroll | 22.09, sluttkontrollen 24.09 (`0c4165d`) |
+| Sprintplanleggingen | 24.09 (`4734aaf`) |
+
+Byggingen skjer nå story for story med `bmad-build`, etter sprintstatusen. To
+steder gikk vi bort fra rekkefølgen.
+
+**Avvik 1, kode før planen.** Hentingen, signalberegningen og meldingsfilteret
+ble bygget 20.09, og markedsoversikten, aksjedetaljen og grafen 21.09. Alt dette
+var før arkitekturen. Spinen førte koden inn som `ADOPTED`, med commit og dato i
+«Opphav» (AD-1, AD-2, AD-8, AD-13, AD-14 og AD-15). Koden ga også målingene
+PRD-en bygger på. Signaltesten mot 199 handelsdager kjørte
+`src/signalberegning.py` uendret og låste terskel, volumfaktor og nøytralsone
+(`malinger.md` §7.4).
+
+Avviket kostet ryddearbeid. Kursdataene hadde to porter fra 1.2 til 1.4c, noe
+som bryter AD-3, og portmodulen `kursdata.py` gjør I/O til 1.5. Til gjengjeld
+hvilte parametrene på målinger, ikke på antakelser, før planen ble skrevet.
+
+**Avvik 2, UX sent med vilje.** `bmad-ux` er valgfritt i BMAD og ble ikke kjørt
+før arkitekturen, fordi kravene til skjermbildene allerede sto som vanlige krav i
+PRD-en (PRD-memloggen 22.09). Oppfølgingen 23.09 (`0de0f17`) gjorde steget til
+story 8.2, en gjennomgang av de to skjermbildene etter brukertesten 8.1. Prisen
+er at skjermbildene ikke ble designet på forhånd og kan måtte endres etter 8.2.
+Gevinsten er at gjennomgangen ser skjermbilder som finnes, ikke skisser.
+
+Rådet sa først at UX-steget var «hoppet over». Det var halvt riktig: `epics.md`
+sier selv at steget ble hoppet over før arkitekturen. Men et oppslag viste at det
+var planlagt som 8.2. Det rådet sa, gjaldt beslutningen fra 22.09 og ikke
+oppfølgingen dagen etter.
+
+Et avvik fra metoden er forsvarlig når det er valgt og skrevet ned, med hva det
+koster, og ikke når det bare har skjedd. Begge avvikene står der de ble valgt:
+det første i spinens «Opphav», det andre i PRD-memloggen og i `epics.md`.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
