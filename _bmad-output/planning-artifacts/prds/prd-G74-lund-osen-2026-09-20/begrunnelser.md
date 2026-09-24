@@ -2,7 +2,7 @@
 title: "Begrunnelser — hvorfor kravene i PRD-en ser slik ut"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-24T23:06
+updated: 2026-09-24T23:14
 ---
 
 # Begrunnelser — hvorfor kravene i PRD-en ser slik ut
@@ -31,6 +31,10 @@ ulike uker — og målingene peker samme vei.
 siste nyhetstreffene for et utvalg selskaper. For et stort finansselskap handlet
 flertallet av treffene i realiteten om andre selskaper; symbolet var bare ett av
 mange i artikkelen.
+
+*Rettet 2026-09-24:* testen 17.09 har ikke tall; notatet sier «flere av dem»
+(`malinger.md` §0). At det gjaldt flertallet, er målt i kjøringen 21.09
+(`malinger.md` §7.2 og §10).
 
 For et shippingselskap var bildet motsatt: treffene handlet i hovedsak om
 selskapet selv eller om markedet det opererer i. *At en artikkel er knyttet til
