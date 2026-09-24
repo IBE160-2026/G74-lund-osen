@@ -2,18 +2,18 @@
 title: "Product Brief: OSE Signal"
 status: final
 created: 2026-09-20
-updated: 2026-09-24T23:14
+updated: 2026-09-25T00:27
 ---
 
 # Product Brief: OSE Signal
 
 **Emne:** IBE160 Programmering med KI, Høgskolen i Molde  
 **Gruppe:** G74 – Joakim Lund, Marian Osen  
-**Status:** Arbeidskrav på 1–2 sider, innleveringsfrist søndag 27.09.2026. Låst med git-taggen `arbeidskrav-product-brief-v5`.
+**Status:** Arbeidskrav på 1–2 sider, innleveringsfrist søndag 27.09.2026. Låst med git-taggen `arbeidskrav-product-brief-v6`.
 
 ## Executive Summary
 
-En vanlig sparer som følger norske aksjer bruker flere tjenester for å finne ut det samme: hva beveget seg i går, hvorfor, og er det noe viktig på vei. OSE Signal er en norsk webapplikasjon for PC som samler dette i én oversikt, slik at spørsmålet kan besvares på omtrent fem minutter om morgenen. Beregninger og grovsortering av meldinger gjøres med vanlig programkode. KI brukes der språkforståelse gir en reell fordel: å forklare hva en børsmelding betyr, og å vurdere relevans der kategorifeltet ikke strekker til.
+En vanlig sparer som følger norske aksjer bruker flere tjenester for å finne ut det samme: hva beveget seg i går, hvorfor, og er det noe viktig på vei. OSE Signal er en norsk webapplikasjon som kjører lokalt og samler dette i én oversikt, slik at spørsmålet kan besvares på omtrent fem minutter om morgenen. Beregninger og grovsortering av meldinger gjøres med vanlig programkode. KI brukes der språkforståelse gir en reell fordel: å forklare hva en børsmelding betyr, og å vurdere relevans der kategorifeltet ikke strekker til.
 
 ## The Problem
 
