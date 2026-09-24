@@ -2,7 +2,7 @@
 title: "Begrunnelser — hvorfor kravene i PRD-en ser slik ut"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-24T21:58
+updated: 2026-09-24T23:06
 ---
 
 # Begrunnelser — hvorfor kravene i PRD-en ser slik ut
@@ -561,3 +561,29 @@ lenger det kravet henger på.
 
 Regelen er ikke skrevet inn som krav ennå — den hører til åpent punkt 4, som nå
 har en målt vei i stedet for et åpent spørsmål.
+
+---
+
+## 12. Fra Product Brief, versjon 2
+
+Briefen ble kortet til to sider for arbeidskravet. Det meste av det som ble tatt ut, står allerede i PRD-en, i `malinger.md` og i `docs/kilder-og-rettigheter.md`. Det som bare sto i briefen, er samlet her, ordrett fra versjon 2 (tag `arbeidskrav-product-brief-v2`).
+
+### Hvorfor prosjektet er mulig nå
+
+Prosjektet er mulig nå fordi KI-assistert utvikling gjør det realistisk for to studenter å bygge en sammensatt applikasjon, samtidig som språkmodeller brukes som en del av produktet.
+
+### Stabilitet foran mange funksjoner
+
+Første versjon er på norsk, kjører lokalt, og prioriterer stabilitet fremfor mange funksjoner.
+
+### Alternativene brukeren har i dag
+
+| Alternativ i dag | Hvorfor det tolereres | Hvorfor vår løsning er bedre |
+|---|---|---|
+| Kombinere gratis kilder selv | Gratis og kjent | Koblingen mellom kurs, melding og hendelse er allerede gjort |
+| Profesjonelle verktøy | Dekker alt | Dekker det en sparer faktisk bruker, uten å kreve opplæring |
+| Bare lese overskrifter | Koster ingen tid | Overskrifter sier ikke hva som gjelder egne aksjer |
+
+### Hva briefen ikke bygger på
+
+Vi har ikke gjennomført en brukerundersøkelse, og briefen bygger derfor ikke på antakelser om et bredere marked.
