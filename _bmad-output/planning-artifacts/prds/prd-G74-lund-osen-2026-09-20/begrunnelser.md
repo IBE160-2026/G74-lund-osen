@@ -286,6 +286,12 @@ uholdbart mot en kvote på 20. For én engangsinnsamling er regnestykket et anne
 Kostnaden er dokumentert 2026-09-20: 5 kall per forespørsel pluss 5 kall per
 ticker, altså 10 for én ticker.
 
+*Rettet 2026-09-24:* målt 21.09 koster én forespørsel med én ticker 5 kall, ikke
+10 (`malinger.md` §7.2). For åtte selskaper blir det ~40 hvis det er 5 per
+ticker, eller ~80 hvis det er 10. Det er ikke målt og avgjøres av den første
+forespørselen med to tickere (story 9.4). Tallet 80 i avsnittet under står
+derfor åpent.
+
 Åtte selskaper à 10 kall er 80 kall, som er anslaget gruppen kom fram til —
 riktig tall, men av en annen grunn enn den gruppen la til grunn. Innsamlingen
 gjøres i uke 39 eller 40, mens bonuskvoten finnes. At bonuskvoten dekker 80 kall
@@ -441,6 +447,8 @@ som kan velte hele meldingsdelen (punkt 1, Euronext). **Å bruke tiden på å
 skrive om kode som virker, i stedet for på de tre, er feil prioritering.**
 
 Dockerkravet er dessuten språkuavhengig. Det trekker ikke i noen retning.
+*24.09: Dockerfilen er sagt av faglærer i samtale 21.09, ikke på emnesiden
+(hjelpelærer 23.09); den lages likevel.*
 
 ### Kostnaden, som skal stå her og ikke bortforklares
 
