@@ -2013,6 +2013,150 @@ prøve som ikke målte det som var galt.
 
 ---
 
+## 24.09.2026 – Oppslaget fant feilene instruksjonene hadde
+
+Instruksjonene skrives i en egen økt som leser en kopi av repoet, men ikke
+skriver til det. Flere av dem hadde feil som et oppslag fant før noe ble
+skrevet:
+
+- Instruksjonen sa at datoen skulle parses strengt med `strptime("%Y-%m-%d")`.
+  Oppslaget fant at den godtar «2026-9-1» (`c409b0a`).
+- Instruksjonen sa at kalltallet for `/api/news` skulle rettes fra 10 til 5 per
+  ticker. Oppslaget fant at `malinger.md` §7.2 med vilje ikke hadde rettet det,
+  fordi bare én ticker er målt.
+- Instruksjonen sa at «rundt 15» meldingstitler sto ordrett. Oppslaget fant 13.
+- Instruksjonen sa at memloggene skrives bare gjennom skriptet (regel 5).
+  Oppslaget fant at regel 5 bare sier append-only (`73060d9`).
+- Instruksjonen sa at `-v3` ikke fantes. Forhåndskontrollen fant at den gjorde
+  det, og instruksjonen stoppet i steg 0.
+- README-instruksjonen tok bort kommaet etter «(`data/`)» (`262f122`).
+
+Tre rettelser gjaldt feil fra våre egne instruksjoner dagen før: «fire funn» var
+fem (`6f7abcd`), og kontrollpunktene i 1.6 om 23:30 og «gårsdagens dato» testet
+feil ting (`b8fc2b0`).
+
+Lærdommen er den samme som 23.09, men nå med en mekanisme: en instruksjon som
+har en forhåndskontroll og en hash å treffe, stopper seg selv når den ikke
+stemmer med repoet.
+
+---
+
+## 24.09.2026 – Økta tok også feil
+
+Økta meldte at `epics.md` manglet et `updated`-felt. `grep` hadde skrevet ut
+linjen uten filnavn, og feltet sto i arkitekturmemloggen. Den skrev «to» titler
+i `begrunnelser.md` der det var fire (rettet i `9d565ee`). Den første
+omskrivingen av regel 5 delte en kodebit over to linjer. Og den la inn kommaet
+på egen hånd, selv om instruksjonen sa ordrett. Det ble tatt ut før commit og
+lagt inn igjen etter beskjed (`262f122`).
+
+Det økta sier, er også en påstand som må slås opp. Utskriften fra et verktøy må
+leses med konteksten, som filnavnet, og ikke bare linjen.
+
+---
+
+## 24.09.2026 – Gjennomgangen fant det testene ikke så etter
+
+Story 1.4a ble bygget med `bmad-build`, og testsettet gikk fra 285 til 377
+(`04933f6`). Mutanten fra «Ville feilet hvis» ble fanget av tre tester, og tre
+mutanter til for beslutningene ble fanget av 1, 22 og 6. Likevel fant de tre
+gjennomgangene et krasj. En verdi i `serier` som ikke var en liste, stoppet hele
+leseren, så alle 15 symbolene gikk tapt, ikke bare det ene. Det bryter AD-15.
+Matrisen dekket rader, ikke serier.
+
+Testene prøver matrisen vi skrev. Gjennomgangen finner formene vi ikke tenkte
+på.
+
+---
+
+## 24.09.2026 – Briefen var aldri godkjent
+
+I fire dager kalte `innlevering.md`, refleksjonsloggen og PRD-memloggen
+tilbakemeldingen fra faglærer 20.09 en godkjenning. Den var et svar på et
+spørsmål fra gruppen (`cf8537f`). Samme dag ble det klart at arbeidskravet er på
+1–2 sider, mens vi hadde ført «Formatkrav: ingen».
+
+«Dette ser veldig bra ut» er ikke «godkjent», og at formatet «ser fint ut», er
+ikke det samme som at det ikke finnes krav. Et svar føres sammen med spørsmålet
+det svarte på.
+
+---
+
+## 24.09.2026 – Å korte er ikke nøytralt
+
+Versjon 2 av briefen hadde setningen «En kjøring 21.09 mot det samme
+finansselskapet ga samme mønster, denne gangen med tidsstempel og rådata bak»,
+lagt inn med vilje i `fc8edc2`. Da briefen ble kortet til to sider i versjon 3,
+forsvant den. Påstanden om «flertallet» hvilte da bare på testen 17.09, som ikke
+har tall (`malinger.md` §0). Det ble rettet i versjon 5 (`16e6f23`) og i
+`begrunnelser.md` §1 (`ca6279e`).
+
+Det som kuttes først, er ofte forbeholdene, fordi de ser ut som fyll. Etter en
+korting leses hver påstand mot kilden på nytt, ikke bare lengden.
+
+---
+
+## 24.09.2026 – Den lange briefen under et annet navn
+
+Versjon 3 flyttet hele versjon 2 til `product-brief-tillegg.md` og lenket til den
+fra briefen (`783644a`). Tillegget ble fjernet igjen i versjon 4 (`85eee2b`),
+fordi det var den lange briefen under et annet navn. Versjon 2 ligger uendret i
+taggen `arbeidskrav-product-brief-v2`. Det som bare sto i briefen, står nå i
+`begrunnelser.md` §12 (`551f28a`).
+
+En kortversjon som lenker til langversjonen, er ikke kortet. Å bevare noe er
+ikke det samme som å levere det, og det som skal bevares, har et sted fra før.
+
+---
+
+## 24.09.2026 – Fem tagger på én kveld
+
+Briefen ble tagget fem ganger mellom 21:46 og 23:14:
+
+| Tag | Klokkeslett | Hva som endret seg |
+|---|---|---|
+| `arbeidskrav-product-brief` | 21:46 | Første låsing |
+| `-v2` | 21:58 | Frontmatter |
+| `-v3` | 22:54 | Kortet til to sider |
+| `-v4` | 23:07 | Uten tillegget |
+| `-v5` | 23:14 | Én setning rettet |
+
+Hver tag kom fordi noe i det låste innholdet endret seg etterpå. Taggene ble
+aldri flyttet, så historikken er lesbar. Likevel var det fem låsinger for én
+leveranse.
+
+Vi låste før innholdet var avklart. Frist, lengdekrav og form skal være på
+bordet før første tag.
+
+---
+
+## 24.09.2026 – Kvote brukt på et åpent spørsmål
+
+Klokka 21:31 ble dagens ubrukte kvote brukt på åpent punkt 23 (`eabb21c`).
+Kjøringen trakk nøyaktig 15 kall. Alle 15 seriene hadde en rad for 24.09, mens
+hentingen 23.09 kl. 19:04 ikke hadde raden for 23.09. På de 3 720 felles
+aksjedagene var det null endringer.
+
+Målingen sier at raden fantes klokka 21:31, ikke når den kom. Punktet er snevret
+inn, ikke lukket, og det står slik i `prd.md`.
+
+---
+
+## 24.09.2026 – Fire regler, hver med et tilfelle bak
+
+Regel 16 kom fordi MOWI-verdiene ble skrevet inn etter at `CLAUDE.md` fantes
+(`19de09e`). Regel 17 kom da briefen ble levert som arbeidskrav (`7c20365`).
+Regel 18, at hver instruksjon lagres ordrett, kom fordi emnesiden krever
+dokumentasjon av hvordan KI ble brukt, og instruksjonene er promptene
+(`d244e65`). Regel 19 kom fordi dokumentlista i README-en sto uendret fra 21.09
+(`05d20f5`, 25.09 kl. 00:01). Regel 5 fikk en advarsel om `memlog.py` etter at
+en instruksjon påsto noe regelen ikke sa (`73060d9`).
+
+Hver regel har et tilfelle bak seg, slik det ble sagt 23.09: en regel uten grunn
+er ikke en grunn.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
