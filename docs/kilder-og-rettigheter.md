@@ -12,7 +12,7 @@ publiseres ikke. Vurderingen gjelder derfor ikke-kommersiell, pedagogisk bruk.
 ikke publisert, men arbeidet med den er. Skillet mellom hva som deles og hva som
 blir liggende lokalt er derfor et valg vi må ta bevisst — se neste avsnitt.
 
-Sist oppdatert: 2026-09-21
+Sist oppdatert: 2026-09-24
 
 ---
 
@@ -22,7 +22,7 @@ Sist oppdatert: 2026-09-21
 |---|---|---|---|
 | EODHD `/api/eod` | Sluttkurser | **2026-09-20, fullstendig** | Gratisnivå dekker EOD for alle tickere, men bare ett år tilbake. 1 kall per symbol. |
 | EODHD `/api/real-time` | — (forkastet) | 2026-09-19 | Virker, men prissiden sier gratisnivået ikke har det. Ikke bygg på. |
-| EODHD `/api/news` | Relevanseksperimentet, én gang | **2026-09-21, med skriftlig svar** | **Svarer for `.OL` på gratisnivå** (testet 21.09). **Språkmodellbruk er klarert med betingelser** — skriftlig godkjenning 21.09, se egen seksjon. Betingelsene er ikke oppfylt før modelltjenestens treningsvilkår er dokumentert. Forkastet for daglig drift: 5 kall per ticker, altså 75 for de 15 mot en dagsgrense på 20. |
+| EODHD `/api/news` | Relevanseksperimentet, én gang | **2026-09-21, med skriftlig svar** | **Svarer for `.OL` på gratisnivå** (testet 21.09). **Språkmodellbruk er klarert av EODHD, ikke av rettighetshaverne**, med betingelser — skriftlig godkjenning 21.09, se egen seksjon. EODHD er et mellomledd: artiklene er syndikert fra `finance.yahoo.com` (se «EODHD er et mellomledd», lagt til 24.09). Betingelsene er ikke oppfylt før modelltjenestens treningsvilkår er dokumentert. Forkastet for daglig drift: 5 kall per ticker, altså 75 for de 15 mot en dagsgrense på 20. |
 | EODHD `/api/calendar` | — (utilgjengelig) | 2026-09-19 | HTTP 403: «Only EOD data allowed for free users». |
 | Oslo Børs NewsWeb | Selskapsmeldinger | **2026-09-21, fullstendig** | Åpent JSON-API, ferdig tagget med utsteder. **Euronexts vilkår dekker `newsweb.oslobors.no` ved navn og forbyr automatisert henting uten skriftlig tillatelse.** Se egen seksjon. |
 | E24 RSS | — (forkastet) | 2026-09-19 | Forbyr eksplisitt LLM-input. Se under. |
@@ -296,6 +296,28 @@ beholdes som dokumentert alternativ, men er ikke lenger nødvendig. Det er en
 vesentlig forbedring av risikobildet: eksperimentet deler ikke lenger kilde med
 meldingsdelen, og et negativt svar fra Euronext velter derfor ikke begge deler
 samtidig.
+
+### EODHD er et mellomledd
+
+*Lagt til 2026-09-24.* Godkjenningen over er gitt av EODHD. EODHD eier ikke
+innholdet den gjelder. `malinger.md` §10 (22.09) fant at alle ti artiklene i
+øyeblikksbildet fra §7.2 peker til `finance.yahoo.com`, og at `content` er et
+syndikert utdrag. Kontrollert på nytt 24.09 mot
+`data/nyhetstest-raa-2026-09-21.json`: alle ti lenkene har domenet
+`finance.yahoo.com`, og det første utdraget er 394 tegn og ender på «Continue
+Reading».
+
+Språkmodellbruken er altså **klarert av EODHD, ikke av rettighetshaverne**.
+Det er samme forhold som hos Euronext: en leverandør gir tillatelse over
+innhold den distribuerer, men ikke eier. E24-klausulen øverst i dette
+dokumentet viser at rettighetshavere kan forby nettopp denne bruken.
+
+Det som taler den andre veien: EODHD visste hva API-et returnerer da de
+godkjente «article text obtained through our News API». Men svaret kommer fra
+supportteamet, og dette dokumentet fører det som belegg for hva leverandøren
+aksepterer, ikke som en endring i vilkårene.
+
+Om det holder, er ikke avgjort. Se «Å følge opp».
 
 ---
 
@@ -951,6 +973,12 @@ lenger uimotsagt» over.
       å legge det andre svaret til grunn som analogi og skrive ned at det er gjort.
       **Eier: Gruppen.** Frist: før story 5B sender noe til en modell, og uansett
       etter at betingelse 4 er dokumentert
+- [ ] **Holder EODHDs klarering når innholdet eies av andre?** *Lagt til
+      2026-09-24.* EODHD er et mellomledd, og artiklene er syndikert fra
+      `finance.yahoo.com` (se «EODHD er et mellomledd»). Før del 2 av
+      relevanseksperimentet sender artikkeltekst til en modell, må gruppen
+      avgjøre om EODHDs klarering holder, og skrive ned hvorfor.
+      **Eier: Marian.** Frist: før del 2 av relevanseksperimentet
 - [ ] Kontrollere Alpha Vantage sine vilkår for ikke-kommersiell bruk
 - [x] ~~Lese EODHDs fullstendige ToS, ikke bare prissiden~~ — gjort 2026-09-20,
       se seksjonen «EODHD: hva de fullstendige vilkårene sier». Svaret er uklart
