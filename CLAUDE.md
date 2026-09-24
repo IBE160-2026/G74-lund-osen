@@ -55,13 +55,13 @@ et sitat som ikke fantes».
     i sporede filer. Tall vi har regnet ut selv, kan stå. Regel 10 dekker bare
     filer, og MOWI-tallene kom inn 23.09 etter at denne fila fantes.
 17. **Product Brief er låst.** Briefen er arbeidskravet: den skal være på 1–2
-    sider, med innleveringsfrist søndag 27.09.2026. `product-brief.md` og
-    `product-brief-tillegg.md` er låst. Gjeldende tag er
-    `arbeidskrav-product-brief-v3`; de eldre taggene står urørt. Filene endres
-    ikke uten at Marian eller Joakim ber om det uttrykkelig. Må de endres før
-    fristen, lages en ny tag med neste ledige nummer (`-v4`, `-v5` …); en tag
-    flyttes aldri. Versjon 3 er om lag 750 ord og fyller to sider, så en ny
-    versjon skal ikke bli lengre. Tilbakemeldingen fra faglærerne føres i
+    sider, med innleveringsfrist søndag 27.09.2026. `product-brief.md` er låst.
+    Gjeldende tag er `arbeidskrav-product-brief-v4`; de eldre taggene står
+    urørt, og versjon 2 i full lengde ligger i `arbeidskrav-product-brief-v2`.
+    Fila endres ikke uten at Marian eller Joakim ber om det uttrykkelig. Må den
+    endres før fristen, lages en ny tag med neste ledige nummer (`-v5`, `-v6`
+    …); en tag flyttes aldri. Versjon 4 er om lag 740 ord og fyller to sider, så
+    en ny versjon skal ikke bli lengre. Tilbakemeldingen fra faglærerne føres i
     `innlevering.md`, ikke i briefen.
 18. **Hver innlimte instruksjon lagres ordrett.** Den lagres i
     `docs/ai-prompts/<ÅÅÅÅ-MM-DD>.md` før den utføres, med klokkeslett. Når den
