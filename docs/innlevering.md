@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-09-24T21:59
+updated: 2026-09-24T22:55
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -59,9 +59,11 @@ fra 19.–20.09: «Ny innleveringsdato for BMAD-leveransen er satt til søndag
 kunngjort. Se §7.
 
 **Frist og vurdering** *(kilde: Marian 24.09)*: Product Brief skal være ferdig
-**søndag 27.09.2026 kl. 16:00**. Da vurderer faglærerne den som godkjent eller
-ikke godkjent, med tilbakemelding. *Rettet 2026-09-24:* «Utsettelsen har ingen
-navngitt kilde» gjelder ikke lenger. Fristen 27.09 er opplyst av Marian 24.09.
+**søndag 27.09.2026**. Da vurderer faglærerne den som godkjent eller
+ikke godkjent, med tilbakemelding. Den skal være på 1–2 sider. *Rettet
+2026-09-24:* «Utsettelsen har ingen navngitt kilde» gjelder ikke lenger.
+Fristen 27.09 er opplyst av Marian 24.09. *Rettet 2026-09-24:* klokkeslettet er
+fjernet fra fristen her, i §4 og i §7, etter beskjed fra Marian.
 
 ### Hva emnesiden ikke sier
 
@@ -173,9 +175,9 @@ teknologiske implikasjoner. Det som er ukjent, er lengde, struktur og format.
 
 | | |
 |---|---|
-| **Status** | **Låst og klar for levering: tag `arbeidskrav-product-brief-v2`, commit `f08c801`** |
+| **Status** | **Låst og klar for levering: tag `arbeidskrav-product-brief-v3`, commit `783644a`** |
 | **Ligger i** | `_bmad-output/planning-artifacts/product-brief.md` |
-| **Gjenstår** | Vurdering fra faglærerne etter 27.09 kl. 16:00. **Formatkrav: ingen** — sagt eksplisitt i tilbakemeldingen 20.09 |
+| **Gjenstår** | Vurdering fra faglærerne etter fristen 27.09. **Lengdekrav: 1–2 sider** (arbeidskravet, kilde: Marian 24.09) |
 
 Samme tilbakemelding er positiv til fordelingen mellom brief og PRD, inkludert
 vår egen seksjon «Data og kilder» som ikke står i malen.
@@ -189,6 +191,11 @@ som leveranse.
 minst 11 commits fra 21.09 til 24.09, blant annet at NewsWeb ikke er en avklart
 kilde, at det ikke hentes før Euronext har svart, og plan B. Tilbakemeldingen
 gjaldt versjonen faglærer så.
+
+*Rettet 2026-09-24:* her sto «Formatkrav: ingen — sagt eksplisitt i tilbakemeldingen
+20.09». Tilbakemeldingen sa at formatet så fint ut, ikke at det ikke fantes krav.
+Arbeidskravet sier 1–2 sider. Versjon 2 hadde om lag 1470 ord og er kortet til
+om lag 750 i versjon 3. Versjon 2 står ordrett i `product-brief-tillegg.md`.
 
 ---
 
@@ -234,7 +241,7 @@ den er ført i repoet og styrer arbeidet, men den bør bekreftes mot Canvas elle
 faglærer før den brukes til å planlegge.
 
 *Rettet 2026-09-24 (kilde: Marian 24.09):* fristen for arbeidskravet er
-**søndag 27.09.2026 kl. 16:00**. Da vurderer faglærerne Product Brief som
+**søndag 27.09.2026**. Da vurderer faglærerne Product Brief som
 godkjent eller ikke godkjent, med tilbakemelding. Datoen har dermed en kilde.
 Om fristen også gjelder de andre BMAD-dokumentene, er ikke opplyst.
 
@@ -360,7 +367,7 @@ innholdskrav, sitert under «Eksamen» øverst.
 
 | Punkt | |
 |---|---|
-| **Product Brief** | Låst og klar for levering: tag `arbeidskrav-product-brief-v2`, commit `f08c801`. Gjenstår: vurdering fra faglærerne etter 27.09 kl. 16:00 |
+| **Product Brief** | Låst og klar for levering: tag `arbeidskrav-product-brief-v3`, commit `783644a`. Arbeidskrav på 1–2 sider, innleveringsfrist 27.09. Gjenstår: vurdering fra faglærerne etter fristen |
 | **Offentlig repo** | Bekreftet i orden |
 | **Teknologivalg** | Avviket er besluttet og begrunnelsen ført |
 | **Databasevalget** | Besluttet og kontrollert med faglærerstaben — *valget*, ikke lagringen |
