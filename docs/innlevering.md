@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-09-24T23:07
+updated: 2026-09-24T23:14
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -175,7 +175,7 @@ teknologiske implikasjoner. Det som er ukjent, er lengde, struktur og format.
 
 | | |
 |---|---|
-| **Status** | **Låst og klar for levering: tag `arbeidskrav-product-brief-v4`, commit `85eee2b`** |
+| **Status** | **Låst og klar for levering: tag `arbeidskrav-product-brief-v5`, commit `16e6f23`** |
 | **Ligger i** | `_bmad-output/planning-artifacts/product-brief.md` |
 | **Gjenstår** | Vurdering fra faglærerne etter fristen 27.09. **Lengdekrav: 1–2 sider** (arbeidskravet, kilde: Marian 24.09) |
 
@@ -202,6 +202,12 @@ om lag 750 i versjon 3. Versjon 2 står ordrett i `product-brief-tillegg.md`.
 stå alene på to sider. Versjon 2 ligger uendret i taggen
 `arbeidskrav-product-brief-v2`, og det som bare sto i briefen, står nå i
 `begrunnelser.md`, seksjonen «Fra Product Brief, versjon 2».
+
+*Rettet 2026-09-24:* versjon 3 og 4 festet påstanden om nyhetstreffene bare til
+testen 17.09, som ikke har tall eller rådata (`malinger.md` §0). Versjon 5
+skiller testen 17.09 («flere av de ti») fra kjøringen 21.09, der det gjaldt
+flertallet (`malinger.md` §7.2 og §10), slik versjon 2 festet påstanden (commit
+`fc8edc2`).
 
 ---
 
@@ -373,7 +379,7 @@ innholdskrav, sitert under «Eksamen» øverst.
 
 | Punkt | |
 |---|---|
-| **Product Brief** | Låst og klar for levering: tag `arbeidskrav-product-brief-v4`, commit `85eee2b`. Arbeidskrav på 1–2 sider, innleveringsfrist 27.09. Gjenstår: vurdering fra faglærerne etter fristen |
+| **Product Brief** | Låst og klar for levering: tag `arbeidskrav-product-brief-v5`, commit `16e6f23`. Arbeidskrav på 1–2 sider, innleveringsfrist 27.09. Gjenstår: vurdering fra faglærerne etter fristen |
 | **Offentlig repo** | Bekreftet i orden |
 | **Teknologivalg** | Avviket er besluttet og begrunnelsen ført |
 | **Databasevalget** | Besluttet og kontrollert med faglærerstaben — *valget*, ikke lagringen |
