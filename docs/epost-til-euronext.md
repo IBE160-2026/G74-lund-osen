@@ -239,7 +239,7 @@ forespørselen 21.09 la seg på.
 
 ## Svaret
 
-*Ikke mottatt per 2026-09-22. Fylles inn når det kommer.*
+*Ikke mottatt per 2026-09-24. Fylles inn når det kommer.*
 
 | | |
 |---|---|
@@ -254,9 +254,10 @@ forespørselen 21.09 la seg på.
 ### Hva svaret dekker, og hva det ikke dekker
 
 **Les huskeregelen først.** Den står ved beslutningspunktet 28.09 i
-`docs/kilder-og-rettigheter.md`: før hvilke av brevets fire deler — Retrieval,
-Storage, Display og Source code — svaret dekker, i stedet for å føre det som ja
-eller nei.
+`docs/kilder-og-rettigheter.md`: før hvilke av brevenes fem deler — Retrieval,
+Storage, Display og Source code fra 21.09, og overføringen til en modelltjeneste
+fra purringen 22.09 — svaret dekker, i stedet for å føre det som ja eller nei.
+*Rettet 2026-09-24: her sto «fire deler». Purringen la til den femte.*
 
 *Fylles inn. Sjekk særlig: dekker svaret lagringen, eller bare hentingen? Gjelder
 det finanskalenderen? Er det gitt til gruppen, til høgskolen, eller generelt? Og
@@ -267,5 +268,7 @@ er det tidsbegrenset til semesteret slik brevet ba om?*
 Fristen er vår egen: 2026-09-28. Brevet ber ikke om svar innen noen dato, så det
 finnes ingen frist Euronext har oversittet. Beslutningen som da må tas, står som
 oppfølgingspunkt i
-`kilder-og-rettigheter.md` med eier Gruppen: stoppe hentingen, fortsette bevisst
-under undervisningsunntaket, eller bygge meldingsdelen om.
+`kilder-og-rettigheter.md` med eier Gruppen: det hentes ikke; 28.09 avgjør om
+Epic 5B utløses. *Rettet 2026-09-24: her sto «stoppe hentingen, fortsette bevisst
+under undervisningsunntaket, eller bygge meldingsdelen om». Det strider mot
+beslutningen 23.09 om at det ikke hentes fra NewsWeb før Euronext har svart.*
