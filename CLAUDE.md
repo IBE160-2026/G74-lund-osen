@@ -16,6 +16,9 @@ et sitat som ikke fantes».
    Det gjelder også påstander i en innlimt instruksjon: slå dem opp før de
    skrives inn.
 4. **`updated`-felter** settes fra `date +%Y-%m-%dT%H:%M`, aldri for hånd.
+   Nye dokumenter under `docs/` og `_bmad-output/planning-artifacts/` får samme
+   frontmatter som `prd.md`: `title`, `status` (`draft`, `final`, `aktiv` eller
+   `sendt`), `created` (datoen fila først ble committet) og `updated`.
 5. **Memloggene er append-only.** En feil rettes med en ny linje.
    Unntak: rå kildedata (regel 16) fjernes fra linjen der de står, linjen merkes
    `[raadata fjernet <dato>]`, og en ny linje nederst sier hvorfor. Brukt i
