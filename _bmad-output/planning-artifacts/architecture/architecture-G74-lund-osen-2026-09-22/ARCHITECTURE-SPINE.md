@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-23T19:40'
+updated: '2026-09-24T18:30'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -301,6 +301,7 @@ parentes. Skillet er ikke pedantisk: pytest kjører på **9.1.1** mens gulvet si
 | Flask | 3.1.3 (gulv `>= 3.0`) |
 | requests | 2.34.2 (gulv `>= 2.32`) |
 | python-dotenv | 1.2.3 (gulv `>= 1.0`) |
+| tzdata | 2026.4 (gulv `>= 2026.4`). Windows har ingen tidssonedatabase, og uten den reiser `ZoneInfo("Europe/Oslo")` feil. AD-20, 1.4c, 1.6 og 2.1 trenger sonen. Lagt til 2026-09-24, holdt av `tests/test_tidssone.py` |
 | pytest | **9.1.1** (gulv `>= 8.0`) |
 | sqlite3 | standardbiblioteket — ingen ny avhengighet |
 | uv | `uv.lock`, CI kjører `uv sync --locked` |
