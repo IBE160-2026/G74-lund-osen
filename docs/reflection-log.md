@@ -541,6 +541,10 @@ feil på — hele skillet mellom briefen som overordnet dokument og PRD-en som b
 detaljer, datakilder, API-begrensninger og begrunnelser hviler på den. Hadde den vært feil,
 måtte begge dokumentene skrives om.
 
+*Rettet 2026-09-24:* «godkjent» er feil ord. Tilbakemeldingen var svar på et
+spørsmål fra gruppen (bekreftet av Marian 24.09). Den er positiv til fordelingen,
+men den er ikke en godkjenning av briefen som leveranse.
+
 **Formatkrav: ingen.** Det åpne punktet om forside, sidetall og skrifttype kan lukkes.
 Innhold og tydelig struktur er det som teller.
 

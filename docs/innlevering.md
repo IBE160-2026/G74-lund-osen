@@ -161,16 +161,21 @@ teknologiske implikasjoner. Det som er ukjent, er lengde, struktur og format.
 
 | | |
 |---|---|
-| **Status** | **Finnes, og er godkjent** |
+| **Status** | **Finnes. Faglærer svarte 20.09 på et spørsmål fra gruppen om briefen, med positiv tilbakemelding – ikke en godkjenning** |
 | **Ligger i** | `_bmad-output/planning-artifacts/product-brief.md` |
-| **Gjenstår** | Ingenting. **Formatkrav: ingen** — bekreftet eksplisitt |
+| **Gjenstår** | Fryse teksten og føre hvilken commit som leveres. **Formatkrav: ingen** — sagt eksplisitt i tilbakemeldingen |
 
-Samme tilbakemelding godkjenner fordelingen mellom brief og PRD, inkludert vår
-egen seksjon «Data og kilder» som ikke står i malen.
+Samme tilbakemelding er positiv til fordelingen mellom brief og PRD, inkludert
+vår egen seksjon «Data og kilder» som ikke står i malen.
 
-*2026-09-24:* **briefen er endret etter godkjenningen 20.09.** `git log` viser
+*Rettet 2026-09-24:* her sto at briefen var godkjent, og at tilbakemeldingen
+«godkjenner» fordelingen. Tilbakemeldingen var svar på et spørsmål fra gruppen
+(bekreftet av Marian 24.09). Den er positiv, men ikke en godkjenning av briefen
+som leveranse.
+
+*2026-09-24:* **briefen er endret etter tilbakemeldingen 20.09.** `git log` viser
 minst 11 commits fra 21.09 til 24.09, blant annet at NewsWeb ikke er en avklart
-kilde, at det ikke hentes før Euronext har svart, og plan B. Godkjenningen
+kilde, at det ikke hentes før Euronext har svart, og plan B. Tilbakemeldingen
 gjaldt versjonen faglærer så.
 
 ---
@@ -338,7 +343,7 @@ innholdskrav, sitert under «Eksamen» øverst.
 
 | Punkt | |
 |---|---|
-| **Product Brief** | Godkjent av faglærer, formatkrav bekreftet fraværende |
+| **Product Brief** | Finnes. Faglærer svarte 20.09 på et spørsmål fra gruppen om briefen, med positiv tilbakemelding – ikke en godkjenning. Formatkrav: ingen |
 | **Offentlig repo** | Bekreftet i orden |
 | **Teknologivalg** | Avviket er besluttet og begrunnelsen ført |
 | **Databasevalget** | Besluttet og kontrollert med faglærerstaben — *valget*, ikke lagringen |
