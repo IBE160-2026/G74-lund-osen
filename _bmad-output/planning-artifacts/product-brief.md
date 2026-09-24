@@ -37,7 +37,7 @@ Signalstyrke er ikke en anbefaling om kjøp eller salg, og presenteres ikke som 
 
 Kursdata hentes fra EODHD, børsmeldinger fra Oslo Børs' NewsWeb der hver melding allerede er knyttet til utsteder og kategori, og finansielle hendelser fra Euronext.
 
-NewsWeb og Euronext ligger under de samme bruksvilkårene, og de krever skriftlig tillatelse på forhånd til automatisert henting. Forespørselen er sendt 21.09. Det hentes ikke fra NewsWeb før Euronext har svart. Får vi nei, eller ikke svar innen 28.09, bygges løsningen uten meldingsdelen og kalenderen over kommende hendelser: KI-laget forklarer da signalet ut fra kursdata i stedet for børsmeldinger. Den regelbaserte forklaringen blir stående, og løsningen virker med KI slått av.
+NewsWeb og Euronext ligger under de samme bruksvilkårene, og de krever skriftlig tillatelse på forhånd til automatisert henting. Forespørselen er sendt 21.09. Det hentes ikke fra NewsWeb før Euronext har svart. Får vi nei, eller ikke svar innen 28.09, bygges løsningen uten meldingsdelen og kalenderen over kommende hendelser: KI-laget forklarer da signalet ut fra verdier regnet ut fra kursene, ikke kursene selv, i stedet for børsmeldinger. Den regelbaserte forklaringen blir stående, og løsningen virker med KI slått av.
 
 Universet er satt til omtrent 15 aksjer fordi EODHD på gratisnivå gir 20 API-kall i døgnet og kurser koster ett kall per symbol; NewsWeb og Euronext bruker ingen av kallene. Tallet er utledet av kvoten, ikke valgt etter skjønn. Målingene og bruksvilkårene vi har sjekket er dokumentert i `docs/kilder-og-rettigheter.md`. Oppdateringsmekanikk og lagring hører til PRD og arkitektur.
 
@@ -65,7 +65,7 @@ Vi er selv i målgruppen og bruker løsningen gjennom prosjektperioden. Vi har i
 |---|---|---|---|
 | Brukerutfall | Person utenfor gruppen gjennomfører hovedflyten og forklarer uoppfordret hvorfor en aksje skiller seg ut | Minst 1 person, under 5 minutter, uten hjelp | Før prosjektinnlevering |
 | Adopsjon | Gruppen bruker løsningen på egne aksjer og logger feil | Minst 4 av 5 børsdager fra første fungerende versjon | Løpende |
-| Kvalitet | Daglig henting fullfører innenfor API-kvoten; ved kildefeil vises siste kjente data med tidsstempel | Ingen manuelle steg, ingen stopp ved manglende data | Ukentlig |
+| Kvalitet | Daglig henting fullfører innenfor API-kvoten; ved kildefeil vises siste kjente data med tidsstempel | Én kommando, utløst bevisst, gjør hele hentingen; ingen stopp ved manglende data | Ukentlig |
 | KI-bidrag i drift | Hvilke meldinger KI-laget forklarte eller omklassifiserte som regelfilteret alene ikke skilte | Dokumentert eksempelsett fra minst én ukes drift | Før demonstrasjon (est. uke 45) |
 | Relevanseksperiment | Testsett på 50 medieartikler merket manuelt, kjørt mot både symbolmatching og KI-klassifisering | Eksperimentet gjennomført og tallene dokumentert — ikke at KI kommer best ut | Innsamling og merking uke 39–40; KI-kjøringen når KI-laget finnes |
 | Fortsatt bruk | Om vi bruker løsningen frivillig etter at utviklingen er ferdig, ikke bare for å teste den | Brukt minst tre dager i uka de to siste ukene før prosjektinnlevering, loggført | Ved prosjektinnlevering |
