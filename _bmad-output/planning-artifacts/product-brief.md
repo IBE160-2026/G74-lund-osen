@@ -2,14 +2,14 @@
 title: "Product Brief: OSE Signal"
 status: final
 created: 2026-09-20
-updated: 2026-09-25T00:27
+updated: 2026-09-25T00:35
 ---
 
 # Product Brief: OSE Signal
 
 **Emne:** IBE160 Programmering med KI, Høgskolen i Molde  
 **Gruppe:** G74 – Joakim Lund, Marian Osen  
-**Status:** Arbeidskrav på 1–2 sider, innleveringsfrist søndag 27.09.2026. Låst med git-taggen `arbeidskrav-product-brief-v6`.
+**Status:** Arbeidskrav på 1–2 sider, innleveringsfrist søndag 27.09.2026. Låst med git-taggen `arbeidskrav-product-brief-v7`.
 
 ## Executive Summary
 
@@ -56,3 +56,5 @@ Ved kildefeil vises siste kjente data med tidsstempel, og «ingen tydelige signa
 ## Vision
 
 Hvis første versjon fungerer, er neste steg personlig oppfølging: favorittaksjer, egne lister og til slutt brukerens egen portefølje. Da blir OSE Signal en personlig markedsassistent.
+
+**Videre lesning:** [PRD-en](prds/prd-G74-lund-osen-2026-09-20/prd.md), [målingene](prds/prd-G74-lund-osen-2026-09-20/malinger.md) og [datakildenes vilkår](../../docs/kilder-og-rettigheter.md).
