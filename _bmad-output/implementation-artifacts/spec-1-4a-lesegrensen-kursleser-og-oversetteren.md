@@ -2,9 +2,10 @@
 title: 'Story 1.4a: Lesegrensen — Kursleser og oversetteren fra øyeblikksbildet'
 type: 'feature'
 created: '2026-09-24'
-status: 'ready-for-dev'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
+baseline_commit: 'ea692920b7816e9df5dd99529609dc6a01269d3f'
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/epic-1-context.md'
   - '{project-root}/CLAUDE.md'
@@ -56,10 +57,10 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `src/kursdata.py` -- `Kursleser` (runtime-checkable Protocol: `serie`, `sist_hentet`); `Kurslager(Kursleser, Protocol)` med bare `erstatt_serie` i tillegg; `kursrad_fra_eodhd(rad)`, som parser datoen strengt og pakker dato- og typefeil i raden inn som `UgyldigKursrad`; `SnapshotLeser(kilde)`, som oversetter alt ved oppretting og gir kopier ut -- ett oversettelsessted, AD-3 og AD-19
-- [ ] `tests/test_kurslager.py` -- ny fixture `leser` (minne, sqlite, snapshot) med én fyllefunksjon per lager. Lesetestene flyttes til den: samme verdier, kronologisk, ukjent symbol, utlevert serie kan ikke endre lageret, ukjent symbol har ingen tid, tiden for et fylt symbol, UTC. Tester som skriver eller krever ulike tider per symbol blir på `lager`. Nye lesetester: `sist_hentet` er `None` hvis og bare hvis serien er tom (begge retninger, alle tre lagre), og sorterte, unike datoer
-- [ ] `tests/test_snapshotleser.py` -- oversetteren og `SnapshotLeser`: hver rad i matrisen over, pluss at ett dårlig symbol ikke rører de andre, at `hentet` som ikke kan leses gjør hele bildet manglende, at en `hentet` med annen sone leveres i UTC, og at `SnapshotLeser` ikke er en `Kurslager`
-- [ ] Protokolltester -- `Kursleser` har nøyaktig `serie` og `sist_hentet`; `Kurslager` har de to pluss `erstatt_serie`
+- [x] `src/kursdata.py` -- `Kursleser` (runtime-checkable Protocol: `serie`, `sist_hentet`); `Kurslager(Kursleser, Protocol)` med bare `erstatt_serie` i tillegg; `kursrad_fra_eodhd(rad)`, som parser datoen strengt og pakker dato- og typefeil i raden inn som `UgyldigKursrad`; `SnapshotLeser(kilde)`, som oversetter alt ved oppretting og gir kopier ut -- ett oversettelsessted, AD-3 og AD-19
+- [x] `tests/test_kurslager.py` -- ny fixture `leser` (minne, sqlite, snapshot) med én fyllefunksjon per lager. Lesetestene flyttes til den: samme verdier, kronologisk, ukjent symbol, utlevert serie kan ikke endre lageret, ukjent symbol har ingen tid, tiden for et fylt symbol, UTC. Tester som skriver eller krever ulike tider per symbol blir på `lager`. Nye lesetester: `sist_hentet` er `None` hvis og bare hvis serien er tom (begge retninger, alle tre lagre), og sorterte, unike datoer
+- [x] `tests/test_snapshotleser.py` -- oversetteren og `SnapshotLeser`: hver rad i matrisen over, pluss at ett dårlig symbol ikke rører de andre, at `hentet` som ikke kan leses gjør hele bildet manglende, at en `hentet` med annen sone leveres i UTC, og at `SnapshotLeser` ikke er en `Kurslager`
+- [x] Protokolltester -- `Kursleser` har nøyaktig `serie` og `sist_hentet`; `Kurslager` har de to pluss `erstatt_serie`
 
 **Acceptance Criteria:**
 - Given hele testsettet, when det kjøres før og etter, then er begge grønne, og tallene står i commit-meldingen
@@ -68,9 +69,30 @@ context:
 
 ## Implementation Notes
 
+- 2026-09-24: 285 tester før, 377 etter, alle grønne. Konsumentene er uendret (kontrollert med `git diff` mot `baseline_commit`).
+- Mutant fra «Ville feilet hvis» (`rad.get("adjusted_close", rad["close"])`): 3 tester feiler. Tre mutanter til for beslutningene: like datoer slipper gjennom (1 feiler), tid uten serie (22), `hentet` uten sone gir likevel serier (6).
+- Etter gjennomgangen: symbolverdi som ikke er en liste gjør bare det symbolet manglende; `serier` som ikke er et objekt gjør hele bildet manglende; `kursrad_fra_eodhd(rad: object)`. Konsumentenes fallback er utsatt til 1.4b (`deferred-work.md`).
+- `SnapshotLeser` lest mot `kurser-raa-2026-09-23.json` av implementeringen: 15 symboler, 3 735 rader, ingen manglende.
+
 ## Spec Change Log
 
 ## Review Triage Log
+
+| # | Kilde | Funn | Dom | Bevis | Rute |
+|---|---|---|---|---|---|
+| 1 | blind, edge, verif. | En symbolverdi i `serier` som ikke er en liste (`None`, tall), gir `TypeError` og stopper hele leseren | medium | Gjenskapt 24.09: `{"EQNR": None, "DNB": [gyldig]}` gir `TypeError`, og DNB går tapt. Bryter AD-15 | patch |
+| 2 | blind, edge, verif. | `serier` som ikke er et objekt (liste, `None`), gir `AttributeError` | medium | Gjenskapt: `serier=[]` gir `AttributeError`. `nyeste_snapshot` kan velge enhver `*-raa-*.json`. Samme lesning som for `hentet`: hele bildet manglende | patch |
+| 3 | edge | `hentet` nær `datetime.min` gir `OverflowError` i `astimezone` | low | Gjenskapt med `0001-01-01T00:30:00+01:00`. Ingen reell kilde skriver det, og rettingen er en ny vakt | avvist |
+| 4 | blind | Statusfeltene i spesifikasjonen og sprint-statusen er uenige | false | De har hvert sitt vokabular; sprint-statusen settes til `review` når 1.4a er ferdig, slik instruksjonen sier | avvist |
+| 5 | blind | Testtall og mutant er ikke ført i spesifikasjonen | low | Rettingen er å endre spesifikasjonen; tallene føres i commit-meldingen, slik kriteriet krever | avvist |
+| 6 | blind | Testen «hvis og bare hvis» skiller ikke rett fra galt | false | Mutanten «tid uten serie» ble fanget av 22 tester, blant dem denne (ukjent symbol gir tid) | avvist |
+| 7 | blind | `kursrad_fra_eodhd(rad: dict)` tar i praksis `object` | low | Testene sender `[]`, `1` og `None`; rettingen er én annotasjon | patch |
+| 8 | blind | «Oversetteren fanger …» i spesifikasjonen, mens koden fanger i `SnapshotLeser` | low | Oppførselen er som storyen krever; bare ordbruken spriker. Rettingen er å endre spesifikasjonen | avvist |
+| 9 | blind | `_hentet_fra_tekst` er mindre streng enn datoen | false | `fromisoformat` gir samme entydige øyeblikk for de kompakte formene; ingenting gjettes | avvist |
+| 10 | blind | Leseren lagrer ikke hvorfor et symbol mangler | low | Ingen skade i 1.4a: appen navngir manglende symboler via tom serie (`app.py:37`). Rettingen er ny offentlig flate | avvist |
+| 11 | blind, edge | `fyll` lekker en tilkobling hvis den kalles to ganger | low | Ingen test kaller den to ganger; rettingen er en vakt | avvist |
+| 12 | blind | Hint-testene for `Kurslager` dupliserer `Kursleser` | false | De sjekker at `Kurslager` fortsatt lover hintene; en overstyring der fanges bare av dem | avvist |
+| 13 | verif. | `aksjedetalj.py:106`, `markedsoversikt.py:99` og `signalberegning.py:86` faller fortsatt tilbake fra `adjusted_close` til `close` | medium | Bekreftet med `grep`. Fantes før 1.4a; konsumentene flyttes i 1.4b | defer |
 
 ## Design Notes
 

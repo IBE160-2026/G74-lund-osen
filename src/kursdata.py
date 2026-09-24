@@ -123,12 +123,35 @@ class Kursrad:
 
 
 @runtime_checkable
-class Kurslager(Protocol):
+class Kursleser(Protocol):
+    """Lesesiden av kursporten - AD-3, AD-19. Story 1.4a.
+
+    Det konsumentene trenger, og ikke mer. SnapshotLeser oppfyller bare denne:
+    et oeyeblikksbilde skrives aldri om (FR-406, NFR-07), saa det faar ingen
+    skrivemetode.
+
+    Lesekontrakten for alle lagre: sist_hentet(s) er None hvis og bare hvis
+    serie(s) er tom.
+    """
+
+    def serie(self, symbol: str) -> list[Kursrad]:
+        """Kronologiske kursrader, nyeste sist. Tom liste hvis vi mangler."""
+
+    def sist_hentet(self, symbol: str) -> datetime | None:
+        """Naar symbolets serie sist ble erstattet, i UTC. None hvis aldri.
+
+        Per symbol og ikke globalt: AD-15 lar ett symbol feile og beholde sin
+        gamle serie, og da ogsaa sin gamle tid.
+        """
+
+
+@runtime_checkable
+class Kurslager(Kursleser, Protocol):
     """Porten for kursdata - AD-3, AD-5, AD-19. Erstatter Kurskilde i 1.4.
 
-    Bare tre metoder. Det finnes med vilje ingen legg_til_rad: serien skjoetes
-    aldri paa, fordi EODHD regner adjusted_close om bakover ved hvert nytt
-    utbytte (AD-5).
+    Kursleser pluss erstatt_serie, altsaa tre metoder. Det finnes med vilje
+    ingen legg_til_rad: serien skjoetes aldri paa, fordi EODHD regner
+    adjusted_close om bakover ved hvert nytt utbytte (AD-5).
     """
 
     def erstatt_serie(self, symbol: str, rader: list[Kursrad], hentet: datetime) -> None:
@@ -139,16 +162,6 @@ class Kurslager(Protocol):
         samme henting baerer samme tidspunkt. En tom serie, en feil radtype,
         to rader med samme dato eller en tid uten sone avvises, og da endres
         ingenting.
-        """
-
-    def serie(self, symbol: str) -> list[Kursrad]:
-        """Kronologiske kursrader, nyeste sist. Tom liste hvis vi mangler."""
-
-    def sist_hentet(self, symbol: str) -> datetime | None:
-        """Naar symbolets serie sist ble erstattet, i UTC. None hvis aldri.
-
-        Per symbol og ikke globalt: AD-15 lar ett symbol feile og beholde sin
-        gamle serie, og da ogsaa sin gamle tid.
         """
 
 
@@ -263,6 +276,102 @@ class SnapshotKilde:
 
     def serie(self, symbol: str) -> list[dict]:
         return self.serier.get(symbol, [])
+
+
+def _dato_fra_tekst(tekst: object) -> date:
+    """Streng YYYY-MM-DD. Godtas bare hvis dato.isoformat() er lik teksten.
+
+    date.fromisoformat alene godtar "20260921" og "2026-W39-1", og
+    strptime("%Y-%m-%d") godtar "2026-9-1". En umulig dato som "2026-09-31"
+    feiler allerede i parsingen.
+    """
+    if not isinstance(tekst, str):
+        raise UgyldigKursrad(f"date maa vaere tekst YYYY-MM-DD, fikk {tekst!r}")
+    try:
+        dato = date.fromisoformat(tekst)
+    except ValueError as feil:
+        raise UgyldigKursrad(f"date er ikke en gyldig dato: {tekst!r}") from feil
+    if dato.isoformat() != tekst:
+        raise UgyldigKursrad(f"date maa ha formen YYYY-MM-DD, fikk {tekst!r}")
+    return dato
+
+
+def kursrad_fra_eodhd(rad: object) -> Kursrad:
+    """Oversett en EODHD-rad til Kursrad. Det eneste stedet det skjer - AD-19.
+
+    adjusted_close gir justert_slutt og close gir slutt, uten fallback mellom
+    dem: en justert kurs som mangler, er en KeyError, ikke close. Fallbacken
+    ville gitt et tall som ser riktig ut, men er regnet paa feil serie.
+
+    Verdiene sjekkes ikke her; det gjoer Kursrad. En rad som ikke er et
+    objekt, og en dato som ikke er streng YYYY-MM-DD, gir UgyldigKursrad.
+    Et felt som mangler, gir KeyError. Epic 2 bruker samme funksjon naar
+    hentingen skriver til basen.
+    """
+    if not isinstance(rad, dict):
+        raise UgyldigKursrad(f"En EODHD-rad maa vaere et objekt, fikk {type(rad).__name__}")
+    return Kursrad(
+        dato=_dato_fra_tekst(rad["date"]),
+        slutt=rad["close"],
+        justert_slutt=rad["adjusted_close"],
+        volum=rad["volume"],
+    )
+
+
+def _hentet_fra_tekst(tekst: object) -> datetime | None:
+    """ISO 8601 med tidssone, i UTC. None hvis tiden ikke kan leses."""
+    if not isinstance(tekst, str):
+        return None
+    try:
+        tid = datetime.fromisoformat(tekst)
+    except ValueError:
+        return None
+    if tid.tzinfo is None or tid.utcoffset() is None:
+        return None
+    return tid.astimezone(timezone.utc)
+
+
+class SnapshotLeser:
+    """Kursleser over et oeyeblikksbilde - story 1.4a, AD-15, AD-19, AD-20.
+
+    Pakker inn SnapshotKilde og gir Kursrad. Alt oversettes ved oppretting,
+    og serie gir kopier ut. Den er med vilje ikke en Kurslager: et
+    oeyeblikksbilde skrives aldri om.
+
+    Et symbol med en rad som ikke kan oversettes, eller to rader med samme
+    dato, behandles som manglende: tom serie og sist_hentet None. De andre
+    leses som vanlig. Ingenting gjettes.
+
+    Kan hentet ikke leses (mangler, ikke ISO 8601, uten tidssone), er hele
+    oeyeblikksbildet manglende. En serie har alltid en tid i de andre
+    lagrene, fordi erstatt_serie setter begge, og slik er det her ogsaa:
+    sist_hentet(s) er None hvis og bare hvis serie(s) er tom.
+    """
+
+    def __init__(self, kilde: SnapshotKilde):
+        self._serier: dict[str, tuple[Kursrad, ...]] = {}
+        self._hentet = _hentet_fra_tekst(kilde.hentet)
+        # serier som ikke er et objekt, kan ikke leses - som en uleselig hentet.
+        if self._hentet is None or not isinstance(kilde.serier, dict):
+            return
+        for symbol, raa in kilde.serier.items():
+            # En serie som ikke er en liste, gjoer bare dette symbolet manglende.
+            if not isinstance(raa, list):
+                continue
+            try:
+                rader = [kursrad_fra_eodhd(r) for r in raa]
+            except (UgyldigKursrad, KeyError):
+                continue
+            datoer = {r.dato for r in rader}
+            if not rader or len(datoer) != len(rader):
+                continue
+            self._serier[symbol] = tuple(sorted(rader, key=lambda r: r.dato))
+
+    def serie(self, symbol: str) -> list[Kursrad]:
+        return list(self._serier.get(symbol, ()))
+
+    def sist_hentet(self, symbol: str) -> datetime | None:
+        return self._hentet if symbol in self._serier else None
 
 
 # Oeyeblikksbilder heter <prefiks>-raa-<ÅÅÅÅ-MM-DD>.json. fetch_prices skriver

@@ -1,8 +1,11 @@
-"""Tester for Kursrad og Kurslager-porten - story 1.2 og 1.3, AD-19 og AD-3.
+"""Tester for Kursrad og Kurslager-porten - story 1.2, 1.3 og 1.4a, AD-19 og AD-3.
 
-Kontrakttestene (fixturen lager) kjoeres mot baade MinneKurslager og
-SqliteKurslager. De to skal oppfoere seg likt; der de ikke gjoer det, tar en
-av dem feil. Det som bare gjelder SQLite, staar i test_lagring_sqlite.py.
+Skrivetestene (fixturen lager) kjoeres mot baade MinneKurslager og
+SqliteKurslager. Lesetestene (fixturen leser) kjoeres i tillegg mot
+SnapshotLeser, som bare er en Kursleser. Lagrene skal oppfoere seg likt; der
+de ikke gjoer det, tar en av dem feil. Det som bare gjelder SQLite, staar i
+test_lagring_sqlite.py, og det som bare gjelder oeyeblikksbildet, i
+test_snapshotleser.py.
 
 Kursrad er raden porten gir ut: norske feltnavn, og ingen av dem kan mangle.
 Poenget er at en feilstavet noekkel blir en feil der dataene kommer inn, i
@@ -25,7 +28,16 @@ from pathlib import Path
 import pytest
 
 import kursdata
-from kursdata import AKSJEUNIVERS, Kurslager, Kursrad, MinneKurslager, UgyldigKursrad
+from kursdata import (
+    AKSJEUNIVERS,
+    Kursleser,
+    Kurslager,
+    Kursrad,
+    MinneKurslager,
+    SnapshotKilde,
+    SnapshotLeser,
+    UgyldigKursrad,
+)
 from lagring_sqlite import MIGRASJONSKATALOG, SqliteKurslager
 from migrering import migrer
 
@@ -192,6 +204,32 @@ class TestKurslagerProtokollen:
     def test_sist_hentet_lover_datetime_eller_none(self):
         assert typing.get_type_hints(Kurslager.sist_hentet)["return"] == datetime | None
 
+    def test_er_kursleser_pluss_bare_erstatt_serie(self):
+        """Story 1.4a: Kurslager arver lesesiden og legger bare til skrivingen."""
+        assert Kursleser in Kurslager.__mro__
+        egne = {
+            navn for navn, verdi in vars(Kurslager).items()
+            if inspect.isfunction(verdi) and not navn.startswith("_")
+        }
+
+        assert egne == {"erstatt_serie"}
+
+
+class TestKursleserProtokollen:
+    def test_har_noeyaktig_serie_og_sist_hentet(self):
+        metoder = {
+            navn for navn, _ in inspect.getmembers(Kursleser, inspect.isfunction)
+            if not navn.startswith("_")
+        }
+
+        assert metoder == {"serie", "sist_hentet"}
+
+    def test_serie_lover_kursrader(self):
+        assert typing.get_type_hints(Kursleser.serie)["return"] == list[Kursrad]
+
+    def test_sist_hentet_lover_datetime_eller_none(self):
+        assert typing.get_type_hints(Kursleser.sist_hentet)["return"] == datetime | None
+
 
 @pytest.fixture(params=["minne", "sqlite"])
 def lager(request, tmp_path):
@@ -218,24 +256,6 @@ class TestKurslagerKontrakt:
                 inspect.signature(getattr(type(lager), navn))
                 == inspect.signature(getattr(Kurslager, navn))
             )
-
-    def test_serie_gir_kursrader_med_samme_verdier(self, lager):
-        inn = [rad("2026-09-18", 101.5, 99.25, 1234), rad("2026-09-21", 102.0, 100.0, 5678)]
-        lager.erstatt_serie("EQNR", inn, HENTET)
-
-        serie = lager.serie("EQNR")
-
-        assert serie == inn
-        assert all(isinstance(r, Kursrad) for r in serie)
-        assert all(type(r.dato) is date for r in serie)
-
-    def test_serie_er_kronologisk_uansett_rekkefoelge_inn(self, lager):
-        lager.erstatt_serie("EQNR", [rad("2026-09-21"), rad("2026-09-18")], HENTET)
-
-        assert datoer(lager) == [date(2026, 9, 18), date(2026, 9, 21)]
-
-    def test_ukjent_symbol_gir_tom_liste(self, lager):
-        assert lager.serie("EQNR") == []
 
     def test_erstatt_serie_erstatter_ikke_skjoeter(self, lager):
         """Ville feilet hvis adapteren skjoetet paa (AD-5)."""
@@ -271,13 +291,6 @@ class TestKurslagerKontrakt:
         lager.erstatt_serie("EQNR", rader, HENTET)
 
         rader.append(rad("2026-09-21"))
-
-        assert len(lager.serie("EQNR")) == 1
-
-    def test_utlevert_serie_kan_ikke_endre_lageret(self, lager):
-        lager.erstatt_serie("EQNR", [rad("2026-09-18")], HENTET)
-
-        lager.serie("EQNR").append(rad("2026-09-21"))
 
         assert len(lager.serie("EQNR")) == 1
 
@@ -350,14 +363,6 @@ class TestAvvisningEndrerIngenting:
 class TestSistHentet:
     """sist_hentet settes av erstatt_serie i samme kall, per symbol, i UTC."""
 
-    def test_ukjent_symbol_har_ingen_tid(self, lager):
-        assert lager.sist_hentet("EQNR") is None
-
-    def test_settes_av_erstatt_serie(self, lager):
-        lager.erstatt_serie("EQNR", [rad()], HENTET)
-
-        assert lager.sist_hentet("EQNR") == HENTET
-
     def test_er_per_symbol(self, lager):
         """AD-15: ett symbol kan feile og beholde sin gamle serie - og da ogsaa
         sin gamle tid. Et globalt tidsstempel ville sagt at DNB er fersk."""
@@ -369,16 +374,119 @@ class TestSistHentet:
         assert lager.sist_hentet("EQNR") == senere
         assert lager.sist_hentet("DNB") == HENTET
 
-    def test_leveres_i_utc(self, lager):
+
+def eodhd(r: Kursrad) -> dict:
+    """Kursrad tilbake til EODHDs form, slik et oeyeblikksbilde lagrer den."""
+    return {"date": r.dato.isoformat(), "close": r.slutt,
+            "adjusted_close": r.justert_slutt, "volume": r.volum}
+
+
+@pytest.fixture(params=["minne", "sqlite", "snapshot"])
+def leser(request, tmp_path):
+    """Lesekontrakten kjoeres mot alle tre lagrene - story 1.4a.
+
+    SnapshotLeser har ingen erstatt_serie, saa fixturen gir en fyllefunksjon
+    per lager: fyll(serier, hentet) -> Kursleser. For de skrivbare lagrene
+    kaller den erstatt_serie, for SnapshotLeser bygger den et
+    oeyeblikksbilde. Et oeyeblikksbilde har en tid per fil, saa tester som
+    krever ulike tider per symbol, bruker fixturen lager.
+    """
+    tilkobling = None
+
+    def fyll(serier: dict[str, list[Kursrad]], hentet: datetime = HENTET):
+        nonlocal tilkobling
+        if request.param == "snapshot":
+            return SnapshotLeser(SnapshotKilde(
+                hentet=hentet.isoformat(),
+                serier={s: [eodhd(r) for r in rader] for s, rader in serier.items()},
+            ))
+        if request.param == "minne":
+            lager = MinneKurslager()
+        else:
+            tilkobling = sqlite3.connect(tmp_path / "ose.db")
+            migrer(tilkobling, MIGRASJONSKATALOG)
+            lager = SqliteKurslager(tilkobling)
+        for symbol, rader in serier.items():
+            lager.erstatt_serie(symbol, rader, hentet)
+        return lager
+
+    yield fyll
+    if tilkobling is not None:
+        tilkobling.close()
+
+
+class TestKursleserKontrakt:
+    """Det alle tre lagrene skal oppfylle naar de leses."""
+
+    def test_oppfyller_protokollen(self, leser):
+        lest = leser({"EQNR": [rad()]})
+
+        assert isinstance(lest, Kursleser)
+        for navn in ("serie", "sist_hentet"):
+            assert (
+                inspect.signature(getattr(type(lest), navn))
+                == inspect.signature(getattr(Kursleser, navn))
+            )
+
+    def test_serie_gir_kursrader_med_samme_verdier(self, leser):
+        inn = [rad("2026-09-18", 101.5, 99.25, 1234), rad("2026-09-21", 102.0, 100.0, 5678)]
+        lest = leser({"EQNR": inn})
+
+        serie = lest.serie("EQNR")
+
+        assert serie == inn
+        assert all(isinstance(r, Kursrad) for r in serie)
+        assert all(type(r.dato) is date for r in serie)
+
+    def test_serie_er_kronologisk_uansett_rekkefoelge_inn(self, leser):
+        lest = leser({"EQNR": [rad("2026-09-21"), rad("2026-09-18")]})
+
+        assert datoer(lest) == [date(2026, 9, 18), date(2026, 9, 21)]
+
+    def test_serie_gir_sorterte_unike_datoer(self, leser):
+        inn = [rad("2026-09-21"), rad("2026-09-16"), rad("2026-09-18"), rad("2026-09-17")]
+        lest = leser({"EQNR": inn})
+
+        ut = datoer(lest)
+
+        assert ut == sorted(set(ut))
+        assert len(ut) == len(inn)
+
+    def test_ukjent_symbol_gir_tom_liste(self, leser):
+        assert leser({}).serie("EQNR") == []
+
+    def test_utlevert_serie_kan_ikke_endre_lageret(self, leser):
+        lest = leser({"EQNR": [rad("2026-09-18")]})
+
+        lest.serie("EQNR").append(rad("2026-09-21"))
+
+        assert len(lest.serie("EQNR")) == 1
+
+
+class TestKursleserSistHentet:
+    def test_ukjent_symbol_har_ingen_tid(self, leser):
+        assert leser({}).sist_hentet("EQNR") is None
+
+    def test_fylt_symbol_har_tiden_det_ble_hentet(self, leser):
+        assert leser({"EQNR": [rad()]}).sist_hentet("EQNR") == HENTET
+
+    def test_leveres_i_utc(self, leser):
         """AD-20: tidsstempler i UTC. Et tidspunkt med annen sone regnes om,
         ikke kastes - oeyeblikket er det samme."""
         oslo = HENTET.astimezone(timezone(timedelta(hours=2)))
 
-        lager.erstatt_serie("EQNR", [rad()], oslo)
+        tid = leser({"EQNR": [rad()]}, oslo).sist_hentet("EQNR")
 
-        tid = lager.sist_hentet("EQNR")
         assert tid == HENTET
         assert tid.utcoffset() == timedelta(0)
+
+    @pytest.mark.parametrize("symbol", ["EQNR", "DNB"], ids=["fylt", "ukjent"])
+    def test_ingen_tid_hvis_og_bare_hvis_tom_serie(self, leser, symbol):
+        """Lesekontrakten, begge retninger: tom serie gir None, og None gir
+        tom serie. Ingen serie uten tid, og ingen tid uten serie."""
+        lest = leser({"EQNR": [rad()]})
+
+        assert (lest.sist_hentet(symbol) is None) == (lest.serie(symbol) == [])
 
 
 class TestKurskildeErPaaVeiUt:
