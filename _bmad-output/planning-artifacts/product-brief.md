@@ -2,14 +2,14 @@
 title: "Product Brief: OSE Signal"
 status: final
 created: 2026-09-20
-updated: 2026-09-24T23:07
+updated: 2026-09-24T23:14
 ---
 
 # Product Brief: OSE Signal
 
 **Emne:** IBE160 Programmering med KI, Høgskolen i Molde  
 **Gruppe:** G74 – Joakim Lund, Marian Osen  
-**Status:** Arbeidskrav på 1–2 sider, innleveringsfrist søndag 27.09.2026. Låst med git-taggen `arbeidskrav-product-brief-v4`.
+**Status:** Arbeidskrav på 1–2 sider, innleveringsfrist søndag 27.09.2026. Låst med git-taggen `arbeidskrav-product-brief-v5`.
 
 ## Executive Summary
 
@@ -19,7 +19,7 @@ En vanlig sparer som følger norske aksjer bruker flere tjenester for å finne u
 
 Den som følger 10–30 norske aksjer ved siden av jobb eller studier har ikke et informasjonsproblem, men et sorteringsproblem: kurser, meldinger og rapportdatoer finnes, men ligger spredt, og det meste er irrelevant akkurat i dag. I tillegg kommer forklaringsproblemet: gratis markedsoversikter viser at en aksje er opp 4 %, men ikke hvorfor.
 
-I vår test 17.09 handlet flertallet av de ti siste nyhetstreffene for et stort finansselskap om andre selskaper, så en nyhet knyttet til et symbol handler ikke nødvendigvis om selskapet bak symbolet. I børsmeldingene for selskapene løsningen skal dekke, målte vi 121 meldinger på fire uker. Nær 29 % er ukentlige statusrapporter om tilbakekjøp av egne aksjer, med samme ordlyd hver gang. Drøyt 26 % er samme melding publisert to ganger, på norsk og på engelsk.
+I vår test 17.09 handlet flere av de ti siste nyhetstreffene for et stort finansselskap om andre selskaper, og i en kjøring 21.09 med tidsstempel og rådata gjaldt det flertallet. En nyhet knyttet til et symbol handler altså ikke nødvendigvis om selskapet bak symbolet. I børsmeldingene for selskapene løsningen skal dekke, målte vi 121 meldinger på fire uker. Nær 29 % er ukentlige statusrapporter om tilbakekjøp av egne aksjer, med samme ordlyd hver gang. Drøyt 26 % er samme melding publisert to ganger, på norsk og på engelsk.
 
 ## The Solution
 
