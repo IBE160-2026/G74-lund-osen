@@ -1097,3 +1097,56 @@ feilkode. To konsekvenser:
 
 Det målingen **ikke** avgjør: om det finnes noe tak når `extraLimit` når 0.
 Det er ikke prøvd, og det skal ikke prøves.
+
+---
+
+## 12. Kvotemåling og kveldshenting 2026-09-24
+
+**Dato:** 2026-09-24, kl. 21:31:44–21:31:54 norsk tid (19:31 UTC). **Kostnad:
+15 kall**, avtalt på forhånd (regel 6 og 15 i `CLAUDE.md`).
+
+**Formål.** Svare på åpent punkt 23 med en henting etter børsens stengetid, og
+se om gårsdagens rader endret seg.
+
+**Metode.** `/api/user` lest før og etter. Hentekommandoen (`fetch_prices.py`)
+kjørt én gang for alle 15 symbolene. Det nye øyeblikksbildet er sammenlignet
+med det fra 23.09 på de felles datoene, og lest med `SnapshotLeser` (story 1.4a).
+Bare utledede tall er ført her (regel 16). Rådata ligger lokalt i
+`data/kurser-raa-2026-09-24.json`.
+
+### Kvoten
+
+| | Før | Etter |
+|---|---|---|
+| `apiRequests` | 20 | 15 |
+| `apiRequestsDate` | 2026-09-23 | 2026-09-24 |
+| `extraLimit` | 484 | 484 |
+
+«20» før gjaldt gårsdagen: datoen sto på 23.09, så det var brukt 0 kall i dag
+(§7.1). **Kjøringen trakk nøyaktig 15 kall**, og ingenting fra bonuskvoten.
+
+### Åpent punkt 23: er dagens rad der?
+
+**Ja, for alle 15.** Kl. 21:31 norsk tid hadde alle 15 serier en rad for
+2026-09-24, og siste dato var 24.09 for alle. Hentingen 23.09 kl. 19:04 hadde
+ingen rad for 23.09 (§11). Den raden er med nå, så begge dagene kom inn i
+kveldens henting.
+
+Det dette viser, er at dagens rad fantes kl. 21:31, ikke når den kom. Tidspunktet
+ligger et sted mellom 19:04 og 21:31, målt på to forskjellige dager. Om raden
+for 24.09 er endelig, viser først neste henting.
+
+### Endringer mot øyeblikksbildet fra 23.09
+
+**Null.** På de 3 720 felles aksjedagene (15 symboler × 248 datoer) er det ingen
+endring i `close`, `adjusted_close` eller `volume`. Siste felles dato er 22.09,
+og den raden var hentet 23.09 kl. 19:04, etter at børsen stengte.
+
+Datoene som ikke er felles, følger av at hentevinduet flyttet seg én dag: 2025-09-24
+falt ut i starten (15 rader), og 2026-09-23 og 2026-09-24 kom inn i slutten
+(30 rader). Hver serie har derfor 250 rader, mot 249 i øyeblikksbildet fra 23.09.
+
+### Lest med `SnapshotLeser`
+
+15 symboler, 3 750 rader, ingen manglende. `sist_hentet` er hentetidspunktet i
+UTC for alle 15.
