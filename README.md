@@ -45,7 +45,7 @@ Hva som er bygget så langt, står i sprintstatusen, `_bmad-output/implementatio
 - `.claude/skills/` og `.agents/skills/` — BMADs ferdigheter, lagt inn av installatøren i to identiske kopier: én som Claude Code leser, én på den verktøynøytrale stien
 
 **Utenfor versjonskontroll, og derfor ikke i repoet:** API-nøkkel (`.env`), hentede
-rådata (`data/`) lokale testskript (`local-tests/`) og den private arbeidsmappa (`_privat/`).
+rådata (`data/`), lokale testskript (`local-tests/`) og den private arbeidsmappa (`_privat/`).
 
 ## Kom i gang
 
