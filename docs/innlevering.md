@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-09-25T00:27
+updated: 2026-09-25T00:36
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -176,7 +176,7 @@ teknologiske implikasjoner. Det som er ukjent, er lengde, struktur og format.
 
 | | |
 |---|---|
-| **Status** | **Låst og klar for levering: tag `arbeidskrav-product-brief-v6`, commit `a5c4052`** |
+| **Status** | **Låst og klar for levering: tag `arbeidskrav-product-brief-v7`, commit `e62ea77`** |
 | **Ligger i** | `_bmad-output/planning-artifacts/product-brief.md` |
 | **Gjenstår** | Vurdering fra faglærerne etter fristen 27.09. **Lengdekrav: 1–2 sider** (arbeidskravet, kilde: faglærer) |
 
@@ -218,6 +218,9 @@ og plattformvalget står i PRD-en.
 påstanden». Det gjelder kjøringen 21.09. Versjon 2 sa også «flertallet» om
 testen 17.09, så skillet mellom «flere» (17.09) og «flertallet» (21.09) er nytt i
 versjon 5.
+
+*Rettet 2026-09-25:* versjon 7 har fått en linje til slutt med lenker til PRD-en,
+målingene og datakildenes vilkår. Linjen kom ikke med i versjon 6.
 
 ---
 
@@ -389,7 +392,7 @@ innholdskrav, sitert under «Eksamen» øverst.
 
 | Punkt | |
 |---|---|
-| **Product Brief** | Låst og klar for levering: tag `arbeidskrav-product-brief-v6`, commit `a5c4052`. Arbeidskrav på 1–2 sider, innleveringsfrist 27.09. Gjenstår: vurdering fra faglærerne etter fristen |
+| **Product Brief** | Låst og klar for levering: tag `arbeidskrav-product-brief-v7`, commit `e62ea77`. Arbeidskrav på 1–2 sider, innleveringsfrist 27.09. Gjenstår: vurdering fra faglærerne etter fristen |
 | **Offentlig repo** | Bekreftet i orden |
 | **Teknologivalg** | Avviket er besluttet og begrunnelsen ført |
 | **Databasevalget** | Besluttet og kontrollert med faglærerstaben — *valget*, ikke lagringen |
