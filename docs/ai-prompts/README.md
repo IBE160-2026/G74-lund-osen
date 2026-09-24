@@ -45,6 +45,13 @@ Formatet:
 - Klokkeslettet er når instruksjonen ble lagret, i norsk tid.
 - Linjen «Utført» legges til etterpå, under blokken. Blokken selv endres ikke.
 - Ingen rådata eller nøkler i fila (regel 16 i `CLAUDE.md`).
+- **Lesing før commit** *(avgjort av Marian 2026-09-24)*: gjelder ikke dagsfilene
+  etter regel 18. Marian leser hver instruksjon når hun limer den inn, så kravet
+  er oppfylt der. Før hver commit sjekker økta selv at fila ikke inneholder
+  rådata, nøkler eller personopplysninger om andre enn Marian og Joakim. For
+  instruksjonene fra 21.–24.09 som hentes inn i story 9.2, gjelder lesingen
+  før commit som før.
+- Dagsfilene har frontmatter, som andre dokumenter under `docs/` (regel 4).
 - Filnavnkonvensjonen under gjelder andre prompts og samtaler, ikke disse.
 
 ## Viktig

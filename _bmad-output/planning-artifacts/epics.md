@@ -1548,7 +1548,12 @@ utføres, med klokkeslett og en linje om utfallet etterpå. Formatet står i
 `docs/ai-prompts/README.md`. Fra 24.09 kl. 22:05 skjer det løpende. Det som
 gjenstår i denne storyen, er å hente inn instruksjonene fra 21.–24.09 fra
 historikken til øktene, i samme format. Punktene under om `bygging/` og
-filnavn er erstattet av regel 18; lesingen før commit gjelder fortsatt.
+filnavn er erstattet av regel 18. *Avgjort av Marian 2026-09-24:* lesingen
+før commit gjelder ikke dagsfilene etter regel 18, fordi Marian leser hver
+instruksjon når hun limer den inn. Før hver commit sjekker økta selv at fila
+ikke inneholder rådata, nøkler eller personopplysninger om andre enn Marian og
+Joakim (regel 16). For instruksjonene fra 21.–24.09 som hentes inn her, gjelder
+lesingen før commit som før.
 
 **Kontroll — hva den ferdige storyen inneholder:**
 - Katalogen finnes, og `docs/ai-prompts/README.md` peker på den
