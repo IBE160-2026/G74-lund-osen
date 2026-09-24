@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-09-24T22:55
+updated: 2026-09-24T23:07
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -175,7 +175,7 @@ teknologiske implikasjoner. Det som er ukjent, er lengde, struktur og format.
 
 | | |
 |---|---|
-| **Status** | **Låst og klar for levering: tag `arbeidskrav-product-brief-v3`, commit `783644a`** |
+| **Status** | **Låst og klar for levering: tag `arbeidskrav-product-brief-v4`, commit `85eee2b`** |
 | **Ligger i** | `_bmad-output/planning-artifacts/product-brief.md` |
 | **Gjenstår** | Vurdering fra faglærerne etter fristen 27.09. **Lengdekrav: 1–2 sider** (arbeidskravet, kilde: Marian 24.09) |
 
@@ -196,6 +196,12 @@ gjaldt versjonen faglærer så.
 20.09». Tilbakemeldingen sa at formatet så fint ut, ikke at det ikke fantes krav.
 Arbeidskravet sier 1–2 sider. Versjon 2 hadde om lag 1470 ord og er kortet til
 om lag 750 i versjon 3. Versjon 2 står ordrett i `product-brief-tillegg.md`.
+
+*Rettet 2026-09-24:* versjon 3 lenket til `product-brief-tillegg.md`, som hadde versjon
+2 i full lengde. Lenken og tillegget er fjernet i versjon 4, fordi briefen skal
+stå alene på to sider. Versjon 2 ligger uendret i taggen
+`arbeidskrav-product-brief-v2`, og det som bare sto i briefen, står nå i
+`begrunnelser.md`, seksjonen «Fra Product Brief, versjon 2».
 
 ---
 
@@ -367,7 +373,7 @@ innholdskrav, sitert under «Eksamen» øverst.
 
 | Punkt | |
 |---|---|
-| **Product Brief** | Låst og klar for levering: tag `arbeidskrav-product-brief-v3`, commit `783644a`. Arbeidskrav på 1–2 sider, innleveringsfrist 27.09. Gjenstår: vurdering fra faglærerne etter fristen |
+| **Product Brief** | Låst og klar for levering: tag `arbeidskrav-product-brief-v4`, commit `85eee2b`. Arbeidskrav på 1–2 sider, innleveringsfrist 27.09. Gjenstår: vurdering fra faglærerne etter fristen |
 | **Offentlig repo** | Bekreftet i orden |
 | **Teknologivalg** | Avviket er besluttet og begrunnelsen ført |
 | **Databasevalget** | Besluttet og kontrollert med faglærerstaben — *valget*, ikke lagringen |
