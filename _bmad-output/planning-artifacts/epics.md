@@ -585,9 +585,15 @@ uten at `SnapshotKilde` får en skrivemetode, så 1.4b har noe å lese fra.
   ved å gjette. Dagens øyeblikksbilde har ingen slike rader: 3 735 rader og null
   manglende felt, kontrollert 23.09
 - En EODHD-rad med NaN eller uendelig i `close` eller `adjusted_close` er en rad
-  som ikke kan oversettes, og behandles likt (AD-15). `Kursrad` avviser slike
-  verdier fra 23.09, så oversetteren skal fange `ValueError` fra `Kursrad`, ikke
-  sin egen sjekk
+  som ikke kan oversettes, og behandles likt (AD-15). Det samme gjelder feil
+  type, et tall for stort for `float`, kurs på null eller under og negativt
+  volum. `Kursrad` reiser `UgyldigKursrad` for alle disse fra 24.09.
+  Oversetteren fanger `UgyldigKursrad` og `KeyError` (manglende felt), og har
+  ingen egen sjekk av verdiene. *Rettet 2026-09-24:* her sto før at
+  oversetteren skulle fange `ValueError`. `Kursrad` reiste også `TypeError` og
+  `OverflowError`, og de ville sluppet gjennom
+- Datoen parses strengt, med `datetime.strptime(tekst, "%Y-%m-%d")`.
+  `date.fromisoformat` godtar både «20260921» og «2026-W39-1», prøvd 24.09
 - **Ingen konsument røres.** Hele testsettet er grønt, og tallet telles før og
   etter
 - **Ville feilet hvis:** oversetteren falt tilbake fra `adjusted_close` til

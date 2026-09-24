@@ -63,6 +63,18 @@ AKSJEUNIVERS: tuple[Aksje, ...] = (
 )
 
 
+class UgyldigKursrad(ValueError):
+    """En verdi Kursrad ikke godtar.
+
+    Alle avvisningene i Kursrad reiser denne, ogsaa feil type. Foer 24.09 kom
+    de som TypeError, ValueError og OverflowError, og en oversetter som fanget
+    ValueError, slapp de to andre gjennom. Naa er det en klasse aa fange.
+
+    Et felt som mangler helt, er unntaket: det stoppes av dataclassens
+    __init__ med TypeError, foer denne kontrollen kjoerer.
+    """
+
+
 @dataclass(frozen=True)
 class Kursrad:
     """En handelsdag slik porten gir den ut - AD-19.
@@ -70,7 +82,7 @@ class Kursrad:
     Norske feltnavn, og ingen av dem kan mangle eller vaere None. En
     feilstavet noekkel gir TypeError her, der dataene kommer inn, i stedet
     for en None som forplanter seg inn i signalberegningen som et tall som
-    mangler.
+    mangler. Feil verdi i et felt som finnes, gir UgyldigKursrad.
 
     dato er en kalenderdato (AD-20), ikke tekst og ikke et tidspunkt.
     Adapteren oversetter fra kildens "YYYY-MM-DD".
@@ -85,17 +97,29 @@ class Kursrad:
         # datetime er en underklasse av date, men baerer et klokkeslett, og et
         # klokkeslett i feil sone kan gi feil boersdag.
         if not isinstance(self.dato, date) or isinstance(self.dato, datetime):
-            raise TypeError(f"dato maa vaere datetime.date, fikk {self.dato!r}")
+            raise UgyldigKursrad(f"dato maa vaere datetime.date, fikk {self.dato!r}")
         for navn in ("slutt", "justert_slutt"):
             verdi = getattr(self, navn)
             if isinstance(verdi, bool) or not isinstance(verdi, (int, float)):
-                raise TypeError(f"{navn} maa vaere et tall, fikk {verdi!r}")
+                raise UgyldigKursrad(f"{navn} maa vaere et tall, fikk {verdi!r}")
             # NaN og uendelig er tall for Python, men ikke kurser. Slapp de
             # gjennom, ville minnelageret lagret NaN mens SQLite avviste den.
-            if not math.isfinite(verdi):
-                raise ValueError(f"{navn} maa vaere et endelig tall, fikk {verdi!r}")
+            # Et heltall for stort for float gir OverflowError i isfinite.
+            try:
+                endelig = math.isfinite(verdi)
+            except OverflowError:
+                endelig = False
+            if not endelig:
+                raise UgyldigKursrad(f"{navn} maa vaere et endelig tall, fikk {verdi!r}")
+            # En kurs paa null eller under er ikke en kurs, og
+            # signalberegningen deler paa kursen.
+            if verdi <= 0:
+                raise UgyldigKursrad(f"{navn} maa vaere over null, fikk {verdi!r}")
         if isinstance(self.volum, bool) or not isinstance(self.volum, int):
-            raise TypeError(f"volum maa vaere et heltall, fikk {self.volum!r}")
+            raise UgyldigKursrad(f"volum maa vaere et heltall, fikk {self.volum!r}")
+        # Null er en dag uten handel og lovlig. Under null er det ikke.
+        if self.volum < 0:
+            raise UgyldigKursrad(f"volum kan ikke vaere negativt, fikk {self.volum!r}")
 
 
 @runtime_checkable

@@ -25,7 +25,7 @@ from pathlib import Path
 import pytest
 
 import kursdata
-from kursdata import AKSJEUNIVERS, Kurslager, Kursrad, MinneKurslager
+from kursdata import AKSJEUNIVERS, Kurslager, Kursrad, MinneKurslager, UgyldigKursrad
 from lagring_sqlite import MIGRASJONSKATALOG, SqliteKurslager
 from migrering import migrer
 
@@ -67,7 +67,7 @@ class TestKursrad:
         verdier = {"dato": date(2026, 9, 21), "slutt": 100.0, "justert_slutt": 98.0, "volum": 1000}
         verdier[felt] = None
 
-        with pytest.raises(TypeError):
+        with pytest.raises(UgyldigKursrad):
             Kursrad(**verdier)
 
     @pytest.mark.parametrize(
@@ -79,7 +79,7 @@ class TestKursrad:
         """AD-20: boersdagen er en kalenderdato. Tekst betyr at adapteren glemte
         aa oversette. datetime er en underklasse av date, men baerer et
         klokkeslett og kan gi feil dag - derfor avvises den eksplisitt."""
-        with pytest.raises(TypeError):
+        with pytest.raises(UgyldigKursrad):
             Kursrad(dato=dato, slutt=100.0, justert_slutt=98.0, volum=1000)
 
     @pytest.mark.parametrize("felt", ["slutt", "justert_slutt"])
@@ -92,8 +92,58 @@ class TestKursrad:
         verdier = {"dato": date(2026, 9, 21), "slutt": 100.0, "justert_slutt": 98.0, "volum": 1000}
         verdier[felt] = verdi
 
-        with pytest.raises(ValueError):
+        with pytest.raises(UgyldigKursrad):
             Kursrad(**verdier)
+
+    @pytest.mark.parametrize(
+        ("felt", "verdi"),
+        [
+            ("slutt", "100.0"),
+            ("justert_slutt", "98.0"),
+            ("slutt", True),
+            ("volum", 1000.0),
+            ("volum", "1000"),
+            ("volum", True),
+        ],
+        ids=["slutt-tekst", "justert-tekst", "slutt-bool", "volum-float",
+             "volum-tekst", "volum-bool"],
+    )
+    def test_feil_type_avvises(self, felt, verdi):
+        verdier = {"dato": date(2026, 9, 21), "slutt": 100.0, "justert_slutt": 98.0, "volum": 1000}
+        verdier[felt] = verdi
+
+        with pytest.raises(UgyldigKursrad):
+            Kursrad(**verdier)
+
+    @pytest.mark.parametrize("felt", ["slutt", "justert_slutt"])
+    def test_heltall_for_stort_for_float_avvises(self, felt):
+        """math.isfinite(10**400) reiser OverflowError. Den skal ikke slippe ut."""
+        verdier = {"dato": date(2026, 9, 21), "slutt": 100.0, "justert_slutt": 98.0, "volum": 1000}
+        verdier[felt] = 10**400
+
+        with pytest.raises(UgyldigKursrad):
+            Kursrad(**verdier)
+
+    @pytest.mark.parametrize("felt", ["slutt", "justert_slutt"])
+    @pytest.mark.parametrize("verdi", [0, 0.0, -0.01, -100])
+    def test_kurs_paa_null_eller_under_avvises(self, felt, verdi):
+        verdier = {"dato": date(2026, 9, 21), "slutt": 100.0, "justert_slutt": 98.0, "volum": 1000}
+        verdier[felt] = verdi
+
+        with pytest.raises(UgyldigKursrad):
+            Kursrad(**verdier)
+
+    def test_negativt_volum_avvises(self):
+        with pytest.raises(UgyldigKursrad):
+            Kursrad(dato=date(2026, 9, 21), slutt=100.0, justert_slutt=98.0, volum=-1)
+
+    def test_volum_null_godtas(self):
+        """En dag uten handel er en lovlig dag."""
+        assert Kursrad(dato=date(2026, 9, 21), slutt=100.0, justert_slutt=98.0, volum=0).volum == 0
+
+    def test_ugyldig_kursrad_er_en_valueerror(self):
+        """Kode som fanger ValueError, fanger den fortsatt."""
+        assert issubclass(UgyldigKursrad, ValueError)
 
     def test_heltall_godtas_som_kurs(self):
         """EODHD sender hele kurser som heltall, for eksempel "open":250."""
