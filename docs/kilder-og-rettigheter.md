@@ -206,6 +206,10 @@ Informasjonen «in repackaged form», og om gratisnivået gir tilgang til
 demonstrasjonen og publiseringsskillet. Det tredje er avgjort av nyhetstesten
 2026-09-21: gratisnivået dekker `/api/news` for `.OL`.
 
+*Rettet 2026-09-24:* «står fortsatt ubesvart» stemmer ikke. De to første ble
+sendt 21.09 kl. 19:33 og besvart samme kveld: «Yes, we confirm both». Se
+«Oppfølgingen samme kveld: begge bekreftet».
+
 ---
 
 ## EODHDs skriftlige svar: ja, med betingelser
