@@ -166,9 +166,9 @@ teknologiske implikasjoner. Det som er ukjent, er lengde, struktur og format.
 
 | | |
 |---|---|
-| **Status** | **Finnes. Faglærer svarte 20.09 på et spørsmål fra gruppen om briefen, med positiv tilbakemelding – ikke en godkjenning** |
+| **Status** | **Låst og klar for levering: tag `arbeidskrav-product-brief`, commit `c7416ee`** |
 | **Ligger i** | `_bmad-output/planning-artifacts/product-brief.md` |
-| **Gjenstår** | Fryse teksten og føre hvilken commit som leveres. **Formatkrav: ingen** — sagt eksplisitt i tilbakemeldingen |
+| **Gjenstår** | Vurdering fra faglærerne etter 27.09 kl. 16:00. **Formatkrav: ingen** — sagt eksplisitt i tilbakemeldingen 20.09 |
 
 Samme tilbakemelding er positiv til fordelingen mellom brief og PRD, inkludert
 vår egen seksjon «Data og kilder» som ikke står i malen.
@@ -353,7 +353,7 @@ innholdskrav, sitert under «Eksamen» øverst.
 
 | Punkt | |
 |---|---|
-| **Product Brief** | Finnes. Faglærer svarte 20.09 på et spørsmål fra gruppen om briefen, med positiv tilbakemelding – ikke en godkjenning. Formatkrav: ingen. Gjenstår: fryse teksten og levere som arbeidskrav |
+| **Product Brief** | Låst og klar for levering: tag `arbeidskrav-product-brief`, commit `c7416ee`. Gjenstår: vurdering fra faglærerne etter 27.09 kl. 16:00 |
 | **Offentlig repo** | Bekreftet i orden |
 | **Teknologivalg** | Avviket er besluttet og begrunnelsen ført |
 | **Databasevalget** | Besluttet og kontrollert med faglærerstaben — *valget*, ikke lagringen |
