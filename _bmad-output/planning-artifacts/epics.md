@@ -592,8 +592,11 @@ uten at `SnapshotKilde` får en skrivemetode, så 1.4b har noe å lese fra.
   ingen egen sjekk av verdiene. *Rettet 2026-09-24:* her sto før at
   oversetteren skulle fange `ValueError`. `Kursrad` reiste også `TypeError` og
   `OverflowError`, og de ville sluppet gjennom
-- Datoen parses strengt, med `datetime.strptime(tekst, "%Y-%m-%d")`.
-  `date.fromisoformat` godtar både «20260921» og «2026-W39-1», prøvd 24.09
+- Datoen parses strengt: en dato godtas bare hvis `dato.isoformat()` er lik
+  teksten. Det avviser «2026-9-1», «20260921» og «2026-W39-1». Et umulig
+  datum som «2026-09-31» feiler allerede i parsingen. *Rettet 2026-09-24:* her
+  sto `datetime.strptime(tekst, "%Y-%m-%d")` alene. Den godtar «2026-9-1», og
+  `date.fromisoformat` godtar «20260921» og «2026-W39-1», prøvd 24.09
 - **Ingen konsument røres.** Hele testsettet er grønt, og tallet telles før og
   etter
 - **Ville feilet hvis:** oversetteren falt tilbake fra `adjusted_close` til
