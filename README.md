@@ -17,7 +17,7 @@ applikasjonen skal fungere uten det.
 
 ## Dokumentene
 
-- **Product Brief** — `_bmad-output/planning-artifacts/product-brief.md`
+- **Product Brief** — `_bmad-output/planning-artifacts/product-brief.md`. Arbeidskrav på 1–2 sider, innleveringsfrist søndag 27.09.2026. Versjon 2 i full lengde står i `product-brief-tillegg.md` i samme mappe.
 - **PRD med krav, begrunnelser og målinger** — `_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/`
 - **Kilder og bruksvilkår** — `docs/kilder-og-rettigheter.md`, med hva hver datakilde tillater og når det sist ble kontrollert
 - **Refleksjonslogg og lagrede KI-prompts** — `docs/reflection-log.md` og `docs/ai-prompts/`
