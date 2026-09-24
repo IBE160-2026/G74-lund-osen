@@ -1,3 +1,10 @@
+---
+title: "Utkast: vilkårsspørsmål til EODHD"
+status: sendt
+created: 2026-09-20
+updated: 2026-09-24T21:58
+---
+
 # Utkast: vilkårsspørsmål til EODHD
 
 Skrevet 2026-09-20. Sendes til `support@eodhistoricaldata.com`.

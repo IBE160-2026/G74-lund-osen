@@ -1,3 +1,10 @@
+---
+title: "Kilder og rettigheter"
+status: aktiv
+created: 2026-09-20
+updated: 2026-09-24T21:58
+---
+
 # Kilder og rettigheter
 
 Oversikt over datakildene OSE Signal bruker eller har vurdert, hva vilkårene sier
@@ -11,8 +18,6 @@ publiseres ikke. Vurderingen gjelder derfor ikke-kommersiell, pedagogisk bruk.
 `IBE160-2026/G74-lund-osen`, som er åpent tilgjengelig. Applikasjonen er altså
 ikke publisert, men arbeidet med den er. Skillet mellom hva som deles og hva som
 blir liggende lokalt er derfor et valg vi må ta bevisst — se neste avsnitt.
-
-Sist oppdatert: 2026-09-24
 
 ---
 

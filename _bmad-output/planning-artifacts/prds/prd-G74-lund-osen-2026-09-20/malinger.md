@@ -1,3 +1,10 @@
+---
+title: "Målinger — grunnlaget for PRD-en"
+status: aktiv
+created: 2026-09-20
+updated: 2026-09-24T21:58
+---
+
 # Målinger — grunnlaget for PRD-en
 
 Alle tall PRD-en bygger på, med metode og dato, slik at de kan etterprøves eller

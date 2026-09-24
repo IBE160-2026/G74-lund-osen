@@ -1,3 +1,10 @@
+---
+title: "Begrunnelser — hvorfor kravene i PRD-en ser slik ut"
+status: aktiv
+created: 2026-09-20
+updated: 2026-09-24T21:58
+---
+
 # Begrunnelser — hvorfor kravene i PRD-en ser slik ut
 
 `prd.md` er et kravregister: hva løsningen skal gjøre. Dette dokumentet bærer

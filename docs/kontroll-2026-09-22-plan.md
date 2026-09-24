@@ -1,3 +1,10 @@
+---
+title: "Rettingsplan etter kontrollen 22.09.2026"
+status: final
+created: 2026-09-22
+updated: 2026-09-24T21:58
+---
+
 # Rettingsplan etter kontrollen 22.09.2026
 
 **Ingenting er skrevet til kildefilene.** Dette er forslag, til lesning sammen

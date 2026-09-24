@@ -1,3 +1,10 @@
+---
+title: "Leveranseliste — IBE160, gruppe G74"
+status: aktiv
+created: 2026-09-22
+updated: 2026-09-24T21:58
+---
+
 # Leveranseliste — IBE160, gruppe G74
 
 **Kvalitetssikringsdokumentasjonen — kontrollrapporter, mutanttester,
