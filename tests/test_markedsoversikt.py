@@ -4,6 +4,8 @@ Seriene bygges i minnet, saa hver test kan beskrive noeyaktig den situasjonen
 den vil proeve.
 """
 
+from datetime import date, timedelta
+
 import pytest
 
 from kursdata import Aksje, MinneKilde
@@ -28,7 +30,7 @@ def serie(kurser, volumer=None, fra_dato=1):
     volumer = volumer or [1000] * len(kurser)
     return [
         {
-            "date": f"2026-09-{fra_dato + i:02d}",
+            "date": (date(2026, 9, fra_dato) + timedelta(days=i)).isoformat(),
             "close": kurs,
             "adjusted_close": kurs,
             "volume": volum,

@@ -6,6 +6,8 @@ i signalet gir ikke en krasj, den gir et tall som ser plausibelt ut, og da er
 haandlagde serier eneste maaten aa se feilen paa.
 """
 
+from datetime import date, timedelta
+
 import pytest
 
 from signalberegning import (
@@ -53,7 +55,7 @@ def serie(kurser: list[float], volumer: list[float] | None = None) -> list[dict]
         volumer = [NORMALT_VOLUM] * len(kurser)
     return [
         {
-            "date": f"2026-09-{nummer + 1:02d}",
+            "date": (date(2026, 9, 1) + timedelta(days=nummer)).isoformat(),
             "close": kurs,
             "adjusted_close": kurs,
             "volume": volum,

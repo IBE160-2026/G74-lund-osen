@@ -4,6 +4,8 @@ data/ er gitignorert, saa den finnes ikke i et ferskt klon. Testene monterer
 derfor sin egen kilde i stedet for aa lese fra katalogen.
 """
 
+from datetime import date, timedelta
+
 import pytest
 
 import app as app_modul
@@ -20,7 +22,7 @@ def serie(kurser, volumer=None):
     volumer = volumer or [1000] * len(kurser)
     return [
         {
-            "date": f"2026-09-{1 + i:02d}",
+            "date": (date(2026, 9, 1) + timedelta(days=i)).isoformat(),
             "close": kurs,
             "adjusted_close": kurs,
             "volume": volum,
