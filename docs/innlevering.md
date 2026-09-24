@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-09-24T23:45
+updated: 2026-09-25T00:27
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -176,7 +176,7 @@ teknologiske implikasjoner. Det som er ukjent, er lengde, struktur og format.
 
 | | |
 |---|---|
-| **Status** | **Låst og klar for levering: tag `arbeidskrav-product-brief-v5`, commit `16e6f23`** |
+| **Status** | **Låst og klar for levering: tag `arbeidskrav-product-brief-v6`, commit `a5c4052`** |
 | **Ligger i** | `_bmad-output/planning-artifacts/product-brief.md` |
 | **Gjenstår** | Vurdering fra faglærerne etter fristen 27.09. **Lengdekrav: 1–2 sider** (arbeidskravet, kilde: faglærer) |
 
@@ -209,6 +209,15 @@ testen 17.09, som ikke har tall eller rådata (`malinger.md` §0). Versjon 5
 skiller testen 17.09 («flere av de ti») fra kjøringen 21.09, der det gjaldt
 flertallet (`malinger.md` §7.2 og §10), slik versjon 2 festet påstanden (commit
 `fc8edc2`).
+
+*Rettet 2026-09-25:* versjon 6 sier «webapplikasjon som kjører lokalt» i stedet for
+«webapplikasjon for PC». Mobiltilpasning står fortsatt utenfor v1 under «Scope»,
+og plattformvalget står i PRD-en.
+
+*Presisering 2026-09-25:* merknaden om versjon 5 sier «slik versjon 2 festet
+påstanden». Det gjelder kjøringen 21.09. Versjon 2 sa også «flertallet» om
+testen 17.09, så skillet mellom «flere» (17.09) og «flertallet» (21.09) er nytt i
+versjon 5.
 
 ---
 
@@ -380,7 +389,7 @@ innholdskrav, sitert under «Eksamen» øverst.
 
 | Punkt | |
 |---|---|
-| **Product Brief** | Låst og klar for levering: tag `arbeidskrav-product-brief-v5`, commit `16e6f23`. Arbeidskrav på 1–2 sider, innleveringsfrist 27.09. Gjenstår: vurdering fra faglærerne etter fristen |
+| **Product Brief** | Låst og klar for levering: tag `arbeidskrav-product-brief-v6`, commit `a5c4052`. Arbeidskrav på 1–2 sider, innleveringsfrist 27.09. Gjenstår: vurdering fra faglærerne etter fristen |
 | **Offentlig repo** | Bekreftet i orden |
 | **Teknologivalg** | Avviket er besluttet og begrunnelsen ført |
 | **Databasevalget** | Besluttet og kontrollert med faglærerstaben — *valget*, ikke lagringen |
