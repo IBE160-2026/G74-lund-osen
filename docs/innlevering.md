@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-09-24T23:14
+updated: 2026-09-24T23:45
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -58,12 +58,13 @@ fra 19.–20.09: «Ny innleveringsdato for BMAD-leveransen er satt til søndag
 27.09.2026 (uke 39).» Loggen sier ikke hvem som satte den eller hvor den er
 kunngjort. Se §7.
 
-**Frist og vurdering** *(kilde: Marian 24.09)*: Product Brief skal være ferdig
+**Frist og vurdering** *(kilde: faglærer)*: Product Brief skal være ferdig
 **søndag 27.09.2026**. Da vurderer faglærerne den som godkjent eller
 ikke godkjent, med tilbakemelding. Den skal være på 1–2 sider. *Rettet
 2026-09-24:* «Utsettelsen har ingen navngitt kilde» gjelder ikke lenger.
-Fristen 27.09 er opplyst av Marian 24.09. *Rettet 2026-09-24:* klokkeslettet er
-fjernet fra fristen her, i §4 og i §7, etter beskjed fra Marian.
+Fristen 27.09 er gitt av faglærer. *Rettet 2026-09-24:* klokkeslettet er
+fjernet fra fristen her, i §4 og i §7, etter beskjed fra Marian. *Rettet
+2026-09-24:* kilden for fristen og lengdekravet er faglærer.
 
 ### Hva emnesiden ikke sier
 
@@ -177,7 +178,7 @@ teknologiske implikasjoner. Det som er ukjent, er lengde, struktur og format.
 |---|---|
 | **Status** | **Låst og klar for levering: tag `arbeidskrav-product-brief-v5`, commit `16e6f23`** |
 | **Ligger i** | `_bmad-output/planning-artifacts/product-brief.md` |
-| **Gjenstår** | Vurdering fra faglærerne etter fristen 27.09. **Lengdekrav: 1–2 sider** (arbeidskravet, kilde: Marian 24.09) |
+| **Gjenstår** | Vurdering fra faglærerne etter fristen 27.09. **Lengdekrav: 1–2 sider** (arbeidskravet, kilde: faglærer) |
 
 Samme tilbakemelding er positiv til fordelingen mellom brief og PRD, inkludert
 vår egen seksjon «Data og kilder» som ikke står i malen.
@@ -252,7 +253,7 @@ ikke hvem som satte den eller hvor den er kunngjort. Den er tatt med her fordi
 den er ført i repoet og styrer arbeidet, men den bør bekreftes mot Canvas eller
 faglærer før den brukes til å planlegge.
 
-*Rettet 2026-09-24 (kilde: Marian 24.09):* fristen for arbeidskravet er
+*Rettet 2026-09-24 (kilde: faglærer):* fristen for arbeidskravet er
 **søndag 27.09.2026**. Da vurderer faglærerne Product Brief som
 godkjent eller ikke godkjent, med tilbakemelding. Datoen har dermed en kilde.
 Om fristen også gjelder de andre BMAD-dokumentene, er ikke opplyst.
