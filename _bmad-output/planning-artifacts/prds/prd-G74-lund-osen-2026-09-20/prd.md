@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-24T18:29
+updated: 2026-09-24T19:07
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -54,10 +54,12 @@ metode og rådatareferanser. `.memlog.md` er beslutningsloggen, og
 **Om lengden.** Vi satte ambisjonsnivået til middels — 5–8 sider — og landet på
 omtrent 11,7. Avviket er kjent og bevisst. Resonnementet er allerede flyttet ut
 til `begrunnelser.md` og målingene til `malinger.md`; det som står igjen er
-kravene selv, og 115 av linjene her er tabellrader som *er* krav: kolonnene i
+kravene selv, og 130 av linjene her er tabellrader som *er* krav: kolonnene i
 markedsoversikten, de ti kategoriene med bøtte, feltene som skal lagres,
 suksessmålene og de åpne punktene. Å komme under 11 sider krever at krav går ut,
-ikke at teksten strammes.
+ikke at teksten strammes. *Talt på nytt 2026-09-24: 130 datarader, uten
+overskrift- og skillelinjer. Her sto 115; da det ble skrevet, hadde fila 114
+tabellinjer medregnet overskrift- og skillelinjer.*
 
 ---
 
@@ -117,6 +119,10 @@ signalene slår markedet.
 Tre vurderinger er utsatt til løsningen eventuelt publiseres:
 **videreformidlingsrett**, **personvern**, og **regelverket som gjelder når en
 tjeneste presenterer finansielle signaler**.
+
+*Rettet 2026-09-24:* videreformidlingsretten er ikke lenger utsatt. Vilkårene
+til EODHD og til Euronext, som dekker NewsWeb, ble kontrollert 2026-09-21. Se
+`docs/kilder-og-rettigheter.md` og åpent punkt 1.
 
 **Utløseren er publisering, ikke kommersialisering.** Kildedokumentet krever at
 vilkårene vurderes på nytt dersom applikasjonen skal publiseres — også uten at
@@ -851,8 +857,10 @@ Hvor grensen faktisk bør gå, er ikke avgjort og kan ikke avgjøres på papir. 
 >
 > **Alle fem parametrene er nå låst.** De to vinduene — de 20 dagene i
 > bevegelsessjekken og de 20 i interessesjekken — var ikke med i testen 21.09,
-> som låste tre parametre og ikke fem. De ble målt 2026-09-22 mot de samme
-> 2 985 aksjedagene; metode og tall i `malinger.md` §9.
+> som låste tre parametre og ikke fem. De ble målt 2026-09-22 mot like mange
+> aksjedager, 2 985, forskjøvet én handelsdag; metode og tall i `malinger.md`
+> §9. *Rettet 2026-09-24: her sto «de samme 2 985». §9 sier «Like mange
+> aksjedager som §7.4, men ikke de samme».*
 
 Kravet til signalet er **forklarbarhet, ikke treffsikkerhet**. Vi lover ikke
 bedre signaler enn andre, men at brukeren alltid kan se hva som ga utslaget.
@@ -1039,11 +1047,13 @@ publiseres og hva som blir liggende lokalt: `docs/kilder-og-rettigheter.md`.
 | EODHD `/api/eod` | Sluttkurser | 1 kall per symbol, 15 i døgnet |
 | Oslo Børs NewsWeb | Børsmeldinger | Nei |
 | Euronext finanskalender | Kommende hendelser | Nei |
-| EODHD `/api/news` | Relevanseksperimentet, én engangsinnsamling | 10 kall per ticker (5 per forespørsel + 5 per ticker), ~80 kall for åtte selskaper. Ikke daglig drift — se åpent punkt 5 |
+| EODHD `/api/news` | Relevanseksperimentet, én engangsinnsamling | Målt: 5 kall for én forespørsel med én ticker (`malinger.md` §7.2). For flere tickere er tallet ikke målt: ~40 kall for åtte selskaper hvis det er 5 per ticker, ~80 hvis det er 10. Avgjøres av den første forespørselen med to tickere (story 9.4). Ikke daglig drift — se åpent punkt 5. *Rettet 2026-09-24: her sto 10 per ticker og ~80* |
 
 To forbehold hører til PRD-en fordi de kan velte krav: **NewsWeb-vilkårene er
 ikke kontrollert**, og API-et er udokumentert backend for Oslo Børs' egen
-nettside. Faller NewsWeb bort, finnes ingen åpenbar erstatning — E24 er forkastet
+nettside. *Rettet 2026-09-24:* vilkårene ble kontrollert 2026-09-21. Euronexts
+vilkår dekker NewsWeb ved navn og forbyr automatisert henting uten skriftlig
+tillatelse på forhånd; se åpent punkt 1. Faller NewsWeb bort, finnes ingen åpenbar erstatning — E24 er forkastet
 på vilkår, og andre norske finansmedier publiserer ikke lenger åpen RSS. Se
 åpent punkt 1.
 
@@ -1115,31 +1125,31 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 
 | # | Punkt | Eier | Frist | Blokkerer |
 |---|---|---|---|---|
-| 1 | **Vilkårskontroll — to av tre deler lukket 2026-09-21.** *Lukket:* EODHD har svart skriftlig ja til språkmodellbruk, med fire betingelser, og kontrollen av NewsWeb og Euronext er gjennomført. *Åpent:* kontrollen ga et **uttrykkelig forbud** mot automatisert henting uten tillatelse på forhånd. Forespørsel sendt 21.09, **purret 22.09 i samme tråd** — purringen dekker både de fire opprinnelige delene og overføring til en modelltjeneste (punkt 19), og tilbyr et smalere alternativ. Svar avventes. Holder ikke unntaket, må meldingsdelen omdisponeres. **Kontrollert 22.09: EODHDs `/api/news` er ikke en reservekilde** — den koster 75 kall i døgnet for universet mot en kvote på 20, innholdet er syndikert fra tredjepart via Yahoo, og taksonomien er **tematisk og ikke regulatorisk**, så FR-502s tre bøtter måtte bygges om fra grunnen. Vurderingen med tall i `malinger.md` §10. Et nei tar derfor hele KI-laget med seg | Gruppen | **2026-09-28** | Meldingsdelen |
+| 1 | **Vilkårskontroll — to av tre deler lukket 2026-09-21.** *Lukket:* EODHD har svart skriftlig ja til språkmodellbruk, med fire betingelser, og kontrollen av NewsWeb og Euronext er gjennomført. *Åpent:* kontrollen ga et **uttrykkelig forbud** mot automatisert henting uten tillatelse på forhånd. Forespørsel sendt 21.09, **purret 22.09 i samme tråd** — purringen dekker både de fire opprinnelige delene og overføring til en modelltjeneste (punkt 19), og tilbyr et smalere alternativ. Svar avventes. Holder ikke unntaket, må meldingsdelen omdisponeres. **Kontrollert 22.09: EODHDs `/api/news` er ikke en reservekilde** — den koster 75 kall i døgnet for universet mot en kvote på 20, innholdet er syndikert fra tredjepart via Yahoo, og taksonomien er **tematisk og ikke regulatorisk**, så FR-502s tre bøtter måtte bygges om fra grunnen. Vurderingen med tall i `malinger.md` §10. Et nei tar derfor hele KI-laget med seg. *Tillegg 2026-09-24:* et nei tar KI-laget **over meldinger** med seg, ikke hele KI-laget. Plan B (Epic 5B) utløses, og det hentes ikke fra NewsWeb før Euronext har svart (beslutningen 23.09) | Gruppen | **2026-09-28** | Meldingsdelen |
 | 2 | **KI-terskelen i samlekategorien** — hvor grensen mellom «kan påvirke» og «lite relevant» skal gå. Kan ikke avgjøres på papir; relevanseksperimentet er input. Foreløpig regel står i FR-606 | *‹fylles inn›* | Etter del 2 av relevanseksperimentet | Kalibrering av FR-606 |
-| 3 | **Hvilken kilde gir handelskalenderen?** FR-402 hviler på «forventet børsdag», men ingen kilde er utpekt for hvilke dager Oslo Børs er åpen. **Utvidet 2026-09-24: «inneværende børsdag» er heller ikke definert for helg og helligdager.** FR-408 og spinens skjerping av AD-7 lar `skriv` avvise enhver dato som ikke er inneværende børsdag, men sier ikke hva den er en lørdag eller en helligdag. Definisjonen må være avgjort før story 1.6. Forslag, ikke avgjort: «siste børsdag på eller før dagens dato i Europe/Oslo» | *‹fylles inn›* | Før implementasjon. Definisjonen av inneværende børsdag: før story 1.6 | FR-402, FR-408 |
-| 4 | **Hvordan utledes eks.dato?** FR-407 og FR-503 forutsetter at utbyttedager kan identifiseres. **En målt vei finnes, funnet 2026-09-21:** avviket mellom close-endringen og `adjusted_close`-endringen peker ut dagen justeringen skjedde. 38 hendelser over 3 720 dagovergangner, og antallet står stille fra 0,05 til 0,5 prosentpoeng — et rent skille, så terskelen kan begrunnes i stedet for velges. **Konsekvensen er større enn kravet:** FR-407 blir da uavhengig av EKS.DATO-meldinger, og dermed av NewsWeb og punkt 1. Se `begrunnelser.md` §11 | Gruppen | Før demonstrasjonen | FR-407, FR-503 |
-| 16 | **Språkgjenkjenningen slår systematisk feil for Vår Energi.** `gjett_spraak` lar ett norsk tegn avgjøre alene, og `VAR` heter *Vår Energi ASA*. Hver engelsk melding derfra bærer «å» i sitt eget firmanavn og leses som norsk, så FR-501 vil beholde den engelske versjonen hver gang selskapet sender et meldingspar. Dette er ikke en kantsituasjon — det er hver gang, for én av de femten, og det vises i en norsk applikasjon. **To forsvarlige veier:** bygge om språkregelen, eller la den stå og forklare avviket i demonstrasjonen. Det som ikke er forsvarlig er at valget tas ved at ingen tar det opp | Gruppen | **Før UI-arbeidet starter** | FR-501, demonstrasjonen |
+| 3 | **Hvilken kilde gir handelskalenderen?** FR-402 hviler på «forventet børsdag», men ingen kilde er utpekt for hvilke dager Oslo Børs er åpen. **Utvidet 2026-09-24: «inneværende børsdag» er heller ikke definert for helg og helligdager.** FR-408 og spinens skjerping av AD-7 lar `skriv` avvise enhver dato som ikke er inneværende børsdag, men sier ikke hva den er en lørdag eller en helligdag. Definisjonen må være avgjort før story 1.6. Forslag, ikke avgjort: «siste børsdag på eller før dagens dato i Europe/Oslo». *Rettet 2026-09-24:* fristen sto «Før implementasjon», som er passert, og punktet hadde ingen eier | Gruppen | **Før story 1.6** | FR-402, FR-408 |
+| 4 | **Hvordan utledes eks.dato?** FR-407 og FR-503 forutsetter at utbyttedager kan identifiseres. **En målt vei finnes, funnet 2026-09-21:** avviket mellom close-endringen og `adjusted_close`-endringen peker ut dagen justeringen skjedde. 38 hendelser over 3 720 dagovergangner, og antallet står stille fra 0,05 til 0,5 prosentpoeng — et rent skille, så terskelen kan begrunnes i stedet for velges. **Konsekvensen er større enn kravet:** FR-407 blir da uavhengig av EKS.DATO-meldinger, og dermed av NewsWeb og punkt 1. Se `begrunnelser.md` §11. *Frist endret 2026-09-24:* sto «Før demonstrasjonen»; story 2.6 bygger merkingen | Gruppen | **Før story 2.6** | FR-407, FR-503 |
+| 16 | **Språkgjenkjenningen slår systematisk feil for Vår Energi.** `gjett_spraak` lar ett norsk tegn avgjøre alene, og `VAR` heter *Vår Energi ASA*. Hver engelsk melding derfra bærer «å» i sitt eget firmanavn og leses som norsk, så FR-501 vil beholde den engelske versjonen hver gang selskapet sender et meldingspar. Dette er ikke en kantsituasjon — det er hver gang, for én av de femten, og det vises i en norsk applikasjon. **To forsvarlige veier:** bygge om språkregelen, eller la den stå og forklare avviket i demonstrasjonen. Det som ikke er forsvarlig er at valget tas ved at ingen tar det opp. *Frist endret 2026-09-24:* sto «Før UI-arbeidet starter»; story 6.3 bygger dedupliseringen | Gruppen | **Før story 6.3** | FR-501, demonstrasjonen |
 | 20 | **Hvordan skal FR-408s eget spørsmål kunne stilles?** Kravet begrunner seg med «hva sa løsningen om EQNR for to uker siden?», men ingen visning, kommando eller spørring i v1 svarer på det. Historikken er da **lagret, men ikke besvarbar**. Tre veier: en visning i aksjedetaljen, en egen kommando, eller en direkte spørring mot basen under demonstrasjonen. FR-409 binder alle tre til å bevare skillet mellom «ingen rad» og «styrke 0» | Gruppen | **Før demonstrasjonen** | FR-408s begrunnelse |
-| 19 | **Forespørselen til Euronext ba aldri om å sende innhold til en modelltjeneste.** Vilkårene forbyr å «otherwise transfer any of the Content to any third person», og parentesen strekker det til «others in your company or organisation» — altså svært bredt. Å sende meldingstekst inn i en språkmodell er en slik overføring. Brevet 21.09 beskriver fire ting — Retrieval, Storage, Display, Source code — og **ingen av dem nevner en modelltjeneste**; kontrollert 22.09, null treff på «language model», «LLM», «third person» og «third party» i hele brevet. Manuell innsamling løser klausul 1 om automatisert henting, men **ikke** overføringsklausulen. **Konsekvens: selv et fullt ja på alle fire delene lukker ikke dette.** Det må stilles som eget spørsmål. Kalenderspørsmålet i samme brev hjelper ikke: det ber om «the same answer» og arver dermed de fire overskriftenes rekkevidde, inkludert utelatelsen. **Purret 22.09, og purringen dekker begge deler** — de fire opprinnelige og overføringen — så et kort svar kan ikke lenger se fullstendig ut mens det bare dekker det ene. Purringen tilbyr også et smalere alternativ: et lite, manuelt innsamlet utvalg brukt én gang. Ordrett i `docs/epost-til-euronext.md` | Gruppen | **Sammen med punkt 1, 2026-09-28** | Plan B for relevanseksperimentet; KI-laget over NewsWeb-innhold |
+| 19 | **Forespørselen til Euronext ba aldri om å sende innhold til en modelltjeneste.** Vilkårene forbyr å «otherwise transfer any of the Content to any third person», og parentesen strekker det til «others in your company or organisation» — altså svært bredt. Å sende meldingstekst inn i en språkmodell er en slik overføring. Brevet 21.09 beskriver fire ting — Retrieval, Storage, Display, Source code — og **ingen av dem nevner en modelltjeneste**; kontrollert 22.09, null treff på «language model», «LLM», «third person» og «third party» i hele brevet. Manuell innsamling løser klausul 1 om automatisert henting, men **ikke** overføringsklausulen. **Konsekvens: selv et fullt ja på alle fire delene lukker ikke dette.** Det må stilles som eget spørsmål. Kalenderspørsmålet i samme brev hjelper ikke: det ber om «the same answer» og arver dermed de fire overskriftenes rekkevidde, inkludert utelatelsen. **Purret 22.09, og purringen dekker begge deler** — de fire opprinnelige og overføringen — så et kort svar kan ikke lenger se fullstendig ut mens det bare dekker det ene. Purringen tilbyr også et smalere alternativ: et lite, manuelt innsamlet utvalg brukt én gang. Ordrett i `docs/epost-til-euronext.md` | Gruppen | **Sammen med punkt 1, 2026-09-28** | Reservealternativet for relevanseksperimentet; KI-laget over NewsWeb-innhold. *Rettet 2026-09-24: her sto «Plan B», som nå betyr Epic 5B* |
 | 23 | **Når på døgnet skal hentekommandoen kjøres?** Kl. 19:04 lokal tid 2026-09-23 var dagens sluttkurs ikke publisert: alle 15 serier sluttet 22.09 (`malinger.md` §11). Og en rad hentet mens børsen er åpen, kan bli korrigert i etterkant — MOWI 21.09 fikk volumet justert ned 0,8 % ved neste henting, med sluttkursen uendret. EODHD dokumenterer bare «2–3 timer etter at børsen stenger» (§2). Kjøres kommandoen for tidlig, får brukeren gårsdagens data eller en foreløpig rad; kjøres den to ganger, trekkes det stille fra bonuskvoten. Lagt til 2026-09-23 | Gruppen | Før story 2.1 | FR-402, story 2.1–2.3 |
+| 24 | **«Ingen rad på en børsdag» betyr ikke alltid at kommandoen ikke ble kjørt.** FR-409 leser det slik, men to tilfeller gir ingen rad uten et hull i driften: kommandoen kjørte før dagens kurs var publisert (punkt 23), eller ett symbol feilet mens de andre ble hentet (`AD-15`). To veier: en fjerde tilstand i FR-409, eller en lagret grunn på raden. Story 2.5 må si hva som skrives for et symbol som feilet. Lagt til 2026-09-24 | *‹fylles inn›* | **Før story 1.7** | FR-409, story 1.7 og 2.5 |
 
 ### Må følges opp
 
 | # | Punkt | Eier | Frist |
 |---|---|---|---|
-| 5 | **Relevanseksperimentet, del 1: utvalgskriterier, innsamling og manuell merking.** Flyttet fram fra uke 41 den 2026-09-21. Uke 41 ble satt mens eksperimentet var blokkert av to ting — om vilkårene tillot språkmodellbruk, og om `/api/news` svarte for `.OL`. **Begge ble avklart 21.09**, men datoen ble aldri flyttet etterpå. Rekkefølge: (a) utvalgskriteriene skriftlig — hvilke åtte selskaper, hvor mange artikler per selskap, og hva som teller som at en artikkel handler om selskapet; (b) innsamlingen, med kalltall-kontrollen som **første** forespørsel: to tickere, og se om `apiRequests` flytter seg 10 eller 15, så kostnaden for resten er kjent før den brukes. Tas fra bonuskvoten `extraLimit`. *Prøvd 2026-09-23, `malinger.md` §11:* kall nummer 21 lyktes og trakk fra bonuskvoten (485 → 484), så den brukes automatisk når dagskvoten er tom. Kalltallet per ticker er fortsatt utledet, ikke målt | Gruppen | Etter punkt 17 og 18 |
+| 5 | **Relevanseksperimentet, del 1: utvalgskriterier, innsamling og manuell merking.** Flyttet fram fra uke 41 den 2026-09-21. Uke 41 ble satt mens eksperimentet var blokkert av to ting — om vilkårene tillot språkmodellbruk, og om `/api/news` svarte for `.OL`. **Begge ble avklart 21.09**, men datoen ble aldri flyttet etterpå. Rekkefølge: (a) utvalgskriteriene skriftlig — hvilke åtte selskaper, hvor mange artikler per selskap, og hva som teller som at en artikkel handler om selskapet; (b) innsamlingen, med kalltall-kontrollen som **første** forespørsel: to tickere, og se om `apiRequests` flytter seg 10 eller 15, så kostnaden for resten er kjent før den brukes. Tas fra bonuskvoten `extraLimit`. *Prøvd 2026-09-23, `malinger.md` §11:* kall nummer 21 lyktes og trakk fra bonuskvoten (485 → 484), så den brukes automatisk når dagskvoten er tom. Kalltallet per ticker er fortsatt utledet, ikke målt. *Rettet 2026-09-24:* fristen sto «Etter punkt 17 og 18», som begge ble lukket 22.09. Ny frist fra briefen og §7. Bygges som story 9.4 | Joakim | **Uke 39–40** |
 | 5b | **Relevanseksperimentet, del 2: KI-klassifiseringen.** Kan ikke gjøres ennå, og det er tre grunner, ikke én: KI-laget finnes ikke som kode, ingen modelltjeneste er valgt, og **betingelse 4 i EODHDs godkjenning — at modelltjenesten ikke trener på innholdet — er udokumentert.** Den må være ført før artikkeltekst sendes inn i en modell, se `docs/kilder-og-rettigheter.md` | Gruppen | Når KI-laget finnes |
 | 6 | **Usikkerhetskriteriene er skrevet for medieartikler.** Kjennetegn 1 bærer svakt når utstederen selv er avsender | | Før KI-laget implementeres |
 | 8 | **Oppstart av tilbakekjøpsprogram** er ekte nyhet, men filtreres bort sammen med de ukentlige statusrapportene | | Før innlevering |
 | 9 | **Kontrollere Alpha Vantages vilkår** for ikke-kommersiell bruk | | Før innlevering |
-| 10 | **Skjevfordeling mot positiv retning**, 68 % i testen. Vurderes mot året, ikke mot femten dager | | Etter utvidet test |
 | 11 | **Meldepliktig handel for primærinnsidere** justeres hvis den viser seg å være i hovedsak opsjonsutøvelse | | Etter én ukes drift |
 | 12 | **Bekrefte horisont og hendelsestyper** i FR-302, som i dag er antatt | | Før implementasjon |
-| 13 | **Datoer for demonstrasjon og prosjektinnlevering.** Spørsmål sendt faglærer i Teams 2026-09-22, sammen med spørsmål om leveranselista er fullstendig og om noen BMAD-dokumenter skal leveres inn. **Besvart av hjelpelærer 2026-09-23: ingen dato finnes ennå** — «Bård Inge vil presisere dette». Åtte suksessmål i §7 er bundet til disse datoene, og «est. uke 45» er vår egen estimering — ikke en oppgitt dato. Se `docs/innlevering.md` | Marian | **Avventer Bård Inge** (spurt 22.09, besvart 23.09) |
+| 13 | **Datoer for demonstrasjon og prosjektinnlevering.** Spørsmål sendt faglærer i Teams 2026-09-22, sammen med spørsmål om leveranselista er fullstendig og om noen BMAD-dokumenter skal leveres inn. **Besvart av hjelpelærer 2026-09-23: ingen dato finnes ennå** — «Bård Inge vil presisere dette». Fire av de åtte suksessmålene i §7 er bundet til disse datoene (*rettet 2026-09-24: her sto «Åtte suksessmål»*), og «est. uke 45» er vår egen estimering — ikke en oppgitt dato. Se `docs/innlevering.md` | Marian | **Avventer Bård Inge** (spurt 22.09, besvart 23.09) |
 | 15 | **Plassér kategoriene som havnet i «ukjent»** i riktig bøtte. Krever en ukes drift for å vite hvilke som faktisk dukker opp | | Etter én ukes drift |
 | 21 | **Hva er emnesidens tredje del?** Emnesiden sier «tre deler», men lister to, og nevner at «delvurdering 3 gir anledning til å demonstrere unike bidrag». Hva den tredje delen er, er ikke oppgitt. Spørres Bård Inge sammen med datoene i punkt 13. Se `docs/innlevering.md`, «Eksamen» | Marian | Sammen med punkt 13 |
-| 22 | **Kodegjennomgang som BMAD-steg, én per epic.** `bmad-code-review` kjøres etter hver ferdige epic, første gang etter Epic 1. Emnesiden: «Dokumentasjon må vise hvordan KI ble brukt, og hvordan studentene har kvalitetssikret koden» — en gjennomgang med flere uavhengige lesere er en del av det, i tillegg til testene og mutantene. Lagt til 2026-09-23 | Gruppen | Etter Epic 1 |
+| 22 | **Kodegjennomgang som BMAD-steg, én per epic.** `bmad-code-review` kjøres etter hver ferdige epic, første gang etter Epic 1. Emnesiden: «Dokumentasjon må vise hvordan KI ble brukt, og hvordan studentene har kvalitetssikret koden» — en gjennomgang med flere uavhengige lesere er en del av det, i tillegg til testene og mutantene. Lagt til 2026-09-23. *2026-09-24:* den første gjennomgangen ble gjort 23.09 etter story 1.1–1.3, midt i Epic 1, ikke etter den. Funnene står som forutsetninger i `epics.md` under 1.6 og 2.2 | Gruppen | Etter Epic 1 |
 
 ### Lukket
 
@@ -1148,6 +1158,7 @@ uten det kan ingen se at de var åpne, eller hva som måtte til.
 
 | # | Punkt | Lukket av | Dato |
 |---|---|---|---|
+| 10 | **Skjevfordeling mot positiv retning**, 68 % i testen. Vurderes mot året, ikke mot femten dager | `malinger.md` §7.4 målte over 199 handelsdager: 60,0 % av aksjedagene med utslag er positive, mot 29,5 % negative. Det korte vinduet lå i en oppgangsperiode og overdrev skjevheten. Flyttet hit 2026-09-24 | 21.09 |
 | 7 | **Låsing av signalparametre** mot ~200 handelsdager | `malinger.md` §7.4 låste terskel, volumfaktor og nøytralsone mot 199 handelsdager; §9 låste de to vinduene mot like mange aksjedager, 2 985, forskjøvet én handelsdag. **Punktet anslo 15 kall. Det kostet 0** — begge målingene ble gjort mot lagrede øyeblikksbilder | 21.09 og 22.09 |
 | 14 | **Hver story leveres med test**, kjørbar uten API-kall | Skrevet inn som `AD-8` i arkitekturspinen. Praksisen var allerede innført: `tests/conftest.py` sperrer `socket.connect`, og CI kjører uten hemmeligheter | 22.09 |
 | 17 | **Database** | SQLite besluttet i arkitekturfasen — spinen `AD-3` til `AD-7`, `AD-16`, `AD-18`, `AD-19`. Rådata forblir filer. **Kontrollert med faglærerstaben 22.09** og bekreftet av assisterende hjelpelærer: «Slik dere beskriver bruken […] bruker dere SQLite som en ordentlig database, ikke bare som enkel fillagring. […] Så ut fra det vi vet nå mener jeg dette er helt innenfor.» Svaret kom ikke fra emneansvarlig og bærer sitt eget forbehold | 22.09 |
@@ -1155,11 +1166,12 @@ uten det kan ingen se at de var åpne, eller hva som måtte til.
 
 **Punkt 1 og 19 er de to som kan velte datagrunnlaget.** Punkt 1 velter nå bare
 én ting, ikke to. Punkt 19 kom til 22.09 og treffer meldingsdelen og KI-laget
-sammen.
+sammen. *Tillegg 2026-09-24:* KI-laget betyr her KI-laget over meldinger. Et nei
+utløser plan B (Epic 5B), og det hentes ikke fra NewsWeb før Euronext har svart.
 
 *Oppdatert 2026-09-21.* EODHD-halvdelen er lukket: språkmodellbruken er
 skriftlig godkjent, og `/api/news` er målt til å svare for `.OL`-tickere.
-Relevanseksperimentet kjøres derfor på plan A og deler ikke lenger kilde med
+Relevanseksperimentet kjøres derfor på medieartiklene (her sto «plan A»; *rettet 2026-09-24*, fordi plan B nå betyr Epic 5B) og deler ikke lenger kilde med
 meldingsdelen. Det som står igjen, er Euronext: vilkårene som dekker NewsWeb
 forbyr uttrykkelig automatisert henting uten tillatelse på forhånd, og
 forespørselen om tillatelse ble sendt 21.09 og er ubesvart. Fristen 28.09 er vår
@@ -1167,7 +1179,7 @@ egen frist for å ta stilling uten svar, ikke en dato Euronext har lovet.
 Fullstendig
 gjennomgang med sitater i `docs/kilder-og-rettigheter.md`.
 
-Av de åpne punktene har 1, 4, 5, 5b, 13, 16, 19, 20, 21, 22 og 23 eier. Punkt 2, 3, 6, 8–12 og 15 mangler det. Punkt 7, 14, 17 og 18 er lukket. *Rettet 2026-09-23: setningen talte lukkede punkter blant de åpne, og manglet 13, 20 og 21.*
+Av de åpne punktene har 1, 3, 4, 5, 5b, 13, 16, 19, 20, 21, 22 og 23 eier. Punkt 2, 6, 8, 9, 11, 12, 15 og 24 mangler det. Punkt 7, 10, 14, 17 og 18 er lukket. *Rettet 2026-09-24: punkt 3 fikk eier, punkt 10 ble lukket, og punkt 24 kom til.* *Rettet 2026-09-23: setningen talte lukkede punkter blant de åpne, og manglet 13, 20 og 21.*
 
 **Om nummereringen.** Numrene følger rekkefølgen punktene ble opprettet i, ikke
 rekkefølgen i tabellene. Punkt 16 står derfor over sammen med de andre som må
