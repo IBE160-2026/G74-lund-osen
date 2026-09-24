@@ -23,7 +23,10 @@ et sitat som ikke fantes».
    Unntak: rå kildedata (regel 16) fjernes fra linjen der de står, linjen merkes
    `[raadata fjernet <dato>]`, og en ny linje nederst sier hvorfor. Brukt i
    `0ccb415`. Nye oppføringer i `docs/reflection-log.md` skrives over «# Joakims
-   oppføringer», ikke nederst i fila.
+   oppføringer», ikke nederst i fila. `_bmad/scripts/memlog.py` skriver hele
+   frontmatteren på nytt og tåler bare linjer på formen `nøkkel: verdi`.
+   PRD-memloggen har kommentarlinjer i frontmatteren som skriptet fjerner eller
+   endrer, så der legges nye linjer til direkte, nederst i fila.
 6. **Ingen nettverkskall i tester** (AD-8, håndhevet i `tests/conftest.py`).
    **Ingen API-kall uten avtale.** Kostnad måles med `/api/user` før og etter
    (`malinger.md` §7.1).
