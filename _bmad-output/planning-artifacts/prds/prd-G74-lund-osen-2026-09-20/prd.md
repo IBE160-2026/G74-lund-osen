@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-24T19:07
+updated: 2026-09-24T19:16
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1077,8 +1077,11 @@ skiller seg ut, åpne én av dem, og lese hvorfor — de tre sjekkene med verdie
 sine, og meldingene som gjelder. Både brukerutfallsmålet og stabilitetsmålet
 måler denne flyten.
 
-**Bundet til datoer som ikke er fastsatt:** FR-407, FR-601 og FR-408, og målene
-«KI-bidrag i drift» og «Grensesnitt og stabilitet». Se åpent punkt 13.
+**Bundet til datoer som ikke er fastsatt:** FR-407, FR-601 og FR-408, og fire av
+de åtte målene: «Brukerutfall», «KI-bidrag i drift», «Fortsatt bruk» og
+«Grensesnitt og stabilitet». Se åpent punkt 13. *Rettet 2026-09-24: her sto
+bare «KI-bidrag i drift» og «Grensesnitt og stabilitet». «Brukerutfall» og
+«Fortsatt bruk» har frist ved prosjektinnlevering.*
 
 *Endret 2026-09-22.* Terskelen sa «Ingen manuelle steg». Den målte **to**
 egenskaper, og FR-401 har skilt dem fra hverandre:
@@ -1133,7 +1136,7 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 | 20 | **Hvordan skal FR-408s eget spørsmål kunne stilles?** Kravet begrunner seg med «hva sa løsningen om EQNR for to uker siden?», men ingen visning, kommando eller spørring i v1 svarer på det. Historikken er da **lagret, men ikke besvarbar**. Tre veier: en visning i aksjedetaljen, en egen kommando, eller en direkte spørring mot basen under demonstrasjonen. FR-409 binder alle tre til å bevare skillet mellom «ingen rad» og «styrke 0» | Gruppen | **Før demonstrasjonen** | FR-408s begrunnelse |
 | 19 | **Forespørselen til Euronext ba aldri om å sende innhold til en modelltjeneste.** Vilkårene forbyr å «otherwise transfer any of the Content to any third person», og parentesen strekker det til «others in your company or organisation» — altså svært bredt. Å sende meldingstekst inn i en språkmodell er en slik overføring. Brevet 21.09 beskriver fire ting — Retrieval, Storage, Display, Source code — og **ingen av dem nevner en modelltjeneste**; kontrollert 22.09, null treff på «language model», «LLM», «third person» og «third party» i hele brevet. Manuell innsamling løser klausul 1 om automatisert henting, men **ikke** overføringsklausulen. **Konsekvens: selv et fullt ja på alle fire delene lukker ikke dette.** Det må stilles som eget spørsmål. Kalenderspørsmålet i samme brev hjelper ikke: det ber om «the same answer» og arver dermed de fire overskriftenes rekkevidde, inkludert utelatelsen. **Purret 22.09, og purringen dekker begge deler** — de fire opprinnelige og overføringen — så et kort svar kan ikke lenger se fullstendig ut mens det bare dekker det ene. Purringen tilbyr også et smalere alternativ: et lite, manuelt innsamlet utvalg brukt én gang. Ordrett i `docs/epost-til-euronext.md` | Gruppen | **Sammen med punkt 1, 2026-09-28** | Reservealternativet for relevanseksperimentet; KI-laget over NewsWeb-innhold. *Rettet 2026-09-24: her sto «Plan B», som nå betyr Epic 5B* |
 | 23 | **Når på døgnet skal hentekommandoen kjøres?** Kl. 19:04 lokal tid 2026-09-23 var dagens sluttkurs ikke publisert: alle 15 serier sluttet 22.09 (`malinger.md` §11). Og en rad hentet mens børsen er åpen, kan bli korrigert i etterkant — MOWI 21.09 fikk volumet justert ned 0,8 % ved neste henting, med sluttkursen uendret. EODHD dokumenterer bare «2–3 timer etter at børsen stenger» (§2). Kjøres kommandoen for tidlig, får brukeren gårsdagens data eller en foreløpig rad; kjøres den to ganger, trekkes det stille fra bonuskvoten. Lagt til 2026-09-23 | Gruppen | Før story 2.1 | FR-402, story 2.1–2.3 |
-| 24 | **«Ingen rad på en børsdag» betyr ikke alltid at kommandoen ikke ble kjørt.** FR-409 leser det slik, men to tilfeller gir ingen rad uten et hull i driften: kommandoen kjørte før dagens kurs var publisert (punkt 23), eller ett symbol feilet mens de andre ble hentet (`AD-15`). To veier: en fjerde tilstand i FR-409, eller en lagret grunn på raden. Story 2.5 må si hva som skrives for et symbol som feilet. Lagt til 2026-09-24 | *‹fylles inn›* | **Før story 1.7** | FR-409, story 1.7 og 2.5 |
+| 24 | **«Ingen rad på en børsdag» betyr ikke alltid at kommandoen ikke ble kjørt.** FR-409 leser det slik, men to tilfeller gir ingen rad uten et hull i driften: kommandoen kjørte før dagens kurs var publisert (punkt 23), eller ett symbol feilet mens de andre ble hentet (`AD-15`). To veier: en fjerde tilstand i FR-409, eller en lagret grunn på raden. Story 2.5 må si hva som skrives for et symbol som feilet. Lagt til 2026-09-24 | Gruppen | **Før story 1.7** | FR-409, story 1.7 og 2.5 |
 
 ### Må følges opp
 
@@ -1179,7 +1182,7 @@ egen frist for å ta stilling uten svar, ikke en dato Euronext har lovet.
 Fullstendig
 gjennomgang med sitater i `docs/kilder-og-rettigheter.md`.
 
-Av de åpne punktene har 1, 3, 4, 5, 5b, 13, 16, 19, 20, 21, 22 og 23 eier. Punkt 2, 6, 8, 9, 11, 12, 15 og 24 mangler det. Punkt 7, 10, 14, 17 og 18 er lukket. *Rettet 2026-09-24: punkt 3 fikk eier, punkt 10 ble lukket, og punkt 24 kom til.* *Rettet 2026-09-23: setningen talte lukkede punkter blant de åpne, og manglet 13, 20 og 21.*
+Av de åpne punktene har 1, 3, 4, 5, 5b, 13, 16, 19, 20, 21, 22, 23 og 24 eier. Punkt 2, 6, 8, 9, 11, 12 og 15 mangler det. Punkt 7, 10, 14, 17 og 18 er lukket. *Rettet 2026-09-24: punkt 3 fikk eier, punkt 10 ble lukket, og punkt 24 kom til, med Gruppen som eier.* *Rettet 2026-09-23: setningen talte lukkede punkter blant de åpne, og manglet 13, 20 og 21.*
 
 **Om nummereringen.** Numrene følger rekkefølgen punktene ble opprettet i, ikke
 rekkefølgen i tabellene. Punkt 16 står derfor over sammen med de andre som må
