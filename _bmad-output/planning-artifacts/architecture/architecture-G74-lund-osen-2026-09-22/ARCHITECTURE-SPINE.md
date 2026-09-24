@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-24T18:30'
+updated: '2026-09-24T19:09'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -104,7 +104,7 @@ prosjektmodul. De er løvnoder, og skal forbli det.
 
 - **Binds:** FR-401, FR-403, FR-404, hele kvotehåndteringen
 - **Prevents:** at to moduler hver for seg begynner å kalle EODHD, og at en kvote på 20 kall brennes uten at noen ser hvor
-- **Rule:** nettkall skjer **bare i skallet**, med **én hentefunksjon per kilde**, og funksjonen injiseres til den som bruker den — slik `hent_universet(..., hent=hent_ett_symbol)` allerede gjør. I dag er EODHD eneste kilde; FR-404 (NewsWeb) og FR-301 (finanskalenderen) får hver sin, i hver sin skallfil.
+- **Rule:** nettkall skjer **bare i skallet**, med **én hentefunksjon per kilde**, og funksjonen injiseres til den som bruker den — slik `hent_universet(..., hent=hent_ett_symbol)` allerede gjør. I dag er EODHD eneste kilde; FR-404 (NewsWeb) og FR-301 (finanskalenderen) får hver sin, i hver sin skallfil. **Modelltjenesten er også en kilde** (Epic 4, og plan B i Epic 5B): én hentefunksjon, i skallet, injisert, og aldri kalt fra en test. *Lagt til 2026-09-24.*
 - **Opphav:** commit `352e3a2` (21.09). *Regelen er omformulert i gjennomgangen: «eneste sted `requests` brukes» kunne ikke overleve FR-404 og FR-301, og ville blitt stilltiende brutt.*
 
 ### AD-3 — Én port per eid datasett
@@ -142,20 +142,20 @@ prosjektmodul. De er løvnoder, og skal forbli det.
 - **Rule:** `Vurderingslager` og `KILogg` har **bare** `skriv` og lesemetoder. Ingen `slett`, ingen `endre`. **Fraværet er invarianten.** Mønsteret er utvidet, ikke oppfunnet: `SnapshotKilde` har allerede «med vilje ingen skrivemetode».
 - **Skjerpet:** fraværet alene holder ikke, fordi AD-17 krever at `skriv` er idempotent på `(symbol, dato)` — og en upsert *endrer* raden hvis den finnes. Derfor bærer **formen** regelen: `skriv` tar imot datoen og **avviser enhver dato som ikke er inneværende børsdag**. Dagens rad kan skrives om så mange ganger man vil; en eldre rad er utilgjengelig gjennom porten. Ingen behøver å huske forskjellen. Dette er en skjerping av AD-7, ikke et unntak fra den.
 - **Merk:** skillet mellom gjenoppbyggbart og uerstattelig går **tvers gjennom databasen**, ikke mellom base og fil. `kurs` er gjenoppbyggbar; `vurdering` og `ki_logg` er det ikke.
-- **Konsekvensen er tilsiktet:** en dag ingen kjørte hentekommandoen, kan ikke etterfylles med en vurdering. `FR-403` fyller hull i kursserien fordi en kurs for 12.09 er den samme uansett når den hentes; en vurdering er det ikke. Dagen vises som manglende, ikke som tom — `FR-409`.
+- **Konsekvensen er tilsiktet:** en dag ingen kjørte hentekommandoen, kan ikke etterfylles med en vurdering. `FR-403` fyller hull i kursserien fordi en kurs for 12.09 er den samme uansett når den hentes; en vurdering er det ikke. Dagen skal kunne skilles som manglende, ikke som tom, i lageret — `FR-409`. *Rettet 2026-09-24: her sto «vises». FR-409 er et lagerkrav.*
 
 ### AD-8 — Nettverk er sperret i testkjøringen `[ADOPTED 2026-09-21]`
 
 - **Binds:** alle tester; åpent punkt 14
 - **Prevents:** at en test ved et uhell spiser en dags kvote — og i CI ville gjort det på hver eneste push
-- **Rule:** `tests/conftest.py` monkeypatcher `socket.connect` og `connect_ex` med en autouse-fixture; bare loopback slipper gjennom. **Hver story leveres med test, og testen kjører uten nett.** CI kjører `pytest` på hver push og PR, uten hemmeligheter.
-- **Opphav:** commit `266e6d9` (21.09). Prøvd: 166 tester grønne 2026-09-22
+- **Rule:** `tests/conftest.py` monkeypatcher `socket.connect` og `connect_ex` med en autouse-fixture; bare loopback slipper gjennom. DNS er også sperret: `socket.getaddrinfo` avviser alle navn utenom loopback. Proxy er sperret: proxyvariablene fjernes, og `getproxies` i `requests` og `urllib` gir alltid `{}`, så en proxy på loopback ikke slipper en forespørsel ut (`982b216`, 23.09). **Hver story leveres med test, og testen kjører uten nett.** CI kjører `pytest` på hver push og PR, uten hemmeligheter.
+- **Opphav:** commit `266e6d9` (21.09). Prøvd: 166 tester grønne 2026-09-22. DNS og proxy lagt til i `982b216` (23.09), hver sperre prøvd med en mutant. *Oppdatert 2026-09-24.*
 
 ### AD-9 — Imaget inneholder aldri data
 
 - **Binds:** punkt 18, leveransen
 - **Prevents:** videreformidling av kilde­data. EODHDs godkjenning av 21.09 dekker **demonstrasjonen** for lærer og klasse — den dekker ikke at vi overleverer et datasett
-- **Rule:** imaget bygges fra repoet, og repoet har ingen rådata (`.gitignore` utelater `data/` og `*-raa-*.json`). Et seedet datasett bakes **ikke** inn «for at det skal virke hos sensor». Leveransen er Dockerfile og kildekode, ikke et ferdig image.
+- **Rule:** imaget bygges fra repoet, og repoet har ingen rådata (`.gitignore` utelater `data/` og `*-raa-*.json`). Et seedet datasett bakes **ikke** inn «for at det skal virke hos sensor». Leveransen er Dockerfile og kildekode, ikke et ferdig image. *24.09: Dockerfilen er sagt av faglærer i samtale 21.09, ikke på emnesiden (hjelpelærer 23.09); den lages likevel.*
 
 ### AD-10 — Webserveren starter aldri en henting
 
@@ -199,7 +199,7 @@ prosjektmodul. De er løvnoder, og skal forbli det.
 - **Binds:** AD-7, alle tabeller
 - **Prevents:** at vi to endrer skjemaet hver vår vei, og at en skjemaendring løses med «slett basen og bygg den på nytt» — noe AD-7 gjør umulig for `vurdering` og `ki_logg`
 - **Rule:** migrasjoner er nummererte SQL-filer som kjøres i rekkefølge; anvendt versjon står i en `skjema_versjon`-tabell. Ingen `ALTER TABLE` utenfor en migrasjonsfil.
-- **Opphav:** besluttet her som ny beslutning, avledet av AD-7. Bygget i story 1.1, commit `57a83c5` (23.09): `src/migrering.py` er løperen, og `tests/test_migrering.py` har 21 tester. Hver migrasjon kjøres i én transaksjon sammen med sin rad i `skjema_versjon`. **Prøvd mot feilen den skal hindre:** med løperen midlertidig byttet til `executescript()` feilet 3 av 6 tester i `TestFeilMidtveis`. Det var skjemakontrollen som fanget det (tabellen `halvveis` ble stående), ikke versjonsraden, som mutanten lot være uendret. `src/migrasjoner/` finnes ikke ennå — første migrasjon kommer i story 1.3.
+- **Opphav:** besluttet her som ny beslutning, avledet av AD-7. Bygget i story 1.1, commit `57a83c5` (23.09): `src/migrering.py` er løperen, og `tests/test_migrering.py` har 21 tester. Hver migrasjon kjøres i én transaksjon sammen med sin rad i `skjema_versjon`. **Prøvd mot feilen den skal hindre:** med løperen midlertidig byttet til `executescript()` feilet 3 av 6 tester i `TestFeilMidtveis`. Det var skjemakontrollen som fanget det (tabellen `halvveis` ble stående), ikke versjonsraden, som mutanten lot være uendret. `src/migrasjoner/` finnes ikke ennå — første migrasjon kommer i story 1.3. *24.09: finnes nå, med `0001_kurs.sql` fra story 1.3 (`f4fada0`).*
 - **To SQLite-forhold migrasjonene må ta hensyn til, begge verifisert:** `executescript()` kjører en implisitt `COMMIT` først, så den nærliggende måten å kjøre en `.sql`-fil på er **ikke** atomisk med oppdateringen av `skjema_versjon` — migrasjonsløperen må styre transaksjonen selv. Og SQLites `ALTER TABLE` dekker bare rename/add/drop column; typeendring, `UNIQUE`, `CHECK` og fremmednøkler krever tabellbytte med `DROP TABLE`. **For `vurdering` og `ki_logg` kolliderer det med AD-7** — se åpent punkt under.
 
 ### AD-17 — Hentekommandoen skriver dagens vurdering
@@ -229,7 +229,8 @@ FR-401:
 får ingen vurdering, og den kan ikke etterfylles. Det følger av `AD-7` og er
 **riktig** — en vurdering skrevet i ettertid ville vært dagens parametres svar,
 ikke datidens. Skillet mot `FR-403`, som *fyller* hull i kursserien, står i
-FR-408. At dagen mangler, skal vises eksplisitt: `FR-409`.
+FR-408. At dagen mangler, skal kunne skilles i lageret: `FR-409`. *Rettet
+2026-09-24: her sto «skal vises eksplisitt».*
 
 > **Den opprinnelige begrunnelsen, 2026-09-22 tidligere samme dag.** Bevart
 > fordi beslutningen overlevde at grunnen falt bort, og det er ikke det samme
@@ -266,6 +267,7 @@ FR-408. At dagen mangler, skal vises eksplisitt: `FR-409`.
 - **Prevents:** at EODHDs engelske nøkler blir en udokumentert kontrakt. En feilstavet nøkkel i en `dict` gir `None` i stedet for en feil, og `None` forplanter seg inn i signalberegningen som et tall som *mangler* — ikke som noe som stopper
 - **Rule:** porten returnerer `list[Kursrad]` med `dato`, `slutt`, `justert_slutt`, `volum`. Adapteren oversetter fra kildens feltnavn. En ny kilde skal ikke måtte etterligne EODHD for å passe inn.
 - **Når:** innføres i **samme endring** som SQLite-adapteren, ikke som egen runde — adapteren må uansett røre dette laget. Rekkefølge: (1) `Kursrad` defineres, (2) protokollen, `SnapshotKilde` og SQLite-adapteren oppdateres i samme omgang, (3) konsumentene. **Testene kjøres i sin helhet mellom hvert steg**, ikke bare til slutt.
+- **Slik det ble, 2026-09-24:** rekkefølgen ble story 1.2 (`Kursrad` og porten, `a796214`), 1.3 (SQLite-adapteren, `f4fada0`) og 1.4a–c (lesegrensen, konsumentene, rydding). `Kursrad` kom altså i en egen endring før SQLite-adapteren, ikke i samme.
 
 ### AD-20 — Børsdager i Europe/Oslo, tidsstempler i UTC
 
@@ -384,7 +386,7 @@ G74-lund-osen/
 | Kommende hendelser (FR-301..303) | *finnes ikke* | **Ingen** — se Deferred |
 | KI-logg (FR-604..605) | `KILogg` | AD-3, AD-7 — *resten utsatt* |
 | Signalet (FR-701..706) | `signalberegning.py` | AD-1, AD-13 |
-| Leveransen | `Dockerfile` | AD-9, AD-10, AD-11, AD-12 |
+| Leveransen | `Dockerfile`. *Sagt av faglærer i samtale 21.09, ikke på emnesiden; lages likevel* | AD-9, AD-10, AD-11, AD-12 |
 
 ## Deferred
 
@@ -392,6 +394,7 @@ G74-lund-osen/
 |---|---|
 | **Nøyaktig Docker-baseimage** | Må verifiseres mot gjeldende tagger når Dockerfilen skrives. Bindingen er at Python-versjonen matcher CI (3.13), ikke en bestemt tag |
 | **KI-laget (FR-601..606)** | Modelltjeneste er ikke valgt, og betingelse 4 i EODHDs godkjenning — at tjenesten ikke trener på innholdet — er udokumentert. Den må føres **før** artikkeltekst sendes inn |
+| **Plan B (Epic 5B), utløses 28.09** | KI forklarer signalet ut fra utledede verdier, hvis Euronext svarer nei eller ikke svarer innen 28.09 (åpent punkt 1 og 19). Arkitekturen for modellkallet er AD-2 (én hentefunksjon), AD-7 (`KILogg`) og AD-17 (teksten lages i hentekommandoen). Avgjøres 28.09, ikke før. *Lagt til 2026-09-24* |
 | **Kilde for handelskalenderen** | Åpent punkt 3. FR-402 hviler på «forventet børsdag», men ingen kilde er utpekt |
 | **NewsWeb-hentingen** | Åpent punkt 1. Euronext forbyr automatisert henting uten tillatelse; forespørselen er ubesvart. Arkitekturen låser seg derfor **ikke** til at meldingsdelen finnes |
 | **FR-301..303, kommende hendelser** | Hele PRD §4.3 var taus i første utkast av denne spinen. Det er en **tredje nettkilde** (Euronexts finanskalender) og et eid datasett uten port. `app.py` sier selv at «kommende hendelser mangler med vilje» — de ligger bak åpent punkt 1, 3 og 12. Får sin port og sin AD når kilden er avklart, og **ikke før**. Står med vilje ikke i frontmatterens `binds` før en AD binder dem |
