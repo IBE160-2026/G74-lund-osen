@@ -883,6 +883,15 @@ testtall.
 den er regnet ut som et sammendrag, kan ikke knyttes til en dato, og EODHD har
 bekreftet at egne sammendragstall ikke er deres data.
 
+*Rettet 2026-09-24:* **bare medianomsetningen i §1 står.** Kolonnen «Median
+volum» er fjernet fra `malinger.md` §1, og DNOs medianvolum er fjernet fra
+teksten under tabellen og fra `begrunnelser.md`. Grunnen: e-posten til EODHD
+beskrev det som publiseres som «a table of fifteen tickers with one median
+turnover figure each» (`docs/epost-til-eodhd.md`). Volumkolonnen ble ikke nevnt,
+så bekreftelsen 21.09 dekker den ikke. Poenget står med ord: DNO omsetter flere
+aksjer enn DNB, men langt mindre i kroner. Verdiene ligger fortsatt i
+git-historikken.
+
 Mønsteret som gjorde dette mulig, er verdt å notere: `data/` ble gitignorert før
 den første målingen ble kjørt. Rådata har aldri vært innom en commit, og da
 trengs ingen opprydding. `.gitignore` er utvidet med mønstre for rådatafiler som

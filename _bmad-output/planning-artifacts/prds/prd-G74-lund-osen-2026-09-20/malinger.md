@@ -58,28 +58,28 @@ skrives aldri om (jf. FR-406). Fila finnes **bare lokalt** og er ikke sporet i
 git; skillet mellom utledede tall som publiseres og datasett som blir liggende,
 står i `docs/kilder-og-rettigheter.md`.
 
-| # | Symbol | Selskap | Sektor | Median volum | Median omsetning | Andel av median |
-|---|---|---|---|---:|---:|---:|
-| 1 | EQNR | Equinor | Energi | 2 478 662 | 919,9 MNOK | 4,11× |
-| 2 | DNB | DNB Bank | Finans | 1 318 670 | 400,4 MNOK | 1,79× |
-| 3 | KOG | Kongsberg Gruppen | Industri | 1 228 088 | 374,7 MNOK | 1,67× |
-| 4 | AKRBP | Aker BP | Energi | 886 576 | 312,1 MNOK | 1,39× |
-| 5 | NHY | Norsk Hydro | Materialer | 3 220 200 | 293,0 MNOK | 1,31× |
-| 6 | FRO | Frontline | Shipping | 715 503 | 284,8 MNOK | 1,27× |
-| 7 | VAR | Vår Energi | Energi | 5 279 688 | 252,9 MNOK | 1,13× |
-| 8 | TEL | Telenor | Telekom | 1 632 539 | 223,9 MNOK | 1,00× |
-| 9 | YAR | Yara International | Materialer | 496 492 | 220,5 MNOK | 0,98× |
-| 10 | MOWI | Mowi | Sjømat | 900 050 | 182,1 MNOK | 0,81× |
-| 11 | ORK | Orkla | Konsum | 1 385 880 | 140,3 MNOK | 0,63× |
-| 12 | SALM | SalMar | Sjømat | 159 922 | 81,8 MNOK | 0,37× |
-| 13 | GJF | Gjensidige Forsikring | Finans | 214 425 | 59,8 MNOK | 0,27× |
-| 14 | DNO | DNO | Energi | 1 956 182 | 34,7 MNOK | 0,16× |
-| 15 | MPCC | MPC Container Ships | Shipping | 1 253 156 | 32,3 MNOK | 0,14× |
+| # | Symbol | Selskap | Sektor | Median omsetning | Andel av median |
+|---|---|---|---|---:|---:|
+| 1 | EQNR | Equinor | Energi | 919,9 MNOK | 4,11× |
+| 2 | DNB | DNB Bank | Finans | 400,4 MNOK | 1,79× |
+| 3 | KOG | Kongsberg Gruppen | Industri | 374,7 MNOK | 1,67× |
+| 4 | AKRBP | Aker BP | Energi | 312,1 MNOK | 1,39× |
+| 5 | NHY | Norsk Hydro | Materialer | 293,0 MNOK | 1,31× |
+| 6 | FRO | Frontline | Shipping | 284,8 MNOK | 1,27× |
+| 7 | VAR | Vår Energi | Energi | 252,9 MNOK | 1,13× |
+| 8 | TEL | Telenor | Telekom | 223,9 MNOK | 1,00× |
+| 9 | YAR | Yara International | Materialer | 220,5 MNOK | 0,98× |
+| 10 | MOWI | Mowi | Sjømat | 182,1 MNOK | 0,81× |
+| 11 | ORK | Orkla | Konsum | 140,3 MNOK | 0,63× |
+| 12 | SALM | SalMar | Sjømat | 81,8 MNOK | 0,37× |
+| 13 | GJF | Gjensidige Forsikring | Finans | 59,8 MNOK | 0,27× |
+| 14 | DNO | DNO | Energi | 34,7 MNOK | 0,16× |
+| 15 | MPCC | MPC Container Ships | Shipping | 32,3 MNOK | 0,14× |
 
 Median for universet: 223,9 MNOK per dag.
 
-**Funnet som avgjorde kriteriet.** DNO omsetter 1 956 182 aksjer per dag — flere
-enn DNB — men til en lav aksjekurs blir det 34,7 MNOK mot DNBs 400,4 MNOK. MPCC
+**Funnet som avgjorde kriteriet.** DNO omsetter flere aksjer per dag enn DNB,
+men til en lav aksjekurs blir det 34,7 MNOK mot DNBs 400,4 MNOK. MPCC
 viser samme mønster. Målt på antall aksjer alene ville begge de lavest omsatte
 symbolene sett ut som de hørte hjemme øverst på lista. Derfor måles likviditet i
 kroner, ikke i volum.
