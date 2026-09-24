@@ -2200,6 +2200,13 @@ Et avvik fra metoden er forsvarlig når det er valgt og skrevet ned, med hva det
 koster, og ikke når det bare har skjedd. Begge avvikene står der de ble valgt:
 det første i spinens «Opphav», det andre i PRD-memloggen og i `epics.md`.
 
+*Rettet 2026-09-25:* det var tre avvik, ikke to. Storyene 1.1–1.3 ble bygget 23.09
+(`57a83c5`, `a796214`, `f4fada0`), før sluttkontrollen av epics og
+sprintplanleggingen 24.09. Commiten for sprintplanleggingen sier det selv:
+«steg 4 og sprint planning kjoert etter 1.1-1.3» (`4734aaf`). BMAD vil ha
+sprintplanleggingen før byggingen. Det er samme mønster som avvik 1: byggingen
+gikk foran planen. Fra 1.4a følger byggingen sprintstatusen.
+
 ---
 
 # Joakims oppføringer
