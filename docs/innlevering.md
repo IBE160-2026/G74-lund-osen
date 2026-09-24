@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-09-24T21:58
+updated: 2026-09-24T21:59
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -173,7 +173,7 @@ teknologiske implikasjoner. Det som er ukjent, er lengde, struktur og format.
 
 | | |
 |---|---|
-| **Status** | **Låst og klar for levering: tag `arbeidskrav-product-brief`, commit `c7416ee`** |
+| **Status** | **Låst og klar for levering: tag `arbeidskrav-product-brief-v2`, commit `f08c801`** |
 | **Ligger i** | `_bmad-output/planning-artifacts/product-brief.md` |
 | **Gjenstår** | Vurdering fra faglærerne etter 27.09 kl. 16:00. **Formatkrav: ingen** — sagt eksplisitt i tilbakemeldingen 20.09 |
 
@@ -360,7 +360,7 @@ innholdskrav, sitert under «Eksamen» øverst.
 
 | Punkt | |
 |---|---|
-| **Product Brief** | Låst og klar for levering: tag `arbeidskrav-product-brief`, commit `c7416ee`. Gjenstår: vurdering fra faglærerne etter 27.09 kl. 16:00 |
+| **Product Brief** | Låst og klar for levering: tag `arbeidskrav-product-brief-v2`, commit `f08c801`. Gjenstår: vurdering fra faglærerne etter 27.09 kl. 16:00 |
 | **Offentlig repo** | Bekreftet i orden |
 | **Teknologivalg** | Avviket er besluttet og begrunnelsen ført |
 | **Databasevalget** | Besluttet og kontrollert med faglærerstaben — *valget*, ikke lagringen |
