@@ -10,6 +10,8 @@ har endret seg og hvorfor. Beregninger og sortering gjøres med vanlig programko
 KI brukes til å forklare hva en børsmelding betyr. KI-laget kan slås av, og
 applikasjonen skal fungere uten det.
 
+Hva som er bygget så langt, står i sprintstatusen, `_bmad-output/implementation-artifacts/sprint-status.yaml`. Børsmeldingene hentes ikke før Euronext har gitt skriftlig tillatelse; se `docs/kilder-og-rettigheter.md`.
+
 ## Medlemmer
 
 - Joakim Lund
@@ -19,7 +21,12 @@ applikasjonen skal fungere uten det.
 
 - **Product Brief** — `_bmad-output/planning-artifacts/product-brief.md`. Arbeidskrav på 1–2 sider, innleveringsfrist søndag 27.09.2026.
 - **PRD med krav, begrunnelser og målinger** — `_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/`
+- **Arkitektur** — `_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md`
+- **Epics og stories** — `_bmad-output/planning-artifacts/epics.md`
+- **Sprintstatus og story-spesifikasjoner** — `_bmad-output/implementation-artifacts/`
 - **Kilder og bruksvilkår** — `docs/kilder-og-rettigheter.md`, med hva hver datakilde tillater og når det sist ble kontrollert
+- **Leveranseliste** — `docs/innlevering.md`, med hva som skal leveres, og hvor det står
+- **Kontrollrapport 22.09** — `docs/kontroll-2026-09-22.md`
 - **Refleksjonslogg og lagrede KI-prompts** — `docs/reflection-log.md` og `docs/ai-prompts/`
 
 ## Mappestruktur
@@ -29,6 +36,7 @@ applikasjonen skal fungere uten det.
 - `src/` — applikasjonen, og `tests/` — testene som hører til
 - `docs/` — arbeidsprosessen: refleksjonslogg, KI-prompts og kildekontroll
 - `_bmad-output/planning-artifacts/` — produktdokumentene og gjennomgangene av dem
+- `_bmad-output/implementation-artifacts/` — sprintstatus, story-spesifikasjoner og utsatt arbeid
 - `.github/workflows/` — testkjøringen bak merket øverst
 
 **Følger med BMAD-rammeverket, ikke skrevet av oss:**
@@ -37,7 +45,7 @@ applikasjonen skal fungere uten det.
 - `.claude/skills/` og `.agents/skills/` — BMADs ferdigheter, lagt inn av installatøren i to identiske kopier: én som Claude Code leser, én på den verktøynøytrale stien
 
 **Utenfor versjonskontroll, og derfor ikke i repoet:** API-nøkkel (`.env`), hentede
-rådata (`data/`) og lokale testskript (`local-tests/`).
+rådata (`data/`) lokale testskript (`local-tests/`) og den private arbeidsmappa (`_privat/`).
 
 ## Kom i gang
 
@@ -69,12 +77,12 @@ kursserier og meldinger vi har skrevet selv, fordi testdata som hentes er
 testdata som endrer seg — da tester vi børsen i stedet for koden vår.
 
 **Det er håndhevet, ikke bare lovet.** `tests/conftest.py` sperrer utgående
-nettverk under hele testkjøringen, under `requests` og alt annet som måtte
-åpne en forbindelse. En test som ved et uhell kaller et ekte endepunkt,
+nettverk i hver test, under `requests` og alt annet som måtte
+åpne en forbindelse. Story 4.0 utvider sperren til hele testkjøringen. En test som ved et uhell kaller et ekte endepunkt,
 feiler i stedet for å spise av EODHD-kvoten på 20 kall i døgnet — som i CI
 ville skjedd på hver eneste push.
 
-Testene kjøres automatisk på hver push og hver pull request mot `main`, se
+Testene kjøres automatisk på hver push til `main` og hver pull request mot `main`, se
 merket øverst. Workflowen har ingen hemmeligheter og ingen API-nøkkel.
 
 Hver story leveres med test. Det gjelder fra og med signalberegningen, og
