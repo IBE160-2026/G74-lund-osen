@@ -95,7 +95,7 @@ krever tre konkrete svar per kandidat:
 - **FR-405** — Avkorting ved lange meldingsintervaller
 - **FR-406** — To lagre for kursdata, med hvert sitt ansvar
 - **FR-408** — Dagens vurdering lagres per aksje
-- **FR-409** — Dager uten vurdering vises som det de er *(ny 22.09)*
+- **FR-409** — De tre tilstandene skal være skillbare i lageret *(ny 22.09. Rettet 2026-09-24: her sto «vises». Kravet gjelder lageret, ikke en skjerm)*
 
 **4.5 Meldingsfilter og deduplisering**
 
@@ -145,8 +145,9 @@ flere av dem er **allerede oppfylt i kode** — de er merket med opphav.
   `Kurslager`, `Meldingskilde`, `Vurderingslager`, `KILogg`
 - `AD-4` — SQLite fra standardbiblioteket. Ingen hostet database. *Bekreftet av
   faglærerstaben 22.09*
-- `AD-5` — `erstatt_serie(symbol, rader)` gjør DELETE+INSERT i én transaksjon.
-  Ingen `legg_til_rad`
+- `AD-5` — `erstatt_serie(symbol, rader, hentet)` gjør DELETE+INSERT i én
+  transaksjon, og setter `sist_hentet` i samme transaksjon. Ingen `legg_til_rad`.
+  *Rettet 2026-09-24: `hentet` manglet*
 - `AD-6` — Rådata er uforanderlige filer, aldri rader. `<prefiks>-raa-<dato>.json`
 - `AD-7` — `Vurderingslager` og `KILogg` har ingen slette- eller endremetode.
   `skriv` avviser enhver dato som ikke er inneværende børsdag
@@ -180,7 +181,9 @@ flere av dem er **allerede oppfylt i kode** — de er merket med opphav.
 - `AD-8` — Nettverk sperret i testkjøringen *(oppfylt: commit `266e6d9`, 166
   tester grønne)*
 - `AD-13` — Signalparametre er konstanter med måling bak seg *(oppfylt:
-  `signalberegning.py:23–31`. Terskel, volumfaktor og nøytralsone i commit
+  `NOYTRALSONE`, `VOLUMFAKTOR`, `TERSKEL`, `VOLATILITET_VINDU` og `VOLUM_VINDU`
+  i `signalberegning.py`. Linjenumre byttet med navn 2026-09-24. Terskel,
+  volumfaktor og nøytralsone i commit
   `8e88ecd`, de to vinduene i `eb7fd9a`)*
 - `AD-14` — Deduplisering før kategorifilter *(oppfylt: commit `9acb55c`)*
 - `AD-15` — En aksje som mangler data stopper ikke hovedflyten *(oppfylt:
@@ -244,7 +247,7 @@ steget er ført i PRD-memloggen 22.09, ikke 20.09 som den senere ble omtalt som.
 `src/templates/` bærer halvparten av fem av disse kravene, og sto ikke nevnt før
 kontrollen 22.09 fant det.
 
-**Fordelt på epics — 21 FR-er.**
+**Fordelt på epics — 22 FR-er.** *Rettet 2026-09-24: her sto 21. Tabellen har 22, og summen under er 12 + 22.*
 
 | FR | Epic |
 |---|---|
@@ -267,7 +270,7 @@ kontrollen 22.09 fant det.
 | **NFR-01** Kvote | **Eid av Epic 2.** Tverrgående støtte: `AD-8` gjør at ingen test kan bruke kvote |
 | **NFR-02** Venter aldri | **Eid av Epic 2** (`AD-10`). Brødteksten rettet 22.09 fordi den lovet en mekanisme som ikke finnes |
 | **NFR-03** Manglende data | **Tverrgående.** Delvis levert: `hent_universet` fortsetter ved feil (`352e3a2`), `app.py` tåler `kilde=None`, FR-204 finnes. **Kontroll på hver story:** en test for den tomme eller manglende stien |
-| **NFR-04** KI tar ikke ned hovedflyten | **Eid av Epic 5.** Bortfaller hvis Epic 5 strykes |
+| **NFR-04** KI tar ikke ned hovedflyten | **Eid av Epic 5.** Bortfaller hvis Epic 5 strykes. *Rettet 2026-09-24:* bortfaller ikke med Epic 5 alene. Epic 5B begrenses også av NFR-04 (5B.2 og 5B.3), så kravet gjelder så lenge én av dem bygges |
 | **NFR-05** Norsk | **Tverrgående, levert i alt som finnes.** **Kontroll på hver visningsstory:** all brukervendt tekst er norsk |
 | **NFR-06** Ikke investeringsråd | **Tverrgående.** Forbeholdstekst finnes: `src/templates/index.html:108` sier «Signalstyrken er 0–3 og sier hvor kraftig de tre sjekkene slår ut — *ikke om aksjen bør kjøpes eller selges*». Kravet er likevel et **forbud**, ikke et tekstkrav: ingen del av grensesnittet skal formuleres som anbefaling. **Kontroll på hver visningsstory:** ordlyden leses mot NFR-06 |
 | **NFR-07** Rådata bevares | **Eid av Epic 1** (`AD-6`). Delvis levert: `fetch_prices` skriver tidsstemplede øyeblikksbilder (`352e3a2`) |
@@ -321,10 +324,12 @@ papirarbeid og en port, og de trengs i både plan A og plan B.
 - **Epic 8.2 etter 8.1.** Funnene fra brukertesten er det viktigste
   grunnlaget for gjennomgangen.
 
-### Epic 1: Dataene overlever en omstart, og historikken kan leses tilbake
+### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
-løsningen om EQNR for to uker siden?» får et svar.
+løsningen om EQNR for to uker siden?» får et svar. *Rettet 2026-09-24:* i v1
+er historikken lagret, men ikke besvarbar. Hvordan spørsmålet skal kunne
+stilles, er åpent punkt 20 i `prd.md`.
 
 **FR-er:** FR-406, FR-408, FR-409 · **NFR-07** · **AD-er:** 3, 4, 5, 6, 7, 16, 17, 18, 19
 
@@ -380,7 +385,7 @@ story som sender inn tekst er *blokkert av* 4.1, ikke anbefalt etter den.
 | **Blokkert av** | Åpent punkt 5b (betingelse 4) **og åpent punkt 1 (Euronext)** |
 | **Eier** | Gruppen |
 | **Avgjøres** | Punkt 5b av Epic 4.1, som er ublokkert. Punkt 1 av Euronext — 28.09 er vår egen frist |
-| **Ved nei fra Euronext** | **Epicen strykes i sin helhet.** Alle seks FR-6xx er om meldinger — FR-602 «meldingene i samlekategorien», FR-604 «for hver melding», FR-606 «melding i samlekategorien». Uten Epic 6 finnes ikke datagrunnlaget. **Da bortfaller også NFR-04**, og suksessmålet «KI-bidrag i drift» kan ikke nås, fordi PRD-en måler det i hvilke *meldinger* laget forklarte. Det som overlever er relevanseksperimentet, som henter fra EODHDs nyhets-API og ikke fra NewsWeb — KI kan da demonstreres, men ikke vises i drift *Endret 2026-09-23:* med plan B (**Epic 5B**) er KI i drift likevel mulig, men som en forklaring av signalet, ikke av meldinger. Det som strykes, er KI-laget over meldinger. Plan A og B utelukker ikke hverandre: kommer et ja senere, bygges plan A oppå 5B. |
+| **Ved nei fra Euronext** | **Epicen strykes i sin helhet.** Alle seks FR-6xx er om meldinger — FR-602 «meldingene i samlekategorien», FR-604 «for hver melding», FR-606 «melding i samlekategorien». Uten Epic 6 finnes ikke datagrunnlaget. **Da bortfaller også NFR-04**, og suksessmålet «KI-bidrag i drift» kan ikke nås, fordi PRD-en måler det i hvilke *meldinger* laget forklarte. Det som overlever er relevanseksperimentet, som henter fra EODHDs nyhets-API og ikke fra NewsWeb — KI kan da demonstreres, men ikke vises i drift *Endret 2026-09-23:* med plan B (**Epic 5B**) er KI i drift likevel mulig, men som en forklaring av signalet, ikke av meldinger. Det som strykes, er KI-laget over meldinger. Plan A og B utelukker ikke hverandre: kommer et ja senere, bygges plan A oppå 5B. *Rettet 2026-09-24:* NFR-04 bortfaller ikke heller, fordi Epic 5B begrenses av det. |
 
 ### Epic 5B: KI forklarer signalet (plan B) 🔀
 
@@ -409,7 +414,7 @@ vært, og det skal stå slik.
 | **Blokkert av** | Åpent punkt 1 — Euronext forbyr automatisert henting uten tillatelse på forhånd |
 | **Eier** | Gruppen |
 | **Avgjøres** | Forespørsel sendt 21.09, ubesvart. **28.09** er vår egen frist for å ta stilling uten svar |
-| **Ved nei** | Strykes i sin helhet — **og tar Epic 5 med seg ned.** Det er ikke en fri strykning: den koster hele KI-laget, NFR-04, to av tre deler av FR-203, og suksessmålet «KI-bidrag i drift». Logikken i `meldinger.py` er bygget og testet fra før, og blir liggende som kode uten datakilde *Endret 2026-09-23:* det tar KI-laget **over meldinger** med seg ned, ikke hele KI-laget. Epic 5B står igjen. |
+| **Ved nei** | Strykes i sin helhet — **og tar Epic 5 med seg ned.** Det er ikke en fri strykning: den koster hele KI-laget, NFR-04, to av tre deler av FR-203, og suksessmålet «KI-bidrag i drift». Logikken i `meldinger.py` er bygget og testet fra før, og blir liggende som kode uten datakilde *Endret 2026-09-23:* det tar KI-laget **over meldinger** med seg ned, ikke hele KI-laget. Epic 5B står igjen. *Rettet 2026-09-24:* NFR-04 blir også stående, fordi Epic 5B begrenses av det. |
 
 ### Epic 7: Kommende finansielle hendelser 🔒
 
@@ -439,7 +444,7 @@ Sensor kan se hvordan KI ble brukt og hvordan koden er kvalitetssikret, uten å
 lese git-loggen. Emnesiden legger dette under prosjektkoden (70 %): «Dokumentasjon
 må vise hvordan KI ble brukt, og hvordan studentene har kvalitetssikret koden».
 
-**FR-er:** ingen · Avhengigheter: 9.1 etter Epic 1; 9.2 og 9.3 ingen
+**FR-er:** ingen · Avhengigheter: 9.1 etter Epic 1; 9.2 og 9.3 ingen; 9.4 uke 39–40
 
 ---
 
@@ -556,7 +561,8 @@ oversikten ikke er tom hver morgen.
 
 **Story 1.4 er delt i 1.4a–c.** *Skrevet om 2026-09-23, før bygging.* Den gamle
 teksten var én story merket
-«Én økt: nei». Rettet: testtallet er 253 per 23.09, ikke 166. Mellomtilstanden
+«Én økt: nei». Rettet: testtallet er 253 per 23.09, ikke 166. *24.09: 285, telt
+ved å kjøre testene.* Mellomtilstanden
 den advarte mot — porten lover `Kursrad` mens `SnapshotKilde` gir `dict` —
 oppstod ikke, fordi valg b i 1.2 holdt `SnapshotKilde` utenfor `Kurslager`.
 «Fem moduler» er erstattet med filene ved navn. Tre ting manglet: hvor appen
@@ -795,6 +801,13 @@ et funn om markedet.
 - De tre returnerer **tre forskjellige** verdier, ikke to og en `None`
 - **Ville feilet hvis:** lageret svarte `None` både for «ikke kjørt» og «ikke børsdag». Da er de to umulige å skille, og skillet kan ikke gjenskapes i ettertid
 
+**Forutsetning** *(lagt til 2026-09-24)*: «ingen rad på en børsdag betyr at
+kommandoen ikke ble kjørt» holder ikke i to tilfeller. Kommandoen kan ha kjørt
+før dagens kurs var publisert (åpent punkt 23), og et symbol kan ha feilet mens
+de andre ble hentet (`AD-15`). Begge gir ingen rad, uten at det er et hull i
+driften. Ført som **åpent punkt 24** i `prd.md`, med frist før denne storyen:
+en fjerde tilstand, eller en lagret grunn.
+
 **Én økt:** ja.
 
 ---
@@ -898,6 +911,11 @@ så den ikke kan regnes av en serie som er byttet ut siden.
 - Én kjøring skriver kurser **og** vurderinger for alle femten
 - Vurderingen er regnet av de radene kjøringen selv lagret
 - Kjøres kommandoen to ganger samme dag, finnes fortsatt én vurdering per aksje
+- **Et symbol som feilet** (`AD-15`): storyen sier eksplisitt hva som skrives
+  for det, og testen prøver det. Svaret avgjøres av åpent punkt 24 før 1.7: en
+  rad med en egen tilstand, eller en rad med grunnen. Ingen rad er ikke et
+  gyldig svar, fordi det da leses som at kommandoen ikke ble kjørt. *Lagt til
+  2026-09-24*
 - **Ville feilet hvis:** vurderingen ble skrevet av en egen kommando. Kjøres den etter en ny henting, er grunnlaget byttet ut — og raden ville lagret hva løsningen mente om *andre* data enn de som lå der
 
 **Én økt:** ja.
@@ -943,7 +961,8 @@ vurderingen ikke avhenger av at gruppens maskin er i rommet.
 > Ingen av de sju NFR-ene dekker at løsningen skal kunne bygges og kjøres av
 > andre — kontrollert 2026-09-22. PRD-en har altså ikke med selve leveransen,
 > mens faglærer navngir «kildekode og docker fil» som innleveringen. Ført som
-> spørsmål til gruppen, ikke rettet.
+> spørsmål til gruppen, ikke rettet. *24.09: sagt av faglærer i samtale 21.09,
+> ikke på emnesiden (hjelpelærer 23.09); lages likevel.*
 
 ### Story 3.2: To volumer, og ingenting uerstattelig i imaget
 
@@ -1496,3 +1515,30 @@ KI ble brukt og ikke bare at den ble brukt.
   gangene det ikke virket, og det er dem refleksjonen trenger
 
 **Én økt:** ja. Kort.
+
+### Story 9.4: Relevanseksperimentet, del 1 — utvalg, innsamling og merking
+
+*Lagt til 2026-09-24.* Ingen story dekket del 1, mens briefen og PRD §7 setter
+innsamling og merking til uke 39–40. **Eier: Joakim.**
+
+Som **gruppe**, vil vi ha et testsett på ~50 medieartikler fra åtte selskaper,
+merket for hånd, så del 2 har noe å kjøre KI-klassifiseringen mot.
+
+**Oppfyller:** suksessmålet «Relevanseksperiment», del 1 (PRD §7, åpent punkt
+5) · **Begrenses av:** regel 6 og 16 i `CLAUDE.md`
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- Utvalgskriteriene skriftlig **før** innsamlingen: hvilke åtte selskaper, hvor
+  mange artikler per selskap, og hva som teller som at en artikkel handler om
+  selskapet
+- Kalltallet kontrolleres med den **første** forespørselen: to tickere, med
+  `/api/user` lest før og etter. Differansen avgjør om ~40 eller ~80 kall er
+  riktig (`malinger.md` §7.2). Ingen kall uten avtale (regel 6)
+- Artiklene ligger bare lokalt, i `data/`. Ingen titler eller utdrag i sporede
+  filer (regel 16)
+- Merkingen gjøres for hånd, én vurdering per artikkel, før noen modell ser
+  artiklene
+- **Ville feilet hvis:** kriteriene ble skrevet etter at artiklene var sett. Da
+  er utvalget tilpasset det som ble funnet
+
+**Én økt:** nei. Merkingen tar tid.
