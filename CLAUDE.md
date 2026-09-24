@@ -59,3 +59,8 @@ et sitat som ikke fantes».
     om det uttrykkelig. Må den endres før fristen, lages en ny tag,
     `arbeidskrav-product-brief-v2`; en tag flyttes aldri. Tilbakemeldingen fra
     faglærerne føres i `innlevering.md`, ikke i briefen.
+18. **Hver innlimte instruksjon lagres ordrett.** Den lagres i
+    `docs/ai-prompts/<ÅÅÅÅ-MM-DD>.md` før den utføres, med klokkeslett. Når den
+    er utført, legges en linje under med commitene og utfallet. Ingen rådata
+    eller nøkler (regel 16). Grunnen: emnesiden krever dokumentasjon av hvordan
+    KI ble brukt, og instruksjonene er promptene.

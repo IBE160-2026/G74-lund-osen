@@ -1540,7 +1540,15 @@ Som **gruppe**, vil vi at instruksjonene som styrte byggingen, ligger ordrett i
 repoet, så refleksjonsrapporten kan vise dem i stedet for å gjenfortelle dem.
 
 **Oppfyller:** — *(emnesiden, «hvordan KI ble brukt»)* · **Begrenses av:** regel
-10 og 11 i `CLAUDE.md`
+10, 11 og 18 i `CLAUDE.md`
+
+*Endret 2026-09-24:* regel 18 i `CLAUDE.md` sier nå at hver innlimte
+instruksjon lagres ordrett i `docs/ai-prompts/<ÅÅÅÅ-MM-DD>.md` før den
+utføres, med klokkeslett og en linje om utfallet etterpå. Formatet står i
+`docs/ai-prompts/README.md`. Fra 24.09 kl. 22:05 skjer det løpende. Det som
+gjenstår i denne storyen, er å hente inn instruksjonene fra 21.–24.09 fra
+historikken til øktene, i samme format. Punktene under om `bygging/` og
+filnavn er erstattet av regel 18; lesingen før commit gjelder fortsatt.
 
 **Kontroll — hva den ferdige storyen inneholder:**
 - Katalogen finnes, og `docs/ai-prompts/README.md` peker på den

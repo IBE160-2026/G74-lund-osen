@@ -26,6 +26,27 @@ Eksempler:
 - `2026-09-20-joakim-database.md`
 - `2026-10-02-begge-debugging.md`
 
+## Instruksjoner til byggeøktene (regel 18)
+
+*Lagt til 2026-09-24.* Hver innlimte instruksjon lagres ordrett i
+`docs/ai-prompts/<ÅÅÅÅ-MM-DD>.md`, én fil per dag, **før** den utføres.
+Formatet:
+
+````markdown
+## 22:05
+
+```text
+<instruksjonen, ordrett, med sluttmarkøren>
+```
+
+**Utført:** <commitene>. <utfallet i én eller to setninger>.
+````
+
+- Klokkeslettet er når instruksjonen ble lagret, i norsk tid.
+- Linjen «Utført» legges til etterpå, under blokken. Blokken selv endres ikke.
+- Ingen rådata eller nøkler i fila (regel 16 i `CLAUDE.md`).
+- Filnavnkonvensjonen under gjelder andre prompts og samtaler, ikke disse.
+
 ## Viktig
 
 Skriv hvem som brukte KI-verktøyet. Git-historikken viser hvem som committed filer,
