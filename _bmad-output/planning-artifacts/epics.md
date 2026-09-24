@@ -142,7 +142,8 @@ flere av dem er **allerede oppfylt i kode** — de er merket med opphav.
 **Lagring og datamodell**
 
 - `AD-3` — Én port per eid datasett, én skriver per datasett. Portene er
-  `Kurslager`, `Meldingskilde`, `Vurderingslager`, `KILogg`
+  `Kurslager`, `Meldingslager`, `Vurderingslager`, `KILogg`. *`Meldingskilde` omdøpt
+  2026-09-24 etter navneregelen i spinen: porten har en skriver*
 - `AD-4` — SQLite fra standardbiblioteket. Ingen hostet database. *Bekreftet av
   faglærerstaben 22.09*
 - `AD-5` — `erstatt_serie(symbol, rader, hentet)` gjør DELETE+INSERT i én
@@ -153,7 +154,10 @@ flere av dem er **allerede oppfylt i kode** — de er merket med opphav.
   `skriv` avviser enhver dato som ikke er inneværende børsdag
 - `AD-18` — `vurdering` lagrer kursen som **verdi**, ikke som fremmednøkkel
 - `AD-19` — Porten returnerer `list[Kursrad]` med norske felt. **Innføres i
-  SAMME endring som SQLite-adapteren**, ikke som egen runde
+  SAMME endring som SQLite-adapteren**, ikke som egen runde. *Rettet
+  2026-09-24:* slik ble det ikke. Rekkefølgen ble story 1.2 (`Kursrad` og
+  porten, `a796214`), 1.3 (SQLite-adapteren, `f4fada0`) og 1.4a–c. `Kursrad`
+  kom i en egen endring før adapteren, som i spinens «Slik det ble»
 - `AD-16` — Skjemaendringer skjer med nummererte migrasjoner. Migrasjonsløperen
   må styre transaksjonen selv; `executescript()` gjør implisitt COMMIT
 
@@ -179,7 +183,7 @@ flere av dem er **allerede oppfylt i kode** — de er merket med opphav.
 **Kvalitet**
 
 - `AD-8` — Nettverk sperret i testkjøringen *(oppfylt: commit `266e6d9`, 166
-  tester grønne)*
+  tester grønne 2026-09-22. DNS og proxy sperret i `982b216`, 23.09)*
 - `AD-13` — Signalparametre er konstanter med måling bak seg *(oppfylt:
   `NOYTRALSONE`, `VOLUMFAKTOR`, `TERSKEL`, `VOLATILITET_VINDU` og `VOLUM_VINDU`
   i `signalberegning.py`. Linjenumre byttet med navn 2026-09-24. Terskel,
@@ -1254,7 +1258,7 @@ uten KI. 5B.4 måler KI-tillegget. Blandes de, vet ingen hva som ble målt.
 > Logikken i `meldinger.py` er allerede bygget og testet; den blir liggende som
 > kode uten datakilde.
 
-### Story 6.1: Meldingskilden som port 🔒
+### Story 6.1: Meldingslageret som port 🔒
 
 Som **utvikler**, vil jeg at meldingene nås gjennom en port, så resten av
 systemet ikke vet hvor de kom fra.
@@ -1262,7 +1266,8 @@ systemet ikke vet hvor de kom fra.
 **Oppfyller:** — *(grunnlag for FR-404)* · **Begrenses av:** `AD-3`, `AD-2`
 
 **Kontroll — hva testen ser etter:**
-- `Meldingskilde` har én skriver, og lesere går gjennom porten
+- `Meldingslager` har én skriver, og lesere går gjennom porten. *Het
+  `Meldingskilde` til 2026-09-24*
 - Hele porten prøves mot en minneimplementasjon
 - **Ville feilet hvis:** meldingshentingen kalte nettet fra en modul utenfor skallet. `AD-2` krever én hentefunksjon per kilde, i sin egen skallfil
 
