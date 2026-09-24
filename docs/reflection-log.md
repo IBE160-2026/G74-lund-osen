@@ -122,6 +122,10 @@ Testfiler og API-nøkler beholdes foreløpig lokalt og skal ikke lastes opp til 
 
 ## Mal for neste arbeidsøkt
 
+*Utgått 2026-09-24.* Står igjen fordi de første oppføringene ble skrevet etter
+den. Nye oppføringer skrives over «# Joakims oppføringer» (regel 5 i
+`CLAUDE.md`), og malen for Joakims egne oppføringer står der.
+
 ### Dato / deltaker(e)
 ### Fase
 ### Hva gjorde vi?
@@ -1991,6 +1995,9 @@ sluttkurs lå der allerede. Instruksjonen om NaN nevnte ikke at uendelig også b
 lagret, av begge lagrene. Av fire funn fra kodegjennomgangen var ett verre enn
 beskrevet (en `COMMIT` i migrasjonsfila, med en feilmelding som sa «rullet
 tilbake»), og ett trengte trigger på både `INSERT` og `UPDATE` (`c569831`).
+*Rettet 2026-09-24:* det var fem funn, ikke fire. Fire står som forutsetninger
+før neste migrasjon (story 1.6), og ett står under story 2.2 (`c569831`).
+Feilen kom fra en innlimt instruksjon.
 
 Lærdommen er at en instruksjon er en påstand, ikke et oppslag. Den kan være
 riktig i retning og feil i detalj, akkurat som en rådgivningsøkt. Derfor er
