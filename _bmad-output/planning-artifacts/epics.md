@@ -710,11 +710,18 @@ har bestemt det.
 **Oppfyller:** FR-408 · **Begrenses av:** `AD-3`, `AD-7`, `AD-18`, `AD-20`
 
 **Kontroll — hva testen ser etter:**
-- `skriv` med gårsdagens dato **reiser** — den logger ikke og hopper ikke stille over
+- `skriv` med en dato før inneværende børsdag **reiser** — den logger ikke og
+  hopper ikke stille over. Testen injiserer klokka, så den ikke avhenger av
+  hvilken dag den kjøres. *Rettet 2026-09-24:* her sto «gårsdagens dato». En
+  lørdag er gårsdagen inneværende børsdag, og regelen i spinen er at `skriv`
+  avviser enhver dato som ikke er inneværende børsdag
 - `skriv` to ganger med samme `(symbol, dato)` gir **én** rad, og den siste vinner
 - Porten har **ingen** `slett` og **ingen** `endre` — kontrollert på protokollen, ikke på implementasjonen
 - En `vurdering` overlever `erstatt_serie` på samme symbol: kursverdiene i raden er uendret etterpå
-- **Ville feilet hvis:** noen la til en `oppdater`-metode «for migrasjoner», eller hvis datogrensen ble regnet i UTC — da ville en kjøring 23:30 norsk tid skrevet på gårsdagen
+- **Ville feilet hvis:** noen la til en `oppdater`-metode «for migrasjoner», eller hvis datogrensen ble regnet i UTC — da ville en kjøring 00:30 norsk tid (22:30 UTC dagen før) skrevet på
+  gårsdagen. *Rettet 2026-09-24:* her sto 23:30. Det er samme dato i UTC og
+  avslører ingenting. Feilvinduet er 00:00–02:00 norsk sommertid (00:00–01:00
+  om vinteren), og 00:30 ligger i begge
 
 **Forutsetninger før neste migrasjon** *(fra kodegjennomgangen 2026-09-23,
 hver prøvd mot koden samme dag)*. Ingen av dem slår ut i dag, fordi det bare
