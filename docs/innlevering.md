@@ -72,13 +72,15 @@ belagt krav.
 > **Innleveringen er «kildekode og docker fil».**
 
 **Kilde:** faglærer i IBE160, 21.09.2026. Ført i `docs/reflection-log.md`,
-oppføringen «Fire avklaringer fra faglærer», punkt 2. Merk at bare frasen
+oppføringen «Faglærer om rammene: database, docker, stack og rapportens plass»
+(21.09), punkt 2. *Rettet 2026-09-24: her sto «Fire avklaringer fra faglærer».*
+Merk at bare frasen
 «kildekode og docker fil» er ordrett; setningen rundt er loggens egen.
 
 | | |
 |---|---|
 | **Status** | **Delvis** |
-| **Ligger i** | `src/` (10 moduler og `migrasjoner/`), `tests/` (13 filer, 253 tester — telt 2026-09-23), `.github/workflows/`, `pyproject.toml`, `uv.lock` |
+| **Ligger i** | `src/` (10 moduler og `migrasjoner/`), `tests/` (13 filer, 285 tester — telt 2026-09-24), `.github/workflows/`, `pyproject.toml`, `uv.lock` |
 | **Gjenstår** | **Dockerfile finnes ikke.** Kontrollert 21.09 og igjen 22.09: ingen treff på `Dockerfile` eller `docker-compose` noe sted i repoet. Ført som åpent punkt 18 i `prd.md` |
 
 Arkitekturen for den er besluttet 22.09 og ligger i `ARCHITECTURE-SPINE.md`:
@@ -139,6 +141,10 @@ emneansvarlig, og det sier «ut fra det vi vet nå».
 
 Sitatet sier *når* rapporten skrives, ikke hva den skal inneholde eller hvor
 lang den skal være. Det er ikke funnet noen kilde på formkrav.
+*Rettet 2026-09-24:* innholdet er gitt av emnesiden, sitert under «Eksamen»
+øverst: beskrivelse av utviklingsprosessen, utfordringer og løsninger; kritisk
+vurdering av hvordan KI påvirket sluttresultatet; og argumentasjon for etiske og
+teknologiske implikasjoner. Det som er ukjent, er lengde, struktur og format.
 
 ---
 
@@ -161,6 +167,11 @@ lang den skal være. Det er ikke funnet noen kilde på formkrav.
 
 Samme tilbakemelding godkjenner fordelingen mellom brief og PRD, inkludert vår
 egen seksjon «Data og kilder» som ikke står i malen.
+
+*2026-09-24:* **briefen er endret etter godkjenningen 20.09.** `git log` viser
+minst 11 commits fra 21.09 til 24.09, blant annet at NewsWeb ikke er en avklart
+kilde, at det ikke hentes før Euronext har svart, og plan B. Godkjenningen
+gjaldt versjonen faglærer så.
 
 ---
 
@@ -210,6 +221,20 @@ faglærer før den brukes til å planlegge.
 | **Status** | **Uavklart hva den omfatter** |
 | **Ligger i** | Product Brief, PRD, arkitekturspine og `epics.md` er alle skrevet |
 | **Gjenstår** | **Besvart 23.09, se under:** BMAD er «fortsatt en sterkt anbefalt arbeidsmetode» — anbefalt, ikke krav — og de sentrale dokumentene «bør derfor ... pushes dit». De ligger allerede i repoet. Emnesiden fører selve arbeidskravet som product brief i repoet (se «Eksamen»). Utsettelsen til 27.09 har fortsatt ingen navngitt kilde |
+
+---
+
+## 8. Dokumentasjon av KI-bruk og kvalitetssikring
+
+*Lagt til 2026-09-24.* Emnesiden legger dette under prosjektkoden (70 %):
+«Dokumentasjon må vise hvordan KI ble brukt, og hvordan studentene har
+kvalitetssikret koden». Se «Eksamen» øverst.
+
+| | |
+|---|---|
+| **Status** | **Delvis — materialet finnes, samlingen ikke** |
+| **Ligger i** | `docs/reflection-log.md` (ført siden 13.09), kontrollrapportene `docs/kontroll-2026-09-22.md` og `docs/kontroll-2026-09-22-plan.md`, CI i `.github/workflows/tester.yml`, nettverkssperren i `tests/conftest.py`, og mutantene, som i dag bare står i commit-meldingene |
+| **Gjenstår** | Epic 9 i `epics.md`: 9.1 `docs/kvalitetssikring.md` (tester, CI, mutanter, og hva som ikke testes), 9.2 instruksjonene ordrett i `docs/ai-prompts/bygging/`, og 9.3 arbeidsmønsteret |
 
 ---
 
@@ -282,8 +307,10 @@ finnes ikke skrevet ned noe sted.
 
 Ukjent. Ført som **åpent punkt 13** i `prd.md` — eier **Marian**, status
 **avventer Bård Inge**. Spørsmålet ble stilt 22.09 og besvart 23.09: det finnes
-ingen dato ennå, og «Bård Inge vil presisere dette». Åtte suksessmål i PRD §7 er bundet til
-den, blant annet «Før prosjektinnlevering» og «Ved prosjektinnlevering».
+ingen dato ennå, og «Bård Inge vil presisere dette». Fire av de åtte suksessmålene i PRD §7 er bundet til
+de to datoene: «Før prosjektinnlevering», «Ved prosjektinnlevering», «Før
+demonstrasjonen» og «Ved demonstrasjonen». *Rettet 2026-09-24: her sto «Åtte
+suksessmål».*
 
 ### D. Dato for demonstrasjonen
 
@@ -302,7 +329,8 @@ og stilt på nytt i Teams 22.09.
 ### F. Formkrav til refleksjonsrapporten
 
 Lengde, struktur og format er ukjent. Det eneste som er bekreftet, er *når* den
-skrives.
+skrives. *Rettet 2026-09-24:* innholdet er også bekreftet. Emnesiden gir tre
+innholdskrav, sitert under «Eksamen» øverst.
 
 ---
 
@@ -315,16 +343,26 @@ skrives.
 | **Teknologivalg** | Avviket er besluttet og begrunnelsen ført |
 | **Databasevalget** | Besluttet og kontrollert med faglærerstaben — *valget*, ikke lagringen |
 
+## Delvis bygget
+
+*Egen overskrift 2026-09-24:* databaseraden sto under «Finnes ikke i det hele
+tatt».
+
+| Punkt | Merknad |
+|---|---|
+| **Databasen** | Sagt i samtale av faglærer 21.09, ikke bekreftet på emnesiden. Gjøres likevel. **Delvis bygget 23.09:** migrasjonsløper (story 1.1, `57a83c5`), `kurs` og `kursserie` med SQLite-adapter (story 1.3, `f4fada0`). Ikke koblet til appen ennå |
+
 ## Finnes ikke i det hele tatt
 
 | Punkt | Merknad |
 |---|---|
 | **Dockerfile** | Sagt i samtale av faglærer 21.09 («kildekode og docker fil»), ikke bekreftet på emnesiden (hjelpelærer 23.09). Gjøres likevel. Arkitekturen er klar, filen er ikke skrevet |
-| **Databasen** | Sagt i samtale av faglærer 21.09, ikke bekreftet på emnesiden. Gjøres likevel. **Delvis bygget 23.09:** migrasjonsløper (story 1.1, `57a83c5`), `kurs` og `kursserie` med SQLite-adapter (story 1.3, `f4fada0`). Ikke koblet til appen ennå |
 | **Refleksjonsrapporten** | Råmaterialet er ført siden 13.09, men rapporten skal etter faglærers eget svar skrives *etter* prosjektet |
-| **Datoene** | Både prosjektinnlevering og demonstrasjon er ukjente, og åtte suksessmål henger på dem |
+| **Datoene** | Både prosjektinnlevering og demonstrasjon er ukjente, og fire av de åtte suksessmålene henger på dem (*rettet 2026-09-24: her sto «åtte»*) |
 
 **Det mest presserende er ikke en fil, men to datoer.** Dockerfilen og databasen
 har begge en besluttet arkitektur og kan bygges. Punkt 13 har stått med frist
 «Snarest» og uten eier siden PRD-en ble skrevet, og uten de datoene kan ikke
-«uke 45» eller «minst én ukes drift» planlegges mot noe.
+«uke 45» eller «minst én ukes drift» planlegges mot noe. *Rettet 2026-09-24:*
+punkt 13 har eier, Marian, og status «avventer Bård Inge», jf. «C. Dato for
+prosjektinnlevering» over.
