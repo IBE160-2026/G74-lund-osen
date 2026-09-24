@@ -840,6 +840,14 @@ datasettet**.
 | Kategorifordelinger i meldingsbildet | Meldingene fra NewsWeb |
 | Kalltall, kvoteforbruk og måleresultater | Alt innhold i `data/` |
 | Metodebeskrivelser og konklusjoner | |
+| Noen siterte meldingstitler, som eksempler på hva vi målte | |
+
+*Lagt til 2026-09-24:* raden om meldingstitler manglet. Brevet til Euronext
+21.09 opplyste om «a small number of announcement titles quoted in our
+documentation to show what we measured» (`docs/epost-til-euronext.md`). Talt
+24.09: 13 titler fra NewsWeb står ordrett i `malinger.md` §4, og to av dem også i
+`begrunnelser.md`. De tre titlene i `malinger.md` om språkgjenkjenningen er
+konstruerte, ikke hentet.
 
 `data/` ligger i `.gitignore`, sammen med `.env`. Rådata og API-nøkler er derfor
 ikke eksponert.
