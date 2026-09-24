@@ -600,6 +600,19 @@ uten at `SnapshotKilde` får en skrivemetode, så 1.4b har noe å lese fra.
   `close` når feltet manglet. Det er fallbacken AD-19 finnes for å fjerne: den
   gir et tall som ser riktig ut, men er regnet på feil serie
 
+**Merknad: lesekontrakten kan ikke kjøres uendret mot `SnapshotLeser`.**
+*Lagt til 2026-09-24.* Kontrakttestene i `test_kurslager.py` fyller lageret med
+`erstatt_serie`, og den har ikke `SnapshotLeser`. Testen for tid per symbol
+(`TestSistHentet.test_er_per_symbol`) krever to ulike tider, mens
+`SnapshotKilde` har én tid per fil. Løsning:
+- En leser-fixture med én fyllefunksjon per lager. For `MinneKurslager` og
+  `SqliteKurslager` kaller den `erstatt_serie`, for `SnapshotLeser` bygger den
+  et øyeblikksbilde
+- Tester som krever ulike tider per symbol, kjøres bare mot de to skrivbare
+  lagrene
+- Egne lesetester for det alle tre skal oppfylle: en tom serie gir
+  `sist_hentet` `None`, og `serie` gir sorterte, unike datoer
+
 **Én økt:** ja.
 
 ### Story 1.4b: Konsumentene leser `Kursrad`
