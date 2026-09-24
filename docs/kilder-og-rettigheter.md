@@ -295,8 +295,10 @@ Beslutningen fra 20.09 sa at eksperimentet kjøres på medieartikler bare hvis
 EODHD svarer skriftlig ja innen 25.09 **og** `/api/news` viser seg å dekke
 `.OL`. Begge forutsetningene er innfridd 21.09, fire dager før fristen.
 
-**Plan A gjelder.** Plan B — 50 børsmeldinger fra NewsWebs samlekategori —
-beholdes som dokumentert alternativ, men er ikke lenger nødvendig. Det er en
+**Hovedalternativet gjelder.** Reservealternativet — 50 børsmeldinger fra
+NewsWebs samlekategori — beholdes som dokumentert alternativ, men er ikke lenger
+nødvendig. *Rettet 2026-09-24: her sto «Plan A» og «Plan B». «Plan B» betyr nå
+Epic 5B, at KI forklarer signalet.* Det er en
 vesentlig forbedring av risikobildet: eksperimentet deler ikke lenger kilde med
 meldingsdelen, og et negativt svar fra Euronext velter derfor ikke begge deler
 samtidig.
