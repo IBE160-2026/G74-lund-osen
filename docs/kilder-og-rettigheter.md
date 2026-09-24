@@ -963,10 +963,13 @@ lenger uimotsagt» over.
       mellomtiden». *23.09: faglærer er ikke kontaktet direkte; avhengigheten,
       at det ikke hentes, og plan B står i Product Brief.*
 - [ ] **Beslutning hvis Euronext ikke svarer innen 2026-09-28.** Vilkårene
-      krever tillatelse på forhånd, og vi henter allerede. Alternativene er å
-      stoppe hentingen, fortsette bevisst under undervisningsunntaket, eller
-      bygge meldingsdelen om. Skal avgjøres og skrives ned, ikke bli stående
-      fordi ingen tok det opp. **Eier: Gruppen.** Frist 2026-09-28
+      krever tillatelse på forhånd, og vi henter allerede. Beslutningen 23.09:
+      det hentes ikke, og 28.09 avgjør om Epic 5B utløses. Skal avgjøres og
+      skrives ned, ikke bli stående fordi ingen tok det opp. **Eier: Gruppen.**
+      Frist 2026-09-28. *Rettet 2026-09-24: her sto «Alternativene er å stoppe
+      hentingen, fortsette bevisst under undervisningsunntaket, eller bygge
+      meldingsdelen om». Det strider mot beslutningen 23.09 om at det ikke
+      hentes fra NewsWeb før Euronext har svart.*
 
       *23.09:* «vi henter allerede» stemmer ikke. Siste henting var 21.09 kl.
       17:42, før forbudet var lest, og beslutningen om å fortsette ble aldri
