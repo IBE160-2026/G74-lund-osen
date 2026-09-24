@@ -51,3 +51,8 @@ et sitat som ikke fantes».
     kildene (kurs, volum eller meldingsinnhold for en bestemt dag) skrives ikke
     i sporede filer. Tall vi har regnet ut selv, kan stå. Regel 10 dekker bare
     filer, og MOWI-tallene kom inn 23.09 etter at denne fila fantes.
+17. **Product Brief er låst.** `product-brief.md` er låst fra 2026-09-24 (tag
+    `arbeidskrav-product-brief`). Den endres ikke uten at Marian eller Joakim ber
+    om det uttrykkelig. Må den endres før fristen, lages en ny tag,
+    `arbeidskrav-product-brief-v2`; en tag flyttes aldri. Tilbakemeldingen fra
+    faglærerne føres i `innlevering.md`, ikke i briefen.
