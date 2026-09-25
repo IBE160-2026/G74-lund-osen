@@ -2,7 +2,7 @@
 title: 'Story 1.4b: Konsumentene leser Kursrad'
 type: 'refactor'
 created: '2026-09-25'
-status: 'in-progress'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'f4bf940e32e5a9470c26d44c9c6aa9bd251fb249'
