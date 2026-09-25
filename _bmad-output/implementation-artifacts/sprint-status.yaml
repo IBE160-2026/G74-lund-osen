@@ -46,7 +46,7 @@ development_status:
   1-3-sqlite-adapteren-og-kurs-tabellen: done
   1-4a-lesegrensen-kursleser-og-oversetteren-fra-øyeblikksbildet: review
   1-4b-konsumentene-leser-kursrad: review
-  1-4c-rydding-kurskilde-ut-sist_hentet-inn: ready-for-dev
+  1-4c-rydding-kurskilde-ut-sist_hentet-inn: in-progress
   1-5-snapshotkilde-ut-av-kursdata-py: backlog
   1-5b-migrasjonsløperen-og-sqlite-adapteren-herdes: backlog
   1-6-vurderingslager-med-datoavvisning: backlog
