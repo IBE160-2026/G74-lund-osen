@@ -2,9 +2,10 @@
 title: 'Story 1.4c: Rydding — Kurskilde ut, sist_hentet inn'
 type: 'refactor'
 created: '2026-09-25'
-status: 'ready-for-dev'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
+baseline_commit: 'fcc48f95b9f8e3a86abc6f0381da37b049e61df9'
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/epic-1-context.md'
   - '{project-root}/CLAUDE.md'
@@ -71,11 +72,11 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `data/kontrollregning_1_4c.py` (ikke i repoet) -- kopi av `kontrollregning_1_4b.py` som bruker `SnapshotLeser` både før og etter, og skriver `-1-4c-foer.json` og `-1-4c-etter.json`. Sammenligningen skriver antall like to ganger: med alt, og med tidsstemplene tatt ut (feltet `sist_hentet` og «data hentet …» og radtidsstempelet i HTML-en). Kjøres før første kodeendring
-- [ ] `src/kursdata.py` -- `Kurskilde` og `MinneKilde` ut, docstringene rettet -- AD-3
-- [ ] `src/markedsoversikt.py`, `src/app.py`, `src/templates/index.html` og `aksje.html` -- `sist_hentet` inn, norsk tid -- FR-101, AD-15, AD-20
-- [ ] `tests/test_kursdata.py`, `tests/test_kurslager.py`, `tests/test_konsumentene.py` -- testene for `Kurskilde` og `MinneKilde` ut
-- [ ] `tests/test_markedsoversikt.py`, `tests/test_app.py` -- nye tester for matrisen over: eldste vinner, eget tidsstempel på den eldste raden og ikke på den ferske, fem kolonner, norsk tid over midnatt og i vintertid, og detaljens tidsstempel
+- [x] `data/kontrollregning_1_4c.py` (ikke i repoet) -- kopi av `kontrollregning_1_4b.py` som bruker `SnapshotLeser` både før og etter, og skriver `-1-4c-foer.json` og `-1-4c-etter.json`. Sammenligningen skriver antall like to ganger: med alt, og med tidsstemplene tatt ut (feltet `sist_hentet` og «data hentet …» og radtidsstempelet i HTML-en). Kjøres før første kodeendring
+- [x] `src/kursdata.py` -- `Kurskilde` og `MinneKilde` ut, docstringene rettet -- AD-3
+- [x] `src/markedsoversikt.py`, `src/app.py`, `src/templates/index.html` og `aksje.html` -- `sist_hentet` inn, norsk tid -- FR-101, AD-15, AD-20
+- [x] `tests/test_kursdata.py`, `tests/test_kurslager.py`, `tests/test_konsumentene.py` -- testene for `Kurskilde` og `MinneKilde` ut
+- [x] `tests/test_markedsoversikt.py`, `tests/test_app.py` -- nye tester for matrisen over: eldste vinner, eget tidsstempel på den eldste raden og ikke på den ferske, fem kolonner, norsk tid over midnatt og i vintertid, og detaljens tidsstempel
 - [ ] Etter flettingen, på `main`: spinen, `epics.md` og arkitekturmemloggen merker AD-3-bruddet lukket med squash-commiten. Egen commit
 
 **Acceptance Criteria:**
@@ -86,10 +87,33 @@ context:
 
 ## Implementation Notes
 
+- `Rad.sist_hentet` er `datetime | None = None`, ikke `datetime`, så `bygg_rad` kan kalles uten tid i de eldre testene. `bygg_oversikt` setter den alltid.
+- Nye rene funksjoner i `markedsoversikt.py`: `sidens_tidsstempel` (eldste), `eldre_enn_nyeste` (symbolene som viser egen tid) og `norsk_tid` (`ZoneInfo("Europe/Oslo")`), som `app.py` registrerer som Jinja-filter.
+- Radens tid står som `<span class="hentet"><br><small>hentet …</small></span>` i `td.selskap`, uten ny CSS.
+- Testtall: 408 før, 416 etter (8 fjernet, 16 nye).
+- Kontrollregningen mot `kurser-raa-2026-09-24.json`: med alt er 0 av 15 rader, 15 av 15 detaljer og 0 av 16 sider like. Uten tidsstemplene er 15 av 15, 15 av 15 og 16 av 16 like, og rekkefølgen er lik. Ingen rad viser egen tid på ekte data.
+- Mutanter, én om gangen: sidens tid er den nyeste (2 feiler), UTC i stedet for norsk tid (11), radens tid vises aldri (1), fast +2 timer (3). Alle fanget.
+- Etter gjennomgangen (rad 5 og 6 i triageloggen): radens tid har egen CSS-regel (`td.selskap .hentet`, dempet, normal vekt) i stedet for `<br><small>`, og docstringen til `Rad.sist_hentet` navngir lesekontrakten. 416 grønne, alle fire mutanter fanget.
+- Kontrollregningen etter rettelsene, uten tidsstemplene: 15 av 15 rader, 15 av 15 detaljer og 15 av 16 sider like. Den ene forskjellen er CSS-regelen for radens tidsstempel i `<style>` på `/`; ingenting annet skiller. Sammenligningen ble ikke endret etter kjøringen før.
+
 ## Spec Change Log
 
 ## Review Triage Log
 
+| # | Kilde | Funn | Dom | Bevis | Rute |
+|---|---|---|---|---|---|
+| 1 | blind | Spinen og `epics.md` er ikke oppdatert, og spinens «Porter»-rad (linje 46) nevner fortsatt `MinneKilde` | low | Spinen og `epics.md` er en planlagt oppgave etter flettingen, fordi de skal ha squash-commiten. Linje 46 manglet i Code Map; den tas i samme commit | patch (etter flettingen) |
+| 2 | blind | `norsk_tid` er visningskode i kjernen | false | AD-1 forbyr I/O, og `zoneinfo` er ikke I/O. `markedsoversikt` kjenner fortsatt ingen HTML, og Code Map plasserte funksjonen der. Ingen kaller eller regel brytes | avvist |
+| 3 | blind, edge | `norsk_tid` tar imot en tid uten sone og viser den som lokal tid | low | Nås ikke: `kontroller_skriving` gir UTC, `_hentet_fra_tekst` avviser tid uten sone, og SQLite lagrer tiden med offset. Rettingen er en ny vakt | avvist |
+| 4 | blind | Med én fersk og fjorten foreldede gjentar fjorten rader sidens tid, og den ferske raden har ingen tid | low | Riktig, men det er FR-101 ordrett («En rad med eldre tidsstempel enn det nyeste viser sitt eget»). En endring er en PRD-endring | avvist, nevnt for gruppa |
+| 5 | blind | Radens tid har ingen CSS og arver `font-weight: 500` fra `td.selskap` | low | Riktig. Synes først når tidene er ulike (Epic 2). Rettingen er én CSS-regel | patch |
+| 6 | blind, edge | Docstringen til `Rad.sist_hentet` sier «alltid», og en rad uten tid ville falt ut av minimumet | low | Nås ikke: lesekontrakten sier at `sist_hentet` er None hvis og bare hvis serien er tom, og en tom serie gir ingen rad (`bygg_rad`). Docstringen bør navngi kontrakten | patch (tekst) |
+| 7 | blind | Tester mangler for dagen sommertiden slutter, for tre ulike tider og for at detaljen ikke har radtid | low | Ingen feil er vist. Sommer- og vintertestene skiller allerede `Europe/Oslo` fra en fast forskyvning (mutant 4) | avvist |
+| 8 | blind | Tidssonetestene står både i `test_markedsoversikt` og `test_app` | low | Apptestene viser at filteret er koblet til hver mal, også detaljen i vintertid. Ingen skade | avvist |
+| 9 | blind | Importvakten for `Kurskilde` er fjernet uten erstatning, så kjernen kan importere `SnapshotKilde` | false | `SnapshotKilde` gir EODHD-`dict`, og `test_ingen_eodhd_noekler_i_kildeteksten` feiler hvis kjernen leser de nøklene | avvist |
+| 10 | blind | Testtallet etter står ikke i spesifikasjonen (anslått 413) | false | Implementation Notes har 416, målt. Anslaget regnet 13 nye tester, ikke 16 | avvist |
+| 11 | edge | To tider som bare skiller seg i sekunder, gir radtid med samme minutt som siden | low | En henting gir samme `hentet` til alle symbolene (AD-5, argumentet til `erstatt_serie`). Rettingen er ny avrundingslogikk | avvist |
+| 12 | edge | Datoen i overskriften er `rader[0].dato`, og den kan motsi sidens eldste tidsstempel når symbolene har ulike siste datoer | low | Fantes før 1.4c (`index.html`). Blir synlig når symbolene hentes hver for seg (Epic 2) | defer |
 ## Design Notes
 
 **Trinn:** (1) Etter ja: spesifikasjonen `ready-for-dev` på `main`, 1-4c `in-progress`, grenen `1-4c`, kontrollregningen før. (2) Kode og tester på grenen, mellomcommits som pushes. (3) Kontrollregningen etter, mutantene og gjennomgangen (bmad-build steg 4), så pull request. Stopp før flettingen med testtallene, kontrollregningen og utfallet av gjennomgangen, og vent på ja. (4) Squash, så spinen og `epics.md`, så 1-4c til `review` sammen med dagsfila.

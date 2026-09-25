@@ -14,7 +14,10 @@ from markedsoversikt import (
     Rad,
     bygg_oversikt,
     bygg_rad,
+    eldre_enn_nyeste,
     endring_i_prosent,
+    norsk_tid,
+    sidens_tidsstempel,
 )
 from signalberegning import BLANDET, INGEN, NEGATIV, POSITIV, Parametre
 
@@ -211,3 +214,68 @@ class TestByggOversikt:
         assert rad.endring_prosent is not None
         assert rad.styrke is not None
         assert rad.retning.tekst
+
+
+def lager_med_tider(tider: dict[str, datetime]) -> MinneKurslager:
+    """Et lager der hvert symbol er hentet paa sin egen tid, slik AD-15 gir
+    det naar ett symbol feiler og beholder sin gamle serie."""
+    ut = MinneKurslager()
+    for symbol, tid in tider.items():
+        ut.erstatt_serie(symbol, serie([100.0] * 6), tid)
+    return ut
+
+
+ELDRE = datetime(2026, 9, 20, 15, 40, tzinfo=timezone.utc)
+
+
+class TestSistHentet:
+    """Story 1.4c, FR-101: hvor gamle dataene er, per symbol."""
+
+    def test_raden_faar_symbolets_egen_tid(self):
+        kilde = lager_med_tider({"EQNR": ELDRE, "DNB": HENTET})
+
+        rader = {r.aksje.symbol: r for r in bygg_oversikt(kilde, (EQNR, DNB), KORT)}
+
+        assert rader["EQNR"].sist_hentet == ELDRE
+        assert rader["DNB"].sist_hentet == HENTET
+
+    def test_sidens_tidsstempel_er_det_eldste(self):
+        """Det nyeste ville faatt en side med en fersk rad og fjorten
+        foreldede til aa se fersk ut."""
+        kilde = lager_med_tider({"EQNR": HENTET, "DNB": ELDRE})
+
+        assert sidens_tidsstempel(bygg_oversikt(kilde, (EQNR, DNB), KORT)) == ELDRE
+
+    def test_alle_like_ferske_gir_den_felles_tiden_og_ingen_egne(self):
+        rader = bygg_oversikt(lager_med_tider({"EQNR": HENTET, "DNB": HENTET}), (EQNR, DNB), KORT)
+
+        assert sidens_tidsstempel(rader) == HENTET
+        assert eldre_enn_nyeste(rader) == set()
+
+    def test_bare_den_eldste_raden_viser_sin_egen_tid(self):
+        rader = bygg_oversikt(lager_med_tider({"EQNR": ELDRE, "DNB": HENTET}), (EQNR, DNB), KORT)
+
+        assert eldre_enn_nyeste(rader) == {"EQNR"}
+
+    def test_uten_rader_er_det_ingen_tid(self):
+        assert sidens_tidsstempel([]) is None
+        assert eldre_enn_nyeste([]) == set()
+
+
+class TestNorskTid:
+    """AD-20: UTC i modellen, Europe/Oslo foerst i visningen."""
+
+    def test_formatet(self):
+        tid = datetime(2026, 9, 24, 18, 5, tzinfo=timezone.utc)
+        assert norsk_tid(tid) == "2026-09-24 kl. 20.05"
+
+    def test_sommertid_over_midnatt(self):
+        """22.30 UTC er 00.30 neste dag i Oslo om sommeren. Datoen skifter."""
+        tid = datetime(2026, 9, 24, 22, 30, tzinfo=timezone.utc)
+        assert norsk_tid(tid) == "2026-09-25 kl. 00.30"
+
+    def test_vintertid(self):
+        """Etter 25.10 er Oslo en time foran UTC, ikke to. En fast +2 timer
+        ville gitt 2026-11-17 kl. 00.30 her."""
+        tid = datetime(2026, 11, 16, 22, 30, tzinfo=timezone.utc)
+        assert norsk_tid(tid) == "2026-11-16 kl. 23.30"
