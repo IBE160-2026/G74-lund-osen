@@ -2328,6 +2328,52 @@ Testene kjenner bare datoene noen gir dem.
 
 ---
 
+## 25.09.2026 – En henvisning er også en påstand
+
+Story 1.5 flyttet fillesingen ut av portmodulen `kursdata.py`, til
+`lagring_fil.py`, og oversettelsen fra EODHDs feltnavn til `eodhd.py`
+(`23af8db`, PR #3). Kvalitetssikringen hadde fem lag:
+
+| Lag | Utfall |
+|---|---|
+| Testsettet | 416 før, 427 etter, grønt lokalt og på GitHub før flettingen |
+| Kontrollregning på det låste øyeblikksbildet fra 24.09, før og etter | 15 av 15 rader, 15 av 15 detaljer og 16 av 16 sider like, også tidsstemplene |
+| Flyttingen, sammenlignet definisjon for definisjon | alt som ble flyttet, er likt |
+| Fem mutanter | alle fanget |
+| Tre gjennomganger av diffen | 13 funn: 3 rettet, 1 utsatt og 9 avvist |
+
+Nytt denne gangen: økta førte sjekksummen til kontrollregningsskriptet før
+flyttingen og kontrollerte den etterpå. At skriptet var uendret, står dermed
+ikke bare som en påstand.
+
+Mutanten der porten importerer en adapter, ga først en sirkulær import, og da sa
+ikke utfallet noe om vakten. Økta flyttet importen inn i en funksjon, og da
+feilet vakten alene. Det er lærdommen fra 23.09, «Et bredt utslag er ikke et
+bevis», brukt uten at vi ba om det.
+
+To funn kom før koden, da planen ble lest mot kildene. Etter gjennomgangen av
+1.4b ble en misvisende melding ført i `deferred-work.md`, med 1.5 som storyen
+der den skulle rettes. Planen for 1.4c sa at meldingen venter til 1.5, og svaret
+kl. 17:40, som rådet skrev, godtok det. Ingen hadde slått opp hva 1.5 gjør. Da
+rådet leste storyen for å skrive planbestillingen, viste det seg at 1.5 ikke
+bytter appen til SQLite. Planen for 1.5 fant så at ingen story sier at
+webserveren skal bytte til SQLite, og rådet så at det samme gjaldt skrivingen
+til basen. Begge står nå i innledningen til Epic 2 (`d9c4561`).
+
+Det andre funnet: planen lot oversetteren bli i portmodulen, der 1.4a hadde lagt
+den, selv om AD-19 sier at adapteren oversetter fra kildens feltnavn. Vi ba om
+at den flyttet, og lot økta velge hvor. Den valgte en egen modul, med en grunn
+vi ikke hadde sett: hentekommandoen i Epic 2 skal oversette API-svaret, og måtte
+ellers ha importert filadapteren.
+
+Gjennomgangene var KI-agenter i bmad-build. Instruksjonene kl. 17:40, 19:22,
+19:42 og 20:03 ble skrevet av rådet og limt inn av oss. Vår del var å avgjøre at
+1.5 skulle forbli en ren flytting, å godta tilleggene og å si ja til flettingen.
+
+Henvisningen sto i tre dokumenter før noen slo opp hva 1.5 gjør.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
