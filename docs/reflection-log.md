@@ -2209,6 +2209,22 @@ gikk foran planen. Fra 1.4a følger byggingen sprintstatusen.
 
 ---
 
+## 25.09.2026 – Felles arbeid, felles commits
+
+Vi diskuterer og avgjør arbeidet sammen, og det meste skrives inn på én maskin.
+Git fører hver commit på den som committer. Derfor sto nesten hele historikken
+på én av oss, også det vi hadde gjort sammen.
+
+Fra i dag får felles commits en linje `Co-authored-by` for den som ikke
+committet (regel 20 i `CLAUDE.md`). Linjen betyr at begge har vært med på det
+som committes. Det som gjøres alene, får den ikke. Commitene før 25.09 har ikke
+linjen, og historikken skrives ikke om.
+
+Den som committer, er ikke alltid den som har bidratt. Git viser bare den som
+committer, så felles arbeid må merkes i selve commiten.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
