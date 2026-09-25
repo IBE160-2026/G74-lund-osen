@@ -27,12 +27,13 @@ den som committet.
 
 - **Product Brief** — [`_bmad-output/planning-artifacts/product-brief.md`](_bmad-output/planning-artifacts/product-brief.md). Arbeidskrav på 1–2 sider, innleveringsfrist søndag 27.09.2026.
 - **PRD med krav, begrunnelser og målinger** — [`_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/`](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/)
+- **Relevanseksperimentet** — [`_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/relevanseksperiment.md`](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/relevanseksperiment.md), med kriteriene som ble satt før innsamlingen, og innsamlingen 25.09
 - **Arkitektur** — [`_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md`](_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md)
 - **Epics og stories** — [`_bmad-output/planning-artifacts/epics.md`](_bmad-output/planning-artifacts/epics.md)
 - **Sprintstatus og story-spesifikasjoner** — [`_bmad-output/implementation-artifacts/`](_bmad-output/implementation-artifacts/)
-- **Kilder og bruksvilkår** — [`docs/kilder-og-rettigheter.md`](docs/kilder-og-rettigheter.md), med hva hver datakilde tillater og når det sist ble kontrollert
+- **Kilder og bruksvilkår** — [`docs/kilder-og-rettigheter.md`](docs/kilder-og-rettigheter.md), med hva hver datakilde tillater og når det sist ble kontrollert. Forespørslene til EODHD og Euronext står i [`docs/epost-til-eodhd.md`](docs/epost-til-eodhd.md) og [`docs/epost-til-euronext.md`](docs/epost-til-euronext.md)
 - **Leveranseliste** — [`docs/innlevering.md`](docs/innlevering.md), med hva som skal leveres, og hvor det står
-- **Kontrollrapport 22.09** — [`docs/kontroll-2026-09-22.md`](docs/kontroll-2026-09-22.md)
+- **Kontrollrapport 22.09** — [`docs/kontroll-2026-09-22.md`](docs/kontroll-2026-09-22.md), med rettingsplanen i [`docs/kontroll-2026-09-22-plan.md`](docs/kontroll-2026-09-22-plan.md)
 - **Refleksjonslogg og lagrede KI-prompts** — [`docs/reflection-log.md`](docs/reflection-log.md) og [`docs/ai-prompts/`](docs/ai-prompts/)
 
 ## Mappestruktur
