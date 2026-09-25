@@ -29,6 +29,7 @@
     td.selskap { font-weight: 500; }
     td.selskap a { color: inherit; text-decoration: none; }
     td.selskap a:hover, td.selskap a:focus { text-decoration: underline; }
+    td.selskap .hentet { display: block; font-weight: normal; color: var(--dempet); font-size: 0.8rem; }
 
     /* FR-103: tekst, symbol og farge samtidig. Teksten baerer alene hvis
        fargen faller bort, og symbolet staar ved siden av teksten - ikke
@@ -67,7 +68,7 @@
       <tbody>
         {% for rad in rader %}
           <tr {% if rad.skiller_seg_ut %}class="utslag"{% endif %}>
-            <td class="selskap"><a href="/aksje/{{ rad.aksje.symbol }}">{{ rad.aksje.navn }}</a>{% if rad.aksje.symbol in eget %}<span class="hentet"><br><small>hentet {{ rad.sist_hentet|norsk_tid }}</small></span>{% endif %}</td>
+            <td class="selskap"><a href="/aksje/{{ rad.aksje.symbol }}">{{ rad.aksje.navn }}</a>{% if rad.aksje.symbol in eget %}<span class="hentet">hentet {{ rad.sist_hentet|norsk_tid }}</span>{% endif %}</td>
 
             <td class="tall">{{ "%.2f"|format(rad.sluttkurs) }}</td>
 

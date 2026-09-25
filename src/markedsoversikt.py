@@ -76,7 +76,9 @@ class Rad:
     aksje ikke skal stoppe hovedflyten.
 
     sist_hentet er naar symbolets serie sist ble hentet, i UTC (AD-20), slik
-    Kursleser gir den. bygg_oversikt setter den alltid; den er None bare naar
+    Kursleser gir den. Paa en rad fra bygg_oversikt er den aldri None, og det
+    er lesekontrakten som sikrer det: sist_hentet(s) er None hvis og bare hvis
+    serie(s) er tom, og en tom serie gir ingen rad. None er den bare naar
     bygg_rad kalles uten tid.
     """
 
