@@ -77,7 +77,7 @@ context:
 - [x] `src/markedsoversikt.py`, `src/app.py`, `src/templates/index.html` og `aksje.html` -- `sist_hentet` inn, norsk tid -- FR-101, AD-15, AD-20
 - [x] `tests/test_kursdata.py`, `tests/test_kurslager.py`, `tests/test_konsumentene.py` -- testene for `Kurskilde` og `MinneKilde` ut
 - [x] `tests/test_markedsoversikt.py`, `tests/test_app.py` -- nye tester for matrisen over: eldste vinner, eget tidsstempel på den eldste raden og ikke på den ferske, fem kolonner, norsk tid over midnatt og i vintertid, og detaljens tidsstempel
-- [ ] Etter flettingen, på `main`: spinen, `epics.md` og arkitekturmemloggen merker AD-3-bruddet lukket med squash-commiten. Egen commit
+- [x] Etter flettingen, på `main`: spinen, `epics.md` og arkitekturmemloggen merker AD-3-bruddet lukket med squash-commiten. Egen commit (`cd97164`)
 
 **Acceptance Criteria:**
 - Given hele testsettet, when det kjøres før og etter, then er begge grønne, og tallene står i commit-meldingen
