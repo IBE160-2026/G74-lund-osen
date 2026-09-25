@@ -324,6 +324,8 @@ papirarbeid og en port, og de trengs i både plan A og plan B.
   prøves i sin helhet mot en minneimplementasjon, slik `MinneKilde` alt gjør i
   35 testreferanser over fire testfiler. Bare **SQLite-adapteren** trenger
   databasen. To av Epic 4s tre deler kan derfor kjøre parallelt med Epic 1.
+  *Rettet 2026-09-25:* `MinneKilde` ble fjernet i story 1.4c. `MinneKurslager`
+  viser det samme i dag: porten `Kurslager` prøves mot den i minnet.
 - **Epic 5 etter både Epic 4.1 og Epic 6.** Se avhengighetsvarselet under.
 - **Epic 8.1 rett etter Epic 2, ikke etter Epic 3.** Brukertesten trenger ekte
   data og begge skjermbildene, ikke Docker. Den kan kjøres på vår egen maskin.
@@ -867,6 +869,15 @@ epicen:
    hentekommandoen kjøres**, når dagens kurs ikke var publisert kl. 19:04? Ført
    som **åpent punkt 23** i `prd.md`, med frist før story 2.1.
 
+*Lagt til 2026-09-25, fra planen for 1.5:* Ingen story i Epic 2 har som
+kontrollpunkt at hentekommandoen skriver kursene til basen gjennom
+`Kurslager`, eller at webserveren leser dem derfra i stedet for fra
+øyeblikksbildet. Skrivingen er forutsatt i 2.5 («Én kjøring skriver kurser
+**og** vurderinger»), og lesingen i 2.2 («også når basen er tom», «hvordan
+webserveren åpner basen»). Når Epic 2 planlegges, avgjøres det om de to blir
+egne stories. Meldingen «Ingen kursdata funnet i `data/`» i `deferred-work.md`
+hører til lesingen.
+
 ### Story 2.1: Børsdag i Oslo, tidsstempel i UTC
 
 Som **utvikler**, vil jeg at «dagen» betyr én ting, så to verdier ikke kan være
@@ -1029,7 +1040,10 @@ skjermbildene med ekte data ved å følge README alene.
   henting av de 15 symbolene), `.env` fra `.env.example`, bygging av imaget, og
   de to kommandoene — webserveren og hentingen
 - **Avsnittet «Kom i gang» erstattes helt,** ikke utvides. Det sier i dag
-  «Applikasjonen leser bare fra `data/`», som blir usant etter 1.4 og 1.5
+  «Applikasjonen leser bare fra `data/`», som blir usant etter 1.4 og 1.5.
+  *Rettet 2026-09-25:* setningen blir usann først når webserveren leser fra
+  basen, som etter spinen skal ligge i `db/ose.db`. 1.4 og 1.5 endrer ikke
+  hvor appen leser fra
 - **Den tomme siden sier hvordan man henter, med samme kommando som README.**
   I dag sier den «Ingen kursdata funnet i `data/`. Kjør
   `uv run python src/fetch_prices.py` først» (`index.html:110–114`). Etter
