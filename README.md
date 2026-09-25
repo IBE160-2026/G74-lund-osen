@@ -20,8 +20,8 @@ Hva som er bygget så langt, står i sprintstatusen, `_bmad-output/implementatio
 Vi diskuterer og avgjør arbeidet sammen, og det meste skrives inn på én maskin.
 Fra 25.09 har felles commits en linje `Co-authored-by` for den av oss som ikke
 committet (regel 20 i `CLAUDE.md`). Skriver Joakim selv på den maskinen, står
-han som forfatter og Marian som medforfatter. Commitene før det står bare på den
-som committet.
+han som forfatter og Marian som medforfatter. Commitene før 25.09 står bare på
+den som committet.
 
 ## Dokumentene
 
