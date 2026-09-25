@@ -2,7 +2,7 @@
 title: 'Story 1.4c: Rydding — Kurskilde ut, sist_hentet inn'
 type: 'refactor'
 created: '2026-09-25'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'fcc48f95b9f8e3a86abc6f0381da37b049e61df9'
