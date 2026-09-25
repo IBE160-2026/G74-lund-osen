@@ -1626,3 +1626,11 @@ merket for hånd, så del 2 har noe å kjøre KI-klassifiseringen mot.
   er utvalget tilpasset det som ble funnet
 
 **Én økt:** nei. Merkingen tar tid.
+
+*Endret 2026-09-25:* kontrollen med to tickere i den første forespørselen er
+byttet ut. Den måler hva en forespørsel med flere tickere koster, og det
+trenger vi ikke når hvert selskap hentes for seg. Prisen for én ticker er målt:
+5 kall (`malinger.md` §7.2). I stedet leses `/api/user` før og etter hver
+forespørsel, og koster en forespørsel noe annet enn 5 kall, stopper vi før
+neste. Budsjettet er åtte forespørsler, ~40 kall. Se
+`prds/prd-G74-lund-osen-2026-09-20/relevanseksperiment.md` §2.
