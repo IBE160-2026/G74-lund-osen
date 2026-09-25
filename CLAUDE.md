@@ -84,12 +84,18 @@ et sitat som ikke fantes».
     trenger ikke egen linje. Endres koden slik at noe README-en sier om den,
     ikke lenger stemmer, rettes README-en i samme commit. `tests/test_readme.py`
     sjekker at hver lenke i README-en peker på noe som finnes.
-20. **Felles arbeid står på begge.** Vi diskuterer og avgjør arbeidet sammen,
-    og det meste skrives inn på én maskin. Hver commit får derfor den av oss
-    som ikke committer, som medforfatter. Linjen står nederst i meldingen, i
-    samme blokk som Claude-linjen. Er `git config user.name` Marian Osen:
-    `Co-authored-by: Joakim Lund <joakim.lund@himolde.no>`. Er den Joakim
-    Lund: `Co-authored-by: Marian Osen <marian.osen@himolde.no>`. Linjen
-    betyr at begge har vært med på det som committes. Sier brukeren at noe er
-    gjort alene, får de commitene ikke linjen. Commitene før 2026-09-25 har
-    den ikke, og historikken skrives ikke om (regel 7).
+20. **Felles arbeid står på begge.** Vi diskuterer og avgjør arbeidet sammen, og
+    det meste skrives inn på én maskin. Hver commit får derfor den av oss som
+    ikke committer, som medforfatter. Linjen står nederst i meldingen, i samme
+    blokk som Claude-linjen. Er `git config user.name` Marian Osen:
+    `Co-authored-by: Joakim Lund <joakim.lund@himolde.no>`. Er den Joakim Lund:
+    `Co-authored-by: Marian Osen <marian.osen@himolde.no>`. Skriver Joakim selv
+    på Marians maskin, og det står i instruksjonen, committes det med
+    `--author="Joakim Lund <joakim.lund@himolde.no>"` og
+    `Co-authored-by: Marian Osen <marian.osen@himolde.no>`. Da står den som
+    skrev, som forfatter. Tilfellet bak: `b4cb9f2` ble ført av Joakim 25.09, men
+    står med Marian som forfatter, fordi git-brukeren på maskinen er hennes. Den
+    skrives ikke om (regel 7). Instruksjonen kl. 22:27 i dagsfila viser at
+    Joakim førte den. Linjen betyr at begge har vært med på det som committes.
+    Sier brukeren at noe er gjort alene, får de commitene ikke linjen. Commitene
+    før 2026-09-25 har den ikke, og historikken skrives ikke om (regel 7).
