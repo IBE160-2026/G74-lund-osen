@@ -5,39 +5,34 @@ nettleseroppdatering kan ikke bruke av kvoten. Nye kurser hentes ved
 aa kjoere fetch_prices.py.
 
 Alt av regning ligger i markedsoversikt.py og aksjedetalj.py, og de leser
-Kursrad gjennom Kursleser (AD-3, AD-19). Denne fila velger bare hvilket
-oeyeblikksbilde som skal brukes, pakker det i en SnapshotLeser og sender
-resultatet til malen. Tidsstemplene er sist_hentet per symbol fra
-Kursleser, i UTC, og blir norsk tid foerst i malen (filteret norsk_tid,
-AD-20). Sidens tidsstempel er det eldste blant radene som vises (story 1.4c).
+Kursrad gjennom Kursleser (AD-3, AD-19). Denne fila henter en Kursleser fra
+filadapteren (lagring_fil.nyeste_leser) og sender resultatet til malen. Hvilket
+oeyeblikksbilde som leses, avgjoeres der, ikke her (story 1.5).
+Tidsstemplene er sist_hentet per symbol fra Kursleser, i UTC, og blir norsk
+tid foerst i malen (filteret norsk_tid, AD-20). Sidens tidsstempel er det
+eldste blant radene som vises (story 1.4c).
 """
 
 from flask import Flask, abort, render_template
 
 from aksjedetalj import bygg_detalj, finn_aksje
 from graf import bygg_graf
-from kursdata import AKSJEUNIVERS, Kursleser, SnapshotKilde, SnapshotLeser, nyeste_snapshot
+from kursdata import AKSJEUNIVERS, Kursleser
+from lagring_fil import nyeste_leser
 from markedsoversikt import bygg_oversikt, eldre_enn_nyeste, norsk_tid, sidens_tidsstempel
 
 app = Flask(__name__)
 app.jinja_env.filters["norsk_tid"] = norsk_tid
 
 
-def hent_kilde() -> SnapshotKilde | None:
-    """Nyeste oeyeblikksbilde i data/, eller None hvis ingen finnes."""
-    fil = nyeste_snapshot()
-    return SnapshotKilde.fra_fil(fil) if fil else None
-
-
 def hent_leser() -> Kursleser | None:
     """Kursleseren sidene leser gjennom, eller None hvis ingen data finnes.
 
-    Pakker hent_kilde() i en SnapshotLeser. Egen funksjon, saa en test kan
+    Kursleseren kommer fra filadapteren. Egen funksjon, saa en test kan
     montere en hvilken som helst Kursleser, for eksempel et MinneKurslager
     med ulike tider per symbol.
     """
-    kilde = hent_kilde()
-    return SnapshotLeser(kilde) if kilde is not None else None
+    return nyeste_leser()
 
 
 @app.route("/")

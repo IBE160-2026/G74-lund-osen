@@ -8,12 +8,15 @@ tidsstemplene monterer i stedet et MinneKurslager bak hent_leser, fordi et
 oeyeblikksbilde har samme tid for alle symbolene.
 """
 
+import json
 from datetime import date, datetime, timedelta, timezone
 
 import pytest
 
 import app as app_modul
-from kursdata import Kursrad, MinneKurslager, SnapshotKilde
+import lagring_fil
+from kursdata import Kursleser, Kursrad, MinneKurslager
+from lagring_fil import SnapshotKilde, SnapshotLeser
 
 HENTET = "2026-09-21T15:40:00+00:00"
 
@@ -61,7 +64,10 @@ def snapshot(serier: dict[str, list], hentet: str | None = HENTET) -> SnapshotKi
 
 
 def monter(monkeypatch, kilde):
-    monkeypatch.setattr(app_modul, "hent_kilde", lambda: kilde)
+    """Oeyeblikksbildet i en SnapshotLeser bak hent_leser, slik filadapteren
+    gir det. None monterer ingen data, som en tom data/."""
+    leser = SnapshotLeser(kilde) if kilde is not None else None
+    monkeypatch.setattr(app_modul, "hent_leser", lambda: leser)
 
 
 def monter_lager(monkeypatch, tider: dict[str, datetime]):
@@ -377,3 +383,27 @@ class TestAksjedetalj:
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
 
         assert 'href="/"' in html
+
+
+class TestHentLeser:
+    """hent_leser uten montering: Kursleseren kommer fra filadapteren (1.5).
+
+    DATA_KATALOG i lagring_fil pekes mot tmp_path, saa data/ ikke roeres.
+    """
+
+    def test_gir_kursleser_fra_en_katalog_med_en_fil(self, monkeypatch, tmp_path):
+        (tmp_path / "kurser-raa-2026-09-21.json").write_text(
+            json.dumps({"hentet": HENTET, "serier": {"EQNR": [eodhd(r) for r in serie([100.0])]}}),
+            encoding="utf-8",
+        )
+        monkeypatch.setattr(lagring_fil, "DATA_KATALOG", tmp_path)
+
+        leser = app_modul.hent_leser()
+
+        assert isinstance(leser, Kursleser)
+        assert len(leser.serie("EQNR")) == 1
+
+    def test_gir_none_fra_en_tom_katalog(self, monkeypatch, tmp_path):
+        monkeypatch.setattr(lagring_fil, "DATA_KATALOG", tmp_path)
+
+        assert app_modul.hent_leser() is None

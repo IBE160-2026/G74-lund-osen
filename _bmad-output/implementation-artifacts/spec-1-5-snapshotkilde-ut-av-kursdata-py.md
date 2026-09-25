@@ -2,9 +2,10 @@
 title: 'Story 1.5: SnapshotKilde ut av kursdata.py'
 type: 'refactor'
 created: '2026-09-25'
-status: 'ready-for-dev'
+status: 'in-progress'
 route: 'dispatch'
 review_loop_iteration: 0
+baseline_commit: 'b0243b61533ac917a863ba19a19700f42d605bc7'
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/epic-1-context.md'
   - '{project-root}/CLAUDE.md'
@@ -66,11 +67,11 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `data/kontrollregning_1_5.py` (ikke i repoet) -- bygger på `kontrollregning_1_4c.py`, men monterer `app.hent_leser`, som finnes både før og etter, og importerer `SnapshotKilde` og `SnapshotLeser` fra `lagring_fil` med `kursdata` som reserve. Da kjører samme skript uendret før og etter. Sammenligningen krever at alt er likt, uten å ta ut noe. Kjøres før første kodeendring
-- [ ] `src/lagring_fil.py`, `src/eodhd.py`, `src/kursdata.py` -- flyttingen -- AD-1, AD-6, AD-19
-- [ ] `src/app.py`, `src/fetch_prices.py` -- importene og `hent_leser` -- AD-2, AD-3
-- [ ] Testene over -- importene rettes, og filtestene flyttes til `tests/test_lagring_fil.py`
-- [ ] Nye vakter: `kursdata.py` importerer verken `json`, `pathlib`, `lagring_fil`, `lagring_sqlite` eller `eodhd` (AST), og vakten mot EODHD-feltnavn dekker `kursdata.py`. `app.py` kaller ikke `nyeste_snapshot` og importerer den ikke. `app.hent_leser()` gir en `Kursleser` fra en katalog med en fil, og `None` fra en tom katalog
+- [x] `data/kontrollregning_1_5.py` (ikke i repoet) -- bygger på `kontrollregning_1_4c.py`, men monterer `app.hent_leser`, som finnes både før og etter, og importerer `SnapshotKilde` og `SnapshotLeser` fra `lagring_fil` med `kursdata` som reserve. Da kjører samme skript uendret før og etter. Sammenligningen krever at alt er likt, uten å ta ut noe. Kjøres før første kodeendring
+- [x] `src/lagring_fil.py`, `src/eodhd.py`, `src/kursdata.py` -- flyttingen -- AD-1, AD-6, AD-19
+- [x] `src/app.py`, `src/fetch_prices.py` -- importene og `hent_leser` -- AD-2, AD-3
+- [x] Testene over -- importene rettes, og filtestene flyttes til `tests/test_lagring_fil.py`
+- [x] Nye vakter: `kursdata.py` importerer verken `json`, `pathlib`, `lagring_fil`, `lagring_sqlite` eller `eodhd` (AST), og vakten mot EODHD-feltnavn dekker `kursdata.py`. `app.py` kaller ikke `nyeste_snapshot` og importerer den ikke. `app.hent_leser()` gir en `Kursleser` fra en katalog med en fil, og `None` fra en tom katalog
 - [ ] Etter flettingen, på `main`: spinen og `epics.md` merker bruddet lukket med squash-commiten, og spinens lagtabell får `lagring_fil.py` i skallet. Egen commit
 
 **Acceptance Criteria:**
@@ -82,6 +83,13 @@ context:
 - Given `grep -nE "^import (json|re)|pathlib|adjusted_close" src/kursdata.py`, when det kjøres, then er det ingen treff
 
 ## Implementation Notes
+
+- Kontrollregningen før er kjørt på grenen før første kodeendring (`data/kontrollregning-1-5-foer.json`, 15 rader, 15 detaljer, 16 sider med 200). Skriptet `data/kontrollregning_1_5.py` har sha256 som begynner på `4eb4a0a6966d15bc`. Verken skriptet eller før-fila skal endres eller kjøres på nytt med `--foer`; etter flyttingen kjøres bare `--etter` og `--sammenlign`.
+- `lagring_fil.nyeste_leser(katalog=None)` er den ene nye funksjonen. Uten argument leses `DATA_KATALOG` ved kallet, så en test kan peke den mot en annen katalog. `app.hent_leser()` returnerer den.
+- Alt som flyttet, er likt definisjon for definisjon (sammenlignet med `ast.get_source_segment` mot `b0243b6`). Eneste endring i det som ble igjen: `Kurslager`-docstringen sier «den justerte kursen» i stedet for `adjusted_close`, så vakten mot EODHD-feltnavn kan dekke `kursdata.py`.
+- Testtall: 416 før, 424 etter. Filtestene er flyttet til `tests/test_lagring_fil.py`.
+- Kontrollregningen etter, med samme skript (sha256 `4eb4a0a6966d15bc…`, uendret): 15 av 15 rader, 15 av 15 detaljer og 16 av 16 sider like, rekkefølgen lik. Ingenting tatt ut av sammenligningen.
+- Mutanter: `max` over `(dato, sti)` (2 feiler), `app.py` kaller `nyeste_snapshot()` (3), `"adjusted_close"` i `kursdata.py` (2), `kursdata.py` importerer en adapter (vakten `test_porten_importerer_verken_io_eller_adapter` feiler; en import på modulnivå gir i tillegg sirkulær import). Alle fanget.
 
 ## Spec Change Log
 

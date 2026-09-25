@@ -11,7 +11,8 @@ from datetime import date
 import pytest
 
 import fetch_prices as fp
-from kursdata import AKSJEUNIVERS, SnapshotKilde, nyeste_snapshot
+from kursdata import AKSJEUNIVERS
+from lagring_fil import SnapshotKilde, nyeste_snapshot
 
 
 def falsk_serie(dager: int = 60):

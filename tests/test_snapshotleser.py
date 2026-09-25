@@ -14,15 +14,9 @@ from datetime import date, datetime, timedelta, timezone
 
 import pytest
 
-from kursdata import (
-    Kursleser,
-    Kurslager,
-    Kursrad,
-    SnapshotKilde,
-    SnapshotLeser,
-    UgyldigKursrad,
-    kursrad_fra_eodhd,
-)
+from eodhd import kursrad_fra_eodhd
+from kursdata import Kursleser, Kurslager, Kursrad, UgyldigKursrad
+from lagring_fil import SnapshotKilde, SnapshotLeser
 
 HENTET = datetime(2026, 9, 23, 17, 4, 11, tzinfo=timezone.utc)
 

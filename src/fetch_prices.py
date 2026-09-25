@@ -12,7 +12,7 @@ kan regnes. Aa hente kort ville derfor kostet like mye og gitt en tom
 signalkolonne.
 
 Resultatet skrives som et tidsstemplet oeyeblikksbilde som aldri skrives om
-(FR-406, NFR-07), i samme format som kursdata.SnapshotKilde leser.
+(FR-406, NFR-07), i samme format som lagring_fil.SnapshotKilde leser.
 """
 
 import json
@@ -26,7 +26,8 @@ from typing import Callable
 import requests
 from dotenv import load_dotenv
 
-from kursdata import AKSJEUNIVERS, DATA_KATALOG, KURSPREFIKS, PROSJEKTROT
+from kursdata import AKSJEUNIVERS
+from lagring_fil import DATA_KATALOG, KURSPREFIKS, PROSJEKTROT
 
 BASE_URL = "https://eodhd.com/api/eod"
 
@@ -121,7 +122,7 @@ def hent_universet(
 
 
 def lag_oyeblikksbilde(resultat: Resultat, fra: str, til: str, naa: str) -> dict:
-    """Formatet kursdata.SnapshotKilde leser. Skrives aldri om etterpaa."""
+    """Formatet lagring_fil.SnapshotKilde leser. Skrives aldri om etterpaa."""
     return {
         "hentet": naa,
         "from": fra,
@@ -135,7 +136,7 @@ def lag_oyeblikksbilde(resultat: Resultat, fra: str, til: str, naa: str) -> dict
 def filnavn(i_dag: date | None = None) -> str:
     """Datoen staar i navnet, saa oeyeblikksbilder aldri overskriver hverandre.
 
-    Prefikset kommer fra kursdata og skrives ikke av her. nyeste_snapshot lar
+    Prefikset kommer fra lagring_fil og skrives ikke av her. nyeste_snapshot lar
     nettopp dette prefikset vinne ved lik dato, saa de to maa ikke kunne gli
     fra hverandre.
     """
