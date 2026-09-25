@@ -2,7 +2,7 @@
 title: "Relevanseksperimentet — kriteriene for del 1"
 status: aktiv
 created: 2026-09-25
-updated: 2026-09-25T12:57
+updated: 2026-09-25T13:03
 ---
 
 # Relevanseksperimentet — kriteriene for del 1
@@ -118,3 +118,44 @@ er treffsikkerheten til symbolmatchingen. I tillegg føres:
 
 **Del 2:** verdiene fra KI-en sammenlignes med den endelige verdien vår, både
 på de tre nivåene og som relevant eller ikke relevant.
+
+## 6. Innsamlingen 25.09
+
+**Tid:** 2026-09-25, kl. 13:02 lokal tid (11:02:24–11:02:48 UTC). Åtte
+forespørsler mot `/api/news`, én per selskap, i rekkefølgen i §1. `/api/user`
+ble lest før og etter hver av dem.
+
+**Kall.** Hver forespørsel kostet **5 kall**, også DNB med `limit=20`. En
+høyere `limit` kostet altså ikke mer. Til sammen **40 kall**: 20 fra
+dagskvoten og 20 fra bonuskvoten.
+
+| | `apiRequests` | `apiRequestsDate` | `extraLimit` |
+|---|---:|---|---:|
+| Før første forespørsel | 15 (gårsdagens, altså 0 i dag) | 2026-09-24 | 484 |
+| Etter siste forespørsel | 20 | 2026-09-25 | 464 |
+
+**Per selskap.** Hver artikkel er telt under én grunn, i denne rekkefølgen:
+uten tekst, dublett, og for DNB blant de ti fra 21.09. Av resten ble de seks
+nyeste brukt.
+
+| Selskap | Hentet | Uten tekst | Dublett | Fra 21.09 | Utenfor de seks nyeste | Brukt | Datospenn for de brukte |
+|---|---:|---:|---:|---:|---:|---:|---|
+| EQNR | 10 | 0 | 0 | — | 4 | 6 | 2026-09-21 – 2026-09-24 |
+| DNB | 20 | 0 | 2 | 10 | 2 | 6 | 2026-05-04 – 2026-06-04 |
+| KOG | 10 | 0 | 0 | — | 4 | 6 | 2026-05-19 – 2026-08-07 |
+| NHY | 10 | 0 | 0 | — | 4 | 6 | 2026-08-13 – 2026-09-23 |
+| FRO | 10 | 0 | 0 | — | 4 | 6 | 2026-09-15 – 2026-09-23 |
+| TEL | 10 | 0 | 0 | — | 4 | 6 | 2026-05-28 – 2026-07-16 |
+| MOWI | 10 | 0 | 0 | — | 4 | 6 | 2026-06-19 – 2026-08-31 |
+| ORK | 10 | 0 | 0 | — | 4 | 6 | 2026-05-21 – 2026-08-21 |
+| **Sum** | **90** | **0** | **2** | **10** | **30** | **48** | |
+
+Alle åtte fikk seks artikler, så ingen selskaper har færre. Det gir **48 par**.
+
+Alle de ti DNB-artiklene fra 21.09 kom med i svaret og ble tatt ut. De er
+datert 2026-06-07 til 2026-09-11 (`malinger.md` §7.2), og EODHD hadde ingen
+nyere DNB-artikler 25.09. De seks som ble brukt, er derfor eldre enn alle de
+ti, og DNBs datospenn slutter før alle de andre selskapenes.
+
+Artiklene, utvalget, tekstene, nøkkelen og de to tomme merkefilene ligger bare
+i `data/`. Frøet for blandingen står i utvalgsfila der.
