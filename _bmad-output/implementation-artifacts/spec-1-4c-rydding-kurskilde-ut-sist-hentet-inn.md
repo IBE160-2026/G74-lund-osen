@@ -2,9 +2,10 @@
 title: 'Story 1.4c: Rydding — Kurskilde ut, sist_hentet inn'
 type: 'refactor'
 created: '2026-09-25'
-status: 'ready-for-dev'
+status: 'in-progress'
 route: 'dispatch'
 review_loop_iteration: 0
+baseline_commit: 'fcc48f95b9f8e3a86abc6f0381da37b049e61df9'
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/epic-1-context.md'
   - '{project-root}/CLAUDE.md'
@@ -71,11 +72,11 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `data/kontrollregning_1_4c.py` (ikke i repoet) -- kopi av `kontrollregning_1_4b.py` som bruker `SnapshotLeser` både før og etter, og skriver `-1-4c-foer.json` og `-1-4c-etter.json`. Sammenligningen skriver antall like to ganger: med alt, og med tidsstemplene tatt ut (feltet `sist_hentet` og «data hentet …» og radtidsstempelet i HTML-en). Kjøres før første kodeendring
-- [ ] `src/kursdata.py` -- `Kurskilde` og `MinneKilde` ut, docstringene rettet -- AD-3
-- [ ] `src/markedsoversikt.py`, `src/app.py`, `src/templates/index.html` og `aksje.html` -- `sist_hentet` inn, norsk tid -- FR-101, AD-15, AD-20
-- [ ] `tests/test_kursdata.py`, `tests/test_kurslager.py`, `tests/test_konsumentene.py` -- testene for `Kurskilde` og `MinneKilde` ut
-- [ ] `tests/test_markedsoversikt.py`, `tests/test_app.py` -- nye tester for matrisen over: eldste vinner, eget tidsstempel på den eldste raden og ikke på den ferske, fem kolonner, norsk tid over midnatt og i vintertid, og detaljens tidsstempel
+- [x] `data/kontrollregning_1_4c.py` (ikke i repoet) -- kopi av `kontrollregning_1_4b.py` som bruker `SnapshotLeser` både før og etter, og skriver `-1-4c-foer.json` og `-1-4c-etter.json`. Sammenligningen skriver antall like to ganger: med alt, og med tidsstemplene tatt ut (feltet `sist_hentet` og «data hentet …» og radtidsstempelet i HTML-en). Kjøres før første kodeendring
+- [x] `src/kursdata.py` -- `Kurskilde` og `MinneKilde` ut, docstringene rettet -- AD-3
+- [x] `src/markedsoversikt.py`, `src/app.py`, `src/templates/index.html` og `aksje.html` -- `sist_hentet` inn, norsk tid -- FR-101, AD-15, AD-20
+- [x] `tests/test_kursdata.py`, `tests/test_kurslager.py`, `tests/test_konsumentene.py` -- testene for `Kurskilde` og `MinneKilde` ut
+- [x] `tests/test_markedsoversikt.py`, `tests/test_app.py` -- nye tester for matrisen over: eldste vinner, eget tidsstempel på den eldste raden og ikke på den ferske, fem kolonner, norsk tid over midnatt og i vintertid, og detaljens tidsstempel
 - [ ] Etter flettingen, på `main`: spinen, `epics.md` og arkitekturmemloggen merker AD-3-bruddet lukket med squash-commiten. Egen commit
 
 **Acceptance Criteria:**
@@ -85,6 +86,13 @@ context:
 - Given `grep -rn "Kurskilde\|MinneKilde\|TestKurskildeErPaaVeiUt" src tests`, when det kjøres, then er det ingen treff
 
 ## Implementation Notes
+
+- `Rad.sist_hentet` er `datetime | None = None`, ikke `datetime`, så `bygg_rad` kan kalles uten tid i de eldre testene. `bygg_oversikt` setter den alltid.
+- Nye rene funksjoner i `markedsoversikt.py`: `sidens_tidsstempel` (eldste), `eldre_enn_nyeste` (symbolene som viser egen tid) og `norsk_tid` (`ZoneInfo("Europe/Oslo")`), som `app.py` registrerer som Jinja-filter.
+- Radens tid står som `<span class="hentet"><br><small>hentet …</small></span>` i `td.selskap`, uten ny CSS.
+- Testtall: 408 før, 416 etter (8 fjernet, 16 nye).
+- Kontrollregningen mot `kurser-raa-2026-09-24.json`: med alt er 0 av 15 rader, 15 av 15 detaljer og 0 av 16 sider like. Uten tidsstemplene er 15 av 15, 15 av 15 og 16 av 16 like, og rekkefølgen er lik. Ingen rad viser egen tid på ekte data.
+- Mutanter, én om gangen: sidens tid er den nyeste (2 feiler), UTC i stedet for norsk tid (11), radens tid vises aldri (1), fast +2 timer (3). Alle fanget.
 
 ## Spec Change Log
 

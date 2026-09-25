@@ -65,7 +65,7 @@
   <h1>{{ detalj.aksje.navn }}</h1>
   <p class="meta">
     {{ detalj.aksje.ticker }} · {{ detalj.aksje.sektor }} · {{ detalj.dato }}
-    {% if hentet %}· data hentet {{ hentet[:10] }}{% endif %}
+    {% if hentet %}· data hentet {{ hentet|norsk_tid }}{% endif %}
   </p>
 
   <div class="sammendrag">

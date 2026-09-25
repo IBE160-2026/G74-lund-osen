@@ -51,7 +51,7 @@
   {% if rader %}
     <p class="meta">
       Oslo Børs · {{ rader[0].dato }} · {{ rader|length }} aksjer
-      {% if hentet %}· data hentet {{ hentet[:10] }}{% endif %}
+      {% if hentet %}· data hentet {{ hentet|norsk_tid }}{% endif %}
     </p>
 
     <table>
@@ -67,7 +67,7 @@
       <tbody>
         {% for rad in rader %}
           <tr {% if rad.skiller_seg_ut %}class="utslag"{% endif %}>
-            <td class="selskap"><a href="/aksje/{{ rad.aksje.symbol }}">{{ rad.aksje.navn }}</a></td>
+            <td class="selskap"><a href="/aksje/{{ rad.aksje.symbol }}">{{ rad.aksje.navn }}</a>{% if rad.aksje.symbol in eget %}<span class="hentet"><br><small>hentet {{ rad.sist_hentet|norsk_tid }}</small></span>{% endif %}</td>
 
             <td class="tall">{{ "%.2f"|format(rad.sluttkurs) }}</td>
 

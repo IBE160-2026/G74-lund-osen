@@ -11,23 +11,16 @@ Kursrad er raden porten gir ut: norske feltnavn, og ingen av dem kan mangle.
 Poenget er at en feilstavet noekkel blir en feil der dataene kommer inn, i
 stedet for en None som forplanter seg inn i signalberegningen som et tall som
 mangler.
-
-Kurslager staar ved siden av Kurskilde til story 1.4. Det er et brudd paa AD-3
-(en port per datasett) som varer til da, og TestKurskildeErPaaVeiUt holder det
-fra aa vokse.
 """
 
 import dataclasses
 import inspect
-import re
 import sqlite3
 import typing
 from datetime import date, datetime, timedelta, timezone
-from pathlib import Path
 
 import pytest
 
-import kursdata
 from kursdata import (
     AKSJEUNIVERS,
     Kursleser,
@@ -487,31 +480,3 @@ class TestKursleserSistHentet:
         lest = leser({"EQNR": [rad()]})
 
         assert (lest.sist_hentet(symbol) is None) == (lest.serie(symbol) == [])
-
-
-class TestKurskildeErPaaVeiUt:
-    """Kurskilde og Kurslager er to porter for samme datasett til story 1.4.
-    Det bryter AD-3. Denne testen hindrer at bruddet vokser: bare modulene som
-    brukte Kurskilde da 1.2 ble bygget, faar importere den. Fjernes i 1.4,
-    sammen med Kurskilde."""
-
-    # Tom siden 1.4b: markedsoversikt og aksjedetalj leser gjennom Kursleser.
-    TILLATT: set[str] = set()
-
-    def test_ingen_ny_modul_importerer_kurskilde(self):
-        src = Path(kursdata.__file__).parent
-        brukere = {
-            sti.name
-            for sti in src.glob("*.py")
-            if sti.name != "kursdata.py"
-            and re.search(r"^from kursdata import .*\bKurskilde\b",
-                          sti.read_text(encoding="utf-8"), re.MULTILINE)
-        }
-
-        assert brukere <= self.TILLATT, (
-            f"Ny bruker av Kurskilde: {brukere - self.TILLATT}. "
-            "Skriv mot Kurslager - Kurskilde fjernes i story 1.4."
-        )
-
-    def test_kurskilde_sier_selv_at_den_er_paa_vei_ut(self):
-        assert "1.4" in (kursdata.Kurskilde.__doc__ or "")

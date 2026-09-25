@@ -5,11 +5,13 @@ Gjoer ingen API-kall, leser ingen filer og kjenner ingen HTML. Derfor kan hele f
 uten nett, og visningen kan byttes uten at noe her endres.
 
 Kolonnene er de fem i FR-101 og ikke flere: selskap, sluttkurs, endring,
-signalstyrke og retning.
+signalstyrke og retning. Hvor gamle dataene er, staar over tabellen og, for en
+rad som er eldre enn de andre, under selskapsnavnet (story 1.4c).
 """
 
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
 
 from kursdata import AKSJEUNIVERS, Aksje, Kursleser, Kursrad
 from signalberegning import (
@@ -72,6 +74,10 @@ class Rad:
     signal er None naar serien er for kort til aa regne. Da staar mangler med
     grunnen, og raden vises fortsatt - NFR-03 sier at manglende data for en
     aksje ikke skal stoppe hovedflyten.
+
+    sist_hentet er naar symbolets serie sist ble hentet, i UTC (AD-20), slik
+    Kursleser gir den. bygg_oversikt setter den alltid; den er None bare naar
+    bygg_rad kalles uten tid.
     """
 
     aksje: Aksje
@@ -80,6 +86,7 @@ class Rad:
     endring_prosent: float | None
     signal: Signal | None
     mangler: str | None
+    sist_hentet: datetime | None = None
 
     @property
     def styrke(self) -> int | None:
@@ -110,7 +117,12 @@ def endring_i_prosent(rader: list[Kursrad]) -> float | None:
     return (til - fra) / fra * 100
 
 
-def bygg_rad(aksje: Aksje, rader: list[Kursrad], p: Parametre = STANDARD) -> Rad | None:
+def bygg_rad(
+    aksje: Aksje,
+    rader: list[Kursrad],
+    p: Parametre = STANDARD,
+    sist_hentet: datetime | None = None,
+) -> Rad | None:
     """En rad for en aksje. None bare naar vi ikke har en eneste kursrad.
 
     En for kort serie gir en rad UTEN signal, ikke ingen rad. Brukeren skal
@@ -134,6 +146,7 @@ def bygg_rad(aksje: Aksje, rader: list[Kursrad], p: Parametre = STANDARD) -> Rad
         endring_prosent=endring_i_prosent(rader),
         signal=signal,
         mangler=mangler,
+        sist_hentet=sist_hentet,
     )
 
 
@@ -157,11 +170,55 @@ def bygg_oversikt(
     """Alle radene, sortert etter FR-102.
 
     Aksjer kilden ikke har data for, faller ut. De telles av kallende kode
-    saa brukeren kan faa vite at oversikten er ufullstendig.
+    saa brukeren kan faa vite at oversikten er ufullstendig. Hver rad faar
+    symbolets egen sist_hentet (FR-101, AD-15).
     """
     rader = [
         rad
-        for rad in (bygg_rad(aksje, kilde.serie(aksje.symbol), p) for aksje in univers)
+        for rad in (
+            bygg_rad(aksje, kilde.serie(aksje.symbol), p, kilde.sist_hentet(aksje.symbol))
+            for aksje in univers
+        )
         if rad is not None
     ]
     return sorted(rader, key=_sorteringsnokkel)
+
+
+def sidens_tidsstempel(rader: list[Rad]) -> datetime | None:
+    """Det eldste sist_hentet blant radene som vises (FR-101).
+
+    Det eldste og ikke det nyeste: med en fersk rad og fjorten foreldede
+    ville det nyeste faatt hele siden til aa se fersk ut. None uten rader.
+    """
+    tider = [rad.sist_hentet for rad in rader if rad.sist_hentet is not None]
+    return min(tider) if tider else None
+
+
+def eldre_enn_nyeste(rader: list[Rad]) -> set[str]:
+    """Symbolene som skal vise sitt eget tidsstempel under selskapsnavnet.
+
+    Det er radene som er eldre enn den nyeste. Er alle like ferske, er
+    mengden tom, og bare sidens tidsstempel vises.
+    """
+    tider = [rad.sist_hentet for rad in rader if rad.sist_hentet is not None]
+    if not tider:
+        return set()
+    nyeste = max(tider)
+    return {
+        rad.aksje.symbol
+        for rad in rader
+        if rad.sist_hentet is not None and rad.sist_hentet < nyeste
+    }
+
+
+NORSK_TID = ZoneInfo("Europe/Oslo")
+
+
+def norsk_tid(tid: datetime) -> str:
+    """Et tidspunkt som ÅÅÅÅ-MM-DD kl. TT.MM i norsk tid (AD-20).
+
+    Modellen har UTC; soneskiftet skjer foerst her, i visningen. Europe/Oslo
+    og ikke en fast forskyvning, saa sommer- og vintertid begge blir riktige.
+    """
+    lokal = tid.astimezone(NORSK_TID)
+    return lokal.strftime("%Y-%m-%d kl. %H.%M")

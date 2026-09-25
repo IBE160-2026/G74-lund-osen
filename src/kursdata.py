@@ -5,10 +5,9 @@ I dag er kilden et tidsstemplet JSON-oeyeblikksbilde i data/. I arkitekturfasen
 blir den etter alt aa doemme en database - aapent punkt 17 - og da skal bare
 denne fila endres.
 
-Derfor gaar all lesing gjennom en port. I dag er det to: Kurskilde, som
-visningen leser gjennom, og Kurslager (story 1.2), som skal erstatte den.
-Mellom 1.2 og 1.4 har kursdataene altsaa to porter. Det bryter AD-3, og
-bruddet varer til 1.4 flytter konsumentene over og fjerner Kurskilde.
+Derfor gaar all lesing gjennom en port: Kurslager, med lesesiden Kursleser
+(AD-3). Visningen leser gjennom Kursleser. Den gamle porten ved siden av ble
+fjernet i story 1.4c, og kursdataene har naa bare denne ene.
 
 Ingen funksjon her gjoer API-kall. Kvoten brukes bare av fetch_prices.py.
 """
@@ -147,7 +146,7 @@ class Kursleser(Protocol):
 
 @runtime_checkable
 class Kurslager(Kursleser, Protocol):
-    """Porten for kursdata - AD-3, AD-5, AD-19. Erstatter Kurskilde i 1.4.
+    """Porten for kursdata - AD-3, AD-5, AD-19. Den eneste for kursdataene.
 
     Kursleser pluss erstatt_serie, altsaa tre metoder. Det finnes med vilje
     ingen legg_til_rad: serien skjoetes aldri paa, fordi EODHD regner
@@ -214,41 +213,6 @@ class MinneKurslager:
 
     def sist_hentet(self, symbol: str) -> datetime | None:
         return self._hentet.get(symbol)
-
-
-class Kurskilde(Protocol):
-    """Det visningen faar lov til aa vite om lagringen.
-
-    **PAA VEI UT - fjernes i story 1.4.** Erstattes av Kurslager, som gir
-    Kursrad i stedet for dict. Ikke skriv ny kode mot denne porten;
-    tests/test_kurslager.py feiler hvis en ny modul importerer den.
-
-    To metoder, ingen av dem knyttet til fil eller database.
-    """
-
-    def tidsstempel(self) -> str | None:
-        """Naar dataene ble hentet. None hvis kilden ikke vet det."""
-
-    def serie(self, symbol: str) -> list[dict]:
-        """Kronologiske kursrader, nyeste sist. Tom liste hvis vi mangler."""
-
-
-@dataclass(frozen=True)
-class MinneKilde:
-    """Kilde som holder seriene i minnet.
-
-    Finnes for at testene skal slippe aa skrive filer, og for at en test
-    skal kunne beskrive noeyaktig den serien den vil proeve.
-    """
-
-    serier: dict[str, list[dict]]
-    hentet: str | None = None
-
-    def tidsstempel(self) -> str | None:
-        return self.hentet
-
-    def serie(self, symbol: str) -> list[dict]:
-        return self.serier.get(symbol, [])
 
 
 @dataclass(frozen=True)

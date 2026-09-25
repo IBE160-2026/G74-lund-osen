@@ -3,15 +3,17 @@
 data/ er gitignorert, saa den finnes ikke i et ferskt klon. Testene monterer
 derfor sitt eget oeyeblikksbilde i stedet for aa lese fra katalogen. Det er en
 ekte SnapshotKilde med EODHDs feltnavn, saa appen proeves gjennom den samme
-oversettelsen til Kursrad (SnapshotLeser) som i drift.
+oversettelsen til Kursrad (SnapshotLeser) som i drift. Testene av
+tidsstemplene monterer i stedet et MinneKurslager bak hent_leser, fordi et
+oeyeblikksbilde har samme tid for alle symbolene.
 """
 
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 import pytest
 
 import app as app_modul
-from kursdata import Kursrad, SnapshotKilde
+from kursdata import Kursrad, MinneKurslager, SnapshotKilde
 
 HENTET = "2026-09-21T15:40:00+00:00"
 
@@ -60,6 +62,15 @@ def snapshot(serier: dict[str, list], hentet: str | None = HENTET) -> SnapshotKi
 
 def monter(monkeypatch, kilde):
     monkeypatch.setattr(app_modul, "hent_kilde", lambda: kilde)
+
+
+def monter_lager(monkeypatch, tider: dict[str, datetime]):
+    """Et MinneKurslager bak hent_leser, med egen tid per symbol. Slik kan en
+    test gi symbolene ulik sist_hentet, noe et oeyeblikksbilde ikke kan."""
+    lager = MinneKurslager()
+    for symbol, tid in tider.items():
+        lager.erstatt_serie(symbol, serie([100.0] * 60 + [101.0]), tid)
+    monkeypatch.setattr(app_modul, "hent_leser", lambda: lager)
 
 
 def test_uten_kilde_viser_beskjed_i_stedet_for_aa_feile(klient, monkeypatch):
@@ -167,12 +178,97 @@ def test_datoen_skrives_som_aaaa_mm_dd(klient, monkeypatch):
 
 
 def test_data_hentet_leses_fra_oeyeblikksbildet(klient, monkeypatch):
-    """Sidens tidsstempel kommer fortsatt fra SnapshotKilde.tidsstempel()."""
+    """Sidens tidsstempel er oeyeblikksbildets hentet, lest som sist_hentet
+    og vist i norsk tid: 15.40 UTC er 17.40 i Oslo i september."""
     monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [101.0])}))
 
     html = klient.get("/").data.decode("utf-8")
 
-    assert "data hentet 2026-09-21" in html
+    assert "data hentet 2026-09-21 kl. 17.40" in html
+    assert 'class="hentet"' not in html
+
+
+def _selskapscelle(html: str, symbol: str) -> str:
+    start = html.index(f'href="/aksje/{symbol}"')
+    return html[start: html.index("</td>", start)]
+
+
+class TestTidsstempler:
+    """Story 1.4c, FR-101: sidens tidsstempel er det eldste, og en rad som er
+    eldre enn den nyeste, viser sitt eget under selskapsnavnet."""
+
+    FERSK = datetime(2026, 9, 24, 18, 5, tzinfo=timezone.utc)
+    GAMMEL = datetime(2026, 9, 22, 18, 5, tzinfo=timezone.utc)
+
+    def test_siden_viser_det_eldste(self, klient, monkeypatch):
+        monter_lager(monkeypatch, {"EQNR": self.FERSK, "DNB": self.GAMMEL})
+
+        html = klient.get("/").data.decode("utf-8")
+
+        assert "data hentet 2026-09-22 kl. 20.05" in html
+        assert "data hentet 2026-09-24" not in html
+
+    def test_den_eldste_raden_viser_sin_egen_tid_under_navnet(self, klient, monkeypatch):
+        monter_lager(monkeypatch, {"EQNR": self.FERSK, "DNB": self.GAMMEL})
+
+        html = klient.get("/").data.decode("utf-8")
+
+        assert "hentet 2026-09-22 kl. 20.05" in _selskapscelle(html, "DNB")
+        assert "hentet" not in _selskapscelle(html, "EQNR")
+
+    def test_alle_like_ferske_gir_ingen_egne(self, klient, monkeypatch):
+        monter_lager(monkeypatch, {"EQNR": self.FERSK, "DNB": self.FERSK})
+
+        html = klient.get("/").data.decode("utf-8")
+
+        assert "data hentet 2026-09-24 kl. 20.05" in html
+        assert 'class="hentet"' not in html
+
+    def test_fortsatt_fem_kolonner(self, klient, monkeypatch):
+        """Radens tid staar i selskapscellen, ikke i en sjette kolonne."""
+        monter_lager(monkeypatch, {"EQNR": self.FERSK, "DNB": self.GAMMEL})
+
+        html = klient.get("/").data.decode("utf-8")
+        hode = html[html.index("<thead>"): html.index("</thead>")]
+        kropp = html[html.index("<tbody>"): html.index("</tbody>")]
+
+        assert hode.count("</th>") == 5
+        rader = kropp.split("</tr>")[:-1]
+        assert len(rader) == 2
+        for rad in rader:
+            assert rad.count("</td>") == 5
+
+    def test_sommertid_over_midnatt(self, klient, monkeypatch):
+        monter_lager(monkeypatch, {"EQNR": datetime(2026, 9, 24, 22, 30, tzinfo=timezone.utc)})
+
+        html = klient.get("/").data.decode("utf-8")
+
+        assert "data hentet 2026-09-25 kl. 00.30" in html
+
+    def test_vintertid(self, klient, monkeypatch):
+        """Demonstrasjonen er etter 25.10. Da er Oslo UTC+1, ikke +2."""
+        monter_lager(monkeypatch, {"EQNR": datetime(2026, 11, 16, 22, 30, tzinfo=timezone.utc)})
+
+        html = klient.get("/").data.decode("utf-8")
+
+        assert "data hentet 2026-11-16 kl. 23.30" in html
+
+    def test_detaljen_viser_symbolets_egen_tid(self, klient, monkeypatch):
+        """Ikke sidens eldste: detaljen gjelder ett symbol."""
+        monter_lager(monkeypatch, {"EQNR": self.FERSK, "DNB": self.GAMMEL})
+
+        eqnr = klient.get("/aksje/EQNR").data.decode("utf-8")
+        dnb = klient.get("/aksje/DNB").data.decode("utf-8")
+
+        assert "data hentet 2026-09-24 kl. 20.05" in eqnr
+        assert "data hentet 2026-09-22 kl. 20.05" in dnb
+
+    def test_detaljen_i_vintertid(self, klient, monkeypatch):
+        monter_lager(monkeypatch, {"EQNR": datetime(2026, 11, 16, 22, 30, tzinfo=timezone.utc)})
+
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+
+        assert "data hentet 2026-11-16 kl. 23.30" in html
 
 
 def test_ruta_gjoer_ingen_nettverkskall(klient, monkeypatch):

@@ -44,25 +44,10 @@ def _importerte_moduler(tre: ast.Module) -> set[str]:
     return moduler
 
 
-def _importerte_navn(tre: ast.Module) -> set[str]:
-    return {
-        alias.name
-        for node in ast.walk(tre)
-        if isinstance(node, (ast.Import, ast.ImportFrom))
-        for alias in node.names
-    }
-
-
 @pytest.mark.parametrize("navn", KJERNEMODULER)
 def test_importerer_verken_sqlite3_eller_pathlib(navn):
     """Kjernen gjoer ikke I/O. Lagringen hoerer til skallet."""
     assert _importerte_moduler(_tre(navn)) & FORBUDTE_MODULER == set()
-
-
-@pytest.mark.parametrize("navn", KJERNEMODULER)
-def test_importerer_ikke_kurskilde(navn):
-    """Kurskilde gir dict. Kjernen leser Kursrad gjennom Kursleser."""
-    assert "Kurskilde" not in _importerte_navn(_tre(navn))
 
 
 @pytest.mark.parametrize("navn", KJERNEMODULER)

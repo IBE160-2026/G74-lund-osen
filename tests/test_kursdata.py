@@ -11,7 +11,6 @@ import pytest
 from kursdata import (
     AKSJEUNIVERS,
     KURSPREFIKS,
-    MinneKilde,
     SnapshotKilde,
     nyeste_snapshot,
 )
@@ -37,20 +36,6 @@ def test_symbol_og_ticker_holdes_fra_hverandre():
 def test_symbolene_er_unike():
     symboler = [aksje.symbol for aksje in AKSJEUNIVERS]
     assert len(set(symboler)) == len(symboler)
-
-
-def test_minnekilde_gir_serien_den_fikk():
-    rader = [{"date": "2026-09-18", "close": 10.0}]
-    kilde = MinneKilde(serier={"EQNR": rader}, hentet="2026-09-21")
-
-    assert kilde.serie("EQNR") == rader
-    assert kilde.tidsstempel() == "2026-09-21"
-
-
-def test_minnekilde_gir_tom_liste_for_ukjent_symbol():
-    """Et symbol vi mangler skal ikke kaste - visningen maa kunne vise resten."""
-    kilde = MinneKilde(serier={})
-    assert kilde.serie("FINNESIKKE") == []
 
 
 def test_snapshotkilde_leser_formatet_signaltesten_skrev(tmp_path):
