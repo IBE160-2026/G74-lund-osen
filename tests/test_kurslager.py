@@ -495,7 +495,8 @@ class TestKurskildeErPaaVeiUt:
     brukte Kurskilde da 1.2 ble bygget, faar importere den. Fjernes i 1.4,
     sammen med Kurskilde."""
 
-    TILLATT = {"markedsoversikt.py", "aksjedetalj.py"}
+    # Tom siden 1.4b: markedsoversikt og aksjedetalj leser gjennom Kursleser.
+    TILLATT: set[str] = set()
 
     def test_ingen_ny_modul_importerer_kurskilde(self):
         src = Path(kursdata.__file__).parent

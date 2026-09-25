@@ -2,9 +2,10 @@
 title: 'Story 1.4b: Konsumentene leser Kursrad'
 type: 'refactor'
 created: '2026-09-25'
-status: 'ready-for-dev'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
+baseline_commit: 'f4bf940e32e5a9470c26d44c9c6aa9bd251fb249'
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/epic-1-context.md'
   - '{project-root}/CLAUDE.md'
@@ -66,11 +67,11 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `data/kontrollregning_1_4b.py` (ikke i repoet) -- bygg oversikten og de 15 detaljene med graf fra den låste fila, og lagre alle felt med datoer som ISO-tekst, pluss HTML for `/` og de 15 `/aksje/<symbol>`. Kjøres før endringen (`-foer.json`) og etter (`-etter.json`), og sammenligningen skriver bare antall -- kontrollpunktet fra 25.09
-- [ ] `src/signalberegning.py`, `src/markedsoversikt.py`, `src/aksjedetalj.py`, `src/graf.py` -- `Kursrad` og `Kursleser`, fallbacken fjernet, docstringer rettet (de nevner `Kurskilde`/`adjusted_close`) -- AD-19
-- [ ] `src/app.py` -- `SnapshotLeser` til konsumentene -- AD-3
-- [ ] `tests/test_signalberegning.py`, `test_markedsoversikt.py`, `test_aksjedetalj.py`, `test_app.py`, `test_graf.py` -- `serie()` gir `Kursrad`. `MinneKilde` byttes med `MinneKurslager`; i `test_app` monteres en `SnapshotKilde` med `hentet`, så appen prøves gjennom den ekte oversettelsen. De to fallback-testene erstattes av tester der `slutt` ≠ `justert_slutt` for endring, signal og grafpunkter
-- [ ] `tests/test_konsumentene.py` (ny) -- de fire kjernemodulene importerer verken `sqlite3`, `pathlib` eller `Kurskilde`, og kildeteksten har ingen EODHD-nøkler (`"adjusted_close"`, `"close"`, `"volume"`, `"date"`). Testen krever at fallbacken er borte
+- [x] `data/kontrollregning_1_4b.py` (ikke i repoet) -- bygg oversikten og de 15 detaljene med graf fra den låste fila, og lagre alle felt med datoer som ISO-tekst, pluss HTML for `/` og de 15 `/aksje/<symbol>`. Kjøres før endringen (`-foer.json`) og etter (`-etter.json`), og sammenligningen skriver bare antall -- kontrollpunktet fra 25.09
+- [x] `src/signalberegning.py`, `src/markedsoversikt.py`, `src/aksjedetalj.py`, `src/graf.py` -- `Kursrad` og `Kursleser`, fallbacken fjernet, docstringer rettet (de nevner `Kurskilde`/`adjusted_close`) -- AD-19
+- [x] `src/app.py` -- `SnapshotLeser` til konsumentene -- AD-3
+- [x] `tests/test_signalberegning.py`, `test_markedsoversikt.py`, `test_aksjedetalj.py`, `test_app.py`, `test_graf.py` -- `serie()` gir `Kursrad`. `MinneKilde` byttes med `MinneKurslager`; i `test_app` monteres en `SnapshotKilde` med `hentet`, så appen prøves gjennom den ekte oversettelsen. De to fallback-testene erstattes av tester der `slutt` ≠ `justert_slutt` for endring, signal og grafpunkter
+- [x] `tests/test_konsumentene.py` (ny) -- de fire kjernemodulene importerer verken `sqlite3`, `pathlib` eller `Kurskilde`, og kildeteksten har ingen EODHD-nøkler (`"adjusted_close"`, `"close"`, `"volume"`, `"date"`). Testen krever at fallbacken er borte
 
 **Acceptance Criteria:**
 - Given hele testsettet, when det kjøres før og etter, then er begge grønne, og tallene står i commit-meldingen
@@ -93,3 +94,19 @@ Trinn 1 og 3 rekker én økt hver. Trinn 2 er det store: storyen anslår at test
 - `uv run pytest -q` -- expected: alt grønt; 378 før
 - `uv run python data/kontrollregning_1_4b.py --sammenlign` -- expected: bare antall, alle like
 - `grep -nE 'adjusted_close|rad\.get\(|rad\[' src/signalberegning.py src/markedsoversikt.py src/aksjedetalj.py src/graf.py` -- expected: ingen treff
+
+## Review Triage Log
+
+| # | Kilde | Funn | Dom | Bevis | Rute |
+|---|---|---|---|---|---|
+| 1 | blind, edge, verif. | Et øyeblikksbilde med `hentet` som ikke kan leses, viser nå «Ingen kursdata funnet i data/» uten rader og uten «data hentet», og detaljen gir 404. Ingen apptest låser det | low | Følger av 1.4a: `SnapshotLeser` gjør da hele bildet manglende, og 1.4b gir den til konsumentene. Nås ikke i dag: `nyeste_snapshot` foretrekker `kurser-`, og de fila har `hentet` med tidssone (kontrollregningen ga 15 rader). Rettingen er en test, ikke ny kode | patch |
+| 2 | blind, edge | Utbyttetestene i `test_markedsoversikt` og `test_aksjedetalj` sammenligner sluttkursen med `justert[-1]`, som er lik `slutt[-1]` | low | Riktig: testene kan ikke skille de to. `test_sluttkursen_er_slutt_ikke_justert` og `test_viser_ujustert_sluttkurs` fanger en slik mutant. Siste dag er lik i ekte data, så fixturen står | patch |
+| 3 | blind | `signalberegning` importerer `kursdata`, som importerer `pathlib`, og testen ser bare direkte importer | false | Testen lover bare direkte importer («importere lageret selv»). `markedsoversikt` og `aksjedetalj` importerte `kursdata` før 1.4b også. Ingen av de fire modulene gjør I/O | avvist |
+| 4 | blind | Docstringene om `Kurskilde` (`kursdata.py`, `test_kurslager.py`) sier «fjernes i 1.4» | false | «1.4» er hele 1.4-rekken. Fjerningen er 1.4c (`epics.md:697`), og den tar `Kurskilde`, `MinneKilde` og `TestKurskildeErPaaVeiUt` | avvist |
+| 5 | blind | Spesifikasjonen nevner ikke `test_kurslager.py` og har ikke resultatene | false | Code Map nevner `tests/test_kurslager.py:492–516`. Resultatene står i commit-meldingen, som AC-en krever, og en rettelse ville endret spesifikasjonen | avvist |
+| 6 | blind | `"2026-11-19" in html` i detaljtesten følger av grafteksten, så datoen i overskriften prøves ikke for seg | low | Riktig: grafteksten «2026-09-01 til 2026-11-19» inneholder datoen. Rettingen er én påstand | patch |
+| 7 | blind, edge | Importvaktene er ulike: regex i `test_kurslager`, AST i `test_konsumentene`, og `import kursdata` med `kursdata.Kurskilde` slipper gjennom | low | Ingen modul i `src/` gjør `import kursdata`. Regex-vakten fjernes i 1.4c. En samlet vakt er mer kode | avvist |
+| 8 | blind | `SnapshotLeser` bygges ved hver forespørsel | low | `hent_kilde()` leser allerede fila ved hver forespørsel. 15 serier, ingen målt kostnad | avvist |
+| 9 | blind | Docstringen i `test_aksjedetalj.py:92` sier fortsatt `close`/`adjusted_close` | low | Riktig, og rettingen er tekst | patch |
+| 10 | edge, verif. | `test_uleselig_symbol_navngis_i_fotnoten` passerer også om DNB vises som rad | low | Riktig: «DNB Bank» står i lenken i raden. Lesertestene i `test_snapshotleser.py` dekker at raden faller ut. Rettingen er én påstand | patch |
+| 11 | edge | Testhjelperne `zip`-er lister som kan ha ulik lengde | low | Ingen test gir ulike lengder i dag. Rettingen er en ny vakt i hjelperne | avvist |

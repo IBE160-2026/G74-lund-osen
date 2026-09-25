@@ -1,5 +1,7 @@
 """Tester for koordinatregningen. En linje som ligger galt, ser riktig ut."""
 
+from datetime import date, timedelta
+
 import pytest
 
 from aksjedetalj import Punkt
@@ -9,7 +11,7 @@ from graf import BREDDE, HOYDE, MARG_X, MARG_Y, bygg_graf
 def punkter(kurser, ma50=None):
     ma50 = ma50 or [None] * len(kurser)
     return tuple(
-        Punkt(dato=f"2026-01-{i + 1:02d}", kurs=k, ma50=m)
+        Punkt(dato=date(2026, 1, 1) + timedelta(days=i), kurs=k, ma50=m)
         for i, (k, m) in enumerate(zip(kurser, ma50))
     )
 
@@ -102,5 +104,5 @@ class TestRutenett:
     def test_datoene_kommer_fra_ytterpunktene(self):
         graf = bygg_graf(punkter([100.0, 110.0, 120.0]))
 
-        assert graf.forste_dato == "2026-01-01"
-        assert graf.siste_dato == "2026-01-03"
+        assert graf.forste_dato == date(2026, 1, 1)
+        assert graf.siste_dato == date(2026, 1, 3)

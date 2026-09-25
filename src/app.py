@@ -4,17 +4,18 @@ Leser kun fra data/. Denne filen gjoer aldri API-kall, saa en
 nettleseroppdatering kan ikke bruke av kvoten. Nye kurser hentes ved
 aa kjoere fetch_prices.py.
 
-Alt av regning ligger i markedsoversikt.py, og all lesing gaar gjennom
-Kurskilde. Denne fila velger bare hvilken kilde som skal brukes og sender
-resultatet til malen - byttes fila ut med en database i arkitekturfasen, er
-det bare linjen under som endres.
+Alt av regning ligger i markedsoversikt.py og aksjedetalj.py, og de leser
+Kursrad gjennom Kursleser (AD-3, AD-19). Denne fila velger bare hvilket
+oeyeblikksbilde som skal brukes, pakker det i en SnapshotLeser og sender
+resultatet til malen. Sidens tidsstempel leses fortsatt fra
+SnapshotKilde.tidsstempel(); sist_hentet i visningen kommer i story 1.4c.
 """
 
 from flask import Flask, abort, render_template
 
 from aksjedetalj import bygg_detalj, finn_aksje
 from graf import bygg_graf
-from kursdata import AKSJEUNIVERS, SnapshotKilde, nyeste_snapshot
+from kursdata import AKSJEUNIVERS, SnapshotKilde, SnapshotLeser, nyeste_snapshot
 from markedsoversikt import bygg_oversikt
 
 app = Flask(__name__)
@@ -32,7 +33,7 @@ def markedsoversikt():
     if kilde is None:
         return render_template("index.html", rader=[], hentet=None, mangler=[])
 
-    rader = bygg_oversikt(kilde)
+    rader = bygg_oversikt(SnapshotLeser(kilde))
     vist = {rad.aksje.symbol for rad in rader}
     mangler = [a.navn for a in AKSJEUNIVERS if a.symbol not in vist]
 
@@ -59,7 +60,7 @@ def aksjedetalj(symbol: str):
     if kilde is None:
         abort(404)
 
-    detalj = bygg_detalj(aksje, kilde)
+    detalj = bygg_detalj(aksje, SnapshotLeser(kilde))
     if detalj is None:
         abort(404)
 
