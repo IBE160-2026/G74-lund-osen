@@ -11,3 +11,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-4c-rydding-kurskilde-ut-sist-hentet-inn.md`
   summary: Spoersmaal til UX-gjennomgangen i story 8.2. Med en fersk rad og fjorten foreldede viser de fjorten samme tid som siden, og den ferske viser ingen tid. Er det den merkingen vi vil ha?
   evidence: Funnet i gjennomgangen av 1.4c (triageloggen, rad 4). Oppfoerselen er FR-101 ordrett («En rad med eldre tidsstempel enn det nyeste viser sitt eget»). Leseren ser hvilke rader som er gamle, men ikke naar den ferske ble hentet. FR-101 endres ikke naa.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-5-snapshotkilde-ut-av-kursdata-py.md`
+  summary: Et nyeste oeyeblikksbilde med ugyldig JSON, eller en liste oeverst i stedet for et objekt, gir 500 paa alle sidene i stedet for en beskjed.
+  evidence: Funnet i gjennomgangen av 1.5 (triageloggen, rad 1). Fantes foer 1.5: hent_kilde() kalte samme SnapshotKilde.fra_fil, og flyttingen til lagring_fil.py endret ikke oppfoerselen. Det rammer ikke webserveren naar den leser fra basen (2.2).

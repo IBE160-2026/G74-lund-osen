@@ -98,7 +98,7 @@ context:
 
 | # | Kilde | Funn | Dom | Bevis | Rute |
 |---|---|---|---|---|---|
-| 1 | edge, blind | Et nyeste øyeblikksbilde med ugyldig JSON, eller en liste øverst, gir 500 på alle sidene | low | Fantes før 1.5: `hent_kilde()` kalte samme `SnapshotKilde.fra_fil` (`b0243b6`, `kursdata.py:231–236`). Flyttingen endrer ikke oppførselen. `fetch_prices` skriver fila selv, og rettingen er en ny vakt | avvist |
+| 1 | edge, blind | Et nyeste øyeblikksbilde med ugyldig JSON, eller en liste øverst, gir 500 på alle sidene | low | Fantes før 1.5: `hent_kilde()` kalte samme `SnapshotKilde.fra_fil` (`b0243b6`, `kursdata.py:231–236`). Flyttingen endrer ikke oppførselen. `fetch_prices` skriver fila selv, og rettingen er en ny vakt. *Rettet 2026-09-25 etter flettingen: ført som utsatt i `deferred-work.md`, som overskriftsdatoen i 1.4c* | defer |
 | 2 | edge | En katalog som heter `*-raa-*.json`, eller en fil som slettes mellom glob og lesing, gir unntak | low | Fantes før 1.5 (`nyeste_snapshot` er flyttet ordrett). Ingen lovlig vei lager en slik katalog. Rettingen er en ny vakt | avvist |
 | 3 | blind | Skillet mellom «ingen fil» og «fil uten lesbare data» som 1.4c-spesifikasjonen la til 1.5, mangler | false | Avgjort 25.09 kl. 19:42: meldingen rettes ikke i 1.5, og henvisningen i `deferred-work.md` er rettet til 2.2 (`d9c4561`). Det står i beslutningene i denne spesifikasjonen | avvist |
 | 4 | blind | «Kildens feltnavn stopper her» i `eodhd.py` håndheves ikke utenfor kjernen og porten | low | Riktig. `lagring_fil.py`, `lagring_sqlite.py` og `app.py` har ingen av nøklene i dag, så vakten kan dekke dem uten ny kode. `fetch_prices.py` er EODHD-adapteren for nettet og bruker `'date'` | patch |
