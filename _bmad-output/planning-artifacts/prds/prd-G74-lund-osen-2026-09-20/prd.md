@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-25T13:12
+updated: 2026-09-25T13:14
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1220,6 +1220,7 @@ den avhenger av.
 | **Mediesaker for ett selskap** *(lagt til 2026-09-25)*: de nyeste artiklene fra EODHDs nyhets-API for én aksje, hentet bare når brukeren ber om det. Også for selskaper utenfor de 15, med ticker skrevet inn | Relevanseksperimentet del 1 (story 9.4): hvor mange artikler som finnes per selskap, og hvor mange av dem som faktisk handler om selskapet. For selskaper utenfor universet: et eget skjermbilde uten kurs og signal, jf. idéen om flere skjermbilder | 5 kall per selskap (`malinger.md` §7.2). Kurshentingen bruker 15 av 20, så ett selskap per dag holder seg innenfor dagskvoten, og mer tar av bonuskvoten (§11). Hentes av hentekommandoen, ikke av en knapp i nettsiden: webserveren henter aldri (NFR-02, AD-10). Artiklene vises bare lokalt og publiseres ikke (`docs/kilder-og-rettigheter.md`). Skal KI vurdere relevansen, gjelder EODHDs betingelser fra 21.09, også betingelse 4 |
 | **Egendefinert meldingsfilter** *(lagt til 2026-09-25)*: brukeren velger selv hvilke kategorier som vises, i tillegg til Anbefalt og Alle (FR-203) | Story 6.5, og en brukertest som viser at noen savner det | Rundt ti kategorier, og valgene må lagres. Hvert valg koster tid i hovedflyten, som skal gå på under fem minutter (§7, «Brukerutfall»). Tas ikke inn uten at en test viser behovet |
 | **Merk det som er nytt siden forrige henting** *(lagt til 2026-09-25)*: meldinger som har kommet siden forrige henting, merkes som nye | At meldingslageret (story 6.1) lagrer når hver melding ble hentet første gang | Svarer rett på spørsmålet i briefen: «hva beveget seg i går, hvorfor». Ingen kall og ingen KI |
+| **Lenke til selskapets side på NewsWeb** *(lagt til 2026-09-25)*: én lenke fra aksjedetaljen, så alle børsmeldingene er ett klikk unna, også de som er filtrert bort | Ingenting nytt. Lenken henter ingenting | Vurderes allerede 28.09 hvis Euronext sier nei eller ikke svarer. Da har aksjedetaljen ingen meldinger, og lenken er det eneste som viser dem (åpent punkt 1). Adressen må slås opp før den bygges |
 
 **Regnestykket for et større univers.** Det er regnet 23.09 fra målte tall: én
 henting per døgn, ett kall per symbol (§2), dagskvote 20, og bonus 484 etter
