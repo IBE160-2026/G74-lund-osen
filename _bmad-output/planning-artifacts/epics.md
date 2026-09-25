@@ -1396,6 +1396,10 @@ så jeg slipper å lete et annet sted.
 - Meldingene vises i aksjedetaljen, filtrert etter FR-502
 - Eks.dato vises ikke som melding, men som merking
 - **Ville feilet hvis:** utbyttemerkingen tok eks.dato herfra i stedet for fra kursserien. Da hviler FR-407 på en epic som kan strykes
+- *Lagt til 2026-09-25:* telleren for funnet og vist, og bryteren Anbefalt/Alle
+  (FR-203). Med Alle vises også det som er filtrert bort, merket med grunnen
+- **Ville også feilet hvis:** bryteren endret hva KI-laget vurderer. Da kan KI
+  på og av ikke sammenlignes (FR-602)
 
 **Én økt:** ja.
 

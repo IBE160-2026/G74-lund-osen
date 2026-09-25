@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-25T12:58
+updated: 2026-09-25T13:11
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -385,6 +385,15 @@ Aksjedetaljen viser i tillegg:
 - KI-forklaring per melding når KI-laget er på, eller «ikke vurdert» når det er
   av (FR-602)
 - Kommende finansielle hendelser fra Euronext
+
+*Lagt til 2026-09-25:* over meldingene står en teller for hvor mange som ble
+funnet og hvor mange som vises, med grunnen til at resten er skjult: filtrert
+bort etter kategori (FR-502) eller vurdert som «lite relevant» (FR-606). En
+bryter veksler mellom **Anbefalt**, som er filteret over, og **Alle**, som også
+viser det som er skjult, merket med grunnen. Eks.dato er fortsatt merking, ikke
+melding (FR-503). Bryteren endrer bare visningen, ikke hva KI-laget vurderer.
+KI-forklaringen per melding ligger bak «Vis forklaring». Teksten er laget i
+hentingen, og et klikk viser den, men lager den ikke (NFR-02).
 
 #### FR-204 — Aksjedetaljen for en aksje uten gyldig signal
 
@@ -843,6 +852,8 @@ resultatene kan sammenlignes direkte.
 **Visning `[FORELØPIG]`:** meldinger vurdert som *påvirker direkte* eller *kan
 påvirke* vises. *Lite relevant* skjules bak en visningsbryter — skjult, men ikke
 borte, slik at brukeren kan kontrollere hva som ble sortert vekk.
+
+*Lagt til 2026-09-25:* visningsbryteren er bryteren Anbefalt/Alle i FR-203.
 
 Hvor grensen faktisk bør gå, er ikke avgjort og kan ikke avgjøres på papir. Se
 åpent punkt 2.
