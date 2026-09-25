@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-25T23:15
+updated: 2026-09-25T23:22
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1223,6 +1223,7 @@ den avhenger av.
 | **Lenke til selskapets side på NewsWeb** *(lagt til 2026-09-25)*: én lenke fra aksjedetaljen, så alle børsmeldingene er ett klikk unna, også de som er filtrert bort | Ingenting nytt. Lenken henter ingenting | Vurderes allerede 28.09 hvis Euronext sier nei eller ikke svarer. Da har aksjedetaljen ingen meldinger, og lenken er det eneste som viser dem (åpent punkt 1). Adressen må slås opp før den bygges |
 | **Sjekk 2 og 3 synlige i grafen** *(lagt til 2026-09-25)*: volumsøyler under kursgrafen, med en strek for medianvolumet, så sjekk 3 (interesse) synes slik MA50-linjen viser sjekk 1. Eventuelt også et bånd for sjekk 2 (bevegelse) | Ingenting nytt. Volumet finnes i `Kursrad`, og tegningen er samme SVG som i dag (`graf.py`). Tas stilling til i UX-gjennomgangen (8.2), etter brukertesten (8.1) | FR-202 sier at volatilitetsbånd og volumsøyler ikke tegnes i v1, så å ta dem inn er en endring av FR-202. Streken må være samme median, over samme vindu, som sjekk 3 regner med, etter samme prinsipp som i FR-202. Story 8.2 skal ikke ende i ny funksjonalitet, så søylene må begrunnes som en forbedring av forklaringen i FR-706, ellers hører de til v1.1 |
 | **Signaldager i grafen** *(lagt til 2026-09-25)*: kursgrafen markerer dagene med sterkt signal, så man ser hvordan signalet har oppført seg over tid | Vurderingslageret (1.6) og at hentekommandoen skriver vurderingen hver dag (2.5). Historikken bygges opp fra første daglige kjøring | Bare visning. En studie av om signalene slår markedet er utenfor v1. Med få ukers historikk ved demonstrasjonen blir det få markeringer |
+| **Hjelp bak et spørsmålstegn** *(lagt til 2026-09-25)*: et «?» på begge skjermbildene åpner et lite vindu som forklarer begrepene og symbolene appen viser: sluttkurs og endring, utbyttejustert kurs, signalstyrke 0–3, retningen (↑ Positiv, ↓ Negativ, ↔ Blandet, – Ingen eller Ukjent), de tre sjekkene (trend med 50-dagers snitt, bevegelse og interesse), «data hentet» og «Uten data». Vinduet sier også at signalene ikke er investeringsråd (NFR-06) | Ingenting nytt. Fast tekst, uten nettkall og uten KI, og det kan lages med HTML alene, uten et nytt bibliotek. Bør bygges før brukertesten (8.1), så testen viser om hjelpen blir brukt | Forklarer bare det appen faktisk viser. P/E og andre nøkkeltall fra regnskapet ligger utenfor v1 («fundamental- og verdimodell»). Retningen forklares med ordene fra FR-704, ikke med «opp» og «ned», som ble fjernet fordi de inviterer til å lese pilen som kursbevegelse (`markedsoversikt.py`). Hjelpen skiller «Ingen» fra «Ukjent», slik FR-101 gjør. Tall i teksten, som 50 dager, hentes fra de samme parametrene som beregningen (`Parametre` i `signalberegning.py`), og en test krever det. Ellers kan hjelpeteksten si én ting mens koden gjør en annen, den samme feilen som story 3.3 skal hindre mellom README og den tomme siden |
 
 **Regnestykket for et større univers.** Det er regnet 23.09 fra målte tall: én
 henting per døgn, ett kall per symbol (§2), dagskvote 20, og bonus 484 etter
