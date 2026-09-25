@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-24-2026 19:26
-last_updated: 09-25-2026 18:07
+last_updated: 09-25-2026 19:44
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -47,7 +47,7 @@ development_status:
   1-4a-lesegrensen-kursleser-og-oversetteren-fra-øyeblikksbildet: review
   1-4b-konsumentene-leser-kursrad: review
   1-4c-rydding-kurskilde-ut-sist_hentet-inn: review
-  1-5-snapshotkilde-ut-av-kursdata-py: backlog
+  1-5-snapshotkilde-ut-av-kursdata-py: ready-for-dev
   1-5b-migrasjonsløperen-og-sqlite-adapteren-herdes: backlog
   1-6-vurderingslager-med-datoavvisning: backlog
   1-7-de-tre-tilstandene-skilles: backlog
