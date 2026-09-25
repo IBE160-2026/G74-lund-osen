@@ -168,7 +168,10 @@ flere av dem er **allerede oppfylt i kode** — de er merket med opphav.
 - `AD-2` — Nettkall bare i skallet, én hentefunksjon per kilde, injisert
 - **Gjenstående brudd:** `kursdata.py` gjør I/O i dag — `SnapshotKilde.fra_fil`
   leser fil, `nyeste_snapshot` globber katalog, og `app.py` kaller den direkte
-  utenom enhver port. Utskillingen er arbeid som må gjøres
+  utenom enhver port. Utskillingen er arbeid som må gjøres. *Lukket 2026-09-25:
+  story 1.5 flyttet lesingen til `lagring_fil.py` og oversettelsen til
+  `eodhd.py`, commit `23af8db`. `app.py` får en `Kursleser` fra
+  `lagring_fil.nyeste_leser`*
 
 **Drift og leveranse**
 

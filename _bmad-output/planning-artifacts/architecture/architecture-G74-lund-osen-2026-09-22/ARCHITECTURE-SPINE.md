@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-25T18:06'
+updated: '2026-09-25T20:04'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -43,15 +43,17 @@ mønsteret og gjør det bindende.
 | Lag | Filer | Regel |
 |---|---|---|
 | **Kjerne** | `signalberegning.py`, `meldinger.py`, `markedsoversikt.py`, `aksjedetalj.py`, `graf.py` | Ingen import av `requests`, `sqlite3`, `pathlib`, `flask` |
-| **Porter** | `kursdata.py` | Protokoller, verdityper og minneimplementasjonene testene bruker (`MinneKurslager`). *Rettet 2026-09-25: `MinneKilde` ble fjernet i story 1.4c*. Ingen I/O — brytes i dag, se under |
-| **Skall** | `app.py` (HTTP), `fetch_prices.py` (nett), lagringsadapteren (SQLite) | Eneste lag som kjenner teknologi |
+| **Porter** | `kursdata.py` | Protokoller, verdityper og minneimplementasjonene testene bruker (`MinneKurslager`). *Rettet 2026-09-25: `MinneKilde` ble fjernet i story 1.4c*. Ingen I/O — oppfylt fra story 1.5 (`23af8db`). *Rettet 2026-09-25: her sto «brytes i dag, se under»* |
+| **Skall** | `app.py` (HTTP), `fetch_prices.py` (nett), `lagring_sqlite.py` (SQLite), `lagring_fil.py` (øyeblikksbildene i `data/`), `eodhd.py` (EODHDs feltnavn til `Kursrad`) | Eneste lag som kjenner teknologi |
 
-**`kursdata.py` oppfyller ikke portregelen i dag, og det skal stå her til den
-gjør det.** Fila importerer `json` og `pathlib`; `SnapshotKilde.fra_fil` leser
-fil og `nyeste_snapshot` globber katalogen. `app.py` kaller `nyeste_snapshot()`
-direkte, altså utenom enhver port. Utskillingen til `lagring_sqlite.py` og
-`lagring_fil.py` er en **gjenstående endring**, ikke en beskrivelse av dagens
-kode.
+**`kursdata.py` oppfyller portregelen fra story 1.5 (`23af8db`, 2026-09-25).**
+Før det importerte fila `json` og `pathlib`; `SnapshotKilde.fra_fil` leste fil
+og `nyeste_snapshot` globbet katalogen, og `app.py` kalte `nyeste_snapshot()`
+direkte, utenom enhver port. Avsnittet sto her som et brudd til det var lukket.
+Nå ligger lesingen av øyeblikksbildene i `lagring_fil.py`, oversettelsen fra
+EODHDs feltnavn i `eodhd.py`, og `app.py` får en `Kursleser` fra
+`lagring_fil.nyeste_leser`. En test feiler hvis `kursdata.py` importerer `json`,
+`pathlib` eller en adapter (`tests/test_konsumentene.py`).
 
 ## Invariants & Rules
 
@@ -64,6 +66,8 @@ graph TD
         app["app.py"]
         fetch["fetch_prices.py"]
         sqlite["lagring_sqlite.py"]
+        fil["lagring_fil.py"]
+        eodhd["eodhd.py"]
     end
     subgraph porter["Porter — Protocol"]
         kursdata["kursdata.py"]
@@ -80,8 +84,13 @@ graph TD
     app --> detalj
     app --> graf
     app --> kursdata
+    app --> fil
     fetch --> kursdata
+    fetch --> fil
     sqlite -. implementerer .-> kursdata
+    fil -. implementerer .-> kursdata
+    fil --> eodhd
+    eodhd --> kursdata
     marked --> signal
     marked --> kursdata
     detalj --> signal
