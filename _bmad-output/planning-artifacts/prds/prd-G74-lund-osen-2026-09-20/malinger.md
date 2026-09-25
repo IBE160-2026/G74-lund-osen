@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-24T21:58
+updated: 2026-09-25T23:29
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -423,6 +423,14 @@ er den opprinnelige lesningen riktig likevel, og budsjettet må dobles.
 
 Tallet er ikke rettet i `prd.md` eller `begrunnelser.md` her, nettopp fordi det
 er utledet. Ført som eget punkt i `docs/kilder-og-rettigheter.md`.
+
+*Lagt til 2026-09-25:* målt ved innsamlingen til relevanseksperimentet
+(`relevanseksperiment.md` §6). Åtte forespørsler mot `/api/news`, én ticker
+hver, kostet **5 kall hver, 40 til sammen**. `limit=20` (DNB) kostet ikke mer
+enn `limit=10`. Tallet ~40 over er dermed målt for åtte forespørsler med én
+ticker hver. En forespørsel med **flere tickere samtidig er fortsatt ikke
+målt**: kontrollen med to tickere ble byttet ut før innsamlingen (`bb54553`),
+fordi hvert selskap hentes for seg.
 
 #### Sidefunn: relevansen i de ti treffene
 
