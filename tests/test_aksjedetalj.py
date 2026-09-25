@@ -89,7 +89,7 @@ class TestBjyggPunkter:
         assert punkter[0].ma50 is None
 
     def test_kurs_og_snitt_tegnes_fra_samme_justerte_serie(self):
-        """Tegnet vi close mot et snitt fra adjusted_close, ville de ligget
+        """Tegnet vi slutt mot et snitt fra justert_slutt, ville de ligget
         paa hver sin skala - og avstanden ville vaert stoerst for aksjene som
         betaler mest utbytte."""
         rader = serie([100.0] * 10, slutt=[200.0] * 10)  # ujustert dobbelt saa hoey
@@ -175,7 +175,7 @@ class TestByggDetalj:
 
         detalj = bygg_detalj(EQNR, kilde, KORT)
 
-        assert detalj.sluttkurs == justert[-1]
+        assert detalj.sluttkurs == slutt[-1]
         assert detalj.dato == date(2026, 1, 6)
         assert detalj.styrke == 0
         assert [p.kurs for p in detalj.punkter] == justert

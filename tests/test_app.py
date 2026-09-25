@@ -137,6 +137,24 @@ def test_uleselig_symbol_navngis_i_fotnoten(klient, monkeypatch):
     assert "Equinor" in html
     assert "Uten data i denne kilden" in html
     assert "DNB Bank" in html
+    assert 'href="/aksje/DNB"' not in html
+
+
+@pytest.mark.parametrize(
+    "hentet", [None, "2026-09-21T15:40:00"], ids=["mangler", "uten-tidssone"]
+)
+def test_uleselig_hentet_gjoer_hele_oeyeblikksbildet_manglende(klient, monkeypatch, hentet):
+    """SnapshotLeser (1.4a): kan hentet ikke leses, er hele oeyeblikksbildet
+    manglende. Ingen rader vises, siden sier at kursdata mangler, og det
+    staar ingen «data hentet». Detaljen gir 404."""
+    monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [101.0])}, hentet=hentet))
+
+    html = klient.get("/").data.decode("utf-8")
+
+    assert 'href="/aksje/EQNR"' not in html
+    assert "Ingen kursdata" in html
+    assert "data hentet" not in html
+    assert klient.get("/aksje/EQNR").status_code == 404
 
 
 def test_datoen_skrives_som_aaaa_mm_dd(klient, monkeypatch):
@@ -247,7 +265,7 @@ class TestAksjedetalj:
 
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
 
-        assert "2026-11-19" in html
+        assert "Energi · 2026-11-19" in html
         assert "2026-09-01 til 2026-11-19" in html
 
     def test_uleselig_symbol_gir_404(self, klient, monkeypatch):

@@ -101,7 +101,7 @@ class TestByggRad:
 
         rad = bygg_rad(EQNR, serie(justert, slutt=slutt), KORT)
 
-        assert rad.sluttkurs == justert[-1]
+        assert rad.sluttkurs == slutt[-1]
         assert rad.endring_prosent == pytest.approx((100.1 - 99.9) / 99.9 * 100)
         assert rad.styrke == 0
 
