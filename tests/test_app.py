@@ -5,7 +5,8 @@ derfor sitt eget oeyeblikksbilde i stedet for aa lese fra katalogen. Det er en
 ekte SnapshotKilde med EODHDs feltnavn, saa appen proeves gjennom den samme
 oversettelsen til Kursrad (SnapshotLeser) som i drift. Testene av
 tidsstemplene monterer i stedet et MinneKurslager bak hent_leser, fordi et
-oeyeblikksbilde har samme tid for alle symbolene.
+oeyeblikksbilde har samme tid for alle symbolene. Unntaket er TestHentLeser,
+som leser en tmp_path-katalog gjennom lagring_fil, aldri data/.
 """
 
 import json

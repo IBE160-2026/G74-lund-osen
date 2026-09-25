@@ -40,6 +40,11 @@ FORBUDT_I_PORTEN = {"json", "pathlib", "lagring_fil", "lagring_sqlite", "eodhd"}
 # Modulene vakten mot EODHDs feltnavn gjelder: kjernen og porten.
 UTEN_EODHD = KJERNEMODULER + (PORTMODUL,)
 
+# Strengvakten gjelder i tillegg skallet utenom oversetteren (eodhd.py) og
+# nettadapteren (fetch_prices.py). Ikke fallbackvakten: lagring_sqlite.py
+# leser rad[0] fra basen, og det er lovlig.
+UTEN_EODHD_STRENGER = UTEN_EODHD + ("lagring_fil.py", "lagring_sqlite.py", "app.py")
+
 
 def _tre(navn: str) -> ast.Module:
     return ast.parse((SRC / navn).read_text(encoding="utf-8"), filename=navn)
@@ -61,7 +66,7 @@ def test_importerer_verken_sqlite3_eller_pathlib(navn):
     assert _importerte_moduler(_tre(navn)) & FORBUDTE_MODULER == set()
 
 
-@pytest.mark.parametrize("navn", UTEN_EODHD)
+@pytest.mark.parametrize("navn", UTEN_EODHD_STRENGER)
 def test_ingen_eodhd_noekler_i_kildeteksten(navn):
     """Ingen streng i modulen er en av EODHDs feltnavn. Staar den der, leser
     modulen kildens rader i stedet for Kursrad."""
@@ -103,5 +108,7 @@ def _navn_i(tre: ast.Module) -> set[str]:
 
 def test_app_velger_ikke_oeyeblikksbilde_selv():
     """app.py verken importerer eller kaller nyeste_snapshot, og kjenner ikke
-    SnapshotKilde. Kursleseren kommer fra filadapteren (story 1.5)."""
-    assert _navn_i(_tre("app.py")) & {"nyeste_snapshot", "SnapshotKilde"} == set()
+    SnapshotKilde, SnapshotLeser eller DATA_KATALOG. Kursleseren kommer fra
+    filadapteren (story 1.5)."""
+    forbudt = {"nyeste_snapshot", "SnapshotKilde", "SnapshotLeser", "DATA_KATALOG"}
+    assert _navn_i(_tre("app.py")) & forbudt == set()
