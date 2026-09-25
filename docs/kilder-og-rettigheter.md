@@ -2,7 +2,7 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-24T21:58
+updated: 2026-09-25T23:31
 ---
 
 # Kilder og rettigheter
@@ -162,6 +162,13 @@ For åtte selskaper blir det ~40 kall, ikke 80. Anslaget på 80 står fortsatt i
 `prd.md` og `begrunnelser.md` og er ikke rettet der — se punktet nederst.
 Konklusjonen om daglig drift endres ikke: 15 tickere er 75 kall mot en
 dagsgrense på 20.
+
+*Rettet 2026-09-25:* ~40 er nå målt. Åtte forespørsler med én ticker hver kostet
+5 kall hver, 40 til sammen, og `limit=20` kostet ikke mer enn `limit=10`
+(`relevanseksperiment.md` §6). Anslaget på 80 ble rettet i `prd.md` og
+`begrunnelser.md` 24.09, så «står fortsatt … og er ikke rettet der» stemmer ikke
+lenger. En forespørsel med flere tickere samtidig er ikke målt; kontrollen med
+to tickere ble byttet ut (`bb54553`).
 
 > Free plan — 20 API calls per day. Enough to try the endpoints out, not to run
 > an application.
@@ -1035,11 +1042,16 @@ lenger uimotsagt» over.
 - [x] ~~Verifisere om `/api/news` svarer for `.OL`-tickere på gratisnivå~~ —
       **gjort 2026-09-21. Ja:** HTTP 200 og ti artikler for `DNB.OL`. Testen
       kostet 5 kall, ikke 10. Se `malinger.md` §7.2
-- [ ] Rette kalltallet for nyhets-API-et der det er ført videre: `prd.md` og
+- [x] ~~Rette kalltallet for nyhets-API-et der det er ført videre: `prd.md` og
       `begrunnelser.md` anslår ~80 kall for relevanseksperimentets åtte
       selskaper, bygget på det doble tallet. Med 5 per ticker blir det ~40.
       Målingen dekker bare én ticker; 5 per ticker for flere er utledet av
-      EODHDs eget eksempel, ikke målt. Koster ingen kall å rette
+      EODHDs eget eksempel, ikke målt. Koster ingen kall å rette~~ — **gjort.
+      `prd.md` og `begrunnelser.md` ble rettet 24.09, og 25.09 ble ~40 målt:
+      åtte forespørsler med én ticker hver kostet 40 kall
+      (`relevanseksperiment.md` §6). Flere tickere i én forespørsel er ikke
+      målt; kontrollen med to tickere ble byttet ut (`bb54553`).** *Rettet
+      2026-09-25*
 - [ ] **Dokumentere at modelltjenesten ikke trener på innholdet.** Betingelse 4
       i EODHDs godkjenning av 21.09, og godkjenningen er ikke oppfylt før den er
       ført. To steg: (a) velge modelltjeneste — ingen er navngitt i noe dokument

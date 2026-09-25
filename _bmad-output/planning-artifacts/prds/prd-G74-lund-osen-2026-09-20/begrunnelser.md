@@ -2,7 +2,7 @@
 title: "Begrunnelser — hvorfor kravene i PRD-en ser slik ut"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-24T23:14
+updated: 2026-09-25T23:31
 ---
 
 # Begrunnelser — hvorfor kravene i PRD-en ser slik ut
@@ -302,6 +302,14 @@ ticker, altså 10 for én ticker.
 ticker, eller ~80 hvis det er 10. Det er ikke målt og avgjøres av den første
 forespørselen med to tickere (story 9.4). Tallet 80 i avsnittet under står
 derfor åpent.
+
+*Rettet 2026-09-25:* ~40 er målt. Åtte forespørsler med én ticker hver kostet 5
+kall hver, 40 til sammen (`relevanseksperiment.md` §6). Det ble ikke avgjort av
+en forespørsel med to tickere: den kontrollen ble byttet ut (`bb54553`), fordi
+hvert selskap hentes for seg, og flere tickere i én forespørsel er fortsatt ikke
+målt. Her sto «Det er ikke målt og avgjøres av den første forespørselen med to
+tickere (story 9.4)». Tallet 80 i avsnittet under står dermed ikke lenger åpent:
+40 er målt.
 
 Åtte selskaper à 10 kall er 80 kall, som er anslaget gruppen kom fram til —
 riktig tall, men av en annen grunn enn den gruppen la til grunn. Innsamlingen
