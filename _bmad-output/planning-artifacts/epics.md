@@ -143,7 +143,8 @@ flere av dem er **allerede oppfylt i kode** — de er merket med opphav.
 
 - `AD-3` — Én port per eid datasett, én skriver per datasett. Portene er
   `Kurslager`, `Meldingslager`, `Vurderingslager`, `KILogg`. *`Meldingskilde` omdøpt
-  2026-09-24 etter navneregelen i spinen: porten har en skriver*
+  2026-09-24 etter navneregelen i spinen: porten har en skriver.* *Bruddet med
+  `Kurskilde` ved siden av `Kurslager` ble lukket 2026-09-25 i story 1.4c (`a91ef79`)*
 - `AD-4` — SQLite fra standardbiblioteket. Ingen hostet database. *Bekreftet av
   faglærerstaben 22.09*
 - `AD-5` — `erstatt_serie(symbol, rader, hentet)` gjør DELETE+INSERT i én
@@ -517,7 +518,7 @@ feilstavet nøkkel blir en feil i stedet for `None`.
 *Endret 2026-09-23, før bygging:*
 - **`sist_hentet(symbol) -> datetime | None`, i UTC (AD-20),** legges i porten nå og ikke i 1.4. Den settes av `erstatt_serie(symbol, rader, hentet)` i samme kall som serien byttes ut, så serie og tidsstempel kommer fra samme øyeblikk. Tidsstempelet er per symbol og ikke globalt, fordi AD-15 lar ett symbol feile og beholde sin gamle serie. Grunnen til å ta det nå: utsettes det, må porten endres to ganger, mens AD-19 sier at kjernen skal røres én gang. «Bare `erstatt_serie` og `serie`» var ment å holde `legg_til_rad` ute, ikke en lesemetode. Hvordan oversikten viser tidsstempelet, avgjøres i 1.4.
 - **`Kursrad.dato` er `datetime.date`, ikke tekst.** En `date` kan ikke være feil formatert, og AD-20 sier at børsdagen er en kalenderdato. Adapteren oversetter.
-- **`Kurskilde` blir stående ved siden av `Kurslager` til 1.4** (valg b). Det er et brudd på AD-3 så lenge det varer. En test hindrer at nye moduler tar `Kurskilde` i bruk.
+- **`Kurskilde` blir stående ved siden av `Kurslager` til 1.4** (valg b). Det er et brudd på AD-3 så lenge det varer. En test hindrer at nye moduler tar `Kurskilde` i bruk. *Lukket 2026-09-25: story 1.4c fjernet `Kurskilde`, `MinneKilde` og testen, commit `a91ef79`.*
 
 **Én økt:** ja.
 

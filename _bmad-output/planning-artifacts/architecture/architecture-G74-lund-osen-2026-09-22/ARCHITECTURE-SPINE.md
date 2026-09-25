@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-24T19:15'
+updated: '2026-09-25T18:06'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -43,7 +43,7 @@ mønsteret og gjør det bindende.
 | Lag | Filer | Regel |
 |---|---|---|
 | **Kjerne** | `signalberegning.py`, `meldinger.py`, `markedsoversikt.py`, `aksjedetalj.py`, `graf.py` | Ingen import av `requests`, `sqlite3`, `pathlib`, `flask` |
-| **Porter** | `kursdata.py` | Protokoller, verdityper og minneimplementasjonene testene bruker (`MinneKilde`, `MinneKurslager`). Ingen I/O — brytes i dag, se under |
+| **Porter** | `kursdata.py` | Protokoller, verdityper og minneimplementasjonene testene bruker (`MinneKurslager`). *Rettet 2026-09-25: `MinneKilde` ble fjernet i story 1.4c*. Ingen I/O — brytes i dag, se under |
 | **Skall** | `app.py` (HTTP), `fetch_prices.py` (nett), lagringsadapteren (SQLite) | Eneste lag som kjenner teknologi |
 
 **`kursdata.py` oppfyller ikke portregelen i dag, og det skal stå her til den
@@ -114,6 +114,7 @@ prosjektmodul. De er løvnoder, og skal forbli det.
 - **Rule:** hvert datasett har nøyaktig **én** port og nøyaktig **én** skriver. Lesere går gjennom porten. Portene er `Kurslager`, `Meldingslager`, `Vurderingslager` og `KILogg` — ikke én felles lagerklasse. *Omdøpt 2026-09-24: `Meldingskilde` heter `Meldingslager` etter navneregelen, fordi porten har en skriver (story 6.1). Den er ikke bygget.*
 - **Opphav:** mønsteret er utvidet, ikke oppfunnet. `Kurskilde` i `kursdata.py`, commit `be2ba93` (21.09)
 - **Leseside, 2026-09-23:** `Kursleser` (`serie`, `sist_hentet`) er lesesiden av porten for kursdata, og `Kurslager` er `Kursleser` pluss `erstatt_serie`. Det er én port med en leseside, ikke to porter. `Kursleser` er `Kurskilde` født på nytt, med `Kursrad` og tid per symbol.
+- **Bruddet er lukket, 2026-09-25:** fra story 1.2 (valg b) sto `Kurskilde` ved siden av `Kurslager`, altså to porter for kursdataene. Story 1.4c fjernet `Kurskilde`, `MinneKilde` og testen som holdt bruddet fra å vokse, commit `a91ef79`. Kursdataene har nå én port.
 
 ### AD-4 — SQLite er motoren
 
@@ -287,7 +288,7 @@ FR-408. At dagen mangler, skal kunne skilles i lageret: `FR-409`. *Rettet
 | Kursrader | `Kursrad` med norske felt (AD-19). Kildens feltnavn stopper i adapteren |
 | Kurs | Beregning bruker `adjusted_close` (FR-701). Markedsoversikten viser `close`. Forskjellen er tilsiktet og dokumentert |
 | Feil | En manglende aksje er en rad i `feil`, ikke et unntak som bobler opp (AD-15) |
-| Tester | Hver story leveres med test. Testen kjører uten nett (AD-8). Kjerne testes direkte; skall testes med port-dobler som `MinneKilde` |
+| Tester | Hver story leveres med test. Testen kjører uten nett (AD-8). Kjerne testes direkte; skall testes med port-dobler som `MinneKurslager` *(rettet 2026-09-25: her sto `MinneKilde`, fjernet i 1.4c)* |
 | Konfigurasjon | Fra miljøet, aldri fra kode eller image (AD-12) |
 
 ## Stack
