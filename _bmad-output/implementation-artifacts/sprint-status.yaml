@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-24-2026 19:26
-last_updated: 09-25-2026 11:46
+last_updated: 09-25-2026 11:52
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -101,7 +101,7 @@ development_status:
   8-2-ux-gjennomgang-av-de-to-skjermbildene-med-cu-bmad-ux: backlog
   epic-8-retrospective: optional
 
-  epic-9: backlog
+  epic-9: in-progress
   9-1-docs-kvalitetssikring-md: backlog
   9-2-docs-ai-prompts-bygging: backlog
   9-3-arbeidsmønsteret: backlog
