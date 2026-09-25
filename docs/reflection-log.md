@@ -2412,3 +2412,22 @@ annerledes.
 
 *Det er lettere å skrive dette nå enn i desember. Oppføringer som skrives i
 ettertid, blir til det man husker — ikke til det som skjedde.*
+
+---
+
+## 25.09.2026 – Samarbeidet så langt
+
+### Dato / deltaker(e)
+
+Joakim og Marian. Ført av Joakim.
+
+### Hva ble gjort eller foreslått?
+
+I starten var fokuset å komme i gang. Vi har samarbeidet tett, snakket oss
+gjennom ideer og valg og brukt tankekart. Etter samtalene har Marian i hovedsak
+lagt informasjonen inn i Claude, på sin maskin.
+
+### Hva førte det til?
+
+Valgene er tatt sammen. Derfor har felles commits fra 25.09 meg som medforfatter
+(regel 20 i `CLAUDE.md`).
