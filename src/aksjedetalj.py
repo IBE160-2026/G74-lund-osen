@@ -1,7 +1,7 @@
 """Aksjedetaljen - FR-201, FR-202 og FR-706.
 
-Ren logikk. Ingen API-kall, ingen filer, ingen HTML. Leser gjennom Kurskilde,
-akkurat som markedsoversikten.
+Ren logikk. Ingen API-kall, ingen filer, ingen HTML. Leser Kursrad gjennom
+Kursleser, akkurat som markedsoversikten.
 
 Avgrenset til forklaringsdelen. Boersmeldinger (FR-203), KI-forklaring
 (FR-602) og kommende hendelser (FR-301) mangler med vilje: de krever kilder
@@ -15,7 +15,7 @@ hver sjekk maalingen sin hit ut, ikke bare fortegnet den endte paa.
 from dataclasses import dataclass
 from datetime import date, timedelta
 
-from kursdata import Aksje, Kurskilde
+from kursdata import Aksje, Kursleser, Kursrad
 from markedsoversikt import RETNINGSVISNING, UKJENT_RETNING, Retningsvisning
 from signalberegning import Parametre, STANDARD, Signal, beregn_signal
 
@@ -28,7 +28,7 @@ GRAFVINDU_DAGER = 182
 class Punkt:
     """Ett punkt i grafen. ma50 er None foer snittet har nok historikk."""
 
-    dato: str
+    dato: date
     kurs: float
     ma50: float | None
 
@@ -67,7 +67,7 @@ class SjekkVisning:
 @dataclass(frozen=True)
 class Detalj:
     aksje: Aksje
-    dato: str
+    dato: date
     sluttkurs: float
     signal: Signal | None
     mangler: str | None
@@ -102,11 +102,6 @@ class Detalj:
         return any(p.ma50 is not None for p in self.punkter)
 
 
-def _justert(rad: dict) -> float | None:
-    verdi = rad.get("adjusted_close") or rad.get("close")
-    return float(verdi) if verdi else None
-
-
 def glidende_snitt(kurser: list[float], vindu: int) -> list[float | None]:
     """Snitt over de siste `vindu` verdiene, None foer det finnes nok."""
     ut: list[float | None] = []
@@ -118,51 +113,43 @@ def glidende_snitt(kurser: list[float], vindu: int) -> list[float | None]:
     return ut
 
 
-def _innenfor_vindu(rader: list[dict], dager: int) -> int:
+def _innenfor_vindu(rader: list[Kursrad], dager: int) -> int:
     """Indeksen der grafvinduet starter. Regnet paa dato, ikke paa radtall."""
-    try:
-        siste = date.fromisoformat(rader[-1]["date"][:10])
-    except (ValueError, KeyError):
+    if not rader:
         return 0
 
-    grense = siste - timedelta(days=dager)
+    grense = rader[-1].dato - timedelta(days=dager)
     for i, rad in enumerate(rader):
-        try:
-            if date.fromisoformat(rad["date"][:10]) >= grense:
-                return i
-        except (ValueError, KeyError):
-            continue
+        if rad.dato >= grense:
+            return i
     return 0
 
 
 def bygg_punkter(
-    rader: list[dict], p: Parametre = STANDARD, dager: int = GRAFVINDU_DAGER
+    rader: list[Kursrad], p: Parametre = STANDARD, dager: int = GRAFVINDU_DAGER
 ) -> tuple[Punkt, ...]:
     """Grafpunktene for de siste seks maanedene, med MA50 oppaa (FR-202).
 
     Kursen og snittet tegnes fra SAMME serie - den utbyttejusterte. Tegnet
-    vi close mot et snitt regnet paa adjusted_close, ville de to ligget paa
+    vi slutt mot et snitt regnet paa justert_slutt, ville de to ligget paa
     hver sin skala, og avstanden mellom dem ville vaert stoerst for aksjene
     som betaler mest utbytte. Linja skal vise sjekk 1, ikke et utbytte.
 
     Snittet regnes paa HELE serien og klippes etterpaa. Ellers ville de
     foerste 50 dagene i vinduet mistet snittet sitt uten grunn.
     """
-    kurser = [k for k in (_justert(rad) for rad in rader) if k is not None]
-    if len(kurser) != len(rader):
-        rader = [rad for rad in rader if _justert(rad) is not None]
-
+    kurser = [float(rad.justert_slutt) for rad in rader]
     snitt = glidende_snitt(kurser, p.ma_vindu)
     start = _innenfor_vindu(rader, dager)
 
     return tuple(
-        Punkt(dato=rad["date"], kurs=kurs, ma50=ma)
+        Punkt(dato=rad.dato, kurs=kurs, ma50=ma)
         for rad, kurs, ma in zip(rader[start:], kurser[start:], snitt[start:])
     )
 
 
 def bygg_detalj(
-    aksje: Aksje, kilde: Kurskilde, p: Parametre = STANDARD
+    aksje: Aksje, kilde: Kursleser, p: Parametre = STANDARD
 ) -> Detalj | None:
     """Detaljen for en aksje, eller None hvis kilden ikke har den i det hele tatt."""
     rader = kilde.serie(aksje.symbol)
@@ -178,8 +165,8 @@ def bygg_detalj(
 
     return Detalj(
         aksje=aksje,
-        dato=rader[-1]["date"],
-        sluttkurs=float(rader[-1]["close"]),
+        dato=rader[-1].dato,
+        sluttkurs=float(rader[-1].slutt),
         signal=signal,
         mangler=mangler,
         punkter=bygg_punkter(rader, p),

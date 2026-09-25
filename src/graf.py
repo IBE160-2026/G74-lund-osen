@@ -10,6 +10,7 @@ riktig ut.
 """
 
 from dataclasses import dataclass
+from datetime import date
 
 from aksjedetalj import Punkt
 
@@ -36,8 +37,8 @@ class Graf:
     ma50linje: str
     lav: float
     hoy: float
-    forste_dato: str
-    siste_dato: str
+    forste_dato: date
+    siste_dato: date
     rutenett: tuple[Rutelinje, ...]
 
     @property

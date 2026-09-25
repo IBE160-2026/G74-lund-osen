@@ -19,6 +19,8 @@ maaling bak seg.
 from dataclasses import dataclass
 from statistics import median, stdev
 
+from kursdata import Kursrad
+
 MA_VINDU = 50
 
 # Laast 21.09.2026 mot 199 handelsdager, se malinger.md §7.4.
@@ -76,18 +78,19 @@ class Signal:
     skiller_seg_ut: bool
 
 
-def _justerte_kurser(rader: list[dict]) -> list[float]:
-    """adjusted_close naar den finnes, ellers close.
+def _justerte_kurser(rader: list[Kursrad]) -> list[float]:
+    """justert_slutt, uten fallback til slutt (AD-19).
 
-    EODHD regner adjusted_close om bakover ved hvert nytt utbytte. Det er
+    Kildens justerte kurs regnes om bakover ved hvert nytt utbytte. Det er
     grunnen til at beregningsgrunnlaget lastes ned i sin helhet ved hver
-    henting (FR-406) og aldri skjoetes paa.
+    henting (FR-406) og aldri skjoetes paa. Kursrad kan ikke mangle feltet,
+    saa det finnes ingen annen kurs aa falle tilbake paa.
     """
-    return [float(rad.get("adjusted_close") or rad["close"]) for rad in rader]
+    return [float(rad.justert_slutt) for rad in rader]
 
 
-def _volumer(rader: list[dict]) -> list[float]:
-    return [float(rad.get("volume") or 0) for rad in rader]
+def _volumer(rader: list[Kursrad]) -> list[float]:
+    return [float(rad.volum) for rad in rader]
 
 
 def _endringer(kurser: list[float]) -> list[float]:
@@ -181,10 +184,10 @@ def finn_retning(sjekker: tuple[Sjekk, ...]) -> str:
     return BLANDET
 
 
-def beregn_signal(rader: list[dict], p: Parametre = STANDARD) -> Signal:
+def beregn_signal(rader: list[Kursrad], p: Parametre = STANDARD) -> Signal:
     """Tre sjekker, hver +1, 0 eller -1. Ingen vekting og ingen fjerde sjekk.
 
-    Radene er kronologiske med nyeste sist, slik EODHD leverer dem.
+    Radene er kronologiske med nyeste sist, slik Kursleser.serie gir dem.
 
     Serier som er for korte gir ValueError i stedet for et tall som ser
     plausibelt ut. Kallende kode avgjoer hva som vises - NFR-03 sier at

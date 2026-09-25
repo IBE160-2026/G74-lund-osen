@@ -10,6 +10,7 @@ from datetime import date, timedelta
 
 import pytest
 
+from kursdata import Kursrad
 from signalberegning import (
     BLANDET,
     INGEN,
@@ -49,18 +50,28 @@ def stigende_kurser(siste_endring: float) -> list[float]:
     return kurser
 
 
-def serie(kurser: list[float], volumer: list[float] | None = None) -> list[dict]:
-    """Bygger raader slik EODHD leverer dem: kronologisk, nyeste sist."""
+def serie(
+    kurser: list[float],
+    volumer: list[int] | None = None,
+    slutt: list[float] | None = None,
+) -> list[Kursrad]:
+    """Kursrader slik Kursleser gir dem: kronologisk, nyeste sist.
+
+    kurser er den justerte serien signalet skal regnes paa. slutt er den
+    ujusterte, og er lik den justerte naar testen ikke sier noe annet.
+    """
     if volumer is None:
         volumer = [NORMALT_VOLUM] * len(kurser)
+    if slutt is None:
+        slutt = kurser
     return [
-        {
-            "date": (date(2026, 9, 1) + timedelta(days=nummer)).isoformat(),
-            "close": kurs,
-            "adjusted_close": kurs,
-            "volume": volum,
-        }
-        for nummer, (kurs, volum) in enumerate(zip(kurser, volumer))
+        Kursrad(
+            dato=date(2026, 9, 1) + timedelta(days=nummer),
+            slutt=ujustert,
+            justert_slutt=kurs,
+            volum=volum,
+        )
+        for nummer, (kurs, ujustert, volum) in enumerate(zip(kurser, slutt, volumer))
     ]
 
 
@@ -121,6 +132,41 @@ class TestSignalstyrke:
         kurser += [100.2, 99.9, 100.1]
 
         signal = beregn_signal(serie(kurser), KORT)
+
+        assert signal.styrke == 0
+        assert signal.retning == INGEN
+
+
+class TestJustertKurs:
+    """FR-701, AD-19: signalet regnes paa justert_slutt, aldri paa slutt."""
+
+    def test_signalet_foelger_justert_ikke_ujustert_kurs(self):
+        """Justert serie stiger og hopper paa stort volum: styrke 3, positiv.
+
+        Den ujusterte serien ligger flatt paa 100 hele veien. Regnet paa den,
+        ville alle tre sjekkene gitt 0. Faar signalet 3, er det regnet paa
+        den justerte.
+        """
+        kurser = stigende_kurser(0.09)
+        volumer = med_stort_volum_siste_dag(len(kurser))
+        flat = [100.0] * len(kurser)
+
+        signal = beregn_signal(serie(kurser, volumer, slutt=flat), KORT)
+
+        assert verdier(signal) == {"Trend": 1, "Bevegelse": 1, "Interesse": 1}
+        assert signal.styrke == 3
+
+    def test_utbyttedag_gir_ikke_kursfall(self):
+        """Utbyttedagen: slutt faller 6 %, justert kurs staar stille.
+
+        Regnet paa slutt, ville bevegelsen og trenden sett et fall. Regnet
+        paa den justerte serien, er dagen rolig.
+        """
+        kurser = [100.0, 100.5, 99.8, 100.2, 99.9, 100.3, 100.1, 99.7, 100.4, 100.0]
+        kurser += [100.2, 99.9, 100.1]
+        slutt = [kurs * 1.06 for kurs in kurser[:-1]] + [kurser[-1]]
+
+        signal = beregn_signal(serie(kurser, slutt=slutt), KORT)
 
         assert signal.styrke == 0
         assert signal.retning == INGEN

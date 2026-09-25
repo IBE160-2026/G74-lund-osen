@@ -1,7 +1,7 @@
 """Markedsoversikten - FR-101 til FR-103.
 
-Ren logikk. Leser gjennom Kurskilde og regner med signalberegning. Gjoer ingen
-API-kall, leser ingen filer og kjenner ingen HTML. Derfor kan hele fila testes
+Ren logikk. Leser Kursrad gjennom Kursleser og regner med signalberegning.
+Gjoer ingen API-kall, leser ingen filer og kjenner ingen HTML. Derfor kan hele fila testes
 uten nett, og visningen kan byttes uten at noe her endres.
 
 Kolonnene er de fem i FR-101 og ikke flere: selskap, sluttkurs, endring,
@@ -9,8 +9,9 @@ signalstyrke og retning.
 """
 
 from dataclasses import dataclass
+from datetime import date
 
-from kursdata import AKSJEUNIVERS, Aksje, Kurskilde
+from kursdata import AKSJEUNIVERS, Aksje, Kursleser, Kursrad
 from signalberegning import (
     BLANDET,
     INGEN,
@@ -74,7 +75,7 @@ class Rad:
     """
 
     aksje: Aksje
-    dato: str
+    dato: date
     sluttkurs: float
     endring_prosent: float | None
     signal: Signal | None
@@ -95,12 +96,7 @@ class Rad:
         return bool(self.signal and self.signal.skiller_seg_ut)
 
 
-def _justert(rad: dict) -> float | None:
-    verdi = rad.get("adjusted_close") or rad.get("close")
-    return float(verdi) if verdi else None
-
-
-def endring_i_prosent(rader: list[dict]) -> float | None:
+def endring_i_prosent(rader: list[Kursrad]) -> float | None:
     """Endring fra forrige boersdag, regnet paa utbyttejustert kurs (FR-101).
 
     Et ordinaert utbytte skal ikke se ut som et kursfall. Derfor justert kurs
@@ -109,14 +105,12 @@ def endring_i_prosent(rader: list[dict]) -> float | None:
     """
     if len(rader) < 2:
         return None
-    fra = _justert(rader[-2])
-    til = _justert(rader[-1])
-    if not fra or til is None:
-        return None
+    fra = rader[-2].justert_slutt
+    til = rader[-1].justert_slutt
     return (til - fra) / fra * 100
 
 
-def bygg_rad(aksje: Aksje, rader: list[dict], p: Parametre = STANDARD) -> Rad | None:
+def bygg_rad(aksje: Aksje, rader: list[Kursrad], p: Parametre = STANDARD) -> Rad | None:
     """En rad for en aksje. None bare naar vi ikke har en eneste kursrad.
 
     En for kort serie gir en rad UTEN signal, ikke ingen rad. Brukeren skal
@@ -135,8 +129,8 @@ def bygg_rad(aksje: Aksje, rader: list[dict], p: Parametre = STANDARD) -> Rad | 
 
     return Rad(
         aksje=aksje,
-        dato=siste["date"],
-        sluttkurs=float(siste["close"]),
+        dato=siste.dato,
+        sluttkurs=float(siste.slutt),
         endring_prosent=endring_i_prosent(rader),
         signal=signal,
         mangler=mangler,
@@ -156,7 +150,7 @@ def _sorteringsnokkel(rad: Rad) -> tuple[int, float]:
 
 
 def bygg_oversikt(
-    kilde: Kurskilde,
+    kilde: Kursleser,
     univers: tuple[Aksje, ...] = AKSJEUNIVERS,
     p: Parametre = STANDARD,
 ) -> list[Rad]:

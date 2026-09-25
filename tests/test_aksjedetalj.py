@@ -1,5 +1,7 @@
 """Tester for aksjedetaljen. Ingen nettverk, ingen filer."""
 
+from datetime import date, datetime, timedelta, timezone
+
 import pytest
 
 from aksjedetalj import (
@@ -10,28 +12,39 @@ from aksjedetalj import (
     finn_aksje,
     glidende_snitt,
 )
-from kursdata import AKSJEUNIVERS, Aksje, MinneKilde
+from kursdata import AKSJEUNIVERS, Aksje, Kursrad, MinneKurslager
 from signalberegning import Parametre
 
 EQNR = Aksje("EQNR", "EQNR.OL", "Equinor", "Energi")
 KORT = Parametre(ma_vindu=5, volatilitet_vindu=3, volum_vindu=3)
+HENTET = datetime(2026, 9, 21, 15, 40, tzinfo=timezone.utc)
 
 
-def serie(kurser, volumer=None, start="2026-01-01"):
-    """Kursrader med ekte, sammenhengende datoer."""
-    from datetime import date, timedelta
+def serie(kurser, volumer=None, start=date(2026, 1, 1), slutt=None):
+    """Kursrader med ekte, sammenhengende datoer.
 
-    d0 = date.fromisoformat(start)
+    kurser er den justerte serien. slutt er den ujusterte, og er lik den
+    justerte naar testen ikke sier noe annet.
+    """
     volumer = volumer or [1000] * len(kurser)
+    slutt = slutt or kurser
     return [
-        {
-            "date": (d0 + timedelta(days=i)).isoformat(),
-            "close": kurs,
-            "adjusted_close": kurs,
-            "volume": volum,
-        }
-        for i, (kurs, volum) in enumerate(zip(kurser, volumer))
+        Kursrad(
+            dato=start + timedelta(days=i),
+            slutt=ujustert,
+            justert_slutt=kurs,
+            volum=volum,
+        )
+        for i, (kurs, ujustert, volum) in enumerate(zip(kurser, slutt, volumer))
     ]
+
+
+def lager(serier: dict[str, list[Kursrad]]) -> MinneKurslager:
+    """Et Kursleser med seriene lagt inn, slik hentingen ville gjort det."""
+    ut = MinneKurslager()
+    for symbol, rader in serier.items():
+        ut.erstatt_serie(symbol, rader, HENTET)
+    return ut
 
 
 class TestGlidendeSnitt:
@@ -48,16 +61,12 @@ class TestGlidendeSnitt:
 class TestBjyggPunkter:
     def test_klipper_til_seks_maaneder(self):
         """Ett aar inn, seks maaneder ut."""
-        rader = serie([100.0] * 365, start="2025-09-21")
+        rader = serie([100.0] * 365, start=date(2025, 9, 21))
 
         punkter = bygg_punkter(rader, KORT)
 
         assert len(punkter) < len(rader)
-        from datetime import date
-
-        forste = date.fromisoformat(punkter[0].dato)
-        siste = date.fromisoformat(punkter[-1].dato)
-        assert (siste - forste).days <= GRAFVINDU_DAGER
+        assert (punkter[-1].dato - punkter[0].dato).days <= GRAFVINDU_DAGER
 
     def test_kort_serie_klippes_ikke(self):
         rader = serie([100.0] * 10)
@@ -69,7 +78,7 @@ class TestBjyggPunkter:
         Regnet vi bare paa vinduet, ville de foerste dagene mistet snittet
         sitt uten grunn - dataene finnes jo.
         """
-        rader = serie([100.0] * 300, start="2025-09-21")
+        rader = serie([100.0] * 300, start=date(2025, 9, 21))
 
         punkter = bygg_punkter(rader, KORT)
 
@@ -83,31 +92,34 @@ class TestBjyggPunkter:
         """Tegnet vi close mot et snitt fra adjusted_close, ville de ligget
         paa hver sin skala - og avstanden ville vaert stoerst for aksjene som
         betaler mest utbytte."""
-        rader = serie([100.0] * 10)
-        for rad in rader:
-            rad["close"] = 200.0  # ujustert er dobbelt saa hoey
+        rader = serie([100.0] * 10, slutt=[200.0] * 10)  # ujustert dobbelt saa hoey
 
         punkter = bygg_punkter(rader, KORT)
 
         assert punkter[-1].kurs == 100.0
         assert punkter[-1].ma50 == pytest.approx(100.0)
 
-    def test_taaler_rader_uten_kurs(self):
-        rader = serie([100.0] * 6)
-        rader[2]["close"] = None
-        rader[2]["adjusted_close"] = None
+    def test_utbyttedag_gir_ikke_hakk_i_grafen(self):
+        """Utbyttedagen: slutt faller 6 % siste dag, justert kurs gjoer det
+        ikke. Hvert punkt skal ligge paa den justerte kursen."""
+        justert = [100.0 + i for i in range(8)]
+        slutt = [kurs * 1.06 for kurs in justert[:-1]] + [justert[-1]]
 
-        punkter = bygg_punkter(rader, KORT)
+        punkter = bygg_punkter(serie(justert, slutt=slutt), KORT)
 
-        assert all(p.kurs is not None for p in punkter)
+        assert [p.kurs for p in punkter] == justert
+
+    def test_punktene_har_date(self):
+        punkter = bygg_punkter(serie([100.0, 101.0]), KORT)
+        assert [p.dato for p in punkter] == [date(2026, 1, 1), date(2026, 1, 2)]
 
 
 class TestByggDetalj:
     def test_none_naar_kilden_ikke_har_aksjen(self):
-        assert bygg_detalj(EQNR, MinneKilde({}), KORT) is None
+        assert bygg_detalj(EQNR, lager({}), KORT) is None
 
     def test_sjekkene_kommer_med_navn_verdi_og_maaling(self):
-        kilde = MinneKilde({"EQNR": serie([100.0] * 5 + [130.0])})
+        kilde = lager({"EQNR": serie([100.0] * 5 + [130.0])})
 
         detalj = bygg_detalj(EQNR, kilde, KORT)
 
@@ -118,7 +130,7 @@ class TestByggDetalj:
 
     def test_styrken_er_summen_av_bidragsyterne(self):
         """Det brukeren skal kunne etterproeve: hvorfor 2 og ikke 1."""
-        kilde = MinneKilde(
+        kilde = lager(
             {"EQNR": serie([100.0, 90.0, 110.0, 95.0, 105.0, 160.0], [1, 1, 1, 1, 1, 9999])}
         )
 
@@ -129,7 +141,7 @@ class TestByggDetalj:
 
     def test_sjekker_uten_utslag_vises_likevel(self):
         """Alle tre skal staa der. En sjekk som ga 0 er ogsaa en forklaring."""
-        kilde = MinneKilde({"EQNR": serie([100.0] * 6)})
+        kilde = lager({"EQNR": serie([100.0] * 6)})
 
         detalj = bygg_detalj(EQNR, kilde, KORT)
 
@@ -137,14 +149,14 @@ class TestByggDetalj:
         assert len(detalj.bidragsytere) <= 3
 
     def test_fortegn_vises_med_plusstegn(self):
-        kilde = MinneKilde({"EQNR": serie([100.0] * 5 + [130.0])})
+        kilde = lager({"EQNR": serie([100.0] * 5 + [130.0])})
         detalj = bygg_detalj(EQNR, kilde, KORT)
 
         fortegn = {s.fortegn for s in detalj.sjekker}
         assert fortegn <= {"+1", "0", "-1"}
 
     def test_for_kort_serie_gir_detalj_uten_signal(self):
-        kilde = MinneKilde({"EQNR": serie([100.0, 101.0])})
+        kilde = lager({"EQNR": serie([100.0, 101.0])})
 
         detalj = bygg_detalj(EQNR, kilde, KORT)
 
@@ -154,9 +166,29 @@ class TestByggDetalj:
         assert detalj.retning.tekst == "Ukjent"
         assert "Trenger" in detalj.mangler
 
+    def test_utbyttedag_viser_slutt_og_regner_paa_justert(self):
+        """Sluttkursen er den aksjen omsettes til. Signal og graf foelger den
+        justerte serien, ellers ser utbyttet ut som et kursfall."""
+        justert = [100.0, 100.4, 99.8, 100.2, 99.9, 100.1]
+        slutt = [kurs * 1.06 for kurs in justert[:-1]] + [justert[-1]]
+        kilde = lager({"EQNR": serie(justert, slutt=slutt)})
+
+        detalj = bygg_detalj(EQNR, kilde, KORT)
+
+        assert detalj.sluttkurs == justert[-1]
+        assert detalj.dato == date(2026, 1, 6)
+        assert detalj.styrke == 0
+        assert [p.kurs for p in detalj.punkter] == justert
+
+    def test_sluttkursen_er_slutt_ikke_justert(self):
+        """Den ujusterte kursen er den aksjen faktisk omsettes til."""
+        kilde = lager({"EQNR": serie([400.0, 400.0], slutt=[419.0, 419.0])})
+
+        assert bygg_detalj(EQNR, kilde, KORT).sluttkurs == 419.0
+
     def test_grafen_finnes_selv_uten_signal(self):
         """Kursen kan tegnes selv om snittet ikke kan regnes."""
-        detalj = bygg_detalj(EQNR, MinneKilde({"EQNR": serie([100.0, 101.0])}), KORT)
+        detalj = bygg_detalj(EQNR, lager({"EQNR": serie([100.0, 101.0])}), KORT)
 
         assert len(detalj.punkter) == 2
         assert detalj.har_ma50 is False
