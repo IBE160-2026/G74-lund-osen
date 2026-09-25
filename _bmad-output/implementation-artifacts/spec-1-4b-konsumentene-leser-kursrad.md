@@ -67,11 +67,11 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `data/kontrollregning_1_4b.py` (ikke i repoet) -- bygg oversikten og de 15 detaljene med graf fra den låste fila, og lagre alle felt med datoer som ISO-tekst, pluss HTML for `/` og de 15 `/aksje/<symbol>`. Kjøres før endringen (`-foer.json`) og etter (`-etter.json`), og sammenligningen skriver bare antall -- kontrollpunktet fra 25.09
-- [ ] `src/signalberegning.py`, `src/markedsoversikt.py`, `src/aksjedetalj.py`, `src/graf.py` -- `Kursrad` og `Kursleser`, fallbacken fjernet, docstringer rettet (de nevner `Kurskilde`/`adjusted_close`) -- AD-19
-- [ ] `src/app.py` -- `SnapshotLeser` til konsumentene -- AD-3
-- [ ] `tests/test_signalberegning.py`, `test_markedsoversikt.py`, `test_aksjedetalj.py`, `test_app.py`, `test_graf.py` -- `serie()` gir `Kursrad`. `MinneKilde` byttes med `MinneKurslager`; i `test_app` monteres en `SnapshotKilde` med `hentet`, så appen prøves gjennom den ekte oversettelsen. De to fallback-testene erstattes av tester der `slutt` ≠ `justert_slutt` for endring, signal og grafpunkter
-- [ ] `tests/test_konsumentene.py` (ny) -- de fire kjernemodulene importerer verken `sqlite3`, `pathlib` eller `Kurskilde`, og kildeteksten har ingen EODHD-nøkler (`"adjusted_close"`, `"close"`, `"volume"`, `"date"`). Testen krever at fallbacken er borte
+- [x] `data/kontrollregning_1_4b.py` (ikke i repoet) -- bygg oversikten og de 15 detaljene med graf fra den låste fila, og lagre alle felt med datoer som ISO-tekst, pluss HTML for `/` og de 15 `/aksje/<symbol>`. Kjøres før endringen (`-foer.json`) og etter (`-etter.json`), og sammenligningen skriver bare antall -- kontrollpunktet fra 25.09
+- [x] `src/signalberegning.py`, `src/markedsoversikt.py`, `src/aksjedetalj.py`, `src/graf.py` -- `Kursrad` og `Kursleser`, fallbacken fjernet, docstringer rettet (de nevner `Kurskilde`/`adjusted_close`) -- AD-19
+- [x] `src/app.py` -- `SnapshotLeser` til konsumentene -- AD-3
+- [x] `tests/test_signalberegning.py`, `test_markedsoversikt.py`, `test_aksjedetalj.py`, `test_app.py`, `test_graf.py` -- `serie()` gir `Kursrad`. `MinneKilde` byttes med `MinneKurslager`; i `test_app` monteres en `SnapshotKilde` med `hentet`, så appen prøves gjennom den ekte oversettelsen. De to fallback-testene erstattes av tester der `slutt` ≠ `justert_slutt` for endring, signal og grafpunkter
+- [x] `tests/test_konsumentene.py` (ny) -- de fire kjernemodulene importerer verken `sqlite3`, `pathlib` eller `Kurskilde`, og kildeteksten har ingen EODHD-nøkler (`"adjusted_close"`, `"close"`, `"volume"`, `"date"`). Testen krever at fallbacken er borte
 
 **Acceptance Criteria:**
 - Given hele testsettet, when det kjøres før og etter, then er begge grønne, og tallene står i commit-meldingen
