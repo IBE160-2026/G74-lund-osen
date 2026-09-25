@@ -1,27 +1,22 @@
-"""Datalaget: hvor kursseriene kommer fra.
+"""Porten for kursdata: typene og kontrakten, uten I/O - AD-1, AD-3, AD-19.
 
 Visningen skal ikke vite om en serie kommer fra en fil eller fra en database.
-I dag er kilden et tidsstemplet JSON-oeyeblikksbilde i data/. I arkitekturfasen
-blir den etter alt aa doemme en database - aapent punkt 17 - og da skal bare
-denne fila endres.
-
 Derfor gaar all lesing gjennom en port: Kurslager, med lesesiden Kursleser
 (AD-3). Visningen leser gjennom Kursleser. Den gamle porten ved siden av ble
 fjernet i story 1.4c, og kursdataene har naa bare denne ene.
 
+Her staar bare porten og typene den gir ut. Adapterne ligger i skallet:
+lagring_fil.py leser oeyeblikksbildene i data/, lagring_sqlite.py er basen,
+og eodhd.py oversetter kildens feltnavn til Kursrad. Porten importerer ingen
+av dem, og gjoer ingen I/O selv (story 1.5).
+
 Ingen funksjon her gjoer API-kall. Kvoten brukes bare av fetch_prices.py.
 """
 
-import json
 import math
-import re
 from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
-from pathlib import Path
 from typing import Protocol, runtime_checkable
-
-PROSJEKTROT = Path(__file__).resolve().parent.parent
-DATA_KATALOG = PROSJEKTROT / "data"
 
 
 @dataclass(frozen=True)
@@ -150,7 +145,7 @@ class Kurslager(Kursleser, Protocol):
 
     Kursleser pluss erstatt_serie, altsaa tre metoder. Det finnes med vilje
     ingen legg_til_rad: serien skjoetes aldri paa, fordi EODHD regner
-    adjusted_close om bakover ved hvert nytt utbytte (AD-5).
+    den justerte kursen om bakover ved hvert nytt utbytte (AD-5).
     """
 
     def erstatt_serie(self, symbol: str, rader: list[Kursrad], hentet: datetime) -> None:
@@ -213,172 +208,3 @@ class MinneKurslager:
 
     def sist_hentet(self, symbol: str) -> datetime | None:
         return self._hentet.get(symbol)
-
-
-@dataclass(frozen=True)
-class SnapshotKilde:
-    """Leser et tidsstemplet oeyeblikksbilde slik signaltesten skrev det.
-
-    Formatet er {"hentet": ..., "serier": {symbol: [rader]}}. Oeyeblikksbilder
-    skrives aldri om (FR-406, NFR-07), saa denne kilden er bare lesende - det
-    finnes med vilje ingen skrivemetode her.
-    """
-
-    hentet: str | None
-    serier: dict[str, list[dict]]
-
-    @classmethod
-    def fra_fil(cls, sti: Path) -> "SnapshotKilde":
-        innhold = json.loads(sti.read_text(encoding="utf-8"))
-        return cls(
-            hentet=innhold.get("hentet"),
-            serier=innhold.get("serier", {}),
-        )
-
-    def tidsstempel(self) -> str | None:
-        return self.hentet
-
-    def serie(self, symbol: str) -> list[dict]:
-        return self.serier.get(symbol, [])
-
-
-def _dato_fra_tekst(tekst: object) -> date:
-    """Streng YYYY-MM-DD. Godtas bare hvis dato.isoformat() er lik teksten.
-
-    date.fromisoformat alene godtar "20260921" og "2026-W39-1", og
-    strptime("%Y-%m-%d") godtar "2026-9-1". En umulig dato som "2026-09-31"
-    feiler allerede i parsingen.
-    """
-    if not isinstance(tekst, str):
-        raise UgyldigKursrad(f"date maa vaere tekst YYYY-MM-DD, fikk {tekst!r}")
-    try:
-        dato = date.fromisoformat(tekst)
-    except ValueError as feil:
-        raise UgyldigKursrad(f"date er ikke en gyldig dato: {tekst!r}") from feil
-    if dato.isoformat() != tekst:
-        raise UgyldigKursrad(f"date maa ha formen YYYY-MM-DD, fikk {tekst!r}")
-    return dato
-
-
-def kursrad_fra_eodhd(rad: object) -> Kursrad:
-    """Oversett en EODHD-rad til Kursrad. Det eneste stedet det skjer - AD-19.
-
-    adjusted_close gir justert_slutt og close gir slutt, uten fallback mellom
-    dem: en justert kurs som mangler, er en KeyError, ikke close. Fallbacken
-    ville gitt et tall som ser riktig ut, men er regnet paa feil serie.
-
-    Verdiene sjekkes ikke her; det gjoer Kursrad. En rad som ikke er et
-    objekt, og en dato som ikke er streng YYYY-MM-DD, gir UgyldigKursrad.
-    Et felt som mangler, gir KeyError. Epic 2 bruker samme funksjon naar
-    hentingen skriver til basen.
-    """
-    if not isinstance(rad, dict):
-        raise UgyldigKursrad(f"En EODHD-rad maa vaere et objekt, fikk {type(rad).__name__}")
-    return Kursrad(
-        dato=_dato_fra_tekst(rad["date"]),
-        slutt=rad["close"],
-        justert_slutt=rad["adjusted_close"],
-        volum=rad["volume"],
-    )
-
-
-def _hentet_fra_tekst(tekst: object) -> datetime | None:
-    """ISO 8601 med tidssone, i UTC. None hvis tiden ikke kan leses."""
-    if not isinstance(tekst, str):
-        return None
-    try:
-        tid = datetime.fromisoformat(tekst)
-    except ValueError:
-        return None
-    if tid.tzinfo is None or tid.utcoffset() is None:
-        return None
-    return tid.astimezone(timezone.utc)
-
-
-class SnapshotLeser:
-    """Kursleser over et oeyeblikksbilde - story 1.4a, AD-15, AD-19, AD-20.
-
-    Pakker inn SnapshotKilde og gir Kursrad. Alt oversettes ved oppretting,
-    og serie gir kopier ut. Den er med vilje ikke en Kurslager: et
-    oeyeblikksbilde skrives aldri om.
-
-    Et symbol med en rad som ikke kan oversettes, eller to rader med samme
-    dato, behandles som manglende: tom serie og sist_hentet None. De andre
-    leses som vanlig. Ingenting gjettes.
-
-    Kan hentet ikke leses (mangler, ikke ISO 8601, uten tidssone), er hele
-    oeyeblikksbildet manglende. En serie har alltid en tid i de andre
-    lagrene, fordi erstatt_serie setter begge, og slik er det her ogsaa:
-    sist_hentet(s) er None hvis og bare hvis serie(s) er tom.
-    """
-
-    def __init__(self, kilde: SnapshotKilde):
-        self._serier: dict[str, tuple[Kursrad, ...]] = {}
-        self._hentet = _hentet_fra_tekst(kilde.hentet)
-        # serier som ikke er et objekt, kan ikke leses - som en uleselig hentet.
-        if self._hentet is None or not isinstance(kilde.serier, dict):
-            return
-        for symbol, raa in kilde.serier.items():
-            # En serie som ikke er en liste, gjoer bare dette symbolet manglende.
-            if not isinstance(raa, list):
-                continue
-            try:
-                rader = [kursrad_fra_eodhd(r) for r in raa]
-            except (UgyldigKursrad, KeyError):
-                continue
-            datoer = {r.dato for r in rader}
-            if not rader or len(datoer) != len(rader):
-                continue
-            self._serier[symbol] = tuple(sorted(rader, key=lambda r: r.dato))
-
-    def serie(self, symbol: str) -> list[Kursrad]:
-        return list(self._serier.get(symbol, ()))
-
-    def sist_hentet(self, symbol: str) -> datetime | None:
-        return self._hentet if symbol in self._serier else None
-
-
-# Oeyeblikksbilder heter <prefiks>-raa-<ÅÅÅÅ-MM-DD>.json. fetch_prices skriver
-# KURSPREFIKS; eksperimentene skrev signaltest-, volumsjekk-, nyhetstest-.
-# Alle leses likt, men ved lik dato vinner kursfila - se nyeste_snapshot.
-KURSPREFIKS = "kurser"
-
-_SNAPSHOT_MONSTER = re.compile(r"-raa-(\d{4}-\d{2}-\d{2})\.json$")
-
-
-def nyeste_snapshot(katalog: Path = DATA_KATALOG) -> Path | None:
-    """Oeyeblikksbildet med nyeste dato i navnet, eller None hvis ingen finnes.
-
-    Datoen leses ut av filnavnet, ikke av filtidsstempelet. Et oeyeblikksbilde
-    som kopieres eller sjekkes ut paa nytt, faar ny mtime, men datoen i navnet
-    er den som gjelder - det er den dagen dataene er fra.
-
-    **Datoen avgjoer alene.** Prefikset er aldri med i sammenligningen av
-    datoer. Det var feilen her foer: valget var `max` over tuplene
-    (dato, sti), og ved LIK dato falt `max` tilbake paa stien - da vant
-    "signaltest-" over "kurser-" fordi s kommer etter k. Docstringen lovet at
-    prefikset ikke ble sortert med, og det holdt saa lenge datoene var ulike.
-
-    **Ved lik dato gjelder denne regelen:** fila fetch_prices skriver
-    (KURSPREFIKS) vinner over alle andre prefikser. De andre er engangsuttrekk
-    fra maalingene - signaltest, volumsjekk, nyhetstest - og skal ikke kunne
-    fortrenge dagens kurser. Er ingen av dem kursfila, velges den alfabetisk
-    foerste, slik at svaret er det samme hver gang og ikke avhenger av hvilken
-    rekkefoelge katalogen leses i.
-    """
-    if not katalog.is_dir():
-        return None
-
-    datert = [
-        (treff.group(1), sti)
-        for sti in katalog.glob("*-raa-*.json")
-        if (treff := _SNAPSHOT_MONSTER.search(sti.name))
-    ]
-    if not datert:
-        return None
-
-    nyeste_dato = max(dato for dato, _ in datert)
-    return min(
-        (sti for dato, sti in datert if dato == nyeste_dato),
-        key=lambda sti: (not sti.name.startswith(f"{KURSPREFIKS}-raa-"), sti.name),
-    )

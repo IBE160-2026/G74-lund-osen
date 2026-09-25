@@ -5,6 +5,8 @@ ingenting selv: en rad som ikke kan oversettes, gir UgyldigKursrad, og et felt
 som mangler, gir KeyError. SnapshotLeser fanger de to og behandler symbolet som
 manglende: tom serie og sist_hentet None. De andre symbolene leses som vanlig.
 
+Siden story 1.5 ligger oversetteren i eodhd.py og SnapshotLeser i lagring_fil.py.
+
 Lesekontrakten SnapshotLeser deler med de to skrivbare lagrene, staar i
 test_kurslager.py (fixturen leser).
 """
@@ -14,15 +16,9 @@ from datetime import date, datetime, timedelta, timezone
 
 import pytest
 
-from kursdata import (
-    Kursleser,
-    Kurslager,
-    Kursrad,
-    SnapshotKilde,
-    SnapshotLeser,
-    UgyldigKursrad,
-    kursrad_fra_eodhd,
-)
+from eodhd import kursrad_fra_eodhd
+from kursdata import Kursleser, Kurslager, Kursrad, UgyldigKursrad
+from lagring_fil import SnapshotKilde, SnapshotLeser
 
 HENTET = datetime(2026, 9, 23, 17, 4, 11, tzinfo=timezone.utc)
 

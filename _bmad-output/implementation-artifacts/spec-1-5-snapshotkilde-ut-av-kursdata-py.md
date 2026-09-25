@@ -2,9 +2,10 @@
 title: 'Story 1.5: SnapshotKilde ut av kursdata.py'
 type: 'refactor'
 created: '2026-09-25'
-status: 'ready-for-dev'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
+baseline_commit: 'b0243b61533ac917a863ba19a19700f42d605bc7'
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/epic-1-context.md'
   - '{project-root}/CLAUDE.md'
@@ -66,11 +67,11 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `data/kontrollregning_1_5.py` (ikke i repoet) -- bygger på `kontrollregning_1_4c.py`, men monterer `app.hent_leser`, som finnes både før og etter, og importerer `SnapshotKilde` og `SnapshotLeser` fra `lagring_fil` med `kursdata` som reserve. Da kjører samme skript uendret før og etter. Sammenligningen krever at alt er likt, uten å ta ut noe. Kjøres før første kodeendring
-- [ ] `src/lagring_fil.py`, `src/eodhd.py`, `src/kursdata.py` -- flyttingen -- AD-1, AD-6, AD-19
-- [ ] `src/app.py`, `src/fetch_prices.py` -- importene og `hent_leser` -- AD-2, AD-3
-- [ ] Testene over -- importene rettes, og filtestene flyttes til `tests/test_lagring_fil.py`
-- [ ] Nye vakter: `kursdata.py` importerer verken `json`, `pathlib`, `lagring_fil`, `lagring_sqlite` eller `eodhd` (AST), og vakten mot EODHD-feltnavn dekker `kursdata.py`. `app.py` kaller ikke `nyeste_snapshot` og importerer den ikke. `app.hent_leser()` gir en `Kursleser` fra en katalog med en fil, og `None` fra en tom katalog
+- [x] `data/kontrollregning_1_5.py` (ikke i repoet) -- bygger på `kontrollregning_1_4c.py`, men monterer `app.hent_leser`, som finnes både før og etter, og importerer `SnapshotKilde` og `SnapshotLeser` fra `lagring_fil` med `kursdata` som reserve. Da kjører samme skript uendret før og etter. Sammenligningen krever at alt er likt, uten å ta ut noe. Kjøres før første kodeendring
+- [x] `src/lagring_fil.py`, `src/eodhd.py`, `src/kursdata.py` -- flyttingen -- AD-1, AD-6, AD-19
+- [x] `src/app.py`, `src/fetch_prices.py` -- importene og `hent_leser` -- AD-2, AD-3
+- [x] Testene over -- importene rettes, og filtestene flyttes til `tests/test_lagring_fil.py`
+- [x] Nye vakter: `kursdata.py` importerer verken `json`, `pathlib`, `lagring_fil`, `lagring_sqlite` eller `eodhd` (AST), og vakten mot EODHD-feltnavn dekker `kursdata.py`. `app.py` kaller ikke `nyeste_snapshot` og importerer den ikke. `app.hent_leser()` gir en `Kursleser` fra en katalog med en fil, og `None` fra en tom katalog
 - [ ] Etter flettingen, på `main`: spinen og `epics.md` merker bruddet lukket med squash-commiten, og spinens lagtabell får `lagring_fil.py` i skallet. Egen commit
 
 **Acceptance Criteria:**
@@ -83,10 +84,33 @@ context:
 
 ## Implementation Notes
 
+- Kontrollregningen før er kjørt på grenen før første kodeendring (`data/kontrollregning-1-5-foer.json`, 15 rader, 15 detaljer, 16 sider med 200). Skriptet `data/kontrollregning_1_5.py` har sha256 som begynner på `4eb4a0a6966d15bc`. Verken skriptet eller før-fila skal endres eller kjøres på nytt med `--foer`; etter flyttingen kjøres bare `--etter` og `--sammenlign`.
+- `lagring_fil.nyeste_leser(katalog=None)` er den ene nye funksjonen. Uten argument leses `DATA_KATALOG` ved kallet, så en test kan peke den mot en annen katalog. `app.hent_leser()` returnerer den.
+- Alt som flyttet, er likt definisjon for definisjon (sammenlignet med `ast.get_source_segment` mot `b0243b6`). Eneste endring i det som ble igjen: `Kurslager`-docstringen sier «den justerte kursen» i stedet for `adjusted_close`, så vakten mot EODHD-feltnavn kan dekke `kursdata.py`.
+- Testtall: 416 før, 424 etter. Filtestene er flyttet til `tests/test_lagring_fil.py`.
+- Kontrollregningen etter, med samme skript (sha256 `4eb4a0a6966d15bc…`, uendret): 15 av 15 rader, 15 av 15 detaljer og 16 av 16 sider like, rekkefølgen lik. Ingenting tatt ut av sammenligningen.
+- Mutanter: `max` over `(dato, sti)` (2 feiler), `app.py` kaller `nyeste_snapshot()` (3), `"adjusted_close"` i `kursdata.py` (2), `kursdata.py` importerer en adapter (vakten `test_porten_importerer_verken_io_eller_adapter` feiler; en import på modulnivå gir i tillegg sirkulær import). Alle fanget.
+- Etter gjennomgangen (triageloggen, rad 4, 6 og 11): vakten for `app.py` forbyr også `SnapshotLeser` og `DATA_KATALOG`, vakten mot EODHD-strenger dekker også `lagring_fil.py`, `lagring_sqlite.py` og `app.py`, og to modul-docstringer i testene er rettet. Testtall etter rettelsene: 427 (3 nye parametre). En femte mutant, der `app.py` gir `DATA_KATALOG` til `nyeste_leser` selv, fanges av vakten. Kontrollregningen etter rettelsene: 15 av 15, 15 av 15 og 16 av 16 like, skriptet uendret.
+
 ## Spec Change Log
 
 ## Review Triage Log
 
+| # | Kilde | Funn | Dom | Bevis | Rute |
+|---|---|---|---|---|---|
+| 1 | edge, blind | Et nyeste øyeblikksbilde med ugyldig JSON, eller en liste øverst, gir 500 på alle sidene | low | Fantes før 1.5: `hent_kilde()` kalte samme `SnapshotKilde.fra_fil` (`b0243b6`, `kursdata.py:231–236`). Flyttingen endrer ikke oppførselen. `fetch_prices` skriver fila selv, og rettingen er en ny vakt | avvist |
+| 2 | edge | En katalog som heter `*-raa-*.json`, eller en fil som slettes mellom glob og lesing, gir unntak | low | Fantes før 1.5 (`nyeste_snapshot` er flyttet ordrett). Ingen lovlig vei lager en slik katalog. Rettingen er en ny vakt | avvist |
+| 3 | blind | Skillet mellom «ingen fil» og «fil uten lesbare data» som 1.4c-spesifikasjonen la til 1.5, mangler | false | Avgjort 25.09 kl. 19:42: meldingen rettes ikke i 1.5, og henvisningen i `deferred-work.md` er rettet til 2.2 (`d9c4561`). Det står i beslutningene i denne spesifikasjonen | avvist |
+| 4 | blind | «Kildens feltnavn stopper her» i `eodhd.py` håndheves ikke utenfor kjernen og porten | low | Riktig. `lagring_fil.py`, `lagring_sqlite.py` og `app.py` har ingen av nøklene i dag, så vakten kan dekke dem uten ny kode. `fetch_prices.py` er EODHD-adapteren for nettet og bruker `'date'` | patch |
+| 5 | blind | Porten kan gjøre I/O med `open(...)` uten import, og vakten ser bare importer | low | Ingen `open` i `kursdata.py`. Vakten holder det storyen krever («importerer verken `json` eller `pathlib`») | avvist |
+| 6 | blind | Vakten for `app.py` forbyr ikke `SnapshotLeser` eller `DATA_KATALOG` | low | Riktig: `app.py` kunne valgt øyeblikksbilde selv og bestått. Rettingen er to navn i en mengde | patch |
+| 7 | blind | `nyeste_snapshot` binder `DATA_KATALOG` ved definisjon, `nyeste_leser` ved kall | low | Standardargumentet fantes før 1.5. Testene gir `nyeste_snapshot` katalogen eksplisitt | avvist |
+| 8 | blind | `PROSJEKTROT` ligger i filadapteren | low | Plassert der av spesifikasjonen (Code Map). `fetch_prices` importerer `lagring_fil` uansett for `DATA_KATALOG` og `KURSPREFIKS` | avvist |
+| 9 | blind | Formatet leses i `lagring_fil.py` og skrives i `fetch_prices.py`, og docstringen sier «slik signaltesten skrev det» | low | Skillet og docstringen fantes før 1.5. `lagring_fil.py` sier bare at lesingen ligger der, og det stemmer | avvist |
+| 10 | blind | `eodhd.py` har ingen egen testfil | low | Testene for oversetteren finnes og kjører (`test_snapshotleser.py`). Plasseringen er kosmetisk | avvist |
+| 11 | blind | Modul-docstringene i `test_app.py` og `test_snapshotleser.py` er ikke oppdatert | low | Riktig: `TestHentLeser` leser en katalog, og oversetteren ligger nå i `eodhd.py`. Rettingen er tekst | patch |
+| 12 | blind | Hjelperen `eodhd` i `test_app.py` har samme navn som den nye modulen | low | Ingen import av modulen i den fila. Kollisjonen er hypotetisk | avvist |
+| 13 | blind | `test_gir_kursleser_fra_en_katalog_med_en_fil` sjekker bare antall rader | low | Valget av nyeste fil og `sist_hentet` prøves i `test_lagring_fil.py` og `test_snapshotleser.py` | avvist |
 ## Design Notes
 
 **Trinn:** (1) Etter ja: spesifikasjonen `ready-for-dev` på `main`, 1-5 `in-progress`, grenen `1-5`, kontrollregningen før. (2) Flyttingen og testene på grenen, mellomcommits som pushes. (3) Kontrollregningen etter, mutantene og gjennomgangen (bmad-build steg 4), så pull request. Stopp før flettingen med testtallene, kontrollregningen og utfallet av gjennomgangen, og vent på ja. (4) Squash, så spinen og `epics.md`, så 1-5 til `review` sammen med dagsfila.

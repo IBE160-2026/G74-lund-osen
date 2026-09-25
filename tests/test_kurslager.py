@@ -27,10 +27,9 @@ from kursdata import (
     Kurslager,
     Kursrad,
     MinneKurslager,
-    SnapshotKilde,
-    SnapshotLeser,
     UgyldigKursrad,
 )
+from lagring_fil import SnapshotKilde, SnapshotLeser
 from lagring_sqlite import MIGRASJONSKATALOG, SqliteKurslager
 from migrering import migrer
 
