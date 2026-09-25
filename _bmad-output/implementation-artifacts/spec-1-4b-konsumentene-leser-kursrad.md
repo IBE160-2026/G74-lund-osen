@@ -2,9 +2,10 @@
 title: 'Story 1.4b: Konsumentene leser Kursrad'
 type: 'refactor'
 created: '2026-09-25'
-status: 'ready-for-dev'
+status: 'in-progress'
 route: 'dispatch'
 review_loop_iteration: 0
+baseline_commit: 'f4bf940e32e5a9470c26d44c9c6aa9bd251fb249'
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/epic-1-context.md'
   - '{project-root}/CLAUDE.md'
