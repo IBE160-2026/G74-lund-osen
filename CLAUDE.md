@@ -69,9 +69,11 @@ et sitat som ikke fantes».
     `innlevering.md`, ikke i briefen.
 18. **Hver innlimte instruksjon lagres ordrett.** Den lagres i
     `docs/ai-prompts/<ÅÅÅÅ-MM-DD>.md` før den utføres, med klokkeslett. Når den
-    er utført, legges en linje under med commitene og utfallet. Ingen rådata
-    eller nøkler (regel 16). Grunnen: emnesiden krever dokumentasjon av hvordan
-    KI ble brukt, og instruksjonene er promptene.
+    er utført, legges en linje under med commitene og utfallet. Linjen begynner
+    med **Utført:**, også når bare noe ble gjort eller svaret var en plan eller
+    spørsmål uten commit, og da sier linjen det. Morgensjekken teller disse
+    linjene. Ingen rådata eller nøkler (regel 16). Grunnen: emnesiden krever
+    dokumentasjon av hvordan KI ble brukt, og instruksjonene er promptene.
 19. **README-en følger repoet.** Når et dokument eller en mappe som README-en
     nevner, legges til, flyttes, får nytt navn eller slettes, rettes
     «Dokumentene» og «Mappestruktur» i samme commit. Nye hoveddokumenter under
