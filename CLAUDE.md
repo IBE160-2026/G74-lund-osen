@@ -45,7 +45,8 @@ et sitat som ikke fantes».
 14. **PRD-en revideres i samme mappe.** Aldri en ny datostemplet mappe ved
     siden av.
 15. **Kvoten sjekkes ved øktstart.** Første ting i hver økt: les `/api/user`
-    (gratis) og si hvor mange kall som er brukt i dag og hvor mange som er igjen.
+    (gratis) med `EODHD_API_KEY` fra `.env`, aldri en annen nøkkel, og si hvor
+    mange kall som er brukt i dag og hvor mange som er igjen.
     Kvoten nullstilles ved midnatt GMT, men `/api/user` viser gårsdagens tall til
     første kall etter det. Står `apiRequestsDate` på en tidligere dato, er det
     brukt 0 i dag (`malinger.md` §7.1). Ubrukte kall forsvinner. Kall nummer 21
