@@ -2247,6 +2247,45 @@ Det brukeren velger å se, er et visningsvalg, ikke en ny oppgave for modellen.
 
 ---
 
+## 25.09.2026 – Lik på ekte data, ulik på data vi ikke har
+
+Story 1.4b flyttet signalberegningen, markedsoversikten, aksjedetaljen og
+grafen fra EODHDs `dict` til `Kursrad` (`c5efd05`, PR #1). Kvalitetssikringen
+hadde fire lag:
+
+| Lag | Utfall |
+|---|---|
+| Testsettet | 378 før, 408 etter, grønt lokalt og på GitHub |
+| Kontrollregning på det låste øyeblikksbildet fra 24.09, før og etter | 15 av 15 rader, 15 av 15 detaljer og 16 av 16 sider like |
+| Seks mutanter som bytter `justert_slutt` og `slutt` | alle fanget, av 1 til 4 tester hver |
+| Tre gjennomganger av diffen | 11 funn: 5 rettet, 6 avvist med begrunnelse i triageloggen |
+
+Kontrollregningen ble kjørt før første kodeendring, og i repoet står bare
+antallene (regel 16).
+
+De tre gjennomgangene var KI-agenter i bmad-build, som leste diffen hver for
+seg. Vår del var å kreve kontrollregningen før koden ble endret, å godkjenne
+planen og å si ja til flettingen.
+
+Gjennomgangene fant en endring i oppførselen som verken testene eller
+kontrollregningen kunne se. Når `hentet` i øyeblikksbildet ikke kan leses,
+gjør `SnapshotLeser` hele bildet manglende (1.4a). Før 1.4b viste appen
+kursene likevel. Nå sier forsiden «Ingen kursdata funnet i data/», og
+detaljsidene gir 404. Det låste øyeblikksbildet har `hentet` med tidssone, så
+kontrollregningen gikk gjennom uten å treffe tilfellet. Endringen er låst med
+en test og ført i `deferred-work.md` (`299cf1e`).
+
+Følgen ble først beskrevet feil. To av gjennomgangene, og triageloggen etter
+dem, sa at alle aksjene ville stå under «Uten data». Testen som skulle låse
+oppførselen, viste noe annet: fotnoten ligger inne i `{% if rader %}` og vises
+aldri når det ikke finnes rader.
+
+En kontrollregning på ekte data viser at ingenting endret seg for dataene vi
+har. Om data vi ikke har, sier den ingenting. Det var gjennomgangen som fant
+tilfellet, og først testen viste hva som faktisk skjer.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
