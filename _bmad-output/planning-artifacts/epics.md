@@ -650,6 +650,10 @@ gjelder hele veien og ikke bare ved porten.
   `justert_slutt`. Kontrolleres med en serie der de to spriker (et utbytte), og
   med en mutant som bytter `justert_slutt` med `slutt` i `signalberegning`. Den
   feilen bryter FR-701 stille
+- *Lagt til 2026-09-25:* kontrollregning på ekte data. Markedsoversikten og de
+  15 aksjedetaljene bygges fra samme øyeblikksbilde før og etter endringen, og
+  tallene skal være like. Utfallet føres som antall like rader, uten verdiene
+  (regel 16). Ingen API-kall
 
 **Omfang, telt 23.09:**
 - 11 `dict`-oppslag: `signalberegning` 2, `markedsoversikt` 3, `aksjedetalj` 6
