@@ -2225,6 +2225,28 @@ committer, så felles arbeid må merkes i selve commiten.
 
 ---
 
+## 25.09.2026 – KI-en skal ikke følge filteret
+
+Vi vurderte å la KI-laget vurdere det filteret til enhver tid viser, Anbefalt,
+Alle eller et utvalg vi setter sammen selv, og å la en knapp lage en ny
+forklaring når den trykkes. Innvendingene kom fra rådet, med henvisning til
+PRD-en og arkitekturen. Vi forkastet forslaget av tre grunner:
+
+- Prompten er kalibrert for én kategori. FR-502 sender med vilje ikke andre
+  kategorier til KI-laget, fordi et sikkert svar fra en modell utenfor sitt
+  område er verre enn ingen vurdering.
+- Modellen kalles i hentekommandoen, ikke fra nettsiden (AD-2, AD-17). Et
+  filtervalg som ga nye vurderinger, ville fått brukeren til å vente (NFR-02).
+- Mengden KI-laget vurderer, må ligge fast. Ellers kan vi ikke sammenligne KI
+  på og av (FR-602), og ikke vise hva KI-en bidro med.
+
+Det vi beholdt: filteret styrer bare visningen, en teller viser hvor mye som er
+skjult og hvorfor, og «Vis forklaring» viser en tekst som er laget på forhånd.
+
+Det brukeren velger å se, er et visningsvalg, ikke en ny oppgave for modellen.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
