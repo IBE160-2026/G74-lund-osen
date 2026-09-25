@@ -2286,6 +2286,48 @@ tilfellet, og først testen viste hva som faktisk skjer.
 
 ---
 
+## 25.09.2026 – En test for en dag som ikke har kommet
+
+Story 1.4c fjernet den gamle porten `Kurskilde`, så kursdataene har én port
+(AD-3), og forsiden viser nå når dataene ble hentet, i norsk tid (`a91ef79`,
+PR #2). Testene gikk fra 408 til 416. Uten tidsstemplene ga kontrollregningen på
+det låste øyeblikksbildet fra 24.09 15 av 15 rader, 15 av 15 detaljer og 15 av
+16 sider like. Alle fire mutantene ble fanget. Gjennomgangen ga 12 funn: 2
+rettet før flettingen, 1 etter, 1 utsatt og 8 avvist.
+
+**Vintertiden.** Sommertiden slutter 25.10, og demonstrasjonen er anslått til
+uke 45. Kode som legger til to timer fast, viser riktig tid i dag og feil tid på
+demonstrasjonen. Tester med tider fra september ser ikke forskjellen. Planen for
+storyen testet ikke vintertid. Rådet pekte på det, og før byggingen la vi inn en
+test med en tid fra november og en mutant med fast +2 timer. Tre tester fanget
+mutanten.
+
+**Et kriterium skrevet før byggingen.** Vi hadde krevd at bare tidsstemplene
+skulle endre seg. Uten tidsstemplene var likevel én av 16 sider ulik: forsiden
+hadde fått en CSS-regel for radens tidsstempel. Regelen kom fra et funn i
+gjennomgangen, fordi radens tid arvet skriftvekten til selskapsnavnet. Økta
+endret ikke sammenligningen etter at den var kjørt. Den la forskjellen fram og
+spurte om den skulle telle som godkjent. Vi godtok regelen som en del av
+endringen av tidsstemplene, og det står i commit-meldingen. Kriteriet gjorde
+forskjellen synlig. Om den var ufarlig, var det vi som måtte avgjøre.
+
+**Et krav som ble fulgt.** FR-101 sier at en rad med eldre tidsstempel enn det
+nyeste viser sitt eget. Med én fersk rad og fjorten foreldede viser da de
+fjorten samme tid som siden, og den ferske viser ingen. En av gjennomgangene
+fant det. Koden gjør det kravet sier, så en retting ville vært en endring av
+PRD-en midt i en story. Vi lot kravet stå og førte spørsmålet til
+UX-gjennomgangen i story 8.2 (`50d41b8`).
+
+På ekte data har alle aksjene samme tidsstempel, så radens egen tid synes bare i
+testene. Det er samme grense som i 1.4b.
+
+Gjennomgangene var KI-agenter i bmad-build. Vår del var å ta inn vintertesten, å
+godta CSS-regelen og å si ja til flettingen.
+
+Testene kjenner bare datoene noen gir dem.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
