@@ -1056,6 +1056,11 @@ skjermbildene med ekte data ved å følge README alene.
 - **Ville feilet hvis:** README og den tomme siden viste hver sin kommando. Da er
   det tilfeldig hvilken av dem som stemmer
 
+*Lagt til 2026-09-25:* Får README-en skjermbilder, viser de bare testdata, aldri
+ekte kurser. Et skjermbilde med ekte EODHD-data i det offentlige repoet ville
+publisert dataene, mot EODHDs betingelse («the data is not published») og regel
+16.
+
 **Avhenger av:** 3.1. **Én økt:** ja.
 
 ---

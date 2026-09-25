@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-25T13:14
+updated: 2026-09-25T23:15
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1221,6 +1221,8 @@ den avhenger av.
 | **Egendefinert meldingsfilter** *(lagt til 2026-09-25)*: brukeren velger selv hvilke kategorier som vises, i tillegg til Anbefalt og Alle (FR-203) | Story 6.5, og en brukertest som viser at noen savner det | Rundt ti kategorier, og valgene må lagres. Hvert valg koster tid i hovedflyten, som skal gå på under fem minutter (§7, «Brukerutfall»). Tas ikke inn uten at en test viser behovet |
 | **Merk det som er nytt siden forrige henting** *(lagt til 2026-09-25)*: meldinger som har kommet siden forrige henting, merkes som nye | At meldingslageret (story 6.1) lagrer når hver melding ble hentet første gang | Svarer rett på spørsmålet i briefen: «hva beveget seg i går, hvorfor». Ingen kall og ingen KI |
 | **Lenke til selskapets side på NewsWeb** *(lagt til 2026-09-25)*: én lenke fra aksjedetaljen, så alle børsmeldingene er ett klikk unna, også de som er filtrert bort | Ingenting nytt. Lenken henter ingenting | Vurderes allerede 28.09 hvis Euronext sier nei eller ikke svarer. Da har aksjedetaljen ingen meldinger, og lenken er det eneste som viser dem (åpent punkt 1). Adressen må slås opp før den bygges |
+| **Sjekk 2 og 3 synlige i grafen** *(lagt til 2026-09-25)*: volumsøyler under kursgrafen, med en strek for medianvolumet, så sjekk 3 (interesse) synes slik MA50-linjen viser sjekk 1. Eventuelt også et bånd for sjekk 2 (bevegelse) | Ingenting nytt. Volumet finnes i `Kursrad`, og tegningen er samme SVG som i dag (`graf.py`). Tas stilling til i UX-gjennomgangen (8.2), etter brukertesten (8.1) | FR-202 sier at volatilitetsbånd og volumsøyler ikke tegnes i v1, så å ta dem inn er en endring av FR-202. Streken må være samme median, over samme vindu, som sjekk 3 regner med, etter samme prinsipp som i FR-202. Story 8.2 skal ikke ende i ny funksjonalitet, så søylene må begrunnes som en forbedring av forklaringen i FR-706, ellers hører de til v1.1 |
+| **Signaldager i grafen** *(lagt til 2026-09-25)*: kursgrafen markerer dagene med sterkt signal, så man ser hvordan signalet har oppført seg over tid | Vurderingslageret (1.6) og at hentekommandoen skriver vurderingen hver dag (2.5). Historikken bygges opp fra første daglige kjøring | Bare visning. En studie av om signalene slår markedet er utenfor v1. Med få ukers historikk ved demonstrasjonen blir det få markeringer |
 
 **Regnestykket for et større univers.** Det er regnet 23.09 fra målte tall: én
 henting per døgn, ett kall per symbol (§2), dagskvote 20, og bonus 484 etter

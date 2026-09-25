@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-09-25T00:36
+updated: 2026-09-25T23:15
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -372,6 +372,11 @@ Ukjent, samme åpne punkt 13, samme eier og status — avventer Bård Inge. PRD 
 demonstrasjonen, est. uke 45» — og «est.» er vår egen estimering, ikke en
 oppgitt dato. Målene «KI-bidrag i drift» og «Grensesnitt og stabilitet» henger
 på den.
+
+*Lagt til 2026-09-25:* Demonstrasjonen skal ikke avhenge av dagens henting. Det
+trengs et kort demomanus og en måte å kjøre løsningen på kjente data, i tilfelle
+hentingen feiler eller kvoten er brukt opp den dagen. Når datoen er kjent, blir
+det en egen oppgave.
 
 ### E. Om PRD og arkitekturdokument er innleveringskrav i seg selv
 
