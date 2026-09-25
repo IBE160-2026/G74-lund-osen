@@ -17,6 +17,11 @@ Hva som er bygget så langt, står i sprintstatusen, `_bmad-output/implementatio
 - Joakim Lund
 - Marian Osen
 
+Vi diskuterer og avgjør arbeidet sammen, og det meste skrives inn på én maskin.
+Fra 25.09 har felles commits en linje `Co-authored-by` for den av oss som ikke
+committet (regel 20 i `CLAUDE.md`). Commitene før det står bare på den som
+committet.
+
 ## Dokumentene
 
 - **Product Brief** — [`_bmad-output/planning-artifacts/product-brief.md`](_bmad-output/planning-artifacts/product-brief.md). Arbeidskrav på 1–2 sider, innleveringsfrist søndag 27.09.2026.
