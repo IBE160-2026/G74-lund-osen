@@ -2,7 +2,7 @@
 title: "Begrunnelser — hvorfor kravene i PRD-en ser slik ut"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-25T23:31
+updated: 2026-09-26T00:30
 ---
 
 # Begrunnelser — hvorfor kravene i PRD-en ser slik ut
@@ -541,8 +541,13 @@ skille**, og det betyr at terskelen kan begrunnes i stedet for å velges — i
 motsetning til signalparametrene, som måtte sveipes fordi de ikke hadde noen
 slik gruppering.
 
-38 hendelser på 15 selskaper over ti måneder er 2,5 per selskap per år, som er
-den kadensen norske utbytter faktisk har. Alle 15 hadde minst én.
+38 hendelser på 15 selskaper over ett år er 2,5 per selskap per år, som er den
+kadensen norske utbytter faktisk har. Alle 15 hadde minst én.
+
+*Rettet 2026-09-26:* her sto «over ti måneder». Tabellen over gjelder 249
+handelsdager. Signaltesten samme dag, 21.09, fikk 249 handelsdager med
+`from=2025-09-22&to=2026-09-18` (`malinger.md` §7.4), altså om lag ett år. 38
+delt på 15 er 2,5 for hele vinduet.
 
 ### Hva dette endrer
 
