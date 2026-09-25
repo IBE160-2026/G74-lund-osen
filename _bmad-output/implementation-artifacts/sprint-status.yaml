@@ -47,7 +47,7 @@ development_status:
   1-4a-lesegrensen-kursleser-og-oversetteren-fra-øyeblikksbildet: review
   1-4b-konsumentene-leser-kursrad: review
   1-4c-rydding-kurskilde-ut-sist_hentet-inn: review
-  1-5-snapshotkilde-ut-av-kursdata-py: ready-for-dev
+  1-5-snapshotkilde-ut-av-kursdata-py: in-progress
   1-5b-migrasjonsløperen-og-sqlite-adapteren-herdes: backlog
   1-6-vurderingslager-med-datoavvisning: backlog
   1-7-de-tre-tilstandene-skilles: backlog
