@@ -897,7 +897,8 @@ Som **gruppe**, vil vi at hentingen aldri viser eller lagrer API-nøkkelen, og
 aldri skriver over et øyeblikksbilde, så en feilmelding ikke kan føre nøkkelen
 inn i repoet, og så råfilene forblir uforanderlige.
 
-**Oppfyller:** — *(grunnlag for NFR-07)* · **Begrenses av:** `AD-6`, `AD-12`
+**Oppfyller:** NFR-03 — *(og grunnlag for NFR-07)* · **Begrenses av:** `AD-6`,
+`AD-12`, `AD-15`
 
 **Grunnen:** `hent_ett_symbol` sender nøkkelen som `api_token` i adressen.
 Feiler kallet, tar feilteksten fra `requests` med hele adressen, og
@@ -911,6 +912,9 @@ skriver over dagens øyeblikksbilde. AD-6 sier at råfilene aldri skrives om.
   feiltekst uten nøkkelen, både i utskriften og i `feil`. Testen bruker en falsk
   nøkkel og ingen nett
 - Et øyeblikksbilde som finnes fra før, skrives ikke over
+- Et svar med feil form gir feilen «svar med feil form» for det symbolet, og de
+  andre symbolene hentes og lagres likevel *(lagt til 2026-09-26, valg A i
+  planen)*
 - **Ville feilet hvis:** feilteksten fra `requests` ble lagret uendret, eller
   fila ble skrevet uten at det var sjekket at den ikke fantes
 
