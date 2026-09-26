@@ -27,11 +27,15 @@ som begge står som `final` per 2026-09-22.
 2. **Meldingsdelen (FR-5xx) skal kunne falle bort uten at resten ryker.** Den
    hviler på en ubesvart Euronext-forespørsel; 28.09 er vår egen frist for å ta
    stilling uten svar. Ingen annen epic skal forutsette at den finnes.
-3. **KI-laget (FR-6xx) legges tidlig, ikke sist.** Eksamen ber om KI-bidrag i
-   drift, og det krever at laget har vært i bruk over tid. De tre blokkeringene
-   beskriver hva «tidlig» må bestå av, ikke at det ikke kan være tidlig:
-   **første KI-epic er *velg modelltjeneste og dokumentér betingelse 4*.**
-   Det er papirarbeid, kan gjøres nå, og låser opp resten.
+3. **KI-laget (FR-6xx) legges tidlig, ikke sist.** Briefen og PRD-en lover
+   KI-bidrag i drift (suksessmål i PRD §7), og det krever at laget har vært i
+   bruk over tid. De tre blokkeringene beskriver hva «tidlig» må bestå av, ikke
+   at det ikke kan være tidlig: **første KI-epic er *velg modelltjeneste og
+   dokumentér betingelse 4*.** Det er papirarbeid, kan gjøres nå, og låser opp
+   resten. *Rettet 2026-09-26:* her sto «Eksamen ber om KI-bidrag i drift».
+   Emnesiden ber om en KI-generert applikasjon, og om dokumentasjon av hvordan
+   KI ble brukt og hvordan koden ble kvalitetssikret (`docs/innlevering.md`),
+   ikke om KI i selve applikasjonen.
 4. **Blokkerte krav får egne epics, tydelig merket.** Ikke av ryddighetshensyn,
    men fordi blokkeringene kan slå ut: kommer Euronext-svaret som et nei, skal
    meldingsdelen kunne falle bort som **én hel enhet**. Blandes blokkerte krav
