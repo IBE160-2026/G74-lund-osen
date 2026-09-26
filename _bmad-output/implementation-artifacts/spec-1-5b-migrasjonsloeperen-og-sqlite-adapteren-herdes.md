@@ -2,7 +2,7 @@
 title: 'Story 1.5b: Migrasjonsløperen og SQLite-adapteren herdes'
 type: 'bugfix'
 created: '2026-09-26'
-status: 'in-progress'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '7c1ae48ff050ebd53d52269afdef90648858a1a4'
@@ -75,10 +75,10 @@ context:
 - [x] `src/migrering.py` -- `_migrasjoner`: bytt `glob` ut med `iterdir()` og velg filer der `suffix.lower() == ".sql"`, så `FILNAVN` avviser `.SQL` med en egen melding. Avvis 0000 og tom katalog med egne meldinger -- g
 - [x] `src/migrering.py` -- `migrer`: katalogen kontrolleres først. Deretter gjøres dette per migrasjon: `BEGIN IMMEDIATE`, les `(versjon, fil, sha256)` inne i transaksjonen, avvis nytt filnavn (a) og endret innhold (e), og kjør neste eller avslutt -- a, e, f
 - [x] `src/migrering.py` -- `_kjoer`: `skjema_versjon` får `sha256 TEXT NOT NULL`, med hash av filteksten normalisert til LF. Mangler kolonnen, avvises basen. Forhåndssjekk av første ord i hver setning (se Beslutninger), `in_transaction` etter hver setning som ekstra sikring, og feilmeldingen leser versjonen etter `ROLLBACK` -- b, e, f. *Endret 26.09 under byggingen:* meldingen bruker versjonen lest inne i transaksjonen, se BH3 og Implementation Notes.
-- [ ] `src/migrering.py` -- ny offentlig `siste_versjon(katalog) -> int`, som gjør samme katalogkontroll. Den er en ren lesing og ingen unntaksvei -- c
-- [ ] `src/lagring_sqlite.py` -- krev `versjon(t) == siste_versjon(MIGRASJONSKATALOG)`, og nevn begge tallene i feilmeldingen -- c
-- [ ] *(del 1 ferdig; `TestIngenUnntaksvei` endres i del 2, sammen med `siste_versjon`)* `tests/test_migrering.py` -- tester for a, b (fem: `COMMIT` midt i fila, `COMMIT` etter en kommentar, «commit;» med små bokstaver midt i fila, en trigger som kjøres, og den ekstra sikringen alene, med forhåndssjekken byttet ut med en som slipper alt gjennom via `monkeypatch`), e (tre), f (to), g (tre) og h (linje 174). `TestIngenUnntaksvei` endres til tre funksjoner, med begrunnelse i testen -- a, b, e, f, g, h
-- [ ] `tests/test_lagring_sqlite.py` -- tester for c og d (to: nytt og kjent symbol) og h (linje 119) -- c, d, h
+- [x] `src/migrering.py` -- ny offentlig `siste_versjon(katalog) -> int`, som gjør samme katalogkontroll. Den er en ren lesing og ingen unntaksvei -- c
+- [x] `src/lagring_sqlite.py` -- krev `versjon(t) == siste_versjon(MIGRASJONSKATALOG)`, og nevn begge tallene i feilmeldingen -- c
+- [x] *(del 1 ferdig 26.09; `TestIngenUnntaksvei` endret i del 2)* `tests/test_migrering.py` -- tester for a, b (fem: `COMMIT` midt i fila, `COMMIT` etter en kommentar, «commit;» med små bokstaver midt i fila, en trigger som kjøres, og den ekstra sikringen alene, med forhåndssjekken byttet ut med en som slipper alt gjennom via `monkeypatch`), e (tre), f (to), g (tre) og h (linje 174). `TestIngenUnntaksvei` endres til tre funksjoner, med begrunnelse i testen -- a, b, e, f, g, h
+- [x] `tests/test_lagring_sqlite.py` -- tester for c og d (to: nytt og kjent symbol) og h (linje 119) -- c, d, h
 
 **Acceptance Criteria:**
 - Gitt at hver test kjøres mot koden fra `baseline_commit`, når testene for a, b, c, e, f og g kjøres, så feiler hver av dem av grunnen som står i matrisen. Unntaket er to tester som vokter mot en for streng retting, triggeren i b og CRLF-testen i e. De skal bestå også mot koden fra `baseline_commit`, og for dem er det mutantene som viser at de virker.
@@ -96,6 +96,24 @@ context:
 - **Feilmeldingen i f** bruker `nummer - 1`. `nummer` er `len(anvendt) + 1`, lest inne i samme transaksjon. En ny lesing etter `ROLLBACK` ville vært etter at låsen er sluppet, og en feil i lesingen ville skjult den opprinnelige feilen (funn i gjennomgangen).
 - **Mutanter, én om gangen, mot hele testsettet:** alle fanges av testene for sitt punkt. To overlever: `BEGIN IMMEDIATE` byttet med utsatt `BEGIN`, som er utsatt til story 3.1 (`deferred-work.md`), og `glob("*.sql")` i g, som bare gir utslag på Linux. Den overlevde på Windows, og det finnes ingen Linux med Python i WSL på maskinen. *Prøvd på Linux 26.09 kl. 22:42, i Docker (instruksjonen kl. 22:42):* `python:3.13-slim` (Linux 6.18, WSL2-kjernen). Arbeidskopien ble montert skrivebeskyttet og kopiert til `/arbeid` uten `.venv`, `data/` og `.git`, og uv ble installert med pip. Kommandoen var `MSYS_NO_PATHCONV=1 docker run --rm -v "C:/Users/maria/G74-lund-osen:/repo:ro" -v "<scratchpad>/docker_g.sh:/docker_g.sh:ro" python:3.13-slim sh /docker_g.sh`, og skriptet kjørte `uv run pytest -q tests/test_migrering.py` før og etter at filvalget i `_migrasjoner` i kopien ble byttet til `sorted(katalog.glob("*.sql"))`. Uten mutanten besto alle 42. Med mutanten feilet bare `TestKatalogkontrollen::test_stor_filendelse_avvises_likt_paa_alle_plattformer`, med `Failed: DID NOT RAISE MigrasjonsFeil`: fila `0002_ny.SQL` ble hoppet stille over, som ventet. Grenen og arbeidskopien var uendret etterpå.
 - **Diffen for gjennomgangen** var `src/` og `tests/` siden `baseline_commit`. Hele repoet siden da ville tatt med dokumentendringene på `main` fra 26.09, som ikke hører til storyen.
+
+
+**Del 2, adapteren, 26.09.** Bygget direkte i økta etter instruksjonen kl. 22:48, på samme gren. Commitene er `ca84bd3` og rettingene etter gjennomgangen.
+
+- **Tester:** 448 før del 2. 451 etter `ca84bd3`: 3 nye (c 1, d 2) og 2 endrede (`TestIngenUnntaksvei` og h-testen på linje 119), som listene sa. 455 etter rettingene fra gjennomgangen: 4 nye, for en base som er nyere enn katalogen, en katalog som ikke er i orden, og to for `siste_versjon`. For hele storyen: 427 før og 455 etter.
+- **c mot `baseline_commit`:** `test_base_paa_eldre_versjon_enn_katalogen_avvises` feilet med `Failed: DID NOT RAISE RuntimeError`. Den gamle adapteren godtok en base på versjon 1 når katalogen hadde 2 migrasjoner. De nye testene fra gjennomgangen feilet også mot den gamle koden, med `DID NOT RAISE RuntimeError` eller `AttributeError: module 'migrering' has no attribute 'siste_versjon'`. d-testene og h-testen besto, som ventet.
+- **Mutanter, én om gangen, mot hele testsettet, etter rettingene:**
+  - kravet tilbake til `versjon < 1`: feiler i testen for eldre versjon
+  - kontrollen av nyere base fjernet: feiler i testen for nyere versjon
+  - `MigrasjonsFeil` pakkes ikke inn: feiler i testen for katalog som ikke er i orden
+  - `siste_versjon` teller `.sql`-filer med `glob`: feiler i `TestSisteVersjon` og i testen for katalog som ikke er i orden
+  - `COMMIT` før skrivingen til `kursserie`: feiler i begge d-testene
+  - adapteren lager en tabell før kontrollen: feiler i h-testen. Den gamle h-testen, fra `f5516d5`, besto mot samme mutant
+
+  Ingen mutant overlevde.
+- **`siste_versjon` gjør ikke forhåndssjekken av transaksjonsord.** Den svarer på hvor mange migrasjoner katalogen har, og til det betyr innholdet i filene ingenting. Om en fil kan kjøres, avgjør `migrer()` når den skal kjøre den. Samme katalogkontroll som `migrer()` gjør den: nummer, navn, filendelse, hull og tom katalog.
+- **Adapteren sjekker bare versjonsnummeret, og bare når den lages.** Filnavn, innhold og en `skjema_versjon` fra før 1.5b kontrolleres av `migrer()`, som skal ha kjørt før adapteren tas i bruk (story 3.1). Grensen står i docstringen til `lagring_sqlite.py`.
+- **d, kjent symbol:** en `BEFORE INSERT`-trigger slår til også ved upsert, før konflikten er sjekket. Det er prøvd: med bare INSERT-triggeren stopper også et kjent symbol. Testen for kjent symbol har derfor bare UPDATE-triggeren, så den prøver `ON CONFLICT DO UPDATE`-veien. Testen for nytt symbol har bare INSERT-triggeren.
 
 ## Spec Change Log
 
@@ -130,6 +148,34 @@ Tre lag gjennomgikk del 1 den 26.09: Blind Hunter (BH), Edge Case Hunter (ECH) o
 | VG3 | Transaksjonene overlapper aldri i testene, så `IMMEDIATE` er ikke prøvd | medium | VG byttet til `BEGIN`, og alt besto | defer: til 3.1, med kommentar i testklassen |
 | VG4 | Testen for feilmeldingen lover mer enn den kan skille | low | Samme som BH3 | patch: under BH3, og docstringen presisert |
 | VG5 | Testen for ekstra sikring sier ikke at basen er halvveis migrert | low | Samme som BH2 | patch: under BH2 |
+
+
+Gjennomgangen av del 2 den 26.09, med de samme tre lagene på diffen `f5516d5..ca84bd3` for `src/` og `tests/`. Radene har prefikset 2-.
+
+| # | Funn | Dom | Bevis | Rute |
+|---|---|---|---|---|
+| 2-BH1 | Meldingen ber om `migrer()` også når basen er nyere enn katalogen | medium | `migrer()` avviser da basen selv | patch: egen melding for en nyere base |
+| 2-BH2 | Ingen test for en base som er nyere enn katalogen, så `!=` → `<` overlever | medium | Begge testene hadde basen under katalogen | patch: ny test. Mutanten fanges nå |
+| 2-BH3 | Adapteren sjekker bare antall, ikke filnavn, hash eller en `skjema_versjon` fra før 1.5b | low | Riktig. c krever siste versjon, og resten er `migrer()` sin oppgave | patch: grensen er dokumentert i docstringen |
+| 2-BH4 | Docstringen til `siste_versjon` lover mer enn den holder | low | Den gjaldt bare filer som var uendret og kjørt av 1.5b-løperen | patch: formulert om |
+| 2-BH5 | `MigrasjonsFeil` kan slippe ut av konstruktøren | low | `_migrasjoner` kaster ved en ødelagt katalog | patch: pakkes inn i `RuntimeError`, og ny test |
+| 2-BH6 | Docstringene til modulene er ikke oppdatert | low | Riktig for begge modulene | patch |
+| 2-BH7 | Spesifikasjonen ble ikke oppdatert i samme commit | low | `ca84bd3` rørte bare `src/` og `tests/` | patch: oppdatert i rettingscommiten |
+| 2-BH8 | Resultatene fra mutantene for c, d og h er ikke ført | low | De var kjørt, men ikke skrevet ned | patch: står i Implementation Notes |
+| 2-BH9 | c-testen viser ikke at adapteren lot basen være | low | Riktig | patch: sjekker versjon 1 og at tabellen `ny` ikke finnes |
+| 2-BH10 | Regex-en i c-testen er løs | low | `.*` hoppet over rekkefølgen | patch: `versjon 1, og .* har 2 migrasjoner` |
+| 2-BH11 | Docstringen for d passer ikke for nytt symbol | low | Riktig | patch |
+| 2-ECH1 | En base fra før 1.5b godtas av adapteren | low | Samme som 2-BH3 | patch: under 2-BH3 |
+| 2-ECH2 | En base med filer som har fått nytt navn eller innhold, godtas av adapteren | low | Samme som 2-BH3 | patch: under 2-BH3 |
+| 2-ECH3 | `MigrasjonsFeil` i stedet for `RuntimeError` fra konstruktøren | low | Samme som 2-BH5 | patch: under 2-BH5 |
+| 2-ECH4 | Misvisende melding når basen er nyere | medium | Samme som 2-BH1 | patch: under 2-BH1 |
+| 2-ECH5 | En adapter som lever lenge, ser ikke en migrering som skjer etterpå | low | Kontrollen skjer når adapteren lages | patch: dokumentert i docstringen, ingen ny vakt |
+| 2-ECH6 | For kjent symbol slår `BEFORE INSERT`-triggeren til før konflikten, så UPDATE-veien prøves aldri alene | medium | Prøvd: med bare INSERT-triggeren stopper også et kjent symbol | patch: testen for kjent symbol har bare UPDATE-triggeren |
+| 2-ECH7 | Docstringen til `siste_versjon` stemmer ikke | low | Samme som 2-BH4 | patch: under 2-BH4 |
+| 2-VG1 | Ingen test for en nyere base | medium | Samme som 2-BH2 | patch: under 2-BH2 |
+| 2-VG2 | Katalogkontrollen i `siste_versjon` har ingen direkte test | low | VG foreslo å utsette. Testen er liten | patch: `TestSisteVersjon`, to tester. Glob-mutanten fanges nå |
+| 2-VG3 | `MigrasjonsFeil` kan slippe ut av konstruktøren | low | Samme som 2-BH5 | patch: under 2-BH5 |
+| 2-VG4 | Konstruktøren leser katalogen fra disk hver gang | low | Riktig, men det er noen få filer | avvist: lite sannsynlig å merkes |
 
 ## Design Notes
 

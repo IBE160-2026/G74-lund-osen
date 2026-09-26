@@ -534,6 +534,25 @@ class TestKatalogkontrollen:
         assert not base.in_transaction
 
 
+class TestSisteVersjon:
+    """Story 1.5b, c: siste_versjon gjoer samme katalogkontroll som migrer()."""
+
+    def test_gir_antall_migrasjoner_og_endrer_ingenting(self, katalog):
+        skriv_migrasjon(katalog, 1, "a", "CREATE TABLE a (x INTEGER);")
+        skriv_migrasjon(katalog, 2, "b", "CREATE TABLE b (y INTEGER);")
+        foer = sorted(p.name for p in katalog.iterdir())
+
+        assert migrering.siste_versjon(katalog) == 2
+        assert sorted(p.name for p in katalog.iterdir()) == foer
+
+    def test_avviser_en_katalog_migrer_avviser(self, katalog):
+        skriv_migrasjon(katalog, 1, "a", "CREATE TABLE a (x INTEGER);")
+        skriv_migrasjon(katalog, 3, "c", "CREATE TABLE c (z INTEGER);")
+
+        with pytest.raises(MigrasjonsFeil, match="0002 mangler"):
+            migrering.siste_versjon(katalog)
+
+
 class TestTransaksjonenEiesAvLoeperen:
     def test_aapen_transaksjon_hos_kalleren_avvises(self, base, katalog):
         """Loeperen styrer transaksjonen selv (AD-16). Har kalleren en aapen,

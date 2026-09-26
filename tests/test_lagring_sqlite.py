@@ -86,15 +86,19 @@ class TestOverleverOmstart:
 class TestFeilISisteSteg:
     """Story 1.5b, d: tilbakerullingen naar skrivingen til kursserie feiler.
 
-    Koden var riktig foer 1.5b, men ingen test holdt den riktig. Triggerne
-    staar paa baade INSERT og UPDATE, fordi erstatt_serie gjoer ON CONFLICT DO
-    UPDATE naar symbolet finnes fra foer. Ville feilet hvis COMMIT laa foer
-    skrivingen til kursserie: da faar symbolet ny serie med gammel tid.
+    Koden var riktig foer 1.5b, men ingen test holdt den riktig. erstatt_serie
+    gjoer INSERT for et nytt symbol og ON CONFLICT DO UPDATE for et kjent, saa
+    det er to veier, og hver test stopper sin: INSERT for nytt symbol og
+    UPDATE for kjent. En BEFORE INSERT-trigger slaar til ogsaa ved upsert, foer
+    konflikten er sjekket, saa testen for kjent symbol har bare UPDATE-triggeren.
+
+    Ville feilet hvis COMMIT laa foer skrivingen til kursserie: da faar et nytt
+    symbol en serie uten tid, og et kjent symbol ny serie med gammel tid.
     """
 
     @staticmethod
-    def stopp_kursserie(tilkobling):
-        for hendelse in ("INSERT", "UPDATE"):
+    def stopp_kursserie(tilkobling, hendelser=("INSERT", "UPDATE")):
+        for hendelse in hendelser:
             tilkobling.execute(
                 f"CREATE TRIGGER stopp_{hendelse.lower()} BEFORE {hendelse} "
                 "ON kursserie BEGIN SELECT RAISE(ABORT, 'stoppet av testen'); END"
@@ -103,7 +107,7 @@ class TestFeilISisteSteg:
 
     def test_nytt_symbol_faar_verken_serie_eller_tid(self, tilkobling):
         lager = SqliteKurslager(tilkobling)
-        self.stopp_kursserie(tilkobling)
+        self.stopp_kursserie(tilkobling, ("INSERT",))
 
         with pytest.raises(ValueError, match="stoppet av testen"):
             lager.erstatt_serie("EQNR", [rad("2026-09-21")], HENTET)
@@ -115,7 +119,7 @@ class TestFeilISisteSteg:
     def test_kjent_symbol_beholder_gammel_serie_og_tid(self, tilkobling):
         lager = SqliteKurslager(tilkobling)
         lager.erstatt_serie("EQNR", [rad("2026-09-18")], HENTET)
-        self.stopp_kursserie(tilkobling)
+        self.stopp_kursserie(tilkobling, ("UPDATE",))
 
         with pytest.raises(ValueError, match="stoppet av testen"):
             lager.erstatt_serie(
@@ -193,7 +197,42 @@ class TestBaseSomIkkeErKlar:
         )
         monkeypatch.setattr(lagring_sqlite, "MIGRASJONSKATALOG", katalog)
 
-        with pytest.raises(RuntimeError, match="versjon 1.* har 2 migrasjoner"):
+        with pytest.raises(RuntimeError, match=r"versjon 1, og .* har 2 migrasjoner"):
+            SqliteKurslager(tilkobling)
+
+        # Adapteren migrerer ikke selv, og lager ingen tabeller.
+        assert versjon(tilkobling) == 1
+        assert tilkobling.execute(
+            "SELECT count(*) FROM sqlite_master WHERE name = 'ny'"
+        ).fetchone()[0] == 0
+
+    def test_base_paa_nyere_versjon_enn_katalogen_avvises(self, tmp_path, monkeypatch):
+        """Story 1.5b, c: en base migrert av en nyere utgave av koden har et
+        skjema denne koden ikke kjenner."""
+        ny = tmp_path / "ny"
+        ny.mkdir()
+        for fil in MIGRASJONSKATALOG.glob("*.sql"):
+            (ny / fil.name).write_bytes(fil.read_bytes())
+        (ny / "0002_ny.sql").write_text("CREATE TABLE ny (x INTEGER);", encoding="utf-8")
+        tilkobling = sqlite3.connect(tmp_path / "nyere.db")
+        try:
+            assert migrer(tilkobling, ny) == 2
+
+            with pytest.raises(RuntimeError, match=r"nyere enn koden.*versjon 2, og .* har bare 1"):
+                SqliteKurslager(tilkobling)
+        finally:
+            tilkobling.close()
+
+    def test_katalog_som_ikke_er_i_orden_gir_runtimeerror(
+        self, tilkobling, tmp_path, monkeypatch
+    ):
+        """Adapteren sier fra paa samme maate som ellers naar basen ikke er
+        klar, i stedet for aa slippe MigrasjonsFeil ut av konstruktoeren."""
+        tom = tmp_path / "tom"
+        tom.mkdir()
+        monkeypatch.setattr(lagring_sqlite, "MIGRASJONSKATALOG", tom)
+
+        with pytest.raises(RuntimeError, match="ikke i orden.*Ingen migrasjoner"):
             SqliteKurslager(tilkobling)
 
     def test_aapen_transaksjon_hos_kalleren_avvises(self, tilkobling):

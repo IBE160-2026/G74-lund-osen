@@ -33,6 +33,10 @@ Story 1.5b herdet loeperen foer 0002 skrives:
   kjoeres.
 - Katalogen velges likt paa Linux og Windows, og 0000, feil filendelse og en
   tom katalog gir egne feilmeldinger.
+- siste_versjon(katalog) er en tredje offentlig funksjon. Den leser bare
+  katalogen og gir antall migrasjoner, saa SQLite-adapteren kan kreve at
+  basen staar paa siste versjon. Den er ingen unntaksvei: den kan verken
+  kjoere, hoppe over eller endre en migrasjon.
 """
 
 import hashlib
@@ -73,10 +77,11 @@ def siste_versjon(katalog: Path) -> int:
     """Versjonen katalogen gir naar alle migrasjonene er kjoert. Leser bare.
 
     Samme katalogkontroll som migrer() gjoer foer den kjoerer noe (nummer,
-    navn og filendelse), saa en katalog migrer() avviser, avvises ogsaa her.
-    Forhaandssjekken av transaksjonsord kjoeres ikke: den handler om hvorvidt
-    en fil kan kjoeres, og det avgjoer migrer(). Ingen fil med et slikt ord kan
-    vaere kjoert, saa en base paa siste versjon er aldri migrert med en.
+    navn, filendelse, hull og tom katalog), saa en slik katalog avvises ogsaa
+    her. Forhaandssjekken av transaksjonsord kjoeres ikke. Den handler om
+    hvorvidt en fil kan kjoeres, og det avgjoer migrer() naar den skal kjoere
+    den. For spoersmaalet siste_versjon svarer paa - hvor mange migrasjoner
+    katalogen har - betyr innholdet i filene ingenting.
     """
     return len(_migrasjoner(Path(katalog)))
 
