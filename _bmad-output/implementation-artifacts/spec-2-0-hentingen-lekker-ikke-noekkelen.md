@@ -2,7 +2,7 @@
 title: 'Story 2.0: Hentingen lekker ikke nøkkelen og skriver ikke over et øyeblikksbilde'
 type: 'bugfix'
 created: '2026-09-26'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '1e56e6fbb008741dc486a870b118ddad5b6d83ba'
