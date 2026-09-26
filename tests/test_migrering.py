@@ -182,8 +182,10 @@ class TestFeilMidtveis:
         with pytest.raises(MigrasjonsFeil):
             migrer(base, katalog)
 
+        # Story 1.5b, h: tabeller() filtrerer bort skjema_versjon, saa den
+        # sjekken ville ikke sett en versjonstabell som ble staaende igjen.
         assert versjon(base) == 0
-        assert tabeller(base) == set()
+        assert base.execute("SELECT count(*) FROM sqlite_master").fetchone()[0] == 0
 
     def test_migrasjoner_etter_den_som_feilet_kjoeres_ikke(self, base, katalog):
         skriv_migrasjon(katalog, 1, "a", "CREATE TABLE a (x INTEGER);")
@@ -254,6 +256,231 @@ class TestNummerering:
         (katalog / "LESMEG.md").write_text("ikke en migrasjon", encoding="utf-8")
 
         assert migrer(base, katalog) == 1
+
+
+def alt_i_basen(tilkobling) -> int:
+    return tilkobling.execute("SELECT count(*) FROM sqlite_master").fetchone()[0]
+
+
+class TestAnvendteFiler:
+    """Story 1.5b, a og e: basen husker hvilke filer som ble kjoert, og
+    hvordan de saa ut."""
+
+    def test_nytt_filnavn_paa_et_anvendt_nummer_avvises(self, base, katalog):
+        """a: to av oss som skriver hver sin 0002, og den ene er alt kjoert."""
+        skriv_migrasjon(katalog, 1, "a", "CREATE TABLE a (x INTEGER);")
+        skriv_migrasjon(katalog, 2, "min", "CREATE TABLE b (y INTEGER);")
+        migrer(base, katalog)
+        (katalog / "0002_min.sql").rename(katalog / "0002_din.sql")
+
+        with pytest.raises(MigrasjonsFeil, match="0002_min.sql.*0002_din.sql"):
+            migrer(base, katalog)
+
+    def test_endret_innhold_i_en_kjoert_fil_avvises(self, base, katalog):
+        """e: samme filnavn, annet innhold."""
+        skriv_migrasjon(katalog, 1, "a", "CREATE TABLE a (x INTEGER);")
+        migrer(base, katalog)
+        skriv_migrasjon(katalog, 1, "a", "CREATE TABLE helt_annet (z TEXT);")
+
+        with pytest.raises(MigrasjonsFeil, match="0001_a.sql er endret"):
+            migrer(base, katalog)
+
+    def test_crlf_i_stedet_for_lf_gir_samme_hash(self, base, katalog):
+        """e: en Windows-utsjekking med core.autocrlf=true gir CRLF. Samme fil
+        skal ikke avvises for det."""
+        katalog.mkdir()
+        sti = katalog / "0001_a.sql"
+        sti.write_bytes(b"CREATE TABLE a (x INTEGER);\nCREATE TABLE b (y INTEGER);\n")
+        migrer(base, katalog)
+        sti.write_bytes(b"CREATE TABLE a (x INTEGER);\r\nCREATE TABLE b (y INTEGER);\r\n")
+
+        assert migrer(base, katalog) == 1
+
+    def test_versjonstabell_uten_sha256_avvises(self, base, katalog):
+        """e: en base fra foer 1.5b oppgraderes ikke stille."""
+        skriv_migrasjon(katalog, 1, "a", "CREATE TABLE a (x INTEGER);")
+        base.execute(
+            "CREATE TABLE skjema_versjon ("
+            "versjon INTEGER PRIMARY KEY, fil TEXT NOT NULL, anvendt TEXT NOT NULL)"
+        )
+        base.execute("CREATE TABLE a (x INTEGER)")
+        base.execute(
+            "INSERT INTO skjema_versjon VALUES (1, '0001_a.sql', '2026-09-23T00:00:00+00:00')"
+        )
+        base.commit()
+
+        with pytest.raises(MigrasjonsFeil, match="laget foer 1.5b"):
+            migrer(base, katalog)
+
+
+class TestTransaksjonskontrollIFila:
+    """Story 1.5b, b: en COMMIT i fila ville avsluttet loeperens transaksjon,
+    og resten av fila ville kjoert uten den."""
+
+    def test_commit_midt_i_fila_avvises_foer_noe_kjoeres(self, base, katalog):
+        skriv_migrasjon(
+            katalog,
+            1,
+            "commit",
+            "CREATE TABLE foer (x INTEGER);\nCOMMIT;\n"
+            "CREATE TABLE etter (y INTEGER);\nDETTE ER IKKE SQL;",
+        )
+
+        with pytest.raises(MigrasjonsFeil, match="begynner med COMMIT"):
+            migrer(base, katalog)
+
+        assert alt_i_basen(base) == 0
+
+    def test_commit_etter_en_kommentar_avvises(self, base, katalog):
+        skriv_migrasjon(
+            katalog,
+            1,
+            "kommentar",
+            "CREATE TABLE foer (x INTEGER);\n-- en kommentar\n/* og en til */ COMMIT;\n"
+            "CREATE TABLE etter (y INTEGER);",
+        )
+
+        with pytest.raises(MigrasjonsFeil, match="begynner med COMMIT"):
+            migrer(base, katalog)
+
+        assert alt_i_basen(base) == 0
+
+    def test_commit_med_smaa_bokstaver_avvises(self, base, katalog):
+        skriv_migrasjon(
+            katalog,
+            1,
+            "smaa",
+            "CREATE TABLE foer (x INTEGER);\ncommit;\nCREATE TABLE etter (y INTEGER);",
+        )
+
+        with pytest.raises(MigrasjonsFeil, match="begynner med commit"):
+            migrer(base, katalog)
+
+        assert alt_i_basen(base) == 0
+
+    def test_trigger_med_begin_og_end_kjoeres(self, base, katalog):
+        """Vokter mot en for streng retting: BEGIN og END midt i en setning
+        er ikke transaksjonskontroll."""
+        skriv_migrasjon(
+            katalog,
+            1,
+            "trigger",
+            "CREATE TABLE t (x INTEGER);\nCREATE TABLE logg (x INTEGER);\n"
+            "CREATE TRIGGER t_logg AFTER INSERT ON t BEGIN\n"
+            "    INSERT INTO logg VALUES (NEW.x);\nEND;",
+        )
+
+        assert migrer(base, katalog) == 1
+        assert "t_logg" in tabeller(base)
+
+    def test_ekstra_sikring_stopper_fila_naar_forhaandssjekken_ikke_gjoer_det(
+        self, base, katalog, monkeypatch
+    ):
+        """Sjekken av in_transaction etter hver setning, fra storyen, proeves
+        alene: forhaandssjekken byttes ut med en som slipper alt gjennom."""
+        monkeypatch.setattr(migrering, "_forhaandssjekk", lambda setninger, sti: None)
+        skriv_migrasjon(
+            katalog,
+            1,
+            "commit",
+            "CREATE TABLE foer (x INTEGER);\nCOMMIT;\nCREATE TABLE etter (y INTEGER);",
+        )
+
+        with pytest.raises(MigrasjonsFeil, match="avsluttet transaksjonen"):
+            migrer(base, katalog)
+
+        assert "etter" not in tabeller(base)
+        assert versjon(base) == 0
+
+
+class TestSamtidigMigrering:
+    """Story 1.5b, f: hentekommandoen og webserveren kan migrere samtidig."""
+
+    @staticmethod
+    def krok(handling):
+        """En tilkoblingsklasse som kjoerer handling() rett foer sin foerste
+        BEGIN, altsaa i luken mellom lesing og transaksjon."""
+
+        class Krok(sqlite3.Connection):
+            utloest = False
+
+            def execute(self, sql, *args):
+                if not Krok.utloest and sql.lstrip().upper().startswith("BEGIN"):
+                    Krok.utloest = True
+                    handling()
+                return super().execute(sql, *args)
+
+        return Krok
+
+    def test_en_annen_tilkobling_migrerer_i_luken(self, tmp_path, katalog):
+        skriv_migrasjon(katalog, 1, "a", "CREATE TABLE a (x INTEGER);")
+        sti = tmp_path / "ose.db"
+
+        def den_andre():
+            b = sqlite3.connect(sti)
+            try:
+                migrer(b, katalog)
+            finally:
+                b.close()
+
+        a = sqlite3.connect(sti, factory=self.krok(den_andre))
+        try:
+            assert migrer(a, katalog) == 1
+        finally:
+            a.close()
+
+    def test_feilmeldingen_leser_versjonen_fra_basen(self, tmp_path, katalog):
+        """Den andre kjoerer 0001 og feiler paa 0002 i luken. Basen staar da
+        paa 1, og det er det meldingen skal si."""
+        skriv_migrasjon(katalog, 1, "a", "CREATE TABLE a (x INTEGER);")
+        skriv_migrasjon(katalog, 2, "feiler", "DETTE ER IKKE SQL;")
+        sti = tmp_path / "ose.db"
+
+        def den_andre():
+            b = sqlite3.connect(sti)
+            try:
+                with pytest.raises(MigrasjonsFeil):
+                    migrer(b, katalog)
+            finally:
+                b.close()
+
+        a = sqlite3.connect(sti, factory=self.krok(den_andre))
+        try:
+            with pytest.raises(MigrasjonsFeil, match="0002_feiler.sql.*versjon 1"):
+                migrer(a, katalog)
+            assert versjon(a) == 1
+        finally:
+            a.close()
+
+
+class TestKatalogkontrollen:
+    """Story 1.5b, g: tre hull i kontrollen av katalogen."""
+
+    def test_stor_filendelse_avvises_likt_paa_alle_plattformer(self, base, katalog):
+        """glob('*.sql') hoppet stille over .SQL paa Linux og avviste den paa
+        Windows. Naa avvises den med samme melding begge steder."""
+        skriv_migrasjon(katalog, 1, "a", "CREATE TABLE a (x INTEGER);")
+        (katalog / "0002_ny.SQL").write_text("CREATE TABLE b (y INTEGER);", encoding="utf-8")
+
+        with pytest.raises(MigrasjonsFeil, match="filendelsen .SQL"):
+            migrer(base, katalog)
+
+        assert versjon(base) == 0
+
+    def test_nummer_0000_avvises_med_egen_melding(self, base, katalog):
+        skriv_migrasjon(katalog, 0, "null", "CREATE TABLE n (x INTEGER);")
+        skriv_migrasjon(katalog, 1, "a", "CREATE TABLE a (x INTEGER);")
+
+        with pytest.raises(MigrasjonsFeil, match="0000 er ikke et gyldig nummer"):
+            migrer(base, katalog)
+
+    def test_tom_katalog_avvises(self, base, katalog):
+        katalog.mkdir()
+
+        with pytest.raises(MigrasjonsFeil, match="Ingen migrasjoner"):
+            migrer(base, katalog)
+
+        assert alt_i_basen(base) == 0
 
 
 class TestTransaksjonenEiesAvLoeperen:

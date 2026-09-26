@@ -2,7 +2,7 @@
 title: 'Story 1.5b: Migrasjonsløperen og SQLite-adapteren herdes'
 type: 'bugfix'
 created: '2026-09-26'
-status: 'ready-for-dev'
+status: 'in-progress'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '7c1ae48ff050ebd53d52269afdef90648858a1a4'
