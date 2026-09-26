@@ -2,7 +2,7 @@
 title: 'Story 2.0: Hentingen lekker ikke nøkkelen og skriver ikke over et øyeblikksbilde'
 type: 'bugfix'
 created: '2026-09-26'
-status: 'in-progress'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '1e56e6fbb008741dc486a870b118ddad5b6d83ba'
@@ -57,11 +57,11 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `src/fetch_prices.py` -- `hent_ett_symbol`: `requests.get` og `raise_for_status()` i en `try`. En `requests.HTTPError` blir en ny `HTTPError` med teksten «HTTP <status> <reason>». Enhver annen `requests.RequestException` blir en feil av samme type med bare typenavnet som tekst. Begge kastes `from None`, så den opprinnelige teksten ikke henger med -- nøkkel, lag 1
-- [ ] `src/fetch_prices.py` -- `hent_universet`: feilteksten som skrives ut og lagres, går gjennom `_uten_noekkel(tekst, api_nokkel)`, som bytter nøkkelen med «***». Gjelder alle unntak fra henteren, også de som ikke kommer fra `requests` -- nøkkel, lag 2
-- [ ] `src/fetch_prices.py` -- `main` deles, så en ny `kjoer(data_katalog, i_dag, api_nokkel, hent, skriv) -> Path | None` gjør arbeidet og kan testes uten nett. Finnes `data_katalog / filnavn(i_dag)`, stopper den før første kall, og `main` avslutter med kode 0. Fila skrives med `open(fil, "x")`, og finnes den da, skrives den ikke over -- overskriving
-- [ ] `src/fetch_prices.py` -- `hent_universet`: svaret kontrolleres (en liste der hver rad er en `dict` med `date`) i samme `try` som kallet. Er formen feil, føres «svar med feil form», og løkka går videre -- form (valg A)
-- [ ] `tests/test_fetch_prices.py` -- tester for nøkkelen, overskrivingen og formen (se Design Notes). `test_en_feil_stopper_ikke_de_andre` beholder navnet, men går gjennom den ekte `hent_ett_symbol` med en falsk 500 -- nøkkel, overskriving
+- [x] `src/fetch_prices.py` -- `hent_ett_symbol`: `requests.get` og `raise_for_status()` i en `try`. En `requests.HTTPError` blir en ny `HTTPError` med teksten «HTTP <status> <reason>». Enhver annen `requests.RequestException` blir en feil av samme type med bare typenavnet som tekst. Begge kastes `from None`, så den opprinnelige teksten ikke henger med -- nøkkel, lag 1
+- [x] `src/fetch_prices.py` -- `hent_universet`: feilteksten som skrives ut og lagres, går gjennom `_uten_noekkel(tekst, api_nokkel)`, som bytter nøkkelen med «***». Gjelder alle unntak fra henteren, også de som ikke kommer fra `requests` -- nøkkel, lag 2
+- [x] `src/fetch_prices.py` -- `main` deles, så en ny `kjoer(data_katalog, i_dag, api_nokkel, hent, skriv) -> Path | None` gjør arbeidet og kan testes uten nett. Finnes `data_katalog / filnavn(i_dag)`, stopper den før første kall, og `main` avslutter med kode 0. Fila skrives med `open(fil, "x")`, og finnes den da, skrives den ikke over -- overskriving
+- [x] `src/fetch_prices.py` -- `hent_universet`: svaret kontrolleres (en liste der hver rad er en `dict` med `date`) i samme `try` som kallet. Er formen feil, føres «svar med feil form», og løkka går videre -- form (valg A)
+- [x] `tests/test_fetch_prices.py` -- tester for nøkkelen, overskrivingen og formen (se Design Notes). `test_en_feil_stopper_ikke_de_andre` beholder navnet, men går gjennom den ekte `hent_ett_symbol` med en falsk 500 -- nøkkel, overskriving
 
 **Acceptance Criteria:**
 - Gitt koden fra `baseline_commit`, når de nye testene kjøres, så feiler hver av dem av grunnen i matrisen.
@@ -69,10 +69,66 @@ context:
 - Gitt hele testsettet lokalt på Windows og i CI på Linux, når det kjøres, så er det grønt begge steder.
 
 ## Implementation Notes
+**Bygget 26.09**, direkte i økta etter instruksjonen kl. 23:17, på grenen `2-0` (PR #6). Commitene er `55851ea` og rettingene etter gjennomgangen.
+
+- **Tester:** 455 før. 461 etter `55851ea` (6 nye, 1 endret), som planen sa. 468 etter rettingene fra gjennomgangen, med 7 til: tidsavbrudd i tilkoblingstesten, en URL-kodet nøkkel, en kjøring som lykkes (`kjoer` skriver en fil som kan leses og er uten nøkkel), og fire formtilfeller til (rad uten `close`, feilobjekt, liste uten rader og `None`).
+- **Mot `baseline_commit`:** alle nye tester feilet. HTTP-testen feilet med «500 Server Error: Internal Server Error for url: …?api_token=<falsk nøkkel>», og tilkoblingstesten med «HTTPSConnectionPool(…): … api_token=<falsk nøkkel>». Testen gjennom `hent_universet` fant nøkkelen i `feil`. Formtesten feilet med `KeyError: 'date'`, fordi hele hentingen stoppet. Den endrede testen fant ikke «HTTP 500», bare «500 Server Error … for url» med nøkkelen. De to overskrivingstestene feilet med `AttributeError`, fordi `kjoer` ikke fantes. `main()` kunne ikke testes uten nett før.
+- **Mutanter, én om gangen, mot hele testsettet, etter rettingene:**
+  - lag 1 fjernet
+  - lag 1 bare for `HTTPError`
+  - `HTTPError` beholder `response`
+  - `from None` fjernet for `RequestException`
+  - lag 2 fjernet
+  - lag 2 uten URL-kodet form
+  - sjekken før første kall fjernet
+  - `"x"` byttet med `"w"`
+  - kode 1 byttet med `return None`
+  - `mkdir` i `kjoer` fjernet
+  - kontrollen av formen fjernet
+  - bare `date` kontrolleres
+  - tomt svar sjekkes før formen
+
+  Alle ble fanget av testene for sitt kontrollpunkt, og ingen overlevde.
+- **Formkontrollen** ligger ikke «i samme `try` som kallet», som oppgaven sa. Den ligger rett etter, før kontrollen av tomt svar. `_riktig_form` kan ikke kaste, så oppførselen er den samme, og rekkefølgen gjør at et feilobjekt eller `None` føres som «svar med feil form» og ikke som «tomt svar». Den krever feltene `eodhd.py` leser (`date`, `close`, `adjusted_close`, `volume`), og at `date` er tekst.
+- **`svar.json()`** ligger utenfor lag 1. En feil der gjelder innholdet, ikke adressen, og lag 2 fanger nøkkelen uansett.
+- **Kode 1** når fila dukker opp under kjøringen, fordi kallene da er brukt og ingenting lagret. Kode 0 når dagens fil fantes fra før, fordi det ikke er en feil.
+- **README-en** (regel 19): hentesteget og avsnittet om kvoten sier nå at en kjøring nummer to samme dag bruker 0 kall.
+
 
 ## Spec Change Log
 
 ## Review Triage Log
+Tre lag gjennomgikk diffen `1e56e6f..55851ea` for `src/` og `tests/` den 26.09: Blind Hunter (BH), Edge Case Hunter (ECH) og Verification Gap (VG).
+
+| # | Funn | Dom | Bevis | Rute |
+|---|---|---|---|---|
+| ECH1 | En skriving som feiler halvveis, etterlater en tom fil som stopper senere kjøringer | low | Krever full disk eller I/O-feil. Fila kan slettes for hånd | avvist: lite sannsynlig, og krever en ny vakt |
+| ECH2 | `kjoer` bruker kvoten før den feiler på en katalog som ikke finnes | medium | Bare `main` laget katalogen | patch: `mkdir` i `kjoer` før sjekken, og testen for vellykket kjøring bruker en ny katalog |
+| ECH3 | Koden skiller ikke «ingenting å gjøre» fra «kall brukt, ingenting lagret» | medium | Begge ga kode 0 | patch: kode 1 når fila dukker opp under kjøringen |
+| ECH4 | `reason` som er `None`, gir «HTTP 500 None» | low | `.strip()` hjalp bare for tom tekst | patch: `r.reason or ''` |
+| ECH5 | Den nye `HTTPError` beholder `response`, og `response.url` har nøkkelen | medium | Riktig | patch: ingen `response`, og testen sjekker det |
+| ECH6 | Lag 2 finner ikke nøkkelen i URL-kodet form | low | `requests` koder `params` | patch: også `quote` og `quote_plus`, og ny test |
+| ECH7 | En rad der `date` er `None` eller ikke tekst, godtas | low | Riktig | patch: `date` må være tekst |
+| ECH8 | `svar.json()` ligger utenfor lag 1 | low | Feilen gjelder innholdet, ikke adressen, og lag 2 fanger nøkkelen | patch: docstringen sier det |
+| ECH9 | Et feilobjekt eller `None` føres som «tomt svar» | low | `if not rader` kom før formkontrollen | patch: formen sjekkes først |
+| VG1 | En kjøring som lykkes, er ikke testet, og testene bruker dagens dato | medium | Bare de to veiene som stopper, var testet | patch: ny test, og 22.09 i stedet for dagens dato |
+| VG2 | Formkontrollen ligger ikke der spesifikasjonen sa | low | Samme oppførsel, siden `_riktig_form` ikke kan kaste | patch: ført i Implementation Notes |
+| VG3 | `from None` for `RequestException` er ikke prøvd | low | Bare HTTP-testen sjekket det | patch: tilkoblingstesten sjekker det |
+| BH1 | Formkontrollen ligger feil sted og i feil rekkefølge | low | Samme som ECH9 og VG2 | patch: under ECH9 |
+| BH2 | `svar.json()` utenfor lag 1 | low | Samme som ECH8 | patch: under ECH8 |
+| BH3 | `response` har nøkkelen | medium | Samme som ECH5 | patch: under ECH5 |
+| BH4 | En URL-kodet nøkkel | low | Samme som ECH6 | patch: under ECH6 |
+| BH5 | Formkontrollen ser bare etter `date`, ikke prisfeltene `eodhd.py` leser | low | `eodhd.py` leser `close`, `adjusted_close` og `volume` | patch: alle fire felt, og ny test |
+| BH6 | Formtesten dekker bare én form | low | Bare en rad uten `date` | patch: fem former |
+| BH7 | Tidsavbrudd og `from None` for tilkoblingsfeil er ikke testet | low | Riktig | patch: parametrisert over `ConnectionError` og `Timeout` |
+| BH8 | Ingen test av en vellykket kjøring, og nøkkelen er ikke sjekket i fila | medium | Samme som VG1 | patch: under VG1, og testen sjekker fila |
+| BH9 | En katalog som mangler | medium | Samme som ECH2 | patch: under ECH2 |
+| BH10 | Koden for kall brukt og ingenting lagret | medium | Samme som ECH3 | patch: under ECH3 |
+| BH11 | Nøkkelen kreves før det er kjent at den trengs | low | Nøkkelen finnes ved vanlig bruk | avvist: lite sannsynlig å merkes |
+| BH12 | README-en er ikke oppdatert (regel 19) | medium | README-en sa «bruker 15 API-kall» og «én full henting per dag» | patch |
+| BH13 | «HTTP 500 None» | low | Samme som ECH4 | patch: under ECH4 |
+| BH14 | En test har «15» skrevet inn | low | Riktig | patch: `len(AKSJEUNIVERS)` |
+
 
 ## Design Notes
 

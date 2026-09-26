@@ -58,24 +58,28 @@ class TestNoekkelenLekkerIkke:
         assert str(feil.value) == "HTTP 500 Internal Server Error"
         assert NOEKKEL not in str(feil.value)
         assert feil.value.__cause__ is None and feil.value.__suppress_context__
+        # response.url har ogsaa noekkelen, saa den nye feilen har ingen response.
+        assert feil.value.response is None
 
-    def test_tilkoblingsfeil_gir_bare_typenavnet(self, monkeypatch):
-        """Ikke bare raise_for_status(): en tilkoblingsfeil fra requests har
-        ogsaa adressen, med noekkelen, i teksten."""
+    @pytest.mark.parametrize("feiltype", [requests.ConnectionError, requests.Timeout])
+    def test_tilkoblingsfeil_og_tidsavbrudd_gir_bare_typenavnet(self, monkeypatch, feiltype):
+        """Ikke bare raise_for_status(): en tilkoblingsfeil eller et
+        tidsavbrudd fra requests har ogsaa adressen, med noekkelen, i teksten."""
 
         def get(url, params, timeout):
-            raise requests.ConnectionError(
+            raise feiltype(
                 "HTTPSConnectionPool(host='eodhd.com', port=443): Max retries "
                 f"exceeded with url: /api/eod/DNB.OL?api_token={params['api_token']}"
             )
 
         monkeypatch.setattr(fp.requests, "get", get)
 
-        with pytest.raises(requests.ConnectionError) as feil:
+        with pytest.raises(feiltype) as feil:
             fp.hent_ett_symbol("DNB.OL", NOEKKEL, "a", "b")
 
-        assert str(feil.value) == "ConnectionError"
+        assert str(feil.value) == feiltype.__name__
         assert NOEKKEL not in str(feil.value)
+        assert feil.value.__cause__ is None and feil.value.__suppress_context__
 
     def test_hent_universet_fjerner_noekkelen_fra_enhver_feil(self):
         """Andre lag: henteren er injisert, og en feil kan komme fra hvor som
@@ -94,24 +98,66 @@ class TestNoekkelenLekkerIkke:
         assert not [l for l in linjer if NOEKKEL in l]
         assert any("DNB: FEIL" in l and "***" in l for l in linjer)
 
+    def test_url_kodet_noekkel_fjernes_ogsaa(self):
+        """requests URL-koder params. En noekkel med tegn som kodes, maa
+        fjernes ogsaa i den formen."""
+        noekkel = "ab+c/d=e"
+
+        def hent(ticker, *_):
+            if ticker == "DNB.OL":
+                raise RuntimeError("feil med api_token=ab%2Bc%2Fd%3De i adressen")
+            return falsk_serie()
+
+        resultat = fp.hent_universet(noekkel, "a", "b", hent, lambda _: None)
+
+        assert "ab%2Bc%2Fd%3De" not in resultat.feil["DNB"]
+        assert "***" in resultat.feil["DNB"]
+
 
 class TestSkriverIkkeOver:
     """Story 2.0: et oeyeblikksbilde skrives aldri om (AD-6)."""
 
+    # En annen dato enn i dag, saa en retting som glemmer i_dag, feiler.
+    DAG = date(2026, 9, 22)
+
+    def test_tom_katalog_gir_ny_fil_som_kan_leses_og_er_uten_noekkel(self, tmp_path):
+        katalog = tmp_path / "data"  # finnes ikke fra foer
+        linjer = []
+
+        def hent(ticker, noekkel, *_):
+            if ticker == "DNB.OL":
+                raise RuntimeError(f"feil med {noekkel}")
+            return falsk_serie()
+
+        fil = fp.kjoer(katalog, self.DAG, NOEKKEL, hent, linjer.append)
+
+        assert fil == katalog / fp.filnavn(self.DAG)
+        tekst = fil.read_text(encoding="utf-8")
+        assert NOEKKEL not in tekst
+        bilde = json.loads(tekst)
+        assert (bilde["from"], bilde["to"]) == fp.bygg_intervall(self.DAG)
+        assert len(bilde["serier"]) == len(AKSJEUNIVERS) - 1
+        assert "***" in bilde["feil"]["DNB"]
+        assert SnapshotKilde.fra_fil(fil) is not None
+        assert any("Lagret" in l for l in linjer)
+        assert any(f"API-kall brukt: {len(AKSJEUNIVERS)}" in l for l in linjer)
+
     def test_dagens_fil_finnes_og_ingen_kall_brukes(self, tmp_path):
-        fil = tmp_path / fp.filnavn(date(2026, 9, 26))
+        fil = tmp_path / fp.filnavn(self.DAG)
         fil.write_text('{"gammel": true}', encoding="utf-8")
         linjer = []
 
         def hent(*_):
             pytest.fail("ingen kall skal brukes naar dagens fil finnes")
 
-        assert fp.kjoer(tmp_path, date(2026, 9, 26), NOEKKEL, hent, linjer.append) is None
+        assert fp.kjoer(tmp_path, self.DAG, NOEKKEL, hent, linjer.append) is None
         assert fil.read_text(encoding="utf-8") == '{"gammel": true}'
         assert any("finnes allerede" in l and "0 kall brukt" in l for l in linjer)
 
     def test_fil_som_dukker_opp_under_kjoeringen_skrives_ikke_over(self, tmp_path):
-        fil = tmp_path / fp.filnavn(date(2026, 9, 26))
+        """Da er kallene brukt og ingenting lagret, og kjoeringen avslutter
+        med kode 1, saa det synes."""
+        fil = tmp_path / fp.filnavn(self.DAG)
         linjer = []
 
         def hent(*_):
@@ -119,19 +165,36 @@ class TestSkriverIkkeOver:
                 fil.write_text('{"annen kjoering": true}', encoding="utf-8")
             return falsk_serie()
 
-        assert fp.kjoer(tmp_path, date(2026, 9, 26), NOEKKEL, hent, linjer.append) is None
+        with pytest.raises(SystemExit) as slutt:
+            fp.kjoer(tmp_path, self.DAG, NOEKKEL, hent, linjer.append)
+
+        assert slutt.value.code == 1
         assert fil.read_text(encoding="utf-8") == '{"annen kjoering": true}'
-        assert any("ikke skrevet over" in l and "15 kall er brukt" in l for l in linjer)
+        assert any(
+            "ikke skrevet over" in l and f"{len(AKSJEUNIVERS)} kall er brukt" in l
+            for l in linjer
+        )
 
 
 class TestSvarMedFeilForm:
     """Story 2.0, valg A: et svar med feil form stopper ikke hentingen
     (AD-15, NFR-03)."""
 
-    def test_feil_form_gir_feil_for_symbolet_og_de_andre_hentes(self):
+    @pytest.mark.parametrize(
+        "svar",
+        [
+            [{"close": 1.0, "adjusted_close": 1.0, "volume": 1}],  # rad uten date
+            [{"date": "2026-09-22"}],  # rad uten prisfeltene eodhd.py leser
+            {"code": 403, "message": "Forbidden"},  # feilobjekt i stedet for liste
+            ["2026-09-22"],  # liste uten rader
+            None,
+        ],
+        ids=["rad-uten-date", "rad-uten-close", "feilobjekt", "liste-uten-rader", "None"],
+    )
+    def test_feil_form_gir_feil_for_symbolet_og_de_andre_hentes(self, svar):
         def hent(ticker, *_):
             if ticker == "DNB.OL":
-                return [{"close": 1.0}]  # mangler date
+                return svar
             return falsk_serie()
 
         resultat = fp.hent_universet(NOEKKEL, "a", "b", hent, lambda _: None)
