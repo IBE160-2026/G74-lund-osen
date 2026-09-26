@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-25T20:04'
+updated: '2026-09-26T23:01'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -209,7 +209,7 @@ prosjektmodul. De er løvnoder, og skal forbli det.
 - **Binds:** AD-7, alle tabeller
 - **Prevents:** at vi to endrer skjemaet hver vår vei, og at en skjemaendring løses med «slett basen og bygg den på nytt» — noe AD-7 gjør umulig for `vurdering` og `ki_logg`
 - **Rule:** migrasjoner er nummererte SQL-filer som kjøres i rekkefølge; anvendt versjon står i en `skjema_versjon`-tabell. Ingen `ALTER TABLE` utenfor en migrasjonsfil.
-- **Opphav:** besluttet her som ny beslutning, avledet av AD-7. Bygget i story 1.1, commit `57a83c5` (23.09): `src/migrering.py` er løperen, og `tests/test_migrering.py` har 21 tester. Hver migrasjon kjøres i én transaksjon sammen med sin rad i `skjema_versjon`. **Prøvd mot feilen den skal hindre:** med løperen midlertidig byttet til `executescript()` feilet 3 av 6 tester i `TestFeilMidtveis`. Det var skjemakontrollen som fanget det (tabellen `halvveis` ble stående), ikke versjonsraden, som mutanten lot være uendret. `src/migrasjoner/` finnes ikke ennå — første migrasjon kommer i story 1.3. *24.09: finnes nå, med `0001_kurs.sql` fra story 1.3 (`f4fada0`).*
+- **Opphav:** besluttet her som ny beslutning, avledet av AD-7. Bygget i story 1.1, commit `57a83c5` (23.09): `src/migrering.py` er løperen, og `tests/test_migrering.py` har 21 tester. Hver migrasjon kjøres i én transaksjon sammen med sin rad i `skjema_versjon`. **Prøvd mot feilen den skal hindre:** med løperen midlertidig byttet til `executescript()` feilet 3 av 6 tester i `TestFeilMidtveis`. Det var skjemakontrollen som fanget det (tabellen `halvveis` ble stående), ikke versjonsraden, som mutanten lot være uendret. `src/migrasjoner/` finnes ikke ennå — første migrasjon kommer i story 1.3. *24.09: finnes nå, med `0001_kurs.sql` fra story 1.3 (`f4fada0`).* *26.09: løperen er herdet i story 1.5b (`ef1cca7`, PR #5).* `skjema_versjon` lagrer filnavn og sha256 av filteksten, og en anvendt migrasjon med nytt navn eller nytt innhold avvises. En `skjema_versjon` fra før 1.5b oppgraderes ikke stille. Hver migrasjon kjøres i sin egen `BEGIN IMMEDIATE`-transaksjon, og versjonen leses inne i den. En migrasjonsfil med en setning som begynner med et transaksjonsord (`BEGIN`, `COMMIT`, `END`, `ROLLBACK`, `SAVEPOINT`, `RELEASE`), avvises før noe kjøres. Katalogkontrollen er lik på Linux og Windows. SQLite-adapteren krever at basen står på siste versjon (`siste_versjon`), ikke bare at den er migrert én gang. Testene: 427 før og 455 etter. Mutanten `BEGIN IMMEDIATE` → `BEGIN` overlever, og en test med to migratorer som overlapper, er utsatt til story 3.1 (`deferred-work.md`).
 - **To SQLite-forhold migrasjonene må ta hensyn til, begge verifisert:** `executescript()` kjører en implisitt `COMMIT` først, så den nærliggende måten å kjøre en `.sql`-fil på er **ikke** atomisk med oppdateringen av `skjema_versjon` — migrasjonsløperen må styre transaksjonen selv. Og SQLites `ALTER TABLE` dekker bare rename/add/drop column; typeendring, `UNIQUE`, `CHECK` og fremmednøkler krever tabellbytte med `DROP TABLE`. **For `vurdering` og `ki_logg` kolliderer det med AD-7** — se åpent punkt under.
 
 ### AD-17 — Hentekommandoen skriver dagens vurdering
