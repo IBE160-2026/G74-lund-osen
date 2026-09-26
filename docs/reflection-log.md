@@ -2403,6 +2403,31 @@ Det var merkingen for hånd som viste hvor skalaen slutter.
 
 ---
 
+## 26.09.2026 – Åtte uenigheter, fem presiseringer
+
+Vi merket de 48 parene i relevanseksperimentet hver for oss, uten å se den
+andres svar, og var enige om 40 av dem (kappa 0,75, `relevanseksperiment.md`
+§7). De åtte vi hadde vurdert forskjellig, gikk vi gjennom sammen og
+sammenlignet med definisjonene for D, K og L.
+
+Samtalen gjorde grensene tydeligere enn definisjonene alene. Det ene skillet
+gikk mellom det som varsles og det som har skjedd: en sak som bare varsler en
+resultatfremleggelse eller en Investor Day, er K, mens noe som faktisk er
+gjennomført og har tydelig betydning, er D. Det andre skillet gikk på hvor
+sikker den økonomiske betydningen er. To av sakene var gode eksempler: noe
+konkret hadde skjedd, men det var usikkert hva det ville bety økonomisk, så
+begge ble K. Saker som egentlig handler om et annet selskap, ble normalt L. Alle
+fem presiseringene står i §7.
+
+Presiseringene kom etter at vi hadde lest tekstene. De er derfor ikke en del av
+kriteriene som ble låst før innsamlingen, og KI-en får dem ikke i del 2. Det var
+rådet som pekte på at KI-en ellers ville fått hint hentet fra de samme parene
+den skal testes på.
+
+Uenighetene var ikke bare støy. De viste hvor definisjonene var for åpne.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
