@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-26T19:25
+updated: 2026-09-26T23:47
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -702,7 +702,9 @@ NewsWeb-målingene dokumenterer feltene `issuerSign`, `issuerName`, `category`,
 
 1. **Språkkoden fra NewsWeb**, hvis feltet finnes. `[ANTAKELSE]` At det finnes,
    er ikke verifisert. Kontrollen koster ingen kvote og står på lista til
-   2026-09-21.
+   2026-09-21. *Merknad 2026-09-26:* kontrollert 2026-09-21 og avkreftet.
+   Meldingsobjektet har ikke noe språkfelt (`malinger.md` §7.3), så punkt 2 er
+   hovedregelen.
 2. **Ellers heuristikk på tittelen.** Æ, ø eller å avgjør alene — de finnes
    ikke i engelske titler. Ellers telles kjente norske ord mot kjente engelske.
 3. **Er det uavklart, beholdes den første.** Vi gjetter ikke når vi ikke vet.
@@ -1162,7 +1164,7 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 | 13 | **Datoer for demonstrasjon og prosjektinnlevering.** Spørsmål sendt faglærer i Teams 2026-09-22, sammen med spørsmål om leveranselista er fullstendig og om noen BMAD-dokumenter skal leveres inn. **Besvart av hjelpelærer 2026-09-23: ingen dato finnes ennå** — «Bård Inge vil presisere dette». Fire av de åtte suksessmålene i §7 er bundet til disse datoene (*rettet 2026-09-24: her sto «Åtte suksessmål»*), og «est. uke 45» er vår egen estimering — ikke en oppgitt dato. Se `docs/innlevering.md` | Marian | **Avventer Bård Inge** (spurt 22.09, besvart 23.09) |
 | 15 | **Plassér kategoriene som havnet i «ukjent»** i riktig bøtte. Krever en ukes drift for å vite hvilke som faktisk dukker opp | | Etter én ukes drift |
 | 21 | **Hva er emnesidens tredje del?** Emnesiden sier «tre deler», men lister to, og nevner at «delvurdering 3 gir anledning til å demonstrere unike bidrag». Hva den tredje delen er, er ikke oppgitt. Spørres Bård Inge sammen med datoene i punkt 13. Se `docs/innlevering.md`, «Eksamen» | Marian | Sammen med punkt 13 |
-| 22 | **Kodegjennomgang som BMAD-steg, én per epic.** `bmad-code-review` kjøres etter hver ferdige epic, første gang etter Epic 1. Emnesiden: «Dokumentasjon må vise hvordan KI ble brukt, og hvordan studentene har kvalitetssikret koden» — en gjennomgang med flere uavhengige lesere er en del av det, i tillegg til testene og mutantene. Lagt til 2026-09-23. *2026-09-24:* den første gjennomgangen ble gjort 23.09 etter story 1.1–1.3, midt i Epic 1, ikke etter den. Funnene står som forutsetninger i `epics.md` under 1.6 og 2.2 | Gruppen | Etter Epic 1 |
+| 22 | **Kodegjennomgang som BMAD-steg, én per epic.** `bmad-code-review` kjøres etter hver ferdige epic, første gang etter Epic 1. Emnesiden: «Dokumentasjon må vise hvordan KI ble brukt, og hvordan studentene har kvalitetssikret koden» — en gjennomgang med flere uavhengige lesere er en del av det, i tillegg til testene og mutantene. Lagt til 2026-09-23. *2026-09-24:* den første gjennomgangen ble gjort 23.09 etter story 1.1–1.3, midt i Epic 1, ikke etter den. Funnene står som forutsetninger i `epics.md` under 1.5b og 2.2. *Rettet 2026-09-26:* her sto «under 1.6 og 2.2». De ble flyttet fra 1.6 til 1.5b 24.09 (`f7e4544`). | Gruppen | Etter Epic 1 |
 
 ### Lukket
 
@@ -1172,7 +1174,7 @@ uten det kan ingen se at de var åpne, eller hva som måtte til.
 | # | Punkt | Lukket av | Dato |
 |---|---|---|---|
 | 10 | **Skjevfordeling mot positiv retning**, 68 % i testen. Vurderes mot året, ikke mot femten dager | `malinger.md` §7.4 målte over 199 handelsdager: 60,0 % av aksjedagene med utslag er positive, mot 29,5 % negative. Det korte vinduet lå i en oppgangsperiode og overdrev skjevheten. Flyttet hit 2026-09-24 | 21.09 |
-| 7 | **Låsing av signalparametre** mot ~200 handelsdager | `malinger.md` §7.4 låste terskel, volumfaktor og nøytralsone mot 199 handelsdager; §9 låste de to vinduene mot like mange aksjedager, 2 985, forskjøvet én handelsdag. **Punktet anslo 15 kall. Det kostet 0** — begge målingene ble gjort mot lagrede øyeblikksbilder | 21.09 og 22.09 |
+| 7 | **Låsing av signalparametre** mot ~200 handelsdager | `malinger.md` §7.4 låste terskel, volumfaktor og nøytralsone mot 199 handelsdager; §9 låste de to vinduene mot like mange aksjedager, 2 985, forskjøvet én handelsdag. **Punktet anslo 15 kall.** §7.4 kostet 15 kall, og §9 kostet 0, fordi den ble regnet mot lagrede øyeblikksbilder (`malinger.md`). *Rettet 2026-09-26:* her sto «Punktet anslo 15 kall. Det kostet 0 — begge målingene ble gjort mot lagrede øyeblikksbilder» | 21.09 og 22.09 |
 | 14 | **Hver story leveres med test**, kjørbar uten API-kall | Skrevet inn som `AD-8` i arkitekturspinen. Praksisen var allerede innført: `tests/conftest.py` sperrer `socket.connect`, og CI kjører uten hemmeligheter | 22.09 |
 | 17 | **Database** | SQLite besluttet i arkitekturfasen — spinen `AD-3` til `AD-7`, `AD-16`, `AD-18`, `AD-19`. Rådata forblir filer. **Kontrollert med faglærerstaben 22.09** og bekreftet av assisterende hjelpelærer: «Slik dere beskriver bruken […] bruker dere SQLite som en ordentlig database, ikke bare som enkel fillagring. […] Så ut fra det vi vet nå mener jeg dette er helt innenfor.» Svaret kom ikke fra emneansvarlig og bærer sitt eget forbehold | 22.09 |
 | 18 | **Dockerfile** | Arkitekturen besluttet: `AD-9` (ingen data i imaget), `AD-10` (webserveren henter aldri), `AD-11` (to volumer), `AD-12` (hemmeligheter fra miljøet). **Merk at selve filen ikke er skrevet** — punktet gjaldt beslutningen, og bygget står i `docs/innlevering.md` | 22.09 |
@@ -1204,7 +1206,7 @@ punkt som renummereres, mister sporet tilbake til målingen som begrunnet det.
 **Om eierfeltet.** «Gruppen» er et bevisst valg, ikke en tom rubrikk: vi er to,
 og fordelingen gjøres internt etter hva som passer når punktet skal tas. Det
 eierfeltet skal sikre, er at punktet har en frist og noen som svarer for den —
-ikke at navnet er låst på forhånd. Punkt 2, 3, 6, 8–12 og 15 har frist, men mangler eier.
+ikke at navnet er låst på forhånd. Punkt 2, 6, 8, 9, 11, 12 og 15 har frist, men mangler eier. *Rettet 2026-09-26:* her sto «Punkt 2, 3, 6, 8–12 og 15». Punkt 3 har eier, og punkt 10 er lukket, slik oppsummeringen over sier.
 
 ### v1.1 — vurderes etter at v1 er kontrollert
 

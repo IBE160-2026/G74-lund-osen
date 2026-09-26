@@ -2,7 +2,7 @@
 title: "Begrunnelser — hvorfor kravene i PRD-en ser slik ut"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-26T00:30
+updated: 2026-09-26T23:47
 ---
 
 # Begrunnelser — hvorfor kravene i PRD-en ser slik ut
@@ -341,6 +341,9 @@ Fullstendig oversikt over mønsteret, de to tapsmekanismene og tiltaket:
 ---
 
 ## 9. Lagringen: filer i dag, database i arkitekturfasen
+
+*Merknad 2026-09-26:* punkt 17 ble lukket 22.09 med SQLite (`prd.md`, «Lukket»).
+Avsnittet under er vurderingen fra før beslutningen, og står som den var.
 
 **Åpent punkt 17.** Dette er en vurdering av grunnlaget, ikke en beslutning.
 
