@@ -44,7 +44,7 @@ den som committet.
 - `docs/` — arbeidsprosessen: refleksjonslogg, KI-prompts og kildekontroll
 - `_bmad-output/planning-artifacts/` — produktdokumentene og gjennomgangene av dem
 - `_bmad-output/implementation-artifacts/` — sprintstatus, story-spesifikasjoner og utsatt arbeid
-- `.github/workflows/` — testkjøringen bak merket øverst
+- `.github/workflows/` — testkjøringen bak merket øverst, og morgensjekken, som hver morgen legger rapporten i saken «Morgensjekk» (skriptene i `.github/scripts/`)
 
 **Følger med BMAD-rammeverket, ikke skrevet av oss:**
 

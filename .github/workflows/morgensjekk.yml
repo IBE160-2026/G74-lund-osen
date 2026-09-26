@@ -1,0 +1,64 @@
+name: morgensjekk
+
+# Morgensjekken, GitHub-delen. Rapporten legges som kommentar i saken
+# «Morgensjekk», og GitHub sender e-post fordi kommentaren nevner Marian.
+# Kontrollregningen og forslaget til dagens hovedoppgave gjoer bare
+# Claude-kjoeringen «Morgensjekk OSE Signal»; skriptet er det samme.
+on:
+  schedule:
+    # Cron gaar i UTC: 04:47 er 06:47 norsk sommertid og 05:47 fra 25.10.
+    # GitHub kan starte planlagte kjoeringer noen minutter sent.
+    - cron: "47 4 * * *"
+  workflow_dispatch:
+
+# Ingen hemmeligheter, bare den innebygde GITHUB_TOKEN. Jobben leser repoet og
+# skriver i saker, ingenting annet. Ingen kall mot EODHD eller andre
+# datakilder, saa den kan ikke bruke av kvoten.
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  morgensjekk:
+    runs-on: ubuntu-latest
+    # Skriptet bruker noen sekunder. Henger noe, stopper det her.
+    timeout-minutes: 5
+
+    steps:
+      - name: Hent koden
+        uses: actions/checkout@v4
+        with:
+          # Hele historikken og taggene: sjekken teller commits siste doegn og
+          # siste 7 dager, og kontrollerer at brief-taggene ikke er flyttet.
+          fetch-depth: 0
+
+      - name: Sett opp uv og Python 3.13
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.13"
+          # Skriptene bruker bare standardbiblioteket, saa det er ingenting
+          # aa cache.
+          enable-cache: false
+
+      - name: Kjoer morgensjekken og lag rapporten
+        run: |
+          uv run --no-project python .github/scripts/morgensjekk.py . > "$RUNNER_TEMP/utskrift.txt"
+          uv run --no-project python .github/scripts/morgenrapport.py Pixienn \
+            "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            < "$RUNNER_TEMP/utskrift.txt" > "$RUNNER_TEMP/kommentar.md"
+          cat "$RUNNER_TEMP/kommentar.md"
+
+      - name: Legg rapporten i saken «Morgensjekk»
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Uten --search: soeket gaar mot en indeks som kan henge etter, saa en
+          # nyopprettet sak ville ikke blitt funnet, og vi fikk en til.
+          nr=$(gh issue list --state open --limit 200 --json number,title \
+            --jq '[.[] | select(.title == "Morgensjekk")][0].number // empty')
+          if [ -z "$nr" ]; then
+            url=$(gh issue create --title "Morgensjekk" --body \
+              "Hver morgen legger workflowen morgensjekk.yml rapporten fra .github/scripts/morgensjekk.py her som kommentar, og nevner Marian slik at GitHub sender e-post. Saken holdes åpen.")
+            nr=${url##*/}
+          fi
+          gh issue comment "$nr" --body-file "$RUNNER_TEMP/kommentar.md"
