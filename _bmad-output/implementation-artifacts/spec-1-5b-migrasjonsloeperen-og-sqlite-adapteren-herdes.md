@@ -34,7 +34,7 @@ context:
 
 ## Beslutninger 26.09
 
-- **b) En `COMMIT` stoppes før noe kjøres (valg B).** Avvisningen ser på første ord i hver hele setning fra `_setninger()`, etter mellomrom og kommentarer, både `--` og `/* */`. Setninger som begynner med `BEGIN`, `COMMIT`, `END`, `ROLLBACK`, `SAVEPOINT` eller `RELEASE`, avvises før transaksjonen starter. Står et slikt ord midt i en setning, avvises den ikke, så `CREATE TRIGGER … BEGIN … END;` er fortsatt lov. Sjekken av `in_transaction` etter hver setning, som storyen beskriver, blir stående som ekstra sikring, med sin egen mutant.
+- **b) En `COMMIT` stoppes før noe kjøres (valg B).** Avvisningen ser på første ord i hver hele setning fra `_setninger()`, etter mellomrom og kommentarer, både `--` og `/* */`. Setninger som begynner med `BEGIN`, `COMMIT`, `END`, `ROLLBACK`, `SAVEPOINT` eller `RELEASE`, avvises før transaksjonen starter. Sjekken skiller ikke mellom store og små bokstaver, så «commit;» og «Commit;» avvises på samme måte som «COMMIT;». Står et slikt ord midt i en setning, avvises den ikke, så `CREATE TRIGGER … BEGIN … END;` er fortsatt lov. Sjekken av `in_transaction` etter hver setning, som storyen beskriver, blir stående som ekstra sikring, med sin egen mutant.
 - **Én story og én PR, i to deler (valg A).** Del 1 er løperen: a, b, e, f, g og h-testen i `test_migrering.py`. Del 2 er adapteren: c, d og h-testen i `test_lagring_sqlite.py`. Blir funnene etter del 1 mange, stopper vi der og tar del 2 i en ny økt på samme gren.
 - **Lengden på spesifikasjonen er godtatt**, fordi hvert av de åtte kontrollpunktene trenger test og mutant.
 
@@ -45,6 +45,7 @@ context:
 | a | Basen har kjørt `0002_min.sql`, katalogen har `0002_din.sql` | `MigrasjonsFeil` som navngir begge filnavnene. Ingenting kjøres |
 | b | Fila har `CREATE TABLE foer; COMMIT; CREATE TABLE etter; <ugyldig>` | Avvist før noe kjøres. Basen er uendret, uten `foer` eller `etter` |
 | b | `-- kommentar` eller `/* kommentar */` rett før `COMMIT;` | Avvist før noe kjøres |
+| b | «commit;» med små bokstaver midt i fila | Avvist før noe kjøres |
 | b | Migrasjonen har `CREATE TRIGGER … BEGIN … END;` | Kjøres. Triggeren finnes etterpå |
 | c | Basen står på 1, adapterens katalog har 2 | `RuntimeError` med begge versjonsnumrene |
 | d | Trigger `RAISE(ABORT)` på `INSERT` og `UPDATE` i `kursserie` | Serie og tid står uendret, både for nytt og for kjent symbol |
@@ -76,11 +77,11 @@ context:
 - [ ] `src/migrering.py` -- `_kjoer`: `skjema_versjon` får `sha256 TEXT NOT NULL`, med hash av filteksten normalisert til LF. Mangler kolonnen, avvises basen. Forhåndssjekk av første ord i hver setning (se Beslutninger), `in_transaction` etter hver setning som ekstra sikring, og feilmeldingen leser versjonen etter `ROLLBACK` -- b, e, f
 - [ ] `src/migrering.py` -- ny offentlig `siste_versjon(katalog) -> int`, som gjør samme katalogkontroll. Den er en ren lesing og ingen unntaksvei -- c
 - [ ] `src/lagring_sqlite.py` -- krev `versjon(t) == siste_versjon(MIGRASJONSKATALOG)`, og nevn begge tallene i feilmeldingen -- c
-- [ ] `tests/test_migrering.py` -- tester for a, b (fire: `COMMIT` midt i fila, `COMMIT` etter en kommentar, en trigger som kjøres, og den ekstra sikringen alene, med forhåndssjekken byttet ut med en som slipper alt gjennom via `monkeypatch`), e (tre), f (to), g (tre) og h (linje 174). `TestIngenUnntaksvei` endres til tre funksjoner, med begrunnelse i testen -- a, b, e, f, g, h
+- [ ] `tests/test_migrering.py` -- tester for a, b (fem: `COMMIT` midt i fila, `COMMIT` etter en kommentar, «commit;» med små bokstaver midt i fila, en trigger som kjøres, og den ekstra sikringen alene, med forhåndssjekken byttet ut med en som slipper alt gjennom via `monkeypatch`), e (tre), f (to), g (tre) og h (linje 174). `TestIngenUnntaksvei` endres til tre funksjoner, med begrunnelse i testen -- a, b, e, f, g, h
 - [ ] `tests/test_lagring_sqlite.py` -- tester for c og d (to: nytt og kjent symbol) og h (linje 119) -- c, d, h
 
 **Acceptance Criteria:**
-- Gitt at hver test kjøres mot koden fra `baseline_commit`, når testene for a, b, c, e, f og g kjøres, så feiler hver av dem av grunnen som står i matrisen.
+- Gitt at hver test kjøres mot koden fra `baseline_commit`, når testene for a, b, c, e, f og g kjøres, så feiler hver av dem av grunnen som står i matrisen. Unntaket er to tester som vokter mot en for streng retting, triggeren i b og CRLF-testen i e. De skal bestå også mot koden fra `baseline_commit`, og for dem er det mutantene som viser at de virker.
 - Gitt mutantene i Design Notes, når hver av dem legges inn én om gangen, så feiler akkurat testene for det punktet, med forventet melding og ikke bare et bredt utslag (lærdommen fra 23.09).
 - Gitt hele testsettet på Windows lokalt og på Linux i CI, når det kjøres, så er det grønt begge steder med samme antall tester.
 
@@ -100,7 +101,7 @@ context:
 - h, andre test: adapteren lager `kurs` i `__init__`.
 - De gamle testene består alle tre mutantene. De nye feiler.
 
-**Mutanter for de andre punktene**, én per punkt: fjern filnavnsjekken (a), fjern forhåndssjekken (b, testene for `COMMIT` feiler), la forhåndssjekken se på hele setningen i stedet for første ord (b, triggertesten feiler), fjern `in_transaction`-sjekken med forhåndssjekken slått av i testen (b, ekstra sikring), bytt `==` tilbake til `< 1` (c), fjern hashsjekken (e), fjern LF-normaliseringen (e, CRLF-testen), bytt `BEGIN IMMEDIATE` tilbake til `BEGIN` og les utenfor (f), og bytt tilbake til `glob("*.sql")` (g, bare utslag på Linux, så denne må kjøres i CI eller i WSL).
+**Mutanter for de andre punktene**, én per punkt: fjern filnavnsjekken (a), fjern forhåndssjekken (b, testene for `COMMIT` feiler), la forhåndssjekken se på hele setningen i stedet for første ord (b, triggertesten feiler), la sjekken skille mellom store og små bokstaver (b, testen med «commit;» feiler), fjern `in_transaction`-sjekken med forhåndssjekken slått av i testen (b, ekstra sikring), bytt `==` tilbake til `< 1` (c), fjern hashsjekken (e), fjern LF-normaliseringen (e, CRLF-testen), bytt `BEGIN IMMEDIATE` tilbake til `BEGIN` og les utenfor (f), og bytt tilbake til `glob("*.sql")` (g, bare utslag på Linux, så denne må kjøres i CI eller i WSL).
 
 **Størrelse.** Om lag 20 nye tester og 3 endrede, alle i to testfiler, og to kildefiler. Punktene a, e og f omskriver samme løkke i `migrer()` og kan ikke deles. c avhenger av `siste_versjon`. Én økt er realistisk for del 1. Del 2 er liten, men gjennomgangen etter del 1 kan ta resten av økta.
 
