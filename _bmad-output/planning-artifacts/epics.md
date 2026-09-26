@@ -826,9 +826,11 @@ har bestemt det.
   avslører ingenting. Feilvinduet er 00:00–02:00 norsk sommertid (00:00–01:00
   om vinteren), og 00:30 ligger i begge
 
-**Forutsetning:** story 1.5b er ferdig. `0002` skrives ikke før
+**Forutsetning:** story 1.5b er ferdig, og åpent punkt 3 er avgjort (`prd.md`:
+«Definisjonen må være avgjort før story 1.6»). `0002` skrives ikke før
 migrasjonsløperen og SQLite-adapteren er herdet. *Flyttet 2026-09-24:
-forutsetningene a–h sto her og er nå kontrollpunktene i 1.5b.*
+forutsetningene a–h sto her og er nå kontrollpunktene i 1.5b.* *Lagt til
+2026-09-26: punkt 3, som PRD-en og Epic 1-konteksten alt krever.*
 
 **Én økt:** ja.
 
