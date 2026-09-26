@@ -276,6 +276,8 @@ class TestAnvendteFiler:
         with pytest.raises(MigrasjonsFeil, match="0002_min.sql.*0002_din.sql"):
             migrer(base, katalog)
 
+        assert not base.in_transaction
+
     def test_endret_innhold_i_en_kjoert_fil_avvises(self, base, katalog):
         """e: samme filnavn, annet innhold."""
         skriv_migrasjon(katalog, 1, "a", "CREATE TABLE a (x INTEGER);")
@@ -284,6 +286,8 @@ class TestAnvendteFiler:
 
         with pytest.raises(MigrasjonsFeil, match="0001_a.sql er endret"):
             migrer(base, katalog)
+
+        assert not base.in_transaction
 
     def test_crlf_i_stedet_for_lf_gir_samme_hash(self, base, katalog):
         """e: en Windows-utsjekking med core.autocrlf=true gir CRLF. Samme fil
@@ -312,6 +316,8 @@ class TestAnvendteFiler:
         with pytest.raises(MigrasjonsFeil, match="laget foer 1.5b"):
             migrer(base, katalog)
 
+        assert not base.in_transaction
+
 
 class TestTransaksjonskontrollIFila:
     """Story 1.5b, b: en COMMIT i fila ville avsluttet loeperens transaksjon,
@@ -330,6 +336,36 @@ class TestTransaksjonskontrollIFila:
             migrer(base, katalog)
 
         assert alt_i_basen(base) == 0
+        assert not base.in_transaction
+
+    @pytest.mark.parametrize(
+        "ord_", ["BEGIN", "COMMIT", "END", "ROLLBACK", "SAVEPOINT s", "RELEASE s"]
+    )
+    def test_alle_seks_transaksjonsordene_avvises(self, base, katalog, ord_):
+        """Lista staar her som tekst, ikke som migrering.TRANSAKSJONSORD, saa
+        et ord som faller ut av settet, faar testen til aa feile."""
+        skriv_migrasjon(
+            katalog,
+            1,
+            "ord",
+            f"CREATE TABLE foer (x INTEGER);\n{ord_};\nCREATE TABLE etter (y INTEGER);",
+        )
+
+        with pytest.raises(MigrasjonsFeil, match=f"begynner med {ord_.split()[0]}"):
+            migrer(base, katalog)
+
+        assert alt_i_basen(base) == 0
+        assert not base.in_transaction
+
+    def test_hele_katalogen_sjekkes_foer_noe_kjoeres(self, base, katalog):
+        """En COMMIT i 0002 stopper ogsaa 0001, som selv er i orden."""
+        skriv_migrasjon(katalog, 1, "a", "CREATE TABLE a (x INTEGER);")
+        skriv_migrasjon(katalog, 2, "commit", "CREATE TABLE b (y INTEGER);\nCOMMIT;")
+
+        with pytest.raises(MigrasjonsFeil, match="0002_commit.sql.*begynner med COMMIT"):
+            migrer(base, katalog)
+
+        assert alt_i_basen(base) == 0
 
     def test_commit_etter_en_kommentar_avvises(self, base, katalog):
         skriv_migrasjon(
@@ -344,6 +380,7 @@ class TestTransaksjonskontrollIFila:
             migrer(base, katalog)
 
         assert alt_i_basen(base) == 0
+        assert not base.in_transaction
 
     def test_commit_med_smaa_bokstaver_avvises(self, base, katalog):
         skriv_migrasjon(
@@ -357,6 +394,7 @@ class TestTransaksjonskontrollIFila:
             migrer(base, katalog)
 
         assert alt_i_basen(base) == 0
+        assert not base.in_transaction
 
     def test_trigger_med_begin_og_end_kjoeres(self, base, katalog):
         """Vokter mot en for streng retting: BEGIN og END midt i en setning
@@ -386,15 +424,24 @@ class TestTransaksjonskontrollIFila:
             "CREATE TABLE foer (x INTEGER);\nCOMMIT;\nCREATE TABLE etter (y INTEGER);",
         )
 
-        with pytest.raises(MigrasjonsFeil, match="avsluttet transaksjonen"):
+        with pytest.raises(MigrasjonsFeil, match="avsluttet transaksjonen.*halvveis migrert"):
             migrer(base, katalog)
 
+        # Setningen foer COMMIT er alt committet og kan ikke rulles tilbake.
+        # Det er derfor forhaandssjekken finnes, og meldingen sier det.
+        assert "foer" in tabeller(base)
         assert "etter" not in tabeller(base)
         assert versjon(base) == 0
 
 
 class TestSamtidigMigrering:
-    """Story 1.5b, f: hentekommandoen og webserveren kan migrere samtidig."""
+    """Story 1.5b, f: hentekommandoen og webserveren kan migrere samtidig.
+
+    Testene dekker luken mellom lesingen og BEGIN: den andre tilkoblingen
+    migrerer ferdig foer den foerste starter transaksjonen. To transaksjoner
+    som overlapper, og dermed forskjellen paa BEGIN IMMEDIATE og en utsatt
+    BEGIN, proeves ikke her. Det krever to samtidige skrivere og er utsatt
+    til story 3.1, som lager dem (deferred-work.md)."""
 
     @staticmethod
     def krok(handling):
@@ -431,7 +478,8 @@ class TestSamtidigMigrering:
 
     def test_feilmeldingen_leser_versjonen_fra_basen(self, tmp_path, katalog):
         """Den andre kjoerer 0001 og feiler paa 0002 i luken. Basen staar da
-        paa 1, og det er det meldingen skal si."""
+        paa 1, og det er det meldingen skal si: versjonen lest inne i
+        transaksjonen, ikke regnet ut fra en lesing foer den."""
         skriv_migrasjon(katalog, 1, "a", "CREATE TABLE a (x INTEGER);")
         skriv_migrasjon(katalog, 2, "feiler", "DETTE ER IKKE SQL;")
         sti = tmp_path / "ose.db"
@@ -474,6 +522,8 @@ class TestKatalogkontrollen:
         with pytest.raises(MigrasjonsFeil, match="0000 er ikke et gyldig nummer"):
             migrer(base, katalog)
 
+        assert alt_i_basen(base) == 0
+
     def test_tom_katalog_avvises(self, base, katalog):
         katalog.mkdir()
 
@@ -481,6 +531,7 @@ class TestKatalogkontrollen:
             migrer(base, katalog)
 
         assert alt_i_basen(base) == 0
+        assert not base.in_transaction
 
 
 class TestTransaksjonenEiesAvLoeperen:

@@ -72,9 +72,15 @@ def versjon(tilkobling: sqlite3.Connection) -> int:
 def migrer(tilkobling: sqlite3.Connection, katalog: Path) -> int:
     """Kjoer alle migrasjoner basen ikke har faatt. Returnerer ny versjon.
 
-    Hele katalogen kontrolleres foer noe kjoeres: to filer med samme nummer
-    eller et hull i rekka stopper alt, fordi begge betyr at to utgaver av
-    skjemaet er i omloep.
+    Hele katalogen kontrolleres foer noe kjoeres: to filer med samme nummer,
+    et hull i rekka, feil filendelse, nummer 0000, en tom katalog og en fil
+    med transaksjonskontroll stopper alt, fordi de betyr at katalogen ikke
+    er i orden.
+
+    Deretter kjoeres en migrasjon per BEGIN IMMEDIATE-transaksjon. Inne i
+    hver transaksjon leses de anvendte migrasjonene paa nytt, og basen
+    avvises hvis en anvendt fil har faatt nytt navn eller nytt innhold, hvis
+    basen er nyere enn katalogen, eller hvis skjema_versjon er fra foer 1.5b.
 
     Tilkoblingen maa ikke ha en aapen transaksjon. Loeperen eier
     transaksjonen, og en COMMIT herfra ville tatt med seg kallerens endringer.
@@ -86,6 +92,8 @@ def migrer(tilkobling: sqlite3.Connection, katalog: Path) -> int:
         )
 
     filer = _migrasjoner(Path(katalog))
+    for _, sti in filer:
+        _forhaandssjekk(_setninger(_tekst(sti)), sti)
 
     # En migrasjon per transaksjon. Versjonen og de anvendte filene leses paa
     # nytt inne i hver transaksjon, etter BEGIN IMMEDIATE, saa en annen
@@ -103,6 +111,10 @@ def migrer(tilkobling: sqlite3.Connection, katalog: Path) -> int:
                 return len(anvendt)
             _kjoer(tilkobling, *filer[len(anvendt)])
             tilkobling.execute("COMMIT")
+        except sqlite3.Error as feil:
+            if tilkobling.in_transaction:
+                tilkobling.execute("ROLLBACK")
+            raise MigrasjonsFeil(f"Migreringen feilet og er rullet tilbake: {feil}") from feil
         except BaseException:
             if tilkobling.in_transaction:
                 tilkobling.execute("ROLLBACK")
@@ -215,7 +227,7 @@ def _anvendte(tilkobling: sqlite3.Connection) -> list[tuple[int, str, str]]:
 
 
 def _kontroller(
-    anvendt: list[tuple[int, str, str]], filer: list[tuple[int, Path]], katalog
+    anvendt: list[tuple[int, str, str]], filer: list[tuple[int, Path]], katalog: Path
 ) -> None:
     """Basen og katalogen skal beskrive samme historikk."""
     if len(anvendt) > len(filer):
@@ -262,7 +274,6 @@ def _kjoer(tilkobling: sqlite3.Connection, nummer: int, sti: Path) -> None:
     """En migrasjon og dens versjonsrad, i transaksjonen migrer() har aapnet."""
     tekst = _tekst(sti)
     setninger = _setninger(tekst)
-    _forhaandssjekk(setninger, sti)
     try:
         tilkobling.execute(
             "CREATE TABLE IF NOT EXISTS skjema_versjon ("
@@ -272,11 +283,14 @@ def _kjoer(tilkobling: sqlite3.Connection, nummer: int, sti: Path) -> None:
         for i, setning in enumerate(setninger, 1):
             tilkobling.execute(setning)
             # Ekstra sikring bak forhaandssjekken: er transaksjonen borte, er
-            # resten av fila i ferd med aa kjoeres uten den.
+            # resten av fila i ferd med aa kjoeres uten den. Det som kom foer,
+            # er da alt committet og kan ikke rulles tilbake.
             if not tilkobling.in_transaction:
                 raise MigrasjonsFeil(
                     f"{sti.name}, setning {i}, avsluttet transaksjonen. "
-                    "Migreringen er stoppet."
+                    f"Migreringen er stoppet, men setningene foer den er "
+                    f"committet uten versjonsrad: basen er halvveis migrert "
+                    f"og maa bygges paa nytt."
                 )
         tilkobling.execute(
             "INSERT INTO skjema_versjon (versjon, fil, sha256, anvendt) "
@@ -287,7 +301,11 @@ def _kjoer(tilkobling: sqlite3.Connection, nummer: int, sti: Path) -> None:
     except sqlite3.Error as feil:
         if tilkobling.in_transaction:
             tilkobling.execute("ROLLBACK")
+        # nummer er len(anvendt) + 1, lest inne i denne transaksjonen, og
+        # tilbakerullingen setter basen tilbake dit. Versjonen leses ikke paa
+        # nytt her: etter ROLLBACK er laasen sluppet, og en feil i lesingen
+        # ville skjult den opprinnelige feilen.
         raise MigrasjonsFeil(
             f"{sti.name} feilet og er rullet tilbake: {feil}. "
-            f"Basen staar paa versjon {versjon(tilkobling)}."
+            f"Basen staar paa versjon {nummer - 1}."
         ) from feil

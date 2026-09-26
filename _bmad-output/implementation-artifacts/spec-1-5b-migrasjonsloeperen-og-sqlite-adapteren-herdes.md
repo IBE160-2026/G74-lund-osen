@@ -72,12 +72,12 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `src/migrering.py` -- `_migrasjoner`: bytt `glob` ut med `iterdir()` og velg filer der `suffix.lower() == ".sql"`, så `FILNAVN` avviser `.SQL` med en egen melding. Avvis 0000 og tom katalog med egne meldinger -- g
-- [ ] `src/migrering.py` -- `migrer`: katalogen kontrolleres først. Deretter gjøres dette per migrasjon: `BEGIN IMMEDIATE`, les `(versjon, fil, sha256)` inne i transaksjonen, avvis nytt filnavn (a) og endret innhold (e), og kjør neste eller avslutt -- a, e, f
-- [ ] `src/migrering.py` -- `_kjoer`: `skjema_versjon` får `sha256 TEXT NOT NULL`, med hash av filteksten normalisert til LF. Mangler kolonnen, avvises basen. Forhåndssjekk av første ord i hver setning (se Beslutninger), `in_transaction` etter hver setning som ekstra sikring, og feilmeldingen leser versjonen etter `ROLLBACK` -- b, e, f
+- [x] `src/migrering.py` -- `_migrasjoner`: bytt `glob` ut med `iterdir()` og velg filer der `suffix.lower() == ".sql"`, så `FILNAVN` avviser `.SQL` med en egen melding. Avvis 0000 og tom katalog med egne meldinger -- g
+- [x] `src/migrering.py` -- `migrer`: katalogen kontrolleres først. Deretter gjøres dette per migrasjon: `BEGIN IMMEDIATE`, les `(versjon, fil, sha256)` inne i transaksjonen, avvis nytt filnavn (a) og endret innhold (e), og kjør neste eller avslutt -- a, e, f
+- [x] `src/migrering.py` -- `_kjoer`: `skjema_versjon` får `sha256 TEXT NOT NULL`, med hash av filteksten normalisert til LF. Mangler kolonnen, avvises basen. Forhåndssjekk av første ord i hver setning (se Beslutninger), `in_transaction` etter hver setning som ekstra sikring, og feilmeldingen leser versjonen etter `ROLLBACK` -- b, e, f
 - [ ] `src/migrering.py` -- ny offentlig `siste_versjon(katalog) -> int`, som gjør samme katalogkontroll. Den er en ren lesing og ingen unntaksvei -- c
 - [ ] `src/lagring_sqlite.py` -- krev `versjon(t) == siste_versjon(MIGRASJONSKATALOG)`, og nevn begge tallene i feilmeldingen -- c
-- [ ] `tests/test_migrering.py` -- tester for a, b (fem: `COMMIT` midt i fila, `COMMIT` etter en kommentar, «commit;» med små bokstaver midt i fila, en trigger som kjøres, og den ekstra sikringen alene, med forhåndssjekken byttet ut med en som slipper alt gjennom via `monkeypatch`), e (tre), f (to), g (tre) og h (linje 174). `TestIngenUnntaksvei` endres til tre funksjoner, med begrunnelse i testen -- a, b, e, f, g, h
+- [ ] *(del 1 ferdig; `TestIngenUnntaksvei` endres i del 2, sammen med `siste_versjon`)* `tests/test_migrering.py` -- tester for a, b (fem: `COMMIT` midt i fila, `COMMIT` etter en kommentar, «commit;» med små bokstaver midt i fila, en trigger som kjøres, og den ekstra sikringen alene, med forhåndssjekken byttet ut med en som slipper alt gjennom via `monkeypatch`), e (tre), f (to), g (tre) og h (linje 174). `TestIngenUnntaksvei` endres til tre funksjoner, med begrunnelse i testen -- a, b, e, f, g, h
 - [ ] `tests/test_lagring_sqlite.py` -- tester for c og d (to: nytt og kjent symbol) og h (linje 119) -- c, d, h
 
 **Acceptance Criteria:**
@@ -85,13 +85,59 @@ context:
 - Gitt mutantene i Design Notes, når hver av dem legges inn én om gangen, så feiler akkurat testene for det punktet, med forventet melding og ikke bare et bredt utslag (lærdommen fra 23.09).
 - Gitt hele testsettet på Windows lokalt og på Linux i CI, når det kjøres, så er det grønt begge steder med samme antall tester.
 
+## Implementation Notes
+
+**Del 1, løperen, 26.09.** Bygget direkte i økta, ikke av en egen implementeringsagent, fordi instruksjonen kl. 22:12 krevde at bare del 1 ble bygget, at hver ny test ble kjørt mot `baseline_commit`, og at mutantene ble lagt inn én om gangen. Grenen `1-5b`, commitene `eca5818`, `ae803ee` og rettingene etter gjennomgangen. PR #5.
+
+- **Tester:** 427 før. 441 etter første commit (14 nye, 1 endret). 448 etter rettingene fra gjennomgangen: 6 til for de seks transaksjonsordene (`test_alle_seks_transaksjonsordene_avvises`, parametrisert over en fast liste) og 1 for at hele katalogen sjekkes før noe kjøres. Listene over sa 14 nye i del 1. De 7 ekstra kom fra funn i gjennomgangen.
+- **Mot `baseline_commit`:** alle nye tester feilet, bortsett fra triggertesten i b, CRLF-testen i e og h-testen, som skal bestå der. Ekstra sikring-testen feilet med `AttributeError`, fordi `_forhaandssjekk` ikke fantes. `.SQL`-testen feilet på Windows med den gamle meldingen «ikke navngitt som en migrasjon». På Linux ville den gamle koden hoppet stille over fila.
+- **LF-normaliseringen:** `read_text()` leser i tekstmodus og gjør CRLF om til LF. `.replace("\r\n", "\n")` var derfor overflødig, og mutanten som fjernet den, overlevde. Linjen er fjernet, og hashen regnes ett sted, `_sha256(tekst)`. Mutanten der `_tekst` leser rå bytes, fanges av CRLF-testen.
+- **Forhåndssjekken** kjøres over alle filene i katalogen i `migrer()`, før den første `BEGIN IMMEDIATE`, slik «Beslutninger 26.09» sier. Første versjon kjørte den per fil inne i transaksjonen (funn i gjennomgangen).
+- **Feilmeldingen i f** bruker `nummer - 1`. `nummer` er `len(anvendt) + 1`, lest inne i samme transaksjon. En ny lesing etter `ROLLBACK` ville vært etter at låsen er sluppet, og en feil i lesingen ville skjult den opprinnelige feilen (funn i gjennomgangen).
+- **Mutanter, én om gangen, mot hele testsettet:** alle fanges av testene for sitt punkt. To overlever: `BEGIN IMMEDIATE` byttet med utsatt `BEGIN`, som er utsatt til story 3.1 (`deferred-work.md`), og `glob("*.sql")` i g, som bare gir utslag på Linux og ikke er prøvd der. Det finnes ingen Linux med Python i WSL på maskinen.
+- **Diffen for gjennomgangen** var `src/` og `tests/` siden `baseline_commit`. Hele repoet siden da ville tatt med dokumentendringene på `main` fra 26.09, som ikke hører til storyen.
+
+## Spec Change Log
+
+## Review Triage Log
+
+Tre lag gjennomgikk del 1 den 26.09: Blind Hunter (BH), Edge Case Hunter (ECH) og Verification Gap (VG). Hvert funn har én rad.
+
+| # | Funn | Dom | Bevis | Rute |
+|---|---|---|---|---|
+| BH1 | Forhåndssjekken kjøres per fil inne i transaksjonen, ikke før den, og tidligere migrasjoner er committet før en `COMMIT` i en senere fil oppdages | medium | Koden kalte `_forhaandssjekk` i `_kjoer`. «Beslutninger 26.09» sier «før transaksjonen starter» | patch: sjekken over hele katalogen i `migrer()`, og ny test |
+| BH2 | Ekstra sikring etterlater en halvveis migrert base uten å si det | low | Setningen før `COMMIT` er committet. Testen sjekket ikke `foer` | patch: meldingen sier det, og testen sjekker at `foer` finnes |
+| BH3 | Testen for feilmeldingen skiller ikke `nummer - 1` fra en ny lesing, og en lesing etter `ROLLBACK` er utsatt for et kappløp | low | Inne i transaksjonen er de like. Etter `ROLLBACK` er låsen sluppet | patch: meldingen bruker `nummer - 1`, lest inne i transaksjonen |
+| BH4 | `versjon()` i feilgrenen kan skjule den opprinnelige feilen | low | En `sqlite3.Error` i f-strengen ville erstattet `MigrasjonsFeil` | patch: samme retting som BH3 |
+| BH5 | Bare `COMMIT` er testet av de seks transaksjonsordene | medium | VG viste det med `TRANSAKSJONSORD = {"COMMIT"}` | patch: parametrisert test over en fast liste |
+| BH6 | Samtidighetstestene har ingen ekte låsekonflikt | medium | Kroken kjører den andre ferdig før første `BEGIN` | defer: sammen med VG3 |
+| BH7 | `_kontroller` leser og hasher alle anvendte filer på nytt for hver migrasjon | low | Riktig, men det er få filer. Å hashe dem én gang før løkka ville lagt til tilstand | avvist: lite sannsynlig å merkes |
+| BH8 | `_kontroller` parer rader og filer på plass og sjekker ikke hull i `skjema_versjon` | low | Krever en tabell som er redigert for hånd. Gir en misvisende, men stoppende melding | avvist: lite sannsynlig, og krever en ny vakt |
+| BH9 | Docstringen til `migrer()` var ikke oppdatert, og `katalog` manglet type | low | Riktig | patch |
+| BH10 | 0000-testen sjekker ikke at ingenting kjørte, og navnet på `.SQL`-testen lover begge plattformer | low | Første del stemmer. Navnet stemmer: testen kjøres lokalt på Windows og i CI på Linux | patch: `alt_i_basen` sjekkes. Navnet står |
+| ECH1 | En skrivebeskyttet tilkobling kan ikke lenger kalle `migrer()` på en oppdatert base | maybe-false | `BEGIN IMMEDIATE` krever skrivetilgang. Om webserveren får en skrivebeskyttet base, avgjøres i 3.1 | defer: ubekreftet, medium hvis sant |
+| ECH2 | Den andre migratoren feiler etter tidsavbruddet på 5 s i stedet for å vente | low | Riktig, men migrasjonene er korte | defer: sammen med VG3 |
+| ECH3 | En `COMMIT` som feiler, slipper ut som rå `sqlite3.Error` | medium | `COMMIT` lå utenfor grenen som pakker inn feil. Den gamle koden pakket den inn | patch: `except sqlite3.Error` i `migrer()` |
+| ECH4 | `ROLLBACK` eller `versjon()` i feilgrenen kan skjule feilen | low | `versjon()` er rettet under BH3. `ROLLBACK` i feilgrenen er samme mønster som før 1.5b | patch: samme retting som BH3 |
+| ECH5 | En fil som ikke er gyldig UTF-8, eller ikke kan leses, gir en rå feil | low | Fantes før 1.5b. Lite sannsynlig | avvist |
+| ECH6 | En BOM fra en editor gir falsk «er endret», og BOM + `COMMIT` slipper forbi | low | Krever en editor som legger til BOM. En BOM-endring er også en endring av fila | avvist: lite sannsynlig |
+| ECH7 | Ekstra sikring etterlater en halvveis migrert base | low | Samme som BH2 | patch: under BH2 |
+| ECH8 | Rader i `skjema_versjon` med hull gir en misvisende melding | low | Samme som BH8 | avvist |
+| ECH9 | Kroken slår til før `BEGIN`, så transaksjonene overlapper aldri | medium | Samme som VG3 | defer: under VG3 |
+| ECH10 | En mappe eller brutt lenke med navnet `NNNN_x.sql` hoppes over | low | Før ga den en rå `IsADirectoryError`, ikke en kontroll. Lite sannsynlig | avvist |
+| VG1 | `ROLLBACK` etter en avvisning inne i transaksjonen er ikke prøvd | medium | VG fjernet `ROLLBACK`, og alle tester besto | patch: `assert not base.in_transaction` etter avvisningene. Mutanten fanges nå av tre tester |
+| VG2 | Bare `COMMIT` er testet av de seks ordene | medium | Samme som BH5 | patch: under BH5 |
+| VG3 | Transaksjonene overlapper aldri i testene, så `IMMEDIATE` er ikke prøvd | medium | VG byttet til `BEGIN`, og alt besto | defer: til 3.1, med kommentar i testklassen |
+| VG4 | Testen for feilmeldingen lover mer enn den kan skille | low | Samme som BH3 | patch: under BH3, og docstringen presisert |
+| VG5 | Testen for ekstra sikring sier ikke at basen er halvveis migrert | low | Samme som BH2 | patch: under BH2 |
+
 ## Design Notes
 
 **f) Kappløpet uten sleep og uten tråder.** Tilkobling A lages med `sqlite3.connect(..., factory=Krok)`, der `Krok.execute` lar tilkobling B migrere første gang den ser en setning som begynner med `BEGIN`. Før rettingen leser A versjon 0, B migrerer, og A kjører `0001` og feiler med «Basen staar paa versjon 0». Etter rettingen leser A versjonen inne i `BEGIN IMMEDIATE`, ser 1 og returnerer 1.
 
 **g) Lik oppførsel på Linux og Windows.** Årsaken til forskjellen er at `glob`s mønster skiller store og små bokstaver bare på Linux. `iterdir()` med `suffix.lower()` gjør valget i Python, likt på begge plattformer. Deretter avviser `FILNAVN`, som bare godtar `.sql`, fila med en melding som sier hva som er feil. Testen oppretter `0002_ny.SQL` og forventer samme `MigrasjonsFeil` på begge.
 
-**e) sha256 og baser som alt finnes.** Hashen regnes av `read_text(encoding="utf-8").replace("\r\n", "\n")`. Uten det ville samme fil gitt ulik hash etter en Windows-utsjekking med `core.autocrlf=true`, som er satt på Marians maskin, og i Linux-imaget. Ingen base finnes ennå. Løperen avviser derfor en `skjema_versjon` uten `sha256` i stedet for å oppgradere den stille, fordi en stille oppgradering måtte stolt på filen slik den er nå, og det er nettopp det e skal hindre. En gammel testbase bygges på nytt fra rådatafilene (AD-6). Etter at `vurdering` finnes (1.6), kan vi ikke gjøre det slik lenger.
+**e) sha256 og baser som alt finnes.** Hashen regnes av `read_text(encoding="utf-8")`, som leser i tekstmodus og gjør CRLF om til LF (*endret 26.09 under byggingen:* her sto `.replace("\r\n", "\n")` i tillegg, men den var overflødig, se Implementation Notes). Uten det ville samme fil gitt ulik hash etter en Windows-utsjekking med `core.autocrlf=true`, som er satt på Marians maskin, og i Linux-imaget. Ingen base finnes ennå. Løperen avviser derfor en `skjema_versjon` uten `sha256` i stedet for å oppgradere den stille, fordi en stille oppgradering måtte stolt på filen slik den er nå, og det er nettopp det e skal hindre. En gammel testbase bygges på nytt fra rådatafilene (AD-6). Etter at `vurdering` finnes (1.6), kan vi ikke gjøre det slik lenger.
 
 **c) krever en ny offentlig funksjon.** `TestIngenUnntaksvei` låser `migrering` til `migrer` og `versjon`. Adapteren må vite siste versjon uten å gjenta katalogkontrollen. Alternativet er at den kaller den private `_migrasjoner`. `siste_versjon` leser bare, og testen endres synlig til tre funksjoner.
 
