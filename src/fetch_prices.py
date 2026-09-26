@@ -64,20 +64,46 @@ def bygg_intervall(i_dag: date | None = None) -> tuple[str, str]:
 
 
 def hent_ett_symbol(ticker: str, api_nokkel: str, fra: str, til: str) -> list[dict]:
-    """Ett API-kall. Eneste funksjonen i prosjektet som roerer nettet."""
-    svar = requests.get(
-        f"{BASE_URL}/{ticker}",
-        params={
-            "api_token": api_nokkel,
-            "fmt": "json",
-            "period": "d",
-            "from": fra,
-            "to": til,
-        },
-        timeout=60,
-    )
-    svar.raise_for_status()
+    """Ett API-kall. Eneste funksjonen i prosjektet som roerer nettet.
+
+    Noekkelen gaar som api_token i adressen, og requests tar med hele
+    adressen i teksten til sine feil. Enhver feil fra requests blir derfor
+    en ny feil med en tekst uten adressen (story 2.0): statuskode og aarsak
+    for en HTTP-feil, bare typenavnet for resten. from None kutter kjeden,
+    saa heller ikke en traceback viser den gamle teksten.
+    """
+    try:
+        svar = requests.get(
+            f"{BASE_URL}/{ticker}",
+            params={
+                "api_token": api_nokkel,
+                "fmt": "json",
+                "period": "d",
+                "from": fra,
+                "to": til,
+            },
+            timeout=60,
+        )
+        svar.raise_for_status()
+    except requests.HTTPError as feil:
+        r = feil.response
+        tekst = f"HTTP {r.status_code} {r.reason}".strip() if r is not None else "HTTPError"
+        raise requests.HTTPError(tekst, response=r) from None
+    except requests.RequestException as feil:
+        raise type(feil)(type(feil).__name__) from None
     return svar.json()
+
+
+def _uten_noekkel(tekst: str, api_nokkel: str) -> str:
+    """Noekkelen byttet med *** - andre lag, for feil som ikke kom fra requests."""
+    return tekst.replace(api_nokkel, "***") if api_nokkel else tekst
+
+
+def _riktig_form(rader) -> bool:
+    """En liste der hver rad er en dict med date, slik EODHD svarer."""
+    return isinstance(rader, list) and all(
+        isinstance(rad, dict) and "date" in rad for rad in rader
+    )
 
 
 def hent_universet(
@@ -105,13 +131,22 @@ def hent_universet(
             resultat.kall_brukt += 1
         except Exception as feil:  # noqa: BLE001 - alt som feiler har kostet kallet
             resultat.kall_brukt += 1
-            resultat.feil[aksje.symbol] = f"{type(feil).__name__}: {feil}"
-            skriv(f"  {aksje.symbol}: FEIL {feil}")
+            resultat.feil[aksje.symbol] = _uten_noekkel(
+                f"{type(feil).__name__}: {feil}", api_nokkel
+            )
+            skriv(f"  {aksje.symbol}: FEIL {_uten_noekkel(str(feil), api_nokkel)}")
             continue
 
         if not rader:
             resultat.feil[aksje.symbol] = "tomt svar"
             skriv(f"  {aksje.symbol}: ingen data")
+            continue
+
+        # Story 2.0, valg A: et svar med feil form skal ikke stoppe hele
+        # hentingen etter at kallene er brukt (AD-15, NFR-03).
+        if not _riktig_form(rader):
+            resultat.feil[aksje.symbol] = "svar med feil form"
+            skriv(f"  {aksje.symbol}: svar med feil form")
             continue
 
         resultat.serier[aksje.symbol] = rader
@@ -143,27 +178,57 @@ def filnavn(i_dag: date | None = None) -> str:
     return f"{KURSPREFIKS}-raa-{(i_dag or date.today()).isoformat()}.json"
 
 
+def kjoer(
+    data_katalog: Path,
+    i_dag: date,
+    api_nokkel: str,
+    hent: Callable[[str, str, str, str], list[dict]] = hent_ett_symbol,
+    skriv: Callable[[str], None] = print,
+) -> Path | None:
+    """En henting. Returnerer fila som ble skrevet, eller None.
+
+    Et oeyeblikksbilde skrives aldri om (AD-6, story 2.0). Finnes dagens fil,
+    stopper kjoeringen foer foerste kall. Fila skrives med modus "x", saa en fil
+    som dukker opp mens kjoeringen paagaar, heller ikke skrives over. Story 2.3
+    bygger videre paa dette med forventet boersdag.
+    """
+    fil = data_katalog / filnavn(i_dag)
+    if fil.exists():
+        skriv(
+            f"Dagens oeyeblikksbilde {fil.name} finnes allerede. Hentingen er "
+            "stoppet foer noe kall er brukt (AD-6). 0 kall brukt."
+        )
+        return None
+
+    fra, til = bygg_intervall(i_dag)
+    skriv(f"Henter {len(AKSJEUNIVERS)} symboler, {fra} til {til}.")
+    skriv(f"Dette koster {len(AKSJEUNIVERS)} av dagskvoten paa 20.\n")
+
+    resultat = hent_universet(api_nokkel, fra, til, hent, skriv)
+
+    naa = datetime.now(timezone.utc).isoformat()
+    tekst = json.dumps(lag_oyeblikksbilde(resultat, fra, til, naa), ensure_ascii=False)
+    try:
+        with open(fil, "x", encoding="utf-8") as ut:
+            ut.write(tekst)
+    except FileExistsError:
+        skriv(
+            f"{fil.name} dukket opp mens hentingen paagikk, og er ikke skrevet "
+            f"over (AD-6). {resultat.kall_brukt} kall er brukt, og ingenting er lagret."
+        )
+        return None
+
+    skriv(f"\nLagret {fil.name} i {data_katalog.name}/")
+    skriv(f"API-kall brukt: {resultat.kall_brukt}")
+    if resultat.feil:
+        skriv(f"Symboler uten data: {', '.join(sorted(resultat.feil))}")
+    return fil
+
+
 def main() -> None:
     api_nokkel = hent_api_nokkel()
     DATA_KATALOG.mkdir(exist_ok=True)
-
-    fra, til = bygg_intervall()
-    print(f"Henter {len(AKSJEUNIVERS)} symboler, {fra} til {til}.")
-    print(f"Dette koster {len(AKSJEUNIVERS)} av dagskvoten paa 20.\n")
-
-    resultat = hent_universet(api_nokkel, fra, til)
-
-    naa = datetime.now(timezone.utc).isoformat()
-    fil = DATA_KATALOG / filnavn()
-    fil.write_text(
-        json.dumps(lag_oyeblikksbilde(resultat, fra, til, naa), ensure_ascii=False),
-        encoding="utf-8",
-    )
-
-    print(f"\nLagret {fil.relative_to(PROSJEKTROT)}")
-    print(f"API-kall brukt: {resultat.kall_brukt}")
-    if resultat.feil:
-        print(f"Symboler uten data: {', '.join(sorted(resultat.feil))}")
+    kjoer(DATA_KATALOG, date.today(), api_nokkel)
 
 
 if __name__ == "__main__":

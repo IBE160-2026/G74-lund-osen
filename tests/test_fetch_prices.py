@@ -1,14 +1,15 @@
 """Tester for hentingen. Ingen nettverk.
 
 hent_universet tar hentefunksjonen som argument, saa hele loekka kan kjoeres
-mot en falsk henter. Den ekte hent_ett_symbol roeres ikke av noen test her -
-den koster kvote, og kvoten testes ikke.
+mot en falsk henter. Den ekte hent_ett_symbol kjoeres bare med requests.get
+byttet ut (story 2.0), saa ingen test naar nettet eller bruker kvote.
 """
 
 import json
 from datetime import date
 
 import pytest
+import requests
 
 import fetch_prices as fp
 from kursdata import AKSJEUNIVERS
@@ -25,6 +26,119 @@ def falsk_serie(dager: int = 60):
         }
         for i in range(dager)
     ]
+
+
+NOEKKEL = "FALSK-NOEKKEL-123456"
+
+
+def falsk_respons(status: int, ticker: str, noekkel: str, innhold=None) -> requests.Response:
+    """En ekte requests.Response, som om EODHD hadde svart. Adressen har
+    noekkelen, slik den ekte har."""
+    r = requests.Response()
+    r.status_code = status
+    r.reason = {200: "OK", 500: "Internal Server Error"}.get(status, "")
+    r.url = f"{fp.BASE_URL}/{ticker}?api_token={noekkel}&fmt=json"
+    r._content = json.dumps(innhold if innhold is not None else []).encode()
+    return r
+
+
+class TestNoekkelenLekkerIkke:
+    """Story 2.0: noekkelen staar aldri i en feiltekst, verken i utskriften
+    eller i feil i oeyeblikksbildet. Falsk noekkel, og requests.get byttet ut."""
+
+    def test_http_feil_gir_statuskode_uten_adresse(self, monkeypatch):
+        monkeypatch.setattr(
+            fp.requests, "get",
+            lambda url, params, timeout: falsk_respons(500, "DNB.OL", params["api_token"]),
+        )
+
+        with pytest.raises(requests.HTTPError) as feil:
+            fp.hent_ett_symbol("DNB.OL", NOEKKEL, "a", "b")
+
+        assert str(feil.value) == "HTTP 500 Internal Server Error"
+        assert NOEKKEL not in str(feil.value)
+        assert feil.value.__cause__ is None and feil.value.__suppress_context__
+
+    def test_tilkoblingsfeil_gir_bare_typenavnet(self, monkeypatch):
+        """Ikke bare raise_for_status(): en tilkoblingsfeil fra requests har
+        ogsaa adressen, med noekkelen, i teksten."""
+
+        def get(url, params, timeout):
+            raise requests.ConnectionError(
+                "HTTPSConnectionPool(host='eodhd.com', port=443): Max retries "
+                f"exceeded with url: /api/eod/DNB.OL?api_token={params['api_token']}"
+            )
+
+        monkeypatch.setattr(fp.requests, "get", get)
+
+        with pytest.raises(requests.ConnectionError) as feil:
+            fp.hent_ett_symbol("DNB.OL", NOEKKEL, "a", "b")
+
+        assert str(feil.value) == "ConnectionError"
+        assert NOEKKEL not in str(feil.value)
+
+    def test_hent_universet_fjerner_noekkelen_fra_enhver_feil(self):
+        """Andre lag: henteren er injisert, og en feil kan komme fra hvor som
+        helst. Noekkelen fjernes baade fra utskriften og fra feil."""
+        linjer = []
+
+        def hent(ticker, noekkel, *_):
+            if ticker == "DNB.OL":
+                raise RuntimeError(f"noe gikk galt med {noekkel}")
+            return falsk_serie()
+
+        resultat = fp.hent_universet(NOEKKEL, "a", "b", hent, linjer.append)
+
+        assert NOEKKEL not in resultat.feil["DNB"]
+        assert "***" in resultat.feil["DNB"]
+        assert not [l for l in linjer if NOEKKEL in l]
+        assert any("DNB: FEIL" in l and "***" in l for l in linjer)
+
+
+class TestSkriverIkkeOver:
+    """Story 2.0: et oeyeblikksbilde skrives aldri om (AD-6)."""
+
+    def test_dagens_fil_finnes_og_ingen_kall_brukes(self, tmp_path):
+        fil = tmp_path / fp.filnavn(date(2026, 9, 26))
+        fil.write_text('{"gammel": true}', encoding="utf-8")
+        linjer = []
+
+        def hent(*_):
+            pytest.fail("ingen kall skal brukes naar dagens fil finnes")
+
+        assert fp.kjoer(tmp_path, date(2026, 9, 26), NOEKKEL, hent, linjer.append) is None
+        assert fil.read_text(encoding="utf-8") == '{"gammel": true}'
+        assert any("finnes allerede" in l and "0 kall brukt" in l for l in linjer)
+
+    def test_fil_som_dukker_opp_under_kjoeringen_skrives_ikke_over(self, tmp_path):
+        fil = tmp_path / fp.filnavn(date(2026, 9, 26))
+        linjer = []
+
+        def hent(*_):
+            if not fil.exists():
+                fil.write_text('{"annen kjoering": true}', encoding="utf-8")
+            return falsk_serie()
+
+        assert fp.kjoer(tmp_path, date(2026, 9, 26), NOEKKEL, hent, linjer.append) is None
+        assert fil.read_text(encoding="utf-8") == '{"annen kjoering": true}'
+        assert any("ikke skrevet over" in l and "15 kall er brukt" in l for l in linjer)
+
+
+class TestSvarMedFeilForm:
+    """Story 2.0, valg A: et svar med feil form stopper ikke hentingen
+    (AD-15, NFR-03)."""
+
+    def test_feil_form_gir_feil_for_symbolet_og_de_andre_hentes(self):
+        def hent(ticker, *_):
+            if ticker == "DNB.OL":
+                return [{"close": 1.0}]  # mangler date
+            return falsk_serie()
+
+        resultat = fp.hent_universet(NOEKKEL, "a", "b", hent, lambda _: None)
+
+        assert resultat.feil == {"DNB": "svar med feil form"}
+        assert len(resultat.serier) == 14
+        assert resultat.kall_brukt == 15
 
 
 class TestIntervall:
@@ -81,18 +195,25 @@ class TestHentUniverset:
         assert "EQNR" in resultat.serier
         assert "EQNR.OL" not in resultat.serier
 
-    def test_en_feil_stopper_ikke_de_andre(self):
-        """NFR-03: manglende data for en aksje stopper ikke hovedflyten."""
+    def test_en_feil_stopper_ikke_de_andre(self, monkeypatch):
+        """NFR-03: manglende data for en aksje stopper ikke hovedflyten.
 
-        def hent(ticker, *_):
+        Story 2.0: gaar gjennom den ekte hent_ett_symbol, med requests.get
+        byttet ut. DNB faar en ekte HTTP 500 fra raise_for_status()."""
+
+        def get(url, params, timeout):
+            ticker = url.rsplit("/", 1)[1]
             if ticker == "DNB.OL":
-                raise RuntimeError("HTTP 500")
-            return falsk_serie()
+                return falsk_respons(500, ticker, params["api_token"])
+            return falsk_respons(200, ticker, params["api_token"], falsk_serie())
 
-        resultat = fp.hent_universet("noekkel", "a", "b", hent, lambda _: None)
+        monkeypatch.setattr(fp.requests, "get", get)
+
+        resultat = fp.hent_universet(NOEKKEL, "a", "b", skriv=lambda _: None)
 
         assert "DNB" in resultat.feil
         assert "HTTP 500" in resultat.feil["DNB"]
+        assert NOEKKEL not in resultat.feil["DNB"]
         assert len(resultat.serier) == 14
 
     def test_feilet_symbol_teller_som_brukt_kall(self):
