@@ -923,6 +923,8 @@ den, og tas før neste henting.
 
 **Én økt:** ja.
 
+*Ferdig 2026-09-26:* flettet i `4b65a3c`, PR #6.
+
 ### Story 2.1: Børsdag i Oslo, tidsstempel i UTC
 
 Som **utvikler**, vil jeg at «dagen» betyr én ting, så to verdier ikke kan være
