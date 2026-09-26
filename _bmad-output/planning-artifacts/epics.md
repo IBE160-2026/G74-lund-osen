@@ -802,6 +802,8 @@ til 2026-09-24, fra gjennomgangen av 23.09, og prøvd mot koden 24.09:*
 
 **Én økt:** ikke vurdert. Åtte kontrollpunkter.
 
+*Ferdig 2026-09-26:* flettet i `ef1cca7`, PR #5.
+
 ### Story 1.6: `Vurderingslager` med datoavvisning
 
 Som **utvikler på laget**, vil jeg ha et `Vurderingslager` som **nekter** å
