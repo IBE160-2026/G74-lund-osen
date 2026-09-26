@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-26T19:23
+updated: 2026-09-26T19:25
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1004,7 +1004,7 @@ kall per symbol er eneste vei, og det er denne begrensningen som gir universet
 på 15.
 
 Relevanseksperimentet er en engangsinnsamling og inngår ikke i daglig drift; se
-åpent punkt 5.
+punkt 5, lukket 26.09, og `relevanseksperiment.md` §8.
 
 ### NFR-02 — Brukeren venter aldri på en henting
 
@@ -1058,7 +1058,7 @@ publiseres og hva som blir liggende lokalt: `docs/kilder-og-rettigheter.md`.
 | EODHD `/api/eod` | Sluttkurser | 1 kall per symbol, 15 i døgnet |
 | Oslo Børs NewsWeb | Børsmeldinger | Nei |
 | Euronext finanskalender | Kommende hendelser | Nei |
-| EODHD `/api/news` | Relevanseksperimentet, én engangsinnsamling | Målt: 5 kall per forespørsel med én ticker (`malinger.md` §7.2). Åtte selskaper, én forespørsel hver, kostet 40 kall 25.09, og `limit=20` kostet ikke mer enn `limit=10` (`relevanseksperiment.md` §6). En forespørsel med flere tickere samtidig er ikke målt, og story 9.4 avgjør det ikke lenger: kontrollen med to tickere ble byttet ut (`bb54553`). Ikke daglig drift — se åpent punkt 5. *Rettet 2026-09-24: her sto 10 per ticker og ~80* *Rettet 2026-09-25: her sto «For flere tickere er tallet ikke målt: ~40 kall for åtte selskaper hvis det er 5 per ticker, ~80 hvis det er 10. Avgjøres av den første forespørselen med to tickere (story 9.4).»* |
+| EODHD `/api/news` | Relevanseksperimentet, én engangsinnsamling | Målt: 5 kall per forespørsel med én ticker (`malinger.md` §7.2). Åtte selskaper, én forespørsel hver, kostet 40 kall 25.09, og `limit=20` kostet ikke mer enn `limit=10` (`relevanseksperiment.md` §6). En forespørsel med flere tickere samtidig er ikke målt, og story 9.4 avgjør det ikke lenger: kontrollen med to tickere ble byttet ut (`bb54553`). Ikke daglig drift — se punkt 5, lukket 26.09, og `relevanseksperiment.md` §8. *Rettet 2026-09-24: her sto 10 per ticker og ~80* *Rettet 2026-09-25: her sto «For flere tickere er tallet ikke målt: ~40 kall for åtte selskaper hvis det er 5 per ticker, ~80 hvis det er 10. Avgjøres av den første forespørselen med to tickere (story 9.4).»* |
 
 To forbehold hører til PRD-en fordi de kan velte krav: **NewsWeb-vilkårene er
 ikke kontrollert**, og API-et er udokumentert backend for Oslo Børs' egen
