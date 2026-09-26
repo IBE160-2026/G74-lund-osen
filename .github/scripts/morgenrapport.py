@@ -1,6 +1,6 @@
 """Gjoer utskriften fra morgensjekk.py om til en kommentar i saken «Morgensjekk».
 
-Bruk: python3 morgenrapport.py <brukernavn> <lenke til kjoeringen> < utskrift.txt
+Bruk: python3 morgenrapport.py <brukernavn,brukernavn> <lenke til kjoeringen> < utskrift.txt
 
 Bare standardbiblioteket. Seksjon 11 tas ikke med: den er grunnlaget for
 kontrollregningen, som bare Claude-kjoeringen gjoer.
@@ -12,7 +12,7 @@ from datetime import date
 UKEDAGER = ["mandag", "tirsdag", "onsdag", "torsdag", "fredag", "lørdag", "søndag"]
 MERKER = ("MERK:", "FIL:", "NOEKKEL?:")
 
-brukernavn, kjoering = sys.argv[1], sys.argv[2]
+brukernavn, kjoering = sys.argv[1].split(","), sys.argv[2]
 sys.stdin.reconfigure(encoding="utf-8")
 linjer = sys.stdin.read().splitlines()
 
@@ -52,7 +52,7 @@ if merket:
     ut += merket + [""]
 ut += [f"{gjerde}text", *blokk, gjerde, ""]
 # Nevningen staar utenfor tekstblokken, ellers varsler ikke GitHub.
-ut += [f"@{brukernavn} Kontrollregningen og forslaget til dagens hovedoppgave "
-       f"står i Claude-kjøringen.", "", f"Kjøringen på GitHub: {kjoering}"]
+ut += [" ".join(f"@{b}" for b in brukernavn) + " Kontrollregningen og forslaget til dagens hovedoppgave "
+       "står i Claude-kjøringen.", "", f"Kjøringen på GitHub: {kjoering}"]
 sys.stdout.reconfigure(encoding="utf-8")
 print("\n".join(ut))

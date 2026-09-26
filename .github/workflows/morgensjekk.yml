@@ -1,7 +1,9 @@
 name: morgensjekk
 
 # Morgensjekken, GitHub-delen. Rapporten legges som kommentar i saken
-# «Morgensjekk», og GitHub sender e-post fordi kommentaren nevner Marian.
+# «Morgensjekk», og GitHub sender e-post fordi kommentaren nevner Marian
+# (Pixienn) og Joakim (jlund76). Hvilken adresse varselet gaar til, styrer
+# hver av dem i sin GitHub-konto; ingen adresser staar her.
 # Kontrollregningen og forslaget til dagens hovedoppgave gjoer bare
 # Claude-kjoeringen «Morgensjekk OSE Signal»; skriptet er det samme.
 on:
@@ -43,7 +45,7 @@ jobs:
       - name: Kjoer morgensjekken og lag rapporten
         run: |
           uv run --no-project python .github/scripts/morgensjekk.py . > "$RUNNER_TEMP/utskrift.txt"
-          uv run --no-project python .github/scripts/morgenrapport.py Pixienn \
+          uv run --no-project python .github/scripts/morgenrapport.py Pixienn,jlund76 \
             "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
             < "$RUNNER_TEMP/utskrift.txt" > "$RUNNER_TEMP/kommentar.md"
           cat "$RUNNER_TEMP/kommentar.md"
@@ -58,7 +60,7 @@ jobs:
             --jq '[.[] | select(.title == "Morgensjekk")][0].number // empty')
           if [ -z "$nr" ]; then
             url=$(gh issue create --title "Morgensjekk" --body \
-              "Hver morgen legger workflowen morgensjekk.yml rapporten fra .github/scripts/morgensjekk.py her som kommentar, og nevner Marian slik at GitHub sender e-post. Saken holdes åpen.")
+              "Hver morgen legger workflowen morgensjekk.yml rapporten fra .github/scripts/morgensjekk.py her som kommentar, og nevner Marian og Joakim slik at GitHub sender e-post. Saken holdes åpen.")
             nr=${url##*/}
           fi
           gh issue comment "$nr" --body-file "$RUNNER_TEMP/kommentar.md"
