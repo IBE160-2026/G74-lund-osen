@@ -2,7 +2,7 @@
 title: "Relevanseksperimentet — kriteriene for del 1"
 status: aktiv
 created: 2026-09-25
-updated: 2026-09-25T13:03
+updated: 2026-09-26T19:02
 ---
 
 # Relevanseksperimentet — kriteriene for del 1
@@ -159,3 +159,22 @@ ti, og DNBs datospenn slutter før alle de andre selskapenes.
 
 Artiklene, utvalget, tekstene, nøkkelen og de to tomme merkefilene ligger bare
 i `data/`. Frøet for blandingen står i utvalgsfila der.
+
+## 7. Merkingen 26.09
+
+Marian og Joakim merket de 48 parene hver for seg, uten å se den andres svar
+(bekreftet av Marian 26.09 kl. 19:00). Hver av oss har sin egen merkefil i
+`data/`. Tallene under er regnet med skriptet `data/relevans_enighet.py`, som
+ikke er i repoet, og de stemmer med det rådet regnet ut fra de samme verdiene.
+
+| | Like | Andel | Forventet ved tilfeldighet | Cohens kappa |
+|---|---:|---:|---:|---:|
+| Tre verdier (D, K, L) | 40 av 48 | 83 % | 0,336 | 0,749 |
+| Relevant (D eller K) mot L | 42 av 48 | 88 % | 0,586 | 0,698 |
+
+**Tvil.** Hver av oss satte tvil på 4 par, og 3 av dem var de samme.
+
+**De åtte ulike parene** avgjøres i samtale. Den felles verdien står i
+`data/relevans-merker-endelig.csv` for de 40 like parene, og feltet er tomt for
+de åtte til vi har snakket sammen. Resultatet for del 1 (§5) regnes først når
+alle 48 har en endelig verdi.
