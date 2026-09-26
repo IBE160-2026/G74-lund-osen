@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-26T23:46'
+updated: '2026-09-26T23:48'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -97,10 +97,14 @@ graph TD
     detalj --> marked
     detalj --> kursdata
     graf --> detalj
+    signal --> kursdata
 ```
 
-`signalberegning.py`, `meldinger.py` og `kursdata.py` importerer ingen annen
-prosjektmodul. De er løvnoder, og skal forbli det.
+`meldinger.py` og `kursdata.py` importerer ingen annen prosjektmodul. De er
+løvnoder, og skal forbli det. `signalberegning.py` importerer bare `kursdata`,
+for `Kursrad`, siden story 1.4b (`c5efd05`). *Rettet 2026-09-26:* her sto at
+også `signalberegning.py` ikke importerte noen annen prosjektmodul, og kanten
+`signal --> kursdata` manglet i grafen.
 
 ### AD-1 — Kjernen gjør ingen I/O `[ADOPTED 2026-09-20/21]`
 
