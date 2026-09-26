@@ -14,3 +14,9 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-5-snapshotkilde-ut-av-kursdata-py.md`
   summary: Et nyeste oeyeblikksbilde med ugyldig JSON, eller en liste oeverst i stedet for et objekt, gir 500 paa alle sidene i stedet for en beskjed.
   evidence: Funnet i gjennomgangen av 1.5 (triageloggen, rad 1). Fantes foer 1.5: hent_kilde() kalte samme SnapshotKilde.fra_fil, og flyttingen til lagring_fil.py endret ikke oppfoerselen. Det rammer ikke webserveren naar den leser fra basen (2.2).
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-5b-migrasjonsloeperen-og-sqlite-adapteren-herdes.md`
+  summary: En test der to migratorer overlapper, som viser at BEGIN IMMEDIATE venter og at den andre ser den foerstes resultat, i stedet for at en av dem feiler.
+  evidence: Gjennomgangen av 1.5b del 1 (triageloggen, VG3, BH6, ECH2 og ECH9). Mutanten som bytter BEGIN IMMEDIATE med BEGIN, overlever alle tester. Testene dekker bare luken mellom lesingen og BEGIN. Hoerer til story 3.1, som lager de samtidige kallerne.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-5b-migrasjonsloeperen-og-sqlite-adapteren-herdes.md`
+  summary: migrer() krever skrivetilgang ogsaa naar basen er oppdatert, fordi den starter med BEGIN IMMEDIATE.
+  evidence: Gjennomgangen av 1.5b del 1 (triageloggen, ECH1). Ubekreftet, medium hvis det er sant. Avgjoeres naar story 3.1 bestemmer hvem som kaller migrer(), og om webserveren faar en skrivebeskyttet base. Proeves med sqlite3.connect("file:...?mode=ro", uri=True) mot en oppdatert base.

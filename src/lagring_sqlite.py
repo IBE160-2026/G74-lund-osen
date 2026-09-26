@@ -6,7 +6,11 @@ Kurslager-porten og Kursrad.
 Adapteren tar en aapen tilkobling, ikke en filsti. Hvem som aapner basen og
 hvor fila ligger, avgjoeres i skallet (story 1.5, 2.2 og 3.1). Den kjoerer
 heller ikke migrasjoner selv - hvem som kaller migrer(), er story 3.1s
-avgjoerelse - men den nekter aa jobbe mot en base som ikke er migrert.
+avgjoerelse - men den nekter aa jobbe mot en base som ikke staar paa siste
+versjon i MIGRASJONSKATALOG (story 1.5b, c). Den sjekker bare
+versjonsnummeret, og bare naar den lages. Filnavn, innhold og en
+skjema_versjon fra foer 1.5b kontrolleres av migrer(), som skal ha kjoert
+foer adapteren tas i bruk.
 
 Oversettelsen skjer her og ingen andre steder: dato er date inne i systemet og
 "YYYY-MM-DD" i basen, hentet er datetime i UTC inne og ISO 8601 med
@@ -18,7 +22,7 @@ from datetime import date, datetime
 from pathlib import Path
 
 from kursdata import Kursrad, kontroller_skriving
-from migrering import versjon
+from migrering import MigrasjonsFeil, siste_versjon, versjon
 
 MIGRASJONSKATALOG = Path(__file__).resolve().parent / "migrasjoner"
 
@@ -33,10 +37,29 @@ class SqliteKurslager:
     """
 
     def __init__(self, tilkobling: sqlite3.Connection):
-        if versjon(tilkobling) < 1:
+        # Story 1.5b, c: basen skal staa paa siste versjon, ikke bare vaere
+        # migrert en gang. Med 0002 ville en base paa versjon 1 ellers blitt
+        # godtatt og lest med et skjema den ikke har.
+        try:
+            siste = siste_versjon(MIGRASJONSKATALOG)
+        except MigrasjonsFeil as feil:
             raise RuntimeError(
-                "Basen er ikke migrert. Kjoer migrer() mot "
-                f"{MIGRASJONSKATALOG} foer adapteren tas i bruk."
+                f"Migrasjonskatalogen {MIGRASJONSKATALOG} er ikke i orden: {feil}"
+            ) from feil
+        naa = versjon(tilkobling)
+        if naa < siste:
+            raise RuntimeError(
+                f"Basen er ikke migrert til siste versjon: den staar paa "
+                f"versjon {naa}, og {MIGRASJONSKATALOG} har {siste} "
+                "migrasjoner. Kjoer migrer() mot katalogen foer adapteren "
+                "tas i bruk."
+            )
+        if naa > siste:
+            raise RuntimeError(
+                f"Basen er nyere enn koden: den staar paa versjon {naa}, og "
+                f"{MIGRASJONSKATALOG} har bare {siste} migrasjoner. Den er "
+                "migrert av en nyere utgave av koden, og migrer() avviser den "
+                "ogsaa."
             )
         self._tilkobling = tilkobling
 
