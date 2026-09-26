@@ -28,7 +28,8 @@ Eksempler:
 
 ## Instruksjoner til byggeøktene (regel 18)
 
-*Lagt til 2026-09-24.* Hver innlimte instruksjon lagres ordrett i
+*Lagt til 2026-09-24.* *Endret 2026-09-26, som regel 18 i `CLAUDE.md`
+(`77a9d1c`).* Hver instruksjon lagres ordrett, også når den skrives rett inn, i
 `docs/ai-prompts/<ÅÅÅÅ-MM-DD>.md`, én fil per dag, **før** den utføres.
 Formatet:
 
@@ -36,7 +37,7 @@ Formatet:
 ## 22:05
 
 ```text
-<instruksjonen, ordrett, med sluttmarkøren>
+<instruksjonen, ordrett, med sluttmarkøren når den er limt inn>
 ```
 
 **Utført:** <commitene>. <utfallet i én eller to setninger>.
