@@ -181,12 +181,14 @@ def _setninger(sql: str) -> list[str]:
 
 def _tekst(sti: Path) -> str:
     """Filteksten med LF. En utsjekking med core.autocrlf=true gir CRLF paa
-    Windows og LF paa Linux, og samme fil skal gi samme hash begge steder."""
-    return sti.read_text(encoding="utf-8").replace("\r\n", "\n")
+    Windows og LF paa Linux, og samme fil skal gi samme hash begge steder.
+    read_text leser i tekstmodus og gjoer CRLF om til LF, saa hashen regnes
+    aldri av raa bytes."""
+    return sti.read_text(encoding="utf-8")
 
 
-def _sha256(sti: Path) -> str:
-    return hashlib.sha256(_tekst(sti).encode("utf-8")).hexdigest()
+def _sha256(tekst: str) -> str:
+    return hashlib.sha256(tekst.encode("utf-8")).hexdigest()
 
 
 def _anvendte(tilkobling: sqlite3.Connection) -> list[tuple[int, str, str]]:
@@ -227,7 +229,7 @@ def _kontroller(
                 f"Migrasjon {versjon_nr:04d} ble kjoert som {fil}, men {katalog} "
                 f"har {sti.name}. Et anvendt nummer har faatt nytt filnavn."
             )
-        if sha != _sha256(sti):
+        if sha != _sha256(_tekst(sti)):
             raise MigrasjonsFeil(
                 f"{fil} er endret etter at den ble kjoert. En kjoert migrasjon "
                 "endres ikke; skriv en ny."
@@ -279,7 +281,7 @@ def _kjoer(tilkobling: sqlite3.Connection, nummer: int, sti: Path) -> None:
         tilkobling.execute(
             "INSERT INTO skjema_versjon (versjon, fil, sha256, anvendt) "
             "VALUES (?, ?, ?, ?)",
-            (nummer, sti.name, hashlib.sha256(tekst.encode("utf-8")).hexdigest(),
+            (nummer, sti.name, _sha256(tekst),
              datetime.now(timezone.utc).isoformat(timespec="seconds")),
         )
     except sqlite3.Error as feil:
