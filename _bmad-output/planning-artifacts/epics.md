@@ -468,8 +468,9 @@ må vise hvordan KI ble brukt, og hvordan studentene har kvalitetssikret koden»
 
 # Stories
 
-42 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
+46 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
 den, hva kontrollen faktisk ser etter, og om den kan gjøres ferdig i én økt.
+*Rettet 2026-09-26:* her sto 42. Tallet er telt fra overskriftene «### Story».
 
 **«Ville feilet hvis» er kontrollen.** Resten er beskrivelse. En story uten den
 linjen er ikke ferdig spesifisert.
