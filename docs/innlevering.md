@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-09-26T21:20
+updated: 2026-09-26T23:02
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -95,7 +95,7 @@ Merk at bare frasen
 | | |
 |---|---|
 | **Status** | **Delvis** |
-| **Ligger i** | `src/` (12 moduler og `migrasjoner/`), `tests/` (17 testfiler, 427 tester — telt 2026-09-26), `.github/workflows/`, `pyproject.toml`, `uv.lock`. *Rettet 2026-09-26:* her sto 10 moduler, 13 filer og 285 tester, telt 2026-09-24 |
+| **Ligger i** | `src/` (12 moduler og `migrasjoner/`), `tests/` (17 testfiler, 455 tester — telt 2026-09-26), `.github/workflows/`, `pyproject.toml`, `uv.lock`. *Rettet 2026-09-26:* her sto 10 moduler, 13 filer og 285 tester, telt 2026-09-24. *Rettet 2026-09-26, etter 1.5b (`ef1cca7`):* her sto 427 tester |
 | **Gjenstår** | **Dockerfile finnes ikke.** Kontrollert 21.09 og igjen 22.09: ingen treff på `Dockerfile` eller `docker-compose` noe sted i repoet. Ført som åpent punkt 18 i `prd.md` |
 
 Arkitekturen for den er besluttet 22.09 og ligger i `ARCHITECTURE-SPINE.md`:
