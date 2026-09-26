@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-09-26T23:37
+updated: 2026-09-26T23:45
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -96,7 +96,7 @@ Merk at bare frasen
 |---|---|
 | **Status** | **Delvis** |
 | **Ligger i** | `src/` (12 moduler og `migrasjoner/`), `tests/` (17 testfiler, 468 tester — telt 2026-09-26), `.github/workflows/`, `pyproject.toml`, `uv.lock`. *Rettet 2026-09-26:* her sto 10 moduler, 13 filer og 285 tester, telt 2026-09-24. *Rettet 2026-09-26, etter 1.5b (`ef1cca7`):* her sto 427 tester. *Rettet 2026-09-26, etter 2.0 (`4b65a3c`):* her sto 455 tester |
-| **Gjenstår** | **Dockerfile finnes ikke.** Kontrollert 21.09 og igjen 22.09: ingen treff på `Dockerfile` eller `docker-compose` noe sted i repoet. Ført som åpent punkt 18 i `prd.md` |
+| **Gjenstår** | **Dockerfile finnes ikke.** Kontrollert 21.09 og igjen 22.09: ingen treff på `Dockerfile` eller `docker-compose` noe sted i repoet. Beslutningen var punkt 18 i `prd.md`, som ble lukket 22.09 (AD-9 til AD-12), og selve Dockerfilen er story 3.1. *Rettet 2026-09-26:* her sto «Ført som åpent punkt 18 i `prd.md`». |
 
 Arkitekturen for den er besluttet 22.09 og ligger i `ARCHITECTURE-SPINE.md`:
 `AD-9` (imaget inneholder aldri data), `AD-10` (webserveren henter aldri),
@@ -126,7 +126,7 @@ i `begrunnelser.md` §9.
 |---|---|
 | **Status** | **Delvis — oppdatert 2026-09-23** |
 | **Ligger i** | `src/migrering.py` (story 1.1), `src/lagring_sqlite.py` og `src/migrasjoner/0001_kurs.sql` (story 1.3). Beslutningen ligger i `ARCHITECTURE-SPINE.md` `AD-3` til `AD-7`, `AD-16`, `AD-18`, `AD-19` |
-| **Gjenstår** | Å koble lagringen til appen (story 1.4–1.5), vurderingslageret (1.6–1.7) og KI-loggen (4.3). *Skrevet 22.09, bevart:* «Hele lagringslaget. `kursdata.py` leser i dag en JSON-fil, og `app.py` leser den direkte utenom porten» |
+| **Gjenstår** | Å koble lagringen til appen: ingen story har det som kontrollpunkt ennå, se innledningen til Epic 2 i `epics.md` (lagt til 25.09). 1.4a–1.5 er ferdige uten at appen leser fra basen. *Rettet 2026-09-26:* her sto «Å koble lagringen til appen (story 1.4–1.5)». Videre gjenstår vurderingslageret (1.6–1.7) og KI-loggen (4.3). *Skrevet 22.09, bevart:* «Hele lagringslaget. `kursdata.py` leser i dag en JSON-fil, og `app.py` leser den direkte utenom porten» |
 
 **Valget er kontrollert med faglærerstaben 22.09** og godkjent av assisterende
 hjelpelærer — ikke av emneansvarlig:
@@ -274,7 +274,7 @@ Om fristen også gjelder de andre BMAD-dokumentene, er ikke opplyst.
 |---|---|
 | **Status** | **Uavklart hva den omfatter** |
 | **Ligger i** | Product Brief, PRD, arkitekturspine og `epics.md` er alle skrevet |
-| **Gjenstår** | **Besvart 23.09, se under:** BMAD er «fortsatt en sterkt anbefalt arbeidsmetode» — anbefalt, ikke krav — og de sentrale dokumentene «bør derfor ... pushes dit». De ligger allerede i repoet. Emnesiden fører selve arbeidskravet som product brief i repoet (se «Eksamen»). Utsettelsen til 27.09 har fortsatt ingen navngitt kilde |
+| **Gjenstår** | **Besvart 23.09, se under:** BMAD er «fortsatt en sterkt anbefalt arbeidsmetode» — anbefalt, ikke krav — og de sentrale dokumentene «bør derfor ... pushes dit». De ligger allerede i repoet. Emnesiden fører selve arbeidskravet som product brief i repoet (se «Eksamen»). Fristen 27.09 er gitt av faglærer (rettelsene under «Arbeidskrav»). *Rettet 2026-09-26:* her sto «Utsettelsen til 27.09 har fortsatt ingen navngitt kilde». |
 
 ---
 
@@ -287,8 +287,8 @@ kvalitetssikret koden». Se «Eksamen» øverst.
 | | |
 |---|---|
 | **Status** | **Delvis — materialet finnes, samlingen ikke** |
-| **Ligger i** | `docs/reflection-log.md` (ført siden 13.09), kontrollrapportene `docs/kontroll-2026-09-22.md` og `docs/kontroll-2026-09-22-plan.md`, CI i `.github/workflows/tester.yml`, nettverkssperren i `tests/conftest.py`, og mutantene, som i dag bare står i commit-meldingene |
-| **Gjenstår** | Epic 9 i `epics.md`: 9.1 `docs/kvalitetssikring.md` (tester, CI, mutanter, og hva som ikke testes), 9.2 instruksjonene ordrett i `docs/ai-prompts/bygging/`, og 9.3 arbeidsmønsteret |
+| **Ligger i** | `docs/reflection-log.md` (ført siden 13.09), kontrollrapportene `docs/kontroll-2026-09-22.md` og `docs/kontroll-2026-09-22-plan.md`, CI i `.github/workflows/tester.yml`, nettverkssperren i `tests/conftest.py`, mutantene, som står i commit-meldingene og i spesifikasjonene i `_bmad-output/implementation-artifacts/`, og instruksjonene ordrett i dagsfilene i `docs/ai-prompts/` (regel 18). *Rettet 2026-09-26:* her sto «mutantene, som i dag bare står i commit-meldingene». |
+| **Gjenstår** | Epic 9 i `epics.md`: 9.1 `docs/kvalitetssikring.md` (tester, CI, mutanter, og hva som ikke testes), og 9.2 instruksjonene ordrett, som nå føres i dagsfilene etter regel 18 (story 9.2 i `epics.md`). 9.3 arbeidsmønsteret er ferdig (`7152b51`). *Rettet 2026-09-26:* her sto «9.2 instruksjonene ordrett i `docs/ai-prompts/bygging/`, og 9.3 arbeidsmønsteret». `bygging/` finnes ikke. |
 
 ---
 
