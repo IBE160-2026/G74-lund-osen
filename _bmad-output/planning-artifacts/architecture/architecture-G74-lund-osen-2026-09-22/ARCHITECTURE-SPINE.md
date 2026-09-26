@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-26T23:01'
+updated: '2026-09-26T23:46'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -156,7 +156,7 @@ prosjektmodul. De er løvnoder, og skal forbli det.
 
 ### AD-8 — Nettverk er sperret i testkjøringen `[ADOPTED 2026-09-21]`
 
-- **Binds:** alle tester; åpent punkt 14
+- **Binds:** alle tester; punkt 14, lukket 22.09 med denne beslutningen *(rettet 2026-09-26: her sto «åpent punkt 14»)*
 - **Prevents:** at en test ved et uhell spiser en dags kvote — og i CI ville gjort det på hver eneste push
 - **Rule:** `tests/conftest.py` monkeypatcher `socket.connect` og `connect_ex` med en autouse-fixture; bare loopback slipper gjennom. DNS er også sperret: `socket.getaddrinfo` avviser alle navn utenom loopback. Proxy er sperret: proxyvariablene fjernes, og `getproxies` i `requests` og `urllib` gir alltid `{}`, så en proxy på loopback ikke slipper en forespørsel ut (`982b216`, 23.09). **Hver story leveres med test, og testen kjører uten nett.** CI kjører `pytest` på hver push og PR, uten hemmeligheter.
 - **Opphav:** commit `266e6d9` (21.09). Prøvd: 166 tester grønne 2026-09-22. DNS og proxy lagt til i `982b216` (23.09), hver sperre prøvd med en mutant. *Oppdatert 2026-09-24.*

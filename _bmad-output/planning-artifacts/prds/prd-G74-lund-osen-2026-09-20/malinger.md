@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-26T21:49
+updated: 2026-09-26T23:46
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -39,7 +39,7 @@ DNB og Frontline.
 
 | Mangler | Hvorfor det betyr noe |
 |---|---|
-| Hvilken nyhetskilde treffene kom fra | Kilden er nå avklart som EODHDs nyhets-API, men innsamlingen er avhengig av vilkårskontrollen — se åpne punkter 1 og 5 |
+| Hvilken nyhetskilde treffene kom fra | Kilden er nå avklart som EODHDs nyhets-API, men innsamlingen er avhengig av vilkårskontrollen — se åpent punkt 1, og punkt 5, som ble lukket 26.09. *Rettet 2026-09-26:* her sto «se åpne punkter 1 og 5». |
 | Rådata eller loggført resultat per artikkel | Testen kan ikke etterprøves, og kan ikke gjenbrukes som en del av testsettet på 50 |
 | Nøyaktig hvor mange av de ti som var feiltreff | «Flere av dem» er ikke et tall. De to andre målingene i dette dokumentet har tall |
 
@@ -1104,8 +1104,11 @@ Det er en annen grense enn dagskvoten, og den er ikke tolket her.
 dagskvoten er brukt opp.** Den trenger ikke aktiveres, og kall 21 gir ingen
 feilkode. To konsekvenser:
 
-- **Relevanseksperimentet kan trekke fra `extraLimit`** (åpent punkt 5). Kalltallet
-  per ticker (§7.2, «~40 kall») er fortsatt utledet og ikke målt.
+- **Relevanseksperimentet kan trekke fra `extraLimit`** (punkt 5, lukket
+  26.09). Kalltallet er målt 25.09: 5 kall per forespørsel med én ticker, og 40
+  kall for de åtte selskapene, 20 fra dagskvoten og 20 fra bonuskvoten
+  (`relevanseksperiment.md` §6). *Rettet 2026-09-26:* her sto «(åpent punkt 5).
+  Kalltallet per ticker (§7.2, «~40 kall») er fortsatt utledet og ikke målt.»
 - **En henting for mye tar ikke stopp, den koster bonuskvote.** NFR-01 og
   FR-402-kontrollen er det som hindrer at 485 bonuskall går tapt stille. Hentes det
   to ganger om dagen, stopper det ikke ved 20. Det tærer på bonusen.

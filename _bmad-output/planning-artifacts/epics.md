@@ -21,9 +21,10 @@ som begge står som `final` per 2026-09-22.
 
 **Fire føringer gjelder hele nedbrytingen:**
 
-1. **Hver story leveres med test som kan kjøres uten API-kall.** Åpent punkt 14,
-   og allerede bindende som `AD-8`. `tests/conftest.py` sperrer `socket.connect`,
-   så en story som trenger nett for å testes, er ikke ferdig.
+1. **Hver story leveres med test som kan kjøres uten API-kall.** Punkt 14,
+   lukket 22.09 som `AD-8`. `tests/conftest.py` sperrer `socket.connect`, så en
+   story som trenger nett for å testes, er ikke ferdig. *Rettet 2026-09-26:* her
+   sto «Åpent punkt 14, og allerede bindende som `AD-8`».
 2. **Meldingsdelen (FR-5xx) skal kunne falle bort uten at resten ryker.** Den
    hviler på en ubesvart Euronext-forespørsel; 28.09 er vår egen frist for å ta
    stilling uten svar. Ingen annen epic skal forutsette at den finnes.
@@ -371,7 +372,7 @@ skjer på serien under henting, og den veien gjør kravet uavhengig av NewsWeb.
 
 Sensor kan bygge og kjøre den, uten vår nøkkel og uten våre data.
 
-**FR-er:** FR-401 (tom-tilstanden, story 3.3) · **AD-er:** 9, 10, 11, 12 · Dekker åpent punkt 18
+**FR-er:** FR-401 (tom-tilstanden, story 3.3) · **AD-er:** 9, 10, 11, 12 · Dekker punkt 18, lukket 22.09 *(rettet 2026-09-26: her sto «Dekker åpent punkt 18»)*
 
 ### Epic 4: KI kan tas i bruk uten å bryte godkjenningen
 
@@ -1683,8 +1684,9 @@ innsamling og merking til uke 39–40. **Eier: Joakim.**
 Som **gruppe**, vil vi ha et testsett på ~50 medieartikler fra åtte selskaper,
 merket for hånd, så del 2 har noe å kjøre KI-klassifiseringen mot.
 
-**Oppfyller:** suksessmålet «Relevanseksperiment», del 1 (PRD §7, åpent punkt
-5) · **Begrenses av:** regel 6 og 16 i `CLAUDE.md`
+**Oppfyller:** suksessmålet «Relevanseksperiment», del 1 (PRD §7, punkt 5,
+lukket 26.09) · **Begrenses av:** regel 6 og 16 i `CLAUDE.md` *(rettet
+2026-09-26: her sto «åpent punkt 5»)*
 
 **Kontroll — hva den ferdige storyen inneholder:**
 - Utvalgskriteriene skriftlig **før** innsamlingen: hvilke åtte selskaper, hvor
