@@ -2,7 +2,7 @@
 title: "Relevanseksperimentet — kriteriene for del 1"
 status: aktiv
 created: 2026-09-25
-updated: 2026-09-26T19:02
+updated: 2026-09-26T19:17
 ---
 
 # Relevanseksperimentet — kriteriene for del 1
@@ -174,7 +174,50 @@ ikke er i repoet, og de stemmer med det rådet regnet ut fra de samme verdiene.
 
 **Tvil.** Hver av oss satte tvil på 4 par, og 3 av dem var de samme.
 
-**De åtte ulike parene** avgjøres i samtale. Den felles verdien står i
-`data/relevans-merker-endelig.csv` for de 40 like parene, og feltet er tomt for
-de åtte til vi har snakket sammen. Resultatet for del 1 (§5) regnes først når
-alle 48 har en endelig verdi.
+**De åtte ulike parene** ble avgjort i samtale 26.09, ut fra definisjonene i §3.
+Den endelige verdien for alle 48 står i `data/relevans-merker-endelig.csv`, og
+resultatet står i §8.
+
+**Presiseringer fra samtalen.** Samtalen om de åtte parene ga disse
+presiseringene for grensetilfeller:
+
+- En sak som bare varsler noe som skal skje, for eksempel en
+  resultatfremleggelse eller en Investor Day, er K, så lenge den ikke har ny
+  informasjon med konkret betydning for selskapet.
+- Noe som faktisk er gjennomført og har tydelig betydning, for eksempel
+  tilbakekjøp av egne aksjer, er D.
+- Har noe konkret skjedd, men den økonomiske betydningen er usikker, er det K.
+- En sak som kan gi inntekter senere, uten at det er sikkert at de kommer, er K.
+  Det samme gjelder ordninger som kan få økonomisk eller eiermessig betydning
+  senere, der utfallet er usikkert.
+- En sak som egentlig handler om et annet selskap, uten tydelig betydning for
+  selskapet vi vurderer, er normalt L.
+
+Presiseringene ble formulert etter at vi hadde lest tekstene, og er derfor ikke
+en del av kriteriene som ble låst før innsamlingen. I del 2 får KI-en kriteriene
+fra §3, ikke presiseringene, fordi presiseringene er utledet av de samme 48
+parene.
+
+## 8. Resultat for del 1
+
+**35 av 48 par (72,9 %) er ikke «Lite relevant».** Det er treffsikkerheten til
+symbolmatchingen (§5): av artiklene EODHD knytter til en aksje, handler om lag
+tre av fire faktisk om selskapet. Perioden per selskap står i §6, og alle åtte
+fikk seks artikler. Tvilsflaggene og enigheten mellom oss står i §7.
+
+| Selskap | Ikke L av 6 | Andel |
+|---|---:|---:|
+| EQNR | 2 | 33 % |
+| DNB | 4 | 67 % |
+| KOG | 5 | 83 % |
+| NHY | 5 | 83 % |
+| FRO | 6 | 100 % |
+| TEL | 4 | 67 % |
+| MOWI | 5 | 83 % |
+| ORK | 4 | 67 % |
+| **Samlet** | **35 av 48** | **72,9 %** |
+
+**Forbehold.** Hvert selskap har bare 6 artikler fra én innsamling, så ett par
+mer eller mindre flytter andelen med 17 prosentpoeng. Tallene per selskap er
+derfor usikre, og forskjellene mellom selskapene sier lite før de er målt på
+flere artikler.
