@@ -67,13 +67,16 @@ et sitat som ikke fantes».
     …); en tag flyttes aldri. Versjon 7 er om lag 750 ord og fyller to sider, så
     en ny versjon skal ikke bli lengre. Tilbakemeldingen fra faglærerne føres i
     `innlevering.md`, ikke i briefen.
-18. **Hver innlimte instruksjon lagres ordrett.** Den lagres i
-    `docs/ai-prompts/<ÅÅÅÅ-MM-DD>.md` før den utføres, med klokkeslett. Når den
-    er utført, legges en linje under med commitene og utfallet. Linjen begynner
-    med **Utført:**, også når bare noe ble gjort eller svaret var en plan eller
-    spørsmål uten commit, og da sier linjen det. Morgensjekken teller disse
-    linjene. Ingen rådata eller nøkler (regel 16). Grunnen: emnesiden krever
-    dokumentasjon av hvordan KI ble brukt, og instruksjonene er promptene.
+18. **Hver instruksjon lagres ordrett, også når den skrives rett inn.** Den
+    lagres i `docs/ai-prompts/<ÅÅÅÅ-MM-DD>.md` før den utføres, med klokkeslett.
+    Når den er utført, legges en linje under med commitene og utfallet. Linjen
+    begynner med **Utført:**, også når bare noe ble gjort eller svaret var en
+    plan eller spørsmål uten commit, og da sier linjen det. Morgensjekken teller
+    disse linjene. Ingen rådata eller nøkler (regel 16). Grunnen: emnesiden
+    krever dokumentasjon av hvordan KI ble brukt, og instruksjonene er
+    promptene. Det gjelder også korte svar som «ja». Sluttmarkøren i regel 1
+    gjelder bare innlimt tekst. Tilfellet bak: et «ja» 26.09 ga `a23b3e5` uten å
+    bli ført, og ble ført i ettertid i `3d9dca0`.
 19. **README-en følger repoet.** Når et dokument eller en mappe som README-en
     nevner, legges til, flyttes, får nytt navn eller slettes, rettes
     «Dokumentene» og «Mappestruktur» i samme commit. Nye hoveddokumenter under
