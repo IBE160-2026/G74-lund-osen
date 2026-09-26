@@ -18,7 +18,7 @@ from datetime import date, datetime
 from pathlib import Path
 
 from kursdata import Kursrad, kontroller_skriving
-from migrering import versjon
+from migrering import siste_versjon, versjon
 
 MIGRASJONSKATALOG = Path(__file__).resolve().parent / "migrasjoner"
 
@@ -33,10 +33,16 @@ class SqliteKurslager:
     """
 
     def __init__(self, tilkobling: sqlite3.Connection):
-        if versjon(tilkobling) < 1:
+        # Story 1.5b, c: basen skal staa paa siste versjon, ikke bare vaere
+        # migrert en gang. Med 0002 ville en base paa versjon 1 ellers blitt
+        # godtatt og lest med et skjema den ikke har.
+        naa, siste = versjon(tilkobling), siste_versjon(MIGRASJONSKATALOG)
+        if naa != siste:
             raise RuntimeError(
-                "Basen er ikke migrert. Kjoer migrer() mot "
-                f"{MIGRASJONSKATALOG} foer adapteren tas i bruk."
+                f"Basen er ikke migrert til siste versjon: den staar paa "
+                f"versjon {naa}, og {MIGRASJONSKATALOG} har {siste} "
+                "migrasjoner. Kjoer migrer() mot katalogen foer adapteren "
+                "tas i bruk."
             )
         self._tilkobling = tilkobling
 

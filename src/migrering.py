@@ -69,6 +69,18 @@ def versjon(tilkobling: sqlite3.Connection) -> int:
     ).fetchone()[0]
 
 
+def siste_versjon(katalog: Path) -> int:
+    """Versjonen katalogen gir naar alle migrasjonene er kjoert. Leser bare.
+
+    Samme katalogkontroll som migrer() gjoer foer den kjoerer noe (nummer,
+    navn og filendelse), saa en katalog migrer() avviser, avvises ogsaa her.
+    Forhaandssjekken av transaksjonsord kjoeres ikke: den handler om hvorvidt
+    en fil kan kjoeres, og det avgjoer migrer(). Ingen fil med et slikt ord kan
+    vaere kjoert, saa en base paa siste versjon er aldri migrert med en.
+    """
+    return len(_migrasjoner(Path(katalog)))
+
+
 def migrer(tilkobling: sqlite3.Connection, katalog: Path) -> int:
     """Kjoer alle migrasjoner basen ikke har faatt. Returnerer ny versjon.
 

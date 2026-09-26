@@ -553,14 +553,18 @@ class TestIngenUnntaksvei:
     """Storyen: ingen DROP TABLE-hjelper, ingen rebuild-mekanikk, ingen
     unntaksvei for lagre AD-7 verner. Trengs det, skal det besluttes synlig."""
 
-    def test_modulen_har_bare_to_offentlige_funksjoner(self):
+    def test_modulen_har_bare_tre_offentlige_funksjoner(self):
+        """Story 1.5b, c, la til siste_versjon, fordi adapteren maa vite
+        hvilken versjon katalogen gir uten aa gjenta katalogkontrollen eller
+        kalle en privat funksjon. Den leser bare, og er ingen unntaksvei:
+        den kan verken kjoere, hoppe over eller endre en migrasjon."""
         funksjoner = {
             navn
             for navn, obj in inspect.getmembers(migrering, inspect.isfunction)
             if obj.__module__ == "migrering" and not navn.startswith("_")
         }
 
-        assert funksjoner == {"migrer", "versjon"}
+        assert funksjoner == {"migrer", "siste_versjon", "versjon"}
 
     def test_migrer_tar_bare_tilkobling_og_katalog(self):
         assert list(inspect.signature(migrer).parameters) == ["tilkobling", "katalog"]
