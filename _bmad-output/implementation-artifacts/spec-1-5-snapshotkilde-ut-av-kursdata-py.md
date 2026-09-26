@@ -72,7 +72,7 @@ context:
 - [x] `src/app.py`, `src/fetch_prices.py` -- importene og `hent_leser` -- AD-2, AD-3
 - [x] Testene over -- importene rettes, og filtestene flyttes til `tests/test_lagring_fil.py`
 - [x] Nye vakter: `kursdata.py` importerer verken `json`, `pathlib`, `lagring_fil`, `lagring_sqlite` eller `eodhd` (AST), og vakten mot EODHD-feltnavn dekker `kursdata.py`. `app.py` kaller ikke `nyeste_snapshot` og importerer den ikke. `app.hent_leser()` gir en `Kursleser` fra en katalog med en fil, og `None` fra en tom katalog
-- [ ] Etter flettingen, på `main`: spinen og `epics.md` merker bruddet lukket med squash-commiten, og spinens lagtabell får `lagring_fil.py` i skallet. Egen commit
+- [x] Etter flettingen, på `main`: spinen og `epics.md` merker bruddet lukket med squash-commiten, og spinens lagtabell får `lagring_fil.py` i skallet. Egen commit -- gjort i `3721132`
 
 **Acceptance Criteria:**
 - Given hele testsettet, when det kjøres før og etter, then er begge grønne, og tallene står i commit-meldingen

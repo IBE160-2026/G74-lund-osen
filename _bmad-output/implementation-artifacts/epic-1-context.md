@@ -10,8 +10,7 @@ skrives om i ettertid. Epicen legger lagringsgrunnlaget de senere epicene står
 på: migrasjonsløperen, `Kurslager`-porten med typede norske rader (`Kursrad`),
 SQLite-adapteren, lesegrensen mot øyeblikksbildene, `Vurderingslager` og
 skillet mellom de tre tilstandene i lageret. Bruddet med `Kurskilde` ved siden
-av `Kurslager` er lukket i 1.4c. Det som står igjen av arkitekturbrudd, er I/O i
-portmodulen `kursdata.py` (1.5). I v1 blir historikken lagret, men ikke
+av `Kurslager` er lukket i 1.4c. I/O i portmodulen `kursdata.py` er lukket i 1.5 (`23af8db`). *Rettet 2026-09-26:* her sto at bruddet sto igjen til 1.5. I v1 blir historikken lagret, men ikke
 besvarbar. Hvordan spørsmålet om hva løsningen sa en tidligere dag skal kunne
 stilles, er et åpent punkt med frist før demonstrasjonen.
 
@@ -75,7 +74,7 @@ stilles, er et åpent punkt med frist før demonstrasjonen.
 - **Funksjonell kjerne, imperativt skall, porter som `typing.Protocol`.**
   Kjernemodulene importerer ikke `requests`, `sqlite3`, `pathlib` eller `flask`.
   Portmodulen `kursdata.py` skal heller ikke gjøre I/O, og skal ikke importere
-  `json` eller `pathlib`. Den gjør I/O i dag, og det lukkes i 1.5.
+  `json` eller `pathlib`. Det er oppfylt fra 1.5 (`23af8db`). *Rettet 2026-09-26:* her sto «Den gjør I/O i dag, og det lukkes i 1.5».
 - **Én port og én skriver per datasett:** `Kurslager` (med lesesiden
   `Kursleser`: `serie`, `sist_hentet`), `Vurderingslager` og `KILogg`. Ingen
   felles lagerklasse. Navneregel: `<Datasett>lager` har skrivesiden,
