@@ -889,6 +889,36 @@ webserveren åpner basen»). Når Epic 2 planlegges, avgjøres det om de to blir
 egne stories. Meldingen «Ingen kursdata funnet i `data/`» i `deferred-work.md`
 hører til lesingen.
 
+### Story 2.0: Hentingen lekker ikke nøkkelen og skriver ikke over et øyeblikksbilde
+
+*Lagt til 2026-09-26, fra kontrollen av repoet.*
+
+Som **gruppe**, vil vi at hentingen aldri viser eller lagrer API-nøkkelen, og
+aldri skriver over et øyeblikksbilde, så en feilmelding ikke kan føre nøkkelen
+inn i repoet, og så råfilene forblir uforanderlige.
+
+**Oppfyller:** — *(grunnlag for NFR-07)* · **Begrenses av:** `AD-6`, `AD-12`
+
+**Grunnen:** `hent_ett_symbol` sender nøkkelen som `api_token` i adressen.
+Feiler kallet, tar feilteksten fra `requests` med hele adressen, og
+`hent_universet` både skriver den ut og lagrer den i `feil` i øyeblikksbildet
+(`deferred-work.md`). Kontrollen 26.09 fant ingen lekkasje. `filnavn()` bruker
+kjøredagen, og `main()` skriver med `write_text`, så en ny kjøring samme dag
+skriver over dagens øyeblikksbilde. AD-6 sier at råfilene aldri skrives om.
+
+**Kontroll — hva testen ser etter:**
+- En feil fra `requests`, både en HTTP-feil og en tilkoblingsfeil, gir en
+  feiltekst uten nøkkelen, både i utskriften og i `feil`. Testen bruker en falsk
+  nøkkel og ingen nett
+- Et øyeblikksbilde som finnes fra før, skrives ikke over
+- **Ville feilet hvis:** feilteksten fra `requests` ble lagret uendret, eller
+  fila ble skrevet uten at det var sjekket at den ikke fantes
+
+**Forutsetning:** ingen. Storyen rører bare `src/fetch_prices.py` og testene for
+den, og tas før neste henting.
+
+**Én økt:** ja.
+
 ### Story 2.1: Børsdag i Oslo, tidsstempel i UTC
 
 Som **utvikler**, vil jeg at «dagen» betyr én ting, så to verdier ikke kan være
