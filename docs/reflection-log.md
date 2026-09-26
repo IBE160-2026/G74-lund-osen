@@ -2374,6 +2374,35 @@ Henvisningen sto i tre dokumenter før noen slo opp hva 1.5 gjør.
 
 ---
 
+## 26.09.2026 – Relevant, men i hvilken retning?
+
+Jeg merket de 48 parene i relevanseksperimentet (9.4) med skalaen fra FR-606:
+påvirker direkte (D), kan påvirke (K) eller lite relevant (L). Underveis så jeg
+hva skalaen ikke fanger. Den sier om en sak angår selskapet, men ikke hvilken
+vei den kan trekke aksjen, eller hva slags sak det er. En sak kan være klart
+relevant og samtidig negativ for aksjen, og D alene sier ikke det. Tvilen kom
+særlig der en tekst beskrev en mulig kontrakt eller transaksjon uten å oppgi
+verdien.
+
+Det ble til et forslag om tre vurderinger i stedet for én: relevans, mulig
+retning (positiv, negativ, blandet eller uklar) og type nyhet, for eksempel
+resultat, kontrakt, oppkjøp, analytikervurdering eller sektor.
+
+Forslaget ble ikke tatt inn i eksperimentet. Kriteriene ble låst før
+innsamlingen, og del 1 måler bare om artiklene som er knyttet til en aksje,
+faktisk handler om selskapet. Da rådet leste forslaget, pekte det på to grenser
+forslaget ikke tok hensyn til: EODHDs godkjenning gjelder å sende tekst til en
+språkmodell bare for å vurdere relevans, og en vurdering av retning ligger nær
+et investeringsråd (NFR-06). Idéen står i v1.1-tabellen med de forbeholdene.
+
+Forslaget hadde også en ny formulering til Executive Summary, der KI skulle
+vurdere om innholdet kan ha betydning for aksjen. Den ble ikke brukt. Briefen er
+låst og skal leveres 27.09, og formuleringen lovet mer enn godkjenningen dekker.
+
+Det var merkingen for hånd som viste hvor skalaen slutter.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
