@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-25T23:29
+updated: 2026-09-26T21:49
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -510,7 +510,7 @@ språkdubletter. Tre er det ikke:
 |---|---|---|
 | NOKO | To ulike rentefastsettelser, begge norske, 11:39:37 og 11:39:50 | Harmløs — `RENTEREGULERING` filtreres bort uansett |
 | PARB | Samme mønster, 11:38:45 og 11:38:48 | Harmløs, samme grunn |
-| GOD | «Notice of Extraordinary General Meeting» og «Key information relating to the proposed supplemental cash dividend» — to *forskjellige* meldinger, begge engelske, samme minutt og kategori | **Reelt tap.** Kategorien slipper gjennom filteret, så den ene meldingen ville forsvunnet |
+| GOD | en innkalling til ekstraordinær generalforsamling og en melding om et foreslått ekstra kontantutbytte — to *forskjellige* meldinger, begge engelske, samme minutt og kategori | **Reelt tap.** Kategorien slipper gjennom filteret, så den ene meldingen ville forsvunnet |
 
 Ingen av de tre gjelder de 15 selskapene i universet. Equinor-paret samme dag er
 en ekte dublett og håndteres riktig. Én dag er ikke grunnlag for en rate.

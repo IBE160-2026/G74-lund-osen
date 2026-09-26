@@ -2,7 +2,7 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-25T23:31
+updated: 2026-09-26T21:49
 ---
 
 # Kilder og rettigheter
@@ -866,6 +866,8 @@ korte beskrivelser, samme prinsipp som for EODHD-verdiene (regel 16 i
 `malinger.md` er konstruerte og står. Ingen artikkeltitler eller utdrag fra
 EODHD-nyhetene står ordrett i sporede filer, kontrollert mot
 `data/nyhetstest-raa-2026-09-21.json` samme dag.
+*2026-09-26:* to titler i `malinger.md` («Fire sidefunn») og i PRD-memloggen ble
+oversett 24.09. De er byttet med en beskrivelse.
 
 `data/` ligger i `.gitignore`, sammen med `.env`. Rådata og API-nøkler er derfor
 ikke eksponert.
