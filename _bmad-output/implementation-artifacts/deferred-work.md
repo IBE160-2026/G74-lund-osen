@@ -24,3 +24,12 @@
   summary: fetch_prices.py kan lekke EODHD-noekkelen naar et kall feiler, fordi feilteksten fra requests tar med hele adressen, med api_token, og den teksten skrives ut (FEIL-linjen) og lagres i feltet feil i oeyeblikksbildet i data/.
   evidence: Funnet ved kontrollen 26.09 (dagsfila, instruksjonen kl. 23:05). hent_ett_symbol sender noekkelen som api_token i params, raise_for_status() kalles, og hent_universet lagrer f"{type(feil).__name__}: {feil}" i resultat.feil og skriver den ut. Ingen lekkasje funnet: 0 treff paa noekkelen i data/ og i 409 commits, og ingen oeyeblikksbilder med ikke-tomt feil. Rettes i en egen liten story foer neste henting: story 2.0 i epics.md (lagt til 2026-09-26). Til da kjoeres ikke fetch_prices.py, og en FEIL-linje fra hentingen limes aldri inn noe sted.
   resolved: Loest i story 2.0 (4b65a3c, 2026-09-26). hent_ett_symbol gjoer enhver feil fra kallet om til en tekst uten adressen og uten response, og hent_universet bytter noekkelen, ogsaa URL-kodet, med *** foer utskrift og lagring. tests/test_fetch_prices.py feiler hvis noekkelen staar i feilteksten, i utskriften eller i det lagrede oeyeblikksbildet. fetch_prices.py kan kjoeres igjen.
+- source_spec: none
+  summary: test_absolutt_endring_avgjoer_ved_lik_styrke (tests/test_markedsoversikt.py) tester ikke regelen i FR-102 om lik styrke. assert staar inne i en if som aldri slaar til.
+  evidence: Kjoert med testdataene 26.09 (kontrollen av repoet, instruksjonen kl. 23:44): styrkene blir DNB 2 og EQNR 1, saa if-en er usann og ingenting sjekkes. Rettes i en egen liten story for testene, sammen med de to under.
+- source_spec: none
+  summary: test_noeyaktig_paa_grensen_gir_null (tests/test_signalberegning.py) skiller ikke <= fra < i noeytralsonen.
+  evidence: Regnet ut 26.09: kurser_med_avvik(0.02) gir et avvik paa 0.019999999999999928, altsaa under grensen, saa baade <= og < gir 0. Rettes i den samme lille storyen for testene.
+- source_spec: none
+  summary: test_formatet_kan_leses_av_snapshotkilde (tests/test_fetch_prices.py) lover at visningen kan lese det hentingen skriver, men leser med SnapshotKilde. Visningen leser gjennom SnapshotLeser.
+  evidence: Kjoert 26.09: SnapshotLeser paa det samme oeyeblikksbildet gir sist_hentet None og en tom serie, fordi den avviser «naa» som hentet og «dag-000» som dato. Rettes i den samme lille storyen for testene.
