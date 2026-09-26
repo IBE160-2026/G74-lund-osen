@@ -123,7 +123,8 @@ stilles, er et åpent punkt med frist før demonstrasjonen.
   SQLite-adapteren (1.2, så 1.3), ikke i samme endring som planen først sa.
 - **1.5b før 1.6:** alle åtte herdingspunktene (a–h) må være på plass før
   `0002` skrives. Åpent punkt 3 må være avgjort før 1.6, og åpent punkt 24
-  før 1.7.
+  før 1.7. *Ferdig 2026-09-26:* 1.5b er flettet i `ef1cca7` (PR #5), så
+  herdingen er på plass. Punkt 3 og 24 gjenstår.
 - **Epic 2 venter på Epic 1:** hentingen skriver gjennom `Kurslager`, bruker
   `kursrad_fra_eodhd` og skriver vurderingen gjennom `Vurderingslager` i samme
   kjøring (2.5). Svaret på åpent punkt 24 bestemmer hva 2.5 skriver for et
