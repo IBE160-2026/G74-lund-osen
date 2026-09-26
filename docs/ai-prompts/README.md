@@ -75,7 +75,7 @@ Formatet:
 |---|---|---|
 | Ingenting bygges før vi har sagt fra | Vi | Regel 9 i `CLAUDE.md` |
 | En plan vises og godkjennes før bygging | Vi | Regel 2, og planinstruksjonene i dagsfilene, for eksempel 1.4b, 1.4c og 1.5 i `2026-09-25.md` |
-| Flettingen til `main` venter på ja | Vi | Planinstruksjonene, for eksempel «Før grenen flettes inn: stopp og vis oss resultatet» (`2026-09-25.md`) |
+| Flettingen til `main` venter på ja | Vi | Instruksjonene, for eksempel «Før grenen flettes inn: stopp og vis oss resultatet» (byggeinstruksjonen for 1.4b, kl. 17:01 i `2026-09-25.md`) |
 | Vilkår og datakilder | Vi | `docs/kilder-og-rettigheter.md`, «Beslutningen gruppen har tatt i mellomtiden» |
 | Merkingen i relevanseksperimentet, for hånd og uten KI | Vi | `relevanseksperiment.md` §3 og §7, og story 9.4 i `epics.md` |
 | En påstand kontrolleres i økta som har kilden | Byggeøkta | Regel 3, og tiltaket fra 20.09 i `docs/reflection-log.md` |
