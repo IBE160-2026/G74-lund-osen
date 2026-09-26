@@ -2,7 +2,7 @@
 title: "Relevanseksperimentet — kriteriene for del 1"
 status: aktiv
 created: 2026-09-25
-updated: 2026-09-26T19:17
+updated: 2026-09-26T19:23
 ---
 
 # Relevanseksperimentet — kriteriene for del 1
@@ -159,6 +159,11 @@ ti, og DNBs datospenn slutter før alle de andre selskapenes.
 
 Artiklene, utvalget, tekstene, nøkkelen og de to tomme merkefilene ligger bare
 i `data/`. Frøet for blandingen står i utvalgsfila der.
+
+*Merknad 2026-09-26:* merkefilene er nå fylt ut, og den endelige verdien for
+alle 48 står i `data/relevans-merker-endelig.csv`. De åtte verdiene som ble
+avgjort i samtale, står også i instruksjonen kl. 19:17 i dagsfila for 26.09
+(`docs/ai-prompts/2026-09-26.md`).
 
 ## 7. Merkingen 26.09
 
