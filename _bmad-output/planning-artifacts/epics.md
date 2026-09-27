@@ -440,7 +440,7 @@ vært, og det skal stå slik.
 
 | Felt | |
 |---|---|
-| **Blokkert av** | Åpent punkt 1 (Euronext), 3 (kilde for handelskalenderen) og 12 (horisont og hendelsestyper) |
+| **Blokkert av** | Åpent punkt 1 (Euronext) og 12 (horisont og hendelsestyper) *(rettet 2026-09-27: her sto også «3 (kilde for handelskalenderen)». Punkt 3 gjelder hvilke dager børsen er åpen, ikke finanskalenderen, og er lukket 27.09)* |
 | **Eier** | Gruppen |
 | **Avgjøres** | Samme frist som Epic 6 |
 | **Ved nei** | Strykes. Tar ingenting med seg ned — ingen annen epic leser kalenderen. Krever dessuten en manuelt vedlikeholdt oppslagstabell, siden kalenderen verken oppgir ticker eller ISIN |
@@ -835,7 +835,9 @@ har bestemt det.
 «Definisjonen må være avgjort før story 1.6»). `0002` skrives ikke før
 migrasjonsløperen og SQLite-adapteren er herdet. *Flyttet 2026-09-24:
 forutsetningene a–h sto her og er nå kontrollpunktene i 1.5b.* *Lagt til
-2026-09-26: punkt 3, som PRD-en og Epic 1-konteksten alt krever.*
+2026-09-26: punkt 3, som PRD-en og Epic 1-konteksten alt krever.* *Oppfylt
+2026-09-27:* punkt 3 er lukket (`prd.md` §8). Lista og funksjonen bygges i
+denne storyen.
 
 **Én økt:** ja.
 
@@ -1481,8 +1483,9 @@ så jeg slipper å lete et annet sted.
 
 ## Epic 7: Kommende finansielle hendelser 🔒
 
-> **Blokkert av åpent punkt 1 (Euronext), 3 (kilde for handelskalenderen) og 12
-> (horisont og hendelsestyper).**
+> **Blokkert av åpent punkt 1 (Euronext) og 12 (horisont og hendelsestyper).**
+> *Rettet 2026-09-27:* her sto også «3 (kilde for handelskalenderen)». Punkt 3
+> gjelder hvilke dager børsen er åpen, ikke finanskalenderen, og er lukket 27.09.
 >
 > **Et nei stryker epicen, men tar ingenting med seg ned** — ingen annen epic
 > leser kalenderen.

@@ -57,7 +57,11 @@ stilles, er et åpent punkt med frist før demonstrasjonen.
 - Hva «inneværende børsdag» betyr en lørdag eller en helligdag, er ikke
   avgjort. Det må avgjøres før 1.6 (åpent punkt 3). Det finnes et forslag,
   «siste børsdag på eller før dagens dato i Europe/Oslo», men det er ikke
-  vedtatt.
+  vedtatt. *Avgjort 2026-09-27:* forslaget er vedtatt (punkt 3 i `prd.md` §8,
+  lukket). En børsdag er mandag–fredag som ikke står på lista over dager Oslo
+  Børs er stengt, ført for hånd fra Euronexts kalender for 2026. Halve
+  handelsdager er børsdager, og for en dato utenfor lista reiser funksjonen en
+  feil. Funksjonen er ren, ligger i kjernen og bygges i 1.6.
 - Om «ingen rad på en børsdag» trenger en fjerde tilstand eller en lagret grunn
   på raden, er ikke avgjort. Det må avgjøres før 1.7 (åpent punkt 24). Årsaken
   er at en kjøring før kursen er publisert, eller et symbol som feilet, også gir
@@ -124,7 +128,8 @@ stilles, er et åpent punkt med frist før demonstrasjonen.
 - **1.5b før 1.6:** alle åtte herdingspunktene (a–h) må være på plass før
   `0002` skrives. Åpent punkt 3 må være avgjort før 1.6, og åpent punkt 24
   før 1.7. *Ferdig 2026-09-26:* 1.5b er flettet i `ef1cca7` (PR #5), så
-  herdingen er på plass. Punkt 3 og 24 gjenstår.
+  herdingen er på plass. Punkt 3 og 24 gjenstår. *Oppdatert 2026-09-27:* punkt 3
+  er avgjort (se «Uavklart i kildene»). Punkt 24 gjenstår.
 - **Epic 2 venter på Epic 1:** hentingen skriver gjennom `Kurslager`, bruker
   `kursrad_fra_eodhd` og skriver vurderingen gjennom `Vurderingslager` i samme
   kjøring (2.5). Svaret på åpent punkt 24 bestemmer hva 2.5 skriver for et
