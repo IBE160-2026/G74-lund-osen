@@ -65,14 +65,14 @@ context:
 ## Tasks & Acceptance
 
 **Execution:** én commit per punkt, pushet til grenen `1-8`.
-- [ ] `src/eodhd.py`, `src/lagring_fil.py` -- seriefunksjonen og leseren. Tester for funksjonen i `test_snapshotleser.py` (`TestOversetteren` eller en ny klasse).
-- [ ] `tests/eodhd_serier.py`, `src/fetch_prices.py`, `tests/test_fetch_prices.py`, `tests/test_snapshotleser.py`, `tests/test_konsumentene.py` -- den felles lista og hentingen. Nye tester: lista mot leseren, lista mot hentingen, lista gjennom `kjoer` og `nyeste_leser` (hver aksje kan leses eller står i `feil`), rådataene er uendret, og en strukturtest for at begge bruker `serie_fra_eodhd` og ingen av dem `kursrad_fra_eodhd` direkte.
-- [ ] `tests/test_fetch_prices.py` -- G2.
-- [ ] `tests/test_fetch_prices.py` -- G3: en nøkkel med mellomrom, parametrisert over `quote` og `quote_plus`.
-- [ ] `src/fetch_prices.py` -- G4.
-- [ ] `src/signalberegning.py`, `tests/test_vurderingslager.py`, `tests/test_signalberegning.py` -- G5.
-- [ ] `tests/test_lagring_sqlite.py` -- G8: `test_tom_base_migreres_og_faar_kurs_og_kursserie`.
-- [ ] `ARCHITECTURE-SPINE.md` -- kanten, AD-15 og AD-19.
+- [x] `src/eodhd.py`, `src/lagring_fil.py` -- seriefunksjonen og leseren. Tester for funksjonen i `test_snapshotleser.py` (`TestOversetteren` eller en ny klasse).
+- [x] `tests/eodhd_serier.py`, `src/fetch_prices.py`, `tests/test_fetch_prices.py`, `tests/test_snapshotleser.py`, `tests/test_konsumentene.py` -- den felles lista og hentingen. Nye tester: lista mot leseren, lista mot hentingen, lista gjennom `kjoer` og `nyeste_leser` (hver aksje kan leses eller står i `feil`), rådataene er uendret, og en strukturtest for at begge bruker `serie_fra_eodhd` og ingen av dem `kursrad_fra_eodhd` direkte.
+- [x] `tests/test_fetch_prices.py` -- G2.
+- [x] `tests/test_fetch_prices.py` -- G3: en nøkkel med mellomrom, parametrisert over `quote` og `quote_plus`.
+- [x] `src/fetch_prices.py` -- G4.
+- [x] `src/signalberegning.py`, `tests/test_vurderingslager.py`, `tests/test_signalberegning.py` -- G5.
+- [x] `tests/test_lagring_sqlite.py` -- G8: `test_tom_base_migreres_og_faar_kurs_og_kursserie`.
+- [x] `ARCHITECTURE-SPINE.md` -- kanten, AD-15 og AD-19.
 
 **Acceptance Criteria:**
 - Gitt en serie i den felles lista for DNB, når `hent_universet` kjøres, så står DNB med «svar med feil form» i `feil`, og de andre er i `serier`.
@@ -80,6 +80,31 @@ context:
 - Gitt hvert kontrollpunkt, når mutanten legges inn alene, så feiler minst én test, og koden settes tilbake før neste: egen regel i hentingen, en henting som hopper over kontrollen, ingen sjekk av like datoer, `"date"` tilbake i utskriften, oversatt serie lagret, `UgyldigSerie` for `[]`, G3 med `quote` og `quote_plus` fjernet hver for seg, og G5 med `finn_styrke` uten `abs` og `beregn_signal` uten `abs`. G2 prøves med en 16. aksje, og G4 og G8 med grep.
 
 ## Implementation Notes
+
+Bygget 27.09 direkte fra spesifikasjonen, ikke av en subagent, fordi planen krever én commit per sak og mutantene én om gangen. Commitene på grenen `1-8`: (a) `8cabfe3`, (b) `8802ff7`, (c) `d5e5fb7`, (d) `3c49590`, (e) `3f16bc7`, (f) `66ed0ae`, (g) `0af3cdf` og (h) `ac1514b`. Tester: 665 før og 815 etter.
+
+- `serie_fra_eodhd` fanger `UgyldigKursrad` og `KeyError` og reiser `UgyldigSerie` med den opprinnelige feilen som `__cause__`. `SnapshotLeser` sjekker fortsatt selv at `kilde.serier` er en dict.
+- `tests/eodhd_serier.py` har 27 serier. `falsk_serie` i `test_fetch_prices.py` fikk ISO-datoer fra 2026-06-01.
+- `test_henter_alle_femten_…` beholder navnet sitt. Tallet i `Resultat(..., kall_brukt=15)` i `test_feil_foelger_med_i_bildet` er data, ikke en påstand, og står.
+
+**Mutantene**, hver lagt inn alene, full testkjøring og koden satt tilbake før neste:
+
+| Mutant | Utfall |
+|---|---|
+| M1: hentingen med sin egen regel (`fetch_prices.py` fra baseline) | 30 feil: 14 av 27 serier i hver av de to testene over lista, strukturtesten og strengvakten. Den gamle regelen slapp gjennom 14 av de 27 |
+| M2: hentingen hopper over kontrollen og lagrer rådataene | 54 feil: alle 27 i begge testene over lista |
+| M3: seriefunksjonen sjekker ikke like datoer | 6 feil, både for leseren og for hentingen |
+| M4: `rader[-1]['date']` tilbake i utskriften | 1 feil: strengvakten for `fetch_prices.py` |
+| M5: den oversatte serien lagres | 29 feil: rådatatesten, `test_formatet_kan_leses_av_visningen` og alle 27 gjennom `kjoer` |
+| M6: `UgyldigSerie` for `[]` | 2 feil: «tomt svar» i hentingen og testen for funksjonen |
+| G2: en 16. aksje i `AKSJEUNIVERS` | De nye testene består (81 av 81). Testene fra før G2 gir 5 feil |
+| G3: `quote`, så `quote_plus`, fjernet fra `_uten_noekkel` | 1 feil hver, i hver sin parametrisering |
+| G5: `finn_styrke` uten `abs` | 22 feil, 19 av dem i testen over de 27 kombinasjonene |
+| G5: `beregn_signal` summerer selv uten `abs` | 4 feil, blant dem de to seriene med negative sjekker i `TestStyrke` |
+
+G4 og G8 er kontrollert med grep: «SnapshotKilde leser» og `versjon_1` finnes ikke lenger.
+
+**Hendelse:** den første kjøringen av mutantene for G5 satte koden tilbake med `git checkout`. Det tilbakestilte også `finn_styrke`, som ikke var committet. Mutant 1 var alt kjørt mot den riktige koden, og mutant 2 feilet før den ble lagt inn, fordi teksten ikke fantes. Endringen ble lagt inn på nytt, mutant 2 ble kjørt, og fra da av ble koden satt tilbake fra en kopi.
 
 ## Spec Change Log
 
