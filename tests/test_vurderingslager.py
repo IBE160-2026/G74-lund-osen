@@ -456,13 +456,12 @@ class TestVurdering:
     def test_styrken_er_den_finn_styrke_gir(self, sjekker):
         """Story 1.8 (G5), som testen for retningen over: alle 27
         kombinasjonene, og porten godtar bare styrken kjernen gir."""
-        riktig = signalberegning.finn_styrke(tuple(
+        som_sjekker = tuple(
             signalberegning.Sjekk(navn="", verdi=verdi, forklaring="") for verdi in sjekker
-        ))
+        )
+        riktig = signalberegning.finn_styrke(som_sjekker)
+        retning = signalberegning.finn_retning(som_sjekker)
         trend, bevegelse, interesse = sjekker
-        retning = signalberegning.finn_retning(tuple(
-            signalberegning.Sjekk(navn="", verdi=verdi, forklaring="") for verdi in sjekker
-        ))
         felt = dict(retning=retning, trend=trend, bevegelse=bevegelse, interesse=interesse)
         vurdering(styrke=riktig, **felt)
         for annen in set(range(4)) - {riktig}:

@@ -5,6 +5,7 @@ mot en falsk henter. Den ekte hent_ett_symbol kjoeres bare med requests.get
 byttet ut (story 2.0), saa ingen test naar nettet eller bruker kvote.
 """
 
+import copy
 import json
 from datetime import date, timedelta
 from urllib.parse import quote, quote_plus
@@ -230,6 +231,22 @@ class TestSvarMedFeilForm:
             assert kan_leses != (aksje.symbol in feil), aksje.symbol
         assert "DNB" in feil
 
+    def test_tom_serie_forsvinner_heller_ikke_uten_aa_staa_i_feil(self, tmp_path):
+        """Den tomme serien er ikke i den felles lista. Den gir «tomt svar»,
+        og loftet over gjelder ogsaa den."""
+
+        def hent(ticker, *_):
+            return [] if ticker == "DNB.OL" else falsk_serie()
+
+        fil = fp.kjoer(tmp_path, date(2026, 9, 22), NOEKKEL, hent, lambda _: None)
+        feil = json.loads(fil.read_text(encoding="utf-8"))["feil"]
+        leser = nyeste_leser(tmp_path)
+
+        for aksje in AKSJEUNIVERS:
+            kan_leses = leser.serie(aksje.symbol) != []
+            assert kan_leses != (aksje.symbol in feil), aksje.symbol
+        assert feil == {"DNB": "tomt svar"}
+
 
 class TestIntervall:
     def test_henter_omtrent_et_aar(self):
@@ -341,16 +358,27 @@ class TestHentUniverset:
         svar = {aksje.ticker: falsk_serie() for aksje in AKSJEUNIVERS}
         # Ekstra felt EODHD sender, og som ikke oversettes, skal ogsaa staa.
         svar["DNB.OL"][0]["open"] = 99.0
+        # Usortert, saa en henting som sorterer raadataene, ogsaa feiler.
+        svar["EQNR.OL"].reverse()
+        # En kopi foer kallet: hentingen faar de samme objektene, saa en
+        # endring paa stedet ville ellers ogsaa endret det testen sammenligner med.
+        forventet = copy.deepcopy(svar)
 
         resultat = fp.hent_universet(
             "noekkel", "a", "b", lambda ticker, *_: svar[ticker], lambda _: None
         )
 
-        assert resultat.serier == {aksje.symbol: svar[aksje.ticker] for aksje in AKSJEUNIVERS}
+        assert resultat.serier == {
+            aksje.symbol: forventet[aksje.ticker] for aksje in AKSJEUNIVERS
+        }
 
     def test_utskriften_viser_siste_dato_fra_serien(self):
+        """Serien er usortert, saa siste dato maa komme fra den oversatte
+        serien, ikke fra siste raa rad."""
         linjer = []
-        fp.hent_universet("noekkel", "a", "b", lambda *_: falsk_serie(60), linjer.append)
+        fp.hent_universet(
+            "noekkel", "a", "b", lambda *_: falsk_serie(60)[::-1], linjer.append
+        )
 
         assert any("60 dager, siste 2026-07-30" in linje for linje in linjer)
 

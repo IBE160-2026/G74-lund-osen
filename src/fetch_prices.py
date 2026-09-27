@@ -110,7 +110,6 @@ def _uten_noekkel(tekst: str, api_nokkel: str) -> str:
     return tekst
 
 
-
 def hent_universet(
     api_nokkel: str,
     fra: str,

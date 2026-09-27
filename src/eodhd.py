@@ -41,8 +41,8 @@ def kursrad_fra_eodhd(rad: object) -> Kursrad:
 
     Verdiene sjekkes ikke her; det gjoer Kursrad. En rad som ikke er et
     objekt, og en dato som ikke er streng YYYY-MM-DD, gir UgyldigKursrad.
-    Et felt som mangler, gir KeyError. Epic 2 bruker samme funksjon naar
-    hentingen skriver til basen.
+    Et felt som mangler, gir KeyError. Hentingen og SnapshotLeser kaller
+    den ikke selv, men gjennom serie_fra_eodhd (story 1.8).
     """
     if not isinstance(rad, dict):
         raise UgyldigKursrad(f"En EODHD-rad maa vaere et objekt, fikk {type(rad).__name__}")

@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-27T23:08'
+updated: '2026-09-27T23:12'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -303,7 +303,7 @@ FR-408. At dagen mangler, skal kunne skilles i lageret: `FR-409`. *Rettet
 - **Rule:** porten returnerer `list[Kursrad]` med `dato`, `slutt`, `justert_slutt`, `volum`. Adapteren oversetter fra kildens feltnavn. En ny kilde skal ikke måtte etterligne EODHD for å passe inn.
 - **Når:** innføres i **samme endring** som SQLite-adapteren, ikke som egen runde — adapteren må uansett røre dette laget. Rekkefølge: (1) `Kursrad` defineres, (2) protokollen, `SnapshotKilde` og SQLite-adapteren oppdateres i samme omgang, (3) konsumentene. **Testene kjøres i sin helhet mellom hvert steg**, ikke bare til slutt.
 - **Slik det ble, 2026-09-24:** rekkefølgen ble story 1.2 (`Kursrad` og porten, `a796214`), 1.3 (SQLite-adapteren, `f4fada0`) og 1.4a–c (lesegrensen, konsumentene, rydding). `Kursrad` kom altså i en egen endring før SQLite-adapteren, ikke i samme.
-- **Bygget 2026-09-27, story 1.8:** hentingen oversetter nå API-svaret gjennom `eodhd.py` (`serie_fra_eodhd`, som bruker `kursrad_fra_eodhd`), og `fetch_prices.py` er under strengvakten i `tests/test_konsumentene.py`. EODHDs feltnavn står dermed bare i `eodhd.py`. Øyeblikksbildet har samme format som før: rådataene lagres uendret, og oversettelsen er kontrollen.
+- **Bygget 2026-09-27, story 1.8:** hentingen oversetter nå API-svaret gjennom `eodhd.py` (`serie_fra_eodhd`, som bruker `kursrad_fra_eodhd`), og `fetch_prices.py` er under strengvakten i `tests/test_konsumentene.py`. EODHDs feltnavn for radene står dermed bare i `eodhd.py`. Parametrene i API-kallet står fortsatt i `fetch_prices.py`, som eneste modul som kaller nettet. Øyeblikksbildet har samme format som før: rådataene lagres uendret, og oversettelsen er kontrollen.
 
 ### AD-20 — Børsdager i Europe/Oslo, tidsstempler i UTC
 

@@ -7,8 +7,8 @@ SnapshotKilde, og ble den staaende i kursdata.py, ville avhengigheten pekt
 feil vei.
 
 EODHDs feltnavn oversettes ikke her, men i eodhd.py. Formatet er EODHDs og
-ikke filens, og hentekommandoen i Epic 2 oversetter API-svaret med samme
-funksjon uten aa gaa via fila.
+ikke filens, og hentekommandoen oversetter API-svaret med samme funksjon,
+serie_fra_eodhd, uten aa gaa via fila (story 1.8).
 
 Ingen funksjon her gjoer API-kall. Kvoten brukes bare av fetch_prices.py.
 """
