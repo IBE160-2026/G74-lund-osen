@@ -7,6 +7,7 @@ byttet ut (story 2.0), saa ingen test naar nettet eller bruker kvote.
 
 import json
 from datetime import date, timedelta
+from urllib.parse import quote, quote_plus
 
 import pytest
 import requests
@@ -102,19 +103,29 @@ class TestNoekkelenLekkerIkke:
         assert not [l for l in linjer if NOEKKEL in l]
         assert any("DNB: FEIL" in l and "***" in l for l in linjer)
 
-    def test_url_kodet_noekkel_fjernes_ogsaa(self):
+    @pytest.mark.parametrize(
+        "kodet",
+        ["ab%20c%2Bd%2Fe", "ab+c%2Bd%2Fe"],
+        ids=["quote", "quote_plus"],
+    )
+    def test_url_kodet_noekkel_fjernes_ogsaa(self, kodet):
         """requests URL-koder params. En noekkel med tegn som kodes, maa
-        fjernes ogsaa i den formen."""
-        noekkel = "ab+c/d=e"
+        fjernes ogsaa i den formen.
+
+        Story 1.8 (G3): noekkelen har mellomrom, saa quote og quote_plus gir
+        ulik tekst. Foer het den ab+c/d=e, der de to ga det samme, og
+        _uten_noekkel kunne mistet en av formene uten at testen feilet."""
+        noekkel = "ab c+d/e"
+        assert kodet in {quote(noekkel, safe=""), quote_plus(noekkel)}
 
         def hent(ticker, *_):
             if ticker == "DNB.OL":
-                raise RuntimeError("feil med api_token=ab%2Bc%2Fd%3De i adressen")
+                raise RuntimeError(f"feil med api_token={kodet} i adressen")
             return falsk_serie()
 
         resultat = fp.hent_universet(noekkel, "a", "b", hent, lambda _: None)
 
-        assert "ab%2Bc%2Fd%3De" not in resultat.feil["DNB"]
+        assert kodet not in resultat.feil["DNB"]
         assert "***" in resultat.feil["DNB"]
 
 
