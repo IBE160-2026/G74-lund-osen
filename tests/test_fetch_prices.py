@@ -12,14 +12,18 @@ import pytest
 import requests
 
 import fetch_prices as fp
+from eodhd_serier import AVVISTE, AVVISTE_IDER
 from kursdata import AKSJEUNIVERS
 from lagring_fil import SnapshotKilde, nyeste_leser, nyeste_snapshot
 
 
 def falsk_serie(dager: int = 60):
+    """En serie leseren godtar. Foer story 1.8 hadde den datoer som «dag-000»,
+    som hentingen slapp gjennom og leseren avviste."""
+    start = date(2026, 6, 1)
     return [
         {
-            "date": f"dag-{i:03d}",
+            "date": (start + timedelta(days=i)).isoformat(),
             "close": 100.0 + i,
             "adjusted_close": 100.0 + i,
             "volume": 1000,
@@ -178,19 +182,12 @@ class TestSkriverIkkeOver:
 
 class TestSvarMedFeilForm:
     """Story 2.0, valg A: et svar med feil form stopper ikke hentingen
-    (AD-15, NFR-03)."""
+    (AD-15, NFR-03).
 
-    @pytest.mark.parametrize(
-        "svar",
-        [
-            [{"close": 1.0, "adjusted_close": 1.0, "volume": 1}],  # rad uten date
-            [{"date": "2026-09-22"}],  # rad uten prisfeltene eodhd.py leser
-            {"code": 403, "message": "Forbidden"},  # feilobjekt i stedet for liste
-            ["2026-09-22"],  # liste uten rader
-            None,
-        ],
-        ids=["rad-uten-date", "rad-uten-close", "feilobjekt", "liste-uten-rader", "None"],
-    )
+    Story 1.8: «feil form» er alt SnapshotLeser avviser. Seriene kommer fra
+    samme liste som testene for leseren bruker (tests/eodhd_serier.py)."""
+
+    @pytest.mark.parametrize("svar", AVVISTE, ids=AVVISTE_IDER)
     def test_feil_form_gir_feil_for_symbolet_og_de_andre_hentes(self, svar):
         def hent(ticker, *_):
             if ticker == "DNB.OL":
@@ -200,8 +197,27 @@ class TestSvarMedFeilForm:
         resultat = fp.hent_universet(NOEKKEL, "a", "b", hent, lambda _: None)
 
         assert resultat.feil == {"DNB": "svar med feil form"}
-        assert len(resultat.serier) == 14
-        assert resultat.kall_brukt == 15
+        assert "DNB" not in resultat.serier
+        assert len(resultat.serier) == len(AKSJEUNIVERS) - 1
+        assert resultat.kall_brukt == len(AKSJEUNIVERS)
+
+    @pytest.mark.parametrize("svar", AVVISTE, ids=AVVISTE_IDER)
+    def test_ingen_aksje_forsvinner_uten_aa_staa_i_feil(self, tmp_path, svar):
+        """Det storyen lover: hver aksje i fila hentingen skrev, kan enten
+        leses av visningen eller staar i feil. Foer 1.8 ble DNB lagret, uten
+        noe i feil, og visningen droppet den."""
+
+        def hent(ticker, *_):
+            return svar if ticker == "DNB.OL" else falsk_serie()
+
+        fil = fp.kjoer(tmp_path, date(2026, 9, 22), NOEKKEL, hent, lambda _: None)
+        feil = json.loads(fil.read_text(encoding="utf-8"))["feil"]
+        leser = nyeste_leser(tmp_path)
+
+        for aksje in AKSJEUNIVERS:
+            kan_leses = leser.serie(aksje.symbol) != []
+            assert kan_leses != (aksje.symbol in feil), aksje.symbol
+        assert "DNB" in feil
 
 
 class TestIntervall:
@@ -307,6 +323,25 @@ class TestHentUniverset:
 
         assert resultat.serier == {}
         assert all(grunn == "tomt svar" for grunn in resultat.feil.values())
+
+    def test_raadataene_lagres_uendret(self):
+        """Story 1.8: oversettelsen er bare kontrollen. Oeyeblikksbildet har
+        samme format som foer, med EODHDs rader slik de kom."""
+        svar = {aksje.ticker: falsk_serie() for aksje in AKSJEUNIVERS}
+        # Ekstra felt EODHD sender, og som ikke oversettes, skal ogsaa staa.
+        svar["DNB.OL"][0]["open"] = 99.0
+
+        resultat = fp.hent_universet(
+            "noekkel", "a", "b", lambda ticker, *_: svar[ticker], lambda _: None
+        )
+
+        assert resultat.serier == {aksje.symbol: svar[aksje.ticker] for aksje in AKSJEUNIVERS}
+
+    def test_utskriften_viser_siste_dato_fra_serien(self):
+        linjer = []
+        fp.hent_universet("noekkel", "a", "b", lambda *_: falsk_serie(60), linjer.append)
+
+        assert any("60 dager, siste 2026-07-30" in linje for linje in linjer)
 
     def test_kort_serie_merkes_i_utskriften(self):
         """En serie under 51 dager kan ikke gi signal. Det skal vaere synlig."""

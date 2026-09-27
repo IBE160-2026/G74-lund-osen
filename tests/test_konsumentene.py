@@ -52,10 +52,15 @@ FORBUDT_I_PORTEN = {
 # Modulene vakten mot EODHDs feltnavn gjelder: kjernen og portene.
 UTEN_EODHD = KJERNEMODULER + PORTMODULER
 
-# Strengvakten gjelder i tillegg skallet utenom oversetteren (eodhd.py) og
-# nettadapteren (fetch_prices.py). Ikke fallbackvakten: lagring_sqlite.py
-# leser rad[0] fra basen, og det er lovlig.
-UTEN_EODHD_STRENGER = UTEN_EODHD + ("lagring_fil.py", "lagring_sqlite.py", "app.py")
+# Strengvakten gjelder i tillegg skallet utenom oversetteren (eodhd.py). Ikke
+# fallbackvakten: lagring_sqlite.py leser rad[0] fra basen, og det er lovlig.
+# Story 1.8: fetch_prices.py oversetter gjennom eodhd.py og er med her.
+UTEN_EODHD_STRENGER = UTEN_EODHD + (
+    "lagring_fil.py", "lagring_sqlite.py", "app.py", "fetch_prices.py",
+)
+
+# De to som leser en serie fra EODHD. Begge skal bruke samme regel (story 1.8).
+SERIELESERE = ("lagring_fil.py", "fetch_prices.py")
 
 
 def _tre(navn: str) -> ast.Module:
@@ -118,6 +123,15 @@ def _navn_i(tre: ast.Module) -> set[str]:
             navn |= {alias.name.split(".")[-1] for alias in node.names}
             navn |= {alias.asname for alias in node.names if alias.asname}
     return navn
+
+
+@pytest.mark.parametrize("navn", SERIELESERE)
+def test_hentingen_og_leseren_bruker_samme_regel_for_en_serie(navn):
+    """Story 1.8: serie_fra_eodhd avgjoer om en serie kan leses. Kaller en
+    av dem kursrad_fra_eodhd selv, har den sin egen regel ved siden av."""
+    brukt = _navn_i(_tre(navn))
+    assert "serie_fra_eodhd" in brukt
+    assert "kursrad_fra_eodhd" not in brukt
 
 
 def test_app_velger_ikke_oeyeblikksbilde_selv():

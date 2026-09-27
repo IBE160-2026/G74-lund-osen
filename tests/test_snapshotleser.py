@@ -19,6 +19,7 @@ from datetime import date, datetime, timedelta, timezone
 import pytest
 
 from eodhd import UgyldigSerie, kursrad_fra_eodhd, serie_fra_eodhd
+from eodhd_serier import AVVISTE, AVVISTE_IDER
 from kursdata import Kursleser, Kurslager, Kursrad, UgyldigKursrad
 from lagring_fil import SnapshotKilde, SnapshotLeser
 
@@ -154,6 +155,12 @@ class TestSerieFraEodhd:
         with pytest.raises(UgyldigSerie):
             serie_fra_eodhd([raa("2026-09-21", close=100.0), raa("2026-09-21", close=101.0)])
 
+    @pytest.mark.parametrize("serie", AVVISTE, ids=AVVISTE_IDER)
+    def test_hver_serie_i_den_felles_lista_avvises(self, serie):
+        """Lista i eodhd_serier.py har bare serier funksjonen avviser."""
+        with pytest.raises(UgyldigSerie):
+            serie_fra_eodhd(serie)
+
 
 class TestSnapshotLeser:
     def test_er_en_kursleser_men_ikke_en_kurslager(self):
@@ -215,6 +222,15 @@ class TestSnapshotLeser:
         leser = bilde({"EQNR": [raa("2026-09-21", close=100.0), raa("2026-09-21", close=101.0)]})
 
         assert er_manglende(leser, "EQNR")
+
+    @pytest.mark.parametrize("serie", AVVISTE, ids=AVVISTE_IDER)
+    def test_serie_fra_den_felles_lista_gjoer_bare_det_symbolet_manglende(self, serie):
+        """Story 1.8: samme serier som testene for hentingen bruker."""
+        leser = bilde({"EQNR": serie, "DNB": [raa("2026-09-18"), raa("2026-09-21")]})
+
+        assert er_manglende(leser, "EQNR")
+        assert len(leser.serie("DNB")) == 2
+        assert leser.sist_hentet("DNB") == HENTET
 
     def test_tom_serie_er_manglende(self):
         assert er_manglende(bilde({"EQNR": []}), "EQNR")
