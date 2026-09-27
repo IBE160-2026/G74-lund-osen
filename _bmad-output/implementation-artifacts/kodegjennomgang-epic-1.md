@@ -158,6 +158,9 @@ dagsfila):
 - **G10 (A-BH2) og G11 (A-BH1) venter på 2.5,** fordi innledningen til Epic 2
   («Lagt til 2026-09-25») legger skrivingen til basen der. De står som
   forutsetning i 2.5.
+  *2026-09-28:* G10 er løst i basen i story 1.9 (AD-21): `0003` avviser et ukjent
+  symbol i `kurs`, `kursserie` og `vurdering`. Om porten til `Kurslager` også
+  skal sjekke symbolet, avgjøres fortsatt i 2.5, sammen med G11.
 - **G12 (B-VG2) venter på 2.1,** som endrer dagen `main()` bruker. Den står som
   kontrollpunkt i 2.1.
 - **G1 gjelder alle tilfellene** som ble prøvd 27.09 uten nett og med falsk

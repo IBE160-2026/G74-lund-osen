@@ -2,9 +2,10 @@
 title: 'Story 1.9: Aksjene i basen, og tabellene peker på dem'
 type: 'feature'
 created: '2026-09-27'
-status: 'ready-for-dev'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
+baseline_commit: '72cd401ea12cb1055841f4ed96ada455840506a3'
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/epic-1-context.md'
   - '{project-root}/_bmad-output/implementation-artifacts/kodegjennomgang-epic-1.md'
@@ -69,13 +70,13 @@ context:
 ## Tasks & Acceptance
 
 **Execution:** én commit per punkt, pushet til grenen `1-9`. 0003 bygges opp på grenen, og hashen låses når grenen flettes.
-- [ ] `src/migrasjoner/0003_aksje.sql`, `tests/test_aksje.py` -- tabellen og de femten, og testen mot `AKSJEUNIVERS` med `ORDER BY rowid`. Tom base gir versjon 3.
-- [ ] samme -- triggerne på `kurs`, `kursserie` og `vurdering`, for `INSERT` og `UPDATE OF symbol`, og testene i matrisen på en ny tilkobling.
-- [ ] samme -- `aksje_slettes_ikke_med_rader` og `aksje_symbol_endres_ikke`, med testene.
-- [ ] samme -- kontrollen for rader med ukjent symbol, og testene for versjon 2 med og uten slike rader.
-- [ ] `tests/test_aksje.py` -- adaptertesten, AD-18-testen (ingen fremmednøkkel på `vurdering`, og en vurdering kan skrives uten kursrader) og spørringen med `JOIN aksje` som gir navnet sammen med vurderingen.
-- [ ] `ARCHITECTURE-SPINE.md` -- AD-21 og merknadene, `updated` fra klokka.
-- [ ] `epics.md` -- forutsetningen i 2.5: G10 løst i basen, og avviket mellom lagrene.
+- [x] `src/migrasjoner/0003_aksje.sql`, `tests/test_aksje.py` -- tabellen og de femten, og testen mot `AKSJEUNIVERS` med `ORDER BY rowid`. Tom base gir versjon 3.
+- [x] samme -- triggerne på `kurs`, `kursserie` og `vurdering`, for `INSERT` og `UPDATE OF symbol`, og testene i matrisen på en ny tilkobling.
+- [x] samme -- `aksje_slettes_ikke_med_rader` og `aksje_symbol_endres_ikke`, med testene.
+- [x] samme -- kontrollen for rader med ukjent symbol, og testene for versjon 2 med og uten slike rader.
+- [x] `tests/test_aksje.py` -- adaptertesten, AD-18-testen (ingen fremmednøkkel på `vurdering`, og en vurdering kan skrives uten kursrader) og spørringen med `JOIN aksje` som gir navnet sammen med vurderingen.
+- [x] `ARCHITECTURE-SPINE.md` -- AD-21 og merknadene, `updated` fra klokka.
+- [x] `epics.md` -- forutsetningen i 2.5: G10 løst i basen, og avviket mellom lagrene.
 
 **Acceptance Criteria:**
 - Gitt en tom base, når `migrer` kjøres, så står basen på versjon 3, og `aksje` er lik `AKSJEUNIVERS` felt for felt og i samme rekkefølge.
@@ -84,9 +85,60 @@ context:
 
 ## Implementation Notes
 
+Bygget 27.09 direkte fra spesifikasjonen, ikke av en subagent, fordi planen krever én commit per punkt og mutantene én om gangen. Commitene på grenen `1-9`: (a) `4b62e39`, (b) `48e9929`, (c) `6201e59`, (d) `f429f0d`, (e) `08cfc01`, (f) `d8c166d` og (g) `3377083`. Alle testene står i `tests/test_aksje.py`, og ingen eksisterende test er endret. Ingen kode i `src/` er endret utenom `0003_aksje.sql`. Tester: 816 før og 871 etter.
+
+- **REPLACE:** under (c) viste det seg i minnet at `INSERT OR REPLACE` med en ticker som finnes, og `UPDATE OR REPLACE` av `ticker`, sletter raden som er i veien uten å kjøre DELETE-triggeren (`recursive_triggers` er av). EQNR forsvant, og kursen ble stående. To triggere til, `aksje_erstattes_ikke_insert` og `aksje_erstattes_ikke_update`, avviser en `INSERT` eller en ny ticker som kolliderer. Det følger av beslutningen om at en aksje med rader ikke kan slettes, og er ingen ny beslutning. En `INSERT` med et symbol eller en ticker som finnes, gir derfor «en aksje erstattes ikke» i stedet for `UNIQUE constraint failed`.
+- **Kontrollen i versjon 2** er en `CHECK (rader_uten_aksje = 0)` på hjelpetabellen `kontroll_0003`, som fjernes igjen i samme migrasjon. `RAISE` finnes bare i triggere.
+- `UKJENTE` i testene er `EQNR.OL`, `eqnr`, `XXX`, tom streng og ` EQNR`.
+
+**Mutantene**, hver lagt inn alene med `mutant.py` i scratchpad: fila kopieres, mutanten legges inn, hele suiten kjøres, og fila settes tilbake fra kopien og sjekkes mot hashen. Ingen `git checkout`.
+
+| Mutant | Utfall |
+|---|---|
+| M1: MPCC mangler i 0003 | 1 feil: testen mot `AKSJEUNIVERS` |
+| M2: `Var Energi` i stedet for `Vår Energi` | 1 feil: samme |
+| M2b: EQNR og DNB byttet om | 1 feil: samme |
+| M3: INSERT-triggeren på `kurs` mangler (`WHEN 0`) | 5 feil: alle fem ukjente symboler i `kurs` |
+| M4: triggeren på `kursserie` med `NOT IN` | 1 feil: NULL-testen |
+| M5: INSERT-triggeren på `vurdering` mangler | 5 feil |
+| M6: UPDATE-triggeren mangler, på `kurs`, `kursserie` og `vurdering` hver for seg | 1 feil hver |
+| M7: slettetriggeren sjekker bare `kurs` | 2 feil: rad bare i `kursserie`, og bare i `vurdering` |
+| M7b: slettetriggeren mangler | 1 feil: rad bare i `kurs` |
+| M8: triggeren for endret symbol mangler | 2 feil: med og uten rader |
+| M8b: REPLACE-triggeren for INSERT mangler | 4 feil |
+| M8c: REPLACE-triggeren for UPDATE mangler | 1 feil |
+| M9: en trigger fra `vurdering` til `kurs` | 55 feil, blant dem AD-18-testene og testene i `test_vurderingslager.py` |
+| M10: `except IntegrityError` fjernet i `SqliteKurslager` | 4 feil: adaptertesten og tre eksisterende |
+| M11: kontrollen i versjon 2 mangler (`CHECK (1)`) | 3 feil: én per tabell |
+| M11b: kontrollen teller ikke `kursserie` | 1 feil |
+
 ## Spec Change Log
 
 ## Review Triage Log
+
+Runde 1, 28.09: Blind Hunter (BH, 11 funn), Edge Case Hunter (ECH, 5) og Verification Gap (VG, 1 hull og 1 annet funn). Hvert funn er prøvd mot koden på `8a7567b`. CI var grønn på PR #11 (871 passed).
+
+| # | Funn | Dom | Bevis | Rute |
+|---|---|---|---|---|
+| VG1 / BH6 | En ticker-oppdatering som ikke kolliderer, prøves ikke. Uten `AND symbol IS NOT OLD.symbol` ville hver ticker-oppdatering blitt avvist | low | Riktig: eneste test som endrer `ticker`, venter en avvisning | patch: `test_ticker_kan_endres_uten_kollisjon`, ny og samme ticker. Mutanten gir 1 feil |
+| VG-annet / BH2 / ECH5 | Forutsetningen i 2.5 sier samme avgjørelse to ganger og har både «Løses» og «Løst» | low | Riktig om gjentakelsen. «Løses …» er en datert merknad fra 27.09 og står, som andre daterte merknader i `epics.md` | patch: den gjentatte setningen er fjernet |
+| ECH1 | `match="…ukjent aksje i kurs"` treffer også `kursserie` | low | Riktig for adaptertesten: uten triggeren på `kurs` ville triggeren på `kursserie` gitt en melding som passer | patch: ankret med `$`. Uten INSERT-triggeren på `kurs` feiler nå også adaptertesten |
+| ECH2 | Slettes en aksje uten rader i SQL, godtar porten symbolet, og triggeren gir rå `IntegrityError` fra `SqliteVurderingslager` | low | Riktig, men krever rå SQL mot `aksje`, og ingen kode skriver til `aksje`. Hvilke feil kjøringen fanger, er G11 i 2.5 | avvist: lite sannsynlig, og rettingen legger til en kontroll i adapteren |
+| ECH3 | AD-18-testen ser bare på triggere på `vurdering`, ikke på en trigger på `kurs` som leser `vurdering` | low | En slik trigger finnes ikke. AD-18 handler om at `erstatt_serie` ikke skal rive `vurdering`, og det holdes av `test_vurderingen_og_kursen_i_den_er_uendret` | avvist: dekket av atferdstesten |
+| ECH4 | Teksten i en CHECK-feil avhenger av SQLite-versjonen | low | Riktig i prinsippet. Lokalt er versjonen 3.50.4, og CI besto | patch: `KONTROLLFEIL` godtar uttrykk, kolonne og tabell |
+| BH1 | G10 står fortsatt som ventende i `kodegjennomgang-epic-1.md` | low | Riktig (`:158`) | patch: datert merknad |
+| BH3 | `test_symbol_kan_endres_til_en_annen_kjent_aksje` låser at en rad i `vurdering` kan skrives om i SQL | low | Riktig: parametrisert over alle tre tabellene. Porten holder AD-7, ikke basen (1.6 ECH3, A-BH3) | patch: testen gjelder bare `kurs` og `kursserie`, med grunnen i docstringen |
+| BH4 | AD-21 og testnavnet sier «aksje med rader», men REPLACE-triggerne gjelder alle aksjer | low | Riktig | patch: AD-21, testnavnet `test_aksje_erstattes_ikke` og et tilfelle med DNB, som ikke har rader |
+| BH5 | `ON CONFLICT DO NOTHING` og `INSERT OR IGNORE` avvises, selv om de ikke sletter noe | low | Riktig, og ikke skrevet ned | patch: `INSERT OR IGNORE` er med i testen, og docstringen og kommentaren i `0003` sier det |
+| BH7 | Kontrollen i versjon 2 prøves ikke med `NULL` i `kursserie` | low | Riktig: en mutant med `NOT IN` i kontrollen overlevde | patch: `test_null_i_kursserie_stopper_migrasjonen`. Mutanten gir 1 feil |
+| BH8 | Mutanttabellen mangler mutanter (hele INSERT-triggeren på `kursserie`, kontrollen uten `kurs` eller `vurdering`, `!=` i symboltriggeren), og M10 navngir ikke testene | low | Triggeren på `kursserie` prøves av fem parametriseringer av INSERT-testen. `symbol` er `NOT NULL` i `aksje`, så `!=` og `IS NOT` gir det samme. Rettingen er en endring i spesifikasjonen | avvist: retter spesifikasjonen |
+| BH9 | En ekte base som stopper på versjon 2, har ingen vei videre, og feilen nevner verken tabell eller symbol | low | Ingen ekte base finnes: ingen kode i `src/` kaller `migrer()`. Stoppet er vedtatt 27.09 | avvist: vedtatt, og ingen base kan treffes før 2.2/3.1 |
+| BH10 | Ingen regel for å ta en aksje ut av universet | low | Universet er fast i v1 (`prd.md` §3), som i A-AA4 | avvist: tas hvis universet endres |
+| BH11 | Tabellen over hvor FR-406 og FR-408 ligger, nevner ikke AD-21, og `docs/innlevering.md:128` nevner bare `0001` | low | Riktig om begge. `innlevering.md` manglet `0002` alt før 1.9 | patch: AD-21 i tabellen. `innlevering.md`: defer |
+
+Ingen `intent_gap` eller `bad_spec`. Rettingene: `3757086` (koden og testene), `17e14eb` (spinen), `290d1b2` (`epics.md`) og `10f3db9` (kodegjennomgangen). Utsatt: `innlevering.md` i `deferred-work.md`. Tester etter rettingene: 875.
+
+Talt fra tabellen: 18 funn i 15 rader. 13 funn er rettet i 10 rettinger, og BH11 er rettet i spinen og utsatt for `innlevering.md`. 5 er avvist (ECH2, ECH3, BH8, BH9, BH10). Commit-meldingen til `2cfda6d` sier «11 … 6 avvist og 1 utsatt». Det er feil, og tallene her gjelder.
 
 ## Verification
 

@@ -1090,7 +1090,7 @@ så den ikke kan regnes av en serie som er byttet ut siden.
   også når nyeste kurs ikke er fra dagen, og når signalet ikke kan regnes.
 - **Ville feilet hvis:** vurderingen ble skrevet av en egen kommando. Kjøres den etter en ny henting, er grunnlaget byttet ut — og raden ville lagret hva løsningen mente om *andre* data enn de som lå der
 
-**Forutsetning** *(fra kodegjennomgangen av Epic 1, 2026-09-27)*: `SqliteKurslager` godtar ethvert symbol, også `EQNR.OL`, mens `SqliteVurderingslager` bare godtar symbolene i `AKSJEUNIVERS` (G10). *Løses i basen i 1.9 (lagt til 2026-09-27).* `SqliteVurderingslager.skriv` slipper ut `sqlite3`-feil, mens `erstatt_serie` gjør `IntegrityError` om til `ValueError` (G11). Her avgjøres det om `Kurslager` skal sjekke symbolet, og hvilke feil kjøringen fanger. Blir skrivingen til basen en egen story, følger forutsetningen dit.
+**Forutsetning** *(fra kodegjennomgangen av Epic 1, 2026-09-27)*: `SqliteKurslager` godtar ethvert symbol, også `EQNR.OL`, mens `SqliteVurderingslager` bare godtar symbolene i `AKSJEUNIVERS` (G10). *Løses i basen i 1.9 (lagt til 2026-09-27).* *Løst i basen i 1.9 (2026-09-27, AD-21):* `0003` avviser et ukjent symbol i `kurs`, `kursserie` og `vurdering`, og `SqliteKurslager` gjør avvisningen om til `ValueError`. `MinneKurslager` godtar fortsatt `EQNR.OL`, så de to lagrene oppfører seg ulikt der. `SqliteVurderingslager.skriv` slipper ut `sqlite3`-feil, mens `erstatt_serie` gjør `IntegrityError` om til `ValueError` (G11). Her avgjøres det om `Kurslager` skal sjekke symbolet, og hvilke feil kjøringen fanger. Blir skrivingen til basen en egen story, følger forutsetningen dit.
 
 **Én økt:** ja.
 

@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-27T23:12'
+updated: '2026-09-28T00:03'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -235,7 +235,7 @@ også `signalberegning.py` ikke importerte noen annen prosjektmodul, og kanten
 - **Prevents:** at vi to endrer skjemaet hver vår vei, og at en skjemaendring løses med «slett basen og bygg den på nytt» — noe AD-7 gjør umulig for `vurdering` og `ki_logg`
 - **Rule:** migrasjoner er nummererte SQL-filer som kjøres i rekkefølge; anvendt versjon står i en `skjema_versjon`-tabell. Ingen `ALTER TABLE` utenfor en migrasjonsfil.
 - **Opphav:** besluttet her som ny beslutning, avledet av AD-7. Bygget i story 1.1, commit `57a83c5` (23.09): `src/migrering.py` er løperen, og `tests/test_migrering.py` har 21 tester. Hver migrasjon kjøres i én transaksjon sammen med sin rad i `skjema_versjon`. **Prøvd mot feilen den skal hindre:** med løperen midlertidig byttet til `executescript()` feilet 3 av 6 tester i `TestFeilMidtveis`. Det var skjemakontrollen som fanget det (tabellen `halvveis` ble stående), ikke versjonsraden, som mutanten lot være uendret. `src/migrasjoner/` finnes ikke ennå — første migrasjon kommer i story 1.3. *24.09: finnes nå, med `0001_kurs.sql` fra story 1.3 (`f4fada0`).* *26.09: løperen er herdet i story 1.5b (`ef1cca7`, PR #5).* `skjema_versjon` lagrer filnavn og sha256 av filteksten, og en anvendt migrasjon med nytt navn eller nytt innhold avvises. En `skjema_versjon` fra før 1.5b oppgraderes ikke stille. Hver migrasjon kjøres i sin egen `BEGIN IMMEDIATE`-transaksjon, og versjonen leses inne i den. En migrasjonsfil med en setning som begynner med et transaksjonsord (`BEGIN`, `COMMIT`, `END`, `ROLLBACK`, `SAVEPOINT`, `RELEASE`), avvises før noe kjøres. Katalogkontrollen er lik på Linux og Windows. SQLite-adapteren krever at basen står på siste versjon (`siste_versjon`), ikke bare at den er migrert én gang. Testene: 427 før og 455 etter. Mutanten `BEGIN IMMEDIATE` → `BEGIN` overlever, og en test med to migratorer som overlapper, er utsatt til story 3.1 (`deferred-work.md`).
-- **To SQLite-forhold migrasjonene må ta hensyn til, begge verifisert:** `executescript()` kjører en implisitt `COMMIT` først, så den nærliggende måten å kjøre en `.sql`-fil på er **ikke** atomisk med oppdateringen av `skjema_versjon` — migrasjonsløperen må styre transaksjonen selv. Og SQLites `ALTER TABLE` dekker bare rename/add/drop column; typeendring, `UNIQUE`, `CHECK` og fremmednøkler krever tabellbytte med `DROP TABLE`. **For `vurdering` og `ki_logg` kolliderer det med AD-7** — se åpent punkt under.
+- **To SQLite-forhold migrasjonene må ta hensyn til, begge verifisert:** `executescript()` kjører en implisitt `COMMIT` først, så den nærliggende måten å kjøre en `.sql`-fil på er **ikke** atomisk med oppdateringen av `skjema_versjon` — migrasjonsløperen må styre transaksjonen selv. Og SQLites `ALTER TABLE` dekker bare rename/add/drop column; typeendring, `UNIQUE`, `CHECK` og fremmednøkler krever tabellbytte med `DROP TABLE`. **For `vurdering` og `ki_logg` kolliderer det med AD-7** — se åpent punkt under. *2026-09-27 (story 1.9):* `0003` legger koblingene til `aksje` med triggere, så ingen tabell bygges om (AD-21).
 
 ### AD-17 — Hentekommandoen skriver dagens vurdering
 
@@ -294,6 +294,7 @@ FR-408. At dagen mangler, skal kunne skilles i lageret: `FR-409`. *Rettet
 - **Binds:** FR-408, AD-5, AD-7
 - **Prevents:** at `erstatt_serie` river grunnen under historikken. Med `RESTRICT` ville hver henting fra dag to feilet for alle femten; med `CASCADE` ville historikk blitt slettet uten at noen kalte `slett`, altså AD-7 omgått på SQL-nivå av en AD-5-lydig handling
 - **Rule:** `vurdering` lagrer `close` og `adjusted_close` som **verdier**, ikke som peker. Ingen fremmednøkkel fra `vurdering` til `kurs`.
+- *Presisert 2026-09-27 (story 1.9):* `vurdering` peker på `aksje` gjennom en trigger, ikke på `kurs` (AD-21). En test holder at ingen trigger på `vurdering` leser `kurs`, og at en vurdering kan skrives uten kursrader.
 - **Merk:** fraværet av fremmednøkkel er ikke en forenkling — det **følger av kravet**. FR-408 ber om et øyeblikksbilde, og et øyeblikksbilde som peker på en rad som endres, er ikke et øyeblikksbilde. At lagret kurs og dagens omregnede kurs spriker etter et utbytte, er to forskjellige spørsmål, og begge svarene skal kunne leses.
 
 ### AD-19 — Porten returnerer en typet norsk rad
@@ -313,12 +314,20 @@ FR-408. At dagen mangler, skal kunne skilles i lageret: `FR-409`. *Rettet
 - **Forkastet:** alt i UTC. «Dagens sluttkurs» ville fått feil dag for alle hentinger mellom midnatt og 02:00, og FR-402 ville bommet i samme vindu. Det er ikke færre omregninger, bare en omregning flyttet dit den ikke synes.
 - **Forkastet:** å rette bare feilen og utsette regelen. Det gjør filnavn og tidsstempel konsistente uten å si hva de skal være konsistente med. To verdier kan være enige og begge være feil. Da er symptomet borte mens spørsmålet står åpent, og det kommer tilbake når FR-402 skal avgjøre hva «forventet børsdag» betyr — på et tidspunkt der ingen lenger husker at det var det samme spørsmålet.
 
+### AD-21 — Basen kjenner universet; koblingene er triggere
+
+- **Binds:** FR-406, FR-408, AD-4, AD-7, AD-16, AD-18
+- **Prevents:** at en rad for et symbol utenfor universet, for eksempel tickeren `EQNR.OL`, blir en egen serie eller en egen historikk fordi porten var eneste vakt (G10 i `kodegjennomgang-epic-1.md`). Og at en aksje forsvinner mens `vurdering` fortsatt har rader for den, rader som verken kan slettes eller skrives på nytt (AD-7)
+- **Rule:** tabellen `aksje` har de samme feltene som `Aksje` og de samme femten som `AKSJEUNIVERS`, i samme rekkefølge. En test holder dem like. `kurs`, `kursserie` og `vurdering` peker på `aksje` gjennom triggere: et ukjent symbol avvises ved `INSERT` og ved `UPDATE OF symbol`, også på en tilkobling som ikke har slått på noe. En aksje med rader kan ikke slettes, og symbolet kan aldri endres. En aksje uten rader kan slettes. Ingen aksje kan erstattes: en `INSERT` eller en ny `ticker` som kolliderer, avvises, fordi `REPLACE` ellers sletter raden uten å kjøre slettetriggeren. `vurdering` peker på `aksje`, aldri på `kurs` (AD-18).
+- **Forkastet:** fremmednøkler. SQLite håndhever dem bare når tilkoblingen har slått dem på, og en ny tilkobling har det ikke. `PRAGMA foreign_keys = ON` gjør ingenting inne i løperens `BEGIN IMMEDIATE`. `ALTER TABLE` kan ikke legge en fremmednøkkel på en kolonne som finnes, så `kurs`, `kursserie` og `vurdering` måtte blitt bygget om, og `vurdering` er uerstattelig (AD-7). Samme grunn som for triggerne på `grunn` i `0002`. Alle tre forholdene er prøvd i minnet 27.09.
+- **Bygget 2026-09-27, story 1.9:** `0003_aksje.sql`. En base i versjon 2 med rader for et symbol som ikke står i `aksje`, stopper migrasjonen, og løperen ruller den tilbake. `SqliteKurslager` gjør avvisningen om til `ValueError`, og `SqliteVurderingslager` avviser et ukjent symbol i porten før SQL-en. Om porten til `Kurslager` også skal sjekke symbolet, og hvilke feil kjøringen fanger (G11), avgjøres i 2.5. Hvert kontrollpunkt er prøvd med en mutant (spesifikasjonen, Implementation Notes).
+
 ## Consistency Conventions
 
 | Hensyn | Konvensjon |
 |---|---|
 | Navn | Norsk i kode og kommentarer, som i resten av prosjektet. Porter navngis etter hva de gjør: `<Datasett>lager` er porten med skrivesiden (én skriver, AD-3), `<Datasett>leser` er lesesiden av samme port, og `<Datasett>logg` er en port som bare legges til (`KILogg`, AD-7). En klasse som bare leser rådata fra fil og aldri skriver, heter `<Noe>kilde` (`SnapshotKilde`). *Endret 2026-09-24: her sto «`<Datasett>lager` (skriver) eller `<Datasett>kilde` (leser)», som ikke passet med `Kursleser` og `KILogg`.* |
-| Symbol mot ticker | `symbol` er NewsWeb-formen (`EQNR`), `ticker` er EODHD-formen (`EQNR.OL`). De blandes aldri; `Aksje` er raden som binder dem |
+| Symbol mot ticker | `symbol` er NewsWeb-formen (`EQNR`), `ticker` er EODHD-formen (`EQNR.OL`). De blandes aldri; `Aksje` er raden som binder dem. *Lagt til 2026-09-27 (story 1.9):* tabellen `aksje` har den samme raden, og `kurs`, `kursserie` og `vurdering` bruker `symbol` (AD-21) |
 | Datoer | En børsdato er `datetime.date` inne i systemet (`Kursrad.dato`) og `YYYY-MM-DD` som tekst ved grensene — JSON, SQLite, filnavn. Adapteren oversetter. *Endret 2026-09-23: raden sa «som tekst» uten begrunnelse, og en `date` kan ikke være feil formatert.* En børsdato er en **norsk** kalenderdato (AD-20); et tidsstempel er ISO 8601 med UTC-offset. Datoen i et filnavn er dataenes dag — aldri filens mtime |
 | Kursrader | `Kursrad` med norske felt (AD-19). Kildens feltnavn stopper i adapteren |
 | Kurs | Beregning bruker `adjusted_close` (FR-701). Markedsoversikten viser `close`. Forskjellen er tilsiktet og dokumentert |
@@ -418,8 +427,8 @@ G74-lund-osen/
 | Markedsoversikt (FR-101..103) | `markedsoversikt.py` | AD-1, AD-3 |
 | Aksjedetalj og graf (FR-201..204) | `aksjedetalj.py`, `graf.py` | AD-1, AD-3 |
 | Henting og kvote (FR-401..405) | `fetch_prices.py` | AD-2, AD-5, AD-10, AD-15 |
-| To lagre (FR-406) | `lagring_sqlite.py`, `data/raa/` | AD-5, AD-6, AD-11 |
-| Dagens vurdering (FR-408) og de tre tilstandene (FR-409) | `Vurderingslager`, skrevet av hentekommandoen. Tilstandene leses av `tilstand.py` | AD-3, AD-7, AD-16, AD-17, AD-18, AD-20 |
+| To lagre (FR-406) | `lagring_sqlite.py`, `data/raa/` | AD-5, AD-6, AD-11, AD-21 |
+| Dagens vurdering (FR-408) og de tre tilstandene (FR-409) | `Vurderingslager`, skrevet av hentekommandoen. Tilstandene leses av `tilstand.py` | AD-3, AD-7, AD-16, AD-17, AD-18, AD-20, AD-21 |
 | Meldingsfilter (FR-501..503) | `meldinger.py` | AD-1, AD-14 |
 | Utbyttemerking (FR-407) | *ikke plassert* | AD-4 — **kilde ikke valgt**, se åpent punkt 4 |
 | Kommende hendelser (FR-301..303) | *finnes ikke* | **Ingen** — se Deferred |
@@ -439,4 +448,4 @@ G74-lund-osen/
 | **FR-301..303, kommende hendelser** | Hele PRD §4.3 var taus i første utkast av denne spinen. Det er en **tredje nettkilde** (Euronexts finanskalender) og et eid datasett uten port. `app.py` sier selv at «kommende hendelser mangler med vilje» — de ligger bak åpent punkt 1 og 12 *(rettet 2026-09-27: her sto «1, 3 og 12». Punkt 3 gjelder hvilke dager børsen er åpen, ikke finanskalenderen)*. Får sin port og sin AD når kilden er avklart, og **ikke før**. Står med vilje ikke i frontmatterens `binds` før en AD binder dem |
 | **Hvem kjører migrasjonene, og når** | AD-16 sier at de finnes, ikke hvem som anvender dem. Med to `docker run`-varianter (AD-10) er både web, henting og en tredje kommando forsvarlige svar. Avgjøres når Dockerfilen skrives. **Merk at en egen migrasjonskommando bryter suksessmålet «Drift»**, som krever at én kommando gjør hele hentingen — se `prd.md` §7 |
 | **Kjøremåte i containeren** | `app.py` har ingen WSGI-oppføring, og de flate importene virker i dag bare via `pythonpath = ["src"]` i pytest-konfigurasjonen. Begge må løses i Dockerfile-storyen |
-| **Skjemaendring på et uerstattelig lager** | SQLite krever `DROP TABLE` for de fleste formendringer. AD-7 forbyr sletting gjennom porten, men sier ikke om en migrasjon er unntatt. Må avgjøres før første migrasjon som rører `vurdering`. *Utsatt videre 2026-09-27 (story 1.6):* `0002` er formet så de to endringene vi vet om, ikke krever ombygging. En ny grunn er en `INSERT INTO grunn`, og «Relevante meldinger» (FR-408) kommer som en kolonne som kan være tom (`ALTER TABLE vurdering ADD COLUMN`), der `NULL` betyr «ikke registrert». Begge er prøvd i minnet. Verdiene kontrolleres i porten, ikke i en `CHECK`, fordi en ny regel i en `CHECK` krever ombygging. Spørsmålet står åpent for alle andre formendringer |
+| **Skjemaendring på et uerstattelig lager** | SQLite krever `DROP TABLE` for de fleste formendringer. AD-7 forbyr sletting gjennom porten, men sier ikke om en migrasjon er unntatt. Må avgjøres før første migrasjon som rører `vurdering`. *Utsatt videre 2026-09-27 (story 1.6):* `0002` er formet så de to endringene vi vet om, ikke krever ombygging. En ny grunn er en `INSERT INTO grunn`, og «Relevante meldinger» (FR-408) kommer som en kolonne som kan være tom (`ALTER TABLE vurdering ADD COLUMN`), der `NULL` betyr «ikke registrert». Begge er prøvd i minnet. Verdiene kontrolleres i porten, ikke i en `CHECK`, fordi en ny regel i en `CHECK` krever ombygging. Spørsmålet står åpent for alle andre formendringer. *2026-09-27 (story 1.9):* `0003` rører ikke formen på `vurdering`; koblingen til `aksje` er triggere (AD-21). Spørsmålet står fortsatt åpent |
