@@ -345,7 +345,7 @@ papirarbeid og en port, og de trengs i både plan A og plan B.
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
 løsningen om EQNR for to uker siden?» får et svar. *Rettet 2026-09-24:* i v1
 er historikken lagret, men ikke besvarbar. Hvordan spørsmålet skal kunne
-stilles, er åpent punkt 20 i `prd.md`.
+stilles, er åpent punkt 20 i `prd.md`. *Avgjort 2026-09-27:* historikken vises i aksjedetaljen, story 2.7 i Epic 2, fordi den trenger at webserveren leser basen (2.2) og at vurderingen skrives (2.5).
 
 **FR-er:** FR-406, FR-408, FR-409 · **NFR-07** · **AD-er:** 3, 4, 5, 6, 7, 16, 17, 18, 19
 

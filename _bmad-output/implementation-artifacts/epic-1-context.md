@@ -14,7 +14,7 @@ av `Kurslager` er lukket i 1.4c. I/O i portmodulen `kursdata.py` er lukket i 1.5
 2026-09-27:* `Vurderingslager` er bygget i 1.6 (flettet i `7dc8a48`, PR #8).
 Det som står igjen i epicen, er 1.8 og 1.9. I v1 blir historikken lagret, men ikke
 besvarbar. Hvordan spørsmålet om hva løsningen sa en tidligere dag skal kunne
-stilles, er et åpent punkt med frist før demonstrasjonen.
+stilles, er et åpent punkt med frist før demonstrasjonen. *Avgjort 2026-09-27:* historikken vises i aksjedetaljen, story 2.7 i Epic 2, fordi den trenger at webserveren leser basen (2.2) og at vurderingen skrives (2.5).
 
 ## Stories
 
