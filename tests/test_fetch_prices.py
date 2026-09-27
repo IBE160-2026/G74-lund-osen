@@ -248,8 +248,8 @@ class TestHentUniverset:
 
         resultat = fp.hent_universet("noekkel", "2025-09-22", "2026-09-21", hent, lambda _: None)
 
-        assert resultat.kall_brukt == 15
-        assert len(kall) == 15
+        assert resultat.kall_brukt == len(AKSJEUNIVERS)
+        assert len(kall) == len(AKSJEUNIVERS)
         assert kall == [aksje.ticker for aksje in AKSJEUNIVERS]
 
     def test_henter_alle_femten_og_ikke_de_fem_gamle(self):
@@ -261,7 +261,7 @@ class TestHentUniverset:
             lambda _: None,
         )
 
-        assert len(hentet) == 15
+        assert len(hentet) == len(AKSJEUNIVERS)
         assert "MPCC.OL" in hentet
         assert "SALM.OL" in hentet
 
@@ -293,7 +293,7 @@ class TestHentUniverset:
         assert "DNB" in resultat.feil
         assert "HTTP 500" in resultat.feil["DNB"]
         assert NOEKKEL not in resultat.feil["DNB"]
-        assert len(resultat.serier) == 14
+        assert len(resultat.serier) == len(AKSJEUNIVERS) - 1
 
     def test_feilet_symbol_teller_som_brukt_kall(self):
         """Kallet er brukt selv om svaret var ubrukelig. Kvoten maa stemme."""
@@ -303,7 +303,7 @@ class TestHentUniverset:
 
         resultat = fp.hent_universet("noekkel", "a", "b", hent, lambda _: None)
 
-        assert resultat.kall_brukt == 15
+        assert resultat.kall_brukt == len(AKSJEUNIVERS)
         assert resultat.serier == {}
 
     def test_feilet_symbol_proeves_ikke_paa_nytt(self):
@@ -425,4 +425,4 @@ def test_ingen_test_her_roerer_nettet(monkeypatch):
     resultat = fp.hent_universet(
         "noekkel", "a", "b", lambda *_: falsk_serie(), lambda _: None
     )
-    assert resultat.kall_brukt == 15
+    assert resultat.kall_brukt == len(AKSJEUNIVERS)
