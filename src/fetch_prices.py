@@ -12,7 +12,7 @@ kan regnes. Aa hente kort ville derfor kostet like mye og gitt en tom
 signalkolonne.
 
 Resultatet skrives som et tidsstemplet oeyeblikksbilde som aldri skrives om
-(FR-406, NFR-07), i samme format som lagring_fil.SnapshotKilde leser.
+(FR-406, NFR-07), i formatet visningen leser gjennom lagring_fil.SnapshotLeser.
 """
 
 import json
@@ -171,7 +171,8 @@ def hent_universet(
 
 
 def lag_oyeblikksbilde(resultat: Resultat, fra: str, til: str, naa: str) -> dict:
-    """Formatet lagring_fil.SnapshotKilde leser. Skrives aldri om etterpaa."""
+    """Formatet visningen leser gjennom lagring_fil.SnapshotLeser. Skrives
+    aldri om etterpaa."""
     return {
         "hentet": naa,
         "from": fra,
