@@ -2,7 +2,7 @@
 title: "Kodegjennomgang av Epic 1"
 status: done
 created: 2026-09-27
-updated: 2026-09-27T22:06
+updated: 2026-09-28T00:28
 ---
 
 # Kodegjennomgang av Epic 1
@@ -184,3 +184,22 @@ Talt fra radene i del A og del B:
   A-AA7 (G5) og A-BH10 (G8). Det er 8.
 - Venter: A-BH2 (G10) og A-BH1 (G11) på 2.5, og B-VG2 (G12) på 2.1. Det er 3.
 - Sum: 22 + 7 + 2 + 19 + 8 + 3 = 61.
+
+## Etter rettingene
+
+*2026-09-28.* Punkt 22 i `prd.md` §8 er fulgt opp for Epic 1. Story 1.8 (`5c316e8`,
+PR #10) rettet G1–G5 og G8, og story 1.9 (`cfe2977`, PR #11) løste G10 i basen
+(AD-21). Begge ble gjennomgått i sin egen PR med tre lag: Blind Hunter, Edge
+Case Hunter og Verification Gap. Det som venter, står i en story: G9 i 4.0, G11
+i 2.5 og G12 i 2.1.
+
+Tellingen etter rettingene, talt fra tellingen etter beslutningen:
+
+- Kjent fra før: 22.
+- Samme sak som et annet funn i denne runden: 7.
+- `false`: 2.
+- Avvist: 19.
+- Rettet i 1.8: 8.
+- Løst i 1.9: A-BH2 (G10). Det er 1.
+- Venter: A-BH1 (G11) på 2.5 og B-VG2 (G12) på 2.1. Det er 2.
+- Sum: 22 + 7 + 2 + 19 + 8 + 1 + 2 = 61.

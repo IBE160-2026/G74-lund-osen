@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-27T22:17
+updated: 2026-09-28T00:28
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1168,7 +1168,7 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 | 13 | **Datoer for demonstrasjon og prosjektinnlevering.** Spørsmål sendt faglærer i Teams 2026-09-22, sammen med spørsmål om leveranselista er fullstendig og om noen BMAD-dokumenter skal leveres inn. **Besvart av hjelpelærer 2026-09-23: ingen dato finnes ennå** — «Bård Inge vil presisere dette». Fire av de åtte suksessmålene i §7 er bundet til disse datoene (*rettet 2026-09-24: her sto «Åtte suksessmål»*), og «est. uke 45» er vår egen estimering — ikke en oppgitt dato. Se `docs/innlevering.md` | Marian | **Avventer Bård Inge** (spurt 22.09, besvart 23.09) |
 | 15 | **Plassér kategoriene som havnet i «ukjent»** i riktig bøtte. Krever en ukes drift for å vite hvilke som faktisk dukker opp | | Etter én ukes drift |
 | 21 | **Hva er emnesidens tredje del?** Emnesiden sier «tre deler», men lister to, og nevner at «delvurdering 3 gir anledning til å demonstrere unike bidrag». Hva den tredje delen er, er ikke oppgitt. Spørres Bård Inge sammen med datoene i punkt 13. Se `docs/innlevering.md`, «Eksamen» | Marian | Sammen med punkt 13 |
-| 22 | **Kodegjennomgang som BMAD-steg, én per epic.** `bmad-code-review` kjøres etter hver ferdige epic, første gang etter Epic 1. Emnesiden: «Dokumentasjon må vise hvordan KI ble brukt, og hvordan studentene har kvalitetssikret koden» — en gjennomgang med flere uavhengige lesere er en del av det, i tillegg til testene og mutantene. Lagt til 2026-09-23. *2026-09-24:* den første gjennomgangen ble gjort 23.09 etter story 1.1–1.3, midt i Epic 1, ikke etter den. Funnene står som forutsetninger i `epics.md` under 1.5b og 2.2. *Rettet 2026-09-26:* her sto «under 1.6 og 2.2». De ble flyttet fra 1.6 til 1.5b 24.09 (`f7e4544`). | Gruppen | Etter Epic 1 |
+| 22 | **Kodegjennomgang som BMAD-steg, én per epic.** `bmad-code-review` kjøres etter hver ferdige epic, første gang etter Epic 1. Emnesiden: «Dokumentasjon må vise hvordan KI ble brukt, og hvordan studentene har kvalitetssikret koden» — en gjennomgang med flere uavhengige lesere er en del av det, i tillegg til testene og mutantene. Lagt til 2026-09-23. *2026-09-24:* den første gjennomgangen ble gjort 23.09 etter story 1.1–1.3, midt i Epic 1, ikke etter den. Funnene står som forutsetninger i `epics.md` under 1.5b og 2.2. *Rettet 2026-09-26:* her sto «under 1.6 og 2.2». De ble flyttet fra 1.6 til 1.5b 24.09 (`f7e4544`). *2026-09-28:* gjennomgangen etter Epic 1 ble gjort 27.09 (`kodegjennomgang-epic-1.md`). Funnene er rettet i 1.8 og 1.9 eller lagt til 2.1, 2.5 og 4.0. Fristen var «Etter Epic 1». Punktet står åpent, fordi det gjelder hver epic. | Gruppen | Etter Epic 2 |
 | 25 | **Dagene Oslo Børs er stengt i 2027.** Fra 2027-01-01 reiser `innevaerende_boersdag`, og dermed `skriv`, til dagene for 2027 er ført inn (punkt 3, og BH2 i gjennomgangen av story 1.6). Når Euronext publiserer kalenderen for 2027, føres dagene inn i `STENGT` i `src/boersdag.py` og i seksjonen Handelskalenderen i `docs/kilder-og-rettigheter.md`, og 2027 legges til i `DEKKEDE_AAR`. Kalenderen for 2026 er merket «© 2025», så kalenderen for 2027 kommer trolig i høst | Marian | 2026-12-01 |
 
 ### Lukket
