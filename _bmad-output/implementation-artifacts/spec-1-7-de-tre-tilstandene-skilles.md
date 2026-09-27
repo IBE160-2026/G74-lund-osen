@@ -2,7 +2,7 @@
 title: 'Story 1.7: De tre tilstandene skilles'
 type: 'feature'
 created: '2026-09-27'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '6c325a2cc90e6cf0e59385dd7735e395f315290d'
