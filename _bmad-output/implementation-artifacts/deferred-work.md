@@ -39,3 +39,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-6-vurderingslager-med-datoavvisning.md`
   summary: En kjoering som gaar over midnatt i Oslo, faar ValueError fra skriv for resten av symbolene, fordi klokka leses ved hvert kall og datoen er fast for kjoeringen. Symbolene som alt er skrevet, staar, mens resten faar verken vurdering eller grunn.
   evidence: Funnet i gjennomgangen av 1.6 (triageloggen, BH2). Oppfoerselen er AD-7 slik den er vedtatt: en dato som ikke er inneveerende boersdag, avvises. Story 2.5 er kalleren og maa si hva som skjer da, for eksempel at kjoeringen stopper og sier fra, eller at datoen regnes paa nytt og kursen kontrolleres mot den (FR-402).
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-9-aksjene-i-basen-og-tabellene-peker-paa-dem.md`
+  summary: docs/innlevering.md (raden «Ligger i» for lagringen, linje 128) nevner bare 0001_kurs.sql, ikke 0002_vurdering.sql og 0003_aksje.sql, og status staar som «oppdatert 2026-09-23».
+  evidence: Funnet i gjennomgangen av 1.9 (triageloggen, BH11). Raden manglet 0002 alt foer 1.9, saa den er ikke skapt av storyen. Fila foerer ogsaa tilbakemeldingen fra faglaererne (regel 17), og den oppdateres samlet naar lagringsdelen er koblet til appen.
