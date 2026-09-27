@@ -110,6 +110,26 @@ G4 og G8 er kontrollert med grep: «SnapshotKilde leser» og `versjon_1` finnes 
 
 ## Review Triage Log
 
+Runde 1, 27.09: Blind Hunter (BH, 11 funn), Edge Case Hunter (ECH, 3) og Verification Gap (VG, ingen hull). Hvert funn er prøvd mot koden på `b6b9267`+1.
+
+| # | Funn | Dom | Bevis | Rute |
+|---|---|---|---|---|
+| BH1 | Docstringen i `lagring_fil.py:9–11` sier «hentekommandoen i Epic 2 oversetter …» | low | Riktig: hentingen oversetter fra 1.8, gjennom `serie_fra_eodhd` | patch |
+| BH2 | `kursrad_fra_eodhd` sier «Epic 2 bruker samme funksjon» | low | Riktig: hentingen og leseren går gjennom `serie_fra_eodhd`, og strukturtesten forbyr direkte kall | patch |
+| BH3 | Tre tomme linjer før `hent_universet` | low | Riktig (`fetch_prices.py:111–113`) | patch |
+| BH4 | Hentingen fører bare «svar med feil form», ikke grunnen | low | Riktig, men teksten er bestemt i intensjonen, og testene krever den. Grunnen kan ha kursverdier (regel 16). Kjent fra før som B-BH1 (1.4a rad 10) | avvist: kjent, og teksten er vedtatt |
+| BH5 / ECH1 | `test_raadataene_lagres_uendret` sammenligner med de samme objektene, så en endring på stedet slipper gjennom | low | Riktig. Prøvd: en henting som snur rådataene på stedet, besto før rettingen | patch: `copy.deepcopy` og en usortert serie. Mutanten feiler nå |
+| BH6 | Den tomme serien prøves ikke gjennom `kjoer` og `nyeste_leser` | low | Riktig: lista har med vilje ikke `[]` | patch: egen test, `feil == {"DNB": "tomt svar"}` |
+| BH7 | To par i lista tester nesten det samme (`dato-uten-nuller` og `dato-2026-9-24`, `close-None` og `justert-None`) | low | Riktig, men de fem fra 27.09 skal være med etter instruksjonen. `close-None` og `justert-None` gjelder ulike felt | avvist: krevd av brukeren |
+| BH8 | G2-raden i mutanttabellen sier ikke hvilke tester, eller om `test_kursdata.py` er med | low | De 5 er i `test_fetch_prices.py`, som var det eneste som ble kjørt. Rettingen er en endring i spesifikasjonen | avvist: retter spesifikasjonen |
+| BH9 | `test_henter_alle_femten_…` heter fortsatt femten | low | Riktig, men `test_kursdata.py:13` holder universet på 15, så med en 16. aksje feiler den testen uansett | avvist: navnet står |
+| BH10 | «Mutant 1» og «mutant 2» i Hendelse kan forveksles med M1 og M2 | low | Retter spesifikasjonen | avvist: retter spesifikasjonen |
+| BH11 | Samme `Sjekk`-tuppel bygges to ganger i `test_styrken_er_den_finn_styrke_gir` | low | Riktig | patch: bygges én gang |
+| ECH2 | Utskriftstesten bruker en stigende serie, så siste rå rad og siste oversatte rad er like | low | Riktig. Prøvd: `rader[-1]` i utskriften besto testen før rettingen (bare strengvakten feilet) | patch: serien snus. Mutanten feiler nå |
+| ECH3 | AD-19 sier at EODHDs feltnavn bare står i `eodhd.py`, men parametrene i kallet står i `fetch_prices.py` | low | Riktig om parametrene. Strengvakten gjelder radenes felt | patch: «feltnavn for radene», og at parametrene står i `fetch_prices.py` |
+
+Ingen `intent_gap`, `bad_spec` eller `defer`. Tester etter rettingene: 816.
+
 ## Verification
 
 **Commands:**
