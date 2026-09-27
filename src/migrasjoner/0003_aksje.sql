@@ -8,6 +8,20 @@
 --
 -- symbol er formen NewsWeb bruker (EQNR), ticker formen EODHD bruker
 -- (EQNR.OL). kurs, kursserie og vurdering bruker symbol.
+--
+-- De tre tabellene peker paa aksje med triggere, ikke fremmednoekler, av
+-- tre grunner. SQLite haandhever fremmednoekler bare naar tilkoblingen har
+-- slaatt dem paa, og en trigger virker alltid (samme grunn som i 0002).
+-- PRAGMA foreign_keys = ON gjoer ingenting inne i en transaksjon, og
+-- loeperen kjoerer hver migrasjon i BEGIN IMMEDIATE. Og ALTER TABLE kan ikke
+-- legge en fremmednoekkel paa en kolonne som finnes: kurs, kursserie og
+-- vurdering maatte blitt bygget om, og vurdering er uerstattelig (AD-7).
+--
+-- Triggerne bruker NOT EXISTS, ikke NOT IN. NULL NOT IN (...) er NULL, og
+-- da slaar triggeren ikke til. kursserie.symbol er en TEXT PRIMARY KEY, som
+-- i SQLite kan vaere NULL.
+--
+-- vurdering peker paa aksje, aldri paa kurs (AD-18).
 
 CREATE TABLE aksje (
     symbol TEXT PRIMARY KEY NOT NULL,
@@ -32,3 +46,45 @@ INSERT INTO aksje (symbol, ticker, navn, sektor) VALUES
     ('GJF', 'GJF.OL', 'Gjensidige Forsikring', 'Finans'),
     ('DNO', 'DNO.OL', 'DNO', 'Energi'),
     ('MPCC', 'MPCC.OL', 'MPC Container Ships', 'Shipping');
+
+CREATE TRIGGER kurs_kjent_aksje_insert
+BEFORE INSERT ON kurs
+WHEN NOT EXISTS (SELECT 1 FROM aksje WHERE symbol = NEW.symbol)
+BEGIN
+    SELECT RAISE(ABORT, 'ukjent aksje i kurs');
+END;
+
+CREATE TRIGGER kurs_kjent_aksje_update
+BEFORE UPDATE OF symbol ON kurs
+WHEN NOT EXISTS (SELECT 1 FROM aksje WHERE symbol = NEW.symbol)
+BEGIN
+    SELECT RAISE(ABORT, 'ukjent aksje i kurs');
+END;
+
+CREATE TRIGGER kursserie_kjent_aksje_insert
+BEFORE INSERT ON kursserie
+WHEN NOT EXISTS (SELECT 1 FROM aksje WHERE symbol = NEW.symbol)
+BEGIN
+    SELECT RAISE(ABORT, 'ukjent aksje i kursserie');
+END;
+
+CREATE TRIGGER kursserie_kjent_aksje_update
+BEFORE UPDATE OF symbol ON kursserie
+WHEN NOT EXISTS (SELECT 1 FROM aksje WHERE symbol = NEW.symbol)
+BEGIN
+    SELECT RAISE(ABORT, 'ukjent aksje i kursserie');
+END;
+
+CREATE TRIGGER vurdering_kjent_aksje_insert
+BEFORE INSERT ON vurdering
+WHEN NOT EXISTS (SELECT 1 FROM aksje WHERE symbol = NEW.symbol)
+BEGIN
+    SELECT RAISE(ABORT, 'ukjent aksje i vurdering');
+END;
+
+CREATE TRIGGER vurdering_kjent_aksje_update
+BEFORE UPDATE OF symbol ON vurdering
+WHEN NOT EXISTS (SELECT 1 FROM aksje WHERE symbol = NEW.symbol)
+BEGIN
+    SELECT RAISE(ABORT, 'ukjent aksje i vurdering');
+END;

@@ -56,3 +56,67 @@ class TestTabellen:
     def test_kolonnene_er_feltene_i_aksje(self, ny):
         kolonner = [rad[1] for rad in ny.execute("PRAGMA table_info(aksje)")]
         assert kolonner == [f.name for f in dataclasses.fields(AKSJEUNIVERS[0])]
+
+
+# En gyldig rad per tabell, med symbolet som parameter. Verdiene er oppdiktet.
+RAD = {
+    "kurs": (
+        "INSERT INTO kurs (symbol, dato, slutt, justert_slutt, volum) "
+        "VALUES (?, '2026-09-23', 1.0, 1.0, 1)"
+    ),
+    "kursserie": (
+        "INSERT INTO kursserie (symbol, hentet) VALUES (?, '2026-09-23T16:00:00+00:00')"
+    ),
+    "vurdering": (
+        "INSERT INTO vurdering (symbol, dato, grunn) VALUES (?, '2026-09-23', 'symbol_feilet')"
+    ),
+}
+TABELLER = list(RAD)
+UKJENTE = ["EQNR.OL", "eqnr", "XXX", "", " EQNR"]
+
+
+def antall(tilkobling, tabell: str) -> int:
+    return tilkobling.execute(f"SELECT count(*) FROM {tabell}").fetchone()[0]
+
+
+class TestBasenAvviserUkjentAksje:
+    """G10: basen selv avviser et symbol som ikke staar i aksje, paa en ny
+    tilkobling uten noe slaatt paa. Ville feilet hvis porten var eneste vakt."""
+
+    def test_tilkoblingen_har_ikke_slaatt_paa_fremmednoekler(self, ny):
+        assert ny.execute("PRAGMA foreign_keys").fetchone()[0] == 0
+
+    @pytest.mark.parametrize("tabell", TABELLER)
+    def test_kjent_aksje_godtas(self, ny, tabell):
+        ny.execute(RAD[tabell], ("EQNR",))
+        ny.commit()
+        assert antall(ny, tabell) == 1
+
+    @pytest.mark.parametrize("symbol", UKJENTE)
+    @pytest.mark.parametrize("tabell", TABELLER)
+    def test_ukjent_aksje_avvises_ved_insert(self, ny, tabell, symbol):
+        with pytest.raises(sqlite3.IntegrityError, match=f"ukjent aksje i {tabell}"):
+            ny.execute(RAD[tabell], (symbol,))
+        assert antall(ny, tabell) == 0
+
+    def test_null_avvises_i_kursserie(self, ny):
+        """kursserie.symbol er TEXT PRIMARY KEY uten NOT NULL. Med NOT IN i
+        triggeren ville NULL sluppet gjennom."""
+        with pytest.raises(sqlite3.IntegrityError, match="ukjent aksje i kursserie"):
+            ny.execute(RAD["kursserie"], (None,))
+        assert antall(ny, "kursserie") == 0
+
+    @pytest.mark.parametrize("tabell", TABELLER)
+    def test_symbol_kan_ikke_endres_til_ukjent_aksje(self, ny, tabell):
+        ny.execute(RAD[tabell], ("EQNR",))
+        ny.commit()
+        with pytest.raises(sqlite3.IntegrityError, match=f"ukjent aksje i {tabell}"):
+            ny.execute(f"UPDATE {tabell} SET symbol = 'EQNR.OL'")
+        assert ny.execute(f"SELECT symbol FROM {tabell}").fetchall() == [("EQNR",)]
+
+    @pytest.mark.parametrize("tabell", TABELLER)
+    def test_symbol_kan_endres_til_en_annen_kjent_aksje(self, ny, tabell):
+        """Triggeren sjekker det nye symbolet, ikke at det staar stille."""
+        ny.execute(RAD[tabell], ("EQNR",))
+        ny.execute(f"UPDATE {tabell} SET symbol = 'DNB'")
+        assert ny.execute(f"SELECT symbol FROM {tabell}").fetchall() == [("DNB",)]
