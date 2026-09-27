@@ -7,9 +7,9 @@ kjoeres.
 Inneveerende boersdag er siste boersdag paa eller foer dagens dato i
 Europe/Oslo. En boersdag er mandag-fredag som ikke staar i STENGT. Halve
 handelsdager er boersdager. Dagens dato i Oslo regnes av norsk_dato, fra et
-tidspunkt med sone. Brukes av Vurderingslager (FR-408, AD-7), og
-senere av de tre tilstandene (1.7, FR-409) og kontrollen mot forventet
-boersdag (2.3, FR-402).
+tidspunkt med sone. er_boersdag sier om en gitt dag var boersdag.
+Brukes av Vurderingslager (FR-408, AD-7) og de tre tilstandene i tilstand.py
+(1.7, FR-409), og senere av kontrollen mot forventet boersdag (2.3, FR-402).
 """
 
 from datetime import date, datetime, timedelta
@@ -71,6 +71,23 @@ def innevaerende_boersdag(dag: date) -> date:
         if oppslag.weekday() < 5 and oppslag not in STENGT:
             return oppslag
         oppslag -= timedelta(days=1)
+
+
+def er_boersdag(dag: date) -> bool:
+    """Om dag er en boersdag: mandag-fredag som ikke staar i STENGT.
+
+    Story 1.7, FR-409. Samme liste som inneveerende_boersdag, ingen ny. Reiser
+    UtenforKalenderen bare naar dag selv ligger utenfor DEKKEDE_AAR, fordi
+    ingen annen dag slaas opp. 2026-01-01 gir False og reiser ikke.
+    """
+    if not isinstance(dag, date) or isinstance(dag, datetime):
+        raise TypeError(f"dag maa vaere datetime.date, fikk {dag!r}")
+    if dag.year not in DEKKEDE_AAR:
+        raise UtenforKalenderen(
+            f"{dag.isoformat()}: lista over stengte dager dekker bare "
+            f"{sorted(DEKKEDE_AAR)}"
+        )
+    return dag.weekday() < 5 and dag not in STENGT
 
 
 def norsk_dato(oeyeblikk: datetime) -> date:
