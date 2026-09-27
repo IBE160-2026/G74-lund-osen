@@ -11,13 +11,19 @@ nyttaar, og halvdagen foer paaske.
 """
 
 import re
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timezone, tzinfo
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import pytest
 
-from boersdag import STENGT, UtenforKalenderen, innevaerende_boersdag, norsk_dato
+from boersdag import (
+    DEKKEDE_AAR,
+    STENGT,
+    UtenforKalenderen,
+    innevaerende_boersdag,
+    norsk_dato,
+)
 
 KILDER = Path(__file__).resolve().parent.parent / "docs" / "kilder-og-rettigheter.md"
 
@@ -55,6 +61,17 @@ class TestInnevaerendeBoersdag:
     def test_julaften_juledag_og_nyttaarsaften_er_stengt(self, dag, forventet):
         assert innevaerende_boersdag(dag) == forventet
 
+    @pytest.mark.parametrize(
+        ("dag", "forventet"),
+        [
+            (date(2026, 5, 1), date(2026, 4, 30)),
+            (date(2026, 5, 14), date(2026, 5, 13)),
+            (date(2026, 5, 25), date(2026, 5, 22)),
+        ],
+    )
+    def test_1_mai_kristi_himmelfart_og_2_pinsedag_er_stengt(self, dag, forventet):
+        assert innevaerende_boersdag(dag) == forventet
+
     def test_1_januar_2026_krever_2025_og_reiser(self):
         """Nyttaarsdag er stengt, og dagen foer ligger i 2025, som lista ikke
         dekker. Uten vakten ville funksjonen svart 2025-12-31 uten aa vite det."""
@@ -85,20 +102,21 @@ class TestInnevaerendeBoersdag:
 class TestStengteDager:
     def test_lista_er_de_ti_datoene_i_kilder_og_rettigheter(self):
         """Lista i koden og lista i seksjonen Handelskalenderen skal ikke gli
-        fra hverandre. Den ene er ført for haand fra den andre."""
+        fra hverandre. Den ene er foert for haand fra den andre."""
         tekst = KILDER.read_text(encoding="utf-8")
         seksjon = tekst.split("## Handelskalenderen", 1)[1].split("\n## ", 1)[0]
-        linje = next(l for l in seksjon.splitlines() if l.startswith("Stengt i 2026"))
-        # Bare foerste setning. Neste setning paa samme linje nevner halvdagen
-        # 2026-04-01, som er boersdag.
-        linje = linje.split(". ", 1)[0]
-        dokumentert = {date.fromisoformat(d) for d in re.findall(r"\d{4}-\d{2}-\d{2}", linje)}
+        # Setningen kan brytes over flere linjer. Bare foerste setning teller:
+        # neste nevner halvdagen 2026-04-01, som er boersdag.
+        setning = " ".join(seksjon.split()).split("Stengt i 2026", 1)[1].split(". ", 1)[0]
+        dokumentert = {date.fromisoformat(d) for d in re.findall(r"\d{4}-\d{2}-\d{2}", setning)}
 
         assert len(dokumentert) == 10
         assert STENGT == dokumentert
 
-    def test_alle_stengte_dager_er_hverdager_i_2026(self):
-        assert all(dag.year == 2026 and dag.weekday() < 5 for dag in STENGT)
+    def test_alle_stengte_dager_er_hverdager_i_et_dekket_aar(self):
+        """Lista og aarene den dekker, skal ikke gli fra hverandre."""
+        assert all(dag.year in DEKKEDE_AAR and dag.weekday() < 5 for dag in STENGT)
+        assert {dag.year for dag in STENGT} == DEKKEDE_AAR
 
 
 class TestNorskDato:
@@ -118,6 +136,20 @@ class TestNorskDato:
         """Uten sone vet ingen hvilken dag det er i Oslo."""
         with pytest.raises(ValueError, match="tidssone"):
             norsk_dato(datetime(2026, 9, 25, 0, 30))
+
+    def test_sone_uten_forskyvning_avvises(self):
+        """En tzinfo som svarer None paa utcoffset, ville astimezone lest som
+        maskinens lokale tid. Da avhenger datoen av maskinen."""
+
+        class UtenForskyvning(tzinfo):
+            def utcoffset(self, dt):
+                return None
+
+            def dst(self, dt):
+                return None
+
+        with pytest.raises(ValueError, match="tidssone"):
+            norsk_dato(datetime(2026, 9, 25, 0, 30, tzinfo=UtenForskyvning()))
 
     def test_dato_avvises_som_tidspunkt(self):
         with pytest.raises(TypeError):

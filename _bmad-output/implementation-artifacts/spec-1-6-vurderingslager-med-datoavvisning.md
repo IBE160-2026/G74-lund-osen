@@ -2,7 +2,7 @@
 title: 'Story 1.6: Vurderingslager med datoavvisning'
 type: 'feature'
 created: '2026-09-27'
-status: 'ready-for-dev'
+status: 'in-progress'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '7dec7410151bc695e6c48e77b4d623d877cec9eb'
@@ -87,9 +87,9 @@ context:
 ## Tasks & Acceptance
 
 **Del 1, børsdagene:**
-- [ ] `src/boersdag.py` -- `STENGT`, `innevaerende_boersdag`, `norsk_dato` og `UtenforKalenderen(ValueError)`.
-- [ ] `tests/test_boersdag.py` -- matrisen over, med 2026-01-02, pluss at `STENGT` er de ti datoene og at `datetime` avvises som dag. `norsk_dato` prøves 00:30 i både sommertid og vintertid.
-- [ ] `tests/test_konsumentene.py` -- `boersdag.py` i `KJERNEMODULER`.
+- [x] `src/boersdag.py` -- `STENGT`, `innevaerende_boersdag`, `norsk_dato` og `UtenforKalenderen(ValueError)`.
+- [x] `tests/test_boersdag.py` -- matrisen over, med 2026-01-02, pluss at `STENGT` er de ti datoene og at `datetime` avvises som dag. `norsk_dato` prøves 00:30 i både sommertid og vintertid.
+- [x] `tests/test_konsumentene.py` -- `boersdag.py` i `KJERNEMODULER`.
 
 **Del 2, lageret:**
 - [ ] `src/migrasjoner/0002_vurdering.sql` -- `grunn` med tre rader, `vurdering` med `PRIMARY KEY (symbol, dato)`, enten/eller-`CHECK` over alle sju vurderingsfeltene og to triggere.
@@ -106,9 +106,48 @@ context:
 
 ## Implementation Notes
 
+**Del 1, børsdagene, 27.09.** Bygget direkte i økta, ikke av en egen implementeringsagent, fordi instruksjonen kl. 15:13 krevde at bare del 1 ble bygget, med gjennomgang og stopp etterpå, og at mutantene ble lagt inn én om gangen. Grenen `1-6` fra `b6de297`, commit `d9d31ac`.
+
+- **Tester:** 468 før, 497 etter `d9d31ac`: 26 nye i `tests/test_boersdag.py` og 3 nye i `tests/test_konsumentene.py`, fordi `KJERNEMODULER` også går inn i de to vaktene mot EODHDs feltnavn. *Rettet 27.09 etter gjennomgangen (BH3):* her sto «28 nye … og 1 ny». 501 etter rettingene fra gjennomgangen: 4 nye, 3 for 1. mai, Kristi himmelfart og 2. pinsedag og 1 for en sone uten forskyvning.
+- **Mot koden uten modulen:** `tests/test_boersdag.py` feilet ved innsamlingen med `ModuleNotFoundError`, som ventet.
+- **Lista i koden og lista i dokumentet:** testen leser linjen «Stengt i 2026 …» i seksjonen Handelskalenderen i `docs/kilder-og-rettigheter.md`. Første versjon talte 11 datoer, fordi neste setning på samme linje nevner halvdagen 2026-04-01. Testen leser nå bare første setning.
+- **Mutanter, én om gangen, mot hele testsettet, med `git checkout` mellom hver:**
+  - B1, 2026-04-06 fjernet fra `STENGT`: påsketesten for 04-06 og testen mot dokumentet feiler
+  - B2, 2026-04-01 lagt til i `STENGT`: halvdagstesten, påsketestene og testen mot dokumentet feiler
+  - B3, årsvakten fjernet: 2026-01-01-testen og begge testene for dager utenfor 2026 feiler
+  - B4, årsvakten sjekker uka rundt nyttår: 2026-01-02-testen feiler, og 2026-01-01-testen feiler på meldingen
+  - B5, lørdag regnes som hverdag: helgetestene, påsketestene for 04-04 til 04-06 og testen for 12-26 feiler
+  - B6, datoen regnes i UTC: begge 00:30-testene og testen med tidspunkt i Oslo feiler
+  - B7, et tidspunkt godtas som dag: testen for `datetime` feiler
+
+  Ingen mutant overlevde.
+- **Etter rettingene fra gjennomgangen**, samme mutanter på nytt mot den rettede koden, pluss to nye:
+  - B8, sonevakten ser bare på `tzinfo`: testen for en sone uten forskyvning feiler
+  - B9, 2027 lagt til i `DEKKEDE_AAR` uten dagene for 2027: testen for 2027-01-04 og testen for at lista og årene stemmer, feiler
+
+  B1–B7 fanges som før, og B5 fanges nå også av testen for 2. pinsedag. Ingen mutant overlevde.
+- **Status** står som `in-progress` under gjennomgangen av del 1, ikke `in-review`, fordi del 2 gjenstår.
+
 ## Spec Change Log
 
 ## Review Triage Log
+
+Tre lag gjennomgikk del 1 den 27.09: Blind Hunter (BH), Edge Case Hunter (ECH) og Verification Gap (VG), på diffen for `src/` og `tests/` siden `baseline_commit`. Hvert funn har én rad.
+
+| # | Funn | Dom | Bevis | Rute |
+|---|---|---|---|---|
+| BH1 | Ett år om gangen: flyttes `AAR` til 2027, må 2027-01-01 slå opp 2026-12-31, og da reiser funksjonen | medium | Kommentaren sa «AAR flyttes samtidig». 2026-12-31 og 2026-12-30 ville ligget utenfor | patch: `DEKKEDE_AAR`, et sett der nye år legges til og gamle blir stående |
+| BH2 | Ingenting varsler før lista går ut, og `skriv` reiser fra 2027-01-01 | low | Riktig, men det er vedtaket i punkt 3: funksjonen reiser i stedet for å gjette, og Marian fører inn 2027 | avvist: følger av vedtaket. Meldes dere |
+| BH3 | Testtallene i Implementation Notes stemmer ikke | low | `--collect-only`: 26 i `test_boersdag.py` og 3 i `test_konsumentene.py`, ikke 28 og 1. Summen 29 stemte | rettet i notatene, med datert rettelse |
+| BH4 | Testen mot dokumentet brekker hvis avsnittet brytes over flere linjer | low | Den leste bare linjen som begynner med «Stengt i 2026» | patch: setningen leses med mellomrom slått sammen |
+| BH5 | 1. mai, Kristi himmelfart og 2. pinsedag har ingen atferdstest | low | De var bare med i sammenlikningen med dokumentet | patch: tre tilfeller |
+| BH6 | Testen for hverdager bruker 2026, ikke konstanten | medium | Samme rot som BH1 | patch: under BH1. Testen sjekker at årene i `STENGT` er `DEKKEDE_AAR` |
+| BH7 | `norsk_dato` er ikke prøvd ved sommertidsskiftet eller i en tredje sone | false | En forenkling til `.date()` eller UTC fanges av 00:30-testene (B6). Skiftet håndteres av `zoneinfo`, ikke av egen kode | avvist |
+| BH8 | Modulens docstring nevner ikke `norsk_dato`, og testfila har «ført» ved siden av «haand» | low | Spesifikasjonen nevner begge funksjonene i samme punkt, så den delen stemmer ikke. Resten stemmer | patch: docstringen og «foert» |
+| ECH1 | Flyttes årstallet før dagene for 2027 er ført inn, telles helligdagene i 2027 som børsdager | medium | Samme rot som BH1 | patch: under BH1. Mutant B9 fanges |
+| ECH2 | Testen for hverdager binder ikke `STENGT` til årstallet | medium | Samme som BH6 | patch: under BH1 |
+| ECH3 | `OverflowError` slipper ut for et tidspunkt nær `datetime.max` | low | Prøvd: gir `OverflowError`. Krever en klokke i år 9999 | avvist: lite sannsynlig, og krever en ny vakt |
+| VG1 | En `tzinfo` som svarer `None` på `utcoffset` er ikke prøvd | low | Prøvd: `astimezone` leser den da som maskinens lokale tid. Mutanten B8 overlevde før testen | patch: ny test |
 
 ## Design Notes
 

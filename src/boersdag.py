@@ -6,7 +6,8 @@ kjoeres.
 
 Inneveerende boersdag er siste boersdag paa eller foer dagens dato i
 Europe/Oslo. En boersdag er mandag-fredag som ikke staar i STENGT. Halve
-handelsdager er boersdager. Brukes av Vurderingslager (FR-408, AD-7), og
+handelsdager er boersdager. Dagens dato i Oslo regnes av norsk_dato, fra et
+tidspunkt med sone. Brukes av Vurderingslager (FR-408, AD-7), og
 senere av de tre tilstandene (1.7, FR-409) og kontrollen mot forventet
 boersdag (2.3, FR-402).
 """
@@ -16,13 +17,15 @@ from zoneinfo import ZoneInfo
 
 OSLO = ZoneInfo("Europe/Oslo")
 
-AAR = 2026
+# Aarene STENGT dekker. Et nytt aar legges til, og de gamle blir staaende:
+# 2027-01-01 er stengt og maa slaa opp 2026-12-31 og 2026-12-30.
+DEKKEDE_AAR = frozenset({2026})
 
 # Dagene Oslo Boers er stengt i 2026, alle hverdager. Foert for haand fra
 # Euronexts egen kalender, se docs/kilder-og-rettigheter.md, seksjonen
 # Handelskalenderen. 2026-04-01 er halv handelsdag og regnes som boersdag, saa
 # den staar ikke her. Dagene for 2027 foeres inn naar Euronext publiserer dem,
-# og AAR flyttes samtidig.
+# og 2027 legges til i DEKKEDE_AAR samtidig.
 STENGT = frozenset({
     date(2026, 1, 1),
     date(2026, 4, 2),
@@ -49,17 +52,17 @@ def innevaerende_boersdag(dag: date) -> date:
     """Siste boersdag paa eller foer dag.
 
     Reiser UtenforKalenderen bare naar en dag funksjonen faktisk maa slaa
-    opp, ligger utenfor AAR. 2026-01-02 er boersdag og gis tilbake, mens
+    opp, ligger utenfor DEKKEDE_AAR. 2026-01-02 er boersdag og gis tilbake, mens
     2026-01-01 er stengt og krever 2025-12-31.
     """
     if not isinstance(dag, date) or isinstance(dag, datetime):
         raise TypeError(f"dag maa vaere datetime.date, fikk {dag!r}")
     oppslag = dag
     while True:
-        if oppslag.year != AAR:
+        if oppslag.year not in DEKKEDE_AAR:
             raise UtenforKalenderen(
                 f"{dag.isoformat()} krever {oppslag.isoformat()}, og lista over "
-                f"stengte dager dekker bare {AAR}"
+                f"stengte dager dekker bare {sorted(DEKKEDE_AAR)}"
             )
         if oppslag.weekday() < 5 and oppslag not in STENGT:
             return oppslag
