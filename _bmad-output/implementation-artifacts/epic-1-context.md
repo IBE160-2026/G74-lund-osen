@@ -65,7 +65,12 @@ stilles, er et åpent punkt med frist før demonstrasjonen.
 - Om «ingen rad på en børsdag» trenger en fjerde tilstand eller en lagret grunn
   på raden, er ikke avgjort. Det må avgjøres før 1.7 (åpent punkt 24). Årsaken
   er at en kjøring før kursen er publisert, eller et symbol som feilet, også gir
-  ingen rad.
+  ingen rad. *Avgjort 2026-09-27:* en lagret grunn på raden (punkt 24 i
+  `prd.md` §8, lukket). Kan kjøringen ikke vurdere en aksje, skriver den en rad
+  med grunnen i stedet: symbolet feilet, nyeste kurs var ikke fra dagen, eller
+  signalet kunne ikke regnes. En rad med grunn skriver aldri over en rad med
+  vurdering samme dag. Svaret bestemmer formen på `vurdering`, så det gjelder
+  allerede fra 1.6.
 - Vurderingen skal etter kravet ha med relevante meldinger, men meldingsdelen er
   blokkert og kan bli strøket 28.09. Kildene sier ikke hvordan feltet skal
   håndteres i 1.6 uten meldinger.
@@ -129,11 +134,14 @@ stilles, er et åpent punkt med frist før demonstrasjonen.
   `0002` skrives. Åpent punkt 3 må være avgjort før 1.6, og åpent punkt 24
   før 1.7. *Ferdig 2026-09-26:* 1.5b er flettet i `ef1cca7` (PR #5), så
   herdingen er på plass. Punkt 3 og 24 gjenstår. *Oppdatert 2026-09-27:* punkt 3
-  er avgjort (se «Uavklart i kildene»). Punkt 24 gjenstår.
+  er avgjort (se «Uavklart i kildene»). Punkt 24 gjenstår. *Oppdatert
+  2026-09-27:* punkt 24 er også avgjort, med en rad med grunnen, og må tas
+  hensyn til i 1.6. Ingen av de to gjenstår.
 - **Epic 2 venter på Epic 1:** hentingen skriver gjennom `Kurslager`, bruker
   `kursrad_fra_eodhd` og skriver vurderingen gjennom `Vurderingslager` i samme
   kjøring (2.5). Svaret på åpent punkt 24 bestemmer hva 2.5 skriver for et
-  symbol som feilet.
+  symbol som feilet. *Avgjort 2026-09-27:* en rad med grunnen, også når nyeste
+  kurs ikke er fra dagen og når signalet ikke kan regnes.
 - **Epic 4.3** (SQLite-adapter for `KILogg`) venter på Epic 1. **Epic 5B**
   avhenger av 1.4a (`Kursleser`).
 - **Utsatt til story 3.1:** hvem som kjører migrasjonene, og når. Løperen må

@@ -826,6 +826,9 @@ har bestemt det.
 - En `vurdering` overlever `erstatt_serie` på samme symbol: kursverdiene i raden er uendret etterpå
 - `vurdering`-tabellen opprettes av en nummerert migrasjon, `0002`, slik 4.3
   har for `ki_logg` *(lagt til 2026-09-24)*
+- `vurdering` har plass til en rad med grunn i stedet for vurdering, og `skriv`
+  lar aldri en rad med grunn skrive over en rad med vurdering samme dag *(lagt
+  til 2026-09-27, punkt 24)*
 - **Ville feilet hvis:** noen la til en `oppdater`-metode «for migrasjoner», eller hvis datogrensen ble regnet i UTC — da ville en kjøring 00:30 norsk tid (22:30 UTC dagen før) skrevet på
   gårsdagen. *Rettet 2026-09-24:* her sto 23:30. Det er samme dato i UTC og
   avslører ingenting. Feilvinduet er 00:00–02:00 norsk sommertid (00:00–01:00
@@ -837,7 +840,8 @@ migrasjonsløperen og SQLite-adapteren er herdet. *Flyttet 2026-09-24:
 forutsetningene a–h sto her og er nå kontrollpunktene i 1.5b.* *Lagt til
 2026-09-26: punkt 3, som PRD-en og Epic 1-konteksten alt krever.* *Oppfylt
 2026-09-27:* punkt 3 er lukket (`prd.md` §8). Lista og funksjonen bygges i
-denne storyen.
+denne storyen. *Punkt 24 lukket 2026-09-27:* svaret bestemmer formen på
+`vurdering`, derfor før denne storyen (`prd.md` §8).
 
 **Én økt:** ja.
 
@@ -854,6 +858,9 @@ et funn om markedet.
 - En manglende rad på en børsdag leses som «kommandoen ble ikke kjørt»
 - En manglende rad på en ikke-børsdag leses som «dagen finnes ikke»
 - De tre returnerer **tre forskjellige** verdier, ikke to og en `None`
+- En rad med grunn leses som en rad: kommandoen kjørte, men kunne ikke vurdere
+  aksjen. Den leses ikke som styrke 0 og ikke som fravær *(lagt til 2026-09-27,
+  punkt 24)*
 - **Ville feilet hvis:** lageret svarte `None` både for «ikke kjørt» og «ikke børsdag». Da er de to umulige å skille, og skillet kan ikke gjenskapes i ettertid
 
 **Forutsetning** *(lagt til 2026-09-24)*: «ingen rad på en børsdag betyr at
@@ -861,7 +868,8 @@ kommandoen ikke ble kjørt» holder ikke i to tilfeller. Kommandoen kan ha kjør
 før dagens kurs var publisert (åpent punkt 23), og et symbol kan ha feilet mens
 de andre ble hentet (`AD-15`). Begge gir ingen rad, uten at det er et hull i
 driften. Ført som **åpent punkt 24** i `prd.md`, med frist før denne storyen:
-en fjerde tilstand, eller en lagret grunn.
+en fjerde tilstand, eller en lagret grunn. *Oppfylt 2026-09-27:* punkt 24 er
+lukket med en rad med grunnen (`prd.md` §8).
 
 **Én økt:** ja.
 
@@ -1015,7 +1023,8 @@ så den ikke kan regnes av en serie som er byttet ut siden.
   for det, og testen prøver det. Svaret avgjøres av åpent punkt 24 før 1.7: en
   rad med en egen tilstand, eller en rad med grunnen. Ingen rad er ikke et
   gyldig svar, fordi det da leses som at kommandoen ikke ble kjørt. *Lagt til
-  2026-09-24*
+  2026-09-24* *Avgjort 2026-09-27 (punkt 24):* en rad med grunnen. Det gjelder
+  også når nyeste kurs ikke er fra dagen, og når signalet ikke kan regnes.
 - **Ville feilet hvis:** vurderingen ble skrevet av en egen kommando. Kjøres den etter en ny henting, er grunnlaget byttet ut — og raden ville lagret hva løsningen mente om *andre* data enn de som lå der
 
 **Én økt:** ja.
