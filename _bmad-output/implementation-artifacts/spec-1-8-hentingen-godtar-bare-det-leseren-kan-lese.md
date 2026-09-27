@@ -110,7 +110,7 @@ G4 og G8 er kontrollert med grep: «SnapshotKilde leser» og `versjon_1` finnes 
 
 ## Review Triage Log
 
-Runde 1, 27.09: Blind Hunter (BH, 11 funn), Edge Case Hunter (ECH, 3) og Verification Gap (VG, ingen hull). Hvert funn er prøvd mot koden på `b6b9267`+1.
+Runde 1, 27.09: Blind Hunter (BH, 11 funn), Edge Case Hunter (ECH, 3) og Verification Gap (VG, ingen hull). Hvert funn er prøvd mot koden på `d61393d`.
 
 | # | Funn | Dom | Bevis | Rute |
 |---|---|---|---|---|
