@@ -12,7 +12,7 @@ kan regnes. Aa hente kort ville derfor kostet like mye og gitt en tom
 signalkolonne.
 
 Resultatet skrives som et tidsstemplet oeyeblikksbilde som aldri skrives om
-(FR-406, NFR-07), i samme format som lagring_fil.SnapshotKilde leser.
+(FR-406, NFR-07), i formatet visningen leser gjennom lagring_fil.SnapshotLeser.
 """
 
 import json
@@ -27,6 +27,7 @@ from urllib.parse import quote, quote_plus
 import requests
 from dotenv import load_dotenv
 
+from eodhd import UgyldigSerie, serie_fra_eodhd
 from kursdata import AKSJEUNIVERS
 from lagring_fil import DATA_KATALOG, KURSPREFIKS, PROSJEKTROT
 
@@ -109,22 +110,6 @@ def _uten_noekkel(tekst: str, api_nokkel: str) -> str:
     return tekst
 
 
-# Feltene eodhd.py leser fra hver rad.
-FELT = ("date", "close", "adjusted_close", "volume")
-
-
-def _riktig_form(rader) -> bool:
-    """En liste der hver rad er en dict med feltene eodhd.py leser, og date
-    er tekst. Formen EODHD svarer med naar alt er i orden."""
-    return isinstance(rader, list) and all(
-        isinstance(rad, dict)
-        and all(felt in rad for felt in FELT)
-        and isinstance(rad["date"], str)
-        and rad["date"]
-        for rad in rader
-    )
-
-
 def hent_universet(
     api_nokkel: str,
     fra: str,
@@ -159,25 +144,34 @@ def hent_universet(
         # Story 2.0, valg A: et svar med feil form skal ikke stoppe hele
         # hentingen etter at kallene er brukt (AD-15, NFR-03). Formen sjekkes
         # foerst, saa et tomt objekt eller None ikke fores som «tomt svar».
-        if not _riktig_form(rader):
+        # Story 1.8: formen er det SnapshotLeser kan lese, avgjort av samme
+        # funksjon. En serie leseren ville droppet, lagres ikke som hentet.
+        try:
+            serie = serie_fra_eodhd(rader)
+        except UgyldigSerie:
             resultat.feil[aksje.symbol] = "svar med feil form"
             skriv(f"  {aksje.symbol}: svar med feil form")
             continue
 
-        if not rader:
+        if not serie:
             resultat.feil[aksje.symbol] = "tomt svar"
             skriv(f"  {aksje.symbol}: ingen data")
             continue
 
+        # Raadataene lagres uendret. Oversettelsen er bare kontrollen.
         resultat.serier[aksje.symbol] = rader
-        merknad = "" if len(rader) >= MINST_HANDELSDAGER else "  ← for kort for MA50"
-        skriv(f"  {aksje.symbol}: {len(rader)} dager, siste {rader[-1]['date']}{merknad}")
+        merknad = "" if len(serie) >= MINST_HANDELSDAGER else "  ← for kort for MA50"
+        skriv(
+            f"  {aksje.symbol}: {len(serie)} dager, "
+            f"siste {serie[-1].dato.isoformat()}{merknad}"
+        )
 
     return resultat
 
 
 def lag_oyeblikksbilde(resultat: Resultat, fra: str, til: str, naa: str) -> dict:
-    """Formatet lagring_fil.SnapshotKilde leser. Skrives aldri om etterpaa."""
+    """Formatet visningen leser gjennom lagring_fil.SnapshotLeser. Skrives
+    aldri om etterpaa."""
     return {
         "hentet": naa,
         "from": fra,

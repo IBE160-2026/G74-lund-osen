@@ -20,6 +20,7 @@ from signalberegning import (
     Sjekk,
     beregn_signal,
     finn_retning,
+    finn_styrke,
     trend,
 )
 
@@ -135,6 +136,27 @@ class TestSignalstyrke:
 
         assert signal.styrke == 0
         assert signal.retning == INGEN
+
+
+class TestStyrke:
+    """Story 1.8 (G5): styrken regnes av finn_styrke, som
+    vurderingsdata.Vurdering er bundet til i test_vurderingslager.py."""
+
+    def test_styrke_er_summen_av_absoluttverdiene(self):
+        sjekker = (Sjekk("A", 1, ""), Sjekk("B", -1, ""), Sjekk("C", -1, ""))
+
+        assert finn_styrke(sjekker) == 3
+
+    @pytest.mark.parametrize("endring", [-0.03, -0.09, 0.09], ids=["blandet", "ned", "opp"])
+    def test_beregn_signal_gir_styrken_finn_styrke_gir(self, endring):
+        """Minst én av seriene har en negativ sjekk. Ellers overlever en
+        beregn_signal som summerer uten abs."""
+        kurser = stigende_kurser(endring)
+        signal = beregn_signal(serie(kurser, med_stort_volum_siste_dag(len(kurser))), KORT)
+
+        assert signal.styrke == finn_styrke(signal.sjekker)
+        if endring < 0:
+            assert any(sjekk.verdi < 0 for sjekk in signal.sjekker)
 
 
 class TestJustertKurs:

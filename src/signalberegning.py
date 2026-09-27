@@ -169,6 +169,17 @@ def interesse(kurser: list[float], volumer: list[float], p: Parametre = STANDARD
     )
 
 
+def finn_styrke(sjekker: tuple[Sjekk, ...]) -> int:
+    """Styrken er summen av absoluttverdiene til sjekkene (FR-703).
+
+    Den maaler hvor kraftig sjekkene slaar ut, ikke hvor enige de er: +1 og
+    -1 gir 2, ikke 0. Egen funksjon siden story 1.8, slik retningen har
+    finn_retning, saa en test kan binde regelen i vurderingsdata.Vurdering
+    til denne.
+    """
+    return sum(abs(sjekk.verdi) for sjekk in sjekker)
+
+
 def finn_retning(sjekker: tuple[Sjekk, ...]) -> str:
     """Retningen leses av fortegnene til de sjekkene som ga utslag (FR-704).
 
@@ -208,7 +219,7 @@ def beregn_signal(rader: list[Kursrad], p: Parametre = STANDARD) -> Signal:
         interesse(kurser, volumer, p),
     )
 
-    styrke = sum(abs(sjekk.verdi) for sjekk in sjekker)
+    styrke = finn_styrke(sjekker)
     return Signal(
         styrke=styrke,
         retning=finn_retning(sjekker),
