@@ -2,7 +2,7 @@
 title: 'Story 9.0: Fem tester sjekker det de lover'
 type: 'chore'
 created: '2026-09-27'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '6dbfcb6ab2cae2d71192f4f5015dd2256d2ca3f7'
