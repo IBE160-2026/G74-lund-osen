@@ -2,7 +2,7 @@
 title: 'Story 1.8: Hentingen godtar bare det leseren kan lese'
 type: 'bugfix'
 created: '2026-09-27'
-status: 'in-progress'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'f6d82c4adf031ab327aa8782f71a68349f24c426'
