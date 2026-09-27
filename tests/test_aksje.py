@@ -10,12 +10,18 @@ Hver test lager sin egen base, i minnet eller under tmp_path. Ingen nett (AD-8).
 
 import dataclasses
 import sqlite3
+from datetime import date, datetime, timezone
 
 import pytest
 
-from kursdata import AKSJEUNIVERS
-from lagring_sqlite import MIGRASJONSKATALOG
+from kursdata import AKSJEUNIVERS, Kursrad
+from lagring_sqlite import MIGRASJONSKATALOG, SqliteKurslager, SqliteVurderingslager
 from migrering import MigrasjonsFeil, migrer, siste_versjon, versjon
+from vurderingsdata import Vurdering
+
+HENTET = datetime(2026, 9, 23, 16, tzinfo=timezone.utc)
+# Onsdag 23.09.2026 midt paa dagen, en boersdag.
+ONSDAG = datetime(2026, 9, 23, 10, tzinfo=timezone.utc)
 
 
 @pytest.fixture
@@ -250,3 +256,77 @@ class TestBaseIVersjon2:
             ).fetchone()[0] == 0
         finally:
             tilkobling.close()
+
+
+def rad(dato: str = "2026-09-23") -> Kursrad:
+    return Kursrad(dato=date.fromisoformat(dato), slutt=1.0, justert_slutt=1.0, volum=1)
+
+
+def vurdering() -> Vurdering:
+    return Vurdering(styrke=2, retning="Positiv", trend=1, bevegelse=1, interesse=0,
+                     slutt=300.0, justert_slutt=290.0)
+
+
+class TestAdapterne:
+    """Hva adapterne gjoer naar basen avviser. G11 staar for 2.5."""
+
+    def test_kurslager_gjoer_avvisningen_om_til_valueerror(self, ny):
+        lager = SqliteKurslager(ny)
+        lager.erstatt_serie("EQNR", [rad("2026-09-22")], HENTET)
+
+        with pytest.raises(ValueError, match="EQNR.OL.*ukjent aksje i kurs"):
+            lager.erstatt_serie("EQNR.OL", [rad()], HENTET)
+
+        assert not ny.in_transaction
+        assert ny.execute("SELECT DISTINCT symbol FROM kurs").fetchall() == [("EQNR",)]
+        assert ny.execute("SELECT symbol FROM kursserie").fetchall() == [("EQNR",)]
+        assert lager.sist_hentet("EQNR.OL") is None
+
+    def test_vurderingslager_avviser_foer_sql_en(self, ny):
+        """Meldingen er portens, ikke triggerens: basen blir aldri spurt."""
+        lager = SqliteVurderingslager(ny, lambda: ONSDAG)
+        with pytest.raises(ValueError, match="ikke et symbol i AKSJEUNIVERS") as feil:
+            lager.skriv("EQNR.OL", date(2026, 9, 23), vurdering())
+        assert "ukjent aksje" not in str(feil.value)
+        assert antall(ny, "vurdering") == 0
+
+
+class TestIngenKoblingFraVurderingTilKurs:
+    """AD-18: vurdering peker paa aksje, aldri paa kurs."""
+
+    @pytest.mark.parametrize("tabell", [*TABELLER, "aksje"])
+    def test_ingen_fremmednoekler(self, ny, tabell):
+        assert ny.execute(f"PRAGMA foreign_key_list({tabell})").fetchall() == []
+
+    def test_vurdering_kan_skrives_uten_kursrader(self, ny):
+        lager = SqliteVurderingslager(ny, lambda: ONSDAG)
+        assert lager.skriv("DNB", date(2026, 9, 23), vurdering())
+        assert antall(ny, "kurs") == 0
+        assert lager.les("DNB", date(2026, 9, 23)) == vurdering()
+
+    def test_ingen_trigger_paa_vurdering_leser_kurs(self, ny):
+        triggere = ny.execute(
+            "SELECT name, sql FROM sqlite_master WHERE type = 'trigger' AND tbl_name = 'vurdering'"
+        ).fetchall()
+        assert {navn for navn, _ in triggere} == {
+            "vurdering_kjent_grunn_insert", "vurdering_kjent_grunn_update",
+            "vurdering_kjent_aksje_insert", "vurdering_kjent_aksje_update",
+        }
+        for _, sql in triggere:
+            assert "kurs" not in sql.replace("kursserie", "")
+
+
+class TestEnSpoerring:
+    """Storyen: historikken kan hentes sammen med aksjen i en spoerring."""
+
+    def test_vurderingen_hentes_med_navnet_fra_aksje(self, ny):
+        SqliteVurderingslager(ny, lambda: ONSDAG).skriv("EQNR", date(2026, 9, 23), vurdering())
+
+        rader = ny.execute(
+            "SELECT a.navn, a.sektor, v.dato, v.styrke, v.retning "
+            "FROM vurdering v JOIN aksje a USING (symbol) "
+            "WHERE v.symbol = ? ORDER BY v.dato",
+            ("EQNR",),
+        ).fetchall()
+
+        assert rader == [("Equinor", "Energi", "2026-09-23", 2, "Positiv")]
