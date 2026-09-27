@@ -2,7 +2,7 @@
 title: 'Story 1.6: Vurderingslager med datoavvisning'
 type: 'feature'
 created: '2026-09-27'
-status: 'in-progress'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '7dec7410151bc695e6c48e77b4d623d877cec9eb'
@@ -92,12 +92,12 @@ context:
 - [x] `tests/test_konsumentene.py` -- `boersdag.py` i `KJERNEMODULER`.
 
 **Del 2, lageret:**
-- [ ] `src/migrasjoner/0002_vurdering.sql` -- `grunn` med tre rader, `vurdering` med `PRIMARY KEY (symbol, dato)`, enten/eller-`CHECK` over alle sju vurderingsfeltene og to triggere.
-- [ ] `src/vurderingsdata.py` -- `Vurdering`, `Grunn`, `Vurderingslager`, `UgyldigVurdering`.
-- [ ] `src/lagring_sqlite.py` -- `SqliteVurderingslager(tilkobling, klokke)` med upsert og `WHERE excluded.grunn IS NULL OR vurdering.grunn IS NOT NULL`.
-- [ ] `tests/test_vurderingslager.py` -- matrisen, protokollen, `grunn` lik `Grunn`, retningene lik `signalberegning`, og validering av `Vurdering`.
-- [ ] `tests/test_lagring_sqlite.py` -- de to testene over bruker neste ledige nummer.
-- [ ] Spinen -- `boersdag.py` i Kjerne, `vurderingsdata.py` i Porter med hvorfor det ikke finnes noe minnelager, nye kanter i grafen, og de to Deferred-radene.
+- [x] `src/migrasjoner/0002_vurdering.sql` -- `grunn` med tre rader, `vurdering` med `PRIMARY KEY (symbol, dato)`, enten/eller-`CHECK` over alle sju vurderingsfeltene og to triggere.
+- [x] `src/vurderingsdata.py` -- `Vurdering`, `Grunn`, `Vurderingslager`, `UgyldigVurdering`.
+- [x] `src/lagring_sqlite.py` -- `SqliteVurderingslager(tilkobling, klokke)` med upsert og `WHERE excluded.grunn IS NULL OR vurdering.grunn IS NOT NULL`.
+- [x] `tests/test_vurderingslager.py` -- matrisen, protokollen, `grunn` lik `Grunn`, retningene lik `signalberegning`, og validering av `Vurdering`.
+- [x] `tests/test_lagring_sqlite.py` -- de to testene over bruker neste ledige nummer.
+- [x] Spinen -- `boersdag.py` i Kjerne, `vurderingsdata.py` i Porter med hvorfor det ikke finnes noe minnelager, nye kanter i grafen, og de to Deferred-radene.
 
 **Acceptance Criteria:**
 - Gitt koden fra `baseline_commit`, når de nye testene kjøres, så feiler de (modulene finnes ikke).
@@ -128,6 +128,36 @@ context:
   B1–B7 fanges som før, og B5 fanges nå også av testen for 2. pinsedag. Ingen mutant overlevde.
 - **Status** står som `in-progress` under gjennomgangen av del 1, ikke `in-review`, fordi del 2 gjenstår.
 
+**Del 2, lageret, 27.09.** Bygget direkte i økta på samme gren, etter instruksjonen kl. 15:44. Commitene: `920b0e0` (0002, porten, adapteren og testene), `0a2f54c` (spinen) og `9e12277` (rettingene etter gjennomgangen).
+
+- **Tester:** 501 før del 2. 578 etter `920b0e0`: 74 nye i `tests/test_vurderingslager.py` og 3 nye i `tests/test_konsumentene.py`, fordi portvakten og de to vaktene mot EODHDs feltnavn også gjelder `vurderingsdata.py`. 614 etter rettingene i `9e12277`: 36 nye, 27 av dem for retningene. Hele storyen: 468 før og 614 etter.
+- **Mot koden uten modulene:** `tests/test_vurderingslager.py` feilet ved innsamlingen med `ImportError` (`SqliteVurderingslager` fantes ikke), som ventet.
+- **De to testene i `tests/test_lagring_sqlite.py`** feilet med `MigrasjonsFeil: To migrasjoner har nummer 0002` da `0002_vurdering.sql` kom inn, og bare de. Etter omskrivingen bruker de `siste_versjon(MIGRASJONSKATALOG) + 1`.
+- **Grunnene** heter `symbol_feilet`, `kurs_ikke_fra_dagen` og `signal_ikke_regnet`, i `Grunn` og i tabellen `grunn`.
+- **Verdiene kontrolleres i `Vurdering`, ikke i en `CHECK`.** `CHECK`-en sjekker bare enten/eller, fordi en ny regel i en `CHECK` krever at tabellen bygges om. `Vurdering` krever at styrken er summen av sjekkene og at retningen er den fortegnene gir, og gjør kursene om til float.
+- **Mutanter, én om gangen, mot hele testsettet, med `git checkout` mellom hver.** Første runde, mot `920b0e0`:
+  - K1, datokontrollen fjernet: 6 tester feiler (i går, i morgen, lørdag, 00:30 i begge tider og at gårsdagens rad ikke kan skrives om neste dag)
+  - K1, UTC i stedet for Oslo: begge 00:30-testene feiler, og testen for en klokke uten sone
+  - K2, `INSERT` uten `ON CONFLICT`: de fire testene for overskriving feiler
+  - K3, `endre` i protokollen: testen for protokollen og testen for at adapteren oppfyller den feiler
+  - K4, `erstatt_serie` sletter fra `vurdering`: testen for at vurderingen overlever, feiler
+  - K5, tabellen lages av adapteren: 25 tester feiler, 24 i `TestSkjemaet` og testen for en åpen transaksjon hos kalleren
+  - K6, `WHERE` fjernet: testen for grunn over vurdering feiler
+  - K6, `WHERE` som stopper vurdering over grunn: testene for vurdering over grunn og grunn over grunn feiler
+  - K6, triggerne fjernet: de tre testene for ukjent grunn feiler
+  - K6, `CHECK` fjernet: 16 tester for enten/eller feiler
+
+  Ingen mutant overlevde.
+- **Andre runde, mot `9e12277`, etter rettingene:** K1–K6 på nytt, B1–B9 fra del 1 på nytt, og seks nye:
+  - R1, triggerne på `grunn` fjernet: de to testene for sletting og endring feiler
+  - R2, retningen kontrolleres ikke mot sjekkene: alle 27 retningstestene feiler
+  - R3, `les` kontrollerer ikke symbol og dato: de to testene for `les` feiler
+  - R4, kursen gjøres ikke om til float: de to testene for store heltall feiler
+  - R5, ingen tilbakerulling i `skriv`: testen for tilbakerullingen feiler
+  - R6, `bool` godtas som styrke: testen for `styrke=True` feiler
+
+  Alle 25 ble fanget. K5 fanges nå av 28 tester, K6 (triggerne) av 4 og K6 (`CHECK`) av 17, fordi testen for `ADD COLUMN` også ser dem.
+
 ## Spec Change Log
 
 ## Review Triage Log
@@ -148,6 +178,40 @@ Tre lag gjennomgikk del 1 den 27.09: Blind Hunter (BH), Edge Case Hunter (ECH) o
 | ECH2 | Testen for hverdager binder ikke `STENGT` til årstallet | medium | Samme som BH6 | patch: under BH1 |
 | ECH3 | `OverflowError` slipper ut for et tidspunkt nær `datetime.max` | low | Prøvd: gir `OverflowError`. Krever en klokke i år 9999 | avvist: lite sannsynlig, og krever en ny vakt |
 | VG1 | En `tzinfo` som svarer `None` på `utcoffset` er ikke prøvd | low | Prøvd: `astimezone` leser den da som maskinens lokale tid. Mutanten B8 overlevde før testen | patch: ny test |
+
+Tre lag gjennomgikk hele storyen den 27.09, del 1 og del 2 sammen, på diffen for `src/` og `tests/` siden `baseline_commit`: Blind Hunter (BH), bare diffen, Edge Case Hunter (ECH) og Verification Gap (VG), med tilgang til repoet. Nummereringen begynner på nytt og gjelder bare denne runden.
+
+| # | Funn | Dom | Bevis | Rute |
+|---|---|---|---|---|
+| BH1 | Testen for ukjent grunn via upsert prøver ikke `UPDATE`-triggeren | low | SQLite kjører `BEFORE INSERT` før konflikten oppdages. VG7 viste det samme: uten `UPDATE`-triggeren feiler bare testen for vanlig `UPDATE` | patch: docstringen sier hvilken trigger som stopper upserten. Begge triggerne fanges av hver sin test |
+| BH2 | En kjøring som går over midnatt i Oslo, feiler halvveis: `skriv` reiser for resten av symbolene | medium | Riktig. Klokka leses ved hvert kall (AD-7), og datoen er fast for kjøringen | avvist her: det er kallerens sak. Ført i `deferred-work.md` for story 2.5 |
+| BH3 | Ingenting beskytter tabellen `grunn`. En slettet grunn gjør rader i `vurdering` uleselige | medium | `test_en_grunn_slettes_ikke` og `test_en_grunn_endres_ikke` feilet mot koden fra før rettingene. En rad som peker på en slettet grunn, gir `ValueError` i `Grunn(...)` når `les` leser den | patch: to triggere i `0002` som stopper `DELETE` og `UPDATE` på `grunn`. Mutant R1 fanges |
+| BH4 | `les` validerer radene på nytt, så strengere regler senere kan gjøre gamle rader uleselige | low | Riktig i prinsippet. Reglene endres i så fall i en migrasjon, og det avgjøres der (spinen, Deferred) | avvist |
+| BH5 | `Vurdering` kontrollerer ikke retningen mot sjekkene | low | `styrke=0, retning="Positiv"` ble godtatt | patch: retningen skal være den fortegnene gir. Testen prøver alle 27 kombinasjonene mot `finn_retning`. Mutant R2 fanges |
+| BH6 | Et stort heltall som kurs slipper gjennom `Vurdering` og feiler i SQLite med `OverflowError` | low | Samme som ECH1 | patch: under ECH1 |
+| BH7 | `les` kontrollerer ikke symbolet | low | `les("EQNR.OL", …)` ga `None`, som leses som at kommandoen ikke ble kjørt (FR-409) | patch: `les` og `skriv` bruker samme kontroll. Mutant R3 fanges |
+| BH8 | Transaksjonen forutsetter Pythons gamle modus, og en feil i `ROLLBACK` skjuler den første feilen | low | ECH7 prøvde `isolation_level=None` og `autocommit=True`: begge virker. `autocommit=False` reiser `RuntimeError`, som i `SqliteKurslager`, og `migrer` avviser samme tilkobling | avvist: samme mønster som `SqliteKurslager` |
+| BH9 | Protokolltesten ser ikke en `slett` arvet fra en baseklasse | low | `vars` ser bare klassen selv | patch: `dir` |
+| BH10 | `ZoneInfo("Europe/Oslo")` krever tzdata på Windows | false | tzdata står i avhengighetene, og `tests/test_tidssone.py` holder den (spinen, Stack) | avvist |
+| BH11 | `skriv` reiser for alle dager fra 2027-01-01 | low | Vedtaket i punkt 3, og punkt 25 i `prd.md` §8 har eier og frist | avvist: følger av vedtaket |
+| ECH1 | `Vurdering(..., justert_slutt=10**20)` godtas, og `skriv` reiser `OverflowError` | low | Kjørt: `OverflowError: Python int too large to convert to SQLite INTEGER`. Tilbakerullingen virket | patch: kursene gjøres om til float i `Vurdering`. `10**400` gir `UgyldigVurdering`. Mutant R4 fanges |
+| ECH2 | `les` gir ikke en lik `Vurdering` tilbake for heltall over 2**53 | low | Kjørt: `2**53+1` ble lest som `9007199254740992.0` | patch: under ECH1. Testet med `2**53+1` og `10**20` |
+| ECH3 | `CHECK` sjekker bare enten/eller, så en rad skrevet utenom porten kan bli uleselig | low | Kjørt: `trend=7` gikk inn i basen, og `les` reiste `UgyldigVurdering` | avvist: valgt med vilje (kommentaren i `0002`), og porten er eneste skriver |
+| ECH4 | Meldingen fra `UtenforKalenderen` gjentar datoen når dagen selv er utenfor | low | «2027-01-01 krever 2027-01-01» | patch: meldingen nevner dagen én gang |
+| ECH5 | Soner og sommertid | false | 21:59:59Z og 22:00Z rundt midnatt, og nettene der sommertiden skifter, gir riktig dag | ingen endring |
+| ECH6 | Upsert og `rowcount` i alle rekkefølger, og triggerne på alle skriveveier | false | Kjørt, også `INSERT OR REPLACE` | ingen endring |
+| ECH7 | Tilkoblingsmodusene | false | Se BH8 | ingen endring |
+| ECH8 | Underklasser av `str`, `int` og `date` slipper gjennom `isinstance` | false | De leses tilbake like, og `bool` avvises | ingen endring |
+| ECH9 | `les` kontrollerer ikke symbolet | low | Samme som BH7 | patch: under BH7 |
+| ECH10 | De to omskrevne testene i `tests/test_lagring_sqlite.py` | false | De regner fra `siste_versjon` og tåler en `0003` | ingen endring |
+| VG1 | Spinen sier at hvert kontrollpunkt er prøvd med mutant, men notatene hadde bare B1–B9 | medium | Riktig da gjennomgangen ble gjort | patch: K1–K6 og R1–R6 står i Implementation Notes |
+| VG2 | Ingen test går gjennom tilbakerullingen i `skriv` | low | Mutanten uten `ROLLBACK` overlevde | patch: en midlertidig trigger stopper `INSERT`, og testen ser at transaksjonen er lukket og lageret virker etterpå. Mutant R5 fanges |
+| VG3 | `les` avviser et tidspunkt som dato, men ingen test ser det | low | Mutanten overlevde | patch: under BH7, med egen test |
+| VG4 | `styrke=True` ble avvist av summen, ikke av `bool`-kontrollen. Kontrollen av området 0–3 overflødig. `OverflowError` utestet | low | Tre mutanter overlevde. Den for området er ekvivalent | patch: testtilfellet har riktig sum, kontrollen av området er fjernet (summen dekker den), og `10**400` er testet. Mutant R6 fanges |
+| VG5 | `0002` og spinen sier at begge endringene er prøvd i minnet, men bare ny grunn har en test | low | Riktig | patch: en test for `ADD COLUMN`, med `integrity_check`, `CHECK` og triggere etterpå |
+| VG6 | «logger ikke» i storyen er ikke testet | low | Koden logger ingenting. Testene ser at `skriv` reiser og at ingen rad skrives | avvist |
+| VG7 | Upsert-testen prøver `INSERT`-triggeren | false | Samme som BH1 | patch: under BH1 |
+| VG8 | «Klokka leses ved hvert kall» | false | `test_eldre_rad_kan_ikke_skrives_om_neste_dag` bytter klokka mellom kallene | ingen endring |
 
 ## Design Notes
 
