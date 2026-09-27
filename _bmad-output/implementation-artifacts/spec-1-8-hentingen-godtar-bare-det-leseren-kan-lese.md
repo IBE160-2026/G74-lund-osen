@@ -2,10 +2,10 @@
 title: 'Story 1.8: Hentingen godtar bare det leseren kan lese'
 type: 'bugfix'
 created: '2026-09-27'
-status: 'ready-for-dev'
+status: 'in-progress'
 route: 'dispatch'
 review_loop_iteration: 0
-baseline_commit: ''
+baseline_commit: 'f6d82c4adf031ab327aa8782f71a68349f24c426'
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/epic-1-context.md'
   - '{project-root}/_bmad-output/implementation-artifacts/kodegjennomgang-epic-1.md'
