@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-27T23:57'
+updated: '2026-09-28T00:03'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -318,7 +318,7 @@ FR-408. At dagen mangler, skal kunne skilles i lageret: `FR-409`. *Rettet
 
 - **Binds:** FR-406, FR-408, AD-4, AD-7, AD-16, AD-18
 - **Prevents:** at en rad for et symbol utenfor universet, for eksempel tickeren `EQNR.OL`, blir en egen serie eller en egen historikk fordi porten var eneste vakt (G10 i `kodegjennomgang-epic-1.md`). Og at en aksje forsvinner mens `vurdering` fortsatt har rader for den, rader som verken kan slettes eller skrives på nytt (AD-7)
-- **Rule:** tabellen `aksje` har de samme feltene som `Aksje` og de samme femten som `AKSJEUNIVERS`, i samme rekkefølge. En test holder dem like. `kurs`, `kursserie` og `vurdering` peker på `aksje` gjennom triggere: et ukjent symbol avvises ved `INSERT` og ved `UPDATE OF symbol`, også på en tilkobling som ikke har slått på noe. En aksje med rader kan ikke slettes eller erstattes med `REPLACE`, og symbolet kan aldri endres. En aksje uten rader kan slettes. `vurdering` peker på `aksje`, aldri på `kurs` (AD-18).
+- **Rule:** tabellen `aksje` har de samme feltene som `Aksje` og de samme femten som `AKSJEUNIVERS`, i samme rekkefølge. En test holder dem like. `kurs`, `kursserie` og `vurdering` peker på `aksje` gjennom triggere: et ukjent symbol avvises ved `INSERT` og ved `UPDATE OF symbol`, også på en tilkobling som ikke har slått på noe. En aksje med rader kan ikke slettes, og symbolet kan aldri endres. En aksje uten rader kan slettes. Ingen aksje kan erstattes: en `INSERT` eller en ny `ticker` som kolliderer, avvises, fordi `REPLACE` ellers sletter raden uten å kjøre slettetriggeren. `vurdering` peker på `aksje`, aldri på `kurs` (AD-18).
 - **Forkastet:** fremmednøkler. SQLite håndhever dem bare når tilkoblingen har slått dem på, og en ny tilkobling har det ikke. `PRAGMA foreign_keys = ON` gjør ingenting inne i løperens `BEGIN IMMEDIATE`. `ALTER TABLE` kan ikke legge en fremmednøkkel på en kolonne som finnes, så `kurs`, `kursserie` og `vurdering` måtte blitt bygget om, og `vurdering` er uerstattelig (AD-7). Samme grunn som for triggerne på `grunn` i `0002`. Alle tre forholdene er prøvd i minnet 27.09.
 - **Bygget 2026-09-27, story 1.9:** `0003_aksje.sql`. En base i versjon 2 med rader for et symbol som ikke står i `aksje`, stopper migrasjonen, og løperen ruller den tilbake. `SqliteKurslager` gjør avvisningen om til `ValueError`, og `SqliteVurderingslager` avviser et ukjent symbol i porten før SQL-en. Om porten til `Kurslager` også skal sjekke symbolet, og hvilke feil kjøringen fanger (G11), avgjøres i 2.5. Hvert kontrollpunkt er prøvd med en mutant (spesifikasjonen, Implementation Notes).
 
@@ -427,8 +427,8 @@ G74-lund-osen/
 | Markedsoversikt (FR-101..103) | `markedsoversikt.py` | AD-1, AD-3 |
 | Aksjedetalj og graf (FR-201..204) | `aksjedetalj.py`, `graf.py` | AD-1, AD-3 |
 | Henting og kvote (FR-401..405) | `fetch_prices.py` | AD-2, AD-5, AD-10, AD-15 |
-| To lagre (FR-406) | `lagring_sqlite.py`, `data/raa/` | AD-5, AD-6, AD-11 |
-| Dagens vurdering (FR-408) og de tre tilstandene (FR-409) | `Vurderingslager`, skrevet av hentekommandoen. Tilstandene leses av `tilstand.py` | AD-3, AD-7, AD-16, AD-17, AD-18, AD-20 |
+| To lagre (FR-406) | `lagring_sqlite.py`, `data/raa/` | AD-5, AD-6, AD-11, AD-21 |
+| Dagens vurdering (FR-408) og de tre tilstandene (FR-409) | `Vurderingslager`, skrevet av hentekommandoen. Tilstandene leses av `tilstand.py` | AD-3, AD-7, AD-16, AD-17, AD-18, AD-20, AD-21 |
 | Meldingsfilter (FR-501..503) | `meldinger.py` | AD-1, AD-14 |
 | Utbyttemerking (FR-407) | *ikke plassert* | AD-4 — **kilde ikke valgt**, se åpent punkt 4 |
 | Kommende hendelser (FR-301..303) | *finnes ikke* | **Ingen** — se Deferred |
