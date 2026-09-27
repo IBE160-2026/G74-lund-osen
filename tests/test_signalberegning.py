@@ -192,8 +192,23 @@ class TestNoytralsone:
         assert trend(self.kurser_med_avvik(0.01), KORT).verdi == 0
 
     def test_noeyaktig_paa_grensen_gir_null(self):
-        """Grensen hoerer til sonen: 2,0 % over snittet er fortsatt 0."""
-        assert trend(self.kurser_med_avvik(0.02), KORT).verdi == 0
+        """Grensen hoerer til sonen: 2,0 % fra snittet er fortsatt 0.
+
+        `kurser_med_avvik(0.02)` gir et avvik paa 0.019999999999999928, som
+        ligger innenfor sonen baade med `<=` og `<`, og proever derfor ikke
+        grensen. Her er seriene valgt saa snittet blir noeyaktig 100,0 og
+        avviket noeyaktig 0,02: (102 - 100) / 100 == 0.02 i flyttall. Samme
+        nedover, med 98 og 102 byttet.
+        """
+        opp = [100.0] * 8 + [98.0, 102.0]
+        ned = [100.0] * 8 + [102.0, 98.0]
+        assert sum(opp) / KORT.ma_vindu == 100.0
+        assert (opp[-1] - 100.0) / 100.0 == 0.02
+        assert sum(ned) / KORT.ma_vindu == 100.0
+        assert (ned[-1] - 100.0) / 100.0 == -0.02
+
+        assert trend(opp, KORT).verdi == 0, "noeyaktig +2 % skal ligge i sonen"
+        assert trend(ned, KORT).verdi == 0, "noeyaktig -2 % skal ligge i sonen"
 
     def test_utenfor_sonen_gir_utslag(self):
         assert trend(self.kurser_med_avvik(0.03), KORT).verdi == 1

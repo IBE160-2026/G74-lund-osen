@@ -2,9 +2,10 @@
 title: 'Story 9.0: Fem tester sjekker det de lover'
 type: 'chore'
 created: '2026-09-27'
-status: 'ready-for-dev'
+status: 'in-progress'
 route: 'dispatch'
 review_loop_iteration: 0
+baseline_commit: '6dbfcb6ab2cae2d71192f4f5015dd2256d2ca3f7'
 context:
   - '{project-root}/CLAUDE.md'
 ---
@@ -56,10 +57,10 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `tests/test_markedsoversikt.py` -- ny serie for EQNR, og `if` byttet med `assert` på lik styrke, så rekkefølgen -- FR-102
-- [ ] `tests/test_signalberegning.py` -- kurser med nøyaktig avvik, opp og ned, og docstringen sier hvorfor -- grensen
-- [ ] `tests/test_fetch_prices.py` -- testen går gjennom `kjoer` og `nyeste_leser`, og heter `test_formatet_kan_leses_av_visningen` -- formatet
-- [ ] `tests/test_app.py` -- K3 krever sluttkursen. K4 bruker `DATA_KATALOG` i stedet for `monter`, ber om begge rutene, og heter `test_rutene_gjoer_ingen_nettverkskall` -- K3, K4
+- [x] `tests/test_markedsoversikt.py` -- ny serie for EQNR, og `if` byttet med `assert` på lik styrke, så rekkefølgen -- FR-102
+- [x] `tests/test_signalberegning.py` -- kurser med nøyaktig avvik, opp og ned, og docstringen sier hvorfor -- grensen
+- [x] `tests/test_fetch_prices.py` -- testen går gjennom `kjoer` og `nyeste_leser`, og heter `test_formatet_kan_leses_av_visningen` -- formatet
+- [x] `tests/test_app.py` -- K3 krever sluttkursen. K4 bruker `DATA_KATALOG` i stedet for `monter`, ber om begge rutene, og heter `test_rutene_gjoer_ingen_nettverkskall` -- K3, K4
 
 **Acceptance Criteria:**
 - Gitt koden i `src/` fra `baseline_commit`, når de fem kjøres, så består de.

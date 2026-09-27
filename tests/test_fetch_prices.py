@@ -6,14 +6,14 @@ byttet ut (story 2.0), saa ingen test naar nettet eller bruker kvote.
 """
 
 import json
-from datetime import date
+from datetime import date, timedelta
 
 import pytest
 import requests
 
 import fetch_prices as fp
 from kursdata import AKSJEUNIVERS
-from lagring_fil import SnapshotKilde, nyeste_snapshot
+from lagring_fil import SnapshotKilde, nyeste_leser, nyeste_snapshot
 
 
 def falsk_serie(dager: int = 60):
@@ -319,19 +319,43 @@ class TestHentUniverset:
 
 
 class TestOyeblikksbilde:
-    def test_formatet_kan_leses_av_snapshotkilde(self, tmp_path):
-        """Det hentingen skriver, skal visningen kunne lese - uten mellomledd."""
-        resultat = fp.hent_universet(
-            "noekkel", "2025-09-22", "2026-09-21", lambda *_: falsk_serie(), lambda _: None
-        )
-        bilde = fp.lag_oyeblikksbilde(resultat, "2025-09-22", "2026-09-21", "naa")
+    def test_formatet_kan_leses_av_visningen(self, tmp_path):
+        """Det hentingen skriver, skal visningen kunne lese - uten mellomledd.
 
-        fil = tmp_path / fp.filnavn(date(2026, 9, 22))
-        fil.write_text(json.dumps(bilde), encoding="utf-8")
+        Het foer test_formatet_kan_leses_av_snapshotkilde, og leste med
+        SnapshotKilde, som godtar alt. Visningen leser gjennom nyeste_leser og
+        SnapshotLeser, som krever ISO-datoer i radene og en hentet-tid med
+        tidssone. Derfor gaar testen gjennom kjoer, som setter tiden selv,
+        og leser fila slik visningen gjoer.
+        """
+        dag = date(2026, 9, 22)
+        start = date(2026, 6, 1)
 
-        kilde = SnapshotKilde.fra_fil(fil)
-        assert kilde.tidsstempel() == "naa"
-        assert len(kilde.serie("EQNR")) == 60
+        def hent(*_):
+            return [
+                {
+                    "date": (start + timedelta(days=i)).isoformat(),
+                    "close": 100.0 + i,
+                    "adjusted_close": 100.0 + i,
+                    "volume": 1000,
+                }
+                for i in range(60)
+            ]
+
+        fil = fp.kjoer(tmp_path, dag, NOEKKEL, hent, lambda _: None)
+        assert fil is not None and fil.parent == tmp_path
+
+        leser = nyeste_leser(tmp_path)
+        assert leser is not None
+        for aksje in AKSJEUNIVERS:
+            tid = leser.sist_hentet(aksje.symbol)
+            assert tid is not None, (
+                f"{aksje.symbol}: visningen kan ikke lese hentet-tiden i fila"
+            )
+            assert tid.tzinfo is not None
+            assert len(leser.serie(aksje.symbol)) == 60, (
+                f"{aksje.symbol}: visningen leser ikke alle radene hentingen skrev"
+            )
 
     def test_filnavnet_baerer_datoen(self):
         assert fp.filnavn(date(2026, 9, 22)) == "kurser-raa-2026-09-22.json"

@@ -5,8 +5,9 @@ derfor sitt eget oeyeblikksbilde i stedet for aa lese fra katalogen. Det er en
 ekte SnapshotKilde med EODHDs feltnavn, saa appen proeves gjennom den samme
 oversettelsen til Kursrad (SnapshotLeser) som i drift. Testene av
 tidsstemplene monterer i stedet et MinneKurslager bak hent_leser, fordi et
-oeyeblikksbilde har samme tid for alle symbolene. Unntaket er TestHentLeser,
-som leser en tmp_path-katalog gjennom lagring_fil, aldri data/.
+oeyeblikksbilde har samme tid for alle symbolene. Unntakene er TestHentLeser
+og test_rutene_gjoer_ingen_nettverkskall, som leser en tmp_path-katalog
+gjennom lagring_fil, aldri data/.
 """
 
 import json
@@ -278,17 +279,38 @@ class TestTidsstempler:
         assert "data hentet 2026-11-16 kl. 23.30" in html
 
 
-def test_ruta_gjoer_ingen_nettverkskall(klient, monkeypatch):
-    """Vakt mot at visningen en dag begynner aa hente selv og spiser kvoten."""
+def test_rutene_gjoer_ingen_nettverkskall(klient, monkeypatch, tmp_path):
+    """Vakt mot at visningen en dag begynner aa hente selv og spiser kvoten.
+
+    Het foer test_ruta_gjoer_ingen_nettverkskall. Den monterte hent_leser, saa
+    lesingen ble aldri kjoert, og bare / ble proevd. Her monteres ingenting:
+    DATA_KATALOG pekes mot tmp_path med en fil, og begge rutene leser den
+    gjennom den ekte hent_leser. requests.get byttes ut foer kallene, og
+    sperren i conftest.py staar i tillegg.
+    """
     import requests
 
     def eksploder(*_args, **_kwargs):
         raise AssertionError("Visningen skal aldri gjoere API-kall")
 
     monkeypatch.setattr(requests, "get", eksploder)
-    monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [101.0])}))
+    (tmp_path / "kurser-raa-2026-09-21.json").write_text(
+        json.dumps(
+            {"hentet": HENTET, "serier": {"EQNR": [eodhd(r) for r in serie([100.0] * 60 + [101.0])]}}
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(lagring_fil, "DATA_KATALOG", tmp_path)
 
-    assert klient.get("/").status_code == 200
+    oversikt = klient.get("/")
+    assert oversikt.status_code == 200
+    assert 'href="/aksje/EQNR"' in oversikt.data.decode("utf-8"), "oversikten viser ikke dataene"
+
+    detalj = klient.get("/aksje/EQNR")
+    assert detalj.status_code == 200
+    assert '<span class="verdi">101.00</span>' in detalj.data.decode("utf-8"), (
+        "detaljen viser ikke dataene"
+    )
 
 
 class TestAksjedetalj:
@@ -340,12 +362,16 @@ class TestAksjedetalj:
         assert "<polyline" in html
 
     def test_kort_serie_viser_kurs_men_sier_at_signalet_mangler(self, klient, monkeypatch):
-        monter(monkeypatch, snapshot({"EQNR": serie([100.0, 101.0, 102.0])}))
+        """Kursen vises, og siden sier at signalet mangler. Sluttkursen er
+        valgt saa den bare kan staa ett sted paa siden: i noekkeltallet."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0, 101.0, 123.45])}))
 
-        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        svar = klient.get("/aksje/EQNR")
+        html = svar.data.decode("utf-8")
 
-        assert klient.get("/aksje/EQNR").status_code == 200
-        assert "kunne ikke regnes" in html
+        assert svar.status_code == 200
+        assert '<span class="verdi">123.45</span>' in html, "sluttkursen vises ikke"
+        assert "kunne ikke regnes" in html, "siden sier ikke at signalet mangler"
 
     def test_sier_hva_som_mangler_i_skjermbildet(self, klient, monkeypatch):
         """Meldinger og KI er ikke med enda. Det skal staa, ikke bare utebli."""
