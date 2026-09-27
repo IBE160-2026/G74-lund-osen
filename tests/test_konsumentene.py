@@ -27,6 +27,7 @@ KJERNEMODULER = (
     "markedsoversikt.py",
     "aksjedetalj.py",
     "graf.py",
+    "boersdag.py",
 )
 
 FORBUDTE_MODULER = {"sqlite3", "pathlib"}
