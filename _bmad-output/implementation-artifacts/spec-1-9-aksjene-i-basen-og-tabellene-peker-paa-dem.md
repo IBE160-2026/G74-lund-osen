@@ -138,6 +138,8 @@ Runde 1, 28.09: Blind Hunter (BH, 11 funn), Edge Case Hunter (ECH, 5) og Verific
 
 Ingen `intent_gap` eller `bad_spec`. Rettingene: `3757086` (koden og testene), `17e14eb` (spinen), `290d1b2` (`epics.md`) og `10f3db9` (kodegjennomgangen). Utsatt: `innlevering.md` i `deferred-work.md`. Tester etter rettingene: 875.
 
+Talt fra tabellen: 18 funn i 15 rader. 13 funn er rettet i 10 rettinger, og BH11 er rettet i spinen og utsatt for `innlevering.md`. 5 er avvist (ECH2, ECH3, BH8, BH9, BH10). Commit-meldingen til `2cfda6d` sier «11 … 6 avvist og 1 utsatt». Det er feil, og tallene her gjelder.
+
 ## Verification
 
 **Commands:**
