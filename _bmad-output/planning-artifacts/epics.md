@@ -900,6 +900,28 @@ Som **gruppe**, vil vi at en aksje hentingen melder som hentet, også kan leses,
 
 **Én økt:** ja.
 
+### Story 1.9: Aksjene i basen, og tabellene peker på dem
+
+*Lagt til 2026-09-27, fra prioriteringen samme dag.*
+
+Som **gruppe**, vil vi at basen selv kjenner de femten, så en rad for et symbol utenfor universet avvises av basen, og historikken kan hentes sammen med aksjen i én spørring.
+
+**Oppfyller:** — *(grunnlag for FR-408, og G10 i kodegjennomgangen)* · **Begrenses av:** `AD-4`, `AD-7`, `AD-16`, `AD-18`
+
+**Grunnen:** migrasjonene lager fire tabeller, `kurs`, `kursserie`, `grunn` og `vurdering`, og ingen av dem har fremmednøkler. Ingen spørring henter fra flere tabeller. Assisterende hjelpelærer godtok SQLite 22.09 ut fra «relasjoner mellom data, joins, migrasjoner og logging av KI-vurderinger» (`AD-4`).
+
+**Kontroll — hva testen ser etter:**
+- `0003` lager `aksje` med de femten, og en test holder tabellen og `AKSJEUNIVERS` like
+- En rad i `kurs`, `kursserie` eller `vurdering` for et symbol som ikke står i `aksje`, avvises av basen, også `EQNR.OL` (G10)
+- En aksje med rader kan ikke slettes
+- Ingen fremmednøkkel fra `vurdering` til `kurs` (`AD-18`)
+- Planen velger fremmednøkkel eller trigger, med grunnen fra `0002`. Fremmednøkler på en kolonne som finnes, krever at tabellen bygges om, og det er billigst før den har data
+- **Ville feilet hvis:** porten var eneste vakt
+
+**Forutsetning:** før Epic 2 skriver til basen.
+
+**Én økt:** ja.
+
 ---
 
 ## Epic 2: Ferske data uten at kvoten sprenges
@@ -1055,7 +1077,7 @@ så den ikke kan regnes av en serie som er byttet ut siden.
   også når nyeste kurs ikke er fra dagen, og når signalet ikke kan regnes.
 - **Ville feilet hvis:** vurderingen ble skrevet av en egen kommando. Kjøres den etter en ny henting, er grunnlaget byttet ut — og raden ville lagret hva løsningen mente om *andre* data enn de som lå der
 
-**Forutsetning** *(fra kodegjennomgangen av Epic 1, 2026-09-27)*: `SqliteKurslager` godtar ethvert symbol, også `EQNR.OL`, mens `SqliteVurderingslager` bare godtar symbolene i `AKSJEUNIVERS` (G10). `SqliteVurderingslager.skriv` slipper ut `sqlite3`-feil, mens `erstatt_serie` gjør `IntegrityError` om til `ValueError` (G11). Her avgjøres det om `Kurslager` skal sjekke symbolet, og hvilke feil kjøringen fanger. Blir skrivingen til basen en egen story, følger forutsetningen dit.
+**Forutsetning** *(fra kodegjennomgangen av Epic 1, 2026-09-27)*: `SqliteKurslager` godtar ethvert symbol, også `EQNR.OL`, mens `SqliteVurderingslager` bare godtar symbolene i `AKSJEUNIVERS` (G10). *Løses i basen i 1.9 (lagt til 2026-09-27).* `SqliteVurderingslager.skriv` slipper ut `sqlite3`-feil, mens `erstatt_serie` gjør `IntegrityError` om til `ValueError` (G11). Her avgjøres det om `Kurslager` skal sjekke symbolet, og hvilke feil kjøringen fanger. Blir skrivingen til basen en egen story, følger forutsetningen dit.
 
 **Én økt:** ja.
 
@@ -1074,6 +1096,24 @@ utbytte, så avviket mellom vist kurs og vist prosent ikke ser ut som en feil.
 
 **Én økt:** ja. **Merk:** kilden er ikke endelig valgt — åpent punkt 4. Storyen
 forutsetter den målte veien.
+
+### Story 2.7: Historikken i aksjedetaljen
+
+*Lagt til 2026-09-27, fra prioriteringen samme dag.*
+
+Som **bruker**, vil jeg se hva løsningen sa om aksjen de siste ukene, så FR-408s spørsmål har et svar i appen.
+
+**Oppfyller:** FR-408, FR-409, punkt 20 i `prd.md` §8 · **Begrenses av:** `AD-3`, `AD-7`, `AD-20`
+
+**Kontroll — hva testen ser etter:**
+- De siste fire ukene, dag for dag: styrke og retning, eller grunnen, «ikke kjørt» eller «ikke børsdag»
+- Hver dag går gjennom `tilstand`, så styrke 0, en grunn og en manglende rad aldri ser like ut
+- `Vurderingslager` får en lesemetode for en periode, og ingen slette- eller endremetode (`AD-7`)
+- Dagens rad som ikke er skrevet ennå, vises ikke som et hull
+- Malene deler én layout og én CSS-fil
+- **Ville feilet hvis:** historikken ble regnet ut på nytt av kursene. Da viser den dagens parametre, ikke hva løsningen sa
+
+**Avhenger av:** 2.2 og 2.5. **Én økt:** ja.
 
 ---
 
@@ -1776,3 +1816,19 @@ trenger vi ikke når hvert selskap hentes for seg. Prisen for én ticker er mål
 forespørsel, og koster en forespørsel noe annet enn 5 kall, stopper vi før
 neste. Budsjettet er åtte forespørsler, ~40 kall. Se
 `prds/prd-G74-lund-osen-2026-09-20/relevanseksperiment.md` §2.
+
+### Story 9.5: Relevanseksperimentet, del 2 — KI-kjøringen
+
+*Lagt til 2026-09-27, fra prioriteringen samme dag.*
+
+Som **gruppe**, vil vi kjøre KI-klassifiseringen på de merkede artiklene, så refleksjonsrapporten kan vurdere KI med tall.
+
+**Oppfyller:** suksessmålet «Relevanseksperiment», del 2 · **Begrenses av:** regel 6 og 16 i `CLAUDE.md`, betingelse 4
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- Tjenesten er valgt i 4.1, og betingelse 4 er dokumentert før noe sendes
+- KI-en får samme kriterier og tekst som merkingen (§4 og §7 i `prds/prd-G74-lund-osen-2026-09-20/relevanseksperiment.md`), og resultatet regnes som §5 sier, uansett utfall
+- Artiklene og svarene ligger bare i `data/`. Bare tallene føres i sporede filer
+- **Ville feilet hvis:** kriteriene eller prompten ble justert etter at svarene var sett
+
+**Avhenger av:** 4.1. **Én økt:** nei.

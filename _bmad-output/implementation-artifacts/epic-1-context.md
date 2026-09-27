@@ -12,7 +12,7 @@ SQLite-adapteren, lesegrensen mot øyeblikksbildene, `Vurderingslager` og
 skillet mellom de tre tilstandene i lageret. Bruddet med `Kurskilde` ved siden
 av `Kurslager` er lukket i 1.4c. I/O i portmodulen `kursdata.py` er lukket i 1.5 (`23af8db`). *Rettet 2026-09-26:* her sto at bruddet sto igjen til 1.5. *Oppdatert
 2026-09-27:* `Vurderingslager` er bygget i 1.6 (flettet i `7dc8a48`, PR #8).
-Det som står igjen i epicen, er 1.8. I v1 blir historikken lagret, men ikke
+Det som står igjen i epicen, er 1.8 og 1.9. I v1 blir historikken lagret, men ikke
 besvarbar. Hvordan spørsmålet om hva løsningen sa en tidligere dag skal kunne
 stilles, er et åpent punkt med frist før demonstrasjonen.
 
@@ -29,6 +29,7 @@ stilles, er et åpent punkt med frist før demonstrasjonen.
 - Story 1.6: `Vurderingslager` med datoavvisning
 - Story 1.7: De tre tilstandene skilles
 - Story 1.8: Hentingen godtar bare det leseren kan lese
+- Story 1.9: Aksjene i basen, og tabellene peker på dem
 
 ## Requirements & Constraints
 

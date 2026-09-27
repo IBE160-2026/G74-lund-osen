@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-24-2026 19:26
-last_updated: 09-27-2026 22:08
+last_updated: 09-27-2026 22:18
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -52,6 +52,7 @@ development_status:
   1-6-vurderingslager-med-datoavvisning: review
   1-7-de-tre-tilstandene-skilles: review
   1-8-hentingen-godtar-bare-det-leseren-kan-lese: backlog
+  1-9-aksjene-i-basen-og-tabellene-peker-på-dem: backlog
   epic-1-retrospective: optional
 
   epic-2: backlog
@@ -62,6 +63,7 @@ development_status:
   2-4-etterfylling-av-hull-i-kursserien: backlog
   2-5-vurderingen-skrives-i-samme-kjøring: backlog
   2-6-utbyttedager-merkes: backlog
+  2-7-historikken-i-aksjedetaljen: backlog
   epic-2-retrospective: optional
 
   epic-3: backlog
@@ -109,4 +111,5 @@ development_status:
   9-2-docs-ai-prompts-bygging: backlog
   9-3-arbeidsmønsteret: done
   9-4-relevanseksperimentet-del-1-utvalg-innsamling-og-merking: done
+  9-5-relevanseksperimentet-del-2-ki-kjøringen: backlog
   epic-9-retrospective: optional
