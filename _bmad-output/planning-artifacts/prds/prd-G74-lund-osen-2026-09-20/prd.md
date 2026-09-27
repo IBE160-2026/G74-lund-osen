@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-27T14:55
+updated: 2026-09-27T15:42
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1170,6 +1170,7 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 | 15 | **Plassér kategoriene som havnet i «ukjent»** i riktig bøtte. Krever en ukes drift for å vite hvilke som faktisk dukker opp | | Etter én ukes drift |
 | 21 | **Hva er emnesidens tredje del?** Emnesiden sier «tre deler», men lister to, og nevner at «delvurdering 3 gir anledning til å demonstrere unike bidrag». Hva den tredje delen er, er ikke oppgitt. Spørres Bård Inge sammen med datoene i punkt 13. Se `docs/innlevering.md`, «Eksamen» | Marian | Sammen med punkt 13 |
 | 22 | **Kodegjennomgang som BMAD-steg, én per epic.** `bmad-code-review` kjøres etter hver ferdige epic, første gang etter Epic 1. Emnesiden: «Dokumentasjon må vise hvordan KI ble brukt, og hvordan studentene har kvalitetssikret koden» — en gjennomgang med flere uavhengige lesere er en del av det, i tillegg til testene og mutantene. Lagt til 2026-09-23. *2026-09-24:* den første gjennomgangen ble gjort 23.09 etter story 1.1–1.3, midt i Epic 1, ikke etter den. Funnene står som forutsetninger i `epics.md` under 1.5b og 2.2. *Rettet 2026-09-26:* her sto «under 1.6 og 2.2». De ble flyttet fra 1.6 til 1.5b 24.09 (`f7e4544`). | Gruppen | Etter Epic 1 |
+| 25 | **Dagene Oslo Børs er stengt i 2027.** Fra 2027-01-01 reiser `innevaerende_boersdag`, og dermed `skriv`, til dagene for 2027 er ført inn (punkt 3, og BH2 i gjennomgangen av story 1.6). Når Euronext publiserer kalenderen for 2027, føres dagene inn i `STENGT` i `src/boersdag.py` og i seksjonen Handelskalenderen i `docs/kilder-og-rettigheter.md`, og 2027 legges til i `DEKKEDE_AAR`. Kalenderen for 2026 er merket «© 2025», så kalenderen for 2027 kommer trolig i høst | Marian | 2026-12-01 |
 
 ### Lukket
 
@@ -1202,7 +1203,7 @@ egen frist for å ta stilling uten svar, ikke en dato Euronext har lovet.
 Fullstendig
 gjennomgang med sitater i `docs/kilder-og-rettigheter.md`.
 
-Av de åpne punktene har 1, 4, 5b, 13, 16, 19, 20, 21, 22 og 23 eier. Punkt 2, 6, 8, 9, 11, 12 og 15 mangler det. Punkt 3, 5, 7, 10, 14, 17, 18 og 24 er lukket. *Rettet 2026-09-27: punkt 3 og 24 ble lukket.* *Rettet 2026-09-26: punkt 5 ble lukket.* *Rettet 2026-09-24: punkt 3 fikk eier, punkt 10 ble lukket, og punkt 24 kom til, med Gruppen som eier.* *Rettet 2026-09-23: setningen talte lukkede punkter blant de åpne, og manglet 13, 20 og 21.*
+Av de åpne punktene har 1, 4, 5b, 13, 16, 19, 20, 21, 22, 23 og 25 eier. Punkt 2, 6, 8, 9, 11, 12 og 15 mangler det. Punkt 3, 5, 7, 10, 14, 17, 18 og 24 er lukket. *Rettet 2026-09-27: punkt 3 og 24 ble lukket, og punkt 25 kom til, med Marian som eier.* *Rettet 2026-09-26: punkt 5 ble lukket.* *Rettet 2026-09-24: punkt 3 fikk eier, punkt 10 ble lukket, og punkt 24 kom til, med Gruppen som eier.* *Rettet 2026-09-23: setningen talte lukkede punkter blant de åpne, og manglet 13, 20 og 21.*
 
 **Om nummereringen.** Numrene følger rekkefølgen punktene ble opprettet i, ikke
 rekkefølgen i tabellene. Punkt 16 står derfor over sammen med de andre som må
