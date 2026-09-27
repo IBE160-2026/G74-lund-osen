@@ -2,9 +2,10 @@
 title: 'Story 1.9: Aksjene i basen, og tabellene peker på dem'
 type: 'feature'
 created: '2026-09-27'
-status: 'ready-for-dev'
+status: 'in-progress'
 route: 'dispatch'
 review_loop_iteration: 0
+baseline_commit: '72cd401ea12cb1055841f4ed96ada455840506a3'
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/epic-1-context.md'
   - '{project-root}/_bmad-output/implementation-artifacts/kodegjennomgang-epic-1.md'
