@@ -15,7 +15,7 @@ import pytest
 
 from kursdata import AKSJEUNIVERS
 from lagring_sqlite import MIGRASJONSKATALOG
-from migrering import migrer, siste_versjon
+from migrering import MigrasjonsFeil, migrer, siste_versjon, versjon
 
 
 @pytest.fixture
@@ -187,3 +187,66 @@ class TestAksjenStaarFast:
         ny.execute("INSERT INTO aksje VALUES ('NY', 'NY.OL', 'Ny', 'Energi')")
         ny.execute(RAD["kurs"], ("NY",))
         assert antall(ny, "aksje") == 16
+
+
+def base_paa_versjon_2(tmp_path) -> sqlite3.Connection:
+    """En base migrert med bare 0001 og 0002, slik en base fra foer 1.9 ser ut."""
+    katalog = tmp_path / "til_0002"
+    katalog.mkdir()
+    for navn in ("0001_kurs.sql", "0002_vurdering.sql"):
+        (katalog / navn).write_bytes((MIGRASJONSKATALOG / navn).read_bytes())
+    tilkobling = sqlite3.connect(tmp_path / "v2.db")
+    assert migrer(tilkobling, katalog) == 2
+    return tilkobling
+
+
+def alle_rader(tilkobling) -> dict[str, list[tuple]]:
+    return {
+        tabell: tilkobling.execute(f"SELECT * FROM {tabell} ORDER BY 1, 2").fetchall()
+        for tabell in TABELLER
+    }
+
+
+class TestBaseIVersjon2:
+    """0003 paa en base som alt har rader."""
+
+    def test_rader_for_kjente_aksjer_blir_staaende(self, tmp_path):
+        tilkobling = base_paa_versjon_2(tmp_path)
+        try:
+            for tabell in TABELLER:
+                for symbol in ("EQNR", "MPCC"):
+                    tilkobling.execute(RAD[tabell], (symbol,))
+            tilkobling.commit()
+            foer = alle_rader(tilkobling)
+
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 3
+            assert alle_rader(tilkobling) == foer
+            assert antall(tilkobling, "aksje") == 15
+            assert tilkobling.execute(
+                "SELECT count(*) FROM sqlite_master WHERE name = 'kontroll_0003'"
+            ).fetchone()[0] == 0
+        finally:
+            tilkobling.close()
+
+    @pytest.mark.parametrize("tabell", TABELLER)
+    def test_rad_for_ukjent_aksje_stopper_migrasjonen(self, tmp_path, tabell):
+        """Godkjent 27.09: 0003 stopper og rulles tilbake, og basen staar paa
+        versjon 2. Radene er uroert, og aksje finnes ikke."""
+        tilkobling = base_paa_versjon_2(tmp_path)
+        try:
+            for t in TABELLER:
+                tilkobling.execute(RAD[t], ("EQNR",))
+            tilkobling.execute(RAD[tabell].replace("2026-09-23", "2026-09-24"), ("EQNR.OL",))
+            tilkobling.commit()
+            foer = alle_rader(tilkobling)
+
+            with pytest.raises(MigrasjonsFeil, match="0003_aksje.sql.*rader_uten_aksje"):
+                migrer(tilkobling, MIGRASJONSKATALOG)
+
+            assert versjon(tilkobling) == 2
+            assert alle_rader(tilkobling) == foer
+            assert tilkobling.execute(
+                "SELECT count(*) FROM sqlite_master WHERE name IN ('aksje', 'kontroll_0003')"
+            ).fetchone()[0] == 0
+        finally:
+            tilkobling.close()

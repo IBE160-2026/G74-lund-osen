@@ -47,6 +47,27 @@ INSERT INTO aksje (symbol, ticker, navn, sektor) VALUES
     ('DNO', 'DNO.OL', 'DNO', 'Energi'),
     ('MPCC', 'MPCC.OL', 'MPC Container Ships', 'Shipping');
 
+-- En base i versjon 2 kan ha rader for et symbol som ikke staar over.
+-- Triggerne under ser bare nye rader, saa de gamle ville blitt staaende uten
+-- aksje, og radene i vurdering kan verken slettes eller skrives paa nytt
+-- (AD-7). Migrasjonen stopper derfor, loeperen ruller den tilbake, og basen
+-- staar paa versjon 2 med feilen synlig. RAISE finnes bare i triggere, saa
+-- kontrollen er en CHECK paa en hjelpetabell som fjernes igjen.
+
+CREATE TABLE kontroll_0003 (
+    rader_uten_aksje INTEGER NOT NULL CHECK (rader_uten_aksje = 0)
+);
+
+INSERT INTO kontroll_0003 (rader_uten_aksje)
+SELECT (SELECT count(*) FROM kurs
+        WHERE NOT EXISTS (SELECT 1 FROM aksje WHERE symbol = kurs.symbol))
+     + (SELECT count(*) FROM kursserie
+        WHERE NOT EXISTS (SELECT 1 FROM aksje WHERE symbol = kursserie.symbol))
+     + (SELECT count(*) FROM vurdering
+        WHERE NOT EXISTS (SELECT 1 FROM aksje WHERE symbol = vurdering.symbol));
+
+DROP TABLE kontroll_0003;
+
 CREATE TRIGGER kurs_kjent_aksje_insert
 BEFORE INSERT ON kurs
 WHEN NOT EXISTS (SELECT 1 FROM aksje WHERE symbol = NEW.symbol)
