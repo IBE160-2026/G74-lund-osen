@@ -875,6 +875,8 @@ lukket med en rad med grunnen (`prd.md` §8).
 
 **Én økt:** ja.
 
+*Ferdig 2026-09-27:* flettet i `5e9e6ad`, PR #9.
+
 ---
 
 ## Epic 2: Ferske data uten at kvoten sprenges
