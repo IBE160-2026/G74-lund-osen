@@ -2428,6 +2428,18 @@ Uenighetene var ikke bare støy. De viste hvor definisjonene var for åpne.
 
 ---
 
+## 28.09.2026 – Funnet ved å prøve
+
+Epic 1 ble lukket natt til 28.09. 1.8 rettet det viktigste funnet fra kodegjennomgangen av Epic 1: hentingen godtok rader som leseren avviste, mens alle de 665 testene var grønne. 1.9 kom fra prioriteringen etter svarene fra faglærerne. SQLite ble godtatt ut fra relasjoner og joins, men tabellene hadde ingen koblinger. Nå kjenner basen de femten aksjene og avviser selv et ukjent symbol. Testene gikk fra 665 til 875.
+
+Mye ble funnet ved å prøve, ikke ved å lese. En prøve i minnet under 1.9 viste at `REPLACE` kunne slette en aksje uten at slettetriggeren slo til. Det sto ikke i planen. I 1.8 tok `git checkout` med seg kode som ikke var committet, og siden er koden satt tilbake fra en kopi. Tellingen i `2cfda6d` var feil, og `updated` hadde stått stille i tre filer. Begge deler ble funnet ved å telle og sammenligne på nytt.
+
+Blokken rådet hadde klar for plan B, del 2, ville lagt inn nøkkelen `epic-5b`. Da delen av BMAD-skriptet som leser `epics.md` ble kjørt, viste det seg at skriptet ikke kan lese den. Det hadde vi selv skrevet ned 24.09, og nummeret avgjøres før del 2.
+
+En plan som bare er lest, er ikke prøvd.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
