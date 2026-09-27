@@ -452,6 +452,23 @@ class TestVurdering:
             with pytest.raises(UgyldigVurdering, match="stemmer ikke"):
                 vurdering(retning=annen, **felt)
 
+    @pytest.mark.parametrize("sjekker", list(itertools.product((-1, 0, 1), repeat=3)))
+    def test_styrken_er_den_finn_styrke_gir(self, sjekker):
+        """Story 1.8 (G5), som testen for retningen over: alle 27
+        kombinasjonene, og porten godtar bare styrken kjernen gir."""
+        riktig = signalberegning.finn_styrke(tuple(
+            signalberegning.Sjekk(navn="", verdi=verdi, forklaring="") for verdi in sjekker
+        ))
+        trend, bevegelse, interesse = sjekker
+        retning = signalberegning.finn_retning(tuple(
+            signalberegning.Sjekk(navn="", verdi=verdi, forklaring="") for verdi in sjekker
+        ))
+        felt = dict(retning=retning, trend=trend, bevegelse=bevegelse, interesse=interesse)
+        vurdering(styrke=riktig, **felt)
+        for annen in set(range(4)) - {riktig}:
+            with pytest.raises(UgyldigVurdering, match="stemmer ikke"):
+                vurdering(styrke=annen, **felt)
+
     @pytest.mark.parametrize("endret", [
         dict(styrke=4, trend=1, bevegelse=1, interesse=1),
         dict(styrke=-1),
