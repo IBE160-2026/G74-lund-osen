@@ -1,8 +1,8 @@
 ---
 title: "Kodegjennomgang av Epic 1"
-status: draft
+status: done
 created: 2026-09-27
-updated: 2026-09-27T21:07
+updated: 2026-09-27T22:06
 ---
 
 # Kodegjennomgang av Epic 1
@@ -143,3 +143,41 @@ denne runden, 1 er `false`, og 18 er avvist. De 14 som står igjen, er samlet i
 - Står igjen: A-BH1, A-BH2, A-BH5, A-BH10, A-BH13, A-AA7, B-BH2, B-BH3, B-BH8,
   B-BH11, B-BH13, B-VG1, B-VG2 og B-VG-a. Det er 14, i G1–G12.
 - Sum: 21 + 7 + 1 + 18 + 14 = 61.
+
+## Beslutning 2026-09-27
+
+Gruppen sier ja til forslagene, med disse endringene (instruksjonen kl. 22:04 i
+dagsfila):
+
+- **G6 (A-BH5) avvises.** Overskriften følger FR-409 og story 1.7, og teksten
+  under den sier fire verdier, som spinen gjør.
+- **G7 (A-BH13) er false.** Fixturen i `TestGjennomLageret` har funksjonsscope,
+  så hver test der lageret er med, får sin egen base, slik docstringen sier.
+- **G9 (B-BH11) er kjent** fra story 4.0: «`gethostbyname`, `gethostbyname_ex`
+  og `getfqdn` sperres også». 4.0 har fått en merknad om docstringen.
+- **G10 (A-BH2) og G11 (A-BH1) venter på 2.5,** fordi innledningen til Epic 2
+  («Lagt til 2026-09-25») legger skrivingen til basen der. De står som
+  forutsetning i 2.5.
+- **G12 (B-VG2) venter på 2.1,** som endrer dagen `main()` bruker. Den står som
+  kontrollpunkt i 2.1.
+- **G1 gjelder alle tilfellene** som ble prøvd 27.09 uten nett og med falsk
+  henting: `close` `None`, `close` 0, `volume` 1000.0, `date` «2026-9-24» og en
+  dato som går igjen. Hver av dem gir i dag serien i `resultat.serier`, ingenting
+  i `feil` og 0 rader i `SnapshotLeser`, mens de andre aksjene leses.
+- **A-AA1 står som avvist,** men 1.7 i `epics.md` har fått en merknad om at
+  lageret svarer `None` for begge, og at `tilstand` skiller dem.
+- **Story 1.8 tar G1–G5 og G8.**
+
+### Tellingen etter beslutningen
+
+Talt fra radene i del A og del B:
+
+- Kjent fra før: de 21 over, og B-BH11 (story 4.0). Det er 22.
+- Samme sak som et annet funn i denne runden: A-ECH3, A-AA2, A-AA3, B-ECH3,
+  B-AA1, B-AA5 og B-VG-b. Det er 7.
+- `false`: A-BH9 og A-BH13. Det er 2.
+- Avvist: de 18 over, og A-BH5. Det er 19.
+- Story 1.8: B-BH2, B-BH3 og B-VG1 (G1), B-BH13 (G2), B-VG-a (G3), B-BH8 (G4),
+  A-AA7 (G5) og A-BH10 (G8). Det er 8.
+- Venter: A-BH2 (G10) og A-BH1 (G11) på 2.5, og B-VG2 (G12) på 2.1. Det er 3.
+- Sum: 22 + 7 + 2 + 19 + 8 + 3 = 61.
