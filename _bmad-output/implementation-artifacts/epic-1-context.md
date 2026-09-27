@@ -10,7 +10,9 @@ skrives om i ettertid. Epicen legger lagringsgrunnlaget de senere epicene står
 på: migrasjonsløperen, `Kurslager`-porten med typede norske rader (`Kursrad`),
 SQLite-adapteren, lesegrensen mot øyeblikksbildene, `Vurderingslager` og
 skillet mellom de tre tilstandene i lageret. Bruddet med `Kurskilde` ved siden
-av `Kurslager` er lukket i 1.4c. I/O i portmodulen `kursdata.py` er lukket i 1.5 (`23af8db`). *Rettet 2026-09-26:* her sto at bruddet sto igjen til 1.5. I v1 blir historikken lagret, men ikke
+av `Kurslager` er lukket i 1.4c. I/O i portmodulen `kursdata.py` er lukket i 1.5 (`23af8db`). *Rettet 2026-09-26:* her sto at bruddet sto igjen til 1.5. *Oppdatert
+2026-09-27:* `Vurderingslager` er bygget i 1.6 (flettet i `7dc8a48`, PR #8).
+Det som står igjen i epicen, er 1.7. I v1 blir historikken lagret, men ikke
 besvarbar. Hvordan spørsmålet om hva løsningen sa en tidligere dag skal kunne
 stilles, er et åpent punkt med frist før demonstrasjonen.
 
@@ -73,10 +75,23 @@ stilles, er et åpent punkt med frist før demonstrasjonen.
   allerede fra 1.6.
 - Vurderingen skal etter kravet ha med relevante meldinger, men meldingsdelen er
   blokkert og kan bli strøket 28.09. Kildene sier ikke hvordan feltet skal
-  håndteres i 1.6 uten meldinger.
+  håndteres i 1.6 uten meldinger. *Avgjort i 1.6, 2026-09-27:* `0002` har
+  ikke feltet. Meldingene kommer senere som en kolonne som kan være tom
+  (`ALTER TABLE vurdering ADD COLUMN`), der `NULL` betyr «ikke registrert».
 - Hvordan en skjemaendring på `vurdering` skal gjøres uten å bryte forbudet mot
   sletting, er ikke avgjort. Det avgjøres ved første migrasjon som rører
-  `vurdering`, tidligst etter 1.6.
+  `vurdering`, tidligst etter 1.6. *Utsatt videre 2026-09-27 (1.6):* `0002` er
+  formet så de to endringene vi vet om, ikke krever ombygging: en ny grunn er
+  en `INSERT INTO grunn` i en ny migrasjon, og meldingene er en ny kolonne.
+  Verdiene kontrolleres derfor i porten, ikke i en `CHECK`, fordi en ny regel i
+  en `CHECK` krever ombygging. Spørsmålet står åpent for alle andre
+  formendringer.
+- **Dagene Oslo Børs er stengt i 2027** er ikke ført inn (åpent punkt 25, lagt
+  til 2026-09-27, eier Marian, frist 2026-12-01). Lista dekker bare 2026, så
+  fra 2027-01-01 reiser `innevaerende_boersdag`, og dermed `skriv`. Dagene
+  føres inn i `STENGT` i `src/boersdag.py` og i `docs/kilder-og-rettigheter.md`
+  (Handelskalenderen) når Euronext publiserer dem, og 2027 legges til i
+  `DEKKEDE_AAR` samtidig.
 
 ## Technical Decisions
 
@@ -106,8 +121,31 @@ stilles, er et åpent punkt med frist før demonstrasjonen.
 - **Uerstattelige lagre** (`vurdering`, `ki_logg`) har bare `skriv` og
   lesemetoder. `skriv` er idempotent på `(symbol, dato)` og avviser enhver dato
   som ikke er inneværende børsdag. Datogrensen regnes i norsk tid, ikke i UTC.
+  *Presisert 2026-09-27 (1.6):* samme `(symbol, dato)` igjen skriver over, og
+  den siste vinner, med ett unntak: en `Grunn` over en `Vurdering` ignoreres,
+  og `skriv` gir `False` uten å reise, så ett symbol som feiler, ikke stopper
+  kjøringen. En dato som avvises, reiser, og da skrives ingenting.
 - **`vurdering` lagrer kursen som verdier.** Den har ingen fremmednøkkel til
   `kurs`, fordi `erstatt_serie` ellers ville feilet eller slettet historikk.
+- **Slik 1.6 ble bygget (2026-09-27, `7dc8a48`):**
+  - `src/boersdag.py` er ren kjerne: `innevaerende_boersdag(dag)` gir siste
+    børsdag på eller før `dag`, og `norsk_dato(oeyeblikk)` gir kalenderdatoen
+    i Oslo for et tidspunkt med sone (uten sone reiser den). `STENGT` er de
+    stengte hverdagene i 2026, og `DEKKEDE_AAR` er årene lista dekker. Må
+    funksjonen slå opp en dag utenfor dem, reiser den `UtenforKalenderen`
+    (en `ValueError`) i stedet for å gjette. Den leser aldri klokka selv.
+  - `src/vurderingsdata.py` er porten, uten I/O og uten import av kjernen:
+    `Vurdering` (styrke, retning, de tre sjekkene og `slutt`/`justert_slutt`,
+    kontrollert ved opprettelse), `Grunn` (`symbol_feilet`,
+    `kurs_ikke_fra_dagen`, `signal_ikke_regnet`) og `Vurderingslager` med
+    bare `skriv` og `les`. `les` gir `Vurdering`, `Grunn` eller `None`.
+  - `0002_vurdering.sql` lager `vurdering` og `grunn`. En `CHECK` krever enten
+    alle sju vurderingsfeltene eller en grunn, aldri begge. Grunnene er rader i
+    `grunn`, håndhevet med triggere, og en grunn kan ikke slettes eller endres.
+  - `SqliteVurderingslager` i `src/lagring_sqlite.py` tar en tilkobling og en
+    klokke, og klokka leses ved hvert `skriv`. Den godtar bare symboler i
+    `AKSJEUNIVERS` (formen `EQNR`, ikke `EQNR.OL`), både i `skriv` og `les`.
+    Det finnes med vilje ikke noe minnelager. Testene bruker SQLite i minnet.
 - **Skjemaendringer bare via nummererte migrasjoner** med `skjema_versjon`.
   Løperen styrer transaksjonen selv og bruker aldri `executescript()`, som gjør
   en implisitt `COMMIT`. `vurdering` opprettes av migrasjon `0002`, og `0002`
@@ -136,12 +174,21 @@ stilles, er et åpent punkt med frist før demonstrasjonen.
   herdingen er på plass. Punkt 3 og 24 gjenstår. *Oppdatert 2026-09-27:* punkt 3
   er avgjort (se «Uavklart i kildene»). Punkt 24 gjenstår. *Oppdatert
   2026-09-27:* punkt 24 er også avgjort, med en rad med grunnen, og må tas
-  hensyn til i 1.6. Ingen av de to gjenstår.
+  hensyn til i 1.6. Ingen av de to gjenstår. *Ferdig 2026-09-27:* 1.6 er
+  flettet i `7dc8a48` (PR #8).
+- **1.7 bygger på 1.6:** de tre tilstandene leses fra `vurdering` gjennom
+  `Vurderingslager`, og børsdagene fra `src/boersdag.py`. En rad med grunn
+  leses som en rad (kommandoen kjørte, men kunne ikke vurdere aksjen), ikke som
+  styrke 0 og ikke som fravær.
 - **Epic 2 venter på Epic 1:** hentingen skriver gjennom `Kurslager`, bruker
   `kursrad_fra_eodhd` og skriver vurderingen gjennom `Vurderingslager` i samme
   kjøring (2.5). Svaret på åpent punkt 24 bestemmer hva 2.5 skriver for et
   symbol som feilet. *Avgjort 2026-09-27:* en rad med grunnen, også når nyeste
-  kurs ikke er fra dagen og når signalet ikke kan regnes.
+  kurs ikke er fra dagen og når signalet ikke kan regnes. *Utsatt til 2.5
+  (2026-09-27, funnet i gjennomgangen av 1.6):* en kjøring som går over
+  midnatt i Oslo, får `ValueError` fra `skriv` for resten av symbolene, fordi
+  klokka leses ved hvert kall. Symbolene som alt er skrevet, står, mens resten
+  får verken vurdering eller grunn. 2.5 må si hva som skjer da.
 - **Epic 4.3** (SQLite-adapter for `KILogg`) venter på Epic 1. **Epic 5B**
   avhenger av 1.4a (`Kursleser`).
 - **Utsatt til story 3.1:** hvem som kjører migrasjonene, og når. Løperen må
