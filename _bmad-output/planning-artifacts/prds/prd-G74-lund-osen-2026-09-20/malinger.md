@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-26T23:46
+updated: 2026-09-27T11:53
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -978,16 +978,17 @@ endrer karakter. **Det kan de ikke**, og grunnen er ikke språket eller formatet
 Regelfilteret sorterer på NewsWebs **regulatoriske** kategoritaksonomi
 (FR-502, tre bøtter): hvilken meldeplikt meldingen oppfyller.
 
-EODHDs nyheter har tagger — **31 unike over ti artikler, 9 av 10 har minst én** —
-men de er **tematiske**: `SHARE-BUYBACK`, `EARNINGS`, `M-A`, `VALUATION`. De
-sier hva saken handler om, ikke hvilken meldeplikt den oppfyller.
+EODHDs nyheter har tagger — **31 unike over ti artikler, 9 av 10 har minst én**
+— men de er **tematiske**, som tagger om tilbakekjøp, resultater, oppkjøp og
+verdsettelse. De sier hva saken handler om, ikke hvilken meldeplikt den
+oppfyller.
 
-Forskjellen er ikke akademisk. `SHARE-BUYBACK` skiller ikke den ukentlige
-statusrapporten under «Utsteders meldeplikt ved handel i egne aksjer» — som
-FR-502 filtrerer bort, 35 av 121 meldinger — fra oppstarten av et nytt program,
-som er ekte nyhet. Det er nøyaktig skillet **åpent punkt 8** handler om, og
-EODHDs taksonomi kan ikke uttrykke det. **FR-502s bøtter kan ikke utledes av
-den**, og måtte bygges om fra grunnen.
+Forskjellen er ikke akademisk. En tagg om tilbakekjøp skiller ikke den
+ukentlige statusrapporten under «Utsteders meldeplikt ved handel i egne aksjer»
+— som FR-502 filtrerer bort, 35 av 121 meldinger — fra oppstarten av et nytt
+program, som er ekte nyhet. Det er nøyaktig skillet **åpent punkt 8** handler
+om, og EODHDs taksonomi kan ikke uttrykke det. **FR-502s bøtter kan ikke
+utledes av den**, og måtte bygges om fra grunnen.
 
 *Rettet 2026-09-22 etter kontroll.* Paragrafen sa opprinnelig at `tags` er tom
 og at reglene derfor ikke har noen jobb. Det var feil: kontrollen så på artikkel

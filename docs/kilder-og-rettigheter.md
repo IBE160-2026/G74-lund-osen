@@ -2,7 +2,7 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-26T21:49
+updated: 2026-09-27T11:53
 ---
 
 # Kilder og rettigheter
@@ -855,6 +855,7 @@ datasettet**.
 | Kalltall, kvoteforbruk og måleresultater | Alt innhold i `data/` |
 | Metodebeskrivelser og konklusjoner | |
 | Meldingstitler: fjernet 2026-09-24 til Euronext har svart. Brevet 21.09 opplyste om dem, og de ligger i historikken | |
+| Antall tagger og hva de handler om | EODHDs tagger ordrett, fjernet 2026-09-27. De ligger i historikken |
 
 *2026-09-24:* brevet til Euronext 21.09 opplyste om «a small number of
 announcement titles quoted in our documentation to show what we measured»
@@ -868,6 +869,10 @@ EODHD-nyhetene står ordrett i sporede filer, kontrollert mot
 `data/nyhetstest-raa-2026-09-21.json` samme dag.
 *2026-09-26:* to titler i `malinger.md` («Fire sidefunn») og i PRD-memloggen ble
 oversett 24.09. De er byttet med en beskrivelse.
+*2026-09-27:* EODHDs tagger regnes også som meldingsinnhold. De sto ordrett i
+`docs/kontroll-2026-09-22.md`, i rettingsplanen og i `malinger.md` §10, og er
+byttet med antall og beskrivelser. Avgjort av oss etter kontrollen 26.09
+(`docs/kontroll-2026-09-26.md`).
 
 `data/` ligger i `.gitignore`, sammen med `.env`. Rådata og API-nøkler er derfor
 ikke eksponert.

@@ -2,7 +2,7 @@
 title: "Rettingsplan etter kontrollen 22.09.2026"
 status: final
 created: 2026-09-22
-updated: 2026-09-24T21:58
+updated: 2026-09-27T11:53
 ---
 
 # Rettingsplan etter kontrollen 22.09.2026
@@ -22,20 +22,24 @@ Bygget opp på nytt fra rådataene, ikke omformulert.
 
 Alle ti artiklene, lest på nytt:
 
-| # | `tags` |
+| # | Antall tagger |
 |---|---|
-| 1 | `[]` |
-| 2 | `SHARE-BUYBACK` |
-| 3 | `ACQUISITION, ENERGY, ENGINEERING, M-A, OFFSHORE-WIND` |
-| 4 | `BANKS, FINANCIALS, M-A` |
-| 5 | `BANKS, EARNINGS, FINANCIALS, RETURN ON EQUITY, SHARE-BUYBACK` |
-| 6 | `ENERGY-TRANSITION, GREEN-FINANCING, OFFSHORE-WIND` |
-| 7 | `AI, CLOUD-COMPUTING, FINANCIAL-SERVICES, PARTNERSHIP, TECHNOLOGY` |
-| 8 | `BANKING, EARNINGS, PRICE-TARGET, RISKS, SHAREHOLDER` |
-| 9 | `BANKS, DISCOUNTED CASH FLOW, DIVIDENDS, EARNINGS PER SHARE, INCOME-INVESTING, NET INCOME, NORWEGIAN-MARKET, REVENUE GROWTH, SHARE PRICE, SHAREHOLDER, VALUATION` |
-| 10 | `AI, CLOUD-COMPUTING, FINANCIALS, TECH` |
+| 1 | 0 |
+| 2 | 1 |
+| 3 | 5 |
+| 4 | 3 |
+| 5 | 5 |
+| 6 | 3 |
+| 7 | 5 |
+| 8 | 5 |
+| 9 | 11 |
+| 10 | 4 |
 
 **31 unike tagger over ti artikler. Ni av ti har minst én.**
+
+*Rettet 2026-09-27:* her sto EODHDs tagger ordrett for hver artikkel. De er
+byttet med antallet, fordi vi regner taggene som meldingsinnhold (regel 16).
+Eksemplene lenger ned er byttet med beskrivelser. Taggene ligger i historikken.
 
 ### Hva som FORTSATT støtter konklusjonen
 
@@ -51,7 +55,7 @@ det siste, og bøttene følger av det:
 | Utsteders meldeplikt ved handel i egne aksjer | **Filtreres bort** (35 av 121) |
 | Ikke-informasjonspliktige pressemeldinger | KI avgjør relevans |
 
-En tag som `SHARE-BUYBACK` sier at saken handler om tilbakekjøp. Den sier
+En tagg om tilbakekjøp sier bare at saken handler om tilbakekjøp. Den sier
 **ikke** om det er den ukentlige statusrapporten under meldeplikt — som
 filtreres bort — eller oppstarten av et nytt program, som er ekte nyhet. Det er
 nøyaktig skillet **åpent punkt 8** handler om, og EODHDs taksonomi kan ikke
@@ -113,12 +117,12 @@ begrunnelsen står gjengitt to steder.
 > (FR-502, tre bøtter): hvilken meldeplikt meldingen oppfyller.
 >
 > EODHDs nyheter har tagger — 31 unike over ti artikler, 9 av 10 har minst én —
-> men de er **tematiske**: `SHARE-BUYBACK`, `EARNINGS`, `M-A`. De sier hva saken
-> handler om, ikke hvilken meldeplikt den oppfyller.
+> men de er **tematiske**, som tagger om tilbakekjøp, resultater og oppkjøp. De
+> sier hva saken handler om, ikke hvilken meldeplikt den oppfyller.
 >
-> Forskjellen er ikke akademisk. `SHARE-BUYBACK` skiller ikke den ukentlige
-> statusrapporten under meldeplikt — som FR-502 filtrerer bort, 35 av 121
-> meldinger — fra oppstarten av et nytt program, som er ekte nyhet. Det er
+> Forskjellen er ikke akademisk. En tagg om tilbakekjøp skiller ikke den
+> ukentlige statusrapporten under meldeplikt — som FR-502 filtrerer bort, 35 av
+> 121 meldinger — fra oppstarten av et nytt program, som er ekte nyhet. Det er
 > nøyaktig skillet åpent punkt 8 handler om. **FR-502s bøtter kan ikke utledes
 > av denne taksonomien**, og måtte bygges om fra grunnen.
 >
