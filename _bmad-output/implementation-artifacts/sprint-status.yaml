@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-24-2026 19:26
-last_updated: 09-28-2026 00:11
+last_updated: 09-28-2026 00:29
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -39,24 +39,29 @@ story_location: _bmad-output/implementation-artifacts
 # og nummereringen avgjoeres da. Avgjort 2026-09-24.
 # Ferdige storyer og commitene deres (satt 2026-09-24, etter at 1.1-1.3 var bygget):
 #   1.1 57a83c5, 1.2 a796214, 1.3 f4fada0 - alle 2026-09-23
+# Satt 2026-09-28, da Epic 1 ble lukket. Kodegjennomgangen av Epic 1 tok ogsaa 2.0 og 9.0:
+#   1.4a 04933f6 (2026-09-24), 1.4b c5efd05, 1.4c a91ef79, 1.5 23af8db (alle
+#   2026-09-25), 1.5b ef1cca7 (2026-09-26), 1.6 7dc8a48, 1.7 5e9e6ad, 1.8 5c316e8
+#   (alle 2026-09-27), 1.9 cfe2977 (2026-09-28), 2.0 4b65a3c (2026-09-26) og
+#   9.0 c2c26ba (2026-09-27)
 development_status:
-  epic-1: in-progress
+  epic-1: done
   1-1-migrasjonsløperen-og-skjema_versjon: done
   1-2-kursrad-og-kurslager-porten: done
   1-3-sqlite-adapteren-og-kurs-tabellen: done
-  1-4a-lesegrensen-kursleser-og-oversetteren-fra-øyeblikksbildet: review
-  1-4b-konsumentene-leser-kursrad: review
-  1-4c-rydding-kurskilde-ut-sist_hentet-inn: review
-  1-5-snapshotkilde-ut-av-kursdata-py: review
-  1-5b-migrasjonsløperen-og-sqlite-adapteren-herdes: review
-  1-6-vurderingslager-med-datoavvisning: review
-  1-7-de-tre-tilstandene-skilles: review
-  1-8-hentingen-godtar-bare-det-leseren-kan-lese: review
-  1-9-aksjene-i-basen-og-tabellene-peker-på-dem: review
+  1-4a-lesegrensen-kursleser-og-oversetteren-fra-øyeblikksbildet: done
+  1-4b-konsumentene-leser-kursrad: done
+  1-4c-rydding-kurskilde-ut-sist_hentet-inn: done
+  1-5-snapshotkilde-ut-av-kursdata-py: done
+  1-5b-migrasjonsløperen-og-sqlite-adapteren-herdes: done
+  1-6-vurderingslager-med-datoavvisning: done
+  1-7-de-tre-tilstandene-skilles: done
+  1-8-hentingen-godtar-bare-det-leseren-kan-lese: done
+  1-9-aksjene-i-basen-og-tabellene-peker-på-dem: done
   epic-1-retrospective: optional
 
   epic-2: backlog
-  2-0-hentingen-lekker-ikke-nøkkelen-og-skriver-ikke-over-et-øyeblikksbilde: review
+  2-0-hentingen-lekker-ikke-nøkkelen-og-skriver-ikke-over-et-øyeblikksbilde: done
   2-1-børsdag-i-oslo-tidsstempel-i-utc: backlog
   2-2-hentekommandoen-som-egen-inngang: backlog
   2-3-børsdagskontroll-før-kvoten-brukes: backlog
@@ -106,7 +111,7 @@ development_status:
   epic-8-retrospective: optional
 
   epic-9: in-progress
-  9-0-fem-tester-sjekker-det-de-lover: review
+  9-0-fem-tester-sjekker-det-de-lover: done
   9-1-docs-kvalitetssikring-md: backlog
   9-2-docs-ai-prompts-bygging: backlog
   9-3-arbeidsmønsteret: done

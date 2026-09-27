@@ -491,6 +491,8 @@ linjen er ikke ferdig spesifisert.
 
 ## Epic 1: Dataene overlever en omstart
 
+*Lukket 2026-09-28:* alle storyene, 1.1–1.9 med 1.4a–1.4c og 1.5b, er flettet. Funnene fra kodegjennomgangen av Epic 1 (`kodegjennomgang-epic-1.md`) er rettet i 1.8 og 1.9 eller lagt til 2.1, 2.5 og 4.0. Verken appen eller hentingen bruker basen ennå. Det avgjøres når Epic 2 planlegges (innledningen til Epic 2).
+
 Rekkefølgen inne i epicen er bundet av `AD-19`.
 
 ### Story 1.1: Migrasjonsløperen og `skjema_versjon`
