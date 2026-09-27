@@ -64,9 +64,10 @@ et sitat som ikke fantes».
     urørt, og versjon 2 i full lengde ligger i `arbeidskrav-product-brief-v2`.
     Fila endres ikke uten at Marian eller Joakim ber om det uttrykkelig. Må den
     endres før fristen, lages en ny tag med neste ledige nummer (`-v8`, `-v9`
-    …); en tag flyttes aldri. Versjon 7 er om lag 750 ord og fyller to sider, så
-    en ny versjon skal ikke bli lengre. Tilbakemeldingen fra faglærerne føres i
-    `innlevering.md`, ikke i briefen.
+    …); en tag flyttes aldri. Versjon 7 er om lag 790 ord (785, telt med `\w+`
+    som i kontrollene av briefen) og fyller to sider, så en ny versjon skal ikke
+    bli lengre. Tilbakemeldingen fra faglærerne føres i `innlevering.md`, ikke i
+    briefen.
 18. **Hver instruksjon lagres ordrett, også når den skrives rett inn.** Den
     lagres i `docs/ai-prompts/<ÅÅÅÅ-MM-DD>.md` før den utføres, med klokkeslett.
     Når den er utført, legges en linje under med commitene og utfallet. Linjen
