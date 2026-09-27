@@ -19,8 +19,8 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
-from eodhd import kursrad_fra_eodhd
-from kursdata import Kursleser, Kursrad, UgyldigKursrad
+from eodhd import UgyldigSerie, serie_fra_eodhd
+from kursdata import Kursleser, Kursrad
 
 PROSJEKTROT = Path(__file__).resolve().parent.parent
 DATA_KATALOG = PROSJEKTROT / "data"
@@ -90,17 +90,15 @@ class SnapshotLeser:
         if self._hentet is None or not isinstance(kilde.serier, dict):
             return
         for symbol, raa in kilde.serier.items():
-            # En serie som ikke er en liste, gjoer bare dette symbolet manglende.
-            if not isinstance(raa, list):
-                continue
+            # Regelen er den samme som i hentingen (story 1.8). En serie som
+            # ikke kan leses, gjoer bare dette symbolet manglende.
             try:
-                rader = [kursrad_fra_eodhd(r) for r in raa]
-            except (UgyldigKursrad, KeyError):
+                rader = serie_fra_eodhd(raa)
+            except UgyldigSerie:
                 continue
-            datoer = {r.dato for r in rader}
-            if not rader or len(datoer) != len(rader):
+            if not rader:
                 continue
-            self._serier[symbol] = tuple(sorted(rader, key=lambda r: r.dato))
+            self._serier[symbol] = tuple(rader)
 
     def serie(self, symbol: str) -> list[Kursrad]:
         return list(self._serier.get(symbol, ()))

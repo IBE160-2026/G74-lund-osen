@@ -6,6 +6,8 @@ som mangler, gir KeyError. SnapshotLeser fanger de to og behandler symbolet som
 manglende: tom serie og sist_hentet None. De andre symbolene leses som vanlig.
 
 Siden story 1.5 ligger oversetteren i eodhd.py og SnapshotLeser i lagring_fil.py.
+Siden story 1.8 fanges de to i serie_fra_eodhd, som reiser UgyldigSerie, og
+SnapshotLeser og hentingen fanger den.
 
 Lesekontrakten SnapshotLeser deler med de to skrivbare lagrene, staar i
 test_kurslager.py (fixturen leser).
@@ -16,7 +18,7 @@ from datetime import date, datetime, timedelta, timezone
 
 import pytest
 
-from eodhd import kursrad_fra_eodhd
+from eodhd import UgyldigSerie, kursrad_fra_eodhd, serie_fra_eodhd
 from kursdata import Kursleser, Kurslager, Kursrad, UgyldigKursrad
 from lagring_fil import SnapshotKilde, SnapshotLeser
 
@@ -109,6 +111,48 @@ class TestOversetteren:
     def test_rad_som_ikke_er_et_objekt_gir_ugyldig_kursrad(self, rad):
         with pytest.raises(UgyldigKursrad):
             kursrad_fra_eodhd(rad)
+
+
+class TestSerieFraEodhd:
+    """Story 1.8: eneste regel for om en hel serie kan leses. Reiser bare
+    UgyldigSerie, saa hentingen og leseren fanger det samme."""
+
+    def test_gyldig_serie_gir_kursrad_nyeste_sist(self):
+        rader = serie_fra_eodhd([raa("2026-09-21"), raa("2026-09-17"), raa("2026-09-18")])
+
+        assert [r.dato for r in rader] == [
+            date(2026, 9, 17), date(2026, 9, 18), date(2026, 9, 21),
+        ]
+        assert all(type(r) is Kursrad for r in rader)
+
+    def test_tom_serie_gir_tom_liste_ikke_feil(self):
+        """Hentingen skiller «tomt svar» fra «svar med feil form»."""
+        assert serie_fra_eodhd([]) == []
+
+    @pytest.mark.parametrize("verdi", [None, 1, "tekst", {}, ({"date": "2026-09-21"},)],
+                             ids=["None", "tall", "tekst", "objekt", "tuppel"])
+    def test_serie_som_ikke_er_en_liste_gir_ugyldig_serie(self, verdi):
+        with pytest.raises(UgyldigSerie):
+            serie_fra_eodhd(verdi)
+
+    def test_ugyldig_rad_gir_ugyldig_serie_ikke_ugyldig_kursrad(self):
+        with pytest.raises(UgyldigSerie) as feil:
+            serie_fra_eodhd([raa("2026-09-18"), raa(close=0)])
+
+        assert isinstance(feil.value.__cause__, UgyldigKursrad)
+
+    def test_manglende_felt_gir_ugyldig_serie_ikke_keyerror(self):
+        rad = raa()
+        del rad["volume"]
+
+        with pytest.raises(UgyldigSerie) as feil:
+            serie_fra_eodhd([rad])
+
+        assert isinstance(feil.value.__cause__, KeyError)
+
+    def test_to_rader_med_samme_dato_gir_ugyldig_serie(self):
+        with pytest.raises(UgyldigSerie):
+            serie_fra_eodhd([raa("2026-09-21", close=100.0), raa("2026-09-21", close=101.0)])
 
 
 class TestSnapshotLeser:
