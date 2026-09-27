@@ -2,7 +2,7 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-27T11:54
+updated: 2026-09-27T13:26
 ---
 
 # Kilder og rettigheter
@@ -33,6 +33,7 @@ blir liggende lokalt er derfor et valg vi må ta bevisst — se neste avsnitt.
 | E24 RSS | — (forkastet) | 2026-09-19 | Forbyr eksplisitt LLM-input. Se under. |
 | NRK RSS | — (forkastet) | 2026-09-20 | Avviser automatisert henting med HTTP 403. Generelle nyheter uten finansfokus. |
 | Euronext | Finanskalender | **2026-09-21, fullstendig** | Samme vilkår som NewsWeb — `live.euronext.com` står i samme liste i samme dokument. |
+| Euronext, handelskalenderen | Stengte dager (punkt 3) | Som Euronext over | PDF lest av et menneske 2026-09-27, aldri hentet av programmet. Se seksjonen Handelskalenderen. |
 | Alpha Vantage | — (forkastet som hovedkilde) | Ikke kontrollert | Testet mot Oslo Børs, men symbolene var ikke pålitelige nok. Brukt i tidlige tester på gull og sølv. |
 
 Mediekilder vurdert til relevanseksperimentet står i egen seksjon lenger nede, ikke i tabellen over.
@@ -837,6 +838,16 @@ unntaket rekker over det vi gjør, og hvem det gjelder for.
 
 Børsmeldinger er kjernen i produktet, og det er denne kilden som leverer dem.
 Svaret fra Euronext er derfor prosjektets største åpne risiko.
+
+---
+
+## Handelskalenderen
+
+*Lagt til 2026-09-27 (punkt 3 i PRD-en).* Kilden er Euronexts «2026 Holiday Calendar for Euronext’s Cash and Derivatives markets» (fila begynner med IF251107CADE), som viser til `www.euronext.com/terms-use`, vilkårene over. Marian lastet den ned selv, og programmet henter den aldri (klausul 1). Datoene ble lest ut i rådgivningsøkta, sjekket av Marian og kontrollert mot samme fil, SHA-256 617bc559510ef3a3d86d4a8b804422d0ba4c4dae43782a0a728d57a23fc4b1c5. PDF-en committes ikke. Klausul 2 nevner også «copy» og «publish», så her står bare dagene, med henvisning. At ti stengte dager ikke er dokumentet, er vår egen vurdering.
+
+Stengt i 2026, alle hverdager: 2026-01-01, 2026-04-02, 2026-04-03, 2026-04-06, 2026-05-01, 2026-05-14, 2026-05-25, 2026-12-24, 2026-12-25 og 2026-12-31. 2026-04-01 er halv handelsdag og regnes som børsdag. Dagene for 2027 føres inn når Euronext publiserer dem.
+
+Hodet i PDF-en sier «07 November 2026», men dokumentet er merket «© 2025». Datoene avhenger ikke av det.
 
 ---
 
