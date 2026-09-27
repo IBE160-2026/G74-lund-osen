@@ -11,7 +11,7 @@ nyttaar, og halvdagen foer paaske.
 """
 
 import re
-from datetime import date, datetime, timezone, tzinfo
+from datetime import date, datetime, timedelta, timezone, tzinfo
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -21,6 +21,7 @@ from boersdag import (
     DEKKEDE_AAR,
     STENGT,
     UtenforKalenderen,
+    er_boersdag,
     innevaerende_boersdag,
     norsk_dato,
 )
@@ -97,6 +98,48 @@ class TestInnevaerendeBoersdag:
         sone. Dagen skal vaere regnet om foer den kommer hit (norsk_dato)."""
         with pytest.raises(TypeError):
             innevaerende_boersdag(datetime(2026, 9, 22, 12, tzinfo=timezone.utc))
+
+
+class TestErBoersdag:
+    """Story 1.7: samme liste som inneveerende_boersdag, ingen ny."""
+
+    def test_vanlig_hverdag_er_boersdag(self):
+        assert er_boersdag(date(2026, 9, 22)) is True
+
+    @pytest.mark.parametrize("dag", [date(2026, 9, 26), date(2026, 9, 27)])
+    def test_helg_er_ikke_boersdag(self, dag):
+        assert er_boersdag(dag) is False
+
+    @pytest.mark.parametrize("dag", sorted(STENGT))
+    def test_hver_stengte_dag_er_ikke_boersdag(self, dag):
+        assert er_boersdag(dag) is False
+
+    def test_halv_handelsdag_er_boersdag(self):
+        assert er_boersdag(date(2026, 4, 1)) is True
+
+    def test_1_januar_2026_reiser_ikke(self):
+        """Dagen selv er i 2026. Ingen annen dag slaas opp, i motsetning til
+        inneveerende_boersdag, som maa gaa til 2025-12-31."""
+        assert er_boersdag(date(2026, 1, 1)) is False
+
+    @pytest.mark.parametrize("dag", [date(2025, 12, 31), date(2027, 1, 4)])
+    def test_dag_utenfor_dekkede_aar_reiser(self, dag):
+        with pytest.raises(UtenforKalenderen, match=dag.isoformat()):
+            er_boersdag(dag)
+
+    def test_tidspunkt_avvises_som_dag(self):
+        with pytest.raises(TypeError, match="date"):
+            er_boersdag(datetime(2026, 9, 22, 10, tzinfo=timezone.utc))
+
+    def test_enig_med_innevaerende_boersdag_hver_dag_i_dekkede_aar(self):
+        """Regelen staar to steder. En dag er boersdag hvis og bare hvis den er
+        sin egen inneveerende boersdag. 1. januar hoppes over i hvert aar,
+        fordi inneveerende_boersdag der maa slaa opp aaret foer."""
+        for aar in DEKKEDE_AAR:
+            dag = date(aar, 1, 2)
+            while dag.year == aar:
+                assert er_boersdag(dag) == (innevaerende_boersdag(dag) == dag), dag
+                dag += timedelta(days=1)
 
 
 class TestStengteDager:
