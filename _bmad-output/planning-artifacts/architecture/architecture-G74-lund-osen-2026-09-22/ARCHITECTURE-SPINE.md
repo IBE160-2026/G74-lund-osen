@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-27T14:55'
+updated: '2026-09-27T15:52'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -38,12 +38,13 @@ kjernemodul sin docstring, med ulik ordlyd. Fire av fem åpner med «Ren logikk�
 (`signalberegning.py`, `meldinger.py`, `markedsoversikt.py`, `aksjedetalj.py`),
 mens `graf.py` åpner med «Ren regning». Bare `aksjedetalj.py` har setningen
 *«Ren logikk. Ingen API-kall, ingen filer, ingen HTML.»* ordrett. Spinen navngir
-mønsteret og gjør det bindende.
+mønsteret og gjør det bindende. *Lagt til 2026-09-27:* `boersdag.py` (story 1.6)
+er den sjette kjernemodulen og har også «Ren logikk».
 
 | Lag | Filer | Regel |
 |---|---|---|
-| **Kjerne** | `signalberegning.py`, `meldinger.py`, `markedsoversikt.py`, `aksjedetalj.py`, `graf.py` | Ingen import av `requests`, `sqlite3`, `pathlib`, `flask` |
-| **Porter** | `kursdata.py` | Protokoller, verdityper og minneimplementasjonene testene bruker (`MinneKurslager`). *Rettet 2026-09-25: `MinneKilde` ble fjernet i story 1.4c*. Ingen I/O — oppfylt fra story 1.5 (`23af8db`). *Rettet 2026-09-25: her sto «brytes i dag, se under»* |
+| **Kjerne** | `signalberegning.py`, `meldinger.py`, `markedsoversikt.py`, `aksjedetalj.py`, `graf.py`, `boersdag.py` (inneværende børsdag, story 1.6) | Ingen import av `requests`, `sqlite3`, `pathlib`, `flask` |
+| **Porter** | `kursdata.py`, `vurderingsdata.py` | Protokoller, verdityper og minneimplementasjonene testene bruker (`MinneKurslager`). *Rettet 2026-09-25: `MinneKilde` ble fjernet i story 1.4c*. Ingen I/O — oppfylt fra story 1.5 (`23af8db`). *Rettet 2026-09-25: her sto «brytes i dag, se under»*. `Vurderingslager` (story 1.6) har med vilje **ikke** noe minnelager: reglene for overskriving (siste vinner, men en grunn aldri over en vurdering) skal stå ett sted, i adapterens upsert, og testene bruker SQLite i minnet (`sqlite3.connect(":memory:")`) |
 | **Skall** | `app.py` (HTTP), `fetch_prices.py` (nett), `lagring_sqlite.py` (SQLite), `lagring_fil.py` (øyeblikksbildene i `data/`), `eodhd.py` (EODHDs feltnavn til `Kursrad`) | Eneste lag som kjenner teknologi |
 
 **`kursdata.py` oppfyller portregelen fra story 1.5 (`23af8db`, 2026-09-25).**
@@ -71,6 +72,7 @@ graph TD
     end
     subgraph porter["Porter — Protocol"]
         kursdata["kursdata.py"]
+        vurdering["vurderingsdata.py"]
     end
     subgraph kjerne["Kjerne — ren logikk"]
         marked["markedsoversikt.py"]
@@ -78,6 +80,7 @@ graph TD
         graf["graf.py"]
         signal["signalberegning.py"]
         meld["meldinger.py"]
+        boersdag["boersdag.py"]
     end
 
     app --> marked
@@ -88,6 +91,8 @@ graph TD
     fetch --> kursdata
     fetch --> fil
     sqlite -. implementerer .-> kursdata
+    sqlite -. implementerer .-> vurdering
+    sqlite --> boersdag
     fil -. implementerer .-> kursdata
     fil --> eodhd
     eodhd --> kursdata
@@ -100,8 +105,13 @@ graph TD
     signal --> kursdata
 ```
 
-`meldinger.py` og `kursdata.py` importerer ingen annen prosjektmodul. De er
-løvnoder, og skal forbli det. `signalberegning.py` importerer bare `kursdata`,
+`meldinger.py`, `kursdata.py`, `vurderingsdata.py` og `boersdag.py` importerer
+ingen annen prosjektmodul. De er løvnoder, og skal forbli det. *Lagt til
+2026-09-27 (story 1.6):* `vurderingsdata.py` og `boersdag.py`. Porten
+importerer ikke kjernen, så datokontrollen i `skriv` ligger i
+`lagring_sqlite.py`, som bruker `boersdag.py`. `tests/test_konsumentene.py`
+feiler hvis en port importerer en adapter eller en kjernemodul.
+`signalberegning.py` importerer bare `kursdata`,
 for `Kursrad`, siden story 1.4b (`c5efd05`). *Rettet 2026-09-26:* her sto at
 også `signalberegning.py` ikke importerte noen annen prosjektmodul, og kanten
 `signal --> kursdata` manglet i grafen.
@@ -156,6 +166,7 @@ også `signalberegning.py` ikke importerte noen annen prosjektmodul, og kanten
 - **Rule:** `Vurderingslager` og `KILogg` har **bare** `skriv` og lesemetoder. Ingen `slett`, ingen `endre`. **Fraværet er invarianten.** Mønsteret er utvidet, ikke oppfunnet: `SnapshotKilde` har allerede «med vilje ingen skrivemetode».
 - **Skjerpet:** fraværet alene holder ikke, fordi AD-17 krever at `skriv` er idempotent på `(symbol, dato)` — og en upsert *endrer* raden hvis den finnes. Derfor bærer **formen** regelen: `skriv` tar imot datoen og **avviser enhver dato som ikke er inneværende børsdag**. Dagens rad kan skrives om så mange ganger man vil; en eldre rad er utilgjengelig gjennom porten. Ingen behøver å huske forskjellen. Dette er en skjerping av AD-7, ikke et unntak fra den.
 - **Utvidet 2026-09-27 (punkt 24 i PRD-en):** en rad kan ha en grunn i stedet for vurderingen. En rad med grunn skriver aldri over en rad med vurdering samme dag, så en kjøring som feiler, kan ikke viske ut et svar som alt er skrevet.
+- **Bygget 2026-09-27, story 1.6:** `vurderingsdata.py` er porten, med bare `skriv` og `les`. `SqliteVurderingslager` tar en klokke, regner dagen i Europe/Oslo med `boersdag.norsk_dato` og avviser enhver annen dato enn `boersdag.innevaerende_boersdag`. `vurdering` lages av `0002_vurdering.sql` med en `CHECK` for enten vurdering eller grunn, og grunnene står i en egen tabell `grunn`. Hvert kontrollpunkt i storyen er prøvd med en mutant (spesifikasjonen, Implementation Notes).
 - **Merk:** skillet mellom gjenoppbyggbart og uerstattelig går **tvers gjennom databasen**, ikke mellom base og fil. `kurs` er gjenoppbyggbar; `vurdering` og `ki_logg` er det ikke.
 - **Konsekvensen er tilsiktet:** en dag ingen kjørte hentekommandoen, kan ikke etterfylles med en vurdering. `FR-403` fyller hull i kursserien fordi en kurs for 12.09 er den samme uansett når den hentes; en vurdering er det ikke. Dagen skal kunne skilles som manglende, ikke som tom, i lageret — `FR-409`. *Rettet 2026-09-24: her sto «vises». FR-409 er et lagerkrav.*
 
@@ -371,6 +382,8 @@ mot `melding` er derfor en *mulig* kilde, ikke den bindende. Valget ligger i
 G74-lund-osen/
   src/
     kursdata.py          # porter + AKSJEUNIVERS. Ingen I/O
+    vurderingsdata.py    # porten Vurderingslager. Ingen I/O  [bygget i 1.6]
+    boersdag.py          # inneværende børsdag, ren logikk  [bygget i 1.6]
     lagring_sqlite.py    # adapter: implementerer portene   [bygget i 1.3]
     migrasjoner/         # nummererte SQL-filer (AD-16)     [bygget i 1.3]
     fetch_prices.py      # eneste nettkall
@@ -410,9 +423,9 @@ G74-lund-osen/
 | **Nøyaktig Docker-baseimage** | Må verifiseres mot gjeldende tagger når Dockerfilen skrives. Bindingen er at Python-versjonen matcher CI (3.13), ikke en bestemt tag |
 | **KI-laget (FR-601..606)** | Modelltjeneste er ikke valgt, og betingelse 4 i EODHDs godkjenning — at tjenesten ikke trener på innholdet — er udokumentert. Den må føres **før** artikkeltekst sendes inn |
 | **Plan B (Epic 5B), utløses 28.09** | KI forklarer signalet ut fra utledede verdier, hvis Euronext svarer nei eller ikke svarer innen 28.09 (åpent punkt 1 og 19). Arkitekturen for modellkallet er AD-2 (én hentefunksjon), AD-7 (`KILogg`) og AD-17 (teksten lages i hentekommandoen). Avgjøres 28.09, ikke før. *Lagt til 2026-09-24* |
-| **Kilde for handelskalenderen** | **Avgjort 2026-09-27** (punkt 3 i `prd.md` §8): stengte dager ført for hånd fra Euronexts egen kalender (`docs/kilder-og-rettigheter.md`, seksjonen Handelskalenderen). Svaret lander i én ren funksjon i kjernen, som får datoen inn; modulen navngis i story 1.6. Det svarer på FUNN 5 i `reviews/review-rubrikk.md`, som ba om at plasseringen ble festet *(rettet 2026-09-27: her sto «Åpent punkt 3. FR-402 hviler på «forventet børsdag», men ingen kilde er utpekt»)* |
+| **Kilde for handelskalenderen** | **Avgjort 2026-09-27** (punkt 3 i `prd.md` §8): stengte dager ført for hånd fra Euronexts egen kalender (`docs/kilder-og-rettigheter.md`, seksjonen Handelskalenderen). Svaret lander i én ren funksjon i kjernen, som får datoen inn: `innevaerende_boersdag` i `src/boersdag.py`, bygget i story 1.6 (27.09). Dagene for 2027 føres inn før 2027-01-01 (punkt 25). Det svarer på FUNN 5 i `reviews/review-rubrikk.md`, som ba om at plasseringen ble festet *(rettet 2026-09-27: her sto «Åpent punkt 3. FR-402 hviler på «forventet børsdag», men ingen kilde er utpekt»)* |
 | **NewsWeb-hentingen** | Åpent punkt 1. Euronext forbyr automatisert henting uten tillatelse; forespørselen er ubesvart. Arkitekturen låser seg derfor **ikke** til at meldingsdelen finnes |
 | **FR-301..303, kommende hendelser** | Hele PRD §4.3 var taus i første utkast av denne spinen. Det er en **tredje nettkilde** (Euronexts finanskalender) og et eid datasett uten port. `app.py` sier selv at «kommende hendelser mangler med vilje» — de ligger bak åpent punkt 1 og 12 *(rettet 2026-09-27: her sto «1, 3 og 12». Punkt 3 gjelder hvilke dager børsen er åpen, ikke finanskalenderen)*. Får sin port og sin AD når kilden er avklart, og **ikke før**. Står med vilje ikke i frontmatterens `binds` før en AD binder dem |
 | **Hvem kjører migrasjonene, og når** | AD-16 sier at de finnes, ikke hvem som anvender dem. Med to `docker run`-varianter (AD-10) er både web, henting og en tredje kommando forsvarlige svar. Avgjøres når Dockerfilen skrives. **Merk at en egen migrasjonskommando bryter suksessmålet «Drift»**, som krever at én kommando gjør hele hentingen — se `prd.md` §7 |
 | **Kjøremåte i containeren** | `app.py` har ingen WSGI-oppføring, og de flate importene virker i dag bare via `pythonpath = ["src"]` i pytest-konfigurasjonen. Begge må løses i Dockerfile-storyen |
-| **Skjemaendring på et uerstattelig lager** | SQLite krever `DROP TABLE` for de fleste formendringer. AD-7 forbyr sletting gjennom porten, men sier ikke om en migrasjon er unntatt. Må avgjøres før første migrasjon som rører `vurdering` |
+| **Skjemaendring på et uerstattelig lager** | SQLite krever `DROP TABLE` for de fleste formendringer. AD-7 forbyr sletting gjennom porten, men sier ikke om en migrasjon er unntatt. Må avgjøres før første migrasjon som rører `vurdering`. *Utsatt videre 2026-09-27 (story 1.6):* `0002` er formet så de to endringene vi vet om, ikke krever ombygging. En ny grunn er en `INSERT INTO grunn`, og «Relevante meldinger» (FR-408) kommer som en kolonne som kan være tom (`ALTER TABLE vurdering ADD COLUMN`), der `NULL` betyr «ikke registrert». Begge er prøvd i minnet. Verdiene kontrolleres i porten, ikke i en `CHECK`, fordi en ny regel i en `CHECK` krever ombygging. Spørsmålet står åpent for alle andre formendringer |

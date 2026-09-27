@@ -27,18 +27,24 @@ KJERNEMODULER = (
     "markedsoversikt.py",
     "aksjedetalj.py",
     "graf.py",
+    "boersdag.py",
 )
 
 FORBUDTE_MODULER = {"sqlite3", "pathlib"}
 
 EODHD_NOEKLER = ("adjusted_close", "close", "volume", "date")
 
-# Porten kjenner ingen adapter og gjoer ingen I/O (story 1.5).
-PORTMODUL = "kursdata.py"
-FORBUDT_I_PORTEN = {"json", "pathlib", "lagring_fil", "lagring_sqlite", "eodhd"}
+# Portene kjenner ingen adapter og gjoer ingen I/O (story 1.5). De importerer
+# heller ikke kjernen: de er loevnoder (spinen, grafen). Story 1.6 la til
+# vurderingsdata.py, som derfor ikke kan regne boersdagen selv.
+PORTMODULER = ("kursdata.py", "vurderingsdata.py")
+FORBUDT_I_PORTEN = {
+    "json", "pathlib", "sqlite3", "lagring_fil", "lagring_sqlite", "eodhd",
+    *(navn.removesuffix(".py") for navn in KJERNEMODULER),
+}
 
-# Modulene vakten mot EODHDs feltnavn gjelder: kjernen og porten.
-UTEN_EODHD = KJERNEMODULER + (PORTMODUL,)
+# Modulene vakten mot EODHDs feltnavn gjelder: kjernen og portene.
+UTEN_EODHD = KJERNEMODULER + PORTMODULER
 
 # Strengvakten gjelder i tillegg skallet utenom oversetteren (eodhd.py) og
 # nettadapteren (fetch_prices.py). Ikke fallbackvakten: lagring_sqlite.py
@@ -86,10 +92,11 @@ def test_fallbacken_er_borte(navn):
     assert re.findall(r"adjusted_close|rad\.get\(|rad\[", tekst) == []
 
 
-def test_porten_importerer_verken_io_eller_adapter():
-    """kursdata.py er porten. Den leser ikke filer, og den importerer ingen
-    adapter - da ville avhengigheten pekt feil vei (story 1.5)."""
-    assert _importerte_moduler(_tre(PORTMODUL)) & FORBUDT_I_PORTEN == set()
+@pytest.mark.parametrize("navn", PORTMODULER)
+def test_porten_importerer_verken_io_eller_adapter(navn):
+    """En port leser ikke filer, og den importerer verken en adapter eller
+    kjernen - da ville avhengigheten pekt feil vei (story 1.5 og 1.6)."""
+    assert _importerte_moduler(_tre(navn)) & FORBUDT_I_PORTEN == set()
 
 
 def _navn_i(tre: ast.Module) -> set[str]:

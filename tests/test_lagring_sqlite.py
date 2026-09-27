@@ -16,7 +16,7 @@ import pytest
 import lagring_sqlite
 from kursdata import Kursrad
 from lagring_sqlite import MIGRASJONSKATALOG, SqliteKurslager
-from migrering import migrer, versjon
+from migrering import migrer, siste_versjon, versjon
 
 HENTET = datetime(2026, 9, 22, 8, 33, tzinfo=timezone.utc)
 
@@ -186,39 +186,51 @@ class TestBaseSomIkkeErKlar:
     def test_base_paa_eldre_versjon_enn_katalogen_avvises(
         self, tilkobling, tmp_path, monkeypatch
     ):
-        """Story 1.5b, c: med 0002 i katalogen er en base paa versjon 1 ikke
-        klar. Adapteren sjekket foer bare at basen var migrert en gang."""
+        """Story 1.5b, c: med en migrasjon til i katalogen er basen ikke
+        klar. Adapteren sjekket foer bare at basen var migrert en gang.
+
+        Den nye migrasjonen faar neste ledige nummer, ikke et fast, saa testen
+        ikke brekker hver gang katalogen faar en migrasjon til (story 1.6)."""
+        siste = siste_versjon(MIGRASJONSKATALOG)
         katalog = tmp_path / "migrasjoner"
         katalog.mkdir()
         for fil in MIGRASJONSKATALOG.glob("*.sql"):
             (katalog / fil.name).write_bytes(fil.read_bytes())
-        (katalog / "0002_ny.sql").write_text(
+        (katalog / f"{siste + 1:04d}_ny.sql").write_text(
             "CREATE TABLE ny (x INTEGER);", encoding="utf-8"
         )
         monkeypatch.setattr(lagring_sqlite, "MIGRASJONSKATALOG", katalog)
 
-        with pytest.raises(RuntimeError, match=r"versjon 1, og .* har 2 migrasjoner"):
+        with pytest.raises(
+            RuntimeError, match=rf"versjon {siste}, og .* har {siste + 1} migrasjoner"
+        ):
             SqliteKurslager(tilkobling)
 
         # Adapteren migrerer ikke selv, og lager ingen tabeller.
-        assert versjon(tilkobling) == 1
+        assert versjon(tilkobling) == siste
         assert tilkobling.execute(
             "SELECT count(*) FROM sqlite_master WHERE name = 'ny'"
         ).fetchone()[0] == 0
 
     def test_base_paa_nyere_versjon_enn_katalogen_avvises(self, tmp_path, monkeypatch):
         """Story 1.5b, c: en base migrert av en nyere utgave av koden har et
-        skjema denne koden ikke kjenner."""
+        skjema denne koden ikke kjenner. Neste ledige nummer, som over."""
+        siste = siste_versjon(MIGRASJONSKATALOG)
         ny = tmp_path / "ny"
         ny.mkdir()
         for fil in MIGRASJONSKATALOG.glob("*.sql"):
             (ny / fil.name).write_bytes(fil.read_bytes())
-        (ny / "0002_ny.sql").write_text("CREATE TABLE ny (x INTEGER);", encoding="utf-8")
+        (ny / f"{siste + 1:04d}_ny.sql").write_text(
+            "CREATE TABLE ny (x INTEGER);", encoding="utf-8"
+        )
         tilkobling = sqlite3.connect(tmp_path / "nyere.db")
         try:
-            assert migrer(tilkobling, ny) == 2
+            assert migrer(tilkobling, ny) == siste + 1
 
-            with pytest.raises(RuntimeError, match=r"nyere enn koden.*versjon 2, og .* har bare 1"):
+            with pytest.raises(
+                RuntimeError,
+                match=rf"nyere enn koden.*versjon {siste + 1}, og .* har bare {siste}",
+            ):
                 SqliteKurslager(tilkobling)
         finally:
             tilkobling.close()
