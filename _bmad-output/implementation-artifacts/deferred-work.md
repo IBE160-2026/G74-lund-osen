@@ -27,9 +27,12 @@
 - source_spec: none
   summary: test_absolutt_endring_avgjoer_ved_lik_styrke (tests/test_markedsoversikt.py) tester ikke regelen i FR-102 om lik styrke. assert staar inne i en if som aldri slaar til.
   evidence: Kjoert med testdataene 26.09 (kontrollen av repoet, instruksjonen kl. 23:44): styrkene blir DNB 2 og EQNR 1, saa if-en er usann og ingenting sjekkes. Rettes i en egen liten story for testene, sammen med de to under.
+  resolved: Loest i story 9.0 (c2c26ba, 2026-09-27). EQNR faller 6 % og DNB stiger 3 %, begge faar styrke 2, og testen krever det med assert, ikke if. Rekkefoelgen skal vaere EQNR foer DNB, som verken fortegn eller navn gir. Testen feiler hvis abs fjernes i _sorteringsnokkel, eller hvis andresorteringen blir paa navn.
 - source_spec: none
   summary: test_noeyaktig_paa_grensen_gir_null (tests/test_signalberegning.py) skiller ikke <= fra < i noeytralsonen.
   evidence: Regnet ut 26.09: kurser_med_avvik(0.02) gir et avvik paa 0.019999999999999928, altsaa under grensen, saa baade <= og < gir 0. Rettes i den samme lille storyen for testene.
+  resolved: Loest i story 9.0 (c2c26ba, 2026-09-27). Seriene [100]*8 + [98, 102] og [100]*8 + [102, 98] gir snitt 100,0 og avvik noeyaktig +-0,02, og testen feiler hvis <= byttes med < i trend.
 - source_spec: none
   summary: test_formatet_kan_leses_av_snapshotkilde (tests/test_fetch_prices.py) lover at visningen kan lese det hentingen skriver, men leser med SnapshotKilde. Visningen leser gjennom SnapshotLeser.
   evidence: Kjoert 26.09: SnapshotLeser paa det samme oeyeblikksbildet gir sist_hentet None og en tom serie, fordi den avviser «naa» som hentet og «dag-000» som dato. Rettes i den samme lille storyen for testene.
+  resolved: Loest i story 9.0 (c2c26ba, 2026-09-27). Testen heter naa test_formatet_kan_leses_av_visningen (het test_formatet_kan_leses_av_snapshotkilde). Den skriver fila gjennom kjoer med ISO-datoer og leser den med nyeste_leser og SnapshotLeser, slik visningen gjoer. Den feiler hvis kjoer skriver hentet-tiden uten tidssone.
