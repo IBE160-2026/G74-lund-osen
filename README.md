@@ -34,6 +34,7 @@ den som committet.
 - **Kilder og bruksvilkår** — [`docs/kilder-og-rettigheter.md`](docs/kilder-og-rettigheter.md), med hva hver datakilde tillater og når det sist ble kontrollert. Forespørslene til EODHD og Euronext står i [`docs/epost-til-eodhd.md`](docs/epost-til-eodhd.md) og [`docs/epost-til-euronext.md`](docs/epost-til-euronext.md)
 - **Leveranseliste** — [`docs/innlevering.md`](docs/innlevering.md), med hva som skal leveres, og hvor det står
 - **Kontrollrapport 22.09** — [`docs/kontroll-2026-09-22.md`](docs/kontroll-2026-09-22.md), med rettingsplanen i [`docs/kontroll-2026-09-22-plan.md`](docs/kontroll-2026-09-22-plan.md)
+- **Kontrollrapport 26.09** — [`docs/kontroll-2026-09-26.md`](docs/kontroll-2026-09-26.md), med det som ble rettet samme kveld, og det som står igjen
 - **Refleksjonslogg og lagrede KI-prompts** — [`docs/reflection-log.md`](docs/reflection-log.md) og [`docs/ai-prompts/`](docs/ai-prompts/)
 
 ## Mappestruktur
