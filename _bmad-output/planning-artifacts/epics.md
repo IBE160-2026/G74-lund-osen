@@ -911,6 +911,8 @@ Som **gruppe**, vil vi at en aksje hentingen melder som hentet, også kan leses,
 
 **Én økt:** ja.
 
+*Ferdig 2026-09-27:* flettet i `5c316e8`, PR #10.
+
 ### Story 1.9: Aksjene i basen, og tabellene peker på dem
 
 *Lagt til 2026-09-27, fra prioriteringen samme dag.*
