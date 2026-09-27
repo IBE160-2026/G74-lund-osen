@@ -116,6 +116,28 @@ Bygget 27.09 direkte fra spesifikasjonen, ikke av en subagent, fordi planen krev
 
 ## Review Triage Log
 
+Runde 1, 28.09: Blind Hunter (BH, 11 funn), Edge Case Hunter (ECH, 5) og Verification Gap (VG, 1 hull og 1 annet funn). Hvert funn er prøvd mot koden på `8a7567b`. CI var grønn på PR #11 (871 passed).
+
+| # | Funn | Dom | Bevis | Rute |
+|---|---|---|---|---|
+| VG1 / BH6 | En ticker-oppdatering som ikke kolliderer, prøves ikke. Uten `AND symbol IS NOT OLD.symbol` ville hver ticker-oppdatering blitt avvist | low | Riktig: eneste test som endrer `ticker`, venter en avvisning | patch: `test_ticker_kan_endres_uten_kollisjon`, ny og samme ticker. Mutanten gir 1 feil |
+| VG-annet / BH2 / ECH5 | Forutsetningen i 2.5 sier samme avgjørelse to ganger og har både «Løses» og «Løst» | low | Riktig om gjentakelsen. «Løses …» er en datert merknad fra 27.09 og står, som andre daterte merknader i `epics.md` | patch: den gjentatte setningen er fjernet |
+| ECH1 | `match="…ukjent aksje i kurs"` treffer også `kursserie` | low | Riktig for adaptertesten: uten triggeren på `kurs` ville triggeren på `kursserie` gitt en melding som passer | patch: ankret med `$`. Uten INSERT-triggeren på `kurs` feiler nå også adaptertesten |
+| ECH2 | Slettes en aksje uten rader i SQL, godtar porten symbolet, og triggeren gir rå `IntegrityError` fra `SqliteVurderingslager` | low | Riktig, men krever rå SQL mot `aksje`, og ingen kode skriver til `aksje`. Hvilke feil kjøringen fanger, er G11 i 2.5 | avvist: lite sannsynlig, og rettingen legger til en kontroll i adapteren |
+| ECH3 | AD-18-testen ser bare på triggere på `vurdering`, ikke på en trigger på `kurs` som leser `vurdering` | low | En slik trigger finnes ikke. AD-18 handler om at `erstatt_serie` ikke skal rive `vurdering`, og det holdes av `test_vurderingen_og_kursen_i_den_er_uendret` | avvist: dekket av atferdstesten |
+| ECH4 | Teksten i en CHECK-feil avhenger av SQLite-versjonen | low | Riktig i prinsippet. Lokalt er versjonen 3.50.4, og CI besto | patch: `KONTROLLFEIL` godtar uttrykk, kolonne og tabell |
+| BH1 | G10 står fortsatt som ventende i `kodegjennomgang-epic-1.md` | low | Riktig (`:158`) | patch: datert merknad |
+| BH3 | `test_symbol_kan_endres_til_en_annen_kjent_aksje` låser at en rad i `vurdering` kan skrives om i SQL | low | Riktig: parametrisert over alle tre tabellene. Porten holder AD-7, ikke basen (1.6 ECH3, A-BH3) | patch: testen gjelder bare `kurs` og `kursserie`, med grunnen i docstringen |
+| BH4 | AD-21 og testnavnet sier «aksje med rader», men REPLACE-triggerne gjelder alle aksjer | low | Riktig | patch: AD-21, testnavnet `test_aksje_erstattes_ikke` og et tilfelle med DNB, som ikke har rader |
+| BH5 | `ON CONFLICT DO NOTHING` og `INSERT OR IGNORE` avvises, selv om de ikke sletter noe | low | Riktig, og ikke skrevet ned | patch: `INSERT OR IGNORE` er med i testen, og docstringen og kommentaren i `0003` sier det |
+| BH7 | Kontrollen i versjon 2 prøves ikke med `NULL` i `kursserie` | low | Riktig: en mutant med `NOT IN` i kontrollen overlevde | patch: `test_null_i_kursserie_stopper_migrasjonen`. Mutanten gir 1 feil |
+| BH8 | Mutanttabellen mangler mutanter (hele INSERT-triggeren på `kursserie`, kontrollen uten `kurs` eller `vurdering`, `!=` i symboltriggeren), og M10 navngir ikke testene | low | Triggeren på `kursserie` prøves av fem parametriseringer av INSERT-testen. `symbol` er `NOT NULL` i `aksje`, så `!=` og `IS NOT` gir det samme. Rettingen er en endring i spesifikasjonen | avvist: retter spesifikasjonen |
+| BH9 | En ekte base som stopper på versjon 2, har ingen vei videre, og feilen nevner verken tabell eller symbol | low | Ingen ekte base finnes: ingen kode i `src/` kaller `migrer()`. Stoppet er vedtatt 27.09 | avvist: vedtatt, og ingen base kan treffes før 2.2/3.1 |
+| BH10 | Ingen regel for å ta en aksje ut av universet | low | Universet er fast i v1 (`prd.md` §3), som i A-AA4 | avvist: tas hvis universet endres |
+| BH11 | Tabellen over hvor FR-406 og FR-408 ligger, nevner ikke AD-21, og `docs/innlevering.md:128` nevner bare `0001` | low | Riktig om begge. `innlevering.md` manglet `0002` alt før 1.9 | patch: AD-21 i tabellen. `innlevering.md`: defer |
+
+Ingen `intent_gap` eller `bad_spec`. Rettingene: `3757086` (koden og testene), `17e14eb` (spinen), `290d1b2` (`epics.md`) og `10f3db9` (kodegjennomgangen). Utsatt: `innlevering.md` i `deferred-work.md`. Tester etter rettingene: 875.
+
 ## Verification
 
 **Commands:**
