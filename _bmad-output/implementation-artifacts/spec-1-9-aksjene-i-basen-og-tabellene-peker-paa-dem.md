@@ -2,7 +2,7 @@
 title: 'Story 1.9: Aksjene i basen, og tabellene peker på dem'
 type: 'feature'
 created: '2026-09-27'
-status: 'in-progress'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '72cd401ea12cb1055841f4ed96ada455840506a3'
