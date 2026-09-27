@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-27T19:20'
+updated: '2026-09-27T19:23'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -44,7 +44,7 @@ er den sjuende, med samme åpning.
 
 | Lag | Filer | Regel |
 |---|---|---|
-| **Kjerne** | `signalberegning.py`, `meldinger.py`, `markedsoversikt.py`, `aksjedetalj.py`, `graf.py`, `boersdag.py` (inneværende børsdag, story 1.6), `tilstand.py` (de tre tilstandene i FR-409, story 1.7) | Ingen import av `requests`, `sqlite3`, `pathlib`, `flask` |
+| **Kjerne** | `signalberegning.py`, `meldinger.py`, `markedsoversikt.py`, `aksjedetalj.py`, `graf.py`, `boersdag.py` (inneværende børsdag, story 1.6), `tilstand.py` (de tre tilstandene i FR-409 og raden med grunn fra punkt 24, altså fire utfall, story 1.7) | Ingen import av `requests`, `sqlite3`, `pathlib`, `flask` |
 | **Porter** | `kursdata.py`, `vurderingsdata.py` | Protokoller, verdityper og minneimplementasjonene testene bruker (`MinneKurslager`). *Rettet 2026-09-25: `MinneKilde` ble fjernet i story 1.4c*. Ingen I/O — oppfylt fra story 1.5 (`23af8db`). *Rettet 2026-09-25: her sto «brytes i dag, se under»*. `Vurderingslager` (story 1.6) har med vilje **ikke** noe minnelager: reglene for overskriving (siste vinner, men en grunn aldri over en vurdering) skal stå ett sted, i adapterens upsert, og testene bruker SQLite i minnet (`sqlite3.connect(":memory:")`) |
 | **Skall** | `app.py` (HTTP), `fetch_prices.py` (nett), `lagring_sqlite.py` (SQLite), `lagring_fil.py` (øyeblikksbildene i `data/`), `eodhd.py` (EODHDs feltnavn til `Kursrad`) | Eneste lag som kjenner teknologi |
 
@@ -173,7 +173,7 @@ også `signalberegning.py` ikke importerte noen annen prosjektmodul, og kanten
 - **Skjerpet:** fraværet alene holder ikke, fordi AD-17 krever at `skriv` er idempotent på `(symbol, dato)` — og en upsert *endrer* raden hvis den finnes. Derfor bærer **formen** regelen: `skriv` tar imot datoen og **avviser enhver dato som ikke er inneværende børsdag**. Dagens rad kan skrives om så mange ganger man vil; en eldre rad er utilgjengelig gjennom porten. Ingen behøver å huske forskjellen. Dette er en skjerping av AD-7, ikke et unntak fra den.
 - **Utvidet 2026-09-27 (punkt 24 i PRD-en):** en rad kan ha en grunn i stedet for vurderingen. En rad med grunn skriver aldri over en rad med vurdering samme dag, så en kjøring som feiler, kan ikke viske ut et svar som alt er skrevet.
 - **Bygget 2026-09-27, story 1.6:** `vurderingsdata.py` er porten, med bare `skriv` og `les`. `SqliteVurderingslager` tar en klokke, regner dagen i Europe/Oslo med `boersdag.norsk_dato` og avviser enhver annen dato enn `boersdag.innevaerende_boersdag`. `vurdering` lages av `0002_vurdering.sql` med en `CHECK` for enten vurdering eller grunn, og grunnene står i en egen tabell `grunn`. Hvert kontrollpunkt i storyen er prøvd med en mutant (spesifikasjonen, Implementation Notes).
-- **Lest 2026-09-27, story 1.7:** `tilstand.tilstand(innhold, dato, idag)` tar imot det `les` gir og skiller svar, rad med grunn, ikke kjørt og ikke børsdag (FR-409), med `boersdag.er_boersdag` og samme liste som `skriv`. Porten fikk ingen ny metode. Ikke kjørt er ikke et endelig hull så lenge dagen er inneværende børsdag: raden kan skrives til neste børsdag begynner.
+- **Lest 2026-09-27, story 1.7:** `tilstand.tilstand(innhold, dato, idag)` tar imot det `les` gir og skiller svar, rad med grunn, ikke kjørt og ikke børsdag (FR-409), med `boersdag.er_boersdag` og samme liste som `skriv`. Porten fikk ingen ny metode. Ikke kjørt er ikke et endelig hull så lenge dagen er inneværende børsdag: raden kan skrives til neste børsdag begynner. En dato etter dagens dato reiser `ValueError`, også når raden finnes, og en dag uten rad utenfor `DEKKEDE_AAR` reiser `UtenforKalenderen`.
 - **Merk:** skillet mellom gjenoppbyggbart og uerstattelig går **tvers gjennom databasen**, ikke mellom base og fil. `kurs` er gjenoppbyggbar; `vurdering` og `ki_logg` er det ikke.
 - **Konsekvensen er tilsiktet:** en dag ingen kjørte hentekommandoen, kan ikke etterfylles med en vurdering. `FR-403` fyller hull i kursserien fordi en kurs for 12.09 er den samme uansett når den hentes; en vurdering er det ikke. Dagen skal kunne skilles som manglende, ikke som tom, i lageret — `FR-409`. *Rettet 2026-09-24: her sto «vises». FR-409 er et lagerkrav.*
 
@@ -391,7 +391,7 @@ G74-lund-osen/
     kursdata.py          # porter + AKSJEUNIVERS. Ingen I/O
     vurderingsdata.py    # porten Vurderingslager. Ingen I/O  [bygget i 1.6]
     boersdag.py          # inneværende børsdag, ren logikk  [bygget i 1.6]
-    tilstand.py          # de tre tilstandene, ren logikk   [bygget i 1.7]
+    tilstand.py          # FR-409, fire utfall, ren logikk  [bygget i 1.7]
     lagring_sqlite.py    # adapter: implementerer portene   [bygget i 1.3]
     migrasjoner/         # nummererte SQL-filer (AD-16)     [bygget i 1.3]
     fetch_prices.py      # eneste nettkall
