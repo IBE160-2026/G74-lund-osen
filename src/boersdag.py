@@ -60,9 +60,13 @@ def innevaerende_boersdag(dag: date) -> date:
     oppslag = dag
     while True:
         if oppslag.year not in DEKKEDE_AAR:
+            hva = dag.isoformat()
+            if oppslag != dag:
+                hva += f" krever {oppslag.isoformat()}, og"
+            else:
+                hva += ":"
             raise UtenforKalenderen(
-                f"{dag.isoformat()} krever {oppslag.isoformat()}, og lista over "
-                f"stengte dager dekker bare {sorted(DEKKEDE_AAR)}"
+                f"{hva} lista over stengte dager dekker bare {sorted(DEKKEDE_AAR)}"
             )
         if oppslag.weekday() < 5 and oppslag not in STENGT:
             return oppslag

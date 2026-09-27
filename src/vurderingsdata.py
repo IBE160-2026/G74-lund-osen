@@ -48,13 +48,31 @@ def _heltall(verdi) -> bool:
     return isinstance(verdi, int) and not isinstance(verdi, bool)
 
 
+def _retning(sjekker: tuple[int, ...]) -> str:
+    """Retningen fortegnene gir, samme regel som signalberegning.finn_retning.
+
+    Porten importerer ikke kjernen, saa regelen staar her ogsaa, og en test
+    proever alle 27 kombinasjonene mot finn_retning.
+    """
+    utslag = [verdi for verdi in sjekker if verdi != 0]
+    if not utslag:
+        return "Ingen"
+    if all(verdi > 0 for verdi in utslag):
+        return "Positiv"
+    if all(verdi < 0 for verdi in utslag):
+        return "Negativ"
+    return "Blandet"
+
+
 @dataclass(frozen=True)
 class Vurdering:
     """Vurderingen slik den var, med feltene i FR-408.
 
-    styrke er summen av de tre sjekkenes absoluttverdier, som i
-    signalberegning (FR-704). slutt og justert_slutt kopieres fra kursen
-    vurderingen bygde paa, uten fremmednoekkel (AD-18).
+    styrke er summen av de tre sjekkenes absoluttverdier, og retning er den
+    fortegnene gir, som i signalberegning (FR-704). slutt og justert_slutt
+    kopieres fra kursen vurderingen bygde paa, uten fremmednoekkel (AD-18).
+    De lagres som float, ogsaa naar de kommer inn som heltall, saa les gir
+    tilbake en lik Vurdering.
     """
 
     styrke: int
@@ -70,27 +88,38 @@ class Vurdering:
             verdi = getattr(self, navn)
             if not _heltall(verdi) or verdi not in SJEKKVERDIER:
                 raise UgyldigVurdering(f"{navn} maa vaere -1, 0 eller 1, fikk {verdi!r}")
-        if not _heltall(self.styrke) or not 0 <= self.styrke <= 3:
-            raise UgyldigVurdering(f"styrke maa vaere et heltall 0-3, fikk {self.styrke!r}")
-        sum_sjekker = abs(self.trend) + abs(self.bevegelse) + abs(self.interesse)
+        sjekker = (self.trend, self.bevegelse, self.interesse)
+        # Summen av tre sjekker er alltid 0-3, saa den dekker ogsaa omraadet.
+        if not _heltall(self.styrke):
+            raise UgyldigVurdering(f"styrke maa vaere et heltall, fikk {self.styrke!r}")
+        sum_sjekker = sum(abs(verdi) for verdi in sjekker)
         if self.styrke != sum_sjekker:
             raise UgyldigVurdering(
                 f"styrke {self.styrke} stemmer ikke med sjekkene, som gir {sum_sjekker}"
             )
         if self.retning not in RETNINGER:
             raise UgyldigVurdering(f"retning maa vaere en av {RETNINGER}, fikk {self.retning!r}")
+        if self.retning != _retning(sjekker):
+            raise UgyldigVurdering(
+                f"retning {self.retning!r} stemmer ikke med sjekkene, som gir "
+                f"{_retning(sjekker)!r}"
+            )
         for navn in ("slutt", "justert_slutt"):
             verdi = getattr(self, navn)
             if isinstance(verdi, bool) or not isinstance(verdi, (int, float)):
                 raise UgyldigVurdering(f"{navn} maa vaere et tall, fikk {verdi!r}")
+            # Et heltall blir float her, som i REAL-kolonnen. Et heltall for
+            # stort for float gir OverflowError. Uten omgjoeringen ville 10**20
+            # sluppet gjennom og feilet foerst i SQLite, med OverflowError.
             try:
-                endelig = math.isfinite(verdi)
+                kurs = float(verdi)
             except OverflowError:
-                endelig = False
-            if not endelig or verdi <= 0:
+                kurs = math.inf
+            if not math.isfinite(kurs) or kurs <= 0:
                 raise UgyldigVurdering(
                     f"{navn} maa vaere et endelig tall over null, fikk {verdi!r}"
                 )
+            object.__setattr__(self, navn, kurs)
 
 
 @runtime_checkable

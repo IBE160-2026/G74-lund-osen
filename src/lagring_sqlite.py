@@ -152,6 +152,16 @@ _UPSERT = (
 )
 
 
+def _kontroller_noekkel(symbol: str, dato: date) -> None:
+    if not isinstance(dato, date) or isinstance(dato, datetime):
+        raise TypeError(f"dato maa vaere datetime.date, fikk {dato!r}")
+    if symbol not in SYMBOLER:
+        raise ValueError(
+            f"{symbol!r} er ikke et symbol i AKSJEUNIVERS. Symbolet er "
+            "formen NewsWeb bruker (EQNR), ikke tickeren (EQNR.OL)"
+        )
+
+
 class SqliteVurderingslager:
     """Vurderingslager i SQLite - story 1.6, AD-7, AD-18, AD-20.
 
@@ -170,13 +180,7 @@ class SqliteVurderingslager:
         self._klokke = klokke
 
     def skriv(self, symbol: str, dato: date, innhold: Vurdering | Grunn) -> bool:
-        if not isinstance(dato, date) or isinstance(dato, datetime):
-            raise TypeError(f"dato maa vaere datetime.date, fikk {dato!r}")
-        if symbol not in SYMBOLER:
-            raise ValueError(
-                f"{symbol!r} er ikke et symbol i AKSJEUNIVERS. Symbolet er "
-                "formen NewsWeb bruker (EQNR), ikke tickeren (EQNR.OL)"
-            )
+        _kontroller_noekkel(symbol, dato)
         if isinstance(innhold, Vurdering):
             verdier = (*(getattr(innhold, k) for k in VURDERINGSKOLONNER), None)
         elif isinstance(innhold, Grunn):
@@ -210,8 +214,9 @@ class SqliteVurderingslager:
         return skrevet > 0
 
     def les(self, symbol: str, dato: date) -> Vurdering | Grunn | None:
-        if not isinstance(dato, date) or isinstance(dato, datetime):
-            raise TypeError(f"dato maa vaere datetime.date, fikk {dato!r}")
+        # Samme kontroll som skriv: en ticker eller et tidspunkt ville ellers
+        # gitt None, som leses som at kommandoen ikke ble kjoert (FR-409).
+        _kontroller_noekkel(symbol, dato)
         rad = self._tilkobling.execute(
             "SELECT " + ", ".join(VURDERINGSKOLONNER) + ", grunn FROM vurdering "
             "WHERE symbol = ? AND dato = ?",

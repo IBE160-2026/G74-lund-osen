@@ -8,6 +8,7 @@ Klokka injiseres, saa ingen test avhenger av dagen den kjoeres. Hver test
 lager sin egen base, i minnet eller under tmp_path. Ingen nett (AD-8).
 """
 
+import itertools
 import math
 import sqlite3
 from datetime import date, datetime, timezone
@@ -178,6 +179,22 @@ class TestLes:
     def test_ingen_rad_gir_none(self, tilkobling):
         assert lager(tilkobling).les("EQNR", date(2026, 9, 23)) is None
 
+    def test_ticker_i_stedet_for_symbol_reiser(self, tilkobling):
+        """None ville blitt lest som at kommandoen ikke ble kjoert (FR-409)."""
+        with pytest.raises(ValueError, match="EQNR.OL"):
+            lager(tilkobling).les("EQNR.OL", date(2026, 9, 23))
+
+    def test_tidspunkt_som_dato_reiser(self, tilkobling):
+        with pytest.raises(TypeError, match="date"):
+            lager(tilkobling).les("EQNR", datetime(2026, 9, 23, 10, tzinfo=timezone.utc))
+
+    @pytest.mark.parametrize("kurs", [2**53 + 1, 10**20], ids=["2**53+1", "10**20"])
+    def test_store_heltall_leses_tilbake_like(self, tilkobling, kurs):
+        """ECH1 og ECH2: et heltall blir float i Vurdering, som i REAL-kolonnen."""
+        vurderinger = lager(tilkobling)
+        vurderinger.skriv("EQNR", date(2026, 9, 23), vurdering(justert_slutt=kurs))
+        assert vurderinger.les("EQNR", date(2026, 9, 23)) == vurdering(justert_slutt=kurs)
+
     def test_eldre_rader_kan_leses(self, tilkobling):
         SqliteVurderingslager(tilkobling, klokke("2026-09-22T10:00:00+00:00")).skriv(
             "EQNR", date(2026, 9, 22), vurdering()
@@ -201,7 +218,8 @@ class TestProtokollen:
 
     @staticmethod
     def _offentlige(klasse) -> set[str]:
-        return {navn for navn in vars(klasse) if not navn.startswith("_")}
+        # dir og ikke vars, saa en slett arvet fra en baseklasse ogsaa sees.
+        return {navn for navn in dir(klasse) if not navn.startswith("_")}
 
     def test_porten_har_bare_skriv_og_les(self):
         assert self._offentlige(Vurderingslager) == {"skriv", "les"}
@@ -223,6 +241,20 @@ class TestSymbol:
         with pytest.raises(TypeError, match="Vurdering eller Grunn"):
             lager(tilkobling).skriv("EQNR", date(2026, 9, 23), "symbol_feilet")
         assert rader(tilkobling) == []
+
+    def test_feil_i_basen_rulles_tilbake(self, tilkobling):
+        """En feil midt i skrivingen etterlater ingen aapen transaksjon, og
+        lageret kan brukes etterpaa."""
+        tilkobling.execute(
+            "CREATE TEMP TRIGGER stopp BEFORE INSERT ON vurdering "
+            "BEGIN SELECT RAISE(ABORT, 'stoppet av testen'); END"
+        )
+        vurderinger = lager(tilkobling)
+        with pytest.raises(sqlite3.IntegrityError, match="stoppet av testen"):
+            vurderinger.skriv("EQNR", date(2026, 9, 23), vurdering())
+        assert not tilkobling.in_transaction
+        tilkobling.execute("DROP TRIGGER stopp")
+        assert vurderinger.skriv("EQNR", date(2026, 9, 23), vurdering()) is True
 
     def test_aapen_transaksjon_hos_kalleren_avvises(self, tilkobling):
         """Samme regel som i SqliteKurslager: adapteren eier transaksjonen."""
@@ -355,11 +387,39 @@ class TestSkjemaet:
             tilkobling.execute("UPDATE vurdering SET grunn = 'noe_annet'")
 
     def test_ukjent_grunn_stoppes_via_upsert(self, tilkobling):
+        """Det er INSERT-triggeren som stopper upserten: SQLite kjoerer den
+        foer konflikten oppdages. UPDATE-triggeren proeves av testen over."""
         self._sett_inn(tilkobling, grunn=Grunn.SYMBOL_FEILET.value)
         with pytest.raises(sqlite3.IntegrityError, match="ukjent grunn"):
             tilkobling.execute(
                 "INSERT INTO vurdering (symbol, dato, grunn) VALUES ('EQNR', '2026-09-23', "
                 "'noe_annet') ON CONFLICT (symbol, dato) DO UPDATE SET grunn = excluded.grunn"
+            )
+
+    def test_en_grunn_slettes_ikke(self, tilkobling):
+        with pytest.raises(sqlite3.IntegrityError, match="slettes ikke"):
+            tilkobling.execute("DELETE FROM grunn WHERE navn = 'symbol_feilet'")
+
+    def test_en_grunn_endres_ikke(self, tilkobling):
+        with pytest.raises(sqlite3.IntegrityError, match="endres ikke"):
+            tilkobling.execute(
+                "UPDATE grunn SET navn = 'noe_annet' WHERE navn = 'symbol_feilet'"
+            )
+
+    def test_kolonne_for_meldinger_krever_ingen_ombygging(self, tilkobling):
+        """Beslutningen: «Relevante meldinger» kan komme som en kolonne som kan
+        vaere tom. Radene staar, og CHECK og triggere virker etterpaa."""
+        lager(tilkobling).skriv("EQNR", date(2026, 9, 23), vurdering())
+        tilkobling.execute("ALTER TABLE vurdering ADD COLUMN meldinger TEXT")
+        assert tilkobling.execute("PRAGMA integrity_check").fetchone() == ("ok",)
+        assert lager(tilkobling).les("EQNR", date(2026, 9, 23)) == vurdering()
+        assert tilkobling.execute("SELECT meldinger FROM vurdering").fetchone() == (None,)
+        with pytest.raises(sqlite3.IntegrityError, match="CHECK"):
+            self._sett_inn(tilkobling,
+                           **self.GYLDIG, grunn=Grunn.SYMBOL_FEILET.value)
+        with pytest.raises(sqlite3.IntegrityError, match="ukjent grunn"):
+            tilkobling.execute(
+                "INSERT INTO vurdering (symbol, dato, grunn) VALUES ('DNB', '2026-09-23', 'x')"
             )
 
     def test_ny_grunn_er_en_insert(self, tilkobling):
@@ -378,10 +438,24 @@ class TestVurdering:
     def test_tre_grunner(self):
         assert len(Grunn) == 3
 
+    @pytest.mark.parametrize("sjekker", list(itertools.product((-1, 0, 1), repeat=3)))
+    def test_retningen_er_den_finn_retning_gir(self, sjekker):
+        """Alle 27 kombinasjonene: porten godtar bare retningen kjernen gir."""
+        riktig = signalberegning.finn_retning(tuple(
+            signalberegning.Sjekk(navn="", verdi=verdi, forklaring="") for verdi in sjekker
+        ))
+        trend, bevegelse, interesse = sjekker
+        felt = dict(styrke=sum(map(abs, sjekker)), trend=trend, bevegelse=bevegelse,
+                    interesse=interesse)
+        vurdering(retning=riktig, **felt)
+        for annen in set(RETNINGER) - {riktig}:
+            with pytest.raises(UgyldigVurdering, match="stemmer ikke"):
+                vurdering(retning=annen, **felt)
+
     @pytest.mark.parametrize("endret", [
         dict(styrke=4, trend=1, bevegelse=1, interesse=1),
         dict(styrke=-1),
-        dict(styrke=True),
+        dict(styrke=True, trend=1, bevegelse=0, interesse=0),
         dict(styrke=2.0),
         dict(styrke=1),
         dict(retning="positiv"),
@@ -395,6 +469,7 @@ class TestVurdering:
         dict(justert_slutt=math.inf),
         dict(justert_slutt="290"),
         dict(slutt=True),
+        dict(slutt=10**400),
     ], ids=repr)
     def test_ugyldige_verdier_avvises(self, endret):
         with pytest.raises(UgyldigVurdering):

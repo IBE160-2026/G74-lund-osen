@@ -14,7 +14,10 @@
 -- INSERT INTO grunn i en ny migrasjon, uten DROP og uten ombygging. To
 -- triggere avviser en grunn som ikke staar der. Det er triggere og ikke en
 -- fremmednoekkel fordi SQLite bare haandhever fremmednoekler naar
--- tilkoblingen har slaatt dem paa, og en trigger virker alltid.
+-- tilkoblingen har slaatt dem paa, og en trigger virker alltid. To triggere
+-- til gjoer grunn til en tabell det bare legges til i. En grunn som ble
+-- slettet eller fikk nytt navn, ville latt rader i vurdering peke paa noe som
+-- ikke finnes, og de radene kan ikke skrives paa nytt (AD-7).
 --
 -- Relevante meldinger (FR-408) kommer senere, som en kolonne som kan vaere
 -- tom (ALTER TABLE vurdering ADD COLUMN). NULL betyr da ikke registrert.
@@ -69,4 +72,16 @@ BEFORE UPDATE OF grunn ON vurdering
 WHEN NEW.grunn IS NOT NULL AND NEW.grunn NOT IN (SELECT navn FROM grunn)
 BEGIN
     SELECT RAISE(ABORT, 'ukjent grunn i vurdering');
+END;
+
+CREATE TRIGGER grunn_slettes_ikke
+BEFORE DELETE ON grunn
+BEGIN
+    SELECT RAISE(ABORT, 'en grunn slettes ikke');
+END;
+
+CREATE TRIGGER grunn_endres_ikke
+BEFORE UPDATE ON grunn
+BEGIN
+    SELECT RAISE(ABORT, 'en grunn endres ikke');
 END;
