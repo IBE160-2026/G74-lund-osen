@@ -86,10 +86,6 @@ class TestIDag:
         grense ville loerdagen regnes som fremtid."""
         assert tilstand(None, date(2026, 9, 26), date(2026, 9, 26)) == Tilstand(Art.IKKE_BOERSDAG)
 
-    def test_boersdag_foer_foerste_kjoering_er_ikke_kjoert(self):
-        """Startdatoen lagres ikke. Den er datoen til foerste rad i tabellen."""
-        assert tilstand(None, date(2026, 3, 2), IDAG) == Tilstand(Art.IKKE_KJOERT)
-
 
 class TestFremtid:
     @pytest.mark.parametrize("dag", [date(2026, 10, 1), date(2026, 10, 3)],
@@ -136,6 +132,11 @@ class TestTyper:
         with pytest.raises(TypeError, match="Vurdering, Grunn eller None"):
             tilstand("symbol_feilet", date(2026, 9, 25), IDAG)
 
+    def test_feil_innhold_gir_typeerror_ogsaa_for_en_dato_etter_i_dag(self):
+        """Typene foerst: en feil kaller skal ikke faa en melding om datoen."""
+        with pytest.raises(TypeError, match="Vurdering, Grunn eller None"):
+            tilstand("symbol_feilet", date(2026, 10, 1), IDAG)
+
 
 class TestGjennomLageret:
     """Samme utfall naar innholdet kommer fra SqliteVurderingslager.les."""
@@ -161,3 +162,23 @@ class TestGjennomLageret:
         assert tilstand(lager.les("KOG", fredag), fredag, IDAG) == Tilstand(Art.IKKE_KJOERT)
         loerdag = date(2026, 9, 26)
         assert tilstand(lager.les("EQNR", loerdag), loerdag, IDAG) == Tilstand(Art.IKKE_BOERSDAG)
+
+    def test_helligdag_uten_rad_er_ikke_boersdag(self, tilkobling):
+        """BH9: les avviser ikke en dag som ikke er boersdag, og tilstand
+        skiller den fra et hull ogsaa naar dagen er en hverdag i STENGT."""
+        lager = SqliteVurderingslager(tilkobling, lambda: datetime(2026, 9, 25, 18, tzinfo=timezone.utc))
+        langfredag = date(2026, 4, 3)
+        assert tilstand(lager.les("EQNR", langfredag), langfredag, IDAG) == Tilstand(
+            Art.IKKE_BOERSDAG
+        )
+
+    def test_boersdag_foer_foerste_kjoering_er_ikke_kjoert(self, tilkobling):
+        """Startdatoen lagres ikke. Trengs den, er den datoen til foerste rad i
+        tabellen. En boersdag foer den uten rad er IKKE_KJOERT."""
+        fredag = date(2026, 9, 25)
+        lager = SqliteVurderingslager(tilkobling, lambda: datetime(2026, 9, 25, 18, tzinfo=timezone.utc))
+        lager.skriv("EQNR", fredag, STYRKE_0)
+        foerste = tilkobling.execute("SELECT MIN(dato) FROM vurdering").fetchone()[0]
+        assert foerste == fredag.isoformat()
+        torsdag = date(2026, 9, 24)
+        assert tilstand(lager.les("EQNR", torsdag), torsdag, IDAG) == Tilstand(Art.IKKE_KJOERT)

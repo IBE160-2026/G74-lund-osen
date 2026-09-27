@@ -11,7 +11,7 @@ nyttaar, og halvdagen foer paaske.
 """
 
 import re
-from datetime import date, datetime, timezone, tzinfo
+from datetime import date, datetime, timedelta, timezone, tzinfo
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -130,6 +130,16 @@ class TestErBoersdag:
     def test_tidspunkt_avvises_som_dag(self):
         with pytest.raises(TypeError, match="date"):
             er_boersdag(datetime(2026, 9, 22, 10, tzinfo=timezone.utc))
+
+    def test_enig_med_innevaerende_boersdag_hver_dag_i_dekkede_aar(self):
+        """Regelen staar to steder. En dag er boersdag hvis og bare hvis den er
+        sin egen inneveerende boersdag. 1. januar hoppes over i hvert aar,
+        fordi inneveerende_boersdag der maa slaa opp aaret foer."""
+        for aar in DEKKEDE_AAR:
+            dag = date(aar, 1, 2)
+            while dag.year == aar:
+                assert er_boersdag(dag) == (innevaerende_boersdag(dag) == dag), dag
+                dag += timedelta(days=1)
 
 
 class TestStengteDager:

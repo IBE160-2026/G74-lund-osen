@@ -50,9 +50,11 @@ def tilstand(innhold: Vurdering | Grunn | None, dato: date, idag: date) -> Tilst
     ikke fremtid. En dato etter idag reiser ValueError: den er verken ikke
     kjoert eller ikke boersdag.
 
-    Finnes raden, er utfallet raden, uten oppslag i kalenderen. Mangler den,
-    avgjoer er_boersdag, og en dag utenfor lista reiser UtenforKalenderen i
-    stedet for aa gjette.
+    Typene kontrolleres foerst, saa feil innhold alltid gir TypeError.
+    Deretter datoen: en dato etter idag reiser ogsaa naar raden finnes. Finnes
+    raden, er utfallet raden, uten oppslag i kalenderen. Mangler den, avgjoer
+    er_boersdag, og en dag utenfor lista reiser UtenforKalenderen i stedet for
+    aa gjette.
 
     IKKE_KJOERT er ikke et endelig hull saa lenge dato er inneveerende
     boersdag. Raden kan skrives helt til neste boersdag begynner, saa
@@ -61,6 +63,10 @@ def tilstand(innhold: Vurdering | Grunn | None, dato: date, idag: date) -> Tilst
     kjoering er ogsaa IKKE_KJOERT: startdatoen lagres ikke, og trengs den, er
     den datoen til foerste rad i tabellen.
     """
+    if innhold is not None and not isinstance(innhold, (Vurdering, Grunn)):
+        raise TypeError(
+            f"innhold maa vaere Vurdering, Grunn eller None, fikk {type(innhold).__name__}"
+        )
     _kontroller_dag("dato", dato)
     _kontroller_dag("idag", idag)
     if dato > idag:
@@ -72,10 +78,6 @@ def tilstand(innhold: Vurdering | Grunn | None, dato: date, idag: date) -> Tilst
         return Tilstand(Art.SVAR, innhold)
     if isinstance(innhold, Grunn):
         return Tilstand(Art.GRUNN, innhold)
-    if innhold is not None:
-        raise TypeError(
-            f"innhold maa vaere Vurdering, Grunn eller None, fikk {type(innhold).__name__}"
-        )
     if er_boersdag(dato):
         return Tilstand(Art.IKKE_KJOERT)
     return Tilstand(Art.IKKE_BOERSDAG)

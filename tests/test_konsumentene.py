@@ -31,7 +31,12 @@ KJERNEMODULER = (
     "tilstand.py",
 )
 
-FORBUDTE_MODULER = {"sqlite3", "pathlib"}
+# Kjernen gjoer ikke I/O og importerer ikke skallet (spinen, lagtabellen).
+# Skallet ble lagt til i story 1.7, der spinen sier det for tilstand.py.
+FORBUDTE_MODULER = {
+    "sqlite3", "pathlib", "requests", "flask",
+    "app", "fetch_prices", "lagring_sqlite", "lagring_fil", "eodhd",
+}
 
 EODHD_NOEKLER = ("adjusted_close", "close", "volume", "date")
 
@@ -68,8 +73,9 @@ def _importerte_moduler(tre: ast.Module) -> set[str]:
 
 
 @pytest.mark.parametrize("navn", KJERNEMODULER)
-def test_importerer_verken_sqlite3_eller_pathlib(navn):
-    """Kjernen gjoer ikke I/O. Lagringen hoerer til skallet."""
+def test_importerer_verken_io_eller_skallet(navn):
+    """Kjernen gjoer ikke I/O og importerer ikke skallet. Lagringen hoerer
+    til skallet."""
     assert _importerte_moduler(_tre(navn)) & FORBUDTE_MODULER == set()
 
 
