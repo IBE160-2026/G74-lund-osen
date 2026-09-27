@@ -101,14 +101,14 @@ class TestBasenAvviserUkjentAksje:
     @pytest.mark.parametrize("symbol", UKJENTE)
     @pytest.mark.parametrize("tabell", TABELLER)
     def test_ukjent_aksje_avvises_ved_insert(self, ny, tabell, symbol):
-        with pytest.raises(sqlite3.IntegrityError, match=f"ukjent aksje i {tabell}"):
+        with pytest.raises(sqlite3.IntegrityError, match=f"ukjent aksje i {tabell}$"):
             ny.execute(RAD[tabell], (symbol,))
         assert antall(ny, tabell) == 0
 
     def test_null_avvises_i_kursserie(self, ny):
         """kursserie.symbol er TEXT PRIMARY KEY uten NOT NULL. Med NOT IN i
         triggeren ville NULL sluppet gjennom."""
-        with pytest.raises(sqlite3.IntegrityError, match="ukjent aksje i kursserie"):
+        with pytest.raises(sqlite3.IntegrityError, match="ukjent aksje i kursserie$"):
             ny.execute(RAD["kursserie"], (None,))
         assert antall(ny, "kursserie") == 0
 
@@ -116,13 +116,16 @@ class TestBasenAvviserUkjentAksje:
     def test_symbol_kan_ikke_endres_til_ukjent_aksje(self, ny, tabell):
         ny.execute(RAD[tabell], ("EQNR",))
         ny.commit()
-        with pytest.raises(sqlite3.IntegrityError, match=f"ukjent aksje i {tabell}"):
+        with pytest.raises(sqlite3.IntegrityError, match=f"ukjent aksje i {tabell}$"):
             ny.execute(f"UPDATE {tabell} SET symbol = 'EQNR.OL'")
         assert ny.execute(f"SELECT symbol FROM {tabell}").fetchall() == [("EQNR",)]
 
-    @pytest.mark.parametrize("tabell", TABELLER)
+    @pytest.mark.parametrize("tabell", ["kurs", "kursserie"])
     def test_symbol_kan_endres_til_en_annen_kjent_aksje(self, ny, tabell):
-        """Triggeren sjekker det nye symbolet, ikke at det staar stille."""
+        """Triggeren sjekker det nye symbolet, ikke at det staar stille.
+
+        vurdering er med vilje ikke med: at en rad der ikke skrives om, holdes
+        av porten (AD-7), ikke av basen, og en test skal ikke laase det motsatte."""
         ny.execute(RAD[tabell], ("EQNR",))
         ny.execute(f"UPDATE {tabell} SET symbol = 'DNB'")
         assert ny.execute(f"SELECT symbol FROM {tabell}").fetchall() == [("DNB",)]
@@ -144,7 +147,7 @@ class TestAksjenStaarFast:
         ny.execute(RAD["kurs"], ("EQNR",))
         ny.execute("DELETE FROM aksje WHERE symbol = 'DNB'")
         assert antall(ny, "aksje") == 14
-        with pytest.raises(sqlite3.IntegrityError, match="ukjent aksje i kurs"):
+        with pytest.raises(sqlite3.IntegrityError, match="ukjent aksje i kurs$"):
             ny.execute(RAD["kurs"], ("DNB",))
 
     def test_symbol_kan_ikke_endres_uten_rader(self, ny):
@@ -174,12 +177,18 @@ class TestAksjenStaarFast:
         "INSERT OR REPLACE INTO aksje VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi')",
         "INSERT OR REPLACE INTO aksje VALUES ('EQNR', 'NY.OL', 'Ny', 'Energi')",
         "REPLACE INTO aksje VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi')",
+        "INSERT OR REPLACE INTO aksje VALUES ('NY', 'DNB.OL', 'Ny', 'Finans')",
         "INSERT INTO aksje VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi') "
         "ON CONFLICT DO NOTHING",
+        "INSERT OR IGNORE INTO aksje VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi')",
         "UPDATE OR REPLACE aksje SET ticker = 'EQNR.OL' WHERE symbol = 'DNB'",
     ])
-    def test_aksje_med_rader_erstattes_ikke(self, ny, sql):
-        """REPLACE sletter raden som er i veien uten DELETE-triggeren."""
+    def test_aksje_erstattes_ikke(self, ny, sql):
+        """REPLACE sletter raden som er i veien uten DELETE-triggeren. Triggeren
+        avviser derfor enhver INSERT som kolliderer paa symbol eller ticker,
+        ogsaa for en aksje uten rader (DNB her) og ogsaa ON CONFLICT DO NOTHING
+        og INSERT OR IGNORE, som ikke ville slettet noe. Ingen kode legger til
+        aksjer; en ny aksje er en ny migrasjon."""
         ny.execute(RAD["kurs"], ("EQNR",))
         ny.commit()
         with pytest.raises(sqlite3.IntegrityError, match="en aksje erstattes ikke"):
@@ -187,7 +196,21 @@ class TestAksjenStaarFast:
         assert ny.execute(
             "SELECT symbol, ticker FROM aksje WHERE symbol = 'EQNR'"
         ).fetchall() == [("EQNR", "EQNR.OL")]
+        assert ny.execute(
+            "SELECT symbol, ticker FROM aksje WHERE symbol = 'DNB'"
+        ).fetchall() == [("DNB", "DNB.OL")]
         assert antall(ny, "aksje") == 15
+
+    @pytest.mark.parametrize("ticker", ["EQNR2.OL", "EQNR.OL"], ids=["ny", "samme"])
+    def test_ticker_kan_endres_uten_kollisjon(self, ny, ticker):
+        """Triggeren mot REPLACE stopper bare en ticker en annen aksje har."""
+        ny.execute(RAD["kurs"], ("EQNR",))
+        ny.execute(
+            "UPDATE aksje SET ticker = ?, navn = 'Nytt navn' WHERE symbol = 'EQNR'", (ticker,)
+        )
+        assert ny.execute(
+            "SELECT ticker, navn FROM aksje WHERE symbol = 'EQNR'"
+        ).fetchone() == (ticker, "Nytt navn")
 
     def test_ny_aksje_kan_legges_til(self, ny):
         ny.execute("INSERT INTO aksje VALUES ('NY', 'NY.OL', 'Ny', 'Energi')")
@@ -211,6 +234,11 @@ def alle_rader(tilkobling) -> dict[str, list[tuple]]:
         tabell: tilkobling.execute(f"SELECT * FROM {tabell} ORDER BY 1, 2").fetchall()
         for tabell in TABELLER
     }
+
+
+# Teksten i en CHECK-feil har varierert mellom SQLite-versjoner: uttrykket,
+# kolonnen eller tabellen. Alle tre er godtatt.
+KONTROLLFEIL = r"0003_aksje\.sql.*CHECK constraint failed.*(rader_uten_aksje|kontroll_0003)"
 
 
 class TestBaseIVersjon2:
@@ -246,7 +274,7 @@ class TestBaseIVersjon2:
             tilkobling.commit()
             foer = alle_rader(tilkobling)
 
-            with pytest.raises(MigrasjonsFeil, match="0003_aksje.sql.*rader_uten_aksje"):
+            with pytest.raises(MigrasjonsFeil, match=KONTROLLFEIL):
                 migrer(tilkobling, MIGRASJONSKATALOG)
 
             assert versjon(tilkobling) == 2
@@ -254,6 +282,20 @@ class TestBaseIVersjon2:
             assert tilkobling.execute(
                 "SELECT count(*) FROM sqlite_master WHERE name IN ('aksje', 'kontroll_0003')"
             ).fetchone()[0] == 0
+        finally:
+            tilkobling.close()
+
+    def test_null_i_kursserie_stopper_migrasjonen(self, tmp_path):
+        """kursserie.symbol kan vaere NULL i versjon 2. Med NOT IN i kontrollen
+        ville raden sluppet gjennom."""
+        tilkobling = base_paa_versjon_2(tmp_path)
+        try:
+            tilkobling.execute(RAD["kursserie"], (None,))
+            tilkobling.commit()
+            with pytest.raises(MigrasjonsFeil, match=KONTROLLFEIL):
+                migrer(tilkobling, MIGRASJONSKATALOG)
+            assert versjon(tilkobling) == 2
+            assert tilkobling.execute("SELECT symbol FROM kursserie").fetchall() == [(None,)]
         finally:
             tilkobling.close()
 
@@ -274,7 +316,7 @@ class TestAdapterne:
         lager = SqliteKurslager(ny)
         lager.erstatt_serie("EQNR", [rad("2026-09-22")], HENTET)
 
-        with pytest.raises(ValueError, match="EQNR.OL.*ukjent aksje i kurs"):
+        with pytest.raises(ValueError, match="EQNR.OL.*ukjent aksje i kurs$"):
             lager.erstatt_serie("EQNR.OL", [rad()], HENTET)
 
         assert not ny.in_transaction
@@ -330,3 +372,4 @@ class TestEnSpoerring:
         ).fetchall()
 
         assert rader == [("Equinor", "Energi", "2026-09-23", 2, "Positiv")]
+

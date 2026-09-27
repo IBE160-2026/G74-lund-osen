@@ -114,7 +114,8 @@ END;
 -- Radene i vurdering kan verken slettes eller skrives paa nytt (AD-7), og de
 -- ville blitt staaende uten aksje. En aksje uten rader kan slettes: aksje er
 -- oppsett, ikke et uerstattelig lager. Symbolet kan aldri endres, fordi det
--- er det radene peker paa. navn og sektor kan endres.
+-- er det radene peker paa. navn og sektor kan endres, og ticker saa lenge
+-- ingen annen aksje har den.
 
 CREATE TRIGGER aksje_slettes_ikke_med_rader
 BEFORE DELETE ON aksje
@@ -136,7 +137,8 @@ END;
 -- mindre recursive_triggers er slaatt paa). INSERT OR REPLACE med en ticker
 -- som finnes, eller UPDATE OR REPLACE av ticker, ville da fjernet en aksje
 -- med rader. En INSERT eller en ny ticker som kolliderer, avvises derfor
--- foer konflikten loeses.
+-- foer konflikten loeses, ogsaa for en aksje uten rader og ogsaa med
+-- OR IGNORE og ON CONFLICT DO NOTHING. En ny aksje er en ny migrasjon.
 
 CREATE TRIGGER aksje_erstattes_ikke_insert
 BEFORE INSERT ON aksje
