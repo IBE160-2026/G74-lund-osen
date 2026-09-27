@@ -98,6 +98,11 @@ class TestFremtid:
         with pytest.raises(ValueError, match="etter"):
             tilstand(None, dag, IDAG)
 
+    def test_loerdag_i_morgen_reiser(self):
+        """En fredag er loerdagen i morgen fremtid, selv om den ikke er boersdag."""
+        with pytest.raises(ValueError, match="etter"):
+            tilstand(None, date(2026, 10, 3), date(2026, 10, 2))
+
     def test_rad_med_dato_etter_i_dag_reiser_ogsaa(self):
         with pytest.raises(ValueError, match="etter"):
             tilstand(vurdering(), date(2026, 10, 1), IDAG)
