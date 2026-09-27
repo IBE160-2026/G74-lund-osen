@@ -12,10 +12,12 @@ SQLite-adapteren, lesegrensen mot øyeblikksbildene, `Vurderingslager` og
 skillet mellom tilstandene i lageret. Bruddet med `Kurskilde` ved siden av
 `Kurslager` er lukket i 1.4c, og I/O i portmodulen `kursdata.py` er lukket i
 1.5 (`23af8db`). `Vurderingslager` er bygget i 1.6 (`7dc8a48`, PR #8), og de tre
-tilstandene skilles i 1.7 (`5e9e6ad`, PR #9). *Oppdatert 2026-09-27:* det som
-står igjen i epicen, er to stories fra kodegjennomgangen og prioriteringen
-27.09: 1.8 (hentingen og leseren får én regel for en gyldig serie) og 1.9
-(`aksje`-tabellen, som de andre tabellene peker på). I v1 blir historikken
+tilstandene skilles i 1.7 (`5e9e6ad`, PR #9). 1.8 (hentingen og leseren får én
+regel for en gyldig serie) er flettet i `5c316e8`, PR #10. *Oppdatert
+2026-09-27:* det som står igjen i epicen, er 1.9 fra prioriteringen 27.09:
+`aksje`-tabellen med de femten, som de andre tabellene peker på, så basen selv
+avviser et symbol utenfor universet og historikken kan hentes sammen med aksjen
+i én spørring. Den skal være på plass før Epic 2 skriver til basen. I v1 blir historikken
 lagret, men ikke besvarbar i denne epicen. *Avgjort 2026-09-27:* historikken
 vises i aksjedetaljen, story 2.7 i Epic 2, fordi den trenger at webserveren
 leser basen (2.2) og at vurderingen skrives (2.5).
@@ -57,12 +59,15 @@ leser basen (2.2) og at vurderingen skrives (2.5).
   regel avgjør om en serie fra EODHD kan leses, og både hentingen og leseren
   bruker den. En serie leseren ville avvist, gir «svar med feil form» for
   symbolet, og de andre lagres likevel. Øyeblikksbildet beholder formatet.
-- **Basen skal selv kjenne de femten aksjene** (1.9). En rad i `kurs`,
+- **Basen skal selv kjenne de femten aksjene** (1.9). `0003` lager `aksje` med
+  de femten, og en test holder tabellen og `AKSJEUNIVERS` like. En rad i `kurs`,
   `kursserie` eller `vurdering` for et symbol som ikke står i `aksje`, avvises
   av basen, også formen `EQNR.OL`. En aksje med rader kan ikke slettes. Porten
-  skal ikke være eneste vakt. SQLite ble godtatt av faglærerstaben ut fra
-  relasjoner mellom data, joins, migrasjoner og logging av KI-vurderinger, og i
-  dag har ingen tabell fremmednøkler.
+  skal ikke være eneste vakt. Historikken skal kunne hentes sammen med aksjen i
+  én spørring. SQLite ble godtatt av assisterende hjelpelærer 22.09 ut fra
+  relasjoner mellom data, joins, migrasjoner og logging av KI-vurderinger, men
+  i dag lager migrasjonene fire tabeller (`kurs`, `kursserie`, `grunn`,
+  `vurdering`) uten fremmednøkler, og ingen spørring henter fra flere tabeller.
 - **Manglende data stopper ikke hovedflyten.** Et symbol som ikke kan leses,
   behandles som manglende og navngis for brukeren. De andre vises som vanlig.
   Hver story trenger en test for den tomme eller manglende stien.
@@ -119,8 +124,15 @@ leser basen (2.2) og at vurderingen skrives (2.5).
   felles lagerklasse. Navneregel: `<Datasett>lager` har skrivesiden,
   `<Datasett>leser` er lesesiden av samme port, `<Datasett>logg` legges bare
   til, og `<Noe>kilde` leser bare rådata fra fil.
-- **SQLite fra standardbiblioteket,** ingen hostet database. Adapteren tar en
-  `sqlite3.Connection`, ikke en filsti. Skallet bestemmer hvor basen ligger.
+- **SQLite fra standardbiblioteket,** ingen hostet database, fordi vilkårene
+  krever at dataene blir lokale. Basefila ligger under `data/`, som er
+  gitignorert. Adapteren tar en `sqlite3.Connection`, ikke en filsti. Skallet
+  bestemmer hvor basen ligger. Godkjenningen av SQLite kom ikke fra
+  emneansvarlig og gjelder «ut fra det vi vet nå»; de to begrensningene skal
+  ikke skrives bort.
+- **Datamodellen** har `aksje` som forelder til `kurs` og `vurdering` (og senere
+  `melding`), og `ki_logg` henger på `vurdering`. `kurs` er gjenoppbyggbar;
+  `vurdering` og `ki_logg` er det ikke.
 - **`erstatt_serie(symbol, rader, hentet)`** gjør DELETE+INSERT og skriver
   `hentet` i samme transaksjon. Tiden er et argument og leses ikke av lagerets
   egen klokke. En tom serie avvises med `ValueError`. Det finnes ingen
@@ -144,8 +156,11 @@ leser basen (2.2) og at vurderingen skrives (2.5).
   feiler, ikke stopper kjøringen. En dato som avvises, reiser, og da skrives
   ingenting.
 - **`vurdering` lagrer kursen som verdier.** Den har ingen fremmednøkkel til
-  `kurs`, fordi `erstatt_serie` ellers ville feilet eller slettet historikk.
-  Det gjelder også etter 1.9.
+  `kurs`, fordi `erstatt_serie` ellers ville feilet eller slettet historikk:
+  med `RESTRICT` ville hver henting fra dag to feilet for alle femten, og med
+  `CASCADE` ville historikk blitt slettet uten at noen kalte `slett`. Et
+  øyeblikksbilde som peker på en rad som endres, er ikke et øyeblikksbilde.
+  Det gjelder også etter 1.9: `vurdering` knyttes til `aksje`, aldri til `kurs`.
 - **Slik 1.6 ble bygget (`7dc8a48`):**
   - `src/boersdag.py` er ren kjerne: `innevaerende_boersdag(dag)` gir siste
     børsdag på eller før `dag`, og `norsk_dato(oeyeblikk)` gir kalenderdatoen
@@ -175,8 +190,14 @@ leser basen (2.2) og at vurderingen skrives (2.5).
   En dato etter dagens dato reiser `ValueError`, også når raden finnes, og en
   dag uten rad utenfor `DEKKEDE_AAR` reiser `UtenforKalenderen`.
 - **Skjemaendringer bare via nummererte migrasjoner** med `skjema_versjon`.
-  Løperen styrer transaksjonen selv og bruker aldri `executescript()`, som gjør
-  en implisitt `COMMIT`. `vurdering` opprettes av `0002`, som ble skrevet etter
+  Ingen `ALTER TABLE` utenfor en migrasjonsfil, og aldri «slett basen og bygg
+  den på nytt». Løperen styrer transaksjonen selv og bruker aldri
+  `executescript()`, som gjør en implisitt `COMMIT`. `skjema_versjon` lagrer
+  filnavn og sha256, så en anvendt migrasjon kan ikke endres eller få nytt navn;
+  en endring krever en ny fil. En migrasjonsfil med en setning som begynner med
+  et transaksjonsord, avvises. SQLites `ALTER TABLE` dekker bare
+  rename/add/drop column: fremmednøkler, `UNIQUE` og `CHECK` krever tabellbytte
+  med `DROP TABLE`, som kolliderer med forbudet mot sletting i `vurdering`. `vurdering` opprettes av `0002`, som ble skrevet etter
   herdingen i 1.5b. `aksje` opprettes av `0003` i 1.9, og en test holder
   tabellen og `AKSJEUNIVERS` like.
 - **Rådatafiler** heter `<prefiks>-raa-<dato>.json` og skrives aldri om.
@@ -211,7 +232,7 @@ leser basen (2.2) og at vurderingen skrives (2.5).
   G2–G5 og G8: `len(AKSJEUNIVERS)` i stedet for 14 og 15, en nøkkel med
   mellomrom i testen for URL-koding, `SnapshotLeser` i docstringene, en test
   som binder `styrke` i `Vurdering` til `beregn_signal`, og testnavnet uten
-  `versjon_1`.
+  `versjon_1`. Ferdig, flettet i `5c316e8` (PR #10).
 - **1.9 før Epic 2 skriver til basen.** Fremmednøkkel eller trigger velges i
   planen, og det er billigst mens tabellene er tomme. 1.9 løser i basen at
   `Kurslager` godtar ethvert symbol mens `Vurderingslager` bare godtar formen i
