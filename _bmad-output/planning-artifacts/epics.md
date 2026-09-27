@@ -845,6 +845,8 @@ denne storyen. *Punkt 24 lukket 2026-09-27:* svaret bestemmer formen på
 
 **Én økt:** ja.
 
+*Ferdig 2026-09-27:* flettet i `7dc8a48`, PR #8.
+
 ### Story 1.7: De tre tilstandene skilles
 
 Som **gruppe som skal forsvare tallene**, vil jeg kunne skille en dag uten
