@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-27T11:53
+updated: 2026-09-27T11:54
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -535,8 +535,13 @@ hentet ikke inneholder meldinger fra Vår Energi:
 | Konstruert tittel | `gjett_spraak` gir |
 |---|---|
 | `Vår Energi ASA: Third quarter 2026 results` | **norsk** — feil |
-| `Vår Energi ASA - Notice of Extraordinary General Meeting` | **norsk** — feil |
+| `Vår Energi ASA - Update on drilling programme` | **norsk** — feil |
 | `Equinor ASA: Share buy-back programme third tranche` | uavklart |
+
+*Rettet 2026-09-27:* den andre tittelen var bygget av en ekte meldingstittel
+fra NewsWeb, ordrett, med et annet selskapsnavn foran. Den engelske delen er
+byttet med en konstruert tekst, og `gjett_spraak` gir fortsatt norsk
+(regel 16).
 
 At Vår Energi faktisk skriver firmanavnet i titlene sine er utledet av mønsteret
 hos de andre — Equinors meldinger 18.09 begynner alle med «Equinor ASA: …» —

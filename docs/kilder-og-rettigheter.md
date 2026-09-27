@@ -2,7 +2,7 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-27T11:53
+updated: 2026-09-27T11:54
 ---
 
 # Kilder og rettigheter
@@ -872,7 +872,8 @@ oversett 24.09. De er byttet med en beskrivelse.
 *2026-09-27:* EODHDs tagger regnes også som meldingsinnhold. De sto ordrett i
 `docs/kontroll-2026-09-22.md`, i rettingsplanen og i `malinger.md` §10, og er
 byttet med antall og beskrivelser. Avgjort av oss etter kontrollen 26.09
-(`docs/kontroll-2026-09-26.md`).
+(`docs/kontroll-2026-09-26.md`). Den andre av de tre konstruerte titlene i
+`malinger.md` var bygget av en ekte tittel, og er skrevet om.
 
 `data/` ligger i `.gitignore`, sammen med `.env`. Rådata og API-nøkler er derfor
 ikke eksponert.
