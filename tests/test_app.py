@@ -370,6 +370,7 @@ class TestAksjedetalj:
         html = svar.data.decode("utf-8")
 
         assert svar.status_code == 200
+        assert html.count("123.45") == 1, "sluttkursen skal staa noeyaktig ett sted"
         assert '<span class="verdi">123.45</span>' in html, "sluttkursen vises ikke"
         assert "kunne ikke regnes" in html, "siden sier ikke at signalet mangler"
 

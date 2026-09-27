@@ -352,7 +352,6 @@ class TestOyeblikksbilde:
             assert tid is not None, (
                 f"{aksje.symbol}: visningen kan ikke lese hentet-tiden i fila"
             )
-            assert tid.tzinfo is not None
             assert len(leser.serie(aksje.symbol)) == 60, (
                 f"{aksje.symbol}: visningen leser ikke alle radene hentingen skrev"
             )

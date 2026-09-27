@@ -2,7 +2,7 @@
 title: 'Story 9.0: Fem tester sjekker det de lover'
 type: 'chore'
 created: '2026-09-27'
-status: 'in-progress'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '6dbfcb6ab2cae2d71192f4f5015dd2256d2ca3f7'
@@ -69,9 +69,37 @@ context:
 
 ## Implementation Notes
 
+**Bygget 27.09** på grenen `9-0` (PR #7), fra `baseline_commit` `6dbfcb6`. Commitene er `0646b99` og rettingene etter gjennomgangen.
+
+- **Tester:** 468 før og 468 etter. Ingen er lagt til eller fjernet. To har fått nytt navn: `test_formatet_kan_leses_av_snapshotkilde` heter `test_formatet_kan_leses_av_visningen`, og `test_ruta_gjoer_ingen_nettverkskall` heter `test_rutene_gjoer_ingen_nettverkskall`. Det gamle navnet står i docstringen til begge.
+- **Mot `baseline_commit`:** `src/` er uendret (`git diff --exit-code 6dbfcb6 -- src/`), og alle 468 består, også de fem omskrevne.
+- **Mutantene**, én om gangen mot hele testsettet, med `src/` satt tilbake og kontrollert mellom hver. Kjørt på nytt etter rettingene:
+  - `abs` fjernet i `_sorteringsnokkel`: bare `test_absolutt_endring_avgjoer_ved_lik_styrke` feiler, med «ved lik styrke skal stoerst absolutt endring staa foerst».
+  - `<=` byttet med `<` i `trend`: bare `test_noeyaktig_paa_grensen_gir_null` feiler, med «noeyaktig +2 % skal ligge i sonen».
+  - `naa` i `kjoer` uten tidssone: bare `test_formatet_kan_leses_av_visningen` feiler, med «EQNR: visningen kan ikke lese hentet-tiden i fila».
+  - Sluttkursen fjernet fra `aksje.html`: K3-testen feiler med «sluttkursen skal staa noeyaktig ett sted», og `test_rutene_gjoer_ingen_nettverkskall` feiler også, fordi den ser etter sluttkursen på detaljen.
+  - `hent_leser` kaller `requests.get`: `test_rutene_gjoer_ingen_nettverkskall` feiler med «Visningen skal aldri gjoere API-kall», fra testens egen utbytting. De to testene i `TestHentLeser` feiler også.
+  - Lagt til etter gjennomgangen (BH1): andresortering på navn i stedet for `abs`: bare `test_absolutt_endring_avgjoer_ved_lik_styrke` feiler.
+- **Rekkefølgen i K3-testen:** `count` kommer før spannet, så en manglende sluttkurs gir meldingen fra `count`. Den har derfor fått egen melding.
+
 ## Spec Change Log
 
 ## Review Triage Log
+Tre lag gjennomgikk diffen `6dbfcb6..0646b99` den 27.09: Blind Hunter (BH), Edge Case Hunter (ECH) og Verification Gap (VG). VG fant ingen hull.
+
+| # | Funn | Dom | Bevis | Rute |
+|---|---|---|---|---|
+| BH1 | Forventet rekkefølge `["DNB", "EQNR"]` er også alfabetisk, så en andresortering på navn ville bestått | low | Riktig. Rettingen er direkte: rollene byttes | patch: EQNR faller og DNB stiger. Ny mutant (navn i stedet for `abs`) fanges |
+| BH2 | Docstringen sier at en stabil sortering gir EQNR først uten `abs` | low | Uten `abs` er nøkkelen `-endring`, og +3 kommer foran -6 på verdien | patch: setningen skrevet om |
+| BH3a | `assert tid.tzinfo is not None` kan ikke feile | low | `_hentet_fra_tekst` gir alltid UTC eller `None` | patch: linjen er fjernet |
+| BH3b | Samme serie for alle symboler, tiden sammenlignes ikke, datoene sjekkes ikke, og samme fil sjekkes ikke | low | Løftet er at visningen kan lese fila. Tid og alle 60 rader for hvert symbol sjekkes | avvist: mer enn en direkte retting, og ingen navngitt feil det ville fanget i dag |
+| BH4a | Filnavnet i K4-testen er skrevet inn for hånd | low | Samme mønster som `TestHentLeser` fra før | avvist: feiler høylytt hvis navnet endres |
+| BH4b | Bare `requests.get` byttes ut, `Session` og `post` fanges bare av `conftest.py` | false | Docstringen sier at sperren i `conftest.py` står i tillegg | avvist |
+| BH5 | Docstringen sier at 123.45 bare står ett sted, men det sjekkes ikke | low | Riktig | patch: `assert html.count("123.45") == 1`, med egen melding |
+| BH6 | Forutsetningene i grensetesten kopierer formelen i `trend`, og 0.019999999999999928 sjekkes ikke | low | Lista er ti lang, så snittet over hele lista er snittet `trend` bruker | avvist: kosmetisk |
+| BH7 | Implementation Notes er tomme, og linjenumrene i Code Map er utdatert | false | Rettingen er å endre spesifikasjonen. Notatene føres her uansett | avvist: gjelder spesifikasjonen |
+| BH8 | Det gamle navnet finnes bare i docstringene før flettingen | false | Docstringene har det gamle navnet, og «resolved:»-linjen kommer etter flettingen, som planen sier | avvist |
+| ECH1 | `close` er lik `adjusted_close` i testdataene, så en forveksling ses ikke | low | `test_sluttkursen_er_slutt_ikke_justert` (`tests/test_aksjedetalj.py:183`) dekker forvekslingen | avvist: dekket av en annen test |
 
 ## Design Notes
 
