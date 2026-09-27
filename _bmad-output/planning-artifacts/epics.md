@@ -325,13 +325,6 @@ virker. Begrunnelsen står i PRD-memloggen og i refleksjonsloggen 23.09.
 **Epic 4.1 og 4.2 tas parallelt med Epic 1** (plan B, besluttet 23.09). De er
 papirarbeid og en port, og de trengs i både plan A og plan B.
 
-**Prioritering, oppdatert 2026-09-27**, etter svarene fra faglærerne og kodegjennomgangen av Epic 1. Prioriteringen fra 23.09 står, og rekkefølgen innenfor den er:
-- *Må med, fordi faglærerne krever det:* databasen i bruk i Epic 2, med skrivingen først, fordi en vurdering ikke kan etterfylles (`AD-7`), og fordi «Adopsjon» og «Fortsatt bruk» i PRD §7 krever at vi bruker løsningen jevnlig. Punkt 23 avgjøres denne uka, fordi det blokkerer 2.1. Deretter Dockerfile og README (Epic 3), `docs/kvalitetssikring.md` (9.1) og refleksjonsrapporten.
-- *Det vi prøver å få til:* `aksje` med relasjoner (1.9) før Epic 2 skriver til basen, historikken i aksjedetaljen (2.7), KI-laget (4.0–4.3, og 5B.1–5B.3 hvis Euronext sier nei eller ikke svarer 28.09), målingene av KI (9.5 og 5B.4), brukertesten (8.1), og et kort demomanus med en reserve på kjente data (punkt D i `docs/innlevering.md`).
-- *Hvis tiden strekker til:* 8.2 med endringene fra brukertesten, og 2.6.
-
-Ingen av 1.9, 2.7 og 9.5 utvider omfanget: 1.9 er en skjemaendring før basen har data, 2.7 svarer på FR-408s eget spørsmål (punkt 20), og 9.5 er et suksessmål i PRD §7. «KI-bidrag i drift» krever minst én ukes drift før demonstrasjonen, som vi har anslått til uke 45, så KI-teksten må lages hver dag fra rundt 26.10.
-
 - **Epic 1 før Epic 2:** hentingen skriver gjennom `Kurslager`, som Epic 1
   oppretter. Uten porten har Epic 2 ingenting å skrive til.
 - **Epic 2 før Epic 3:** Dockerfilen pakker to kommandoer, og den ene er
@@ -350,6 +343,13 @@ Ingen av 1.9, 2.7 og 9.5 utvider omfanget: 1.9 er en skjemaendring før basen ha
   data og begge skjermbildene, ikke Docker. Den kan kjøres på vår egen maskin.
 - **Epic 8.2 etter 8.1.** Funnene fra brukertesten er det viktigste
   grunnlaget for gjennomgangen.
+
+**Prioritering, oppdatert 2026-09-27**, etter svarene fra faglærerne og kodegjennomgangen av Epic 1. Prioriteringen fra 23.09 står, og rekkefølgen innenfor den er:
+- *Må med, fordi faglærerne krever det:* databasen i bruk i Epic 2, med skrivingen først, fordi en vurdering ikke kan etterfylles (`AD-7`), og fordi «Adopsjon» og «Fortsatt bruk» i PRD §7 krever at vi bruker løsningen jevnlig. Punkt 23 avgjøres denne uka, fordi det blokkerer 2.1. Deretter Dockerfile og README (Epic 3), `docs/kvalitetssikring.md` (9.1) og refleksjonsrapporten.
+- *Det vi prøver å få til:* `aksje` med relasjoner (1.9) før Epic 2 skriver til basen, historikken i aksjedetaljen (2.7), KI-laget (4.0–4.3, og 5B.1–5B.3 hvis Euronext sier nei eller ikke svarer 28.09), målingene av KI (9.5 og 5B.4), brukertesten (8.1), og et kort demomanus med en reserve på kjente data (punkt D i `docs/innlevering.md`).
+- *Hvis tiden strekker til:* 8.2 med endringene fra brukertesten, og 2.6.
+
+Ingen av 1.9, 2.7 og 9.5 utvider omfanget: 1.9 er en skjemaendring før basen har data, 2.7 svarer på FR-408s eget spørsmål (punkt 20), og 9.5 er et suksessmål i PRD §7. «KI-bidrag i drift» krever minst én ukes drift før demonstrasjonen, som vi har anslått til uke 45, så KI-teksten må lages hver dag fra rundt 26.10.
 
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
