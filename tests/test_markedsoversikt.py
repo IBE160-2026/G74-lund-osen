@@ -173,15 +173,24 @@ class TestSortering:
         assert rader[0].styrke >= rader[1].styrke
 
     def test_absolutt_endring_avgjoer_ved_lik_styrke(self):
-        """Absolutt, ikke fortegn: et stort fall skal ikke havne bakerst."""
-        lite = serie([100.0] * 5 + [100.5])
+        """Absolutt, ikke fortegn: et stort fall skal ikke havne bakerst (FR-102).
+
+        EQNR faller 6 %, DNB stiger 3 %. Begge faar styrke 2, saa det er
+        endringen som avgjoer. Uten abs ville stigningen (+3) komme foran
+        fallet (-6). Fallet er heller ikke foerst alfabetisk, saa en
+        andresortering paa navn ville ogsaa feilet.
+        """
         stort_fall = serie([100.0] * 5 + [94.0])
-        kilde = lager({"EQNR": lite, "DNB": stort_fall})
+        opp = serie([100.0] * 5 + [103.0])
+        kilde = lager({"EQNR": stort_fall, "DNB": opp})
 
         rader = bygg_oversikt(kilde, (EQNR, DNB), KORT)
-        med_lik_styrke = {r.aksje.symbol: r for r in rader}
-        if med_lik_styrke["EQNR"].styrke == med_lik_styrke["DNB"].styrke:
-            assert rader[0].aksje.symbol == "DNB"
+        styrker = {r.aksje.symbol: r.styrke for r in rader}
+
+        assert styrker["EQNR"] == styrker["DNB"] == 2, styrker
+        assert [r.aksje.symbol for r in rader] == ["EQNR", "DNB"], (
+            "ved lik styrke skal stoerst absolutt endring staa foerst"
+        )
 
     def test_rader_uten_signal_sorteres_sist(self):
         kilde = lager(
