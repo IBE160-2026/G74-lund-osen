@@ -935,6 +935,8 @@ Som **gruppe**, vil vi at basen selv kjenner de femten, så en rad for et symbol
 
 **Én økt:** ja.
 
+*Ferdig 2026-09-28:* flettet i `cfe2977`, PR #11.
+
 ---
 
 ## Epic 2: Ferske data uten at kvoten sprenges
