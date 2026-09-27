@@ -120,3 +120,70 @@ class TestBasenAvviserUkjentAksje:
         ny.execute(RAD[tabell], ("EQNR",))
         ny.execute(f"UPDATE {tabell} SET symbol = 'DNB'")
         assert ny.execute(f"SELECT symbol FROM {tabell}").fetchall() == [("DNB",)]
+
+
+class TestAksjenStaarFast:
+    """En aksje med rader kan ikke slettes, og symbolet kan aldri endres."""
+
+    @pytest.mark.parametrize("tabell", TABELLER)
+    def test_aksje_med_rad_i_bare_en_tabell_kan_ikke_slettes(self, ny, tabell):
+        ny.execute(RAD[tabell], ("EQNR",))
+        ny.commit()
+        with pytest.raises(sqlite3.IntegrityError, match="en aksje med rader slettes ikke"):
+            ny.execute("DELETE FROM aksje WHERE symbol = 'EQNR'")
+        assert antall(ny, "aksje") == 15
+
+    def test_aksje_uten_rader_kan_slettes(self, ny):
+        """aksje er oppsett, ikke et uerstattelig lager (godkjent 27.09)."""
+        ny.execute(RAD["kurs"], ("EQNR",))
+        ny.execute("DELETE FROM aksje WHERE symbol = 'DNB'")
+        assert antall(ny, "aksje") == 14
+        with pytest.raises(sqlite3.IntegrityError, match="ukjent aksje i kurs"):
+            ny.execute(RAD["kurs"], ("DNB",))
+
+    def test_symbol_kan_ikke_endres_uten_rader(self, ny):
+        with pytest.raises(sqlite3.IntegrityError, match="symbolet til en aksje endres ikke"):
+            ny.execute("UPDATE aksje SET symbol = 'EQNR.OL' WHERE symbol = 'EQNR'")
+        assert ny.execute(
+            "SELECT count(*) FROM aksje WHERE symbol = 'EQNR'"
+        ).fetchone()[0] == 1
+
+    def test_symbol_kan_ikke_endres_med_rader(self, ny):
+        ny.execute(RAD["vurdering"], ("EQNR",))
+        ny.commit()
+        with pytest.raises(sqlite3.IntegrityError, match="symbolet til en aksje endres ikke"):
+            ny.execute("UPDATE aksje SET symbol = 'EQUINOR' WHERE symbol = 'EQNR'")
+        assert ny.execute(
+            "SELECT a.navn FROM vurdering v JOIN aksje a USING (symbol)"
+        ).fetchall() == [("Equinor",)]
+
+    def test_navn_og_sektor_kan_endres(self, ny):
+        ny.execute(RAD["kurs"], ("EQNR",))
+        ny.execute("UPDATE aksje SET navn = 'Nytt navn', sektor = 'Ny' WHERE symbol = 'EQNR'")
+        assert ny.execute(
+            "SELECT navn, sektor FROM aksje WHERE symbol = 'EQNR'"
+        ).fetchone() == ("Nytt navn", "Ny")
+
+    @pytest.mark.parametrize("sql", [
+        "INSERT OR REPLACE INTO aksje VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi')",
+        "INSERT OR REPLACE INTO aksje VALUES ('EQNR', 'NY.OL', 'Ny', 'Energi')",
+        "REPLACE INTO aksje VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi')",
+        "INSERT INTO aksje VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi') "
+        "ON CONFLICT DO NOTHING",
+        "UPDATE OR REPLACE aksje SET ticker = 'EQNR.OL' WHERE symbol = 'DNB'",
+    ])
+    def test_aksje_med_rader_erstattes_ikke(self, ny, sql):
+        """REPLACE sletter raden som er i veien uten DELETE-triggeren."""
+        ny.execute(RAD["kurs"], ("EQNR",))
+        ny.commit()
+        with pytest.raises(sqlite3.IntegrityError, match="en aksje erstattes ikke"):
+            ny.execute(sql)
+        assert ny.execute(
+            "SELECT symbol, ticker FROM aksje WHERE symbol = 'EQNR'"
+        ).fetchall() == [("EQNR", "EQNR.OL")]
+        assert antall(ny, "aksje") == 15
+
+    def test_ny_aksje_kan_legges_til(self, ny):
+        ny.execute("INSERT INTO aksje VALUES ('NY', 'NY.OL', 'Ny', 'Energi')")
+        ny.execute(RAD["kurs"], ("NY",))
+        assert antall(ny, "aksje") == 16

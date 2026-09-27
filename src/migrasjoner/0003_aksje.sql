@@ -88,3 +88,45 @@ WHEN NOT EXISTS (SELECT 1 FROM aksje WHERE symbol = NEW.symbol)
 BEGIN
     SELECT RAISE(ABORT, 'ukjent aksje i vurdering');
 END;
+
+-- En aksje med rader i kurs, kursserie eller vurdering kan ikke slettes.
+-- Radene i vurdering kan verken slettes eller skrives paa nytt (AD-7), og de
+-- ville blitt staaende uten aksje. En aksje uten rader kan slettes: aksje er
+-- oppsett, ikke et uerstattelig lager. Symbolet kan aldri endres, fordi det
+-- er det radene peker paa. navn og sektor kan endres.
+
+CREATE TRIGGER aksje_slettes_ikke_med_rader
+BEFORE DELETE ON aksje
+WHEN EXISTS (SELECT 1 FROM kurs WHERE symbol = OLD.symbol)
+  OR EXISTS (SELECT 1 FROM kursserie WHERE symbol = OLD.symbol)
+  OR EXISTS (SELECT 1 FROM vurdering WHERE symbol = OLD.symbol)
+BEGIN
+    SELECT RAISE(ABORT, 'en aksje med rader slettes ikke');
+END;
+
+CREATE TRIGGER aksje_symbol_endres_ikke
+BEFORE UPDATE OF symbol ON aksje
+WHEN NEW.symbol IS NOT OLD.symbol
+BEGIN
+    SELECT RAISE(ABORT, 'symbolet til en aksje endres ikke');
+END;
+
+-- REPLACE sletter raden som er i veien uten aa kjoere DELETE-triggere (med
+-- mindre recursive_triggers er slaatt paa). INSERT OR REPLACE med en ticker
+-- som finnes, eller UPDATE OR REPLACE av ticker, ville da fjernet en aksje
+-- med rader. En INSERT eller en ny ticker som kolliderer, avvises derfor
+-- foer konflikten loeses.
+
+CREATE TRIGGER aksje_erstattes_ikke_insert
+BEFORE INSERT ON aksje
+WHEN EXISTS (SELECT 1 FROM aksje WHERE symbol = NEW.symbol OR ticker = NEW.ticker)
+BEGIN
+    SELECT RAISE(ABORT, 'en aksje erstattes ikke');
+END;
+
+CREATE TRIGGER aksje_erstattes_ikke_update
+BEFORE UPDATE OF ticker ON aksje
+WHEN EXISTS (SELECT 1 FROM aksje WHERE ticker = NEW.ticker AND symbol IS NOT OLD.symbol)
+BEGIN
+    SELECT RAISE(ABORT, 'en aksje erstattes ikke');
+END;
