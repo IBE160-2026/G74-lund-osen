@@ -48,7 +48,7 @@ class TestMigrasjonen:
         assert MIGRASJONSKATALOG.parent.name == "src"
         assert (MIGRASJONSKATALOG / "0001_kurs.sql").is_file()
 
-    def test_tom_base_migreres_til_versjon_1_med_to_tabeller(self, tmp_path):
+    def test_tom_base_migreres_og_faar_kurs_og_kursserie(self, tmp_path):
         tilkobling = sqlite3.connect(tmp_path / "ny.db")
         try:
             assert migrer(tilkobling, MIGRASJONSKATALOG) >= 1
