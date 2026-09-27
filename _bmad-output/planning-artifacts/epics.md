@@ -1607,6 +1607,8 @@ Som **gruppe**, vil vi at hver test sjekker det navnet og docstringen lover, så
 
 **Én økt:** ja.
 
+*Ferdig 2026-09-27:* flettet i `c2c26ba`, PR #7.
+
 ### Story 9.1: `docs/kvalitetssikring.md`
 
 Som **sensor**, vil jeg finne i ett dokument hva som er testet, hvordan, og hva
