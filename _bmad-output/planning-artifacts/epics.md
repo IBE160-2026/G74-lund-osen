@@ -468,9 +468,10 @@ må vise hvordan KI ble brukt, og hvordan studentene har kvalitetssikret koden»
 
 # Stories
 
-46 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
+47 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
 den, hva kontrollen faktisk ser etter, og om den kan gjøres ferdig i én økt.
 *Rettet 2026-09-26:* her sto 42. Tallet er telt fra overskriftene «### Story».
+*Rettet 2026-09-27:* her sto 46. Story 9.0 kom til 27.09.
 
 **«Ville feilet hvis» er kontrollen.** Resten er beskrivelse. En story uten den
 linjen er ikke ferdig spesifisert.
@@ -1586,6 +1587,25 @@ bygge det. Det er et svar på papir, ikke en endring.
 ---
 
 ## Epic 9: Dokumentasjon av prosessen
+
+### Story 9.0: Fem tester sjekker det de lover
+
+*Lagt til 2026-09-27, fra kontrollen av repoet 26.09 (`docs/kontroll-2026-09-26.md`, «Utsatt», K3 og K4).*
+
+Som **gruppe**, vil vi at hver test sjekker det navnet og docstringen lover, så en grønn testkjøring betyr det vi sier den betyr, og så 9.1 kan vise til tester som faktisk kan feile.
+
+**Oppfyller:** — *(grunnlag for 9.1)* · **Begrenses av:** `AD-8`
+
+**Grunnen:** kontrollen 26.09 fant fem tester som består uten å sjekke det de lover: `test_absolutt_endring_avgjoer_ved_lik_styrke`, `test_noeyaktig_paa_grensen_gir_null` og `test_formatet_kan_leses_av_snapshotkilde` (ført i `deferred-work.md`), og `test_kort_serie_viser_kurs_men_sier_at_signalet_mangler` og `test_ruta_gjoer_ingen_nettverkskall` (K3 og K4 i kontrollrapporten).
+
+**Kontroll — hva testen ser etter:**
+- Hver av de fem testene feiler mot en mutant som bryter det den lover, og består mot koden slik den er
+- Koden i `src/` endres ikke. Viser en test at koden er feil, stopper vi og avgjør det som egen sak
+- **Ville feilet hvis:** en av de fem fortsatt besto med mutanten for sitt løfte
+
+**Forutsetning:** ingen. Storyen rører bare `tests/`.
+
+**Én økt:** ja.
 
 ### Story 9.1: `docs/kvalitetssikring.md`
 
