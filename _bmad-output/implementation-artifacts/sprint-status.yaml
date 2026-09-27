@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-24-2026 19:26
-last_updated: 09-27-2026 18:35
+last_updated: 09-27-2026 19:17
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -50,7 +50,7 @@ development_status:
   1-5-snapshotkilde-ut-av-kursdata-py: review
   1-5b-migrasjonsløperen-og-sqlite-adapteren-herdes: review
   1-6-vurderingslager-med-datoavvisning: review
-  1-7-de-tre-tilstandene-skilles: backlog
+  1-7-de-tre-tilstandene-skilles: in-progress
   epic-1-retrospective: optional
 
   epic-2: backlog
