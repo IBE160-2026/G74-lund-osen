@@ -878,6 +878,28 @@ lukket med en rad med grunnen (`prd.md` §8).
 
 *Ferdig 2026-09-27:* flettet i `5e9e6ad`, PR #9.
 
+### Story 1.8: Hentingen godtar bare det leseren kan lese
+
+*Lagt til 2026-09-27, fra kodegjennomgangen av Epic 1 (G1).*
+
+Som **gruppe**, vil vi at en aksje hentingen melder som hentet, også kan leses, så ingen aksje forsvinner fra oversikten uten at noe er ført.
+
+**Oppfyller:** — *(retting etter punkt 22 i `prd.md` §8)* · **Begrenses av:** `AD-15`, `AD-19`
+
+**Grunnen:** `_riktig_form` i `fetch_prices.py` sjekker bare at feltene finnes og at `date` er tekst, mens `SnapshotLeser` oversetter hver rad og avviser like datoer. Prøvd 27.09: `close` 0, `volume` 1000.0 eller en dato som går igjen gir en serie som lagres uten noe i `feil`, og som leseren dropper.
+
+**Kontroll — hva testen ser etter:**
+- Én funksjon avgjør om en serie fra EODHD kan leses, og både `SnapshotLeser` og `hent_universet` bruker den
+- Hver slags rad leseren avviser, gir «svar med feil form» for symbolet, og de andre lagres likevel. Testene for leseren og hentingen tar radene fra samme liste
+- `fetch_prices.py` kommer under strengvakten i `test_konsumentene.py`, så EODHDs feltnavn bare står i `eodhd.py`
+- Øyeblikksbildet har samme format som før
+- G2–G5 og G8: `len(AKSJEUNIVERS)` for 14 og 15, en nøkkel med mellomrom i testen for URL-koding, `SnapshotLeser` i docstringene, en test som binder `styrke` i `Vurdering` til `beregn_signal`, og testnavnet uten `versjon_1`
+- **Ville feilet hvis:** hentingen og leseren hadde hver sin regel for en gyldig serie
+
+**Forutsetning:** ingen.
+
+**Én økt:** ja.
+
 ---
 
 ## Epic 2: Ferske data uten at kvoten sprenges
