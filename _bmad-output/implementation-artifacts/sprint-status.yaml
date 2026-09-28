@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-24-2026 19:26
-last_updated: 09-28-2026 20:28
+last_updated: 09-29-2026 00:19
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -65,6 +65,7 @@ development_status:
   2-0-hentingen-lekker-ikke-nøkkelen-og-skriver-ikke-over-et-øyeblikksbilde: done
   2-1-børsdag-i-oslo-tidsstempel-i-utc: backlog
   2-1b-basen-åpnes-ett-sted-og-hentingen-skriver-kursene-dit: backlog
+  2-1c-vurderingen-lagrer-målingene-bak-de-tre-sjekkene: backlog
   2-2-hentekommandoen-som-egen-inngang: backlog
   2-3-børsdagskontroll-før-kvoten-brukes: backlog
   2-4-etterfylling-av-hull-i-kursserien: backlog
