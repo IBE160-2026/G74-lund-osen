@@ -1,17 +1,23 @@
 ---
 title: "Endringsforslag 28.09: databasen i bruk i Epic 2"
-status: draft
+status: final
 created: 2026-09-28
-updated: 2026-09-28T17:35
+updated: 2026-09-28T20:26
 ---
 
 # Endringsforslag 28.09: databasen i bruk i Epic 2
 
 Laget med `bmad-correct-course` i modusen Batch, etter instruksjonen kl. 17:32 i
-`docs/ai-prompts/2026-09-28.md`. **Dette er et forslag.** Ingenting i
-`epics.md`, `sprint-status.yaml`, PRD-en eller spinen er endret, og ingenting
-endres før gruppen har sagt ja (regel 2 og 9). Plan B (Epic 5B) er ikke med. Den
-føres inn i kveld med egne blokker.
+`docs/ai-prompts/2026-09-28.md`. **Godkjent av gruppen 28.09**, med endringene
+i instruksjonen kl. 20:25 samme sted. De er ført inn her, og forslaget er deretter
+ført inn i `epics.md`, `sprint-status.yaml` og spinen, som i punkt 6.
+*Skrevet 17:35, bevart:* «Dette er et forslag. Ingenting i `epics.md`,
+`sprint-status.yaml`, PRD-en eller spinen er endret, og ingenting endres før
+gruppen har sagt ja (regel 2 og 9).»
+
+Plan B er ført inn 28.09 (`733239e` til `023dabb`), og Epic 5B heter Epic 10.
+Epic 10 er med i tidsplanen (punkt 4.6). *Her sto 17:35:* «Plan B (Epic 5B) er
+ikke med. Den føres inn i kveld med egne blokker.»
 
 ## 1. Hva som utløste forslaget
 
@@ -51,7 +57,9 @@ måler.
 | **Epic 3** | Innholdet er det samme, men 3.1 og 3.2 får mindre å avgjøre. Stiene, åpningen av basen og migrasjonene er avgjort i Epic 2. 3.1 bare pakker |
 | **Epic 4** | 4.3 flyttes til rett etter 2.1b, fordi den bruker samme åpning av basen og `0004`. 4.2 kan tas når som helst |
 | **Epic 8** | 8.1 kan tas når 2.2 og 2.7 er ferdige, uten å vente på 2.4 og 2.6 |
-| Epic 5, 6, 7, 9 | Ingen virkning. 5B er holdt utenfor |
+| **Epic 10** | 10.1 i uke 40–41, og 10.2 og 10.3 i uke 42–43 (punkt 4.6). 10.3 leser KI-teksten med `ki_logg` mot `vurdering` (punkt 4.5) |
+| Epic 5, 6, 7 | Ute av v1 fra 28.09 (plan B). Ingen virkning her |
+| Epic 9 | Ingen virkning |
 
 ### Andre dokumenter
 
@@ -59,7 +67,7 @@ måler.
 |---|---|
 | `epics.md` | Innledningen til Epic 2, den nye 2.1b, 2.2, 2.3, 2.5, avhengighetsgrafen, AD-lista for Epic 2, og merknaden i 3.1 om migrasjoner |
 | `sprint-status.yaml` | En ny linje: `2-1b-basen-åpnes-ett-sted-og-hentingen-skriver-kursene-dit: backlog` |
-| Spinen | Raden «Hvem kjører migrasjonene, og når» under Deferred blir avgjort. Mappetreet får `[bygget i 2.1b]`. AD-16 får en linje om hvor `migrer()` kalles |
+| Spinen | Raden «Hvem kjører migrasjonene, og når» under Deferred blir avgjort. Mappetreet får `[2.1b]` ved `data/raa/` og `data/db/ose.db`. AD-16 får en linje om hvor `migrer()` skal kalles. *Rettet 28.09 kl. 20:25: her sto «Mappetreet får `[bygget i 2.1b]`». Ingenting er bygget før 2.1b er ferdig* |
 | PRD-en | Ingen krav endres. Terskelen for «Drift» i §7 («migrasjoner er uttrykkelig ikke et eget steg») blir oppfylt i 2.1b, ikke i 3.1. Det kan føres som en merknad |
 | `docs/innlevering.md` §2 | «Gjenstår» sier at 1.6–1.7 står igjen, men de er ferdige. Dette står alt i `deferred-work.md`. Rettes når 2.1b er ferdig, med den nye stien |
 | `README.md` | Når webserveren leser fra basen (2.2), blir «Kom i gang» feil (regel 19, story 3.3) |
@@ -119,6 +127,15 @@ regnes av.
 - Kjøringen virker når både `data/raa/` og `data/db/` mangler (3.2)
 - Fire dagers opphold i serien er borte etter neste henting, uten ekstra kall
   (FR-403, se 4.6 om 2.4)
+- Leseren av øyeblikksbildene ser i `data/raa/`, så markedsoversikten og
+  aksjedetaljen viser de samme kursene før og etter flyttingen. Til 2.2 er
+  ferdig, leser webserveren fortsatt øyeblikksbildene, og `nyeste_snapshot`
+  ser i dag bare i `data/`
+- Et øyeblikksbilde som alt finnes, kan skrives til basen uten API-kall, samme
+  vei som etter en henting. Det skriver bare `kurs`, aldri `vurdering` (AD-7).
+  Det gir en test med ekte data uten kall, og en reserve til demonstrasjonen
+  (punkt D i `docs/innlevering.md`). AD-6 forbyr å lagre filene i basen, ikke å
+  lese kursene ut av dem
 - **Ville feilet hvis:** webserveren og hentekommandoen hadde hver sin
   åpning av basen. Da kan den ene migrere og den andre ikke, og AD-16 er brutt
   av den første som startet
@@ -126,6 +143,10 @@ regnes av.
 **Forutsetning** *(flyttet fra 2.5)*: `SqliteKurslager` gjør avvisningen fra
 `0003` om til `ValueError`, mens `MinneKurslager` godtar `EQNR.OL` (G10, G11).
 Her avgjøres det om porten `Kurslager` skal sjekke symbolet.
+
+**Spørsmål til planen:** `erstatt_serie` bytter ut hele serien (AD-5). Et
+øyeblikksbilde som er eldre enn serien i basen, ville derfor skrevet en eldre
+serie over en nyere. Planen avgjør om det avvises.
 
 **Lokalt, utenfor git:** de eksisterende `kurser-raa-*.json` flyttes for hånd
 fra `data/` til `data/raa/`. `data/` committes aldri (regel 10).
@@ -171,11 +192,25 @@ Nye kontrollpunkter:
 - Meldingen på den tomme siden sier ikke lenger «Ingen kursdata funnet i
   `data/`» (`deferred-work.md`), og «Kom i gang» i README rettes i samme commit
   (regel 19)
+
+Spørsmål til planen:
+- Kan oversikten hente de femten fra `aksje` sammen med nyeste kurs i én
+  spørring? Det er en join appen faktisk bruker (punkt 4.5)
+- Skal oversikten lese dagens vurdering fra `vurdering` i stedet for å regne
+  signalet av kursene ved hver visning? Samme data og samme parametre gir
+  samme svar, men det er to veier til samme tall
 ```
 
 Grunnen: forutsetningen i 2.2 sier alt at det er her det avgjøres hvordan
 webserveren åpner basen. Blir 2.2 mer enn én økt, deles den i 2.2 og 2.2b når
 den planlegges, ikke nå.
+
+#### Story 10.3: nytt kontrollpunkt *(lagt til 28.09 kl. 20:25)*
+
+```
+- KI-teksten leses med `ki_logg` mot `vurdering`, så teksten vises sammen med
+  vurderingen den forklarer
+```
 
 ### 4.2 Rekkefølgen i Epic 2
 
@@ -251,7 +286,7 @@ KI-vurderinger».
 |---|---|---|
 | **Lagring over tid** | `vurdering` finnes (`0002`, 1.6), men ingenting skriver dit utenom testene | Én rad per aksje per børsdag fra 2.5. Vises dag for dag i 2.7 |
 | **Relasjoner mellom data** | `aksje` med triggere fra `kurs`, `kursserie` og `vurdering` (`0003`, AD-21), prøvd i `tests/test_aksje.py` | Holdes av basen ved hver ekte skriving fra 2.1b. `ki_logg` peker på `vurdering` i 4.3 (ER-diagrammet i spinen) |
-| **Joins** | **Ingen.** Ingen `JOIN` i `src/` (slått opp 28.09) | Se usikkerhetene. Forslaget er at lesingen for en periode i 2.7 er én spørring over `vurdering` og `aksje`, og at KI-teksten leses med `ki_logg` mot `vurdering` i 4.3 |
+| **Joins** | **Ingen.** Ingen `JOIN` i `src/` (slått opp 28.09) | Minst én join som appen faktisk bruker. Planen for 2.2 vurderer om oversikten kan hente de femten fra `aksje` sammen med nyeste kurs i én spørring, og 10.3 leser KI-teksten med `ki_logg` mot `vurdering`. En join mot `aksje` i 2.7 bare for navnet teller ikke, fordi siden alt vet hvilken aksje den viser. *Avgjort 28.09 kl. 20:25. Her sto:* «Se usikkerhetene. Forslaget er at lesingen for en periode i 2.7 er én spørring over `vurdering` og `aksje`, og at KI-teksten leses med `ki_logg` mot `vurdering` i 4.3» |
 | **Migrasjoner** | `0001`–`0003`, løperen og `skjema_versjon`, prøvd i testene | Kjøres av appen selv fra 2.1b, ved oppstart av begge inngangene |
 | **Logging av KI-vurderinger** | Ingenting. 4.2 og 4.3 er `backlog` | 4.2 (porten og minneutgaven) når som helst. 4.3 (`0004_ki_logg.sql` og adapteren) rett etter 2.1b, fordi den bruker samme åpning av basen |
 
@@ -281,11 +316,20 @@ bruk, og Dockerfile og README.
 
 | Uke | Datoer | Hva |
 |---|---|---|
-| 40 | 28.09–04.10 | 2.1, 2.1b, 2.5. **Første kjøring til basen så tidlig som mulig i uka.** Deretter 2.3. 4.1 (papirarbeid) ved siden av |
-| 41 | 05.10–11.10 | 2.2, 2.7. 4.2 ved siden av |
-| 42 | 12.10–18.10 | 8.1 (brukertesten) tidlig i uka, med data fra uke 40 og 41 i historikken. 3.1, 3.2, 3.3. 4.3 |
-| 43 | 19.10–25.10 | Reserve. 2.4 og 2.6 hvis det er tid. Plan B kommer i tillegg (ikke med her) |
-| 44 | fra 26.10 | KI-teksten lages hver dag |
+| 40 | 28.09–04.10 | 2.1, 2.1b, 2.5. **Første kjøring til basen så tidlig som mulig i uka.** Deretter 2.3. 4.3 rett etter 2.1b. 4.1 (papirarbeid) og 10.1 ved siden av |
+| 41 | 05.10–11.10 | 2.2, 2.7. 4.2. 4.1 og 10.1 ferdige. Punktet om EODHD og plan B avgjøres før 10.2 |
+| 42 | 12.10–18.10 | 8.1 (brukertesten) tidlig i uka, med data fra uke 40 og 41 i historikken. 3.1, 3.2, 3.3. 10.2 |
+| 43 | 19.10–25.10 | 10.2 og 10.3 ferdige. 2.4 og 2.6 hvis det er tid |
+| 44 | fra 26.10 | KI-teksten lages hver dag (Epic 10) |
+
+*Rettet 28.09 kl. 20:25:* Epic 10 er tatt inn. 4.1 og 10.1 i uke 40–41 (10.1
+sender ingenting), 4.2 i uke 41, 4.3 rett etter 2.1b, og 10.2 og 10.3 i uke
+42–43. Punktet «Plan B for KI-laget: spørre EODHD eller ikke?» i
+`docs/kilder-og-rettigheter.md` avgjøres før 10.2. Uke 43 er ikke lenger
+reserve. Her sto for uke 40–44: «2.1, 2.1b, 2.5. … 4.1 (papirarbeid) ved siden
+av», «2.2, 2.7. 4.2 ved siden av», «… 3.1, 3.2, 3.3. 4.3», «Reserve. 2.4 og 2.6
+hvis det er tid. Plan B kommer i tillegg (ikke med her)» og «KI-teksten lages
+hver dag».
 
 Det er ikke regnet på hvor lang tid storyene tar. Rekkefølgen er avhengighetene
 og prioriteringen, ikke et estimat.
@@ -296,15 +340,19 @@ og prioriteringen, ikke et estimat.
    i dag. Navnet på aksjen står også i `AKSJEUNIVERS`, så en join mot `aksje` i
    2.7 kan bli en join for å ha en join. Den mest naturlige er `ki_logg` mot
    `vurdering`, men den kommer først med 4.3 og plan B. Det bør gruppen avgjøre,
-   ikke jeg.
+   ikke jeg. *Avgjort 28.09 kl. 20:25:* se «Joins» i punkt 4.5.
 2. **Om webserveren fortsatt skal regne signalet selv.** Markedsoversikten regner
    signalet av kursene ved hver visning. Etter 2.5 ligger dagens vurdering i
    basen. Samme data og samme parametre gir samme svar, men det er to veier til
    samme tall. Om oversikten skal lese `vurdering`, er ikke vurdert her.
+   *Avgjort 28.09 kl. 20:25:* et spørsmål i planen for 2.2.
 3. **Om AD-6 tillater at basen fylles fra et øyeblikksbilde.** «Filene går ikke
    inn i databasen» (AD-6) kan leses som et forbud mot å importere et
    øyeblikksbilde til `kurs`. En slik import ville kostet 0 kall og gitt en
    reserve til demonstrasjonen (punkt D i `innlevering.md`). Den er ikke foreslått.
+   *Avgjort 28.09 kl. 20:25:* gruppen leser AD-6 slik at den forbyr å lagre
+   filene i basen, ikke å lese kursene ut av dem. Importen er et kontrollpunkt i
+   2.1b, og den skriver bare `kurs`.
 4. **Om 2.2 blir én økt.** Lesingen fra basen, tilkoblingen per forespørsel og
    den tomme siden er tre ting. Det er grunnen til at en deling i 2.2b er nevnt.
 5. **Webserverens lås.** Forslaget i punkt 4.4 bygger på at adapterne sjekker
@@ -322,7 +370,7 @@ og prioriteringen, ikke et estimat.
 PRD-krav og ingen AD-er endres, bare Deferred-raden om migrasjonene og
 merknadene over.
 
-**Hvis gruppen sier ja:**
+*Godkjent 28.09 kl. 20:25.* **Hvis gruppen sier ja:**
 
 1. `epics.md`: endringene i punkt 4.1–4.3, i én commit
 2. `sprint-status.yaml`: linja for 2.1b, i samme commit eller den neste
