@@ -345,7 +345,7 @@ papirarbeid og en port, og de trengs i både plan A og plan B.
   grunnlaget for gjennomgangen.
 
 **Prioritering, oppdatert 2026-09-27**, etter svarene fra faglærerne og kodegjennomgangen av Epic 1. Prioriteringen fra 23.09 står, og rekkefølgen innenfor den er:
-- *Må med, fordi faglærerne krever det:* databasen i bruk i Epic 2, med skrivingen først, fordi en vurdering ikke kan etterfylles (`AD-7`), og fordi «Adopsjon» og «Fortsatt bruk» i PRD §7 krever at vi bruker løsningen jevnlig. Punkt 23 avgjøres denne uka, fordi det blokkerer 2.1. Deretter Dockerfile og README (Epic 3), `docs/kvalitetssikring.md` (9.1) og refleksjonsrapporten.
+- *Må med, fordi faglærerne krever det:* databasen i bruk i Epic 2, med skrivingen først, fordi en vurdering ikke kan etterfylles (`AD-7`), og fordi «Adopsjon» og «Fortsatt bruk» i PRD §7 krever at vi bruker løsningen jevnlig. Punkt 23 avgjøres denne uka, fordi det blokkerer 2.1 *(avgjort 28.09)*. Deretter Dockerfile og README (Epic 3), `docs/kvalitetssikring.md` (9.1) og refleksjonsrapporten.
 - *Det vi prøver å få til:* `aksje` med relasjoner (1.9) før Epic 2 skriver til basen, historikken i aksjedetaljen (2.7), KI-laget (4.0–4.3, og 5B.1–5B.3 hvis Euronext sier nei eller ikke svarer 28.09), målingene av KI (9.5 og 5B.4), brukertesten (8.1), og et kort demomanus med en reserve på kjente data (punkt D i `docs/innlevering.md`).
 - *Hvis tiden strekker til:* 8.2 med endringene fra brukertesten, og 2.6.
 
@@ -881,7 +881,7 @@ et funn om markedet.
 
 **Forutsetning** *(lagt til 2026-09-24)*: «ingen rad på en børsdag betyr at
 kommandoen ikke ble kjørt» holder ikke i to tilfeller. Kommandoen kan ha kjørt
-før dagens kurs var publisert (åpent punkt 23), og et symbol kan ha feilet mens
+før dagens kurs var publisert (åpent punkt 23 *(avgjort 28.09)*), og et symbol kan ha feilet mens
 de andre ble hentet (`AD-15`). Begge gir ingen rad, uten at det er et hull i
 driften. Ført som **åpent punkt 24** i `prd.md`, med frist før denne storyen:
 en fjerde tilstand, eller en lagret grunn. *Oppfylt 2026-09-27:* punkt 24 er
@@ -957,7 +957,8 @@ epicen:
    en egen grunn til å erstatte i stedet for å skjøte, uavhengig av utbytter
    (AD-5). Det reiser et spørsmål epicen må svare på: **når på døgnet skal
    hentekommandoen kjøres**, når dagens kurs ikke var publisert kl. 19:04? Ført
-   som **åpent punkt 23** i `prd.md`, med frist før story 2.1.
+   som **åpent punkt 23** *(avgjort 28.09)* i `prd.md`, med frist før story 2.1.
+   *Avgjort 2026-09-28:* på børsdager mellom kl. 22:00 og midnatt, norsk tid.
 
 *Lagt til 2026-09-25, fra planen for 1.5:* Ingen story i Epic 2 har som
 kontrollpunkt at hentekommandoen skriver kursene til basen gjennom
@@ -1057,6 +1058,8 @@ allerede har dagens data, så en kjøring nummer to ikke koster 15 kall til.
 - Er nyeste dato i svaret ikke forventet børsdag, vises siste kjente data med tidsstempel
 - Kontrollen regner børsdag i **norsk** kalenderdato
 - **Ville feilet hvis:** kontrollen lå i webserveren. Den kan ikke handle på utfallet, og da ville sjekken vært pynt
+
+**Forutsetning** *(punkt 23, avgjort 2026-09-28)*: kommandoen kjøres på børsdager mellom kl. 22:00 og midnatt. Planen avgjør om den advarer eller nekter før kl. 22:00, fordi en kjøring som kommer for tidlig, bruker dagens kall uten å få dagens rad.
 
 **Én økt:** ja.
 
