@@ -2,12 +2,12 @@
 title: "Forespørsel om skriftlig tillatelse — Euronext / Oslo Børs"
 status: sendt
 created: 2026-09-21
-updated: 2026-09-24T21:58
+updated: 2026-09-28T18:11
 ---
 
 # Forespørsel om skriftlig tillatelse — Euronext / Oslo Børs
 
-**Status: SENDT 2026-09-21. Svar avventes. Egen beslutningsfrist 2026-09-28.**
+**Status: SENDT 2026-09-21. Ingen tillatelse innen vår egen frist 2026-09-28, så plan B gjelder fra den dagen.**
 
 | | |
 |---|---|

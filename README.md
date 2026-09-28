@@ -4,13 +4,9 @@
 
 Gruppeprosjekt i **IBE160 Programmering med KI** ved Høgskolen i Molde, høsten 2026 (15 studiepoeng).
 
-**OSE Signal** samler kursutvikling, signalstyrke og børsmeldinger for omtrent 15
-likvide Oslo Børs-aksjer i én oversikt, slik at en vanlig sparer kan se hva som
-har endret seg og hvorfor. Beregninger og sortering gjøres med vanlig programkode;
-KI brukes til å forklare hva en børsmelding betyr. KI-laget kan slås av, og
-applikasjonen skal fungere uten det.
+**OSE Signal** samler kursutvikling og signalstyrke for omtrent 15 likvide Oslo Børs-aksjer i én oversikt, slik at en vanlig sparer kan se hva som har endret seg og hvorfor. Beregningene gjøres med vanlig programkode, og KI forklarer signalet med ord, ut fra tall regnet av kursene. KI-laget kan slås av, og applikasjonen skal fungere uten det.
 
-Hva som er bygget så langt, står i sprintstatusen, `_bmad-output/implementation-artifacts/sprint-status.yaml`. Børsmeldingene hentes ikke før Euronext har gitt skriftlig tillatelse; se `docs/kilder-og-rettigheter.md`.
+Hva som er bygget så langt, står i sprintstatusen, `_bmad-output/implementation-artifacts/sprint-status.yaml`. Børsmeldinger og kommende hendelser er ikke med i v1: Euronext ga ikke tillatelse til automatisert henting innen vår frist 28.09 (plan B); se `docs/kilder-og-rettigheter.md`.
 
 ## Medlemmer
 

@@ -2,7 +2,7 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-27T13:26
+updated: 2026-09-28T18:11
 ---
 
 # Kilder og rettigheter
@@ -29,10 +29,10 @@ blir liggende lokalt er derfor et valg vi må ta bevisst — se neste avsnitt.
 | EODHD `/api/real-time` | — (forkastet) | 2026-09-19 | Virker, men prissiden sier gratisnivået ikke har det. Ikke bygg på. |
 | EODHD `/api/news` | Relevanseksperimentet, én gang | **2026-09-21, med skriftlig svar** | **Svarer for `.OL` på gratisnivå** (testet 21.09). **Språkmodellbruk er klarert av EODHD, ikke av rettighetshaverne**, med betingelser — skriftlig godkjenning 21.09, se egen seksjon. EODHD er et mellomledd: artiklene er syndikert fra `finance.yahoo.com` (se «EODHD er et mellomledd», lagt til 24.09). Betingelsene er ikke oppfylt før modelltjenestens treningsvilkår er dokumentert. Forkastet for daglig drift: 5 kall per ticker, altså 75 for de 15 mot en dagsgrense på 20. |
 | EODHD `/api/calendar` | — (utilgjengelig) | 2026-09-19 | HTTP 403: «Only EOD data allowed for free users». |
-| Oslo Børs NewsWeb | Selskapsmeldinger | **2026-09-21, fullstendig** | Åpent JSON-API, ferdig tagget med utsteder. **Euronexts vilkår dekker `newsweb.oslobors.no` ved navn og forbyr automatisert henting uten skriftlig tillatelse.** Se egen seksjon. |
+| Oslo Børs NewsWeb | Selskapsmeldinger | **2026-09-21, fullstendig** | Åpent JSON-API, ferdig tagget med utsteder. **Euronexts vilkår dekker `newsweb.oslobors.no` ved navn og forbyr automatisert henting uten skriftlig tillatelse.** Se egen seksjon. *28.09: ingen tillatelse innen fristen. Ikke brukt i v1 (plan B).* |
 | E24 RSS | — (forkastet) | 2026-09-19 | Forbyr eksplisitt LLM-input. Se under. |
 | NRK RSS | — (forkastet) | 2026-09-20 | Avviser automatisert henting med HTTP 403. Generelle nyheter uten finansfokus. |
-| Euronext | Finanskalender | **2026-09-21, fullstendig** | Samme vilkår som NewsWeb — `live.euronext.com` står i samme liste i samme dokument. |
+| Euronext | Finanskalender | **2026-09-21, fullstendig** | Samme vilkår som NewsWeb — `live.euronext.com` står i samme liste i samme dokument. *28.09: ingen tillatelse innen fristen. Ikke brukt i v1 (plan B).* |
 | Euronext, handelskalenderen | Stengte dager (punkt 3) | Som Euronext over | PDF lest av et menneske 2026-09-27, aldri hentet av programmet. Se seksjonen Handelskalenderen. |
 | Alpha Vantage | — (forkastet som hovedkilde) | Ikke kontrollert | Testet mot Oslo Børs, men symbolene var ikke pålitelige nok. Brukt i tidlige tester på gull og sølv. |
 
@@ -989,13 +989,17 @@ lenger uimotsagt» over.
       per døgn for ca. 15 utstedere, lokal kjøring, offentlig repo med utledet
       statistikk, og samme spørsmål for finanskalenderen på
       `live.euronext.com`. **Svar avventes. Egen beslutningsfrist 2026-09-28.**
+      *28.09: ingen svar innen fristen, så plan B gjelder.*
       **Purret 2026-09-22** i samme tråd, med et nytt spørsmål om overføring
       til en språkmodell og et smalere alternativ. Brevet er
       arkivert ordrett i `docs/epost-til-euronext.md`. Faglærer er *ikke*
       varslet — besluttet av gruppen, se «Beslutningen gruppen har tatt i
       mellomtiden». *23.09: faglærer er ikke kontaktet direkte; avhengigheten,
       at det ikke hentes, og plan B står i Product Brief.*
-- [ ] **Beslutning hvis Euronext ikke svarer innen 2026-09-28.** Vilkårene
+- [ ] **Lenken til NewsWeb (plan B).** En av oss slår opp adressen til
+      selskapssidene og hva Euronexts vilkår sier om lenker, før lenken bygges.
+      Sidene leses av et menneske og hentes ikke av programmet. **Eier: Gruppen.**
+- [x] ~~**Beslutning hvis Euronext ikke svarer innen 2026-09-28.**~~ — **avgjort 2026-09-28: plan B.** Se punkt 1 i `prd.md` §8. Vilkårene
       krever tillatelse på forhånd, og vi henter allerede. Beslutningen 23.09:
       det hentes ikke, og 28.09 avgjør om Epic 5B utløses. Skal avgjøres og
       skrives ned, ikke bli stående fordi ingen tok det opp. **Eier: Gruppen.**
