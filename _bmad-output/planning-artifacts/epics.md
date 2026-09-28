@@ -313,6 +313,8 @@ Epic 4.1 + 4.2 ──> Epic 5B (KI forklarer signalet) 🔀 <── Epic 1.4a
 
 Epic 1.9 (aksje-tabellen) ──> Epic 2 skriver til basen
 Epic 2.2 + 2.5 ──> Epic 2.7 (historikken i aksjedetaljen)
+Epic 2.1 ──> 2.1b (basen) ──> 2.5 ──> de daglige kjøringene til basen
+Epic 2.1b ──> Epic 4.3 (samme åpning av basen)
 Epic 4.1 ──> Epic 9.5 (relevanseksperimentet, del 2)
 ```
 
@@ -374,7 +376,7 @@ snapshot utenom porten.
 
 Brukeren kan hente nye kurser bevisst, og kan ikke ved uhell brenne dagskvoten.
 
-**FR-er:** FR-401, FR-402, FR-403, FR-407 · **NFR-01, NFR-02** · **AD-er:** 2, 10, 17, 20
+**FR-er:** FR-401, FR-402, FR-403, FR-407 · **NFR-01, NFR-02** · **AD-er:** 2, 10, 17, 20 · *utvidet 2026-09-28 med 2.1b og 2.5:* 4, 5, 6, 7, 11, 16, 21
 
 De to kjente `AD-20`-feilene rettes her: `fetch_prices.main` som blander lokal
 dato og UTC, og `meldinger._minutt` som kutter på tegn 16. FR-407 ligger her
@@ -979,6 +981,8 @@ webserveren åpner basen»). Når Epic 2 planlegges, avgjøres det om de to blir
 egne stories. Meldingen «Ingen kursdata funnet i `data/`» i `deferred-work.md`
 hører til lesingen.
 
+*Avgjort 2026-09-28 (endringsforslaget, `sprint-change-proposal-2026-09-28.md`):* skrivingen blir en egen story, 2.1b, og lesingen blir kontrollpunkter i 2.2. Rekkefølgen i epicen er 2.1, 2.1b og 2.5, så begynner de daglige kjøringene til basen, og deretter 2.3, 2.2, 2.7, 2.4 og 2.6. 2.5 er storyen som gjør at hentingen kan kjøres hver børsdag mellom kl. 22:00 og midnatt og skrive til basen.
+
 ### Story 2.0: Hentingen lekker ikke nøkkelen og skriver ikke over et øyeblikksbilde
 
 *Lagt til 2026-09-26, fra kontrollen av repoet.*
@@ -1032,6 +1036,58 @@ enige og begge være feil.
 
 **Én økt:** ja. Retter de to kjente feilene fra `AD-20`.
 
+### Story 2.1b: Basen åpnes ett sted, og hentingen skriver kursene dit
+
+*Lagt til 2026-09-28, fra endringsforslaget (`sprint-change-proposal-2026-09-28.md`).*
+
+Som **gruppe**, vil vi at hentekommandoen skriver kursene til basen, så
+databasen er i bruk fra første henting, og så vurderingen i 2.5 har noe å
+regnes av.
+
+**Oppfyller:** FR-406 · **Begrenses av:** `AD-4`, `AD-5`, `AD-6`, `AD-11`,
+`AD-16`, `AD-21`
+
+**Kontroll — hva testen ser etter:**
+- Øyeblikksbildene skrives til `data/raa/`, og basen ligger i `data/db/ose.db`,
+  som i mappetreet i spinen
+- Én funksjon åpner basen: den lager mappa hvis den mangler, kobler til og
+  kjører `migrer()`. Både hentekommandoen og webserveren (2.2) bruker den.
+  Ingen egen kommando for migrasjonene (PRD §7, «Drift»)
+- Hentekommandoen kaller `erstatt_serie` for hvert symbol som ble hentet, med
+  samme `hentet` som øyeblikksbildet (AD-5, AD-20)
+- Et symbol som feilet, rører ikke serien sin i basen (AD-15)
+- Kjøringen virker når både `data/raa/` og `data/db/` mangler (3.2)
+- Fire dagers opphold i serien er borte etter neste henting, uten ekstra kall
+  (FR-403, se 2.4)
+- Leseren av øyeblikksbildene ser i `data/raa/`, så markedsoversikten og
+  aksjedetaljen viser de samme kursene før og etter flyttingen. Til 2.2 er
+  ferdig, leser webserveren fortsatt øyeblikksbildene, og `nyeste_snapshot`
+  ser i dag bare i `data/`
+- Et øyeblikksbilde som alt finnes, kan skrives til basen uten API-kall, samme
+  vei som etter en henting. Det skriver bare `kurs`, aldri `vurdering` (AD-7).
+  Det gir en test med ekte data uten kall, og en reserve til demonstrasjonen
+  (punkt D i `docs/innlevering.md`). AD-6 forbyr å lagre filene i basen, ikke å
+  lese kursene ut av dem
+- Testen der to migratorer overlapper (`deferred-work.md`, utsatt til 3.1), tas
+  her, fordi det er her to innganger får samme åpning
+- **Ville feilet hvis:** webserveren og hentekommandoen hadde hver sin
+  åpning av basen. Da kan den ene migrere og den andre ikke, og AD-16 er brutt
+  av den første som startet
+
+**Forutsetning** *(flyttet fra 2.5)*: `SqliteKurslager` gjør avvisningen fra
+`0003` om til `ValueError`, mens `MinneKurslager` godtar `EQNR.OL` (G10, G11).
+Her avgjøres det om porten `Kurslager` skal sjekke symbolet.
+
+**Spørsmål til planen:** `erstatt_serie` bytter ut hele serien (AD-5). Et
+øyeblikksbilde som er eldre enn serien i basen, ville derfor skrevet en eldre
+serie over en nyere. Planen avgjør om det avvises.
+
+**Lokalt, utenfor git:** de eksisterende `kurser-raa-*.json` flyttes for hånd
+fra `data/` til `data/raa/`. Målingsfilene blir liggende. `data/` committes
+aldri (regel 10).
+
+**Avhenger av:** 2.1. **Én økt:** ja.
+
 ### Story 2.2: Hentekommandoen som egen inngang
 
 Som **sensor som kjører containeren**, vil jeg at oppstart ikke bruker et eneste
@@ -1044,6 +1100,17 @@ API-kall, så jeg ikke brenner gruppens dagskvote ved å se på løsningen.
 - Tom base gir tom-tilstand med beskjed om hvordan man henter, ikke en feilside
 - Hentekommandoen er en egen inngang mot samme kodebase
 - Nøkkelen leses fra miljøet, ikke fra en fil i imaget
+- Markedsoversikten og aksjedetaljen leser kursene fra basen gjennom
+  `SqliteKurslager`, ikke fra øyeblikksbildet *(lagt til 2026-09-28, fra
+  endringsforslaget)*
+- Webserveren åpner basen med samme funksjon som hentekommandoen (2.1b), og
+  kjører `migrer()` én gang ved oppstart, ikke ved hver forespørsel, fordi
+  `migrer()` alltid tar skrivelås (`deferred-work.md`) *(lagt til 2026-09-28)*
+- Én tilkobling per forespørsel, lukket når forespørselen er ferdig
+  (forutsetningen under) *(lagt til 2026-09-28)*
+- Meldingen på den tomme siden sier ikke lenger «Ingen kursdata funnet i
+  `data/`» (`deferred-work.md`), og «Kom i gang» i README rettes i samme commit
+  (regel 19) *(lagt til 2026-09-28)*
 - **Ville feilet hvis:** noen la hentingen i en oppstartskrok «for at det skal virke ut av boksen». To kjøringer samme dag hadde da brukt 30 av 20 kall
 
 **Forutsetning** *(fra kodegjennomgangen 2026-09-23)*: Flask kjører
@@ -1052,6 +1119,16 @@ en `sqlite3`-tilkobling kan som standard ikke deles mellom tråder
 (`check_same_thread`). Prøvd: brukt fra en annen tråd gir den `ProgrammingError`.
 Det avgjøres her hvordan webserveren åpner basen, for eksempel én tilkobling per
 forespørsel. Åpner webserveren basen tidligere, følger forutsetningen dit.
+
+**Spørsmål til planen** *(fra endringsforslaget 2026-09-28)*:
+- Kan oversikten hente de femten fra `aksje` sammen med nyeste kurs i én
+  spørring? Det er en join appen faktisk bruker. Gruppen vil ha minst én, og en
+  join mot `aksje` i 2.7 bare for navnet teller ikke
+- Skal oversikten lese dagens vurdering fra `vurdering` i stedet for å regne
+  signalet av kursene ved hver visning? Samme data og samme parametre gir samme
+  svar, men det er to veier til samme tall
+
+Blir storyen mer enn én økt, deles den i 2.2 og 2.2b når den planlegges.
 
 **Én økt:** ja.
 
@@ -1070,6 +1147,13 @@ allerede har dagens data, så en kjøring nummer to ikke koster 15 kall til.
 - **Ville feilet hvis:** kontrollen lå i webserveren. Den kan ikke handle på utfallet, og da ville sjekken vært pynt
 
 **Forutsetning** *(punkt 23, avgjort 2026-09-28)*: kommandoen kjøres på børsdager mellom kl. 22:00 og midnatt. Planen avgjør om den advarer eller nekter før kl. 22:00, fordi en kjøring som kommer for tidlig, bruker dagens kall uten å få dagens rad.
+
+*Fra endringsforslaget 2026-09-28, et argument for planen og ikke en
+avgjørelse:* en kjøring som kommer for tidlig, skriver dagens øyeblikksbilde, og
+vernet fra 2.0 i `kjoer()` stopper da kveldens kjøring. Dagen får en grunn i
+stedet for en vurdering, og kan ikke etterfylles. Det taler for at kommandoen
+nekter før kl. 22:00, med en uttrykkelig overstyring. Mellom 2.5 og 2.3 kjøres
+hentingen for hånd, bare på børsdager og bare mellom kl. 22:00 og midnatt.
 
 **Én økt:** ja.
 
@@ -1105,9 +1189,15 @@ så den ikke kan regnes av en serie som er byttet ut siden.
   gyldig svar, fordi det da leses som at kommandoen ikke ble kjørt. *Lagt til
   2026-09-24* *Avgjort 2026-09-27 (punkt 24):* en rad med grunnen. Det gjelder
   også når nyeste kurs ikke er fra dagen, og når signalet ikke kan regnes.
+- Datoen for vurderingen regnes én gang, fra samme øyeblikk som filnavnet og
+  `hentet` (2.1). En kjøring som går over midnatt i Oslo, stopper og sier fra, i
+  stedet for å få `ValueError` fra `skriv` midt i universet (`deferred-work.md`,
+  fra spesifikasjonen for 1.6) *(lagt til 2026-09-28, fra endringsforslaget)*
+- Vurderingene leses tilbake gjennom `Vurderingslager.les` i samme test, fra en
+  base på disk, ikke bare `:memory:` *(lagt til 2026-09-28)*
 - **Ville feilet hvis:** vurderingen ble skrevet av en egen kommando. Kjøres den etter en ny henting, er grunnlaget byttet ut — og raden ville lagret hva løsningen mente om *andre* data enn de som lå der
 
-**Forutsetning** *(fra kodegjennomgangen av Epic 1, 2026-09-27)*: `SqliteKurslager` godtar ethvert symbol, også `EQNR.OL`, mens `SqliteVurderingslager` bare godtar symbolene i `AKSJEUNIVERS` (G10). *Løses i basen i 1.9 (lagt til 2026-09-27).* *Løst i basen i 1.9 (2026-09-27, AD-21):* `0003` avviser et ukjent symbol i `kurs`, `kursserie` og `vurdering`, og `SqliteKurslager` gjør avvisningen om til `ValueError`. `MinneKurslager` godtar fortsatt `EQNR.OL`, så de to lagrene oppfører seg ulikt der. `SqliteVurderingslager.skriv` slipper ut `sqlite3`-feil, mens `erstatt_serie` gjør `IntegrityError` om til `ValueError` (G11). Her avgjøres det om `Kurslager` skal sjekke symbolet, og hvilke feil kjøringen fanger. Blir skrivingen til basen en egen story, følger forutsetningen dit.
+**Forutsetning** *(fra kodegjennomgangen av Epic 1, 2026-09-27)*: `SqliteKurslager` godtar ethvert symbol, også `EQNR.OL`, mens `SqliteVurderingslager` bare godtar symbolene i `AKSJEUNIVERS` (G10). *Løses i basen i 1.9 (lagt til 2026-09-27).* *Løst i basen i 1.9 (2026-09-27, AD-21):* `0003` avviser et ukjent symbol i `kurs`, `kursserie` og `vurdering`, og `SqliteKurslager` gjør avvisningen om til `ValueError`. `MinneKurslager` godtar fortsatt `EQNR.OL`, så de to lagrene oppfører seg ulikt der. `SqliteVurderingslager.skriv` slipper ut `sqlite3`-feil, mens `erstatt_serie` gjør `IntegrityError` om til `ValueError` (G11). Her avgjøres det om `Kurslager` skal sjekke symbolet, og hvilke feil kjøringen fanger. Blir skrivingen til basen en egen story, følger forutsetningen dit. *Flyttet til 2.1b 2026-09-28 for `Kurslager`.* Det som gjelder `SqliteVurderingslager.skriv`, som slipper ut `sqlite3`-feil (G11), står igjen her.
 
 **Én økt:** ja.
 
@@ -1161,7 +1251,7 @@ vurderingen ikke avhenger av at gruppens maskin er i rommet.
 - Å starte webserveren gjør null nettkall
 - Hentekommandoen kjører hentingen
 - Python-versjonen i imaget er **3.13**, samme som CI
-- Migrasjoner kjøres **uten** et eget kommandosteg
+- Migrasjoner kjøres **uten** et eget kommandosteg *(avgjort i 2.1b 2026-09-28: én funksjon åpner basen og kjører migrasjonene for begge inngangene, så 3.1 bare pakker)*
 - **Ville feilet hvis:** migrasjonene ble lagt i en egen kommando. Det ville sett ut som ryddig ansvarsdeling og brutt suksessmålet «Drift»
 
 **Én økt:** ja.
@@ -1480,6 +1570,8 @@ så jeg alltid ser hva signalet faktisk bygger på.
 - En dag uten KI-tekst sier det, i stedet for å vise et tomt felt
 - En vakt på vår side: tekst med ord som «kjøp», «selg» eller «anbefal» vises
   ikke, men logges (NFR-06)
+- KI-teksten leses med `ki_logg` mot `vurdering`, så teksten vises sammen med
+  vurderingen den forklarer *(lagt til 2026-09-28, fra endringsforslaget)*
 - **Ville feilet hvis:** KI-teksten erstattet regelforklaringen eller sto før den.
   Da leses KI som kilden og regelen som en fotnote
 
