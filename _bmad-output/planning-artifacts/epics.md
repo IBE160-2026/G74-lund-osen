@@ -420,7 +420,9 @@ story som sender inn tekst er *blokkert av* 4.1, ikke anbefalt etter den.
 | **Avgjøres** | Punkt 5b av Epic 4.1, som er ublokkert. Punkt 1 av Euronext — 28.09 er vår egen frist |
 | **Ved nei fra Euronext** | **Epicen strykes i sin helhet.** Alle seks FR-6xx er om meldinger — FR-602 «meldingene i samlekategorien», FR-604 «for hver melding», FR-606 «melding i samlekategorien». Uten Epic 6 finnes ikke datagrunnlaget. **Da bortfaller også NFR-04**, og suksessmålet «KI-bidrag i drift» kan ikke nås, fordi PRD-en måler det i hvilke *meldinger* laget forklarte. Det som overlever er relevanseksperimentet, som henter fra EODHDs nyhets-API og ikke fra NewsWeb — KI kan da demonstreres, men ikke vises i drift *Endret 2026-09-23:* med plan B (**Epic 5B**) er KI i drift likevel mulig, men som en forklaring av signalet, ikke av meldinger. Det som strykes, er KI-laget over meldinger. Plan A og B utelukker ikke hverandre: kommer et ja senere, bygges plan A oppå 5B. *Rettet 2026-09-24:* NFR-04 bortfaller ikke heller, fordi Epic 5B begrenses av det. |
 
-### Epic 5B: KI forklarer signalet (plan B) 🔀
+### Epic 10: KI forklarer signalet (plan B) 🔀
+
+*Het Epic 5B til 28.09.* *Utløst 2026-09-28:* Euronext ga ikke tillatelse innen fristen, og epicen bygges i v1. Nummeret ble endret fordi BMAD-skriptet bare leser epics med hele tall.
 
 KI legger en forklaring i naturlig språk oppå den regelbaserte forklaringen i
 FR-706, for én aksje om gangen, i aksjedetaljen. Bare utledede verdier fra
@@ -1405,12 +1407,16 @@ på papir.
 
 ---
 
-## Epic 5B: KI forklarer signalet (plan B) 🔀
+## Epic 10: KI forklarer signalet (plan B) 🔀
+
+*Het Epic 5B til 28.09.* *Utløst 2026-09-28:* Euronext ga ikke tillatelse innen fristen, og epicen bygges i v1. Nummeret ble endret fordi BMAD-skriptet bare leser epics med hele tall.
 
 > **Utløses av nei eller taushet fra Euronext 28.09.** 5B.1 kan bygges før
 > det, fordi den ikke sender noe. Plan A og B utelukker ikke hverandre.
 
-### Story 5B.1: Grunnlaget som sendes — bare utledede verdier
+### Story 10.1: Grunnlaget som sendes — bare utledede verdier
+
+*Het Story 5B.1 til 28.09.*
 
 Som **gruppe**, vil vi at det som sendes til modellen, er bestemt av én ren
 funksjon, så ingen kan sende rådata ved et uhell.
@@ -1430,7 +1436,9 @@ funksjon, så ingen kan sende rådata ved et uhell.
 
 **Én økt:** ja. Kan bygges før 28.09, fordi den ikke sender noe.
 
-### Story 5B.2: Teksten lages i hentekommandoen og lagres i `KILogg`
+### Story 10.2: Teksten lages i hentekommandoen og lagres i `KILogg`
+
+*Het Story 5B.2 til 28.09.*
 
 Som **bruker**, vil jeg at KI-teksten er klar når jeg åpner siden, så jeg aldri
 venter på en modell.
@@ -1455,7 +1463,9 @@ venter på en modell.
 
 **Én økt:** ja.
 
-### Story 5B.3: Visningen i aksjedetaljen
+### Story 10.3: Visningen i aksjedetaljen
+
+*Het Story 5B.3 til 28.09.*
 
 Som **bruker**, vil jeg lese regelforklaringen først og KI-teksten som et tillegg,
 så jeg alltid ser hva signalet faktisk bygger på.
@@ -1475,7 +1485,9 @@ så jeg alltid ser hva signalet faktisk bygger på.
 
 **Én økt:** ja.
 
-### Story 5B.4: Måle bidraget — egen brukertest, etter 8.1
+### Story 10.4: Måle bidraget — egen brukertest, etter 8.1
+
+*Het Story 5B.4 til 28.09.*
 
 Som **gruppe**, vil vi vite om KI-teksten faktisk hjelper, så refleksjonsrapporten
 kan vurdere det kritisk i stedet for å anta det.
@@ -1496,6 +1508,29 @@ uten KI. 5B.4 måler KI-tillegget. Blandes de, vet ingen hva som ble målt.
   måle hvordan siden fungerer uten
 
 **Avhenger av:** 8.1 og 5B.3. **Én økt:** ja.
+
+### Story 10.5: Lenke til selskapets side på NewsWeb
+
+*Lagt til 2026-09-28, med plan B.*
+
+Som **bruker**, vil jeg komme til selskapets side på NewsWeb med ett klikk fra
+aksjedetaljen, så børsmeldingene er ett klikk unna når løsningen ikke viser dem.
+
+**Oppfyller:** §2 i `prd.md` («Lenke fra aksjedetaljen til selskapets side på
+NewsWeb») · **Begrenses av:** `AD-2`
+
+Én lenke per aksje i aksjedetaljen. Lenken henter ingenting, og ingen kode i
+`src/` henter fra NewsWeb.
+
+**Kontroll — hva testen ser etter:**
+- Aksjedetaljen har lenken for hver av de femten
+- **Ville feilet hvis:** programmet hentet innholdet fra NewsWeb for å vise det.
+  Da er det automatisert henting, som Euronexts vilkår forbyr uten tillatelse
+
+**Forutsetning:** punktet «Lenken til NewsWeb (plan B)» under «Å følge opp» i
+`docs/kilder-og-rettigheter.md` er gjort.
+
+**Én økt:** ja.
 
 ---
 
