@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-28T23:44
+updated: 2026-09-28T23:56
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -836,7 +836,7 @@ informasjon**: KI-teksten sier det samme som regelforklaringen, i hele setninger
 #### FR-603 — KI-teksten sier ikke mer enn grunnlaget
 
 KI-teksten kontrolleres mot grunnlaget som ble sendt (story 10.1), før den
-lagres som vist. Kontrollen er én ren funksjon, som hentekommandoen kaller når
+kan vises. Kontrollen er én ren funksjon, som hentekommandoen kaller når
 teksten lages (story 10.2), og den testes med en falsk modell (AD-8). Den bygger
 på kjennetegn som kan observeres, ikke på en sikkerhetsscore fra modellen:
 
@@ -875,14 +875,14 @@ Loggen skrives i hentekommandoen. Siden skriver aldri i den.
 Loggingen starter ved første kjøring, ikke når eksempelsettet skal lages. Skrus
 loggingen på i etterkant, finnes ikke uka målet krever.
 
-#### FR-605 — Promptversjon og modell lagres med hver vurdering
+#### FR-605 — Promptversjon og modell lagres med hver KI-tekst
 
 Hver lagret KI-tekst skal bære promptversjonen og modellen som produserte den.
 Ellers blandes den sammen med vurderingen i FR-408, som er regelens og ikke
 KI-ens.
 
 Justeres prompten i oktober, må det være mulig å se hvilken versjon som ga
-hvilken vurdering. Uten det blir eksempelsettet en blanding av flere systemer
+hvilken tekst. Uten det blir eksempelsettet en blanding av flere systemer
 som ser ut som ett.
 
 #### FR-606 — Relevansskalaen
@@ -912,6 +912,13 @@ står i §4.6. Kommer et ja fra Euronext, bygges plan A oppå plan B.
 Til 28.09 var første setning i FR-605, ordrett:
 
 Hver lagret vurdering skal bære promptversjonen og modellen som produserte den.
+
+Til 28.09 var overskriften i FR-605 «FR-605 — Promptversjon og modell lagres med
+hver vurdering», og andre avsnitt var, ordrett:
+
+Justeres prompten i oktober, må det være mulig å se hvilken versjon som ga
+hvilken vurdering. Uten det blir eksempelsettet en blanding av flere systemer
+som ser ut som ett.
 
 KI brukes der, og bare der, metadata er uttømt. At metadata ikke skiller
 betydning er målt tre ganger uavhengig; argumentet står i `begrunnelser.md`.
