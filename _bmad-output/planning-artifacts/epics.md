@@ -314,6 +314,7 @@ Epic 4.1 + 4.2 ──> Epic 5B (KI forklarer signalet) 🔀 <── Epic 1.4a
 Epic 1.9 (aksje-tabellen) ──> Epic 2 skriver til basen
 Epic 2.2 + 2.5 ──> Epic 2.7 (historikken i aksjedetaljen)
 Epic 2.1 ──> 2.1b (basen) ──> 2.5 ──> de daglige kjøringene til basen
+Epic 2.1b ──> 2.1c (målingene) ──> 2.5   *(lagt til 2026-09-29)*
 Epic 2.1b ──> Epic 4.3 (samme åpning av basen)
 Epic 4.1 ──> Epic 9.5 (relevanseksperimentet, del 2)
 ```
@@ -983,6 +984,8 @@ hører til lesingen.
 
 *Avgjort 2026-09-28 (endringsforslaget, `sprint-change-proposal-2026-09-28.md`):* skrivingen blir en egen story, 2.1b, og lesingen blir kontrollpunkter i 2.2. Rekkefølgen i epicen er 2.1, 2.1b og 2.5, så begynner de daglige kjøringene til basen, og deretter 2.3, 2.2, 2.7, 2.4 og 2.6. 2.5 er storyen som gjør at hentingen kan kjøres hver børsdag mellom kl. 22:00 og midnatt og skrive til basen.
 
+*Lagt til 2026-09-29, avgjort av gruppen 28.09:* story 2.1c, der vurderingen lagrer målingene bak de tre sjekkene, kommer mellom 2.1b og 2.5. Rekkefølgen er da 2.1, 2.1b, 2.1c og 2.5, så begynner de daglige kjøringene. 2.1c må være ferdig før den første ekte raden skrives, fordi en rad aldri kan endres eller fylles inn etterpå (AD-7).
+
 ### Story 2.0: Hentingen lekker ikke nøkkelen og skriver ikke over et øyeblikksbilde
 
 *Lagt til 2026-09-26, fra kontrollen av repoet.*
@@ -1087,6 +1090,56 @@ fra `data/` til `data/raa/`. Målingsfilene blir liggende. `data/` committes
 aldri (regel 10).
 
 **Avhenger av:** 2.1. **Én økt:** ja.
+
+### Story 2.1c: Vurderingen lagrer målingene bak de tre sjekkene
+
+*Lagt til 2026-09-29, avgjort av gruppen 28.09.*
+
+Som **gruppe**, vil vi at hver vurdering lagrer tallene sjekkene ble avgjort av,
+så en vurdering kan etterprøves og sjekkes. Et fortegn uten måling kan ikke det
+(FR-706).
+
+**Oppfyller:** FR-408 (raden «Målingene») · **Begrenses av:** `AD-1`, `AD-7`,
+`AD-13`, `AD-16`, `AD-18`
+
+**Kontroll — hva testen ser etter:**
+- Fire tall lagres i `vurdering`, uavrundet og som brøk, i samme enhet som
+  regelen regner i: `trend_avvik`, `dagens_endring`, `standardavvik` og
+  `volumforhold`. Volumet lagres som forholdstall mot medianen, ikke som to
+  volumtall
+- Én funksjon avrunder, og visningen i FR-706, grunnlaget i 10.1 og kontrollen i
+  FR-603 bruker den alle tre: én desimal for prosent og to for forholdstallet
+- `Sjekk` får `maaling` og `grense`. Bare bevegelse har en grense som varierer
+  (standardavviket). `forklaring` lages av de to feltene, og teksten for
+  interesse blir forholdstallet i stedet for to volumtall
+- Regelen for interesse avgjør med forholdstallet, så det lagrede tallet er det
+  som avgjorde. Er medianvolumet 0, er `volumforhold` `None`, og interesse er 0
+- Testene for `signalberegning` står uendret og er grønne. En ny test viser at
+  regelen, brukt på `maaling` og `grense`, gir samme verdi som sjekken for hver
+  av de tre
+- En kontrollregning på det nyeste øyeblikksbildet i `data/`, før og etter, som
+  i 1.4b–1.5: styrke, retning og de tre verdiene er like for alle 15, og bare
+  teksten for interesse skiller. Skifter noen, føres det. Ingen API-kall, og
+  `fetch_prices.py` kjøres ikke
+- Migrasjonen `0004_maalinger.sql` legger kolonnene til med `ADD COLUMN` og en
+  CHECK i hver kolonne, uten `DROP TABLE`: en vurdering har alle fire, bortsett
+  fra at `volumforhold` kan mangle når `interesse = 0`, og en rad med grunn har
+  ingen av dem. En kommentar i `0004` gir enheten for hver kolonne
+- `0004` har en hjelpetabell som `kontroll_0003`, som stopper migrasjonen hvis
+  det finnes vurderingsrader uten grunn. De kan ikke få målinger etterpå (AD-7)
+- `Vurdering` kontrollerer verdiene: endelige tall, standardavvik ≥ 0,
+  forholdstall ≥ 0 eller `None`, og `None` bare når interesse er 0. Porten
+  sjekker ikke fortegnet mot målingen, fordi den da ville vært bundet til
+  parametrene i kjernen, og en eldre rad ikke lenger kunne leses
+- Kolonnene står i `VURDERINGSKOLONNER`, så `_UPSERT` og `les` tar dem med
+- **Ville feilet hvis:** målingene ble lagret avrundet, eller i prosent. Da er
+  det lagrede tallet ikke det regelen sammenlignet med grensen, og fortegnet kan
+  ikke regnes etter fra raden
+
+**Forutsetning:** finnes det vurderingsrader uten grunn i basen på PC-en, stopper
+`0004`, og gruppen avgjør hva som skjer med dem før 2.1c flettes.
+
+**Avhenger av:** 2.1b. **Én økt:** ja.
 
 ### Story 2.2: Hentekommandoen som egen inngang
 
@@ -1195,6 +1248,8 @@ så den ikke kan regnes av en serie som er byttet ut siden.
   fra spesifikasjonen for 1.6) *(lagt til 2026-09-28, fra endringsforslaget)*
 - Vurderingene leses tilbake gjennom `Vurderingslager.les` i samme test, fra en
   base på disk, ikke bare `:memory:` *(lagt til 2026-09-28)*
+- Vurderingen bygges med målingene fra `Signal` (2.1c), og testen leser dem
+  tilbake *(lagt til 2026-09-29)*
 - **Ville feilet hvis:** vurderingen ble skrevet av en egen kommando. Kjøres den etter en ny henting, er grunnlaget byttet ut — og raden ville lagret hva løsningen mente om *andre* data enn de som lå der
 
 **Forutsetning** *(fra kodegjennomgangen av Epic 1, 2026-09-27)*: `SqliteKurslager` godtar ethvert symbol, også `EQNR.OL`, mens `SqliteVurderingslager` bare godtar symbolene i `AKSJEUNIVERS` (G10). *Løses i basen i 1.9 (lagt til 2026-09-27).* *Løst i basen i 1.9 (2026-09-27, AD-21):* `0003` avviser et ukjent symbol i `kurs`, `kursserie` og `vurdering`, og `SqliteKurslager` gjør avvisningen om til `ValueError`. `MinneKurslager` godtar fortsatt `EQNR.OL`, så de to lagrene oppfører seg ulikt der. `SqliteVurderingslager.skriv` slipper ut `sqlite3`-feil, mens `erstatt_serie` gjør `IntegrityError` om til `ValueError` (G11). Her avgjøres det om `Kurslager` skal sjekke symbolet, og hvilke feil kjøringen fanger. Blir skrivingen til basen en egen story, følger forutsetningen dit. *Flyttet til 2.1b 2026-09-28 for `Kurslager`.* Det som gjelder `SqliteVurderingslager.skriv`, som slipper ut `sqlite3`-feil (G11), står igjen her.
@@ -1227,6 +1282,7 @@ Som **bruker**, vil jeg se hva løsningen sa om aksjen de siste ukene, så FR-40
 
 **Kontroll — hva testen ser etter:**
 - De siste fire ukene, dag for dag: styrke og retning, eller grunnen, «ikke kjørt» eller «ikke børsdag»
+- Målingene vises dag for dag, avrundet som i FR-706 (2.1c) *(lagt til 2026-09-29)*
 - Hver dag går gjennom `tilstand`, så styrke 0, en grunn og en manglende rad aldri ser like ut
 - `Vurderingslager` får en lesemetode for en periode, og ingen slette- eller endremetode (`AD-7`)
 - Dagens rad som ikke er skrevet ennå, vises ikke som et hull
@@ -1413,7 +1469,8 @@ Som **gruppe**, vil jeg at KI-loggen overlever en omstart, så eksempelsettet fr
 **Oppfyller:** FR-604 · **Begrenses av:** `AD-4`, `AD-7`, `AD-16`
 
 **Kontroll — hva testen ser etter:**
-- `ki_logg`-tabellen opprettes av en nummerert migrasjon
+- `ki_logg`-tabellen opprettes av en nummerert migrasjon *(29.09: den blir
+  `0005`, fordi `0004` er målingene i 2.1c)*
 - En skrevet rad finnes etter omstart
 - Ingen vei gjennom adapteren kan slette eller endre en eldre rad
 - **Ville feilet hvis:** tabellen ble opprettet utenfor migrasjonsløperen. Da har to utviklere hvert sitt skjema, og `AD-16` er brutt av den første som kjørte
@@ -1518,7 +1575,10 @@ funksjon, så ingen kan sende rådata ved et uhell.
   av de tre sjekkene, styrken og retningen
 - Interessesjekken sendes som **forholdstall** (volum mot median), ikke som de to
   volumtallene. Forklaringsteksten i dag inneholder rå volumtall
-  (`signalberegning.py:165`)
+  (`signalberegning.py:165`) *(29.09: løses i 2.1c, der teksten blir
+  forholdstallet. Linja er nå 168)*
+- Målingene tas fra `Sjekk.maaling` og `Sjekk.grense` (2.1c), og avrundes med
+  samme funksjon som FR-706 *(lagt til 2026-09-29)*
 - En test krever at ingen kurs og ingen volumverdi fra serien finnes i grunnlaget
 - **Ville feilet hvis:** grunnlaget inneholdt dagens volum eller en kurs. Da
   sendes et rått datapunkt fra EODHD til en tredjepart, og det har ingen av
@@ -1572,6 +1632,8 @@ så jeg alltid ser hva signalet faktisk bygger på.
   ikke, men logges (NFR-06)
 - KI-teksten leses med `ki_logg` mot `vurdering`, så teksten vises sammen med
   vurderingen den forklarer *(lagt til 2026-09-28, fra endringsforslaget)*
+- Sammenligningen i FR-602 tar med målingene, avrundet som i FR-706 (2.1c)
+  *(lagt til 2026-09-29)*
 - **Ville feilet hvis:** KI-teksten erstattet regelforklaringen eller sto før den.
   Da leses KI som kilden og regelen som en fotnote
 
