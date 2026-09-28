@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-28T00:03'
+updated: '2026-09-28T18:13'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -44,7 +44,7 @@ er den sjuende, med samme åpning.
 
 | Lag | Filer | Regel |
 |---|---|---|
-| **Kjerne** | `signalberegning.py`, `meldinger.py`, `markedsoversikt.py`, `aksjedetalj.py`, `graf.py`, `boersdag.py` (inneværende børsdag, story 1.6), `tilstand.py` (de tre tilstandene i FR-409 og raden med grunn fra punkt 24, altså fire utfall, story 1.7) | Ingen import av `requests`, `sqlite3`, `pathlib`, `flask` |
+| **Kjerne** | `signalberegning.py`, `meldinger.py` (bygget og testet, men ikke brukt i v1 (plan B)), `markedsoversikt.py`, `aksjedetalj.py`, `graf.py`, `boersdag.py` (inneværende børsdag, story 1.6), `tilstand.py` (de tre tilstandene i FR-409 og raden med grunn fra punkt 24, altså fire utfall, story 1.7) | Ingen import av `requests`, `sqlite3`, `pathlib`, `flask` |
 | **Porter** | `kursdata.py`, `vurderingsdata.py` | Protokoller, verdityper og minneimplementasjonene testene bruker (`MinneKurslager`). *Rettet 2026-09-25: `MinneKilde` ble fjernet i story 1.4c*. Ingen I/O — oppfylt fra story 1.5 (`23af8db`). *Rettet 2026-09-25: her sto «brytes i dag, se under»*. `Vurderingslager` (story 1.6) har med vilje **ikke** noe minnelager: reglene for overskriving (siste vinner, men en grunn aldri over en vurdering) skal stå ett sted, i adapterens upsert, og testene bruker SQLite i minnet (`sqlite3.connect(":memory:")`) |
 | **Skall** | `app.py` (HTTP), `fetch_prices.py` (nett), `lagring_sqlite.py` (SQLite), `lagring_fil.py` (øyeblikksbildene i `data/`), `eodhd.py` (EODHDs feltnavn til `Kursrad`) | Eneste lag som kjenner teknologi |
 
@@ -429,9 +429,9 @@ G74-lund-osen/
 | Henting og kvote (FR-401..405) | `fetch_prices.py` | AD-2, AD-5, AD-10, AD-15 |
 | To lagre (FR-406) | `lagring_sqlite.py`, `data/raa/` | AD-5, AD-6, AD-11, AD-21 |
 | Dagens vurdering (FR-408) og de tre tilstandene (FR-409) | `Vurderingslager`, skrevet av hentekommandoen. Tilstandene leses av `tilstand.py` | AD-3, AD-7, AD-16, AD-17, AD-18, AD-20, AD-21 |
-| Meldingsfilter (FR-501..503) | `meldinger.py` | AD-1, AD-14 |
+| Meldingsfilter (FR-501..503) | `meldinger.py` | AD-1, AD-14. *Ute av v1 fra 2026-09-28 (plan B).* |
 | Utbyttemerking (FR-407) | *ikke plassert* | AD-4 — **kilde ikke valgt**, se åpent punkt 4 |
-| Kommende hendelser (FR-301..303) | *finnes ikke* | **Ingen** — se Deferred |
+| Kommende hendelser (FR-301..303) | *finnes ikke* | **Ingen** — se Deferred. *Ute av v1 fra 2026-09-28 (plan B).* |
 | KI-logg (FR-604..605) | `KILogg` | AD-3, AD-7 — *resten utsatt* |
 | Signalet (FR-701..706) | `signalberegning.py` | AD-1, AD-13 |
 | Leveransen | `Dockerfile`. *Sagt av faglærer i samtale 21.09, ikke på emnesiden; lages likevel* | AD-9, AD-10, AD-11, AD-12 |
@@ -442,9 +442,9 @@ G74-lund-osen/
 |---|---|
 | **Nøyaktig Docker-baseimage** | Må verifiseres mot gjeldende tagger når Dockerfilen skrives. Bindingen er at Python-versjonen matcher CI (3.13), ikke en bestemt tag |
 | **KI-laget (FR-601..606)** | Modelltjeneste er ikke valgt, og betingelse 4 i EODHDs godkjenning — at tjenesten ikke trener på innholdet — er udokumentert. Den må føres **før** artikkeltekst sendes inn |
-| **Plan B (Epic 5B), utløses 28.09** | KI forklarer signalet ut fra utledede verdier, hvis Euronext svarer nei eller ikke svarer innen 28.09 (åpent punkt 1 og 19). Arkitekturen for modellkallet er AD-2 (én hentefunksjon), AD-7 (`KILogg`) og AD-17 (teksten lages i hentekommandoen). Avgjøres 28.09, ikke før. *Lagt til 2026-09-24* |
+| **Plan B (Epic 5B), utløses 28.09** | KI forklarer signalet ut fra utledede verdier, hvis Euronext svarer nei eller ikke svarer innen 28.09 (åpent punkt 1 og 19). Arkitekturen for modellkallet er AD-2 (én hentefunksjon), AD-7 (`KILogg`) og AD-17 (teksten lages i hentekommandoen). Avgjøres 28.09, ikke før. *Lagt til 2026-09-24* *Utløst 2026-09-28. Epicen heter Epic 10.* |
 | **Kilde for handelskalenderen** | **Avgjort 2026-09-27** (punkt 3 i `prd.md` §8): stengte dager ført for hånd fra Euronexts egen kalender (`docs/kilder-og-rettigheter.md`, seksjonen Handelskalenderen). Svaret lander i én ren funksjon i kjernen, som får datoen inn: `innevaerende_boersdag` i `src/boersdag.py`, bygget i story 1.6 (27.09). Dagene for 2027 føres inn før 2027-01-01 (punkt 25). Det svarer på FUNN 5 i `reviews/review-rubrikk.md`, som ba om at plasseringen ble festet *(rettet 2026-09-27: her sto «Åpent punkt 3. FR-402 hviler på «forventet børsdag», men ingen kilde er utpekt»)* |
-| **NewsWeb-hentingen** | Åpent punkt 1. Euronext forbyr automatisert henting uten tillatelse; forespørselen er ubesvart. Arkitekturen låser seg derfor **ikke** til at meldingsdelen finnes |
+| **NewsWeb-hentingen** | Åpent punkt 1. Euronext forbyr automatisert henting uten tillatelse; forespørselen er ubesvart. Arkitekturen låser seg derfor **ikke** til at meldingsdelen finnes. *28.09: ingen tillatelse innen fristen, ikke i v1.* |
 | **FR-301..303, kommende hendelser** | Hele PRD §4.3 var taus i første utkast av denne spinen. Det er en **tredje nettkilde** (Euronexts finanskalender) og et eid datasett uten port. `app.py` sier selv at «kommende hendelser mangler med vilje» — de ligger bak åpent punkt 1 og 12 *(rettet 2026-09-27: her sto «1, 3 og 12». Punkt 3 gjelder hvilke dager børsen er åpen, ikke finanskalenderen)*. Får sin port og sin AD når kilden er avklart, og **ikke før**. Står med vilje ikke i frontmatterens `binds` før en AD binder dem |
 | **Hvem kjører migrasjonene, og når** | AD-16 sier at de finnes, ikke hvem som anvender dem. Med to `docker run`-varianter (AD-10) er både web, henting og en tredje kommando forsvarlige svar. Avgjøres når Dockerfilen skrives. **Merk at en egen migrasjonskommando bryter suksessmålet «Drift»**, som krever at én kommando gjør hele hentingen — se `prd.md` §7 |
 | **Kjøremåte i containeren** | `app.py` har ingen WSGI-oppføring, og de flate importene virker i dag bare via `pythonpath = ["src"]` i pytest-konfigurasjonen. Begge må løses i Dockerfile-storyen |

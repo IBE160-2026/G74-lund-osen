@@ -316,6 +316,8 @@ Epic 2.2 + 2.5 ──> Epic 2.7 (historikken i aksjedetaljen)
 Epic 4.1 ──> Epic 9.5 (relevanseksperimentet, del 2)
 ```
 
+*2026-09-28:* plan B er utløst. Epic 5, 6 og 7 er ute av v1, og Epic 5B heter Epic 10.
+
 **Prioritering, besluttet 2026-09-23:** Epic 1, 2 og 3 først, fordi det er at
 noen utenfor gruppen kan kjøre `docker run`, hente kurser og se begge
 skjermbildene med ekte data. Brukertesten (8.1) kommer rett etter Epic 2, ikke
@@ -346,7 +348,7 @@ papirarbeid og en port, og de trengs i både plan A og plan B.
 
 **Prioritering, oppdatert 2026-09-27**, etter svarene fra faglærerne og kodegjennomgangen av Epic 1. Prioriteringen fra 23.09 står, og rekkefølgen innenfor den er:
 - *Må med, fordi faglærerne krever det:* databasen i bruk i Epic 2, med skrivingen først, fordi en vurdering ikke kan etterfylles (`AD-7`), og fordi «Adopsjon» og «Fortsatt bruk» i PRD §7 krever at vi bruker løsningen jevnlig. Punkt 23 avgjøres denne uka, fordi det blokkerer 2.1 *(avgjort 28.09)*. Deretter Dockerfile og README (Epic 3), `docs/kvalitetssikring.md` (9.1) og refleksjonsrapporten.
-- *Det vi prøver å få til:* `aksje` med relasjoner (1.9) før Epic 2 skriver til basen, historikken i aksjedetaljen (2.7), KI-laget (4.0–4.3, og 5B.1–5B.3 hvis Euronext sier nei eller ikke svarer 28.09), målingene av KI (9.5 og 5B.4), brukertesten (8.1), og et kort demomanus med en reserve på kjente data (punkt D i `docs/innlevering.md`).
+- *Det vi prøver å få til:* `aksje` med relasjoner (1.9) før Epic 2 skriver til basen, historikken i aksjedetaljen (2.7), KI-laget (4.0–4.3, og 5B.1–5B.3 hvis Euronext sier nei eller ikke svarer 28.09 (utløst 28.09)), målingene av KI (9.5 og 5B.4), brukertesten (8.1), og et kort demomanus med en reserve på kjente data (punkt D i `docs/innlevering.md`).
 - *Hvis tiden strekker til:* 8.2 med endringene fra brukertesten, og 2.6.
 
 Ingen av 1.9, 2.7 og 9.5 utvider omfanget: 1.9 er en skjemaendring før basen har data, 2.7 svarer på FR-408s eget spørsmål (punkt 20), og 9.5 er et suksessmål i PRD §7. «KI-bidrag i drift» krever minst én ukes drift før demonstrasjonen, som vi har anslått til uke 45, så KI-teksten må lages hver dag fra rundt 26.10.
@@ -407,6 +409,8 @@ story som sender inn tekst er *blokkert av* 4.1, ikke anbefalt etter den.
 
 ### Epic 5: KI-laget i drift 🔒
 
+*Ute av v1 fra 2026-09-28 (plan B, punkt 1 i `prd.md` §8).* Storyene står som plan for en senere versjon.
+
 **FR-er:** FR-601, FR-602, FR-603, FR-606, del av FR-203 · **NFR-04**
 
 | Felt | |
@@ -436,6 +440,8 @@ vært, og det skal stå slik.
 
 ### Epic 6: Børsmeldinger i oversikten 🔒
 
+*Ute av v1 fra 2026-09-28 (plan B, punkt 1 i `prd.md` §8).* Storyene står som plan for en senere versjon.
+
 **FR-er:** FR-404, FR-405, FR-501, FR-502, FR-503, del av FR-203
 
 | Felt | |
@@ -446,6 +452,8 @@ vært, og det skal stå slik.
 | **Ved nei** | Strykes i sin helhet — **og tar Epic 5 med seg ned.** Det er ikke en fri strykning: den koster hele KI-laget, NFR-04, to av tre deler av FR-203, og suksessmålet «KI-bidrag i drift». Logikken i `meldinger.py` er bygget og testet fra før, og blir liggende som kode uten datakilde *Endret 2026-09-23:* det tar KI-laget **over meldinger** med seg ned, ikke hele KI-laget. Epic 5B står igjen. *Rettet 2026-09-24:* NFR-04 blir også stående, fordi Epic 5B begrenses av det. |
 
 ### Epic 7: Kommende finansielle hendelser 🔒
+
+*Ute av v1 fra 2026-09-28 (plan B, punkt 1 i `prd.md` §8).* Storyene står som plan for en senere versjon.
 
 **FR-er:** FR-301, FR-302, FR-303, del av FR-203
 
@@ -1324,6 +1332,8 @@ Som **gruppe**, vil jeg at KI-loggen overlever en omstart, så eksempelsettet fr
 
 ## Epic 5: KI-laget i drift 🔒
 
+*Ute av v1 fra 2026-09-28 (plan B, punkt 1 i `prd.md` §8).* Storyene står som plan for en senere versjon.
+
 > **Blokkert.** Av åpent punkt 5b (betingelse 4, løses av story 4.1) **og**
 > åpent punkt 1 og 19 (Euronext). Et nei 28.09 stryker hele epicen, fordi alle
 > FR-6xx handler om meldinger.
@@ -1491,6 +1501,8 @@ uten KI. 5B.4 måler KI-tillegget. Blandes de, vet ingen hva som ble målt.
 
 ## Epic 6: Børsmeldinger i oversikten 🔒
 
+*Ute av v1 fra 2026-09-28 (plan B, punkt 1 i `prd.md` §8).* Storyene står som plan for en senere versjon.
+
 > **Blokkert av åpent punkt 1 og 19.** Euronext forbyr automatisert henting uten
 > tillatelse, og punkt 19 gjelder om innhold i det hele tatt kan sendes til en
 > modelltjeneste.
@@ -1581,6 +1593,8 @@ så jeg slipper å lete et annet sted.
 ---
 
 ## Epic 7: Kommende finansielle hendelser 🔒
+
+*Ute av v1 fra 2026-09-28 (plan B, punkt 1 i `prd.md` §8).* Storyene står som plan for en senere versjon.
 
 > **Blokkert av åpent punkt 1 (Euronext) og 12 (horisont og hendelsestyper).**
 > *Rettet 2026-09-27:* her sto også «3 (kilde for handelskalenderen)». Punkt 3
