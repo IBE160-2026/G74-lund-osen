@@ -2,7 +2,7 @@
 title: "Endringsforslag 28.09: databasen i bruk i Epic 2"
 status: final
 created: 2026-09-28
-updated: 2026-09-28T20:26
+updated: 2026-09-29T00:19
 ---
 
 # Endringsforslag 28.09: databasen i bruk i Epic 2
@@ -55,7 +55,7 @@ måler.
 |---|---|
 | **Epic 2** | Én ny story (2.1b), ny rekkefølge, kontrollpunkter lagt til i 2.2, 2.3 og 2.5, og forutsetningen fra 2.5 flyttet til 2.1b. Ingen story får nytt nummer, og ingen strykes |
 | **Epic 3** | Innholdet er det samme, men 3.1 og 3.2 får mindre å avgjøre. Stiene, åpningen av basen og migrasjonene er avgjort i Epic 2. 3.1 bare pakker |
-| **Epic 4** | 4.3 flyttes til rett etter 2.1b, fordi den bruker samme åpning av basen og `0004`. 4.2 kan tas når som helst |
+| **Epic 4** | 4.3 flyttes til rett etter 2.1b, fordi den bruker samme åpning av basen og `0004`. 4.2 kan tas når som helst. *29.09: `ki_logg` blir `0005`, fordi `0004` er målingene i story 2.1c.* |
 | **Epic 8** | 8.1 kan tas når 2.2 og 2.7 er ferdige, uten å vente på 2.4 og 2.6 |
 | **Epic 10** | 10.1 i uke 40–41, og 10.2 og 10.3 i uke 42–43 (punkt 4.6). 10.3 leser KI-teksten med `ki_logg` mot `vurdering` (punkt 4.5) |
 | Epic 5, 6, 7 | Ute av v1 fra 28.09 (plan B). Ingen virkning her |
@@ -288,7 +288,7 @@ KI-vurderinger».
 | **Relasjoner mellom data** | `aksje` med triggere fra `kurs`, `kursserie` og `vurdering` (`0003`, AD-21), prøvd i `tests/test_aksje.py` | Holdes av basen ved hver ekte skriving fra 2.1b. `ki_logg` peker på `vurdering` i 4.3 (ER-diagrammet i spinen) |
 | **Joins** | **Ingen.** Ingen `JOIN` i `src/` (slått opp 28.09) | Minst én join som appen faktisk bruker. Planen for 2.2 vurderer om oversikten kan hente de femten fra `aksje` sammen med nyeste kurs i én spørring, og 10.3 leser KI-teksten med `ki_logg` mot `vurdering`. En join mot `aksje` i 2.7 bare for navnet teller ikke, fordi siden alt vet hvilken aksje den viser. *Avgjort 28.09 kl. 20:25. Her sto:* «Se usikkerhetene. Forslaget er at lesingen for en periode i 2.7 er én spørring over `vurdering` og `aksje`, og at KI-teksten leses med `ki_logg` mot `vurdering` i 4.3» |
 | **Migrasjoner** | `0001`–`0003`, løperen og `skjema_versjon`, prøvd i testene | Kjøres av appen selv fra 2.1b, ved oppstart av begge inngangene |
-| **Logging av KI-vurderinger** | Ingenting. 4.2 og 4.3 er `backlog` | 4.2 (porten og minneutgaven) når som helst. 4.3 (`0004_ki_logg.sql` og adapteren) rett etter 2.1b, fordi den bruker samme åpning av basen |
+| **Logging av KI-vurderinger** | Ingenting. 4.2 og 4.3 er `backlog` | 4.2 (porten og minneutgaven) når som helst. 4.3 (`0004_ki_logg.sql` og adapteren) rett etter 2.1b, fordi den bruker samme åpning av basen. *29.09: `ki_logg` blir `0005`, fordi `0004` er målingene i story 2.1c.* |
 
 **4.2 og 4.3 i rekkefølgen.** 4.2 har ingen avhengighet og kan tas mellom
 stories i Epic 2. 4.3 kan tas når 2.1b er ferdig, og må være ferdig før
@@ -316,11 +316,13 @@ bruk, og Dockerfile og README.
 
 | Uke | Datoer | Hva |
 |---|---|---|
-| 40 | 28.09–04.10 | 2.1, 2.1b, 2.5. **Første kjøring til basen så tidlig som mulig i uka.** Deretter 2.3. 4.3 rett etter 2.1b. 4.1 (papirarbeid) og 10.1 ved siden av |
-| 41 | 05.10–11.10 | 2.2, 2.7. 4.2. 4.1 og 10.1 ferdige. Punktet om EODHD og plan B avgjøres før 10.2 |
+| 40 | 28.09–04.10 | 2.1, 2.1b, 2.1c, 2.5. **Første kjøring til basen så tidlig som mulig i uka.** Deretter 2.3. 4.2, og 4.3 rett etter den. 4.1 (papirarbeid) og 10.1 ved siden av |
+| 41 | 05.10–11.10 | 2.2, 2.7. 4.1 og 10.1 ferdige. Punktet om EODHD og plan B avgjøres før 10.2 |
 | 42 | 12.10–18.10 | 8.1 (brukertesten) tidlig i uka, med data fra uke 40 og 41 i historikken. 3.1, 3.2, 3.3. 10.2 |
 | 43 | 19.10–25.10 | 10.2 og 10.3 ferdige. 2.4 og 2.6 hvis det er tid |
 | 44 | fra 26.10 | KI-teksten lages hver dag (Epic 10) |
+
+*Rettet 2026-09-29:* 2.1c (målingene) er tatt inn i uke 40, før 2.5, og 4.2 er flyttet fra uke 41 til uke 40, før 4.3, fordi 4.3 er adapteren for porten 4.2 lager. Her sto for uke 40: «2.1, 2.1b, 2.5. **Første kjøring til basen så tidlig som mulig i uka.** Deretter 2.3. 4.3 rett etter 2.1b. 4.1 (papirarbeid) og 10.1 ved siden av |» og for uke 41: «2.2, 2.7. 4.2. 4.1 og 10.1 ferdige. Punktet om EODHD og plan B avgjøres før 10.2 |».
 
 *Rettet 28.09 kl. 20:25:* Epic 10 er tatt inn. 4.1 og 10.1 i uke 40–41 (10.1
 sender ingenting), 4.2 i uke 41, 4.3 rett etter 2.1b, og 10.2 og 10.3 i uke
