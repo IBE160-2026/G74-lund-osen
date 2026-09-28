@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-28T23:56
+updated: 2026-09-29T00:17
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -612,9 +612,17 @@ var:
 | Signalstyrke | 0–3 |
 | Retning | Positiv, negativ, blandet eller ingen |
 | De tre sjekkene | Hvilken verdi hver av trend, bevegelse og interesse ga |
+| Målingene | Tallet hver sjekk ble avgjort av: avviket fra MA50, dagens endring og standardavviket den måles mot, og volumet som forholdstall mot medianen. Uavrundet, som brøk, ikke prosent, i samme enhet som regelen regner i. Forholdstallet mangler bare når medianvolumet er 0, og da er interesse 0. *Lagt til 2026-09-29* |
 | Relevante meldinger | Hvilke meldinger som ble vist for aksjen den dagen |
 | Kurs | `close` og `adjusted_close` |
 | Grunn | Bare når vurderingen mangler: hvorfor (punkt 24 i §8) |
+
+*Lagt til 2026-09-29, avgjort av gruppen 28.09.* Målingene lagres fordi en
+vurdering skal kunne etterprøves og sjekkes. Et fortegn uten måling kan ikke det
+(FR-706): «trend +1» sier ikke hvor langt over snittet kursen lå. Med målingen
+kan fortegnet regnes etter fra raden alene, med de låste parametrene (AD-13).
+Endres en parameter, føres det i `malinger.md` (AD-13) med datoen den nye
+grensen gjelder fra, så en eldre rad leses med grensene som gjaldt da.
 
 **Lagringen skjer automatisk innenfor en kjøring** — ingen skal måtte be om
 vurderingen separat. Den skjer **ikke** automatisk i tid: ingenting utløses av
@@ -825,9 +833,11 @@ vises alltid, og KI-teksten erstatter den aldri. En dag uten KI-tekst sier det,
 i stedet for å vise et tomt felt.
 
 KI-teksten vises bare når grunnlaget i loggen (FR-604) stemmer med vurderingen
-som vises: samme styrke, samme retning og samme fortegn for de tre sjekkene.
-Ellers vises siden som en dag uten KI-tekst. Målingene lagres ikke i
-vurderingen (FR-408), så de kan ikke sammenlignes der.
+som vises: samme styrke, samme retning, samme fortegn for de tre sjekkene, og
+samme målinger, avrundet som i FR-706. Ellers vises siden som en dag uten
+KI-tekst. *Rettet 2026-09-29:* her sto «samme styrke, samme retning og samme
+fortegn for de tre sjekkene» og «Målingene lagres ikke i vurderingen (FR-408),
+så de kan ikke sammenlignes der.» Målingene lagres fra story 2.1c (FR-408).
 
 Begrunnelsen er den samme som i FR-602A: av og på skal kunne sammenlignes, og
 det eneste som skiller dem, er KI-teksten. Bidraget er **forståelighet, ikke
