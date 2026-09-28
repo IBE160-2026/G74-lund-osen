@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-28T18:10
+updated: 2026-09-28T23:44
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -95,7 +95,7 @@ koden.
 - Kommende finansielle hendelser *Ute av v1 fra 2026-09-28 (plan B, punkt 1 i §8).*
 - Lenke fra aksjedetaljen til selskapets side på NewsWeb *(plan B, 28.09)*
 
-*Plan B, 2026-09-28:* KI-laget forklarer signalet i stedet for børsmeldingene, ut fra tall regnet av kursene (Epic 10). Av/på-bryteren står. FR-601–606 skrives om for plan B i en egen runde.
+*Plan B, 2026-09-28:* KI-laget forklarer signalet i stedet for børsmeldingene, ut fra tall regnet av kursene (Epic 10). Av/på-bryteren står. FR-601–606 er skrevet om for plan B 2026-09-28, og meldingsversjonen står i §4.6A. *Her sto:* «FR-601–606 skrives om for plan B i en egen runde.»
 
 Løsningen er en **webapplikasjon for PC**. Mobiltilpasning er utenfor v1, og
 plattformvalget er dermed låst.
@@ -384,14 +384,19 @@ Aksjedetaljen viser i tillegg:
 - En synlig vei tilbake til markedsoversikten, jf. navigasjonskravet i FR-101
 - De tre sjekkene ved navn, med verdien hver av dem ga og målingen bak den
   (FR-706)
-- Børsmeldinger som passerte filteret, med lenke til originalen på NewsWeb
+- Børsmeldinger som passerte filteret, med lenke til originalen på NewsWeb *Ute av v1 fra 2026-09-28 (plan B).*
 - KI-forklaring per melding når KI-laget er på, eller «ikke vurdert» når det er
-  av (FR-602)
-- Kommende finansielle hendelser fra Euronext
+  av (FR-602A) *Ute av v1 fra 2026-09-28 (plan B).*
+- Kommende finansielle hendelser fra Euronext *Ute av v1 fra 2026-09-28 (plan B).*
+- KI-teksten under regelforklaringen når KI-laget er på (FR-602) *(plan B, 2026-09-28)*
+- Én lenke til selskapets side på NewsWeb. Lenken hentes aldri av programmet:
+  brukeren klikker, og siden åpnes i nettleseren. Ingen kode i `src/` henter fra
+  NewsWeb (Euronexts vilkår, punkt 1 i §8). Adressen og det vilkårene sier om
+  lenker, slås opp av en av oss før lenken bygges *(plan B, 2026-09-28)*
 
-*Lagt til 2026-09-25:* over meldingene står en teller for hvor mange som ble
+*Ute av v1 fra 2026-09-28 (plan B).* *Lagt til 2026-09-25:* over meldingene står en teller for hvor mange som ble
 funnet og hvor mange som vises, med grunnen til at resten er skjult: filtrert
-bort etter kategori (FR-502) eller vurdert som «lite relevant» (FR-606). En
+bort etter kategori (FR-502) eller vurdert som «lite relevant» (FR-606A). En
 bryter veksler mellom **Anbefalt**, som er filteret over, og **Alle**, som også
 viser det som er skjult, merket med grunnen. Eks.dato er fortsatt merking, ikke
 melding (FR-503). Bryteren endrer bare visningen, ikke hva KI-laget vurderer.
@@ -786,11 +791,22 @@ om dagen, ikke titalls.
 
 ### 4.6 KI-laget og grensen mot regelbasert kode
 
-KI brukes der, og bare der, metadata er uttømt. At metadata ikke skiller
-betydning er målt tre ganger uavhengig; argumentet står i `begrunnelser.md`.
+*Skrevet om 2026-09-28 for plan B* (punkt 1 i §8). Kravene for KI-laget over
+meldinger står ordrett i 4.6A. FR-601 og FR-605 gjelder begge planene.
 
-KI-laget brukes ikke til å avgjøre hvilket selskap en melding gjelder — den
-jobben gjør `issuerSign` bedre og gratis.
+KI forklarer signalet med ord, for én aksje om gangen, i aksjedetaljen. Regler
+regner, og KI formulerer. Bidraget er **forståelighet, ikke informasjon**: med
+bare tall regnet av kursene kan KI ikke vite noe reglene ikke vet, men den kan
+si det slik at en person forstår det første gang. Det er et mindre bidrag enn
+forklaringen av meldinger ville vært, og det skal stå slik.
+
+Grensen mot regelbasert kode: KI får bare utledede verdier, aldri rådata fra
+kilden (story 10.1). Teksten lages i hentekommandoen, ikke når siden vises
+(NFR-02), og står under regelforklaringen, aldri i stedet for den (FR-602).
+
+Om EODHD skal spørres før tallene sendes til en modell, er et åpent punkt under
+«Å følge opp» i `docs/kilder-og-rettigheter.md` («Plan B for KI-laget: spørre
+EODHD eller ikke?»). Story 10.2 er blokkert til det er avgjort.
 
 #### FR-601 — Av/på-bryteren er brukersynlig
 
@@ -798,7 +814,112 @@ KI-laget skal kunne slås av og på fra grensesnittet. Bryteren er ikke et
 utviklerflagg i en konfigurasjonsfil, fordi bidraget skal kunne vises fram under
 demonstrasjonen mens noen ser på.
 
+I v1 slår bryteren av og på KI-teksten i aksjedetaljen (FR-602).
+
 #### FR-602 — Visningen når KI-laget er av
+
+Med laget av er forklaringen i aksjedetaljen de tre sjekkene med verdiene og
+målingene sine (FR-706), uten KI-tekst. Med laget på står KI-teksten **under**
+regelforklaringen, merket som laget av KI, med modellnavnet. Regelforklaringen
+vises alltid, og KI-teksten erstatter den aldri. En dag uten KI-tekst sier det,
+i stedet for å vise et tomt felt.
+
+KI-teksten vises bare når grunnlaget i loggen (FR-604) stemmer med vurderingen
+som vises: samme styrke, samme retning og samme fortegn for de tre sjekkene.
+Ellers vises siden som en dag uten KI-tekst. Målingene lagres ikke i
+vurderingen (FR-408), så de kan ikke sammenlignes der.
+
+Begrunnelsen er den samme som i FR-602A: av og på skal kunne sammenlignes, og
+det eneste som skiller dem, er KI-teksten. Bidraget er **forståelighet, ikke
+informasjon**: KI-teksten sier det samme som regelforklaringen, i hele setninger.
+
+#### FR-603 — KI-teksten sier ikke mer enn grunnlaget
+
+KI-teksten kontrolleres mot grunnlaget som ble sendt (story 10.1), før den
+lagres som vist. Kontrollen er én ren funksjon, som hentekommandoen kaller når
+teksten lages (story 10.2), og den testes med en falsk modell (AD-8). Den bygger
+på kjennetegn som kan observeres, ikke på en sikkerhetsscore fra modellen:
+
+1. **Retning og styrke.** Sier teksten hva retningen eller styrken er, skal det
+   være regelens. Det sjekkes der teksten sier det, som «retningen er blandet»,
+   ikke som enkeltord. «Positiv» og «negativ» står naturlig i en tekst om
+   retningen Blandet, og «ingen» er et vanlig ord.
+2. **Tallene.** Hvert tall i teksten står i grunnlaget, med samme avrunding som
+   i FR-706, eller er et av regelens faste tall, som 50 i MA50.
+3. **Råd.** Teksten har ingen ord som gir råd (NFR-06).
+
+En tekst som ikke består, vises ikke, men logges med grunnen (FR-604). Aksjen
+får da ingen KI-tekst den dagen, og siden sier det (FR-602).
+
+**Kontrollen er grov.** Den fanger feil tall og feil retning, ikke en misvisende
+tekst med riktige tall.
+
+#### FR-604 — Logging av KI-bidraget, fra første kjøring
+
+For hver aksje og børsdag KI-laget forklarer, lagres én rad:
+
+| Felt | Hvorfor |
+|---|---|
+| Aksje og børsdag | Emnet. Det samme paret som vurderingen (FR-408), så KI-teksten kan leses sammen med den |
+| Grunnlaget som ble sendt (story 10.1) | Det modellen faktisk så. Dagens vurdering kan skrives om samme dag (AD-7, AD-17), og loggen skal vise hva modellen så, ikke hva som står i vurderingen etterpå. Uten det finnes ingen kontrast å måle KI-teksten mot |
+| KI-teksten | Selve bidraget |
+| Om teksten besto kontrollen i FR-603, og ellers hvorfor ikke | En tekst som ikke vises, skal fortsatt finnes |
+| Promptversjon og modell | Se FR-605 |
+
+Det er én rad per aksje og børsdag, også når modellen feiler. Da har raden
+ingen tekst og sier at modellen feilet (NFR-04). Finnes raden for dagen, kalles
+ikke modellen på nytt, og raden står.
+
+Loggen skrives i hentekommandoen. Siden skriver aldri i den.
+
+Loggingen starter ved første kjøring, ikke når eksempelsettet skal lages. Skrus
+loggingen på i etterkant, finnes ikke uka målet krever.
+
+#### FR-605 — Promptversjon og modell lagres med hver vurdering
+
+Hver lagret KI-tekst skal bære promptversjonen og modellen som produserte den.
+Ellers blandes den sammen med vurderingen i FR-408, som er regelens og ikke
+KI-ens.
+
+Justeres prompten i oktober, må det være mulig å se hvilken versjon som ga
+hvilken vurdering. Uten det blir eksempelsettet en blanding av flere systemer
+som ser ut som ett.
+
+#### FR-606 — Relevansskalaen
+
+Relevansskalaen har tre verdier:
+
+| Verdi | Betyr |
+|---|---|
+| **Påvirker selskapet direkte** | Saken har konkret betydning for selskapets drift, kontrakter, eierskap eller resultat |
+| **Kan påvirke** | Saken kan få betydning, men det er ikke gitt |
+| **Lite relevant** | Saken har ingen praktisk betydning for en sparer |
+
+De tre nivåene er bevisst de samme som brukes i relevanseksperimentet, slik at
+resultatene kan sammenlignes direkte.
+
+I v1 brukes skalaen i relevanseksperimentet, på EODHDs medieartikler
+(`relevanseksperiment.md` §3, story 9.5), og ikke i applikasjonen. Hvordan den
+brukes på meldinger i applikasjonen, står i FR-606A.
+
+### 4.6A Plan A: KI-laget over meldinger (utenfor v1)
+
+*Lagt til 2026-09-28.* Ute av v1 fra 2026-09-28 (plan B, punkt 1 i §8). Dette er
+innledningen og kravene fra §4.6 slik de sto før plan B, ordrett. Kravene som
+bare gjelder meldinger, har fått en A. FR-601 og FR-605 gjelder begge planene og
+står i §4.6. Kommer et ja fra Euronext, bygges plan A oppå plan B.
+
+Til 28.09 var første setning i FR-605, ordrett:
+
+Hver lagret vurdering skal bære promptversjonen og modellen som produserte den.
+
+KI brukes der, og bare der, metadata er uttømt. At metadata ikke skiller
+betydning er målt tre ganger uavhengig; argumentet står i `begrunnelser.md`.
+
+KI-laget brukes ikke til å avgjøre hvilket selskap en melding gjelder — den
+jobben gjør `issuerSign` bedre og gratis.
+
+#### FR-602A — Visningen når KI-laget er av
 
 Meldingene i samlekategorien skal fortsatt vises når laget er av, merket
 **«ikke vurdert»**. De skal ikke forsvinne.
@@ -811,7 +932,7 @@ Begrunnelsen er at meldinger som forsvinner, blander sammen to forskjellige ting
 — færre meldinger og uforklarte meldinger — og gjør sammenligningen av og på
 meningsløs.
 
-#### FR-603 — Usikkerhet vises som forbehold, ikke som rekkefølge
+#### FR-603A — Usikkerhet vises som forbehold, ikke som rekkefølge
 
 Er en KI-vurdering usikker, skal den vises med forbehold der den står.
 Usikkerhet skal ikke håndteres ved å sortere meldingen ned.
@@ -826,7 +947,7 @@ sikkerhetsscore fra modellen:
 Der kjennetegnene spriker, merkes vurderingen som usikker i stedet for at
 modellen tvinges til et svar.
 
-#### FR-604 — Logging av KI-bidraget, fra første kjøring
+#### FR-604A — Logging av KI-bidraget, fra første kjøring
 
 For hver melding KI-laget behandler, lagres:
 
@@ -840,15 +961,7 @@ For hver melding KI-laget behandler, lagres:
 Loggingen starter ved første kjøring, ikke når eksempelsettet skal lages. Skrus
 loggingen på i etterkant, finnes ikke uka målet krever.
 
-#### FR-605 — Promptversjon og modell lagres med hver vurdering
-
-Hver lagret vurdering skal bære promptversjonen og modellen som produserte den.
-
-Justeres prompten i oktober, må det være mulig å se hvilken versjon som ga
-hvilken vurdering. Uten det blir eksempelsettet en blanding av flere systemer
-som ser ut som ett.
-
-#### FR-606 — Relevansskalaen
+#### FR-606A — Relevansskalaen
 
 KI-vurderingen av en melding i samlekategorien gir én av tre verdier:
 
