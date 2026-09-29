@@ -5,6 +5,8 @@ som hentes er testdata som endrer seg, og da tester vi boersen i stedet for
 koden vaar.
 """
 
+import pytest
+
 from meldinger import (
     ENGELSK,
     FILTRERES_BORT,
@@ -27,7 +29,7 @@ def melding(
     id: str = "1",
     issuer: str = "EQNR",
     kategori: str = "Innsideinformasjon",
-    publisert: str = "2026-09-18T08:30:00",
+    publisert: str = "2026-09-18T08:30:00Z",
     tittel: str = "Tittel",
     spraak: str = "no",
 ) -> Melding:
@@ -66,8 +68,8 @@ class TestDeduplisering:
         assert [m.id for m in beholdt] == ["en-1"]
 
     def test_ulik_minutt_er_ikke_dublett(self):
-        tidlig = melding(id="a", publisert="2026-09-18T08:30:00")
-        sent = melding(id="b", publisert="2026-09-18T08:31:00")
+        tidlig = melding(id="a", publisert="2026-09-18T08:30:00Z")
+        sent = melding(id="b", publisert="2026-09-18T08:31:00Z")
 
         assert len(dedupliser([tidlig, sent])) == 2
 
@@ -85,12 +87,44 @@ class TestDeduplisering:
 
     def test_sekunder_teller_ikke(self):
         """To oversettelser legges ut samtidig, men ikke i samme sekund."""
-        norsk = melding(id="no-1", publisert="2026-09-18T08:30:04", spraak="no")
-        engelsk = melding(id="en-1", publisert="2026-09-18T08:30:41", spraak="en")
+        norsk = melding(id="no-1", publisert="2026-09-18T08:30:04Z", spraak="no")
+        engelsk = melding(id="en-1", publisert="2026-09-18T08:30:41Z", spraak="en")
 
         beholdt = dedupliser([norsk, engelsk])
 
         assert [m.id for m in beholdt] == ["no-1"]
+
+
+class TestMinuttViaTidsobjekt:
+    """Story 2.1 (AD-20, K3/K4): publiseringsminuttet regnes via et
+    tidsobjekt i UTC, ikke ved aa kutte teksten paa tegn 16."""
+
+    def test_samme_oeyeblikk_i_to_soner_er_en_dublett(self):
+        """Ville feilet hvis _minutt kuttet teksten: 06:30Z og 08:30+02:00
+        er samme oeyeblikk, men ulik tekst."""
+        norsk = melding(id="no-1", publisert="2026-09-18T06:30:00Z", spraak="no")
+        engelsk = melding(id="en-1", publisert="2026-09-18T08:30:00+02:00", spraak="en")
+
+        assert [m.id for m in dedupliser([engelsk, norsk])] == ["no-1"]
+
+    def test_samme_tekst_ulikt_oeyeblikk_er_ikke_dublett(self):
+        """Ville feilet hvis _minutt kuttet teksten: de 16 foerste tegnene er
+        like, men oeyeblikkene ligger to timer fra hverandre."""
+        utc = melding(id="a", publisert="2026-09-18T08:30:00Z")
+        oslo = melding(id="b", publisert="2026-09-18T08:30:00+02:00")
+
+        assert len(dedupliser([utc, oslo])) == 2
+
+    def test_millisekunder_og_sekunder_teller_ikke(self):
+        norsk = melding(id="no-1", publisert="2026-09-18T06:30:00.123Z", spraak="no")
+        engelsk = melding(id="en-1", publisert="2026-09-18T06:30:41Z", spraak="en")
+
+        assert [m.id for m in dedupliser([engelsk, norsk])] == ["no-1"]
+
+    def test_tidspunkt_uten_sone_avvises(self):
+        """Vi gjetter ikke paa UTC eller Oslo."""
+        with pytest.raises(ValueError):
+            dedupliser([melding(publisert="2026-09-18T08:30:00")])
 
 
 class TestKategorifilter:

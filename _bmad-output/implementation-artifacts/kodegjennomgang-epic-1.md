@@ -2,7 +2,7 @@
 title: "Kodegjennomgang av Epic 1"
 status: done
 created: 2026-09-27
-updated: 2026-09-28T00:28
+updated: 2026-09-29T11:29
 ---
 
 # Kodegjennomgang av Epic 1
@@ -54,7 +54,7 @@ denne runden, 1 er `false`, og 18 er avvist. De 14 som står igjen, er samlet i
 | G9 | nettsperren (`982b216`) | `conftest.py` sier «ingen navneoppslag», men bare `getaddrinfo` er sperret | low | B-BH11 | egen story |
 | G10 | 1.3 × 1.6 | `Kurslager` godtar ethvert symbol, `Vurderingslager` bare formen i `AKSJEUNIVERS` | low | A-BH2, A-ECH3, A-AA3 | vent: forutsetning i 2.2 |
 | G11 | 1.3 × 1.6 | `Vurderingslager.skriv` slipper ut rå `sqlite3`-feil, mens `SqliteKurslager` gjør `IntegrityError` om til `ValueError` | low | A-BH1, A-AA2 | vent: avgjøres i 2.5 |
-| G12 | 2.0 | `main()`, eneste kaller av `kjoer` i produksjon, har ingen test | low | B-VG2 | vent: tas i 2.3 |
+| G12 | 2.0 | `main()`, eneste kaller av `kjoer` i produksjon, har ingen test | low | B-VG2 | vent: tas i 2.3 *(merknad 2026-09-29: `epics.md` la den til 2.1 27.09, i `51f1cf9`. Tatt i 2.1.)* |
 | — | | Avvist (se tabellene) | | 18 funn | avvis |
 
 ## Del A: lagringen
@@ -116,7 +116,7 @@ denne runden, 1 er `false`, og 18 er avvist. De 14 som står igjen, er samlet i
 | B-ECH6 | — | Skriptene `data/kontrollregning_1_4*.py` og `_1_5.py` importerer navn som er flyttet | low | Riktig, men `data/` spores ikke (regel 10) | avvist: utenfor repoet |
 | B-ECH7 | 1.2 | Meldingen til `54696d9` sier `strptime`, men koden bruker `fromisoformat` med kontroll | low | Riktig. `04933f6` beskriver den virkelige oppførselen | avvist: historikken skrives ikke om (regel 7) |
 | B-VG1 | 2.0 | Ingen test har en rad som mangler bare ett prisfelt, eller en `date` som er tall eller tom | low | Filet av VG: mutantene som fjerner `adjusted_close` fra `FELT` eller tekstkontrollen, overlever | G1: testene byttes når hentingen bruker oversetteren |
-| B-VG2 | 2.0 | `main()` er eneste kaller av `kjoer` i produksjonen, og ingen test kjører den | low | Filet av VG: en `main` som skriver til en annen katalog, består alle tester. VG foreslo å utsette | G12, vent: tas når 2.3 utvider `kjoer` |
+| B-VG2 | 2.0 | `main()` er eneste kaller av `kjoer` i produksjonen, og ingen test kjører den | low | Filet av VG: en `main` som skriver til en annen katalog, består alle tester. VG foreslo å utsette | G12, vent: tas når 2.3 utvider `kjoer` *(merknad 2026-09-29: tatt i 2.1)* |
 | B-VG-a | 2.0 | `test_url_kodet_noekkel_fjernes_ogsaa` bruker `ab+c/d=e`, der `quote` og `quote_plus` gir samme tekst | low | Riktig (`test_fetch_prices.py:104`). Å fjerne én av formene fra `_uten_noekkel` gir ingen feil | G3, egen story: en nøkkel med mellomrom |
 | B-VG-b | — | Skriptene i `data/` | low | Samme som B-ECH6 | avvist |
 | B-AA1 | 2.0 × 1.4a | Hentingen har sin egen, svakere radkontroll | medium | Samme som B-BH2 | G1 |

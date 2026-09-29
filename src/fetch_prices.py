@@ -13,6 +13,11 @@ signalkolonne.
 
 Resultatet skrives som et tidsstemplet oeyeblikksbilde som aldri skrives om
 (FR-406, NFR-07), i formatet visningen leser gjennom lagring_fil.SnapshotLeser.
+
+Tid (AD-20, story 2.1): klokka leses en gang, i UTC, naar kjoeringen starter.
+Datoen i filnavnet og i intervallet er norsk kalenderdato for det oeyeblikket,
+og hentet er det samme oeyeblikket i UTC med offset. Ingen kode her leser
+maskinens lokale sone.
 """
 
 import json
@@ -27,6 +32,7 @@ from urllib.parse import quote, quote_plus
 import requests
 from dotenv import load_dotenv
 
+from boersdag import norsk_dato
 from eodhd import UgyldigSerie, serie_fra_eodhd
 from kursdata import AKSJEUNIVERS
 from lagring_fil import DATA_KATALOG, KURSPREFIKS, PROSJEKTROT
@@ -59,9 +65,20 @@ def hent_api_nokkel() -> str:
     return nokkel
 
 
-def bygg_intervall(i_dag: date | None = None) -> tuple[str, str]:
-    """Fra- og til-dato for hentingen. Begge inklusive, jf. malinger.md §2."""
-    i_dag = i_dag or date.today()
+def naa() -> datetime:
+    """Klokka, i UTC. Leses en gang per kjoering, av main (AD-20).
+
+    Egen funksjon, saa testene kan bytte den ut, slik SqliteVurderingslager
+    tar klokka inn.
+    """
+    return datetime.now(timezone.utc)
+
+
+def bygg_intervall(i_dag: date) -> tuple[str, str]:
+    """Fra- og til-dato for hentingen. Begge inklusive, jf. malinger.md §2.
+
+    i_dag er norsk kalenderdato (AD-20), regnet av kjoer.
+    """
     return (i_dag - timedelta(days=DAGER_TILBAKE)).isoformat(), i_dag.isoformat()
 
 
@@ -182,19 +199,21 @@ def lag_oyeblikksbilde(resultat: Resultat, fra: str, til: str, naa: str) -> dict
     }
 
 
-def filnavn(i_dag: date | None = None) -> str:
+def filnavn(i_dag: date) -> str:
     """Datoen staar i navnet, saa oeyeblikksbilder aldri overskriver hverandre.
+
+    i_dag er norsk kalenderdato (AD-20), regnet av kjoer.
 
     Prefikset kommer fra lagring_fil og skrives ikke av her. nyeste_snapshot lar
     nettopp dette prefikset vinne ved lik dato, saa de to maa ikke kunne gli
     fra hverandre.
     """
-    return f"{KURSPREFIKS}-raa-{(i_dag or date.today()).isoformat()}.json"
+    return f"{KURSPREFIKS}-raa-{i_dag.isoformat()}.json"
 
 
 def kjoer(
     data_katalog: Path,
-    i_dag: date,
+    oeyeblikk: datetime,
     api_nokkel: str,
     hent: Callable[[str, str, str, str], list[dict]] = hent_ett_symbol,
     skriv: Callable[[str], None] = print,
@@ -208,9 +227,19 @@ def kjoer(
     skrives over. Da er kallene brukt og ingenting lagret, og kjoeringen
     avslutter med kode 1. Story 2.3 bygger videre paa dette med forventet
     boersdag.
+
+    Alt om tid utledes av oeyeblikk, som maa ha sone (AD-20, story 2.1):
+    dagen er norsk kalenderdato (boersdag.norsk_dato) og gir filnavnet og
+    til-datoen i intervallet, og hentet er oeyeblikket i UTC med offset.
+    hentet er altsaa starten paa kjoeringen, ikke tidspunktet da siste kall
+    var ferdig, saa filnavn og hentet kan aldri havne paa hver sin dag, heller
+    ikke naar kjoeringen gaar over midnatt. Et oeyeblikk uten sone gir
+    ValueError foer vakten og foer noe kall.
     """
+    dag = norsk_dato(oeyeblikk)
+    hentet = oeyeblikk.astimezone(timezone.utc).isoformat()
     data_katalog.mkdir(parents=True, exist_ok=True)
-    fil = data_katalog / filnavn(i_dag)
+    fil = data_katalog / filnavn(dag)
     if fil.exists():
         skriv(
             f"Dagens oeyeblikksbilde {fil.name} finnes allerede. Hentingen er "
@@ -218,14 +247,13 @@ def kjoer(
         )
         return None
 
-    fra, til = bygg_intervall(i_dag)
+    fra, til = bygg_intervall(dag)
     skriv(f"Henter {len(AKSJEUNIVERS)} symboler, {fra} til {til}.")
     skriv(f"Dette koster {len(AKSJEUNIVERS)} av dagskvoten paa 20.\n")
 
     resultat = hent_universet(api_nokkel, fra, til, hent, skriv)
 
-    naa = datetime.now(timezone.utc).isoformat()
-    tekst = json.dumps(lag_oyeblikksbilde(resultat, fra, til, naa), ensure_ascii=False)
+    tekst = json.dumps(lag_oyeblikksbilde(resultat, fra, til, hentet), ensure_ascii=False)
     try:
         with open(fil, "x", encoding="utf-8") as ut:
             ut.write(tekst)
@@ -244,7 +272,7 @@ def kjoer(
 
 
 def main() -> None:
-    kjoer(DATA_KATALOG, date.today(), hent_api_nokkel())
+    kjoer(DATA_KATALOG, naa(), hent_api_nokkel())
 
 
 if __name__ == "__main__":
