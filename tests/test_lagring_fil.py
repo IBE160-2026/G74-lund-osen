@@ -8,6 +8,7 @@ portmodulen.
 import json
 from datetime import date
 
+import lagring_fil
 from kursdata import Kursleser
 from lagring_fil import (
     KURSPREFIKS,
@@ -128,3 +129,51 @@ def test_nyeste_leser_gir_kursleser_for_nyeste_fil(tmp_path):
 def test_nyeste_leser_er_none_uten_oeyeblikksbilde(tmp_path):
     assert nyeste_leser(tmp_path) is None
     assert nyeste_leser(tmp_path / "finnes-ikke") is None
+
+
+def _kursfil(katalog, dato: str, hentet: str):
+    katalog.mkdir(parents=True, exist_ok=True)
+    fil = katalog / f"kurser-raa-{dato}.json"
+    fil.write_text(
+        json.dumps({
+            "hentet": hentet,
+            "serier": {"DNB": [{"date": dato, "close": 250.0,
+                                "adjusted_close": 245.0, "volume": 10}]},
+        }),
+        encoding="utf-8",
+    )
+    return fil
+
+
+def test_standardstien_er_raa_katalog_slik_den_er_ved_kallet(tmp_path, monkeypatch):
+    """Story 2.1b, K10: uten argument leser nyeste_snapshot og nyeste_leser
+    RAA_KATALOG naar de kalles. Fixturen i conftest.py har pekt den mot
+    tmp_path/raa, og en fil der blir funnet. En nyere fil rett i DATA_KATALOG
+    blir ikke det: det finnes ingen reserve som ogsaa ser i data/. Ville
+    feilet hvis nyeste_leser leste DATA_KATALOG (M13)."""
+    assert lagring_fil.RAA_KATALOG == tmp_path / "raa"
+    fil = _kursfil(tmp_path / "raa", "2026-09-22", "2026-09-22T20:00:00+00:00")
+    # DATA_KATALOG er pekt mot tmp_path/data av fixturen; her staar det
+    # uttrykkelig, saa testen aldri leser data/.
+    monkeypatch.setattr(lagring_fil, "DATA_KATALOG", tmp_path / "data")
+    _kursfil(tmp_path / "data", "2026-09-24", "2026-09-24T20:00:00+00:00")
+
+    assert nyeste_snapshot() == fil
+    leser = nyeste_leser()
+    assert leser.serie("DNB")[0].dato == date(2026, 9, 22)
+
+
+def test_standardstien_foelger_en_ny_verdi(tmp_path, monkeypatch):
+    """Verdien slaas opp ved kallet, ikke naar modulen lastes."""
+    annen = tmp_path / "annen"
+    fil = _kursfil(annen, "2026-09-21", "2026-09-21T20:00:00+00:00")
+    monkeypatch.setattr(lagring_fil, "RAA_KATALOG", annen)
+
+    assert nyeste_snapshot() == fil
+    assert nyeste_leser() is not None
+
+
+def test_uten_raa_katalog_er_svaret_none(tmp_path):
+    assert not (tmp_path / "raa").exists()
+    assert nyeste_snapshot() is None
+    assert nyeste_leser() is None

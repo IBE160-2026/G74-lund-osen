@@ -11,6 +11,7 @@ at ingenting skjedde, og ingenting feiler.
 
 import inspect
 import sqlite3
+import threading
 
 import pytest
 
@@ -437,11 +438,11 @@ class TestTransaksjonskontrollIFila:
 class TestSamtidigMigrering:
     """Story 1.5b, f: hentekommandoen og webserveren kan migrere samtidig.
 
-    Testene dekker luken mellom lesingen og BEGIN: den andre tilkoblingen
-    migrerer ferdig foer den foerste starter transaksjonen. To transaksjoner
-    som overlapper, og dermed forskjellen paa BEGIN IMMEDIATE og en utsatt
-    BEGIN, proeves ikke her. Det krever to samtidige skrivere og er utsatt
-    til story 3.1, som lager dem (deferred-work.md)."""
+    De to foerste testene dekker luken mellom lesingen og BEGIN: den andre
+    tilkoblingen migrerer ferdig foer den foerste starter transaksjonen. To
+    transaksjoner som overlapper, og dermed forskjellen paa BEGIN IMMEDIATE
+    og en utsatt BEGIN, ble utsatt fra 1.5b (deferred-work.md) og proeves i
+    TestToMigratorerOverlapper under (story 2.1b)."""
 
     @staticmethod
     def krok(handling):
@@ -499,6 +500,90 @@ class TestSamtidigMigrering:
             assert versjon(a) == 1
         finally:
             a.close()
+
+
+class TestToMigratorerOverlapper:
+    """Story 2.1b, K8: to traader, hver med sin tilkobling til samme fil.
+
+    Den foerste holder transaksjonen aapen inne i migrasjonen til den andre
+    har startet sin. Overlappen tvinges med hendelser, ikke med tilfeldig
+    timing: den foerste venter til den andre er rett foer sin BEGIN, og gir
+    den deretter inntil ett sekund til aa komme inn i en transaksjon. Med
+    BEGIN IMMEDIATE kommer den ikke inn foer den foerste har committet, og
+    begge lykkes uansett hvor lang ventetiden er. Med en utsatt BEGIN (M11)
+    kommer den andre inn med en gang, leser versjon 0 mens den foerste ennaa
+    ikke har committet, og proever 0001 paa nytt, og da feiler den."""
+
+    VENT = 10  # sekunder foer testen gir opp en hendelse som aldri kommer
+
+    def test_begge_lykkes_og_0001_kjoeres_en_gang(self, tmp_path, katalog):
+        skriv_migrasjon(katalog, 1, "a", "CREATE TABLE a (x INTEGER);")
+        sti = tmp_path / "ose.db"
+        foerste_i_migrasjonen = threading.Event()
+        andre_startet = threading.Event()
+        andre_i_transaksjon = threading.Event()
+        vent = self.VENT
+
+        class Foerste(sqlite3.Connection):
+            pauset = False
+
+            def execute(self, sql, *args):
+                svar = super().execute(sql, *args)
+                if not Foerste.pauset and sql.lstrip().startswith("CREATE TABLE a"):
+                    # Inne i migrasjonen, med transaksjonen aapen.
+                    Foerste.pauset = True
+                    assert self.in_transaction
+                    foerste_i_migrasjonen.set()
+                    assert andre_startet.wait(vent), "den andre startet aldri"
+                    andre_i_transaksjon.wait(1.0)
+                return svar
+
+        class Andre(sqlite3.Connection):
+            begynt = False
+
+            def execute(self, sql, *args):
+                if not Andre.begynt and sql.lstrip().upper().startswith("BEGIN"):
+                    Andre.begynt = True
+                    andre_startet.set()
+                    return super().execute(sql, *args)
+                svar = super().execute(sql, *args)
+                if Andre.begynt:
+                    andre_i_transaksjon.set()
+                return svar
+
+        utfall: dict[str, object] = {}
+
+        def migrator(navn, fabrikk, foer=None):
+            try:
+                if foer is not None:
+                    assert foer.wait(vent), f"{navn} fikk aldri startsignalet"
+                tilkobling = sqlite3.connect(sti, timeout=vent, factory=fabrikk)
+                try:
+                    utfall[navn] = migrer(tilkobling, katalog)
+                finally:
+                    tilkobling.close()
+            except BaseException as feil:  # noqa: BLE001 - rapporteres under
+                utfall[navn] = feil
+
+        traader = [
+            threading.Thread(target=migrator, args=("foerste", Foerste)),
+            threading.Thread(target=migrator, args=("andre", Andre, foerste_i_migrasjonen)),
+        ]
+        for traad in traader:
+            traad.start()
+        for traad in traader:
+            traad.join(3 * vent)
+            assert not traad.is_alive(), "en migrator ble aldri ferdig"
+
+        assert andre_startet.is_set()
+        assert utfall == {"foerste": 1, "andre": 1}
+        kontroll = sqlite3.connect(sti)
+        try:
+            assert kontroll.execute(
+                "SELECT versjon, fil FROM skjema_versjon"
+            ).fetchall() == [(1, "0001_a.sql")]
+        finally:
+            kontroll.close()
 
 
 class TestKatalogkontrollen:

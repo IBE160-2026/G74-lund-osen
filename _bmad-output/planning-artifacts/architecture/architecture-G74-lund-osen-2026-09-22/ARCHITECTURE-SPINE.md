@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-29T11:30'
+updated: '2026-09-29T15:18'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -237,6 +237,7 @@ også `signalberegning.py` ikke importerte noen annen prosjektmodul, og kanten
 - **Rule:** migrasjoner er nummererte SQL-filer som kjøres i rekkefølge; anvendt versjon står i en `skjema_versjon`-tabell. Ingen `ALTER TABLE` utenfor en migrasjonsfil.
 - **Opphav:** besluttet her som ny beslutning, avledet av AD-7. Bygget i story 1.1, commit `57a83c5` (23.09): `src/migrering.py` er løperen, og `tests/test_migrering.py` har 21 tester. Hver migrasjon kjøres i én transaksjon sammen med sin rad i `skjema_versjon`. **Prøvd mot feilen den skal hindre:** med løperen midlertidig byttet til `executescript()` feilet 3 av 6 tester i `TestFeilMidtveis`. Det var skjemakontrollen som fanget det (tabellen `halvveis` ble stående), ikke versjonsraden, som mutanten lot være uendret. `src/migrasjoner/` finnes ikke ennå — første migrasjon kommer i story 1.3. *24.09: finnes nå, med `0001_kurs.sql` fra story 1.3 (`f4fada0`).* *26.09: løperen er herdet i story 1.5b (`ef1cca7`, PR #5).* `skjema_versjon` lagrer filnavn og sha256 av filteksten, og en anvendt migrasjon med nytt navn eller nytt innhold avvises. En `skjema_versjon` fra før 1.5b oppgraderes ikke stille. Hver migrasjon kjøres i sin egen `BEGIN IMMEDIATE`-transaksjon, og versjonen leses inne i den. En migrasjonsfil med en setning som begynner med et transaksjonsord (`BEGIN`, `COMMIT`, `END`, `ROLLBACK`, `SAVEPOINT`, `RELEASE`), avvises før noe kjøres. Katalogkontrollen er lik på Linux og Windows. SQLite-adapteren krever at basen står på siste versjon (`siste_versjon`), ikke bare at den er migrert én gang. Testene: 427 før og 455 etter. Mutanten `BEGIN IMMEDIATE` → `BEGIN` overlever, og en test med to migratorer som overlapper, er utsatt til story 3.1 (`deferred-work.md`).
 - **Hvor `migrer()` kalles, avgjort 2026-09-28** (endringsforslaget): én funksjon åpner basen og kjører `migrer()` for både hentekommandoen og webserveren (story 2.1b og 2.2). Testen med to migratorer som overlapper, flyttes fra 3.1 til 2.1b. Se raden «Hvem kjører migrasjonene, og når» under Deferred.
+- **Bygget 2026-09-29, story 2.1b:** `lagring_sqlite.aapne_base(sti)` lager mappa, kobler til og kjører `migrer()` mot `MIGRASJONSKATALOG`. Feiler migreringen, lukkes tilkoblingen, og feilen går videre. Ingen annen kode i `src/` kaller `sqlite3.connect`, og en vakt i `tests/test_konsumentene.py` holder det. Stiene er `lagring_fil.RAA_KATALOG` (`data/raa/`) og `lagring_sqlite.BASE_STI` (`data/db/ose.db`). Hentekommandoen bruker `aapne_base`; webserveren tar den i bruk i 2.2. Testen med to migratorer som overlapper, er på plass (`TestToMigratorerOverlapper` i `tests/test_migrering.py`): to tråder, hver med sin tilkobling, der den første holder transaksjonen åpen inne i migrasjonen til den andre har startet. Mutanten `BEGIN IMMEDIATE` → `BEGIN` feiler nå.
 - **To SQLite-forhold migrasjonene må ta hensyn til, begge verifisert:** `executescript()` kjører en implisitt `COMMIT` først, så den nærliggende måten å kjøre en `.sql`-fil på er **ikke** atomisk med oppdateringen av `skjema_versjon` — migrasjonsløperen må styre transaksjonen selv. Og SQLites `ALTER TABLE` dekker bare rename/add/drop column; typeendring, `UNIQUE`, `CHECK` og fremmednøkler krever tabellbytte med `DROP TABLE`. **For `vurdering` og `ki_logg` kolliderer det med AD-7** — se åpent punkt under. *2026-09-27 (story 1.9):* `0003` legger koblingene til `aksje` med triggere, så ingen tabell bygges om (AD-21).
 
 ### AD-17 — Hentekommandoen skriver dagens vurdering
@@ -324,7 +325,7 @@ FR-408. At dagen mangler, skal kunne skilles i lageret: `FR-409`. *Rettet
 - **Prevents:** at en rad for et symbol utenfor universet, for eksempel tickeren `EQNR.OL`, blir en egen serie eller en egen historikk fordi porten var eneste vakt (G10 i `kodegjennomgang-epic-1.md`). Og at en aksje forsvinner mens `vurdering` fortsatt har rader for den, rader som verken kan slettes eller skrives på nytt (AD-7)
 - **Rule:** tabellen `aksje` har de samme feltene som `Aksje` og de samme femten som `AKSJEUNIVERS`, i samme rekkefølge. En test holder dem like. `kurs`, `kursserie` og `vurdering` peker på `aksje` gjennom triggere: et ukjent symbol avvises ved `INSERT` og ved `UPDATE OF symbol`, også på en tilkobling som ikke har slått på noe. En aksje med rader kan ikke slettes, og symbolet kan aldri endres. En aksje uten rader kan slettes. Ingen aksje kan erstattes: en `INSERT` eller en ny `ticker` som kolliderer, avvises, fordi `REPLACE` ellers sletter raden uten å kjøre slettetriggeren. `vurdering` peker på `aksje`, aldri på `kurs` (AD-18).
 - **Forkastet:** fremmednøkler. SQLite håndhever dem bare når tilkoblingen har slått dem på, og en ny tilkobling har det ikke. `PRAGMA foreign_keys = ON` gjør ingenting inne i løperens `BEGIN IMMEDIATE`. `ALTER TABLE` kan ikke legge en fremmednøkkel på en kolonne som finnes, så `kurs`, `kursserie` og `vurdering` måtte blitt bygget om, og `vurdering` er uerstattelig (AD-7). Samme grunn som for triggerne på `grunn` i `0002`. Alle tre forholdene er prøvd i minnet 27.09.
-- **Bygget 2026-09-27, story 1.9:** `0003_aksje.sql`. En base i versjon 2 med rader for et symbol som ikke står i `aksje`, stopper migrasjonen, og løperen ruller den tilbake. `SqliteKurslager` gjør avvisningen om til `ValueError`, og `SqliteVurderingslager` avviser et ukjent symbol i porten før SQL-en. Om porten til `Kurslager` også skal sjekke symbolet, og hvilke feil kjøringen fanger (G11), avgjøres i 2.5. Hvert kontrollpunkt er prøvd med en mutant (spesifikasjonen, Implementation Notes).
+- **Bygget 2026-09-27, story 1.9:** `0003_aksje.sql`. En base i versjon 2 med rader for et symbol som ikke står i `aksje`, stopper migrasjonen, og løperen ruller den tilbake. `SqliteKurslager` gjør avvisningen om til `ValueError`, og `SqliteVurderingslager` avviser et ukjent symbol i porten før SQL-en. Om porten til `Kurslager` også skal sjekke symbolet, og hvilke feil kjøringen fanger (G11), avgjøres i 2.5. Hvert kontrollpunkt er prøvd med en mutant (spesifikasjonen, Implementation Notes). *Merknad 2026-09-29:* `epics.md` flyttet spørsmålet om porten fra 2.5 til 2.1b 28.09, og det er avgjort der (G10): `kontroller_skriving` avviser et symbol utenfor `AKSJEUNIVERS` med `ValueError` før noe lagres, så `MinneKurslager` og `SqliteKurslager` oppfører seg likt. Triggerne fra `0003` står som vakten i basen. G11 står fortsatt for 2.5.
 
 ## Consistency Conventions
 
@@ -418,8 +419,8 @@ G74-lund-osen/
     graf.py              # ren regning
     app.py               # HTTP og HTML
   data/                  # gitignorert — to volumer i Docker
-    raa/                 # uforanderlige øyeblikksbilder      [flyttes hit i 2.1b]
-    db/ose.db            #                                    [ny, 2.1b]
+    raa/                 # uforanderlige øyeblikksbilder      [bygget i 2.1b]
+    db/ose.db            # basen, åpnes av aapne_base         [bygget i 2.1b]
   tests/                 # conftest.py sperrer nett
   Dockerfile             # [ny]
 ```

@@ -136,7 +136,48 @@ def test_hentingen_og_leseren_bruker_samme_regel_for_en_serie(navn):
 
 def test_app_velger_ikke_oeyeblikksbilde_selv():
     """app.py verken importerer eller kaller nyeste_snapshot, og kjenner ikke
-    SnapshotKilde, SnapshotLeser eller DATA_KATALOG. Kursleseren kommer fra
-    filadapteren (story 1.5)."""
-    forbudt = {"nyeste_snapshot", "SnapshotKilde", "SnapshotLeser", "DATA_KATALOG"}
+    SnapshotKilde, SnapshotLeser, DATA_KATALOG eller RAA_KATALOG.
+    Kursleseren kommer fra filadapteren (story 1.5 og 2.1b)."""
+    forbudt = {
+        "nyeste_snapshot", "SnapshotKilde", "SnapshotLeser", "DATA_KATALOG", "RAA_KATALOG",
+    }
     assert _navn_i(_tre("app.py")) & forbudt == set()
+
+
+def _connect_kall(tre: ast.Module) -> list[str]:
+    """Funksjonene som kaller connect paa sqlite3, eller importerer connect
+    fra sqlite3. "<modul>" for kall utenfor en funksjon."""
+    funnet = []
+
+    def besoek(node, funksjon):
+        for barn in ast.iter_child_nodes(node):
+            navn = funksjon
+            if isinstance(barn, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                navn = barn.name
+            if (
+                isinstance(barn, ast.Call)
+                and isinstance(barn.func, ast.Attribute)
+                and barn.func.attr == "connect"
+                and isinstance(barn.func.value, ast.Name)
+                and barn.func.value.id == "sqlite3"
+            ):
+                funnet.append(navn)
+            if isinstance(barn, ast.ImportFrom) and barn.module == "sqlite3":
+                if any(alias.name == "connect" for alias in barn.names):
+                    funnet.append(navn)
+            besoek(barn, navn)
+
+    besoek(tre, "<modul>")
+    return funnet
+
+
+def test_bare_aapne_base_kobler_til_basen():
+    """Story 2.1b, K2: basen aapnes ett sted. Ingen annen kode i src/
+    kaller sqlite3.connect. Ville feilet hvis fetch_prices koblet til selv
+    (M4)."""
+    kall = {
+        (sti.name, funksjon)
+        for sti in sorted(SRC.glob("*.py"))
+        for funksjon in _connect_kall(_tre(sti.name))
+    }
+    assert kall == {("lagring_sqlite.py", "aapne_base")}

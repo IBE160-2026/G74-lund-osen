@@ -8,15 +8,19 @@ en base som ikke er klar.
 Hver test bruker sin egen basefil under tmp_path. Ingen test roerer data/.
 """
 
+import os
 import sqlite3
+import subprocess
+import sys
 from datetime import date, datetime, timedelta, timezone
+from pathlib import Path
 
 import pytest
 
 import lagring_sqlite
 from kursdata import Kursrad
-from lagring_sqlite import MIGRASJONSKATALOG, SqliteKurslager
-from migrering import migrer, siste_versjon, versjon
+from lagring_sqlite import MIGRASJONSKATALOG, SqliteKurslager, aapne_base
+from migrering import MigrasjonsFeil, migrer, siste_versjon, versjon
 
 HENTET = datetime(2026, 9, 22, 8, 33, tzinfo=timezone.utc)
 
@@ -167,9 +171,9 @@ class TestOversettelsenVedGrensen:
 
 class TestBaseSomIkkeErKlar:
     def test_umigrert_base_avvises_og_faar_ingen_tabeller(self, tmp_path):
-        """Adapteren kjoerer ikke migrasjoner selv - hvem som gjoer det,
-        avgjoeres i story 3.1. Den sier fra i stedet for aa feile paa
-        'no such table' ved foerste oppslag."""
+        """Adapteren kjoerer ikke migrasjoner selv - det gjoer aapne_base
+        (story 2.1b). Den sier fra i stedet for aa feile paa 'no such table'
+        ved foerste oppslag."""
         tilkobling = sqlite3.connect(tmp_path / "umigrert.db")
         try:
             with pytest.raises(RuntimeError, match="migrert"):
@@ -260,3 +264,108 @@ class TestBaseSomIkkeErKlar:
         assert tilkobling.in_transaction
         tilkobling.rollback()
         assert lager.serie("EQNR") == []
+
+
+class TestAapneBase:
+    """Story 2.1b, K2: basen aapnes ett sted. aapne_base lager mappa, kobler
+    til og kjoerer migrer(). Feiler migreringen, lukkes tilkoblingen."""
+
+    def test_sti_uten_mappe_gir_mappe_og_base_paa_siste_versjon(self, tmp_path):
+        """Ville feilet uten mkdir (M2) eller uten migrer (M3)."""
+        sti = tmp_path / "data" / "db" / "ose.db"
+
+        tilkobling = aapne_base(sti)
+        try:
+            assert sti.parent.is_dir()
+            assert sti.is_file()
+            assert versjon(tilkobling) == siste_versjon(MIGRASJONSKATALOG)
+            SqliteKurslager(tilkobling).erstatt_serie("EQNR", [rad("2026-09-21")], HENTET)
+        finally:
+            tilkobling.close()
+
+    def test_aapne_to_ganger_beholder_dataene(self, tmp_path):
+        sti = tmp_path / "db" / "ose.db"
+        foerste = aapne_base(sti)
+        SqliteKurslager(foerste).erstatt_serie("EQNR", [rad("2026-09-21")], HENTET)
+        foerste.close()
+
+        andre = aapne_base(sti)
+        try:
+            assert SqliteKurslager(andre).sist_hentet("EQNR") == HENTET
+        finally:
+            andre.close()
+
+    def test_feil_i_migreringen_lukker_tilkoblingen_og_gaar_videre(
+        self, tmp_path, monkeypatch
+    ):
+        aapnet = []
+        ekte_connect = sqlite3.connect
+
+        def connect(*args, **kwargs):
+            tilkobling = ekte_connect(*args, **kwargs)
+            aapnet.append(tilkobling)
+            return tilkobling
+
+        tom = tmp_path / "tom"
+        tom.mkdir()
+        monkeypatch.setattr(lagring_sqlite, "MIGRASJONSKATALOG", tom)
+        monkeypatch.setattr(lagring_sqlite.sqlite3, "connect", connect)
+
+        with pytest.raises(MigrasjonsFeil, match="Ingen migrasjoner"):
+            aapne_base(tmp_path / "db" / "ose.db")
+
+        assert len(aapnet) == 1
+        with pytest.raises(sqlite3.ProgrammingError, match="closed"):
+            aapnet[0].execute("SELECT 1")
+
+    def test_base_nyere_enn_koden_avvises_av_aapningen(self, tmp_path):
+        """En base migrert av en nyere utgave av koden: migrer() avviser den,
+        og aapne_base slipper feilen videre i stedet for aa gi en tilkobling."""
+        siste = siste_versjon(MIGRASJONSKATALOG)
+        ny = tmp_path / "ny"
+        ny.mkdir()
+        for fil in MIGRASJONSKATALOG.glob("*.sql"):
+            (ny / fil.name).write_bytes(fil.read_bytes())
+        (ny / f"{siste + 1:04d}_ny.sql").write_text(
+            "CREATE TABLE ny (x INTEGER);", encoding="utf-8"
+        )
+        sti = tmp_path / "nyere.db"
+        tilkobling = sqlite3.connect(sti)
+        migrer(tilkobling, ny)
+        tilkobling.close()
+
+        with pytest.raises(MigrasjonsFeil):
+            aapne_base(sti)
+
+    def test_mappe_som_sti_gir_sqlite_feil(self, tmp_path):
+        """Kanttilfellet hentingen fanger: base_sti er en mappe."""
+        sti = tmp_path / "ose.db"
+        sti.mkdir()
+
+        with pytest.raises(sqlite3.Error):
+            aapne_base(sti)
+
+
+def test_stiene_er_data_raa_og_data_db_ose_db():
+    """Story 2.1b, K1: konstantene slik de staar i koden, lest i en egen
+    prosess, fordi fixturen i conftest.py peker dem mot tmp_path her."""
+    kode = (
+        "import lagring_fil, lagring_sqlite;"
+        "print(lagring_fil.RAA_KATALOG.relative_to(lagring_fil.PROSJEKTROT).as_posix());"
+        "print(lagring_sqlite.BASE_STI.relative_to(lagring_fil.PROSJEKTROT).as_posix())"
+    )
+    src = Path(lagring_sqlite.__file__).resolve().parent
+    miljoe = {**os.environ, "PYTHONPATH": str(src)}
+    ut = subprocess.run(
+        [sys.executable, "-c", kode], capture_output=True, text=True, env=miljoe, check=True
+    ).stdout.split()
+
+    assert ut == ["data/raa", "data/db/ose.db"]
+
+
+def test_fixturen_peker_stiene_mot_tmp_path(tmp_path):
+    """Ingen test roerer data/: fixturen i conftest.py har flyttet begge."""
+    import lagring_fil
+
+    assert lagring_fil.RAA_KATALOG == tmp_path / "raa"
+    assert lagring_sqlite.BASE_STI == tmp_path / "db" / "ose.db"

@@ -17,6 +17,7 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-5b-migrasjonsloeperen-og-sqlite-adapteren-herdes.md`
   summary: En test der to migratorer overlapper, som viser at BEGIN IMMEDIATE venter og at den andre ser den foerstes resultat, i stedet for at en av dem feiler.
   evidence: Gjennomgangen av 1.5b del 1 (triageloggen, VG3, BH6, ECH2 og ECH9). Mutanten som bytter BEGIN IMMEDIATE med BEGIN, overlever alle tester. Testene dekker bare luken mellom lesingen og BEGIN. Hoerer til story 3.1, som lager de samtidige kallerne.
+  resolved: Loest i story 2.1b (2026-09-29; flyttet fra 3.1 til 2.1b i endringsforslaget 28.09). TestToMigratorerOverlapper i tests/test_migrering.py: to traader, hver med sin tilkobling til samme fil, der den foerste holder transaksjonen aapen inne i migrasjonen til den andre har startet. Begge lykkes, og 0001 kjoeres en gang. Mutanten BEGIN IMMEDIATE -> BEGIN feiler naa testen. Kjoert 50 ganger lokalt: 50 besto.
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-5b-migrasjonsloeperen-og-sqlite-adapteren-herdes.md`
   summary: migrer() krever skrivetilgang ogsaa naar basen er oppdatert, fordi den starter med BEGIN IMMEDIATE.
   evidence: Gjennomgangen av 1.5b del 1 (triageloggen, ECH1). Ubekreftet, medium hvis det er sant. Avgjoeres naar story 3.1 bestemmer hvem som kaller migrer(), og om webserveren faar en skrivebeskyttet base. Proeves med sqlite3.connect("file:...?mode=ro", uri=True) mot en oppdatert base.

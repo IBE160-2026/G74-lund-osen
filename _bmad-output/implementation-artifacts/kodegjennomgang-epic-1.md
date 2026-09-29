@@ -2,7 +2,7 @@
 title: "Kodegjennomgang av Epic 1"
 status: done
 created: 2026-09-27
-updated: 2026-09-29T11:29
+updated: 2026-09-29T15:52
 ---
 
 # Kodegjennomgang av Epic 1
@@ -52,7 +52,7 @@ denne runden, 1 er `false`, og 18 er avvist. De 14 som står igjen, er samlet i
 | G7 | 1.7 | Docstringen i `test_tilstand.py` sier at hver test lager en base | low | A-BH13 | egen story |
 | G8 | 1.3 / 1.6 | Testnavnet `…_til_versjon_1_…` krever nå `>= 1` | low | A-BH10 | egen story |
 | G9 | nettsperren (`982b216`) | `conftest.py` sier «ingen navneoppslag», men bare `getaddrinfo` er sperret | low | B-BH11 | egen story |
-| G10 | 1.3 × 1.6 | `Kurslager` godtar ethvert symbol, `Vurderingslager` bare formen i `AKSJEUNIVERS` | low | A-BH2, A-ECH3, A-AA3 | vent: forutsetning i 2.2 |
+| G10 | 1.3 × 1.6 | `Kurslager` godtar ethvert symbol, `Vurderingslager` bare formen i `AKSJEUNIVERS` | low | A-BH2, A-ECH3, A-AA3 | vent: forutsetning i 2.2 *(merknad 2026-09-29: `epics.md` flyttet porten til 2.1b 28.09. Tatt i 2.1b: `kontroller_skriving` avviser et symbol utenfor `AKSJEUNIVERS` i begge lagrene.)* |
 | G11 | 1.3 × 1.6 | `Vurderingslager.skriv` slipper ut rå `sqlite3`-feil, mens `SqliteKurslager` gjør `IntegrityError` om til `ValueError` | low | A-BH1, A-AA2 | vent: avgjøres i 2.5 |
 | G12 | 2.0 | `main()`, eneste kaller av `kjoer` i produksjon, har ingen test | low | B-VG2 | vent: tas i 2.3 *(merknad 2026-09-29: `epics.md` la den til 2.1 27.09, i `51f1cf9`. Tatt i 2.1.)* |
 | — | | Avvist (se tabellene) | | 18 funn | avvis |
@@ -161,6 +161,8 @@ dagsfila):
   *2026-09-28:* G10 er løst i basen i story 1.9 (AD-21): `0003` avviser et ukjent
   symbol i `kurs`, `kursserie` og `vurdering`. Om porten til `Kurslager` også
   skal sjekke symbolet, avgjøres fortsatt i 2.5, sammen med G11.
+  *2026-09-29:* porten ble flyttet til 2.1b og tatt der: `kontroller_skriving`
+  får symbolet og avviser alt utenfor `AKSJEUNIVERS`. G11 venter fortsatt på 2.5.
 - **G12 (B-VG2) venter på 2.1,** som endrer dagen `main()` bruker. Den står som
   kontrollpunkt i 2.1.
 - **G1 gjelder alle tilfellene** som ble prøvd 27.09 uten nett og med falsk
@@ -192,6 +194,9 @@ PR #10) rettet G1–G5 og G8, og story 1.9 (`cfe2977`, PR #11) løste G10 i base
 (AD-21). Begge ble gjennomgått i sin egen PR med tre lag: Blind Hunter, Edge
 Case Hunter og Verification Gap. Det som venter, står i en story: G9 i 4.0, G11
 i 2.5 og G12 i 2.1.
+*2026-09-29:* portdelen av G10 ble lukket i story 2.1b: `kontroller_skriving`
+avviser et symbol utenfor `AKSJEUNIVERS` i både `MinneKurslager` og
+`SqliteKurslager`, før noe lagres.
 
 Tellingen etter rettingene, talt fra tellingen etter beslutningen:
 

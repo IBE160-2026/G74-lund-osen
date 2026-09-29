@@ -153,20 +153,30 @@ class Kurslager(Kursleser, Protocol):
 
         hentet er oeyeblikket dataene ble hentet, og maa ha tidssone. Det er
         et argument og ikke lagerets egen klokke, saa basen og raadatafila fra
-        samme henting baerer samme tidspunkt. En tom serie, en feil radtype,
-        to rader med samme dato eller en tid uten sone avvises, og da endres
-        ingenting.
+        samme henting baerer samme tidspunkt. Et symbol utenfor AKSJEUNIVERS,
+        en tom serie, en feil radtype, to rader med samme dato eller en tid
+        uten sone avvises, og da endres ingenting.
         """
 
 
-def kontroller_skriving(rader: list[Kursrad], hentet: datetime) -> datetime:
+def kontroller_skriving(symbol: str, rader: list[Kursrad], hentet: datetime) -> datetime:
     """Felles kontroll for alle Kurslager-implementasjoner. Returnerer hentet i UTC.
 
     Kjoeres foer noe lagres, saa en avvist skriving etterlater lageret slik
     det var. Like datoer kontrolleres IKKE her: i SQLite stoppes de av
     primaernoekkelen midt i transaksjonen, og det er den veien som beviser at
     slettingen og innsettingen henger sammen.
+
+    Story 2.1b (G10): symbolet maa staa i AKSJEUNIVERS. Da avviser
+    MinneKurslager og SqliteKurslager det samme, og en test mot minnelageret
+    kan ikke godta EQNR.OL som basen avviser. Triggerne fra 0003 staar
+    fortsatt som vakten i basen.
     """
+    if symbol not in {aksje.symbol for aksje in AKSJEUNIVERS}:
+        raise ValueError(
+            f"{symbol!r} er ikke et symbol i AKSJEUNIVERS. Symbolet er "
+            "formen NewsWeb bruker (EQNR), ikke tickeren (EQNR.OL)"
+        )
     for rad in rader:
         if not isinstance(rad, Kursrad):
             raise TypeError(f"Kurslager tar Kursrad, fikk {type(rad).__name__}")
@@ -195,7 +205,7 @@ class MinneKurslager:
 
     def erstatt_serie(self, symbol: str, rader: list[Kursrad], hentet: datetime) -> None:
         rader = list(rader)
-        tid = kontroller_skriving(rader, hentet)
+        tid = kontroller_skriving(symbol, rader, hentet)
         # Samme regel som primaernoekkelen (symbol, dato) i SQLite.
         datoer = [rad.dato for rad in rader]
         if len(set(datoer)) != len(datoer):
