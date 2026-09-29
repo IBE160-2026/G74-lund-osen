@@ -1093,6 +1093,8 @@ aldri (regel 10).
 
 **Avhenger av:** 2.1. **Én økt:** ja.
 
+*Ferdig 2026-09-29:* flettet i `9aa6131`, PR #14.
+
 ### Story 2.1c: Vurderingen lagrer målingene bak de tre sjekkene
 
 *Lagt til 2026-09-29, avgjort av gruppen 28.09.*
