@@ -8,6 +8,7 @@ byttet ut (story 2.0), saa ingen test naar nettet eller bruker kvote.
 import copy
 import json
 import os
+import sqlite3
 import time
 from datetime import date, datetime, timedelta, timezone
 from urllib.parse import quote, quote_plus
@@ -17,10 +18,13 @@ import pytest
 import requests
 
 import fetch_prices as fp
+import lagring_fil
+import lagring_sqlite
 from eodhd_serier import AVVISTE, AVVISTE_IDER
 from boersdag import norsk_dato
 from kursdata import AKSJEUNIVERS
 from lagring_fil import SnapshotKilde, nyeste_leser, nyeste_snapshot
+from lagring_sqlite import SqliteKurslager, aapne_base
 
 
 def falsk_serie(dager: int = 60):
@@ -154,7 +158,7 @@ class TestSkriverIkkeOver:
                 raise RuntimeError(f"feil med {noekkel}")
             return falsk_serie()
 
-        fil = fp.kjoer(katalog, self.OEYEBLIKK, NOEKKEL, hent, linjer.append)
+        fil = fp.kjoer(katalog, tmp_path / "ose.db", self.OEYEBLIKK, NOEKKEL, hent, linjer.append)
 
         assert fil == katalog / fp.filnavn(self.DAG)
         tekst = fil.read_text(encoding="utf-8")
@@ -175,7 +179,7 @@ class TestSkriverIkkeOver:
         def hent(*_):
             pytest.fail("ingen kall skal brukes naar dagens fil finnes")
 
-        assert fp.kjoer(tmp_path, self.OEYEBLIKK, NOEKKEL, hent, linjer.append) is None
+        assert fp.kjoer(tmp_path, tmp_path / "ose.db", self.OEYEBLIKK, NOEKKEL, hent, linjer.append) is None
         assert fil.read_text(encoding="utf-8") == '{"gammel": true}'
         assert any("finnes allerede" in l and "0 kall brukt" in l for l in linjer)
 
@@ -191,7 +195,7 @@ class TestSkriverIkkeOver:
             return falsk_serie()
 
         with pytest.raises(SystemExit) as slutt:
-            fp.kjoer(tmp_path, self.OEYEBLIKK, NOEKKEL, hent, linjer.append)
+            fp.kjoer(tmp_path, tmp_path / "ose.db", self.OEYEBLIKK, NOEKKEL, hent, linjer.append)
 
         assert slutt.value.code == 1
         assert fil.read_text(encoding="utf-8") == '{"annen kjoering": true}'
@@ -231,7 +235,7 @@ class TestSvarMedFeilForm:
         def hent(ticker, *_):
             return svar if ticker == "DNB.OL" else falsk_serie()
 
-        fil = fp.kjoer(tmp_path, OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None)
+        fil = fp.kjoer(tmp_path, tmp_path / "ose.db", OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None)
         feil = json.loads(fil.read_text(encoding="utf-8"))["feil"]
         leser = nyeste_leser(tmp_path)
 
@@ -247,7 +251,7 @@ class TestSvarMedFeilForm:
         def hent(ticker, *_):
             return [] if ticker == "DNB.OL" else falsk_serie()
 
-        fil = fp.kjoer(tmp_path, OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None)
+        fil = fp.kjoer(tmp_path, tmp_path / "ose.db", OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None)
         feil = json.loads(fil.read_text(encoding="utf-8"))["feil"]
         leser = nyeste_leser(tmp_path)
 
@@ -424,7 +428,7 @@ class TestOyeblikksbilde:
                 for i in range(60)
             ]
 
-        fil = fp.kjoer(tmp_path, OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None)
+        fil = fp.kjoer(tmp_path, tmp_path / "ose.db", OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None)
         assert fil is not None and fil.parent == tmp_path
 
         leser = nyeste_leser(tmp_path)
@@ -521,7 +525,7 @@ def _kjoer_matrisen(tmp_path, rad):
     ikke stopper det andre oeyeblikket i en rad med to."""
     for nr, (oeyeblikk, dato, hentet) in enumerate(rad):
         katalog = tmp_path / str(nr)
-        fil = fp.kjoer(katalog, oeyeblikk, NOEKKEL, lambda *_: falsk_serie(), lambda _: None)
+        fil = fp.kjoer(katalog, tmp_path / "ose.db", oeyeblikk, NOEKKEL, lambda *_: falsk_serie(), lambda _: None)
 
         assert fil == katalog / f"kurser-raa-{dato}.json"
         bilde = json.loads(fil.read_text(encoding="utf-8"))
@@ -548,7 +552,7 @@ class TestBoersdagIOsloTidsstempelIUtc:
             pytest.fail("ingen kall skal brukes naar oeyeblikket mangler sone")
 
         with pytest.raises(ValueError):
-            fp.kjoer(tmp_path, datetime(2026, 9, 25, 0, 30), NOEKKEL, hent, lambda _: None)
+            fp.kjoer(tmp_path, tmp_path / "ose.db", datetime(2026, 9, 25, 0, 30), NOEKKEL, hent, lambda _: None)
 
         assert list(tmp_path.iterdir()) == []
 
@@ -591,8 +595,7 @@ class TestMaskinensSoneSpillerIngenRolle:
 
     def test_oeyeblikk_uten_sone_avvises_ogsaa_her(self, tmp_path, maskinsone):
         with pytest.raises(ValueError):
-            fp.kjoer(
-                tmp_path, datetime(2026, 9, 25, 0, 30), NOEKKEL,
+            fp.kjoer(tmp_path, tmp_path / "ose.db", datetime(2026, 9, 25, 0, 30), NOEKKEL,
                 lambda *_: pytest.fail("ingen kall"), lambda _: None,
             )
         assert list(tmp_path.iterdir()) == []
@@ -611,7 +614,12 @@ def test_main_skriver_fila_for_norsk_dato_uten_noekkel(tmp_path, monkeypatch):
     sommertid. Ville feilet hvis main ga kjoer date.today() (M5)."""
     monkeypatch.setenv("EODHD_API_KEY", NOEKKEL)
     monkeypatch.setattr(fp, "load_dotenv", lambda *a, **k: None)
-    monkeypatch.setattr(fp, "DATA_KATALOG", tmp_path)
+    # Story 2.1b: RAA_KATALOG og BASE_STI i stedet for DATA_KATALOG. Fixturen
+    # i conftest.py gjoer det samme; her staar det uttrykkelig.
+    raa = tmp_path / "data" / "raa"
+    base = tmp_path / "data" / "db" / "ose.db"
+    monkeypatch.setattr(lagring_fil, "RAA_KATALOG", raa)
+    monkeypatch.setattr(lagring_sqlite, "BASE_STI", base)
     monkeypatch.setattr(fp, "naa", lambda: _utc(2026, 9, 24, 22, 30))
 
     def get(url, params, timeout):
@@ -620,12 +628,340 @@ def test_main_skriver_fila_for_norsk_dato_uten_noekkel(tmp_path, monkeypatch):
 
     monkeypatch.setattr(fp.requests, "get", get)
 
-    fp.main()
+    fp.main([])
 
-    fil = tmp_path / "kurser-raa-2026-09-25.json"
-    assert [f.name for f in tmp_path.iterdir()] == [fil.name]
+    fil = raa / "kurser-raa-2026-09-25.json"
+    assert [f.name for f in raa.iterdir()] == [fil.name]
     tekst = fil.read_text(encoding="utf-8")
     assert NOEKKEL not in tekst
     bilde = json.loads(tekst)
     assert len(bilde["serier"]) == len(AKSJEUNIVERS) == 15
     assert bilde["hentet"] == "2026-09-24T22:30:00+00:00"
+    # Basen i data/db/, med samme hentet som fila.
+    tilkobling = sqlite3.connect(base)
+    try:
+        lager = SqliteKurslager(tilkobling)
+        for aksje in AKSJEUNIVERS:
+            assert lager.sist_hentet(aksje.symbol) == _utc(2026, 9, 24, 22, 30)
+    finally:
+        tilkobling.close()
+
+
+# Story 2.1b: basen aapnes ett sted, og hentingen skriver kursene dit. Fila
+# skrives foerst, saa basen, med samme hentet. Ingen test roerer data/: stiene
+# pekes mot tmp_path her og i fixturen i conftest.py.
+
+
+def serie_til(siste: date, dager: int = 60) -> list[dict]:
+    """En serie leseren godtar, som slutter paa en gitt dato."""
+    return [
+        {
+            "date": (siste - timedelta(days=dager - 1 - i)).isoformat(),
+            "close": 100.0 + i,
+            "adjusted_close": 100.0 + i,
+            "volume": 1000,
+        }
+        for i in range(dager)
+    ]
+
+
+def lager_i(base):
+    """Et blikk paa basen gjennom porten. Kalleren lukker tilkoblingen."""
+    tilkobling = aapne_base(base)
+    return tilkobling, SqliteKurslager(tilkobling)
+
+
+def antall_rader(base, tabell: str) -> int:
+    tilkobling = aapne_base(base)
+    try:
+        return tilkobling.execute(f"SELECT count(*) FROM {tabell}").fetchone()[0]
+    finally:
+        tilkobling.close()
+
+
+def alle_kursrader(base) -> list[tuple]:
+    tilkobling = aapne_base(base)
+    try:
+        return tilkobling.execute("SELECT * FROM kurs ORDER BY symbol, dato").fetchall()
+    finally:
+        tilkobling.close()
+
+
+@pytest.fixture
+def stier(tmp_path):
+    """raa/ og db/ under tmp_path/data, som i prosjektet. Ingen av dem finnes."""
+    return tmp_path / "data" / "raa", tmp_path / "data" / "db" / "ose.db"
+
+
+class TestHentingenSkriverBasen:
+    """Story 2.1b, K1, K3, K4 og K9: matrisen i spesifikasjonen."""
+
+    def test_foerste_henting_lager_begge_mappene_og_skriver_15_serier(self, stier):
+        """K1 og K3: fila i raa/, basen i db/ose.db, og hver serie i basen har
+        samme hentet som fila. Ville feilet hvis hentet kom fra klokka (M5)."""
+        raa, base = stier
+        fil = fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, lambda *_: falsk_serie(), lambda _: None)
+
+        assert fil == raa / "kurser-raa-2026-09-22.json"
+        assert base.is_file()
+        bilde = json.loads(fil.read_text(encoding="utf-8"))
+        tilkobling, lager = lager_i(base)
+        try:
+            for aksje in AKSJEUNIVERS:
+                assert lager.sist_hentet(aksje.symbol) == OEYEBLIKK_22_09
+                assert lager.sist_hentet(aksje.symbol) == datetime.fromisoformat(bilde["hentet"])
+                assert lager.serie(aksje.symbol) == fp.serie_fra_eodhd(
+                    bilde["serier"][aksje.symbol]
+                )
+        finally:
+            tilkobling.close()
+        assert antall_rader(base, "kursserie") == len(AKSJEUNIVERS) == 15
+        assert antall_rader(base, "vurdering") == 0
+
+    def test_symbol_som_feilet_faar_ingen_rad_i_ny_base(self, stier):
+        """K3 og AD-15. Ville feilet hvis symbolet som feilet, ble skrevet (M6)."""
+        raa, base = stier
+
+        def hent(ticker, *_):
+            if ticker == "DNB.OL":
+                raise RuntimeError("nei")
+            return falsk_serie()
+
+        fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None)
+
+        tilkobling, lager = lager_i(base)
+        try:
+            assert lager.serie("DNB") == []
+            assert lager.sist_hentet("DNB") is None
+            assert lager.sist_hentet("EQNR") == OEYEBLIKK_22_09
+        finally:
+            tilkobling.close()
+        assert antall_rader(base, "kursserie") == len(AKSJEUNIVERS) - 1
+
+    def test_symbol_som_feilet_beholder_gammel_serie_og_tid(self, stier):
+        raa, base = stier
+        foer = OEYEBLIKK_22_09
+        fp.kjoer(raa, base, foer, NOEKKEL, lambda *_: serie_til(date(2026, 9, 22)), lambda _: None)
+        tilkobling, lager = lager_i(base)
+        gammel = lager.serie("DNB")
+        tilkobling.close()
+
+        etter = foer + timedelta(days=1)
+
+        def hent(ticker, *_):
+            if ticker == "DNB.OL":
+                return []
+            return serie_til(date(2026, 9, 23))
+
+        fp.kjoer(raa, base, etter, NOEKKEL, hent, lambda _: None)
+
+        tilkobling, lager = lager_i(base)
+        try:
+            assert lager.serie("DNB") == gammel
+            assert lager.sist_hentet("DNB") == foer
+            assert lager.sist_hentet("EQNR") == etter
+            assert lager.serie("EQNR")[-1].dato == date(2026, 9, 23)
+        finally:
+            tilkobling.close()
+
+    def test_basen_kan_ikke_aapnes_fila_staar_og_kode_1(self, stier):
+        """K4: base_sti er en mappe. Fila staar, meldingen sier hvordan den
+        leses inn, og kjoeringen ender med kode 1. Ville feilet hvis basen
+        ble skrevet foer fila (M7)."""
+        raa, base = stier
+        base.mkdir(parents=True)
+        linjer = []
+
+        with pytest.raises(SystemExit) as slutt:
+            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, lambda *_: falsk_serie(), linjer.append)
+
+        assert slutt.value.code == 1
+        fil = raa / "kurser-raa-2026-09-22.json"
+        assert len(json.loads(fil.read_text(encoding="utf-8"))["serier"]) == 15
+        assert any(f"--les-inn {fil}" in l for l in linjer)
+        assert not [l for l in linjer if NOEKKEL in l]
+
+    def test_ett_symbol_avvist_av_basen_de_andre_skrives(self, stier, monkeypatch):
+        raa, base = stier
+
+        class Avvisende(SqliteKurslager):
+            def erstatt_serie(self, symbol, rader, hentet):
+                if symbol == "DNB":
+                    raise ValueError("avvist i testen")
+                super().erstatt_serie(symbol, rader, hentet)
+
+        monkeypatch.setattr(fp, "SqliteKurslager", Avvisende)
+        linjer = []
+
+        with pytest.raises(SystemExit) as slutt:
+            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, lambda *_: falsk_serie(), linjer.append)
+
+        assert slutt.value.code == 1
+        assert any("DNB" in l and "avvist i testen" in l for l in linjer)
+        tilkobling, lager = lager_i(base)
+        try:
+            assert lager.sist_hentet("DNB") is None
+            assert all(
+                lager.sist_hentet(a.symbol) == OEYEBLIKK_22_09
+                for a in AKSJEUNIVERS if a.symbol != "DNB"
+            )
+        finally:
+            tilkobling.close()
+
+    def test_fire_dagers_opphold_fylles_med_15_kall(self, stier):
+        """K9: basen mangler fire boersdager. Etter neste henting er de der,
+        og hentingen brukte 15 kall. Ville feilet hvis kjoer bare skrev
+        symboler som ikke finnes i basen (M12)."""
+        raa, base = stier
+        # Mandag 21.09, saa fredag 25.09, begge kl. 22 i Oslo: 22.-25. mangler.
+        fp.kjoer(raa, base, _utc(2026, 9, 21, 20), NOEKKEL,
+                 lambda *_: serie_til(date(2026, 9, 21)), lambda _: None)
+        kall = []
+
+        def hent(ticker, *_):
+            kall.append(ticker)
+            return serie_til(date(2026, 9, 25), dager=64)
+
+        fp.kjoer(raa, base, _utc(2026, 9, 25, 20), NOEKKEL, hent, lambda _: None)
+
+        assert len(kall) == 15
+        tilkobling, lager = lager_i(base)
+        try:
+            for aksje in AKSJEUNIVERS:
+                datoer = {r.dato for r in lager.serie(aksje.symbol)}
+                assert {date(2026, 9, d) for d in (22, 23, 24, 25)} <= datoer
+                assert lager.sist_hentet(aksje.symbol) == _utc(2026, 9, 25, 20)
+        finally:
+            tilkobling.close()
+
+    def test_hentingen_og_innlesingen_gaar_samme_vei(self, stier, monkeypatch):
+        """K5: begge skriver gjennom skriv_til_basen, med samme hentet."""
+        raa, base = stier
+        kall = []
+        ekte = fp.skriv_til_basen
+
+        def spion(base_sti, serier, hentet, fil, skriv):
+            kall.append((set(serier), hentet))
+            return ekte(base_sti, serier, hentet, fil, skriv)
+
+        monkeypatch.setattr(fp, "skriv_til_basen", spion)
+        fil = fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, lambda *_: falsk_serie(), lambda _: None)
+        fp.les_inn(fil, base, lambda _: None)
+
+        assert len(kall) == 2
+        assert kall[0] == kall[1] == ({a.symbol for a in AKSJEUNIVERS}, OEYEBLIKK_22_09)
+
+
+@pytest.fixture
+def uten_noekkel_og_nett(monkeypatch):
+    """Innlesingen leser ingen noekkel og gjoer ingen kall. Alt som ville
+    gjort det, feiler testen."""
+    monkeypatch.delenv("EODHD_API_KEY", raising=False)
+    monkeypatch.setattr(fp, "hent_api_nokkel", lambda: pytest.fail("noekkelen ble lest"))
+    monkeypatch.setattr(fp, "load_dotenv", lambda *a, **k: pytest.fail(".env ble lest"))
+    monkeypatch.setattr(fp, "hent_ett_symbol", lambda *a: pytest.fail("et kall ble gjort"))
+    monkeypatch.setattr(fp.requests, "get", lambda *a, **k: pytest.fail("et kall ble gjort"))
+
+
+def lag_bilde(katalog, hentet: datetime, siste: date = date(2026, 9, 22)):
+    """Et oeyeblikksbilde med 15 serier, i formatet kjoer skriver."""
+    katalog.mkdir(parents=True, exist_ok=True)
+    resultat = fp.Resultat(
+        serier={a.symbol: serie_til(siste) for a in AKSJEUNIVERS}, kall_brukt=15
+    )
+    fil = katalog / fp.filnavn(norsk_dato(hentet))
+    bilde = fp.lag_oyeblikksbilde(resultat, "a", siste.isoformat(), hentet.isoformat())
+    fil.write_text(json.dumps(bilde), encoding="utf-8")
+    return fil
+
+
+class TestInnlesing:
+    """Story 2.1b, K5 og K6: et oeyeblikksbilde som finnes, inn i basen uten kall."""
+
+    def test_innlesing_gir_15_serier_uten_vurdering_noekkel_eller_kall(
+        self, stier, uten_noekkel_og_nett
+    ):
+        """Ville feilet hvis innlesingen leste noekkelen (M8)."""
+        raa, base = stier
+        fil = lag_bilde(raa, OEYEBLIKK_22_09)
+        linjer = []
+
+        fp.les_inn(fil, base, linjer.append)
+
+        tilkobling, lager = lager_i(base)
+        try:
+            for aksje in AKSJEUNIVERS:
+                assert lager.sist_hentet(aksje.symbol) == OEYEBLIKK_22_09
+                assert len(lager.serie(aksje.symbol)) == 60
+        finally:
+            tilkobling.close()
+        assert antall_rader(base, "vurdering") == 0
+        # Regel 16: ingen kurser i utskriften, bare antall, symboler og datoer.
+        assert not [l for l in linjer if "100.0" in l or "159.0" in l]
+        assert any("15 serier" in l for l in linjer)
+
+    def test_main_med_les_inn_skriver_til_base_sti(self, stier, uten_noekkel_og_nett):
+        """Flagget gaar til les_inn, og BASE_STI slaas opp naar main kalles."""
+        raa, _ = stier
+        fil = lag_bilde(raa, OEYEBLIKK_22_09)
+
+        fp.main(["--les-inn", str(fil)])
+
+        tilkobling, lager = lager_i(lagring_sqlite.BASE_STI)
+        try:
+            assert lager.sist_hentet("EQNR") == OEYEBLIKK_22_09
+        finally:
+            tilkobling.close()
+
+    def test_innlesing_to_ganger_gir_samme_innhold(self, stier):
+        raa, base = stier
+        fil = lag_bilde(raa, OEYEBLIKK_22_09)
+
+        fp.les_inn(fil, base, lambda _: None)
+        foer = alle_kursrader(base)
+        fp.les_inn(fil, base, lambda _: None)
+
+        assert alle_kursrader(base) == foer
+        assert len(foer) == 15 * 60
+
+    def test_eldre_oeyeblikksbilde_hopper_over_symbolet_og_gir_kode_1(self, stier):
+        """K6, svar A: DNB i basen er nyere enn fila. DNB hoppes over med en
+        melding som nevner fila, symbolet og begge tidene, de andre skrives,
+        og kjoeringen ender med kode 1. Ville feilet uten sammenligningen (M9)."""
+        raa, base = stier
+        fil = lag_bilde(raa, OEYEBLIKK_22_09)
+        fp.les_inn(fil, base, lambda _: None)
+        nyere = OEYEBLIKK_22_09 + timedelta(days=1)
+        tilkobling, lager = lager_i(base)
+        lager.erstatt_serie("DNB", fp.serie_fra_eodhd(serie_til(date(2026, 9, 23))), nyere)
+        tilkobling.close()
+        linjer = []
+
+        with pytest.raises(SystemExit) as slutt:
+            fp.les_inn(fil, base, linjer.append)
+
+        assert slutt.value.code == 1
+        melding = [l for l in linjer if "DNB" in l and "hoppet over" in l]
+        assert len(melding) == 1
+        assert fil.name in melding[0]
+        assert OEYEBLIKK_22_09.isoformat() in melding[0]
+        assert nyere.isoformat() in melding[0]
+        tilkobling, lager = lager_i(base)
+        try:
+            assert lager.sist_hentet("DNB") == nyere
+            assert lager.serie("DNB")[-1].dato == date(2026, 9, 23)
+            assert lager.sist_hentet("EQNR") == OEYEBLIKK_22_09
+        finally:
+            tilkobling.close()
+
+    def test_fil_som_ikke_kan_leses_gir_kode_1_og_ingen_base(self, stier):
+        raa, base = stier
+        raa.mkdir(parents=True)
+        fil = raa / "kurser-raa-2026-09-22.json"
+        fil.write_text("ikke json", encoding="utf-8")
+
+        with pytest.raises(SystemExit) as slutt:
+            fp.les_inn(fil, base, lambda _: None)
+
+        assert slutt.value.code == 1
+        assert not base.exists()
