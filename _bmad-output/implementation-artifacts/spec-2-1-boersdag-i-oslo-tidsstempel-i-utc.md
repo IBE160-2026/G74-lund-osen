@@ -2,10 +2,10 @@
 title: 'Story 2.1: Børsdag i Oslo, tidsstempel i UTC'
 type: 'bugfix'
 created: '2026-09-29'
-status: 'ready-for-dev'
+status: 'in-progress'
 route: 'dispatch'
 review_loop_iteration: 0
-baseline_commit: ''
+baseline_commit: '882326c11ae1f83f379d0dbab833a8256a3fc30b'
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/epic-2-context.md'
   - '{project-root}/CLAUDE.md'
@@ -76,13 +76,13 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `src/fetch_prices.py` -- øyeblikket, `naa()`, `kjoer`, `main`, ingen `date.today()`; docstringene sier at `hentet` er starten.
-- [ ] `tests/test_fetch_prices.py` -- de seks kallene; matrisen over som parametrisert test av `kjoer`; samme sett med `TZ=UTC` og `TZ=Pacific/Auckland` (hoppes over uten `tzset`); `naa()` gir sone med offset 0; G12.
-- [ ] `src/meldinger.py` -- `_minutt` via `fromisoformat`.
-- [ ] `tests/test_meldinger.py` -- `Z` i fem tidsstempler; de fire meldingsradene i matrisen.
-- [ ] `tests/test_tidssone.py` -- strengvakten over hele `src/` (svar A).
-- [ ] Spinen, AD-20 -- en linje «Bygget 2026-09-.., story 2.1» (dato fra klokka).
-- [ ] `kodegjennomgang-epic-1.md` -- merknad ved G12: raden sier «tas i 2.3», men epics.md la den til 2.1 27.09. Tatt i 2.1.
+- [x] `src/fetch_prices.py` -- øyeblikket, `naa()`, `kjoer`, `main`, ingen `date.today()`; docstringene sier at `hentet` er starten.
+- [x] `tests/test_fetch_prices.py` -- de seks kallene; matrisen over som parametrisert test av `kjoer`; samme sett med `TZ=UTC` og `TZ=Pacific/Auckland` (hoppes over uten `tzset`); `naa()` gir sone med offset 0; G12.
+- [x] `src/meldinger.py` -- `_minutt` via `fromisoformat`.
+- [x] `tests/test_meldinger.py` -- `Z` i fem tidsstempler; de fire meldingsradene i matrisen.
+- [x] `tests/test_tidssone.py` -- strengvakten over hele `src/` (svar A).
+- [x] Spinen, AD-20 -- en linje «Bygget 2026-09-.., story 2.1» (dato fra klokka).
+- [x] `kodegjennomgang-epic-1.md` -- merknad ved G12: raden sier «tas i 2.3», men epics.md la den til 2.1 27.09. Tatt i 2.1.
 
 **Acceptance Criteria (kontrollpunktene i epics.md, hvert med en mutant, én om gangen, satt tilbake fra kopi):**
 - K1 Filnavn og `hentet` fra samme øyeblikk: gitt et fast øyeblikk, så er `norsk_dato(fromisoformat(hentet))` datoen i filnavnet og `hentet` lik øyeblikket. *Mutant M1:* `hentet` leses fra klokka etter hentingen.
@@ -107,6 +107,19 @@ context:
 - CI på PR-en -- grønn, ingen TZ-test hoppet over; kjørings-ID og antall passed i rapporten.
 
 ## Implementation Notes
+
+- **Tester lokalt (Windows):** før 875 passed. Etter 890 passed, 14 skipped (`uv run pytest -q`). De 14 som hoppes over, er TZ-testene (`TestMaskinensSoneSpillerIngenRolle`, 7 × `UTC`/`Pacific/Auckland`), fordi `time.tzset` mangler. Nye: 7 i matrisen for `kjoer` (seks rader + øyeblikk uten sone), `naa`, G12, 4 i meldingene og 2 i strengvakten (vakten selv og en test av mønsteret). Anslaget var 903 i alt; det ble 904.
+- **Matrisen:** radene med to øyeblikk (02:30 to ganger, midnatt i vintertid) kjører hvert øyeblikk i sin egen katalog, så vakten mot en fil som finnes, ikke stopper det andre. `hentet` sammenlignes som tekst, fordi to `datetime` i ulike soner er like når øyeblikket er det samme; ellers ville M7 overlevd.
+- **Mutantene,** én om gangen, satt tilbake fra kopi, hele `tests/` hver gang:
+  - M1 (`hentet` fra klokka etter hentingen): 7 feilet.
+  - M2 (`dag = oeyeblikk.date()`): 6 feilet.
+  - M3 (`[:16]` tilbake): 3 feilet.
+  - M4 (`_minutt` godtar tid uten sone): 1 feilet.
+  - M5 (`date.today()` tilbake i `main`): 2 feilet (G12 og strengvakten).
+  - M6 (`oeyeblikk.astimezone().date()`): 2 feilet lokalt (strengvakten, og øyeblikket uten sone, som da ikke gir `ValueError`). Matrisen fanger den ikke på denne maskinen; det skal TZ-testene gjøre i CI.
+  - M7 (`hentet` i Oslo-tid): 7 feilet.
+- **grep:** `grep -rn "date.today(\|datetime.now()\|astimezone()" src/ --include=*.py` gir ingen treff.
+- **Ikke gjort her:** CI på PR-en (kjørings-ID, antall passed, ingen TZ-test hoppet over) gjenstår, og ingenting er committet.
 
 ## Spec Change Log
 
