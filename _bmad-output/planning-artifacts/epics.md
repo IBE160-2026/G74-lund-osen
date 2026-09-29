@@ -1203,9 +1203,13 @@ allerede har dagens data, så en kjøring nummer to ikke koster 15 kall til.
 - Er de eldre, hentes det
 - Er nyeste dato i svaret ikke forventet børsdag, vises siste kjente data med tidsstempel
 - Kontrollen regner børsdag i **norsk** kalenderdato
+- Startet før kl. 22:00, på en dag som ikke er børsdag, eller når dataene for siste børsdag finnes, bruker kommandoen **null** kall og sier hvorfor *(lagt til 2026-09-29)*
 - **Ville feilet hvis:** kontrollen lå i webserveren. Den kan ikke handle på utfallet, og da ville sjekken vært pynt
 
 **Forutsetning** *(punkt 23, avgjort 2026-09-28)*: kommandoen kjøres på børsdager mellom kl. 22:00 og midnatt. Planen avgjør om den advarer eller nekter før kl. 22:00, fordi en kjøring som kommer for tidlig, bruker dagens kall uten å få dagens rad.
+
+*Avgjort, lagt til 2026-09-29:* kommandoen nekter før kl. 22:00, med en uttrykkelig
+overstyring for kjøring for hånd. En planlagt jobb kan ikke svare på en advarsel.
 
 *Fra endringsforslaget 2026-09-28, et argument for planen og ikke en
 avgjørelse:* en kjøring som kommer for tidlig, skriver dagens øyeblikksbilde, og
@@ -1213,6 +1217,9 @@ vernet fra 2.0 i `kjoer()` stopper da kveldens kjøring. Dagen får en grunn i
 stedet for en vurdering, og kan ikke etterfylles. Det taler for at kommandoen
 nekter før kl. 22:00, med en uttrykkelig overstyring. Mellom 2.5 og 2.3 kjøres
 hentingen for hånd, bare på børsdager og bare mellom kl. 22:00 og midnatt.
+
+**Følge** *(lagt til 2026-09-29)*: når 2.3 er flettet, endres FR-401, og oppsettet i
+Oppgaveplanlegging beskrives i README (regel 19).
 
 **Én økt:** ja.
 
