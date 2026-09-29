@@ -1039,6 +1039,8 @@ enige og begge være feil.
 
 **Én økt:** ja. Retter de to kjente feilene fra `AD-20`.
 
+*Ferdig 2026-09-29:* flettet i `27ae8e3`, PR #13.
+
 ### Story 2.1b: Basen åpnes ett sted, og hentingen skriver kursene dit
 
 *Lagt til 2026-09-28, fra endringsforslaget (`sprint-change-proposal-2026-09-28.md`).*
