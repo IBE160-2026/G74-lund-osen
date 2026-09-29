@@ -2,7 +2,7 @@
 title: 'Story 2.1: Børsdag i Oslo, tidsstempel i UTC'
 type: 'bugfix'
 created: '2026-09-29'
-status: 'in-progress'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '882326c11ae1f83f379d0dbab833a8256a3fc30b'
@@ -121,6 +121,24 @@ context:
 - **grep:** `grep -rn "date.today(\|datetime.now()\|astimezone()" src/ --include=*.py` gir ingen treff.
 - **Ikke gjort her:** CI på PR-en (kjørings-ID, antall passed, ingen TZ-test hoppet over) gjenstår, og ingenting er committet.
 
+- **Etter gjennomgangen (29.09):** mellomcommitene `e4528cf`–`a3ab2fc` er pushet til grenen `2-1`, og PR #13 er åpnet, så «ingenting er committet» over gjelder ikke lenger. Rettet etter funnene: en rad i matrisen med øyeblikket gitt i Europe/Oslo (mutanten `hentet = oeyeblikk.isoformat()` ga 890 passed før, 1 failed etter), fixturen `maskinsone` sjekker `tm_gmtoff` etter `tzset`, docstringen til `dedupliser` nevner `ValueError`, og merknad ved B-VG2. Lokalt nå: 891 passed, 16 skipped, 907 i alt.
+
 ## Spec Change Log
 
 ## Review Triage Log
+| Funn | Dom | Bevis | Rute |
+|---|---|---|---|
+| BH1: omregningen av `hentet` til UTC er ikke prøvd, alle øyeblikk er i UTC fra før | medium | Prøvd: mutanten `hentet = oeyeblikk.isoformat()` ga 890 passed | patch: en rad i matrisen med øyeblikket i Europe/Oslo |
+| ECH5: uten tzdata i CI faller `TZ=Pacific/Auckland` stille tilbake til UTC | medium | TZ-testene ville da bevist mindre enn de sier, og CI-kjøringen er eneste bevis for M6 | patch: fixturen sjekker `tm_gmtoff` etter `tzset` |
+| BH6 og VG-annet-1: AD-20 sier «Bygget» før TZ-testene har kjørt | medium | 14 hoppet over lokalt; CI på PR-en er ikke kjørt | patch: linjen får kjørings-ID fra CI før flettingen |
+| BH7: rad B-VG2 (linje 119) sier fortsatt «tas når 2.3 utvider `kjoer`» | low | Lest: linje 119 uten merknad | patch: merknad. «De 14 som står igjen» er tellingen fra 27.09 og står |
+| BH8, ECH1, ECH2: `dedupliser` reiser nå `ValueError` for ett dårlig tidspunkt | low | Avgjort i den låste delen (ingen gjetning). Ingen kode i `src/` lager en `Melding` (VG, grep), og meldingsdelen er ute av v1 | patch: én setning i docstringen til `dedupliser`; resten avvist |
+| BH3, ECH3, VG-annet-2: strengvakten fanger ikke `datetime.today()`, `utcnow()`, `fromtimestamp`, `localtime` eller alias | low | De tre formene er gruppens valg (svar A, 29.09 kl. 11:17). `src/` bruker ingen av de andre (VG, grep) | avvist |
+| ECH4: et forbudt kall delt over to linjer slipper gjennom | low | Riktig, men lite sannsynlig, og rettingen mister linjenummeret i feilmeldingen | avvist |
+| BH4: vakten treffer også kommentarer og docstringer | false | Da feiler testen høylytt, og ingen kode slipper gjennom. Ingen docstring i `src/` har formene i dag (testen er grønn) | avvist |
+| BH2: vårskiftet 29.03 og årsskiftet er ikke i matrisen | low | Instruksjonen ba om skiftet til vintertid 25.10; de første ekte kjøringene er før vårskiftet | avvist |
+| BH5: notatene sier «ingenting er committet» | low | Riktig etter mellomcommitene; rettingen er å endre spesifikasjonen | avvist; ny linje under i notatene |
+| BH9: `DAG` og `OEYEBLIKK` i `TestSkriverIkkeOver` kan gli fra hverandre | low | Satt ved siden av hverandre med kommentar; lite sannsynlig | avvist |
+| BH10: anslaget 903 mot 904 | low | Forklart i notatene; nøyaktige tall i commit-meldingen | avvist |
+| ECH6: ingen rad med mikrosekunder | low | Formen med mikrosekunder er prøvd i `test_snapshotleser.py:300` | avvist |
+| VG: ingen hull | — | — | — |
