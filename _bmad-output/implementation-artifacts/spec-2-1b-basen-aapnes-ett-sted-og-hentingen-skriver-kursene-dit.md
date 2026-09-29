@@ -2,7 +2,7 @@
 title: 'Story 2.1b: Basen åpnes ett sted, og hentingen skriver kursene dit'
 type: 'feature'
 created: '2026-09-29'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'b613f698dd9fa4e5e4455309354e573a80037167'
