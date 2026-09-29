@@ -204,6 +204,9 @@ def dedupliser(meldinger: list[Melding]) -> list[Melding]:
     Kan ingen av dem avgjoeres som norske, beholdes den foerste. Da har vi
     ikke grunnlag for aa velge, og et vilkaarlig valg forkledd som en regel
     er verre enn en aapen foerstemann-regel.
+
+    Story 2.1 (AD-20): en melding der publisert mangler tidssone, gir
+    ValueError fra _minutt.
     """
     beholdt: dict[tuple[str, str, datetime], Melding] = {}
     rekkefolge: list[tuple[str, str, datetime]] = []
