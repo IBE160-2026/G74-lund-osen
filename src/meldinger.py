@@ -11,6 +11,7 @@ ganger.
 """
 
 from dataclasses import dataclass
+from datetime import datetime, timezone
 
 SLIPPER_GJENNOM = "slipper_gjennom"
 KI_AVGJOER = "ki_avgjoer"
@@ -107,14 +108,23 @@ def _normaliser(kategori: str) -> str:
     return " ".join(kategori.strip().upper().split())
 
 
-def _minutt(tidspunkt: str) -> str:
-    """Kutter sekunder og finere opploesning bort.
+def _minutt(tidspunkt: str) -> datetime:
+    """Publiseringsminuttet i UTC, med sekunder og finere opploesning kuttet.
 
     Dublettkjennetegnet er samme publiseringsminutt (FR-501). To oversettelser
     av samme melding legges ut samtidig, men ikke noedvendigvis i samme
     sekund.
+
+    Story 2.1 (AD-20): tidspunktet parses og regnes om til UTC, saa samme
+    oeyeblikk gir samme noekkel uansett sonen det er skrevet i, og samme tekst
+    i ulike soner gir ulike noekler. Foer kuttet funksjonen paa tegn 16. Et
+    tidspunkt uten sone gir ValueError: vi gjetter ikke paa UTC eller Oslo.
+    NewsWeb gir publishedTime med Z.
     """
-    return tidspunkt[:16]
+    tid = datetime.fromisoformat(tidspunkt)
+    if tid.tzinfo is None or tid.utcoffset() is None:
+        raise ValueError(f"tidspunktet maa ha sone (AD-20), fikk {tidspunkt!r}")
+    return tid.astimezone(timezone.utc).replace(second=0, microsecond=0)
 
 
 def _ord(tittel: str) -> set[str]:
@@ -195,8 +205,8 @@ def dedupliser(meldinger: list[Melding]) -> list[Melding]:
     ikke grunnlag for aa velge, og et vilkaarlig valg forkledd som en regel
     er verre enn en aapen foerstemann-regel.
     """
-    beholdt: dict[tuple[str, str, str], Melding] = {}
-    rekkefolge: list[tuple[str, str, str]] = []
+    beholdt: dict[tuple[str, str, datetime], Melding] = {}
+    rekkefolge: list[tuple[str, str, datetime]] = []
 
     for melding in meldinger:
         nokkel = (
