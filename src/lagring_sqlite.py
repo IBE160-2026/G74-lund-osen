@@ -4,11 +4,12 @@ FR-408, AD-4, AD-5 og AD-7.
 Skall: dette er en av filene som kjenner teknologi. Kjernen ser bare
 portene, Kurslager med Kursrad og Vurderingslager med Vurdering og Grunn.
 
-Adapteren tar en aapen tilkobling, ikke en filsti. Hvem som aapner basen og
-hvor fila ligger, avgjoeres i skallet (story 1.5, 2.2 og 3.1). Den kjoerer
-heller ikke migrasjoner selv - hvem som kaller migrer(), er story 3.1s
-avgjoerelse - men den nekter aa jobbe mot en base som ikke staar paa siste
-versjon i MIGRASJONSKATALOG (story 1.5b, c). Den sjekker bare
+Adapteren tar en aapen tilkobling, ikke en filsti. Basen aapnes ett sted,
+aapne_base (story 2.1b): den lager mappa, kobler til og kjoerer migrer(). Hvor
+fila ligger, staar i BASE_STI. Hentekommandoen bruker aapne_base, og
+webserveren skal gjoere det samme (2.2). Migrasjoner er ikke et eget steg.
+Adapteren kjoerer ikke migrasjoner selv, men den nekter aa jobbe mot en base
+som ikke staar paa siste versjon i MIGRASJONSKATALOG (story 1.5b, c). Den sjekker bare
 versjonsnummeret, og bare naar den lages. Filnavn, innhold og en
 skjema_versjon fra foer 1.5b kontrolleres av migrer(), som skal ha kjoert
 foer adapteren tas i bruk.
@@ -25,10 +26,36 @@ from pathlib import Path
 
 from boersdag import innevaerende_boersdag, norsk_dato
 from kursdata import AKSJEUNIVERS, Kursrad, kontroller_skriving
-from migrering import MigrasjonsFeil, siste_versjon, versjon
+from lagring_fil import DATA_KATALOG
+from migrering import MigrasjonsFeil, migrer, siste_versjon, versjon
 from vurderingsdata import Grunn, Vurdering
 
 MIGRASJONSKATALOG = Path(__file__).resolve().parent / "migrasjoner"
+
+# Story 2.1b: basen ligger i data/db/, oeyeblikksbildene i data/raa/ (se
+# lagring_fil.RAA_KATALOG). Ingen annen kode skriver stiene.
+BASE_STI = DATA_KATALOG / "db" / "ose.db"
+
+
+def aapne_base(sti: Path) -> sqlite3.Connection:
+    """Den ene aapningen av basen - story 2.1b.
+
+    Lager mappa, kobler til og kjoerer migrer() mot MIGRASJONSKATALOG, saa
+    basen alltid staar paa siste versjon naar kalleren faar den. Feiler
+    migreringen, lukkes tilkoblingen, og feilen gaar videre. Ingen annen kode
+    i src/ kobler til basen selv.
+
+    Kalleren eier tilkoblingen og lukker den.
+    """
+    sti = Path(sti)
+    sti.parent.mkdir(parents=True, exist_ok=True)
+    tilkobling = sqlite3.connect(sti)
+    try:
+        migrer(tilkobling, MIGRASJONSKATALOG)
+    except BaseException:
+        tilkobling.close()
+        raise
+    return tilkobling
 
 
 def _krev_siste_versjon(tilkobling: sqlite3.Connection) -> None:
@@ -170,8 +197,8 @@ class SqliteVurderingslager:
     Europe/Oslo (norsk_dato), og bare inneveerende boersdag godtas. En eldre
     rad kan leses, men aldri skrives om gjennom porten.
 
-    Det finnes ingen minneutgave. Testene og story 2.5 bruker
-    sqlite3.connect(":memory:").
+    Det finnes ingen minneutgave. Testene bruker en base i minnet, og
+    story 2.5 aapner basen med aapne_base.
     """
 
     def __init__(self, tilkobling: sqlite3.Connection, klokke: Callable[[], datetime]):

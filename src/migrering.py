@@ -15,9 +15,9 @@ ingenting skjedde, og neste kjoering proever samme migrasjon paa nytt mot en
 base som alt er delvis migrert. Loeperen deler derfor fila i setninger selv og
 styrer transaksjonen selv.
 
-Loeperen tar en tilkobling og en katalog, og gjoer resten. Hvem som kaller
-den - hentekommandoen, webserverens oppstart eller begge - avgjoeres naar
-Dockerfilen skrives (story 3.1), ikke her.
+Loeperen tar en tilkobling og en katalog, og gjoer resten. Den kalles fra
+ett sted, lagring_sqlite.aapne_base (story 2.1b), som hentekommandoen bruker
+og webserverens oppstart skal bruke (2.2). Migrasjoner er ikke et eget steg.
 
 Med vilje finnes ingen DROP TABLE-hjelper, ingen "rebuild table"-mekanikk og
 ingen unntaksvei for lagrene AD-7 verner. Trengs det, er det en beslutning som

@@ -50,7 +50,8 @@ den som committet.
 - `.claude/skills/` og `.agents/skills/` — BMADs ferdigheter, lagt inn av installatøren i to identiske kopier: én som Claude Code leser, én på den verktøynøytrale stien
 
 **Utenfor versjonskontroll, og derfor ikke i repoet:** API-nøkkel (`.env`), hentede
-rådata (`data/`), lokale testskript (`local-tests/`) og den private arbeidsmappa (`_privat/`).
+rådata og basen (`data/`: øyeblikksbildene i `data/raa/`, basen i `data/db/ose.db`),
+lokale testskript (`local-tests/`) og den private arbeidsmappa (`_privat/`).
 
 ## Kom i gang
 
@@ -63,7 +64,17 @@ uv run python src/fetch_prices.py        # henter kurser, bruker 15 API-kall (0 
 uv run python src/app.py                 # http://localhost:5000
 ```
 
-Applikasjonen leser bare fra `data/` og gjør aldri API-kall selv, så en
+Hentingen skriver først øyeblikksbildet i `data/raa/` og så kursene til basen i
+`data/db/ose.db`, med samme tidspunkt. Mappene og basen lages ved første
+henting. Feiler basen, står fila, og den kan leses inn senere uten API-kall:
+
+```
+uv run python src/fetch_prices.py --les-inn data/raa/kurser-raa-ÅÅÅÅ-MM-DD.json
+```
+
+Innlesingen skriver bare kursene, aldri en vurdering, og leser ingen nøkkel.
+
+Applikasjonen leser bare øyeblikksbildene i `data/raa/` og gjør aldri API-kall selv, så en
 nettleseroppdatering kan ikke bruke av kvoten. `fetch_prices.py` er det eneste
 stedet i prosjektet som bruker kvote: 15 kall av de 20 EODHDs gratisnivå gir i
 døgnet, altså én full henting per dag. Finnes dagens øyeblikksbilde fra før,
@@ -71,7 +82,7 @@ stopper den før første kall, så en kjøring nummer to samme dag bruker ingen 
 og skriver ikke over fila.
 
 Hopper du over hentesteget, starter applikasjonen likevel — med tom oversikt og
-beskjed om at `data/` er tom. Testene under krever verken nøkkel eller data.
+beskjed om at det ikke finnes kursdata. Testene under krever verken nøkkel eller data.
 
 ## Tester
 
@@ -79,7 +90,9 @@ beskjed om at `data/` er tom. Testene under krever verken nøkkel eller data.
 uv run pytest
 ```
 
-Testene bruker ingen API-kall og leser ikke `data/`. Testdataene er
+Testene bruker ingen API-kall og rører ikke `data/`: en fixture i
+`tests/conftest.py` peker `data/raa/` og `data/db/` mot en midlertidig mappe i
+hver test. Testdataene er
 kursserier og meldinger vi har skrevet selv, fordi testdata som hentes er
 testdata som endrer seg — da tester vi børsen i stedet for koden vår.
 

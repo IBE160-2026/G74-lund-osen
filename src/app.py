@@ -1,6 +1,6 @@
 """Markedsoversikten for OSE Signal.
 
-Leser kun fra data/. Denne filen gjoer aldri API-kall, saa en
+Leser kun fra data/raa/. Denne filen gjoer aldri API-kall, saa en
 nettleseroppdatering kan ikke bruke av kvoten. Nye kurser hentes ved
 aa kjoere fetch_prices.py.
 

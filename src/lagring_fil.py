@@ -1,6 +1,6 @@
 """Filadapteren for oeyeblikksbildene - story 1.5, AD-1, AD-3 og AD-19.
 
-Skall: alt som leser oeyeblikksbilder fra data/, ligger her. Foer 1.5 laa det
+Skall: alt som leser oeyeblikksbilder fra data/raa/, ligger her. Foer 1.5 laa det
 i portmodulen kursdata.py, som dermed gjorde I/O. Porten importerer ingen
 adapter, saa SnapshotLeser flyttet hit sammen med SnapshotKilde: den tar en
 SnapshotKilde, og ble den staaende i kursdata.py, ville avhengigheten pekt
@@ -24,6 +24,10 @@ from kursdata import Kursleser, Kursrad
 
 PROSJEKTROT = Path(__file__).resolve().parent.parent
 DATA_KATALOG = PROSJEKTROT / "data"
+# Story 2.1b: oeyeblikksbildene ligger i data/raa/, basen i data/db/ (se
+# lagring_sqlite.BASE_STI). Ingen annen kode skriver stiene. Testene peker dem
+# mot tmp_path med en autouse-fixture i tests/conftest.py.
+RAA_KATALOG = DATA_KATALOG / "raa"
 
 
 @dataclass(frozen=True)
@@ -115,8 +119,11 @@ KURSPREFIKS = "kurser"
 _SNAPSHOT_MONSTER = re.compile(r"-raa-(\d{4}-\d{2}-\d{2})\.json$")
 
 
-def nyeste_snapshot(katalog: Path = DATA_KATALOG) -> Path | None:
+def nyeste_snapshot(katalog: Path | None = None) -> Path | None:
     """Oeyeblikksbildet med nyeste dato i navnet, eller None hvis ingen finnes.
+
+    Uten argument leses RAA_KATALOG slik den er naar funksjonen kalles, ikke
+    naar modulen lastes (story 2.1b), saa fixturen i conftest.py flytter den.
 
     Datoen leses ut av filnavnet, ikke av filtidsstempelet. Et oeyeblikksbilde
     som kopieres eller sjekkes ut paa nytt, faar ny mtime, men datoen i navnet
@@ -135,6 +142,8 @@ def nyeste_snapshot(katalog: Path = DATA_KATALOG) -> Path | None:
     foerste, slik at svaret er det samme hver gang og ikke avhenger av hvilken
     rekkefoelge katalogen leses i.
     """
+    if katalog is None:
+        katalog = RAA_KATALOG
     if not katalog.is_dir():
         return None
 
@@ -157,8 +166,9 @@ def nyeste_leser(katalog: Path | None = None) -> Kursleser | None:
     """Kursleser for det nyeste oeyeblikksbildet i katalogen, eller None.
 
     None betyr at katalogen mangler eller ikke har noe oeyeblikksbilde. Uten
-    argument leses DATA_KATALOG naar funksjonen kalles, ikke naar den
-    defineres, saa en test kan peke den mot en annen katalog.
+    argument leses RAA_KATALOG naar funksjonen kalles, ikke naar den
+    defineres, saa en test kan peke den mot en annen katalog. Det finnes med
+    vilje ingen reserve som ogsaa ser i data/ (story 2.1b).
     """
-    fil = nyeste_snapshot(DATA_KATALOG if katalog is None else katalog)
+    fil = nyeste_snapshot(RAA_KATALOG if katalog is None else katalog)
     return SnapshotLeser(SnapshotKilde.fra_fil(fil)) if fil else None

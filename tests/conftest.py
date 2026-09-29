@@ -1,6 +1,7 @@
 """Felles oppsett for alle tester.
 
-Sperrer utgaaende nettverk under hele testkjoeringen.
+Sperrer utgaaende nettverk under hele testkjoeringen, og peker stiene til
+data/raa/ og data/db/ mot tmp_path (story 2.1b, nederst).
 
 Grunnen er konkret, ikke prinsipiell: EODHD-kvoten er 20 kall i doegnet. En
 test som ved et uhell kaller et ekte endepunkt, kan spise en dags maaling -
@@ -90,3 +91,25 @@ def ingen_nettverk(monkeypatch):
     monkeypatch.setattr(
         socket.socket, "connect_ex", _sperret("connect_ex", _ekte_connect_ex)
     )
+
+
+@pytest.fixture(autouse=True)
+def stiene_i_tmp_path(monkeypatch, tmp_path):
+    """Autouse, story 2.1b: ingen test roerer data/.
+
+    RAA_KATALOG pekes mot tmp_path/raa og BASE_STI mot tmp_path/db/ose.db.
+    Koden slaar dem opp naar den kalles (nyeste_snapshot, nyeste_leser og
+    fetch_prices.main), saa dette flytter ogsaa standardstiene. Mappene lages
+    ikke her, saa tmp_path er tom naar testen starter, og en test kan se at
+    koden lager dem.
+
+    DATA_KATALOG pekes i tillegg mot tmp_path/data. Ingen kode skal bruke
+    den til aa lese eller skrive, men gjoer en feil det likevel, havner det
+    i tmp_path og ikke i data/.
+    """
+    import lagring_fil
+    import lagring_sqlite
+
+    monkeypatch.setattr(lagring_fil, "DATA_KATALOG", tmp_path / "data")
+    monkeypatch.setattr(lagring_fil, "RAA_KATALOG", tmp_path / "raa")
+    monkeypatch.setattr(lagring_sqlite, "BASE_STI", tmp_path / "db" / "ose.db")

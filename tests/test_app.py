@@ -284,7 +284,7 @@ def test_rutene_gjoer_ingen_nettverkskall(klient, monkeypatch, tmp_path):
 
     Het foer test_ruta_gjoer_ingen_nettverkskall. Den monterte hent_leser, saa
     lesingen ble aldri kjoert, og bare / ble proevd. Her monteres ingenting:
-    DATA_KATALOG pekes mot tmp_path med en fil, og begge rutene leser den
+    RAA_KATALOG pekes mot tmp_path med en fil, og begge rutene leser den
     gjennom den ekte hent_leser. requests.get byttes ut foer kallene, og
     sperren i conftest.py staar i tillegg.
     """
@@ -300,7 +300,7 @@ def test_rutene_gjoer_ingen_nettverkskall(klient, monkeypatch, tmp_path):
         ),
         encoding="utf-8",
     )
-    monkeypatch.setattr(lagring_fil, "DATA_KATALOG", tmp_path)
+    monkeypatch.setattr(lagring_fil, "RAA_KATALOG", tmp_path)
 
     oversikt = klient.get("/")
     assert oversikt.status_code == 200
@@ -416,7 +416,7 @@ class TestAksjedetalj:
 class TestHentLeser:
     """hent_leser uten montering: Kursleseren kommer fra filadapteren (1.5).
 
-    DATA_KATALOG i lagring_fil pekes mot tmp_path, saa data/ ikke roeres.
+    RAA_KATALOG i lagring_fil pekes mot tmp_path, saa data/ ikke roeres.
     """
 
     def test_gir_kursleser_fra_en_katalog_med_en_fil(self, monkeypatch, tmp_path):
@@ -424,7 +424,7 @@ class TestHentLeser:
             json.dumps({"hentet": HENTET, "serier": {"EQNR": [eodhd(r) for r in serie([100.0])]}}),
             encoding="utf-8",
         )
-        monkeypatch.setattr(lagring_fil, "DATA_KATALOG", tmp_path)
+        monkeypatch.setattr(lagring_fil, "RAA_KATALOG", tmp_path)
 
         leser = app_modul.hent_leser()
 
@@ -432,6 +432,6 @@ class TestHentLeser:
         assert len(leser.serie("EQNR")) == 1
 
     def test_gir_none_fra_en_tom_katalog(self, monkeypatch, tmp_path):
-        monkeypatch.setattr(lagring_fil, "DATA_KATALOG", tmp_path)
+        monkeypatch.setattr(lagring_fil, "RAA_KATALOG", tmp_path)
 
         assert app_modul.hent_leser() is None
