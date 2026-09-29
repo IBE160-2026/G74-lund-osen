@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-29T11:23'
+updated: '2026-09-29T11:30'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -316,7 +316,7 @@ FR-408. At dagen mangler, skal kunne skilles i lageret: `FR-409`. *Rettet
 - **Rule:** hvilken dag en sluttkurs tilhører, avgjøres av **norsk kalenderdato** — det er Oslo Børs dataene kommer fra. Tidsstempler for *når* noe ble hentet, forblir **UTC med offset**, så de kan sammenliknes på tvers av sommertid. Filnavn og `hentet` utledes av **samme øyeblikk**.
 - **Forkastet:** alt i UTC. «Dagens sluttkurs» ville fått feil dag for alle hentinger mellom midnatt og 02:00, og FR-402 ville bommet i samme vindu. Det er ikke færre omregninger, bare en omregning flyttet dit den ikke synes.
 - **Forkastet:** å rette bare feilen og utsette regelen. Det gjør filnavn og tidsstempel konsistente uten å si hva de skal være konsistente med. To verdier kan være enige og begge være feil. Da er symptomet borte mens spørsmålet står åpent, og det kommer tilbake når FR-402 skal avgjøre hva «forventet børsdag» betyr — på et tidspunkt der ingen lenger husker at det var det samme spørsmålet.
-- **Bygget 2026-09-29, story 2.1:** `fetch_prices.main` leser klokka én gang, i UTC (`naa()`), og `kjoer` tar øyeblikket: dagen i filnavnet og i intervallet er `boersdag.norsk_dato`, og `hentet` er øyeblikket i UTC med offset. `hentet` er dermed starten på kjøringen, ikke tidspunktet da siste kall var ferdig. `meldinger._minutt` parser med `datetime.fromisoformat`, krever sone, regner om til UTC og kutter sekunder. En strengvakt i `tests/test_tidssone.py` avviser `date.today(`, `datetime.now()` og `astimezone()` uten argument i hele `src/`, og matrisen kjøres også med maskinen i `UTC` og `Pacific/Auckland` (hoppes over uten `time.tzset`, altså på Windows). Hvert kontrollpunkt er prøvd med en mutant (spesifikasjonen, Implementation Notes).
+- **Bygget 2026-09-29, story 2.1:** `fetch_prices.main` leser klokka én gang, i UTC (`naa()`), og `kjoer` tar øyeblikket: dagen i filnavnet og i intervallet er `boersdag.norsk_dato`, og `hentet` er øyeblikket i UTC med offset. `hentet` er dermed starten på kjøringen, ikke tidspunktet da siste kall var ferdig. `meldinger._minutt` parser med `datetime.fromisoformat`, krever sone, regner om til UTC og kutter sekunder. En strengvakt i `tests/test_tidssone.py` avviser `date.today(`, `datetime.now()` og `astimezone()` uten argument i hele `src/`, og matrisen kjøres også med maskinen i `UTC` og `Pacific/Auckland` (hoppes over uten `time.tzset`, altså på Windows). Hvert kontrollpunkt er prøvd med en mutant (spesifikasjonen, Implementation Notes). TZ-testene er kjørt i CI på PR #13 (kjøring 36549505889): 907 passed, ingen hoppet over.
 
 ### AD-21 — Basen kjenner universet; koblingene er triggere
 
