@@ -13,8 +13,9 @@ målingene bak de tre sjekkene (2.1c, lagt til 29.09), dagens vurdering skrives 
 samme kjøring (2.5), og webserveren leser basen i stedet for øyeblikksbildene
 (2.2). Fra 2.5 kan hentingen kjøres hver børsdag mellom kl. 22:00 og midnatt, og
 hver dag blir et svar eller en grunn i `vurdering`. Historikken vises i
-aksjedetaljen (2.7). Epic 1 er ferdig (1.9 i `cfe2977`), og 2.0 er flettet i
-`4b65a3c` (PR #6). Resten står som `backlog`.
+aksjedetaljen (2.7). Epic 1 er ferdig (1.9 i `cfe2977`). 2.0 er flettet i
+`4b65a3c` (PR #6), og 2.1 er ferdig og flettet i `27ae8e3` (PR #13); i
+sprint-status står 2.1 i `review`. Resten står som `backlog`, og 2.1b er neste.
 
 ## Stories
 
@@ -82,11 +83,15 @@ aksjedetaljen (2.7). Epic 1 er ferdig (1.9 i `cfe2977`), og 2.0 er flettet i
   (`fetch_prices.py`), og den injiseres. Ingen test kaller den.
 - **Tid (AD-20):** hvilken dag en sluttkurs tilhører, er norsk kalenderdato
   (Europe/Oslo); tidsstempler for når noe ble hentet, er UTC med offset.
-  Filnavn, `hentet` og datoen for vurderingen utledes av **samme øyeblikk**. To
-  kjente feil rettes i 2.1: `fetch_prices.main` blander lokal dato og UTC, og
-  `meldinger._minutt` kutter på tegn 16 i stedet for å gå via et tidsobjekt, så
-  to representasjoner av samme øyeblikk gir ulike dublettnøkler. Å gjøre
-  verdiene konsistente uten å si hvilken sone de er i, er forkastet.
+  Filnavn, `hentet` og datoen for vurderingen utledes av **samme øyeblikk**. Å
+  gjøre verdiene konsistente uten å si hvilken sone de er i, er forkastet.
+  *Bygget i 2.1:* `fetch_prices.main` leser klokka én gang, i UTC (`naa()`), og
+  `kjoer` tar øyeblikket. Dagen i filnavnet og intervallet er
+  `boersdag.norsk_dato`, og `hentet` er øyeblikket i UTC med offset, altså
+  starten på kjøringen. `meldinger._minutt` parser med `fromisoformat`, krever
+  sone og regner om til UTC. En strengvakt i `tests/test_tidssone.py` avviser
+  `date.today(`, `datetime.now()` og `astimezone()` uten argument i hele `src/`,
+  så ny kode i 2.1b–2.5 må ta øyeblikket inn, ikke lese klokka selv.
 - **Mappene:** øyeblikksbildene i `data/raa/`, basen i `data/db/ose.db`, faste
   stier under prosjektroten (ingen sti fra miljøet i v1). Testene peker stiene
   mot `tmp_path` med `monkeypatch`. `kurser-raa-*.json` flyttes for hånd fra
@@ -149,8 +154,10 @@ aksjedetaljen (2.7). Epic 1 er ferdig (1.9 i `cfe2977`), og 2.0 er flettet i
 
 ## Cross-Story Dependencies
 
-- **Rekkefølgen:** 2.1 → 2.1b → 2.1c → 2.5, så begynner de daglige kjøringene
-  til basen. Deretter 2.3, 2.2, 2.7, 2.4 og 2.6. 2.7 avhenger av 2.2 og 2.5.
+- **Rekkefølgen:** 2.1 (ferdig) → 2.1b → 2.1c → 2.5, så begynner de daglige
+  kjøringene til basen. Deretter 2.3, 2.2, 2.7, 2.4 og 2.6. 2.1b avhenger av
+  2.1, 2.1c av 2.1b, og 2.7 av 2.2 og 2.5. 2.5 regner datoen for vurderingen fra
+  det samme øyeblikket som 2.1 innførte i `kjoer`.
 - **Epic 1 er forutsetningen:** hentingen skriver gjennom `Kurslager` og
   `Vurderingslager`, bruker `kursrad_fra_eodhd` og `tilstand`, og `aksje`
   (1.9) er på plass før Epic 2 skriver til basen.
