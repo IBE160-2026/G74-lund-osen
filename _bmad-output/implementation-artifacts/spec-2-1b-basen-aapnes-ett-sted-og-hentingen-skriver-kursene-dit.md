@@ -2,10 +2,10 @@
 title: 'Story 2.1b: Basen åpnes ett sted, og hentingen skriver kursene dit'
 type: 'feature'
 created: '2026-09-29'
-status: 'ready-for-dev'
+status: 'in-progress'
 route: 'dispatch'
 review_loop_iteration: 0
-baseline_commit: ''
+baseline_commit: 'b613f698dd9fa4e5e4455309354e573a80037167'
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/epic-2-context.md'
   - '{project-root}/_bmad-output/implementation-artifacts/spec-2-1-boersdag-i-oslo-tidsstempel-i-utc.md'
@@ -88,13 +88,13 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `src/lagring_fil.py`, `src/lagring_sqlite.py` -- konstantene og `aapne_base`.
-- [ ] `src/kursdata.py`, `src/lagring_sqlite.py` -- symbolet i `kontroller_skriving` (G10).
-- [ ] `src/fetch_prices.py` -- basen i `kjoer`, `les_inn`, `--les-inn`, eldre-regelen (svar A).
-- [ ] `tests/conftest.py` -- autouse-fixturen for stiene.
-- [ ] `tests/test_fetch_prices.py`, `tests/test_lagring_sqlite.py`, `tests/test_migrering.py`, `tests/test_kurslager.py`, `tests/test_app.py`, `tests/test_aksje.py` -- matrisen, overlapptesten og endringene over.
-- [ ] `tests/test_konsumentene.py` -- vakt: `sqlite3.connect` bare i `lagring_sqlite.aapne_base`.
-- [ ] `README.md` (linje 53, 66, 74 og 82 nevner `data/`), spinen (AD-16 «Bygget», mappetreet uten `[flyttes hit i 2.1b]`, og en merknad ved AD-21 linje 327, som sier at porten avgjøres i 2.5, mens epics.md flyttet den til 2.1b 28.09), `deferred-work.md`, `kodegjennomgang-epic-1.md` (merknad ved G10).
+- [x] `src/lagring_fil.py`, `src/lagring_sqlite.py` -- konstantene og `aapne_base`.
+- [x] `src/kursdata.py`, `src/lagring_sqlite.py` -- symbolet i `kontroller_skriving` (G10).
+- [x] `src/fetch_prices.py` -- basen i `kjoer`, `les_inn`, `--les-inn`, eldre-regelen (svar A).
+- [x] `tests/conftest.py` -- autouse-fixturen for stiene.
+- [x] `tests/test_fetch_prices.py`, `tests/test_lagring_sqlite.py`, `tests/test_migrering.py`, `tests/test_kurslager.py`, `tests/test_app.py`, `tests/test_aksje.py` -- matrisen, overlapptesten og endringene over.
+- [x] `tests/test_konsumentene.py` -- vakt: `sqlite3.connect` bare i `lagring_sqlite.aapne_base`.
+- [x] `README.md` (linje 53, 66, 74 og 82 nevner `data/`), spinen (AD-16 «Bygget», mappetreet uten `[flyttes hit i 2.1b]`, og en merknad ved AD-21 linje 327, som sier at porten avgjøres i 2.5, mens epics.md flyttet den til 2.1b 28.09), `deferred-work.md`, `kodegjennomgang-epic-1.md` (merknad ved G10).
 
 **Acceptance Criteria (kontrollpunktene i epics.md, hvert med en mutant, én om gangen, satt tilbake fra kopi):**
 - K1 Stiene: fila i `raa/`, basen i `db/ose.db`. *M1:* `kjoer` skriver fila i `DATA_KATALOG`.
@@ -123,6 +123,27 @@ context:
 - `grep -rn "sqlite3.connect" src/` -- bare i `aapne_base`.
 
 ## Implementation Notes
+
+- **Tester lokalt (Windows):** før 891 passed, 16 skipped (907). Etter 923 passed, 16 skipped (939), `uv run pytest -q`. De 16 som hoppes over, er TZ-testene fra 2.1. Anslaget var om lag 932; det ble 939. CI er ikke kjørt.
+- **`kjoer(data_katalog, base_sti, oeyeblikk, api_nokkel, hent, skriv)`:** `base_sti` er andre posisjonsargument, påkrevd. Veien til basen er én funksjon, `skriv_til_basen(base_sti, serier, hentet, fil, skriv) -> bool`, som både `kjoer` og `les_inn` kaller. Den åpner basen med `aapne_base`, sammenligner `hentet` med `sist_hentet` per symbol (svar A), fanger `ValueError` per symbol og `sqlite3.Error`, `OSError`, `MigrasjonsFeil` og `RuntimeError` som «basen feilet».
+- **Valg som ikke står i den låste delen:** (1) et symbol basen avviser (`ValueError`), gir også kode 1, som eldre-regelen, fordi kjøringen da ikke skrev alt. (2) `les_inn` går gjennom alle symbolene i fila, ikke bare universet; et ukjent symbol stoppes av porten (G10), nevnes, og gir kode 1. En serie i fila som ikke kan leses, nevnes og hoppes over uten kode 1. (3) Fixturen i `conftest.py` peker i tillegg `DATA_KATALOG` mot `tmp_path/data`, så en feil som bruker den (M1, M13), havner i `tmp_path` og ikke i `data/`. (4) Docstringen til `SqliteVurderingslager` nevnte `sqlite3.connect(":memory:")`; den er omskrevet, så `grep sqlite3.connect src/` bare gir `aapne_base`.
+- **Mutantene,** én om gangen, satt tilbake fra kopi (sha256 sjekket), hele `tests/` hver gang, og `data/` uendret etterpå (liste, størrelse og mtime):
+  - M1 (`main` gir `DATA_KATALOG`): 1 feilet (G12).
+  - M2 (uten `mkdir`): 14 feilet.
+  - M3 (uten `migrer`): 52 feilet.
+  - M4 (`fetch_prices` kaller `sqlite3.connect` selv, og migrerer selv): 1 feilet (vakten).
+  - M5 (`hentet` fra klokka): 6 feilet.
+  - M6 (symbolet som feilet, skrives likevel): 2 feilet.
+  - M7 (basen før fila): 1 feilet.
+  - M8 (innlesingen leser nøkkelen): 2 feilet.
+  - M9 (sammenligningen fjernet): 1 feilet.
+  - M10 (symbolsjekken fjernet): 9 feilet.
+  - M11 (`BEGIN IMMEDIATE` → `BEGIN`): 1 feilet (overlapptesten).
+  - M12 (bare symboler som ikke finnes i basen): 3 feilet.
+  - M13 (`nyeste_leser` leser `DATA_KATALOG`): 4 feilet.
+- **Overlapptesten** kjørt 50 ganger lokalt, hver i sin egen `pytest`-prosess: 50 besto.
+- **Kontrollregningen** (skript i scratchpad, ikke `data/db/ose.db`): `les_inn` på `kurser-raa-2026-09-24.json` i en midlertidig base ga 15 serier, 250 rader per symbol, første dato 2025-09-25 og siste 2026-09-24 for alle, 0 vurderingsrader og én felles `sist_hentet`. `data/db/` ble ikke laget.
+- **Ikke gjort her:** flyttingen av de tre `kurser-raa-*.json` til `data/raa/` (etter flettingen, svar 2), CI på PR-en, commitene og dagsfila (regel 18). Til flyttingen er gjort, finner siden ingen kursdata, fordi leseren bare ser i `data/raa/`.
 
 ## Spec Change Log
 
