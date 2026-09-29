@@ -492,10 +492,12 @@ må vise hvordan KI ble brukt, og hvordan studentene har kvalitetssikret koden»
 
 # Stories
 
-47 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
+55 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
 den, hva kontrollen faktisk ser etter, og om den kan gjøres ferdig i én økt.
 *Rettet 2026-09-26:* her sto 42. Tallet er telt fra overskriftene «### Story».
 *Rettet 2026-09-27:* her sto 46. Story 9.0 kom til 27.09.
+*Rettet 2026-09-29:* her sto 47. Siden 27.09 har 1.8, 1.9, 2.1b, 2.1c, 2.7, 8.0,
+9.5 og 10.5 kommet til. 10.1–10.4 er 5B.1–5B.4 med nytt navn, ikke nye.
 
 **«Ville feilet hvis» er kontrollen.** Resten er beskrivelse. En story uten den
 linjen er ikke ferdig spesifisert.
@@ -1841,6 +1843,27 @@ Som **bruker**, vil jeg at resten av siden virker selv om kalenderen er nede, s�
 ---
 
 ## Epic 8: Tydelig for den som ikke har bygget den
+
+### Story 8.0: De rene feilene i de to skjermbildene
+
+*Lagt til 2026-09-29, fra gjennomgangen av skjermbildene 29.09 og regel 21.*
+
+Som **bruker**, vil jeg at tallene står på norsk, at jeg ser hvilke aksjer som skiller seg ut og hva jeg kan klikke på, og at siden ikke sier noe som ikke stemmer, så 8.1 tester skjermbildene og ikke feil vi kjenner fra før.
+
+**Oppfyller:** NFR-05, FR-705, navigasjonen i FR-101 · **Begrenses av:** FR-101–103, FR-706, NFR-06, regel 21
+
+**Kontroll — hva testen ser etter:**
+- Tallene følger regel 21 i begge skjermbildene: sluttkurs, endring og målingene. Én funksjon formaterer, og «-0,00» vises aldri
+- Endringen i oversikten har to desimaler, som i dag, så rekkefølgen i FR-102 kan leses av
+- En måling som blir lik grensen etter avrunding uten å være det, vises med så mange desimaler at forskjellen synes
+- En aksje som skiller seg ut, er merket med tekst og ikke bare farge, og tabellen har fortsatt nøyaktig fem kolonner
+- Selskapsnavnet ser ut som en lenke og har synlig fokus, og veien tilbake i aksjedetaljen er like tydelig
+- Fotnoten i aksjedetaljen og docstringene i `app.py` og `aksjedetalj.py` sier det som stemmer etter plan B
+- Tekst brukeren ser, har æ, ø og å (i dag står «for aa regne signal»)
+- Datoen over tabellen avhenger ikke av sorteringen
+- **Ville feilet hvis:** en rad med styrke 2 og en med styrke 1 så like ut for en som ikke ser farger, eller «-1,2 % mot 1,2 % standardavvik» sto ved en sjekk som ga -1
+
+**Avhenger av:** ingen. 2.1c bruker samme funksjon når forklaringen lages av `maaling` og `grense`. **Én økt:** ja.
 
 ### Story 8.1: Brukertest rett etter Epic 2
 
