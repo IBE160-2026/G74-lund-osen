@@ -351,6 +351,21 @@ class TestAvvisningEndrerIngenting:
 
         self._uendret(lager)
 
+    @pytest.mark.parametrize("symbol", ["EQNR.OL", "eqnr", "UKJENT", ""])
+    def test_symbol_utenfor_universet_avvises(self, lager, symbol):
+        """Story 2.1b (G10): porten sjekker symbolet, saa minnelageret og
+        basen avviser det samme, foer noe lagres. Foer godtok MinneKurslager
+        EQNR.OL, som basen avviste. Ville feilet uten symbolsjekken i
+        kontroller_skriving (M10)."""
+        self._foer(lager)
+
+        with pytest.raises(ValueError, match="ikke et symbol i AKSJEUNIVERS"):
+            lager.erstatt_serie(symbol, [rad("2026-09-21")], self.SENERE)
+
+        self._uendret(lager)
+        assert lager.serie(symbol) == []
+        assert lager.sist_hentet(symbol) is None
+
 
 class TestSistHentet:
     """sist_hentet settes av erstatt_serie i samme kall, per symbol, i UTC."""

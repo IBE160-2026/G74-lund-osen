@@ -75,7 +75,7 @@ class SqliteKurslager:
 
     def erstatt_serie(self, symbol: str, rader: list[Kursrad], hentet: datetime) -> None:
         rader = list(rader)
-        tid = kontroller_skriving(rader, hentet)
+        tid = kontroller_skriving(symbol, rader, hentet)
         if self._tilkobling.in_transaction:
             raise RuntimeError(
                 "Tilkoblingen har en aapen transaksjon. Adapteren styrer "

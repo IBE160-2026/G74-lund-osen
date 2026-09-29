@@ -312,12 +312,16 @@ def vurdering() -> Vurdering:
 class TestAdapterne:
     """Hva adapterne gjoer naar basen avviser. G11 staar for 2.5."""
 
-    def test_kurslager_gjoer_avvisningen_om_til_valueerror(self, ny):
+    def test_kurslager_avviser_foer_sql_en(self, ny):
+        """Story 2.1b (G10): porten sjekker symbolet, saa meldingen er
+        portens, ikke triggerens. Triggeren er fortsatt proevd med raa SQL
+        over, og staar som vakten i basen."""
         lager = SqliteKurslager(ny)
         lager.erstatt_serie("EQNR", [rad("2026-09-22")], HENTET)
 
-        with pytest.raises(ValueError, match="EQNR.OL.*ukjent aksje i kurs$"):
+        with pytest.raises(ValueError, match="ikke et symbol i AKSJEUNIVERS") as feil:
             lager.erstatt_serie("EQNR.OL", [rad()], HENTET)
+        assert "ukjent aksje" not in str(feil.value)
 
         assert not ny.in_transaction
         assert ny.execute("SELECT DISTINCT symbol FROM kurs").fetchall() == [("EQNR",)]
