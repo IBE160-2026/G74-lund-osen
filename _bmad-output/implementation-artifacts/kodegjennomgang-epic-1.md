@@ -2,7 +2,7 @@
 title: "Kodegjennomgang av Epic 1"
 status: done
 created: 2026-09-27
-updated: 2026-09-29T15:18
+updated: 2026-09-29T15:52
 ---
 
 # Kodegjennomgang av Epic 1
@@ -194,6 +194,9 @@ PR #10) rettet G1–G5 og G8, og story 1.9 (`cfe2977`, PR #11) løste G10 i base
 (AD-21). Begge ble gjennomgått i sin egen PR med tre lag: Blind Hunter, Edge
 Case Hunter og Verification Gap. Det som venter, står i en story: G9 i 4.0, G11
 i 2.5 og G12 i 2.1.
+*2026-09-29:* portdelen av G10 ble lukket i story 2.1b: `kontroller_skriving`
+avviser et symbol utenfor `AKSJEUNIVERS` i både `MinneKurslager` og
+`SqliteKurslager`, før noe lagres.
 
 Tellingen etter rettingene, talt fra tellingen etter beslutningen:
 
