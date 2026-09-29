@@ -103,3 +103,13 @@ et sitat som ikke fantes».
     Joakim førte den. Linjen betyr at begge har vært med på det som committes.
     Sier brukeren at noe er gjort alene, får de commitene ikke linjen. Commitene
     før 2026-09-25 har den ikke, og historikken skrives ikke om (regel 7).
+21. **Tall skrives norsk der de leses, og som tall der de regnes.** Det sidene
+    viser: desimalkomma, hardt mellomrom som tusenskille og foran %, og vanlig
+    bindestrek (-) som minus, så tallet kan limes inn i et regneark. Hvor mange
+    desimaler hver type tall har, bestemmes i én funksjon med tester, ikke i
+    hver mal. Norsk tekst i dokumentene bruker også desimalkomma. I kode,
+    basen, JSON og CSV: punktum og ingen tusenskille, og tall lagres som tall
+    med full presisjon. Avrunding skjer bare der tallet vises. Siteres en
+    kodeverdi med punktum i norsk tekst, står den i kodeformat. Tilfellet bak:
+    29.09 viste sidene punktum (`"%.2f"` i malene og forklaringene i
+    `signalberegning.py`), mens dokumentene hadde komma.
