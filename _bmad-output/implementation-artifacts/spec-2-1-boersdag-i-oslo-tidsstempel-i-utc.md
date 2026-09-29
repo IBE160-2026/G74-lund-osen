@@ -2,7 +2,7 @@
 title: 'Story 2.1: Børsdag i Oslo, tidsstempel i UTC'
 type: 'bugfix'
 created: '2026-09-29'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '882326c11ae1f83f379d0dbab833a8256a3fc30b'
