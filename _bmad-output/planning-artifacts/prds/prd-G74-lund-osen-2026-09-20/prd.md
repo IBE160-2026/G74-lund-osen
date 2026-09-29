@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-29T00:17
+updated: 2026-09-29T23:57
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -482,6 +482,14 @@ starter. Det var skrevet for en applikasjon som starter én gang. En container
 startes på nytt hver gang, så «ved oppstart» ville betydd 15 kall per
 `docker run` mot en dagskvote på 20 — to kjøringer ville brukt opp dagen.
 Arkitekturspinen AD-10 og AD-17.
+
+*Avgjort 2026-09-29, gjelder når story 2.3 er bygget.* Da endres kravet slik
+at hentekommandoen kan startes av en planlagt jobb på Marians PC:
+Oppgaveplanlegging i Windows, hverdager kl. 22:15. Tapte kjøringer tas ikke
+igjen, og utskriften går til en loggfil i `data/`. Grunnene: punkt 23 har lagt
+kjøringen til kl. 22:00–midnatt, 2.3 gjør kommandoen trygg å starte når som
+helst, og etter 2.5 er en dag uten henting en vurdering som mangler for alltid
+(AD-7). Til da kjøres hentingen for hånd, og kravteksten over står uendret.
 
 #### FR-402 — Kontroll mot forventet børsdag, ikke mot klokkeslett
 
