@@ -73,6 +73,8 @@ uv run python src/fetch_prices.py --les-inn data/raa/kurser-raa-ÅÅÅÅ-MM-DD.j
 ```
 
 Innlesingen skriver bare kursene, aldri en vurdering, og leser ingen nøkkel.
+Øyeblikksbilder fra før 2.1b (`data/kurser-raa-*.json`) flyttes til `data/raa/`;
+målingsfilene blir liggende i `data/`.
 
 Applikasjonen leser bare øyeblikksbildene i `data/raa/` og gjør aldri API-kall selv, så en
 nettleseroppdatering kan ikke bruke av kvoten. `fetch_prices.py` er det eneste
