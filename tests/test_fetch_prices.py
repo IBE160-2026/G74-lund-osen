@@ -7,7 +7,9 @@ byttet ut (story 2.0), saa ingen test naar nettet eller bruker kvote.
 
 import copy
 import json
-from datetime import date, timedelta
+import os
+import time
+from datetime import date, datetime, timedelta, timezone
 from urllib.parse import quote, quote_plus
 
 import pytest
@@ -15,6 +17,7 @@ import requests
 
 import fetch_prices as fp
 from eodhd_serier import AVVISTE, AVVISTE_IDER
+from boersdag import norsk_dato
 from kursdata import AKSJEUNIVERS
 from lagring_fil import SnapshotKilde, nyeste_leser, nyeste_snapshot
 
@@ -35,6 +38,9 @@ def falsk_serie(dager: int = 60):
 
 
 NOEKKEL = "FALSK-NOEKKEL-123456"
+
+# 22:00 i Oslo 22.09.2026. kjoer tar et oeyeblikk med sone (story 2.1).
+OEYEBLIKK_22_09 = datetime(2026, 9, 22, 20, 0, tzinfo=timezone.utc)
 
 
 def falsk_respons(status: int, ticker: str, noekkel: str, innhold=None) -> requests.Response:
@@ -135,6 +141,8 @@ class TestSkriverIkkeOver:
 
     # En annen dato enn i dag, saa en retting som glemmer i_dag, feiler.
     DAG = date(2026, 9, 22)
+    # Story 2.1: kjoer tar et oeyeblikk. 20:00 UTC er 22:00 i Oslo samme dag.
+    OEYEBLIKK = datetime(2026, 9, 22, 20, 0, tzinfo=timezone.utc)
 
     def test_tom_katalog_gir_ny_fil_som_kan_leses_og_er_uten_noekkel(self, tmp_path):
         katalog = tmp_path / "data"  # finnes ikke fra foer
@@ -145,7 +153,7 @@ class TestSkriverIkkeOver:
                 raise RuntimeError(f"feil med {noekkel}")
             return falsk_serie()
 
-        fil = fp.kjoer(katalog, self.DAG, NOEKKEL, hent, linjer.append)
+        fil = fp.kjoer(katalog, self.OEYEBLIKK, NOEKKEL, hent, linjer.append)
 
         assert fil == katalog / fp.filnavn(self.DAG)
         tekst = fil.read_text(encoding="utf-8")
@@ -166,7 +174,7 @@ class TestSkriverIkkeOver:
         def hent(*_):
             pytest.fail("ingen kall skal brukes naar dagens fil finnes")
 
-        assert fp.kjoer(tmp_path, self.DAG, NOEKKEL, hent, linjer.append) is None
+        assert fp.kjoer(tmp_path, self.OEYEBLIKK, NOEKKEL, hent, linjer.append) is None
         assert fil.read_text(encoding="utf-8") == '{"gammel": true}'
         assert any("finnes allerede" in l and "0 kall brukt" in l for l in linjer)
 
@@ -182,7 +190,7 @@ class TestSkriverIkkeOver:
             return falsk_serie()
 
         with pytest.raises(SystemExit) as slutt:
-            fp.kjoer(tmp_path, self.DAG, NOEKKEL, hent, linjer.append)
+            fp.kjoer(tmp_path, self.OEYEBLIKK, NOEKKEL, hent, linjer.append)
 
         assert slutt.value.code == 1
         assert fil.read_text(encoding="utf-8") == '{"annen kjoering": true}'
@@ -222,7 +230,7 @@ class TestSvarMedFeilForm:
         def hent(ticker, *_):
             return svar if ticker == "DNB.OL" else falsk_serie()
 
-        fil = fp.kjoer(tmp_path, date(2026, 9, 22), NOEKKEL, hent, lambda _: None)
+        fil = fp.kjoer(tmp_path, OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None)
         feil = json.loads(fil.read_text(encoding="utf-8"))["feil"]
         leser = nyeste_leser(tmp_path)
 
@@ -238,7 +246,7 @@ class TestSvarMedFeilForm:
         def hent(ticker, *_):
             return [] if ticker == "DNB.OL" else falsk_serie()
 
-        fil = fp.kjoer(tmp_path, date(2026, 9, 22), NOEKKEL, hent, lambda _: None)
+        fil = fp.kjoer(tmp_path, OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None)
         feil = json.loads(fil.read_text(encoding="utf-8"))["feil"]
         leser = nyeste_leser(tmp_path)
 
@@ -402,7 +410,6 @@ class TestOyeblikksbilde:
         tidssone. Derfor gaar testen gjennom kjoer, som setter tiden selv,
         og leser fila slik visningen gjoer.
         """
-        dag = date(2026, 9, 22)
         start = date(2026, 6, 1)
 
         def hent(*_):
@@ -416,7 +423,7 @@ class TestOyeblikksbilde:
                 for i in range(60)
             ]
 
-        fil = fp.kjoer(tmp_path, dag, NOEKKEL, hent, lambda _: None)
+        fil = fp.kjoer(tmp_path, OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None)
         assert fil is not None and fil.parent == tmp_path
 
         leser = nyeste_leser(tmp_path)
@@ -465,3 +472,143 @@ def test_ingen_test_her_roerer_nettet(monkeypatch):
         "noekkel", "a", "b", lambda *_: falsk_serie(), lambda _: None
     )
     assert resultat.kall_brukt == len(AKSJEUNIVERS)
+
+
+# Story 2.1 (AD-20): filnavn og hentet fra samme oeyeblikk. Dagen er norsk
+# kalenderdato, hentet er oeyeblikket i UTC med offset. Hver rad er en liste av
+# (oeyeblikk i UTC, dato i filnavnet, hentet), fordi to rader i matrisen i
+# spesifikasjonen har to oeyeblikk.
+def _utc(*deler) -> datetime:
+    return datetime(*deler, tzinfo=timezone.utc)
+
+
+TIDSMATRISE = {
+    "00:30 norsk sommertid": [
+        (_utc(2026, 9, 24, 22, 30), "2026-09-25", "2026-09-24T22:30:00+00:00"),
+    ],
+    "like foer midnatt": [
+        (_utc(2026, 9, 24, 21, 59, 59), "2026-09-24", "2026-09-24T21:59:59+00:00"),
+    ],
+    "like etter midnatt": [
+        (_utc(2026, 9, 24, 22, 0, 0), "2026-09-25", "2026-09-24T22:00:00+00:00"),
+    ],
+    "00:30 siste sommertidsdag": [
+        (_utc(2026, 10, 24, 22, 30), "2026-10-25", "2026-10-24T22:30:00+00:00"),
+    ],
+    "02:30 to ganger 25.10": [
+        (_utc(2026, 10, 25, 0, 30), "2026-10-25", "2026-10-25T00:30:00+00:00"),
+        (_utc(2026, 10, 25, 1, 30), "2026-10-25", "2026-10-25T01:30:00+00:00"),
+    ],
+    "midnatt i vintertid": [
+        (_utc(2026, 10, 25, 22, 59, 59), "2026-10-25", "2026-10-25T22:59:59+00:00"),
+        (_utc(2026, 10, 25, 23, 0, 0), "2026-10-26", "2026-10-25T23:00:00+00:00"),
+    ],
+}
+
+
+def _kjoer_matrisen(tmp_path, rad):
+    """Hvert oeyeblikk i sin egen katalog, saa vakten mot en fil som finnes,
+    ikke stopper det andre oeyeblikket i en rad med to."""
+    for nr, (oeyeblikk, dato, hentet) in enumerate(rad):
+        katalog = tmp_path / str(nr)
+        fil = fp.kjoer(katalog, oeyeblikk, NOEKKEL, lambda *_: falsk_serie(), lambda _: None)
+
+        assert fil == katalog / f"kurser-raa-{dato}.json"
+        bilde = json.loads(fil.read_text(encoding="utf-8"))
+        # K1: hentet er oeyeblikket, i UTC, som tekst. Teksten sammenlignes,
+        # fordi to datetime i ulike soner er like naar oeyeblikket er det samme.
+        assert bilde["hentet"] == hentet
+        assert datetime.fromisoformat(bilde["hentet"]) == oeyeblikk
+        assert norsk_dato(datetime.fromisoformat(bilde["hentet"])).isoformat() == dato
+        assert bilde["to"] == dato
+
+
+class TestBoersdagIOsloTidsstempelIUtc:
+    """Story 2.1, K1 og K2: filnavn, til-dato og hentet fra samme oeyeblikk.
+
+    Ville feilet hvis hentet ble lest fra klokka etter hentingen (M1), hvis
+    dagen var UTC-dagen (M2), eller hvis hentet sto i Oslo-tid (M7)."""
+
+    @pytest.mark.parametrize("rad", TIDSMATRISE.values(), ids=TIDSMATRISE.keys())
+    def test_filnavn_og_hentet_fra_samme_oeyeblikk(self, tmp_path, rad):
+        _kjoer_matrisen(tmp_path, rad)
+
+    def test_oeyeblikk_uten_sone_gir_valueerror_foer_vakt_og_kall(self, tmp_path):
+        def hent(*_):
+            pytest.fail("ingen kall skal brukes naar oeyeblikket mangler sone")
+
+        with pytest.raises(ValueError):
+            fp.kjoer(tmp_path, datetime(2026, 9, 25, 0, 30), NOEKKEL, hent, lambda _: None)
+
+        assert list(tmp_path.iterdir()) == []
+
+
+@pytest.fixture(params=["UTC", "Pacific/Auckland"])
+def maskinsone(request):
+    """Setter maskinens sone for testen og setter den tilbake etterpaa.
+
+    time.tzset finnes ikke paa Windows, saa der hoppes testene over. I CI
+    (Linux) kjoeres de. Ville feilet hvis kjoer leste maskinens sone, for
+    eksempel med oeyeblikk.astimezone().date() (M6)."""
+    if not hasattr(time, "tzset"):
+        pytest.skip("time.tzset finnes ikke her (Windows); TZ-testene kjoeres i CI")
+    foer = os.environ.get("TZ")
+    os.environ["TZ"] = request.param
+    time.tzset()
+    try:
+        yield request.param
+    finally:
+        if foer is None:
+            os.environ.pop("TZ", None)
+        else:
+            os.environ["TZ"] = foer
+        time.tzset()
+
+
+class TestMaskinensSoneSpillerIngenRolle:
+    """Story 2.1, K6: samme matrise med maskinen i UTC og i Pacific/Auckland."""
+
+    @pytest.mark.parametrize("rad", TIDSMATRISE.values(), ids=TIDSMATRISE.keys())
+    def test_filnavn_og_hentet_uavhengig_av_maskinens_sone(self, tmp_path, maskinsone, rad):
+        _kjoer_matrisen(tmp_path, rad)
+
+    def test_oeyeblikk_uten_sone_avvises_ogsaa_her(self, tmp_path, maskinsone):
+        with pytest.raises(ValueError):
+            fp.kjoer(
+                tmp_path, datetime(2026, 9, 25, 0, 30), NOEKKEL,
+                lambda *_: pytest.fail("ingen kall"), lambda _: None,
+            )
+        assert list(tmp_path.iterdir()) == []
+
+
+def test_naa_gir_utc_med_offset_null():
+    tid = fp.naa()
+
+    assert tid.tzinfo is not None
+    assert tid.utcoffset() == timedelta(0)
+
+
+def test_main_skriver_fila_for_norsk_dato_uten_noekkel(tmp_path, monkeypatch):
+    """G12 og K5: main hele veien, uten nett. Falsk noekkel i miljoeet,
+    load_dotenv byttet ut, falsk requests.get og klokka satt til 00:30 norsk
+    sommertid. Ville feilet hvis main ga kjoer date.today() (M5)."""
+    monkeypatch.setenv("EODHD_API_KEY", NOEKKEL)
+    monkeypatch.setattr(fp, "load_dotenv", lambda *a, **k: None)
+    monkeypatch.setattr(fp, "DATA_KATALOG", tmp_path)
+    monkeypatch.setattr(fp, "naa", lambda: _utc(2026, 9, 24, 22, 30))
+
+    def get(url, params, timeout):
+        ticker = url.rsplit("/", 1)[1]
+        return falsk_respons(200, ticker, params["api_token"], falsk_serie())
+
+    monkeypatch.setattr(fp.requests, "get", get)
+
+    fp.main()
+
+    fil = tmp_path / "kurser-raa-2026-09-25.json"
+    assert [f.name for f in tmp_path.iterdir()] == [fil.name]
+    tekst = fil.read_text(encoding="utf-8")
+    assert NOEKKEL not in tekst
+    bilde = json.loads(tekst)
+    assert len(bilde["serier"]) == len(AKSJEUNIVERS) == 15
+    assert bilde["hentet"] == "2026-09-24T22:30:00+00:00"
