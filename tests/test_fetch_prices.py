@@ -11,6 +11,7 @@ import os
 import time
 from datetime import date, datetime, timedelta, timezone
 from urllib.parse import quote, quote_plus
+from zoneinfo import ZoneInfo
 
 import pytest
 import requests
@@ -483,6 +484,15 @@ def _utc(*deler) -> datetime:
 
 
 TIDSMATRISE = {
+    # Oeyeblikket gitt i Oslo-tid: hentet maa likevel skrives i UTC. Ville
+    # feilet hvis kjoer skrev oeyeblikket uten aa regne det om til UTC.
+    "00:30 norsk sommertid, gitt i Oslo-tid": [
+        (
+            datetime(2026, 9, 25, 0, 30, tzinfo=ZoneInfo("Europe/Oslo")),
+            "2026-09-25",
+            "2026-09-24T22:30:00+00:00",
+        ),
+    ],
     "00:30 norsk sommertid": [
         (_utc(2026, 9, 24, 22, 30), "2026-09-25", "2026-09-24T22:30:00+00:00"),
     ],
@@ -556,6 +566,13 @@ def maskinsone(request):
     os.environ["TZ"] = request.param
     time.tzset()
     try:
+        # Uten tidssonedata faller TZ stille tilbake til UTC, og da beviser
+        # testene ingenting. Sjekk at sonen faktisk ble satt.
+        forskyvning = time.localtime(0).tm_gmtoff
+        if request.param == "UTC":
+            assert forskyvning == 0
+        else:
+            assert forskyvning != 0, f"TZ={request.param} ga UTC; mangler tidssonedata?"
         yield request.param
     finally:
         if foer is None:
