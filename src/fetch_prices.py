@@ -45,7 +45,13 @@ import lagring_sqlite
 from boersdag import norsk_dato
 from eodhd import UgyldigSerie, serie_fra_eodhd
 from kursdata import AKSJEUNIVERS, Kursrad
-from lagring_fil import KURSPREFIKS, PROSJEKTROT, SnapshotKilde, SnapshotLeser
+from lagring_fil import (
+    KURSPREFIKS,
+    PROSJEKTROT,
+    SnapshotKilde,
+    SnapshotLeser,
+    _hentet_fra_tekst,
+)
 from lagring_sqlite import SqliteKurslager, aapne_base
 from migrering import MigrasjonsFeil
 
@@ -245,8 +251,9 @@ def skriv_til_basen(
     Per symbol sammenlignes hentet med sist_hentet i basen (svar A, 29.09):
     er fila eldre, hoppes symbolet over med en melding som nevner fila,
     symbolet og begge tidene. Lik tid godtas, saa samme fil kan leses inn to
-    ganger. Et symbol basen avviser (ValueError), nevnes, og de andre
-    skrives.
+    ganger. Et symbol som avvises (ValueError, fra porten eller basen),
+    nevnes, og de andre skrives. Feiler basen etter at noen serier er
+    skrevet, sier meldingen hvor mange.
 
     Returnerer True hvis alt ble skrevet. False hvis et symbol ble hoppet
     over eller avvist, eller hvis basen ikke kunne aapnes eller skrives; da
@@ -255,7 +262,7 @@ def skriv_til_basen(
     try:
         tilkobling = aapne_base(base_sti)
     except BASEFEIL as feil:
-        _basen_feilet(feil, base_sti, fil, skriv)
+        _basen_feilet(feil, base_sti, fil, 0, skriv)
         return False
 
     alt_skrevet = True
@@ -276,12 +283,12 @@ def skriv_til_basen(
             try:
                 lager.erstatt_serie(symbol, rader, hentet)
             except ValueError as feil:
-                skriv(f"  {symbol}: avvist av basen og ikke skrevet: {feil}")
+                skriv(f"  {symbol}: avvist og ikke skrevet: {feil}")
                 alt_skrevet = False
                 continue
             skrevet += 1
     except BASEFEIL as feil:
-        _basen_feilet(feil, base_sti, fil, skriv)
+        _basen_feilet(feil, base_sti, fil, skrevet, skriv)
         return False
     finally:
         tilkobling.close()
@@ -290,9 +297,17 @@ def skriv_til_basen(
     return alt_skrevet
 
 
-def _basen_feilet(feil: BaseException, base_sti: Path, fil: Path, skriv) -> None:
+def _basen_feilet(
+    feil: BaseException, base_sti: Path, fil: Path, skrevet: int, skriv
+) -> None:
+    alt = (
+        f"{skrevet} serier var alt skrevet; --les-inn skriver dem paa nytt.\n"
+        if skrevet
+        else ""
+    )
     skriv(
         f"Basen {base_sti} kunne ikke skrives: {type(feil).__name__}: {feil}\n"
+        f"{alt}"
         f"Fila {fil} staar. Les den inn uten kall med:\n"
         f"  uv run python src/fetch_prices.py --les-inn {fil}"
     )
@@ -379,8 +394,10 @@ def les_inn(fil: Path, base_sti: Path, skriv: Callable[[str], None] = print) -> 
     kursserie, leser ingen noekkel og gjoer ingen kall. Skriver ingen kurser
     ut, bare antall serier, symbolene og datoene (regel 16).
 
-    Avslutter med kode 1 hvis fila ikke kan leses, eller hvis ikke alt ble
-    skrevet til basen.
+    Avslutter med kode 1 hvis fila ikke kan leses, hvis hentet i fila ikke
+    kan leses (da aapnes ikke basen), eller hvis ikke alt ble skrevet til
+    basen. En serie som ikke kan leses, nevnes, de andre skrives, og
+    kjoeringen ender med kode 1.
     """
     fil = Path(fil)
     try:
@@ -389,17 +406,25 @@ def les_inn(fil: Path, base_sti: Path, skriv: Callable[[str], None] = print) -> 
         skriv(f"{fil} kan ikke leses: {type(feil).__name__}. Ingenting er lest inn.")
         sys.exit(1)
 
+    # Samme regel som SnapshotLeser: uten en hentet som kan leses, er hele
+    # oeyeblikksbildet manglende, og da sies aarsaken foer noe annet.
+    hentet = _hentet_fra_tekst(kilde.hentet)
+    if hentet is None:
+        skriv(f"hentet i fila {fil.name} kan ikke leses. Ingenting er lest inn.")
+        sys.exit(1)
+
     leser = SnapshotLeser(kilde)
     symboler = list(kilde.serier) if isinstance(kilde.serier, dict) else []
     serier: dict[str, list[Kursrad]] = {}
+    alt_lest = True
     for symbol in symboler:
         rader = leser.serie(symbol)
         if rader:
             serier[symbol] = rader
         else:
             skriv(f"  {symbol}: serien i fila kan ikke leses, hoppet over")
-    hentet = next((leser.sist_hentet(symbol) for symbol in serier), None)
-    if hentet is None:
+            alt_lest = False
+    if not serier:
         skriv(f"{fil.name} har ingen serie som kan leses inn. Ingenting er lest inn.")
         sys.exit(1)
 
@@ -409,7 +434,7 @@ def les_inn(fil: Path, base_sti: Path, skriv: Callable[[str], None] = print) -> 
             f"  {symbol}: {len(rader)} dager, "
             f"{rader[0].dato.isoformat()} til {rader[-1].dato.isoformat()}"
         )
-    if not skriv_til_basen(base_sti, serier, hentet, fil, skriv):
+    if not skriv_til_basen(base_sti, serier, hentet, fil, skriv) or not alt_lest:
         sys.exit(1)
 
 

@@ -781,6 +781,57 @@ class TestHentingenSkriverBasen:
         assert any(f"--les-inn {fil}" in l for l in linjer)
         assert not [l for l in linjer if NOEKKEL in l]
 
+    def _basen_feilet(self, raa, base, linjer, slutt):
+        """Det K4 lover: kode 1, fila staar med 15 serier, og meldingen sier
+        hvordan den leses inn."""
+        assert slutt.value.code == 1
+        fil = raa / "kurser-raa-2026-09-22.json"
+        assert len(json.loads(fil.read_text(encoding="utf-8"))["serier"]) == 15
+        assert any(f"--les-inn {fil}" in l for l in linjer)
+        return fil
+
+    def test_basen_feiler_midt_i_skrivingen_fila_staar_og_kode_1(self, stier, monkeypatch):
+        """K4 inne i loekka: basen er laast for ett symbol etter at andre er
+        skrevet. Meldingen sier hvor mange som alt var skrevet."""
+        raa, base = stier
+
+        class Laast(SqliteKurslager):
+            def erstatt_serie(self, symbol, rader, hentet):
+                if symbol == "KOG":
+                    raise sqlite3.OperationalError("database is locked")
+                super().erstatt_serie(symbol, rader, hentet)
+
+        monkeypatch.setattr(fp, "SqliteKurslager", Laast)
+        linjer = []
+
+        with pytest.raises(SystemExit) as slutt:
+            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, lambda *_: falsk_serie(), linjer.append)
+
+        self._basen_feilet(raa, base, linjer, slutt)
+        # EQNR og DNB kommer foer KOG i universet.
+        assert any("database is locked" in l and "2 serier var alt skrevet" in l for l in linjer)
+
+    def test_basen_nyere_enn_koden_fila_staar_og_kode_1(self, stier):
+        """K4 med MigrasjonsFeil: basen er migrert med en migrasjon koden ikke
+        har, saa aapne_base avviser den."""
+        raa, base = stier
+        katalog = base.parent / "nyere"
+        katalog.mkdir(parents=True)
+        for migrasjon in lagring_sqlite.MIGRASJONSKATALOG.glob("*.sql"):
+            (katalog / migrasjon.name).write_bytes(migrasjon.read_bytes())
+        neste = lagring_sqlite.siste_versjon(lagring_sqlite.MIGRASJONSKATALOG) + 1
+        (katalog / f"{neste:04d}_ny.sql").write_text("CREATE TABLE ny (x INTEGER);", encoding="utf-8")
+        tilkobling = sqlite3.connect(base)
+        lagring_sqlite.migrer(tilkobling, katalog)
+        tilkobling.close()
+        linjer = []
+
+        with pytest.raises(SystemExit) as slutt:
+            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, lambda *_: falsk_serie(), linjer.append)
+
+        self._basen_feilet(raa, base, linjer, slutt)
+        assert any("MigrasjonsFeil" in l for l in linjer)
+
     def test_ett_symbol_avvist_av_basen_de_andre_skrives(self, stier, monkeypatch):
         raa, base = stier
 
@@ -897,7 +948,17 @@ class TestInnlesing:
             tilkobling.close()
         assert antall_rader(base, "vurdering") == 0
         # Regel 16: ingen kurser i utskriften, bare antall, symboler og datoer.
-        assert not [l for l in linjer if "100.0" in l or "159.0" in l]
+        # Hver close, adjusted_close og volume i fila, i tekstformen den ville
+        # blitt skrevet ut i.
+        bilde = json.loads(fil.read_text(encoding="utf-8"))
+        verdier = {
+            str(rad[felt])
+            for serie in bilde["serier"].values()
+            for rad in serie
+            for felt in ("close", "adjusted_close", "volume")
+        }
+        assert verdier
+        assert not [(l, v) for l in linjer for v in verdier if v in l]
         assert any("15 serier" in l for l in linjer)
 
     def test_main_med_les_inn_skriver_til_base_sti(self, stier, uten_noekkel_og_nett):
@@ -953,6 +1014,68 @@ class TestInnlesing:
             assert lager.sist_hentet("EQNR") == OEYEBLIKK_22_09
         finally:
             tilkobling.close()
+
+    @staticmethod
+    def _endret_bilde(raa, endring):
+        fil = lag_bilde(raa, OEYEBLIKK_22_09)
+        bilde = json.loads(fil.read_text(encoding="utf-8"))
+        endring(bilde)
+        fil.write_text(json.dumps(bilde), encoding="utf-8")
+        return fil
+
+    def _de_femten_skrevet(self, base, uten=()):
+        tilkobling, lager = lager_i(base)
+        try:
+            for aksje in AKSJEUNIVERS:
+                if aksje.symbol in uten:
+                    assert lager.sist_hentet(aksje.symbol) is None
+                else:
+                    assert lager.sist_hentet(aksje.symbol) == OEYEBLIKK_22_09
+        finally:
+            tilkobling.close()
+
+    def test_symbol_utenfor_universet_nevnes_og_gir_kode_1(self, stier):
+        raa, base = stier
+        fil = self._endret_bilde(
+            raa, lambda b: b["serier"].__setitem__("EQNR.OL", serie_til(date(2026, 9, 22)))
+        )
+        linjer = []
+
+        with pytest.raises(SystemExit) as slutt:
+            fp.les_inn(fil, base, linjer.append)
+
+        assert slutt.value.code == 1
+        assert any("EQNR.OL" in l and "ikke skrevet" in l for l in linjer)
+        self._de_femten_skrevet(base)
+
+    def test_serie_som_ikke_kan_leses_nevnes_og_gir_kode_1(self, stier):
+        raa, base = stier
+
+        def oedelegg(bilde):
+            bilde["serier"]["DNB"][3]["close"] = "ikke et tall"
+
+        fil = self._endret_bilde(raa, oedelegg)
+        linjer = []
+
+        with pytest.raises(SystemExit) as slutt:
+            fp.les_inn(fil, base, linjer.append)
+
+        assert slutt.value.code == 1
+        assert any("DNB" in l and "kan ikke leses" in l for l in linjer)
+        self._de_femten_skrevet(base, uten={"DNB"})
+
+    def test_hentet_null_gir_kode_1_og_ingen_base(self, stier):
+        raa, base = stier
+        fil = self._endret_bilde(raa, lambda b: b.__setitem__("hentet", None))
+        linjer = []
+
+        with pytest.raises(SystemExit) as slutt:
+            fp.les_inn(fil, base, linjer.append)
+
+        assert slutt.value.code == 1
+        assert any("hentet i fila" in l and "kan ikke leses" in l for l in linjer)
+        assert not [l for l in linjer if "serien i fila" in l]
+        assert not base.exists()
 
     def test_fil_som_ikke_kan_leses_gir_kode_1_og_ingen_base(self, stier):
         raa, base = stier
