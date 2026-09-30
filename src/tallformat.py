@@ -10,7 +10,7 @@ som rundes til null, vises uten fortegn, saa «-0,00» aldri staar paa siden.
 Tallet selv endres ikke: avrunding skjer bare her, der det vises.
 """
 
-HARDT_MELLOMROM = " "
+HARDT_MELLOMROM = "\u00a0"
 
 # Desimaler per slag. Maaling er et minimum: desimaler_mot_grense kan gi
 # flere. Endringen har to desimaler, som foer, saa rekkefoelgen i FR-102 kan

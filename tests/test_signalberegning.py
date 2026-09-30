@@ -292,7 +292,7 @@ class TestForklaringenPaaNorsk:
     """Story 8.0, regel 21: forklaringen bruker tallformat, og en maaling som
     ville blitt lik grensen etter avrunding, faar flere desimaler."""
 
-    NB = " "
+    NB = "\u00a0"
 
     def test_feilmeldingen_har_aa(self):
         """NFR-05: teksten vises i begge skjermbildene."""

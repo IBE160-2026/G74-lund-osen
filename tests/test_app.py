@@ -441,7 +441,7 @@ class TestHentLeser:
 
 # --- Story 8.0: de rene feilene i de to skjermbildene -------------------------
 
-NB = " "
+NB = "\u00a0"
 
 
 class _Tabell(HTMLParser):
