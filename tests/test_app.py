@@ -515,6 +515,7 @@ class TestStory80:
 
         tabell = _tabell(klient.get("/").data.decode("utf-8"))
 
+        assert len(tabell.rader) == 2
         for rad in tabell.rader:
             for celle in rad[1:4]:
                 assert "." not in celle, celle
@@ -563,8 +564,10 @@ class TestStory80:
         assert "outline" in _regel(stil, "a.tilbake:focus-visible")
 
     def test_datoen_er_den_eldste_ikke_den_foerste_raden(self, klient, monkeypatch):
-        """EQNR sorteres foerst (styrke 2), men DNB har eldre dato. Datoen og
-        «data hentet» skal ikke spri (FR-101)."""
+        """EQNR sorteres foerst (styrke 2), men DNB har eldre dato. Datoen
+        velges etter samme prinsipp som «data hentet» (FR-101): den eldste."""
+        # serie() starter 2026-09-01. EQNR har 61 rader og slutter 31.10,
+        # DNB har 60 og slutter 30.10.
         lager = MinneKurslager()
         tid = datetime(2026, 9, 24, 18, 5, tzinfo=timezone.utc)
         lager.erstatt_serie("EQNR", serie([100.0] * 60 + [104.0]), tid)
@@ -590,8 +593,39 @@ class TestStory80:
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
 
         assert f'<span class="verdi">1{NB}250,00</span>' in html
-        for sjekk in re.findall(r'<td class="regnestykke">([^<]*)</td>', html):
+        regnestykker = re.findall(r'<td class="regnestykke">([^<]*)</td>', html)
+        assert len(regnestykker) == 3
+        for sjekk in regnestykker:
             assert "." not in sjekk, sjekk
+
+        aksen = [t.strip() for t in re.findall(r'<text class="rutetekst"[^>]*>([^<]*)</text>', html)]
+        assert aksen, "grafen har ingen tall paa aksen"
+        for etikett in aksen:
+            assert not re.search(r"\d{4}", etikett), etikett
+            assert NB in etikett, etikett
+
+    def test_endring_som_vises_som_null_har_ingen_farge(self, klient, monkeypatch):
+        """+0,003 % vises som 0,00 %, og da skal cellen ikke vaere groenn."""
+        monter(monkeypatch, snapshot({"EQNR": serie([1000.0] * 60 + [1000.03])}))
+
+        html = klient.get("/").data.decode("utf-8")
+
+        assert f"0,00{NB}%" in html
+        assert 'class="tall opp"' not in html
+        assert 'class="tall ned"' not in html
+
+    def test_rad_uten_signal_er_ikke_merket(self, klient, monkeypatch):
+        """Den andre veien av FR-705: uten signal staar ikke merket."""
+        monter(monkeypatch, snapshot({
+            "EQNR": serie([100.0] * 60 + [104.0]),   # styrke 2
+            "DNB": serie([100.0, 101.0, 102.0]),     # for kort, uten signal
+        }))
+
+        tabell = _tabell(klient.get("/").data.decode("utf-8"))
+        styrke = {rad[0]: rad[3] for rad in tabell.rader}
+
+        assert "skiller seg ut" in styrke["Equinor"]
+        assert "skiller seg ut" not in styrke["DNB Bank"]
 
     def test_manglende_signal_forklares_med_aa(self, klient, monkeypatch):
         """NFR-05: grunnen vises i begge skjermbildene."""

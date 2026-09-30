@@ -36,7 +36,7 @@ class TestTall:
 
     def test_endring_har_fortegn_to_desimaler_og_prosent(self):
         assert tall(1.234, "endring") == f"+1,23{NB}%"
-        assert tall(-1.235, "endring").startswith("-1,2")
+        assert tall(-1.236, "endring") == f"-1,24{NB}%"
 
     def test_minus_er_vanlig_bindestrek(self):
         assert tall(-2.0, "endring")[0] == "-"
@@ -49,8 +49,7 @@ class TestTall:
         assert tall(1.2, "maaling", fortegn=False) == f"1,2{NB}%"
 
     def test_desimaler_kan_overstyres(self):
-        assert tall(1.2345, "maaling", desimaler=3) == f"+1,234{NB}%" or \
-            tall(1.2345, "maaling", desimaler=3) == f"+1,235{NB}%"
+        assert tall(1.2346, "maaling", desimaler=3) == f"+1,235{NB}%"
 
     def test_akse_har_ingen_desimaler(self):
         assert tall(1234.4, "akse") == f"1{NB}234"

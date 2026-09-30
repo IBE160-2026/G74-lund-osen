@@ -75,7 +75,9 @@
 
             <td class="tall">{{ rad.sluttkurs|tall('kurs') }}</td>
 
-            <td class="tall {% if rad.endring_prosent is not none %}{{ 'opp' if rad.endring_prosent > 0 else 'ned' if rad.endring_prosent < 0 else '' }}{% endif %}">
+            {# Fargen foelger tallet slik det vises: 0,00 % har ingen farge (story 8.0). #}
+            {% set vist_endring = rad.endring_prosent|round(2) if rad.endring_prosent is not none else none %}
+            <td class="tall {% if vist_endring is not none %}{{ 'opp' if vist_endring > 0 else 'ned' if vist_endring < 0 else '' }}{% endif %}">
               {% if rad.endring_prosent is not none %}
                 {{ rad.endring_prosent|tall('endring') }}
               {% else %}

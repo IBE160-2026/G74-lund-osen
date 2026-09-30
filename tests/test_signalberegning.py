@@ -327,6 +327,13 @@ class TestForklaringenPaaNorsk:
         tekst = _interesseforklaring(1501.0, 1000.5)
         assert tekst == f"volum 1{self.NB}501 mot median 1{self.NB}000,5"
 
+    def test_interesse_gjennom_beregn_signal(self):
+        """Den ekte kallveien, ikke bare hjelperen: volumene har hardt
+        mellomrom som tusenskille (regel 21)."""
+        signal = beregn_signal(serie([100.0] * 60 + [104.0]))
+        interesse = next(s for s in signal.sjekker if s.navn == "Interesse")
+        assert interesse.forklaring == f"volum 1{self.NB}000 mot median 1{self.NB}000"
+
     def test_forklaringene_i_et_signal_har_ikke_punktum(self):
         kurser = [100.0] * 60 + [104.0]
         signal = beregn_signal(serie(kurser))
