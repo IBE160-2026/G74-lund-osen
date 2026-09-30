@@ -1935,8 +1935,35 @@ inntrykket ikke bare hviler på at logikken er riktig.
 **Føring** *(lagt til 2026-09-23, fra v1.1-idéene i `prd.md` §8)*: gjennomgangen
 skal si **hvordan et tredje skjermbilde ville passet inn** i navigasjonen, uten å
 bygge det. Det er et svar på papir, ikke en endring.
+*Rettet 2026-09-30:* Min liste blir det tredje skjermbildet (8.3) og er bygget
+før gjennomgangen. Den sier fortsatt på papir hvordan Nyheter og Kalender ville
+passet inn.
 
 **Avhenger av:** 8.1. **Én økt:** ja.
+
+### Story 8.3: Min liste: eget skjermbilde med stjerne og filter
+
+*Lagt til 2026-09-30, Marians beslutning.*
+
+Som **bruker**, vil jeg ha en egen side der jeg merker aksjene jeg følger med en
+stjerne og ser bare dem.
+
+**Oppfyller:** «Favorittmerking av aksjer» fra «Hvis vi rekker» i `prd.md` §2, og
+knapperaden fra v1.1-raden «Navigasjon mellom flere skjermbilder», for
+skjermbildene som finnes · **Begrenses av:** FR-101–103, `AD-3`, `AD-10`,
+`AD-16`, `AD-21` med føringen 30.09
+
+**Kontroll — hva testen ser etter:**
+- Min liste har samme tabell som oversikten, med en stjerne på hver rad, og en knapp «Alle / Min liste» som viser alle eller bare de merkede, sortert etter FR-102
+- Øverst på alle skjermbildene står en knapperad med Markedsoversikt og Min liste, og knappen for siden man står på, er fylt. Aksjedetaljen beholder veien tilbake (FR-101)
+- Merkingen er et eget datasett med egen port og webserveren som eneste skriver (`AD-3`), i en egen tabell med ny migrering (`AD-16`). Webserveren skriver bare denne tabellen og henter aldri (`AD-10`)
+- Merkingen overlever en omstart, gjelder maskinen (ingen innlogging) og koster ingen API-kall
+- En tom liste sier hvordan man merker
+- Lista tas som parameter og testes også med færre enn 15 aksjer (føringen 30.09 under `AD-21`)
+- **Ville feilet hvis:** merkingen forsvant ved omstart, filteret endret rekkefølgen fra FR-102, eller lista fikk antall aksjer eller kjøpskurs. Da er det en personlig portefølje, som er utenfor v1
+
+**Avhenger av:** 2.2. Bygges etter brukertesten i 8.1 og før UX-gjennomgangen i
+8.2, så 8.2 vurderer alle tre skjermbildene.
 
 ---
 
