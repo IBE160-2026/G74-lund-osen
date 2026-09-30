@@ -3,9 +3,10 @@
 Ren logikk. Ingen API-kall, ingen filer, ingen HTML. Leser Kursrad gjennom
 Kursleser, akkurat som markedsoversikten.
 
-Avgrenset til forklaringsdelen. Boersmeldinger (FR-203), KI-forklaring
-(FR-602) og kommende hendelser (FR-301) mangler med vilje: de krever kilder
-som ligger bak aapent punkt 1 og 12.
+Avgrenset til forklaringsdelen. Boersmeldinger (FR-203) og kommende
+hendelser (FR-301) er ikke med: Euronext ga ikke tillatelse innen fristen, saa
+plan B gjelder fra 28.09 (Epic 10 i epics.md). KI-forklaringen av signalet
+(FR-602) kommer med Epic 10.
 
 Forklarbarhet er hele poenget. En bruker skal kunne lese seg fram til hvorfor
 styrken ble 2 og ikke 1, uten aa kjenne formelen paa forhaand. Derfor baerer

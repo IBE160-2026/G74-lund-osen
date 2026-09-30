@@ -20,6 +20,7 @@ from dataclasses import dataclass
 from statistics import median, stdev
 
 from kursdata import Kursrad
+from tallformat import desimaler_mot_grense, tall
 
 MA_VINDU = 50
 
@@ -111,6 +112,36 @@ def _nodvendige_dager(p: Parametre) -> int:
     return max(p.ma_vindu, p.volatilitet_vindu + 1, p.volum_vindu) + 1
 
 
+def _trendforklaring(avvik: float, p: Parametre) -> str:
+    """Avviket fra snittet, med saa mange desimaler at det skilles fra
+    noytralsonen. Ellers kunne «+2,0 % mot MA50» staa ved en sjekk som ga +1
+    (story 8.0)."""
+    antall = desimaler_mot_grense(avvik * 100, p.noytralsone * 100)
+    return f"{tall(avvik * 100, 'maaling', antall)} mot MA{p.ma_vindu}"
+
+
+def _bevegelsesforklaring(dagens: float, avvik: float) -> str:
+    """Dagens endring mot standardavviket, med like mange desimaler paa begge,
+    nok til at de skilles. Ville feilet hvis «-1,2 % mot 1,2 %
+    standardavvik» sto ved en sjekk som ga -1 (story 8.0)."""
+    antall = desimaler_mot_grense(dagens * 100, avvik * 100)
+    return (
+        f"{tall(dagens * 100, 'maaling', antall)} mot "
+        f"{tall(avvik * 100, 'maaling', antall, fortegn=False)} standardavvik"
+    )
+
+
+def _interesseforklaring(dagens_volum: float, median_volum: float) -> str:
+    """Volumene som hele tall. Medianen av et partall volumer kan ende paa
+    ,5, og da vises den desimalen, saa 1,5 ganger medianen kan regnes riktig
+    av den som leser (story 8.0)."""
+    median_desimaler = 0 if float(median_volum).is_integer() else 1
+    return (
+        f"volum {tall(dagens_volum, 'volum')} mot median "
+        f"{tall(median_volum, 'volum', median_desimaler)}"
+    )
+
+
 def trend(kurser: list[float], p: Parametre = STANDARD) -> Sjekk:
     """Sjekk 1: sluttkurs mot glidende snitt, med noytralsone (FR-702).
 
@@ -126,7 +157,7 @@ def trend(kurser: list[float], p: Parametre = STANDARD) -> Sjekk:
     return Sjekk(
         navn="Trend",
         verdi=verdi,
-        forklaring=f"{avvik * 100:+.1f} % mot MA{p.ma_vindu}",
+        forklaring=_trendforklaring(avvik, p),
     )
 
 
@@ -146,7 +177,7 @@ def bevegelse(kurser: list[float], p: Parametre = STANDARD) -> Sjekk:
     return Sjekk(
         navn="Bevegelse",
         verdi=verdi,
-        forklaring=f"{dagens * 100:+.1f} % mot {avvik * 100:.1f} % standardavvik",
+        forklaring=_bevegelsesforklaring(dagens, avvik),
     )
 
 
@@ -165,7 +196,7 @@ def interesse(kurser: list[float], volumer: list[float], p: Parametre = STANDARD
     return Sjekk(
         navn="Interesse",
         verdi=verdi,
-        forklaring=f"volum {dagens_volum:.0f} mot median {median_volum:.0f}",
+        forklaring=_interesseforklaring(dagens_volum, median_volum),
     )
 
 
@@ -207,7 +238,7 @@ def beregn_signal(rader: list[Kursrad], p: Parametre = STANDARD) -> Signal:
     nodvendig = _nodvendige_dager(p)
     if len(rader) < nodvendig:
         raise ValueError(
-            f"Trenger {nodvendig} dager for aa regne signal, fikk {len(rader)}"
+            f"Trenger {nodvendig} dager for å regne signal, fikk {len(rader)}"
         )
 
     kurser = _justerte_kurser(rader)

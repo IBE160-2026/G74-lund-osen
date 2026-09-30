@@ -19,10 +19,19 @@ from aksjedetalj import bygg_detalj, finn_aksje
 from graf import bygg_graf
 from kursdata import AKSJEUNIVERS, Kursleser
 from lagring_fil import nyeste_leser
-from markedsoversikt import bygg_oversikt, eldre_enn_nyeste, norsk_tid, sidens_tidsstempel
+from markedsoversikt import (
+    bygg_oversikt,
+    eldre_enn_nyeste,
+    norsk_tid,
+    sidens_dato,
+    sidens_tidsstempel,
+)
+from tallformat import tall
 
 app = Flask(__name__)
 app.jinja_env.filters["norsk_tid"] = norsk_tid
+# Regel 21: tallene formateres ett sted, ikke med "%.2f" i malene (story 8.0).
+app.jinja_env.filters["tall"] = tall
 
 
 def hent_leser() -> Kursleser | None:
@@ -39,7 +48,9 @@ def hent_leser() -> Kursleser | None:
 def markedsoversikt():
     leser = hent_leser()
     if leser is None:
-        return render_template("index.html", rader=[], hentet=None, mangler=[], eget=set())
+        return render_template(
+            "index.html", rader=[], dato=None, hentet=None, mangler=[], eget=set()
+        )
 
     rader = bygg_oversikt(leser)
     vist = {rad.aksje.symbol for rad in rader}
@@ -48,6 +59,7 @@ def markedsoversikt():
     return render_template(
         "index.html",
         rader=rader,
+        dato=sidens_dato(rader),
         hentet=sidens_tidsstempel(rader),
         eget=eldre_enn_nyeste(rader),
         mangler=mangler,
@@ -58,8 +70,9 @@ def markedsoversikt():
 def aksjedetalj(symbol: str):
     """Forklaringsdelen av aksjedetaljen.
 
-    Meldinger, KI-forklaring og kommende hendelser mangler med vilje - de
-    krever kilder som ligger bak aapent punkt 1 og 12.
+    Meldinger og kommende hendelser er ikke med: Euronext ga ikke
+    tillatelse innen fristen, saa plan B gjelder fra 28.09 (Epic 10 i
+    epics.md). KI-forklaringen av signalet kommer med Epic 10.
     """
     aksje = finn_aksje(symbol, AKSJEUNIVERS)
     if aksje is None:

@@ -16,8 +16,12 @@ from signalberegning import (
     INGEN,
     NEGATIV,
     POSITIV,
+    STANDARD,
     Parametre,
     Sjekk,
+    _bevegelsesforklaring,
+    _interesseforklaring,
+    _trendforklaring,
     beregn_signal,
     finn_retning,
     finn_styrke,
@@ -282,3 +286,56 @@ class TestForKorteSerier:
 
         signal = beregn_signal(serie([100.0] * 51))
         assert signal.styrke == 0
+
+
+class TestForklaringenPaaNorsk:
+    """Story 8.0, regel 21: forklaringen bruker tallformat, og en maaling som
+    ville blitt lik grensen etter avrunding, faar flere desimaler."""
+
+    NB = "\u00a0"
+
+    def test_feilmeldingen_har_aa(self):
+        """NFR-05: teksten vises i begge skjermbildene."""
+        with pytest.raises(ValueError, match="for å regne signal"):
+            beregn_signal(serie([100.0] * 5), KORT)
+
+    def test_bevegelse_naer_grensen_skilles(self):
+        """Ville feilet hvis «-1,2 % mot 1,2 % standardavvik» sto ved en
+        sjekk som ga -1."""
+        tekst = _bevegelsesforklaring(-0.01214, 0.01212)
+        assert tekst == f"-1,214{self.NB}% mot 1,212{self.NB}% standardavvik"
+
+    def test_bevegelse_langt_fra_grensen_har_en_desimal(self):
+        tekst = _bevegelsesforklaring(0.034, 0.012)
+        assert tekst == f"+3,4{self.NB}% mot 1,2{self.NB}% standardavvik"
+
+    def test_trend_like_over_sonen_skilles(self):
+        assert _trendforklaring(0.02004, STANDARD) == f"+2,004{self.NB}% mot MA50"
+
+    def test_trend_paa_sonen_har_en_desimal(self):
+        """Matrisen i spesifikasjonen: noeyaktig paa grensen er riktig likt."""
+        assert _trendforklaring(0.02, STANDARD) == f"+2,0{self.NB}% mot MA50"
+        assert _trendforklaring(-0.02, STANDARD) == f"-2,0{self.NB}% mot MA50"
+
+    def test_interesse_med_hel_median(self):
+        tekst = _interesseforklaring(1500.0, 1000.0)
+        assert tekst == f"volum 1{self.NB}500 mot median 1{self.NB}000"
+
+    def test_interesse_med_median_paa_halv(self):
+        """1,5 x 1 000,5 = 1 500,75 < 1 501. Med medianen rundet til 1 000
+        eller 1 001 kunne leseren regnet seg til feil side av grensen."""
+        tekst = _interesseforklaring(1501.0, 1000.5)
+        assert tekst == f"volum 1{self.NB}501 mot median 1{self.NB}000,5"
+
+    def test_interesse_gjennom_beregn_signal(self):
+        """Den ekte kallveien, ikke bare hjelperen: volumene har hardt
+        mellomrom som tusenskille (regel 21)."""
+        signal = beregn_signal(serie([100.0] * 60 + [104.0]))
+        interesse = next(s for s in signal.sjekker if s.navn == "Interesse")
+        assert interesse.forklaring == f"volum 1{self.NB}000 mot median 1{self.NB}000"
+
+    def test_forklaringene_i_et_signal_har_ikke_punktum(self):
+        kurser = [100.0] * 60 + [104.0]
+        signal = beregn_signal(serie(kurser))
+        for sjekk in signal.sjekker:
+            assert "." not in sjekk.forklaring, sjekk.forklaring

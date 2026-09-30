@@ -17,6 +17,7 @@ from markedsoversikt import (
     eldre_enn_nyeste,
     endring_i_prosent,
     norsk_tid,
+    sidens_dato,
     sidens_tidsstempel,
 )
 from signalberegning import BLANDET, INGEN, NEGATIV, POSITIV, Parametre
@@ -288,3 +289,29 @@ class TestNorskTid:
         ville gitt 2026-11-17 kl. 00.30 her."""
         tid = datetime(2026, 11, 16, 22, 30, tzinfo=timezone.utc)
         assert norsk_tid(tid) == "2026-11-16 kl. 23.30"
+
+
+class TestSidensDato:
+    """Story 8.0: datoen over tabellen er den eldste blant radene som vises,
+    samme prinsipp som sidens tidsstempel (FR-101), og avhenger ikke av
+    sorteringen."""
+
+    def _rader(self):
+        # EQNR har sterkere signal og sorteres foerst, men DNB har eldre dato.
+        kilde = lager({
+            "EQNR": serie([100.0] * 5 + [104.0], fra_dato=3),
+            "DNB": serie([100.0] * 6, fra_dato=1),
+        })
+        return bygg_oversikt(kilde, (EQNR, DNB), KORT)
+
+    def test_radene_i_to_rekkefoelger_gir_samme_dato(self):
+        rader = self._rader()
+        assert sidens_dato(rader) == sidens_dato(list(reversed(rader)))
+
+    def test_eldre_rad_gir_den_eldre_datoen(self):
+        rader = self._rader()
+        assert [rad.aksje.symbol for rad in rader] == ["EQNR", "DNB"]
+        assert sidens_dato(rader) == date(2026, 9, 6)
+
+    def test_uten_rader_er_none(self):
+        assert sidens_dato([]) is None

@@ -29,6 +29,7 @@ KJERNEMODULER = (
     "graf.py",
     "boersdag.py",
     "tilstand.py",
+    "tallformat.py",
 )
 
 # Kjernen gjoer ikke I/O og importerer ikke skallet (spinen, lagtabellen).
