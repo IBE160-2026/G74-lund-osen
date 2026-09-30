@@ -154,6 +154,7 @@ den som filteret `tall` i malene.
 - **Opphav:** mønsteret er utvidet, ikke oppfunnet. `Kurskilde` i `kursdata.py`, commit `be2ba93` (21.09)
 - **Leseside, 2026-09-23:** `Kursleser` (`serie`, `sist_hentet`) er lesesiden av porten for kursdata, og `Kurslager` er `Kursleser` pluss `erstatt_serie`. Det er én port med en leseside, ikke to porter. `Kursleser` er `Kurskilde` født på nytt, med `Kursrad` og tid per symbol.
 - **Bruddet er lukket, 2026-09-25:** fra story 1.2 (valg b) sto `Kurskilde` ved siden av `Kurslager`, altså to porter for kursdataene. Story 1.4c fjernet `Kurskilde`, `MinneKilde` og testen som holdt bruddet fra å vokse, commit `a91ef79`. Kursdataene har nå én port.
+- **Føring 2026-09-30 (Min liste, story 8.3):** merkingen i Min liste blir et nytt datasett med egen port og webserveren som eneste skriver. Hentekommandoen og webserveren skriver da til samme basefil, men til hver sin tabell (AD-4). Navnet på porten settes når 8.3 bygges.
 
 ### AD-4 — SQLite er motoren
 
