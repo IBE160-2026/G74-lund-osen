@@ -1872,6 +1872,8 @@ Som **bruker**, vil jeg at tallene står på norsk, at jeg ser hvilke aksjer som
 
 **Avhenger av:** ingen. 2.1c bruker samme funksjon når forklaringen lages av `maaling` og `grense`. **Én økt:** ja.
 
+*Ferdig 2026-09-30:* flettet i `33317df`, PR #15.
+
 ### Story 8.1: Brukertest rett etter Epic 2
 
 Som **gruppe**, vil vi se en person utenfor gruppen bruke løsningen tidlig, så
