@@ -84,13 +84,37 @@ context:
 - Lenkene er alltid understreket og har `:focus-visible` med `outline`. `a.tilbake` har `color: inherit` i stedet for den dempede fargen.
 - `tallformat.py` står i `KJERNEMODULER` i `test_konsumentene.py`, og en egen test holder den som løvnode. Spinen har modulen i grafen, kantene `app --> tallformat` og `signal --> tallformat`, og mappetreet.
 - To eksisterende tester så etter punktum (`101.00` og `123.45`) og er rettet til komma.
-- Tre tester skrev det harde mellomrommet usynlig i kilden. Nå står det som `" "`, i `7e7aa54`.
+- `tallformat.py` og to testfiler hadde det harde mellomrommet som et usynlig tegn i kilden. Nå står det som `"\u00a0"`, i `7e7aa54`.
 - Mutantene (14): de tolv fra planen, nyeste dato (13) og tilbakelenken uten understrek (14). Hver ble lagt inn én om gangen og satt tilbake fra en kopi, og alle ble fanget. Mutant 2 ble først ikke lagt inn, fordi kilden hadde et literalt hardt mellomrom. Den ble kjørt på nytt etter `7e7aa54` og ble fanget.
 - Testene: før 928 passed og 16 skipped lokalt, og 944 passed i CI på main (kjøring 36744235389). Etter: 973 passed og 16 skipped lokalt.
 
 ## Spec Change Log
 
 ## Review Triage Log
+
+Gjennomgang 1, 30.09, av diffen fra `348ce60` til `4975f21`, med Blind Hunter (BH), Edge Case Hunter (ECH) og Verification Gap (VG). 17 funn: 8 rettet, 1 utsatt og 8 avvist.
+
+| # | Kilde | Funn | Verdikt | Begrunnelse | Rute |
+|---|---|---|---|---|---|
+| 1 | VG | Ingen test ser `_interesseforklaring` gjennom `interesse()` og `beregn_signal`. Tilbakeført f-streng ville overlevd | medium | Stemmer. Volumene var 1 000, og den gamle formen gir «1000», uten punktum | patch: `test_interesse_gjennom_beregn_signal`, mutant 17 fanget |
+| 2 | VG | Aksen i grafen testes ikke i siden | medium | Stemmer. `"%.0f"` gir aldri punktum, så sjekken fanget ikke en tilbakeføring | patch: aksen i `test_tallene_i_detaljen_er_norske`, mutant 16 fanget |
+| 3 | ECH | `desimaler_mot_grense` faller tilbake til `minst` når tallene er like med seks desimaler, også når sjekken slo ut (trend) | low | Stemmer bare når avviket ligger under 5e-9 fra sonen, altså ved støy fra flyttallene. Med ekte kurser forekommer det nesten aldri, og rettingen krever at sjekkens utfall sendes inn | avvist: lav, og rettingen legger til en parameter |
+| 4 | ECH | Samme for bevegelse | low | Samme grunn som 3 | avvist |
+| 5 | ECH | Grensen sammenlignes skalert med 100, mens sjekken er uskalert | low | Skaleringen kan bare flytte likhet på støynivå, samme tilfelle som 3 | avvist |
+| 6 | ECH | Endringen farges opp eller ned når teksten viser «0,00 %» | medium | Stemmer: +0,003 % fikk klassen `opp`. Farge og tekst sa hver sin ting (FR-103) | patch: fargen følger `round(2)`, `test_endring_som_vises_som_null_har_ingen_farge`, mutant 15 fanget |
+| 7 | ECH | Negativt eller ikke-heltallig `desimaler` gir en uklar feil | false | Ingen kaller sender det. Malene bruker slagets tall, og `desimaler_mot_grense` gir 1–6 | avvist |
+| 8 | BH | Spinen sier fortsatt «importerer bare `kursdata`» over den nye merknaden | low | Stemmer | patch: rettet på stedet med *Rettet 2026-09-30* |
+| 9 | BH | `tallformat.py` mangler i lista over løvnoder i spinen | low | Stemmer | patch: lagt til i lista (samme retting som 8) |
+| 10 | BH | Fotnoten nevner ikke lenger KI-forklaringen | false | Teksten er gruppens eget valg 30.09 kl. 20:12, og den stemmer også etter Epic 10. Docstringene nevner Epic 10 | avvist: avgjort av gruppen |
+| 11 | BH | Løkkene over regnestykket og tabellradene kan passere uten å sjekke noe | low | Stemmer | patch: `len(...) == 3` og `len(tabell.rader) == 2` |
+| 12 | BH | `test_desimaler_kan_overstyres` godtar to svar, og `startswith("-1,2")` er svak | low | Stemmer. Rettelsen fra byggingen ble ikke lagt inn, fordi shellet endret teksten den skulle erstatte | patch: nøyaktige strenger med 1.2346 og -1.236 |
+| 13 | BH | Datotesten lover i docstringen mer enn den sjekker | low | Stemmer | patch: docstringen og en kommentar om hvor datoene kommer fra |
+| 14 | BH | `tall()` har ingen oppførsel for NaN og uendelig | low | Ingen vei inn er vist: kursene kommer gjennom oversetteren, `endring` er None uten forrige dag, og medianvolumet er beskyttet med `> 0`. Hvis NaN likevel kom inn, ville «nan» stått på siden | avvist: ingen vei vist |
+| 15 | BH | Aksen med 0 desimaler viser like tall ved et smalt kursspenn | low | Stemmer, men oppførselen er fra før 8.0 (`"%.0f"`) | utsatt til `deferred-work.md` |
+| 16 | BH | Merket testes bare den ene veien | low | Stemmer for en rad uten signal | patch: `test_rad_uten_signal_er_ikke_merket` |
+| 17 | BH | Blandet skrivemåte av «å» i testnavn, og andre tekster med «aa» | false | ASCII i kode og kommentarer er prosjektets skikk. Søket etter «aa» i strenger brukeren ser, fant bare `signalberegning.py:210` (planen) | avvist |
+
+Etter rettingene: 976 passed og 16 skipped lokalt, og mutant 15–17 ble fanget.
 
 ## Verification
 
