@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-30T22:30
+updated: 2026-10-01T00:33
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -289,6 +289,8 @@ vinduet er for kort til å avgjøre spørsmålet.
 | Vilkårskontroll NewsWeb + Euronext | Avgjøre om datagrunnlaget holder | 0 kall, frist 2026-09-27 |
 | Relevanseksperiment del 1, innsamling av ~50 medieartikler | Grunnlaget for symbolmatching mot KI-klassifisering | `extraLimit`, uke 39–40. Kalltallet kontrolleres i første forespørsel |
 | Relevanseksperiment del 2, KI-klassifiseringen | Symbolmatching mot KI-klassifisering | 0 kall mot EODHD. Venter på KI-laget og på betingelse 4 |
+| Kontrollregning av de tre sjekkene *(lagt til 2026-10-01)* | Vise at trend, bevegelse og interesse i aksjedetaljen stemmer: én aksje og én børsdag regnes for hånd i et regneark fra rådatafila i data/, og sammenlignes med tallene appen viser. Regnearket blir liggende lokalt, fordi det inneholder rådata. Bare tallene side om side, og om de stemmer, føres hit | 0 kall |
+| Sluttkurs, høy og lav mot Oslo Børs *(lagt til 2026-10-01)* | Vise at kursene fra EODHD stemmer med børsens egne tall: noen dager sammenlignes for hånd med børsens side, lest av en av oss | 0 kall |
 
 **Rekkefølgen er bestemt av kvoten, ikke av prioritet.** Nyhetstesten var
 budsjettert til 10 kall og signaltesten til 15; dagsgrensen er 20, så de kunne
