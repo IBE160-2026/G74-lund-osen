@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-01T00:32
+updated: 2026-10-01T01:11
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -871,12 +871,21 @@ på kjennetegn som kan observeres, ikke på en sikkerhetsscore fra modellen:
 2. **Tallene.** Hvert tall i teksten står i grunnlaget, med samme avrunding som
    i FR-706, eller er et av regelens faste tall, som 50 i MA50.
 3. **Råd.** Teksten har ingen ord som gir råd (NFR-06).
+4. **Gjetning.** Teksten gjetter ikke. Den har ingen ord som gjetter eller spår,
+   som «trolig», «sannsynligvis», «kan tyde på» eller «forventes», og nevner
+   ingen årsak som ikke står i grunnlaget, som nyheter, resultater eller
+   kontrakter. Grunnlaget har bare fortegn og målinger for de tre sjekkene,
+   styrken og retningen (story 10.1), så en årsak i teksten er alltid gjettet.
+   Ordene står i lister i kontrollen, og en test viser at hvert av dem stopper
+   teksten. *Lagt til 2026-10-01, Marians beslutning.*
 
 En tekst som ikke består, vises ikke, men logges med grunnen (FR-604). Aksjen
 får da ingen KI-tekst den dagen, og siden sier det (FR-602).
 
 **Kontrollen er grov.** Den fanger feil tall og feil retning, ikke en misvisende
 tekst med riktige tall.
+
+*Lagt til 2026-10-01:* punkt 4 fanger ord, ikke mening.
 
 #### FR-604 — Logging av KI-bidraget, fra første kjøring
 
