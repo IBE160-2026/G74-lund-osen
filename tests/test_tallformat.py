@@ -5,6 +5,9 @@ minus, og aldri «-0,00». Desimalene per slag bestemmes i tallformat.py, ikke i
 malene.
 """
 
+import ast
+from pathlib import Path
+
 import pytest
 
 from tallformat import HARDT_MELLOMROM as NB
@@ -90,3 +93,13 @@ class TestDesimalerMotGrense:
 
     def test_minst_kan_hoeynes(self):
         assert desimaler_mot_grense(-3.4, 1.2, minst=2) == 2
+
+
+def test_tallformat_er_en_loevnode():
+    """Spinen: tallformat.py importerer ingenting, saa kjernen og app.py kan
+    bruke den uten aa trekke med seg noe annet."""
+    kilde = Path(__file__).resolve().parent.parent / "src" / "tallformat.py"
+    tre = ast.parse(kilde.read_text(encoding="utf-8"))
+    assert not [
+        node for node in ast.walk(tre) if isinstance(node, (ast.Import, ast.ImportFrom))
+    ]

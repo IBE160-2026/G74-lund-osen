@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-09-30T18:25'
+updated: '2026-09-30T20:21'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -83,6 +83,7 @@ graph TD
         meld["meldinger.py"]
         boersdag["boersdag.py"]
         tilstand["tilstand.py"]
+        tallformat["tallformat.py"]
     end
 
     app --> marked
@@ -90,6 +91,7 @@ graph TD
     app --> graf
     app --> kursdata
     app --> fil
+    app --> tallformat
     fetch --> kursdata
     fetch --> fil
     fetch --> eodhd
@@ -108,6 +110,7 @@ graph TD
     detalj --> kursdata
     graf --> detalj
     signal --> kursdata
+    signal --> tallformat
 ```
 
 `meldinger.py`, `kursdata.py`, `vurderingsdata.py` og `boersdag.py` importerer
@@ -122,6 +125,11 @@ feiler hvis en port importerer en adapter eller en kjernemodul. *Lagt til
 for `Kursrad`, siden story 1.4b (`c5efd05`). *Rettet 2026-09-26:* her sto at
 også `signalberegning.py` ikke importerte noen annen prosjektmodul, og kanten
 `signal --> kursdata` manglet i grafen.
+*Lagt til 2026-09-30 (story 8.0):* `tallformat.py` formaterer tallene sidene
+viser (regel 21) og importerer ingen annen modul. Den er en løvnode.
+`signalberegning.py` importerer den for forklaringen, og `app.py` registrerer
+den som filteret `tall` i malene. Da importerer `signalberegning.py` også
+`tallformat`, ikke bare `kursdata`.
 
 ### AD-1 — Kjernen gjør ingen I/O `[ADOPTED 2026-09-20/21]`
 
@@ -418,6 +426,7 @@ G74-lund-osen/
     markedsoversikt.py   # ren logikk
     aksjedetalj.py       # ren logikk
     graf.py              # ren regning
+    tallformat.py        # tall slik sidene viser dem, ren logikk  [bygget i 8.0]
     app.py               # HTTP og HTML
   data/                  # gitignorert — to volumer i Docker
     raa/                 # uforanderlige øyeblikksbilder      [bygget i 2.1b]
