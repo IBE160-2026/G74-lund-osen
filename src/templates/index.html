@@ -27,8 +27,9 @@
     td.tall { text-align: right; font-variant-numeric: tabular-nums; }
     tr.utslag td { background: #fafafa; }
     td.selskap { font-weight: 500; }
-    td.selskap a { color: inherit; text-decoration: none; }
-    td.selskap a:hover, td.selskap a:focus { text-decoration: underline; }
+    /* Story 8.0: navnet ser ut som en lenke, og fokus synes. */
+    td.selskap a { color: inherit; text-decoration: underline; }
+    td.selskap a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
     td.selskap .hentet { display: block; font-weight: normal; color: var(--dempet); font-size: 0.8rem; }
 
     /* FR-103: tekst, symbol og farge samtidig. Teksten baerer alene hvis
@@ -42,6 +43,8 @@
     .ingen, .ukjent { color: var(--dempet); }
 
     .styrke { font-variant-numeric: tabular-nums; }
+    /* FR-705 med tekst, ikke bare farge (story 8.0). */
+    .merke { display: block; font-size: 0.75rem; font-weight: 600; }
     .mangler { color: var(--dempet); font-style: italic; font-size: 0.85rem; }
     p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
   </style>
@@ -51,7 +54,7 @@
 
   {% if rader %}
     <p class="meta">
-      Oslo Børs · {{ rader[0].dato }} · {{ rader|length }} aksjer
+      Oslo Børs · {{ dato }} · {{ rader|length }} aksjer
       {% if hentet %}· data hentet {{ hentet|norsk_tid }}{% endif %}
     </p>
 
@@ -70,11 +73,11 @@
           <tr {% if rad.skiller_seg_ut %}class="utslag"{% endif %}>
             <td class="selskap"><a href="/aksje/{{ rad.aksje.symbol }}">{{ rad.aksje.navn }}</a>{% if rad.aksje.symbol in eget %}<span class="hentet">hentet {{ rad.sist_hentet|norsk_tid }}</span>{% endif %}</td>
 
-            <td class="tall">{{ "%.2f"|format(rad.sluttkurs) }}</td>
+            <td class="tall">{{ rad.sluttkurs|tall('kurs') }}</td>
 
             <td class="tall {% if rad.endring_prosent is not none %}{{ 'opp' if rad.endring_prosent > 0 else 'ned' if rad.endring_prosent < 0 else '' }}{% endif %}">
               {% if rad.endring_prosent is not none %}
-                {{ "%+.2f"|format(rad.endring_prosent) }} %
+                {{ rad.endring_prosent|tall('endring') }}
               {% else %}
                 –
               {% endif %}
@@ -83,6 +86,7 @@
             <td class="tall styrke">
               {% if rad.styrke is not none %}
                 {{ rad.styrke }}
+                {% if rad.skiller_seg_ut %}<span class="merke">skiller seg ut</span>{% endif %}
               {% else %}
                 <span class="mangler" title="{{ rad.mangler }}">–</span>
               {% endif %}

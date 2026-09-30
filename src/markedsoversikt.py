@@ -196,6 +196,17 @@ def sidens_tidsstempel(rader: list[Rad]) -> datetime | None:
     return min(tider) if tider else None
 
 
+def sidens_dato(rader: list[Rad]) -> date | None:
+    """Den eldste datoen blant radene som vises (story 8.0).
+
+    Samme prinsipp som sidens_tidsstempel og FR-101 («Hvor gamle dataene
+    er»): siden skal aldri se ferskere ut enn den er, og datoen skal ikke
+    avhenge av sorteringen. Foer 8.0 sto datoen til den foerste raden, altsaa
+    den med sterkest signal. None uten rader.
+    """
+    return min((rad.dato for rad in rader), default=None)
+
+
 def eldre_enn_nyeste(rader: list[Rad]) -> set[str]:
     """Symbolene som skal vise sitt eget tidsstempel under selskapsnavnet.
 

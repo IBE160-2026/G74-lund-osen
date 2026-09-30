@@ -11,7 +11,9 @@ gjennom lagring_fil, aldri data/.
 """
 
 import json
+import re
 from datetime import date, datetime, timedelta, timezone
+from html.parser import HTMLParser
 
 import pytest
 
@@ -308,7 +310,7 @@ def test_rutene_gjoer_ingen_nettverkskall(klient, monkeypatch, tmp_path):
 
     detalj = klient.get("/aksje/EQNR")
     assert detalj.status_code == 200
-    assert '<span class="verdi">101.00</span>' in detalj.data.decode("utf-8"), (
+    assert '<span class="verdi">101,00</span>' in detalj.data.decode("utf-8"), (
         "detaljen viser ikke dataene"
     )
 
@@ -370,8 +372,8 @@ class TestAksjedetalj:
         html = svar.data.decode("utf-8")
 
         assert svar.status_code == 200
-        assert html.count("123.45") == 1, "sluttkursen skal staa noeyaktig ett sted"
-        assert '<span class="verdi">123.45</span>' in html, "sluttkursen vises ikke"
+        assert html.count("123,45") == 1, "sluttkursen skal staa noeyaktig ett sted"
+        assert '<span class="verdi">123,45</span>' in html, "sluttkursen vises ikke"
         assert "kunne ikke regnes" in html, "siden sier ikke at signalet mangler"
 
     def test_sier_hva_som_mangler_i_skjermbildet(self, klient, monkeypatch):
@@ -435,3 +437,165 @@ class TestHentLeser:
         monkeypatch.setattr(lagring_fil, "RAA_KATALOG", tmp_path)
 
         assert app_modul.hent_leser() is None
+
+
+# --- Story 8.0: de rene feilene i de to skjermbildene -------------------------
+
+NB = " "
+
+
+class _Tabell(HTMLParser):
+    """Cellene i tbody, rad for rad, som tekst. Leser ikke stil eller farge."""
+
+    def __init__(self):
+        super().__init__()
+        self.hode: list[str] = []
+        self.rader: list[list[str]] = []
+        self._i_kropp = False
+        self._celle: list[str] | None = None
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "tbody":
+            self._i_kropp = True
+        elif tag == "tr" and self._i_kropp:
+            self.rader.append([])
+        elif tag in ("td", "th"):
+            self._celle = []
+
+    def handle_endtag(self, tag):
+        if tag == "tbody":
+            self._i_kropp = False
+        elif tag in ("td", "th") and self._celle is not None:
+            # Bare vanlige blanktegn slaas sammen. str.split() ville ogsaa
+            # tatt det harde mellomrommet, som testene ser etter.
+            tekst = re.sub(r"[ \t\r\n]+", " ", "".join(self._celle)).strip()
+            if tag == "th":
+                self.hode.append(tekst)
+            elif self.rader:
+                self.rader[-1].append(tekst)
+            self._celle = None
+
+    def handle_data(self, data):
+        if self._celle is not None:
+            self._celle.append(data)
+
+
+def _tabell(html: str) -> _Tabell:
+    tabell = _Tabell()
+    tabell.feed(html)
+    return tabell
+
+
+def _stil(html: str) -> str:
+    return html[html.index("<style>"): html.index("</style>")]
+
+
+def _regel(stil: str, velger: str) -> str:
+    treff = re.search(re.escape(velger) + r"\s*\{([^}]*)\}", stil)
+    assert treff, f"ingen regel for {velger}"
+    return treff.group(1)
+
+
+class TestStory80:
+    def test_tallene_i_oversikten_er_norske(self, klient, monkeypatch):
+        """Regel 21: komma, hardt mellomrom, og aldri «-0,00»."""
+        monter(monkeypatch, snapshot({"EQNR": serie([1234.5] * 60 + [1234.49])}))
+
+        tabell = _tabell(klient.get("/").data.decode("utf-8"))
+        selskap, kurs, endring, *_ = tabell.rader[0]
+
+        assert kurs == f"1{NB}234,49"
+        assert endring == f"0,00{NB}%", "en endring som rundes til null, har ikke fortegn"
+
+    def test_ingen_tallcelle_har_punktum(self, klient, monkeypatch):
+        monter(monkeypatch, snapshot({
+            "EQNR": serie([100.0] * 60 + [104.0]),
+            "DNB": serie([200.0] * 60 + [197.5]),
+        }))
+
+        tabell = _tabell(klient.get("/").data.decode("utf-8"))
+
+        for rad in tabell.rader:
+            for celle in rad[1:4]:
+                assert "." not in celle, celle
+                assert "-0,00" not in celle, celle
+
+    def test_aksjen_som_skiller_seg_ut_er_merket_med_tekst(self, klient, monkeypatch):
+        """Ville feilet hvis en rad med styrke 2 og en med styrke 1 saa like ut
+        for en som ikke ser farger. Testen leser bare teksten i cellene."""
+        monter(monkeypatch, snapshot({
+            "EQNR": serie([100.0] * 60 + [104.0]),   # styrke 2
+            "DNB": serie([100.0] * 60 + [101.0]),    # styrke 1
+        }))
+
+        tabell = _tabell(klient.get("/").data.decode("utf-8"))
+        styrke = {rad[0]: rad[3] for rad in tabell.rader}
+
+        assert styrke["Equinor"] == "2 skiller seg ut"
+        assert styrke["DNB Bank"] == "1"
+
+    def test_fortsatt_noeyaktig_fem_kolonner(self, klient, monkeypatch):
+        monter(monkeypatch, snapshot({
+            "EQNR": serie([100.0] * 60 + [104.0]),
+            "DNB": serie([100.0] * 60 + [101.0]),
+        }))
+
+        tabell = _tabell(klient.get("/").data.decode("utf-8"))
+
+        assert len(tabell.hode) == 5
+        assert all(len(rad) == 5 for rad in tabell.rader)
+
+    def test_selskapsnavnet_ser_ut_som_en_lenke_og_fokus_synes(self, klient, monkeypatch):
+        """Leser stilen i malen, ikke hvordan nettleseren tegner den."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))
+        stil = _stil(klient.get("/").data.decode("utf-8"))
+
+        assert "text-decoration: none" not in _regel(stil, "td.selskap a")
+        assert "underline" in _regel(stil, "td.selskap a")
+        assert "outline" in _regel(stil, "td.selskap a:focus-visible")
+
+    def test_veien_tilbake_er_like_tydelig(self, klient, monkeypatch):
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))
+        stil = _stil(klient.get("/aksje/EQNR").data.decode("utf-8"))
+
+        assert "text-decoration: none" not in _regel(stil, "a.tilbake")
+        assert "underline" in _regel(stil, "a.tilbake")
+        assert "outline" in _regel(stil, "a.tilbake:focus-visible")
+
+    def test_datoen_er_den_eldste_ikke_den_foerste_raden(self, klient, monkeypatch):
+        """EQNR sorteres foerst (styrke 2), men DNB har eldre dato. Datoen og
+        «data hentet» skal ikke spri (FR-101)."""
+        lager = MinneKurslager()
+        tid = datetime(2026, 9, 24, 18, 5, tzinfo=timezone.utc)
+        lager.erstatt_serie("EQNR", serie([100.0] * 60 + [104.0]), tid)
+        lager.erstatt_serie("DNB", serie([100.0] * 59 + [101.0]), tid)
+        monkeypatch.setattr(app_modul, "hent_leser", lambda: lager)
+
+        html = klient.get("/").data.decode("utf-8")
+
+        assert [rad[0] for rad in _tabell(html).rader][0] == "Equinor"
+        assert "Oslo Børs · 2026-10-30 ·" in html
+
+    def test_fotnoten_sier_det_som_stemmer(self, klient, monkeypatch):
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))
+
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+
+        assert "under avklaring" not in html
+        assert "kurs og volum" in html
+
+    def test_tallene_i_detaljen_er_norske(self, klient, monkeypatch):
+        monter(monkeypatch, snapshot({"EQNR": serie([1234.5] * 60 + [1250.0])}))
+
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+
+        assert f'<span class="verdi">1{NB}250,00</span>' in html
+        for sjekk in re.findall(r'<td class="regnestykke">([^<]*)</td>', html):
+            assert "." not in sjekk, sjekk
+
+    def test_manglende_signal_forklares_med_aa(self, klient, monkeypatch):
+        """NFR-05: grunnen vises i begge skjermbildene."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0, 101.0, 102.0])}))
+
+        assert "for å regne signal" in klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert "for å regne signal" in klient.get("/").data.decode("utf-8")

@@ -21,8 +21,9 @@
       padding: 0 1rem;
       color: var(--tekst);
     }
-    a.tilbake { color: var(--dempet); font-size: 0.9rem; text-decoration: none; }
-    a.tilbake:hover { text-decoration: underline; }
+    /* Story 8.0: like tydelig som lenken fra oversikten. */
+    a.tilbake { color: inherit; font-size: 0.9rem; text-decoration: underline; }
+    a.tilbake:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
     h1 { font-size: 1.4rem; margin: 0.6rem 0 0.2rem; }
     p.meta { color: var(--dempet); font-size: 0.9rem; margin-top: 0; }
 
@@ -71,7 +72,7 @@
   <div class="sammendrag">
     <div class="noekkeltall">
       <span class="etikett">Sluttkurs</span>
-      <span class="verdi">{{ "%.2f"|format(detalj.sluttkurs) }}</span>
+      <span class="verdi">{{ detalj.sluttkurs|tall('kurs') }}</span>
     </div>
     <div class="noekkeltall">
       <span class="etikett">Signalstyrke</span>
@@ -96,7 +97,7 @@
           <line class="rute" x1="0" y1="{{ "%.1f"|format(linje.y) }}"
                 x2="{{ graf.bredde }}" y2="{{ "%.1f"|format(linje.y) }}"></line>
           <text class="rutetekst" x="2" y="{{ "%.1f"|format(linje.y - 3) }}">
-            {{ "%.0f"|format(linje.verdi) }}
+            {{ linje.verdi|tall('akse') }}
           </text>
         {% endfor %}
         {% if graf.ma50linje %}
@@ -159,8 +160,8 @@
   {% endif %}
 
   <p class="fotnote">
-    Børsmeldinger, KI-forklaring og kommende finansielle hendelser er ikke med
-    ennå. De krever kilder som fortsatt er under avklaring.
+    Signalet bygger bare på kurs og volum. Børsmeldinger og kommende
+    finansielle hendelser er ikke med i denne versjonen.
   </p>
 </body>
 </html>
