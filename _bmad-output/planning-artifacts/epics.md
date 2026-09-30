@@ -1699,6 +1699,19 @@ NewsWeb») · **Begrenses av:** `AD-2`
 
 **Én økt:** ja.
 
+*Utvidet 2026-09-30:*
+
+- Aksjedetaljen har to lenker: selskapets side på NewsWeb og selskapets egen
+  nettside, på norsk der den finnes. Begge gjelder aksjen siden viser, og ingen
+  av dem henter noe.
+- Adressene slås opp én gang per aksje og står sammen med navn og bransje,
+  knyttet til symbolet fra Oslo Børs (EQNR), ikke til tickeren hos EODHD
+  (EQNR.OL).
+- Tickeren fra Oslo Børs står ved navnet øverst i aksjedetaljen.
+- Kontrollpunkter: begge lenkene finnes for hver av de femten, og tickeren står
+  ved navnet. Ville feilet hvis en lenke gikk til en annen aksje enn den siden
+  viser.
+
 ---
 
 ## Epic 6: Børsmeldinger i oversikten 🔒
