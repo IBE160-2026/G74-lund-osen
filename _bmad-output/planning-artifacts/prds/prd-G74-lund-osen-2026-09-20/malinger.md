@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-01T00:33
+updated: 2026-10-01T00:34
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -1212,6 +1212,10 @@ og egne aksjelister er en idé til v1.1.
 
 **Metode.** Ett `/api/eod`-kall for `OSEBX.OL`, med `from=2025-10-01` og
 `to=2026-09-30`. Kallet ble ikke prøvd på nytt.
+
+*Lagt til 2026-10-01:* EODHD fører indeksen som `OSEBX.OL`, «OSE Benchmark», med
+typen Index, på https://eodhd.com/financial-summary/OSEBX.OL. Siden er lest av
+rådet og hentes ikke av programmet.
 
 **Kostnad.** 1 kall fra `extraLimit`, etter at dagskvoten var brukt opp av
 hentingen og sjømatmålingen (§13). `apiRequests` sto på 20 før og etter, og
