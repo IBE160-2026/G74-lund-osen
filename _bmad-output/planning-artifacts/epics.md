@@ -287,9 +287,12 @@ kontrollen 22.09 fant det.
 | **NFR-05** Norsk | **Tverrgående, levert i alt som finnes.** **Kontroll på hver visningsstory:** all brukervendt tekst er norsk |
 | **NFR-06** Ikke investeringsråd | **Tverrgående.** Forbeholdstekst finnes: `src/templates/index.html:108` sier «Signalstyrken er 0–3 og sier hvor kraftig de tre sjekkene slår ut — *ikke om aksjen bør kjøpes eller selges*». Kravet er likevel et **forbud**, ikke et tekstkrav: ingen del av grensesnittet skal formuleres som anbefaling. **Kontroll på hver visningsstory:** ordlyden leses mot NFR-06 |
 | **NFR-07** Rådata bevares | **Eid av Epic 1** (`AD-6`). Delvis levert: `fetch_prices` skriver tidsstemplede øyeblikksbilder (`352e3a2`) |
+| **NFR-08** Bare tall vi kan stå for *(lagt til 2026-10-01)* | **Tverrgående.** Levert i det som finnes: «Ukjent» i FR-101, og ingen fallback mellom `close` og `adjusted_close` i `eodhd.py`. **Kontroll på hver visningsstory:** et tall som mangler eller ikke består kontrollen, vises som «–» med grunnen. For KI-teksten gjelder FR-603 |
 
 **Alle sju NFR-er er plassert:** fire eid av en epic (NFR-01, 02, 04, 07), tre
 tverrgående med navngitt kontroll (NFR-03, 05, 06).
+*Rettet 2026-10-01:* med NFR-08 er det åtte: fire eid av en epic og fire
+tverrgående (NFR-03, 05, 06 og 08).
 
 ## Epic List
 
