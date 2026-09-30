@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-30T22:21
+updated: 2026-09-30T22:29
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -1203,3 +1203,33 @@ Alle fem har 67 handelsdager, fra 2026-06-30 til 2026-09-30.
 
 Ingen av dem er lagt i universet, fordi AD-21 holder `aksje` lik `AKSJEUNIVERS`,
 og egne aksjelister er en idé til v1.1.
+
+---
+
+## 14. OSEBX på gratisnivået (2026-09-30)
+
+**Metode.** Ett `/api/eod`-kall for `OSEBX.OL`, med `from=2025-10-01` og
+`to=2026-09-30`. Kallet ble ikke prøvd på nytt.
+
+**Kostnad.** 1 kall fra `extraLimit`, etter at dagskvoten var brukt opp av
+hentingen og sjømatmålingen (§13). `apiRequests` sto på 20 før og etter, og
+`extraLimit` gikk fra 464 til 463, som §11 viste for kall nummer 21.
+
+**Rådata.** `data/raa/maaling-osebx-raa-2026-09-30.json`. Fila finnes **bare
+lokalt** og er ikke sporet i git. Ingen tall fra serien er ført her.
+
+**Svaret:**
+
+- HTTP 200. Gratisnivået gir indeksdata for `OSEBX.OL`.
+- 255 rader, fra 2025-10-01 til 2026-09-30.
+- Feltene er de samme som for aksjene: `date`, `open`, `high`, `low`,
+  `close`, `adjusted_close` og `volume`.
+- `volume` finnes på alle rader og er 0 på én (2025-10-03).
+- `close` og `adjusted_close` er like på alle 255 radene.
+- Aksjene har 250 rader over samme periode (EQNR i basen). Indeksen har fem
+  datoer som aksjene ikke har: 2025-12-24, 2025-12-31, 2026-04-02, 2026-05-14
+  og 2026-05-25, som alle er norske helligdager. Hver dato EQNR har, finnes
+  også i indeksen.
+
+Om sluttkursen stemmer med Oslo Børs, avgjøres for hånd av en av oss, og bare
+svaret føres her.
