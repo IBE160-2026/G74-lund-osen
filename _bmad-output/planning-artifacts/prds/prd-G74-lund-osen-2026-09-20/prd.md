@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-30T22:22
+updated: 2026-09-30T22:31
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -110,7 +110,9 @@ Første versjon er på norsk og kjører lokalt.
 - Flere valgbare tidsperioder i kursgrafen enn de faste seks månedene
 - OSEBX som referanseindeks. Koster ett API-kall i døgnet og ville redusert
   marginen fra fem til fire; det er heller ikke kontrollert om indeksdata er
-  tilgjengelig på EODHDs gratisnivå
+  tilgjengelig på EODHDs gratisnivå. *Rettet 2026-09-30:* kontrollert med ett
+  kall. Gratisnivået gir indeksdata for `OSEBX.OL`: HTTP 200 og ett års serie
+  med de samme feltene som aksjene (`malinger.md` §14)
 
 ### Utenfor v1
 
