@@ -313,6 +313,8 @@ class TestForklaringenPaaNorsk:
         assert _trendforklaring(0.02004, STANDARD) == f"+2,004{self.NB}% mot MA50"
 
     def test_trend_paa_sonen_har_en_desimal(self):
+        """Matrisen i spesifikasjonen: noeyaktig paa grensen er riktig likt."""
+        assert _trendforklaring(0.02, STANDARD) == f"+2,0{self.NB}% mot MA50"
         assert _trendforklaring(-0.02, STANDARD) == f"-2,0{self.NB}% mot MA50"
 
     def test_interesse_med_hel_median(self):

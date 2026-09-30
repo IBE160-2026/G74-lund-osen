@@ -2,7 +2,7 @@
 title: 'Story 8.0: De rene feilene i de to skjermbildene'
 type: 'bugfix'
 created: '2026-09-30'
-status: 'ready-for-dev'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '348ce60a68a97856a647d50044129f4c73f27fc8'
@@ -63,10 +63,10 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `src/tallformat.py`, `tests/test_tallformat.py` -- funksjonen og matrisen over
-- [ ] `src/signalberegning.py` -- forklaringene gjennom `tall`, og «å regne»
-- [ ] `src/markedsoversikt.py`, `src/app.py`, malene -- filteret, `sidens_dato`, merket, lenkene, fotnoten, docstringene
-- [ ] `tests/test_app.py`, `tests/test_markedsoversikt.py` -- sidetestene
+- [x] `src/tallformat.py`, `tests/test_tallformat.py` -- funksjonen og matrisen over
+- [x] `src/signalberegning.py` -- forklaringene gjennom `tall`, og «å regne»
+- [x] `src/markedsoversikt.py`, `src/app.py`, malene -- filteret, `sidens_dato`, merket, lenkene, fotnoten, docstringene
+- [x] `tests/test_app.py`, `tests/test_markedsoversikt.py` -- sidetestene
 - [ ] Spinen -- grafen og mappetreet
 
 **Acceptance Criteria:**
@@ -75,6 +75,18 @@ context:
 - Given malenes stil, when `td.selskap a` og `a.tilbake` leses, then ingen har `text-decoration: none`, og begge har en `:focus-visible`-regel med `outline`
 
 ## Implementation Notes
+
+- Bygget direkte i denne økta, ikke av en egen implementasjonsagent. Gjennomgangen gjøres av tre agenter uten kontekst.
+- `tallformat.tall(verdi, slag, desimaler=None, fortegn=None)`. `fortegn=False` brukes for standardavviket, som ikke har retning. `desimaler_mot_grense` gir `minst` når tallene er like også med seks desimaler: da er forskjellen støy fra flyttallene.
+- Forklaringen ligger i tre hjelpere i `signalberegning.py`: `_trendforklaring`, `_bevegelsesforklaring` og `_interesseforklaring`. Testene kaller dem direkte, fordi en serie som treffer 1,214 mot 1,212 er vanskelig å lage.
+- `markedsoversikt.sidens_dato(rader)` gir den eldste datoen. `app.py` sender den til malen som `dato`.
+- Merket er `<span class="merke">skiller seg ut</span>` i Signalstyrke-cellen, med `display: block`. Fargen på `tr.utslag` står.
+- Lenkene er alltid understreket og har `:focus-visible` med `outline`. `a.tilbake` har `color: inherit` i stedet for den dempede fargen.
+- `tallformat.py` står i `KJERNEMODULER` i `test_konsumentene.py`, og en egen test holder den som løvnode. Spinen har modulen i grafen, kantene `app --> tallformat` og `signal --> tallformat`, og mappetreet.
+- To eksisterende tester så etter punktum (`101.00` og `123.45`) og er rettet til komma.
+- Tre tester skrev det harde mellomrommet usynlig i kilden. Nå står det som `" "`, i `7e7aa54`.
+- Mutantene (14): de tolv fra planen, nyeste dato (13) og tilbakelenken uten understrek (14). Hver ble lagt inn én om gangen og satt tilbake fra en kopi, og alle ble fanget. Mutant 2 ble først ikke lagt inn, fordi kilden hadde et literalt hardt mellomrom. Den ble kjørt på nytt etter `7e7aa54` og ble fanget.
+- Testene: før 928 passed og 16 skipped lokalt, og 944 passed i CI på main (kjøring 36744235389). Etter: 973 passed og 16 skipped lokalt.
 
 ## Spec Change Log
 
