@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-09-30T18:24
+updated: 2026-09-30T21:15
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -94,6 +94,8 @@ koden.
 - Av/på-bryter for KI-laget, synlig i grensesnittet
 - Kommende finansielle hendelser *Ute av v1 fra 2026-09-28 (plan B, punkt 1 i §8).*
 - Lenke fra aksjedetaljen til selskapets side på NewsWeb *(plan B, 28.09)*
+- Lenke fra aksjedetaljen til selskapets egen nettside, på norsk der den finnes *(lagt til 2026-09-30)*
+- Tickeren fra Oslo Børs står ved selskapsnavnet i aksjedetaljen, for eksempel EQNR *(lagt til 2026-09-30)*
 
 *Plan B, 2026-09-28:* KI-laget forklarer signalet i stedet for børsmeldingene, ut fra tall regnet av kursene (Epic 10). Av/på-bryteren står. FR-601–606 er skrevet om for plan B 2026-09-28, og meldingsversjonen står i §4.6A. *Her sto:* «FR-601–606 skrives om for plan B i en egen runde.»
 
