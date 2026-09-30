@@ -2,7 +2,7 @@
 title: 'Story 8.0: De rene feilene i de to skjermbildene'
 type: 'bugfix'
 created: '2026-09-30'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '348ce60a68a97856a647d50044129f4c73f27fc8'
