@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-27T11:54
+updated: 2026-09-30T22:21
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -1174,3 +1174,32 @@ falt ut i starten (15 rader), og 2026-09-23 og 2026-09-24 kom inn i slutten
 
 15 symboler, 3 750 rader, ingen manglende. `sist_hentet` er hentetidspunktet i
 UTC for alle 15.
+
+---
+
+## 13. Sjømat: fem kandidater mot kriteriet i §3 (2026-09-30)
+
+**Metode.** Som i §1: ett `/api/eod`-kall per symbol, med `from=2026-06-30` og
+`to=2026-09-30`. Omsetning regnes som `volume × close` per handelsdag, og
+medianen tas over perioden. Kravet er en median daglig omsetning over 25 MNOK
+(`prd.md` §3). Målingen er første målerunde for idéen «Egne aksjelister» i
+v1.1-tabellen i `prd.md` §8.
+
+**Kostnad.** 5 kall, tatt av dagskvoten 30.09 etter den daglige hentingen på
+15. Ingen kall feilet.
+
+**Rådata.** `data/raa/maaling-sjomat-raa-2026-09-30.json`. Fila finnes **bare
+lokalt** og er ikke sporet i git. Bare tallene under er regnet ut og ført her.
+
+| Symbol | Selskap | Handelsdager | Median omsetning | Over 25 MNOK |
+|---|---|---:|---:|---|
+| BAKKA | Bakkafrost | 67 | 36,7 MNOK | Ja |
+| LSG | Lerøy Seafood Group | 67 | 18,3 MNOK | Nei |
+| AUSS | Austevoll Seafood | 67 | 9,7 MNOK | Nei |
+| GSF | Grieg Seafood | 67 | 6,7 MNOK | Nei |
+| SALME | Salmon Evolution | 67 | 2,6 MNOK | Nei |
+
+Alle fem har 67 handelsdager, fra 2026-06-30 til 2026-09-30.
+
+Ingen av dem er lagt i universet, fordi AD-21 holder `aksje` lik `AKSJEUNIVERS`,
+og egne aksjelister er en idé til v1.1.
