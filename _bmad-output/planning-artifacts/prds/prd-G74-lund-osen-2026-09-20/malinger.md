@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-30T22:29
+updated: 2026-09-30T22:30
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -1228,8 +1228,11 @@ lokalt** og er ikke sporet i git. Ingen tall fra serien er ført her.
 - `close` og `adjusted_close` er like på alle 255 radene.
 - Aksjene har 250 rader over samme periode (EQNR i basen). Indeksen har fem
   datoer som aksjene ikke har: 2025-12-24, 2025-12-31, 2026-04-02, 2026-05-14
-  og 2026-05-25, som alle er norske helligdager. Hver dato EQNR har, finnes
-  også i indeksen.
+  og 2026-05-25. De tre i 2026 står som stengte dager i `STENGT` i
+  `src/boersdag.py`. Lista dekker ikke 2025, men ingen av de 15 aksjene har
+  rader for de to datoene i desember. Hver dato EQNR har, finnes også i
+  indeksen. *Rettet 2026-09-30:* her sto «som alle er norske helligdager». Det
+  var ikke slått opp, og 2025-12-24 og 2025-12-31 er ingen helligdager.
 
 Om sluttkursen stemmer med Oslo Børs, avgjøres for hånd av en av oss, og bare
 svaret føres her.
