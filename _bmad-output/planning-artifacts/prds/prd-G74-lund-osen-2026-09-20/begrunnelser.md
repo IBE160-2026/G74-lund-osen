@@ -2,7 +2,7 @@
 title: "Begrunnelser — hvorfor kravene i PRD-en ser slik ut"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-26T23:47
+updated: 2026-10-01T00:10
 ---
 
 # Begrunnelser — hvorfor kravene i PRD-en ser slik ut
@@ -256,6 +256,17 @@ Et tidligere utkast av FR-705 begrenset meldingshenting og KI-vurdering til
 selskapene som skilte seg ut. Begrensningen hadde ingen begrunnelse — NewsWeb
 koster ingen kvote — og den motsa både FR-404, som etterfyller meldinger for hele
 intervallet, og FR-203, som lover meldinger i aksjedetaljen for enhver aksje.
+
+### Hvorfor akkurat disse tre sjekkene (FR-701)
+
+*Lagt til 2026-10-01, Marians beslutning. Skrevet ned etter at sjekkene ble valgt.*
+
+Hver sjekk svarer på sitt eget spørsmål om én aksje på én dag:
+- **Trend:** ligger kursen over eller under snittet for de siste 50 børsdagene? Det er en tilstand, som kan vare i uker.
+- **Bevegelse:** var dagens endring uvanlig for akkurat denne aksjen? Endringen måles mot aksjens egne svingninger, så en rolig og en urolig aksje måles hver på sitt.
+- **Interesse:** handlet flere enn vanlig? Volum har ingen retning i seg selv, så fortegnet følger dagens endring.
+
+De tre ser på hver sin del av dataene: kursnivået, endringen og volumet. Alle regnes av utbyttejustert kurs og volum, som appen allerede henter, med én regel og én grense hver. Da kan brukeren se hva som ga utslaget, slik briefen lover. Sjekkene er valgt for å kunne forklares, ikke for å treffe markedet. Om de sier noe om kursen videre, er ikke målt (FR-703).
 
 ### Åpent punkt: skjevfordeling mot positiv retning
 
