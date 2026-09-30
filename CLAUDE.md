@@ -27,6 +27,8 @@ et sitat som ikke fantes».
    frontmatteren på nytt og tåler bare linjer på formen `nøkkel: verdi`.
    PRD-memloggen har kommentarlinjer i frontmatteren som skriptet fjerner eller
    endrer, så der legges nye linjer til direkte, nederst i fila.
+   Da settes `updated` fra klokka i samme commit (regel 4), og bare den linjen
+   i frontmatteren endres.
 6. **Ingen nettverkskall i tester** (AD-8, håndhevet i `tests/conftest.py`).
    **Ingen API-kall uten avtale.** Kostnad måles med `/api/user` før og etter
    (`malinger.md` §7.1).
