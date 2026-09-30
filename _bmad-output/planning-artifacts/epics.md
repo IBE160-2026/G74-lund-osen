@@ -1887,6 +1887,36 @@ Som **bruker**, vil jeg at tallene står på norsk, at jeg ser hvilke aksjer som
 
 *Ferdig 2026-09-30:* flettet i `33317df`, PR #15.
 
+### Story 8.0b: Hjelp bak et spørsmålstegn
+
+*Lagt til 2026-10-01, Marians beslutning.*
+
+Som **bruker**, vil jeg kunne trykke på et «?» og få forklart det appen viser, så
+jeg forstår tallene uten å spørre noen.
+
+**Oppfyller:** raden «Hjelp bak et spørsmålstegn» i v1.1-tabellen i `prd.md` §8 ·
+**Begrenses av:** FR-701, FR-703, FR-704, NFR-06
+
+Et «?» på begge skjermbildene åpner et lite vindu med fast tekst, uten nettkall og
+uten KI. Det sier hva hver sjekk måler (FR-701), hvorfor akkurat disse tre (den
+nye delen i §6 i `begrunnelser.md`), at grensene er valgt etter målinger over 199
+børsdager (`malinger.md` §7.4 og §9), hvorfor retningen oftere blir positiv i en
+stigende periode («Åpent punkt» i §6), og at signalet ikke sier noe om
+fremtiden (FR-703, NFR-06).
+
+Hjelpetekstene ligger i én fil, ikke spredt i malene, så et ord kan endres ett
+sted. Min liste (8.3) bruker de samme.
+
+**Kontroll — hva testen ser etter:**
+- Tall i teksten, som 50 dager og 1,5 ganger, hentes fra `Parametre`, og en test krever det
+- En test sjekker at hver tekst malene ber om, finnes i fila
+- «Ingen» og «Ukjent» forklares hver for seg
+- Retningen forklares med ordene i FR-704
+- **Ville feilet hvis:** teksten sa noe koden ikke gjør, noe som ikke står i en kilde, eller noe som kan leses som et råd
+
+**Avhenger av:** 8.0. Ferdig før 8.1, så testen viser om hjelpen blir brukt.
+**Én økt:** ja.
+
 ### Story 8.1: Brukertest rett etter Epic 2
 
 Som **gruppe**, vil vi se en person utenfor gruppen bruke løsningen tidlig, så
