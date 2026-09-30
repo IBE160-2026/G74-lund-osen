@@ -2,7 +2,7 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-28T18:11
+updated: 2026-09-30T21:17
 ---
 
 # Kilder og rettigheter
@@ -999,6 +999,9 @@ lenger uimotsagt» over.
 - [ ] **Lenken til NewsWeb (plan B).** En av oss slår opp adressen til
       selskapssidene og hva Euronexts vilkår sier om lenker, før lenken bygges.
       Sidene leses av et menneske og hentes ikke av programmet. **Eier: Gruppen.**
+- [ ] **Lenken til selskapenes nettsider.** En av oss slår opp adressen til den
+      norske nettsiden for hver av de femten, før lenken bygges. Sidene leses av
+      et menneske og hentes ikke av programmet. **Eier: Gruppen.**
 - [x] ~~**Beslutning hvis Euronext ikke svarer innen 2026-09-28.**~~ — **avgjort 2026-09-28: plan B.** Se punkt 1 i `prd.md` §8. Vilkårene
       krever tillatelse på forhånd, og vi henter allerede. Beslutningen 23.09:
       det hentes ikke, og 28.09 avgjør om Epic 5B utløses. Skal avgjøres og
