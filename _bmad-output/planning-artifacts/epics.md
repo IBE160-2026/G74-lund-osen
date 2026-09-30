@@ -1620,6 +1620,11 @@ venter på en modell.
   KI-tekst den dagen, og det logges (NFR-04)
 - `KILogg` får én rad per aksje per dag, med emnet `(symbol, dato)`: hva
   regelforklaringen sa, hva KI la til, promptversjon og modell (FR-605, story 4.2)
+- Kontrollen i FR-603 er én ren funksjon, som kalles før teksten logges som
+  bestått. En test med falsk modell viser at hvert av de fire punktene stopper en
+  tekst: feil tall, feil retning eller styrke, råd og gjetning. Et tall kan stå
+  uten fortegn når teksten sier «falt» eller «steg». En tekst som stopper, vises
+  ikke og logges med grunnen (FR-604) *(lagt til 2026-10-01)*
 - **Ville feilet hvis:** KI-kallet lå i webserveren. Da koster hver visning av
   siden et kall, brukeren venter (NFR-02), og teksten som ble vist, finnes ikke
   igjen i loggen
