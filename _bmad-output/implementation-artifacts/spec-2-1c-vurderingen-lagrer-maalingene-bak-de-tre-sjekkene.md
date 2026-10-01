@@ -2,7 +2,7 @@
 title: 'Story 2.1c: Vurderingen lagrer målingene bak de tre sjekkene'
 type: 'feature'
 created: '2026-10-01'
-status: 'ready-for-dev'
+status: 'in-progress'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '94ee9bb4df50c3ed3dd39c645dab34620c7e7365'
