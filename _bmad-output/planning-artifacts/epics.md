@@ -1152,6 +1152,8 @@ så en vurdering kan etterprøves og sjekkes. Et fortegn uten måling kan ikke d
 
 **Avhenger av:** 2.1b. **Én økt:** ja.
 
+*Ferdig 2026-10-01:* flettet i `4b7e074`, PR #16.
+
 ### Story 2.2: Hentekommandoen som egen inngang
 
 Som **sensor som kjører containeren**, vil jeg at oppstart ikke bruker et eneste
