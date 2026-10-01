@@ -2,7 +2,7 @@
 title: 'Story 2.1c: Vurderingen lagrer målingene bak de tre sjekkene'
 type: 'feature'
 created: '2026-10-01'
-status: 'in-progress'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '94ee9bb4df50c3ed3dd39c645dab34620c7e7365'
@@ -112,6 +112,27 @@ context:
 ## Spec Change Log
 
 ## Review Triage Log
+
+Gjennomgang 1 (01.10), Blind Hunter (BH), Edge Case Hunter (ECH) og Verification Gap (VG).
+
+| # | Funn | Dom | Grunnlag | Rute |
+|---|---|---|---|---|
+| ECH1 | «1,50 × medianen» kan stå ved +1 når forholdstallet ligger under seks desimaler over 1,5 | low | `desimaler_mot_grense` gir `minst` når tallene er like med seks desimaler (8.0, flyttallsstøy). Docstringen lovet mer enn koden gjør | patch: docstringen |
+| ECH2 | Negativ eller NaN medianvolum gir feil tekst | false | `Kursrad` krever heltall ≥ 0 for volum (`kursdata.py:112–116`), og `beregn_signal` får bare `Kursrad` | avvist |
+| BH1 | AD-7 i spinen slutter fortsatt med «Ikke bygget ennå.» over Bygget-linjen | low | Linje 188 | patch: Rettet-merknad |
+| BH2 | `docs/kilder-og-rettigheter.md:440–444` beskriver den gamle interesseteksten som «i dag» | medium | Teksten er ikke lenger sann etter 2.1c | patch: Rettet-merknad |
+| BH3 | `SjekkVisning.maaling` er tekst, `Sjekk.maaling` tall | low | Navnet fantes før 2.1c. Et nytt navn rører mal og tester uten at noen bruker merker det | avvist |
+| BH4 | Tekst slipper gjennom `>= 0` i basen | low | REAL-affinitet lagrer tekst, som sammenlignes større enn tall. Porten avviser tekst | patch: kommentar i `0004` |
+| BH5 | «3.37 og nyere» i `0004` uten kilde | low | Ikke slått opp (regel 3) | patch: tallet fjernet |
+| BH6 | Egenskapstesten dekker ikke medianvolum 0 | false | `test_medianvolum_null_gir_ingen_maaling` dekker grenen, og VG fant den | avvist |
+| BH7 | 8.0-spesifikasjonen får ingen merknad om at tre tester er byttet | low | Beslutning 1 sier hvor merknaden står: i 2.1c i `epics.md` og her | avvist |
+| BH8 | Koblingen fra sjekk til kolonne står bare i en testhjelper, etter posisjon | low | Omformingen lages i 2.5 (beslutning 2) | avvist |
+| BH9 | `grense` er satt bare for bevegelse | false | Slik spesifikasjonen sier: bare bevegelse har en grense som varierer | avvist |
+| BH10 | `test_porten_sjekker_ikke_fortegnet_mot_maalingen` sjekker ingenting | low | Testen lager bare objektet | patch: assert |
+| BH11 | «En vurdering lagret bare fortegnene» i `0004` er unøyaktig | low | Raden lagret også styrke, retning og kursene | patch: kommentaren |
+| BH12 | Spinelinjene peker ikke på spesifikasjonsfila | low | Kosmetisk | avvist |
+| BH13 | Import midt i `test_migrering.py` med `noqa: E402`, og innrykk i to hjelpere | low | Importen er en direkte retting. Innrykket er kosmetisk | patch: importen. Innrykket avvist |
+| VG | Ingen hull | – | Alle endrede atferder har en test som ville feilet | – |
 
 ## Verification
 

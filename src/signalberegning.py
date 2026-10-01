@@ -143,8 +143,9 @@ def _bevegelsesforklaring(dagens: float, avvik: float) -> str:
 
 def _interesseforklaring(forhold: float | None, p: Parametre) -> str:
     """Volumet som forholdstall mot medianen, med saa mange desimaler (minst
-    to) at det skilles fra volumfaktoren (story 2.1c, FR-706). Ville feilet
-    hvis «1,50 × medianen» sto ved en sjekk som ga +1.
+    to) at det skilles fra volumfaktoren (story 2.1c, FR-706). En forskjell
+    under seks desimaler regnes som stoey fra flyttallene og vises med to, som
+    i desimaler_mot_grense (story 8.0).
 
     Mangler forholdstallet, fordi medianvolumet er 0, vises «–» med grunnen,
     aldri 0 og aldri et anslag (NFR-08). Vinduet kommer fra parametrene.

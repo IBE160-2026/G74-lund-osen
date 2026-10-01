@@ -1,8 +1,8 @@
 -- 0004 - maalingene bak de tre sjekkene. Story 2.1c, FR-408, FR-706, AD-7,
 -- AD-16, AD-18.
 --
--- En vurdering lagret bare fortegnene. Tallene de ble avgjort av, kastes, og
--- et fortegn uten maaling kan ikke etterproeves (FR-706). Raden er et
+-- Av de tre sjekkene lagret raden bare fortegnene. Tallene de ble avgjort av,
+-- ble kastet, og et fortegn uten maaling kan ikke etterproeves (FR-706). Raden er et
 -- oeyeblikksbilde av hva regelen saa, saa maalingene kopieres inn som verdier,
 -- som kursen (AD-18). De lagres uavrundet og i samme enhet som regelen regner
 -- i. Avrunding skjer bare der tallet vises (regel 21).
@@ -14,13 +14,16 @@
 --
 -- En rad med grunn har ingen maaling. En vurdering har alle fire, bortsett
 -- fra at volumforhold mangler naar medianvolumet var 0, og da er interesse 0.
+-- Basen sjekker bare om tallene finnes, og fortegnet naar de er tall: en
+-- tekst i en REAL-kolonne lagres som tekst og sammenlignes som stoerre enn
+-- alle tall, saa typen kontrolleres av Vurdering i porten.
 
 -- En vurderingsrad uten grunn fra foer 0004 har ingen maalinger, og de kan
 -- ikke fylles inn etterpaa (AD-7). Migrasjonen stopper derfor, loeperen ruller
 -- den tilbake, og basen staar paa versjon 3 med feilen synlig. Nyere SQLite
--- avviser ogsaa ADD COLUMN naar en gammel rad bryter CHECK-en, men det
--- avhenger av versjonen (3.37 og nyere), saa kontrollen staar her, som
--- kontroll_0003 i 0003.
+-- avviser ogsaa ADD COLUMN naar en gammel rad bryter CHECK-en. Hvilken
+-- versjon som innfoerte det, er ikke slaatt opp, og hjelpetabellen gjoer det
+-- uten betydning. Kontrollen staar her, som kontroll_0003 i 0003.
 
 CREATE TABLE kontroll_0004 (
     vurderinger_uten_grunn INTEGER NOT NULL CHECK (vurderinger_uten_grunn = 0)

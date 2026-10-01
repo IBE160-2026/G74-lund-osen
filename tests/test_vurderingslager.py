@@ -570,7 +570,9 @@ class TestVurdering:
     def test_porten_sjekker_ikke_fortegnet_mot_maalingen(self):
         """Spesifikasjonen: fortegnet mot maalingen er kjernens regel, og
         porten importerer ikke kjernen."""
-        vurdering(trend=1, trend_avvik=-0.5, bevegelse=1, dagens_endring=-0.5)
+        godtatt = vurdering(trend=1, trend_avvik=-0.5, bevegelse=1, dagens_endring=-0.5)
+        assert godtatt.trend_avvik == -0.5
+        assert godtatt.dagens_endring == -0.5
 
     def test_kolonnene_er_feltene_i_vurdering(self):
         """Ville feilet hvis en maaling manglet i VURDERINGSKOLONNER, saa

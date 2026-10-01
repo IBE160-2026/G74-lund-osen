@@ -16,6 +16,7 @@ import threading
 import pytest
 
 import migrering
+from lagring_sqlite import MIGRASJONSKATALOG
 from migrering import MigrasjonsFeil, migrer, versjon
 
 
@@ -677,8 +678,6 @@ class TestIngenUnntaksvei:
 # Story 2.1c: 0004 legger maalingene til vurdering. Testene under leser de
 # ekte migrasjonsfilene, men kopierer dem til tmp_path og skriver aldri i
 # src/migrasjoner/.
-
-from lagring_sqlite import MIGRASJONSKATALOG  # noqa: E402
 
 FILENE_TIL_0003 = ("0001_kurs.sql", "0002_vurdering.sql", "0003_aksje.sql")
 MAALINGENE = ("trend_avvik", "dagens_endring", "standardavvik", "volumforhold")
