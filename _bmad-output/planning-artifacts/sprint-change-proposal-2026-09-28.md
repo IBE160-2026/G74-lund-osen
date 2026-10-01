@@ -2,7 +2,7 @@
 title: "Endringsforslag 28.09: databasen i bruk i Epic 2"
 status: final
 created: 2026-09-28
-updated: 2026-09-29T00:19
+updated: 2026-10-01T23:43
 ---
 
 # Endringsforslag 28.09: databasen i bruk i Epic 2
@@ -332,6 +332,11 @@ reserve. Her sto for uke 40–44: «2.1, 2.1b, 2.5. … 4.1 (papirarbeid) ved si
 av», «2.2, 2.7. 4.2 ved siden av», «… 3.1, 3.2, 3.3. 4.3», «Reserve. 2.4 og 2.6
 hvis det er tid. Plan B kommer i tillegg (ikke med her)» og «KI-teksten lages
 hver dag».
+
+*Lagt til 2026-10-01 (hovedindeksen OSEBX i v1, Marians beslutning):* 2.8, 2.9
+og 2.9b kommer inn i uke 41, etter 4.2 og 4.3 i uke 40, så `ki_logg` blir `0005`
+og indeksen `0006`. Ingen av dem står på lista «Kan ikke kuttes», og blir det
+trangt, venter 2.9b først. Rekkefølgen i Epic 2 står i `epics.md`.
 
 Det er ikke regnet på hvor lang tid storyene tar. Rekkefølgen er avhengighetene
 og prioriteringen, ikke et estimat.
