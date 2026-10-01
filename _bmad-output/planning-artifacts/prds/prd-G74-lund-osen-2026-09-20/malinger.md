@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-01T00:34
+updated: 2026-10-01T16:07
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -1242,3 +1242,5 @@ lokalt** og er ikke sporet i git. Ingen tall fra serien er ført her.
 
 Om sluttkursen stemmer med Oslo Børs, avgjøres for hånd av en av oss, og bare
 svaret føres her.
+
+*Lagt til 2026-10-01:* Kontrollert for hånd av Marian 01.10. `close` for 2026-09-30 i råfila er, avrundet til to desimaler, lik sluttverdien hun hadde fra Oslo Børs samme dag. Ingen tall er ført (regel 16).
