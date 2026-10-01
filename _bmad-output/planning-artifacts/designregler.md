@@ -36,3 +36,14 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 **Hvorfor:** Samme knapp betyr det samme overalt, så brukeren lærer valget én gang. Den første knappen sier hvilken dag tallene gjelder, med ord brukeren kjenner.
 
 **I dag:** appen har ikke noe periodevalg. Kursgrafen har faste seks måneder (FR-201), og flere perioder står under «Hvis vi rekker».
+
+## 3. Gult betyr 3 av 3
+
+*Avgjort 2026-10-01, Marians beslutning.*
+
+- Ved en aksje betyr gult at den fikk 3 av 3 på siste børsdag: gul ring rundt pillen «3 av 3» i tabellen, gul ramme med hvit kant og merket «3 av 3» i børsometeret, og gult bransjesymbol over søylen under hovedindeksen (FR-105).
+- Gult står også når siden viser en periode eller en annen dag, så aksjen er lett å kjenne igjen. 2 av 3 merkes uten gult, og bare for siste børsdag.
+
+**Hvorfor:** 3 av 3 er det sterkeste signalet, og samme farge overalt gjør det lett å finne.
+
+**I dag:** appen bruker ikke gult. Rader som skiller seg ut, har lys grå bakgrunn og merket «skiller seg ut» (index.html).

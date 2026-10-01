@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-01T23:40
+updated: 2026-10-01T23:58
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -346,6 +346,8 @@ falt.
 - Ingen nye kall og ingen ny lagring: endringen er den i FR-101, og bransjen står
   i `AKSJEUNIVERS`.
 - Bare dagens søyler. Periodene og «Velg dag» fra designtavla er idé til v1.1.
+
+*Lagt til 2026-10-01:* bransjesymbolet er gult når aksjen har 3 av 3 på siste børsdag (designregler.md §3).
 
 #### FR-407 — Merking av utbyttedager
 

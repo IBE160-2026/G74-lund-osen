@@ -1385,6 +1385,7 @@ med en gang hvilke som trakk opp og ned.
 - Bransjesymbolene ligger i malen og hentes ikke fra nettet, som skriftene i `designregler.md`
 - Grensene for fargene avgjøres i spesifikasjonen og føres i `designregler.md`
 - Bare dagens søyler. Periodene og «Velg dag» fra designtavla er idé til v1.1
+- Bransjesymbolet er gult når aksjen har 3 av 3 på siste børsdag (`designregler.md` §3) *(lagt til 2026-10-01)*
 - **Ville feilet hvis:** søylene trengte et nytt kall eller en ny tabell. Endringen er den i FR-101, og bransjen står i `AKSJEUNIVERS`
 
 **Avhenger av:** 2.9. **Én økt:** ja.
