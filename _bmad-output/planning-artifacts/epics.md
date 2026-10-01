@@ -1126,6 +1126,8 @@ så en vurdering kan etterprøves og sjekkes. Et fortegn uten måling kan ikke d
 - Testene for `signalberegning` står uendret og er grønne. En ny test viser at
   regelen, brukt på `maaling` og `grense`, gir samme verdi som sjekken for hver
   av de tre
+  *Rettet 2026-10-01:* tre tester fra 8.0 sjekket den gamle teksten for
+  interesse og er byttet ut, fordi teksten følger FR-706. Resten står uendret.
 - En kontrollregning på det nyeste øyeblikksbildet i `data/`, før og etter, som
   i 1.4b–1.5: styrke, retning og de tre verdiene er like for alle 15, og bare
   teksten for interesse skiller. Skifter noen, føres det. Ingen API-kall, og
