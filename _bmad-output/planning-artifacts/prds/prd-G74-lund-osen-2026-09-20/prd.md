@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-01T15:54
+updated: 2026-10-01T23:40
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -96,6 +96,7 @@ koden.
 - Lenke fra aksjedetaljen til selskapets side på NewsWeb *(plan B, 28.09)*
 - Lenke fra aksjedetaljen til selskapets egen nettside, på norsk der den finnes *(lagt til 2026-09-30)*
 - Tickeren fra Oslo Børs står ved selskapsnavnet i aksjedetaljen, for eksempel EQNR *(lagt til 2026-09-30)*
+- Hovedindeksen OSEBX i markedsoversikten, med søyler for dagens endring per aksje (FR-104, FR-105, FR-410) *(lagt til 2026-10-01, Marians beslutning)*
 
 *Plan B, 2026-09-28:* KI-laget forklarer signalet i stedet for børsmeldingene, ut fra tall regnet av kursene (Epic 10). Av/på-bryteren står. FR-601–606 er skrevet om for plan B 2026-09-28, og meldingsversjonen står i §4.6A. *Her sto:* «FR-601–606 skrives om for plan B i en egen runde.»
 
@@ -114,6 +115,7 @@ Første versjon er på norsk og kjører lokalt.
   tilgjengelig på EODHDs gratisnivå. *Rettet 2026-09-30:* kontrollert med ett
   kall. Gratisnivået gir indeksdata for `OSEBX.OL`: HTTP 200 og ett års serie
   med de samme feltene som aksjene (`malinger.md` §14)
+  *Flyttet til v1 2026-10-01, Marians beslutning:* FR-104, FR-105 og FR-410.
 
 ### Utenfor v1
 
@@ -308,6 +310,42 @@ og «blandet» lar seg ikke uttrykke lesbart i farge i det hele tatt. Teksten er
 den bærende kanalen; symbol og farge er forsterkninger. Symbolet står ved siden
 av teksten, ikke i stedet for den, og skjules for skjermlesere så pilen ikke
 leses opp i tillegg til ordet.
+
+#### FR-104 — Hovedindeksen i markedsoversikten
+
+*Lagt til 2026-10-01, Marians beslutning.*
+
+Over tabellen står overskriften «Hovedindeksen» med OSEBX ved siden av,
+indeksverdien (`close` for indeksens siste børsdag), dagens endring i prosent og
+«x av N gikk bedre enn indeksen». Ingenting av dette er en kolonne: FR-101 står
+med fem.
+
+- Endringen regnes mot forrige børsdag, ikke mot forrige rad, fordi indeksen har
+  datoer aksjene ikke har (`malinger.md` §14). `close` og `adjusted_close` er like
+  for indeksen (§14), så den sammenlignes med aksjenes endring fra FR-101.
+- N er aksjene med kurs for samme dato som indeksen, aldri et fast 15 (føringen
+  30.09 under `AD-21`). En aksje som ikke er med, navngis, slik FR-101 navngir
+  aksjer som mangler. Mangler én aksje dagens kurs, står det «x av 14».
+- «Bedre» avgjøres på endringen slik den vises, og lik er ikke bedre.
+- Har ingen aksje kurs for indeksens dato, vises ikke sammenligningen. Mangler
+  indeksen, står siste lagrede verdi med datoen sin, eller at indeksen mangler
+  (NFR-03). Hentingen står i FR-410.
+
+#### FR-105 — Søylene under hovedindeksen
+
+*Lagt til 2026-10-01, Marians beslutning.*
+
+Under indeksen (FR-104) står én søyle per aksje med dagens endring, fra størst
+fall til størst stigning. Over hver søyle står bransjesymbolet, over tickeren.
+Indeksens endring er en stiplet linje, grønn når indeksen steg og rød når den
+falt.
+
+- Antallet telles (føringen 30.09 under `AD-21`). En aksje uten kurs for
+  indeksens dato får ingen søyle.
+- Søylene har en tekst for skjermleser med alle tallene.
+- Ingen nye kall og ingen ny lagring: endringen er den i FR-101, og bransjen står
+  i `AKSJEUNIVERS`.
+- Bare dagens søyler. Periodene og «Velg dag» fra designtavla er idé til v1.1.
 
 #### FR-407 — Merking av utbyttedager
 
@@ -711,6 +749,25 @@ for en dag som allerede har passert.
 `AD-7` ble avgjort eksplisitt. *Rettet samme kveld:* kravet var først formulert
 som et visningskrav og lovet at dagen ikke skulle se ut som «et hopp i
 historikken» — i en historikkvisning som ikke er spesifisert noe sted.
+
+#### FR-410 — Hovedindeksen hentes i samme kjøring
+
+*Lagt til 2026-10-01, Marians beslutning.*
+
+Hentekommandoen henter `OSEBX.OL` med ett kall per kjøring, med samme intervall
+som aksjene. Daglig henting koster da 16 kall (NFR-01).
+
+- Rådata lagres i samme øyeblikksbilde som aksjene, under en egen nøkkel og ikke
+  blant aksjeseriene (FR-406, NFR-07).
+- Indeksen lagres i en egen tabell, `indeks`, aldri i `aksje`, `kurs`, `kursserie`
+  eller `vurdering` (føringen 2026-10-01 under `AD-21`). Migreringen er `0006`,
+  etter `ki_logg` i `0005` (`AD-16`). Tabellen kan bygges opp igjen fra kilden,
+  som `kurs` (`AD-7`).
+- Bare børsdager lagres, i årene kalenderen dekker (`DEKKEDE_AAR` i
+  `boersdag.py`), uten et fast årstall i koden.
+- Webserveren henter aldri indeksen (`AD-10`).
+- Feiler indekskallet, lagres og vurderes aksjene som vanlig. Indeksen føres i
+  `feil` og får ingen ny sjanse (`AD-15`), og den gir aldri en rad i `vurdering`.
 
 ---
 
@@ -1164,6 +1221,10 @@ EODHD gir 20 kall i døgnet på gratisnivå. Daglig henting av kurser koster ett
 kall per symbol, altså 15. Det gir **fem kalls margin** til omkjøringer,
 feilretting og manuell testing.
 
+*Endret 2026-10-01 (OSEBX i v1, Marians beslutning):* hovedindeksen hentes i
+samme kjøring (FR-410), så daglig henting koster 16 kall og gir **fire kalls
+margin**. Avsnittet over gjelder til story 2.8 er bygget.
+
 Ett bulk-kall er ikke et alternativ: bulk-endepunktet koster 100 kall flatt. Ett
 kall per symbol er eneste vei, og det er denne begrensningen som gir universet
 på 15.
@@ -1395,7 +1456,7 @@ den avhenger av.
 
 | Idé | Avhenger av | Forbehold |
 |---|---|---|
-| **Sektorvisning:** endring per sektor for dag, uke og måned | Ingenting nytt. Sektor finnes i `AKSJEUNIVERS`, og tallene regnes fra kursserien | 15 aksjer gir få per sektor: 8 sektorer, der Energi har 4, fire har 2 og **tre har bare én** (Industri, Telekom, Konsum). En «sektor» med én aksje er aksjen selv. Vurderes etter brukertesten (story 8.1) |
+| **Sektorvisning:** endring per sektor for dag, uke og måned | Ingenting nytt. Sektor finnes i `AKSJEUNIVERS`, og tallene regnes fra kursserien | 15 aksjer gir få per sektor: 8 sektorer, der Energi har 4, fire har 2 og **tre har bare én** (Industri, Telekom, Konsum). En «sektor» med én aksje er aksjen selv. Vurderes etter brukertesten (story 8.1). *Lagt til 2026-10-01, Marians beslutning:* søylene per aksje for dagens endring, med bransjesymbol og indeksen som stiplet linje, er tatt inn i v1 (FR-105). Endring per sektor står igjen her |
 | **Større aksjeunivers enn 15** | Målingen av `extraLimit` 23.09 (`malinger.md` §11): bonuskvoten trer inn ved kall 21, men den er på 485 og tar slutt | Se regnestykket under. Det skal stå før idéen vurderes |
 | **Navigasjon mellom flere skjermbilder** *(utvidet 2026-09-26)*: en knapperad øverst, der knappen for skjermbildet man står på, er fylt. Kandidatene er Markedsoversikt, Min liste, Nyheter og Kalender. En knapp vises bare når skjermbildet finnes | Story 8.2, som skal si hvordan et tredje skjermbilde ville passet inn, uten å bygge det. Min liste er «Favorittmerking av aksjer» fra «Hvis vi rekker». Nyheter krever Epic 6 eller raden «Mediesaker for ett selskap». Kalender er Epic 7, der utbyttedatoer er blant de typiske hendelsestypene (FR-302) | Med to skjermbilder i v1 gir en knapperad lite: aksjedetaljen nås ved å klikke på en aksje. Epic 6 og 7 er blokkert av åpent punkt 1, så uten et ja fra Euronext blir det verken børsmeldinger under Nyheter eller noen Kalender. Min liste er favorittmerking, ikke en personlig portefølje, som står under «Utenfor v1», og med 15 aksjer kan den like gjerne være et filter i oversikten. Utbyttehistorikken fra kursserien er historikk, ikke en kalender, og hører til aksjedetaljen. *Delvis flyttet til v1 2026-09-30:* knapperaden med Markedsoversikt og Min liste bygges i 8.3. Nyheter og Kalender står igjen her |
 | **Mediesaker for ett selskap** *(lagt til 2026-09-25)*: de nyeste artiklene fra EODHDs nyhets-API for én aksje, hentet bare når brukeren ber om det. Også for selskaper utenfor de 15, med ticker skrevet inn | Relevanseksperimentet del 1 (story 9.4): hvor mange artikler som finnes per selskap, og hvor mange av dem som faktisk handler om selskapet. For selskaper utenfor universet: et eget skjermbilde uten kurs og signal, jf. idéen om flere skjermbilder | 5 kall per selskap (`malinger.md` §7.2). Kurshentingen bruker 15 av 20, så ett selskap per dag holder seg innenfor dagskvoten, og mer tar av bonuskvoten (§11). Hentes av hentekommandoen, ikke av en knapp i nettsiden: webserveren henter aldri (NFR-02, AD-10). Artiklene vises bare lokalt og publiseres ikke (`docs/kilder-og-rettigheter.md`). Skal KI vurdere relevansen, gjelder EODHDs betingelser fra 21.09, også betingelse 4 |
@@ -1415,7 +1476,7 @@ den avhenger av.
 | **Endring i kroner** *(lagt til 2026-10-01)*: endringen fra forrige børsdag vises også i kroner. I markedsoversikten står kronene på en mindre linje under prosenten, i samme celle. I aksjedetaljen står de ved prosenten, sammen med høy og lav fra raden «Høy, lav og omsetning i aksjedetaljen» | Ingenting nytt. Kronene regnes av `adjusted_close` for de to siste børsdagene, de samme tallene som prosenten (`endring_i_prosent`). Ingen nye kall og ingen endring i basen | FR-101 sier nøyaktig fem kolonner, så kronene står i samme celle som prosenten, slik tidsstempelet står under selskapsnavnet, og FR-101 må endres før idéen bygges. Kronene regnes på samme justerte kurs som prosenten, så de to peker alltid samme vei. På en utbyttedag blir kronene derfor ikke lik forskjellen mellom de to sluttkursene og kan avvike fra børsens egne sider. Dagen merkes etter FR-407. Sorteringen i FR-102 er fortsatt på prosent: 5 kr er 2 % av 250 kr, men 10 % av 50 kr |
 | **Innstillinger øverst** *(lagt til 2026-10-01)*: en knapp «Innstillinger» i knapperaden på alle sider, med «Vis hjelp» og «Vis KI-tekst». Valgene gjelder alle sidene og lagres i basen på samme måte som merkingen i Min liste (8.3), så de huskes | Hjelpen (8.0b), KI-teksten (Epic 10) og en tabell for innstillinger i basen | FR-601 sier at bryteren skal kunne brukes under demonstrasjonen mens noen ser på, så hver KI-tekst beholder sin egen bryter ved teksten. Begge styrer samme valg. Ingen innlogging: valgene gjelder maskinen |
 | **Omvisning på alle sidene** («Vis meg rundt») *(lagt til 2026-10-01)*: en knapp som viser siden steg for steg, med fast tekst vi har skrevet og sjekket | Hjelpen (8.0b), som omvisningen deler tekstfil med, og at sidene finnes: først markedsoversikten og aksjedetaljen, så Min liste (8.3), og børsometeret hvis det blir bygget | Uten KI. Tall i teksten hentes fra `Parametre`, som i hjelpen. En test sjekker at hvert steg peker på noe som finnes på siden |
-| **Egne aksjer** («Følg en aksje») *(lagt til 2026-10-01)*: opptil 3 aksjer i tillegg til de 15, valgt av brukeren og merket «Egen». Hver hentes med samme nøkkel og ett av de fem ekstra kallene, så de er gratis og krever ingen konto; appen har ingen innlogging. Stjernen i Min liste virker også på dem, og hjelpen forklarer dette. Er en aksje under kriteriet i §3, gjelder Marians beslutning i raden «Egne aksjelister»: først en forklaring, og merket «Under kravet» hvis brukeren velger den likevel | At `aksje` kan ha opptil 3 aksjer utenom AKSJEUNIVERS, samme endring av AD-21 som «Egne aksjelister» trenger. Kriteriet sjekkes med ett kall per aksje, som i malinger.md §13, der Bakkafrost var over kravet | Hver aksje tar ett av de fem kallene i NFR-01, så 3 gir 2 kall i margin, og 1 med OSEBX i tillegg. Marians beslutning 01.10: flest mulig, og taket settes ned hvis marginen blir for liten i drift. Grensene i signalet er målt på de 15 (AD-13), og det må stå ved aksjen |
+| **Egne aksjer** («Følg en aksje») *(lagt til 2026-10-01)*: opptil 3 aksjer i tillegg til de 15, valgt av brukeren og merket «Egen». Hver hentes med samme nøkkel og ett av de fem ekstra kallene, så de er gratis og krever ingen konto; appen har ingen innlogging. Stjernen i Min liste virker også på dem, og hjelpen forklarer dette. Er en aksje under kriteriet i §3, gjelder Marians beslutning i raden «Egne aksjelister»: først en forklaring, og merket «Under kravet» hvis brukeren velger den likevel | At `aksje` kan ha opptil 3 aksjer utenom AKSJEUNIVERS, samme endring av AD-21 som «Egne aksjelister» trenger. Kriteriet sjekkes med ett kall per aksje, som i malinger.md §13, der Bakkafrost var over kravet | Hver aksje tar ett av de fem kallene i NFR-01, så 3 gir 2 kall i margin, og 1 med OSEBX i tillegg. Marians beslutning 01.10: flest mulig, og taket settes ned hvis marginen blir for liten i drift. Grensene i signalet er målt på de 15 (AD-13), og det må stå ved aksjen. *Rettet 2026-10-01:* OSEBX er nå i v1 (FR-410), så det er fire ekstra kall, og 3 egne aksjer gir 1 kall i margin |
 
 **Regnestykket for et større univers.** Det er regnet 23.09 fra målte tall: én
 henting per døgn, ett kall per symbol (§2), dagskvote 20, og bonus 484 etter
@@ -1427,6 +1488,9 @@ kall 21. **Det forutsettes at bonusen ikke fylles på. Det er ikke kjent.**
 | 20 | 20 | 0 | Urørt, men **margin 0**: hver ekstra kjøring tar fra bonus |
 | 25 | 25 | 5 | 96 døgn (484 / 5) |
 | 30 | 30 | 10 | 48 døgn (484 / 10) |
+
+*Rettet 2026-10-01:* med hovedindeksen i v1 (FR-410) koster hentingen ett kall
+mer enn antall aksjer. 15 aksjer gir 16 kall og margin 4.
 
 **Antall rader per skjermbilde avgjøres ikke her.** 15 er valgt av kvoten, ikke
 av skjermen. Om oversikten er for tett, er et spørsmål til brukertesten (story 8.1).
