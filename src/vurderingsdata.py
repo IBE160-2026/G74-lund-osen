@@ -48,6 +48,23 @@ def _heltall(verdi) -> bool:
     return isinstance(verdi, int) and not isinstance(verdi, bool)
 
 
+def _endelig(navn: str, verdi) -> float:
+    """Et endelig tall som float. bool og tekst avvises, et heltall blir float.
+
+    Et heltall for stort for float gir OverflowError ved omgjoeringen, og
+    regnes da som uendelig, saa det avvises her og ikke foerst i SQLite.
+    """
+    if isinstance(verdi, bool) or not isinstance(verdi, (int, float)):
+        raise UgyldigVurdering(f"{navn} maa vaere et tall, fikk {verdi!r}")
+    try:
+        tall = float(verdi)
+    except OverflowError:
+        tall = math.inf
+    if not math.isfinite(tall):
+        raise UgyldigVurdering(f"{navn} maa vaere et endelig tall, fikk {verdi!r}")
+    return tall
+
+
 def _retning(sjekker: tuple[int, ...]) -> str:
     """Retningen fortegnene gir, samme regel som signalberegning.finn_retning.
 
@@ -73,6 +90,13 @@ class Vurdering:
     kopieres fra kursen vurderingen bygde paa, uten fremmednoekkel (AD-18).
     De lagres som float, ogsaa naar de kommer inn som heltall, saa les gir
     tilbake en lik Vurdering.
+
+    De fire maalingene er tallene de tre sjekkene ble avgjort av, uavrundet
+    og i regelens enhet (story 2.1c, FR-706): trend_avvik, dagens_endring og
+    standardavvik som broek, volumforhold som forholdstall mot medianvolumet.
+    volumforhold er None bare naar medianvolumet var 0, og da er interesse 0.
+    Porten sjekker ikke fortegnene mot maalingene: det er kjernens regel, og
+    porten importerer ikke kjernen.
     """
 
     styrke: int
@@ -82,6 +106,10 @@ class Vurdering:
     interesse: int
     slutt: float
     justert_slutt: float
+    trend_avvik: float
+    dagens_endring: float
+    standardavvik: float
+    volumforhold: float | None
 
     def __post_init__(self):
         for navn in ("trend", "bevegelse", "interesse"):
@@ -120,6 +148,25 @@ class Vurdering:
                     f"{navn} maa vaere et endelig tall over null, fikk {verdi!r}"
                 )
             object.__setattr__(self, navn, kurs)
+        for navn in ("trend_avvik", "dagens_endring", "standardavvik"):
+            object.__setattr__(self, navn, _endelig(navn, getattr(self, navn)))
+        if self.standardavvik < 0:
+            raise UgyldigVurdering(
+                f"standardavvik kan ikke vaere negativt, fikk {self.standardavvik!r}"
+            )
+        if self.volumforhold is None:
+            if self.interesse != 0:
+                raise UgyldigVurdering(
+                    "volumforhold kan mangle bare naar interesse er 0, "
+                    f"interesse er {self.interesse}"
+                )
+        else:
+            forhold = _endelig("volumforhold", self.volumforhold)
+            if forhold < 0:
+                raise UgyldigVurdering(
+                    f"volumforhold kan ikke vaere negativt, fikk {self.volumforhold!r}"
+                )
+            object.__setattr__(self, "volumforhold", forhold)
 
 
 @runtime_checkable

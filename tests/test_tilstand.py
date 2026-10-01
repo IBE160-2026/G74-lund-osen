@@ -24,7 +24,8 @@ IDAG = date(2026, 9, 30)
 
 def vurdering(**endret) -> Vurdering:
     felt = dict(styrke=2, retning="Positiv", trend=1, bevegelse=1, interesse=0,
-                slutt=300.0, justert_slutt=290.0)
+                slutt=300.0, justert_slutt=290.0, trend_avvik=0.035,
+                dagens_endring=0.021, standardavvik=0.012, volumforhold=1.2)
     felt.update(endret)
     return Vurdering(**felt)
 

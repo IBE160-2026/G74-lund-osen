@@ -672,3 +672,127 @@ class TestIngenUnntaksvei:
 
     def test_migrer_tar_bare_tilkobling_og_katalog(self):
         assert list(inspect.signature(migrer).parameters) == ["tilkobling", "katalog"]
+
+
+# Story 2.1c: 0004 legger maalingene til vurdering. Testene under leser de
+# ekte migrasjonsfilene, men kopierer dem til tmp_path og skriver aldri i
+# src/migrasjoner/.
+
+from lagring_sqlite import MIGRASJONSKATALOG  # noqa: E402
+
+FILENE_TIL_0003 = ("0001_kurs.sql", "0002_vurdering.sql", "0003_aksje.sql")
+MAALINGENE = ("trend_avvik", "dagens_endring", "standardavvik", "volumforhold")
+
+# Teksten i en CHECK-feil har varierert mellom SQLite-versjoner: uttrykket,
+# kolonnen eller tabellen. Alle tre er godtatt, som i test_aksje.py. Uten
+# hjelpetabellen ville ADD COLUMN feilet med en annen CHECK, og da ville
+# meldingen ikke nevnt kontroll_0004.
+KONTROLLFEIL_0004 = (
+    r"0004_maalinger\.sql.*CHECK constraint failed.*(vurderinger_uten_grunn|kontroll_0004)"
+)
+
+VURDERING_UTEN_GRUNN = (
+    "INSERT INTO vurdering (symbol, dato, styrke, retning, trend, bevegelse, "
+    "interesse, slutt, justert_slutt) "
+    "VALUES ('EQNR', '2026-09-23', 1, 'Positiv', 1, 0, 0, 300.0, 290.0)"
+)
+VURDERING_MED_GRUNN = (
+    "INSERT INTO vurdering (symbol, dato, grunn) VALUES ('DNB', '2026-09-23', 'symbol_feilet')"
+)
+
+
+def base_paa_versjon_3(tmp_path) -> sqlite3.Connection:
+    """En base migrert med 0001-0003, slik basen saa ut foer 2.1c."""
+    til_0003 = tmp_path / "til_0003"
+    til_0003.mkdir()
+    for navn in FILENE_TIL_0003:
+        (til_0003 / navn).write_bytes((MIGRASJONSKATALOG / navn).read_bytes())
+    tilkobling = sqlite3.connect(tmp_path / "v3.db")
+    assert migrer(tilkobling, til_0003) == 3
+    return tilkobling
+
+
+def kolonner(tilkobling, tabell: str) -> list[str]:
+    return [rad[1] for rad in tilkobling.execute(f"PRAGMA table_info({tabell})")]
+
+
+class TestMaalingene0004:
+    def test_filen_bygger_ikke_om_vurdering(self):
+        tekst = (MIGRASJONSKATALOG / "0004_maalinger.sql").read_text(encoding="utf-8")
+        assert "DROP TABLE vurdering" not in tekst
+        assert tekst.count("ALTER TABLE vurdering ADD COLUMN") == 4
+        assert "DROP TABLE kontroll_0004" in tekst
+
+    def test_rad_med_grunn_blir_staaende_uten_maalinger(self, tmp_path):
+        """Matrisen: en rad med grunn i versjon 3 staar, og de fire
+        kolonnene er NULL."""
+        tilkobling = base_paa_versjon_3(tmp_path)
+        try:
+            tilkobling.execute(VURDERING_MED_GRUNN)
+            tilkobling.commit()
+            foer = tilkobling.execute("SELECT * FROM vurdering").fetchall()
+
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 4
+
+            assert kolonner(tilkobling, "vurdering")[-4:] == list(MAALINGENE)
+            assert tilkobling.execute(
+                "SELECT symbol, dato, grunn, " + ", ".join(MAALINGENE) + " FROM vurdering"
+            ).fetchall() == [("DNB", "2026-09-23", "symbol_feilet", None, None, None, None)]
+            assert tilkobling.execute(
+                "SELECT * FROM vurdering"
+            ).fetchall() == [rad + (None,) * 4 for rad in foer]
+            assert "kontroll_0004" not in tabeller(tilkobling)
+        finally:
+            tilkobling.close()
+
+    def test_vurdering_uten_grunn_stopper_migrasjonen(self, tmp_path):
+        """Kriteriet: 0004 stopper med kontroll_0004 i feilen, rulles
+        tilbake, og basen staar paa versjon 3 med radene uroert."""
+        tilkobling = base_paa_versjon_3(tmp_path)
+        try:
+            tilkobling.execute(VURDERING_UTEN_GRUNN)
+            tilkobling.execute(VURDERING_MED_GRUNN)
+            tilkobling.commit()
+            foer = tilkobling.execute("SELECT * FROM vurdering ORDER BY symbol").fetchall()
+            kolonner_foer = kolonner(tilkobling, "vurdering")
+
+            with pytest.raises(MigrasjonsFeil, match=KONTROLLFEIL_0004):
+                migrer(tilkobling, MIGRASJONSKATALOG)
+
+            assert versjon(tilkobling) == 3
+            assert tilkobling.execute(
+                "SELECT * FROM vurdering ORDER BY symbol"
+            ).fetchall() == foer
+            assert kolonner(tilkobling, "vurdering") == kolonner_foer
+            assert "kontroll_0004" not in tabeller(tilkobling)
+        finally:
+            tilkobling.close()
+
+    def test_triggerne_fra_0002_og_0003_virker_etter_0004(self, tmp_path):
+        """Kriteriet: en rad for ukjent aksje eller med ukjent grunn avvises
+        fortsatt, paa en ny tilkobling uten noe slaatt paa."""
+        tilkobling = base_paa_versjon_3(tmp_path)
+        try:
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 4
+        finally:
+            tilkobling.close()
+        ny = sqlite3.connect(tmp_path / "v3.db")
+        try:
+            gyldig = (
+                "INSERT INTO vurdering (symbol, dato, styrke, retning, trend, bevegelse, "
+                "interesse, slutt, justert_slutt, trend_avvik, dagens_endring, "
+                "standardavvik, volumforhold) "
+                "VALUES (?, '2026-09-23', 1, 'Positiv', 1, 0, 0, 300.0, 290.0, "
+                "0.035, 0.001, 0.012, 1.2)"
+            )
+            with pytest.raises(sqlite3.IntegrityError, match="ukjent aksje"):
+                ny.execute(gyldig, ("EQNR.OL",))
+            with pytest.raises(sqlite3.IntegrityError, match="ukjent grunn"):
+                ny.execute(
+                    "INSERT INTO vurdering (symbol, dato, grunn) "
+                    "VALUES ('EQNR', '2026-09-23', 'noe_annet')"
+                )
+            ny.execute(gyldig, ("EQNR",))
+            assert ny.execute("SELECT count(*) FROM vurdering").fetchone() == (1,)
+        finally:
+            ny.close()
