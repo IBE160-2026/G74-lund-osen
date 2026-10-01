@@ -26,6 +26,7 @@ den som committet.
 - **Relevanseksperimentet** — [`_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/relevanseksperiment.md`](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/relevanseksperiment.md), med kriteriene som ble satt før innsamlingen, og innsamlingen 25.09
 - **Arkitektur** — [`_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md`](_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md)
 - **Epics og stories** — [`_bmad-output/planning-artifacts/epics.md`](_bmad-output/planning-artifacts/epics.md)
+- **Designregler** — [`_bmad-output/planning-artifacts/designregler.md`](_bmad-output/planning-artifacts/designregler.md). Hvordan skjermbildene ser ut, begynner med skriften
 - **Endringsforslag 28.09: databasen i bruk i Epic 2** — [`_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-28.md`](_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-28.md). Utkast, ikke godkjent
 - **Sprintstatus og story-spesifikasjoner** — [`_bmad-output/implementation-artifacts/`](_bmad-output/implementation-artifacts/)
 - **Kilder og bruksvilkår** — [`docs/kilder-og-rettigheter.md`](docs/kilder-og-rettigheter.md), med hva hver datakilde tillater og når det sist ble kontrollert. Forespørslene til EODHD og Euronext står i [`docs/epost-til-eodhd.md`](docs/epost-til-eodhd.md) og [`docs/epost-til-euronext.md`](docs/epost-til-euronext.md)

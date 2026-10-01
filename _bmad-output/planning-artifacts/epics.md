@@ -1981,6 +1981,8 @@ bygge det. Det er et svar på papir, ikke en endring.
 før gjennomgangen. Den sier fortsatt på papir hvordan Nyheter og Kalender ville
 passet inn.
 
+*Lagt til 2026-10-01:* skriftregelen i `designregler.md` §1 tas inn her, som en egen liten endring med tre tester: ingen mal viser til en skrift på nettet, tallcellene i tabellene har tabelltall, og skriftfilene har OpenType-funksjonen `tnum`.
+
 **Avhenger av:** 8.1. **Én økt:** ja.
 
 ### Story 8.3: Min liste: eget skjermbilde med stjerne og filter
