@@ -7,6 +7,7 @@ haandlagde serier eneste maaten aa se feilen paa.
 """
 
 from datetime import date, timedelta
+from statistics import median, stdev
 
 import pytest
 
@@ -23,8 +24,10 @@ from signalberegning import (
     _interesseforklaring,
     _trendforklaring,
     beregn_signal,
+    bevegelse,
     finn_retning,
     finn_styrke,
+    interesse,
     trend,
 )
 
@@ -317,25 +320,164 @@ class TestForklaringenPaaNorsk:
         assert _trendforklaring(0.02, STANDARD) == f"+2,0{self.NB}% mot MA50"
         assert _trendforklaring(-0.02, STANDARD) == f"-2,0{self.NB}% mot MA50"
 
-    def test_interesse_med_hel_median(self):
-        tekst = _interesseforklaring(1500.0, 1000.0)
-        assert tekst == f"volum 1{self.NB}500 mot median 1{self.NB}000"
+    def test_interesse_viser_forholdstallet(self):
+        """Story 2.1c: teksten er tallet regelen avgjorde med (FR-706), ikke
+        de to volumene. Erstatter de tre testene fra 8.0 for den gamle
+        teksten (beslutning 1)."""
+        assert _interesseforklaring(4.95, STANDARD) == "volum 4,95 × medianen"
 
-    def test_interesse_med_median_paa_halv(self):
-        """1,5 x 1 000,5 = 1 500,75 < 1 501. Med medianen rundet til 1 000
-        eller 1 001 kunne leseren regnet seg til feil side av grensen."""
-        tekst = _interesseforklaring(1501.0, 1000.5)
-        assert tekst == f"volum 1{self.NB}501 mot median 1{self.NB}000,5"
+    def test_interesse_paa_volumfaktoren_har_to_desimaler(self):
+        """Noeyaktig paa grensen er det riktig at tallene er like."""
+        assert _interesseforklaring(1.5, STANDARD) == "volum 1,50 × medianen"
+
+    def test_interesse_naer_volumfaktoren_skilles(self):
+        """Ville feilet hvis «1,50 × medianen» sto ved en sjekk som ga +1.
+        desimaler_mot_grense gir flere desimaler, ikke fast to."""
+        assert _interesseforklaring(1.5004, STANDARD) == "volum 1,5004 × medianen"
+        assert _interesseforklaring(1.4996, STANDARD) == "volum 1,4996 × medianen"
+
+    def test_interesse_uten_median_viser_strek_og_grunnen(self):
+        """NFR-08: aldri 0 og aldri et anslag. Vinduet kommer fra
+        parametrene, ikke fra teksten."""
+        assert _interesseforklaring(None, STANDARD) == (
+            "–, medianvolumet de 20 dagene før er 0"
+        )
+        assert _interesseforklaring(None, KORT) == "–, medianvolumet de 5 dagene før er 0"
 
     def test_interesse_gjennom_beregn_signal(self):
-        """Den ekte kallveien, ikke bare hjelperen: volumene har hardt
-        mellomrom som tusenskille (regel 21)."""
+        """Den ekte kallveien, ikke bare hjelperen: like volumer gir
+        forholdstallet 1 med to desimaler og komma (regel 21)."""
         signal = beregn_signal(serie([100.0] * 60 + [104.0]))
         interesse = next(s for s in signal.sjekker if s.navn == "Interesse")
-        assert interesse.forklaring == f"volum 1{self.NB}000 mot median 1{self.NB}000"
+        assert interesse.forklaring == "volum 1,00 × medianen"
 
     def test_forklaringene_i_et_signal_har_ikke_punktum(self):
         kurser = [100.0] * 60 + [104.0]
         signal = beregn_signal(serie(kurser))
         for sjekk in signal.sjekker:
             assert "." not in sjekk.forklaring, sjekk.forklaring
+
+
+def sjekk(signal, navn: str) -> Sjekk:
+    return next(s for s in signal.sjekker if s.navn == navn)
+
+
+def fortegn(tall: float) -> int:
+    return (tall > 0) - (tall < 0)
+
+
+class TestMaalingen:
+    """Story 2.1c: hver sjekk baerer tallet den ble avgjort av, uavrundet og
+    i regelens enhet (broek, forholdstall for interesse). Forventningene
+    regnes her for haand fra seriene og sammenlignes med ==, saa en maaling i
+    prosent eller avrundet ikke slipper gjennom."""
+
+    def test_trend_maaler_avviket_som_broek(self):
+        kurser = stigende_kurser(0.002)
+        snitt = sum(kurser[-KORT.ma_vindu :]) / KORT.ma_vindu
+        forventet = (kurser[-1] - snitt) / snitt
+
+        resultat = trend(kurser, KORT)
+
+        assert resultat.maaling == forventet
+        assert resultat.grense is None
+        assert 0.02 < resultat.maaling < 1, "broek, ikke prosent"
+
+    def test_trend_noeyaktig_paa_grensen(self):
+        """Matrisen: avvik noeyaktig 0,02 gir 0, og teksten +2,0 %. Snittet av
+        de 50 er noeyaktig 100,0, som i TestNoytralsone."""
+        kurser = [100.0] * 48 + [98.0, 102.0]
+        resultat = trend(kurser, STANDARD)
+
+        assert resultat.maaling == 0.02
+        assert resultat.verdi == 0
+        assert resultat.forklaring == "+2,0 % mot MA50"
+
+    def test_bevegelse_maaler_dagens_endring_mot_standardavviket(self):
+        kurser = stigende_kurser(0.0123)
+        endringer = [(ny - gammel) / gammel for gammel, ny in zip(kurser, kurser[1:])]
+
+        resultat = bevegelse(kurser, KORT)
+
+        assert resultat.maaling == endringer[-1]
+        assert resultat.grense == stdev(endringer[-(KORT.volatilitet_vindu + 1) : -1])
+        assert resultat.maaling < 1 and resultat.grense < 1, "broek, ikke prosent"
+
+    def test_interesse_maaler_forholdstallet(self):
+        """1 000 mot medianen 3 000 er en tredjedel, med alle desimalene."""
+        kurser = stigende_kurser(0.002)
+        volumer = [3_000] * (len(kurser) - 1) + [1_000]
+
+        resultat = interesse(kurser, volumer, KORT)
+
+        assert resultat.maaling == 1_000 / 3_000
+        assert resultat.grense is None
+        assert resultat.verdi == 0
+
+    def test_forholdstallet_avgjoer_interesse(self):
+        kurser = stigende_kurser(0.002)
+        volumer = [1_000] * (len(kurser) - 1) + [4_950]
+
+        resultat = interesse(kurser, volumer, KORT)
+
+        assert resultat.maaling == 4.95
+        assert resultat.verdi == 1
+        assert resultat.forklaring == "volum 4,95 × medianen"
+
+    def test_forholdstall_noeyaktig_paa_volumfaktoren_gir_null(self):
+        """Matrisen: 1,5 er ikke over 1,5. Ville feilet med >=."""
+        kurser = stigende_kurser(0.002)
+        volumer = [1_000] * (len(kurser) - 1) + [1_500]
+
+        resultat = interesse(kurser, volumer, KORT)
+
+        assert resultat.maaling == KORT.volumfaktor
+        assert resultat.verdi == 0
+
+    def test_medianvolum_null_gir_ingen_maaling(self):
+        """Matrisen: medianen 0 gir None, aldri 0,0, interesse 0 og «–» med
+        grunnen, ogsaa naar dagens volum er stort."""
+        kurser = stigende_kurser(0.09)
+        volumer = [0] * (len(kurser) - 1) + [5_000]
+        assert median(volumer[-(KORT.volum_vindu + 1) : -1]) == 0
+
+        resultat = interesse(kurser, volumer, KORT)
+
+        assert resultat.maaling is None
+        assert resultat.verdi == 0
+        assert resultat.forklaring == "–, medianvolumet de 5 dagene før er 0"
+
+    SERIER = {
+        "styrke 1": (0.002, False),
+        "styrke 3": (0.09, True),
+        "blandet": (-0.03, True),
+        "ned": (-0.09, True),
+        "lik volumfaktor": (0.002, None),
+    }
+
+    @pytest.mark.parametrize("navn", list(SERIER))
+    def test_regelen_paa_maalingene_gir_verdien_sjekken_ga(self, navn):
+        """Kriteriet: regelen brukt paa maaling og grense gir samme verdi som
+        sjekken, for alle tre. Maalingen er da det regelen saa."""
+        endring, stort = self.SERIER[navn]
+        kurser = stigende_kurser(endring)
+        if stort is None:
+            volumer = [1_000] * (len(kurser) - 1) + [1_500]
+        else:
+            volumer = med_stort_volum_siste_dag(len(kurser)) if stort else None
+        signal = beregn_signal(serie(kurser, volumer), KORT)
+        t, b, i = (sjekk(signal, n) for n in ("Trend", "Bevegelse", "Interesse"))
+
+        assert t.verdi == (0 if abs(t.maaling) <= KORT.noytralsone else fortegn(t.maaling))
+        assert b.verdi == (fortegn(b.maaling) if abs(b.maaling) > b.grense else 0)
+        assert i.verdi == (
+            fortegn(b.maaling)
+            if i.maaling is not None and i.maaling > KORT.volumfaktor
+            else 0
+        )
+
+    def test_sjekk_uten_maaling_kan_fortsatt_lages(self):
+        """maaling og grense har standardverdi, saa Sjekk(navn, verdi,
+        forklaring) virker som foer."""
+        assert Sjekk("A", 1, "").maaling is None
+        assert Sjekk("A", 1, "").grense is None

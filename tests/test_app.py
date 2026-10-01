@@ -352,7 +352,7 @@ class TestAksjedetalj:
 
         assert "mot MA50" in html
         assert "standardavvik" in html
-        assert "median" in html
+        assert "× medianen" in html
 
     def test_tegner_baade_kurs_og_ma50(self, klient, monkeypatch):
         monter(monkeypatch, snapshot({"EQNR": serie([100.0 + i for i in range(80)])}))

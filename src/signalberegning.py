@@ -64,11 +64,21 @@ class Sjekk:
 
     FR-706 krever at hver sjekk vises ved navn med sin egen verdi, ikke bare
     den samlede styrken. Derfor baerer hver sjekk navnet sitt hit ut.
+
+    maaling og grense er tallene verdien ble avgjort av, uavrundet og i samme
+    enhet som regelen regner i (broek, eller forholdstall for interesse), og
+    forklaringen lages av dem (story 2.1c). Trend: maalingen er avviket fra
+    snittet. Bevegelse: maalingen er dagens endring, grensen standardavviket.
+    Interesse: maalingen er volumet som forholdstall mot medianen, None naar
+    medianvolumet er 0. Grensene som er parametre (noytralsonen og
+    volumfaktoren), staar i Parametre og gjentas ikke her.
     """
 
     navn: str
     verdi: int
     forklaring: str
+    maaling: float | None = None
+    grense: float | None = None
 
 
 @dataclass(frozen=True)
@@ -131,15 +141,18 @@ def _bevegelsesforklaring(dagens: float, avvik: float) -> str:
     )
 
 
-def _interesseforklaring(dagens_volum: float, median_volum: float) -> str:
-    """Volumene som hele tall. Medianen av et partall volumer kan ende paa
-    ,5, og da vises den desimalen, saa 1,5 ganger medianen kan regnes riktig
-    av den som leser (story 8.0)."""
-    median_desimaler = 0 if float(median_volum).is_integer() else 1
-    return (
-        f"volum {tall(dagens_volum, 'volum')} mot median "
-        f"{tall(median_volum, 'volum', median_desimaler)}"
-    )
+def _interesseforklaring(forhold: float | None, p: Parametre) -> str:
+    """Volumet som forholdstall mot medianen, med saa mange desimaler (minst
+    to) at det skilles fra volumfaktoren (story 2.1c, FR-706). Ville feilet
+    hvis «1,50 × medianen» sto ved en sjekk som ga +1.
+
+    Mangler forholdstallet, fordi medianvolumet er 0, vises «–» med grunnen,
+    aldri 0 og aldri et anslag (NFR-08). Vinduet kommer fra parametrene.
+    """
+    if forhold is None:
+        return f"–, medianvolumet de {p.volum_vindu} dagene før er 0"
+    antall = desimaler_mot_grense(forhold, p.volumfaktor, minst=2)
+    return f"volum {tall(forhold, 'forhold', antall)} × medianen"
 
 
 def trend(kurser: list[float], p: Parametre = STANDARD) -> Sjekk:
@@ -158,6 +171,7 @@ def trend(kurser: list[float], p: Parametre = STANDARD) -> Sjekk:
         navn="Trend",
         verdi=verdi,
         forklaring=_trendforklaring(avvik, p),
+        maaling=avvik,
     )
 
 
@@ -178,6 +192,8 @@ def bevegelse(kurser: list[float], p: Parametre = STANDARD) -> Sjekk:
         navn="Bevegelse",
         verdi=verdi,
         forklaring=_bevegelsesforklaring(dagens, avvik),
+        maaling=dagens,
+        grense=avvik,
     )
 
 
@@ -186,17 +202,23 @@ def interesse(kurser: list[float], volumer: list[float], p: Parametre = STANDARD
 
     Volum har ingen retning i seg selv, saa fortegnet foelger dagens
     kursendring: hoeyt volum paa en oppgangsdag gir +1, paa en nedgangsdag -1.
+
+    Regelen avgjoer med forholdstallet, saa tallet som lagres, er det som
+    avgjorde (story 2.1c). Er medianvolumet 0, finnes ikke forholdstallet, og
+    sjekken gir 0.
     """
     dagens_volum = volumer[-1]
     median_volum = median(volumer[-(p.volum_vindu + 1) : -1])
     dagens_endring = _endringer(kurser)[-1]
 
-    slaar_ut = median_volum > 0 and dagens_volum > p.volumfaktor * median_volum
+    volumforhold = dagens_volum / median_volum if median_volum > 0 else None
+    slaar_ut = volumforhold is not None and volumforhold > p.volumfaktor
     verdi = _fortegn(dagens_endring) if slaar_ut else 0
     return Sjekk(
         navn="Interesse",
         verdi=verdi,
-        forklaring=_interesseforklaring(dagens_volum, median_volum),
+        forklaring=_interesseforklaring(volumforhold, p),
+        maaling=volumforhold,
     )
 
 
