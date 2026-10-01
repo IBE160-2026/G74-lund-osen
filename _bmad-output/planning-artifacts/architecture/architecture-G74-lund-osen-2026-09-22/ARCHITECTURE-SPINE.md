@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-10-01T11:46'
+updated: '2026-10-01T23:41'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -339,6 +339,7 @@ FR-408. At dagen mangler, skal kunne skilles i lageret: `FR-409`. *Rettet
 - **Forkastet:** fremmednøkler. SQLite håndhever dem bare når tilkoblingen har slått dem på, og en ny tilkobling har det ikke. `PRAGMA foreign_keys = ON` gjør ingenting inne i løperens `BEGIN IMMEDIATE`. `ALTER TABLE` kan ikke legge en fremmednøkkel på en kolonne som finnes, så `kurs`, `kursserie` og `vurdering` måtte blitt bygget om, og `vurdering` er uerstattelig (AD-7). Samme grunn som for triggerne på `grunn` i `0002`. Alle tre forholdene er prøvd i minnet 27.09.
 - **Bygget 2026-09-27, story 1.9:** `0003_aksje.sql`. En base i versjon 2 med rader for et symbol som ikke står i `aksje`, stopper migrasjonen, og løperen ruller den tilbake. `SqliteKurslager` gjør avvisningen om til `ValueError`, og `SqliteVurderingslager` avviser et ukjent symbol i porten før SQL-en. Om porten til `Kurslager` også skal sjekke symbolet, og hvilke feil kjøringen fanger (G11), avgjøres i 2.5. Hvert kontrollpunkt er prøvd med en mutant (spesifikasjonen, Implementation Notes). *Merknad 2026-09-29:* `epics.md` flyttet spørsmålet om porten fra 2.5 til 2.1b 28.09, og det er avgjort der (G10): `kontroller_skriving` avviser et symbol utenfor `AKSJEUNIVERS` med `ValueError` før noe lagres, så `MinneKurslager` og `SqliteKurslager` oppfører seg likt. Triggerne fra `0003` står som vakten i basen. G11 står fortsatt for 2.5.
 - **Føring 2026-09-30 (egne aksjelister, v1.1 i PRD-en §8):** AD-21 endres ikke. Føringen holder muligheten åpen i oppbyggingen, uten at funksjonen bygges nå. En aksje som byttes ut, merkes som inaktiv og slettes ikke, slik AD-21 allerede krever for en aksje med rader. Koden teller aksjene i lista og antar aldri at det er 15. Lista er definert ett sted, `AKSJEUNIVERS`, men leses i dag direkte flere steder og er standardverdi for parameteren i `bygg_oversikt`. Ny kode tar lista som parameter, slik `bygg_oversikt` og `finn_aksje` gjør, og testes også med en kortere liste enn de 15.
+- **Føring 2026-10-01 (hovedindeksen OSEBX i v1, Marians beslutning):** indeksen er ikke en aksje. Den lagres i en egen tabell, `indeks`, aldri i `aksje`, `kurs`, `kursserie` eller `vurdering`, og står ikke i `AKSJEUNIVERS`. Triggerne over gjelder ikke tabellen, og en henting av `OSEBX.OL` i story 2.8 er derfor ikke det AD-21 skal hindre. Migreringen er `0006`, etter `ki_logg` i `0005` (AD-16). Kravene står i FR-104, FR-105 og FR-410 i PRD-en.
 
 ## Consistency Conventions
 
