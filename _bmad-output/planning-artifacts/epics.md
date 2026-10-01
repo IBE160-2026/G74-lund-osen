@@ -76,6 +76,8 @@ krever tre konkrete svar per kandidat:
 - **FR-101** — Fem kolonner: selskap, sluttkurs, endring, signalstyrke, retning
 - **FR-102** — Standard sortering
 - **FR-103** — Retning vises i tre redundante kanaler
+- **FR-104** — Hovedindeksen i markedsoversikten *(ny 2026-10-01)*
+- **FR-105** — Søylene under hovedindeksen *(ny 2026-10-01)*
 - **FR-407** — Merking av utbyttedager *(ID beholdt fra da kravet lå i datahentingen)*
 
 **4.2 Aksjedetaljen**
@@ -101,6 +103,7 @@ krever tre konkrete svar per kandidat:
 - **FR-406** — To lagre for kursdata, med hvert sitt ansvar
 - **FR-408** — Dagens vurdering lagres per aksje
 - **FR-409** — De tre tilstandene skal være skillbare i lageret *(ny 22.09. Rettet 2026-09-24: her sto «vises». Kravet gjelder lageret, ikke en skjerm)*
+- **FR-410** — Hovedindeksen hentes i samme kjøring *(ny 2026-10-01)*
 
 **4.5 Meldingsfilter og deduplisering**
 
@@ -128,6 +131,9 @@ krever tre konkrete svar per kandidat:
 
 **34 FR-er i alt.** FR-409 kom til 22.09, da konsekvensen av `AD-7` ble
 avgjort eksplisitt i stedet for å bli stående som en stille mangel.
+
+*Lagt til 2026-10-01:* FR-104, FR-105 og FR-410 kom til med hovedindeksen OSEBX i
+v1 (Marians beslutning), så det er 37 FR-er.
 
 ### NonFunctional Requirements
 
@@ -270,11 +276,14 @@ kontrollen 22.09 fant det.
 | FR-404, FR-405 | Epic 6 🔒 |
 | FR-406, FR-408, FR-409 | Epic 1 |
 | FR-407 | Epic 2 |
+| FR-104, FR-105, FR-410 | Epic 2 *(lagt til 2026-10-01)* |
 | FR-501, FR-502, FR-503 | Epic 6 🔒 |
 | FR-601, FR-602, FR-603, FR-606 | Epic 5 🔒 |
 | FR-604, FR-605 | Epic 4 |
 
 **12 + 22 = 34.** Alle FR-er er plassert.
+
+*Lagt til 2026-10-01:* med FR-104, FR-105 og FR-410 er det 12 + 25 = 37.
 
 ### NFR Coverage Map
 
@@ -319,6 +328,8 @@ Epic 2.2 + 2.5 ──> Epic 2.7 (historikken i aksjedetaljen)
 Epic 2.1 ──> 2.1b (basen) ──> 2.5 ──> de daglige kjøringene til basen
 Epic 2.1b ──> 2.1c (målingene) ──> 2.5   *(lagt til 2026-09-29)*
 Epic 2.1b ──> Epic 4.3 (samme åpning av basen)
+Epic 2.3 + 4.3 ──> 2.8 (indeksen hentes) ──> 2.9 (indeksen vises) ──> 2.9b (søylene)   *(lagt til 2026-10-01)*
+Epic 2.2 ──> 2.9
 Epic 4.1 ──> Epic 9.5 (relevanseksperimentet, del 2)
 ```
 
@@ -380,7 +391,7 @@ snapshot utenom porten.
 
 Brukeren kan hente nye kurser bevisst, og kan ikke ved uhell brenne dagskvoten.
 
-**FR-er:** FR-401, FR-402, FR-403, FR-407 · **NFR-01, NFR-02** · **AD-er:** 2, 10, 17, 20 · *utvidet 2026-09-28 med 2.1b og 2.5:* 4, 5, 6, 7, 11, 16, 21
+**FR-er:** FR-401, FR-402, FR-403, FR-407 · **NFR-01, NFR-02** · **AD-er:** 2, 10, 17, 20 · *utvidet 2026-09-28 med 2.1b og 2.5:* 4, 5, 6, 7, 11, 16, 21 · *utvidet 2026-10-01 med 2.8, 2.9 og 2.9b:* FR-104, FR-105, FR-410, AD-15
 
 De to kjente `AD-20`-feilene rettes her: `fetch_prices.main` som blander lokal
 dato og UTC, og `meldinger._minutt` som kutter på tegn 16. FR-407 ligger her
@@ -991,6 +1002,8 @@ hører til lesingen.
 
 *Lagt til 2026-09-29, avgjort av gruppen 28.09:* story 2.1c, der vurderingen lagrer målingene bak de tre sjekkene, kommer mellom 2.1b og 2.5. Rekkefølgen er da 2.1, 2.1b, 2.1c og 2.5, så begynner de daglige kjøringene. 2.1c må være ferdig før den første ekte raden skrives, fordi en rad aldri kan endres eller fylles inn etterpå (AD-7).
 
+*Lagt til 2026-10-01, med hovedindeksen OSEBX i v1 (Marians beslutning):* rekkefølgen er 2.1, 2.1b, 2.1c, 2.5, de daglige kjøringene, 2.3, 2.8 (etter 4.3), 2.2, 2.9, 2.9b, 2.7, 2.4 og 2.6. De daglige kjøringene begynner rett etter 2.5 og venter ikke på 2.8: indeksen kan bygges fra siste øyeblikksbilde, som har et helt år (`DAGER_TILBAKE` i `fetch_prices.py`), men en vurdering kan ikke etterfylles (AD-7). Blir 4.3 utsatt, tas den før 2.8, fordi indeksen får `0006` etter `ki_logg` i `0005`. Ingen av de tre står på lista «Kan ikke kuttes», og blir det trangt, venter 2.9b først.
+
 ### Story 2.0: Hentingen lekker ikke nøkkelen og skriver ikke over et øyeblikksbilde
 
 *Lagt til 2026-09-26, fra kontrollen av repoet.*
@@ -1228,6 +1241,8 @@ hentingen for hånd, bare på børsdager og bare mellom kl. 22:00 og midnatt.
 **Følge** *(lagt til 2026-09-29)*: når 2.3 er flettet, endres FR-401, og oppsettet i
 Oppgaveplanlegging beskrives i README (regel 19).
 
+*Lagt til 2026-10-01:* med 2.8 koster en henting 16 kall, ikke 15. 2.8 utvider testen her med indekskallet, så en andre kjøring samme børsdag fortsatt gjør null kall.
+
 **Én økt:** ja.
 
 ### Story 2.4: Etterfylling av hull i kursserien
@@ -1242,6 +1257,8 @@ jeg kommer tilbake, så hullet ikke ser ut som en kursbevegelse.
 - Etterfyllingen koster **15 kall**, ikke 15 per manglende dag
 - Serien erstattes i sin helhet, den skjøtes ikke
 - **Ville feilet hvis:** noen etterfylte vurderinger på samme måte. Kurser kan etterfylles; vurderinger kan ikke, og `AD-7` skal stoppe forsøket
+
+*Lagt til 2026-10-01:* med 2.8 blir tallet 16 kall, ikke 15.
 
 **Én økt:** ja.
 
@@ -1310,6 +1327,67 @@ Som **bruker**, vil jeg se hva løsningen sa om aksjen de siste ukene, så FR-40
 - **Ville feilet hvis:** historikken ble regnet ut på nytt av kursene. Da viser den dagens parametre, ikke hva løsningen sa
 
 **Avhenger av:** 2.2 og 2.5. **Én økt:** ja.
+
+### Story 2.8: Hovedindeksen hentes i samme kjøring
+
+*Lagt til 2026-10-01, Marians beslutning.*
+
+Som **bruker**, vil jeg at hovedindeksen hentes sammen med aksjene, så dagens
+tall kan sammenlignes med børsen som helhet.
+
+**Oppfyller:** FR-410 · **Begrenses av:** `AD-10`, `AD-15`, `AD-16`, `AD-21` med føringen 2026-10-01, NFR-01, NFR-07
+
+**Kontroll — hva testen ser etter:**
+- Én kjøring henter `OSEBX.OL` med ett kall, med samme intervall som aksjene, og bruker 16 kall i alt
+- Rådata står i samme øyeblikksbilde som aksjene, under en egen nøkkel og ikke blant aksjeseriene
+- Indeksen lagres i tabellen `indeks` fra migrering `0006`, aldri i `aksje`, `kurs`, `kursserie` eller `vurdering`
+- Bare børsdager lagres, i årene `DEKKEDE_AAR` dekker, uten et fast årstall i koden. Datoene fra `malinger.md` §14 som aksjene ikke har, lagres ikke
+- Feiler indekskallet, lagres og vurderes aksjene som vanlig. Indeksen står i `feil` og får ingen ny sjanse (`AD-15`), og `vurdering` får ingen rad for den
+- Testen i 2.3 er utvidet med indekskallet: en andre kjøring samme børsdag gjør null kall
+- README (linje 82, «15 kall») og diagrammet i spinen («15 kall, bevisst») rettes til 16 i samme commit som koden (regel 19)
+- **Ville feilet hvis:** indeksen ble lagt i `kurs` eller `AKSJEUNIVERS` for å slippe en ny tabell. Da teller den som en aksje i signalet og i «x av N»
+
+**Avhenger av:** 2.3 og 4.3 (`ki_logg` er `0005`). **Én økt:** ja.
+
+### Story 2.9: Hovedindeksen i markedsoversikten
+
+*Lagt til 2026-10-01, Marians beslutning.*
+
+Som **bruker**, vil jeg se hvordan børsen gikk i dag, og hvor mange av aksjene som
+gikk bedre, før jeg leser tabellen.
+
+**Oppfyller:** FR-104 · **Begrenses av:** FR-101, `AD-10`, `AD-21` med føringene 30.09 og 2026-10-01, NFR-03, NFR-06, NFR-08
+
+**Kontroll — hva testen ser etter:**
+- Over tabellen står «Hovedindeksen» med OSEBX ved siden av, verdien, dagens endring og «x av N gikk bedre enn indeksen». Tabellen har fortsatt fem kolonner (FR-101)
+- Endringen regnes mot forrige børsdag, ikke mot forrige rad
+- N er aksjene med kurs for indeksens dato, og testen prøver det med en kortere liste enn 15. En aksje som ikke er med, navngis
+- «Bedre» avgjøres på endringen slik den vises, og lik er ikke bedre
+- Uten indeks i basen viser siden det, og resten av siden virker (NFR-03). Webserveren gjør ingen nettkall (`AD-10`)
+- **Ville feilet hvis:** N var et fast 15. Da står det «x av 15» en dag én aksje mangler kurs
+
+**Avhenger av:** 2.2 og 2.8. **Én økt:** ja.
+
+### Story 2.9b: Søylene under hovedindeksen
+
+*Lagt til 2026-10-01, Marians beslutning kl. 18:19.*
+
+Som **bruker**, vil jeg se dagens endring for hver aksje mot indeksen, så jeg ser
+med en gang hvilke som trakk opp og ned.
+
+**Oppfyller:** FR-105 · **Begrenses av:** FR-101, FR-104, `AD-21` med føringen 30.09, NFR-05, NFR-06
+
+**Kontroll — hva testen ser etter:**
+- Én søyle per aksje med kurs for indeksens dato, fra størst fall til størst stigning
+- Antallet telles og prøves med en kortere liste enn 15
+- Indeksens endring er en stiplet linje, grønn når indeksen steg og rød når den falt
+- Skjermleserteksten har alle tallene
+- Bransjesymbolene ligger i malen og hentes ikke fra nettet, som skriftene i `designregler.md`
+- Grensene for fargene avgjøres i spesifikasjonen og føres i `designregler.md`
+- Bare dagens søyler. Periodene og «Velg dag» fra designtavla er idé til v1.1
+- **Ville feilet hvis:** søylene trengte et nytt kall eller en ny tabell. Endringen er den i FR-101, og bransjen står i `AKSJEUNIVERS`
+
+**Avhenger av:** 2.9. **Én økt:** ja.
 
 ---
 
@@ -1956,6 +2034,8 @@ noteres det, med tidspunkt.
 
 **Tidspunkt:** rett etter Epic 2, ikke før innlevering. Suksessmålets frist
 «Før prosjektinnlevering» står fortsatt som ytre grense.
+
+*Lagt til 2026-10-01:* 2.9 og 2.9b er ferdige før testen. Testen får et spørsmål til, som observeres og ikke spørres om: legger personen merke til indeksen og søylene?
 
 **Én økt:** ja.
 
