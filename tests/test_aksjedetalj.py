@@ -128,6 +128,17 @@ class TestByggDetalj:
         for sjekk in detalj.sjekker:
             assert sjekk.maaling, "maalingen bak fortegnet skal vaere med"
 
+    def test_interesse_uten_medianvolum_viser_strek_og_grunnen(self):
+        """Story 2.1c, NFR-08: medianvolumet 0 gir «–» med grunnen, aldri 0.
+        Vinduet er KORT.volum_vindu, 3, ikke 20 skrevet inn for haand."""
+        kilde = lager({"EQNR": serie([100.0] * 5 + [130.0], [0] * 5 + [1000])})
+
+        detalj = bygg_detalj(EQNR, kilde, KORT)
+
+        interesse = next(s for s in detalj.sjekker if s.navn == "Interesse")
+        assert interesse.maaling == "–, medianvolumet de 3 dagene før er 0"
+        assert interesse.verdi == 0
+
     def test_styrken_er_summen_av_bidragsyterne(self):
         """Det brukeren skal kunne etterproeve: hvorfor 2 og ikke 1."""
         kilde = lager(

@@ -42,11 +42,11 @@ def ny(basefil):
 
 
 class TestTabellen:
-    def test_tom_base_migreres_til_versjon_3(self):
+    def test_tom_base_migreres_til_versjon_4(self):
         tilkobling = sqlite3.connect(":memory:")
         try:
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 3
-            assert siste_versjon(MIGRASJONSKATALOG) == 3
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 4
+            assert siste_versjon(MIGRASJONSKATALOG) == 4
         finally:
             tilkobling.close()
 
@@ -253,7 +253,10 @@ class TestBaseIVersjon2:
             tilkobling.commit()
             foer = alle_rader(tilkobling)
 
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 3
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 4
+            # 0004 (story 2.1c) legger fire maalinger til vurdering. En rad
+            # med grunn har ingen, saa de er NULL.
+            foer["vurdering"] = [rad + (None,) * 4 for rad in foer["vurdering"]]
             assert alle_rader(tilkobling) == foer
             assert antall(tilkobling, "aksje") == 15
             assert tilkobling.execute(
@@ -306,7 +309,8 @@ def rad(dato: str = "2026-09-23") -> Kursrad:
 
 def vurdering() -> Vurdering:
     return Vurdering(styrke=2, retning="Positiv", trend=1, bevegelse=1, interesse=0,
-                     slutt=300.0, justert_slutt=290.0)
+                     slutt=300.0, justert_slutt=290.0, trend_avvik=0.035,
+                dagens_endring=0.021, standardavvik=0.012, volumforhold=1.2)
 
 
 class TestAdapterne:

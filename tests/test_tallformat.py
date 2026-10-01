@@ -54,6 +54,16 @@ class TestTall:
     def test_akse_har_ingen_desimaler(self):
         assert tall(1234.4, "akse") == f"1{NB}234"
 
+    def test_forhold_har_to_desimaler_uten_fortegn_og_uten_prosent(self):
+        """Story 2.1c: volumet som forholdstall mot medianen."""
+        assert tall(4.954, "forhold") == "4,95"
+        assert tall(1.5, "forhold") == "1,50"
+        assert tall(0, "forhold") == "0,00"
+
+    def test_forhold_med_flere_desimaler_og_tusenskille(self):
+        assert tall(1.5004, "forhold", desimaler_mot_grense(1.5004, 1.5, minst=2)) == "1,5004"
+        assert tall(1234.5, "forhold") == f"1{NB}234,50"
+
     def test_ukjent_slag_avvises(self):
         with pytest.raises(ValueError, match="Ukjent slag"):
             tall(1.0, "pris")

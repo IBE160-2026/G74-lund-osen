@@ -12,13 +12,15 @@ Tallet selv endres ikke: avrunding skjer bare her, der det vises.
 
 HARDT_MELLOMROM = "\u00a0"
 
-# Desimaler per slag. Maaling er et minimum: desimaler_mot_grense kan gi
-# flere. Endringen har to desimaler, som foer, saa rekkefoelgen i FR-102 kan
-# leses av.
+# Desimaler per slag. Maaling og forhold er et minimum: desimaler_mot_grense
+# kan gi flere. Endringen har to desimaler, som foer, saa rekkefoelgen i
+# FR-102 kan leses av. Forhold er volumet som forholdstall mot medianen
+# (story 2.1c), uten fortegn og uten %.
 DESIMALER = {
     "kurs": 2,
     "endring": 2,
     "maaling": 1,
+    "forhold": 2,
     "volum": 0,
     "akse": 0,
 }

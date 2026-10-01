@@ -2,7 +2,7 @@
 title: 'Story 2.1c: Vurderingen lagrer målingene bak de tre sjekkene'
 type: 'feature'
 created: '2026-10-01'
-status: 'ready-for-dev'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '94ee9bb4df50c3ed3dd39c645dab34620c7e7365'
@@ -81,12 +81,12 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `src/tallformat.py` -- slaget `"forhold"` -- forholdstallet vises etter regel 21
-- [ ] `src/signalberegning.py` -- `maaling`, `grense`, forholdstallet, forklaringen av feltene -- målingen er det regelen så
-- [ ] `src/migrasjoner/0004_maalinger.sql` -- hjelpetabell og fire kolonner med CHECK -- basen krever målingene
-- [ ] `src/vurderingsdata.py`, `src/lagring_sqlite.py` -- fire felt med kontroller, `VURDERINGSKOLONNER` -- porten og lageret tar dem med
-- [ ] Testene i Code Map, og mutantene 1–13 i Verification
-- [ ] Spinen -- en «Bygget»-linje ved AD-7 og ved AD-18
+- [x] `src/tallformat.py` -- slaget `"forhold"` -- forholdstallet vises etter regel 21
+- [x] `src/signalberegning.py` -- `maaling`, `grense`, forholdstallet, forklaringen av feltene -- målingen er det regelen så
+- [x] `src/migrasjoner/0004_maalinger.sql` -- hjelpetabell og fire kolonner med CHECK -- basen krever målingene
+- [x] `src/vurderingsdata.py`, `src/lagring_sqlite.py` -- fire felt med kontroller, `VURDERINGSKOLONNER` -- porten og lageret tar dem med
+- [x] Testene i Code Map, og mutantene 1–13 i Verification
+- [x] Spinen -- en «Bygget»-linje ved AD-7 og ved AD-18
 
 **Acceptance Criteria:**
 - Given testseriene, when regelen brukes på `maaling` og `grense`, then den gir samme verdi som sjekken, for alle tre sjekker.
@@ -97,9 +97,42 @@ context:
 
 ## Implementation Notes
 
+- Bygget 01.10 av en implementasjonsagent. Ingenting er committet; commitene, dagsfila (regel 18) og pull requesten står igjen.
+- `Sjekk(navn, verdi, forklaring, maaling=None, grense=None)`. `forklaring` er fortsatt et felt, så `Sjekk("A", 1, "")` virker som før; hjelperne lager teksten av de samme tallene som legges i `maaling` og `grense`. Trend og interesse har `grense=None`: grensene deres er `noytralsone` og `volumfaktor` i `Parametre`.
+- `_interesseforklaring(forhold, p)`: «volum 4,95 × medianen» med vanlige mellomrom rundt ×, eller «–, medianvolumet de {p.volum_vindu} dagene før er 0».
+- `Vurdering`: ny hjelper `_endelig` (bool og tekst avvises, heltall blir `float`, et heltall for stort for float regnes som uendelig). `volumforhold` gjøres til `float` når det ikke er `None`.
+- `0004`: CHECK-ene står i hver kolonne, som i spesifikasjonen. `standardavvik >= 0` og `volumforhold >= 0` gir NULL når kolonnen er NULL, og en CHECK som gir NULL, godtas, så de slår bare til når tallet finnes.
+- Testene som fulgte med: `vurdering()` i `test_tilstand.py`, `test_aksje.py` og `test_vurderingslager.py` og `GYLDIG` fikk de fire (oppdiktede verdier). `test_aksje.py`: versjon 3 → 4, og `test_rader_for_kjente_aksjer_blir_staaende` venter fire NULL-kolonner i `vurdering` etter `0004`.
+- Tester: før 976 passed og 16 skipped lokalt, etter 1031 passed og 16 skipped (`uv run pytest -q`). CI er ikke kjørt.
+- Kontrollregningen (`--etter`, `--sammenlign`, på `kurser-raa-2026-09-30.json`): styrke, retning og de tre verdiene er like for alle 15, tekst for trend og bevegelse lik, tekst for interesse ulik for alle 15.
+- Mutantene, én om gangen, hele `tests/` hver gang, satt tilbake fra en kopi i scratchpad med sha256 sjekket: M1 3 feilet, M2 1, M3 2, M4 2, M5 2, M6 2, M7 2, M8 1, M9 17, M10 1, M11 2, M12 1, M13 1. Alle fanget.
+- Spinen: «Bygget»-linjer ved AD-7 og AD-18, `updated` fra klokka.
+- Ikke rørt, men utdatert: `docs/kilder-og-rettigheter.md` linje 440–443 sier at forklaringen til interesse «i dag» er `"volum {dagens_volum} mot median {median_volum}"`. Det stemmer ikke lenger etter 2.1c.
+
 ## Spec Change Log
 
 ## Review Triage Log
+
+Gjennomgang 1 (01.10), Blind Hunter (BH), Edge Case Hunter (ECH) og Verification Gap (VG).
+
+| # | Funn | Dom | Grunnlag | Rute |
+|---|---|---|---|---|
+| ECH1 | «1,50 × medianen» kan stå ved +1 når forholdstallet ligger under seks desimaler over 1,5 | low | `desimaler_mot_grense` gir `minst` når tallene er like med seks desimaler (8.0, flyttallsstøy). Docstringen lovet mer enn koden gjør | patch: docstringen |
+| ECH2 | Negativ eller NaN medianvolum gir feil tekst | false | `Kursrad` krever heltall ≥ 0 for volum (`kursdata.py:112–116`), og `beregn_signal` får bare `Kursrad` | avvist |
+| BH1 | AD-7 i spinen slutter fortsatt med «Ikke bygget ennå.» over Bygget-linjen | low | Linje 188 | patch: Rettet-merknad |
+| BH2 | `docs/kilder-og-rettigheter.md:440–444` beskriver den gamle interesseteksten som «i dag» | medium | Teksten er ikke lenger sann etter 2.1c | patch: Rettet-merknad |
+| BH3 | `SjekkVisning.maaling` er tekst, `Sjekk.maaling` tall | low | Navnet fantes før 2.1c. Et nytt navn rører mal og tester uten at noen bruker merker det | avvist |
+| BH4 | Tekst slipper gjennom `>= 0` i basen | low | REAL-affinitet lagrer tekst, som sammenlignes større enn tall. Porten avviser tekst | patch: kommentar i `0004` |
+| BH5 | «3.37 og nyere» i `0004` uten kilde | low | Ikke slått opp (regel 3) | patch: tallet fjernet |
+| BH6 | Egenskapstesten dekker ikke medianvolum 0 | false | `test_medianvolum_null_gir_ingen_maaling` dekker grenen, og VG fant den | avvist |
+| BH7 | 8.0-spesifikasjonen får ingen merknad om at tre tester er byttet | low | Beslutning 1 sier hvor merknaden står: i 2.1c i `epics.md` og her | avvist |
+| BH8 | Koblingen fra sjekk til kolonne står bare i en testhjelper, etter posisjon | low | Omformingen lages i 2.5 (beslutning 2) | avvist |
+| BH9 | `grense` er satt bare for bevegelse | false | Slik spesifikasjonen sier: bare bevegelse har en grense som varierer | avvist |
+| BH10 | `test_porten_sjekker_ikke_fortegnet_mot_maalingen` sjekker ingenting | low | Testen lager bare objektet | patch: assert |
+| BH11 | «En vurdering lagret bare fortegnene» i `0004` er unøyaktig | low | Raden lagret også styrke, retning og kursene | patch: kommentaren |
+| BH12 | Spinelinjene peker ikke på spesifikasjonsfila | low | Kosmetisk | avvist |
+| BH13 | Import midt i `test_migrering.py` med `noqa: E402`, og innrykk i to hjelpere | low | Importen er en direkte retting. Innrykket er kosmetisk | patch: importen. Innrykket avvist |
+| VG | Ingen hull | – | Alle endrede atferder har en test som ville feilet | – |
 
 ## Verification
 

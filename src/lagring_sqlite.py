@@ -163,8 +163,11 @@ class SqliteKurslager:
 
 SYMBOLER = frozenset(aksje.symbol for aksje in AKSJEUNIVERS)
 
+# Maalingene fra 0004 (story 2.1c) staar her, saa _UPSERT, skriv og les tar
+# dem med uten egen kode.
 VURDERINGSKOLONNER = (
     "styrke", "retning", "trend", "bevegelse", "interesse", "slutt", "justert_slutt",
+    "trend_avvik", "dagens_endring", "standardavvik", "volumforhold",
 )
 
 # Siste vinner, med ett unntak: en grunn skriver aldri over en vurdering

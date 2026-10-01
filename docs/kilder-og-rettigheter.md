@@ -2,7 +2,7 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-09-30T21:17
+updated: 2026-10-01T11:46
 ---
 
 # Kilder og rettigheter
@@ -442,6 +442,10 @@ Men det er en analogi. Ordlyden sier det ikke.
 Dagens volum er et **rått datapunkt fra EODHD**, ikke en utledet verdi. Sendes
 målingene slik de står, går rådata til modellen. Plan B må sende forholdstallet
 (volum mot median), ikke tallene det er regnet av.
+
+*Rettet 2026-10-01 (story 2.1c):* forklaringen er nå forholdstallet, «volum X ×
+medianen», og `Sjekk.maaling` er forholdstallet. Ingen volumtall står i teksten
+lenger.
 
 **Betingelse 4 gjelder uansett.** Modelltjenesten skal ikke trene på det som
 sendes, og det må være dokumentert før noe sendes. Om ett spørsmål til EODHD
