@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-10-03T00:58
+updated: 2026-10-03T01:10
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -286,7 +286,7 @@ kvalitetssikret koden». Se «Eksamen» øverst.
 
 | | |
 |---|---|
-| **Status** | **Delvis — materialet finnes, samlingen ikke** *Rettet 2026-10-03:* samlingen finnes nå i `docs/kvalitetssikring.md` (story 9.1, `2208ae1`), som står i review til Marian eller Joakim har lest den. |
+| **Status** | **Delvis — materialet finnes, samlingen ikke** *Rettet 2026-10-03:* samlingen finnes nå i `docs/kvalitetssikring.md` (story 9.1, `2208ae1`), som står i review til Marian eller Joakim har lest den. *Rettet 2026-10-03:* dokumentet er lest av Marian, og 9-1 er done. |
 | **Ligger i** | `docs/reflection-log.md` (ført siden 13.09), kontrollrapportene `docs/kontroll-2026-09-22.md`, `docs/kontroll-2026-09-22-plan.md` og `docs/kontroll-2026-09-26.md`, CI i `.github/workflows/tester.yml`, nettverkssperren i `tests/conftest.py`, mutantene, som står i commit-meldingene og i spesifikasjonene i `_bmad-output/implementation-artifacts/`, og instruksjonene ordrett i dagsfilene i `docs/ai-prompts/` (regel 18). *Rettet 2026-09-26:* her sto «mutantene, som i dag bare står i commit-meldingene». |
 | **Gjenstår** | Epic 9 i `epics.md`: 9.1 `docs/kvalitetssikring.md` (tester, CI, mutanter, og hva som ikke testes), og 9.2 instruksjonene ordrett, som nå føres i dagsfilene etter regel 18 (story 9.2 i `epics.md`). 9.3 arbeidsmønsteret er ferdig (`7152b51`). *Rettet 2026-09-26:* her sto «9.2 instruksjonene ordrett i `docs/ai-prompts/bygging/`, og 9.3 arbeidsmønsteret». `bygging/` finnes ikke. *Rettet 2026-10-03:* 9.1 er skrevet (`2208ae1`), så det som gjenstår her, er 9.2. |
 
