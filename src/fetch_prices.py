@@ -24,6 +24,11 @@ Tid (AD-20, story 2.1): klokka leses en gang, i UTC, naar kjoeringen starter.
 Datoen i filnavnet og i intervallet er norsk kalenderdato for det oeyeblikket,
 og hentet er det samme oeyeblikket i UTC med offset. Ingen kode her leser
 maskinens lokale sone.
+
+Story 2.5: etter kursene skriver hentingen dagens vurdering for alle femten i
+samme kjoering (AD-17), regnet av seriene den selv lagret, lest tilbake fra
+basen. Kan en aksje ikke vurderes, skrives en rad med grunnen (punkt 24).
+Boersdagen raden gjelder, regnes en gang, fra samme oeyeblikk som filnavnet.
 """
 
 import argparse
@@ -42,7 +47,7 @@ from dotenv import load_dotenv
 
 import lagring_fil
 import lagring_sqlite
-from boersdag import norsk_dato
+from boersdag import UtenforKalenderen, innevaerende_boersdag, norsk_dato
 from eodhd import UgyldigSerie, serie_fra_eodhd
 from kursdata import AKSJEUNIVERS, Kursrad
 from lagring_fil import (
@@ -52,8 +57,10 @@ from lagring_fil import (
     SnapshotLeser,
     _hentet_fra_tekst,
 )
-from lagring_sqlite import SqliteKurslager, aapne_base
+from lagring_sqlite import SqliteKurslager, SqliteVurderingslager, aapne_base
 from migrering import MigrasjonsFeil
+from signalberegning import vurder
+from vurderingsdata import Grunn
 
 BASE_URL = "https://eodhd.com/api/eod"
 
@@ -240,7 +247,7 @@ def skriv_til_basen(
     hentet: datetime,
     fil: Path,
     skriv: Callable[[str], None] = print,
-) -> bool:
+) -> set[str] | None:
     """Kursene fra ett oeyeblikksbilde til basen - story 2.1b.
 
     Den ene veien til basen, for hentingen og for innlesingen. Hvert symbol i
@@ -255,18 +262,18 @@ def skriv_til_basen(
     nevnes, og de andre skrives. Feiler basen etter at noen serier er
     skrevet, sier meldingen hvor mange.
 
-    Returnerer True hvis alt ble skrevet. False hvis et symbol ble hoppet
-    over eller avvist, eller hvis basen ikke kunne aapnes eller skrives; da
+    Returnerer symbolene som ble skrevet (story 2.5). Alt ble skrevet naar
+    alle symbolene i serier er med. Et symbol som ble hoppet over eller
+    avvist, er ikke med. None hvis basen ikke kunne aapnes eller skrives; da
     staar fila, og meldingen sier hvordan den leses inn.
     """
     try:
         tilkobling = aapne_base(base_sti)
     except BASEFEIL as feil:
         _basen_feilet(feil, base_sti, fil, 0, skriv)
-        return False
+        return None
 
-    alt_skrevet = True
-    skrevet = 0
+    skrevne: set[str] = set()
     try:
         lager = SqliteKurslager(tilkobling)
         for symbol, rader in serier.items():
@@ -278,23 +285,21 @@ def skriv_til_basen(
                     f"{forrige.isoformat()}. En eldre fil skriver ikke over en "
                     "nyere serie."
                 )
-                alt_skrevet = False
                 continue
             try:
                 lager.erstatt_serie(symbol, rader, hentet)
             except ValueError as feil:
                 skriv(f"  {symbol}: avvist og ikke skrevet: {feil}")
-                alt_skrevet = False
                 continue
-            skrevet += 1
+            skrevne.add(symbol)
     except BASEFEIL as feil:
-        _basen_feilet(feil, base_sti, fil, skrevet, skriv)
-        return False
+        _basen_feilet(feil, base_sti, fil, len(skrevne), skriv)
+        return None
     finally:
         tilkobling.close()
 
-    skriv(f"Skrev {skrevet} serier til basen {base_sti.name}.")
-    return alt_skrevet
+    skriv(f"Skrev {len(skrevne)} serier til basen {base_sti.name}.")
+    return skrevne
 
 
 def _basen_feilet(
@@ -313,6 +318,113 @@ def _basen_feilet(
     )
 
 
+def _kan_skrives_til(dato: date) -> str:
+    return (
+        f"En rad for {dato.isoformat()} kan bare skrives saa lenge den er "
+        "inneveerende boersdag (AD-7)."
+    )
+
+
+def _stoppet_ved_midnatt(dato: date, skrevet: int, skriv, aarsak: str = "") -> None:
+    skriv(
+        f"Kjoeringen gikk over midnatt i Oslo. Vurderingene for {dato.isoformat()} "
+        f"er stoppet etter {skrevet} rader, og datoen regnes ikke paa nytt."
+        f"{' ' + aarsak if aarsak else ''} Kursene og fila staar. "
+        f"{_kan_skrives_til(dato)}"
+    )
+
+
+def skriv_vurderinger(
+    base_sti: Path,
+    dato: date,
+    dag: date,
+    skrevne: set[str],
+    klokke: Callable[[], datetime],
+    skriv: Callable[[str], None] = print,
+) -> bool:
+    """Dagens rad for hver aksje i universet - story 2.5, FR-408, AD-17.
+
+    dato er boersdagen raden gjelder, regnet en gang av kjoer. dag er
+    kalenderdagen kjoeringen startet, og er ulik dato bare naar boersen er
+    stengt. Seriene leses tilbake fra basen etter at alle er skrevet, saa
+    vurderingen er regnet av det basen har fra denne kjoeringen. Bare
+    symbolene i skrevne vurderes; de andre faar SYMBOL_FEILET (AD-15). En
+    kjoering som fullfoerer, gir aldri en aksje uten rad. Stopper den ved
+    midnatt eller fordi basen feiler, mangler resten, og meldingen sier det.
+
+    En dag boersen er stengt, staar en rad som finnes for dato fra foer
+    (svar 1, 02.10). En grunn skriver aldri over en vurdering (punkt 24).
+    Lageret avgjoer det, og raden nevnes som en som sto fra foer.
+
+    Klokka gaar til lageret, som avviser en dato som ikke lenger er
+    inneveerende boersdag. Skjer det midt i universet, stopper skrivingen og
+    sier fra. Returnerer True hvis hver aksje fikk eller hadde en rad.
+    Utskriften har ingen kurser og ingen maalinger (regel 16).
+    """
+    try:
+        tilkobling = aapne_base(base_sti)
+    except BASEFEIL as feil:
+        skriv(
+            f"Basen {base_sti} kunne ikke aapnes for vurderingene: "
+            f"{type(feil).__name__}: {feil}. Ingen vurdering er skrevet for "
+            f"{dato.isoformat()}. {_kan_skrives_til(dato)}"
+        )
+        return False
+
+    skrevet = 0
+    grunner: dict[str, Grunn] = {}
+    sto_fra_foer: list[str] = []
+    try:
+        kurslager = SqliteKurslager(tilkobling)
+        lager = SqliteVurderingslager(tilkobling, klokke)
+        for aksje in AKSJEUNIVERS:
+            symbol = aksje.symbol
+            if dag != dato and lager.les(symbol, dato) is not None:
+                sto_fra_foer.append(symbol)
+                continue
+            if symbol in skrevne:
+                innhold = vurder(kurslager.serie(symbol), dato)
+            else:
+                innhold = Grunn.SYMBOL_FEILET
+            try:
+                ny = lager.skriv(symbol, dato, innhold)
+            except ValueError as feil:
+                _stoppet_ved_midnatt(dato, skrevet, skriv, f"Lageret sa: {feil}")
+                return False
+            if not ny:
+                sto_fra_foer.append(symbol)
+                continue
+            skrevet += 1
+            if isinstance(innhold, Grunn):
+                grunner[symbol] = innhold
+    except BASEFEIL as feil:
+        skriv(
+            f"Basen {base_sti} feilet etter {skrevet} vurderinger: "
+            f"{type(feil).__name__}: {feil}. {_kan_skrives_til(dato)}"
+        )
+        return False
+    finally:
+        tilkobling.close()
+
+    stengt = "" if dag == dato else f" (boersen er stengt {dag.isoformat()})"
+    skriv(
+        f"Skrev {skrevet} rader i vurdering for boersdagen {dato.isoformat()}"
+        f"{stengt}: {skrevet - len(grunner)} vurderinger og "
+        f"{len(grunner)} med grunn."
+    )
+    if grunner:
+        skriv(
+            "  Med grunn: "
+            + ", ".join(f"{symbol} ({grunn.value})" for symbol, grunn in grunner.items())
+        )
+    if sto_fra_foer:
+        skriv(
+            f"  Raden for {dato.isoformat()} sto fra foer og er ikke skrevet over: "
+            + ", ".join(sto_fra_foer)
+        )
+    return True
+
+
 def kjoer(
     data_katalog: Path,
     base_sti: Path,
@@ -320,6 +432,7 @@ def kjoer(
     api_nokkel: str,
     hent: Callable[[str, str, str, str], list[dict]] = hent_ett_symbol,
     skriv: Callable[[str], None] = print,
+    klokke: Callable[[], datetime] | None = None,
 ) -> Path | None:
     """En henting. Returnerer fila som ble skrevet, eller None hvis dagens fil
     fantes fra foer.
@@ -344,8 +457,28 @@ def kjoer(
     var ferdig, saa filnavn og hentet kan aldri havne paa hver sin dag, heller
     ikke naar kjoeringen gaar over midnatt. Et oeyeblikk uten sone gir
     ValueError foer vakten og foer noe kall.
+
+    Story 2.5: boersdagen vurderingene gjelder, regnes her, en gang, fra
+    oeyeblikket, foer vakten og foer noe kall. Dekker ikke lista over stengte
+    dager aaret, stopper kjoeringen med 0 kall (NFR-08). Etter kursene
+    skrives vurderingene med skriv_vurderinger. klokke er den ekte klokka
+    (main gir naa); uten den leses oeyeblikket. Den leses en gang foer
+    vurderingene: er det blitt en ny dag i Oslo, stopper kjoeringen og sier
+    fra. Feiler basen, skrives ingen vurdering.
     """
     dag = norsk_dato(oeyeblikk)
+    try:
+        dato = innevaerende_boersdag(dag)
+    except UtenforKalenderen as feil:
+        skriv(
+            f"{feil}. Foer inn dagene Oslo Boers er stengt for aaret som mangler, "
+            "i boersdag.py, foer hentingen kjoeres. Hentingen gjetter ikke paa "
+            "boersdagen (NFR-08). 0 kall brukt."
+        )
+        sys.exit(1)
+    if klokke is None:
+        def klokke():
+            return oeyeblikk
     hentet_tid = oeyeblikk.astimezone(timezone.utc)
     hentet = hentet_tid.isoformat()
     data_katalog.mkdir(parents=True, exist_ok=True)
@@ -381,7 +514,21 @@ def kjoer(
 
     # Basen etter fila. Et symbol i feil er ikke med og roeres ikke (AD-15).
     serier = {symbol: serie_fra_eodhd(rader) for symbol, rader in resultat.serier.items()}
-    if not skriv_til_basen(base_sti, serier, hentet_tid, fil, skriv):
+    skrevne = skriv_til_basen(base_sti, serier, hentet_tid, fil, skriv)
+    if skrevne is None:
+        skriv(
+            f"Ingen vurdering er skrevet for {dato.isoformat()}, og --les-inn "
+            f"skriver ingen. {_kan_skrives_til(dato)}"
+        )
+        sys.exit(1)
+
+    # Vurderingene etter kursene (AD-17), med datoen fra oeyeblikket.
+    if norsk_dato(klokke()) != dag:
+        _stoppet_ved_midnatt(dato, 0, skriv)
+        sys.exit(1)
+    if not skriv_vurderinger(base_sti, dato, dag, skrevne, klokke, skriv):
+        sys.exit(1)
+    if skrevne != set(serier):
         sys.exit(1)
     return fil
 
@@ -434,7 +581,8 @@ def les_inn(fil: Path, base_sti: Path, skriv: Callable[[str], None] = print) -> 
             f"  {symbol}: {len(rader)} dager, "
             f"{rader[0].dato.isoformat()} til {rader[-1].dato.isoformat()}"
         )
-    if not skriv_til_basen(base_sti, serier, hentet, fil, skriv) or not alt_lest:
+    skrevne = skriv_til_basen(base_sti, serier, hentet, fil, skriv)
+    if skrevne is None or skrevne != set(serier) or not alt_lest:
         sys.exit(1)
 
 
@@ -455,7 +603,13 @@ def main(argv: list[str] | None = None) -> None:
     if argumenter.les_inn is not None:
         les_inn(argumenter.les_inn, lagring_sqlite.BASE_STI)
         return
-    kjoer(lagring_fil.RAA_KATALOG, lagring_sqlite.BASE_STI, naa(), hent_api_nokkel())
+    kjoer(
+        lagring_fil.RAA_KATALOG,
+        lagring_sqlite.BASE_STI,
+        naa(),
+        hent_api_nokkel(),
+        klokke=naa,
+    )
 
 
 if __name__ == "__main__":

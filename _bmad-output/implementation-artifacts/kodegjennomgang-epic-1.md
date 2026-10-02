@@ -2,7 +2,7 @@
 title: "Kodegjennomgang av Epic 1"
 status: done
 created: 2026-09-27
-updated: 2026-09-29T15:52
+updated: 2026-10-02T11:04
 ---
 
 # Kodegjennomgang av Epic 1
@@ -53,7 +53,7 @@ denne runden, 1 er `false`, og 18 er avvist. De 14 som står igjen, er samlet i
 | G8 | 1.3 / 1.6 | Testnavnet `…_til_versjon_1_…` krever nå `>= 1` | low | A-BH10 | egen story |
 | G9 | nettsperren (`982b216`) | `conftest.py` sier «ingen navneoppslag», men bare `getaddrinfo` er sperret | low | B-BH11 | egen story |
 | G10 | 1.3 × 1.6 | `Kurslager` godtar ethvert symbol, `Vurderingslager` bare formen i `AKSJEUNIVERS` | low | A-BH2, A-ECH3, A-AA3 | vent: forutsetning i 2.2 *(merknad 2026-09-29: `epics.md` flyttet porten til 2.1b 28.09. Tatt i 2.1b: `kontroller_skriving` avviser et symbol utenfor `AKSJEUNIVERS` i begge lagrene.)* |
-| G11 | 1.3 × 1.6 | `Vurderingslager.skriv` slipper ut rå `sqlite3`-feil, mens `SqliteKurslager` gjør `IntegrityError` om til `ValueError` | low | A-BH1, A-AA2 | vent: avgjøres i 2.5 |
+| G11 | 1.3 × 1.6 | `Vurderingslager.skriv` slipper ut rå `sqlite3`-feil, mens `SqliteKurslager` gjør `IntegrityError` om til `ValueError` | low | A-BH1, A-AA2 | vent: avgjøres i 2.5 *(merknad 2026-10-02: tatt i 2.5. Hentingen fanger `sqlite3`-feil fra `SqliteVurderingslager.skriv` og sier fra, med test og mutant.)* |
 | G12 | 2.0 | `main()`, eneste kaller av `kjoer` i produksjon, har ingen test | low | B-VG2 | vent: tas i 2.3 *(merknad 2026-09-29: `epics.md` la den til 2.1 27.09, i `51f1cf9`. Tatt i 2.1.)* |
 | — | | Avvist (se tabellene) | | 18 funn | avvis |
 
@@ -61,7 +61,7 @@ denne runden, 1 er `false`, og 18 er avvist. De 14 som står igjen, er samlet i
 
 | # | Story | Funn | Dom | Bevis | Forslag |
 |---|---|---|---|---|---|
-| A-BH1 | 1.3 × 1.6 | `SqliteVurderingslager.skriv` slipper ut rå `sqlite3.IntegrityError`, mens `SqliteKurslager.erstatt_serie` gjør den om til `ValueError` (`lagring_sqlite.py:102`, `:210`) | low | Riktig. `test_feil_i_basen_rulles_tilbake` låser det. Men porten kontrollerer alt før SQL-en, så `IntegrityError` nås bare med en trigger eller en base som er endret utenom porten. `OperationalError` slipper ut av begge adapterne | G11, vent: 2.5 skriver gjennom begge portene og avgjør hvilke feil den fanger |
+| A-BH1 | 1.3 × 1.6 | `SqliteVurderingslager.skriv` slipper ut rå `sqlite3.IntegrityError`, mens `SqliteKurslager.erstatt_serie` gjør den om til `ValueError` (`lagring_sqlite.py:102`, `:210`) | low | Riktig. `test_feil_i_basen_rulles_tilbake` låser det. Men porten kontrollerer alt før SQL-en, så `IntegrityError` nås bare med en trigger eller en base som er endret utenom porten. `OperationalError` slipper ut av begge adapterne | G11, vent: 2.5 skriver gjennom begge portene og avgjør hvilke feil den fanger *(merknad 2026-10-02: tatt i 2.5)* |
 | A-BH2 | 1.3 × 1.6 | `SqliteKurslager.erstatt_serie` kontrollerer ikke symbolet mot `AKSJEUNIVERS`, og `EQNR.OL` blir en egen serie | low | Riktig: `_kontroller_noekkel` kalles bare fra `SqliteVurderingslager` (`lagring_sqlite.py:183`, `:219`). Ingen skriver i produksjonskoden ennå: hentingen skriver til fil til 2.2 | G10, vent: forutsetning i 2.2, der hentingen begynner å skrive gjennom `Kurslager` |
 | A-BH3 | 1.6 | Tabellen `vurdering` har ingen trigger mot `DELETE` eller `UPDATE`, selv om `grunn` har det | low | Riktig (`0002_vurdering.sql:63–87`). Porten har ingen `slett`, og protokolltesten holder det | avvist: samme som 1.6 ECH3 (porten er eneste skriver). `grunn` har triggere fordi en slettet grunn gjør rader i `vurdering` uleselige (1.6 BH3) |
 | A-BH4 | 1.6 | Fra 2027-01-01 reiser `skriv` for alle symboler, også for en grunn, og ingenting varsler før det | — | Kjent | kjent: 1.6 BH2 og BH11 (runde 2), vedtaket i punkt 3 og punkt 25 i `prd.md` §8 |

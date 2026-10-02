@@ -67,7 +67,18 @@ uv run python src/app.py                 # http://localhost:5000
 
 Hentingen skriver først øyeblikksbildet i `data/raa/` og så kursene til basen i
 `data/db/ose.db`, med samme tidspunkt. Mappene og basen lages ved første
-henting. Feiler basen, står fila, og den kan leses inn senere uten API-kall:
+henting. Etter kursene skriver den dagens vurdering for hver av de 15 aksjene i
+tabellen `vurdering`, regnet av seriene den nettopp lagret. Kan en aksje ikke
+vurderes, skrives en rad med grunnen. Utskriften sier hvilken børsdag radene
+gjelder, og hvilke aksjer som fikk en grunn. En vurdering kan ikke fylles inn
+etterpå, så hentingen kjøres for hånd på børsdager mellom kl. 22 og midnatt.
+Kjøres hentingen før kursene er publisert, stopper filvakten kveldens kjøring,
+og dagen får ingen vurdering. Går kjøringen over midnatt, stopper den før
+vurderingene og sier fra. En dag børsen er stengt, gjelder raden forrige
+børsdag, og en rad som finnes, står. Er ikke dagene børsen er stengt ført inn
+for året i `src/boersdag.py`, stopper hentingen før første kall.
+
+Feiler basen, står fila, og den kan leses inn senere uten API-kall:
 
 ```
 uv run python src/fetch_prices.py --les-inn data/raa/kurser-raa-ÅÅÅÅ-MM-DD.json
