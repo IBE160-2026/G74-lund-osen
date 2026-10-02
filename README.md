@@ -33,6 +33,7 @@ den som committet.
 - **Leveranseliste** — [`docs/innlevering.md`](docs/innlevering.md), med hva som skal leveres, og hvor det står
 - **Kontrollrapport 22.09** — [`docs/kontroll-2026-09-22.md`](docs/kontroll-2026-09-22.md), med rettingsplanen i [`docs/kontroll-2026-09-22-plan.md`](docs/kontroll-2026-09-22-plan.md)
 - **Kontrollrapport 26.09** — [`docs/kontroll-2026-09-26.md`](docs/kontroll-2026-09-26.md), med det som ble rettet samme kveld, og det som står igjen
+- **Kvalitetssikring** — [`docs/kvalitetssikring.md`](docs/kvalitetssikring.md), med hva som er testet, mutantene, kontrollene og hva som ikke er testet
 - **Refleksjonslogg og lagrede KI-prompts** — [`docs/reflection-log.md`](docs/reflection-log.md) og [`docs/ai-prompts/`](docs/ai-prompts/)
 
 ## Mappestruktur
@@ -121,5 +122,7 @@ merket øverst. Workflowen har ingen hemmeligheter og ingen API-nøkkel.
 
 Hver story leveres med test. Det gjelder fra og med signalberegningen, og
 det er også svaret vårt på hvordan KI-generert kode kvalitetssikres.
+Hva som er testet, hvordan, og hva som ikke er det, står samlet i
+[`docs/kvalitetssikring.md`](docs/kvalitetssikring.md).
 
 Skillet mellom `docs/` og `_bmad-output/` er bevisst. `docs/` viser hvordan vi kom fram til noe og hvilken rolle KI spilte underveis; `_bmad-output/` viser hva vi kom fram til. Vurderinger vi forkastet, og prompter som ledet til en beslutning, hører hjemme i `docs/ai-prompts/` — ikke i produktdokumentene, som skal kunne leses av seg selv.
