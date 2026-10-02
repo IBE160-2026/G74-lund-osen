@@ -2092,6 +2092,31 @@ skjermbildene som finnes · **Begrenses av:** FR-101–103, `AD-3`, `AD-10`,
 **Avhenger av:** 2.2. Bygges etter brukertesten i 8.1 og før UX-gjennomgangen i
 8.2, så 8.2 vurderer alle tre skjermbildene.
 
+### Story 8.4: Se nærmere i aksjedetaljen
+
+*Lagt til 2026-10-02, Marians beslutning.*
+
+Som **bruker**, vil jeg se hva jeg kan sjekke selv når en aksje skiller seg ut, så
+jeg forstår dagen uten at appen gir råd.
+
+**Oppfyller:** FR-205 · **Begrenses av:** FR-104, FR-203, FR-408, NFR-06
+
+Delen «Se nærmere» står rett under kursgrafen og har tre deler, som i FR-205:
+«Børsen, bransjen eller selskapet?», med aksjens endring mot hovedindeksen og mot
+snittet av de andre i samme bransje; «Står det noe i børsmeldingene?», med lenken
+til NewsWeb; og «Er en slik dag vanlig for aksjen?», med målingene som er lagret i
+vurderingen. Tekstene ligger i hjelpefila fra 8.0b.
+
+**Kontroll — hva testen ser etter:**
+- Hvert av de fem svarene i del 1, med grensene fra `Parametre`
+- «Selskapet eller bransjen» når aksjen er alene i bransjen
+- Del 3 bruker målingene i vurderingen og regner ikke kursene på nytt
+- Ingen nye kall og ingen ny tabell
+- **Ville feilet hvis:** et svar kunne leses som et råd eller en spådom, eller et tall ble gjettet
+
+**Avhenger av:** 10.5 for lenken, FR-104 og FR-410 for hovedindeksen, og 2.5 for målingene.
+**Én økt:** ja.
+
 ---
 
 ## Epic 9: Dokumentasjon av prosessen
