@@ -94,6 +94,8 @@ context:
 
 Gjennomgang 1, 30.09, av diffen fra `348ce60` til `4975f21`, med Blind Hunter (BH), Edge Case Hunter (ECH) og Verification Gap (VG). 17 funn: 8 rettet, 1 utsatt og 8 avvist.
 
+*Rettet 2026-10-03:* tabellen under gir 9 rettet, 1 utsatt og 7 avvist. Rad 8 og 9 er samme retting. Her sto «8 rettet, 1 utsatt og 8 avvist».
+
 | # | Kilde | Funn | Verdikt | Begrunnelse | Rute |
 |---|---|---|---|---|---|
 | 1 | VG | Ingen test ser `_interesseforklaring` gjennom `interesse()` og `beregn_signal`. Tilbakeført f-streng ville overlevd | medium | Stemmer. Volumene var 1 000, og den gamle formen gir «1000», uten punktum | patch: `test_interesse_gjennom_beregn_signal`, mutant 17 fanget |
