@@ -24,7 +24,9 @@ from eodhd_serier import AVVISTE, AVVISTE_IDER
 from boersdag import norsk_dato
 from kursdata import AKSJEUNIVERS
 from lagring_fil import SnapshotKilde, nyeste_leser, nyeste_snapshot
-from lagring_sqlite import SqliteKurslager, aapne_base
+from lagring_sqlite import SqliteKurslager, SqliteVurderingslager, aapne_base
+from signalberegning import beregn_signal, vurder
+from vurderingsdata import Grunn, Vurdering
 
 
 def falsk_serie(dager: int = 60):
@@ -716,7 +718,8 @@ class TestHentingenSkriverBasen:
         finally:
             tilkobling.close()
         assert antall_rader(base, "kursserie") == len(AKSJEUNIVERS) == 15
-        assert antall_rader(base, "vurdering") == 0
+        # Story 2.5: kjoeringen skriver ogsaa en rad i vurdering per aksje.
+        assert antall_rader(base, "vurdering") == 15
 
     def test_symbol_som_feilet_faar_ingen_rad_i_ny_base(self, stier):
         """K3 og AD-15. Ville feilet hvis symbolet som feilet, ble skrevet (M6)."""
@@ -1088,3 +1091,414 @@ class TestInnlesing:
 
         assert slutt.value.code == 1
         assert not base.exists()
+
+
+# Story 2.5: vurderingen skrives i samme kjoering. Hver test leser radene
+# tilbake med Vurderingslager.les fra en base paa disk.
+
+TIRSDAG_22_09 = date(2026, 9, 22)
+
+
+def serie_med_utslag(siste: date, dager: int = 60) -> list[dict]:
+    """Som serie_til, men siste dag stiger mer og har tre ganger volumet, saa
+    verdiene skiller seg fra serie_til og sjekkene gir utslag."""
+    serie = serie_til(siste, dager)
+    serie[-1] = {**serie[-1], "close": 180.0, "adjusted_close": 180.0, "volume": 3000}
+    return serie
+
+
+def vurderingene(base, dato: date, klokke: datetime = OEYEBLIKK_22_09) -> dict:
+    """Radene for dato gjennom porten, og seriene i basen, per symbol."""
+    tilkobling = aapne_base(base)
+    try:
+        lager = SqliteVurderingslager(tilkobling, lambda: klokke)
+        kurslager = SqliteKurslager(tilkobling)
+        return {
+            a.symbol: (lager.les(a.symbol, dato), kurslager.serie(a.symbol))
+            for a in AKSJEUNIVERS
+        }
+    finally:
+        tilkobling.close()
+
+
+def datoene_i_vurdering(base) -> list[str]:
+    tilkobling = aapne_base(base)
+    try:
+        return [r[0] for r in tilkobling.execute("SELECT DISTINCT dato FROM vurdering")]
+    finally:
+        tilkobling.close()
+
+
+class TestVurderingenISammeKjoering:
+    """Story 2.5, K1-K13 i spesifikasjonen."""
+
+    def test_en_kjoering_skriver_kurser_og_vurderinger_for_alle_femten(self, stier):
+        """K1: 15 serier og 15 vurderinger, lest tilbake fra en base paa disk,
+        med maalingene fra Signal av serien i basen. Ville feilet hvis
+        standardavvik og dagens_endring var byttet om (M1)."""
+        raa, base = stier
+        fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
+                 lambda *_: serie_med_utslag(TIRSDAG_22_09), lambda _: None)
+
+        rader = vurderingene(base, TIRSDAG_22_09)
+        assert len(rader) == 15
+        for symbol, (innhold, serie) in rader.items():
+            assert isinstance(innhold, Vurdering), symbol
+            assert serie[-1].dato == TIRSDAG_22_09
+            signal = beregn_signal(serie)
+            trend_sjekk, bevegelse_sjekk, interesse_sjekk = signal.sjekker
+            assert (innhold.styrke, innhold.retning) == (signal.styrke, signal.retning)
+            assert (innhold.trend, innhold.bevegelse, innhold.interesse) == (
+                trend_sjekk.verdi, bevegelse_sjekk.verdi, interesse_sjekk.verdi
+            )
+            assert innhold.trend_avvik == trend_sjekk.maaling
+            assert innhold.dagens_endring == bevegelse_sjekk.maaling
+            assert innhold.standardavvik == bevegelse_sjekk.grense
+            assert innhold.volumforhold == interesse_sjekk.maaling
+            assert innhold.slutt == serie[-1].slutt
+            assert innhold.justert_slutt == serie[-1].justert_slutt
+        assert innhold.styrke > 0
+
+    def test_vurderingen_er_regnet_av_serien_kjoeringen_selv_lagret(self, stier):
+        """K2: basen har en serie fra en tidligere kjoering samme dag. Den nye
+        kjoeringen vurderer den nye serien. Ville feilet hvis vurderingen ble
+        regnet foer kursene var skrevet (M2)."""
+        raa, base = stier
+        fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
+                 lambda *_: serie_til(TIRSDAG_22_09), lambda _: None)
+        (raa / "kurser-raa-2026-09-22.json").unlink()
+        senere = OEYEBLIKK_22_09 + timedelta(minutes=30)
+
+        fp.kjoer(raa, base, senere, NOEKKEL,
+                 lambda *_: serie_med_utslag(TIRSDAG_22_09), lambda _: None)
+
+        for symbol, (innhold, serie) in vurderingene(base, TIRSDAG_22_09, senere).items():
+            assert serie == fp.serie_fra_eodhd(serie_med_utslag(TIRSDAG_22_09))
+            assert innhold == vurder(serie, TIRSDAG_22_09), symbol
+            assert innhold != vurder(fp.serie_fra_eodhd(serie_til(TIRSDAG_22_09)), TIRSDAG_22_09)
+
+    def test_symbol_som_feilet_i_hentingen_faar_en_rad_med_grunn(self, stier):
+        """K3 og AD-15. Ville feilet hvis et feilet symbol ikke fikk rad (M3)."""
+        raa, base = stier
+
+        def hent(ticker, *_):
+            if ticker == "DNB.OL":
+                raise RuntimeError("nei")
+            return serie_til(TIRSDAG_22_09)
+
+        fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None)
+
+        rader = vurderingene(base, TIRSDAG_22_09)
+        assert rader["DNB"] == (Grunn.SYMBOL_FEILET, [])
+        assert all(isinstance(v, Vurdering) for s, (v, _) in rader.items() if s != "DNB")
+
+    def test_symbol_avvist_av_basen_faar_en_rad_med_grunn(self, stier, monkeypatch):
+        """K3: serien ble ikke lagret, saa symbolet regnes som feilet. De
+        andre faar vurdering, og kjoeringen ender med kode 1."""
+        raa, base = stier
+
+        class Avvisende(SqliteKurslager):
+            def erstatt_serie(self, symbol, rader, hentet):
+                if symbol == "DNB":
+                    raise ValueError("avvist i testen")
+                super().erstatt_serie(symbol, rader, hentet)
+
+        monkeypatch.setattr(fp, "SqliteKurslager", Avvisende)
+
+        with pytest.raises(SystemExit) as slutt:
+            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
+                     lambda *_: serie_til(TIRSDAG_22_09), lambda _: None)
+
+        assert slutt.value.code == 1
+        rader = vurderingene(base, TIRSDAG_22_09)
+        assert rader["DNB"][0] == Grunn.SYMBOL_FEILET
+        assert sum(isinstance(v, Vurdering) for v, _ in rader.values()) == 14
+
+    def test_nyeste_kurs_ikke_fra_dagen_gir_en_rad_med_grunn(self, stier):
+        """K4: EQNR har ingen kurs for 22.09. Ville feilet hvis vurderingen
+        ble regnet av gaarsdagens kurs (M4)."""
+        raa, base = stier
+
+        def hent(ticker, *_):
+            siste = date(2026, 9, 21) if ticker == "EQNR.OL" else TIRSDAG_22_09
+            return serie_til(siste)
+
+        fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None)
+
+        rader = vurderingene(base, TIRSDAG_22_09)
+        assert rader["EQNR"][0] == Grunn.KURS_IKKE_FRA_DAGEN
+        assert isinstance(rader["DNB"][0], Vurdering)
+
+    def test_signal_som_ikke_kan_regnes_gir_en_rad_med_grunn(self, stier):
+        """K5: 30 dager er for kort for MA50. Ville feilet hvis ValueError fra
+        beregn_signal ikke ble fanget (M5)."""
+        raa, base = stier
+
+        def hent(ticker, *_):
+            return serie_til(TIRSDAG_22_09, dager=30 if ticker == "KOG.OL" else 60)
+
+        fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None)
+
+        rader = vurderingene(base, TIRSDAG_22_09)
+        assert rader["KOG"][0] == Grunn.SIGNAL_IKKE_REGNET
+        assert len(rader["KOG"][1]) == 30
+        assert isinstance(rader["EQNR"][0], Vurdering)
+
+    def test_to_kjoeringer_samme_dag_gir_en_vurdering_per_aksje(self, stier):
+        """K6: den andre kjoeringen stopper ved filvakten foer noe kall, og
+        radene er de samme."""
+        raa, base = stier
+        hent = lambda *_: serie_med_utslag(TIRSDAG_22_09)  # noqa: E731
+        fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None)
+        foer = vurderingene(base, TIRSDAG_22_09)
+        kall = []
+
+        assert fp.kjoer(raa, base, OEYEBLIKK_22_09 + timedelta(minutes=5), NOEKKEL,
+                        lambda *a: kall.append(a), lambda _: None) is None
+
+        assert kall == []
+        assert antall_rader(base, "vurdering") == 15
+        assert vurderingene(base, TIRSDAG_22_09) == foer
+
+    def test_grunn_skriver_ikke_over_vurderingen_fra_tidligere_i_dag(self, stier):
+        """K6 og punkt 24: fila er borte, og DNB feiler i kjoering nummer to.
+        Vurderingen fra den foerste staar, og utskriften sier det. Ville
+        feilet hvis upserten skrev en grunn over en vurdering (M6)."""
+        raa, base = stier
+        fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
+                 lambda *_: serie_med_utslag(TIRSDAG_22_09), lambda _: None)
+        dnb_foer = vurderingene(base, TIRSDAG_22_09)["DNB"][0]
+        (raa / "kurser-raa-2026-09-22.json").unlink()
+
+        def hent(ticker, *_):
+            if ticker == "DNB.OL":
+                raise RuntimeError("nei")
+            return serie_til(TIRSDAG_22_09)
+
+        linjer = []
+        senere = OEYEBLIKK_22_09 + timedelta(minutes=30)
+        fp.kjoer(raa, base, senere, NOEKKEL, hent, linjer.append)
+
+        assert antall_rader(base, "vurdering") == 15
+        assert isinstance(dnb_foer, Vurdering)
+        assert vurderingene(base, TIRSDAG_22_09, senere)["DNB"][0] == dnb_foer
+        assert any("sto fra foer" in l and "DNB" in l for l in linjer)
+
+    @staticmethod
+    def _klokke(*tider):
+        """En klokke som gir tidene etter tur, og den siste resten av tiden."""
+        tider = list(tider)
+
+        def klokke():
+            return tider.pop(0) if len(tider) > 1 else tider[0]
+
+        return klokke
+
+    def test_midnatt_midt_i_universet_stopper_og_sier_fra(self, stier):
+        """K7: klokka gaar over midnatt i Oslo etter to rader. Kjoeringen
+        stopper med kode 1, sier fra, og ingen rad faar neste dag. Ville
+        feilet hvis datoen ble lest paa nytt for hvert symbol (M7), eller
+        hvis ValueError fra skriv ikke ble fanget (M8)."""
+        raa, base = stier
+        start = _utc(2026, 9, 22, 21, 59, 50)   # 23:59:50 i Oslo
+        klokke = self._klokke(start, start, start, _utc(2026, 9, 22, 22, 0, 10))
+        linjer = []
+
+        with pytest.raises(SystemExit) as slutt:
+            fp.kjoer(raa, base, start, NOEKKEL, lambda *_: serie_til(TIRSDAG_22_09),
+                     linjer.append, klokke=klokke)
+
+        assert slutt.value.code == 1
+        assert datoene_i_vurdering(base) == ["2026-09-22"]
+        assert antall_rader(base, "vurdering") == 2
+        assert any("midnatt" in l and "etter 2 rader" in l for l in linjer)
+        assert antall_rader(base, "kursserie") == 15
+
+    def test_midnatt_foer_vurderingene_stopper_ogsaa_fredag(self, stier):
+        """K7: fredag 25.09 kl. 23:59 til loerdag. Lageret ville godtatt
+        fredagen, som fortsatt er inneveerende boersdag, men kjoeringen
+        stopper fordi dagen er en annen enn oeyeblikkets. Ville feilet hvis
+        sjekken foer vurderingene var fjernet (M8)."""
+        raa, base = stier
+        start = _utc(2026, 9, 25, 21, 59, 50)
+        klokke = self._klokke(_utc(2026, 9, 25, 22, 0, 10))
+        linjer = []
+
+        with pytest.raises(SystemExit) as slutt:
+            fp.kjoer(raa, base, start, NOEKKEL, lambda *_: serie_til(date(2026, 9, 25)),
+                     linjer.append, klokke=klokke)
+
+        assert slutt.value.code == 1
+        assert antall_rader(base, "vurdering") == 0
+        assert any("midnatt" in l and "etter 0 rader" in l for l in linjer)
+
+    def test_main_gir_kjoeringen_den_ekte_klokka(self, tmp_path, monkeypatch):
+        """K7 gjennom main: naa leses for oeyeblikket og igjen foer
+        vurderingene. Ville feilet hvis main ikke ga kjoer klokka."""
+        monkeypatch.setenv("EODHD_API_KEY", NOEKKEL)
+        monkeypatch.setattr(fp, "load_dotenv", lambda *a, **k: None)
+        raa = tmp_path / "data" / "raa"
+        base = tmp_path / "data" / "db" / "ose.db"
+        monkeypatch.setattr(lagring_fil, "RAA_KATALOG", raa)
+        monkeypatch.setattr(lagring_sqlite, "BASE_STI", base)
+        monkeypatch.setattr(fp, "naa", self._klokke(
+            _utc(2026, 9, 22, 21, 59, 50), _utc(2026, 9, 22, 22, 0, 10)
+        ))
+
+        def get(url, params, timeout):
+            ticker = url.rsplit("/", 1)[1]
+            return falsk_respons(200, ticker, params["api_token"], serie_til(TIRSDAG_22_09))
+
+        monkeypatch.setattr(fp.requests, "get", get)
+
+        with pytest.raises(SystemExit) as slutt:
+            fp.main([])
+
+        assert slutt.value.code == 1
+        assert antall_rader(base, "vurdering") == 0
+        assert antall_rader(base, "kursserie") == 15
+
+    def test_innlesing_skriver_aldri_vurdering(self, stier, monkeypatch):
+        """K8 og AD-7: basen har dagens vurderinger. --les-inn av samme fil
+        gjennom main endrer ingen rad og skriver ingen ny. Ville feilet hvis
+        innlesingen skrev vurderinger (M9)."""
+        raa, base = stier
+        fil = fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
+                       lambda *_: serie_med_utslag(TIRSDAG_22_09), lambda _: None)
+        foer = vurderingene(base, TIRSDAG_22_09)
+        tilkobling = aapne_base(base)
+        try:
+            tilkobling.execute("DELETE FROM vurdering WHERE symbol = 'DNB'")
+            tilkobling.commit()
+        finally:
+            tilkobling.close()
+        monkeypatch.setattr(lagring_sqlite, "BASE_STI", base)
+        monkeypatch.setattr(fp, "hent_api_nokkel", lambda: pytest.fail("noekkelen ble lest"))
+        monkeypatch.setattr(fp.requests, "get", lambda *a, **k: pytest.fail("et kall ble gjort"))
+
+        fp.main(["--les-inn", str(fil)])
+        fp.les_inn(fil, base, lambda _: None)
+
+        etter = vurderingene(base, TIRSDAG_22_09)
+        assert etter["DNB"][0] is None
+        assert {s: v for s, (v, _) in etter.items() if s != "DNB"} == {
+            s: v for s, (v, _) in foer.items() if s != "DNB"
+        }
+        assert antall_rader(base, "vurdering") == 14
+
+    def test_utskriften_har_antall_dag_og_grunner_men_ingen_kurser(self, stier):
+        """K9 og regel 16: antall rader, boersdagen, antall med grunn og
+        symbolene med grunnen. Ingen kurs, intet volum og ingen maaling i
+        utskriften. Ville feilet hvis slutt sto i linjen (M10)."""
+        raa, base = stier
+
+        def hent(ticker, *_):
+            if ticker == "DNB.OL":
+                raise RuntimeError("nei")
+            return serie_med_utslag(TIRSDAG_22_09)
+
+        linjer = []
+        fil = fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, hent, linjer.append)
+
+        assert any(
+            "Skrev 15 rader i vurdering for boersdagen 2026-09-22" in l
+            and "14 vurderinger og 1 med grunn" in l
+            for l in linjer
+        )
+        assert any("Med grunn: DNB (symbol_feilet)" in l for l in linjer)
+        bilde = json.loads(fil.read_text(encoding="utf-8"))
+        verdier = {
+            str(rad[felt])
+            for serie in bilde["serier"].values()
+            for rad in serie
+            for felt in ("close", "adjusted_close", "volume")
+        }
+        for innhold, _ in vurderingene(base, TIRSDAG_22_09).values():
+            if isinstance(innhold, Vurdering):
+                verdier |= {
+                    str(getattr(innhold, felt)) for felt in (
+                        "slutt", "justert_slutt", "trend_avvik", "dagens_endring",
+                        "standardavvik", "volumforhold",
+                    )
+                }
+        assert verdier
+        assert not [(l, v) for l in linjer for v in verdier if v in l]
+
+    def test_basen_feiler_ingen_vurdering_og_kode_1(self, stier, monkeypatch):
+        """K10: basen feiler midt i kursene. Ingen vurdering skrives, og
+        meldingen sier at dagen ikke kan fylles inn. Ville feilet hvis
+        vurderingene ble skrevet likevel (M11)."""
+        raa, base = stier
+
+        class Laast(SqliteKurslager):
+            def erstatt_serie(self, symbol, rader, hentet):
+                if symbol == "KOG":
+                    raise sqlite3.OperationalError("database is locked")
+                super().erstatt_serie(symbol, rader, hentet)
+
+        monkeypatch.setattr(fp, "SqliteKurslager", Laast)
+        linjer = []
+
+        with pytest.raises(SystemExit) as slutt:
+            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
+                     lambda *_: serie_til(TIRSDAG_22_09), linjer.append)
+
+        assert slutt.value.code == 1
+        assert antall_rader(base, "vurdering") == 0
+        assert any("Ingen vurdering er skrevet for 2026-09-22" in l for l in linjer)
+
+    def test_stengt_dag_skriver_raden_for_inneveerende_boersdag(self, stier):
+        """K11, svar 1: en kjoering loerdag 26.09 uten rad fra foer skriver
+        fredagens rad, og utskriften sier hvilken dag den gjelder."""
+        raa, base = stier
+        loerdag = _utc(2026, 9, 26, 20, 0)
+        fredag = date(2026, 9, 25)
+        linjer = []
+
+        fp.kjoer(raa, base, loerdag, NOEKKEL, lambda *_: serie_til(fredag), linjer.append)
+
+        assert datoene_i_vurdering(base) == ["2026-09-25"]
+        rader = vurderingene(base, fredag, loerdag)
+        assert all(isinstance(v, Vurdering) for v, _ in rader.values())
+        assert any(
+            "boersdagen 2026-09-25 (boersen er stengt 2026-09-26)" in l for l in linjer
+        )
+
+    def test_stengt_dag_lar_raden_fra_foer_staa(self, stier):
+        """K12, svar 1: fredagens rad finnes fra fredag kveld. Loerdagens
+        kjoering skriver den ikke om, og utskriften sier det. Ville feilet
+        hvis raden ble skrevet over (M12)."""
+        raa, base = stier
+        fredag = date(2026, 9, 25)
+        fp.kjoer(raa, base, _utc(2026, 9, 25, 20, 0), NOEKKEL,
+                 lambda *_: serie_til(fredag), lambda _: None)
+        loerdag = _utc(2026, 9, 26, 20, 0)
+        foer = vurderingene(base, fredag, loerdag)
+        linjer = []
+
+        fp.kjoer(raa, base, loerdag, NOEKKEL,
+                 lambda *_: serie_med_utslag(fredag), linjer.append)
+
+        etter = vurderingene(base, fredag, loerdag)
+        assert {s: v for s, (v, _) in etter.items()} == {s: v for s, (v, _) in foer.items()}
+        assert etter["EQNR"][1] == fp.serie_fra_eodhd(serie_med_utslag(fredag))
+        assert any("Skrev 0 rader" in l for l in linjer)
+        assert any("sto fra foer" in l and "EQNR" in l for l in linjer)
+
+    def test_utenfor_kalenderen_stopper_foer_foerste_kall(self, stier):
+        """K13, svar 2: 2027 er ikke foert inn. Kjoeringen stopper med 0 kall,
+        uten fil og uten base, og sier at dagene maa foeres inn. Ville feilet
+        hvis datoen ble regnet etter kallene (M13)."""
+        raa, base = stier
+        kall = []
+        linjer = []
+
+        with pytest.raises(SystemExit) as slutt:
+            fp.kjoer(raa, base, _utc(2027, 1, 4, 21, 0), NOEKKEL,
+                     lambda *a: kall.append(a), linjer.append)
+
+        assert slutt.value.code == 1
+        assert kall == []
+        assert not base.exists()
+        assert not raa.exists() or list(raa.iterdir()) == []
+        assert any("2027" in l and "stengt" in l and "0 kall" in l for l in linjer)

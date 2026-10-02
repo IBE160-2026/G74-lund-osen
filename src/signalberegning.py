@@ -14,13 +14,19 @@ Vinduene paa 20 dager i bevegelse og interesse ble maalt 22.09.2026 mot like
 mange aksjedager, 2985, i et vindu forskjoevet en handelsdag (til og med 21.09,
 ikke 18.09), se malinger.md §9. Alle fem parametrene er dermed laast med
 maaling bak seg.
+
+Story 2.5: vurder gjoer en serie om til det som lagres for dagen, en
+Vurdering eller en Grunn. Kjernen importerer porten vurderingsdata, slik
+tilstand.py gjoer, aldri lageret.
 """
 
 from dataclasses import dataclass
+from datetime import date
 from statistics import median, stdev
 
 from kursdata import Kursrad
 from tallformat import desimaler_mot_grense, tall
+from vurderingsdata import Grunn, Vurdering
 
 MA_VINDU = 50
 
@@ -280,3 +286,41 @@ def beregn_signal(rader: list[Kursrad], p: Parametre = STANDARD) -> Signal:
         sjekker=sjekker,
         skiller_seg_ut=styrke >= p.terskel,
     )
+
+
+def vurder(rader: list[Kursrad], dato: date, p: Parametre = STANDARD) -> Vurdering | Grunn:
+    """Det som lagres for aksjen paa dato - story 2.5, FR-408, punkt 24.
+
+    Den eneste omformingen fra Signal til Vurdering. Radene er serien
+    kjoeringen selv lagret, kronologisk med nyeste sist. Er nyeste rad ikke
+    fra dato, regnes ingenting, og grunnen er KURS_IKKE_FRA_DAGEN: et signal
+    regnet av gaarsdagens kurs ville blitt lagret som dagens. Kan signalet
+    ikke regnes, eller godtar ikke porten tallene, er grunnen
+    SIGNAL_IKKE_REGNET (FR-204). Et symbol som feilet i hentingen, kjenner
+    bare skallet, saa SYMBOL_FEILET settes der.
+
+    Maalingene er tallene sjekkene ble avgjort av, uavrundet (story 2.1c):
+    avviket fra snittet, dagens endring og standardavviket den maales mot,
+    og volumforholdet.
+    """
+    if not rader or rader[-1].dato != dato:
+        return Grunn.KURS_IKKE_FRA_DAGEN
+    try:
+        signal = beregn_signal(rader, p)
+        trend_sjekk, bevegelse_sjekk, interesse_sjekk = signal.sjekker
+        siste = rader[-1]
+        return Vurdering(
+            styrke=signal.styrke,
+            retning=signal.retning,
+            trend=trend_sjekk.verdi,
+            bevegelse=bevegelse_sjekk.verdi,
+            interesse=interesse_sjekk.verdi,
+            slutt=siste.slutt,
+            justert_slutt=siste.justert_slutt,
+            trend_avvik=trend_sjekk.maaling,
+            dagens_endring=bevegelse_sjekk.maaling,
+            standardavvik=bevegelse_sjekk.grense,
+            volumforhold=interesse_sjekk.maaling,
+        )
+    except (ValueError, ArithmeticError):
+        return Grunn.SIGNAL_IKKE_REGNET

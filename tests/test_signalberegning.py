@@ -29,7 +29,9 @@ from signalberegning import (
     finn_styrke,
     interesse,
     trend,
+    vurder,
 )
+from vurderingsdata import Grunn, Vurdering
 
 # Korte vinduer, slik at hele serien faar plass paa skjermen og kan
 # kontrolleres for haand. Logikken er den samme som med MA50.
@@ -481,3 +483,80 @@ class TestMaalingen:
         forklaring) virker som foer."""
         assert Sjekk("A", 1, "").maaling is None
         assert Sjekk("A", 1, "").grense is None
+
+
+class TestVurder:
+    """Story 2.5: vurder er den ene omformingen fra Signal til det som lagres."""
+
+    def rader(self, siste_endring: float = 0.05, volumer=None) -> list[Kursrad]:
+        kurser = stigende_kurser(siste_endring)
+        if volumer is None:
+            volumer = med_stort_volum_siste_dag(len(kurser))
+        # Ujustert kurs ulik den justerte, saa slutt og justert_slutt ikke byttes.
+        return serie(kurser, volumer, slutt=[kurs * 1.1 for kurs in kurser])
+
+    def test_vurderingen_har_signalets_verdier_og_maalinger(self):
+        """Ville feilet hvis standardavvik og dagens_endring var byttet om."""
+        rader = self.rader()
+        signal = beregn_signal(rader, KORT)
+        trend_sjekk, bevegelse_sjekk, interesse_sjekk = signal.sjekker
+
+        svar = vurder(rader, rader[-1].dato, KORT)
+
+        assert svar == Vurdering(
+            styrke=signal.styrke,
+            retning=signal.retning,
+            trend=trend_sjekk.verdi,
+            bevegelse=bevegelse_sjekk.verdi,
+            interesse=interesse_sjekk.verdi,
+            slutt=rader[-1].slutt,
+            justert_slutt=rader[-1].justert_slutt,
+            trend_avvik=trend_sjekk.maaling,
+            dagens_endring=bevegelse_sjekk.maaling,
+            standardavvik=bevegelse_sjekk.grense,
+            volumforhold=interesse_sjekk.maaling,
+        )
+        assert svar.styrke == 3
+        assert svar.dagens_endring != svar.standardavvik
+
+    def test_standardparametrene_brukes_uten_p(self):
+        """Uten p er det de laaste parametrene som gjelder, og 13 dager er for
+        kort for MA50."""
+        rader = self.rader()
+        assert vurder(rader, rader[-1].dato) == Grunn.SIGNAL_IKKE_REGNET
+
+    def test_nyeste_kurs_ikke_fra_dagen(self):
+        """Ville feilet hvis vurderingen ble regnet av gaarsdagens kurs."""
+        rader = self.rader()
+        assert vurder(rader, rader[-1].dato + timedelta(days=1), KORT) == (
+            Grunn.KURS_IKKE_FRA_DAGEN
+        )
+        assert vurder(rader, rader[-2].dato, KORT) == Grunn.KURS_IKKE_FRA_DAGEN
+
+    def test_tom_serie_er_ikke_fra_dagen(self):
+        assert vurder([], date(2026, 9, 22), KORT) == Grunn.KURS_IKKE_FRA_DAGEN
+
+    def test_for_kort_serie_gir_signal_ikke_regnet(self):
+        rader = self.rader()[:5]
+        assert vurder(rader, rader[-1].dato, KORT) == Grunn.SIGNAL_IKKE_REGNET
+
+    def test_medianvolum_0_gir_vurdering_uten_volumforhold(self):
+        """Forholdstallet mangler, interesse er 0, og porten godtar raden."""
+        rader = self.rader(volumer=[0] * 13)
+
+        svar = vurder(rader, rader[-1].dato, KORT)
+
+        assert isinstance(svar, Vurdering)
+        assert svar.volumforhold is None
+        assert svar.interesse == 0
+
+    def test_porten_som_avviser_gir_signal_ikke_regnet(self, monkeypatch):
+        """Godtar ikke porten tallene, lagres grunnen, ikke et unntak."""
+        import signalberegning
+
+        def avvis(**_):
+            raise ValueError("avvist i testen")
+
+        monkeypatch.setattr(signalberegning, "Vurdering", avvis)
+        rader = self.rader()
+        assert vurder(rader, rader[-1].dato, KORT) == Grunn.SIGNAL_IKKE_REGNET

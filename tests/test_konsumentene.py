@@ -85,6 +85,16 @@ def test_importerer_verken_io_eller_skallet(navn):
     assert _importerte_moduler(_tre(navn)) & FORBUDTE_MODULER == set()
 
 
+def test_signalberegning_importerer_bare_porten_og_loevnodene():
+    """Story 2.5: vurder bygger Vurdering og Grunn, saa kjernen importerer
+    porten vurderingsdata, slik tilstand.py gjoer. Av prosjektets moduler er
+    det bare kursdata, tallformat og vurderingsdata, aldri et lager."""
+    prosjektet = {sti.stem for sti in SRC.glob("*.py")}
+    assert _importerte_moduler(_tre("signalberegning.py")) & prosjektet == {
+        "kursdata", "tallformat", "vurderingsdata",
+    }
+
+
 @pytest.mark.parametrize("navn", UTEN_EODHD_STRENGER)
 def test_ingen_eodhd_noekler_i_kildeteksten(navn):
     """Ingen streng i modulen er en av EODHDs feltnavn. Staar den der, leser
