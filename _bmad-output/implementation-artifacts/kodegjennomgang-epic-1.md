@@ -2,7 +2,7 @@
 title: "Kodegjennomgang av Epic 1"
 status: done
 created: 2026-09-27
-updated: 2026-10-02T11:04
+updated: 2026-10-03T00:39
 ---
 
 # Kodegjennomgang av Epic 1
@@ -208,3 +208,5 @@ Tellingen etter rettingene, talt fra tellingen etter beslutningen:
 - Løst i 1.9: A-BH2 (G10). Det er 1.
 - Venter: A-BH1 (G11) på 2.5 og B-VG2 (G12) på 2.1. Det er 2.
 - Sum: 22 + 7 + 2 + 19 + 8 + 1 + 2 = 61.
+
+*Rettet 2026-10-03:* tellingen over ble ikke oppdatert da de to siste ble tatt. B-VG2 (G12) er tatt i 2.1, med merknad 2026-09-29, og A-BH1 (G11) er tatt i 2.5, med merknad 2026-10-02 (radene G11 og G12 i tabellen). Da venter ingen, og summen er fortsatt 61.
