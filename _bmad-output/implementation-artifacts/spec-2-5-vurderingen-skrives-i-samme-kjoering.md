@@ -2,7 +2,7 @@
 title: 'Story 2.5: Vurderingen skrives i samme kjøring'
 type: 'feature'
 created: '2026-10-02'
-status: 'ready-for-dev'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'c5c42f101ef7c2041ebecebbf83226c45b70dde0'
@@ -75,10 +75,10 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `src/signalberegning.py` -- `vurder` -- den ene omformingen fra `Signal` til `Vurdering | Grunn`
-- [ ] `src/fetch_prices.py` -- dato før vakten, `skriv_til_basen` gir de skrevne symbolene, `skriv_vurderinger`, klokke og midnatt, `main` gir `naa` -- vurderingen i samme kjøring
-- [ ] Testene og mutantene i Verification
-- [ ] `README.md`, spinen, `deferred-work.md` -- regel 19 og pila
+- [x] `src/signalberegning.py` -- `vurder` -- den ene omformingen fra `Signal` til `Vurdering | Grunn`
+- [x] `src/fetch_prices.py` -- dato før vakten, `skriv_til_basen` gir de skrevne symbolene, `skriv_vurderinger`, klokke og midnatt, `main` gir `naa` -- vurderingen i samme kjøring
+- [x] Testene og mutantene i Verification
+- [x] `README.md`, spinen, `deferred-work.md` -- regel 19 og pila
 
 **Acceptance Criteria:**
 - Given en falsk kilde og en base på disk, when `kjoer` går, then `Vurderingslager.les` gir 15 rader, og målingene er lik `beregn_signal` av serien i basen.
@@ -86,6 +86,19 @@ context:
 - Given en klokke som går over midnatt, when vurderingene skal skrives, then kjøringen stopper med kode 1 og ingen rad for neste dag.
 
 ## Implementation Notes
+
+- Bygget 02.10 direkte i økta, ikke av en egen implementasjonsagent: planen og kildene var alt lest, og koden er liten.
+- `vurder(rader, dato, p=STANDARD)` i `signalberegning.py`. Tom serie gir `KURS_IKKE_FRA_DAGEN`. `beregn_signal` og `Vurdering` ligger i samme `try`, så en verdi porten avviser, gir `SIGNAL_IKKE_REGNET`.
+- `skriv_til_basen` gir `set[str] | None`. `les_inn` regner «alt skrevet» som `skrevne == set(serier)`.
+- `kjoer(…, klokke=None)`: uten klokke leses `oeyeblikk`, så de om lag 20 testkallene som finnes, står uendret. `main` gir `klokke=naa`.
+- Klokka leses én gang i `kjoer` før vurderingene (`norsk_dato(klokke()) != dag`), og lageret leser den ved hver `skriv`. Sjekken i `kjoer` stopper også fredag → lørdag, som lageret ville godtatt.
+- `skriv_vurderinger` fanger `ValueError` fra `skriv` som midnatt. Andre `ValueError` kan ikke nås der: symbolene kommer fra `AKSJEUNIVERS`, og datoen er en `date`.
+- Utskriften: «Skrev N rader i vurdering for børsdagen D[ (børsen er stengt X)]: A vurderinger og B med grunn.», «Med grunn: SYM (grunn), …» og «Raden for D sto fra før og er ikke skrevet over: …».
+- G11 (`SqliteVurderingslager.skriv` slipper ut `sqlite3`-feil) er løst i kalleren: `skriv_vurderinger` fanger `BASEFEIL`.
+- Spinen: pilene `signal --> vurdering`, `fetch --> signal` og `fetch --> vurdering`, og de manglende `fetch --> sqlite` og `fetch --> boersdag`. «Bygget»-linje ved AD-17.
+- Tester: før 1031 passed og 16 skipped lokalt (1047 i CI på main), etter 1056 passed og 16 skipped. 17 nye i `tests/test_fetch_prices.py`, 7 i `tests/test_signalberegning.py` og 1 i `tests/test_konsumentene.py`. Én test endret: `test_foerste_henting_…` venter 15 vurderinger.
+- Kontrollregningen, uten nett og uten basen, på `kurser-raa-2026-10-01.json` med dato 2026-10-01: 15 av 15 gir en `Vurdering`, ingen grunn.
+- Mutantene, én om gangen, hele `tests/` hver gang, satt tilbake fra en kopi i scratchpad med sha256 sjekket: M1 2 feilet, M2 12, M3 4, M4 2, M5 4, M6 2, M7 1, M8a 2, M8b 1, M9 2, M10 1, M11 1, M12 1, M13 1. Alle fanget. M8 er delt i to: a) sjekken før vurderingene fjernet, b) `ValueError` fra `skriv` fanges ikke.
 
 ## Spec Change Log
 
