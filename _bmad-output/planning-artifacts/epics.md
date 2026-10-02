@@ -1293,6 +1293,8 @@ så den ikke kan regnes av en serie som er byttet ut siden.
 
 **Én økt:** ja.
 
+*Ferdig 2026-10-02:* flettet i `c65f587`, PR #18.
+
 ### Story 2.6: Utbyttedager merkes
 
 Som **bruker som regner etter**, vil jeg vite når en kurs falt på grunn av
