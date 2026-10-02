@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-02T18:59
+updated: 2026-10-02T19:00
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1227,6 +1227,8 @@ feilretting og manuell testing.
 samme kjøring (FR-410), så daglig henting koster 16 kall og gir **fire kalls
 margin**. Avsnittet over gjelder til story 2.8 er bygget.
 
+*Lagt til 2026-10-02:* idéen «Måling av omsetning med kall til overs» i §8 bruker marginen bare etter at kveldens henting har gått bra, og lar 2 kall stå igjen. Alle kallene brukes bare når brukeren selv kjører målingen etter at dagen er ferdig.
+
 Ett bulk-kall er ikke et alternativ: bulk-endepunktet koster 100 kall flatt. Ett
 kall per symbol er eneste vei, og det er denne begrensningen som gir universet
 på 15.
@@ -1479,6 +1481,7 @@ den avhenger av.
 | **Innstillinger øverst** *(lagt til 2026-10-01)*: en knapp «Innstillinger» i knapperaden på alle sider, med «Vis hjelp» og «Vis KI-tekst». Valgene gjelder alle sidene og lagres i basen på samme måte som merkingen i Min liste (8.3), så de huskes | Hjelpen (8.0b), KI-teksten (Epic 10) og en tabell for innstillinger i basen | FR-601 sier at bryteren skal kunne brukes under demonstrasjonen mens noen ser på, så hver KI-tekst beholder sin egen bryter ved teksten. Begge styrer samme valg. Ingen innlogging: valgene gjelder maskinen |
 | **Omvisning på alle sidene** («Vis meg rundt») *(lagt til 2026-10-01)*: en knapp som viser siden steg for steg, med fast tekst vi har skrevet og sjekket | Hjelpen (8.0b), som omvisningen deler tekstfil med, og at sidene finnes: først markedsoversikten og aksjedetaljen, så Min liste (8.3), og børsometeret hvis det blir bygget | Uten KI. Tall i teksten hentes fra `Parametre`, som i hjelpen. En test sjekker at hvert steg peker på noe som finnes på siden |
 | **Egne aksjer** («Følg en aksje») *(lagt til 2026-10-01)*: opptil 3 aksjer i tillegg til de 15, valgt av brukeren og merket «Egen». Hver hentes med samme nøkkel og ett av de fem ekstra kallene, så de er gratis og krever ingen konto; appen har ingen innlogging. Stjernen i Min liste virker også på dem, og hjelpen forklarer dette. Er en aksje under kriteriet i §3, gjelder Marians beslutning i raden «Egne aksjelister»: først en forklaring, og merket «Under kravet» hvis brukeren velger den likevel | At `aksje` kan ha opptil 3 aksjer utenom AKSJEUNIVERS, samme endring av AD-21 som «Egne aksjelister» trenger. Kriteriet sjekkes med ett kall per aksje, som i malinger.md §13, der Bakkafrost var over kravet | Hver aksje tar ett av de fem kallene i NFR-01, så 3 gir 2 kall i margin, og 1 med OSEBX i tillegg. Marians beslutning 01.10: flest mulig, og taket settes ned hvis marginen blir for liten i drift. Grensene i signalet er målt på de 15 (AD-13), og det må stå ved aksjen. *Rettet 2026-10-01:* OSEBX er nå i v1 (FR-410), så det er fire ekstra kall, og 3 egne aksjer gir 1 kall i margin *Rettet 2026-10-02:* «Under kravet» er erstattet av «Utenfor målingen», se «Egne aksjelister». |
+| **Måling av omsetning med kall til overs** *(lagt til 2026-10-02, Marians beslutning)*: når kveldens henting har gått bra, måler den median omsetning for nye aksjer med kallene som er til overs, og lar 2 stå igjen til omkjøring. Vil man bruke alle kallene, kjører man målingen selv når man er ferdig for dagen. Den nekter hvis kveldens henting ikke har gått bra, og sier først hvor mange kall den bruker. Aksjene i OBX som ikke er blant de 15, måles først, så resten. Hver aksje måles på nytt etter 3 måneder, og datoen står ved tallet | En tabell for median omsetning og dato per symbol, i en ny migrasjon. Kvotesjekken før målingen. OBX-lista ført inn for hånd | 1 kall per aksje (malinger.md §13): med 1 egen aksje blir det 1 måling per kveld, uten egne 2. Euronext beskriver OBX som de 25 mest omsatte på Oslo Børs, regnet over seks måneder og revidert i mars og september (https://www.euronext.com/en/news/obx-index-0). Det er en ny kilde, lest av et menneske, ikke hentet av programmet. Webserveren henter aldri (AD-10), og rådata committes aldri (regel 10) |
 
 **Regnestykket for et større univers.** Det er regnet 23.09 fra målte tall: én
 henting per døgn, ett kall per symbol (§2), dagskvote 20, og bonus 484 etter
