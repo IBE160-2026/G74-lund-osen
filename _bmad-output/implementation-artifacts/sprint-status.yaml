@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-24-2026 19:26
-last_updated: 10-02-2026 10:32
+last_updated: 10-02-2026 15:37
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -69,7 +69,7 @@ development_status:
   2-2-hentekommandoen-som-egen-inngang: backlog
   2-3-børsdagskontroll-før-kvoten-brukes: backlog
   2-4-etterfylling-av-hull-i-kursserien: backlog
-  2-5-vurderingen-skrives-i-samme-kjøring: in-progress
+  2-5-vurderingen-skrives-i-samme-kjøring: review
   2-6-utbyttedager-merkes: backlog
   2-7-historikken-i-aksjedetaljen: backlog
   2-8-hovedindeksen-hentes-i-samme-kjøring: backlog

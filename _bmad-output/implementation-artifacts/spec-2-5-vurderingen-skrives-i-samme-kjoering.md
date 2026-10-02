@@ -2,7 +2,7 @@
 title: 'Story 2.5: Vurderingen skrives i samme kjøring'
 type: 'feature'
 created: '2026-10-02'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'c5c42f101ef7c2041ebecebbf83226c45b70dde0'
