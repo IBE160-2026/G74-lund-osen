@@ -2191,6 +2191,8 @@ som ikke er det, så jeg ikke må sette det sammen fra commit-meldinger.
 **Tidspunkt:** skrives når Epic 1 er ferdig, og oppdateres ved hver epic.
 **Én økt:** ja.
 
+*Ferdig 2026-10-03:* skrevet i `2208ae1`, uten PR, fordi bare dokumenter endres. Står i review til Marian eller Joakim har lest dokumentet.
+
 ### Story 9.2: `docs/ai-prompts/bygging/`
 
 Som **gruppe**, vil vi at instruksjonene som styrte byggingen, ligger ordrett i
