@@ -1805,6 +1805,31 @@ NewsWeb») · **Begrenses av:** `AD-2`
   ved navnet. Ville feilet hvis en lenke gikk til en annen aksje enn den siden
   viser.
 
+### Story 10.6: KI-teksten om dagen på forsiden
+
+*Lagt til 2026-10-02, Marians beslutning.*
+
+Som **bruker**, vil jeg lese noen setninger om hele børsdagen under tabellen, så
+jeg ser sammenhengen uten å regne selv.
+
+**Oppfyller:** FR-607 · **Begrenses av:** FR-601, FR-602, FR-603, FR-604, FR-605, NFR-02, NFR-06
+
+Grunnlaget er bare utledede tall regnet av kursene: hvor mange som skilte seg ut,
+hvor mange som gikk bedre enn hovedindeksen, indeksens endring og snittendringen
+per bransje, for dagen og for uka. Teksten lages én gang i hentekommandoen, med
+ett kall til modellen per børsdag, og logges. Den står under tabellen, merket som
+laget av KI, med modellnavnet.
+
+**Kontroll — hva testen ser etter:**
+- Grunnlaget har ingen kurser eller rådata fra EODHD
+- Teksten lages i hentingen, aldri når siden vises
+- En tekst som ikke består FR-603, vises ikke
+- Bryteren slår av begge KI-tekstene
+- **Ville feilet hvis:** teksten nevnte et tall som ikke står i grunnlaget, eller kunne leses som et råd
+
+**Avhenger av:** 10.1, 10.2 og 10.3, FR-104 og FR-410 for hovedindeksen, og spørsmålet til EODHD om plan B, som raden i §8 sier.
+**Én økt:** ja.
+
 ---
 
 ## Epic 6: Børsmeldinger i oversikten 🔒
