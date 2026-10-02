@@ -2440,6 +2440,56 @@ En plan som bare er lest, er ikke prøvd.
 
 ---
 
+## 29.09.2026 – 0 av 15 like, og ingen verdi avvek
+
+*Skrevet av rådet ut fra dagsfila.*
+
+Story 2.1 og 2.1b ble flettet samme dag (#13 og #14). Om kvelden gikk den første ekte hentingen gjennom, med 15 kall, og basen ble laget med 250 rader for hver av de 15 aksjene.
+
+Etterpå sammenlignet Claude Code seriene i basen med øyeblikksbildet de kom fra. Første forsøk ga 0 av 15 like. Feilen lå i sammenligningen og ikke i basen: fila har noen hele kurser som heltall, og basen gir dem tilbake som desimaltall. Sammenlignet som `Kursrad` var 15 av 15 like, og ingen verdi avvek.
+
+Et avvik er et spørsmål, ikke et svar.
+
+---
+
+## 30.09–01.10.2026 – Seks stopp på to dager
+
+*Skrevet av rådet ut fra dagsfilene.*
+
+Blokkene skrives av rådet, som leser en kopi av repoet, men ikke skriver til det. Claude Code slår opp påstandene før noe skrives (regel 3). På to dager stoppet seks blokker i forhåndskontrollen, og hver gang sto det noe i blokka som ikke stemte med repoet eller kilden.
+
+Tre av dem var samme blokk 30.09, og den fjerde versjonen gikk gjennom kl. 18:24. Én feil hadde gått en runde: blokka sa «fem steder», men det var seks, og tallet kom fra Claude Codes eget svar kl. 17:45. Rettelsen i den tredje versjonen ga selv en ny feil, en henvisning til en overskrift som ikke fantes. Kontrollen er heller ikke fullstendig: en henvisning til tre spørsmål som ikke står i repoet, sto i alle tre versjonene, men ble meldt først den tredje gangen.
+
+01.10 sa en kilde på nett noe annet enn blokka, og en annen blokk bygde på en ja-blokk som aldri ble lagret, fordi økta ble avbrutt.
+
+Ingenting ble skrevet på feil grunnlag, men hver stopp ble en ny runde gjennom Marian. Én stopp er billig. Tre på rad er det ikke.
+
+---
+
+## 02.10.2026 – De første vurderingene
+
+*Skrevet av rådet ut fra dagsfila.*
+
+Story 2.5 ble flettet om ettermiddagen (#18), og kveldens henting var den første som skrev vurderinger: 15 kall, 15 vurderinger og ingen rad med grunn. Målingene bak de tre sjekkene står i samme rad, fordi 2.1c ble bygget dagen før. En vurdering kan ikke fylles inn etterpå (AD-7), og det kan heller ikke målingene bak den.
+
+Den første blokka for hentingen ble limt inn kl. 15:52 og stoppet riktig, fordi hentingen skal gå mellom kl. 22:00 og 23:45. Senere stoppet forhåndskontrollen en blokk som var limt inn to ganger. Story 10.6 sto allerede i `epics.md`, og ingenting ble skrevet to ganger.
+
+Det som ikke kan fylles inn etterpå, må bygges først.
+
+---
+
+## 29.09–02.10.2026 – Planen vokste raskere enn koden
+
+*Skrevet av rådet ut fra sprint-status og git-loggen.*
+
+Fra 29.09 til 02.10 ble fem storyer bygget og flettet: 2.1, 2.1b, 8.0, 2.1c og 2.5. I samme tid kom ni nye storyer inn i planen: 2.1c, 8.0, 8.3, 8.0b, 2.8, 2.9, 2.9b, 8.4 og 10.6. To av dem ble bygget i samme periode. 02.10 tok Marian «Se nærmere» (8.4) og «Børsdagen kort fortalt» (10.6) inn i v1.
+
+v1 har nå 50 storyer, uten Epic 5–7. 16 er ferdige, 5 venter på kodegjennomgang, og 29 er ikke startet.
+
+Spørsmålet for gruppa er hva som rekker å bli bygget før fristen.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
