@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-02T20:53
+updated: 2026-10-02T22:45
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -97,6 +97,7 @@ koden.
 - Lenke fra aksjedetaljen til selskapets egen nettside, på norsk der den finnes *(lagt til 2026-09-30)*
 - Tickeren fra Oslo Børs står ved selskapsnavnet i aksjedetaljen, for eksempel EQNR *(lagt til 2026-09-30)*
 - Hovedindeksen OSEBX i markedsoversikten, med søyler for dagens endring per aksje (FR-104, FR-105, FR-410) *(lagt til 2026-10-01, Marians beslutning)*
+- «Se nærmere» i aksjedetaljen: tre ting brukeren kan sjekke selv (FR-205) *(lagt til 2026-10-02, Marians beslutning)*
 
 *Plan B, 2026-09-28:* KI-laget forklarer signalet i stedet for børsmeldingene, ut fra tall regnet av kursene (Epic 10). Av/på-bryteren står. FR-601–606 er skrevet om for plan B 2026-09-28, og meldingsversjonen står i §4.6A. *Her sto:* «FR-601–606 skrives om for plan B i en egen runde.»
 
@@ -472,6 +473,18 @@ data for én aksje ikke skal stoppe hovedflyten.
 
 **404 er forbeholdt to tilfeller:** et symbol som ikke er i aksjeuniverset, og
 en aksje kilden ikke har en eneste kursrad for.
+
+#### FR-205 — Se nærmere
+
+*Lagt til 2026-10-02, Marians beslutning (story 8.4).*
+
+Aksjedetaljen har delen «Se nærmere», rett under kursgrafen, med tre spørsmål brukeren kan sjekke selv. Den gir ikke råd (NFR-06). Svarene regnes av tall appen allerede har, uten nye kall og uten ny tabell.
+
+1. «Børsen, bransjen eller selskapet?»: aksjens endring mot hovedindeksen (FR-104) og mot snittet av de andre i samme bransje i lista som er aktiv. Svarene er «Børsen», «Bransjen», «Selskapet», «Selskapet eller bransjen» når aksjen er alene i bransjen, og «Liten bevegelse». Grensene avgjøres i spesifikasjonen og står i `Parametre`. Svaret sier hvor bevegelsen ser ut til å komme fra, ikke hvorfor.
+2. «Står det noe i børsmeldingene?»: lenken til NewsWeb fra FR-203 står her.
+3. «Er en slik dag vanlig for aksjen?»: dagens endring mot standardavviket, og volumet mot medianen, slik de er lagret i vurderingen (FR-408).
+
+Mangler et tall, står grunnen, ikke et gjettet svar (NFR-03).
 
 ---
 
