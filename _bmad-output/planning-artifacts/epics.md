@@ -2193,6 +2193,8 @@ som ikke er det, så jeg ikke må sette det sammen fra commit-meldinger.
 
 *Ferdig 2026-10-03:* skrevet i `2208ae1`, uten PR, fordi bare dokumenter endres. Står i review til Marian eller Joakim har lest dokumentet.
 
+*Lest 2026-10-03:* Marian svarte kl. 01:05 at dokumentet er lest, og 9-1 er done.
+
 ### Story 9.2: `docs/ai-prompts/bygging/`
 
 Som **gruppe**, vil vi at instruksjonene som styrte byggingen, ligger ordrett i
