@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-10-02T10:40'
+updated: '2026-10-02T11:04'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -272,7 +272,7 @@ opprinnelige står bevart nederst i blokken.
 - **Binds:** FR-408, FR-409, AD-5, AD-7, AD-10
 - **Prevents:** at vurderingen regnes av en **annen serie** enn den som lå der da den ble skrevet
 - **Rule:** `docker run … hent` henter kursene, kaller `erstatt_serie`, og regner deretter ut og skriver dagens vurdering for alle femten **i samme kjøring**. Én utløser, ett øyeblikk, ett par som hører sammen. `skriv` er idempotent på `(symbol, dato)`.
-- **Bygget 2026-10-02, story 2.5:** `fetch_prices.kjoer` regner børsdagen én gang, `innevaerende_boersdag(norsk_dato(oeyeblikk))`, før filvakten og før første kall. Dekker ikke lista over stengte dager året, stopper kjøringen med 0 kall (NFR-08). Etter at alle seriene er skrevet, leser `skriv_vurderinger` dem tilbake med `SqliteKurslager.serie` og skriver én rad per aksje i universet med `SqliteVurderingslager`: `signalberegning.vurder` gir `Vurdering` med de fire målingene, eller `KURS_IKKE_FRA_DAGEN` eller `SIGNAL_IKKE_REGNET`, og et symbol som ikke ble skrevet, får `SYMBOL_FEILET`. Aldri ingen rad. Feiler basen, skrives ingen vurdering. `main` gir `kjoer` klokka (`naa`); er det blitt en ny dag i Oslo før vurderingene, eller avviser `skriv` datoen midt i universet, stopper kjøringen og sier fra. En dag børsen er stengt, står en rad som finnes fra før. `--les-inn` skriver fortsatt aldri vurdering. Kjøringen fanger `sqlite3`-feil fra `SqliteVurderingslager.skriv` (G11). Hvert kontrollpunkt er prøvd med en mutant (spesifikasjonen, Verification).
+- **Bygget 2026-10-02, story 2.5:** `fetch_prices.kjoer` regner børsdagen én gang, `innevaerende_boersdag(norsk_dato(oeyeblikk))`, før filvakten og før første kall. Dekker ikke lista over stengte dager året, stopper kjøringen med 0 kall (NFR-08). Etter at alle seriene er skrevet, leser `skriv_vurderinger` dem tilbake med `SqliteKurslager.serie` og skriver én rad per aksje i universet med `SqliteVurderingslager`: `signalberegning.vurder` gir `Vurdering` med de fire målingene, eller `KURS_IKKE_FRA_DAGEN` eller `SIGNAL_IKKE_REGNET`, og et symbol som ikke ble skrevet, får `SYMBOL_FEILET`. En kjøring som fullfører, gir aldri en aksje uten rad. Feiler basen, skrives ingen vurdering, eller ingen flere. `main` gir `kjoer` klokka (`naa`); er det blitt en ny dag i Oslo før vurderingene, eller avviser `skriv` datoen midt i universet, stopper kjøringen og sier fra. En dag børsen er stengt, står en rad som finnes fra før. `--les-inn` skriver fortsatt aldri vurdering. Kjøringen fanger `sqlite3`-feil fra `SqliteVurderingslager.skriv` (G11). Hvert kontrollpunkt er prøvd med en mutant (spesifikasjonen, Verification).
 
 **Begrunnelsen.** Vurderingen regnes av kursene som ble lagret i samme kjøring.
 `AD-5` sier at `erstatt_serie` bytter ut **hele** symbolets serie ved hver

@@ -74,7 +74,9 @@ gjelder, og hvilke aksjer som fikk en grunn. En vurdering kan ikke fylles inn
 etterpå, så hentingen kjøres for hånd på børsdager mellom kl. 22 og midnatt.
 Kjøres hentingen før kursene er publisert, stopper filvakten kveldens kjøring,
 og dagen får ingen vurdering. Går kjøringen over midnatt, stopper den før
-vurderingene og sier fra.
+vurderingene og sier fra. En dag børsen er stengt, gjelder raden forrige
+børsdag, og en rad som finnes, står. Er ikke dagene børsen er stengt ført inn
+for året i `src/boersdag.py`, stopper hentingen før første kall.
 
 Feiler basen, står fila, og den kan leses inn senere uten API-kall:
 

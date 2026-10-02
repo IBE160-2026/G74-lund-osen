@@ -1141,9 +1141,10 @@ class TestVurderingenISammeKjoering:
                  lambda *_: serie_med_utslag(TIRSDAG_22_09), lambda _: None)
 
         rader = vurderingene(base, TIRSDAG_22_09)
-        assert len(rader) == 15
+        assert antall_rader(base, "vurdering") == 15
         for symbol, (innhold, serie) in rader.items():
             assert isinstance(innhold, Vurdering), symbol
+            assert innhold.styrke > 0, symbol
             assert serie[-1].dato == TIRSDAG_22_09
             signal = beregn_signal(serie)
             trend_sjekk, bevegelse_sjekk, interesse_sjekk = signal.sjekker
@@ -1157,7 +1158,6 @@ class TestVurderingenISammeKjoering:
             assert innhold.volumforhold == interesse_sjekk.maaling
             assert innhold.slutt == serie[-1].slutt
             assert innhold.justert_slutt == serie[-1].justert_slutt
-        assert innhold.styrke > 0
 
     def test_vurderingen_er_regnet_av_serien_kjoeringen_selv_lagret(self, stier):
         """K2: basen har en serie fra en tidligere kjoering samme dag. Den nye
@@ -1298,7 +1298,12 @@ class TestVurderingenISammeKjoering:
         """K7: klokka gaar over midnatt i Oslo etter to rader. Kjoeringen
         stopper med kode 1, sier fra, og ingen rad faar neste dag. Ville
         feilet hvis datoen ble lest paa nytt for hvert symbol (M7), eller
-        hvis ValueError fra skriv ikke ble fanget (M8)."""
+        hvis ValueError fra skriv ikke ble fanget (M8b).
+
+        Klokka leses en gang i kjoer foer vurderingene og en gang per skriv i
+        SqliteVurderingslager. Tre lesinger foer midnatt gir derfor to rader.
+        Leser koden klokka oftere, flytter punktet seg, og testen maa telles
+        paa nytt."""
         raa, base = stier
         start = _utc(2026, 9, 22, 21, 59, 50)   # 23:59:50 i Oslo
         klokke = self._klokke(start, start, start, _utc(2026, 9, 22, 22, 0, 10))
@@ -1318,7 +1323,7 @@ class TestVurderingenISammeKjoering:
         """K7: fredag 25.09 kl. 23:59 til loerdag. Lageret ville godtatt
         fredagen, som fortsatt er inneveerende boersdag, men kjoeringen
         stopper fordi dagen er en annen enn oeyeblikkets. Ville feilet hvis
-        sjekken foer vurderingene var fjernet (M8)."""
+        sjekken foer vurderingene var fjernet (M8a)."""
         raa, base = stier
         start = _utc(2026, 9, 25, 21, 59, 50)
         klokke = self._klokke(_utc(2026, 9, 25, 22, 0, 10))
@@ -1446,6 +1451,58 @@ class TestVurderingenISammeKjoering:
         assert slutt.value.code == 1
         assert antall_rader(base, "vurdering") == 0
         assert any("Ingen vurdering er skrevet for 2026-09-22" in l for l in linjer)
+
+    def test_basen_feiler_midt_i_vurderingene_kode_1_og_melding(self, stier, monkeypatch):
+        """K10 og G11: basen er laast for den tredje vurderingen. To rader
+        staar, kjoeringen sier fra uten traceback og ender med kode 1. Ville
+        feilet hvis sqlite3-feilen slapp ut (M14), eller hvis kjoeringen
+        endte med kode 0 (M15)."""
+        raa, base = stier
+
+        class Laast(SqliteVurderingslager):
+            def skriv(self, symbol, dato, innhold):
+                if symbol == "KOG":
+                    raise sqlite3.OperationalError("database is locked")
+                return super().skriv(symbol, dato, innhold)
+
+        monkeypatch.setattr(fp, "SqliteVurderingslager", Laast)
+        linjer = []
+
+        with pytest.raises(SystemExit) as slutt:
+            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
+                     lambda *_: serie_til(TIRSDAG_22_09), linjer.append)
+
+        assert slutt.value.code == 1
+        assert antall_rader(base, "vurdering") == 2
+        assert antall_rader(base, "kursserie") == 15
+        assert any(
+            "feilet etter 2 vurderinger" in l and "database is locked" in l for l in linjer
+        )
+
+    def test_basen_kan_ikke_aapnes_for_vurderingene_kode_1(self, stier, monkeypatch):
+        """K10 og G11: basen aapnes for kursene, men ikke for vurderingene.
+        Ingen rad, en melding og kode 1."""
+        raa, base = stier
+        aapne = fp.aapne_base
+        kall = []
+
+        def aapne_en_gang(sti):
+            kall.append(sti)
+            if len(kall) > 1:
+                raise sqlite3.OperationalError("unable to open database file")
+            return aapne(sti)
+
+        monkeypatch.setattr(fp, "aapne_base", aapne_en_gang)
+        linjer = []
+
+        with pytest.raises(SystemExit) as slutt:
+            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
+                     lambda *_: serie_til(TIRSDAG_22_09), linjer.append)
+
+        assert slutt.value.code == 1
+        assert antall_rader(base, "vurdering") == 0
+        assert antall_rader(base, "kursserie") == 15
+        assert any("kunne ikke aapnes for vurderingene" in l for l in linjer)
 
     def test_stengt_dag_skriver_raden_for_inneveerende_boersdag(self, stier):
         """K11, svar 1: en kjoering loerdag 26.09 uten rad fra foer skriver

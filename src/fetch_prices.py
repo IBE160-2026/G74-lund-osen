@@ -318,12 +318,19 @@ def _basen_feilet(
     )
 
 
-def _stoppet_ved_midnatt(dato: date, skrevet: int, skriv) -> None:
+def _kan_skrives_til(dato: date) -> str:
+    return (
+        f"En rad for {dato.isoformat()} kan bare skrives saa lenge den er "
+        "inneveerende boersdag (AD-7)."
+    )
+
+
+def _stoppet_ved_midnatt(dato: date, skrevet: int, skriv, aarsak: str = "") -> None:
     skriv(
         f"Kjoeringen gikk over midnatt i Oslo. Vurderingene for {dato.isoformat()} "
-        f"er stoppet etter {skrevet} rader: en rad skrives bare for inneveerende "
-        "boersdag (AD-7), og datoen regnes ikke paa nytt. Kursene og fila staar. "
-        "Resten av dagens rader kan ikke fylles inn etterpaa."
+        f"er stoppet etter {skrevet} rader, og datoen regnes ikke paa nytt."
+        f"{' ' + aarsak if aarsak else ''} Kursene og fila staar. "
+        f"{_kan_skrives_til(dato)}"
     )
 
 
@@ -341,8 +348,9 @@ def skriv_vurderinger(
     kalenderdagen kjoeringen startet, og er ulik dato bare naar boersen er
     stengt. Seriene leses tilbake fra basen etter at alle er skrevet, saa
     vurderingen er regnet av det basen har fra denne kjoeringen. Bare
-    symbolene i skrevne vurderes; de andre faar SYMBOL_FEILET (AD-15). Aldri
-    ingen rad.
+    symbolene i skrevne vurderes; de andre faar SYMBOL_FEILET (AD-15). En
+    kjoering som fullfoerer, gir aldri en aksje uten rad. Stopper den ved
+    midnatt eller fordi basen feiler, mangler resten, og meldingen sier det.
 
     En dag boersen er stengt, staar en rad som finnes for dato fra foer
     (svar 1, 02.10). En grunn skriver aldri over en vurdering (punkt 24).
@@ -359,7 +367,7 @@ def skriv_vurderinger(
         skriv(
             f"Basen {base_sti} kunne ikke aapnes for vurderingene: "
             f"{type(feil).__name__}: {feil}. Ingen vurdering er skrevet for "
-            f"{dato.isoformat()}, og den kan ikke fylles inn etterpaa (AD-7)."
+            f"{dato.isoformat()}. {_kan_skrives_til(dato)}"
         )
         return False
 
@@ -380,8 +388,8 @@ def skriv_vurderinger(
                 innhold = Grunn.SYMBOL_FEILET
             try:
                 ny = lager.skriv(symbol, dato, innhold)
-            except ValueError:
-                _stoppet_ved_midnatt(dato, skrevet, skriv)
+            except ValueError as feil:
+                _stoppet_ved_midnatt(dato, skrevet, skriv, f"Lageret sa: {feil}")
                 return False
             if not ny:
                 sto_fra_foer.append(symbol)
@@ -392,8 +400,7 @@ def skriv_vurderinger(
     except BASEFEIL as feil:
         skriv(
             f"Basen {base_sti} feilet etter {skrevet} vurderinger: "
-            f"{type(feil).__name__}: {feil}. Resten av dagens rader kan ikke "
-            "fylles inn etterpaa (AD-7)."
+            f"{type(feil).__name__}: {feil}. {_kan_skrives_til(dato)}"
         )
         return False
     finally:
@@ -464,8 +471,8 @@ def kjoer(
         dato = innevaerende_boersdag(dag)
     except UtenforKalenderen as feil:
         skriv(
-            f"{feil}. Foer inn dagene Oslo Boers er stengt i {dag.year} i "
-            "boersdag.py foer hentingen kjoeres. Hentingen gjetter ikke paa "
+            f"{feil}. Foer inn dagene Oslo Boers er stengt for aaret som mangler, "
+            "i boersdag.py, foer hentingen kjoeres. Hentingen gjetter ikke paa "
             "boersdagen (NFR-08). 0 kall brukt."
         )
         sys.exit(1)
@@ -510,8 +517,8 @@ def kjoer(
     skrevne = skriv_til_basen(base_sti, serier, hentet_tid, fil, skriv)
     if skrevne is None:
         skriv(
-            f"Ingen vurdering er skrevet for {dato.isoformat()}. En vurdering kan "
-            "ikke fylles inn etterpaa (AD-7), heller ikke med --les-inn."
+            f"Ingen vurdering er skrevet for {dato.isoformat()}, og --les-inn "
+            f"skriver ingen. {_kan_skrives_til(dato)}"
         )
         sys.exit(1)
 
