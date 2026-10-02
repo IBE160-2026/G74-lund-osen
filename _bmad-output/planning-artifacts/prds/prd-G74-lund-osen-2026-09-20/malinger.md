@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-01T16:07
+updated: 2026-10-02T23:27
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -1244,3 +1244,42 @@ Om sluttkursen stemmer med Oslo Børs, avgjøres for hånd av en av oss, og bare
 svaret føres her.
 
 *Lagt til 2026-10-01:* Kontrollert for hånd av Marian 01.10. `close` for 2026-09-30 i råfila er, avrundet til to desimaler, lik sluttverdien hun hadde fra Oslo Børs samme dag. Ingen tall er ført (regel 16).
+
+---
+
+## 15. OBX: fem aksjer utenom de 15 (2026-10-02)
+
+**Metode.** Som i §13: ett `/api/eod`-kall per symbol, med `from=2026-07-02` og
+`to=2026-10-02`. Omsetning regnes som `volume × close` per handelsdag, og
+medianen tas over perioden. Målingen er den første etter raden «Måling av
+omsetning med kall til overs» i v1.1-tabellen i `prd.md` §8, kjørt for hånd
+etter at kveldens henting hadde gått bra, med de kallene som var igjen.
+
+De fem er de første av de 12 aksjene i OBX som ikke er blant de 15.
+OBX-sammensetningen fra 21.09.2026 er lest av et menneske i Euronexts
+pressemelding, ikke hentet av programmet. De 7 andre måles senere: Vend
+Marketplaces, Höegh Autoliners, Nordic Semiconductor, Norwegian Air Shuttle,
+TGS, Tomra og BlueNord. Vend heter Schibsted til 2025, så tickeren hos EODHD
+slås opp før den måles.
+
+**Kostnad.** 5 kall, tatt av dagskvoten 02.10 etter den daglige hentingen på
+15. `apiRequests` gikk fra 15 til 20, og `extraLimit` sto på 463 før og etter.
+Ingen kall feilet, og ingen kall er igjen til en ny kjøring samme dag.
+
+**Rådata.** `data/raa/maaling-obx-raa-2026-10-02.json`. Fila finnes **bare
+lokalt** og er ikke sporet i git. Bare tallene under er regnet ut og ført her.
+
+| Symbol | Selskap | Handelsdager | Median omsetning | Over 32 MNOK | Over 25 MNOK |
+|---|---|---:|---:|---|---|
+| AKER | Aker | 67 | 150,5 MNOK | Ja | Ja |
+| SUBC | Subsea 7 | 67 | 83,7 MNOK | Ja | Ja |
+| STB | Storebrand | 67 | 87,8 MNOK | Ja | Ja |
+| KMAR | Kongsberg Maritime | 67 | 58,3 MNOK | Ja | Ja |
+| BWLPG | BW LPG | 67 | 70,4 MNOK | Ja | Ja |
+
+«Over 32 MNOK» betyr innenfor målingen: de 15 omsettes for 32 til 920 MNOK om
+dagen (`prd.md` §3). «Over 25 MNOK» er kriteriet i `prd.md` §3.
+
+Alle fem har 67 handelsdager, fra 2026-07-02 til 2026-10-02.
+
+Ingen av dem er lagt i universet.
