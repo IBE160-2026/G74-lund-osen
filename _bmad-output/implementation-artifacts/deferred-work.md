@@ -47,3 +47,30 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-8-0-de-rene-feilene-i-de-to-skjermbildene.md`
   summary: Tallene på aksen i kursgrafen har 0 desimaler, så en aksje med smalt kursspenn (for eksempel 1,2–1,5) får like tall på aksen.
   evidence: Funn 15 i gjennomgangen av 8.0. Oppførselen er fra før 8.0 (`"%.0f"` i `aksje.html`), og 8.0 flyttet den bare til slaget `akse` i `tallformat.py`. Kan tas i 8.2 eller når en aksje med lav kurs kommer inn.
+- source_spec: `docs/kontroll-2026-09-26.md`
+  summary: `tests/test_tidssone.py` består uten `tzdata`-pakken på Linux, fordi `zoneinfo` bruker systemets tidssonedatabase først. Spinen sier at `tzdata` er «holdt av» testen, men det gjelder bare der systemdatabasen mangler, som på Windows.
+  evidence: K5 i kontrollen 26.09, slått opp på nytt 03.10: står (`tests/test_tidssone.py:20–36`, spinen linje 384). Venter på story 4.0, som tar testoppsettet.
+- source_spec: `docs/kontroll-2026-09-26.md`
+  summary: Nettsperren stopper ikke UDP (`sendto`) eller nettkall fra en underprosess.
+  evidence: K11 i kontrollen 26.09, slått opp på nytt 03.10: står (fixturen `ingen_nettverk` i `tests/conftest.py`). Rapporten legger K11 til story 4.0 (linje 443). Venter på 4.0.
+- source_spec: `docs/kontroll-2026-09-26.md`
+  summary: Datoen i filnavnet til øyeblikksbildet er kjøredagen, mens `src/lagring_fil.py` og spinen sier at den er dagen dataene er fra.
+  evidence: K8 i kontrollen 26.09, slått opp på nytt 03.10: står (`src/fetch_prices.py:485`, `src/lagring_fil.py:128–130`, spinen linje 364). Story 2.1 endret bare sonen (`27ae8e3`). Venter på 2.3 eller 2.4, som tar forventet børsdag og etterfylling.
+- source_spec: `docs/kontroll-2026-09-26.md`
+  summary: AD-5 krever minst 175 handelsdager per henting, men ingen story har et kontrollpunkt for det, og hentingen har `MINST_HANDELSDAGER = 51`, med bare en merknad i utskriften.
+  evidence: E9 i kontrollen 26.09, slått opp på nytt 03.10: står (`src/fetch_prices.py:73` og :205, spinen linje 184). Venter på 2.3 eller 2.4.
+- source_spec: `docs/kontroll-2026-09-26.md`
+  summary: `Kursrad(volum=2**63)` godtas. `MinneKurslager` lagrer raden, mens `SqliteKurslager` reiser `OverflowError`, ikke `ValueError`, så lagrene oppfører seg ikke likt.
+  evidence: K6 i kontrollen 26.09, slått opp på nytt 03.10: står (`src/kursdata.py:112–116`, `src/lagring_sqlite.py:129–136`), og ingen test dekker det. Venter på 3.1.
+- source_spec: `docs/kontroll-2026-09-26.md`
+  summary: `migrer()` og `SqliteKurslager` avviser en tilkobling som er åpnet med `autocommit=False` (Python 3.12 og nyere), med en beskjed som ikke kan følges.
+  evidence: K9 i kontrollen 26.09, slått opp på nytt 03.10: står (`src/migrering.py:105–109`, `src/lagring_sqlite.py:106–110`). Venter på 3.1.
+- source_spec: `docs/kontroll-2026-09-26.md`
+  summary: `src/app.py` starter appen med `debug=True`. Et uhåndtert unntak viser Werkzeug-debuggeren med traceback. Det blir en risiko hvis Dockerfilen bruker samme inngang.
+  evidence: K10 i kontrollen 26.09, slått opp på nytt 03.10: står (`src/app.py:98`). Venter på Epic 3, der Dockerfilen lages.
+- source_spec: `docs/kontroll-2026-09-26.md`
+  summary: CI kjører ved push til `main` og pull request mot `main`, mens AD-8 i spinen sier «på hver push og PR».
+  evidence: K12 i kontrollen 26.09, slått opp på nytt 03.10: står (`.github/workflows/tester.yml:6–10`, spinen linje 210). Tas ved neste endring i CI.
+- source_spec: `docs/kontroll-2026-09-26.md`
+  summary: `Punkt` og `Rad` importeres uten å brukes i to testfiler, og `SnapshotKilde.tidsstempel`, `SnapshotKilde.serie` og `Detalj.har_ma50` brukes bare av tester.
+  evidence: K13 i kontrollen 26.09, delvis rettet før 27.09 (`Path` i `4b65a3c`), slått opp på nytt 03.10: resten står (`tests/test_aksjedetalj.py:9`, `tests/test_markedsoversikt.py:14`, `src/lagring_fil.py:53–57`, `src/aksjedetalj.py`). Tas av neste story som rører de filene.
