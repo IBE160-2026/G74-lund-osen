@@ -735,6 +735,8 @@ class TestBasenIWebserveren:
         monkeypatch.setattr(SqliteKurslager, "serie", laast)
         # Story 2.2b: oversikten leser gjennom Oversiktsleser.
         monkeypatch.setattr(lagring_sqlite.SqliteOversiktsleser, "oversikt", lambda self: laast(self, None))
+        # Gjennomgangen av 2.2b: ogsaa oppslaget i aksjedetaljen (post).
+        monkeypatch.setattr(lagring_sqlite.SqliteOversiktsleser, "post", laast)
 
         for rute in ("/", "/aksje/EQNR"):
             svar = klient.get(rute)
@@ -1103,13 +1105,23 @@ class TestVurderingenPaaOversikten:
         finally:
             tilkobling.close()
 
+        tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+        try:
+            uten_kurser = [n for (n,) in tilkobling.execute(
+                "SELECT navn FROM aksje WHERE symbol != 'EQNR' ORDER BY rowid"
+            )]
+        finally:
+            tilkobling.close()
+
         html = klient.get("/").data.decode("utf-8")
         fotnote = html.split("Uten data i denne kilden:")[1].split("</p>")[0]
 
         assert "Bank fra basen" in fotnote
         assert "DNO" not in fotnote
         assert "MPC Container Ships" not in fotnote
-        assert fotnote.count(",") == 15 - 2 - 1 - 1
+        # Like mange navn som aksje har uten kurser, ikke et fast tall
+        # (gjennomgangen av 2.2b).
+        assert fotnote.strip().rstrip(".") == ", ".join(uten_kurser)
 
 
 class TestVurderingenIDetaljen:
@@ -1150,6 +1162,19 @@ class TestVurderingenIDetaljen:
         assert f"Ingen vurdering for {rader[-1].dato.isoformat()}: ingen kurs fra dagen." in html
         assert "Målt mot" not in html
 
+    def test_lang_serie_med_signal_ikke_regnet_sier_ikke_antall_dager(self, klient):
+        """Raadet 03.10: signal_ikke_regnet paa en serie som er lang nok, for
+        eksempel naar porten ikke godtar tallene. Siden sier bare at signalet
+        ikke kunne regnes, ikke «Trenger N dager, fikk M» (M12)."""
+        rader = serie([100.0] * 61)
+        skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET), vurdert=False)
+        skriv_vurdering("EQNR", rader[-1].dato, Grunn.SIGNAL_IKKE_REGNET)
+
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+
+        assert f"Ingen vurdering for {rader[-1].dato.isoformat()}: signalet kunne ikke regnes." in html
+        assert "for å regne signal" not in html
+
     def test_ikke_vurdert_med_fotnoten(self, klient, monkeypatch):
         # 60 rader slutter fredag 30.10, en boersdag.
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 59 + [110.0])}), vurdert=False)
@@ -1159,6 +1184,23 @@ class TestVurderingenIDetaljen:
         assert "ikke vurdert" in html
         assert "hentekommandoen har ikke skrevet en vurdering" in html
         assert "Målt mot" not in html
+
+    def test_feil_i_spoerringen_gir_503_paa_begge_rutene(self, klient):
+        """Gjennomgangen av 2.2b: en sqlite3-feil i selve spoerringen, her en
+        base uten tabellen vurdering, gir 503 og ikke 404 eller 500. Ville
+        feilet hvis oppslaget i aksjedetaljen svelget feilen (M15)."""
+        skriv_serie("EQNR", serie([100.0] * 61), datetime.fromisoformat(HENTET))
+        tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+        try:
+            with tilkobling:
+                tilkobling.execute("DROP TABLE vurdering")
+        finally:
+            tilkobling.close()
+
+        for rute in ("/", "/aksje/EQNR"):
+            svar = klient.get(rute)
+            assert svar.status_code == 503, rute
+            assert "OperationalError" in svar.data.decode("utf-8"), rute
 
     def test_aksjen_slaas_opp_i_basen(self, klient):
         """Merknaden 03.10 under AD-21. Ville feilet hvis aksjedetaljen slo

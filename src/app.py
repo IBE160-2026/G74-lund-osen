@@ -24,6 +24,7 @@ stier. Bare de to rutene roerer basen.
 
 import sqlite3
 import threading
+from collections.abc import Callable
 from datetime import date, datetime, timezone
 from pathlib import Path
 
@@ -175,7 +176,10 @@ class _BasenFeilet(Exception):
     som en nyere henting har migrert forbi koden. Gir 503, ikke 500."""
 
 
-def _leser_eller_basefeil(hent=None):
+def _leser_eller_basefeil(
+    hent: Callable[[], Kursleser | Oversiktsleser | None] | None = None,
+) -> Kursleser | Oversiktsleser | None:
+    """Leseren fra hent (som standard hent_leser), eller 503 ved basefeil."""
     try:
         return (hent or hent_leser)()
     except BASEFEIL as feil:

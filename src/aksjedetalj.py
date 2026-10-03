@@ -20,6 +20,7 @@ from datetime import date, timedelta
 
 from kursdata import Aksje, Kursrad
 from markedsoversikt import (
+    IKKE_VURDERT,
     RETNINGSVISNING,
     UKJENT_RETNING,
     Retningsvisning,
@@ -108,8 +109,20 @@ class Detalj:
         return RETNINGSVISNING.get(self.vurdering.retning, UKJENT_RETNING)
 
     @property
-    def signalet_ikke_regnet(self) -> bool:
-        return self.tilstand is not None and self.tilstand.innhold is Grunn.SIGNAL_IKKE_REGNET
+    def for_kort_serie(self) -> bool:
+        """Raden har grunnen signal_ikke_regnet, og serien er kortere enn
+        signalet trenger. Bare da sier siden antallet dager (FR-204).
+        vurder() gir samme grunn naar porten ikke godtar tallene, eller ved
+        ArithmeticError, paa en serie som er lang nok (raadet 03.10)."""
+        return (
+            self.tilstand is not None
+            and self.tilstand.innhold is Grunn.SIGNAL_IKKE_REGNET
+            and self.antall_dager < self.noedvendige_dager
+        )
+
+    @property
+    def ikke_vurdert(self) -> bool:
+        return self.tekst == IKKE_VURDERT
 
     @property
     def bidragsytere(self) -> tuple[SjekkVisning, ...]:

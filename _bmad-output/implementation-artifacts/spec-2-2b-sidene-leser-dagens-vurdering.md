@@ -2,7 +2,7 @@
 title: 'Story 2.2b: Sidene leser dagens vurdering'
 type: 'feature'
 created: '2026-10-03'
-status: 'in-progress'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'a9b87d591751b32b9382250cdfb0b82fc1bca3d3'
@@ -110,10 +110,39 @@ context:
 | M9 `UtenforKalenderen` fanges ikke for seg | 1 | `test_utenfor_boerskalenderen_gir_tekst_ikke_feil` |
 | M10 spørringen i `app.py` | 1 | `test_app_har_ingen_sql_og_regner_ikke_signalet` |
 | M11 rader uten vurdering sorteres som styrke 0 | 1 | `test_rad_uten_vurdering_staar_bak_styrke_0` |
+| M12 antallet dager vises for all `signal_ikke_regnet` (etter gjennomgangen) | 2 | `test_lang_serie_med_signal_ikke_regnet_er_ikke_for_kort`, `test_lang_serie_med_signal_ikke_regnet_sier_ikke_antall_dager` |
+| M13 sjekken av en dato etter i dag fjernet (etter gjennomgangen) | 1 | `test_dato_etter_i_dag_gir_tekst_ikke_feil` |
+| M14 `Detalj.ikke_vurdert` mot en annen tekst (etter gjennomgangen) | 1 | `test_ikke_vurdert_med_fotnoten` (aksjedetaljen) |
+| M15 en `sqlite3`-feil i `post()` svelges og gir 404 (etter gjennomgangen) | 1 | `test_feil_i_spoerringen_gir_503_paa_begge_rutene`. Overlevde først: testen med låst base bytter ut hele `post`, så mutanten inne i den ble aldri kjørt. Den nye testen fjerner tabellen `vurdering`, så selve spørringen feiler |
+
+- **Etter gjennomgangen og rådet 03.10** (04.10): 1129 ble 1132 passed og 16 skipped lokalt, med 3 nye tester. `test_feil_mens_sidene_leser_gir_503` låser nå også `post`, og testen for lista over manglende sammenligner med `aksje` i basen i stedet for et fast tall.
 
 ## Spec Change Log
 
 ## Review Triage Log
+
+Gjennomgang 1 (03.10, triert 04.10 etter bruddet kl. 23:07), Blind Hunter (BH), Edge Case Hunter (ECH) og Verification Gap (VG), og tre funn fra rådet 03.10.
+
+| # | Funn | Dom | Grunnlag | Rute |
+|---|---|---|---|---|
+| BH1, ECH1, VG-annet, rådet 03.10 a | Aksjedetaljen sier «Trenger N dager … fikk M» for all `signal_ikke_regnet`, også når serien er lang nok | medium | `vurder()` gir grunnen også for `UgyldigVurdering` og `ArithmeticError`, og `antall_dager` er lengden på serien i dag | patch: `Detalj.for_kort_serie` sjekker lengden, ellers står bare at signalet ikke kunne regnes. To tester, M12 |
+| BH2, rådet 03.10 c | Forklaringene og «skiller seg ut» bruker dagens parametre, som ikke lagres med raden | low | For dagens rad er det det samme, og parametrene er låst. Det betyr noe for eldre rader | utsatt til `deferred-work.md`, for 2.7 |
+| BH3, ECH4 | Aksjedetaljen leser posten og serien i to spørringer, uten én transaksjon | low | Hentekommandoen skriver én gang i døgnet, mellom kl. 22 og midnatt. En henting mellom de to lesingene gir én side der overskriften og siste punkt i grafen kan sprike. `erstatt_serie` tømmer aldri en serie, så det gir ikke 404 | avvist: lite sannsynlig, og rettingen krever transaksjonsstyring på tvers av to porter |
+| BH4 | `les_tilstand` gjør enhver `ValueError` til «datoen er etter i dag» | low | I dag reiser `tilstand()` bare `ValueError` for en dato etter i dag, men det hvilte på rekkefølgen av `except` | patch: datoen sjekkes før kallet, og `ValueError` fanges ikke lenger. M13 |
+| BH5 | Rettet-merknaden i `designregler.md` slår sammen «ikke vurdert» og «ikke børsdag» | low | Stemmer, FR-409 holder dem fra hverandre | patch: Presisert-merknad |
+| BH6, ECH5 | Docstringen til `Rad` sier at `sist_hentet` kommer fra `Kursleser` og aldri er None | low | Den kommer nå fra `kursserie` gjennom porten. `erstatt_serie` skriver `kurs` og `kursserie` i samme transaksjon (AD-5), så None skjer bare i en test | patch: docstringen |
+| BH7 | «ikke vurdert» står som tekst i `aksje.html` | low | Stemmer. Endres konstanten, forsvinner fotnoten | patch: `Detalj.ikke_vurdert` mot `IKKE_VURDERT`. M14 |
+| BH8 | `Rad` og `Detalj` har de samme tre egenskapene | low | Begge leser `Art.SVAR` på samme måte, og ingen kaller er funnet som vil sprike | avvist |
+| BH9 | Testen for lista over manglende har 15 skrevet inn | low | Stemmer, mot det testen selv sier | patch: sammenligner med navnene i `aksje` i basen |
+| BH10 | En `sqlite3`-feil i `post()` er ikke testet | low | Bare `oversikt` var låst i testen | patch: `post` låses også, og en ny test fjerner tabellen `vurdering`. M15 |
+| BH11 | Datoen i Oslo er ikke testet gjennom appen | false | En kurs for dag D skrives mellom kl. 22 og midnatt i Oslo, altså samme dato i UTC. Siden kan ikke få en kursdato etter UTC-datoen. VG kom til det samme | avvist |
+| BH12 | `_leser_eller_basefeil` mistet typene | low | Stemmer | patch: typene er tilbake |
+| BH13 | Fotnoten sier «Uten data i denne kilden» | low | Teksten er fra før 2.2b, og kilden er basen. Den stemmer | avvist |
+| BH14 | «Ingen vurdering for 2026-10-30» har datoen på ISO-form | false | Appen viser ÅÅÅÅ-MM-DD overalt (`test_datoen_skrives_som_aaaa_mm_dd`, `test_detaljen_skriver_datoene_som_aaaa_mm_dd`) | avvist |
+| BH15 | Status «Delvis» i `innlevering.md` motsier raden | false | KI-loggen (4.3) gjenstår, slik raden sier, så «Delvis» stemmer | avvist |
+| ECH2 | En ny `Grunn` uten tekst gir `KeyError` og 500 | false | `test_rad_med_grunn_viser_grunnen_ikke_styrke_0` går over `list(Grunn)`, så en ny grunn uten tekst feiler testene før den kan flettes | avvist |
+| ECH3 | En lagret rad som `Vurdering` ikke godtar, gir 500 på oversikten | low | Radene skrives gjennom `Vurdering` og CHECK-ene i `0002` og `0004`, og `SqliteVurderingslager.les` reiste det samme før 2.2b. Bare en endring for hånd i basen gir det | avvist |
+| Rådet 03.10 b | Docstringen til `_sorteringsnokkel` sier at FR-102 ikke sier hvor rader uten signal hører hjemme | low | FR-102: «Aksjer uten gyldig signal sorteres sist, uansett kursendring.» | patch: docstringen |
 
 ## Verification
 

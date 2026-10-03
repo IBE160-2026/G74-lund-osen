@@ -32,6 +32,7 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 - Den første knappen heter «I går» når siste børsdag i dataene var i går, og «I dag» når den er fra i dag. Ellers står ukedagen, for eksempel «Fredag» på en mandag. Knappen er valgt når siden åpnes. Unntaket er kursgrafen, som åpner med 6 mnd (FR-201).
 - «Velg dag» åpner en kalender, og dagen som er valgt, står på knappen. Signalet den dagen vises bare når vurderingen er lagret, ellers «– ikke lagret» (NFR-08).
   *Rettet 2026-10-03 (story 2.2b, Marians beslutning kl. 22:30):* en dag uten rad viser «– ikke vurdert», samme tekst som oversikten og aksjedetaljen. Har raden en grunn, står grunnen i stedet.
+  *Presisert 2026-10-04 (gjennomgangen av 2.2b):* «ikke vurdert» gjelder en børsdag uten rad. En dag som ikke er børsdag, viser «– ikke børsdag», så de to tilstandene i FR-409 ikke slås sammen.
 - Startdagen for periodene følger én skriftlig regel, lik for alle, som skrives og testes før et periodevalg bygges (NFR-08).
 
 **Hvorfor:** Samme knapp betyr det samme overalt, så brukeren lærer valget én gang. Den første knappen sier hvilken dag tallene gjelder, med ord brukeren kjenner.

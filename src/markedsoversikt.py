@@ -85,14 +85,16 @@ def les_tilstand(
     """Tilstanden for raden, og teksten som vises under «–».
 
     Teksten er None bare for en vurdering, ogsaa med styrke 0. En dato
-    tilstand() ikke kan svare paa, gir ingen tilstand, bare teksten.
+    tilstand() ikke kan svare paa, gir ingen tilstand, bare teksten: en dato
+    etter i dag sjekkes her foer kallet, og UtenforKalenderen fanges for seg.
+    Andre feil fra tilstand() slipper gjennom.
     """
+    if dato > idag:
+        return None, ETTER_I_DAG
     try:
         utfall = tilstand(innhold, dato, idag)
     except UtenforKalenderen:
         return None, UTENFOR_KALENDEREN
-    except ValueError:
-        return None, ETTER_I_DAG
     if utfall.art is Art.SVAR:
         return utfall, None
     if utfall.art is Art.GRUNN:
@@ -111,11 +113,10 @@ class Rad:
     fortsatt - NFR-03 sier at manglende data for en aksje ikke skal stoppe
     hovedflyten.
 
-    sist_hentet er naar symbolets serie sist ble hentet, i UTC (AD-20), slik
-    Kursleser gir den. Paa en rad fra bygg_oversikt er den aldri None, og det
-    er lesekontrakten som sikrer det: sist_hentet(s) er None hvis og bare hvis
-    serie(s) er tom, og en tom serie gir ingen rad. None er den bare naar
-    bygg_rad kalles uten tid.
+    sist_hentet er naar symbolets serie sist ble hentet, i UTC (AD-20), fra
+    kursserie gjennom Oversiktsleser (story 2.2b). erstatt_serie skriver kurs
+    og kursserie i samme transaksjon (AD-5), saa en aksje med kurser har ogsaa
+    en tid. None er den bare naar posten er laget uten tid, som i en test.
     """
 
     aksje: Aksje
@@ -195,9 +196,9 @@ def bygg_rad(post: Oversiktspost, idag: date, p: Parametre = STANDARD) -> Rad | 
 def _sorteringsnokkel(rad: Rad) -> tuple[int, float]:
     """FR-102: signalstyrke fallende, absolutt kursendring som andrekriterium.
 
-    Rader uten vurdering sorteres sist, ogsaa bak styrke 0. FR-102 sier ikke
-    hvor de hoerer hjemme - se aapent punkt om hull i kravene. Valget her er
-    at en rad uten vurdering ikke skal legge seg foran en med (story 2.2b).
+    Rader uten vurdering sorteres sist, ogsaa bak styrke 0. FR-102 sier det
+    selv: «Aksjer uten gyldig signal sorteres sist, uansett kursendring.»
+    (Raadet 03.10: her sto at FR-102 ikke sa hvor de hoerer hjemme.)
     """
     styrke = rad.styrke if rad.styrke is not None else -1
     endring = abs(rad.endring_prosent) if rad.endring_prosent is not None else -1.0

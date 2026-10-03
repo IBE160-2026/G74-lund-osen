@@ -152,7 +152,7 @@
       utslag — er de ikke enige, er retningen blandet.
       Ingen vekting og ingen skjult formel.
     </p>
-  {% elif detalj.signalet_ikke_regnet %}
+  {% elif detalj.for_kort_serie %}
     <p class="mangler">
       Signalet kunne ikke regnes: Trenger {{ detalj.noedvendige_dager }} dager
       for å regne signal, fikk {{ detalj.antall_dager }}.
@@ -163,7 +163,7 @@
       Ingen vurdering for {{ detalj.dato }}: {{ detalj.tekst }}.
       Kursen vises likevel.
     </p>
-    {% if detalj.tekst == "ikke vurdert" %}
+    {% if detalj.ikke_vurdert %}
       <p class="fotnote">
         «Ikke vurdert»: hentekommandoen har ikke skrevet en vurdering for
         dagen, for eksempel fordi kursene er lest inn med <code>--les-inn</code>.

@@ -180,8 +180,18 @@ class TestByggDetalj:
         assert d.styrke is None
         assert d.sjekker == ()
         assert d.retning.tekst == "Ukjent"
-        assert d.signalet_ikke_regnet
+        assert d.for_kort_serie
         assert (d.noedvendige_dager, d.antall_dager) == (6, 2)
+
+    def test_lang_serie_med_signal_ikke_regnet_er_ikke_for_kort(self):
+        """Raadet 03.10: vurder() gir signal_ikke_regnet ogsaa naar porten
+        ikke godtar tallene paa en serie som er lang nok. Da skal siden ikke
+        si antallet dager. Ville feilet hvis lengden ikke ble sjekket (M12)."""
+        d = detalj(serie([100.0] * 10), innhold=Grunn.SIGNAL_IKKE_REGNET)
+
+        assert d.tekst == "signalet kunne ikke regnes"
+        assert not d.for_kort_serie
+        assert d.sjekker == ()
 
     def test_utbyttedag_viser_slutt_og_regner_paa_justert(self):
         """Sluttkursen er den aksjen omsettes til. Signal og graf foelger den
