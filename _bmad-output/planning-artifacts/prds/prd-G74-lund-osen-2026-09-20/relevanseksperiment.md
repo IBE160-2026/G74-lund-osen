@@ -2,7 +2,7 @@
 title: "Relevanseksperimentet — kriteriene for del 1"
 status: aktiv
 created: 2026-09-25
-updated: 2026-09-26T19:23
+updated: 2026-10-03T14:46
 ---
 
 # Relevanseksperimentet — kriteriene for del 1
@@ -71,6 +71,8 @@ forespørselen skal ha to tickere, for å måle om to tickere koster 10 eller 15
 kall. Den kontrollen er byttet ut med målingen over. Den måler hva en
 forespørsel med flere tickere koster, og det trenger vi ikke når hvert selskap
 hentes for seg.
+
+*Rettet 2026-10-03 (kontrollen 26.09, P3):* avviket er tatt inn begge steder. Story 9.4 sier fra 25.09 at kontrollen med to tickere er byttet ut (`epics.md`, «Endret 2026-09-25»), og punkt 5 i `prd.md` §8 sier det samme og ble lukket 26.09.
 
 ## 3. Merkingen
 
