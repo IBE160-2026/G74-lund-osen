@@ -91,7 +91,8 @@ målingsfilene blir liggende i `data/`.
 
 Applikasjonen leser kursene fra basen `data/db/ose.db` og gjør aldri API-kall selv, så en
 nettleseroppdatering kan ikke bruke av kvoten. Første forespørsel kjører migrasjonene én
-gang, og hver forespørsel åpner sin egen tilkobling til basen. `fetch_prices.py` er det eneste
+gang, og hver forespørsel åpner sin egen tilkobling til basen. Mangler basen, lager
+webserveren `data/db/ose.db` selv, så den trenger skrivetilgang til `data/db/`. `fetch_prices.py` er det eneste
 stedet i prosjektet som bruker kvote: 15 kall av de 20 EODHDs gratisnivå gir i
 døgnet, altså én full henting per dag. Finnes dagens øyeblikksbilde fra før,
 stopper den før første kall, så en kjøring nummer to samme dag bruker ingen kall

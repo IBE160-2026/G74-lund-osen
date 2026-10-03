@@ -592,6 +592,105 @@ class TestBasenIWebserveren:
             assert "MigrasjonsFeil" in html
             assert "Traceback" not in html
 
+    @staticmethod
+    def _migrer_forbi_koden(tmp_path):
+        """Basen i BASE_STI migreres med en migrasjon koden ikke har."""
+        import sqlite3
+
+        katalog = tmp_path / "nyere"
+        katalog.mkdir(exist_ok=True)
+        for migrasjon in lagring_sqlite.MIGRASJONSKATALOG.glob("*.sql"):
+            (katalog / migrasjon.name).write_bytes(migrasjon.read_bytes())
+        neste = lagring_sqlite.siste_versjon(lagring_sqlite.MIGRASJONSKATALOG) + 1
+        (katalog / f"{neste:04d}_ny.sql").write_text("CREATE TABLE ny (x INTEGER);", encoding="utf-8")
+        lagring_sqlite.BASE_STI.parent.mkdir(parents=True, exist_ok=True)
+        tilkobling = sqlite3.connect(lagring_sqlite.BASE_STI)
+        lagring_sqlite.migrer(tilkobling, katalog)
+        tilkobling.close()
+
+    def test_basen_migrert_forbi_koden_etter_oppstart_gir_503(self, klient, tmp_path):
+        """Gjennomgangen (BH, ECH, VG): en nyere henting migrerer basen etter
+        at webserveren har migrert den. Feilen kommer i hent_leser, og siden
+        svarer 503, ikke 500. Ville feilet hvis rutene kalte hent_leser uten
+        aa fange feilen (M13)."""
+        fyll_basen({"EQNR": serie([100.0] * 60 + [101.0])})
+        assert klient.get("/").status_code == 200
+        self._migrer_forbi_koden(tmp_path)
+
+        for rute in ("/", "/aksje/EQNR"):
+            svar = klient.get(rute)
+            html = svar.data.decode("utf-8")
+            assert svar.status_code == 503, rute
+            assert "RuntimeError" in html
+
+    def test_feil_ved_aapning_per_forespoersel_gir_503(self, klient, monkeypatch):
+        """VG: migreringen gaar, men aapningen per forespoersel feiler."""
+        import sqlite3
+
+        ekte = app_modul.aapne_base
+
+        def laast(sti, **navngitt):
+            if navngitt.get("kjoer_migrasjoner") is False:
+                raise sqlite3.OperationalError("database is locked")
+            return ekte(sti, **navngitt)
+
+        monkeypatch.setattr(app_modul, "aapne_base", laast)
+
+        for rute in ("/", "/aksje/EQNR"):
+            svar = klient.get(rute)
+            assert svar.status_code == 503, rute
+            assert "OperationalError" in svar.data.decode("utf-8")
+
+    def test_slettet_base_lages_paa_nytt(self, klient):
+        """BH og ECH: basefila slettes mens webserveren kjoerer. Neste
+        forespoersel migrerer paa nytt og viser tom tilstand, i stedet for 503
+        til omstart. Ville feilet uten den nye migreringen (M14)."""
+        assert klient.get("/").status_code == 200
+        lagring_sqlite.BASE_STI.unlink()
+
+        svar = klient.get("/")
+
+        assert svar.status_code == 200
+        assert TOM_TILSTAND in svar.data.decode("utf-8")
+        assert lagring_sqlite.BASE_STI.is_file()
+
+    def test_mislykket_migrering_proeves_igjen(self, klient, tmp_path):
+        """BH: en migrering som feiler, merkes ikke, saa neste forespoersel
+        proever igjen. Ville feilet hvis stien ble merket foer migreringen
+        (M15)."""
+        self._migrer_forbi_koden(tmp_path)
+        assert klient.get("/").status_code == 503
+        lagring_sqlite.BASE_STI.unlink()
+
+        svar = klient.get("/")
+
+        assert svar.status_code == 200
+        assert TOM_TILSTAND in svar.data.decode("utf-8")
+
+    def test_feilsiden_viser_ingen_stier(self, klient, tmp_path):
+        """BH og ECH: 503-siden viser feiltypen og filnavnet, ikke stier paa
+        maskinen, og ingen paastand om kvoten. Ville feilet med hele
+        feilteksten (M16)."""
+        self._migrer_forbi_koden(tmp_path)
+
+        html = klient.get("/").data.decode("utf-8")
+
+        assert "MigrasjonsFeil" in html
+        assert str(tmp_path) not in html
+        assert str(lagring_sqlite.MIGRASJONSKATALOG) not in html
+        assert "kvote" not in html
+
+    def test_andre_ruter_roerer_ikke_basen(self, klient, monkeypatch):
+        """BH: en 404 aapner ikke basen og lager ingen fil. Ville feilet hvis
+        kroken gjaldt alle forespoersler (M17)."""
+        kall = []
+        monkeypatch.setattr(app_modul, "aapne_base", lambda *a, **k: kall.append(a))
+
+        assert klient.get("/finnes-ikke").status_code == 404
+
+        assert kall == []
+        assert not lagring_sqlite.BASE_STI.exists()
+
     def test_oppstart_med_tom_base_gjoer_ingen_nettkall(self, klient, monkeypatch):
         """K1 og FR-401: foerste forespoersel, som migrerer, og sidene gjoer
         null nettkall, ogsaa med tom base. Ville feilet hvis oppstarten hentet

@@ -77,3 +77,9 @@
 - source_spec: `docs/kontroll-2026-09-26.md`
   summary: `Punkt` og `Rad` importeres uten å brukes i to testfiler, og `SnapshotKilde.tidsstempel`, `SnapshotKilde.serie` og `Detalj.har_ma50` brukes bare av tester.
   evidence: K13 i kontrollen 26.09, delvis rettet før 27.09 (`Path` i `4b65a3c`), slått opp på nytt 03.10: resten står (`tests/test_aksjedetalj.py:9`, `tests/test_markedsoversikt.py:14`, `src/lagring_fil.py:53–57`, `src/aksjedetalj.py`). Tas av neste story som rører de filene.
+- source_spec: `_bmad-output/implementation-artifacts/spec-2-2-hentekommandoen-som-egen-inngang.md`
+  summary: Den tomme siden viser HENTEKOMMANDO, som er den lokale kommandoen (uv run python src/fetch_prices.py). I en container er kommandoen en annen.
+  evidence: Funnet i gjennomgangen av 2.2 (Blind Hunter). Konstanten i app.py og README endres i 3.1, og testen test_kommandoen_paa_den_tomme_siden_staar_i_readme krever at de to er like.
+- source_spec: `_bmad-output/implementation-artifacts/spec-2-2-hentekommandoen-som-egen-inngang.md`
+  summary: Migreringen i webserveren holder en laas mens den venter paa basen. Feiler migreringen hver gang, for eksempel paa en skrivebeskyttet base, venter hver forespoersel paa tur, opptil 5 sekunder hver.
+  evidence: Funnet i gjennomgangen av 2.2 (Blind Hunter og Edge Case Hunter). Det betyr noe for avgjoerelsen i 3.1 om imaget skal ha en skrivebeskyttet base.

@@ -18,14 +18,15 @@ med python src/app.py, flask run og en WSGI-server, og ingen import av
 modulen roerer basen. Hver forespoersel aapner sin egen tilkobling uten
 migrering og lukker den naar forespoerselen er ferdig, fordi en
 sqlite3-tilkobling ikke kan deles mellom traadene Flask kjoerer forespoerslene
-i. Kan basen ikke aapnes, svarer siden 503 med grunnen.
+i. Kan basen ikke aapnes eller leses, svarer siden 503 med feiltypen, uten
+stier. Bare de to rutene roerer basen.
 """
 
 import sqlite3
 import threading
 from pathlib import Path
 
-from flask import Flask, abort, g, render_template
+from flask import Flask, abort, g, render_template, request
 
 import lagring_sqlite
 from aksjedetalj import bygg_detalj, finn_aksje
@@ -73,17 +74,42 @@ def _migrer_en_gang(sti: Path) -> None:
         _migrerte.add(sti)
 
 
+# Rutene som leser basen. Andre forespoersler (404, statiske filer) roerer den
+# ikke.
+_RUTER_MED_BASE = {"markedsoversikt", "aksjedetalj"}
+
+
+def _basefeil(feil: BaseException) -> str:
+    """Feiltypen, uten teksten, som kan inneholde stier paa maskinen."""
+    return type(feil).__name__
+
+
 @app.before_request
 def _aapne_basen() -> None:
-    """Migrer en gang, og aapne forespoerselens egen tilkobling."""
-    sti = Path(lagring_sqlite.BASE_STI).resolve()
+    """Migrer en gang, og aapne forespoerselens egen tilkobling.
+
+    Mangler basefila etter at stien er migrert, for eksempel fordi den er
+    slettet, glemmes stien, og migreringen proeves en gang til, som lager en
+    tom base.
+    """
     g.tilkobling = None
     g.basefeil = None
+    if request.endpoint not in _RUTER_MED_BASE:
+        return
+    sti = Path(lagring_sqlite.BASE_STI).resolve()
     try:
         _migrer_en_gang(sti)
-        g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False)
+        try:
+            g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False)
+        except sqlite3.OperationalError:
+            if sti.exists():
+                raise
+            with _migrerings_laas:
+                _migrerte.discard(sti)
+            _migrer_en_gang(sti)
+            g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False)
     except BASEFEIL as feil:
-        g.basefeil = f"{type(feil).__name__}: {feil}"
+        g.basefeil = _basefeil(feil)
 
 
 @app.teardown_appcontext
@@ -117,11 +143,29 @@ def hent_leser() -> Kursleser | None:
     return SqliteKurslager(tilkobling)
 
 
+class _BasenFeilet(Exception):
+    """En feil i basen etter at tilkoblingen ble aapnet, for eksempel en base
+    som en nyere henting har migrert forbi koden. Gir 503, ikke 500."""
+
+
+def _leser_eller_basefeil() -> Kursleser | None:
+    try:
+        return hent_leser()
+    except BASEFEIL as feil:
+        g.basefeil = _basefeil(feil)
+        raise _BasenFeilet from feil
+
+
+@app.errorhandler(_BasenFeilet)
+def _basen_feilet_underveis(_feil):
+    return _basen_kan_ikke_aapnes()
+
+
 @app.route("/")
 def markedsoversikt():
     if g.get("basefeil"):
         return _basen_kan_ikke_aapnes()
-    leser = hent_leser()
+    leser = _leser_eller_basefeil()
     if leser is None:
         return render_template(
             "index.html",
@@ -162,7 +206,7 @@ def aksjedetalj(symbol: str):
     if aksje is None:
         abort(404)
 
-    leser = hent_leser()
+    leser = _leser_eller_basefeil()
     if leser is None:
         abort(404)
 
