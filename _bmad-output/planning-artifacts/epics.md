@@ -335,7 +335,11 @@ Epic 2.1b ──> Epic 4.3 (samme åpning av basen)
 Epic 2.3 + 4.3 ──> 2.8 (indeksen hentes) ──> 2.9 (indeksen vises) ──> 2.9b (søylene)   *(lagt til 2026-10-01)*
 Epic 2.2 ──> 2.9
 Epic 4.1 ──> Epic 9.5 (relevanseksperimentet, del 2)
+Epic 2.5 ──> Epic 10.2 (teksten lages rett etter vurderingen)   *(lagt til 2026-10-03, E6)*
+Epic 4.3 + 8.1 + 10.3 ──> Epic 10.4 (måle bidraget, med KILogg)   *(lagt til 2026-10-03, E6)*
 ```
+
+*Rettet 2026-10-03 (kontrollen 26.09, E6):* grafen manglet to harde avhengigheter som står i storyene. 10.2 lager teksten i hentekommandoen rett etter vurderingen, og trenger derfor 2.5. 10.4 avhenger av 8.1 og 10.3, og måler bidraget med `KILogg` over minst én ukes drift, som krever 4.3.
 
 *2026-09-28:* plan B er utløst. Epic 5, 6 og 7 er ute av v1, og Epic 5B heter Epic 10.
 
