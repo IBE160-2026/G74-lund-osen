@@ -46,6 +46,7 @@
     /* FR-705 med tekst, ikke bare farge (story 8.0). */
     .merke { display: block; font-size: 0.75rem; font-weight: 600; }
     .mangler { color: var(--dempet); font-style: italic; font-size: 0.85rem; }
+    .merke.mangler { font-weight: normal; }
     p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
   </style>
 </head>
@@ -90,7 +91,7 @@
                 {{ rad.styrke }}
                 {% if rad.skiller_seg_ut %}<span class="merke">skiller seg ut</span>{% endif %}
               {% else %}
-                <span class="mangler" title="{{ rad.mangler }}">–</span>
+                – <span class="merke mangler">{{ rad.tekst }}</span>
               {% endif %}
             </td>
 
@@ -101,6 +102,13 @@
         {% endfor %}
       </tbody>
     </table>
+
+    {% if ikke_vurdert %}
+      <p class="fotnote">
+        «Ikke vurdert»: hentekommandoen har ikke skrevet en vurdering for
+        dagen, for eksempel fordi kursene er lest inn med <code>--les-inn</code>.
+      </p>
+    {% endif %}
 
     {% if mangler %}
       <p class="fotnote">
