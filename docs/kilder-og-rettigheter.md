@@ -2,7 +2,7 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-01T11:46
+updated: 2026-10-03T21:58
 ---
 
 # Kilder og rettigheter
@@ -871,6 +871,9 @@ datasettet**.
 | Metodebeskrivelser og konklusjoner | |
 | Meldingstitler: fjernet 2026-09-24 til Euronext har svart. Brevet 21.09 opplyste om dem, og de ligger i historikken | |
 | Antall tagger og hva de handler om | EODHDs tagger ordrett, fjernet 2026-09-27. De ligger i historikken |
+
+*2026-10-03:* demobasen (FR-411) har oppdiktede tall og er ikke kildedata. Den
+ligger likevel under `data/` og publiseres ikke, så skillet over gjelder uendret.
 
 *2026-09-24:* brevet til Euronext 21.09 opplyste om «a small number of
 announcement titles quoted in our documentation to show what we measured»
