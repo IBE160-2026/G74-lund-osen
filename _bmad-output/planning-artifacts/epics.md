@@ -266,6 +266,8 @@ steget er ført i PRD-memloggen 22.09, ikke 20.09 som den senere ble omtalt som.
 `src/templates/` bærer halvparten av fem av disse kravene, og sto ikke nevnt før
 kontrollen 22.09 fant det.
 
+*Rettet 2026-10-03 (kontrollen 26.09, E7):* FR-101 ble endret 23.09, og story 1.4c i Epic 1 oppfyller kravet slik det står nå. FR-101 er altså også levert i Epic 1, selv om FR-lista for Epic 1 ikke nevner det.
+
 **Fordelt på epics — 22 FR-er.** *Rettet 2026-09-24: her sto 21. Tabellen har 22, og summen under er 12 + 22.*
 
 | FR | Epic |
@@ -280,6 +282,8 @@ kontrollen 22.09 fant det.
 | FR-501, FR-502, FR-503 | Epic 6 🔒 |
 | FR-601, FR-602, FR-603, FR-606 | Epic 5 🔒 |
 | FR-604, FR-605 | Epic 4 |
+
+*Rettet 2026-10-03 (kontrollen 26.09, E7):* tabellen viser epicen der kravet først bygges. FR-401 hører også til Epic 3, der en story oppfyller tom-tilstanden, og FR-408 også til Epic 2, der story 2.5 skriver vurderingen i hentingen.
 
 **12 + 22 = 34.** Alle FR-er er plassert.
 
@@ -2243,6 +2247,9 @@ KI ble brukt og ikke bare at den ble brukt.
 **Kontroll — hva den ferdige storyen inneholder:**
 - En kort beskrivelse i `docs/ai-prompts/README.md`: en rådgivende KI-økt uten
   tilgang til repoet, en byggeøkt med tilgang, og et menneske som relé mellom dem
+  *Rettet 2026-10-03 (kontrollen 26.09, E22):* rådgivningsøkta hadde ikke tilgang
+  til repoet de første dagene, men har lest det offentlige repoet gjennom sin egen
+  kopi siden 23.09 (`docs/ai-prompts/README.md`, «Arbeidsmønsteret»)
 - En tabell over hva som avgjøres av hvem
 - Hvorfor mønsteret ble valgt
 - **Tilfeller begge veier, med kilde.** Reléet går begge veier, og beskrivelsen
