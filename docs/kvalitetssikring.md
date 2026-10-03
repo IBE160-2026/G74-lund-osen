@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-03T12:41
+updated: 2026-10-03T14:51
 ---
 
 # Kvalitetssikring
@@ -399,6 +399,8 @@ som K8 til 2.1, men ingen har ført om de er lukket.
 
 *Rettet 2026-10-03:* alle 74 punktene under «Står igjen» er slått opp på nytt mot `9214a95`. 5 var lukket, 6 delvis og 63 sto. Ni av dem ble rettet samme dag, og etter det er 14 lukket, 6 delvis og 54 står. Ni av dem som står, venter på en story og har punkt i `deferred-work.md`. Tolv gjelder meldinger og plan A, som er utenfor v1. Tabellen står i [«Etterkontroll 03.10»](kontroll-2026-09-26.md#etterkontroll-0310).
 
+*Rettet 2026-10-03, senere samme dag:* seks til ble rettet (P3, P5, P6, P11, P13 og E6). Nå er 20 lukket, 4 delvis og 50 står. P9, P10, P12 og E8 er spørsmål til gruppa.
+
 ### Det som står igjen i `deferred-work.md`
 
 [`S/deferred-work.md`](../_bmad-output/implementation-artifacts/deferred-work.md)
@@ -452,6 +454,7 @@ har sju punkter uten `resolved:` 03.10:
   *Rettet 2026-10-03:* de er kontrollert på nytt. Etter rettingene samme dag er
   14 av de 74 lukket, 6 delvis og 54 står (§5, og «Etterkontroll 03.10» i
   [`docs/kontroll-2026-09-26.md`](kontroll-2026-09-26.md#etterkontroll-0310)).
+  *Rettet 2026-10-03, senere samme dag:* nå er 20 lukket, 4 delvis og 50 står.
 
 ## 7. Hvordan KI-arbeidet kontrolleres
 
