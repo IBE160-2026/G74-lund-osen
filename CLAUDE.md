@@ -57,6 +57,10 @@ et sitat som ikke fantes».
     kall igjen sent på dagen, foreslå en bruk som svarer på noe åpent: en måling,
     en test mot ekte data, et øyeblikksbilde Epic 2 trenger. Foreslå, ikke bruk:
     regel 6 gjelder fortsatt, ingen kall uten avtale.
+    *Presisert 2026-10-04:* «i dag» og «en tidligere dato» regnes i GMT. Fra
+    midnatt norsk tid til midnatt GMT, kl. 02:00 om sommeren og kl. 01:00 om
+    vinteren, står apiRequestsDate fortsatt på dagens dato i GMT, og kallene fra
+    dagen før teller. Tilfellet er kvotesjekken 04.10 kl. 01:00.
 16. **Ingen rå enkeltverdier fra kildene i sporede filer.** Rå enkeltverdier fra
     kildene (kurs, volum eller meldingsinnhold for en bestemt dag) skrives ikke
     i sporede filer. Tall vi har regnet ut selv, kan stå. Regel 10 dekker bare
