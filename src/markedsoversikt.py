@@ -1,8 +1,11 @@
-"""Markedsoversikten - FR-101 til FR-103.
+"""Markedsoversikten - FR-101 til FR-103, FR-409.
 
-Ren logikk. Leser Kursrad gjennom Kursleser og regner med signalberegning.
-Gjoer ingen API-kall, leser ingen filer og kjenner ingen HTML. Derfor kan hele fila testes
-uten nett, og visningen kan byttes uten at noe her endres.
+Ren logikk. Faar en Oversiktspost per aksje fra Oversiktsleser og viser
+vurderingen som er lagret, gjennom tilstand() (story 2.2b). Signalet regnes
+aldri her: hentekommandoen regnet det og skrev det i vurdering (AD-17), og
+siden og historikken skal aldri si hver sin ting. Gjoer ingen API-kall,
+leser ingen filer og kjenner ingen HTML. Derfor kan hele fila testes uten
+nett, og visningen kan byttes uten at noe her endres.
 
 Kolonnene er de fem i FR-101 og ikke flere: selskap, sluttkurs, endring,
 signalstyrke og retning. Hvor gamle dataene er, staar over tabellen og, for en
@@ -13,17 +16,12 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
-from kursdata import AKSJEUNIVERS, Aksje, Kursleser, Kursrad
-from signalberegning import (
-    BLANDET,
-    INGEN,
-    NEGATIV,
-    POSITIV,
-    Parametre,
-    STANDARD,
-    Signal,
-    beregn_signal,
-)
+from boersdag import UtenforKalenderen
+from kursdata import Aksje, Kursrad
+from oversiktsdata import Oversiktspost
+from signalberegning import BLANDET, INGEN, NEGATIV, POSITIV, Parametre, STANDARD
+from tilstand import Art, Tilstand, tilstand
+from vurderingsdata import Grunn, Vurdering
 
 
 @dataclass(frozen=True)
@@ -66,43 +64,89 @@ RETNINGSVISNING: dict[str, Retningsvisning] = {
 # aksjer uten gyldig signal.
 UKJENT_RETNING = Retningsvisning("Ukjent", "–", "ukjent")
 
+# Tekstene under «–» naar raden ikke har en vurdering (story 2.2b, FR-409,
+# NFR-08). Godkjent 03.10 kl. 22:30.
+GRUNNTEKST: dict[Grunn, str] = {
+    Grunn.SYMBOL_FEILET: "hentingen feilet",
+    Grunn.KURS_IKKE_FRA_DAGEN: "ingen kurs fra dagen",
+    Grunn.SIGNAL_IKKE_REGNET: "signalet kunne ikke regnes",
+}
+IKKE_VURDERT = "ikke vurdert"
+IKKE_BOERSDAG = "ikke børsdag"
+UTENFOR_KALENDEREN = "utenfor børskalenderen"
+# Datoen til nyeste kurs er etter dagens dato. Skjer bare med en klokke eller
+# en kilde som tar feil, og vises da i stedet for en feilside.
+ETTER_I_DAG = "datoen er etter i dag"
+
+
+def les_tilstand(
+    innhold: Vurdering | Grunn | None, dato: date, idag: date
+) -> tuple[Tilstand | None, str | None]:
+    """Tilstanden for raden, og teksten som vises under «–».
+
+    Teksten er None bare for en vurdering, ogsaa med styrke 0. En dato
+    tilstand() ikke kan svare paa, gir ingen tilstand, bare teksten: en dato
+    etter i dag sjekkes her foer kallet, og UtenforKalenderen fanges for seg.
+    Andre feil fra tilstand() slipper gjennom.
+    """
+    if dato > idag:
+        return None, ETTER_I_DAG
+    try:
+        utfall = tilstand(innhold, dato, idag)
+    except UtenforKalenderen:
+        return None, UTENFOR_KALENDEREN
+    if utfall.art is Art.SVAR:
+        return utfall, None
+    if utfall.art is Art.GRUNN:
+        return utfall, GRUNNTEKST[utfall.innhold]
+    if utfall.art is Art.IKKE_KJOERT:
+        return utfall, IKKE_VURDERT
+    return utfall, IKKE_BOERSDAG
+
 
 @dataclass(frozen=True)
 class Rad:
     """En rad i markedsoversikten.
 
-    signal er None naar serien er for kort til aa regne. Da staar mangler med
-    grunnen, og raden vises fortsatt - NFR-03 sier at manglende data for en
-    aksje ikke skal stoppe hovedflyten.
+    tilstand er utfallet av tilstand() for datoen til nyeste kurs (FR-409).
+    Har raden ingen vurdering, staar teksten under «–», og raden vises
+    fortsatt - NFR-03 sier at manglende data for en aksje ikke skal stoppe
+    hovedflyten.
 
-    sist_hentet er naar symbolets serie sist ble hentet, i UTC (AD-20), slik
-    Kursleser gir den. Paa en rad fra bygg_oversikt er den aldri None, og det
-    er lesekontrakten som sikrer det: sist_hentet(s) er None hvis og bare hvis
-    serie(s) er tom, og en tom serie gir ingen rad. None er den bare naar
-    bygg_rad kalles uten tid.
+    sist_hentet er naar symbolets serie sist ble hentet, i UTC (AD-20), fra
+    kursserie gjennom Oversiktsleser (story 2.2b). erstatt_serie skriver kurs
+    og kursserie i samme transaksjon (AD-5), saa en aksje med kurser har ogsaa
+    en tid. None er den bare naar posten er laget uten tid, som i en test.
     """
 
     aksje: Aksje
     dato: date
     sluttkurs: float
     endring_prosent: float | None
-    signal: Signal | None
-    mangler: str | None
+    tilstand: Tilstand | None
+    tekst: str | None
+    skiller_seg_ut: bool = False
     sist_hentet: datetime | None = None
 
     @property
+    def vurdering(self) -> Vurdering | None:
+        if self.tilstand is not None and self.tilstand.art is Art.SVAR:
+            return self.tilstand.innhold
+        return None
+
+    @property
     def styrke(self) -> int | None:
-        return self.signal.styrke if self.signal else None
+        return self.vurdering.styrke if self.vurdering else None
 
     @property
     def retning(self) -> Retningsvisning:
-        if not self.signal:
+        if not self.vurdering:
             return UKJENT_RETNING
-        return RETNINGSVISNING.get(self.signal.retning, UKJENT_RETNING)
+        return RETNINGSVISNING.get(self.vurdering.retning, UKJENT_RETNING)
 
     @property
-    def skiller_seg_ut(self) -> bool:
-        return bool(self.signal and self.signal.skiller_seg_ut)
+    def ikke_vurdert(self) -> bool:
+        return self.tekst == IKKE_VURDERT
 
 
 def endring_i_prosent(rader: list[Kursrad]) -> float | None:
@@ -119,45 +163,42 @@ def endring_i_prosent(rader: list[Kursrad]) -> float | None:
     return (til - fra) / fra * 100
 
 
-def bygg_rad(
-    aksje: Aksje,
-    rader: list[Kursrad],
-    p: Parametre = STANDARD,
-    sist_hentet: datetime | None = None,
-) -> Rad | None:
-    """En rad for en aksje. None bare naar vi ikke har en eneste kursrad.
+def bygg_rad(post: Oversiktspost, idag: date, p: Parametre = STANDARD) -> Rad | None:
+    """En rad for en aksje. None bare naar aksjen ikke har en eneste kursrad.
 
-    En for kort serie gir en rad UTEN signal, ikke ingen rad. Brukeren skal
-    se at aksjen finnes og at signalet mangler, ikke at aksjen er borte.
+    En aksje uten vurdering gir en rad UTEN styrke, ikke ingen rad. Brukeren
+    skal se at aksjen finnes og at vurderingen mangler, ikke at aksjen er
+    borte. Endringen regnes av de to siste kursene (FR-101). Signalet regnes
+    ikke: styrken og retningen er radens, og «skiller seg ut» er den lagrede
+    styrken mot terskelen (FR-705).
     """
-    if not rader:
+    siste = post.nyeste
+    if siste is None:
         return None
 
-    siste = rader[-1]
-    signal: Signal | None = None
-    mangler: str | None = None
-    try:
-        signal = beregn_signal(rader, p)
-    except ValueError as feil:
-        mangler = str(feil)
-
+    utfall, tekst = les_tilstand(post.innhold, siste.dato, idag)
+    rader = [r for r in (post.forrige, siste) if r is not None]
+    styrke = (
+        utfall.innhold.styrke if utfall is not None and utfall.art is Art.SVAR else None
+    )
     return Rad(
-        aksje=aksje,
+        aksje=post.aksje,
         dato=siste.dato,
         sluttkurs=float(siste.slutt),
         endring_prosent=endring_i_prosent(rader),
-        signal=signal,
-        mangler=mangler,
-        sist_hentet=sist_hentet,
+        tilstand=utfall,
+        tekst=tekst,
+        skiller_seg_ut=styrke is not None and styrke >= p.terskel,
+        sist_hentet=post.hentet,
     )
 
 
 def _sorteringsnokkel(rad: Rad) -> tuple[int, float]:
     """FR-102: signalstyrke fallende, absolutt kursendring som andrekriterium.
 
-    Rader uten signal sorteres sist. FR-102 sier ikke hvor de hoerer hjemme -
-    se aapent punkt om hull i kravene. Valget her er at en rad vi ikke kan
-    vurdere, ikke skal legge seg foran en vi kan.
+    Rader uten vurdering sorteres sist, ogsaa bak styrke 0. FR-102 sier det
+    selv: «Aksjer uten gyldig signal sorteres sist, uansett kursendring.»
+    (Raadet 03.10: her sto at FR-102 ikke sa hvor de hoerer hjemme.)
     """
     styrke = rad.styrke if rad.styrke is not None else -1
     endring = abs(rad.endring_prosent) if rad.endring_prosent is not None else -1.0
@@ -165,25 +206,21 @@ def _sorteringsnokkel(rad: Rad) -> tuple[int, float]:
 
 
 def bygg_oversikt(
-    kilde: Kursleser,
-    univers: tuple[Aksje, ...] = AKSJEUNIVERS,
-    p: Parametre = STANDARD,
+    poster: list[Oversiktspost], idag: date, p: Parametre = STANDARD
 ) -> list[Rad]:
     """Alle radene, sortert etter FR-102.
 
-    Aksjer kilden ikke har data for, faller ut. De telles av kallende kode
-    saa brukeren kan faa vite at oversikten er ufullstendig. Hver rad faar
-    symbolets egen sist_hentet (FR-101, AD-15).
+    Aksjer uten kurser faller ut, og navngis av uten_kurser. Hver rad faar
+    symbolets egen sist_hentet (FR-101, AD-15). Antallet er det som staar i
+    aksje i basen, aldri et fast tall.
     """
-    rader = [
-        rad
-        for rad in (
-            bygg_rad(aksje, kilde.serie(aksje.symbol), p, kilde.sist_hentet(aksje.symbol))
-            for aksje in univers
-        )
-        if rad is not None
-    ]
+    rader = [rad for rad in (bygg_rad(post, idag, p) for post in poster) if rad is not None]
     return sorted(rader, key=_sorteringsnokkel)
+
+
+def uten_kurser(poster: list[Oversiktspost]) -> list[str]:
+    """Navnene paa aksjene i aksje som ikke har en eneste kursrad (FR-101)."""
+    return [post.aksje.navn for post in poster if post.nyeste is None]
 
 
 def sidens_tidsstempel(rader: list[Rad]) -> datetime | None:

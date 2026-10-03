@@ -229,6 +229,44 @@ def interesse(kurser: list[float], volumer: list[float], p: Parametre = STANDARD
     )
 
 
+def nodvendige_dager(p: Parametre = STANDARD) -> int:
+    """Hvor mange kursdager signalet trenger. Aksjedetaljen sier det naar
+    raden har grunnen signal_ikke_regnet (FR-204, story 2.2b)."""
+    return _nodvendige_dager(p)
+
+
+def sjekker_fra(vurdering: Vurdering, p: Parametre = STANDARD) -> tuple[Sjekk, Sjekk, Sjekk]:
+    """De tre sjekkene slik de ble lagret, med forklaringen laget av
+    maalingene i raden - story 2.2b, FR-706.
+
+    Regner ingenting paa nytt: verdiene og maalingene er radens, og
+    forklaringene lages av de samme funksjonene som da signalet ble regnet,
+    saa teksten er den samme. Grensene som er parametre (noytralsonen og
+    volumfaktoren), kommer fra p.
+    """
+    return (
+        Sjekk(
+            navn="Trend",
+            verdi=vurdering.trend,
+            forklaring=_trendforklaring(vurdering.trend_avvik, p),
+            maaling=vurdering.trend_avvik,
+        ),
+        Sjekk(
+            navn="Bevegelse",
+            verdi=vurdering.bevegelse,
+            forklaring=_bevegelsesforklaring(vurdering.dagens_endring, vurdering.standardavvik),
+            maaling=vurdering.dagens_endring,
+            grense=vurdering.standardavvik,
+        ),
+        Sjekk(
+            navn="Interesse",
+            verdi=vurdering.interesse,
+            forklaring=_interesseforklaring(vurdering.volumforhold, p),
+            maaling=vurdering.volumforhold,
+        ),
+    )
+
+
 def finn_styrke(sjekker: tuple[Sjekk, ...]) -> int:
     """Styrken er summen av absoluttverdiene til sjekkene (FR-703).
 

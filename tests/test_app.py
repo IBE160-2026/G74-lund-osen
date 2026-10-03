@@ -1,14 +1,13 @@
 """Tester for Flask-ruta. Ingen nettverk, og ingen avhengighet til data/.
 
-data/ er gitignorert, saa den finnes ikke i et ferskt klon. Testene monterer
-derfor sitt eget oeyeblikksbilde i stedet for aa lese fra katalogen. Det er en
-ekte SnapshotKilde med EODHDs feltnavn, saa appen proeves gjennom den samme
-oversettelsen til Kursrad (SnapshotLeser) som i drift. Testene av
-tidsstemplene monterer i stedet et MinneKurslager bak hent_leser, fordi et
-oeyeblikksbilde har samme tid for alle symbolene. Unntakene er TestHentLeser,
-test_rutene_gjoer_ingen_nettverkskall og TestBasenIWebserveren, som leser en
-base i tmp_path (BASE_STI, pekt dit av conftest.py) gjennom den ekte
-hent_leser, aldri data/ (story 2.2).
+data/ er gitignorert, saa den finnes ikke i et ferskt klon. Testene fyller
+derfor sin egen base i tmp_path (BASE_STI, pekt dit av conftest.py), og
+sidene leser den gjennom de ekte portene (story 2.2 og 2.2b). monter tar et
+oeyeblikksbilde med EODHDs feltnavn, oversetter det med SnapshotLeser som i
+drift, skriver kursene og skriver saa vurderingen vurder() gir for nyeste
+dag, slik hentekommandoen gjoer. Vurderingen skrives med adapterens egen
+upsert, uten datokontrollen i skriv, fordi testseriene ikke ligger paa
+inneveerende boersdag. Klokka sidene regner dagens dato av, staar fast.
 """
 
 import json
@@ -22,11 +21,21 @@ import pytest
 import app as app_modul
 import lagring_fil
 import lagring_sqlite
-from kursdata import Kursleser, Kursrad, MinneKurslager
+from kursdata import Kursleser, Kursrad
 from lagring_fil import SnapshotKilde, SnapshotLeser
 from lagring_sqlite import SqliteKurslager, aapne_base
+from signalberegning import vurder
+from vurderingsdata import Grunn, Vurdering
 
 HENTET = "2026-09-21T15:40:00+00:00"
+
+# Etter alle testseriene, saa ingen dato er etter i dag (tilstand).
+NAA = datetime(2026, 12, 31, 12, 0, tzinfo=timezone.utc)
+
+
+@pytest.fixture(autouse=True)
+def fast_klokke(monkeypatch):
+    monkeypatch.setattr(app_modul, "naa", lambda: NAA)
 
 
 @pytest.fixture
@@ -71,20 +80,52 @@ def snapshot(serier: dict[str, list], hentet: str | None = HENTET) -> SnapshotKi
     )
 
 
-def monter(monkeypatch, kilde):
-    """Oeyeblikksbildet i en SnapshotLeser bak hent_leser, slik filadapteren
-    gir det. None monterer ingen data, som en tom data/."""
-    leser = SnapshotLeser(kilde) if kilde is not None else None
-    monkeypatch.setattr(app_modul, "hent_leser", lambda: leser)
+def skriv_vurdering(symbol: str, dato: date, innhold: Vurdering | Grunn) -> None:
+    """Raden i vurdering, med adapterens egen upsert og uten datokontrollen
+    i skriv. Bare for testene: testseriene ligger ikke paa inneveerende
+    boersdag."""
+    if isinstance(innhold, Vurdering):
+        verdier = (*(getattr(innhold, k) for k in lagring_sqlite.VURDERINGSKOLONNER), None)
+    else:
+        verdier = (*(None for _ in lagring_sqlite.VURDERINGSKOLONNER), innhold.value)
+    tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+    try:
+        with tilkobling:
+            tilkobling.execute(lagring_sqlite._UPSERT, (symbol, dato.isoformat(), *verdier))
+    finally:
+        tilkobling.close()
+
+
+def skriv_serie(symbol: str, rader: list[Kursrad], hentet: datetime, vurdert: bool = True):
+    """Kursene inn i basen, og vurderingen for nyeste dag slik hentekommandoen
+    regner den (vurder, story 2.5). vurdert=False er som --les-inn."""
+    tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+    try:
+        SqliteKurslager(tilkobling).erstatt_serie(symbol, rader, hentet)
+    finally:
+        tilkobling.close()
+    if vurdert:
+        skriv_vurdering(symbol, rader[-1].dato, vurder(rader, rader[-1].dato))
+
+
+def monter(monkeypatch, kilde, vurdert: bool = True):
+    """Oeyeblikksbildet inn i basen, oversatt med SnapshotLeser slik
+    filadapteren gir det, med vurderingen for nyeste dag. None gir en tom
+    base, som foer foerste henting."""
+    if kilde is None:
+        return
+    leser = SnapshotLeser(kilde)
+    for symbol in kilde.serier:
+        rader = leser.serie(symbol)
+        if rader:
+            skriv_serie(symbol, rader, leser.sist_hentet(symbol), vurdert)
 
 
 def monter_lager(monkeypatch, tider: dict[str, datetime]):
-    """Et MinneKurslager bak hent_leser, med egen tid per symbol. Slik kan en
-    test gi symbolene ulik sist_hentet, noe et oeyeblikksbilde ikke kan."""
-    lager = MinneKurslager()
+    """Hvert symbol i basen med sin egen tid. Slik kan en test gi symbolene
+    ulik sist_hentet, noe et oeyeblikksbilde ikke kan."""
     for symbol, tid in tider.items():
-        lager.erstatt_serie(symbol, serie([100.0] * 60 + [101.0]), tid)
-    monkeypatch.setattr(app_modul, "hent_leser", lambda: lager)
+        skriv_serie(symbol, serie([100.0] * 60 + [101.0]), tid)
 
 
 def fyll_basen(serier: dict[str, list[Kursrad]], hentet: str = HENTET) -> None:
@@ -692,6 +733,10 @@ class TestBasenIWebserveren:
             raise sqlite3.OperationalError("database is locked")
 
         monkeypatch.setattr(SqliteKurslager, "serie", laast)
+        # Story 2.2b: oversikten leser gjennom Oversiktsleser.
+        monkeypatch.setattr(lagring_sqlite.SqliteOversiktsleser, "oversikt", lambda self: laast(self, None))
+        # Gjennomgangen av 2.2b: ogsaa oppslaget i aksjedetaljen (post).
+        monkeypatch.setattr(lagring_sqlite.SqliteOversiktsleser, "post", laast)
 
         for rute in ("/", "/aksje/EQNR"):
             svar = klient.get(rute)
@@ -896,11 +941,9 @@ class TestStory80:
         velges etter samme prinsipp som «data hentet» (FR-101): den eldste."""
         # serie() starter 2026-09-01. EQNR har 61 rader og slutter 31.10,
         # DNB har 60 og slutter 30.10.
-        lager = MinneKurslager()
         tid = datetime(2026, 9, 24, 18, 5, tzinfo=timezone.utc)
-        lager.erstatt_serie("EQNR", serie([100.0] * 60 + [104.0]), tid)
-        lager.erstatt_serie("DNB", serie([100.0] * 59 + [101.0]), tid)
-        monkeypatch.setattr(app_modul, "hent_leser", lambda: lager)
+        skriv_serie("EQNR", serie([100.0] * 60 + [104.0]), tid)
+        skriv_serie("DNB", serie([100.0] * 59 + [101.0]), tid)
 
         html = klient.get("/").data.decode("utf-8")
 
@@ -960,4 +1003,228 @@ class TestStory80:
         monter(monkeypatch, snapshot({"EQNR": serie([100.0, 101.0, 102.0])}))
 
         assert "for å regne signal" in klient.get("/aksje/EQNR").data.decode("utf-8")
-        assert "for å regne signal" in klient.get("/").data.decode("utf-8")
+        # Story 2.2b: oversikten viser grunnen fra raden i vurdering.
+        assert "signalet kunne ikke regnes" in klient.get("/").data.decode("utf-8")
+
+
+def _rader_per_selskap(html: str) -> dict[str, list[str]]:
+    """Radene i oversikten, med selskapsnavnet (uten egen tid) som noekkel."""
+    return {rad[0].split(" hentet ")[0]: rad for rad in _tabell(html).rader}
+
+
+class TestVurderingenPaaOversikten:
+    """Story 2.2b: oversikten viser raden i vurdering for datoen til nyeste
+    kurs, gjennom tilstand(), og regner aldri signalet (FR-408, FR-409)."""
+
+    def test_vurderingen_kommer_fra_raden_ikke_fra_kursene(self, klient):
+        """En flat serie ville gitt styrke 0. Raden sier 3, og siden viser 3."""
+        rader = serie([100.0] * 60 + [100.0])
+        skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET), vurdert=False)
+        skriv_vurdering("EQNR", rader[-1].dato, Vurdering(
+            styrke=3, retning="Negativ", trend=-1, bevegelse=-1, interesse=-1,
+            slutt=100.0, justert_slutt=100.0, trend_avvik=-0.05,
+            dagens_endring=-0.04, standardavvik=0.01, volumforhold=0.2,
+        ))
+
+        rad = _rader_per_selskap(klient.get("/").data.decode("utf-8"))["Equinor"]
+
+        assert rad[3].startswith("3")
+        assert "Negativ" in rad[4]
+
+    def test_ikke_vurdert_med_fotnoten(self, klient, monkeypatch):
+        """Kurser uten rad i vurdering, som etter --les-inn. Ville feilet hvis
+        siden regnet signalet naar raden mangler (M1)."""
+        # 60 rader slutter fredag 30.10, en boersdag.
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 59 + [110.0])}), vurdert=False)
+
+        html = klient.get("/").data.decode("utf-8")
+        rad = _rader_per_selskap(html)["Equinor"]
+
+        assert rad[3] == "– ikke vurdert"
+        assert "Ukjent" in rad[4]
+        assert "hentekommandoen har ikke skrevet en vurdering" in html
+        assert "--les-inn" in html
+
+    def test_ingen_fotnote_naar_alle_er_vurdert(self, klient, monkeypatch):
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [110.0])}))
+        assert "hentekommandoen har ikke skrevet" not in klient.get("/").data.decode("utf-8")
+
+    @pytest.mark.parametrize("grunn,tekst", [
+        (Grunn.SYMBOL_FEILET, "hentingen feilet"),
+        (Grunn.KURS_IKKE_FRA_DAGEN, "ingen kurs fra dagen"),
+        (Grunn.SIGNAL_IKKE_REGNET, "signalet kunne ikke regnes"),
+    ])
+    def test_grunnen_staar_synlig_under_streken(self, klient, grunn, tekst):
+        """Beslutning 3: synlig liten tekst under «–», ikke i title. Ville
+        feilet hvis en rad med grunn ble vist som styrke 0 (M5)."""
+        rader = serie([100.0] * 60 + [101.0])
+        skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET), vurdert=False)
+        skriv_vurdering("EQNR", rader[-1].dato, grunn)
+
+        rad = _rader_per_selskap(klient.get("/").data.decode("utf-8"))["Equinor"]
+
+        assert rad[3] == f"– {tekst}"
+        assert "Ukjent" in rad[4]
+
+    def test_styrke_0_vises_som_0(self, klient, monkeypatch):
+        """Ville feilet hvis styrke 0 ble vist som «–» (M6)."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}))
+
+        rad = _rader_per_selskap(klient.get("/").data.decode("utf-8"))["Equinor"]
+
+        assert rad[3] == "0"
+        assert "Ingen" in rad[4]
+
+    def test_gaarsdagens_vurdering_naar_dagens_rad_har_grunn(self, klient):
+        """Tillegget 22:30: hentingen feilet for aksjen i dag, saa nyeste
+        kurs er fra i gaar, og dagens rad har grunnen. Siden viser
+        gaarsdagens vurdering med gaarsdagens dato (FR-101). Ville feilet
+        hvis raden ble lest for en annen dato enn nyeste kurs (M2)."""
+        rader = serie([100.0] * 60 + [110.0])
+        i_gaar = rader[-1].dato
+        skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET))
+        skriv_vurdering("EQNR", i_gaar + timedelta(days=1), Grunn.SYMBOL_FEILET)
+
+        html = klient.get("/").data.decode("utf-8")
+        rad = _rader_per_selskap(html)["Equinor"]
+
+        assert rad[3].split()[0] == str(vurder(rader, i_gaar).styrke)
+        assert "hentingen feilet" not in html
+        assert f"Oslo Børs · {i_gaar.isoformat()} ·" in html
+
+    def test_selskapene_og_lista_over_manglende_kommer_fra_aksje(self, klient):
+        """AD-21, merknaden 03.10: siden leser selskapene fra aksje, ikke fra
+        AKSJEUNIVERS, og antar aldri 15. Ville feilet hvis lista over aksjer
+        som mangler, kom fra AKSJEUNIVERS (M4)."""
+        skriv_serie("EQNR", serie([100.0] * 61), datetime.fromisoformat(HENTET))
+        tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+        try:
+            with tilkobling:
+                tilkobling.execute("DELETE FROM aksje WHERE symbol IN ('DNO', 'MPCC')")
+                tilkobling.execute("UPDATE aksje SET navn = 'Bank fra basen' WHERE symbol = 'DNB'")
+        finally:
+            tilkobling.close()
+
+        tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+        try:
+            uten_kurser = [n for (n,) in tilkobling.execute(
+                "SELECT navn FROM aksje WHERE symbol != 'EQNR' ORDER BY rowid"
+            )]
+        finally:
+            tilkobling.close()
+
+        html = klient.get("/").data.decode("utf-8")
+        fotnote = html.split("Uten data i denne kilden:")[1].split("</p>")[0]
+
+        assert "Bank fra basen" in fotnote
+        assert "DNO" not in fotnote
+        assert "MPC Container Ships" not in fotnote
+        # Like mange navn som aksje har uten kurser, ikke et fast tall
+        # (gjennomgangen av 2.2b).
+        assert fotnote.strip().rstrip(".") == ", ".join(uten_kurser)
+
+
+class TestVurderingenIDetaljen:
+    """Story 2.2b: aksjedetaljen tegner grafen av kurs og forklarer sjekkene
+    med maalingene i raden (FR-706). Har raden ingen vurdering, er svaret 200
+    med grafen og tilstanden (FR-204)."""
+
+    LAGRET = Vurdering(
+        styrke=3, retning="Blandet", trend=1, bevegelse=-1, interesse=-1,
+        slutt=100.0, justert_slutt=100.0, trend_avvik=0.031,
+        dagens_endring=-0.035, standardavvik=0.011, volumforhold=4.95,
+    )
+
+    def test_sjekkene_fra_raden_ikke_fra_kursene(self, klient):
+        """En flat serie ville gitt tre nuller. Ville feilet hvis detaljen
+        forklarte med et signal regnet av serien (M7)."""
+        rader = serie([100.0] * 61)
+        skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET), vurdert=False)
+        skriv_vurdering("EQNR", rader[-1].dato, self.LAGRET)
+
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+
+        assert "3 av 3" in html
+        assert "Blandet" in html
+        assert "volum 4,95 × medianen" in html
+        assert "mot MA50" in html
+
+    def test_rad_med_grunn_gir_200_med_grafen_og_grunnen(self, klient):
+        rader = serie([100.0] * 61)
+        skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET), vurdert=False)
+        skriv_vurdering("EQNR", rader[-1].dato, Grunn.KURS_IKKE_FRA_DAGEN)
+
+        svar = klient.get("/aksje/EQNR")
+        html = svar.data.decode("utf-8")
+
+        assert svar.status_code == 200
+        assert "<svg" in html
+        assert f"Ingen vurdering for {rader[-1].dato.isoformat()}: ingen kurs fra dagen." in html
+        assert "Målt mot" not in html
+
+    def test_lang_serie_med_signal_ikke_regnet_sier_ikke_antall_dager(self, klient):
+        """Raadet 03.10: signal_ikke_regnet paa en serie som er lang nok, for
+        eksempel naar porten ikke godtar tallene. Siden sier bare at signalet
+        ikke kunne regnes, ikke «Trenger N dager, fikk M» (M12)."""
+        rader = serie([100.0] * 61)
+        skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET), vurdert=False)
+        skriv_vurdering("EQNR", rader[-1].dato, Grunn.SIGNAL_IKKE_REGNET)
+
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+
+        assert f"Ingen vurdering for {rader[-1].dato.isoformat()}: signalet kunne ikke regnes." in html
+        assert "for å regne signal" not in html
+
+    def test_ikke_vurdert_med_fotnoten(self, klient, monkeypatch):
+        # 60 rader slutter fredag 30.10, en boersdag.
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 59 + [110.0])}), vurdert=False)
+
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+
+        assert "ikke vurdert" in html
+        assert "hentekommandoen har ikke skrevet en vurdering" in html
+        assert "Målt mot" not in html
+
+    def test_feil_i_spoerringen_gir_503_paa_begge_rutene(self, klient):
+        """Gjennomgangen av 2.2b: en sqlite3-feil i selve spoerringen, her en
+        base uten tabellen vurdering, gir 503 og ikke 404 eller 500. Ville
+        feilet hvis oppslaget i aksjedetaljen svelget feilen (M15)."""
+        skriv_serie("EQNR", serie([100.0] * 61), datetime.fromisoformat(HENTET))
+        tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+        try:
+            with tilkobling:
+                tilkobling.execute("DROP TABLE vurdering")
+        finally:
+            tilkobling.close()
+
+        for rute in ("/", "/aksje/EQNR"):
+            svar = klient.get(rute)
+            assert svar.status_code == 503, rute
+            assert "OperationalError" in svar.data.decode("utf-8"), rute
+
+    def test_aksjen_slaas_opp_i_basen(self, klient):
+        """Merknaden 03.10 under AD-21. Ville feilet hvis aksjedetaljen slo
+        opp i AKSJEUNIVERS (M8): da sto navnet derfra, og DNO ga ikke 404."""
+        skriv_serie("EQNR", serie([100.0] * 61), datetime.fromisoformat(HENTET))
+        tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+        try:
+            with tilkobling:
+                tilkobling.execute("UPDATE aksje SET navn = 'Navn fra basen' WHERE symbol = 'EQNR'")
+                tilkobling.execute("DELETE FROM aksje WHERE symbol = 'DNO'")
+        finally:
+            tilkobling.close()
+
+        assert "Navn fra basen" in klient.get("/aksje/eqnr").data.decode("utf-8")
+        assert klient.get("/aksje/DNO").status_code == 404
+
+
+def test_app_har_ingen_sql_og_regner_ikke_signalet():
+    """Story 2.2b: spoerringen ligger bak porten, ikke i app.py, og sidene
+    leser selskapene fra basen. Ville feilet hvis spoerringen ble flyttet inn
+    i app.py (M10), eller AKSJEUNIVERS, beregn_signal eller vurder ble tatt
+    inn igjen."""
+    kode = Path(app_modul.__file__).read_text(encoding="utf-8")
+    for ord_ in ("SELECT", "AKSJEUNIVERS", "beregn_signal", "vurder("):
+        assert ord_ not in kode, ord_
+    for navn in ("AKSJEUNIVERS", "beregn_signal", "vurder"):
+        assert not hasattr(app_modul, navn), navn

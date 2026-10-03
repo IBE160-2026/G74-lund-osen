@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-10-03T01:10
+updated: 2026-10-03T22:48
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -124,9 +124,9 @@ i `begrunnelser.md` §9.
 
 | | |
 |---|---|
-| **Status** | **Delvis — oppdatert 2026-09-23** |
-| **Ligger i** | `src/migrering.py` (story 1.1), `src/lagring_sqlite.py` og `src/migrasjoner/0001_kurs.sql` (story 1.3). Beslutningen ligger i `ARCHITECTURE-SPINE.md` `AD-3` til `AD-7`, `AD-16`, `AD-18`, `AD-19` |
-| **Gjenstår** | Å koble lagringen til appen: ingen story har det som kontrollpunkt ennå, se innledningen til Epic 2 i `epics.md` (lagt til 25.09). 1.4a–1.5 er ferdige uten at appen leser fra basen. *Rettet 2026-09-26:* her sto «Å koble lagringen til appen (story 1.4–1.5)». Videre gjenstår vurderingslageret (1.6–1.7) og KI-loggen (4.3). *Skrevet 22.09, bevart:* «Hele lagringslaget. `kursdata.py` leser i dag en JSON-fil, og `app.py` leser den direkte utenom porten» |
+| **Status** | **Delvis — oppdatert 2026-09-23** *Oppdatert 2026-10-03 (story 2.2b):* sidene leser kursene og vurderingene fra basen. |
+| **Ligger i** | `src/migrering.py` (story 1.1), `src/lagring_sqlite.py` og `src/migrasjoner/0001_kurs.sql` (story 1.3). Beslutningen ligger i `ARCHITECTURE-SPINE.md` `AD-3` til `AD-7`, `AD-16`, `AD-18`, `AD-19` *Lagt til 2026-10-03 (story 2.2b):* også `0002_vurdering.sql` (1.6), `0003_aksje.sql` (1.9) og `0004_maalinger.sql` (2.1c), og `src/oversiktsdata.py` med `SqliteOversiktsleser`, som sidene leser gjennom (2.2b). |
+| **Gjenstår** | Å koble lagringen til appen: ingen story har det som kontrollpunkt ennå, se innledningen til Epic 2 i `epics.md` (lagt til 25.09). 1.4a–1.5 er ferdige uten at appen leser fra basen. *Rettet 2026-09-26:* her sto «Å koble lagringen til appen (story 1.4–1.5)». Videre gjenstår vurderingslageret (1.6–1.7) og KI-loggen (4.3). *Skrevet 22.09, bevart:* «Hele lagringslaget. `kursdata.py` leser i dag en JSON-fil, og `app.py` leser den direkte utenom porten» *Rettet 2026-10-03 (story 2.2b):* lagringen er koblet til appen. Sidene leser kursene fra basen fra story 2.2, og dagens vurdering fra 2.2b. Vurderingslageret (1.6–1.7) er bygget. KI-loggen (4.3) gjenstår. |
 
 **Valget er kontrollert med faglærerstaben 22.09** og godkjent av assisterende
 hjelpelærer — ikke av emneansvarlig:

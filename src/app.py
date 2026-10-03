@@ -24,23 +24,28 @@ stier. Bare de to rutene roerer basen.
 
 import sqlite3
 import threading
+from collections.abc import Callable
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 from flask import Flask, abort, g, render_template, request
 
 import lagring_sqlite
-from aksjedetalj import bygg_detalj, finn_aksje
+from aksjedetalj import bygg_detalj, normaliser_symbol
+from boersdag import norsk_dato
 from graf import bygg_graf
-from kursdata import AKSJEUNIVERS, Kursleser
-from lagring_sqlite import SqliteKurslager, aapne_base, har_kurser
+from kursdata import Kursleser
+from lagring_sqlite import SqliteKurslager, SqliteOversiktsleser, aapne_base, har_kurser
 from markedsoversikt import (
     bygg_oversikt,
     eldre_enn_nyeste,
     norsk_tid,
     sidens_dato,
     sidens_tidsstempel,
+    uten_kurser,
 )
 from migrering import MigrasjonsFeil
+from oversiktsdata import Oversiktsleser
 from tallformat import tall
 
 # Kommandoen den tomme siden ber brukeren kjoere. Den staar ogsaa i README, og
@@ -56,6 +61,17 @@ app = Flask(__name__)
 app.jinja_env.filters["norsk_tid"] = norsk_tid
 # Regel 21: tallene formateres ett sted, ikke med "%.2f" i malene (story 8.0).
 app.jinja_env.filters["tall"] = tall
+
+def naa() -> datetime:
+    """Klokka sidene regner dagens dato av, i UTC (AD-20). Egen funksjon, saa
+    testene kan stille den."""
+    return datetime.now(timezone.utc)
+
+
+def idag() -> date:
+    """Dagens dato i Oslo, som tilstand() maaler datoen til nyeste kurs mot."""
+    return norsk_dato(naa())
+
 
 _migrerte: set[Path] = set()
 _migrerings_laas = threading.Lock()
@@ -143,14 +159,29 @@ def hent_leser() -> Kursleser | None:
     return SqliteKurslager(tilkobling)
 
 
+def hent_oversiktsleser() -> Oversiktsleser | None:
+    """Porten sidene leser selskapene og vurderingene gjennom (story 2.2b).
+
+    None naar forespoerselen ikke har en tilkobling. app.py har ingen SQL:
+    spoerringen med join ligger i SqliteOversiktsleser.
+    """
+    tilkobling = g.get("tilkobling")
+    if tilkobling is None:
+        return None
+    return SqliteOversiktsleser(tilkobling)
+
+
 class _BasenFeilet(Exception):
     """En feil i basen etter at tilkoblingen ble aapnet, for eksempel en base
     som en nyere henting har migrert forbi koden. Gir 503, ikke 500."""
 
 
-def _leser_eller_basefeil() -> Kursleser | None:
+def _leser_eller_basefeil(
+    hent: Callable[[], Kursleser | Oversiktsleser | None] | None = None,
+) -> Kursleser | Oversiktsleser | None:
+    """Leseren fra hent (som standard hent_leser), eller 503 ved basefeil."""
     try:
-        return hent_leser()
+        return (hent or hent_leser)()
     except BASEFEIL as feil:
         g.basefeil = _basefeil(feil)
         raise _BasenFeilet from feil
@@ -186,9 +217,8 @@ def markedsoversikt():
             hentekommando=HENTEKOMMANDO,
         )
 
-    rader = bygg_oversikt(leser)
-    vist = {rad.aksje.symbol for rad in rader}
-    mangler = [a.navn for a in AKSJEUNIVERS if a.symbol not in vist]
+    poster = _leser_eller_basefeil(hent_oversiktsleser).oversikt()
+    rader = bygg_oversikt(poster, idag())
 
     return render_template(
         "index.html",
@@ -196,7 +226,8 @@ def markedsoversikt():
         dato=sidens_dato(rader),
         hentet=sidens_tidsstempel(rader),
         eget=eldre_enn_nyeste(rader),
-        mangler=mangler,
+        mangler=uten_kurser(poster),
+        ikke_vurdert=any(rad.ikke_vurdert for rad in rader),
         hentekommando=HENTEKOMMANDO,
     )
 
@@ -211,15 +242,18 @@ def aksjedetalj(symbol: str):
     """
     if g.get("basefeil"):
         return _basen_kan_ikke_aapnes()
-    aksje = finn_aksje(symbol, AKSJEUNIVERS)
-    if aksje is None:
-        abort(404)
-
     leser = _leser_eller_basefeil()
     if leser is None:
         abort(404)
 
-    detalj = bygg_detalj(aksje, leser)
+    # Aksjen slaas opp i aksje i basen, ikke i lista i kursdata.py (story 2.2b,
+    # merknaden 03.10 under AD-21). 404 bare for et symbol som ikke staar der,
+    # og for en aksje uten kursrader (FR-204).
+    post = _leser_eller_basefeil(hent_oversiktsleser).post(normaliser_symbol(symbol))
+    if post is None:
+        abort(404)
+
+    detalj = bygg_detalj(post, leser.serie(post.aksje.symbol), idag())
     if detalj is None:
         abort(404)
 
@@ -227,7 +261,7 @@ def aksjedetalj(symbol: str):
         "aksje.html",
         detalj=detalj,
         graf=bygg_graf(detalj.punkter),
-        hentet=leser.sist_hentet(aksje.symbol),
+        hentet=post.hentet,
     )
 
 
