@@ -86,6 +86,7 @@ krever tre konkrete svar per kandidat:
 - **FR-202** — MA50-linjen tegnes oppå kursen
 - **FR-203** — Øvrig innhold
 - **FR-204** — Aksjedetaljen for en aksje uten gyldig signal
+- **FR-205** — Se nærmere *(lagt til 2026-10-03)*
 
 **4.3 Kommende finansielle hendelser**
 
@@ -119,6 +120,7 @@ krever tre konkrete svar per kandidat:
 - **FR-604** — Logging av KI-bidraget, fra første kjøring
 - **FR-605** — Promptversjon og modell lagres med hver vurdering
 - **FR-606** — Relevansskalaen
+- **FR-607** — KI-teksten om dagen på forsiden *(lagt til 2026-10-03)*
 
 **4.7 Signalstyrke og retning**
 
@@ -135,6 +137,10 @@ avgjort eksplisitt i stedet for å bli stående som en stille mangel.
 *Lagt til 2026-10-01:* FR-104, FR-105 og FR-410 kom til med hovedindeksen OSEBX i
 v1 (Marians beslutning), så det er 37 FR-er.
 
+*Rettet 2026-10-03:* FR-205 (story 8.4) og FR-607 (story 10.6) kom til med
+Marians beslutninger 02.10 og sto i PRD-en, men manglet i lista. Med dem er det
+39 FR-er.
+
 ### NonFunctional Requirements
 
 - **NFR-01** — Daglig drift skal holde seg innenfor API-kvoten
@@ -144,6 +150,10 @@ v1 (Marians beslutning), så det er 37 FR-er.
 - **NFR-05** — Norsk i grensesnitt og forklaringer
 - **NFR-06** — Løsningen gir ikke investeringsråd
 - **NFR-07** — Rådata bevares fra første kjøring
+- **NFR-08** — Bare tall vi kan stå for *(lagt til 2026-10-03)*
+
+*Rettet 2026-10-03:* NFR-08 kom inn i PRD-en 2026-10-01 og sto i NFR Coverage
+Map, men manglet i lista. Med den er det åtte NFR-er.
 
 ### Additional Requirements
 
@@ -282,12 +292,17 @@ kontrollen 22.09 fant det.
 | FR-501, FR-502, FR-503 | Epic 6 🔒 |
 | FR-601, FR-602, FR-603, FR-606 | Epic 5 🔒 |
 | FR-604, FR-605 | Epic 4 |
+| FR-205 | Epic 8 *(lagt til 2026-10-03)* |
+| FR-607 | Epic 10 *(lagt til 2026-10-03)* |
 
 *Rettet 2026-10-03 (kontrollen 26.09, E7):* tabellen viser epicen der kravet først bygges. FR-401 hører også til Epic 3, der en story oppfyller tom-tilstanden, og FR-408 også til Epic 2, der story 2.5 skriver vurderingen i hentingen.
 
 **12 + 22 = 34.** Alle FR-er er plassert.
 
 *Lagt til 2026-10-01:* med FR-104, FR-105 og FR-410 er det 12 + 25 = 37.
+
+*Rettet 2026-10-03:* FR-205 og FR-607 manglet i tabellen. Med dem er det
+12 + 27 = 39.
 
 ### NFR Coverage Map
 
