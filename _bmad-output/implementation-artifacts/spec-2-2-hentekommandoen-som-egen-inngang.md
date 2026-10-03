@@ -2,7 +2,7 @@
 title: 'Story 2.2: Hentekommandoen som egen inngang'
 type: 'feature'
 created: '2026-10-03'
-status: 'ready-for-dev'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '325abb202cb7bdbb0efbc90d35dd7965a706452b'
@@ -73,10 +73,10 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `src/lagring_sqlite.py` -- `kjoer_migrasjoner`, `mode=rw`, `VENTETID_SEKUNDER`
-- [ ] `src/app.py` og `src/templates/index.html` -- basen per forespørsel, migrering én gang, 503, `HENTEKOMMANDO`, tom tilstand
-- [ ] Testene og mutantene i Verification
-- [ ] `README.md`, `deferred-work.md`, spinen ved AD-10
+- [x] `src/lagring_sqlite.py` -- `kjoer_migrasjoner`, `mode=rw`, `VENTETID_SEKUNDER`
+- [x] `src/app.py` og `src/templates/index.html` -- basen per forespørsel, migrering én gang, 503, `HENTEKOMMANDO`, tom tilstand
+- [x] Testene og mutantene i Verification
+- [x] `README.md`, `deferred-work.md`, spinen ved AD-10
 
 **Acceptance Criteria:**
 - Given en base med serier, when `/` og `/aksje/EQNR` vises, then tallene kommer fra basen, også når øyeblikksbildet i `data/raa/` har andre tall.
@@ -84,9 +84,60 @@ context:
 
 ## Implementation Notes
 
+- Bygget 03.10 direkte i økta, ikke av en egen implementasjonsagent.
+- `aapne_base(sti, *, kjoer_migrasjoner=True)`. Uten migrering: `sqlite3.connect(sti.resolve().as_uri() + "?mode=rw", uri=True, timeout=VENTETID_SEKUNDER)`, uten `mkdir`. `VENTETID_SEKUNDER = 5.0`. Ny `har_kurser(tilkobling)` i `lagring_sqlite.py`, så `app.py` har ingen SQL.
+- `app.py`: `before_request` kjører `_migrer_en_gang(sti)` under en lås, med et sett av stier som er migrert i prosessen, og åpner så `aapne_base(sti, kjoer_migrasjoner=False)` i `g.tilkobling`. `teardown_appcontext` lukker den. `BASEFEIL` gir `g.basefeil`, og begge rutene svarer 503 med `basefeil.html`. Stien slås opp ved hver forespørsel (`lagring_sqlite.BASE_STI`), så fixturen i `conftest.py` styrer den i testene, og ingen import rører basen.
+- Avvik fra planen som ble vist i chatten kl. 17:52, ikke fra denne spesifikasjonen: planen sa at en forespørsel ikke lager basefila. Fordi migreringen nå skjer ved første forespørsel, lager den første forespørselen en tom base hvis den mangler, slik hentingen gjør. Forespørsler etter det åpner med `mode=rw`. Det står i matrisen.
+- `HENTEKOMMANDO = "uv run python src/fetch_prices.py"` i `app.py`, sendt til malen som `hentekommando`.
+- Testene som ble skrevet om, fordi de gjaldt filadapteren: `test_uten_kilde_…`, `test_tom_kilde_…`, `test_uleselig_hentet_…` (bare teksten), `test_rutene_gjoer_ingen_nettverkskall` (basen i stedet for fila) og `TestHentLeser`.
+- Tester: før 1058 passed og 16 skipped lokalt (1074 i CI på main). Etter byggingen 1077 passed og 16 skipped, etter gjennomgangen 1083, og etter rettelsene fra rådet 03.10 1085 passed og 16 skipped. De 27 nye er talt som testkjøringer: 18 i `TestBasenIWebserveren` (6 etter gjennomgangen og 2 etter rådet), 6 i `TestAapneBaseUtenMigrering` (den parametriserte ventetidstesten teller to), 2 for nøkkelen i `test_fetch_prices.py` og 1 vakt i `test_konsumentene.py`.
+- Kontrollregning uten kall, på en kopi av basen i scratchpad, som ble slettet etterpå: forsiden og de 15 aksjedetaljene vist fra øyeblikksbildet `kurser-raa-2026-10-02.json` og fra basen etter hentingen 02.10. 16 av 16 sider like, 16 av 16 rader i oversikten (15 aksjer og overskriftsraden) og 15 av 15 detaljer.
+- Mutantene, én om gangen, hele `tests/` hver gang, satt tilbake fra en kopi i scratchpad med sha256 sjekket. Testen som fanget hver:
+
+| Mutant | Feilet | Testen som fanget den |
+|---|---:|---|
+| M1 oppstart kaller hentingen (`requests.get` i `before_request`) | 56 | `test_oppstart_med_tom_base_gjoer_ingen_nettkall`, `test_webserveren_importerer_ikke_hentingen` og alle sidetestene |
+| M2 `migrer()` ved hver forespørsel | 1 | `test_migrer_kjoeres_en_gang_for_to_forespoersler` |
+| M3 tilkoblingen lukkes ikke | 1 | `test_tilkoblingen_lukkes_etter_forespoerselen` |
+| M4 tilkoblingen på modulnivå | 6 | `test_en_forespoersel_i_en_annen_traad_faar_egen_tilkobling` og fem til |
+| M5 sidene leser øyeblikksbildet | 7 | `test_sidene_leser_basen_ikke_oeyeblikksbildet` og seks til |
+| M6 tom base gir feilside | 4 | `test_tom_base_gir_tom_tilstand_med_kommandoen` og tre til |
+| M7 `mode=rw` fjernet | 1 | `test_en_base_som_mangler_lages_ikke`. Overlevde først, fordi testen brukte en mappe som ikke fantes. Rettet i `e4f1be8` |
+| M8 den gamle meldingen om `data/` | 6 | `test_tom_base_gir_tom_tilstand_med_kommandoen` og fem til |
+| M9 nøkkelen fra fil | 1 | `test_noekkelen_leses_fra_miljoeet_uten_env_fil` |
+| M10 feil ved migrering gir 500 | 1 | `test_basen_nyere_enn_koden_gir_503_med_grunnen` |
+| M11 ventetiden fjernet | 2 | `test_tilkoblingen_bruker_ventetiden_fra_koden[med]` og `[uten]`. Overlevde først, fordi standarden i `sqlite3` også er 5 sekunder. Testen setter nå ventetiden til 2,5. Rettet i `e4f1be8` |
+| M12 kommandoen skrevet i malen | 1 | `test_kommandoen_paa_den_tomme_siden_staar_i_readme` |
+| M13 feil i `hent_leser` fanges ikke (etter gjennomgangen) | 1 | `test_basen_migrert_forbi_koden_etter_oppstart_gir_503` |
+| M14 ny migrering når fila er borte, fjernet | 1 | `test_slettet_base_lages_paa_nytt` |
+| M15 stien merkes før migreringen | 1 | `test_basen_nyere_enn_koden_gir_503_med_grunnen`. `test_mislykket_migrering_proeves_igjen` fanget den ikke, fordi den nye migreringen ved en slettet fil dekker over den. *Kjørt på nytt etter rådet 03.10:* 2 feilet, også `test_migrering_som_feiler_en_gang_proeves_igjen_uten_ny_fil` |
+| M16 hele feilteksten på 503-siden | 1 | `test_feilsiden_viser_ingen_stier` |
+| M17 kroken gjelder alle forespørsler | 1 | `test_andre_ruter_roerer_ikke_basen` |
+| M18 en sqlite3-feil mens sidene leser, håndteres ikke (rådet 03.10) | 1 | `test_feil_mens_sidene_leser_gir_503` |
+
 ## Spec Change Log
 
 ## Review Triage Log
+
+Gjennomgang 1 (03.10), Blind Hunter (BH), Edge Case Hunter (ECH) og Verification Gap (VG).
+
+| # | Funn | Dom | Grunnlag | Rute |
+|---|---|---|---|---|
+| BH1, ECH1, VG-annet | Feil i `hent_leser` etter oppstart, for eksempel en base en nyere henting har migrert forbi koden, gir 500 | medium | `SqliteKurslager` reiser `RuntimeError` utenfor `try` i kroken | patch: `_leser_eller_basefeil` og en errorhandler gir 503. Test og M13 |
+| VG1 | Feil ved åpningen per forespørsel er ikke testet gjennom rutene | medium | Bare migreringsfeil var testet | patch: `test_feil_ved_aapning_per_forespoersel_gir_503` |
+| BH2, ECH2 | `_migrerte` glemmes aldri, så en slettet base gir 503 til omstart | medium | Stemmer | patch: mangler fila, glemmes stien og migreringen prøves én gang til. Test og M14 |
+| BH3 | At en mislykket migrering prøves på nytt, er ikke testet | low | Stemmer | patch: `test_mislykket_migrering_proeves_igjen`. M15 ble fanget av `test_basen_nyere_enn_koden_gir_503_med_grunnen` |
+| BH4, ECH3 | Låsen setter forespørslene i kø når migreringen feiler | low | Stemmer, men gjelder først en skrivebeskyttet base | utsatt til `deferred-work.md`, for 3.1 |
+| BH5 | Kommandoen for Docker er ikke ført noe sted | low | Stemmer | utsatt til `deferred-work.md`, for 3.1 |
+| BH6 | Avviket i Implementation Notes ser ut til å motsi matrisen | low | Avviket gjaldt planen i chatten, ikke spesifikasjonen | patch: notatet sier det |
+| BH7 | Testtallet blander enheter | low | Den parametriserte testen teller to | patch: notatet teller testkjøringer |
+| BH8, ECH5 | 503-siden viser stier og påstår at ingen kvote er brukt | medium | `str(feil)` kan ha stier, og siden vet ikke om en henting kjører | patch: bare feiltypen og filnavnet, og påstanden er fjernet. Test og M16 |
+| BH9 | Kroken åpner basen for alle forespørsler | low | Stemmer | patch: bare de to rutene. Test og M17 |
+| BH10 | Reload av `app` i testen kan gi gamle objekter i andre moduler | false | Ingen modul gjør `from app import`. `test_app.py` leser `app_modul.app` ved hvert kall | avvist |
+| BH11 | `test_ventetiden_er_fem_sekunder` sjekker bare tallet | low | Beslutning 3 sier at 5 sekunder står i koden, og testen holder valget | avvist |
+| BH12 | README sier ikke at webserveren trenger skrivetilgang | low | Stemmer | patch: én setning i README |
+| Rådet 03.10 | En `sqlite3`-feil mens sidene leser, etter at leseren er laget, gir 500, og med `debug=True` en traceback. Og `test_mislykket_migrering_proeves_igjen` fanger ikke M15 | medium | Rådet prøvde det med en test der `SqliteKurslager.serie` reiser `OperationalError`. Den slettede fila i testen dekker over M15 | patch: en errorhandler for `sqlite3.Error` gir 503, og 503-siden sier «kan ikke åpnes eller leses». To tester, og M18. Spinen ved AD-10 er skrevet om |
+| ECH4 | En UNC-sti gir en URI SQLite avviser | low | Basen ligger lokalt under `data/db/` (AD-4). Ingen kaller bruker en nettverkssti | avvist |
 
 ## Verification
 
@@ -94,4 +145,4 @@ context:
 - `uv run pytest -q` -- grønn. Før: 1074 i CI på main, kjøring 37132586305 (1058 passed og 16 skipped lokalt).
 
 **Mutantene**, én om gangen, satt tilbake fra en kopi med sha256. Hver føres med testen som fanget den:
-1. Oppstart kaller hentingen. 2. `migrer()` ved hver forespørsel. 3. Tilkoblingen lukkes ikke. 4. Tilkoblingen på modulnivå. 5. Sidene leser øyeblikksbildet. 6. Tom base gir feilside. 7. `mode=rw` fjernet, så en forespørsel uten migrering lager fila. 8. Den gamle meldingen om `data/`. 9. Nøkkelen fra fil. 10. Feil ved migrering gir 500 i stedet for 503. 11. Ventetiden fjernet. 12. Kommandoen skrevet i malen i stedet for fra konstanten.
+1. Oppstart kaller hentingen. 2. `migrer()` ved hver forespørsel. 3. Tilkoblingen lukkes ikke. 4. Tilkoblingen på modulnivå. 5. Sidene leser øyeblikksbildet. 6. Tom base gir feilside. 7. `mode=rw` fjernet, så en forespørsel uten migrering lager fila. 8. Den gamle meldingen om `data/`. 9. Nøkkelen fra fil. 10. Feil ved migrering gir 500 i stedet for 503. 11. Ventetiden fjernet. 12. Kommandoen skrevet i malen i stedet for fra konstanten. *Lagt til etter gjennomgangen:* 13. Feil i `hent_leser` fanges ikke. 14. Ny migrering når fila er borte, fjernet. 15. Stien merkes før migreringen. 16. Hele feilteksten på 503-siden. 17. Kroken gjelder alle forespørsler. *Lagt til etter rådet 03.10:* 18. En `sqlite3`-feil mens sidene leser, håndteres ikke.
