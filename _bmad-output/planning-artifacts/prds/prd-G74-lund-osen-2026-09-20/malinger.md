@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-03T12:34
+updated: 2026-10-03T12:55
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -1282,5 +1282,63 @@ lokalt** og er ikke sporet i git. Bare tallene under er regnet ut og ført her.
 dagen (`prd.md` §3). «Over 25 MNOK» er kriteriet i `prd.md` §3.
 
 Alle fem har 67 handelsdager, fra 2026-07-02 til 2026-10-02.
+
+Ingen av dem er lagt i universet.
+
+---
+
+## 16. Helgemåling: 20 aksjer (2026-10-03)
+
+**Metode.** Som i §15: ett `/api/eod`-kall per symbol, med `from=2026-07-02` og
+`to=2026-10-02`, samme vindu. Omsetning regnes som `volume × close` per
+handelsdag, og medianen tas over perioden. Målingen ble kjørt lørdag 03.10, da
+børsen var stengt og ingen henting trengte kallene. Marians beslutning 02.10
+kl. 23:26: på dager uten henting kan alle 20 kallene brukes til måling.
+
+De 7 første er resten av OBX, de som §15 sa skulle måles senere. De 13 neste er
+de største av resten, målt i markedsverdi. Markedsverdien er bare brukt som en
+rekkefølge for målingen, og er ikke et tall appen bruker. Tickeren til Vend hos
+EODHD er `VEND.OL`, og den ga rader for hele perioden.
+
+**Kostnad.** 20 kall, tatt av dagskvoten 03.10. Før målingen sto
+`apiRequestsDate` på 2026-10-02, altså 0 brukt i dag. Etter første kall sto
+`apiRequests` på 1 med datoen 2026-10-03, og `extraLimit` var uendret på 463.
+Etter målingen er `apiRequests` 20 og `extraLimit` fortsatt 463. Ingen kall
+feilet, ingen symboler var tomme, og ingen dagskall er igjen.
+
+**Rådata.** `data/raa/maaling-raa-2026-10-03.json`. Fila finnes **bare
+lokalt** og er ikke sporet i git. Bare tallene under er regnet ut og ført her.
+
+| Symbol | Selskap | Handelsdager | Median omsetning | Over 32 MNOK | Over 25 MNOK |
+|---|---|---:|---:|---|---|
+| VEND | Vend Marketplaces | 67 | 108,7 MNOK | Ja | Ja |
+| HAUTO | Höegh Autoliners | 67 | 57,0 MNOK | Ja | Ja |
+| NOD | Nordic Semiconductor | 67 | 132,5 MNOK | Ja | Ja |
+| NAS | Norwegian Air Shuttle | 67 | 70,2 MNOK | Ja | Ja |
+| TGS | TGS | 67 | 49,7 MNOK | Ja | Ja |
+| TOM | Tomra | 67 | 45,7 MNOK | Ja | Ja |
+| BNOR | BlueNord | 67 | 78,4 MNOK | Ja | Ja |
+| SB1NO | ikke slått opp | 67 | 31,7 MNOK | Nei | Ja |
+| WAWI | ikke slått opp | 67 | 47,6 MNOK | Ja | Ja |
+| CMBTO | ikke slått opp | 67 | 47,6 MNOK | Ja | Ja |
+| AUTO | ikke slått opp | 67 | 52,1 MNOK | Ja | Ja |
+| HAFNI | ikke slått opp | 67 | 35,0 MNOK | Ja | Ja |
+| PROT | ikke slått opp | 67 | 30,7 MNOK | Nei | Ja |
+| SBNOR | ikke slått opp | 67 | 19,1 MNOK | Nei | Nei |
+| WWI | ikke slått opp | 67 | 8,3 MNOK | Nei | Nei |
+| DOFG | ikke slått opp | 67 | 34,0 MNOK | Ja | Ja |
+| OET | ikke slått opp | 67 | 46,1 MNOK | Ja | Ja |
+| MING | ikke slått opp | 67 | 17,8 MNOK | Nei | Nei |
+| VEI | ikke slått opp | 67 | 10,0 MNOK | Nei | Nei |
+| SPOL | ikke slått opp | 67 | 5,2 MNOK | Nei | Nei |
+
+«Over 32 MNOK» betyr innenfor målingen: de 15 omsettes for 32 til 920 MNOK om
+dagen (`prd.md` §3). «Over 25 MNOK» er kriteriet i `prd.md` §3. 13 av de 20 er
+over 32 MNOK, og 15 er over 25 MNOK.
+
+Alle 20 har 67 handelsdager, fra 2026-07-02 til 2026-10-02.
+
+Selskapsnavnene for de 13 siste er ikke slått opp i en kilde i denne økta, og
+svaret fra `/api/eod` har ingen navn. De føres når de er slått opp.
 
 Ingen av dem er lagt i universet.
