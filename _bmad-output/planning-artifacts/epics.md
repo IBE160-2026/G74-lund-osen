@@ -1219,6 +1219,43 @@ Blir storyen mer enn én økt, deles den i 2.2 og 2.2b når den planlegges.
 
 **Én økt:** ja.
 
+*Delt 2026-10-03, Marians beslutning:* 2.2 tar de to inngangene, at sidene leser kursene fra basen, den tomme tilstanden og at oppstart gjør null nettkall. Signalet regnes fortsatt av kursene. De to spørsmålene over er tatt videre til 2.2b.
+
+### Story 2.2b: Sidene leser dagens vurdering
+
+*Lagt til 2026-10-03, Marians beslutning, da 2.2 ble delt.*
+
+Som **bruker**, vil jeg at oversikten og aksjedetaljen viser det løsningen mente
+den dagen, så siden og historikken aldri sier hver sin ting.
+
+**Oppfyller:** FR-101, FR-408, FR-409 · **Begrenses av:** `AD-3`, `AD-7`, `AD-17`
+
+Svarene på de to spørsmålene i 2.2, gitt i planen 03.10:
+
+- Oversikten henter de femten fra `aksje` sammen med nyeste og forrige kurs,
+  `hentet` fra `kursserie` og dagens rad i `vurdering` i én spørring. Det er en
+  join appen faktisk bruker.
+- Oversikten og aksjedetaljen leser dagens vurdering fra `vurdering` for
+  datoen til nyeste kurs, og regner ikke signalet av kursene. Da finnes det én
+  vei til tallet.
+
+**Kontroll — hva testen ser etter:**
+- Oversikten bygges av én spørring med join mot `aksje`, og testen ser at den
+  gir de femten med navn, kurs, endring og vurdering
+- En aksje med rad i `vurdering` viser styrke, retning og sjekkene derfra.
+  Aksjedetaljen tegner grafen av serien i `kurs` og forklarer sjekkene med
+  målingene i `vurdering` (FR-706)
+- En dag uten vurdering viser «–» med tilstanden fra `tilstand.py` (FR-409):
+  grunnen når raden har en grunn, og «ikke vurdert» når kommandoen ikke ble
+  kjørt. Signalet regnes ikke i stedet
+- En base som er lest inn med `--les-inn`, viser ingen signaler, fordi
+  `--les-inn` aldri skriver vurderinger (AD-7). Siden sier det med tilstanden
+- **Ville feilet hvis:** siden regnet signalet når raden mangler. Da finnes to
+  veier til samme tall, og en dag ingen kjørte kommandoen, ser ut som en dag
+  med svar
+
+**Avhenger av:** 2.2 og 2.5. **Én økt:** ja.
+
 ### Story 2.3: Børsdagskontroll før kvoten brukes
 
 Som **gruppe med 20 kall i døgnet**, vil jeg at kommandoen sjekker om vi
