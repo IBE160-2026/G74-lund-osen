@@ -352,13 +352,21 @@ class TestAapneBaseUtenMigrering:
 
     def test_en_base_som_mangler_lages_ikke(self, tmp_path):
         """Ville feilet hvis mode=rw ble fjernet: da lager sqlite3 en tom fil
-        (M7)."""
-        sti = tmp_path / "db" / "ose.db"
+        (M7). Mappa finnes, saa det er mode=rw og ikke en manglende mappe som
+        stopper aapningen."""
+        sti = tmp_path / "ose.db"
 
         with pytest.raises(sqlite3.OperationalError):
             aapne_base(sti, kjoer_migrasjoner=False)
 
         assert not sti.exists()
+
+    def test_uten_migrering_lages_ingen_mappe(self, tmp_path):
+        sti = tmp_path / "db" / "ose.db"
+
+        with pytest.raises(sqlite3.OperationalError):
+            aapne_base(sti, kjoer_migrasjoner=False)
+
         assert not sti.parent.exists()
 
     def test_en_base_som_finnes_aapnes_uten_migrering(self, tmp_path, monkeypatch):
@@ -375,17 +383,22 @@ class TestAapneBaseUtenMigrering:
             tilkobling.close()
         assert kall == []
 
+    def test_ventetiden_er_fem_sekunder(self):
+        """BH7 fra 2.1b: valget staar i koden."""
+        assert lagring_sqlite.VENTETID_SEKUNDER == 5.0
+
     @pytest.mark.parametrize("migrering", [True, False], ids=["med", "uten"])
-    def test_ventetiden_er_fem_sekunder(self, tmp_path, migrering):
-        """BH7 fra 2.1b. Ville feilet hvis ventetiden ble tatt bort, fordi
-        standarden da ikke er et valg i koden (M11)."""
+    def test_tilkoblingen_bruker_ventetiden_fra_koden(self, tmp_path, monkeypatch, migrering):
+        """Ventetiden kommer fra VENTETID_SEKUNDER, ikke fra standarden i
+        sqlite3, som ogsaa er 5 sekunder. Derfor settes den til 2,5 her. Ville
+        feilet hvis ventetiden ble tatt bort (M11)."""
         sti = tmp_path / "ose.db"
         aapne_base(sti).close()
+        monkeypatch.setattr(lagring_sqlite, "VENTETID_SEKUNDER", 2.5)
 
         tilkobling = aapne_base(sti, kjoer_migrasjoner=migrering)
         try:
-            assert lagring_sqlite.VENTETID_SEKUNDER == 5.0
-            assert tilkobling.execute("PRAGMA busy_timeout").fetchone()[0] == 5000
+            assert tilkobling.execute("PRAGMA busy_timeout").fetchone()[0] == 2500
         finally:
             tilkobling.close()
 
