@@ -2,7 +2,7 @@
 title: "Begrunnelser — hvorfor kravene i PRD-en ser slik ut"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-03T12:34
+updated: 2026-10-03T14:47
 ---
 
 # Begrunnelser — hvorfor kravene i PRD-en ser slik ut
@@ -280,6 +280,8 @@ utslag, fordi trendsjekken bidrar hver eneste dag mens de to andre tier.
 Skjevheten skal *ikke* justeres bort nå. Om den er et problem eller bare en
 riktig beskrivelse av perioden, avgjøres mot året — ikke mot femten dager.
 
+*Rettet 2026-10-03 (kontrollen 26.09, P6):* punktet ble lukket 21.09, som punkt 10 i `prd.md` §8. Målt over 199 handelsdager er 60,0 % av aksjedagene med utslag positive, mot 29,5 % negative (`malinger.md` §7.4). Det korte vinduet lå i en oppgangsperiode og overdrev skjevheten.
+
 ---
 
 ## 7. Kvoten og relevanseksperimentet
@@ -482,6 +484,8 @@ Vi står samtidig foran arkitekturfasen med to uavklarte punkter som faktisk
 betyr noe for resultatet — database (punkt 17) og Dockerfile (punkt 18) — og ett
 som kan velte hele meldingsdelen (punkt 1, Euronext). **Å bruke tiden på å
 skrive om kode som virker, i stedet for på de tre, er feil prioritering.**
+
+*Rettet 2026-10-03 (kontrollen 26.09, P5):* punkt 17 og 18 ble begge lukket 22.09: databasen med SQLite, og Dockerfilen med beslutningene AD-9 til AD-12 (`prd.md` §8). Avsnittet beskriver situasjonen før det.
 
 Dockerkravet er dessuten språkuavhengig. Det trekker ikke i noen retning.
 *24.09: Dockerfilen er sagt av faglærer i samtale 21.09, ikke på emnesiden
