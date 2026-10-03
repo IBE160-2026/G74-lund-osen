@@ -105,6 +105,7 @@ krever tre konkrete svar per kandidat:
 - **FR-408** — Dagens vurdering lagres per aksje
 - **FR-409** — De tre tilstandene skal være skillbare i lageret *(ny 22.09. Rettet 2026-09-24: her sto «vises». Kravet gjelder lageret, ikke en skjerm)*
 - **FR-410** — Hovedindeksen hentes i samme kjøring *(ny 2026-10-01)*
+- **FR-411** — Demoversjonen har oppdiktede tall i en egen base *(ny 2026-10-03)*
 
 **4.5 Meldingsfilter og deduplisering**
 
@@ -140,6 +141,9 @@ v1 (Marians beslutning), så det er 37 FR-er.
 *Rettet 2026-10-03:* FR-205 (story 8.4) og FR-607 (story 10.6) kom til med
 Marians beslutninger 02.10 og sto i PRD-en, men manglet i lista. Med dem er det
 39 FR-er.
+
+*Lagt til 2026-10-03:* FR-411 kom til med demoversjonen (Marians beslutning), så
+det er 40 FR-er.
 
 ### NonFunctional Requirements
 
@@ -294,6 +298,7 @@ kontrollen 22.09 fant det.
 | FR-604, FR-605 | Epic 4 |
 | FR-205 | Epic 8 *(lagt til 2026-10-03)* |
 | FR-607 | Epic 10 *(lagt til 2026-10-03)* |
+| FR-411 | Epic 3 *(lagt til 2026-10-03)* |
 
 *Rettet 2026-10-03 (kontrollen 26.09, E7):* tabellen viser epicen der kravet først bygges. FR-401 hører også til Epic 3, der en story oppfyller tom-tilstanden, og FR-408 også til Epic 2, der story 2.5 skriver vurderingen i hentingen.
 
@@ -303,6 +308,8 @@ kontrollen 22.09 fant det.
 
 *Rettet 2026-10-03:* FR-205 og FR-607 manglet i tabellen. Med dem er det
 12 + 27 = 39.
+
+*Lagt til 2026-10-03:* med FR-411 er det 12 + 28 = 40.
 
 ### NFR Coverage Map
 
@@ -425,7 +432,7 @@ skjer på serien under henting, og den veien gjør kravet uavhengig av NewsWeb.
 
 Sensor kan bygge og kjøre den, uten vår nøkkel og uten våre data.
 
-**FR-er:** FR-401 (tom-tilstanden, story 3.3) · **AD-er:** 9, 10, 11, 12 · Dekker punkt 18, lukket 22.09 *(rettet 2026-09-26: her sto «Dekker åpent punkt 18»)*
+**FR-er:** FR-401 (tom-tilstanden, story 3.3) · **AD-er:** 9, 10, 11, 12 · Dekker punkt 18, lukket 22.09 *(rettet 2026-09-26: her sto «Dekker åpent punkt 18»)* · *utvidet 2026-10-03 med 3.4:* FR-411, NFR-08, AD-7, AD-21
 
 ### Epic 4: KI kan tas i bruk uten å bryte godkjenningen
 
@@ -1529,6 +1536,56 @@ publisert dataene, mot EODHDs betingelse («the data is not published») og rege
 16.
 
 **Avhenger av:** 3.1. **Én økt:** ja.
+
+### Story 3.4: Demoversjonen
+
+*Lagt til 2026-10-03, Marians beslutning kl. 18:10.*
+
+Som **faglærer, sensor eller medstudent uten egen EODHD-nøkkel**, vil jeg kunne
+prøve appen med oppdiktede tall, så jeg ser hvordan den virker uten at gruppen
+deler kontoen sin.
+
+**Oppfyller:** FR-411 · **Begrenses av:** NFR-08, `AD-7`, `AD-9`, `AD-10`, `AD-12`, `AD-21`
+
+**Kontroll — hva testen ser etter:**
+- Demokommandoen lager `data/db/demo.db` med nettsperren på (AD-8) og uten
+  `EODHD_API_KEY` i miljøet
+- To kjøringer med samme frø gir like baser, rad for rad
+- Serien er lang nok til seks måneder i grafen og MA50 fra grafens første punkt
+  (FR-201, FR-202)
+- Ingen symbol eller ticker i demobasen står i `AKSJEUNIVERS`. Navnene er
+  kontrollert for hånd mot Oslo Børs' liste, og datoen står i spesifikasjonen;
+  lista hentes aldri av programmet
+- Demokommandoen fjerner de 15 som `0003` legger inn, før den skriver noe, og
+  `aksje` i demobasen er lik `DEMOUNIVERS`. Testen som holder `aksje` lik
+  `AKSJEUNIVERS` i den ekte basen, står (AD-21)
+- Sidene leser selskapene fra `aksje` i basen. Portene som skriver, tar lista
+  som parameter, med `AKSJEUNIVERS` som standard
+- Hver børsdag i serien har én rad i `vurdering` per aksje, lik det `vurder()`
+  gir for serien fram til den dagen. Raden er skrevet med `skriv` uendret og
+  lagerets klokke stilt på dagen (AD-7)
+- Bare demokommandoen setter `PRAGMA application_id` til demoverdien
+- Hver side med demobasen viser «Eksempeltall», og ingen side med en ekte base
+  gjør det. Merket leses fra basen, og testen bytter bryteren uten å bytte
+  basen, og omvendt
+- Begge vaktene: demokommandoen nekter en base uten demomerket, også en tom
+  base, og hentekommandoen og `--les-inn` nekter en demobase før første kall
+- Uten bryteren åpner webserveren `data/db/ose.db`. Med bryteren åpner den
+  `data/db/demo.db` og lager den aldri selv. Mangler demobasen, viser siden
+  kommandoen som lager den
+- Imaget har ingen base, heller ikke demobasen
+- README «Kom i gang» har demoversjonen, og en test krever at kommandoen der er
+  den samme som i koden (regel 19)
+- **Ville feilet hvis:** merket fulgte bryteren. Da kunne en ekte base vises som
+  eksempeltall, eller en demobase vises uten merket, og det er det NFR-08 forbyr
+
+**Hovedindeksen** kommer inn i demoen i den av 2.8 og 3.4 som bygges sist.
+**Legger en senere story noe til på sidene,** får den et kontrollpunkt om at
+demoen viser det også.
+
+**Åpent:** hva KI-laget gjør med demobasen (Epic 10).
+
+**Avhenger av:** 2.2b, 3.1 og 3.3, ikke av 2.8. **Én økt:** avgjøres i planen.
 
 ---
 
