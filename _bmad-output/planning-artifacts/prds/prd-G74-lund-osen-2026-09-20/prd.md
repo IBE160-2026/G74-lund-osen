@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-02T23:13
+updated: 2026-10-03T12:34
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1483,7 +1483,7 @@ den avhenger av.
 | Idé | Avhenger av | Forbehold |
 |---|---|---|
 | **Sektorvisning:** endring per sektor for dag, uke og måned | Ingenting nytt. Sektor finnes i `AKSJEUNIVERS`, og tallene regnes fra kursserien | 15 aksjer gir få per sektor: 8 sektorer, der Energi har 4, fire har 2 og **tre har bare én** (Industri, Telekom, Konsum). En «sektor» med én aksje er aksjen selv. Vurderes etter brukertesten (story 8.1). *Lagt til 2026-10-01, Marians beslutning:* søylene per aksje for dagens endring, med bransjesymbol og indeksen som stiplet linje, er tatt inn i v1 (FR-105). Endring per sektor står igjen her |
-| **Større aksjeunivers enn 15** | Målingen av `extraLimit` 23.09 (`malinger.md` §11): bonuskvoten trer inn ved kall 21, men den er på 485 og tar slutt | Se regnestykket under. Det skal stå før idéen vurderes |
+| **Større aksjeunivers enn 15** | Målingen av `extraLimit` 23.09 (`malinger.md` §11): bonuskvoten trer inn ved kall 21, men den er på 485 og tar slutt. *Rettet 2026-10-03 (kontrollen 26.09, P2):* 485 gjaldt 23.09. Bonuskvoten synker når den brukes. Den var 485 fram til kall 21 den 23.09, 484 etter det (`malinger.md` §11), 464 etter innsamlingen til relevanseksperimentet 25.09 (`relevanseksperiment.md` §6) og 463 etter OSEBX-kallet 30.09 (`malinger.md` §14) | Se regnestykket under. Det skal stå før idéen vurderes |
 | **Navigasjon mellom flere skjermbilder** *(utvidet 2026-09-26)*: en knapperad øverst, der knappen for skjermbildet man står på, er fylt. Kandidatene er Markedsoversikt, Min liste, Nyheter og Kalender. En knapp vises bare når skjermbildet finnes | Story 8.2, som skal si hvordan et tredje skjermbilde ville passet inn, uten å bygge det. Min liste er «Favorittmerking av aksjer» fra «Hvis vi rekker». Nyheter krever Epic 6 eller raden «Mediesaker for ett selskap». Kalender er Epic 7, der utbyttedatoer er blant de typiske hendelsestypene (FR-302) | Med to skjermbilder i v1 gir en knapperad lite: aksjedetaljen nås ved å klikke på en aksje. Epic 6 og 7 er blokkert av åpent punkt 1, så uten et ja fra Euronext blir det verken børsmeldinger under Nyheter eller noen Kalender. Min liste er favorittmerking, ikke en personlig portefølje, som står under «Utenfor v1», og med 15 aksjer kan den like gjerne være et filter i oversikten. Utbyttehistorikken fra kursserien er historikk, ikke en kalender, og hører til aksjedetaljen. *Delvis flyttet til v1 2026-09-30:* knapperaden med Markedsoversikt og Min liste bygges i 8.3. Nyheter og Kalender står igjen her |
 | **Mediesaker for ett selskap** *(lagt til 2026-09-25)*: de nyeste artiklene fra EODHDs nyhets-API for én aksje, hentet bare når brukeren ber om det. Også for selskaper utenfor de 15, med ticker skrevet inn | Relevanseksperimentet del 1 (story 9.4): hvor mange artikler som finnes per selskap, og hvor mange av dem som faktisk handler om selskapet. For selskaper utenfor universet: et eget skjermbilde uten kurs og signal, jf. idéen om flere skjermbilder | 5 kall per selskap (`malinger.md` §7.2). Kurshentingen bruker 15 av 20, så ett selskap per dag holder seg innenfor dagskvoten, og mer tar av bonuskvoten (§11). Hentes av hentekommandoen, ikke av en knapp i nettsiden: webserveren henter aldri (NFR-02, AD-10). Artiklene vises bare lokalt og publiseres ikke (`docs/kilder-og-rettigheter.md`). Skal KI vurdere relevansen, gjelder EODHDs betingelser fra 21.09, også betingelse 4 |
 | **Egendefinert meldingsfilter** *(lagt til 2026-09-25)*: brukeren velger selv hvilke kategorier som vises, i tillegg til Anbefalt og Alle (FR-203) | Story 6.5, og en brukertest som viser at noen savner det | Rundt ti kategorier, og valgene må lagres. Hvert valg koster tid i hovedflyten, som skal gå på under fem minutter (§7, «Brukerutfall»). Tas ikke inn uten at en test viser behovet |
@@ -1509,6 +1509,8 @@ den avhenger av.
 **Regnestykket for et større univers.** Det er regnet 23.09 fra målte tall: én
 henting per døgn, ett kall per symbol (§2), dagskvote 20, og bonus 484 etter
 kall 21. **Det forutsettes at bonusen ikke fylles på. Det er ikke kjent.**
+
+*Rettet 2026-10-03 (kontrollen 26.09, P2):* regnestykket bruker 484, tallet 23.09. Bonuskvoten synker når den brukes. Den var 485 fram til kall 21 den 23.09, 484 etter det (`malinger.md` §11), 464 etter innsamlingen til relevanseksperimentet 25.09 (`relevanseksperiment.md` §6) og 463 etter OSEBX-kallet 30.09 (`malinger.md` §14).
 
 | Symboler | Kall per henting | Fra bonus per døgn | Bonusen varer |
 |---:|---:|---:|---|

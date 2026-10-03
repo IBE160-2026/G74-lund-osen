@@ -2,7 +2,7 @@
 title: "Begrunnelser — hvorfor kravene i PRD-en ser slik ut"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-01T00:10
+updated: 2026-10-03T12:34
 ---
 
 # Begrunnelser — hvorfor kravene i PRD-en ser slik ut
@@ -305,6 +305,8 @@ feile.
 dyrt». Den vurderingen gjaldt *daglig drift*, der 10 kall per ticker hver dag er
 uholdbart mot en kvote på 20. For én engangsinnsamling er regnestykket et annet.
 
+*Rettet 2026-10-03 (kontrollen 26.09, P7):* `docs/kilder-og-rettigheter.md` har ikke lenger ordene «forkastet — for dyrt». Der står nyhets-API-et nå som «Forkastet for daglig drift: 5 kall per ticker, altså 75 for de 15 mot en dagsgrense på 20».
+
 Kostnaden er dokumentert 2026-09-20: 5 kall per forespørsel pluss 5 kall per
 ticker, altså 10 for én ticker.
 
@@ -327,6 +329,8 @@ riktig tall, men av en annen grunn enn den gruppen la til grunn. Innsamlingen
 gjøres i uke 39 eller 40, mens bonuskvoten finnes. At bonuskvoten dekker 80 kall
 er ikke kontrollert mot faktisk kontosaldo, og det er heller ikke verifisert at
 gratisnivået gir tilgang til nyhets-API-et for `.OL`-tickere i det hele tatt.
+
+*Rettet 2026-10-03 (kontrollen 26.09, P7):* begge er målt. Gratisnivået svarer for `.OL` (`malinger.md` §7.2, 21.09), og innsamlingen 25.09 kostet 40 kall, 20 av dem fra bonuskvoten (`relevanseksperiment.md` §6).
 
 **Innsamlingen skjer først etter at EODHDs bruksvilkår er kontrollert.**
 Spørsmålet er om vilkårene tillater at innholdet brukes som input til en

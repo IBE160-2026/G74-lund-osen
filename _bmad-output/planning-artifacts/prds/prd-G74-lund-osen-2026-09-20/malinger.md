@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-02T23:27
+updated: 2026-10-03T12:34
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -286,8 +286,8 @@ vinduet er for kort til å avgjøre spørsmålet.
 | ~~Nyhetstest mot én `.OL`-ticker~~ | ~~Avgjøre om `/api/news` svarer på gratisnivå i det hele tatt~~ | **Gjort 2026-09-21, se §7.2. Kostet 5 kall, ikke 10. Svaret er ja** |
 | ~~Har NewsWeb et språkfelt?~~ | ~~Avgjør om FR-501 kan bruke språkkode eller må bygge på heuristikk~~ | **Gjort 2026-09-21, se §7.3. Svaret er nei — heuristikken må beholdes** |
 | ~~Signaltest mot ~200 handelsdager~~ | ~~Låse terskel, volumfaktor og nøytralsonebredde~~ | **Gjort 2026-09-21, se §7.4. 15 kall, 199 dager. Alle tre verdiene holdt** |
-| Vilkårskontroll NewsWeb + Euronext | Avgjøre om datagrunnlaget holder | 0 kall, frist 2026-09-27 |
-| Relevanseksperiment del 1, innsamling av ~50 medieartikler | Grunnlaget for symbolmatching mot KI-klassifisering | `extraLimit`, uke 39–40. Kalltallet kontrolleres i første forespørsel |
+| Vilkårskontroll NewsWeb + Euronext | Avgjøre om datagrunnlaget holder | 0 kall, frist 2026-09-27. *Rettet 2026-10-03 (kontrollen 26.09, P4):* gjort. Vilkårene til EODHD og Euronext ble kontrollert 2026-09-21 (`prd.md` §2), og fristen gruppen satte for svaret fra Euronext, var 28.09 (åpent punkt 1 i `prd.md` §8) |
+| Relevanseksperiment del 1, innsamling av ~50 medieartikler | Grunnlaget for symbolmatching mot KI-klassifisering | `extraLimit`, uke 39–40. Kalltallet kontrolleres i første forespørsel. *Rettet 2026-10-03 (kontrollen 26.09, P4):* gjort 25.09, med 40 kall, 20 fra dagskvoten og 20 fra bonuskvoten (`relevanseksperiment.md` §6) |
 | Relevanseksperiment del 2, KI-klassifiseringen | Symbolmatching mot KI-klassifisering | 0 kall mot EODHD. Venter på KI-laget og på betingelse 4 |
 | Kontrollregning av de tre sjekkene *(lagt til 2026-10-01)* | Vise at trend, bevegelse og interesse i aksjedetaljen stemmer: én aksje og én børsdag regnes for hånd i et regneark fra rådatafila i data/, og sammenlignes med tallene appen viser. Regnearket blir liggende lokalt, fordi det inneholder rådata. Bare tallene side om side, og om de stemmer, føres hit | 0 kall |
 | Sluttkurs, høy og lav mot Oslo Børs *(lagt til 2026-10-01)* | Vise at kursene fra EODHD stemmer med børsens egne tall: noen dager sammenlignes for hånd med børsens side, lest av en av oss | 0 kall |
@@ -1120,6 +1120,7 @@ feilkode. To konsekvenser:
 - **En henting for mye tar ikke stopp, den koster bonuskvote.** NFR-01 og
   FR-402-kontrollen er det som hindrer at 485 bonuskall går tapt stille. Hentes det
   to ganger om dagen, stopper det ikke ved 20. Det tærer på bonusen.
+  *Rettet 2026-10-03 (kontrollen 26.09, P2):* 485 er tallet før kall 21 den 23.09. Bonuskvoten synker når den brukes: 484 etter kall 21, 464 etter innsamlingen til relevanseksperimentet 25.09 (`relevanseksperiment.md` §6) og 463 etter OSEBX-kallet 30.09 (§14).
 
 Det målingen **ikke** avgjør: om det finnes noe tak når `extraLimit` når 0.
 Det er ikke prøvd, og det skal ikke prøves.
