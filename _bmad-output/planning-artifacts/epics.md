@@ -1221,6 +1221,8 @@ Blir storyen mer enn én økt, deles den i 2.2 og 2.2b når den planlegges.
 
 *Delt 2026-10-03, Marians beslutning:* 2.2 tar de to inngangene, at sidene leser kursene fra basen, den tomme tilstanden og at oppstart gjør null nettkall. Signalet regnes fortsatt av kursene. De to spørsmålene over er tatt videre til 2.2b.
 
+*Ferdig 2026-10-03:* flettet i `1570ae9`, PR #19.
+
 ### Story 2.2b: Sidene leser dagens vurdering
 
 *Lagt til 2026-10-03, Marians beslutning, da 2.2 ble delt.*
