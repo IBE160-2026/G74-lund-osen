@@ -680,6 +680,51 @@ class TestBasenIWebserveren:
         assert str(lagring_sqlite.MIGRASJONSKATALOG) not in html
         assert "kvote" not in html
 
+    def test_feil_mens_sidene_leser_gir_503(self, klient, monkeypatch):
+        """Raadet 03.10: en sqlite3-feil etter at leseren er laget, her en
+        laast base i SqliteKurslager.serie, gir 503 med feiltypen paa begge
+        rutene. Ville feilet uten haandteringen av sqlite3.Error (M18)."""
+        import sqlite3
+
+        fyll_basen({"EQNR": serie([100.0] * 60 + [101.0])})
+
+        def laast(self, symbol):
+            raise sqlite3.OperationalError("database is locked")
+
+        monkeypatch.setattr(SqliteKurslager, "serie", laast)
+
+        for rute in ("/", "/aksje/EQNR"):
+            svar = klient.get(rute)
+            html = svar.data.decode("utf-8")
+            assert svar.status_code == 503, rute
+            assert "kan ikke åpnes eller leses" in html
+            assert "OperationalError" in html
+            assert "database is locked" not in html
+
+    def test_migrering_som_feiler_en_gang_proeves_igjen_uten_ny_fil(self, klient, monkeypatch):
+        """Raadet 03.10: migrer() feiler en gang, og fila slettes ikke. Foerste
+        forespoersel gir 503, neste gir 200, og migrer() er kalt to ganger.
+        Ville feilet hvis stien ble merket foer migreringen (M15)."""
+        from migrering import MigrasjonsFeil
+
+        kall = []
+        ekte = lagring_sqlite.migrer
+
+        def spion(tilkobling, katalog):
+            kall.append(katalog)
+            if len(kall) == 1:
+                raise MigrasjonsFeil("feiler en gang i testen")
+            return ekte(tilkobling, katalog)
+
+        monkeypatch.setattr(lagring_sqlite, "migrer", spion)
+
+        assert klient.get("/").status_code == 503
+        svar = klient.get("/")
+
+        assert svar.status_code == 200
+        assert TOM_TILSTAND in svar.data.decode("utf-8")
+        assert len(kall) == 2
+
     def test_andre_ruter_roerer_ikke_basen(self, klient, monkeypatch):
         """BH: en 404 aapner ikke basen og lager ingen fil. Ville feilet hvis
         kroken gjaldt alle forespoersler (M17)."""

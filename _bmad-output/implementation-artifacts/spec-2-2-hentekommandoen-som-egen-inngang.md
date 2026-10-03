@@ -90,7 +90,7 @@ context:
 - Avvik fra planen som ble vist i chatten kl. 17:52, ikke fra denne spesifikasjonen: planen sa at en forespørsel ikke lager basefila. Fordi migreringen nå skjer ved første forespørsel, lager den første forespørselen en tom base hvis den mangler, slik hentingen gjør. Forespørsler etter det åpner med `mode=rw`. Det står i matrisen.
 - `HENTEKOMMANDO = "uv run python src/fetch_prices.py"` i `app.py`, sendt til malen som `hentekommando`.
 - Testene som ble skrevet om, fordi de gjaldt filadapteren: `test_uten_kilde_…`, `test_tom_kilde_…`, `test_uleselig_hentet_…` (bare teksten), `test_rutene_gjoer_ingen_nettverkskall` (basen i stedet for fila) og `TestHentLeser`.
-- Tester: før 1058 passed og 16 skipped lokalt (1074 i CI på main). Etter byggingen 1077 passed og 16 skipped, og etter gjennomgangen 1083 passed og 16 skipped. De 25 nye er talt som testkjøringer: 16 i `TestBasenIWebserveren` (6 etter gjennomgangen), 6 i `TestAapneBaseUtenMigrering` (den parametriserte ventetidstesten teller to), 2 for nøkkelen i `test_fetch_prices.py` og 1 vakt i `test_konsumentene.py`.
+- Tester: før 1058 passed og 16 skipped lokalt (1074 i CI på main). Etter byggingen 1077 passed og 16 skipped, etter gjennomgangen 1083, og etter rettelsene fra rådet 03.10 1085 passed og 16 skipped. De 27 nye er talt som testkjøringer: 18 i `TestBasenIWebserveren` (6 etter gjennomgangen og 2 etter rådet), 6 i `TestAapneBaseUtenMigrering` (den parametriserte ventetidstesten teller to), 2 for nøkkelen i `test_fetch_prices.py` og 1 vakt i `test_konsumentene.py`.
 - Kontrollregning uten kall, på en kopi av basen i scratchpad, som ble slettet etterpå: forsiden og de 15 aksjedetaljene vist fra øyeblikksbildet `kurser-raa-2026-10-02.json` og fra basen etter hentingen 02.10. 16 av 16 sider like, 16 av 16 rader i oversikten (15 aksjer og overskriftsraden) og 15 av 15 detaljer.
 - Mutantene, én om gangen, hele `tests/` hver gang, satt tilbake fra en kopi i scratchpad med sha256 sjekket. Testen som fanget hver:
 
@@ -110,9 +110,10 @@ context:
 | M12 kommandoen skrevet i malen | 1 | `test_kommandoen_paa_den_tomme_siden_staar_i_readme` |
 | M13 feil i `hent_leser` fanges ikke (etter gjennomgangen) | 1 | `test_basen_migrert_forbi_koden_etter_oppstart_gir_503` |
 | M14 ny migrering når fila er borte, fjernet | 1 | `test_slettet_base_lages_paa_nytt` |
-| M15 stien merkes før migreringen | 1 | `test_basen_nyere_enn_koden_gir_503_med_grunnen`. `test_mislykket_migrering_proeves_igjen` fanget den ikke, fordi den nye migreringen ved en slettet fil dekker over den |
+| M15 stien merkes før migreringen | 1 | `test_basen_nyere_enn_koden_gir_503_med_grunnen`. `test_mislykket_migrering_proeves_igjen` fanget den ikke, fordi den nye migreringen ved en slettet fil dekker over den. *Kjørt på nytt etter rådet 03.10:* 2 feilet, også `test_migrering_som_feiler_en_gang_proeves_igjen_uten_ny_fil` |
 | M16 hele feilteksten på 503-siden | 1 | `test_feilsiden_viser_ingen_stier` |
 | M17 kroken gjelder alle forespørsler | 1 | `test_andre_ruter_roerer_ikke_basen` |
+| M18 en sqlite3-feil mens sidene leser, håndteres ikke (rådet 03.10) | 1 | `test_feil_mens_sidene_leser_gir_503` |
 
 ## Spec Change Log
 
@@ -135,6 +136,7 @@ Gjennomgang 1 (03.10), Blind Hunter (BH), Edge Case Hunter (ECH) og Verification
 | BH10 | Reload av `app` i testen kan gi gamle objekter i andre moduler | false | Ingen modul gjør `from app import`. `test_app.py` leser `app_modul.app` ved hvert kall | avvist |
 | BH11 | `test_ventetiden_er_fem_sekunder` sjekker bare tallet | low | Beslutning 3 sier at 5 sekunder står i koden, og testen holder valget | avvist |
 | BH12 | README sier ikke at webserveren trenger skrivetilgang | low | Stemmer | patch: én setning i README |
+| Rådet 03.10 | En `sqlite3`-feil mens sidene leser, etter at leseren er laget, gir 500, og med `debug=True` en traceback. Og `test_mislykket_migrering_proeves_igjen` fanger ikke M15 | medium | Rådet prøvde det med en test der `SqliteKurslager.serie` reiser `OperationalError`. Den slettede fila i testen dekker over M15 | patch: en errorhandler for `sqlite3.Error` gir 503, og 503-siden sier «kan ikke åpnes eller leses». To tester, og M18. Spinen ved AD-10 er skrevet om |
 | ECH4 | En UNC-sti gir en URI SQLite avviser | low | Basen ligger lokalt under `data/db/` (AD-4). Ingen kaller bruker en nettverkssti | avvist |
 
 ## Verification
@@ -143,4 +145,4 @@ Gjennomgang 1 (03.10), Blind Hunter (BH), Edge Case Hunter (ECH) og Verification
 - `uv run pytest -q` -- grønn. Før: 1074 i CI på main, kjøring 37132586305 (1058 passed og 16 skipped lokalt).
 
 **Mutantene**, én om gangen, satt tilbake fra en kopi med sha256. Hver føres med testen som fanget den:
-1. Oppstart kaller hentingen. 2. `migrer()` ved hver forespørsel. 3. Tilkoblingen lukkes ikke. 4. Tilkoblingen på modulnivå. 5. Sidene leser øyeblikksbildet. 6. Tom base gir feilside. 7. `mode=rw` fjernet, så en forespørsel uten migrering lager fila. 8. Den gamle meldingen om `data/`. 9. Nøkkelen fra fil. 10. Feil ved migrering gir 500 i stedet for 503. 11. Ventetiden fjernet. 12. Kommandoen skrevet i malen i stedet for fra konstanten. *Lagt til etter gjennomgangen:* 13. Feil i `hent_leser` fanges ikke. 14. Ny migrering når fila er borte, fjernet. 15. Stien merkes før migreringen. 16. Hele feilteksten på 503-siden. 17. Kroken gjelder alle forespørsler.
+1. Oppstart kaller hentingen. 2. `migrer()` ved hver forespørsel. 3. Tilkoblingen lukkes ikke. 4. Tilkoblingen på modulnivå. 5. Sidene leser øyeblikksbildet. 6. Tom base gir feilside. 7. `mode=rw` fjernet, så en forespørsel uten migrering lager fila. 8. Den gamle meldingen om `data/`. 9. Nøkkelen fra fil. 10. Feil ved migrering gir 500 i stedet for 503. 11. Ventetiden fjernet. 12. Kommandoen skrevet i malen i stedet for fra konstanten. *Lagt til etter gjennomgangen:* 13. Feil i `hent_leser` fanges ikke. 14. Ny migrering når fila er borte, fjernet. 15. Stien merkes før migreringen. 16. Hele feilteksten på 503-siden. 17. Kroken gjelder alle forespørsler. *Lagt til etter rådet 03.10:* 18. En `sqlite3`-feil mens sidene leser, håndteres ikke.

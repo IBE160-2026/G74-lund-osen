@@ -161,6 +161,15 @@ def _basen_feilet_underveis(_feil):
     return _basen_kan_ikke_aapnes()
 
 
+@app.errorhandler(sqlite3.Error)
+def _basen_feilet_under_lesingen(feil):
+    """En sqlite3-feil mens sidene leser, etter at leseren er laget, for
+    eksempel en laast base. Gir 503 med feiltypen, som de andre basefeilene,
+    ikke 500 og ikke en traceback (raadet 03.10)."""
+    g.basefeil = _basefeil(feil)
+    return _basen_kan_ikke_aapnes()
+
+
 @app.route("/")
 def markedsoversikt():
     if g.get("basefeil"):
