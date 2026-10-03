@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-03T17:11
+updated: 2026-10-03T21:56
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -99,6 +99,7 @@ koden.
 - Hovedindeksen OSEBX i markedsoversikten, med søyler for dagens endring per aksje (FR-104, FR-105, FR-410) *(lagt til 2026-10-01, Marians beslutning)*
 - «Se nærmere» i aksjedetaljen: tre ting brukeren kan sjekke selv (FR-205) *(lagt til 2026-10-02, Marians beslutning)*
 - KI-tekst om dagen på forsiden, under tabellen (FR-607) *(lagt til 2026-10-02, Marians beslutning)*
+- Demoversjonen: oppdiktede selskaper og kurser i en egen base, laget uten nøkkel og uten nett, og merket «Eksempeltall» (FR-411) *(lagt til 2026-10-03, Marians beslutning)*
 
 *Plan B, 2026-09-28:* KI-laget forklarer signalet i stedet for børsmeldingene, ut fra tall regnet av kursene (Epic 10). Av/på-bryteren står. FR-601–606 er skrevet om for plan B 2026-09-28, og meldingsversjonen står i §4.6A. *Her sto:* «FR-601–606 skrives om for plan B i en egen runde.»
 
@@ -785,6 +786,40 @@ som aksjene. Daglig henting koster da 16 kall (NFR-01).
 - Feiler indekskallet, lagres og vurderes aksjene som vanlig. Indeksen føres i
   `feil` og får ingen ny sjanse (`AD-15`), og den gir aldri en rad i `vurdering`.
 
+#### FR-411 — Demoversjonen har oppdiktede tall i en egen base
+
+*Lagt til 2026-10-03, Marians beslutning kl. 18:10.*
+
+Appen skal kunne vises fram uten EODHD-nøkkel og uten data fra EODHD. En egen
+kommando lager demobasen `data/db/demo.db`.
+
+- Kommandoen gjør null API-kall, leser ingen nøkkel og virker uten nett.
+- Selskapene, tickerne og hovedindeksen er oppdiktet, med navn som ikke finnes
+  på Oslo Børs.
+- Kursene lages etter en regel som står skrevet, med fast frø, så samme
+  kommando gir samme base.
+- Serien er lang nok til alt sidene viser, også seks måneder i grafen (FR-201)
+  og MA50 fra grafens første punkt (FR-202), altså minst 175 handelsdager som i
+  FR-406.
+- Hver børsdag i serien får én vurdering per aksje, regnet med den samme
+  `vurder()` som hentekommandoen bruker, så historikken og sammenligningene
+  virker.
+- Basen er selv merket som demobase, og hver side som viser den, sier
+  «Eksempeltall» (NFR-08). Merket avgjøres av basen, ikke av innstillingen, så
+  en demobase vises aldri uten merket, og en ekte base aldri med det.
+- Demokommandoen nekter å skrive til en base uten demomerket, og
+  hentekommandoen nekter å skrive til en demobase (`AD-7`).
+- Én bryter avgjør hvilken base webserveren åpner. Med bryteren åpner den
+  `data/db/demo.db`, og den lager aldri demobasen selv. Mangler demobasen, viser
+  siden kommandoen som lager den. Uten bryteren er det den ekte basen.
+- Demobasen ligger aldri i imaget eller i repoet (`AD-9`).
+
+Grunnen: EODHDs vilkår forbyr å dele kontoen med andre, også i en gruppe
+(`docs/kilder-og-rettigheter.md`). Andre kan prøve appen med sin egen
+gratisnøkkel (story 3.3) eller med demoversjonen.
+
+Åpent: hva KI-laget gjør med demobasen (Epic 10).
+
 ---
 
 ### 4.5 Meldingsfilter og deduplisering
@@ -1314,6 +1349,10 @@ skrevet, og har bestått kontrollen. Mangler tallet, eller ser det feil ut, vise
 når begge finnes og lav ≤ sluttkurs ≤ høy. Valgbare perioder (1 uke, 1 mnd og så
 videre) får én skriftlig regel for startdagen, lik for alle periodene, og testes
 med faste datoer rundt helger, helligdager og nyttår før de bygges.
+
+*Lagt til 2026-10-03, Marians beslutning (FR-411):* oppdiktede tall merkes
+«Eksempeltall» på hver side der de vises, og vises aldri sammen med ekte tall.
+En side leser enten demobasen eller den ekte basen, aldri begge.
 
 ---
 
