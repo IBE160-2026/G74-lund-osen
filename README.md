@@ -98,6 +98,11 @@ døgnet, altså én full henting per dag. Finnes dagens øyeblikksbilde fra før
 stopper den før første kall, så en kjøring nummer to samme dag bruker ingen kall
 og skriver ikke over fila.
 
+Oversikten og aksjedetaljen viser vurderingen hentingen lagret i `vurdering` for
+datoen til nyeste kurs, og regner ikke signalet på nytt. Mangler vurderingen, står
+«–» med grunnen, for eksempel «ikke vurdert» når kursene er lest inn med
+`--les-inn`. Selskapene leses fra tabellen `aksje` i basen.
+
 Hopper du over hentesteget, starter applikasjonen likevel — med tom oversikt og
 beskjed om at basen ikke har kurser ennå, med kommandoen som henter dem. Testene under krever verken nøkkel eller data.
 

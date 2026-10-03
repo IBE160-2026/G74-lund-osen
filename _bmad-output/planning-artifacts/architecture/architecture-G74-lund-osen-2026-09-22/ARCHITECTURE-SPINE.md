@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-10-03T21:58'
+updated: '2026-10-03T22:48'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -168,6 +168,7 @@ manglet i grafen.
 - **Leseside, 2026-09-23:** `Kursleser` (`serie`, `sist_hentet`) er lesesiden av porten for kursdata, og `Kurslager` er `Kursleser` pluss `erstatt_serie`. Det er én port med en leseside, ikke to porter. `Kursleser` er `Kurskilde` født på nytt, med `Kursrad` og tid per symbol.
 - **Bruddet er lukket, 2026-09-25:** fra story 1.2 (valg b) sto `Kurskilde` ved siden av `Kurslager`, altså to porter for kursdataene. Story 1.4c fjernet `Kurskilde`, `MinneKilde` og testen som holdt bruddet fra å vokse, commit `a91ef79`. Kursdataene har nå én port.
 - **Føring 2026-09-30 (Min liste, story 8.3):** merkingen i Min liste blir et nytt datasett med egen port og webserveren som eneste skriver. Hentekommandoen og webserveren skriver da til samme basefil, men til hver sin tabell (AD-4). Navnet på porten settes når 8.3 bygges.
+- **Merknad 2026-10-03 (story 2.2b, beslutning 1):** `Oversiktsleser` (`oversiktsdata.py`) er en port som bare leser, uten skriver. Den leser på tvers av datasettene, `aksje`, `kursserie`, `kurs` og `vurdering`, i én spørring med join, så sidene får én vei til tallet. Adapteren er `SqliteOversiktsleser` i `lagring_sqlite.py`, og `app.py` har ingen SQL. Hvert datasett har fortsatt én port med én skriver. Porten har bare `oversikt()` og `post(symbol)`, og en test krever at den ikke har noen skrivemetode. Dagens vurdering er raden for datoen til nyeste kurs, og sidene leser selskapene fra `aksje` (merknaden 03.10 under AD-21).
 
 ### AD-4 — SQLite er motoren
 

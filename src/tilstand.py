@@ -11,7 +11,10 @@ None. Den fjerde er raden med grunn fra punkt 24: kommandoen kjoerte, men
 kunne ikke vurdere aksjen.
 
 Enhver visning, kommando eller spoerring som senere leser historikken, skal
-bevare skillet (FR-409). Ingen kaller i produksjonskoden ennaa (punkt 20).
+bevare skillet (FR-409). Kalleren i produksjonskoden er sidene: fra story
+2.2b viser oversikten og aksjedetaljen raden for datoen til nyeste kurs
+gjennom tilstand (markedsoversikt.les_tilstand). Historikken i punkt 20
+kommer i story 2.7.
 """
 
 from dataclasses import dataclass

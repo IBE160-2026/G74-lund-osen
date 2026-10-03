@@ -75,16 +75,41 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `src/oversiktsdata.py`, `src/lagring_sqlite.py`, tester -- porten, adapteren og spørringen. Commit.
-- [ ] `src/markedsoversikt.py`, `src/app.py`, `src/templates/index.html`, tester -- oversikten. Commit.
-- [ ] `src/aksjedetalj.py`, `src/signalberegning.py`, `src/templates/aksje.html`, tester -- aksjedetaljen. Commit.
-- [ ] Mutantene og kontrollregningen. Spinen, `designregler.md`, `tilstand.py`, `deferred-work.md`, `innlevering.md`, README. Commit.
+- [x] `src/oversiktsdata.py`, `src/lagring_sqlite.py`, tester -- porten, adapteren og spørringen. Commit.
+- [x] `src/markedsoversikt.py`, `src/app.py`, `src/templates/index.html`, tester -- oversikten. Commit.
+- [x] `src/aksjedetalj.py`, `src/signalberegning.py`, `src/templates/aksje.html`, tester -- aksjedetaljen. Commit.
+- [x] Mutantene og kontrollregningen. Spinen, `designregler.md`, `tilstand.py`, `deferred-work.md`, `innlevering.md`, README. Commit.
 
 **Acceptance Criteria:**
 - Given en kopi av basen etter hentingen 02.10, when sidene vises på main (signalet regnet) og etter 2.2b (vurderingen lest), then styrke, retning og sjekker er like for alle aksjene. Bare antallet føres.
 - Given en rad uten vurdering og en med styrke 0, when oversikten vises, then raden uten vurdering står sist.
 
 ## Implementation Notes
+
+- Bygget 03.10 direkte i økta, ikke av en egen implementasjonsagent, som i 2.2. Fire commits på grenen, én per del: porten (`37748ce`), oversikten (`31761ed`), aksjedetaljen (`f9382f8`) og dokumentene.
+- **Porten:** `oversiktsdata.py` med `Oversiktspost` og `Oversiktsleser` (`oversikt()`, `post(symbol)`). `SqliteOversiktsleser` i `lagring_sqlite.py` kjører én spørring: `aksje` med `LEFT JOIN` mot `kursserie`, nyeste kurs (`MAX(dato)`), forrige kurs (`MAX(dato) < nyeste`) og `vurdering` for datoen til nyeste kurs, sortert på `aksje.rowid`. `_innhold` gjør raden om til `Vurdering` eller `Grunn`, felles med `SqliteVurderingslager.les`.
+- **Oversikten:** `bygg_rad(post, idag, p)` og `bygg_oversikt(poster, idag, p)`. `les_tilstand` gir tilstanden og teksten under «–», og fanger `UtenforKalenderen` og en dato etter i dag. `uten_kurser(poster)` gir lista over aksjer som mangler. `Rad` har `tilstand` og `tekst` i stedet for `signal` og `mangler`, og «skiller seg ut» er den lagrede styrken mot `p.terskel`.
+- **Valg som ikke sto i planen:** en nyeste kurs med dato etter dagens dato i Oslo gir teksten «datoen er etter i dag» i stedet for 500. `tilstand()` reiser `ValueError` da. Det skjer bare med en klokke eller en kilde som tar feil.
+- **app.py:** `naa()` og `idag()` er klokka testene stiller, og `hent_oversiktsleser()` er kroken for porten. Ingen SQL, og verken `AKSJEUNIVERS`, `beregn_signal` eller `vurder`. Aksjedetaljen slår opp med `normaliser_symbol` (store bokstaver, uten mellomrom) i `aksje`.
+- **Aksjedetaljen:** `bygg_detalj(post, rader, idag, p)`. `sjekker_fra(vurdering, p)` i `signalberegning.py` bygger de tre sjekkene av verdiene og målingene i raden med de samme forklaringsfunksjonene, så tekstene er like. For `signal_ikke_regnet` sier siden hvor mange dager signalet trenger (`nodvendige_dager`) og hvor mange serien har, som før. `finn_aksje` og `Detalj.har_ma50` er fjernet.
+- **Testene i `test_app.py`** fyller basen i `tmp_path` med kurser og med vurderingen `vurder()` gir for nyeste dag, skrevet med adapterens `_UPSERT` uten datokontrollen i `skriv`, fordi testseriene ikke ligger på inneværende børsdag. Klokka står fast på 31.12.2026. `test_feil_mens_sidene_leser_gir_503` låser nå også `SqliteOversiktsleser.oversikt`, fordi oversikten ikke kaller `SqliteKurslager.serie` lenger.
+- **Kontrollregning** uten kall, på to kopier av basen i scratchpad, slettet etterpå. Sidene fra main (`a9b87d5`, signalet regnet, i en egen worktree) mot sidene fra grenen (vurderingen lest) for 02.10. 15 av 15 like i styrke, 15 av 15 i retning, og 15 av 15 i sjekkene med navn, fortegn og «målt mot».
+- **Tester:** før 1085 passed og 16 skipped lokalt. Etter porten 1100, etter oversikten 1121 og etter aksjedetaljen 1129 passed og 16 skipped. 44 flere testkjøringer, talt med `--collect-only` per fil på main og på grenen: `test_oversiktsleser.py` 0 til 15, `test_markedsoversikt.py` 38 til 50, `test_aksjedetalj.py` 24 til 27 (de 4 i `TestFinnAksje` er byttet med 2 for `normaliser_symbol`) og `test_app.py` 65 til 79.
+- **Mutantene**, én om gangen, hele `tests/` hver gang, satt tilbake fra en kopi i scratchpad med sha256 sjekket:
+
+| Mutant | Feilet | Testen som fanget den |
+|---|---:|---|
+| M1 siden regner signalet når raden mangler (`vurder` i ruta) | 1 | `test_ikke_vurdert_med_fotnoten` (oversikten) |
+| M2 raden leses for nyeste dato i `vurdering`, ikke for nyeste kursdato | 3 | `test_gaarsdagens_vurdering_naar_dagens_rad_har_grunn` i begge filene, `test_ingen_rad_gir_none` |
+| M3 forrige kurs blir lik nyeste (`<=`) | 2 | `test_nyeste_og_forrige_kurs_og_hentet`, `test_en_kurs_gir_ingen_forrige` |
+| M4 lista over aksjer som mangler, fra `AKSJEUNIVERS` | 2 | `test_selskapene_og_lista_over_manglende_kommer_fra_aksje`, `test_app_har_ingen_sql_og_regner_ikke_signalet` |
+| M5 en rad med grunn vises som styrke 0 | 9 | `test_rad_med_grunn_viser_grunnen_ikke_styrke_0` (alle tre grunnene) og seks til |
+| M6 styrke 0 vises som «–» (`{% if rad.styrke %}`) | 1 | `test_styrke_0_vises_som_0` |
+| M7 aksjedetaljen forklarer med et signal regnet av serien | 2 | `test_sjekkene_og_maalingene_fra_raden_ikke_fra_serien`, `test_sjekkene_fra_raden_ikke_fra_kursene` |
+| M8 aksjedetaljen slår opp i `AKSJEUNIVERS` | 2 | `test_aksjen_slaas_opp_i_basen`, `test_app_har_ingen_sql_og_regner_ikke_signalet` |
+| M9 `UtenforKalenderen` fanges ikke for seg | 1 | `test_utenfor_boerskalenderen_gir_tekst_ikke_feil` |
+| M10 spørringen i `app.py` | 1 | `test_app_har_ingen_sql_og_regner_ikke_signalet` |
+| M11 rader uten vurdering sorteres som styrke 0 | 1 | `test_rad_uten_vurdering_staar_bak_styrke_0` |
 
 ## Spec Change Log
 
