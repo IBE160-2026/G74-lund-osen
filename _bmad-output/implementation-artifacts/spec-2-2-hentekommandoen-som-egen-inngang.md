@@ -2,7 +2,7 @@
 title: 'Story 2.2: Hentekommandoen som egen inngang'
 type: 'feature'
 created: '2026-10-03'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '325abb202cb7bdbb0efbc90d35dd7965a706452b'
