@@ -1280,6 +1280,8 @@ Svarene på de to spørsmålene i 2.2, gitt i planen 03.10:
 
 **Avhenger av:** 2.2 og 2.5. **Én økt:** ja.
 
+*Ferdig 2026-10-04:* flettet i `ff58ecf`, PR #20.
+
 ### Story 2.3: Børsdagskontroll før kvoten brukes
 
 Som **gruppe med 20 kall i døgnet**, vil jeg at kommandoen sjekker om vi
