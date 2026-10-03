@@ -2,7 +2,7 @@
 title: 'Story 2.2b: Sidene leser dagens vurdering'
 type: 'feature'
 created: '2026-10-03'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'a9b87d591751b32b9382250cdfb0b82fc1bca3d3'
