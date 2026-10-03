@@ -2490,6 +2490,16 @@ Spørsmålet for gruppa er hva som rekker å bli bygget før fristen.
 
 ---
 
+## 03.10.2026 – Begge mulighetene
+
+*Ført av Marian, kl. 18:10. Rådet har bare rettet skrivefeil.*
+
+Vi ønsker å ha begge mulighetene. Det viser også at vi har tatt høyde for å vise fram appen uten å risikere noe etisk med det vi har fått lov til å bruke.
+
+*Bakgrunn, skrevet av rådet:* faglærer kan prøve appen med sin egen gratisnøkkel fra EODHD, eller med en demoversjon med oppdiktede selskaper og kurser. EODHDs vilkår forbyr å dele kontoen med andre, også i en gruppe (docs/kilder-og-rettigheter.md).
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
