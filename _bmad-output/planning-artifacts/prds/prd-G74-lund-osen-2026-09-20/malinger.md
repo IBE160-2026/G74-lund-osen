@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-03T13:46
+updated: 2026-10-03T13:47
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -1262,6 +1262,8 @@ pressemelding, ikke hentet av programmet. De 7 andre måles senere: Vend
 Marketplaces, Höegh Autoliners, Nordic Semiconductor, Norwegian Air Shuttle,
 TGS, Tomra og BlueNord. Vend heter Schibsted til 2025, så tickeren hos EODHD
 slås opp før den måles.
+
+*Rettet 2026-10-03:* sammensetningen ble satt sammen av rådet fra flere offentlige kilder, ikke lest som én liste i pressemeldingen. Kongsberg Maritime er utledet av utskillelsen fra Kongsberg Gruppen i april 2026, ikke lest direkte. Av de 15 er alle unntatt DNO og MPCC i OBX.
 
 **Kostnad.** 5 kall, tatt av dagskvoten 02.10 etter den daglige hentingen på
 15. `apiRequests` gikk fra 15 til 20, og `extraLimit` sto på 463 før og etter.
