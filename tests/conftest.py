@@ -1,7 +1,12 @@
 """Felles oppsett for alle tester.
 
-Sperrer utgaaende nettverk under hele testkjoeringen, og peker stiene til
+Sperrer utgaaende nettverk inne i hver test, og peker stiene til
 data/raa/ og data/db/ mot tmp_path (story 2.1b, nederst).
+
+Rettet 2026-10-03 (D10 i kontrollen 26.09): her sto "under hele
+testkjoeringen". Sperren er en autouse-fixture med funksjonsscope, saa den
+gjelder inne i testfunksjonene, ikke i fixturer med module-scope eller under
+innsamlingen. Story 4.0 utvider den til hele testkjoeringen.
 
 Grunnen er konkret, ikke prinsipiell: EODHD-kvoten er 20 kall i doegnet. En
 test som ved et uhell kaller et ekte endepunkt, kan spise en dags maaling -
