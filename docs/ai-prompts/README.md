@@ -53,6 +53,10 @@ Formatet:
   instruksjonene fra 21.–24.09 som hentes inn i story 9.2, gjelder lesingen
   før commit som før.
 - Dagsfilene har frontmatter, som andre dokumenter under `docs/` (regel 4).
+  *Rettet 2026-10-03 (kontrollen 26.09, D8):* ikke alle har det. 7 av 25 sporede
+  .md-filer under `docs/` har ingen frontmatter: denne README-en,
+  `prompt-log-template.md`, `docs/reflection-log.md` og de fire utkastene i
+  `product-brief/`. Regel 4 krever frontmatter for nye dokumenter.
 - Filnavnkonvensjonen under gjelder andre prompts og samtaler, ikke disse.
 
 ## Arbeidsmønsteret

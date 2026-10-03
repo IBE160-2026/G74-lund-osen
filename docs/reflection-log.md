@@ -2494,6 +2494,8 @@ Spørsmålet for gruppa er hva som rekker å bli bygget før fristen.
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
 
+*Rettet 2026-10-03 (kontrollen 26.09, D3):* seksjonen er ikke tom lenger. Joakim førte den første oppføringen 25.09, «Samarbeidet så langt», i `b4cb9f2` (regel 20 i `CLAUDE.md`). Avsnittet under beskriver loggen slik den var før det.
+
 **Hvorfor den finnes.** Oppføringene over er ført av Marian eller av en
 KI-økt. Joakim har bidratt med ideer som har formet prosjektet — men det har
 skjedd utenfor de øktene som ble loggført, og derfor finnes bidragene ikke i

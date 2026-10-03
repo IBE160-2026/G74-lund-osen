@@ -23,7 +23,8 @@ et sitat som ikke fantes».
    Unntak: rå kildedata (regel 16) fjernes fra linjen der de står, linjen merkes
    `[raadata fjernet <dato>]`, og en ny linje nederst sier hvorfor. Brukt i
    `0ccb415`. Nye oppføringer i `docs/reflection-log.md` skrives over «# Joakims
-   oppføringer», ikke nederst i fila. `_bmad/scripts/memlog.py` skriver hele
+   oppføringer», ikke nederst i fila. Joakims egne oppføringer står under
+   «# Joakims oppføringer» (rettet 2026-10-03, D4 i kontrollen 26.09). `_bmad/scripts/memlog.py` skriver hele
    frontmatteren på nytt og tåler bare linjer på formen `nøkkel: verdi`.
    PRD-memloggen har kommentarlinjer i frontmatteren som skriptet fjerner eller
    endrer, så der legges nye linjer til direkte, nederst i fila.
