@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-10-03T17:12'
+updated: '2026-10-03T18:14'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -221,6 +221,7 @@ manglet i grafen.
 - **Binds:** FR-401, FR-408, FR-409
 - **Prevents:** at kvoten brennes av at noen starter containeren. En container startes på nytt hver gang, så «ved oppstart» betyr noe helt annet i Docker enn i en applikasjon som starter én gang. To `docker run` samme dag = 30 kall mot en grense på 20
 - **Rule:** `docker run` starter Flask og koster **null** API-kall, alltid. Er basen tom, vises tom-tilstand med melding om hvordan man henter. Henting er en egen kommando mot samme image, altså en bevisst handling og ikke en bivirkning av at noe startet.
+- **Bygget 2026-10-03, story 2.2:** webserveren leser kursene fra basen gjennom `SqliteKurslager`. Første forespørsel i en prosess mot en gitt `BASE_STI` kjører `migrer()` én gang, gjennom `aapne_base`, under en lås, så det virker likt med `python src/app.py`, `flask run` og en WSGI-server, og ingen import av `app` rører basen. Hver forespørsel åpner sin egen tilkobling med `aapne_base(..., kjoer_migrasjoner=False)`, som bruker `mode=rw` og ikke lager en fil som mangler, og lukker den i `teardown_appcontext`. Ventetiden på en lås er 5 sekunder (`VENTETID_SEKUNDER`). Kan basen ikke åpnes, svarer sidene 503 med grunnen. Den tomme siden viser kommandoen fra `HENTEKOMMANDO`, og en test krever den samme i README. `app.py` importerer verken `fetch_prices`, `requests`, `eodhd` eller `lagring_fil`, og en test viser null nettkall med tom base. Hvert kontrollpunkt er prøvd med en mutant (spesifikasjonen, Verification).
 
 ### AD-11 — To volumer
 

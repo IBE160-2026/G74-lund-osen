@@ -89,15 +89,16 @@ Innlesingen skriver bare kursene, aldri en vurdering, og leser ingen nøkkel.
 Øyeblikksbilder fra før 2.1b (`data/kurser-raa-*.json`) flyttes til `data/raa/`;
 målingsfilene blir liggende i `data/`.
 
-Applikasjonen leser bare øyeblikksbildene i `data/raa/` og gjør aldri API-kall selv, så en
-nettleseroppdatering kan ikke bruke av kvoten. `fetch_prices.py` er det eneste
+Applikasjonen leser kursene fra basen `data/db/ose.db` og gjør aldri API-kall selv, så en
+nettleseroppdatering kan ikke bruke av kvoten. Første forespørsel kjører migrasjonene én
+gang, og hver forespørsel åpner sin egen tilkobling til basen. `fetch_prices.py` er det eneste
 stedet i prosjektet som bruker kvote: 15 kall av de 20 EODHDs gratisnivå gir i
 døgnet, altså én full henting per dag. Finnes dagens øyeblikksbilde fra før,
 stopper den før første kall, så en kjøring nummer to samme dag bruker ingen kall
 og skriver ikke over fila.
 
 Hopper du over hentesteget, starter applikasjonen likevel — med tom oversikt og
-beskjed om at det ikke finnes kursdata. Testene under krever verken nøkkel eller data.
+beskjed om at basen ikke har kurser ennå, med kommandoen som henter dem. Testene under krever verken nøkkel eller data.
 
 ## Tester
 

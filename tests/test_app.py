@@ -5,22 +5,26 @@ derfor sitt eget oeyeblikksbilde i stedet for aa lese fra katalogen. Det er en
 ekte SnapshotKilde med EODHDs feltnavn, saa appen proeves gjennom den samme
 oversettelsen til Kursrad (SnapshotLeser) som i drift. Testene av
 tidsstemplene monterer i stedet et MinneKurslager bak hent_leser, fordi et
-oeyeblikksbilde har samme tid for alle symbolene. Unntakene er TestHentLeser
-og test_rutene_gjoer_ingen_nettverkskall, som leser en tmp_path-katalog
-gjennom lagring_fil, aldri data/.
+oeyeblikksbilde har samme tid for alle symbolene. Unntakene er TestHentLeser,
+test_rutene_gjoer_ingen_nettverkskall og TestBasenIWebserveren, som leser en
+base i tmp_path (BASE_STI, pekt dit av conftest.py) gjennom den ekte
+hent_leser, aldri data/ (story 2.2).
 """
 
 import json
 import re
 from datetime import date, datetime, timedelta, timezone
 from html.parser import HTMLParser
+from pathlib import Path
 
 import pytest
 
 import app as app_modul
 import lagring_fil
+import lagring_sqlite
 from kursdata import Kursleser, Kursrad, MinneKurslager
 from lagring_fil import SnapshotKilde, SnapshotLeser
+from lagring_sqlite import SqliteKurslager, aapne_base
 
 HENTET = "2026-09-21T15:40:00+00:00"
 
@@ -83,13 +87,29 @@ def monter_lager(monkeypatch, tider: dict[str, datetime]):
     monkeypatch.setattr(app_modul, "hent_leser", lambda: lager)
 
 
+def fyll_basen(serier: dict[str, list[Kursrad]], hentet: str = HENTET) -> None:
+    """Seriene inn i basen i BASE_STI, som conftest.py peker mot tmp_path."""
+    tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+    try:
+        lager = SqliteKurslager(tilkobling)
+        for symbol, rader in serier.items():
+            lager.erstatt_serie(symbol, rader, datetime.fromisoformat(hentet))
+    finally:
+        tilkobling.close()
+
+
+TOM_TILSTAND = "Ingen kurser i basen ennå"
+
+
 def test_uten_kilde_viser_beskjed_i_stedet_for_aa_feile(klient, monkeypatch):
     monter(monkeypatch, None)
 
     svar = klient.get("/")
 
     assert svar.status_code == 200
-    assert "Ingen kursdata" in svar.data.decode("utf-8")
+    html = svar.data.decode("utf-8")
+    assert TOM_TILSTAND in html
+    assert app_modul.HENTEKOMMANDO in html
 
 
 def test_tom_kilde_gir_ogsaa_beskjed(klient, monkeypatch):
@@ -98,7 +118,7 @@ def test_tom_kilde_gir_ogsaa_beskjed(klient, monkeypatch):
     svar = klient.get("/")
 
     assert svar.status_code == 200
-    assert "Ingen kursdata" in svar.data.decode("utf-8")
+    assert TOM_TILSTAND in svar.data.decode("utf-8")
 
 
 def test_viser_selskapsnavn_og_de_fem_kolonnene(klient, monkeypatch):
@@ -173,7 +193,7 @@ def test_uleselig_hentet_gjoer_hele_oeyeblikksbildet_manglende(klient, monkeypat
     html = klient.get("/").data.decode("utf-8")
 
     assert 'href="/aksje/EQNR"' not in html
-    assert "Ingen kursdata" in html
+    assert TOM_TILSTAND in html
     assert "data hentet" not in html
     assert klient.get("/aksje/EQNR").status_code == 404
 
@@ -286,9 +306,9 @@ def test_rutene_gjoer_ingen_nettverkskall(klient, monkeypatch, tmp_path):
 
     Het foer test_ruta_gjoer_ingen_nettverkskall. Den monterte hent_leser, saa
     lesingen ble aldri kjoert, og bare / ble proevd. Her monteres ingenting:
-    RAA_KATALOG pekes mot tmp_path med en fil, og begge rutene leser den
-    gjennom den ekte hent_leser. requests.get byttes ut foer kallene, og
-    sperren i conftest.py staar i tillegg.
+    basen i BASE_STI (tmp_path) har en serie, og begge rutene leser den
+    gjennom den ekte hent_leser (story 2.2). requests.get byttes ut foer
+    kallene, og sperren i conftest.py staar i tillegg.
     """
     import requests
 
@@ -296,13 +316,7 @@ def test_rutene_gjoer_ingen_nettverkskall(klient, monkeypatch, tmp_path):
         raise AssertionError("Visningen skal aldri gjoere API-kall")
 
     monkeypatch.setattr(requests, "get", eksploder)
-    (tmp_path / "kurser-raa-2026-09-21.json").write_text(
-        json.dumps(
-            {"hentet": HENTET, "serier": {"EQNR": [eodhd(r) for r in serie([100.0] * 60 + [101.0])]}}
-        ),
-        encoding="utf-8",
-    )
-    monkeypatch.setattr(lagring_fil, "RAA_KATALOG", tmp_path)
+    fyll_basen({"EQNR": serie([100.0] * 60 + [101.0])})
 
     oversikt = klient.get("/")
     assert oversikt.status_code == 200
@@ -416,27 +430,197 @@ class TestAksjedetalj:
 
 
 class TestHentLeser:
-    """hent_leser uten montering: Kursleseren kommer fra filadapteren (1.5).
+    """hent_leser uten montering: Kursleseren er SqliteKurslager paa
+    forespoerselens tilkobling (story 2.2). BASE_STI peker mot tmp_path."""
 
-    RAA_KATALOG i lagring_fil pekes mot tmp_path, saa data/ ikke roeres.
-    """
+    @staticmethod
+    def _i_en_forespoersel():
+        with app_modul.app.test_request_context("/"):
+            app_modul.app.preprocess_request()
+            try:
+                leser = app_modul.hent_leser()
+                serie_lengde = len(leser.serie("EQNR")) if leser is not None else None
+                return leser, serie_lengde
+            finally:
+                app_modul.app.do_teardown_appcontext()
 
-    def test_gir_kursleser_fra_en_katalog_med_en_fil(self, monkeypatch, tmp_path):
+    def test_gir_kursleser_fra_basen_med_en_serie(self):
+        fyll_basen({"EQNR": serie([100.0])})
+
+        leser, lengde = self._i_en_forespoersel()
+
+        assert isinstance(leser, SqliteKurslager)
+        assert isinstance(leser, Kursleser)
+        assert lengde == 1
+
+    def test_gir_none_fra_en_tom_base(self):
+        assert self._i_en_forespoersel() == (None, None)
+
+
+class TestBasenIWebserveren:
+    """Story 2.2: webserveren leser kursene fra basen, migrerer en gang per
+    prosess og base, og aapner en tilkobling per forespoersel."""
+
+    def test_sidene_leser_basen_ikke_oeyeblikksbildet(self, klient, monkeypatch, tmp_path):
+        """K5. Ville feilet hvis sidene fortsatt leste data/raa/ (M5)."""
+        fyll_basen({"EQNR": serie([100.0] * 60 + [101.0])})
         (tmp_path / "kurser-raa-2026-09-21.json").write_text(
-            json.dumps({"hentet": HENTET, "serier": {"EQNR": [eodhd(r) for r in serie([100.0])]}}),
+            json.dumps(
+                {"hentet": HENTET, "serier": {"EQNR": [eodhd(r) for r in serie([200.0] * 60 + [202.0])]}}
+            ),
             encoding="utf-8",
         )
         monkeypatch.setattr(lagring_fil, "RAA_KATALOG", tmp_path)
 
-        leser = app_modul.hent_leser()
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
 
-        assert isinstance(leser, Kursleser)
-        assert len(leser.serie("EQNR")) == 1
+        assert '<span class="verdi">101,00</span>' in html
+        assert "202,00" not in html
 
-    def test_gir_none_fra_en_tom_katalog(self, monkeypatch, tmp_path):
-        monkeypatch.setattr(lagring_fil, "RAA_KATALOG", tmp_path)
+    def test_tom_base_gir_tom_tilstand_med_kommandoen(self, klient):
+        """K2 og K8. Basen finnes, men har ingen serie. Ville feilet med en
+        feilside (M6) eller den gamle meldingen om data/ (M8)."""
+        aapne_base(lagring_sqlite.BASE_STI).close()
 
-        assert app_modul.hent_leser() is None
+        svar = klient.get("/")
+
+        html = svar.data.decode("utf-8")
+        assert svar.status_code == 200
+        assert TOM_TILSTAND in html
+        assert f"<code>{app_modul.HENTEKOMMANDO}</code>" in html
+        assert "data/</code>" not in html
+        assert "Ingen kursdata" not in html
+
+    def test_basefil_som_mangler_lages_av_foerste_forespoersel(self, klient):
+        """Matrisen: foerste forespoersel migrerer og lager en tom base, som
+        hentingen gjoer. Siden viser tom tilstand, ikke en feil."""
+        assert not lagring_sqlite.BASE_STI.exists()
+
+        svar = klient.get("/")
+
+        assert svar.status_code == 200
+        assert TOM_TILSTAND in svar.data.decode("utf-8")
+        assert lagring_sqlite.BASE_STI.is_file()
+
+    def test_kommandoen_paa_den_tomme_siden_staar_i_readme(self):
+        """Story 3.3: den tomme siden og README viser samme kommando, fra
+        konstanten. Ville feilet hvis malen hadde sin egen kommando (M12)."""
+        readme = (Path(__file__).resolve().parent.parent / "README.md").read_text(encoding="utf-8")
+        mal = (Path(app_modul.__file__).parent / "templates" / "index.html").read_text(encoding="utf-8")
+
+        assert app_modul.HENTEKOMMANDO in readme
+        assert "{{ hentekommando }}" in mal
+        assert "fetch_prices" not in mal
+
+    def test_migrer_kjoeres_en_gang_for_to_forespoersler(self, klient, monkeypatch):
+        """K6. Ville feilet hvis migrer() ble kjoert ved hver forespoersel,
+        fordi den alltid tar skrivelaas (M2)."""
+        kall = []
+        ekte = lagring_sqlite.migrer
+
+        def spion(tilkobling, katalog):
+            kall.append(katalog)
+            return ekte(tilkobling, katalog)
+
+        monkeypatch.setattr(lagring_sqlite, "migrer", spion)
+        fyll_basen({"EQNR": serie([100.0] * 60 + [101.0])})
+        kall.clear()
+
+        assert klient.get("/").status_code == 200
+        assert klient.get("/aksje/EQNR").status_code == 200
+
+        assert len(kall) == 1
+
+    def test_tilkoblingen_lukkes_etter_forespoerselen(self, klient, monkeypatch):
+        """K7. Ville feilet hvis tilkoblingen ble staaende aapen (M3)."""
+        aapnet = []
+        ekte = app_modul.aapne_base
+
+        def spion(sti, **navngitt):
+            tilkobling = ekte(sti, **navngitt)
+            if navngitt.get("kjoer_migrasjoner") is False:
+                aapnet.append(tilkobling)
+            return tilkobling
+
+        monkeypatch.setattr(app_modul, "aapne_base", spion)
+        fyll_basen({"EQNR": serie([100.0] * 60 + [101.0])})
+
+        assert klient.get("/").status_code == 200
+        assert klient.get("/aksje/EQNR").status_code == 200
+
+        assert len(aapnet) == 2
+        for tilkobling in aapnet:
+            with pytest.raises(Exception, match="closed"):
+                tilkobling.execute("SELECT 1")
+
+    def test_en_forespoersel_i_en_annen_traad_faar_egen_tilkobling(self, klient):
+        """K7 og forutsetningen i storyen: sqlite3 kan ikke dele en
+        tilkobling mellom traader. Ville feilet hvis tilkoblingen laa paa
+        modulnivaa (M4)."""
+        import threading
+
+        fyll_basen({"EQNR": serie([100.0] * 60 + [101.0])})
+        assert klient.get("/").status_code == 200
+        svar = []
+        traad = threading.Thread(target=lambda: svar.append(klient.get("/aksje/EQNR").status_code))
+        traad.start()
+        traad.join()
+
+        assert svar == [200]
+
+    def test_basen_nyere_enn_koden_gir_503_med_grunnen(self, klient, tmp_path):
+        """Matrisen: migreringen feiler. Siden svarer 503 med en beskjed, ikke
+        en traceback. Ville feilet hvis feilen ble 500 (M10)."""
+        import sqlite3
+
+        katalog = tmp_path / "nyere"
+        katalog.mkdir()
+        for migrasjon in lagring_sqlite.MIGRASJONSKATALOG.glob("*.sql"):
+            (katalog / migrasjon.name).write_bytes(migrasjon.read_bytes())
+        neste = lagring_sqlite.siste_versjon(lagring_sqlite.MIGRASJONSKATALOG) + 1
+        (katalog / f"{neste:04d}_ny.sql").write_text("CREATE TABLE ny (x INTEGER);", encoding="utf-8")
+        lagring_sqlite.BASE_STI.parent.mkdir(parents=True, exist_ok=True)
+        tilkobling = sqlite3.connect(lagring_sqlite.BASE_STI)
+        lagring_sqlite.migrer(tilkobling, katalog)
+        tilkobling.close()
+
+        for rute in ("/", "/aksje/EQNR"):
+            svar = klient.get(rute)
+            html = svar.data.decode("utf-8")
+            assert svar.status_code == 503, rute
+            assert "kan ikke åpnes" in html
+            assert "MigrasjonsFeil" in html
+            assert "Traceback" not in html
+
+    def test_oppstart_med_tom_base_gjoer_ingen_nettkall(self, klient, monkeypatch):
+        """K1 og FR-401: foerste forespoersel, som migrerer, og sidene gjoer
+        null nettkall, ogsaa med tom base. Ville feilet hvis oppstarten hentet
+        (M1)."""
+        import requests
+
+        def eksploder(*_args, **_kwargs):
+            raise AssertionError("Webserveren skal aldri gjoere nettkall")
+
+        monkeypatch.setattr(requests, "get", eksploder)
+        monkeypatch.setattr(requests, "request", eksploder)
+
+        assert klient.get("/").status_code == 200
+        assert klient.get("/aksje/EQNR").status_code == 404
+
+    def test_import_av_app_roerer_ikke_basen(self):
+        """Tillegget 18:05: ingen import av app kjoerer migrasjoner. En
+        reload med en spion paa aapne_base gir null kall, og ingen fil."""
+        import importlib
+
+        kall = []
+        try:
+            with pytest.MonkeyPatch.context() as mp:
+                mp.setattr(lagring_sqlite, "aapne_base", lambda *a, **k: kall.append(a))
+                importlib.reload(app_modul)
+                assert kall == []
+                assert not lagring_sqlite.BASE_STI.exists()
+        finally:
+            importlib.reload(app_modul)
 
 
 # --- Story 8.0: de rene feilene i de to skjermbildene -------------------------

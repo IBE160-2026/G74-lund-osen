@@ -155,6 +155,13 @@ def test_app_velger_ikke_oeyeblikksbilde_selv():
     assert _navn_i(_tre("app.py")) & forbudt == set()
 
 
+def test_webserveren_importerer_ikke_hentingen():
+    """Story 2.2, AD-2 og AD-10: app.py er sin egen inngang og kjenner verken
+    hentekommandoen, nettet eller filadapteren. Sidene leser basen."""
+    forbudt = {"fetch_prices", "requests", "eodhd", "lagring_fil"}
+    assert _importerte_moduler(_tre("app.py")) & forbudt == set()
+
+
 def _connect_kall(tre: ast.Module) -> list[str]:
     """Funksjonene som kaller connect paa sqlite3, eller importerer connect
     fra sqlite3. "<modul>" for kall utenfor en funksjon."""

@@ -603,6 +603,23 @@ class TestMaskinensSoneSpillerIngenRolle:
         assert list(tmp_path.iterdir()) == []
 
 
+def test_noekkelen_leses_fra_miljoeet_uten_env_fil(tmp_path, monkeypatch):
+    """Story 2.2 og AD-12: i en container finnes ingen .env, og nøkkelen
+    kommer fra miljøet. Ville feilet hvis den bare ble lest fra fila (M9)."""
+    monkeypatch.setattr(fp, "PROSJEKTROT", tmp_path)
+    monkeypatch.setenv("EODHD_API_KEY", NOEKKEL)
+
+    assert fp.hent_api_nokkel() == NOEKKEL
+
+
+def test_uten_noekkel_i_miljoeet_og_uten_env_stopper_hentingen(tmp_path, monkeypatch):
+    monkeypatch.setattr(fp, "PROSJEKTROT", tmp_path)
+    monkeypatch.delenv("EODHD_API_KEY", raising=False)
+
+    with pytest.raises(SystemExit):
+        fp.hent_api_nokkel()
+
+
 def test_naa_gir_utc_med_offset_null():
     tid = fp.naa()
 

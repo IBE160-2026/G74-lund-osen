@@ -1,24 +1,37 @@
 """Markedsoversikten for OSE Signal.
 
-Leser kun fra data/raa/. Denne filen gjoer aldri API-kall, saa en
-nettleseroppdatering kan ikke bruke av kvoten. Nye kurser hentes ved
-aa kjoere fetch_prices.py.
+Leser kursene fra basen i data/db/ose.db (story 2.2). Denne filen gjoer
+aldri API-kall, saa en nettleseroppdatering kan ikke bruke av kvoten. Nye
+kurser hentes med hentekommandoen, den andre inngangen mot samme kodebase:
+HENTEKOMMANDO under (FR-401, AD-10).
 
 Alt av regning ligger i markedsoversikt.py og aksjedetalj.py, og de leser
-Kursrad gjennom Kursleser (AD-3, AD-19). Denne fila henter en Kursleser fra
-filadapteren (lagring_fil.nyeste_leser) og sender resultatet til malen. Hvilket
-oeyeblikksbilde som leses, avgjoeres der, ikke her (story 1.5).
+Kursrad gjennom Kursleser (AD-3, AD-19). Denne fila gir dem SqliteKurslager
+paa forespoerselens tilkobling og sender resultatet til malen.
 Tidsstemplene er sist_hentet per symbol fra Kursleser, i UTC, og blir norsk
 tid foerst i malen (filteret norsk_tid, AD-20). Sidens tidsstempel er det
 eldste blant radene som vises (story 1.4c).
+
+Basen (story 2.2): foerste forespoersel i en prosess mot en gitt BASE_STI
+kjoerer migrer() en gang, gjennom aapne_base, under en laas. Det virker likt
+med python src/app.py, flask run og en WSGI-server, og ingen import av
+modulen roerer basen. Hver forespoersel aapner sin egen tilkobling uten
+migrering og lukker den naar forespoerselen er ferdig, fordi en
+sqlite3-tilkobling ikke kan deles mellom traadene Flask kjoerer forespoerslene
+i. Kan basen ikke aapnes, svarer siden 503 med grunnen.
 """
 
-from flask import Flask, abort, render_template
+import sqlite3
+import threading
+from pathlib import Path
 
+from flask import Flask, abort, g, render_template
+
+import lagring_sqlite
 from aksjedetalj import bygg_detalj, finn_aksje
 from graf import bygg_graf
 from kursdata import AKSJEUNIVERS, Kursleser
-from lagring_fil import nyeste_leser
+from lagring_sqlite import SqliteKurslager, aapne_base, har_kurser
 from markedsoversikt import (
     bygg_oversikt,
     eldre_enn_nyeste,
@@ -26,30 +39,98 @@ from markedsoversikt import (
     sidens_dato,
     sidens_tidsstempel,
 )
+from migrering import MigrasjonsFeil
 from tallformat import tall
+
+# Kommandoen den tomme siden ber brukeren kjoere. Den staar ogsaa i README, og
+# en test krever at de to er like (story 3.3). Kommer kommandoen for Docker i
+# 3.1, endres bare denne og README.
+HENTEKOMMANDO = "uv run python src/fetch_prices.py"
+
+# Feil som betyr at basen ikke kan aapnes eller migreres, som BASEFEIL i
+# hentingen. Siden svarer da 503 med grunnen i stedet for en traceback.
+BASEFEIL = (sqlite3.Error, OSError, MigrasjonsFeil, RuntimeError)
 
 app = Flask(__name__)
 app.jinja_env.filters["norsk_tid"] = norsk_tid
 # Regel 21: tallene formateres ett sted, ikke med "%.2f" i malene (story 8.0).
 app.jinja_env.filters["tall"] = tall
 
+_migrerte: set[Path] = set()
+_migrerings_laas = threading.Lock()
+
+
+def _migrer_en_gang(sti: Path) -> None:
+    """migrer() en gang per prosess og per base, gjennom aapne_base.
+
+    Lager basen hvis den mangler, som hentingen gjoer. Feiler det, blir ikke
+    stien merket, saa neste forespoersel proever igjen.
+    """
+    with _migrerings_laas:
+        if sti in _migrerte:
+            return
+        aapne_base(sti).close()
+        _migrerte.add(sti)
+
+
+@app.before_request
+def _aapne_basen() -> None:
+    """Migrer en gang, og aapne forespoerselens egen tilkobling."""
+    sti = Path(lagring_sqlite.BASE_STI).resolve()
+    g.tilkobling = None
+    g.basefeil = None
+    try:
+        _migrer_en_gang(sti)
+        g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False)
+    except BASEFEIL as feil:
+        g.basefeil = f"{type(feil).__name__}: {feil}"
+
+
+@app.teardown_appcontext
+def _lukk_basen(_unntak) -> None:
+    tilkobling = g.pop("tilkobling", None)
+    if tilkobling is not None:
+        tilkobling.close()
+
+
+def _basen_kan_ikke_aapnes():
+    return (
+        render_template(
+            "basefeil.html", feil=g.basefeil, base=Path(lagring_sqlite.BASE_STI).name
+        ),
+        503,
+    )
+
 
 def hent_leser() -> Kursleser | None:
-    """Kursleseren sidene leser gjennom, eller None hvis ingen data finnes.
+    """Kursleseren sidene leser gjennom, eller None hvis basen ikke har en
+    eneste serie (story 2.2).
 
-    Kursleseren kommer fra filadapteren. Egen funksjon, saa en test kan
-    montere en hvilken som helst Kursleser, for eksempel et MinneKurslager
-    med ulike tider per symbol.
+    Egen funksjon, saa en test kan montere en hvilken som helst Kursleser,
+    for eksempel et MinneKurslager med ulike tider per symbol.
     """
-    return nyeste_leser()
+    tilkobling = g.get("tilkobling")
+    if tilkobling is None:
+        return None
+    if not har_kurser(tilkobling):
+        return None
+    return SqliteKurslager(tilkobling)
 
 
 @app.route("/")
 def markedsoversikt():
+    if g.get("basefeil"):
+        return _basen_kan_ikke_aapnes()
     leser = hent_leser()
     if leser is None:
         return render_template(
-            "index.html", rader=[], dato=None, hentet=None, mangler=[], eget=set()
+            "index.html",
+            rader=[],
+            dato=None,
+            hentet=None,
+            mangler=[],
+            eget=set(),
+            hentekommando=HENTEKOMMANDO,
         )
 
     rader = bygg_oversikt(leser)
@@ -63,6 +144,7 @@ def markedsoversikt():
         hentet=sidens_tidsstempel(rader),
         eget=eldre_enn_nyeste(rader),
         mangler=mangler,
+        hentekommando=HENTEKOMMANDO,
     )
 
 
@@ -74,6 +156,8 @@ def aksjedetalj(symbol: str):
     tillatelse innen fristen, saa plan B gjelder fra 28.09 (Epic 10 i
     epics.md). KI-forklaringen av signalet kommer med Epic 10.
     """
+    if g.get("basefeil"):
+        return _basen_kan_ikke_aapnes()
     aksje = finn_aksje(symbol, AKSJEUNIVERS)
     if aksje is None:
         abort(404)

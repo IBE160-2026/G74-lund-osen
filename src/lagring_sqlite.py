@@ -36,26 +36,53 @@ MIGRASJONSKATALOG = Path(__file__).resolve().parent / "migrasjoner"
 # lagring_fil.RAA_KATALOG). Ingen annen kode skriver stiene.
 BASE_STI = DATA_KATALOG / "db" / "ose.db"
 
+# Hvor lenge en tilkobling venter paa en laas foer den gir opp (story 2.2,
+# BH7 i 2.1b). 5 sekunder er standarden i sqlite3, skrevet ut her saa den er et
+# valg og ikke en tilfeldighet. Hentingen og webserveren kan naa bruke basen
+# samtidig.
+VENTETID_SEKUNDER = 5.0
 
-def aapne_base(sti: Path) -> sqlite3.Connection:
-    """Den ene aapningen av basen - story 2.1b.
 
-    Lager mappa, kobler til og kjoerer migrer() mot MIGRASJONSKATALOG, saa
-    basen alltid staar paa siste versjon naar kalleren faar den. Feiler
-    migreringen, lukkes tilkoblingen, og feilen gaar videre. Ingen annen kode
-    i src/ kobler til basen selv.
+def aapne_base(sti: Path, *, kjoer_migrasjoner: bool = True) -> sqlite3.Connection:
+    """Den ene aapningen av basen - story 2.1b og 2.2.
 
-    Kalleren eier tilkoblingen og lukker den.
+    Med kjoer_migrasjoner (standard) lages mappa, basen kobles til og
+    migrer() kjoeres mot MIGRASJONSKATALOG, saa basen staar paa siste versjon
+    naar kalleren faar den. Det gjoer hentingen, og webserveren gjoer det en
+    gang per prosess (story 2.2).
+
+    Uten kjoer_migrasjoner aapnes en base som finnes, med mode=rw: en fil som
+    mangler, gir sqlite3.OperationalError i stedet for en ny, tom fil, og ingen
+    mappe lages. Det bruker webserveren for hver forespoersel, fordi migrer()
+    alltid tar skrivelaas. Versjonen kontrolleres av adapterne
+    (_krev_siste_versjon).
+
+    Feiler migreringen, lukkes tilkoblingen, og feilen gaar videre. Ingen
+    annen kode i src/ kobler til basen selv. Kalleren eier tilkoblingen og
+    lukker den.
     """
     sti = Path(sti)
+    if not kjoer_migrasjoner:
+        return sqlite3.connect(
+            sti.resolve().as_uri() + "?mode=rw", uri=True, timeout=VENTETID_SEKUNDER
+        )
     sti.parent.mkdir(parents=True, exist_ok=True)
-    tilkobling = sqlite3.connect(sti)
+    tilkobling = sqlite3.connect(sti, timeout=VENTETID_SEKUNDER)
     try:
         migrer(tilkobling, MIGRASJONSKATALOG)
     except BaseException:
         tilkobling.close()
         raise
     return tilkobling
+
+
+def har_kurser(tilkobling: sqlite3.Connection) -> bool:
+    """Om basen har minst en serie i kursserie - story 2.2.
+
+    Webserveren viser den tomme tilstanden naar svaret er nei, i stedet for
+    en oversikt uten rader.
+    """
+    return tilkobling.execute("SELECT 1 FROM kursserie LIMIT 1").fetchone() is not None
 
 
 def _krev_siste_versjon(tilkobling: sqlite3.Connection) -> None:

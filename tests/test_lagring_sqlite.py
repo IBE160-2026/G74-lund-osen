@@ -346,6 +346,50 @@ class TestAapneBase:
             aapne_base(sti)
 
 
+class TestAapneBaseUtenMigrering:
+    """Story 2.2: webserveren aapner basen uten migrering for hver
+    forespoersel, og begge veiene venter 5 sekunder paa en laas."""
+
+    def test_en_base_som_mangler_lages_ikke(self, tmp_path):
+        """Ville feilet hvis mode=rw ble fjernet: da lager sqlite3 en tom fil
+        (M7)."""
+        sti = tmp_path / "db" / "ose.db"
+
+        with pytest.raises(sqlite3.OperationalError):
+            aapne_base(sti, kjoer_migrasjoner=False)
+
+        assert not sti.exists()
+        assert not sti.parent.exists()
+
+    def test_en_base_som_finnes_aapnes_uten_migrering(self, tmp_path, monkeypatch):
+        sti = tmp_path / "db" / "ose.db"
+        aapne_base(sti).close()
+        kall = []
+        monkeypatch.setattr(lagring_sqlite, "migrer", lambda *a: kall.append(a))
+
+        tilkobling = aapne_base(sti, kjoer_migrasjoner=False)
+        try:
+            assert versjon(tilkobling) == siste_versjon(MIGRASJONSKATALOG)
+            SqliteKurslager(tilkobling)
+        finally:
+            tilkobling.close()
+        assert kall == []
+
+    @pytest.mark.parametrize("migrering", [True, False], ids=["med", "uten"])
+    def test_ventetiden_er_fem_sekunder(self, tmp_path, migrering):
+        """BH7 fra 2.1b. Ville feilet hvis ventetiden ble tatt bort, fordi
+        standarden da ikke er et valg i koden (M11)."""
+        sti = tmp_path / "ose.db"
+        aapne_base(sti).close()
+
+        tilkobling = aapne_base(sti, kjoer_migrasjoner=migrering)
+        try:
+            assert lagring_sqlite.VENTETID_SEKUNDER == 5.0
+            assert tilkobling.execute("PRAGMA busy_timeout").fetchone()[0] == 5000
+        finally:
+            tilkobling.close()
+
+
 def test_stiene_er_data_raa_og_data_db_ose_db():
     """Story 2.1b, K1: konstantene slik de staar i koden, lest i en egen
     prosess, fordi fixturen i conftest.py peker dem mot tmp_path her."""
