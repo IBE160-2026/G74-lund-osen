@@ -1346,3 +1346,102 @@ svaret fra `/api/eod` har ingen navn. De føres når de er slått opp.
 *Rettet 2026-10-03:* navnene på de 13 siste er ført inn. Her sto «ikke slått opp». Navnene er slått opp av rådet 03.10 på offentlige kurssider, blant dem Euronext, Bloomberg, Yahoo Finance og eodhd.com.
 
 Ingen av dem er lagt i universet.
+
+---
+
+## 17. De 15 i samme vindu, og alle 40 rangert (2026-10-03)
+
+**Metode.** Som i §15 og §16: omsetning regnes som `volume × close` per
+handelsdag, og medianen tas over perioden fra 2026-07-02 til 2026-10-02. Tallene
+er regnet fra `data/raa/kurser-raa-2026-10-02.json`, kveldens henting 02.10, uten
+nye kall. Fila finnes **bare lokalt** og er ikke sporet i git. Bare tallene under
+er regnet ut og ført her.
+
+**Kostnad.** 0 kall.
+
+### De 15 i universet
+
+Alle 15 har 67 handelsdager i vinduet, fra 2026-07-02 til 2026-10-02.
+
+| Symbol | Selskap | Handelsdager | Median omsetning | Over 32 MNOK | Over 25 MNOK | §1, annet vindu |
+|---|---|---:|---:|---|---|---:|
+| EQNR | Equinor | 67 | 937,9 MNOK | Ja | Ja | 919,9 MNOK |
+| DNB | DNB Bank | 67 | 391,2 MNOK | Ja | Ja | 400,4 MNOK |
+| KOG | Kongsberg Gruppen | 67 | 363,6 MNOK | Ja | Ja | 374,7 MNOK |
+| AKRBP | Aker BP | 67 | 312,1 MNOK | Ja | Ja | 312,1 MNOK |
+| NHY | Norsk Hydro | 67 | 276,7 MNOK | Ja | Ja | 293,0 MNOK |
+| FRO | Frontline | 67 | 303,2 MNOK | Ja | Ja | 284,8 MNOK |
+| VAR | Vår Energi | 67 | 252,9 MNOK | Ja | Ja | 252,9 MNOK |
+| TEL | Telenor | 67 | 226,2 MNOK | Ja | Ja | 223,9 MNOK |
+| YAR | Yara International | 67 | 213,1 MNOK | Ja | Ja | 220,5 MNOK |
+| MOWI | Mowi | 67 | 187,5 MNOK | Ja | Ja | 182,1 MNOK |
+| ORK | Orkla | 67 | 140,3 MNOK | Ja | Ja | 140,3 MNOK |
+| SALM | SalMar | 67 | 83,3 MNOK | Ja | Ja | 81,8 MNOK |
+| GJF | Gjensidige Forsikring | 67 | 60,5 MNOK | Ja | Ja | 59,8 MNOK |
+| DNO | DNO | 67 | 40,5 MNOK | Ja | Ja | 34,7 MNOK |
+| MPCC | MPC Container Ships | 67 | 33,9 MNOK | Ja | Ja | 32,3 MNOK |
+
+§1 gjaldt et annet vindu, fra 2026-06-22 til 2026-09-18, med 65 handelsdager.
+Tallene kan derfor ikke sammenlignes én til én. AKRBP, VAR og ORK har samme
+median i begge vinduene. Vinduene overlapper i 57 handelsdager, og for AKRBP og
+ORK er medianen omsetningen samme dag i begge. For VAR er det to ulike dager med
+samme verdi, avrundet til én desimal. Regnet på samme fil gir vinduet fra §1
+919,9 MNOK for EQNR, som i §1.
+
+Alle 15 er over 32 MNOK i dette vinduet. MPCC er lavest, med 33,9 MNOK.
+
+### Alle 40, rangert
+
+De 15 fra §17, de 5 fra §15 og de 20 fra §16, alle i samme vindu. «I OBX» følger
+§15 og rettelsen der: av de 15 er alle unntatt DNO og MPCC i OBX, og 25 av de 40
+er i OBX.
+
+| # | Symbol | Selskap | Median omsetning (MNOK) | Blant de 15 | I OBX | Fra |
+|---|---|---|---:|---|---|---|
+| 1 | EQNR | Equinor | 937,9 | Ja | Ja | §17 |
+| 2 | DNB | DNB Bank | 391,2 | Ja | Ja | §17 |
+| 3 | KOG | Kongsberg Gruppen | 363,6 | Ja | Ja | §17 |
+| 4 | AKRBP | Aker BP | 312,1 | Ja | Ja | §17 |
+| 5 | FRO | Frontline | 303,2 | Ja | Ja | §17 |
+| 6 | NHY | Norsk Hydro | 276,7 | Ja | Ja | §17 |
+| 7 | VAR | Vår Energi | 252,9 | Ja | Ja | §17 |
+| 8 | TEL | Telenor | 226,2 | Ja | Ja | §17 |
+| 9 | YAR | Yara International | 213,1 | Ja | Ja | §17 |
+| 10 | MOWI | Mowi | 187,5 | Ja | Ja | §17 |
+| 11 | AKER | Aker | 150,5 | Nei | Ja | §15 |
+| 12 | ORK | Orkla | 140,3 | Ja | Ja | §17 |
+| 13 | NOD | Nordic Semiconductor | 132,5 | Nei | Ja | §16 |
+| 14 | VEND | Vend Marketplaces | 108,7 | Nei | Ja | §16 |
+| 15 | STB | Storebrand | 87,8 | Nei | Ja | §15 |
+| 16 | SUBC | Subsea 7 | 83,7 | Nei | Ja | §15 |
+| 17 | SALM | SalMar | 83,3 | Ja | Ja | §17 |
+| 18 | BNOR | BlueNord | 78,4 | Nei | Ja | §16 |
+| 19 | BWLPG | BW LPG | 70,4 | Nei | Ja | §15 |
+| 20 | NAS | Norwegian Air Shuttle | 70,2 | Nei | Ja | §16 |
+| 21 | GJF | Gjensidige Forsikring | 60,5 | Ja | Ja | §17 |
+| 22 | KMAR | Kongsberg Maritime | 58,3 | Nei | Ja | §15 |
+| 23 | HAUTO | Höegh Autoliners | 57,0 | Nei | Ja | §16 |
+| 24 | AUTO | AutoStore | 52,1 | Nei | Nei | §16 |
+| 25 | TGS | TGS | 49,7 | Nei | Ja | §16 |
+| 26 | WAWI | Wallenius Wilhelmsen | 47,6 | Nei | Nei | §16 |
+| 27 | CMBTO | CMB.TECH | 47,6 | Nei | Nei | §16 |
+| 28 | OET | Okeanis Eco Tankers | 46,1 | Nei | Nei | §16 |
+| 29 | TOM | Tomra | 45,7 | Nei | Ja | §16 |
+| 30 | DNO | DNO | 40,5 | Ja | Nei | §17 |
+| 31 | HAFNI | Hafnia | 35,0 | Nei | Nei | §16 |
+| 32 | DOFG | DOF Group | 34,0 | Nei | Nei | §16 |
+| 33 | MPCC | MPC Container Ships | 33,9 | Ja | Nei | §17 |
+| 34 | SB1NO | SpareBank 1 Sør-Norge | 31,7 | Nei | Nei | §16 |
+| 35 | PROT | Protector Forsikring | 30,7 | Nei | Nei | §16 |
+| 36 | SBNOR | Sparebanken Norge | 19,1 | Nei | Nei | §16 |
+| 37 | MING | SpareBank 1 SMN | 17,8 | Nei | Nei | §16 |
+| 38 | VEI | Veidekke | 10,0 | Nei | Nei | §16 |
+| 39 | WWI | Wilh. Wilhelmsen Holding | 8,3 | Nei | Nei | §16 |
+| 40 | SPOL | SpareBank 1 Østlandet | 5,2 | Nei | Nei | §16 |
+
+De fem sjømatselskapene i §13 (BAKKA, LSG, AUSS, GSF og SALME) er ikke med,
+fordi vinduet der er 2026-06-30 til 2026-09-30.
+
+Rangeringen endrer ikke universet. Parametrene i signalet er låst og målt på de
+15 (AD-13). Rangeringen er grunnlaget for idéen «De 15 mest omsatte» i raden
+«Flere ferdige lister og filter på signalet» i `prd.md` §8.
