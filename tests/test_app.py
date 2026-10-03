@@ -21,7 +21,7 @@ import pytest
 import app as app_modul
 import lagring_fil
 import lagring_sqlite
-from kursdata import Kursleser, Kursrad, MinneKurslager
+from kursdata import Kursleser, Kursrad
 from lagring_fil import SnapshotKilde, SnapshotLeser
 from lagring_sqlite import SqliteKurslager, aapne_base
 from signalberegning import vurder
@@ -1110,3 +1110,79 @@ class TestVurderingenPaaOversikten:
         assert "DNO" not in fotnote
         assert "MPC Container Ships" not in fotnote
         assert fotnote.count(",") == 15 - 2 - 1 - 1
+
+
+class TestVurderingenIDetaljen:
+    """Story 2.2b: aksjedetaljen tegner grafen av kurs og forklarer sjekkene
+    med maalingene i raden (FR-706). Har raden ingen vurdering, er svaret 200
+    med grafen og tilstanden (FR-204)."""
+
+    LAGRET = Vurdering(
+        styrke=3, retning="Blandet", trend=1, bevegelse=-1, interesse=-1,
+        slutt=100.0, justert_slutt=100.0, trend_avvik=0.031,
+        dagens_endring=-0.035, standardavvik=0.011, volumforhold=4.95,
+    )
+
+    def test_sjekkene_fra_raden_ikke_fra_kursene(self, klient):
+        """En flat serie ville gitt tre nuller. Ville feilet hvis detaljen
+        forklarte med et signal regnet av serien (M7)."""
+        rader = serie([100.0] * 61)
+        skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET), vurdert=False)
+        skriv_vurdering("EQNR", rader[-1].dato, self.LAGRET)
+
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+
+        assert "3 av 3" in html
+        assert "Blandet" in html
+        assert "volum 4,95 × medianen" in html
+        assert "mot MA50" in html
+
+    def test_rad_med_grunn_gir_200_med_grafen_og_grunnen(self, klient):
+        rader = serie([100.0] * 61)
+        skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET), vurdert=False)
+        skriv_vurdering("EQNR", rader[-1].dato, Grunn.KURS_IKKE_FRA_DAGEN)
+
+        svar = klient.get("/aksje/EQNR")
+        html = svar.data.decode("utf-8")
+
+        assert svar.status_code == 200
+        assert "<svg" in html
+        assert f"Ingen vurdering for {rader[-1].dato.isoformat()}: ingen kurs fra dagen." in html
+        assert "Målt mot" not in html
+
+    def test_ikke_vurdert_med_fotnoten(self, klient, monkeypatch):
+        # 60 rader slutter fredag 30.10, en boersdag.
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 59 + [110.0])}), vurdert=False)
+
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+
+        assert "ikke vurdert" in html
+        assert "hentekommandoen har ikke skrevet en vurdering" in html
+        assert "Målt mot" not in html
+
+    def test_aksjen_slaas_opp_i_basen(self, klient):
+        """Merknaden 03.10 under AD-21. Ville feilet hvis aksjedetaljen slo
+        opp i AKSJEUNIVERS (M8): da sto navnet derfra, og DNO ga ikke 404."""
+        skriv_serie("EQNR", serie([100.0] * 61), datetime.fromisoformat(HENTET))
+        tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+        try:
+            with tilkobling:
+                tilkobling.execute("UPDATE aksje SET navn = 'Navn fra basen' WHERE symbol = 'EQNR'")
+                tilkobling.execute("DELETE FROM aksje WHERE symbol = 'DNO'")
+        finally:
+            tilkobling.close()
+
+        assert "Navn fra basen" in klient.get("/aksje/eqnr").data.decode("utf-8")
+        assert klient.get("/aksje/DNO").status_code == 404
+
+
+def test_app_har_ingen_sql_og_regner_ikke_signalet():
+    """Story 2.2b: spoerringen ligger bak porten, ikke i app.py, og sidene
+    leser selskapene fra basen. Ville feilet hvis spoerringen ble flyttet inn
+    i app.py (M10), eller AKSJEUNIVERS, beregn_signal eller vurder ble tatt
+    inn igjen."""
+    kode = Path(app_modul.__file__).read_text(encoding="utf-8")
+    for ord_ in ("SELECT", "AKSJEUNIVERS", "beregn_signal", "vurder("):
+        assert ord_ not in kode, ord_
+    for navn in ("AKSJEUNIVERS", "beregn_signal", "vurder"):
+        assert not hasattr(app_modul, navn), navn

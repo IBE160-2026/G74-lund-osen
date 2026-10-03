@@ -30,10 +30,10 @@ from pathlib import Path
 from flask import Flask, abort, g, render_template, request
 
 import lagring_sqlite
-from aksjedetalj import bygg_detalj, finn_aksje
+from aksjedetalj import bygg_detalj, normaliser_symbol
 from boersdag import norsk_dato
 from graf import bygg_graf
-from kursdata import AKSJEUNIVERS, Kursleser
+from kursdata import Kursleser
 from lagring_sqlite import SqliteKurslager, SqliteOversiktsleser, aapne_base, har_kurser
 from markedsoversikt import (
     bygg_oversikt,
@@ -238,15 +238,18 @@ def aksjedetalj(symbol: str):
     """
     if g.get("basefeil"):
         return _basen_kan_ikke_aapnes()
-    aksje = finn_aksje(symbol, AKSJEUNIVERS)
-    if aksje is None:
-        abort(404)
-
     leser = _leser_eller_basefeil()
     if leser is None:
         abort(404)
 
-    detalj = bygg_detalj(aksje, leser)
+    # Aksjen slaas opp i aksje i basen, ikke i lista i kursdata.py (story 2.2b,
+    # merknaden 03.10 under AD-21). 404 bare for et symbol som ikke staar der,
+    # og for en aksje uten kursrader (FR-204).
+    post = _leser_eller_basefeil(hent_oversiktsleser).post(normaliser_symbol(symbol))
+    if post is None:
+        abort(404)
+
+    detalj = bygg_detalj(post, leser.serie(post.aksje.symbol), idag())
     if detalj is None:
         abort(404)
 
@@ -254,7 +257,7 @@ def aksjedetalj(symbol: str):
         "aksje.html",
         detalj=detalj,
         graf=bygg_graf(detalj.punkter),
-        hentet=leser.sist_hentet(aksje.symbol),
+        hentet=post.hentet,
     )
 
 

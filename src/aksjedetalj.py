@@ -1,7 +1,9 @@
-"""Aksjedetaljen - FR-201, FR-202 og FR-706.
+"""Aksjedetaljen - FR-201, FR-202, FR-204 og FR-706.
 
-Ren logikk. Ingen API-kall, ingen filer, ingen HTML. Leser Kursrad gjennom
-Kursleser, akkurat som markedsoversikten.
+Ren logikk. Ingen API-kall, ingen filer, ingen HTML. Grafen tegnes av serien
+i kurs. Sjekkene og maalingene kommer fra raden i vurdering for datoen til
+nyeste kurs, gjennom tilstand(), som i markedsoversikten (story 2.2b).
+Signalet regnes aldri her.
 
 Avgrenset til forklaringsdelen. Boersmeldinger (FR-203) og kommende
 hendelser (FR-301) er ikke med: Euronext ga ikke tillatelse innen fristen, saa
@@ -16,9 +18,17 @@ hver sjekk maalingen sin hit ut, ikke bare fortegnet den endte paa.
 from dataclasses import dataclass
 from datetime import date, timedelta
 
-from kursdata import Aksje, Kursleser, Kursrad
-from markedsoversikt import RETNINGSVISNING, UKJENT_RETNING, Retningsvisning
-from signalberegning import Parametre, STANDARD, Signal, beregn_signal
+from kursdata import Aksje, Kursrad
+from markedsoversikt import (
+    RETNINGSVISNING,
+    UKJENT_RETNING,
+    Retningsvisning,
+    les_tilstand,
+)
+from oversiktsdata import Oversiktspost
+from signalberegning import Parametre, STANDARD, nodvendige_dager, sjekker_fra
+from tilstand import Art, Tilstand
+from vurderingsdata import Grunn, Vurdering
 
 # FR-201: seks maaneder. Regnet i kalenderdager fra siste boersdag, ikke i
 # antall rader - en boersdag er ikke en fast broekdel av en maaned.
@@ -67,40 +77,44 @@ class SjekkVisning:
 
 @dataclass(frozen=True)
 class Detalj:
+    """Aksjedetaljen. tilstand og tekst er som i markedsoversikten: tekst er
+    None bare naar raden har en vurdering. sjekker er tom naar den ikke har
+    det, og da staar tekst i stedet (FR-204)."""
+
     aksje: Aksje
     dato: date
     sluttkurs: float
-    signal: Signal | None
-    mangler: str | None
+    tilstand: Tilstand | None
+    tekst: str | None
+    sjekker: tuple[SjekkVisning, ...]
     punkter: tuple[Punkt, ...]
+    antall_dager: int = 0
+    noedvendige_dager: int = 0
+
+    @property
+    def vurdering(self) -> Vurdering | None:
+        if self.tilstand is not None and self.tilstand.art is Art.SVAR:
+            return self.tilstand.innhold
+        return None
 
     @property
     def styrke(self) -> int | None:
-        return self.signal.styrke if self.signal else None
+        return self.vurdering.styrke if self.vurdering else None
 
     @property
     def retning(self) -> Retningsvisning:
-        if not self.signal:
+        if not self.vurdering:
             return UKJENT_RETNING
-        return RETNINGSVISNING.get(self.signal.retning, UKJENT_RETNING)
+        return RETNINGSVISNING.get(self.vurdering.retning, UKJENT_RETNING)
 
     @property
-    def sjekker(self) -> tuple[SjekkVisning, ...]:
-        if not self.signal:
-            return ()
-        return tuple(
-            SjekkVisning(navn=s.navn, verdi=s.verdi, maaling=s.forklaring)
-            for s in self.signal.sjekker
-        )
+    def signalet_ikke_regnet(self) -> bool:
+        return self.tilstand is not None and self.tilstand.innhold is Grunn.SIGNAL_IKKE_REGNET
 
     @property
     def bidragsytere(self) -> tuple[SjekkVisning, ...]:
         """De sjekkene som faktisk ga utslag. Summen av dem er styrken."""
         return tuple(s for s in self.sjekker if s.bidro)
-
-    @property
-    def har_ma50(self) -> bool:
-        return any(p.ma50 is not None for p in self.punkter)
 
 
 def glidende_snitt(kurser: list[float], vindu: int) -> list[float | None]:
@@ -150,33 +164,40 @@ def bygg_punkter(
 
 
 def bygg_detalj(
-    aksje: Aksje, kilde: Kursleser, p: Parametre = STANDARD
+    post: Oversiktspost, rader: list[Kursrad], idag: date, p: Parametre = STANDARD
 ) -> Detalj | None:
-    """Detaljen for en aksje, eller None hvis kilden ikke har den i det hele tatt."""
-    rader = kilde.serie(aksje.symbol)
-    if not rader:
+    """Detaljen for en aksje, eller None hvis den ikke har en eneste kursrad.
+
+    post er aksjen og raden i vurdering fra Oversiktsleser, rader er serien i
+    kurs. Grafen tegnes av serien. Sjekkene kommer fra raden, med
+    forklaringene laget av maalingene der (FR-706). Har raden ingen
+    vurdering, er sjekkene tomme og teksten sier hvorfor (FR-204).
+    """
+    if not rader or post.nyeste is None:
         return None
 
-    signal: Signal | None = None
-    mangler: str | None = None
-    try:
-        signal = beregn_signal(rader, p)
-    except ValueError as feil:
-        mangler = str(feil)
+    utfall, tekst = les_tilstand(post.innhold, post.nyeste.dato, idag)
+    sjekker: tuple[SjekkVisning, ...] = ()
+    if utfall is not None and utfall.art is Art.SVAR:
+        sjekker = tuple(
+            SjekkVisning(navn=s.navn, verdi=s.verdi, maaling=s.forklaring)
+            for s in sjekker_fra(utfall.innhold, p)
+        )
 
     return Detalj(
-        aksje=aksje,
-        dato=rader[-1].dato,
-        sluttkurs=float(rader[-1].slutt),
-        signal=signal,
-        mangler=mangler,
+        aksje=post.aksje,
+        dato=post.nyeste.dato,
+        sluttkurs=float(post.nyeste.slutt),
+        tilstand=utfall,
+        tekst=tekst,
+        sjekker=sjekker,
         punkter=bygg_punkter(rader, p),
+        antall_dager=len(rader),
+        noedvendige_dager=nodvendige_dager(p),
     )
 
 
-def finn_aksje(symbol: str, univers: tuple[Aksje, ...]) -> Aksje | None:
-    letes_etter = symbol.strip().upper()
-    for aksje in univers:
-        if aksje.symbol == letes_etter:
-            return aksje
-    return None
+def normaliser_symbol(symbol: str) -> str:
+    """Symbolet i ruta slik aksje har det: uten mellomrom, med store
+    bokstaver. En ticker som EQNR.OL blir ikke et symbol."""
+    return symbol.strip().upper()
