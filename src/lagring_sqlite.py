@@ -25,9 +25,10 @@ from datetime import date, datetime
 from pathlib import Path
 
 from boersdag import innevaerende_boersdag, norsk_dato
-from kursdata import AKSJEUNIVERS, Kursrad, kontroller_skriving
+from kursdata import AKSJEUNIVERS, Aksje, Kursrad, kontroller_skriving
 from lagring_fil import DATA_KATALOG
 from migrering import MigrasjonsFeil, migrer, siste_versjon, versjon
+from oversiktsdata import Oversiktspost
 from vurderingsdata import Grunn, Vurdering
 
 MIGRASJONSKATALOG = Path(__file__).resolve().parent / "migrasjoner"
@@ -282,6 +283,80 @@ class SqliteVurderingslager:
         if rad is None:
             return None
         *felt, grunn = rad
-        if grunn is not None:
-            return Grunn(grunn)
-        return Vurdering(**dict(zip(VURDERINGSKOLONNER, felt)))
+        return _innhold(felt, grunn)
+
+
+def _innhold(felt, grunn) -> Vurdering | Grunn:
+    """Raden i vurdering som Vurdering eller Grunn, ett sted for begge
+    adapterne som leser den."""
+    if grunn is not None:
+        return Grunn(grunn)
+    return Vurdering(**dict(zip(VURDERINGSKOLONNER, felt)))
+
+
+# Spoerringen med join for oversikten - story 2.2b. En rad per aksje i aksje,
+# i rowid-rekkefoelge. Alle koblingene er LEFT JOIN, saa en aksje uten kurser
+# kommer med og kan navngis under tabellen. Forrige kurs er den nyeste foer
+# nyeste, og vurderingen er raden for datoen til nyeste kurs (FR-101, FR-408).
+_KURSFELT = "dato, slutt, justert_slutt, volum"
+_OVERSIKT = (
+    "SELECT a.symbol, a.ticker, a.navn, a.sektor, ks.hentet, "
+    + ", ".join(f"n.{k}" for k in _KURSFELT.split(", ")) + ", "
+    + ", ".join(f"f.{k}" for k in _KURSFELT.split(", ")) + ", "
+    + ", ".join(f"v.{k}" for k in VURDERINGSKOLONNER) + ", v.grunn "
+    "FROM aksje a "
+    "LEFT JOIN kursserie ks ON ks.symbol = a.symbol "
+    "LEFT JOIN kurs n ON n.symbol = a.symbol "
+    "AND n.dato = (SELECT MAX(dato) FROM kurs WHERE symbol = a.symbol) "
+    "LEFT JOIN kurs f ON f.symbol = a.symbol "
+    "AND f.dato = (SELECT MAX(dato) FROM kurs WHERE symbol = a.symbol AND dato < n.dato) "
+    "LEFT JOIN vurdering v ON v.symbol = a.symbol AND v.dato = n.dato "
+)
+
+
+def _kursrad(dato, slutt, justert_slutt, volum) -> Kursrad | None:
+    if dato is None:
+        return None
+    return Kursrad(
+        dato=date.fromisoformat(dato), slutt=slutt, justert_slutt=justert_slutt, volum=volum
+    )
+
+
+class SqliteOversiktsleser:
+    """Oversiktsleser i SQLite - story 2.2b, merknaden under AD-3.
+
+    Bare lesemetoder. Leser aksje, kursserie, kurs og vurdering i en
+    spoerring, og skriver aldri. Selskapene kommer fra aksje, ikke fra
+    AKSJEUNIVERS (merknaden 2026-10-03 under AD-21).
+    """
+
+    def __init__(self, tilkobling: sqlite3.Connection):
+        _krev_siste_versjon(tilkobling)
+        self._tilkobling = tilkobling
+
+    def oversikt(self) -> list[Oversiktspost]:
+        return [
+            _post(rad)
+            for rad in self._tilkobling.execute(_OVERSIKT + "ORDER BY a.rowid")
+        ]
+
+    def post(self, symbol: str) -> Oversiktspost | None:
+        rad = self._tilkobling.execute(
+            _OVERSIKT + "WHERE a.symbol = ?", (symbol,)
+        ).fetchone()
+        return _post(rad) if rad is not None else None
+
+
+def _post(rad) -> Oversiktspost:
+    symbol, ticker, navn, sektor, hentet = rad[:5]
+    nyeste = _kursrad(*rad[5:9])
+    forrige = _kursrad(*rad[9:13])
+    *felt, grunn = rad[13:]
+    har_rad = grunn is not None or felt[0] is not None
+    return Oversiktspost(
+        aksje=Aksje(symbol, ticker, navn, sektor),
+        nyeste=nyeste,
+        forrige=forrige,
+        hentet=datetime.fromisoformat(hentet) if hentet is not None else None,
+        innhold=_innhold(felt, grunn) if har_rad else None,
+    )
