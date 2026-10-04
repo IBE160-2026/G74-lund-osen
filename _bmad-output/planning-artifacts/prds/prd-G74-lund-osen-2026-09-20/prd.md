@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-04T21:31
+updated: 2026-10-04T21:32
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1457,7 +1457,7 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 
 | # | Punkt | Eier | Frist |
 |---|---|---|---|
-| 5b | **Relevanseksperimentet, del 2: KI-klassifiseringen.** Kan ikke gjøres ennå, og det er tre grunner, ikke én: KI-laget finnes ikke som kode, ingen modelltjeneste er valgt, og **betingelse 4 i EODHDs godkjenning — at modelltjenesten ikke trener på innholdet — er udokumentert.** Den må være ført før artikkeltekst sendes inn i en modell, se `docs/kilder-og-rettigheter.md`. *Rettet 2026-10-03 (kontrollen 26.09, P13):* `docs/kilder-og-rettigheter.md` har en fjerde avklaring før del 2: om EODHDs klarering holder når innholdet eies av andre, fordi EODHD er et mellomledd. Eier Marian, frist før del 2 | Gruppen | Når KI-laget finnes |
+| 5b | **Relevanseksperimentet, del 2: KI-klassifiseringen.** Kan ikke gjøres ennå, og det er tre grunner, ikke én: KI-laget finnes ikke som kode, ingen modelltjeneste er valgt, og **betingelse 4 i EODHDs godkjenning — at modelltjenesten ikke trener på innholdet — er udokumentert.** Den må være ført før artikkeltekst sendes inn i en modell, se `docs/kilder-og-rettigheter.md`. *Rettet 2026-10-03 (kontrollen 26.09, P13):* `docs/kilder-og-rettigheter.md` har en fjerde avklaring før del 2: om EODHDs klarering holder når innholdet eies av andre, fordi EODHD er et mellomledd. Eier Marian, frist før del 2 *2026-10-04:* tjenesten er valgt, og betingelse 4 er ført i `docs/kilder-og-rettigheter.md` («Betingelse 4 og KI-tjenestene (2026-10-04)»). Standard er en lokal modell, Gemma 4 E4B. Igjen står at KI-laget ikke finnes som kode, og avklaringen om EODHDs klarering holder når EODHD er et mellomledd. | Gruppen | Når KI-laget finnes |
 | 6 | **Usikkerhetskriteriene er skrevet for medieartikler.** Kjennetegn 1 bærer svakt når utstederen selv er avsender | | Før KI-laget implementeres |
 | 8 | **Oppstart av tilbakekjøpsprogram** er ekte nyhet, men filtreres bort sammen med de ukentlige statusrapportene | | Før innlevering |
 | 9 | **Kontrollere Alpha Vantages vilkår** for ikke-kommersiell bruk | | Før innlevering |
