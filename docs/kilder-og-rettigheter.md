@@ -587,6 +587,8 @@ lenger.
 sendes, og det må være dokumentert før noe sendes. Om ett spørsmål til EODHD
 skal stilles om plan B, er ført under «Å følge opp».
 
+*Avgjort 2026-10-04:* vi spør ikke. Grunnen: bare våre egne resultater sendes til modellen, altså fortegn, styrke, retning og antall, og ingen prosenter, forholdstall, kurser eller volumer. `malinger.md` §19 viste at målingene ikke ga bedre tekst.
+
 ---
 
 ## Mediekilder vurdert for relevanseksperimentet
@@ -1183,7 +1185,9 @@ lenger uimotsagt» over.
       ja til «Storage» — det står allerede i `docs/epost-til-euronext.md`,
       seksjonen «En klausul brevet ikke nevner ved navn», og huskeregelen her
       utvider det til alle fire.
-- [ ] **Plan B for KI-laget: spørre EODHD eller ikke?** Ingen av svarene 21.09
+- [x] ~~**Plan B for KI-laget: spørre EODHD eller ikke?**~~ *Avgjort 2026-10-04:*
+      vi spør ikke. Grunnen: bare våre egne resultater sendes til modellen, altså fortegn, styrke, retning og antall, og ingen prosenter, forholdstall, kurser eller volumer. `malinger.md` §19 viste at målingene ikke ga bedre tekst. Teksten som sto:
+      **Plan B for KI-laget: spørre EODHD eller ikke?** Ingen av svarene 21.09
       dekker at utledede kursverdier sendes til en språkmodell (se «Plan B for
       KI-laget» over). Alternativene er ett spørsmål til EODHD i samme tråd, eller
       å legge det andre svaret til grunn som analogi og skrive ned at det er gjort.

@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-03T21:56
+updated: 2026-10-04T21:31
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -939,6 +939,8 @@ kilden (story 10.1). Teksten lages i hentekommandoen, ikke når siden vises
 Om EODHD skal spørres før tallene sendes til en modell, er et åpent punkt under
 «Å følge opp» i `docs/kilder-og-rettigheter.md` («Plan B for KI-laget: spørre
 EODHD eller ikke?»). Story 10.2 er blokkert til det er avgjort.
+
+*Avgjort 2026-10-04:* vi spør ikke. Modellen får bare våre egne resultater: fortegn, styrke, retning og antall, og ingen prosenter, forholdstall, kurser eller volumer. Det gjelder også FR-607. `malinger.md` §19 viste at målingene ikke ga bedre tekst. Se punktet under «Å følge opp» i `docs/kilder-og-rettigheter.md`.
 
 #### FR-601 — Av/på-bryteren er brukersynlig
 
