@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-04T17:00
+updated: 2026-10-04T18:02
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -1595,6 +1595,7 @@ EODHD eller fra `data/`. Det ble ikke gjort noen kall til EODHD.
 |---|---|---|---|
 | Gemma 4 E4B | Ollama 0.35.1 i Docker (`ollama/ollama`) | `gemma4:e4b`, ID `dc35e8d9c606` | «License: apache-2.0» (https://huggingface.co/google/gemma-4-e4b-it) |
 | Qwen 3.5 4B | Ollama 0.35.1 i Docker (`ollama/ollama`) | `qwen3.5:4b`, ID `2a654d98e6fb` | «License: apache-2.0» (https://huggingface.co/Qwen/Qwen3.5-4B) |
+| NorMistral-7b-warm-instruct | Ollama 0.35.1 i Docker (`ollama/ollama`) | `hf.co/ltg/normistral-7b-warm-instruct:Q4_K_M`, ID `a9435d7c2cfb` | «License: apache-2.0» (https://huggingface.co/ltg/normistral-7b-warm-instruct), lest 04.10 |
 | Gemini 3.5 Flash-Lite | Gemini API, gratisnivået | `gemini-3.5-flash-lite`, `modelVersion` i svaret: `gemini-3.5-flash-lite` | Vilkårene er ført i dagsfila 04.10 kl. 11:00 |
 
 For Qwen ble lisensen først lest på kortet for Qwen3.5-9B, i samme familie, før nedlastingen. Kortet for Qwen3.5-4B ble lest etterpå, og det sier det samme.
@@ -1616,12 +1617,15 @@ volumet `ose-ki-ollama`. Det ble ikke installert noe på Windows. PC-en har
   en gang til. Da var 3,3 GB ledig.
 - **Gemma uten grafikkort ble kjørt** med 2,1 GB ledig.
 - **Gemini: 11 kall.** Det kom ingen nye kall etter de 11.
+- **NorMistral med grafikkort ble kjørt** med 3,8 GB ledig, og **uten grafikkort** med 2,3 GB ledig. *Lagt til kl. 18:02.*
 
 **NorMistral-7b-warm-instruct ble ikke prøvd.** Nedlastingen ble stoppet da
 PC-en hadde for lite minne, og instruksjonen kl. 16:52 valgte å gå videre uten
 den. Etter instruksjonen kl. 16:52 viste det seg at nedlastingen hadde fullført i
 containeren. Sjekksummen stemte med manifestet. Modellen ligger i volumet,
 men er ikke kjørt.
+
+*Lagt til 2026-10-04 kl. 18:02:* NorMistral er prøvd etter instruksjonen kl. 17:56, med og uten grafikkort, i samme oppsett og med samme eksempler, prompt og innstillinger. `ollama ps` viste kontekst 2048 og «100% GPU» og «100% CPU».
 
 **Tiden** er målt fra kallet ble sendt til svaret kom, per tekst. Den første
 teksten i hver lokal kjøring tar med innlastingen av modellen. For Gemini er
@@ -1635,6 +1639,8 @@ tiden med nettverket.
 | `qwen3.5:4b` | gpu | 11 | 9 | 1,4 s | 61,4 s | 61,4 s |
 | `gemma4:e4b` | gpu | 11 | 9 | 0,9 s | 79,9 s | 79,9 s |
 | `gemma4:e4b` | cpu | 11 | 9 | 7,7 s | 32,7 s | 32,7 s |
+| `hf.co/ltg/normistral-7b-warm-instruct:Q4_K_M` | gpu | 11 | 2 | 2,9 s | 42,6 s | 42,6 s |
+| `hf.co/ltg/normistral-7b-warm-instruct:Q4_K_M` | cpu | 11 | 3 | 14,5 s | 35,8 s | 27,1 s |
 
 Med samme seed og temperatur ga Gemma ulik tekst med og uten grafikkort i 7 av
 11 tilfeller. Lik tekst kom for A-uten, B-uten, E-med og Dag. Om samme kjøring
@@ -1772,6 +1778,23 @@ tekstene i tabellen er sjekket med den endelige versjonen.
 - `gemma4:e4b`, gpu, D-med: 4: «skyldes»
 - `gemma4:e4b`, cpu, D-uten: 4: «skyldes»
 - `gemma4:e4b`, cpu, D-med: 4: «skyldes»
+- `hf.co/ltg/normistral-7b-warm-instruct:Q4_K_M`, gpu, A-uten: 4: «resultat»
+- `hf.co/ltg/normistral-7b-warm-instruct:Q4_K_M`, gpu, A-med: 3: «investeringsalternativ»
+- `hf.co/ltg/normistral-7b-warm-instruct:Q4_K_M`, gpu, B-uten: 4: «resultat»
+- `hf.co/ltg/normistral-7b-warm-instruct:Q4_K_M`, gpu, C-uten: 4: «sannsynlig»; 4: «sannsynlig»
+- `hf.co/ltg/normistral-7b-warm-instruct:Q4_K_M`, gpu, C-med: 4: «resultatet»
+- `hf.co/ltg/normistral-7b-warm-instruct:Q4_K_M`, gpu, D-uten: 3: «investeringsråd»
+- `hf.co/ltg/normistral-7b-warm-instruct:Q4_K_M`, gpu, D-med: 3: «kjøps»; 3: «salgs»; 4: «resultatene»
+- `hf.co/ltg/normistral-7b-warm-instruct:Q4_K_M`, gpu, E-uten: 4: «resultater»
+- `hf.co/ltg/normistral-7b-warm-instruct:Q4_K_M`, gpu, E-med: 1: «ingen av de tre sjekk», styrken er 1; 4: «resultat»
+- `hf.co/ltg/normistral-7b-warm-instruct:Q4_K_M`, cpu, A-uten: 3: «investeringsmulighet»; 4: «resultater»
+- `hf.co/ltg/normistral-7b-warm-instruct:Q4_K_M`, cpu, A-med: 4: «sannsynligvis»; 4: «vil fortsette»
+- `hf.co/ltg/normistral-7b-warm-instruct:Q4_K_M`, cpu, C-uten: 3: «kjøpe»; 3: «anbefales»; 3: «investeringsbeslutninger»
+- `hf.co/ltg/normistral-7b-warm-instruct:Q4_K_M`, cpu, C-med: 4: «kanskje»
+- `hf.co/ltg/normistral-7b-warm-instruct:Q4_K_M`, cpu, D-med: 4: «forventede»
+- `hf.co/ltg/normistral-7b-warm-instruct:Q4_K_M`, cpu, E-uten: 3: «bør»; 3: «investeringsbeslutninger»; 4: «sannsynlig»; 4: «vil fortsette»; 4: «resultater»; 4: «resultater»
+- `hf.co/ltg/normistral-7b-warm-instruct:Q4_K_M`, cpu, E-med: 4: «resultat»
+- `hf.co/ltg/normistral-7b-warm-instruct:Q4_K_M`, cpu, Dag: 4: «resultater»; 4: «resultater»
 
 **Lest manuelt etterpå.** Ordene «fordi», «skyldes» og «på grunn av» viser i
 alle seks tilfellene til regelen selv, for eksempel at retningen er Ingen fordi
@@ -1784,6 +1807,33 @@ sifre:
 - `qwen3.5:4b` Dag sier «seks av de femti aksjene». Grunnlaget har 15 aksjer.
 - `qwen3.5:4b` Dag sier at det i de fire sektorene var flere aksjer som gikk opp
   enn ned. Grunnlaget har 7 av 15 opp.
+- `gemma4:e4b` uten grafikkort skriver i C-med «interessen er negativ
+  sammenlignet med medianvolumet». Det kan leses som at volumet var lavt, men
+  grunnlaget har 1,80 × medianen. Fortegnet for interessen følger dagens
+  kursendring, og det står ikke i prompten. Kontrollen fanger ikke en slik feil.
+
+*Lagt til kl. 18:02:* NorMistral-tekstene som besto kontrollen, har også feil kontrollen ikke ser:
+
+- Med grafikkort, B-med: «Interessenivået … var også negativt», og «to positive
+  signaler og ett negativt signal». Grunnlaget har interesse 0 og to negative.
+- Med grafikkort, Dag: «Disse aksjene var positive» om de tre som skilte seg
+  ut. Det står ikke i grunnlaget. Hver retning forklares som at aksjene
+  «presterte bedre enn markedet» eller «omtrent som markedet».
+- Uten grafikkort, B-uten: «Interesseindikatoren viser også en negativ verdi».
+  Grunnlaget har 0.
+- Uten grafikkort, B-med: «to av tre signaler (trend og interesse) har vært
+  negative». Grunnlaget har trend og bevegelse.
+- Uten grafikkort, D-uten: «dagens handelsvolum under gjennomsnittet». Grunnlaget
+  uten målinger sier ikke noe om volumet.
+
+Ordet «resultat» stoppet seks NorMistral-tekster alene. Der viser det til
+sjekkene eller til kursen, som i «ga et positivt resultat», og ikke til
+selskapenes regnskap. To av de seks har likevel råd eller spådom med ord som
+ikke står i listene:
+
+- Med grafikkort, A-uten: «kan være et godt alternativ for investorer å vurdere».
+- Med grafikkort, E-uten: «kan antyde at prisen på aksjen kan stabilisere seg
+  eller til og med øke i nær fremtid».
 
 ### Tekstene, ordrett
 
@@ -1842,3 +1892,33 @@ sifre:
 - **E-uten** (7,2 s): For aksjen Eksempel E er trenden negativ basert på kursen sammenlignet med snittet de siste 50 dagene. Bevegelsen og interessen gir ingen utslag. Styrken på signalet er 1, og retningen er Negativ.
 - **E-med** (8,2 s): For aksjen Eksempel E er trenden negativ, da kursen er -2,9 % mot MA50. Bevegelsen er nøytral, og interessen er nøytral. Styrken til signalet er 1, og retningen er Negativ.
 - **Dag** (7,6 s): På børsdagen var det totalt 15 aksjer i oversikten. Tre aksjer skilte seg ut med styrke to eller mer, mens fem aksjer hadde en positiv retning. Hovedindeksen gikk ned, men seks aksjer gikk bedre enn hovedindeksen.
+
+NorMistral skrev flere avsnitt i noen tekster. Avsnittsskiftene er slått sammen til mellomrom her, og ordene står som modellen skrev dem.
+
+#### `hf.co/ltg/normistral-7b-warm-instruct:Q4_K_M`, gpu
+
+- **A-uten** (42,6 s): Aksjeeksempel A viser en positiv trend, noe som indikerer at aksjekursen har vært konsekvent økende over en lengre periode. I tillegg viser den et positivt momentum, noe som indikerer at dagens endring i aksjekursen er større enn det vanlige daglige utslaget som har forekommet i løpet av de siste 20 dagene. Videre viser den et positivt interessevolum, noe som indikerer at dagens handelsvolum er høyere enn det vanlige daglige volumet som har forekommet i løpet av de siste 20 dagene. Til slutt viser den en styrke på 3, noe som indikerer at alle tre av de tre sjekkene som er nevnt i grunnlaget, ga et positivt resultat. Derfor er aksjeeksempel A for øyeblikket i en positiv retning og kan være et godt alternativ for investorer å vurdere.
+- **A-med** (2,3 s): Aksjeeksempel A viser en positiv trend, noe som indikerer at kursen har vært konsekvent økende sammenlignet med gjennomsnittet de siste 50 dagene. I tillegg viser aksjen en positiv bevegelse, noe som betyr at dagens endring i pris var større enn det vanlige daglige utslaget de siste 20 dagene. Til slutt viser aksjen en sterk interesse, med dagens volum som er mer enn dobbelt så mye som medianvolumet de siste 20 dagene. Alle disse faktorene bidrar til en samlet positiv vurdering av aksjen, noe som gjør den til et lovende investeringsalternativ.
+- **B-uten** (2,3 s): Aksjen med tickersymbol Eksempel B har for tiden en negativ trend, noe som betyr at den har prestert dårligere enn gjennomsnittet de siste 50 dagene. I tillegg har den opplevd et negativt avvik i dag sammenlignet med det vanlige daglige avviket de siste 20 dagene. Interessen for denne aksjen er også lavere enn gjennomsnittet, som indikert av dagens volum. Denne kombinasjonen av faktorer har ført til at styrken til denne signalsjekken er vurdert til 2 av 3, noe som indikerer et sterkt negativt sentiment. Som et resultat er retningen på dette signalet negativt.
+- **B-med** (2,7 s): Aksjeeksempel B viser en negativ trend, med en nedgang på -4,1 % sammenlignet med glidende gjennomsnitt (MA50). Dagens endring i aksjeprisen var også negativ, med en nedgang på -3,0 % sammenlignet med det vanlige daglige utslaget de siste 20 dagene. Interessenivået, som måler dagens volum sammenlignet med medianvolumet de siste 20 dagene, var også negativt, med et volum på 1,12 ganger medianen. Aksjen hadde to positive signaler og ett negativt signal, noe som gir en styrke på 2. Basert på disse signalene er retningen på aksjens bevegelse negativ.
+- **C-uten** (5,4 s): Aksjeeksempel C viser et regelbasert signal basert på tre nøkkelindikatorer: trenden, bevegelsen og interessen. Testen av trenden er positiv, noe som indikerer at aksjekursen har vært konsekvent økende sammenlignet med sitt 50-dagers glidende gjennomsnitt (MA50). Bevegelsestesten viser en negativ verdi, noe som indikerer at dagens endring i aksjekursen har vært mindre enn det typiske daglige utslaget som er observert i løpet av de siste 20 dagene. Til slutt viser interesse testen en negativ verdi, noe som indikerer at dagens handelsvolum er lavere enn medianverdien som er observert i løpet av de siste 20 dagene.  I tillegg til disse testene evaluerer signalet også styrken til signalet ved å telle antall positive, negative og nøytrale tester. I dette tilfellet er det tre positive tester av tre mulige, noe som resulterer i en styrkeverdi på 3. Styrkeverdien indikerer den generelle helsen til signalet og dets evne til å nøyaktig identifisere potensielle prisbevegelser.  Til slutt indikerer retningen på signalet Blandet, noe som indikerer at det er like sannsynlig at aksjekursen vil øke som å falle basert på de nåværende markedsforholdene. Samlet sett indikerer det regelbaserte signalet for aksjeeksempel C en positiv trend og er sannsynlig å generere sterke signaler i de kommende dagene.
+- **C-med** (4,4 s): Aksjeeksempel C viser en blandet trend basert på de tre sjekkene som er nevnt i grunnlaget. Trendsjekken sammenligner aksjens kurs med gjennomsnittet de siste 50 dagene (MA50), og den gir en +1-score (+2,6 % mot MA50). Bevegelsessjekken måler dagens endring mot det vanlige daglige utslaget de siste 20 dagene. I dette tilfellet resulterer det i en -1-score (-2,2 % mot 1,4 % standardavvik). Interessesjekken vurderer dagens volum mot medianvolumet de siste 20 dagene. Resultatet er en -1-score (volum 1,80 ganger medianen). Styrkesjekken evaluerer antall positive, negative og nøytrale trender blant de tre sjekkene. I dette tilfellet er det 3 positive trender, noe som resulterer i en +1-score. Til slutt indikerer retningssjekken at trenden er blandet, noe som resulterer i en -1-score.
+- **D-uten** (2,0 s): Aksjeeksempel D viser for øyeblikket ingen trend. Aksjen har beveget seg innenfor sitt vanlige daglige område de siste 20 dagene, men det er ingen signifikant endring i dag sammenlignet med dette gjennomsnittet. Interessen for aksjen er også lav, med dagens handelsvolum under gjennomsnittet. Basert på disse faktorene har aksjen ingen trend og anses for øyeblikket for å være sidelengs. Denne informasjonen er basert på de gitte grunnlagene og gir ikke investeringsråd.
+- **D-med** (4,5 s): Aksjen som heter Eksempel D på Oslo Børs viser en trend på 0% sammenlignet med sitt 50-dagers glidende gjennomsnitt (MA50). Dagens endring i prisvolatilitet er også 0%, noe som er innenfor det vanlige 1,3% standardavviket. Interessenivået, som er beregnet ved å sammenligne dagens volum med medianvolumet de siste 20 dagene, er også 0%, noe som indikerer at volumet er innenfor det vanlige området.  Styrken til denne trenden er 0 av 3 sjekker, noe som indikerer at ingen av de tre komponentene i trenden - prisendring, volumendring eller pris-volum-korrelasjon - har vært sterke nok til å produsere en betydelig trend.  Basert på disse resultatene er retningen på trenden ingen. Dette betyr at det ikke er noe tydelig bevis for at prisen på aksjen vil øke eller redusere i nær fremtid. Det er viktig å merke seg at denne informasjonen ikke er en kjøps-, salgs- eller holdanbefaling. I stedet gir den en kortfattet oppsummering av den nåværende tilstanden til trenden for denne aksjen.
+- **E-uten** (2,9 s): Aksjen med tickersymbol Eksempel E er for tiden i en negativ trend, som indikert av verdien -1 i grunnlaget. Dette betyr at prisen på aksjen har vært synkende sammenlignet med gjennomsnittet de siste 50 dagene. I tillegg er det ingen interesse for aksjen, som indikert av verdien 0 i grunnlaget. Imidlertid er det ett positivt aspekt ved denne aksjen, og det er at volumet er høyere enn gjennomsnittet for de siste 20 dagene. Denne kombinasjonen av negative trender og positive aspekter kan antyde at prisen på aksjen kan stabilisere seg eller til og med øke i nær fremtid. Det er imidlertid viktig å merke seg at dette bare er en regelbasert signal, og faktiske resultater kan variere.
+- **E-med** (2,4 s): Aksjeeksempel E viser en negativ trend, noe som indikerer at kursen har vært konsekvent synkende sammenlignet med gjennomsnittet de siste 50 dagene. Denne trenden forsterkes ytterligere av en negativ bevegelse, som indikerer at dagens endring i pris var større enn det vanlige daglige utslaget de siste 20 dagene. I tillegg var dagens volum under gjennomsnittet, noe som ytterligere støtter den negative retningen. Imidlertid er det ingen styrke i dette tilfellet, noe som betyr at ingen av de tre sjekkene - trend, bevegelse og interesse - ga et positivt eller negativt resultat. Derfor er retningen for denne aksjen negativ.
+- **Dag** (5,3 s): Basert på informasjonen som er oppgitt, var det 15 aksjer som ble handlet på Oslo Børs i løpet av handelsdagen. Av disse skilte tre aksjer seg ut med en styrke på 2 eller mer. Disse aksjene var positive, noe som indikerer at de presterte bedre enn markedet. Fem aksjer skilte seg ut i en positiv retning, noe som indikerer at de presterte bedre enn markedet. Fire aksjer skilte seg ut i en negativ retning, noe som indikerer at de presterte dårligere enn markedet. To aksjer skilte seg ut som blandet, noe som indikerer at de presterte omtrent som markedet. Fire aksjer skilte seg ikke ut i noen retning, noe som indikerer at de presterte omtrent som markedet.  I tillegg var seks av aksjene bedre enn hovedindeksen, noe som indikerer at de presterte bedre enn markedet. Hovedindeksen gikk ned i løpet av handelsdagen. Energi-, sjømat-, finans- og industrisektorene hadde også aksjer som presterte bedre enn markedet. Energi-sektoren hadde tre av sine fire aksjer som presterte bedre enn markedet, mens sjømatsektoren hadde én av sine tre aksjer som presterte bedre enn markedet. Finanssektoren hadde to av sine fire aksjer som presterte bedre enn markedet, og industrisektoren hadde én av sine fire aksjer som presterte bedre enn markedet.
+
+#### `hf.co/ltg/normistral-7b-warm-instruct:Q4_K_M`, cpu
+
+- **A-uten** (27,1 s): Aksjeeksempel A viser en positiv trend, noe som indikerer at aksjekursen har vært konsekvent økende over en lengre periode. I tillegg viser den et positivt momentum, noe som indikerer at dagens økning i aksjekursen er større enn det typiske daglige utslaget som har skjedd i løpet av de siste 20 dagene. Videre viser den et positivt interessevolum, noe som indikerer at dagens handelsvolum er høyere enn det typiske daglige volumet som har skjedd i løpet av de siste 20 dagene. Til slutt viser den en styrke på 3, noe som indikerer at alle tre komponentene i signalet - trend, momentum og interesse - har vist positive resultater. Derfor er aksjeeksempel A for øyeblikket i en positiv retning og kan være en lovende investeringsmulighet.
+- **A-med** (15,3 s): Aksjeeksempel A viser en positiv trend, noe som indikerer at aksjekursen har økt sammenlignet med gjennomsnittet de siste 50 dagene. I tillegg viser aksjen en positiv bevegelse, noe som betyr at dagens endring i pris er større enn det vanlige daglige utslaget som er observert de siste 20 dagene. Aksjen viser også en positiv interesse, med dagens volum som er større enn medianvolumet de siste 20 dagene.  Styrken til denne signalet beregnes ved å telle antall positive, negative og blandede signaler blant de tre tilgjengelige. I dette tilfellet er det tre positive signaler, noe som resulterer i en styrke på 3.  Til slutt indikerer retningen på signalet den generelle trenden i aksjekursen. I dette tilfellet er retningen positiv, noe som indikerer at aksjekursen sannsynligvis vil fortsette å øke.
+- **B-uten** (14,5 s): Aksjeeksempel B viser en negativ trend, noe som indikerer at aksjekursen har vært konsekvent synkende sammenlignet med gjennomsnittet de siste 50 dagene. I tillegg viser den en negativ bevegelse, noe som indikerer at dagens endring i aksjekursen har vært større enn det vanlige daglige utslaget, som har vært synkende de siste 20 dagene. Interesseindikatoren viser også en negativ verdi, noe som indikerer at dagens handelsvolum har vært lavere enn medianverdien de siste 20 dagene. Til slutt viser styrken til signalet en verdi på 2, noe som indikerer at to av de tre sjekkene som ble utført, ga en negativ verdi, noe som ytterligere støtter den negative retningen til signalet. Derfor er retningen til signalet for aksjeeksempel B negativ.
+- **B-med** (13,4 s): Aksjeeksempel B viser en negativ trend, med en nedgang på -4,1 % sammenlignet med glidende gjennomsnitt (MA50). Dagens endring i kursen er også negativ, med en nedgang på -3,0 % sammenlignet med det vanlige daglige utslaget de siste 20 dagene. Interessenivået, som måler dagens volum sammenlignet med medianvolumet de siste 20 dagene, er negativt, med et volum på 1,12 ganger medianen. Denne aksjen har vist styrke ved at to av tre signaler (trend og interesse) har vært negative, noe som resulterer i en samlet retning på -1 (negativ).
+- **C-uten** (13,3 s): Aksjeeksempel C viser et blandet signal, noe som indikerer en delt trend mellom trenden og bevegelsen. Interesseindikatoren viste også et negativt signal, noe som indikerer en nedgang i handelsvolumet. Imidlertid var styrken til signalet høy, med alle tre av de tre sjekkene som viste et positivt signal. Dette indikerer en sterk trend i favør av en bullish posisjon. Derfor, basert på dette signalet, kan det være tilrådelig å vurdere å kjøpe aksjeeksempel C. Det er imidlertid viktig å merke seg at dette bare er ett signal, og markedsforholdene kan endres raskt. Derfor anbefales det å konsultere ytterligere kilder og utføre grundig forskning før du tar investeringsbeslutninger.
+- **C-med** (35,8 s): Aksjeeksempel C er en regelbasert signal for én aksje på Oslo Børs. Signalet er basert på tre nøkkelindikatorer: trenden, bevegelsen og interessen.  Trendindikatoren sammenligner aksjens pris med sitt glidende gjennomsnitt (MA50) over de siste 50 dagene. En positiv trend er indikert når prisen er høyere enn MA50, og en negativ trend er indikert når prisen er lavere enn MA50. I dette tilfellet er trenden positiv, med en +1-score.  Bevegelsesindikatoren måler dagens endring i pris sammenlignet med det vanlige daglige utslaget over de siste 20 dagene. En positiv bevegelse er indikert når prisen stiger, og en negativ bevegelse er indikert når prisen faller. I dette tilfellet er bevegelsen negativ, med en -1-score.  Interesseindikatoren måler dagens handelsvolum sammenlignet med medianvolumet over de siste 20 dagene. En positiv interesse er indikert når volumet er høyere enn medianen, og en negativ interesse er indikert når volumet er lavere enn medianen. I dette tilfellet er interessen negativ, med en -1-score.  Styrkeindikatoren teller antall positive trender blant de tre indikatorene. En styrke på 3 betyr at alle tre indikatorene ga et positivt signal. I dette tilfellet er styrken 3.  Retningindikatoren bestemmer den generelle retningen til signalet. Den kan være positiv, negativ, blandet eller ingen. I dette tilfellet er retningen blandet, noe som betyr at signalet ikke er sterkt nok til å indikere en klar retning.  Oppsummert er aksjeeksempel C et blandet signal, med en positiv trend, negativ bevegelse og negativ interesse. Styrken på 3 indikerer at dette signalet er sterkt, men retningen er blandet, noe som betyr at investorer kanskje vil vente på ytterligere bekreftelse før de tar noen avgjørelser.
+- **D-uten** (7,8 s): Aksjeeksempel D viser for øyeblikket ingen trend. Aksjen har beveget seg innenfor sitt vanlige daglige område de siste 20 dagene, men det er ingen signifikant endring i dag sammenlignet med dette gjennomsnittet. Interessen for aksjen er også minimal, med dagens handelsvolum som ligger under gjennomsnittet. Basert på disse faktorene har aksjen ingen trend og anses å være i en flat eller hakkete fase.
+- **D-med** (11,1 s): Aksjeeksempel D følger ikke en klar trend, ettersom kursen har beveget seg både opp og ned sammenlignet med gjennomsnittet de siste 50 dagene (MA50). Dagens endring i forhold til det vanlige daglige utslaget de siste 20 dagene er også ubetydelig, og ligger innenfor det forventede området. Interessen for aksjen er også minimal, ettersom dagens handelsvolum er under gjennomsnittet. Basert på disse faktorene tildeles Aksjeeksempel D en styrke på 0 av 3 mulige. Aksjen viser ingen klar retning, så retningen tildeles Ingen.
+- **E-uten** (21,0 s): Aksjeeksempel E viser en negativ trend, noe som indikerer at kursen har vært konsekvent synkende sammenlignet med gjennomsnittet de siste 50 dagene. I tillegg viser den en nøytral bevegelse, noe som betyr at dagens endring ikke er betydelig sammenlignet med det vanlige daglige utslaget de siste 20 dagene. Interessenivået er også nøytralt, med dagens handelsvolum som samsvarer med medianvolumet de siste 20 dagene.  Styrken til denne regelen er indikert av styrken, som er 1 i dette tilfellet. Styrke måler antall positive, negative eller nøytrale signaler blant de tre faktorene som vurderes. Når styrken er 1, indikerer det at alle tre faktorene viser et negativt signal.  Retningen til denne regelen er negativ, noe som betyr at basert på de nåværende markedsforholdene, er det sannsynlig at aksjekursen vil fortsette å synke. Denne regelen er basert på analysen av historiske data og gir innsikt i potensielle fremtidige prisbevegelser. Det er imidlertid viktig å merke seg at tidligere resultater ikke er en garanti for fremtidige resultater, og investorer bør alltid gjøre sin egen forskning og konsultere en finansiell rådgiver før de tar investeringsbeslutninger.
+- **E-med** (12,6 s): Aksjeeksempel E viser en negativ trend, noe som betyr at kursen har gått ned sammenlignet med gjennomsnittet de siste 50 dagene. Denne trenden er betydelig, ettersom den er -2,9 % mot MA50. I tillegg er det ingen interesse for aksjen, noe som betyr at dagens volum er under gjennomsnittet for de siste 20 dagene. Imidlertid er det ett positivt aspekt ved denne aksjen, og det er at styrken er 1. Dette indikerer at det er minst én av de tre sjekkene som ble utført på aksjen, som ga et positivt resultat. Til slutt er retningen for denne aksjen negativ.
+- **Dag** (23,3 s): Basert på informasjonen som er oppgitt, var det 15 aksjer som ble handlet på Oslo Børs i løpet av handelsdagen. Av disse skilte tre aksjer seg ut med en styrke på 2 eller mer, noe som indikerer et sterkt handelsvolum. Tre aksjer hadde en positiv retning, noe som betyr at de presterte bedre enn markedet som helhet. På den annen side hadde fire aksjer en negativ retning, noe som betyr at de presterte dårligere enn markedet. To aksjer hadde en blandet retning, noe som betyr at de presterte omtrent som markedet. Til slutt hadde fire aksjer ingen retning, noe som betyr at de ikke presterte bedre eller dårligere enn markedet. I tillegg hadde seks aksjer bedre resultater enn hovedindeksen, noe som indikerer at de presterte bedre enn markedet som helhet. Hovedindeksen gikk ned i løpet av handelsdagen. Energi-, sjømat-, finans- og industrisektorene hadde varierende resultater. Energi- og industrisektorene hadde tre aksjer hver som presterte bedre enn markedet, mens sjømat- og finanssektorene hadde en aksje hver som presterte bedre enn markedet.
