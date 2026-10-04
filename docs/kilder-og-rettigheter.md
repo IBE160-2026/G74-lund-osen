@@ -2,7 +2,7 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-03T21:58
+updated: 2026-10-04T21:31
 ---
 
 # Kilder og rettigheter
@@ -290,6 +290,8 @@ you outlined», og deretter legges én ny til:
 | 3 | «the data is not published, redistributed, resold, or used to train any model» | Oppfylt. Artiklene selv: `data/` er gitignorert. De utledede tallene: EODHD bekreftet skriftlig samme kveld at egne sammendragstall ikke er deres Informasjon «in repackaged form» — se «Oppfølgingen samme kveld». Forbeholdet som sto her, er dermed innfridd for EODHDs data. *24.09: gjaldt ikke 20.–23.09, da rå enkeltverdier fra EODHD sto i repoet. Se «Avvik, funnet og rettet 2026-09-23» under «Hva vi publiserer».* |
 | 4 | «Please ensure that your chosen LLM service does not use the submitted content for training either» | **Ikke oppfylt.** Se under |
 
+*2026-10-04:* betingelse 4 er oppfylt for den lokale modellen, som er standard, og for Gemini, Anthropic API og OpenAI API med egen nøkkel. For et ChatGPT-abonnement er det ikke avklart. Se «Betingelse 4 og KI-tjenestene (2026-10-04)».
+
 **Betingelse 4 er en plikt EODHD har lagt på oss, ikke en de har oppfylt.**
 Godkjenningen er ikke innfridd før vi har slått opp modelltjenestens faktiske
 vilkår og sitert setningen som sier at innhold sendt gjennom API-et ikke brukes
@@ -300,7 +302,141 @@ Det kan ikke gjøres ennå, fordi **ingen modelltjeneste er valgt**. Verken
 promptversjon og modell skal lagres med hver vurdering, men ikke hvilken modell.
 Valget er dermed første steg, ikke oppslaget.
 
+*2026-10-04:* tjenesten er valgt og vilkårene er sitert. Standard er en lokal modell, Gemma 4 E4B, og egne nøkler til Gemini, Anthropic API og OpenAI API er valg. Om ChatGPT-abonnementet trener på innholdet, er ikke avklart. Se «Betingelse 4 og KI-tjenestene (2026-10-04)» rett under.
+
 Ført som oppfølgingspunkt med eier nederst i dokumentet.
+
+### Betingelse 4 og KI-tjenestene (2026-10-04)
+
+**Beslutningen 04.10.** Standard er en lokal modell, Gemma 4 E4B, som kjører i
+Ollama i Docker. Den som vil, kan bruke sin egen nøkkel til Gemini 3.5
+Flash-Lite, med gratis nøkkel, til Anthropic API eller til OpenAI API.
+ChatGPT Plus eller Pro med «Sign in with ChatGPT» kommer senere. Et
+Claude-abonnement kan ikke brukes. Ingen nøkkel eller innlogging følger med
+appen eller repoet, og hver kobler bare til sin egen. Prøven som valget bygger
+på, står i `malinger.md` §19.
+
+**Hva som sendes.** Modellen får bare våre egne resultater: fortegn, styrke,
+retning og antall. Den får ingen prosenter, forholdstall, kurser eller volumer,
+og ingen artikkeltekst. Betingelse 4 ble stilt for artikkeltekst fra
+`/api/news`. Det vi sender nå, er ikke EODHDs innhold. Vilkårene for hver
+tjeneste står likevel her, fordi story 4.1 krever dem, og fordi godkjenningen
+skal kunne brukes hvis artikkeltekst sendes senere (plan A).
+
+Alt under er lest 04.10.2026.
+
+#### Lokal modell: Gemma 4 E4B
+
+Ingenting sendes ut. Modellen kjører på maskinen, og ingen tredjepart får
+grunnlaget eller teksten. Betingelse 4 er oppfylt av seg selv.
+
+Lisensen, fra modellsiden https://huggingface.co/google/gemma-4-e4b-it:
+«License: apache-2.0». Versjonen er `gemma4:e4b` med ID `dc35e8d9c606` i
+Ollama, som i `malinger.md` §19.
+
+#### Gemini API, med egen gratis nøkkel
+
+Fra Gemini API Additional Terms of Service,
+https://ai.google.dev/gemini-api/terms, «Last updated 2026-04-28 UTC»:
+
+- Data i EØS: «If you're in the European Economic Area, Switzerland, or the
+  United Kingdom, the terms under "How Google uses Your Data" in "Paid
+  Services" apply to all Services, including Google AI Studio and unpaid quota
+  in the Gemini API, even though they are offered free of charge.»
+- Det som da gjelder: «When you use Paid Services, including, for example, the
+  paid quota of the Gemini API, Google doesn't use your prompts (including
+  associated system instructions, cached content, and files such as images,
+  videos, or documents) or responses to improve our products».
+- API-klienter i EØS: «You may use only Paid Services when making API Clients
+  available to users in the European Economic Area, Switzerland, or the United
+  Kingdom.»
+- Formålet: «Use of Google AI Studio and Gemini API is for developers building
+  with Google AI models for professional or business purposes, not for
+  consumer use.»
+- Alder og definisjonen av API-klienter: «You must be 18 years of age or older
+  to use the APIs. You also will not use the Services as part of a website,
+  application, or other service (collectively, "API Clients") that is directed
+  towards or is likely to be accessed by individuals under the age of 18.»
+
+Fra Google APIs Terms of Service, https://developers.google.com/terms, «Last
+modified: November 9, 2021», avsnitt 4b: «Developer credentials (such as
+passwords, keys, and client IDs) are intended to be used by you and identify
+your API Client. You will keep your credentials confidential and make
+reasonable efforts to prevent and discourage other API Clients from using your
+credentials. Developer credentials may not be embedded in open source
+projects.»
+
+**Vår lesning.** Hver kjører sin egen kopi av appen med sin egen nøkkel. Vi gjør
+ingen API-klient tilgjengelig for andre, og ingen nøkkel ligger i repoet eller
+følger med appen (4b). I EØS gjelder datavilkårene for betalt nivå også
+gratisnivået, så Google bruker ikke det som sendes, til å forbedre produktene.
+«professional or business purposes» passer dårligst på oss. Det er vår
+lesning, ikke en avklaring fra Google.
+
+**Gratisgrensene for Flash-Lite:** 15 kall per minutt og 500 per dag. Tallene
+står ikke på Googles side om rate limits, som viser til AI Studio. De er lest
+av Marian i AI Studio 04.10.2026 kl. 12:39, for hennes eget prosjekt. Grensene
+gjelder per prosjekt og kan være andre for andre.
+
+#### Anthropic API, med egen nøkkel
+
+Fra Commercial Terms of Service, https://www.anthropic.com/legal/commercial-terms,
+«Effective June 17, 2025», del B «Customer Content»: «Anthropic may not train
+models on Customer Content from Services.» Vilkårene gjelder «Customer's use of
+Anthropic API keys».
+
+Fra Anthropic Privacy Center, «Is my data used for model training?»,
+https://privacy.claude.com/en/articles/7996868-is-my-data-used-for-model-training,
+datert 18.08.2026: «By default, we will not use your inputs or outputs from our
+commercial products (e.g. Claude for Work, Anthropic API, Claude Gov, etc.) to
+train our models.» De to unntakene står i neste setning: «If you explicitly
+report feedback or bugs to us (e.g. via our thumbs up/down feedback button), or
+otherwise choose to allow us to use your data, then we may use your chats and
+coding sessions to train our models.» Appen gir ingen tilbakemelding til
+Anthropic, og den som kobler til, må ikke ha sagt ja til databruk.
+
+**Claude-abonnementet kan ikke brukes.** Fra Agent SDK-oversikten,
+https://code.claude.com/docs/en/agent-sdk/overview: «Unless previously
+approved, Anthropic does not allow third party developers to offer claude.ai
+login or rate limits for their products, including agents built on the Claude
+Agent SDK. Use the API key authentication methods described in the Quickstart
+instead.»
+
+#### OpenAI API, med egen nøkkel
+
+Fra OpenAI Services Agreement, https://openai.com/policies/services-agreement,
+«Effective: January 1, 2026», punkt 4.2: «OpenAI will only use Customer Content
+as necessary to provide Customer with the Services, comply with applicable law,
+enforce the OpenAI Policies, and prevent abuse. OpenAI will not use Customer
+Content to develop or improve the Services, unless Customer explicitly agrees to
+such use.» Den som kobler til, må ikke ha sagt ja til datadeling.
+
+#### ChatGPT med «Sign in with ChatGPT» (senere)
+
+Fra OpenAIs cookbook-artikkel «Integrating Sign in with ChatGPT in your
+Opensource App», https://developers.openai.com/cookbook/articles/sign-in-with-chatgpt,
+28.09.2026: «At launch, ChatGPT plan usage is available to open-source projects,
+personal projects that run locally, and selected private apps.»
+
+Fra hjelpeartikkelen «Using your ChatGPT plan in other apps and sites»,
+https://help.openai.com/en/articles/20001542-using-your-chatgpt-plan-in-other-apps-and-sites:
+«Anyone can sign in to participating apps and sites with ChatGPT, but the option
+to use your ChatGPT plan is only available with Plus and Pro.»
+
+**Ikke avklart:** ingen av sidene som er lest, sier om innhold sendt gjennom
+ChatGPT-abonnementet brukes til trening. Ført som oppfølgingspunkt nederst i
+dokumentet.
+
+#### Hva som er oppfylt
+
+| Tjeneste | Trener på det som sendes? | Status |
+|---|---|---|
+| Lokal modell, Gemma 4 E4B (standard) | Nei, ingenting sendes ut | Oppfylt |
+| Gemini, gratis nøkkel, i EØS | Nei, etter EØS-setningen | Oppfylt, etter vår lesning av vilkårene |
+| Anthropic API | Nei, unntatt ved tilbakemelding eller samtykke | Oppfylt |
+| OpenAI API | Nei, unntatt ved samtykke | Oppfylt |
+| ChatGPT-abonnement | Står ikke | Ikke avklart, senere |
+| Claude-abonnement | – | Kan ikke brukes |
 
 ### Hva dette betyr for relevanseksperimentet
 
@@ -1085,12 +1221,18 @@ lenger uimotsagt» over.
       (`relevanseksperiment.md` §6). Flere tickere i én forespørsel er ikke
       målt; kontrollen med to tickere ble byttet ut (`bb54553`).** *Rettet
       2026-09-25*
-- [ ] **Dokumentere at modelltjenesten ikke trener på innholdet.** Betingelse 4
+- [x] ~~**Dokumentere at modelltjenesten ikke trener på innholdet.**~~ — **gjort
+      2026-10-04.** Se «Betingelse 4 og KI-tjenestene (2026-10-04)». Det som ikke er
+      avklart, ChatGPT-abonnementet, har eget punkt under. Teksten som sto:
+      **Dokumentere at modelltjenesten ikke trener på innholdet.** Betingelse 4
       i EODHDs godkjenning av 21.09, og godkjenningen er ikke oppfylt før den er
       ført. To steg: (a) velge modelltjeneste — ingen er navngitt i noe dokument
       i dag; (b) slå opp tjenestens faktiske vilkår, sitere setningen ordrett og
       føre lenke og dato her. Koster ingen API-kall. **Eier: Gruppen.**
       Frist: før første KI-kall kjøres
+- [ ] **Brukes innholdet til trening når appen bruker et ChatGPT-abonnement?**
+      *Lagt til 2026-10-04.* Sidene om «Sign in with ChatGPT» som er lest, sier det
+      ikke. **Eier: Gruppen.** Frist: før ChatGPT-innloggingen bygges
 - [ ] Vurdere vilkårene på nytt dersom applikasjonen skal publiseres
 - [ ] **Kontrollere at skillet over holder mot NewsWebs faktiske vilkår.**
       EODHD-halvdelen er lukket 2026-09-21: leverandøren har skriftlig bekreftet
