@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-04T09:16
+updated: 2026-10-04T17:00
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -1580,3 +1580,265 @@ med, fordi vinduet der er et annet, 2026-06-30 til 2026-09-30.
 
 Rangeringen endrer ikke universet. Parametrene i signalet er låst og målt på de
 15 (AD-13).
+
+
+---
+
+## 19. Prøve av KI-modeller for teksten (2026-10-04)
+
+**Hva som er prøvd.** Tre modeller har skrevet tekst for fem oppdiktede
+aksjedager, med og uten målingene, og for én oppdiktet børsdag med bare antall
+og retninger. Tallene i eksemplene er laget for prøven og er ikke hentet fra
+EODHD eller fra `data/`. Det ble ikke gjort noen kall til EODHD.
+
+| Modell | Hvor | Versjon | Lisens, sitert fra modellsiden 04.10 |
+|---|---|---|---|
+| Gemma 4 E4B | Ollama 0.35.1 i Docker (`ollama/ollama`) | `gemma4:e4b`, ID `dc35e8d9c606` | «License: apache-2.0» (https://huggingface.co/google/gemma-4-e4b-it) |
+| Qwen 3.5 4B | Ollama 0.35.1 i Docker (`ollama/ollama`) | `qwen3.5:4b`, ID `2a654d98e6fb` | «License: apache-2.0» (https://huggingface.co/Qwen/Qwen3.5-4B) |
+| Gemini 3.5 Flash-Lite | Gemini API, gratisnivået | `gemini-3.5-flash-lite`, `modelVersion` i svaret: `gemini-3.5-flash-lite` | Vilkårene er ført i dagsfila 04.10 kl. 11:00 |
+
+For Qwen ble lisensen først lest på kortet for Qwen3.5-9B, i samme familie, før nedlastingen. Kortet for Qwen3.5-4B ble lest etterpå, og det sier det samme.
+
+**Innstillinger.** Temperatur 0 og seed 42 for alle. For Gemma og Qwen var
+tenkingen slått av (`think: false`). For Gemini sto tenkingen på standard, som
+er «minimal» for Flash-Lite ifølge Googles side om thinking.
+
+**Kjøringene.** Ollama kjørte i en container med modellene i det navngitte
+volumet `ose-ki-ollama`. Det ble ikke installert noe på Windows. PC-en har
+15,7 GB minne, i7-13700HX og RTX 4070 Laptop med 8 188 MiB. Docker Desktop hadde
+8,2 GB minne. `ollama ps` viste «100% GPU» for kjøringene med grafikkort og
+«100% CPU» for kjøringen uten.
+
+- **Qwen uten grafikkort ble hoppet over.** Windows hadde 1,7 GB ledig minne
+  før kjøringen, og 1,8 GB etter at Docker Desktop var startet på nytt. Grensen
+  var 2 GB.
+- **Gemma med grafikkort ble kjørt** etter at Docker Desktop var startet på nytt
+  en gang til. Da var 3,3 GB ledig.
+- **Gemma uten grafikkort ble kjørt** med 2,1 GB ledig.
+- **Gemini: 11 kall.** Det kom ingen nye kall etter de 11.
+
+**NorMistral-7b-warm-instruct ble ikke prøvd.** Nedlastingen ble stoppet da
+PC-en hadde for lite minne, og instruksjonen kl. 16:52 valgte å gå videre uten
+den. Etter instruksjonen kl. 16:52 viste det seg at nedlastingen hadde fullført i
+containeren. Sjekksummen stemte med manifestet. Modellen ligger i volumet,
+men er ikke kjørt.
+
+**Tiden** er målt fra kallet ble sendt til svaret kom, per tekst. Den første
+teksten i hver lokal kjøring tar med innlastingen av modellen. For Gemini er
+tiden med nettverket.
+
+### Tid og kontroll per kjøring
+
+| Modell | Kjøring | Tekster | Besto FR-603 | Median tid per tekst | Lengste | Første (med innlasting) |
+|---|---|---:|---:|---:|---:|---:|
+| `gemini-3.5-flash-lite` | sky | 11 | 10 | 4,2 s | 7,6 s | 5,1 s |
+| `qwen3.5:4b` | gpu | 11 | 9 | 1,4 s | 61,4 s | 61,4 s |
+| `gemma4:e4b` | gpu | 11 | 9 | 0,9 s | 79,9 s | 79,9 s |
+| `gemma4:e4b` | cpu | 11 | 9 | 7,7 s | 32,7 s | 32,7 s |
+
+Med samme seed og temperatur ga Gemma ulik tekst med og uten grafikkort i 7 av
+11 tilfeller. Lik tekst kom for A-uten, B-uten, E-med og Dag. Om samme kjøring
+gir samme tekst to ganger på samme maskin, er ikke prøvd.
+
+### Prompten, ordrett
+
+For aksjedetaljen, der `{grunnlag}` byttes ut med grunnlaget:
+
+```text
+Du skriver en kort forklaring på norsk (bokmål) av et regelbasert signal for én aksje på Oslo Børs. Skriv to eller tre hele setninger. Bruk bare det som står i grunnlaget under. Ikke gi råd om å kjøpe, selge eller holde. Ikke gjett på årsaker, og ikke si noe om hva som vil skje videre. Ikke nevn tall som ikke står i grunnlaget.
+
+Slik leses grunnlaget:
+- Trend: kursen sammenlignet med snittet de siste 50 dagene (MA50).
+- Bevegelse: dagens endring sammenlignet med det vanlige daglige utslaget de siste 20 dagene.
+- Interesse: dagens volum sammenlignet med medianvolumet de 20 dagene før.
+- Hver sjekk har fortegn +1 (utslag opp), -1 (utslag ned) eller 0 (ingen utslag).
+- Styrke er hvor mange av de tre sjekkene som ga utslag (0 til 3).
+- Retning er Positiv, Negativ, Blandet eller Ingen.
+
+Grunnlag:
+{grunnlag}
+```
+
+For dagsteksten:
+
+```text
+Du skriver en kort tekst på norsk (bokmål) om hele børsdagen for de 15 aksjene i en oversikt over Oslo Børs. Skriv to eller tre hele setninger. Bruk bare det som står i grunnlaget under. Ikke gi råd om å kjøpe, selge eller holde. Ikke gjett på årsaker, og ikke si noe om hva som vil skje videre. Ikke nevn tall som ikke står i grunnlaget.
+
+Grunnlag:
+{grunnlag}
+```
+
+### Eksemplene
+
+Uten målingene er grunnlaget det samme, uten parentesene. Eksempel A uten
+målingene:
+
+```text
+Aksje: Eksempel A
+Trend: +1
+Bevegelse: +1
+Interesse: +1
+Styrke: 3
+Retning: Positiv
+```
+
+Eksempel A, med målingene:
+
+```text
+Aksje: Eksempel A
+Trend: +1 (+3,4 % mot MA50)
+Bevegelse: +1 (+2,8 % mot 1,6 % standardavvik)
+Interesse: +1 (volum 2,10 × medianen)
+Styrke: 3
+Retning: Positiv
+```
+
+Eksempel B, med målingene:
+
+```text
+Aksje: Eksempel B
+Trend: -1 (-4,1 % mot MA50)
+Bevegelse: -1 (-3,0 % mot 1,9 % standardavvik)
+Interesse: 0 (volum 1,12 × medianen)
+Styrke: 2
+Retning: Negativ
+```
+
+Eksempel C, med målingene:
+
+```text
+Aksje: Eksempel C
+Trend: +1 (+2,6 % mot MA50)
+Bevegelse: -1 (-2,2 % mot 1,4 % standardavvik)
+Interesse: -1 (volum 1,80 × medianen)
+Styrke: 3
+Retning: Blandet
+```
+
+Eksempel D, med målingene:
+
+```text
+Aksje: Eksempel D
+Trend: 0 (+0,8 % mot MA50)
+Bevegelse: 0 (+0,5 % mot 1,3 % standardavvik)
+Interesse: 0 (volum 0,95 × medianen)
+Styrke: 0
+Retning: Ingen
+```
+
+Eksempel E, med målingene:
+
+```text
+Aksje: Eksempel E
+Trend: -1 (-2,9 % mot MA50)
+Bevegelse: 0 (-0,7 % mot 1,5 % standardavvik)
+Interesse: 0 (volum 1,20 × medianen)
+Styrke: 1
+Retning: Negativ
+```
+
+Dagen:
+
+```text
+Antall aksjer: 15
+Skilte seg ut (styrke 2 eller mer): 3
+Retning Positiv: 5
+Retning Negativ: 4
+Retning Blandet: 2
+Retning Ingen: 4
+Gikk bedre enn hovedindeksen: 6
+Hovedindeksen: ned
+Energi: 3 av 4 opp
+Sjømat: 1 av 3 opp
+Finans: 2 av 4 opp
+Industri: 1 av 4 opp
+```
+
+### Kontrollen mot FR-603
+
+Kontrollen er et lite skript utenfor repoet, med ordlister for de fire
+punktene: retning og styrke, tallene, råd og gjetning eller årsak. Den er grov.
+Punkt 2 kjenner bare tall skrevet med sifre. Underveis fikk den en sjekk av
+fortegn: et negativt tall i grunnlaget kan stå uten minus bare når teksten sier
+at det gikk ned. Sjekken kom etter at Gemini-teksten B-med ble lest. Alle
+tekstene i tabellen er sjekket med den endelige versjonen.
+
+**Tekster kontrollen stoppet:**
+
+- `gemini-3.5-flash-lite`, sky, B-med: 2: 4,1 står uten minus, grunnlaget har -4,1
+- `qwen3.5:4b`, gpu, C-uten: 4: «på grunn av»
+- `qwen3.5:4b`, gpu, D-med: 4: «fordi»
+- `gemma4:e4b`, gpu, D-uten: 4: «skyldes»
+- `gemma4:e4b`, gpu, D-med: 4: «skyldes»
+- `gemma4:e4b`, cpu, D-uten: 4: «skyldes»
+- `gemma4:e4b`, cpu, D-med: 4: «skyldes»
+
+**Lest manuelt etterpå.** Ordene «fordi», «skyldes» og «på grunn av» viser i
+alle seks tilfellene til regelen selv, for eksempel at retningen er Ingen fordi
+ingen sjekk ga utslag. De nevner ingen årsak utenfor grunnlaget.
+
+Kontrollen slapp gjennom disse feilene, fordi de er skrevet med ord og ikke med
+sifre:
+
+- `qwen3.5:4b` A-uten sier «den femdagssnittet». Grunnlaget har snittet over 50 dager.
+- `qwen3.5:4b` Dag sier «seks av de femti aksjene». Grunnlaget har 15 aksjer.
+- `qwen3.5:4b` Dag sier at det i de fire sektorene var flere aksjer som gikk opp
+  enn ned. Grunnlaget har 7 av 15 opp.
+
+### Tekstene, ordrett
+
+#### `gemini-3.5-flash-lite`, sky
+
+- **A-uten** (5,1 s): Aksje Eksempel A har en positiv retning med en styrke på 3, ettersom alle de tre sjekkene for trend, bevegelse og interesse ga utslag på +1. Kursen er høyere enn snittet de siste 50 dagene, dagens endring er større enn det vanlige utslaget de siste 20 dagene, og dagens volum er høyere enn medianvolumet de 20 dagene før.
+- **A-med** (5,6 s): For aksjen Eksempel A viser trenden og bevegelsen utslag opp med henholdsvis +3,4 % mot MA50 og +2,8 % mot standardavviket. Dagens volum er 2,10 ganger medianen, noe som gir et utslag opp på interesse. Samlet gir dette en styrke på 3 og en positiv retning.
+- **B-uten** (0,8 s): Aksje Eksempel B har en negativ retning med en styrke på 2. Trenden og bevegelsen gir utslag ned, mens interessen viser ingen utslag.
+- **B-med** (6,9 s): For Eksempel B er trenden -1 med en kurs som ligger 4,1 % mot MA50, og bevegelsen er -1 med et utslag på -3,0 % mot 1,9 % standardavvik. Interessen er 0 med et volum på 1,12 ganger medianen, noe som gir en styrke på 2 og en negativ retning.
+- **C-uten** (6,4 s): For aksjen Eksempel C viser trenden et utslag opp, mens både bevegelse og interesse viser utslag ned. Styrken er tre, og retningen er blandet.
+- **C-med** (4,2 s): For aksjen Eksempel C viser trenden +1 med en kurs som er 2,6 prosent mot MA50, mens bevegelsen er -1 på -2,2 prosent mot 1,4 prosent standardavvik. Interessen er -1 med et volum på 1,80 ganger medianen, noe som gir en styrke på 3 og en blandet retning.
+- **D-uten** (0,9 s): Aksje Eksempel D har en styrke på 0 og en retning som er satt til Ingen. Sjekkene for både trend, bevegelse og interesse viser ingen utslag med verdien 0.
+- **D-med** (0,8 s): For aksjen Eksempel D viser sjekkene en styrke på 0, ettersom ingen av de tre sjekkene ga utslag. Dette gir en retning som er definert som Ingen.
+- **E-uten** (0,9 s): For aksjen Eksempel E viser trenden et negativt utslag på -1, mens bevegelse og interesse ikke gir noen utslag. Den totale styrken er 1, og samlet retning er definert som negativ.
+- **E-med** (7,6 s): For aksjen Eksempel E viser trenden et negativt utslag på minus 2,9 prosent mot MA50, mens bevegelse og interesse ikke gir noen utslag. Dette gir en samlet styrke på én og en negativ retning.
+- **Dag** (1,0 s): Oslo Børs endte ned for hovedindeksen, og av de 15 aksjene i oversikten hadde 5 en positiv retning, 4 en negativ retning, 2 en blandet retning og 4 ingen retning. Tre aksjer skilte seg ut med en styrke på 2 eller mer, og 6 aksjer gikk bedre enn hovedindeksen. Innen sektorene gikk 3 av 4 opp i energi, 1 av 3 opp i sjømat, 2 av 4 opp i finans og 1 av 4 opp i industri.
+
+#### `qwen3.5:4b`, gpu
+
+- **A-uten** (61,4 s): For aksjen Eksempel A indikerer regelbaserte sjekker at kursen ligger over den femdagssnittet, har en positiv endring i forhold til det vanlige daglige utslaget og et volum som overstiger medianvolumet. Alle tre faktorer gir et positivt utslag, noe som resulterer i en styrke på 3 og en total retning klassifisert som Positiv.
+- **A-med** (1,7 s): Signalet for aksjen er basert på at kursen ligger over snittet de siste 50 dagene, at dagens endring overstiger det vanlige daglige utslaget og at dagens volum er høyere enn medianvolumet de siste 20 dagene. Alle tre sjekker gir et positivt utslag, noe som resulterer i en styrke på 3 og en retning klassifisert som Positiv.
+- **B-uten** (1,0 s): For aksjen Eksempel B indikerer analysen en negativ retning basert på at både trend og bevegelse viser nedadgående utslag. Dette gir en styrke på to, mens interesse sjekken ikke ga et klart utslag.
+- **B-med** (1,1 s): Signalet for aksjen Eksempel B er basert på en negativ trend og en nedadbevegelse, mens volumet ligger i snitt. Dette gir et totalt styrkeverdi på to utslag, noe som resulterer i en negativ retning.
+- **C-uten** (1,1 s): For aksjen Eksempel C er trenden positiv, mens bevegelsen og interessen begge viser nedadgående utslag. Dette gir en styrke på tre, men retningen blir klassifisert som blandet på grunn av motsetningene mellom de ulike faktorene.
+- **C-med** (1,4 s): Signalet for aksjen Eksempel C er basert på en analyse av trend, bevegelse og interesse i forhold til henholdsvis 50-dagers snitt, standardavvik og medianvolum. Alle tre sjekker ga utslag, noe som resulterte i en styrke på 3 og en retning klassifisert som blandet.
+- **D-uten** (0,8 s): For aksjen Eksempel D er trend, bevegelse og interesse alle null, noe som gir en styrke på null. Dette resulterer i at retningen blir klassifisert som «Ingen».
+- **D-med** (1,5 s): For aksjen Eksempel D er trenden, bevegelsen og interessen alle null fordi dagens utvikling ikke avviker markant fra snittet, det vanlige utslaget eller medianvolumet. Det betyr at ingen av de tre sjekkene ga et utslag, noe som resulterte i en styrke på null og en retning klassifisert som «Ingen».
+- **E-uten** (1,0 s): For aksjen Eksempel E er trenden negativ siden kursen ligger under snittet på 50 dager, mens bevegelsen og interessen ikke viste utslag. Dette gir en styrke på én og en generell retning som er negativ.
+- **E-med** (1,4 s): Signalet for aksjen Eksempel E er basert på en trend som ligger under snittet de siste 50 dagene, noe som gir et negativt utslag. Bevegelsen og interessen viser ingen utslag, slik at styrken blir én av tre sjekker. Dette resulterer i en total retning som er negativ.
+- **Dag** (1,9 s): I dagens børsdag på Oslo Børs var hovedindeksen ned, og seks av de femti aksjene i oversikten gikk bedre enn denne. Av de 15 aksjene som ble presentert, skilte tre ut med en styrke på to eller mer, mens retningen varierte fra positiv til negativ blandet med ingen endring. I sektorene energi, sjømat, finans og industri var det flere aksjer som opp enn som gikk ned.
+
+#### `gemma4:e4b`, gpu
+
+- **A-uten** (79,9 s): For aksjen Eksempel A er trenden positiv, da kursen er sammenlignet med snittet de siste 50 dagene. Bevegelsen er også positiv, basert på dagens endring sammenlignet med det vanlige daglige utslaget de siste 20 dagene. Samlet sett har aksjen en styrke på 3, noe som gir en positiv retning.
+- **A-med** (0,9 s): For aksjen Eksempel A er trenden positiv, da kursen er opp mot MA50. Bevegelsen er også positiv, og volumet er høyere enn medianvolumet de siste 20 dagene. Dette resulterer i en styrke på 3 og en retning som er Positiv.
+- **B-uten** (0,9 s): For aksjen Eksempel B er trenden negativ, da kursen sammenlignes med snittet de siste 50 dagene. Bevegelsen er også negativ, basert på dagens endring sammenlignet med det vanlige daglige utslaget de siste 20 dagene. Samlet sett har aksjen en styrke på 2, noe som gir en negativ retning.
+- **B-med** (0,9 s): For aksjen Eksempel B er trenden negativ, da kursen er -4,1 % mot MA50. Bevegelsen er også negativ, med en endring på -3,0 % mot det vanlige daglige utslaget. Samlet gir dette en negativ retning med en styrke på 2.
+- **C-uten** (0,6 s): For aksjen Eksempel C er trenden positiv, mens bevegelsen og interessen er negative. Styrken til signalet er 3, og retningen er Blandet.
+- **C-med** (0,9 s): For aksjen Eksempel C er trenden positiv, da kursen er opp 2,6 % mot MA50. Bevegelsen er negativ, og volumet er høyere enn medianvolumet de 20 dagene før. Dette resulterer i en styrke på 3 og en retning som er Blandet.
+- **D-uten** (0,7 s): For aksjen Eksempel D er styrken på signalet 0. Retningen på signalet er Ingen. Dette skyldes at Trend, Bevegelse og Interesse alle ga utslag på 0.
+- **D-med** (1,1 s): For aksjen Eksempel D er styrken 0, da ingen av de tre sjekkene ga utslag. Retningen er Ingen. Dette skyldes at kursen sammenlignet med snittet de siste 50 dagene, dagens endring sammenlignet med det vanlige daglige utslaget de siste 20 dagene, og dagens volum sammenlignet med medianvolumet de 20 dagene før, alle ga utslag på 0.
+- **E-uten** (0,8 s): For aksjen Eksempel E er trenden negativ basert på sammenligningen med snittet de siste 50 dagene. Bevegelsen og interessen gir ingen utslag. Styrken på signalet er 1, og retningen er Negativ.
+- **E-med** (0,9 s): For aksjen Eksempel E er trenden negativ, da kursen er -2,9 % mot MA50. Bevegelsen er nøytral, og interessen er nøytral. Styrken til signalet er 1, og retningen er Negativ.
+- **Dag** (0,9 s): På børsdagen var det totalt 15 aksjer i oversikten. Tre aksjer skilte seg ut med styrke to eller mer, mens fem aksjer hadde en positiv retning. Hovedindeksen gikk ned, men seks aksjer gikk bedre enn hovedindeksen.
+
+#### `gemma4:e4b`, cpu
+
+- **A-uten** (32,7 s): For aksjen Eksempel A er trenden positiv, da kursen er sammenlignet med snittet de siste 50 dagene. Bevegelsen er også positiv, basert på dagens endring sammenlignet med det vanlige daglige utslaget de siste 20 dagene. Samlet sett har aksjen en styrke på 3, noe som gir en positiv retning.
+- **A-med** (7,4 s): For aksjen Eksempel A er trenden positiv, da kursen er opp mot MA50. Bevegelsen er også positiv, og interessen er positiv da volumet er høyere enn medianvolumet. Dette resulterer i en styrke på 3 og en retning som er Positiv.
+- **B-uten** (7,1 s): For aksjen Eksempel B er trenden negativ, da kursen sammenlignes med snittet de siste 50 dagene. Bevegelsen er også negativ, basert på dagens endring sammenlignet med det vanlige daglige utslaget de siste 20 dagene. Samlet sett har aksjen en styrke på 2, noe som gir en negativ retning.
+- **B-med** (8,6 s): For aksjen Eksempel B er trenden negativ, da kursen er -4,1 % mot MA50. Bevegelsen er også negativ, med en endring på -3,0 % mot det vanlige daglige utslaget. Samlet sett har aksjen en styrke på 2, noe som gir en negativ retning.
+- **C-uten** (6,6 s): For aksjen Eksempel C er trenden +1, bevegelsen er -1 og interessen er -1. Styrken er 3, og retningen er Blandet.
+- **C-med** (7,9 s): For aksjen Eksempel C er trenden positiv, da kursen er opp mot MA50. Bevegelsen er negativ, og interessen er negativ sammenlignet med medianvolumet de 20 dagene før. Styrken er 3, og retningen er Blandet.
+- **D-uten** (7,7 s): For aksjen Eksempel D er styrken på signalet 0. Retningen på signalet er Ingen. Dette skyldes at Trend, Bevegelse og Interesse alle ga et utslag på 0.
+- **D-med** (8,5 s): For aksjen Eksempel D er styrken 0, da ingen av de tre sjekkene ga utslag. Retningen er Ingen. Dette skyldes at trenden, bevegelsen og interessen alle ga et utslag på 0.
+- **E-uten** (7,2 s): For aksjen Eksempel E er trenden negativ basert på kursen sammenlignet med snittet de siste 50 dagene. Bevegelsen og interessen gir ingen utslag. Styrken på signalet er 1, og retningen er Negativ.
+- **E-med** (8,2 s): For aksjen Eksempel E er trenden negativ, da kursen er -2,9 % mot MA50. Bevegelsen er nøytral, og interessen er nøytral. Styrken til signalet er 1, og retningen er Negativ.
+- **Dag** (7,6 s): På børsdagen var det totalt 15 aksjer i oversikten. Tre aksjer skilte seg ut med styrke to eller mer, mens fem aksjer hadde en positiv retning. Hovedindeksen gikk ned, men seks aksjer gikk bedre enn hovedindeksen.
