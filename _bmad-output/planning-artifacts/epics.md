@@ -1648,6 +1648,10 @@ kan sende artikkeltekst inn uten å bryte godkjenningen vi fikk.
 > delene av systemet fra å sprike. **Enhver story som sender artikkeltekst inn i
 > en modell, er blokkert av denne.** Ikke anbefalt etter: blokkert.
 
+*Merknad 2026-10-04:* det som sendes til modellen i v1, er våre egne resultater: fortegn, styrke, retning og antall. Det er ikke artikkeltekst, og ikke prosenter, forholdstall, kurser eller volumer. Betingelse 4 ble stilt for artikkeltekst. Vilkårene er likevel ført for hver tjeneste, slik storyen krever. Valget: en lokal modell, Gemma 4 E4B, er standard, og egne nøkler til Gemini, Anthropic API og OpenAI API er valg. Prøven står i `malinger.md` §19.
+
+*Ferdig 2026-10-04:* skrevet i `dcbce6d` (vilkårene i `docs/kilder-og-rettigheter.md`), `28851b0` (plan B) og `a4b7171` (`prd.md`), uten PR, fordi bare dokumenter endres. Står i review til Marian eller Joakim har lest seksjonen.
+
 ### Story 4.2: `KILogg`-porten med minneimplementasjon
 
 Som **utvikler**, vil jeg definere KI-loggen som én port før modellen finnes, så
