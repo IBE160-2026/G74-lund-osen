@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-05T17:30
+updated: 2026-10-05T19:20
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -552,6 +552,8 @@ igjen, og utskriften går til en loggfil i `data/`. Grunnene: punkt 23 har lagt
 kjøringen til kl. 22:00–midnatt, 2.3 gjør kommandoen trygg å starte når som
 helst, og etter 2.5 er en dag uten henting en vurdering som mangler for alltid
 (AD-7). Til da kjøres hentingen for hånd, og kravteksten over står uendret.
+
+*Lagt til 2026-10-05, gruppens svar kl. 19:17 på planen for story 2.3:* jobben kjører hver dag kl. 22:15, ikke bare på hverdager. På en dag som ikke er børsdag avgjør basen om det hentes: mangler siste børsdag for noen av aksjene, hentes den, fordi raden for den dagen fortsatt kan skrives (AD-7). Jobben kjører fra en egen arbeidskopi av main, som deler `data/` og `.env` med hovedkopien uten at nøkkelen kopieres.
 
 #### FR-402 — Kontroll mot forventet børsdag, ikke mot klokkeslett
 
@@ -1338,6 +1340,8 @@ margin**. Avsnittet over gjelder til story 2.8 er bygget.
 *Lagt til 2026-10-02:* idéen «Måling av omsetning med kall til overs» i §8 bruker marginen bare etter at kveldens henting har gått bra, og lar 2 kall stå igjen. Alle kallene brukes bare når brukeren selv kjører målingen etter at dagen er ferdig.
 
 *Lagt til 2026-10-02:* lista har opptil 18 aksjer (§8, «Egne aksjer»), så minst 1 kall er igjen hver dag.
+
+*Lagt til 2026-10-05, gruppens svar kl. 19:17 på planen for story 2.3:* bonuskvoten (`extraLimit`) brukes bare til å fullføre hovedhentingen. Hentekommandoen leser kvoten med `/api/user` før første kall. Er det færre enn 15 kall igjen av dagens 20, men bonuskvoten dekker resten, hentes det likevel, og utskriften sier hvor mange kall som tas fra bonusen. Dekker heller ikke bonusen det, blir det 0 kall. Nye forsøk etter hovedhentingen (story 2.3b) bruker aldri bonuskvoten.
 
 Ett bulk-kall er ikke et alternativ: bulk-endepunktet koster 100 kall flatt. Ett
 kall per symbol er eneste vei, og det er denne begrensningen som gir universet
