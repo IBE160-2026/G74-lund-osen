@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-10-03T22:48'
+updated: '2026-10-05T15:39'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -158,6 +158,7 @@ manglet i grafen.
 - **Prevents:** at to moduler hver for seg begynner å kalle EODHD, og at en kvote på 20 kall brennes uten at noen ser hvor
 - **Rule:** nettkall skjer **bare i skallet**, med **én hentefunksjon per kilde**, og funksjonen injiseres til den som bruker den — slik `hent_universet(..., hent=hent_ett_symbol)` allerede gjør. I dag er EODHD eneste kilde; FR-404 (NewsWeb) og FR-301 (finanskalenderen) får hver sin, i hver sin skallfil. **Modelltjenesten er også en kilde** (Epic 4, og plan B i Epic 5B): én hentefunksjon, i skallet, injisert, og aldri kalt fra en test. *Lagt til 2026-09-24.*
 - **Opphav:** commit `352e3a2` (21.09). *Regelen er omformulert i gjennomgangen: «eneste sted `requests` brukes» kunne ikke overleve FR-404 og FR-301, og ville blitt stilltiende brutt.*
+- **Merknad 2026-10-05 (FR-608, story 10.2 og 10.7):** hver modelltjeneste er en egen kilde, med én hentefunksjon i sin egen skallfil: `ki_lokal.py` (Ollama), `ki_gemini.py`, `ki_anthropic.py` og `ki_openai.py`. Alle oppfyller porten `Modell`, og funksjonen injiseres. `OSE_KI_TJENESTE` velger én tjeneste per kjøring, uten stille overgang. Ingen av dem kalles fra en test (`AD-8`).
 
 ### AD-3 — Én port per eid datasett
 
@@ -218,6 +219,7 @@ manglet i grafen.
 - **Prevents:** videreformidling av kilde­data. EODHDs godkjenning av 21.09 dekker **demonstrasjonen** for lærer og klasse — den dekker ikke at vi overleverer et datasett
 - **Rule:** imaget bygges fra repoet, og repoet har ingen rådata (`.gitignore` utelater `data/` og `*-raa-*.json`). Et seedet datasett bakes **ikke** inn «for at det skal virke hos sensor». Leveransen er Dockerfile og kildekode, ikke et ferdig image. *24.09: Dockerfilen er sagt av faglærer i samtale 21.09, ikke på emnesiden (hjelpelærer 23.09); den lages likevel.*
 - **Utvidet 2026-10-03 (FR-411, Marians beslutning):** demobasen `data/db/demo.db` har oppdiktede selskaper og kurser, laget av en egen kommando uten nøkkel og uten nett. Oppdiktede tall er ikke data fra EODHD, så demobasen bryter ikke formålet med regelen, som er å ikke videreformidle kildedata. Imaget har likevel ingen base, heller ikke demobasen. Repoet har den heller ikke, fordi den ligger under `data/`, som er gitignorert. Den som vil prøve demoversjonen, kjører kommandoen selv.
+- **Merknad 2026-10-05 (FR-608, story 3.1, 3.2 og 3.4):** den lokale modellen ligger i et eget volum, `ollama`, hentes første gang med Ollamas pull-endepunkt og er aldri i imaget. De ferdige KI-tekstene til demoen ligger i en fil i repoet, fordi demobasen aldri ligger der. Tekstene er laget av oppdiktede tall, ikke av data fra EODHD.
 
 ### AD-10 — Webserveren starter aldri en henting
 
@@ -237,6 +239,7 @@ manglet i grafen.
 - **Binds:** AD-9, FR-401
 - **Prevents:** en API-nøkkel i et image eller i git
 - **Rule:** `EODHD_API_KEY` leses fra miljøet ved kjøretid. `.env` er gitignorert, `.env.example` viser bare variabelnavnet, og CI kjører med `permissions: contents: read` og ingen hemmeligheter.
+- **Merknad 2026-10-05 (FR-608, story 10.7 og 10.8):** de nye variablene leses også fra miljøet: `OSE_KI_TJENESTE`, `OSE_KI_GEMINI_NOKKEL`, `OSE_KI_ANTHROPIC_NOKKEL` og `OSE_KI_OPENAI_NOKKEL`. `.env.example` viser bare navnene. Tokenfila for ChatGPT (10.8) ligger under `data/ki/`, som er gitignorert. Ingen nøkkel eller innlogging følger med appen eller repoet, og hver kobler bare til sin egen. Grunnen står i `docs/kilder-og-rettigheter.md`, «Betingelse 4 og KI-tjenestene (2026-10-04)»: avsnitt 4b i Google APIs Terms sier at «Developer credentials may not be embedded in open source projects.», og Agent SDK-oversikten sier at Anthropic ikke tillater tredjeparter å tilby claude.ai-innlogging. PRD-memloggen 04.10 nevner også avsnitt 2 i Anthropics Consumer Terms. Det er ikke sitert i `docs/kilder-og-rettigheter.md` og er ikke lest i økta 05.10, så det står ikke her.
 
 ### AD-13 — Signalparametre er konstanter med måling bak seg `[ADOPTED 2026-09-20/21]`
 
