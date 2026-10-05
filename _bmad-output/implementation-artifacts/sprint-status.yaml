@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-24-2026 19:26
-last_updated: 10-05-2026 17:06
+last_updated: 10-05-2026 17:29
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -88,7 +88,7 @@ development_status:
 
   epic-4: backlog
   4-0-nettsperren-dekker-hele-testkjøringen: backlog
-  4-1-velg-modelltjeneste-og-dokumentér-betingelse-4: review
+  4-1-velg-modelltjeneste-og-dokumentér-betingelse-4: done
   4-2-kilogg-porten-med-minneimplementasjon: backlog
   4-3-sqlite-adapter-for-kilogg: backlog
   epic-4-retrospective: optional

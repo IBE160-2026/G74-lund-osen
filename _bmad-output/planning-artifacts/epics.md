@@ -1773,6 +1773,8 @@ kan sende artikkeltekst inn uten å bryte godkjenningen vi fikk.
 
 *Ferdig 2026-10-04:* skrevet i `dcbce6d` (vilkårene i `docs/kilder-og-rettigheter.md`), `28851b0` (plan B) og `a4b7171` (`prd.md`), uten PR, fordi bare dokumenter endres. Står i review til Marian eller Joakim har lest seksjonen.
 
+*Lest 2026-10-05:* Marian sa kl. 17:29 at seksjonen er lest, og 4-1 er done.
+
 ### Story 4.2: `KILogg`-porten med minneimplementasjon
 
 Som **utvikler**, vil jeg definere KI-loggen som én port før modellen finnes, så
