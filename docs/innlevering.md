@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-10-05T17:08
+updated: 2026-10-05T19:48
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -26,6 +26,21 @@ svaret er utdrag, gjengitt av Marian i økta 23.09. Verken emnesiden eller
 e-posten er lagt i repoet, så de kan ikke kontrolleres herfra, og utdragene er
 ikke rekonstruert til mer enn det som ble gjengitt. Legg inn fullteksten når
 den finnes.
+
+---
+
+## Status 2026-10-05
+
+**Virker nå:** hentingen av sluttkurser fra EODHD til SQLite-basen, med dagens
+vurdering per aksje i samme kjøring, og markedsoversikten og aksjedetaljen, som
+leser kursene og den lagrede vurderingen fra basen.
+
+**Kommer:** børsdagskontrollen (2.3), så Docker og demoversjonen (3.1–3.4).
+Demoversjonen er hovedveien for vurderingen etter svaret fra hjelpelæreren
+05.10 (under). Deretter KI-laget (Epic 4 og 10).
+
+**Ukjent:** datoene for prosjektinnlevering og demonstrasjon (punkt C og D).
+Hver story og status står i [sprintstatusen](../_bmad-output/implementation-artifacts/sprint-status.yaml).
 
 ---
 
@@ -95,7 +110,7 @@ Merk at bare frasen
 | | |
 |---|---|
 | **Status** | **Delvis** |
-| **Ligger i** | `src/` (12 moduler og `migrasjoner/`), `tests/` (17 testfiler, 468 tester — telt 2026-09-26), `.github/workflows/`, `pyproject.toml`, `uv.lock`. *Rettet 2026-09-26:* her sto 10 moduler, 13 filer og 285 tester, telt 2026-09-24. *Rettet 2026-09-26, etter 1.5b (`ef1cca7`):* her sto 427 tester. *Rettet 2026-09-26, etter 2.0 (`4b65a3c`):* her sto 455 tester |
+| **Ligger i** | `src/` (12 moduler og `migrasjoner/`), `tests/` (17 testfiler, 468 tester — telt 2026-09-26), `.github/workflows/`, `pyproject.toml`, `uv.lock`. *Rettet 2026-09-26:* her sto 10 moduler, 13 filer og 285 tester, telt 2026-09-24. *Rettet 2026-09-26, etter 1.5b (`ef1cca7`):* her sto 427 tester. *Rettet 2026-09-26, etter 2.0 (`4b65a3c`):* her sto 455 tester. *Telt 2026-10-05, på `3fac7cc`:* 17 moduler i `src/` og fire migrasjoner i `src/migrasjoner/`, 23 testfiler og 1148 tester |
 | **Gjenstår** | **Dockerfile finnes ikke.** Kontrollert 21.09 og igjen 22.09: ingen treff på `Dockerfile` eller `docker-compose` noe sted i repoet. Beslutningen var punkt 18 i `prd.md`, som ble lukket 22.09 (AD-9 til AD-12), og selve Dockerfilen er story 3.1. *Rettet 2026-09-26:* her sto «Ført som åpent punkt 18 i `prd.md`». |
 
 Arkitekturen for den er besluttet 22.09 og ligger i `ARCHITECTURE-SPINE.md`:
@@ -489,13 +504,14 @@ tatt».
 
 | Punkt | Merknad |
 |---|---|
-| **Databasen** | Sagt i samtale av faglærer 21.09, ikke bekreftet på emnesiden. Gjøres likevel. **Delvis bygget 23.09:** migrasjonsløper (story 1.1, `57a83c5`), `kurs` og `kursserie` med SQLite-adapter (story 1.3, `f4fada0`). Ikke koblet til appen ennå |
+| **Databasen** | Sagt i samtale av faglærer 21.09, ikke bekreftet på emnesiden. Gjøres likevel. **Delvis bygget 23.09:** migrasjonsløper (story 1.1, `57a83c5`), `kurs` og `kursserie` med SQLite-adapter (story 1.3, `f4fada0`). Ikke koblet til appen ennå. *Rettet 2026-10-05:* koblet til appen. Hentingen skriver kursene og dagens vurdering til basen (story 2.1b og 2.5), og sidene leser kursene og vurderingen derfra (story 2.2, `1570ae9`, og 2.2b, `ff58ecf`). Basen har migrasjonene 0001–0004: `kurs`, `vurdering`, `aksje` og målingene |
 
 ## Finnes ikke i det hele tatt
 
 | Punkt | Merknad |
 |---|---|
 | **Dockerfile** | Sagt i samtale av faglærer 21.09 («kildekode og docker fil»), ikke bekreftet på emnesiden (hjelpelærer 23.09). Gjøres likevel. Arkitekturen er klar, filen er ikke skrevet |
+| **Demoversjonen** *(lagt til 2026-10-05)* | Oppdiktede selskaper og kurser i en egen base, uten konto og uten nøkkel (FR-411, story 3.4). Hovedveien for vurderingen etter svaret fra hjelpelæreren 05.10. Bygges sammen med Docker i 3.1–3.4 |
 | **Refleksjonsrapporten** | Råmaterialet er ført siden 13.09, men rapporten skal etter faglærers eget svar skrives *etter* prosjektet |
 | **Datoene** | Både prosjektinnlevering og demonstrasjon er ukjente, og fire av de åtte suksessmålene henger på dem (*rettet 2026-09-24: her sto «åtte»*) |
 
