@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-24-2026 19:26
-last_updated: 10-04-2026 21:32
+last_updated: 10-05-2026 15:37
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -141,4 +141,6 @@ development_status:
   10-4-måle-bidraget-egen-brukertest-etter-8-1: backlog
   10-5-lenke-til-selskapets-side-på-newsweb: backlog
   10-6-ki-teksten-om-dagen-på-forsiden: backlog
+  10-7-egen-nøkkel-til-gemini-anthropic-og-openai: backlog
+  10-8-chatgpt-med-sign-in-with-chatgpt: backlog
   epic-10-retrospective: optional

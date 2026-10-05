@@ -122,6 +122,7 @@ krever tre konkrete svar per kandidat:
 - **FR-605** — Promptversjon og modell lagres med hver vurdering
 - **FR-606** — Relevansskalaen
 - **FR-607** — KI-teksten om dagen på forsiden *(lagt til 2026-10-03)*
+- **FR-608** — Valg av tjeneste *(lagt til 2026-10-05)*
 
 **4.7 Signalstyrke og retning**
 
@@ -144,6 +145,9 @@ Marians beslutninger 02.10 og sto i PRD-en, men manglet i lista. Med dem er det
 
 *Lagt til 2026-10-03:* FR-411 kom til med demoversjonen (Marians beslutning), så
 det er 40 FR-er.
+
+*Lagt til 2026-10-05:* FR-608 kom til med valget av KI-tjeneste (gruppens
+beslutning 04.10), så det er 41 FR-er.
 
 ### NonFunctional Requirements
 
@@ -299,6 +303,7 @@ kontrollen 22.09 fant det.
 | FR-205 | Epic 8 *(lagt til 2026-10-03)* |
 | FR-607 | Epic 10 *(lagt til 2026-10-03)* |
 | FR-411 | Epic 3 *(lagt til 2026-10-03)* |
+| FR-608 | Epic 10 *(lagt til 2026-10-05)* |
 
 *Rettet 2026-10-03 (kontrollen 26.09, E7):* tabellen viser epicen der kravet først bygges. FR-401 hører også til Epic 3, der en story oppfyller tom-tilstanden, og FR-408 også til Epic 2, der story 2.5 skriver vurderingen i hentingen.
 
@@ -310,6 +315,8 @@ kontrollen 22.09 fant det.
 12 + 27 = 39.
 
 *Lagt til 2026-10-03:* med FR-411 er det 12 + 28 = 40.
+
+*Lagt til 2026-10-05:* med FR-608 er det 12 + 29 = 41.
 
 ### NFR Coverage Map
 
@@ -359,7 +366,15 @@ Epic 2.2 ──> 2.9
 Epic 4.1 ──> Epic 9.5 (relevanseksperimentet, del 2)
 Epic 2.5 ──> Epic 10.2 (teksten lages rett etter vurderingen)   *(lagt til 2026-10-03, E6)*
 Epic 4.3 + 8.1 + 10.3 ──> Epic 10.4 (måle bidraget, med KILogg)   *(lagt til 2026-10-03, E6)*
+Epic 4.0 + 4.2 + 4.3 ──> Epic 10.2 (nettsperren og KILogg før modellen)   *(lagt til 2026-10-05)*
 ```
+
+*Lagt til 2026-10-05:* 10.2 skriver til `KILogg` (FR-604), og nettsperren må
+dekke hele testkjøringen før noe kan kalle Ollama (`AD-8`). Derfor kommer 4.0,
+4.2 og 4.3 før 10.2. Rekkefølgen for KI-laget er da 4.0, 4.2, 4.3, 10.1, 10.2,
+3.1 med compose-fila, 10.3, 10.6, 3.4 og 10.7. 10.8 er kandidat til v1.1. Blir
+tiden knapp, gir den lokale modellen alene gratis KI for alle, og 10.7 kan
+vente.
 
 *Rettet 2026-10-03 (kontrollen 26.09, E6):* grafen manglet to harde avhengigheter som står i storyene. 10.2 lager teksten i hentekommandoen rett etter vurderingen, og trenger derfor 2.5. 10.4 avhenger av 8.1 og 10.3, og måler bidraget med `KILogg` over minst én ukes drift, som krever 4.3.
 
@@ -486,6 +501,11 @@ vært, og det skal stå slik.
 | **Avhenger av** | Epic 4.1 (betingelse 4 dokumentert), `KILogg` (4.2/4.3), 1.4a (`Kursleser`), og at oppfølgingspunktet om EODHD og plan B er avgjort (`docs/kilder-og-rettigheter.md`) |
 | **Krav** | FR-601..606 skrives ikke om før 28.09. Blir plan B utløst, skrives de om da, med «forståelighet, ikke informasjon» i kravteksten |
 | **Forhold til plan A** | Ikke enten–eller. Kommer et ja senere, bygges plan A oppå 5B, ikke i stedet for |
+
+*Lagt til 2026-10-05:* 4.1 er ført, og oppfølgingspunktet om EODHD og plan B er
+avgjort 04.10 (vi spør ikke). FR-601 til FR-607 er skrevet om etter valget av
+tjeneste, og FR-608 er ny. Epicen har fått 10.7 (egen nøkkel) og 10.8 (ChatGPT,
+kandidat til v1.1).
 
 ### Epic 6: Børsmeldinger i oversikten 🔒
 
@@ -1482,6 +1502,16 @@ vurderingen ikke avhenger av at gruppens maskin er i rommet.
 - Migrasjoner kjøres **uten** et eget kommandosteg *(avgjort i 2.1b 2026-09-28: én funksjon åpner basen og kjører migrasjonene for begge inngangene, så 3.1 bare pakker)*
 - **Ville feilet hvis:** migrasjonene ble lagt i en egen kommando. Det ville sett ut som ryddig ansvarsdeling og brutt suksessmålet «Drift»
 
+*Lagt til 2026-10-05 (KI-laget, FR-608):*
+- En compose-fil med appen og Ollama, og volumene `ose-db`, `ose-raa` og
+  `ollama` (3.2)
+- Modellen hentes første gang med Ollamas pull-endepunkt og bakes aldri inn i
+  imaget (`AD-9`)
+- Appen starter og viser sidene uten at Ollama kjører. KI er da av, og siden
+  sier hvorfor (FR-601, NFR-04)
+- **Ville feilet hvis:** modellen lå i imaget. Da blir imaget flere GB større,
+  og modellen følger med leveransen i stedet for å hentes av den som kjører
+
 **Én økt:** ja.
 
 > **Denne storyen har ingen FR bak seg, og det er ikke storyens mangel.**
@@ -1503,6 +1533,13 @@ slettes ved et uhell, så det som ikke kan hentes på nytt, overlever.
 - Å fjerne basevolumet lar øyeblikksbildene stå
 - Imaget kjører uten at noen av volumene finnes fra før
 - **Ville feilet hvis:** ett volum dekket hele `data/`. Da tar én kommando med seg både det gjenoppbyggbare og det uerstattelige — og `vurdering` er uerstattelig selv om den ligger i basen
+
+*Merknad 2026-10-05:* med den lokale modellen (FR-608) kommer et tredje volum,
+`ollama`, for modellen. Det er gjenoppbyggbart: modellen kan hentes på nytt, og
+volumet har ingen data fra kildene. Det holdes atskilt fra `ose-db` og
+`ose-raa`, så å fjerne det tar verken basen eller øyeblikksbildene med seg. I
+prøven i `malinger.md` §19 var volumet `ose-ki-ollama` på 6,2 GB med bare Gemma
+igjen (dagsfila 04.10, instruksjonen kl. 21:29).
 
 **Én økt:** ja.
 
@@ -1536,6 +1573,19 @@ skjermbildene med ekte data ved å følge README alene.
 ekte kurser. Et skjermbilde med ekte EODHD-data i det offentlige repoet ville
 publisert dataene, mot EODHDs betingelse («the data is not published») og regel
 16.
+
+*Lagt til 2026-10-05 (KI-laget, FR-608):*
+- «Kom i gang» sier at den lokale modellen er gratis standard og hentes første
+  gang, og at hver enkelt kan velge Gemini, Anthropic eller OpenAI med sin egen
+  nøkkel, på sine egne vilkår
+- README-en sier hvor mye minne den lokale modellen trenger, etter
+  `malinger.md` §19. §19 har ikke målt et minstekrav. Den viser at Gemma
+  kjørte med 2,1 GB ledig uten grafikkort og 3,3 GB med, på en PC med 15,7 GB
+  og 8,2 GB til Docker Desktop. Tallet README-en oppgir, måles derfor når
+  storyen bygges
+- README-en sier at appen virker uten KI-tekst når minnet ikke holder (NFR-04)
+- README-en endres først i denne storyen, når det den sier, stemmer. Ikke før
+  (regel 19)
 
 **Avhenger av:** 3.1. **Én økt:** ja.
 
@@ -1586,6 +1636,18 @@ deler kontoen sin.
 demoen viser det også.
 
 **Åpent:** hva KI-laget gjør med demobasen (Epic 10).
+
+*Avgjort 2026-10-05:* demoen får ferdige KI-tekster for de oppdiktede dagene,
+laget med Gemma og merket med modellen. Da ser faglærer KI uten Ollama og uten
+å vente.
+- De ferdige tekstene ligger i en fil i repoet, fordi demobasen aldri ligger der
+  (`AD-9`). Demokommandoen leser fila og skriver tekstene inn i demobasen
+- En test krever at grunnlaget for hver tekst stemmer med demodagen den hører
+  til (FR-602)
+- Tekstene består kontrollen i FR-603, og raden har tjenesten, modellen og
+  hvordan modellen kjørte (FR-604, FR-605)
+- **Ville feilet hvis:** demoen endret seg, og tekstene ble stående. Da forklarer
+  KI en annen dag enn den siden viser
 
 **Avhenger av:** 2.2b, 3.1 og 3.3, ikke av 2.8. **Én økt:** avgjøres i planen.
 
@@ -1810,6 +1872,17 @@ funksjon, så ingen kan sende rådata ved et uhell.
   sendes et rått datapunkt fra EODHD til en tredjepart, og det har ingen av
   svarene fra EODHD godkjent
 
+*Rettet 2026-10-05:* grunnlaget har ingen målinger lenger (`prd.md` §4.6,
+avgjort 2026-10-04). Punktene over om forholdstallet og om målingene fra
+`Sjekk.maaling` og `Sjekk.grense` gjelder ikke grunnlaget lenger. De står for
+historikken.
+- `ki_grunnlag(signal)` er ren logikk og gir bare fortegnet for hver av de tre
+  sjekkene, styrken og retningen
+- En test krever at det ikke finnes desimaltall i grunnlaget
+- Testen om at ingen kurs og ingen volumverdi finnes i grunnlaget, står
+- **Ville feilet hvis:** grunnlaget hadde en prosent eller et forholdstall. Da
+  sendes mer enn våre egne resultater, mot beslutningen 04.10
+
 **Én økt:** ja. Kan bygges før 28.09, fordi den ikke sender noe.
 
 ### Story 10.2: Teksten lages i hentekommandoen og lagres i `KILogg`
@@ -1842,6 +1915,21 @@ venter på en modell.
   siden et kall, brukeren venter (NFR-02), og teksten som ble vist, finnes ikke
   igjen i loggen
 
+*Lagt til 2026-10-05:* blokkeringen er løst. 4.1 er ført, og spørsmålet om
+EODHD og plan B er avgjort 04.10 (vi spør ikke). **Avhenger av:** 4.0, 4.2 og
+4.3. 10.2 skriver til `KILogg` (FR-604), og nettsperren må dekke hele
+testkjøringen før noe kan kalle Ollama (`AD-8`).
+- Porten `Modell`, og `ki_lokal.py` mot Ollama med `think: false`,
+  temperatur 0 og seed (FR-608, `AD-2`)
+- Prompten forklarer at fortegnet for interessen følger dagens kursendring og
+  ikke volumet. Det er lærdommen fra Gemma i C-med i `malinger.md` §19
+- Kontrollen i FR-603 med de nye ordlistene, tall skrevet med ord og «fordi» om
+  regelen. En test med falsk modell viser hvert av dem (`AD-8`)
+- Raden har tjenesten, modell-ID, seed, temperatur, om modellen kjørte med
+  eller uten grafikkort, og Ollama-versjonen (FR-604, FR-605)
+- Kjører ikke Ollama, eller feiler tjenesten, blir det ingen tekst og en rad i
+  loggen, og hentingen går videre (NFR-04)
+
 **Én økt:** ja.
 
 ### Story 10.3: Visningen i aksjedetaljen
@@ -1864,9 +1952,16 @@ så jeg alltid ser hva signalet faktisk bygger på.
 - KI-teksten leses med `ki_logg` mot `vurdering`, så teksten vises sammen med
   vurderingen den forklarer *(lagt til 2026-09-28, fra endringsforslaget)*
 - Sammenligningen i FR-602 tar med målingene, avrundet som i FR-706 (2.1c)
-  *(lagt til 2026-09-29)*
+  *(lagt til 2026-09-29)* *(rettet 2026-10-05: gjelder ikke lenger.
+  Sammenligningen tar ikke med målingene, fordi grunnlaget ikke har dem
+  (FR-602))*
 - **Ville feilet hvis:** KI-teksten erstattet regelforklaringen eller sto før den.
   Da leses KI som kilden og regelen som en fotnote
+
+*Lagt til 2026-10-05:*
+- Modellnavnet vises med tjenesten, også for den lokale modellen, for eksempel
+  «gemma4:e4b, lokal» (FR-602)
+- Er tjenesten ikke tilgjengelig, er KI av, og siden sier hvorfor (FR-601)
 
 **Én økt:** ja.
 
@@ -1954,6 +2049,63 @@ laget av KI, med modellnavnet.
 
 **Avhenger av:** 10.1, 10.2 og 10.3, FR-104 og FR-410 for hovedindeksen, og spørsmålet til EODHD om plan B, som raden i §8 sier.
 **Én økt:** ja.
+
+*Rettet 2026-10-05:* grunnlaget følger FR-607 slik det står nå: bare antall og
+retninger, altså hvor mange som skilte seg ut, antall per retning, hvor mange
+som gikk bedre enn hovedindeksen, retningen for hovedindeksen og antall opp per
+bransje. Ingen prosenter. Avsnittet over om indeksens endring og snittendringen
+per bransje gjelder ikke lenger. Om uka skal med som antall, avgjøres når
+storyen bygges. Spørsmålet til EODHD er avgjort 04.10: vi spør ikke.
+- Samme kontroll som i 10.2 (FR-603), også for tall skrevet med ord
+- En test krever at det ikke finnes desimaltall i grunnlaget
+
+### Story 10.7: Egen nøkkel til Gemini, Anthropic og OpenAI
+
+*Lagt til 2026-10-05, gruppens beslutning 04.10.*
+
+Som **bruker med egen nøkkel**, vil jeg kunne la en tjeneste jeg selv har valgt,
+skrive KI-teksten, på mine egne vilkår.
+
+**Oppfyller:** FR-608 · **Begrenses av:** `AD-2`, `AD-8`, `AD-12`, FR-603,
+FR-604, FR-605, NFR-04
+
+**Kontroll — hva testen ser etter:**
+- `ki_gemini.py`, `ki_anthropic.py` og `ki_openai.py`, hver for seg og med samme
+  port `Modell` som `ki_lokal.py` (10.2)
+- `OSE_KI_TJENESTE` velger tjenesten, og nøkkelen leses fra miljøet
+  (`OSE_KI_GEMINI_NOKKEL`, `OSE_KI_ANTHROPIC_NOKKEL`, `OSE_KI_OPENAI_NOKKEL`)
+- Mangler nøkkelen, eller feiler tjenesten, blir det ingen tekst og en rad i
+  loggen. Det er ingen stille overgang til en annen tjeneste
+- Nøkkelen står aldri i loggen, i en feilmelding eller på en side
+- Testene bruker en falsk modell og gjør ingen nettkall (`AD-8`)
+- **Ville feilet hvis:** appen gikk over til en annen tjeneste da den valgte
+  feilet. Da sendes grunnlaget til en tjeneste brukeren ikke har valgt, på
+  vilkår brukeren ikke har godtatt
+
+**Avhenger av:** 10.2. **Én økt:** ja. Den er liten.
+
+### Story 10.8: ChatGPT med «Sign in with ChatGPT»
+
+*Lagt til 2026-10-05, gruppens beslutning 04.10.* **Kandidat til v1.1.**
+
+**Blokkert av:** oppfølgingspunktet «Brukes innholdet til trening når appen
+bruker et ChatGPT-abonnement?» i `docs/kilder-og-rettigheter.md`. Ingen av
+sidene som er lest, sier det.
+
+Som **bruker med ChatGPT Plus eller Pro**, vil jeg kunne logge inn med ChatGPT,
+så KI-teksten bruker abonnementet jeg har.
+
+**Oppfyller:** FR-608 · **Begrenses av:** `AD-2`, `AD-8`, `AD-12`
+
+**Kontroll — hva testen ser etter:**
+- Innloggingen går via `127.0.0.1`, og tokenfila ligger under `data/ki/`, som er
+  gitignorert (regel 10)
+- Samme port `Modell` som de andre tjenestene
+- Tokenet står aldri i loggen, i en feilmelding eller på en side
+- **Ville feilet hvis:** tokenfila lå et sted git kunne ta med. Da kan en
+  innlogging havne i det offentlige repoet
+
+**Avhenger av:** 10.7. **Én økt:** avgjøres i planen.
 
 ---
 
