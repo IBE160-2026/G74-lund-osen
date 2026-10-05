@@ -367,6 +367,7 @@ Epic 4.1 ──> Epic 9.5 (relevanseksperimentet, del 2)
 Epic 2.5 ──> Epic 10.2 (teksten lages rett etter vurderingen)   *(lagt til 2026-10-03, E6)*
 Epic 4.3 + 8.1 + 10.3 ──> Epic 10.4 (måle bidraget, med KILogg)   *(lagt til 2026-10-03, E6)*
 Epic 4.0 + 4.2 + 4.3 ──> Epic 10.2 (nettsperren og KILogg før modellen)   *(lagt til 2026-10-05)*
+Epic 3.4 + 10.2 + 10.3 ──> Epic 3.4b (KI-tekstene i demoen)   *(lagt til 2026-10-05)*
 ```
 
 *Lagt til 2026-10-05:* 10.2 skriver til `KILogg` (FR-604), og nettsperren må
@@ -375,6 +376,15 @@ dekke hele testkjøringen før noe kan kalle Ollama (`AD-8`). Derfor kommer 4.0,
 3.1 med compose-fila, 10.3, 10.6, 3.4 og 10.7. 10.8 er kandidat til v1.1. Blir
 tiden knapp, gir den lokale modellen alene gratis KI for alle, og 10.7 kan
 vente.
+
+*Rettet 2026-10-05, gruppens beslutning kl. 16:53, etter svaret fra
+hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):* 3.1, 3.2, 3.3
+og 3.4 uten KI-tekster bygges rett etter 2.3. KI-laget kommer så i rekkefølgen
+4.0, 4.2, 4.3, 10.1, 10.2, 10.3, 10.6, 3.4b og 10.7. 3.4b er KI-tekstene i
+demoen. 10.8 er fortsatt kandidat til v1.1. Hentingen fortsetter hver børsdag
+uansett hva som bygges, fordi en vurdering ikke kan fylles inn senere (`AD-7`).
+En bygging som ikke er ferdig kl. 22:00, stopper på en commit, så hentingen kan
+kjøres fra main.
 
 *Rettet 2026-10-03 (kontrollen 26.09, E6):* grafen manglet to harde avhengigheter som står i storyene. 10.2 lager teksten i hentekommandoen rett etter vurderingen, og trenger derfor 2.5. 10.4 avhenger av 8.1 og 10.3, og måler bidraget med `KILogg` over minst én ukes drift, som krever 4.3.
 
@@ -1512,6 +1522,11 @@ vurderingen ikke avhenger av at gruppens maskin er i rommet.
 - **Ville feilet hvis:** modellen lå i imaget. Da blir imaget flere GB større,
   og modellen følger med leveransen i stedet for å hentes av den som kjører
 
+*Rettet 2026-10-05, gruppens beslutning kl. 16:53:* compose-fila i 3.1 har bare
+appen og volumene `ose-db` og `ose-raa`. Den lokale modellen starter ikke av seg
+selv. Punktene over om Ollama og volumet `ollama` gjelder 10.2, der Ollama kommer
+inn som eget valg. Punktet om at appen virker uten Ollama, står.
+
 **Én økt:** ja.
 
 > **Denne storyen har ingen FR bak seg, og det er ikke storyens mangel.**
@@ -1540,6 +1555,9 @@ volumet har ingen data fra kildene. Det holdes atskilt fra `ose-db` og
 `ose-raa`, så å fjerne det tar verken basen eller øyeblikksbildene med seg. I
 prøven i `malinger.md` §19 var volumet `ose-ki-ollama` på 6,2 GB med bare Gemma
 igjen (dagsfila 04.10, instruksjonen kl. 21:29).
+
+*Rettet 2026-10-05, gruppens beslutning kl. 16:53:* 3.2 har bare `ose-db` og
+`ose-raa`. Merknaden over om det tredje volumet gjelder 10.2.
 
 **Én økt:** ja.
 
@@ -1586,6 +1604,15 @@ publisert dataene, mot EODHDs betingelse («the data is not published») og rege
 - README-en sier at appen virker uten KI-tekst når minnet ikke holder (NFR-04)
 - README-en endres først i denne storyen, når det den sier, stemmer. Ikke før
   (regel 19)
+
+*Rettet 2026-10-05, gruppens beslutning kl. 16:53, etter svaret fra
+hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
+- Docker er hovedmåten i README-en, og Python med uv er alternativet
+- Demoen står først. EODHD med egen nøkkel er et eget avsnitt for den som vil
+  teste med ekte data
+- Punktene over om den lokale modellen og minnet gjelder 10.2, og punktet om
+  egne nøkler gjelder 10.7. Punktet om at README-en endres når det den sier,
+  stemmer, står
 
 **Avhenger av:** 3.1. **Én økt:** ja.
 
@@ -1650,6 +1677,37 @@ laget med Gemma og merket med modellen. Da ser faglærer KI uten Ollama og uten
   KI en annen dag enn den siden viser
 
 **Avhenger av:** 2.2b, 3.1 og 3.3, ikke av 2.8. **Én økt:** avgjøres i planen.
+
+*Rettet 2026-10-05, gruppens beslutning kl. 16:53:* 3.4 bygges uten
+KI-tekster, og demoen står først i «Kom i gang». Demoen er hovedveien for
+vurderingen (svaret fra hjelpelæreren, `docs/innlevering.md`, «Svaret,
+2026-10-05»). Den første kommandoen i README-en starter demoen. Hvordan,
+avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
+(FR-411). Punktene over fra «Avgjort 2026-10-05» om KI-tekstene gjelder 3.4b.
+
+### Story 3.4b: KI-tekstene i demoen
+
+*Lagt til 2026-10-05, gruppens beslutning kl. 16:53.*
+
+Som **faglærer eller sensor**, vil jeg se KI-teksten i demoen, så jeg ser hva
+KI-laget gjør uten Ollama og uten å vente.
+
+**Oppfyller:** FR-411 for KI-tekstene · **Begrenses av:** FR-602, FR-603,
+FR-604, FR-605, `AD-8`, `AD-9`
+
+**Kontroll — hva testen ser etter:**
+- Demoen får ferdige KI-tekster for de oppdiktede dagene, laget med Gemma og
+  merket med modellen
+- De ferdige tekstene ligger i en fil i repoet, fordi demobasen aldri ligger der
+  (`AD-9`). Demokommandoen leser fila og skriver tekstene inn i demobasen
+- En test krever at grunnlaget for hver tekst stemmer med demodagen den hører
+  til (FR-602)
+- Tekstene består kontrollen i FR-603, og raden har tjenesten, modellen og
+  hvordan modellen kjørte (FR-604, FR-605)
+- **Ville feilet hvis:** demoen endret seg, og tekstene ble stående. Da forklarer
+  KI en annen dag enn den siden viser
+
+**Avhenger av:** 3.4, 10.2 og 10.3. **Én økt:** ja.
 
 ---
 
@@ -1930,6 +1988,13 @@ testkjøringen før noe kan kalle Ollama (`AD-8`).
 - Kjører ikke Ollama, eller feiler tjenesten, blir det ingen tekst og en rad i
   loggen, og hentingen går videre (NFR-04)
 
+*Lagt til 2026-10-05, gruppens beslutning kl. 16:53:* den lokale modellen
+starter ikke av seg selv.
+- Ollama kommer inn i compose-fila som eget valg, med volumet `ollama`.
+  Punktene fra 3.1 og 3.2 om Ollama og det tredje volumet gjelder her
+- README-en får avsnittet om den lokale modellen, med minnet målt. Punktene fra
+  3.3 om den lokale modellen og minnet gjelder her (regel 19)
+
 **Én økt:** ja.
 
 ### Story 10.3: Visningen i aksjedetaljen
@@ -2083,6 +2148,9 @@ FR-604, FR-605, NFR-04
   vilkår brukeren ikke har godtatt
 
 **Avhenger av:** 10.2. **Én økt:** ja. Den er liten.
+
+*Lagt til 2026-10-05, gruppens beslutning kl. 16:53:* README-en får avsnittet om
+egne nøkler (regel 19). Punktet fra 3.3 om egne nøkler gjelder her.
 
 ### Story 10.8: ChatGPT med «Sign in with ChatGPT»
 
