@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-04T18:02
+updated: 2026-10-05T22:12
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -1922,3 +1922,40 @@ NorMistral skrev flere avsnitt i noen tekster. Avsnittsskiftene er slått sammen
 - **E-uten** (21,0 s): Aksjeeksempel E viser en negativ trend, noe som indikerer at kursen har vært konsekvent synkende sammenlignet med gjennomsnittet de siste 50 dagene. I tillegg viser den en nøytral bevegelse, noe som betyr at dagens endring ikke er betydelig sammenlignet med det vanlige daglige utslaget de siste 20 dagene. Interessenivået er også nøytralt, med dagens handelsvolum som samsvarer med medianvolumet de siste 20 dagene.  Styrken til denne regelen er indikert av styrken, som er 1 i dette tilfellet. Styrke måler antall positive, negative eller nøytrale signaler blant de tre faktorene som vurderes. Når styrken er 1, indikerer det at alle tre faktorene viser et negativt signal.  Retningen til denne regelen er negativ, noe som betyr at basert på de nåværende markedsforholdene, er det sannsynlig at aksjekursen vil fortsette å synke. Denne regelen er basert på analysen av historiske data og gir innsikt i potensielle fremtidige prisbevegelser. Det er imidlertid viktig å merke seg at tidligere resultater ikke er en garanti for fremtidige resultater, og investorer bør alltid gjøre sin egen forskning og konsultere en finansiell rådgiver før de tar investeringsbeslutninger.
 - **E-med** (12,6 s): Aksjeeksempel E viser en negativ trend, noe som betyr at kursen har gått ned sammenlignet med gjennomsnittet de siste 50 dagene. Denne trenden er betydelig, ettersom den er -2,9 % mot MA50. I tillegg er det ingen interesse for aksjen, noe som betyr at dagens volum er under gjennomsnittet for de siste 20 dagene. Imidlertid er det ett positivt aspekt ved denne aksjen, og det er at styrken er 1. Dette indikerer at det er minst én av de tre sjekkene som ble utført på aksjen, som ga et positivt resultat. Til slutt er retningen for denne aksjen negativ.
 - **Dag** (23,3 s): Basert på informasjonen som er oppgitt, var det 15 aksjer som ble handlet på Oslo Børs i løpet av handelsdagen. Av disse skilte tre aksjer seg ut med en styrke på 2 eller mer, noe som indikerer et sterkt handelsvolum. Tre aksjer hadde en positiv retning, noe som betyr at de presterte bedre enn markedet som helhet. På den annen side hadde fire aksjer en negativ retning, noe som betyr at de presterte dårligere enn markedet. To aksjer hadde en blandet retning, noe som betyr at de presterte omtrent som markedet. Til slutt hadde fire aksjer ingen retning, noe som betyr at de ikke presterte bedre eller dårligere enn markedet. I tillegg hadde seks aksjer bedre resultater enn hovedindeksen, noe som indikerer at de presterte bedre enn markedet som helhet. Hovedindeksen gikk ned i løpet av handelsdagen. Energi-, sjømat-, finans- og industrisektorene hadde varierende resultater. Energi- og industrisektorene hadde tre aksjer hver som presterte bedre enn markedet, mens sjømat- og finanssektorene hadde en aksje hver som presterte bedre enn markedet.
+
+---
+
+## 20. Sjømat-fem i samme vindu, og alle 65 rangert (2026-10-05)
+
+**Metode.** Som i §15–§18: ett `/api/eod`-kall per symbol, med
+`from=2026-07-02` og `to=2026-10-02`, samme vindu. Omsetning regnes som
+`volume × close` per handelsdag, og medianen tas over perioden. Symbolene er de
+fem fra §13, som §18 sa ikke var med fordi vinduet der var et annet. Målingen ble
+kjørt 05.10, etter den daglige hentingen, med de 5 kallene som var
+igjen, etter Marians beslutning kl. 22:11.
+
+**Kostnad.** 5 kall, tatt av dagskvoten 05.10. Før målingen sto `apiRequests` på
+15 for 2026-10-05, etter den daglige hentingen. Etter første kall sto den på 16
+med `extraLimit` uendret på 463. Etter målingen er `apiRequests` 20 og
+`extraLimit` fortsatt 463. Ingen kall feilet, og ingen symboler var tomme.
+
+**Rådata.** `data/raa/maaling-raa-2026-10-05.json`. Fila finnes **bare
+lokalt** og er ikke sporet i git. Bare tallene under er regnet ut og ført her.
+
+| Symbol | Selskap | Handelsdager | Median omsetning | Over 32 MNOK | Over 25 MNOK | Plass av 65 |
+|---|---|---:|---:|---|---|---:|
+| BAKKA | Bakkafrost | 67 | 36,2 MNOK | Ja | Ja | 32 |
+| LSG | Lerøy Seafood Group | 67 | 17,5 MNOK | Nei | Nei | 45 |
+| AUSS | Austevoll Seafood | 67 | 9,7 MNOK | Nei | Nei | 50 |
+| GSF | Grieg Seafood | 67 | 6,7 MNOK | Nei | Nei | 57 |
+| SALME | Salmon Evolution | 67 | 2,5 MNOK | Nei | Nei | 65 |
+
+Plassen er regnet mot de 60 medianene i rangeringen i §18, som er i samme vindu.
+Ingen av de fem har samme median som en av de 60. Med de fem er 36 av de 65 over
+32 MNOK, og 39 er over 25 MNOK. Bakkafrost er den eneste av de fem over begge.
+
+I §13, med vinduet 2026-06-30 til 2026-09-30, var tallene 36,7, 18,3, 9,7, 6,7 og
+2,6 MNOK. Svaret på kriteriet i §3 er det samme i begge vinduene.
+
+Målingen endrer ikke universet. Parametrene i signalet er låst og målt på de
+15 (AD-13).
