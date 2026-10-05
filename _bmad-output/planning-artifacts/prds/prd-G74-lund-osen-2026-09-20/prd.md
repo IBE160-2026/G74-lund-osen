@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-04T21:32
+updated: 2026-10-05T15:34
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -932,9 +932,12 @@ bare tall regnet av kursene kan KI ikke vite noe reglene ikke vet, men den kan
 si det slik at en person forstår det første gang. Det er et mindre bidrag enn
 forklaringen av meldinger ville vært, og det skal stå slik.
 
-Grensen mot regelbasert kode: KI får bare utledede verdier, aldri rådata fra
-kilden (story 10.1). Teksten lages i hentekommandoen, ikke når siden vises
-(NFR-02), og står under regelforklaringen, aldri i stedet for den (FR-602).
+Grensen mot regelbasert kode: KI får bare våre egne resultater: fortegn,
+styrke, retning og antall, aldri rådata fra kilden (story 10.1). Teksten lages
+i hentekommandoen, ikke når siden vises (NFR-02), og står under
+regelforklaringen, aldri i stedet for den (FR-602). *Rettet 2026-10-05:* her
+sto «KI får bare utledede verdier». Målingene er utledede verdier, men sendes
+ikke lenger (avgjort 2026-10-04, under).
 
 Om EODHD skal spørres før tallene sendes til en modell, er et åpent punkt under
 «Å følge opp» i `docs/kilder-og-rettigheter.md` («Plan B for KI-laget: spørre
@@ -950,6 +953,8 @@ demonstrasjonen mens noen ser på.
 
 I v1 slår bryteren av og på KI-teksten i aksjedetaljen (FR-602). *Lagt til 2026-10-02:* Bryteren gjelder også KI-teksten om dagen på forsiden (FR-607). Én bryter styrer begge.
 
+*Lagt til 2026-10-05:* Bryteren slår av KI-teksten uansett hvilken tjeneste som er valgt (FR-608). Er tjenesten ikke tilgjengelig, også når Ollama ikke kjører, er KI av, og siden sier hvorfor.
+
 #### FR-602 — Visningen når KI-laget er av
 
 Med laget av er forklaringen i aksjedetaljen de tre sjekkene med verdiene og
@@ -958,12 +963,18 @@ regelforklaringen, merket som laget av KI, med modellnavnet. Regelforklaringen
 vises alltid, og KI-teksten erstatter den aldri. En dag uten KI-tekst sier det,
 i stedet for å vise et tomt felt.
 
+*Lagt til 2026-10-05:* modellnavnet vises også for den lokale modellen, med
+tjenesten, for eksempel «gemma4:e4b, lokal».
+
 KI-teksten vises bare når grunnlaget i loggen (FR-604) stemmer med vurderingen
-som vises: samme styrke, samme retning, samme fortegn for de tre sjekkene, og
-samme målinger, avrundet som i FR-706. Ellers vises siden som en dag uten
-KI-tekst. *Rettet 2026-09-29:* her sto «samme styrke, samme retning og samme
-fortegn for de tre sjekkene» og «Målingene lagres ikke i vurderingen (FR-408),
-så de kan ikke sammenlignes der.» Målingene lagres fra story 2.1c (FR-408).
+som vises: samme styrke, samme retning og samme fortegn for de tre sjekkene.
+Ellers vises siden som en dag uten KI-tekst. *Rettet 2026-09-29:* her sto
+«samme styrke, samme retning og samme fortegn for de tre sjekkene» og
+«Målingene lagres ikke i vurderingen (FR-408), så de kan ikke sammenlignes
+der.» Målingene lagres fra story 2.1c (FR-408). *Rettet 2026-10-05:* her sto
+også «og samme målinger, avrundet som i FR-706». Grunnlaget har ikke målingene
+lenger (§4.6, avgjort 2026-10-04), så de sammenlignes ikke. Målingene står
+fortsatt i vurderingen (FR-408) og i regelforklaringen (FR-706).
 
 Begrunnelsen er den samme som i FR-602A: av og på skal kunne sammenlignes, og
 det eneste som skiller dem, er KI-teksten. Bidraget er **forståelighet, ikke
@@ -980,16 +991,28 @@ på kjennetegn som kan observeres, ikke på en sikkerhetsscore fra modellen:
    være regelens. Det sjekkes der teksten sier det, som «retningen er blandet»,
    ikke som enkeltord. «Positiv» og «negativ» står naturlig i en tekst om
    retningen Blandet, og «ingen» er et vanlig ord.
-2. **Tallene.** Hvert tall i teksten står i grunnlaget, med samme avrunding som
-   i FR-706, eller er et av regelens faste tall, som 50 i MA50.
-3. **Råd.** Teksten har ingen ord som gir råd (NFR-06).
+2. **Tallene.** Bare antall fra grunnlaget og regelens faste tall, som 50 i
+   MA50, er lov. Tall skrevet med ord sjekkes også, som «femti» eller «seks av
+   de femten». *Rettet 2026-10-05:* her sto «Hvert tall i teksten står i
+   grunnlaget, med samme avrunding som i FR-706, eller er et av regelens faste
+   tall, som 50 i MA50.» Grunnlaget har ikke målingene lenger (§4.6), og
+   `malinger.md` §19 viste feil tall skrevet med ord som kontrollen slapp
+   gjennom.
+3. **Råd.** Teksten har ingen ord som gir råd (NFR-06). *Lagt til 2026-10-05:*
+   lista har også ord som «alternativ for investorer», «investerings-» og
+   «rådgiver», fra tekstene i `malinger.md` §19.
 4. **Gjetning.** Teksten gjetter ikke. Den har ingen ord som gjetter eller spår,
    som «trolig», «sannsynligvis», «kan tyde på» eller «forventes», og nevner
    ingen årsak som ikke står i grunnlaget, som nyheter, resultater eller
-   kontrakter. Grunnlaget har bare fortegn og målinger for de tre sjekkene,
-   styrken og retningen (story 10.1), så en årsak i teksten er alltid gjettet.
+   kontrakter. Grunnlaget har bare fortegn for de tre sjekkene, styrken,
+   retningen og antall (story 10.1), så en årsak i teksten er alltid gjettet.
    Ordene står i lister i kontrollen, og en test viser at hvert av dem stopper
-   teksten. *Lagt til 2026-10-01, Marians beslutning.*
+   teksten. *Lagt til 2026-10-01, Marians beslutning.* *Rettet 2026-10-05:*
+   her sto «Grunnlaget har bare fortegn og målinger for de tre sjekkene,
+   styrken og retningen». *Lagt til 2026-10-05:* lista har også «antyde». En
+   forklaring av regelen selv er lov, som «fordi ingen sjekk ga utslag», men en
+   årsak utenfor grunnlaget er det ikke. Ordet «resultat» står ikke i lista,
+   fordi det i §19 viste til sjekkene og ikke til selskapenes regnskap.
 
 En tekst som ikke består, vises ikke, men logges med grunnen (FR-604). Aksjen
 får da ingen KI-tekst den dagen, og siden sier det (FR-602).
@@ -1010,6 +1033,7 @@ For hver aksje og børsdag KI-laget forklarer, lagres én rad:
 | KI-teksten | Selve bidraget |
 | Om teksten besto kontrollen i FR-603, og ellers hvorfor ikke | En tekst som ikke vises, skal fortsatt finnes |
 | Promptversjon og modell | Se FR-605 |
+| Tjenesten, modell-ID, seed, temperatur og hvordan modellen kjørte, med eller uten grafikkort *(lagt til 2026-10-05)* | Gemma ga ulik tekst med og uten grafikkort i 7 av 11 tilfeller med samme seed og temperatur (`malinger.md` §19). Uten feltene kan ikke to tekster sammenlignes |
 
 Det er én rad per aksje og børsdag, også når modellen feiler. Da har raden
 ingen tekst og sier at modellen feilet (NFR-04). Finnes raden for dagen, kalles
@@ -1029,6 +1053,11 @@ KI-ens.
 Justeres prompten i oktober, må det være mulig å se hvilken versjon som ga
 hvilken tekst. Uten det blir eksempelsettet en blanding av flere systemer
 som ser ut som ett.
+
+*Lagt til 2026-10-05:* med modellen føres også tjenesten (FR-608), modell-ID,
+seed, temperatur og om modellen kjørte med eller uten grafikkort (FR-604). For
+den lokale modellen føres også Ollama-versjonen. Prøven i `malinger.md` §19 ble
+kjørt med Ollama 0.35.1.
 
 #### FR-606 — Relevansskalaen
 
@@ -1052,6 +1081,16 @@ brukes på meldinger i applikasjonen, står i FR-606A.
 *Lagt til 2026-10-02, Marians beslutning (story 10.6).*
 
 Under tabellen i markedsoversikten står noen setninger om hele børsdagen, skrevet av KI. Grunnlaget er bare utledede tall regnet av kursene: hvor mange som skilte seg ut, hvor mange som gikk bedre enn hovedindeksen (FR-104), indeksens endring, og snittendringen per bransje, for dagen og for uka. Teksten lages én gang i hentekommandoen, med ett kall til modellen per børsdag (NFR-02), og logges som i FR-604 og FR-605. Den er merket som laget av KI, med modellnavnet (FR-602). Kontrollen i FR-603 gjelder med alle 4 punktene, og teksten vises bare når grunnlaget stemmer med det siden viser. Ellers står det at dagen er uten KI-tekst. Teksten gir ikke råd og spår ikke (NFR-06).
+
+*Rettet 2026-10-05:* grunnlaget er bare antall og retninger: hvor mange som skilte seg ut, antall per retning, hvor mange som gikk bedre enn hovedindeksen (FR-104), retningen for hovedindeksen, og antall opp per bransje. Ingen prosenter. Her sto «Grunnlaget er bare utledede tall regnet av kursene: hvor mange som skilte seg ut, hvor mange som gikk bedre enn hovedindeksen (FR-104), indeksens endring, og snittendringen per bransje, for dagen og for uka.» Indeksens endring og snittendringen per bransje er prosenter, og sendes ikke (§4.6, avgjort 2026-10-04). Uka er ikke med i det nye grunnlaget; om den skal med som antall, avgjøres i story 10.6.
+
+#### FR-608 — Valg av tjeneste
+
+*Lagt til 2026-10-05, gruppens beslutning 04.10 (§4.6 og `docs/kilder-og-rettigheter.md`, «Betingelse 4 og KI-tjenestene (2026-10-04)»).*
+
+Tjenesten velges i `.env` med `OSE_KI_TJENESTE`: `lokal` er standard, eller `gemini`, `anthropic` eller `openai`. Det er én tjeneste per kjøring, uten stille overgang til en annen. Feiler tjenesten, blir det ingen tekst og en rad i loggen (FR-604, NFR-04). Nøklene heter `OSE_KI_GEMINI_NOKKEL`, `OSE_KI_ANTHROPIC_NOKKEL` og `OSE_KI_OPENAI_NOKKEL`, og ingen nøkkel følger med appen eller repoet (`AD-12`). Hver kobler bare til sin egen, på sine egne vilkår.
+
+ChatGPT Plus eller Pro med «Sign in with ChatGPT» kommer senere (story 10.8). Et Claude-abonnement kan ikke brukes.
 
 ### 4.6A Plan A: KI-laget over meldinger (utenfor v1)
 
