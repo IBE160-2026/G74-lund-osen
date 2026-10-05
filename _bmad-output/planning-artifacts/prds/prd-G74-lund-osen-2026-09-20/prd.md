@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-05T17:15
+updated: 2026-10-05T17:30
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -820,6 +820,8 @@ Grunnen: EODHDs vilkår forbyr å dele kontoen med andre, også i en gruppe
 gratisnøkkel (story 3.3) eller med demoversjonen.
 
 Åpent: hva KI-laget gjør med demobasen (Epic 10).
+
+*Avgjort 2026-10-05:* demoen får ferdige KI-tekster laget med Gemma, i story 3.4b (`epics.md`).
 
 *Lagt til 2026-10-05, gruppens beslutning:* demoversjonen er hovedveien for
 vurderingen. Den ekte versjonen med egen EODHD-nøkkel står i README-en som et
