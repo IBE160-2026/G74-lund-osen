@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-03T17:14
+updated: 2026-10-05T19:48
 ---
 
 # Kvalitetssikring
@@ -24,6 +24,7 @@ Forkortelser i kildene: `S/` er `_bmad-output/implementation-artifacts/`, og
 - 1074 tester i 22 testfiler. Lokalt på Windows består 1058, og 16 hoppes over.
   I CI på Linux består alle 1074 (kjøring 37072797767 på `74fc69b`, den siste
   på main da dette ble skrevet, med samme tester som `3803b4d`; `D/2026-10-03.md`).
+  *Oppdatert 2026-10-05:* 1148 tester i 23 testfiler, telt med `uv run pytest --collect-only -q` på `3fac7cc`. Lokalt på Windows består 1132, og 16 hoppes over. I CI på Linux består alle 1148 (kjøring 37348017033 på `3fac7cc`). Siden 03.10 har story 2.2 (`1570ae9`, PR #19) og 2.2b (`ff58ecf`, PR #20) kommet til, med den nye testfila `test_oversiktsleser.py`. Tabellen under er fra 03.10.
 - Testene kan ikke nå nettet. En sperre i `tests/conftest.py` stopper det
   (AD-8), men den dekker ikke hele testkjøringen ennå (§6).
 - Hver story med kode er prøvd med mutanter: koden er ødelagt med vilje, og
