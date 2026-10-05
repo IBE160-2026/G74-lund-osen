@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-10-05T16:31
+updated: 2026-10-05T17:03
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -102,6 +102,10 @@ Arkitekturen for den er besluttet 22.09 og ligger i `ARCHITECTURE-SPINE.md`:
 `AD-9` (imaget inneholder aldri data), `AD-10` (webserveren henter aldri),
 `AD-11` (to volumer), `AD-12` (hemmeligheter fra miljøet). Selve filen er ikke
 skrevet.
+
+*Lagt til 2026-10-05:* hjelpelæreren anbefaler «en anbefalt hovedmåte å kjøre
+prosjektet på» i README-en (svaret 05.10, under «Spørsmål sendt hjelpelærer
+2026-10-04»). Dockerfilen er fortsatt ikke et belagt krav.
 
 ---
 
@@ -237,6 +241,11 @@ målingene og datakildenes vilkår. Linjen kom ikke med i versjon 6.
 | **Ligger i** | `IBE160-2026/G74-lund-osen` |
 | **Gjenstår** | Ingenting. Merk at dette er en **betingelse** for hva som kan ligge der: EODHDs godkjenning krever at data ikke publiseres, og `data/` er gitignorert |
 
+*Lagt til 2026-10-05:* utviklingen skal ligge fortløpende i GitHub: «Derfor er
+det også viktig at prosjektet og utviklingen ligger fortløpende i GitHub, slik
+at vi kan følge progresjonen deres.» (hjelpelæreren, svaret 05.10, under
+«Spørsmål sendt hjelpelærer 2026-10-04»).
+
 ---
 
 ## 6. Teknologistack — anbefaling, ikke krav
@@ -355,11 +364,42 @@ Teksten ordrett:
 
 Svar avventes.
 
+*Besvart 2026-10-05:* svaret står under.
+
 | Svaret om | Storyene det treffer |
 |---|---|
 | Docker Desktop eller Python | 3.1 og 3.3 (Docker og README) |
 | Ekte kurser eller demoversjonen | 3.3 og 3.4 |
 | Den lokale modellen | 10.2 |
+
+### Svaret, 2026-10-05
+
+**Fra:** hjelpelærer i IBE160, i Teams. Navnet føres ikke. **Form:** fullteksten,
+slik Marian ga den videre 05.10.
+
+> Hei Marian,
+>
+> Takk for god forklaring
+>
+> Jeg ville anbefalt at dere ikke gjør vurderingen avhengig av at vi må opprette konto hos en ekstern tjeneste for å kunne teste appen. Det tryggeste er at dere sørger for at løsningen også kan kjøres og vurderes uten dette.
+>
+> En demoversjon med samme funksjonalitet og struktur, men med test-/demodata, høres derfor ut som en veldig god løsning. Dere kan gjerne samtidig dokumentere i README hvordan man kan koble til EODHD med egen API-nøkkel dersom man ønsker å teste med ekte data.
+>
+> I dette emnet er det heller ikke nødvendigvis poenget at absolutt alt skal være helt perfekt eller produksjonsklart. Det viktigste er at dere lærer underveis, utvikler løsningen steg for steg og viser at dere forstår sammenhengene og valgene dere gjør. Derfor er det også viktig at prosjektet og utviklingen ligger fortløpende i GitHub, slik at vi kan følge progresjonen deres.
+>
+> Så jeg mener en god demoversjon er mer enn tilstrekkelig for å vise hvordan løsningen fungerer, samtidig som dere dokumenterer hvordan den kan brukes med ekte data. Bård Inge kommer heller ikke til å sitte og detaljteste hver eneste ekstern integrasjon i alle prosjektene.
+>
+> Når det gjelder Docker/Python, ville jeg lagt opp README-en slik at oppstarten er så enkel og tydelig som mulig, gjerne med en anbefalt hovedmåte å kjøre prosjektet på.
+>
+> Dette ser derfor ut som en veldig fornuftig løsning
+
+| Spørsmålet | Svaret |
+|---|---|
+| Ekte kurser eller demoversjonen? | Demoversjonen er «mer enn tilstrekkelig», og README-en kan vise hvordan man kobler til EODHD med egen nøkkel |
+| Docker Desktop eller Python? | Ikke besvart direkte, men README-en bør ha «en anbefalt hovedmåte å kjøre prosjektet på» |
+| Den lokale modellen | Ikke nevnt |
+
+Hva gruppen gjør med svaret, føres når det er avgjort.
 
 ---
 
@@ -403,6 +443,11 @@ på den.
 trengs et kort demomanus og en måte å kjøre løsningen på kjente data, i tilfelle
 hentingen feiler eller kvoten er brukt opp den dagen. Når datoen er kjent, blir
 det en egen oppgave.
+
+*Lagt til 2026-10-05:* demoversjonen (FR-411, story 3.4) er måten å kjøre
+løsningen på kjente data. Hjelpelæreren skriver at «en god demoversjon er mer
+enn tilstrekkelig for å vise hvordan løsningen fungerer» (svaret 05.10, under
+«Spørsmål sendt hjelpelærer 2026-10-04»).
 
 ### E. Om PRD og arkitekturdokument er innleveringskrav i seg selv
 
