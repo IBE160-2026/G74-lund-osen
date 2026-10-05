@@ -8,7 +8,12 @@ OSE Signal samler kursutvikling og signalstyrke for 15 likvide Oslo Børs-aksjer
 
 ## Status
 
-Under arbeid, og ingenting er endelig. Nå virker hentingen av sluttkurser fra EODHD til en SQLite-base, med dagens vurdering per aksje, og markedsoversikten og aksjedetaljen, som leser fra basen. Neste er børsdagskontrollen (2.3), så Docker og demoversjonen (3.1–3.4), og deretter KI-laget. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Se [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml).
+Under arbeid, og ingenting er endelig. Vi jobber med to versjoner samtidig, med samme kode:
+
+- **Den ekte versjonen** henter sluttkurser fra EODHD hver børsdag og lagrer dagens vurdering per aksje. Markedsoversikten og aksjedetaljen leser fra basen. Den krever en egen gratis nøkkel fra EODHD.
+- **Demoversjonen** får oppdiktede selskaper og kurser, og kan prøves uten konto og uten nøkkel. Den bygges sammen med Docker i 3.1–3.4, og blir den enkleste måten å prøve appen på.
+
+Neste er børsdagskontrollen (2.3), så Docker og demoversjonen, og deretter KI-laget. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Se [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml).
 
 Til faglærer: leveranselista står i [`docs/innlevering.md`](docs/innlevering.md), og kvalitetssikringen i [`docs/kvalitetssikring.md`](docs/kvalitetssikring.md).
 
@@ -23,7 +28,7 @@ uv run python src/fetch_prices.py        # henter kurser
 uv run python src/app.py                 # http://localhost:5000
 ```
 
-- Du trenger en egen gratis API-nøkkel fra EODHD. Den gir 20 kall i døgnet, og en henting bruker 15.
+- Du trenger en egen gratis API-nøkkel fra [EODHD](https://eodhd.com/register), fordi vilkårene ikke lar oss dele vår. Den gir 20 kall i døgnet, og en henting bruker 15.
 - Kjør hentingen på børsdager mellom kl. 22 og midnatt. En vurdering kan ikke fylles inn senere.
 - Appen bruker aldri kvote selv. Den leser bare fra basen.
 - Uten henting starter appen med tom oversikt og viser kommandoen som henter.
@@ -40,7 +45,7 @@ uv run pytest
 - `data/` røres ikke: testene bruker en midlertidig mappe.
 - CI kjører på hver push og pull request mot `main`, uten hemmeligheter og uten API-nøkkel.
 
-Mer i [`docs/kvalitetssikring.md`](docs/kvalitetssikring.md).
+Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan KI-generert kode kvalitetssikres, og alt står i [`docs/kvalitetssikring.md`](docs/kvalitetssikring.md).
 
 ## Dokumentene
 
