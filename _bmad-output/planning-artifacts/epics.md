@@ -2439,6 +2439,12 @@ Som **bruker**, vil jeg se med en gang hvilke aksjer som skiller seg ut, lese hv
 - Kursgrafen har et merke ved første børsdag i hver måned, med norsk månedsnavn. Merket står på samme x som punktet for den dagen i kurslinja. Datoene i bildeteksten står fortsatt
 - **Ville feilet hvis:** en rad med 2 av 3 bare skilte seg fra en med 1 av 3 ved lys bakgrunn, det sto opp eller ned ved en sjekk, eller et månedsmerke sto under feil dag fordi merkene ble spredd etter kalenderen, mens linja har lik avstand per børsdag
 
+*Lagt til 2026-10-05, Marians beslutning kl. 22:24:* 05.10, den andre dagen med lagret vurdering, fikk ingen av aksjene 2 av 3 eller mer (4 fikk 0 og 11 fikk 1, dagsfila kl. 22:08), så ingen rad var merket, og siden sa ikke at ingen skilte seg ut. Det skjer 5 av 199 dager i målingene (FR-705).
+- En dag der ingen aksje har styrke 2 eller mer, står det over tabellen: «Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer.»
+- Tallet 2 hentes fra `Parametre` (terskelen i FR-705), ikke skrevet fast i malen, og en test krever det
+- Setningen står ikke når minst én aksje har styrke 2 eller mer, og ikke når ingen rad har en vurdering
+- **Ville feilet hvis:** setningen sto en dag der en aksje hadde 2 av 3, eller manglet en dag der alle hadde 0 eller 1
+
 **Funnene bak** (rådets gjennomgang 05.10): signalstyrken 0–3 forklares bare i fotnoten. Radene som skiller seg ut, har bakgrunnen `#fafafa`, som er nesten hvit, og ellers bare den lille teksten «skiller seg ut». Ga-kolonnen viser bare +1, -1 og 0. Grafen har datoer bare i bildeteksten. Ordene ved sjekkene er FR-704 sine, positiv og negativ, ikke opp og ned (FR-103, endret 21.09).
 
 **Avhenger av:** 8.0. Ferdig før 8.1, som 8.0b, så brukertesten ikke finner det vi alt vet. **Én økt:** ja.
