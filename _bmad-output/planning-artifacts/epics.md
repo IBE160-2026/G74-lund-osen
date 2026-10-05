@@ -369,6 +369,7 @@ Epic 4.3 + 8.1 + 10.3 ──> Epic 10.4 (måle bidraget, med KILogg)   *(lagt ti
 Epic 4.0 + 4.2 + 4.3 ──> Epic 10.2 (nettsperren og KILogg før modellen)   *(lagt til 2026-10-05)*
 Epic 10.1 ──> Epic 10.2 (grunnlaget)   *(lagt til 2026-10-05)*
 Epic 3.4 + 10.2 + 10.3 ──> Epic 3.4b (KI-tekstene i demoen)   *(lagt til 2026-10-05)*
+Epic 2.3 + 3.4 ──> Epic 2.3b (nye forsøk med kallene som er igjen)   *(lagt til 2026-10-05)*
 ```
 
 *Lagt til 2026-10-05:* 10.2 skriver til `KILogg` (FR-604), og nettsperren må
@@ -386,6 +387,8 @@ demoen. 10.8 er fortsatt kandidat til v1.1. Hentingen fortsetter hver børsdag
 uansett hva som bygges, fordi en vurdering ikke kan fylles inn senere (`AD-7`).
 En bygging som ikke er ferdig kl. 22:00, stopper på en commit, så hentingen kan
 kjøres fra main.
+
+*Lagt til 2026-10-05, gruppens beslutning kl. 19:17:* rekkefølgen er 2.3, 3.1–3.4, 2.3b, og så KI-laget. Når jobben kjører fra en egen arbeidskopi av main (svar 3 under story 2.3), gjelder ikke lenger regelen over om at byggingen stopper kl. 22:00.
 
 *Rettet 2026-10-03 (kontrollen 26.09, E6):* grafen manglet to harde avhengigheter som står i storyene. 10.2 lager teksten i hentekommandoen rett etter vurderingen, og trenger derfor 2.5. 10.4 avhenger av 8.1 og 10.3, og måler bidraget med `KILogg` over minst én ukes drift, som krever 4.3.
 
@@ -1326,6 +1329,7 @@ allerede har dagens data, så en kjøring nummer to ikke koster 15 kall til.
 - Er nyeste dato i svaret ikke forventet børsdag, vises siste kjente data med tidsstempel
 - Kontrollen regner børsdag i **norsk** kalenderdato
 - Startet før kl. 22:00, på en dag som ikke er børsdag, eller når dataene for siste børsdag finnes, bruker kommandoen **null** kall og sier hvorfor *(lagt til 2026-09-29)*
+  *(rettet 2026-10-05, svar 2 kl. 19:17: på en dag som ikke er børsdag avgjør basen. Mangler siste børsdag for noen av aksjene, hentes den, fordi raden for den dagen fortsatt kan skrives (AD-7). Ellers null kall)*
 - **Ville feilet hvis:** kontrollen lå i webserveren. Den kan ikke handle på utfallet, og da ville sjekken vært pynt
 
 **Forutsetning** *(punkt 23, avgjort 2026-09-28)*: kommandoen kjøres på børsdager mellom kl. 22:00 og midnatt. Planen avgjør om den advarer eller nekter før kl. 22:00, fordi en kjøring som kommer for tidlig, bruker dagens kall uten å få dagens rad.
@@ -1345,7 +1349,34 @@ Oppgaveplanlegging beskrives i README (regel 19).
 
 *Lagt til 2026-10-01:* med 2.8 koster en henting 16 kall, ikke 15. 2.8 utvider testen her med indekskallet, så en andre kjøring samme børsdag fortsatt gjør null kall.
 
+*Avgjort 2026-10-05, gruppens svar kl. 19:17 på planen kl. 17:35:*
+1. **Kvoten** leses med `/api/user` før første kall. Er det færre enn 15 igjen av dagens 20, men bonuskvoten (`extraLimit`) dekker resten, hentes det likevel, og utskriften sier hvor mange kall som tas fra bonusen. Dekker heller ikke bonusen 15, blir det 0 kall. Kan svaret ikke leses, hentes det, og utskriften sier det. Navn og e-post fra svaret står aldri i utskriften.
+2. **Overstyringen** gjelder bare før kl. 22:00 på en børsdag. På en dag som ikke er børsdag avgjør basen: mangler siste børsdag for noen av aksjene, hentes den, fordi raden for den dagen fortsatt kan skrives (AD-7). Ellers 0 kall. Oppgaveplanlegging kjører derfor hver dag kl. 22:15, ikke bare på hverdager.
+3. **Jobben** kjører fra en egen arbeidskopi av main. `data/` og `.env` deles med hovedkopien uten at nøkkelen kopieres, helst uten ny kode. Når jobben går slik, gjelder ikke lenger regelen fra 05.10 om at byggingen stopper kl. 22:00.
+- **Rekkefølgen før første kall:** klokka, tidskontrollen, basen, filvakten, nøkkelen og kvoten.
+- **Regelen om at grener bare bruker testbaser** føres i `CLAUDE.md` når 2.3 bygges, ikke i README-en.
+
 **Én økt:** ja.
+
+### Story 2.3b: Kallene som er igjen, brukes på nye forsøk
+
+*Lagt til 2026-10-05, gruppens beslutning kl. 19:17.*
+
+Som **gruppe med 20 kall i døgnet**, vil vi at kallene som er igjen etter kveldens henting, brukes til å hente aksjer som mangler dagens kurs, så færre dager får en grunn i stedet for en vurdering.
+
+**Oppfyller:** FR-402, NFR-01 · **Begrenses av:** `AD-6`, `AD-7`, `AD-20`
+
+**Kontroll — hva testen ser etter:**
+- Aksjer som feilet eller mangler dagens kurs etter hentingen, prøves igjen med det som er igjen av dagens 20 kall, aldri bonuskvoten. Eldste først, og rundt igjen til alle har dagens kurs, kallene er brukt eller klokka er 23:45
+- En aksje som allerede har dagens kurs, hentes ikke igjen. Hvert kall henter hele året, så eldre kurser er alt sjekket
+- Et forsøk som lykkes, skriver vurderingen over grunnen samme dag. En grunn skriver aldri over en vurdering (AD-7)
+- Filvakten slipper gjennom et delvis forsøk uten å skrive over kveldens øyeblikksbilde
+- Oppgaveplanlegging gjentar jobben hver halvtime fra 22:15 til 23:45
+- **Ville feilet hvis:** et nytt forsøk brukte bonuskvoten eller hentet en aksje som har dagens kurs
+
+Med 2.8 er det 4 kall igjen, ikke 5.
+
+**Avhenger av:** 2.3, og bygges etter 3.4. **Én økt:** avgjøres i planen.
 
 ### Story 2.4: Etterfylling av hull i kursserien
 
