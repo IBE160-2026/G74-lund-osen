@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-10-03T22:48
+updated: 2026-10-05T16:31
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -334,6 +334,32 @@ Fullteksten ligger ikke i repoet.
 | 1 | Er leveranselista fullstendig? | **Delvis.** Emnesiden lister mappeinnlevering (prosjektkode 70 %, refleksjonsrapport 30 %) og arbeidskravet. **Dockerfile og database står ikke der** — de flyttes til «sagt i samtale, ikke bekreftet» i §1 og §2. Emnesiden sier «tre deler» og lister to: åpent punkt 21 |
 | 2 | Datoer for demonstrasjon og prosjektinnlevering? | **Ingen dato finnes ennå.** «Bård Inge vil presisere dette.» Åpent punkt 13 står nå som «avventer Bård Inge» |
 | 3 | Skal BMAD-dokumenter leveres inn? | **Anbefalt, ikke krav.** De sentrale dokumentene er «viktige» og «bør derfor ... pushes dit». De ligger allerede i repoet |
+
+## Spørsmål sendt hjelpelærer 2026-10-04
+
+Sendt på e-post av Marian før kl. 21:49. Navnet på hjelpelæreren føres ikke.
+Teksten ordrett:
+
+> Hei! Gruppe G74 her, med et kort spørsmål om innleveringen.
+>
+> Appen kjører lokalt og starter med én kommando i Docker. Vi lager to versjoner med samme kode og samme SQLite-database:
+> - Den ekte versjonen henter sluttkurser fra EODHD. Den krever en gratis konto hos dem, uten betalingskort, fordi vilkårene ikke lar oss dele vår: https://eodhd.com/register. Gratisplanen gir 20 kall i døgnet, og appen bruker 15 per henting. README-en viser hvordan nøkkelen legges inn.
+> - Demoversjonen har oppdiktede tall og trenger ingen konto.
+>
+> KI-teksten lages av en lokal modell som lastes ned automatisk første gang, så den krever verken konto eller nøkkel.
+>
+> Vi håper dere vil teste med ekte kurser. Er dere villige til å lage en gratis konto hos EODHD, eller foretrekker dere demoversjonen? Og bruker dere Docker Desktop eller Python?
+>
+> Takk!
+> Marian og Joakim, G74
+
+Svar avventes.
+
+| Svaret om | Storyene det treffer |
+|---|---|
+| Docker Desktop eller Python | 3.1 og 3.3 (Docker og README) |
+| Ekte kurser eller demoversjonen | 3.3 og 3.4 |
+| Den lokale modellen | 10.2 |
 
 ---
 
