@@ -2500,6 +2500,20 @@ Vi ønsker å ha begge mulighetene. Det viser også at vi har tatt høyde for å
 
 ---
 
+## 04.–05.10.2026 – Kan ikke ta alt for god fisk
+
+*Joakim og Marian.*
+
+Vi vil gjerne ha en fungerende versjon med ekte kurser som vi kan bruke selv. Vi har begge interesse for aksjer og vil bruke den som en supplering ved hjelp av AI, videreutvikle den og ta imot betalte kontoer for å få mer bruk og utnyttelse av det vi bygger.
+
+Når vi bruker Claude i to sesjoner som kontrollerer hverandres arbeid, blir det flere rettelser og mer dokumentasjon. Noe er unødvendig, og KI kan bli for detaljert, men det er også en del av prosessen for å få klarhet.
+
+Vi kan ikke ta alt for god fisk og må være kritiske. KI er flink til å fylle inn ting som det ikke er grunnlag for, eller som ikke er riktig. Derfor kontrollsjekker vi ofte underveis.
+
+Vi føler vi har kommet et steg videre og har en mer helhetlig tankegang, men vi har kanskje også gitt oss selv merarbeid i ønsket om å lage en god app.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
