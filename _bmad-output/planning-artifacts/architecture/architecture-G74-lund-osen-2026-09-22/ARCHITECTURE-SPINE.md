@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-10-05T15:39'
+updated: '2026-10-05T17:07'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -220,6 +220,7 @@ manglet i grafen.
 - **Rule:** imaget bygges fra repoet, og repoet har ingen rådata (`.gitignore` utelater `data/` og `*-raa-*.json`). Et seedet datasett bakes **ikke** inn «for at det skal virke hos sensor». Leveransen er Dockerfile og kildekode, ikke et ferdig image. *24.09: Dockerfilen er sagt av faglærer i samtale 21.09, ikke på emnesiden (hjelpelærer 23.09); den lages likevel.*
 - **Utvidet 2026-10-03 (FR-411, Marians beslutning):** demobasen `data/db/demo.db` har oppdiktede selskaper og kurser, laget av en egen kommando uten nøkkel og uten nett. Oppdiktede tall er ikke data fra EODHD, så demobasen bryter ikke formålet med regelen, som er å ikke videreformidle kildedata. Imaget har likevel ingen base, heller ikke demobasen. Repoet har den heller ikke, fordi den ligger under `data/`, som er gitignorert. Den som vil prøve demoversjonen, kjører kommandoen selv.
 - **Merknad 2026-10-05 (FR-608, story 3.1, 3.2 og 3.4):** den lokale modellen ligger i et eget volum, `ollama`, hentes første gang med Ollamas pull-endepunkt og er aldri i imaget. De ferdige KI-tekstene til demoen ligger i en fil i repoet, fordi demobasen aldri ligger der. Tekstene er laget av oppdiktede tall, ikke av data fra EODHD.
+- **Merknad 2026-10-05, gruppens beslutning kl. 16:53:** den lokale modellen starter ikke av seg selv. Compose-fila i 3.1 starter appen uten Ollama, og Ollama med volumet `ollama` kommer inn som eget valg i story 10.2. KI-tekstene til demoen er story 3.4b.
 
 ### AD-10 — Webserveren starter aldri en henting
 
