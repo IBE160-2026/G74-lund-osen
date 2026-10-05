@@ -367,6 +367,7 @@ Epic 4.1 ──> Epic 9.5 (relevanseksperimentet, del 2)
 Epic 2.5 ──> Epic 10.2 (teksten lages rett etter vurderingen)   *(lagt til 2026-10-03, E6)*
 Epic 4.3 + 8.1 + 10.3 ──> Epic 10.4 (måle bidraget, med KILogg)   *(lagt til 2026-10-03, E6)*
 Epic 4.0 + 4.2 + 4.3 ──> Epic 10.2 (nettsperren og KILogg før modellen)   *(lagt til 2026-10-05)*
+Epic 10.1 ──> Epic 10.2 (grunnlaget)   *(lagt til 2026-10-05)*
 Epic 3.4 + 10.2 + 10.3 ──> Epic 3.4b (KI-tekstene i demoen)   *(lagt til 2026-10-05)*
 ```
 
@@ -1977,6 +1978,10 @@ venter på en modell.
 EODHD og plan B er avgjort 04.10 (vi spør ikke). **Avhenger av:** 4.0, 4.2 og
 4.3. 10.2 skriver til `KILogg` (FR-604), og nettsperren må dekke hele
 testkjøringen før noe kan kalle Ollama (`AD-8`).
+*Lagt til 2026-10-05, kl. 17:13:* avhengighetene over er i tillegg til de som
+fantes. 2.5 gjelder fortsatt, fordi teksten lages rett etter vurderingen, og
+10.1 gjelder fortsatt, fordi 10.2 sender grunnlaget fra `ki_grunnlag`. Grafen
+har fått «Epic 10.1 ──> Epic 10.2 (grunnlaget)».
 - Porten `Modell`, og `ki_lokal.py` mot Ollama med `think: false`,
   temperatur 0 og seed (FR-608, `AD-2`)
 - Prompten forklarer at fortegnet for interessen følger dagens kursendring og
