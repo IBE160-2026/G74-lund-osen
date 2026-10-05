@@ -370,6 +370,7 @@ Epic 4.0 + 4.2 + 4.3 ──> Epic 10.2 (nettsperren og KILogg før modellen)   *
 Epic 10.1 ──> Epic 10.2 (grunnlaget)   *(lagt til 2026-10-05)*
 Epic 3.4 + 10.2 + 10.3 ──> Epic 3.4b (KI-tekstene i demoen)   *(lagt til 2026-10-05)*
 Epic 2.3 + 3.4 ──> Epic 2.3b (nye forsøk med kallene som er igjen)   *(lagt til 2026-10-05)*
+Epic 8.0 ──> 8.0b + 8.0c ──> Epic 8.1   *(lagt til 2026-10-05)*
 ```
 
 *Lagt til 2026-10-05:* 10.2 skriver til `KILogg` (FR-604), og nettsperren må
@@ -389,6 +390,8 @@ En bygging som ikke er ferdig kl. 22:00, stopper på en commit, så hentingen ka
 kjøres fra main.
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 19:17:* rekkefølgen er 2.3, 3.1–3.4, 2.3b, og så KI-laget. Når jobben kjører fra en egen arbeidskopi av main (svar 3 under story 2.3), gjelder ikke lenger regelen over om at byggingen stopper kl. 22:00.
+
+*Lagt til 2026-10-05, Marians beslutning kl. 21:23:* 8.0b og 8.0c bygges etter 2.3b og før KI-laget.
 
 *Rettet 2026-10-03 (kontrollen 26.09, E6):* grafen manglet to harde avhengigheter som står i storyene. 10.2 lager teksten i hentekommandoen rett etter vurderingen, og trenger derfor 2.5. 10.4 avhenger av 8.1 og 10.3, og måler bidraget med `KILogg` over minst én ukes drift, som krever 4.3.
 
@@ -570,12 +573,14 @@ må vise hvordan KI ble brukt, og hvordan studentene har kvalitetssikret koden»
 
 # Stories
 
-55 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
+69 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
 den, hva kontrollen faktisk ser etter, og om den kan gjøres ferdig i én økt.
 *Rettet 2026-09-26:* her sto 42. Tallet er telt fra overskriftene «### Story».
 *Rettet 2026-09-27:* her sto 46. Story 9.0 kom til 27.09.
 *Rettet 2026-09-29:* her sto 47. Siden 27.09 har 1.8, 1.9, 2.1b, 2.1c, 2.7, 8.0,
 9.5 og 10.5 kommet til. 10.1–10.4 er 5B.1–5B.4 med nytt navn, ikke nye.
+*Rettet 2026-10-05:* her sto «55 stories». Siden 29.09 har 2.2b, 2.3b, 2.8, 2.9,
+2.9b, 3.4, 3.4b, 8.0b, 8.0c, 8.3, 8.4, 10.6, 10.7 og 10.8 kommet til, og ingen er fjernet.
 
 **«Ville feilet hvis» er kontrollen.** Resten er beskrivelse. En story uten den
 linjen er ikke ferdig spesifisert.
@@ -2417,6 +2422,26 @@ sted. Min liste (8.3) bruker de samme.
 
 **Avhenger av:** 8.0. Ferdig før 8.1, så testen viser om hjelpen blir brukt.
 **Én økt:** ja.
+
+*Lagt til 2026-10-05, Marians beslutning kl. 21:23:* i oversikten står et «?» ved overskriften Signalstyrke. I dag forklares 0–3 bare i fotnoten nederst.
+
+### Story 8.0c: Tydelig merking, ord ved sjekkene og datoer på grafen
+
+*Lagt til 2026-10-05, fra rådets gjennomgang av sidene og Marians beslutning kl. 21:23.*
+
+Som **bruker**, vil jeg se med en gang hvilke aksjer som skiller seg ut, lese hva hver sjekk ga uten å tolke et fortegn, og se datoene langs grafen, så 8.1 tester skjermbildene og ikke feil vi kjenner fra før.
+
+**Oppfyller:** designregler §3 for tabellen, FR-705, FR-706, FR-201 · **Begrenses av:** FR-101, FR-103, FR-704, NFR-05, NFR-06
+
+**Kontroll — hva testen ser etter:**
+- Signalstyrken i oversikten står som «N av 3», som i aksjedetaljen. 3 av 3 får gul ring (designregler §3). 2 av 3 merkes med mer enn lys bakgrunn, uten gult. «skiller seg ut» står fortsatt, og tabellen har fortsatt fem kolonner
+- Ga-kolonnen viser tallet og et ord: positiv ved +1, negativ ved -1 og ingen utslag ved 0. Positiv og negativ bygges av konstantene i `signalberegning.py`, som retningen
+- Kursgrafen har et merke ved første børsdag i hver måned, med norsk månedsnavn. Merket står på samme x som punktet for den dagen i kurslinja. Datoene i bildeteksten står fortsatt
+- **Ville feilet hvis:** en rad med 2 av 3 bare skilte seg fra en med 1 av 3 ved lys bakgrunn, det sto opp eller ned ved en sjekk, eller et månedsmerke sto under feil dag fordi merkene ble spredd etter kalenderen, mens linja har lik avstand per børsdag
+
+**Funnene bak** (rådets gjennomgang 05.10): signalstyrken 0–3 forklares bare i fotnoten. Radene som skiller seg ut, har bakgrunnen `#fafafa`, som er nesten hvit, og ellers bare den lille teksten «skiller seg ut». Ga-kolonnen viser bare +1, -1 og 0. Grafen har datoer bare i bildeteksten. Ordene ved sjekkene er FR-704 sine, positiv og negativ, ikke opp og ned (FR-103, endret 21.09).
+
+**Avhenger av:** 8.0. Ferdig før 8.1, som 8.0b, så brukertesten ikke finner det vi alt vet. **Én økt:** ja.
 
 ### Story 8.1: Brukertest rett etter Epic 2
 
