@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-10-05T17:07'
+updated: '2026-10-05T17:14'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -241,6 +241,7 @@ manglet i grafen.
 - **Prevents:** en API-nøkkel i et image eller i git
 - **Rule:** `EODHD_API_KEY` leses fra miljøet ved kjøretid. `.env` er gitignorert, `.env.example` viser bare variabelnavnet, og CI kjører med `permissions: contents: read` og ingen hemmeligheter.
 - **Merknad 2026-10-05 (FR-608, story 10.7 og 10.8):** de nye variablene leses også fra miljøet: `OSE_KI_TJENESTE`, `OSE_KI_GEMINI_NOKKEL`, `OSE_KI_ANTHROPIC_NOKKEL` og `OSE_KI_OPENAI_NOKKEL`. `.env.example` viser bare navnene. Tokenfila for ChatGPT (10.8) ligger under `data/ki/`, som er gitignorert. Ingen nøkkel eller innlogging følger med appen eller repoet, og hver kobler bare til sin egen. Grunnen står i `docs/kilder-og-rettigheter.md`, «Betingelse 4 og KI-tjenestene (2026-10-04)»: avsnitt 4b i Google APIs Terms sier at «Developer credentials may not be embedded in open source projects.», og Agent SDK-oversikten sier at Anthropic ikke tillater tredjeparter å tilby claude.ai-innlogging. PRD-memloggen 04.10 nevner også avsnitt 2 i Anthropics Consumer Terms. Det er ikke sitert i `docs/kilder-og-rettigheter.md` og er ikke lest i økta 05.10, så det står ikke her.
+- **Lagt til 2026-10-05, senere samme dag:** avsnitt 2 i Anthropics Consumer Terms er lest og sitert i `docs/kilder-og-rettigheter.md`, ved avsnittet om Claude-abonnementet: «You may not share your Account login information, Anthropic API key, or Account credentials with anyone else or make your Account available to anyone else.» (Consumer Terms, «Effective October 8, 2025»). Setningen er en grunn til regelen i denne merknaden, sammen med 4b i Google APIs Terms. Linjen over, som sier at avsnittet ikke er lest, står (regel 13).
 
 ### AD-13 — Signalparametre er konstanter med måling bak seg `[ADOPTED 2026-09-20/21]`
 

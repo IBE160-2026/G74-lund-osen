@@ -2,7 +2,7 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-04T21:31
+updated: 2026-10-05T17:14
 ---
 
 # Kilder og rettigheter
@@ -401,6 +401,15 @@ approved, Anthropic does not allow third party developers to offer claude.ai
 login or rate limits for their products, including agents built on the Claude
 Agent SDK. Use the API key authentication methods described in the Quickstart
 instead.»
+
+*Lagt til 2026-10-05:* fra Consumer Terms of Service,
+https://www.anthropic.com/legal/consumer-terms, «Effective October 8, 2025»,
+avsnitt 2 «Account creation and access», lest 05.10.2026: «You may not share
+your Account login information, Anthropic API key, or Account credentials with
+anyone else or make your Account available to anyone else.» Det er grunnen til
+at ingen nøkkel eller innlogging følger med appen eller repoet (`AD-12`).
+Dagsfila 04.10 sier at avsnittet ble slått opp da, men setningen ble ikke
+sitert her før nå.
 
 #### OpenAI API, med egen nøkkel
 
