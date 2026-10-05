@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-05T17:04
+updated: 2026-10-05T17:15
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -100,6 +100,7 @@ koden.
 - «Se nærmere» i aksjedetaljen: tre ting brukeren kan sjekke selv (FR-205) *(lagt til 2026-10-02, Marians beslutning)*
 - KI-tekst om dagen på forsiden, under tabellen (FR-607) *(lagt til 2026-10-02, Marians beslutning)*
 - Demoversjonen: oppdiktede selskaper og kurser i en egen base, laget uten nøkkel og uten nett, og merket «Eksempeltall» (FR-411) *(lagt til 2026-10-03, Marians beslutning)*
+- Valg av KI-tjeneste: en lokal modell er standard og trenger verken nøkkel eller konto, og hver kan velge Gemini, Anthropic eller OpenAI med sin egen nøkkel (FR-608) *(lagt til 2026-10-05, gruppens beslutning 04.10)*
 
 *Plan B, 2026-09-28:* KI-laget forklarer signalet i stedet for børsmeldingene, ut fra tall regnet av kursene (Epic 10). Av/på-bryteren står. FR-601–606 er skrevet om for plan B 2026-09-28, og meldingsversjonen står i §4.6A. *Her sto:* «FR-601–606 skrives om for plan B i en egen runde.»
 
