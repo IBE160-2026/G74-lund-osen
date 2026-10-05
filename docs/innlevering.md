@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-10-05T17:03
+updated: 2026-10-05T17:08
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -400,6 +400,15 @@ slik Marian ga den videre 05.10.
 | Den lokale modellen | Ikke nevnt |
 
 Hva gruppen gjør med svaret, føres når det er avgjort.
+
+*Avgjort 2026-10-05, gruppens beslutning kl. 16:53:* demoversjonen er hovedveien
+for vurderingen, og den ekte versjonen med egen EODHD-nøkkel står i README-en
+som et valg. Docker er hovedmåten i README-en, og Python med uv er
+alternativet. Den første kommandoen starter demoen. Den lokale modellen starter
+ikke av seg selv, og blir et eget valg i story 10.2. 3.1 til 3.4 bygges uten
+KI-tekster rett etter 2.3, og KI-tekstene i demoen blir story 3.4b. Hentingen
+fortsetter hver børsdag. Ført i `prd.md` under FR-411, i `epics.md` og i spinen
+(AD-9).
 
 ---
 
