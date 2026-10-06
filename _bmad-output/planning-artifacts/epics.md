@@ -2140,6 +2140,20 @@ NewsWeb») · **Begrenses av:** `AD-2`
   ved navnet. Ville feilet hvis en lenke gikk til en annen aksje enn den siden
   viser.
 
+*Rettet 2026-10-06, Marians beslutning:* appen lenker ikke til
+`newsweb.oslobors.no`, `oslobors.no` eller `live.euronext.com`, fordi Euronexts
+vilkår forbyr lenker uten tillatelse (`docs/kilder-og-rettigheter.md`, «Lenker
+til Euronexts nettsteder (lest 2026-10-06)»). Aksjedetaljen lenker til
+selskapets investorside, der mange selskaper viser dagens kurs og børsmeldingene
+sine, og nevner NewsWeb uten lenke. Vi ber ikke Euronext om tillatelse, fordi
+brevet 21.09 og purringen 22.09 ikke er besvart. Tittelen står.
+- Ingen mal har en lenke til `newsweb.oslobors.no`, `oslobors.no` eller
+  `live.euronext.com`, og en test krever det
+- Lenken går til selskapets investorside, slått opp for hånd for hver av de 15
+- I demoen er selskapene oppdiktet, så der vises ingen lenke. Hva som står i
+  stedet, avgjøres når 10.5 planlegges
+- **Ville feilet hvis:** en lenke til et av Euronexts nettsteder kom inn i en mal
+
 ### Story 10.6: KI-teksten om dagen på forsiden
 
 *Lagt til 2026-10-02, Marians beslutning.*
@@ -2756,3 +2770,5 @@ Som **gruppe**, vil vi ha en brief som beskriver appen vi leverer, så sensor ka
 **Avhenger av:** ingen. Gjøres før 3.1, så demoen og briefen beskriver samme app. **Én økt:** ja.
 
 *Lagt til 2026-10-06:* kontrollregningen i `malinger.md` §6 er gjort for EQNR 05.10 og stemmer (`55a1165`), så v8 kan vise til den.
+
+*Lagt til 2026-10-06, Marians beslutning:* v8 lover ikke lenker til NewsWeb eller Oslo Børs, men kan nevne lenken til investorsiden (10.5).
