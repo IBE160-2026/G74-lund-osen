@@ -75,6 +75,10 @@ et sitat som ikke fantes».
     som i kontrollene av briefen) og fyller to sider, så en ny versjon skal ikke
     bli lengre. Tilbakemeldingen fra faglærerne føres i `innlevering.md`, ikke i
     briefen.
+    *Presisert 2026-10-06, Marians beslutning kl. 12:42:* det faglærere legger
+    inn i repoet selv, blir liggende urørt i sin egen fil og lenkes i
+    «Dokumentene» (regel 19). Svar på e-post vi har sendt, føres i
+    `innlevering.md`.
 18. **Hver instruksjon lagres ordrett, også når den skrives rett inn.** Den
     lagres i `docs/ai-prompts/<ÅÅÅÅ-MM-DD>.md` før den utføres, med klokkeslett.
     Når den er utført, legges en linje under med commitene og utfallet. Linjen
