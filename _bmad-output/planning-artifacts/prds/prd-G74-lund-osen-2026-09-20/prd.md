@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-06T18:36
+updated: 2026-10-06T23:13
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -77,6 +77,11 @@ om morgenen.
 **Målet med v1** er at en vanlig sparer skal kunne åpne løsningen om morgenen,
 se hva som har endret seg, forstå hvorfor noe skiller seg ut, og finne det
 viktigste uten å slå opp flere steder.
+*Rettet 2026-10-06, etter brief v8:* spørsmålet v1 svarer på, er hva som
+beveget seg i går, og hvorfor. «Er det noe viktig på vei» er ute av v1 med
+plan B (§2), og «om morgenen» gjelder ikke lenger, etter Marians beslutning
+06.10 kl. 21:21: oversikten er ikke bundet til morgenen, og den kan leses når
+kveldens henting er gjort.
 
 **Det bærende prinsippet** er at kode og KI holdes fra hverandre: regler
 sorterer, KI forklarer, og grensen er synlig i grensesnittet — ikke bare i
@@ -93,8 +98,8 @@ koden.
 - Børsmeldinger sortert av regler og forklart av KI *Ute av v1 fra 2026-09-28 (plan B, punkt 1 i §8).*
 - Av/på-bryter for KI-laget, synlig i grensesnittet
 - Kommende finansielle hendelser *Ute av v1 fra 2026-09-28 (plan B, punkt 1 i §8).*
-- Lenke fra aksjedetaljen til selskapets side på NewsWeb *(plan B, 28.09)*
-- Lenke fra aksjedetaljen til selskapets egen nettside, på norsk der den finnes *(lagt til 2026-09-30)*
+- Lenke fra aksjedetaljen til selskapets side på NewsWeb *(plan B, 28.09)* *Rettet 2026-10-06:* Marians beslutning 2026-10-06 kl. 20:42: appen lenker ikke til `newsweb.oslobors.no`, `oslobors.no` eller `live.euronext.com`, fordi Euronexts vilkår forbyr lenker uten tillatelse. Aksjedetaljen lenker til selskapets investorside og nevner NewsWeb uten lenke (`docs/kilder-og-rettigheter.md`, «Lenker til Euronexts nettsteder (lest 2026-10-06)»).
+- Lenke fra aksjedetaljen til selskapets egen nettside, på norsk der den finnes *(lagt til 2026-09-30)* *Lagt til 2026-10-06:* lenken går til selskapets investorside (story 10.5).
 - Tickeren fra Oslo Børs står ved selskapsnavnet i aksjedetaljen, for eksempel EQNR *(lagt til 2026-09-30)*
 - Hovedindeksen OSEBX i markedsoversikten, med søyler for dagens endring per aksje (FR-104, FR-105, FR-410) *(lagt til 2026-10-01, Marians beslutning)*
 - «Se nærmere» i aksjedetaljen: tre ting brukeren kan sjekke selv (FR-205) *(lagt til 2026-10-02, Marians beslutning)*
@@ -443,6 +448,7 @@ Aksjedetaljen viser i tillegg:
   brukeren klikker, og siden åpnes i nettleseren. Ingen kode i `src/` henter fra
   NewsWeb (Euronexts vilkår, punkt 1 i §8). Adressen og det vilkårene sier om
   lenker, slås opp av en av oss før lenken bygges *(plan B, 2026-09-28)*
+  *Rettet 2026-10-06:* Marians beslutning 2026-10-06 kl. 20:42: appen lenker ikke til `newsweb.oslobors.no`, `oslobors.no` eller `live.euronext.com`, fordi Euronexts vilkår forbyr lenker uten tillatelse. Aksjedetaljen lenker til selskapets investorside og nevner NewsWeb uten lenke (`docs/kilder-og-rettigheter.md`, «Lenker til Euronexts nettsteder (lest 2026-10-06)»).
 
 *Ute av v1 fra 2026-09-28 (plan B).* *Lagt til 2026-09-25:* over meldingene står en teller for hvor mange som ble
 funnet og hvor mange som vises, med grunnen til at resten er skjult: filtrert
@@ -485,6 +491,7 @@ Aksjedetaljen har delen «Se nærmere», rett under kursgrafen, med tre spørsm�
 
 1. «Børsen, bransjen eller selskapet?»: aksjens endring mot hovedindeksen (FR-104) og mot snittet av de andre i samme bransje i lista som er aktiv. Svarene er «Børsen», «Bransjen», «Selskapet», «Selskapet eller bransjen» når aksjen er alene i bransjen, og «Liten bevegelse». Grensene avgjøres i spesifikasjonen og står i `Parametre`. Svaret sier hvor bevegelsen ser ut til å komme fra, ikke hvorfor.
 2. «Står det noe i børsmeldingene?»: lenken til NewsWeb fra FR-203 står her.
+   *Rettet 2026-10-06:* Marians beslutning 2026-10-06 kl. 20:42: appen lenker ikke til `newsweb.oslobors.no`, `oslobors.no` eller `live.euronext.com`, fordi Euronexts vilkår forbyr lenker uten tillatelse. Aksjedetaljen lenker til selskapets investorside og nevner NewsWeb uten lenke (`docs/kilder-og-rettigheter.md`, «Lenker til Euronexts nettsteder (lest 2026-10-06)»).
 3. «Er en slik dag vanlig for aksjen?»: dagens endring mot standardavviket, og volumet mot medianen, slik de er lagret i vurderingen (FR-408).
 
 Mangler et tall, står grunnen, ikke et gjettet svar (NFR-03).
@@ -1590,7 +1597,7 @@ den avhenger av.
 | **Mediesaker for ett selskap** *(lagt til 2026-09-25)*: de nyeste artiklene fra EODHDs nyhets-API for én aksje, hentet bare når brukeren ber om det. Også for selskaper utenfor de 15, med ticker skrevet inn | Relevanseksperimentet del 1 (story 9.4): hvor mange artikler som finnes per selskap, og hvor mange av dem som faktisk handler om selskapet. For selskaper utenfor universet: et eget skjermbilde uten kurs og signal, jf. idéen om flere skjermbilder | 5 kall per selskap (`malinger.md` §7.2). Kurshentingen bruker 15 av 20, så ett selskap per dag holder seg innenfor dagskvoten, og mer tar av bonuskvoten (§11). Hentes av hentekommandoen, ikke av en knapp i nettsiden: webserveren henter aldri (NFR-02, AD-10). Artiklene vises bare lokalt og publiseres ikke (`docs/kilder-og-rettigheter.md`). Skal KI vurdere relevansen, gjelder EODHDs betingelser fra 21.09, også betingelse 4 |
 | **Egendefinert meldingsfilter** *(lagt til 2026-09-25)*: brukeren velger selv hvilke kategorier som vises, i tillegg til Anbefalt og Alle (FR-203) | Story 6.5, og en brukertest som viser at noen savner det | Rundt ti kategorier, og valgene må lagres. Hvert valg koster tid i hovedflyten, som skal gå på under fem minutter (§7, «Brukerutfall»). Tas ikke inn uten at en test viser behovet |
 | **Merk det som er nytt siden forrige henting** *(lagt til 2026-09-25)*: meldinger som har kommet siden forrige henting, merkes som nye | At meldingslageret (story 6.1) lagrer når hver melding ble hentet første gang | Svarer rett på spørsmålet i briefen: «hva beveget seg i går, hvorfor». Ingen kall og ingen KI |
-| **Lenke til selskapets side på NewsWeb** *(lagt til 2026-09-25)*: én lenke fra aksjedetaljen, så alle børsmeldingene er ett klikk unna, også de som er filtrert bort | Ingenting nytt. Lenken henter ingenting | Vurderes allerede 28.09 hvis Euronext sier nei eller ikke svarer. Da har aksjedetaljen ingen meldinger, og lenken er det eneste som viser dem (åpent punkt 1). Adressen må slås opp før den bygges. *Tatt inn i v1 28.09 (plan B).* Adressen og det Euronexts vilkår sier om lenker, slås opp av en av oss før lenken bygges |
+| **Lenke til selskapets side på NewsWeb** *(lagt til 2026-09-25)*: én lenke fra aksjedetaljen, så alle børsmeldingene er ett klikk unna, også de som er filtrert bort | Ingenting nytt. Lenken henter ingenting | Vurderes allerede 28.09 hvis Euronext sier nei eller ikke svarer. Da har aksjedetaljen ingen meldinger, og lenken er det eneste som viser dem (åpent punkt 1). Adressen må slås opp før den bygges. *Tatt inn i v1 28.09 (plan B).* Adressen og det Euronexts vilkår sier om lenker, slås opp av en av oss før lenken bygges *Lagt til 2026-10-06:* bygges ikke. Euronexts vilkår forbyr lenker uten tillatelse, og vi ber ikke om tillatelse fordi brevet 21.09 og purringen 22.09 ikke er besvart. Aksjedetaljen lenker til selskapets investorside og nevner NewsWeb uten lenke (Marians beslutning 06.10 kl. 20:42) |
 | **Sjekk 2 og 3 synlige i grafen** *(lagt til 2026-09-25)*: volumsøyler under kursgrafen, med en strek for medianvolumet, så sjekk 3 (interesse) synes slik MA50-linjen viser sjekk 1. Eventuelt også et bånd for sjekk 2 (bevegelse) | Ingenting nytt. Volumet finnes i `Kursrad`, og tegningen er samme SVG som i dag (`graf.py`). Tas stilling til i UX-gjennomgangen (8.2), etter brukertesten (8.1) | FR-202 sier at volatilitetsbånd og volumsøyler ikke tegnes i v1, så å ta dem inn er en endring av FR-202. Streken må være samme median, over samme vindu, som sjekk 3 regner med, etter samme prinsipp som i FR-202. Story 8.2 skal ikke ende i ny funksjonalitet, så søylene må begrunnes som en forbedring av forklaringen i FR-706, ellers hører de til v1.1 |
 | **Signaldager i grafen** *(lagt til 2026-09-25)*: kursgrafen markerer dagene med sterkt signal, så man ser hvordan signalet har oppført seg over tid | Vurderingslageret (1.6) og at hentekommandoen skriver vurderingen hver dag (2.5). Historikken bygges opp fra første daglige kjøring | Bare visning. En studie av om signalene slår markedet er utenfor v1. Med få ukers historikk ved demonstrasjonen blir det få markeringer |
 | **Hjelp bak et spørsmålstegn** *(lagt til 2026-09-25)*: et «?» på begge skjermbildene åpner et lite vindu som forklarer begrepene og symbolene appen viser: sluttkurs og endring, utbyttejustert kurs, signalstyrke 0–3, retningen (↑ Positiv, ↓ Negativ, ↔ Blandet, – Ingen eller Ukjent), de tre sjekkene (trend med 50-dagers snitt, bevegelse og interesse), «data hentet» og «Uten data». Vinduet sier også at signalene ikke er investeringsråd (NFR-06) | Ingenting nytt. Fast tekst, uten nettkall og uten KI, og det kan lages med HTML alene, uten et nytt bibliotek. Bør bygges før brukertesten (8.1), så testen viser om hjelpen blir brukt | Forklarer bare det appen faktisk viser. P/E og andre nøkkeltall fra regnskapet ligger utenfor v1 («fundamental- og verdimodell»). Retningen forklares med ordene fra FR-704, ikke med «opp» og «ned», som ble fjernet fordi de inviterer til å lese pilen som kursbevegelse (`markedsoversikt.py`). Hjelpen skiller «Ingen» fra «Ukjent», slik FR-101 gjør. Tall i teksten, som 50 dager, hentes fra de samme parametrene som beregningen (`Parametre` i `signalberegning.py`), og en test krever det. Ellers kan hjelpeteksten si én ting mens koden gjør en annen, den samme feilen som story 3.3 skal hindre mellom README og den tomme siden. *Flyttet til v1 2026-10-01:* story 8.0b (Marians beslutning). |
