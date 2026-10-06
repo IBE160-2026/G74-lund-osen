@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-06T23:13
+updated: 2026-10-06T23:19
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1094,6 +1094,7 @@ resultatene kan sammenlignes direkte.
 I v1 brukes skalaen i relevanseksperimentet, på EODHDs medieartikler
 (`relevanseksperiment.md` §3, story 9.5), og ikke i applikasjonen. Hvordan den
 brukes på meldinger i applikasjonen, står i FR-606A.
+*Lagt til 2026-10-06:* Marians beslutning 2026-10-06 kl. 21:11: del 2 av relevanseksperimentet kjøres ikke, og story 9.5 utgår. Grunnen er rettighetene: nyhetene kan brukes privat, men ikke i en app som kan bli tilgjengelig for andre, og henvendelsene om dem er ikke besvart. Del 1 viste at mye av nyhetene kunne vært silt bort, og den brukes i refleksjonsrapporten. Skalaen brukes dermed ikke i v1.
 
 #### FR-607 — KI-teksten om dagen på forsiden
 
@@ -1450,21 +1451,32 @@ på vilkår, og andre norske finansmedier publiserer ikke lenger åpen RSS. Se
 | Adopsjon | Gruppen bruker løsningen på egne aksjer og logger feil | Minst 4 av 5 børsdager fra første fungerende versjon | Løpende |
 | Drift | Én henting fullfører innenfor kvoten; ved kildefeil vises siste kjente data med tidsstempel | **Én kommando gjør hele hentingen.** Ingen skjulte steg, ingenting som må huskes utenom den — **migrasjoner er uttrykkelig ikke et eget steg**. Ingen stopp ved manglende data | Ukentlig |
 | Dager uten signal | Dager uten tydelige signaler håndteres uten at hovedflyten stopper eller systemet tvinger frem et resultat | Signalstyrke 0 forekommer og vises korrekt | Løpende |
-| KI-bidrag i drift | Hvilke meldinger KI-laget forklarte eller omklassifiserte som regelfilteret alene ikke klarte å skille | Dokumentert eksempelsett fra minst én ukes drift | Før demonstrasjonen, est. uke 45 |
-| Relevanseksperiment | Testsett på ~50 medieartikler fra åtte selskaper, merket manuelt, kjørt mot både symbolmatching og KI-klassifisering | Eksperimentet gjennomført og tallene dokumentert — ikke at KI kommer best ut | **Del 1** innsamling og merking, uke 39–40. *Gjennomført 26.09* (`relevanseksperiment.md` §8). **Del 2** KI-kjøringen, når KI-laget finnes |
+| KI-bidrag i drift | Hvilke meldinger KI-laget forklarte eller omklassifiserte som regelfilteret alene ikke klarte å skille | Dokumentert eksempelsett fra minst én ukes drift | Før demonstrasjonen, est. uke 45 *Rettet 2026-10-06, brief v8:* erstattet av «KI-forklaringen» etter plan B. KI-laget forklarer signalet og omklassifiserer ingen meldinger |
+| Relevanseksperiment | Testsett på ~50 medieartikler fra åtte selskaper, merket manuelt, kjørt mot både symbolmatching og KI-klassifisering | Eksperimentet gjennomført og tallene dokumentert — ikke at KI kommer best ut | **Del 1** innsamling og merking, uke 39–40. *Gjennomført 26.09* (`relevanseksperiment.md` §8). **Del 2** KI-kjøringen, når KI-laget finnes *Lagt til 2026-10-06:* Marians beslutning 2026-10-06 kl. 21:11: del 2 av relevanseksperimentet kjøres ikke, og story 9.5 utgår. Grunnen er rettighetene: nyhetene kan brukes privat, men ikke i en app som kan bli tilgjengelig for andre, og henvendelsene om dem er ikke besvart. Del 1 viste at mye av nyhetene kunne vært silt bort, og den brukes i refleksjonsrapporten. |
 | Fortsatt bruk | Om vi bruker løsningen frivillig etter at utviklingen er ferdig, ikke bare for å teste den | Minst tre dager i uka de to siste ukene, loggført | Ved prosjektinnlevering |
 | Grensesnitt og stabilitet | Hovedflyten fungerer uten feil og med et ryddig, gjennomarbeidet grensesnitt i en demonstrasjon | Hovedflyten gjennomført uten feil eller manuelle inngrep | Ved demonstrasjonen |
+| Riktige beregninger *(lagt til 2026-10-06, brief v8)* | Håndlagde kursserier gir forhåndsberegnet styrke og retning | Testene består. Kontrollert for hånd for EQNR 05.10 og GJF 02.10: regnearket og appen stemmer (`malinger.md` §6) | Ved hver testkjøring |
+| KI-forklaringen *(lagt til 2026-10-06, brief v8)* | Hver KI-tekst som vises, har bestått kontrollen mot grunnlaget (FR-603), og hver tekst er logget (FR-604) | Testene viser at feil stoppes. Én ukes drift er logget | Før demonstrasjonen |
+| Kjørbar for andre *(lagt til 2026-10-06, brief v8)* | README-oppskriften fullføres gratis på en ren maskin, uten gruppens nøkler: demoen uten konto, og den ekte versjonen med egen gratiskonto hos EODHD | README-prøven fra en ren maskin i story 3.4 | Før prosjektinnlevering |
 
 **Hovedflyten** er definert som: åpne markedsoversikten, se hvilke aksjer som
 skiller seg ut, åpne én av dem, og lese hvorfor — de tre sjekkene med verdiene
 sine, og meldingene som gjelder. Både brukerutfallsmålet og stabilitetsmålet
 måler denne flyten.
+*Rettet 2026-10-06, brief v8:* «og meldingene som gjelder» er ute med plan B
+(§2). Flyten slutter med de tre sjekkene, og KI-teksten når laget er på.
 
 **Bundet til datoer som ikke er fastsatt:** FR-407, FR-601 og FR-408, og fire av
 de åtte målene: «Brukerutfall», «KI-bidrag i drift», «Fortsatt bruk» og
 «Grensesnitt og stabilitet». Se åpent punkt 13. *Rettet 2026-09-24: her sto
 bare «KI-bidrag i drift» og «Grensesnitt og stabilitet». «Brukerutfall» og
 «Fortsatt bruk» har frist ved prosjektinnlevering.*
+*Lagt til 2026-10-06, brief v8:* med de tre nye radene har tabellen elleve
+mål. «KI-bidrag i drift» er erstattet av «KI-forklaringen», og del 2 av
+«Relevanseksperiment» utgår, mens del 1 er gjennomført. Ni mål gjelder, og fem
+av dem er bundet til datoer som ikke er fastsatt: «Brukerutfall», «Fortsatt
+bruk», «Grensesnitt og stabilitet», «KI-forklaringen» og «Kjørbar for andre».
+«Riktige beregninger» gjelder ved hver testkjøring.
 
 *Endret 2026-09-22.* Terskelen sa «Ingen manuelle steg». Den målte **to**
 egenskaper, og FR-401 har skilt dem fra hverandre:
@@ -1494,8 +1506,11 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 - **Relevanseksperimentet skal avgjøre påstanden, ikke bekrefte den.** Viser
   målingen liten forskjell mellom symbolmatching og KI-klassifisering, er det
   også et funn.
+  *Lagt til 2026-10-06:* eksperimentet utgår etter del 1. Marians beslutning kl. 21:11: del 2 av relevanseksperimentet kjøres ikke, og story 9.5 utgår. Grunnen er rettighetene: nyhetene kan brukes privat, men ikke i en app som kan bli tilgjengelig for andre, og henvendelsene om dem er ikke besvart. Del 1 viste at mye av nyhetene kunne vært silt bort, og den brukes i refleksjonsrapporten.
 - **KI-bidrag måles i hva laget faktisk klarte å skille**, ikke i hvor mange
   meldinger det behandlet.
+  *Rettet 2026-10-06, brief v8:* KI-laget måles i at tekstene består kontrollen
+  i FR-603, ikke i hvor mange det lager.
 - **Adopsjon som bare er testing teller ikke.** Derfor er «fortsatt bruk» et
   eget mål med egen terskel.
 - **Usikkerhetsmerking som aldri slår til er et varsel**, ikke en suksess. Slår
@@ -1519,7 +1534,7 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 
 | # | Punkt | Eier | Frist |
 |---|---|---|---|
-| 5b | **Relevanseksperimentet, del 2: KI-klassifiseringen.** Kan ikke gjøres ennå, og det er tre grunner, ikke én: KI-laget finnes ikke som kode, ingen modelltjeneste er valgt, og **betingelse 4 i EODHDs godkjenning — at modelltjenesten ikke trener på innholdet — er udokumentert.** Den må være ført før artikkeltekst sendes inn i en modell, se `docs/kilder-og-rettigheter.md`. *Rettet 2026-10-03 (kontrollen 26.09, P13):* `docs/kilder-og-rettigheter.md` har en fjerde avklaring før del 2: om EODHDs klarering holder når innholdet eies av andre, fordi EODHD er et mellomledd. Eier Marian, frist før del 2 *2026-10-04:* tjenesten er valgt, og betingelse 4 er ført i `docs/kilder-og-rettigheter.md` («Betingelse 4 og KI-tjenestene (2026-10-04)»). Standard er en lokal modell, Gemma 4 E4B. Igjen står at KI-laget ikke finnes som kode, og avklaringen om EODHDs klarering holder når EODHD er et mellomledd. | Gruppen | Når KI-laget finnes |
+| 5b | **Relevanseksperimentet, del 2: KI-klassifiseringen.** Kan ikke gjøres ennå, og det er tre grunner, ikke én: KI-laget finnes ikke som kode, ingen modelltjeneste er valgt, og **betingelse 4 i EODHDs godkjenning — at modelltjenesten ikke trener på innholdet — er udokumentert.** Den må være ført før artikkeltekst sendes inn i en modell, se `docs/kilder-og-rettigheter.md`. *Rettet 2026-10-03 (kontrollen 26.09, P13):* `docs/kilder-og-rettigheter.md` har en fjerde avklaring før del 2: om EODHDs klarering holder når innholdet eies av andre, fordi EODHD er et mellomledd. Eier Marian, frist før del 2 *2026-10-04:* tjenesten er valgt, og betingelse 4 er ført i `docs/kilder-og-rettigheter.md` («Betingelse 4 og KI-tjenestene (2026-10-04)»). Standard er en lokal modell, Gemma 4 E4B. Igjen står at KI-laget ikke finnes som kode, og avklaringen om EODHDs klarering holder når EODHD er et mellomledd. *Lagt til 2026-10-06:* Marians beslutning 2026-10-06 kl. 21:11: del 2 av relevanseksperimentet kjøres ikke, og story 9.5 utgår. Grunnen er rettighetene: nyhetene kan brukes privat, men ikke i en app som kan bli tilgjengelig for andre, og henvendelsene om dem er ikke besvart. Del 1 viste at mye av nyhetene kunne vært silt bort, og den brukes i refleksjonsrapporten. | Gruppen | Når KI-laget finnes |
 | 6 | **Usikkerhetskriteriene er skrevet for medieartikler.** Kjennetegn 1 bærer svakt når utstederen selv er avsender | | Før KI-laget implementeres |
 | 8 | **Oppstart av tilbakekjøpsprogram** er ekte nyhet, men filtreres bort sammen med de ukentlige statusrapportene | | Før innlevering |
 | 9 | **Kontrollere Alpha Vantages vilkår** for ikke-kommersiell bruk | | Før innlevering |
