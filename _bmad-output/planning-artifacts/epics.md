@@ -2739,6 +2739,8 @@ neste. Budsjettet er åtte forespørsler, ~40 kall. Se
 
 ### Story 9.5: Relevanseksperimentet, del 2 — KI-kjøringen
 
+*Utgår fra 2026-10-06 (Marians beslutning kl. 21:11, `prd.md` §7).* Del 2 kjøres ikke, fordi nyhetene kan brukes privat, men ikke i en app som kan bli tilgjengelig for andre, og henvendelsene om dem er ikke besvart. Del 1 står og brukes i refleksjonsrapporten. Storyen står som den var.
+
 *Lagt til 2026-09-27, fra prioriteringen samme dag.*
 
 Som **gruppe**, vil vi kjøre KI-klassifiseringen på de merkede artiklene, så refleksjonsrapporten kan vurdere KI med tall.
