@@ -66,6 +66,8 @@ en beskrivelse av arbeidsmønsteret mellom rådgivningsøkt, byggeøkt og mennes
   diskusjon); del 2, KI-klassifiseringen, venter på KI-laget og på at EODHDs
   betingelse om at modelltjenesten ikke trener på innholdet er dokumentert.
   Kriteriene fra del 1 endres ikke i ettertid.
+  *Lagt til 2026-10-06:* del 2 av relevanseksperimentet utgår etter Marians beslutning 06.10 kl. 21:11
+  (story 9.5).
 
 ## Cross-Story Dependencies
 
@@ -77,3 +79,5 @@ en beskrivelse av arbeidsmønsteret mellom rådgivningsøkt, byggeøkt og mennes
   arbeidsmønsteret inn i samme README.
 - Del 2 av relevanseksperimentet avhenger av KI-laget og kalibrerer terskelen for
   samlekategorien i relevansvurderingen.
+  *Lagt til 2026-10-06:* del 2 av relevanseksperimentet utgår etter Marians beslutning 06.10 kl. 21:11
+  (story 9.5).

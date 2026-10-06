@@ -37,6 +37,8 @@ som begge står som `final` per 2026-09-22.
    Emnesiden ber om en KI-generert applikasjon, og om dokumentasjon av hvordan
    KI ble brukt og hvordan koden ble kvalitetssikret (`docs/innlevering.md`),
    ikke om KI i selve applikasjonen.
+   *Lagt til 2026-10-06:* suksessmålet heter nå «KI-forklaringen» (`prd.md` §7,
+   brief v8), og det krever fortsatt én ukes logget drift.
 4. **Blokkerte krav får egne epics, tydelig merket.** Ikke av ryddighetshensyn,
    men fordi blokkeringene kan slå ut: kommer Euronext-svaret som et nei, skal
    meldingsdelen kunne falle bort som **én hel enhet**. Blandes blokkerte krav
@@ -363,7 +365,7 @@ Epic 2.1b ──> 2.1c (målingene) ──> 2.5   *(lagt til 2026-09-29)*
 Epic 2.1b ──> Epic 4.3 (samme åpning av basen)
 Epic 2.3 + 4.3 ──> 2.8 (indeksen hentes) ──> 2.9 (indeksen vises) ──> 2.9b (søylene)   *(lagt til 2026-10-01)*
 Epic 2.2 ──> 2.9
-Epic 4.1 ──> Epic 9.5 (relevanseksperimentet, del 2)
+Epic 4.1 ──> Epic 9.5 (relevanseksperimentet, del 2)   *(utgår 2026-10-06)*
 Epic 2.5 ──> Epic 10.2 (teksten lages rett etter vurderingen)   *(lagt til 2026-10-03, E6)*
 Epic 4.3 + 8.1 + 10.3 ──> Epic 10.4 (måle bidraget, med KILogg)   *(lagt til 2026-10-03, E6)*
 Epic 4.0 + 4.2 + 4.3 ──> Epic 10.2 (nettsperren og KILogg før modellen)   *(lagt til 2026-10-05)*
@@ -2089,6 +2091,10 @@ kan vurdere det kritisk i stedet for å anta det.
 
 **Oppfyller:** suksessmålet «KI-bidrag i drift», tilpasset plan B · **Begrenses
 av:** —
+
+*Lagt til 2026-10-06:* «KI-bidrag i drift» er erstattet av «KI-forklaringen»
+(`prd.md` §7, brief v8). 10.4 dekker «Én ukes drift er logget» i det
+kriteriet, og brukertesten står som måling til refleksjonsrapporten.
 
 **Egen test, ikke en del av 8.1** *(avgjort 2026-09-23)*. 8.1 måler skjermen
 uten KI. 5B.4 måler KI-tillegget. Blandes de, vet ingen hva som ble målt.
