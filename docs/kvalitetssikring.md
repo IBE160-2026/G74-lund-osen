@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-05T19:48
+updated: 2026-10-06T20:16
 ---
 
 # Kvalitetssikring
@@ -452,6 +452,10 @@ har sju punkter uten `resolved:` 03.10:
   sjekkene i et regneark, og kursene mot Oslo Børs. Ingenting viser at de er
   gjort. Sluttverdien for OSEBX er kontrollert for hånd én gang (`malinger.md`
   §14).
+  *Rettet 2026-10-06:* kontrollregningen av de tre sjekkene er gjort for EQNR
+  05.10 (`malinger.md` §6). De fire målingene, de tre verdiene, styrken og
+  retningen i regnearket er like det appen lagret 05.10. Kontrollen av kursene
+  mot Oslo Børs gjenstår, utenom OSEBX 01.10 (§14).
 - **De 71 punktene fra kontrollen 26.09** er ikke kontrollert på nytt. Minst
   tre av dem er lukket (§5).
   *Rettet 2026-10-03:* de er kontrollert på nytt. Etter rettingene samme dag er

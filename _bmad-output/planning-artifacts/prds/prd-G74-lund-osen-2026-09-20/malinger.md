@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-05T22:12
+updated: 2026-10-06T20:16
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -289,8 +289,32 @@ vinduet er for kort til å avgjøre spørsmålet.
 | Vilkårskontroll NewsWeb + Euronext | Avgjøre om datagrunnlaget holder | 0 kall, frist 2026-09-27. *Rettet 2026-10-03 (kontrollen 26.09, P4):* gjort. Vilkårene til EODHD og Euronext ble kontrollert 2026-09-21 (`prd.md` §2), og fristen gruppen satte for svaret fra Euronext, var 28.09 (åpent punkt 1 i `prd.md` §8) |
 | Relevanseksperiment del 1, innsamling av ~50 medieartikler | Grunnlaget for symbolmatching mot KI-klassifisering | `extraLimit`, uke 39–40. Kalltallet kontrolleres i første forespørsel. *Rettet 2026-10-03 (kontrollen 26.09, P4):* gjort 25.09, med 40 kall, 20 fra dagskvoten og 20 fra bonuskvoten (`relevanseksperiment.md` §6) |
 | Relevanseksperiment del 2, KI-klassifiseringen | Symbolmatching mot KI-klassifisering | 0 kall mot EODHD. Venter på KI-laget og på betingelse 4 |
-| Kontrollregning av de tre sjekkene *(lagt til 2026-10-01)* | Vise at trend, bevegelse og interesse i aksjedetaljen stemmer: én aksje og én børsdag regnes for hånd i et regneark fra rådatafila i data/, og sammenlignes med tallene appen viser. Regnearket blir liggende lokalt, fordi det inneholder rådata. Bare tallene side om side, og om de stemmer, føres hit | 0 kall |
+| Kontrollregning av de tre sjekkene *(lagt til 2026-10-01)* | Vise at trend, bevegelse og interesse i aksjedetaljen stemmer: én aksje og én børsdag regnes for hånd i et regneark fra rådatafila i data/, og sammenlignes med tallene appen viser. Regnearket blir liggende lokalt, fordi det inneholder rådata. Bare tallene side om side, og om de stemmer, føres hit | 0 kall. Gjort 2026-10-06, se under |
 | Sluttkurs, høy og lav mot Oslo Børs *(lagt til 2026-10-01)* | Vise at kursene fra EODHD stemmer med børsens egne tall: noen dager sammenlignes for hånd med børsens side, lest av en av oss | 0 kall |
+
+### Kontrollregningen av de tre sjekkene, EQNR 2026-10-05 *(lagt til 2026-10-06)*
+
+EQNR og børsdagen 2026-10-05, regnet for hånd av Joakim i et regneark fra
+`data/raa/kurser-raa-2026-10-05.json`, med 51 rader fra 27.07 til 05.10. Appens tall er vurderingen som ble lagret
+05.10, lest med `SqliteVurderingslager.les` fra `data/db/ose.db` uten å regne
+noe på nytt (AD-7). Regnearket ligger bare lokalt i `data/kontroll/` (regel 10).
+Bare de utledede tallene står her, ingen kurser eller volumer (regel 16).
+
+| | Regnearket | Appen (lagret 05.10) | Stemmer |
+|---|---|---|---|
+| Avvik fra snittet (`trend_avvik`) | 0,0201 | 0,020140 | Ja |
+| Endring 05.10 (`dagens_endring`) | 0,0030 | 0,002979 | Ja |
+| Standardavvik (`standardavvik`) | 0,0181 | 0,018062 | Ja |
+| Volum mot medianen (`volumforhold`) | 0,8798 | 0,879759 | Ja |
+| Trend | 1 | 1 | Ja |
+| Bevegelse | 0 | 0 | Ja |
+| Interesse | 0 | 0 | Ja |
+| Styrke | 1 | 1 | Ja |
+| Retning | Positiv | Positiv | Ja |
+
+Et tall stemmer når appens verdi, avrundet til fire desimaler, er lik regnearkets.
+**Alt stemmer.** Trend lå 0,014 prosentpoeng over grensen på 2 %: avviket
+var 2,0140 %. Kontrollen gjelder én aksje og én dag.
 
 **Rekkefølgen er bestemt av kvoten, ikke av prioritet.** Nyhetstesten var
 budsjettert til 10 kall og signaltesten til 15; dagsgrensen er 20, så de kunne
