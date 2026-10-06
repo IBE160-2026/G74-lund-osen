@@ -2,10 +2,12 @@
 title: "Relevanseksperimentet — kriteriene for del 1"
 status: aktiv
 created: 2026-09-25
-updated: 2026-10-03T14:46
+updated: 2026-10-06T23:21
 ---
 
 # Relevanseksperimentet — kriteriene for del 1
+
+*Lagt til 2026-10-06:* del 2 kjøres ikke (Marians beslutning kl. 21:11, `prd.md` §7). Grunnen er rettighetene: nyhetene kan brukes privat, men ikke i en app som kan bli tilgjengelig for andre, og henvendelsene om dem er ikke besvart. Del 1 står, med kriteriene og resultatet under, og brukes i refleksjonsrapporten.
 
 **Kriteriene er skrevet og committet før noen artikkel er hentet til
 eksperimentet.** Tidspunktet for commiten er beviset. Kriteriene endres ikke

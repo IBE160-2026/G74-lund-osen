@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-06T22:55
+updated: 2026-10-06T23:21
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -288,7 +288,7 @@ vinduet er for kort til å avgjøre spørsmålet.
 | ~~Signaltest mot ~200 handelsdager~~ | ~~Låse terskel, volumfaktor og nøytralsonebredde~~ | **Gjort 2026-09-21, se §7.4. 15 kall, 199 dager. Alle tre verdiene holdt** |
 | Vilkårskontroll NewsWeb + Euronext | Avgjøre om datagrunnlaget holder | 0 kall, frist 2026-09-27. *Rettet 2026-10-03 (kontrollen 26.09, P4):* gjort. Vilkårene til EODHD og Euronext ble kontrollert 2026-09-21 (`prd.md` §2), og fristen gruppen satte for svaret fra Euronext, var 28.09 (åpent punkt 1 i `prd.md` §8) |
 | Relevanseksperiment del 1, innsamling av ~50 medieartikler | Grunnlaget for symbolmatching mot KI-klassifisering | `extraLimit`, uke 39–40. Kalltallet kontrolleres i første forespørsel. *Rettet 2026-10-03 (kontrollen 26.09, P4):* gjort 25.09, med 40 kall, 20 fra dagskvoten og 20 fra bonuskvoten (`relevanseksperiment.md` §6) |
-| Relevanseksperiment del 2, KI-klassifiseringen | Symbolmatching mot KI-klassifisering | 0 kall mot EODHD. Venter på KI-laget og på betingelse 4 |
+| Relevanseksperiment del 2, KI-klassifiseringen | Symbolmatching mot KI-klassifisering | 0 kall mot EODHD. Venter på KI-laget og på betingelse 4 *Lagt til 2026-10-06:* utgår. Marians beslutning 2026-10-06 kl. 21:11: del 2 av relevanseksperimentet kjøres ikke, og story 9.5 utgår. Grunnen er rettighetene: nyhetene kan brukes privat, men ikke i en app som kan bli tilgjengelig for andre, og henvendelsene om dem er ikke besvart. Del 1 viste at mye av nyhetene kunne vært silt bort, og den brukes i refleksjonsrapporten. |
 | Kontrollregning av de tre sjekkene *(lagt til 2026-10-01)* | Vise at trend, bevegelse og interesse i aksjedetaljen stemmer: én aksje og én børsdag regnes for hånd i et regneark fra rådatafila i data/, og sammenlignes med tallene appen viser. Regnearket blir liggende lokalt, fordi det inneholder rådata. Bare tallene side om side, og om de stemmer, føres hit | 0 kall. Gjort 2026-10-06, se under |
 | Sluttkurs, høy og lav mot Oslo Børs *(lagt til 2026-10-01)* | Vise at kursene fra EODHD stemmer med børsens egne tall: noen dager sammenlignes for hånd med børsens side, lest av en av oss | 0 kall |
 
