@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-05T19:20
+updated: 2026-10-06T18:36
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1342,6 +1342,8 @@ margin**. Avsnittet over gjelder til story 2.8 er bygget.
 *Lagt til 2026-10-02:* lista har opptil 18 aksjer (§8, «Egne aksjer»), så minst 1 kall er igjen hver dag.
 
 *Lagt til 2026-10-05, gruppens svar kl. 19:17 på planen for story 2.3:* bonuskvoten (`extraLimit`) brukes bare til å fullføre hovedhentingen. Hentekommandoen leser kvoten med `/api/user` før første kall. Er det færre enn 15 kall igjen av dagens 20, men bonuskvoten dekker resten, hentes det likevel, og utskriften sier hvor mange kall som tas fra bonusen. Dekker heller ikke bonusen det, blir det 0 kall. Nye forsøk etter hovedhentingen (story 2.3b) bruker aldri bonuskvoten.
+
+*Avgjort 2026-10-06, Marians beslutning:* v1 bygges på gratisnivået, og ingen del av v1 krever betaling. Demoen trenger verken konto eller nøkkel, ekte kurser trenger en gratis konto hos EODHD, og KI-teksten lages med den lokale modellen. Gruppen bruker selv gratisnivået, og studentrabatten er undersøkt (`docs/kilder-og-rettigheter.md`, «EODHD: studentrabatt»). En større plan på egen konto, betalte modeller med egen nøkkel og rettigheter til nyheter er valg for den enkelte, ikke krav, fordi sensor og andre skal kunne kjøre appen uten å betale (tilbakemeldingen 06.10, «Kjørbar for sensor» og «Avhengigheter og kostnader»). Kontrollen er README-prøven i 3.4.
 
 Ett bulk-kall er ikke et alternativ: bulk-endepunktet koster 100 kall flatt. Ett
 kall per symbol er eneste vei, og det er denne begrensningen som gir universet
