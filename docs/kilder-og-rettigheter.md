@@ -2,7 +2,7 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-06T18:47
+updated: 2026-10-06T20:47
 ---
 
 # Kilder og rettigheter
@@ -908,6 +908,25 @@ Ansvarsdelen er ren fraskrivelse og sier ingenting om bruk:
 > kravene i verdipapirhandelloven § 5-12. Oslo Børs har ikke ansvar for feil
 > eller unøyaktigheter i informasjonen.
 
+### Lenker til Euronexts nettsteder (lest 2026-10-06)
+
+Marian leste avsnittet «Use of Links» i Euronexts vilkår
+(https://www.euronext.com/en/terms-use) 2026-10-06 kl. 20:42. Vilkårene gjelder
+også `newsweb.oslobors.no`, `oslobors.no` og `live.euronext.com` (lista under
+«De to kildene deler vilkår»). Ordrett:
+
+> Euronext prohibits caching, unauthorised hypertext links by others to the
+> Euronext Website and the framing of any Content available on its Euronext
+> Website. Euronext reserves the right to disable any unauthorised links or
+> frames and disclaims any responsibility for the content available on any other
+> site reached by links to or from the Euronext Website.
+
+**Marians beslutning 2026-10-06:** appen lenker ikke til `newsweb.oslobors.no`,
+`oslobors.no` eller `live.euronext.com`. Aksjedetaljen lenker til selskapets
+investorside, der mange selskaper viser dagens kurs og børsmeldingene sine, og
+nevner NewsWeb uten lenke. Vi ber ikke Euronext om tillatelse, fordi brevet
+21.09 og purringen 22.09 ikke er besvart.
+
 ### Hvor vi henter fra, og hvorfor det ikke er et forsvar
 
 **Faktum:** hentingen skjer fra `api3.oslo.oslobors.no`, og det vertsnavnet
@@ -1208,12 +1227,17 @@ lenger uimotsagt» over.
       varslet — besluttet av gruppen, se «Beslutningen gruppen har tatt i
       mellomtiden». *23.09: faglærer er ikke kontaktet direkte; avhengigheten,
       at det ikke hentes, og plan B står i Product Brief.*
-- [ ] **Lenken til NewsWeb (plan B).** En av oss slår opp adressen til
+- [x] ~~**Lenken til NewsWeb (plan B).**~~ — **avgjort 2026-10-06: ingen lenke.**
+      Euronexts vilkår forbyr lenker uten tillatelse, og aksjedetaljen nevner
+      NewsWeb uten lenke. Se «Lenker til Euronexts nettsteder (lest 2026-10-06)».
+      Teksten som sto: En av oss slår opp adressen til
       selskapssidene og hva Euronexts vilkår sier om lenker, før lenken bygges.
       Sidene leses av et menneske og hentes ikke av programmet. **Eier: Gruppen.**
 - [ ] **Lenken til selskapenes nettsider.** En av oss slår opp adressen til den
       norske nettsiden for hver av de femten, før lenken bygges. Sidene leses av
       et menneske og hentes ikke av programmet. **Eier: Gruppen.**
+      *Lagt til 2026-10-06, Marians beslutning:* lenken går til selskapets
+      investorside. Se «Lenker til Euronexts nettsteder (lest 2026-10-06)».
 - [x] ~~**Beslutning hvis Euronext ikke svarer innen 2026-09-28.**~~ — **avgjort 2026-09-28: plan B.** Se punkt 1 i `prd.md` §8. Vilkårene
       krever tillatelse på forhånd, og vi henter allerede. Beslutningen 23.09:
       det hentes ikke, og 28.09 avgjør om Epic 5B utløses. Skal avgjøres og
