@@ -2,7 +2,7 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-06T18:41
+updated: 2026-10-06T18:47
 ---
 
 # Kilder og rettigheter
@@ -311,6 +311,12 @@ Valget er dermed første steg, ikke oppslaget.
 *2026-10-04:* tjenesten er valgt og vilkårene er sitert. Standard er en lokal modell, Gemma 4 E4B, og egne nøkler til Gemini, Anthropic API og OpenAI API er valg. Om ChatGPT-abonnementet trener på innholdet, er ikke avklart. Se «Betingelse 4 og KI-tjenestene (2026-10-04)» rett under.
 
 Ført som oppfølgingspunkt med eier nederst i dokumentet.
+
+*Lagt til 2026-10-06:* godkjenningen gjelder bare klassifisering av relevans
+(«solely to classify company relevance»). Spørsmålet som ble sendt 20.09,
+nevnte ikke forklaringer (`epost-til-eodhd.md`, «Slik e-postene ble sendt»).
+Skal KI forklare artikler eller meldinger (plan A), må EODHD spørres på nytt.
+Plan B sender ikke EODHDs innhold til modellen og berøres ikke.
 
 ### Betingelse 4 og KI-tjenestene (2026-10-04)
 
