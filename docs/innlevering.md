@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-10-06T18:36
+updated: 2026-10-06T23:03
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -195,7 +195,7 @@ teknologiske implikasjoner. Det som er ukjent, er lengde, struktur og format.
 
 | | |
 |---|---|
-| **Status** | **Låst og klar for levering: tag `arbeidskrav-product-brief-v7`, commit `e62ea77`** |
+| **Status** | **Låst og klar for levering: tag `arbeidskrav-product-brief-v7`, commit `e62ea77`** *Lagt til 2026-10-06:* versjon 8 er lagt inn etter tilbakemeldingen, med taggen `arbeidskrav-product-brief-v8` og commit `52023c9`. |
 | **Ligger i** | `_bmad-output/planning-artifacts/product-brief.md` |
 | **Gjenstår** | Vurdering fra faglærerne etter fristen 27.09. **Lengdekrav: 1–2 sider** (arbeidskravet, kilde: faglærer) *Rettet 2026-10-06:* vurderingen fra faglærer kom 06.10 i egen fil, [`tilbakemelding-product-brief.md`](../_bmad-output/planning-artifacts/tilbakemelding-product-brief.md). Versjon 8 av briefen er story 9.6 i `epics.md`. |
 
@@ -492,7 +492,7 @@ innholdskrav, sitert under «Eksamen» øverst.
 
 | Punkt | |
 |---|---|
-| **Product Brief** | Låst og klar for levering: tag `arbeidskrav-product-brief-v7`, commit `e62ea77`. Arbeidskrav på 1–2 sider, innleveringsfrist 27.09. Gjenstår: vurdering fra faglærerne etter fristen *Rettet 2026-10-06:* vurderingen fra faglærer kom 06.10 i egen fil, [`tilbakemelding-product-brief.md`](../_bmad-output/planning-artifacts/tilbakemelding-product-brief.md). Versjon 8 av briefen er story 9.6 i `epics.md`. |
+| **Product Brief** | Låst og klar for levering: tag `arbeidskrav-product-brief-v7`, commit `e62ea77`. Arbeidskrav på 1–2 sider, innleveringsfrist 27.09. Gjenstår: vurdering fra faglærerne etter fristen *Rettet 2026-10-06:* vurderingen fra faglærer kom 06.10 i egen fil, [`tilbakemelding-product-brief.md`](../_bmad-output/planning-artifacts/tilbakemelding-product-brief.md). Versjon 8 av briefen er story 9.6 i `epics.md`. *Lagt til 2026-10-06:* versjon 8 er lagt inn etter tilbakemeldingen, med taggen `arbeidskrav-product-brief-v8` og commit `52023c9`. |
 | **Offentlig repo** | Bekreftet i orden |
 | **Teknologivalg** | Avviket er besluttet og begrunnelsen ført |
 | **Databasevalget** | Besluttet og kontrollert med faglærerstaben — *valget*, ikke lagringen |
