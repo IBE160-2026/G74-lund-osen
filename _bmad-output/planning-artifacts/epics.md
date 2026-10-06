@@ -2577,6 +2577,8 @@ vurderingen. Tekstene ligger i hjelpefila fra 8.0b.
 **Avhenger av:** 10.5 for lenken, FR-104 og FR-410 for hovedindeksen, og 2.5 for målingene.
 **Én økt:** ja.
 
+*Lagt til 2026-10-06, Marians beslutning kl. 20:42:* «Står det noe i børsmeldingene?» nevner NewsWeb uten lenke og viser til lenken til selskapets investorside (10.5). Euronexts vilkår forbyr lenker uten tillatelse (`docs/kilder-og-rettigheter.md`, «Lenker til Euronexts nettsteder (lest 2026-10-06)»).
+
 ---
 
 ## Epic 9: Dokumentasjon av prosessen
