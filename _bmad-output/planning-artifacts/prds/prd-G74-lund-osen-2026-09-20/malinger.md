@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-06T20:16
+updated: 2026-10-06T20:49
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -292,6 +292,16 @@ vinduet er for kort til å avgjøre spørsmålet.
 | Kontrollregning av de tre sjekkene *(lagt til 2026-10-01)* | Vise at trend, bevegelse og interesse i aksjedetaljen stemmer: én aksje og én børsdag regnes for hånd i et regneark fra rådatafila i data/, og sammenlignes med tallene appen viser. Regnearket blir liggende lokalt, fordi det inneholder rådata. Bare tallene side om side, og om de stemmer, føres hit | 0 kall. Gjort 2026-10-06, se under |
 | Sluttkurs, høy og lav mot Oslo Børs *(lagt til 2026-10-01)* | Vise at kursene fra EODHD stemmer med børsens egne tall: noen dager sammenlignes for hånd med børsens side, lest av en av oss | 0 kall |
 
+**Rekkefølgen er bestemt av kvoten, ikke av prioritet.** Nyhetstesten var
+budsjettert til 10 kall og signaltesten til 15; dagsgrensen er 20, så de kunne
+ikke kjøres samme dag. Nyhetstesten gikk først fordi et negativt svar velter
+relevanseksperimentet, og det måtte oppdages tidlig. Signaltesten kunne vente
+et døgn uten at noe annet stoppet. Kvoten nullstilles midnatt GMT.
+
+*Rettet 2026-09-21: nyhetstesten kostet 5 kall, ikke 10 (§7.2). Rekkefølgen
+ville vært den samme, men premisset om at de to ikke får plass samme dag holdt
+ikke.*
+
 ### Kontrollregningen av de tre sjekkene, EQNR 2026-10-05 *(lagt til 2026-10-06)*
 
 EQNR og børsdagen 2026-10-05, regnet for hånd av Joakim i et regneark fra
@@ -315,16 +325,6 @@ Bare de utledede tallene står her, ingen kurser eller volumer (regel 16).
 Et tall stemmer når appens verdi, avrundet til fire desimaler, er lik regnearkets.
 **Alt stemmer.** Trend lå 0,014 prosentpoeng over grensen på 2 %: avviket
 var 2,0140 %. Kontrollen gjelder én aksje og én dag.
-
-**Rekkefølgen er bestemt av kvoten, ikke av prioritet.** Nyhetstesten var
-budsjettert til 10 kall og signaltesten til 15; dagsgrensen er 20, så de kunne
-ikke kjøres samme dag. Nyhetstesten gikk først fordi et negativt svar velter
-relevanseksperimentet, og det måtte oppdages tidlig. Signaltesten kunne vente
-et døgn uten at noe annet stoppet. Kvoten nullstilles midnatt GMT.
-
-*Rettet 2026-09-21: nyhetstesten kostet 5 kall, ikke 10 (§7.2). Rekkefølgen
-ville vært den samme, men premisset om at de to ikke får plass samme dag holdt
-ikke.*
 
 ---
 
