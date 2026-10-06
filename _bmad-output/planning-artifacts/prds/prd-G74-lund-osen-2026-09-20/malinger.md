@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-06T20:49
+updated: 2026-10-06T22:42
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -325,6 +325,36 @@ Bare de utledede tallene står her, ingen kurser eller volumer (regel 16).
 Et tall stemmer når appens verdi, avrundet til fire desimaler, er lik regnearkets.
 **Alt stemmer.** Trend lå 0,014 prosentpoeng over grensen på 2 %: avviket
 var 2,0140 %. Kontrollen gjelder én aksje og én dag.
+
+### Kontrollregningen av de tre sjekkene, GJF 2026-10-02 *(lagt til 2026-10-06)*
+
+GJF og børsdagen 2026-10-02, regnet for hånd av Joakim i et regneark fra
+`data/raa/kurser-raa-2026-10-02.json`, med 51 rader fra 24.07 til 02.10. Appens
+tall er vurderingen som ble lagret 02.10, lest med `SqliteVurderingslager.les`
+fra `data/db/ose.db` uten å regne noe på nytt (AD-7). Regnearket ligger bare
+lokalt i `data/kontroll/` (regel 10). Bare de utledede tallene står her, ingen
+kurser eller volumer (regel 16).
+
+**Slik ble dagen valgt:** etter regelen i instruksjonen kl. 22:23 06.10, den
+første aksjen og dagen med utslag på bevegelse. Av 45 lagrede aksjedager hadde 8
+utslag på bevegelse og ingen på interesse, så vi visste at bevegelse slo ut, men
+ikke tallene.
+
+| | Regnearket | Appen (lagret 02.10) | Stemmer |
+|---|---|---|---|
+| Avvik fra snittet (`trend_avvik`) | -0,0736 | -0,073593 | Ja |
+| Endring 02.10 (`dagens_endring`) | 0,0126 | 0,012628 | Ja |
+| Standardavvik (`standardavvik`) | 0,0116 | 0,011637 | Ja |
+| Volum mot medianen (`volumforhold`) | 0,9598 | 0,959832 | Ja |
+| Trend | -1 | -1 | Ja |
+| Bevegelse | 1 | 1 | Ja |
+| Interesse | 0 | 0 | Ja |
+| Styrke | 2 | 2 | Ja |
+| Retning | Blandet | Blandet | Ja |
+
+Et tall stemmer når appens verdi, avrundet til fire desimaler, er lik regnearkets.
+**Alt stemmer.** Dagens endring var 1,09 ganger standardavviket, regnet fra de
+lagrede verdiene. En håndregning av en dag der interesse slår ut, gjenstår.
 
 ---
 
