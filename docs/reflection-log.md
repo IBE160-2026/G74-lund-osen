@@ -2514,6 +2514,27 @@ Vi føler vi har kommet et steg videre og har en mer helhetlig tankegang, men vi
 
 ---
 
+## 06.10.2026 – Briefen på nytt
+
+*Joakim og Marian.*
+
+Tilbakemeldingen fra faglærer kom 06.10. Briefen beskrev fortsatt børsmeldinger og hendelser, selv om vi har gått over til plan B. Vi gikk gjennom den del for del og laget versjon 8.
+
+Det vi valgte:
+- Problemet, det som skiller oss fra andre, og hvem appen er for, fikk ros og står urørt.
+- Børsmeldinger og hendelser er ute av v1, fordi Euronext ikke svarte. Appen lenker heller ikke til NewsWeb eller Oslo Børs, fordi Euronexts vilkår forbyr lenker uten tillatelse. Den lenker til selskapets investorside.
+- Del 2 av relevanseksperimentet er kuttet. Nyhetene kan brukes privat, men ikke i en app som andre kan bruke. Del 1 tar vi med i refleksjonsrapporten.
+- «Om morgenen» er tatt ut. Oversikten kan leses når kveldens henting er gjort.
+- Tre nye suksesskriterier: riktige beregninger, en KI-forklaring som kontrolleres, og at andre kan kjøre appen gratis. Joakim regnet to aksjer for hånd, og begge stemte med appen.
+
+Målingene i problemet handlet om nyheter som v1 ikke lenger viser. Derfor la vi til at oversikten viser hvilke få aksjer det er verdt å lese børsmeldinger om.
+
+Briefen fikk ikke bli lengre enn v7, så hver ny setning kostet en annen. Setningen om at vi ikke setter mål for hvor godt signalene treffer markedet, beholdt vi.
+
+Til slutt oppdaterte vi PRD-en, storyene og README-en, så alt sier det samme som briefen. Én endring i briefen ga endringer i mange dokumenter.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
