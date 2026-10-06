@@ -79,6 +79,9 @@ et sitat som ikke fantes».
     inn i repoet selv, blir liggende urørt i sin egen fil og lenkes i
     «Dokumentene» (regel 19). Svar på e-post vi har sendt, føres i
     `innlevering.md`.
+    *Lagt til 2026-10-06 (story 9.6):* gjeldende tag er nå
+    `arbeidskrav-product-brief-v8`. Versjon 8 er 785 ord, telt på samme måte, og
+    en ny versjon skal fortsatt ikke bli lengre.
 18. **Hver instruksjon lagres ordrett, også når den skrives rett inn.** Den
     lagres i `docs/ai-prompts/<ÅÅÅÅ-MM-DD>.md` før den utføres, med klokkeslett.
     Når den er utført, legges en linje under med commitene og utfallet. Linjen
