@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-06T23:21
+updated: 2026-10-06T23:58
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -2083,7 +2083,7 @@ median, står den med høyest uavrundet median først.
 | 25 | AUTO | AutoStore | 52,1 | Nei | Nei | §16 |
 | 26 | TGS | TGS | 49,7 | Nei | Ja | §16 |
 | 27 | WAWI | Wallenius Wilhelmsen | 47,6 | Nei | Nei | §16 |
-| 28 | CMBTO | CMB,TECH | 47,6 | Nei | Nei | §16 |
+| 28 | CMBTO | CMB.TECH | 47,6 | Nei | Nei | §16 |
 | 29 | OET | Okeanis Eco Tankers | 46,1 | Nei | Nei | §16 |
 | 30 | TOM | Tomra | 45,7 | Nei | Ja | §16 |
 | 31 | DNO | DNO | 40,5 | Ja | Nei | §17 |
@@ -2111,7 +2111,7 @@ median, står den med høyest uavrundet median først.
 | 53 | NONG | SpareBank 1 Nord-Norge | 9,2 | Nei | Nei | §18 |
 | 54 | BRG | Borregaard | 8,8 | Nei | Nei | §18 |
 | 55 | SNI | Stolt-Nielsen | 8,3 | Nei | Nei | §18 |
-| 56 | WWI | Wilh, Wilhelmsen Holding | 8,3 | Nei | Nei | §16 |
+| 56 | WWI | Wilh. Wilhelmsen Holding | 8,3 | Nei | Nei | §16 |
 | 57 | NORCO | Norconsult | 7,0 | Nei | Nei | §18 |
 | 58 | GSF | Grieg Seafood | 6,7 | Nei | Nei | §20 |
 | 59 | SPOL | SpareBank 1 Østlandet | 5,2 | Nei | Nei | §16 |
@@ -2126,6 +2126,8 @@ median, står den med høyest uavrundet median først.
 | 68 | SALME | Salmon Evolution | 2,5 | Nei | Nei | §20 |
 | 69 | AKBM | Aker BioMarine | 0,9 | Nei | Nei | §21 |
 | 70 | AFK | Arendals Fossekompani | 0,6 | Nei | Nei | §21 |
+
+*Rettet 2026-10-06:* to navn fikk komma i stedet for punktum da desimaltegnene ble gjort om. Her sto `| 28 | CMBTO | CMB,TECH | 47,6 | Nei | Nei | §16 |` og `| 56 | WWI | Wilh, Wilhelmsen Holding | 8,3 | Nei | Nei | §16 |`. Navnene er nå som i §16–§20. Ingen andre navn eller tall i §21 hadde samme feil.
 
 Målingen endrer ikke universet. Parametrene i signalet er låst og målt på de
 15 (AD-13).
