@@ -2772,3 +2772,5 @@ Som **gruppe**, vil vi ha en brief som beskriver appen vi leverer, så sensor ka
 *Lagt til 2026-10-06:* kontrollregningen i `malinger.md` §6 er gjort for EQNR 05.10 og stemmer (`55a1165`), så v8 kan vise til den.
 
 *Lagt til 2026-10-06, Marians beslutning:* v8 lover ikke lenker til NewsWeb eller Oslo Børs, men kan nevne lenken til investorsiden (10.5).
+
+*Lagt til 2026-10-06:* v8 er lagt inn i `product-brief.md` i `52023c9`, med taggen `arbeidskrav-product-brief-v8`, etter at Marian og Joakim leste utkastet og sa ja.
