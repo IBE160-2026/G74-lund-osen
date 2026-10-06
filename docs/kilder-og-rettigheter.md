@@ -2,7 +2,7 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-05T17:14
+updated: 2026-10-06T18:34
 ---
 
 # Kilder og rettigheter
@@ -597,6 +597,46 @@ sendes, og det må være dokumentert før noe sendes. Om ett spørsmål til EODH
 skal stilles om plan B, er ført under «Å følge opp».
 
 *Avgjort 2026-10-04:* vi spør ikke. Grunnen: bare våre egne resultater sendes til modellen, altså fortegn, styrke, retning og antall, og ingen prosenter, forholdstall, kurser eller volumer. `malinger.md` §19 viste at målingene ikke ga bedre tekst.
+
+---
+
+## EODHD: studentrabatt (svar 2026-09-16)
+
+**Mottatt 2026-09-16 kl. 23:20**, slik Marians innboks viser det, fra «EOD Level 1»,
+`supportlevel1@eodhistoricaldata.com`, signert Levon V., EODHD Support Team.
+Svar på kontaktskjemaet på eodhd.com/pricing, sendt samme kveld.
+
+### Svaret, ordrett
+
+> Hello,
+>
+> To apply for a student/academic discount, you can pay for any package via
+> credit card (it’s important: not PayPal) on this page:
+> https://eodhd.com/pricing and then tell us about that, and after that you will
+> need to provide your student card or a similar document to get the discount.
+> We will modify the subscription, so you won’t pay for the second month
+> (meaning the first two months, combined, will cost 50% each), and after that
+> the subscription will cost 50% of its price for the next 10 months, for a
+> total of 12 months of this discount.
+>
+> Bien Cordialement,
+>
+> Levon V.
+>
+> EODHD Support Team
+
+### Spørsmålet som ble stilt, ordrett
+
+> I would like to know more about discounts for students and for academic purposes
+
+### Hvem svaret kommer fra
+
+Kundestøtten, ikke en avtale. Rabatten og prisene kan endres, og sjekkes på nytt
+før noen bruker dem.
+
+### Hva vi gjorde med det
+
+Se beslutningen i `prd.md`, NFR-01.
 
 ---
 
