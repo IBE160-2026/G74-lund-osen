@@ -393,6 +393,8 @@ kjøres fra main.
 
 *Lagt til 2026-10-05, Marians beslutning kl. 21:23:* 8.0b og 8.0c bygges etter 2.3b og før KI-laget.
 
+*Lagt til 2026-10-06, Marians beslutning:* tilbakemeldingen på briefen ([`tilbakemelding-product-brief.md`](tilbakemelding-product-brief.md)) ber om at oversikten og aksjedetaljen er ferdige og stabile i demoen før KI-laget bygges ut, og at antall epics ikke vokser. Rekkefølgen fra 05.10 står: 2.3 først, fordi kveldshentingen da går fra egen arbeidskopi, og demoen kan bygges over flere dager uten stopp kl. 22:00. Så 9.6 og 3.1–3.4, før 2.3b, 8.0b, 8.0c og KI-laget.
+
 *Rettet 2026-10-03 (kontrollen 26.09, E6):* grafen manglet to harde avhengigheter som står i storyene. 10.2 lager teksten i hentekommandoen rett etter vurderingen, og trenger derfor 2.5. 10.4 avhenger av 8.1 og 10.3, og måler bidraget med `KILogg` over minst én ukes drift, som krever 4.3.
 
 *2026-09-28:* plan B er utløst. Epic 5, 6 og 7 er ute av v1, og Epic 5B heter Epic 10.
@@ -573,7 +575,7 @@ må vise hvordan KI ble brukt, og hvordan studentene har kvalitetssikret koden»
 
 # Stories
 
-69 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
+70 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
 den, hva kontrollen faktisk ser etter, og om den kan gjøres ferdig i én økt.
 *Rettet 2026-09-26:* her sto 42. Tallet er telt fra overskriftene «### Story».
 *Rettet 2026-09-27:* her sto 46. Story 9.0 kom til 27.09.
@@ -581,6 +583,7 @@ den, hva kontrollen faktisk ser etter, og om den kan gjøres ferdig i én økt.
 9.5 og 10.5 kommet til. 10.1–10.4 er 5B.1–5B.4 med nytt navn, ikke nye.
 *Rettet 2026-10-05:* her sto «55 stories». Siden 29.09 har 2.2b, 2.3b, 2.8, 2.9,
 2.9b, 3.4, 3.4b, 8.0b, 8.0c, 8.3, 8.4, 10.6, 10.7 og 10.8 kommet til, og ingen er fjernet.
+*Rettet 2026-10-06:* her sto «69 stories». Story 9.6 kom til 06.10.
 
 **«Ville feilet hvis» er kontrollen.** Resten er beskrivelse. En story uten den
 linjen er ikke ferdig spesifisert.
@@ -1722,6 +1725,10 @@ vurderingen (svaret fra hjelpelæreren, `docs/innlevering.md`, «Svaret,
 avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 (FR-411). Punktene over fra «Avgjort 2026-10-05» om KI-tekstene gjelder 3.4b.
 
+*Lagt til 2026-10-06, etter tilbakemeldingen på briefen:* punkt 3 under «Neste steg for gruppen» i [`tilbakemelding-product-brief.md`](tilbakemelding-product-brief.md).
+- README-oppskriften er fulgt fra start til slutt på en maskin som ikke har hatt repoet eller imaget før, uten nøkler. Dato, maskin og det som ikke stemte, føres i `docs/kvalitetssikring.md`. Prøven gjentas før innleveringen
+- **Ville feilet hvis:** README-en bare var prøvd på maskinen den ble skrevet på
+
 ### Story 3.4b: KI-tekstene i demoen
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 16:53.*
@@ -2729,3 +2736,21 @@ Som **gruppe**, vil vi kjøre KI-klassifiseringen på de merkede artiklene, så 
 - **Ville feilet hvis:** kriteriene eller prompten ble justert etter at svarene var sett
 
 **Avhenger av:** 4.1. **Én økt:** nei.
+
+### Story 9.6: Product brief v8 etter plan B
+
+*Lagt til 2026-10-06, fra tilbakemeldingen på briefen ([`tilbakemelding-product-brief.md`](tilbakemelding-product-brief.md), `d363002`).*
+
+Som **gruppe**, vil vi ha en brief som beskriver appen vi leverer, så sensor kan følge veien fra brief til kode uten å møte børsmeldinger som ikke er i v1.
+
+**Oppfyller:** punkt 1 og 2 under «Neste steg for gruppen» i tilbakemeldingen · **Begrenses av:** regel 17 i `CLAUDE.md`, FR-608
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- v8 erstatter v7 i `product-brief.md` og får taggen `arbeidskrav-product-brief-v8`. v7 står urørt i sin tag. Øverst står kort hva som er endret mot v7. v8 er ikke lengre enn v7, telt som i regel 17
+- Scope: børsmeldinger og kommende hendelser står under «Utenfor v1», med svaret fra Euronext som grunn. «Inne i v1» skiller kjernen som skal bli ferdig uansett (oversikten og aksjedetaljen med regelbasert signal, i demoen) fra trinnene etter, i rekkefølge
+- Solution: det v7 hadde som reserveplan under «Data og kilder», er nå planen. KI-laget forklarer signalet ut fra fortegn, styrke, retning og antall (avgjort 04.10), og briefen sier hvilken modell som er standard og hva den koster (FR-608). Demoen med oppdiktede selskaper er versjonen sensor bruker, og alt i v1 kan vises der, også med KI av
+- «KI-bidrag i drift» er skrevet om til et sjekkbart kriterium for KI-laget etter plan B
+- Minst ett kriterium for at beregningene er riktige: kjente kursserier gir forhåndsberegnet styrke og retning, sporbart til testene med håndlagde serier i `tests/test_signalberegning.py`. De bruker korte vinduer, og de ekte parameterne dekkes av kontrollregningen for hånd i `malinger.md` §6. Den gjenstår, og briefen sier ikke at den er gjort
+- **Ville feilet hvis:** v8 lovet noe som ikke er i v1, eller taggen for v7 ble flyttet
+
+**Avhenger av:** ingen. Gjøres før 3.1, så demoen og briefen beskriver samme app. **Én økt:** ja.
