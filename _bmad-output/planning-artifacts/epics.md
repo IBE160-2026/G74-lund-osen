@@ -2754,3 +2754,5 @@ Som **gruppe**, vil vi ha en brief som beskriver appen vi leverer, så sensor ka
 - **Ville feilet hvis:** v8 lovet noe som ikke er i v1, eller taggen for v7 ble flyttet
 
 **Avhenger av:** ingen. Gjøres før 3.1, så demoen og briefen beskriver samme app. **Én økt:** ja.
+
+*Lagt til 2026-10-06:* kontrollregningen i `malinger.md` §6 er gjort for EQNR 05.10 og stemmer (`55a1165`), så v8 kan vise til den.
