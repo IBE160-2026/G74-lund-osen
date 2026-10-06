@@ -2,7 +2,7 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-06T18:34
+updated: 2026-10-06T18:41
 ---
 
 # Kilder og rettigheter
@@ -229,6 +229,9 @@ sendt 21.09 kl. 19:33 og besvart samme kveld: «Yes, we confirm both». Se
 
 **Mottatt 2026-09-21** fra Alejandro C., EOD Support Team,
 `support@eodhistoricaldata.com`. Svar på e-posten sendt 20.09.
+*Rettet 2026-10-06:* ifølge Marians innboks kom svaret 20.09 kl. 22:56, fra
+«EOD Level 1», `supportlevel1@eodhistoricaldata.com`, signert Alejandro C. med
+`support@eodhistoricaldata.com` i signaturen. 21.09 er dagen det ble ført.
 
 ### Svaret, ordrett
 
@@ -262,6 +265,9 @@ support erfaringsmessig svarer på det letteste når flere stilles samtidig:
 > locally run application. We ask because another provider we evaluated
 > prohibits this explicitly in their feed terms, and your Terms and Conditions
 > do not mention language models in either direction.
+
+*Rettet 2026-10-06:* sitatet over er utkastet, ikke spørsmålet som ble sendt.
+Det som ble sendt 20.09, står ordrett i [`epost-til-eodhd.md`](epost-til-eodhd.md), «Slik e-postene ble sendt (ført 2026-10-06 fra Marians innboks)».
 
 ### Hvem svaret kommer fra
 
@@ -534,6 +540,9 @@ var besvart:
 > control. If that distinction is not one your terms recognise, we would like to
 > know now rather than later.
 
+*Rettet 2026-10-06:* sitatene over er utkastet, ikke spørsmålene som ble
+sendt. Det som ble sendt 21.09 kl. 19:33, står ordrett i [`epost-til-eodhd.md`](epost-til-eodhd.md), «Slik e-postene ble sendt (ført 2026-10-06 fra Marians innboks)».
+
 #### Hva svaret dekker
 
 Svaret er kort, men det er ikke uklart: begge spørsmålene er stilt som ja/nei
@@ -558,6 +567,9 @@ Bekreftelsen rekker bare over den første. **Kategorifordelingene i
 `malinger.md` §4 ligger under Euronexts vilkår**, og de er ikke avklart av
 dette svaret. At begge sto i samme spørsmål, gjør ikke at ett svar dekker
 begge.
+*Rettet 2026-10-06:* spørsmål 2 i e-posten som ble sendt, nevnte bare median
+daglig omsetning, ikke kategorifordelingene fra NewsWeb ([`epost-til-eodhd.md`](epost-til-eodhd.md), «Slik e-postene ble sendt (ført 2026-10-06 fra Marians innboks)»). De er derfor
+ikke dekket. Konklusjonen står, men grunnen er en annen: de ble ikke spurt om.
 
 **Avsenderen er igjen support, ikke en juridisk avdeling** — og en annen person
 enn den som svarte om språkmodeller. Samme forbehold gjelder som over: dette er
@@ -1217,6 +1229,11 @@ lenger uimotsagt» over.
       kategorifordelinger fra NewsWeb-meldinger — og «Yes, we confirm both»
       bekreftet to *spørsmål*, ikke alle tallene nevnt i dem. Rekkevidden var
       tvetydig fordi spørsmålet selv blandet to kilder.
+      *Rettet 2026-10-06:* spørsmål 2 i e-posten som ble sendt, nevnte bare
+      median daglig omsetning, ikke kategorifordelingene fra NewsWeb
+      (`epost-til-eodhd.md`, «Slik e-postene ble sendt (ført 2026-10-06 fra Marians innboks)»). De er derfor
+      ikke dekket. Konklusjonen står, men grunnen er en annen: de ble ikke
+      spurt om. Huskeregelen står.
 
       Brevet til Euronext har samme form, bare større: det ber om tillatelse
       til fire ting i én forespørsel, med hver sin overskrift i brevet —

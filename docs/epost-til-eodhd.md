@@ -2,7 +2,7 @@
 title: "Utkast: vilkårsspørsmål til EODHD"
 status: sendt
 created: 2026-09-20
-updated: 2026-09-24T21:58
+updated: 2026-10-06T18:41
 ---
 
 # Utkast: vilkårsspørsmål til EODHD
@@ -25,6 +25,10 @@ refereres.
 > - **Spørsmål 1** sendt 20.09, **besvart 21.09: ja, med fire betingelser.**
 >   Ført ordrett i `kilder-og-rettigheter.md`, seksjonen «EODHDs skriftlige
 >   svar: ja, med betingelser».
+>   *Rettet 2026-10-06:* svaret på spørsmål 1 kom 20.09 kl. 22:56, ifølge
+>   Marians innboks. 21.09 er dagen det ble ført. Spørsmål 1 ble ikke sendt
+>   slik det står i utkastet under. Det som ble sendt, står ordrett i
+>   «Slik e-postene ble sendt (ført 2026-10-06 fra Marians innboks)» nederst.
 > - **Spørsmål 2 og 3** holdt tilbake til det første var besvart, **sendt
 >   21.09 kl. 19:33 og besvart samme kveld: «Yes, we confirm both».** Ført
 >   ordrett i «Oppfølgingen samme kveld: begge bekreftet». Bekreftelsen
@@ -106,6 +110,9 @@ Molde University College, Norway
 kveld.** Svaret — «Yes, we confirm both», fra Lana A., EOD Support Team — er
 ført ordrett i `kilder-og-rettigheter.md`. Teksten under står slik den ble
 sendt, fordi det er ordlyden i spørsmålet som avgjør hvor langt svaret rekker.
+*Rettet 2026-10-06:* teksten under er utkastet, ikke det som ble sendt. Det
+som ble sendt 21.09 kl. 19:33, står ordrett i «Slik e-postene ble sendt (ført 2026-10-06 fra Marians innboks)»
+nederst.
 
 **Hvorfor nå.** Beslutningen 20.09 var å holde spørsmål 2 og 3 tilbake til
 språkmodellspørsmålet var besvart, fordi support erfaringsmessig svarer på det
@@ -169,3 +176,50 @@ Best regards,
 Joakim Lund and Marian Osen
 Group G74, course IBE160
 Molde University College, Norway
+
+---
+
+# Slik e-postene ble sendt (ført 2026-10-06 fra Marians innboks)
+
+Utkastene over er ikke det som ble sendt. Tekstene under er ordrett fra Marians
+innboks.
+
+## Sendt 2026-09-20
+
+Til `support@eodhistoricaldata.com`, emne «Emne: Terms question: sending News API text to a language model (free plan, student project)»:
+
+> Hello,
+>
+> I am a student at Molde University College in Norway, building a non-commercial course project on your free plan.
+>
+> I would like to check one thing against your terms before I build it:
+>
+> May I send the article text returned by /api/news — headline and body — to a third-party large language model, in order to classify whether an article is actually about the company it is tagged with?
+>
+> The output stays local. Nothing is republished, redistributed or resold, the project is not deployed publicly, and the data is not used to train any model.
+>
+> Your terms do not mention language models either way, so I would rather ask than assume. If the answer depends on the plan level, please say which plan would permit it.
+>
+> Thank you,
+>
+> Marian Osen
+>
+> Group G74, IBE160, Høgskolen i Molde
+
+## Oppfølgingen 2026-09-21 kl. 19:33, i samme tråd
+
+> Hello Alejandro,
+>
+> Thank you for the clear answer, and for the approval.
+>
+> Two small points, so that we stay inside what you approved rather than assume:
+>
+> The project is assessed by a demonstration to our teacher and class at the end of the semester. We understand this as part of the non-commercial course project you approved, not as public deployment. Please confirm if that is correct.
+>
+> Our source code is in a public repository for assessment. It contains no article text and no price data — those stay local. It does contain summary figures we computed ourselves, for example the median daily turnover for a symbol over a period. We read that as our own result rather than your data in repackaged form. Please confirm if that is correct.
+>
+> Thank you,
+>
+> Marian Osen
+>
+> Group G74, IBE160, Høgskolen i Molde
