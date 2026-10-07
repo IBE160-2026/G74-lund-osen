@@ -2535,6 +2535,18 @@ Til slutt oppdaterte vi PRD-en, storyene og README-en, så alt sier det samme so
 
 ---
 
+## 07.10.2026 – Markedet, ikke koden
+
+*Joakim og Marian.*
+
+Etter fire dager med lagrede vurderinger hadde interesse ikke slått ut én eneste gang. Det var 0 av 60 aksjedager, der målingen fra september ga grunn til å vente rundt 9. Det så ut som en feil.
+
+Før vi endret noe, sjekket vi to mulige grunner, uten et eneste kall. Den første var at volumet ikke er ferdig når vi henter etter kl. 22. Kursfilene vi allerede hadde, viste at kursene er endelige, og at volumet nesten er det: 6 av 90 rader fikk litt høyere volum dagen etter, men ingen verdi på interesse skiftet. Den andre var at dagene var rolige. Regnet over de siste 200 børsdagene slår interesse ut like ofte som i september, men det varierer mye fra måned til måned, og fire dager på rad uten utslag hadde skjedd før, i april.
+
+Det var markedet og ikke koden. Hadde vi «rettet» grensen, hadde vi tilpasset signalet til fire rolige dager.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
