@@ -1,0 +1,113 @@
+---
+title: 'Story 2.3: Børsdagskontroll før kvoten brukes'
+type: 'feature'
+created: '2026-10-07'
+status: 'in-progress'
+route: 'dispatch'
+review_loop_iteration: 0
+baseline_commit: '7d03d8ea74e9d3d74947c78e4aa3a24988ce6b85'
+context:
+  - '{project-root}/_bmad-output/implementation-artifacts/spec-2-2-hentekommandoen-som-egen-inngang.md'
+  - '{project-root}/_bmad-output/implementation-artifacts/spec-2-5-vurderingen-skrives-i-samme-kjoering.md'
+  - '{project-root}/CLAUDE.md'
+---
+
+<frozen-after-approval reason="human-owned intent — do not modify unless human renegotiates">
+
+## Intent
+
+**Problem:** Hentekommandoen bruker 15 kall hver gang den startes, med ett unntak: dagens fil finnes (AD-6). En kjøring før kl. 22:00 bruker dagens kall uten å få dagens rad, og en kjøring en lørdag bruker 15 kall på data basen alt har. Oppgaveplanlegging kan ikke starte den hver dag før den vet selv om det er noe å hente (FR-401, FR-402).
+
+**Approach:** `kjoer()` sjekker i fast rekkefølge før første kall: klokka, tidskontrollen, basen, filvakten, nøkkelen og kvoten. Hver sjekk som sier nei, gir 0 kall og en utskrift som sier hvorfor. Øyeblikksbildet får navn etter børsdagen vurderingene skrives for (K8).
+
+## Planen
+
+Planen fra 05.10 kl. 17:35 ble gitt i chatten og finnes ikke i denne økta. Den er laget på nytt 07.10 fra storyen i `epics.md` (med gruppens svar kl. 19:17) og punktene i instruksjonen kl. 20:35 i `docs/ai-prompts/2026-10-07.md`. Mutantene M1–M8 er derfor nummerert her, ikke hentet fra planen kl. 17:35.
+
+## Boundaries & Constraints
+
+**Always:**
+- **Rekkefølgen før første kall:** (1) klokka: `oeyeblikk` leses én gang (AD-20), og `dag` og `dato` (inneværende børsdag) regnes av den. (2) tidskontrollen. (3) basen. (4) filvakten. (5) nøkkelen. (6) kvoten. Nøkkelen leses først etter filvakten, så en kjøring som stopper tidligere, aldri leser `.env`. En test låser rekkefølgen.
+- **Tidskontrollen:** er `dag` en børsdag og klokka i Oslo før 22:00, blir det 0 kall, og utskriften nevner `--hent-foer-kl-22`. Med flagget hentes det, og navnet blir dagens dato, som før. `argparse` med `allow_abbrev=False`, så `--hent` ikke gjelder som flagget. På en dag som ikke er børsdag gjelder ingen tidskontroll; basen avgjør.
+- **Basen:** har hver aksje i `AKSJEUNIVERS` en kurs for `dato` i basen, blir det 0 kall, og utskriften sier at basen alt har dataene for børsdagen (FR-402). Mangler noen, hentes det (AD-7: raden for `dato` kan fortsatt skrives). Basen åpnes for lesing med `aapne_base`. Kan den ikke åpnes eller leses, hentes det, og utskriften sier det: fila skrives først uansett (AD-6), og den kan leses inn senere med `--les-inn`.
+- **Filvakten (K8):** fila heter `kurser-raa-<dato>.json`, der `dato` er børsdagen vurderingene skrives for, ikke kjøredagen. Finnes den, stopper kjøringen med 0 kall som i dag (AD-6), også på en dag som ikke er børsdag, og utskriften sier hvorfor og at et nytt forsøk hører til 2.3b. Intervallet slutter fortsatt på kjøredagen.
+- **Kvoten:** leses med `/api/user` gjennom en egen nettfunksjon `hent_kvote` i `fetch_prices.py`, injisert som `les_kvote`, etter nøkkelen og før første kall. Kallet er gratis (regel 15). Regnestykket:
+  - `brukt` er `apiRequests`, men 0 når `apiRequestsDate` er før dagens dato i GMT (regel 15, presisert 04.10). Dagens dato i GMT regnes av `oeyeblikk`.
+  - `igjen` er `dailyRateLimit − brukt`, aldri under 0.
+  - `igjen ≥ 15`: hent. `igjen < 15` og `igjen + extraLimit ≥ 15`: hent, og utskriften sier hvor mange kall som tas fra bonusen (`15 − igjen`). Ellers: 0 kall, utskriften sier hvorfor, kode 1.
+  - Kan svaret ikke leses (nettfeil, ikke JSON, et felt mangler eller er ikke et heltall, en dato som ikke kan leses): hent, og utskriften sier at kvoten ikke kunne leses. Feilteksten er bare typenavnet, som i `hent_ett_symbol` (story 2.0).
+  - Navn, e-post og andre felt fra svaret står aldri i utskriften. Bare tallene over.
+- **Utskrift og koder:** tidskontrollen, basen og filvakten gir kode 0 (ingenting å gjøre). Kvoten som ikke strekker til, gir kode 1, fordi dagen da ikke får data.
+- **Spinen:** raden «Datoer» sier at datoen i navnet på et øyeblikksbilde er børsdagen vurderingene skrives for, og at dataene i fila kan være eldre når FR-402 slår til (API-et har ikke dagens kurs ennå). En merknad under AD-2: `/api/user` og `/api/eod` er to nettfunksjoner mot samme kilde, begge i `fetch_prices.py`, begge injisert.
+- **Docstringen i `lagring_fil.py`** (`nyeste_snapshot`) sier det samme som spinen.
+- **`CLAUDE.md`** får regel 22: en gren bruker bare testbaser, aldri `data/db/ose.db`.
+- **README:** bare det som ellers blir feil: linjen om å kjøre hentingen mellom kl. 22 og midnatt.
+- **K8** i `deferred-work.md` merkes løst i 2.3. **E9** venter på 2.4, med en datert linje.
+- Ingen API-kall utover kvotesjekken i regel 15. `src/fetch_prices.py` kjøres ikke, heller ikke med `--les-inn`. Ingen test eller kjøring rører `data/db/ose.db`.
+
+**Never:** nye forsøk for en dag som har fil (2.3b). Arbeidskopien jobben kjører fra og oppsettet i Oppgaveplanlegging (etter flettingen). Etterfylling og E9 (2.4). Indekskallet (2.8). Ingen fil i `data/raa/` får nytt navn.
+
+</frozen-after-approval>
+
+## I/O & Edge-Case Matrix
+
+| Scenario | Tilstand | Forventet |
+|---|---|---|
+| Børsdag før 22:00 | Tirsdag 21:59 Oslo | 0 kall, nevner `--hent-foer-kl-22`, kode 0, nøkkelen ikke lest |
+| Børsdag før 22:00 med flagget | Tirsdag 12:00, flagget | Henter, fila heter tirsdagens dato |
+| Børsdag etter 22:00, basen har dagen | Alle 15 har kurs for tirsdag | 0 kall, kode 0 |
+| Børsdag etter 22:00, basen mangler én | 14 av 15 har kurs for tirsdag | Henter |
+| Lørdag, basen har fredag | Alle 15 har kurs for fredag | 0 kall |
+| Lørdag, basen mangler fredag | Fredag mangler for noen | Henter, fila heter fredagens dato |
+| Lørdag, fredagens fil finnes | `kurser-raa-<fredag>.json` | 0 kall, sier hvorfor, nevner 2.3b |
+| Basen kan ikke leses | Ødelagt basefil | Henter, sier at basen ikke kunne leses |
+| Kvote: nok igjen | 20 igjen | Henter, ingen bonuslinje |
+| Kvote: under 15, bonus dekker | 10 igjen, `extraLimit` 463 | Henter, «5 kall fra bonusen» |
+| Kvote: under 15, bonus dekker ikke | 10 igjen, `extraLimit` 2 | 0 kall, kode 1 |
+| Kvote: gårsdagens tall | `apiRequests` 20, `apiRequestsDate` i går (GMT) | Henter, 20 igjen |
+| Kvote: 01:00 norsk tid | `apiRequestsDate` lik dagens dato i GMT, som er gårsdagen i Oslo | Tallet teller |
+| Kvote: kan ikke leses | Unntak, ikke JSON, felt mangler | Henter, sier det |
+| Kvote: navn og e-post | Svaret har `name` og `email` | Står ikke i utskriften |
+
+## Code Map
+
+- `src/fetch_prices.py` -- `kjoer()` får sjekkene, `hent_foer_kl_22` og `les_kvote`. Nye funksjoner: `hent_kvote` (nettfunksjonen), `vurder_kvote` (regnestykket, ren), `basen_har_dagen`. `main()` får flagget og sender nøkkelen som funksjon. Docstringene følger.
+- `src/lagring_fil.py` -- docstringen i `nyeste_snapshot` (K8).
+- `tests/test_fetch_prices.py` -- nye klasser for tidskontrollen, basen, helgen, filvakten, kvoten og rekkefølgen. Matrisetestene som starter før 22:00 på en børsdag, får flagget.
+- `ARCHITECTURE-SPINE.md` -- raden «Datoer», merknad under AD-2.
+- `CLAUDE.md`, `README.md`, `deferred-work.md`, `sprint-status.yaml`.
+
+## Tasks & Acceptance
+
+**Execution:**
+- [ ] Spesifikasjonen. Commit og push.
+- [ ] Del 1: tidskontrollen, basen, filvakten med K8, nøkkelen sist, flagget. Tester. Commit og push.
+- [ ] Del 2: kvoten med `/api/user`. Tester. Commit og push.
+- [ ] Del 3: spinen, `lagring_fil.py`, `CLAUDE.md`, README, `deferred-work.md`. Commit og push.
+- [ ] Mutantene M1–M8 og kvote- og helgemutantene. PR mot main, gjennomgang (Blind Hunter, Edge Case Hunter, Verification Gap), CI grønn. Stopp før flettingen.
+
+**Mutantene** (én om gangen, hele `tests/`):
+- M1: tidskontrollen fjernet.
+- M2: grensen `<` 22:00 byttet med `<=`.
+- M3: basesjekken krever at bare én aksje har dagen (`any` i stedet for `all`).
+- M4: filvakten sjekker `dag` i stedet for `dato` (K8 tilbake).
+- M5: nøkkelen leses før tidskontrollen.
+- M6: flagget ignoreres.
+- M7: tidskontrollen gjelder også dager som ikke er børsdag.
+- M8: en base som ikke kan leses, gir 0 kall.
+- K1: `apiRequestsDate` sammenlignes med datoen i Oslo, ikke GMT.
+- K2: bonusen telles ikke med.
+- K3: et svar som ikke kan leses, gir 0 kall.
+- K4: hele svaret skrives ut.
+
+**Acceptance Criteria:**
+- Given en lørdag og en base der alle har fredagens kurs, when kommandoen kjøres, then 0 kall, og nøkkelen er ikke lest.
+- Given en lørdag og en base som mangler fredagen, when kommandoen kjøres, then fila heter fredagens dato og vurderingene skrives for fredag.
+
+## Implementation Notes
+
+## Spec Change Log
+
+## Review Triage Log
+
+## Verification
