@@ -275,7 +275,7 @@ steget er ført i PRD-memloggen 22.09, ikke 20.09 som den senere ble omtalt som.
 
 | FR | Levert i |
 |---|---|
-| FR-101, FR-102 | `markedsoversikt.py`, commit `706720f` |
+| FR-101, FR-102 | `markedsoversikt.py`, commit `706720f`. *Lagt til 2026-10-07:* endringen i NOK i FR-101 er Epic 8, story 8.5 (Marians beslutning kl. 23:11). |
 | FR-103 | `markedsoversikt.py` + `index.html`. **`706720f` inneholdt bruddet** — den hadde `Retningsvisning("Opp", "↑", "opp")`, mens kravet krever modellens egen streng. Oppfylt av den senere commiten som fjernet oversettelsen |
 | FR-201 | `aksjedetalj.py` `076bb12`, `graf.py` `b6ba9d8` |
 | FR-202, FR-204 | Samme, **pluss `app.py` og `src/templates/`** — tegnforklaring, 200-svar og «kunne ikke regnes»-beskjed ligger der |
@@ -292,7 +292,7 @@ kontrollen 22.09 fant det.
 
 | FR | Epic |
 |---|---|
-| FR-203 | **Epic 5, 6 og 7 — delt.** «Øvrig innhold» er meldinger *pluss* KI-forklaring *pluss* hendelser. `aksjedetalj.py` sier selv at alle tre mangler med vilje. Å mappe den til én epic ville vært feil |
+| FR-203 | **Epic 5, 6 og 7 — delt.** «Øvrig innhold» er meldinger *pluss* KI-forklaring *pluss* hendelser. `aksjedetalj.py` sier selv at alle tre mangler med vilje. Å mappe den til én epic ville vært feil. *Lagt til 2026-10-07:* høy og lav i FR-203 er Epic 2, story 2.10 (lagringen), og Epic 8, story 8.5 (visningen), etter Marians beslutning kl. 23:11. |
 | FR-301, FR-302, FR-303 | Epic 7 🔒 |
 | FR-401, FR-402, FR-403 | Epic 2 |
 | FR-404, FR-405 | Epic 6 🔒 |
@@ -458,7 +458,7 @@ snapshot utenom porten.
 
 Brukeren kan hente nye kurser bevisst, og kan ikke ved uhell brenne dagskvoten.
 
-**FR-er:** FR-401, FR-402, FR-403, FR-407 · **NFR-01, NFR-02** · **AD-er:** 2, 10, 17, 20 · *utvidet 2026-09-28 med 2.1b og 2.5:* 4, 5, 6, 7, 11, 16, 21 · *utvidet 2026-10-01 med 2.8, 2.9 og 2.9b:* FR-104, FR-105, FR-410, AD-15
+**FR-er:** FR-401, FR-402, FR-403, FR-407 · **NFR-01, NFR-02** · **AD-er:** 2, 10, 17, 20 · *utvidet 2026-09-28 med 2.1b og 2.5:* 4, 5, 6, 7, 11, 16, 21 · *utvidet 2026-10-01 med 2.8, 2.9 og 2.9b:* FR-104, FR-105, FR-410, AD-15 · *utvidet 2026-10-07 med 2.10:* del av FR-203
 
 De to kjente `AD-20`-feilene rettes her: `fetch_prices.main` som blander lokal
 dato og UTC, og `meldinger._minutt` som kutter på tegn 16. FR-407 ligger her
@@ -562,6 +562,7 @@ vurdert, ikke bare arvet fra kravene.
 
 **FR-er:** ingen nye. Prøver FR-101–103, FR-201–204 og FR-706 fra utsiden ·
 **NFR-05, NFR-06** · Oppfyller suksessmålet «Brukerutfall» (PRD §7)
+*Lagt til 2026-10-07, Marians beslutning kl. 23:11:* story 8.5 oppfyller endringen i NOK i FR-101 og del av FR-203 (høy og lav i aksjedetaljen).
 
 Egen epic og ikke en del av Epic 3: Epic 3 har ett utfall — at løsningen kan
 bygges og kjøres av andre — og brukertesten skal ikke vente på Dockerfilen.
