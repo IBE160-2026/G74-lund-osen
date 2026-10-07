@@ -80,9 +80,9 @@ Planen fra 05.10 kl. 17:35 ble gitt i chatten og finnes ikke i denne økta. Den 
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] Spesifikasjonen. Commit og push.
-- [ ] Del 1: tidskontrollen, basen, filvakten med K8, nøkkelen sist, flagget. Tester. Commit og push.
-- [ ] Del 2: kvoten med `/api/user`. Tester. Commit og push.
+- [x] Spesifikasjonen. Commit og push (`acb3d90`).
+- [x] Del 1: tidskontrollen, basen, filvakten med K8, nøkkelen sist, flagget. Tester. Commit og push.
+- [x] Del 2: kvoten med `/api/user`. Tester. Del 1 og 2 ble én commit (`600096e`), fordi de ligger i de samme funksjonene.
 - [ ] Del 3: spinen, `lagring_fil.py`, `CLAUDE.md`, README, `deferred-work.md`. Commit og push.
 - [ ] Mutantene M1–M8 og kvote- og helgemutantene. PR mot main, gjennomgang (Blind Hunter, Edge Case Hunter, Verification Gap), CI grønn. Stopp før flettingen.
 
@@ -105,6 +105,13 @@ Planen fra 05.10 kl. 17:35 ble gitt i chatten og finnes ikke i denne økta. Den 
 - Given en lørdag og en base som mangler fredagen, when kommandoen kjøres, then fila heter fredagens dato og vurderingene skrives for fredag.
 
 ## Implementation Notes
+
+**Stoppet 07.10 kl. 21:29, fristen var 21:40.** Det som er gjort:
+- `src/fetch_prices.py`: `hent_kvote`, `UlesbarKvote`, `tolk_kvote`, `manglende_i_basen`, sjekkene i `kjoer()` i rekkefølgen fra spesifikasjonen, `--hent-foer-kl-22` med `allow_abbrev=False`, og nøkkelen gis til `kjoer()` som funksjon.
+- `tests/test_fetch_prices.py`: 32 nye testkjøringer (tidskontrollen, basen, helgen, rekkefølgen, kvoten og `hent_kvote`). Fem eldre tester er tilpasset: matrisen fra 2.1 får flagget, egen base per øyeblikk og navnet etter børsdagen (K8). Tre tester fra 2.5 som kjører to ganger samme dag, slår av basesjekken (og for lørdagen filvakten), som et nytt forsøk i 2.3b. `test_main_skriver_fila_for_norsk_dato_uten_noekkel` får flagget. `uv run pytest tests/test_fetch_prices.py`: 163 passed og 16 skipped (før: 131 passed og 16 skipped i samme fil).
+- **Hele suiten ble ikke ferdig.** `uv run pytest` gikk i over en halvtime uten utskrift og ble stoppet kl. 21:29. Det må undersøkes først i morgen: om en test i en annen fil henger på den nye koden (for eksempel `les_kvote` med `hent_kvote` som standard), eller om det var noe annet. `data/db/ose.db` er ikke endret (sist endret 06.10 kl. 22:17).
+
+**Gjenstår:** hele suiten grønn. Del 3 (spinen med raden «Datoer» og merknaden under AD-2, docstringen i `lagring_fil.py`, regel 22 i `CLAUDE.md`, README-linjen, K8 og E9 i `deferred-work.md`). Mutantene M1–M8 og K1–K4. PR, gjennomgang og CI. Kontrollen av `data/raa/`: navnene er lest. De ni kursfilene (22.–24.09, 29.09–02.10, 05.–06.10) har alle en børsdag i navnet, så de følger regelen. Ingen fil har fått nytt navn.
 
 ## Spec Change Log
 
