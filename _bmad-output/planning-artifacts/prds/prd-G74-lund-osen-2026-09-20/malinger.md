@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-07T22:37
+updated: 2026-10-07T23:03
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -2216,3 +2216,41 @@ noen av disse over 1,5×.
   er åpent, er hvorfor fire dager på rad har gitt 0 utslag mot 14,9 % i §7.4.
   Målingen her sier bare at årsaken ikke er hentetidspunktet. Paret 07.10 mot
   08.10 måles etter neste henting.
+
+*Lagt til 2026-10-07 kl. 23:02:* er det rolige dager? Ja, men ikke uvanlig rolige.
+Interesse er regnet med `beregn_signal` i `signalberegning.py`, slik appen gjør,
+for hver dag i `kurser-raa-2026-10-07.json` der signalet kan regnes. Det første
+er dag 51 i serien, og det gir 200 dager fra 2025-12-17 til 2026-10-07 og 3 000
+aksjedager for de 15. Vinduet overlapper §7.4 (2025-12-01 til 2026-09-18), men er
+ikke det samme.
+
+| Periode | Dager | +1 | −1 | Utslag i alt |
+|---|---:|---:|---:|---:|
+| §7.4 (199 dager) | 199 | 8,0 % | 6,9 % | 14,9 % |
+| Hele fila | 200 | 7,6 % | 6,9 % | 14,5 % |
+| 2025-12 (fra 17.12) | 7 | 12,4 % | 3,8 % | 16,2 % |
+| 2026-01 | 21 | 14,3 % | 8,9 % | 23,2 % |
+| 2026-02 | 20 | 9,7 % | 5,0 % | 14,7 % |
+| 2026-03 | 22 | 13,6 % | 9,4 % | 23,0 % |
+| 2026-04 | 19 | 2,1 % | 5,3 % | 7,4 % |
+| 2026-05 | 18 | 4,8 % | 12,6 % | 17,4 % |
+| 2026-06 | 22 | 5,8 % | 7,0 % | 12,7 % |
+| 2026-07 | 23 | 3,5 % | 4,1 % | 7,5 % |
+| 2026-08 | 21 | 10,5 % | 5,7 % | 16,2 % |
+| 2026-09 | 22 | 4,2 % | 6,7 % | 10,9 % |
+| 2026-10 (til 07.10) | 5 | 0,0 % | 2,7 % | 2,7 % |
+| Siste 20 børsdager (10.09–07.10) | 20 | 3,0 % | 6,3 % | 9,3 % |
+
+**43 av de 200 dagene** (21,5 %) hadde 0 utslag på interesse for alle 15. Slike
+dager kom i 26 perioder: 15 på én dag, 7 på to dager, 2 på tre dager og 2 på fire
+dager. De lengste var 2026-04-13 til 2026-04-16 og 2026-10-02 til 2026-10-07, fire
+børsdager hver. Deretter kom 2026-03-24 til 2026-03-26 og 2026-07-03 til
+2026-07-07, tre børsdager hver.
+
+Svaret er at de fire dagene uten utslag er rolige dager, ikke en feil. Over hele
+fila slår interesse ut like ofte som i §7.4 (14,5 % mot 14,9 %), og andelen
+varierer mye fra måned til måned, fra 7,4 % i april til 23,2 % i januar. De siste
+20 børsdagene ligger lavt, på 9,3 %, og fire dager på rad med 0 utslag har
+skjedd før, i april. Utslagene samler seg på noen få dager: 18.09 hadde 13 av 15,
+mens 16 av de andre 19 dagene i det samme vinduet hadde 0 eller 1. Det trengs
+ingen endring i koden.
