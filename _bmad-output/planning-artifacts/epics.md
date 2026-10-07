@@ -373,6 +373,7 @@ Epic 10.1 ──> Epic 10.2 (grunnlaget)   *(lagt til 2026-10-05)*
 Epic 3.4 + 10.2 + 10.3 ──> Epic 3.4b (KI-tekstene i demoen)   *(lagt til 2026-10-05)*
 Epic 2.3 + 3.4 ──> Epic 2.3b (nye forsøk med kallene som er igjen)   *(lagt til 2026-10-05)*
 Epic 8.0 ──> 8.0b + 8.0c ──> Epic 8.1   *(lagt til 2026-10-05)*
+Epic 2.10 (høy og lav lagres) ──> Epic 8.5 (kroner, høy og lav)   *(lagt til 2026-10-07)*
 ```
 
 *Lagt til 2026-10-05:* 10.2 skriver til `KILogg` (FR-604), og nettsperren må
@@ -577,7 +578,7 @@ må vise hvordan KI ble brukt, og hvordan studentene har kvalitetssikret koden»
 
 # Stories
 
-70 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
+72 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
 den, hva kontrollen faktisk ser etter, og om den kan gjøres ferdig i én økt.
 *Rettet 2026-09-26:* her sto 42. Tallet er telt fra overskriftene «### Story».
 *Rettet 2026-09-27:* her sto 46. Story 9.0 kom til 27.09.
@@ -586,6 +587,7 @@ den, hva kontrollen faktisk ser etter, og om den kan gjøres ferdig i én økt.
 *Rettet 2026-10-05:* her sto «55 stories». Siden 29.09 har 2.2b, 2.3b, 2.8, 2.9,
 2.9b, 3.4, 3.4b, 8.0b, 8.0c, 8.3, 8.4, 10.6, 10.7 og 10.8 kommet til, og ingen er fjernet.
 *Rettet 2026-10-06:* her sto «69 stories». Story 9.6 kom til 06.10.
+*Rettet 2026-10-07:* her sto «70 stories». Story 2.10 og 8.5 kom til 07.10.
 
 **«Ville feilet hvis» er kontrollen.** Resten er beskrivelse. En story uten den
 linjen er ikke ferdig spesifisert.
@@ -1534,6 +1536,24 @@ med en gang hvilke som trakk opp og ned.
 - **Ville feilet hvis:** søylene trengte et nytt kall eller en ny tabell. Endringen er den i FR-101, og bransjen står i `AKSJEUNIVERS`
 
 **Avhenger av:** 2.9. **Én økt:** ja.
+
+### Story 2.10: Høy og lav lagres med kursene
+
+*Lagt til 2026-10-07, Marians beslutning kl. 23:11.*
+
+Som **bruker**, vil jeg at dagens høyeste og laveste kurs finnes i basen, så
+aksjedetaljen kan vise dem uten et nytt kall.
+
+**Oppfyller:** FR-203 (tillegget 2026-10-07) · **Begrenses av:** `AD-5`, `AD-6`, `AD-16`, `AD-19`, NFR-01, NFR-08
+
+**Kontroll — hva testen ser etter:**
+- Adapteren i `eodhd.py`, `Kursrad` og lageret tar med `high` og `low` fra svaret, og en ny migrasjon legger dem til (`AD-16`)
+- Ingen nye kall. Øyeblikksbildene har feltene alt (`AD-6`), og neste henting fyller dem for hele året, fordi serien byttes ut (`AD-5`)
+- En rad uten `high` eller `low` lagres uten dem
+- Grenen bruker bare testbaser og rører aldri `data/db/ose.db`
+- **Ville feilet hvis:** en rad uten `high` eller `low` stoppet hentingen
+
+**Avhenger av:** ingen åpne. **Én økt:** ja.
 
 ---
 
@@ -2584,6 +2604,25 @@ vurderingen. Tekstene ligger i hjelpefila fra 8.0b.
 **Én økt:** ja.
 
 *Lagt til 2026-10-06, Marians beslutning kl. 20:42:* «Står det noe i børsmeldingene?» nevner NewsWeb uten lenke og viser til lenken til selskapets investorside (10.5). Euronexts vilkår forbyr lenker uten tillatelse (`docs/kilder-og-rettigheter.md`, «Lenker til Euronexts nettsteder (lest 2026-10-06)»).
+
+### Story 8.5: Endring i kroner, og høy og lav i aksjedetaljen
+
+*Lagt til 2026-10-07, Marians beslutning kl. 23:11.*
+
+Som **bruker**, vil jeg se hvor mange kroner aksjen endret seg, og hvor høyt og
+lavt den gikk, så jeg forstår dagen uten å regne selv.
+
+**Oppfyller:** FR-101 og FR-203 (tilleggene 2026-10-07) · **Begrenses av:** FR-102, FR-201, FR-407, `AD-10`, NFR-08
+
+**Kontroll — hva testen ser etter:**
+- Markedsoversikten viser kronene på en mindre linje under prosenten, i samme celle. Det er fortsatt fem kolonner (FR-101), og sorteringen er fortsatt på prosent (FR-102)
+- Aksjedetaljen viser kronene ved prosenten, og høy og lav for siste børsdag ved sluttkursen. Høy og lav tegnes ikke i grafen (FR-201)
+- Kronene regnes av `adjusted_close` for de to siste børsdagene, som prosenten, så de to peker alltid samme vei. En utbyttedag merkes etter FR-407
+- Høy og lav vises bare når begge finnes og lav ≤ sluttkurs ≤ høy, ellers «–» (NFR-08)
+- Før høy og lav vises, sammenlignes noen dager for hånd med Oslo Børs' egen side, lest av en av oss (`malinger.md` §6, raden «Sluttkurs, høy og lav mot Oslo Børs»). Siden hentes aldri av programmet
+- **Ville feilet hvis:** kronene ble regnet av `close` og pekte en annen vei enn prosenten på en utbyttedag, eller høy og lav ble vist når lav ≤ sluttkurs ≤ høy ikke holder
+
+**Avhenger av:** 2.10 for høy og lav. **Én økt:** ja.
 
 ---
 
