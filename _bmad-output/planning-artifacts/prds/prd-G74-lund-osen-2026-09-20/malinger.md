@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-06T23:58
+updated: 2026-10-07T22:37
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -1217,6 +1217,12 @@ Det dette viser, er at dagens rad fantes kl. 21:31, ikke når den kom. Tidspunkt
 ligger et sted mellom 19:04 og 21:31, målt på to forskjellige dager. Om raden
 for 24.09 er endelig, viser først neste henting.
 
+*Svar 2026-10-07 (§22):* neste henting viste det, og det samme gjelder alle
+kveldshentingene til og med 06.10. `close` og `adjusted_close` er endelige.
+`volume` er det nesten: 6 av 90 rader hentet etter kl. 22 fikk et litt høyere
+volum dagen etter, med opptil 6,9 %. Raden for 24.09 var uendret bortsett fra
+volumet for AKRBP, som var 0,04 % høyere 29.09.
+
 ### Endringer mot øyeblikksbildet fra 23.09
 
 **Null.** På de 3 720 felles aksjedagene (15 symboler × 248 datoer) er det ingen
@@ -2131,3 +2137,82 @@ median, står den med høyest uavrundet median først.
 
 Målingen endrer ikke universet. Parametrene i signalet er låst og målt på de
 15 (AD-13).
+
+---
+
+## 22. Er kveldens rad endelig? (2026-10-07)
+
+**Formål.** Svare på setningen i §12: «Om raden for 24.09 er endelig, viser
+først neste henting.» Det trengs nå fordi interesse ga 0 utslag på 60
+aksjedager (02.10, 05.10, 06.10 og 07.10), mot 14,9 % utslag i §7.4
+(8,0 % +1 og 6,9 % −1 over 199 dager). Er dagens volum ikke ferdig når vi
+henter, slår interesse sjeldnere ut enn den skal.
+
+**Kostnad.** 0 kall. Bare kursfilene i `data/raa/` er lest, og basen er ikke
+lest.
+
+**Metode.** De ti kursfilene `kurser-raa-*.json` fra 22.09 til 07.10 er tatt i
+datorekkefølge, to og to, så det blir ni par. For hvert par er siste rad i den
+første fila sammenlignet med raden for samme dato i den neste, for alle 15
+aksjene. Interesse er regnet for datoen med `beregn_signal` i
+`signalberegning.py`, slik appen gjør, én gang med serien fra den første fila og
+én gang med serien fra den neste, kuttet ved samme dato. Seriene er lest med
+`SnapshotLeser`. Det nederste paret (07.10 mot 08.10) kan først måles etter
+neste henting. Bare antall og forholdstall er ført her (regel 16).
+
+| Fila | Hentet (norsk tid) | Dato | Annet `volume` | Annen `close` | Annen `adjusted_close` | `volume` ny/gammel: minst / median / størst | Interesse skifter |
+|---|---|---|---:|---:|---:|---|---:|
+| `kurser-raa-2026-09-22.json` | 22.09 10:33 | 2026-09-21 | 1 av 15 | 0 | 0 | 0,9919 / 1,0000 / 1,0000 | 0 |
+| `kurser-raa-2026-09-23.json` | 23.09 19:04 | 2026-09-22 | 0 av 15 | 0 | 0 | 1,0000 / 1,0000 / 1,0000 | 0 |
+| `kurser-raa-2026-09-24.json` | 24.09 21:31 | 2026-09-24 | 1 av 15 | 0 | 0 | 1,0000 / 1,0000 / 1,0004 | 0 |
+| `kurser-raa-2026-09-29.json` | 29.09 22:27 | 2026-09-29 | 0 av 15 | 0 | 0 | 1,0000 / 1,0000 / 1,0000 | 0 |
+| `kurser-raa-2026-09-30.json` | 30.09 22:09 | 2026-09-30 | 1 av 15 | 0 | 0 | 1,0000 / 1,0000 / 1,0008 | 0 |
+| `kurser-raa-2026-10-01.json` | 01.10 23:13 | 2026-10-01 | 0 av 15 | 0 | 0 | 1,0000 / 1,0000 / 1,0000 | 0 |
+| `kurser-raa-2026-10-02.json` | 02.10 22:39 | 2026-10-02 | 3 av 15 | 0 | 0 | 1,0000 / 1,0000 / 1,0280 | 0 |
+| `kurser-raa-2026-10-05.json` | 05.10 22:09 | 2026-10-05 | 2 av 15 | 0 | 0 | 1,0000 / 1,0000 / 1,0693 | 0 |
+| `kurser-raa-2026-10-06.json` | 06.10 22:17 | 2026-10-06 | 0 av 15 | 0 | 0 | 1,0000 / 1,0000 / 1,0000 | 0 |
+
+De to første filene ble hentet før dagens rad var kommet. Siste rad er derfor
+dagen før, og den raden var en dag gammel da den ble hentet. Fra 24.09 er siste
+rad dagens.
+
+Volumet endret seg for disse, med forholdet ny/gammel:
+
+| Fila | Symbol | Dato | Ny/gammel |
+|---|---|---|---:|
+| `kurser-raa-2026-09-22.json` | MOWI | 2026-09-21 | 0,9919 |
+| `kurser-raa-2026-09-24.json` | AKRBP | 2026-09-24 | 1,0004 |
+| `kurser-raa-2026-09-30.json` | MOWI | 2026-09-30 | 1,0008 |
+| `kurser-raa-2026-10-02.json` | NHY | 2026-10-02 | 1,0233 |
+| `kurser-raa-2026-10-02.json` | MOWI | 2026-10-02 | 1,0280 |
+| `kurser-raa-2026-10-02.json` | ORK | 2026-10-02 | 1,0137 |
+| `kurser-raa-2026-10-05.json` | VAR | 2026-10-05 | 1,0693 |
+| `kurser-raa-2026-10-05.json` | ORK | 2026-10-05 | 1,0116 |
+
+**Interesse.** 0 av 135 rader skifter verdi på interesse mellom den første og
+den neste fila.
+
+For å se hvor nær terskelen dagene var, er volumforholdet regnet for alle 15 på
+hver av de fire dagene uten utslag, fra fila for dagen. Ingen er over 1,5×.
+Det største forholdet var 1,28 (NHY) 02.10, 1,30 (FRO) 05.10, 1,21 (GJF) 06.10
+og 1,40 (YAR) 07.10. Den største revisjonen i tabellen, 6,9 %, ville ikke løftet
+noen av disse over 1,5×.
+
+**Konklusjon.**
+
+- **`close` og `adjusted_close` er endelige når vi henter etter kl. 22.** Ingen
+  av de 90 radene fra de seks hentingene etter kl. 22 er endret dagen etter.
+- **`volume` er nesten endelig.** 6 av de 90 radene fikk et høyere volum dagen
+  etter, med 0,08 % til 6,9 %. Ingen fikk lavere volum. Det eneste fallet,
+  MOWI med 0,9919, var en rad som var en dag gammel da den ble hentet kl. 10:33
+  22.09.
+- **For interesse betyr det lite.** Ingen verdi på interesse skifter. De 0
+  utslagene på 60 aksjedager skyldes ikke et volum som ikke er ferdig: det
+  største forholdet på de fire dagene var 1,40, og terskelen er 1,5×.
+  Volumforholdet som lagres i `vurdering`, kan likevel være noen prosent for
+  lavt. En aksje med forhold mellom om lag 1,40 og 1,5 kan da slå ut dagen
+  etter, men ikke i den lagrede vurderingen.
+- **Ingen endring trengs nå, verken i koden eller i hentetidspunktet.** Det som
+  er åpent, er hvorfor fire dager på rad har gitt 0 utslag mot 14,9 % i §7.4.
+  Målingen her sier bare at årsaken ikke er hentetidspunktet. Paret 07.10 mot
+  08.10 måles etter neste henting.
