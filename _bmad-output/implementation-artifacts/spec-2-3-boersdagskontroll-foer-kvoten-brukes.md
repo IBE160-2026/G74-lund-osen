@@ -38,6 +38,7 @@ Planen fra 05.10 kl. 17:35 ble gitt i chatten og finnes ikke i denne økta. Den 
   - Kan svaret ikke leses (nettfeil, ikke JSON, et felt mangler eller er ikke et heltall, en dato som ikke kan leses): hent, og utskriften sier at kvoten ikke kunne leses. Feilteksten er bare typenavnet, som i `hent_ett_symbol` (story 2.0).
   - Navn, e-post og andre felt fra svaret står aldri i utskriften. Bare tallene over.
 - **Utskrift og koder:** tidskontrollen, basen og filvakten gir kode 0 (ingenting å gjøre). Kvoten som ikke strekker til, gir kode 1, fordi dagen da ikke får data.
+  *Rettet 2026-10-08 kl. 20:22, Marians beslutning (BH4 i gjennomgangen):* filvakten gir kode 1, ikke 0. Når filvakten stopper kjøringen, mangler basen dagen eller kunne ikke leses, så dagen er ikke komplett. Utskriften sier fortsatt hvorfor, og at et nytt forsøk hører til 2.3b. Tidskontrollen og basen gir fortsatt kode 0.
 - **Spinen:** raden «Datoer» sier at datoen i navnet på et øyeblikksbilde er børsdagen vurderingene skrives for, og at dataene i fila kan være eldre når FR-402 slår til (API-et har ikke dagens kurs ennå). En merknad under AD-2: `/api/user` og `/api/eod` er to nettfunksjoner mot samme kilde, begge i `fetch_prices.py`, begge injisert.
 - **Docstringen i `lagring_fil.py`** (`nyeste_snapshot`) sier det samme som spinen.
 - **`CLAUDE.md`** får regel 22: en gren bruker bare testbaser, aldri `data/db/ose.db`.
@@ -59,7 +60,7 @@ Planen fra 05.10 kl. 17:35 ble gitt i chatten og finnes ikke i denne økta. Den 
 | Børsdag etter 22:00, basen mangler én | 14 av 15 har kurs for tirsdag | Henter |
 | Lørdag, basen har fredag | Alle 15 har kurs for fredag | 0 kall |
 | Lørdag, basen mangler fredag | Fredag mangler for noen | Henter, fila heter fredagens dato |
-| Lørdag, fredagens fil finnes | `kurser-raa-<fredag>.json` | 0 kall, sier hvorfor, nevner 2.3b |
+| Lørdag, fredagens fil finnes | `kurser-raa-<fredag>.json` | 0 kall, sier hvorfor, nevner 2.3b. *Rettet 08.10 (BH4):* kode 1 |
 | Basen kan ikke leses | Ødelagt basefil | Henter, sier at basen ikke kunne leses |
 | Kvote: nok igjen | 20 igjen | Henter, ingen bonuslinje |
 | Kvote: under 15, bonus dekker | 10 igjen, `extraLimit` 463 | Henter, «5 kall fra bonusen» |
@@ -123,6 +124,7 @@ Planen fra 05.10 kl. 17:35 ble gitt i chatten og finnes ikke i denne økta. Den 
   - *Svaret er ikke fra børsdagen (FR-402).* Mangler svaret kursen for børsdagen for noen av aksjene, nevner utskriften dem (antall og symboler), og kjøringen avslutter med kode 1. Kursene, fila og vurderingene med grunnen `kurs_ikke_fra_dagen` står. En ny kjøring samme kveld gir 0 kall, fordi filvakten stopper den (et nytt forsøk er 2.3b). Mutant: V3 varselet fjernet. Ni eldre tester brukte `falsk_serie()`, som slutter 30.07, i kjøringer for 22.09 eller andre dager. De handler om noe annet og får nå en serie som slutter på børsdagen (`serie_til`). Testen for K4 i 2.5 (EQNR uten kurs for 22.09) venter nå kode 1.
 - **2026-10-08, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 6 og 10), Marians beslutning:** kvotesjekken tar antallet aksjer i lista som parameter, ikke 15. Regnestykket er skilt ut i `vurder_kvote(igjen, bonus, antall)`, som testes med en kortere liste (10) og med 18. `kjoer()` gir `len(AKSJEUNIVERS)`, og 2.11 gir bare et annet tall. Grensen «`igjen ≥ 15`» under Boundaries gjelder dermed antallet. Mutant: V4 15 skrevet inn i `vurder_kvote`. Bonuskvoten brukes bare til å fullføre kveldens henting (Marians beslutning 08.10 kl. 08:06), som før.
 - **2026-10-08: navnene i Code Map** er rettet til navnene i koden (`tolk_kvote`, `manglende_i_basen`).
+- **2026-10-08 kl. 20:22, Marians beslutning, instruksjonen kl. 20:22 i `docs/ai-prompts/2026-10-08.md`: filvakten gir kode 1 (BH4).** Dette endrer den frosne delen. Rettet-linjen står under «Utskrift og koder», og teksten over den står. Når filvakten stopper, mangler basen dagen eller kunne ikke leses, så dagen er ikke komplett. Tidskontrollen og basen gir fortsatt kode 0. Tre tester låser kode 1, og mutanten B4 (kode 0 igjen) fanges av alle tre. `--hent-foer-kl-22` (BH1/ECH2) skriver fila som før, med advarselen: flagget er en overstyring for hånd (gruppens beslutning 29.09), og den planlagte jobben bruker det aldri.
 - **2026-10-08, etter gjennomgangen (VG7):** «Feilteksten er bare typenavnet» under Boundaries gjelder nettfeil. Et svar med feil form gir `UlesbarKvote`, der teksten nevner feltnavnet, aldri en verdi fra svaret. En 401 eller 403 fra `/api/user` er ikke et ulesbart svar: den stopper med 0 kall og kode 1 (BH2). En test låser begge.
 
 ## Review Triage Log
@@ -131,11 +133,11 @@ Gjennomgang 1 (08.10 kl. 19:05–19:20, PR #22), Blind Hunter (BH, bare diffen),
 
 | # | Funn | Dom | Grunnlag | Rute |
 |---|---|---|---|---|
-| BH1, ECH2 | `--hent-foer-kl-22` før dagens kurs finnes, skriver fila under dagens dato. Svaret mangler dagen (FR-402, kode 1), og kveldens henting stopper ved filvakten med 0 kall | high | Stemmer. Spesifikasjonen sier at flagget gir dagens navn «som før», og et nytt forsøk er 2.3b | patch: utskriften og hjelpeteksten sier at fila kan låse dagen. **Til Marian:** om flagget skal skrive fila før kursen finnes, eller nekte å skrive fila når svaret mangler dagen |
+| BH1, ECH2 | `--hent-foer-kl-22` før dagens kurs finnes, skriver fila under dagens dato. Svaret mangler dagen (FR-402, kode 1), og kveldens henting stopper ved filvakten med 0 kall | high | Stemmer. Spesifikasjonen sier at flagget gir dagens navn «som før», og et nytt forsøk er 2.3b | patch: utskriften og hjelpeteksten sier at fila kan låse dagen. **Til Marian:** om flagget skal skrive fila før kursen finnes, eller nekte å skrive fila når svaret mangler dagen. *Avgjort 08.10 kl. 20:22, Marians beslutning:* flagget skriver fila som før, med advarselen. Det er en overstyring for hånd, slik gruppen bestemte 29.09, og den planlagte jobben bruker det aldri. Ingen ny endring i koden |
 | ECH1 | Et symbol som feiler i hentingen, gir kode 0, mens et svar uten dagens rad gir kode 1 | medium | Kode 0 ved et symbol som feiler, er oppførselen fra main (AD-15, NFR-03: «stopper aldri på en enkelt feil»). «Hoppet over eller avvist» i docstringen gjelder basen. En retting ga 35 tester som feilet | utsatt til 2.3b, som gjør nye forsøk for symbolene som feilet (`deferred-work.md`) |
 | BH2 | En nøkkel som avvises av `/api/user` (401 eller 403), gir likevel henting og en fil med 15 feil | medium | Stemmer. En avvist nøkkel er ikke et ulesbart svar | patch: 401 og 403 stopper med 0 kall og kode 1. Andre HTTP-feil gir henting. To tester |
 | BH3 | `except Exception` sluker programmeringsfeil, og hentingen går uten kvotesjekk | medium | Stemmer | patch: bare `requests.RequestException` og `ValueError`. Testene som brukte `RuntimeError`, bruker nå `requests.ConnectionError`. Én test for `AttributeError` |
-| BH4 | Filvakten gir kode 0 også når basen mangler dagen | medium | Når filvakten svarer, mangler basen dagen, eller den kunne ikke leses. Kode 0 for filvakten står i den frosne delen (Boundaries) | **til Marian**, fordi det endrer den frosne delen. Ikke endret |
+| BH4 | Filvakten gir kode 0 også når basen mangler dagen | medium | Når filvakten svarer, mangler basen dagen, eller den kunne ikke leses. Kode 0 for filvakten står i den frosne delen (Boundaries) | **til Marian**, fordi det endrer den frosne delen. Ikke endret. *Avgjort 08.10 kl. 20:22, Marians beslutning:* kode 1. patch: `sys.exit(1)` i filvakten, tre tester, mutant B4 |
 | ECH3 | En base på nyere skjemaversjon gir «henter likevel» og 15 kall som så feiler i basen | medium | Stemmer. Tilstanden er kjent før første kall | utsatt (`deferred-work.md`). Skillet mellom nyere og eldre versjon må gjøres i porten |
 | VG1 | «En test låser rekkefølgen» gjelder bare nøkkel, kvote og kall | medium | Stemmer. To flyttinger overlevde | patch: to tester der to sjekker sier nei samtidig |
 | VG2, ECH5 | `igjen` under 0 er ikke testet, og negative tall i svaret godtas | medium | Stemmer. Etter kall 21 er `apiRequests` over 20 | patch: test med 25 brukt. Negative tall er `UlesbarKvote` |
@@ -196,6 +198,8 @@ Gjennomgang 1 (08.10 kl. 19:05–19:20, PR #22), Blind Hunter (BH, bare diffen),
 | BH3 `except Exception` tilbake | `TestEtterGjennomgangen::test_programmeringsfeil_i_kvoten_synes` |
 | ECH5 negative tall godtas | `TestEtterGjennomgangen::test_negativt_tall_er_ulesbart` (3 av 3) |
 | BH1 advarselen fjernet | `TestEtterGjennomgangen::test_flagget_advarer_om_filvakten` |
+
+**B4, 08.10 kl. 20:25** (BH4, Marians beslutning): filvakten gir kode 0 igjen. Drept av alle tre: `TestHelgen::test_loerdag_naar_fredagens_fil_finnes_gir_0_kall_og_sier_hvorfor`, `TestSkriverIkkeOver::test_dagens_fil_finnes_og_ingen_kall_brukes` og `TestSvaretIkkeFraBoersdagen::test_ny_kjoering_samme_kveld_gir_0_kall`. Suiten etterpå: 1191 passed og 16 skipped.
 
 Fixturen for `data/db/ose.db` (VG4) er ikke prøvd med en mutant, fordi en mutant måtte skrive den ekte basen.
 

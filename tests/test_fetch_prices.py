@@ -187,7 +187,12 @@ class TestSkriverIkkeOver:
         def hent(*_):
             pytest.fail("ingen kall skal brukes naar dagens fil finnes")
 
-        assert fp.kjoer(tmp_path, tmp_path / "ose.db", self.OEYEBLIKK, NOEKKEL, hent, linjer.append, les_kvote=nok_kvote) is None
+        # Marians beslutning 08.10 (BH4): filvakten gir kode 1, fordi basen
+        # da mangler dagen.
+        with pytest.raises(SystemExit) as slutt:
+            fp.kjoer(tmp_path, tmp_path / "ose.db", self.OEYEBLIKK, NOEKKEL, hent,
+                     linjer.append, les_kvote=nok_kvote)
+        assert slutt.value.code == 1
         assert fil.read_text(encoding="utf-8") == '{"gammel": true}'
         assert any("finnes allerede" in l and "0 kall brukt" in l for l in linjer)
 
@@ -1642,6 +1647,20 @@ def kjoer_23(raa, base, oeyeblikk, hent=None, nokkel=NOEKKEL, les_kvote=nok_kvot
     return fil, kall, "\n".join(linjer)
 
 
+def kjoer_23_kode(raa, base, oeyeblikk, hent=None, nokkel=NOEKKEL, les_kvote=nok_kvote, **kw):
+    """Som kjoer_23, for en kjoering som skal avslutte: (kode, kall, utskrift)."""
+    linjer, kall = [], []
+
+    def tell(ticker, *a):
+        kall.append(ticker)
+        return (hent or (lambda *_: serie_til(norsk_dato(oeyeblikk))))(ticker, *a)
+
+    with pytest.raises(SystemExit) as slutt:
+        fp.kjoer(raa, base, oeyeblikk, nokkel, tell, linjer.append,
+                 les_kvote=les_kvote, **kw)
+    return slutt.value.code, kall, "\n".join(linjer)
+
+
 class TestTidskontrollen:
     """Foer kl. 22:00 paa en boersdag: 0 kall, med mindre flagget er gitt."""
 
@@ -1784,9 +1803,11 @@ class TestHelgen:
         raa.mkdir(parents=True)
         (raa / "kurser-raa-2026-09-25.json").write_text("{}", encoding="utf-8")
 
-        fil, kall, ut = kjoer_23(raa, base, LOERDAG_26_09_KL_12,
-                                 ingen_kall, ingen_noekkel, ingen_kall)
-        assert fil is None and kall == []
+        kode, kall, ut = kjoer_23_kode(raa, base, LOERDAG_26_09_KL_12,
+                                       ingen_kall, ingen_noekkel, ingen_kall)
+        # Marians beslutning 08.10 (BH4): fredagen er ikke komplett, saa kode 1.
+        # Ville feilet hvis filvakten ga kode 0 igjen (B4).
+        assert kode == 1 and kall == []
         assert "kurser-raa-2026-09-25.json" in ut and "AD-6" in ut and "2.3b" in ut
         assert sorted(f.name for f in raa.iterdir()) == ["kurser-raa-2026-09-25.json"]
 
@@ -1990,9 +2011,9 @@ class TestSvaretIkkeFraBoersdagen:
             fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, self._uten_dagen,
                      lambda _: None, les_kvote=nok_kvote)
 
-        fil, kall, ut = kjoer_23(raa, base, OEYEBLIKK_22_09 + timedelta(minutes=30),
-                                 ingen_kall, ingen_noekkel, ingen_kall)
-        assert fil is None and kall == []
+        kode, kall, ut = kjoer_23_kode(raa, base, OEYEBLIKK_22_09 + timedelta(minutes=30),
+                                       ingen_kall, ingen_noekkel, ingen_kall)
+        assert kode == 1 and kall == []
         assert "0 kall brukt" in ut and "2.3b" in ut
 
     def test_alle_har_dagen_gir_ingen_varsel(self, stier):

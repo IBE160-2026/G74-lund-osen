@@ -556,8 +556,8 @@ def kjoer(
     hent_foer_kl_22: bool = False,
     les_kvote: Callable[[str], object],
 ) -> Path | None:
-    """En henting. Returnerer fila som ble skrevet, eller None hvis en sjekk
-    foer foerste kall sa nei: tidskontrollen, basen eller filvakten (story 2.3).
+    """En henting. Returnerer fila som ble skrevet, eller None hvis
+    tidskontrollen eller basen sa nei foer foerste kall (story 2.3).
 
     Story 2.1b: fila skrives foerst (AD-6), saa kursene til basen i base_sti
     gjennom skriv_til_basen, med oeyeblikket som hentet. base_sti har ingen
@@ -584,7 +584,9 @@ def kjoer(
     noekkelen. Kvoten leses med les_kvote, og vurder_kvote regner med antallet aksjer
     som hentes, ikke et fast 15: er det faerre igjen av dagens kall, men
     bonusen dekker resten, hentes det; ellers 0 kall og kode 1. Kan svaret
-    ikke leses, hentes det. Tidskontrollen, basen og filvakten gir kode 0.
+    ikke leses, hentes det. Tidskontrollen og basen gir kode 0. Filvakten
+    gir kode 1, fordi basen da mangler dagen eller ikke kunne leses (Marians
+    beslutning 08.10, BH4).
     Klokka i tidskontrollen er Oslo-tid, ogsaa i vintertid. Mangler svaret
     kursen for boersdagen for noen aksjer (FR-402), nevner utskriften dem,
     og kjoeringen gir kode 1; en ny kjoering samme kveld stopper ved
@@ -665,7 +667,9 @@ def kjoer(
             "foer noe kall er brukt. Et nytt forsoek for en dag som har fil, "
             "kommer med story 2.3b. 0 kall brukt."
         )
-        return None
+        # Marians beslutning 08.10 (BH4): naar filvakten stopper, mangler basen
+        # dagen eller kunne ikke leses, saa dagen er ikke komplett. Kode 1.
+        sys.exit(1)
 
     # Noekkelen foerst naa, saa en kjoering som stoppet over, aldri leser den.
     if callable(api_nokkel):
