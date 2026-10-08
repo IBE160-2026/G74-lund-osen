@@ -83,11 +83,56 @@ Planen er vist i chatten 08.10 og ført i `docs/ai-prompts/2026-10-08.md` (instr
 
 ## Implementation Notes
 
+- **Grunnbildet** er `python:3.13.15-slim` (laget 2026-09-19), og uv kopieres fra `ghcr.io/astral-sh/uv:0.12.15`, samme uv som lokalt. Avhengighetene ligger i `/opt/venv` (`UV_PROJECT_ENVIRONMENT`), med `--no-install-project`, fordi prosjektet ikke er en pakke. `PYTHONPATH=/app/src` gjør at `waitress-serve app:app` og `python src/fetch_prices.py` finner modulene som i pytest.
+- **`UV_PYTHON_DOWNLOADS=never`** kom til etter mutanten I5: med `python:3.12-slim` lastet uv ned en egen 3.13 under byggingen, og CI-steget for versjonen gikk gjennom. Nå feiler byggingen.
+- **Stiene:** `PROSJEKTROT` er `/app`, så basen er `/app/data/db/ose.db` og øyeblikksbildene `/app/data/raa/`, der volumene monteres. Mappene eies av brukeren `ose` (uid 10001), så et nytt navngitt volum får den eieren.
+- **`.env` i `hent`:** `fetch_prices` leser `/app/.env` med `load_dotenv`, som ikke finnes i imaget, og så `os.getenv`. Nøkkelen fra `env_file` kommer gjennom miljøet. Uten `.env` nekter `docker compose run --rm hent` å starte (`env file … not found`), og `docker compose up` starter `app` som før (prøvd 08.10 med prosjektnavnet `ose-proeve` i en mappe uten `.env`).
+- **Lokale prøver 08.10, uten nøkkel og uten `data/`:** imaget har Python 3.13.15, brukeren `ose`, Oslo-tid og ingen `*.db`, `*-raa-*.json` eller `.env`. Webserveren med `--network none` svarte 200 med den tomme siden og migrerte basen i containeren. `python src/fetch_prices.py` med `--network none` og uten nøkkel stoppet med «EODHD_API_KEY mangler» og kode 1, etter tidskontrollen, basen og filvakten (kl. 22:5x). Med compose og `-p ose-proeve` var porten `127.0.0.1:5000`, `/` svarte 200, `app` hadde ingen `EODHD`-variabel, og volumene het `ose-proeve_ose-db` og `ose-proeve_ose-raa`. De er fjernet med `down -v`.
+- **README** er ikke endret. Den nevner ikke Docker-filene, og «Kom i gang» med Docker er 3.3 (regel 19).
+- **compose-parseren** i `tests/test_docker.py` er laget for akkurat `compose.yaml`, så testene ikke trenger en YAML-pakke. CI-steget `docker compose config --services` prøver at fila er gyldig compose.
+
 ## Spec Change Log
 
 ## Review Triage Log
 
 ## Verification
+
+**Mutantene, 08.10 rett før kl. 23:00.** Statiske mot `tests/test_docker.py`, 18 av 18 drept:
+
+| Mutant | Testen som fanger den |
+|---|---|
+| D1 Python 3.12 | `test_python_er_313_som_ci` |
+| D2 dev-gruppen med | `test_avhengighetene_kommer_fra_uv_lock_uten_dev` |
+| D3 `COPY . .` | `test_bare_koden_kopieres` |
+| D4 `EODHD_API_KEY` i `ENV` | `test_ingen_noekkel_i_imaget` |
+| D5 `USER` fjernet | `test_ikke_root` |
+| D6 Flasks egen server | `test_webserveren_er_waitress_uten_debug` |
+| D7 migrering i et eget `RUN`-steg | `test_ingen_migrering_i_eget_steg` |
+| D8 migrering i `command` for `app` | `test_ingen_migrering_i_eget_steg`, `test_app_er_standard_og_hent_ligger_i_profilen` |
+| D9 `data/` ut av `.dockerignore` | `test_data_noekler_og_lokale_baser_holdes_ute` |
+| D10 `"5000:5000"` | `test_porten_er_bare_paa_maskinen` |
+| D11 `./data:/app/data` | `test_navngitte_volumer_aldri_data_paa_maskinen` |
+| D12 `app` får `env_file` | `test_bare_hent_har_noekkelen` |
+| D13 `hent` uten profil | `test_app_er_standard_og_hent_ligger_i_profilen` |
+| D14 `hent` kjører noe annet | `test_hent_kjoerer_hentekommandoen` |
+| D15 volumene med fast `name:` | `test_navngitte_volumer_aldri_data_paa_maskinen` |
+| D16 Ollama i compose | `test_ingen_ollama_i_31` og to til |
+| D17 waitress ut av avhengighetene | `test_waitress_er_en_avhengighet_ikke_dev` |
+| D18 `UV_PYTHON_DOWNLOADS=never` fjernet | `test_uv_laster_aldri_ned_en_egen_python` |
+
+I imaget, mot stegene i CI-jobben `docker`, kjørt lokalt med de samme kommandoene. 5 av 5 drept etter rettingen:
+
+| Mutant | Steget som feiler |
+|---|---|
+| I1 en tom `kurser-raa-*.json` og `ose.db` lages i imaget | 2, ingen rådata eller base |
+| I2 `EODHD_API_KEY` i miljøet til imaget | 2 og 4 |
+| I3 webserveren starter ikke (`app:finnes_ikke`) | 4 |
+| I4 `hent` uten profil | 6 |
+| I5 `python:3.12-slim` | overlevde først (uv lastet ned 3.13). Etter `UV_PYTHON_DOWNLOADS=never`: 1, byggingen, og 3 |
+
+Ingen mutant leste eller skrev `data/`. I1 lager tomme filer i imaget i stedet for å kopiere ekte data.
+
+**Suiten:** 1209 passed og 16 skipped, mot 1191 og 16 før (18 nye i `tests/test_docker.py`).
 
 **Commands:**
 - `uv run pytest -q` -- expected: grønn, med de nye testene i `tests/test_docker.py`.
