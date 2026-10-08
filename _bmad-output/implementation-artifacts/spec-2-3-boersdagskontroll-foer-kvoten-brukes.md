@@ -85,7 +85,7 @@ Planen fra 05.10 kl. 17:35 ble gitt i chatten og finnes ikke i denne økta. Den 
 - [x] Del 1: tidskontrollen, basen, filvakten med K8, nøkkelen sist, flagget. Tester. Commit og push.
 - [x] Del 2: kvoten med `/api/user`. Tester. Del 1 og 2 ble én commit (`600096e`), fordi de ligger i de samme funksjonene.
 - [x] Del 3: spinen, `lagring_fil.py`, `CLAUDE.md`, README, `deferred-work.md`. Commit og push. *08.10:* regel 22 i `CLAUDE.md`, raden «Datoer» og merknaden under AD-2 i spinen, docstringen i `nyeste_snapshot`, README-linjen om kl. 22, K8 løst og E9 til 2.4.
-- [ ] Mutantene M1–M8, K1–K4 og V1–V4 (Spec Change Log 08.10). PR mot main, gjennomgang (Blind Hunter, Edge Case Hunter, Verification Gap), CI grønn. Stopp før flettingen.
+- [x] Mutantene M1–M8, K1–K4 og V1–V4 (Spec Change Log 08.10), kjørt 08.10 kl. 18:18–18:56 mot hele `tests/` med `-x`. Resultatet står under Verification. PR mot main, gjennomgang (Blind Hunter, Edge Case Hunter, Verification Gap), CI grønn. Stopp før flettingen.
 
 **Mutantene** (én om gangen, hele `tests/`):
 - M1: tidskontrollen fjernet.
@@ -112,7 +112,7 @@ Planen fra 05.10 kl. 17:35 ble gitt i chatten og finnes ikke i denne økta. Den 
 - `tests/test_fetch_prices.py`: 32 nye testkjøringer (tidskontrollen, basen, helgen, rekkefølgen, kvoten og `hent_kvote`). Fem eldre tester er tilpasset: matrisen fra 2.1 får flagget, egen base per øyeblikk og navnet etter børsdagen (K8). Tre tester fra 2.5 som kjører to ganger samme dag, slår av basesjekken (og for lørdagen filvakten), som et nytt forsøk i 2.3b. `test_main_skriver_fila_for_norsk_dato_uten_noekkel` får flagget. `uv run pytest tests/test_fetch_prices.py`: 163 passed og 16 skipped (før: 131 passed og 16 skipped i samme fil).
 - **Hele suiten ble ikke ferdig.** `uv run pytest` gikk i over en halvtime uten utskrift og ble stoppet kl. 21:29. Det må undersøkes først i morgen: om en test i en annen fil henger på den nye koden (for eksempel `les_kvote` med `hent_kvote` som standard), eller om det var noe annet. `data/db/ose.db` er ikke endret (sist endret 06.10 kl. 22:17).
 
-**Hele suiten, undersøkt 08.10 kl. 18:03–18:06** (instruksjonen kl. 18:03): `uv run pytest -o faulthandler_timeout=120` på grenen etter mergen av main (`ee79105`), i forgrunnen med en grense på 10 minutter. Den hang ikke: 1164 passed og 16 skipped på 92 s, og 75 s andre gang. faulthandler skrev ingenting. Hengen 07.10 er ikke gjenskapt, og årsaken er ikke funnet. Det som er sjekket: `kjoer()` har ingen løkke eller ventetid, og `requests.get` i `hent_kvote` har `timeout=30`. Funnet underveis: 40 kall til `fp.kjoer` i 34 tester i `test_fetch_prices.py` er uten `les_kvote` (telt med `ast`). De som kommer forbi filvakten, går mot nettet med `hent_kvote`. Sperren i `tests/conftest.py` avviser kallet med en gang, og `except Exception` i kvotesjekken sluker feilen og henter likevel. Det henger ikke, men sperren sees ikke i testene. Ført som funn til gjennomgangen. `data/db/ose.db` er ikke endret av kjøringene (sist endret 07.10 kl. 22:24, av kveldshentingen fra main).
+**Hele suiten, undersøkt 08.10 kl. 18:03–18:06** (instruksjonen kl. 18:03): `uv run pytest -o faulthandler_timeout=120` på grenen etter mergen av main (`ee79105`), i forgrunnen med en grense på 10 minutter. Den hang ikke: 1164 passed og 16 skipped på 92 s, og 75 s andre gang. faulthandler skrev ingenting. Hengen 07.10 er ikke gjenskapt, og årsaken er ikke funnet. Det som er sjekket: `kjoer()` har ingen løkke eller ventetid, og `requests.get` i `hent_kvote` har `timeout=30`. Funnet underveis: 40 kall til `fp.kjoer` i 34 tester i `test_fetch_prices.py` er uten `les_kvote` (telt med `ast`). De som kommer forbi filvakten, går mot nettet med `hent_kvote`. Sperren i `tests/conftest.py` avviser kallet med en gang, og `except Exception` i kvotesjekken sluker feilen og henter likevel. Det henger ikke, men sperren sees ikke i testene. Ført som funn til gjennomgangen. *Rettet 08.10 (instruksjonen kl. 19:00, `f48729b`):* `kjoer()` har ingen standardverdi for `les_kvote`, `main()` gir `hent_kvote`, og de 40 kallene har fått `nok_kvote`. En test som glemmer kvoten, feiler nå med `TypeError` (AD-8). `data/db/ose.db` er ikke endret av kjøringene (sist endret 07.10 kl. 22:24, av kveldshentingen fra main).
 
 **Gjenstår:** hele suiten grønn. Del 3 (spinen med raden «Datoer» og merknaden under AD-2, docstringen i `lagring_fil.py`, regel 22 i `CLAUDE.md`, README-linjen, K8 og E9 i `deferred-work.md`). Mutantene M1–M8 og K1–K4. PR, gjennomgang og CI. Kontrollen av `data/raa/`: navnene er lest. De ni kursfilene (22.–24.09, 29.09–02.10, 05.–06.10) har alle en børsdag i navnet, så de følger regelen. Ingen fil har fått nytt navn.
 
@@ -127,3 +127,28 @@ Planen fra 05.10 kl. 17:35 ble gitt i chatten og finnes ikke i denne økta. Den 
 ## Review Triage Log
 
 ## Verification
+
+**Mutantene, 08.10 kl. 18:18–18:56.** Én om gangen, et eksakt bytte i `src/fetch_prices.py`, `uv run pytest -q -x tests/`, originalen tilbake etter hver. 16 av 16 gir en feilende test. 15 ble drept i første kjøring:
+
+| Mutant | Første test som feilet |
+|---|---|
+| M1 tidskontrollen fjernet | `TestTidskontrollen::test_boersdag_foer_kl_22_gir_0_kall_og_nevner_flagget` |
+| M2 `<` byttet med `<=` | `TestSkriverIkkeOver::test_tom_katalog_gir_ny_fil_som_kan_leses_og_er_uten_noekkel` |
+| M3 `any` i stedet for `all` | `TestVurderingenISammeKjoering::test_vurderingen_er_regnet_av_serien_kjoeringen_selv_lagret` |
+| M4 filvakten sjekker `dag` | Se under. `TestBoersdagIOsloTidsstempelIUtc::test_filnavn_og_hentet_fra_samme_oeyeblikk[00:30 siste sommertidsdag]`, linje 544 |
+| M5 nøkkelen før tidskontrollen | `TestTidskontrollen::test_boersdag_foer_kl_22_gir_0_kall_og_nevner_flagget` |
+| M6 flagget ignoreres | `test_filnavn_og_hentet_fra_samme_oeyeblikk[00:30 norsk sommertid, gitt i Oslo-tid]` |
+| M7 tidskontroll alle dager | `TestTidskontrollen::test_dag_som_ikke_er_boersdag_har_ingen_tidskontroll` |
+| M8 ulesbar base gir 0 kall | `TestHentingenSkriverBasen::test_basen_kan_ikke_aapnes_fila_staar_og_kode_1` |
+| K1 kvotedato i Oslo | `TestKvoten::test_dagen_regnes_i_gmt_ikke_i_oslo` |
+| K2 bonusen telles ikke | `TestKvoten::test_under_15_med_bonus_henter_og_sier_hvor_mange` |
+| K3 ulesbart svar gir 0 kall | `test_main_skriver_fila_for_norsk_dato_uten_noekkel` |
+| K4 hele svaret skrives ut | `TestRekkefoelgen::test_noekkelen_og_kvoten_kommer_foer_foerste_kall` |
+| V1 klokka i UTC | `TestSkriverIkkeOver::test_tom_katalog_gir_ny_fil_som_kan_leses_og_er_uten_noekkel` |
+| V2 fast UTC+2 | `TestVintertid::test_kl_21_59_i_oslo_i_november_nekter` |
+| V3 FR-402-varselet fjernet | `TestVurderingenISammeKjoering::test_nyeste_kurs_ikke_fra_dagen_gir_en_rad_med_grunn` |
+| V4 15 skrevet inn i `vurder_kvote` | `TestKvotenTarAntallet::test_vurder_kvote[12-0-10-0]` |
+
+**M4 hang én gang.** I første kjøring ga M4 tidsavbrudd etter 600 s, uten faulthandler. Ingen pytest-prosess ble stående igjen. Kjørt på nytt fire ganger: én gang mot `tests/test_fetch_prices.py` med `faulthandler_timeout=45` (drept på 17 s), og tre ganger mot hele `tests/`, én gang med `faulthandler_timeout=60` kl. 18:57 og to ganger kl. 18:59–19:00 (drept på 35–38 s, i testen i tabellen). faulthandler skrev ingenting, fordi ingen kjøring hang. Hengen er derfor ikke gjenskapt, og det er **ikke avgjort** om den har samme årsak som hengen 07.10. Ingen rettelse er gjort i testen eller koden for selve hengen, fordi årsaken ikke er funnet. Ingen test starter `fetch_prices` som underprosess, så M4 kan ikke ha brukt kvoten. Kandidat, ikke vist: `traad.join()` uten tidsgrense i `tests/test_app.py` (`test_en_forespoersel_i_en_annen_traad_faar_egen_tilkobling`). Tiltakene er at en ny heng skal synes: `faulthandler_timeout = 120` i `pyproject.toml` (`74f8210`), og `timeout-minutes: 15` på pytest-jobben i `tester.yml` (`5e9efde`).
+
+**Suiten** etter del 4, del 3 og rettingen av `les_kvote`: 1179 passed og 16 skipped (`uv run pytest -q`, 92 s, kl. 19:03).
