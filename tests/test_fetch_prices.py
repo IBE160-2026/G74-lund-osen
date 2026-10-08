@@ -166,7 +166,7 @@ class TestSkriverIkkeOver:
                 raise RuntimeError(f"feil med {noekkel}")
             return serie_til(TIRSDAG_22_09)
 
-        fil = fp.kjoer(katalog, tmp_path / "ose.db", self.OEYEBLIKK, NOEKKEL, hent, linjer.append)
+        fil = fp.kjoer(katalog, tmp_path / "ose.db", self.OEYEBLIKK, NOEKKEL, hent, linjer.append, les_kvote=nok_kvote)
 
         assert fil == katalog / fp.filnavn(self.DAG)
         tekst = fil.read_text(encoding="utf-8")
@@ -187,7 +187,7 @@ class TestSkriverIkkeOver:
         def hent(*_):
             pytest.fail("ingen kall skal brukes naar dagens fil finnes")
 
-        assert fp.kjoer(tmp_path, tmp_path / "ose.db", self.OEYEBLIKK, NOEKKEL, hent, linjer.append) is None
+        assert fp.kjoer(tmp_path, tmp_path / "ose.db", self.OEYEBLIKK, NOEKKEL, hent, linjer.append, les_kvote=nok_kvote) is None
         assert fil.read_text(encoding="utf-8") == '{"gammel": true}'
         assert any("finnes allerede" in l and "0 kall brukt" in l for l in linjer)
 
@@ -203,7 +203,7 @@ class TestSkriverIkkeOver:
             return falsk_serie()
 
         with pytest.raises(SystemExit) as slutt:
-            fp.kjoer(tmp_path, tmp_path / "ose.db", self.OEYEBLIKK, NOEKKEL, hent, linjer.append)
+            fp.kjoer(tmp_path, tmp_path / "ose.db", self.OEYEBLIKK, NOEKKEL, hent, linjer.append, les_kvote=nok_kvote)
 
         assert slutt.value.code == 1
         assert fil.read_text(encoding="utf-8") == '{"annen kjoering": true}'
@@ -243,7 +243,7 @@ class TestSvarMedFeilForm:
         def hent(ticker, *_):
             return svar if ticker == "DNB.OL" else serie_til(TIRSDAG_22_09)
 
-        fil = fp.kjoer(tmp_path, tmp_path / "ose.db", OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None)
+        fil = fp.kjoer(tmp_path, tmp_path / "ose.db", OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None, les_kvote=nok_kvote)
         feil = json.loads(fil.read_text(encoding="utf-8"))["feil"]
         leser = nyeste_leser(tmp_path)
 
@@ -259,7 +259,7 @@ class TestSvarMedFeilForm:
         def hent(ticker, *_):
             return [] if ticker == "DNB.OL" else serie_til(TIRSDAG_22_09)
 
-        fil = fp.kjoer(tmp_path, tmp_path / "ose.db", OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None)
+        fil = fp.kjoer(tmp_path, tmp_path / "ose.db", OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None, les_kvote=nok_kvote)
         feil = json.loads(fil.read_text(encoding="utf-8"))["feil"]
         leser = nyeste_leser(tmp_path)
 
@@ -436,7 +436,7 @@ class TestOyeblikksbilde:
                 for i in range(60)
             ]
 
-        fil = fp.kjoer(tmp_path, tmp_path / "ose.db", OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None)
+        fil = fp.kjoer(tmp_path, tmp_path / "ose.db", OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None, les_kvote=nok_kvote)
         assert fil is not None and fil.parent == tmp_path
 
         leser = nyeste_leser(tmp_path)
@@ -566,7 +566,7 @@ class TestBoersdagIOsloTidsstempelIUtc:
             pytest.fail("ingen kall skal brukes naar oeyeblikket mangler sone")
 
         with pytest.raises(ValueError):
-            fp.kjoer(tmp_path, tmp_path / "ose.db", datetime(2026, 9, 25, 0, 30), NOEKKEL, hent, lambda _: None)
+            fp.kjoer(tmp_path, tmp_path / "ose.db", datetime(2026, 9, 25, 0, 30), NOEKKEL, hent, lambda _: None, les_kvote=nok_kvote)
 
         assert list(tmp_path.iterdir()) == []
 
@@ -610,7 +610,7 @@ class TestMaskinensSoneSpillerIngenRolle:
     def test_oeyeblikk_uten_sone_avvises_ogsaa_her(self, tmp_path, maskinsone):
         with pytest.raises(ValueError):
             fp.kjoer(tmp_path, tmp_path / "ose.db", datetime(2026, 9, 25, 0, 30), NOEKKEL,
-                lambda *_: pytest.fail("ingen kall"), lambda _: None,
+                lambda *_: pytest.fail("ingen kall"), lambda _: None, les_kvote=nok_kvote,
             )
         assert list(tmp_path.iterdir()) == []
 
@@ -732,7 +732,7 @@ class TestHentingenSkriverBasen:
         """K1 og K3: fila i raa/, basen i db/ose.db, og hver serie i basen har
         samme hentet som fila. Ville feilet hvis hentet kom fra klokka (M5)."""
         raa, base = stier
-        fil = fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, lambda *_: serie_til(TIRSDAG_22_09), lambda _: None)
+        fil = fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, lambda *_: serie_til(TIRSDAG_22_09), lambda _: None, les_kvote=nok_kvote)
 
         assert fil == raa / "kurser-raa-2026-09-22.json"
         assert base.is_file()
@@ -760,7 +760,7 @@ class TestHentingenSkriverBasen:
                 raise RuntimeError("nei")
             return serie_til(TIRSDAG_22_09)
 
-        fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None)
+        fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None, les_kvote=nok_kvote)
 
         tilkobling, lager = lager_i(base)
         try:
@@ -774,7 +774,7 @@ class TestHentingenSkriverBasen:
     def test_symbol_som_feilet_beholder_gammel_serie_og_tid(self, stier):
         raa, base = stier
         foer = OEYEBLIKK_22_09
-        fp.kjoer(raa, base, foer, NOEKKEL, lambda *_: serie_til(date(2026, 9, 22)), lambda _: None)
+        fp.kjoer(raa, base, foer, NOEKKEL, lambda *_: serie_til(date(2026, 9, 22)), lambda _: None, les_kvote=nok_kvote)
         tilkobling, lager = lager_i(base)
         gammel = lager.serie("DNB")
         tilkobling.close()
@@ -786,7 +786,7 @@ class TestHentingenSkriverBasen:
                 return []
             return serie_til(date(2026, 9, 23))
 
-        fp.kjoer(raa, base, etter, NOEKKEL, hent, lambda _: None)
+        fp.kjoer(raa, base, etter, NOEKKEL, hent, lambda _: None, les_kvote=nok_kvote)
 
         tilkobling, lager = lager_i(base)
         try:
@@ -806,7 +806,7 @@ class TestHentingenSkriverBasen:
         linjer = []
 
         with pytest.raises(SystemExit) as slutt:
-            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, lambda *_: falsk_serie(), linjer.append)
+            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, lambda *_: falsk_serie(), linjer.append, les_kvote=nok_kvote)
 
         assert slutt.value.code == 1
         fil = raa / "kurser-raa-2026-09-22.json"
@@ -838,7 +838,7 @@ class TestHentingenSkriverBasen:
         linjer = []
 
         with pytest.raises(SystemExit) as slutt:
-            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, lambda *_: falsk_serie(), linjer.append)
+            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, lambda *_: falsk_serie(), linjer.append, les_kvote=nok_kvote)
 
         self._basen_feilet(raa, base, linjer, slutt)
         # EQNR og DNB kommer foer KOG i universet.
@@ -860,7 +860,7 @@ class TestHentingenSkriverBasen:
         linjer = []
 
         with pytest.raises(SystemExit) as slutt:
-            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, lambda *_: falsk_serie(), linjer.append)
+            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, lambda *_: falsk_serie(), linjer.append, les_kvote=nok_kvote)
 
         self._basen_feilet(raa, base, linjer, slutt)
         assert any("MigrasjonsFeil" in l for l in linjer)
@@ -878,7 +878,7 @@ class TestHentingenSkriverBasen:
         linjer = []
 
         with pytest.raises(SystemExit) as slutt:
-            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, lambda *_: falsk_serie(), linjer.append)
+            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, lambda *_: falsk_serie(), linjer.append, les_kvote=nok_kvote)
 
         assert slutt.value.code == 1
         assert any("DNB" in l and "avvist i testen" in l for l in linjer)
@@ -899,14 +899,14 @@ class TestHentingenSkriverBasen:
         raa, base = stier
         # Mandag 21.09, saa fredag 25.09, begge kl. 22 i Oslo: 22.-25. mangler.
         fp.kjoer(raa, base, _utc(2026, 9, 21, 20), NOEKKEL,
-                 lambda *_: serie_til(date(2026, 9, 21)), lambda _: None)
+                 lambda *_: serie_til(date(2026, 9, 21)), lambda _: None, les_kvote=nok_kvote)
         kall = []
 
         def hent(ticker, *_):
             kall.append(ticker)
             return serie_til(date(2026, 9, 25), dager=64)
 
-        fp.kjoer(raa, base, _utc(2026, 9, 25, 20), NOEKKEL, hent, lambda _: None)
+        fp.kjoer(raa, base, _utc(2026, 9, 25, 20), NOEKKEL, hent, lambda _: None, les_kvote=nok_kvote)
 
         assert len(kall) == 15
         tilkobling, lager = lager_i(base)
@@ -929,7 +929,7 @@ class TestHentingenSkriverBasen:
             return ekte(base_sti, serier, hentet, fil, skriv)
 
         monkeypatch.setattr(fp, "skriv_til_basen", spion)
-        fil = fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, lambda *_: serie_til(TIRSDAG_22_09), lambda _: None)
+        fil = fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, lambda *_: serie_til(TIRSDAG_22_09), lambda _: None, les_kvote=nok_kvote)
         fp.les_inn(fil, base, lambda _: None)
 
         assert len(kall) == 2
@@ -1168,7 +1168,7 @@ class TestVurderingenISammeKjoering:
         standardavvik og dagens_endring var byttet om (M1)."""
         raa, base = stier
         fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
-                 lambda *_: serie_med_utslag(TIRSDAG_22_09), lambda _: None)
+                 lambda *_: serie_med_utslag(TIRSDAG_22_09), lambda _: None, les_kvote=nok_kvote)
 
         rader = vurderingene(base, TIRSDAG_22_09)
         assert antall_rader(base, "vurdering") == 15
@@ -1195,7 +1195,7 @@ class TestVurderingenISammeKjoering:
         regnet foer kursene var skrevet (M2)."""
         raa, base = stier
         fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
-                 lambda *_: serie_til(TIRSDAG_22_09), lambda _: None)
+                 lambda *_: serie_til(TIRSDAG_22_09), lambda _: None, les_kvote=nok_kvote)
         (raa / "kurser-raa-2026-09-22.json").unlink()
         senere = OEYEBLIKK_22_09 + timedelta(minutes=30)
         # Story 2.3: basesjekken ville stoppet kjoering nummer to, fordi basen
@@ -1203,7 +1203,7 @@ class TestVurderingenISammeKjoering:
         monkeypatch.setattr(fp, "manglende_i_basen", lambda *_: ["alle"])
 
         fp.kjoer(raa, base, senere, NOEKKEL,
-                 lambda *_: serie_med_utslag(TIRSDAG_22_09), lambda _: None)
+                 lambda *_: serie_med_utslag(TIRSDAG_22_09), lambda _: None, les_kvote=nok_kvote)
 
         for symbol, (innhold, serie) in vurderingene(base, TIRSDAG_22_09, senere).items():
             assert serie == fp.serie_fra_eodhd(serie_med_utslag(TIRSDAG_22_09))
@@ -1219,7 +1219,7 @@ class TestVurderingenISammeKjoering:
                 raise RuntimeError("nei")
             return serie_til(TIRSDAG_22_09)
 
-        fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None)
+        fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None, les_kvote=nok_kvote)
 
         rader = vurderingene(base, TIRSDAG_22_09)
         assert rader["DNB"] == (Grunn.SYMBOL_FEILET, [])
@@ -1240,7 +1240,7 @@ class TestVurderingenISammeKjoering:
 
         with pytest.raises(SystemExit) as slutt:
             fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
-                     lambda *_: serie_til(TIRSDAG_22_09), lambda _: None)
+                     lambda *_: serie_til(TIRSDAG_22_09), lambda _: None, les_kvote=nok_kvote)
 
         assert slutt.value.code == 1
         rader = vurderingene(base, TIRSDAG_22_09)
@@ -1276,7 +1276,7 @@ class TestVurderingenISammeKjoering:
         def hent(ticker, *_):
             return serie_til(TIRSDAG_22_09, dager=30 if ticker == "KOG.OL" else 60)
 
-        fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None)
+        fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None, les_kvote=nok_kvote)
 
         rader = vurderingene(base, TIRSDAG_22_09)
         assert rader["KOG"][0] == Grunn.SIGNAL_IKKE_REGNET
@@ -1288,12 +1288,12 @@ class TestVurderingenISammeKjoering:
         radene er de samme."""
         raa, base = stier
         hent = lambda *_: serie_med_utslag(TIRSDAG_22_09)  # noqa: E731
-        fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None)
+        fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None, les_kvote=nok_kvote)
         foer = vurderingene(base, TIRSDAG_22_09)
         kall = []
 
         assert fp.kjoer(raa, base, OEYEBLIKK_22_09 + timedelta(minutes=5), NOEKKEL,
-                        lambda *a: kall.append(a), lambda _: None) is None
+                        lambda *a: kall.append(a), lambda _: None, les_kvote=nok_kvote) is None
 
         assert kall == []
         assert antall_rader(base, "vurdering") == 15
@@ -1305,7 +1305,7 @@ class TestVurderingenISammeKjoering:
         feilet hvis upserten skrev en grunn over en vurdering (M6)."""
         raa, base = stier
         fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
-                 lambda *_: serie_med_utslag(TIRSDAG_22_09), lambda _: None)
+                 lambda *_: serie_med_utslag(TIRSDAG_22_09), lambda _: None, les_kvote=nok_kvote)
         dnb_foer = vurderingene(base, TIRSDAG_22_09)["DNB"][0]
         (raa / "kurser-raa-2026-09-22.json").unlink()
         # Story 2.3: basesjekken ville stoppet kjoering nummer to, fordi basen
@@ -1319,7 +1319,7 @@ class TestVurderingenISammeKjoering:
 
         linjer = []
         senere = OEYEBLIKK_22_09 + timedelta(minutes=30)
-        fp.kjoer(raa, base, senere, NOEKKEL, hent, linjer.append)
+        fp.kjoer(raa, base, senere, NOEKKEL, hent, linjer.append, les_kvote=nok_kvote)
 
         assert antall_rader(base, "vurdering") == 15
         assert isinstance(dnb_foer, Vurdering)
@@ -1353,7 +1353,7 @@ class TestVurderingenISammeKjoering:
 
         with pytest.raises(SystemExit) as slutt:
             fp.kjoer(raa, base, start, NOEKKEL, lambda *_: serie_til(TIRSDAG_22_09),
-                     linjer.append, klokke=klokke)
+                     linjer.append, klokke=klokke, les_kvote=nok_kvote)
 
         assert slutt.value.code == 1
         assert datoene_i_vurdering(base) == ["2026-09-22"]
@@ -1373,7 +1373,7 @@ class TestVurderingenISammeKjoering:
 
         with pytest.raises(SystemExit) as slutt:
             fp.kjoer(raa, base, start, NOEKKEL, lambda *_: serie_til(date(2026, 9, 25)),
-                     linjer.append, klokke=klokke)
+                     linjer.append, klokke=klokke, les_kvote=nok_kvote)
 
         assert slutt.value.code == 1
         assert antall_rader(base, "vurdering") == 0
@@ -1411,7 +1411,7 @@ class TestVurderingenISammeKjoering:
         innlesingen skrev vurderinger (M9)."""
         raa, base = stier
         fil = fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
-                       lambda *_: serie_med_utslag(TIRSDAG_22_09), lambda _: None)
+                       lambda *_: serie_med_utslag(TIRSDAG_22_09), lambda _: None, les_kvote=nok_kvote)
         foer = vurderingene(base, TIRSDAG_22_09)
         tilkobling = aapne_base(base)
         try:
@@ -1445,7 +1445,7 @@ class TestVurderingenISammeKjoering:
             return serie_med_utslag(TIRSDAG_22_09)
 
         linjer = []
-        fil = fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, hent, linjer.append)
+        fil = fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, hent, linjer.append, les_kvote=nok_kvote)
 
         assert any(
             "Skrev 15 rader i vurdering for boersdagen 2026-09-22" in l
@@ -1488,7 +1488,7 @@ class TestVurderingenISammeKjoering:
 
         with pytest.raises(SystemExit) as slutt:
             fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
-                     lambda *_: serie_til(TIRSDAG_22_09), linjer.append)
+                     lambda *_: serie_til(TIRSDAG_22_09), linjer.append, les_kvote=nok_kvote)
 
         assert slutt.value.code == 1
         assert antall_rader(base, "vurdering") == 0
@@ -1512,7 +1512,7 @@ class TestVurderingenISammeKjoering:
 
         with pytest.raises(SystemExit) as slutt:
             fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
-                     lambda *_: serie_til(TIRSDAG_22_09), linjer.append)
+                     lambda *_: serie_til(TIRSDAG_22_09), linjer.append, les_kvote=nok_kvote)
 
         assert slutt.value.code == 1
         assert antall_rader(base, "vurdering") == 2
@@ -1539,7 +1539,7 @@ class TestVurderingenISammeKjoering:
 
         with pytest.raises(SystemExit) as slutt:
             fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
-                     lambda *_: serie_til(TIRSDAG_22_09), linjer.append)
+                     lambda *_: serie_til(TIRSDAG_22_09), linjer.append, les_kvote=nok_kvote)
 
         assert slutt.value.code == 1
         assert antall_rader(base, "vurdering") == 0
@@ -1554,7 +1554,7 @@ class TestVurderingenISammeKjoering:
         fredag = date(2026, 9, 25)
         linjer = []
 
-        fp.kjoer(raa, base, loerdag, NOEKKEL, lambda *_: serie_til(fredag), linjer.append)
+        fp.kjoer(raa, base, loerdag, NOEKKEL, lambda *_: serie_til(fredag), linjer.append, les_kvote=nok_kvote)
 
         assert datoene_i_vurdering(base) == ["2026-09-25"]
         rader = vurderingene(base, fredag, loerdag)
@@ -1570,7 +1570,7 @@ class TestVurderingenISammeKjoering:
         raa, base = stier
         fredag = date(2026, 9, 25)
         fp.kjoer(raa, base, _utc(2026, 9, 25, 20, 0), NOEKKEL,
-                 lambda *_: serie_til(fredag), lambda _: None)
+                 lambda *_: serie_til(fredag), lambda _: None, les_kvote=nok_kvote)
         loerdag = _utc(2026, 9, 26, 20, 0)
         foer = vurderingene(base, fredag, loerdag)
         linjer = []
@@ -1580,7 +1580,7 @@ class TestVurderingenISammeKjoering:
         monkeypatch.setattr(fp, "manglende_i_basen", lambda *_: ["alle"])
 
         fp.kjoer(raa, base, loerdag, NOEKKEL,
-                 lambda *_: serie_med_utslag(fredag), linjer.append)
+                 lambda *_: serie_med_utslag(fredag), linjer.append, les_kvote=nok_kvote)
 
         etter = vurderingene(base, fredag, loerdag)
         assert {s: v for s, (v, _) in etter.items()} == {s: v for s, (v, _) in foer.items()}
@@ -1598,7 +1598,7 @@ class TestVurderingenISammeKjoering:
 
         with pytest.raises(SystemExit) as slutt:
             fp.kjoer(raa, base, _utc(2027, 1, 4, 21, 0), NOEKKEL,
-                     lambda *a: kall.append(a), linjer.append)
+                     lambda *a: kall.append(a), linjer.append, les_kvote=nok_kvote)
 
         assert slutt.value.code == 1
         assert kall == []
@@ -2029,3 +2029,21 @@ class TestKvotenTarAntallet:
         monkeypatch.setattr(fp, "vurder_kvote", spion)
         kjoer_23(raa, base, OEYEBLIKK_22_09)
         assert sett == [len(AKSJEUNIVERS)]
+
+
+class TestKvotenErInjisert:
+    """Instruksjonen kl. 19:00 08.10: kjoer() har ingen standardverdi for
+    les_kvote, saa en test som glemmer kvoten, feiler i stedet for aa gaa mot
+    nettet og bli stoppet av sperren uten at noen ser det (AD-8)."""
+
+    def test_kjoer_uten_les_kvote_feiler(self, stier):
+        raa, base = stier
+        with pytest.raises(TypeError, match="les_kvote"):
+            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, ingen_kall, lambda _: None)
+
+    def test_main_gir_hent_kvote(self, monkeypatch):
+        sett = {}
+        monkeypatch.setattr(fp, "kjoer", lambda *a, **kw: sett.update(kw))
+        monkeypatch.setattr(fp, "naa", lambda: OEYEBLIKK_22_09)
+        fp.main([])
+        assert sett["les_kvote"] is fp.hent_kvote

@@ -551,7 +551,7 @@ def kjoer(
     klokke: Callable[[], datetime] | None = None,
     *,
     hent_foer_kl_22: bool = False,
-    les_kvote: Callable[[str], object] = hent_kvote,
+    les_kvote: Callable[[str], object],
 ) -> Path | None:
     """En henting. Returnerer fila som ble skrevet, eller None hvis dagens fil
     fantes fra foer.
@@ -576,7 +576,9 @@ def kjoer(
     ikke leses, hentes det. Fila heter etter boersdagen vurderingene skrives
     for (K8), og filvakten sjekker samme dato. api_nokkel kan vaere en
     funksjon, som main gir, saa noekkelen leses foerst etter filvakten.
-    Kvoten leses med les_kvote, og vurder_kvote regner med antallet aksjer
+    les_kvote har ingen standardverdi, saa en test som glemmer kvoten, feiler
+    i stedet for aa gaa mot nettet (AD-8); main gir hent_kvote, slik den gir
+    noekkelen. Kvoten leses med les_kvote, og vurder_kvote regner med antallet aksjer
     som hentes, ikke et fast 15: er det faerre igjen av dagens kall, men
     bonusen dekker resten, hentes det; ellers 0 kall og kode 1. Kan svaret
     ikke leses, hentes det. Tidskontrollen, basen og filvakten gir kode 0.
@@ -833,6 +835,7 @@ def main(argv: list[str] | None = None) -> None:
         hent_api_nokkel,
         klokke=naa,
         hent_foer_kl_22=argumenter.hent_foer_kl_22,
+        les_kvote=hent_kvote,
     )
 
 
