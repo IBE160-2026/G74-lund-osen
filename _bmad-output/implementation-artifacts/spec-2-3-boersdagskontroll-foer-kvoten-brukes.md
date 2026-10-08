@@ -72,6 +72,7 @@ Planen fra 05.10 kl. 17:35 ble gitt i chatten og finnes ikke i denne økta. Den 
 ## Code Map
 
 - `src/fetch_prices.py` -- `kjoer()` får sjekkene, `hent_foer_kl_22` og `les_kvote`. Nye funksjoner: `hent_kvote` (nettfunksjonen), `vurder_kvote` (regnestykket, ren), `basen_har_dagen`. `main()` får flagget og sender nøkkelen som funksjon. Docstringene følger.
+  *Rettet 2026-10-08:* navnene i koden er `hent_kvote` (nettfunksjonen), `UlesbarKvote` og `tolk_kvote` (leser svaret, ren), `vurder_kvote(igjen, bonus, antall)` (regnestykket, ren, med antallet som parameter) og `manglende_i_basen` (aksjene som mangler børsdagen). `basen_har_dagen` finnes ikke. Varselet for svar uten børsdagen (FR-402) ligger i `kjoer()`.
 - `src/lagring_fil.py` -- docstringen i `nyeste_snapshot` (K8).
 - `tests/test_fetch_prices.py` -- nye klasser for tidskontrollen, basen, helgen, filvakten, kvoten og rekkefølgen. Matrisetestene som starter før 22:00 på en børsdag, får flagget.
 - `ARCHITECTURE-SPINE.md` -- raden «Datoer», merknad under AD-2.
@@ -111,9 +112,17 @@ Planen fra 05.10 kl. 17:35 ble gitt i chatten og finnes ikke i denne økta. Den 
 - `tests/test_fetch_prices.py`: 32 nye testkjøringer (tidskontrollen, basen, helgen, rekkefølgen, kvoten og `hent_kvote`). Fem eldre tester er tilpasset: matrisen fra 2.1 får flagget, egen base per øyeblikk og navnet etter børsdagen (K8). Tre tester fra 2.5 som kjører to ganger samme dag, slår av basesjekken (og for lørdagen filvakten), som et nytt forsøk i 2.3b. `test_main_skriver_fila_for_norsk_dato_uten_noekkel` får flagget. `uv run pytest tests/test_fetch_prices.py`: 163 passed og 16 skipped (før: 131 passed og 16 skipped i samme fil).
 - **Hele suiten ble ikke ferdig.** `uv run pytest` gikk i over en halvtime uten utskrift og ble stoppet kl. 21:29. Det må undersøkes først i morgen: om en test i en annen fil henger på den nye koden (for eksempel `les_kvote` med `hent_kvote` som standard), eller om det var noe annet. `data/db/ose.db` er ikke endret (sist endret 06.10 kl. 22:17).
 
+**Hele suiten, undersøkt 08.10 kl. 18:03–18:06** (instruksjonen kl. 18:03): `uv run pytest -o faulthandler_timeout=120` på grenen etter mergen av main (`ee79105`), i forgrunnen med en grense på 10 minutter. Den hang ikke: 1164 passed og 16 skipped på 92 s, og 75 s andre gang. faulthandler skrev ingenting. Hengen 07.10 er ikke gjenskapt, og årsaken er ikke funnet. Det som er sjekket: `kjoer()` har ingen løkke eller ventetid, og `requests.get` i `hent_kvote` har `timeout=30`. Funnet underveis: 40 kall til `fp.kjoer` i 34 tester i `test_fetch_prices.py` er uten `les_kvote` (telt med `ast`). De som kommer forbi filvakten, går mot nettet med `hent_kvote`. Sperren i `tests/conftest.py` avviser kallet med en gang, og `except Exception` i kvotesjekken sluker feilen og henter likevel. Det henger ikke, men sperren sees ikke i testene. Ført som funn til gjennomgangen. `data/db/ose.db` er ikke endret av kjøringene (sist endret 07.10 kl. 22:24, av kveldshentingen fra main).
+
 **Gjenstår:** hele suiten grønn. Del 3 (spinen med raden «Datoer» og merknaden under AD-2, docstringen i `lagring_fil.py`, regel 22 i `CLAUDE.md`, README-linjen, K8 og E9 i `deferred-work.md`). Mutantene M1–M8 og K1–K4. PR, gjennomgang og CI. Kontrollen av `data/raa/`: navnene er lest. De ni kursfilene (22.–24.09, 29.09–02.10, 05.–06.10) har alle en børsdag i navnet, så de følger regelen. Ingen fil har fått nytt navn.
 
 ## Spec Change Log
+
+- **2026-10-08, instruksjonen kl. 18:03 i `docs/ai-prompts/2026-10-08.md`: to ting fra planen 05.10 som manglet her.**
+  - *Vintertid.* Etter 25.10 er kl. 22:30 i Oslo 21:30 UTC. En test henter tirsdag 27.10 kl. 21:30 UTC, og en test nekter tirsdag 10.11 kl. 21:59 i Oslo (20:59 UTC). Mutanter: V1 klokka regnet i UTC, V2 klokka regnet med fast UTC+2.
+  - *Svaret er ikke fra børsdagen (FR-402).* Mangler svaret kursen for børsdagen for noen av aksjene, nevner utskriften dem (antall og symboler), og kjøringen avslutter med kode 1. Kursene, fila og vurderingene med grunnen `kurs_ikke_fra_dagen` står. En ny kjøring samme kveld gir 0 kall, fordi filvakten stopper den (et nytt forsøk er 2.3b). Mutant: V3 varselet fjernet. Ni eldre tester brukte `falsk_serie()`, som slutter 30.07, i kjøringer for 22.09 eller andre dager. De handler om noe annet og får nå en serie som slutter på børsdagen (`serie_til`). Testen for K4 i 2.5 (EQNR uten kurs for 22.09) venter nå kode 1.
+- **2026-10-08, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 6 og 10), Marians beslutning:** kvotesjekken tar antallet aksjer i lista som parameter, ikke 15. Regnestykket er skilt ut i `vurder_kvote(igjen, bonus, antall)`, som testes med en kortere liste (10) og med 18. `kjoer()` gir `len(AKSJEUNIVERS)`, og 2.11 gir bare et annet tall. Grensen «`igjen ≥ 15`» under Boundaries gjelder dermed antallet. Mutant: V4 15 skrevet inn i `vurder_kvote`. Bonuskvoten brukes bare til å fullføre kveldens henting (Marians beslutning 08.10 kl. 08:06), som før.
+- **2026-10-08: navnene i Code Map** er rettet til navnene i koden (`tolk_kvote`, `manglende_i_basen`).
 
 ## Review Triage Log
 

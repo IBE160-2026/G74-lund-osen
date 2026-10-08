@@ -219,6 +219,23 @@ def tolk_kvote(svar: object, i_dag_gmt: date) -> tuple[int, int]:
     return max(grense - brukt, 0), max(bonus, 0)
 
 
+def vurder_kvote(igjen: int, bonus: int, antall: int) -> int | None:
+    """Kall fra bonuskvoten hentingen trenger, eller None - story 2.3.
+
+    antall er aksjene i lista som hentes, og kommer som parameter, ikke som
+    et fast 15 (endringsforslaget 08.10, foeringen 30.09 under AD-21). Med
+    lista i basen (2.11) gis bare et annet tall. 0 betyr at dagens kall
+    holder. None betyr at heller ikke bonusen dekker det, og da hentes
+    ingenting. Bonusen brukes bare til aa fullfoere kveldens henting
+    (NFR-01, Marians beslutning 08.10 kl. 08:06).
+    """
+    if igjen >= antall:
+        return 0
+    if igjen + bonus >= antall:
+        return antall - igjen
+    return None
+
+
 def _uten_noekkel(tekst: str, api_nokkel: str) -> str:
     """Noekkelen byttet med *** - andre lag, for feil som ikke kom fra requests.
 
@@ -559,10 +576,14 @@ def kjoer(
     ikke leses, hentes det. Fila heter etter boersdagen vurderingene skrives
     for (K8), og filvakten sjekker samme dato. api_nokkel kan vaere en
     funksjon, som main gir, saa noekkelen leses foerst etter filvakten.
-    Kvoten leses med les_kvote: er det faerre enn 15 igjen av dagens kall,
-    men bonusen dekker resten, hentes det; ellers 0 kall og kode 1. Kan
-    svaret ikke leses, hentes det. Tidskontrollen, basen og filvakten gir
-    kode 0.
+    Kvoten leses med les_kvote, og vurder_kvote regner med antallet aksjer
+    som hentes, ikke et fast 15: er det faerre igjen av dagens kall, men
+    bonusen dekker resten, hentes det; ellers 0 kall og kode 1. Kan svaret
+    ikke leses, hentes det. Tidskontrollen, basen og filvakten gir kode 0.
+    Klokka i tidskontrollen er Oslo-tid, ogsaa i vintertid. Mangler svaret
+    kursen for boersdagen for noen aksjer (FR-402), nevner utskriften dem,
+    og kjoeringen gir kode 1; en ny kjoering samme kveld stopper ved
+    filvakten.
 
     Alt om tid utledes av oeyeblikk, som maa ha sone (AD-20, story 2.1):
     dagen er norsk kalenderdato (boersdag.norsk_dato) og gir filnavnet og
@@ -653,11 +674,12 @@ def kjoer(
             "Henter likevel."
         )
     else:
-        if igjen >= behov:
+        fra_bonus = vurder_kvote(igjen, bonus, behov)
+        if fra_bonus == 0:
             skriv(f"Kvoten: {igjen} kall igjen av dagens.")
-        elif igjen + bonus >= behov:
+        elif fra_bonus is not None:
             skriv(
-                f"Kvoten: {igjen} kall igjen av dagens. {behov - igjen} kall tas "
+                f"Kvoten: {igjen} kall igjen av dagens. {fra_bonus} kall tas "
                 f"fra bonuskvoten, som har {bonus}."
             )
         else:
@@ -704,6 +726,21 @@ def kjoer(
         _stoppet_ved_midnatt(dato, 0, skriv)
         sys.exit(1)
     if not skriv_vurderinger(base_sti, dato, dag, skrevne, klokke, skriv):
+        sys.exit(1)
+
+    # FR-402: svaret er ikke fra boersdagen for noen av aksjene. Kursene og
+    # fila staar, og vurderingen har grunnen kurs_ikke_fra_dagen. En ny
+    # kjoering samme kveld stopper ved filvakten med 0 kall (nytt forsoek: 2.3b).
+    uten_dagen = sorted(
+        symbol for symbol in skrevne
+        if not any(rad.dato == dato for rad in serier[symbol])
+    )
+    if uten_dagen:
+        skriv(
+            f"Svaret har ikke kursen for boersdagen {dato.isoformat()} for "
+            f"{len(uten_dagen)} aksjer: {', '.join(uten_dagen)} (FR-402). "
+            "Kursene og fila staar. Et nytt forsoek kommer med story 2.3b."
+        )
         sys.exit(1)
     if skrevne != set(serier):
         sys.exit(1)
