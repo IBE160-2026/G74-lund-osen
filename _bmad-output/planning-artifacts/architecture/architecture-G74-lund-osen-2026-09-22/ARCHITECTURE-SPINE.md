@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-10-08T17:22'
+updated: '2026-10-08T18:16'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -159,6 +159,7 @@ manglet i grafen.
 - **Rule:** nettkall skjer **bare i skallet**, med **én hentefunksjon per kilde**, og funksjonen injiseres til den som bruker den — slik `hent_universet(..., hent=hent_ett_symbol)` allerede gjør. I dag er EODHD eneste kilde; FR-404 (NewsWeb) og FR-301 (finanskalenderen) får hver sin, i hver sin skallfil. **Modelltjenesten er også en kilde** (Epic 4, og plan B i Epic 5B): én hentefunksjon, i skallet, injisert, og aldri kalt fra en test. *Lagt til 2026-09-24.*
 - **Opphav:** commit `352e3a2` (21.09). *Regelen er omformulert i gjennomgangen: «eneste sted `requests` brukes» kunne ikke overleve FR-404 og FR-301, og ville blitt stilltiende brutt.*
 - **Merknad 2026-10-05 (FR-608, story 10.2 og 10.7):** hver modelltjeneste er en egen kilde, med én hentefunksjon i sin egen skallfil: `ki_lokal.py` (Ollama), `ki_gemini.py`, `ki_anthropic.py` og `ki_openai.py`. Alle oppfyller porten `Modell`, og funksjonen injiseres. `OSE_KI_TJENESTE` velger én tjeneste per kjøring, uten stille overgang. Ingen av dem kalles fra en test (`AD-8`).
+- **Merknad 2026-10-08 (story 2.3):** `/api/user` og `/api/eod` er to nettfunksjoner mot samme kilde, `hent_kvote` og `hent_ett_symbol`, begge i `fetch_prices.py` og begge injisert i `kjoer()` (`les_kvote` og `hent`). `/api/user` er gratis (regel 15 i `CLAUDE.md`), og svaret tolkes i den rene `tolk_kvote`.
 
 ### AD-3 — Én port per eid datasett
 
@@ -376,7 +377,7 @@ FR-408. At dagen mangler, skal kunne skilles i lageret: `FR-409`. *Rettet
 |---|---|
 | Navn | Norsk i kode og kommentarer, som i resten av prosjektet. Porter navngis etter hva de gjør: `<Datasett>lager` er porten med skrivesiden (én skriver, AD-3), `<Datasett>leser` er lesesiden av samme port, og `<Datasett>logg` er en port som bare legges til (`KILogg`, AD-7). En klasse som bare leser rådata fra fil og aldri skriver, heter `<Noe>kilde` (`SnapshotKilde`). *Endret 2026-09-24: her sto «`<Datasett>lager` (skriver) eller `<Datasett>kilde` (leser)», som ikke passet med `Kursleser` og `KILogg`.* |
 | Symbol mot ticker | `symbol` er NewsWeb-formen (`EQNR`), `ticker` er EODHD-formen (`EQNR.OL`). De blandes aldri; `Aksje` er raden som binder dem. *Lagt til 2026-09-27 (story 1.9):* tabellen `aksje` har den samme raden, og `kurs`, `kursserie` og `vurdering` bruker `symbol` (AD-21) |
-| Datoer | En børsdato er `datetime.date` inne i systemet (`Kursrad.dato`) og `YYYY-MM-DD` som tekst ved grensene — JSON, SQLite, filnavn. Adapteren oversetter. *Endret 2026-09-23: raden sa «som tekst» uten begrunnelse, og en `date` kan ikke være feil formatert.* En børsdato er en **norsk** kalenderdato (AD-20); et tidsstempel er ISO 8601 med UTC-offset. Datoen i et filnavn er dataenes dag — aldri filens mtime |
+| Datoer | En børsdato er `datetime.date` inne i systemet (`Kursrad.dato`) og `YYYY-MM-DD` som tekst ved grensene — JSON, SQLite, filnavn. Adapteren oversetter. *Endret 2026-09-23: raden sa «som tekst» uten begrunnelse, og en `date` kan ikke være feil formatert.* En børsdato er en **norsk** kalenderdato (AD-20); et tidsstempel er ISO 8601 med UTC-offset. Datoen i et filnavn er dataenes dag — aldri filens mtime. *Presisert 2026-10-08 (story 2.3, K8):* datoen i navnet på et øyeblikksbilde er børsdagen vurderingene skrives for, ikke kjøredagen. På en dag børsen er stengt er det forrige børsdag. Dataene i fila kan være eldre enn datoen i navnet når FR-402 slår til, fordi API-et ikke har dagens kurs ennå, og da sier utskriften hvilke aksjer det gjelder |
 | Kursrader | `Kursrad` med norske felt (AD-19). Kildens feltnavn stopper i adapteren |
 | Kurs | Beregning bruker `adjusted_close` (FR-701). Markedsoversikten viser `close`. Forskjellen er tilsiktet og dokumentert |
 | Feil | En manglende aksje er en rad i `feil`, ikke et unntak som bobler opp (AD-15) |

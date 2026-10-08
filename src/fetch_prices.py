@@ -29,6 +29,13 @@ Story 2.5: etter kursene skriver hentingen dagens vurdering for alle femten i
 samme kjoering (AD-17), regnet av seriene den selv lagret, lest tilbake fra
 basen. Kan en aksje ikke vurderes, skrives en rad med grunnen (punkt 24).
 Boersdagen raden gjelder, regnes en gang, fra samme oeyeblikk som filnavnet.
+
+Story 2.3 (FR-401, FR-402): foer foerste kall sjekker kjoer() i fast
+rekkefoelge klokka, tidskontrollen, basen, filvakten, noekkelen og kvoten.
+Hver sjekk som sier nei, gir 0 kall og en utskrift som sier hvorfor. Paa en
+boersdag foer kl. 22:00 hentes ingenting uten --hent-foer-kl-22. Har basen
+alt kursene for boersdagen for alle aksjene, hentes ingenting. Kvoten leses
+med /api/user (gratis), den andre nettfunksjonen mot EODHD (AD-2).
 """
 
 import argparse
@@ -37,7 +44,7 @@ import os
 import sqlite3
 import sys
 from dataclasses import dataclass, field
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
 from typing import Callable
 from urllib.parse import quote, quote_plus
@@ -47,7 +54,13 @@ from dotenv import load_dotenv
 
 import lagring_fil
 import lagring_sqlite
-from boersdag import UtenforKalenderen, innevaerende_boersdag, norsk_dato
+from boersdag import (
+    OSLO,
+    UtenforKalenderen,
+    er_boersdag,
+    innevaerende_boersdag,
+    norsk_dato,
+)
 from eodhd import UgyldigSerie, serie_fra_eodhd
 from kursdata import AKSJEUNIVERS, Kursrad
 from lagring_fil import (
@@ -63,6 +76,12 @@ from signalberegning import vurder
 from vurderingsdata import Grunn
 
 BASE_URL = "https://eodhd.com/api/eod"
+KVOTE_URL = "https://eodhd.com/api/user"
+
+# Story 2.3: paa en boersdag hentes ingenting foer dette klokkeslettet i Oslo,
+# uten flagget --hent-foer-kl-22. En kjoering som kommer for tidlig, bruker
+# dagens kall uten aa faa dagens rad.
+KL_22 = time(22, 0)
 
 # Gratisnivaaet gir ett aars historikk. 364 dager holder seg innenfor med en
 # dags margin - det var intervallet som faktisk svarte 2026-09-21, og det ga
@@ -139,6 +158,85 @@ def hent_ett_symbol(ticker: str, api_nokkel: str, fra: str, til: str) -> list[di
     except requests.RequestException as feil:
         raise type(feil)(type(feil).__name__) from None
     return svar.json()
+
+
+def hent_kvote(api_nokkel: str) -> object:
+    """/api/user - story 2.3. Den andre nettfunksjonen mot EODHD (AD-2).
+
+    Kallet er gratis og trekker ikke fra kvoten (regel 15). Feilene vaskes
+    som i hent_ett_symbol (story 2.0), fordi noekkelen staar i adressen.
+    Svaret gis tilbake uten tolkning; tolk_kvote leser det.
+    """
+    try:
+        svar = requests.get(
+            KVOTE_URL,
+            params={"api_token": api_nokkel, "fmt": "json"},
+            timeout=30,
+        )
+        svar.raise_for_status()
+    except requests.HTTPError as feil:
+        r = feil.response
+        tekst = f"HTTP {r.status_code} {r.reason or ''}".strip() if r is not None else "HTTPError"
+        raise requests.HTTPError(tekst) from None
+    except requests.RequestException as feil:
+        raise type(feil)(type(feil).__name__) from None
+    return svar.json()
+
+
+class UlesbarKvote(ValueError):
+    """Svaret fra /api/user kan ikke leses. Teksten nevner bare feltnavn,
+    aldri en verdi fra svaret."""
+
+
+def tolk_kvote(svar: object, i_dag_gmt: date) -> tuple[int, int]:
+    """(kall igjen av dagens, bonuskvoten extraLimit) - story 2.3, regel 15.
+
+    Kvoten nullstilles ved midnatt GMT, men /api/user viser gaarsdagens tall
+    til foerste kall etter det. Staar apiRequestsDate paa en tidligere dato
+    enn i_dag_gmt, er det brukt 0 i dag. i_dag_gmt er dagens dato i GMT, ikke
+    i Oslo (presisert 04.10). Bare de fire feltene leses; navn og e-post i
+    svaret roeres ikke. Reiser UlesbarKvote hvis et felt mangler eller har
+    feil form.
+    """
+    if not isinstance(svar, dict):
+        raise UlesbarKvote("svaret er ikke et objekt")
+
+    def heltall(navn: str) -> int:
+        verdi = svar.get(navn)
+        if isinstance(verdi, bool) or not isinstance(verdi, int):
+            raise UlesbarKvote(f"{navn} mangler eller er ikke et heltall")
+        return verdi
+
+    brukt = heltall("apiRequests")
+    grense = heltall("dailyRateLimit")
+    bonus = heltall("extraLimit")
+    for navn, verdi in (("apiRequests", brukt), ("dailyRateLimit", grense), ("extraLimit", bonus)):
+        if verdi < 0:
+            raise UlesbarKvote(f"{navn} er negativ")
+    try:
+        dato = date.fromisoformat(svar.get("apiRequestsDate"))
+    except (TypeError, ValueError):
+        raise UlesbarKvote("apiRequestsDate mangler eller kan ikke leses") from None
+    if dato < i_dag_gmt:
+        brukt = 0
+    return max(grense - brukt, 0), max(bonus, 0)
+
+
+def vurder_kvote(igjen: int, bonus: int, antall: int) -> int | None:
+    """Kall fra bonuskvoten hentingen trenger, eller None - story 2.3.
+
+    antall er aksjene i lista som hentes, og kommer som parameter, ikke som
+    et fast 15 (endringsforslaget 08.10, foeringen 30.09 under AD-21). Med
+    lista i basen (2.11) gis bare et annet tall. 0 betyr at dagens kall
+    holder. None betyr at heller ikke bonusen dekker det, og da hentes
+    ingenting. Bonusen brukes bare til aa fullfoere kveldens henting
+    (NFR-01, Marians beslutning 08.10 kl. 08:06).
+    """
+    if igjen >= antall:
+        return 0
+    if igjen + bonus >= antall:
+        return antall - igjen
+    return None
 
 
 def _uten_noekkel(tekst: str, api_nokkel: str) -> str:
@@ -425,17 +523,41 @@ def skriv_vurderinger(
     return True
 
 
+def manglende_i_basen(base_sti: Path, dato: date) -> list[str]:
+    """Aksjene i universet som ikke har en kurs for dato i basen - story 2.3.
+
+    Finnes ikke basen, mangler alle. Basen aapnes uten migrering, saa
+    ingenting skrives. En base som ikke kan aapnes eller leses, gir en feil
+    fra BASEFEIL; kjoer henter da likevel.
+    """
+    if not base_sti.exists():
+        return [aksje.symbol for aksje in AKSJEUNIVERS]
+    tilkobling = aapne_base(base_sti, kjoer_migrasjoner=False)
+    try:
+        lager = SqliteKurslager(tilkobling)
+        return [
+            aksje.symbol
+            for aksje in AKSJEUNIVERS
+            if not any(rad.dato == dato for rad in lager.serie(aksje.symbol))
+        ]
+    finally:
+        tilkobling.close()
+
+
 def kjoer(
     data_katalog: Path,
     base_sti: Path,
     oeyeblikk: datetime,
-    api_nokkel: str,
+    api_nokkel: str | Callable[[], str],
     hent: Callable[[str, str, str, str], list[dict]] = hent_ett_symbol,
     skriv: Callable[[str], None] = print,
     klokke: Callable[[], datetime] | None = None,
+    *,
+    hent_foer_kl_22: bool = False,
+    les_kvote: Callable[[str], object],
 ) -> Path | None:
-    """En henting. Returnerer fila som ble skrevet, eller None hvis dagens fil
-    fantes fra foer.
+    """En henting. Returnerer fila som ble skrevet, eller None hvis
+    tidskontrollen eller basen sa nei foer foerste kall (story 2.3).
 
     Story 2.1b: fila skrives foerst (AD-6), saa kursene til basen i base_sti
     gjennom skriv_til_basen, med oeyeblikket som hentet. base_sti har ingen
@@ -443,12 +565,32 @@ def kjoer(
     gir BASE_STI. Feiler basen, eller blir et symbol hoppet over eller
     avvist, staar fila, og kjoeringen avslutter med kode 1.
 
-    Et oeyeblikksbilde skrives aldri om (AD-6, story 2.0). Finnes dagens fil,
-    stopper kjoeringen foer foerste kall. Det er ingen feil. Fila skrives med
-    modus "x", saa en fil som dukker opp mens kjoeringen paagaar, heller ikke
-    skrives over. Da er kallene brukt og ingenting lagret, og kjoeringen
-    avslutter med kode 1. Story 2.3 bygger videre paa dette med forventet
-    boersdag.
+    Et oeyeblikksbilde skrives aldri om (AD-6, story 2.0). Finnes fila for
+    boersdagen, stopper kjoeringen foer foerste kall. Det er ingen feil. Fila
+    skrives med modus "x", saa en fil som dukker opp mens kjoeringen paagaar,
+    heller ikke skrives over. Da er kallene brukt og ingenting lagret, og
+    kjoeringen avslutter med kode 1.
+
+    Story 2.3: rekkefoelgen foer foerste kall er klokka (oeyeblikk),
+    tidskontrollen, basen, filvakten, noekkelen og kvoten. Paa en boersdag
+    foer kl. 22:00 i Oslo hentes ingenting uten hent_foer_kl_22. Har hver
+    aksje en kurs for boersdagen i basen, hentes ingenting (FR-402); mangler
+    noen, hentes det, ogsaa paa en dag som ikke er boersdag (AD-7). Kan basen
+    ikke leses, hentes det. Fila heter etter boersdagen vurderingene skrives
+    for (K8), og filvakten sjekker samme dato. api_nokkel kan vaere en
+    funksjon, som main gir, saa noekkelen leses foerst etter filvakten.
+    les_kvote har ingen standardverdi, saa en test som glemmer kvoten, feiler
+    i stedet for aa gaa mot nettet (AD-8); main gir hent_kvote, slik den gir
+    noekkelen. Kvoten leses med les_kvote, og vurder_kvote regner med antallet aksjer
+    som hentes, ikke et fast 15: er det faerre igjen av dagens kall, men
+    bonusen dekker resten, hentes det; ellers 0 kall og kode 1. Kan svaret
+    ikke leses, hentes det. Tidskontrollen og basen gir kode 0. Filvakten
+    gir kode 1, fordi basen da mangler dagen eller ikke kunne leses (Marians
+    beslutning 08.10, BH4).
+    Klokka i tidskontrollen er Oslo-tid, ogsaa i vintertid. Mangler svaret
+    kursen for boersdagen for noen aksjer (FR-402), nevner utskriften dem,
+    og kjoeringen gir kode 1; en ny kjoering samme kveld stopper ved
+    filvakten.
 
     Alt om tid utledes av oeyeblikk, som maa ha sone (AD-20, story 2.1):
     dagen er norsk kalenderdato (boersdag.norsk_dato) og gir filnavnet og
@@ -481,18 +623,100 @@ def kjoer(
             return oeyeblikk
     hentet_tid = oeyeblikk.astimezone(timezone.utc)
     hentet = hentet_tid.isoformat()
+
+    # Tidskontrollen (story 2.3): bare paa en boersdag, bare foer kl. 22:00.
+    if er_boersdag(dag) and oeyeblikk.astimezone(OSLO).time() < KL_22:
+        if not hent_foer_kl_22:
+            skriv(
+                f"{dag.isoformat()} er boersdag, og klokka er ikke 22:00 i Oslo "
+                "ennaa. En henting naa bruker dagens kall uten aa faa dagens "
+                "rad. Kjoer etter kl. 22:00, eller med --hent-foer-kl-22 for aa "
+                "hente likevel. 0 kall brukt."
+            )
+            return None
+        skriv(
+            "Henter foer kl. 22:00 (--hent-foer-kl-22). Har API-et ikke dagens "
+            "kurs ennaa, skrives fila likevel under dagens dato, og kveldens "
+            "henting stopper da ved filvakten med 0 kall."
+        )
+
+    # Basen (FR-402): har den boersdagen for alle aksjene, er det ingenting aa hente.
+    try:
+        mangler = manglende_i_basen(base_sti, dato)
+    except BASEFEIL as feil:
+        skriv(
+            f"Basen {base_sti.name} kunne ikke leses ({type(feil).__name__}). "
+            "Henter likevel; fila skrives foerst og kan leses inn senere."
+        )
+    else:
+        if not mangler:
+            skriv(
+                f"Basen har alt kursene for boersdagen {dato.isoformat()} for "
+                f"alle {len(AKSJEUNIVERS)} aksjene. Ingenting aa hente (FR-402). "
+                "0 kall brukt."
+            )
+            return None
+
+    # Filvakten (AD-6, K8): fila heter etter boersdagen, ikke kjoeredagen.
     data_katalog.mkdir(parents=True, exist_ok=True)
-    fil = data_katalog / filnavn(dag)
+    fil = data_katalog / filnavn(dato)
     if fil.exists():
         skriv(
-            f"Dagens oeyeblikksbilde {fil.name} finnes allerede. Hentingen er "
-            "stoppet foer noe kall er brukt (AD-6). 0 kall brukt."
+            f"Oeyeblikksbildet for boersdagen {dato.isoformat()}, {fil.name}, "
+            "finnes allerede og skrives aldri om (AD-6). Hentingen er stoppet "
+            "foer noe kall er brukt. Et nytt forsoek for en dag som har fil, "
+            "kommer med story 2.3b. 0 kall brukt."
         )
-        return None
+        # Marians beslutning 08.10 (BH4): naar filvakten stopper, mangler basen
+        # dagen eller kunne ikke leses, saa dagen er ikke komplett. Kode 1.
+        sys.exit(1)
+
+    # Noekkelen foerst naa, saa en kjoering som stoppet over, aldri leser den.
+    if callable(api_nokkel):
+        api_nokkel = api_nokkel()
+
+    # Kvoten (regel 15): /api/user er gratis. Dagens dato regnes i GMT.
+    behov = len(AKSJEUNIVERS)
+    try:
+        igjen, bonus = tolk_kvote(les_kvote(api_nokkel), hentet_tid.date())
+    except UlesbarKvote as feil:
+        skriv(f"Kvoten kunne ikke leses fra /api/user: {feil}. Henter likevel.")
+    except requests.HTTPError as feil:
+        # hent_kvote vasker teksten til «HTTP <kode> <grunn>» (story 2.0).
+        if str(feil).startswith(("HTTP 401", "HTTP 403")):
+            skriv(
+                f"EODHD avviste noekkelen ved /api/user ({feil}). Hentingen ville "
+                "feilet for alle aksjene og laast dagen med en fil uten kurser. "
+                "Sjekk EODHD_API_KEY i .env. 0 kall brukt."
+            )
+            sys.exit(1)
+        skriv(f"Kvoten kunne ikke leses fra /api/user ({feil}). Henter likevel.")
+    except (requests.RequestException, ValueError) as feil:
+        # Bare nett- og formfeil. En programmeringsfeil skal synes, ikke gi
+        # henting uten kvotesjekk (gjennomgangen, BH3).
+        skriv(
+            f"Kvoten kunne ikke leses fra /api/user ({type(feil).__name__}). "
+            "Henter likevel."
+        )
+    else:
+        fra_bonus = vurder_kvote(igjen, bonus, behov)
+        if fra_bonus == 0:
+            skriv(f"Kvoten: {igjen} kall igjen av dagens.")
+        elif fra_bonus is not None:
+            skriv(
+                f"Kvoten: {igjen} kall igjen av dagens. {fra_bonus} kall tas "
+                f"fra bonuskvoten, som har {bonus}."
+            )
+        else:
+            skriv(
+                f"Kvoten: {igjen} kall igjen av dagens og {bonus} i bonuskvoten. "
+                f"Hentingen trenger {behov}. 0 kall brukt."
+            )
+            sys.exit(1)
 
     fra, til = bygg_intervall(dag)
     skriv(f"Henter {len(AKSJEUNIVERS)} symboler, {fra} til {til}.")
-    skriv(f"Dette koster {len(AKSJEUNIVERS)} av dagskvoten paa 20.\n")
+    skriv(f"Dette koster {len(AKSJEUNIVERS)} kall.\n")
 
     resultat = hent_universet(api_nokkel, fra, til, hent, skriv)
 
@@ -527,6 +751,21 @@ def kjoer(
         _stoppet_ved_midnatt(dato, 0, skriv)
         sys.exit(1)
     if not skriv_vurderinger(base_sti, dato, dag, skrevne, klokke, skriv):
+        sys.exit(1)
+
+    # FR-402: svaret er ikke fra boersdagen for noen av aksjene. Kursene og
+    # fila staar, og vurderingen har grunnen kurs_ikke_fra_dagen. En ny
+    # kjoering samme kveld stopper ved filvakten med 0 kall (nytt forsoek: 2.3b).
+    uten_dagen = sorted(
+        symbol for symbol in skrevne
+        if not any(rad.dato == dato for rad in serier[symbol])
+    )
+    if uten_dagen:
+        skriv(
+            f"Svaret har ikke kursen for boersdagen {dato.isoformat()} for "
+            f"{len(uten_dagen)} aksjer: {', '.join(uten_dagen)} (FR-402). "
+            "Kursene og fila staar. Et nytt forsoek kommer med story 2.3b."
+        )
         sys.exit(1)
     if skrevne != set(serier):
         sys.exit(1)
@@ -588,16 +827,29 @@ def les_inn(fil: Path, base_sti: Path, skriv: Callable[[str], None] = print) -> 
 
 def main(argv: list[str] | None = None) -> None:
     """Uten flagg: en henting. Med --les-inn <fil>: innlesing uten kall.
+    Med --hent-foer-kl-22: en henting paa en boersdag foer kl. 22:00 (story
+    2.3). Noekkelen gaar til kjoer som funksjon og leses etter filvakten.
 
     Stiene slaas opp her, naar main kalles (story 2.1b), saa fixturen i
     tests/conftest.py flytter dem.
     """
-    parser = argparse.ArgumentParser(description="Henter sluttkurser fra EODHD.")
+    parser = argparse.ArgumentParser(
+        description="Henter sluttkurser fra EODHD.", allow_abbrev=False
+    )
     parser.add_argument(
         "--les-inn",
         metavar="FIL",
         type=Path,
         help="les et oeyeblikksbilde som finnes, inn i basen, uten API-kall",
+    )
+    parser.add_argument(
+        "--hent-foer-kl-22",
+        action="store_true",
+        help=(
+            "hent paa en boersdag foer kl. 22:00 i Oslo (story 2.3). Har API-et "
+            "ikke dagens kurs ennaa, laaser fila dagen, og kveldens henting "
+            "stopper ved filvakten"
+        ),
     )
     argumenter = parser.parse_args(argv)
     if argumenter.les_inn is not None:
@@ -607,8 +859,10 @@ def main(argv: list[str] | None = None) -> None:
         lagring_fil.RAA_KATALOG,
         lagring_sqlite.BASE_STI,
         naa(),
-        hent_api_nokkel(),
+        hent_api_nokkel,
         klokke=naa,
+        hent_foer_kl_22=argumenter.hent_foer_kl_22,
+        les_kvote=hent_kvote,
     )
 
 

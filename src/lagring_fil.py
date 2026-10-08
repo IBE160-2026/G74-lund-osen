@@ -129,6 +129,11 @@ def nyeste_snapshot(katalog: Path | None = None) -> Path | None:
     som kopieres eller sjekkes ut paa nytt, faar ny mtime, men datoen i navnet
     er den som gjelder - det er den dagen dataene er fra.
 
+    Presisert i story 2.3 (K8): datoen i navnet er boersdagen vurderingene
+    skrives for, ikke kjoeredagen. En loerdag er det fredagens dato. Mangler
+    svaret dagens kurs for noen aksjer (FR-402), kan dataene i fila vaere
+    eldre enn datoen i navnet, og hentingen sier fra og gir kode 1.
+
     **Datoen avgjoer alene.** Prefikset er aldri med i sammenligningen av
     datoer. Det var feilen her foer: valget var `max` over tuplene
     (dato, sti), og ved LIK dato falt `max` tilbake paa stien - da vant

@@ -127,3 +127,9 @@ et sitat som ikke fantes».
     kodeverdi med punktum i norsk tekst, står den i kodeformat. Tilfellet bak:
     29.09 viste sidene punktum (`"%.2f"` i malene og forklaringene i
     `signalberegning.py`), mens dokumentene hadde komma.
+22. **En gren bruker bare testbaser.** Kode, tester og kjøringer på en gren
+    rører aldri `data/db/ose.db`. Basen skrives bare av kveldshentingen, som
+    kjører fra main. Grunnen: en vurdering som er skrevet, kan verken slettes
+    eller skrives på nytt (AD-7), så en feil fra en gren kan ikke rettes.
+    Besluttet av gruppen 05.10 kl. 19:17 (svar 3 under story 2.3 i
+    `epics.md`), og ført her da 2.3 ble bygget.

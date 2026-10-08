@@ -60,9 +60,10 @@
 - source_spec: `docs/kontroll-2026-09-26.md`
   summary: Datoen i filnavnet til øyeblikksbildet er kjøredagen, mens `src/lagring_fil.py` og spinen sier at den er dagen dataene er fra.
   evidence: K8 i kontrollen 26.09, slått opp på nytt 03.10: står (`src/fetch_prices.py:485`, `src/lagring_fil.py:128–130`, spinen linje 364). Story 2.1 endret bare sonen (`27ae8e3`). Venter på 2.3 eller 2.4, som tar forventet børsdag og etterfylling.
+  resolved: Løst i story 2.3 (2026-10-08, grenen 2-3). Fila heter etter børsdagen vurderingene skrives for, og filvakten sjekker samme dato. Spinen (raden «Datoer») og docstringen i `nyeste_snapshot` sier det samme. Ingen fil i `data/raa/` har fått nytt navn.
 - source_spec: `docs/kontroll-2026-09-26.md`
   summary: AD-5 krever minst 175 handelsdager per henting, men ingen story har et kontrollpunkt for det, og hentingen har `MINST_HANDELSDAGER = 51`, med bare en merknad i utskriften.
-  evidence: E9 i kontrollen 26.09, slått opp på nytt 03.10: står (`src/fetch_prices.py:73` og :205, spinen linje 184). Venter på 2.3 eller 2.4.
+  evidence: E9 i kontrollen 26.09, slått opp på nytt 03.10: står (`src/fetch_prices.py:73` og :205, spinen linje 184). Venter på 2.3 eller 2.4. *2026-10-08:* 2.3 tar ikke E9 (spesifikasjonen for 2.3, «Never»). Venter på 2.4.
 - source_spec: `docs/kontroll-2026-09-26.md`
   summary: `Kursrad(volum=2**63)` godtas. `MinneKurslager` lagrer raden, mens `SqliteKurslager` reiser `OverflowError`, ikke `ValueError`, så lagrene oppfører seg ikke likt.
   evidence: K6 i kontrollen 26.09, slått opp på nytt 03.10: står (`src/kursdata.py:112–116`, `src/lagring_sqlite.py:129–136`), og ingen test dekker det. Venter på 3.1.
@@ -91,3 +92,18 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-2-2b-sidene-leser-dagens-vurdering.md`
   summary: Sidene bygger forklaringene av maalingene i raden (sjekker_fra) og merket «skiller seg ut» med dagens parametre: noeytralsonen, volumfaktoren og terskelen. Parametrene lagres ikke med raden. For dagens rad er det det samme, men for eldre rader i historikken kan forklaringen motsi fortegnet hvis en parameter endres.
   evidence: Gjennomgangen av 2.2b (Blind Hunter) og raadet 03.10, punkt c. sjekker_fra(vurdering, p) i src/signalberegning.py og skiller_seg_ut i markedsoversikt.bygg_rad bruker p. AD-13 sier at en endret parameter foeres i malinger.md med datoen den gjelder fra, saa en eldre rad kan leses med grensene som gjaldt da. Parametrene er laast i dag, saa ingen side viser det ennaa. Venter paa story 2.7, som viser eldre rader.
+- source_spec: `_bmad-output/implementation-artifacts/spec-2-3-boersdagskontroll-foer-kvoten-brukes.md`
+  summary: Et symbol som feiler i hentingen, gir kode 0, mens et svar uten kursen for børsdagen (FR-402) gir kode 1. Oppgaveplanlegging ser da en vellykket kjøring for en dag der en aksje mangler.
+  evidence: ECH1 i gjennomgangen av 2.3 (08.10). Kode 0 er oppførselen fra main (AD-15, NFR-03). Tas i 2.3b, som gjør nye forsøk for symbolene som feilet.
+- source_spec: `_bmad-output/implementation-artifacts/spec-2-3-boersdagskontroll-foer-kvoten-brukes.md`
+  summary: En base på nyere skjemaversjon enn koden gir «henter likevel» i basesjekken, og 15 kall som så feiler i basen. Tilstanden er kjent før første kall.
+  evidence: ECH3 i gjennomgangen av 2.3 (08.10). `_krev_siste_versjon` reiser `RuntimeError` både for nyere og eldre versjon, så skillet må gjøres i porten. Venter på en egen retting.
+- source_spec: `_bmad-output/implementation-artifacts/spec-2-3-boersdagskontroll-foer-kvoten-brukes.md`
+  summary: En `dato` i `kurs` som ikke kan leses, gir `ValueError` i `manglende_i_basen` og traceback før første kall.
+  evidence: ECH4 i gjennomgangen av 2.3 (08.10). Bare en endring for hånd i basen gir det.
+- source_spec: `_bmad-output/implementation-artifacts/spec-2-3-boersdagskontroll-foer-kvoten-brukes.md`
+  summary: Stopper vurderingene ved midnatt eller fordi basen feiler, nevner ikke utskriften aksjene uten kursen for børsdagen (FR-402).
+  evidence: ECH7 i gjennomgangen av 2.3 (08.10). Fila står og viser det.
+- source_spec: `_bmad-output/implementation-artifacts/spec-2-3-boersdagskontroll-foer-kvoten-brukes.md`
+  summary: Har basen kursene for børsdagen, men vurderingene for dagen mangler, sier kommandoen «Ingenting aa hente» med kode 0.
+  evidence: ECH8 i gjennomgangen av 2.3 (08.10). Ingen regresjon: filvakten ville stoppet kjøringen uansett. Tas i 2.3b.

@@ -18,3 +18,6 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+# Story 2.3: hele suiten hang 07.10 og under mutant M4 08.10, uten at det kunne
+# gjenskapes. Henger en test i over 120 s, skriver faulthandler stakken.
+faulthandler_timeout = 120

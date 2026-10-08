@@ -118,3 +118,28 @@ def stiene_i_tmp_path(monkeypatch, tmp_path):
     monkeypatch.setattr(lagring_fil, "DATA_KATALOG", tmp_path / "data")
     monkeypatch.setattr(lagring_fil, "RAA_KATALOG", tmp_path / "raa")
     monkeypatch.setattr(lagring_sqlite, "BASE_STI", tmp_path / "db" / "ose.db")
+
+
+def _avtrykk(sti):
+    import hashlib
+
+    if not sti.exists():
+        return None
+    return hashlib.sha256(sti.read_bytes()).hexdigest(), sti.stat().st_mtime_ns
+
+
+@pytest.fixture(autouse=True, scope="session")
+def den_ekte_basen_er_uroert():
+    """Regel 22 i CLAUDE.md: ingen test roerer data/db/ose.db.
+
+    Fixturen over flytter BASE_STI, men den virker bare saa lenge koden slaar
+    opp lagring_sqlite.BASE_STI naar den kalles. Denne ser paa selve fila:
+    innholdet og mtime foer og etter hele kjoeringen. Finnes ikke fila, som i
+    CI, er det ingenting aa sjekke. Lagt til etter gjennomgangen av 2.3 (VG4).
+    """
+    from pathlib import Path
+
+    ekte = Path(__file__).resolve().parent.parent / "data" / "db" / "ose.db"
+    foer = _avtrykk(ekte)
+    yield
+    assert _avtrykk(ekte) == foer, f"{ekte} ble endret av testkjoeringen (regel 22)"
