@@ -43,6 +43,9 @@ def _instruksjoner() -> list[tuple[str, str]]:
         navn, _, resten = samlet.partition(" ")
         ut.append((navn.upper(), resten.strip()))
         samlet = ""
+    # En siste linje som slutter med \ ville ellers forsvunnet uten at noen
+    # test saa den (ECH10).
+    assert not samlet, f"Dockerfile slutter midt i en instruksjon: {samlet!r}"
     return ut
 
 
@@ -113,8 +116,18 @@ class TestImaget:
         assert ".env" not in " ".join(r for i, r in _instruksjoner() if i in ("COPY", "ADD"))
 
     def test_ikke_root(self):
+        """Ville feilet med USER root, USER 0 eller USER root:root (ECH9)."""
         bruker = [r for i, r in _instruksjoner() if i == "USER"]
-        assert bruker and bruker[-1] not in ("root", "0")
+        assert bruker and bruker[-1].split(":")[0] not in ("root", "0")
+
+    def test_mappene_til_volumene_eies_av_brukeren(self):
+        """Et nytt navngitt volum faar eieren fra mappa i imaget. Ville feilet
+        hvis data/raa manglet eller ikke ble eid av ose. Da kunne hent bruke
+        dagens kall og saa feile naar oeyeblikksbildet skrives (VG2)."""
+        kjoer = " ".join(r for i, r in _instruksjoner() if i == "RUN")
+        assert "mkdir -p data/db data/raa" in kjoer
+        assert re.search(r"chown -R ose:ose data(\s|$)", kjoer), kjoer
+        assert [r for i, r in _instruksjoner() if i == "USER"][-1] == "ose"
 
     def test_webserveren_er_waitress_uten_debug(self):
         """Svar 1 fra gruppen 08.10: waitress, aldri Flasks egen server og
@@ -150,6 +163,15 @@ class TestDockerignore:
         for krav in ("data/", ".env", ".env.*", "_privat/", ".git", "*.db", "*-raa-*.json"):
             assert krav in moenstre, krav
 
+    def test_filmoenstrene_gjelder_ogsaa_under_src(self):
+        """Et moenster uten **/ gjelder bare roten av konteksten, og
+        COPY src/ src/ tar med alt under src/. Ville feilet hvis en base,
+        en raadatafil eller __pycache__ under src/ kunne komme med (ECH1)."""
+        moenstre = set(_linjer(DOCKERIGNORE))
+        for krav in ("**/.env", "**/*.db", "**/*-raa-*.json", "**/*-raw-*.json",
+                     "**/raadata-*.json", "**/newsweb-*.json", "**/__pycache__/"):
+            assert krav in moenstre, krav
+
     def test_env_example_er_unntaket(self):
         moenstre = _linjer(DOCKERIGNORE)
         assert "!.env.example" in moenstre
@@ -162,22 +184,36 @@ class TestCompose:
         assert set(tjenester) == {"app", "hent"}
         assert _verdier(tjenester["app"]["image"]) == _verdier(tjenester["hent"]["image"]) == ["ose-signal"]
 
+    def test_begge_bygger_fra_repoet_og_henter_aldri_imaget(self):
+        """Ville feilet hvis hent manglet build. Da ville docker compose run
+        --rm hent paa en ny maskin hentet et image som heter ose-signal fra et
+        register, og gitt det .env med noekkelen (BH2, ECH6)."""
+        for navn, felt in _tjenester().items():
+            assert _verdier(felt["build"]) == ["."], navn
+            assert _verdier(felt["pull_policy"]) == ["build"], navn
+
+    def test_init_som_pid_1(self):
+        """Ville feilet uten init. Da venter docker compose stop i 10 sekunder
+        og dreper waitress midt i en forespoersel (ECH8)."""
+        for navn, felt in _tjenester().items():
+            assert _verdier(felt["init"]) == ["true"], navn
+
     def test_app_er_standard_og_hent_ligger_i_profilen(self):
-        """Svar 2: docker compose up starter bare webserveren. Ville feilet
-        hvis hent startet med up og brukte kall."""
+        """Svar 2 og 3 fra gruppen 08.10: docker compose up starter bare
+        webserveren. Ville feilet hvis hent startet med up og brukte kall."""
         tjenester = _tjenester()
         assert "profiles" not in tjenester["app"]
         assert "command" not in tjenester["app"]
         assert tjenester["hent"]["profiles"][0].split(":", 1)[1].strip() == '["hent"]'
 
     def test_hent_kjoerer_hentekommandoen(self):
-        """Hentekommandoen kjoerer hentingen, uten ny kode (svar 2)."""
+        """Hentekommandoen kjoerer hentingen, uten ny kode (svar 2 og 3)."""
         assert _tjenester()["hent"]["command"][0].split(":", 1)[1].strip() == (
             '["python", "src/fetch_prices.py"]'
         )
 
     def test_bare_hent_har_noekkelen(self):
-        """Svar 3: app har ingen noekkel og ingen env_file. hent har .env.
+        """Svar 2 og 3: app har ingen noekkel og ingen env_file. hent har .env.
         Ville feilet hvis webserveren fikk noekkelen."""
         tjenester = _tjenester()
         assert "env_file" not in tjenester["app"] and "environment" not in tjenester["app"]

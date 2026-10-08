@@ -9,7 +9,9 @@
 # (compose.yaml), og migrasjonene kjoeres av aapne_base i begge inngangene,
 # ikke i et eget steg (story 2.1b).
 
-# Samme Python 3.13 som CI. Fast versjon, saa en ny bygging gir samme bilde.
+# Samme Python 3.13 som CI, med fast versjon. Taggen kan likevel bygges paa
+# nytt med sikkerhetsoppdateringer fra Debian, saa bildet er ikke byte for
+# byte det samme ved hver bygging.
 FROM python:3.13.15-slim
 
 COPY --from=ghcr.io/astral-sh/uv:0.12.15 /uv /bin/uv

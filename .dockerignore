@@ -1,6 +1,8 @@
 # Holdes ute av byggekonteksten, saa imaget aldri faar data eller noekler
 # (story 3.1, AD-9, AD-12). Dockerfile kopierer bare pyproject.toml, uv.lock
-# og src/, og denne fila er det andre laget.
+# og src/, og denne fila er det andre laget. Et moenster uten **/ gjelder bare
+# roten av konteksten, saa filmoenstrene staar ogsaa med **/ og fanger filer
+# under src/.
 data/
 .env
 .env.*
@@ -15,9 +17,20 @@ _privat/
 *-raw-*.json
 raadata-*.json
 newsweb-*.json
+**/data/
+**/.env
+**/.env.*
+**/*.db
+**/*.db-journal
+**/*.db-wal
+**/*.db-shm
+**/*-raa-*.json
+**/*-raw-*.json
+**/raadata-*.json
+**/newsweb-*.json
 .venv/
-__pycache__/
-*.py[cod]
+**/__pycache__/
+**/*.py[cod]
 .pytest_cache/
 .ruff_cache/
 local-tests/
