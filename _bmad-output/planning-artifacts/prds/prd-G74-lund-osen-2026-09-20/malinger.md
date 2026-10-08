@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-06T23:58
+updated: 2026-10-07T23:26
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -1217,6 +1217,12 @@ Det dette viser, er at dagens rad fantes kl. 21:31, ikke når den kom. Tidspunkt
 ligger et sted mellom 19:04 og 21:31, målt på to forskjellige dager. Om raden
 for 24.09 er endelig, viser først neste henting.
 
+*Svar 2026-10-07 (§22):* neste henting viste det, og det samme gjelder alle
+kveldshentingene til og med 06.10. `close` og `adjusted_close` er endelige.
+`volume` er det nesten: 6 av 90 rader hentet etter kl. 22 fikk et litt høyere
+volum dagen etter, med opptil 6,9 %. Raden for 24.09 var uendret bortsett fra
+volumet for AKRBP, som var 0,04 % høyere 29.09.
+
 ### Endringer mot øyeblikksbildet fra 23.09
 
 **Null.** På de 3 720 felles aksjedagene (15 symboler × 248 datoer) er det ingen
@@ -2128,6 +2134,247 @@ median, står den med høyest uavrundet median først.
 | 70 | AFK | Arendals Fossekompani | 0,6 | Nei | Nei | §21 |
 
 *Rettet 2026-10-06:* to navn fikk komma i stedet for punktum da desimaltegnene ble gjort om. Her sto `| 28 | CMBTO | CMB,TECH | 47,6 | Nei | Nei | §16 |` og `| 56 | WWI | Wilh, Wilhelmsen Holding | 8,3 | Nei | Nei | §16 |`. Navnene er nå som i §16–§20. Ingen andre navn eller tall i §21 hadde samme feil.
+
+Målingen endrer ikke universet. Parametrene i signalet er låst og målt på de
+15 (AD-13).
+
+---
+
+## 22. Er kveldens rad endelig? (2026-10-07)
+
+**Formål.** Svare på setningen i §12: «Om raden for 24.09 er endelig, viser
+først neste henting.» Det trengs nå fordi interesse ga 0 utslag på 60
+aksjedager (02.10, 05.10, 06.10 og 07.10), mot 14,9 % utslag i §7.4
+(8,0 % +1 og 6,9 % −1 over 199 dager). Er dagens volum ikke ferdig når vi
+henter, slår interesse sjeldnere ut enn den skal.
+
+**Kostnad.** 0 kall. Bare kursfilene i `data/raa/` er lest, og basen er ikke
+lest.
+
+**Metode.** De ti kursfilene `kurser-raa-*.json` fra 22.09 til 07.10 er tatt i
+datorekkefølge, to og to, så det blir ni par. For hvert par er siste rad i den
+første fila sammenlignet med raden for samme dato i den neste, for alle 15
+aksjene. Interesse er regnet for datoen med `beregn_signal` i
+`signalberegning.py`, slik appen gjør, én gang med serien fra den første fila og
+én gang med serien fra den neste, kuttet ved samme dato. Seriene er lest med
+`SnapshotLeser`. Det nederste paret (07.10 mot 08.10) kan først måles etter
+neste henting. Bare antall og forholdstall er ført her (regel 16).
+
+| Fila | Hentet (norsk tid) | Dato | Annet `volume` | Annen `close` | Annen `adjusted_close` | `volume` ny/gammel: minst / median / størst | Interesse skifter |
+|---|---|---|---:|---:|---:|---|---:|
+| `kurser-raa-2026-09-22.json` | 22.09 10:33 | 2026-09-21 | 1 av 15 | 0 | 0 | 0,9919 / 1,0000 / 1,0000 | 0 |
+| `kurser-raa-2026-09-23.json` | 23.09 19:04 | 2026-09-22 | 0 av 15 | 0 | 0 | 1,0000 / 1,0000 / 1,0000 | 0 |
+| `kurser-raa-2026-09-24.json` | 24.09 21:31 | 2026-09-24 | 1 av 15 | 0 | 0 | 1,0000 / 1,0000 / 1,0004 | 0 |
+| `kurser-raa-2026-09-29.json` | 29.09 22:27 | 2026-09-29 | 0 av 15 | 0 | 0 | 1,0000 / 1,0000 / 1,0000 | 0 |
+| `kurser-raa-2026-09-30.json` | 30.09 22:09 | 2026-09-30 | 1 av 15 | 0 | 0 | 1,0000 / 1,0000 / 1,0008 | 0 |
+| `kurser-raa-2026-10-01.json` | 01.10 23:13 | 2026-10-01 | 0 av 15 | 0 | 0 | 1,0000 / 1,0000 / 1,0000 | 0 |
+| `kurser-raa-2026-10-02.json` | 02.10 22:39 | 2026-10-02 | 3 av 15 | 0 | 0 | 1,0000 / 1,0000 / 1,0280 | 0 |
+| `kurser-raa-2026-10-05.json` | 05.10 22:09 | 2026-10-05 | 2 av 15 | 0 | 0 | 1,0000 / 1,0000 / 1,0693 | 0 |
+| `kurser-raa-2026-10-06.json` | 06.10 22:17 | 2026-10-06 | 0 av 15 | 0 | 0 | 1,0000 / 1,0000 / 1,0000 | 0 |
+
+De to første filene ble hentet før dagens rad var kommet. Siste rad er derfor
+dagen før, og den raden var en dag gammel da den ble hentet. Fra 24.09 er siste
+rad dagens.
+
+Volumet endret seg for disse, med forholdet ny/gammel:
+
+| Fila | Symbol | Dato | Ny/gammel |
+|---|---|---|---:|
+| `kurser-raa-2026-09-22.json` | MOWI | 2026-09-21 | 0,9919 |
+| `kurser-raa-2026-09-24.json` | AKRBP | 2026-09-24 | 1,0004 |
+| `kurser-raa-2026-09-30.json` | MOWI | 2026-09-30 | 1,0008 |
+| `kurser-raa-2026-10-02.json` | NHY | 2026-10-02 | 1,0233 |
+| `kurser-raa-2026-10-02.json` | MOWI | 2026-10-02 | 1,0280 |
+| `kurser-raa-2026-10-02.json` | ORK | 2026-10-02 | 1,0137 |
+| `kurser-raa-2026-10-05.json` | VAR | 2026-10-05 | 1,0693 |
+| `kurser-raa-2026-10-05.json` | ORK | 2026-10-05 | 1,0116 |
+
+**Interesse.** 0 av 135 rader skifter verdi på interesse mellom den første og
+den neste fila.
+
+For å se hvor nær terskelen dagene var, er volumforholdet regnet for alle 15 på
+hver av de fire dagene uten utslag, fra fila for dagen. Ingen er over 1,5×.
+Det største forholdet var 1,28 (NHY) 02.10, 1,30 (FRO) 05.10, 1,21 (GJF) 06.10
+og 1,40 (YAR) 07.10. Den største revisjonen i tabellen, 6,9 %, ville ikke løftet
+noen av disse over 1,5×.
+
+**Konklusjon.**
+
+- **`close` og `adjusted_close` er endelige når vi henter etter kl. 22.** Ingen
+  av de 90 radene fra de seks hentingene etter kl. 22 er endret dagen etter.
+- **`volume` er nesten endelig.** 6 av de 90 radene fikk et høyere volum dagen
+  etter, med 0,08 % til 6,9 %. Ingen fikk lavere volum. Det eneste fallet,
+  MOWI med 0,9919, var en rad som var en dag gammel da den ble hentet kl. 10:33
+  22.09.
+- **For interesse betyr det lite.** Ingen verdi på interesse skifter. De 0
+  utslagene på 60 aksjedager skyldes ikke et volum som ikke er ferdig: det
+  største forholdet på de fire dagene var 1,40, og terskelen er 1,5×.
+  Volumforholdet som lagres i `vurdering`, kan likevel være noen prosent for
+  lavt. En aksje med forhold mellom om lag 1,40 og 1,5 kan da slå ut dagen
+  etter, men ikke i den lagrede vurderingen.
+- **Ingen endring trengs nå, verken i koden eller i hentetidspunktet.** Det som
+  er åpent, er hvorfor fire dager på rad har gitt 0 utslag mot 14,9 % i §7.4.
+  Målingen her sier bare at årsaken ikke er hentetidspunktet. Paret 07.10 mot
+  08.10 måles etter neste henting.
+
+*Lagt til 2026-10-07 kl. 23:02:* er det rolige dager? Ja, men ikke uvanlig rolige.
+Interesse er regnet med `beregn_signal` i `signalberegning.py`, slik appen gjør,
+for hver dag i `kurser-raa-2026-10-07.json` der signalet kan regnes. Det første
+er dag 51 i serien, og det gir 200 dager fra 2025-12-17 til 2026-10-07 og 3 000
+aksjedager for de 15. Vinduet overlapper §7.4 (2025-12-01 til 2026-09-18), men er
+ikke det samme.
+
+| Periode | Dager | +1 | −1 | Utslag i alt |
+|---|---:|---:|---:|---:|
+| §7.4 (199 dager) | 199 | 8,0 % | 6,9 % | 14,9 % |
+| Hele fila | 200 | 7,6 % | 6,9 % | 14,5 % |
+| 2025-12 (fra 17.12) | 7 | 12,4 % | 3,8 % | 16,2 % |
+| 2026-01 | 21 | 14,3 % | 8,9 % | 23,2 % |
+| 2026-02 | 20 | 9,7 % | 5,0 % | 14,7 % |
+| 2026-03 | 22 | 13,6 % | 9,4 % | 23,0 % |
+| 2026-04 | 19 | 2,1 % | 5,3 % | 7,4 % |
+| 2026-05 | 18 | 4,8 % | 12,6 % | 17,4 % |
+| 2026-06 | 22 | 5,8 % | 7,0 % | 12,7 % |
+| 2026-07 | 23 | 3,5 % | 4,1 % | 7,5 % |
+| 2026-08 | 21 | 10,5 % | 5,7 % | 16,2 % |
+| 2026-09 | 22 | 4,2 % | 6,7 % | 10,9 % |
+| 2026-10 (til 07.10) | 5 | 0,0 % | 2,7 % | 2,7 % |
+| Siste 20 børsdager (10.09–07.10) | 20 | 3,0 % | 6,3 % | 9,3 % |
+
+**43 av de 200 dagene** (21,5 %) hadde 0 utslag på interesse for alle 15. Slike
+dager kom i 26 perioder: 15 på én dag, 7 på to dager, 2 på tre dager og 2 på fire
+dager. De lengste var 2026-04-13 til 2026-04-16 og 2026-10-02 til 2026-10-07, fire
+børsdager hver. Deretter kom 2026-03-24 til 2026-03-26 og 2026-07-03 til
+2026-07-07, tre børsdager hver.
+
+Svaret er at de fire dagene uten utslag er rolige dager, ikke en feil. Over hele
+fila slår interesse ut like ofte som i §7.4 (14,5 % mot 14,9 %), og andelen
+varierer mye fra måned til måned, fra 7,4 % i april til 23,2 % i januar. De siste
+20 børsdagene ligger lavt, på 9,3 %, og fire dager på rad med 0 utslag har
+skjedd før, i april. Utslagene samler seg på noen få dager: 18.09 hadde 13 av 15,
+mens 16 av de andre 19 dagene i det samme vinduet hadde 0 eller 1. Det trengs
+ingen endring i koden.
+
+---
+
+## 23. Fem til fra rådets liste, og alle 75 rangert (2026-10-07)
+
+**Metode.** Som i §21: ett `/api/eod`-kall per symbol, med `from=2026-07-02` og
+`to=2026-10-02`, samme vindu. Omsetning regnes som `volume × close` per
+handelsdag, og medianen tas over perioden. Målingen ble kjørt 07.10, etter den
+daglige hentingen, med de 5 kallene som var igjen.
+
+De fem er de neste etter markedsverdi på rådets liste 02.10, satt sammen fra
+stockanalysis.com, uten de 70 som alt er målt. Plassen på lista står i tabellen.
+B-aksjer er hoppet over, som ODFB i §21. Lista finnes ikke i repoet.
+Markedsverdien er bare brukt som en rekkefølge for målingen, og er ikke et tall
+appen bruker.
+
+**Kostnad.** 5 kall, tatt av dagskvoten 07.10. Før målingen sto `apiRequests` på
+15 for 2026-10-07, etter den daglige hentingen. Etter første kall sto den på 16
+med `extraLimit` uendret på 463. Etter målingen er `apiRequests` 20 og
+`extraLimit` fortsatt 463. Ingen kall feilet, og ingen symboler var tomme.
+
+**Rådata.** `data/raa/maaling-raa-2026-10-07.json`. Fila finnes **bare
+lokalt** og er ikke sporet i git. Bare tallene under er regnet ut og ført her.
+
+| Symbol | Selskap | Plass på lista | Handelsdager | Median omsetning | Over 32 MNOK | Over 25 MNOK | Plass av 75 |
+|---|---|---:|---:|---:|---|---|---:|
+| ELO | Elopak | 71 | 67 | 7,0 MNOK | Nei | Nei | 61 |
+| B2I | B2 Impact | 72 | 67 | 10,1 MNOK | Nei | Nei | 52 |
+| SNTIA | Sentia | 73 | 67 | 5,9 MNOK | Nei | Nei | 63 |
+| SATS | Sats | 74 | 67 | 11,6 MNOK | Nei | Nei | 51 |
+| HSHP | Himalaya Shipping | 75 | 67 | 22,1 MNOK | Nei | Nei | 43 |
+
+Alle fem har 67 handelsdager, fra 2026-07-02 til 2026-10-02. Ingen av de fem er
+over 25 MNOK. Med de fem er fortsatt 36 av de 75 over 32 MNOK, og 39 over
+25 MNOK.
+
+### Alle 75, rangert
+
+De 70 fra §21 og de 5 over, alle i samme vindu. Tallene for de 70 er regnet på
+nytt fra de lokale råfilene og er de samme som i §21, i samme rekkefølge. Ingen
+av de fem over er i OBX, fordi alle 25 i OBX er blant de 40 i §17 (se §18). Der
+to aksjer har samme avrundede median, står den med høyest uavrundet median
+først.
+
+| # | Symbol | Selskap | Median omsetning (MNOK) | Blant de 15 | I OBX | Fra |
+|---|---|---|---:|---|---|---|
+| 1 | EQNR | Equinor | 937,9 | Ja | Ja | §17 |
+| 2 | DNB | DNB Bank | 391,2 | Ja | Ja | §17 |
+| 3 | KOG | Kongsberg Gruppen | 363,6 | Ja | Ja | §17 |
+| 4 | AKRBP | Aker BP | 312,1 | Ja | Ja | §17 |
+| 5 | FRO | Frontline | 303,2 | Ja | Ja | §17 |
+| 6 | NHY | Norsk Hydro | 276,7 | Ja | Ja | §17 |
+| 7 | VAR | Vår Energi | 252,9 | Ja | Ja | §17 |
+| 8 | TEL | Telenor | 226,2 | Ja | Ja | §17 |
+| 9 | YAR | Yara International | 213,1 | Ja | Ja | §17 |
+| 10 | MOWI | Mowi | 187,5 | Ja | Ja | §17 |
+| 11 | AKER | Aker | 150,5 | Nei | Ja | §15 |
+| 12 | ORK | Orkla | 140,3 | Ja | Ja | §17 |
+| 13 | NOD | Nordic Semiconductor | 132,5 | Nei | Ja | §16 |
+| 14 | VEND | Vend Marketplaces | 108,7 | Nei | Ja | §16 |
+| 15 | STB | Storebrand | 87,8 | Nei | Ja | §15 |
+| 16 | SUBC | Subsea 7 | 83,7 | Nei | Ja | §15 |
+| 17 | SALM | SalMar | 83,3 | Ja | Ja | §17 |
+| 18 | BNOR | BlueNord | 78,4 | Nei | Ja | §16 |
+| 19 | BWLPG | BW LPG | 70,4 | Nei | Ja | §15 |
+| 20 | NAS | Norwegian Air Shuttle | 70,2 | Nei | Ja | §16 |
+| 21 | GJF | Gjensidige Forsikring | 60,5 | Ja | Ja | §17 |
+| 22 | KMAR | Kongsberg Maritime | 58,3 | Nei | Ja | §15 |
+| 23 | HAUTO | Höegh Autoliners | 57,0 | Nei | Ja | §16 |
+| 24 | KIT | Kitron | 56,5 | Nei | Nei | §18 |
+| 25 | AUTO | AutoStore | 52,1 | Nei | Nei | §16 |
+| 26 | TGS | TGS | 49,7 | Nei | Ja | §16 |
+| 27 | WAWI | Wallenius Wilhelmsen | 47,6 | Nei | Nei | §16 |
+| 28 | CMBTO | CMB.TECH | 47,6 | Nei | Nei | §16 |
+| 29 | OET | Okeanis Eco Tankers | 46,1 | Nei | Nei | §16 |
+| 30 | TOM | Tomra | 45,7 | Nei | Ja | §16 |
+| 31 | DNO | DNO | 40,5 | Ja | Nei | §17 |
+| 32 | BAKKA | Bakkafrost | 36,2 | Nei | Nei | §20 |
+| 33 | HAFNI | Hafnia | 35,0 | Nei | Nei | §16 |
+| 34 | DOFG | DOF Group | 34,0 | Nei | Nei | §16 |
+| 35 | MPCC | MPC Container Ships | 33,9 | Ja | Nei | §17 |
+| 36 | SCATC | Scatec | 33,2 | Nei | Nei | §18 |
+| 37 | SB1NO | SpareBank 1 Sør-Norge | 31,7 | Nei | Nei | §16 |
+| 38 | PROT | Protector Forsikring | 30,7 | Nei | Nei | §16 |
+| 39 | CAPT | Capital Tankers | 28,4 | Nei | Nei | §18 |
+| 40 | ELK | Elkem | 24,5 | Nei | Nei | §18 |
+| 41 | ODL | Odfjell Drilling | 23,9 | Nei | Nei | §18 |
+| 42 | NORBT | Norbit | 22,8 | Nei | Nei | §21 |
+| 43 | HSHP | Himalaya Shipping | 22,1 | Nei | Nei | §23 |
+| 44 | CADLR | Cadeler | 21,2 | Nei | Nei | §18 |
+| 45 | SBNOR | Sparebanken Norge | 19,1 | Nei | Nei | §16 |
+| 46 | MING | SpareBank 1 SMN | 17,8 | Nei | Nei | §16 |
+| 47 | LSG | Lerøy Seafood Group | 17,5 | Nei | Nei | §20 |
+| 48 | AKSO | Aker Solutions | 14,8 | Nei | Nei | §18 |
+| 49 | COSH | Constellation Oil Services | 14,3 | Nei | Nei | §18 |
+| 50 | EPR | Europris | 13,4 | Nei | Nei | §18 |
+| 51 | SATS | Sats | 11,6 | Nei | Nei | §23 |
+| 52 | B2I | B2 Impact | 10,1 | Nei | Nei | §23 |
+| 53 | VEI | Veidekke | 10,0 | Nei | Nei | §16 |
+| 54 | AUSS | Austevoll Seafood | 9,7 | Nei | Nei | §20 |
+| 55 | ATEA | Atea | 9,4 | Nei | Nei | §18 |
+| 56 | NONG | SpareBank 1 Nord-Norge | 9,2 | Nei | Nei | §18 |
+| 57 | BRG | Borregaard | 8,8 | Nei | Nei | §18 |
+| 58 | SNI | Stolt-Nielsen | 8,3 | Nei | Nei | §18 |
+| 59 | WWI | Wilh. Wilhelmsen Holding | 8,3 | Nei | Nei | §16 |
+| 60 | NORCO | Norconsult | 7,0 | Nei | Nei | §18 |
+| 61 | ELO | Elopak | 7,0 | Nei | Nei | §23 |
+| 62 | GSF | Grieg Seafood | 6,7 | Nei | Nei | §20 |
+| 63 | SNTIA | Sentia | 5,9 | Nei | Nei | §23 |
+| 64 | SPOL | SpareBank 1 Østlandet | 5,2 | Nei | Nei | §16 |
+| 65 | ODF | Odfjell SE | 5,2 | Nei | Nei | §21 |
+| 66 | SWON | SoftwareOne | 4,8 | Nei | Nei | §18 |
+| 67 | ENTRA | Entra | 4,8 | Nei | Nei | §18 |
+| 68 | BORR | Borr Drilling | 4,8 | Nei | Nei | §18 |
+| 69 | AFG | AF Gruppen | 4,3 | Nei | Nei | §18 |
+| 70 | BONHR | Bonheur | 3,6 | Nei | Nei | §21 |
+| 71 | SOMA | Solstad Maritime | 3,5 | Nei | Nei | §18 |
+| 72 | BWE | BW Energy | 3,4 | Nei | Nei | §18 |
+| 73 | SALME | Salmon Evolution | 2,5 | Nei | Nei | §20 |
+| 74 | AKBM | Aker BioMarine | 0,9 | Nei | Nei | §21 |
+| 75 | AFK | Arendals Fossekompani | 0,6 | Nei | Nei | §21 |
 
 Målingen endrer ikke universet. Parametrene i signalet er låst og målt på de
 15 (AD-13).

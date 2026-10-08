@@ -80,6 +80,11 @@ krever tre konkrete svar per kandidat:
 - **FR-103** — Retning vises i tre redundante kanaler
 - **FR-104** — Hovedindeksen i markedsoversikten *(ny 2026-10-01)*
 - **FR-105** — Søylene under hovedindeksen *(ny 2026-10-01)*
+- **FR-106** — Børsometeret *(ny 2026-10-08)*
+- **FR-107** — Endret signalstyrke siden forrige børsdag *(ny 2026-10-08)*
+- **FR-108** — Filter på signalet *(ny 2026-10-08)*
+- **FR-109** — Hjelpen på sidene *(ny 2026-10-08)*
+- **FR-110** — Innstillinger *(ny 2026-10-08)*
 - **FR-407** — Merking av utbyttedager *(ID beholdt fra da kravet lå i datahentingen)*
 
 **4.2 Aksjedetaljen**
@@ -89,6 +94,8 @@ krever tre konkrete svar per kandidat:
 - **FR-203** — Øvrig innhold
 - **FR-204** — Aksjedetaljen for en aksje uten gyldig signal
 - **FR-205** — Se nærmere *(lagt til 2026-10-03)*
+- **FR-206** — Signaldager i kursgrafen *(ny 2026-10-08)*
+- **FR-207** — Kommende eks.dato i kursgrafen *(ny 2026-10-08)*
 
 **4.3 Kommende finansielle hendelser**
 
@@ -108,6 +115,9 @@ krever tre konkrete svar per kandidat:
 - **FR-409** — De tre tilstandene skal være skillbare i lageret *(ny 22.09. Rettet 2026-09-24: her sto «vises». Kravet gjelder lageret, ikke en skjerm)*
 - **FR-410** — Hovedindeksen hentes i samme kjøring *(ny 2026-10-01)*
 - **FR-411** — Demoversjonen har oppdiktede tall i en egen base *(ny 2026-10-03)*
+- **FR-412** — Lista over aksjer *(ny 2026-10-08)*
+- **FR-413** — Måling av omsetning *(ny 2026-10-08)*
+- **FR-414** — Eks.datoer ført for hånd *(ny 2026-10-08)*
 
 **4.5 Meldingsfilter og deduplisering**
 
@@ -150,6 +160,10 @@ det er 40 FR-er.
 
 *Lagt til 2026-10-05:* FR-608 kom til med valget av KI-tjeneste (gruppens
 beslutning 04.10), så det er 41 FR-er.
+
+*Lagt til 2026-10-08:* FR-106–FR-110, FR-206, FR-207 og FR-412–FR-414 kom til
+med endringsforslaget 08.10 (Marians beslutning), så det er 51 FR-er. FR-101,
+FR-102, FR-201, FR-202, FR-407, FR-409, FR-411 og NFR-01 har fått tillegg.
 
 ### NonFunctional Requirements
 
@@ -275,10 +289,10 @@ steget er ført i PRD-memloggen 22.09, ikke 20.09 som den senere ble omtalt som.
 
 | FR | Levert i |
 |---|---|
-| FR-101, FR-102 | `markedsoversikt.py`, commit `706720f` |
+| FR-101, FR-102 | `markedsoversikt.py`, commit `706720f`. *Lagt til 2026-10-07:* endringen i NOK i FR-101 er Epic 8, story 8.5 (Marians beslutning kl. 23:11). *Lagt til 2026-10-08:* lista som er aktiv i FR-101 er Epic 2, story 2.11, periodevalget i FR-101 er Epic 8, story 8.17, og sorteringen ved klikk i FR-102 er Epic 8, story 8.15 (endringsforslaget 08.10). |
 | FR-103 | `markedsoversikt.py` + `index.html`. **`706720f` inneholdt bruddet** — den hadde `Retningsvisning("Opp", "↑", "opp")`, mens kravet krever modellens egen streng. Oppfylt av den senere commiten som fjernet oversettelsen |
 | FR-201 | `aksjedetalj.py` `076bb12`, `graf.py` `b6ba9d8` |
-| FR-202, FR-204 | Samme, **pluss `app.py` og `src/templates/`** — tegnforklaring, 200-svar og «kunne ikke regnes»-beskjed ligger der |
+| FR-202, FR-204 | Samme, **pluss `app.py` og `src/templates/`** — tegnforklaring, 200-svar og «kunne ikke regnes»-beskjed ligger der. *Lagt til 2026-10-08:* periodevalget i FR-201 er Epic 8, story 8.16, og sjekk 2 og 3 i grafen (FR-202, tillegget) er Epic 8, story 8.7 (endringsforslaget 08.10) |
 | FR-701 – FR-705 | `signalberegning.py`, commit `01af1a5` |
 | FR-706 | `aksjedetalj.py` (`076bb12`) + `aksje.html`. **Ikke `signalberegning.py`** — kravet gjelder aksjedetaljen |
 
@@ -292,7 +306,7 @@ kontrollen 22.09 fant det.
 
 | FR | Epic |
 |---|---|
-| FR-203 | **Epic 5, 6 og 7 — delt.** «Øvrig innhold» er meldinger *pluss* KI-forklaring *pluss* hendelser. `aksjedetalj.py` sier selv at alle tre mangler med vilje. Å mappe den til én epic ville vært feil |
+| FR-203 | **Epic 5, 6 og 7 — delt.** «Øvrig innhold» er meldinger *pluss* KI-forklaring *pluss* hendelser. `aksjedetalj.py` sier selv at alle tre mangler med vilje. Å mappe den til én epic ville vært feil. *Lagt til 2026-10-07:* høy og lav i FR-203 er Epic 2, story 2.10 (lagringen), og Epic 8, story 8.5 (visningen), etter Marians beslutning kl. 23:11. |
 | FR-301, FR-302, FR-303 | Epic 7 🔒 |
 | FR-401, FR-402, FR-403 | Epic 2 |
 | FR-404, FR-405 | Epic 6 🔒 |
@@ -306,6 +320,8 @@ kontrollen 22.09 fant det.
 | FR-607 | Epic 10 *(lagt til 2026-10-03)* |
 | FR-411 | Epic 3 *(lagt til 2026-10-03)* |
 | FR-608 | Epic 10 *(lagt til 2026-10-05)* |
+| FR-106, FR-107, FR-108, FR-109, FR-110, FR-206, FR-207 | Epic 8 *(lagt til 2026-10-08)*: 8.6, 8.12, 8.11, 8.9 og 8.13, 8.10, 8.8 og 8.18 |
+| FR-412, FR-413, FR-414 | Epic 2 *(lagt til 2026-10-08)*: 2.11 og 2.12, 2.13, 2.14. De ferdige listene i FR-412 er Epic 8, story 8.11 |
 
 *Rettet 2026-10-03 (kontrollen 26.09, E7):* tabellen viser epicen der kravet først bygges. FR-401 hører også til Epic 3, der en story oppfyller tom-tilstanden, og FR-408 også til Epic 2, der story 2.5 skriver vurderingen i hentingen.
 
@@ -319,6 +335,10 @@ kontrollen 22.09 fant det.
 *Lagt til 2026-10-03:* med FR-411 er det 12 + 28 = 40.
 
 *Lagt til 2026-10-05:* med FR-608 er det 12 + 29 = 41.
+
+*Lagt til 2026-10-08:* med FR-106–FR-110, FR-206, FR-207 og FR-412–FR-414 er det
+12 + 39 = 51. Tillegget til FR-407 (justeringsdagene i grafen) er Epic 8, story
+8.14, og tillegget til FR-409 («ikke i lista») er Epic 2, story 2.11.
 
 ### NFR Coverage Map
 
@@ -373,7 +393,23 @@ Epic 10.1 ──> Epic 10.2 (grunnlaget)   *(lagt til 2026-10-05)*
 Epic 3.4 + 10.2 + 10.3 ──> Epic 3.4b (KI-tekstene i demoen)   *(lagt til 2026-10-05)*
 Epic 2.3 + 3.4 ──> Epic 2.3b (nye forsøk med kallene som er igjen)   *(lagt til 2026-10-05)*
 Epic 8.0 ──> 8.0b + 8.0c ──> Epic 8.1   *(lagt til 2026-10-05)*
+Epic 2.10 (høy og lav lagres) ──> Epic 8.5 (kroner, høy og lav)   *(lagt til 2026-10-07)*
+Epic 2.3 + 2.8 ──> 2.11 (lista i basen) ──> 2.12 (velge og bytte) ──> 8.11 (ferdige lister)   *(lagt til 2026-10-08)*
+Epic 2.3 + 2.8 ──> 2.13 (måling av omsetning) ──> 8.11   *(lagt til 2026-10-08)*
+Epic 2.3 ──> 2.14 (eks.datoer for hånd) ──> 8.18 (eks.dato i grafen) <── 2.6   *(lagt til 2026-10-08)*
+Epic 2.9b ──> 8.6 (børsometeret)   *(lagt til 2026-10-08)*
+Epic 8.16 (startdagen) ──> 8.17 (periodene i oversikten) <── 8.3 + 8.6   *(lagt til 2026-10-08)*
+Epic 2.7 ──> 8.8 (signaldager) og 8.12 (endret signalstyrke) <── 8.3   *(lagt til 2026-10-08)*
+Epic 2.6 ──> 8.14 (justeringsdager)   *(lagt til 2026-10-08)*
+Epic 8.0b ──> 8.9 (omvisningen) og 8.13 (Lær noe nytt)   *(lagt til 2026-10-08)*
+Epic 8.0b + 8.3 + 10.3 ──> 8.10 (Innstillinger)   *(lagt til 2026-10-08)*
 ```
+
+*Lagt til 2026-10-08:* 8.6 sier i forslaget at den avhenger av 8.17 for
+periodene, og 8.17 at den avhenger av 8.6. Grafen følger rekkefølgen Marian
+godkjente: 8.6 først, med siste børsdag, og periodene i børsometeret kommer med
+8.17. 8.7, 8.15 og 8.16 har ingen åpne avhengigheter. 8.9 bygges etter sidene den
+viser.
 
 *Lagt til 2026-10-05:* 10.2 skriver til `KILogg` (FR-604), og nettsperren må
 dekke hele testkjøringen før noe kan kalle Ollama (`AD-8`). Derfor kommer 4.0,
@@ -436,6 +472,22 @@ papirarbeid og en port, og de trengs i både plan A og plan B.
 
 Ingen av 1.9, 2.7 og 9.5 utvider omfanget: 1.9 er en skjemaendring før basen har data, 2.7 svarer på FR-408s eget spørsmål (punkt 20), og 9.5 er et suksessmål i PRD §7. «KI-bidrag i drift» krever minst én ukes drift før demonstrasjonen, som vi har anslått til uke 45, så KI-teksten må lages hver dag fra rundt 26.10.
 
+**Prioritering, endret 2026-10-08, Marians beslutning** (endringsforslaget 08.10, [`sprint-change-proposal-2026-10-08.md`](sprint-change-proposal-2026-10-08.md), godkjent kl. 08:04 med endringene kl. 08:06): femten idéer er «Fast i v1», og 17 storyer kom til. «Ingen utvidelse av omfanget» fra 23.09 gjelder ikke dem. Rekkefølgen:
+1. 2.3 bygges ferdig først, med kontrollpunktet om lista som parameter.
+2. 3.1–3.4 før README-prøven 13.–16.10, med demoen i punkt 4.4 i forslaget.
+3. 2.3b, 8.0b og 8.0c, som besluttet 05.10 og 06.10.
+4. 4.0, 4.2, 4.3, 10.1 og 10.2, så KI-teksten lages hver dag fra rundt 26.10.
+5. 10.3 og 3.4b rett etter 10.2, før de nye storyene, fordi KI-teksten må vises og være med i demoen for suksessmålet «KI-forklaringen».
+6. De nye som bare leser det vi har, og er små: 8.15, 8.16 og 8.7.
+7. Det som trenger historikken: 2.7, så 8.8 og 8.12. 2.6, så 8.14, og 2.14 og 8.18.
+8. 10.6 og 10.7.
+9. 2.8, 2.9, 2.9b, så 8.6 og 8.17.
+10. 8.3, så 8.10, 8.9 og 8.13.
+11. Lista: 2.11, 2.12, 2.13 og 8.11. 2.13 kan tas tidligere, fordi den ikke endrer lista.
+12. 8.1, brukertesten for «Brukerutfall», har fast plass før uke 45 og før 8.2. 8.2, 8.4, 8.5, 2.10, 2.4 og 9.2 der de passer.
+
+Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» avgjøres i planen for 2.12, og navnet på FR-407 og 2.6 i planen for 2.6.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -457,7 +509,7 @@ snapshot utenom porten.
 
 Brukeren kan hente nye kurser bevisst, og kan ikke ved uhell brenne dagskvoten.
 
-**FR-er:** FR-401, FR-402, FR-403, FR-407 · **NFR-01, NFR-02** · **AD-er:** 2, 10, 17, 20 · *utvidet 2026-09-28 med 2.1b og 2.5:* 4, 5, 6, 7, 11, 16, 21 · *utvidet 2026-10-01 med 2.8, 2.9 og 2.9b:* FR-104, FR-105, FR-410, AD-15
+**FR-er:** FR-401, FR-402, FR-403, FR-407 · **NFR-01, NFR-02** · **AD-er:** 2, 10, 17, 20 · *utvidet 2026-09-28 med 2.1b og 2.5:* 4, 5, 6, 7, 11, 16, 21 · *utvidet 2026-10-01 med 2.8, 2.9 og 2.9b:* FR-104, FR-105, FR-410, AD-15 · *utvidet 2026-10-07 med 2.10:* del av FR-203 · *utvidet 2026-10-08 med 2.11–2.14, endringsforslaget 08.10:* FR-412, FR-413, FR-414, tillegget til FR-409, tillegget til NFR-01, `AD-3`, `AD-13`, `AD-21` (endret)
 
 De to kjente `AD-20`-feilene rettes her: `fetch_prices.main` som blander lokal
 dato og UTC, og `meldinger._minutt` som kutter på tegn 16. FR-407 ligger her
@@ -561,6 +613,8 @@ vurdert, ikke bare arvet fra kravene.
 
 **FR-er:** ingen nye. Prøver FR-101–103, FR-201–204 og FR-706 fra utsiden ·
 **NFR-05, NFR-06** · Oppfyller suksessmålet «Brukerutfall» (PRD §7)
+*Lagt til 2026-10-07, Marians beslutning kl. 23:11:* story 8.5 oppfyller endringen i NOK i FR-101 og del av FR-203 (høy og lav i aksjedetaljen).
+*Lagt til 2026-10-08, endringsforslaget 08.10, godkjent av Marian kl. 08:04:* story 8.6–8.18 oppfyller FR-106, FR-107, FR-108, FR-109, FR-110, FR-206, FR-207 og tilleggene til FR-101, FR-102, FR-201, FR-202 og FR-407, og ferdige lister i FR-412. «FR-er: ingen nye» over gjelder ikke lenger. Epic 8 er den største epicen, med 21 storyer.
 
 Egen epic og ikke en del av Epic 3: Epic 3 har ett utfall — at løsningen kan
 bygges og kjøres av andre — og brukertesten skal ikke vente på Dockerfilen.
@@ -577,7 +631,7 @@ må vise hvordan KI ble brukt, og hvordan studentene har kvalitetssikret koden»
 
 # Stories
 
-70 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
+72 stories. Hver bærer hvilket krav den oppfyller, hvilke `AD`-er som begrenser
 den, hva kontrollen faktisk ser etter, og om den kan gjøres ferdig i én økt.
 *Rettet 2026-09-26:* her sto 42. Tallet er telt fra overskriftene «### Story».
 *Rettet 2026-09-27:* her sto 46. Story 9.0 kom til 27.09.
@@ -586,6 +640,10 @@ den, hva kontrollen faktisk ser etter, og om den kan gjøres ferdig i én økt.
 *Rettet 2026-10-05:* her sto «55 stories». Siden 29.09 har 2.2b, 2.3b, 2.8, 2.9,
 2.9b, 3.4, 3.4b, 8.0b, 8.0c, 8.3, 8.4, 10.6, 10.7 og 10.8 kommet til, og ingen er fjernet.
 *Rettet 2026-10-06:* her sto «69 stories». Story 9.6 kom til 06.10.
+*Rettet 2026-10-07:* her sto «70 stories». Story 2.10 og 8.5 kom til 07.10.
+*Rettet 2026-10-08:* her sto «72 stories». Story 2.11–2.14 og 8.6–8.18 kom til
+08.10 med endringsforslaget (`sprint-change-proposal-2026-10-08.md`), og det er
+89. Forslaget sa først 87, før rad 12 ga 2.14 og 8.18.
 
 **«Ville feilet hvis» er kontrollen.** Resten er beskrivelse. En story uten den
 linjen er ikke ferdig spesifisert.
@@ -1366,6 +1424,10 @@ Oppgaveplanlegging beskrives i README (regel 19).
 - **Rekkefølgen før første kall:** klokka, tidskontrollen, basen, filvakten, nøkkelen og kvoten.
 - **Regelen om at grener bare bruker testbaser** føres i `CLAUDE.md` når 2.3 bygges, ikke i README-en.
 
+*Lagt til 2026-10-08, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 6 og 10), godkjent av Marian kl. 08:04:*
+- **Kontroll:** kvotesjekken tar antallet aksjer i lista som parameter og regner ikke med et fast 15. Testen prøver den med en kortere liste enn 15 (føringen 30.09 under `AD-21`). Med 2.8 er det antallet pluss 1. Da trenger 2.11 bare å gi den et annet tall.
+- *Avgjort 2026-10-08 kl. 08:06, Marians beslutning:* svar 1 over står. Bonuskvoten brukes bare til å fullføre kveldens henting, aldri til 2.3b, målingen i 2.13 eller noe annet (NFR-01).
+
 **Én økt:** ja.
 
 ### Story 2.3b: Kallene som er igjen, brukes på nye forsøk
@@ -1385,6 +1447,8 @@ Som **gruppe med 20 kall i døgnet**, vil vi at kallene som er igjen etter kveld
 - **Ville feilet hvis:** et nytt forsøk brukte bonuskvoten eller hentet en aksje som har dagens kurs
 
 Med 2.8 er det 4 kall igjen, ikke 5.
+
+*Lagt til 2026-10-08, endringsforslaget 08.10:* kallene som er igjen, er 20 minus antallet aksjer i lista og indeksen, ikke et fast 4. Med 18 aksjer og indeksen er det 1. Testen prøver en liste med 18. Bonuskvoten brukes fortsatt aldri her (Marians beslutning kl. 08:06).
 
 **Avhenger av:** 2.3, og bygges etter 3.4. **Én økt:** avgjøres i planen.
 
@@ -1534,6 +1598,126 @@ med en gang hvilke som trakk opp og ned.
 - **Ville feilet hvis:** søylene trengte et nytt kall eller en ny tabell. Endringen er den i FR-101, og bransjen står i `AKSJEUNIVERS`
 
 **Avhenger av:** 2.9. **Én økt:** ja.
+
+### Story 2.10: Høy og lav lagres med kursene
+
+*Lagt til 2026-10-07, Marians beslutning kl. 23:11.*
+
+Som **bruker**, vil jeg at dagens høyeste og laveste kurs finnes i basen, så
+aksjedetaljen kan vise dem uten et nytt kall.
+
+**Oppfyller:** FR-203 (tillegget 2026-10-07) · **Begrenses av:** `AD-5`, `AD-6`, `AD-16`, `AD-19`, NFR-01, NFR-08
+
+**Kontroll — hva testen ser etter:**
+- Adapteren i `eodhd.py`, `Kursrad` og lageret tar med `high` og `low` fra svaret, og en ny migrasjon legger dem til (`AD-16`)
+- Ingen nye kall. Øyeblikksbildene har feltene alt (`AD-6`), og neste henting fyller dem for hele året, fordi serien byttes ut (`AD-5`)
+- En rad uten `high` eller `low` lagres uten dem
+- Grenen bruker bare testbaser og rører aldri `data/db/ose.db`
+- **Ville feilet hvis:** en rad uten `high` eller `low` stoppet hentingen
+
+**Avhenger av:** ingen åpne. **Én økt:** ja.
+
+### Story 2.11: Lista leses fra basen
+
+*Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 6 og 10).*
+
+Som **gruppe**, vil vi at hentingen og sidene leser lista fra basen, så den kan
+byttes uten at koden endres.
+
+**Oppfyller:** FR-412, FR-409 (tillegget), NFR-01 (tillegget) · **Begrenses av:**
+`AD-3`, `AD-7`, `AD-10`, `AD-16`, `AD-21` (endret, punkt 4.3)
+
+**Kontroll — hva testen ser etter:**
+- `aksje` får når aksjen kom inn i lista og når den gikk ut, med ny migrasjon
+  (`AD-16`). De 15 som står i dag, får datoen for den første raden sin
+- Hentekommandoen henter aksjene som er i lista, og kvotesjekken fra 2.3 regner
+  med antallet pluss indeksen
+- En aksje som er tatt ut, hentes ikke, og vurderingene og kursene står (`AD-7`,
+  `AD-21`). Aksjedetaljen viser den fortsatt med historikken
+- En dag etter at aksjen gikk ut, gir «ikke i lista» i `tilstand`, ikke «ikke
+  kjørt»
+- `AKSJEUNIVERS` er lista appen starter med, og testen som holder `aksje` lik
+  `AKSJEUNIVERS`, byttes mot en som holder de 15 i første migrasjon like
+- Grenen bruker bare testbaser og rører aldri `data/db/ose.db`
+- **Ville feilet hvis:** en aksje som ble tatt ut, mistet vurderingene sine, eller
+  dagene etter ble talt som dager vi ikke kjørte
+
+**Avhenger av:** 2.3, og 2.8 for indekskallet. **Én økt:** avgjøres i planen.
+
+### Story 2.12: Velge og bytte aksjer
+
+*Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 6 og 10).*
+
+Som **bruker**, vil jeg velge opptil 18 aksjer selv og bytte underveis, så appen
+følger aksjene jeg bryr meg om.
+
+**Oppfyller:** FR-412, rad 6 og 10 · **Begrenses av:** NFR-01, NFR-06, `AD-3`,
+`AD-10`, `AD-13`, `AD-21`
+
+**Kontroll — hva testen ser etter:**
+- Siden viser «x av 18 aksjer», og en nittende avvises med en forklaring
+- Webserveren skriver bare ønsket om endring, i en egen tabell. Hentekommandoen
+  tar ønsket i bruk ved neste henting og er fortsatt eneste skriver av kurser og
+  vurderinger (`AD-3`). Webserveren henter aldri (`AD-10`)
+- En ticker som ikke gir rader ved hentingen, tas ikke inn, og utskriften sier det
+- Står omsetningen målt fra før (2.13), vises den før brukeren velger. Er den
+  under det de 15 ble målt på, merkes aksjen «Utenfor målingen» i grått overalt
+- Ingen forslag fra KI om hvilke aksjer man bør følge (NFR-06)
+- **Ville feilet hvis:** et valg i nettsiden startet et API-kall, eller lista
+  kunne få 19 aksjer
+
+**Avhenger av:** 2.11. **Én økt:** avgjøres i planen.
+
+### Story 2.13: Kommandoen som måler omsetning
+
+*Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 13).*
+
+Som **gruppe**, vil vi måle omsetningen for nye aksjer med kallene som er til
+overs, så lista kan vise den før noen velger en aksje.
+
+**Oppfyller:** FR-413 · **Begrenses av:** NFR-01, `AD-2`, `AD-6`, `AD-10`,
+`AD-16`
+
+**Kontroll — hva testen ser etter:**
+- Tallet og datoen lagres i en egen tabell, med ny migrasjon (`AD-16`). Rådata
+  skrives til `data/raa/` (`AD-6`) og committes aldri (regel 10)
+- Kommandoen nekter når dagens henting ikke er gjort eller har feilet, og bruker
+  da 0 kall
+- Den leser `/api/user` før første kall, sier hvor mange kall den vil bruke, og
+  lar 2 stå igjen, med mindre alle er bedt om
+- Den bruker aldri bonuskvoten: står `extraLimit` lavere etter første kall,
+  stopper den
+- OBX først, så resten, og en aksje målt de siste 3 månedene måles ikke på nytt
+- Kommandoen er en del av hentekommandoen, som et eget valg, så Dockerfilen i
+  3.1 fortsatt har to innganger. Planen avgjør navnet (`allow_abbrev=False`)
+- **Ville feilet hvis:** målingen kunne startes fra nettsiden, eller tok et kall
+  fra bonuskvoten
+
+**Avhenger av:** 2.3 og 2.8. **Én økt:** ja.
+
+### Story 2.14: Eks.datoer føres inn for hånd
+
+*Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 12, Marians beslutning kl. 08:06).*
+
+Som **gruppe**, vil vi føre inn kommende eks.datoer fra selskapenes egne sider,
+så appen kan vise dem uten en kilde vi ikke har.
+
+**Oppfyller:** FR-414 · **Begrenses av:** NFR-08, `AD-3`, `AD-6`, `AD-10`,
+`AD-16`, regel 16
+
+**Kontroll — hva testen ser etter:**
+- En egen tabell, med ny migrasjon (`AD-16`): symbol, eks.dato, datoen den ble
+  sjekket og hvor den ble lest
+- Kommandoen tar inn én dato for ett symbol, og nekter et symbol der vilkårene
+  for nettstedet ikke er ført i `docs/kilder-og-rettigheter.md`
+- Kommandoen gjør ingen nettkall, og webserveren skriver ikke tabellen
+- Ingen eks.dato står i en sporet fil (regel 16)
+- En ny sjekk av samme dato oppdaterer datoen den ble sjekket, og en flyttet dato
+  erstatter den gamle
+- **Ville feilet hvis:** programmet hentet en side fra et selskap, eller en dato
+  kunne føres inn uten dato for sjekken
+
+**Avhenger av:** 2.3. Vilkårene leses før første dato. **Én økt:** ja.
 
 ---
 
@@ -1730,6 +1914,12 @@ avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 *Lagt til 2026-10-06, etter tilbakemeldingen på briefen:* punkt 3 under «Neste steg for gruppen» i [`tilbakemelding-product-brief.md`](tilbakemelding-product-brief.md).
 - README-oppskriften er fulgt fra start til slutt på en maskin som ikke har hatt repoet eller imaget før, uten nøkler. Dato, maskin og det som ikke stemte, føres i `docs/kvalitetssikring.md`. Prøven gjentas før innleveringen
 - **Ville feilet hvis:** README-en bare var prøvd på maskinen den ble skrevet på
+
+*Lagt til 2026-10-08, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, punkt 4.4), godkjent av Marian kl. 08:04:* alt i v1 skal kunne vises i demoen (tilbakemeldingen 06.10). Kontrollpunktene gjelder det som er bygget når 3.4 bygges, og en senere story legger til sitt eget, som avsnittet over sier.
+- Demobasen har minst én aksje som er tatt ut av lista, én merket «Utenfor målingen», noen målte omsetninger, oppdiktede eks.datoer merket «Eksempeltall», og vurderinger nok til at signaldagene, merket for endret signalstyrke og «Velg dag» har noe å vise
+- Lista i demoen kan byttes, og siden viser «x av 18», men det hentes aldri
+- Når 2.11 er bygget, byttes testen som holder `aksje` lik `AKSJEUNIVERS`, mot den i 2.11
+- **Ville feilet hvis:** en funksjon i v1 bare kunne vises med ekte data og nøkkel
 
 ### Story 3.4b: KI-tekstene i demoen
 
@@ -1989,6 +2179,10 @@ historikken.
 - **Ville feilet hvis:** grunnlaget hadde en prosent eller et forholdstall. Da
   sendes mer enn våre egne resultater, mot beslutningen 04.10
 
+*Lagt til 2026-10-08, endringsforslaget 08.10 (punkt 4.5), godkjent av Marian kl. 08:04:*
+- En aksje utenfor de 15 (FR-412) sendes med de samme utledede verdiene som de andre, og med merket «Utenfor målingen»
+- **Ville feilet hvis:** KI-teksten for en aksje utenfor målingen ikke kunne si at grensene ikke er målt på den
+
 **Én økt:** ja. Kan bygges før 28.09, fordi den ikke sender noe.
 
 ### Story 10.2: Teksten lages i hentekommandoen og lagres i `KILogg`
@@ -2193,6 +2387,10 @@ per bransje gjelder ikke lenger. Om uka skal med som antall, avgjøres når
 storyen bygges. Spørsmålet til EODHD er avgjort 04.10: vi spør ikke.
 - Samme kontroll som i 10.2 (FR-603), også for tall skrevet med ord
 - En test krever at det ikke finnes desimaltall i grunnlaget
+
+*Lagt til 2026-10-08, endringsforslaget 08.10 (punkt 4.5), godkjent av Marian kl. 08:04:*
+- Teksten gjelder lista som er aktiv (FR-412), og tallet på aksjer telles. Testen prøver en liste med færre enn 15 og en med 18
+- **Ville feilet hvis:** grunnlaget sa «av 15» når lista hadde et annet antall
 
 ### Story 10.7: Egen nøkkel til Gemini, Anthropic og OpenAI
 
@@ -2584,6 +2782,305 @@ vurderingen. Tekstene ligger i hjelpefila fra 8.0b.
 **Én økt:** ja.
 
 *Lagt til 2026-10-06, Marians beslutning kl. 20:42:* «Står det noe i børsmeldingene?» nevner NewsWeb uten lenke og viser til lenken til selskapets investorside (10.5). Euronexts vilkår forbyr lenker uten tillatelse (`docs/kilder-og-rettigheter.md`, «Lenker til Euronexts nettsteder (lest 2026-10-06)»).
+
+### Story 8.5: Endring i kroner, og høy og lav i aksjedetaljen
+
+*Lagt til 2026-10-07, Marians beslutning kl. 23:11.*
+
+Som **bruker**, vil jeg se hvor mange kroner aksjen endret seg, og hvor høyt og
+lavt den gikk, så jeg forstår dagen uten å regne selv.
+
+**Oppfyller:** FR-101 og FR-203 (tilleggene 2026-10-07) · **Begrenses av:** FR-102, FR-201, FR-407, `AD-10`, NFR-08
+
+**Kontroll — hva testen ser etter:**
+- Markedsoversikten viser kronene på en mindre linje under prosenten, i samme celle. Det er fortsatt fem kolonner (FR-101), og sorteringen er fortsatt på prosent (FR-102)
+- Aksjedetaljen viser kronene ved prosenten, og høy og lav for siste børsdag ved sluttkursen. Høy og lav tegnes ikke i grafen (FR-201)
+- Kronene regnes av `adjusted_close` for de to siste børsdagene, som prosenten, så de to peker alltid samme vei. En utbyttedag merkes etter FR-407
+- Høy og lav vises bare når begge finnes og lav ≤ sluttkurs ≤ høy, ellers «–» (NFR-08)
+- Før høy og lav vises, sammenlignes noen dager for hånd med Oslo Børs' egen side, lest av en av oss (`malinger.md` §6, raden «Sluttkurs, høy og lav mot Oslo Børs»). Siden hentes aldri av programmet
+- **Ville feilet hvis:** kronene ble regnet av `close` og pekte en annen vei enn prosenten på en utbyttedag, eller høy og lav ble vist når lav ≤ sluttkurs ≤ høy ikke holder
+
+**Avhenger av:** 2.10 for høy og lav. **Én økt:** ja.
+
+### Story 8.6: Børsometeret
+
+*Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 1).*
+
+Som **bruker**, vil jeg se hvilke sektorer som trakk opp og ned, så jeg ser om
+dagen gjaldt hele børsen eller noen bransjer.
+
+**Oppfyller:** FR-106 · **Begrenses av:** FR-101, FR-105, FR-412, `AD-10`,
+`AD-21`, NFR-06, NFR-08
+
+**Kontroll — hva testen ser etter:**
+- Én verdi per sektor i lista som er aktiv, regnet som snittet av endringen i
+  FR-101 for aksjene i sektoren
+- En sektor med én aksje merkes «1 aksje»
+- Antallet sektorer og aksjer telles fra lista og prøves med en kortere liste
+  enn 15 (føringen 30.09 under AD-21)
+- Gult bare ved 3 av 3 på siste børsdag (`designregler.md` §3)
+- Ingen nye kall og ingen ny tabell
+- **Ville feilet hvis:** en sektor med én aksje så ut som et snitt av flere, eller
+  antallet sektorer var fast
+
+**Avhenger av:** 2.9b for søylene den står ved, og 8.17 for periodene. **Én økt:** ja.
+
+### Story 8.7: Sjekk 2 og 3 i kursgrafen
+
+*Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 2).*
+
+Som **bruker**, vil jeg se volumet og bevegelsen i grafen, så jeg ser hvorfor
+sjekk 2 og 3 slo ut, slik MA50-linjen viser sjekk 1.
+
+**Oppfyller:** FR-202 (tillegget) · **Begrenses av:** FR-201, FR-706, `AD-1`,
+`AD-13`, NFR-08
+
+**Kontroll — hva testen ser etter:**
+- Volumsøylene står under kursgrafen, i samme SVG (`graf.py`)
+- Streken for medianen og streken for grensen regnes med samme funksjon og
+  samme vindu som sjekk 3. En test bytter vinduet i `Parametre` og ser at
+  streken følger med
+- Båndet for sjekk 2 bruker standardavviket fra sjekk 2, på `adjusted_close`
+  (FR-201)
+- Den siste dagen i grafen gir samme utslag som sjekkene i aksjedetaljen
+- Mangler volumet eller medianen er 0, tegnes ikke streken, og grafen sier det
+  (NFR-08)
+- **Ville feilet hvis:** streken var en median over et annet vindu enn sjekk 3.
+  Da forklarer grafen en annen regel enn den som ble brukt
+
+**Avhenger av:** ingen åpne. **Én økt:** ja.
+
+### Story 8.8: Signaldager i kursgrafen
+
+*Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 3).*
+
+Som **bruker**, vil jeg se hvilke dager aksjen skilte seg ut, så jeg ser hvordan
+signalet har oppført seg over tid.
+
+**Oppfyller:** FR-206 · **Begrenses av:** FR-408, FR-409, `AD-7`, `AD-20`, NFR-06
+
+**Kontroll — hva testen ser etter:**
+- Markeringene leses med lesemetoden for en periode fra 2.7
+- Grafen sier hvilken dato markeringene starter, og før den datoen er det ingen
+  markeringer
+- En dag med grunn, en dag uten rad og en dag som ikke er børsdag ser ulike ut,
+  eller markeres ikke, og ser aldri ut som styrke 0
+- **Ville feilet hvis:** markeringene ble regnet av kursene. Da viser grafen
+  dagens parametre, ikke hva løsningen sa
+
+**Avhenger av:** 2.7. **Én økt:** ja.
+
+### Story 8.9: «Vis meg rundt»
+
+*Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 4).*
+
+Som **bruker som er ny**, vil jeg bli vist rundt på siden, så jeg vet hva hver
+del er før jeg leser tallene.
+
+**Oppfyller:** FR-109 · **Begrenses av:** FR-701, FR-703, FR-704, NFR-05, NFR-06
+
+**Kontroll — hva testen ser etter:**
+- En knapp «Vis meg rundt» på hver side som finnes
+- Teksten ligger i samme tekstfil som hjelpen fra 8.0b
+- En test sjekker at hvert steg peker på noe som finnes på siden
+- Tall i teksten kommer fra `Parametre`, og en test krever det
+- Ingen KI og ingen nettkall
+- **Ville feilet hvis:** et steg pekte på noe siden ikke har, for eksempel
+  børsometeret før 8.6 er bygget
+
+**Avhenger av:** 8.0b, og bygges etter sidene den viser. **Én økt:** ja.
+
+### Story 8.10: Innstillinger øverst
+
+*Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 5).*
+
+Som **bruker**, vil jeg slå hjelpen og KI-teksten av og på ett sted, så valget
+gjelder alle sidene og huskes.
+
+**Oppfyller:** FR-110 · **Begrenses av:** FR-601, `AD-3`, `AD-10`, `AD-16`
+
+**Kontroll — hva testen ser etter:**
+- Valgene ligger i en egen tabell, med ny migrasjon (`AD-16`). Webserveren er
+  eneste skriver av tabellen, som for Min liste (føringen 30.09 under `AD-3`)
+- Valgene overlever en omstart og gjelder maskinen. Ingen innlogging
+- Bryteren ved KI-teksten og valget i Innstillinger viser alltid det samme
+- Ingen API-kall
+- **Ville feilet hvis:** bryteren ved KI-teksten og Innstillinger kunne vise hver
+  sin verdi
+
+**Avhenger av:** 8.3 for knapperaden, 8.0b for hjelpen og 10.3 for KI-teksten.
+**Én økt:** ja.
+
+### Story 8.11: Ferdige lister og filter på signalet
+
+*Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 7).*
+
+Som **bruker**, vil jeg starte fra en ferdig liste og se bare aksjene med 3 av 3,
+så jeg slipper å sette lista sammen selv.
+
+**Oppfyller:** FR-108, FR-412 (tillegget) · **Begrenses av:** FR-102, FR-703,
+NFR-01, NFR-06
+
+**Kontroll — hva testen ser etter:**
+- De ferdige listene står ett sted i koden og har aldri mer enn 18 aksjer
+- Filteret viser bare aksjer med 3 av 3 i den retningen som er valgt, og
+  rekkefølgen er fortsatt FR-102
+- Filteret virker bare innenfor lista som er aktiv. Ingen kall
+- En liste vi ikke har målt, står ikke som ferdig liste
+- **Ville feilet hvis:** filteret kunne leses som et råd, eller en ferdig liste
+  hadde 19 aksjer
+
+**Avhenger av:** 2.12, og 2.13 for listene som må måles. **Én økt:** ja.
+
+### Story 8.12: Endret signalstyrke siden forrige børsdag
+
+*Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 8, skrevet om etter Marians beslutning 02.10 kl. 23:30).*
+
+Som **bruker**, vil jeg se når signalstyrken har endret seg siden forrige
+børsdag, så jeg ser med en gang hva som er nytt.
+
+**Oppfyller:** FR-107 · **Begrenses av:** FR-103, FR-408, FR-409, `AD-7`, `AD-20`
+
+**Kontroll — hva testen ser etter:**
+- Merket står under signalstyrken i oversikten og i Min liste, for eksempel
+  «var 1 mandag», og bare når styrken er en annen enn forrige lagrede børsdag
+- Ukedagen er forrige børsdag, regnet i Europe/Oslo (`AD-20`)
+- Merket regnes av to lagrede vurderinger, dagens og forrige børsdags, og vises
+  fra 05.10
+- En forrige dag med grunn, uten rad eller som ikke var børsdag, gir ikke noe
+  merke
+- Merket har ingen pil, og skjules når «Sammenlign med» er på
+- **Ville feilet hvis:** forrige dags styrke ble regnet av kursene, eller merket
+  hadde en pil som kunne leses som retning
+
+**Avhenger av:** 2.7 for lesingen av en periode, og 8.3 for Min liste. **Én økt:** ja.
+
+### Story 8.13: Lær noe nytt
+
+*Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 9).*
+
+Som **bruker**, vil jeg lære ett nytt begrep om dagen, så jeg forstår mer av det
+appen viser.
+
+**Oppfyller:** FR-109 · **Begrenses av:** NFR-05, NFR-06
+
+**Kontroll — hva testen ser etter:**
+- Tipsene står i en fast liste i repoet, og hvert tips er merket med hvem som
+  kontrollerte det og når
+- Dagens tips velges ut fra datoen, eller ut fra dagens tall når et tips passer.
+  Valget er en regel i koden og testes med faste datoer
+- Tall i teksten kommer fra `Parametre`
+- Ingen KI og ingen nettkall når siden vises
+- **Ville feilet hvis:** et tips kom på skjermen uten at noen av oss hadde
+  kontrollert det, eller kunne leses som et råd
+
+**Avhenger av:** 8.0b. **Én økt:** ja.
+
+### Story 8.14: Justeringsdager i kursgrafen
+
+*Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 11).*
+
+Som **bruker**, vil jeg se dagene kursen ble justert det siste året, så jeg ser
+hvor ofte det skjer og når det sist skjedde.
+
+**Oppfyller:** FR-407 (tillegget) · **Begrenses av:** FR-201, `AD-5`, `AD-19`,
+NFR-06, NFR-08
+
+**Kontroll — hva testen ser etter:**
+- Dagene er de samme som 2.6 finner, regnet av kursserien alene
+- Antallet og den siste datoen står i aksjedetaljen
+- Ordet «utbytte» står ikke ved dagene. En test krever det
+- Teksten sier ikke noe om neste justering
+- **Ville feilet hvis:** grensesnittet kalte en justering for utbytte, eller
+  dagene ble lest fra en annen kilde enn kursserien
+
+**Avhenger av:** 2.6. **Én økt:** ja.
+
+### Story 8.15: Sortering ved klikk i kolonneraden
+
+*Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 14).*
+
+Som **bruker**, vil jeg sortere tabellen på kursen, endringen eller signalet, så
+jeg finner det jeg leter etter.
+
+**Oppfyller:** FR-102 (tillegget) · **Begrenses av:** FR-101, FR-103, NFR-05
+
+**Kontroll — hva testen ser etter:**
+- Uten klikk er rekkefølgen FR-102
+- Ett klikk sorterer stigende eller fallende på kolonnen, og et nytt klikk snur
+- Endring sorteres på prosent, ikke på kroner (FR-101, tillegget 07.10)
+- Rader uten verdi står sist i begge retninger
+- Kolonneraden sier hvilken kolonne og retning som gjelder, også til
+  skjermleseren
+- **Ville feilet hvis:** en rad uten signal kom først når rekkefølgen ble snudd
+
+**Avhenger av:** ingen åpne. Gjelder også Min liste når 8.3 er bygget.
+**Én økt:** ja.
+
+### Story 8.16: Regelen for startdagen, og periodene i kursgrafen
+
+*Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 15).*
+
+Som **bruker**, vil jeg velge hvor langt tilbake kursgrafen går, med samme
+knapper som ellers i appen.
+
+**Oppfyller:** FR-201 (tillegget) · **Begrenses av:** FR-202, NFR-08, `AD-20`
+
+**Kontroll — hva testen ser etter:**
+- Én funksjon gir startdagen for hver periode, og regelen står skrevet i
+  `designregler.md` §2 før koden
+- Testene har faste datoer rundt helger, helligdager og nyttår
+- Knappene står i rekkefølgen i `designregler.md` §2, og grafen åpner med 6 mnd
+- 1 år viser bare det kursserien har, og grafen sier det når serien er kortere
+- MA50-linjen finnes fra første punkt for 6 mnd og kortere (FR-406)
+- **Ville feilet hvis:** to perioder regnet startdagen med hver sin regel
+
+**Avhenger av:** ingen åpne. **Én økt:** ja.
+
+### Story 8.17: Periodevalget i oversikten, Min liste og børsometeret
+
+*Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 15).*
+
+Som **bruker**, vil jeg se endringen over en uke eller en måned i oversikten, og
+signalet for en dag jeg velger.
+
+**Oppfyller:** FR-101 (tillegget), FR-106 · **Begrenses av:** FR-102, FR-409,
+`AD-7`, NFR-08
+
+**Kontroll — hva testen ser etter:**
+- Startdagen kommer fra funksjonen i 8.16
+- Endringen over en periode regnes av kursserien, på `adjusted_close`, som
+  endringen for én dag
+- «Velg dag» viser vurderingen som er lagret for dagen, eller «– ikke vurdert»,
+  grunnen, eller «– ikke børsdag». Signalet regnes aldri på nytt (`AD-7`)
+- Gult står ved 3 av 3 også når en annen dag eller periode vises
+  (`designregler.md` §3)
+- **Ville feilet hvis:** «Velg dag» for 01.10 viste et signal. Det finnes
+  vurderinger fra 02.10
+
+**Avhenger av:** 8.16, 8.3 for Min liste og 8.6 for børsometeret. **Én økt:**
+avgjøres i planen.
+
+### Story 8.18: Kommende eks.dato i kursgrafen
+
+*Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 12, Marians beslutning kl. 08:06).*
+
+Som **bruker**, vil jeg se neste eks.dato i kursgrafen, så jeg vet det før jeg
+handler, og ser hvor gammel opplysningen er.
+
+**Oppfyller:** FR-207 · **Begrenses av:** FR-201, FR-407, FR-411, NFR-06, NFR-08
+
+**Kontroll — hva testen ser etter:**
+- Neste eks.dato står i grafen med datoen den ble sjekket
+- Sjekket for mer enn 7 dager siden: grått og «sjekket <dato>, kan være endret».
+  En test med faste datoer prøver grensen
+- En passert dato uten justering i kursserien (2.6) merkes «ikke bekreftet»
+- Uten dato står det ingenting, og det ser ikke ut som en feil (FR-303)
+- I demoen er datoene oppdiktet og merket «Eksempeltall»
+- **Ville feilet hvis:** en dato som ikke er sjekket på over 7 dager, så like
+  sikker ut som en som ble sjekket i dag
+
+**Avhenger av:** 2.14, og 2.6 for «ikke bekreftet». **Én økt:** ja.
 
 ---
 

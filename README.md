@@ -60,6 +60,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [Epics og stories](_bmad-output/planning-artifacts/epics.md)
 - [Designregler](_bmad-output/planning-artifacts/designregler.md)
 - [Endringsforslag 28.09](_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-28.md), godkjent av gruppen 28.09
+- [Endringsforslag 08.10](_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-08.md): femten idéer inn i v1, godkjent av Marian 08.10
 - [Kilder og bruksvilkår](docs/kilder-og-rettigheter.md), med e-postene til [EODHD](docs/epost-til-eodhd.md) og [Euronext](docs/epost-til-euronext.md)
 - [Leveranseliste](docs/innlevering.md)
 

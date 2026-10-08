@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-24-2026 19:26
-last_updated: 10-07-2026 20:39
+last_updated: 10-08-2026 18:03
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -77,6 +77,11 @@ development_status:
   2-8-hovedindeksen-hentes-i-samme-kjøring: backlog
   2-9-hovedindeksen-i-markedsoversikten: backlog
   2-9b-søylene-under-hovedindeksen: backlog
+  2-10-høy-og-lav-lagres-med-kursene: backlog
+  2-11-lista-leses-fra-basen: backlog
+  2-12-velge-og-bytte-aksjer: backlog
+  2-13-kommandoen-som-måler-omsetning: backlog
+  2-14-eksdatoer-føres-inn-for-hånd: backlog
   epic-2-retrospective: optional
 
   epic-3: backlog
@@ -126,6 +131,20 @@ development_status:
   8-2-ux-gjennomgang-av-de-to-skjermbildene-med-cu-bmad-ux: backlog
   8-3-min-liste-eget-skjermbilde-med-stjerne-og-filter: backlog
   8-4-se-nærmere-i-aksjedetaljen: backlog
+  8-5-endring-i-kroner-og-høy-og-lav-i-aksjedetaljen: backlog
+  8-6-børsometeret: backlog
+  8-7-sjekk-2-og-3-i-kursgrafen: backlog
+  8-8-signaldager-i-kursgrafen: backlog
+  8-9-vis-meg-rundt: backlog
+  8-10-innstillinger-øverst: backlog
+  8-11-ferdige-lister-og-filter-på-signalet: backlog
+  8-12-endret-signalstyrke-siden-forrige-børsdag: backlog
+  8-13-lær-noe-nytt: backlog
+  8-14-justeringsdager-i-kursgrafen: backlog
+  8-15-sortering-ved-klikk-i-kolonneraden: backlog
+  8-16-regelen-for-startdagen-og-periodene-i-kursgrafen: backlog
+  8-17-periodevalget-i-oversikten-min-liste-og-børsometeret: backlog
+  8-18-kommende-eksdato-i-kursgrafen: backlog
   epic-8-retrospective: optional
 
   epic-9: in-progress
