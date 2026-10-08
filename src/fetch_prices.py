@@ -210,6 +210,9 @@ def tolk_kvote(svar: object, i_dag_gmt: date) -> tuple[int, int]:
     brukt = heltall("apiRequests")
     grense = heltall("dailyRateLimit")
     bonus = heltall("extraLimit")
+    for navn, verdi in (("apiRequests", brukt), ("dailyRateLimit", grense), ("extraLimit", bonus)):
+        if verdi < 0:
+            raise UlesbarKvote(f"{navn} er negativ")
     try:
         dato = date.fromisoformat(svar.get("apiRequestsDate"))
     except (TypeError, ValueError):
@@ -553,8 +556,8 @@ def kjoer(
     hent_foer_kl_22: bool = False,
     les_kvote: Callable[[str], object],
 ) -> Path | None:
-    """En henting. Returnerer fila som ble skrevet, eller None hvis dagens fil
-    fantes fra foer.
+    """En henting. Returnerer fila som ble skrevet, eller None hvis en sjekk
+    foer foerste kall sa nei: tidskontrollen, basen eller filvakten (story 2.3).
 
     Story 2.1b: fila skrives foerst (AD-6), saa kursene til basen i base_sti
     gjennom skriv_til_basen, med oeyeblikket som hentet. base_sti har ingen
@@ -629,7 +632,11 @@ def kjoer(
                 "hente likevel. 0 kall brukt."
             )
             return None
-        skriv("Henter foer kl. 22:00 (--hent-foer-kl-22).")
+        skriv(
+            "Henter foer kl. 22:00 (--hent-foer-kl-22). Har API-et ikke dagens "
+            "kurs ennaa, skrives fila likevel under dagens dato, og kveldens "
+            "henting stopper da ved filvakten med 0 kall."
+        )
 
     # Basen (FR-402): har den boersdagen for alle aksjene, er det ingenting aa hente.
     try:
@@ -670,7 +677,19 @@ def kjoer(
         igjen, bonus = tolk_kvote(les_kvote(api_nokkel), hentet_tid.date())
     except UlesbarKvote as feil:
         skriv(f"Kvoten kunne ikke leses fra /api/user: {feil}. Henter likevel.")
-    except Exception as feil:  # noqa: BLE001 - kvoten skal ikke stoppe hentingen
+    except requests.HTTPError as feil:
+        # hent_kvote vasker teksten til «HTTP <kode> <grunn>» (story 2.0).
+        if str(feil).startswith(("HTTP 401", "HTTP 403")):
+            skriv(
+                f"EODHD avviste noekkelen ved /api/user ({feil}). Hentingen ville "
+                "feilet for alle aksjene og laast dagen med en fil uten kurser. "
+                "Sjekk EODHD_API_KEY i .env. 0 kall brukt."
+            )
+            sys.exit(1)
+        skriv(f"Kvoten kunne ikke leses fra /api/user ({feil}). Henter likevel.")
+    except (requests.RequestException, ValueError) as feil:
+        # Bare nett- og formfeil. En programmeringsfeil skal synes, ikke gi
+        # henting uten kvotesjekk (gjennomgangen, BH3).
         skriv(
             f"Kvoten kunne ikke leses fra /api/user ({type(feil).__name__}). "
             "Henter likevel."
@@ -693,7 +712,7 @@ def kjoer(
 
     fra, til = bygg_intervall(dag)
     skriv(f"Henter {len(AKSJEUNIVERS)} symboler, {fra} til {til}.")
-    skriv(f"Dette koster {len(AKSJEUNIVERS)} av dagskvoten paa 20.\n")
+    skriv(f"Dette koster {len(AKSJEUNIVERS)} kall.\n")
 
     resultat = hent_universet(api_nokkel, fra, til, hent, skriv)
 
@@ -822,7 +841,11 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument(
         "--hent-foer-kl-22",
         action="store_true",
-        help="hent paa en boersdag foer kl. 22:00 i Oslo (story 2.3)",
+        help=(
+            "hent paa en boersdag foer kl. 22:00 i Oslo (story 2.3). Har API-et "
+            "ikke dagens kurs ennaa, laaser fila dagen, og kveldens henting "
+            "stopper ved filvakten"
+        ),
     )
     argumenter = parser.parse_args(argv)
     if argumenter.les_inn is not None:

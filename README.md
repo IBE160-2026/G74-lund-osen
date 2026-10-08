@@ -29,7 +29,7 @@ uv run python src/app.py                 # http://localhost:5000
 ```
 
 - Du trenger en egen gratis API-nøkkel fra [EODHD](https://eodhd.com/register), fordi vilkårene ikke lar oss dele vår. Den gir 20 kall i døgnet, og en henting bruker 15.
-- Kjør hentingen på børsdager mellom kl. 22 og midnatt. En vurdering kan ikke fylles inn senere. Før kl. 22 på en børsdag stopper kommandoen med 0 kall, med mindre du gir `--hent-foer-kl-22`. Har basen alt kursene for børsdagen, bruker den 0 kall. På en dag børsen er stengt henter den bare hvis basen mangler forrige børsdag. Før kallene leser den kvoten med `/api/user`, som er gratis.
+- Kjør hentingen på børsdager mellom kl. 22 og midnatt. En vurdering kan ikke fylles inn senere. Før kl. 22 på en børsdag stopper kommandoen med 0 kall, med mindre du gir `--hent-foer-kl-22`. Har basen alt kursene for børsdagen, bruker den 0 kall. På en dag børsen er stengt henter den bare hvis basen mangler forrige børsdag og fila for den dagen ikke finnes. Før kallene leser den kvoten med `/api/user`, som er gratis.
 - Appen bruker aldri kvote selv. Den leser bare fra basen.
 - Uten henting starter appen med tom oversikt og viser kommandoen som henter.
 

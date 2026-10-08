@@ -1742,11 +1742,13 @@ class TestBasenAvgjoer:
             kall.append(ticker)
             return serie_til(TIRSDAG_22_09)
 
-        with pytest.raises(SystemExit):
+        with pytest.raises(SystemExit) as slutt:
             fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, hent, linjer.append,
                      les_kvote=nok_kvote)
+        assert slutt.value.code == 1
         assert len(kall) == len(AKSJEUNIVERS)
-        assert any("kunne ikke leses" in l for l in linjer)
+        # Gjennomgangen, VG8: meldingen om basen, ikke om kvoten.
+        assert any(l.startswith(f"Basen {base.name} kunne ikke leses") for l in linjer)
         assert (raa / "kurser-raa-2026-09-22.json").exists()
 
 
@@ -1850,14 +1852,18 @@ class TestKvoten:
         """00:30 i Oslo 23.09 er 22.09 i GMT, og gaarsdagens kall teller
         fortsatt (presisert 04.10). Ville feilet med datoen i Oslo (K1)."""
         raa, base = stier
+        linjer = []
         with pytest.raises(SystemExit) as stopp:
             fp.kjoer(raa, base, _utc(2026, 9, 22, 22, 30), NOEKKEL, ingen_kall,
-                     lambda _: None, hent_foer_kl_22=True,
+                     linjer.append, hent_foer_kl_22=True,
                      les_kvote=kvote(brukt=20, dato="2026-09-22"))
         assert stopp.value.code == 1
+        ut = "\n".join(linjer)
+        # Gjennomgangen, BH9: stoppet av kvoten, ikke av noe annet.
+        assert "0 kall igjen av dagens" in ut and "trenger 15" in ut and "0 kall brukt" in ut
 
     @pytest.mark.parametrize("svar", [
-        RuntimeError("nett"), "tekst", [], {}, {"apiRequests": 1},
+        requests.ConnectionError("nett"), "tekst", [], {}, {"apiRequests": 1},
         {"apiRequests": True, "apiRequestsDate": "2026-09-22", "dailyRateLimit": 20, "extraLimit": 0},
         {"apiRequests": 1, "apiRequestsDate": "igaar", "dailyRateLimit": 20, "extraLimit": 0},
         {"apiRequests": 1, "apiRequestsDate": None, "dailyRateLimit": 20, "extraLimit": 0},
@@ -1896,10 +1902,10 @@ class TestKvoten:
         raa, base = stier
 
         def les(_):
-            raise RuntimeError(f"https://eodhd.com/api/user?api_token={NOEKKEL}")
+            raise requests.ConnectionError(f"https://eodhd.com/api/user?api_token={NOEKKEL}")
 
         _, _, ut = kjoer_23(raa, base, OEYEBLIKK_22_09, les_kvote=les)
-        assert "RuntimeError" in ut and NOEKKEL not in ut
+        assert "ConnectionError" in ut and NOEKKEL not in ut
 
 
 class TestHentKvote:
@@ -2047,3 +2053,120 @@ class TestKvotenErInjisert:
         monkeypatch.setattr(fp, "naa", lambda: OEYEBLIKK_22_09)
         fp.main([])
         assert sett["les_kvote"] is fp.hent_kvote
+
+
+class TestEtterGjennomgangen:
+    """Funnene fra gjennomgangen av 2.3 (Review Triage Log i spesifikasjonen)."""
+
+    def test_avvist_noekkel_gir_0_kall_og_kode_1(self, stier):
+        """BH2: en 401 fra /api/user stopper foer fila skrives."""
+        raa, base = stier
+        linjer = []
+
+        def les(_):
+            raise requests.HTTPError("HTTP 401 Unauthorized")
+
+        with pytest.raises(SystemExit) as slutt:
+            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, ingen_kall, linjer.append,
+                     les_kvote=les)
+        assert slutt.value.code == 1
+        ut = "\n".join(linjer)
+        assert "HTTP 401" in ut and "EODHD_API_KEY" in ut and "0 kall brukt" in ut
+        assert list(raa.iterdir()) == []
+
+    def test_serverfeil_fra_kvoten_gir_henting(self, stier):
+        """BH2: andre HTTP-feil er et ulesbart svar, og da hentes det."""
+        raa, base = stier
+
+        def les(_):
+            raise requests.HTTPError("HTTP 500 Internal Server Error")
+
+        fil, kall, ut = kjoer_23(raa, base, OEYEBLIKK_22_09, les_kvote=les)
+        assert fil is not None and len(kall) == len(AKSJEUNIVERS)
+        assert "HTTP 500" in ut and "Henter likevel" in ut
+
+    def test_programmeringsfeil_i_kvoten_synes(self, stier):
+        """BH3: en AttributeError gir ikke henting uten kvotesjekk."""
+        raa, base = stier
+
+        def les(_):
+            raise AttributeError("feil i koden")
+
+        with pytest.raises(AttributeError):
+            kjoer_23(raa, base, OEYEBLIKK_22_09, ingen_kall, les_kvote=les)
+
+    @pytest.mark.parametrize("felt", ["apiRequests", "dailyRateLimit", "extraLimit"])
+    def test_negativt_tall_er_ulesbart(self, felt):
+        """ECH5: -5 brukt ga 25 igjen."""
+        svar = {"apiRequests": 1, "apiRequestsDate": "2026-09-22",
+                "dailyRateLimit": 20, "extraLimit": 0, felt: -5}
+        with pytest.raises(fp.UlesbarKvote, match=felt):
+            fp.tolk_kvote(svar, date(2026, 9, 22))
+
+    def test_brukt_over_grensen_gir_0_igjen_og_bonusen_fullfoerer(self, stier):
+        """VG2: etter kall 21 er apiRequests over 20. Ville feilet uten max(…, 0)."""
+        raa, base = stier
+        fil, kall, ut = kjoer_23(raa, base, OEYEBLIKK_22_09,
+                                 les_kvote=kvote(brukt=25, bonus=463))
+        assert fil is not None and len(kall) == len(AKSJEUNIVERS)
+        assert "Kvoten: 0 kall igjen av dagens. 15 kall tas fra bonuskvoten" in ut
+
+    def test_ulesbart_svar_med_navn_og_epost_viser_ingen_verdier(self, stier):
+        """VG6 og VG7: feilteksten nevner feltnavn, aldri en verdi fra svaret."""
+        raa, base = stier
+        les = kvote(brukt="x", dato="igaar", name="Kari Testesen",
+                    email="kari@eksempel.no")
+        _, _, ut = kjoer_23(raa, base, OEYEBLIKK_22_09, les_kvote=les)
+        assert "Kvoten kunne ikke leses" in ut and "apiRequests" in ut
+        for verdi in ("Kari", "kari@eksempel.no", "igaar", "'x'"):
+            assert verdi not in ut
+
+    def test_tidskontrollen_kommer_foer_basen(self, stier):
+        """VG1: foer kl. 22 paa en boersdag, og basen har alt dagen. Tidskontrollen
+        svarer, ikke basen. Ville feilet med basen foer tidskontrollen."""
+        raa, base = stier
+        kjoer_23(raa, base, OEYEBLIKK_22_09)
+        # Samme boersdag kl. 21 i Oslo: basen har dagen, og klokka er foer 22.
+        _, _, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 19, 0),
+                            ingen_kall, ingen_noekkel, ingen_kall)
+        assert "--hent-foer-kl-22" in ut and "FR-402" not in ut
+
+    def test_basen_kommer_foer_filvakten(self, stier):
+        """VG1: basen har dagen, og fila finnes. Basen svarer, ikke filvakten.
+        Ville feilet med filvakten foer basen."""
+        raa, base = stier
+        kjoer_23(raa, base, OEYEBLIKK_22_09)
+        assert (raa / "kurser-raa-2026-09-22.json").exists()
+        _, _, ut = kjoer_23(raa, base, OEYEBLIKK_22_09 + timedelta(minutes=30),
+                            ingen_kall, ingen_noekkel, ingen_kall)
+        assert "FR-402" in ut and "AD-6" not in ut
+
+    def test_basesjekken_migrerer_ikke(self, stier, tmp_path):
+        """VG3: manglende_i_basen aapner uten migrering. En base paa eldre
+        skjemaversjon gir «kunne ikke leses» i basesjekken, og fila skrives
+        foer basen migreres i skriv_til_basen. Ville feilet hvis basesjekken
+        migrerte. (En base paa siste versjon endres ikke av en migrering, saa
+        den kan ikke vise dette.)"""
+        import migrering
+
+        raa, base = stier
+        eldre = tmp_path / "eldre"
+        eldre.mkdir()
+        for sql in sorted(lagring_sqlite.MIGRASJONSKATALOG.glob("*.sql"))[:3]:
+            (eldre / sql.name).write_bytes(sql.read_bytes())
+        base.parent.mkdir(parents=True)
+        tilkobling = sqlite3.connect(base)
+        try:
+            migrering.migrer(tilkobling, eldre)
+        finally:
+            tilkobling.close()
+
+        fil, _, ut = kjoer_23(raa, base, OEYEBLIKK_22_09)
+        assert f"Basen {base.name} kunne ikke leses (RuntimeError)" in ut
+        assert fil is not None
+
+    def test_flagget_advarer_om_filvakten(self, stier):
+        """BH1 og ECH2: utskriften sier at fila kan laase dagen."""
+        raa, base = stier
+        _, _, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 10, 0), hent_foer_kl_22=True)
+        assert "filvakten" in ut and "dagens dato" in ut
