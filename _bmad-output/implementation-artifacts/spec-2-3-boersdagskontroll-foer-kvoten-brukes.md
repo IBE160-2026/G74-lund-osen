@@ -84,8 +84,8 @@ Planen fra 05.10 kl. 17:35 ble gitt i chatten og finnes ikke i denne økta. Den 
 - [x] Spesifikasjonen. Commit og push (`acb3d90`).
 - [x] Del 1: tidskontrollen, basen, filvakten med K8, nøkkelen sist, flagget. Tester. Commit og push.
 - [x] Del 2: kvoten med `/api/user`. Tester. Del 1 og 2 ble én commit (`600096e`), fordi de ligger i de samme funksjonene.
-- [ ] Del 3: spinen, `lagring_fil.py`, `CLAUDE.md`, README, `deferred-work.md`. Commit og push.
-- [ ] Mutantene M1–M8 og kvote- og helgemutantene. PR mot main, gjennomgang (Blind Hunter, Edge Case Hunter, Verification Gap), CI grønn. Stopp før flettingen.
+- [x] Del 3: spinen, `lagring_fil.py`, `CLAUDE.md`, README, `deferred-work.md`. Commit og push. *08.10:* regel 22 i `CLAUDE.md`, raden «Datoer» og merknaden under AD-2 i spinen, docstringen i `nyeste_snapshot`, README-linjen om kl. 22, K8 løst og E9 til 2.4.
+- [ ] Mutantene M1–M8, K1–K4 og V1–V4 (Spec Change Log 08.10). PR mot main, gjennomgang (Blind Hunter, Edge Case Hunter, Verification Gap), CI grønn. Stopp før flettingen.
 
 **Mutantene** (én om gangen, hele `tests/`):
 - M1: tidskontrollen fjernet.
