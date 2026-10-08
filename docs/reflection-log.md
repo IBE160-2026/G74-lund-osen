@@ -2547,6 +2547,18 @@ Det var markedet og ikke koden. Hadde vi «rettet» grensen, hadde vi tilpasset 
 
 ---
 
+## 08.10.2026 – Mer i v1, og en heng vi ikke fant
+
+*Joakim og Marian.*
+
+I dag tok vi femten idéer inn i v1, blant dem lister man kan bytte, børsometeret og perioder i grafen. v1 har nå 75 storyer, og 49 av dem er ikke påbegynt. Med farten så langt, om lag 0,8 storyer om dagen, rekker vi om lag 20 før demonstrasjonen. Rekkefølgen avgjør derfor hva som faktisk blir med, og den tar vi opp igjen etter README-prøven, når vi vet mer om farten.
+
+Story 2.3 ble klar til fletting. Tre uavhengige gjennomganger fant 26 ting. 18 ble rettet med en gang og 5 utsatt. De tre siste var ikke tekniske, men valg som var våre: om en henting før kl. 22 skal kunne låse dagen, og hvilken kode filvakten skal gi. Hele testkjøringen hang i over en halvtime 07.10, og i dag hang én av mutantene i ti minutter. Ingen av dem klarte vi å gjenskape. I stedet for å gjette på en årsak gjorde vi neste heng synlig: med 2.3 skriver testene ut hvor de står etter to minutter, og CI stopper etter 15.
+
+Underveis så vi at 34 tester gikk mot nettet uten at noen merket det, fordi sperren stoppet kallene i stillhet. En sperre ingen ser, skjuler feil i stedet for å vise dem.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
