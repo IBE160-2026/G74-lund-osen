@@ -123,8 +123,34 @@ Planen fra 05.10 kl. 17:35 ble gitt i chatten og finnes ikke i denne økta. Den 
   - *Svaret er ikke fra børsdagen (FR-402).* Mangler svaret kursen for børsdagen for noen av aksjene, nevner utskriften dem (antall og symboler), og kjøringen avslutter med kode 1. Kursene, fila og vurderingene med grunnen `kurs_ikke_fra_dagen` står. En ny kjøring samme kveld gir 0 kall, fordi filvakten stopper den (et nytt forsøk er 2.3b). Mutant: V3 varselet fjernet. Ni eldre tester brukte `falsk_serie()`, som slutter 30.07, i kjøringer for 22.09 eller andre dager. De handler om noe annet og får nå en serie som slutter på børsdagen (`serie_til`). Testen for K4 i 2.5 (EQNR uten kurs for 22.09) venter nå kode 1.
 - **2026-10-08, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 6 og 10), Marians beslutning:** kvotesjekken tar antallet aksjer i lista som parameter, ikke 15. Regnestykket er skilt ut i `vurder_kvote(igjen, bonus, antall)`, som testes med en kortere liste (10) og med 18. `kjoer()` gir `len(AKSJEUNIVERS)`, og 2.11 gir bare et annet tall. Grensen «`igjen ≥ 15`» under Boundaries gjelder dermed antallet. Mutant: V4 15 skrevet inn i `vurder_kvote`. Bonuskvoten brukes bare til å fullføre kveldens henting (Marians beslutning 08.10 kl. 08:06), som før.
 - **2026-10-08: navnene i Code Map** er rettet til navnene i koden (`tolk_kvote`, `manglende_i_basen`).
+- **2026-10-08, etter gjennomgangen (VG7):** «Feilteksten er bare typenavnet» under Boundaries gjelder nettfeil. Et svar med feil form gir `UlesbarKvote`, der teksten nevner feltnavnet, aldri en verdi fra svaret. En 401 eller 403 fra `/api/user` er ikke et ulesbart svar: den stopper med 0 kall og kode 1 (BH2). En test låser begge.
 
 ## Review Triage Log
+
+Gjennomgang 1 (08.10 kl. 19:05–19:20, PR #22), Blind Hunter (BH, bare diffen), Edge Case Hunter (ECH) og Verification Gap (VG), som tre uavhengige agenter. Rettelsene er `df02b7f`.
+
+| # | Funn | Dom | Grunnlag | Rute |
+|---|---|---|---|---|
+| BH1, ECH2 | `--hent-foer-kl-22` før dagens kurs finnes, skriver fila under dagens dato. Svaret mangler dagen (FR-402, kode 1), og kveldens henting stopper ved filvakten med 0 kall | high | Stemmer. Spesifikasjonen sier at flagget gir dagens navn «som før», og et nytt forsøk er 2.3b | patch: utskriften og hjelpeteksten sier at fila kan låse dagen. **Til Marian:** om flagget skal skrive fila før kursen finnes, eller nekte å skrive fila når svaret mangler dagen |
+| ECH1 | Et symbol som feiler i hentingen, gir kode 0, mens et svar uten dagens rad gir kode 1 | medium | Kode 0 ved et symbol som feiler, er oppførselen fra main (AD-15, NFR-03: «stopper aldri på en enkelt feil»). «Hoppet over eller avvist» i docstringen gjelder basen. En retting ga 35 tester som feilet | utsatt til 2.3b, som gjør nye forsøk for symbolene som feilet (`deferred-work.md`) |
+| BH2 | En nøkkel som avvises av `/api/user` (401 eller 403), gir likevel henting og en fil med 15 feil | medium | Stemmer. En avvist nøkkel er ikke et ulesbart svar | patch: 401 og 403 stopper med 0 kall og kode 1. Andre HTTP-feil gir henting. To tester |
+| BH3 | `except Exception` sluker programmeringsfeil, og hentingen går uten kvotesjekk | medium | Stemmer | patch: bare `requests.RequestException` og `ValueError`. Testene som brukte `RuntimeError`, bruker nå `requests.ConnectionError`. Én test for `AttributeError` |
+| BH4 | Filvakten gir kode 0 også når basen mangler dagen | medium | Når filvakten svarer, mangler basen dagen, eller den kunne ikke leses. Kode 0 for filvakten står i den frosne delen (Boundaries) | **til Marian**, fordi det endrer den frosne delen. Ikke endret |
+| ECH3 | En base på nyere skjemaversjon gir «henter likevel» og 15 kall som så feiler i basen | medium | Stemmer. Tilstanden er kjent før første kall | utsatt (`deferred-work.md`). Skillet mellom nyere og eldre versjon må gjøres i porten |
+| VG1 | «En test låser rekkefølgen» gjelder bare nøkkel, kvote og kall | medium | Stemmer. To flyttinger overlevde | patch: to tester der to sjekker sier nei samtidig |
+| VG2, ECH5 | `igjen` under 0 er ikke testet, og negative tall i svaret godtas | medium | Stemmer. Etter kall 21 er `apiRequests` over 20 | patch: test med 25 brukt. Negative tall er `UlesbarKvote` |
+| VG3 | At basesjekken ikke migrerer, er ikke testet | medium | Stemmer. En base på siste versjon endres ikke av en migrering, så første forsøk på test fanget ikke mutanten | patch: test med en base på versjon 3, som skal gi «kunne ikke leses» i basesjekken |
+| VG4 | Regel 22 håndheves ikke av noen test | medium | Stemmer. Fixturen flytter `BASE_STI`, men ser ikke på fila | patch: en fixture for hele økta i `conftest.py` sammenligner innhold og mtime for `data/db/ose.db` før og etter. Hoppes over når fila ikke finnes, som i CI |
+| VG6, VG7 | Feilgrenen for et ulesbart svar er ikke testet med navn og e-post. Spesifikasjonen sier «bare typenavnet», men `UlesbarKvote` gir feltnavn | medium | Stemmer | patch: test med navn, e-post og verdier i et ulesbart svar. Spec Change Log: feltnavn, aldri verdier |
+| VG5 | Tabellen viste bare første test som feilet, med `-x`, og M4 var ikke entydig | low | Stemmer | patch: hver mutant kjørt mot sin egen test (under Verification), og M4 delt i M4a og M4b |
+| BH5, ECH6 | «Dette koster 15 av dagskvoten paa 20» også når bonusen brukes | low | Stemmer | patch: «Dette koster 15 kall.» |
+| BH6, VG9 | Docstringen til `kjoer()` sier None bare for fila som finnes | low | Stemmer | patch |
+| BH7, VG9 | README om stengte dager nevner ikke filvakten | low | Stemmer | patch |
+| BH8, VG8 | Testen for ulesbar base sjekker ikke koden, og meldingen kunne vært kvotens | low | Stemmer | patch: kode 1 og linja som begynner med «Basen ose.db kunne ikke leses» |
+| BH9 | GMT-testen sjekker bare kode 1 | low | Stemmer | patch: utskriften sier 0 igjen, trenger 15 og 0 kall brukt |
+| ECH4 | En `dato` i `kurs` som ikke kan leses, gir `ValueError` og traceback før første kall | low | Bare en endring for hånd i basen gir det. Triggerne og porten slipper ikke slike rader inn | utsatt (`deferred-work.md`) |
+| ECH7 | Stopper vurderingene ved midnatt eller basefeil, nevnes ikke aksjene uten dagens kurs | low | Stemmer. Fila står og kan leses | utsatt (`deferred-work.md`) |
+| ECH8 | Basen har kursene, men vurderingene for dagen mangler: «Ingenting aa hente», kode 0 | low | Ingen regresjon: filvakten ville stoppet kjøringen uansett. `--les-inn` skriver ingen vurdering (2.1b), og en ny kjøring stopper ved basesjekken, så dagen blir stående uten vurdering | utsatt til 2.3b (`deferred-work.md`) |
 
 ## Verification
 
@@ -150,5 +176,27 @@ Planen fra 05.10 kl. 17:35 ble gitt i chatten og finnes ikke i denne økta. Den 
 | V4 15 skrevet inn i `vurder_kvote` | `TestKvotenTarAntallet::test_vurder_kvote[12-0-10-0]` |
 
 **M4 hang én gang.** I første kjøring ga M4 tidsavbrudd etter 600 s, uten faulthandler. Ingen pytest-prosess ble stående igjen. Kjørt på nytt fire ganger: én gang mot `tests/test_fetch_prices.py` med `faulthandler_timeout=45` (drept på 17 s), og tre ganger mot hele `tests/`, én gang med `faulthandler_timeout=60` kl. 18:57 og to ganger kl. 18:59–19:00 (drept på 35–38 s, i testen i tabellen). faulthandler skrev ingenting, fordi ingen kjøring hang. Hengen er derfor ikke gjenskapt, og det er **ikke avgjort** om den har samme årsak som hengen 07.10. Ingen rettelse er gjort i testen eller koden for selve hengen, fordi årsaken ikke er funnet. Ingen test starter `fetch_prices` som underprosess, så M4 kan ikke ha brukt kvoten. Kandidat, ikke vist: `traad.join()` uten tidsgrense i `tests/test_app.py` (`test_en_forespoersel_i_en_annen_traad_faar_egen_tilkobling`). Tiltakene er at en ny heng skal synes: `faulthandler_timeout = 120` i `pyproject.toml` (`74f8210`), og `timeout-minutes: 15` på pytest-jobben i `tester.yml` (`5e9efde`).
+
+**Hver mutant mot sin egen test, 08.10 kl. 19:28** (VG5, uten `-x`). 15 av 15 drept:
+
+| Mutant | Testen som fanger den |
+|---|---|
+| M2 `<` byttet med `<=` | `TestTidskontrollen::test_kl_22_presis_henter` |
+| V1 klokka i UTC | `TestVintertid::test_kl_22_30_i_oslo_etter_25_10_er_21_30_utc_og_henter` |
+| M4a navnet etter `dag` | `TestHelgen::test_loerdag_uten_fredagens_kurser_henter_med_fredagens_navn` |
+| M4b vakten etter `dag` | `TestHelgen` (1 av 3) |
+| M6 flagget ignoreres | `TestTidskontrollen::test_flagget_henter_foer_kl_22_med_dagens_navn` |
+| K4 hele svaret skrives ut | `TestKvoten::test_navn_og_epost_staar_aldri_i_utskriften` (1 av 3) |
+| VG1a basen før tidskontrollen | `TestEtterGjennomgangen::test_tidskontrollen_kommer_foer_basen` |
+| VG1b filvakten før basen | `TestEtterGjennomgangen::test_basen_kommer_foer_filvakten` |
+| VG2 `max(grense - brukt, 0)` fjernet | `TestEtterGjennomgangen::test_brukt_over_grensen_gir_0_igjen_og_bonusen_fullfoerer` |
+| VG3 basesjekken migrerer | `TestEtterGjennomgangen::test_basesjekken_migrerer_ikke` |
+| VG6 verdien i feilteksten | `TestEtterGjennomgangen::test_ulesbart_svar_med_navn_og_epost_viser_ingen_verdier` |
+| BH2 avvist nøkkel henter | `TestEtterGjennomgangen::test_avvist_noekkel_gir_0_kall_og_kode_1` |
+| BH3 `except Exception` tilbake | `TestEtterGjennomgangen::test_programmeringsfeil_i_kvoten_synes` |
+| ECH5 negative tall godtas | `TestEtterGjennomgangen::test_negativt_tall_er_ulesbart` (3 av 3) |
+| BH1 advarselen fjernet | `TestEtterGjennomgangen::test_flagget_advarer_om_filvakten` |
+
+Fixturen for `data/db/ose.db` (VG4) er ikke prøvd med en mutant, fordi en mutant måtte skrive den ekte basen.
 
 **Suiten** etter del 4, del 3 og rettingen av `les_kvote`: 1179 passed og 16 skipped (`uv run pytest -q`, 92 s, kl. 19:03).
