@@ -1,8 +1,8 @@
 ---
 title: "Endringsforslag 08.10: femten idéer inn i v1"
-status: draft
+status: final
 created: 2026-10-08
-updated: 2026-10-08T07:51
+updated: 2026-10-08T08:09
 ---
 
 # Endringsforslag 08.10: femten idéer inn i v1
@@ -11,9 +11,14 @@ Laget med `bmad-correct-course` i modusen Batch, etter instruksjonen kl. 07:32 i
 `docs/ai-prompts/2026-10-08.md`. Bygd opp som
 [`sprint-change-proposal-2026-09-28.md`](sprint-change-proposal-2026-09-28.md).
 
-**Dette er et forslag.** Ingenting i `prd.md`, `epics.md`, `sprint-status.yaml`,
-spinen eller `designregler.md` er endret. Ingenting endres før rådet har lest
-forslaget og Marian har sagt ja (regel 2 og 9).
+**Godkjent av Marian 08.10 kl. 08:04**, med endringene i instruksjonen kl. 08:06
+i `docs/ai-prompts/2026-10-08.md`. De er ført inn her, og forslaget er deretter
+ført inn i `prd.md`, `epics.md`, `sprint-status.yaml`, spinen og README-en, som
+i punkt 6. `designregler.md` venter til 8.16.
+*Skrevet 07:51, bevart:* «**Dette er et forslag.** Ingenting i `prd.md`,
+`epics.md`, `sprint-status.yaml`, spinen eller `designregler.md` er endret.
+Ingenting endres før rådet har lest forslaget og Marian har sagt ja (regel 2 og
+9).»
 
 ## 1. Hva som utløste forslaget
 
@@ -360,6 +365,45 @@ NFR-01, NFR-06
 
 #### Rad 8 — Merk det som er nytt siden forrige henting
 
+*Rettet 2026-10-08 kl. 08:06, Marians beslutning:* rad 8 gjelder som Marian
+bestemte 02.10 kl. 23:30. Beslutningen er gjengitt i instruksjonen kl. 08:06 og
+står ikke i repoet fra før. FR-107 og 8.12 er skrevet om etter den. Teksten fra
+07:51 står under, merket «Her sto».
+
+**Krav: ny FR-107 — Endret signalstyrke siden forrige børsdag.** Når
+signalstyrken har endret seg siden forrige lagrede børsdag, står et lite merke
+under den, for eksempel «var 1 mandag», i markedsoversikten og i Min liste.
+Merket regnes av lagrede vurderinger, og signalet regnes aldri på nytt (AD-7).
+Det vises fra 05.10, den første børsdagen med en lagret børsdag før seg. Merket
+skjules når «Sammenlign med» er på. Det har ingen pil, fordi pilene står for
+retning (FR-103). Mangler den forrige raden, eller har den en grunn, står det
+ikke noe merke.
+
+```
+### Story 8.12: Endret signalstyrke siden forrige børsdag
+
+Som **bruker**, vil jeg se når signalstyrken har endret seg siden forrige
+børsdag, så jeg ser med en gang hva som er nytt.
+
+**Oppfyller:** FR-107 · **Begrenses av:** FR-103, FR-408, FR-409, `AD-7`, `AD-20`
+
+**Kontroll — hva testen ser etter:**
+- Merket står under signalstyrken i oversikten og i Min liste, for eksempel
+  «var 1 mandag», og bare når styrken er en annen enn forrige lagrede børsdag
+- Ukedagen er forrige børsdag, regnet i Europe/Oslo (`AD-20`)
+- Merket regnes av to lagrede vurderinger, dagens og forrige børsdags, og vises
+  fra 05.10
+- En forrige dag med grunn, uten rad eller som ikke var børsdag, gir ikke noe
+  merke
+- Merket har ingen pil, og skjules når «Sammenlign med» er på
+- **Ville feilet hvis:** forrige dags styrke ble regnet av kursene, eller merket
+  hadde en pil som kunne leses som retning
+
+**Avhenger av:** 2.7 for lesingen av en periode, og 8.3 for Min liste. **Én økt:** ja.
+```
+
+*Her sto 07:51:*
+
 Raden i §8 gjaldt meldinger og avhang av meldingslageret i story 6.1. Epic 6 er
 ute av v1. **Forslaget leser raden om vurderingene:** det som er nytt, er det
 som har endret seg siden forrige lagrede børsdag. Marian bør bekrefte den
@@ -455,6 +499,70 @@ merkes». Navnene står i dag. Om de skal endres, er et spørsmål til 2.6 (punk
 #### Rad 12 — Kommende eks.dato, vist i grafen
 
 **Ingen story ennå.** Marian avgjør raden etter at hun har lest dette.
+
+*Rettet 2026-10-08 kl. 08:06, Marians beslutning:* ja, nå. To storyer, 2.14 og
+8.18, med det tabellen under sier om vilkår, hvor ofte, lagring og merking.
+Vilkårene for hvert selskap leses og føres i `docs/kilder-og-rettigheter.md`
+før datoen tas inn.
+
+**Krav: ny FR-414 — Eks.datoer ført for hånd.** Kommende eks.datoer føres inn
+for hånd fra selskapenes egne investorsider, med en kommando, og lagres i basen,
+aldri i en sporet fil (regel 16). Hver dato har datoen den ble sjekket og hvor den
+ble lest. Et selskap får ingen dato før vilkårene for nettstedet er lest og ført
+i `docs/kilder-og-rettigheter.md`. Sidene leses av en av oss og hentes aldri av
+programmet. Lista sjekkes minst én gang i uka, og dagen før en eks.dato.
+
+**Krav: ny FR-207 — Kommende eks.dato i kursgrafen.** Kursgrafen viser neste
+eks.dato som er ført inn, med datoen den ble sjekket. Er den sjekket for mer enn
+7 dager siden, vises den i grått med «sjekket <dato>, kan være endret». En dato
+som har passert uten at kursserien viser en justering, merkes «ikke bekreftet».
+Ingen dato vises uten at den er sjekket (NFR-08). I demoen er datoene oppdiktet
+og merket «Eksempeltall» (FR-411).
+
+```
+### Story 2.14: Eks.datoer føres inn for hånd
+
+Som **gruppe**, vil vi føre inn kommende eks.datoer fra selskapenes egne sider,
+så appen kan vise dem uten en kilde vi ikke har.
+
+**Oppfyller:** FR-414 · **Begrenses av:** NFR-08, `AD-3`, `AD-6`, `AD-10`,
+`AD-16`, regel 16
+
+**Kontroll — hva testen ser etter:**
+- En egen tabell, med ny migrasjon (`AD-16`): symbol, eks.dato, datoen den ble
+  sjekket og hvor den ble lest
+- Kommandoen tar inn én dato for ett symbol, og nekter et symbol der vilkårene
+  for nettstedet ikke er ført i `docs/kilder-og-rettigheter.md`
+- Kommandoen gjør ingen nettkall, og webserveren skriver ikke tabellen
+- Ingen eks.dato står i en sporet fil (regel 16)
+- En ny sjekk av samme dato oppdaterer datoen den ble sjekket, og en flyttet dato
+  erstatter den gamle
+- **Ville feilet hvis:** programmet hentet en side fra et selskap, eller en dato
+  kunne føres inn uten dato for sjekken
+
+**Avhenger av:** 2.3. Vilkårene leses før første dato. **Én økt:** ja.
+```
+
+```
+### Story 8.18: Kommende eks.dato i kursgrafen
+
+Som **bruker**, vil jeg se neste eks.dato i kursgrafen, så jeg vet det før jeg
+handler, og ser hvor gammel opplysningen er.
+
+**Oppfyller:** FR-207 · **Begrenses av:** FR-201, FR-407, FR-411, NFR-06, NFR-08
+
+**Kontroll — hva testen ser etter:**
+- Neste eks.dato står i grafen med datoen den ble sjekket
+- Sjekket for mer enn 7 dager siden: grått og «sjekket <dato>, kan være endret».
+  En test med faste datoer prøver grensen
+- En passert dato uten justering i kursserien (2.6) merkes «ikke bekreftet»
+- Uten dato står det ingenting, og det ser ikke ut som en feil (FR-303)
+- I demoen er datoene oppdiktet og merket «Eksempeltall»
+- **Ville feilet hvis:** en dato som ikke er sjekket på over 7 dager, så like
+  sikker ut som en som ble sjekket i dag
+
+**Avhenger av:** 2.14, og 2.6 for «ikke bekreftet». **Én økt:** ja.
+```
 
 **Hvorfor kilden mangler:**
 
@@ -623,6 +731,12 @@ avgjøres i planen.
 | **«Ingen utvidelse av omfanget» (prioriteringen 23.09 i `epics.md`)** | Ja. Prioriteringen sa at forbedringer ut over v1 tas først når v1 er kontrollert og virker, og innledningen til v1.1 i §8 sier det samme. Marians beslutning 08.10 endrer det. Prioriteringen bør få en datert linje |
 | **Faglærer: oversikten og aksjedetaljen ferdige og stabile i demoversjonen før KI-laget bygges ut** | Står i tilbakemeldingen 06.10. Tolv av de nye storyene endrer de to sidene. Rekkefølgen i punkt 5 legger dem etter at den daglige KI-teksten er i gang, unntatt 2.3, 3.1–3.4, 8.0b og 8.0c |
 
+*Rettet 2026-10-08 kl. 08:06, Marians beslutning:* regelen fra 05.10 står (svar 1
+under 2.3 og tillegget 05.10 under NFR-01). Bonuskvoten brukes bare til å fullføre
+kveldens henting, aldri til 2.3b, målingen i rad 13 eller noe annet. «Aldri
+bonuskvoten» i instruksjonen kl. 07:32 var for kort sagt. Første rad i tabellen
+over står slik den ble skrevet 07:51.
+
 ### 4.3 Spinen
 
 | AD | Forslag |
@@ -666,6 +780,10 @@ Telt fra `sprint-status.yaml` 08.10 kl. 07:38, uten Epic 5, 6 og 7 (ute av v1),
 De 32 er 2.3, 2.3b, 2.4, 2.6, 2.7, 2.8, 2.9, 2.9b, 2.10, 3.1–3.4, 3.4b, 4.0, 4.2,
 4.3, 8.0b, 8.0c, 8.1–8.5, 9.2 og 10.1–10.7. Rad 12 kan gi minst to til.
 
+*Rettet 2026-10-08 kl. 08:06:* rad 12 gir to storyer, 2.14 og 8.18. Det er 17 nye
+storyer, ikke 15. Etter forslaget er det 49 i `backlog`, ikke 47, og 89 storyer i
+`epics.md`, ikke 87. Anslaget over gjelder fortsatt: om lag 20 storyer før uke 45.
+
 ### Farten
 
 Fra 29.09 til 07.10 ble 7 storyer flettet: 2.1, 2.1b, 8.0, 2.1c, 2.5, 2.2 og 2.2b
@@ -707,6 +825,13 @@ og noen av de nye er små (8.15, 8.13). Det er ikke regnet på hver story.
 
 Rekkefølgen er avhengighetene og risikoen, ikke et estimat.
 
+*Rettet 2026-10-08 kl. 08:06, Marians beslutning:* 10.3 og 3.4b kommer rett etter
+10.2, før de nye storyene, fordi KI-teksten må vises og være med i demoen for
+suksessmålet «KI-forklaringen». Punkt 7 over har da bare 10.6 og 10.7. 8.1,
+brukertesten for «Brukerutfall», får fast plass før uke 45 og før 8.2, og står
+ikke lenger i punkt 11 «der de passer». 2.14 og 8.18 (rad 12) kommer etter 2.6.
+Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent.
+
 ## 6. Hva som må endres, hvis forslaget godtas
 
 | Dokument | Endring |
@@ -723,13 +848,20 @@ Rekkefølgen er avhengighetene og risikoen, ikke et estimat.
 1. **Bonuskvoten.** NFR-01 og 2.3 tillater i dag bonuskvoten for å fullføre
    hovedhentingen. Instruksjonen sier aldri bonuskvoten. Det må avgjøres før 2.3
    flettes (punkt 4.2).
+   *Rettet 2026-10-08 kl. 08:06, Marians beslutning:* regelen fra 05.10 står.
+   Bonuskvoten brukes bare til å fullføre kveldens henting, aldri til 2.3b,
+   målingen i rad 13 eller noe annet.
 2. **Rad 8.** Er det riktig å lese «det som er nytt» om vurderingene, nå som
    meldingene er ute?
+   *Avgjort 2026-10-08 kl. 08:06:* nei. Rad 8 gjelder som Marian bestemte 02.10
+   kl. 23:30: et merke under signalstyrken når den har endret seg (FR-107).
 3. **«Egen».** Raden «Egne aksjer» merket aksjene utenom de 15 «Egen». Når hele
    lista kan byttes, er det uklart hva «Egen» skal bety. Forslaget bruker bare
    «Utenfor målingen» og «x av 18».
+   *Avgjort 2026-10-08 kl. 08:06:* i planen for 2.12.
 4. **Navnet på FR-407 og 2.6.** Begge sier «utbyttedager», mens rad 11 ikke kan
    bruke ordet. Det bør avgjøres i planen for 2.6.
+   *Avgjort 2026-10-08 kl. 08:06:* i planen for 2.6.
 5. **Hvem skriver `aksje`.** Forslaget lar hentekommandoen være eneste skriver,
    så valg i nettsiden tas i bruk ved neste henting. Vil man se valget med en
    gang, må webserveren skrive `aksje`, og det er en endring av `AD-3`.
@@ -740,6 +872,11 @@ Rekkefølgen er avhengighetene og risikoen, ikke et estimat.
 8. **Regelen fra 02.10.** Den står i raden «Måling av omsetning med kall til
    overs» i §8 og i tilleggene 02.10 under NFR-01. Tidspunktet 10:57 er fra en
    samtale og står ikke i repoet, så forslaget viser til de to.
+9. **Beslutningen 02.10 kl. 23:30 og «Sammenlign med».** *Lagt til 2026-10-08
+   kl. 08:06:* beslutningen om rad 8 står ikke i repoet. Den er ført inn slik
+   instruksjonen kl. 08:06 gjengir den. «Sammenlign med» er heller ikke beskrevet
+   i repoet. Det må beskrives før 8.12 bygges, ellers kan testen ikke prøve at
+   merket skjules.
 
 ## 8. Overlevering
 
@@ -750,6 +887,7 @@ endringer.
 **Hvis Marian sier ja:**
 
 1. Punkt 1 i punkt 7 avgjøres først, fordi det gjelder 2.3, som bygges nå
+   *(avgjort 08.10 kl. 08:06)*
 2. `prd.md` med memloggen, i én commit
 3. `epics.md` med `sprint-status.yaml`, i én commit
 4. Spinen, i én commit
