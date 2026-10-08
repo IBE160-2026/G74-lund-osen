@@ -1,0 +1,35 @@
+# OSE Signal i Docker (story 3.1).
+#
+#   docker compose up              webserveren paa http://127.0.0.1:5000
+#   docker compose run --rm hent   hentingen, med EODHD_API_KEY fra .env
+#
+# app har ingen noekkel og gjoer null API-kall (AD-10). hent ligger i profilen
+# hent, saa docker compose up aldri starter en henting. Volumene er navngitte,
+# saa ingen container roerer data/ paa maskinen (regel 22). ose-db og ose-raa
+# er atskilte (AD-11, story 3.2).
+name: ose-signal
+
+services:
+  app:
+    build: .
+    image: ose-signal
+    ports:
+      # Bare paa maskinen selv. Appen skal ikke kunne naas fra nettet
+      # (betingelsen fra EODHD 21.09: lokalt, ikke publisert).
+      - "127.0.0.1:5000:5000"
+    volumes:
+      - ose-db:/app/data/db
+      - ose-raa:/app/data/raa
+
+  hent:
+    image: ose-signal
+    profiles: ["hent"]
+    command: ["python", "src/fetch_prices.py"]
+    env_file: .env
+    volumes:
+      - ose-db:/app/data/db
+      - ose-raa:/app/data/raa
+
+volumes:
+  ose-db:
+  ose-raa:
