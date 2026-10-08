@@ -40,3 +40,68 @@ jobs:
       - name: Kjoer testene
         # Samme kommando som lokalt, jf. README.
         run: uv run pytest -q
+
+  # Story 3.1: imaget bygges og proeves, uten hemmeligheter og uten EODHD.
+  # Det eneste nettet jobben bruker, er nedlastingen av grunnbildet og uv.
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Hent koden
+        uses: actions/checkout@v4
+
+      - name: Bygg imaget fra ren utsjekk
+        run: docker build -t ose-signal:ci .
+
+      - name: Ingen rådata, base eller nøkkel i imaget (AD-9, AD-12)
+        run: |
+          funn=$(docker run --rm --network none ose-signal:ci sh -c \
+            'find / -xdev \( -name "*.db" -o -name "*-raa-*.json" -o -name ".env" \) -print 2>/dev/null; find /app/data -type f')
+          if [ -n "$funn" ]; then echo "$funn"; exit 1; fi
+          if docker image inspect ose-signal:ci --format '{{json .Config.Env}}' | grep -q EODHD; then
+            echo "EODHD i miljøet til imaget"; exit 1
+          fi
+
+      - name: Python 3.13 og Oslo-tid i imaget (AD-20)
+        run: |
+          docker run --rm --network none ose-signal:ci python -c "
+          import sys, datetime as d
+          from zoneinfo import ZoneInfo
+          assert sys.version_info[:2] == (3, 13), sys.version
+          vinter = d.datetime(2026, 1, 15, 12, tzinfo=d.timezone.utc).astimezone(ZoneInfo('Europe/Oslo'))
+          sommer = d.datetime(2026, 7, 15, 12, tzinfo=d.timezone.utc).astimezone(ZoneInfo('Europe/Oslo'))
+          assert vinter.utcoffset() == d.timedelta(hours=1) and sommer.utcoffset() == d.timedelta(hours=2)
+          print(sys.version.split()[0], vinter.isoformat(), sommer.isoformat())
+          "
+
+      - name: Webserveren svarer uten nett og uten nøkkel (AD-10)
+        run: |
+          c=$(docker run -d --network none ose-signal:ci)
+          ok=0
+          for i in $(seq 1 30); do
+            if docker exec "$c" python -c "import urllib.request, sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:5000/').status == 200 else 1)" 2>/dev/null; then
+              ok=1; break
+            fi
+            sleep 1
+          done
+          noekler=$(docker exec "$c" sh -c 'env | grep -c EODHD || true')
+          docker logs "$c"
+          docker rm -f "$c" > /dev/null
+          [ "$ok" = 1 ] && [ "$noekler" = 0 ]
+
+      - name: Hentingen uten nøkkel og uten nett stopper før første kall
+        run: |
+          set +e
+          ut=$(docker run --rm --network none ose-signal:ci python src/fetch_prices.py 2>&1)
+          kode=$?
+          set -e
+          echo "$ut"
+          echo "kode $kode"
+          if echo "$ut" | grep -q Traceback; then exit 1; fi
+          echo "$ut" | grep -Eq "EODHD_API_KEY mangler|0 kall brukt"
+
+      - name: compose.yaml starter bare webserveren uten profilen hent
+        run: |
+          [ "$(docker compose config --services)" = "app" ]
+          [ "$(docker compose --profile hent config --services | sort | tr '\n' ' ')" = "app hent " ]
