@@ -2,7 +2,7 @@
 title: 'Story 2.3: Børsdagskontroll før kvoten brukes'
 type: 'feature'
 created: '2026-10-07'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '7d03d8ea74e9d3d74947c78e4aa3a24988ce6b85'
