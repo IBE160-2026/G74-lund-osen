@@ -18,6 +18,9 @@ permissions:
 jobs:
   pytest:
     runs-on: ubuntu-latest
+    # Suiten bruker 1-2 minutter. Uten grense kan en test som henger, holde
+    # paa i opptil 6 timer. Hele suiten hang 07.10 og en gang 08.10 (story 2.3).
+    timeout-minutes: 15
 
     steps:
       - name: Hent koden
