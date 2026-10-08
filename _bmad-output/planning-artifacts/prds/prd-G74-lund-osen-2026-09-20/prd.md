@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-08T17:16
+updated: 2026-10-08T21:56
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -406,6 +406,11 @@ falt.
 - Ingen nye kall og ingen ny lagring: endringen er den i FR-101, og bransjen står
   i `AKSJEUNIVERS`.
 - Bare dagens søyler. Periodene og «Velg dag» fra designtavla er idé til v1.1.
+  *Rettet 2026-10-08 kl. 21:48, Marians beslutning:* «Bare dagens søyler» gjelder
+  ikke lenger. Søylene følger periodevalget i oversikten og «Velg dag», som
+  tabellen (FR-101, tillegget 08.10), og indekslinja følger samme periode.
+  Endringen regnes som i FR-101, av kursserien på `adjusted_close`.
+  Bransjesymbolet er gult som før (`designregler.md` §3). Story 8.17.
 
 *Lagt til 2026-10-01:* bransjesymbolet er gult når aksjen har 3 av 3 på siste børsdag (designregler.md §3).
 
@@ -437,6 +442,11 @@ ikke noe merke.
 
 «Sammenlign med» er ikke beskrevet i repoet. Det må beskrives før 8.12 bygges
 (`sprint-change-proposal-2026-10-08.md`, punkt 7.9).
+
+*Lagt til 2026-10-08 kl. 21:48, Marians beslutning:* «Sammenlign med» er
+periodevalget i Min liste i designforslaget. Hver rad viser tallene for siste
+børsdag øverst og dagen man sammenligner med under. Det beskrives og bygges i
+8.17, som kommer før 8.12.
 
 #### FR-108 — Filter på signalet
 
