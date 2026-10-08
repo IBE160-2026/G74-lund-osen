@@ -2,7 +2,7 @@
 title: "Endringsforslag 08.10: femten idéer inn i v1"
 status: final
 created: 2026-10-08
-updated: 2026-10-08T08:09
+updated: 2026-10-08T21:56
 ---
 
 # Endringsforslag 08.10: femten idéer inn i v1
@@ -877,6 +877,9 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent.
    instruksjonen kl. 08:06 gjengir den. «Sammenlign med» er heller ikke beskrevet
    i repoet. Det må beskrives før 8.12 bygges, ellers kan testen ikke prøve at
    merket skjules.
+   *Avgjort 2026-10-08 kl. 21:48:* «Sammenlign med» er periodevalget i Min liste
+   i designforslaget. Hver rad viser tallene for siste børsdag øverst og dagen man
+   sammenligner med under. Det beskrives og bygges i 8.17, som kommer før 8.12.
 
 ## 8. Overlevering
 
