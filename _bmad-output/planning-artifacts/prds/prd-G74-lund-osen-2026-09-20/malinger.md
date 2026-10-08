@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-08T22:11
+updated: 2026-10-08T22:27
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -2505,3 +2505,39 @@ først.
 
 Målingen endrer ikke universet. Parametrene i signalet er låst og målt på de
 15 (AD-13).
+
+## 25. Håndkontroll av første utslag på interesse (2026-10-08)
+
+**Hvorfor.** Vurderingen for 2026-10-08 har det første utslaget på interesse
+siden de lagrede vurderingene begynte 02.10. De 60 radene for 02.10, 05.10,
+06.10 og 07.10 har alle interesse 0, og 14 av de 15 for 08.10 også.
+
+**Metode.** Raden ble lest fra `vurdering` i `data/db/ose.db`, bare feltene
+`interesse`, `volumforhold`, `styrke` og `retning`. Det samme ble så regnet for
+hånd fra `data/raa/kurser-raa-2026-10-08.json`, kveldens henting 08.10, med et
+eget lite skript som ikke importerer noe fra `src/`: dagens volum delt på
+medianen av volumet de 20 handelsdagene før, og om forholdet er over 1,5.
+Fortegnet er retningen på dagens endring i `adjusted_close` fra forrige
+handelsdag. Fila finnes **bare lokalt** og er ikke sporet i git. Bare tallene
+under er regnet ut og ført her.
+
+**Kostnad.** 0 kall.
+
+| | Raden i basen | For hånd |
+|---|---|---|
+| Symbol | TEL | TEL |
+| Interesse | -1 | -1 |
+| Volumforhold | 1,53 | 1,53 |
+| Over 1,5 | Ja | Ja |
+| Vindu, 20 handelsdager | | 2026-09-10 til 2026-10-07 |
+| Dagens endring | | ned, fra 2026-10-07 |
+| Styrke og retning | 2, Negativ | |
+
+**Resultat.** Regnestykket for hånd ga samme svar som koden: forholdet er det
+samme også uavrundet, det er over 1,5, og dagens endring er ned, så interesse er
+-1. Utslaget er riktig regnet.
+
+Kveldsraden kan få litt høyere volum dagen etter (§22: 6 av 90 rader fikk
+0,08 % til 6,9 % mer, og ingen fikk mindre). Vinduet på 20 dager før er ferdig,
+så et høyere volum for 08.10 kan bare gjøre forholdet større og utslaget
+sterkere, ikke ta det bort. Vurderingen som er lagret, endres ikke (`AD-7`).
