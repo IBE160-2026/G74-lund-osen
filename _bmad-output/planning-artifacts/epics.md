@@ -312,7 +312,7 @@ kontrollen 22.09 fant det.
 | FR-404, FR-405 | Epic 6 🔒 |
 | FR-406, FR-408, FR-409 | Epic 1 |
 | FR-407 | Epic 2 |
-| FR-104, FR-105, FR-410 | Epic 2 *(lagt til 2026-10-01)* |
+| FR-104, FR-105, FR-410 | Epic 2 *(lagt til 2026-10-01)*. *Lagt til 2026-10-08 kl. 21:48:* periodene for søylene i FR-105 er Epic 8, story 8.17 |
 | FR-501, FR-502, FR-503 | Epic 6 🔒 |
 | FR-601, FR-602, FR-603, FR-606 | Epic 5 🔒 |
 | FR-604, FR-605 | Epic 4 |
@@ -403,6 +403,7 @@ Epic 2.7 ──> 8.8 (signaldager) og 8.12 (endret signalstyrke) <── 8.3   *
 Epic 2.6 ──> 8.14 (justeringsdager)   *(lagt til 2026-10-08)*
 Epic 8.0b ──> 8.9 (omvisningen) og 8.13 (Lær noe nytt)   *(lagt til 2026-10-08)*
 Epic 8.0b + 8.3 + 10.3 ──> 8.10 (Innstillinger)   *(lagt til 2026-10-08)*
+Epic 8.17 («Sammenlign med») ──> 8.12   *(lagt til 2026-10-08 kl. 21:48)*
 ```
 
 *Lagt til 2026-10-08:* 8.6 sier i forslaget at den avhenger av 8.17 for
@@ -485,6 +486,8 @@ Ingen av 1.9, 2.7 og 9.5 utvider omfanget: 1.9 er en skjemaendring før basen ha
 10. 8.3, så 8.10, 8.9 og 8.13.
 11. Lista: 2.11, 2.12, 2.13 og 8.11. 2.13 kan tas tidligere, fordi den ikke endrer lista.
 12. 8.1, brukertesten for «Brukerutfall», har fast plass før uke 45 og før 8.2. 8.2, 8.4, 8.5, 2.10, 2.4 og 9.2 der de passer.
+
+*Lagt til 2026-10-08 kl. 21:48:* storyene krever at 8.3 kommer før 8.17 og 8.12, og 8.17 før 8.12. Punkt 7, 9 og 10 følger ikke det, og rettes når rekkefølgen tas opp igjen etter README-prøven.
 
 Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» avgjøres i planen for 2.12, og navnet på FR-407 og 2.6 i planen for 2.6.
 
@@ -2955,6 +2958,9 @@ børsdag, så jeg ser med en gang hva som er nytt.
 
 **Avhenger av:** 2.7 for lesingen av en periode, og 8.3 for Min liste. **Én økt:** ja.
 
+*Lagt til 2026-10-08 kl. 21:48:* avhenger også av 8.17, fordi merket ikke kan
+prøves skjult før «Sammenlign med» finnes.
+
 ### Story 8.13: Lær noe nytt
 
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 9).*
@@ -3057,6 +3063,14 @@ signalet for en dag jeg velger.
   (`designregler.md` §3)
 - **Ville feilet hvis:** «Velg dag» for 01.10 viste et signal. Det finnes
   vurderinger fra 02.10
+
+*Lagt til 2026-10-08 kl. 21:48, Marians beslutning (FR-105, FR-107):*
+- Søylene under hovedindeksen følger periodevalget og «Velg dag», som tabellen,
+  og indekslinja følger samme periode. Endringen regnes som i FR-101, av
+  kursserien på `adjusted_close`. Bransjesymbolet er gult ved 3 av 3 som før
+- «Sammenlign med» er periodevalget i Min liste: hver rad viser tallene for
+  siste børsdag øverst og dagen man sammenligner med under
+- **Ville feilet hvis:** søylene viste dagens endring mens tabellen viste en uke
 
 **Avhenger av:** 8.16, 8.3 for Min liste og 8.6 for børsometeret. **Én økt:**
 avgjøres i planen.
