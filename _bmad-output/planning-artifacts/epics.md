@@ -1433,6 +1433,8 @@ Oppgaveplanlegging beskrives i README (regel 19).
 
 **Én økt:** ja.
 
+*Ferdig 2026-10-08:* flettet i `249853e`, PR #22.
+
 ### Story 2.3b: Kallene som er igjen, brukes på nye forsøk
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 19:17.*
