@@ -92,6 +92,13 @@ class TestImaget:
         kjoer = " ".join(r for i, r in _instruksjoner() if i == "RUN")
         assert "uv sync --locked --no-dev" in kjoer
 
+    def test_uv_laster_aldri_ned_en_egen_python(self):
+        """Ville feilet hvis uv kunne hente en annen Python under byggingen.
+        Med python:3.12-slim lastet uv ned 3.13, og imaget kjoerte en Python
+        Dockerfile ikke styrer (mutanten I5)."""
+        miljoe = " ".join(r for i, r in _instruksjoner() if i == "ENV")
+        assert "UV_PYTHON_DOWNLOADS=never" in miljoe
+
     def test_bare_koden_kopieres(self):
         """Ville feilet hvis hele mappa ble kopiert. Da er .dockerignore eneste
         vakt mot data/ og .env i imaget."""

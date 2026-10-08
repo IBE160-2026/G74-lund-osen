@@ -14,7 +14,11 @@ FROM python:3.13.15-slim
 
 COPY --from=ghcr.io/astral-sh/uv:0.12.15 /uv /bin/uv
 
+# UV_PYTHON_DOWNLOADS=never: uv bruker Pythonen i grunnbildet og laster aldri
+# ned en egen. Uten den kunne et feil grunnbilde gitt et image med en Python
+# uv hentet under byggingen (mutanten I5).
 ENV UV_COMPILE_BYTECODE=1 \
+    UV_PYTHON_DOWNLOADS=never \
     UV_LINK_MODE=copy \
     UV_PROJECT_ENVIRONMENT=/opt/venv \
     PYTHONUNBUFFERED=1
