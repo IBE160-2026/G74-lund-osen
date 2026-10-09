@@ -272,11 +272,19 @@ class TestCompose:
         hent = _tjenester()["hent"]
         ci = CI.read_text(encoding="utf-8")
         steg = ci.split("- name: Hentingen med skrivebeskyttet rot", 1)[1].split("- name:", 1)[0]
-        assert _verdier(hent["read_only"]) == ["true"] and "--read-only" in steg
-        for monteringspunkt in _verdier(hent["tmpfs"]):
-            assert f"--tmpfs {monteringspunkt}" in steg
-        for volum in _verdier(hent["volumes"]):
-            assert volum.split(":")[1] in steg
+        kjoeringer = [k for k in steg.split("docker run ")[1:] if "ose-signal:ci" in k]
+        assert len(kjoeringer) == 2, len(kjoeringer)
+        assert _verdier(hent["read_only"]) == ["true"]
+        for kjoering in kjoeringer:
+            flagg = kjoering.split("ose-signal:ci", 1)[0]
+            assert "--read-only" in flagg
+            for monteringspunkt in _verdier(hent["tmpfs"]):
+                assert re.search(rf"--tmpfs {re.escape(monteringspunkt)}(\s|$)", flagg), monteringspunkt
+            # Hvert volum i compose paa sin egen mappe, med samme navn bak ose-ci-ro-.
+            for volum in _verdier(hent["volumes"]):
+                navn, maal = volum.split(":")
+                del_ = navn.removeprefix("ose-")
+                assert re.search(rf"-v ose-ci-ro-{re.escape(del_)}:{re.escape(maal)}(\s|$)", flagg), volum
 
     def test_advarslene_om_basen_og_down_v(self):
         """Svar 3 i 3.2 og AD-7: «du kan slette basen» er feil raad. Ville

@@ -135,6 +135,9 @@ jobs:
         # kjoeres med innstillingene i compose.yaml, ogsaa read_only og tmpfs.
         run: |
           p=ose-ci-32
+          # Foer trap: finnes volumene fra foer, stopper steget uten aa roere dem.
+          fra_foer=$(docker volume ls -q --filter "name=^${p}_")
+          if [ -n "$fra_foer" ]; then echo "volumer fra før: $fra_foer"; exit 1; fi
           trap 'docker compose -p $p down -v > /dev/null 2>&1 || true; docker volume rm ${p}_ose-db ${p}_ose-raa > /dev/null 2>&1 || true' EXIT
           svar() {
             for i in $(seq 1 30); do
@@ -148,15 +151,30 @@ jobs:
             docker compose -p $p logs app
             return 1
           }
-          if docker volume ls --format '{{.Name}}' | grep -q "^${p}_"; then echo "volumer fra før"; exit 1; fi
+          # Ny og tom base: siste skjemaversjon og ingen rader i kurs eller vurdering.
+          tom_base() {
+            docker compose -p $p exec -T app python -c "
+          import sqlite3, lagring_sqlite as l
+          from migrering import siste_versjon, versjon
+          c = sqlite3.connect('file:/app/data/db/ose.db?mode=ro', uri=True)
+          assert versjon(c) == siste_versjon(l.MIGRASJONSKATALOG), versjon(c)
+          for tabell in ('kurs', 'vurdering'):
+              assert c.execute(f'select count(*) from {tabell}').fetchone()[0] == 0, tabell
+          "
+          }
           docker compose -p $p up -d --build app
           svar
-          docker compose -p $p exec -T app test -s /app/data/db/ose.db
-          # Bare /tmp og volumet kan skrives: waitress sin TemporaryFile virker,
-          # og en fil i hjemmemappa til ose, som ose eier, gjoer det ikke.
-          docker compose -p $p exec -T app python -c "import tempfile; tempfile.TemporaryFile('w+b').close()"
-          if docker compose -p $p exec -T app sh -c 'touch /home/ose/skrevet' 2>/dev/null; then echo "rotfilsystemet er skrivbart"; exit 1; fi
-          # app har ikke ose-raa.
+          tom_base
+          # Bare /tmp og volumet kan skrives: tempfile bruker /tmp, og en fil i
+          # hjemmemappa til ose, som ose eier, gir «Read-only file system».
+          docker compose -p $p exec -T app python -c "
+          import tempfile
+          assert tempfile.gettempdir() == '/tmp', tempfile.gettempdir()
+          tempfile.TemporaryFile('w+b').close()
+          "
+          ut=$(docker compose -p $p exec -T app sh -c 'touch /home/ose/skrevet' 2>&1 || true)
+          echo "$ut" | grep -q "Read-only file system"
+          # app har bare ose-db.
           monteringer=$(docker inspect "$(docker compose -p $p ps -q app)" --format '{{range .Mounts}}{{.Destination}} {{end}}')
           echo "app har $monteringer"
           [ "$(echo $monteringer)" = "/app/data/db" ]
@@ -169,18 +187,37 @@ jobs:
           docker volume rm ${p}_ose-db > /dev/null
           docker compose -p $p up -d app
           svar
-          if docker compose -p $p exec -T app test -e /app/data/db/merke; then echo "basen er ikke ny"; exit 1; fi
-          docker compose -p $p exec -T app test -s /app/data/db/ose.db
+          set +e
+          docker compose -p $p exec -T app test -e /app/data/db/merke
+          merke=$?
+          set -e
+          [ "$merke" = 1 ]
+          tom_base
           docker run --rm --network none -v ${p}_ose-raa:/app/data/raa ose-signal:ci test -f /app/data/raa/kurser-raa-2026-01-02.json
-          echo "ose-db fjernet og laget paa nytt, ose-raa sto"
+          echo "ose-db fjernet og laget paa nytt, tom, og ose-raa sto"
 
       - name: Hentingen med skrivebeskyttet rot og /tmp som tmpfs
         # Samme innstillinger som hent i compose.yaml (read_only, tmpfs /tmp
-        # og de to volumene), men med docker run og uten .env.
+        # og de to volumene), men med docker run og uten .env. Foerst det hent
+        # skriver: basen migreres paa ose-db, en fil i ose-raa og en
+        # midlertidig fil i /tmp. Saa hentekommandoen til noekkelen.
         run: |
           docker volume create ose-ci-ro-db > /dev/null
           docker volume create ose-ci-ro-raa > /dev/null
           trap 'docker volume rm ose-ci-ro-db ose-ci-ro-raa > /dev/null 2>&1 || true' EXIT
+          docker run --rm --network none --read-only --tmpfs /tmp \
+            -v ose-ci-ro-db:/app/data/db -v ose-ci-ro-raa:/app/data/raa \
+            ose-signal:ci python -c "
+          import tempfile, lagring_sqlite as l, lagring_fil as f
+          assert tempfile.gettempdir() == '/tmp', tempfile.gettempdir()
+          tempfile.TemporaryFile('w+b').close()
+          c = l.aapne_base(l.BASE_STI)
+          c.execute('select count(*) from kurs').fetchone()
+          c.close()
+          with open(f.RAA_KATALOG / 'proeve-raa-2026-01-02.json', 'x') as ut:
+              ut.write('{}')
+          print('skrev basen, raa og /tmp')
+          "
           set +e
           ut=$(docker run --rm --network none --read-only --tmpfs /tmp \
             -v ose-ci-ro-db:/app/data/db -v ose-ci-ro-raa:/app/data/raa \
