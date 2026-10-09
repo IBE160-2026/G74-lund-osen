@@ -81,8 +81,8 @@ jobs:
           "
 
       - name: Webserveren svarer uten nett og uten nøkkel (AD-10)
-        # Den tomme siden med hentekommandoen, og basen er migrert av
-        # aapne_base ved foerste forespoersel.
+        # Den tomme siden med hentekommandoen for Docker (OSE_I_DOCKER, story
+        # 3.3), og basen er migrert av aapne_base ved foerste forespoersel.
         run: |
           c=$(docker run -d --network none ose-signal:ci)
           ok=0
@@ -91,7 +91,7 @@ jobs:
           import urllib.request, sys
           s = urllib.request.urlopen('http://127.0.0.1:5000/')
           html = s.read().decode()
-          sys.exit(0 if s.status == 200 and 'fetch_prices.py' in html else 1)
+          sys.exit(0 if s.status == 200 and 'docker compose run --rm hent' in html else 1)
           " 2>/dev/null; then
               ok=1; break
             fi
@@ -144,7 +144,7 @@ jobs:
               if docker compose -p $p exec -T app python -c "
           import urllib.request, sys
           s = urllib.request.urlopen('http://127.0.0.1:5000/')
-          sys.exit(0 if s.status == 200 and 'fetch_prices.py' in s.read().decode() else 1)
+          sys.exit(0 if s.status == 200 and 'docker compose run --rm hent' in s.read().decode() else 1)
           " 2>/dev/null; then return 0; fi
               sleep 1
             done
