@@ -63,11 +63,11 @@ Planen er vist i chatten 09.10 og ført i `docs/ai-prompts/2026-10-09.md` (instr
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `compose.yaml` -- svarene 1–3.
-- [ ] `tests/test_docker.py` -- volumene per tjeneste, ingen overlapp, `read_only` og `tmpfs`, kommentarene.
-- [ ] `.github/workflows/tester.yml` -- livsløpet og skrivebeskyttet rot.
-- [ ] Spinen -- merknaden under `AD-11`.
-- [ ] `deferred-work.md` -- README-teksten for 3.3.
+- [x] `compose.yaml` -- svarene 1–3.
+- [x] `tests/test_docker.py` -- volumene per tjeneste, ingen overlapp, `read_only` og `tmpfs`, kommentarene.
+- [x] `.github/workflows/tester.yml` -- livsløpet og skrivebeskyttet rot.
+- [x] Spinen -- merknaden under `AD-11`.
+- [x] `deferred-work.md` -- README-teksten for 3.3.
 
 **Acceptance Criteria:**
 - Given ingen volumer, when `app` startes med compose, then svarer `/` 200 og `ose-db` er laget.
@@ -76,11 +76,47 @@ Planen er vist i chatten 09.10 og ført i `docs/ai-prompts/2026-10-09.md` (instr
 
 ## Implementation Notes
 
+- **waitress 3.0.2** i `.venv`: `outbuf_overflow = 1048576` og `inbuf_overflow = 524288` (`waitress/adjustments.py`), og `buffers.py` lager `tempfile.TemporaryFile("w+b")` når grensen nås. Verdien står i kommentaren i `compose.yaml`.
+- **Livsløpet i CI** (steg 7) kjører `app` gjennom compose i prosjektet `ose-ci-32`, så `read_only`, `tmpfs` og volumene er de i `compose.yaml`. Det sjekker at ingen `ose-ci-32_*`-volumer finnes før `up`, at `/` svarer 200 med den tomme siden, at basen er laget, at `TemporaryFile` virker i `/tmp`, at `touch /home/ose/skrevet` feiler, at `app` bare har `/app/data/db` montert, og at en fil i `ose-raa` står etter at `ose-db` er fjernet og laget på nytt (merket i `ose-db` er borte). `trap` fjerner begge volumene i prosjektet, også når steget feiler.
+- **`touch /app/...`** var første utgave av sjekken for skrivebeskyttet rot. Mutanten C3 (`app` uten `read_only`) overlevde, fordi `/app` eies av root, så `ose` kunne ikke skrive der uansett. Sjekken bruker nå `/home/ose`, som `ose` eier.
+- **Oppryddingen i `trap`** sluttet først med `; true`. Under `bash -e` stoppet `docker volume rm` med feil når `down -v` alt hadde fjernet volumet, og steget fikk kode 1 selv om prøven gikk. Hver kommando har nå `|| true`, og mutantene C3 og C5 er kjørt på nytt etterpå.
+- **Hentingen** (steg 8) prøves med `docker run --read-only --tmpfs /tmp` og to egne volumer, fordi CI ikke har `.env` og compose da nekter `hent`. `test_ci_proever_hent_med_de_samme_innstillingene` holder flaggene like med `hent` i `compose.yaml`.
+- **Lokalt** er stegene kjørt fra en ren eksport av grenen (`git archive` av arbeidskopien) i en mappe uten `.env` og `data/`, så compose aldri leste nøkkelen. `hent` er aldri kjørt gjennom compose. Containeren `focused_booth` fra mutanten I3 i 3.1 (08.10 kl. 22:56) og volumene `ose-ci-32_ose-raa` og `ose-ci-32_ose-db` fra prøvene her lå igjen og er fjernet. Etter prøvene viser `docker volume ls` bare `ose-ki-ollama`.
+
 ## Spec Change Log
 
 ## Review Triage Log
 
 ## Verification
+
+**Mutantene, 09.10 kl. 20:52–20:59.** Statiske mot `tests/test_docker.py`, 8 av 8 drept:
+
+| Mutant | Testen som fanger den |
+|---|---|
+| S1 ett volum over hele `data/` | `test_navngitte_volumer_aldri_data_paa_maskinen`, `test_volumene_overlapper_ikke` |
+| S2 `ose-raa` på `/app/data/db` | de samme to |
+| S3 `app` får `ose-raa` | `test_webserveren_har_ikke_oeyeblikksbildene` og volumtesten |
+| S4 kommentaren om basen fjernet | `test_advarslene_om_basen_og_down_v` |
+| S5 advarselen om `down -v` fjernet | `test_advarslene_om_basen_og_down_v` |
+| S6 `app` uten `read_only` | `test_skrivebeskyttet_rot_med_tmp_som_tmpfs` |
+| S7 `hent` uten `tmpfs` | `test_skrivebeskyttet_rot_med_tmp_som_tmpfs`, `test_ci_proever_hent_med_de_samme_innstillingene` |
+| S8 CI-steget uten `--tmpfs /tmp` | `test_ci_proever_hent_med_de_samme_innstillingene` |
+
+I CI, mot stegene i jobben `docker` fra en ren eksport, 7 av 7 drept etter rettingene over:
+
+| Mutant | Steget som feiler |
+|---|---|
+| C1 `app` med ett volum over `/app/data` | 7 |
+| C2 `app` uten tmpfs | 7, `TemporaryFile` |
+| C3 `app` uten `read_only` | 7. Overlevde med `touch /app`, drept med `/home/ose` |
+| C4 `app` med `ose-raa` | 7, monteringene |
+| C5 volumene laget på forhånd | 7 |
+| C6 webserveren skriver `/app/startet` før waitress | 7 |
+| C7 `main()` i hentingen skriver `/home/ose/startet` | 8. Første forsøk med `sed` i Dockerfile bygget ikke, og `sitecustomize` overlevde, fordi Python bare skriver en melding når den feiler |
+
+C8, CI-steget for hentingen uten `--tmpfs /tmp`, gir ingen feil i kjøringen: hentingen uten nøkkel skriver ikke i `/tmp`. Den fanges av S8.
+
+**Suiten:** 1218 passed og 16 skipped, mot 1213 og 16 før (27 i `tests/test_docker.py`).
 
 **Commands:**
 - `uv run pytest -q` -- expected: grønn.
