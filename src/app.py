@@ -22,6 +22,7 @@ i. Kan basen ikke aapnes eller leses, svarer siden 503 med feiltypen, uten
 stier. Bare de to rutene roerer basen.
 """
 
+import os
 import sqlite3
 import threading
 from collections.abc import Callable
@@ -52,6 +53,17 @@ from tallformat import tall
 # en test krever at de to er like (story 3.3). Kommer kommandoen for Docker i
 # 3.1, endres bare denne og README.
 HENTEKOMMANDO = "uv run python src/fetch_prices.py"
+
+# Story 3.3, gruppens svar 09.10 kl. 23:13: en konstant for hver maate aa
+# kjoere paa. Dockerfile setter OSE_I_DOCKER=1, og da viser den tomme siden
+# kommandoen for Docker. README har begge, og en test holder dem like.
+HENTEKOMMANDO_DOCKER = "docker compose run --rm hent"
+I_DOCKER = "OSE_I_DOCKER"
+
+
+def hentekommando() -> str:
+    """Kommandoen for maaten appen kjoerer paa, lest fra miljoeet (AD-12)."""
+    return HENTEKOMMANDO_DOCKER if os.environ.get(I_DOCKER) == "1" else HENTEKOMMANDO
 
 # Feil som betyr at basen ikke kan aapnes eller migreres, som BASEFEIL i
 # hentingen. Siden svarer da 503 med grunnen i stedet for en traceback.
@@ -214,7 +226,7 @@ def markedsoversikt():
             hentet=None,
             mangler=[],
             eget=set(),
-            hentekommando=HENTEKOMMANDO,
+            hentekommando=hentekommando(),
         )
 
     poster = _leser_eller_basefeil(hent_oversiktsleser).oversikt()
@@ -228,7 +240,7 @@ def markedsoversikt():
         eget=eldre_enn_nyeste(rader),
         mangler=uten_kurser(poster),
         ikke_vurdert=any(rad.ikke_vurdert for rad in rader),
-        hentekommando=HENTEKOMMANDO,
+        hentekommando=hentekommando(),
     )
 
 

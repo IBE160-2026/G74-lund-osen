@@ -43,8 +43,11 @@ RUN useradd --create-home --uid 10001 ose \
     && chown -R ose:ose data
 USER ose
 
+# OSE_I_DOCKER=1: den tomme siden viser «docker compose run --rm hent» i
+# stedet for uv-kommandoen (story 3.3).
 ENV PATH=/opt/venv/bin:$PATH \
-    PYTHONPATH=/app/src
+    PYTHONPATH=/app/src \
+    OSE_I_DOCKER=1
 
 EXPOSE 5000
 
