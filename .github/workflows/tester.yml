@@ -135,7 +135,7 @@ jobs:
         # kjoeres med innstillingene i compose.yaml, ogsaa read_only og tmpfs.
         run: |
           p=ose-ci-32
-          trap 'docker compose -p $p down -v > /dev/null 2>&1; docker volume rm ${p}_ose-raa > /dev/null 2>&1; true' EXIT
+          trap 'docker compose -p $p down -v > /dev/null 2>&1 || true; docker volume rm ${p}_ose-db ${p}_ose-raa > /dev/null 2>&1 || true' EXIT
           svar() {
             for i in $(seq 1 30); do
               if docker compose -p $p exec -T app python -c "
@@ -153,9 +153,9 @@ jobs:
           svar
           docker compose -p $p exec -T app test -s /app/data/db/ose.db
           # Bare /tmp og volumet kan skrives: waitress sin TemporaryFile virker,
-          # og en fil i /app gjoer det ikke.
+          # og en fil i hjemmemappa til ose, som ose eier, gjoer det ikke.
           docker compose -p $p exec -T app python -c "import tempfile; tempfile.TemporaryFile('w+b').close()"
-          if docker compose -p $p exec -T app sh -c 'touch /app/skrevet' 2>/dev/null; then echo "rotfilsystemet er skrivbart"; exit 1; fi
+          if docker compose -p $p exec -T app sh -c 'touch /home/ose/skrevet' 2>/dev/null; then echo "rotfilsystemet er skrivbart"; exit 1; fi
           # app har ikke ose-raa.
           monteringer=$(docker inspect "$(docker compose -p $p ps -q app)" --format '{{range .Mounts}}{{.Destination}} {{end}}')
           echo "app har $monteringer"
@@ -180,7 +180,7 @@ jobs:
         run: |
           docker volume create ose-ci-ro-db > /dev/null
           docker volume create ose-ci-ro-raa > /dev/null
-          trap 'docker volume rm ose-ci-ro-db ose-ci-ro-raa > /dev/null 2>&1; true' EXIT
+          trap 'docker volume rm ose-ci-ro-db ose-ci-ro-raa > /dev/null 2>&1 || true' EXIT
           set +e
           ut=$(docker run --rm --network none --read-only --tmpfs /tmp \
             -v ose-ci-ro-db:/app/data/db -v ose-ci-ro-raa:/app/data/raa \
