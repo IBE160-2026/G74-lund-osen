@@ -1794,6 +1794,8 @@ igjen (dagsfila 04.10, instruksjonen kl. 21:29).
 
 **Én økt:** ja.
 
+*Ferdig 2026-10-09:* flettet i `088c885`, PR #24.
+
 
 ### Story 3.3: README — «Slik kjører du den»
 
