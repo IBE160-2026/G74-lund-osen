@@ -2,7 +2,7 @@
 title: 'Story 3.1: Dockerfile med to innganger'
 type: 'feature'
 created: '2026-10-08'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '0f084ee6c3435706a864e7b03e04f42477f21283'
