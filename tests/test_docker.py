@@ -265,6 +265,19 @@ class TestCompose:
             assert _verdier(felt["read_only"]) == ["true"], navn
             assert _verdier(felt["tmpfs"]) == ["/tmp"], navn
 
+    def test_ci_proever_hent_med_de_samme_innstillingene(self):
+        """Svar 2 i 3.2: prøven med skrivebeskyttet rot i CI bruker det
+        compose.yaml gir hent. Ville feilet hvis compose-fila fikk en annen
+        tmpfs, eller CI-steget mistet --read-only eller --tmpfs /tmp."""
+        hent = _tjenester()["hent"]
+        ci = CI.read_text(encoding="utf-8")
+        steg = ci.split("- name: Hentingen med skrivebeskyttet rot", 1)[1].split("- name:", 1)[0]
+        assert _verdier(hent["read_only"]) == ["true"] and "--read-only" in steg
+        for monteringspunkt in _verdier(hent["tmpfs"]):
+            assert f"--tmpfs {monteringspunkt}" in steg
+        for volum in _verdier(hent["volumes"]):
+            assert volum.split(":")[1] in steg
+
     def test_advarslene_om_basen_og_down_v(self):
         """Svar 3 i 3.2 og AD-7: «du kan slette basen» er feil raad. Ville
         feilet hvis kommentaren ved ose-db eller advarselen om down -v ble

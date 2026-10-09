@@ -130,6 +130,69 @@ jobs:
           docker volume rm ose-ci-db ose-ci-raa > /dev/null
           [ "$kode" = 0 ]
 
+      - name: Volumene i drift med compose (story 3.2, AD-11)
+        # Eget prosjekt, saa bare volumene ose-ci-32_* lages og fjernes. app
+        # kjoeres med innstillingene i compose.yaml, ogsaa read_only og tmpfs.
+        run: |
+          p=ose-ci-32
+          trap 'docker compose -p $p down -v > /dev/null 2>&1; docker volume rm ${p}_ose-raa > /dev/null 2>&1; true' EXIT
+          svar() {
+            for i in $(seq 1 30); do
+              if docker compose -p $p exec -T app python -c "
+          import urllib.request, sys
+          s = urllib.request.urlopen('http://127.0.0.1:5000/')
+          sys.exit(0 if s.status == 200 and 'fetch_prices.py' in s.read().decode() else 1)
+          " 2>/dev/null; then return 0; fi
+              sleep 1
+            done
+            docker compose -p $p logs app
+            return 1
+          }
+          if docker volume ls --format '{{.Name}}' | grep -q "^${p}_"; then echo "volumer fra før"; exit 1; fi
+          docker compose -p $p up -d --build app
+          svar
+          docker compose -p $p exec -T app test -s /app/data/db/ose.db
+          # Bare /tmp og volumet kan skrives: waitress sin TemporaryFile virker,
+          # og en fil i /app gjoer det ikke.
+          docker compose -p $p exec -T app python -c "import tempfile; tempfile.TemporaryFile('w+b').close()"
+          if docker compose -p $p exec -T app sh -c 'touch /app/skrevet' 2>/dev/null; then echo "rotfilsystemet er skrivbart"; exit 1; fi
+          # app har ikke ose-raa.
+          monteringer=$(docker inspect "$(docker compose -p $p ps -q app)" --format '{{range .Mounts}}{{.Destination}} {{end}}')
+          echo "app har $monteringer"
+          [ "$(echo $monteringer)" = "/app/data/db" ]
+          # En fil i ose-raa og et merke i ose-db.
+          docker volume create ${p}_ose-raa > /dev/null
+          docker run --rm --network none -v ${p}_ose-raa:/app/data/raa ose-signal:ci sh -c 'echo {} > /app/data/raa/kurser-raa-2026-01-02.json'
+          docker compose -p $p exec -T app touch /app/data/db/merke
+          # Basevolumet fjernes, oeyeblikksbildene staar.
+          docker compose -p $p rm -s -f app
+          docker volume rm ${p}_ose-db > /dev/null
+          docker compose -p $p up -d app
+          svar
+          if docker compose -p $p exec -T app test -e /app/data/db/merke; then echo "basen er ikke ny"; exit 1; fi
+          docker compose -p $p exec -T app test -s /app/data/db/ose.db
+          docker run --rm --network none -v ${p}_ose-raa:/app/data/raa ose-signal:ci test -f /app/data/raa/kurser-raa-2026-01-02.json
+          echo "ose-db fjernet og laget paa nytt, ose-raa sto"
+
+      - name: Hentingen med skrivebeskyttet rot og /tmp som tmpfs
+        # Samme innstillinger som hent i compose.yaml (read_only, tmpfs /tmp
+        # og de to volumene), men med docker run og uten .env.
+        run: |
+          docker volume create ose-ci-ro-db > /dev/null
+          docker volume create ose-ci-ro-raa > /dev/null
+          trap 'docker volume rm ose-ci-ro-db ose-ci-ro-raa > /dev/null 2>&1; true' EXIT
+          set +e
+          ut=$(docker run --rm --network none --read-only --tmpfs /tmp \
+            -v ose-ci-ro-db:/app/data/db -v ose-ci-ro-raa:/app/data/raa \
+            ose-signal:ci python src/fetch_prices.py --hent-foer-kl-22 2>&1)
+          kode=$?
+          set -e
+          echo "$ut"
+          echo "kode $kode"
+          if echo "$ut" | grep -q Traceback; then exit 1; fi
+          echo "$ut" | grep -q "EODHD_API_KEY mangler"
+          [ "$kode" = 1 ]
+
       - name: compose.yaml starter bare webserveren uten profilen hent
         run: |
           [ "$(docker compose config --services)" = "app" ]
