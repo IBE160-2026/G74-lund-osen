@@ -150,10 +150,13 @@ class TestImaget:
             if instruksjon in ("RUN", "CMD", "ENTRYPOINT"):
                 assert not re.search(r"migr|aapne_base", resten, re.I), resten
         assert "ENTRYPOINT" not in [i for i, _ in _instruksjoner()]
+        # Story 3.3, svar 2: hent har entrypoint. Ingen entrypoint eller
+        # command i compose-fila migrerer.
         for navn, felt in _tjenester().items():
-            assert "entrypoint" not in felt, navn
-            for verdi in _verdier(felt.get("command", ["command:"])):
-                assert not re.search(r"migr|aapne_base", verdi, re.I), (navn, verdi)
+            for noekkel in ("entrypoint", "command"):
+                linjer = felt.get(noekkel, [f"{noekkel}:"])
+                verdi = " ".join([linjer[0].split(":", 1)[1], *linjer[1:]])
+                assert not re.search(r"migr|aapne_base", verdi, re.I), (navn, noekkel, verdi)
 
 
 class TestDockerignore:
@@ -207,10 +210,12 @@ class TestCompose:
         assert tjenester["hent"]["profiles"][0].split(":", 1)[1].strip() == '["hent"]'
 
     def test_hent_kjoerer_hentekommandoen(self):
-        """Hentekommandoen kjoerer hentingen, uten ny kode (svar 2 og 3)."""
-        assert _tjenester()["hent"]["command"][0].split(":", 1)[1].strip() == (
-            '["python", "src/fetch_prices.py"]'
-        )
+        """Hentekommandoen kjoerer hentingen, uten ny kode (svar 2 og 3 i 3.1).
+        Story 3.3, svar 2: som entrypoint og uten command, saa flagg legges
+        til. Ville feilet med command, der flagget erstatter kommandoen (ECH7)."""
+        hent = _tjenester()["hent"]
+        assert hent["entrypoint"][0].split(":", 1)[1].strip() == '["python", "src/fetch_prices.py"]'
+        assert "command" not in hent
 
     def test_bare_hent_har_noekkelen(self):
         """Svar 2 og 3: app har ingen noekkel og ingen env_file. hent har .env.
@@ -298,3 +303,57 @@ class TestCompose:
     def test_ingen_ollama_i_31(self):
         """Rettelsen 05.10 kl. 16:53: Ollama kommer i 10.2."""
         assert "ollama" not in "\n".join(_linjer(COMPOSE)).lower()
+
+
+README = ROT / "README.md"
+
+
+def _kom_i_gang() -> str:
+    tekst = README.read_text(encoding="utf-8")
+    return tekst.split("## Kom i gang\n", 1)[1].split("\n## ", 1)[0]
+
+
+class TestReadme:
+    """Story 3.3: «Kom i gang» med Docker foerst og uv som alternativ."""
+
+    def test_dockerfile_setter_variabelen_appen_leser(self):
+        """Svar 1: ville feilet hvis Dockerfile ikke satte OSE_I_DOCKER=1, saa
+        den tomme siden i containeren viste uv-kommandoen."""
+        import app
+
+        miljoe = " ".join(r for i, r in _instruksjoner() if i == "ENV")
+        assert f"{app.I_DOCKER}=1" in miljoe
+
+    def test_docker_foerst_og_uv_som_alternativ(self):
+        """Rettelsen 05.10 og svaret fra hjelpelaereren. Ville feilet hvis uv
+        kom foerst, eller en av kommandoene manglet."""
+        del_ = _kom_i_gang()
+        for kommando in ("git clone", "cp .env.example .env", "docker compose up --build",
+                         "http://127.0.0.1:5000", "docker compose run --rm hent", "docker compose down"):
+            assert kommando in del_, kommando
+        assert del_.index("docker compose up --build") < del_.index("uv run python src/app.py")
+
+    def test_tjenestene_i_readme_finnes_i_compose(self):
+        """Ville feilet hvis README-en viste en tjeneste compose.yaml ikke har."""
+        brukt = set(re.findall(r"docker compose run --rm (\w+)", README.read_text(encoding="utf-8")))
+        assert brukt and brukt <= set(_tjenester())
+
+    def test_advarselen_om_down_v_og_basen(self):
+        """Story 3.2, svar 3, og AD-7: ville feilet hvis README-en ikke advarte
+        mot docker compose down -v, eller sa at basen kan slettes."""
+        del_ = _kom_i_gang()
+        assert "Bruk aldri `docker compose down -v`" in del_
+        assert "vurderingene" in del_ and "ose-raa" in del_ and "ose-db" in del_
+
+    def test_raadet_om_tidspunkt_uten_flagget(self):
+        """Svar 3: README-en raader til kveld paa en boersdag eller helg, og
+        viser ikke --hent-foer-kl-22, som kan laase dagen."""
+        tekst = README.read_text(encoding="utf-8")
+        assert "--hent-foer-kl-22" not in tekst
+        assert "etter kl. 22" in _kom_i_gang() and "helgen" in _kom_i_gang()
+
+    def test_ingen_bilder_utenom_ci_merket(self):
+        """Story 3.3: skjermbilder med ekte data publiserer dataene. Ville feilet
+        med et bilde i README-en."""
+        bilder = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", README.read_text(encoding="utf-8"))
+        assert all(b.endswith("tester.yml/badge.svg") for b in bilder), bilder
