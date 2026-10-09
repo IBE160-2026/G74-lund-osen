@@ -116,3 +116,6 @@
   summary: README-en sier at `docker compose down -v` fjerner begge volumene, også øyeblikksbildene i `ose-raa` og vurderingene i `ose-db`, og at man stopper med `docker compose down` uten `-v`. Den sier også at basen ikke kan slettes og bygges opp igjen, fordi `vurdering` ikke kan lages på nytt (`AD-7`, `AD-11`).
   evidence: Svar 3 fra gruppen 09.10 kl. 20:46. Advarselen står i `compose.yaml`, og README-teksten tas i 3.3, som ECH7 fra 3.1.
   resolved: Loest i story 3.3 (2026-10-09). «Kom i gang» sier at volumene står når containerne stoppes, at man aldri bruker `docker compose down -v`, og at basen ikke kan slettes og bygges opp igjen.
+- source_spec: `_bmad-output/implementation-artifacts/spec-3-3-readme-slik-kjoerer-du-den.md`
+  summary: Når basen ikke kan skrives, sier hentingen at fila kan leses inn med `uv run python src/fetch_prices.py --les-inn <fil>`, også i containeren. I Docker er kommandoen `docker compose run --rm hent --les-inn <fil>`, med stien i containeren.
+  evidence: VG1 i gjennomgangen av 3.3 (09.10). `_basen_feilet` i `src/fetch_prices.py` har kommandoen fast, og `src/fetch_prices.py` endres ikke i 3.3. Rettes med `OSE_I_DOCKER` som på den tomme siden, og en test i `tests/test_fetch_prices.py`.
