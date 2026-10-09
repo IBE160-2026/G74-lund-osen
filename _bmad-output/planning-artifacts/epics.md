@@ -1767,6 +1767,8 @@ inn som eget valg. Punktet om at appen virker uten Ollama, står.
 > spørsmål til gruppen, ikke rettet. *24.09: sagt av faglærer i samtale 21.09,
 > ikke på emnesiden (hjelpelærer 23.09); lages likevel.*
 
+*Ferdig 2026-10-09:* flettet i `a2ecee8`, PR #23.
+
 ### Story 3.2: To volumer, og ingenting uerstattelig i imaget
 
 Som **gruppe**, vil jeg at rådataøyeblikksbildene ligger utenfor alt som kan
