@@ -2,7 +2,7 @@
 title: 'Story 3.3: README — «Slik kjører du den»'
 type: 'feature'
 created: '2026-10-09'
-status: 'in-progress'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '13090feddeeb716ffa748c81d151d6fadda4ac34'
@@ -89,6 +89,24 @@ Planen er vist i chatten 09.10 og ført i `docs/ai-prompts/2026-10-09.md` (instr
 
 ## Review Triage Log
 
+Gjennomgang 1 (09.10 kl. 23:25–23:27, PR #25), Blind Hunter (BH, bare diffen), Edge Case Hunter (ECH) og Verification Gap (VG), som tre uavhengige agenter. Rettelsene er `ec225fe` og `1c8edda`.
+
+| # | Funn | Dom | Grunnlag | Rute |
+|---|---|---|---|---|
+| VG1 | Når basen ikke kan skrives, viser hentingen `uv run python src/fetch_prices.py --les-inn` også i containeren | medium | Stemmer. `_basen_feilet` har kommandoen fast, og `OSE_I_DOCKER` leses bare i `app.py` | utsatt, fordi `src/fetch_prices.py` ikke endres i 3.3 (`deferred-work.md`) |
+| ECH1 | `cp .env.example .env` skriver over en `.env` med nøkkelen hvis oppskriften følges en gang til | medium | Stemmer, både `cp` og `Copy-Item` | patch: «bare første gang» i begge kodeblokkene og i punktet om nøkkelen |
+| BH1, ECH4 | «Status» sier «ferdige», mens `sprint-status.yaml` har dem i review | low | Stemmer. 2.3, 3.1 og 3.2 er flettet, og review er tilstanden etter flettingen | patch: «flettet til `main`» |
+| BH2 | «Til da krever appen en egen nøkkel» mot «Webserveren starter uten `.env`» | low | Stemmer | patch: «krever hentingen» |
+| ECH2 | `docker compose run --rm hent` uten `.env` gir compose sin feil, ikke appens | low | Stemmer. `env_file` er påkrevd | patch: README-en sier at `hent` ikke starter uten `.env`. `env_file` står, fordi webserveren ikke trenger fila |
+| BH3 | Rådet om helg er uklart | low | Stemmer. I helgen henter den bare når basen mangler siste børsdag | patch: helgen gjelder første henting |
+| BH10 | Bare `notepad .env` er nevnt | low | Stemmer | patch: `open -e .env` på macOS og `nano .env` på Linux |
+| BH6, ECH3 | `test_advarselen_om_down_v_og_basen` krever ikke setningen om basen | low | Stemmer | patch: setningen kreves. Mutant R13 drept |
+| BH7 | Bildetesten fanger ikke `<img>` eller bilder med referanse | low | Stemmer | patch: begge fanges. Mutantene R14 og R15 drept |
+| BH4 | Kommentaren over `HENTEKOMMANDO` sier at Docker-kommandoen kommer i 3.1 | low | Stemmer | patch: en Rettet-linje i kommentaren, uten å fjerne den |
+| BH5 | `hentekommando()` viser til `AD-12`, merknaden står under `AD-10` | low | Begge gjelder: `AD-10` for inngangene, `AD-12` for konfigurasjon fra miljøet | patch: «(AD-10, AD-12)» |
+| BH8 | At flagget når `fetch_prices.py`, er bare prøvd statisk | low | Stemmer. `docker compose --profile hent config` i en ren eksport viste `entrypoint` uten `command` (Implementation Notes). CI kan ikke kjøre `hent` gjennom compose uten `.env` | ikke endret |
+| BH9 | CI kjører `up app`, ikke `docker compose up --build` uten tjeneste | low | Stemmer. Steg 9 viser at `config --services` uten profil bare gir `app`, som er det `up` starter | ikke endret |
+
 ## Verification
 
 **Mutantene, 09.10 kl. 23:21–23:24.** Statiske mot `tests/test_app.py`, `tests/test_docker.py` og `tests/test_readme.py`, 12 av 12 drept:
@@ -111,6 +129,8 @@ Planen er vist i chatten 09.10 og ført i `docs/ai-prompts/2026-10-09.md` (instr
 I CI fra en ren eksport: C1, imaget uten `OSE_I_DOCKER`, drept i steg 4 og 7 (siden viser uv-kommandoen).
 
 **Suiten:** 1226 passed og 16 skipped, mot 1218 og 16 før.
+
+**Etter gjennomgangen, 09.10 kl. 23:28.** R7 og R10 kjørt på nytt, og tre nye: R13 setningen om basen fjernet, R14 `<img>` i README og R15 bilde med referanse. 5 av 5 drept. Suiten: 1226 passed og 16 skipped.
 
 **Commands:**
 - `uv run pytest -q` -- expected: grønn.
