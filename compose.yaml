@@ -1,13 +1,25 @@
-# OSE Signal i Docker (story 3.1).
+# OSE Signal i Docker (story 3.1 og 3.2).
 #
 #   docker compose up --build      webserveren paa http://127.0.0.1:5000
 #   docker compose run --rm hent   hentingen, med EODHD_API_KEY fra .env
+#   docker compose down            stopper, og lar volumene staa
+#
+# ADVARSEL: docker compose down -v fjerner BEGGE volumene i en kommando, ogsaa
+# ose-raa med oeyeblikksbildene og ose-db med vurderingene. Ingen av dem kan
+# hentes paa nytt (NFR-07, AD-6, AD-7). Bruk aldri -v her.
 #
 # app har ingen noekkel og gjoer null API-kall (AD-10). hent ligger i profilen
 # hent, saa docker compose up aldri starter en henting. Begge bygger imaget
 # fra repoet og henter det aldri fra et register. Volumene er navngitte, saa
 # ingen container roerer data/ paa maskinen (regel 22). ose-db og ose-raa er
 # atskilte (AD-11, story 3.2).
+#
+# Begge tjenestene har skrivebeskyttet rotfilsystem (story 3.2): det eneste
+# som kan skrives, er volumene og /tmp. /tmp er en tmpfs, fordi waitress
+# lager en midlertidig fil naar et svar som venter paa aa bli sendt, er
+# stoerre enn outbuf_overflow (1048576 byte i waitress 3.0.2), og SQLite kan
+# legge midlertidige filer der. Det som ligger i /tmp, forsvinner med
+# containeren og skal ikke overleve.
 name: ose-signal
 
 services:
@@ -18,19 +30,26 @@ services:
     # init: true gir en init-prosess som PID 1, saa docker compose stop
     # stopper waitress med en gang i stedet for etter 10 sekunder.
     init: true
+    read_only: true
+    tmpfs:
+      - /tmp
     ports:
       # Bare paa maskinen selv. Appen skal ikke kunne naas fra nettet
       # (betingelsen fra EODHD 21.09: lokalt, ikke publisert).
       - "127.0.0.1:5000:5000"
+    # Webserveren leser ikke oeyeblikksbildene, saa den har ikke ose-raa
+    # (story 3.2). Trenger en side dem senere, faar den volumet skrivebeskyttet.
     volumes:
       - ose-db:/app/data/db
-      - ose-raa:/app/data/raa
 
   hent:
     build: .
     image: ose-signal
     pull_policy: build
     init: true
+    read_only: true
+    tmpfs:
+      - /tmp
     profiles: ["hent"]
     command: ["python", "src/fetch_prices.py"]
     env_file: .env
@@ -39,5 +58,9 @@ services:
       - ose-raa:/app/data/raa
 
 volumes:
+  # Basen kan IKKE slettes og bygges opp igjen: vurdering ligger her og kan
+  # ikke lages paa nytt, fordi en omregning gir dagens svar, ikke datidens
+  # (AD-7, AD-11). Kursene kan hentes paa nytt, vurderingene kan ikke.
   ose-db:
+  # Oeyeblikksbildene fra EODHD, skrevet en gang og aldri om (AD-6, NFR-07).
   ose-raa:
