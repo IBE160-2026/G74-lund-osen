@@ -2,7 +2,7 @@
 title: 'Story 3.2: To volumer, og ingenting uerstattelig i imaget'
 type: 'feature'
 created: '2026-10-09'
-status: 'in-progress'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '2ed4587301306658304b3a5906a23492da036386'
@@ -87,6 +87,27 @@ Planen er vist i chatten 09.10 og ført i `docs/ai-prompts/2026-10-09.md` (instr
 
 ## Review Triage Log
 
+Gjennomgang 1 (09.10 kl. 21:00–21:02, PR #24), Blind Hunter (BH, bare diffen), Edge Case Hunter (ECH) og Verification Gap (VG), som tre uavhengige agenter. Rettelsene er `14a6384`.
+
+| # | Funn | Dom | Grunnlag | Rute |
+|---|---|---|---|---|
+| VG1, BH2, BH1, ECH9, ECH10 | CI-steget for `hent` med skrivebeskyttet rot stopper ved nøkkelen før noe skrives, så det ser verken en manglende tmpfs eller en skriving utenfor volumene | medium | Stemmer. `kjoer` går ut i `hent_api_nokkel` før `open(fil, "x")` og basen | patch: steget skriver først det `hent` skriver, med de samme flaggene: `aapne_base` migrerer basen på `ose-db`, en fil i `ose-raa` og en `TemporaryFile` med `gettempdir() == '/tmp'`. Mutant C8 (uten tmpfs) feiler nå med «No usable temporary directory» |
+| ECH1 | `trap` settes før forhåndssjekken, så finnes `ose-ci-32_*` fra før, fjerner oppryddingen dem | medium | Stemmer | patch: sjekken kjører før `trap`. Mutanten C5 la igjen volumet den laget, som vist |
+| BH5, ECH11 | «Ny og tom base» sjekkes bare med merket og `test -s` | low | Stemmer | patch: siste skjemaversjon og 0 rader i `kurs` og `vurdering`, før og etter |
+| BH6, ECH6, ECH7 | Testen som binder CI til compose, matcher løst: `--tmpfs /tmpx`, byttede volumer, og to `docker run` i samme steg | low | Stemmer. S8–S10 overlevde først | patch: hver `docker run` for seg, volumparene og `--tmpfs /tmp` med grense. S8, S9 og S10 drept |
+| BH7 | `TemporaryFile` faller tilbake på andre mapper enn `/tmp` | low | Stemmer | patch: `tempfile.gettempdir() == '/tmp'` i begge stegene |
+| ECH4 | Den negative `touch`-sjekken godtar enhver feil | low | Stemmer | patch: krever «Read-only file system» |
+| ECH5 | `test -e merke` godtar enhver feil som «borte» | low | Stemmer | patch: kode 1 kreves |
+| ECH2 | `docker volume ls \| grep -q` kan gi SIGPIPE under `pipefail` | low | Mulig med `pipefail`; GitHub bruker `bash -e` uten den som standard | patch: `--filter` og en variabel |
+| BH10 | SQLite-skriving under `read_only` er ikke prøvd | low | Stemmer for `hent` | patch: dekket av VG1-rettingen (`aapne_base` med migrering). `app` migrerer ved første forespørsel i steg 7 |
+| BH4 | At `ose-raa` står etter at `ose-db` er fjernet, kan ikke feile når `app` ikke har volumet | low | Stemmer. Skillet holdes av `test_volumene_overlapper_ikke` og volumtesten. Steget viser at `ose-raa` er et eget volum som overlever, ikke at compose skåner det | ikke endret. `down` uten `-v` er README-tekst i 3.3 |
+| BH3 | Hentesteget avhenger av datoen: utenfor kalenderen i `boersdag.py` stopper det før nøkkelen | low | Stemmer, som steg 5 fra 3.1. Den ekte hentingen stopper da også (NFR-08) | ikke endret. Kalenderen må utvides før 2027 uansett |
+| ECH3 | En lokal kjøring av steg 7 bygger og tagger `ose-signal` | low | Stemmer. `pull_policy: build` gjør at `ose-signal` bygges på nytt fra repoet ved neste `up` uansett | ikke endret |
+| BH9 | Oppføringen i `deferred-work.md` leses som om README-en alt sier det | low | Lista er det som gjenstår, og oppføringen sier at teksten tas i 3.3 | ikke endret |
+| BH8 | Spesifikasjonen henger etter arbeidet | false | `d48e57d` har Implementation Notes, avkrysningene og mutantene. Diffen var laget før den | ingen |
+| VG2 | `tmpfs` kan vises i `.Mounts`, så monteringssjekken feiler | false | Steg 7 er grønt lokalt og i CI (kjøring 37977139490) med `/app/data/db` alene | ingen |
+| ECH8 | Lang syntaks for volumer deles feil i testen | false | Fila bruker kort syntaks. Lang syntaks ville gi en feil i testen, ikke et stille bestått | ingen |
+
 ## Verification
 
 **Mutantene, 09.10 kl. 20:52–20:59.** Statiske mot `tests/test_docker.py`, 8 av 8 drept:
@@ -117,6 +138,8 @@ I CI, mot stegene i jobben `docker` fra en ren eksport, 7 av 7 drept etter retti
 C8, CI-steget for hentingen uten `--tmpfs /tmp`, gir ingen feil i kjøringen: hentingen uten nøkkel skriver ikke i `/tmp`. Den fanges av S8.
 
 **Suiten:** 1218 passed og 16 skipped, mot 1213 og 16 før (27 i `tests/test_docker.py`).
+
+**Etter gjennomgangen, 09.10 kl. 21:02–21:05.** Statiske: S1–S10, 10 av 10 drept. S8 (CI-steget uten `--tmpfs /tmp` i hentekommandoen), S9 (volumene byttet) og S10 (`--tmpfs /tmpx`) overlevde først, fordi steget har to `docker run`, og testen godtok at én av dem var riktig. I CI: C1–C8, 8 av 8 drept med de rettede stegene, blant dem C8, `hent`-steget uten tmpfs («No usable temporary directory found in ['/tmp', '/var/tmp', '/usr/tmp', '/app']»), og C7 («Read-only file system: '/home/ose/startet'»). Alle ni stegene er grønne med det ekte imaget. Suiten: 1218 passed og 16 skipped.
 
 **Commands:**
 - `uv run pytest -q` -- expected: grønn.
