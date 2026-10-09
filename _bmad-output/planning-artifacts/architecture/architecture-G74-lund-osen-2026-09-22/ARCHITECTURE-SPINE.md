@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-10-08T22:55'
+updated: '2026-10-09T20:51'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -238,6 +238,7 @@ manglet i grafen.
 - **Binds:** NFR-07, punkt 18
 - **Prevents:** at ett `docker volume rm` tar rådataøyeblikksbildene sammen med en base som skulle vært engangs
 - **Rule:** `ose-db` for basefila, `ose-raa` for øyeblikksbildene. Rådata er beskyttet uansett hva som skjer med basen. **Men «du kan slette basen» er feil råd** — se AD-7.
+- **Merknad 2026-10-09 (story 3.2, gruppens svar kl. 20:46):** regelen står. I `compose.yaml` har `app` bare `ose-db`, fordi webserveren ikke leser øyeblikksbildene. Trenger en side dem senere, får den `ose-raa` skrivebeskyttet. Begge tjenestene har `read_only: true` med `/tmp` som tmpfs, så det eneste som kan skrives, er volumene og `/tmp`, og det som ligger i `/tmp`, forsvinner med containeren. `docker compose down -v` fjerner begge volumene i én kommando, også `ose-raa`. Fila advarer mot det, og README-en sier det i 3.3. CI prøver i et eget compose-prosjekt at `ose-db` kan fjernes mens `ose-raa` står med filene sine, og at appen da starter med en ny, tom base. Det er en prøve, ikke et råd: basen har `vurdering`.
 
 ### AD-12 — Hemmeligheter kommer fra miljøet
 
