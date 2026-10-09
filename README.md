@@ -11,9 +11,9 @@ OSE Signal samler kursutvikling og signalstyrke for 15 likvide Oslo Børs-aksjer
 Under arbeid, og ingenting er endelig. Vi jobber med to versjoner samtidig, med samme kode:
 
 - **Den ekte versjonen** henter sluttkurser fra EODHD hver børsdag og lagrer dagens vurdering per aksje. Markedsoversikten og aksjedetaljen leser fra basen. Den krever en egen gratis nøkkel fra EODHD.
-- **Demoversjonen** får oppdiktede selskaper og kurser, og kan prøves uten konto og uten nøkkel. Den kommer i story 3.4 og blir den enkleste måten å prøve appen på. Til da krever appen en egen nøkkel.
+- **Demoversjonen** får oppdiktede selskaper og kurser, og kan prøves uten konto og uten nøkkel. Den kommer i story 3.4 og blir den enkleste måten å prøve appen på. Til da krever hentingen en egen nøkkel.
 
-Børsdagskontrollen (2.3), Docker (3.1 og 3.2) og denne oppskriften (3.3) er ferdige. Neste er demoversjonen (3.4), og deretter KI-laget. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Se [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml).
+Børsdagskontrollen (2.3), Docker (3.1 og 3.2) og denne oppskriften (3.3) er flettet til `main`. Neste er demoversjonen (3.4), og deretter KI-laget. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Se [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml).
 
 Til faglærer: leveranselista står i [`docs/innlevering.md`](docs/innlevering.md), og kvalitetssikringen i [`docs/kvalitetssikring.md`](docs/kvalitetssikring.md). Prosessen og valgene våre står i [`docs/reflection-log.md`](docs/reflection-log.md).
 
@@ -24,7 +24,7 @@ Docker er hovedmåten. Du trenger [Docker Desktop](https://www.docker.com/produc
 ```
 git clone https://github.com/IBE160-2026/G74-lund-osen.git
 cd G74-lund-osen
-cp .env.example .env                     # fyll inn EODHD_API_KEY i .env
+cp .env.example .env                     # bare første gang: fyll inn EODHD_API_KEY i .env
 docker compose up --build                # webserveren på http://127.0.0.1:5000
 ```
 
@@ -40,8 +40,8 @@ Stopp med `Ctrl+C` i vinduet med webserveren, eller med:
 docker compose down
 ```
 
-- **Nøkkelen.** Du trenger en egen gratis API-nøkkel fra [EODHD](https://eodhd.com/register), fordi vilkårene ikke lar oss dele vår. Den gir 20 kall i døgnet, og en henting bruker 15. Åpne `.env` i en teksteditor (`notepad .env` på Windows) og lim den inn etter `EODHD_API_KEY=`. Webserveren starter uten `.env` og bruker aldri kvote: den leser bare fra basen. Bare hentingen trenger nøkkelen.
-- **Når du henter.** Hent etter kl. 22 og før midnatt på en børsdag, eller i helgen. På dagtid en børsdag stopper hentingen med 0 kall og sier hvorfor: dagens sluttkurs er ikke klar ennå, og en vurdering kan ikke fylles inn senere. Har basen alt kursene for børsdagen, bruker den også 0 kall. På en dag børsen er stengt henter den bare hvis basen mangler forrige børsdag og fila for den dagen ikke finnes. Før kallene leser den kvoten med `/api/user`, som er gratis.
+- **Nøkkelen.** Du trenger en egen gratis API-nøkkel fra [EODHD](https://eodhd.com/register), fordi vilkårene ikke lar oss dele vår. Den gir 20 kall i døgnet, og en henting bruker 15. Åpne `.env` i en teksteditor (`notepad .env` på Windows, `open -e .env` på macOS, `nano .env` på Linux) og lim den inn etter `EODHD_API_KEY=`. `cp` skriver over en `.env` som finnes, så kopier bare første gang. Webserveren starter uten `.env` og bruker aldri kvote: den leser bare fra basen. Bare hentingen trenger nøkkelen, og `docker compose run --rm hent` starter ikke uten `.env`.
+- **Når du henter.** Hent etter kl. 22 og før midnatt på en børsdag. Første gang kan du også hente i helgen: da henter den siste børsdag, fordi basen mangler den. På dagtid en børsdag stopper hentingen med 0 kall og sier hvorfor: dagens sluttkurs er ikke klar ennå, og en vurdering kan ikke fylles inn senere. Har basen alt kursene for børsdagen, bruker den også 0 kall. På en dag børsen er stengt henter den bare hvis basen mangler forrige børsdag og fila for den dagen ikke finnes. Før kallene leser den kvoten med `/api/user`, som er gratis.
 - **Uten henting** starter appen med tom oversikt og viser kommandoen som henter. Utskriften fra hentingen sier hvilken børsdag vurderingene gjelder, og hvilke aksjer som fikk en grunn i stedet for en vurdering.
 - **Dataene** ligger i to Docker-volumer: `ose-db` med basen og `ose-raa` med øyeblikksbildene fra EODHD. De står når containerne stoppes. **Bruk aldri `docker compose down -v`.** `-v` fjerner begge volumene, og verken øyeblikksbildene eller vurderingene kan hentes på nytt. Basen kan heller ikke slettes og bygges opp igjen: kursene kan hentes på nytt, men vurderingene for dagene som har gått, kan ikke lages på nytt.
 - **Porten** er bare åpen på maskinen selv (127.0.0.1). Appen kan ikke nås fra nettet.
@@ -52,7 +52,7 @@ Med Python 3.13 og [uv](https://docs.astral.sh/uv/):
 
 ```
 uv sync                                  # installerer avhengighetene
-cp .env.example .env                     # fyll inn EODHD_API_KEY
+cp .env.example .env                     # bare første gang: fyll inn EODHD_API_KEY
 uv run python src/fetch_prices.py        # henter kurser
 uv run python src/app.py                 # http://127.0.0.1:5000
 ```

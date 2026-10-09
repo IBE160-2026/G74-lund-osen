@@ -51,7 +51,8 @@ from tallformat import tall
 
 # Kommandoen den tomme siden ber brukeren kjoere. Den staar ogsaa i README, og
 # en test krever at de to er like (story 3.3). Kommer kommandoen for Docker i
-# 3.1, endres bare denne og README.
+# 3.1, endres bare denne og README. Rettet 2026-10-09 (3.3): kommandoen for
+# Docker kom i 3.3, som HENTEKOMMANDO_DOCKER under.
 HENTEKOMMANDO = "uv run python src/fetch_prices.py"
 
 # Story 3.3, gruppens svar 09.10 kl. 23:13: en konstant for hver maate aa
@@ -62,7 +63,7 @@ I_DOCKER = "OSE_I_DOCKER"
 
 
 def hentekommando() -> str:
-    """Kommandoen for maaten appen kjoerer paa, lest fra miljoeet (AD-12)."""
+    """Kommandoen for maaten appen kjoerer paa, lest fra miljoeet (AD-10, AD-12)."""
     return HENTEKOMMANDO_DOCKER if os.environ.get(I_DOCKER) == "1" else HENTEKOMMANDO
 
 # Feil som betyr at basen ikke kan aapnes eller migreres, som BASEFEIL i

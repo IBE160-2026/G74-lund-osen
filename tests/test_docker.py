@@ -344,6 +344,7 @@ class TestReadme:
         del_ = _kom_i_gang()
         assert "Bruk aldri `docker compose down -v`" in del_
         assert "vurderingene" in del_ and "ose-raa" in del_ and "ose-db" in del_
+        assert "Basen kan heller ikke slettes og bygges opp igjen" in del_
 
     def test_raadet_om_tidspunkt_uten_flagget(self):
         """Svar 3: README-en raader til kveld paa en boersdag eller helg, og
@@ -355,5 +356,9 @@ class TestReadme:
     def test_ingen_bilder_utenom_ci_merket(self):
         """Story 3.3: skjermbilder med ekte data publiserer dataene. Ville feilet
         med et bilde i README-en."""
-        bilder = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", README.read_text(encoding="utf-8"))
+        tekst = README.read_text(encoding="utf-8")
+        bilder = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", tekst)
         assert all(b.endswith("tester.yml/badge.svg") for b in bilder), bilder
+        # Ogsaa HTML-bilder og bilder med referanse (BH7).
+        assert "<img" not in tekst.lower()
+        assert not re.search(r"!\[[^\]]*\]\[", tekst)
