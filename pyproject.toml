@@ -8,6 +8,7 @@ dependencies = [
     "requests>=2.32",
     "python-dotenv>=1.0",
     "tzdata>=2026.4",
+    "waitress>=3.0.2",
 ]
 
 [dependency-groups]

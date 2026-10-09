@@ -107,3 +107,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-2-3-boersdagskontroll-foer-kvoten-brukes.md`
   summary: Har basen kursene for børsdagen, men vurderingene for dagen mangler, sier kommandoen «Ingenting aa hente» med kode 0.
   evidence: ECH8 i gjennomgangen av 2.3 (08.10). Ingen regresjon: filvakten ville stoppet kjøringen uansett. Tas i 2.3b.
+- source_spec: `_bmad-output/implementation-artifacts/spec-3-1-dockerfile-med-to-innganger.md`
+  summary: `docker compose run --rm hent --hent-foer-kl-22` erstatter `command` i stedet for å legge flagget til, så flagget må gis med hele kommandoen (`docker compose run --rm hent python src/fetch_prices.py --hent-foer-kl-22`).
+  evidence: ECH7 i gjennomgangen av 3.1 (08.10). Tas i 3.3, der README viser kommandoene. Et `entrypoint` for `hent` er det andre valget.

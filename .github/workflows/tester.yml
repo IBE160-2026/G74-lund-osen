@@ -40,3 +40,97 @@ jobs:
       - name: Kjoer testene
         # Samme kommando som lokalt, jf. README.
         run: uv run pytest -q
+
+  # Story 3.1: imaget bygges og proeves, uten hemmeligheter og uten EODHD.
+  # Det eneste nettet jobben bruker, er nedlastingen av grunnbildet og uv.
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Hent koden
+        uses: actions/checkout@v4
+
+      - name: Bygg imaget fra ren utsjekk
+        run: docker build -t ose-signal:ci .
+
+      - name: Ingen rådata, base eller nøkkel i imaget (AD-9, AD-12)
+        # Som root, saa ingen mappe er lukket for find. Samme moenstre som
+        # .dockerignore.
+        run: |
+          funn=$(docker run --rm --user root --network none ose-signal:ci sh -c \
+            'find / -xdev \( -name "*.db" -o -name "*.db-*" -o -name "*-raa-*.json" -o -name "*-raw-*.json" -o -name "raadata-*.json" -o -name "newsweb-*.json" -o -name ".env" -o -name ".env.*" -o -name "__pycache__" -path "/app/*" \) -print 2>/dev/null; find /app/data -type f')
+          if [ -n "$funn" ]; then echo "$funn"; exit 1; fi
+          if docker image inspect ose-signal:ci --format '{{json .Config.Env}}' | grep -q EODHD; then
+            echo "EODHD i miljøet til imaget"; exit 1
+          fi
+
+      - name: Python 3.13 og Oslo-tid fra tzdata i uv.lock (AD-20)
+        # PYTHONTZPATH tom: zoneinfo ser bort fra /usr/share/zoneinfo i
+        # grunnbildet og maa bruke pakken tzdata fra uv.lock.
+        run: |
+          docker run --rm --network none -e PYTHONTZPATH= ose-signal:ci python -c "
+          import sys, zoneinfo, datetime as d
+          assert sys.version_info[:2] == (3, 13), sys.version
+          assert zoneinfo.TZPATH == (), zoneinfo.TZPATH
+          oslo = zoneinfo.ZoneInfo('Europe/Oslo')
+          vinter = d.datetime(2026, 1, 15, 12, tzinfo=d.timezone.utc).astimezone(oslo)
+          sommer = d.datetime(2026, 7, 15, 12, tzinfo=d.timezone.utc).astimezone(oslo)
+          assert vinter.utcoffset() == d.timedelta(hours=1) and sommer.utcoffset() == d.timedelta(hours=2)
+          print(sys.version.split()[0], vinter.isoformat(), sommer.isoformat())
+          "
+
+      - name: Webserveren svarer uten nett og uten nøkkel (AD-10)
+        # Den tomme siden med hentekommandoen, og basen er migrert av
+        # aapne_base ved foerste forespoersel.
+        run: |
+          c=$(docker run -d --network none ose-signal:ci)
+          ok=0
+          for i in $(seq 1 30); do
+            if docker exec "$c" python -c "
+          import urllib.request, sys
+          s = urllib.request.urlopen('http://127.0.0.1:5000/')
+          html = s.read().decode()
+          sys.exit(0 if s.status == 200 and 'fetch_prices.py' in html else 1)
+          " 2>/dev/null; then
+              ok=1; break
+            fi
+            sleep 1
+          done
+          docker logs "$c" || true
+          base=$(docker exec "$c" sh -c 'test -s /app/data/db/ose.db && echo ja' || echo nei)
+          noekler=$(docker exec "$c" sh -c 'env | grep -c EODHD || true' || echo feil)
+          docker rm -f "$c" > /dev/null
+          echo "svar $ok, base $base, EODHD-variabler $noekler"
+          [ "$ok" = 1 ] && [ "$base" = ja ] && [ "$noekler" = 0 ]
+
+      - name: Hentingen uten nøkkel og uten nett stopper før første kall
+        # --hent-foer-kl-22 slipper forbi tidskontrollen uansett klokke, saa
+        # kjoeringen gaar gjennom basen og filvakten til noekkelen.
+        run: |
+          set +e
+          ut=$(docker run --rm --network none ose-signal:ci python src/fetch_prices.py --hent-foer-kl-22 2>&1)
+          kode=$?
+          set -e
+          echo "$ut"
+          echo "kode $kode"
+          if echo "$ut" | grep -q Traceback; then exit 1; fi
+          echo "$ut" | grep -q "EODHD_API_KEY mangler"
+          [ "$kode" = 1 ]
+
+      - name: Brukeren ose kan skrive i nye navngitte volumer
+        run: |
+          docker volume create ose-ci-db > /dev/null
+          docker volume create ose-ci-raa > /dev/null
+          set +e
+          docker run --rm --network none -v ose-ci-db:/app/data/db -v ose-ci-raa:/app/data/raa ose-signal:ci \
+            sh -c 'touch /app/data/db/x /app/data/raa/x && stat -c "%U %n" /app/data/db /app/data/raa'
+          kode=$?
+          set -e
+          docker volume rm ose-ci-db ose-ci-raa > /dev/null
+          [ "$kode" = 0 ]
+
+      - name: compose.yaml starter bare webserveren uten profilen hent
+        run: |
+          [ "$(docker compose config --services)" = "app" ]
+          [ "$(docker compose --profile hent config --services | sort | tr '\n' ' ')" = "app hent " ]
