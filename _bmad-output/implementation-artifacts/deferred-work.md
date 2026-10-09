@@ -110,3 +110,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-3-1-dockerfile-med-to-innganger.md`
   summary: `docker compose run --rm hent --hent-foer-kl-22` erstatter `command` i stedet for å legge flagget til, så flagget må gis med hele kommandoen (`docker compose run --rm hent python src/fetch_prices.py --hent-foer-kl-22`).
   evidence: ECH7 i gjennomgangen av 3.1 (08.10). Tas i 3.3, der README viser kommandoene. Et `entrypoint` for `hent` er det andre valget.
+- source_spec: `_bmad-output/implementation-artifacts/spec-3-2-to-volumer-og-ingenting-uerstattelig-i-imaget.md`
+  summary: README-en sier at `docker compose down -v` fjerner begge volumene, også øyeblikksbildene i `ose-raa` og vurderingene i `ose-db`, og at man stopper med `docker compose down` uten `-v`. Den sier også at basen ikke kan slettes og bygges opp igjen, fordi `vurdering` ikke kan lages på nytt (`AD-7`, `AD-11`).
+  evidence: Svar 3 fra gruppen 09.10 kl. 20:46. Advarselen står i `compose.yaml`, og README-teksten tas i 3.3, som ECH7 fra 3.1.

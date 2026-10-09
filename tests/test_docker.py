@@ -232,12 +232,68 @@ class TestCompose:
     def test_navngitte_volumer_aldri_data_paa_maskinen(self):
         """Regel 22 og AD-11: ose-db og ose-raa er navngitte og atskilte. Ville
         feilet med ./data:/app/data, som rorer data/db/ose.db."""
-        forventet = ["ose-db:/app/data/db", "ose-raa:/app/data/raa"]
-        for navn, felt in _tjenester().items():
-            assert _verdier(felt["volumes"]) == forventet, navn
+        tjenester = _tjenester()
+        assert _verdier(tjenester["hent"]["volumes"]) == ["ose-db:/app/data/db", "ose-raa:/app/data/raa"]
+        assert _verdier(tjenester["app"]["volumes"]) == ["ose-db:/app/data/db"]
         toppvolumer = _blokk(_toppnivaa()["volumes"][1:], 2)
         assert set(toppvolumer) == {"ose-db", "ose-raa"}
         assert all(len(linjer) == 1 for linjer in toppvolumer.values()), "volumene skal ikke ha name:"
+
+    def test_webserveren_har_ikke_oeyeblikksbildene(self):
+        """Svar 1 i 3.2: app leser ikke ose-raa, saa den skal heller ikke kunne
+        skrive der. Ville feilet hvis app fikk ose-raa tilbake."""
+        assert not any("ose-raa" in v for v in _verdier(_tjenester()["app"]["volumes"]))
+
+    def test_volumene_overlapper_ikke(self):
+        """Story 3.2 og AD-11: ett volum over hele data/ tar med seg baade det
+        som kan bygges opp igjen og det uerstattelige. Ville feilet med
+        ose-data:/app/data, eller med to volumer paa samme mappe."""
+        for navn, felt in _tjenester().items():
+            maal = [v.split(":")[1] for v in _verdier(felt["volumes"])]
+            assert len(set(maal)) == len(maal), (navn, maal)
+            for m in maal:
+                assert m.rstrip("/") not in ("/app", "/app/data"), (navn, m)
+                assert m.startswith("/app/data/"), (navn, m)
+                andre = [a for a in maal if a != m]
+                assert not any(a.startswith(m.rstrip("/") + "/") for a in andre), (navn, maal)
+
+    def test_skrivebeskyttet_rot_med_tmp_som_tmpfs(self):
+        """Svar 2 i 3.2: bare volumene og /tmp kan skrives. Ville feilet uten
+        read_only, eller uten /tmp, som waitress trenger for svar over
+        outbuf_overflow."""
+        for navn, felt in _tjenester().items():
+            assert _verdier(felt["read_only"]) == ["true"], navn
+            assert _verdier(felt["tmpfs"]) == ["/tmp"], navn
+
+    def test_ci_proever_hent_med_de_samme_innstillingene(self):
+        """Svar 2 i 3.2: prøven med skrivebeskyttet rot i CI bruker det
+        compose.yaml gir hent. Ville feilet hvis compose-fila fikk en annen
+        tmpfs, eller CI-steget mistet --read-only eller --tmpfs /tmp."""
+        hent = _tjenester()["hent"]
+        ci = CI.read_text(encoding="utf-8")
+        steg = ci.split("- name: Hentingen med skrivebeskyttet rot", 1)[1].split("- name:", 1)[0]
+        kjoeringer = [k for k in steg.split("docker run ")[1:] if "ose-signal:ci" in k]
+        assert len(kjoeringer) == 2, len(kjoeringer)
+        assert _verdier(hent["read_only"]) == ["true"]
+        for kjoering in kjoeringer:
+            flagg = kjoering.split("ose-signal:ci", 1)[0]
+            assert "--read-only" in flagg
+            for monteringspunkt in _verdier(hent["tmpfs"]):
+                assert re.search(rf"--tmpfs {re.escape(monteringspunkt)}(\s|$)", flagg), monteringspunkt
+            # Hvert volum i compose paa sin egen mappe, med samme navn bak ose-ci-ro-.
+            for volum in _verdier(hent["volumes"]):
+                navn, maal = volum.split(":")
+                del_ = navn.removeprefix("ose-")
+                assert re.search(rf"-v ose-ci-ro-{re.escape(del_)}:{re.escape(maal)}(\s|$)", flagg), volum
+
+    def test_advarslene_om_basen_og_down_v(self):
+        """Svar 3 i 3.2 og AD-7: «du kan slette basen» er feil raad. Ville
+        feilet hvis kommentaren ved ose-db eller advarselen om down -v ble
+        fjernet."""
+        tekst = COMPOSE.read_text(encoding="utf-8")
+        foer_db = tekst.split("\nvolumes:\n", 1)[1].split("\n  ose-db:", 1)[0]
+        assert "vurdering" in foer_db and "AD-7" in foer_db
+        assert "docker compose down -v" in tekst and "aldri -v" in tekst
 
     def test_ingen_ollama_i_31(self):
         """Rettelsen 05.10 kl. 16:53: Ollama kommer i 10.2."""
