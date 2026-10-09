@@ -2,7 +2,7 @@
 title: 'Story 3.2: To volumer, og ingenting uerstattelig i imaget'
 type: 'feature'
 created: '2026-10-09'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '2ed4587301306658304b3a5906a23492da036386'
