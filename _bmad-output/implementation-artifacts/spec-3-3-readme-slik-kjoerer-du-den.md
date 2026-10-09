@@ -66,11 +66,11 @@ Planen er vist i chatten 09.10 og ført i `docs/ai-prompts/2026-10-09.md` (instr
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `src/app.py`, `Dockerfile`, `tests/test_app.py` -- svar 1.
-- [ ] `compose.yaml`, `tests/test_docker.py` -- svar 2.
-- [ ] `.github/workflows/tester.yml` -- Docker-kommandoen på siden.
-- [ ] `README.md` -- «Status», «Kom i gang» med svar 3, `down -v`, «Mappestruktur», og tester for README-en.
-- [ ] Spinen, `epics.md` og `deferred-work.md`.
+- [x] `src/app.py`, `Dockerfile`, `tests/test_app.py` -- svar 1.
+- [x] `compose.yaml`, `tests/test_docker.py` -- svar 2.
+- [x] `.github/workflows/tester.yml` -- Docker-kommandoen på siden.
+- [x] `README.md` -- «Status», «Kom i gang» med svar 3, `down -v`, «Mappestruktur», og tester for README-en.
+- [x] Spinen, `epics.md` og `deferred-work.md`.
 
 **Acceptance Criteria:**
 - Given imaget og en tom base, when siden åpnes, then viser den `docker compose run --rm hent`, og README-en har den samme kommandoen.
@@ -80,11 +80,37 @@ Planen er vist i chatten 09.10 og ført i `docs/ai-prompts/2026-10-09.md` (instr
 
 ## Implementation Notes
 
+- **`hentekommando()`** i `app.py` gir `HENTEKOMMANDO_DOCKER` bare når `OSE_I_DOCKER` er `"1"`, og `HENTEKOMMANDO` ellers, også for `"0"` og tom verdi. Begge `render_template` bruker den. En autouse-fixture i `tests/test_app.py` fjerner variabelen, så testene ikke avhenger av miljøet på maskinen.
+- **README-en** er kontrollert mot den gamle teksten (regel 13). Tre ting falt ut i første utkast og er lagt inn igjen: «før midnatt», hva hentingen gjør på en dag børsen er stengt, og at appen bare leser fra basen. `--hent-foer-kl-22` er tatt ut med vilje (svar 3). «Status» beholder setningene om begge versjonene, børsmeldingene og sprintstatusen.
+- **Windows:** `cp .env.example .env` virker i PowerShell (`cp` er alias for `Copy-Item`), og `notepad .env` står i README-en. CRLF i `.env` er prøvd 09.10 kl. 23:17 i en ren eksport av grenen, med en oppdiktet verdi og prosjektnavnet `ose-proeve-33`, uten å kjøre `hent`: `docker compose --profile hent config` ga verdien uten `\r`, `app` hadde ingen `EODHD_API_KEY`, og `hent` hadde `entrypoint` uten `command`. Den oppdiktede `.env` er fjernet. `python-dotenv` i uv-veien leser også CRLF.
+- **CI:** de to stegene som krevde `fetch_prices.py` på den tomme siden, krever nå `docker compose run --rm hent`, fordi imaget setter `OSE_I_DOCKER=1`. Alle ni stegene er grønne fra en ren eksport.
+
 ## Spec Change Log
 
 ## Review Triage Log
 
 ## Verification
+
+**Mutantene, 09.10 kl. 23:21–23:24.** Statiske mot `tests/test_app.py`, `tests/test_docker.py` og `tests/test_readme.py`, 12 av 12 drept:
+
+| Mutant | Testen som fanger den |
+|---|---|
+| R1 README og siden med hver sin kommando (konstanten endret) | `test_kommandoen_paa_den_tomme_siden_staar_i_readme` |
+| R2 malen skriver kommandoen selv | den samme og to til |
+| R3 Dockerfile uten `OSE_I_DOCKER` | `test_dockerfile_setter_variabelen_appen_leser` |
+| R4 appen ser bort fra variabelen | `test_den_tomme_siden_i_docker_viser_docker_kommandoen`, `test_bare_verdien_1_gir_docker_kommandoen` |
+| R5 enhver verdi gir Docker | `test_bare_verdien_1_gir_docker_kommandoen` |
+| R6 `hent` med `command` | `test_hent_kjoerer_hentekommandoen` |
+| R7 advarselen om `down -v` fjernet | `test_advarselen_om_down_v_og_basen` |
+| R8 README med tjenesten `henting` | `test_tjenestene_i_readme_finnes_i_compose` |
+| R9 README viser `--hent-foer-kl-22` | `test_raadet_om_tidspunkt_uten_flagget` |
+| R10 skjermbilde i README | `test_ingen_bilder_utenom_ci_merket` og lenketesten |
+| R11 uten `docker compose up --build` | `test_docker_foerst_og_uv_som_alternativ` |
+| R12 `entrypoint` som migrerer | `test_ingen_migrering_i_eget_steg`, `test_hent_kjoerer_hentekommandoen` |
+
+I CI fra en ren eksport: C1, imaget uten `OSE_I_DOCKER`, drept i steg 4 og 7 (siden viser uv-kommandoen).
+
+**Suiten:** 1226 passed og 16 skipped, mot 1218 og 16 før.
 
 **Commands:**
 - `uv run pytest -q` -- expected: grønn.
