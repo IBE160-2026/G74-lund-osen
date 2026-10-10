@@ -13,7 +13,7 @@ Under arbeid, og ingenting er endelig. Vi jobber med to versjoner samtidig, med 
 - **Den ekte versjonen** henter sluttkurser fra EODHD hver børsdag og lagrer dagens vurdering per aksje. Markedsoversikten og aksjedetaljen leser fra basen. Den krever en egen gratis nøkkel fra EODHD.
 - **Demoversjonen** har oppdiktede selskaper og kurser, og kan prøves uten konto og uten nøkkel. Den er den enkleste måten å prøve appen på: `docker compose up --build demo` (se «Kom i gang»).
 
-Børsdagskontrollen (2.3), Docker (3.1 og 3.2), denne oppskriften (3.3) og demoversjonen (3.4) er flettet til `main`. Neste er KI-laget. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Se [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml).
+Børsdagskontrollen (2.3), Docker (3.1 og 3.2), denne oppskriften (3.3) og demoversjonen (3.4) er flettet til `main`. Neste er README-prøven 13.–16.10, så nye forsøk med kallene som er igjen (2.3b), hjelp bak et spørsmålstegn (8.0b) og tydeligere merking (8.0c), og så KI-laget. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Se [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml).
 
 Til faglærer: leveranselista står i [`docs/innlevering.md`](docs/innlevering.md), og kvalitetssikringen i [`docs/kvalitetssikring.md`](docs/kvalitetssikring.md). Prosessen og valgene våre står i [`docs/reflection-log.md`](docs/reflection-log.md).
 
