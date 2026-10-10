@@ -122,3 +122,9 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-3-4-demoversjonen.md`
   summary: Med ekte data gjør en aksje uten kurs siste dag datoen over tabellen til dagen før for hele siden, og ingen rad viser hvilken aksje som henger etter.
   evidence: Funnet med Tareøy Havbruk i 3.4 (Spec Change Log, 10.10). Oversikten viser vurderingen for dagen til nyeste kurs for hver aksje, og datoen over tabellen er den eldste av dem (story 8.0). Demoen viser derfor ikke «ingen kurs fra dagen», etter gruppens beslutning i instruksjonen kl. 14:46 10.10. Ikke rettet nå.
+- source_spec: `_bmad-output/implementation-artifacts/spec-3-4-demoversjonen.md`
+  summary: To kjøringer av demokommandoen samtidig, for eksempel `docker compose run --rm demo-lag` mens en `docker compose up demo` kjører `demo-lag`, bruker samme midlertidige fil `demo.db.ny`. Den ene kan bytte inn en halvferdig base med merket.
+  evidence: ECH2 i gjennomgangen av 3.4 PR 2 (10.10). `lag_demobase` i `src/demo.py` sletter `demo.db.ny` før den bygger, og bytter den inn med `os.replace`. Én kjøring av gangen er prøvd i CI. Rettes med et eget navn per prosess eller en låsefil. Ikke rettet nå.
+- source_spec: `_bmad-output/implementation-artifacts/spec-3-4-demoversjonen.md`
+  summary: Ligger det en fil som ikke kan leses, som `demo.db` i volumet `ose-demo`, nekter `demo-lag`, og `docker compose up --build demo` stopper. Siden viser `docker compose run --rm demo-lag`, som nekter igjen, og README-en sier ikke hva man da gjør.
+  evidence: ECH3 i gjennomgangen av 3.4 PR 2 (10.10). Demokommandoen nekter en fil uten merket, og en fil som ikke kan leses, regnes ikke som demobase (gruppens beslutning 10.10, PR 1). Om `demo-lag` skal få skrive over en slik fil i `ose-demo`, der det bare ligger demodata, eller README-en skal vise hvordan volumet fjernes, er gruppens valg. Ikke rettet nå.
