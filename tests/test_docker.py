@@ -358,6 +358,12 @@ def _kom_i_gang() -> str:
     return tekst.split("## Kom i gang\n", 1)[1].split("\n## ", 1)[0]
 
 
+def _kommandoene() -> list[str]:
+    """Hver kommando i kodeblokkene i «Kom i gang», uten kommentaren bak #."""
+    blokker = _kom_i_gang().split("```\n")[1::2]
+    return [l.split("#")[0].strip() for b in blokker for l in b.splitlines() if l.strip()]
+
+
 class TestReadme:
     """Story 3.3: «Kom i gang» med Docker foerst og uv som alternativ."""
 
@@ -424,8 +430,11 @@ class TestReadme:
         import demo
 
         tekst = README.read_text(encoding="utf-8")
-        for kommando in (app.HENTEKOMMANDO, app.HENTEKOMMANDO_DOCKER, demo.DEMOKOMMANDO, demo.DEMOKOMMANDO_DOCKER):
-            assert kommando in tekst, kommando
+        # Hele linjer i kodeblokkene, ikke bare tekst et sted (VG3).
+        kommandoer = _kommandoene()
+        for kommando in (app.HENTEKOMMANDO, app.HENTEKOMMANDO_DOCKER, demo.DEMOKOMMANDO):
+            assert kommando in kommandoer, kommando
+        assert f"`{demo.DEMOKOMMANDO_DOCKER}`" in _kom_i_gang()
         # demo-lag kjoerer det DEMOKOMMANDO kjoerer, i containeren.
         lag = _tjenester()["demo-lag"]["entrypoint"][0].split(":", 1)[1].strip()
         assert lag == '["' + '", "'.join(demo.DEMOKOMMANDO.split()[2:]) + '"]'
@@ -463,6 +472,31 @@ class TestReadme:
         steg = CI.read_text(encoding="utf-8").split("- name: Demoen med compose", 1)[1].split("- name:", 1)[0]
         assert "docker compose -p $p --profile demo down\n" in steg
         assert "docker compose -p $p up -d --build demo\n" in steg
+
+    def test_tallene_om_demoen_er_de_samme_som_i_koden(self):
+        """VG7: ville feilet hvis demo.py fikk en annen sluttdato eller et annet
+        antall selskaper uten at README-en ble rettet."""
+        import demo
+
+        maaneder = ("januar", "februar", "mars", "april", "mai", "juni", "juli",
+                    "august", "september", "oktober", "november", "desember")
+        dag = demo.SLUTTDATO
+        ukedag = ("mandag", "tirsdag", "onsdag", "torsdag", "fredag", "lørdag", "søndag")[dag.weekday()]
+        tekst = _kom_i_gang().split("### Den ekte versjonen", 1)[0]
+        assert f"{len(demo.DEMOUNIVERS)} oppdiktede selskaper" in tekst
+        assert f"til {ukedag} {dag.day}. {maaneder[dag.month - 1]} {dag.year}" in tekst
+        assert "`ose-demo`" in tekst and "ose-demo" in _blokk(_toppnivaa()["volumes"][1:], 2)
+
+    def test_readme_proeven_har_hver_kommando(self):
+        """VG6: §9 i docs/kvalitetssikring.md sier at lista rettes naar
+        README-en endres. Ville feilet hvis en kommando i «Kom i gang» manglet
+        i tabellen for README-proeven."""
+        import demo
+
+        kvalitet = (ROT / "docs" / "kvalitetssikring.md").read_text(encoding="utf-8")
+        tabell = kvalitet.split("## 9. README-prøven", 1)[1].split("\n## ", 1)[0]
+        for kommando in [*_kommandoene(), demo.DEMOKOMMANDO_DOCKER]:
+            assert f"`{kommando}`" in tabell, kommando
 
     def test_siden_lastes_paa_nytt_etter_hentingen(self):
         """Story 3.4, PR 2: siden oppdateres ikke av seg selv."""

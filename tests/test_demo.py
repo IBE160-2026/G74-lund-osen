@@ -458,3 +458,8 @@ class TestSidene:
         c.close()
         html = klient.get("/").data.decode("utf-8")
         assert demo.DEMOKOMMANDO in html and app_modul.HENTEKOMMANDO not in html
+        # VG1 i gjennomgangen av PR 2: i Docker er det Docker-kommandoen ogsaa her.
+        monkeypatch.setenv(app_modul.I_DOCKER, "1")
+        html = klient.get("/").data.decode("utf-8")
+        assert f"<code>{demo.DEMOKOMMANDO_DOCKER}</code>" in html
+        assert demo.DEMOKOMMANDO not in html and app_modul.HENTEKOMMANDO_DOCKER not in html
