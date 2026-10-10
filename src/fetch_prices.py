@@ -544,6 +544,21 @@ def manglende_i_basen(base_sti: Path, dato: date) -> list[str]:
         tilkobling.close()
 
 
+def nekt_demobase(base_sti: Path, skriv: Callable[[str], None] = print) -> None:
+    """Stopper med kode 1 hvis base_sti er en demobase (story 3.4, FR-411).
+
+    Hentekommandoen og --les-inn skriver aldri til en demobase (AD-7). En
+    base som ikke finnes eller ikke kan leses, er ikke en demobase
+    (lagring_sqlite.er_demobase).
+    """
+    if lagring_sqlite.er_demobase(base_sti):
+        skriv(
+            f"{Path(base_sti).name} er en demobase med oppdiktede tall. Hentingen "
+            "skriver aldri til en demobase (FR-411). 0 kall brukt."
+        )
+        sys.exit(1)
+
+
 def kjoer(
     data_katalog: Path,
     base_sti: Path,
@@ -600,6 +615,10 @@ def kjoer(
     ikke naar kjoeringen gaar over midnatt. Et oeyeblikk uten sone gir
     ValueError foer vakten og foer noe kall.
 
+    Story 3.4: er base_sti en demobase (FR-411), stopper kjoeringen foer alt
+    annet, med 0 kall og kode 1. En base som ikke finnes eller ikke kan
+    leses, er ikke en demobase, og kjoeringen gaar videre som foer.
+
     Story 2.5: boersdagen vurderingene gjelder, regnes her, en gang, fra
     oeyeblikket, foer vakten og foer noe kall. Dekker ikke lista over stengte
     dager aaret, stopper kjoeringen med 0 kall (NFR-08). Etter kursene
@@ -608,6 +627,7 @@ def kjoer(
     vurderingene: er det blitt en ny dag i Oslo, stopper kjoeringen og sier
     fra. Feiler basen, skrives ingen vurdering.
     """
+    nekt_demobase(base_sti, skriv)
     dag = norsk_dato(oeyeblikk)
     try:
         dato = innevaerende_boersdag(dag)
@@ -784,7 +804,10 @@ def les_inn(fil: Path, base_sti: Path, skriv: Callable[[str], None] = print) -> 
     kan leses (da aapnes ikke basen), eller hvis ikke alt ble skrevet til
     basen. En serie som ikke kan leses, nevnes, de andre skrives, og
     kjoeringen ender med kode 1.
+
+    Story 3.4: nekter en demobase foer fila leses.
     """
+    nekt_demobase(base_sti, skriv)
     fil = Path(fil)
     try:
         kilde = SnapshotKilde.fra_fil(fil)
