@@ -58,9 +58,18 @@
     .regnestykke { font-variant-numeric: tabular-nums; }
     p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
     .mangler { color: var(--dempet); font-style: italic; }
+    .eksempeltall {
+      background: #fff3cd;
+      border: 1px solid #c9a227;
+      padding: 0.5rem 1rem;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
+  {% if eksempeltall %}
+  <p class="eksempeltall">Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.</p>
+  {% endif %}
   <a class="tilbake" href="/">← Markedsoversikt</a>
 
   <h1>{{ detalj.aksje.navn }}</h1>

@@ -11,14 +11,26 @@
       padding: 0 1rem;
       color: #1a1a1a;
     }
+    .eksempeltall {
+      background: #fff3cd;
+      border: 1px solid #c9a227;
+      padding: 0.5rem 1rem;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
+  {% if eksempeltall %}
+  <p class="eksempeltall">Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.</p>
+  {% endif %}
   <h1>OSE Signal</h1>
   <p>
     Basen <code>{{ base }}</code> kan ikke åpnes eller leses, så siden kan ikke vises.
     Siden henter aldri data selv.
   </p>
   <p>Feilen: <code>{{ feil }}</code></p>
+  {% if demokommando %}
+  <p>Lag demobasen på nytt med <code>{{ demokommando }}</code>.</p>
+  {% endif %}
 </body>
 </html>
