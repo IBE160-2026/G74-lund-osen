@@ -2,7 +2,7 @@
 title: 'Story 3.4: Demoversjonen'
 type: 'feature'
 created: '2026-10-10'
-status: 'in-progress'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'b294a9514aca2d455e72b6da3942abe7fff49910'
@@ -128,6 +128,32 @@ I tillegg, fra instruksjonen:
 
 ## Review Triage Log
 
+Gjennomgang 1 av PR 1 (10.10 kl. 13:02–13:06, PR #26), Blind Hunter (BH, bare diffen), Edge Case Hunter (ECH) og Verification Gap (VG), som tre uavhengige agenter. Rettelsene er `5bcdef0`, `f9bbdcd` og `680fcf6`.
+
+| # | Funn | Dom | Grunnlag | Rute |
+|---|---|---|---|---|
+| BH2, ECH5, ECH2, ECH3 | En bygging som stopper halvveis, etterlater en halv base med merket, og en gammel `-journal` kan bli liggende | high | Stemmer. Merket ble satt før innholdet, i fila webserveren leser | patch: bygges i `demo.db.ny` og byttes inn med `os.replace`. `-journal`, `-wal` og `-shm` fjernes. Test og mutant M19 |
+| BH6 | Uten bryteren migrerer webserveren en demobase som ligger som `ose.db` | medium | Stemmer. `_migrer_en_gang` kom før merket ble lest | patch: en demobase åpnes skrivebeskyttet og migreres ikke. Test med kallene, mutant M20 (overlevde først, fordi en migrering av en base på siste versjon ikke endrer en byte) |
+| BH5 | Webserveren åpner demobasen skrivbar | medium | Stemmer, `mode=rw` | patch: `skrivebeskyttet=True` |
+| VG1 | 503 med bryteren og en ulesbar `demo.db` er ikke prøvd, heller ikke navnet på feilsiden | medium | Stemmer | patch: test for begge rutene, som krever `demo.db` og `DEMOKOMMANDO`. Mutantene M21 og M23 |
+| ECH6 | En demobase uten kurser viser hentekommandoen, som skriver til `ose.db` | medium | Stemmer | patch: `DEMOKOMMANDO` med bryteren. Mutant M22 |
+| VG3 | `--demo` er bare prøvd som tekst | medium | Stemmer | patch: `les_flagg(argv)`, testet ved å kalle den. Testen lekket `OSE_DEMO` til testene etter, og det er også rettet |
+| BH11 | At samme frø gir samme base på andre plattformer, er ikke prøvd | medium | Stemmer. `math.log`, `cos` og `exp` er ikke lovet like overalt | patch: et fingeravtrykk av `kurs` regnet på Windows. CI på Linux ga samme (kjøring 38047102791) |
+| ECH1, ECH11 | Vakten slipper gjennom en låst demobase eller en med varm journal | low | Stemmer, den går videre ved enhver lesefeil | ikke endret: gruppens beslutning kl. 12:27 er at en base som ikke kan leses, ikke er en demobase, og hentingen går videre som før |
+| VG2 | «Eksempeltall» på feilsiden er ikke prøvd | low | Stemmer | patch: test der lesingen feiler etter at demobasen er åpnet |
+| ECH4 | `PermissionError` når `demo.db` er åpen i et annet program, gir traceback | low | Stemmer på Windows | patch: `main` fanger `OSError` med kode 1 |
+| ECH10, BH | `main(argv)` ser bort fra `argv` | low | Stemmer | patch: argparse. Test for et ukjent argument |
+| ECH9 | En demobase på eldre skjema gir 503 uten råd | low | Stemmer | patch: feilsiden viser `DEMOKOMMANDO` med bryteren |
+| ECH7 | I Docker viser siden uv-kommandoen for demoen | low | Stemmer | utsatt til PR 2, som har Docker-kommandoen |
+| ECH8 | `demo.db` kan forsvinne mellom `is_file()` og åpningen | low | Med `os.replace` forsvinner den ikke under en ny bygging | ikke endret |
+| BH1 | Kommentaren ved `DEMOKOMMANDO` sier at README og en test holder dem like | low | Stemmer ikke ennå | patch: kommentaren sier PR 2. Den ubrukte `README` i testen er fjernet |
+| BH3 | Docstringen til `kjoer` sier at `ValueError` kommer før vakten | low | Stemmer ikke lenger | patch: en setning som sier at vakten for demobasen kommer før |
+| BH9 | Feilteksten velges etter om det er samme objekt | low | Stemmer | patch: sammenligner innholdet |
+| BH4 | Boundaries nevner fortsatt Tareøy uten siste dag | low | Står i Spec Change Log, og den frosne delen endres ikke uten gruppen | ikke endret |
+| BH8 | Merket er kopiert i tre maler | low | Det finnes ingen felles mal. Tre korte blokker | ikke endret |
+| BH10 | Varde Systemer har rader med grunn før den ble notert | low | Storyen krever én rad per aksje og børsdag. Oversikten leser datoen til nyeste kurs | ikke endret |
+| BH12 | Linjenumrene i Code Map er utdatert, og statusen henger etter | low | Linjenumrene var riktige da planen ble skrevet | status satt til in-review. Linjenumrene står |
+
 ## Verification
 
 **Mutantene, 10.10 kl. 12:49–12:58.** Mot `tests/test_demo.py`, `tests/test_app.py`, `tests/test_fetch_prices.py` og `tests/test_aksje.py`. 18 av 18 drept:
@@ -154,6 +180,10 @@ I tillegg, fra instruksjonen:
 | M18 `--demo` setter ikke bryteren | `test_demo_flagget_setter_bryteren` |
 
 **Suiten:** 1250 passed og 16 skipped, mot 1226 og 16 før (24 i `tests/test_demo.py`).
+
+**Etter gjennomgangen, 10.10 kl. 13:10–13:35.** Alle mutantene kjørt på nytt med de nye ankrene, 24 av 24 drept. Nye: M1b en demobase som `ose.db` følger bryteren, M19 byggingen rett i `demo.db`, M20 webserveren migrerer en demobase som `ose.db`, M21 feilsiden uten demokommandoen, M22 en tom demobase viser hentekommandoen, M23 feilsiden nevner `ose.db`. M1 er flyttet til grenen med bryteren, der merket faktisk leses. Første kjøring etter rettingene viste M1 og M20 som drept av en test i `test_app.py`. Det var `OSE_DEMO` som lekket fra testen for `--demo`, ikke mutantene. Etter rettingen ble M20 fanget først med testen som ser på kallene. M2 er bare fanget av en test som leser kildene. M12 og M16 fanges nå også av fingeravtrykket.
+
+**Suiten etter rettingene:** 1257 passed og 16 skipped (31 i `tests/test_demo.py`). CI på `f9bbdcd`, kjøring 38047102791: `pytest` 1273 passed og `docker` grønn.
 
 **Commands:**
 - `uv run pytest -q` -- expected: grønn.
