@@ -332,7 +332,7 @@ class SqliteVurderingslager:
     def les(self, symbol: str, dato: date) -> Vurdering | Grunn | None:
         # Samme kontroll som skriv: en ticker eller et tidspunkt ville ellers
         # gitt None, som leses som at kommandoen ikke ble kjoert (FR-409).
-        _kontroller_noekkel(symbol, dato)
+        _kontroller_noekkel(symbol, dato, self._symboler)
         rad = self._tilkobling.execute(
             "SELECT " + ", ".join(VURDERINGSKOLONNER) + ", grunn FROM vurdering "
             "WHERE symbol = ? AND dato = ?",
