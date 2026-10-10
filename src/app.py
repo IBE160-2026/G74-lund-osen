@@ -84,6 +84,12 @@ def demo_paa() -> bool:
     return os.environ.get(I_DEMO) == "1"
 
 
+def les_flagg(argv: list[str]) -> None:
+    """--demo setter bryteren, saa kommandoen er lik i PowerShell og bash."""
+    if "--demo" in argv:
+        os.environ[I_DEMO] = "1"
+
+
 def _base_sti() -> Path:
     """Basen bryteren velger: demo.db eller den ekte ose.db."""
     return Path(demo_sti() if demo_paa() else lagring_sqlite.BASE_STI).resolve()
@@ -162,8 +168,17 @@ def _aapne_basen() -> None:
             g.demo_mangler = True
             return
         try:
-            g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False)
+            g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False, skrivebeskyttet=True)
             g.eksempeltall = les_merket(g.tilkobling) == DEMOMERKE
+        except BASEFEIL as feil:
+            g.basefeil = _basefeil(feil)
+        return
+    if lagring_sqlite.er_demobase(sti):
+        # Gjennomgangen av PR 1 (BH6): en demobase der den ekte skal ligge,
+        # migreres ikke. Den vises skrivebeskyttet, med «Eksempeltall».
+        try:
+            g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False, skrivebeskyttet=True)
+            g.eksempeltall = True
         except BASEFEIL as feil:
             g.basefeil = _basefeil(feil)
         return
@@ -200,7 +215,8 @@ def _lukk_basen(_unntak) -> None:
 def _basen_kan_ikke_aapnes():
     return (
         render_template(
-            "basefeil.html", feil=g.basefeil, base=_base_sti().name
+            "basefeil.html", feil=g.basefeil, base=_base_sti().name,
+            demokommando=DEMOKOMMANDO if demo_paa() else None,
         ),
         503,
     )
@@ -274,6 +290,8 @@ def markedsoversikt():
         )
     leser = _leser_eller_basefeil()
     if leser is None:
+        # Med bryteren er det demokommandoen som fyller basen, ikke hentingen
+        # (gjennomgangen av PR 1, ECH6).
         return render_template(
             "index.html",
             rader=[],
@@ -282,6 +300,7 @@ def markedsoversikt():
             mangler=[],
             eget=set(),
             hentekommando=hentekommando(),
+            demokommando=DEMOKOMMANDO if demo_paa() else None,
         )
 
     poster = _leser_eller_basefeil(hent_oversiktsleser).oversikt()
@@ -337,6 +356,5 @@ def aksjedetalj(symbol: str):
 if __name__ == "__main__":
     # Story 3.4: --demo setter bryteren, saa kommandoen er lik i PowerShell
     # og i bash.
-    if "--demo" in sys.argv[1:]:
-        os.environ[I_DEMO] = "1"
+    les_flagg(sys.argv[1:])
     app.run(debug=True, port=5000)

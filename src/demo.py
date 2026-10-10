@@ -35,7 +35,9 @@ Kommandoen nekter en fil uten merket, ogsaa en tom fil, og lager en demobase
 paa nytt fra bunnen. Hentingen nekter en base med merket.
 """
 
+import argparse
 import math
+import os
 import random
 import sys
 from datetime import date, datetime, timedelta
@@ -56,8 +58,8 @@ from signalberegning import vurder
 
 OSLO = ZoneInfo("Europe/Oslo")
 
-# Kommandoen den tomme siden viser naar demobasen mangler. README har den
-# samme, og en test holder dem like (story 3.4).
+# Kommandoen den tomme siden viser naar demobasen mangler (story 3.4). README
+# faar den i PR 2, og da kommer testen som holder dem like.
 DEMOKOMMANDO = "uv run python src/demo.py"
 
 FROE = 20261009
@@ -166,17 +168,45 @@ def lag_demobase(sti: Path, skriv=print) -> None:
 
     Reiser IkkeEnDemobase hvis fila finnes uten merket, ogsaa naar den er tom,
     foer noe er skrevet (FR-411, AD-7).
+
+    Basen bygges i en egen fil ved siden av (demo.db.ny) og byttes inn med
+    os.replace foerst naar alt er skrevet. En byggingen som stopper halvveis,
+    etterlater aldri en halv demobase med merket der webserveren leter
+    (gjennomgangen av PR 1, BH2 og ECH5).
     """
     sti = Path(sti)
-    if sti.exists():
-        if not lagring_sqlite.er_demobase(sti):
-            raise IkkeEnDemobase(
-                f"{sti.name} finnes og er ikke en demobase. Demokommandoen skriver "
-                "aldri til en base uten demomerket (FR-411)."
-            )
-        for rest in (sti, sti.with_name(sti.name + "-wal"), sti.with_name(sti.name + "-shm")):
+    if sti.exists() and not lagring_sqlite.er_demobase(sti):
+        raise IkkeEnDemobase(
+            f"{sti.name} finnes og er ikke en demobase. Demokommandoen skriver "
+            "aldri til en base uten demomerket (FR-411)."
+        )
+    ny = sti.with_name(sti.name + ".ny")
+    for rest in _med_hjelpefiler(ny):
+        rest.unlink(missing_ok=True)
+    try:
+        _bygg(ny)
+    except BaseException:
+        for rest in _med_hjelpefiler(ny):
             rest.unlink(missing_ok=True)
+        raise
+    for rest in _med_hjelpefiler(sti)[1:]:
+        rest.unlink(missing_ok=True)
+    os.replace(ny, sti)
+    dager = handelsdager()
+    skriv(
+        f"Laget {sti.name}: {len(DEMOUNIVERS)} oppdiktede selskaper, "
+        f"{len(dager)} handelsdager fra {dager[0]} til {dager[-1]}. Eksempeltall, "
+        "ikke data fra Oslo Børs. Ingen nettkall."
+    )
 
+
+def _med_hjelpefiler(sti: Path) -> list[Path]:
+    """Basen og hjelpefilene SQLite kan legge ved siden av den."""
+    return [sti, *(sti.with_name(sti.name + ending) for ending in ("-journal", "-wal", "-shm"))]
+
+
+def _bygg(sti: Path) -> None:
+    """Skriver hele demobasen i sti, som ikke finnes fra foer."""
     tilkobling = aapne_base(sti)
     try:
         tilkobling.execute(f"PRAGMA application_id = {DEMOMERKE}")
@@ -208,19 +238,21 @@ def lag_demobase(sti: Path, skriv=print) -> None:
                 lager.skriv(aksje.symbol, dag, vurder(fram_til, dag))
     finally:
         tilkobling.close()
-    skriv(
-        f"Laget {sti.name}: {len(DEMOUNIVERS)} oppdiktede selskaper, "
-        f"{len(dager)} handelsdager fra {dager[0]} til {dager[-1]}. Eksempeltall, "
-        "ikke data fra Oslo Børs. Ingen nettkall."
-    )
 
 
 def main(argv: list[str] | None = None) -> None:
+    argparse.ArgumentParser(
+        description="Lager demobasen data/db/demo.db med oppdiktede tall (FR-411)."
+    ).parse_args(argv)
     sti = lagring_sqlite.demo_sti()
     try:
         lag_demobase(sti)
     except IkkeEnDemobase as feil:
         print(f"{feil} Ingenting er skrevet.")
+        sys.exit(1)
+    except OSError as feil:
+        print(f"{sti.name} kunne ikke lages: {type(feil).__name__}. Er den aapen i "
+              "et annet program, for eksempel webserveren?")
         sys.exit(1)
 
 

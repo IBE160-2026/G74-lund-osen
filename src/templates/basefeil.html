@@ -29,5 +29,8 @@
     Siden henter aldri data selv.
   </p>
   <p>Feilen: <code>{{ feil }}</code></p>
+  {% if demokommando %}
+  <p>Lag demobasen på nytt med <code>{{ demokommando }}</code>.</p>
+  {% endif %}
 </body>
 </html>

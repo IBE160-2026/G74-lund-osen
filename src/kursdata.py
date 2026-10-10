@@ -186,7 +186,7 @@ def kontroller_skriving(
     if symbol not in {aksje.symbol for aksje in univers}:
         raise ValueError(
             f"{symbol!r} er ikke et symbol i "
-            f"{'AKSJEUNIVERS' if univers is AKSJEUNIVERS else 'lista som skrives'}. Symbolet er "
+            f"{'AKSJEUNIVERS' if tuple(univers) == AKSJEUNIVERS else 'lista som skrives'}. Symbolet er "
             "formen NewsWeb bruker (EQNR), ikke tickeren (EQNR.OL)"
         )
     for rad in rader:

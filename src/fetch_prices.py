@@ -616,7 +616,8 @@ def kjoer(
     ValueError foer vakten og foer noe kall.
 
     Story 3.4: er base_sti en demobase (FR-411), stopper kjoeringen foer alt
-    annet, med 0 kall og kode 1. En base som ikke finnes eller ikke kan
+    annet, med 0 kall og kode 1. Vakten kommer ogsaa foer ValueError for et
+    oeyeblikk uten sone, som setningen over sier kommer foer vakten. En base som ikke finnes eller ikke kan
     leses, er ikke en demobase, og kjoeringen gaar videre som foer.
 
     Story 2.5: boersdagen vurderingene gjelder, regnes her, en gang, fra

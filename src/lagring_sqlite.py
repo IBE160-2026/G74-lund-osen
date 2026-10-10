@@ -263,7 +263,7 @@ def _kontroller_noekkel(symbol: str, dato: date, symboler: frozenset[str] = SYMB
     if symbol not in symboler:
         raise ValueError(
             f"{symbol!r} er ikke et symbol i "
-            f"{'AKSJEUNIVERS' if symboler is SYMBOLER else 'lista som skrives'}. Symbolet er "
+            f"{'AKSJEUNIVERS' if symboler == SYMBOLER else 'lista som skrives'}. Symbolet er "
             "formen NewsWeb bruker (EQNR), ikke tickeren (EQNR.OL)"
         )
 
