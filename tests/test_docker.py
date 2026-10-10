@@ -443,7 +443,8 @@ class TestReadme:
         tekst = _kom_i_gang()
         flagg = re.findall(r"uv run python src/app\.py (--[\w-]+)", tekst)
         assert flagg == ["--demo"]
-        monkeypatch.delenv(app.I_DEMO, raising=False)
+        # setenv foerst, ellers lekker bryteren til testene etter (som i test_demo.py).
+        monkeypatch.setenv(app.I_DEMO, "0")
         app.les_flagg(flagg)
         assert app.demo_paa()
         assert tekst.index("uv run python src/demo.py") < tekst.index("uv run python src/app.py --demo")
