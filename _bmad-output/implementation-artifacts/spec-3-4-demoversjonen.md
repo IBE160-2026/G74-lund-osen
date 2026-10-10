@@ -159,6 +159,8 @@ Gjennomgang 1 av PR 1 (10.10 kl. 13:02–13:06, PR #26), Blind Hunter (BH, bare 
 
 *Rettet 2026-10-10 kl. 13:23:* klokkeslettene i denne spesifikasjonen er ikke lest fra klokka: «kl. 12:45» i Spec Change Log, «12:49–12:58» for de første mutantene, «13:02–13:06» for gjennomgangen og «13:10–13:35» for mutantene etter den. Etter git log: avviket for Tareøy er committet kl. 12:47 (`a1f8e54`), de første mutantene gikk mellom 12:47 og 12:57 (`63c19cc`), gjennomgangen startet etter 12:57 og rettingene er fra 13:04 (`5bcdef0`, `f9bbdcd`), og mutantene etter den gikk mellom 13:04 og 13:22 (`680fcf6`).
 
+*Rettet 2026-10-10 kl. 14:49:* «kl. 12:27» for gruppens ja, i Planen og i raden ECH1, ECH11, er ikke overskriften. Instruksjonen står under «## 12:28» i `docs/ai-prompts/2026-10-10.md`.
+
 ## Verification
 
 **Mutantene, 10.10 kl. 12:49–12:58.** Mot `tests/test_demo.py`, `tests/test_app.py`, `tests/test_fetch_prices.py` og `tests/test_aksje.py`. 18 av 18 drept:
