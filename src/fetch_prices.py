@@ -41,6 +41,8 @@ Story 2.3b: finnes fila for boersdagen, og basen mangler dagens kurs for noen
 aksjer, gjoer samme kommando et nytt forsoek for dem, eldste foerst, med
 kallene som er igjen av dagens og aldri bonuskvoten. Forsoeket lagres i
 forsoek<n>-raa-<dato>.json, og fila for boersdagen skrives aldri om (AD-6).
+Har basen alle kursene, men mangler rader i vurdering for dagen, skrives de
+uten kall.
 """
 
 import argparse
@@ -656,7 +658,9 @@ def kjoer(
     lista: tuple[Aksje, ...] = AKSJEUNIVERS,
 ) -> Path | None:
     """En henting. Returnerer fila som ble skrevet, eller None hvis
-    tidskontrollen eller basen sa nei foer foerste kall (story 2.3).
+    tidskontrollen eller basen sa nei foer foerste kall (story 2.3). Story
+    2.3b: et nytt forsoek gir forsoeksfila, og radene som mangler i
+    vurdering naar basen har kursene, skrives uten kall og gir None.
 
     Story 2.1b: fila skrives foerst (AD-6), saa kursene til basen i base_sti
     gjennom skriv_til_basen, med oeyeblikket som hentet. base_sti har ingen
@@ -667,7 +671,7 @@ def kjoer(
     Et oeyeblikksbilde skrives aldri om (AD-6, story 2.0). Finnes fila for
     boersdagen, stopper kjoeringen foer foerste kall. Det er ingen feil.
     *Story 2.3b:* mangler basen dagens kurs for noen aksjer, gaar kjoeringen
-    i stedet til nytt_forsoek, som skriver en egen fil. Fila
+    i stedet til nytt_forsoek, som skriver en egen fil. Kursfila
     skrives med modus "x", saa en fil som dukker opp mens kjoeringen paagaar,
     heller ikke skrives over. Da er kallene brukt og ingenting lagret, og
     kjoeringen avslutter med kode 1.
@@ -780,6 +784,9 @@ def kjoer(
                 )
                 sys.exit(1)
             if uten_rad:
+                if norsk_dato(klokke()) != dag:
+                    _stoppet_ved_midnatt(dato, 0, skriv)
+                    sys.exit(1)
                 skriv(
                     f"{len(uten_rad)} aksjer mangler raden i vurdering for "
                     f"boersdagen {dato.isoformat()}: {', '.join(uten_rad)}. De "
@@ -943,10 +950,14 @@ def eldste_foerst(
     return sorted(symboler, key=lambda s: (tider[s] or tidligst, plass[s]))
 
 
-def _for_sent(naa: datetime, dag: date) -> bool:
+def _for_sent(naa: datetime, dag: date) -> str:
     """Svar 4 og AD-20: ingen nye kall fra kl. 23:50 i Oslo, og ingen etter
-    midnatt."""
-    return norsk_dato(naa) != dag or naa.astimezone(OSLO).time() >= KL_23_50
+    midnatt. Gir grunnen, eller en tom tekst naar det ikke er for sent."""
+    if norsk_dato(naa) != dag:
+        return "Det er blitt en ny dag i Oslo siden kjoeringen startet."
+    if naa.astimezone(OSLO).time() >= KL_23_50:
+        return "Klokka er 23:50 i Oslo eller senere."
+    return ""
 
 
 def nytt_forsoek(
@@ -989,11 +1000,8 @@ def nytt_forsoek(
         f"{len(mangler)} aksjer: {', '.join(sorted(mangler))}. Nytt forsoek med "
         "kallene som er igjen av dagens (story 2.3b)."
     )
-    if _for_sent(klokke(), dag):
-        skriv(
-            "Klokka er 23:50 i Oslo eller senere. Et nytt forsoek starter ingen "
-            "kall saa sent. 0 kall brukt."
-        )
+    if grunn := _for_sent(klokke(), dag):
+        skriv(f"{grunn} Et nytt forsoek starter ingen kall saa sent. 0 kall brukt.")
         sys.exit(1)
 
     if callable(api_nokkel):
@@ -1026,6 +1034,7 @@ def nytt_forsoek(
         )
         sys.exit(1)
     igjen = max(grense - brukt, 0)
+    # Med indeksen (2.8) blir antallet len(lista) + 1 (NFR-01, tillegget 08.10).
     antall = kall_til_nye_forsoek(igjen, grense, len(lista))
     if antall == 0:
         skriv(
@@ -1034,7 +1043,11 @@ def nytt_forsoek(
         )
         sys.exit(1)
 
-    rekkefoelge = eldste_foerst(base_sti, list(mangler), lista)[:antall]
+    try:
+        rekkefoelge = eldste_foerst(base_sti, list(mangler), lista)[:antall]
+    except BASEFEIL as feil:
+        skriv(f"Basen {base_sti.name} kunne ikke leses ({type(feil).__name__}). 0 kall brukt.")
+        sys.exit(1)
     skriv(
         f"Kvoten: {igjen} kall igjen av dagens, {antall} til nye forsoek. "
         "Bonuskvoten brukes ikke. "
@@ -1044,15 +1057,15 @@ def nytt_forsoek(
     aksjer = {aksje.symbol: aksje for aksje in lista}
     resultat = Resultat()
     for symbol in rekkefoelge:
-        if _for_sent(klokke(), dag):
-            skriv("Klokka er 23:50 i Oslo eller senere. Ingen flere kall.")
+        if grunn := _for_sent(klokke(), dag):
+            skriv(f"{grunn} Ingen flere kall.")
             break
         en = hent_universet(api_nokkel, fra, til, hent, skriv, (aksjer[symbol],))
         resultat.serier.update(en.serier)
         resultat.feil.update(en.feil)
         resultat.kall_brukt += en.kall_brukt
         try:
-            bonus_naa = kvotetall()[2]
+            brukt_naa, _, bonus_naa = kvotetall()
         except (requests.RequestException, ValueError) as feil:
             skriv(
                 f"Kvoten kunne ikke leses etter kallet ({type(feil).__name__}). "
@@ -1065,21 +1078,32 @@ def nytt_forsoek(
                 "stopper, fordi nye forsoek aldri bruker bonuskvoten (NFR-01)."
             )
             break
+        if brukt_naa >= grense:
+            skriv(
+                f"Dagens {grense} kall er brukt. Forsoeket stopper, saa neste kall "
+                "ikke tas fra bonuskvoten (NFR-01)."
+            )
+            break
     if resultat.kall_brukt == 0:
         skriv("Ingen kall ble gjort, og ingen fil er skrevet. 0 kall brukt.")
         sys.exit(1)
 
-    fil = forsoeksfil(data_katalog, dato)
     tekst = json.dumps(
         lag_oyeblikksbilde(resultat, fra, til, hentet_tid.isoformat()), ensure_ascii=False
     )
-    try:
-        with open(fil, "x", encoding="utf-8") as ut:
-            ut.write(tekst)
-    except FileExistsError:
+    # Navnet er fritt, saa en fil som dukker opp underveis, gir neste n.
+    for _ in range(10):
+        fil = forsoeksfil(data_katalog, dato)
+        try:
+            with open(fil, "x", encoding="utf-8") as ut:
+                ut.write(tekst)
+            break
+        except FileExistsError:
+            continue
+    else:
         skriv(
-            f"{fil.name} dukket opp mens forsoeket paagikk, og er ikke skrevet "
-            f"over (AD-6). {resultat.kall_brukt} kall er brukt, og ingenting er lagret."
+            f"Ingen ledig fil for forsoeket i {data_katalog.name}/ (AD-6). "
+            f"{resultat.kall_brukt} kall er brukt, og ingenting er lagret."
         )
         sys.exit(1)
     skriv(f"\nLagret {fil.name} i {data_katalog.name}/")
@@ -1088,6 +1112,10 @@ def nytt_forsoek(
     serier = {symbol: serie_fra_eodhd(rader) for symbol, rader in resultat.serier.items()}
     skrevne = skriv_til_basen(base_sti, serier, hentet_tid, fil, skriv, lista)
     if skrevne is None:
+        skriv(
+            f"Ingen vurdering er skrevet for {dato.isoformat()} i forsoeket, og "
+            f"--les-inn skriver ingen. {_kan_skrives_til(dato)}"
+        )
         sys.exit(1)
     if skrevne:
         if norsk_dato(klokke()) != dag:
