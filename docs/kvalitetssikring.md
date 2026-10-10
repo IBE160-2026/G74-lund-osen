@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-10T17:37
+updated: 2026-10-10T20:04
 ---
 
 # Kvalitetssikring
@@ -507,6 +507,8 @@ prøver. Det som står over, gjelder fortsatt commit `3803b4d`.
 
 Kommandoene står i den rekkefølgen «Kom i gang» i [`README.md`](../README.md)
 har dem. Endres README-en før prøven, rettes lista her i samme commit.
+
+*Lagt til 2026-10-10 (story 2.3b):* teksten under «Når du henter» i README-en er endret. Setningen om dager børsen er stengt nevner ikke lenger fila for dagen, og en ny setning sier at samme kommando kjørt igjen senere samme kveld prøver aksjene som mangler dagens kurs. Ingen kommando er ny eller endret, så tabellen under står. Prøven fører commiten den brukte.
 
 ### Prøve 1
 
