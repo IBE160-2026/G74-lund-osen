@@ -20,9 +20,11 @@ Regelen for kursene (spesifikasjonen til 3.4, Boundaries):
   avrundes til to desimaler og volumet til heltall.
 - Siste dag faller Brattfjell Energi 6 % med tre ganger volumet, saa minst en
   aksje skiller seg ut.
-- Varde Systemer har bare de siste 30 dagene (nylig notert), Tareoey Havbruk
-  mangler siste dag, og Matfjord Merkevarer har ingen kurser. Da viser sidene
-  ogsaa «signalet kunne ikke regnes», «ingen kurs fra dagen» og «Uten data».
+- Varde Systemer har bare de siste 30 dagene (nylig notert), og Matfjord
+  Merkevarer har ingen kurser. Da viser sidene ogsaa «signalet kunne ikke
+  regnes», «Trenger 51 dager» og «Uten data». (En aksje uten siste dag ble
+  tatt ut 10.10: den flyttet datoen over tabellen til dagen foer, se Spec
+  Change Log i spesifikasjonen.)
 
 Vurderingene: for hver boersdag og hver aksje er raden det vurder() gir for
 serien fram til dagen, skrevet med SqliteVurderingslager.skriv uendret og
@@ -85,7 +87,6 @@ DEMOUNIVERS: tuple[Aksje, ...] = (
 )
 
 NYLIG_NOTERT = "VRDS"
-MANGLER_SISTE_DAG = "TROY"
 UTEN_KURSER = "MTFJ"
 SKILLER_SEG_UT = "BRFE"
 
@@ -146,8 +147,6 @@ def serie(nummer: int, aksje: Aksje, dager: list[date]) -> list[Kursrad]:
         rader.append(Kursrad(dato=dag, slutt=slutt, justert_slutt=slutt, volum=int(round(volum))))
     if aksje.symbol == NYLIG_NOTERT:
         rader = rader[-NYLIG_NOTERT_DAGER:]
-    elif aksje.symbol == MANGLER_SISTE_DAG:
-        rader = rader[:-1]
     elif aksje.symbol == UTEN_KURSER:
         rader = []
     return rader
