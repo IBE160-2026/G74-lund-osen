@@ -182,10 +182,12 @@ class TestDockerignore:
 
 
 class TestCompose:
-    def test_to_tjenester_fra_samme_image(self):
+    def test_alle_tjenestene_fra_samme_image(self):
+        """Story 3.4 la til demo-lag og demo, fra samme image."""
         tjenester = _tjenester()
-        assert set(tjenester) == {"app", "hent"}
-        assert _verdier(tjenester["app"]["image"]) == _verdier(tjenester["hent"]["image"]) == ["ose-signal"]
+        assert set(tjenester) == {"app", "hent", "demo-lag", "demo"}
+        for navn, felt in tjenester.items():
+            assert _verdier(felt["image"]) == ["ose-signal"], navn
 
     def test_begge_bygger_fra_repoet_og_henter_aldri_imaget(self):
         """Ville feilet hvis hent manglet build. Da ville docker compose run
@@ -222,6 +224,8 @@ class TestCompose:
         Ville feilet hvis webserveren fikk noekkelen."""
         tjenester = _tjenester()
         assert "env_file" not in tjenester["app"] and "environment" not in tjenester["app"]
+        for navn in ("demo-lag", "demo"):
+            assert "env_file" not in tjenester[navn], navn
         assert _verdier(tjenester["hent"]["env_file"]) == [".env"]
         assert "environment" not in tjenester["hent"]
         assert "EODHD" not in "\n".join(_linjer(COMPOSE)).upper()
@@ -233,6 +237,9 @@ class TestCompose:
         porter = _verdier(tjenester["app"]["ports"])
         assert porter == ["127.0.0.1:5000:5000"]
         assert "ports" not in tjenester["hent"]
+        # Story 3.4: demoen har samme port, saa app og demo kan ikke kjoere samtidig.
+        assert _verdier(tjenester["demo"]["ports"]) == porter
+        assert "ports" not in tjenester["demo-lag"]
 
     def test_navngitte_volumer_aldri_data_paa_maskinen(self):
         """Regel 22 og AD-11: ose-db og ose-raa er navngitte og atskilte. Ville
@@ -241,7 +248,7 @@ class TestCompose:
         assert _verdier(tjenester["hent"]["volumes"]) == ["ose-db:/app/data/db", "ose-raa:/app/data/raa"]
         assert _verdier(tjenester["app"]["volumes"]) == ["ose-db:/app/data/db"]
         toppvolumer = _blokk(_toppnivaa()["volumes"][1:], 2)
-        assert set(toppvolumer) == {"ose-db", "ose-raa"}
+        assert set(toppvolumer) == {"ose-db", "ose-raa", "ose-demo"}
         assert all(len(linjer) == 1 for linjer in toppvolumer.values()), "volumene skal ikke ha name:"
 
     def test_webserveren_har_ikke_oeyeblikksbildene(self):
@@ -299,6 +306,44 @@ class TestCompose:
         foer_db = tekst.split("\nvolumes:\n", 1)[1].split("\n  ose-db:", 1)[0]
         assert "vurdering" in foer_db and "AD-7" in foer_db
         assert "docker compose down -v" in tekst and "aldri -v" in tekst
+
+    def test_demoen_har_bare_sitt_eget_volum(self):
+        """Story 3.4: demoen roerer aldri den ekte basen eller oeyeblikksbildene.
+        Ville feilet hvis demo eller demo-lag fikk ose-db eller ose-raa, eller
+        ose-demo laa paa en annen mappe enn basen, der demo_sti() peker."""
+        import lagring_sqlite
+
+        assert lagring_sqlite.demo_sti().parent == Path(lagring_sqlite.BASE_STI).parent
+        tjenester = _tjenester()
+        mappe = _verdier(tjenester["app"]["volumes"])[0].split(":")[1]
+        assert mappe == "/app/data/db"
+        for navn in ("demo-lag", "demo"):
+            assert _verdier(tjenester[navn]["volumes"]) == [f"ose-demo:{mappe}"], navn
+        for navn in ("app", "hent"):
+            assert not any("ose-demo" in v for v in _verdier(tjenester[navn]["volumes"])), navn
+
+    def test_demoen_ligger_i_profilen_og_lager_basen_foerst(self):
+        """Story 3.4: docker compose up starter ikke demoen, og demo venter til
+        demo-lag har laget demobasen. Ville feilet uten profilen, eller med
+        depends_on uten betingelsen, som starter demo foer basen finnes."""
+        tjenester = _tjenester()
+        for navn in ("demo-lag", "demo"):
+            assert tjenester[navn]["profiles"][0].split(":", 1)[1].strip() == '["demo"]', navn
+        avhengig = [l.strip() for l in tjenester["demo"]["depends_on"][1:]]
+        assert avhengig == ["demo-lag:", "condition: service_completed_successfully"]
+        assert "depends_on" not in tjenester["demo-lag"]
+
+    def test_demo_lag_kjoerer_demokommandoen_og_demo_har_bryteren(self):
+        """demo-lag kjoerer src/demo.py, og demo er webserveren med OSE_DEMO=1.
+        Ville feilet hvis demo ikke hadde bryteren, og viste den ekte basen."""
+        import app
+
+        tjenester = _tjenester()
+        assert tjenester["demo-lag"]["entrypoint"][0].split(":", 1)[1].strip() == '["python", "src/demo.py"]'
+        assert "command" not in tjenester["demo-lag"]
+        miljoe = [l.strip() for l in tjenester["demo"]["environment"][1:]]
+        assert miljoe == [f'{app.I_DEMO}: "1"']
+        assert "entrypoint" not in tjenester["demo"] and "command" not in tjenester["demo"]
 
     def test_ingen_ollama_i_31(self):
         """Rettelsen 05.10 kl. 16:53: Ollama kommer i 10.2."""
