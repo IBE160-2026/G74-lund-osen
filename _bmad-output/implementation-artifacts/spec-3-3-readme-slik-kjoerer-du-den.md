@@ -2,7 +2,7 @@
 title: 'Story 3.3: README — «Slik kjører du den»'
 type: 'feature'
 created: '2026-10-09'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '13090feddeeb716ffa748c81d151d6fadda4ac34'
