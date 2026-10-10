@@ -2918,3 +2918,37 @@ class TestVurderingeneSomManglerEtterGjennomgangen:
                                        klokke=lambda: _utc(2026, 9, 25, 22, 1))
         assert kode == 1 and kall == [] and "over midnatt" in ut
         assert antall_rader(base, "vurdering") == 0
+
+
+class TestNyttForsoekEtterMutantene:
+    """De to mutantene som overlevde foerste kjoering (M10 og M20)."""
+
+    def test_fredag_over_midnatt_skriver_ingen_rad(self, stier):
+        """M10: fredag til loerdag godtar lageret fortsatt fredag, saa bare
+        sjekken i forsoeket hindrer at raden skrives etter midnatt (AD-20)."""
+        raa, base = stier
+        hovedhenting(stier, feiler=("DNB",), oeyeblikk=_utc(2026, 9, 25, 20, 0),
+                     dato=FREDAG_25_09)
+        tider = [_utc(2026, 9, 25, 21, 45), _utc(2026, 9, 25, 21, 45), _utc(2026, 9, 25, 22, 1)]
+
+        def klokke():
+            return tider.pop(0) if len(tider) > 1 else tider[0]
+
+        kode, kall, ut = kjoer_23_kode(raa, base, _utc(2026, 9, 25, 21, 45),
+                                       lambda *_: serie_til(FREDAG_25_09), klokke=klokke)
+        assert kode == 1 and kall == ["DNB.OL"] and "over midnatt" in ut
+        assert vurderingene(base, FREDAG_25_09, LOERDAG_26_09_KL_12)["DNB"][0] == Grunn.SYMBOL_FEILET
+
+    def test_ingen_kall_gir_ingen_fil(self, stier):
+        """M20: klokka passerer 23:50 foer foerste kall. Ingen tom forsoeksfil."""
+        raa, base = stier
+        hovedhenting(stier, feiler=("DNB",))
+        tider = [_utc(2026, 9, 22, 21, 49), _utc(2026, 9, 22, 21, 50)]
+
+        def klokke():
+            return tider.pop(0) if len(tider) > 1 else tider[0]
+
+        kode, kall, ut = kjoer_23_kode(raa, base, _utc(2026, 9, 22, 21, 49), klokke=klokke)
+        assert kode == 1 and kall == []
+        assert "ingen fil er skrevet" in ut
+        assert raa_filer(raa) == ["kurser-raa-2026-09-22.json"]
