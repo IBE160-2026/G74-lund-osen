@@ -38,6 +38,13 @@ def fast_klokke(monkeypatch):
     monkeypatch.setattr(app_modul, "naa", lambda: NAA)
 
 
+@pytest.fixture(autouse=True)
+def utenfor_docker(monkeypatch):
+    """Testene kjoerer som med uv. En test som vil se Docker-kommandoen,
+    setter OSE_I_DOCKER selv (story 3.3)."""
+    monkeypatch.delenv(app_modul.I_DOCKER, raising=False)
+
+
 @pytest.fixture
 def klient():
     app_modul.app.config["TESTING"] = True
@@ -550,8 +557,30 @@ class TestBasenIWebserveren:
         mal = (Path(app_modul.__file__).parent / "templates" / "index.html").read_text(encoding="utf-8")
 
         assert app_modul.HENTEKOMMANDO in readme
+        assert app_modul.HENTEKOMMANDO_DOCKER in readme
         assert "{{ hentekommando }}" in mal
-        assert "fetch_prices" not in mal
+        assert "fetch_prices" not in mal and "docker compose" not in mal
+
+    def test_den_tomme_siden_i_docker_viser_docker_kommandoen(self, klient, monkeypatch):
+        """Story 3.3, svar 1: med OSE_I_DOCKER=1, som Dockerfile setter, viser
+        den tomme siden kommandoen for Docker. Ville feilet hvis appen saa bort
+        fra variabelen og viste uv-kommandoen i containeren."""
+        monkeypatch.setenv(app_modul.I_DOCKER, "1")
+        aapne_base(lagring_sqlite.BASE_STI).close()
+
+        html = klient.get("/").data.decode("utf-8")
+
+        assert f"<code>{app_modul.HENTEKOMMANDO_DOCKER}</code>" in html
+        assert app_modul.HENTEKOMMANDO not in html
+
+    def test_bare_verdien_1_gir_docker_kommandoen(self, monkeypatch):
+        """Ville feilet hvis enhver verdi, ogsaa tom eller 0, ga Docker-kommandoen."""
+        for verdi, forventet in (("1", app_modul.HENTEKOMMANDO_DOCKER), ("0", app_modul.HENTEKOMMANDO),
+                                 ("", app_modul.HENTEKOMMANDO)):
+            monkeypatch.setenv(app_modul.I_DOCKER, verdi)
+            assert app_modul.hentekommando() == forventet, verdi
+        monkeypatch.delenv(app_modul.I_DOCKER)
+        assert app_modul.hentekommando() == app_modul.HENTEKOMMANDO
 
     def test_migrer_kjoeres_en_gang_for_to_forespoersler(self, klient, monkeypatch):
         """K6. Ville feilet hvis migrer() ble kjoert ved hver forespoersel,

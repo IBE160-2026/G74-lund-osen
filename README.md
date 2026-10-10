@@ -11,29 +11,53 @@ OSE Signal samler kursutvikling og signalstyrke for 15 likvide Oslo Børs-aksjer
 Under arbeid, og ingenting er endelig. Vi jobber med to versjoner samtidig, med samme kode:
 
 - **Den ekte versjonen** henter sluttkurser fra EODHD hver børsdag og lagrer dagens vurdering per aksje. Markedsoversikten og aksjedetaljen leser fra basen. Den krever en egen gratis nøkkel fra EODHD.
-- **Demoversjonen** får oppdiktede selskaper og kurser, og kan prøves uten konto og uten nøkkel. Den bygges sammen med Docker i 3.1–3.4, og blir den enkleste måten å prøve appen på.
+- **Demoversjonen** får oppdiktede selskaper og kurser, og kan prøves uten konto og uten nøkkel. Den kommer i story 3.4 og blir den enkleste måten å prøve appen på. Til da krever hentingen en egen nøkkel.
 
-Neste er børsdagskontrollen (2.3), så Docker og demoversjonen, og deretter KI-laget. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Se [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml).
+Børsdagskontrollen (2.3), Docker (3.1 og 3.2) og denne oppskriften (3.3) er flettet til `main`. Neste er demoversjonen (3.4), og deretter KI-laget. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Se [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml).
 
 Til faglærer: leveranselista står i [`docs/innlevering.md`](docs/innlevering.md), og kvalitetssikringen i [`docs/kvalitetssikring.md`](docs/kvalitetssikring.md). Prosessen og valgene våre står i [`docs/reflection-log.md`](docs/reflection-log.md).
 
 ## Kom i gang
 
+Docker er hovedmåten. Du trenger [Docker Desktop](https://www.docker.com/products/docker-desktop/) (eller Docker Engine med Compose på Linux) og git. Kommandoene er de samme i PowerShell på Windows og i terminalen på macOS og Linux.
+
 ```
 git clone https://github.com/IBE160-2026/G74-lund-osen.git
 cd G74-lund-osen
-uv sync                                  # installerer avhengighetene
-cp .env.example .env                     # fyll inn EODHD_API_KEY
-uv run python src/fetch_prices.py        # henter kurser
-uv run python src/app.py                 # http://localhost:5000
+cp .env.example .env                     # bare første gang: fyll inn EODHD_API_KEY i .env
+docker compose up --build                # webserveren på http://127.0.0.1:5000
 ```
 
-- Du trenger en egen gratis API-nøkkel fra [EODHD](https://eodhd.com/register), fordi vilkårene ikke lar oss dele vår. Den gir 20 kall i døgnet, og en henting bruker 15.
-- Kjør hentingen på børsdager mellom kl. 22 og midnatt. En vurdering kan ikke fylles inn senere. Før kl. 22 på en børsdag stopper kommandoen med 0 kall, med mindre du gir `--hent-foer-kl-22`. Har basen alt kursene for børsdagen, bruker den 0 kall. På en dag børsen er stengt henter den bare hvis basen mangler forrige børsdag og fila for den dagen ikke finnes. Før kallene leser den kvoten med `/api/user`, som er gratis.
-- Appen bruker aldri kvote selv. Den leser bare fra basen.
-- Uten henting starter appen med tom oversikt og viser kommandoen som henter.
+Hent kursene i et nytt vindu, fra samme mappe:
 
-Utskriften fra hentingen sier hvilken børsdag vurderingene gjelder, og hvilke aksjer som fikk en grunn i stedet for en vurdering.
+```
+docker compose run --rm hent
+```
+
+Stopp med `Ctrl+C` i vinduet med webserveren, eller med:
+
+```
+docker compose down
+```
+
+- **Nøkkelen.** Du trenger en egen gratis API-nøkkel fra [EODHD](https://eodhd.com/register), fordi vilkårene ikke lar oss dele vår. Den gir 20 kall i døgnet, og en henting bruker 15. Åpne `.env` i en teksteditor (`notepad .env` på Windows, `open -e .env` på macOS, `nano .env` på Linux) og lim den inn etter `EODHD_API_KEY=`. `cp` skriver over en `.env` som finnes, så kopier bare første gang. Webserveren starter uten `.env` og bruker aldri kvote: den leser bare fra basen. Bare hentingen trenger nøkkelen, og `docker compose run --rm hent` starter ikke uten `.env`.
+- **Når du henter.** Hent etter kl. 22 og før midnatt på en børsdag. Første gang kan du også hente i helgen: da henter den siste børsdag, fordi basen mangler den. På dagtid en børsdag stopper hentingen med 0 kall og sier hvorfor: dagens sluttkurs er ikke klar ennå, og en vurdering kan ikke fylles inn senere. Har basen alt kursene for børsdagen, bruker den også 0 kall. På en dag børsen er stengt henter den bare hvis basen mangler forrige børsdag og fila for den dagen ikke finnes. Før kallene leser den kvoten med `/api/user`, som er gratis.
+- **Uten henting** starter appen med tom oversikt og viser kommandoen som henter. Utskriften fra hentingen sier hvilken børsdag vurderingene gjelder, og hvilke aksjer som fikk en grunn i stedet for en vurdering.
+- **Dataene** ligger i to Docker-volumer: `ose-db` med basen og `ose-raa` med øyeblikksbildene fra EODHD. De står når containerne stoppes. **Bruk aldri `docker compose down -v`.** `-v` fjerner begge volumene, og verken øyeblikksbildene eller vurderingene kan hentes på nytt. Basen kan heller ikke slettes og bygges opp igjen: kursene kan hentes på nytt, men vurderingene for dagene som har gått, kan ikke lages på nytt.
+- **Porten** er bare åpen på maskinen selv (127.0.0.1). Appen kan ikke nås fra nettet.
+
+### Uten Docker, med uv
+
+Med Python 3.13 og [uv](https://docs.astral.sh/uv/):
+
+```
+uv sync                                  # installerer avhengighetene
+cp .env.example .env                     # bare første gang: fyll inn EODHD_API_KEY
+uv run python src/fetch_prices.py        # henter kurser
+uv run python src/app.py                 # http://127.0.0.1:5000
+```
+
+Basen og øyeblikksbildene ligger da i `data/` i mappa.
 
 ## Tester
 
@@ -78,6 +102,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - `docs/` — arbeidsprosessen
 - `_bmad-output/` — plan, krav og sprintstatus
 - `.github/` — testkjøringen og morgensjekken
+- `Dockerfile`, `compose.yaml` og `.dockerignore` — imaget og de to tjenestene, webserveren og hentingen
 - `_bmad/`, `.claude/skills/` og `.agents/skills/` — BMAD-rammeverket, ikke skrevet av oss
 
 Ikke i repoet: API-nøkkelen (`.env`), rådata og basen (`data/`), lokale testskript (`local-tests/`) og den private arbeidsmappa (`_privat/`).

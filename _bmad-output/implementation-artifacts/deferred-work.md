@@ -83,6 +83,7 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-2-2-hentekommandoen-som-egen-inngang.md`
   summary: Den tomme siden viser HENTEKOMMANDO, som er den lokale kommandoen (uv run python src/fetch_prices.py). I en container er kommandoen en annen.
   evidence: Funnet i gjennomgangen av 2.2 (Blind Hunter). Konstanten i app.py og README endres i 3.1, og testen test_kommandoen_paa_den_tomme_siden_staar_i_readme krever at de to er like.
+  resolved: Loest i story 3.3 (2026-10-09). Den tomme siden viser HENTEKOMMANDO_DOCKER naar OSE_I_DOCKER=1, som Dockerfile setter, og HENTEKOMMANDO ellers. README har begge, og testen krever det.
 - source_spec: `_bmad-output/implementation-artifacts/spec-2-2-hentekommandoen-som-egen-inngang.md`
   summary: Migreringen i webserveren holder en laas mens den venter paa basen. Feiler migreringen hver gang, for eksempel paa en skrivebeskyttet base, venter hver forespoersel paa tur, opptil 5 sekunder hver.
   evidence: Funnet i gjennomgangen av 2.2 (Blind Hunter og Edge Case Hunter). Det betyr noe for avgjoerelsen i 3.1 om imaget skal ha en skrivebeskyttet base.
@@ -110,6 +111,11 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-3-1-dockerfile-med-to-innganger.md`
   summary: `docker compose run --rm hent --hent-foer-kl-22` erstatter `command` i stedet for å legge flagget til, så flagget må gis med hele kommandoen (`docker compose run --rm hent python src/fetch_prices.py --hent-foer-kl-22`).
   evidence: ECH7 i gjennomgangen av 3.1 (08.10). Tas i 3.3, der README viser kommandoene. Et `entrypoint` for `hent` er det andre valget.
+  resolved: Loest i story 3.3 (2026-10-09). `hent` har `entrypoint` og ingen `command`, så flagget legges til.
 - source_spec: `_bmad-output/implementation-artifacts/spec-3-2-to-volumer-og-ingenting-uerstattelig-i-imaget.md`
   summary: README-en sier at `docker compose down -v` fjerner begge volumene, også øyeblikksbildene i `ose-raa` og vurderingene i `ose-db`, og at man stopper med `docker compose down` uten `-v`. Den sier også at basen ikke kan slettes og bygges opp igjen, fordi `vurdering` ikke kan lages på nytt (`AD-7`, `AD-11`).
   evidence: Svar 3 fra gruppen 09.10 kl. 20:46. Advarselen står i `compose.yaml`, og README-teksten tas i 3.3, som ECH7 fra 3.1.
+  resolved: Loest i story 3.3 (2026-10-09). «Kom i gang» sier at volumene står når containerne stoppes, at man aldri bruker `docker compose down -v`, og at basen ikke kan slettes og bygges opp igjen.
+- source_spec: `_bmad-output/implementation-artifacts/spec-3-3-readme-slik-kjoerer-du-den.md`
+  summary: Når basen ikke kan skrives, sier hentingen at fila kan leses inn med `uv run python src/fetch_prices.py --les-inn <fil>`, også i containeren. I Docker er kommandoen `docker compose run --rm hent --les-inn <fil>`, med stien i containeren.
+  evidence: VG1 i gjennomgangen av 3.3 (09.10). `_basen_feilet` i `src/fetch_prices.py` har kommandoen fast, og `src/fetch_prices.py` endres ikke i 3.3. Rettes med `OSE_I_DOCKER` som på den tomme siden, og en test i `tests/test_fetch_prices.py`.

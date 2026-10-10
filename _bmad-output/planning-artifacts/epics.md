@@ -1822,6 +1822,8 @@ skjermbildene med ekte data ved å følge README alene.
 - **Ville feilet hvis:** README og den tomme siden viste hver sin kommando. Da er
   det tilfeldig hvilken av dem som stemmer
 
+*Lagt til 2026-10-09, gruppens svar kl. 23:13 (spesifikasjonen til 3.3):* kontrollpunktet om én konstant blir to, én for hver måte å kjøre på: `HENTEKOMMANDO` for uv og `HENTEKOMMANDO_DOCKER` for Docker. Den tomme siden viser Docker-kommandoen når `OSE_I_DOCKER=1`, som Dockerfile setter. README-en har begge, og testen krever det. Grunnen: Docker er hovedmåten og uv alternativet, og én kommando ville vært feil på den ene.
+
 *Lagt til 2026-09-25:* Får README-en skjermbilder, viser de bare testdata, aldri
 ekte kurser. Et skjermbilde med ekte EODHD-data i det offentlige repoet ville
 publisert dataene, mot EODHDs betingelse («the data is not published») og regel

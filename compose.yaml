@@ -51,7 +51,9 @@ services:
     tmpfs:
       - /tmp
     profiles: ["hent"]
-    command: ["python", "src/fetch_prices.py"]
+    # entrypoint, ikke command, saa flagg legges til: docker compose run --rm
+    # hent --les-inn FIL gir python src/fetch_prices.py --les-inn FIL (3.3).
+    entrypoint: ["python", "src/fetch_prices.py"]
     env_file: .env
     volumes:
       - ose-db:/app/data/db

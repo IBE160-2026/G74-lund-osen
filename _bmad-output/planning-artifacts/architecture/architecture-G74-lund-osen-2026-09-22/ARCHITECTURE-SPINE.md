@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-10-09T20:51'
+updated: '2026-10-09T23:19'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -232,6 +232,7 @@ manglet i grafen.
 - **Bygget 2026-10-03, story 2.2:** webserveren leser kursene fra basen gjennom `SqliteKurslager`. Bare de to rutene, `/` og `/aksje/<symbol>`, rører basen. Første forespørsel i en prosess mot en gitt `BASE_STI` kjører `migrer()` én gang, gjennom `aapne_base`, under en lås, så det virker likt med `python src/app.py`, `flask run` og en WSGI-server, og ingen import av `app` rører basen. Mangler basen, lager første forespørsel en tom base, slik hentingen gjør, så webserveren trenger skrivetilgang til `data/db/`. Hver forespørsel åpner sin egen tilkobling med `aapne_base(..., kjoer_migrasjoner=False)`, som bruker `mode=rw`, og lukker den i `teardown_appcontext`. Ventetiden på en lås er 5 sekunder (`VENTETID_SEKUNDER`). Kan basen ikke åpnes eller leses, svarer sidene 503 med feiltypen, uten stier. Den tomme siden viser kommandoen fra `HENTEKOMMANDO`, og en test krever den samme i README. `app.py` importerer verken `fetch_prices`, `requests`, `eodhd` eller `lagring_fil`, og en test viser null nettkall med tom base. Hvert kontrollpunkt er prøvd med en mutant (spesifikasjonen, Verification).
 - **Merknad 2026-10-08 (endringsforslaget 08.10, Marians beslutning):** regelen står. Et valg av aksjer i nettsiden tas i bruk ved neste henting (FR-412, story 2.12). Målingen av omsetning (FR-413, story 2.13) er et eget valg i hentekommandoen, så Dockerfilen i 3.1 fortsatt har to innganger, og den startes for hånd, aldri fra webserveren. Kommandoen for eks.datoer (FR-414, story 2.14) startes også for hånd og gjør ingen nettkall. Hvor den ligger, avgjøres i planen for 2.14.
 - **Merknad 2026-10-08 (story 3.1, gruppens svar kl. 22:45):** regelen står. I imaget er webserveren waitress (`waitress-serve` mot `app:app`), aldri Flasks egen server og aldri debug. `compose.yaml` har tjenestene `app` og `hent` fra samme image. `docker compose up` starter bare `app`, uten nøkkel og med porten bare på `127.0.0.1:5000`. Hentingen startes med `docker compose run --rm hent`, som kjører `python src/fetch_prices.py` med `.env` fra `env_file`. `hent` ligger i profilen `hent`, så en oppstart av containeren aldri bruker kall. Begge migrerer gjennom `aapne_base`, uten eget steg.
+- **Merknad 2026-10-09 (story 3.3, gruppens svar kl. 23:13):** regelen står. `hent` har `entrypoint: ["python", "src/fetch_prices.py"]` og ingen `command`, så flagg legges til: `docker compose run --rm hent --les-inn FIL`. Dockerfile setter `OSE_I_DOCKER=1`, og da viser den tomme siden `HENTEKOMMANDO_DOCKER` («docker compose run --rm hent») i stedet for `HENTEKOMMANDO`. README-en har begge, og en test holder dem like.
 
 ### AD-11 — To volumer
 
