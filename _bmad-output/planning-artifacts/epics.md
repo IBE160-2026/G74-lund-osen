@@ -1853,6 +1853,8 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 
 **Avhenger av:** 3.1. **Én økt:** ja.
 
+*Ferdig 2026-10-10:* flettet i `5816bc2`, PR #25.
+
 ### Story 3.4: Demoversjonen
 
 *Lagt til 2026-10-03, Marians beslutning kl. 18:10.*
