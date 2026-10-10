@@ -24,6 +24,7 @@ stier. Bare de to rutene roerer basen.
 
 import os
 import sqlite3
+import sys
 import threading
 from collections.abc import Callable
 from datetime import date, datetime, timezone
@@ -36,7 +37,16 @@ from aksjedetalj import bygg_detalj, normaliser_symbol
 from boersdag import norsk_dato
 from graf import bygg_graf
 from kursdata import Kursleser
-from lagring_sqlite import SqliteKurslager, SqliteOversiktsleser, aapne_base, har_kurser
+from demo import DEMOKOMMANDO
+from lagring_sqlite import (
+    DEMOMERKE,
+    SqliteKurslager,
+    SqliteOversiktsleser,
+    aapne_base,
+    demo_sti,
+    har_kurser,
+    les_merket,
+)
 from markedsoversikt import (
     bygg_oversikt,
     eldre_enn_nyeste,
@@ -60,6 +70,23 @@ HENTEKOMMANDO = "uv run python src/fetch_prices.py"
 # kommandoen for Docker. README har begge, og en test holder dem like.
 HENTEKOMMANDO_DOCKER = "docker compose run --rm hent"
 I_DOCKER = "OSE_I_DOCKER"
+
+
+# Story 3.4 (FR-411): bryteren som velger demobasen. Med OSE_DEMO=1, eller
+# --demo til python src/app.py, aapner webserveren demo.db ved siden av
+# ose.db, og den lager den aldri selv. «Eksempeltall» paa sidene avgjoeres
+# av merket i basen, ikke av bryteren.
+I_DEMO = "OSE_DEMO"
+
+
+def demo_paa() -> bool:
+    """Om bryteren er paa, lest fra miljoeet (AD-12)."""
+    return os.environ.get(I_DEMO) == "1"
+
+
+def _base_sti() -> Path:
+    """Basen bryteren velger: demo.db eller den ekte ose.db."""
+    return Path(demo_sti() if demo_paa() else lagring_sqlite.BASE_STI).resolve()
 
 
 def hentekommando() -> str:
@@ -123,9 +150,23 @@ def _aapne_basen() -> None:
     """
     g.tilkobling = None
     g.basefeil = None
+    g.demo_mangler = False
+    g.eksempeltall = False
     if request.endpoint not in _RUTER_MED_BASE:
         return
-    sti = Path(lagring_sqlite.BASE_STI).resolve()
+    sti = _base_sti()
+    if demo_paa():
+        # Story 3.4: demobasen migreres og lages aldri av webserveren.
+        # Mangler den, viser siden kommandoen som lager den.
+        if not sti.is_file():
+            g.demo_mangler = True
+            return
+        try:
+            g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False)
+            g.eksempeltall = les_merket(g.tilkobling) == DEMOMERKE
+        except BASEFEIL as feil:
+            g.basefeil = _basefeil(feil)
+        return
     try:
         _migrer_en_gang(sti)
         try:
@@ -137,8 +178,16 @@ def _aapne_basen() -> None:
                 _migrerte.discard(sti)
             _migrer_en_gang(sti)
             g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False)
+        # Merket avgjoer «Eksempeltall», ogsaa uten bryteren (FR-411).
+        g.eksempeltall = les_merket(g.tilkobling) == DEMOMERKE
     except BASEFEIL as feil:
         g.basefeil = _basefeil(feil)
+
+
+@app.context_processor
+def _eksempeltall():
+    """«Eksempeltall» paa hver side som viser en base med demomerket."""
+    return {"eksempeltall": g.get("eksempeltall", False)}
 
 
 @app.teardown_appcontext
@@ -151,7 +200,7 @@ def _lukk_basen(_unntak) -> None:
 def _basen_kan_ikke_aapnes():
     return (
         render_template(
-            "basefeil.html", feil=g.basefeil, base=Path(lagring_sqlite.BASE_STI).name
+            "basefeil.html", feil=g.basefeil, base=_base_sti().name
         ),
         503,
     )
@@ -218,6 +267,11 @@ def _basen_feilet_under_lesingen(feil):
 def markedsoversikt():
     if g.get("basefeil"):
         return _basen_kan_ikke_aapnes()
+    if g.get("demo_mangler"):
+        return render_template(
+            "index.html", rader=[], dato=None, hentet=None, mangler=[], eget=set(),
+            demokommando=DEMOKOMMANDO,
+        )
     leser = _leser_eller_basefeil()
     if leser is None:
         return render_template(
@@ -255,6 +309,8 @@ def aksjedetalj(symbol: str):
     """
     if g.get("basefeil"):
         return _basen_kan_ikke_aapnes()
+    if g.get("demo_mangler"):
+        abort(404)
     leser = _leser_eller_basefeil()
     if leser is None:
         abort(404)
@@ -279,4 +335,8 @@ def aksjedetalj(symbol: str):
 
 
 if __name__ == "__main__":
+    # Story 3.4: --demo setter bryteren, saa kommandoen er lik i PowerShell
+    # og i bash.
+    if "--demo" in sys.argv[1:]:
+        os.environ[I_DEMO] = "1"
     app.run(debug=True, port=5000)

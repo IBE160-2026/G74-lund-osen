@@ -48,9 +48,18 @@
     .mangler { color: var(--dempet); font-style: italic; font-size: 0.85rem; }
     .merke.mangler { font-weight: normal; }
     p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
+    .eksempeltall {
+      background: #fff3cd;
+      border: 1px solid #c9a227;
+      padding: 0.5rem 1rem;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
+  {% if eksempeltall %}
+  <p class="eksempeltall">Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.</p>
+  {% endif %}
   <h1>OSE Signal</h1>
 
   {% if rader %}
@@ -121,6 +130,10 @@
       regnet på utbyttejustert kurs, slik at et ordinært utbytte ikke ser ut
       som et kursfall. Signalstyrken er 0–3 og sier hvor kraftig de tre
       sjekkene slår ut — ikke om aksjen bør kjøpes eller selges.
+    </p>
+  {% elif demokommando %}
+    <p>
+      Demobasen finnes ikke ennå. Lag den med <code>{{ demokommando }}</code>.
     </p>
   {% else %}
     <p>
