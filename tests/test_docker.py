@@ -470,8 +470,10 @@ class TestReadme:
             assert "docker compose --profile demo down" in avsnitt
         assert "`docker compose down` stopper ikke demoen" in bytte
         steg = CI.read_text(encoding="utf-8").split("- name: Demoen med compose", 1)[1].split("- name:", 1)[0]
-        assert "docker compose -p $p --profile demo down\n" in steg
-        assert "docker compose -p $p up -d --build demo\n" in steg
+        assert "docker compose -f $f --profile demo down\n" in steg
+        assert "docker compose -f $f up -d --build demo;" in steg
+        # Ikke -p: med -p stopper docker compose down ogsaa demoen (proevd 10.10).
+        assert "-p $p" not in steg and "docker compose -f $f down\n" in steg
 
     def test_tallene_om_demoen_er_de_samme_som_i_koden(self):
         """VG7: ville feilet hvis demo.py fikk en annen sluttdato eller et annet
