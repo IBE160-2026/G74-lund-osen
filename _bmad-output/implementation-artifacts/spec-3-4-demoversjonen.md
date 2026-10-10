@@ -2,7 +2,7 @@
 title: 'Story 3.4: Demoversjonen'
 type: 'feature'
 created: '2026-10-10'
-status: 'in-review'
+status: 'in-progress'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'b294a9514aca2d455e72b6da3942abe7fff49910'
