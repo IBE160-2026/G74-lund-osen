@@ -34,7 +34,11 @@ from signalberegning import nodvendige_dager, vurder
 from vurderingsdata import Grunn
 
 SRC = Path(demo.__file__).resolve().parent
-README = SRC.parent / "README.md"
+
+# sha256 av repr() av kurs-tabellen, sortert, regnet paa Windows med Python
+# 3.13 10.10. CI kjoerer paa Linux, saa testen viser om kursene blir like paa
+# tvers av plattformene (gjennomgangen av PR 1, BH11).
+FINGERAVTRYKK_KURS = "73c277d2007d448f19ed95bd58ae30fac9bb7f43d60234455496aa1e0dbdec16"
 
 
 @pytest.fixture(scope="module")
@@ -100,6 +104,17 @@ class TestDemokommandoen:
         ny = tmp_path / "demo.db"
         demo.lag_demobase(ny, skriv=lambda _: None)
         assert _tabeller(ny) == _tabeller(mal)
+
+    def test_kursene_har_samme_fingeravtrykk_paa_alle_plattformer(self, mal):
+        """BH11: samme frø gir samme kurser ogsaa paa Linux i CI og i Docker.
+        Ville feilet hvis libm eller Python ga andre tall enn paa Windows."""
+        c = sqlite3.connect(mal)
+        try:
+            rader = c.execute(
+                "SELECT symbol, dato, slutt, justert_slutt, volum FROM kurs ORDER BY symbol, dato").fetchall()
+        finally:
+            c.close()
+        assert hashlib.sha256(repr(rader).encode()).hexdigest() == FINGERAVTRYKK_KURS
 
     def test_normalfordelingen_bruker_bare_random(self):
         """Python lover bare at random() er lik paa tvers av versjoner. Ville
@@ -212,9 +227,38 @@ class TestVaktene:
         aapne_base(sti).close()
         foer = _sha(sti)
         with pytest.raises(SystemExit) as slutt:
-            demo.main()
+            demo.main([])
         assert slutt.value.code == 1 and _sha(sti) == foer
         assert "ikke en demobase" in capsys.readouterr().out
+
+    def test_en_bygging_som_feiler_etterlater_ingen_halv_demobase(self, tmp_path, monkeypatch, mal):
+        """BH2 og ECH5: stopper byggingen halvveis, finnes det ingen demo.db med
+        merket der webserveren leter, og en demobase som fantes, staar."""
+        sti = tmp_path / "demo.db"
+        kall = []
+
+        def feiler(rader, dag):
+            kall.append(dag)
+            if len(kall) > 100:
+                raise RuntimeError("stopper halvveis")
+            return vurder(rader, dag)
+
+        monkeypatch.setattr(demo, "vurder", feiler)
+        with pytest.raises(RuntimeError):
+            demo.lag_demobase(sti, skriv=lambda _: None)
+        assert not sti.exists() and not (tmp_path / "demo.db.ny").exists()
+
+        shutil.copy(mal, sti)
+        foer = _sha(sti)
+        kall.clear()
+        with pytest.raises(RuntimeError):
+            demo.lag_demobase(sti, skriv=lambda _: None)
+        assert _sha(sti) == foer
+
+    def test_main_tar_ingen_ukjente_argumenter(self):
+        with pytest.raises(SystemExit) as slutt:
+            demo.main(["--ukjent"])
+        assert slutt.value.code == 2 and not demo_sti().exists()
 
     def test_en_demobase_lages_paa_nytt(self, demobase, mal):
         demo.lag_demobase(demobase, skriv=lambda _: None)
@@ -306,9 +350,67 @@ class TestSidene:
             monkeypatch.setenv(app_modul.I_DEMO, verdi)
             assert app_modul.demo_paa() is forventet, verdi
 
-    def test_demo_flagget_setter_bryteren(self):
+    def test_demo_flagget_setter_bryteren(self, monkeypatch):
         """--demo til python src/app.py setter OSE_DEMO, saa kommandoen er lik i
-        PowerShell og bash."""
+        PowerShell og bash. Ville feilet hvis flagget ikke slo paa bryteren."""
+        monkeypatch.delenv(app_modul.I_DEMO, raising=False)
+        app_modul.les_flagg([])
+        assert not app_modul.demo_paa()
+        app_modul.les_flagg(["--demo"])
+        assert app_modul.demo_paa()
         kilde = (SRC / "app.py").read_text(encoding="utf-8")
         hoved = kilde.split('if __name__ == "__main__":', 1)[1]
-        assert '"--demo" in sys.argv[1:]' in hoved and "os.environ[I_DEMO] = \"1\"" in hoved
+        assert hoved.index("les_flagg(sys.argv[1:])") < hoved.index("app.run(")
+
+    def test_ulesbar_demobase_gir_503_med_navnet_og_kommandoen(self, klient, monkeypatch):
+        """VG1: med bryteren og en demo.db som ikke kan leses, svarer begge
+        sidene 503, nevner demo.db og viser kommandoen som lager den paa nytt."""
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        sti = demo_sti()
+        sti.parent.mkdir(parents=True, exist_ok=True)
+        sti.write_bytes(b"ikke en sqlite-base" * 10)
+        for rute in ("/", "/aksje/BRFE"):
+            svar = klient.get(rute)
+            html = svar.data.decode("utf-8")
+            assert svar.status_code == 503, rute
+            assert "<code>demo.db</code>" in html and demo.DEMOKOMMANDO in html, rute
+
+    def test_feilsiden_har_eksempeltall_for_en_demobase(self, klient, monkeypatch, demobase):
+        """VG2: feiler lesingen etter at en demobase er aapnet, har feilsiden
+        ogsaa «Eksempeltall»."""
+        import sqlite3 as sql
+
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+
+        def feiler():
+            raise sql.OperationalError("disk I/O error")
+
+        monkeypatch.setattr(app_modul, "hent_oversiktsleser", feiler)
+        svar = klient.get("/")
+        assert svar.status_code == 503 and "Eksempeltall" in svar.data.decode("utf-8")
+
+    def test_en_demobase_som_ose_db_migreres_ikke(self, klient, mal):
+        """BH6: uten bryteren, med en demobase der den ekte skal ligge, viser
+        webserveren den med «Eksempeltall» og skriver ingenting til den."""
+        ekte = Path(lagring_sqlite.BASE_STI)
+        ekte.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(mal, ekte)
+        foer = _sha(ekte)
+        assert "Eksempeltall" in klient.get("/").data.decode("utf-8")
+        assert _sha(ekte) == foer
+
+    def test_demobase_uten_kurser_viser_demokommandoen(self, klient, monkeypatch, mal):
+        """ECH6: med bryteren og en demobase uten kurser viser siden
+        demokommandoen, ikke hentekommandoen, som skriver til ose.db."""
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        sti = demo_sti()
+        sti.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(mal, sti)
+        c = sqlite3.connect(sti)
+        with c:
+            c.execute("DELETE FROM vurdering")
+            c.execute("DELETE FROM kurs")
+            c.execute("DELETE FROM kursserie")
+        c.close()
+        html = klient.get("/").data.decode("utf-8")
+        assert demo.DEMOKOMMANDO in html and app_modul.HENTEKOMMANDO not in html
