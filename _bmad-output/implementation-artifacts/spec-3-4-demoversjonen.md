@@ -100,11 +100,11 @@ I tillegg, fra instruksjonen:
 ## Tasks & Acceptance
 
 **Execution (PR 1):**
-- [ ] `src/kursdata.py`, `src/lagring_sqlite.py` -- lista som parameter, merket og `er_demobase`.
-- [ ] `src/demo.py` -- `DEMOUNIVERS`, regelen og demokommandoen.
-- [ ] `src/fetch_prices.py` -- vakten i `kjoer` og `les_inn`.
-- [ ] `src/app.py` og malene -- bryteren, siden når demobasen mangler, «Eksempeltall».
-- [ ] `tests/test_demo.py` -- kontrollpunktene.
+- [x] `src/kursdata.py`, `src/lagring_sqlite.py` -- lista som parameter, merket og `er_demobase`.
+- [x] `src/demo.py` -- `DEMOUNIVERS`, regelen og demokommandoen.
+- [x] `src/fetch_prices.py` -- vakten i `kjoer` og `les_inn`.
+- [x] `src/app.py` og malene -- bryteren, siden når demobasen mangler, «Eksempeltall».
+- [x] `tests/test_demo.py` -- kontrollpunktene.
 
 **Acceptance Criteria:**
 - Given to kjøringer av demokommandoen, then er basene like rad for rad.
@@ -113,11 +113,47 @@ I tillegg, fra instruksjonen:
 
 ## Implementation Notes
 
+- **Skriveportene:** `kontroller_skriving`, `SqliteKurslager` og `SqliteVurderingslager` (`skriv` og `les`) tar lista som skrives, med `AKSJEUNIVERS` som standard. Med standardlista er feilteksten den samme som før («ikke et symbol i AKSJEUNIVERS»), fordi to tester krever den.
+- **Merket:** `DEMOMERKE = 0x4F534544` («OSED») i `lagring_sqlite.py`. `er_demobase` åpner med `aapne_base(..., kjoer_migrasjoner=False, skrivebeskyttet=True)` (`mode=ro`), fordi testen fra 2.1b krever at ingen annen kode i `src/` kaller `sqlite3.connect`.
+- **Demokommandoen** skriver med `PRAGMA synchronous = OFF` på sin egen tilkobling. Med fsync per transaksjon tok de 2 925 vurderingene 34 sekunder på Windows, uten 2,7. Demobasen kan alltid lages på nytt. En demobase som finnes, slettes med `-wal` og `-shm` og lages fra bunnen.
+- **Vakten i hentingen** er `nekt_demobase(base_sti, skriv)`, første linje i `kjoer` og `les_inn`. Den kommer før klokka: en test gir et øyeblikk uten sone og får kode 1, ikke `ValueError`. En base som ikke finnes, eller en fil som ikke er en SQLite-base, gir ingen stopp. Alle 190 testene i `tests/test_fetch_prices.py` er grønne uendret.
+- **Endringer i `src/fetch_prices.py`:** bare `nekt_demobase` og kallet til den i `kjoer` og `les_inn`, og et avsnitt i docstringen til `kjoer`.
+- **Webserveren:** med bryteren migreres og lages demobasen aldri. Mangler `demo.db`, får oversikten `DEMOKOMMANDO`, og aksjedetaljen gir 404. «Eksempeltall» kommer fra en context processor som leser `g.eksempeltall`, satt fra merket i basen ved hver forespørsel. Feilsiden viser navnet på basen bryteren valgte.
+- **«samme frø gir like baser»** sammenligner `aksje`, `kurs`, `kursserie`, `vurdering`, merket og `skjema_versjon` uten kolonnen `anvendt`, som er tidspunktet migrasjonen ble kjørt.
+- **Regel 22:** alle demobaser under byggingen er laget i `tmp_path` eller i scratch-mappa for økta. `data/db/` har ingen `demo.db`.
+
 ## Spec Change Log
+
+- **2026-10-10 kl. 12:45, Tareøy Havbruk (avvik fra planen):** Boundaries sier at Tareøy Havbruk mangler siste dag, for å vise «ingen kurs fra dagen». Det virket ikke: oversikten leser vurderingen for datoen til nyeste kurs for hver aksje, så Tareøy viste vurderingen for 08.10, og datoen over tabellen ble 2026-10-08, fordi den er den eldste nyeste datoen (story 8.0). Regelen er tatt ut, og alle 14 med kurser har siste dag. «ingen kurs fra dagen» er ikke blant tilstandene demoen viser, som «hentingen feilet». En test krever at datoen over tabellen er 2026-10-09. **Til gruppen:** avviket står her og i PR-en, og kan tas tilbake før flettingen.
 
 ## Review Triage Log
 
 ## Verification
+
+**Mutantene, 10.10 kl. 12:49–12:58.** Mot `tests/test_demo.py`, `tests/test_app.py`, `tests/test_fetch_prices.py` og `tests/test_aksje.py`. 18 av 18 drept:
+
+| Mutant | Testen som fanger den |
+|---|---|
+| M1 merket følger bryteren | `test_merket_foelger_basen_ikke_bryteren` |
+| M2 hentingen setter merket | `test_bare_demokommandoen_setter_merket` |
+| M3 vakten i hentingen borte | `test_hentingen_nekter_en_demobase_foer_alt_annet` |
+| M4 vakten i demokommandoen borte | `test_demokommandoen_nekter_en_ekte_base` |
+| M5 nytt frø per kjøring | `test_samme_froe_gir_like_baser` |
+| M6 serien på 120 dager | `test_serien_er_lang_nok_for_grafen_og_ma50` |
+| M7 et navn fra `AKSJEUNIVERS` | `test_ingen_symboler_fra_den_ekte_lista` |
+| M8 vurderingen regnes av hele serien | `test_hver_vurdering_er_det_vurder_gir` |
+| M9 webserveren lager demobasen | `test_bryteren_uten_demobase_viser_kommandoen` |
+| M10 «Eksempeltall» borte fra aksjedetaljen | `test_bryteren_med_demobase_viser_eksempeltall` |
+| M11 `aksje` i en annen rekkefølge | `test_aksje_er_lik_demounivers` |
+| M12 `gauss` i stedet for Box–Muller | `test_normalfordelingen_bruker_bare_random` |
+| M13 en ulesbar base regnes som demobase | `test_en_base_som_mangler_eller_ikke_kan_leses_er_ikke_en_demobase` |
+| M14 enhver verdi slår på bryteren | `test_bare_verdien_1_slaar_paa_bryteren` |
+| M15 `les` sjekker mot `AKSJEUNIVERS` | `test_hver_vurdering_er_det_vurder_gir` |
+| M16 siste dag uten fallet | `test_tilstandene_siste_dag` |
+| M17 en tom fil godtas | `test_demokommandoen_nekter_en_tom_fil` |
+| M18 `--demo` setter ikke bryteren | `test_demo_flagget_setter_bryteren` |
+
+**Suiten:** 1250 passed og 16 skipped, mot 1226 og 16 før (24 i `tests/test_demo.py`).
 
 **Commands:**
 - `uv run pytest -q` -- expected: grønn.
