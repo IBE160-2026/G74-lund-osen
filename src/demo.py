@@ -58,9 +58,12 @@ from signalberegning import vurder
 
 OSLO = ZoneInfo("Europe/Oslo")
 
-# Kommandoen den tomme siden viser naar demobasen mangler (story 3.4). README
-# faar den i PR 2, og da kommer testen som holder dem like.
+# Kommandoen den tomme siden viser naar demobasen mangler (story 3.4), en for
+# hver maate aa kjoere paa, som hentekommandoen i app.py. I Docker lager
+# demo-lag i compose.yaml demobasen i volumet ose-demo. README har begge, og
+# en test i tests/test_docker.py holder dem like (PR 2).
 DEMOKOMMANDO = "uv run python src/demo.py"
+DEMOKOMMANDO_DOCKER = "docker compose run --rm demo-lag"
 
 FROE = 20261009
 FOERSTE_DAG = date(2026, 1, 2)

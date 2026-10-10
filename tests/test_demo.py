@@ -377,6 +377,34 @@ class TestSidene:
             assert svar.status_code == 503, rute
             assert "<code>demo.db</code>" in html and demo.DEMOKOMMANDO in html, rute
 
+    def test_i_docker_viser_sidene_docker_kommandoen_for_demobasen(self, klient, monkeypatch):
+        """PR 2, ECH7: med OSE_I_DOCKER=1, som Dockerfile setter, viser siden og
+        feilsiden kommandoen som lager demobasen i volumet ose-demo. Ville
+        feilet hvis containeren viste uv-kommandoen, som ikke finnes der."""
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        monkeypatch.setenv(app_modul.I_DOCKER, "1")
+        html = klient.get("/").data.decode("utf-8")
+        assert f"<code>{demo.DEMOKOMMANDO_DOCKER}</code>" in html
+        assert demo.DEMOKOMMANDO not in html
+        sti = demo_sti()
+        sti.parent.mkdir(parents=True, exist_ok=True)
+        sti.write_bytes(b"ikke en sqlite-base" * 10)
+        for rute in ("/", "/aksje/BRFE"):
+            svar = klient.get(rute)
+            html = svar.data.decode("utf-8")
+            assert svar.status_code == 503, rute
+            assert f"<code>{demo.DEMOKOMMANDO_DOCKER}</code>" in html, rute
+            assert demo.DEMOKOMMANDO not in html, rute
+
+    def test_bare_verdien_1_gir_docker_kommandoen_for_demobasen(self, monkeypatch):
+        """Som hentekommandoen: ville feilet hvis enhver verdi ga Docker-kommandoen."""
+        for verdi, forventet in (("1", demo.DEMOKOMMANDO_DOCKER), ("0", demo.DEMOKOMMANDO),
+                                 ("", demo.DEMOKOMMANDO)):
+            monkeypatch.setenv(app_modul.I_DOCKER, verdi)
+            assert app_modul.demokommando() == forventet, verdi
+        monkeypatch.delenv(app_modul.I_DOCKER)
+        assert app_modul.demokommando() == demo.DEMOKOMMANDO
+
     def test_feilsiden_har_eksempeltall_for_en_demobase(self, klient, monkeypatch, demobase):
         """VG2: feiler lesingen etter at en demobase er aapnet, har feilsiden
         ogsaa «Eksempeltall»."""
@@ -430,3 +458,8 @@ class TestSidene:
         c.close()
         html = klient.get("/").data.decode("utf-8")
         assert demo.DEMOKOMMANDO in html and app_modul.HENTEKOMMANDO not in html
+        # VG1 i gjennomgangen av PR 2: i Docker er det Docker-kommandoen ogsaa her.
+        monkeypatch.setenv(app_modul.I_DOCKER, "1")
+        html = klient.get("/").data.decode("utf-8")
+        assert f"<code>{demo.DEMOKOMMANDO_DOCKER}</code>" in html
+        assert demo.DEMOKOMMANDO not in html and app_modul.HENTEKOMMANDO_DOCKER not in html

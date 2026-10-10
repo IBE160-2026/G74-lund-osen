@@ -1,8 +1,13 @@
-# OSE Signal i Docker (story 3.1 og 3.2).
+# OSE Signal i Docker (story 3.1, 3.2 og 3.4).
 #
-#   docker compose up --build      webserveren paa http://127.0.0.1:5000
-#   docker compose run --rm hent   hentingen, med EODHD_API_KEY fra .env
-#   docker compose down            stopper, og lar volumene staa
+#   docker compose up --build demo      demoen paa http://127.0.0.1:5000
+#   docker compose --profile demo down  stopper demoen
+#   docker compose up --build           webserveren paa http://127.0.0.1:5000
+#   docker compose run --rm hent        hentingen, med EODHD_API_KEY fra .env
+#   docker compose down                 stopper, og lar volumene staa
+#
+# docker compose down uten profilen stopper ikke demoen (Compose v5.5.1,
+# proevd 10.10 i story 3.4). --profile demo down stopper begge.
 #
 # ADVARSEL: docker compose down -v fjerner BEGGE volumene i en kommando, ogsaa
 # ose-raa med oeyeblikksbildene og ose-db med vurderingene. Ingen av dem kan
@@ -59,6 +64,47 @@ services:
       - ose-db:/app/data/db
       - ose-raa:/app/data/raa
 
+  # Demoen (story 3.4): demo-lag lager demobasen med oppdiktede selskaper i
+  # ose-demo, og demo er webserveren med bryteren OSE_DEMO=1. Ingen noekkel,
+  # ingen kall, og verken ose-db eller ose-raa, saa demoen aldri roerer den
+  # ekte basen. Webserveren lager aldri demobasen selv (AD-10). Begge ligger
+  # i profilen demo: docker compose up --build demo starter demo-lag foerst
+  # og demo naar den er ferdig. demo har samme port som app, saa de to kan
+  # ikke kjoere samtidig.
+  demo-lag:
+    build: .
+    image: ose-signal
+    pull_policy: build
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    profiles: ["demo"]
+    # entrypoint som hent, saa docker compose run --rm demo-lag lager
+    # demobasen paa nytt.
+    entrypoint: ["python", "src/demo.py"]
+    volumes:
+      - ose-demo:/app/data/db
+
+  demo:
+    build: .
+    image: ose-signal
+    pull_policy: build
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    profiles: ["demo"]
+    depends_on:
+      demo-lag:
+        condition: service_completed_successfully
+    environment:
+      OSE_DEMO: "1"
+    ports:
+      - "127.0.0.1:5000:5000"
+    volumes:
+      - ose-demo:/app/data/db
+
 volumes:
   # Basen kan IKKE slettes og bygges opp igjen: vurdering ligger her og kan
   # ikke lages paa nytt, fordi en omregning gir dagens svar, ikke datidens
@@ -66,3 +112,6 @@ volumes:
   ose-db:
   # Oeyeblikksbildene fra EODHD, skrevet en gang og aldri om (AD-6, NFR-07).
   ose-raa:
+  # Bare demobasen (story 3.4). Den kan alltid lages paa nytt, og
+  # docker compose up --build demo gjoer det hver gang.
+  ose-demo:

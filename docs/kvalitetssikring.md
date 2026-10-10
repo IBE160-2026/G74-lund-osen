@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-06T22:42
+updated: 2026-10-10T15:34
 ---
 
 # Kvalitetssikring
@@ -495,6 +495,55 @@ Dokumentet oppdateres ved hver epic, sammen med kodegjennomgangen av den
 **Fra 03.10 navngir hver spesifikasjon hver mutant og testen som fanget den**,
 så dokumentet kan oppdateres uten hull. Det var ikke gjort for alle storyene
 før 03.10 (§3, «Åpne punkter i kildene»).
+
+## 9. README-prøven
+
+Kontrollpunktet i story 3.4 i [`epics.md`](../_bmad-output/planning-artifacts/epics.md):
+README-oppskriften følges fra start til slutt på en maskin som ikke har hatt
+repoet eller imaget før, uten nøkler. Prøven er planlagt 13.–16.10 (punkt 2 i
+rekkefølgen i `epics.md`, fra endringsforslaget 08.10), og gjentas før
+innleveringen. Avsnittet er laget i story 3.4, PR 2, og fylles ut av den som
+prøver. Det som står over, gjelder fortsatt commit `3803b4d`.
+
+Kommandoene står i den rekkefølgen «Kom i gang» i [`README.md`](../README.md)
+har dem. Endres README-en før prøven, rettes lista her i samme commit.
+
+### Prøve 1
+
+- **Hvem som prøver:** åpent.
+- **Dato og klokkeslett:**
+- **Maskin og operativsystem:**
+- **Docker Desktop, versjon** (`docker version`, linjen med «Docker Desktop»):
+- **Maskinen har aldri hatt repoet eller imaget:** ja / nei. Sjekket med
+  `docker images` (ingen `ose-signal`) og at mappa `G74-lund-osen` ikke fantes.
+- **Commit som ble prøvd** (`git log -1 --oneline`):
+
+| # | Kommando eller steg i README-en | Det som skjedde |
+|---|---|---|
+| 1 | Start Docker Desktop og vent til motoren kjører | |
+| 2 | `git clone https://github.com/IBE160-2026/G74-lund-osen.git` | |
+| 3 | `cd G74-lund-osen` | |
+| 4 | `docker compose up --build demo` | |
+| 5 | Åpne http://127.0.0.1:5000. Står «Eksempeltall» på siden? | |
+| 6 | En aksje i demoen åpnes fra oversikten | |
+| 7 | `docker compose run --rm demo-lag`, i et nytt vindu mens demoen kjører | |
+| 8 | `Ctrl+C` i vinduet med demoen | |
+| 9 | `docker compose --profile demo down` | |
+| 10 | `cp .env.example .env` (uten å fylle inn nøkkelen) | |
+| 11 | `docker compose up --build` og http://127.0.0.1:5000 | |
+| 12 | `docker compose run --rm hent`, uten nøkkel | |
+| 13 | Siden lastet på nytt | |
+| 14 | `docker compose down` | |
+| 15 | Byttet: `docker compose --profile demo down`, så `docker compose up --build`, så det samme tilbake til `docker compose up --build demo` | |
+| 16 | uv: `uv sync` | |
+| 17 | `uv run python src/demo.py` | |
+| 18 | `uv run python src/app.py --demo` og http://127.0.0.1:5000 | |
+| 19 | `uv run python src/fetch_prices.py`, uten nøkkel | |
+| 20 | `uv run python src/app.py` | |
+| 21 | `docker ps -a` til slutt: står det containere igjen fra prøven? | |
+
+- **Det som ikke stemte:**
+- **Rettet i** (commit eller story):
 
 ## Vedlegg: hver mutant
 

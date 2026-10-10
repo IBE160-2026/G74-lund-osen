@@ -182,10 +182,12 @@ class TestDockerignore:
 
 
 class TestCompose:
-    def test_to_tjenester_fra_samme_image(self):
+    def test_alle_tjenestene_fra_samme_image(self):
+        """Story 3.4 la til demo-lag og demo, fra samme image."""
         tjenester = _tjenester()
-        assert set(tjenester) == {"app", "hent"}
-        assert _verdier(tjenester["app"]["image"]) == _verdier(tjenester["hent"]["image"]) == ["ose-signal"]
+        assert set(tjenester) == {"app", "hent", "demo-lag", "demo"}
+        for navn, felt in tjenester.items():
+            assert _verdier(felt["image"]) == ["ose-signal"], navn
 
     def test_begge_bygger_fra_repoet_og_henter_aldri_imaget(self):
         """Ville feilet hvis hent manglet build. Da ville docker compose run
@@ -222,6 +224,8 @@ class TestCompose:
         Ville feilet hvis webserveren fikk noekkelen."""
         tjenester = _tjenester()
         assert "env_file" not in tjenester["app"] and "environment" not in tjenester["app"]
+        for navn in ("demo-lag", "demo"):
+            assert "env_file" not in tjenester[navn], navn
         assert _verdier(tjenester["hent"]["env_file"]) == [".env"]
         assert "environment" not in tjenester["hent"]
         assert "EODHD" not in "\n".join(_linjer(COMPOSE)).upper()
@@ -233,6 +237,9 @@ class TestCompose:
         porter = _verdier(tjenester["app"]["ports"])
         assert porter == ["127.0.0.1:5000:5000"]
         assert "ports" not in tjenester["hent"]
+        # Story 3.4: demoen har samme port, saa app og demo kan ikke kjoere samtidig.
+        assert _verdier(tjenester["demo"]["ports"]) == porter
+        assert "ports" not in tjenester["demo-lag"]
 
     def test_navngitte_volumer_aldri_data_paa_maskinen(self):
         """Regel 22 og AD-11: ose-db og ose-raa er navngitte og atskilte. Ville
@@ -241,7 +248,7 @@ class TestCompose:
         assert _verdier(tjenester["hent"]["volumes"]) == ["ose-db:/app/data/db", "ose-raa:/app/data/raa"]
         assert _verdier(tjenester["app"]["volumes"]) == ["ose-db:/app/data/db"]
         toppvolumer = _blokk(_toppnivaa()["volumes"][1:], 2)
-        assert set(toppvolumer) == {"ose-db", "ose-raa"}
+        assert set(toppvolumer) == {"ose-db", "ose-raa", "ose-demo"}
         assert all(len(linjer) == 1 for linjer in toppvolumer.values()), "volumene skal ikke ha name:"
 
     def test_webserveren_har_ikke_oeyeblikksbildene(self):
@@ -300,6 +307,44 @@ class TestCompose:
         assert "vurdering" in foer_db and "AD-7" in foer_db
         assert "docker compose down -v" in tekst and "aldri -v" in tekst
 
+    def test_demoen_har_bare_sitt_eget_volum(self):
+        """Story 3.4: demoen roerer aldri den ekte basen eller oeyeblikksbildene.
+        Ville feilet hvis demo eller demo-lag fikk ose-db eller ose-raa, eller
+        ose-demo laa paa en annen mappe enn basen, der demo_sti() peker."""
+        import lagring_sqlite
+
+        assert lagring_sqlite.demo_sti().parent == Path(lagring_sqlite.BASE_STI).parent
+        tjenester = _tjenester()
+        mappe = _verdier(tjenester["app"]["volumes"])[0].split(":")[1]
+        assert mappe == "/app/data/db"
+        for navn in ("demo-lag", "demo"):
+            assert _verdier(tjenester[navn]["volumes"]) == [f"ose-demo:{mappe}"], navn
+        for navn in ("app", "hent"):
+            assert not any("ose-demo" in v for v in _verdier(tjenester[navn]["volumes"])), navn
+
+    def test_demoen_ligger_i_profilen_og_lager_basen_foerst(self):
+        """Story 3.4: docker compose up starter ikke demoen, og demo venter til
+        demo-lag har laget demobasen. Ville feilet uten profilen, eller med
+        depends_on uten betingelsen, som starter demo foer basen finnes."""
+        tjenester = _tjenester()
+        for navn in ("demo-lag", "demo"):
+            assert tjenester[navn]["profiles"][0].split(":", 1)[1].strip() == '["demo"]', navn
+        avhengig = [l.strip() for l in tjenester["demo"]["depends_on"][1:]]
+        assert avhengig == ["demo-lag:", "condition: service_completed_successfully"]
+        assert "depends_on" not in tjenester["demo-lag"]
+
+    def test_demo_lag_kjoerer_demokommandoen_og_demo_har_bryteren(self):
+        """demo-lag kjoerer src/demo.py, og demo er webserveren med OSE_DEMO=1.
+        Ville feilet hvis demo ikke hadde bryteren, og viste den ekte basen."""
+        import app
+
+        tjenester = _tjenester()
+        assert tjenester["demo-lag"]["entrypoint"][0].split(":", 1)[1].strip() == '["python", "src/demo.py"]'
+        assert "command" not in tjenester["demo-lag"]
+        miljoe = [l.strip() for l in tjenester["demo"]["environment"][1:]]
+        assert miljoe == [f'{app.I_DEMO}: "1"']
+        assert "entrypoint" not in tjenester["demo"] and "command" not in tjenester["demo"]
+
     def test_ingen_ollama_i_31(self):
         """Rettelsen 05.10 kl. 16:53: Ollama kommer i 10.2."""
         assert "ollama" not in "\n".join(_linjer(COMPOSE)).lower()
@@ -311,6 +356,12 @@ README = ROT / "README.md"
 def _kom_i_gang() -> str:
     tekst = README.read_text(encoding="utf-8")
     return tekst.split("## Kom i gang\n", 1)[1].split("\n## ", 1)[0]
+
+
+def _kommandoene() -> list[str]:
+    """Hver kommando i kodeblokkene i «Kom i gang», uten kommentaren bak #."""
+    blokker = _kom_i_gang().split("```\n")[1::2]
+    return [l.split("#")[0].strip() for b in blokker for l in b.splitlines() if l.strip()]
 
 
 class TestReadme:
@@ -335,8 +386,12 @@ class TestReadme:
 
     def test_tjenestene_i_readme_finnes_i_compose(self):
         """Ville feilet hvis README-en viste en tjeneste compose.yaml ikke har."""
-        brukt = set(re.findall(r"docker compose run --rm (\w+)", README.read_text(encoding="utf-8")))
-        assert brukt and brukt <= set(_tjenester())
+        tekst = README.read_text(encoding="utf-8")
+        # [\w-], saa demo-lag ikke leses som demo (story 3.4).
+        brukt = set(re.findall(r"docker compose run --rm ([\w-]+)", tekst))
+        brukt |= set(re.findall(r"docker compose up --build ([\w-]+)", tekst))
+        assert {"hent", "demo-lag", "demo"} <= brukt
+        assert brukt <= set(_tjenester())
 
     def test_advarselen_om_down_v_og_basen(self):
         """Story 3.2, svar 3, og AD-7: ville feilet hvis README-en ikke advarte
@@ -352,6 +407,103 @@ class TestReadme:
         tekst = README.read_text(encoding="utf-8")
         assert "--hent-foer-kl-22" not in tekst
         assert "etter kl. 22" in _kom_i_gang() and "helgen" in _kom_i_gang()
+
+    def test_demoen_er_den_foerste_kommandoen(self):
+        """Story 3.4, PR 2: etter git clone og cd er den foerste kommandoen
+        demoen, som virker uten .env og uten noekkel. Ville feilet hvis
+        README-en ba om .env foer demoen."""
+        del_ = _kom_i_gang()
+        blokk = del_.split("```\n", 2)[1]
+        kommandoer = [l.split("#")[0].strip() for l in blokk.splitlines() if l.strip()]
+        assert kommandoer[0].startswith("git clone") and kommandoer[1].startswith("cd ")
+        assert kommandoer[2] == "docker compose up --build demo"
+        demo = del_.split("### Den ekte versjonen", 1)[0]
+        assert "Start Docker Desktop" in demo and "http://127.0.0.1:5000" in demo
+        assert "Eksempeltall" in demo and ".env" not in blokk
+        assert del_.index("docker compose up --build demo") < del_.index("cp .env.example .env")
+
+    def test_kommandoene_er_de_samme_som_i_koden_og_compose(self):
+        """Story 3.4, PR 2: kommandoene siden viser, finnes i README-en, og
+        flagget og profilen README-en bruker, finnes i koden og compose.yaml.
+        Ville feilet hvis en av dem ble endret bare ett sted."""
+        import app
+        import demo
+
+        tekst = README.read_text(encoding="utf-8")
+        # Hele linjer i kodeblokkene, ikke bare tekst et sted (VG3).
+        kommandoer = _kommandoene()
+        for kommando in (app.HENTEKOMMANDO, app.HENTEKOMMANDO_DOCKER, demo.DEMOKOMMANDO):
+            assert kommando in kommandoer, kommando
+        assert f"`{demo.DEMOKOMMANDO_DOCKER}`" in _kom_i_gang()
+        # demo-lag kjoerer det DEMOKOMMANDO kjoerer, i containeren.
+        lag = _tjenester()["demo-lag"]["entrypoint"][0].split(":", 1)[1].strip()
+        assert lag == '["' + '", "'.join(demo.DEMOKOMMANDO.split()[2:]) + '"]'
+        assert demo.DEMOKOMMANDO_DOCKER == "docker compose run --rm demo-lag"
+        # Profilene README-en bruker, finnes i compose.yaml.
+        profiler = {f[0].split(":", 1)[1].strip().strip('[]"') for f in
+                    (felt.get("profiles") for felt in _tjenester().values()) if f}
+        brukt = set(re.findall(r"docker compose --profile ([\w-]+)", tekst))
+        assert brukt == {"demo"} and brukt <= profiler
+
+    def test_uv_med_demo_flagget_som_appen_leser(self, monkeypatch):
+        """uv-veien: README-en viser --demo, og det er flagget les_flagg kjenner."""
+        import app
+
+        tekst = _kom_i_gang()
+        flagg = re.findall(r"uv run python src/app\.py (--[\w-]+)", tekst)
+        assert flagg == ["--demo"]
+        # setenv foerst, ellers lekker bryteren til testene etter (som i test_demo.py).
+        monkeypatch.setenv(app.I_DEMO, "0")
+        app.les_flagg(flagg)
+        assert app.demo_paa()
+        assert tekst.index("uv run python src/demo.py") < tekst.index("uv run python src/app.py --demo")
+
+    def test_stoppkommandoen_for_demoen(self):
+        """Proeven 10.10 med Compose v5.5.1: docker compose down uten profilen
+        stopper ikke demoen. Ville feilet hvis README-en ga docker compose
+        down som stoppkommando for demoen, eller CI proevde en annen kommando
+        enn README-en viser."""
+        del_ = _kom_i_gang()
+        demo = del_.split("### Den ekte versjonen", 1)[0]
+        bytte = del_.split("### Bytte mellom demoen og den ekte versjonen", 1)[1].split("\n### ", 1)[0]
+        for avsnitt in (demo, bytte):
+            assert "docker compose --profile demo down" in avsnitt
+        assert "`docker compose down` stopper ikke demoen" in bytte
+        steg = CI.read_text(encoding="utf-8").split("- name: Demoen med compose", 1)[1].split("- name:", 1)[0]
+        assert "docker compose -f $f --profile demo down\n" in steg
+        assert "docker compose -f $f up -d --build demo;" in steg
+        # Ikke -p: med -p stopper docker compose down ogsaa demoen (proevd 10.10).
+        assert "-p $p" not in steg and "docker compose -f $f down\n" in steg
+
+    def test_tallene_om_demoen_er_de_samme_som_i_koden(self):
+        """VG7: ville feilet hvis demo.py fikk en annen sluttdato eller et annet
+        antall selskaper uten at README-en ble rettet."""
+        import demo
+
+        maaneder = ("januar", "februar", "mars", "april", "mai", "juni", "juli",
+                    "august", "september", "oktober", "november", "desember")
+        dag = demo.SLUTTDATO
+        ukedag = ("mandag", "tirsdag", "onsdag", "torsdag", "fredag", "lørdag", "søndag")[dag.weekday()]
+        tekst = _kom_i_gang().split("### Den ekte versjonen", 1)[0]
+        assert f"{len(demo.DEMOUNIVERS)} oppdiktede selskaper" in tekst
+        assert f"til {ukedag} {dag.day}. {maaneder[dag.month - 1]} {dag.year}" in tekst
+        assert "`ose-demo`" in tekst and "ose-demo" in _blokk(_toppnivaa()["volumes"][1:], 2)
+
+    def test_readme_proeven_har_hver_kommando(self):
+        """VG6: §9 i docs/kvalitetssikring.md sier at lista rettes naar
+        README-en endres. Ville feilet hvis en kommando i «Kom i gang» manglet
+        i tabellen for README-proeven."""
+        import demo
+
+        kvalitet = (ROT / "docs" / "kvalitetssikring.md").read_text(encoding="utf-8")
+        tabell = kvalitet.split("## 9. README-prøven", 1)[1].split("\n## ", 1)[0]
+        for kommando in [*_kommandoene(), demo.DEMOKOMMANDO_DOCKER]:
+            assert f"`{kommando}`" in tabell, kommando
+
+    def test_siden_lastes_paa_nytt_etter_hentingen(self):
+        """Story 3.4, PR 2: siden oppdateres ikke av seg selv."""
+        ekte = _kom_i_gang().split("### Den ekte versjonen", 1)[1]
+        assert "Last siden på nytt når hentingen er ferdig" in ekte
 
     def test_ingen_bilder_utenom_ci_merket(self):
         """Story 3.3: skjermbilder med ekte data publiserer dataene. Ville feilet

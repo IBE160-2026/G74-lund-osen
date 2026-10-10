@@ -196,6 +196,68 @@ jobs:
           docker run --rm --network none -v ${p}_ose-raa:/app/data/raa ose-signal:ci test -f /app/data/raa/kurser-raa-2026-01-02.json
           echo "ose-db fjernet og laget paa nytt, tom, og ose-raa sto"
 
+      - name: Demoen med compose, uten .env og uten nøkkel (story 3.4)
+        # Eget prosjekt, saa bare volumet ose-ci-34_ose-demo lages og fjernes.
+        # Kommandoene fra README-en med -f foran, mot en kopi av compose.yaml
+        # med name: ose-ci-34. Ikke -p: med -p stopper docker compose down
+        # ogsaa demoen, uten -p gjoer den det ikke (Compose v5.5.1, proevd
+        # 10.10), og README-en bruker ikke -p.
+        run: |
+          p=ose-ci-34
+          f=compose-ci-34.yaml
+          test ! -e .env
+          test ! -e $f
+          sed "s/^name: ose-signal$/name: $p/" compose.yaml > $f
+          grep -q "^name: $p$" $f
+          # Foer trap: finnes volumet fra foer, stopper steget uten aa roere det.
+          fra_foer=$(docker volume ls -q --filter "name=^${p}_")
+          if [ -n "$fra_foer" ]; then echo "volumer fra før: $fra_foer"; exit 1; fi
+          trap 'docker compose -f $f --profile demo down > /dev/null 2>&1 || true; docker volume rm ${p}_ose-demo > /dev/null 2>&1 || true; rm -f $f' EXIT
+          # Feiler demo-lag, vises utskriften foer trap rydder (ECH10).
+          if ! docker compose -f $f up -d --build demo; then
+            docker compose -f $f --profile demo logs demo-lag; exit 1
+          fi
+          # Oversikten og en aksje svarer 200 med «Eksempeltall» (VG9).
+          sider() {
+            for i in $(seq 1 30); do
+              if docker compose -f $f exec -T demo python -c "
+          import urllib.request, sys
+          for rute, tekst in (('/', 'Brattfjell Energi'), ('/aksje/BRFE', 'Brattfjell Energi')):
+              s = urllib.request.urlopen('http://127.0.0.1:5000' + rute, timeout=5)
+              html = s.read().decode()
+              if s.status != 200 or 'Eksempeltall' not in html or tekst not in html:
+                  sys.exit(rute + ' svarte ' + str(s.status))
+          "; then return 0; fi
+              sleep 1
+            done
+            docker compose -f $f --profile demo logs
+            return 1
+          }
+          sider
+          # Fra maskinen, gjennom porten paa 127.0.0.1, som README-en viser (VG4).
+          curl -fsS --max-time 5 http://127.0.0.1:5000/ | grep -q Eksempeltall
+          # Demobasen lages paa nytt mens demoen kjoerer, som README-en sier (VG2).
+          docker compose -f $f run --rm demo-lag
+          sider
+          # demo og demo-lag har bare ose-demo, og demo-lag gikk ut med kode 0.
+          for t in demo demo-lag; do
+            c=$(docker compose -f $f ps -a -q $t)
+            m=$(docker inspect "$c" --format '{{range .Mounts}}{{.Name}}:{{.Destination}} {{end}}')
+            echo "$t har $m"
+            [ "$(echo $m)" = "${p}_ose-demo:/app/data/db" ]
+          done
+          [ "$(docker inspect "$(docker compose -f $f ps -a -q demo-lag)" --format '{{.State.ExitCode}}')" = 0 ]
+          # docker compose down uten profilen stopper ikke demoen, som README-en
+          # sier (Compose v5.5.1, proevd 10.10). Endres det, maa README-en rettes (VG5).
+          docker compose -f $f down
+          [ "$(docker inspect "$(docker compose -f $f ps -q demo)" --format '{{.State.Running}}')" = true ]
+          # Stoppkommandoen fra README-en etterlater ingen container, og volumet staar.
+          docker compose -f $f --profile demo down
+          igjen=$(docker ps -a -q --filter "label=com.docker.compose.project=$p")
+          if [ -n "$igjen" ]; then docker ps -a --filter "label=com.docker.compose.project=$p"; exit 1; fi
+          docker volume inspect ${p}_ose-demo > /dev/null
+          echo "demoen svarte med Eksempeltall, og --profile demo down stoppet den"
+
       - name: Hentingen med skrivebeskyttet rot og /tmp som tmpfs
         # Samme innstillinger som hent i compose.yaml (read_only, tmpfs /tmp
         # og de to volumene), men med docker run og uten .env. Foerst det hent
@@ -230,7 +292,8 @@ jobs:
           echo "$ut" | grep -q "EODHD_API_KEY mangler"
           [ "$kode" = 1 ]
 
-      - name: compose.yaml starter bare webserveren uten profilen hent
+      - name: compose.yaml starter bare webserveren uten profilene hent og demo
         run: |
           [ "$(docker compose config --services)" = "app" ]
           [ "$(docker compose --profile hent config --services | sort | tr '\n' ' ')" = "app hent " ]
+          [ "$(docker compose --profile demo config --services | sort | tr '\n' ' ')" = "app demo demo-lag " ]

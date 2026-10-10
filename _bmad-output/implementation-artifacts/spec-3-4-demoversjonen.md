@@ -88,6 +88,30 @@ I tillegg, fra instruksjonen:
 
 </frozen-after-approval>
 
+## Planen for PR 2
+
+Fra instruksjonen kl. 15:23 i `docs/ai-prompts/2026-10-10.md`, på grenen `3-4-docker` fra main etter `0ed87be`.
+
+**Prøven først, 10.10 mellom kl. 15:23 og 15:26 (etter at instruksjonen ble committet, før planen ble skrevet), Docker Desktop 4.91.0, motor 29.8.0 og Compose v5.5.1.** I egne prosjekter (`ose-proeve-down`, `ose-proeve-env`, `ose-proeve-dep`) med `python:3.13.15-slim` som allerede lå på maskinen, og bare deres egne volumer er fjernet:
+- `docker compose down` uten profilen stopper **ikke** demoen. Den går med kode 0, demo-containeren kjører videre, og nettverket blir stående («Resource is still in use»). Svar 2 i Planen sier at `docker compose down` også stopper demotjenestene. Det stemmer ikke med denne Compose-versjonen.
+- `docker compose --profile demo down` stopper demoen, og også `app` når den kjører. `docker compose down demo` stopper også demoen.
+- En tjeneste i en annen profil med `env_file: .env`, som `hent`, hindrer ikke `docker compose up demo` når `.env` mangler.
+- `depends_on` med `condition: service_completed_successfully` mellom to tjenester i profilen `demo` starter `demo-lag` først, og `demo` når den er ferdig.
+
+**Delene, med commit og push etter hver:**
+1. `compose.yaml`: `demo-lag` med `entrypoint: ["python", "src/demo.py"]`, som `hent`, og `demo` med `environment: OSE_DEMO: "1"` og `depends_on` på `demo-lag`. Begge har profilen `demo`, `build: .`, `image: ose-signal`, `pull_policy: build`, `init`, `read_only`, `tmpfs /tmp` og bare `ose-demo:/app/data/db`. `demo` har `127.0.0.1:5000:5000`. Testene i `tests/test_docker.py`.
+2. `src/app.py`: `DEMOKOMMANDO_DOCKER = "docker compose run --rm demo-lag"` og `demokommando()`, valgt med `OSE_I_DOCKER` som `hentekommando()` (ECH7). Siden og feilsiden bruker den.
+3. CI: et steg i jobben `docker` med prosjektet `ose-ci-34`, uten `.env`: `docker compose -p ose-ci-34 up -d --build demo`, siden svarer 200 med «Eksempeltall», så stoppkommandoen fra README-en, og ingen container igjen. Bare `ose-ci-34_ose-demo` fjernes. Steget med `config --services` får profilen `demo`.
+4. README, «Kom i gang»: demoen først med `docker compose up --build demo`, så den ekte versjonen som i 3.3, og at siden lastes på nytt etter hentingen. Byttet: demoen stoppes med `docker compose --profile demo down`, fordi `docker compose down` ikke gjør det. uv-veien med `--demo`. Status og Mappestruktur. En test krever at kommandoene i README-en er de samme som i koden og `compose.yaml`.
+5. `docs/kvalitetssikring.md`: avsnittet for README-prøven 13.–16.10.
+6. Spinen: merknader under `AD-9`, `AD-10` og `AD-11`.
+
+**Avvik fra punktene i instruksjonen:** ingen. At `docker compose down` ikke stopper demoen, er dekket av instruksjonen: README-en gir `docker compose --profile demo down` der den forklarer byttet. Svar 2 i Planen står, og denne linjen sier hva som gjelder.
+
+*Rettet 2026-10-10 kl. 16:18:* «Svar 2 i Planen står» over er upresist. Delen av svar 2 som sier at `docker compose down` også stopper demotjenestene, stemmer ikke uten `-p`. Port 5000 og at README-en sier hvordan man bytter, gjelder. Den frosne teksten endres ikke uten gruppen (BH2).
+
+*Rettet 2026-10-10 kl. 16:18:* funnet etter gjennomgangen, i egne prosjekter: med `-p NAVN` stopper `docker compose -p NAVN down` også demoen. Uten `-p`, med prosjektnavnet fra `name:` i fila, stopper den ikke demoen. Prøvd begge veier samme ettermiddag med Compose v5.5.1. README-en bruker ikke `-p`, så det er den oppførselen brukeren får. CI-steget brukte først `-p ose-ci-34` og bruker nå `-f` mot en kopi av `compose.yaml` med `name: ose-ci-34`, og prøver at `down` uten profilen lar demoen kjøre (`2fa6f9f`).
+
 ## Code Map
 
 - `src/kursdata.py` -- `kontroller_skriving` (linje 162) sjekker mot `AKSJEUNIVERS`. Får `univers` som parameter.
@@ -106,6 +130,14 @@ I tillegg, fra instruksjonen:
 - [x] `src/fetch_prices.py` -- vakten i `kjoer` og `les_inn`.
 - [x] `src/app.py` og malene -- bryteren, siden når demobasen mangler, «Eksempeltall».
 - [x] `tests/test_demo.py` -- kontrollpunktene.
+
+**Execution (PR 2):**
+- [x] `compose.yaml` -- `demo-lag`, `demo` og `ose-demo` (`e9199f2`).
+- [x] `src/app.py`, `src/demo.py` -- `DEMOKOMMANDO_DOCKER` og `demokommando()` (`cbbad89`).
+- [x] `.github/workflows/tester.yml` -- demosteget og profilen `demo` i `config --services` (`957c90d`, `2fa6f9f`).
+- [x] `README.md` -- «Kom i gang» med demoen først, byttet og uv med `--demo` (`27d7241`).
+- [x] `docs/kvalitetssikring.md` -- §9 for README-prøven (`ea1c7d2`).
+- [x] Spinen -- merknader under `AD-9`, `AD-10` og `AD-11` (`fe22cd3`).
 
 **Acceptance Criteria:**
 - Given to kjøringer av demokommandoen, then er basene like rad for rad.
@@ -161,6 +193,34 @@ Gjennomgang 1 av PR 1 (10.10 kl. 13:02–13:06, PR #26), Blind Hunter (BH, bare 
 
 *Rettet 2026-10-10 kl. 14:49:* «kl. 12:27» for gruppens ja, i Planen og i raden ECH1, ECH11, er ikke overskriften. Instruksjonen står under «## 12:28» i `docs/ai-prompts/2026-10-10.md`.
 
+Gjennomgang av PR 2 (PR #27, etter `fe22cd3` kl. 15:35), Blind Hunter (BH, bare diffen), Edge Case Hunter (ECH) og Verification Gap (VG), som tre uavhengige agenter mot en ren eksport av grenen. Rettelsene er `abaad78`, `4b0bfc0` og `2fa6f9f`.
+
+| # | Funn | Dom | Grunnlag | Rute |
+|---|---|---|---|---|
+| BH1, ECH1 | Testen for `--demo` i `tests/test_docker.py` lekker `OSE_DEMO=1` til testene etter | high | Stemmer. `delenv` uten variabelen legger ingenting tilbake, og `les_flagg` setter `os.environ`. Med `test_docker.py` først feilet testene i `test_app.py`, og den første mutantkjøringen ble drept av lekkasjen | patch: `setenv("0")` først, som i `test_demo.py` (`abaad78`). Mutantene kjørt på nytt |
+| VG1 | En demobase uten kurser i Docker er ikke prøvd | medium | Stemmer, det tredje kallet til `demokommando()` | patch: testen for en tom demobase prøver også Docker. Mutant P16 |
+| VG2, BH4 | `docker compose run --rm demo-lag` mens demoen kjører, som README-en viser, er ikke prøvd | medium | Stemmer | patch: CI kjører den mellom to sjekker av sidene |
+| VG5 | At `docker compose down` uten profilen lar demoen kjøre, er ikke prøvd | low | Stemmer, og prøven viste at det bare gjelder uten `-p` | patch: CI bruker `-f` og prøver det. Mutant C5 |
+| VG4 | Porten fra maskinen er ikke prøvd | low | Stemmer | patch: `curl` mot `127.0.0.1:5000` fra maskinen i CI |
+| VG9 | Aksjedetaljen i demoen er ikke prøvd i CI | low | Stemmer | patch: `/aksje/BRFE` med «Eksempeltall» |
+| BH6 | `urlopen` uten tidsgrense, og feilen skjules | low | Stemmer | patch: `timeout=5`, og ruten og statusen skrives ut |
+| ECH10 | Feiler `demo-lag`, viser CI ikke utskriften | low | Stemmer | patch: loggen til `demo-lag` før trap rydder |
+| VG3 | Kommandoene i README-en sjekkes bare som tekst et sted | low | Stemmer | patch: hele linjer i kodeblokkene |
+| VG6 | Tabellen i §9 følger ikke README-en av seg selv | medium | Stemmer | patch: en test krever hver kommando i tabellen. Mutant P17 |
+| VG7 | Antall selskaper, sluttdatoen og `ose-demo` i README-en er ikke bundet til koden | low | Stemmer | patch: test mot `DEMOUNIVERS`, `SLUTTDATO` og `compose.yaml` |
+| BH2 | Planen sier både at svar 2 ikke stemmer og at det står | medium | Stemmer | Rettet-linje under planen for PR 2 |
+| ECH2 | To `demo-lag` samtidig deler `demo.db.ny` | low | Stemmer, men krever to byggekommandoer samtidig | utsatt: `deferred-work.md` |
+| ECH3 | En ødelagt fil i `ose-demo` stopper demoen, og siden viser en kommando som nekter igjen | medium | Stemmer. `demo-lag` nekter en fil som ikke kan leses (PR 1, gruppens beslutning) | utsatt: `deferred-work.md`. Om `demo-lag` skal få skrive over en fil som ikke kan leses i `ose-demo`, er gruppens valg |
+| BH3 | Status i README-en sier at demoen er flettet før PR-en er flettet | low | Som i 3.3: linjen blir sann ved flettingen | ikke endret |
+| BH5 | «hver gang demoen starter» gjelder `up`, ikke `start` | low | README-en viser bare `up`. Prøvd med `down` og med `stop` før `up` | ikke endret |
+| BH7, ECH11 | Sjekken av monteringene og parseren i testene er skjøre | low | De feiler høyt og ikke stille | ikke endret |
+| BH8 | De nye tjenestene er ikke med i testene for `build`, `init`, `read_only` og `tmpfs` | low | Stemmer ikke. Testene går over alle tjenestene. Mutant P11 | ikke endret |
+| BH9, ECH9 | `up --build demo` bygger samme image for to tjenester og merker `ose-signal` på nytt | low | Som for `app` og `hent` | ikke endret |
+| BH10 | Testen skriver til `demo_sti()` | low | `tests/conftest.py` flytter `BASE_STI` til `tmp_path` | ikke endret |
+| ECH7, ECH8 | README-en forklarer ikke feilen ved port i bruk, og volumet heter `ose-signal_ose-demo` | low | Byttet sier at bare én kan kjøre. Volumene er omtalt med kortnavn også for `ose-db` og `ose-raa` | ikke endret |
+| VG8, VG10 | Rekkefølgen ved oppstart og spinen prøves ikke i drift | low | Betingelsen er testet statisk (mutant P6), og spinen er tekst | ikke endret |
+
+
 ## Verification
 
 **Mutantene, 10.10 kl. 12:49–12:58.** Mot `tests/test_demo.py`, `tests/test_app.py`, `tests/test_fetch_prices.py` og `tests/test_aksje.py`. 18 av 18 drept:
@@ -194,3 +254,42 @@ Gjennomgang 1 av PR 1 (10.10 kl. 13:02–13:06, PR #26), Blind Hunter (BH, bare 
 
 **Commands:**
 - `uv run pytest -q` -- expected: grønn.
+
+**Mutantene for PR 2, 10.10 etter `2fa6f9f` (15:51) og før `4a25835` (16:16).** Eksakt tekstbytting, og originalen lagt tilbake etter hver. De statiske mot `tests/test_docker.py`, `tests/test_demo.py`, `tests/test_app.py` og `tests/test_readme.py`. CI-mutantene med demosteget i jobben `docker`, kjørt fra en ren eksport av arbeidskopien uten `.env` og `data/`, i prosjektet `ose-ci-34`.
+
+Den første kjøringen, før `abaad78`, viste alle som drept, men av lekkasjen av `OSE_DEMO` fra testen for `--demo` (BH1). Kjøringen under er etter rettingen. 28 av 28 drept:
+
+| Mutant | Fanget av |
+|---|---|
+| P1 `ose-db` montert i demoen i tillegg | `test_demoen_har_bare_sitt_eget_volum` |
+| P1b demo bruker `ose-db` i stedet for `ose-demo` | `test_demoen_har_bare_sitt_eget_volum` |
+| P2 demo uten profilen | `test_demoen_ligger_i_profilen_og_lager_basen_foerst` |
+| P2b demo-lag uten profilen | `test_demoen_ligger_i_profilen_og_lager_basen_foerst` |
+| P3 ulik kommando i README og koden | `test_kommandoene_er_de_samme_som_i_koden_og_compose`, `test_readme_proeven_har_hver_kommando` |
+| P3b README starter en tjeneste compose ikke har | `test_tjenestene_i_readme_finnes_i_compose`, `test_demoen_er_den_foerste_kommandoen` |
+| P4 uv-kommandoen i Docker | `test_i_docker_viser_sidene_docker_kommandoen_for_demobasen` og to til |
+| P4b uv-kommandoen på feilsiden i Docker | `test_i_docker_viser_sidene_docker_kommandoen_for_demobasen` |
+| P5 demo uten bryteren | `test_demo_lag_kjoerer_demokommandoen_og_demo_har_bryteren` |
+| P6 `depends_on` med `service_started` | `test_demoen_ligger_i_profilen_og_lager_basen_foerst` |
+| P7 demo-lag kjører hentingen | `test_demo_lag_kjoerer_demokommandoen_og_demo_har_bryteren` |
+| P8 `env_file` i demo-lag | `test_bare_hent_har_noekkelen` |
+| P9 README stopper demoen med `docker compose down` | `test_stoppkommandoen_for_demoen` |
+| P10 `.env` før demoen | `test_demoen_er_den_foerste_kommandoen` |
+| P11 demo uten `read_only` | `test_skrivebeskyttet_rot_med_tmp_som_tmpfs` |
+| P12 demoen på alle adresser | `test_porten_er_bare_paa_maskinen` |
+| P13 README uten omlastingen | `test_siden_lastes_paa_nytt_etter_hentingen` |
+| P14 README uten `--demo` | `test_uv_med_demo_flagget_som_appen_leser` |
+| P15 CI stopper uten profilen | `test_stoppkommandoen_for_demoen` |
+| P16 en tom demobase i Docker viser uv | `test_demobase_uten_kurser_viser_demokommandoen` |
+| P17 README-prøven mangler en kommando | `test_readme_proeven_har_hver_kommando` |
+| P18 CI med `-p` | `test_stoppkommandoen_for_demoen` |
+| C1 CI stopper uten profilen | demosteget: containerne står igjen |
+| C2 demo uten bryteren | demosteget: siden har ikke «Eksempeltall» |
+| C3 `ose-db` montert i demoen | demosteget: sjekken av monteringene |
+| C4 demo-lag lager ingen base | demosteget: siden har ikke kursene |
+| C5 `-p` i stedet for `-f` ved `down` | demosteget: demoen kjører ikke etter `down` |
+| C6 demo-lag nekter en demobase som finnes | demosteget: `run --rm demo-lag` gir kode 1 |
+
+C3 la igjen volumet `ose-ci-34_ose-db`, fordi mutanten la til et volum trap ikke fjerner. Derfor stoppet C4–C6 første gang på sjekken av volumer fra før. Bare det volumet er fjernet, og C4–C6 er kjørt på nytt.
+
+**Suiten etter PR 2:** 1269 passed og 16 skipped lokalt, mot 1257 og 16 før (33 i `tests/test_demo.py`, 43 i `tests/test_docker.py`). CI på `2fa6f9f`, kjøring 38057371770: `pytest` 1285 passed og `docker` grønn, også demosteget.
