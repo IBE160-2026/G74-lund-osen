@@ -37,7 +37,7 @@ from aksjedetalj import bygg_detalj, normaliser_symbol
 from boersdag import norsk_dato
 from graf import bygg_graf
 from kursdata import Kursleser
-from demo import DEMOKOMMANDO
+from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER
 from lagring_sqlite import (
     DEMOMERKE,
     SqliteKurslager,
@@ -98,6 +98,11 @@ def _base_sti() -> Path:
 def hentekommando() -> str:
     """Kommandoen for maaten appen kjoerer paa, lest fra miljoeet (AD-10, AD-12)."""
     return HENTEKOMMANDO_DOCKER if os.environ.get(I_DOCKER) == "1" else HENTEKOMMANDO
+
+
+def demokommando() -> str:
+    """Kommandoen som lager demobasen, valgt som hentekommandoen (story 3.4, ECH7)."""
+    return DEMOKOMMANDO_DOCKER if os.environ.get(I_DOCKER) == "1" else DEMOKOMMANDO
 
 # Feil som betyr at basen ikke kan aapnes eller migreres, som BASEFEIL i
 # hentingen. Siden svarer da 503 med grunnen i stedet for en traceback.
@@ -216,7 +221,7 @@ def _basen_kan_ikke_aapnes():
     return (
         render_template(
             "basefeil.html", feil=g.basefeil, base=_base_sti().name,
-            demokommando=DEMOKOMMANDO if demo_paa() else None,
+            demokommando=demokommando() if demo_paa() else None,
         ),
         503,
     )
@@ -286,7 +291,7 @@ def markedsoversikt():
     if g.get("demo_mangler"):
         return render_template(
             "index.html", rader=[], dato=None, hentet=None, mangler=[], eget=set(),
-            demokommando=DEMOKOMMANDO,
+            demokommando=demokommando(),
         )
     leser = _leser_eller_basefeil()
     if leser is None:
@@ -300,7 +305,7 @@ def markedsoversikt():
             mangler=[],
             eget=set(),
             hentekommando=hentekommando(),
-            demokommando=DEMOKOMMANDO if demo_paa() else None,
+            demokommando=demokommando() if demo_paa() else None,
         )
 
     poster = _leser_eller_basefeil(hent_oversiktsleser).oversikt()
