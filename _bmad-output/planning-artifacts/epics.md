@@ -1934,6 +1934,8 @@ avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 - Når 2.11 er bygget, byttes testen som holder `aksje` lik `AKSJEUNIVERS`, mot den i 2.11
 - **Ville feilet hvis:** en funksjon i v1 bare kunne vises med ekte data og nøkkel
 
+*Ferdig 2026-10-10:* flettet i `0ed87be`, PR #26, og `59c0baf`, PR #27. README-prøven 13.–16.10 gjenstår (§9 i `docs/kvalitetssikring.md`).
+
 ### Story 3.4b: KI-tekstene i demoen
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 16:53.*
