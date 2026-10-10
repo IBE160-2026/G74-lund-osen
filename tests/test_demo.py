@@ -353,7 +353,9 @@ class TestSidene:
     def test_demo_flagget_setter_bryteren(self, monkeypatch):
         """--demo til python src/app.py setter OSE_DEMO, saa kommandoen er lik i
         PowerShell og bash. Ville feilet hvis flagget ikke slo paa bryteren."""
-        monkeypatch.delenv(app_modul.I_DEMO, raising=False)
+        # setenv foerst, saa monkeypatch fjerner variabelen etterpaa, ogsaa
+        # naar les_flagg har satt den (ellers lekker den til neste test).
+        monkeypatch.setenv(app_modul.I_DEMO, "0")
         app_modul.les_flagg([])
         assert not app_modul.demo_paa()
         app_modul.les_flagg(["--demo"])
@@ -389,15 +391,29 @@ class TestSidene:
         svar = klient.get("/")
         assert svar.status_code == 503 and "Eksempeltall" in svar.data.decode("utf-8")
 
-    def test_en_demobase_som_ose_db_migreres_ikke(self, klient, mal):
+    def test_en_demobase_som_ose_db_migreres_ikke(self, klient, mal, monkeypatch):
         """BH6: uten bryteren, med en demobase der den ekte skal ligge, viser
-        webserveren den med «Eksempeltall» og skriver ingenting til den."""
+        webserveren den med «Eksempeltall» og skriver ingenting til den. En
+        migrering av en base paa siste versjon endrer ingen byte, saa testen
+        ser ogsaa paa kallene: ingen migrering og bare skrivebeskyttet
+        aapning (mutanten M20)."""
         ekte = Path(lagring_sqlite.BASE_STI)
         ekte.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(mal, ekte)
         foer = _sha(ekte)
+        migrert, aapninger = [], []
+        ekte_aapne = app_modul.aapne_base
+        monkeypatch.setattr(app_modul, "_migrer_en_gang", migrert.append)
+
+        def aapne(sti, **kw):
+            aapninger.append(kw)
+            return ekte_aapne(sti, **kw)
+
+        monkeypatch.setattr(app_modul, "aapne_base", aapne)
         assert "Eksempeltall" in klient.get("/").data.decode("utf-8")
         assert _sha(ekte) == foer
+        assert migrert == []
+        assert aapninger and all(kw.get("skrivebeskyttet") for kw in aapninger)
 
     def test_demobase_uten_kurser_viser_demokommandoen(self, klient, monkeypatch, mal):
         """ECH6: med bryteren og en demobase uten kurser viser siden
