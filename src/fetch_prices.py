@@ -62,7 +62,7 @@ from boersdag import (
     norsk_dato,
 )
 from eodhd import UgyldigSerie, serie_fra_eodhd
-from kursdata import AKSJEUNIVERS, Kursrad
+from kursdata import AKSJEUNIVERS, Aksje, Kursrad
 from lagring_fil import (
     KURSPREFIKS,
     PROSJEKTROT,
@@ -188,8 +188,8 @@ class UlesbarKvote(ValueError):
     aldri en verdi fra svaret."""
 
 
-def tolk_kvote(svar: object, i_dag_gmt: date) -> tuple[int, int]:
-    """(kall igjen av dagens, bonuskvoten extraLimit) - story 2.3, regel 15.
+def les_kvotetall(svar: object, i_dag_gmt: date) -> tuple[int, int, int]:
+    """(brukt i dag, dailyRateLimit, extraLimit) - story 2.3 og 2.3b, regel 15.
 
     Kvoten nullstilles ved midnatt GMT, men /api/user viser gaarsdagens tall
     til foerste kall etter det. Staar apiRequestsDate paa en tidligere dato
@@ -219,7 +219,28 @@ def tolk_kvote(svar: object, i_dag_gmt: date) -> tuple[int, int]:
         raise UlesbarKvote("apiRequestsDate mangler eller kan ikke leses") from None
     if dato < i_dag_gmt:
         brukt = 0
+    return brukt, grense, bonus
+
+
+def tolk_kvote(svar: object, i_dag_gmt: date) -> tuple[int, int]:
+    """(kall igjen av dagens, bonuskvoten extraLimit) - story 2.3, regel 15.
+
+    Leser svaret med les_kvotetall. Reiser UlesbarKvote som den.
+    """
+    brukt, grense, bonus = les_kvotetall(svar, i_dag_gmt)
     return max(grense - brukt, 0), max(bonus, 0)
+
+
+def kall_til_nye_forsoek(igjen: int, grense: int, antall: int) -> int:
+    """Kall et nytt forsoek kan bruke - story 2.3b, NFR-01.
+
+    Det minste av kallene som er igjen av dagens (igjen) og dailyRateLimit
+    minus antallet hovedhentingen trenger. antall er aksjene i lista pluss
+    indeksen naar den hentes (2.8), og gis av den som kaller. Med 15 og 20
+    er det 5, med 18 aksjer og indeksen 1. Bonuskvoten er aldri med
+    (Marians beslutning 08.10 kl. 08:06).
+    """
+    return max(0, min(igjen, grense - antall))
 
 
 def vurder_kvote(igjen: int, bonus: int, antall: int) -> int | None:
@@ -256,8 +277,9 @@ def hent_universet(
     til: str,
     hent: Callable[[str, str, str, str], list[dict]] = hent_ett_symbol,
     skriv: Callable[[str], None] = print,
+    aksjer: tuple[Aksje, ...] = AKSJEUNIVERS,
 ) -> Resultat:
-    """Ett kall per aksje i universet. Stopper aldri paa en enkelt feil.
+    """Ett kall per aksje i aksjer. Stopper aldri paa en enkelt feil.
 
     Hentingen er injisert saa testene kan kjoere hele loekka uten nett.
 
@@ -269,7 +291,7 @@ def hent_universet(
     """
     resultat = Resultat()
 
-    for aksje in AKSJEUNIVERS:
+    for aksje in aksjer:
         try:
             rader = hent(aksje.ticker, api_nokkel, fra, til)
             resultat.kall_brukt += 1
@@ -334,6 +356,30 @@ def filnavn(i_dag: date) -> str:
     return f"{KURSPREFIKS}-raa-{i_dag.isoformat()}.json"
 
 
+FORSOEKSPREFIKS = "forsoek"
+
+
+def forsoeksfil(katalog: Path, dato: date) -> Path:
+    """Fila for et nytt forsoek - story 2.3b, svar 1 (10.10).
+
+    forsoek<n>-raa-<dato>.json med foerste n fra 2 som ikke finnes. Fila
+    skrives med modus "x" av den som kaller, og kursfila for dagen roeres
+    aldri (AD-6). Prefikset begynner ikke med KURSPREFIKS, saa
+    nyeste_snapshot lar kursfila vinne ved lik dato.
+    """
+    n = 2
+    while (katalog / f"{FORSOEKSPREFIKS}{n}-raa-{dato.isoformat()}.json").exists():
+        n += 1
+    return katalog / f"{FORSOEKSPREFIKS}{n}-raa-{dato.isoformat()}.json"
+
+
+# Story 2.3b: det samme kommandoen sier hver gang en aksje mangler dagens kurs.
+IGJEN_SENERE = (
+    "Kjoer samme kommando igjen senere i kveld, saa proeves aksjene som mangler, "
+    "med kallene som er igjen av dagens (story 2.3b)."
+)
+
+
 # Feil som betyr at basen ikke kunne aapnes eller skrives. En ValueError fra
 # erstatt_serie gjelder bare ett symbol og fanges for seg.
 BASEFEIL = (sqlite3.Error, OSError, MigrasjonsFeil, RuntimeError)
@@ -345,6 +391,7 @@ def skriv_til_basen(
     hentet: datetime,
     fil: Path,
     skriv: Callable[[str], None] = print,
+    lista: tuple[Aksje, ...] = AKSJEUNIVERS,
 ) -> set[str] | None:
     """Kursene fra ett oeyeblikksbilde til basen - story 2.1b.
 
@@ -373,7 +420,7 @@ def skriv_til_basen(
 
     skrevne: set[str] = set()
     try:
-        lager = SqliteKurslager(tilkobling)
+        lager = SqliteKurslager(tilkobling, lista)
         for symbol, rader in serier.items():
             forrige = lager.sist_hentet(symbol)
             if forrige is not None and hentet < forrige:
@@ -439,8 +486,10 @@ def skriv_vurderinger(
     skrevne: set[str],
     klokke: Callable[[], datetime],
     skriv: Callable[[str], None] = print,
+    lista: tuple[Aksje, ...] = AKSJEUNIVERS,
+    bare: set[str] | None = None,
 ) -> bool:
-    """Dagens rad for hver aksje i universet - story 2.5, FR-408, AD-17.
+    """Dagens rad for hver aksje i lista - story 2.5, FR-408, AD-17.
 
     dato er boersdagen raden gjelder, regnet en gang av kjoer. dag er
     kalenderdagen kjoeringen startet, og er ulik dato bare naar boersen er
@@ -458,6 +507,11 @@ def skriv_vurderinger(
     inneveerende boersdag. Skjer det midt i universet, stopper skrivingen og
     sier fra. Returnerer True hvis hver aksje fikk eller hadde en rad.
     Utskriften har ingen kurser og ingen maalinger (regel 16).
+
+    Story 2.3b: med bare skrives rader bare for de aksjene. Et nytt forsoek
+    gir aksjene det fikk skrevet, og en aksje som feilet igjen, faar ingen ny
+    rad, saa grunnen den har, staar. Returnerer True naar hver aksje i bare
+    fikk eller hadde en rad.
     """
     try:
         tilkobling = aapne_base(base_sti)
@@ -473,10 +527,12 @@ def skriv_vurderinger(
     grunner: dict[str, Grunn] = {}
     sto_fra_foer: list[str] = []
     try:
-        kurslager = SqliteKurslager(tilkobling)
-        lager = SqliteVurderingslager(tilkobling, klokke)
-        for aksje in AKSJEUNIVERS:
+        kurslager = SqliteKurslager(tilkobling, lista)
+        lager = SqliteVurderingslager(tilkobling, klokke, lista)
+        for aksje in lista:
             symbol = aksje.symbol
+            if bare is not None and symbol not in bare:
+                continue
             if dag != dato and lager.les(symbol, dato) is not None:
                 sto_fra_foer.append(symbol)
                 continue
@@ -523,21 +579,23 @@ def skriv_vurderinger(
     return True
 
 
-def manglende_i_basen(base_sti: Path, dato: date) -> list[str]:
-    """Aksjene i universet som ikke har en kurs for dato i basen - story 2.3.
+def manglende_i_basen(
+    base_sti: Path, dato: date, lista: tuple[Aksje, ...] = AKSJEUNIVERS
+) -> list[str]:
+    """Aksjene i lista som ikke har en kurs for dato i basen - story 2.3.
 
     Finnes ikke basen, mangler alle. Basen aapnes uten migrering, saa
     ingenting skrives. En base som ikke kan aapnes eller leses, gir en feil
     fra BASEFEIL; kjoer henter da likevel.
     """
     if not base_sti.exists():
-        return [aksje.symbol for aksje in AKSJEUNIVERS]
+        return [aksje.symbol for aksje in lista]
     tilkobling = aapne_base(base_sti, kjoer_migrasjoner=False)
     try:
-        lager = SqliteKurslager(tilkobling)
+        lager = SqliteKurslager(tilkobling, lista)
         return [
             aksje.symbol
-            for aksje in AKSJEUNIVERS
+            for aksje in lista
             if not any(rad.dato == dato for rad in lager.serie(aksje.symbol))
         ]
     finally:
@@ -570,6 +628,7 @@ def kjoer(
     *,
     hent_foer_kl_22: bool = False,
     les_kvote: Callable[[str], object],
+    lista: tuple[Aksje, ...] = AKSJEUNIVERS,
 ) -> Path | None:
     """En henting. Returnerer fila som ble skrevet, eller None hvis
     tidskontrollen eller basen sa nei foer foerste kall (story 2.3).
@@ -627,6 +686,12 @@ def kjoer(
     (main gir naa); uten den leses oeyeblikket. Den leses en gang foer
     vurderingene: er det blitt en ny dag i Oslo, stopper kjoeringen og sier
     fra. Feiler basen, skrives ingen vurdering.
+
+    Story 2.3b: lista er aksjene som hentes, med AKSJEUNIVERS som standard
+    (AD-21). Mangler en aksje i lista kursen for boersdagen etter
+    kjoeringen, ogsaa naar den feilet i hentingen, gir kjoeringen kode 1
+    (svar 5, ECH1), og utskriften sier at samme kommando kjoert igjen samme
+    kveld proever dem.
     """
     nekt_demobase(base_sti, skriv)
     dag = norsk_dato(oeyeblikk)
@@ -663,7 +728,7 @@ def kjoer(
 
     # Basen (FR-402): har den boersdagen for alle aksjene, er det ingenting aa hente.
     try:
-        mangler = manglende_i_basen(base_sti, dato)
+        mangler = manglende_i_basen(base_sti, dato, lista)
     except BASEFEIL as feil:
         skriv(
             f"Basen {base_sti.name} kunne ikke leses ({type(feil).__name__}). "
@@ -673,7 +738,7 @@ def kjoer(
         if not mangler:
             skriv(
                 f"Basen har alt kursene for boersdagen {dato.isoformat()} for "
-                f"alle {len(AKSJEUNIVERS)} aksjene. Ingenting aa hente (FR-402). "
+                f"alle {len(lista)} aksjene. Ingenting aa hente (FR-402). "
                 "0 kall brukt."
             )
             return None
@@ -697,7 +762,7 @@ def kjoer(
         api_nokkel = api_nokkel()
 
     # Kvoten (regel 15): /api/user er gratis. Dagens dato regnes i GMT.
-    behov = len(AKSJEUNIVERS)
+    behov = len(lista)
     try:
         igjen, bonus = tolk_kvote(les_kvote(api_nokkel), hentet_tid.date())
     except UlesbarKvote as feil:
@@ -736,10 +801,10 @@ def kjoer(
             sys.exit(1)
 
     fra, til = bygg_intervall(dag)
-    skriv(f"Henter {len(AKSJEUNIVERS)} symboler, {fra} til {til}.")
-    skriv(f"Dette koster {len(AKSJEUNIVERS)} kall.\n")
+    skriv(f"Henter {len(lista)} symboler, {fra} til {til}.")
+    skriv(f"Dette koster {len(lista)} kall.\n")
 
-    resultat = hent_universet(api_nokkel, fra, til, hent, skriv)
+    resultat = hent_universet(api_nokkel, fra, til, hent, skriv, lista)
 
     tekst = json.dumps(lag_oyeblikksbilde(resultat, fra, til, hentet), ensure_ascii=False)
     try:
@@ -759,7 +824,7 @@ def kjoer(
 
     # Basen etter fila. Et symbol i feil er ikke med og roeres ikke (AD-15).
     serier = {symbol: serie_fra_eodhd(rader) for symbol, rader in resultat.serier.items()}
-    skrevne = skriv_til_basen(base_sti, serier, hentet_tid, fil, skriv)
+    skrevne = skriv_til_basen(base_sti, serier, hentet_tid, fil, skriv, lista)
     if skrevne is None:
         skriv(
             f"Ingen vurdering er skrevet for {dato.isoformat()}, og --les-inn "
@@ -771,12 +836,12 @@ def kjoer(
     if norsk_dato(klokke()) != dag:
         _stoppet_ved_midnatt(dato, 0, skriv)
         sys.exit(1)
-    if not skriv_vurderinger(base_sti, dato, dag, skrevne, klokke, skriv):
+    if not skriv_vurderinger(base_sti, dato, dag, skrevne, klokke, skriv, lista):
         sys.exit(1)
 
     # FR-402: svaret er ikke fra boersdagen for noen av aksjene. Kursene og
-    # fila staar, og vurderingen har grunnen kurs_ikke_fra_dagen. En ny
-    # kjoering samme kveld stopper ved filvakten med 0 kall (nytt forsoek: 2.3b).
+    # fila staar, og vurderingen har grunnen kurs_ikke_fra_dagen. Samme
+    # kommando kjoert igjen samme kveld proever dem (story 2.3b).
     uten_dagen = sorted(
         symbol for symbol in skrevne
         if not any(rad.dato == dato for rad in serier[symbol])
@@ -785,10 +850,17 @@ def kjoer(
         skriv(
             f"Svaret har ikke kursen for boersdagen {dato.isoformat()} for "
             f"{len(uten_dagen)} aksjer: {', '.join(uten_dagen)} (FR-402). "
-            "Kursene og fila staar. Et nytt forsoek kommer med story 2.3b."
+            f"Kursene og fila staar. {IGJEN_SENERE}"
         )
-        sys.exit(1)
-    if skrevne != set(serier):
+    # Svar 5 (ECH1): en aksje som feilet i hentingen, mangler ogsaa dagens
+    # kurs, og gir kode 1 som et svar uten dagen.
+    feilet = sorted(resultat.feil)
+    if feilet:
+        skriv(
+            f"{len(feilet)} aksjer feilet i hentingen og mangler kursen for "
+            f"boersdagen {dato.isoformat()}: {', '.join(feilet)}. {IGJEN_SENERE}"
+        )
+    if uten_dagen or feilet or skrevne != set(serier):
         sys.exit(1)
     return fil
 

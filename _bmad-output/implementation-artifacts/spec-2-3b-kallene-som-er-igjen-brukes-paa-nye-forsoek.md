@@ -103,6 +103,21 @@ I tillegg, fra instruksjonen kl. 19:32: Oppgaveplanlegging blir et eget steg ett
 
 ## Implementation Notes
 
+**Eldre tester som er endret (svar 5).** Bare koden de venter, er endret, og grunnen står ved hver. 11 testfunksjoner, 36 testkjøringer, alle i `tests/test_fetch_prices.py`:
+
+| Test | Endret | Grunn |
+|---|---|---|
+| `TestSkriverIkkeOver::test_tom_katalog_gir_ny_fil_som_kan_leses_og_er_uten_noekkel` | venter kode 1, og fila slås opp på navnet i stedet for å komme fra `kjoer` | DNB feiler (ECH1). Fila står som før |
+| `TestSvarMedFeilForm::test_ingen_aksje_forsvinner_uten_aa_staa_i_feil` (26 kjøringer) | venter kode 1, fila slås opp på navnet | DNB har feil form (ECH1) |
+| `TestSvarMedFeilForm::test_tom_serie_forsvinner_heller_ikke_uten_aa_staa_i_feil` | som over | DNB gir tomt svar (ECH1) |
+| `TestHentingenSkriverBasen::test_symbol_som_feilet_faar_ingen_rad_i_ny_base` | venter kode 1 | DNB feiler (ECH1) |
+| `TestHentingenSkriverBasen::test_symbol_som_feilet_beholder_gammel_serie_og_tid` | venter kode 1 i kjøring nummer to | DNB gir tomt svar (ECH1) |
+| `TestHentingenSkriverBasen::test_hentingen_og_innlesingen_gaar_samme_vei` | spionen tar også `lista` | `kjoer` gir lista til `skriv_til_basen` (AD-21). Det spionen sammenligner, er det samme |
+| `TestVurderingenISammeKjoering::test_symbol_som_feilet_i_hentingen_faar_en_rad_med_grunn` | venter kode 1 | DNB feiler (ECH1) |
+| `TestVurderingenISammeKjoering::test_grunn_skriver_ikke_over_vurderingen_fra_tidligere_i_dag` | venter kode 1 i kjøring nummer to | DNB feiler (ECH1) |
+| `TestVurderingenISammeKjoering::test_utskriften_har_antall_dag_og_grunner_men_ingen_kurser` | venter kode 1, fila slås opp på navnet | DNB feiler (ECH1) |
+| `TestBasenAvgjoer::test_basen_mangler_en_aksje_og_da_hentes_det` | første kjøring venter kode 1 | DNB feiler (ECH1) |
+
 ## Spec Change Log
 
 ## Review Triage Log
