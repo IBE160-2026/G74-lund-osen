@@ -128,3 +128,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-3-4-demoversjonen.md`
   summary: Ligger det en fil som ikke kan leses, som `demo.db` i volumet `ose-demo`, nekter `demo-lag`, og `docker compose up --build demo` stopper. Siden viser `docker compose run --rm demo-lag`, som nekter igjen, og README-en sier ikke hva man da gjør.
   evidence: ECH3 i gjennomgangen av 3.4 PR 2 (10.10). Demokommandoen nekter en fil uten merket, og en fil som ikke kan leses, regnes ikke som demobase (gruppens beslutning 10.10, PR 1). Om `demo-lag` skal få skrive over en slik fil i `ose-demo`, der det bare ligger demodata, eller README-en skal vise hvordan volumet fjernes, er gruppens valg. Ikke rettet nå.
+- source_spec: `_bmad-output/implementation-artifacts/spec-3-4-demoversjonen.md`
+  summary: I demoen står «Oslo Børs · 2026-10-09 · 14 aksjer» over tabellen, rett under «Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.» Spørsmål til gruppen: skal linjen si «Eksempeltall» i stedet for «Oslo Børs» når basen har demomerket?
+  evidence: Gruppens instruksjon kl. 17:35 10.10, etter PR #27. Linjen kommer fra `src/templates/index.html:67`, og merknaden fra linje 61 i samme mal. `test_bryteren_med_demobase_viser_eksempeltall` i `tests/test_demo.py` krever teksten «Oslo Børs · 2026-10-09 · 14 aksjer» i dag. Ikke rettet nå.
