@@ -2686,3 +2686,68 @@ class TestNyttForsoekVaktene:
         verdier = {str(r[f]) for r in serie_med_utslag(TIRSDAG_22_09)
                    for f in ("close", "adjusted_close", "volume")}
         assert not [v for v in verdier if v in ut]
+
+
+class TestVurderingeneSomMangler:
+    """Svar 6 (ECH8 i 2.3): har basen kursene for boersdagen, men radene i
+    vurdering mangler, skrives de med 0 kall. Ville feilet uten (M11)."""
+
+    @staticmethod
+    def _bare_kursene(stier):
+        """Kursene for 22.09 lest inn uten vurdering (2.1b), og fila borte."""
+        raa, base = stier
+        fil = lag_bilde(raa, OEYEBLIKK_22_09)
+        fp.les_inn(fil, base, lambda _: None)
+        fil.unlink()
+        assert antall_rader(base, "vurdering") == 0
+
+    def test_radene_skrives_med_0_kall(self, stier):
+        raa, base = stier
+        self._bare_kursene(stier)
+        fil, kall, ut = kjoer_23(raa, base, ETTER_30_MIN, ingen_kall, ingen_noekkel, ingen_kall)
+        assert fil is None and kall == []
+        assert antall_rader(base, "vurdering") == len(AKSJEUNIVERS)
+        assert "15 aksjer mangler raden i vurdering" in ut and "uten kall" in ut
+        assert raa_filer(raa) == []
+
+    def test_rader_som_finnes_roeres_ikke(self, stier, monkeypatch):
+        raa, base = stier
+        self._bare_kursene(stier)
+        tilkobling = aapne_base(base)
+        try:
+            lager = SqliteVurderingslager(tilkobling, lambda: ETTER_30_MIN)
+            for symbol in ("EQNR", "DNB"):
+                lager.skriv(symbol, TIRSDAG_22_09, Grunn.SIGNAL_IKKE_REGNET)
+        finally:
+            tilkobling.close()
+        skrevet = []
+        ekte = SqliteVurderingslager.skriv
+
+        def spion(self, symbol, *a):
+            skrevet.append(symbol)
+            return ekte(self, symbol, *a)
+
+        monkeypatch.setattr(SqliteVurderingslager, "skriv", spion)
+        kjoer_23(raa, base, ETTER_30_MIN, ingen_kall, ingen_noekkel, ingen_kall)
+        assert len(skrevet) == 13 and not {"EQNR", "DNB"} & set(skrevet)
+        rader = vurderingene(base, TIRSDAG_22_09, ETTER_30_MIN)
+        assert rader["EQNR"][0] == Grunn.SIGNAL_IKKE_REGNET
+
+    def test_alle_radene_finnes_gir_ingen_skriving(self, stier, monkeypatch):
+        raa, base = stier
+        kjoer_23(raa, base, OEYEBLIKK_22_09)
+        monkeypatch.setattr(SqliteVurderingslager, "skriv",
+                            lambda *a: pytest.fail("ingen rad skal skrives"))
+        fil, kall, ut = kjoer_23(raa, base, ETTER_30_MIN, ingen_kall, ingen_noekkel, ingen_kall)
+        assert fil is None and kall == [] and "mangler raden" not in ut
+
+    def test_over_midnatt_skrives_ingen_rad(self, stier):
+        """AD-7: radene kan bare skrives saa lenge dagen er inneveerende
+        boersdag."""
+        raa, base = stier
+        self._bare_kursene(stier)
+        kode, kall, ut = kjoer_23_kode(
+            raa, base, _utc(2026, 9, 22, 21, 59), ingen_kall, ingen_noekkel, ingen_kall,
+            klokke=lambda: _utc(2026, 9, 22, 22, 1))
+        assert kode == 1 and kall == []
+        assert antall_rader(base, "vurdering") == 0

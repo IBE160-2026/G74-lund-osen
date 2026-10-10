@@ -611,6 +611,22 @@ def manglende_i_basen(
         tilkobling.close()
 
 
+def manglende_vurderinger(
+    base_sti: Path, dato: date, lista: tuple[Aksje, ...] = AKSJEUNIVERS
+) -> list[str]:
+    """Aksjene i lista uten rad i vurdering for dato - story 2.3b, svar 6.
+
+    Basen aapnes uten migrering, saa ingenting skrives. En base som ikke kan
+    aapnes eller leses, gir en feil fra BASEFEIL.
+    """
+    tilkobling = aapne_base(base_sti, kjoer_migrasjoner=False)
+    try:
+        lager = SqliteVurderingslager(tilkobling, naa, lista)
+        return [aksje.symbol for aksje in lista if lager.les(aksje.symbol, dato) is None]
+    finally:
+        tilkobling.close()
+
+
 def nekt_demobase(base_sti: Path, skriv: Callable[[str], None] = print) -> None:
     """Stopper med kode 1 hvis base_sti er en demobase (story 3.4, FR-411).
 
@@ -753,6 +769,27 @@ def kjoer(
                 f"alle {len(lista)} aksjene. Ingenting aa hente (FR-402). "
                 "0 kall brukt."
             )
+            # Story 2.3b, svar 6 (ECH8 i 2.3): radene i vurdering som mangler,
+            # skrives av kursene i basen, uten kall.
+            try:
+                uten_rad = manglende_vurderinger(base_sti, dato, lista)
+            except BASEFEIL as feil:
+                skriv(
+                    f"Radene i vurdering kunne ikke leses ({type(feil).__name__}). "
+                    f"{_kan_skrives_til(dato)}"
+                )
+                sys.exit(1)
+            if uten_rad:
+                skriv(
+                    f"{len(uten_rad)} aksjer mangler raden i vurdering for "
+                    f"boersdagen {dato.isoformat()}: {', '.join(uten_rad)}. De "
+                    "skrives av kursene i basen, uten kall (story 2.3b)."
+                )
+                if not skriv_vurderinger(
+                    base_sti, dato, dag, set(uten_rad), klokke, skriv, lista,
+                    bare=set(uten_rad),
+                ):
+                    sys.exit(1)
             return None
 
     # Filvakten (AD-6, K8): fila heter etter boersdagen, ikke kjoeredagen.
