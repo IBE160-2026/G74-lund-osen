@@ -118,6 +118,16 @@ I tillegg, fra instruksjonen kl. 19:32: Oppgaveplanlegging blir et eget steg ett
 | `TestVurderingenISammeKjoering::test_utskriften_har_antall_dag_og_grunner_men_ingen_kurser` | venter kode 1, fila slås opp på navnet | DNB feiler (ECH1) |
 | `TestBasenAvgjoer::test_basen_mangler_en_aksje_og_da_hentes_det` | første kjøring venter kode 1 | DNB feiler (ECH1) |
 
+**Eldre tester som er endret av det nye forsøket.** Filvakten stopper ikke lenger en kjøring når basen mangler dagens kurs for noen aksjer. Tre tester prøvde at den gjorde det. De får en kvote der dagens 20 kall er brukt, så det nye forsøket bruker 0 kall, og prøver fortsatt at fila står og at koden er 1:
+
+| Test | Endret | Grunn |
+|---|---|---|
+| `TestSkriverIkkeOver::test_dagens_fil_finnes_og_ingen_kall_brukes` | kvoten med 20 brukt, og teksten «finnes og skrives aldri om» og «0 kall brukt» i hver sin linje | basen finnes ikke, så alle mangler, og det blir et nytt forsøk |
+| `TestHelgen::test_loerdag_naar_fredagens_fil_finnes_gir_0_kall_og_sier_hvorfor` | nøkkelen og kvoten med 20 brukt i stedet for funksjonene som feiler testen | det nye forsøket leser nøkkelen og kvoten |
+| `TestSvaretIkkeFraBoersdagen::test_ny_kjoering_samme_kveld_gir_0_kall` | som over | som over |
+
+Totalt er 14 eldre testfunksjoner endret, 39 testkjøringer.
+
 ## Spec Change Log
 
 ## Review Triage Log
