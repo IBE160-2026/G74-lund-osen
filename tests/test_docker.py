@@ -380,8 +380,12 @@ class TestReadme:
 
     def test_tjenestene_i_readme_finnes_i_compose(self):
         """Ville feilet hvis README-en viste en tjeneste compose.yaml ikke har."""
-        brukt = set(re.findall(r"docker compose run --rm (\w+)", README.read_text(encoding="utf-8")))
-        assert brukt and brukt <= set(_tjenester())
+        tekst = README.read_text(encoding="utf-8")
+        # [\w-], saa demo-lag ikke leses som demo (story 3.4).
+        brukt = set(re.findall(r"docker compose run --rm ([\w-]+)", tekst))
+        brukt |= set(re.findall(r"docker compose up --build ([\w-]+)", tekst))
+        assert {"hent", "demo-lag", "demo"} <= brukt
+        assert brukt <= set(_tjenester())
 
     def test_advarselen_om_down_v_og_basen(self):
         """Story 3.2, svar 3, og AD-7: ville feilet hvis README-en ikke advarte
@@ -397,6 +401,72 @@ class TestReadme:
         tekst = README.read_text(encoding="utf-8")
         assert "--hent-foer-kl-22" not in tekst
         assert "etter kl. 22" in _kom_i_gang() and "helgen" in _kom_i_gang()
+
+    def test_demoen_er_den_foerste_kommandoen(self):
+        """Story 3.4, PR 2: etter git clone og cd er den foerste kommandoen
+        demoen, som virker uten .env og uten noekkel. Ville feilet hvis
+        README-en ba om .env foer demoen."""
+        del_ = _kom_i_gang()
+        blokk = del_.split("```\n", 2)[1]
+        kommandoer = [l.split("#")[0].strip() for l in blokk.splitlines() if l.strip()]
+        assert kommandoer[0].startswith("git clone") and kommandoer[1].startswith("cd ")
+        assert kommandoer[2] == "docker compose up --build demo"
+        demo = del_.split("### Den ekte versjonen", 1)[0]
+        assert "Start Docker Desktop" in demo and "http://127.0.0.1:5000" in demo
+        assert "Eksempeltall" in demo and ".env" not in blokk
+        assert del_.index("docker compose up --build demo") < del_.index("cp .env.example .env")
+
+    def test_kommandoene_er_de_samme_som_i_koden_og_compose(self):
+        """Story 3.4, PR 2: kommandoene siden viser, finnes i README-en, og
+        flagget og profilen README-en bruker, finnes i koden og compose.yaml.
+        Ville feilet hvis en av dem ble endret bare ett sted."""
+        import app
+        import demo
+
+        tekst = README.read_text(encoding="utf-8")
+        for kommando in (app.HENTEKOMMANDO, app.HENTEKOMMANDO_DOCKER, demo.DEMOKOMMANDO, demo.DEMOKOMMANDO_DOCKER):
+            assert kommando in tekst, kommando
+        # demo-lag kjoerer det DEMOKOMMANDO kjoerer, i containeren.
+        lag = _tjenester()["demo-lag"]["entrypoint"][0].split(":", 1)[1].strip()
+        assert lag == '["' + '", "'.join(demo.DEMOKOMMANDO.split()[2:]) + '"]'
+        assert demo.DEMOKOMMANDO_DOCKER == "docker compose run --rm demo-lag"
+        # Profilene README-en bruker, finnes i compose.yaml.
+        profiler = {f[0].split(":", 1)[1].strip().strip('[]"') for f in
+                    (felt.get("profiles") for felt in _tjenester().values()) if f}
+        brukt = set(re.findall(r"docker compose --profile ([\w-]+)", tekst))
+        assert brukt == {"demo"} and brukt <= profiler
+
+    def test_uv_med_demo_flagget_som_appen_leser(self, monkeypatch):
+        """uv-veien: README-en viser --demo, og det er flagget les_flagg kjenner."""
+        import app
+
+        tekst = _kom_i_gang()
+        flagg = re.findall(r"uv run python src/app\.py (--[\w-]+)", tekst)
+        assert flagg == ["--demo"]
+        monkeypatch.delenv(app.I_DEMO, raising=False)
+        app.les_flagg(flagg)
+        assert app.demo_paa()
+        assert tekst.index("uv run python src/demo.py") < tekst.index("uv run python src/app.py --demo")
+
+    def test_stoppkommandoen_for_demoen(self):
+        """Proeven 10.10 med Compose v5.5.1: docker compose down uten profilen
+        stopper ikke demoen. Ville feilet hvis README-en ga docker compose
+        down som stoppkommando for demoen, eller CI proevde en annen kommando
+        enn README-en viser."""
+        del_ = _kom_i_gang()
+        demo = del_.split("### Den ekte versjonen", 1)[0]
+        bytte = del_.split("### Bytte mellom demoen og den ekte versjonen", 1)[1].split("\n### ", 1)[0]
+        for avsnitt in (demo, bytte):
+            assert "docker compose --profile demo down" in avsnitt
+        assert "`docker compose down` stopper ikke demoen" in bytte
+        steg = CI.read_text(encoding="utf-8").split("- name: Demoen med compose", 1)[1].split("- name:", 1)[0]
+        assert "docker compose -p $p --profile demo down\n" in steg
+        assert "docker compose -p $p up -d --build demo\n" in steg
+
+    def test_siden_lastes_paa_nytt_etter_hentingen(self):
+        """Story 3.4, PR 2: siden oppdateres ikke av seg selv."""
+        ekte = _kom_i_gang().split("### Den ekte versjonen", 1)[1]
+        assert "Last siden på nytt når hentingen er ferdig" in ekte
 
     def test_ingen_bilder_utenom_ci_merket(self):
         """Story 3.3: skjermbilder med ekte data publiserer dataene. Ville feilet
