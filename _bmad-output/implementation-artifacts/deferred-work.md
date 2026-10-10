@@ -119,3 +119,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-3-3-readme-slik-kjoerer-du-den.md`
   summary: Når basen ikke kan skrives, sier hentingen at fila kan leses inn med `uv run python src/fetch_prices.py --les-inn <fil>`, også i containeren. I Docker er kommandoen `docker compose run --rm hent --les-inn <fil>`, med stien i containeren.
   evidence: VG1 i gjennomgangen av 3.3 (09.10). `_basen_feilet` i `src/fetch_prices.py` har kommandoen fast, og `src/fetch_prices.py` endres ikke i 3.3. Rettes med `OSE_I_DOCKER` som på den tomme siden, og en test i `tests/test_fetch_prices.py`.
+- source_spec: `_bmad-output/implementation-artifacts/spec-3-4-demoversjonen.md`
+  summary: Med ekte data gjør en aksje uten kurs siste dag datoen over tabellen til dagen før for hele siden, og ingen rad viser hvilken aksje som henger etter.
+  evidence: Funnet med Tareøy Havbruk i 3.4 (Spec Change Log, 10.10). Oversikten viser vurderingen for dagen til nyeste kurs for hver aksje, og datoen over tabellen er den eldste av dem (story 8.0). Demoen viser derfor ikke «ingen kurs fra dagen», etter gruppens beslutning i instruksjonen kl. 14:46 10.10. Ikke rettet nå.
