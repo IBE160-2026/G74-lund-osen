@@ -37,6 +37,45 @@ MIGRASJONSKATALOG = Path(__file__).resolve().parent / "migrasjoner"
 # lagring_fil.RAA_KATALOG). Ingen annen kode skriver stiene.
 BASE_STI = DATA_KATALOG / "db" / "ose.db"
 
+# Story 3.4 (FR-411): demobasen er merket med PRAGMA application_id. Bare
+# demokommandoen (src/demo.py) setter merket. Webserveren viser
+# «Eksempeltall» naar basen har det, og hentingen nekter en base med det.
+# 0x4F534544 er «OSED» i ASCII.
+DEMOMERKE = 0x4F534544
+
+
+def demo_sti() -> Path:
+    """Demobasen ligger ved siden av den ekte basen, i data/db/demo.db.
+
+    Regnes fra BASE_STI ved hvert kall, saa fixturen i tests/conftest.py,
+    som flytter BASE_STI, ogsaa flytter demobasen.
+    """
+    return Path(BASE_STI).with_name("demo.db")
+
+
+def les_merket(tilkobling: sqlite3.Connection) -> int:
+    """application_id i basen. 0 naar den ikke er satt."""
+    return tilkobling.execute("PRAGMA application_id").fetchone()[0]
+
+
+def er_demobase(sti: Path) -> bool:
+    """Om fila er en demobase. Leser bare, og lager aldri fila.
+
+    En base som ikke finnes eller ikke kan leses, er ikke en demobase, saa
+    hentingen gaar videre som foer (story 3.4).
+    """
+    sti = Path(sti)
+    if not sti.is_file():
+        return False
+    try:
+        tilkobling = aapne_base(sti, kjoer_migrasjoner=False, skrivebeskyttet=True)
+        try:
+            return les_merket(tilkobling) == DEMOMERKE
+        finally:
+            tilkobling.close()
+    except (sqlite3.Error, OSError):
+        return False
+
 # Hvor lenge en tilkobling venter paa en laas foer den gir opp (story 2.2,
 # BH7 i 2.1b). 5 sekunder er standarden i sqlite3, skrevet ut her saa den er et
 # valg og ikke en tilfeldighet. Hentingen og webserveren kan naa bruke basen
@@ -44,7 +83,9 @@ BASE_STI = DATA_KATALOG / "db" / "ose.db"
 VENTETID_SEKUNDER = 5.0
 
 
-def aapne_base(sti: Path, *, kjoer_migrasjoner: bool = True) -> sqlite3.Connection:
+def aapne_base(
+    sti: Path, *, kjoer_migrasjoner: bool = True, skrivebeskyttet: bool = False
+) -> sqlite3.Connection:
     """Den ene aapningen av basen - story 2.1b og 2.2.
 
     Med kjoer_migrasjoner (standard) lages mappa, basen kobles til og
@@ -64,9 +105,14 @@ def aapne_base(sti: Path, *, kjoer_migrasjoner: bool = True) -> sqlite3.Connecti
     """
     sti = Path(sti)
     if not kjoer_migrasjoner:
+        # Story 3.4: skrivebeskyttet aapner med mode=ro. Det bruker
+        # er_demobase, som bare leser merket.
+        modus = "ro" if skrivebeskyttet else "rw"
         return sqlite3.connect(
-            sti.resolve().as_uri() + "?mode=rw", uri=True, timeout=VENTETID_SEKUNDER
+            sti.resolve().as_uri() + f"?mode={modus}", uri=True, timeout=VENTETID_SEKUNDER
         )
+    if skrivebeskyttet:
+        raise ValueError("skrivebeskyttet krever kjoer_migrasjoner=False")
     sti.parent.mkdir(parents=True, exist_ok=True)
     tilkobling = sqlite3.connect(sti, timeout=VENTETID_SEKUNDER)
     try:
@@ -124,13 +170,14 @@ class SqliteKurslager:
     kjoert - rulles alt tilbake, og symbolet har gammel serie og gammel tid.
     """
 
-    def __init__(self, tilkobling: sqlite3.Connection):
+    def __init__(self, tilkobling: sqlite3.Connection, univers: tuple[Aksje, ...] = AKSJEUNIVERS):
         _krev_siste_versjon(tilkobling)
         self._tilkobling = tilkobling
+        self._univers = univers
 
     def erstatt_serie(self, symbol: str, rader: list[Kursrad], hentet: datetime) -> None:
         rader = list(rader)
-        tid = kontroller_skriving(symbol, rader, hentet)
+        tid = kontroller_skriving(symbol, rader, hentet, self._univers)
         if self._tilkobling.in_transaction:
             raise RuntimeError(
                 "Tilkoblingen har en aapen transaksjon. Adapteren styrer "
@@ -210,12 +257,13 @@ _UPSERT = (
 )
 
 
-def _kontroller_noekkel(symbol: str, dato: date) -> None:
+def _kontroller_noekkel(symbol: str, dato: date, symboler: frozenset[str] = SYMBOLER) -> None:
     if not isinstance(dato, date) or isinstance(dato, datetime):
         raise TypeError(f"dato maa vaere datetime.date, fikk {dato!r}")
-    if symbol not in SYMBOLER:
+    if symbol not in symboler:
         raise ValueError(
-            f"{symbol!r} er ikke et symbol i AKSJEUNIVERS. Symbolet er "
+            f"{symbol!r} er ikke et symbol i "
+            f"{'AKSJEUNIVERS' if symboler is SYMBOLER else 'lista som skrives'}. Symbolet er "
             "formen NewsWeb bruker (EQNR), ikke tickeren (EQNR.OL)"
         )
 
@@ -232,13 +280,23 @@ class SqliteVurderingslager:
     story 2.5 aapner basen med aapne_base.
     """
 
-    def __init__(self, tilkobling: sqlite3.Connection, klokke: Callable[[], datetime]):
+    def __init__(
+        self,
+        tilkobling: sqlite3.Connection,
+        klokke: Callable[[], datetime],
+        univers: tuple[Aksje, ...] = AKSJEUNIVERS,
+    ):
         _krev_siste_versjon(tilkobling)
         self._tilkobling = tilkobling
         self._klokke = klokke
+        # Story 3.4: lista som skrives, med AKSJEUNIVERS som standard.
+        self._symboler = (
+            SYMBOLER if univers is AKSJEUNIVERS
+            else frozenset(aksje.symbol for aksje in univers)
+        )
 
     def skriv(self, symbol: str, dato: date, innhold: Vurdering | Grunn) -> bool:
-        _kontroller_noekkel(symbol, dato)
+        _kontroller_noekkel(symbol, dato, self._symboler)
         if isinstance(innhold, Vurdering):
             verdier = (*(getattr(innhold, k) for k in VURDERINGSKOLONNER), None)
         elif isinstance(innhold, Grunn):

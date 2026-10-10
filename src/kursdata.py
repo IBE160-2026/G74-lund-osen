@@ -159,7 +159,12 @@ class Kurslager(Kursleser, Protocol):
         """
 
 
-def kontroller_skriving(symbol: str, rader: list[Kursrad], hentet: datetime) -> datetime:
+def kontroller_skriving(
+    symbol: str,
+    rader: list[Kursrad],
+    hentet: datetime,
+    univers: tuple[Aksje, ...] | None = None,
+) -> datetime:
     """Felles kontroll for alle Kurslager-implementasjoner. Returnerer hentet i UTC.
 
     Kjoeres foer noe lagres, saa en avvist skriving etterlater lageret slik
@@ -171,10 +176,17 @@ def kontroller_skriving(symbol: str, rader: list[Kursrad], hentet: datetime) -> 
     MinneKurslager og SqliteKurslager det samme, og en test mot minnelageret
     kan ikke godta EQNR.OL som basen avviser. Triggerne fra 0003 staar
     fortsatt som vakten i basen.
+
+    Story 3.4: univers er lista kalleren skriver for, med AKSJEUNIVERS som
+    standard. Demokommandoen gir DEMOUNIVERS (merknaden 2026-10-03 under
+    AD-21).
     """
-    if symbol not in {aksje.symbol for aksje in AKSJEUNIVERS}:
+    if univers is None:
+        univers = AKSJEUNIVERS
+    if symbol not in {aksje.symbol for aksje in univers}:
         raise ValueError(
-            f"{symbol!r} er ikke et symbol i AKSJEUNIVERS. Symbolet er "
+            f"{symbol!r} er ikke et symbol i "
+            f"{'AKSJEUNIVERS' if univers is AKSJEUNIVERS else 'lista som skrives'}. Symbolet er "
             "formen NewsWeb bruker (EQNR), ikke tickeren (EQNR.OL)"
         )
     for rad in rader:
