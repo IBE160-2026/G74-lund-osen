@@ -39,6 +39,7 @@ I tillegg, fra instruksjonen:
 - `DEMOUNIVERS` har de 15 i tabellen under. Ingen symbol eller ticker står i `AKSJEUNIVERS`.
 - Kursene: 195 handelsdager fra 2026-01-02 til 2026-10-09 etter `boersdag.er_boersdag`. Hver aksje har sitt eget frø, `FROE * 100 + nummeret i lista`. Daglig logavkastning er drift + volatilitet · z, der z er normalfordelt fra Box–Muller på `random()`. Drift og volatilitet følger sektoren. Volumet er et nivå per aksje ganger `exp(0,3 · z)`, og med sannsynlighet 0,04 per dag tre ganger det. `adjusted_close` er lik `close`. Kursene avrundes til to desimaler, volumet til heltall. Siste dag faller Brattfjell Energi 6 % med tre ganger volumet, så minst én aksje skiller seg ut.
 - Tilstandene: Varde Systemer har bare de siste 30 dagene (nylig notert, «signalet kunne ikke regnes» og «Trenger 51 dager»), Tareøy Havbruk mangler siste dag («ingen kurs fra dagen»), og Matfjord Merkevarer har ingen kurser («Uten data i denne kilden»).
+  *Rettet 2026-10-10 kl. 14:48:* Tareøy Havbruk har siste dag etter gruppens beslutning, se Spec Change Log.
 - Hver børsdag i serien har én rad i `vurdering` per aksje, lik det `vurder()` gir for serien fram til dagen, skrevet med `SqliteVurderingslager.skriv` uendret og lagerets klokke stilt på dagen (`AD-7`).
 - Merket er `PRAGMA application_id = 0x4F534544`. Bare demokommandoen setter det.
 - Demokommandoen nekter en fil uten merket, også en tom fil. En demobase lages på nytt fra bunnen.
@@ -125,6 +126,8 @@ I tillegg, fra instruksjonen:
 ## Spec Change Log
 
 - **2026-10-10 kl. 12:45, Tareøy Havbruk (avvik fra planen):** Boundaries sier at Tareøy Havbruk mangler siste dag, for å vise «ingen kurs fra dagen». Det virket ikke: oversikten leser vurderingen for datoen til nyeste kurs for hver aksje, så Tareøy viste vurderingen for 08.10, og datoen over tabellen ble 2026-10-08, fordi den er den eldste nyeste datoen (story 8.0). Regelen er tatt ut, og alle 14 med kurser har siste dag. «ingen kurs fra dagen» er ikke blant tilstandene demoen viser, som «hentingen feilet». En test krever at datoen over tabellen er 2026-10-09. **Til gruppen:** avviket står her og i PR-en, og kan tas tilbake før flettingen.
+
+- **Gruppen godtok avviket** i instruksjonen kl. 14:46 i `docs/ai-prompts/2026-10-10.md`, sammen med ja til flettingen av PR #26: datoen over tabellen er den eldste av datoene til nyeste kurs (story 8.0), så en aksje uten siste dag kan ikke vise «ingen kurs fra dagen» uten å flytte datoen for hele siden. Demoen viser ikke den tilstanden, slik den heller ikke viser «hentingen feilet».
 
 ## Review Triage Log
 
