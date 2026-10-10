@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-10-09T23:19'
+updated: '2026-10-10T15:35'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -223,6 +223,7 @@ manglet i grafen.
 - **Utvidet 2026-10-03 (FR-411, Marians beslutning):** demobasen `data/db/demo.db` har oppdiktede selskaper og kurser, laget av en egen kommando uten nøkkel og uten nett. Oppdiktede tall er ikke data fra EODHD, så demobasen bryter ikke formålet med regelen, som er å ikke videreformidle kildedata. Imaget har likevel ingen base, heller ikke demobasen. Repoet har den heller ikke, fordi den ligger under `data/`, som er gitignorert. Den som vil prøve demoversjonen, kjører kommandoen selv.
 - **Merknad 2026-10-05 (FR-608, story 3.1, 3.2 og 3.4):** den lokale modellen ligger i et eget volum, `ollama`, hentes første gang med Ollamas pull-endepunkt og er aldri i imaget. De ferdige KI-tekstene til demoen ligger i en fil i repoet, fordi demobasen aldri ligger der. Tekstene er laget av oppdiktede tall, ikke av data fra EODHD.
 - **Merknad 2026-10-05, gruppens beslutning kl. 16:53:** den lokale modellen starter ikke av seg selv. Compose-fila i 3.1 starter appen uten Ollama, og Ollama med volumet `ollama` kommer inn som eget valg i story 10.2. KI-tekstene til demoen er story 3.4b.
+- **Merknad 2026-10-10 (story 3.4, PR 2, instruksjonen kl. 15:23):** regelen står. Demobasen er ikke i imaget. `demo-lag` i `compose.yaml` lager den med `python src/demo.py` i volumet `ose-demo` hver gang demoen startes, og CI sjekker fortsatt at imaget ikke har noen `*.db`.
 
 ### AD-10 — Webserveren starter aldri en henting
 
@@ -233,6 +234,7 @@ manglet i grafen.
 - **Merknad 2026-10-08 (endringsforslaget 08.10, Marians beslutning):** regelen står. Et valg av aksjer i nettsiden tas i bruk ved neste henting (FR-412, story 2.12). Målingen av omsetning (FR-413, story 2.13) er et eget valg i hentekommandoen, så Dockerfilen i 3.1 fortsatt har to innganger, og den startes for hånd, aldri fra webserveren. Kommandoen for eks.datoer (FR-414, story 2.14) startes også for hånd og gjør ingen nettkall. Hvor den ligger, avgjøres i planen for 2.14.
 - **Merknad 2026-10-08 (story 3.1, gruppens svar kl. 22:45):** regelen står. I imaget er webserveren waitress (`waitress-serve` mot `app:app`), aldri Flasks egen server og aldri debug. `compose.yaml` har tjenestene `app` og `hent` fra samme image. `docker compose up` starter bare `app`, uten nøkkel og med porten bare på `127.0.0.1:5000`. Hentingen startes med `docker compose run --rm hent`, som kjører `python src/fetch_prices.py` med `.env` fra `env_file`. `hent` ligger i profilen `hent`, så en oppstart av containeren aldri bruker kall. Begge migrerer gjennom `aapne_base`, uten eget steg.
 - **Merknad 2026-10-09 (story 3.3, gruppens svar kl. 23:13):** regelen står. `hent` har `entrypoint: ["python", "src/fetch_prices.py"]` og ingen `command`, så flagg legges til: `docker compose run --rm hent --les-inn FIL`. Dockerfile setter `OSE_I_DOCKER=1`, og da viser den tomme siden `HENTEKOMMANDO_DOCKER` («docker compose run --rm hent») i stedet for `HENTEKOMMANDO`. README-en har begge, og en test holder dem like.
+- **Merknad 2026-10-10 (story 3.4, PR 2, instruksjonen kl. 15:23):** regelen står. Webserveren lager aldri demobasen. `demo` er webserveren med `OSE_DEMO=1`, og den starter når `demo-lag` er ferdig (`depends_on` med `service_completed_successfully`). Begge ligger i profilen `demo`, uten nøkkel og uten `env_file`, så `docker compose up` starter ingen av dem. Mangler demobasen, viser siden i Docker `DEMOKOMMANDO_DOCKER` («docker compose run --rm demo-lag»), valgt med `OSE_I_DOCKER` som hentekommandoen. `demo` har samme port som `app`, så de to kjører ikke samtidig. `docker compose down` uten profilen stopper ikke demoen (Compose v5.5.1, prøvd 10.10), og README-en gir `docker compose --profile demo down`.
 
 ### AD-11 — To volumer
 
@@ -240,6 +242,7 @@ manglet i grafen.
 - **Prevents:** at ett `docker volume rm` tar rådataøyeblikksbildene sammen med en base som skulle vært engangs
 - **Rule:** `ose-db` for basefila, `ose-raa` for øyeblikksbildene. Rådata er beskyttet uansett hva som skjer med basen. **Men «du kan slette basen» er feil råd** — se AD-7.
 - **Merknad 2026-10-09 (story 3.2, gruppens svar kl. 20:46):** regelen står. I `compose.yaml` har `app` bare `ose-db`, fordi webserveren ikke leser øyeblikksbildene. Trenger en side dem senere, får den `ose-raa` skrivebeskyttet. Begge tjenestene har `read_only: true` med `/tmp` som tmpfs, så det eneste som kan skrives, er volumene og `/tmp`, og det som ligger i `/tmp`, forsvinner med containeren. `docker compose down -v` fjerner begge volumene i én kommando, også `ose-raa`. Fila advarer mot det, og README-en sier det i 3.3. CI prøver i et eget compose-prosjekt at `ose-db` kan fjernes mens `ose-raa` står med filene sine, og at appen da starter med en ny, tom base. Det er en prøve, ikke et råd: basen har `vurdering`.
+- **Merknad 2026-10-10 (story 3.4, PR 2, instruksjonen kl. 15:23):** regelen står for den ekte versjonen. `ose-demo` er et tredje volum, bare for demoen, montert på `/app/data/db` i `demo-lag` og `demo`, som verken har `ose-db` eller `ose-raa`. Demobasen kan alltid lages på nytt, og `docker compose up --build demo` gjør det hver gang.
 
 ### AD-12 — Hemmeligheter kommer fra miljøet
 
