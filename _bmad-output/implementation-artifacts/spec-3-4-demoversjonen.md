@@ -88,6 +88,26 @@ I tillegg, fra instruksjonen:
 
 </frozen-after-approval>
 
+## Planen for PR 2
+
+Fra instruksjonen kl. 15:23 i `docs/ai-prompts/2026-10-10.md`, på grenen `3-4-docker` fra main etter `0ed87be`.
+
+**Prøven først, 10.10 mellom kl. 15:23 og 15:26 (etter at instruksjonen ble committet, før planen ble skrevet), Docker Desktop 4.91.0, motor 29.8.0 og Compose v5.5.1.** I egne prosjekter (`ose-proeve-down`, `ose-proeve-env`, `ose-proeve-dep`) med `python:3.13.15-slim` som allerede lå på maskinen, og bare deres egne volumer er fjernet:
+- `docker compose down` uten profilen stopper **ikke** demoen. Den går med kode 0, demo-containeren kjører videre, og nettverket blir stående («Resource is still in use»). Svar 2 i Planen sier at `docker compose down` også stopper demotjenestene. Det stemmer ikke med denne Compose-versjonen.
+- `docker compose --profile demo down` stopper demoen, og også `app` når den kjører. `docker compose down demo` stopper også demoen.
+- En tjeneste i en annen profil med `env_file: .env`, som `hent`, hindrer ikke `docker compose up demo` når `.env` mangler.
+- `depends_on` med `condition: service_completed_successfully` mellom to tjenester i profilen `demo` starter `demo-lag` først, og `demo` når den er ferdig.
+
+**Delene, med commit og push etter hver:**
+1. `compose.yaml`: `demo-lag` med `entrypoint: ["python", "src/demo.py"]`, som `hent`, og `demo` med `environment: OSE_DEMO: "1"` og `depends_on` på `demo-lag`. Begge har profilen `demo`, `build: .`, `image: ose-signal`, `pull_policy: build`, `init`, `read_only`, `tmpfs /tmp` og bare `ose-demo:/app/data/db`. `demo` har `127.0.0.1:5000:5000`. Testene i `tests/test_docker.py`.
+2. `src/app.py`: `DEMOKOMMANDO_DOCKER = "docker compose run --rm demo-lag"` og `demokommando()`, valgt med `OSE_I_DOCKER` som `hentekommando()` (ECH7). Siden og feilsiden bruker den.
+3. CI: et steg i jobben `docker` med prosjektet `ose-ci-34`, uten `.env`: `docker compose -p ose-ci-34 up -d --build demo`, siden svarer 200 med «Eksempeltall», så stoppkommandoen fra README-en, og ingen container igjen. Bare `ose-ci-34_ose-demo` fjernes. Steget med `config --services` får profilen `demo`.
+4. README, «Kom i gang»: demoen først med `docker compose up --build demo`, så den ekte versjonen som i 3.3, og at siden lastes på nytt etter hentingen. Byttet: demoen stoppes med `docker compose --profile demo down`, fordi `docker compose down` ikke gjør det. uv-veien med `--demo`. Status og Mappestruktur. En test krever at kommandoene i README-en er de samme som i koden og `compose.yaml`.
+5. `docs/kvalitetssikring.md`: avsnittet for README-prøven 13.–16.10.
+6. Spinen: merknader under `AD-9`, `AD-10` og `AD-11`.
+
+**Avvik fra punktene i instruksjonen:** ingen. At `docker compose down` ikke stopper demoen, er dekket av instruksjonen: README-en gir `docker compose --profile demo down` der den forklarer byttet. Svar 2 i Planen står, og denne linjen sier hva som gjelder.
+
 ## Code Map
 
 - `src/kursdata.py` -- `kontroller_skriving` (linje 162) sjekker mot `AKSJEUNIVERS`. Får `univers` som parameter.
