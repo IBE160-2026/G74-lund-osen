@@ -2559,6 +2559,18 @@ Underveis så vi at 34 tester gikk mot nettet uten at noen merket det, fordi spe
 
 ---
 
+## 09.10.2026 – Docker på plass, og en grense vi ikke styrer
+
+*Joakim og Marian.*
+
+I går ble Docker-delen nesten ferdig. Story 3.1 og 3.2 ble flettet, og 3.3, README-en, ble bygget samme kveld og flettet lørdag formiddag. Appen kan nå bygges og kjøres fra repoet med Docker, og README-en har Docker som hovedvei. Kveldens henting var den første på koden fra 2.3, og vernet virket: en ny kjøring rett etterpå stoppet uten å bruke kall. Vi målte også omsetningen for fem aksjer til, så 85 er nå rangert.
+
+Det meste som gikk galt, lå utenfor koden. Docker Hub begrenser hvor ofte man kan hente images uten innlogging, og GitHub sine maskiner deler nettadresser med mange andre. Derfor stoppet CI fire ganger på pull requesten for 3.3, og først det femte forsøket gikk gjennom. Én gang ble ventingen på CI liggende i bakgrunnen, og svaret ble ikke lest før neste morgen. Skjer det ofte, kan vi hente Python-imaget fra et speil i stedet. En instruksjon om fletting kom også inn akkurat ved fristen kl. 21:40, før hentingen. Claude Code lot den ligge, og det var riktig. Vi flettet etter hentingen i stedet.
+
+Gjennomgangene fant igjen hull vi ikke hadde sett. I 3.2 stoppet CI-prøven av hentingen før den skrev noe, så den kunne ikke se om den midlertidige mappa manglet. Én mutant overlevde fordi prøven skrev til en mappe brukeren uansett ikke kunne skrive til. Begge er rettet. Noen klokkeslett i dagsfila stemte heller ikke med klokka eller overskriften, og de rettes med Rettet-linjer. Nå er målet demoen, story 3.4, før README-prøven 13.–16.10.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
