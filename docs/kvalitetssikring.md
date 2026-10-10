@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-10T15:34
+updated: 2026-10-10T17:37
 ---
 
 # Kvalitetssikring
@@ -514,6 +514,7 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
 - **Dato og klokkeslett:**
 - **Maskin og operativsystem:**
 - **Docker Desktop, versjon** (`docker version`, linjen med «Docker Desktop»):
+- **Logget inn i Docker Desktop:** ja / nei. Prøven gjøres uten innlogging, så vi vet at README-en virker uten Docker-konto.
 - **Maskinen har aldri hatt repoet eller imaget:** ja / nei. Sjekket med
   `docker images` (ingen `ose-signal`) og at mappa `G74-lund-osen` ikke fantes.
 - **Commit som ble prøvd** (`git log -1 --oneline`):
