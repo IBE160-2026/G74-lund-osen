@@ -19,25 +19,25 @@ Til faglærer: leveranselista står i [`docs/innlevering.md`](docs/innlevering.m
 
 ## Kom i gang
 
-**Du trenger** en Windows-maskin eller en Mac, lov til å installere programmer, nett og noen GB ledig plass, men verken konto, nøkkel eller git. På Linux bruker du Docker Engine med Compose i stedet for Docker Desktop. Står du fast, se [Står du fast?](#står-du-fast).
+**Du trenger** en Windows-maskin eller en Mac, lov til å installere programmer, nett og noen GB ledig plass, men verken konto, nøkkel eller git. Første gang tar det en stund. På Linux bruker du Docker Engine med Compose i stedet for Docker Desktop. Står du fast, se [Står du fast?](#står-du-fast).
 
 ### Demoen på seks steg
 
-1. **Installer og start Docker Desktop** fra [docker.com](https://www.docker.com/products/docker-desktop/). Hopp over innloggingen. Det er klart når det står «Engine running» nederst i vinduet.
-2. **Last ned koden.** Trykk den grønne knappen «Code» på [GitHub-siden](https://github.com/IBE160-2026/G74-lund-osen) og «Download ZIP» nederst i menyen. Windows: høyreklikk fila i Nedlastinger og velg «Pakk ut alle». Mac: dobbeltklikk fila.
-3. **Åpne PowerShell** (Windows: trykk Start og skriv PowerShell) **eller Terminal** (Mac).
-4. **Skriv `cd` og et mellomrom**, dra den innerste mappa `G74-lund-osen-main` inn i vinduet, og trykk Enter.
-5. **Kopier kommandoen** med knappen i boksen, lim den inn og trykk Enter. Første gang tar det noen minutter. Demoen er klar når det står `Serving on http://0.0.0.0:5000`.
+1. **Installer og start Docker Desktop** fra [docker.com](https://www.docker.com/products/docker-desktop/). Hopp over innloggingen. Det er klart når det står «Engine running» nederst i vinduet. La det være åpent.
+2. **Last ned koden.** Trykk den grønne knappen «Code» på [GitHub-siden](https://github.com/IBE160-2026/G74-lund-osen) og «Download ZIP» nederst i menyen. Windows: høyreklikk fila i Nedlastinger (Downloads) og velg «Pakk ut alle» (Extract All). Mac: dobbeltklikk fila. Det er klart når du har en mappe som heter `G74-lund-osen-main`.
+3. **Åpne PowerShell** (Windows: trykk Start, skriv PowerShell og velg «Windows PowerShell», ikke ISE) **eller Terminal** (Mac: trykk Cmd+mellomrom og skriv Terminal). Det er klart når et vindu venter på at du skriver.
+4. **Skriv `cd` og et mellomrom**, dra mappa `G74-lund-osen-main` der README og compose ligger (den innerste hvis det er to) fra Filutforsker eller Finder inn i vinduet, og trykk Enter. Det er klart når mappenavnet står foran `>` eller `%`.
+5. **Kopier kommandoen** med knappen til høyre i boksen, lim den inn (Ctrl+V eller Cmd+V) og trykk Enter. Første gang tar det noen minutter. Demoen er klar når det står `Serving on http://0.0.0.0:5000`. Den adressen skal du ikke åpne.
 
 ```
 docker compose up --build demo
 ```
 
-6. **Åpne http://127.0.0.1:5000.** Øverst står «Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.»
+6. **Åpne http://127.0.0.1:5000** i en ny fane. Øverst står «Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.» Klikk på et selskapsnavn for å se en aksje.
 
 ### Stopp
 
-Trykk Ctrl+C i terminalvinduet, også på Mac. Lim så inn denne og trykk Enter. Det er klart når det står at containerne er fjernet (Removed).
+Gå tilbake til terminalvinduet og trykk Ctrl+C, også på Mac. Lim så inn denne og trykk Enter. Det er klart når det står at containerne er fjernet (Removed). Har du lukket vinduet, åpner du et nytt, gjør steg 4 og limer inn denne.
 
 ```
 docker compose --profile demo down
@@ -118,9 +118,16 @@ Ligger mappa `G74-lund-osen-main` allerede i Nedlastinger (Downloads), har Safar
 </details>
 
 <details>
+<summary>Jeg har fått koden fra før.</summary>
+
+Har du fått koden som mappe eller ZIP-fil, pakker du den ut og går til steg 3.
+
+</details>
+
+<details>
 <summary>Mappa finnes fra før.</summary>
 
-Har du fått koden som mappe eller ZIP-fil fra før, pakker du den ut og går til steg 3. Vil du laste ned på nytt, og det ligger en `.env` med nøkkelen din i den gamle mappa, flytter du den ut først. Slett så den gamle mappa og pakk ut på nytt. Demodataene ligger i Docker, ikke i mappa, så de går ikke tapt. Har du hentet koden med `git clone`, går du heller inn i mappa og skriver `git pull`.
+Vil du laste ned på nytt, og det ligger en `.env` med nøkkelen din i den gamle mappa, flytter du den ut først. Slett så den gamle mappa og pakk ut på nytt. Demodataene ligger i Docker, ikke i mappa, så de går ikke tapt. Har du hentet koden med `git clone`, går du heller inn i mappa og skriver `git pull`.
 
 </details>
 
@@ -128,13 +135,6 @@ Har du fått koden som mappe eller ZIP-fil fra før, pakker du den ut og går ti
 <summary>Hvilket vindu skal jeg åpne?</summary>
 
 Et terminalvindu, der du skriver kommandoer i stedet for å klikke. Windows: trykk Start, skriv `PowerShell` og åpne «Windows PowerShell». Ikke velg «Windows PowerShell ISE», som også står i lista. Mac: trykk Cmd+mellomrom, skriv `Terminal` og trykk Enter. Når det har gått bra, ser du et vindu med en linje som venter på at du skriver. Kommandoene er de samme i PowerShell på Windows og i Terminal på Mac og Linux.
-
-</details>
-
-<details>
-<summary>Ingenting skjer når jeg limer inn.</summary>
-
-Kommandoene skrives i PowerShell eller Terminal, ikke i Docker Desktop. Docker Desktop skal bare være åpent, og du skriver ingenting i det. Ledetekst (Command Prompt) på Windows virker også for demoen, men stegene er skrevet for PowerShell.
 
 </details>
 
@@ -162,7 +162,7 @@ Får du en feil etter `cd` når mappa ligger i en mappe med mellomrom i navnet, 
 <details>
 <summary>Terminal spør om tilgang til Nedlastinger (Mac).</summary>
 
-Svar OK. Ellers kan ikke Docker lese mappa.
+Svar OK. Ellers får ikke Terminal åpne mappa.
 
 </details>
 
@@ -176,6 +176,13 @@ demo-1  | INFO:waitress:Serving on http://0.0.0.0:5000
 ```
 
 Under den kan det komme en linje med valg fra Docker. La terminalvinduet stå åpent mens du bruker demoen. `0.0.0.0` er adressen inne i Docker, og du åpner http://127.0.0.1:5000 i steg 6.
+
+</details>
+
+<details>
+<summary>Ingenting skjer når jeg limer inn.</summary>
+
+Kommandoene skrives i PowerShell eller Terminal, ikke i Docker Desktop. Docker Desktop skal bare være åpent, og du skriver ingenting i det. Ledetekst (Command Prompt) på Windows virker også for demoen, men stegene er skrevet for PowerShell.
 
 </details>
 
@@ -238,7 +245,7 @@ Sidene sier «Eksempeltall»: 15 oppdiktede selskaper med kurser til fredag 9. o
 <details>
 <summary>Hvordan starter jeg neste gang?</summary>
 
-Start Docker Desktop og vent til det står «Engine running». Gjør så steg 3, 4 og 5, og hopp over steg 2. Det går raskere enn første gang. Etter «Stopp» kan du lukke terminalvinduet og Docker Desktop.
+Start Docker Desktop fra Start-menyen (Windows) eller Programmer (Mac), og vent til det står «Engine running». Gjør så steg 3 til 6, og hopp over steg 2. Det går raskere enn første gang. Etter «Stopp» kan du lukke terminalvinduet og Docker Desktop.
 
 </details>
 

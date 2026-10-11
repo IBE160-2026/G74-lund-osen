@@ -553,7 +553,7 @@ def _steg(nummer: int) -> str:
 
 def _sporsmaalene() -> list[tuple[str, str]]:
     """Hvert spoersmaal i «Står du fast?» som (summary, svar)."""
-    return re.findall(r"<details>\n<summary>(.+?)</summary>\n(.*?)</details>", _faq(), re.DOTALL)
+    return re.findall(r"<details>\n<summary>(.+?)</summary>\n\n(.*?)\n\n</details>", _faq(), re.DOTALL)
 
 
 def _anker(overskrift: str) -> str:
@@ -625,13 +625,20 @@ class TestReadmeForNybegynnere:
     def test_hvert_spoersmaal_er_details_med_summary(self):
         """«Klikk på spørsmålet som passer» (21:53). Ville feilet med et
         spoersmaal i fet skrift i stedet for <details>."""
-        faq = _faq().split("Klikk på spørsmålet som passer.", 1)[1]
-        faq = faq.split("Resten av «Kom i gang»", 1)[0]
-        antall = len(_sporsmaalene())
-        assert antall >= 20
-        assert faq.count("<details>") == faq.count("</details>") == faq.count("<summary>") == antall
-        assert "**" not in faq
-        assert all(s.strip() and svar.strip() for s, svar in _sporsmaalene())
+        faq = _faq()
+        sporsmaal = _sporsmaalene()
+        # Minst like mange som de 16 i «Hvis noe går galt» før 21:53.
+        assert len(sporsmaal) >= 16
+        assert faq.count("<details>") == faq.count("</details>") == faq.count("<summary>") == len(sporsmaal)
+        assert all(s.strip() and svar.strip() for s, svar in sporsmaal)
+        # Hvert spoersmaal én gang, ellers slaar dict() i testene opp feil svar (BH).
+        assert len({s for s, _ in sporsmaal}) == len(sporsmaal)
+        # Utenom <details> staar bare ledeteksten og linja om resten (VG).
+        rest = re.sub(r"<details>.*?</details>", "", faq, flags=re.DOTALL)
+        assert [l for l in rest.splitlines() if l.strip()] == [
+            "Klikk på spørsmålet som passer.",
+            "Resten av «Kom i gang» gjelder den ekte versjonen med egen nøkkel, og trengs ikke for demoen.",
+        ]
 
     def test_staar_du_fast_har_alt_som_ble_flyttet(self):
         """Ingenting fra stegene og «Hvis noe går galt» før 21:53 falt bort,
@@ -686,6 +693,7 @@ class TestReadmeForNybegynnere:
         assert "command" not in demo and "entrypoint" not in demo
         assert f"`Serving on http://{lytter}`" in _steg(5)
         tekst = [b for spraak, b in _blokkene(_faq()) if spraak == "text"]
+        assert len(tekst) == 1
         assert tekst[0].strip() == f"demo-1  | INFO:waitress:Serving on http://{lytter}"
 
     def test_stegene_og_henvisningene_til_dem(self):
@@ -703,3 +711,10 @@ class TestReadmeForNybegynnere:
     def test_stopp_har_kommandoen(self):
         assert "Ctrl+C" in _stopp()
         assert [b.strip() for _, b in _blokkene(_stopp())] == ["docker compose --profile demo down"]
+
+    def test_ingen_bokser_testene_ikke_ser(self):
+        """GitHub viser ogsaa ~~~ og ``` med innrykk som bokser, men
+        _blokkene ser dem ikke, og da slipper # og to kommandoer unna (VG i
+        gjennomgangen av den korte formen)."""
+        for linje in _kom_i_gang().splitlines():
+            assert not re.match(r"^ +```|^ *~~~", linje), linje
