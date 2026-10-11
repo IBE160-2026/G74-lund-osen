@@ -811,3 +811,22 @@ class TestReadmeForNybegynnere:
                 assert "#" not in blokk and len([l for l in blokk.splitlines() if l.strip()]) == 1, blokk
         for linje in hjelp.splitlines():
             assert not re.match(r"^ +```|^ *~~~", linje), linje
+
+    def test_til_faglaerer_og_kom_i_gang_foer_status(self):
+        """Marian kl. 23:41: «Til faglærer» rett under beskrivelsen, så «Kom i
+        gang», så «Status». Ville feilet hvis «Status» kom foerst igjen."""
+        tekst = README.read_text(encoding="utf-8")
+        assert tekst.index("Til faglærer:") < tekst.index("## Kom i gang") < tekst.index("## Status")
+        assert tekst.index("## Status") < tekst.index("## Tester")
+        topp = tekst.split("## Kom i gang", 1)[0]
+        assert "## Status" not in topp and "\n## " not in topp.split("# OSE Signal", 1)[1]
+
+    def test_status_uten_storynumre_og_uten_kommando(self):
+        """Marian kl. 23:41: «Status» i vanlige ord, uten storynumre og uten
+        kommandoen, som sto uten stegene foer den. Lenken til sprintstatusen,
+        at appen er under arbeid, og setningen om Euronext staar."""
+        status = README.read_text(encoding="utf-8").split("## Status\n", 1)[1].split("\n## ", 1)[0]
+        assert not re.search(r"\b[1-9]\.\d{1,2}[a-z]?\b", status), status
+        assert "```" not in status and "docker compose" not in status
+        assert "Under arbeid" in status and "Euronext" in status
+        assert "](_bmad-output/implementation-artifacts/sprint-status.yaml)" in status
