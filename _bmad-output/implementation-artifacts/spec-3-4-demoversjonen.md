@@ -112,6 +112,30 @@ Fra instruksjonen kl. 15:23 i `docs/ai-prompts/2026-10-10.md`, på grenen `3-4-d
 
 *Rettet 2026-10-10 kl. 16:18:* funnet etter gjennomgangen, i egne prosjekter: med `-p NAVN` stopper `docker compose -p NAVN down` også demoen. Uten `-p`, med prosjektnavnet fra `name:` i fila, stopper den ikke demoen. Prøvd begge veier samme ettermiddag med Compose v5.5.1. README-en bruker ikke `-p`, så det er den oppførselen brukeren får. CI-steget brukte først `-p ose-ci-34` og bruker nå `-f` mot en kopi av `compose.yaml` med `name: ose-ci-34`, og prøver at `down` uten profilen lar demoen kjøre (`2fa6f9f`).
 
+## Planen for PR 3
+
+Fra instruksjonen kl. 16:54 i `docs/ai-prompts/2026-10-11.md` (planen) og kl. 20:32 (ja, med svar og endringer), på grenen `3-4-readme` fra main etter `5665f5c`.
+
+**Målet:** en som aldri har brukt Docker eller et terminalvindu, starter demoen bare ved å følge README-en, på Windows og på Mac.
+
+**Beslutninger (svarene kl. 20:32):**
+1. Koden hentes med «Download ZIP». Har noen fått koden som mappe eller ZIP fra før, pakker de ut og går til steg 4.
+2. Linjene fra terminalen står som tekst.
+3. Mac står som «ikke prøvd» i §9 til noen har prøvd stegene på en Mac.
+4. Ingen bilder nå. Forbudet fra 3.3 og `test_ingen_bilder_utenom_ci_merket` står. Bilder kan tas inn senere, tidligst bildet av demosiden etter 8.0d, og da bare fra `docs/bilder/readme/`, med alt-tekst, og aldri av den ekte versjonen. Marian bekrefter «Engine running», «Pakk ut alle», «Windows PowerShell» og om en sti med mellomrom får anførselstegn, før gjennomgangen.
+5. Flettes før PR #28 og 8.0b: i kveld hvis den er klar og kontrollert, ellers mandag på dagtid. Aldri mellom kl. 21:40 og slutten av hentingen.
+
+**Marians ønske kl. 17:08:** «Før du begynner» øverst. Hvert steg begynner med det man skal gjøre, i én kort setning, og sier så hva man ser når det har gått bra. «Hvis noe går galt» blir en kort FAQ rett etter stegene, og steg 1, 2 og 6 peker dit.
+
+**Boundaries for PR 3:**
+- Én kommando per kodeblokk, og ingen `#` på en kommandolinje i hele «Kom i gang».
+- Linjene som viser at demoen er klar, er kopiert fra en kjøring 11.10 i prosjektet `ose-readme-pr3` (se Implementation Notes).
+- Den ekte versjonen, byttet og uv står som før, med kommandoene delt opp og kommentarene flyttet til teksten. Punktet «Når du henter» (PR #28) og Status-linja (8.0b) røres ikke.
+- Merket steg 7 siterer, er det samme som i malene, og en test krever det.
+- §9 i `docs/kvalitetssikring.md` følger stegene i samme commit, med en datert linje under tabellen.
+
+**Delene, med commit og push etter hver:** a) README «Kom i gang» med §9 og de testene som må følge med, b) de nye testene.
+
 ## Code Map
 
 - `src/kursdata.py` -- `kontroller_skriving` (linje 162) sjekker mot `AKSJEUNIVERS`. Får `univers` som parameter.
@@ -160,6 +184,8 @@ Fra instruksjonen kl. 15:23 i `docs/ai-prompts/2026-10-10.md`, på grenen `3-4-d
 - **2026-10-10 kl. 12:45, Tareøy Havbruk (avvik fra planen):** Boundaries sier at Tareøy Havbruk mangler siste dag, for å vise «ingen kurs fra dagen». Det virket ikke: oversikten leser vurderingen for datoen til nyeste kurs for hver aksje, så Tareøy viste vurderingen for 08.10, og datoen over tabellen ble 2026-10-08, fordi den er den eldste nyeste datoen (story 8.0). Regelen er tatt ut, og alle 14 med kurser har siste dag. «ingen kurs fra dagen» er ikke blant tilstandene demoen viser, som «hentingen feilet». En test krever at datoen over tabellen er 2026-10-09. **Til gruppen:** avviket står her og i PR-en, og kan tas tilbake før flettingen.
 
 - **Gruppen godtok avviket** i instruksjonen kl. 14:46 i `docs/ai-prompts/2026-10-10.md`, sammen med ja til flettingen av PR #26: datoen over tabellen er den eldste av datoene til nyeste kurs (story 8.0), så en aksje uten siste dag kan ikke vise «ingen kurs fra dagen» uten å flytte datoen for hele siden. Demoen viser ikke den tilstanden, slik den heller ikke viser «hentingen feilet».
+
+- **2026-10-11, PR 3 (README-en for en som aldri har brukt Docker):** Marian prøvde demoen etter README-en 11.10 og fant ikke ut hvor kommandoene skulle skrives. Hun limte dem inn i Docker Desktop og i en tom PowerShell-linje, og to kommandoer havnet på samme linje. README-prøven 13.–16.10 skal kunne gjøres av en som aldri har brukt Docker eller et terminalvindu, så «Kom i gang» skrives om i nummererte steg, med én kommando per boks og en FAQ. Planen og svarene står i «Planen for PR 3».
 
 ## Review Triage Log
 
