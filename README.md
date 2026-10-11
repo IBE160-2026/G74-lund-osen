@@ -6,15 +6,6 @@ Gruppe G74 (Ai Ai Ai) i IBE160 Programmering med KI, Høgskolen i Molde, høsten
 
 OSE Signal samler kursutvikling og signalstyrke for 15 likvide Oslo Børs-aksjer i én oversikt, så en vanlig sparer kan se hva som har endret seg og hvorfor. Beregningene gjøres med vanlig programkode, og KI skal forklare signalet med ord.
 
-## Status
-
-Under arbeid, og ingenting er endelig. Vi jobber med to versjoner samtidig, med samme kode:
-
-- **Den ekte versjonen** henter sluttkurser fra EODHD hver børsdag og lagrer dagens vurdering per aksje. Markedsoversikten og aksjedetaljen leser fra basen. Den krever en egen gratis nøkkel fra EODHD.
-- **Demoversjonen** har oppdiktede selskaper og kurser, og kan prøves uten konto og uten nøkkel. Den er den enkleste måten å prøve appen på: `docker compose up --build demo` (se «Kom i gang»).
-
-Børsdagskontrollen (2.3), Docker (3.1 og 3.2), denne oppskriften (3.3) og demoversjonen (3.4) er flettet til `main`. Neste er README-prøven 13.–16.10, så nye forsøk med kallene som er igjen (2.3b), hjelp bak et spørsmålstegn (8.0b) og tydeligere merking (8.0c), og så KI-laget. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Se [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml).
-
 Til faglærer: leveranselista står i [`docs/innlevering.md`](docs/innlevering.md), og kvalitetssikringen i [`docs/kvalitetssikring.md`](docs/kvalitetssikring.md). Prosessen og valgene våre står i [`docs/reflection-log.md`](docs/reflection-log.md).
 
 ## Kom i gang
@@ -27,7 +18,7 @@ Appen finnes i to versjoner, med samme kode. Vi anbefaler den ekte versjonen. Vi
 | Trenger | Docker Desktop og en gratis nøkkel fra EODHD | Bare Docker Desktop |
 | Klar | Viser kurser etter første henting om kvelden | Med en gang |
 
-**Du trenger** en Windows-maskin eller en Mac, lov til å installere programmer, nett og noen GB ledig plass, men verken git eller Docker-konto. Første gang tar det en stund. På Linux bruker du Docker Engine med Compose i stedet for Docker Desktop. Står du fast, se [Står du fast?](#står-du-fast).
+**Du trenger** en Windows-maskin eller en Mac, lov til å installere programmer, nett og noen GB ledig plass, men verken git eller Docker-konto. Første gang tar det en stund. På Linux bruker du Docker Engine med Compose i stedet for Docker Desktop. Står du fast, se [«Står du fast?»](#står-du-fast) lenger ned.
 
 ### Felles for begge
 
@@ -229,6 +220,10 @@ uv run python src/app.py
 Basen, demobasen og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo` åpner webserveren den ekte basen.
 
 </details>
+
+## Status
+
+Under arbeid, og ingenting er endelig. Ferdig: hentingen av kurser med kontroll av børsdagen, Docker, demoen og denne README-en. Neste: README-prøven 13.–16.10, nye forsøk med kallene som er igjen etter hentingen, hjelp bak «?» på sidene, tydeligere merking, utseendet fra designforslaget, og så KI-laget. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml).
 
 ## Tester
 
