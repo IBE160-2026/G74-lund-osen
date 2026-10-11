@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-11T22:01
+updated: 2026-10-11T22:35
 ---
 
 # Kvalitetssikring
@@ -525,28 +525,29 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
 | 2 | Steg 2: «Code» → «Download ZIP» på GitHub, og pakk ut med «Pakk ut alle» (Windows) eller dobbeltklikk (Mac). Lå det en mappe med samme navn inni? Viste Windows filene som README og compose? | |
 | 3 | Steg 3: åpne «Windows PowerShell», ikke «Windows PowerShell ISE» (Windows), eller Terminal (Mac) | |
 | 4 | Steg 4: `cd`, mellomrom, og den innerste mappa dratt inn i vinduet. Fikk en sti med mellomrom anførselstegn? | |
-| 5 | Steg 5: `docker compose up --build demo`, kopiert med knappen i boksen, til linja med «Serving on» kommer. Hvor lang tid tok det, og kom det en linje med valg under? | |
-| 6 | Steg 6: åpne http://127.0.0.1:5000. Står «Eksempeltall» på siden? | |
-| 7 | En aksje i demoen åpnes fra oversikten | |
-| 8 | `docker compose run --rm demo-lag`, i et nytt vindu mens demoen kjører | |
-| 9 | Stopp: `Ctrl+C` i vinduet med demoen, så `docker compose --profile demo down`. Stod det «Removed»? | |
-| 10 | `cp .env.example .env` (uten å fylle inn nøkkelen) | |
-| 11 | `docker compose up --build` og http://127.0.0.1:5000 | |
-| 12 | `docker compose run --rm hent`, uten nøkkel | |
-| 13 | Siden lastet på nytt | |
-| 14 | `docker compose down` | |
-| 15 | Byttet: `docker compose --profile demo down`, så `docker compose up --build`, så det samme tilbake til `docker compose up --build demo` | |
-| 16 | uv: `uv sync` | |
-| 17 | `uv run python src/demo.py` | |
-| 18 | `uv run python src/app.py --demo` og http://127.0.0.1:5000 | |
-| 19 | `uv run python src/fetch_prices.py`, uten nøkkel | |
-| 20 | `uv run python src/app.py` | |
-| 21 | `docker ps -a` til slutt: står det containere igjen fra prøven? | |
-| 22 | Ble et spørsmål i «Står du fast?» brukt? Hvilket, og hjalp svaret? | |
+| 5 | Den ekte versjonen, steg 5: nøkkelen hos EODHD. Hoppes over i prøven, som gjøres uten nøkkel | |
+| 6 | Den ekte versjonen, steg 6: `cp .env.example .env`, så `notepad .env` (Windows) eller `open -e .env` (Mac), uten å fylle inn nøkkelen | |
+| 7 | Den ekte versjonen, steg 7: `docker compose up --build` og http://127.0.0.1:5000. Var oversikten tom, med kommandoen som henter? | |
+| 8 | Den ekte versjonen, steg 8: `docker compose run --rm hent`, uten nøkkel | |
+| 9 | Siden lastet på nytt | |
+| 10 | Den ekte versjonen, steg 9: `docker compose down`. Stod det «Removed»? | |
+| 11 | Demoen, steg 5: `docker compose up --build demo`, kopiert med knappen i boksen, til linja med «Serving on» kommer. Hvor lang tid tok det, og kom det en linje med valg under? | |
+| 12 | Demoen, steg 6: åpne http://127.0.0.1:5000. Står «Eksempeltall» på siden? | |
+| 13 | En aksje i demoen åpnes fra oversikten | |
+| 14 | `docker compose run --rm demo-lag`, i et nytt vindu mens demoen kjører | |
+| 15 | Demoen, steg 7: `Ctrl+C` i vinduet med demoen, så `docker compose --profile demo down`. Stod det «Removed»? | |
+| 16 | Byttet: `docker compose --profile demo down`, så `docker compose up --build`, så det samme tilbake til `docker compose up --build demo` | |
+| 17 | uv: `uv sync` | |
+| 18 | `uv run python src/demo.py` | |
+| 19 | `uv run python src/app.py --demo` og http://127.0.0.1:5000 | |
+| 20 | `uv run python src/fetch_prices.py`, uten nøkkel | |
+| 21 | `uv run python src/app.py` | |
+| 22 | `docker ps -a` til slutt: står det containere igjen fra prøven? | |
+| 23 | Ble et spørsmål i «Står du fast?» eller i `docs/hjelp.md` brukt? Hvilket, og hjalp svaret? | |
 
 - **Prøvd på Mac:** ikke prøvd (svar 3 11.10). Står slik til noen har prøvd stegene på en Mac.
 
-*Rettet 2026-10-11 (story 3.4, PR 3):* radene 1–9 følger de seks stegene og «Stopp» i «Kom i gang», i den korte formen Marian godkjente kl. 21:37. Før PR 3 sto `git clone https://github.com/IBE160-2026/G74-lund-osen.git` og `cd G74-lund-osen` som rad 2 og 3, og `Ctrl+C` og `docker compose --profile demo down` som to rader. Nye eller slått sammen i PR 3, sammenlignet med tabellen før PR 3: rad 1 (installer og start, slått sammen av to steg i den første formen av PR 3), rad 2 til 4 (Download ZIP, PowerShell eller Terminal, og `cd`), rad 9 (Ctrl+C og `docker compose --profile demo down`, slått sammen) og rad 22 (spørsmålene i «Står du fast?»). Rad 5 til 8 og 10 til 21 er de samme radene som før, med nytt nummer. Koden hentes nå med «Download ZIP», så prøveren har ikke git: commiten som ble prøvd, er den GitHub viser øverst på siden når ZIP-fila lastes ned, og mappa som ikke skal finnes, er `G74-lund-osen-main`, ikke `G74-lund-osen` som i punktet om maskinen over. Radene 2 og 3 følger Marians svar kl. 21:14 samme dag: ZIP-fila må pakkes ut med «Pakk ut alle», Windows viser filene uten filendelse, og «Windows PowerShell ISE» står også i lista.
+*Rettet 2026-10-11 (story 3.4, PR 3):* tabellen følger «Kom i gang» slik den ble etter instruksjonen kl. 22:32: steg 1–4 felles, så den ekte versjonen (steg 5–9) og demoen (steg 5–7), i den rekkefølgen README-en har dem. Før PR 3 sto `git clone https://github.com/IBE160-2026/G74-lund-osen.git` og `cd G74-lund-osen` som rad 2 og 3, demoen før den ekte versjonen, og `Ctrl+C` og `docker compose --profile demo down` som to rader. Nytt i PR 3: rad 1 (installer og start, slått sammen av to rader), rad 2–4 (Download ZIP, PowerShell eller Terminal, og `cd`), rad 5 (nøkkelen), `notepad .env` og `open -e .env` i rad 6, og rad 23 (spørsmålene i «Står du fast?» og `docs/hjelp.md`). Slått sammen: rad 15 (Ctrl+C og `docker compose --profile demo down`). Flyttet: radene for den ekte versjonen står nå før demoen, som 6–10 (før rad 10–14). De andre radene er de samme som før, med nytt nummer. Koden hentes nå med «Download ZIP», så prøveren har ikke git: commiten som ble prøvd, er den GitHub viser øverst på siden når ZIP-fila lastes ned, og mappa som ikke skal finnes, er `G74-lund-osen-main`, ikke `G74-lund-osen` som i punktet om maskinen over. Radene 2 og 3 følger Marians svar kl. 21:14 samme dag: ZIP-fila må pakkes ut med «Pakk ut alle», Windows viser filene uten filendelse, og «Windows PowerShell ISE» står også i lista.
 
 - **Det som ikke stemte:**
 - **Rettet i** (commit eller story):
