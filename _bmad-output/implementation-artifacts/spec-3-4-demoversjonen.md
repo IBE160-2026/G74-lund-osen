@@ -198,6 +198,8 @@ Fra instruksjonen kl. 16:54 i `docs/ai-prompts/2026-10-11.md` (planen) og kl. 20
 
 - **2026-10-11, PR 3 (README-en for en som aldri har brukt Docker):** Marian prøvde demoen etter README-en 11.10 og fant ikke ut hvor kommandoene skulle skrives. Hun limte dem inn i Docker Desktop og i en tom PowerShell-linje, og to kommandoer havnet på samme linje. README-prøven 13.–16.10 skal kunne gjøres av en som aldri har brukt Docker eller et terminalvindu, så «Kom i gang» skrives om i nummererte steg, med én kommando per boks og en FAQ. Planen og svarene står i «Planen for PR 3».
 
+- **2026-10-11 kl. 21:53, PR 3 i kortere form:** Marian syntes kl. 21:22 at demodelen av «Kom i gang» var for lang og så komplisert ut. Kl. 21:37 godkjente hun en kortere form: én linje om hva man trenger, seks steg på én til to linjer, «Stopp», og «Står du fast?» med spørsmålene som `<details>` med `<summary>`, sortert etter steget. Alt fra de åtte stegene og «Hvis noe går galt» som ikke er med i de seks stegene, er flyttet dit, og fem spørsmål er nye. Grunnen: målgruppen er en som aldri har brukt Docker eller et terminalvindu, og en lang side gjorde det vanskeligere å se hva man skal gjøre. «Steg 1, 2 og 6 peker dit» fra Marians ønske kl. 17:08 er erstattet av én lenke til «Står du fast?» i linja øverst. Commit `50e6c2e`.
+
 ## Review Triage Log
 
 Gjennomgang 1 av PR 1 (10.10 kl. 13:02–13:06, PR #26), Blind Hunter (BH, bare diffen), Edge Case Hunter (ECH) og Verification Gap (VG), som tre uavhengige agenter. Rettelsene er `5bcdef0`, `f9bbdcd` og `680fcf6`.
