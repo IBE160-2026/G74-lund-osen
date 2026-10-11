@@ -340,6 +340,26 @@ class TestSidene:
         aapne_base(demo_sti()).close()
         assert "Eksempeltall" not in klient.get("/").data.decode("utf-8")
 
+    def test_hjelpen_virker_ogsaa_i_demoen(self, klient, monkeypatch, demobase):
+        """Story 8.0b: «?» og tekstene vises ogsaa med demobasen, ved siden
+        av «Eksempeltall». Ville feilet hvis hjelpen var skjult i demoen."""
+        from hjelpetekster import hjelpetekster
+
+        tekster = hjelpetekster()
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        for adresse, vinduer, noekler in (
+            ("/", ("hjelp-oversikt", "hjelp-signalstyrke"), ("signalstyrke", "trend", "ukjent")),
+            ("/aksje/BRFE", ("hjelp-aksje",), ("grafen", "trend", "ukjent_aksje")),
+            ("/aksje/VRDS", ("hjelp-aksje",), ("antall_dager", "ukjent_aksje")),
+        ):
+            html = klient.get(adresse).data.decode("utf-8")
+            assert "Eksempeltall" in html, adresse
+            for vindu in vinduer:
+                assert f'popovertarget="{vindu}"' in html, (adresse, vindu)
+                assert f'<div id="{vindu}" class="hjelpevindu" popover>' in html, (adresse, vindu)
+            for noekkel in noekler:
+                assert tekster[noekkel].tekst in html, (adresse, noekkel)
+
     def test_den_ekte_basen_uten_bryter_har_ikke_merket(self, klient):
         aapne_base(Path(lagring_sqlite.BASE_STI)).close()
         html = klient.get("/").data.decode("utf-8")
