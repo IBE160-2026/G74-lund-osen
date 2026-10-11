@@ -425,10 +425,10 @@ class TestReadme:
         kommandoer = _kommandoene()
         assert kommandoer[0] == "docker compose up --build demo"
         demo = del_.split("### Den ekte versjonen", 1)[0]
-        assert "Start Docker Desktop" in demo and "http://127.0.0.1:5000" in demo
+        assert "start Docker Desktop" in demo and "http://127.0.0.1:5000" in demo
         assert "Eksempeltall" in demo
         assert demo.index("«Download ZIP»") < demo.index("docker compose up --build demo")
-        assert "git clone" not in demo.split("### Hvis noe går galt", 1)[0]
+        assert "git clone" not in demo.split("### Står du fast?", 1)[0]
         assert del_.index("docker compose up --build demo") < del_.index("cp .env.example .env")
 
     def test_kommandoene_er_de_samme_som_i_koden_og_compose(self):
@@ -533,16 +533,27 @@ def _proevetabellen() -> str:
 
 
 def _demostegene() -> str:
-    """Fra «Før du begynner» til «Hvis noe går galt», uten FAQ-en."""
-    return _kom_i_gang().split("### Før du begynner", 1)[1].split("### Hvis noe går galt", 1)[0]
+    """De seks stegene, fra «Demoen på seks steg» til «Stopp» (11.10 kl. 21:53)."""
+    return _kom_i_gang().split("### Demoen på seks steg", 1)[1].split("### Stopp", 1)[0]
+
+
+def _stopp() -> str:
+    return _kom_i_gang().split("### Stopp", 1)[1].split("### Står du fast?", 1)[0]
 
 
 def _faq() -> str:
-    return _kom_i_gang().split("### Hvis noe går galt", 1)[1].split("\n### ", 1)[0]
+    """«Står du fast?», til linja om resten av «Kom i gang»."""
+    return _kom_i_gang().split("### Står du fast?", 1)[1].split("### Den ekte versjonen", 1)[0]
 
 
 def _steg(nummer: int) -> str:
-    return _demostegene().split(f"**{nummer}. ", 1)[1].split(f"**{nummer + 1}. ", 1)[0]
+    """Steg nummer i lista, med boksen som hoerer til det."""
+    return re.split(r"^\d+\. ", _demostegene(), flags=re.MULTILINE)[nummer]
+
+
+def _sporsmaalene() -> list[tuple[str, str]]:
+    """Hvert spoersmaal i «Står du fast?» som (summary, svar)."""
+    return re.findall(r"<details>\n<summary>(.+?)</summary>\n(.*?)</details>", _faq(), re.DOTALL)
 
 
 def _anker(overskrift: str) -> str:
@@ -552,9 +563,14 @@ def _anker(overskrift: str) -> str:
     return re.sub(r"[^\w\- ]", "", overskrift.strip().lower()).replace(" ", "-")
 
 
+def _uten_bokser(tekst: str) -> str:
+    return re.sub(r"^```.*?^```$", "", tekst, flags=re.MULTILINE | re.DOTALL)
+
+
 class TestReadmeForNybegynnere:
     """Story 3.4, PR 3: README-en for en som aldri har brukt Docker eller et
-    terminalvindu (Marian 11.10, svarene kl. 20:32)."""
+    terminalvindu (Marian 11.10, svarene kl. 20:32), i den korte formen
+    Marian godkjente kl. 21:37: seks steg, «Stopp» og «Står du fast?»."""
 
     def test_ingen_kommentar_paa_kommandolinjene(self):
         """Linjene skal virke ogsaa i Ledetekst, der # ikke er en kommentar.
@@ -570,51 +586,90 @@ class TestReadmeForNybegynnere:
             if not spraak:
                 assert len([l for l in blokk.splitlines() if l.strip()]) == 1, blokk
 
+    def test_bare_kommandoer_og_en_tekstblokk(self):
+        """En blokk med spraak, som ```powershell, slapp unna testene for # og
+        én kommando per boks (VG i gjennomgangen av PR 3). Bare blokker uten
+        spraak, og den ene ```text-blokka under «Hva skal jeg se etter», er lov."""
+        blokker = _blokkene(_kom_i_gang())
+        assert {spraak for spraak, _ in blokker} <= {"", "text"}
+        assert len([b for spraak, b in blokker if spraak == "text"]) == 1
+        se_etter = dict(_sporsmaalene())["Hva skal jeg se etter i vinduet?"]
+        assert len([b for spraak, b in _blokkene(se_etter) if spraak == "text"]) == 1
+
+    def test_seks_steg_med_hoeyst_60_ord(self):
+        """Marian kl. 21:22: for lang. Stegene er nummerert 1-6, og hvert har
+        hoeyst 60 ord utenom boksene. Ville feilet med et sjuende steg eller
+        et steg som vokser."""
+        numre = [int(n) for n in re.findall(r"^(\d+)\. ", _demostegene(), re.MULTILINE)]
+        assert numre == [1, 2, 3, 4, 5, 6]
+        for n in numre:
+            ord_ = re.findall(r"\w+", _uten_bokser(_steg(n)))
+            assert len(ord_) <= 60, (n, len(ord_))
+
     def test_stegene_nevner_powershell_og_terminal(self):
-        """Steg 4 sier hvilket vindu kommandoene skrives i, paa Windows og Mac."""
-        steg = _steg(4)
-        assert "«Windows PowerShell»" in steg and "Terminal" in steg
-        # Marians svar kl. 21:14: ISE staar ogsaa i lista.
-        assert "Ikke velg «Windows PowerShell ISE»" in steg
-
-    def test_steg_3_sier_at_zip_fila_maa_pakkes_ut(self):
-        """Marians svar kl. 21:14: aapnet ZIP-fila saa ut som en mappe uten aa
-        vaere pakket ut, og Windows viser filene uten filendelse."""
+        """Steg 3 sier hvilket vindu kommandoene skrives i, paa Windows og
+        Mac. At ISE ikke skal velges (Marian kl. 21:14), staar i FAQ-en."""
         steg = _steg(3)
-        assert "«Pakk ut alle» (Extract All)" in steg and "Du må pakke ut" in steg
-        assert "filene README og compose" in steg and "uten filendelsen" in steg
+        assert "PowerShell" in steg and "Terminal" in steg
+        assert "Ikke velg «Windows PowerShell ISE»" in dict(_sporsmaalene())["Hvilket vindu skal jeg åpne?"]
 
-    def test_hvis_noe_gaar_galt(self):
-        """Svaret 11.10: FAQ-en rett etter stegene, med feilene planen og
-        Marian nevnte. Ville feilet hvis ett av tilfellene manglet."""
+    def test_zip_fila_maa_pakkes_ut(self):
+        """Marians svar kl. 21:14: en aapnet ZIP-fil saa ut som en mappe uten
+        aa vaere pakket ut, og Windows viser filene uten filendelse."""
+        assert "«Pakk ut alle»" in _steg(2) and "«Download ZIP»" in _steg(2)
+        svar = dict(_sporsmaalene())
+        assert "Du må pakke ut" in svar["ZIP-fila ser ut som en vanlig mappe."]
+        assert "filene README og compose" in svar["Det er to mapper med samme navn."]
+        assert "uten filendelsen" in svar["Det er to mapper med samme navn."]
+
+    def test_hvert_spoersmaal_er_details_med_summary(self):
+        """«Klikk på spørsmålet som passer» (21:53). Ville feilet med et
+        spoersmaal i fet skrift i stedet for <details>."""
+        faq = _faq().split("Klikk på spørsmålet som passer.", 1)[1]
+        faq = faq.split("Resten av «Kom i gang»", 1)[0]
+        antall = len(_sporsmaalene())
+        assert antall >= 20
+        assert faq.count("<details>") == faq.count("</details>") == faq.count("<summary>") == antall
+        assert "**" not in faq
+        assert all(s.strip() and svar.strip() for s, svar in _sporsmaalene())
+
+    def test_staar_du_fast_har_alt_som_ble_flyttet(self):
+        """Ingenting fra stegene og «Hvis noe går galt» før 21:53 falt bort,
+        og de nye spoersmaalene finnes."""
         faq = _faq()
         for tilfelle in ("logge inn", "administrator", "virtualisering", "«Engine running» etter",
-                         "Cannot connect to the Docker daemon", "Ledetekst", "samme linje",
-                         "mellomrom", "finnes fra før", "port 5000", "toomanyrequests",
-                         "AirPlay", "`.env` med nøkkelen", "ZIP-fila ser ut som en vanlig mappe",
-                         "fila compose ligger"):
+                         "Quit Docker Desktop", "hvalen ved klokka", "Cannot connect to the Docker daemon",
+                         "Ledetekst", "samme linje", "mellomrom", "finnes fra før", "port 5000",
+                         "toomanyrequests", "AirPlay", "`.env` med nøkkelen", "ZIP-fila ser ut som en vanlig mappe",
+                         "fila compose ligger", "AMD64", "Apple Silicon", "Safari", "Nedlastinger",
+                         "administrator, og da sperrer Windows dra og slipp", "wsl --update"):
             assert tilfelle in faq, tilfelle
-        kom = _kom_i_gang()
-        assert kom.index("### Demoen, steg for steg") < kom.index("### Hvis noe går galt") \
-            < kom.index("### Den ekte versjonen")
-
-    def test_steg_1_2_og_6_peker_til_faqen(self):
-        lenke = "](#" + _anker("Hvis noe går galt") + ")"
-        for nummer in (1, 2, 6):
-            assert lenke in _steg(nummer), nummer
+        sporsmaal = [s for s, _ in _sporsmaalene()]
+        for nytt in ("Hvilken Docker Desktop skal jeg velge?", "Det er to mapper med samme navn.",
+                     "Hvordan starter jeg neste gang?", "Hva er demoen?",
+                     "Mappa lar seg ikke dra inn i vinduet."):
+            assert nytt in sporsmaal, nytt
 
     def test_hver_lenke_til_et_avsnitt_finnes(self):
-        """test_readme.py hopper over lenker med #. Ville feilet hvis ankeret
-        til FAQ-en ikke passet med overskriften."""
+        """test_readme.py hopper over lenker med #. Ville feilet hvis lenken
+        til «Står du fast?» ikke passet med overskriften."""
         tekst = README.read_text(encoding="utf-8")
-        uten_kode = re.sub(r"^```.*?^```$", "", tekst, flags=re.MULTILINE | re.DOTALL)
-        ankre = {_anker(o) for o in re.findall(r"^#+ (.+)$", uten_kode, re.MULTILINE)}
-        for maal in re.findall(r"\]\(#([^)\s]+)\)", tekst):
+        ankre = {_anker(o) for o in re.findall(r"^#+ (.+)$", _uten_bokser(tekst), re.MULTILINE)}
+        lenker = re.findall(r"\]\(#([^)\s]+)\)", tekst)
+        assert "står-du-fast" in lenker
+        for maal in lenker:
             assert maal in ankre, maal
 
-    def test_merket_i_steg_7_er_det_samme_som_i_malene(self):
+    def test_linja_om_resten_staar_foran_den_ekte_versjonen(self):
+        """21:53: én linje sier at resten gjelder den ekte versjonen. Ville
+        feilet hvis den sto et annet sted, eller manglet."""
+        foer = _kom_i_gang().split("### Den ekte versjonen", 1)[0].rstrip()
+        siste = foer.splitlines()[-1]
+        assert siste == "Resten av «Kom i gang» gjelder den ekte versjonen med egen nøkkel, og trengs ikke for demoen."
+
+    def test_merket_i_steg_6_er_det_samme_som_i_malene(self):
         """Regel 19: 8.0c kan ikke endre merket uten at README-en rettes."""
-        sitert = _steg(7).split("står det øverst på siden: «", 1)[1].split("»", 1)[0]
+        sitert = _steg(6).split("Øverst står «", 1)[1].split("»", 1)[0]
         for mal in ("index.html", "aksje.html", "basefeil.html"):
             tekst = (ROT / "src" / "templates" / mal).read_text(encoding="utf-8")
             treff = re.search(r'<p class="eksempeltall">([^<]+)</p>', tekst)
@@ -622,41 +677,29 @@ class TestReadmeForNybegynnere:
             assert sitert == treff.group(1), mal
 
     def test_linja_som_viser_at_demoen_er_klar(self):
-        """Linja i steg 6 er kopiert fra en kjoering 11.10. Ville feilet hvis
-        porten i Dockerfile eller navnet paa tjenesten ble endret uten at
-        README-en fulgte med."""
-        tekst = [b for spraak, b in _blokkene(_steg(6)) if spraak == "text"]
-        assert len(tekst) == 1
-        linje = tekst[0].strip()
+        """Linja er kopiert fra en kjoering 11.10. Ville feilet hvis porten i
+        Dockerfile eller navnet paa tjenesten ble endret uten at README-en
+        fulgte med, i steg 5 og i FAQ-en."""
         kommando = dict(_instruksjoner())["CMD"]
         lytter = re.search(r"--listen=([\d.]+:\d+)", kommando).group(1)
         demo = _tjenester()["demo"]
         assert "command" not in demo and "entrypoint" not in demo
-        assert linje == f"demo-1  | INFO:waitress:Serving on http://{lytter}"
-
-    def test_bare_kommandoer_og_en_tekstblokk(self):
-        """Gjennomgangen av PR 3 (VG): en blokk med spraak, som ```powershell,
-        slapp unna testene for # og én kommando per boks. Bare blokker uten
-        spraak, og den ene ```text-blokka i steg 6, er lov."""
-        blokker = _blokkene(_kom_i_gang())
-        assert {spraak for spraak, _ in blokker} <= {"", "text"}
-        assert len([b for spraak, b in blokker if spraak == "text"]) == 1
-        assert len([b for spraak, b in _blokkene(_steg(6)) if spraak == "text"]) == 1
+        assert f"`Serving on http://{lytter}`" in _steg(5)
+        tekst = [b for spraak, b in _blokkene(_faq()) if spraak == "text"]
+        assert tekst[0].strip() == f"demo-1  | INFO:waitress:Serving on http://{lytter}"
 
     def test_stegene_og_henvisningene_til_dem(self):
-        """Gjennomgangen av PR 3 (VG): stegene er nummerert 1..N, hver «steg N»
-        i «Kom i gang» peker paa et steg som finnes, og §9 har «Steg 1» til
-        «Steg N» i rekkefoelge. Ville feilet hvis et steg ble satt inn uten at
-        henvisningene og §9 fulgte med."""
-        numre = [int(n) for n in re.findall(r"^\*\*(\d+)\. ", _demostegene(), re.MULTILINE)]
-        assert numre == list(range(1, len(numre) + 1)), numre
+        """Hver «steg N» i «Kom i gang» peker paa et av de seks stegene, og §9
+        har «Steg 1» til «Steg 6» i rekkefoelge (VG i gjennomgangen av PR 3)."""
         for n in re.findall(r"[Ss]teg (\d+)", _kom_i_gang()):
-            assert 1 <= int(n) <= len(numre), n
+            assert 1 <= int(n) <= 6, n
         i_tabellen = [int(n) for n in re.findall(r"\| Steg (\d+):", _proevetabellen())]
-        assert i_tabellen == [n for n in numre if n in i_tabellen]
-        assert set(i_tabellen) == set(numre), i_tabellen
+        assert i_tabellen == [1, 2, 3, 4, 5, 6], i_tabellen
 
     def test_ingen_env_foer_demoen(self):
-        """PR 2-kravet om at demoen ikke trenger .env, i teksten til steg 1-6
-        ogsaa, ikke bare i kommandoene (BH)."""
-        assert all(".env" not in _steg(n) for n in range(1, 7))
+        """Demoen trenger ikke .env, heller ikke i teksten til steg 1-5."""
+        assert all(".env" not in _steg(n) for n in range(1, 6))
+
+    def test_stopp_har_kommandoen(self):
+        assert "Ctrl+C" in _stopp()
+        assert [b.strip() for _, b in _blokkene(_stopp())] == ["docker compose --profile demo down"]

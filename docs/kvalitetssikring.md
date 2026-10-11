@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-11T21:20
+updated: 2026-10-11T21:57
 ---
 
 # Kvalitetssikring
@@ -521,33 +521,32 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
 
 | # | Kommando eller steg i README-en | Det som skjedde |
 |---|---|---|
-| 1 | Steg 1: installer Docker Desktop, hvis maskinen ikke har det. Ba installasjonen om administrator eller omstart? | |
-| 2 | Steg 2: start Docker Desktop uten å logge inn, og vent til det står «Engine running» | |
-| 3 | Steg 3: «Code» → «Download ZIP» på GitHub, og pakk ut med «Pakk ut alle» (Windows) eller dobbeltklikk (Mac). Lå det en mappe med samme navn inni? Viste Windows filene som README og compose? | |
-| 4 | Steg 4: åpne «Windows PowerShell», ikke «Windows PowerShell ISE» (Windows), eller Terminal (Mac) | |
-| 5 | Steg 5: `cd`, mellomrom, og mappa dratt inn i vinduet. Fikk en sti med mellomrom anførselstegn? | |
-| 6 | Steg 6: `docker compose up --build demo`, kopiert med knappen i boksen, til linja med «Serving on» kommer. Hvor lang tid tok det, og kom det en linje med valg under? | |
-| 7 | Steg 7: åpne http://127.0.0.1:5000. Står «Eksempeltall» på siden? | |
-| 8 | En aksje i demoen åpnes fra oversikten | |
-| 9 | `docker compose run --rm demo-lag`, i et nytt vindu mens demoen kjører | |
-| 10 | Steg 8: `Ctrl+C` i vinduet med demoen, så `docker compose --profile demo down`. Stod det «Removed»? | |
-| 11 | `cp .env.example .env` (uten å fylle inn nøkkelen) | |
-| 12 | `docker compose up --build` og http://127.0.0.1:5000 | |
-| 13 | `docker compose run --rm hent`, uten nøkkel | |
-| 14 | Siden lastet på nytt | |
-| 15 | `docker compose down` | |
-| 16 | Byttet: `docker compose --profile demo down`, så `docker compose up --build`, så det samme tilbake til `docker compose up --build demo` | |
-| 17 | uv: `uv sync` | |
-| 18 | `uv run python src/demo.py` | |
-| 19 | `uv run python src/app.py --demo` og http://127.0.0.1:5000 | |
-| 20 | `uv run python src/fetch_prices.py`, uten nøkkel | |
-| 21 | `uv run python src/app.py` | |
-| 22 | `docker ps -a` til slutt: står det containere igjen fra prøven? | |
-| 23 | Ble noe i «Hvis noe går galt» brukt? Hvilket, og hjalp svaret? | |
+| 1 | Steg 1: installer og start Docker Desktop uten å logge inn, og vent til det står «Engine running». Ba installasjonen om administrator eller omstart? | |
+| 2 | Steg 2: «Code» → «Download ZIP» på GitHub, og pakk ut med «Pakk ut alle» (Windows) eller dobbeltklikk (Mac). Lå det en mappe med samme navn inni? Viste Windows filene som README og compose? | |
+| 3 | Steg 3: åpne «Windows PowerShell», ikke «Windows PowerShell ISE» (Windows), eller Terminal (Mac) | |
+| 4 | Steg 4: `cd`, mellomrom, og den innerste mappa dratt inn i vinduet. Fikk en sti med mellomrom anførselstegn? | |
+| 5 | Steg 5: `docker compose up --build demo`, kopiert med knappen i boksen, til linja med «Serving on» kommer. Hvor lang tid tok det, og kom det en linje med valg under? | |
+| 6 | Steg 6: åpne http://127.0.0.1:5000. Står «Eksempeltall» på siden? | |
+| 7 | En aksje i demoen åpnes fra oversikten | |
+| 8 | `docker compose run --rm demo-lag`, i et nytt vindu mens demoen kjører | |
+| 9 | Stopp: `Ctrl+C` i vinduet med demoen, så `docker compose --profile demo down`. Stod det «Removed»? | |
+| 10 | `cp .env.example .env` (uten å fylle inn nøkkelen) | |
+| 11 | `docker compose up --build` og http://127.0.0.1:5000 | |
+| 12 | `docker compose run --rm hent`, uten nøkkel | |
+| 13 | Siden lastet på nytt | |
+| 14 | `docker compose down` | |
+| 15 | Byttet: `docker compose --profile demo down`, så `docker compose up --build`, så det samme tilbake til `docker compose up --build demo` | |
+| 16 | uv: `uv sync` | |
+| 17 | `uv run python src/demo.py` | |
+| 18 | `uv run python src/app.py --demo` og http://127.0.0.1:5000 | |
+| 19 | `uv run python src/fetch_prices.py`, uten nøkkel | |
+| 20 | `uv run python src/app.py` | |
+| 21 | `docker ps -a` til slutt: står det containere igjen fra prøven? | |
+| 22 | Ble et spørsmål i «Står du fast?» brukt? Hvilket, og hjalp svaret? | |
 
 - **Prøvd på Mac:** ikke prøvd (svar 3 11.10). Står slik til noen har prøvd stegene på en Mac.
 
-*Rettet 2026-10-11 (story 3.4, PR 3):* radene 1–10 følger de nye stegene i «Kom i gang». Her sto `git clone https://github.com/IBE160-2026/G74-lund-osen.git` og `cd G74-lund-osen` som rad 2 og 3, og `Ctrl+C` og `docker compose --profile demo down` som to rader. Koden hentes nå med «Download ZIP», så mappa heter `G74-lund-osen-main`, ikke `G74-lund-osen` som i punktet om maskinen over. Rad 23 er ny. Med «Download ZIP» har prøveren ikke git: commiten som ble prøvd, er den GitHub viser øverst på siden når ZIP-fila lastes ned, og mappa som ikke skal finnes, er `G74-lund-osen-main`. Radene 3 og 4 følger Marians svar kl. 21:14 samme dag: ZIP-fila må pakkes ut med «Pakk ut alle», Windows viser filene uten filendelse, og «Windows PowerShell ISE» står også i lista.
+*Rettet 2026-10-11 (story 3.4, PR 3):* radene 1–9 følger de seks stegene og «Stopp» i «Kom i gang», i den korte formen Marian godkjente kl. 21:37. Før PR 3 sto `git clone https://github.com/IBE160-2026/G74-lund-osen.git` og `cd G74-lund-osen` som rad 2 og 3, og `Ctrl+C` og `docker compose --profile demo down` som to rader. Nye eller slått sammen: rad 1 (installer og start, slått sammen av to steg i den første formen av PR 3), rad 2 til 4 (Download ZIP, PowerShell eller Terminal, og `cd`), rad 9 (Ctrl+C og `docker compose --profile demo down`, slått sammen) og rad 22 (spørsmålene i «Står du fast?»). Rad 5 til 8 og 10 til 21 er de samme radene som før, med nytt nummer. Koden hentes nå med «Download ZIP», så prøveren har ikke git: commiten som ble prøvd, er den GitHub viser øverst på siden når ZIP-fila lastes ned, og mappa som ikke skal finnes, er `G74-lund-osen-main`, ikke `G74-lund-osen` som i punktet om maskinen over. Radene 2 og 3 følger Marians svar kl. 21:14 samme dag: ZIP-fila må pakkes ut med «Pakk ut alle», Windows viser filene uten filendelse, og «Windows PowerShell ISE» står også i lista.
 
 - **Det som ikke stemte:**
 - **Rettet i** (commit eller story):
