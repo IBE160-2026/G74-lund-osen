@@ -489,6 +489,8 @@ Ingen av 1.9, 2.7 og 9.5 utvider omfanget: 1.9 er en skjemaendring før basen ha
 
 *Lagt til 2026-10-08 kl. 21:48:* storyene krever at 8.3 kommer før 8.17 og 8.12, og 8.17 før 8.12. Punkt 7, 9 og 10 følger ikke det, og rettes når rekkefølgen tas opp igjen etter README-prøven.
 
+*Lagt til 2026-10-11, Marians beslutning:* 8.0d bygges etter 8.0b og 8.0c og før KI-laget (kl. 12:13).
+
 Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» avgjøres i planen for 2.12, og navnet på FR-407 og 2.6 i planen for 2.6.
 
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
@@ -1936,6 +1938,8 @@ avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 
 *Ferdig 2026-10-10:* flettet i `0ed87be`, PR #26, og `59c0baf`, PR #27. README-prøven 13.–16.10 gjenstår (§9 i `docs/kvalitetssikring.md`).
 
+*Lagt til 2026-10-11, Marians beslutning:* README-en skrives om for en som aldri har brukt Docker eller et terminalvindu, med steg, bilder og «Hvis noe går galt», før README-prøven (PR 3). Grunnen: Marian fant ikke ut hvor kommandoene skulle skrives. Bildet av demosiden tas etter 8.0d.
+
 ### Story 3.4b: KI-tekstene i demoen
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 16:53.*
@@ -2665,6 +2669,8 @@ sted. Min liste (8.3) bruker de samme.
 
 *Lagt til 2026-10-05, Marians beslutning kl. 21:23:* i oversikten står et «?» ved overskriften Signalstyrke. I dag forklares 0–3 bare i fotnoten nederst.
 
+*Lagt til 2026-10-11, Marians beslutning:* fotnotene under tabellene (funn 23 i gjennomgangen av 8.0b, `deferred-work.md`) tas i 8.0c, ikke før flettingen.
+
 ### Story 8.0c: Tydelig merking, ord ved sjekkene og datoer på grafen
 
 *Lagt til 2026-10-05, fra rådets gjennomgang av sidene og Marians beslutning kl. 21:23.*
@@ -2688,6 +2694,35 @@ Som **bruker**, vil jeg se med en gang hvilke aksjer som skiller seg ut, lese hv
 **Funnene bak** (rådets gjennomgang 05.10): signalstyrken 0–3 forklares bare i fotnoten. Radene som skiller seg ut, har bakgrunnen `#fafafa`, som er nesten hvit, og ellers bare den lille teksten «skiller seg ut». Ga-kolonnen viser bare +1, -1 og 0. Grafen har datoer bare i bildeteksten. Ordene ved sjekkene er FR-704 sine, positiv og negativ, ikke opp og ned (FR-103, endret 21.09).
 
 **Avhenger av:** 8.0. Ferdig før 8.1, som 8.0b, så brukertesten ikke finner det vi alt vet. **Én økt:** ja.
+
+*Lagt til 2026-10-11, Marians beslutning:*
+- Overskriftene over tallkolonnene står over tallene, også i tabellene i aksjedetaljen
+- Merket i demoen sier «Demoversjon» foran «Eksempeltall: …», og «Eksempeltall» står (FR-411, NFR-08)
+- En linje nederst på alle sidene sier at appen er under arbeid, styrt av én innstilling, og `docs/innlevering.md` får et punkt om å bytte den ved innleveringen
+- Radene i aksjedetaljen med sjekkene som slo ut, har også `#fafafa` og synes nesten ikke. De merkes så de synes, og hjelpeteksten «Målt mot» («lys bakgrunn») følger merkingen
+- Planen avgjør «Oslo Børs ·» over tabellen i demoen (`deferred-work.md`, 10.10)
+- Planen avgjør fotnotene under tabellene. De bruker ordene i FR-703, mens hjelpen sier det enklere. Forbeholdet om kjøp og salg står synlig (NFR-06), og raden for NFR-06 i denne fila, som siterer fotnoten, får en datert linje hvis den endres
+- Planen avgjør om hjelpen i demoen skal si at målingen over 199 børsdager er gjort på ekte kurser (funn 21 i gjennomgangen av 8.0b)
+
+### Story 8.0d: Utseendet fra designforslaget
+
+*Lagt til 2026-10-11, Marians beslutning kl. 12:13.*
+
+Som **gruppe**, vil vi at sidene ser ut som designforslaget i designtavla, så
+demoen sensor ser, har det utseendet vi har valgt.
+
+**Oppfyller:** `designregler.md` §1, og reglene planen skriver inn i `designregler.md` ·
+**Begrenses av:** FR-411, NFR-06, NFR-08
+
+**Kontroll — hva testen ser etter:**
+- Planen skriver reglene for utseendet inn i `designregler.md`, med dato og grunn, og gruppen godkjenner dem før noe bygges: farger, skrift, stripa øverst, kolonneraden, avstander og fokus. Tavla ligger i Claude og ikke i repoet, så rådet gir utdraget fra den
+- Oversikten, aksjedetaljen og feilsiden følger reglene, også i demoen, og «Eksempeltall» synes like godt som før
+- Skriften fra §1: filene ligger i appen med lisensen, ingen skrift eller skript hentes fra nettet, og tallcellene har tabelltall, med testene som sto i 8.2
+- Tekst har kontrast på minst 4,5:1, og farger som skal skilles, skiller seg også i lyshet
+- Ingen nye funksjoner og ingen knapp til en side som ikke finnes. Knapperaden kommer med 8.3
+- **Ville feilet hvis:** en side hentet noe fra nettet, eller utseendet tok inn en funksjon som ikke er bygget
+
+**Avhenger av:** 8.0b og 8.0c. **Én økt:** avgjøres i planen.
 
 ### Story 8.1: Brukertest rett etter Epic 2
 
@@ -2744,6 +2779,8 @@ før gjennomgangen. Den sier fortsatt på papir hvordan Nyheter og Kalender vill
 passet inn.
 
 *Lagt til 2026-10-01:* skriftregelen i `designregler.md` §1 tas inn her, som en egen liten endring med tre tester: ingen mal viser til en skrift på nettet, tallcellene i tabellene har tabelltall, og skriftfilene har OpenType-funksjonen `tnum`.
+
+*Lagt til 2026-10-11, Marians beslutning:* skriftregelen i `designregler.md` §1 flyttes til 8.0d, med de tre testene (kl. 12:13).
 
 **Avhenger av:** 8.1. **Én økt:** ja.
 
