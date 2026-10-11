@@ -522,3 +522,93 @@ class TestReadme:
         # Ogsaa HTML-bilder og bilder med referanse (BH7).
         assert "<img" not in tekst.lower()
         assert not re.search(r"!\[[^\]]*\]\[", tekst)
+
+
+def _demostegene() -> str:
+    """Fra «Før du begynner» til «Hvis noe går galt», uten FAQ-en."""
+    return _kom_i_gang().split("### Før du begynner", 1)[1].split("### Hvis noe går galt", 1)[0]
+
+
+def _faq() -> str:
+    return _kom_i_gang().split("### Hvis noe går galt", 1)[1].split("\n### ", 1)[0]
+
+
+def _steg(nummer: int) -> str:
+    return _demostegene().split(f"**{nummer}. ", 1)[1].split(f"**{nummer + 1}. ", 1)[0]
+
+
+def _anker(overskrift: str) -> str:
+    """Ankeret GitHub lager av en overskrift: smaa bokstaver, mellomrom blir
+    bindestrek, og tegn som ikke er bokstav, tall, bindestrek eller
+    understrek, faller bort."""
+    return re.sub(r"[^\w\- ]", "", overskrift.strip().lower()).replace(" ", "-")
+
+
+class TestReadmeForNybegynnere:
+    """Story 3.4, PR 3: README-en for en som aldri har brukt Docker eller et
+    terminalvindu (Marian 11.10, svarene kl. 20:32)."""
+
+    def test_ingen_kommentar_paa_kommandolinjene(self):
+        """Linjene skal virke ogsaa i Ledetekst, der # ikke er en kommentar.
+        Ville feilet med «docker compose up --build demo  # demoen»."""
+        for spraak, blokk in _blokkene(_kom_i_gang()):
+            if not spraak:
+                assert "#" not in blokk, blokk
+
+    def test_en_kommando_per_boks(self):
+        """Marian fikk to kommandoer paa samme linje 11.10. Ville feilet med
+        to kommandoer i én boks."""
+        for spraak, blokk in _blokkene(_kom_i_gang()):
+            if not spraak:
+                assert len([l for l in blokk.splitlines() if l.strip()]) == 1, blokk
+
+    def test_stegene_nevner_powershell_og_terminal(self):
+        """Steg 4 sier hvilket vindu kommandoene skrives i, paa Windows og Mac."""
+        steg = _steg(4)
+        assert "«Windows PowerShell»" in steg and "Terminal" in steg
+
+    def test_hvis_noe_gaar_galt(self):
+        """Svaret 11.10: FAQ-en rett etter stegene, med feilene planen og
+        Marian nevnte. Ville feilet hvis ett av tilfellene manglet."""
+        faq = _faq()
+        for tilfelle in ("logge inn", "administrator", "virtualisering", "«Engine running» etter",
+                         "Cannot connect to the Docker daemon", "Ledetekst", "samme linje",
+                         "mellomrom", "finnes fra før", "port 5000", "toomanyrequests",
+                         "AirPlay", "`.env` med nøkkelen"):
+            assert tilfelle in faq, tilfelle
+        kom = _kom_i_gang()
+        assert kom.index("### Demoen, steg for steg") < kom.index("### Hvis noe går galt") \
+            < kom.index("### Den ekte versjonen")
+
+    def test_steg_1_2_og_6_peker_til_faqen(self):
+        lenke = "](#" + _anker("Hvis noe går galt") + ")"
+        for nummer in (1, 2, 6):
+            assert lenke in _steg(nummer), nummer
+
+    def test_hver_lenke_til_et_avsnitt_finnes(self):
+        """test_readme.py hopper over lenker med #. Ville feilet hvis ankeret
+        til FAQ-en ikke passet med overskriften."""
+        tekst = README.read_text(encoding="utf-8")
+        ankre = {_anker(o) for o in re.findall(r"^#+ (.+)$", tekst, re.MULTILINE)}
+        for maal in re.findall(r"\]\(#([^)\s]+)\)", tekst):
+            assert maal in ankre, maal
+
+    def test_merket_i_steg_7_er_det_samme_som_i_malene(self):
+        """Regel 19: 8.0c kan ikke endre merket uten at README-en rettes."""
+        sitert = _steg(7).split("står det øverst på siden: «", 1)[1].split("»", 1)[0]
+        for mal in ("index.html", "aksje.html", "basefeil.html"):
+            tekst = (ROT / "src" / "templates" / mal).read_text(encoding="utf-8")
+            merket = re.search(r'<p class="eksempeltall">([^<]+)</p>', tekst).group(1)
+            assert sitert == merket, mal
+
+    def test_linja_som_viser_at_demoen_er_klar(self):
+        """Linja i steg 6 er kopiert fra en kjoering 11.10. Ville feilet hvis
+        porten i Dockerfile eller navnet paa tjenesten ble endret uten at
+        README-en fulgte med."""
+        tekst = [b for spraak, b in _blokkene(_steg(6)) if spraak == "text"]
+        assert len(tekst) == 1
+        linje = tekst[0].strip()
+        kommando = dict(_instruksjoner())["CMD"]
+        lytter = re.search(r"--listen=([\d.]+:\d+)", kommando).group(1)
+        assert "demo" in _tjenester()
+        assert linje == f"demo-1  | INFO:waitress:Serving on http://{lytter}"
