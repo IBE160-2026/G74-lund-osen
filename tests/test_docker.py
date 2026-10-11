@@ -566,6 +566,15 @@ class TestReadmeForNybegynnere:
         """Steg 4 sier hvilket vindu kommandoene skrives i, paa Windows og Mac."""
         steg = _steg(4)
         assert "«Windows PowerShell»" in steg and "Terminal" in steg
+        # Marians svar kl. 21:14: ISE staar ogsaa i lista.
+        assert "Ikke velg «Windows PowerShell ISE»" in steg
+
+    def test_steg_3_sier_at_zip_fila_maa_pakkes_ut(self):
+        """Marians svar kl. 21:14: aapnet ZIP-fila saa ut som en mappe uten aa
+        vaere pakket ut, og Windows viser filene uten filendelse."""
+        steg = _steg(3)
+        assert "«Pakk ut alle» (Extract All)" in steg and "Du må pakke ut" in steg
+        assert "filene README og compose" in steg and "uten filendelsen" in steg
 
     def test_hvis_noe_gaar_galt(self):
         """Svaret 11.10: FAQ-en rett etter stegene, med feilene planen og
@@ -574,7 +583,8 @@ class TestReadmeForNybegynnere:
         for tilfelle in ("logge inn", "administrator", "virtualisering", "«Engine running» etter",
                          "Cannot connect to the Docker daemon", "Ledetekst", "samme linje",
                          "mellomrom", "finnes fra før", "port 5000", "toomanyrequests",
-                         "AirPlay", "`.env` med nøkkelen"):
+                         "AirPlay", "`.env` med nøkkelen", "ZIP-fila ser ut som en vanlig mappe",
+                         "fila compose ligger"):
             assert tilfelle in faq, tilfelle
         kom = _kom_i_gang()
         assert kom.index("### Demoen, steg for steg") < kom.index("### Hvis noe går galt") \

@@ -45,14 +45,14 @@ Når det har gått bra, står det «Engine running» nederst i vinduet. La Docke
 
 **3. Last ned koden.** Gå til [repoet på GitHub](https://github.com/IBE160-2026/G74-lund-osen), trykk den grønne knappen «Code» og så «Download ZIP». Pakk ut fila:
 
-- Windows: åpne Nedlastinger (Downloads) i Filutforsker (File Explorer), høyreklikk `G74-lund-osen-main.zip` og velg «Pakk ut alle» (Extract All) og så «Pakk ut» (Extract).
+- Windows: åpne Nedlastinger (Downloads) i Filutforsker (File Explorer), høyreklikk ZIP-fila `G74-lund-osen-main` og velg «Pakk ut alle» (Extract All) og så «Pakk ut» (Extract). Du må pakke ut: åpner du ZIP-fila i stedet, ser den ut som en vanlig mappe, men den er ikke pakket ut.
 - Mac: dobbeltklikk `G74-lund-osen-main.zip` i Nedlastinger (Downloads).
 
-Når det har gått bra, har du en mappe som heter `G74-lund-osen-main`, med blant annet `README.md` og `compose.yaml`. Ligger det en mappe med samme navn inni den, er det den innerste du skal bruke. Har du fått koden som mappe eller ZIP-fil fra før, pakker du den ut og går til steg 4.
+Når det har gått bra, har du en mappe som heter `G74-lund-osen-main`, med blant annet filene README og compose. Windows viser dem uten filendelsen (.md og .yaml). Ligger det en mappe med samme navn inni den, er det den innerste du skal bruke. Har du fått koden som mappe eller ZIP-fil fra før, pakker du den ut og går til steg 4.
 
 **4. Åpne et terminalvindu.** Et terminalvindu er et vindu der du skriver kommandoer i stedet for å klikke.
 
-- Windows: trykk Start, skriv `PowerShell` og åpne «Windows PowerShell».
+- Windows: trykk Start, skriv `PowerShell` og åpne «Windows PowerShell». Ikke velg «Windows PowerShell ISE», som også står i lista.
 - Mac: trykk Cmd+mellomrom, skriv `Terminal` og trykk Enter.
 
 Når det har gått bra, ser du et vindu med en linje som venter på at du skriver.
@@ -111,7 +111,9 @@ Sidene sier «Eksempeltall»: 15 oppdiktede selskaper med kurser til fredag 9. o
 
 **Stien har mellomrom og fikk ikke anførselstegn.** Får du en feil etter `cd` når mappa ligger i en mappe med mellomrom i navnet, skriver du anførselstegn rundt stien, for eksempel `cd "C:\Users\Ola Nordmann\Downloads\G74-lund-osen-main"`.
 
-**«no configuration file provided: not found».** Terminalvinduet står i feil mappe. Gjør steg 5 på nytt, og dra den mappa som inneholder `compose.yaml`.
+**ZIP-fila ser ut som en vanlig mappe.** Står det «Komprimert størrelse» (Compressed size) som kolonne og «Pakk ut alle» (Extract All) øverst i vinduet, er du inne i ZIP-fila, og den er ikke pakket ut. Trykk «Pakk ut alle», og bruk mappa som lages (steg 3).
+
+**«no configuration file provided: not found».** Terminalvinduet står i feil mappe. Gjør steg 5 på nytt, og dra den mappa der fila compose ligger. Windows viser den uten filendelsen, som compose og ikke compose.yaml.
 
 **«toomanyrequests» fra Docker Hub.** Docker Hub begrenser hvor ofte en nettadresse kan laste ned uten innlogging. Prøv igjen senere, eller fra et annet nett. Innlogging i Docker Desktop hever grensen, men trengs ellers ikke.
 
