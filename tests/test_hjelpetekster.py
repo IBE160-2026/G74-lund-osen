@@ -5,10 +5,15 @@ mutant (spesifikasjonen, Verification).
 """
 
 import re
+import shutil
+import sqlite3
 from pathlib import Path
 
 import pytest
 
+import app as app_modul
+import demo
+import lagring_sqlite
 from hjelpetekster import Hjelp, hjelpetekster
 from markedsoversikt import RETNINGSVISNING
 from signalberegning import BLANDET, INGEN, NEGATIV, POSITIV, STANDARD, Parametre
@@ -155,3 +160,138 @@ class TestHjelp:
 
     def test_en_kjent_noekkel_gir_teksten(self):
         assert Hjelp(hjelpetekster()).tekst("trend") == hjelpetekster()["trend"]
+
+
+# --- Sidene (del c) --------------------------------------------------------
+
+@pytest.fixture(scope="module")
+def basemal(tmp_path_factory):
+    """En base uten demomerket, med demoens kurser og vurderinger. Lages i
+    tmp_path (regel 22), og merket nulles, saa sidene leser den som en ekte
+    base uten «Eksempeltall»."""
+    sti = tmp_path_factory.mktemp("hjelpemal") / "ose.db"
+    demo.lag_demobase(sti, skriv=lambda _: None)
+    tilkobling = sqlite3.connect(sti)
+    try:
+        tilkobling.execute("PRAGMA application_id = 0")
+        tilkobling.commit()
+    finally:
+        tilkobling.close()
+    return sti
+
+
+@pytest.fixture
+def klient(monkeypatch):
+    monkeypatch.delenv(app_modul.I_DEMO, raising=False)
+    monkeypatch.delenv(app_modul.I_DOCKER, raising=False)
+    app_modul.app.config["TESTING"] = True
+    return app_modul.app.test_client()
+
+
+@pytest.fixture
+def base(basemal):
+    sti = Path(lagring_sqlite.BASE_STI)
+    sti.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(basemal, sti)
+    return sti
+
+
+SIDENE = ("/", "/aksje/BRFE", "/aksje/VRDS")
+
+
+def _side(klient, adresse: str) -> str:
+    svar = klient.get(adresse)
+    assert svar.status_code == 200, adresse
+    return svar.data.decode("utf-8")
+
+
+class TestSidene:
+    def test_hver_tekst_malene_ber_om_finnes(self, klient, base):
+        """Kontrollpunktet: en test sjekker at hver tekst malene ber om,
+        finnes i fila. hjelp.tekst() feiler paa en noekkel som mangler, og
+        med TESTING slipper feilen gjennom her."""
+        for adresse in SIDENE:
+            _side(klient, adresse)
+
+    def test_hver_tekst_i_fila_brukes_av_en_mal(self, klient, base, monkeypatch):
+        """Ingen tekst blir liggende uten at en side viser den."""
+        bedt_om: set[str] = set()
+
+        class Opptak(Hjelp):
+            def tekst(self, noekkel):
+                bedt_om.add(noekkel)
+                return super().tekst(noekkel)
+
+        monkeypatch.setattr(app_modul, "HJELP", Opptak(hjelpetekster()))
+        for adresse in SIDENE:
+            _side(klient, adresse)
+        assert bedt_om == set(hjelpetekster())
+
+    def test_spoersmaalstegn_ved_overskriften_paa_begge_sidene(self, klient, base):
+        oversikt = _side(klient, "/")
+        detalj = _side(klient, "/aksje/BRFE")
+        assert re.search(r'<h1>OSE Signal</h1>\s*<button type="button" class="hjelpeknapp" popovertarget="hjelp-oversikt"', oversikt)
+        assert re.search(r'<h1>Brattfjell Energi</h1>\s*<button type="button" class="hjelpeknapp" popovertarget="hjelp-aksje"', detalj)
+
+    def test_spoersmaalstegn_ved_signalstyrke_i_oversikten(self, klient, base):
+        """Tillegget 05.10: «?» ved overskriften Signalstyrke, med teksten
+        om styrken. Det er fortsatt fem kolonner (FR-101)."""
+        html = _side(klient, "/")
+        assert re.search(r'<th class="tall">Signalstyrke <button type="button" class="hjelpeknapp" popovertarget="hjelp-signalstyrke"[^>]*>\?</button></th>', html)
+        thead = html.split("<thead>")[1].split("</thead>")[0]
+        assert thead.count("<th") == 5
+        vindu = html.split('<div id="hjelp-signalstyrke"')[1].split("</body>")[0]
+        assert "<h2>Signalstyrke</h2>" in vindu
+        for noekkel in ("signalstyrke", "uten_styrke", "ikke_raad"):
+            assert hjelpetekster()[noekkel].tekst in vindu, noekkel
+
+    def test_ingen_skript_og_ingenting_fra_nettet(self, klient, base):
+        """Kontrollpunktet: uten nettkall. Ville feilet hvis en side hentet
+        et skript, et stilark eller en skrift fra nettet."""
+        for adresse in SIDENE:
+            html = _side(klient, adresse)
+            assert "<script" not in html.lower(), adresse
+            assert not re.search(r'(src|href)\s*=\s*"(https?:)?//', html), adresse
+            assert "url(" not in html and "@import" not in html, adresse
+
+    def test_hver_knapp_aapner_et_vindu_paa_samme_side(self, klient, base):
+        """Ville feilet hvis knappen pekte paa et id som ikke finnes, og
+        vinduet aldri aapnet seg."""
+        for adresse in SIDENE:
+            html = _side(klient, adresse)
+            maal = set(re.findall(r'popovertarget="([^"]+)"', html))
+            vinduer = set(re.findall(r'<div id="([^"]+)" class="hjelpevindu" popover>', html))
+            assert maal and maal == vinduer, adresse
+
+    def test_knappen_virker_med_tastatur_og_skjermleser(self, klient, base):
+        """En <button> kan naas med Tab og aapnes med Enter, og popover
+        lukkes med Esc. Knappen har et navn, og vinduet en lukkeknapp."""
+        for adresse in SIDENE:
+            html = _side(klient, adresse)
+            for knapp in re.findall(r'<button type="button" class="hjelpeknapp"[^>]*>', html):
+                assert 'aria-label="Hjelp: ' in knapp
+            for vindu in re.findall(r'<div id="([^"]+)" class="hjelpevindu" popover>', html):
+                assert f'popovertarget="{vindu}" popovertargetaction="hide">Lukk</button>' in html
+
+    def test_vinduet_passer_paa_en_telefon(self, klient, base):
+        html = _side(klient, "/")
+        assert "width: min(32rem, calc(100vw - 2rem)); max-height: 80vh; overflow: auto;" in html
+
+    def test_tom_base_har_ogsaa_hjelpen(self, klient):
+        """Uten kurser er det ingen tabell, men «?» ved overskriften virker."""
+        html = _side(klient, "/")
+        assert 'popovertarget="hjelp-oversikt"' in html
+        assert 'id="hjelp-oversikt"' in html
+        assert 'popovertarget="hjelp-signalstyrke"' not in html
+
+
+class TestSnittetIGrafen:
+    def test_ma_vinduet_kommer_fra_parametre(self, klient, base, monkeypatch):
+        """Svar 4 11.10: «50-dagers snitt» i aksje.html hentes fra Parametre.
+        Ville feilet hvis 50 sto fast i malen."""
+        assert "50-dagers snitt (sjekk 1)" in _side(klient, "/aksje/BRFE")
+        monkeypatch.setattr(app_modul, "STANDARD", Parametre(ma_vindu=40))
+        html = _side(klient, "/aksje/BRFE")
+        assert "40-dagers snitt (sjekk 1)" in html
+        assert "med 40-dagers glidende snitt" in html
+        assert "50-dagers" not in html

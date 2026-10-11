@@ -1,0 +1,53 @@
+{#- Story 8.0b: hjelpen bak «?». Ren HTML med attributtet popover, uten
+    skript og uten noe fra nettet. Tekstene kommer fra hjelpetekster.py
+    gjennom hjelp.tekst(), som feiler paa en noekkel som ikke finnes.
+
+    Knappen staar der hjelpen gjelder, og vinduet sist i <body>, fordi en
+    <th> ikke kan ha overskrifter. Grått, aldri gult (designregler §3).
+    Importeres med «with context», saa hjelp er med. -#}
+
+{% macro hjelpestil() -%}
+    .tittelrad { display: flex; align-items: center; gap: 0.5rem; }
+    button.hjelpeknapp {
+      font: inherit; font-size: 0.85rem; font-weight: 700; line-height: 1;
+      width: 1.75rem; height: 1.75rem; padding: 0; margin-left: 0.25rem;
+      border: 1px solid var(--dempet); border-radius: 50%;
+      background: #fff; color: var(--tekst); cursor: pointer; vertical-align: middle;
+    }
+    button.hjelpeknapp:focus-visible,
+    .hjelpevindu button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+    .hjelpevindu {
+      width: min(32rem, calc(100vw - 2rem)); max-height: 80vh; overflow: auto;
+      margin: auto; padding: 1rem 1.25rem; box-sizing: border-box;
+      border: 1px solid var(--strek); border-radius: 6px;
+      background: #fff; color: var(--tekst); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+    .hjelpevindu .hjelpetopp { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+    .hjelpevindu h2 { font-size: 1.05rem; margin: 0; }
+    .hjelpevindu h3 { font-size: 0.9rem; margin: 1rem 0 0.3rem; }
+    .hjelpevindu p { font-size: 0.9rem; line-height: 1.45; margin: 0.3rem 0; }
+    .hjelpevindu button.lukk {
+      font: inherit; font-size: 0.85rem; padding: 0.3rem 0.7rem; cursor: pointer;
+      border: 1px solid var(--dempet); border-radius: 4px; background: #fff; color: var(--tekst);
+    }
+{%- endmacro %}
+
+{% macro hjelpeknapp(id, etikett) -%}
+<button type="button" class="hjelpeknapp" popovertarget="{{ id }}" aria-label="{{ etikett }}">?</button>
+{%- endmacro %}
+
+{% macro hjelpevindu(id, tittel, grupper) -%}
+<div id="{{ id }}" class="hjelpevindu" popover>
+  <div class="hjelpetopp">
+    <h2>{{ tittel }}</h2>
+    <button type="button" class="lukk" popovertarget="{{ id }}" popovertargetaction="hide">Lukk</button>
+  </div>
+  {% for overskrift, noekler in grupper %}
+    {% if overskrift %}<h3>{{ overskrift }}</h3>{% endif %}
+    {% for noekkel in noekler %}
+      {% set tekst = hjelp.tekst(noekkel) %}
+      <p>{% if tekst.tittel %}<strong>{{ tekst.tittel }}</strong> {% endif %}{{ tekst.tekst }}</p>
+    {% endfor %}
+  {% endfor %}
+</div>
+{%- endmacro %}

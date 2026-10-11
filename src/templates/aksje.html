@@ -1,3 +1,4 @@
+{% from "_hjelp.html" import hjelpestil, hjelpeknapp, hjelpevindu with context -%}
 <!DOCTYPE html>
 <html lang="no">
 <head>
@@ -64,6 +65,8 @@
       padding: 0.5rem 1rem;
       font-weight: bold;
     }
+    /* Story 8.0b: hjelpen bak «?». */
+    {{ hjelpestil() }}
   </style>
 </head>
 <body>
@@ -72,7 +75,10 @@
   {% endif %}
   <a class="tilbake" href="/">← Markedsoversikt</a>
 
-  <h1>{{ detalj.aksje.navn }}</h1>
+  <div class="tittelrad">
+    <h1>{{ detalj.aksje.navn }}</h1>
+    {{ hjelpeknapp("hjelp-aksje", "Hjelp: tallene og signalet") }}
+  </div>
   <p class="meta">
     {{ detalj.aksje.ticker }} · {{ detalj.aksje.sektor }} · {{ detalj.dato }}
     {% if hentet %}· data hentet {{ hentet|norsk_tid }}{% endif %}
@@ -101,7 +107,7 @@
   {% if graf %}
     <figure>
       <svg viewBox="0 0 {{ graf.bredde }} {{ graf.hoyde }}" role="img"
-           aria-label="Kursutvikling for {{ detalj.aksje.navn }} med 50-dagers glidende snitt">
+           aria-label="Kursutvikling for {{ detalj.aksje.navn }} med {{ parametre.ma_vindu }}-dagers glidende snitt">
         {% for linje in graf.rutenett %}
           <line class="rute" x1="0" y1="{{ "%.1f"|format(linje.y) }}"
                 x2="{{ graf.bredde }}" y2="{{ "%.1f"|format(linje.y) }}"></line>
@@ -118,7 +124,7 @@
       <div class="tegnforklaring">
         <span><span class="prikk kurs"></span>Utbyttejustert kurs</span>
         {% if graf.har_ma50 %}
-          <span><span class="prikk ma50"></span>50-dagers snitt (sjekk 1)</span>
+          <span><span class="prikk ma50"></span>{{ parametre.ma_vindu }}-dagers snitt (sjekk 1)</span>
         {% endif %}
       </div>
 
@@ -184,5 +190,14 @@
     Signalet bygger bare på kurs og volum. Børsmeldinger og kommende
     finansielle hendelser er ikke med i denne versjonen.
   </p>
+
+  {{ hjelpevindu("hjelp-aksje", "Tallene og signalet", [
+    ("Tallene", ["sluttkurs", "utbyttejustert", "grafen", "data_hentet_aksje"]),
+    ("Signalstyrke", ["signalstyrke"]),
+    ("Retning", ["retning", "positiv", "negativ", "blandet", "ingen", "ukjent_aksje"]),
+    ("De tre sjekkene", ["trend", "bevegelse", "interesse", "ga", "maalt_mot", "antall_dager", "hvorfor_tre"]),
+    ("Grensene", ["grensene", "skjevhet"]),
+    ("Ikke et råd", ["ikke_raad"]),
+  ]) }}
 </body>
 </html>

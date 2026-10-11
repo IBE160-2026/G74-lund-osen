@@ -176,7 +176,8 @@ def test_viser_selskapsnavn_og_de_fem_kolonnene(klient, monkeypatch):
     html = klient.get("/").data.decode("utf-8")
 
     for overskrift in ("Selskap", "Sluttkurs", "Endring", "Signalstyrke", "Retning"):
-        assert f"<th>{overskrift}</th>" in html or f">{overskrift}</th>" in html
+        # Signalstyrke har «?» etter ordet fra story 8.0b, i samme celle.
+        assert re.search(rf"<th[^>]*>{overskrift}( <button[^<]*>\?</button>)?</th>", html), overskrift
     assert "Equinor" in html
 
 
@@ -1189,7 +1190,8 @@ class TestVurderingenIDetaljen:
         assert svar.status_code == 200
         assert "<svg" in html
         assert f"Ingen vurdering for {rader[-1].dato.isoformat()}: ingen kurs fra dagen." in html
-        assert "Målt mot" not in html
+        # Tabellen, ikke hjelpeteksten om kolonnen (story 8.0b).
+        assert "<th>Målt mot</th>" not in html
 
     def test_lang_serie_med_signal_ikke_regnet_sier_ikke_antall_dager(self, klient):
         """Raadet 03.10: signal_ikke_regnet paa en serie som er lang nok, for
@@ -1212,7 +1214,8 @@ class TestVurderingenIDetaljen:
 
         assert "ikke vurdert" in html
         assert "hentekommandoen har ikke skrevet en vurdering" in html
-        assert "Målt mot" not in html
+        # Tabellen, ikke hjelpeteksten om kolonnen (story 8.0b).
+        assert "<th>Målt mot</th>" not in html
 
     def test_feil_i_spoerringen_gir_503_paa_begge_rutene(self, klient):
         """Gjennomgangen av 2.2b: en sqlite3-feil i selve spoerringen, her en

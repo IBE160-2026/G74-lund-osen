@@ -38,6 +38,7 @@ from boersdag import norsk_dato
 from graf import bygg_graf
 from kursdata import Kursleser
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER
+from hjelpetekster import Hjelp, hjelpetekster
 from lagring_sqlite import (
     DEMOMERKE,
     SqliteKurslager,
@@ -57,6 +58,7 @@ from markedsoversikt import (
 )
 from migrering import MigrasjonsFeil
 from oversiktsdata import Oversiktsleser
+from signalberegning import STANDARD
 from tallformat import tall
 
 # Kommandoen den tomme siden ber brukeren kjoere. Den staar ogsaa i README, og
@@ -208,6 +210,18 @@ def _aapne_basen() -> None:
 def _eksempeltall():
     """«Eksempeltall» paa hver side som viser en base med demomerket."""
     return {"eksempeltall": g.get("eksempeltall", False)}
+
+
+# Story 8.0b: tekstene bak «?», med tallene fra parametrene som gjelder i
+# appen. Malene henter dem med hjelp.tekst(), og MA-vinduet i grafens
+# tegnforklaring med parametre.ma_vindu.
+HJELP = Hjelp(hjelpetekster(STANDARD))
+
+
+@app.context_processor
+def _hjelp():
+    """Hjelpetekstene og parametrene paa hver side."""
+    return {"hjelp": HJELP, "parametre": STANDARD}
 
 
 @app.teardown_appcontext
