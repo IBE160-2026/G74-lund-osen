@@ -23,11 +23,18 @@ DESIMALER = {
     "forhold": 2,
     "volum": 0,
     "akse": 0,
+    # Story 8.0b: tallene i hjelpetekstene. Heltall er vinduer og terskelen,
+    # faktor er volumfaktoren (1,5), grense er noeytralsonen i prosent (2 %),
+    # og andel er en maalt andel i prosent (60,0 %). Ingen av dem har fortegn.
+    "heltall": 0,
+    "faktor": 1,
+    "grense": 0,
+    "andel": 1,
 }
 
 # Slagene som vises med fortegn og prosent.
 MED_FORTEGN = {"endring", "maaling"}
-PROSENT = {"endring", "maaling"}
+PROSENT = {"endring", "maaling", "grense", "andel"}
 
 MEST_DESIMALER = 6
 
