@@ -358,10 +358,17 @@ def _kom_i_gang() -> str:
     return tekst.split("## Kom i gang\n", 1)[1].split("\n## ", 1)[0]
 
 
+def _blokkene(tekst: str) -> list[tuple[str, str]]:
+    """Kodeblokkene i teksten som (spraak, innhold). En blokk uten spraak er
+    kommandoer. ```text er det terminalen viser (story 3.4, PR 3)."""
+    return re.findall(r"^```(\w*)\n(.*?)^```$", tekst, re.MULTILINE | re.DOTALL)
+
+
 def _kommandoene() -> list[str]:
-    """Hver kommando i kodeblokkene i «Kom i gang», uten kommentaren bak #."""
-    blokker = _kom_i_gang().split("```\n")[1::2]
-    return [l.split("#")[0].strip() for b in blokker for l in b.splitlines() if l.strip()]
+    """Hver kommando i kodeblokkene uten spraak i «Kom i gang». Fra PR 3 har
+    ingen linje kommentar med #, og testen for det staar for seg."""
+    return [l.strip() for spraak, b in _blokkene(_kom_i_gang()) if not spraak
+            for l in b.splitlines() if l.strip()]
 
 
 class TestReadme:
@@ -409,17 +416,18 @@ class TestReadme:
         assert "etter kl. 22" in _kom_i_gang() and "helgen" in _kom_i_gang()
 
     def test_demoen_er_den_foerste_kommandoen(self):
-        """Story 3.4, PR 2: etter git clone og cd er den foerste kommandoen
-        demoen, som virker uten .env og uten noekkel. Ville feilet hvis
-        README-en ba om .env foer demoen."""
+        """Story 3.4, PR 2: den foerste kommandoen er demoen, som virker uten
+        .env og uten noekkel. Fra PR 3 hentes koden med «Download ZIP» foer
+        den, og ikke med git clone (svar 1 11.10). Ville feilet hvis
+        README-en ba om .env foer demoen, eller sendte git clone foerst."""
         del_ = _kom_i_gang()
-        blokk = del_.split("```\n", 2)[1]
-        kommandoer = [l.split("#")[0].strip() for l in blokk.splitlines() if l.strip()]
-        assert kommandoer[0].startswith("git clone") and kommandoer[1].startswith("cd ")
-        assert kommandoer[2] == "docker compose up --build demo"
+        kommandoer = _kommandoene()
+        assert kommandoer[0] == "docker compose up --build demo"
         demo = del_.split("### Den ekte versjonen", 1)[0]
         assert "Start Docker Desktop" in demo and "http://127.0.0.1:5000" in demo
-        assert "Eksempeltall" in demo and ".env" not in blokk
+        assert "Eksempeltall" in demo
+        assert demo.index("«Download ZIP»") < demo.index("docker compose up --build demo")
+        assert "git clone" not in demo.split("### Hvis noe går galt", 1)[0]
         assert del_.index("docker compose up --build demo") < del_.index("cp .env.example .env")
 
     def test_kommandoene_er_de_samme_som_i_koden_og_compose(self):

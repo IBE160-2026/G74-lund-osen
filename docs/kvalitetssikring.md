@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-10T17:37
+updated: 2026-10-11T20:36
 ---
 
 # Kvalitetssikring
@@ -521,27 +521,33 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
 
 | # | Kommando eller steg i README-en | Det som skjedde |
 |---|---|---|
-| 1 | Start Docker Desktop og vent til motoren kjører | |
-| 2 | `git clone https://github.com/IBE160-2026/G74-lund-osen.git` | |
-| 3 | `cd G74-lund-osen` | |
-| 4 | `docker compose up --build demo` | |
-| 5 | Åpne http://127.0.0.1:5000. Står «Eksempeltall» på siden? | |
-| 6 | En aksje i demoen åpnes fra oversikten | |
-| 7 | `docker compose run --rm demo-lag`, i et nytt vindu mens demoen kjører | |
-| 8 | `Ctrl+C` i vinduet med demoen | |
-| 9 | `docker compose --profile demo down` | |
-| 10 | `cp .env.example .env` (uten å fylle inn nøkkelen) | |
-| 11 | `docker compose up --build` og http://127.0.0.1:5000 | |
-| 12 | `docker compose run --rm hent`, uten nøkkel | |
-| 13 | Siden lastet på nytt | |
-| 14 | `docker compose down` | |
-| 15 | Byttet: `docker compose --profile demo down`, så `docker compose up --build`, så det samme tilbake til `docker compose up --build demo` | |
-| 16 | uv: `uv sync` | |
-| 17 | `uv run python src/demo.py` | |
-| 18 | `uv run python src/app.py --demo` og http://127.0.0.1:5000 | |
-| 19 | `uv run python src/fetch_prices.py`, uten nøkkel | |
-| 20 | `uv run python src/app.py` | |
-| 21 | `docker ps -a` til slutt: står det containere igjen fra prøven? | |
+| 1 | Steg 1: installer Docker Desktop, hvis maskinen ikke har det. Ba installasjonen om administrator eller omstart? | |
+| 2 | Steg 2: start Docker Desktop uten å logge inn, og vent til det står «Engine running» | |
+| 3 | Steg 3: «Code» → «Download ZIP» på GitHub, og pakk ut med «Pakk ut alle» (Windows) eller dobbeltklikk (Mac). Lå det en mappe med samme navn inni? | |
+| 4 | Steg 4: åpne «Windows PowerShell» (Windows) eller Terminal (Mac) | |
+| 5 | Steg 5: `cd`, mellomrom, og mappa dratt inn i vinduet. Fikk en sti med mellomrom anførselstegn? | |
+| 6 | Steg 6: `docker compose up --build demo`, til den siste linja er den med «Serving on». Hvor lang tid tok det? | |
+| 7 | Steg 7: åpne http://127.0.0.1:5000. Står «Eksempeltall» på siden? | |
+| 8 | En aksje i demoen åpnes fra oversikten | |
+| 9 | `docker compose run --rm demo-lag`, i et nytt vindu mens demoen kjører | |
+| 10 | Steg 8: `Ctrl+C` i vinduet med demoen, så `docker compose --profile demo down`. Stod det «Removed»? | |
+| 11 | `cp .env.example .env` (uten å fylle inn nøkkelen) | |
+| 12 | `docker compose up --build` og http://127.0.0.1:5000 | |
+| 13 | `docker compose run --rm hent`, uten nøkkel | |
+| 14 | Siden lastet på nytt | |
+| 15 | `docker compose down` | |
+| 16 | Byttet: `docker compose --profile demo down`, så `docker compose up --build`, så det samme tilbake til `docker compose up --build demo` | |
+| 17 | uv: `uv sync` | |
+| 18 | `uv run python src/demo.py` | |
+| 19 | `uv run python src/app.py --demo` og http://127.0.0.1:5000 | |
+| 20 | `uv run python src/fetch_prices.py`, uten nøkkel | |
+| 21 | `uv run python src/app.py` | |
+| 22 | `docker ps -a` til slutt: står det containere igjen fra prøven? | |
+| 23 | Ble noe i «Hvis noe går galt» brukt? Hvilket, og hjalp svaret? | |
+
+- **Prøvd på Mac:** ikke prøvd (svar 3 11.10). Står slik til noen har prøvd stegene på en Mac.
+
+*Rettet 2026-10-11 (story 3.4, PR 3):* radene 1–10 følger de nye stegene i «Kom i gang». Her sto `git clone https://github.com/IBE160-2026/G74-lund-osen.git` og `cd G74-lund-osen` som rad 2 og 3, og `Ctrl+C` og `docker compose --profile demo down` som to rader. Koden hentes nå med «Download ZIP», så mappa heter `G74-lund-osen-main`, ikke `G74-lund-osen` som i punktet om maskinen over. Rad 23 er ny.
 
 - **Det som ikke stemte:**
 - **Rettet i** (commit eller story):

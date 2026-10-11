@@ -19,31 +19,120 @@ Til faglærer: leveranselista står i [`docs/innlevering.md`](docs/innlevering.m
 
 ## Kom i gang
 
-Docker er hovedmåten. Du trenger [Docker Desktop](https://www.docker.com/products/docker-desktop/) (eller Docker Engine med Compose på Linux) og git. Kommandoene er de samme i PowerShell på Windows og i terminalen på macOS og Linux.
+Docker er hovedmåten: Docker Desktop på Windows og Mac, eller Docker Engine med Compose på Linux. Kommandoene er de samme i PowerShell på Windows og i Terminal på Mac og Linux.
 
-### Demoen, uten nøkkel
+### Før du begynner
 
-Start Docker Desktop og vent til den sier at motoren kjører. Så:
+- En Windows-maskin eller en Mac. På Linux bruker du Docker Engine med Compose og kommandoene i steg 6 og 8.
+- Lov til å installere programmer. På Windows betyr det å være administrator på maskinen, eller å ha en som kan godkjenne.
+- Nett. Docker Desktop og den første byggingen laster ned en del.
+- Litt tid. Første gang tar installasjonen og byggingen en stund. Neste gang går det raskere.
+
+Demoen trenger verken git, konto eller nøkkel. Du laster ned koden som en ZIP-fil og skriver to kommandoer i et terminalvindu.
+
+### Demoen, steg for steg
+
+**1. Installer Docker Desktop.** Last det ned fra [docker.com](https://www.docker.com/products/docker-desktop/), og kjør installasjonen.
+
+- Windows: åpne fila du lastet ned, og behold valgene som er krysset av. Spør Windows om programmet får gjøre endringer, svarer du ja. Ber Windows om omstart, gjør det.
+- Mac: velg «Apple Silicon» hvis Apple-menyen → Om denne maskinen (About This Mac) viser en M-brikke på linja Brikke (Chip), ellers «Intel». Åpne fila og dra Docker til Programmer (Applications).
+
+Når det har gått bra, ligger Docker Desktop i Start-menyen (Windows) eller i Programmer (Mac). Ber installasjonen om administrator, se [Hvis noe går galt](#hvis-noe-går-galt).
+
+**2. Start Docker Desktop, og vent til motoren kjører.** Åpne Docker Desktop fra Start-menyen eller Programmer. Første gang godtar du vilkårene. Du trenger ikke logge inn eller lage konto, så hopp over innloggingen hvis Docker Desktop spør.
+
+Når det har gått bra, står det «Engine running» nederst i vinduet. La Docker Desktop være åpent, men skriv ingenting i det. Står det ikke «Engine running» etter noen minutter, se [Hvis noe går galt](#hvis-noe-går-galt).
+
+**3. Last ned koden.** Gå til [repoet på GitHub](https://github.com/IBE160-2026/G74-lund-osen), trykk den grønne knappen «Code» og så «Download ZIP». Pakk ut fila:
+
+- Windows: åpne Nedlastinger (Downloads) i Filutforsker (File Explorer), høyreklikk `G74-lund-osen-main.zip` og velg «Pakk ut alle» (Extract All) og så «Pakk ut» (Extract).
+- Mac: dobbeltklikk `G74-lund-osen-main.zip` i Nedlastinger (Downloads).
+
+Når det har gått bra, har du en mappe som heter `G74-lund-osen-main`, med blant annet `README.md` og `compose.yaml`. Ligger det en mappe med samme navn inni den, er det den innerste du skal bruke. Har du fått koden som mappe eller ZIP-fil fra før, pakker du den ut og går til steg 4.
+
+**4. Åpne et terminalvindu.** Et terminalvindu er et vindu der du skriver kommandoer i stedet for å klikke.
+
+- Windows: trykk Start, skriv `PowerShell` og åpne «Windows PowerShell».
+- Mac: trykk Cmd+mellomrom, skriv `Terminal` og trykk Enter.
+
+Når det har gått bra, ser du et vindu med en linje som venter på at du skriver.
+
+**5. Gå til mappa med koden.** Skriv `cd` og et mellomrom i terminalvinduet, dra mappa `G74-lund-osen-main` fra Filutforsker eller Finder inn i vinduet, og trykk Enter. `cd` betyr «gå til mappe», og kommandoene under virker bare fra mappa med koden.
+
+Når det har gått bra, slutter linja som venter, med `G74-lund-osen-main`.
+
+**6. Start demoen.** Kopier kommandoen under med knappen til høyre i boksen, lim den inn i terminalvinduet og trykk Enter:
 
 ```
-git clone https://github.com/IBE160-2026/G74-lund-osen.git
-cd G74-lund-osen
-docker compose up --build demo           # demoen på http://127.0.0.1:5000
+docker compose up --build demo
 ```
 
-Åpne http://127.0.0.1:5000. Demoen trenger verken `.env` eller nøkkel, og gjør ingen kall. Sidene sier «Eksempeltall»: 15 oppdiktede selskaper med kurser til fredag 9. oktober 2026, ikke data fra Oslo Børs. Demobasen lages på nytt hver gang demoen starter, i sitt eget volum, `ose-demo`. Den ekte basen røres ikke. Mens demoen kjører, kan demobasen også lages på nytt med `docker compose run --rm demo-lag`.
+Første gang bygger Docker appen. Det tar noen minutter, og det kommer mange linjer i vinduet. Når det har gått bra, er den siste linja denne:
 
-Stopp med `Ctrl+C` i vinduet, og fjern containerne med:
+```text
+demo-1  | INFO:waitress:Serving on http://0.0.0.0:5000
+```
+
+La terminalvinduet stå åpent mens du bruker demoen. `0.0.0.0` er adressen inne i Docker, og du åpner adressen i neste steg. Kommer det en feil i stedet, se [Hvis noe går galt](#hvis-noe-går-galt).
+
+**7. Åpne demoen i nettleseren.** Gå til http://127.0.0.1:5000.
+
+Når det har gått bra, står det øverst på siden: «Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.» Under står en tabell med aksjer. Klikk på et selskapsnavn for å se aksjen.
+
+**8. Stopp demoen.** Gå tilbake til terminalvinduet og trykk Ctrl+C, også på Mac. Lim så inn denne og trykk Enter:
 
 ```
 docker compose --profile demo down
 ```
 
+Når det har gått bra, står det at containerne er fjernet (Removed). Nå kan du lukke terminalvinduet og Docker Desktop. Neste gang starter du på steg 2 og hopper over steg 3.
+
+Sidene sier «Eksempeltall»: 15 oppdiktede selskaper med kurser til fredag 9. oktober 2026, ikke data fra Oslo Børs. Demoen trenger verken `.env` eller nøkkel, og gjør ingen kall. Demobasen lages på nytt hver gang demoen starter, i sitt eget volum, `ose-demo`. Den ekte basen røres ikke. Mens demoen kjører, kan demobasen også lages på nytt med `docker compose run --rm demo-lag` i et nytt terminalvindu, fra samme mappe.
+
+### Hvis noe går galt
+
+**Må jeg logge inn eller lage konto?** Nei. Hopp over innloggingen i Docker Desktop. Demoen trenger verken Docker-konto, GitHub-konto eller nøkkel.
+
+**Installasjonen ber om administrator.** Docker Desktop må installeres av en som er administrator på maskinen. Spør den som har ansvar for maskinen, eller bruk en annen maskin.
+
+**Docker Desktop sier at virtualisering mangler.** Virtualisering må være slått på i maskinens oppstartsinnstillinger (BIOS eller UEFI). Hvordan, er forskjellig fra maskin til maskin. Spør den som har ansvar for maskinen, eller søk på maskinmodellen og «enable virtualization».
+
+**Docker Desktop ber om å oppdatere WSL (Windows).** Følg beskjeden, eller lim inn `wsl --update` i PowerShell og start Docker Desktop på nytt.
+
+**Det står ikke «Engine running» etter noen minutter.** Avslutt Docker Desktop helt (Quit Docker Desktop), åpne det igjen og vent. Hjelper ikke det, starter du maskinen på nytt.
+
+**«docker» er ikke gjenkjent, eller «command not found: docker».** Docker Desktop er ikke installert, eller terminalvinduet ble åpnet før installasjonen. Lukk terminalvinduet og åpne et nytt (steg 4).
+
+**«Cannot connect to the Docker daemon», «error during connect» eller «dockerDesktopLinuxEngine».** Docker Desktop er ikke startet, eller motoren er ikke klar. Gjør steg 2, vent til det står «Engine running», og prøv kommandoen igjen.
+
+**Ingenting skjer når jeg limer inn.** Kommandoene skrives i PowerShell eller Terminal, ikke i Docker Desktop. Docker Desktop skal bare være åpent. Ledetekst (Command Prompt) på Windows virker også for demoen, men stegene er skrevet for PowerShell.
+
+**To kommandoer havnet på samme linje**, for eksempel med feilen «no such service». Lim inn én kommando om gangen, og trykk Enter etter hver. Står det noe på linja fra før, sletter du det først.
+
+**Stien har mellomrom og fikk ikke anførselstegn.** Får du en feil etter `cd` når mappa ligger i en mappe med mellomrom i navnet, skriver du anførselstegn rundt stien, for eksempel `cd "C:\Users\Ola Nordmann\Downloads\G74-lund-osen-main"`.
+
+**«no configuration file provided: not found».** Terminalvinduet står i feil mappe. Gjør steg 5 på nytt, og dra den mappa som inneholder `compose.yaml`.
+
+**«toomanyrequests» fra Docker Hub.** Docker Hub begrenser hvor ofte en nettadresse kan laste ned uten innlogging. Prøv igjen senere, eller fra et annet nett. Innlogging i Docker Desktop hever grensen, men trengs ellers ikke.
+
+**«port is already allocated» eller «address already in use».** Noe annet bruker port 5000. Kjører den ekte versjonen, stopper du den først (se «Bytte mellom demoen og den ekte versjonen»). På Mac bruker AirPlay-mottakeren (AirPlay Receiver) port 5000. Slå den av under Systeminnstillinger (System Settings) → Generelt (General) → AirDrop og Handoff (AirDrop & Handoff), og prøv igjen.
+
+**Mappa finnes fra før.** Ligger det en `.env` med nøkkelen din i den gamle mappa, flytter du den ut først. Slett så den gamle mappa og pakk ut på nytt. Demodataene ligger i Docker, ikke i mappa, så de går ikke tapt. Har du hentet koden med `git clone`, går du heller inn i mappa og skriver `git pull`.
+
+**Siden åpnes ikke.** Vent til linja med «Serving on» har kommet, og sjekk at terminalvinduet fortsatt er åpent. Adressen er http://127.0.0.1:5000, ikke 0.0.0.0.
+
 ### Den ekte versjonen, med egen nøkkel
 
+Bare første gang: kopier malen, og fyll inn `EODHD_API_KEY` i `.env` (se «Nøkkelen» under).
+
 ```
-cp .env.example .env                     # bare første gang: fyll inn EODHD_API_KEY i .env
-docker compose up --build                # webserveren på http://127.0.0.1:5000
+cp .env.example .env
+```
+
+Start webserveren på http://127.0.0.1:5000:
+
+```
+docker compose up --build
 ```
 
 Hent kursene i et nytt vindu, fra samme mappe:
@@ -68,10 +157,22 @@ docker compose down
 
 Begge bruker port 5000, så bare én kan kjøre om gangen. `docker compose down` stopper ikke demoen, fordi demoen ligger i en egen profil. `docker compose --profile demo down` stopper begge. Start så den du vil bruke:
 
+Stopp demoen og den ekte versjonen:
+
 ```
-docker compose --profile demo down       # stopper demoen og den ekte versjonen
-docker compose up --build                # den ekte versjonen
-docker compose up --build demo           # eller demoen
+docker compose --profile demo down
+```
+
+Start så den ekte versjonen:
+
+```
+docker compose up --build
+```
+
+eller demoen:
+
+```
+docker compose up --build demo
 ```
 
 Volumene står når du bytter, også basen med vurderingene.
@@ -80,18 +181,42 @@ Volumene står når du bytter, også basen med vurderingene.
 
 Med Python 3.13 og [uv](https://docs.astral.sh/uv/). Demoen:
 
+Installer avhengighetene:
+
 ```
-uv sync                                  # installerer avhengighetene
-uv run python src/demo.py                # lager demobasen, data/db/demo.db
-uv run python src/app.py --demo          # demoen på http://127.0.0.1:5000
+uv sync
+```
+
+Lag demobasen, `data/db/demo.db`:
+
+```
+uv run python src/demo.py
+```
+
+Start demoen på http://127.0.0.1:5000:
+
+```
+uv run python src/app.py --demo
 ```
 
 Den ekte versjonen:
 
+Bare første gang: kopier malen, og fyll inn `EODHD_API_KEY` i `.env`.
+
 ```
-cp .env.example .env                     # bare første gang: fyll inn EODHD_API_KEY
-uv run python src/fetch_prices.py        # henter kurser
-uv run python src/app.py                 # http://127.0.0.1:5000
+cp .env.example .env
+```
+
+Hent kurser:
+
+```
+uv run python src/fetch_prices.py
+```
+
+Start webserveren på http://127.0.0.1:5000:
+
+```
+uv run python src/app.py
 ```
 
 Basen, demobasen og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo` åpner webserveren den ekte basen.
