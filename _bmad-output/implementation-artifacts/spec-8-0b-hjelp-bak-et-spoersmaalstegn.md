@@ -2,7 +2,7 @@
 title: 'Story 8.0b: Hjelp bak et spørsmålstegn'
 type: 'feature'
 created: '2026-10-11'
-status: 'in-progress'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '00a69ceb262e1850e53d9a4320b84772b88b51ba'
@@ -100,11 +100,41 @@ Planen ble vist i chatten 11.10 og er ført i `docs/ai-prompts/2026-10-11.md` (i
 - **To tester i `test_app.py`** så etter ordene «Signalstyrke» og «Målt mot», som nå også står i hjelpen. De ser nå etter tabellcellen.
 - **`docs/kvalitetssikring.md` er ikke endret.** §8 sier at dokumentet oppdateres ved hver epic, og 2.3 og 3.1–3.4 har heller ingen rad ennå. Mutantene står under Verification med testene som fanget dem, som §8 krever fra 03.10.
 - **README:** Status-linjen sier at 2.3b og 8.0b er flettet. Det stemmer når 8.0b flettes, fordi 8.0b venter på PR #28 (svar 5).
+- **Nettlesere uten `popover`** (Safari før 17, Firefox før 125) bruker ikke attributtet. Vinduet blir en vanlig `<div>` nederst på siden, med teksten åpen, og «?» gjør ingenting. Det er ikke prøvd i en slik nettleser.
+- **Etter gjennomgangen** (`45623d4`): teksten om målingen bruker `MAALTE_GRENSER` og ikke `p`, fordi den sier hva som ble målt (Boundaries: målinger er egne konstanter). `test_andre_parametre_gir_andre_tall` ser derfor bort fra `grensene`, og `TestGrensene` krever at `STANDARD` er lik de målte grensene.
 - **Regel 22:** basene i testene ligger i `tmp_path`. HTML-en ble kontrollert én gang med en demobase i scratch-mappa for økta.
 
 ## Spec Change Log
 
 ## Review Triage Log
+
+Gjennomgangen 11.10 av diffen fra `00a69ce` til `3f6d4ec`: Blind Hunter (BH, 12 funn), Edge Case Hunter (ECH, 8 funn og kontrollen av tekstene mot kildene) og Verification Gap (VG, 2 hull og kontrollen av tekstene). Rettingene står i `45623d4`.
+
+| # | Funn | Dom | Rute og grunn |
+|---|---|---|---|
+| 1 | ECH, VG: `maalt_mot` sier «grensen det ble målt mot», men trend viser MA50 og interesse medianen, ikke grensen | medium | patch: «hva det ble målt mot», som FR-706. Kilden har fått FR-706-setningen |
+| 2 | ECH, VG: `grafen` beskriver den stiplede linja og tabellen også når siden ikke har dem (VRDS) | medium | patch: `grafen`, `ga` og `maalt_mot` vises bare når `graf.har_ma50` og tabellen finnes. Ny test |
+| 3 | BH, ECH: `grensene` sier at verdiene fra `p` ble kontrollert, også når `p` ikke er de målte | medium | patch: `MAALTE_GRENSER` med en test som krever `STANDARD` lik dem |
+| 4 | BH, ECH: `grense` og `faktor` runder av (1,25 vises «1,2»), og testen prøvde bare `STANDARD` | low | patch: `_vis` gir `ValueError` når tallet ikke kan vises uten avrunding. Ny test med 1,25 og 0,025 |
+| 5 | BH, ECH, VG: `HJELP` laget ved import, `parametre` per forespørsel, og `bygg_detalj` med egen standard. Testen med 40 dager viste tre ulike vinduer på én side | medium | patch: hjelpen lages i context processoren av samme `STANDARD`, som også går til `bygg_oversikt` og `bygg_detalj`. Testen krever at hjelpen følger |
+| 6 | VG: ingen test binder setningene om fortegn og sone til koden | medium | patch: `TestTekstenSierDetKodenGjoer` for interesse og trend. Resten av ordlyden er kontrollert av ECH og VG mot kildene, ikke av tester |
+| 7 | VG: `RAADSORD` fanger ikke «salg» eller «handle» | medium | patch: `salg`, `handl`, `invester` og `verdt å` (M14) |
+| 8 | ECH, VG: `skjevhet` siterer ikke stedet med «kan vare i uker» | low | patch: begrunnelser.md, «Det er en tilstand, som kan vare i uker.» |
+| 9 | ECH: `retning`, «ikke hvor kursen går videre», står ikke i FR-103 | low | patch: kilden i begrunnelser.md §6 er lagt til |
+| 10 | ECH: `uten_styrke` siterer bare `GRUNNTEKST`, men teksten under «–» kan også være «ikke vurdert» og «ikke børsdag» | low | patch: begge konstantene er lagt til som kilder |
+| 11 | BH: `Hjelp.noekler()` brukes ikke | low | patch: fjernet |
+| 12 | BH: kildetesten sjekker at stedet finnes, ikke at teksten er enig med kilden | low | avvist som kodefeil: testen sier hva den gjør, og innholdet er kontrollert av ECH og VG (rad 6) |
+| 13 | ECH: `data_hentet`, «Øverst står det eldste tidspunktet», når `hentet` er `None` | false | `sist_hentet` er `None` bare i tester. `erstatt_serie` skriver kurs og kursserie i samme transaksjon (`Rad`, `markedsoversikt.py`) |
+| 14 | VG: `uten_data` og tabellen nevnes i hjelpen på en tom side | low | avvist: hjelpen forklarer begrepene, og teksten er sann når tabellen vises |
+| 15 | VG: `utbyttejustert` nevner endringen på aksjesiden, som ikke viser den | low | avvist: setningen er sann om appen, og endringen står i oversikten |
+| 16 | VG: `endring`, «fra børsdagen før», bruker de to siste radene, som ved hull ikke er dagen før | low | avvist: samme forenkling som `endring_i_prosent` og FR-101 har fra før |
+| 17 | VG: `interesse` sier ikke at sjekken gir 0 når medianvolumet er 0 | low | avvist: teksten er ufullstendig, ikke feil, og aksjedetaljen viser grunnen («medianvolumet … er 0») |
+| 18 | BH: README sier at 8.0b er flettet før den er det | false | Svar 5: 8.0b flettes etter PR #28, og linjen er sann fra flettingen (Implementation Notes) |
+| 19 | BH: Verification har ikke tallene etter endringen | low | patch: tallene og mutantene etter rettingene står under Verification |
+| 20 | BH, ECH: nettlesere uten `popover` | low | avvist: uten støtte lar nettleseren vinduet stå åpent nederst på siden, så teksten kan leses. ECH mente at hjelpen da ikke kan nås. Det stemmer ikke. Ført i Implementation Notes |
+| 21 | BH: demoen viser ekte målinger (199 dager, 60,0 %) ved «Eksempeltall» | low | avvist: tekstene forklarer grensene appen bruker, og de er målt på ekte kurser. Kan tas opp i 8.0c eller 8.1 |
+| 22 | BH: `#fff` skrevet fast i stilen | low | avvist: sidene har ingen variabel for bakgrunn, og ingen mørk modus |
+| 23 | VG: fotnotene i `index.html` («hvor kraftig», «bør kjøpes eller selges») og `aksje.html` («summen av tallene uten fortegn») bruker ordene svar 3 tok ut av hjelpen | medium | defer: linjene fantes før 8.0b, og ingen ber om å endre dem. Ført i `deferred-work.md` |
 
 ## Verification
 
@@ -129,3 +159,11 @@ Planen ble vist i chatten 11.10 og er ført i `docs/ai-prompts/2026-10-11.md` (i
 | M11 | `id` som ikke passer med `popovertarget` | 5 tester, blant dem `test_hver_knapp_aapner_et_vindu_paa_samme_side` og `test_hjelpen_virker_ogsaa_i_demoen` |
 | M12 | «?» skjult når siden viser «Eksempeltall» | **overlevde først**, fordi lukkeknappen i vinduet også har `popovertarget`. Fanget av `test_hjelpen_virker_ogsaa_i_demoen` etter `ccdd7ee` |
 | M13 | «50-dagers snitt» skrevet fast i `aksje.html` | `test_ma_vinduet_kommer_fra_parametre` |
+| M14 | «salgssignal» i tittelen til `hvorfor_tre` | `test_ingen_tekst_kan_leses_som_et_raad` (etter gjennomgangen) |
+| M15 | fortegnene byttet i `interesse` («-1 en dag kursen steg») | `test_interesse[…+1 en dag kursen steg]`, `test_interesse[…-1 en dag den falt]` |
+| M16 | `grafen` står i hjelpen også uten graf og tabell | `test_grafen_og_tabellen_forklares_bare_naar_de_vises` |
+| M17 | hjelpen laget én gang ved import | `test_hver_tekst_i_fila_brukes_av_en_mal`, `test_ma_vinduet_kommer_fra_parametre` |
+| M18 | teksten om målingen tar grensene fra `p` | `test_teksten_om_maalingen_nevner_de_maalte_grensene` |
+| M19 | avrundingen i `_vis` ikke sjekket | `test_en_parameter_som_maatte_rundes_av_stopper[p0]`, `[p1]` |
+
+**Etter gjennomgangen** ble alle 19 kjørt på nytt mot `45623d4`, og alle ble fanget. M3 fanges nå av 114 tester, fordi `_vis` stopper sidene når 1,5 vises som «2». Hele testsettet på `45623d4`: 1314 passed og 16 skipped lokalt, 1330 samlet. Før storyen: 1269 passed og 16 skipped lokalt, 1285 i CI.
