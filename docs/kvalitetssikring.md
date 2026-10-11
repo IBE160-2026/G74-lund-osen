@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-11T21:15
+updated: 2026-10-11T21:20
 ---
 
 # Kvalitetssikring
@@ -526,7 +526,7 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
 | 3 | Steg 3: «Code» → «Download ZIP» på GitHub, og pakk ut med «Pakk ut alle» (Windows) eller dobbeltklikk (Mac). Lå det en mappe med samme navn inni? Viste Windows filene som README og compose? | |
 | 4 | Steg 4: åpne «Windows PowerShell», ikke «Windows PowerShell ISE» (Windows), eller Terminal (Mac) | |
 | 5 | Steg 5: `cd`, mellomrom, og mappa dratt inn i vinduet. Fikk en sti med mellomrom anførselstegn? | |
-| 6 | Steg 6: `docker compose up --build demo`, til den siste linja er den med «Serving on». Hvor lang tid tok det? | |
+| 6 | Steg 6: `docker compose up --build demo`, kopiert med knappen i boksen, til linja med «Serving on» kommer. Hvor lang tid tok det, og kom det en linje med valg under? | |
 | 7 | Steg 7: åpne http://127.0.0.1:5000. Står «Eksempeltall» på siden? | |
 | 8 | En aksje i demoen åpnes fra oversikten | |
 | 9 | `docker compose run --rm demo-lag`, i et nytt vindu mens demoen kjører | |
@@ -547,7 +547,7 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
 
 - **Prøvd på Mac:** ikke prøvd (svar 3 11.10). Står slik til noen har prøvd stegene på en Mac.
 
-*Rettet 2026-10-11 (story 3.4, PR 3):* radene 1–10 følger de nye stegene i «Kom i gang». Her sto `git clone https://github.com/IBE160-2026/G74-lund-osen.git` og `cd G74-lund-osen` som rad 2 og 3, og `Ctrl+C` og `docker compose --profile demo down` som to rader. Koden hentes nå med «Download ZIP», så mappa heter `G74-lund-osen-main`, ikke `G74-lund-osen` som i punktet om maskinen over. Rad 23 er ny. Radene 3 og 4 følger Marians svar kl. 21:14 samme dag: ZIP-fila må pakkes ut med «Pakk ut alle», Windows viser filene uten filendelse, og «Windows PowerShell ISE» står også i lista.
+*Rettet 2026-10-11 (story 3.4, PR 3):* radene 1–10 følger de nye stegene i «Kom i gang». Her sto `git clone https://github.com/IBE160-2026/G74-lund-osen.git` og `cd G74-lund-osen` som rad 2 og 3, og `Ctrl+C` og `docker compose --profile demo down` som to rader. Koden hentes nå med «Download ZIP», så mappa heter `G74-lund-osen-main`, ikke `G74-lund-osen` som i punktet om maskinen over. Rad 23 er ny. Med «Download ZIP» har prøveren ikke git: commiten som ble prøvd, er den GitHub viser øverst på siden når ZIP-fila lastes ned, og mappa som ikke skal finnes, er `G74-lund-osen-main`. Radene 3 og 4 følger Marians svar kl. 21:14 samme dag: ZIP-fila må pakkes ut med «Pakk ut alle», Windows viser filene uten filendelse, og «Windows PowerShell ISE» står også i lista.
 
 - **Det som ikke stemte:**
 - **Rettet i** (commit eller story):

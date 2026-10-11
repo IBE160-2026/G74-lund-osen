@@ -386,7 +386,8 @@ class TestReadme:
         """Rettelsen 05.10 og svaret fra hjelpelaereren. Ville feilet hvis uv
         kom foerst, eller en av kommandoene manglet."""
         del_ = _kom_i_gang()
-        for kommando in ("git clone", "cp .env.example .env", "docker compose up --build",
+        # Fra 3.4 PR 3 hentes koden med «Download ZIP», ikke git clone (svar 1 11.10).
+        for kommando in ("«Download ZIP»", "cp .env.example .env", "docker compose up --build",
                          "http://127.0.0.1:5000", "docker compose run --rm hent", "docker compose down"):
             assert kommando in del_, kommando
         assert del_.index("docker compose up --build") < del_.index("uv run python src/app.py")
@@ -500,11 +501,10 @@ class TestReadme:
     def test_readme_proeven_har_hver_kommando(self):
         """VG6: §9 i docs/kvalitetssikring.md sier at lista rettes naar
         README-en endres. Ville feilet hvis en kommando i «Kom i gang» manglet
-        i tabellen for README-proeven."""
+        i tabellen for README-proeven. Fra PR 3 teller bare radene."""
         import demo
 
-        kvalitet = (ROT / "docs" / "kvalitetssikring.md").read_text(encoding="utf-8")
-        tabell = kvalitet.split("## 9. README-prøven", 1)[1].split("\n## ", 1)[0]
+        tabell = _proevetabellen()
         for kommando in [*_kommandoene(), demo.DEMOKOMMANDO_DOCKER]:
             assert f"`{kommando}`" in tabell, kommando
 
@@ -522,6 +522,14 @@ class TestReadme:
         # Ogsaa HTML-bilder og bilder med referanse (BH7).
         assert "<img" not in tekst.lower()
         assert not re.search(r"!\[[^\]]*\]\[", tekst)
+
+
+def _proevetabellen() -> str:
+    """Radene i tabellen i §9, uten linjene under den. Den daterte linja
+    nevner kommandoer som ikke lenger er rader (gjennomgangen av PR 3, VG)."""
+    kvalitet = (ROT / "docs" / "kvalitetssikring.md").read_text(encoding="utf-8")
+    seksjon = kvalitet.split("## 9. README-prøven", 1)[1].split("\n## ", 1)[0]
+    return "\n".join(l for l in seksjon.splitlines() if l.startswith("|"))
 
 
 def _demostegene() -> str:
@@ -599,7 +607,8 @@ class TestReadmeForNybegynnere:
         """test_readme.py hopper over lenker med #. Ville feilet hvis ankeret
         til FAQ-en ikke passet med overskriften."""
         tekst = README.read_text(encoding="utf-8")
-        ankre = {_anker(o) for o in re.findall(r"^#+ (.+)$", tekst, re.MULTILINE)}
+        uten_kode = re.sub(r"^```.*?^```$", "", tekst, flags=re.MULTILINE | re.DOTALL)
+        ankre = {_anker(o) for o in re.findall(r"^#+ (.+)$", uten_kode, re.MULTILINE)}
         for maal in re.findall(r"\]\(#([^)\s]+)\)", tekst):
             assert maal in ankre, maal
 
@@ -608,8 +617,9 @@ class TestReadmeForNybegynnere:
         sitert = _steg(7).split("står det øverst på siden: «", 1)[1].split("»", 1)[0]
         for mal in ("index.html", "aksje.html", "basefeil.html"):
             tekst = (ROT / "src" / "templates" / mal).read_text(encoding="utf-8")
-            merket = re.search(r'<p class="eksempeltall">([^<]+)</p>', tekst).group(1)
-            assert sitert == merket, mal
+            treff = re.search(r'<p class="eksempeltall">([^<]+)</p>', tekst)
+            assert treff, f"{mal} har ikke merket"
+            assert sitert == treff.group(1), mal
 
     def test_linja_som_viser_at_demoen_er_klar(self):
         """Linja i steg 6 er kopiert fra en kjoering 11.10. Ville feilet hvis
@@ -620,5 +630,33 @@ class TestReadmeForNybegynnere:
         linje = tekst[0].strip()
         kommando = dict(_instruksjoner())["CMD"]
         lytter = re.search(r"--listen=([\d.]+:\d+)", kommando).group(1)
-        assert "demo" in _tjenester()
+        demo = _tjenester()["demo"]
+        assert "command" not in demo and "entrypoint" not in demo
         assert linje == f"demo-1  | INFO:waitress:Serving on http://{lytter}"
+
+    def test_bare_kommandoer_og_en_tekstblokk(self):
+        """Gjennomgangen av PR 3 (VG): en blokk med spraak, som ```powershell,
+        slapp unna testene for # og én kommando per boks. Bare blokker uten
+        spraak, og den ene ```text-blokka i steg 6, er lov."""
+        blokker = _blokkene(_kom_i_gang())
+        assert {spraak for spraak, _ in blokker} <= {"", "text"}
+        assert len([b for spraak, b in blokker if spraak == "text"]) == 1
+        assert len([b for spraak, b in _blokkene(_steg(6)) if spraak == "text"]) == 1
+
+    def test_stegene_og_henvisningene_til_dem(self):
+        """Gjennomgangen av PR 3 (VG): stegene er nummerert 1..N, hver «steg N»
+        i «Kom i gang» peker paa et steg som finnes, og §9 har «Steg 1» til
+        «Steg N» i rekkefoelge. Ville feilet hvis et steg ble satt inn uten at
+        henvisningene og §9 fulgte med."""
+        numre = [int(n) for n in re.findall(r"^\*\*(\d+)\. ", _demostegene(), re.MULTILINE)]
+        assert numre == list(range(1, len(numre) + 1)), numre
+        for n in re.findall(r"[Ss]teg (\d+)", _kom_i_gang()):
+            assert 1 <= int(n) <= len(numre), n
+        i_tabellen = [int(n) for n in re.findall(r"\| Steg (\d+):", _proevetabellen())]
+        assert i_tabellen == [n for n in numre if n in i_tabellen]
+        assert set(i_tabellen) == set(numre), i_tabellen
+
+    def test_ingen_env_foer_demoen(self):
+        """PR 2-kravet om at demoen ikke trenger .env, i teksten til steg 1-6
+        ogsaa, ikke bare i kommandoene (BH)."""
+        assert all(".env" not in _steg(n) for n in range(1, 7))

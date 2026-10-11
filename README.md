@@ -23,9 +23,9 @@ Docker er hovedmåten: Docker Desktop på Windows og Mac, eller Docker Engine me
 
 ### Før du begynner
 
-- En Windows-maskin eller en Mac. På Linux bruker du Docker Engine med Compose og kommandoene i steg 6 og 8.
+- En Windows-maskin eller en Mac. På Linux installerer du Docker Engine med Compose i stedet for steg 1 og 2, og følger resten.
 - Lov til å installere programmer. På Windows betyr det å være administrator på maskinen, eller å ha en som kan godkjenne.
-- Nett. Docker Desktop og den første byggingen laster ned en del.
+- Nett, og noen GB ledig plass. Docker Desktop og den første byggingen laster ned en del.
 - Litt tid. Første gang tar installasjonen og byggingen en stund. Neste gang går det raskere.
 
 Demoen trenger verken git, konto eller nøkkel. Du laster ned koden som en ZIP-fil og skriver to kommandoer i et terminalvindu.
@@ -34,21 +34,21 @@ Demoen trenger verken git, konto eller nøkkel. Du laster ned koden som en ZIP-f
 
 **1. Installer Docker Desktop.** Last det ned fra [docker.com](https://www.docker.com/products/docker-desktop/), og kjør installasjonen.
 
-- Windows: åpne fila du lastet ned, og behold valgene som er krysset av. Spør Windows om programmet får gjøre endringer, svarer du ja. Ber Windows om omstart, gjør det.
+- Windows: velg den vanlige (AMD64), med mindre maskinen har en ARM-prosessor. Åpne fila du lastet ned, og behold valgene som er krysset av. Spør Windows om programmet får gjøre endringer, svarer du ja. Ber Windows om omstart, gjør det.
 - Mac: velg «Apple Silicon» hvis Apple-menyen → Om denne maskinen (About This Mac) viser en M-brikke på linja Brikke (Chip), ellers «Intel». Åpne fila og dra Docker til Programmer (Applications).
 
 Når det har gått bra, ligger Docker Desktop i Start-menyen (Windows) eller i Programmer (Mac). Ber installasjonen om administrator, se [Hvis noe går galt](#hvis-noe-går-galt).
 
-**2. Start Docker Desktop, og vent til motoren kjører.** Åpne Docker Desktop fra Start-menyen eller Programmer. Første gang godtar du vilkårene. Du trenger ikke logge inn eller lage konto, så hopp over innloggingen hvis Docker Desktop spør.
+**2. Start Docker Desktop, og vent til motoren kjører.** Åpne Docker Desktop fra Start-menyen eller Programmer. Første gang godtar du vilkårene, og på Mac kan det be om passordet ditt. Du trenger ikke logge inn eller lage konto, så hopp over innloggingen hvis Docker Desktop spør.
 
 Når det har gått bra, står det «Engine running» nederst i vinduet. La Docker Desktop være åpent, men skriv ingenting i det. Står det ikke «Engine running» etter noen minutter, se [Hvis noe går galt](#hvis-noe-går-galt).
 
 **3. Last ned koden.** Gå til [repoet på GitHub](https://github.com/IBE160-2026/G74-lund-osen), trykk den grønne knappen «Code» og så «Download ZIP». Pakk ut fila:
 
 - Windows: åpne Nedlastinger (Downloads) i Filutforsker (File Explorer), høyreklikk ZIP-fila `G74-lund-osen-main` og velg «Pakk ut alle» (Extract All) og så «Pakk ut» (Extract). Du må pakke ut: åpner du ZIP-fila i stedet, ser den ut som en vanlig mappe, men den er ikke pakket ut.
-- Mac: dobbeltklikk `G74-lund-osen-main.zip` i Nedlastinger (Downloads).
+- Mac: dobbeltklikk `G74-lund-osen-main.zip` i Nedlastinger (Downloads). Ligger mappa `G74-lund-osen-main` der allerede, har Safari pakket den ut for deg.
 
-Når det har gått bra, har du en mappe som heter `G74-lund-osen-main`, med blant annet filene README og compose. Windows viser dem uten filendelsen (.md og .yaml). Ligger det en mappe med samme navn inni den, er det den innerste du skal bruke. Har du fått koden som mappe eller ZIP-fil fra før, pakker du den ut og går til steg 4.
+Når det har gått bra, har du en mappe som heter `G74-lund-osen-main`, med blant annet filene README og compose. Windows viser dem ofte uten filendelsen (.md og .yaml). Ligger det en mappe med samme navn inni den, er det den innerste du skal bruke. Har du fått koden som mappe eller ZIP-fil fra før, pakker du den ut og går til steg 4.
 
 **4. Åpne et terminalvindu.** Et terminalvindu er et vindu der du skriver kommandoer i stedet for å klikke.
 
@@ -57,9 +57,9 @@ Når det har gått bra, har du en mappe som heter `G74-lund-osen-main`, med blan
 
 Når det har gått bra, ser du et vindu med en linje som venter på at du skriver.
 
-**5. Gå til mappa med koden.** Skriv `cd` og et mellomrom i terminalvinduet, dra mappa `G74-lund-osen-main` fra Filutforsker eller Finder inn i vinduet, og trykk Enter. `cd` betyr «gå til mappe», og kommandoene under virker bare fra mappa med koden.
+**5. Gå til mappa med koden.** Skriv `cd` og et mellomrom i terminalvinduet, dra mappa `G74-lund-osen-main` fra Filutforsker eller Finder inn i vinduet, og trykk Enter. Dra mappa der fila compose ligger: den innerste hvis det er to, og ikke ZIP-fila, som på Windows har samme navn og en glidelås på ikonet. `cd` betyr «gå til mappe», og kommandoene under virker bare fra mappa med koden.
 
-Når det har gått bra, slutter linja som venter, med `G74-lund-osen-main`.
+Når det har gått bra, står `G74-lund-osen-main` rett før `>` (Windows) eller `%` (Mac) på linja som venter. På Mac kan Terminal spørre om tilgang til Nedlastinger. Svar OK.
 
 **6. Start demoen.** Kopier kommandoen under med knappen til høyre i boksen, lim den inn i terminalvinduet og trykk Enter:
 
@@ -67,13 +67,13 @@ Når det har gått bra, slutter linja som venter, med `G74-lund-osen-main`.
 docker compose up --build demo
 ```
 
-Første gang bygger Docker appen. Det tar noen minutter, og det kommer mange linjer i vinduet. Når det har gått bra, er den siste linja denne:
+Første gang bygger Docker appen. Det tar noen minutter, og det kommer mange linjer i vinduet. Når det har gått bra, kommer denne linja. Den skal du ikke kopiere, bare se etter:
 
 ```text
 demo-1  | INFO:waitress:Serving on http://0.0.0.0:5000
 ```
 
-La terminalvinduet stå åpent mens du bruker demoen. `0.0.0.0` er adressen inne i Docker, og du åpner adressen i neste steg. Kommer det en feil i stedet, se [Hvis noe går galt](#hvis-noe-går-galt).
+Under den kan det komme en linje med valg fra Docker. La terminalvinduet stå åpent mens du bruker demoen. `0.0.0.0` er adressen inne i Docker, og du åpner adressen i neste steg. Kommer det en feil i stedet, se [Hvis noe går galt](#hvis-noe-går-galt).
 
 **7. Åpne demoen i nettleseren.** Gå til http://127.0.0.1:5000.
 
@@ -109,15 +109,15 @@ Sidene sier «Eksempeltall»: 15 oppdiktede selskaper med kurser til fredag 9. o
 
 **To kommandoer havnet på samme linje**, for eksempel med feilen «no such service». Lim inn én kommando om gangen, og trykk Enter etter hver. Står det noe på linja fra før, sletter du det først.
 
-**Stien har mellomrom og fikk ikke anførselstegn.** Får du en feil etter `cd` når mappa ligger i en mappe med mellomrom i navnet, skriver du anførselstegn rundt stien, for eksempel `cd "C:\Users\Ola Nordmann\Downloads\G74-lund-osen-main"`.
+**Stien har mellomrom og fikk ikke anførselstegn.** Får du en feil etter `cd` når mappa ligger i en mappe med mellomrom i navnet, skriver du anførselstegn rundt stien, for eksempel `cd "C:\Users\Ola Nordmann\Downloads\G74-lund-osen-main"`. På Mac setter Terminal `\` foran hvert mellomrom, og det virker også.
 
 **ZIP-fila ser ut som en vanlig mappe.** Står det «Komprimert størrelse» (Compressed size) som kolonne og «Pakk ut alle» (Extract All) øverst i vinduet, er du inne i ZIP-fila, og den er ikke pakket ut. Trykk «Pakk ut alle», og bruk mappa som lages (steg 3).
 
 **«no configuration file provided: not found».** Terminalvinduet står i feil mappe. Gjør steg 5 på nytt, og dra den mappa der fila compose ligger. Windows viser den uten filendelsen, som compose og ikke compose.yaml.
 
-**«toomanyrequests» fra Docker Hub.** Docker Hub begrenser hvor ofte en nettadresse kan laste ned uten innlogging. Prøv igjen senere, eller fra et annet nett. Innlogging i Docker Desktop hever grensen, men trengs ellers ikke.
+**«toomanyrequests» fra Docker Hub.** Docker Hub begrenser hvor ofte samme IP-adresse kan laste ned uten innlogging. Prøv igjen senere, eller fra et annet nett. Innlogging i Docker Desktop hever grensen, men trengs ellers ikke.
 
-**«port is already allocated» eller «address already in use».** Noe annet bruker port 5000. Kjører den ekte versjonen, stopper du den først (se «Bytte mellom demoen og den ekte versjonen»). På Mac bruker AirPlay-mottakeren (AirPlay Receiver) port 5000. Slå den av under Systeminnstillinger (System Settings) → Generelt (General) → AirDrop og Handoff (AirDrop & Handoff), og prøv igjen.
+**«port is already allocated», «address already in use» eller «ports are not available».** Noe annet bruker port 5000. Kjører den ekte versjonen, stopper du den først (se «Bytte mellom demoen og den ekte versjonen»). På Mac bruker AirPlay-mottakeren (AirPlay Receiver) port 5000. Slå den av under Systeminnstillinger (System Settings) → Generelt (General) → AirDrop og Handoff (AirDrop & Handoff), og prøv igjen.
 
 **Mappa finnes fra før.** Ligger det en `.env` med nøkkelen din i den gamle mappa, flytter du den ut først. Slett så den gamle mappa og pakk ut på nytt. Demodataene ligger i Docker, ikke i mappa, så de går ikke tapt. Har du hentet koden med `git clone`, går du heller inn i mappa og skriver `git pull`.
 
@@ -157,7 +157,7 @@ docker compose down
 
 ### Bytte mellom demoen og den ekte versjonen
 
-Begge bruker port 5000, så bare én kan kjøre om gangen. `docker compose down` stopper ikke demoen, fordi demoen ligger i en egen profil. `docker compose --profile demo down` stopper begge. Start så den du vil bruke:
+Begge bruker port 5000, så bare én kan kjøre om gangen. `docker compose down` stopper ikke demoen, fordi demoen ligger i en egen profil. `docker compose --profile demo down` stopper begge.
 
 Stopp demoen og den ekte versjonen:
 
@@ -181,7 +181,7 @@ Volumene står når du bytter, også basen med vurderingene.
 
 ### Uten Docker, med uv
 
-Med Python 3.13 og [uv](https://docs.astral.sh/uv/). Demoen:
+Med Python 3.13 og [uv](https://docs.astral.sh/uv/). Først demoen.
 
 Installer avhengighetene:
 
@@ -201,7 +201,7 @@ Start demoen på http://127.0.0.1:5000:
 uv run python src/app.py --demo
 ```
 
-Den ekte versjonen:
+Så den ekte versjonen.
 
 Bare første gang: kopier malen, og fyll inn `EODHD_API_KEY` i `.env`.
 
