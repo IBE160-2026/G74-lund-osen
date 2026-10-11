@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-11T22:41
+updated: 2026-10-11T23:19
 ---
 
 # Hjelp til «Kom i gang»
@@ -155,7 +155,7 @@ Docker Hub begrenser hvor ofte samme IP-adresse kan laste ned uten innlogging. P
 
 ### «port is already allocated», «address already in use» eller «ports are not available».
 
-Noe annet bruker port 5000. Kjører den andre versjonen, stopper du den først (se «Bytte mellom demoen og den ekte versjonen» under «Mer for den som vil» i [README-en](../README.md)). På Mac bruker AirPlay-mottakeren (AirPlay Receiver) port 5000. Slå den av under Systeminnstillinger (System Settings) → Generelt (General) → AirDrop og Handoff (AirDrop & Handoff), og prøv igjen.
+Noe annet bruker port 5000. Kjører den andre versjonen, stopper du den først (se «Bytte mellom demoen og den ekte versjonen» under «Mer for den som vil»). På Mac bruker AirPlay-mottakeren (AirPlay Receiver) port 5000. Slå den av under Systeminnstillinger (System Settings) → Generelt (General) → AirDrop og Handoff (AirDrop & Handoff), og prøv igjen. «Mer for den som vil» står i [README-en](../README.md).
 
 ## Stopp
 

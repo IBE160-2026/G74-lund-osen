@@ -790,7 +790,12 @@ class TestReadmeForNybegynnere:
     def test_like_spoersmaal_har_samme_svar(self):
         """Et spoersmaal som staar baade i README-en og i docs/hjelp.md, har
         samme svar begge steder. Svaret i docs/hjelp.md kan ha mer etter."""
-        i_hjelp = dict(re.findall(r"^### (.+)\n\n(.*?)(?=\n\n### |\n\n## |\Z)", _hjelp(), re.MULTILINE | re.DOTALL))
+        i_hjelp = dict(re.findall(r"^### ([^\n]+)\n\n(.*?)(?=\n\n### |\n\n## |\Z)", _hjelp(), re.MULTILINE | re.DOTALL))
+        # Mutanten H13 overlevde foerst: (.+) med DOTALL slukte resten av fila,
+        # saa bare ett spoersmaal ble lest, og ingen ble sammenlignet.
+        assert len(i_hjelp) == len(re.findall(r"^### ", _hjelp(), re.MULTILINE))
+        felles = [s for s in _detaljer(_faq()) if s in i_hjelp]
+        assert len(felles) >= 7, felles
         for sporsmaal, svar in _detaljer(_faq()).items():
             if sporsmaal in i_hjelp:
                 assert i_hjelp[sporsmaal].strip().startswith(svar.strip()), sporsmaal
