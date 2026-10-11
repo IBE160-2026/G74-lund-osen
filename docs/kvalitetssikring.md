@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-11T22:35
+updated: 2026-10-11T22:41
 ---
 
 # Kvalitetssikring
@@ -546,6 +546,7 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
 | 23 | Ble et spørsmål i «Står du fast?» eller i `docs/hjelp.md` brukt? Hvilket, og hjalp svaret? | |
 
 - **Prøvd på Mac:** ikke prøvd (svar 3 11.10). Står slik til noen har prøvd stegene på en Mac.
+- **Den ekte versjonen med nøkkel:** prøves ikke her. Prøven gjøres uten nøkkel, så sjekken i steg 8 («utskriften sier hvilken børsdag vurderingene gjelder») og at oversikten fylles etter hentingen, er ikke prøvd etter README-en.
 
 *Rettet 2026-10-11 (story 3.4, PR 3):* tabellen følger «Kom i gang» slik den ble etter instruksjonen kl. 22:32: steg 1–4 felles, så den ekte versjonen (steg 5–9) og demoen (steg 5–7), i den rekkefølgen README-en har dem. Før PR 3 sto `git clone https://github.com/IBE160-2026/G74-lund-osen.git` og `cd G74-lund-osen` som rad 2 og 3, demoen før den ekte versjonen, og `Ctrl+C` og `docker compose --profile demo down` som to rader. Nytt i PR 3: rad 1 (installer og start, slått sammen av to rader), rad 2–4 (Download ZIP, PowerShell eller Terminal, og `cd`), rad 5 (nøkkelen), `notepad .env` og `open -e .env` i rad 6, og rad 23 (spørsmålene i «Står du fast?» og `docs/hjelp.md`). Slått sammen: rad 15 (Ctrl+C og `docker compose --profile demo down`). Flyttet: radene for den ekte versjonen står nå før demoen, som 6–10 (før rad 10–14). De andre radene er de samme som før, med nytt nummer. Koden hentes nå med «Download ZIP», så prøveren har ikke git: commiten som ble prøvd, er den GitHub viser øverst på siden når ZIP-fila lastes ned, og mappa som ikke skal finnes, er `G74-lund-osen-main`, ikke `G74-lund-osen` som i punktet om maskinen over. Radene 2 og 3 følger Marians svar kl. 21:14 samme dag: ZIP-fila må pakkes ut med «Pakk ut alle», Windows viser filene uten filendelse, og «Windows PowerShell ISE» står også i lista.
 

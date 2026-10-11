@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-11T22:34
+updated: 2026-10-11T22:41
 ---
 
 # Hjelp til «Kom i gang»
@@ -13,7 +13,7 @@ Spørsmål og svar til «Kom i gang» i [README-en](../README.md), sortert etter
 
 ### Må jeg logge inn eller lage konto?
 
-Nei. Hopp over innloggingen i Docker Desktop. Demoen trenger verken Docker-konto, GitHub-konto eller nøkkel.
+Nei. Hopp over innloggingen i Docker Desktop. Demoen trenger verken Docker-konto, GitHub-konto eller nøkkel. Den ekte versjonen trenger en gratis bruker hos EODHD (steg 5 i den ekte versjonen).
 
 ### Hvilken Docker Desktop skal jeg velge?
 
@@ -69,7 +69,7 @@ Et terminalvindu, der du skriver kommandoer i stedet for å klikke. Windows: try
 
 ### Ingenting skjer når jeg limer inn.
 
-Kommandoene skrives i PowerShell eller Terminal, ikke i Docker Desktop. Docker Desktop skal bare være åpent, og du skriver ingenting i det. Ledetekst (Command Prompt) på Windows virker også for demoen, men stegene er skrevet for PowerShell.
+Kommandoene skrives i PowerShell eller Terminal, ikke i Docker Desktop. Docker Desktop skal bare være åpent, og du skriver ingenting i det. Ledetekst (Command Prompt) på Windows virker også for demoen, men stegene er skrevet for PowerShell, og den ekte versjonen trenger PowerShell.
 
 ## Steg 4: mappa
 
@@ -101,11 +101,11 @@ Hent etter kl. 22 og før midnatt på en børsdag. Første gang kan du også hen
 
 ### Oversikten er tom.
 
-Uten henting starter appen med tom oversikt og viser kommandoen som henter. Utskriften fra hentingen sier hvilken børsdag vurderingene gjelder, og hvilke aksjer som fikk en grunn i stedet for en vurdering.
+Uten henting starter appen med tom oversikt og viser kommandoen som henter. Hent kursene med steg 8 i den ekte versjonen, og last siden på nytt. Utskriften fra hentingen sier hvilken børsdag vurderingene gjelder, og hvilke aksjer som fikk en grunn i stedet for en vurdering.
 
 ### Hvor ligger dataene?
 
-ligger i to Docker-volumer: `ose-db` med basen og `ose-raa` med øyeblikksbildene fra EODHD. De står når containerne stoppes. **Bruk aldri `docker compose down -v`.** `-v` fjerner begge volumene, og verken øyeblikksbildene eller vurderingene kan hentes på nytt. Basen kan heller ikke slettes og bygges opp igjen: kursene kan hentes på nytt, men vurderingene for dagene som har gått, kan ikke lages på nytt.
+Dataene ligger i to Docker-volumer: `ose-db` med basen og `ose-raa` med øyeblikksbildene fra EODHD. De står når containerne stoppes. **Bruk aldri `docker compose down -v`.** `-v` fjerner begge volumene, og verken øyeblikksbildene eller vurderingene kan hentes på nytt. Basen kan heller ikke slettes og bygges opp igjen: kursene kan hentes på nytt, men vurderingene for dagene som har gått, kan ikke lages på nytt.
 
 ### Kan appen nås fra nettet?
 
@@ -127,11 +127,11 @@ Under den kan det komme en linje med valg fra Docker. La terminalvinduet stå å
 
 Sidene sier «Eksempeltall»: 15 oppdiktede selskaper med kurser til fredag 9. oktober 2026, ikke data fra Oslo Børs. Under merket står en tabell med aksjer, og du klikker på et selskapsnavn for å se aksjen. Demoen trenger verken `.env` eller nøkkel, og gjør ingen kall. Demobasen lages på nytt hver gang demoen starter, i sitt eget volum, `ose-demo`. Den ekte basen røres ikke. Mens demoen kjører, kan demobasen også lages på nytt med `docker compose run --rm demo-lag` i et nytt terminalvindu, fra samme mappe.
 
+## Når appen kjører, eller ikke
+
 ### Siden åpnes ikke.
 
 Vent til linja med «Serving on» har kommet, og sjekk at terminalvinduet fortsatt er åpent. Adressen er http://127.0.0.1:5000, ikke 0.0.0.0.
-
-## Feilmeldinger fra Docker
 
 ### «docker» er ikke gjenkjent, eller «command not found: docker».
 
@@ -155,10 +155,16 @@ Docker Hub begrenser hvor ofte samme IP-adresse kan laste ned uten innlogging. P
 
 ### «port is already allocated», «address already in use» eller «ports are not available».
 
-Noe annet bruker port 5000. Kjører den ekte versjonen, stopper du den først (se «Bytte mellom demoen og den ekte versjonen»). På Mac bruker AirPlay-mottakeren (AirPlay Receiver) port 5000. Slå den av under Systeminnstillinger (System Settings) → Generelt (General) → AirDrop og Handoff (AirDrop & Handoff), og prøv igjen.
+Noe annet bruker port 5000. Kjører den andre versjonen, stopper du den først (se «Bytte mellom demoen og den ekte versjonen» under «Mer for den som vil» i [README-en](../README.md)). På Mac bruker AirPlay-mottakeren (AirPlay Receiver) port 5000. Slå den av under Systeminnstillinger (System Settings) → Generelt (General) → AirDrop og Handoff (AirDrop & Handoff), og prøv igjen.
+
+## Stopp
+
+### Jeg lukket vinduet før jeg stoppet.
+
+Åpne et nytt terminalvindu, gjør steg 4 og lim inn stoppkommandoen for versjonen du kjørte: `docker compose down` for den ekte versjonen, eller `docker compose --profile demo down` for demoen.
 
 ## Neste gang
 
 ### Hvordan starter jeg neste gang?
 
-Start Docker Desktop fra Start-menyen (Windows) eller Programmer (Mac), og vent til det står «Engine running». Gjør så steg 3 og 4, og hopp over steg 2. Start så appen med steg 7 i den ekte versjonen, eller demoen med steg 5 i demoen. Det går raskere enn første gang. Etter «Stopp» kan du lukke terminalvinduet og Docker Desktop.
+Start Docker Desktop fra Start-menyen (Windows) eller Programmer (Mac), og vent til det står «Engine running». Gjør så steg 3 og 4, og hopp over steg 2. Start så appen med steg 7 i den ekte versjonen, og hent kursene med steg 8 om kvelden, eller start demoen med steg 5 i demoen. Det går raskere enn første gang. Etter «Stopp» kan du lukke terminalvinduet og Docker Desktop.

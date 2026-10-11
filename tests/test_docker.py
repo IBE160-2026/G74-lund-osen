@@ -427,11 +427,12 @@ class TestReadme:
         assert "--hent-foer-kl-22" not in tekst and "--hent-foer-kl-22" not in _hjelp()
         assert "etter kl. 22" in _kom_i_gang() and "helgen" in _hjelp()
 
-    def test_demoen_er_den_foerste_kommandoen(self):
+    def test_ekte_versjonen_foerst_og_zip_foer_kommandoene(self):
         """Story 3.4: fra 11.10 kl. 22:32 anbefaler README-en den ekte
         versjonen, og den staar foerst. Demoen virker fortsatt uten .env.
         Koden hentes med «Download ZIP» foer den foerste kommandoen, ikke med
-        git clone (svar 1 11.10). Navnet paa testen staar fra PR 2."""
+        git clone (svar 1 11.10). Het test_demoen_er_den_foerste_kommandoen
+        fra PR 2 til gjennomgangen 11.10."""
         del_ = _kom_i_gang()
         kommandoer = _kommandoene()
         assert kommandoer[0] == "cp .env.example .env"
@@ -462,7 +463,8 @@ class TestReadme:
         # Profilene README-en bruker, finnes i compose.yaml.
         profiler = {f[0].split(":", 1)[1].strip().strip('[]"') for f in
                     (felt.get("profiles") for felt in _tjenester().values()) if f}
-        brukt = set(re.findall(r"docker compose --profile ([\w-]+)", tekst))
+        # Ogsaa docs/hjelp.md, der stoppkommandoen for demoen staar (VG).
+        brukt = set(re.findall(r"docker compose --profile ([\w-]+)", tekst + _hjelp()))
         assert brukt == {"demo"} and brukt <= profiler
 
     def test_uv_med_demo_flagget_som_appen_leser(self, monkeypatch):
@@ -521,8 +523,7 @@ class TestReadme:
 
     def test_siden_lastes_paa_nytt_etter_hentingen(self):
         """Story 3.4, PR 2: siden oppdateres ikke av seg selv."""
-        ekte = _kom_i_gang().split("### Den ekte versjonen", 1)[1]
-        assert "Last siden på nytt når hentingen er ferdig" in ekte
+        assert "Last siden på nytt når hentingen er ferdig" in _steg("Den ekte versjonen (anbefalt)", 8)
 
     def test_ingen_bilder_utenom_ci_merket(self):
         """Story 3.3: skjermbilder med ekte data publiserer dataene. Ville feilet
@@ -718,6 +719,8 @@ class TestReadmeForNybegynnere:
         readme = README.read_text(encoding="utf-8")
         mappestruktur = readme.split("## Mappestruktur", 1)[1]
         assert "docs/hjelp.md" in mappestruktur
+        dokumentene = readme.split("## Dokumentene", 1)[1].split("\n## ", 1)[0]
+        assert "](docs/hjelp.md)" in dokumentene
 
     def test_merket_i_demoen_er_det_samme_som_i_malene(self):
         """Regel 19: 8.0c kan ikke endre merket uten at README-en rettes."""
@@ -745,8 +748,15 @@ class TestReadmeForNybegynnere:
     def test_henvisningene_og_proevetabellen(self):
         """Hver «steg N» peker paa et steg som finnes, og §9 har stegene i
         rekkefoelge for begge versjonene (VG i gjennomgangen av PR 3)."""
-        for n in re.findall(r"[Ss]teg (\d+)", _kom_i_gang() + _hjelp()):
+        tekst = _kom_i_gang() + _hjelp()
+        for n in re.findall(r"[Ss]teg (\d+)", tekst):
             assert 1 <= int(n) <= 9, n
+        # «steg N i demoen» og «steg N i den ekte versjonen» peker paa et steg
+        # som finnes i den versjonen (VG).
+        for n in re.findall(r"steg (\d+) i demoen", tekst):
+            assert int(n) in SEKSJONENE["Demoen"], n
+        for n in re.findall(r"steg (\d+) i den ekte versjonen", tekst):
+            assert int(n) in SEKSJONENE["Den ekte versjonen (anbefalt)"], n
         tabell = _proevetabellen()
         assert [int(n) for n in re.findall(r"\| Steg (\d+):", tabell)] == [1, 2, 3, 4]
         assert [int(n) for n in re.findall(r"\| Den ekte versjonen, steg (\d+):", tabell)] == [5, 6, 7, 8, 9]
@@ -761,3 +771,38 @@ class TestReadmeForNybegynnere:
         """22:32: Bytte og uv staar, lukket i <details> under én overskrift."""
         mer = _seksjon("Mer for den som vil")
         assert set(_detaljer(mer)) == {"Bytte mellom demoen og den ekte versjonen", "Uten Docker, med uv"}
+
+    def test_svarene_beholdt_innholdet(self):
+        """Gjennomgangen 11.10 (VG): bare overskriftene ble sjekket etter
+        flyttingen. Innholdet fra svarene foer 22:32 staar i README-en eller
+        docs/hjelp.md. Ville feilet hvis et svar ble tomt eller mistet en del."""
+        tekst = _faq() + _hjelp()
+        for innhold in ("wsl --update", "AirPlay", "Quit Docker Desktop", "hvalen ved klokka",
+                        "AMD64", "Apple Silicon", "Safari", "administrator, og da sperrer Windows dra og slipp",
+                        "`.env` med nøkkelen", "port 5000", "Ledetekst", "Ikke velg «Windows PowerShell ISE»",
+                        "filene README og compose", "uten filendelsen", "virtualisering", "toomanyrequests",
+                        "samme IP-adresse", "Dataene ligger i to Docker-volumer", "20 kall i døgnet",
+                        "notepad .env", "open -e .env", "nano .env", "før midnatt", "helgen",
+                        "Appen kan ikke nås fra nettet", "lim inn stoppkommandoen", "Cmd+mellomrom",
+                        "Svar OK", "Pakk ut alle", "glidelås"):
+            assert innhold in tekst, innhold
+
+    def test_like_spoersmaal_har_samme_svar(self):
+        """Et spoersmaal som staar baade i README-en og i docs/hjelp.md, har
+        samme svar begge steder. Svaret i docs/hjelp.md kan ha mer etter."""
+        i_hjelp = dict(re.findall(r"^### (.+)\n\n(.*?)(?=\n\n### |\n\n## |\Z)", _hjelp(), re.MULTILINE | re.DOTALL))
+        for sporsmaal, svar in _detaljer(_faq()).items():
+            if sporsmaal in i_hjelp:
+                assert i_hjelp[sporsmaal].strip().startswith(svar.strip()), sporsmaal
+
+    def test_boksene_i_hjelp_foelger_de_samme_reglene(self):
+        """Gjennomgangen 11.10 (VG): docs/hjelp.md har ogsaa kommandoer.
+        Ingen #, én kommando per boks, bare blokker uten spraak eller text, og
+        ingen ~~~ eller ``` med innrykk."""
+        hjelp = _hjelp()
+        for spraak, blokk in _blokkene(hjelp):
+            assert spraak in ("", "text"), spraak
+            if not spraak:
+                assert "#" not in blokk and len([l for l in blokk.splitlines() if l.strip()]) == 1, blokk
+        for linje in hjelp.splitlines():
+            assert not re.match(r"^ +```|^ *~~~", linje), linje

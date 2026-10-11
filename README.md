@@ -63,13 +63,13 @@ open -e .env
 docker compose up --build
 ```
 
-8. **Hent kursene** etter kl. 22 på en børsdag. Åpne et nytt terminalvindu i samme mappe (steg 3 og 4), og lim inn denne. Det er klart når utskriften sier hvilken børsdag vurderingene gjelder. Last siden på nytt når hentingen er ferdig.
+8. **Hent kursene** etter kl. 22 og før midnatt på en børsdag. Åpne et nytt terminalvindu i samme mappe (steg 3 og 4), og lim inn denne. Det er klart når utskriften sier hvilken børsdag vurderingene gjelder. Last siden på nytt når hentingen er ferdig.
 
 ```
 docker compose run --rm hent
 ```
 
-9. **Stopp** med Ctrl+C i vinduet med appen, eller med denne. Det er klart når det står at containerne er fjernet (Removed).
+9. **Stopp** med Ctrl+C i vinduet med appen, og lim så inn denne. Det er klart når det står at containerne er fjernet (Removed).
 
 ```
 docker compose down
@@ -120,7 +120,7 @@ PowerShell er trolig åpnet som administrator, og da sperrer Windows dra og slip
 <details>
 <summary>Ingenting skjer når jeg limer inn.</summary>
 
-Kommandoene skrives i PowerShell eller Terminal, ikke i Docker Desktop. Docker Desktop skal bare være åpent, og du skriver ingenting i det. Ledetekst (Command Prompt) på Windows virker også for demoen, men stegene er skrevet for PowerShell.
+Kommandoene skrives i PowerShell eller Terminal, ikke i Docker Desktop. Docker Desktop skal bare være åpent, og du skriver ingenting i det. Ledetekst (Command Prompt) på Windows virker også for demoen, men stegene er skrevet for PowerShell, og den ekte versjonen trenger PowerShell.
 
 </details>
 
@@ -141,7 +141,7 @@ Terminalvinduet står i feil mappe. Gjør steg 4 på nytt, og dra den mappa der 
 <details>
 <summary>«port is already allocated», «address already in use» eller «ports are not available».</summary>
 
-Noe annet bruker port 5000. Kjører den ekte versjonen, stopper du den først (se «Bytte mellom demoen og den ekte versjonen»). På Mac bruker AirPlay-mottakeren (AirPlay Receiver) port 5000. Slå den av under Systeminnstillinger (System Settings) → Generelt (General) → AirDrop og Handoff (AirDrop & Handoff), og prøv igjen.
+Noe annet bruker port 5000. Kjører den andre versjonen, stopper du den først (se «Bytte mellom demoen og den ekte versjonen» under «Mer for den som vil»). På Mac bruker AirPlay-mottakeren (AirPlay Receiver) port 5000. Slå den av under Systeminnstillinger (System Settings) → Generelt (General) → AirDrop og Handoff (AirDrop & Handoff), og prøv igjen.
 
 </details>
 
