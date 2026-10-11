@@ -135,6 +135,14 @@ Fra instruksjonen kl. 16:54 i `docs/ai-prompts/2026-10-11.md` (planen) og kl. 20
 - §9 i `docs/kvalitetssikring.md` følger stegene i samme commit, med en datert linje under tabellen.
 
 **Delene, med commit og push etter hver:** a) README «Kom i gang» med §9 og de testene som må følge med, b) de nye testene.
+*Lagt til 2026-10-11 kl. 21:14:* c) steg 3, steg 4 og FAQ-en etter Marians svar kl. 21:14 (`docs/ai-prompts/2026-10-11.md`), d) rettingene etter gjennomgangen.
+
+**Marians svar kl. 21:14**, før gjennomgangen, som beslutning 4 ba om:
+- «Engine running» står nederst i vinduet.
+- «Pakk ut alle» (Extract All) stemmer, og det ble en mappe med samme navn inni. En åpnet ZIP-fil ser ut som en vanlig mappe uten å være pakket ut, så steg 3 sier at man må trykke «Pakk ut alle», og FAQ-en har et punkt om det.
+- Windows viser filene som README og compose, uten filendelse.
+- «Windows PowerShell» stemmer, men «Windows PowerShell ISE» står også i lista, og den skal ikke velges.
+- En sti med mellomrom får anførselstegn når mappa dras inn i PowerShell.
 
 ## Code Map
 
@@ -178,6 +186,9 @@ Fra instruksjonen kl. 16:54 i `docs/ai-prompts/2026-10-11.md` (planen) og kl. 20
 - **Webserveren:** med bryteren migreres og lages demobasen aldri. Mangler `demo.db`, får oversikten `DEMOKOMMANDO`, og aksjedetaljen gir 404. «Eksempeltall» kommer fra en context processor som leser `g.eksempeltall`, satt fra merket i basen ved hver forespørsel. Feilsiden viser navnet på basen bryteren valgte.
 - **«samme frø gir like baser»** sammenligner `aksje`, `kurs`, `kursserie`, `vurdering`, merket og `skjema_versjon` uten kolonnen `anvendt`, som er tidspunktet migrasjonen ble kjørt.
 - **Regel 22:** alle demobaser under byggingen er laget i `tmp_path` eller i scratch-mappa for økta. `data/db/` har ingen `demo.db`.
+
+- **PR 3, kjøringen som linja i steg 6 er kopiert fra** (11.10, ca. kl. 20:34): Docker Engine 29.8.0 og Compose v5.5.1. En kopi av `compose.yaml` i repoet, `compose-pr3.yaml`, med `name: ose-readme-pr3`, `image: ose-readme-pr3` og porten `127.0.0.1:5098:5000`, fordi Marians demo, `ose-signal-demo-1`, brukte port 5000. Kommandoen var `docker compose -p ose-readme-pr3 -f compose-pr3.yaml up --build demo`. Den viste `Attaching to demo-1`, ikke loggen fra demo-lag, og til sist `demo-1  | INFO:waitress:Serving on http://0.0.0.0:5000`. Utskriften gikk til en fil, ikke til et terminalvindu, så en eventuell linje med valg fra Compose i et ekte vindu er ikke sett. Etterpå ble bare det kjøringen startet, fjernet: `--profile demo down`, volumet `ose-readme-pr3_ose-demo`, imaget `ose-readme-pr3` og kopien av `compose.yaml`. Sjekket etterpå: ingen container eller image fra `ose-readme-pr3`. `ose-signal-demo-1` og `ose-signal_ose-demo` sto urørt.
+- **PR 3, bilder:** ingen (beslutning 4). `test_ingen_bilder_utenom_ci_merket` står.
 
 ## Spec Change Log
 
@@ -246,6 +257,40 @@ Gjennomgang av PR 2 (PR #27, etter `fe22cd3` kl. 15:35), Blind Hunter (BH, bare 
 | ECH7, ECH8 | README-en forklarer ikke feilen ved port i bruk, og volumet heter `ose-signal_ose-demo` | low | Byttet sier at bare én kan kjøre. Volumene er omtalt med kortnavn også for `ose-db` og `ose-raa` | ikke endret |
 | VG8, VG10 | Rekkefølgen ved oppstart og spinen prøves ikke i drift | low | Betingelsen er testet statisk (mutant P6), og spinen er tekst | ikke endret |
 
+
+**Gjennomgangen av PR 3** (11.10, diffen `5665f5c..86c4e28`). Blind Hunter (BH, 15 funn), Edge Case Hunter (ECH, 21) og Verification Gap (VG, 2 hull og 4 andre). Like funn er slått sammen. Rettingene står i `b0deee4`.
+
+| Funn | Hva | Dom | Rute |
+|---|---|---|---|
+| BH1, BH2, VG, ECH | Ledetekstene «Start så den du vil bruke:», «Demoen:» og «Den ekte versjonen:» ble stående foran de nye | medium | patch |
+| BH3, ECH | Linux-setningen motsa seg selv og nevnte bare steg 6 og 8 | medium | patch: Docker Engine i stedet for steg 1 og 2. Docker-gruppen og sudo avvist: Linux er ikke målgruppen |
+| BH4, ECH | Steg 5 sa ikke hvilken mappe når det er to, og sjekken passet for den ytre også | medium | patch: mappa der compose ligger, den innerste, ikke ZIP-fila |
+| ECH | Sjekken i steg 5 («slutter med») stemmer ikke med `>` og `%` | medium | patch |
+| ECH | Linja i steg 6 får en kopieringsknapp og kan limes inn ved en feil | medium | patch: «Den skal du ikke kopiere» |
+| ECH | En linje med valg fra Compose kan komme under «Serving on» i et ekte vindu | maybe-false | patch i teksten («kan komme»). Ikke sett, fordi kjøringen skrev til en fil. Rad 6 i §9 spør |
+| BH6, ECH | «nettadresse» om grensen hos Docker Hub, som gjelder IP-adressen | low | patch |
+| BH7 | Ingenting om plass på disken | low | patch: «noen GB ledig plass». Versjonskrav til Windows og macOS er ikke slått opp og står ikke |
+| BH8 | Ingen eksempel for Mac i punktet om mellomrom | low | patch |
+| ECH | Safari kan pakke ut ZIP-fila selv | low | patch |
+| ECH | Windows kan vise filendelsen | low | patch: «ofte uten» |
+| ECH | Windows ARM har en egen nedlasting | low | patch |
+| ECH | Mac kan be om passord ved første start | low | patch |
+| ECH | Terminal på Mac kan spørre om tilgang til Nedlastinger | low | patch |
+| ECH | Windows har andre feilmeldinger for en port i bruk | low | patch: «ports are not available». De andre ordlydene er ikke slått opp |
+| BH9, BH10 | Spesifikasjonen viste til Implementation Notes uten en note om kjøringen, og hadde verken del c eller Marians svar | medium | patch: Implementation Notes og «Delene» |
+| BH11, VG | §9 spør etter `git log` og mappa `G74-lund-osen`, som ikke passer med ZIP | medium | patch i den daterte linja. Feltene står, fordi PR #28 endrer linjene rett over |
+| BH12 | Ingen rad sier om kopieringsknappen virket | low | patch i rad 6. Egne rader for «Mappa finnes fra før» og «Neste gang» avvist: rad 23 spør etter FAQ-en |
+| BH13 | Kravet om ingen `.env` før demoen gjaldt bare kommandoene | medium | patch: `test_ingen_env_foer_demoen` |
+| BH14 | Testen for linja i steg 6 så ikke om `demo` har egen `command` | medium | patch. Prefikset `demo-1` følger Compose og er kopiert fra v5.5.1, avvist |
+| BH15, ECH | Overskrifter i kodeblokker ble regnet som ankre | low | patch. Like overskrifter med `-1` avvist: README-en har ingen |
+| VG1 | Stegnumrene, henvisningene «steg N» og §9 var ikke bundet sammen, og den daterte linja i §9 kunne fylle inn for en rad | high | patch: `test_stegene_og_henvisningene_til_dem` og `_proevetabellen()` |
+| VG2, ECH | En kodeblokk med språk slapp unna testene for `#` og én kommando | high | patch: `test_bare_kommandoer_og_en_tekstblokk` |
+| VG | `test_docker_foerst_og_uv_som_alternativ` krevde fortsatt `git clone` | low | patch: krever «Download ZIP» |
+| ECH | En mal uten merket ga `AttributeError` og ikke en tydelig feil | low | patch |
+| BH5 | Tipset om `demo-lag` kommer etter at demoen er stoppet | low | avvist: avsnittet står etter steg 8 etter gruppens endring kl. 20:32 |
+| ECH | Repoet kan være privat | false | `gh repo view` 11.10: `PUBLIC` |
+| ECH | `cd` i Ledetekst bytter ikke stasjon uten `/d` | low | avvist: stegene er for PowerShell, og Ledetekst er bare nevnt som et alternativ som virker for demoen |
+| VG | Adressen http://127.0.0.1:5000 hentes ikke fra `ports` i compose.yaml | low | avvist: fantes før PR 3, og `test_porten_er_bare_paa_maskinen` holder den |
 
 ## Verification
 
@@ -319,3 +364,27 @@ Den første kjøringen, før `abaad78`, viste alle som drept, men av lekkasjen a
 C3 la igjen volumet `ose-ci-34_ose-db`, fordi mutanten la til et volum trap ikke fjerner. Derfor stoppet C4–C6 første gang på sjekken av volumer fra før. Bare det volumet er fjernet, og C4–C6 er kjørt på nytt.
 
 **Suiten etter PR 2:** 1269 passed og 16 skipped lokalt, mot 1257 og 16 før (33 i `tests/test_demo.py`, 43 i `tests/test_docker.py`). CI på `2fa6f9f`, kjøring 38057371770: `pytest` 1285 passed og `docker` grønn, også demosteget.
+
+**PR 3, mutantene** (11.10, hele testsettet for hver, mot `b0deee4`, koden satt tilbake fra en kopi med sha256 kontrollert). P1–P11 ble også kjørt mot `ba81406`, før rettingene, og alle ble fanget der også.
+
+| # | Mutanten | Fanget av |
+|---|---|---|
+| P1 | `# demoen` bak `docker compose up --build demo` | `test_ingen_kommentar_paa_kommandolinjene`, `test_demoen_er_den_foerste_kommandoen`, `test_readme_proeven_har_hver_kommando` |
+| P2 | to kommandoer i boksen i steg 8 | `test_en_kommando_per_boks` |
+| P3 | PowerShell tatt ut av steg 4 | `test_stegene_nevner_powershell_og_terminal` |
+| P4 | «toomanyrequests» tatt ut av FAQ-en | `test_hvis_noe_gaar_galt` |
+| P5 | ankeret til FAQ-en skrevet feil | `test_steg_1_2_og_6_peker_til_faqen`, `test_hver_lenke_til_et_avsnitt_finnes` |
+| P6 | merket endret i `index.html` uten README-en | `test_merket_i_steg_7_er_det_samme_som_i_malene` |
+| P7 | `uv sync` tatt ut av §9 | `test_readme_proeven_har_hver_kommando` |
+| P8 | `demoen` i stedet for `demo` i Bytte | `test_tjenestene_i_readme_finnes_i_compose`, `test_readme_proeven_har_hver_kommando` |
+| P9 | `git clone` som steg før demoen | `test_demoen_er_den_foerste_kommandoen` (og to til mot `b0deee4`) |
+| P10 | porten i Dockerfile endret til 5001 | `test_linja_som_viser_at_demoen_er_klar`, `test_webserveren_er_waitress_uten_debug` |
+| P11 | FAQ-en fikk en annen overskrift | `test_hvis_noe_gaar_galt`, `test_demoen_er_den_foerste_kommandoen`, `test_hver_lenke_til_et_avsnitt_finnes` |
+| P12 | blokka i steg 8 med `powershell`, `#` og to kommandoer | `test_bare_kommandoer_og_en_tekstblokk` |
+| P13 | «Gjør steg 9» i FAQ-en | `test_stegene_og_henvisningene_til_dem` |
+| P14 | «Steg 2:» tatt ut av §9 | `test_stegene_og_henvisningene_til_dem` |
+| P15 | `.env` nevnt i steg 2 | `test_ingen_env_foer_demoen` |
+| P16 | `demo` får egen `command` i compose.yaml | `test_linja_som_viser_at_demoen_er_klar`, `test_demo_lag_kjoerer_demokommandoen_og_demo_har_bryteren` |
+| P17 | rad 10 (steg 8) tatt ut av §9 | `test_stegene_og_henvisningene_til_dem`. Kommandoen står fortsatt i rad 16, så testen for kommandoene alene fanger den ikke |
+
+**Testene etter PR 3:** lokalt 1281 passed og 16 skipped, 1297 samlet. Før PR 3: lokalt 1269 passed og 16 skipped, i CI 1285.
