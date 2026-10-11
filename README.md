@@ -379,6 +379,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [Endringsforslag 08.10](_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-08.md): femten idéer inn i v1, godkjent av Marian 08.10
 - [Kilder og bruksvilkår](docs/kilder-og-rettigheter.md), med e-postene til [EODHD](docs/epost-til-eodhd.md) og [Euronext](docs/epost-til-euronext.md)
 - [Leveranseliste](docs/innlevering.md)
+- [Hjelp til «Kom i gang»](docs/hjelp.md): spørsmål og svar, sortert etter steg
 
 **Arbeidsprosess og kvalitet**
 
@@ -391,7 +392,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 ## Mappestruktur
 
 - `src/` og `tests/` — applikasjonen og testene
-- `docs/` — arbeidsprosessen
+- `docs/` — arbeidsprosessen, og `docs/hjelp.md` med spørsmål og svar til «Kom i gang»
 - `_bmad-output/` — plan, krav og sprintstatus
 - `.github/` — testkjøringen og morgensjekken
 - `Dockerfile`, `compose.yaml` og `.dockerignore` — imaget og tjenestene: webserveren, hentingen og demoen
