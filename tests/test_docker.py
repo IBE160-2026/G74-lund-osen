@@ -813,20 +813,39 @@ class TestReadmeForNybegynnere:
             assert not re.match(r"^ +```|^ *~~~", linje), linje
 
     def test_til_faglaerer_og_kom_i_gang_foer_status(self):
-        """Marian kl. 23:41: «Til faglærer» rett under beskrivelsen, så «Kom i
-        gang», så «Status». Ville feilet hvis «Status» kom foerst igjen."""
+        """Marian kl. 23:41: beskrivelsen, så «Til faglærer», så «Kom i gang»,
+        så «Status». Ville feilet hvis «Status» kom foerst igjen, eller noe
+        kom mellom beskrivelsen og «Til faglærer»."""
         tekst = README.read_text(encoding="utf-8")
-        assert tekst.index("Til faglærer:") < tekst.index("## Kom i gang") < tekst.index("## Status")
-        assert tekst.index("## Status") < tekst.index("## Tester")
-        topp = tekst.split("## Kom i gang", 1)[0]
-        assert "## Status" not in topp and "\n## " not in topp.split("# OSE Signal", 1)[1]
+        for del_ in ("Til faglærer:", "\n## Kom i gang\n", "\n## Status\n", "\n## Tester\n"):
+            assert del_ in tekst, del_
+        assert (tekst.index("Til faglærer:") < tekst.index("\n## Kom i gang\n")
+                < tekst.index("\n## Status\n") < tekst.index("\n## Tester\n"))
+        topp = tekst.split("\n## Kom i gang\n", 1)[0]
+        avsnitt = [a.strip() for a in topp.split("\n\n") if a.strip()]
+        assert avsnitt[-1].startswith("Til faglærer:"), avsnitt[-1]
+        assert avsnitt[-2].startswith("OSE Signal samler"), avsnitt[-2]
+        assert "\n## " not in topp
 
     def test_status_uten_storynumre_og_uten_kommando(self):
         """Marian kl. 23:41: «Status» i vanlige ord, uten storynumre og uten
-        kommandoen, som sto uten stegene foer den. Lenken til sprintstatusen,
-        at appen er under arbeid, og setningen om Euronext staar."""
-        status = README.read_text(encoding="utf-8").split("## Status\n", 1)[1].split("\n## ", 1)[0]
-        assert not re.search(r"\b[1-9]\.\d{1,2}[a-z]?\b", status), status
-        assert "```" not in status and "docker compose" not in status
-        assert "Under arbeid" in status and "Euronext" in status
-        assert "](_bmad-output/implementation-artifacts/sprint-status.yaml)" in status
+        kommandoen, som sto uten stegene foer den. Datoer som «13.–16.10» er
+        lov, storynumre i alle formene vi har brukt er ikke det."""
+        tekst = README.read_text(encoding="utf-8")
+        assert "\n## Status\n" in tekst
+        status = tekst.split("\n## Status\n", 1)[1].split("\n## ", 1)[0]
+        assert not re.search(r"\(\s*\d{1,2}[AB]?\.\d", status), status
+        assert not re.search(r"\b\d{1,2}[AB]?\.\d{1,2}[a-z]\b", status), status
+        assert not re.search(r"\b\d{1,2}-\d{1,2}[a-z]?\b", status), status
+        assert not re.search(r"\b[Ss]tor(y|ies|yen)\b|PR #\d", status), status
+        assert "```" not in status and "~~~" not in status and "`" not in status
+        assert not re.search(r"docker[ -]compose|uv run", status, re.IGNORECASE)
+        for innhold in ("Under arbeid", "Flettet til main:", "hentingen", "Docker", "demoen", "README-en",
+                        "README-prøven 13.–16.10", "kallene som er igjen", "hjelp bak «?»",
+                        "tydeligere merking", "utseendet fra designforslaget", "KI-laget", "Euronext",
+                        "](_bmad-output/implementation-artifacts/sprint-status.yaml)"):
+            assert innhold in status, innhold
+
+    def test_lenken_til_staar_du_fast_sier_lenger_ned(self):
+        """Marian kl. 23:46: «se «Står du fast?» lenger ned»."""
+        assert "se [«Står du fast?»](#står-du-fast) lenger ned." in _kom_i_gang()

@@ -14,7 +14,7 @@ Appen finnes i to versjoner, med samme kode. Vi anbefaler den ekte versjonen. Vi
 
 | | Den ekte versjonen (anbefalt) | Demoen |
 |---|---|---|
-| Kurser | Ekte kurser fra Oslo Børs | Oppdiktede selskaper («Eksempeltall») |
+| Kurser | Ekte sluttkurser fra Oslo Børs, hentet fra EODHD hver børsdag. Dagens vurdering lagres per aksje | Oppdiktede selskaper og kurser («Eksempeltall») |
 | Trenger | Docker Desktop og en gratis nøkkel fra EODHD | Bare Docker Desktop |
 | Klar | Viser kurser etter første henting om kvelden | Med en gang |
 
@@ -223,7 +223,7 @@ Basen, demobasen og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo`
 
 ## Status
 
-Under arbeid, og ingenting er endelig. Ferdig: hentingen av kurser med kontroll av børsdagen, Docker, demoen og denne README-en. Neste: README-prøven 13.–16.10, nye forsøk med kallene som er igjen etter hentingen, hjelp bak «?» på sidene, tydeligere merking, utseendet fra designforslaget, og så KI-laget. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml).
+Under arbeid, og ingenting er endelig. Flettet til main: hentingen av kurser med kontroll av børsdagen, Docker, demoen og denne README-en. Neste: README-prøven 13.–16.10, nye forsøk med kallene som er igjen etter hentingen, hjelp bak «?» på sidene, tydeligere merking, utseendet fra designforslaget, og så KI-laget. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
 
 ## Tester
 
