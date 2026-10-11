@@ -199,6 +199,10 @@ Fra instruksjonen kl. 16:54 i `docs/ai-prompts/2026-10-11.md` (planen) og kl. 20
 - **2026-10-11, PR 3 (README-en for en som aldri har brukt Docker):** Marian prøvde demoen etter README-en 11.10 og fant ikke ut hvor kommandoene skulle skrives. Hun limte dem inn i Docker Desktop og i en tom PowerShell-linje, og to kommandoer havnet på samme linje. README-prøven 13.–16.10 skal kunne gjøres av en som aldri har brukt Docker eller et terminalvindu, så «Kom i gang» skrives om i nummererte steg, med én kommando per boks og en FAQ. Planen og svarene står i «Planen for PR 3».
 
 - **2026-10-11 kl. 21:53, PR 3 i kortere form:** Marian syntes kl. 21:22 at demodelen av «Kom i gang» var for lang og så komplisert ut. Kl. 21:37 godkjente hun en kortere form: én linje om hva man trenger, seks steg på én til to linjer, «Stopp», og «Står du fast?» med spørsmålene som `<details>` med `<summary>`, sortert etter steget. Alt fra de åtte stegene og «Hvis noe går galt» som ikke er med i de seks stegene, er flyttet dit, og fem spørsmål er nye. Grunnen: målgruppen er en som aldri har brukt Docker eller et terminalvindu, og en lang side gjorde det vanskeligere å se hva man skal gjøre. «Steg 1, 2 og 6 peker dit» fra Marians ønske kl. 17:08 er erstattet av én lenke til «Står du fast?» i linja øverst. Commit `50e6c2e`.
+- **Rettet samme kveld, etter gjennomgangen av den korte formen:**
+  - «fem spørsmål er nye» over gjelder de fem instruksjonen kl. 21:53 nevner. Bare «Mappa lar seg ikke dra inn i vinduet» har nytt innhold. De fire andre, og spørsmålene «Hva skjer under installasjonen?», «Jeg finner ikke ZIP-fila på Mac.», «Hvilket vindu skal jeg åpne?», «Hva betyr cd, og hvordan ser jeg at det gikk?», «Hva skal jeg se etter i vinduet?», «Terminal spør om tilgang til Nedlastinger (Mac).» og «Jeg har fått koden fra før.», er nye overskrifter over innhold fra de åtte stegene.
+  - Stegnumrene i «Planen for PR 3» gjelder den første formen med åtte steg. I den korte formen er «går til steg 4» i beslutning 1 steg 3, og «merket steg 7 siterer» er merket i steg 6.
+  - Marians ønske kl. 17:08 om at hvert steg sier hva man ser når det har gått bra, gjelder fortsatt. Hvert av de seks stegene har en slik sjekk etter `9dd0f48`.
 
 ## Review Triage Log
 
@@ -293,6 +297,60 @@ Gjennomgang av PR 2 (PR #27, etter `fe22cd3` kl. 15:35), Blind Hunter (BH, bare 
 | ECH | Repoet kan være privat | false | `gh repo view` 11.10: `PUBLIC` |
 | ECH | `cd` i Ledetekst bytter ikke stasjon uten `/d` | low | avvist: stegene er for PowerShell, og Ledetekst er bare nevnt som et alternativ som virker for demoen |
 | VG | Adressen http://127.0.0.1:5000 hentes ikke fra `ports` i compose.yaml | low | avvist: fantes før PR 3, og `test_porten_er_bare_paa_maskinen` holder den |
+
+**Gjennomgangen av den korte formen** (11.10, diffen `003ce36..19c0a5e`). Blind Hunter (BH, 14 funn), Edge Case Hunter (ECH, 18) og Verification Gap (VG, 2 hull og 1 annet). Rettingene står i `9dd0f48`.
+
+| Funn | Hva | Dom | Rute |
+|---|---|---|---|
+| BH, ECH | Steg 1 sa ikke lenger at Docker Desktop skal stå åpent | medium | patch: «La det være åpent» |
+| BH, ECH | Steg 2, 3 og 4 hadde mistet sjekken etter steget, og steg 4 «fra Filutforsker eller Finder» | medium | patch |
+| ECH | Steg 3 sa ikke hvordan Terminal åpnes på Mac, og ikke at ISE er feil valg | medium | patch: Cmd+mellomrom, og «ikke ISE» |
+| ECH | Steg 5 viser `0.0.0.0:5000` uten å si at den ikke skal åpnes | medium | patch |
+| ECH | Hvor kopieringsknappen er, og hvordan man limer inn | low | patch: «til høyre i boksen», Ctrl+V eller Cmd+V |
+| ECH | Lenken i steg 6 åpnes i samme fane, og README-en med «Stopp» forsvinner | low | patch: «i en ny fane» |
+| BH | Rad 7 i §9 (en aksje åpnes) hadde ingen instruks i stegene | low | patch: steg 6 sier at man klikker på et selskapsnavn |
+| ECH | Mappa på Mac er bare én, så «den innerste» er uklart | low | patch: mappa der README og compose ligger |
+| ECH | Stopp sa ikke hva man gjør når vinduet er lukket | medium | patch |
+| BH, ECH | «Hvordan starter jeg neste gang?» utelot steg 6 og hvor Docker Desktop startes | low | patch: steg 3 til 6, Start-menyen eller Programmer |
+| ECH | Den som har fått koden fra før, finner ikke svaret under «Mappa finnes fra før» | low | patch: eget spørsmål |
+| BH, ECH | «Ingenting skjer når jeg limer inn» sto under steg 3 og 4, ikke steg 5 | low | patch: flyttet |
+| ECH | «Første gang tar det en stund» om installasjonen falt bort | low | patch: i linja øverst |
+| ECH | De engelske navnene (Downloads, Extract All) sto ikke første gang de ble nevnt | low | patch: i steg 2 |
+| BH | «Ellers kan ikke Docker lese mappa» er ikke slått opp | low | patch: «Ellers får ikke Terminal åpne mappa» |
+| BH | Linux har ingen linje om hvilke steg som gjelder | low | avvist: linja øverst sier Docker Engine med Compose i stedet for Docker Desktop, og målgruppen er Windows og Mac |
+| BH, ECH | «fem spørsmål er nye» og stegnumrene i «Planen for PR 3» stemmer ikke med formen | low | patch i Spec Change Log |
+| BH | Rettet-linja i §9 ble skrevet om, ikke lagt til | low | avvist: instruksjonen kl. 21:53 ba om at Rettet-linja fra PR 3 sier hvilke rader som er nye, og den har ikke vært på main. «Nye i PR 3» er presisert |
+| BH | 60 ord er mer enn «én til to linjer» | low | avvist: grensen på 60 ord står i instruksjonen kl. 21:53 |
+| BH | Boksen etter steg 5 er ikke rykket inn under steget, så lista brytes | low | avvist: GitHub viser «6.» riktig, og innrykkede bokser er nå forbudt fordi testene ikke ser dem (VG) |
+| BH | Tomme linjer rundt svarene i `<details>` ble ikke krevd | medium | patch: `_sporsmaalene()` krever dem (K4) |
+| BH | Like spørsmål ble ikke oppdaget, og `>= 20` var valgt fritt | low | patch: unike spørsmål (K14), og minst 16, som i «Hvis noe går galt» før |
+| BH | Testen for linja i FAQ-en tok `tekst[0]` uten å sjekke antallet | low | patch |
+| VG1 | `~~~` og ``` med innrykk er bokser for GitHub, men ikke for testene | high | patch: `test_ingen_bokser_testene_ikke_ser` (K9) |
+| VG2 | Et spørsmål som vanlig avsnitt eller overskrift slapp gjennom | medium | patch: utenom `<details>` står bare ledeteksten og linja om resten (K3) |
+| VG | Henvisningene «steg N» sjekkes bare mot 1–6, ikke mot riktig steg | low | avvist: alle er lest og stemmer, og en riktig-steg-sjekk krever en tabell over hva hvert steg handler om |
+
+**Mutantene for den korte formen** (11.10, hele testsettet for hver, mot `9dd0f48`, koden satt tilbake fra en kopi med sha256 kontrollert). Alle 16 ble fanget.
+
+| # | Mutanten | Fanget av |
+|---|---|---|
+| K1 | et sjuende steg | `test_seks_steg_med_hoeyst_60_ord`, `test_merket_i_steg_6_er_det_samme_som_i_malene` |
+| K2 | steg 2 over 60 ord | `test_seks_steg_med_hoeyst_60_ord` |
+| K3 | et spørsmål i fet skrift | `test_hvert_spoersmaal_er_details_med_summary` |
+| K4 | ingen tom linje etter `</summary>` | `test_hvert_spoersmaal_er_details_med_summary`, `test_staar_du_fast_har_alt_som_ble_flyttet` |
+| K5 | ankeret skrevet feil | `test_hver_lenke_til_et_avsnitt_finnes` |
+| K6 | linja om resten tatt bort | `test_linja_om_resten_staar_foran_den_ekte_versjonen`, `test_hvert_spoersmaal_er_details_med_summary` |
+| K7 | `#` i boksen i steg 5 | `test_ingen_kommentar_paa_kommandolinjene`, `test_demoen_er_den_foerste_kommandoen`, `test_readme_proeven_har_hver_kommando` |
+| K8 | to kommandoer i Stopp | `test_en_kommando_per_boks`, `test_stopp_har_kommandoen` |
+| K9 | `~~~`-boks med `#` og to kommandoer i FAQ-en | `test_ingen_bokser_testene_ikke_ser` |
+| K10 | PowerShell og Terminal tatt ut av steg 3 | `test_stegene_nevner_powershell_og_terminal` |
+| K11 | merket endret i `index.html` | `test_merket_i_steg_6_er_det_samme_som_i_malene` |
+| K12 | «Download ZIP» tatt ut av steg 2 | `test_docker_foerst_og_uv_som_alternativ`, `test_demoen_er_den_foerste_kommandoen`, `test_zip_fila_maa_pakkes_ut` |
+| K13 | «Steg 3:» tatt ut av §9 | `test_stegene_og_henvisningene_til_dem` |
+| K14 | to like spørsmål | `test_hvert_spoersmaal_er_details_med_summary`, `test_staar_du_fast_har_alt_som_ble_flyttet` |
+| K15 | porten i Dockerfile endret | `test_linja_som_viser_at_demoen_er_klar`, `test_webserveren_er_waitress_uten_debug` |
+| K16 | AirPlay falt bort fra FAQ-en | `test_staar_du_fast_har_alt_som_ble_flyttet` |
+
+**Testene etter den korte formen:** lokalt 1285 passed og 16 skipped, 1301 samlet. Før PR 3: lokalt 1269 passed og 16 skipped, i CI 1285.
 
 ## Verification
 
