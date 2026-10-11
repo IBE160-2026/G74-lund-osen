@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-10-10T15:35'
+updated: '2026-10-11T11:45'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -84,6 +84,7 @@ graph TD
         boersdag["boersdag.py"]
         tilstand["tilstand.py"]
         tallformat["tallformat.py"]
+        hjelp["hjelpetekster.py"]
     end
 
     app --> marked
@@ -92,6 +93,8 @@ graph TD
     app --> kursdata
     app --> fil
     app --> tallformat
+    app --> hjelp
+    app --> signal
     fetch --> kursdata
     fetch --> fil
     fetch --> eodhd
@@ -116,6 +119,9 @@ graph TD
     signal --> kursdata
     signal --> tallformat
     signal --> vurdering
+    hjelp --> signal
+    hjelp --> marked
+    hjelp --> tallformat
 ```
 
 `meldinger.py`, `kursdata.py`, `vurderingsdata.py`, `boersdag.py` og
@@ -144,6 +150,12 @@ importerer den bare `kursdata`, `tallformat` og `vurderingsdata`, og
 `signalberegning` og `vurderingsdata`. *Rettet samme dag:* kantene
 `fetch --> sqlite` (fra story 2.1b) og `fetch --> boersdag` (fra story 2.1)
 manglet i grafen.
+*Lagt til 2026-10-11 (story 8.0b):* `hjelpetekster.py` har tekstene bak «?»
+på sidene. Den er kjerne og gjør ingen I/O. Den importerer `signalberegning`
+for `Parametre`, `markedsoversikt` for `RETNINGSVISNING` og `tallformat`, så
+tallene og ordene i hjelpen er de samme som i beregningen og tabellen.
+`app.py` gir malene tekstene og `Parametre` (kantene `app --> hjelp` og
+`app --> signal`). `tests/test_konsumentene.py` har den i `KJERNEMODULER`.
 
 ### AD-1 — Kjernen gjør ingen I/O `[ADOPTED 2026-09-20/21]`
 
@@ -468,6 +480,7 @@ G74-lund-osen/
     aksjedetalj.py       # ren logikk
     graf.py              # ren regning
     tallformat.py        # tall slik sidene viser dem, ren logikk  [bygget i 8.0]
+    hjelpetekster.py     # tekstene bak «?», ren logikk     [bygget i 8.0b]
     app.py               # HTTP og HTML
   data/                  # gitignorert — to volumer i Docker
     raa/                 # uforanderlige øyeblikksbilder      [bygget i 2.1b]

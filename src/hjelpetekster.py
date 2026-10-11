@@ -111,7 +111,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "Endring:",
             "endringen i prosent fra børsdagen før, regnet på utbyttejustert "
             "kurs.",
-            ((PRD, "| Endring | Endring i prosent, regnet på `adjusted_close` |"),
+            ((PRD, "| Endring | Endring i prosent, regnet på "),
              (MARKEDSOVERSIKT, "def endring_i_prosent(")),
         ),
         "utbyttejustert": Hjelpetekst(
