@@ -204,6 +204,11 @@ Fra instruksjonen kl. 16:54 i `docs/ai-prompts/2026-10-11.md` (planen) og kl. 20
   - Stegnumrene i «Planen for PR 3» gjelder den første formen med åtte steg. I den korte formen er «går til steg 4» i beslutning 1 steg 3, og «merket steg 7 siterer» er merket i steg 6.
   - Marians ønske kl. 17:08 om at hvert steg sier hva man ser når det har gått bra, gjelder fortsatt. Hvert av de seks stegene har en slik sjekk etter `9dd0f48`.
 - **2026-10-11 kl. 22:32, «Kom i gang» helhetlig og kort:** Marian kl. 22:21: README-en skal vise de to versjonene med forskjellen forklart, anbefale den ekte, ha lite informasjon, og FAQ-en var for lang. «Kom i gang» har nå en tabell over de to versjonene, felles steg 1–4, den ekte versjonen (steg 5–9) før demoen (steg 5–7), og «Står du fast?» med 8 spørsmål. De 28 spørsmålene og punktene om nøkkelen, hentingen, tom oversikt, dataene og porten er flyttet til `docs/hjelp.md`, ordrett og sortert etter steg. Den ekte versjonen står nå før demoen, så kravet fra PR 2 om at demoen er den første kommandoen gjelder ikke lenger, og testen med det navnet krever i stedet «Download ZIP» før `cp .env.example .env`. Commitene `706b9f5` og `4ae6a30`. **Til gruppen:** punktet «Når du henter», som PR #28 endrer, står nå i `docs/hjelp.md` under «Når kan jeg hente?». Flettes PR #28 etter denne, må endringen dens føres der.
+  - *Rettet samme kveld, etter gjennomgangen:* «ordrett» over stemmer ikke helt. Det som er flyttet til `docs/hjelp.md`, er 28 spørsmål og 5 punkter, 33 i alt. 7 av spørsmålene står også i README-en, og «Oversikten er tom.» er det åttende spørsmålet der. Endret ved flyttingen, for at svarene skal stemme med den nye formen:
+    - henvisningene til steg i «Hva betyr cd …», «Hva skal jeg se etter i vinduet?» og «Hvordan starter jeg neste gang?»
+    - «Nei.» foran svaret om porten
+    - subjektet «Dataene», som falt ut og er satt inn igjen
+    - etter gjennomgangen: kontoen hos EODHD, Ledetekst for den ekte versjonen, «Siden åpnes ikke.» for begge versjonene, og setningen om et lukket vindu, som hadde falt bort
 
 ## Review Triage Log
 
@@ -352,6 +357,58 @@ Gjennomgang av PR 2 (PR #27, etter `fe22cd3` kl. 15:35), Blind Hunter (BH, bare 
 | K16 | AirPlay falt bort fra FAQ-en | `test_staar_du_fast_har_alt_som_ble_flyttet` |
 
 **Testene etter den korte formen:** lokalt 1285 passed og 16 skipped, 1301 samlet. Før PR 3: lokalt 1269 passed og 16 skipped, i CI 1285.
+
+**Gjennomgangen av den helhetlige formen** (11.10, diffen `76b68cb..d844238`). Blind Hunter (BH, 16 funn), Edge Case Hunter (ECH, 14) og Verification Gap (VG, 5 hull og 2 andre). Rettingene står i `1d7e16f` og `dcc5e9e`.
+
+| Funn | Hva | Dom | Rute |
+|---|---|---|---|
+| BH, ECH | Stoppet i den ekte versjonen var «Ctrl+C eller denne», men sjekken «Removed» kommer bare etter kommandoen | medium | patch: Ctrl+C og så kommandoen, som i demoen |
+| ECH | Setningen om et lukket vindu før stoppet falt bort | medium | patch: eget spørsmål i `docs/hjelp.md` |
+| BH | Steg 8 mistet «og før midnatt» | medium | patch. Helgen første gang står i `docs/hjelp.md` |
+| BH, ECH, VG | «Hvor ligger dataene?» mistet subjektet | low | patch |
+| BH, ECH | Svaret om konto sa bare at demoen ikke trenger nøkkel | medium | patch: kontoen hos EODHD for den ekte versjonen |
+| BH | Ledetekst virker ikke for `cp` i den ekte versjonen | medium | patch |
+| BH, ECH | Port-svaret viste til «Bytte», som nå er lukket og står i en annen fil | low | patch |
+| ECH | Port-svaret gjaldt bare den ekte versjonen, nå som den står først | low | patch: «den andre versjonen» |
+| ECH | «Siden åpnes ikke.» sto bare under demoen | low | patch: egen del for begge versjonene |
+| BH | «Hvordan starter jeg neste gang?» nevnte ikke hentingen | low | patch |
+| BH | «Oversikten er tom.» hadde ulike svar i README-en og `docs/hjelp.md` | medium | patch, og `test_like_spoersmaal_har_samme_svar` |
+| BH | §9 prøver ikke den ekte versjonen med nøkkel | low | patch: står åpent i §9 |
+| BH, ECH | «ordrett» og antallet i Spec Change Log | low | patch |
+| VG1 | Bare overskriftene ble sjekket etter flyttingen, ikke innholdet | high | patch: `test_svarene_beholdt_innholdet` |
+| VG2 | Kommandoene i `docs/hjelp.md` slapp unna reglene for bokser og `--profile` | medium | patch: `test_boksene_i_hjelp_foelger_de_samme_reglene` og `--profile` over begge filene. Å kreve `wsl --update`, `git pull` og `nano .env` i §9 er avvist: prøven kan ikke kjøre dem |
+| VG3 | «steg N i demoen» ble bare sjekket mot 1–9 | medium | patch |
+| VG4 | Lenken i «Dokumentene» ble ikke testet | low | patch |
+| VG5 | `test_siden_lastes_paa_nytt_etter_hentingen` leste alt etter overskriften | low | patch: steg 8 |
+| BH | Testnavnet `test_demoen_er_den_foerste_kommandoen` sa det motsatte | low | patch: nytt navn |
+| BH, ECH | Linux mangler redigeringskommando i steg 6 | low | avvist: `nano .env` står i `docs/hjelp.md`, og steg 6 er på 59 ord |
+| ECH | Feilmeldingene fra hentingen har ingen svar | low | avvist: ny informasjon, som instruksjonen kl. 22:32 utelukker |
+| ECH | «om kvelden» i tabellen strider mot helgen første gang | low | avvist: ordlyden står i instruksjonen kl. 22:32 |
+| ECH | Linja «Serving on» for den ekte versjonen står ikke i `docs/hjelp.md` | low | avvist: den er ikke sett i en kjøring, og «ingen ny informasjon» |
+| VG | `git pull` står i et svar mens README-en sier at git ikke trengs | low | avvist: svaret gjelder bare den som har brukt `git clone` |
+
+**Mutantene for den helhetlige formen** (11.10, hele testsettet for hver, koden satt tilbake fra en kopi med sha256 kontrollert). Alle 16 ble fanget. H12 og H13 overlevde først, fordi testen for like svar leste bare ett spørsmål. Testen er rettet i `dcc5e9e`, og begge ble fanget etterpå.
+
+| # | Mutanten | Fanget av |
+|---|---|---|
+| H1 | Demoen mangler i tabellen | `test_tabellen_nevner_begge_og_hvilken_som_er_anbefalt` |
+| H2 | demoen anbefalt | `test_tabellen_nevner_begge_og_hvilken_som_er_anbefalt` |
+| H3 | advarselen mot `down -v` i en `<details>` | `test_advarselen_mot_down_v_staar_synlig` |
+| H4 | et niende spørsmål | `test_staar_du_fast_har_hoeyst_8_spoersmaal` |
+| H5 | et tema borte fra `docs/hjelp.md` | `test_hvert_tema_staar_i_readme_eller_hjelp` |
+| H6 | lenken til `docs/hjelp.md` brutt | `test_lenkene_virker`, `test_staar_du_fast_har_hoeyst_8_spoersmaal`, `test_hver_lenke_i_readme_peker_paa_noe_som_finnes` |
+| H7 | steg 1 over 60 ord | `test_stegene_er_nummerert_og_har_hoeyst_60_ord` |
+| H8 | `#` i boksen i steg 7 | `test_ingen_kommentar_paa_kommandolinjene`, `test_readme_proeven_har_hver_kommando` |
+| H9 | merket endret i malen | `test_merket_i_demoen_er_det_samme_som_i_malene` |
+| H10 | «Download ZIP» tatt ut | `test_ekte_versjonen_foerst_og_zip_foer_kommandoene`, `test_docker_foerst_og_uv_som_alternativ`, `test_zip_fila_maa_pakkes_ut` |
+| H11 | to kommandoer i en boks i `docs/hjelp.md` | `test_boksene_i_hjelp_foelger_de_samme_reglene` |
+| H12 | AirPlay borte fra svaret i `docs/hjelp.md` | `test_like_spoersmaal_har_samme_svar` (etter `dcc5e9e`) |
+| H13 | ulikt svar i README-en og `docs/hjelp.md` | `test_like_spoersmaal_har_samme_svar` (etter `dcc5e9e`) |
+| H14 | «steg 8 i demoen» | `test_henvisningene_og_proevetabellen` |
+| H15 | «Dokumentene» uten lenken | `test_hjelp_har_frontmatter_og_er_nevnt_i_readme` |
+| H16 | `notepad .env` mangler i §9 | `test_readme_proeven_har_hver_kommando` |
+
+**Testene etter den helhetlige formen:** lokalt 1290 passed og 16 skipped, 1306 samlet. Før instruksjonen kl. 22:32: lokalt 1285 passed og 16 skipped, i CI 1301. Før PR 3: lokalt 1269 passed og 16 skipped, i CI 1285.
 
 ## Verification
 
