@@ -14,9 +14,9 @@ import pytest
 import app as app_modul
 import demo
 import lagring_sqlite
-from hjelpetekster import Hjelp, hjelpetekster
+from hjelpetekster import MAALTE_GRENSER, Hjelp, hjelpetekster
 from markedsoversikt import RETNINGSVISNING
-from signalberegning import BLANDET, INGEN, NEGATIV, POSITIV, STANDARD, Parametre
+from signalberegning import BLANDET, INGEN, NEGATIV, POSITIV, STANDARD, Parametre, interesse, trend
 from tallformat import HARDT_MELLOMROM as NB
 from tallformat import tall
 
@@ -38,8 +38,8 @@ ANDRE = Parametre(
 )
 
 
-def _alt(tekster) -> str:
-    return "\n".join(f"{t.tittel} {t.tekst}" for t in tekster.values())
+def _alt(tekster, uten=()) -> str:
+    return "\n".join(f"{t.tittel} {t.tekst}" for n, t in tekster.items() if n not in uten)
 
 
 class TestTalleneFraParametre:
@@ -51,7 +51,8 @@ class TestTalleneFraParametre:
     def test_andre_parametre_gir_andre_tall(self):
         """Kontrollpunktet: tallene hentes fra Parametre. Ville feilet hvis
         50 dager eller 1,5 ganger var skrevet fast i en tekst."""
-        alt = _alt(hjelpetekster(ANDRE))
+        # grensene sier hva som ble maalt, og staar for seg (TestGrensene).
+        alt = _alt(hjelpetekster(ANDRE), uten=("grensene",))
         for tekst in STANDARDTALL:
             assert tekst not in alt, tekst
         for tekst in (
@@ -63,8 +64,6 @@ class TestTalleneFraParametre:
             "2,5 ganger",
             "trenger 41 børsdager",
             "styrke 3 eller mer",
-            "vinduene på 15 og 25 børsdager",
-            "terskelen 3",
         ):
             assert tekst in alt, tekst
 
@@ -84,6 +83,58 @@ class TestTalleneFraParametre:
         for eksempel en volumfaktor paa 1,25 vist som «1,3»."""
         vist = tall(verdi, slag).replace(NB, "").removesuffix("%").replace(",", ".")
         assert float(vist) == pytest.approx(verdi, abs=1e-12)
+
+
+    @pytest.mark.parametrize(
+        "p", [Parametre(volumfaktor=1.25), Parametre(noytralsone=0.025)]
+    )
+    def test_en_parameter_som_maatte_rundes_av_stopper(self, p):
+        """Gjennomgangen av 8.0b: en volumfaktor paa 1,25 ville staatt som
+        «1,2» med én desimal. Da feiler tekstene i stedet for aa vise et
+        annet tall enn koden bruker."""
+        with pytest.raises(ValueError, match="Rett desimalene"):
+            hjelpetekster(p)
+
+
+class TestGrensene:
+    def test_standard_er_grensene_som_ble_maalt(self):
+        """Teksten om maalingen gjelder grensene i malinger.md §7.4 og §9.
+        Ville feilet hvis en grense i Parametre ble endret uten ny maaling."""
+        for felt in ("noytralsone", "volumfaktor", "volatilitet_vindu", "volum_vindu", "terskel"):
+            assert getattr(STANDARD, felt) == getattr(MAALTE_GRENSER, felt), felt
+
+    def test_teksten_om_maalingen_nevner_de_maalte_grensene(self):
+        forventet = (f"2{NB}%, 1,5 ganger, de to vinduene på 20 børsdager og terskelen 2 "
+                     f"ble kontrollert mot 15 aksjer over 199 børsdager")
+        assert forventet in hjelpetekster()["grensene"].tekst
+        assert forventet in hjelpetekster(ANDRE)["grensene"].tekst
+
+
+def _serie(siste: float, n: int = 22) -> list[float]:
+    return [100.0] * (n - 1) + [siste]
+
+
+class TestTekstenSierDetKodenGjoer:
+    """Gjennomgangen av 8.0b (Verification Gap): setningene om fortegn og
+    sone bindes til det koden gjoer, ikke bare til tallene."""
+
+    @pytest.mark.parametrize(
+        "siste, verdi, setning",
+        [(103.0, 1, "+1 en dag kursen steg"), (97.0, -1, "-1 en dag den falt"),
+         (100.0, 0, "0 når kursen var uendret")],
+    )
+    def test_interesse(self, siste, verdi, setning):
+        volumer = [100.0] * 21 + [200.0]
+        assert interesse(_serie(siste), volumer).verdi == verdi
+        assert setning in hjelpetekster()["interesse"].tekst
+
+    @pytest.mark.parametrize(
+        "siste, verdi, setning",
+        [(110.0, 1, "Over gir +1"), (90.0, -1, "under gir -1"), (100.5, 0, f"innenfor 2{NB}% gir 0")],
+    )
+    def test_trend(self, siste, verdi, setning):
+        assert trend(_serie(siste, 50)).verdi == verdi
+        assert setning in hjelpetekster()["trend"].tekst
 
 
 class TestRetningen:
@@ -122,6 +173,7 @@ class TestRetningen:
 RAADSORD = (
     r"\bbør\b", r"\banbefal", r"\bkjøp", r"\bselg", r"\blønn", r"\bmulighet",
     r"\btips", r"\bvil stige", r"\bvil falle", r"\bkurspotensial", r"\bgevinst",
+    r"\bsalg", r"\bhandl", r"\binvester", r"\bverdt å",
 )
 
 
@@ -222,7 +274,7 @@ class TestSidene:
                 bedt_om.add(noekkel)
                 return super().tekst(noekkel)
 
-        monkeypatch.setattr(app_modul, "HJELP", Opptak(hjelpetekster()))
+        monkeypatch.setattr(app_modul, "Hjelp", Opptak)
         for adresse in SIDENE:
             _side(klient, adresse)
         assert bedt_om == set(hjelpetekster())
@@ -279,6 +331,17 @@ class TestSidene:
         html = _side(klient, "/")
         assert "width: min(32rem, calc(100vw - 2rem)); max-height: 80vh; overflow: auto;" in html
 
+    def test_grafen_og_tabellen_forklares_bare_naar_de_vises(self, klient, base):
+        """Gjennomgangen av 8.0b: VRDS har for kort serie til signal og
+        snitt, saa hjelpen forklarer verken den stiplede linja eller
+        kolonnene Ga og Maalt mot."""
+        tekster = hjelpetekster()
+        brfe = _side(klient, "/aksje/BRFE")
+        vrds = _side(klient, "/aksje/VRDS")
+        for noekkel in ("grafen", "ga", "maalt_mot"):
+            assert tekster[noekkel].tekst in brfe, noekkel
+            assert tekster[noekkel].tekst not in vrds, noekkel
+
     def test_tom_base_har_ogsaa_hjelpen(self, klient):
         """Uten kurser er det ingen tabell, men «?» ved overskriften virker."""
         html = _side(klient, "/")
@@ -297,3 +360,6 @@ class TestSnittetIGrafen:
         assert "40-dagers snitt (sjekk 1)" in html
         assert "med 40-dagers glidende snitt" in html
         assert "50-dagers" not in html
+        # Hjelpen foelger samme parametre som tegnforklaringen.
+        assert "snittet av de siste 40 børsdagene" in html
+        assert "de siste 50 børsdagene" not in html

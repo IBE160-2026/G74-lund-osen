@@ -191,11 +191,17 @@
     finansielle hendelser er ikke med i denne versjonen.
   </p>
 
+  {#- grafen bare med grafen og snittet, ga og maalt_mot bare med tabellen
+      (gjennomgangen av 8.0b): ellers forklarer hjelpen noe siden ikke viser. #}
   {{ hjelpevindu("hjelp-aksje", "Tallene og signalet", [
-    ("Tallene", ["sluttkurs", "utbyttejustert", "grafen", "data_hentet_aksje"]),
+    ("Tallene", ["sluttkurs", "utbyttejustert"]
+      + (["grafen"] if graf and graf.har_ma50 and detalj.sjekker else [])
+      + ["data_hentet_aksje"]),
     ("Signalstyrke", ["signalstyrke"]),
     ("Retning", ["retning", "positiv", "negativ", "blandet", "ingen", "ukjent_aksje"]),
-    ("De tre sjekkene", ["trend", "bevegelse", "interesse", "ga", "maalt_mot", "antall_dager", "hvorfor_tre"]),
+    ("De tre sjekkene", ["trend", "bevegelse", "interesse"]
+      + (["ga", "maalt_mot"] if detalj.sjekker else [])
+      + ["antall_dager", "hvorfor_tre"]),
     ("Grensene", ["grensene", "skjevhet"]),
     ("Ikke et råd", ["ikke_raad"]),
   ]) }}

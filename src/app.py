@@ -214,14 +214,14 @@ def _eksempeltall():
 
 # Story 8.0b: tekstene bak «?», med tallene fra parametrene som gjelder i
 # appen. Malene henter dem med hjelp.tekst(), og MA-vinduet i grafens
-# tegnforklaring med parametre.ma_vindu.
-HJELP = Hjelp(hjelpetekster(STANDARD))
+# tegnforklaring med parametre.ma_vindu. Tekstene, tegnforklaringen og
+# beregningen paa sidene bruker samme Parametre (gjennomgangen av 8.0b).
 
 
 @app.context_processor
 def _hjelp():
-    """Hjelpetekstene og parametrene paa hver side."""
-    return {"hjelp": HJELP, "parametre": STANDARD}
+    """Hjelpetekstene og parametrene paa hver side, laget av samme objekt."""
+    return {"hjelp": Hjelp(hjelpetekster(STANDARD)), "parametre": STANDARD}
 
 
 @app.teardown_appcontext
@@ -323,7 +323,7 @@ def markedsoversikt():
         )
 
     poster = _leser_eller_basefeil(hent_oversiktsleser).oversikt()
-    rader = bygg_oversikt(poster, idag())
+    rader = bygg_oversikt(poster, idag(), STANDARD)
 
     return render_template(
         "index.html",
@@ -360,7 +360,7 @@ def aksjedetalj(symbol: str):
     if post is None:
         abort(404)
 
-    detalj = bygg_detalj(post, leser.serie(post.aksje.symbol), idag())
+    detalj = bygg_detalj(post, leser.serie(post.aksje.symbol), idag(), STANDARD)
     if detalj is None:
         abort(404)
 

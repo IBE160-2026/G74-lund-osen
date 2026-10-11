@@ -29,7 +29,7 @@ from signalberegning import (
     Parametre,
     nodvendige_dager,
 )
-from tallformat import tall
+from tallformat import HARDT_MELLOMROM, tall
 
 # Kildene, som stier fra roten av repoet.
 PRD = "_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md"
@@ -47,6 +47,14 @@ ANTALL_SJEKKER = 3
 
 # Maalingene bak grensene (malinger.md §7.4 og §9). De er ikke parametre: de
 # sier hva grensene ble kontrollert mot.
+#
+# Grensene som ble maalt, staar for seg og ikke fra Parametre: teksten om
+# maalingen sier hvilke verdier som ble kontrollert, og det var disse. En test
+# krever at STANDARD er lik dem, saa en ny grense i Parametre stopper testene
+# til grensen er maalt og teksten rettet (gjennomgangen av 8.0b).
+MAALTE_GRENSER = Parametre(
+    noytralsone=0.02, volumfaktor=1.5, volatilitet_vindu=20, volum_vindu=20, terskel=2,
+)
 MAALTE_BOERSDAGER = 199
 MAALTE_AKSJER = 15
 MAALT_PERIODE = "fra desember 2025 til september 2026"
@@ -85,19 +93,38 @@ def _retningstittel(retning: str) -> str:
     return f"{visning.symbol} {visning.tekst}:"
 
 
-def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
-    """Alle hjelpetekstene, med tallene fra p."""
-    sone = tall(p.noytralsone * 100, "grense")
-    faktor = tall(p.volumfaktor, "faktor")
-    ma = tall(p.ma_vindu, "heltall")
-    volatilitet = tall(p.volatilitet_vindu, "heltall")
-    volum = tall(p.volum_vindu, "heltall")
-    terskel = tall(p.terskel, "heltall")
-    dager = tall(nodvendige_dager(p), "heltall")
-    if p.volatilitet_vindu == p.volum_vindu:
-        vinduene = f"de to vinduene på {volatilitet} børsdager"
+def _vis(verdi: float, slag: str) -> str:
+    """Tallet som tekst etter regel 21, eller ValueError hvis det ikke kan
+    vises uten aa rundes av. Da ville hjelpen vist en annen grense enn den
+    koden bruker, for eksempel «1,3» for en volumfaktor paa 1,25."""
+    tekst = tall(verdi, slag)
+    tilbake = float(tekst.replace(HARDT_MELLOMROM, "").removesuffix("%").replace(",", "."))
+    if abs(tilbake - verdi) > 1e-9:
+        raise ValueError(f"{verdi} vises som {tekst!r} med slaget {slag!r}. Rett desimalene i tallformat.py")
+    return tekst
+
+
+def _grensene(m: Parametre) -> str:
+    """Grensene som ble maalt, i den rekkefoelgen teksten nevner dem."""
+    if m.volatilitet_vindu == m.volum_vindu:
+        vinduene = f"de to vinduene på {_vis(m.volatilitet_vindu, 'heltall')} børsdager"
     else:
-        vinduene = f"vinduene på {volatilitet} og {volum} børsdager"
+        vinduene = (f"vinduene på {_vis(m.volatilitet_vindu, 'heltall')} og "
+                    f"{_vis(m.volum_vindu, 'heltall')} børsdager")
+    return (f"{_vis(m.noytralsone * 100, 'grense')}, {_vis(m.volumfaktor, 'faktor')} ganger, "
+            f"{vinduene} og terskelen {_vis(m.terskel, 'heltall')}")
+
+
+def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
+    """Alle hjelpetekstene, med tallene fra p. Teksten om maalingen bruker
+    MAALTE_GRENSER, fordi den sier hva som ble maalt."""
+    sone = _vis(p.noytralsone * 100, "grense")
+    faktor = _vis(p.volumfaktor, "faktor")
+    ma = _vis(p.ma_vindu, "heltall")
+    volatilitet = _vis(p.volatilitet_vindu, "heltall")
+    volum = _vis(p.volum_vindu, "heltall")
+    terskel = _vis(p.terskel, "heltall")
+    dager = _vis(nodvendige_dager(p), "heltall")
 
     tekster = {
         "sluttkurs": Hjelpetekst(
@@ -161,13 +188,16 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "Står det «–» med en tekst under i stedet for et tall, finnes det "
             "ingen vurdering for dagen, og teksten sier hvorfor.",
             ((PRD, "| Signalstyrke | Tom |"),
-             (MARKEDSOVERSIKT, "GRUNNTEKST")),
+             (MARKEDSOVERSIKT, "GRUNNTEKST"),
+             (MARKEDSOVERSIKT, 'IKKE_VURDERT = "ikke vurdert"'),
+             (MARKEDSOVERSIKT, 'IKKE_BOERSDAG = "ikke børsdag"')),
         ),
         "retning": Hjelpetekst(
             "",
             "Retningen sier hva sjekkene peker mot, ikke hvor kursen går "
             "videre.",
-            ((PRD, "#### FR-103"),),
+            ((PRD, "#### FR-103"),
+             (BEGRUNNELSER, "Om de sier noe om kursen videre, er ikke målt (FR-703).")),
         ),
         **{
             noekkel: Hjelpetekst(
@@ -247,7 +277,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         ),
         "grensene": Hjelpetekst(
             "Grensene:",
-            f"{sone}, {faktor} ganger, {vinduene} og terskelen {terskel} ble "
+            f"{_grensene(MAALTE_GRENSER)} ble "
             f"kontrollert mot {MAALTE_AKSJER} aksjer over {MAALTE_BOERSDAGER} "
             f"børsdager, {MAALT_PERIODE}, før de ble låst. Det var en kontroll "
             f"av at de holder, ikke et søk etter verdiene som gir penest "
@@ -265,6 +295,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             f"og {tall(ANDEL_NEGATIV, 'andel')} negative. Det beskriver "
             f"perioden, ikke det som kommer.",
             ((BEGRUNNELSER, "### Åpent punkt: skjevfordeling mot positiv retning"),
+             (BEGRUNNELSER, "Det er en tilstand, som kan vare i uker."),
              (MAALINGER, "Målt over 199 dager er **60,0 % av aksjedagene med "
                          "utslag positive**, mot 29,5 %")),
         ),
@@ -284,9 +315,10 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         ),
         "maalt_mot": Hjelpetekst(
             "Målt mot:",
-            "tallet sjekken ble avgjort av, og grensen det ble målt mot. "
+            "tallet sjekken ble avgjort av, og hva det ble målt mot. "
             "Radene med lys bakgrunn er sjekkene som slo ut.",
             ((PRD, "#### FR-706"),
+             (PRD, "se hva hvert fortegn ble målt mot"),
              (AKSJE_MAL, "<th>Målt mot</th>"),
              (AKSJE_MAL, "class=\"bidro\"")),
         ),
@@ -317,6 +349,3 @@ class Hjelp:
             return self._tekster[noekkel]
         except KeyError:
             raise KeyError(f"Ingen hjelpetekst med nøkkelen {noekkel!r} i hjelpetekster.py") from None
-
-    def noekler(self) -> set[str]:
-        return set(self._tekster)
