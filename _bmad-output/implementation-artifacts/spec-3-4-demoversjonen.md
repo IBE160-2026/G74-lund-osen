@@ -210,6 +210,11 @@ Fra instruksjonen kl. 16:54 i `docs/ai-prompts/2026-10-11.md` (planen) og kl. 20
     - subjektet «Dataene», som falt ut og er satt inn igjen
     - etter gjennomgangen: kontoen hos EODHD, Ledetekst for den ekte versjonen, «Siden åpnes ikke.» for begge versjonene, og setningen om et lukket vindu, som hadde falt bort
 
+- **2026-10-11 kl. 23:48, «Kom i gang» øverst og «Status» kortere:** Marian kl. 23:41–23:46: README-en begynner med beskrivelsen, så «Til faglærer», så «Kom i gang», så «Status». «Status» er i vanlige ord, uten storynumre og uten demokommandoen, som sto uten stegene før den. Tabellen i «Kom i gang» sier det de to punktene om versjonene sa. Steg 5 i den ekte versjonen sier ikke hvor nøkkelen står hos EODHD, fordi Marian ikke husker det (svaret kl. 23:55 i `docs/ai-prompts/2026-10-11.md`). Commitene `85cad6a` og `56d886f`.
+  - **Konfliktene ved flettingen** (rettes når de oppstår, ikke nå):
+    - Grenen 8-0b (PR #29) endrer den gamle statuslinja, som begynte med «Børsdagskontrollen (2.3) …». Den finnes ikke lenger etter PR 3. Når 8-0b henter main, må den nye statuslinja i stedet si at hjelpen bak «?» er ferdig.
+    - PR #28 (2.3b) endrer punktet «Når du henter» i README-en. Det står nå i `docs/hjelp.md` under «Når kan jeg hente?», og endringen må føres der.
+
 ## Review Triage Log
 
 Gjennomgang 1 av PR 1 (10.10 kl. 13:02–13:06, PR #26), Blind Hunter (BH, bare diffen), Edge Case Hunter (ECH) og Verification Gap (VG), som tre uavhengige agenter. Rettelsene er `5bcdef0`, `f9bbdcd` og `680fcf6`.
