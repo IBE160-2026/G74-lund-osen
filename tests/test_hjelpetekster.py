@@ -256,10 +256,12 @@ class TestSidene:
 
     def test_hver_knapp_aapner_et_vindu_paa_samme_side(self, klient, base):
         """Ville feilet hvis knappen pekte paa et id som ikke finnes, og
-        vinduet aldri aapnet seg."""
+        vinduet aldri aapnet seg, eller et vindu sto uten «?» som aapner det.
+        Bare «?»-knappene teller: lukkeknappen inne i vinduet peker ogsaa paa
+        vinduet (mutant M12)."""
         for adresse in SIDENE:
             html = _side(klient, adresse)
-            maal = set(re.findall(r'popovertarget="([^"]+)"', html))
+            maal = set(re.findall(r'class="hjelpeknapp" popovertarget="([^"]+)"', html))
             vinduer = set(re.findall(r'<div id="([^"]+)" class="hjelpevindu" popover>', html))
             assert maal and maal == vinduer, adresse
 

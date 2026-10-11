@@ -355,7 +355,9 @@ class TestSidene:
             html = klient.get(adresse).data.decode("utf-8")
             assert "Eksempeltall" in html, adresse
             for vindu in vinduer:
-                assert f'popovertarget="{vindu}"' in html, (adresse, vindu)
+                # «?»-knappen, ikke lukkeknappen inne i vinduet, som ogsaa har
+                # popovertarget (mutant M12).
+                assert f'class="hjelpeknapp" popovertarget="{vindu}"' in html, (adresse, vindu)
                 assert f'<div id="{vindu}" class="hjelpevindu" popover>' in html, (adresse, vindu)
             for noekkel in noekler:
                 assert tekster[noekkel].tekst in html, (adresse, noekkel)
