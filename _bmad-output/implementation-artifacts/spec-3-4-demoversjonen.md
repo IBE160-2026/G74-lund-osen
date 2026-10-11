@@ -417,6 +417,39 @@ Gjennomgang av PR 2 (PR #27, etter `fe22cd3` kl. 15:35), Blind Hunter (BH, bare 
 
 **Testene etter den helhetlige formen:** lokalt 1290 passed og 16 skipped, 1306 samlet. Før instruksjonen kl. 22:32: lokalt 1285 passed og 16 skipped, i CI 1301. Før PR 3: lokalt 1269 passed og 16 skipped, i CI 1285.
 
+**Gjennomgangen av rekkefølgen og «Status»** (12.10, diffen `d2cb634..d1e6639`). Blind Hunter (BH, 10 funn), Edge Case Hunter (ECH, 11) og Verification Gap (VG, 2 hull). Rettingene står i `0f7b42d`.
+
+| Funn | Hva | Dom | Rute |
+|---|---|---|---|
+| BH, ECH | Tabellen sa ikke at kursene hentes fra EODHD hver børsdag og at dagens vurdering lagres per aksje, slik punktene som ble tatt ut, gjorde | medium | patch i tabellen. «Sidene leser fra basen» står ikke lenger, og det står i Spec Change Log |
+| BH, ECH | «Ferdig» stemmer ikke med `review` i sprintstatusen | medium | patch: «Flettet til main», som git kan bekrefte når PR 3 er flettet |
+| BH, ECH | 8.0d står ikke i sprintstatusen som statuslinja lenker til | low | patch: lenke også til planen i `epics.md` |
+| BH, ECH | Konfliktnotatene manglet regelen for statuslinja ved hver fletting, og 8-0b sier at 2.3b er flettet | low | patch i Spec Change Log |
+| BH, ECH, VG | Regelen for storynumre slapp gjennom «(10.1)», «8-0b» og «story 11.2», og kunne slå ut på datoer | medium | patch: parentes, bokstav bak, bindestrek og ordet story, men ikke datoer |
+| VG, ECH | «Ingen kommando» sjekket bare ``` og `docker compose` | medium | patch: også `~~~`, kode i backticks, `docker-compose` og `uv run` |
+| BH | Testen sjekket ikke innholdet Marian ba om i «Status» | medium | patch |
+| BH, ECH | Rekkefølgetesten sjekket ikke «rett under beskrivelsen», og ga `ValueError` i stedet for en feilmelding | low | patch |
+| BH | Ingen test for «lenger ned» | low | patch |
+| BH | Tidsstemplet i Spec Change Log var eldre enn svaret det viser til | low | patch: «instruksjonen kl. 23:48» |
+| BH | Steg 5 sier ikke hvor nøkkelen står hos EODHD | low | avvist: Marian husker ikke, og det er ikke slått opp (regel 3) |
+
+**Mutantene for rekkefølgen og «Status»** (12.10, hele testsettet for hver, mot `0f7b42d`, koden satt tilbake fra en kopi med sha256 kontrollert). Alle 9 som brøt en regel, ble fanget. T9 er forkastet, fordi den la inn en ny linje som ikke het «Til faglærer:», mens den ekte linja ble stående. Den brøt derfor ingen regel. T9b flytter selve linja.
+
+| # | Mutanten | Fanget av |
+|---|---|---|
+| T1 | «Status» før «Kom i gang» | `test_til_faglaerer_og_kom_i_gang_foer_status`, `test_status_uten_storynumre_og_uten_kommando` |
+| T2 | et avsnitt mellom beskrivelsen og «Til faglærer» | `test_til_faglaerer_og_kom_i_gang_foer_status` |
+| T3 | «(10.1–10.3)» i «Status» | `test_status_uten_storynumre_og_uten_kommando` |
+| T4 | «(8-0b)» i «Status» | `test_status_uten_storynumre_og_uten_kommando` |
+| T5 | `docker compose up --build demo` i «Status» | `test_status_uten_storynumre_og_uten_kommando` |
+| T6 | en `~~~`-boks i «Status» | `test_status_uten_storynumre_og_uten_kommando` |
+| T7 | «hjelp bak «?»» falt bort | `test_status_uten_storynumre_og_uten_kommando` |
+| T8 | «lenger ned» borte | `test_lenken_til_staar_du_fast_sier_lenger_ned` |
+| T9 | en ekstra linje under «Kom i gang» | forkastet, se over |
+| T9b | «Til faglærer» flyttet under «Kom i gang» | `test_til_faglaerer_og_kom_i_gang_foer_status` |
+
+**Testene etter rekkefølgen og «Status»:** lokalt 1293 passed og 16 skipped, 1309 samlet. Før instruksjonen kl. 23:48: lokalt 1290 passed og 16 skipped, i CI 1306.
+
 ## Verification
 
 **Mutantene, 10.10 kl. 12:49–12:58.** Mot `tests/test_demo.py`, `tests/test_app.py`, `tests/test_fetch_prices.py` og `tests/test_aksje.py`. 18 av 18 drept:
