@@ -1940,6 +1940,8 @@ avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 
 *Lagt til 2026-10-11, Marians beslutning:* README-en skrives om for en som aldri har brukt Docker eller et terminalvindu, med steg, bilder og «Hvis noe går galt», før README-prøven (PR 3). Grunnen: Marian fant ikke ut hvor kommandoene skulle skrives. Bildet av demosiden tas etter 8.0d.
 
+*Lagt til 2026-10-12:* PR 3 er flettet i `4464a10`, PR #30. README-en har en tabell over de to versjonene, felles steg 1–4, den ekte versjonen og demoen, «Står du fast?» og `docs/hjelp.md`, uten bilder (svar 4 11.10). README-prøven 13.–16.10 gjenstår (§9 i `docs/kvalitetssikring.md`).
+
 ### Story 3.4b: KI-tekstene i demoen
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 16:53.*
