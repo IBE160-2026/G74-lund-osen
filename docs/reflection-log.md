@@ -2595,6 +2595,20 @@ Marian så også at sidene ikke ligner designforslaget. Vi la til story 8.0d for
 
 ---
 
+## 12.10.2026 – Briefen øverst, og designforslaget utenfor repoet
+
+*Joakim og Marian.*
+
+Natt til mandag ble svaret fra Claude Code avbrutt av en API-feil etter at PR #30 var flettet, så Utført-linja manglet. Dagsfila viste hva som var gjort, og om morgenen fullførte vi instruksjonen. Så leste Marian README-en som en som ser repoet for første gang, og tok opp tre ting. Hvorfor bare 15 aksjer? Det ble et spørsmål i hjelpen: gratisnøkkelen gir 20 kall i døgnet, og hver aksje koster ett. At appen er under utvikling og ikke ferdig, sto bare under «Status» langt nede, så det kom inn i beskrivelsen øverst. Og briefen var vanskelig å finne. Vi flyttet ingen filer, fordi stiene brukes i lenker, tagger og BMAD, men la fire linjer under «Til faglærer» øverst i README-en.
+
+Om dagen flettet vi 8.0b, hjelp bak «?». Da Marian så hjelpen på skjermen, var den lang og ikke lik designforslaget. Tekstene og oppsettet i designforslaget ligger på en tavle i Claude og ikke i repoet, så verken byggingen eller testene så dem. I stedet for å rette bit for bit startet vi en samleliste til én samlet endring etter README-prøven. Den har nå 12 punkter. Om kvelden spurte Marian om vi bruker riktige ord, og om teksten i designforslaget er kontrollert. Det var den ikke helt. Noen setninger sier sluttkurs der koden bruker den utbyttejusterte kursen, og PRD-en og fotnoten sier at signalstyrken er hvor kraftig sjekkene slår ut, mens hjelpen sier hvor mange av dem som slo ut. Seks ting i designforslaget har ingen story ennå, og Marian bestemte at alle seks skal med. Rådet bommet også. Det første forslaget til kortere hjelp brukte ord som ordlista på tavla har valgt bort, og rådet skrev at FR-701 sier sluttkurs. Claude Code slo opp før commit og fant at det bare er tabellen i FR-701 som gjør det.
+
+Hentingen gikk som den skulle. Før det kom henteblokka to ganger avkortet da den ble limt inn, og Claude Code gjorde ingenting, fordi sluttlinja manglet. Det er regel 1 i CLAUDE.md, og den virket. Alle 15 aksjene fikk dagens kurs, så vi har 105 lagrede vurderinger etter sju børsdager. Nye forsøk med kallene som er igjen (2.3b), flettet vi først etter hentingen, så den gikk på kode vi kjente. I morgen er første henting med nye forsøk. De 5 kallene som var igjen i kveld, gikk til å måle omsetningen for fem aksjer til (`malinger.md` §28).
+
+Det vi lærte: det som bare ligger utenfor repoet, blir verken fulgt eller testet, og en tekst som er gjennomgått én gang, må likevel kontrolleres mot koden før den brukes. Det som ligger i repoet, må også kunne finnes av en som leser det ovenfra.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
