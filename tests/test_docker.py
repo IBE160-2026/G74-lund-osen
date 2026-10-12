@@ -874,6 +874,10 @@ class TestReadmeForNybegynnere:
         assert f"signalstyrke fra 0 til {antall}" in beskrivelse
         assert "– " + ", ".join(n.lower() for n in navn[:antall - 1]) + f" og {navn[antall - 1].lower()} –" in beskrivelse
         assert "Appen gir ikke råd om å kjøpe eller selge." in beskrivelse
+        # Marian 12.10 kl. 11:12: at appen er under utvikling, staar ogsaa oeverst,
+        # ikke bare i «Status» etter hele «Kom i gang».
+        # Rett etter setningen om raad, som instruksjonen kl. 11:15 sier (VG 12.10).
+        assert "selge. Den er under utvikling og ikke ferdig." in beskrivelse
 
     def test_hvorfor_bare_15_aksjer(self):
         """Marian 12.10 kl. 10:22: spoersmaalet staar i docs/hjelp.md under
