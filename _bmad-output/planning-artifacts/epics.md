@@ -2673,6 +2673,8 @@ sted. Min liste (8.3) bruker de samme.
 
 *Lagt til 2026-10-11, Marians beslutning:* fotnotene under tabellene (funn 23 i gjennomgangen av 8.0b, `deferred-work.md`) tas i 8.0c, ikke før flettingen.
 
+*Ferdig 2026-10-12:* flettet i `8d70762`, PR #29.
+
 ### Story 8.0c: Tydelig merking, ord ved sjekkene og datoer på grafen
 
 *Lagt til 2026-10-05, fra rådets gjennomgang av sidene og Marians beslutning kl. 21:23.*

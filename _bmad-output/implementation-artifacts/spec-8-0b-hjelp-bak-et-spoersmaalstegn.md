@@ -2,7 +2,7 @@
 title: 'Story 8.0b: Hjelp bak et spørsmålstegn'
 type: 'feature'
 created: '2026-10-11'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '00a69ceb262e1850e53d9a4320b84772b88b51ba'
