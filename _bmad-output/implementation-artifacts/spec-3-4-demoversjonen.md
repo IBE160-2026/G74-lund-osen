@@ -224,6 +224,8 @@ Fra instruksjonen kl. 16:54 i `docs/ai-prompts/2026-10-11.md` (planen) og kl. 20
 
 - **2026-10-12, instruksjonen kl. 10:45, «en henting bruker 15»:** punkt 3 fra gjennomgangen av PR #31 (Marian kl. 10:38). Setningen i svaret på «Hva med nøkkelen?» i `docs/hjelp.md` var ikke knyttet til `AKSJEUNIVERS` i noen test, så den kunne bli stående med feil tall når lista endres (2.11 og 2.12). `test_hvorfor_bare_15_aksjer` krever nå «en henting bruker N», der N er lengden av lista. `docs/hjelp.md` er ikke endret. Mutantene: «en henting bruker 16» i hjelpen, og setningen tatt ut. Begge ble fanget, kjørt bare mot `tests/test_docker.py`. Punkt 2, om 16 kall når indeksen hentes, er ført i `deferred-work.md`, fordi det først kan gjøres med story 2.8.
 
+- **2026-10-12, instruksjonen kl. 11:15, «Den er under utvikling og ikke ferdig.»:** Marian kl. 11:12: at appen er under utvikling, sto bare i «Status», som kommer etter hele «Kom i gang». Setningen står nå også i beskrivelsen øverst, rett etter «Appen gir ikke råd om å kjøpe eller selge.», og `test_beskrivelsen_foelger_koden_og_gir_ikke_raad` krever den. Mutantene, setningen tatt ut og setningen flyttet til «Status», ble begge fanget, kjørt bare mot `tests/test_docker.py`. **Ved innleveringen** ses setningen på igjen, sammen med linja nederst på sidene om at appen er under arbeid, og punktet i `docs/innlevering.md` om å bytte den. Begge er planlagt i 8.0c og finnes ikke ennå.
+
 ## Review Triage Log
 
 Gjennomgang 1 av PR 1 (10.10 kl. 13:02–13:06, PR #26), Blind Hunter (BH, bare diffen), Edge Case Hunter (ECH) og Verification Gap (VG), som tre uavhengige agenter. Rettelsene er `5bcdef0`, `f9bbdcd` og `680fcf6`.
