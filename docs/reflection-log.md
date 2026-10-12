@@ -2583,6 +2583,18 @@ Lørdagens 20 kall gikk til å måle omsetningen for 20 aksjer til, så 104 er n
 
 ---
 
+## 11.10.2026 – README-en møtte en som aldri har brukt Docker
+
+*Joakim og Marian.*
+
+Søndag, uten henting. Om formiddagen planla og bygde vi story 8.0b, hjelp bak et «?» på sidene. Tekstene ligger i én fil, og tallene i dem hentes fra koden, så hjelpen ikke kan si noe annet enn beregningen gjør. Gjennomgangen fant blant annet at fotnotene under tabellene bruker andre ord enn hjelpen. Dem tar vi i 8.0c, og 8.0b ble liggende klar til fletting.
+
+Så prøvde Marian demoen selv, bare med README-en, og det gikk ikke. Hun limte kommandoene inn i Docker Desktop i stedet for i et terminalvindu, og siden svarte ikke. Fra en ny mappe og med PowerShell gikk det. README-en var skrevet for en som kan Docker, så vi skrev den om for en som aldri har brukt Docker eller et terminalvindu. Marian svarte på spørsmål mens hun prøvde på sin egen maskin: ZIP-fila ser ut som en vanlig mappe før den er pakket ut, Windows skjuler filendelser, og mappa som dras inn i PowerShell, får anførselstegn. Det ble egne spørsmål i hjelpen. Første versjon ble for lang, så vi gjorde den kortere, la de fleste spørsmålene i `docs/hjelp.md`, satte «Kom i gang» rett etter beskrivelsen og skrev en ny beskrivelse av appen.
+
+Marian så også at sidene ikke ligner designforslaget. Vi la til story 8.0d for utseendet, etter 8.0b og 8.0c, og skrev beslutningene inn i `epics.md`, så de ikke blir borte. Det vi lærte: en README må prøves av noen som ikke har skrevet den. README-prøven 13.–16.10 gjør det samme på en maskin som ikke har hatt repoet før.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
