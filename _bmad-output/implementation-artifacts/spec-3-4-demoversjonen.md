@@ -222,6 +222,8 @@ Fra instruksjonen kl. 16:54 i `docs/ai-prompts/2026-10-11.md` (planen) og kl. 20
 
 - **2026-10-12, instruksjonen kl. 10:25, «Hvorfor bare 15 aksjer?»:** Marian lurte kl. 10:19–10:22 på om beskrivelsen øverst skulle si at kursene kommer fra gratisnivået hos EODHD. Hun valgte et spørsmål i `docs/hjelp.md` i stedet, så beskrivelsen holder seg kort. Det står under «Den ekte versjonen», rett etter «Hva med nøkkelen?». `test_hvorfor_bare_15_aksjer` henter tallet fra `AKSJEUNIVERS`. Mutantene A1 (16 i overskriften), A2 (16 i svaret), A3 (spørsmålet flyttet til «Demoen») og A4 (en aksje tatt ut av `AKSJEUNIVERS`) ble fanget, kjørt bare mot `tests/test_docker.py`. A4 ble også fanget av `test_beskrivelsen_foelger_koden_og_gir_ikke_raad`, som dermed er prøvd mot B6, mutanten som ble stoppet natt til 12.10.
 
+- **2026-10-12, instruksjonen kl. 10:45, «en henting bruker 15»:** punkt 3 fra gjennomgangen av PR #31 (Marian kl. 10:38). Setningen i svaret på «Hva med nøkkelen?» i `docs/hjelp.md` var ikke knyttet til `AKSJEUNIVERS` i noen test, så den kunne bli stående med feil tall når lista endres (2.11 og 2.12). `test_hvorfor_bare_15_aksjer` krever nå «en henting bruker N», der N er lengden av lista. `docs/hjelp.md` er ikke endret. Mutantene: «en henting bruker 16» i hjelpen, og setningen tatt ut. Begge ble fanget, kjørt bare mot `tests/test_docker.py`. Punkt 2, om 16 kall når indeksen hentes, er ført i `deferred-work.md`, fordi det først kan gjøres med story 2.8.
+
 ## Review Triage Log
 
 Gjennomgang 1 av PR 1 (10.10 kl. 13:02–13:06, PR #26), Blind Hunter (BH, bare diffen), Edge Case Hunter (ECH) og Verification Gap (VG), som tre uavhengige agenter. Rettelsene er `5bcdef0`, `f9bbdcd` og `680fcf6`.

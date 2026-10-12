@@ -892,3 +892,9 @@ class TestReadmeForNybegynnere:
         svar = ekte.split(f"### {sporsmaal}\n\n", 1)[1].split("\n\n", 1)[0]
         assert f"med {antall} aksjer" in svar
         assert "20 kall i døgnet" in svar and "opptil 18" in svar
+        # Gjennomgangen av PR #31, punkt 3 (Marian 12.10 kl. 10:38): svaret
+        # rett over sier hvor mange kall en henting bruker, og det tallet
+        # foelger ogsaa lista.
+        nokkel = ekte.split("### Hva med nøkkelen?\n\n", 1)[1].split("\n\n", 1)[0]
+        # Ordgrense etter tallet, saa 1 ikke godtar «15» (Verification Gap 12.10).
+        assert re.search(rf"en henting bruker {antall}\b", nokkel), nokkel
