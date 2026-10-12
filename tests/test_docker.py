@@ -896,4 +896,5 @@ class TestReadmeForNybegynnere:
         # rett over sier hvor mange kall en henting bruker, og det tallet
         # foelger ogsaa lista.
         nokkel = ekte.split("### Hva med nøkkelen?\n\n", 1)[1].split("\n\n", 1)[0]
-        assert f"en henting bruker {antall}" in nokkel
+        # Ordgrense etter tallet, saa 1 ikke godtar «15» (Verification Gap 12.10).
+        assert re.search(rf"en henting bruker {antall}\b", nokkel), nokkel
