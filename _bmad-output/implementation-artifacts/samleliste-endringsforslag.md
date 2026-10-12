@@ -2,12 +2,14 @@
 title: "Samleliste til neste endringsforslag"
 status: aktiv
 created: 2026-10-12
-updated: 2026-10-12T22:39
+updated: 2026-10-12T23:45
 ---
 
 # Samleliste til neste endringsforslag
 
 Punkter som dukker opp, samles her og tas i ett endringsforslag med bmad-correct-course, ikke ett og ett (Marian 12.10 kl. 12:21). Rekkefølgen tas opp samtidig, etter README-prøven 13.–16.10. Et punkt som er tatt, får en datert linje om hvor det ble tatt.
+
+*Lagt til 2026-10-12:* rådet anbefalte kl. 22:03 og 22:40 at den samlede endringen tas før 8.0c planlegges, fordi 8.0c blir større med de fire første tingene i punkt 11. Ikke avgjort.
 
 1. Kortere hjelp, som i designforslaget (Marian 12.10 kl. 12:17: «laaaang hjelp tekst», «ikke lik som forslaget»). Hjelpetekstene fra 8.0b står i ett vindu bak «?» ved tittelen. Tavla har «Slik leser du tabellen» med tre korte punkter, noen få korte setninger bak hvert «?», og «Vis meg rundt» i sju korte steg (8.9).
 2. Gjennomgå tekstene (Marian 12.10 kl. 12:21): hjelpen og tekstene på sidene, kortere og i vanlige ord (NFR-05).
