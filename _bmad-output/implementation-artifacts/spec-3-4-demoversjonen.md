@@ -226,6 +226,8 @@ Fra instruksjonen kl. 16:54 i `docs/ai-prompts/2026-10-11.md` (planen) og kl. 20
 
 - **2026-10-12, instruksjonen kl. 11:15, «Den er under utvikling og ikke ferdig.»:** Marian kl. 11:12: at appen er under utvikling, sto bare i «Status», som kommer etter hele «Kom i gang». Setningen står nå også i beskrivelsen øverst, rett etter «Appen gir ikke råd om å kjøpe eller selge.», og `test_beskrivelsen_foelger_koden_og_gir_ikke_raad` krever den. Mutantene, setningen tatt ut og setningen flyttet til «Status», ble begge fanget, kjørt bare mot `tests/test_docker.py`. **Ved innleveringen** ses setningen på igjen, sammen med linja nederst på sidene om at appen er under arbeid, og punktet i `docs/innlevering.md` om å bytte den. Begge er planlagt i 8.0c og finnes ikke ennå.
 
+- **2026-10-12, instruksjonen kl. 20:43, «Til faglærer» øverst:** Marian kl. 12:12: briefen var gjemt langt nede i «Dokumentene». Under «Til faglærer:» står nå fire linjer: briefen (versjon 8, taggen `arbeidskrav-product-brief-v8`), plan og krav, leveranselista, og prosessen og KI-bruken. Ingen filer er flyttet, fordi stiene brukes i lenker, tagger og BMAD. `test_til_faglaerer_lenker_til_briefen_med_gjeldende_tag` henter taggen fra regel 17 i `CLAUDE.md`. Mutantene, v7 i lista og lenken til briefen tatt ut, ble begge fanget, kjørt bare mot `tests/test_docker.py`. `docs/innlevering.md` sier at statusen fra 05.10 er utdatert.
+
 ## Review Triage Log
 
 Gjennomgang 1 av PR 1 (10.10 kl. 13:02–13:06, PR #26), Blind Hunter (BH, bare diffen), Edge Case Hunter (ECH) og Verification Gap (VG), som tre uavhengige agenter. Rettelsene er `5bcdef0`, `f9bbdcd` og `680fcf6`.
