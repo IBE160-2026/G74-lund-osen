@@ -1470,6 +1470,8 @@ Med 2.8 er det 4 kall igjen, ikke 5.
 - Kontrollpunktet «Oppgaveplanlegging gjentar jobben hver halvtime fra 22:15 til 23:45» er flyttet til et eget steg etter README-prøven, med egen plan. 2.3b skriver ingen oppskrift for Oppgaveplanlegging.
 - **Én økt:** ja.
 
+*Ferdig 2026-10-12:* flettet i `c3d6660`, PR #28.
+
 ### Story 2.4: Etterfylling av hull i kursserien
 
 Som **bruker som ikke åpnet løsningen på en uke**, vil jeg at grafen er hel når

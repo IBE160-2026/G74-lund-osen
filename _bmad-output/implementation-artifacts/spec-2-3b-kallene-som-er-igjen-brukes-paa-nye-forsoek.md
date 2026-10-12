@@ -2,7 +2,7 @@
 title: 'Story 2.3b: Kallene som er igjen, brukes på nye forsøk'
 type: 'feature'
 created: '2026-10-10'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '8905b5d4a2d601fa80eee9e362080244fae6c89d'
