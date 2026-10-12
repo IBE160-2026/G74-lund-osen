@@ -140,3 +140,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-3-4-demoversjonen.md`
   summary: Når hovedindeksen hentes i samme kjøring (story 2.8), bruker en henting 16 kall. Da må «Hvorfor bare 15 aksjer?» og «en henting bruker 15» i «Hva med nøkkelen?» i docs/hjelp.md ses på igjen, og test_hvorfor_bare_15_aksjer følge.
   evidence: VG2 i gjennomgangen av PR #31 (12.10). NFR-01 i PRD-en: daglig henting koster 16 kall når indeksen hentes, og avsnittet med 15 gjelder til story 2.8 er bygget. Testen henter bare antallet aksjer fra AKSJEUNIVERS, ikke kallet for indeksen.
+- source_spec: `_bmad-output/implementation-artifacts/spec-2-3b-kallene-som-er-igjen-brukes-paa-nye-forsoek.md`
+  summary: Har kveldens henting skrevet kursfila, men skrivingen til basen feilet, og basen kan leses ved neste kjøring, går samme kommando til et nytt forsøk. Det bruker inntil 5 kall på aksjer som allerede står i kveldens fil, og resten mangler fortsatt. `--les-inn <fil>` hadde lest alle inn med 0 kall.
+  evidence: Rådet leste `kjoer` og `nytt_forsoek` 10.10: filvakten sender til `nytt_forsoek` når fila finnes og basen mangler dagens kurs, uten å se i fila. Funnet skulle føres ved flettingen av PR #28 12.10, men kom ikke med i blokka. Meldingen ved basefeil viser `--les-inn`, men hjelpen under «Når kan jeg hente?» sier at samme kommando kan kjøres igjen. Ikke rettet nå.
