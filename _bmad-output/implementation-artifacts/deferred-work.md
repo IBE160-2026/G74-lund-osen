@@ -131,6 +131,9 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-3-4-demoversjonen.md`
   summary: I demoen står «Oslo Børs · 2026-10-09 · 14 aksjer» over tabellen, rett under «Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.» Spørsmål til gruppen: skal linjen si «Eksempeltall» i stedet for «Oslo Børs» når basen har demomerket?
   evidence: Gruppens instruksjon kl. 17:35 10.10, etter PR #27. Linjen kommer fra `src/templates/index.html:67`, og merknaden fra linje 61 i samme mal. `test_bryteren_med_demobase_viser_eksempeltall` i `tests/test_demo.py` krever teksten «Oslo Børs · 2026-10-09 · 14 aksjer» i dag. Ikke rettet nå.
+- source_spec: `_bmad-output/implementation-artifacts/spec-8-0b-hjelp-bak-et-spoersmaalstegn.md`
+  summary: Fotnotene under tabellene bruker ordene svar 3 11.10 tok ut av hjelpen. `index.html` sier at signalstyrken «sier hvor kraftig de tre sjekkene slår ut — ikke om aksjen bør kjøpes eller selges», og `aksje.html` at den «er summen av tallene uten fortegn». Hjelpen ved siden av sier at styrken teller sjekkene som ga +1 eller -1.
+  evidence: Funn 23 i gjennomgangen av 8.0b (VG, 11.10). Linjene fantes før 8.0b, og instruksjonen ba ikke om å endre dem. Om fotnotene skal si det samme som hjelpen, eller tas ut fordi hjelpen nå forklarer styrken, er gruppens valg, for eksempel i 8.0c. Ikke rettet nå.
 - source_spec: `_bmad-output/implementation-artifacts/spec-3-4-demoversjonen.md`
   summary: Når hovedindeksen hentes i samme kjøring (story 2.8), bruker en henting 16 kall. Da må «Hvorfor bare 15 aksjer?» og «en henting bruker 15» i «Hva med nøkkelen?» i docs/hjelp.md ses på igjen, og test_hvorfor_bare_15_aksjer følge.
   evidence: VG2 i gjennomgangen av PR #31 (12.10). NFR-01 i PRD-en: daglig henting koster 16 kall når indeksen hentes, og avsnittet med 15 gjelder til story 2.8 er bygget. Testen henter bare antallet aksjer fra AKSJEUNIVERS, ikke kallet for indeksen.

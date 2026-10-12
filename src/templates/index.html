@@ -1,3 +1,4 @@
+{% from "_hjelp.html" import hjelpestil, hjelpeknapp, hjelpevindu with context -%}
 <!DOCTYPE html>
 <html lang="no">
 <head>
@@ -54,13 +55,18 @@
       padding: 0.5rem 1rem;
       font-weight: bold;
     }
+    /* Story 8.0b: hjelpen bak «?». */
+    {{ hjelpestil() }}
   </style>
 </head>
 <body>
   {% if eksempeltall %}
   <p class="eksempeltall">Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.</p>
   {% endif %}
-  <h1>OSE Signal</h1>
+  <div class="tittelrad">
+    <h1>OSE Signal</h1>
+    {{ hjelpeknapp("hjelp-oversikt", "Hjelp: tallene og signalet") }}
+  </div>
 
   {% if rader %}
     <p class="meta">
@@ -74,7 +80,7 @@
           <th>Selskap</th>
           <th class="tall">Sluttkurs</th>
           <th class="tall">Endring</th>
-          <th class="tall">Signalstyrke</th>
+          <th class="tall">Signalstyrke {{ hjelpeknapp("hjelp-signalstyrke", "Hjelp: signalstyrken") }}</th>
           <th>Retning</th>
         </tr>
       </thead>
@@ -139,6 +145,20 @@
     <p>
       Ingen kurser i basen ennå. Hent dem med <code>{{ hentekommando }}</code>.
     </p>
+  {% endif %}
+
+  {{ hjelpevindu("hjelp-oversikt", "Tallene og signalet", [
+    ("Tallene", ["sluttkurs", "endring", "utbyttejustert", "data_hentet", "uten_data"]),
+    ("Signalstyrke", ["signalstyrke", "uten_styrke"]),
+    ("Retning", ["retning", "positiv", "negativ", "blandet", "ingen", "ukjent"]),
+    ("De tre sjekkene", ["trend", "bevegelse", "interesse", "antall_dager", "hvorfor_tre"]),
+    ("Grensene", ["grensene", "skjevhet"]),
+    ("Ikke et råd", ["ikke_raad"]),
+  ]) }}
+  {% if rader %}
+    {{ hjelpevindu("hjelp-signalstyrke", "Signalstyrke", [
+      ("", ["signalstyrke", "uten_styrke", "ikke_raad"]),
+    ]) }}
   {% endif %}
 </body>
 </html>

@@ -38,6 +38,7 @@ from boersdag import norsk_dato
 from graf import bygg_graf
 from kursdata import Kursleser
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER
+from hjelpetekster import Hjelp, hjelpetekster
 from lagring_sqlite import (
     DEMOMERKE,
     SqliteKurslager,
@@ -57,6 +58,7 @@ from markedsoversikt import (
 )
 from migrering import MigrasjonsFeil
 from oversiktsdata import Oversiktsleser
+from signalberegning import STANDARD
 from tallformat import tall
 
 # Kommandoen den tomme siden ber brukeren kjoere. Den staar ogsaa i README, og
@@ -210,6 +212,18 @@ def _eksempeltall():
     return {"eksempeltall": g.get("eksempeltall", False)}
 
 
+# Story 8.0b: tekstene bak «?», med tallene fra parametrene som gjelder i
+# appen. Malene henter dem med hjelp.tekst(), og MA-vinduet i grafens
+# tegnforklaring med parametre.ma_vindu. Tekstene, tegnforklaringen og
+# beregningen paa sidene bruker samme Parametre (gjennomgangen av 8.0b).
+
+
+@app.context_processor
+def _hjelp():
+    """Hjelpetekstene og parametrene paa hver side, laget av samme objekt."""
+    return {"hjelp": Hjelp(hjelpetekster(STANDARD)), "parametre": STANDARD}
+
+
 @app.teardown_appcontext
 def _lukk_basen(_unntak) -> None:
     tilkobling = g.pop("tilkobling", None)
@@ -309,7 +323,7 @@ def markedsoversikt():
         )
 
     poster = _leser_eller_basefeil(hent_oversiktsleser).oversikt()
-    rader = bygg_oversikt(poster, idag())
+    rader = bygg_oversikt(poster, idag(), STANDARD)
 
     return render_template(
         "index.html",
@@ -346,7 +360,7 @@ def aksjedetalj(symbol: str):
     if post is None:
         abort(404)
 
-    detalj = bygg_detalj(post, leser.serie(post.aksje.symbol), idag())
+    detalj = bygg_detalj(post, leser.serie(post.aksje.symbol), idag(), STANDARD)
     if detalj is None:
         abort(404)
 
