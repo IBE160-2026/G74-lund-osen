@@ -824,7 +824,7 @@ class TestReadmeForNybegynnere:
         topp = tekst.split("\n## Kom i gang\n", 1)[0]
         avsnitt = [a.strip() for a in topp.split("\n\n") if a.strip()]
         assert avsnitt[-1].startswith("Til faglærer:"), avsnitt[-1]
-        assert avsnitt[-2].startswith("OSE Signal samler"), avsnitt[-2]
+        assert avsnitt[-2].startswith("OSE Signal viser"), avsnitt[-2]
         assert "\n## " not in topp
 
     def test_status_uten_storynumre_og_uten_kommando(self):
@@ -849,3 +849,26 @@ class TestReadmeForNybegynnere:
     def test_lenken_til_staar_du_fast_sier_lenger_ned(self):
         """Marian kl. 23:46: «se «Står du fast?» lenger ned»."""
         assert "se [«Står du fast?»](#står-du-fast) lenger ned." in _kom_i_gang()
+
+    def test_beskrivelsen_foelger_koden_og_gir_ikke_raad(self):
+        """Beskrivelsen Marian godkjente 11.10 kl. 23:50. Antallet aksjer er
+        lengden av AKSJEUNIVERS, og antallet sjekker og navnene deres er de i
+        signalberegning.py, saa README-en maa foelge naar lista endres (2.11
+        og 2.12). Den sier at appen ikke gir raad (NFR-06)."""
+        import typing
+
+        import kursdata
+        import signalberegning
+
+        tekst = README.read_text(encoding="utf-8")
+        beskrivelse = tekst.split("Til faglærer:", 1)[0].strip().split("\n\n")[-1]
+        assert beskrivelse.startswith("OSE Signal viser")
+        assert f"viser {len(kursdata.AKSJEUNIVERS)} aksjer på Oslo Børs" in beskrivelse
+        antall = len(typing.get_args(typing.get_type_hints(signalberegning.sjekker_fra)["return"]))
+        tall = {2: "To", 3: "Tre", 4: "Fire"}
+        assert f"{tall[antall]} enkle sjekker" in beskrivelse
+        assert f"signalstyrke fra 0 til {antall}" in beskrivelse
+        navn = re.findall(r'navn="(\w+)"', (ROT / "src" / "signalberegning.py").read_text(encoding="utf-8"))
+        assert len(set(navn)) == antall
+        assert "– " + ", ".join(n.lower() for n in navn[:antall - 1]) + f" og {navn[antall - 1].lower()} –" in beskrivelse
+        assert "Appen gir ikke råd om å kjøpe eller selge." in beskrivelse
