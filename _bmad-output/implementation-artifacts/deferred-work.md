@@ -134,3 +134,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-8-0b-hjelp-bak-et-spoersmaalstegn.md`
   summary: Fotnotene under tabellene bruker ordene svar 3 11.10 tok ut av hjelpen. `index.html` sier at signalstyrken «sier hvor kraftig de tre sjekkene slår ut — ikke om aksjen bør kjøpes eller selges», og `aksje.html` at den «er summen av tallene uten fortegn». Hjelpen ved siden av sier at styrken teller sjekkene som ga +1 eller -1.
   evidence: Funn 23 i gjennomgangen av 8.0b (VG, 11.10). Linjene fantes før 8.0b, og instruksjonen ba ikke om å endre dem. Om fotnotene skal si det samme som hjelpen, eller tas ut fordi hjelpen nå forklarer styrken, er gruppens valg, for eksempel i 8.0c. Ikke rettet nå.
+- source_spec: `_bmad-output/implementation-artifacts/spec-3-4-demoversjonen.md`
+  summary: Når hovedindeksen hentes i samme kjøring (story 2.8), bruker en henting 16 kall. Da må «Hvorfor bare 15 aksjer?» og «en henting bruker 15» i «Hva med nøkkelen?» i docs/hjelp.md ses på igjen, og test_hvorfor_bare_15_aksjer følge.
+  evidence: VG2 i gjennomgangen av PR #31 (12.10). NFR-01 i PRD-en: daglig henting koster 16 kall når indeksen hentes, og avsnittet med 15 gjelder til story 2.8 er bygget. Testen henter bare antallet aksjer fra AKSJEUNIVERS, ikke kallet for indeksen.

@@ -112,6 +112,38 @@ Fra instruksjonen kl. 15:23 i `docs/ai-prompts/2026-10-10.md`, på grenen `3-4-d
 
 *Rettet 2026-10-10 kl. 16:18:* funnet etter gjennomgangen, i egne prosjekter: med `-p NAVN` stopper `docker compose -p NAVN down` også demoen. Uten `-p`, med prosjektnavnet fra `name:` i fila, stopper den ikke demoen. Prøvd begge veier samme ettermiddag med Compose v5.5.1. README-en bruker ikke `-p`, så det er den oppførselen brukeren får. CI-steget brukte først `-p ose-ci-34` og bruker nå `-f` mot en kopi av `compose.yaml` med `name: ose-ci-34`, og prøver at `down` uten profilen lar demoen kjøre (`2fa6f9f`).
 
+## Planen for PR 3
+
+Fra instruksjonen kl. 16:54 i `docs/ai-prompts/2026-10-11.md` (planen) og kl. 20:32 (ja, med svar og endringer), på grenen `3-4-readme` fra main etter `5665f5c`.
+
+**Målet:** en som aldri har brukt Docker eller et terminalvindu, starter demoen bare ved å følge README-en, på Windows og på Mac.
+
+**Beslutninger (svarene kl. 20:32):**
+1. Koden hentes med «Download ZIP». Har noen fått koden som mappe eller ZIP fra før, pakker de ut og går til steg 4.
+2. Linjene fra terminalen står som tekst.
+3. Mac står som «ikke prøvd» i §9 til noen har prøvd stegene på en Mac.
+4. Ingen bilder nå. Forbudet fra 3.3 og `test_ingen_bilder_utenom_ci_merket` står. Bilder kan tas inn senere, tidligst bildet av demosiden etter 8.0d, og da bare fra `docs/bilder/readme/`, med alt-tekst, og aldri av den ekte versjonen. Marian bekrefter «Engine running», «Pakk ut alle», «Windows PowerShell» og om en sti med mellomrom får anførselstegn, før gjennomgangen.
+5. Flettes før PR #28 og 8.0b: i kveld hvis den er klar og kontrollert, ellers mandag på dagtid. Aldri mellom kl. 21:40 og slutten av hentingen.
+
+**Marians ønske kl. 17:08:** «Før du begynner» øverst. Hvert steg begynner med det man skal gjøre, i én kort setning, og sier så hva man ser når det har gått bra. «Hvis noe går galt» blir en kort FAQ rett etter stegene, og steg 1, 2 og 6 peker dit.
+
+**Boundaries for PR 3:**
+- Én kommando per kodeblokk, og ingen `#` på en kommandolinje i hele «Kom i gang».
+- Linjene som viser at demoen er klar, er kopiert fra en kjøring 11.10 i prosjektet `ose-readme-pr3` (se Implementation Notes).
+- Den ekte versjonen, byttet og uv står som før, med kommandoene delt opp og kommentarene flyttet til teksten. Punktet «Når du henter» (PR #28) og Status-linja (8.0b) røres ikke.
+- Merket steg 7 siterer, er det samme som i malene, og en test krever det.
+- §9 i `docs/kvalitetssikring.md` følger stegene i samme commit, med en datert linje under tabellen.
+
+**Delene, med commit og push etter hver:** a) README «Kom i gang» med §9 og de testene som må følge med, b) de nye testene.
+*Lagt til 2026-10-11 kl. 21:14:* c) steg 3, steg 4 og FAQ-en etter Marians svar kl. 21:14 (`docs/ai-prompts/2026-10-11.md`), d) rettingene etter gjennomgangen.
+
+**Marians svar kl. 21:14**, før gjennomgangen, som beslutning 4 ba om:
+- «Engine running» står nederst i vinduet.
+- «Pakk ut alle» (Extract All) stemmer, og det ble en mappe med samme navn inni. En åpnet ZIP-fil ser ut som en vanlig mappe uten å være pakket ut, så steg 3 sier at man må trykke «Pakk ut alle», og FAQ-en har et punkt om det.
+- Windows viser filene som README og compose, uten filendelse.
+- «Windows PowerShell» stemmer, men «Windows PowerShell ISE» står også i lista, og den skal ikke velges.
+- En sti med mellomrom får anførselstegn når mappa dras inn i PowerShell.
+
 ## Code Map
 
 - `src/kursdata.py` -- `kontroller_skriving` (linje 162) sjekker mot `AKSJEUNIVERS`. Får `univers` som parameter.
@@ -155,11 +187,44 @@ Fra instruksjonen kl. 15:23 i `docs/ai-prompts/2026-10-10.md`, på grenen `3-4-d
 - **«samme frø gir like baser»** sammenligner `aksje`, `kurs`, `kursserie`, `vurdering`, merket og `skjema_versjon` uten kolonnen `anvendt`, som er tidspunktet migrasjonen ble kjørt.
 - **Regel 22:** alle demobaser under byggingen er laget i `tmp_path` eller i scratch-mappa for økta. `data/db/` har ingen `demo.db`.
 
+- **PR 3, kjøringen som linja i steg 6 er kopiert fra** (11.10, ca. kl. 20:34): Docker Engine 29.8.0 og Compose v5.5.1. En kopi av `compose.yaml` i repoet, `compose-pr3.yaml`, med `name: ose-readme-pr3`, `image: ose-readme-pr3` og porten `127.0.0.1:5098:5000`, fordi Marians demo, `ose-signal-demo-1`, brukte port 5000. Kommandoen var `docker compose -p ose-readme-pr3 -f compose-pr3.yaml up --build demo`. Den viste `Attaching to demo-1`, ikke loggen fra demo-lag, og til sist `demo-1  | INFO:waitress:Serving on http://0.0.0.0:5000`. Utskriften gikk til en fil, ikke til et terminalvindu, så en eventuell linje med valg fra Compose i et ekte vindu er ikke sett. Etterpå ble bare det kjøringen startet, fjernet: `--profile demo down`, volumet `ose-readme-pr3_ose-demo`, imaget `ose-readme-pr3` og kopien av `compose.yaml`. Sjekket etterpå: ingen container eller image fra `ose-readme-pr3`. `ose-signal-demo-1` og `ose-signal_ose-demo` sto urørt.
+- **PR 3, bilder:** ingen (beslutning 4). `test_ingen_bilder_utenom_ci_merket` står.
+
 ## Spec Change Log
 
 - **2026-10-10 kl. 12:45, Tareøy Havbruk (avvik fra planen):** Boundaries sier at Tareøy Havbruk mangler siste dag, for å vise «ingen kurs fra dagen». Det virket ikke: oversikten leser vurderingen for datoen til nyeste kurs for hver aksje, så Tareøy viste vurderingen for 08.10, og datoen over tabellen ble 2026-10-08, fordi den er den eldste nyeste datoen (story 8.0). Regelen er tatt ut, og alle 14 med kurser har siste dag. «ingen kurs fra dagen» er ikke blant tilstandene demoen viser, som «hentingen feilet». En test krever at datoen over tabellen er 2026-10-09. **Til gruppen:** avviket står her og i PR-en, og kan tas tilbake før flettingen.
 
 - **Gruppen godtok avviket** i instruksjonen kl. 14:46 i `docs/ai-prompts/2026-10-10.md`, sammen med ja til flettingen av PR #26: datoen over tabellen er den eldste av datoene til nyeste kurs (story 8.0), så en aksje uten siste dag kan ikke vise «ingen kurs fra dagen» uten å flytte datoen for hele siden. Demoen viser ikke den tilstanden, slik den heller ikke viser «hentingen feilet».
+
+- **2026-10-11, PR 3 (README-en for en som aldri har brukt Docker):** Marian prøvde demoen etter README-en 11.10 og fant ikke ut hvor kommandoene skulle skrives. Hun limte dem inn i Docker Desktop og i en tom PowerShell-linje, og to kommandoer havnet på samme linje. README-prøven 13.–16.10 skal kunne gjøres av en som aldri har brukt Docker eller et terminalvindu, så «Kom i gang» skrives om i nummererte steg, med én kommando per boks og en FAQ. Planen og svarene står i «Planen for PR 3».
+
+- **2026-10-11 kl. 21:53, PR 3 i kortere form:** Marian syntes kl. 21:22 at demodelen av «Kom i gang» var for lang og så komplisert ut. Kl. 21:37 godkjente hun en kortere form: én linje om hva man trenger, seks steg på én til to linjer, «Stopp», og «Står du fast?» med spørsmålene som `<details>` med `<summary>`, sortert etter steget. Alt fra de åtte stegene og «Hvis noe går galt» som ikke er med i de seks stegene, er flyttet dit, og fem spørsmål er nye. Grunnen: målgruppen er en som aldri har brukt Docker eller et terminalvindu, og en lang side gjorde det vanskeligere å se hva man skal gjøre. «Steg 1, 2 og 6 peker dit» fra Marians ønske kl. 17:08 er erstattet av én lenke til «Står du fast?» i linja øverst. Commit `50e6c2e`.
+- **Rettet samme kveld, etter gjennomgangen av den korte formen:**
+  - «fem spørsmål er nye» over gjelder de fem instruksjonen kl. 21:53 nevner. Bare «Mappa lar seg ikke dra inn i vinduet» har nytt innhold. De fire andre, og spørsmålene «Hva skjer under installasjonen?», «Jeg finner ikke ZIP-fila på Mac.», «Hvilket vindu skal jeg åpne?», «Hva betyr cd, og hvordan ser jeg at det gikk?», «Hva skal jeg se etter i vinduet?», «Terminal spør om tilgang til Nedlastinger (Mac).» og «Jeg har fått koden fra før.», er nye overskrifter over innhold fra de åtte stegene.
+  - Stegnumrene i «Planen for PR 3» gjelder den første formen med åtte steg. I den korte formen er «går til steg 4» i beslutning 1 steg 3, og «merket steg 7 siterer» er merket i steg 6.
+  - Marians ønske kl. 17:08 om at hvert steg sier hva man ser når det har gått bra, gjelder fortsatt. Hvert av de seks stegene har en slik sjekk etter `9dd0f48`.
+- **2026-10-11 kl. 22:32, «Kom i gang» helhetlig og kort:** Marian kl. 22:21: README-en skal vise de to versjonene med forskjellen forklart, anbefale den ekte, ha lite informasjon, og FAQ-en var for lang. «Kom i gang» har nå en tabell over de to versjonene, felles steg 1–4, den ekte versjonen (steg 5–9) før demoen (steg 5–7), og «Står du fast?» med 8 spørsmål. De 28 spørsmålene og punktene om nøkkelen, hentingen, tom oversikt, dataene og porten er flyttet til `docs/hjelp.md`, ordrett og sortert etter steg. Den ekte versjonen står nå før demoen, så kravet fra PR 2 om at demoen er den første kommandoen gjelder ikke lenger, og testen med det navnet krever i stedet «Download ZIP» før `cp .env.example .env`. Commitene `706b9f5` og `4ae6a30`. **Til gruppen:** punktet «Når du henter», som PR #28 endrer, står nå i `docs/hjelp.md` under «Når kan jeg hente?». Flettes PR #28 etter denne, må endringen dens føres der.
+  - *Rettet samme kveld, etter gjennomgangen:* «ordrett» over stemmer ikke helt. Det som er flyttet til `docs/hjelp.md`, er 28 spørsmål og 5 punkter, 33 i alt. 7 av spørsmålene står også i README-en, og «Oversikten er tom.» er det åttende spørsmålet der. Endret ved flyttingen, for at svarene skal stemme med den nye formen:
+    - henvisningene til steg i «Hva betyr cd …», «Hva skal jeg se etter i vinduet?» og «Hvordan starter jeg neste gang?»
+    - «Nei.» foran svaret om porten
+    - subjektet «Dataene», som falt ut og er satt inn igjen
+    - etter gjennomgangen: kontoen hos EODHD, Ledetekst for den ekte versjonen, «Siden åpnes ikke.» for begge versjonene, og setningen om et lukket vindu, som hadde falt bort
+
+- **2026-10-11, instruksjonen kl. 23:48, «Kom i gang» øverst og «Status» kortere:** Marian kl. 23:41–23:46: README-en begynner med beskrivelsen, så «Til faglærer», så «Kom i gang», så «Status». «Status» er i vanlige ord, uten storynumre og uten demokommandoen, som sto uten stegene før den. Tabellen i «Kom i gang» sier det de to punktene om versjonene sa. Etter gjennomgangen står også at kursene hentes fra EODHD hver børsdag og at dagens vurdering lagres per aksje. At sidene leser fra basen, står ikke lenger i README-en. Steg 5 i den ekte versjonen sier ikke hvor nøkkelen står hos EODHD, fordi Marian ikke husker det (svaret kl. 23:55 i `docs/ai-prompts/2026-10-11.md`). Commitene `85cad6a` og `56d886f`.
+  - **Konfliktene ved flettingen** (rettes når de oppstår, ikke nå):
+    - Grenen 8-0b (PR #29) endrer den gamle statuslinja, som begynte med «Børsdagskontrollen (2.3) …». Den finnes ikke lenger etter PR 3. Når 8-0b henter main, må den nye statuslinja i stedet si at hjelpen bak «?» er ferdig.
+    - PR #28 (2.3b) endrer punktet «Når du henter» i README-en. Det står nå i `docs/hjelp.md` under «Når kan jeg hente?», og endringen må føres der.
+    - Generelt: den som fletter 2.3b, 8.0b, 8.0c eller 8.0d, flytter saken fra «Neste» til «Flettet til main» i statuslinja. Grenen 8-0b sin egen statuslinje sier også at 2.3b er flettet. Det føres bare hvis PR #28 faktisk er flettet først.
+    - 8.0d står i statuslinja og i `epics.md`, men ikke i `sprint-status.yaml` før den planlegges (instruksjonen kl. 15:57). Derfor lenker statuslinja også til `epics.md`.
+
+- **2026-10-12, instruksjonen kl. 00:22, ny beskrivelse øverst:** Marian godkjente 11.10 kl. 23:50 en ny beskrivelse under gruppelinja. Den sier hva appen viser for en som ikke kjenner den: 15 aksjer som omsettes mye, de tre sjekkene ved navn, signalstyrken fra 0 til 3, og at appen ikke gir råd om å kjøpe eller selge (NFR-06). Den gamle sa «15 likvide Oslo Børs-aksjer» og nevnte verken sjekkene eller rådet. `test_beskrivelsen_foelger_koden_og_gir_ikke_raad` henter antallet aksjer fra `AKSJEUNIVERS`, og antallet sjekker og navnene deres fra `signalberegning.py`, så README-en må følge når lista endres (2.11 og 2.12). §9 er ikke rørt.
+  - Mutantene, hele testsettet for hver, med koden satt tilbake fra en kopi: B1 (rådet tatt ut), B2 (18 aksjer), B3 («Fire enkle sjekker»), B4 («fra 0 til 4») og B5 (en sjekk med feil navn) ble alle fanget av `test_beskrivelsen_foelger_koden_og_gir_ikke_raad`. B6 (en aksje tatt ut av `AKSJEUNIVERS`) ble stoppet underveis fordi maskinen hadde lite minne, og er ikke kjørt ferdig. Mutanten ble liggende i `src/kursdata.py`, ble satt tilbake fra kopien, og fila er lik HEAD.
+
+- **2026-10-12, instruksjonen kl. 10:25, «Hvorfor bare 15 aksjer?»:** Marian lurte kl. 10:19–10:22 på om beskrivelsen øverst skulle si at kursene kommer fra gratisnivået hos EODHD. Hun valgte et spørsmål i `docs/hjelp.md` i stedet, så beskrivelsen holder seg kort. Det står under «Den ekte versjonen», rett etter «Hva med nøkkelen?». `test_hvorfor_bare_15_aksjer` henter tallet fra `AKSJEUNIVERS`. Mutantene A1 (16 i overskriften), A2 (16 i svaret), A3 (spørsmålet flyttet til «Demoen») og A4 (en aksje tatt ut av `AKSJEUNIVERS`) ble fanget, kjørt bare mot `tests/test_docker.py`. A4 ble også fanget av `test_beskrivelsen_foelger_koden_og_gir_ikke_raad`, som dermed er prøvd mot B6, mutanten som ble stoppet natt til 12.10.
+
+- **2026-10-12, instruksjonen kl. 10:45, «en henting bruker 15»:** punkt 3 fra gjennomgangen av PR #31 (Marian kl. 10:38). Setningen i svaret på «Hva med nøkkelen?» i `docs/hjelp.md` var ikke knyttet til `AKSJEUNIVERS` i noen test, så den kunne bli stående med feil tall når lista endres (2.11 og 2.12). `test_hvorfor_bare_15_aksjer` krever nå «en henting bruker N», der N er lengden av lista. `docs/hjelp.md` er ikke endret. Mutantene: «en henting bruker 16» i hjelpen, og setningen tatt ut. Begge ble fanget, kjørt bare mot `tests/test_docker.py`. Punkt 2, om 16 kall når indeksen hentes, er ført i `deferred-work.md`, fordi det først kan gjøres med story 2.8.
+
+- **2026-10-12, instruksjonen kl. 11:15, «Den er under utvikling og ikke ferdig.»:** Marian kl. 11:12: at appen er under utvikling, sto bare i «Status», som kommer etter hele «Kom i gang». Setningen står nå også i beskrivelsen øverst, rett etter «Appen gir ikke råd om å kjøpe eller selge.», og `test_beskrivelsen_foelger_koden_og_gir_ikke_raad` krever den. Mutantene, setningen tatt ut og setningen flyttet til «Status», ble begge fanget, kjørt bare mot `tests/test_docker.py`. **Ved innleveringen** ses setningen på igjen, sammen med linja nederst på sidene om at appen er under arbeid, og punktet i `docs/innlevering.md` om å bytte den. Begge er planlagt i 8.0c og finnes ikke ennå.
 
 ## Review Triage Log
 
@@ -220,6 +285,179 @@ Gjennomgang av PR 2 (PR #27, etter `fe22cd3` kl. 15:35), Blind Hunter (BH, bare 
 | ECH7, ECH8 | README-en forklarer ikke feilen ved port i bruk, og volumet heter `ose-signal_ose-demo` | low | Byttet sier at bare én kan kjøre. Volumene er omtalt med kortnavn også for `ose-db` og `ose-raa` | ikke endret |
 | VG8, VG10 | Rekkefølgen ved oppstart og spinen prøves ikke i drift | low | Betingelsen er testet statisk (mutant P6), og spinen er tekst | ikke endret |
 
+
+**Gjennomgangen av PR 3** (11.10, diffen `5665f5c..86c4e28`). Blind Hunter (BH, 15 funn), Edge Case Hunter (ECH, 21) og Verification Gap (VG, 2 hull og 4 andre). Like funn er slått sammen. Rettingene står i `b0deee4`.
+
+| Funn | Hva | Dom | Rute |
+|---|---|---|---|
+| BH1, BH2, VG, ECH | Ledetekstene «Start så den du vil bruke:», «Demoen:» og «Den ekte versjonen:» ble stående foran de nye | medium | patch |
+| BH3, ECH | Linux-setningen motsa seg selv og nevnte bare steg 6 og 8 | medium | patch: Docker Engine i stedet for steg 1 og 2. Docker-gruppen og sudo avvist: Linux er ikke målgruppen |
+| BH4, ECH | Steg 5 sa ikke hvilken mappe når det er to, og sjekken passet for den ytre også | medium | patch: mappa der compose ligger, den innerste, ikke ZIP-fila |
+| ECH | Sjekken i steg 5 («slutter med») stemmer ikke med `>` og `%` | medium | patch |
+| ECH | Linja i steg 6 får en kopieringsknapp og kan limes inn ved en feil | medium | patch: «Den skal du ikke kopiere» |
+| ECH | En linje med valg fra Compose kan komme under «Serving on» i et ekte vindu | maybe-false | patch i teksten («kan komme»). Ikke sett, fordi kjøringen skrev til en fil. Rad 6 i §9 spør |
+| BH6, ECH | «nettadresse» om grensen hos Docker Hub, som gjelder IP-adressen | low | patch |
+| BH7 | Ingenting om plass på disken | low | patch: «noen GB ledig plass». Versjonskrav til Windows og macOS er ikke slått opp og står ikke |
+| BH8 | Ingen eksempel for Mac i punktet om mellomrom | low | patch |
+| ECH | Safari kan pakke ut ZIP-fila selv | low | patch |
+| ECH | Windows kan vise filendelsen | low | patch: «ofte uten» |
+| ECH | Windows ARM har en egen nedlasting | low | patch |
+| ECH | Mac kan be om passord ved første start | low | patch |
+| ECH | Terminal på Mac kan spørre om tilgang til Nedlastinger | low | patch |
+| ECH | Windows har andre feilmeldinger for en port i bruk | low | patch: «ports are not available». De andre ordlydene er ikke slått opp |
+| BH9, BH10 | Spesifikasjonen viste til Implementation Notes uten en note om kjøringen, og hadde verken del c eller Marians svar | medium | patch: Implementation Notes og «Delene» |
+| BH11, VG | §9 spør etter `git log` og mappa `G74-lund-osen`, som ikke passer med ZIP | medium | patch i den daterte linja. Feltene står, fordi PR #28 endrer linjene rett over |
+| BH12 | Ingen rad sier om kopieringsknappen virket | low | patch i rad 6. Egne rader for «Mappa finnes fra før» og «Neste gang» avvist: rad 23 spør etter FAQ-en |
+| BH13 | Kravet om ingen `.env` før demoen gjaldt bare kommandoene | medium | patch: `test_ingen_env_foer_demoen` |
+| BH14 | Testen for linja i steg 6 så ikke om `demo` har egen `command` | medium | patch. Prefikset `demo-1` følger Compose og er kopiert fra v5.5.1, avvist |
+| BH15, ECH | Overskrifter i kodeblokker ble regnet som ankre | low | patch. Like overskrifter med `-1` avvist: README-en har ingen |
+| VG1 | Stegnumrene, henvisningene «steg N» og §9 var ikke bundet sammen, og den daterte linja i §9 kunne fylle inn for en rad | high | patch: `test_stegene_og_henvisningene_til_dem` og `_proevetabellen()` |
+| VG2, ECH | En kodeblokk med språk slapp unna testene for `#` og én kommando | high | patch: `test_bare_kommandoer_og_en_tekstblokk` |
+| VG | `test_docker_foerst_og_uv_som_alternativ` krevde fortsatt `git clone` | low | patch: krever «Download ZIP» |
+| ECH | En mal uten merket ga `AttributeError` og ikke en tydelig feil | low | patch |
+| BH5 | Tipset om `demo-lag` kommer etter at demoen er stoppet | low | avvist: avsnittet står etter steg 8 etter gruppens endring kl. 20:32 |
+| ECH | Repoet kan være privat | false | `gh repo view` 11.10: `PUBLIC` |
+| ECH | `cd` i Ledetekst bytter ikke stasjon uten `/d` | low | avvist: stegene er for PowerShell, og Ledetekst er bare nevnt som et alternativ som virker for demoen |
+| VG | Adressen http://127.0.0.1:5000 hentes ikke fra `ports` i compose.yaml | low | avvist: fantes før PR 3, og `test_porten_er_bare_paa_maskinen` holder den |
+
+**Gjennomgangen av den korte formen** (11.10, diffen `003ce36..19c0a5e`). Blind Hunter (BH, 14 funn), Edge Case Hunter (ECH, 18) og Verification Gap (VG, 2 hull og 1 annet). Rettingene står i `9dd0f48`.
+
+| Funn | Hva | Dom | Rute |
+|---|---|---|---|
+| BH, ECH | Steg 1 sa ikke lenger at Docker Desktop skal stå åpent | medium | patch: «La det være åpent» |
+| BH, ECH | Steg 2, 3 og 4 hadde mistet sjekken etter steget, og steg 4 «fra Filutforsker eller Finder» | medium | patch |
+| ECH | Steg 3 sa ikke hvordan Terminal åpnes på Mac, og ikke at ISE er feil valg | medium | patch: Cmd+mellomrom, og «ikke ISE» |
+| ECH | Steg 5 viser `0.0.0.0:5000` uten å si at den ikke skal åpnes | medium | patch |
+| ECH | Hvor kopieringsknappen er, og hvordan man limer inn | low | patch: «til høyre i boksen», Ctrl+V eller Cmd+V |
+| ECH | Lenken i steg 6 åpnes i samme fane, og README-en med «Stopp» forsvinner | low | patch: «i en ny fane» |
+| BH | Rad 7 i §9 (en aksje åpnes) hadde ingen instruks i stegene | low | patch: steg 6 sier at man klikker på et selskapsnavn |
+| ECH | Mappa på Mac er bare én, så «den innerste» er uklart | low | patch: mappa der README og compose ligger |
+| ECH | Stopp sa ikke hva man gjør når vinduet er lukket | medium | patch |
+| BH, ECH | «Hvordan starter jeg neste gang?» utelot steg 6 og hvor Docker Desktop startes | low | patch: steg 3 til 6, Start-menyen eller Programmer |
+| ECH | Den som har fått koden fra før, finner ikke svaret under «Mappa finnes fra før» | low | patch: eget spørsmål |
+| BH, ECH | «Ingenting skjer når jeg limer inn» sto under steg 3 og 4, ikke steg 5 | low | patch: flyttet |
+| ECH | «Første gang tar det en stund» om installasjonen falt bort | low | patch: i linja øverst |
+| ECH | De engelske navnene (Downloads, Extract All) sto ikke første gang de ble nevnt | low | patch: i steg 2 |
+| BH | «Ellers kan ikke Docker lese mappa» er ikke slått opp | low | patch: «Ellers får ikke Terminal åpne mappa» |
+| BH | Linux har ingen linje om hvilke steg som gjelder | low | avvist: linja øverst sier Docker Engine med Compose i stedet for Docker Desktop, og målgruppen er Windows og Mac |
+| BH, ECH | «fem spørsmål er nye» og stegnumrene i «Planen for PR 3» stemmer ikke med formen | low | patch i Spec Change Log |
+| BH | Rettet-linja i §9 ble skrevet om, ikke lagt til | low | avvist: instruksjonen kl. 21:53 ba om at Rettet-linja fra PR 3 sier hvilke rader som er nye, og den har ikke vært på main. «Nye i PR 3» er presisert |
+| BH | 60 ord er mer enn «én til to linjer» | low | avvist: grensen på 60 ord står i instruksjonen kl. 21:53 |
+| BH | Boksen etter steg 5 er ikke rykket inn under steget, så lista brytes | low | avvist: GitHub viser «6.» riktig, og innrykkede bokser er nå forbudt fordi testene ikke ser dem (VG) |
+| BH | Tomme linjer rundt svarene i `<details>` ble ikke krevd | medium | patch: `_sporsmaalene()` krever dem (K4) |
+| BH | Like spørsmål ble ikke oppdaget, og `>= 20` var valgt fritt | low | patch: unike spørsmål (K14), og minst 16, som i «Hvis noe går galt» før |
+| BH | Testen for linja i FAQ-en tok `tekst[0]` uten å sjekke antallet | low | patch |
+| VG1 | `~~~` og ``` med innrykk er bokser for GitHub, men ikke for testene | high | patch: `test_ingen_bokser_testene_ikke_ser` (K9) |
+| VG2 | Et spørsmål som vanlig avsnitt eller overskrift slapp gjennom | medium | patch: utenom `<details>` står bare ledeteksten og linja om resten (K3) |
+| VG | Henvisningene «steg N» sjekkes bare mot 1–6, ikke mot riktig steg | low | avvist: alle er lest og stemmer, og en riktig-steg-sjekk krever en tabell over hva hvert steg handler om |
+
+**Mutantene for den korte formen** (11.10, hele testsettet for hver, mot `9dd0f48`, koden satt tilbake fra en kopi med sha256 kontrollert). Alle 16 ble fanget.
+
+| # | Mutanten | Fanget av |
+|---|---|---|
+| K1 | et sjuende steg | `test_seks_steg_med_hoeyst_60_ord`, `test_merket_i_steg_6_er_det_samme_som_i_malene` |
+| K2 | steg 2 over 60 ord | `test_seks_steg_med_hoeyst_60_ord` |
+| K3 | et spørsmål i fet skrift | `test_hvert_spoersmaal_er_details_med_summary` |
+| K4 | ingen tom linje etter `</summary>` | `test_hvert_spoersmaal_er_details_med_summary`, `test_staar_du_fast_har_alt_som_ble_flyttet` |
+| K5 | ankeret skrevet feil | `test_hver_lenke_til_et_avsnitt_finnes` |
+| K6 | linja om resten tatt bort | `test_linja_om_resten_staar_foran_den_ekte_versjonen`, `test_hvert_spoersmaal_er_details_med_summary` |
+| K7 | `#` i boksen i steg 5 | `test_ingen_kommentar_paa_kommandolinjene`, `test_demoen_er_den_foerste_kommandoen`, `test_readme_proeven_har_hver_kommando` |
+| K8 | to kommandoer i Stopp | `test_en_kommando_per_boks`, `test_stopp_har_kommandoen` |
+| K9 | `~~~`-boks med `#` og to kommandoer i FAQ-en | `test_ingen_bokser_testene_ikke_ser` |
+| K10 | PowerShell og Terminal tatt ut av steg 3 | `test_stegene_nevner_powershell_og_terminal` |
+| K11 | merket endret i `index.html` | `test_merket_i_steg_6_er_det_samme_som_i_malene` |
+| K12 | «Download ZIP» tatt ut av steg 2 | `test_docker_foerst_og_uv_som_alternativ`, `test_demoen_er_den_foerste_kommandoen`, `test_zip_fila_maa_pakkes_ut` |
+| K13 | «Steg 3:» tatt ut av §9 | `test_stegene_og_henvisningene_til_dem` |
+| K14 | to like spørsmål | `test_hvert_spoersmaal_er_details_med_summary`, `test_staar_du_fast_har_alt_som_ble_flyttet` |
+| K15 | porten i Dockerfile endret | `test_linja_som_viser_at_demoen_er_klar`, `test_webserveren_er_waitress_uten_debug` |
+| K16 | AirPlay falt bort fra FAQ-en | `test_staar_du_fast_har_alt_som_ble_flyttet` |
+
+**Testene etter den korte formen:** lokalt 1285 passed og 16 skipped, 1301 samlet. Før PR 3: lokalt 1269 passed og 16 skipped, i CI 1285.
+
+**Gjennomgangen av den helhetlige formen** (11.10, diffen `76b68cb..d844238`). Blind Hunter (BH, 16 funn), Edge Case Hunter (ECH, 14) og Verification Gap (VG, 5 hull og 2 andre). Rettingene står i `1d7e16f` og `dcc5e9e`.
+
+| Funn | Hva | Dom | Rute |
+|---|---|---|---|
+| BH, ECH | Stoppet i den ekte versjonen var «Ctrl+C eller denne», men sjekken «Removed» kommer bare etter kommandoen | medium | patch: Ctrl+C og så kommandoen, som i demoen |
+| ECH | Setningen om et lukket vindu før stoppet falt bort | medium | patch: eget spørsmål i `docs/hjelp.md` |
+| BH | Steg 8 mistet «og før midnatt» | medium | patch. Helgen første gang står i `docs/hjelp.md` |
+| BH, ECH, VG | «Hvor ligger dataene?» mistet subjektet | low | patch |
+| BH, ECH | Svaret om konto sa bare at demoen ikke trenger nøkkel | medium | patch: kontoen hos EODHD for den ekte versjonen |
+| BH | Ledetekst virker ikke for `cp` i den ekte versjonen | medium | patch |
+| BH, ECH | Port-svaret viste til «Bytte», som nå er lukket og står i en annen fil | low | patch |
+| ECH | Port-svaret gjaldt bare den ekte versjonen, nå som den står først | low | patch: «den andre versjonen» |
+| ECH | «Siden åpnes ikke.» sto bare under demoen | low | patch: egen del for begge versjonene |
+| BH | «Hvordan starter jeg neste gang?» nevnte ikke hentingen | low | patch |
+| BH | «Oversikten er tom.» hadde ulike svar i README-en og `docs/hjelp.md` | medium | patch, og `test_like_spoersmaal_har_samme_svar` |
+| BH | §9 prøver ikke den ekte versjonen med nøkkel | low | patch: står åpent i §9 |
+| BH, ECH | «ordrett» og antallet i Spec Change Log | low | patch |
+| VG1 | Bare overskriftene ble sjekket etter flyttingen, ikke innholdet | high | patch: `test_svarene_beholdt_innholdet` |
+| VG2 | Kommandoene i `docs/hjelp.md` slapp unna reglene for bokser og `--profile` | medium | patch: `test_boksene_i_hjelp_foelger_de_samme_reglene` og `--profile` over begge filene. Å kreve `wsl --update`, `git pull` og `nano .env` i §9 er avvist: prøven kan ikke kjøre dem |
+| VG3 | «steg N i demoen» ble bare sjekket mot 1–9 | medium | patch |
+| VG4 | Lenken i «Dokumentene» ble ikke testet | low | patch |
+| VG5 | `test_siden_lastes_paa_nytt_etter_hentingen` leste alt etter overskriften | low | patch: steg 8 |
+| BH | Testnavnet `test_demoen_er_den_foerste_kommandoen` sa det motsatte | low | patch: nytt navn |
+| BH, ECH | Linux mangler redigeringskommando i steg 6 | low | avvist: `nano .env` står i `docs/hjelp.md`, og steg 6 er på 59 ord |
+| ECH | Feilmeldingene fra hentingen har ingen svar | low | avvist: ny informasjon, som instruksjonen kl. 22:32 utelukker |
+| ECH | «om kvelden» i tabellen strider mot helgen første gang | low | avvist: ordlyden står i instruksjonen kl. 22:32 |
+| ECH | Linja «Serving on» for den ekte versjonen står ikke i `docs/hjelp.md` | low | avvist: den er ikke sett i en kjøring, og «ingen ny informasjon» |
+| VG | `git pull` står i et svar mens README-en sier at git ikke trengs | low | avvist: svaret gjelder bare den som har brukt `git clone` |
+
+**Mutantene for den helhetlige formen** (11.10, hele testsettet for hver, koden satt tilbake fra en kopi med sha256 kontrollert). Alle 16 ble fanget. H12 og H13 overlevde først, fordi testen for like svar leste bare ett spørsmål. Testen er rettet i `dcc5e9e`, og begge ble fanget etterpå.
+
+| # | Mutanten | Fanget av |
+|---|---|---|
+| H1 | Demoen mangler i tabellen | `test_tabellen_nevner_begge_og_hvilken_som_er_anbefalt` |
+| H2 | demoen anbefalt | `test_tabellen_nevner_begge_og_hvilken_som_er_anbefalt` |
+| H3 | advarselen mot `down -v` i en `<details>` | `test_advarselen_mot_down_v_staar_synlig` |
+| H4 | et niende spørsmål | `test_staar_du_fast_har_hoeyst_8_spoersmaal` |
+| H5 | et tema borte fra `docs/hjelp.md` | `test_hvert_tema_staar_i_readme_eller_hjelp` |
+| H6 | lenken til `docs/hjelp.md` brutt | `test_lenkene_virker`, `test_staar_du_fast_har_hoeyst_8_spoersmaal`, `test_hver_lenke_i_readme_peker_paa_noe_som_finnes` |
+| H7 | steg 1 over 60 ord | `test_stegene_er_nummerert_og_har_hoeyst_60_ord` |
+| H8 | `#` i boksen i steg 7 | `test_ingen_kommentar_paa_kommandolinjene`, `test_readme_proeven_har_hver_kommando` |
+| H9 | merket endret i malen | `test_merket_i_demoen_er_det_samme_som_i_malene` |
+| H10 | «Download ZIP» tatt ut | `test_ekte_versjonen_foerst_og_zip_foer_kommandoene`, `test_docker_foerst_og_uv_som_alternativ`, `test_zip_fila_maa_pakkes_ut` |
+| H11 | to kommandoer i en boks i `docs/hjelp.md` | `test_boksene_i_hjelp_foelger_de_samme_reglene` |
+| H12 | AirPlay borte fra svaret i `docs/hjelp.md` | `test_like_spoersmaal_har_samme_svar` (etter `dcc5e9e`) |
+| H13 | ulikt svar i README-en og `docs/hjelp.md` | `test_like_spoersmaal_har_samme_svar` (etter `dcc5e9e`) |
+| H14 | «steg 8 i demoen» | `test_henvisningene_og_proevetabellen` |
+| H15 | «Dokumentene» uten lenken | `test_hjelp_har_frontmatter_og_er_nevnt_i_readme` |
+| H16 | `notepad .env` mangler i §9 | `test_readme_proeven_har_hver_kommando` |
+
+**Testene etter den helhetlige formen:** lokalt 1290 passed og 16 skipped, 1306 samlet. Før instruksjonen kl. 22:32: lokalt 1285 passed og 16 skipped, i CI 1301. Før PR 3: lokalt 1269 passed og 16 skipped, i CI 1285.
+
+**Gjennomgangen av rekkefølgen og «Status»** (12.10, diffen `d2cb634..d1e6639`). Blind Hunter (BH, 10 funn), Edge Case Hunter (ECH, 11) og Verification Gap (VG, 2 hull). Rettingene står i `0f7b42d`.
+
+| Funn | Hva | Dom | Rute |
+|---|---|---|---|
+| BH, ECH | Tabellen sa ikke at kursene hentes fra EODHD hver børsdag og at dagens vurdering lagres per aksje, slik punktene som ble tatt ut, gjorde | medium | patch i tabellen. «Sidene leser fra basen» står ikke lenger, og det står i Spec Change Log |
+| BH, ECH | «Ferdig» stemmer ikke med `review` i sprintstatusen | medium | patch: «Flettet til main», som git kan bekrefte når PR 3 er flettet |
+| BH, ECH | 8.0d står ikke i sprintstatusen som statuslinja lenker til | low | patch: lenke også til planen i `epics.md` |
+| BH, ECH | Konfliktnotatene manglet regelen for statuslinja ved hver fletting, og 8-0b sier at 2.3b er flettet | low | patch i Spec Change Log |
+| BH, ECH, VG | Regelen for storynumre slapp gjennom «(10.1)», «8-0b» og «story 11.2», og kunne slå ut på datoer | medium | patch: parentes, bokstav bak, bindestrek og ordet story, men ikke datoer |
+| VG, ECH | «Ingen kommando» sjekket bare ``` og `docker compose` | medium | patch: også `~~~`, kode i backticks, `docker-compose` og `uv run` |
+| BH | Testen sjekket ikke innholdet Marian ba om i «Status» | medium | patch |
+| BH, ECH | Rekkefølgetesten sjekket ikke «rett under beskrivelsen», og ga `ValueError` i stedet for en feilmelding | low | patch |
+| BH | Ingen test for «lenger ned» | low | patch |
+| BH | Tidsstemplet i Spec Change Log var eldre enn svaret det viser til | low | patch: «instruksjonen kl. 23:48» |
+| BH | Steg 5 sier ikke hvor nøkkelen står hos EODHD | low | avvist: Marian husker ikke, og det er ikke slått opp (regel 3) |
+
+**Mutantene for rekkefølgen og «Status»** (12.10, hele testsettet for hver, mot `0f7b42d`, koden satt tilbake fra en kopi med sha256 kontrollert). Alle 9 som brøt en regel, ble fanget. T9 er forkastet, fordi den la inn en ny linje som ikke het «Til faglærer:», mens den ekte linja ble stående. Den brøt derfor ingen regel. T9b flytter selve linja.
+
+| # | Mutanten | Fanget av |
+|---|---|---|
+| T1 | «Status» før «Kom i gang» | `test_til_faglaerer_og_kom_i_gang_foer_status`, `test_status_uten_storynumre_og_uten_kommando` |
+| T2 | et avsnitt mellom beskrivelsen og «Til faglærer» | `test_til_faglaerer_og_kom_i_gang_foer_status` |
+| T3 | «(10.1–10.3)» i «Status» | `test_status_uten_storynumre_og_uten_kommando` |
+| T4 | «(8-0b)» i «Status» | `test_status_uten_storynumre_og_uten_kommando` |
+| T5 | `docker compose up --build demo` i «Status» | `test_status_uten_storynumre_og_uten_kommando` |
+| T6 | en `~~~`-boks i «Status» | `test_status_uten_storynumre_og_uten_kommando` |
+| T7 | «hjelp bak «?»» falt bort | `test_status_uten_storynumre_og_uten_kommando` |
+| T8 | «lenger ned» borte | `test_lenken_til_staar_du_fast_sier_lenger_ned` |
+| T9 | en ekstra linje under «Kom i gang» | forkastet, se over |
+| T9b | «Til faglærer» flyttet under «Kom i gang» | `test_til_faglaerer_og_kom_i_gang_foer_status` |
+
+**Testene etter rekkefølgen og «Status»:** lokalt 1293 passed og 16 skipped, 1309 samlet. Før instruksjonen kl. 23:48: lokalt 1290 passed og 16 skipped, i CI 1306.
 
 ## Verification
 
@@ -293,3 +531,27 @@ Den første kjøringen, før `abaad78`, viste alle som drept, men av lekkasjen a
 C3 la igjen volumet `ose-ci-34_ose-db`, fordi mutanten la til et volum trap ikke fjerner. Derfor stoppet C4–C6 første gang på sjekken av volumer fra før. Bare det volumet er fjernet, og C4–C6 er kjørt på nytt.
 
 **Suiten etter PR 2:** 1269 passed og 16 skipped lokalt, mot 1257 og 16 før (33 i `tests/test_demo.py`, 43 i `tests/test_docker.py`). CI på `2fa6f9f`, kjøring 38057371770: `pytest` 1285 passed og `docker` grønn, også demosteget.
+
+**PR 3, mutantene** (11.10, hele testsettet for hver, mot `b0deee4`, koden satt tilbake fra en kopi med sha256 kontrollert). P1–P11 ble også kjørt mot `ba81406`, før rettingene, og alle ble fanget der også.
+
+| # | Mutanten | Fanget av |
+|---|---|---|
+| P1 | `# demoen` bak `docker compose up --build demo` | `test_ingen_kommentar_paa_kommandolinjene`, `test_demoen_er_den_foerste_kommandoen`, `test_readme_proeven_har_hver_kommando` |
+| P2 | to kommandoer i boksen i steg 8 | `test_en_kommando_per_boks` |
+| P3 | PowerShell tatt ut av steg 4 | `test_stegene_nevner_powershell_og_terminal` |
+| P4 | «toomanyrequests» tatt ut av FAQ-en | `test_hvis_noe_gaar_galt` |
+| P5 | ankeret til FAQ-en skrevet feil | `test_steg_1_2_og_6_peker_til_faqen`, `test_hver_lenke_til_et_avsnitt_finnes` |
+| P6 | merket endret i `index.html` uten README-en | `test_merket_i_steg_7_er_det_samme_som_i_malene` |
+| P7 | `uv sync` tatt ut av §9 | `test_readme_proeven_har_hver_kommando` |
+| P8 | `demoen` i stedet for `demo` i Bytte | `test_tjenestene_i_readme_finnes_i_compose`, `test_readme_proeven_har_hver_kommando` |
+| P9 | `git clone` som steg før demoen | `test_demoen_er_den_foerste_kommandoen` (og to til mot `b0deee4`) |
+| P10 | porten i Dockerfile endret til 5001 | `test_linja_som_viser_at_demoen_er_klar`, `test_webserveren_er_waitress_uten_debug` |
+| P11 | FAQ-en fikk en annen overskrift | `test_hvis_noe_gaar_galt`, `test_demoen_er_den_foerste_kommandoen`, `test_hver_lenke_til_et_avsnitt_finnes` |
+| P12 | blokka i steg 8 med `powershell`, `#` og to kommandoer | `test_bare_kommandoer_og_en_tekstblokk` |
+| P13 | «Gjør steg 9» i FAQ-en | `test_stegene_og_henvisningene_til_dem` |
+| P14 | «Steg 2:» tatt ut av §9 | `test_stegene_og_henvisningene_til_dem` |
+| P15 | `.env` nevnt i steg 2 | `test_ingen_env_foer_demoen` |
+| P16 | `demo` får egen `command` i compose.yaml | `test_linja_som_viser_at_demoen_er_klar`, `test_demo_lag_kjoerer_demokommandoen_og_demo_har_bryteren` |
+| P17 | rad 10 (steg 8) tatt ut av §9 | `test_stegene_og_henvisningene_til_dem`. Kommandoen står fortsatt i rad 16, så testen for kommandoene alene fanger den ikke |
+
+**Testene etter PR 3:** lokalt 1281 passed og 16 skipped, 1297 samlet. Før PR 3: lokalt 1269 passed og 16 skipped, i CI 1285.

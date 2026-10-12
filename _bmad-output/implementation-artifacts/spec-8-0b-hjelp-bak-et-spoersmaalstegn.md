@@ -106,6 +106,8 @@ Planen ble vist i chatten 11.10 og er ført i `docs/ai-prompts/2026-10-11.md` (i
 
 ## Spec Change Log
 
+- **2026-10-12, flettingen med main (instruksjonen kl. 12:12):** 8.0b flettes på dagtid og før PR #28, etter Marians beslutning kl. 12:08, fordi 8.0b ikke endrer hentingen. Svar 5 fra 11.10 om å vente til PR #28 er flettet gjelder derfor ikke lenger. Main ble hentet inn med merge, og ga to konflikter. I README.md gjelder mains versjon etter PR #30–#33. Grenens statuslinje sa at 2.3b var flettet, og det er den ikke. I mains statuslinje er «hjelp bak «?» på sidene» flyttet fra «Neste» til «Flettet til main». I `deferred-work.md` står begge oppføringene, grenens først.
+
 ## Review Triage Log
 
 Gjennomgangen 11.10 av diffen fra `00a69ce` til `3f6d4ec`: Blind Hunter (BH, 12 funn), Edge Case Hunter (ECH, 8 funn og kontrollen av tekstene mot kildene) og Verification Gap (VG, 2 hull og kontrollen av tekstene). Rettingene står i `45623d4`.
