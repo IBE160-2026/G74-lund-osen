@@ -874,3 +874,21 @@ class TestReadmeForNybegynnere:
         assert f"signalstyrke fra 0 til {antall}" in beskrivelse
         assert "– " + ", ".join(n.lower() for n in navn[:antall - 1]) + f" og {navn[antall - 1].lower()} –" in beskrivelse
         assert "Appen gir ikke råd om å kjøpe eller selge." in beskrivelse
+
+    def test_hvorfor_bare_15_aksjer(self):
+        """Marian 12.10 kl. 10:22: spoersmaalet staar i docs/hjelp.md under
+        «Den ekte versjonen», rett etter «Hva med nøkkelen?». Tallet er
+        lengden av AKSJEUNIVERS, saa hjelpen maa foelge naar lista endres
+        (2.11 og 2.12)."""
+        import kursdata
+
+        antall = len(kursdata.AKSJEUNIVERS)
+        hjelp = _hjelp()
+        ekte = hjelp.split("\n## Den ekte versjonen\n", 1)[1].split("\n## ", 1)[0]
+        overskrifter = re.findall(r"^### (.+)$", ekte, re.MULTILINE)
+        sporsmaal = f"Hvorfor bare {antall} aksjer?"
+        assert sporsmaal in overskrifter, overskrifter
+        assert overskrifter.index(sporsmaal) == overskrifter.index("Hva med nøkkelen?") + 1
+        svar = ekte.split(f"### {sporsmaal}\n\n", 1)[1].split("\n\n", 1)[0]
+        assert f"med {antall} aksjer" in svar
+        assert "20 kall i døgnet" in svar and "opptil 18" in svar
