@@ -134,6 +134,8 @@ Totalt er 14 eldre testfunksjoner endret, 39 testkjøringer.
 
 ## Spec Change Log
 
+- **2026-10-12, instruksjonen kl. 22:15 i `docs/ai-prompts/2026-10-12.md`: main flettet inn i grenen før flettingen av PR #28.** Etter PR #30 står ikke «Når du henter» lenger i README-en. Endringen fra denne storyen i teksten om når en kan hente, er ført under «Når kan jeg hente?» i `docs/hjelp.md`. Statuslinja i README-en har flyttet nye forsøk fra Neste til Flettet til main, og testen for «Status» i `tests/test_docker.py` følger. Flettingen ga ingen konflikt i `src/`, og ingen kode er endret for hånd.
+
 ## Review Triage Log
 
 Gjennomgang av PR #28 etter `afd5545` (kl. 20:05), Blind Hunter (BH, bare diffen), Edge Case Hunter (ECH) og Verification Gap (VG), som tre uavhengige agenter mot diffen fra `8905b5d`. Rettelsene er `e245619` og `796d4b7`, og det som er utsatt, står i `8c14a17`.

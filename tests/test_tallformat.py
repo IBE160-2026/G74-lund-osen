@@ -64,6 +64,16 @@ class TestTall:
         assert tall(1.5004, "forhold", desimaler_mot_grense(1.5004, 1.5, minst=2)) == "1,5004"
         assert tall(1234.5, "forhold") == f"1{NB}234,50"
 
+    def test_slagene_i_hjelpetekstene(self):
+        """Story 8.0b: vinduene, volumfaktoren, noeytralsonen og en maalt
+        andel, alle uten fortegn. Ville feilet hvis noeytralsonen sto som
+        «+2 %» eller volumfaktoren som «1,50»."""
+        assert tall(50, "heltall") == "50"
+        assert tall(1.5, "faktor") == "1,5"
+        assert tall(2.0, "grense") == f"2{NB}%"
+        assert tall(60.0, "andel") == f"60,0{NB}%"
+        assert tall(29.5, "andel") == f"29,5{NB}%"
+
     def test_ukjent_slag_avvises(self):
         with pytest.raises(ValueError, match="Ukjent slag"):
             tall(1.0, "pris")

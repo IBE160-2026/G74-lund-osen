@@ -2571,6 +2571,30 @@ Gjennomgangene fant igjen hull vi ikke hadde sett. I 3.2 stoppet CI-prøven av h
 
 ---
 
+## 10.10.2026 – Demoen er ferdig, og en dato som flyttet seg
+
+*Joakim og Marian.*
+
+I dag ble demoen ferdig. Story 3.3 ble flettet om formiddagen, etter at CI gikk grønt på femte forsøk. Så bygde vi story 3.4 i to pull requests. Den første lager en demobase med 15 oppdiktede selskaper og kurser etter en fast regel, så den blir lik hver gang og på alle maskiner. Et merke i basen avgjør om sidene sier «Eksempeltall», og vaktene hindrer at demoen og den ekte basen blandes. Den andre la demoen inn i Docker og først i README-en, så den første kommandoen starter demoen uten nøkkel og uten konto. Joakim sjekket for hånd at ingen av tickerne står på lista over aksjer i Oslo. Om kvelden planla og bygde vi også 2.3b, nye forsøk med kallene som er igjen etter hentingen. Den flettes først etter hentingen mandag.
+
+Ikke alt gikk som planlagt. Vi ville vise «ingen kurs fra dagen» ved å la én demoaksje mangle siste dag, men da flyttet datoen for hele oversikten seg én dag tilbake. Vi godtok avviket, og at det samme kan skje med ekte data, står nå på lista over ting vi tar senere. docker compose down stoppet heller ikke demoen, fordi den ligger i en egen profil, så README-en bruker en kommando som gjør det. To ganger lekket en test bryteren for demoen til testene etter, og da så mutantene drept ut uten å være det. Begge gangene ble det oppdaget og rettet, og mutantene ble kjørt på nytt. Noen klokkeslett i spesifikasjonen var ikke lest fra klokka, og de er rettet med Rettet-linjer.
+
+Lørdagens 20 kall gikk til å måle omsetningen for 20 aksjer til, så 104 er nå rangert. Ingen av dem kom over 25 MNOK. Shelf Drilling ga ingen tall, fordi selskapet ble slått sammen med et annet i 2025 og ikke lenger handles i Oslo, og lista vi målte etter, var ikke oppdatert. Nå venter README-prøven 13.–16.10, og mandag blir den første hentingen med vakten mot demobasen.
+
+---
+
+## 11.10.2026 – README-en møtte en som aldri har brukt Docker
+
+*Joakim og Marian.*
+
+Søndag, uten henting. Om formiddagen planla og bygde vi story 8.0b, hjelp bak et «?» på sidene. Tekstene ligger i én fil, og tallene i dem hentes fra koden, så hjelpen ikke kan si noe annet enn beregningen gjør. Gjennomgangen fant blant annet at fotnotene under tabellene bruker andre ord enn hjelpen. Dem tar vi i 8.0c, og 8.0b ble liggende klar til fletting.
+
+Så prøvde Marian demoen selv, bare med README-en, og det gikk ikke. Hun limte kommandoene inn i Docker Desktop i stedet for i et terminalvindu, og siden svarte ikke. Fra en ny mappe og med PowerShell gikk det. README-en var skrevet for en som kan Docker, så vi skrev den om for en som aldri har brukt Docker eller et terminalvindu. Marian svarte på spørsmål mens hun prøvde på sin egen maskin: ZIP-fila ser ut som en vanlig mappe før den er pakket ut, Windows skjuler filendelser, og mappa som dras inn i PowerShell, får anførselstegn. Det ble egne spørsmål i hjelpen. Første versjon ble for lang, så vi gjorde den kortere, la de fleste spørsmålene i `docs/hjelp.md`, satte «Kom i gang» rett etter beskrivelsen og skrev en ny beskrivelse av appen.
+
+Marian så også at sidene ikke ligner designforslaget. Vi la til story 8.0d for utseendet, etter 8.0b og 8.0c, og skrev beslutningene inn i `epics.md`, så de ikke blir borte. Det vi lærte: en README må prøves av noen som ikke har skrevet den. README-prøven 13.–16.10 gjør det samme på en maskin som ikke har hatt repoet før.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
