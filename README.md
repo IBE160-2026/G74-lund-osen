@@ -227,7 +227,7 @@ Basen, demobasen og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo`
 
 ## Status
 
-Under arbeid, og ingenting er endelig. Flettet til main: hentingen av kurser med kontroll av børsdagen, Docker, demoen, denne README-en og hjelp bak «?» på sidene. Neste: README-prøven 13.–16.10, nye forsøk med kallene som er igjen etter hentingen, tydeligere merking, utseendet fra designforslaget, og så KI-laget. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
+Under arbeid, og ingenting er endelig. Flettet til main: hentingen av kurser med kontroll av børsdagen, nye forsøk med kallene som er igjen etter hentingen, Docker, demoen, denne README-en og hjelp bak «?» på sidene. Neste: README-prøven 13.–16.10, tydeligere merking, utseendet fra designforslaget, og så KI-laget. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
 
 ## Tester
 

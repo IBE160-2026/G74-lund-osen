@@ -1459,6 +1459,17 @@ Med 2.8 er det 4 kall igjen, ikke 5.
 
 **Avhenger av:** 2.3, og bygges etter 3.4. **Én økt:** avgjøres i planen.
 
+*Lagt til 2026-10-10, gruppens svar kl. 19:32 på planen kl. 19:07 (`spec-2-3b-kallene-som-er-igjen-brukes-paa-nye-forsoek.md`):*
+1. Fila for et nytt forsøk heter `forsoek<n>-raa-<dato>.json`, med n fra 2.
+2. Én runde per kjøring, eldste først. Gjentakelsen gir «rundt igjen».
+3. En dag børsen er stengt, står raden, som beslutning 1 i spesifikasjonen til 2.5 (02.10 kl. 10:29).
+4. Ingen nye kall etter kl. 23:50.
+5. Kode 1 når en aksje mangler dagens kurs etter kjøringen, også når den feilet (ECH1 i 2.3).
+6. ECH8 fra 2.3 tas i 2.3b: vurderingene som mangler når basen har kursene, skrives med 0 kall.
+7. Flettes tidligst etter at hentingen mandag 12.10 er gjort og kontrollert. README-prøven fører commiten den brukte.
+- Kontrollpunktet «Oppgaveplanlegging gjentar jobben hver halvtime fra 22:15 til 23:45» er flyttet til et eget steg etter README-prøven, med egen plan. 2.3b skriver ingen oppskrift for Oppgaveplanlegging.
+- **Én økt:** ja.
+
 ### Story 2.4: Etterfylling av hull i kursserien
 
 Som **bruker som ikke åpnet løsningen på en uke**, vil jeg at grafen er hel når
