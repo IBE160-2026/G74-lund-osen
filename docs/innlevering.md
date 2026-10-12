@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-10-06T23:03
+updated: 2026-10-12T20:44
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -30,6 +30,8 @@ den finnes.
 ---
 
 ## Status 2026-10-05
+
+*Lagt til 2026-10-12:* statusen under er fra 05.10 og er utdatert. Gjeldende status står i [README-en](../README.md#status) og i sprintstatusen.
 
 **Virker nå:** hentingen av sluttkurser fra EODHD til SQLite-basen, med dagens
 vurdering per aksje i samme kjøring, og markedsoversikten og aksjedetaljen, som

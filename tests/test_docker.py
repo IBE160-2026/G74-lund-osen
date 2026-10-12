@@ -912,3 +912,17 @@ class TestReadmeForNybegynnere:
         nokkel = ekte.split("### Hva med nøkkelen?\n\n", 1)[1].split("\n\n", 1)[0]
         # Ordgrense etter tallet, saa 1 ikke godtar «15» (Verification Gap 12.10).
         assert re.search(rf"en henting bruker {antall}\b", nokkel), nokkel
+
+    def test_til_faglaerer_lenker_til_briefen_med_gjeldende_tag(self):
+        """Marian 12.10 kl. 12:12: briefen var gjemt langt nede. Lista under
+        «Til faglærer:» lenker til den, og taggen er den CLAUDE.md sier er
+        gjeldende (regel 17). Ville feilet med en eldre tag i lista."""
+        tekst = README.read_text(encoding="utf-8")
+        claude = (ROT / "CLAUDE.md").read_text(encoding="utf-8")
+        # Regel 17 kan bryte linja mellom «er nå» og taggen.
+        gjeldende = re.findall(r"[Gg]jeldende tag er(?:\s+nå)?\s+`([^`]+)`", claude)[-1]
+        lista = tekst.split("Til faglærer:\n", 1)[1].split("\n\n", 1)[0]
+        assert all(l.startswith("- ") for l in lista.splitlines()), lista
+        brief = [l for l in lista.splitlines() if "](_bmad-output/planning-artifacts/product-brief.md)" in l]
+        assert len(brief) == 1, lista
+        assert re.findall(r"arbeidskrav-product-brief-v\d+", brief[0]) == [gjeldende], brief[0]
