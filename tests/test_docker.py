@@ -855,20 +855,22 @@ class TestReadmeForNybegynnere:
         lengden av AKSJEUNIVERS, og antallet sjekker og navnene deres er de i
         signalberegning.py, saa README-en maa foelge naar lista endres (2.11
         og 2.12). Den sier at appen ikke gir raad (NFR-06)."""
-        import typing
-
         import kursdata
-        import signalberegning
 
         tekst = README.read_text(encoding="utf-8")
         beskrivelse = tekst.split("Til faglærer:", 1)[0].strip().split("\n\n")[-1]
         assert beskrivelse.startswith("OSE Signal viser")
         assert f"viser {len(kursdata.AKSJEUNIVERS)} aksjer på Oslo Børs" in beskrivelse
-        antall = len(typing.get_args(typing.get_type_hints(signalberegning.sjekker_fra)["return"]))
-        tall = {2: "To", 3: "Tre", 4: "Fire"}
-        assert f"{tall[antall]} enkle sjekker" in beskrivelse
-        assert f"signalstyrke fra 0 til {antall}" in beskrivelse
+        # Antallet sjekker telles fra navnene i koden, ikke fra returtypen til
+        # sjekker_fra, som kan skrives tuple[Sjekk, ...] uten at noe endres
+        # (gjennomgangen 12.10).
         navn = re.findall(r'navn="(\w+)"', (ROT / "src" / "signalberegning.py").read_text(encoding="utf-8"))
-        assert len(set(navn)) == antall
+        navn = list(dict.fromkeys(navn))
+        antall = len(navn)
+        tall = {2: "To", 3: "Tre", 4: "Fire"}
+        assert antall in tall, navn
+        assert f"{tall[antall]} enkle sjekker" in beskrivelse
+        # Styrken er summen av sjekkene uten fortegn (FR-703), saa den hoeyeste er antallet.
+        assert f"signalstyrke fra 0 til {antall}" in beskrivelse
         assert "– " + ", ".join(n.lower() for n in navn[:antall - 1]) + f" og {navn[antall - 1].lower()} –" in beskrivelse
         assert "Appen gir ikke råd om å kjøpe eller selge." in beskrivelse
