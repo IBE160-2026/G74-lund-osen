@@ -4,97 +4,226 @@
 
 Gruppe G74 (Ai Ai Ai) i IBE160 Programmering med KI, Høgskolen i Molde, høsten 2026.
 
-OSE Signal samler kursutvikling og signalstyrke for 15 likvide Oslo Børs-aksjer i én oversikt, så en vanlig sparer kan se hva som har endret seg og hvorfor. Beregningene gjøres med vanlig programkode, og KI skal forklare signalet med ord.
-
-## Status
-
-Under arbeid, og ingenting er endelig. Vi jobber med to versjoner samtidig, med samme kode:
-
-- **Den ekte versjonen** henter sluttkurser fra EODHD hver børsdag og lagrer dagens vurdering per aksje. Markedsoversikten og aksjedetaljen leser fra basen. Den krever en egen gratis nøkkel fra EODHD.
-- **Demoversjonen** har oppdiktede selskaper og kurser, og kan prøves uten konto og uten nøkkel. Den er den enkleste måten å prøve appen på: `docker compose up --build demo` (se «Kom i gang»).
-
-Børsdagskontrollen (2.3), Docker (3.1 og 3.2), denne oppskriften (3.3) og demoversjonen (3.4) er flettet til `main`. Neste er README-prøven 13.–16.10, så nye forsøk med kallene som er igjen (2.3b), hjelp bak et spørsmålstegn (8.0b) og tydeligere merking (8.0c), og så KI-laget. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Se [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml).
+OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversikt. Tre enkle sjekker – trend, bevegelse og interesse – gir hver aksje en signalstyrke fra 0 til 3, så en vanlig sparer kan se hva som har endret seg, og hvorfor. Beregningene gjøres med vanlig programkode, og KI skal forklare signalet med ord. Appen gir ikke råd om å kjøpe eller selge.
 
 Til faglærer: leveranselista står i [`docs/innlevering.md`](docs/innlevering.md), og kvalitetssikringen i [`docs/kvalitetssikring.md`](docs/kvalitetssikring.md). Prosessen og valgene våre står i [`docs/reflection-log.md`](docs/reflection-log.md).
 
 ## Kom i gang
 
-Docker er hovedmåten. Du trenger [Docker Desktop](https://www.docker.com/products/docker-desktop/) (eller Docker Engine med Compose på Linux) og git. Kommandoene er de samme i PowerShell på Windows og i terminalen på macOS og Linux.
+Appen finnes i to versjoner, med samme kode. Vi anbefaler den ekte versjonen. Vil du bare se hvordan appen virker, er demoen raskest.
 
-### Demoen, uten nøkkel
+| | Den ekte versjonen (anbefalt) | Demoen |
+|---|---|---|
+| Kurser | Ekte sluttkurser fra Oslo Børs, hentet fra EODHD hver børsdag. Dagens vurdering lagres per aksje | Oppdiktede selskaper og kurser («Eksempeltall») |
+| Trenger | Docker Desktop og en gratis nøkkel fra EODHD | Bare Docker Desktop |
+| Klar | Viser kurser etter første henting om kvelden | Med en gang |
 
-Start Docker Desktop og vent til den sier at motoren kjører. Så:
+**Du trenger** en Windows-maskin eller en Mac, lov til å installere programmer, nett og noen GB ledig plass, men verken git eller Docker-konto. Første gang tar det en stund. På Linux bruker du Docker Engine med Compose i stedet for Docker Desktop. Står du fast, se [«Står du fast?»](#står-du-fast) lenger ned.
+
+### Felles for begge
+
+1. **Installer og start Docker Desktop** fra [docker.com](https://www.docker.com/products/docker-desktop/). Hopp over innloggingen. Det er klart når det står «Engine running» nederst i vinduet. La det være åpent.
+2. **Last ned koden.** Trykk den grønne knappen «Code» på [GitHub-siden](https://github.com/IBE160-2026/G74-lund-osen) og «Download ZIP» nederst i menyen. Windows: høyreklikk fila i Nedlastinger (Downloads) og velg «Pakk ut alle» (Extract All). Mac: dobbeltklikk fila. Det er klart når du har en mappe som heter `G74-lund-osen-main`.
+3. **Åpne PowerShell** (Windows: trykk Start, skriv PowerShell og velg «Windows PowerShell», ikke ISE) **eller Terminal** (Mac: trykk Cmd+mellomrom og skriv Terminal). Det er klart når et vindu venter på at du skriver.
+4. **Skriv `cd` og et mellomrom**, dra mappa `G74-lund-osen-main` der README og compose ligger (den innerste hvis det er to) fra Filutforsker eller Finder inn i vinduet, og trykk Enter. Det er klart når mappenavnet står foran `>` eller `%`.
+
+### Den ekte versjonen (anbefalt)
+
+5. **Hent en nøkkel.** Lag en gratis bruker hos [EODHD](https://eodhd.com/register), og kopier API-nøkkelen din. Det er klart når du har nøkkelen.
+6. **Legg inn nøkkelen, bare første gang.** Kopier kommandoene med knappen til høyre i boksen, lim dem inn én om gangen (Ctrl+V eller Cmd+V) og trykk Enter. Den første lager fila `.env`, og den neste åpner den (Windows eller Mac). Lim inn nøkkelen etter `EODHD_API_KEY=`, lagre og lukk. Det er klart når nøkkelen står etter `EODHD_API_KEY=`.
 
 ```
-git clone https://github.com/IBE160-2026/G74-lund-osen.git
-cd G74-lund-osen
-docker compose up --build demo           # demoen på http://127.0.0.1:5000
+cp .env.example .env
 ```
 
-Åpne http://127.0.0.1:5000. Demoen trenger verken `.env` eller nøkkel, og gjør ingen kall. Sidene sier «Eksempeltall»: 15 oppdiktede selskaper med kurser til fredag 9. oktober 2026, ikke data fra Oslo Børs. Demobasen lages på nytt hver gang demoen starter, i sitt eget volum, `ose-demo`. Den ekte basen røres ikke. Mens demoen kjører, kan demobasen også lages på nytt med `docker compose run --rm demo-lag`.
-
-Stopp med `Ctrl+C` i vinduet, og fjern containerne med:
+Windows:
 
 ```
-docker compose --profile demo down
+notepad .env
 ```
 
-### Den ekte versjonen, med egen nøkkel
+Mac:
 
 ```
-cp .env.example .env                     # bare første gang: fyll inn EODHD_API_KEY i .env
-docker compose up --build                # webserveren på http://127.0.0.1:5000
+open -e .env
 ```
 
-Hent kursene i et nytt vindu, fra samme mappe:
+7. **Start appen.** Lim inn denne og trykk Enter. Første gang tar det noen minutter. Det er klart når det står `Serving on http://0.0.0.0:5000`. Åpne http://127.0.0.1:5000 i en ny fane. Første gang er oversikten tom og viser kommandoen som henter.
+
+```
+docker compose up --build
+```
+
+8. **Hent kursene** etter kl. 22 og før midnatt på en børsdag. Åpne et nytt terminalvindu i samme mappe (steg 3 og 4), og lim inn denne. Det er klart når utskriften sier hvilken børsdag vurderingene gjelder. Last siden på nytt når hentingen er ferdig.
 
 ```
 docker compose run --rm hent
 ```
 
-Last siden på nytt når hentingen er ferdig. Stopp med `Ctrl+C` i vinduet med webserveren, eller med:
+9. **Stopp** med Ctrl+C i vinduet med appen, og lim så inn denne. Det er klart når det står at containerne er fjernet (Removed).
 
 ```
 docker compose down
 ```
 
-- **Nøkkelen.** Du trenger en egen gratis API-nøkkel fra [EODHD](https://eodhd.com/register), fordi vilkårene ikke lar oss dele vår. Den gir 20 kall i døgnet, og en henting bruker 15. Åpne `.env` i en teksteditor (`notepad .env` på Windows, `open -e .env` på macOS, `nano .env` på Linux) og lim den inn etter `EODHD_API_KEY=`. `cp` skriver over en `.env` som finnes, så kopier bare første gang. Webserveren starter uten `.env` og bruker aldri kvote: den leser bare fra basen. Bare hentingen trenger nøkkelen, og `docker compose run --rm hent` starter ikke uten `.env`.
-- **Når du henter.** Hent etter kl. 22 og før midnatt på en børsdag. Første gang kan du også hente i helgen: da henter den siste børsdag, fordi basen mangler den. På dagtid en børsdag stopper hentingen med 0 kall og sier hvorfor: dagens sluttkurs er ikke klar ennå, og en vurdering kan ikke fylles inn senere. Har basen alt kursene for børsdagen, bruker den også 0 kall. På en dag børsen er stengt henter den bare hvis basen mangler forrige børsdag og fila for den dagen ikke finnes. Før kallene leser den kvoten med `/api/user`, som er gratis.
-- **Uten henting** starter appen med tom oversikt og viser kommandoen som henter. Utskriften fra hentingen sier hvilken børsdag vurderingene gjelder, og hvilke aksjer som fikk en grunn i stedet for en vurdering.
-- **Dataene** ligger i to Docker-volumer: `ose-db` med basen og `ose-raa` med øyeblikksbildene fra EODHD. De står når containerne stoppes. **Bruk aldri `docker compose down -v`.** `-v` fjerner begge volumene, og verken øyeblikksbildene eller vurderingene kan hentes på nytt. Basen kan heller ikke slettes og bygges opp igjen: kursene kan hentes på nytt, men vurderingene for dagene som har gått, kan ikke lages på nytt.
-- **Porten** er bare åpen på maskinen selv (127.0.0.1). Appen kan ikke nås fra nettet.
+**Skriv aldri `docker compose down -v`.** Det sletter kursene og vurderingene, og vurderingene kan ikke lages på nytt.
 
-### Bytte mellom demoen og den ekte versjonen
+### Demoen
 
-Begge bruker port 5000, så bare én kan kjøre om gangen. `docker compose down` stopper ikke demoen, fordi demoen ligger i en egen profil. `docker compose --profile demo down` stopper begge. Start så den du vil bruke:
+5. **Start demoen.** Kopier kommandoen med knappen til høyre i boksen, lim den inn (Ctrl+V eller Cmd+V) og trykk Enter. Første gang tar det noen minutter. Demoen er klar når det står `Serving on http://0.0.0.0:5000`. Den adressen skal du ikke åpne.
 
 ```
-docker compose --profile demo down       # stopper demoen og den ekte versjonen
-docker compose up --build                # den ekte versjonen
-docker compose up --build demo           # eller demoen
+docker compose up --build demo
+```
+
+6. **Åpne http://127.0.0.1:5000** i en ny fane. Øverst står «Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.» Klikk på et selskapsnavn for å se en aksje.
+7. **Stopp** med Ctrl+C i terminalvinduet, også på Mac, og lim så inn denne. Det er klart når det står at containerne er fjernet (Removed).
+
+```
+docker compose --profile demo down
+```
+
+### Står du fast?
+
+Klikk på spørsmålet som passer.
+
+<details>
+<summary>Det står ikke «Engine running» etter noen minutter.</summary>
+
+Avslutt Docker Desktop helt: høyreklikk hvalen ved klokka (Windows) eller klikk den i menylinja øverst (Mac), og velg «Quit Docker Desktop». Åpne det igjen og vent. Hjelper ikke det, starter du maskinen på nytt.
+
+</details>
+
+<details>
+<summary>ZIP-fila ser ut som en vanlig mappe.</summary>
+
+Du må pakke ut. Står det «Komprimert størrelse» (Compressed size) som kolonne og «Pakk ut alle» (Extract All) øverst i vinduet, er du inne i ZIP-fila, og den er ikke pakket ut. Trykk «Pakk ut alle», og bruk mappa som lages. På Windows finner du Nedlastinger (Downloads) i Filutforsker (File Explorer), og etter «Pakk ut alle» trykker du «Pakk ut» (Extract).
+
+</details>
+
+<details>
+<summary>Mappa lar seg ikke dra inn i vinduet.</summary>
+
+PowerShell er trolig åpnet som administrator, og da sperrer Windows dra og slipp. Lukk vinduet og åpne PowerShell på vanlig måte (steg 3).
+
+</details>
+
+<details>
+<summary>Ingenting skjer når jeg limer inn.</summary>
+
+Kommandoene skrives i PowerShell eller Terminal, ikke i Docker Desktop. Docker Desktop skal bare være åpent, og du skriver ingenting i det. Ledetekst (Command Prompt) på Windows virker også for demoen, men stegene er skrevet for PowerShell, og den ekte versjonen trenger PowerShell.
+
+</details>
+
+<details>
+<summary>«Cannot connect to the Docker daemon», «error during connect» eller «dockerDesktopLinuxEngine».</summary>
+
+Docker Desktop er ikke startet, eller motoren er ikke klar. Start Docker Desktop, vent til det står «Engine running» (steg 1), og prøv kommandoen igjen.
+
+</details>
+
+<details>
+<summary>«no configuration file provided: not found».</summary>
+
+Terminalvinduet står i feil mappe. Gjør steg 4 på nytt, og dra den mappa der fila compose ligger. Windows viser den uten filendelsen, som compose og ikke compose.yaml.
+
+</details>
+
+<details>
+<summary>«port is already allocated», «address already in use» eller «ports are not available».</summary>
+
+Noe annet bruker port 5000. Kjører den andre versjonen, stopper du den først (se «Bytte mellom demoen og den ekte versjonen» under «Mer for den som vil»). På Mac bruker AirPlay-mottakeren (AirPlay Receiver) port 5000. Slå den av under Systeminnstillinger (System Settings) → Generelt (General) → AirDrop og Handoff (AirDrop & Handoff), og prøv igjen.
+
+</details>
+
+<details>
+<summary>Oversikten er tom.</summary>
+
+Uten henting starter appen med tom oversikt og viser kommandoen som henter. Hent kursene med steg 8 i den ekte versjonen, og last siden på nytt.
+
+</details>
+
+Flere spørsmål og svar står i [docs/hjelp.md](docs/hjelp.md).
+
+### Mer for den som vil
+
+<details>
+<summary>Bytte mellom demoen og den ekte versjonen</summary>
+
+Begge bruker port 5000, så bare én kan kjøre om gangen. `docker compose down` stopper ikke demoen, fordi demoen ligger i en egen profil. `docker compose --profile demo down` stopper begge.
+
+Stopp demoen og den ekte versjonen:
+
+```
+docker compose --profile demo down
+```
+
+Start så den ekte versjonen:
+
+```
+docker compose up --build
+```
+
+eller demoen:
+
+```
+docker compose up --build demo
 ```
 
 Volumene står når du bytter, også basen med vurderingene.
 
-### Uten Docker, med uv
+</details>
 
-Med Python 3.13 og [uv](https://docs.astral.sh/uv/). Demoen:
+<details>
+<summary>Uten Docker, med uv</summary>
 
-```
-uv sync                                  # installerer avhengighetene
-uv run python src/demo.py                # lager demobasen, data/db/demo.db
-uv run python src/app.py --demo          # demoen på http://127.0.0.1:5000
-```
+Med Python 3.13 og [uv](https://docs.astral.sh/uv/). Først demoen.
 
-Den ekte versjonen:
+Installer avhengighetene:
 
 ```
-cp .env.example .env                     # bare første gang: fyll inn EODHD_API_KEY
-uv run python src/fetch_prices.py        # henter kurser
-uv run python src/app.py                 # http://127.0.0.1:5000
+uv sync
+```
+
+Lag demobasen, `data/db/demo.db`:
+
+```
+uv run python src/demo.py
+```
+
+Start demoen på http://127.0.0.1:5000:
+
+```
+uv run python src/app.py --demo
+```
+
+Så den ekte versjonen.
+
+Bare første gang: kopier malen, og fyll inn `EODHD_API_KEY` i `.env`.
+
+```
+cp .env.example .env
+```
+
+Hent kurser:
+
+```
+uv run python src/fetch_prices.py
+```
+
+Start webserveren på http://127.0.0.1:5000:
+
+```
+uv run python src/app.py
 ```
 
 Basen, demobasen og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo` åpner webserveren den ekte basen.
+
+</details>
+
+## Status
+
+Under arbeid, og ingenting er endelig. Flettet til main: hentingen av kurser med kontroll av børsdagen, Docker, demoen og denne README-en. Neste: README-prøven 13.–16.10, nye forsøk med kallene som er igjen etter hentingen, hjelp bak «?» på sidene, tydeligere merking, utseendet fra designforslaget, og så KI-laget. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
 
 ## Tester
 
@@ -124,6 +253,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [Endringsforslag 08.10](_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-08.md): femten idéer inn i v1, godkjent av Marian 08.10
 - [Kilder og bruksvilkår](docs/kilder-og-rettigheter.md), med e-postene til [EODHD](docs/epost-til-eodhd.md) og [Euronext](docs/epost-til-euronext.md)
 - [Leveranseliste](docs/innlevering.md)
+- [Hjelp til «Kom i gang»](docs/hjelp.md): spørsmål og svar, sortert etter steg
 
 **Arbeidsprosess og kvalitet**
 
@@ -136,7 +266,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 ## Mappestruktur
 
 - `src/` og `tests/` — applikasjonen og testene
-- `docs/` — arbeidsprosessen
+- `docs/` — arbeidsprosessen, og `docs/hjelp.md` med spørsmål og svar til «Kom i gang»
 - `_bmad-output/` — plan, krav og sprintstatus
 - `.github/` — testkjøringen og morgensjekken
 - `Dockerfile`, `compose.yaml` og `.dockerignore` — imaget og tjenestene: webserveren, hentingen og demoen
