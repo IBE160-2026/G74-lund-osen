@@ -100,6 +100,7 @@ Planen ble vist i chatten 11.10 og er ført i `docs/ai-prompts/2026-10-11.md` (i
 - **To tester i `test_app.py`** så etter ordene «Signalstyrke» og «Målt mot», som nå også står i hjelpen. De ser nå etter tabellcellen.
 - **`docs/kvalitetssikring.md` er ikke endret.** §8 sier at dokumentet oppdateres ved hver epic, og 2.3 og 3.1–3.4 har heller ingen rad ennå. Mutantene står under Verification med testene som fanget dem, som §8 krever fra 03.10.
 - **README:** Status-linjen sier at 2.3b og 8.0b er flettet. Det stemmer når 8.0b flettes, fordi 8.0b venter på PR #28 (svar 5).
+  *Rettet 2026-10-12:* gjelder ikke lenger. 8.0b flettes før PR #28 (Marians beslutning 12.10 kl. 12:08), og README-en på grenen er mains versjon, der bare «hjelp bak «?» på sidene» er flyttet til «Flettet til main». 2.3b står fortsatt under «Neste». Det samme gjelder rad 18 i triageloggen.
 - **Nettlesere uten `popover`** (Safari før 17, Firefox før 125) bruker ikke attributtet. Vinduet blir en vanlig `<div>` nederst på siden, med teksten åpen, og «?» gjør ingenting. Det er ikke prøvd i en slik nettleser.
 - **Etter gjennomgangen** (`45623d4`): teksten om målingen bruker `MAALTE_GRENSER` og ikke `p`, fordi den sier hva som ble målt (Boundaries: målinger er egne konstanter). `test_andre_parametre_gir_andre_tall` ser derfor bort fra `grensene`, og `TestGrensene` krever at `STANDARD` er lik de målte grensene.
 - **Regel 22:** basene i testene ligger i `tmp_path`. HTML-en ble kontrollert én gang med en demobase i scratch-mappa for økta.
