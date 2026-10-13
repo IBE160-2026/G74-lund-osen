@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-10-13T13:18
+updated: 2026-10-13T16:56
 ---
 
 # Designregler
@@ -49,6 +49,8 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 **Hvorfor:** 3 av 3 er det sterkeste signalet, og samme farge overalt gjør det lett å finne.
 
 **I dag:** appen bruker ikke gult. Rader som skiller seg ut, har lys grå bakgrunn og merket «skiller seg ut» (index.html).
+
+*Lagt til 2026-10-13 (story 8.0c, PR #35):* oversikten har gul ring rundt «3 av 3» i fargen `#a67c00`, for kontrast på minst 3:1 mot hvitt. 2 av 3 merkes med fet skrift og en strek til venstre i tekstfargen, uten gult.
 
 *Lagt til 2026-10-05:* tabelldelen av regelen, gul ring rundt «3 av 3» og 2 av 3 merket uten gult, tas inn i story 8.0c.
 
