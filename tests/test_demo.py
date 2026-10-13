@@ -582,3 +582,5 @@ class TestStory80eIDemoen:
         for celle in vurdert:
             assert re.fullmatch(r"\d av 3 T (\+1|0|-1) B (\+1|0|-1) I (\+1|0|-1)( skiller seg ut)?", celle), celle
         assert "background: var(--fyll)" in _regel(_stil(html), ".pille.tre-av-tre")
+        # BH5 og ECH1 i gjennomgangen: pillen med fyll staar ogsaa i demoen.
+        assert '<span class="pille tre-av-tre">3 av 3</span>' in html

@@ -105,13 +105,9 @@ def les_tilstand(
     return utfall, IKKE_BOERSDAG
 
 
-# Bokstaven, navnet og feltet i Vurdering for hver sjekk, i samme rekkefoelge
-# som paa aksjesiden (story 8.0e).
-SJEKKBOKSTAVER = (
-    ("T", "trend", "trend"),
-    ("B", "bevegelse", "bevegelse"),
-    ("I", "interesse", "interesse"),
-)
+# Bokstaven og feltet i Vurdering for hver sjekk, i samme rekkefoelge som
+# paa aksjesiden (story 8.0e). Feltnavnet er ogsaa navnet som vises.
+SJEKKBOKSTAVER = (("T", "trend"), ("B", "bevegelse"), ("I", "interesse"))
 
 
 @dataclass(frozen=True)
@@ -167,8 +163,8 @@ class Rad:
         if not self.vurdering:
             return ()
         return tuple(
-            (bokstav, navn, fortegn(getattr(self.vurdering, felt)))
-            for bokstav, navn, felt in SJEKKBOKSTAVER
+            (bokstav, felt, fortegn(getattr(self.vurdering, felt)))
+            for bokstav, felt in SJEKKBOKSTAVER
         )
 
 

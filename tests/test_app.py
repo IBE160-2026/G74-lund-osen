@@ -1614,8 +1614,12 @@ class TestStory80e:
         """Den flate serien ville gitt T 0, B 0 og I 0. Ville feilet hvis T, B
         og I ble regnet av kursene, eller stod over «N av 3»."""
         _lagret("EQNR", 0.0, 1, -1, 0)
-        rad = _rader_per_selskap(klient.get("/").data.decode("utf-8"))["Equinor"]
+        html = klient.get("/").data.decode("utf-8")
+        rad = _rader_per_selskap(html)["Equinor"]
         assert rad[3] == "2 av 3 T +1 B -1 I 0 skiller seg ut"
+        # VG1 i gjennomgangen: navnet staar ved bokstaven.
+        for bokstav, navn in (("T", "trend"), ("B", "bevegelse"), ("I", "interesse")):
+            assert f'<abbr title="{navn}">{bokstav}</abbr>' in html
 
     def test_rad_uten_vurdering_har_ikke_t_b_og_i(self, klient):
         """Ville feilet hvis en rad med en grunn eller uten vurdering viste T,
@@ -1689,6 +1693,15 @@ class TestStory80e:
         assert "Skilte seg ut</th>" not in html
         assert html.index("Ingen aksjer skilte seg ut") > html.index("</thead>")
 
+    def test_bare_setningen_fra_0510_naar_alle_er_vurdert(self, klient):
+        """BH11: med alle vurdert staar bare den foerste setningen, og den
+        staar i tabellen."""
+        _lagret("EQNR", 1.0, 1, 0, 0)
+        _lagret("DNB", 1.0, 0, 0, 0)
+        assert _tabell(klient.get("/").data.decode("utf-8")).deler == [
+            "Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer.", "Øvrige aksjer",
+        ]
+
     def test_alle_over_terskelen_gir_bare_skilte_seg_ut(self, klient):
         _lagret("EQNR", 1.0, 1, 1, 0)
         _lagret("KOG", 1.0, 1, 1, 1)
@@ -1716,16 +1729,27 @@ class TestStory80e:
         assert '<span class="pille tre-av-tre">3 av 3</span>' in html
         assert '<span class="pille">2 av 3</span>' in html
 
-    def test_hvit_tekst_paa_fyllet_har_minst_4_5_til_1(self, klient):
-        """WCAG 1.4.3 for vanlig tekst."""
+    def test_kontrasten_paa_pillen_med_fyll(self, klient):
+        """WCAG 1.4.3: teksten mot fyllet minst 4,5:1. WCAG 1.4.11: den gule
+        ringen mot fyllet minst 3:1, som mot hvitt i 8.0c. Begge fargene i
+        teksten leses fra stilen (BH1 og BH2 i gjennomgangen)."""
         _lagret("KOG", 0.0, 1, 1, 1)
         stil = _stil(klient.get("/").data.decode("utf-8"))
-        farge = re.search(r"--fyll:\s*#([0-9a-fA-F]{6})", stil).group(1)
+        fyll = re.search(r"--fyll:\s*#([0-9a-fA-F]{6})", stil).group(1)
+        gul = re.search(r"--gul:\s*#([0-9a-fA-F]{6})", stil).group(1)
+        tekst = re.search(r"(?<!-)color:\s*#([0-9a-fA-F]{6})", _regel(stil, ".pille.tre-av-tre")).group(1)
 
-        def lin(c):
-            c = c / 255
-            return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+        def lys(farge):
+            def lin(c):
+                c = c / 255
+                return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
 
-        r, g, b = (int(farge[i:i + 2], 16) for i in (0, 2, 4))
-        lys = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
-        assert (1.0 + 0.05) / (lys + 0.05) >= 4.5, farge
+            r, g, b = (int(farge[i:i + 2], 16) for i in (0, 2, 4))
+            return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
+
+        def kontrast(a, b):
+            hoey, lav = sorted((lys(a), lys(b)), reverse=True)
+            return (hoey + 0.05) / (lav + 0.05)
+
+        assert kontrast(tekst, fyll) >= 4.5, (tekst, fyll)
+        assert kontrast(gul, fyll) >= 3.0, (gul, fyll)
