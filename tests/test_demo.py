@@ -41,6 +41,13 @@ SRC = Path(demo.__file__).resolve().parent
 FINGERAVTRYKK_KURS = "73c277d2007d448f19ed95bd58ae30fac9bb7f43d60234455496aa1e0dbdec16"
 
 
+@pytest.fixture(autouse=True)
+def fast_klokke(monkeypatch):
+    """Story 8.0c: datoene paa sidene viser aaret naar det er et annet enn i
+    dag. Uten fast klokke ville demotestene feilet fra 01.01.2027 (VG1)."""
+    monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 13, 12, 0, tzinfo=timezone.utc))
+
+
 @pytest.fixture(scope="module")
 def mal(tmp_path_factory):
     """En demobase, laget en gang for modulen og kopiert av testene som trenger den."""

@@ -35,10 +35,16 @@ MAANEDER = ("januar", "februar", "mars", "april", "mai", "juni", "juli",
             "august", "september", "oktober", "november", "desember")
 
 
+# Plassen et maanedsnavn trenger med 10px skrift. Naermere hoeyre kant enn
+# dette staar teksten til venstre for streken, saa den ikke kuttes (ECH1).
+NAVNEBREDDE = 60
+
+
 @dataclass(frozen=True)
 class Maanedsmerke:
     x: float
     navn: str
+    til_venstre: bool = False
 
 
 @dataclass(frozen=True)
@@ -131,7 +137,8 @@ def _maanedsmerker(punkter: tuple[Punkt, ...], bredde: int) -> tuple[Maanedsmerk
         if foerste is None or foerste not in indeks:
             continue
         x = MARG_X + tegne_bredde * indeks[foerste] / (len(punkter) - 1)
-        merker.append(Maanedsmerke(x=x, navn=MAANEDER[foerste.month - 1]))
+        merker.append(Maanedsmerke(x=x, navn=MAANEDER[foerste.month - 1],
+                                   til_venstre=x > bredde - NAVNEBREDDE))
     return tuple(merker)
 
 

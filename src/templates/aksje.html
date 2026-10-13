@@ -122,16 +122,21 @@
             {{ linje.verdi|tall('akse') }}
           </text>
         {% endfor %}
+        {#- Story 8.0c: et merke ved foerste boersdag i hver maaned, tegnet foer
+            linjene saa streken ligger under kurslinja. #}
+        {% for merke in graf.maanedsmerker %}
+          <line class="maanedsstrek" x1="{{ "%.1f"|format(merke.x) }}" y1="0"
+                x2="{{ "%.1f"|format(merke.x) }}" y2="{{ graf.hoyde }}"></line>
+          {% if merke.til_venstre %}
+            <text class="maanedstekst" text-anchor="end" x="{{ "%.1f"|format(merke.x - 3) }}" y="{{ graf.hoyde - 3 }}">{{ merke.navn }}</text>
+          {% else %}
+            <text class="maanedstekst" x="{{ "%.1f"|format(merke.x + 3) }}" y="{{ graf.hoyde - 3 }}">{{ merke.navn }}</text>
+          {% endif %}
+        {% endfor %}
         {% if graf.ma50linje %}
           <polyline class="ma50linje" points="{{ graf.ma50linje }}"></polyline>
         {% endif %}
         <polyline class="kurslinje" points="{{ graf.kurslinje }}"></polyline>
-        {#- Story 8.0c: et merke ved foerste boersdag i hver maaned. #}
-        {% for merke in graf.maanedsmerker %}
-          <line class="maanedsstrek" x1="{{ "%.1f"|format(merke.x) }}" y1="0"
-                x2="{{ "%.1f"|format(merke.x) }}" y2="{{ graf.hoyde }}"></line>
-          <text class="maanedstekst" x="{{ "%.1f"|format(merke.x + 3) }}" y="{{ graf.hoyde - 3 }}">{{ merke.navn }}</text>
-        {% endfor %}
       </svg>
 
       <div class="tegnforklaring">

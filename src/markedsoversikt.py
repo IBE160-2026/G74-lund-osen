@@ -283,14 +283,14 @@ def eldre_enn_nyeste(rader: list[Rad]) -> set[str]:
 NORSK_TID = ZoneInfo("Europe/Oslo")
 
 
-def norsk_tid(tid: datetime, i_aar: int | None = None) -> str:
+def norsk_tid(tid: datetime, i_aar: int) -> str:
     """Et tidspunkt som «24.09 kl. 20.05» i norsk tid (AD-20, story 8.0c).
 
     Modellen har UTC; soneskiftet skjer foerst her, i visningen. Europe/Oslo
     og ikke en fast forskyvning, saa sommer- og vintertid begge blir riktige.
     Datoen formes av dato() i tallformat.py (regel 21), med aar bare naar
-    aaret er et annet enn i_aar. Uten i_aar regnes aaret til tidspunktet som
-    i aar.
+    aaret er et annet enn i_aar, aaret i dag fra app.idag(). i_aar er
+    paakrevd, saa en kaller ikke kan miste aaret uten aa merke det.
     """
     lokal = tid.astimezone(NORSK_TID)
-    return f"{dato(lokal.date(), lokal.year if i_aar is None else i_aar)} kl. {lokal:%H.%M}"
+    return f"{dato(lokal.date(), i_aar)} kl. {lokal:%H.%M}"

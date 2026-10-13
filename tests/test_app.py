@@ -1533,6 +1533,10 @@ class TestStory80c:
         html = klient.get("/").data.decode("utf-8")
         assert re.search(r"Oslo Børs · \d\d\.\d\d\.2026 ·", html)
         assert re.search(r"data hentet \d\d\.\d\d\.2026 kl\. \d\d\.\d\d", html)
+        # VG4: aksjesiden ogsaa, med datoen i meta-linja og grafens fra-til.
+        detalj = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert re.search(r"Energi · \d\d\.\d\d\.2026", detalj)
+        assert re.search(r"\d\d\.\d\d\.2026 til \d\d\.\d\d\.2026\.", detalj)
 
     def test_ingen_synlig_iso_dato_paa_sidene(self, klient, monkeypatch):
         """Beslutning 12: ingen synlig tekst har en dato som 2026-10-13.
@@ -1540,6 +1544,10 @@ class TestStory80c:
         from test_hjelpetekster import synlig_tekst
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0]),
                                       "DNB": serie([100.0, 101.0])}))
+        # VG3: ulike tider, saa tidsstempelet under navnet ogsaa vises.
+        monter_lager(monkeypatch, {"KOG": datetime(2026, 9, 20, 18, 0, tzinfo=timezone.utc),
+                                   "TEL": datetime(2026, 9, 22, 18, 0, tzinfo=timezone.utc)})
+        assert 'class="hentet">hentet ' in klient.get("/").data.decode("utf-8")
         for sti in ("/", "/aksje/EQNR", "/aksje/DNB"):
             tekst = synlig_tekst(klient.get(sti).data.decode("utf-8"))
             assert not re.search(r"\b\d{4}-\d{2}-\d{2}\b", tekst), (sti, re.findall(r"\b\d{4}-\d{2}-\d{2}\b", tekst))
@@ -1551,4 +1559,7 @@ class TestStory80c:
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
         navn = re.findall(r'<text class="maanedstekst"[^>]*>([a-zæøå]+)</text>', html)
         assert navn and all(n in ("september", "oktober", "november") for n in navn), navn
+        # BH9: en strek per navn, og streken under kurslinja (ECH7).
+        assert html.count('<line class="maanedsstrek"') == len(navn)
+        assert html.index('class="maanedsstrek"') < html.index('class="kurslinje" points')
         assert "01.09 til" in html

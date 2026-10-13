@@ -146,3 +146,24 @@ class TestMaanedsmerker:
         """boersdag dekker bare 2026. En maaned utenfor kan ikke avgjoeres."""
         ps = tuple(Punkt(dato=date(2025, 12, 1) + timedelta(days=i), kurs=100.0, ma50=None) for i in range(20))
         assert bygg_graf(ps).maanedsmerker == ()
+
+
+class TestMaanedsmerkerEtterGjennomgangen:
+    def test_mai_starter_paa_foerste_boersdag_etter_helligdagen(self):
+        """VG5: 01.05.2026 er en ukedag uten handel, saa merket staar ved 04.05."""
+        ps = boersdagspunkter(date(2026, 4, 15), date(2026, 5, 15))
+        graf = bygg_graf(ps)
+        x_per_dato = {p.dato: x for p, (x, _) in zip(ps, koordinater(graf.kurslinje))}
+        assert [m.navn for m in graf.maanedsmerker] == ["mai"]
+        assert graf.maanedsmerker[0].x == pytest.approx(x_per_dato[date(2026, 5, 4)], abs=0.06)
+
+    def test_merket_ved_hoeyre_kant_staar_til_venstre(self):
+        """ECH1: navnet kuttes ikke naar maaneden starter paa et av de siste
+        punktene."""
+        ps = boersdagspunkter(date(2026, 9, 1), date(2026, 10, 1))
+        merke = bygg_graf(ps).maanedsmerker[-1]
+        assert merke.navn == "oktober" and merke.til_venstre
+
+    def test_merket_langt_fra_kanten_staar_til_hoeyre(self):
+        ps = boersdagspunkter(date(2026, 9, 15), date(2026, 11, 10))
+        assert not bygg_graf(ps).maanedsmerker[0].til_venstre
