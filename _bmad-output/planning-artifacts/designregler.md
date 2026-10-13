@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-10-13T17:48
+updated: 2026-10-13T22:49
 ---
 
 # Designregler
@@ -55,6 +55,8 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 *Lagt til 2026-10-13:* linja «I dag» over gjelder før 8.0c. Den lyse grå bakgrunnen er byttet ut med fet skrift og strek, og merket «skiller seg ut» står fortsatt (index.html).
 
 *Lagt til 2026-10-05:* tabelldelen av regelen, gul ring rundt «3 av 3» og 2 av 3 merket uten gult, tas inn i story 8.0c.
+
+*Lagt til 2026-10-13 (story 8.0e, svar 8 kl. 21:27):* pillen «3 av 3» i oversikten har svart fyll og hvit tekst inne i den gule ringen, som i designforslaget, med kontrast på minst 4,5:1. 2 av 3 merkes som før, med fet skrift og strek, uten fyll og uten gult.
 
 ## 4. Ordliste – samme ord på alle sidene (01.10)
 
