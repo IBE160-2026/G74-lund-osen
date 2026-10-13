@@ -2765,6 +2765,8 @@ Som **bruker**, vil jeg se med en gang hvilke aksjer som skiller seg ut, lese hv
 - Tallene kommer fortsatt fra `Parametre`, og testene som krever det, står
 - **Ville feilet hvis:** en tekst bak «?» hadde mer enn 3 setninger utenom unntakene, «peker opp» sto igjen i hjelpen for retning, eller en dato sto som 2026-10-12 på siden
 
+*Lagt til 2026-10-13:* PR 1 flettet i `82271fb`, PR #35. PR 2 med datoene og månedsmerkene gjenstår.
+
 ### Story 8.0e: Oversikten fra designforslaget
 
 *Lagt til 2026-10-13, endringsforslaget 13.10 (punkt 4.6, nr. 1–4, svar 8, 11 og 12), godkjent av Marian kl. 12:46.*

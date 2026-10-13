@@ -2,7 +2,7 @@
 title: 'Story 8.0c: Tydelig merking, ord ved sjekkene og datoer på grafen'
 type: 'feature'
 created: '2026-10-13'
-status: 'in-review'
+status: 'in-progress'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'd9315a9570fdd8fa3b63f15e4f8fc8a93d143ffd'
@@ -87,6 +87,8 @@ Planen ble vist i chatten 13.10 og er ført i `docs/ai-prompts/2026-10-13.md` (i
 - Given demobasen, when sidene vises, then alt det nye i PR 1 står også der.
 
 ## Implementation Notes
+
+- *Lagt til 2026-10-13:* PR 1 er flettet i `82271fb`, PR #35, låst til `5fa7304`. PR 2 med datoene og månedsmerkene gjenstår, og spesifikasjonen står som in-progress til den er flettet.
 
 - Del a `fcb6c31`, b `83fa382`, c `e2e3f79`, d `c6769d8`. Main hentet inn med merge i `b5fcc8f`. Den commiten mangler Co-authored-by og er ikke skrevet om (regel 7).
 - `ingen_skilte_seg_ut()` i `markedsoversikt.py` leser `skiller_seg_ut`, som alt bruker terskelen fra `Parametre`.
