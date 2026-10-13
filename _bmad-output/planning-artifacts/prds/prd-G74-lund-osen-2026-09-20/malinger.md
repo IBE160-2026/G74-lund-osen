@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-13T11:11
+updated: 2026-10-13T15:23
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -355,6 +355,44 @@ ikke tallene.
 Et tall stemmer når appens verdi, avrundet til fire desimaler, er lik regnearkets.
 **Alt stemmer.** Dagens endring var 1,09 ganger standardavviket, regnet fra de
 lagrede verdiene. En håndregning av en dag der interesse slår ut, gjenstår.
+*Lagt til 2026-10-13:* den er gjort 13.10, for TEL 08.10, i delen under.
+
+### Kontrollregningen av de tre sjekkene, TEL 2026-10-08 *(lagt til 2026-10-13)*
+
+TEL og børsdagen 2026-10-08, regnet av gruppen i et regneark fra
+`data/raa/kurser-raa-2026-10-08.json`, med 51 rader fra 30.07 til 08.10. Appens
+tall er vurderingen som ble lagret 08.10, lest med `SqliteVurderingslager.les`
+fra `data/db/ose.db`, skrivebeskyttet og uten å regne noe på nytt (AD-7).
+Regnearket ligger bare lokalt i `data/kontroll/` (regel 10). Bare de utledede
+tallene står her, ingen kurser eller volumer (regel 16).
+
+**Slik ble dagen valgt:** etter regelen i instruksjonen kl. 14:25 13.10, den
+første aksjen og dagen med utslag på interesse. Av 105 kandidater hadde 2 utslag
+på interesse. Uttrekket ble laget før regningen, og gruppen så ikke appens tall
+først.
+
+**Formlene** kom fra rådet i chatten, etter reglene i FR-701 og FR-702: snittet
+av de 50 siste dagene med dagen, standardavviket for et utvalg av de 20
+endringene før dagen, og medianen av volumet de 20 dagene før. Vinduene og typen
+standardavvik sjekket rådet mot `signalberegning.py`. Samme dag er også
+kontrollert med et skript for interesse alene, i §25.
+
+| | Regnearket | Appen (lagret 08.10) | Stemmer |
+|---|---|---|---|
+| Avvik fra snittet (`trend_avvik`) | -0,0507 | -0,050666 | Ja |
+| Endring 08.10 (`dagens_endring`) | -0,0094 | -0,009427 | Ja |
+| Standardavvik (`standardavvik`) | 0,0136 | 0,013569 | Ja |
+| Volum mot medianen (`volumforhold`) | 1,5288 | 1,528785 | Ja |
+| Trend | -1 | -1 | Ja |
+| Bevegelse | 0 | 0 | Ja |
+| Interesse | -1 | -1 | Ja |
+| Styrke | 2 | 2 | Ja |
+| Retning | Negativ | Negativ | Ja |
+
+Et tall stemmer når appens verdi, avrundet til fire desimaler, er lik regnearkets.
+**Alt stemmer.** Dagens endring var 0,69 ganger standardavviket, regnet fra de
+lagrede verdiene, så bevegelse slo ikke ut, mens volumet var over 1,5 ganger
+medianen på en dag kursen falt, så interesse ga -1.
 
 ---
 

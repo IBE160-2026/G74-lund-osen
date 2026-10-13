@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-13T14:02
+updated: 2026-10-13T15:23
 ---
 
 # Kvalitetssikring
@@ -459,6 +459,9 @@ har sju punkter uten `resolved:` 03.10:
   *Lagt til 2026-10-06:* kontrollregningen er også gjort for GJF 02.10, en dag
   der bevegelse slo ut (`malinger.md` §6). Også der er regnearket og det appen
   lagret, like. En dag med utslag på interesse gjenstår.
+  *Lagt til 2026-10-13:* kontrollregningen er også gjort for TEL 08.10, en dag
+  med utslag på interesse (`malinger.md` §6). De fire målingene, de tre
+  verdiene, styrken og retningen i regnearket er like det appen lagret 08.10.
 - **De 71 punktene fra kontrollen 26.09** er ikke kontrollert på nytt. Minst
   tre av dem er lukket (§5).
   *Rettet 2026-10-03:* de er kontrollert på nytt. Etter rettingene samme dag er
@@ -613,6 +616,9 @@ og at alle fire kriteriene står her.
 | **Brukerutfall**: minst én person utenfor gruppen gjennomfører hovedflyten og forklarer uoppfordret hvorfor en aksje skiller seg ut, under 5 minutter, uten hjelp | Ingen ennå. Kriteriet måles med en person, ikke med en test | Brukertesten i story 8.1 |
 | **KI-forklaringen**: hver KI-tekst som vises, har bestått kontrollen mot grunnlaget, og testene viser at feil stoppes. Én ukes drift er logget | Ingen ennå. KI-laget er ikke bygget | Kontrollen i FR-603 (story 10.2), loggen i FR-604 (story 4.2 og 4.3), visningen (story 10.3) og målingen av bidraget (story 10.4) |
 | **Kjørbar for andre**: README-oppskriften fullføres gratis på en ren maskin, uten gruppens nøkler: demoen uten konto, og den ekte versjonen med egen gratiskonto hos EODHD | `tests/test_demo.py::TestDemokommandoen::test_lages_uten_nett_og_uten_noekkel`, `tests/test_demo.py::TestSidene::test_bryteren_med_demobase_viser_eksempeltall`, `tests/test_docker.py::TestImaget::test_ingen_noekkel_i_imaget`, `tests/test_docker.py::TestReadme::test_kommandoene_er_de_samme_som_i_koden_og_compose`, `tests/test_docker.py::TestReadme::test_readme_proeven_har_hver_kommando` og `tests/test_readme.py::test_hver_lenke_i_readme_peker_paa_noe_som_finnes`. Kontrollen: README-prøven i §9, Prøve 1 (demoen uten nøkkel) og Prøve 2 (den ekte versjonen med egen nøkkel) | Ingen av prøvene i §9 er gjort ennå |
+
+*Lagt til 2026-10-13:* håndregningen for TEL 08.10, en dag med utslag på
+interesse, står i `malinger.md` §6, ved siden av EQNR 05.10 og GJF 02.10.
 
 ## Vedlegg: hver mutant
 
