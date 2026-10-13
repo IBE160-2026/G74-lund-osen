@@ -2,7 +2,7 @@
 title: 'Story 8.0c: Tydelig merking, ord ved sjekkene og datoer på grafen'
 type: 'feature'
 created: '2026-10-13'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'd9315a9570fdd8fa3b63f15e4f8fc8a93d143ffd'
