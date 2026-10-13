@@ -2,7 +2,7 @@
 title: "Samleliste til neste endringsforslag"
 status: aktiv
 created: 2026-10-12
-updated: 2026-10-13T23:16
+updated: 2026-10-13T23:39
 ---
 
 # Samleliste til neste endringsforslag
@@ -28,6 +28,7 @@ Punkter som dukker opp, samles her og tas i ett endringsforslag med bmad-correct
 12. Hovedindeksen tidligere (Marian 12.10 kl. 22:12–22:13). 2.8, 2.9 og 2.9b er punkt 9 av 12 i rekkefølgen, etter KI-laget. Tas med når rekkefølgen tas opp, sammen med punkt 6.
 13. Fra rådets logg, aldri ført (Marian 12.10 kl. 23:42). Lista over FR-er under «4.6 KI-laget og grensen mot regelbasert kode» i epics.md har fortsatt de gamle titlene på FR-603 og FR-605, og dekningstabellen gir FR-601, FR-602, FR-603 og FR-606 til Epic 5. PRD-en skrev FR-601 til FR-607 om 05.10, FR-603 er nå kontrollen av KI-teksten, den gamle er FR-603A, og storyene i Epic 10 viser til dem (rådets funn 01.10, «ikke rettet ennå»). Tavla sier også «U … betalt utbytte» ved kursen, mens story 8.14 sier at ordet «utbytte» ikke står ved dagene (rådet 08.10).
 14. Årets spenn på aksjesiden (ønske 13.10 kl. 22:48). En strek fra laveste til høyeste kurs det siste året, med et merke for kursen nå, regnet av kursene som alt er hentet, uten nye kall. Bare fakta: ingen kursmål, ingen «oppside» eller «nedside», og ikke et råd (NFR-06). Idéen kom fra en side med analytikeranbefalinger, og anbefalingene og kursmålene er valgt bort. Hvilken kurs streken bruker, og når det bygges, avgjøres etter README-prøven. Står også som lapp på designtavla.
+15. Nøytralsonen ±2 % i kursgrafen (planen for 8.0d, 13.10). Tavla tegner feltet rundt snittet der trend gir 0. Appen tegner det ikke i dag, og 8.0d tar ingen nye funksjoner. Kantene må ha minst 3:1 (WCAG 1.4.11). Hvilken story det hører til, avgjøres i neste endringsforslag.
 
 ## Utdraget fra designforslaget (punkt 7 og 10)
 
