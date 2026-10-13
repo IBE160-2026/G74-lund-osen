@@ -864,9 +864,9 @@ class TestReadmeForNybegynnere:
         flettet, neste = status.split("Flettet til main:", 1)[1].split("Neste:", 1)
         neste = neste.split("KI-laget", 1)[0]
         for sak in ("hentingen", "kallene som er igjen", "Docker", "demoen", "README-en",
-                    "hjelp bak «?»"):
+                    "hjelp bak «?»", "tydeligere merking"):
             assert sak in flettet, sak
-        for sak in ("README-prøven 13.–16.10", "tydeligere merking",
+        for sak in ("README-prøven 13.–16.10", "datoene og månedsmerkene i grafen",
                     "utseendet fra designforslaget"):
             assert sak in neste and sak not in flettet, sak
 
