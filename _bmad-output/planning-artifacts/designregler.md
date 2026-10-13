@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-10-05T21:24
+updated: 2026-10-13T10:56
 ---
 
 # Designregler
@@ -51,3 +51,22 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 **I dag:** appen bruker ikke gult. Rader som skiller seg ut, har lys grå bakgrunn og merket «skiller seg ut» (index.html).
 
 *Lagt til 2026-10-05:* tabelldelen av regelen, gul ring rundt «3 av 3» og 2 av 3 merket uten gult, tas inn i story 8.0c.
+
+## 4. Ordliste – samme ord på alle sidene (01.10)
+
+*Ført 2026-10-13 ordrett fra designtavla i Claude, versjon 1791623938-3408, med «-» for «•». Ordlista er ikke kontrollert mot koden og PRD-en etter 02.10. Det gjør den samlede endringen (samlelista punkt 8 og 10) før noe herfra brukes i appen.*
+
+- Signalstyrke 0–3: hvor mange av de 3 sjekkene som slo ut.
+- Sjekkene: trend (T), bevegelse (B) og interesse (I). Hver gir +1, 0 eller -1, skrevet «T +1» overalt, som kolonnen «Ga» i appen.
+- Retning: Positiv, Negativ, Blandet eller Ingen, med pil (FR-103). Pilene brukes ikke til noe annet.
+- Skilte seg ut: signalstyrke 2 eller mer. Signalstyrken skrives «3 av 3», og 3 av 3 er fylt med gul ring.
+- Tall med sifre, også små: «3 av 3 sjekker», ikke «alle tre».
+- Endring: fra forrige børsdag, utbyttejustert, med fortegn. Kolonnehodet sier «i går», som den første knappen i periodevalget.
+- Retning forklares med tall: «1 sjekk ga +1, 2 ga -1», ikke «peker hver sin vei». På aksjesiden står sjekkene med navn: «Trend ga +1. Bevegelse og interesse ga -1.»
+- Beløp skrives i NOK, ikke «kroner» eller «kr» (Marian 01.10). Øverst på hver side, i den svarte stripa, står når dataene ble oppdatert og når neste oppdatering tidligst kan komme, med klokke.
+- Egen aksje: blått merke «Egen» og blå strek. Den står i tabellen sammen med de andre og sorteres likt. Under tabellen står bare valget: hentet eller venter, og Fjern. Stjerne betyr Min liste. Gul ring, gul ramme og gult symbol betyr 3 av 3 i går, også når en periode er valgt. I børsometeret har ruta gul ramme med hvit kant og merket «3 av 3».
+- Utenfor målingen: en egen aksje som omsettes for under 32 MNOK om dagen. Grensene i signalet er målt på aksjer som omsettes for over 32 MNOK, og så mye handel gjør dem lette å kjøpe og selge (begrunnelser.md §2). Teksten sier ikke «de 15» (Marian 02.10 kl. 21.56). Ikke «krav» og ikke «omsatt for lite». Grått merke, fordi gult betyr 3 av 3.
+- Børsen, bransjen eller selskapet: hvor dagens bevegelse ser ut til å komme fra, ikke hvorfor. Børsen er hovedindeksen, og tallet står med «for hovedindeksen». Regnes alltid av lista som er aktiv, også egne aksjer som er hentet. Svarene er «Børsen», «Bransjen», «Selskapet», «Selskapet eller bransjen» og «Liten bevegelse».
+- Bransjer: 13, hver med navn og symbol (tavla «Bransjer»). De 11 hos Euronext (ICB), med sjømat og shipping for seg, som Euronexts indekser OBSFX og OBSHX. Nye: Forbruk, Teknologi, Helse, Eiendom og Kraft.
+- Sortering: vinkler i den svarte kolonneraden. Pilene er bare for retning.
+- Stiplet linje betyr bare hovedindeksen. 50-dagers snittet og grensen for interesse er heltrukne, og kursen er tykkere enn snittet.
