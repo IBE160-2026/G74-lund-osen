@@ -74,15 +74,12 @@
   {% if eksempeltall %}
   <p class="eksempeltall">Demoversjon. {{ eksempeltall_merke }}</p>
   {% endif %}
-  <div class="tittelrad">
-    <h1>OSE Signal</h1>
-    {{ hjelpeknapp("hjelp-oversikt", "Hjelp: tallene og signalet") }}
-  </div>
+  <h1>OSE Signal</h1>
 
   {% if rader %}
     <p class="meta">
       {% if eksempeltall %}Eksempeltall{% else %}Oslo Børs{% endif %} · {{ dato }} · {{ rader|length }} aksjer
-      {% if hentet %}· data hentet {{ hentet|norsk_tid }}{% endif %}
+      {% if hentet %}· data hentet {{ hentet|norsk_tid }} {{ hjelpeknapp("hjelp-hentet", "Hjelp: data hentet") }}{% endif %}
     </p>
 
     {% if ingen_skilte_seg_ut %}
@@ -92,11 +89,11 @@
     <table>
       <thead>
         <tr>
-          <th>Selskap</th>
-          <th class="tall">Sluttkurs</th>
-          <th class="tall">Endring</th>
+          <th>Selskap {{ hjelpeknapp("hjelp-selskap", "Hjelp: selskap") }}</th>
+          <th class="tall">Sluttkurs {{ hjelpeknapp("hjelp-sluttkurs", "Hjelp: sluttkurs") }}</th>
+          <th class="tall">Endring {{ hjelpeknapp("hjelp-endring", "Hjelp: endring") }}</th>
           <th class="tall">Signalstyrke {{ hjelpeknapp("hjelp-signalstyrke", "Hjelp: signalstyrken") }}</th>
-          <th>Retning</th>
+          <th>Retning {{ hjelpeknapp("hjelp-retning", "Hjelp: retning") }}</th>
         </tr>
       </thead>
       <tbody>
@@ -162,18 +159,21 @@
     </p>
   {% endif %}
 
-  {{ hjelpevindu("hjelp-oversikt", "Tallene og signalet", [
-    ("Tallene", ["sluttkurs", "endring", "utbyttejustert", "data_hentet", "uten_data"]),
-    ("Signalstyrke", ["signalstyrke", "uten_styrke"]),
-    ("Retning", ["retning", "positiv", "negativ", "blandet", "ingen", "ukjent"]),
-    ("De tre sjekkene", ["trend", "bevegelse", "interesse", "antall_dager", "hvorfor_tre"]),
-    ("Grensene", ["grensene", "skjevhet"]),
-    ("Ikke et råd", ["ikke_raad"]),
-  ]) }}
+  {#- Story 8.0c: hvert «?» staar ved det det forklarer, og vinduet har bare
+      tekstene for det. Sjekkene og grensene forklares paa aksjesiden. #}
   {% if rader %}
+    {{ hjelpevindu("hjelp-selskap", "Selskap", [("", ["selskap"])]) }}
+    {{ hjelpevindu("hjelp-sluttkurs", "Sluttkurs", [("", ["sluttkurs"])]) }}
+    {{ hjelpevindu("hjelp-endring", "Endring", [("", ["endring", "utbyttejustert"])]) }}
     {{ hjelpevindu("hjelp-signalstyrke", "Signalstyrke", [
       ("", ["signalstyrke", "uten_styrke", "ikke_raad"]),
     ]) }}
+    {{ hjelpevindu("hjelp-retning", "Retning", [
+      ("", ["retning", "positiv", "negativ", "blandet", "ingen", "ukjent"]),
+    ]) }}
+    {% if hentet %}
+      {{ hjelpevindu("hjelp-hentet", "Data hentet", [("", ["data_hentet", "uten_data"])]) }}
+    {% endif %}
   {% endif %}
   {% if under_arbeid %}
   <p class="under-arbeid">{{ under_arbeid }}</p>

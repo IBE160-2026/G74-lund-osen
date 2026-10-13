@@ -14,11 +14,14 @@ gir ikke raad (NFR-06). Retningen forklares med ordene og symbolene fra
 RETNINGSVISNING (FR-704, FR-103), ikke med egne ord.
 
 Tekstene ble godkjent av gruppen 11.10 kl. 11:33, med endringene i
-spesifikasjonen.
+spesifikasjonen. Story 8.0c (godkjent 13.10 kl. 15:36): hvert «?» staar ved
+det det forklarer, hver tekst har hoeyst 3 setninger utenom grensene og
+skjevhet, og retningen forklares med +1 og -1 (FR-704, rettet 13.10).
 """
 
 from dataclasses import dataclass
 
+from aksjedetalj import INGEN_UTSLAG
 from markedsoversikt import RETNINGSVISNING, UKJENT_RETNING
 from signalberegning import (
     BLANDET,
@@ -64,12 +67,13 @@ MAALT_PERIODE = "fra desember 2025 til september 2026"
 ANDEL_POSITIV = 60.0
 ANDEL_NEGATIV = 29.5
 
-# Betingelsen for hver retning, med ordene i FR-704. Ordet og symbolet foran
-# kommer fra RETNINGSVISNING.
+# Betingelsen for hver retning, med ordene i FR-704 (rettet 13.10: +1 og -1,
+# ikke «peker opp» og «peker ned»). Ordet og symbolet foran kommer fra
+# RETNINGSVISNING.
 _RETNINGSBETINGELSE = {
-    POSITIV: "alle sjekkene som slo ut, peker opp.",
-    NEGATIV: "alle sjekkene som slo ut, peker ned.",
-    BLANDET: "sjekkene som slo ut, spriker.",
+    POSITIV: "alle sjekkene som slo ut, ga +1.",
+    NEGATIV: "alle sjekkene som slo ut, ga -1.",
+    BLANDET: "noen av sjekkene som slo ut, ga +1, og noen -1.",
     INGEN: "ingen av sjekkene slo ut, og styrken er 0.",
 }
 
@@ -127,6 +131,13 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
     dager = _vis(nodvendige_dager(p), "heltall")
 
     tekster = {
+        "selskap": Hjelpetekst(
+            "",
+            "Klikk for å se sjekkene, tallene bak og kursgrafen.",
+            ((INDEX_MAL, '<a href="/aksje/{{ rad.aksje.symbol }}">'),
+             (AKSJE_MAL, "<th>Målt mot"),
+             (AKSJE_MAL, 'class="kurslinje"')),
+        ),
         "sluttkurs": Hjelpetekst(
             "Sluttkurs:",
             "kursen ved børsens stengning siste børsdag i dataene, uten "
@@ -144,8 +155,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         "utbyttejustert": Hjelpetekst(
             "Utbyttejustert kurs:",
             "kilden regner kursen om bakover ved hvert nytt utbytte, så et "
-            "ordinært utbytte ikke ser ut som et kursfall. Endringen, de tre "
-            "sjekkene og kursgrafen bruker den.",
+            "ordinært utbytte ikke ser ut som et kursfall. Endringen, de "
+            f"{ANTALL_SJEKKER} sjekkene og kursgrafen bruker den.",
             ((PRD, "#### FR-701"),
              (SIGNALBEREGNING, "Kildens justerte kurs regnes om bakover ved hvert nytt"),
              (AKSJE_MAL, "Begge linjene er tegnet på utbyttejustert kurs")),
@@ -174,11 +185,10 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         ),
         "signalstyrke": Hjelpetekst(
             "Signalstyrke:",
-            f"hvor mange av de tre sjekkene som ga +1 eller -1, fra 0 til "
+            f"hvor mange av de {ANTALL_SJEKKER} sjekkene som slo ut, fra 0 til "
             f"{ANTALL_SJEKKER}. Både +1 og -1 teller, så en sjekk med +1 og en "
-            f"med -1 gir 2. Styrken sier ikke hvor sannsynlig en kursbevegelse "
-            f"er. En aksje med styrke {terskel} eller mer er merket «skiller "
-            f"seg ut» i oversikten.",
+            f"med -1 gir 2. En aksje med styrke {terskel} eller mer er merket "
+            f"«skiller seg ut» i oversikten.",
             ((PRD, "#### FR-703 — Signalstyrke"),
              (PRD, "#### FR-705"),
              (SIGNALBEREGNING, "def finn_styrke(")),
@@ -194,8 +204,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         ),
         "retning": Hjelpetekst(
             "",
-            "Retningen sier hva sjekkene peker mot, ikke hvor kursen går "
-            "videre.",
+            "Retningen sier om sjekkene som slo ut, ga +1 eller -1, ikke hvor "
+            "kursen går videre.",
             ((PRD, "#### FR-103"),
              (BEGRUNNELSER, "Om de sier noe om kursen videre, er ikke målt (FR-703).")),
         ),
@@ -216,19 +226,16 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         "ukjent": Hjelpetekst(
             f"{UKJENT_RETNING.symbol} {UKJENT_RETNING.tekst}:",
             f"det finnes ingen vurdering for dagen, og grunnen står under "
-            f"signalstyrken. Det er ikke en femte retning. «{INGEN}» betyr at "
-            f"sjekkene ble regnet uten at noen slo ut. «{UKJENT_RETNING.tekst}» "
-            f"betyr at det ikke finnes noen vurdering å vise.",
+            f"signalstyrken. Det er ikke en femte retning: «{INGEN}» betyr at "
+            f"sjekkene ble regnet uten at noen slo ut.",
             ((PRD, "«Ukjent» er ikke en femte retning i FR-704"),
              (MARKEDSOVERSIKT, "UKJENT_RETNING")),
         ),
         "ukjent_aksje": Hjelpetekst(
             f"{UKJENT_RETNING.symbol} {UKJENT_RETNING.tekst}:",
             f"det finnes ingen vurdering for dagen, og grunnen står under "
-            f"«Hvorfor signalet ble ukjent». Det er ikke en femte retning. "
-            f"«{INGEN}» betyr at sjekkene ble regnet uten at noen slo ut. "
-            f"«{UKJENT_RETNING.tekst}» betyr at det ikke finnes noen vurdering "
-            f"å vise.",
+            f"«Hvorfor signalet ble ukjent». Det er ikke en femte retning: "
+            f"«{INGEN}» betyr at sjekkene ble regnet uten at noen slo ut.",
             ((PRD, "«Ukjent» er ikke en femte retning i FR-704"),
              (AKSJE_MAL, "Hvorfor signalet ble")),
         ),
@@ -243,18 +250,18 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         ),
         "bevegelse": Hjelpetekst(
             "Bevegelse:",
-            f"var dagens endring større enn ett standardavvik av endringene de "
-            f"{volatilitet} børsdagene før? Opp gir +1, ned gir -1, ellers 0. "
-            f"Endringen måles mot aksjens egne svingninger, så en rolig og en "
-            f"urolig aksje måles hver på sitt.",
+            f"endringen fra børsdagen før, mot de vanlige svingningene de "
+            f"{volatilitet} børsdagene før. Slår ut over 1 standardavvik: +1 når "
+            f"kursen steg, -1 når den falt. Måles mot hvor mye akkurat denne "
+            f"aksjen pleier å svinge.",
             ((PRD, "#### FR-701"),
              (SIGNALBEREGNING, "def bevegelse("),
              (BEGRUNNELSER, "så en rolig og en urolig aksje måles hver på sitt")),
         ),
         "interesse": Hjelpetekst(
             "Interesse:",
-            f"var volumet i dag mer enn {faktor} ganger medianvolumet de "
-            f"{volum} børsdagene før? Volum har ingen retning i seg selv, så "
+            f"volumet mot medianvolumet de {volum} børsdagene før. Slår ut over "
+            f"{faktor} ganger medianen. Volum har ingen retning i seg selv, så "
             f"fortegnet følger dagens kursendring: +1 en dag kursen steg, -1 "
             f"en dag den falt, og 0 når kursen var uendret.",
             ((PRD, "#### FR-701"),
@@ -268,17 +275,17 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
              (SIGNALBEREGNING, "def nodvendige_dager(")),
         ),
         "hvorfor_tre": Hjelpetekst(
-            "Hvorfor disse tre:",
-            "de ser på hver sin del av dataene, kursnivået, endringen og "
-            "volumet, med én regel og én grense hver. Da kan man se hva som ga "
-            "utslaget. Sjekkene er valgt for å kunne forklares, ikke for å "
-            "treffe markedet.",
+            f"Hvorfor disse {ANTALL_SJEKKER}:",
+            "hver sjekk ser på sin del av dataene: kursnivå, endring og volum, "
+            "med én regel og én grense hver. Da ser du hva som ga utslaget. "
+            "Sjekkene er valgt for å kunne forklares, ikke for å treffe "
+            "markedet.",
             ((BEGRUNNELSER, "### Hvorfor akkurat disse tre sjekkene (FR-701)"),),
         ),
         "grensene": Hjelpetekst(
             "Grensene:",
             f"{_grensene(MAALTE_GRENSER)} ble "
-            f"kontrollert mot {MAALTE_AKSJER} aksjer over {MAALTE_BOERSDAGER} "
+            f"kontrollert mot {MAALTE_AKSJER} aksjer på Oslo Børs over {MAALTE_BOERSDAGER} "
             f"børsdager, {MAALT_PERIODE}, før de ble låst. Det var en kontroll "
             f"av at de holder, ikke et søk etter verdiene som gir penest "
             f"resultat.",
@@ -309,18 +316,21 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         ),
         "ga": Hjelpetekst(
             "Ga:",
-            "det hver sjekk ga, +1, 0 eller -1.",
+            f"det hver sjekk ga: +1 {POSITIV.lower()}, -1 {NEGATIV.lower()} eller "
+            f"0 {INGEN_UTSLAG}.",
             ((PRD, "#### FR-706"),
-             (AKSJE_MAL, "<th class=\"fortegn\">Ga</th>")),
+             (AKSJE_MAL, "<th class=\"fortegn\">Ga"),
+             (AKSJEDETALJ, 'INGEN_UTSLAG = "ingen utslag"')),
         ),
         "maalt_mot": Hjelpetekst(
             "Målt mot:",
             "tallet sjekken ble avgjort av, og hva det ble målt mot. "
-            "Radene med lys bakgrunn er sjekkene som slo ut.",
+            "Sjekkene som slo ut, står med fet skrift og en strek til venstre.",
             ((PRD, "#### FR-706"),
              (PRD, "se hva hvert fortegn ble målt mot"),
-             (AKSJE_MAL, "<th>Målt mot</th>"),
-             (AKSJE_MAL, "class=\"bidro\"")),
+             (AKSJE_MAL, "<th>Målt mot"),
+             (AKSJE_MAL, "class=\"bidro\""),
+             (AKSJE_MAL, "tr.bidro td:first-child")),
         ),
         "ikke_raad": Hjelpetekst(
             "",

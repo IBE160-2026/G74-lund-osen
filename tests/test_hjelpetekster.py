@@ -105,7 +105,7 @@ class TestGrensene:
 
     def test_teksten_om_maalingen_nevner_de_maalte_grensene(self):
         forventet = (f"2{NB}%, 1,5 ganger, de to vinduene på 20 børsdager og terskelen 2 "
-                     f"ble kontrollert mot 15 aksjer over 199 børsdager")
+                     f"ble kontrollert mot 15 aksjer på Oslo Børs over 199 børsdager")
         assert forventet in hjelpetekster()["grensene"].tekst
         assert forventet in hjelpetekster(ANDRE)["grensene"].tekst
 
@@ -279,11 +279,74 @@ class TestSidene:
             _side(klient, adresse)
         assert bedt_om == set(hjelpetekster())
 
-    def test_spoersmaalstegn_ved_overskriften_paa_begge_sidene(self, klient, base):
+    def test_hvert_spoersmaalstegn_staar_ved_det_det_forklarer(self, klient, base):
+        """Story 8.0c, den nye delen 2 (godkjent 13.10 kl. 15:36): «?» ved
+        hver kolonne og ved «data hentet» i oversikten, og ved nøkkeltallene,
+        grafen, «Hvorfor signalet ble …», hver sjekk, Ga og Målt mot paa
+        aksjesiden. Ingen «?» ved overskriften lenger. Ville feilet hvis et
+        «?» sto et annet sted enn ved det det forklarer."""
+        knapp = r'<button type="button" class="hjelpeknapp" popovertarget="{}"'
         oversikt = _side(klient, "/")
+        for tekst, vindu in (("<th>Selskap ", "hjelp-selskap"),
+                             ('<th class="tall">Sluttkurs ', "hjelp-sluttkurs"),
+                             ('<th class="tall">Endring ', "hjelp-endring"),
+                             ('<th class="tall">Signalstyrke ', "hjelp-signalstyrke"),
+                             ("<th>Retning ", "hjelp-retning")):
+            assert re.search(re.escape(tekst) + knapp.format(vindu), oversikt), vindu
+        assert re.search(r"data hentet [^<]+ " + knapp.format("hjelp-hentet"), oversikt)
+        assert re.search(r"<h1>OSE Signal</h1>\s*<p", oversikt)
         detalj = _side(klient, "/aksje/BRFE")
-        assert re.search(r'<h1>OSE Signal</h1>\s*<button type="button" class="hjelpeknapp" popovertarget="hjelp-oversikt"', oversikt)
-        assert re.search(r'<h1>Brattfjell Energi</h1>\s*<button type="button" class="hjelpeknapp" popovertarget="hjelp-aksje"', detalj)
+        for tekst, vindu in (('<span class="etikett">Sluttkurs ', "hjelp-kurs"),
+                             ('<span class="etikett">Signalstyrke ', "hjelp-styrke"),
+                             ('<span class="etikett">Retning ', "hjelp-retning-aksje"),
+                             ("<h2>Kursutvikling, seks måneder ", "hjelp-graf"),
+                             ('<th class="fortegn">Ga ', "hjelp-ga"),
+                             ("<th>Målt mot ", "hjelp-maalt"),
+                             ("<td>Trend ", "hjelp-trend"),
+                             ("<td>Bevegelse ", "hjelp-bevegelse"),
+                             ("<td>Interesse ", "hjelp-interesse")):
+            assert re.search(re.escape(tekst) + knapp.format(vindu), detalj), vindu
+        assert re.search(r"<h2>Hvorfor signalet ble [^<]* " + knapp.format("hjelp-sjekkene"), detalj)
+        assert "Tallene og signalet" not in oversikt + detalj
+
+    def test_hvert_vindu_har_bare_sine_tekster(self, klient, base):
+        """Den nye delen 2: vinduene og tekstene i dem, i rekkefoelge. «Ikke et
+        raad» staar i vinduet for signalstyrken paa begge sidene, og skjevhet
+        i vinduet for retning paa aksjesiden."""
+        tekster = hjelpetekster()
+
+        def vindu(html, id_):
+            del_ = html.split(f'<div id="{id_}" class="hjelpevindu" popover>', 1)[1].split('<div id="hjelp-')[0].split("</body>")[0]
+            return [n for n, t in tekster.items() if t.tekst in del_ and t.tekst]
+
+        forventet = {
+            "/": {
+                "hjelp-selskap": ["selskap"],
+                "hjelp-sluttkurs": ["sluttkurs"],
+                "hjelp-endring": ["endring", "utbyttejustert"],
+                "hjelp-signalstyrke": ["signalstyrke", "uten_styrke", "ikke_raad"],
+                "hjelp-retning": ["retning", "positiv", "negativ", "blandet", "ingen", "ukjent"],
+                "hjelp-hentet": ["data_hentet", "uten_data"],
+            },
+            "/aksje/BRFE": {
+                "hjelp-kurs": ["sluttkurs", "utbyttejustert", "data_hentet_aksje"],
+                "hjelp-graf": ["grafen"],
+                "hjelp-styrke": ["signalstyrke", "ikke_raad"],
+                "hjelp-retning-aksje": ["retning", "positiv", "negativ", "blandet", "ingen",
+                                        "ukjent_aksje", "skjevhet"],
+                "hjelp-sjekkene": ["antall_dager", "hvorfor_tre"],
+                "hjelp-trend": ["trend"],
+                "hjelp-bevegelse": ["bevegelse"],
+                "hjelp-interesse": ["interesse"],
+                "hjelp-ga": ["ga"],
+                "hjelp-maalt": ["maalt_mot", "grensene"],
+            },
+        }
+        for adresse, vinduer in forventet.items():
+            html = _side(klient, adresse)
+            assert set(re.findall(r'<div id="(hjelp-[a-z-]+)" class="hjelpevindu"', html)) == set(vinduer), adresse
+            for id_, noekler in vinduer.items():
+                assert sorted(vindu(html, id_)) == sorted(noekler), (adresse, id_)
 
     def test_spoersmaalstegn_ved_signalstyrke_i_oversikten(self, klient, base):
         """Tillegget 05.10: «?» ved overskriften Signalstyrke, med teksten
@@ -342,12 +405,12 @@ class TestSidene:
             assert tekster[noekkel].tekst in brfe, noekkel
             assert tekster[noekkel].tekst not in vrds, noekkel
 
-    def test_tom_base_har_ogsaa_hjelpen(self, klient):
-        """Uten kurser er det ingen tabell, men «?» ved overskriften virker."""
+    def test_tom_base_har_ingen_hjelp(self, klient):
+        """Story 8.0c: uten kurser er det ingen tabell og ingen tall aa
+        forklare, saa det staar ingen «?» og ingen vinduer."""
         html = _side(klient, "/")
-        assert 'popovertarget="hjelp-oversikt"' in html
-        assert 'id="hjelp-oversikt"' in html
-        assert 'popovertarget="hjelp-signalstyrke"' not in html
+        assert "popovertarget" not in html
+        assert 'class="hjelpevindu"' not in html
 
 
 class TestSnittetIGrafen:
@@ -363,3 +426,49 @@ class TestSnittetIGrafen:
         # Hjelpen foelger samme parametre som tegnforklaringen.
         assert "snittet av de siste 40 børsdagene" in html
         assert "de siste 50 børsdagene" not in html
+
+
+# Story 8.0c: hoeyst 3 setninger per tekst, og ordene ordlista har valgt bort
+# (designregler.md §4, rettet 13.10).
+UNNTAK_LENGDE = {"grensene", "skjevhet"}
+VALGT_BORT = (
+    r"peker opp", r"peker ned", r"peker hver sin vei", r"\bspriker\b",
+    r"\balle tre\b", r"\bde tre\b", r"hvor kraftig", r"summen av tallene",
+    r"\bkroner\b", r"\bkr\b", r"v1\.1", r"\(idé\)",
+)
+
+
+def _setninger(tekst: str) -> int:
+    """Setninger som slutter med punktum, spoersmaalstegn eller utropstegn."""
+    return len(re.findall(r"[.?!](?=\s|$)", tekst.strip()))
+
+
+class TestStory80c:
+    def test_setningstelleren(self):
+        assert _setninger("En. To? Tre!") == 3
+        assert _setninger("1,5 ganger og 2 %.") == 1
+
+    @pytest.mark.parametrize("p", [STANDARD, ANDRE], ids=["standard", "andre"])
+    def test_hoeyst_tre_setninger_per_tekst(self, p):
+        """Svar 6 og 2: hoeyst 3 setninger, utenom grensene og skjevhet, som
+        forklarer en maaling. Ville feilet med signalstyrke paa 4 setninger,
+        som foer 8.0c."""
+        for noekkel, tekst in hjelpetekster(p).items():
+            if noekkel in UNNTAK_LENGDE:
+                continue
+            assert _setninger(tekst.tekst) <= 3, (noekkel, tekst.tekst)
+
+    def test_ingen_tekst_har_ord_ordlista_har_valgt_bort(self):
+        """Ville feilet med «peker opp» i hjelpen for retning, som foer 8.0c."""
+        for noekkel, tekst in hjelpetekster().items():
+            for ord_ in VALGT_BORT:
+                assert not re.search(ord_, f"{tekst.tittel} {tekst.tekst}", re.IGNORECASE), (noekkel, ord_)
+
+    def test_ingen_side_har_ord_ordlista_har_valgt_bort(self, klient, base):
+        """Malene ogsaa: fotnotene sa «hvor kraftig» og «summen av tallene»
+        foer 8.0c. Sidene leses med testbasen her og med demobasen i
+        test_demo.py."""
+        for adresse in SIDENE:
+            html = _side(klient, adresse)
+            for ord_ in VALGT_BORT:
+                assert not re.search(ord_, html, re.IGNORECASE), (adresse, ord_)
