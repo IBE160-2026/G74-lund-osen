@@ -117,6 +117,13 @@ et sitat som ikke fantes».
     Joakim førte den. Linjen betyr at begge har vært med på det som committes.
     Sier brukeren at noe er gjort alene, får de commitene ikke linjen. Commitene
     før 2026-09-25 har den ikke, og historikken skrives ikke om (regel 7).
+    *Lagt til 2026-10-13:* fordi vi avgjør sammen, skrives godkjenninger og
+    beslutninger uten navn, for eksempel «godkjent 13.10 kl. 12:46» eller
+    «gruppen avgjorde». Det gjelder dokumentene, commit-meldingene,
+    Utført-linjene og kommentarene i koden og testene. Navnene står under
+    «Medlemmer» i README-en, i briefen og i Co-authored-by. Det som alt står i
+    dokumentene og loggene, blir stående som historikk, og instruksjonene lagres
+    ordrett som før (regel 18).
 21. **Tall skrives norsk der de leses, og som tall der de regnes.** Det sidene
     viser: desimalkomma, hardt mellomrom som tusenskille og foran %, og vanlig
     bindestrek (-) som minus, så tallet kan limes inn i et regneark. Hvor mange
