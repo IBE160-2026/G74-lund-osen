@@ -155,3 +155,9 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-8-0c-tydelig-merking-ord-ved-sjekkene-og-datoer-paa-grafen.md`
   summary: 404-siden er Flasks standardside på engelsk, uten merket i demoen og uten linja «Appen er under utvikling og ikke ferdig.»
   evidence: ECH9 i gjennomgangen av PR #35 (13.10). Svar 4 sier linja nederst på alle sidene. En `errorhandler(404)` med en egen mal er ny funksjonalitet. Ikke rettet nå.
+- source_spec: `_bmad-output/implementation-artifacts/spec-8-0c-tydelig-merking-ord-ved-sjekkene-og-datoer-paa-grafen.md`
+  summary: Kursgrafen får ikke månedsmerker for måneder utenfor børskalenderen. Den dekker bare 2026 (`boersdag.DEKKEDE_AAR`), så fra januar 2027 mangler merket for inneværende måned.
+  evidence: BH3, BH4 og ECH4 i gjennomgangen av PR #36 (13.10). Beslutning 13 sier «etter `er_boersdag`». Rettes når stengte dager for 2027 føres inn (kommentaren i `boersdag.py`), eller med første punkt i måneden som merke. Ikke rettet nå.
+- source_spec: `_bmad-output/implementation-artifacts/spec-8-0c-tydelig-merking-ord-ved-sjekkene-og-datoer-paa-grafen.md`
+  summary: Månedsmerkene kan overlappe når et langt hull gjør to måneder til naboer i serien, og navnene står uten år når serien går over et årsskifte.
+  evidence: ECH3 og BH6 i gjennomgangen av PR #36 (13.10). Kan tas i 8.0d sammen med utseendet. Ikke rettet nå.

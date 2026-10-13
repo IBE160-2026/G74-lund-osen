@@ -37,6 +37,8 @@
     svg { width: 100%; height: auto; display: block; }
     .rute { stroke: var(--strek); stroke-width: 1; }
     .rutetekst { fill: var(--dempet); font-size: 10px; }
+    .maanedsstrek { stroke: var(--strek); stroke-width: 1; }
+    .maanedstekst { fill: var(--dempet); font-size: 10px; }
     .kurslinje { fill: none; stroke: var(--kurs); stroke-width: 1.8; }
     .ma50linje { fill: none; stroke: var(--ma50); stroke-width: 1.5; stroke-dasharray: 5 3; }
     figcaption { color: var(--dempet); font-size: 0.85rem; margin-top: 0.4rem; }
@@ -84,7 +86,7 @@
 
   <h1>{{ detalj.aksje.navn }}</h1>
   <p class="meta">
-    {{ detalj.aksje.ticker }} · {{ detalj.aksje.sektor }} · {{ detalj.dato }}
+    {{ detalj.aksje.ticker }} · {{ detalj.aksje.sektor }} · {{ detalj.dato|dato }}
     {% if hentet %}· data hentet {{ hentet|norsk_tid }}{% endif %}
   </p>
 
@@ -120,6 +122,17 @@
             {{ linje.verdi|tall('akse') }}
           </text>
         {% endfor %}
+        {#- Story 8.0c: et merke ved foerste boersdag i hver maaned, tegnet foer
+            linjene saa streken ligger under kurslinja. #}
+        {% for merke in graf.maanedsmerker %}
+          <line class="maanedsstrek" x1="{{ "%.1f"|format(merke.x) }}" y1="0"
+                x2="{{ "%.1f"|format(merke.x) }}" y2="{{ graf.hoyde }}"></line>
+          {% if merke.til_venstre %}
+            <text class="maanedstekst" text-anchor="end" x="{{ "%.1f"|format(merke.x - 3) }}" y="{{ graf.hoyde - 3 }}">{{ merke.navn }}</text>
+          {% else %}
+            <text class="maanedstekst" x="{{ "%.1f"|format(merke.x + 3) }}" y="{{ graf.hoyde - 3 }}">{{ merke.navn }}</text>
+          {% endif %}
+        {% endfor %}
         {% if graf.ma50linje %}
           <polyline class="ma50linje" points="{{ graf.ma50linje }}"></polyline>
         {% endif %}
@@ -134,7 +147,7 @@
       </div>
 
       <figcaption>
-        {{ graf.forste_dato }} til {{ graf.siste_dato }}.
+        {{ graf.forste_dato|dato }} til {{ graf.siste_dato|dato }}.
         Begge linjene er tegnet på utbyttejustert kurs, så de ligger på samme
         skala. Sjekk 2 og 3 tegnes ikke — de står som tall under.
       </figcaption>
@@ -178,7 +191,7 @@
     </p>
   {% else %}
     <p class="mangler">
-      Ingen vurdering for {{ detalj.dato }}: {{ detalj.tekst }}.
+      Ingen vurdering for {{ detalj.dato|dato }}: {{ detalj.tekst }}.
       Kursen vises likevel.
     </p>
     {% if detalj.ikke_vurdert %}

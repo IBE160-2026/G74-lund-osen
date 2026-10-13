@@ -249,7 +249,7 @@ def kall_til_nye_forsoek(igjen: int, grense: int, antall: int) -> int:
     minus antallet hovedhentingen trenger. antall er aksjene i lista pluss
     indeksen naar den hentes (2.8), og gis av den som kaller. Med 15 og 20
     er det 5, med 18 aksjer og indeksen 1. Bonuskvoten er aldri med
-    (Marians beslutning 08.10 kl. 08:06).
+    (beslutningen 08.10 kl. 08:06).
     """
     return max(0, min(igjen, grense - antall))
 
@@ -262,7 +262,7 @@ def vurder_kvote(igjen: int, bonus: int, antall: int) -> int | None:
     lista i basen (2.11) gis bare et annet tall. 0 betyr at dagens kall
     holder. None betyr at heller ikke bonusen dekker det, og da hentes
     ingenting. Bonusen brukes bare til aa fullfoere kveldens henting
-    (NFR-01, Marians beslutning 08.10 kl. 08:06).
+    (NFR-01, beslutningen 08.10 kl. 08:06).
     """
     if igjen >= antall:
         return 0
@@ -690,8 +690,8 @@ def kjoer(
     som hentes, ikke et fast 15: er det faerre igjen av dagens kall, men
     bonusen dekker resten, hentes det; ellers 0 kall og kode 1. Kan svaret
     ikke leses, hentes det. Tidskontrollen og basen gir kode 0. Filvakten
-    gir kode 1, fordi basen da mangler dagen eller ikke kunne leses (Marians
-    beslutning 08.10, BH4).
+    gir kode 1, fordi basen da mangler dagen eller ikke kunne leses
+    (beslutningen 08.10, BH4).
     Klokka i tidskontrollen er Oslo-tid, ogsaa i vintertid. Mangler svaret
     kursen for boersdagen for noen aksjer (FR-402), nevner utskriften dem,
     og kjoeringen gir kode 1; en ny kjoering samme kveld stopper ved
@@ -816,7 +816,7 @@ def kjoer(
             "leses, saa det er ikke kjent hvilke aksjer som mangler, og det "
             "blir ikke noe nytt forsoek (story 2.3b). 0 kall brukt."
         )
-        # Marians beslutning 08.10 (BH4): naar filvakten stopper, mangler basen
+        # Beslutningen 08.10 (BH4): naar filvakten stopper, mangler basen
         # dagen eller kunne ikke leses, saa dagen er ikke komplett. Kode 1.
         sys.exit(1)
 

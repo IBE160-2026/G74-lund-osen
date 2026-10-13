@@ -622,7 +622,7 @@ class TestReadmeForNybegynnere:
             assert "#" not in blokk, blokk
 
     def test_en_kommando_per_boks(self):
-        """Marian fikk to kommandoer paa samme linje 11.10."""
+        """En av oss fikk to kommandoer paa samme linje 11.10."""
         for spraak, blokk in _blokkene(_kom_i_gang()):
             assert len([l for l in blokk.splitlines() if l.strip()]) == 1, blokk
 
@@ -638,7 +638,7 @@ class TestReadmeForNybegynnere:
             assert not re.match(r"^ +```|^ *~~~", linje), linje
 
     def test_tabellen_nevner_begge_og_hvilken_som_er_anbefalt(self):
-        """Marian kl. 22:21: to versjoner med forskjellen forklart, og vi
+        """Kl. 22:21: to versjoner med forskjellen forklart, og vi
         anbefaler den ekte. Ville feilet hvis tabellen manglet en versjon,
         eller anbefalte demoen."""
         topp = _kom_i_gang().split("### Felles for begge", 1)[0]
@@ -826,7 +826,7 @@ class TestReadmeForNybegynnere:
             assert not re.match(r"^ +```|^ *~~~", linje), linje
 
     def test_til_faglaerer_og_kom_i_gang_foer_status(self):
-        """Marian kl. 23:41: beskrivelsen, så «Til faglærer», så «Kom i gang»,
+        """Kl. 23:41: beskrivelsen, så «Til faglærer», så «Kom i gang»,
         så «Status». Ville feilet hvis «Status» kom foerst igjen, eller noe
         kom mellom beskrivelsen og «Til faglærer»."""
         tekst = README.read_text(encoding="utf-8")
@@ -841,7 +841,7 @@ class TestReadmeForNybegynnere:
         assert "\n## " not in topp
 
     def test_status_uten_storynumre_og_uten_kommando(self):
-        """Marian kl. 23:41: «Status» i vanlige ord, uten storynumre og uten
+        """Kl. 23:41: «Status» i vanlige ord, uten storynumre og uten
         kommandoen, som sto uten stegene foer den. Datoer som «13.–16.10» er
         lov, storynumre i alle formene vi har brukt er ikke det."""
         tekst = README.read_text(encoding="utf-8")
@@ -864,18 +864,18 @@ class TestReadmeForNybegynnere:
         flettet, neste = status.split("Flettet til main:", 1)[1].split("Neste:", 1)
         neste = neste.split("KI-laget", 1)[0]
         for sak in ("hentingen", "kallene som er igjen", "Docker", "demoen", "README-en",
-                    "hjelp bak «?»", "tydeligere merking"):
+                    "hjelp bak «?»", "tydeligere merking", "datoene og månedsmerkene i grafen"):
             assert sak in flettet, sak
-        for sak in ("README-prøven 13.–16.10", "datoene og månedsmerkene i grafen",
-                    "utseendet fra designforslaget"):
+        for sak in ("README-prøven 13.–16.10", "oversikten fra designforslaget",
+                    "periodene i kursgrafen", "utseendet fra designforslaget"):
             assert sak in neste and sak not in flettet, sak
 
     def test_lenken_til_staar_du_fast_sier_lenger_ned(self):
-        """Marian kl. 23:46: «se «Står du fast?» lenger ned»."""
+        """Kl. 23:46: «se «Står du fast?» lenger ned»."""
         assert "se [«Står du fast?»](#står-du-fast) lenger ned." in _kom_i_gang()
 
     def test_beskrivelsen_foelger_koden_og_gir_ikke_raad(self):
-        """Beskrivelsen Marian godkjente 11.10 kl. 23:50. Antallet aksjer er
+        """Beskrivelsen som ble godkjent 11.10 kl. 23:50. Antallet aksjer er
         lengden av AKSJEUNIVERS, og antallet sjekker og navnene deres er de i
         signalberegning.py, saa README-en maa foelge naar lista endres (2.11
         og 2.12). Den sier at appen ikke gir raad (NFR-06)."""
@@ -898,13 +898,13 @@ class TestReadmeForNybegynnere:
         assert f"signalstyrke fra 0 til {antall}" in beskrivelse
         assert "– " + ", ".join(n.lower() for n in navn[:antall - 1]) + f" og {navn[antall - 1].lower()} –" in beskrivelse
         assert "Appen gir ikke råd om å kjøpe eller selge." in beskrivelse
-        # Marian 12.10 kl. 11:12: at appen er under utvikling, staar ogsaa oeverst,
+        # 12.10 kl. 11:12: at appen er under utvikling, staar ogsaa oeverst,
         # ikke bare i «Status» etter hele «Kom i gang».
         # Rett etter setningen om raad, som instruksjonen kl. 11:15 sier (VG 12.10).
         assert "selge. Den er under utvikling og ikke ferdig." in beskrivelse
 
     def test_hvorfor_bare_15_aksjer(self):
-        """Marian 12.10 kl. 10:22: spoersmaalet staar i docs/hjelp.md under
+        """12.10 kl. 10:22: spoersmaalet staar i docs/hjelp.md under
         «Den ekte versjonen», rett etter «Hva med nøkkelen?». Tallet er
         lengden av AKSJEUNIVERS, saa hjelpen maa foelge naar lista endres
         (2.11 og 2.12)."""
@@ -920,7 +920,7 @@ class TestReadmeForNybegynnere:
         svar = ekte.split(f"### {sporsmaal}\n\n", 1)[1].split("\n\n", 1)[0]
         assert f"med {antall} aksjer" in svar
         assert "20 kall i døgnet" in svar and "opptil 18" in svar
-        # Gjennomgangen av PR #31, punkt 3 (Marian 12.10 kl. 10:38): svaret
+        # Gjennomgangen av PR #31, punkt 3 (12.10 kl. 10:38): svaret
         # rett over sier hvor mange kall en henting bruker, og det tallet
         # foelger ogsaa lista.
         nokkel = ekte.split("### Hva med nøkkelen?\n\n", 1)[1].split("\n\n", 1)[0]
@@ -928,7 +928,7 @@ class TestReadmeForNybegynnere:
         assert re.search(rf"en henting bruker {antall}\b", nokkel), nokkel
 
     def test_til_faglaerer_lenker_til_briefen_med_gjeldende_tag(self):
-        """Marian 12.10 kl. 12:12: briefen var gjemt langt nede. Lista under
+        """12.10 kl. 12:12: briefen var gjemt langt nede. Lista under
         «Til faglærer:» lenker til den, og taggen er den CLAUDE.md sier er
         gjeldende (regel 17). Ville feilet med en eldre tag i lista."""
         tekst = README.read_text(encoding="utf-8")

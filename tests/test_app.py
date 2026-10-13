@@ -247,13 +247,14 @@ def test_uleselig_hentet_gjoer_hele_oeyeblikksbildet_manglende(klient, monkeypat
     assert klient.get("/aksje/EQNR").status_code == 404
 
 
-def test_datoen_skrives_som_aaaa_mm_dd(klient, monkeypatch):
-    """Datoen er en date i modellen, og malen skriver den som foer."""
+def test_datoen_skrives_som_dd_mm(klient, monkeypatch):
+    """Datoen er en date i modellen, og malen skriver den som «31.10» (8.0c).
+    Klokka i testene staar i 2026, saa aaret vises ikke."""
     monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [101.0])}))
 
     html = klient.get("/").data.decode("utf-8")
 
-    assert "Oslo Børs · 2026-10-31 ·" in html
+    assert "Oslo Børs · 31.10 ·" in html
 
 
 def test_data_hentet_leses_fra_oeyeblikksbildet(klient, monkeypatch):
@@ -263,7 +264,7 @@ def test_data_hentet_leses_fra_oeyeblikksbildet(klient, monkeypatch):
 
     html = klient.get("/").data.decode("utf-8")
 
-    assert "data hentet 2026-09-21 kl. 17.40" in html
+    assert "data hentet 21.09 kl. 17.40" in html
     assert 'class="hentet"' not in html
 
 
@@ -284,7 +285,7 @@ class TestTidsstempler:
 
         html = klient.get("/").data.decode("utf-8")
 
-        assert "data hentet 2026-09-22 kl. 20.05" in html
+        assert "data hentet 22.09 kl. 20.05" in html
         assert "data hentet 2026-09-24" not in html
 
     def test_den_eldste_raden_viser_sin_egen_tid_under_navnet(self, klient, monkeypatch):
@@ -292,7 +293,7 @@ class TestTidsstempler:
 
         html = klient.get("/").data.decode("utf-8")
 
-        assert "hentet 2026-09-22 kl. 20.05" in _selskapscelle(html, "DNB")
+        assert "hentet 22.09 kl. 20.05" in _selskapscelle(html, "DNB")
         assert "hentet" not in _selskapscelle(html, "EQNR")
 
     def test_alle_like_ferske_gir_ingen_egne(self, klient, monkeypatch):
@@ -300,7 +301,7 @@ class TestTidsstempler:
 
         html = klient.get("/").data.decode("utf-8")
 
-        assert "data hentet 2026-09-24 kl. 20.05" in html
+        assert "data hentet 24.09 kl. 20.05" in html
         assert 'class="hentet"' not in html
 
     def test_fortsatt_fem_kolonner(self, klient, monkeypatch):
@@ -322,7 +323,7 @@ class TestTidsstempler:
 
         html = klient.get("/").data.decode("utf-8")
 
-        assert "data hentet 2026-09-25 kl. 00.30" in html
+        assert "data hentet 25.09 kl. 00.30" in html
 
     def test_vintertid(self, klient, monkeypatch):
         """Demonstrasjonen er etter 25.10. Da er Oslo UTC+1, ikke +2."""
@@ -330,7 +331,7 @@ class TestTidsstempler:
 
         html = klient.get("/").data.decode("utf-8")
 
-        assert "data hentet 2026-11-16 kl. 23.30" in html
+        assert "data hentet 16.11 kl. 23.30" in html
 
     def test_detaljen_viser_symbolets_egen_tid(self, klient, monkeypatch):
         """Ikke sidens eldste: detaljen gjelder ett symbol."""
@@ -339,15 +340,15 @@ class TestTidsstempler:
         eqnr = klient.get("/aksje/EQNR").data.decode("utf-8")
         dnb = klient.get("/aksje/DNB").data.decode("utf-8")
 
-        assert "data hentet 2026-09-24 kl. 20.05" in eqnr
-        assert "data hentet 2026-09-22 kl. 20.05" in dnb
+        assert "data hentet 24.09 kl. 20.05" in eqnr
+        assert "data hentet 22.09 kl. 20.05" in dnb
 
     def test_detaljen_i_vintertid(self, klient, monkeypatch):
         monter_lager(monkeypatch, {"EQNR": datetime(2026, 11, 16, 22, 30, tzinfo=timezone.utc)})
 
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
 
-        assert "data hentet 2026-11-16 kl. 23.30" in html
+        assert "data hentet 16.11 kl. 23.30" in html
 
 
 def test_rutene_gjoer_ingen_nettverkskall(klient, monkeypatch, tmp_path):
@@ -455,13 +456,13 @@ class TestAksjedetalj:
 
         assert 'href="/aksje/EQNR"' in html
 
-    def test_detaljen_skriver_datoene_som_aaaa_mm_dd(self, klient, monkeypatch):
+    def test_detaljen_skriver_datoene_som_dd_mm(self, klient, monkeypatch):
         monter(monkeypatch, snapshot({"EQNR": serie([100.0 + i for i in range(80)])}))
 
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
 
-        assert "Energi · 2026-11-19" in html
-        assert "2026-09-01 til 2026-11-19" in html
+        assert "Energi · 19.11" in html
+        assert "01.09 til 19.11" in html
 
     def test_uleselig_symbol_gir_404(self, klient, monkeypatch):
         ugyldig = [eodhd(r) for r in serie([100.0] * 61)]
@@ -978,7 +979,7 @@ class TestStory80:
         html = klient.get("/").data.decode("utf-8")
 
         assert [rad[0] for rad in _tabell(html).rader][0] == "Equinor"
-        assert "Oslo Børs · 2026-10-30 ·" in html
+        assert "Oslo Børs · 30.10 ·" in html
 
     def test_fotnoten_sier_det_som_stemmer(self, klient, monkeypatch):
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))
@@ -1120,7 +1121,7 @@ class TestVurderingenPaaOversikten:
 
         assert rad[3].split()[0] == str(vurder(rader, i_gaar).styrke)
         assert "hentingen feilet" not in html
-        assert f"Oslo Børs · {i_gaar.isoformat()} ·" in html
+        assert f"Oslo Børs · {i_gaar:%d.%m} ·" in html
 
     def test_selskapene_og_lista_over_manglende_kommer_fra_aksje(self, klient):
         """AD-21, merknaden 03.10: siden leser selskapene fra aksje, ikke fra
@@ -1189,7 +1190,7 @@ class TestVurderingenIDetaljen:
 
         assert svar.status_code == 200
         assert "<svg" in html
-        assert f"Ingen vurdering for {rader[-1].dato.isoformat()}: ingen kurs fra dagen." in html
+        assert f"Ingen vurdering for {rader[-1].dato:%d.%m}: ingen kurs fra dagen." in html
         # Tabellen, ikke hjelpeteksten om kolonnen (story 8.0b).
         assert "<th>Målt mot</th>" not in html
 
@@ -1203,7 +1204,7 @@ class TestVurderingenIDetaljen:
 
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
 
-        assert f"Ingen vurdering for {rader[-1].dato.isoformat()}: signalet kunne ikke regnes." in html
+        assert f"Ingen vurdering for {rader[-1].dato:%d.%m}: signalet kunne ikke regnes." in html
         assert "for å regne signal" not in html
 
     def test_ikke_vurdert_med_fotnoten(self, klient, monkeypatch):
@@ -1521,3 +1522,44 @@ class TestStory80c:
         assert antall_vurdert([]) == 0
         assert antall_vurdert([rad(None), rad(1)]) == 1
         assert antall_vurdert([rad(0), rad(3)]) == 2
+
+    # PR 2: datoene (beslutning 12).
+
+    def test_aaret_vises_naar_det_er_et_annet_enn_i_aar(self, klient, monkeypatch):
+        """Ville feilet hvis dato() aldri viste aaret, eller viste det i samme aar."""
+        import app as app_modul
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}))
+        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2027, 1, 4, 12, 0, tzinfo=timezone.utc))
+        html = klient.get("/").data.decode("utf-8")
+        assert re.search(r"Oslo Børs · \d\d\.\d\d\.2026 ·", html)
+        assert re.search(r"data hentet \d\d\.\d\d\.2026 kl\. \d\d\.\d\d", html)
+        # VG4: aksjesiden ogsaa, med datoen i meta-linja og grafens fra-til.
+        detalj = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert re.search(r"Energi · \d\d\.\d\d\.2026", detalj)
+        assert re.search(r"\d\d\.\d\d\.2026 til \d\d\.\d\d\.2026\.", detalj)
+
+    def test_ingen_synlig_iso_dato_paa_sidene(self, klient, monkeypatch):
+        """Beslutning 12: ingen synlig tekst har en dato som 2026-10-13.
+        Ville feilet hvis en dato gikk utenom dato() eller norsk_tid."""
+        from test_hjelpetekster import synlig_tekst
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0]),
+                                      "DNB": serie([100.0, 101.0])}))
+        # VG3: ulike tider, saa tidsstempelet under navnet ogsaa vises.
+        monter_lager(monkeypatch, {"KOG": datetime(2026, 9, 20, 18, 0, tzinfo=timezone.utc),
+                                   "TEL": datetime(2026, 9, 22, 18, 0, tzinfo=timezone.utc)})
+        assert 'class="hentet">hentet ' in klient.get("/").data.decode("utf-8")
+        for sti in ("/", "/aksje/EQNR", "/aksje/DNB"):
+            tekst = synlig_tekst(klient.get(sti).data.decode("utf-8"))
+            assert not re.search(r"\b\d{4}-\d{2}-\d{2}\b", tekst), (sti, re.findall(r"\b\d{4}-\d{2}-\d{2}\b", tekst))
+
+    def test_maanedsmerkene_staar_i_grafen(self, klient, monkeypatch):
+        """Beslutning 13: et merke med fullt norsk maanedsnavn ved foerste
+        boersdag i maaneden, i SVG-en."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0 + i for i in range(80)])}))
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        navn = re.findall(r'<text class="maanedstekst"[^>]*>([a-zæøå]+)</text>', html)
+        assert navn and all(n in ("september", "oktober", "november") for n in navn), navn
+        # BH9: en strek per navn, og streken under kurslinja (ECH7).
+        assert html.count('<line class="maanedsstrek"') == len(navn)
+        assert html.index('class="maanedsstrek"') < html.index('class="kurslinje" points')
+        assert "01.09 til" in html

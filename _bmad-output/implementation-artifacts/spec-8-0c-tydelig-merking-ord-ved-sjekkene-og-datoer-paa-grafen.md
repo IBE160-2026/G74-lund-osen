@@ -34,6 +34,8 @@ Planen ble vist i chatten 13.10 og er ført i `docs/ai-prompts/2026-10-13.md` (i
 8. **Fotnoten på aksjesiden** slutter med «Signalstyrken sier ikke om du bør kjøpe eller selge.» (tillegget 11.10).
 9. **Ordtesten** leter også etter «kr» som eget ord.
 11. **Setningen når noen rader mangler vurdering** (svar 3 på BH1/ECH2, 13.10 kl. 16:42): står setningen fra 05.10, og minst én rad mangler vurdering, kommer «N av M aksjer ble vurdert.» under den. N er radene med vurdering og M alle radene, begge talt fra radene, og den virker for alle tall, også 1. Er alle vurdert, står setningen fra 05.10 alene. Har ingen rad vurdering, står ingen av dem.
+12. **PR 2, datoene** (instruksjonen kl. 18:45 13.10): `dato()` i `tallformat.py` gir «22.09», og med år bare når året er et annet enn i dag: «29.09.2025». I dag kommer fra `app.idag()`, så testene styrer det. `norsk_tid` gir «24.09 kl. 20.05». Alle datoene på sidene går gjennom `dato()` eller `norsk_tid`: linja over tabellen (i demoen «Eksempeltall · 09.10 · 14 aksjer»), «data hentet», tidsstempelet under navnet, datoene på aksjesiden, grafens fra–til og «Ingen vurdering for …». En test krever at ingen synlig tekst på sidene har en dato som 2026-10-13, også med demobasen (FR-411).
+13. **PR 2, månedsmerkene:** merket står ved første børsdag i måneden etter `er_boersdag`, med fullt norsk månedsnavn i små bokstaver («oktober»), på samme x som punktet for den dagen. Mangler den dagen i serien, får måneden ikke merke. Datoene i bildeteksten står. Mutantene M7 (merkene etter kalenderen), M8 (merkene én dag feil) og én der `dato()` viser året i samme år, fanges.
 10. **Den nye delen 2 er godkjent** 13.10 kl. 15:36, slik den ble vist kl. 15:03 (instruksjonen og svaret i `docs/ai-prompts/2026-10-13.md`), med én endring: i tabellen med sjekkene på aksjesiden får hver sjekk sitt eget «?» ved navnet, med bare sin tekst (trend 2, bevegelse 3 og interesse 3 setninger). «?» ved «Hvorfor signalet ble …» har bare «Hvorfor disse 3» og antall dager (5 setninger). Oversikten får 6 «?»: Selskap, Sluttkurs, Endring, Signalstyrke, Retning og «data hentet». Aksjesiden får «?» ved Sluttkurs, kursgrafen, Signalstyrke, Retning (med skjevhet), «Hvorfor signalet ble …», hver sjekk, Ga og «Målt mot» (med grensene).
 
 ## Boundaries & Constraints
@@ -88,6 +90,8 @@ Planen ble vist i chatten 13.10 og er ført i `docs/ai-prompts/2026-10-13.md` (i
 
 ## Implementation Notes
 
+- *PR 2, 13.10:* `fbf24c4` datoene og månedsmerkene, `8ac5db6` navnene ut av kommentarene og docstringene (regel 20, tillegget 13.10, 17 treff i fire filer). `dato()` i `tallformat.py`, og filtrene `dato` og `norsk_tid` i `app.py` får året fra `idag()`. Månedsmerkene regnes i `graf.py` med `er_boersdag`. Kalenderen dekker bare 2026 (`boersdag.DEKKEDE_AAR`), så en måned utenfor kalenderen får ikke merke. Ingen av de fire punktene fra 8.0c i `deferred-work.md` gjelder datoene eller grafen.
+
 - *Lagt til 2026-10-13:* PR 1 er flettet i `82271fb`, PR #35, låst til `5fa7304`. PR 2 med datoene og månedsmerkene gjenstår, og spesifikasjonen står som in-progress til den er flettet.
 
 - Del a `fcb6c31`, b `83fa382`, c `e2e3f79`, d `c6769d8`. Main hentet inn med merge i `b5fcc8f`. Den commiten mangler Co-authored-by og er ikke skrevet om (regel 7).
@@ -98,6 +102,27 @@ Planen ble vist i chatten 13.10 og er ført i `docs/ai-prompts/2026-10-13.md` (i
 - Hjelpen: 6 «?» i oversikten (23 setninger) og 12 på aksjesiden. Ny tekst «selskap», ordrett fra tavla. Ingen «?» med tom base. «Ga» bygges av `POSITIV`, `NEGATIV` og `INGEN_UTSLAG`.
 - Tekstene avviker fra tavla og fra tabellen i 4.4 der planen kl. 13:35 og delen 2 kl. 15:03 viste det: trend står som før, fordi testen krever «de siste 50 børsdagene», interesse sier «1,5 ganger» og ikke «1,5 ×», bevegelse og hvorfor_tre har +1 og -1 og «med én regel og én grense hver», og blandet og signalstyrke har ordlyden fra delen 2. Godkjent 13.10 kl. 14:33 og 15:36.
 - Testene som er endret: «N av 3» i `test_app.py`, demolinja og hjelpen i `test_demo.py`, grensene, plasseringen og tom base i `test_hjelpetekster.py`, og merket i `test_docker.py`.
+
+Gjennomgang av PR #36 (diffen `main...8-0c-datoer`, 13.10), med Blind Hunter (11 funn), Edge Case Hunter (10) og Verification Gap (7). Rettingene står i `859f1d3`.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| VG1, BH1, ECH2 | Demotesten bruker den ekte klokka og feiler fra 01.01.2027 | høy | patch: fast klokke i `test_demo.py` |
+| BH2, ECH5 | `norsk_tid` uten `i_aar` mister året uten å merke det | medium | patch: `i_aar` påkrevd, og en test rundt nyttår |
+| ECH1, BH5 | Månedsnavnet kuttes ved høyre kant | medium | patch: til venstre for streken nærmere kanten enn 60, og testene |
+| VG4, BH7 | Året er bare prøvd på oversikten | medium | patch: aksjesidens dato og grafens fra–til med et annet år |
+| VG2 | M17 og M18 fra planen er ikke fulgt opp | medium | patch: kjørt og fanget, se tabellen |
+| VG3 | ISO-testen viser ikke tidsstempelet under navnet | lav | patch: rader med ulike tider |
+| VG5 | Ingen måned der første ukedag er en helligdag | lav | patch: mai 2026 |
+| ECH7 | Månedsstreken ligger over kurslinja | lav | patch: tegnet før linjene |
+| BH9 | Testen sjekker ikke streken | lav | patch: en strek per navn |
+| BH11 | Ordstilling i kommentaren i `demo.py` | lav | patch |
+| BH3, BH4, ECH4 | Kalenderen dekker bare 2026, så månedene i 2027 får ikke merke | medium | utsatt: `deferred-work.md`. Beslutning 13 sier «etter `er_boersdag`» |
+| ECH3, BH6 | Merkene kan overlappe ved et langt hull, og navnene står uten år | lav | utsatt: `deferred-work.md` |
+| BH8, ECH6 | ISO-testen ser ikke attributter | lav | avvist: ingen attributt på sidene har en dato |
+| BH10 | `dato()` feiler på None | lav | avvist: alle stedene har en dato |
+| VG6 | x i SVG-en er ikke prøvd på appnivå | lav | avvist: `test_graf.py` prøver x, og malen setter bare tallet inn |
+| VG7, ECH8, ECH9, ECH10 | Merknader uten feil | info | – |
 
 ## Spec Change Log
 
@@ -140,6 +165,8 @@ Gjennomgang av PR #35 (diffen `main...8-0c` på `c6db3e5`), med Blind Hunter (BH
 | VG7 | Fotnoten på aksjesiden følger tavlas tekst for styrken, ikke resten av 4.4 | avvist | teksten sto i planen kl. 13:35 (4b) og ble godkjent |
 | VG9, VG12, VG13 | Små merknader: ordet bygget av konstanten, `data_hentet_aksje` uten `hentet`, perioden for vinduene | avvist | merknader uten feil |
 
+*Lagt til 2026-10-13:* triagen for PR #36 (PR 2, datoene og månedsmerkene i grafen) står under «Implementation Notes», etter linja om PR 2.
+
 ## Verification
 
 **Commands:**
@@ -169,3 +196,10 @@ Gjennomgang av PR #35 (diffen `main...8-0c` på `c6db3e5`), med Blind Hunter (BH
 | M22 | «Målt mot» sier lys bakgrunn | `tests/test_demo.py::TestStory80cIDemoen::test_merkingen_og_ordene_i_demoen` |
 | M23 | grensene uten «på Oslo Børs» | `tests/test_hjelpetekster.py::TestGrensene::test_teksten_om_maalingen_nevner_de_maalte_grensene` |
 | M24 | «N av M aksjer ble vurdert.» borte | `tests/test_app.py::TestStory80c::test_noen_mangler_vurdering_gir_begge_setningene` |
+| M7 | månedsmerkene etter kalenderen (PR 2) | `tests/test_graf.py::TestMaanedsmerker::test_merket_staar_paa_samme_x_som_punktet_for_dagen` |
+| M8 | månedsmerkene én dag feil (PR 2) | `tests/test_graf.py::TestMaanedsmerker::test_merket_staar_paa_samme_x_som_punktet_for_dagen` |
+| M25 | `dato()` viser året også i samme år (PR 2) | `tests/test_app.py::test_datoen_skrives_som_dd_mm` |
+| M17 | ISO-dato på aksjesiden (PR 2, på `859f1d3`) | `tests/test_app.py::TestAksjedetalj::test_detaljen_skriver_datoene_som_dd_mm` |
+| M18 | datoen uten år når året er et annet (PR 2, på `859f1d3`) | `tests/test_app.py::TestStory80c::test_aaret_vises_naar_det_er_et_annet_enn_i_aar` |
+
+M7, M8 og M25 ble kjørt på nytt på `859f1d3`, og alle tre ble fanget igjen.

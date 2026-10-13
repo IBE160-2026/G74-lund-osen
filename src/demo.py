@@ -70,7 +70,7 @@ FOERSTE_DAG = date(2026, 1, 2)
 SLUTTDATO = date(2026, 10, 9)
 NYLIG_NOTERT_DAGER = 30
 
-# Navnene og tickerne er kontrollert for haand: Joakim mot lista over aksjer
+# Navnene og tickerne er kontrollert for haand av en av oss mot lista over aksjer
 # i Oslo hos Euronext 10.10 kl. 12:25, og raadet med et soek paa nettet
 # samme dag (spesifikasjonen til 3.4). Programmet henter aldri lista.
 DEMOUNIVERS: tuple[Aksje, ...] = (

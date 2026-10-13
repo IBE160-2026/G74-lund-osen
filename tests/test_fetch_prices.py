@@ -192,7 +192,7 @@ class TestSkriverIkkeOver:
         def hent(*_):
             pytest.fail("ingen kall skal brukes naar dagens fil finnes")
 
-        # Marians beslutning 08.10 (BH4): filvakten gir kode 1, fordi basen
+        # Beslutningen 08.10 (BH4): filvakten gir kode 1, fordi basen
         # da mangler dagen. Story 2.3b: basen mangler alle, saa det blir et
         # nytt forsoek; med dagens 20 brukt er det 0 kall til det.
         with pytest.raises(SystemExit) as slutt:
@@ -1841,7 +1841,7 @@ class TestHelgen:
         kode, kall, ut = kjoer_23_kode(raa, base, LOERDAG_26_09_KL_12,
                                        ingen_kall, NOEKKEL,
                                        kvote(brukt=20, dato="2026-09-26"))
-        # Marians beslutning 08.10 (BH4): fredagen er ikke komplett, saa kode 1.
+        # Beslutningen 08.10 (BH4): fredagen er ikke komplett, saa kode 1.
         # Ville feilet hvis filvakten ga kode 0 igjen (B4).
         assert kode == 1 and kall == []
         assert "kurser-raa-2026-09-25.json" in ut and "AD-6" in ut and "2.3b" in ut
