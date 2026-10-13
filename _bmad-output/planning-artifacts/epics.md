@@ -2767,6 +2767,8 @@ Som **bruker**, vil jeg se med en gang hvilke aksjer som skiller seg ut, lese hv
 
 *Lagt til 2026-10-13:* PR 1 flettet i `82271fb`, PR #35. PR 2 med datoene og månedsmerkene gjenstår.
 
+*Lagt til 2026-10-13:* PR 2 flettet i `16e18d8`, PR #36. Begge PR-ene er flettet, og 8.0c er ferdig.
+
 ### Story 8.0e: Oversikten fra designforslaget
 
 *Lagt til 2026-10-13, endringsforslaget 13.10 (punkt 4.6, nr. 1–4, svar 8, 11 og 12), godkjent av Marian kl. 12:46.*
