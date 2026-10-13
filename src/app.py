@@ -207,10 +207,26 @@ def _aapne_basen() -> None:
         g.basefeil = _basefeil(feil)
 
 
+# Story 8.0c: merket staar ett sted, ikke kopiert i tre maler, og demoen
+# sier «Demoversjon.» foran det (tillegget 11.10).
+EKSEMPELTALL_MERKE = "Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs."
+
+# Story 8.0c (tillegget 11.10, svar 4): linja nederst paa alle sidene. Én
+# innstilling avgjoer den, og docs/innlevering.md §5 sier at den avgjoeres
+# ved innleveringen.
+UNDER_ARBEID = True
+UNDER_ARBEID_TEKST = "Appen er under utvikling og ikke ferdig."
+
+
 @app.context_processor
 def _eksempeltall():
-    """«Eksempeltall» paa hver side som viser en base med demomerket."""
-    return {"eksempeltall": g.get("eksempeltall", False)}
+    """«Eksempeltall» paa hver side som viser en base med demomerket, og
+    linja om at appen er under arbeid."""
+    return {
+        "eksempeltall": g.get("eksempeltall", False),
+        "eksempeltall_merke": EKSEMPELTALL_MERKE,
+        "under_arbeid": UNDER_ARBEID_TEKST if UNDER_ARBEID else None,
+    }
 
 
 # Story 8.0b: tekstene bak «?», med tallene fra parametrene som gjelder i

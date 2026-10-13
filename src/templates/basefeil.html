@@ -11,6 +11,7 @@
       padding: 0 1rem;
       color: #1a1a1a;
     }
+    p.under-arbeid { color: #666; font-size: 0.8rem; margin-top: 2rem; }
     .eksempeltall {
       background: #fff3cd;
       border: 1px solid #c9a227;
@@ -21,7 +22,7 @@
 </head>
 <body>
   {% if eksempeltall %}
-  <p class="eksempeltall">Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.</p>
+  <p class="eksempeltall">Demoversjon. {{ eksempeltall_merke }}</p>
   {% endif %}
   <h1>OSE Signal</h1>
   <p>
@@ -31,6 +32,9 @@
   <p>Feilen: <code>{{ feil }}</code></p>
   {% if demokommando %}
   <p>Lag demobasen på nytt med <code>{{ demokommando }}</code>.</p>
+  {% endif %}
+  {% if under_arbeid %}
+  <p class="under-arbeid">{{ under_arbeid }}</p>
   {% endif %}
 </body>
 </html>

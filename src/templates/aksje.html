@@ -65,6 +65,7 @@
     .regnestykke { font-variant-numeric: tabular-nums; }
     p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
     .mangler { color: var(--dempet); font-style: italic; }
+    p.under-arbeid { color: #666; font-size: 0.8rem; margin-top: 2rem; }
     .eksempeltall {
       background: #fff3cd;
       border: 1px solid #c9a227;
@@ -77,7 +78,7 @@
 </head>
 <body>
   {% if eksempeltall %}
-  <p class="eksempeltall">Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.</p>
+  <p class="eksempeltall">Demoversjon. {{ eksempeltall_merke }}</p>
   {% endif %}
   <a class="tilbake" href="/">← Markedsoversikt</a>
 
@@ -210,5 +211,8 @@
     ("Grensene", ["grensene", "skjevhet"]),
     ("Ikke et råd", ["ikke_raad"]),
   ]) }}
+  {% if under_arbeid %}
+  <p class="under-arbeid">{{ under_arbeid }}</p>
+  {% endif %}
 </body>
 </html>

@@ -319,7 +319,12 @@ class TestSidene:
         oversikt = klient.get("/").data.decode("utf-8")
         detalj = klient.get("/aksje/BRFE").data.decode("utf-8")
         assert "Eksempeltall" in oversikt and "Eksempeltall" in detalj
-        assert "Oslo Børs · 2026-10-09 · 14 aksjer" in oversikt
+        # Story 8.0c (4a): linja over tabellen sier «Eksempeltall», ikke
+        # «Oslo Børs», og merket har «Demoversjon.» foran.
+        assert "Eksempeltall · 2026-10-09 · 14 aksjer" in oversikt
+        assert "Oslo Børs · " not in oversikt
+        assert f"Demoversjon. {app_modul.EKSEMPELTALL_MERKE}" in oversikt
+        assert f"Demoversjon. {app_modul.EKSEMPELTALL_MERKE}" in detalj
         for tekst in ("Brattfjell Energi", "skiller seg ut",
                       "signalet kunne ikke regnes", "Matfjord Merkevarer"):
             assert tekst in oversikt, tekst
@@ -440,6 +445,10 @@ class TestSidene:
         monkeypatch.setattr(app_modul, "hent_oversiktsleser", feiler)
         svar = klient.get("/")
         assert svar.status_code == 503 and "Eksempeltall" in svar.data.decode("utf-8")
+        # Story 8.0c: «Demoversjon.» og linja nederst ogsaa paa feilsiden.
+        html = svar.data.decode("utf-8")
+        assert f"Demoversjon. {app_modul.EKSEMPELTALL_MERKE}" in html
+        assert app_modul.UNDER_ARBEID_TEKST in html
 
     def test_en_demobase_som_ose_db_migreres_ikke(self, klient, mal, monkeypatch):
         """BH6: uten bryteren, med en demobase der den ekte skal ligge, viser

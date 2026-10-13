@@ -1394,3 +1394,31 @@ class TestStory80c:
         assert "Ga noen +1 og noen -1, er retningen Blandet." in html
         assert "Signalstyrken sier ikke om du bør kjøpe eller selge." in html
         assert "summen av tallene" not in html
+
+    # Del c: linja nederst og linja over tabellen.
+
+    def test_under_arbeid_staar_nederst_paa_begge_sidene(self, klient, monkeypatch):
+        """Tillegget 11.10, svar 4. Ville feilet hvis linja manglet paa en side."""
+        import app as app_modul
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}))
+        for sti in ("/", "/aksje/EQNR"):
+            html = klient.get(sti).data.decode("utf-8")
+            assert '<p class="under-arbeid">Appen er under utvikling og ikke ferdig.</p>' in html, sti
+            assert html.index('class="under-arbeid"') > html.index("<table"), sti
+        assert app_modul.UNDER_ARBEID is True
+
+    def test_under_arbeid_styres_av_en_innstilling(self, klient, monkeypatch):
+        """Ville feilet hvis linja sto fast i malene og ikke kom fra UNDER_ARBEID."""
+        import app as app_modul
+        monkeypatch.setattr(app_modul, "UNDER_ARBEID", False)
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}))
+        for sti in ("/", "/aksje/EQNR"):
+            assert "<p class=\"under-arbeid\">" not in klient.get(sti).data.decode("utf-8"), sti
+
+    def test_den_ekte_basen_sier_oslo_boers_over_tabellen(self, klient, monkeypatch):
+        """4a gjelder bare demoen. Ville feilet hvis «Eksempeltall» sto over
+        tabellen uten demomerket."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}))
+        html = klient.get("/").data.decode("utf-8")
+        assert "Oslo Børs · " in html
+        assert "Eksempeltall" not in html and "Demoversjon" not in html
