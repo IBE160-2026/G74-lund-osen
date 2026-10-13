@@ -33,6 +33,7 @@ Planen ble vist i chatten 13.10 og er ført i `docs/ai-prompts/2026-10-13.md` (i
 7. **Setningen «Ingen aksjer skilte seg ut …»** står bare når ingen har styrke på terskelen eller mer. En test med én aksje på 3 av 3 og ingen på 2 krever at den ikke står.
 8. **Fotnoten på aksjesiden** slutter med «Signalstyrken sier ikke om du bør kjøpe eller selge.» (tillegget 11.10).
 9. **Ordtesten** leter også etter «kr» som eget ord.
+10. **Den nye delen 2 er godkjent** 13.10 kl. 15:36, slik den ble vist kl. 15:03 (instruksjonen og svaret i `docs/ai-prompts/2026-10-13.md`), med én endring: i tabellen med sjekkene på aksjesiden får hver sjekk sitt eget «?» ved navnet, med bare sin tekst (trend 2, bevegelse 3 og interesse 3 setninger). «?» ved «Hvorfor signalet ble …» har bare «Hvorfor disse 3» og antall dager (5 setninger). Oversikten får 6 «?»: Selskap, Sluttkurs, Endring, Signalstyrke, Retning og «data hentet». Aksjesiden får «?» ved Sluttkurs, kursgrafen, Signalstyrke, Retning (med skjevhet), «Hvorfor signalet ble …», hver sjekk, Ga og «Målt mot» (med grensene).
 
 ## Boundaries & Constraints
 
