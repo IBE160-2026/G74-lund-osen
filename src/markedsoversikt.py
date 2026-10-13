@@ -21,6 +21,7 @@ from kursdata import Aksje, Kursrad
 from oversiktsdata import Oversiktspost
 from signalberegning import BLANDET, INGEN, NEGATIV, POSITIV, Parametre, STANDARD
 from tilstand import Art, Tilstand, tilstand
+from tallformat import dato
 from vurderingsdata import Grunn, Vurdering
 
 
@@ -282,11 +283,14 @@ def eldre_enn_nyeste(rader: list[Rad]) -> set[str]:
 NORSK_TID = ZoneInfo("Europe/Oslo")
 
 
-def norsk_tid(tid: datetime) -> str:
-    """Et tidspunkt som ÅÅÅÅ-MM-DD kl. TT.MM i norsk tid (AD-20).
+def norsk_tid(tid: datetime, i_aar: int | None = None) -> str:
+    """Et tidspunkt som «24.09 kl. 20.05» i norsk tid (AD-20, story 8.0c).
 
     Modellen har UTC; soneskiftet skjer foerst her, i visningen. Europe/Oslo
     og ikke en fast forskyvning, saa sommer- og vintertid begge blir riktige.
+    Datoen formes av dato() i tallformat.py (regel 21), med aar bare naar
+    aaret er et annet enn i_aar. Uten i_aar regnes aaret til tidspunktet som
+    i aar.
     """
     lokal = tid.astimezone(NORSK_TID)
-    return lokal.strftime("%Y-%m-%d kl. %H.%M")
+    return f"{dato(lokal.date(), lokal.year if i_aar is None else i_aar)} kl. {lokal:%H.%M}"

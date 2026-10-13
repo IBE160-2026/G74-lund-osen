@@ -106,3 +106,43 @@ class TestRutenett:
 
         assert graf.forste_dato == date(2026, 1, 1)
         assert graf.siste_dato == date(2026, 1, 3)
+
+
+def boersdagspunkter(fra: date, til: date, uten=()):
+    """Et punkt per boersdag fra og med fra til og med til, som serien i
+    appen har, uten dagene i uten."""
+    from boersdag import er_boersdag
+    dager = []
+    dag = fra
+    while dag <= til:
+        if er_boersdag(dag) and dag not in uten:
+            dager.append(dag)
+        dag += timedelta(days=1)
+    return tuple(Punkt(dato=d, kurs=100.0 + i, ma50=None) for i, d in enumerate(dager))
+
+
+class TestMaanedsmerker:
+    """Story 8.0c, beslutning 13."""
+
+    def test_merket_staar_paa_samme_x_som_punktet_for_dagen(self):
+        """Ville feilet hvis merkene ble spredd etter kalenderen (M7) eller sto
+        én dag feil (M8): linja har lik avstand per boersdag."""
+        ps = boersdagspunkter(date(2026, 9, 15), date(2026, 11, 10))
+        graf = bygg_graf(ps)
+        x_per_dato = {p.dato: x for p, (x, _) in zip(ps, koordinater(graf.kurslinje))}
+        assert [m.navn for m in graf.maanedsmerker] == ["oktober", "november"]
+        assert graf.maanedsmerker[0].x == pytest.approx(x_per_dato[date(2026, 10, 1)], abs=0.06)
+        assert graf.maanedsmerker[1].x == pytest.approx(x_per_dato[date(2026, 11, 2)], abs=0.06)
+
+    def test_mangler_foerste_boersdag_faar_maaneden_ikke_merke(self):
+        ps = boersdagspunkter(date(2026, 9, 15), date(2026, 11, 10), uten={date(2026, 10, 1)})
+        assert [m.navn for m in bygg_graf(ps).maanedsmerker] == ["november"]
+
+    def test_foerste_maaned_i_vinduet_faar_ikke_merke_naar_dagen_er_foer_vinduet(self):
+        ps = boersdagspunkter(date(2026, 9, 15), date(2026, 9, 30))
+        assert bygg_graf(ps).maanedsmerker == ()
+
+    def test_utenfor_kalenderen_gir_ingen_merker(self):
+        """boersdag dekker bare 2026. En maaned utenfor kan ikke avgjoeres."""
+        ps = tuple(Punkt(dato=date(2025, 12, 1) + timedelta(days=i), kurs=100.0, ma50=None) for i in range(20))
+        assert bygg_graf(ps).maanedsmerker == ()

@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from datetime import date
 
 from aksjedetalj import Punkt
+from boersdag import UtenforKalenderen, er_boersdag
 
 BREDDE = 720
 HOYDE = 260
@@ -29,6 +30,17 @@ class Rutelinje:
     verdi: float
 
 
+# Story 8.0c: fullt norsk maanedsnavn, smaa bokstaver (designregler §4).
+MAANEDER = ("januar", "februar", "mars", "april", "mai", "juni", "juli",
+            "august", "september", "oktober", "november", "desember")
+
+
+@dataclass(frozen=True)
+class Maanedsmerke:
+    x: float
+    navn: str
+
+
 @dataclass(frozen=True)
 class Graf:
     bredde: int
@@ -40,6 +52,7 @@ class Graf:
     forste_dato: date
     siste_dato: date
     rutenett: tuple[Rutelinje, ...]
+    maanedsmerker: tuple[Maanedsmerke, ...] = ()
 
     @property
     def har_ma50(self) -> bool:
@@ -86,6 +99,42 @@ def _koordinater(punkter, hent, lav, hoy, bredde, hoyde) -> str:
     return " ".join(deler) if len(deler) >= 2 else ""
 
 
+def _foerste_boersdag(aar: int, maaned: int) -> date | None:
+    """Foerste boersdag i maaneden etter er_boersdag, eller None naar
+    kalenderen ikke dekker aaret (boersdag.DEKKEDE_AAR)."""
+    dag = date(aar, maaned, 1)
+    try:
+        while not er_boersdag(dag):
+            dag = date.fromordinal(dag.toordinal() + 1)
+    except UtenforKalenderen:
+        return None
+    return dag
+
+
+def _maanedsmerker(punkter: tuple[Punkt, ...], bredde: int) -> tuple[Maanedsmerke, ...]:
+    """Et merke ved foerste boersdag i hver maaned som finnes i serien - story
+    8.0c. x er samme x som punktet for dagen, altsaa etter indeks og ikke
+    etter kalenderen, fordi linja har lik avstand per boersdag. Mangler dagen
+    i serien, faar maaneden ikke merke."""
+    if len(punkter) < 2:
+        return ()
+    tegne_bredde = bredde - 2 * MARG_X
+    indeks = {p.dato: i for i, p in enumerate(punkter)}
+    merker = []
+    sett = set()
+    for p in punkter:
+        maaned = (p.dato.year, p.dato.month)
+        if maaned in sett:
+            continue
+        sett.add(maaned)
+        foerste = _foerste_boersdag(*maaned)
+        if foerste is None or foerste not in indeks:
+            continue
+        x = MARG_X + tegne_bredde * indeks[foerste] / (len(punkter) - 1)
+        merker.append(Maanedsmerke(x=x, navn=MAANEDER[foerste.month - 1]))
+    return tuple(merker)
+
+
 def _rutenett(lav: float, hoy: float, hoyde: int, linjer: int = 3) -> tuple[Rutelinje, ...]:
     tegne_hoyde = hoyde - 2 * MARG_Y
     ut = []
@@ -118,5 +167,6 @@ def bygg_graf(
         hoy=hoy,
         forste_dato=punkter[0].dato,
         siste_dato=punkter[-1].dato,
+        maanedsmerker=_maanedsmerker(punkter, bredde),
         rutenett=_rutenett(lav, hoy, hoyde),
     )

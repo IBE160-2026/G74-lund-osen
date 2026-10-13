@@ -61,7 +61,7 @@ from markedsoversikt import (
 from migrering import MigrasjonsFeil
 from oversiktsdata import Oversiktsleser
 from signalberegning import BLANDET, STANDARD
-from tallformat import tall
+from tallformat import dato, tall
 
 # Kommandoen den tomme siden ber brukeren kjoere. Den staar ogsaa i README, og
 # en test krever at de to er like (story 3.3). Kommer kommandoen for Docker i
@@ -113,7 +113,10 @@ def demokommando() -> str:
 BASEFEIL = (sqlite3.Error, OSError, MigrasjonsFeil, RuntimeError)
 
 app = Flask(__name__)
-app.jinja_env.filters["norsk_tid"] = norsk_tid
+# Story 8.0c: datoene og tidspunktene med aar bare naar aaret er et annet
+# enn i dag. I dag kommer fra idag(), saa testene styrer det.
+app.jinja_env.filters["norsk_tid"] = lambda tid: norsk_tid(tid, idag().year)
+app.jinja_env.filters["dato"] = lambda dag: dato(dag, idag().year)
 # Regel 21: tallene formateres ett sted, ikke med "%.2f" i malene (story 8.0).
 app.jinja_env.filters["tall"] = tall
 

@@ -321,7 +321,7 @@ class TestSidene:
         assert "Eksempeltall" in oversikt and "Eksempeltall" in detalj
         # Story 8.0c (4a): linja over tabellen sier «Eksempeltall», ikke
         # «Oslo Børs», og merket har «Demoversjon.» foran.
-        assert "Eksempeltall · 2026-10-09 · 14 aksjer" in oversikt
+        assert "Eksempeltall · 09.10 · 14 aksjer" in oversikt
         assert "Oslo Børs · " not in oversikt
         assert f"Demoversjon. {app_modul.EKSEMPELTALL_MERKE}" in oversikt
         assert f"Demoversjon. {app_modul.EKSEMPELTALL_MERKE}" in detalj
@@ -542,3 +542,15 @@ class TestStory80cIDemoen:
         assert "Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer." in html
         treff = re.search(r"(\d+) av (\d+) aksjer ble vurdert\.", html)
         assert treff and int(treff.group(1)) < int(treff.group(2)), treff
+
+    def test_ingen_synlig_iso_dato_i_demoen(self, klient, monkeypatch, demobase):
+        """Beslutning 12 med demobasen (FR-411)."""
+        import re
+
+        from test_hjelpetekster import synlig_tekst
+
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        for sti in ("/", "/aksje/BRFE", "/aksje/VRDS"):
+            tekst = synlig_tekst(klient.get(sti).data.decode("utf-8"))
+            assert not re.search(r"\b\d{4}-\d{2}-\d{2}\b", tekst), sti
+        assert re.search(r'<text class="maanedstekst"', klient.get("/aksje/BRFE").data.decode("utf-8"))

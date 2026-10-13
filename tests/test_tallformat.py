@@ -122,3 +122,21 @@ def test_tallformat_er_en_loevnode():
     assert not [
         node for node in ast.walk(tre) if isinstance(node, (ast.Import, ast.ImportFrom))
     ]
+
+
+class TestDato:
+    """Story 8.0c, beslutning 12: «22.09», og aaret bare naar det er et annet."""
+
+    def test_samme_aar_uten_aar(self):
+        from datetime import date
+
+        from tallformat import dato
+        assert dato(date(2026, 9, 22), 2026) == "22.09"
+        assert dato(date(2026, 1, 5), 2026) == "05.01"
+
+    def test_annet_aar_med_aar(self):
+        from datetime import date
+
+        from tallformat import dato
+        assert dato(date(2025, 9, 29), 2026) == "29.09.2025"
+        assert dato(date(2027, 1, 4), 2026) == "04.01.2027"

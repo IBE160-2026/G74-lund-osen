@@ -329,18 +329,18 @@ class TestNorskTid:
 
     def test_formatet(self):
         tid = datetime(2026, 9, 24, 18, 5, tzinfo=timezone.utc)
-        assert norsk_tid(tid) == "2026-09-24 kl. 20.05"
+        assert norsk_tid(tid) == "24.09 kl. 20.05"
 
     def test_sommertid_over_midnatt(self):
         """22.30 UTC er 00.30 neste dag i Oslo om sommeren. Datoen skifter."""
         tid = datetime(2026, 9, 24, 22, 30, tzinfo=timezone.utc)
-        assert norsk_tid(tid) == "2026-09-25 kl. 00.30"
+        assert norsk_tid(tid) == "25.09 kl. 00.30"
 
     def test_vintertid(self):
         """Etter 25.10 er Oslo en time foran UTC, ikke to. En fast +2 timer
-        ville gitt 2026-11-17 kl. 00.30 her."""
+        ville gitt 17.11 kl. 00.30 her."""
         tid = datetime(2026, 11, 16, 22, 30, tzinfo=timezone.utc)
-        assert norsk_tid(tid) == "2026-11-16 kl. 23.30"
+        assert norsk_tid(tid) == "16.11 kl. 23.30"
 
 
 class TestSidensDato:
@@ -447,3 +447,10 @@ class TestTilstandene:
 
         assert not hasattr(markedsoversikt, "beregn_signal")
         assert not hasattr(markedsoversikt, "vurder")
+
+
+def test_norsk_tid_med_aar_naar_aaret_er_et_annet():
+    """Story 8.0c: aaret i norsk tid vises naar det er et annet enn i_aar."""
+    tid = datetime(2025, 9, 24, 18, 5, tzinfo=timezone.utc)
+    assert norsk_tid(tid, 2026) == "24.09.2025 kl. 20.05"
+    assert norsk_tid(tid, 2025) == "24.09 kl. 20.05"

@@ -78,7 +78,7 @@
 
   {% if rader %}
     <p class="meta">
-      {% if eksempeltall %}Eksempeltall{% else %}Oslo Børs{% endif %} · {{ dato }} · {{ rader|length }} aksjer
+      {% if eksempeltall %}Eksempeltall{% else %}Oslo Børs{% endif %} · {{ dato|dato }} · {{ rader|length }} aksjer
       {% if hentet %}· data hentet {{ hentet|norsk_tid }} {{ hjelpeknapp("hjelp-hentet", "Hjelp: data hentet") }}{% endif %}
     </p>
 

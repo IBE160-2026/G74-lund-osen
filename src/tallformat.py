@@ -73,6 +73,20 @@ def tall(
     return tekst
 
 
+def dato(dag, i_aar: int) -> str:
+    """En dato slik sidene viser den - story 8.0c, ordlista i designregler §4.
+
+    «22.09», uten punktum til slutt, og med aar bare naar aaret er et annet
+    enn i_aar: «29.09.2025». i_aar er aaret i dag, fra app.idag(), saa
+    testene styrer det. Funksjonen importerer ikke datetime: dag er en
+    datetime.date eller noe med day, month og year.
+    """
+    tekst = f"{dag.day:02d}.{dag.month:02d}"
+    if dag.year != i_aar:
+        tekst += f".{dag.year}"
+    return tekst
+
+
 def desimaler_mot_grense(maaling: float, grense: float, minst: int = 1) -> int:
     """Faerrest desimaler, minst minst, som skiller maalingen fra grensen.
 
