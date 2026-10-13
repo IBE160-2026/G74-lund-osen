@@ -165,6 +165,8 @@ Gjennomgang av PR #35 (diffen `main...8-0c` på `c6db3e5`), med Blind Hunter (BH
 | VG7 | Fotnoten på aksjesiden følger tavlas tekst for styrken, ikke resten av 4.4 | avvist | teksten sto i planen kl. 13:35 (4b) og ble godkjent |
 | VG9, VG12, VG13 | Små merknader: ordet bygget av konstanten, `data_hentet_aksje` uten `hentet`, perioden for vinduene | avvist | merknader uten feil |
 
+*Lagt til 2026-10-13:* triagen for PR #36 (PR 2, datoene og månedsmerkene i grafen) står under «Implementation Notes», etter linja om PR 2.
+
 ## Verification
 
 **Commands:**
