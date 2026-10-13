@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-12T22:58
+updated: 2026-10-13T11:11
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -2694,6 +2694,8 @@ på 20 med `apiRequestsDate` 2026-10-09, altså 0 brukt i dag i GMT, og
 `extraLimit` uendret på 463. Etter målingen er `apiRequests` 20 og `extraLimit`
 fortsatt 463. Ingen kall feilet. SHLF (Shelf Drilling) ga ingen rader og er
 ført som tom. Den er ikke prøvd igjen, og ingen annen ticker er prøvd (AD-15).
+
+*Lagt til 2026-10-13:* grunnen står i refleksjonsloggen 10.10: Shelf Drilling ble slått sammen med et annet selskap i 2025 og handles ikke lenger i Oslo, og lista fra 02.10 var ikke oppdatert. Rådet skulle føre det i §28 (10.10), men det kom ikke med.
 
 **Rådata.** `data/raa/maaling-raa-2026-10-10.json`. Fila finnes **bare
 lokalt** og er ikke sporet i git. Bare tallene under er regnet ut og ført her.
