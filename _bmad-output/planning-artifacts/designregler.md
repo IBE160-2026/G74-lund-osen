@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-10-13T11:06
+updated: 2026-10-13T13:18
 ---
 
 # Designregler
@@ -56,16 +56,23 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 
 *Ført 2026-10-13 ordrett fra designtavla i Claude, versjon 1791623938-3408, med «-» for «•». Ordlista er ikke kontrollert mot koden og PRD-en etter 02.10. Det gjør den samlede endringen (samlelista punkt 8 og 10) før noe herfra brukes i appen.*
 
+*Lagt til 2026-10-13:* kontrollert i endringsforslaget 13.10, punkt 4.3, og rettet under punktene. Punkt 21 venter til etter prøven i kveld (svar 6 og N1).
+
 - Signalstyrke 0–3: hvor mange av de 3 sjekkene som slo ut.
 - Sjekkene: trend (T), bevegelse (B) og interesse (I). Hver gir +1, 0 eller -1, skrevet «T +1» overalt, som kolonnen «Ga» i appen.
+  *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* sjekkene skrives «T +1» i oversikten. På aksjesiden står navnet på sjekken og ordet, som i 8.0c (svar 8).
 - Retning: Positiv, Negativ, Blandet eller Ingen, med pil (FR-103). Pilene brukes ikke til noe annet.
 - Skilte seg ut: signalstyrke 2 eller mer. Signalstyrken skrives «3 av 3», og 3 av 3 er fylt med gul ring.
+  *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* 3 av 3 merkes med gul ring rundt, som i §3.
 - Tall med sifre, også små: «3 av 3 sjekker», ikke «alle tre».
 - Endring: fra forrige børsdag, utbyttejustert, med fortegn. Kolonnehodet sier «i går», som den første knappen i periodevalget.
+  *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* endringen gjelder siste børsdag. Kolonnehodet følger den første knappen i periodevalget, som heter «I går», «I dag» eller ukedagen (§2).
 - Retning forklares med tall: «1 sjekk ga +1, 2 ga -1», ikke «peker hver sin vei». På aksjesiden står sjekkene med navn: «Trend ga +1. Bevegelse og interesse ga -1.»
 - Beløp skrives i NOK, ikke «kroner» eller «kr» (Marian 01.10). Øverst på hver side, i den svarte stripa, står når dataene ble oppdatert og når neste oppdatering tidligst kan komme, med klokke.
 - Egen aksje: blått merke «Egen» og blå strek. Den står i tabellen sammen med de andre og sorteres likt. Under tabellen står bare valget: hentet eller venter, og Fjern. Stjerne betyr Min liste. Gul ring, gul ramme og gult symbol betyr 3 av 3 i går, også når en periode er valgt. I børsometeret har ruta gul ramme med hvit kant og merket «3 av 3».
+  *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* egne aksjer står i en egen del, «Dine egne aksjer» (svar 11). Gul ring, gul ramme og gult symbol betyr 3 av 3 på siste børsdag (§3).
 - Utenfor målingen: en egen aksje som omsettes for under 32 MNOK om dagen. Grensene i signalet er målt på aksjer som omsettes for over 32 MNOK, og så mye handel gjør dem lette å kjøpe og selge (begrunnelser.md §2). Teksten sier ikke «de 15» (Marian 02.10 kl. 21.56). Ikke «krav» og ikke «omsatt for lite». Grått merke, fordi gult betyr 3 av 3.
+  *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* «en egen aksje» blir «en aksje», fordi hele lista kan byttes (08.10). Resten står.
 - Børsen, bransjen eller selskapet: hvor dagens bevegelse ser ut til å komme fra, ikke hvorfor. Børsen er hovedindeksen, og tallet står med «for hovedindeksen». Regnes alltid av lista som er aktiv, også egne aksjer som er hentet. Svarene er «Børsen», «Bransjen», «Selskapet», «Selskapet eller bransjen» og «Liten bevegelse».
 - Bransjer: 13, hver med navn og symbol (tavla «Bransjer»). De 11 hos Euronext (ICB), med sjømat og shipping for seg, som Euronexts indekser OBSFX og OBSHX. Nye: Forbruk, Teknologi, Helse, Eiendom og Kraft.
 - Sortering: vinkler i den svarte kolonneraden. Pilene er bare for retning.
@@ -75,12 +82,16 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 - Merker ved et navn («Egen», «Utenfor målingen») har samme størrelse.
 - Uten farger: retning, endring og sjekkene står alltid også som tekst, fortegn eller pil, og linjer og søyler kan leses av plassen over eller under null-linja.
 - Periodevalg, likt overalt: «I går», 1 uke, 1 mnd, 3 mnd, 6 mnd, I år, 1 år og «Velg dag». Var siste børsdag ikke i går, står ukedagen, for eksempel «Fredag» på en mandag. Grafen åpner med 6 mnd (FR-201).
+  *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* den første knappen heter «I går», «I dag» eller ukedagen, som i §2.
 - Sammenligning: hver rad får en linje til for dagen du sammenligner med: sluttkursen, endringen siden da, og T, B og I den dagen, med T rett under T. Retningen står bare for i går. Kolonnehodet sier «i går», og datoen står i gult under.
+  *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* retningen står bare for siste børsdag. Kolonnehodet følger den første knappen i periodevalget (§2), og datoen står under, uten gult (§3).
 - U ved kursen: aksjen har betalt utbytte i perioden. Endringen er justert for utbytte, sluttkursen er ikke det, så de to stemmer ikke helt med hverandre (FR-101, FR-407).
 - Ikke vurdert: en dag uten lagret vurdering. Signalet regnes aldri ut på nytt av kursene i ettertid (designregler §2, story 2.7).
+  *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* «Ikke vurdert: en børsdag uten lagret vurdering. Har raden en grunn, står grunnen, og en dag som ikke er børsdag, står som «ikke børsdag» (§2, FR-409). Signalet regnes aldri ut på nytt i ettertid (FR-101, story 2.7).»
 - KI-tekst: tekst fra språkmodellen, alltid merket «Laget av KI». Modellnavnet står i en liten linje under teksten (FR-602).
 - Hjelp: faste tekster vi har skrevet og sjekket.
 - Gul strek: det viktigste på siden. I KI-teksten har tall som er sjekket mot grunnlaget, prikket strek og farge etter retning.
+  *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* det viktigste på siden merkes med fet skrift. I KI-teksten har tall som er sjekket mot grunnlaget, prikket strek i tekstfargen (svar 7). Gult betyr bare 3 av 3 (§3).
 - Antall: telles alltid og står aldri fast som 15, så tallene følger lista når egne aksjer kommer med.
 - Hvor mange aksjer: én grense for hele lista, «opptil 18 aksjer», vist som «16 av 18 aksjer». Ikke «opptil 3 i tillegg».
 - Hjelp bak «?»: forklaringer som ellers ville stått som løs tekst, samme utseende som «Vis meg rundt».
@@ -89,3 +100,25 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 - Skrift (valgt 01.10): IBM Plex Sans til all tekst og alle tall, med tabelltall. Newsreader bare til overskrifter og titler, også når det står et tall i dem.
 
 Ord kan endres rett i tavla. I appen samles hjelpetekstene i én fil (8.0b).
+
+*Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* Ord endres her, med dato og grunn, og så i tavla.
+
+### Bransjene
+
+*Lagt til 2026-10-13, fra tavla «Bransjer», versjon 1791623938-3408, uten eksempelet BAKKA (en egen aksje). Tavla kaller de 5 nye «idé til v1.1», men Marian tok alle 13 inn nå (kl. 11:50). Brukeren ser «bransje», og koden sier `sektor` (svar 24).*
+
+| Bransje | Hva som hører til | Hos Euronext (ICB) | I lista i dag |
+|---|---|---|---|
+| Energi | Olje og gass, oljeservice og utstyr til fornybar energi | Energy | EQNR, VAR, AKRBP, DNO |
+| Finans | Banker, forsikring og andre finansselskaper | Financials | DNB, GJF |
+| Industri | Forsvar, maskiner, bygg, elektronikk og transport utenom skip | Industrials, utenom shipping | KOG |
+| Materialer | Metaller, gruver, kjemikalier, gjødsel og skog | Basic Materials | NHY, YAR |
+| Shipping | Rederier og skipsfart | Marine Transportation, som indeksen OBSHX | FRO, MPCC |
+| Telekom | Mobil, bredbånd og utstyr til nett | Telecommunications | TEL |
+| Sjømat | Oppdrett og fiske | Farming, Fishing, Ranching and Plantations, som indeksen OBSFX | MOWI, SALM |
+| Konsum | Mat, drikke, dagligvarer og pleieprodukter, utenom sjømat | Consumer Staples, utenom sjømat | ORK |
+| Forbruk | Butikker, media, reiser, fritid og biler | Consumer Discretionary | Ny |
+| Teknologi | Programvare, IT-tjenester og maskinvare | Technology | Ny |
+| Helse | Legemidler, bioteknologi, medisinsk utstyr og helsetjenester | Health Care | Ny |
+| Eiendom | Selskaper som eier, leier ut eller utvikler eiendom | Real Estate | Ny |
+| Kraft | Strøm og fornybar kraft, vann og avfall | Utilities | Ny |
