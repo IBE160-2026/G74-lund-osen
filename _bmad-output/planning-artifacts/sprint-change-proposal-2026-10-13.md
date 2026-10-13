@@ -2,7 +2,7 @@
 title: "Endringsforslag 13.10: samlelista, tekstene og rekkefølgen"
 status: draft
 created: 2026-10-13
-updated: 2026-10-13T12:29
+updated: 2026-10-13T12:47
 ---
 
 # Endringsforslag 13.10: samlelista, tekstene og rekkefølgen
@@ -18,6 +18,8 @@ kommer med i punkt 5. Ingenting i `prd.md`, `epics.md`, `designregler.md`,
 har lest forslaget og Marian har sagt ja (regel 2 og 9).
 
 *Rettet 2026-10-13, Marians beslutning kl. 11:34:* forslaget godkjennes uten å vente på README-prøven, så 8.0c kan planlegges denne uka. Bare rekkefølgen (spørsmål 14 og 15) venter til etter prøven, «når farten er kjent». Funn fra prøven blir små rettelser. Det over om at forslaget godkjennes først etter prøven, gjelder ikke lenger. Status står som `draft` til svarene og de nye punktene i 4.9 er ført inn i `prd.md` og `epics.md`.
+
+**Godkjent av Marian 13.10 kl. 12:46**, med instruksjonen kl. 12:46 i `docs/ai-prompts/2026-10-13.md`, etter beslutningen kl. 11:34 og svarene kl. 12:28. N1 og N2 føres inn i `prd.md` og `epics.md` etter prøven i kveld, og rekkefølgen etter README-prøven. Status blir `final` når N1 og N2 er ført.
 
 Grunnlaget er [`samleliste-endringsforslag.md`](../implementation-artifacts/samleliste-endringsforslag.md),
 punkt 1–13 med de daterte linjene og utdraget fra designforslaget nederst, og
@@ -852,19 +854,25 @@ hvilken story eller hvilket punkt over de hører til.
     *Svar 13.10:* som forslaget.
 19. **FR-414 og 2.14.** Trengs eks.datoer ført for hånd når utbyttet kommer fra
     EODHD (N1, punkt 4.9)? Avgjøres etter prøven i kveld.
+    *Svar 13.10:* Marian sa ja kl. 12:28 til rådets anbefaling: avgjøres når prøven i kveld er gjort.
 20. **Valutakursen.** Hvilken kilde gir kursen og datoen når et utbytte i en annen
     valuta vises i NOK (N1)?
+    *Svar 13.10:* Marian sa ja kl. 12:28 til rådets anbefaling: EODHDs egen valutakurs, som EOD-data (USDNOK.FOREX gjennom /api/eod), 1 kall per valuta. Kursen og datoen står ved beløpet. Avhenger av prøven i kveld.
 21. **Kallene som er igjen.** Nye forsøk, så utbytte, så måling, som rådet
     foreslår? En runde med utbytte koster 15 kall og det er 5 igjen etter en
     henting: deles den over tre kvelder, eller tas den på en dag uten henting (N1)?
+    *Svar 13.10:* Marian sa ja kl. 12:28 til rådets anbefaling: på dager med henting: nye forsøk (2.3b), så måling (FR-413). Utbytte og valutakurs tas på en dag uten henting, og måling med resten. Aldri bonuskvoten. Kontrollpunktet om kallene i 2.15 rettes etter dette når N1 føres inn.
 22. **Gratisnivået for `/api/div`.** Det står ikke i repoet, og `/api/calendar`
     svarte 403 på gratisnivået. Skal det prøves med ett kall, etter avtale
     (regel 6), før 2.15 planlegges (N1)?
+    *Svar 13.10:* Marian sa ja kl. 12:28 til rådets anbefaling: ja. Etter hentingen i kveld, i en egen instruksjon: 3 kall, /api/div for EQNR.OL og FRO.OL, og USDNOK.FOREX gjennom /api/eod. Bare hvis alle 15 har fått dagens kurs og ingen nye forsøk trengs, så 2 kall står igjen. Rådata bare lokalt (regel 10 og 16).
 23. **Beslutningen 04.10.** Grunnlaget i 10.1 har bare fortegn, styrke og
     retning, uten desimaltall. Skal det få mer, og i så fall hva, så KI-teksten
     kan forklare med tall (N2)?
+    *Svar 13.10:* Marian sa ja kl. 12:28 til rådets anbefaling: beslutningen 04.10 står: ingen beløp, prosenter eller desimaltall i grunnlaget. Når 2.15 og 2.8 finnes, kan 10.1 få antall og retninger, som grunnlaget i FR-607: hvor mange utbytter aksjen har hatt det siste året, og om den gikk bedre eller dårligere enn hovedindeksen. Beløpet og utbytteavkastningen vises av appen på aksjesiden, ikke i KI-teksten.
 24. **Sektor eller bransje.** Koden og PRD-en sier «sektor», ordlista og tavla
     «bransje». Hvilket ord gjelder (N3)?
+    *Svar 13.10:* Marian sa ja kl. 12:28 til rådets anbefaling: «bransje» i alt brukeren ser, og «sektor» i koden, med feltet `sektor` som i dag.
 
 ## 8. Overlevering
 
