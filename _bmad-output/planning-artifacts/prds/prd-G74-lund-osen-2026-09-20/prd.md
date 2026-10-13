@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-13T12:47
+updated: 2026-10-13T14:06
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1038,6 +1038,8 @@ Demobasen har i tillegg minst én aksje som er tatt ut av lista, én merket
 «Utenfor målingen», noen målte omsetninger, oppdiktede eks.datoer og vurderinger
 nok til at signaldagene, merket for endret signalstyrke og «Velg dag» har noe å
 vise. Lista i demoen kan byttes, men det hentes aldri (story 3.4).
+
+*Lagt til 2026-10-13, Marians ja kl. 13:44, etter faglærers tilbakemelding 06.10 (`tilbakemelding-product-brief.md`):* alt brukeren ser i v1, vises også i demoen, også KI-laget av og på (story 3.4b). Faglærer skrev: «sørg for at alle funksjoner i v1, også KI-laget i av-modus, kan vises der.»
 
 #### FR-412 — Lista over aksjer
 
