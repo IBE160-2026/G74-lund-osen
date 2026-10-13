@@ -2,7 +2,7 @@
 title: 'Story 8.0e: Oversikten fra designforslaget'
 type: 'feature'
 created: '2026-10-13'
-status: 'in-progress'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '4c4b420f3ef2bd6ef07d1ae24d301632d721544c'
@@ -76,11 +76,11 @@ Planen ble vist i chatten 13.10 og er ført kort i `docs/ai-prompts/2026-10-13.m
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `src/tallformat.py`, `src/aksjedetalj.py` -- `fortegn()` og bruk den i `SjekkVisning` -- én form for fortegnet
-- [ ] `src/markedsoversikt.py` -- `Rad.sjekker` (T, B, I fra vurderingen, tom uten vurdering) og `del_i_to(rader)` (skiller seg ut / øvrige, rekkefølgen beholdt) -- logikken uten HTML
-- [ ] `src/app.py`, `src/templates/index.html` -- to `tbody` med en overskriftsrad hver, setningene fra 8.0c i første del når ingen skilte seg ut, T, B og I under pillen, svart fyll på «3 av 3» -- tabellen
-- [ ] `tests/test_app.py`, `tests/test_markedsoversikt.py`, `tests/test_tallformat.py`, `tests/test_demo.py` -- testene for matrisen og mutantene
-- [ ] `designregler.md` §3 -- datert linje
+- [x] `src/tallformat.py`, `src/aksjedetalj.py` -- `fortegn()` og bruk den i `SjekkVisning` -- én form for fortegnet
+- [x] `src/markedsoversikt.py` -- `Rad.sjekker` (T, B, I fra vurderingen, tom uten vurdering) og `del_i_to(rader)` (skiller seg ut / øvrige, rekkefølgen beholdt) -- logikken uten HTML
+- [x] `src/app.py`, `src/templates/index.html` -- to `tbody` med en overskriftsrad hver, setningene fra 8.0c i første del når ingen skilte seg ut, T, B og I under pillen, svart fyll på «3 av 3» -- tabellen
+- [x] `tests/test_app.py`, `tests/test_markedsoversikt.py`, `tests/test_tallformat.py`, `tests/test_demo.py` -- testene for matrisen og mutantene
+- [x] `designregler.md` §3 -- datert linje
 
 **Acceptance Criteria:**
 - Given en rad med vurdering, when oversikten vises, then cellen har «N av 3» og under den «T +1», «B 0» og «I -1» fra vurderingen.
@@ -89,9 +89,34 @@ Planen ble vist i chatten 13.10 og er ført kort i `docs/ai-prompts/2026-10-13.m
 
 ## Implementation Notes
 
+- *PR 1, 13.10:* `e5060f3` tabellen og testene, `4ad1013` den daterte linja i `designregler.md` §3, `877cd01` rettingene fra gjennomgangen. Bygget direkte i økta, ikke av en egen agent.
+- `fortegn()` i `tallformat.py` gir formen for både T, B og I og Ga på aksjesiden (regel 21). `Rad.sjekker` leser `trend`, `bevegelse` og `interesse` fra `Rad.vurdering` og er tom uten vurdering. `del_i_to` deler etter `skiller_seg_ut` og beholder rekkefølgen fra `bygg_oversikt`.
+- Radene står i makroen `tabellrad` i `index.html`, så de to delene bruker samme rad. Setningene fra 8.0c er flyttet fra over tabellen til en rad `<tr class="del">` i første `tbody`.
+- `_Tabell` i `test_app.py` legger overskriftsradene i `deler` og ikke i `rader`, og `del_av` sier hvilken del hver rad står under. Fire tester som sammenlignet hele cellen med styrken, krever nå også T, B og I.
+- Demobasen har både «Skilte seg ut» og «Øvrige aksjer», og minst én rad med 3 av 3.
+- Epic 8-konteksten er ikke laget på nytt: den eneste endringen i planleggingsmappa etter den, er linja om at 8.0c er ferdig (`3ad2922`).
+
 ## Spec Change Log
 
 ## Review Triage Log
+
+Gjennomgang av PR 1 (diffen `4c4b420...4ad1013`, 13.10), med Blind Hunter (BH, 12 funn), Edge Case Hunter (ECH, 1) og Verification Gap (VG, 1) som tre uavhengige agenter. Rettingene står i `877cd01`.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| VG1 | Navnene i `<abbr title>` ved T, B og I er ikke prøvd i siden | low | patch: test på de tre `<abbr>` |
+| BH1 | Kontrasttesten leser ikke tekstfargen | medium | patch: fargen leses fra regelen |
+| BH2 | Den gule ringen står nå mot svart, og ingen test prøver det | low | patch: ringen mot fyllet minst 3:1 |
+| BH4 | Navnet står to ganger i `SJEKKBOKSTAVER` | low | patch: feltnavnet er navnet |
+| BH5, ECH1 | Demotesten krever ikke pillen med fyll i HTML-en | medium | patch |
+| BH11 | Setningen fra 05.10 alene er ikke prøvd i tabellen | low | patch |
+| BH12 | Importen i `aksjedetalj.py` står ikke i rekkefølge | low | patch |
+| BH3 | T, B og I forklares ikke på siden før PR 2 | avvist | svar 6 legger teksten over tabellen i PR 2, og `<abbr>` har navnet til da |
+| BH6 | Malen stoler på at `del_i_to` og `ingen_skilte_seg_ut` er enige | false | begge leser `skiller_seg_ut`: er `skilte_seg_ut` ikke tom, gir `ingen_skilte_seg_ut` False |
+| BH7 | Spesifikasjonen mangler notater, testtall og avkryssing | avvist | rettingen er å skrive i spesifikasjonen, som gjøres her |
+| BH8 | Fyllet har ingen mørk modus | avvist | sidene har ingen mørk modus i dag, og utseendet hører til 8.0d |
+| BH9 | Demotesten importerer hjelpere fra `test_app` | low, avvist | samme mønster som importen fra `test_hjelpetekster` i 8.0c |
+| BH10 | CSS-testene ser etter eksakt tekst | low, avvist | samme form som testene for ringen og streken i 8.0c |
 
 ## Design Notes
 
@@ -110,4 +135,17 @@ Overskriften for hver del er en rad `<tr class="del"><th colspan="5" scope="rowg
 **Commands:**
 - `uv run pytest -q` -- expected: grønn. Før: 1461 bestått og 16 hoppet over på main (`3ad2922`, 13.10 kl. 22:32).
 
-**Mutantene** kjøres én om gangen mot hele testsettet med `-x`, og fila settes tilbake og kontrolleres med sha256: T, B og I regnet av kursene; en sjette kolonne; T, B og I på en rad uten vurdering; `>=` blir `>` i delingen; terskelen skrevet fast; «Skilte seg ut» sammen med setningen fra 8.0c; sorteringen snudd i én del; «3 av 3» uten svart fyll.
+**Etter:** 1478 bestått og 16 hoppet over på `877cd01` (1477 og 16 før rettingene).
+
+**Mutantene** (13.10, på `4ad1013`) ble kjørt én om gangen mot hele testsettet med `-x`, og fila settes tilbake og kontrolleres med sha256: T, B og I regnet av kursene; en sjette kolonne; T, B og I på en rad uten vurdering; `>=` blir `>` i delingen; terskelen skrevet fast; «Skilte seg ut» sammen med setningen fra 8.0c; sorteringen snudd i én del; «3 av 3» uten svart fyll. Alle 8 ble fanget:
+
+| # | Mutant | Fanget av |
+|---|---|---|
+| M1 | T, B og I regnet av kursene (B fra endringen) | `tests/test_app.py::TestStory80e::test_t_b_og_i_staar_under_n_av_3_fra_vurderingen` |
+| M2 | en sjette kolonne | `tests/test_app.py::TestTidsstempler::test_fortsatt_fem_kolonner` |
+| M3 | T, B og I på en rad uten vurdering | `tests/test_app.py::TestVurderingenPaaOversikten::test_ikke_vurdert_med_fotnoten` |
+| M4 | `>=` blir `>` i delingen | `tests/test_app.py::TestStory80::test_aksjen_som_skiller_seg_ut_er_merket_med_tekst` |
+| M5 | terskelen skrevet fast | `tests/test_app.py::TestStory80c::test_terskelen_i_setningen_kommer_fra_parametre` |
+| M6 | «Skilte seg ut» sammen med setningen fra 8.0c | `tests/test_app.py::TestStory80e::test_setningene_fra_8_0c_der_skilte_seg_ut_ellers_staar` |
+| M7 | sorteringen snudd i én del | `tests/test_app.py::TestStory80e::test_to_deler_hver_sortert_etter_fr_102` |
+| M8 | «3 av 3» uten svart fyll | `tests/test_app.py::TestStory80e::test_tre_av_tre_har_svart_fyll_og_hvit_tekst` |
