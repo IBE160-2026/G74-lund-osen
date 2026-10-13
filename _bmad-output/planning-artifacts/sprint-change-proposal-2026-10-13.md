@@ -2,7 +2,7 @@
 title: "Endringsforslag 13.10: samlelista, tekstene og rekkefølgen"
 status: draft
 created: 2026-10-13
-updated: 2026-10-13T12:22
+updated: 2026-10-13T12:29
 ---
 
 # Endringsforslag 13.10: samlelista, tekstene og rekkefølgen
@@ -708,6 +708,8 @@ det ingen kall igjen om kvelden (`prd.md:1092–1093`). Spørsmål 21.
 kommer fra EODHD, avgjøres etter prøven i kveld (spørsmål 19). `/api/div` gir
 utbytte som er betalt. Om det også gir kommende eks.datoer, står ikke i repoet.
 
+Historikken (Marian 13.10 kl. 12:19): gratisnivået gir utbyttet ett år bakover. Kursgrafen (8.14) viser utbyttet med beløp der EODHD har det, ellers «justeringsdag», og aksjesiden viser hva aksjen har betalt det siste året. Om utbytte eldre enn ett år tas vare på når det faller ut av vinduet, så historikken blir lengre etter hvert, avgjøres i planen for 2.15, fordi kursserien byttes ut ved hver henting (AD-5). Signalhistorikken står i 2.7, og når den kommer, avgjøres med rekkefølgen.
+
 #### N2 — KI-teksten forklarer med tall hva som har skjedd
 
 **Hva Marian vil.** KI-teksten forklarer med tall hva som har skjedd: signalet,
@@ -803,6 +805,11 @@ hvilken story eller hvilket punkt over de hører til.
    ordrett, innledningen under overskriften, og det tredje punktet i «Slik leser
    du tabellen» (punkt 4.2 og 4.6)?
    *Svar 13.10:* rådet gir tekstene i neste instruksjon.
+   Tekstene fra tavla (rådet 13.10), med rettet ordlyd der den trengs:
+   - Innledningen under overskriften (Main): «OSE Signal er et regelbasert signal for aksjer på Oslo Børs: 3 faste sjekker måler sluttkurs og volum mot aksjens egen historikk. Hos disse 4 slo minst 2 av 3 ut. Det viser hvor du kan se nærmere, ikke hva du bør kjøpe eller selge.» Rettet: «måler kurs og volum», og tallet telles fra radene. Under står «3 av 3» og «Bare Equinor fikk utslag på alle 3 sjekkene.», med navnene fra radene.
+   - Første punkt i «Slik leser du tabellen» (Main), «Signalstyrke 0–3»: «T, B og I er trend, bevegelse og interesse, og hver gir +1, 0 eller -1. Til høyre står hvor mange som slo ut, fra 0 av 3 til 3 av 3. Klikk på T, B eller I i en rad for å se hva sjekken målte.» Kan tas når T, B og I står i radene (8.0e). Siste setning venter til klikket finnes.
+   - Trend (Main): «Sluttkursen mot snittet av de 50 siste børsdagene. Slår ut når avstanden er mer enn 2 %.» blir «Kursen, justert for utbytte, mot snittet av de 50 siste børsdagene. Slår ut når avstanden er mer enn 2 %.» Fire setninger begynner med «Sluttkursen lå»: «… mer enn 2 % over snittet av 50 børsdager.», «… mer enn 2 % under snittet av 50 børsdager.», «… innenfor ±2 % av snittet av 50 børsdager.» og «… X % over snittet av 50 børsdager (grense 2 %).». De begynner i stedet med «Kursen lå».
+   - Trend (Aksje): «Tirsdagens sluttkurs mot snittet av 50 børsdager» blir «Tirsdagens kurs, justert for utbytte, mot snittet av 50 børsdager».
 5. **«Hva du kan sjekke selv» og det grå feltet.** Hvilken story hører de til?
    Ingen av dem står i `epics.md` (punkt 4.2).
    *Svar 13.10:* «hva du kan sjekke selv» er 8.4, og det grå feltet tas i 8.0d.
