@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-12T22:16
+updated: 2026-10-13T13:58
 ---
 
 # Kvalitetssikring
@@ -551,8 +551,44 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
 
 - **Prøvd på Mac:** ikke prøvd (svar 3 11.10). Står slik til noen har prøvd stegene på en Mac.
 - **Den ekte versjonen med nøkkel:** prøves ikke her. Prøven gjøres uten nøkkel, så sjekken i steg 8 («utskriften sier hvilken børsdag vurderingene gjelder») og at oversikten fylles etter hentingen, er ikke prøvd etter README-en.
+  *Lagt til 2026-10-13:* den ekte versjonen med nøkkel prøves i Prøve 2 under, med begge sjekkene.
 
 *Rettet 2026-10-11 (story 3.4, PR 3):* tabellen følger «Kom i gang» slik den ble etter instruksjonen kl. 22:32: steg 1–4 felles, så den ekte versjonen (steg 5–9) og demoen (steg 5–7), i den rekkefølgen README-en har dem. Før PR 3 sto `git clone https://github.com/IBE160-2026/G74-lund-osen.git` og `cd G74-lund-osen` som rad 2 og 3, demoen før den ekte versjonen, og `Ctrl+C` og `docker compose --profile demo down` som to rader. Nytt i PR 3: rad 1 (installer og start, slått sammen av to rader), rad 2–4 (Download ZIP, PowerShell eller Terminal, og `cd`), rad 5 (nøkkelen), `notepad .env` og `open -e .env` i rad 6, og rad 23 (spørsmålene i «Står du fast?» og `docs/hjelp.md`). Slått sammen: rad 15 (Ctrl+C og `docker compose --profile demo down`). Flyttet: radene for den ekte versjonen står nå før demoen, som 6–10 (før rad 10–14). De andre radene er de samme som før, med nytt nummer. Koden hentes nå med «Download ZIP», så prøveren har ikke git: commiten som ble prøvd, er den GitHub viser øverst på siden når ZIP-fila lastes ned, og mappa som ikke skal finnes, er `G74-lund-osen-main`, ikke `G74-lund-osen` som i punktet om maskinen over. Radene 2 og 3 følger Marians svar kl. 21:14 samme dag: ZIP-fila må pakkes ut med «Pakk ut alle», Windows viser filene uten filendelse, og «Windows PowerShell ISE» står også i lista.
+
+- **Det som ikke stemte:**
+- **Rettet i** (commit eller story):
+
+### Prøve 2: den ekte versjonen med egen nøkkel
+
+*Lagt til 2026-10-13, etter faglærers tilbakemelding 06.10 og Marians ja kl. 13:44.*
+Kriteriet «Kjørbar for andre» i briefen v8 krever også den ekte versjonen med
+egen gratiskonto hos EODHD (`prd.md` §7), og Prøve 1 gjøres uten nøkkel. Testeren
+lager sin egen gratiskonto, så kallene går fra testerens kvote og aldri fra
+gruppens. EODHDs vilkår forbyr å dele kontoen (FR-411). Maskinen er den fra
+Prøve 1 eller en annen ren maskin, aldri PC-en gruppen utvikler på. Prøven tas når
+hentingen kan gi kurser, se «Når kan jeg hente?» i
+[`docs/hjelp.md`](hjelp.md): etter kl. 22 og før midnatt på en børsdag.
+
+- **Hvem som prøver:** åpent.
+- **Dato og klokkeslett:**
+- **Maskin og operativsystem:**
+- **Docker Desktop, versjon** (`docker version`, linjen med «Docker Desktop»):
+- **Logget inn i Docker Desktop:** ja / nei.
+- **Maskinen:** den fra Prøve 1 / en annen ren maskin. Ikke PC-en gruppen utvikler på.
+- **Egen gratiskonto hos EODHD, laget av testeren:** ja / nei. Nøkkelen skrives ikke her.
+- **Commit som ble prøvd** (den GitHub viser når ZIP-fila lastes ned):
+
+| # | Kommando eller steg i README-en | Det som skjedde |
+|---|---|---|
+| 1 | Den ekte versjonen, steg 5: lag en gratis bruker hos EODHD og kopier API-nøkkelen. Ba registreringen om kort eller betaling? | |
+| 2 | Den ekte versjonen, steg 6: `cp .env.example .env`, så `notepad .env` (Windows) eller `open -e .env` (Mac), og lim inn nøkkelen etter `EODHD_API_KEY=` | |
+| 3 | Den ekte versjonen, steg 7: `docker compose up --build` og http://127.0.0.1:5000. Var oversikten tom, med kommandoen som henter? | |
+| 4 | Den ekte versjonen, steg 8: `docker compose run --rm hent` i et nytt vindu, etter kl. 22 på en børsdag. Sa utskriften hvilken børsdag vurderingene gjelder? (Prøve 1 tar ikke denne sjekken) | |
+| 5 | Siden lastet på nytt: ble oversikten fylt med aksjene, signalstyrken og retningen? (Prøve 1 tar ikke denne sjekken) | |
+| 6 | En aksje åpnes fra oversikten | |
+| 7 | Den ekte versjonen, steg 9: Ctrl+C i vinduet med appen, så `docker compose down`. Stod det «Removed»? | |
+| 8 | `docker ps -a` til slutt: står det containere igjen fra prøven? | |
+| 9 | Ble et spørsmål i «Står du fast?» eller i `docs/hjelp.md` brukt? Hvilket, og hjalp svaret? | |
 
 - **Det som ikke stemte:**
 - **Rettet i** (commit eller story):

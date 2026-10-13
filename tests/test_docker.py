@@ -536,11 +536,14 @@ class TestReadme:
         assert not re.search(r"!\[[^\]]*\]\[", tekst)
 
 
-def _proevetabellen() -> str:
-    """Radene i tabellen i §9, uten linjene under den. Den daterte linja
-    nevner kommandoer som ikke lenger er rader (gjennomgangen av PR 3, VG)."""
+def _proevetabellen(proeve: str | None = None) -> str:
+    """Radene i tabellene i §9, uten linjene under dem. Den daterte linja
+    nevner kommandoer som ikke lenger er rader (gjennomgangen av PR 3, VG).
+    Med proeve: bare tabellen under «### proeve» (Proeve 2 kom 13.10)."""
     kvalitet = (ROT / "docs" / "kvalitetssikring.md").read_text(encoding="utf-8")
     seksjon = kvalitet.split("## 9. README-prøven", 1)[1].split("\n## ", 1)[0]
+    if proeve is not None:
+        seksjon = seksjon.split(f"\n### {proeve}\n", 1)[1].split("\n### ", 1)[0]
     return "\n".join(l for l in seksjon.splitlines() if l.startswith("|"))
 
 
@@ -757,10 +760,14 @@ class TestReadmeForNybegynnere:
             assert int(n) in SEKSJONENE["Demoen"], n
         for n in re.findall(r"steg (\d+) i den ekte versjonen", tekst):
             assert int(n) in SEKSJONENE["Den ekte versjonen (anbefalt)"], n
-        tabell = _proevetabellen()
+        tabell = _proevetabellen("Prøve 1")
         assert [int(n) for n in re.findall(r"\| Steg (\d+):", tabell)] == [1, 2, 3, 4]
         assert [int(n) for n in re.findall(r"\| Den ekte versjonen, steg (\d+):", tabell)] == [5, 6, 7, 8, 9]
         assert [int(n) for n in re.findall(r"\| Demoen, steg (\d+):", tabell)] == [5, 6, 7]
+        # Proeve 2 (13.10) er den ekte versjonen med egen noekkel, steg 5-9.
+        tabell = _proevetabellen("Prøve 2: den ekte versjonen med egen nøkkel")
+        assert re.findall(r"\| Steg (\d+):|\| Demoen, steg (\d+):", tabell) == []
+        assert [int(n) for n in re.findall(r"\| Den ekte versjonen, steg (\d+):", tabell)] == [5, 6, 7, 8, 9]
 
     def test_stopp_i_begge_versjonene(self):
         assert [b.strip() for _, b in _blokkene(_steg("Den ekte versjonen (anbefalt)", 9))] == ["docker compose down"]
