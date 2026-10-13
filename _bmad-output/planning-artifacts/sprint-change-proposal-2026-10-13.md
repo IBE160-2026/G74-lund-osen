@@ -2,7 +2,7 @@
 title: "Endringsforslag 13.10: samlelista, tekstene og rekkefølgen"
 status: draft
 created: 2026-10-13
-updated: 2026-10-13T11:32
+updated: 2026-10-13T12:22
 ---
 
 # Endringsforslag 13.10: samlelista, tekstene og rekkefølgen
@@ -16,6 +16,8 @@ README-prøven 13.–16.10, så forslaget godkjennes først da, og funnene fra p
 kommer med i punkt 5. Ingenting i `prd.md`, `epics.md`, `designregler.md`,
 `sprint-status.yaml`, spinen eller koden er endret. Ingenting endres før rådet
 har lest forslaget og Marian har sagt ja (regel 2 og 9).
+
+*Rettet 2026-10-13, Marians beslutning kl. 11:34:* forslaget godkjennes uten å vente på README-prøven, så 8.0c kan planlegges denne uka. Bare rekkefølgen (spørsmål 14 og 15) venter til etter prøven, «når farten er kjent». Funn fra prøven blir små rettelser. Det over om at forslaget godkjennes først etter prøven, gjelder ikke lenger. Status står som `draft` til svarene og de nye punktene i 4.9 er ført inn i `prd.md` og `epics.md`.
 
 Grunnlaget er [`samleliste-endringsforslag.md`](../implementation-artifacts/samleliste-endringsforslag.md),
 punkt 1–13 med de daterte linjene og utdraget fra designforslaget nederst, og
@@ -53,6 +55,8 @@ tabell og en overskrift), som Marian bestemte 12.10 kl. 22:03.
 og 22:40 at den samlede endringen tas før 8.0c planlegges, fordi 8.0c blir større
 med de fire første tingene i punkt 11. Det er ikke avgjort (spørsmål 1 i punkt 7).
 
+*Rettet 2026-10-13, Marians beslutning kl. 11:34:* avgjort. Den samlede endringen tas før 8.0c planlegges (svar 1).
+
 ## 2. Virkninger
 
 ### Epics
@@ -67,6 +71,10 @@ vokser ([`tilbakemelding-product-brief.md`](tilbakemelding-product-brief.md)).
 | **Epic 10** | Får FR-601, FR-602, FR-603 og FR-605 i dekningstabellen og en FR-linje (punkt 13) |
 | **Epic 5** | Beholder bare A-variantene av FR-6xx (punkt 13). Er fortsatt ute av v1 |
 | Epic 4, 9 | Ingen virkning, utenom rekkefølgen |
+
+*Rettet 2026-10-13:* Epic 10 får FR-601, FR-602 og FR-603. FR-605 står i Epic 4, som punkt 4.8 sier.
+
+*Lagt til 2026-10-13, etter svarene og punkt 4.9:* Epic 2 får 2.15, utbytte fra EODHD (N1), og 2.11 og 2.12 får de 13 bransjene (N3). Epic 8 får 8.0e (svar 12), 8.10b og 8.19 (svar 13). Epic 10 får et tillegg i 10.1 og 10.2 hvis beslutningen 04.10 endres (N2, spørsmål 23).
 
 ### Andre dokumenter
 
@@ -636,10 +644,128 @@ storyene gjelder kravene slik de sto før 05.10, nå A-variantene og FR-601.
 **Ordet «utbytte» på tavla** (andre halvdel av punkt 13) er tatt i punkt 4.3,
 linje 21 i ordlista.
 
+### 4.9 Nye punkter 13.10
+
+*Lagt til 2026-10-13, Marian kl. 11:50–11:58, etter instruksjonen kl. 12:19 i
+`docs/ai-prompts/2026-10-13.md`.*
+
+#### N1 — Utbytte fra EODHD
+
+**I dag.** `/api/eod` har intet utbyttefelt (`begrunnelser.md` §11), så
+justeringsdagen leses av kursserien, og «Metoden ser justeringer, ikke utbytter.
+En aksjesplitt gir samme utslag.» (§11, forbehold 1). Derfor sier FR-407 og 8.14
+«justeringsdag», ikke «utbytte» (`prd.md:507–513`, `epics.md:3064`). Kommende
+eks.datoer skal føres inn for hånd (FR-414, story 2.14), fordi EODHDs kalender
+svarer 403 på gratisnivået (`prd.md:1109–1110`).
+
+**Hva Marian vil.** Utbytte hentes fra EODHD med `/api/div/{symbol}?fmt=json`.
+Instruksjonen kl. 12:19 sier at endepunktet er med i gratisnivået, med ett års
+historikk, og koster 1 kall per aksje (EODHD-dokumentasjonen, «Splits and
+Dividends API»). Det står ikke i repoet. `docs/kilder-og-rettigheter.md:31` viser
+at `/api/calendar` svarte 403 «Only EOD data allowed for free users». Spørsmål
+22.
+
+**Krav: ny FR-415 — Utbytte fra kilden.** Neste ledige nummer i §4.4 etter
+FR-414 (`prd.md:1095`). FR-407 rettes etter svar 6: merket under kursen sier
+«utbytte» når dataene fra EODHD har utbytte den dagen, ellers «justeringsdag».
+
+```
+### Story 2.15: Utbytte fra EODHD
+
+Som **bruker**, vil jeg se hva aksjen har betalt i utbytte det siste året, så
+jeg forstår en dag der kursen og endringen spriker.
+
+**Oppfyller:** FR-415, og FR-407 slik den rettes · **Begrenses av:** NFR-01,
+NFR-06, NFR-08, `AD-6`, `AD-10`, regel 10 og 16
+
+**Kontroll — hva testen ser etter:**
+- Ett kall til /api/div per aksje i lista, én gang i uka, bare med kallene som
+  er igjen etter kveldens henting og nye forsøk (2.3b)
+- Bruker aldri bonuskvoten: står extraLimit lavere etter første kall, stopper
+  den (NFR-01, tillegget 08.10, som FR-413)
+- Rådata skrives til data/raa/ og står aldri i en sporet fil (AD-6, regel 10
+  og 16)
+- Merket under kursen sier «utbytte» når dataene har utbytte den dagen, ellers
+  «justeringsdag»
+- Aksjedetaljen viser utbyttet det siste året og utbytteavkastningen. Beløpet
+  står i valutaen det betales i, og i NOK når det er en annen, omregnet med kurs
+  og dato fra en kilde som avgjøres i planen
+- Ingen nettkall i testene (AD-8)
+- **Ville feilet hvis:** et kall ble tatt fra bonuskvoten, en justeringsdag uten
+  utbytte i dataene sto som «utbytte», eller et beløp sto i en sporet fil
+
+**Avhenger av:** 2.3b for kallene som er igjen, og 2.6 og 8.14 for merket.
+```
+
+**Kallene.** Rådets forslag til rekkefølge for kallene som er igjen: nye forsøk
+(2.3b), så utbytte, så måling (FR-413). Med 15 aksjer er det 5 kall igjen etter
+en henting (20 minus én per aksje), mens en runde med utbytte koster 15. Runden
+må da deles over minst tre kvelder, eller tas på en dag uten henting, slik
+FR-413 kan bruke alle 20 (`prd.md:1088`). Med 17 eller 18 aksjer og indeksen er
+det ingen kall igjen om kvelden (`prd.md:1092–1093`). Spørsmål 21.
+
+**FR-414 og 2.14.** Om eks.datoer ført for hånd fortsatt trengs når utbyttet
+kommer fra EODHD, avgjøres etter prøven i kveld (spørsmål 19). `/api/div` gir
+utbytte som er betalt. Om det også gir kommende eks.datoer, står ikke i repoet.
+
+#### N2 — KI-teksten forklarer med tall hva som har skjedd
+
+**Hva Marian vil.** KI-teksten forklarer med tall hva som har skjedd: signalet,
+utbyttet og hvordan aksjen har gått mot hovedindeksen. Den gir ikke råd og spår
+ikke (NFR-06, FR-603). «Se nærmere» (8.4) viser hva brukeren kan sjekke selv.
+Grunnlaget i 10.1 får utbyttet fra N1, og hovedindeksen når 2.8 er bygget.
+
+**Det står i veien.** 10.1 ble rettet 05.10 etter beslutningen 04.10: grunnlaget
+«gir bare fortegnet for hver av de tre sjekkene, styrken og retningen», og «En
+test krever at det ikke finnes desimaltall i grunnlaget». «Ville feilet hvis»
+sier: «grunnlaget hadde en prosent eller et forholdstall. Da sendes mer enn våre
+egne resultater, mot beslutningen 04.10» (`epics.md:2205–2214`). Kontrollpunktet
+fra før sier også at et rått datapunkt fra EODHD til en tredjepart ikke er
+godkjent av EODHD (`epics.md:2201–2203`). Et utbyttebeløp er en rå verdi fra
+EODHD, og endringen mot hovedindeksen er en prosent. N2 krever derfor at
+beslutningen 04.10 tas opp igjen. Spørsmål 23.
+
+**Forslag, hvis beslutningen endres:** et tillegg i 10.1 med det som kan sendes
+(for eksempel om aksjen har betalt utbytte det siste året, og om den gikk bedre
+eller dårligere enn hovedindeksen, uten beløp), og et kontrollpunkt i 10.2 om at
+tallene i teksten finnes i grunnlaget (FR-603). Avhenger av 2.15 for utbyttet og
+2.8 for hovedindeksen.
+
+**8.4.** «Se nærmere» står rett under kursgrafen, med «Børsen, bransjen eller
+selskapet?», «Står det noe i børsmeldingene?» og «Er en slik dag vanlig for
+aksjen?» (`epics.md:2837–2841`). Svar 5 legger «hva du kan sjekke selv» dit. Det
+krever ingen endring i 8.4 utenom tekstene fra tavla.
+
+#### N3 — Alle 13 bransjene nå
+
+**Hva Marian vil.** Alle 13 bransjene fra tavla «Bransjer» og ordlista tas inn
+nå. De 8 som de 15 hører til, er de samme som i `src/kursdata.py`. De 5 nye
+brukes når egne aksjer kan velges (2.11 og 2.12), og symbolene kommer med 8.0d og
+8.6.
+
+**I dag.** `Aksje` har feltet `sektor` (`kursdata.py:33`), og de 15 fordeler seg
+på 8: Energi, Finans, Industri, Materialer, Shipping, Telekom, Sjømat og Konsum
+(`kursdata.py:42–55`). PRD-en sier «Universet dekker minst åtte sektorer»
+(`prd.md:184`). Ordlista sier: «De 11 hos Euronext (ICB), med sjømat og shipping
+for seg, som Euronexts indekser OBSFX og OBSHX. Nye: Forbruk, Teknologi, Helse,
+Eiendom og Kraft.» (`designregler.md` §4). Navnene på de 8 står ikke i ordlista,
+så at de er de samme som i koden, er Marians ord og ikke slått opp på tavla.
+
+**Forslag.**
+- `designregler.md` §4: de 13 navnene skrives inn, når rådet gir dem fra tavla.
+- Koden: de 13 står som én konstant ved `AKSJEUNIVERS`, og en test krever at
+  hver aksje har en sektor fra den. De 15 endres ikke.
+- **Ordet.** Koden og PRD-en sier «sektor», ordlista og tavla «bransje». Ett av
+  dem velges, som en del av punkt 8. Spørsmål 24.
+- 2.11 og 2.12 får et kontrollpunkt om at en aksje som velges, får en av de 13.
+  8.0d og 8.6 får symbolene.
+
 ## 5. Fra README-prøven
 
 *Tom til prøven er gjort.* Funnene føres her før forslaget godkjennes, med
 hvilken story eller hvilket punkt over de hører til.
+
+*Rettet 2026-10-13, Marians beslutning kl. 11:34:* funnene fra prøven blir små rettelser og venter ikke på godkjenningen. Første prøve er i kveld 13.10.
 
 ## 6. Hva som må endres, hvis forslaget godtas
 
@@ -653,43 +779,85 @@ hvilken story eller hvilket punkt over de hører til.
 | `README.md` | Ingen, utenom lenken til dette forslaget, som står fra før (regel 19). Statuslinja rettes når rekkefølgen er valgt, hvis den sier noe om «Neste» som endres |
 | Tester | De tre testene i punkt 4.5, og testen for ordene ordlista har valgt bort (punkt 4.1). Ingen tester endres nå |
 
+*Lagt til 2026-10-13, etter svarene og punkt 4.9:*
+
+| Dokument | Endring |
+|---|---|
+| `prd.md` | FR-407 rettes: merket under kursen sier «utbytte» når dataene fra EODHD har utbytte den dagen, ellers «justeringsdag» (svar 6). Ny FR-415, utbytte fra kilden (N1). FR-414 avgjøres etter prøven (spørsmål 19). «Sektor» eller «bransje» i §3 etter spørsmål 24. Beslutningen 04.10 om grunnlaget i §4.6, hvis spørsmål 23 endrer den |
+| `epics.md` | Ny 2.15 (N1), ny 8.0e (svar 12), ny 8.19 (svar 13) og 8.10b. Kontrollpunkt i 2.11 og 2.12 om de 13 bransjene (N3). Tillegg i 10.1 og 10.2 etter spørsmål 23. Dekningstabellen for FR-415 |
+| `designregler.md` | §4: de 13 bransjene (N3), merket under kursen (svar 6), fet skrift og prikket strek i tekstfargen i stedet for gul strek (svar 7), «T +1» i oversikten og navnet og ordet på aksjesiden (svar 8), og egen del for egne aksjer (svar 11) |
+| `sprint-status.yaml` | `2-15`, `8-0e`, `8-10b` og `8-19` som `backlog` |
+
 ## 7. Spørsmål til Marian
 
 1. **Når.** Rådet anbefaler at den samlede endringen tas før 8.0c planlegges.
    Skal den det, eller planlegges 8.0c som den står, og dette tas etterpå?
+   *Svar 13.10:* Marians beslutning kl. 11:34: forslaget godkjennes uten å vente på README-prøven, så 8.0c kan planlegges denne uka. Bare rekkefølgen (spørsmål 14 og 15) venter til etter prøven.
 2. **Lengden på hjelpen.** Hvor mange setninger kan en tekst bak «?» ha (punkt
    4.1)?
+   *Svar 13.10:* høyst 3 setninger, med unntakene som står («Grensene» og «Hvorfor retningen oftere er positiv»).
 3. **Hjelpebryteren.** Skal «Vis hjelp» vente på knapperaden i 8.3, eller komme
    før, et annet sted på siden (punkt 4.1)?
+   *Svar 13.10:* vent på 8.3.
 4. **Tekster som mangler i utdraget.** Kan rådet gi setningene med «Sluttkursen …»
    ordrett, innledningen under overskriften, og det tredje punktet i «Slik leser
    du tabellen» (punkt 4.2 og 4.6)?
+   *Svar 13.10:* rådet gir tekstene i neste instruksjon.
 5. **«Hva du kan sjekke selv» og det grå feltet.** Hvilken story hører de til?
    Ingen av dem står i `epics.md` (punkt 4.2).
+   *Svar 13.10:* «hva du kan sjekke selv» er 8.4, og det grå feltet tas i 8.0d.
 6. **Merket ved kursen.** FR-407 og 8.14 sier «justeringsdag», ikke «utbytte».
    Skal merket fortsatt være bokstaven U (punkt 4.3)?
+   *Svar 13.10:* merket står under kursen. Det sier «utbytte» når dataene fra EODHD har utbytte den dagen (N1, punkt 4.9), ellers «justeringsdag», og FR-407 rettes etter det.
 7. **Det viktigste på siden.** Gult betyr 3 av 3 (§3). Hvordan merkes det
    viktigste uten gult (punkt 4.3)?
+   *Svar 13.10:* fet skrift, og prikket strek i tekstfargen for tall som er sjekket.
 8. **Sjekkene.** «T +1» som i ordlista, eller «+1 positiv» som i 8.0c (punkt
    4.3)? Svaret gjelder også T, B og I i oversikten (punkt 4.6).
+   *Svar 13.10:* «T +1» i oversikten, navnet og ordet på aksjesiden.
 9. **Bransjene.** Ordlista har 13 bransjer, mens koden har 8 sektorer og PRD-en
    krever minst åtte. Skal de 13 inn, og i så fall i hvilken story (8.6?), eller
    følger ordlista sektorene (punkt 4.3)?
+   *Svar 13.10:* alle 13 bransjene nå (N3, punkt 4.9).
 10. **Hullene fra 12.10.** Rett på main, én commit per sak, eller i 8.0c (punkt
     4.5)?
+    *Svar 13.10:* rett på main, én commit per sak.
 11. **Egne aksjer.** Egen del «Dine egne aksjer», som tavla viser, eller i
     tabellen sammen med de andre, som ordlista sier (punkt 4.6)?
+    *Svar 13.10:* egen del, som Marian valgte 12.10 kl. 22:03, og ordlista rettes.
 12. **T, B og I, delt tabell, overskrift og «Slik leser du tabellen».** I 8.0c,
     som rådet foreslår, eller i en ny 8.0e etter 8.0c (punkt 4.6)?
+    *Svar 13.10:* ny 8.0e etter 8.0c.
 13. **«Neste» i stripa.** Ny story 8.19, eller et unntak i 8.0d (punkt 4.6)?
+    *Svar 13.10:* ny 8.19.
 14. **Rekkefølgen.** A, B eller C (punkt 4.7)?
+    *Svar 13.10:* etter README-prøven.
 15. **8.3 og brukertesten.** Skal linja «Bygges etter brukertesten i 8.1» i 8.3
     stå? Den avgjør om B er mulig (punkt 4.7).
+    *Svar 13.10:* etter README-prøven.
 16. **10.6 og hovedindeksen.** 10.6 står før 2.8 og 2.9 i dag, men trenger dem.
     Skal den flyttes etter 2.9, som i alle tre alternativene (punkt 4.7)?
+    *Svar 13.10:* som forslaget.
 17. **Epic 10.** 10.2 oppfyller FR-603, og 10.3 FR-601 og FR-602? (punkt 4.8)
+    *Svar 13.10:* som forslaget.
 18. **Snittet i kursgrafen.** Heltrukket, som ordlista sier, med hjelpeteksten
     rettet i 8.0d? I dag er det stiplet (punkt 4.3).
+    *Svar 13.10:* som forslaget.
+19. **FR-414 og 2.14.** Trengs eks.datoer ført for hånd når utbyttet kommer fra
+    EODHD (N1, punkt 4.9)? Avgjøres etter prøven i kveld.
+20. **Valutakursen.** Hvilken kilde gir kursen og datoen når et utbytte i en annen
+    valuta vises i NOK (N1)?
+21. **Kallene som er igjen.** Nye forsøk, så utbytte, så måling, som rådet
+    foreslår? En runde med utbytte koster 15 kall og det er 5 igjen etter en
+    henting: deles den over tre kvelder, eller tas den på en dag uten henting (N1)?
+22. **Gratisnivået for `/api/div`.** Det står ikke i repoet, og `/api/calendar`
+    svarte 403 på gratisnivået. Skal det prøves med ett kall, etter avtale
+    (regel 6), før 2.15 planlegges (N1)?
+23. **Beslutningen 04.10.** Grunnlaget i 10.1 har bare fortegn, styrke og
+    retning, uten desimaltall. Skal det få mer, og i så fall hva, så KI-teksten
+    kan forklare med tall (N2)?
+24. **Sektor eller bransje.** Koden og PRD-en sier «sektor», ordlista og tavla
+    «bransje». Hvilket ord gjelder (N3)?
 
 ## 8. Overlevering
 
@@ -697,11 +865,15 @@ hvilken story eller hvilket punkt over de hører til.
 signalet. Ny ordlyd i tre krav, kontrollpunkter i fem storyer, opptil tre nye små
 storyer (8.0e, 8.10b og 8.19), rettelser i ordlista og en ny rekkefølge.
 
+*Lagt til 2026-10-13:* med punkt 4.9 kommer 2.15 og FR-415 til, og et tillegg i 10.1 og 10.2 hvis beslutningen 04.10 endres. Omfanget er fortsatt middels, men N1 og N2 berører kvoten og grunnlaget til KI.
+
 **Før godkjenning:**
 
 1. README-prøven 13.–16.10, og funnene i punkt 5
 2. Rådet leser forslaget og gir tekstene i spørsmål 4
 3. Marian svarer på spørsmålene i punkt 7
+
+*Rettet 2026-10-13, Marians beslutning kl. 11:34:* forslaget godkjennes uten å vente på prøven, og Marian har svart på spørsmål 1–18 13.10. Det som står igjen før svarene føres inn i `prd.md` og `epics.md`: tekstene fra rådet (svar 4) og spørsmål 19–24. Rekkefølgen (spørsmål 14 og 15) avgjøres etter prøven, og prøven i kveld 13.10 kan gi små rettelser i punkt 5.
 
 **Hvis Marian sier ja:**
 
