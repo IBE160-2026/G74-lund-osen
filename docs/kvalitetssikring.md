@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-13T13:58
+updated: 2026-10-13T14:02
 ---
 
 # Kvalitetssikring
@@ -592,6 +592,27 @@ hentingen kan gi kurser, se «Når kan jeg hente?» i
 
 - **Det som ikke stemte:**
 - **Rettet i** (commit eller story):
+
+## 10. Suksesskriteriene og testene
+
+*Lagt til 2026-10-13, etter faglærers tilbakemelding 06.10
+([`tilbakemelding-product-brief.md`](../_bmad-output/planning-artifacts/tilbakemelding-product-brief.md)):*
+«Legg til suksesskriterier for at signalberegningen er riktig, slik at testene
+kan spores tilbake til briefen.»
+
+De fire kriteriene i briefen v8
+([`product-brief.md`](../_bmad-output/planning-artifacts/product-brief.md),
+«Success Criteria»), slik de står i `prd.md` §7, med testene og kontrollene som
+viser dem. Tabellen viser bare tester og kontroller som finnes. En test i
+`tests/test_suksesskriterier.py` krever at hver test tabellen viser til, finnes,
+og at alle fire kriteriene står her.
+
+| Kriterium | Testene og kontrollene som viser det | Det som står igjen |
+|---|---|---|
+| **Riktige beregninger**: håndlagde kursserier gir forhåndsberegnet styrke og retning, ved hver testkjøring | `tests/test_signalberegning.py::TestSignalstyrke::test_alle_tre_sjekkene_slaar_ut`, `tests/test_signalberegning.py::TestSignalstyrke::test_sjekkene_spriker_gir_blandet`, `tests/test_signalberegning.py::TestSignalstyrke::test_flat_serie_gir_styrke_0_og_ingen_retning`, `tests/test_signalberegning.py::TestStyrke::test_styrke_er_summen_av_absoluttverdiene`, `tests/test_signalberegning.py::TestRetning::test_alle_utslag_opp_er_positiv`, `tests/test_signalberegning.py::TestRetning::test_alle_utslag_ned_er_negativ`, `tests/test_signalberegning.py::TestRetning::test_sprikende_utslag_er_blandet`, `tests/test_signalberegning.py::TestRetning::test_ingen_utslag_er_ingen`, `tests/test_signalberegning.py::TestJustertKurs::test_signalet_foelger_justert_ikke_ujustert_kurs`, `tests/test_signalberegning.py::TestNoytralsone::test_noeyaktig_paa_grensen_gir_null`, `tests/test_signalberegning.py::TestTerskel::test_styrke_paa_terskelen_skiller_seg_ut` og `tests/test_signalberegning.py::TestMaalingen::test_regelen_paa_maalingene_gir_verdien_sjekken_ga`. Kontrollene: håndregningen for EQNR 05.10 og GJF 02.10 i `malinger.md` §6, håndkontrollen av første utslag på interesse i `malinger.md` §25, mutantpraksisen i §3 og kontrollregningen på ekte data i §4 her | Ingenting. Testene kjøres i CI ved hver push (§2) |
+| **Brukerutfall**: minst én person utenfor gruppen gjennomfører hovedflyten og forklarer uoppfordret hvorfor en aksje skiller seg ut, under 5 minutter, uten hjelp | Ingen ennå. Kriteriet måles med en person, ikke med en test | Brukertesten i story 8.1 |
+| **KI-forklaringen**: hver KI-tekst som vises, har bestått kontrollen mot grunnlaget, og testene viser at feil stoppes. Én ukes drift er logget | Ingen ennå. KI-laget er ikke bygget | Kontrollen i FR-603 (story 10.2), loggen i FR-604 (story 4.2 og 4.3), visningen (story 10.3) og målingen av bidraget (story 10.4) |
+| **Kjørbar for andre**: README-oppskriften fullføres gratis på en ren maskin, uten gruppens nøkler: demoen uten konto, og den ekte versjonen med egen gratiskonto hos EODHD | `tests/test_demo.py::TestDemokommandoen::test_lages_uten_nett_og_uten_noekkel`, `tests/test_demo.py::TestSidene::test_bryteren_med_demobase_viser_eksempeltall`, `tests/test_docker.py::TestImaget::test_ingen_noekkel_i_imaget`, `tests/test_docker.py::TestReadme::test_kommandoene_er_de_samme_som_i_koden_og_compose`, `tests/test_docker.py::TestReadme::test_readme_proeven_har_hver_kommando` og `tests/test_readme.py::test_hver_lenke_i_readme_peker_paa_noe_som_finnes`. Kontrollen: README-prøven i §9, Prøve 1 (demoen uten nøkkel) og Prøve 2 (den ekte versjonen med egen nøkkel) | Ingen av prøvene i §9 er gjort ennå |
 
 ## Vedlegg: hver mutant
 
