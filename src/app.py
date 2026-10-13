@@ -50,6 +50,7 @@ from lagring_sqlite import (
 )
 from markedsoversikt import (
     bygg_oversikt,
+    antall_vurdert,
     eldre_enn_nyeste,
     ingen_skilte_seg_ut,
     norsk_tid,
@@ -357,6 +358,7 @@ def markedsoversikt():
         mangler=uten_kurser(poster),
         ikke_vurdert=any(rad.ikke_vurdert for rad in rader),
         ingen_skilte_seg_ut=ingen_skilte_seg_ut(rader),
+        antall_vurdert=antall_vurdert(rader),
         hentekommando=hentekommando(),
     )
 

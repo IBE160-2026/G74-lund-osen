@@ -84,6 +84,9 @@
 
     {% if ingen_skilte_seg_ut %}
       <p class="ingen-utslag">Ingen aksjer skilte seg ut: ingen fikk {{ parametre.terskel }} av {{ antall_sjekker }} eller mer.</p>
+      {% if antall_vurdert < rader|length %}
+        <p class="ingen-utslag">{{ antall_vurdert }} av {{ rader|length }} aksjer ble vurdert.</p>
+      {% endif %}
     {% endif %}
 
     <table>

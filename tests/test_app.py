@@ -1474,3 +1474,40 @@ class TestStory80c:
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
         assert "Signalet kunne ikke regnes" in html
         assert "Signalstyrken sier ikke om du bør kjøpe eller selge." in html
+
+    # Svar 3 paa BH1/ECH2 (13.10 kl. 16:42).
+
+    def test_noen_mangler_vurdering_gir_begge_setningene(self, klient, monkeypatch):
+        """Ville feilet hvis «N av M aksjer ble vurdert.» manglet."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [101.0])}))   # 1 av 3
+        monter(monkeypatch, snapshot({"DNB": serie([100.0] * 61)}), vurdert=False)
+        html = klient.get("/").data.decode("utf-8")
+        assert "Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer." in html
+        assert "1 av 2 aksjer ble vurdert." in html
+        assert html.index("Ingen aksjer skilte seg ut") < html.index("1 av 2 aksjer ble vurdert.")
+
+    def test_alle_vurdert_gir_bare_setningen_fra_0510(self, klient, monkeypatch):
+        monter(monkeypatch, snapshot({
+            "EQNR": serie([100.0] * 60 + [101.0]),
+            "DNB": serie([100.0] * 61),
+        }))
+        html = klient.get("/").data.decode("utf-8")
+        assert "Ingen aksjer skilte seg ut" in html
+        assert "ble vurdert." not in html
+
+    def test_ingen_vurdert_gir_ingen_av_setningene(self, klient, monkeypatch):
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}), vurdert=False)
+        html = klient.get("/").data.decode("utf-8")
+        assert "Ingen aksjer skilte seg ut" not in html
+        assert "ble vurdert." not in html
+
+    def test_antall_vurdert_teller_radene_med_styrke(self):
+        """Enhetstest: 0, 1 og alle."""
+        from types import SimpleNamespace
+
+        from markedsoversikt import antall_vurdert
+
+        rad = lambda s: SimpleNamespace(styrke=s)  # noqa: E731
+        assert antall_vurdert([]) == 0
+        assert antall_vurdert([rad(None), rad(1)]) == 1
+        assert antall_vurdert([rad(0), rad(3)]) == 2

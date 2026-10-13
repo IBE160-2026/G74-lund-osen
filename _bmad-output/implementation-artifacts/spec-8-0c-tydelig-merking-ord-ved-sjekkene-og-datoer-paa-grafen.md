@@ -33,6 +33,7 @@ Planen ble vist i chatten 13.10 og er ført i `docs/ai-prompts/2026-10-13.md` (i
 7. **Setningen «Ingen aksjer skilte seg ut …»** står bare når ingen har styrke på terskelen eller mer. En test med én aksje på 3 av 3 og ingen på 2 krever at den ikke står.
 8. **Fotnoten på aksjesiden** slutter med «Signalstyrken sier ikke om du bør kjøpe eller selge.» (tillegget 11.10).
 9. **Ordtesten** leter også etter «kr» som eget ord.
+11. **Setningen når noen rader mangler vurdering** (svar 3 på BH1/ECH2, 13.10 kl. 16:42): står setningen fra 05.10, og minst én rad mangler vurdering, kommer «N av M aksjer ble vurdert.» under den. N er radene med vurdering og M alle radene, begge talt fra radene, og den virker for alle tall, også 1. Er alle vurdert, står setningen fra 05.10 alene. Har ingen rad vurdering, står ingen av dem.
 10. **Den nye delen 2 er godkjent** 13.10 kl. 15:36, slik den ble vist kl. 15:03 (instruksjonen og svaret i `docs/ai-prompts/2026-10-13.md`), med én endring: i tabellen med sjekkene på aksjesiden får hver sjekk sitt eget «?» ved navnet, med bare sin tekst (trend 2, bevegelse 3 og interesse 3 setninger). «?» ved «Hvorfor signalet ble …» har bare «Hvorfor disse 3» og antall dager (5 setninger). Oversikten får 6 «?»: Selskap, Sluttkurs, Endring, Signalstyrke, Retning og «data hentet». Aksjesiden får «?» ved Sluttkurs, kursgrafen, Signalstyrke, Retning (med skjevhet), «Hvorfor signalet ble …», hver sjekk, Ga og «Målt mot» (med grensene).
 
 ## Boundaries & Constraints
@@ -165,3 +166,4 @@ Gjennomgang av PR #35 (diffen `main...8-0c` på `c6db3e5`), med Blind Hunter (BH
 | M21 | «?» per sjekk borte | `tests/test_demo.py::TestSidene::test_hjelpen_virker_ogsaa_i_demoen` |
 | M22 | «Målt mot» sier lys bakgrunn | `tests/test_demo.py::TestStory80cIDemoen::test_merkingen_og_ordene_i_demoen` |
 | M23 | grensene uten «på Oslo Børs» | `tests/test_hjelpetekster.py::TestGrensene::test_teksten_om_maalingen_nevner_de_maalte_grensene` |
+| M24 | «N av M aksjer ble vurdert.» borte | `tests/test_app.py::TestStory80c::test_noen_mangler_vurdering_gir_begge_setningene` |

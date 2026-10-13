@@ -255,6 +255,13 @@ def ingen_skilte_seg_ut(rader: list[Rad]) -> bool:
     return bool(vurdert) and not any(rad.skiller_seg_ut for rad in vurdert)
 
 
+def antall_vurdert(rader: list[Rad]) -> int:
+    """Hvor mange rader som har en vurdering - story 8.0c, svar 3 paa
+    BH1/ECH2. Siden sier «N av M aksjer ble vurdert.» naar det er faerre
+    enn alle."""
+    return sum(1 for rad in rader if rad.styrke is not None)
+
+
 def eldre_enn_nyeste(rader: list[Rad]) -> set[str]:
     """Symbolene som skal vise sitt eget tidsstempel under selskapsnavnet.
 

@@ -521,3 +521,23 @@ class TestStory80cIDemoen:
             assert "popovertarget=" in html
             for ord_ in VALGT_BORT:
                 assert not re.search(ord_, synlig_tekst(html), re.IGNORECASE), ord_
+
+    def test_setningene_om_ingen_utslag_i_demoen(self, klient, monkeypatch, demobase):
+        """Svar 3 paa BH1/ECH2 med demobasen (FR-411). Demobasen har aksjer
+        som skiller seg ut, saa testen tar bort de vurderingene i kopien i
+        tmp (regel 22). VRDS har ingen vurdering, saa begge setningene staar."""
+        import re
+        import sqlite3
+
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        foer = klient.get("/").data.decode("utf-8")
+        assert "Ingen aksjer skilte seg ut" not in foer and "ble vurdert." not in foer
+        tilkobling = sqlite3.connect(demo_sti())
+        with tilkobling:
+            siste = tilkobling.execute("SELECT MAX(dato) FROM vurdering").fetchone()[0]
+            tilkobling.execute("DELETE FROM vurdering WHERE dato = ? AND styrke >= 2", (siste,))
+        tilkobling.close()
+        html = klient.get("/").data.decode("utf-8")
+        assert "Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer." in html
+        treff = re.search(r"(\d+) av (\d+) aksjer ble vurdert\.", html)
+        assert treff and int(treff.group(1)) < int(treff.group(2)), treff
