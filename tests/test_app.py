@@ -1495,6 +1495,16 @@ class TestStory80c:
         assert "Ingen aksjer skilte seg ut" in html
         assert "ble vurdert." not in html
 
+    def test_ingen_ny_setning_naar_en_skiller_seg_ut_og_en_mangler(self, klient, monkeypatch):
+        """VG paa svar 3: «ble vurdert.» staar bare under setningen fra 05.10.
+        Ville feilet hvis den nye setningen ble flyttet ut av den ytre if-en."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))   # 2 av 3
+        monter(monkeypatch, snapshot({"DNB": serie([100.0] * 61)}), vurdert=False)
+        html = klient.get("/").data.decode("utf-8")
+        assert "2 av 3" in html
+        assert "Ingen aksjer skilte seg ut" not in html
+        assert "ble vurdert." not in html
+
     def test_ingen_vurdert_gir_ingen_av_setningene(self, klient, monkeypatch):
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}), vurdert=False)
         html = klient.get("/").data.decode("utf-8")

@@ -535,7 +535,8 @@ class TestStory80cIDemoen:
         tilkobling = sqlite3.connect(demo_sti())
         with tilkobling:
             siste = tilkobling.execute("SELECT MAX(dato) FROM vurdering").fetchone()[0]
-            tilkobling.execute("DELETE FROM vurdering WHERE dato = ? AND styrke >= 2", (siste,))
+            tilkobling.execute("DELETE FROM vurdering WHERE dato = ? AND styrke >= ?",
+                               (siste, app_modul.STANDARD.terskel))
         tilkobling.close()
         html = klient.get("/").data.decode("utf-8")
         assert "Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer." in html
