@@ -90,6 +90,8 @@ Planen ble vist i chatten 13.10 og er ført i `docs/ai-prompts/2026-10-13.md` (i
 
 ## Implementation Notes
 
+- *PR 2, 13.10:* `fbf24c4` datoene og månedsmerkene, `8ac5db6` navnene ut av kommentarene og docstringene (regel 20, tillegget 13.10, 17 treff i fire filer). `dato()` i `tallformat.py`, og filtrene `dato` og `norsk_tid` i `app.py` får året fra `idag()`. Månedsmerkene regnes i `graf.py` med `er_boersdag`. Kalenderen dekker bare 2026 (`boersdag.DEKKEDE_AAR`), så en måned utenfor kalenderen får ikke merke. Ingen av de fire punktene fra 8.0c i `deferred-work.md` gjelder datoene eller grafen.
+
 - *Lagt til 2026-10-13:* PR 1 er flettet i `82271fb`, PR #35, låst til `5fa7304`. PR 2 med datoene og månedsmerkene gjenstår, og spesifikasjonen står som in-progress til den er flettet.
 
 - Del a `fcb6c31`, b `83fa382`, c `e2e3f79`, d `c6769d8`. Main hentet inn med merge i `b5fcc8f`. Den commiten mangler Co-authored-by og er ikke skrevet om (regel 7).
@@ -171,3 +173,6 @@ Gjennomgang av PR #35 (diffen `main...8-0c` på `c6db3e5`), med Blind Hunter (BH
 | M22 | «Målt mot» sier lys bakgrunn | `tests/test_demo.py::TestStory80cIDemoen::test_merkingen_og_ordene_i_demoen` |
 | M23 | grensene uten «på Oslo Børs» | `tests/test_hjelpetekster.py::TestGrensene::test_teksten_om_maalingen_nevner_de_maalte_grensene` |
 | M24 | «N av M aksjer ble vurdert.» borte | `tests/test_app.py::TestStory80c::test_noen_mangler_vurdering_gir_begge_setningene` |
+| M7 | månedsmerkene etter kalenderen (PR 2) | `tests/test_graf.py::TestMaanedsmerker::test_merket_staar_paa_samme_x_som_punktet_for_dagen` |
+| M8 | månedsmerkene én dag feil (PR 2) | `tests/test_graf.py::TestMaanedsmerker::test_merket_staar_paa_samme_x_som_punktet_for_dagen` |
+| M25 | `dato()` viser året også i samme år (PR 2) | `tests/test_app.py::test_datoen_skrives_som_dd_mm` |
