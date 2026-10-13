@@ -506,7 +506,7 @@ class TestStory80cIDemoen:
     def test_merkingen_og_ordene_i_demoen(self, klient, monkeypatch, demobase):
         import re
 
-        from test_hjelpetekster import VALGT_BORT
+        from test_hjelpetekster import VALGT_BORT, synlig_tekst
 
         monkeypatch.setenv(app_modul.I_DEMO, "1")
         oversikt = klient.get("/").data.decode("utf-8")
@@ -520,4 +520,4 @@ class TestStory80cIDemoen:
             assert f"Demoversjon. {app_modul.EKSEMPELTALL_MERKE}" in html
             assert "popovertarget=" in html
             for ord_ in VALGT_BORT:
-                assert not re.search(ord_, html, re.IGNORECASE), ord_
+                assert not re.search(ord_, synlig_tekst(html), re.IGNORECASE), ord_

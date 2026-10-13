@@ -59,7 +59,7 @@ from markedsoversikt import (
 )
 from migrering import MigrasjonsFeil
 from oversiktsdata import Oversiktsleser
-from signalberegning import STANDARD
+from signalberegning import BLANDET, STANDARD
 from tallformat import tall
 
 # Kommandoen den tomme siden ber brukeren kjoere. Den staar ogsaa i README, og
@@ -243,6 +243,7 @@ def _hjelp():
         "hjelp": Hjelp(hjelpetekster(STANDARD)),
         "parametre": STANDARD,
         "antall_sjekker": ANTALL_SJEKKER,
+        "blandet": BLANDET,
     }
 
 

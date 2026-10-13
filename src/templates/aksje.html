@@ -53,7 +53,7 @@
     th.fortegn { text-align: center; }
     td.fortegn { text-align: center; font-variant-numeric: tabular-nums;
                  font-weight: 700; width: 9rem; white-space: nowrap; }
-    td.fortegn .ord { font-weight: normal; margin-left: 0.3rem; }
+    td.fortegn .ord { font-weight: normal; }
     /* Story 8.0c: sjekkene som slo ut, merkes som 2 av 3 i oversikten: fet
        skrift og en strek til venstre i tekstfargen, ikke lys bakgrunn. */
     tr.bidro td { font-weight: 600; }
@@ -107,7 +107,8 @@
     </div>
   </div>
 
-  <h2>Kursutvikling, seks måneder{% if graf and graf.har_ma50 and detalj.sjekker %} {{ hjelpeknapp("hjelp-graf", "Hjelp: kursgrafen") }}{% endif %}</h2>
+  {%- set vis_grafhjelp = graf and graf.har_ma50 and detalj.sjekker %}
+  <h2>Kursutvikling, 6 måneder{% if vis_grafhjelp %} {{ hjelpeknapp("hjelp-graf", "Hjelp: kursgrafen") }}{% endif %}</h2>
   {% if graf %}
     <figure>
       <svg viewBox="0 0 {{ graf.bredde }} {{ graf.hoyde }}" role="img"
@@ -157,7 +158,7 @@
         {% for sjekk in detalj.sjekker %}
           <tr {% if sjekk.bidro %}class="bidro"{% endif %}>
             <td>{{ sjekk.navn }} {{ hjelpeknapp("hjelp-" ~ sjekk.navn|lower, "Hjelp: " ~ sjekk.navn|lower) }}</td>
-            <td class="fortegn {{ sjekk.klasse }}">{{ sjekk.fortegn }}<span class="ord">{{ sjekk.ord }}</span></td>
+            <td class="fortegn {{ sjekk.klasse }}">{{ sjekk.fortegn }} <span class="ord">{{ sjekk.ord }}</span></td>
             <td class="regnestykke">{{ sjekk.maaling }}</td>
           </tr>
         {% endfor %}
@@ -166,9 +167,8 @@
 
     <p class="fotnote">
       Signalstyrken er hvor mange sjekker som slo ut: {{ detalj.bidragsytere|length }} av {{ antall_sjekker }} ga utslag.
-      Ga noen +1 og noen -1, er retningen Blandet.
+      Ga noen +1 og noen -1, er retningen {{ blandet }}.
       Ingen vekting og ingen skjult formel.
-      Signalstyrken sier ikke om du bør kjøpe eller selge.
     </p>
   {% elif detalj.for_kort_serie %}
     <p class="mangler">
@@ -189,6 +189,8 @@
     {% endif %}
   {% endif %}
 
+  <p class="fotnote">Signalstyrken sier ikke om du bør kjøpe eller selge.</p>
+
   <p class="fotnote">
     Signalet bygger bare på kurs og volum. Børsmeldinger og kommende
     finansielle hendelser er ikke med i denne versjonen.
@@ -199,7 +201,7 @@
   {#- Story 8.0c: hvert «?» staar ved det det forklarer. Grafen bare med
       grafen og snittet, og Ga, Maalt mot og hver sjekk bare med tabellen. #}
   {{ hjelpevindu("hjelp-kurs", "Sluttkurs", [("", ["sluttkurs", "utbyttejustert", "data_hentet_aksje"])]) }}
-  {% if graf and graf.har_ma50 and detalj.sjekker %}
+  {% if vis_grafhjelp %}
     {{ hjelpevindu("hjelp-graf", "Kursgrafen", [("", ["grafen"])]) }}
   {% endif %}
   {{ hjelpevindu("hjelp-styrke", "Signalstyrke", [("", ["signalstyrke", "ikke_raad"])]) }}

@@ -1355,7 +1355,7 @@ class TestStory80c:
         sa opp eller ned."""
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
-        celler = re.findall(r'<td class="fortegn [a-z]+">([^<]*)<span class="ord">([^<]*)</span></td>', html)
+        celler = re.findall(r'<td class="fortegn [a-z]+">([^<]*) <span class="ord">([^<]*)</span></td>', html)
         assert len(celler) == 3, celler
         par = {(tall, ord_) for tall, ord_ in celler}
         assert ("+1", "positiv") in par
@@ -1400,12 +1400,12 @@ class TestStory80c:
     def test_under_arbeid_staar_nederst_paa_begge_sidene(self, klient, monkeypatch):
         """Tillegget 11.10, svar 4. Ville feilet hvis linja manglet paa en side."""
         import app as app_modul
+        monkeypatch.setattr(app_modul, "UNDER_ARBEID", True)
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}))
         for sti in ("/", "/aksje/EQNR"):
             html = klient.get(sti).data.decode("utf-8")
             assert '<p class="under-arbeid">Appen er under utvikling og ikke ferdig.</p>' in html, sti
             assert html.index('class="under-arbeid"') > html.index("<table"), sti
-        assert app_modul.UNDER_ARBEID is True
 
     def test_under_arbeid_styres_av_en_innstilling(self, klient, monkeypatch):
         """Ville feilet hvis linja sto fast i malene og ikke kom fra UNDER_ARBEID."""
@@ -1422,3 +1422,55 @@ class TestStory80c:
         html = klient.get("/").data.decode("utf-8")
         assert "Oslo Børs · " in html
         assert "Eksempeltall" not in html and "Demoversjon" not in html
+
+    # Etter gjennomgangen av PR #35.
+
+    def test_setningen_staar_ikke_med_to_av_tre(self, klient, monkeypatch):
+        """VG1: med STANDARD og én aksje paa 2 av 3 staar ikke setningen.
+        Ville feilet hvis funksjonen saa etter 3 av 3 i stedet for terskelen."""
+        monter(monkeypatch, snapshot({
+            "EQNR": serie([100.0] * 60 + [104.0]),   # 2 av 3
+            "DNB": serie([100.0] * 61),              # 0
+        }))
+        html = klient.get("/").data.decode("utf-8")
+        assert "2 av 3" in html
+        assert "Ingen aksjer skilte seg ut" not in html
+
+    def test_bare_radene_over_terskelen_er_merket(self, klient, monkeypatch):
+        """VG2: en rad med 1 av 3 skal ikke ha merkingen. Ville feilet hvis
+        alle rader fikk class="utslag"."""
+        monter(monkeypatch, snapshot({
+            "EQNR": serie([100.0] * 60 + [104.0]),   # 2 av 3
+            "DNB": serie([100.0] * 60 + [101.0]),    # 1 av 3
+        }))
+        html = klient.get("/").data.decode("utf-8")
+        assert html.count('<tr class="utslag">') == 1
+        dnb = html.split("DNB Bank")[0].rsplit("<tr", 1)[1]
+        assert "utslag" not in dnb
+
+    def test_bare_sjekkene_som_slo_ut_er_merket(self, klient, monkeypatch):
+        """VG2: like mange rader med class="bidro" som sjekker som slo ut."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))  # 2 av 3
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert html.count('<tr class="bidro">') == 2
+
+    def test_den_gule_ringen_har_minst_3_til_1_mot_hvit(self, klient, monkeypatch):
+        """BH3, WCAG 1.4.11. Ville feilet med #d4a000, som har om lag 2,3:1."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}))
+        stil = _stil(klient.get("/").data.decode("utf-8"))
+        farge = re.search(r"--gul:\s*#([0-9a-fA-F]{6})", stil).group(1)
+
+        def lin(c):
+            c = c / 255
+            return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+
+        r, g, b = (int(farge[i:i + 2], 16) for i in (0, 2, 4))
+        lys = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
+        assert (1.0 + 0.05) / (lys + 0.05) >= 3.0, farge
+
+    def test_forbeholdet_staar_ogsaa_uten_tabellen(self, klient, monkeypatch):
+        """VG6: forbeholdet staar synlig ogsaa naar sjekkene ikke vises."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0, 101.0])}))  # for kort serie
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert "Signalet kunne ikke regnes" in html
+        assert "Signalstyrken sier ikke om du bør kjøpe eller selge." in html

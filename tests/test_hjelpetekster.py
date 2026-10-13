@@ -136,6 +136,15 @@ class TestTekstenSierDetKodenGjoer:
         assert trend(_serie(siste, 50)).verdi == verdi
         assert setning in hjelpetekster()["trend"].tekst
 
+    @pytest.mark.parametrize("siste, verdi, setning", [(110.0, 1, "+1 når kursen steg"), (90.0, -1, "-1 når den falt")])
+    def test_bevegelse(self, siste, verdi, setning):
+        """VG8 i gjennomgangen av PR #35: setningen om fortegnet i bevegelse
+        er bundet til koden, som trend og interesse."""
+        from signalberegning import bevegelse
+        kurser = [100.0 + (i % 2) for i in range(30)] + [siste]
+        assert bevegelse(kurser).verdi == verdi
+        assert setning in hjelpetekster()["bevegelse"].tekst
+
 
 class TestRetningen:
     @pytest.mark.parametrize(
@@ -299,7 +308,7 @@ class TestSidene:
         for tekst, vindu in (('<span class="etikett">Sluttkurs ', "hjelp-kurs"),
                              ('<span class="etikett">Signalstyrke ', "hjelp-styrke"),
                              ('<span class="etikett">Retning ', "hjelp-retning-aksje"),
-                             ("<h2>Kursutvikling, seks måneder ", "hjelp-graf"),
+                             ("<h2>Kursutvikling, 6 måneder ", "hjelp-graf"),
                              ('<th class="fortegn">Ga ', "hjelp-ga"),
                              ("<th>Målt mot ", "hjelp-maalt"),
                              ("<td>Trend ", "hjelp-trend"),
@@ -315,9 +324,17 @@ class TestSidene:
         i vinduet for retning paa aksjesiden."""
         tekster = hjelpetekster()
 
+        from markupsafe import escape
+
         def vindu(html, id_):
             del_ = html.split(f'<div id="{id_}" class="hjelpevindu" popover>', 1)[1].split('<div id="hjelp-')[0].split("</body>")[0]
-            return [n for n, t in tekster.items() if t.tekst in del_ and t.tekst]
+            avsnitt = re.findall(r"<p>(.*?)</p>", del_, flags=re.DOTALL)
+            funnet = []
+            for p_ in avsnitt:
+                treff = [n for n, t in tekster.items() if t.tekst and str(escape(t.tekst)) in p_]
+                assert len(treff) == 1, (id_, p_)
+                funnet.append(treff[0])
+            return funnet
 
         forventet = {
             "/": {
@@ -334,7 +351,7 @@ class TestSidene:
                 "hjelp-styrke": ["signalstyrke", "ikke_raad"],
                 "hjelp-retning-aksje": ["retning", "positiv", "negativ", "blandet", "ingen",
                                         "ukjent_aksje", "skjevhet"],
-                "hjelp-sjekkene": ["antall_dager", "hvorfor_tre"],
+                "hjelp-sjekkene": ["hvorfor_tre", "antall_dager"],
                 "hjelp-trend": ["trend"],
                 "hjelp-bevegelse": ["bevegelse"],
                 "hjelp-interesse": ["interesse"],
@@ -346,7 +363,7 @@ class TestSidene:
             html = _side(klient, adresse)
             assert set(re.findall(r'<div id="(hjelp-[a-z-]+)" class="hjelpevindu"', html)) == set(vinduer), adresse
             for id_, noekler in vinduer.items():
-                assert sorted(vindu(html, id_)) == sorted(noekler), (adresse, id_)
+                assert vindu(html, id_) == noekler, (adresse, id_)
 
     def test_spoersmaalstegn_ved_signalstyrke_i_oversikten(self, klient, base):
         """Tillegget 05.10: «?» ved overskriften Signalstyrke, med teksten
@@ -434,19 +451,28 @@ UNNTAK_LENGDE = {"grensene", "skjevhet"}
 VALGT_BORT = (
     r"peker opp", r"peker ned", r"peker hver sin vei", r"\bspriker\b",
     r"\balle tre\b", r"\bde tre\b", r"hvor kraftig", r"summen av tallene",
-    r"\bkroner\b", r"\bkr\b", r"v1\.1", r"\(idé\)",
+    r"\bkroner\b", r"\bkr\b", r"v1\.1", r"\(idé\)", r"lys bakgrunn",
 )
+
+
+def synlig_tekst(html: str) -> str:
+    """Teksten paa siden uten <style> og tagger, med mellomrom slaatt sammen,
+    saa et ord som er delt over to linjer i malen ogsaa blir funnet (ECH3), og
+    et klassenavn i CSS ikke gir treff (ECH4)."""
+    html = re.sub(r"<style>.*?</style>", " ", html, flags=re.DOTALL)
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html))
 
 
 def _setninger(tekst: str) -> int:
     """Setninger som slutter med punktum, spoersmaalstegn eller utropstegn."""
-    return len(re.findall(r"[.?!](?=\s|$)", tekst.strip()))
+    return len(re.findall(r"[.?!][»)\"]*(?=\s|$)", tekst.strip()))
 
 
 class TestStory80c:
     def test_setningstelleren(self):
         assert _setninger("En. To? Tre!") == 3
         assert _setninger("1,5 ganger og 2 %.") == 1
+        assert _setninger("Slutt.» Ny. (Se FR-703.)") == 3
 
     @pytest.mark.parametrize("p", [STANDARD, ANDRE], ids=["standard", "andre"])
     def test_hoeyst_tre_setninger_per_tekst(self, p):
@@ -469,6 +495,40 @@ class TestStory80c:
         foer 8.0c. Sidene leses med testbasen her og med demobasen i
         test_demo.py."""
         for adresse in SIDENE:
-            html = _side(klient, adresse)
+            tekst = synlig_tekst(_side(klient, adresse))
             for ord_ in VALGT_BORT:
-                assert not re.search(ord_, html, re.IGNORECASE), (adresse, ord_)
+                assert not re.search(ord_, tekst, re.IGNORECASE), (adresse, ord_)
+
+    def test_hver_sjekk_har_en_noekkel_som_gir_en_gyldig_id(self):
+        """ECH6: «?» per sjekk bruker navnet med smaa bokstaver som id og som
+        noekkel. Ville feilet med et navn med mellomrom eller æøå, eller et
+        som kolliderer med et fast vindu."""
+        import aksjedetalj  # noqa: F401
+        from signalberegning import beregn_signal
+
+        faste = {"kurs", "graf", "styrke", "retning-aksje", "sjekkene", "ga", "maalt"}
+        from datetime import date, timedelta
+
+        from kursdata import Kursrad
+        rader = [Kursrad(dato=date(2026, 9, 1) + timedelta(days=i), slutt=k, justert_slutt=k, volum=1000)
+                 for i, k in enumerate([100.0] * 60 + [104.0])]
+        signal = beregn_signal(rader)
+        tekster = hjelpetekster()
+        for sjekk in signal.sjekker:
+            noekkel = sjekk.navn.lower()
+            assert re.fullmatch(r"[a-z]+", noekkel), sjekk.navn
+            assert noekkel in tekster and noekkel not in faste, noekkel
+
+    def test_antall_sjekker_er_antallet_i_koden(self):
+        """ECH7: «N av 3» og den gule ringen bygger paa ANTALL_SJEKKER. Ville
+        feilet hvis en fjerde sjekk kom til uten at konstanten ble rettet."""
+        from hjelpetekster import ANTALL_SJEKKER
+        from signalberegning import beregn_signal
+
+        from datetime import date, timedelta
+
+        from kursdata import Kursrad
+        rader = [Kursrad(dato=date(2026, 9, 1) + timedelta(days=i), slutt=k, justert_slutt=k, volum=1000)
+                 for i, k in enumerate([100.0] * 60 + [104.0])]
+        signal = beregn_signal(rader)
+        assert len(signal.sjekker) == ANTALL_SJEKKER
