@@ -561,3 +561,24 @@ class TestStory80cIDemoen:
             tekst = synlig_tekst(klient.get(sti).data.decode("utf-8"))
             assert not re.search(r"\b\d{4}-\d{2}-\d{2}\b", tekst), sti
         assert re.search(r'<text class="maanedstekst"', klient.get("/aksje/BRFE").data.decode("utf-8"))
+
+
+class TestStory80eIDemoen:
+    """FR-411: tabellen fra 8.0e vises ogsaa med demobasen."""
+
+    def test_t_b_og_i_og_de_to_delene_i_demoen(self, klient, monkeypatch, demobase):
+        import re
+
+        from test_app import _deler, _regel, _stil, _tabell
+
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        html = klient.get("/").data.decode("utf-8")
+        tabell = _tabell(html)
+        assert tabell.deler == ["Skilte seg ut", "Øvrige aksjer"]
+        deler = _deler(html)
+        assert deler["Skilte seg ut"] and deler["Øvrige aksjer"]
+        vurdert = [rad[3] for rad in tabell.rader if rad[3][0].isdigit()]
+        assert vurdert
+        for celle in vurdert:
+            assert re.fullmatch(r"\d av 3 T (\+1|0|-1) B (\+1|0|-1) I (\+1|0|-1)( skiller seg ut)?", celle), celle
+        assert "background: var(--fyll)" in _regel(_stil(html), ".pille.tre-av-tre")

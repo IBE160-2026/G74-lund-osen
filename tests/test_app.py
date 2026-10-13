@@ -310,10 +310,11 @@ class TestTidsstempler:
 
         html = klient.get("/").data.decode("utf-8")
         hode = html[html.index("<thead>"): html.index("</thead>")]
-        kropp = html[html.index("<tbody>"): html.index("</tbody>")]
+        # Story 8.0e: to tbody, og overskriften for hver del er en egen rad.
+        kropp = html[html.index("<tbody>"): html.rindex("</tbody>")]
 
         assert hode.count("</th>") == 5
-        rader = kropp.split("</tr>")[:-1]
+        rader = re.findall(r'<tr(?! class="del)[^>]*>.*?</tr>', kropp, re.DOTALL)
         assert len(rader) == 2
         for rad in rader:
             assert rad.count("</td>") == 5
@@ -849,20 +850,30 @@ NB = "\u00a0"
 
 
 class _Tabell(HTMLParser):
-    """Cellene i tbody, rad for rad, som tekst. Leser ikke stil eller farge."""
+    """Cellene i tbody, rad for rad, som tekst. Leser ikke stil eller farge.
+
+    Story 8.0e: en rad med class="del" er overskriften for en del av
+    tabellen, eller setningene fra 8.0c. Den staar i deler og ikke i rader,
+    og del_av sier hvilken del hver rad i rader staar under ("" uten)."""
 
     def __init__(self):
         super().__init__()
         self.hode: list[str] = []
         self.rader: list[list[str]] = []
+        self.deler: list[str] = []
+        self.del_av: list[str] = []
         self._i_kropp = False
+        self._i_del = False
         self._celle: list[str] | None = None
 
     def handle_starttag(self, tag, attrs):
         if tag == "tbody":
             self._i_kropp = True
         elif tag == "tr" and self._i_kropp:
-            self.rader.append([])
+            self._i_del = "del" in (dict(attrs).get("class") or "").split()
+            if not self._i_del:
+                self.rader.append([])
+                self.del_av.append(self.deler[-1] if self.deler else "")
         elif tag in ("td", "th"):
             self._celle = []
 
@@ -873,7 +884,9 @@ class _Tabell(HTMLParser):
             # Bare vanlige blanktegn slaas sammen. str.split() ville ogsaa
             # tatt det harde mellomrommet, som testene ser etter.
             tekst = re.sub(r"[ \t\r\n]+", " ", "".join(self._celle)).strip()
-            if tag == "th":
+            if self._i_kropp and self._i_del:
+                self.deler.append(tekst)
+            elif tag == "th":
                 self.hode.append(tekst)
             elif self.rader:
                 self.rader[-1].append(tekst)
@@ -936,8 +949,8 @@ class TestStory80:
         tabell = _tabell(klient.get("/").data.decode("utf-8"))
         styrke = {rad[0]: rad[3] for rad in tabell.rader}
 
-        assert styrke["Equinor"] == "2 av 3 skiller seg ut"
-        assert styrke["DNB Bank"] == "1 av 3"
+        assert styrke["Equinor"] == "2 av 3 T +1 B +1 I 0 skiller seg ut"
+        assert styrke["DNB Bank"] == "1 av 3 T 0 B +1 I 0"
 
     def test_fortsatt_noeyaktig_fem_kolonner(self, klient, monkeypatch):
         monter(monkeypatch, snapshot({
@@ -1103,7 +1116,7 @@ class TestVurderingenPaaOversikten:
 
         rad = _rader_per_selskap(klient.get("/").data.decode("utf-8"))["Equinor"]
 
-        assert rad[3] == "0 av 3"
+        assert rad[3] == "0 av 3 T 0 B 0 I 0"
         assert "Ingen" in rad[4]
 
     def test_gaarsdagens_vurdering_naar_dagens_rad_har_grunn(self, klient):
@@ -1274,7 +1287,7 @@ class TestStory80c:
         }))
         styrke = {rad[0]: rad[3] for rad in _tabell(klient.get("/").data.decode("utf-8")).rader}
         assert styrke["Equinor"].startswith("2 av 3")
-        assert styrke["DNB Bank"] == "0 av 3"
+        assert styrke["DNB Bank"] == "0 av 3 T 0 B 0 I 0"
 
     def test_tre_av_tre_har_gul_ring_og_to_av_tre_ikke(self, klient, monkeypatch):
         """designregler §3. Ville feilet uten ringen, eller med gult ved 2 av 3."""
@@ -1563,3 +1576,156 @@ class TestStory80c:
         assert html.count('<line class="maanedsstrek"') == len(navn)
         assert html.index('class="maanedsstrek"') < html.index('class="kurslinje" points')
         assert "01.09 til" in html
+
+
+def _lagret(symbol: str, endring: float, trend: int, bevegelse: int, interesse: int,
+            vurdert: bool = True) -> None:
+    """En flat serie der siste dag endrer seg med endring prosent, og en
+    lagret vurdering med de tre fortegnene. Kursene ville gitt noe annet,
+    saa siden viser bare det vurderingen sier. vurdert=False gir ingen rad i
+    vurdering."""
+    rader = serie([100.0] * 60 + [100.0 * (1 + endring / 100)])
+    skriv_serie(symbol, rader, datetime.fromisoformat(HENTET), vurdert=False)
+    if not vurdert:
+        return
+    utslag = [v for v in (trend, bevegelse, interesse) if v]
+    retning = ("Ingen" if not utslag else "Positiv" if all(v > 0 for v in utslag)
+               else "Negativ" if all(v < 0 for v in utslag) else "Blandet")
+    skriv_vurdering(symbol, rader[-1].dato, Vurdering(
+        styrke=len(utslag), retning=retning, trend=trend, bevegelse=bevegelse,
+        interesse=interesse, slutt=rader[-1].slutt, justert_slutt=rader[-1].justert_slutt,
+        trend_avvik=0.0, dagens_endring=endring / 100, standardavvik=0.01, volumforhold=1.0,
+    ))
+
+
+def _deler(html: str) -> dict[str, list[str]]:
+    """Selskapene under hver del, i rekkefoelgen de staar."""
+    tabell = _tabell(html)
+    deler: dict[str, list[str]] = {}
+    for rad, del_ in zip(tabell.rader, tabell.del_av):
+        deler.setdefault(del_, []).append(rad[0].split(" hentet ")[0])
+    return deler
+
+
+class TestStory80e:
+    """Story 8.0e, PR 1: tabellen i oversikten."""
+
+    def test_t_b_og_i_staar_under_n_av_3_fra_vurderingen(self, klient):
+        """Den flate serien ville gitt T 0, B 0 og I 0. Ville feilet hvis T, B
+        og I ble regnet av kursene, eller stod over «N av 3»."""
+        _lagret("EQNR", 0.0, 1, -1, 0)
+        rad = _rader_per_selskap(klient.get("/").data.decode("utf-8"))["Equinor"]
+        assert rad[3] == "2 av 3 T +1 B -1 I 0 skiller seg ut"
+
+    def test_rad_uten_vurdering_har_ikke_t_b_og_i(self, klient):
+        """Ville feilet hvis en rad med en grunn eller uten vurdering viste T,
+        B og I."""
+        _lagret("EQNR", 0.0, 1, 0, 0)
+        _lagret("DNB", 0.0, 0, 0, 0, vurdert=False)
+        rader = serie([100.0] * 61)
+        skriv_serie("KOG", rader, datetime.fromisoformat(HENTET), vurdert=False)
+        skriv_vurdering("KOG", rader[-1].dato, Grunn.SIGNAL_IKKE_REGNET)
+        html = klient.get("/").data.decode("utf-8")
+        celler = {rad[0]: rad[3] for rad in _tabell(html).rader}
+        for navn in ("DNB Bank", "Kongsberg Gruppen"):
+            assert celler[navn].startswith("–"), celler[navn]
+            assert not re.search(r"\b[TBI] [+-]?\d", celler[navn]), celler[navn]
+        assert "signalet kunne ikke regnes" in celler["Kongsberg Gruppen"]
+        assert html.count('<span class="sjekker">') == 1
+
+    def test_to_deler_hver_sortert_etter_fr_102(self, klient):
+        """Styrke 2 er paa terskelen og staar under «Skilte seg ut». Ville
+        feilet med > i stedet for >=, en rad med 1 av 3 under «Skilte seg
+        ut», eller sorteringen snudd i én del."""
+        _lagret("KOG", 0.5, 1, 1, 1)       # 3 av 3
+        _lagret("EQNR", -5.0, 1, 1, 0)     # 2, stor endring
+        _lagret("DNB", 1.0, -1, -1, 0)     # 2, liten endring
+        _lagret("AKRBP", 0.2, 1, 0, 0)     # 1, liten endring
+        _lagret("NHY", -3.0, 0, 1, 0)      # 1, stor endring
+        _lagret("FRO", 10.0, 0, 0, 0)      # 0
+        _lagret("VAR", 20.0, 0, 0, 0, vurdert=False)
+        html = klient.get("/").data.decode("utf-8")
+        assert _tabell(html).deler == ["Skilte seg ut", "Øvrige aksjer"]
+        assert _deler(html) == {
+            "Skilte seg ut": ["Kongsberg Gruppen", "Equinor", "DNB Bank"],
+            "Øvrige aksjer": ["Norsk Hydro", "Aker BP", "Frontline", "Vår Energi"],
+        }
+
+    def test_fortsatt_fem_kolonner_med_to_deler(self, klient):
+        """FR-101. Overskriftene for delene gaar over alle fem kolonnene.
+        Ville feilet med en sjette kolonne."""
+        _lagret("EQNR", 1.0, 1, 1, 0)
+        _lagret("DNB", 1.0, 0, 0, 0)
+        html = klient.get("/").data.decode("utf-8")
+        tabell = _tabell(html)
+        assert len(tabell.hode) == 5 and len(tabell.rader) == 2
+        assert all(len(rad) == 5 for rad in tabell.rader)
+        assert html.count('<th colspan="5" scope="rowgroup">') == 2
+        assert html.count('<td colspan="5">') == 0
+
+    def test_delingen_bruker_terskelen_fra_parametre(self, klient, monkeypatch):
+        """FR-705. Ville feilet hvis terskelen 2 sto fast i delingen."""
+        import dataclasses
+
+        monkeypatch.setattr(app_modul, "STANDARD", dataclasses.replace(app_modul.STANDARD, terskel=3))
+        _lagret("KOG", 0.0, 1, 1, 1)
+        _lagret("EQNR", 0.0, 1, 1, 0)
+        assert _deler(klient.get("/").data.decode("utf-8")) == {
+            "Skilte seg ut": ["Kongsberg Gruppen"], "Øvrige aksjer": ["Equinor"],
+        }
+
+    def test_setningene_fra_8_0c_der_skilte_seg_ut_ellers_staar(self, klient):
+        """Svar 3. Ville feilet hvis «Skilte seg ut» stod sammen med
+        setningen, eller setningen stod over tabellen."""
+        _lagret("EQNR", 1.0, 1, 0, 0)
+        _lagret("DNB", 1.0, 0, 0, 0, vurdert=False)
+        html = klient.get("/").data.decode("utf-8")
+        tabell = _tabell(html)
+        assert tabell.deler == [
+            "Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer. 1 av 2 aksjer ble vurdert.",
+            "Øvrige aksjer",
+        ]
+        assert set(tabell.del_av) == {"Øvrige aksjer"}
+        assert "Skilte seg ut</th>" not in html
+        assert html.index("Ingen aksjer skilte seg ut") > html.index("</thead>")
+
+    def test_alle_over_terskelen_gir_bare_skilte_seg_ut(self, klient):
+        _lagret("EQNR", 1.0, 1, 1, 0)
+        _lagret("KOG", 1.0, 1, 1, 1)
+        html = klient.get("/").data.decode("utf-8")
+        assert _tabell(html).deler == ["Skilte seg ut"]
+        assert "Øvrige aksjer" not in html
+
+    def test_uten_en_eneste_vurdering_er_det_én_del_uten_overskrift(self, klient):
+        _lagret("EQNR", 1.0, 0, 0, 0, vurdert=False)
+        _lagret("DNB", 1.0, 0, 0, 0, vurdert=False)
+        tabell = _tabell(klient.get("/").data.decode("utf-8"))
+        assert tabell.deler == [] and len(tabell.rader) == 2
+
+    def test_tre_av_tre_har_svart_fyll_og_hvit_tekst(self, klient):
+        """Svar 8. Ville feilet uten fyllet, eller med fyll ogsaa paa 2 av 3."""
+        _lagret("KOG", 0.0, 1, 1, 1)
+        _lagret("EQNR", 0.0, 1, 1, 0)
+        html = klient.get("/").data.decode("utf-8")
+        stil = _stil(html)
+        fyll = _regel(stil, ".pille.tre-av-tre")
+        assert "var(--gul)" in fyll and "background: var(--fyll)" in fyll
+        assert "color: #ffffff" in fyll
+        assert re.search(r"--fyll:\s*#000000", stil)
+        assert "background" not in _regel(stil, ".pille")
+        assert '<span class="pille tre-av-tre">3 av 3</span>' in html
+        assert '<span class="pille">2 av 3</span>' in html
+
+    def test_hvit_tekst_paa_fyllet_har_minst_4_5_til_1(self, klient):
+        """WCAG 1.4.3 for vanlig tekst."""
+        _lagret("KOG", 0.0, 1, 1, 1)
+        stil = _stil(klient.get("/").data.decode("utf-8"))
+        farge = re.search(r"--fyll:\s*#([0-9a-fA-F]{6})", stil).group(1)
+
+        def lin(c):
+            c = c / 255
+            return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+
+        r, g, b = (int(farge[i:i + 2], 16) for i in (0, 2, 4))
+        lys = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
+        assert (1.0 + 0.05) / (lys + 0.05) >= 4.5, farge

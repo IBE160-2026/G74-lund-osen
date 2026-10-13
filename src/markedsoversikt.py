@@ -21,7 +21,7 @@ from kursdata import Aksje, Kursrad
 from oversiktsdata import Oversiktspost
 from signalberegning import BLANDET, INGEN, NEGATIV, POSITIV, Parametre, STANDARD
 from tilstand import Art, Tilstand, tilstand
-from tallformat import dato
+from tallformat import dato, fortegn
 from vurderingsdata import Grunn, Vurdering
 
 
@@ -105,6 +105,15 @@ def les_tilstand(
     return utfall, IKKE_BOERSDAG
 
 
+# Bokstaven, navnet og feltet i Vurdering for hver sjekk, i samme rekkefoelge
+# som paa aksjesiden (story 8.0e).
+SJEKKBOKSTAVER = (
+    ("T", "trend", "trend"),
+    ("B", "bevegelse", "bevegelse"),
+    ("I", "interesse", "interesse"),
+)
+
+
 @dataclass(frozen=True)
 class Rad:
     """En rad i markedsoversikten.
@@ -148,6 +157,19 @@ class Rad:
     @property
     def ikke_vurdert(self) -> bool:
         return self.tekst == IKKE_VURDERT
+
+    @property
+    def sjekker(self) -> tuple[tuple[str, str, str], ...]:
+        """T, B og I under «N av 3» (story 8.0e): bokstaven, navnet og
+        verdien med fortegn, som «T +1». Lest fra den lagrede vurderingen,
+        aldri regnet paa nytt (FR-101, AD-7). Tom uten vurdering, saa en rad
+        med en grunn ikke viser noen."""
+        if not self.vurdering:
+            return ()
+        return tuple(
+            (bokstav, navn, fortegn(getattr(self.vurdering, felt)))
+            for bokstav, navn, felt in SJEKKBOKSTAVER
+        )
 
 
 def endring_i_prosent(rader: list[Kursrad]) -> float | None:
@@ -254,6 +276,18 @@ def ingen_skilte_seg_ut(rader: list[Rad]) -> bool:
     """
     vurdert = [rad for rad in rader if rad.styrke is not None]
     return bool(vurdert) and not any(rad.skiller_seg_ut for rad in vurdert)
+
+
+def del_i_to(rader: list[Rad]) -> tuple[list[Rad], list[Rad]]:
+    """Radene som skilte seg ut, og de oevrige - story 8.0e.
+
+    Delingen er skiller_seg_ut, altsaa den lagrede styrken mot terskelen i
+    Parametre (FR-705). Rekkefoelgen fra bygg_oversikt beholdes, saa hver del
+    er sortert etter FR-102. Rader uten vurdering havner i de oevrige.
+    """
+    ut = [rad for rad in rader if rad.skiller_seg_ut]
+    oevrige = [rad for rad in rader if not rad.skiller_seg_ut]
+    return ut, oevrige
 
 
 def antall_vurdert(rader: list[Rad]) -> int:

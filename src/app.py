@@ -51,6 +51,7 @@ from lagring_sqlite import (
 from markedsoversikt import (
     bygg_oversikt,
     antall_vurdert,
+    del_i_to,
     eldre_enn_nyeste,
     ingen_skilte_seg_ut,
     norsk_tid,
@@ -351,6 +352,7 @@ def markedsoversikt():
 
     poster = _leser_eller_basefeil(hent_oversiktsleser).oversikt()
     rader = bygg_oversikt(poster, idag(), STANDARD)
+    skilte_seg_ut, oevrige = del_i_to(rader)
 
     return render_template(
         "index.html",
@@ -362,6 +364,8 @@ def markedsoversikt():
         ikke_vurdert=any(rad.ikke_vurdert for rad in rader),
         ingen_skilte_seg_ut=ingen_skilte_seg_ut(rader),
         antall_vurdert=antall_vurdert(rader),
+        skilte_seg_ut=skilte_seg_ut,
+        oevrige=oevrige,
         hentekommando=hentekommando(),
     )
 
