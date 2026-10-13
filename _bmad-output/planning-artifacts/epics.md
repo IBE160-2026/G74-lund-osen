@@ -361,6 +361,8 @@ kontrollen 22.09 fant det.
 | **NFR-07** Rådata bevares | **Eid av Epic 1** (`AD-6`). Delvis levert: `fetch_prices` skriver tidsstemplede øyeblikksbilder (`352e3a2`) |
 | **NFR-08** Bare tall vi kan stå for *(lagt til 2026-10-01)* | **Tverrgående.** Levert i det som finnes: «Ukjent» i FR-101, og ingen fallback mellom `close` og `adjusted_close` i `eodhd.py`. **Kontroll på hver visningsstory:** et tall som mangler eller ikke består kontrollen, vises som «–» med grunnen. For KI-teksten gjelder FR-603 |
 
+*Lagt til 2026-10-13, Marians ja kl. 13:44, etter faglærers tilbakemelding 06.10 (`tilbakemelding-product-brief.md`):* FR-411 er også tverrgående. **Kontroll på hver visningsstory:** det storyen viser, vises også med demobasen, og en test krever det. Gjelder fra 8.0c.
+
 **Alle sju NFR-er er plassert:** fire eid av en epic (NFR-01, 02, 04, 07), tre
 tverrgående med navngitt kontroll (NFR-03, 05, 06).
 *Rettet 2026-10-01:* med NFR-08 er det åtte: fire eid av en epic og fire
