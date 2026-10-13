@@ -2,7 +2,7 @@
 title: 'Story 8.0e: Oversikten fra designforslaget'
 type: 'feature'
 created: '2026-10-13'
-status: 'in-review'
+status: 'in-progress'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '4c4b420f3ef2bd6ef07d1ae24d301632d721544c'
@@ -32,6 +32,18 @@ Planen ble vist i chatten 13.10 og er ført kort i `docs/ai-prompts/2026-10-13.m
 6. **To pull requests:** først tabellen, så teksten over tabellen.
 7. **Demoen har samme logo og utseende** som den ekte versjonen, nå og når 8.0d kommer. Bare merket øverst og «Demo Børs» skiller dem (FR-411).
 8. **Pillen «3 av 3»** får svart fyll og hvit tekst inne i den gule ringen (`#a67c00`), som i designforslaget. 2 av 3 merkes som i dag, med fet skrift og strek, uten fyll og uten gult. PR 1, med en test for kontrasten, og `designregler.md` §3 får en datert linje.
+
+## PR 2: teksten over tabellen
+
+Instruksjonen kl. 23:43 13.10 (grenen `8-0e-tekst`, fra main etter `85fe8a4`). Svarene 1–5 over er beslutningene, med disse i tillegg:
+
+- **Overskriften** «N av M aksjer skilte seg ut <ukedag>», med «N av M aksjer» i fet skrift. N og M telles fra radene, og ukedagen er datoen i linja over tabellen (svar 3 og 5). Den gule understreken fra tavla tas ikke med: det viktigste merkes med fet skrift (`designregler.md` §4, rettet 13.10), og gult betyr bare 3 av 3 (beslutningen kl. 23:43).
+- **Innledningen** med ordlyden i `epics.md`, tallene fra radene, `Parametre` og `antall_sjekker`, «Hos 1 aksje» når N er 1, og ingen setning «Hos …» når N er 0 (svar 3 og 4).
+- **Linja om «3 av 3»:** «Bare <navn> fikk utslag på alle 3 sjekkene.», med navnene fra radene bundet med «og». Har ingen 3 av 3, står ikke linja.
+- **«Slik leser du tabellen»** med 3 punkter: «Signalstyrke 0–3» med ordlyden i svar 2, og tavlas tekster om retning og selskapsnavnet fra endringsforslaget 13.10, punkt 4.2 («Kan tas som de står»). Ingen setning om klikk på T, B eller I.
+- **«Demo Børs»** i innledningen og linja over tabellen i demoen (svar 1). Ingen tekst bak «?» endres.
+- **README-en:** statuslinja ordrett fra instruksjonen, steg 2 får setningen fra «Jeg har fått koden fra før» i `docs/hjelp.md`, og steg 4 får «Har mappa et annet navn, drar du den mappa der README og compose ligger.» `docs/kvalitetssikring.md` §9 rettes i samme commit, med en datert linje om at Prøve 1 og 2 tas etter at 8.0d er flettet (beslutningen kl. 23:40), og at prøven før innleveringen bruker ZIP-fila som faktisk leveres (kl. 23:22).
+- **Mutantene:** M skrevet fast som 15; ukedagen fra dagen siden åpnes; feil indeks i lista over ukedager; linja med «3 av 3» uten 3 av 3; «Oslo Børs» i innledningen i demoen; «Hos 1 aksjer»; setningen om klikk i første punkt; setningen borte fra steg 2 i README-en.
 
 ## Boundaries & Constraints
 
