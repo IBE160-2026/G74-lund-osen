@@ -2,7 +2,7 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-06T20:47
+updated: 2026-10-13T22:13
 ---
 
 # Kilder og rettigheter
@@ -29,6 +29,7 @@ blir liggende lokalt er derfor et valg vi må ta bevisst — se neste avsnitt.
 | EODHD `/api/real-time` | — (forkastet) | 2026-09-19 | Virker, men prissiden sier gratisnivået ikke har det. Ikke bygg på. |
 | EODHD `/api/news` | Relevanseksperimentet, én gang | **2026-09-21, med skriftlig svar** | **Svarer for `.OL` på gratisnivå** (testet 21.09). **Språkmodellbruk er klarert av EODHD, ikke av rettighetshaverne**, med betingelser — skriftlig godkjenning 21.09, se egen seksjon. EODHD er et mellomledd: artiklene er syndikert fra `finance.yahoo.com` (se «EODHD er et mellomledd», lagt til 24.09). Betingelsene er ikke oppfylt før modelltjenestens treningsvilkår er dokumentert. Forkastet for daglig drift: 5 kall per ticker, altså 75 for de 15 mot en dagsgrense på 20. |
 | EODHD `/api/calendar` | — (utilgjengelig) | 2026-09-19 | HTTP 403: «Only EOD data allowed for free users». |
+| EODHD `/api/div` | — (prøvd) | Vilkår ikke lest. Prøvd 2026-10-13 | *Lagt til 2026-10-13:* svarer HTTP 200 for `.OL` på gratisnivå, med historikk fra 2001–2002, i motsetning til `/api/calendar` over. Se «Prøven 13.10: utbytte og valutakurs på gratisnivået». |
 | Oslo Børs NewsWeb | Selskapsmeldinger | **2026-09-21, fullstendig** | Åpent JSON-API, ferdig tagget med utsteder. **Euronexts vilkår dekker `newsweb.oslobors.no` ved navn og forbyr automatisert henting uten skriftlig tillatelse.** Se egen seksjon. *28.09: ingen tillatelse innen fristen. Ikke brukt i v1 (plan B).* |
 | E24 RSS | — (forkastet) | 2026-09-19 | Forbyr eksplisitt LLM-input. Se under. |
 | NRK RSS | — (forkastet) | 2026-09-20 | Avviser automatisert henting med HTTP 403. Generelle nyheter uten finansfokus. |
@@ -190,6 +191,10 @@ hele tatt.
 og ti artikler. Gratisnivået gir `/api/news` for norske tickere, og 403-svaret
 på `/api/calendar` kan ikke generaliseres til de andre endepunktene. Måling og
 rådatareferanse: `malinger.md` §7.2.
+
+*Lagt til 2026-10-13:* `/api/div` svarte også HTTP 200 for `EQNR.OL` og `FRO.OL` på
+gratisnivå, og `/api/eod` for `USDNOK.FOREX`. Se «Prøven 13.10: utbytte og
+valutakurs på gratisnivået».
 
 ### Konklusjon på lesningen: uklart — men spørsmålet er nå besvart
 
@@ -615,6 +620,36 @@ sendes, og det må være dokumentert før noe sendes. Om ett spørsmål til EODH
 skal stilles om plan B, er ført under «Å følge opp».
 
 *Avgjort 2026-10-04:* vi spør ikke. Grunnen: bare våre egne resultater sendes til modellen, altså fortegn, styrke, retning og antall, og ingen prosenter, forholdstall, kurser eller volumer. `malinger.md` §19 viste at målingene ikke ga bedre tekst.
+
+---
+
+## Prøven 13.10: utbytte og valutakurs på gratisnivået
+
+*Lagt til 2026-10-13.* Tre kall etter kveldens henting, ett om gangen, godkjent
+som svar 19, 20 og 22 i `sprint-change-proposal-2026-10-13.md`. Hvert kall kostet
+1 kall. Kvoten etterpå: 18 brukt og 2 igjen, og `extraLimit` uendret. Svarene
+ligger bare lokalt, i `data/raa/utbytte-proeve-2026-10-13.json` (regel 10 og 16).
+Ingen beløp, kurser eller valutakurser står her.
+
+| Endepunkt | Status | Rader | Første og siste `date` | Felt |
+|---|---|---|---|---|
+| `/api/div/EQNR.OL`, uten `from` og `to` | 200 | 64 | 2002-05-08 og 2026-11-13 | `date`, `declarationDate`, `recordDate`, `paymentDate`, `period`, `value`, `unadjustedValue`, `currency` |
+| `/api/div/FRO.OL`, uten `from` og `to` | 200 | 68 | 2001-05-22 og 2026-09-17 | De samme åtte |
+| `/api/eod/USDNOK.FOREX`, fra 2025-10-14 til 2026-10-13 | 200 | 313 | 2025-10-14 og 2026-10-13 | `date`, `open`, `high`, `low`, `close`, `adjusted_close`, `volume` |
+
+Utbyttet:
+
+- `currency` er `NOK` i alle radene for begge aksjene.
+- `EQNR.OL`: `declarationDate` er fylt ut i 41 av 64 rader, `recordDate` i 0 og
+  `paymentDate` i 52. `value` og `unadjustedValue` er like i alle 64.
+- `FRO.OL`: `declarationDate`, `recordDate` og `paymentDate` er ikke fylt ut i
+  noen av de 68 radene. `value` og `unadjustedValue` er ulike i 42.
+- Kommende utbytte (spørsmål 19): ja for `EQNR.OL`. Én rad har `date`
+  2026-11-13 og `paymentDate` 2026-11-25, etter 13.10. `FRO.OL` har ingen dato
+  etter 13.10.
+
+Utbyttet går altså lenger tilbake enn året vilkårene nevner for EOD-dataene
+(«within the past year only»).
 
 ---
 

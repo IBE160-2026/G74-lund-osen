@@ -2609,6 +2609,20 @@ Det vi lærte: det som bare ligger utenfor repoet, blir verken fulgt eller teste
 
 ---
 
+## 13.10.2026 – Endringsforslaget godkjent, og krav som falt ut
+
+*Joakim og Marian.*
+
+Endringsforslaget 13.10 ble godkjent kl. 12:46 og ført inn i PRD-en, epics, designreglene, samlelista og README-en. Så leste vi tilbakemeldingen fra faglærer en gang til, og fire ting kom inn: en tabell over hvilke tester som prøver hvert suksesskriterium, en regel om at alt som vises, også skal vises i demoen, en README-prøve med testerens egen nøkkel, og en håndregning av en dag der interesse slo ut. Vi regnet TEL 08.10 i et regneark uten å se appens tall først, og alle fire målingene stemte. Rådet skrev først at interesse aldri var kontrollert med et utslag. Det var feil: et skript hadde gjort det 08.10 (`malinger.md` §25).
+
+Story 8.0c, PR 1, ble flettet: «N av 3» i tabellen, gul ring rundt 3 av 3, fet skrift og strek ved 2 av 3, ordet ved hver sjekk, og hjelp ved det den forklarer. Gjennomgangen ga ett spørsmål vi måtte svare på: skal «Ingen aksjer skilte seg ut» stå når noen aksjer ikke er vurdert? Den står, og «N av M aksjer ble vurdert.» kommer under. PR 2 med datoene og månedsmerkene er bygget, men flettes i morgen, fordi kveldens henteblokk ser etter den gamle datoformen. Gjennomgangen av PR 2 fant at demotestene brukte den ekte klokka og ville feilet fra 1. januar 2027.
+
+Etter flettingen fant rådet at Epic 8-konteksten, som KI setter sammen av planen, hadde mistet ni punkter da den ble laget på nytt på grenen, blant annet at sluttkursen er `close` mens endringen regnes på `adjusted_close`. Kravene sto fortsatt i PRD-en og epics, og testene var grønne, så ingenting varslet. Rådet så det ikke da grenen ble kontrollert, men først da flettingen ble gått gjennom en gang til. Punktene er lagt inn igjen. Claude Code skrev også klokkeslett i to Utført-linjer som lå etter commitene de sto i, og de rettes. Til slutt så vi at navnet til én av oss sto over 300 ganger i plandokumentene, og den andres under 20, selv om regel 20 sier at vi avgjør sammen. Nå skrives godkjenninger og beslutninger uten navn, og det som står, blir stående som historikk. Kveldens henting kommer i neste oppføring.
+
+Det vi lærte: en tekst som KI lager på nytt, må diffes mot forrige versjon, også når den kalles en sammenstilling og testene er grønne. Et klokkeslett i en logg må slås opp, ikke anslås.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.

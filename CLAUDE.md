@@ -19,6 +19,9 @@ et sitat som ikke fantes».
    Nye dokumenter under `docs/` og `_bmad-output/planning-artifacts/` får samme
    frontmatter som `prd.md`: `title`, `status` (`draft`, `final`, `aktiv` eller
    `sendt`), `created` (datoen fila først ble committet) og `updated`.
+   *Lagt til 2026-10-13:* klokkeslett i Utført-linjer og andre logglinjer tas
+   også fra `date` eller `git log`, aldri anslått. To Utført-linjer 13.10 hadde
+   et klokkeslett etter commiten de sto i.
 5. **Memloggene er append-only.** En feil rettes med en ny linje.
    Unntak: rå kildedata (regel 16) fjernes fra linjen der de står, linjen merkes
    `[raadata fjernet <dato>]`, og en ny linje nederst sier hvorfor. Brukt i
