@@ -12,6 +12,7 @@
       --opp: #0a7d32;
       --ned: #b3261e;
       --blandet: #8a5a00;
+      --gul: #d4a000;
     }
     body {
       font-family: system-ui, sans-serif;
@@ -25,8 +26,13 @@
     table { border-collapse: collapse; width: 100%; }
     th, td { text-align: left; padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--strek); }
     th { font-weight: 600; font-size: 0.85rem; color: var(--dempet); }
+    /* Story 8.0c: overskriften staar over tallene. */
+    th.tall { text-align: right; }
     td.tall { text-align: right; font-variant-numeric: tabular-nums; }
-    tr.utslag td { background: #fafafa; }
+    /* Story 8.0c: 2 av 3 eller mer merkes med fet skrift og en strek til
+       venstre i tekstfargen, ikke med lys bakgrunn og ikke med gult. */
+    tr.utslag td { font-weight: 600; }
+    tr.utslag td:first-child { box-shadow: inset 3px 0 0 var(--tekst); }
     td.selskap { font-weight: 500; }
     /* Story 8.0: navnet ser ut som en lenke, og fokus synes. */
     td.selskap a { color: inherit; text-decoration: underline; }
@@ -44,6 +50,10 @@
     .ingen, .ukjent { color: var(--dempet); }
 
     .styrke { font-variant-numeric: tabular-nums; }
+    /* designregler §3: gult betyr 3 av 3, med gul ring rundt pillen. */
+    .pille { white-space: nowrap; padding: 0.05rem 0.45rem; border-radius: 999px; }
+    .pille.tre-av-tre { border: 2px solid var(--gul); }
+    p.ingen-utslag { margin: 0.6rem 0; }
     /* FR-705 med tekst, ikke bare farge (story 8.0). */
     .merke { display: block; font-size: 0.75rem; font-weight: 600; }
     .mangler { color: var(--dempet); font-style: italic; font-size: 0.85rem; }
@@ -74,6 +84,10 @@
       {% if hentet %}· data hentet {{ hentet|norsk_tid }}{% endif %}
     </p>
 
+    {% if ingen_skilte_seg_ut %}
+      <p class="ingen-utslag">Ingen aksjer skilte seg ut: ingen fikk {{ parametre.terskel }} av {{ antall_sjekker }} eller mer.</p>
+    {% endif %}
+
     <table>
       <thead>
         <tr>
@@ -103,7 +117,7 @@
 
             <td class="tall styrke">
               {% if rad.styrke is not none %}
-                {{ rad.styrke }}
+                <span class="pille{% if rad.styrke == antall_sjekker %} tre-av-tre{% endif %}">{{ rad.styrke }} av {{ antall_sjekker }}</span>
                 {% if rad.skiller_seg_ut %}<span class="merke">skiller seg ut</span>{% endif %}
               {% else %}
                 – <span class="merke mangler">{{ rad.tekst }}</span>

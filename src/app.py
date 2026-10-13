@@ -38,7 +38,7 @@ from boersdag import norsk_dato
 from graf import bygg_graf
 from kursdata import Kursleser
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER
-from hjelpetekster import Hjelp, hjelpetekster
+from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster
 from lagring_sqlite import (
     DEMOMERKE,
     SqliteKurslager,
@@ -51,6 +51,7 @@ from lagring_sqlite import (
 from markedsoversikt import (
     bygg_oversikt,
     eldre_enn_nyeste,
+    ingen_skilte_seg_ut,
     norsk_tid,
     sidens_dato,
     sidens_tidsstempel,
@@ -220,8 +221,13 @@ def _eksempeltall():
 
 @app.context_processor
 def _hjelp():
-    """Hjelpetekstene og parametrene paa hver side, laget av samme objekt."""
-    return {"hjelp": Hjelp(hjelpetekster(STANDARD)), "parametre": STANDARD}
+    """Hjelpetekstene og parametrene paa hver side, laget av samme objekt.
+    antall_sjekker er «3» i «N av 3» (story 8.0c), fra samme sted som hjelpen."""
+    return {
+        "hjelp": Hjelp(hjelpetekster(STANDARD)),
+        "parametre": STANDARD,
+        "antall_sjekker": ANTALL_SJEKKER,
+    }
 
 
 @app.teardown_appcontext
@@ -333,6 +339,7 @@ def markedsoversikt():
         eget=eldre_enn_nyeste(rader),
         mangler=uten_kurser(poster),
         ikke_vurdert=any(rad.ikke_vurdert for rad in rader),
+        ingen_skilte_seg_ut=ingen_skilte_seg_ut(rader),
         hentekommando=hentekommando(),
     )
 
