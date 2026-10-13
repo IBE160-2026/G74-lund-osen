@@ -1299,7 +1299,7 @@ class TestStory80c:
         # Story 8.0e PR 2: pillen staar ogsaa i linja over tabellen.
         tabell = html[html.index("<table"):]
         assert tabell.count('class="pille tre-av-tre"') == 1
-        assert '<span class="pille tre-av-tre">3 av 3</span>' in html
+        assert '<span class="pille tre-av-tre">3 av 3</span>' in tabell
         assert '<span class="pille">2 av 3</span>' in html
         ring = _regel(_stil(html), ".pille.tre-av-tre")
         assert "border" in ring and "var(--gul)" in ring
@@ -1789,6 +1789,8 @@ class TestStory80eTekst:
         tekst = _synlig(klient.get("/").data.decode("utf-8"))
         assert "0 av 2 aksjer skilte seg ut lørdag" in tekst
         assert "Hos " not in tekst
+        # Svar 3: setningen fra 8.0c staar fortsatt i tabellen (BH4).
+        assert "Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer." in tekst
         assert "fikk utslag på alle" not in tekst
 
     def test_uten_en_eneste_vurdering_staar_ingen_overskrift(self, klient):
@@ -1823,6 +1825,15 @@ class TestStory80eTekst:
         _lagret("DNB", 5.0, -1, -1, -1)
         tekst = _synlig(klient.get("/").data.decode("utf-8"))
         assert "Bare DNB Bank og Kongsberg Gruppen fikk utslag på alle 3 sjekkene." in tekst
+
+    def test_linja_om_3_av_3_ogsaa_naar_terskelen_er_over_3(self, klient, monkeypatch):
+        """ECH3 i gjennomgangen: navnene tas fra alle radene, ikke bare fra
+        «Skilte seg ut»."""
+        import dataclasses
+
+        monkeypatch.setattr(app_modul, "STANDARD", dataclasses.replace(app_modul.STANDARD, terskel=4))
+        _lagret("KOG", 0.0, 1, 1, 1)
+        assert "Bare Kongsberg Gruppen fikk utslag på alle 3 sjekkene." in _synlig(klient.get("/").data.decode("utf-8"))
 
     def test_ingen_linje_uten_3_av_3(self, klient):
         _lagret("KOG", 0.0, 1, 1, 0)

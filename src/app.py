@@ -369,7 +369,7 @@ def markedsoversikt():
         antall_vurdert=antall_vurdert(rader),
         skilte_seg_ut=skilte_seg_ut,
         oevrige=oevrige,
-        tre_av_tre=[rad.aksje.navn for rad in skilte_seg_ut if rad.styrke == ANTALL_SJEKKER],
+        tre_av_tre=[rad.aksje.navn for rad in rader if rad.styrke == ANTALL_SJEKKER],
         hentekommando=hentekommando(),
     )
 
