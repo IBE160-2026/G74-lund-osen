@@ -141,3 +141,27 @@ Gjennomgang av PR #35 (diffen `main...8-0c` på `c6db3e5`), med Blind Hunter (BH
 
 **Commands:**
 - `uv run pytest -q` -- expected: grønn. Før: 1404 bestått og 16 hoppet over, 1420 samlet (instruksjonen kl. 14:33). På main før grenen: 1407 og 16, 1423 samlet, etter `tests/test_suksesskriterier.py`.
+
+**Mutantene** (13.10, på `ce4f6e0`): hver mutant ble kjørt mot hele testsettet med `-x`, én om gangen. Fila ble satt tilbake fra en kopi og kontrollert med sha256. Alle 19 ble fanget. M7, M8, M17 og M18 i planen gjelder datoene og grafen og hører til PR 2.
+
+| # | Mutant | Fanget av |
+|---|---|---|
+| M1 | styrken bare som tall | `tests/test_app.py::TestStory80::test_aksjen_som_skiller_seg_ut_er_merket_med_tekst` |
+| M2 | den gule ringen borte | `tests/test_app.py::TestStory80c::test_tre_av_tre_har_gul_ring_og_to_av_tre_ikke` |
+| M3 | 2 av 3 bare med lys bakgrunn | `tests/test_app.py::TestStory80c::test_to_av_tre_merkes_med_mer_enn_lys_bakgrunn` |
+| M4 | en sjette kolonne | `tests/test_app.py::TestTidsstempler::test_fortsatt_fem_kolonner` |
+| M5 | Ga uten ordet | `tests/test_app.py::TestStory80c::test_ga_kolonnen_har_tallet_og_ordet` |
+| M6 | Ga sier opp | `tests/test_aksjedetalj.py::TestByggDetalj::test_ordet_bygges_av_konstantene_i_signalberegning` |
+| M9 | terskelen fast i setningen | `tests/test_app.py::TestStory80c::test_terskelen_i_setningen_kommer_fra_parametre` |
+| M10 | setningen ser etter 3 av 3 | `tests/test_app.py::TestStory80c::test_setningen_staar_ikke_med_to_av_tre` |
+| M11 | th.tall venstrejustert | `tests/test_app.py::TestStory80c::test_overskriftene_staar_over_tallene` |
+| M12 | «Demoversjon.» borte | `tests/test_demo.py::TestSidene::test_bryteren_med_demobase_viser_eksempeltall` |
+| M13 | «under arbeid» ikke fra innstillingen | `tests/test_app.py::TestStory80c::test_under_arbeid_styres_av_en_innstilling` |
+| M14 | en hjelpetekst med 4 setninger | `tests/test_hjelpetekster.py::TestStory80c::test_hoeyst_tre_setninger_per_tekst[standard]` |
+| M15 | «peker opp» igjen | `tests/test_demo.py::TestStory80cIDemoen::test_merkingen_og_ordene_i_demoen` |
+| M16 | fotnoten sier «hvor kraftig» | `tests/test_app.py::TestStory80c::test_fotnoten_i_oversikten_sier_hvor_mange_som_slo_ut` |
+| M19 | demolinja sier Oslo Børs | `tests/test_demo.py::TestSidene::test_bryteren_med_demobase_viser_eksempeltall` |
+| M20 | forbeholdet borte fra aksjesiden | `tests/test_app.py::TestStory80c::test_fotnoten_paa_aksjesiden_har_forbeholdet` |
+| M21 | «?» per sjekk borte | `tests/test_demo.py::TestSidene::test_hjelpen_virker_ogsaa_i_demoen` |
+| M22 | «Målt mot» sier lys bakgrunn | `tests/test_demo.py::TestStory80cIDemoen::test_merkingen_og_ordene_i_demoen` |
+| M23 | grensene uten «på Oslo Børs» | `tests/test_hjelpetekster.py::TestGrensene::test_teksten_om_maalingen_nevner_de_maalte_grensene` |
