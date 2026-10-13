@@ -2,7 +2,7 @@
 title: "Endringsforslag 13.10: samlelista, tekstene og rekkefølgen"
 status: draft
 created: 2026-10-13
-updated: 2026-10-13T11:28
+updated: 2026-10-13T11:29
 ---
 
 # Endringsforslag 13.10: samlelista, tekstene og rekkefølgen
@@ -281,3 +281,216 @@ ikke tatt inn i appen ennå, selv om ingen krav sier noe annet: tall med sifre
 `index.html:137–138`), og datoer som «22.09» (15), der appen viser ISO-dato
 (`index.html:73`, og `"%Y-%m-%d kl. %H.%M"` i `markedsoversikt.py:274`). Begge kan
 tas i 8.0c, med en test.
+
+### 4.4 Punkt 8: samme ord for signalstyrke, trend og retning
+
+Koden er fasit. `finn_styrke` er `sum(abs(verdi))` (`signalberegning.py:278`),
+altså hvor mange sjekker som slo ut, og alle tre sjekkene får den utbyttejusterte
+kursen (`signalberegning.py:311`).
+
+**Krav: FR-701, tabellen** (`prd.md:1499`).
+
+```
+| 1 | **Trend** | Utbyttejustert kurs mot 50-dagers glidende snitt | Kursen ligger mer enn **2 %** over eller under snittet |
+```
+
+*Her sto:* «Sluttkurs mot 50-dagers glidende snitt». Setningen under tabellen,
+«Alle beregninger bruker `adjusted_close`» (`prd.md:1507`), står. Det var bare
+tabellen som sa noe annet.
+
+**Krav: FR-703, første avsnitt** (`prd.md:1527–1529`).
+
+```
+Signalstyrke er summen av absoluttverdiene til de tre sjekkene, altså et helt
+tall fra 0 til 3: hvor mange av sjekkene som slo ut. Styrken sier ikke hvor
+sannsynlig en kursbevegelse er, og ikke om aksjen bør kjøpes eller selges.
+```
+
+*Her sto:* «Styrken sier hvor kraftig sjekkene slår ut — ikke hvor sannsynlig en
+kursbevegelse er, og ikke om aksjen bør kjøpes eller selges.» Definisjonen er den
+samme. Bare forklaringen endres.
+
+**Krav: FR-704, tabellen** (`prd.md:1540–1545`). Hjelpen følger FR-704 i dag
+(«peker opp», `hjelpetekster.py:69–74`). Bytter hjelpen til +1 og -1 uten at
+FR-704 følger med, sier de to hver sin ting.
+
+```
+| Positiv | Alle utslag er +1 |
+| Negativ | Alle utslag er -1 |
+| Blandet | Noen utslag er +1 og noen -1 |
+| Ingen | Ingen av sjekkene ga utslag (styrke 0) |
+```
+
+*Her sto:* «Alle utslag peker opp», «Alle utslag peker ned» og «Utslagene
+spriker».
+
+**Fotnoten under oversikten** (`index.html:134–139`). Første del står, fordi
+hjelpen viser til den ordrett (`hjelpetekster.py:135`, og testen i
+`tests/test_hjelpetekster.py:196–207`).
+
+```
+Sluttkursen er den ujusterte kursen aksjen omsettes til. Endringen er
+regnet på utbyttejustert kurs, slik at et ordinært utbytte ikke ser ut
+som et kursfall. Signalstyrken sier hvor mange av de 3 sjekkene som slo
+ut, ikke om du bør kjøpe eller selge.
+```
+
+*Her sto:* «Signalstyrken er 0–3 og sier hvor kraftig de tre sjekkene slår ut —
+ikke om aksjen bør kjøpes eller selges.» Siste setning er tavlas fotnote ordrett.
+Raden for NFR-06 i `epics.md:352` siterer den gamle fotnoten, med linjenummeret
+`index.html:108`, som ikke stemmer lenger. Den får en datert linje, som den
+daterte linja 11.10 under 8.0c sier (`epics.md:2721`).
+
+**Aksjesiden** (`aksje.html:164`): «Signalstyrken er summen av tallene uten
+fortegn:» blir «Signalstyrken er hvor mange sjekker som slo ut:». Resten av
+setningen står. Det er også utsatt arbeid i `deferred-work.md:138` og funn 23 i
+gjennomgangen av 8.0b.
+
+**Hjelpen** (`src/hjelpetekster.py`):
+
+| Hvor | I dag | Ny |
+|---|---|---|
+| Retning, Positiv (linje 70) | «alle sjekkene som slo ut, peker opp.» | «alle sjekkene som slo ut, ga +1.» |
+| Retning, Negativ (71) | «alle sjekkene som slo ut, peker ned.» | «alle sjekkene som slo ut, ga -1.» |
+| Retning, Blandet (72) | «sjekkene som slo ut, spriker.» | «noen ga +1 og noen -1.» |
+| Retning (197–198) | «Retningen sier hva sjekkene peker mot, ikke hvor kursen går videre.» | «Retningen sier om sjekkene som slo ut, ga +1 eller -1, ikke hvor kursen går videre.» |
+| Signalstyrke (177) | «hvor mange av de tre sjekkene som ga +1 eller -1» | «hvor mange av de 3 sjekkene som ga +1 eller -1» |
+
+Ingen test låser «peker opp», «hvor kraftig» eller «summen av tallene» i malene
+eller hjelpen. Treffene i `tests/` er bare kommentarer
+(`tests/test_signalberegning.py:126–128`, `tests/test_docker.py:884`). Testen i
+punkt 4.1 som leter etter ordene ordlista har valgt bort, låser den nye
+ordlyden.
+
+**Hvor:** malene og hjelpen i 8.0c. PRD-en endres når forslaget godkjennes.
+Når 8.0c gir tabellen «N av 3» (`epics.md:2700`), sier hjelpen det samme.
+
+### 4.5 Punkt 9: fire hull fra gjennomgangene 12.10
+
+| Hull | Slått opp | Forslag |
+|---|---|---|
+| Ingen test sjekker at `../README.md#status` i `docs/innlevering.md` peker på en overskrift | Lenken står i `docs/innlevering.md:34`. `tests/test_readme.py` sjekker bare lenkene i README-en, og den ser bort fra ankeret etter `#` (linje 17 og 27). Ingen test leser `docs/innlevering.md` | En test: hvert anker fra `docs/innlevering.md` til README-en svarer til en overskrift. **Ville feilet hvis** «## Status» fikk nytt navn |
+| Taggen i linja om briefen under «Dokumentene» er ikke knyttet til regel 17 | `test_til_faglaerer_lenker_til_briefen_med_gjeldende_tag` (`tests/test_docker.py:917`) sjekker bare lista under «Til faglærer:». Linja under «Dokumentene» (`README.md:250`) har både `-v7` og `-v8` | Testen utvides til linja under «Dokumentene»: den gjeldende taggen står der, og en eldre tag står bare som historikk. Hvordan «historikk» skal kjennes igjen, avgjøres i planen |
+| Testen for «Status» sjekker ikke at en sak under Flettet til main mangler under Neste | `tests/test_docker.py:855` sjekker bare den andre veien. Også funnet i Verification Gap av flettingen 12.10 | `assert sak not in neste` for sakene under Flettet til main. **Ville feilet hvis** «kallene som er igjen» sto begge steder |
+| `updated` i `docs/hjelp.md` ble ikke satt i flettingen av PR #28 | Står på 2026-10-12T10:26, også etter `c3d6660` | Settes fra klokka neste gang fila endres (regel 4), med en linje i dagsfila om hvorfor |
+
+**Hvor:** tre tester og én frontmatterlinje, uten en story. Forslaget er én commit
+per sak rett på main etter godkjenningen, eller i 8.0c. Spørsmål 10.
+
+### 4.6 Punkt 11: seks ting fra tavla som ikke har en story
+
+Marian bestemte 12.10 kl. 22:03 at alle seks skal med. Ingen av dem står i 8.0c
+eller 8.0d i dag. Det nærmeste er setningen for dager uten utslag i 8.0c, «Ingen
+aksjer skilte seg ut: ingen fikk 2 av 3 eller mer.» (`epics.md:2706`).
+
+FR-101 sier «nøyaktig fem kolonner» (`prd.md:240`), og en sjette ville bryte
+kravet (`prd.md:312–314`). Tabellen har fem i dag: Selskap, Sluttkurs, Endring,
+Signalstyrke og Retning (`index.html:80–84`).
+
+**Rådets forslag** (samlelista punkt 11): de fire første i 8.0c, «Neste» som egen
+liten story eller i 8.0d, og rekkefølgen inn i `designregler.md` i planen for
+8.0d.
+
+#### 1. T, B og I i hver rad
+
+```
+- Hver rad med vurdering viser T, B og I med +1, 0 eller -1 i cellen for
+  signalstyrke, under «N av 3». Tabellen har fortsatt fem kolonner (FR-101)
+- Verdiene leses fra den lagrede vurderingen, aldri regnet på nytt (FR-101,
+  `prd.md:267`)
+- En rad uten vurdering viser grunnen, som i dag, og ingen T, B eller I
+- **Ville feilet hvis:** tabellen fikk en sjette kolonne, eller en rad uten
+  vurdering viste T, B og I
+```
+
+Formen («T +1» eller «+1 positiv») avhenger av spørsmål 8. Klikk på T, B og I
+venter (punkt 4.2). Hvor klikket skal føre, er ikke beskrevet i utdraget.
+
+#### 2. Tabellen delt i «Skilte seg ut», «Øvrige aksjer» og «Dine egne aksjer»
+
+```
+- Radene med styrke på terskelen eller mer står under «Skilte seg ut», og de
+  andre under «Øvrige aksjer». Terskelen kommer fra Parametre (FR-705)
+- Er ingen over terskelen, står setningen fra 05.10 i stedet for «Skilte seg ut»
+- **Ville feilet hvis:** en rad med 1 av 3 sto under «Skilte seg ut», eller
+  terskelen var skrevet fast i malen
+```
+
+«Dine egne aksjer» kan ikke bygges før egne aksjer finnes (2.12), og «Egen»
+avgjøres i planen for 2.12 (`prd.md:1064`). Ordlista sier dessuten at en egen
+aksje «står i tabellen sammen med de andre og sorteres likt» (§4, punkt 9). Det
+strider mot en egen del for dem. Spørsmål 11.
+
+Sorteringen i 8.15 må da gjelde innenfor hver del. Det er et nytt kontrollpunkt i
+8.15 hvis delingen kommer først.
+
+#### 3. Overskriften «4 av 15 aksjer skilte seg ut tirsdag», med innledningen
+
+```
+- Over tabellen står «N av M aksjer skilte seg ut <ukedag>», der N og M telles
+  fra radene, og ukedagen er børsdagen vurderingene gjelder, på norsk
+- Er N 0, står setningen fra 05.10 (epics.md:2706)
+- **Ville feilet hvis:** M var skrevet fast som 15, eller ukedagen var dagen
+  siden ble åpnet og ikke børsdagen
+```
+
+Innledningen under overskriften står ikke i utdraget. Spørsmål 4.
+
+#### 4. «Slik leser du tabellen»
+
+```
+- Over tabellen står «Slik leser du tabellen» med tre korte punkter. To av dem er
+  tavlas tekster om retning og selskapsnavnet (punkt 4.2)
+- **Ville feilet hvis:** et punkt brukte et ord ordlista har valgt bort
+```
+
+Det tredje punktet står ikke i utdraget. Spørsmål 4.
+
+#### 5. «Neste: … etter kl. 22» i stripa
+
+8.0d sier «Ingen nye funksjoner» (`epics.md:2739`). «Neste» er en ny funksjon:
+den sier når neste henting tidligst kan komme. To plasseringer:
+
+- **A, ny liten story (rådets første forslag).**
+
+  ```
+  ### Story 8.19: Neste henting i stripa øverst
+
+  **Kontroll — hva testen ser etter:**
+  - Stripa øverst sier når dataene ble hentet, og når neste henting tidligst
+    kan komme: «Neste: <dag> etter kl. 22»
+  - Klokkeslettet kommer fra KL_22 i fetch_prices.py (linje 91), og dagen fra
+    boersdag.py, ikke skrevet fast
+  - Ingen API-kall
+  - **Ville feilet hvis:** stripa sa i morgen en fredag, eller klokkeslettet
+    sto fast i malen
+
+  **Avhenger av:** 8.0d for stripa
+  ```
+
+- **B, i 8.0d.** Unntaket «bortsett fra Neste i stripa» skrives inn i
+  kontrollpunktet «Ingen nye funksjoner». Det er færre storyer, men 8.0d blir
+  ikke bare utseende lenger.
+
+#### 6. Rekkefølgen av delene på sidene
+
+Står bare i notatene på tavla, ikke i `designregler.md`. 8.0d sier alt at planen
+skriver reglene for utseendet inn i `designregler.md` og at rådet gir utdraget
+(`epics.md:2735`). Forslag: «rekkefølgen av delene på hver side» legges til i den
+lista.
+
+#### En annen plassering for 1–4
+
+8.0c har alt mange kontrollpunkter: tre under «Kontroll», tre i den daterte
+linja 05.10 kl. 22:24 og sju i den daterte linja 11.10 (`epics.md:2698–2722`), og
+«Én økt: ja» (`epics.md:2713`). Med punkt 1, 2,
+4.4 og 4.6 blir den trolig ikke én økt.
+
+- **Rådets forslag:** 1–4 i 8.0c.
+- **Alternativ:** 8.0c som i dag, med ordene fra punkt 4.4 og hjelpen fra punkt
+  4.1. 1–4 i en ny story 8.0e «Oversikten fra designforslaget», som avhenger av
+  8.0c og kommer før 8.0d, så utseendet legges på den nye oversikten. 8.0c blir
+  da fortsatt én økt, og 8.0e kan planlegges når utdraget for innledningen og
+  det tredje punktet finnes.
+
+Marian velger (spørsmål 12).
