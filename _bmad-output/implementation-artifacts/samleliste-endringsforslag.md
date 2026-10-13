@@ -2,7 +2,7 @@
 title: "Samleliste til neste endringsforslag"
 status: aktiv
 created: 2026-10-12
-updated: 2026-10-13T11:06
+updated: 2026-10-13T11:11
 ---
 
 # Samleliste til neste endringsforslag
@@ -24,6 +24,7 @@ Punkter som dukker opp, samles her og tas i ett endringsforslag med bmad-correct
 10. Teksten i designforslaget kontrolleres mot koden og PRD-en før den brukes (Marian 12.10 kl. 21:54). Tavla ligger i Claude og ikke i repoet, så rådet gir utdraget. Gjennomgangen 12.10 står i punkt 7.
 11. Oppsettet i designforslaget mot planen (Marian 12.10 kl. 22:00: «sjekk oppsettet at det også stemmer»). Det meste har en story (8.3, 8.6, 8.9, 8.10, 8.0c, 8.0d, 8.15, 8.16, 8.17, 2.7, 2.8, 2.9, 2.9b, 8.4, 2.11, 2.12, 10.3, 10.6). Uten story: T, B og I med +1, 0 eller -1 i hver rad i oversikten, tabellen delt i «Skilte seg ut», «Øvrige aksjer» og «Dine egne aksjer», overskriften «4 av 15 aksjer skilte seg ut tirsdag» med innledningen, «Slik leser du tabellen», «Neste: … etter kl. 22» i stripa (8.0d tar ingen nye funksjoner), og rekkefølgen av delene på sidene, som bare står i notatene på tavla og ikke i designregler.md. Marian 12.10 kl. 22:03: alle seks skal med. Forslag til den samlede endringen: de fire første i 8.0c, med fortsatt fem kolonner (FR-101), «Neste» som egen liten story eller i 8.0d, og rekkefølgen inn i designregler.md i planen for 8.0d.
 12. Hovedindeksen tidligere (Marian 12.10 kl. 22:12–22:13). 2.8, 2.9 og 2.9b er punkt 9 av 12 i rekkefølgen, etter KI-laget. Tas med når rekkefølgen tas opp, sammen med punkt 6.
+13. Fra rådets logg, aldri ført (Marian 12.10 kl. 23:42). Lista over FR-er under «4.6 KI-laget og grensen mot regelbasert kode» i epics.md har fortsatt de gamle titlene på FR-603 og FR-605, og dekningstabellen gir FR-601, FR-602, FR-603 og FR-606 til Epic 5. PRD-en skrev FR-601 til FR-607 om 05.10, FR-603 er nå kontrollen av KI-teksten, den gamle er FR-603A, og storyene i Epic 10 viser til dem (rådets funn 01.10, «ikke rettet ennå»). Tavla sier også «U … betalt utbytte» ved kursen, mens story 8.14 sier at ordet «utbytte» ikke står ved dagene (rådet 08.10).
 
 ## Utdraget fra designforslaget (punkt 7 og 10)
 
