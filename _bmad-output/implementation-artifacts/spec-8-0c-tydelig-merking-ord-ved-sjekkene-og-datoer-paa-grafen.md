@@ -2,7 +2,7 @@
 title: 'Story 8.0c: Tydelig merking, ord ved sjekkene og datoer på grafen'
 type: 'feature'
 created: '2026-10-13'
-status: 'in-progress'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'd9315a9570fdd8fa3b63f15e4f8fc8a93d143ffd'
@@ -75,17 +75,25 @@ Planen ble vist i chatten 13.10 og er ført i `docs/ai-prompts/2026-10-13.md` (i
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] a. Oversikten: «N av 3», gul ring, merkingen av 2 av 3, `th.tall`, setningen -- tillegget 05.10 og svar 2 og 7
-- [ ] b. Aksjesiden: Ga med ord, merkingen av radene, `th.fortegn`, fotnotene på begge sidene -- tilleggene 05.10, 11.10 og svar 8
-- [ ] c. Demoen og linja nederst: «Demoversjon.», «Eksempeltall · …», «under arbeid», `docs/innlevering.md` -- svar 3 og 4
-- [ ] d. Hjelpen etter den nye delen 2, ordtesten og grensene -- svar 5, 6 og 9 (venter på ja)
-- [ ] e. Demotesten for alt det nye, og README-ens statuslinje i flettingen
+- [x] a. Oversikten: «N av 3», gul ring, merkingen av 2 av 3, `th.tall`, setningen -- tillegget 05.10 og svar 2 og 7
+- [x] b. Aksjesiden: Ga med ord, merkingen av radene, `th.fortegn`, fotnotene på begge sidene -- tilleggene 05.10, 11.10 og svar 8
+- [x] c. Demoen og linja nederst: «Demoversjon.», «Eksempeltall · …», «under arbeid», `docs/innlevering.md` -- svar 3 og 4
+- [x] d. Hjelpen etter den nye delen 2, ordtesten og grensene -- svar 5, 6 og 9 (venter på ja)
+- [x] e. Demotesten for alt det nye (`TestStory80cIDemoen` og testene i `test_demo.py`). README-ens statuslinje flyttes i flettingen
 
 **Acceptance Criteria:**
 - Given en aksje med 2 av 3, when oversikten vises, then raden har fet skrift og en strek til venstre, uten gult og uten bare lys bakgrunn.
 - Given demobasen, when sidene vises, then alt det nye i PR 1 står også der.
 
 ## Implementation Notes
+
+- Del a `fcb6c31`, b `83fa382`, c `e2e3f79`, d `c6769d8`. Main hentet inn med merge i `b5fcc8f`. Den commiten mangler Co-authored-by og er ikke skrevet om (regel 7).
+- `ingen_skilte_seg_ut()` i `markedsoversikt.py` leser `skiller_seg_ut`, som alt bruker terskelen fra `Parametre`.
+- `antall_sjekker` gis til malene fra kontekstprosessoren, fra `ANTALL_SJEKKER` i `hjelpetekster.py`.
+- Merket står ett sted, `EKSEMPELTALL_MERKE` i `app.py`. README-ens sitat i steg 6 står ordrett øverst på siden, så README-en er ikke endret. `test_merket_i_demoen_er_det_samme_som_i_malene` sammenligner med konstanten.
+- Linja over tabellen i demoen er «Eksempeltall · 2026-10-09 · 14 aksjer». «09.10» kommer med PR 2.
+- Hjelpen: 6 «?» i oversikten (23 setninger) og 12 på aksjesiden. Ny tekst «selskap», ordrett fra tavla. Ingen «?» med tom base. «Ga» bygges av `POSITIV`, `NEGATIV` og `INGEN_UTSLAG`.
+- Testene som er endret: «N av 3» i `test_app.py`, demolinja og hjelpen i `test_demo.py`, grensene, plasseringen og tom base i `test_hjelpetekster.py`, og merket i `test_docker.py`.
 
 ## Spec Change Log
 
