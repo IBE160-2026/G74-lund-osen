@@ -1347,3 +1347,50 @@ class TestStory80c:
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))  # 2 av 3
         html = klient.get("/").data.decode("utf-8")
         assert "Ingen aksjer skilte seg ut: ingen fikk 3 av 3 eller mer." in html
+
+    # Del b: aksjesiden og fotnotene.
+
+    def test_ga_kolonnen_har_tallet_og_ordet(self, klient, monkeypatch):
+        """Tillegget 05.10. Ville feilet hvis Ga viste bare fortegnet, eller
+        sa opp eller ned."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        celler = re.findall(r'<td class="fortegn [a-z]+">([^<]*)<span class="ord">([^<]*)</span></td>', html)
+        assert len(celler) == 3, celler
+        par = {(tall, ord_) for tall, ord_ in celler}
+        assert ("+1", "positiv") in par
+        assert ("0", "ingen utslag") in par
+        assert not re.search(r'class="ord">\s*(opp|ned)\b', html)
+
+    def test_sjekkene_som_slo_ut_merkes_som_i_oversikten(self, klient, monkeypatch):
+        """Tillegget 11.10. Ville feilet hvis radene bare hadde #fafafa."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        stil = _stil(html)
+        assert '<tr class="bidro">' in html
+        assert "font-weight: 600" in _regel(stil, "tr.bidro td")
+        assert "inset 3px 0 0 var(--tekst)" in _regel(stil, "tr.bidro td:first-child")
+        assert "#fafafa" not in stil
+
+    def test_overskriften_ga_staar_over_tallene(self, klient, monkeypatch):
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))
+        stil = _stil(klient.get("/aksje/EQNR").data.decode("utf-8"))
+        assert "text-align: center" in _regel(stil, "th.fortegn")
+
+    def test_fotnoten_i_oversikten_sier_hvor_mange_som_slo_ut(self, klient, monkeypatch):
+        """Punkt 4.4 i endringsforslaget 13.10. Ville feilet med «hvor kraftig»."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}))
+        html = klient.get("/").data.decode("utf-8")
+        assert "Signalstyrken sier hvor mange av de 3 sjekkene som slo ut, ikke om du bør kjøpe eller selge." in html
+        assert "Sluttkursen er den ujusterte kursen" in html
+        assert "hvor kraftig" not in html
+
+    def test_fotnoten_paa_aksjesiden_har_forbeholdet(self, klient, monkeypatch):
+        """Presiseringen kl. 14:33 og tillegget 11.10: forbeholdet staar
+        synlig. Ville feilet med «summen av tallene uten fortegn»."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert "Signalstyrken er hvor mange sjekker som slo ut: 2 av 3 ga utslag." in html
+        assert "Ga noen +1 og noen -1, er retningen Blandet." in html
+        assert "Signalstyrken sier ikke om du bør kjøpe eller selge." in html
+        assert "summen av tallene" not in html

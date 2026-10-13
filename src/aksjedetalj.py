@@ -27,13 +27,17 @@ from markedsoversikt import (
     les_tilstand,
 )
 from oversiktsdata import Oversiktspost
-from signalberegning import Parametre, STANDARD, nodvendige_dager, sjekker_fra
+from signalberegning import NEGATIV, POSITIV, Parametre, STANDARD, nodvendige_dager, sjekker_fra
 from tilstand import Art, Tilstand
 from vurderingsdata import Grunn, Vurdering
 
 # FR-201: seks maaneder. Regnet i kalenderdager fra siste boersdag, ikke i
 # antall rader - en boersdag er ikke en fast broekdel av en maaned.
 GRAFVINDU_DAGER = 182
+
+# Story 8.0c: ordet ved 0 i Ga-kolonnen. «Ingen» er en retning (FR-704), ikke
+# det en sjekk ga, saa ordet er et eget.
+INGEN_UTSLAG = "ingen utslag"
 
 
 @dataclass(frozen=True)
@@ -61,6 +65,16 @@ class SjekkVisning:
     @property
     def fortegn(self) -> str:
         return f"{self.verdi:+d}" if self.verdi else "0"
+
+    @property
+    def ord(self) -> str:
+        """Ordet ved tallet i Ga-kolonnen (story 8.0c), som retningen: bygget
+        av konstantene i signalberegning.py, aldri «opp» eller «ned»."""
+        if self.verdi > 0:
+            return POSITIV.lower()
+        if self.verdi < 0:
+            return NEGATIV.lower()
+        return INGEN_UTSLAG
 
     @property
     def klasse(self) -> str:

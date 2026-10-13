@@ -49,9 +49,15 @@
     table { border-collapse: collapse; width: 100%; }
     th, td { text-align: left; padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--strek); }
     th { font-weight: 600; font-size: 0.85rem; color: var(--dempet); }
+    /* Story 8.0c: overskriften staar over tallene. */
+    th.fortegn { text-align: center; }
     td.fortegn { text-align: center; font-variant-numeric: tabular-nums;
-                 font-weight: 700; width: 4rem; }
-    tr.bidro td { background: #fafafa; }
+                 font-weight: 700; width: 9rem; white-space: nowrap; }
+    td.fortegn .ord { font-weight: normal; margin-left: 0.3rem; }
+    /* Story 8.0c: sjekkene som slo ut, merkes som 2 av 3 i oversikten: fet
+       skrift og en strek til venstre i tekstfargen, ikke lys bakgrunn. */
+    tr.bidro td { font-weight: 600; }
+    tr.bidro td:first-child { box-shadow: inset 3px 0 0 var(--tekst); }
     .opp { color: var(--opp); }
     .ned { color: var(--ned); }
     .blandet { color: var(--blandet); }
@@ -92,7 +98,7 @@
     <div class="noekkeltall">
       <span class="etikett">Signalstyrke</span>
       <span class="verdi">
-        {% if detalj.styrke is not none %}{{ detalj.styrke }} av 3{% else %}–{% endif %}
+        {% if detalj.styrke is not none %}{{ detalj.styrke }} av {{ antall_sjekker }}{% else %}–{% endif %}
       </span>
     </div>
     <div class="noekkeltall">
@@ -153,7 +159,7 @@
         {% for sjekk in detalj.sjekker %}
           <tr {% if sjekk.bidro %}class="bidro"{% endif %}>
             <td>{{ sjekk.navn }}</td>
-            <td class="fortegn {{ sjekk.klasse }}">{{ sjekk.fortegn }}</td>
+            <td class="fortegn {{ sjekk.klasse }}">{{ sjekk.fortegn }}<span class="ord">{{ sjekk.ord }}</span></td>
             <td class="regnestykke">{{ sjekk.maaling }}</td>
           </tr>
         {% endfor %}
@@ -161,11 +167,10 @@
     </table>
 
     <p class="fotnote">
-      Signalstyrken er summen av tallene uten fortegn:
-      {{ detalj.bidragsytere|length }} av 3 sjekker ga utslag, så styrken er
-      {{ detalj.styrke }}. Retningen leses av fortegnene til de sjekkene som ga
-      utslag — er de ikke enige, er retningen blandet.
+      Signalstyrken er hvor mange sjekker som slo ut: {{ detalj.bidragsytere|length }} av {{ antall_sjekker }} ga utslag.
+      Ga noen +1 og noen -1, er retningen Blandet.
       Ingen vekting og ingen skjult formel.
+      Signalstyrken sier ikke om du bør kjøpe eller selge.
     </p>
   {% elif detalj.for_kort_serie %}
     <p class="mangler">
