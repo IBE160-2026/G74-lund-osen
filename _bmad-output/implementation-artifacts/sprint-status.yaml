@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-24-2026 19:26
-last_updated: 10-12-2026 22:24
+last_updated: 10-13-2026 13:06
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -127,6 +127,8 @@ development_status:
   8-0-de-rene-feilene-i-de-to-skjermbildene: review
   8-0b-hjelp-bak-et-spørsmålstegn: done
   8-0c-tydelig-merking-ord-ved-sjekkene-og-datoer-på-grafen: backlog
+  8-0d-utseendet-fra-designforslaget: backlog
+  8-0e-oversikten-fra-designforslaget: backlog
   8-1-brukertest-rett-etter-epic-2: backlog
   8-2-ux-gjennomgang-av-de-to-skjermbildene-med-cu-bmad-ux: backlog
   8-3-min-liste-eget-skjermbilde-med-stjerne-og-filter: backlog
@@ -137,6 +139,7 @@ development_status:
   8-8-signaldager-i-kursgrafen: backlog
   8-9-vis-meg-rundt: backlog
   8-10-innstillinger-øverst: backlog
+  8-10b-vis-ki-tekst-i-innstillinger: backlog
   8-11-ferdige-lister-og-filter-på-signalet: backlog
   8-12-endret-signalstyrke-siden-forrige-børsdag: backlog
   8-13-lær-noe-nytt: backlog
@@ -145,6 +148,7 @@ development_status:
   8-16-regelen-for-startdagen-og-periodene-i-kursgrafen: backlog
   8-17-periodevalget-i-oversikten-min-liste-og-børsometeret: backlog
   8-18-kommende-eksdato-i-kursgrafen: backlog
+  8-19-neste-henting-i-stripa-øverst: backlog
   epic-8-retrospective: optional
 
   epic-9: in-progress

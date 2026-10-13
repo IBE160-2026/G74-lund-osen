@@ -129,12 +129,14 @@ krever tre konkrete svar per kandidat:
 
 - **FR-601** — Av/på-bryteren er brukersynlig
 - **FR-602** — Visningen når KI-laget er av
-- **FR-603** — Usikkerhet vises som forbehold, ikke som rekkefølge
+- **FR-603** — KI-teksten sier ikke mer enn grunnlaget
 - **FR-604** — Logging av KI-bidraget, fra første kjøring
-- **FR-605** — Promptversjon og modell lagres med hver vurdering
+- **FR-605** — Promptversjon og modell lagres med hver KI-tekst
 - **FR-606** — Relevansskalaen
 - **FR-607** — KI-teksten om dagen på forsiden *(lagt til 2026-10-03)*
 - **FR-608** — Valg av tjeneste *(lagt til 2026-10-05)*
+
+*Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.8), godkjent av Marian kl. 12:46:* titlene på FR-603 og FR-605 følger `prd.md` etter omskrivingen 05.10. Her sto «FR-603 — Usikkerhet vises som forbehold, ikke som rekkefølge» og «FR-605 — Promptversjon og modell lagres med hver vurdering». Den gamle FR-603 heter nå FR-603A. FR-602A, FR-603A, FR-604A og FR-606A står i `prd.md` §4.6A og gjelder plan A, utenfor v1. De telles ikke med i de 51.
 
 **4.7 Signalstyrke og retning**
 
@@ -314,7 +316,9 @@ kontrollen 22.09 fant det.
 | FR-407 | Epic 2 |
 | FR-104, FR-105, FR-410 | Epic 2 *(lagt til 2026-10-01)*. *Lagt til 2026-10-08 kl. 21:48:* periodene for søylene i FR-105 er Epic 8, story 8.17 |
 | FR-501, FR-502, FR-503 | Epic 6 🔒 |
-| FR-601, FR-602, FR-603, FR-606 | Epic 5 🔒 |
+| FR-601, FR-602, FR-603 | Epic 10 *(rettet 2026-10-13)* |
+| FR-606 | Ikke i v1: skalaen brukes ikke i applikasjonen (`prd.md`, FR-606) *(rettet 2026-10-13)* |
+| FR-602A, FR-603A, FR-604A, FR-606A | Epic 5 🔒 *(lagt til 2026-10-13)* |
 | FR-604, FR-605 | Epic 4 |
 | FR-205 | Epic 8 *(lagt til 2026-10-03)* |
 | FR-607 | Epic 10 *(lagt til 2026-10-03)* |
@@ -322,6 +326,8 @@ kontrollen 22.09 fant det.
 | FR-608 | Epic 10 *(lagt til 2026-10-05)* |
 | FR-106, FR-107, FR-108, FR-109, FR-110, FR-206, FR-207 | Epic 8 *(lagt til 2026-10-08)*: 8.6, 8.12, 8.11, 8.9 og 8.13, 8.10, 8.8 og 8.18 |
 | FR-412, FR-413, FR-414 | Epic 2 *(lagt til 2026-10-08)*: 2.11 og 2.12, 2.13, 2.14. De ferdige listene i FR-412 er Epic 8, story 8.11 |
+
+*Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.8), godkjent av Marian kl. 12:46:* her sto «FR-601, FR-602, FR-603, FR-606 | Epic 5 🔒». Kravene ble skrevet om 05.10. FR-601, FR-602 og FR-603 bygges i Epic 10, FR-606 brukes ikke i v1, og Epic 5 har nå bare A-variantene.
 
 *Rettet 2026-10-03 (kontrollen 26.09, E7):* tabellen viser epicen der kravet først bygges. FR-401 hører også til Epic 3, der en story oppfyller tom-tilstanden, og FR-408 også til Epic 2, der story 2.5 skriver vurderingen i hentingen.
 
@@ -340,6 +346,8 @@ kontrollen 22.09 fant det.
 12 + 39 = 51. Tillegget til FR-407 (justeringsdagene i grafen) er Epic 8, story
 8.14, og tillegget til FR-409 («ikke i lista») er Epic 2, story 2.11.
 
+*Lagt til 2026-10-13, endringsforslaget 13.10 (punkt 4.8), godkjent av Marian kl. 12:46:* summen står: 12 + 39 = 51. FR-601, FR-602 og FR-603 er flyttet til Epic 10, og FR-606 står som ikke i v1, men alle er fortsatt plassert. A-variantene telles ikke, som i kravlista.
+
 ### NFR Coverage Map
 
 | NFR | Dekning |
@@ -357,6 +365,8 @@ kontrollen 22.09 fant det.
 tverrgående med navngitt kontroll (NFR-03, 05, 06).
 *Rettet 2026-10-01:* med NFR-08 er det åtte: fire eid av en epic og fire
 tverrgående (NFR-03, 05, 06 og 08).
+
+*Lagt til 2026-10-13, endringsforslaget 13.10 (punkt 4.4), godkjent av Marian kl. 12:46:* fotnoten som raden for NFR-06 siterer, står nå i `src/templates/index.html:137`, ikke på linje 108. Den endres i 8.0c til «Signalstyrken sier hvor mange av de 3 sjekkene som slo ut, ikke om du bør kjøpe eller selge.» Forbeholdet om kjøp og salg står fortsatt synlig.
 
 ## Epic List
 
@@ -493,6 +503,8 @@ Ingen av 1.9, 2.7 og 9.5 utvider omfanget: 1.9 er en skjemaendring før basen ha
 
 Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» avgjøres i planen for 2.12, og navnet på FR-407 og 2.6 i planen for 2.6.
 
+*Lagt til 2026-10-13, endringsforslaget 13.10 ([`sprint-change-proposal-2026-10-13.md`](sprint-change-proposal-2026-10-13.md)), godkjent av Marian kl. 12:46:* 8.0e kommer etter 8.0c og før 8.0d. 10.6 kommer etter 2.9, fordi den trenger hovedindeksen (svar 16). Plassen til 8.19, 8.10b og resten avgjøres etter README-prøven (spørsmål 14 og 15). 2.15, endringen i 8.14 og tillegget i 10.1 og 10.2 føres etter prøven i kveld (N1, svar 6 og 23).
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -551,7 +563,9 @@ story som sender inn tekst er *blokkert av* 4.1, ikke anbefalt etter den.
 
 *Ute av v1 fra 2026-09-28 (plan B, punkt 1 i `prd.md` §8).* Storyene står som plan for en senere versjon.
 
-**FR-er:** FR-601, FR-602, FR-603, FR-606, del av FR-203 · **NFR-04**
+**FR-er:** FR-602A, FR-603A, FR-604A, FR-606A, del av FR-203 · **NFR-04**
+
+*Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.8), godkjent av Marian kl. 12:46:* her sto «FR-601, FR-602, FR-603, FR-606». Etter omskrivingen 05.10 gjelder FR-601–FR-603 KI-teksten i plan B (Epic 10), og FR-606 brukes ikke i v1. Det tabellen under sier om at «alle seks FR-6xx er om meldinger», gjelder A-variantene i `prd.md` §4.6A.
 
 | Felt | |
 |---|---|
@@ -584,6 +598,8 @@ vært, og det skal stå slik.
 avgjort 04.10 (vi spør ikke). FR-601 til FR-607 er skrevet om etter valget av
 tjeneste, og FR-608 er ny. Epicen har fått 10.7 (egen nøkkel) og 10.8 (ChatGPT,
 kandidat til v1.1).
+
+*Lagt til 2026-10-13, endringsforslaget 13.10 (punkt 4.8, svar 17), godkjent av Marian kl. 12:46:* **FR-er:** FR-601, FR-602, FR-603, FR-607, FR-608. 10.2 oppfyller FR-603, 10.3 oppfyller FR-601 og FR-602, 10.6 oppfyller FR-607, og 10.7 og 10.8 oppfyller FR-608.
 
 ### Epic 6: Børsmeldinger i oversikten 🔒
 
@@ -1547,7 +1563,7 @@ Som **bruker**, vil jeg se hva løsningen sa om aksjen de siste ukene, så FR-40
 **Oppfyller:** FR-408, FR-409, punkt 20 i `prd.md` §8 · **Begrenses av:** `AD-3`, `AD-7`, `AD-20`
 
 **Kontroll — hva testen ser etter:**
-- De siste fire ukene, dag for dag: styrke og retning, eller grunnen, «ikke kjørt» eller «ikke børsdag»
+- De siste fire ukene, dag for dag: styrke og retning, eller grunnen, «ikke vurdert» eller «ikke børsdag»
 - Målingene vises dag for dag, avrundet som i FR-706 (2.1c) *(lagt til 2026-09-29)*
 - Hver dag går gjennom `tilstand`, så styrke 0, en grunn og en manglende rad aldri ser like ut
 - `Vurderingslager` får en lesemetode for en periode, og ingen slette- eller endremetode (`AD-7`)
@@ -1556,6 +1572,8 @@ Som **bruker**, vil jeg se hva løsningen sa om aksjen de siste ukene, så FR-40
 - **Ville feilet hvis:** historikken ble regnet ut på nytt av kursene. Da viser den dagens parametre, ikke hva løsningen sa
 
 **Avhenger av:** 2.2 og 2.5. **Én økt:** ja.
+
+*Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3, nr. 22), godkjent av Marian kl. 12:46:* her sto «ikke kjørt» i første kontrollpunkt. Teksten brukeren ser, er «ikke vurdert», som i `designregler.md` §2. `Art.IKKE_KJOERT` i koden står.
 
 ### Story 2.8: Hovedindeksen hentes i samme kjøring
 
@@ -1664,6 +1682,10 @@ byttes uten at koden endres.
 
 **Avhenger av:** 2.3, og 2.8 for indekskallet. **Én økt:** avgjøres i planen.
 
+*Lagt til 2026-10-13, endringsforslaget 13.10 (N3, svar 24), godkjent av Marian kl. 12:46:*
+- En aksje som kommer inn i lista, får en av de 13 bransjene i `designregler.md` §4, i feltet `sektor`
+- **Ville feilet hvis:** en aksje kunne komme inn uten bransje, eller med en som ikke er blant de 13
+
 ### Story 2.12: Velge og bytte aksjer
 
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 6 og 10).*
@@ -1687,6 +1709,11 @@ følger aksjene jeg bryr meg om.
   kunne få 19 aksjer
 
 **Avhenger av:** 2.11. **Én økt:** avgjøres i planen.
+
+*Lagt til 2026-10-13, endringsforslaget 13.10 (N3, svar 11 og 24), godkjent av Marian kl. 12:46:*
+- En aksje som velges, får en av de 13 bransjene, og det brukeren ser, heter «bransje»
+- Oversikten får delen «Dine egne aksjer» for aksjene brukeren har valgt selv (8.0e). Hva «egen» betyr, avgjøres i planen, som før
+- **Ville feilet hvis:** en valgt aksje sto uten bransje, eller sto under «Øvrige aksjer» i stedet for «Dine egne aksjer»
 
 ### Story 2.13: Kommandoen som måler omsetning
 
@@ -2108,6 +2135,8 @@ Som **gruppe**, vil jeg at KI-loggen overlever en omstart, så eksempelsettet fr
 > Storyene er skrevet likevel. En blokkert epic uten stories ser billigere ut
 > enn den er, og da blir et nei vanskeligere å vurdere.
 
+*Lagt til 2026-10-13, endringsforslaget 13.10 (punkt 4.8), godkjent av Marian kl. 12:46:* storyene under gjelder kravene slik de sto før 05.10: 5.1 FR-601, som gjelder begge planene, 5.2 FR-602A, 5.3 FR-603A og 5.4 FR-606A (`prd.md` §4.6A). At «alle FR-6xx handler om meldinger», gjelder A-variantene.
+
 ### Story 5.1: Av/på-bryteren i grensesnittet 🔒
 
 Som **person som ser demonstrasjonen**, vil jeg se KI-laget slås av og på mens
@@ -2226,8 +2255,10 @@ historikken.
 Som **bruker**, vil jeg at KI-teksten er klar når jeg åpner siden, så jeg aldri
 venter på en modell.
 
-**Oppfyller:** — *(plan B, punkt 1 og 4)* · **Begrenses av:** `AD-2`, `AD-8`,
+**Oppfyller:** FR-603, *(plan B, punkt 1 og 4)* · **Begrenses av:** `AD-2`, `AD-8`,
 `AD-10`, `AD-17`, NFR-02, NFR-04
+
+*Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.8, svar 17), godkjent av Marian kl. 12:46:* her sto «**Oppfyller:** — *(plan B, punkt 1 og 4)*». Kontrollen i FR-603 er en ren funksjon i denne storyen.
 
 **Blokkert av:** 4.1 (betingelse 4) og oppfølgingspunktet om EODHD og plan B.
 
@@ -2284,7 +2315,9 @@ starter ikke av seg selv.
 Som **bruker**, vil jeg lese regelforklaringen først og KI-teksten som et tillegg,
 så jeg alltid ser hva signalet faktisk bygger på.
 
-**Oppfyller:** — *(plan B, punkt 1)* · **Begrenses av:** NFR-04, NFR-05, NFR-06
+**Oppfyller:** FR-601, FR-602, *(plan B, punkt 1)* · **Begrenses av:** NFR-04, NFR-05, NFR-06
+
+*Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.8, svar 17), godkjent av Marian kl. 12:46:* her sto «**Oppfyller:** — *(plan B, punkt 1)*». Siden viser KI-teksten og sier hvorfor når KI er av (FR-601, FR-602).
 
 **Kontroll — hva testen ser etter:**
 - Regelforklaringen (FR-706) står først og er alltid synlig
@@ -2721,6 +2754,39 @@ Som **bruker**, vil jeg se med en gang hvilke aksjer som skiller seg ut, lese hv
 - Planen avgjør fotnotene under tabellene. De bruker ordene i FR-703, mens hjelpen sier det enklere. Forbeholdet om kjøp og salg står synlig (NFR-06), og raden for NFR-06 i denne fila, som siterer fotnoten, får en datert linje hvis den endres
 - Planen avgjør om hjelpen i demoen skal si at målingen over 199 børsdager er gjort på ekte kurser (funn 21 i gjennomgangen av 8.0b)
 
+*Lagt til 2026-10-13, endringsforslaget 13.10 (punkt 4.1, 4.3 og 4.4, svar 2 og 4), godkjent av Marian kl. 12:46:*
+- Hver tekst bak «?» har høyst 3 setninger. Unntak: «Grensene» og «Hvorfor retningen oftere er positiv», som forklarer en måling
+- Tekstene som kan tas fra tavla, står ordrett, og de som må rettes, står med rettet ordlyd (punkt 4.2 og tekstene under svar 4 i endringsforslaget 13.10)
+- Ordene følger ordlista i `designregler.md` §4, slik den står etter rettelsene i punkt 4.3. En test leter etter ordene ordlista har valgt bort («peker opp», «peker ned», «alle tre», «kroner») i malene og i hjelpetekstene
+- Malene og hjelpen følger FR-701, FR-703 og FR-704 slik de ble rettet 13.10: fotnoten under oversikten slutter med «Signalstyrken sier hvor mange av de 3 sjekkene som slo ut, ikke om du bør kjøpe eller selge.», aksjesiden sier «Signalstyrken er hvor mange sjekker som slo ut:», og hjelpen for retning sier +1 og -1 (tabellen i punkt 4.4)
+- Tall skrives med sifre («de 3 sjekkene»), og datoer som «22.09», med år bare når året er et annet. Formen bestemmes ett sted, med tester (regel 21)
+- Tallene kommer fortsatt fra `Parametre`, og testene som krever det, står
+- **Ville feilet hvis:** en tekst bak «?» hadde mer enn 3 setninger utenom unntakene, «peker opp» sto igjen i hjelpen for retning, eller en dato sto som 2026-10-12 på siden
+
+### Story 8.0e: Oversikten fra designforslaget
+
+*Lagt til 2026-10-13, endringsforslaget 13.10 (punkt 4.6, nr. 1–4, svar 8, 11 og 12), godkjent av Marian kl. 12:46.*
+
+Som **bruker**, vil jeg se i oversikten hvilke sjekker som slo ut og hvilke
+aksjer som skilte seg ut, så jeg kan lese tabellen uten å åpne hver aksje.
+
+**Oppfyller:** designforslaget, punkt 11 i samlelista · **Begrenses av:** FR-101,
+FR-103, FR-703, FR-705, NFR-05, NFR-06
+
+**Kontroll — hva testen ser etter:**
+- Hver rad med vurdering viser T, B og I med +1, 0 eller -1, skrevet «T +1», i cellen for signalstyrke, under «N av 3». Tabellen har fortsatt fem kolonner (FR-101)
+- Verdiene leses fra den lagrede vurderingen, aldri regnet på nytt (FR-101)
+- En rad uten vurdering viser grunnen, som i dag, og ingen T, B eller I
+- Radene med styrke på terskelen eller mer står under «Skilte seg ut», og de andre under «Øvrige aksjer». Terskelen kommer fra `Parametre` (FR-705). Er ingen over terskelen, står setningen fra 8.0c (05.10) i stedet for «Skilte seg ut»
+- Over tabellen står «N av M aksjer skilte seg ut <ukedag>», der N og M telles fra radene, og ukedagen er børsdagen vurderingene gjelder, på norsk
+- Under overskriften står innledningen fra tavla, med rettet ordlyd: «OSE Signal er et regelbasert signal for aksjer på Oslo Børs: 3 faste sjekker måler kurs og volum mot aksjens egen historikk. Hos disse 4 slo minst 2 av 3 ut. Det viser hvor du kan se nærmere, ikke hva du bør kjøpe eller selge.» Tallene telles fra radene og `Parametre`. Under står «3 av 3» og hvilke aksjer som fikk utslag på alle 3 sjekkene, med navnene fra radene
+- «Slik leser du tabellen» står over tabellen med 3 korte punkter. Det første er «Signalstyrke 0–3» fra tavla, uten setningen om klikk til klikket finnes. De to andre er tavlas tekster om retning og selskapsnavnet
+- **Ville feilet hvis:** tabellen fikk en sjette kolonne, en rad med 1 av 3 sto under «Skilte seg ut», M var skrevet fast som 15, ukedagen var dagen siden ble åpnet og ikke børsdagen, eller en rad uten vurdering viste T, B og I
+
+Delen «Dine egne aksjer» kommer med 2.12 (svar 11).
+
+**Avhenger av:** 8.0c. **Én økt:** avgjøres i planen.
+
 ### Story 8.0d: Utseendet fra designforslaget
 
 *Lagt til 2026-10-11, Marians beslutning kl. 12:13.*
@@ -2740,6 +2806,14 @@ demoen sensor ser, har det utseendet vi har valgt.
 - **Ville feilet hvis:** en side hentet noe fra nettet, eller utseendet tok inn en funksjon som ikke er bygget
 
 **Avhenger av:** 8.0b og 8.0c. **Én økt:** avgjøres i planen.
+
+*Lagt til 2026-10-13, endringsforslaget 13.10 (punkt 4.3 og 4.6, svar 5, 12 og 18, og N3), godkjent av Marian kl. 12:46:*
+- Lista over det planen skriver inn i `designregler.md`, får også rekkefølgen av delene på hver side og det grå feltet fra tavla
+- 50-dagers snittet i kursgrafen er heltrukket, og hjelpeteksten om kursgrafen følger (i dag «den stiplede er snittet» i `src/hjelpetekster.py`). Stiplet linje er bare for hovedindeksen (`designregler.md` §4)
+- Tilbakelenken på aksjesiden har tekst uten pil. Pilene er bare for retning (FR-103)
+- Symbolene for de 13 bransjene (N3, `designregler.md` §4)
+- 8.0d avhenger også av 8.0e, så utseendet legges på den nye oversikten
+- **Ville feilet hvis:** snittet var stiplet, hjelpen sa noe annet enn grafen, eller en pil sto ved noe annet enn retningen
 
 ### Story 8.1: Brukertest rett etter Epic 2
 
@@ -2852,6 +2926,8 @@ vurderingen. Tekstene ligger i hjelpefila fra 8.0b.
 
 *Lagt til 2026-10-06, Marians beslutning kl. 20:42:* «Står det noe i børsmeldingene?» nevner NewsWeb uten lenke og viser til lenken til selskapets investorside (10.5). Euronexts vilkår forbyr lenker uten tillatelse (`docs/kilder-og-rettigheter.md`, «Lenker til Euronexts nettsteder (lest 2026-10-06)»).
 
+*Lagt til 2026-10-13, endringsforslaget 13.10 (svar 5), godkjent av Marian kl. 12:46:* «Hva du kan sjekke selv» fra designforslaget hører hit, i delen «Se nærmere». Tekstene kontrolleres mot koden og PRD-en før de brukes, som i 8.0c.
+
 ### Story 8.5: Endring i kroner, og høy og lav i aksjedetaljen
 
 *Lagt til 2026-10-07, Marians beslutning kl. 23:11.*
@@ -2893,6 +2969,10 @@ dagen gjaldt hele børsen eller noen bransjer.
   antallet sektorer var fast
 
 **Avhenger av:** 2.9b for søylene den står ved, og 8.17 for periodene. **Én økt:** ja.
+
+*Lagt til 2026-10-13, endringsforslaget 13.10 (N3, svar 24), godkjent av Marian kl. 12:46:*
+- Børsometeret bruker de 13 bransjene i `designregler.md` §4, med symbolene fra 8.0d. Det brukeren ser, heter «bransje», og koden sier `sektor`
+- **Ville feilet hvis:** siden sa «sektor», eller en bransje sto uten symbol
 
 ### Story 8.7: Sjekk 2 og 3 i kursgrafen
 
@@ -2959,6 +3039,9 @@ del er før jeg leser tallene.
 
 **Avhenger av:** 8.0b, og bygges etter sidene den viser. **Én økt:** ja.
 
+*Lagt til 2026-10-13, endringsforslaget 13.10 (punkt 4.1), godkjent av Marian kl. 12:46:*
+- «Vis meg rundt» har høyst 7 steg, og stegene om retning, signalstyrke og sjekkene bruker tekstene fra tavla i punkt 4.2
+
 ### Story 8.10: Innstillinger øverst
 
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 5).*
@@ -2979,6 +3062,26 @@ gjelder alle sidene og huskes.
 
 **Avhenger av:** 8.3 for knapperaden, 8.0b for hjelpen og 10.3 for KI-teksten.
 **Én økt:** ja.
+
+*Lagt til 2026-10-13, endringsforslaget 13.10 (punkt 4.1, svar 3), godkjent av Marian kl. 12:46:* 8.10 deles. 8.10 har «Vis hjelp» og avhenger av 8.3 for knapperaden og 8.0b for hjelpen. «Vis KI-tekst» kommer i 8.10b. Kontrollpunktet «Bryteren ved KI-teksten og valget i Innstillinger viser alltid det samme», «Ville feilet hvis» over og 10.3 i «Avhenger av» gjelder 8.10b.
+
+### Story 8.10b: «Vis KI-tekst» i Innstillinger
+
+*Lagt til 2026-10-13, endringsforslaget 13.10 (punkt 4.1), godkjent av Marian kl. 12:46.*
+
+Som **bruker**, vil jeg slå KI-teksten av og på i Innstillinger, så valget
+gjelder alle sidene og huskes.
+
+**Oppfyller:** FR-110 (KI-delen) · **Begrenses av:** FR-601, `AD-3`, `AD-10`, `AD-16`
+
+**Kontroll — hva testen ser etter:**
+- «Vis KI-tekst» står i Innstillinger, i samme tabell som «Vis hjelp» fra 8.10
+- Bryteren ved KI-teksten og valget i Innstillinger viser alltid det samme
+- Ingen API-kall
+- **Ville feilet hvis:** bryteren ved KI-teksten og Innstillinger kunne vise hver
+  sin verdi
+
+**Avhenger av:** 8.10 og 10.3. **Én økt:** ja.
 
 ### Story 8.11: Ferdige lister og filter på signalet
 
@@ -3089,6 +3192,10 @@ jeg finner det jeg leter etter.
 **Avhenger av:** ingen åpne. Gjelder også Min liste når 8.3 er bygget.
 **Én økt:** ja.
 
+*Lagt til 2026-10-13, endringsforslaget 13.10 (punkt 4.6, nr. 2), godkjent av Marian kl. 12:46:*
+- Når tabellen er delt i «Skilte seg ut» og «Øvrige aksjer» (8.0e), gjelder sorteringen innenfor hver del
+- **Ville feilet hvis:** en rad fra «Øvrige aksjer» havnet under «Skilte seg ut» etter et klikk
+
 ### Story 8.16: Regelen for startdagen, og periodene i kursgrafen
 
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 15).*
@@ -3161,6 +3268,27 @@ handler, og ser hvor gammel opplysningen er.
   sikker ut som en som ble sjekket i dag
 
 **Avhenger av:** 2.14, og 2.6 for «ikke bekreftet». **Én økt:** ja.
+
+### Story 8.19: Neste henting i stripa øverst
+
+*Lagt til 2026-10-13, endringsforslaget 13.10 (punkt 4.6, nr. 5 A, svar 13), godkjent av Marian kl. 12:46.*
+
+Som **bruker**, vil jeg se når dataene ble hentet og når neste henting tidligst
+kan komme, så jeg vet hvor ferske tallene er.
+
+**Oppfyller:** designforslaget, punkt 11 i samlelista · **Begrenses av:** NFR-05,
+NFR-08, `AD-10`
+
+**Kontroll — hva testen ser etter:**
+- Stripa øverst sier når dataene ble hentet, og når neste henting tidligst kan
+  komme: «Neste: <dag> etter kl. 22»
+- Klokkeslettet kommer fra `KL_22` i `fetch_prices.py`, og dagen fra
+  `boersdag.py`, ikke skrevet fast
+- Ingen API-kall
+- **Ville feilet hvis:** stripa sa i morgen en fredag, eller klokkeslettet sto
+  fast i malen
+
+**Avhenger av:** 8.0d for stripa. **Én økt:** avgjøres i planen.
 
 ---
 
