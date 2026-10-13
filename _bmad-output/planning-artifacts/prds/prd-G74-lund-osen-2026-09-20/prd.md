@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-08T21:56
+updated: 2026-10-13T12:47
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -183,6 +183,8 @@ Et symbol er med i universet når det oppfyller begge kravene:
    perioden.
 2. **Universet dekker minst åtte sektorer.** Kravet gjelder lista som helhet,
    ikke det enkelte symbolet.
+
+   *Lagt til 2026-10-13, endringsforslaget 13.10 (svar 24 og N3):* det brukeren ser, heter «bransje», og koden og kravene sier «sektor». Appen har 13 bransjer (`designregler.md` §4), og de 15 hører til 8 av dem.
 
 Antallet på 15 er utledet av API-kvoten, ikke valgt etter skjønn: EODHD på
 gratisnivå gir 20 kall i døgnet, og kurser koster ett kall per symbol.
@@ -1496,9 +1498,11 @@ sjekk, ingen vekting og ingen skjult formel.
 
 | # | Sjekk | Måler | Gir utslag når |
 |---|---|---|---|
-| 1 | **Trend** | Sluttkurs mot 50-dagers glidende snitt | Kursen ligger mer enn **2 %** over eller under snittet |
+| 1 | **Trend** | Utbyttejustert kurs mot 50-dagers glidende snitt | Kursen ligger mer enn **2 %** over eller under snittet |
 | 2 | **Bevegelse** | Dagens endring mot aksjens egen volatilitet | Endringen overstiger ett standardavvik av siste **20** dagers endringer |
 | 3 | **Interesse** | Dagens volum mot eget medianvolum | Volumet overstiger **1,5 ×** medianen siste **20** dager |
+
+*Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.4), godkjent av Marian kl. 12:46:* her sto «Sluttkurs mot 50-dagers glidende snitt» i raden for trend. Trend bruker den utbyttejusterte kursen, som setningen under tabellen sier.
 
 Fortegnet på **interesse** følger dagens kursendring: høyt volum på en dag med
 oppgang gir +1, høyt volum på en dag med nedgang gir −1. Volum har ingen retning
@@ -1525,8 +1529,10 @@ prosentpoeng av styrke 2 og 3 til sammen. Se `malinger.md` §7.4.
 #### FR-703 — Signalstyrke
 
 Signalstyrke er summen av absoluttverdiene til de tre sjekkene, altså et helt
-tall fra 0 til 3. Styrken sier hvor kraftig sjekkene slår ut — ikke hvor
+tall fra 0 til 3: hvor mange av sjekkene som slo ut. Styrken sier ikke hvor
 sannsynlig en kursbevegelse er, og ikke om aksjen bør kjøpes eller selges.
+
+*Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.4), godkjent av Marian kl. 12:46:* her sto «Styrken sier hvor kraftig sjekkene slår ut — ikke hvor sannsynlig en kursbevegelse er, og ikke om aksjen bør kjøpes eller selges.» Definisjonen er den samme. Bare forklaringen er endret, så den sier det samme som hjelpen.
 
 Målt fordeling over 199 handelsdager og 2 985 aksjedager: styrke 0 hos
 **12,7 %**, styrke 1 hos **56,3 %**, styrke 2 hos **23,9 %**, styrke 3 hos
@@ -1539,10 +1545,12 @@ Retningen leses av fortegnene til de sjekkene som ga utslag:
 
 | Retning | Betingelse |
 |---|---|
-| Positiv | Alle utslag peker opp |
-| Negativ | Alle utslag peker ned |
-| Blandet | Utslagene spriker |
+| Positiv | Alle utslag er +1 |
+| Negativ | Alle utslag er -1 |
+| Blandet | Noen utslag er +1 og noen -1 |
 | Ingen | Ingen av sjekkene ga utslag (styrke 0) |
+
+*Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.4), godkjent av Marian kl. 12:46:* her sto «Alle utslag peker opp», «Alle utslag peker ned» og «Utslagene spriker». Retningen forklares med +1 og -1, som ordlista i `designregler.md` §4.
 
 Blandet er et gyldig og informativt svar — et kursfall på høyt volum i en aksje
 som fortsatt ligger over sitt eget snitt *er* blandet, og skal presenteres som
