@@ -148,3 +148,24 @@ def test_fortegn_som_i_ga_kolonnen():
     from tallformat import fortegn
 
     assert (fortegn(1), fortegn(0), fortegn(-1)) == ("+1", "0", "-1")
+
+
+def test_ukedagene_paa_norsk():
+    """Story 8.0e, svar 5. Ville feilet med feil indeks i lista."""
+    from datetime import date, timedelta
+
+    from tallformat import ukedag
+
+    mandag = date(2026, 10, 12)
+    assert [ukedag(mandag + timedelta(days=i)) for i in range(7)] == [
+        "mandag", "tirsdag", "onsdag", "torsdag", "fredag", "lørdag", "søndag",
+    ]
+
+
+def test_navnene_bundet_med_og():
+    from tallformat import med_og
+
+    assert med_og([]) == ""
+    assert med_og(["Equinor"]) == "Equinor"
+    assert med_og(["Equinor", "DNB Bank"]) == "Equinor og DNB Bank"
+    assert med_og(["Equinor", "DNB Bank", "Telenor"]) == "Equinor, DNB Bank og Telenor"

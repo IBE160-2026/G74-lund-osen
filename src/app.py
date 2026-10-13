@@ -62,7 +62,7 @@ from markedsoversikt import (
 from migrering import MigrasjonsFeil
 from oversiktsdata import Oversiktsleser
 from signalberegning import BLANDET, STANDARD
-from tallformat import dato, tall
+from tallformat import dato, med_og, tall, ukedag
 
 # Kommandoen den tomme siden ber brukeren kjoere. Den staar ogsaa i README, og
 # en test krever at de to er like (story 3.3). Kommer kommandoen for Docker i
@@ -120,6 +120,9 @@ app.jinja_env.filters["norsk_tid"] = lambda tid: norsk_tid(tid, idag().year)
 app.jinja_env.filters["dato"] = lambda dag: dato(dag, idag().year)
 # Regel 21: tallene formateres ett sted, ikke med "%.2f" i malene (story 8.0).
 app.jinja_env.filters["tall"] = tall
+# Story 8.0e: ukedagen i overskriften og navnene i linja om «3 av 3».
+app.jinja_env.filters["ukedag"] = ukedag
+app.jinja_env.filters["med_og"] = med_og
 
 def naa() -> datetime:
     """Klokka sidene regner dagens dato av, i UTC (AD-20). Egen funksjon, saa
@@ -366,6 +369,7 @@ def markedsoversikt():
         antall_vurdert=antall_vurdert(rader),
         skilte_seg_ut=skilte_seg_ut,
         oevrige=oevrige,
+        tre_av_tre=[rad.aksje.navn for rad in skilte_seg_ut if rad.styrke == ANTALL_SJEKKER],
         hentekommando=hentekommando(),
     )
 
