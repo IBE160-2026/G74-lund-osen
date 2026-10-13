@@ -167,3 +167,17 @@ i arbeid, resten er backlog.
   10.5, FR-104/FR-410 og 2.5; «Hva du kan sjekke selv» hører til 8.4.
 - **Utbytte (2.15, N1)** kan endre merket under kursen i 8.14 til «utbytte» når
   EODHD-data har utbytte den dagen, ellers «justeringsdag». Føres etter prøven.
+
+## Krav som falt ut da konteksten ble laget på nytt (13.10)
+
+- Sluttkurs er `close`, og endringen regnes på `adjusted_close` (FR-101).
+- Sidens tidsstempel er det eldste `sist_hentet`, i norsk tid, og en rad med eldre data viser sitt eget under navnet (FR-101). Tidsstempelet påvirker ikke sorteringen (FR-102), og datoen over tabellen avhenger ikke av sorteringen (8.0).
+- Retningen vises med tekst, symbol og farge. Teksten bærer, og symbolet skjules for skjermlesere (FR-103). «Ukjent» er fraværet av en vurdering, ikke en femte retning (FR-101).
+- En aksje som skiller seg ut, merkes med tekst og ikke bare farge. Selskapsnavnet ser ut som en lenke og har synlig fokus, og veien tilbake er like tydelig (8.0).
+- Endringen i oversikten har to desimaler, så rekkefølgen i FR-102 kan leses av. En måling som blir lik grensen etter avrunding uten å være det, vises med så mange desimaler at forskjellen synes (8.0).
+- Aksjedetaljen viser alle tre sjekkene, også de som ga 0 (FR-706). Uten gyldig signal: svar 200, kursgrafen så langt dataene rekker og en beskjed med grunnen i stedet for sjekkene (FR-204). Tegnforklaringen sier at linjene er utbyttejustert kurs (FR-202).
+- Brukertesten: tiden måles fra det første skjermbildet vises til forklaringen er gitt (8.1).
+- UX-gjennomgangen er en gjennomgang av skjermbildene som finnes, ikke design fra bunnen, uten nye skjermbilder eller ny funksjonalitet. Hver forbedring knyttes til et skjermbilde og et krav og blir en egen liten endring med test (8.2).
+- Børsmeldinger og kommende hendelser er ute av v1 (plan B 28.09, prd.md).
+
+Lages konteksten på nytt, skal disse punktene være med, og den nye versjonen diffes mot den forrige før commit (regel 13).
