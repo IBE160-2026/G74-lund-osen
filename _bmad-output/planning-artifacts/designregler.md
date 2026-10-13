@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-10-13T10:56
+updated: 2026-10-13T11:06
 ---
 
 # Designregler
@@ -70,3 +70,22 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 - Bransjer: 13, hver med navn og symbol (tavla «Bransjer»). De 11 hos Euronext (ICB), med sjømat og shipping for seg, som Euronexts indekser OBSFX og OBSHX. Nye: Forbruk, Teknologi, Helse, Eiendom og Kraft.
 - Sortering: vinkler i den svarte kolonneraden. Pilene er bare for retning.
 - Stiplet linje betyr bare hovedindeksen. 50-dagers snittet og grensen for interesse er heltrukne, og kursen er tykkere enn snittet.
+- Datoer: 22.09, uten punktum til slutt, og med år bare når året er et annet: 29.09.2025.
+- Knapper i en dialog: hovedvalget til høyre, det andre valget eller Avbryt til venstre for det. Samme handling har samme ord overalt, for eksempel «Følg aksjen».
+- Merker ved et navn («Egen», «Utenfor målingen») har samme størrelse.
+- Uten farger: retning, endring og sjekkene står alltid også som tekst, fortegn eller pil, og linjer og søyler kan leses av plassen over eller under null-linja.
+- Periodevalg, likt overalt: «I går», 1 uke, 1 mnd, 3 mnd, 6 mnd, I år, 1 år og «Velg dag». Var siste børsdag ikke i går, står ukedagen, for eksempel «Fredag» på en mandag. Grafen åpner med 6 mnd (FR-201).
+- Sammenligning: hver rad får en linje til for dagen du sammenligner med: sluttkursen, endringen siden da, og T, B og I den dagen, med T rett under T. Retningen står bare for i går. Kolonnehodet sier «i går», og datoen står i gult under.
+- U ved kursen: aksjen har betalt utbytte i perioden. Endringen er justert for utbytte, sluttkursen er ikke det, så de to stemmer ikke helt med hverandre (FR-101, FR-407).
+- Ikke vurdert: en dag uten lagret vurdering. Signalet regnes aldri ut på nytt av kursene i ettertid (designregler §2, story 2.7).
+- KI-tekst: tekst fra språkmodellen, alltid merket «Laget av KI». Modellnavnet står i en liten linje under teksten (FR-602).
+- Hjelp: faste tekster vi har skrevet og sjekket.
+- Gul strek: det viktigste på siden. I KI-teksten har tall som er sjekket mot grunnlaget, prikket strek og farge etter retning.
+- Antall: telles alltid og står aldri fast som 15, så tallene følger lista når egne aksjer kommer med.
+- Hvor mange aksjer: én grense for hele lista, «opptil 18 aksjer», vist som «16 av 18 aksjer». Ikke «opptil 3 i tillegg».
+- Hjelp bak «?»: forklaringer som ellers ville stått som løs tekst, samme utseende som «Vis meg rundt».
+- Ikke «v1.1» eller «(idé)» i tekster brukeren leser. De stiplede merkene på tavla («Idé til v1.1», «Ønsket», «Planlagt») er for gruppa.
+- Lenken går til selskapets investorside, den norske når den finnes, uten å skrive «på norsk» (Marian 02.10 kl. 21.56 og 06.10 kl. 20.42). NewsWeb og Oslo Børs nevnes uten lenke.
+- Skrift (valgt 01.10): IBM Plex Sans til all tekst og alle tall, med tabelltall. Newsreader bare til overskrifter og titler, også når det står et tall i dem.
+
+Ord kan endres rett i tavla. I appen samles hjelpetekstene i én fil (8.0b).
