@@ -93,11 +93,49 @@ Planen ble vist i chatten 13.10 og er ført i `docs/ai-prompts/2026-10-13.md` (i
 - Merket står ett sted, `EKSEMPELTALL_MERKE` i `app.py`. README-ens sitat i steg 6 står ordrett øverst på siden, så README-en er ikke endret. `test_merket_i_demoen_er_det_samme_som_i_malene` sammenligner med konstanten.
 - Linja over tabellen i demoen er «Eksempeltall · 2026-10-09 · 14 aksjer». «09.10» kommer med PR 2.
 - Hjelpen: 6 «?» i oversikten (23 setninger) og 12 på aksjesiden. Ny tekst «selskap», ordrett fra tavla. Ingen «?» med tom base. «Ga» bygges av `POSITIV`, `NEGATIV` og `INGEN_UTSLAG`.
+- Tekstene avviker fra tavla og fra tabellen i 4.4 der planen kl. 13:35 og delen 2 kl. 15:03 viste det: trend står som før, fordi testen krever «de siste 50 børsdagene», interesse sier «1,5 ganger» og ikke «1,5 ×», bevegelse og hvorfor_tre har +1 og -1 og «med én regel og én grense hver», og blandet og signalstyrke har ordlyden fra delen 2. Godkjent 13.10 kl. 14:33 og 15:36.
 - Testene som er endret: «N av 3» i `test_app.py`, demolinja og hjelpen i `test_demo.py`, grensene, plasseringen og tom base i `test_hjelpetekster.py`, og merket i `test_docker.py`.
 
 ## Spec Change Log
 
 ## Review Triage Log
+
+Gjennomgang av PR #35 (diffen `main...8-0c` på `c6db3e5`), med Blind Hunter (BH, bare diffen), Edge Case Hunter (ECH) og Verification Gap (VG) som tre uavhengige agenter 13.10. Rettingene står i `1dcfbdb`.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| VG1 | Setningen «Ingen aksjer skilte seg ut» er ikke prøvd med 2 av 3, så en mutant med `== ANTALL_SJEKKER` overlever | høy | patch: test med én aksje på 2 av 3 |
+| VG2 | Merkingen er bare prøvd der den skal stå, ikke at den mangler der den ikke skal | medium | patch: én rad med 1 av 3 og én med 2 av 3, og antall `bidro` |
+| VG3 | Ingen test binder «Målt mot» til merkingen | medium | patch: «lys bakgrunn» i ordtesten |
+| ECH3, ECH4 | Ordtesten bommer når et ord er delt over to linjer, og kan treffe CSS | medium | patch: bare synlig tekst, med mellomrom slått sammen |
+| BH2 | Ingen mellomrom mellom tallet og ordet i Ga | medium | patch |
+| BH3 | Den gule ringen har om lag 2,3:1 mot hvit | medium | patch: `#a67c00`, og en test for minst 3:1 |
+| VG6 | Forbeholdet om kjøp og salg står bare med tabellen | lav-medium | patch: egen fotnote, test på en side uten sjekker |
+| BH7, ECH11 | «Blandet» skrevet fast i fotnoten | lav | patch: fra `BLANDET` |
+| BH8 | Testen låser `UNDER_ARBEID` på True | lav | patch: monkeypatch |
+| BH9, VG10 | Vindustesten finner ikke escapet tekst og sjekker ikke rekkefølgen | lav | patch |
+| BH10, ECH5 | Setningstelleren teller ikke setninger som slutter med «.»» | lav | patch, med tilfellet i testen |
+| BH12 | Betingelsen for grafhjelpen står to steder | lav | patch: `vis_grafhjelp` |
+| BH15 | `.tittelrad` brukes ikke lenger | lav | patch: fjernet |
+| ECH6 | Id-en per sjekk kommer fra navnet | lav-medium | patch: test som krever en gyldig og unik nøkkel per sjekk |
+| ECH7 | `ANTALL_SJEKKER` er ikke bundet til antall sjekker i koden | lav-medium | patch: test |
+| VG8 | Bevegelse er ikke bundet til koden i hjelpen | lav | patch: test |
+| VG11 | «seks måneder» med bokstaver | lav | patch: «6 måneder» |
+| BH1, ECH2 | Setningen står selv om noen rader ikke er vurdert | medium | spørsmål til gruppen før flettingen |
+| BH4 | «?» inne i `<th>` og `<h2>` gir overskriftene et lengre tilgjengelig navn | medium | utsatt: `deferred-work.md`, 8.0d (fokus og utseende) |
+| BH5, ECH8 | `uten_data` vises bare når `hentet` finnes | lav | utsatt: `deferred-work.md` |
+| ECH1 | Ga sier «ingen utslag» når volumet var høyt og kursen uendret | lav | utsatt: `deferred-work.md` |
+| ECH9 | 404-siden har verken merket eller linja «under arbeid» | lav | utsatt: `deferred-work.md` |
+| BH14 | «Demoversjon.» og stilen står i tre maler | lav | utsatt: felles layout i 8.0d |
+| BH6 | Fotnoten viser antall sjekker som slo ut, ikke den lagrede styrken | false | `test_aksjedetalj.py` krever `d.styrke == len(d.bidragsytere)` |
+| BH11 | `hjelpetekster` importerer `INGEN_UTSLAG` fra `aksjedetalj` | avvist | `aksjedetalj` importerer ikke `hjelpetekster`, og spesifikasjonen sier ingen endring i `signalberegning.py` |
+| BH13 | «selskap» sier «Klikk» og nevner grafen også når den mangler | avvist | ordrett fra tavla, godkjent i delen 2 |
+| ECH10 | Ingen «?» ved grafen når tabellen mangler | avvist | samme betingelse som i 8.0b, og teksten viser til tabellen |
+| ECH12 | Terskelen kommer fra to steder | avvist | begge er `STANDARD` i `app.py`, og testen bytter begge |
+| VG4 | Tekstene er ikke ordrett fra tavla og 4.4 | avvist | avvikene ble vist i planen kl. 13:35 og delen 2 kl. 15:03 og godkjent kl. 14:33 og 15:36. Ført under Implementation Notes |
+| VG5 | Kildene er overskrifter og funksjonsnavn | avvist | samme form som i 8.0b, og VG fant at alle sier det teksten sier |
+| VG7 | Fotnoten på aksjesiden følger tavlas tekst for styrken, ikke resten av 4.4 | avvist | teksten sto i planen kl. 13:35 (4b) og ble godkjent |
+| VG9, VG12, VG13 | Små merknader: ordet bygget av konstanten, `data_hentet_aksje` uten `hentet`, perioden for vinduene | avvist | merknader uten feil |
 
 ## Verification
 

@@ -143,3 +143,15 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-2-3b-kallene-som-er-igjen-brukes-paa-nye-forsoek.md`
   summary: Har kveldens henting skrevet kursfila, men skrivingen til basen feilet, og basen kan leses ved neste kjøring, går samme kommando til et nytt forsøk. Det bruker inntil 5 kall på aksjer som allerede står i kveldens fil, og resten mangler fortsatt. `--les-inn <fil>` hadde lest alle inn med 0 kall.
   evidence: Rådet leste `kjoer` og `nytt_forsoek` 10.10: filvakten sender til `nytt_forsoek` når fila finnes og basen mangler dagens kurs, uten å se i fila. Funnet skulle føres ved flettingen av PR #28 12.10, men kom ikke med i blokka. Meldingen ved basefeil viser `--les-inn`, men hjelpen under «Når kan jeg hente?» sier at samme kommando kan kjøres igjen. Ikke rettet nå.
+- source_spec: `_bmad-output/implementation-artifacts/spec-8-0c-tydelig-merking-ord-ved-sjekkene-og-datoer-paa-grafen.md`
+  summary: «?» står inne i `<th>` og `<h2>`, så skjermleseren leser overskriften som for eksempel «Sluttkurs Hjelp: sluttkurs» ved hver celle i kolonnen.
+  evidence: BH4 i gjennomgangen av PR #35 (13.10). Mulige løsninger: `aria-labelledby` på overskriften, eller knappen utenfor `<h2>` i en flex-rad. Hører til 8.0d (fokus og utseende). Ikke rettet nå.
+- source_spec: `_bmad-output/implementation-artifacts/spec-8-0c-tydelig-merking-ord-ved-sjekkene-og-datoer-paa-grafen.md`
+  summary: Teksten om «Uten data i denne kilden» står bare i vinduet ved «data hentet», og det vinduet finnes bare når `hentet` har en verdi. Fotnoten kan stå uten at teksten finnes på siden.
+  evidence: BH5 og ECH8 i gjennomgangen av PR #35 (13.10). Delen 2 av hjelpen ble godkjent med teksten i det vinduet. Et eget «?» ved fotnoten er et valg for gruppen. Ikke rettet nå.
+- source_spec: `_bmad-output/implementation-artifacts/spec-8-0c-tydelig-merking-ord-ved-sjekkene-og-datoer-paa-grafen.md`
+  summary: Ga sier «0 ingen utslag» en dag volumet var over 1,5 ganger medianen og kursen var uendret, mens hjelpen for interesse sier «Slår ut over 1,5 ganger medianen».
+  evidence: ECH1 i gjennomgangen av PR #35 (13.10). Sjekken gir 0 og teller ikke i styrken (`signalberegning.py`, `interesse`), så «ingen utslag» stemmer med styrken. Hjelpen kan presiseres. Ikke rettet nå.
+- source_spec: `_bmad-output/implementation-artifacts/spec-8-0c-tydelig-merking-ord-ved-sjekkene-og-datoer-paa-grafen.md`
+  summary: 404-siden er Flasks standardside på engelsk, uten merket i demoen og uten linja «Appen er under utvikling og ikke ferdig.»
+  evidence: ECH9 i gjennomgangen av PR #35 (13.10). Svar 4 sier linja nederst på alle sidene. En `errorhandler(404)` med en egen mal er ny funksjonalitet. Ikke rettet nå.
