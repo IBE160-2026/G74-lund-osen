@@ -2,7 +2,7 @@
 title: "Samleliste til neste endringsforslag"
 status: aktiv
 created: 2026-10-12
-updated: 2026-10-12T23:45
+updated: 2026-10-13T10:49
 ---
 
 # Samleliste til neste endringsforslag
@@ -23,3 +23,27 @@ Punkter som dukker opp, samles her og tas i ett endringsforslag med bmad-correct
 10. Teksten i designforslaget kontrolleres mot koden og PRD-en før den brukes (Marian 12.10 kl. 21:54). Tavla ligger i Claude og ikke i repoet, så rådet gir utdraget. Gjennomgangen 12.10 står i punkt 7.
 11. Oppsettet i designforslaget mot planen (Marian 12.10 kl. 22:00: «sjekk oppsettet at det også stemmer»). Det meste har en story (8.3, 8.6, 8.9, 8.10, 8.0c, 8.0d, 8.15, 8.16, 8.17, 2.7, 2.8, 2.9, 2.9b, 8.4, 2.11, 2.12, 10.3, 10.6). Uten story: T, B og I med +1, 0 eller -1 i hver rad i oversikten, tabellen delt i «Skilte seg ut», «Øvrige aksjer» og «Dine egne aksjer», overskriften «4 av 15 aksjer skilte seg ut tirsdag» med innledningen, «Slik leser du tabellen», «Neste: … etter kl. 22» i stripa (8.0d tar ingen nye funksjoner), og rekkefølgen av delene på sidene, som bare står i notatene på tavla og ikke i designregler.md. Marian 12.10 kl. 22:03: alle seks skal med. Forslag til den samlede endringen: de fire første i 8.0c, med fortsatt fem kolonner (FR-101), «Neste» som egen liten story eller i 8.0d, og rekkefølgen inn i designregler.md i planen for 8.0d.
 12. Hovedindeksen tidligere (Marian 12.10 kl. 22:12–22:13). 2.8, 2.9 og 2.9b er punkt 9 av 12 i rekkefølgen, etter KI-laget. Tas med når rekkefølgen tas opp, sammen med punkt 6.
+
+## Utdraget fra designforslaget (punkt 7 og 10)
+
+Rådet gikk gjennom alle tavlene 12.10 kl. 21:56–21:59, i «OSE Signal – designforslag», versjon 1791623938-3408. Tavla ligger i Claude og ikke i repoet. Navnet i parentes er tavla.
+
+**Kan tas som de står**, fordi det de beskriver, finnes i appen i dag:
+- Retning (Main): «Om sjekkene som slo ut, ga +1 eller -1. Ikke et råd om å kjøpe eller selge.»
+- Selskapsnavnet (Main): «Klikk for å se sjekkene, tallene bak og kursgrafen.»
+- Retning i omvisningen (Main): «Viser om sjekkene som slo ut, ga +1 eller -1. Blandet betyr at noen ga +1 og noen -1, og Ingen at ingen slo ut. Retningen er ikke det samme som dagens endring.»
+- Fotnoten (Main): «Signalstyrken sier hvor mange av de 3 sjekkene som slo ut, ikke om du bør kjøpe eller selge.»
+- Sjekkene (Aksje): «Hver sjekk gir +1, 0 eller -1. Signalstyrken er hvor mange som slo ut. Ingen vekting og ingen skjult formel.»
+- Trend (Aksje): «Slår ut når kursen ligger mer enn 2 % over eller under snittet.»
+- Bevegelse (Main og Aksje): «Endringen fra børsdagen før, mot de vanlige svingningene de 20 børsdagene før. Slår ut over 1 standardavvik.» og «Måles mot hvor mye akkurat denne aksjen pleier å svinge.»
+- Interesse (Main og Aksje): «Volumet mot medianvolumet de 20 børsdagene før. Slår ut over 1,5 × medianen, i samme retning som endringen.» og «Volum har ingen retning, så fortegnet følger dagens endring.»
+- Styrken (Aksje): «Styrken er hvor mange sjekker som slo ut. Ga noen +1 og noen -1, er retningen Blandet.»
+- Aksje: «Hver sjekk ser på sin del av dataene: kursnivå, endring og volum. Da ser du hva som ga utslaget.» og «Trend varer, de 2 andre er hendelser. I en stigende periode blir retningen derfor oftere Positiv.»
+
+**Må rettes før de brukes:**
+- Main: «3 faste sjekker måler sluttkurs og volum». Koden bruker utbyttejustert kurs i trend og bevegelse. Forslag: «måler kurs og volum».
+- Main, flere steder: «Sluttkursen mot/lå … snittet». Trend bruker utbyttejustert kurs (svar 3 11.10). Forslag: «Kursen, justert for utbytte, …» eller «Kursen lå …».
+- Aksje: «Grensene er valgt etter målinger …». Hjelpen i appen sier at de ble kontrollert før de ble låst. Forslag med ordene fra hjelpen: «Grensene ble kontrollert mot 15 aksjer over 199 børsdager før de ble låst.»
+- TydeligMerking: «summen av tallene uten fortegn». Svar 3 11.10 tok det ut.
+
+**Venter til det er bygget:** T, B og I i tabellen og klikk på dem, «N av 3», hovedindeksen og søylene, egne aksjer, Min liste, Innstillinger, KI-teksten, den svarte stripa, «hva du kan sjekke selv», det grå feltet og U-dager, periodevalget og historikken. Hvilken story hver hører til, står i punkt 11.
