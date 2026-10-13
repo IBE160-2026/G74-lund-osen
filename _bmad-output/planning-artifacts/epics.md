@@ -2793,6 +2793,8 @@ Delen «Dine egne aksjer» kommer med 2.12 (svar 11).
 
 **Avhenger av:** 8.0c. **Én økt:** avgjøres i planen.
 
+*Lagt til 2026-10-13:* PR 1 flettet i `85fe8a4`, PR #37.
+
 ### Story 8.0d: Utseendet fra designforslaget
 
 *Lagt til 2026-10-11, Marians beslutning kl. 12:13.*
