@@ -647,15 +647,20 @@ class TestReadmeForNybegynnere:
         assert "Vi anbefaler den ekte versjonen." in topp
         assert "(anbefalt)" not in hode.split("Den ekte versjonen (anbefalt)", 1)[1]
 
-    def test_stegene_er_nummerert_og_har_hoeyst_60_ord(self):
+    def test_stegene_er_nummerert_og_har_hoeyst_65_ord(self):
         """Felles 1-4, så 5-9 i den ekte versjonen og 5-7 i demoen, hvert
-        med hoeyst 60 ord utenom boksene og en sjekk paa at det gikk bra."""
+        med hoeyst 65 ord utenom boksene og en sjekk paa at det gikk bra.
+
+        Rettet 2026-10-13 (story 8.0e PR 2, svaret kl. 23:50): ordene telles
+        slik leseren ser dem, med lenketeksten og uten adressen bak, og
+        grensen er 65, ikke 60. Setningen fra docs/hjelp.md i steg 2 gjorde
+        steget til 70 ord, 8 av dem i adressen til GitHub."""
         for seksjon, numre in SEKSJONENE.items():
             funnet = [int(n) for n in re.findall(r"^(\d+)\. ", _seksjon(seksjon), re.MULTILINE)]
             assert funnet == numre, (seksjon, funnet)
             for n in numre:
-                tekst = _uten_bokser(_steg(seksjon, n))
-                assert len(re.findall(r"\w+", tekst)) <= 60, (seksjon, n)
+                tekst = re.sub(r"\]\([^)]*\)", "]", _uten_bokser(_steg(seksjon, n)))
+                assert len(re.findall(r"\w+", tekst)) <= 65, (seksjon, n)
                 assert "klar" in tekst.lower() or "Øverst står" in tekst, (seksjon, n)
 
     def test_stegene_nevner_powershell_og_terminal(self):
@@ -665,6 +670,13 @@ class TestReadmeForNybegynnere:
     def test_zip_fila_maa_pakkes_ut(self):
         steg = _steg("Felles for begge", 2)
         assert "«Download ZIP»" in steg and "«Pakk ut alle»" in steg
+        # Story 8.0e PR 2: setningen fra «Jeg har fått koden fra før» i
+        # docs/hjelp.md staar ordrett til slutt i steg 2.
+        svar = _hjelp().split("### Jeg har fått koden fra før.", 1)[1].strip().split("\n\n", 1)[0]
+        assert svar == "Har du fått koden som mappe eller ZIP-fil, pakker du den ut og går til steg 3."
+        assert steg.strip().endswith(svar)
+        assert _steg("Felles for begge", 4).strip().endswith(
+            "Har mappa et annet navn, drar du den mappa der README og compose ligger.")
         assert "Du må pakke ut" in _detaljer(_faq())["ZIP-fila ser ut som en vanlig mappe."]
 
     def test_advarselen_mot_down_v_staar_synlig(self):
@@ -854,7 +866,7 @@ class TestReadmeForNybegynnere:
         assert "```" not in status and "~~~" not in status and "`" not in status
         assert not re.search(r"docker[ -]compose|uv run", status, re.IGNORECASE)
         for innhold in ("Under arbeid", "Flettet til main:", "hentingen", "Docker", "demoen", "README-en",
-                        "README-prøven 13.–16.10", "kallene som er igjen", "hjelp bak «?»",
+                        "README-prøven", "kallene som er igjen", "hjelp bak «?»",
                         "tydeligere merking", "utseendet fra designforslaget", "KI-laget", "Euronext",
                         "](_bmad-output/implementation-artifacts/sprint-status.yaml)"):
             assert innhold in status, innhold
@@ -864,10 +876,12 @@ class TestReadmeForNybegynnere:
         flettet, neste = status.split("Flettet til main:", 1)[1].split("Neste:", 1)
         neste = neste.split("KI-laget", 1)[0]
         for sak in ("hentingen", "kallene som er igjen", "Docker", "demoen", "README-en",
-                    "hjelp bak «?»", "tydeligere merking", "datoene og månedsmerkene i grafen"):
+                    "hjelp bak «?»", "tydeligere merking", "datoene og månedsmerkene i grafen",
+                    "oversikten fra designforslaget"):
             assert sak in flettet, sak
-        for sak in ("README-prøven 13.–16.10", "oversikten fra designforslaget",
-                    "periodene i kursgrafen", "utseendet fra designforslaget"):
+        # Story 8.0e PR 2: README-prøven tas etter at 8.0d er flettet
+        # (beslutningen 13.10 kl. 23:40).
+        for sak in ("utseendet fra designforslaget", "README-prøven", "periodene i kursgrafen"):
             assert sak in neste and sak not in flettet, sak
 
     def test_lenken_til_staar_du_fast_sier_lenger_ned(self):
