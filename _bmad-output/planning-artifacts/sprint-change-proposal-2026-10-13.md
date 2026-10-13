@@ -2,7 +2,7 @@
 title: "Endringsforslag 13.10: samlelista, tekstene og rekkefølgen"
 status: draft
 created: 2026-10-13
-updated: 2026-10-13T11:29
+updated: 2026-10-13T11:32
 ---
 
 # Endringsforslag 13.10: samlelista, tekstene og rekkefølgen
@@ -494,3 +494,229 @@ linja 05.10 kl. 22:24 og sju i den daterte linja 11.10 (`epics.md:2698–2722`),
   det tredje punktet finnes.
 
 Marian velger (spørsmål 12).
+
+### 4.7 Punkt 6 og 12: rekkefølgen etter README-prøven
+
+**Rekkefølgen i dag** står i `epics.md:476–488`, punkt 1–12. Punkt 1 og 2 er
+gjort, og av punkt 3 er 2.3b og 8.0b flettet. 8.0d kommer etter 8.0b og 8.0c og
+før KI-laget (`epics.md:492`). «Rekkefølgen tas opp igjen etter README-prøven,
+når farten er kjent» (`epics.md:494`).
+
+**Det som bryter avhengighetene i dag:**
+
+| Brudd | Kilde |
+|---|---|
+| 8.12 (punkt 7) trenger 8.3 (punkt 10) og 8.17 (punkt 9) | `epics.md:3025`, og den daterte linja 08.10 kl. 21:48 (`epics.md:490`) |
+| 8.17 (punkt 9) trenger 8.3 (punkt 10) | `epics.md:3141`, og linja kl. 21:48 |
+| 10.6 (punkt 8) trenger hovedindeksen, FR-104 og FR-410, som er 2.9 og 2.8 (punkt 9) | `epics.md:2413`. Dette står ikke i linja kl. 21:48 |
+| 8.1 krever at 2.9 og 2.9b er ferdige før testen, så 8.1 kan tidligst komme etter punkt 9 | `epics.md:2772` |
+| 8.3 skal bygges etter brukertesten i 8.1 | `epics.md:2825` |
+| 2.8 trenger 4.3, fordi `ki_logg` er migrasjon `0005` | `epics.md:1579` |
+| 8.10 trenger 10.3 for KI-teksten | `epics.md:2980`. Punkt 4.1 foreslår å dele den |
+| 8.9 bygges etter sidene den viser | `epics.md:2960` |
+
+**Farten.** Endringsforslaget 08.10 regnet om lag 0,8 storyer per dag (7 storyer
+29.09–07.10) og kalte det grovt
+([`sprint-change-proposal-2026-10-08.md`](sprint-change-proposal-2026-10-08.md)
+§5). Fra 08.10 til 12.10 ble 2.3, 3.1, 3.2, 3.3, 8.0b og 2.3b flettet, og 3.4 i
+flere PR-er (git-loggen). Det er om lag 1,2 per dag med de seks, regnet her og
+ikke ført noe annet sted. Begge tallene er brukt under. Fra 16.10 er det 10 dager
+til 26.10 og 17 dager til mandag 02.11, da uke 45 begynner.
+
+Plassene under teller fra første story etter README-prøven. Ny 8.0e eller 8.19
+(punkt 4.6) gir én plass til hver der de står.
+
+#### A — dagens rekkefølge, bare rettet for avhengighetene
+
+1. 8.0c, 8.0d
+2. 4.0, 4.2, 4.3, 10.1, 10.2
+3. 10.3, 3.4b
+4. 8.15, 8.16, 8.7
+5. 2.7, 8.8, 2.6, 8.14, 2.14, 8.18
+6. 10.7
+7. 2.8, 2.9, 2.9b, 8.1, 8.6, 10.6
+8. 8.3, 8.17, 8.12, 8.10, 8.9, 8.13
+9. Lista: 2.11, 2.12, 2.13, 8.11
+
+- **KI-laget:** 10.2 er plass 7. Om lag 9 dager med 0,8 per dag og 6 med 1,2.
+  KI-teksten fra rundt 26.10 holder med begge.
+- **8.1:** plass 23. Om lag 29 dager med 0,8 og 19 med 1,2. Kommer etter
+  02.11 med begge, så 8.1 før uke 45 holder ikke.
+
+#### B — knapperaden tidligere (samlelista punkt 6)
+
+1. 8.0c, 8.0d
+2. 4.0, 4.2, 4.3, 10.1, 10.2
+3. 10.3, 3.4b
+4. 8.3, 8.10, 8.13, og 8.9 når sidene den viser, finnes
+5. Resten som i A
+
+- Krever at linja «Bygges etter brukertesten i 8.1» i 8.3 (`epics.md:2825`)
+  endres, ellers kan 8.3 ikke komme før 8.1. Spørsmål 15.
+- Med delingen i punkt 4.1 kan hjelpebryteren (8.10) komme rett etter 8.3, og
+  KI-bryteren (8.10b) står allerede etter 10.3.
+- **KI-laget:** som A, plass 7.
+- **8.1:** enda senere enn i A, fordi 2.9 og 2.9b skyves bak. Holder ikke.
+
+#### C — hovedindeksen tidligere (samlelista punkt 12)
+
+1. 8.0c, 8.0d
+2. 4.0, 4.2, 4.3, 10.1, 10.2
+3. 2.8, 2.9, 2.9b
+4. 10.3, 3.4b
+5. 8.1
+6. 8.6, 10.6
+7. Resten som i A, med 8.3 etter 8.1
+
+- 2.8 kan ikke komme før 4.3 (`epics.md:1579`), så hovedindeksen kan ikke legges
+  før KI-laget uten en endring som ikke finnes.
+- Punkt 5 i dag sier at 10.3 og 3.4b kommer «før de nye storyene». 2.8–2.9b er
+  fra 01.10 og ikke blant de nye fra 08.10, så ordlyden brytes ikke. Om det er
+  meningen, avgjør Marian.
+- **KI-laget:** 10.2 er fortsatt plass 7, så teksten lages fra rundt 26.10.
+  Visningen (10.3) kommer på plass 11.
+- **8.1:** plass 13. Om lag 16 dager med 0,8 og 11 med 1,2. Før 02.11 med
+  begge, men med 0,8 per dag bare akkurat, og ingenting annet kan legges inn
+  mellom 2.9b og 8.1.
+- 10.6 og 8.6 blir mulige tidlig, og bruddet for 10.6 i dag er borte.
+
+Legges 2.8–2.9b i stedet før 10.1, blir 10.2 plass 10, og KI-teksten fra rundt
+26.10 holder ikke med 0,8 per dag.
+
+**Oppsummert:** bare C får både KI-teksten fra rundt 26.10 og 8.1 før uke 45
+innenfor farten som står i repoet. B gir knapperaden tidligere, men skyver 8.1
+lenger bak. Marian velger (spørsmål 14).
+
+### 4.8 Punkt 13: kravlista og dekningstabellen etter 05.10
+
+PRD-en skrev FR-601 til FR-607 om etter valget av tjeneste 05.10, og kravene fra
+før plan B står ordrett i §4.6A, med en A på dem som bare gjelder meldinger:
+«Dette er innledningen og kravene fra §4.6 slik de sto før plan B, ordrett.
+Kravene som bare gjelder meldinger, har fått en A.» (`prd.md:1389–1390`). Det
+finnes ingen FR-601A og ingen FR-605A. `epics.md` er ikke fulgt etter.
+
+**Lista under «4.6 KI-laget og grensen mot regelbasert kode»** (`epics.md:128–137`):
+
+| Linje | I dag | Ny, etter `prd.md` |
+|---:|---|---|
+| 132 | FR-603 — Usikkerhet vises som forbehold, ikke som rekkefølge | FR-603 — KI-teksten sier ikke mer enn grunnlaget (`prd.md:1273`) |
+| 134 | FR-605 — Promptversjon og modell lagres med hver vurdering | FR-605 — Promptversjon og modell lagres med hver KI-tekst (`prd.md:1337`) |
+
+Under lista kommer en linje om 4.6A: FR-602A, FR-603A, FR-604A og FR-606A gjelder
+plan A, utenfor v1 (`prd.md:1386–1452`). Alle andre titler i lista er like i
+ordlyden som i `prd.md`, og antallet, 51 FR-er, stemmer (`epics.md:165`).
+
+**Dekningstabellen** (`epics.md:317–322`):
+
+| I dag | Ny |
+|---|---|
+| FR-601, FR-602, FR-603, FR-606 \| Epic 5 🔒 | FR-601, FR-602, FR-603 \| Epic 10 |
+| | FR-606 \| ikke i v1: skalaen brukes ikke i applikasjonen (`prd.md:1368`) |
+| | FR-602A, FR-603A, FR-604A, FR-606A \| Epic 5 🔒 |
+| FR-604, FR-605 \| Epic 4 | Står. 4.2 oppfyller begge (`epics.md:2053`) |
+| FR-607 \| Epic 10, og FR-608 \| Epic 10 | Står |
+
+**FR-linjene:** Epic 5 (`epics.md:554`) får A-variantene i stedet for FR-601,
+FR-602, FR-603 og FR-606. Epic 10 har ingen FR-linje i dag. Den får FR-601,
+FR-602, FR-603, FR-607 og FR-608.
+
+**Hvilken story som oppfyller hva.** I Epic 10 står FR-601–605 bare i
+kontrollpunktene, ikke i «Oppfyller». Kontrollen i FR-603 er en ren funksjon i
+10.2 (`epics.md:2243`), og 10.3 sier at siden sier hvorfor når KI er av (FR-601,
+`epics.md:2309`). Forslag: 10.2 oppfyller FR-603, og 10.3 oppfyller FR-601 og
+FR-602. 8.10 (eller 8.10b) begrenses fortsatt av FR-601 (`epics.md:2969`).
+Spørsmål 17.
+
+**Daterte linjer** der teksten fortsatt bygger på A-innholdet: `epics.md:561`
+(FR-602, FR-604 og FR-606 sitert som meldingskrav) og `epics.md:2106` («FR-6xx
+handler om meldinger»), og storyene 5.1–5.4, som oppfyller FR-601, FR-602,
+FR-603 og FR-606 (`epics.md:2116`, `2131`, `2147`, `2162`). Linjene sier at
+storyene gjelder kravene slik de sto før 05.10, nå A-variantene og FR-601.
+
+**Ordet «utbytte» på tavla** (andre halvdel av punkt 13) er tatt i punkt 4.3,
+linje 21 i ordlista.
+
+## 5. Fra README-prøven
+
+*Tom til prøven er gjort.* Funnene føres her før forslaget godkjennes, med
+hvilken story eller hvilket punkt over de hører til.
+
+## 6. Hva som må endres, hvis forslaget godtas
+
+| Dokument | Endring |
+|---|---|
+| `prd.md` | FR-701 (tabellen), FR-703 (første avsnitt) og FR-704 (tabellen), med «Her sto» (punkt 4.4). Memloggen: en decision-linje nederst i `.memlog.md`, direkte og ikke med skriptet (regel 5) |
+| `epics.md` | 8.0c: kontrollpunktene fra punkt 4.1, 4.4 og 4.6, eller ny 8.0e. 8.0d: rekkefølgen av delene, og eventuelt «Neste». Ny 8.19 hvis «Neste» blir egen story. 8.9: tekstene fra tavla. 8.10 delt i 8.10 og 8.10b. 8.15: sortering innenfor hver del. 2.7: «ikke kjørt» blir «ikke vurdert». Raden for NFR-06 med en datert linje. Kravlista under 4.6, dekningstabellen, FR-linjene for Epic 5 og 10, og de daterte linjene i punkt 4.8. Prioriteringen med en datert linje etter valget i punkt 4.7 |
+| `designregler.md` | §4: rettelsene i punkt 4.3, med «Her sto» (innledningen, linje 10). Rekkefølgen av delene på sidene skrives i planen for 8.0d, ikke nå |
+| `sprint-status.yaml` | 8.0d som `backlog` (mangler i dag). Nye linjer for 8.10b, og for 8.0e og 8.19 hvis de kommer. `last_updated` |
+| Spinen | Ingen endring funnet. Den binder FR-604 og FR-605 med nummer (`ARCHITECTURE-SPINE.md:16, 178, 190, 210`), og ingen av dem får nytt innhold |
+| `README.md` | Ingen, utenom lenken til dette forslaget, som står fra før (regel 19). Statuslinja rettes når rekkefølgen er valgt, hvis den sier noe om «Neste» som endres |
+| Tester | De tre testene i punkt 4.5, og testen for ordene ordlista har valgt bort (punkt 4.1). Ingen tester endres nå |
+
+## 7. Spørsmål til Marian
+
+1. **Når.** Rådet anbefaler at den samlede endringen tas før 8.0c planlegges.
+   Skal den det, eller planlegges 8.0c som den står, og dette tas etterpå?
+2. **Lengden på hjelpen.** Hvor mange setninger kan en tekst bak «?» ha (punkt
+   4.1)?
+3. **Hjelpebryteren.** Skal «Vis hjelp» vente på knapperaden i 8.3, eller komme
+   før, et annet sted på siden (punkt 4.1)?
+4. **Tekster som mangler i utdraget.** Kan rådet gi setningene med «Sluttkursen …»
+   ordrett, innledningen under overskriften, og det tredje punktet i «Slik leser
+   du tabellen» (punkt 4.2 og 4.6)?
+5. **«Hva du kan sjekke selv» og det grå feltet.** Hvilken story hører de til?
+   Ingen av dem står i `epics.md` (punkt 4.2).
+6. **Merket ved kursen.** FR-407 og 8.14 sier «justeringsdag», ikke «utbytte».
+   Skal merket fortsatt være bokstaven U (punkt 4.3)?
+7. **Det viktigste på siden.** Gult betyr 3 av 3 (§3). Hvordan merkes det
+   viktigste uten gult (punkt 4.3)?
+8. **Sjekkene.** «T +1» som i ordlista, eller «+1 positiv» som i 8.0c (punkt
+   4.3)? Svaret gjelder også T, B og I i oversikten (punkt 4.6).
+9. **Bransjene.** Ordlista har 13 bransjer, mens koden har 8 sektorer og PRD-en
+   krever minst åtte. Skal de 13 inn, og i så fall i hvilken story (8.6?), eller
+   følger ordlista sektorene (punkt 4.3)?
+10. **Hullene fra 12.10.** Rett på main, én commit per sak, eller i 8.0c (punkt
+    4.5)?
+11. **Egne aksjer.** Egen del «Dine egne aksjer», som tavla viser, eller i
+    tabellen sammen med de andre, som ordlista sier (punkt 4.6)?
+12. **T, B og I, delt tabell, overskrift og «Slik leser du tabellen».** I 8.0c,
+    som rådet foreslår, eller i en ny 8.0e etter 8.0c (punkt 4.6)?
+13. **«Neste» i stripa.** Ny story 8.19, eller et unntak i 8.0d (punkt 4.6)?
+14. **Rekkefølgen.** A, B eller C (punkt 4.7)?
+15. **8.3 og brukertesten.** Skal linja «Bygges etter brukertesten i 8.1» i 8.3
+    stå? Den avgjør om B er mulig (punkt 4.7).
+16. **10.6 og hovedindeksen.** 10.6 står før 2.8 og 2.9 i dag, men trenger dem.
+    Skal den flyttes etter 2.9, som i alle tre alternativene (punkt 4.7)?
+17. **Epic 10.** 10.2 oppfyller FR-603, og 10.3 FR-601 og FR-602? (punkt 4.8)
+18. **Snittet i kursgrafen.** Heltrukket, som ordlista sier, med hjelpeteksten
+    rettet i 8.0d? I dag er det stiplet (punkt 4.3).
+
+## 8. Overlevering
+
+**Omfang: middels.** Ingen nye epics og ingen endring i hentingen, basen eller
+signalet. Ny ordlyd i tre krav, kontrollpunkter i fem storyer, opptil tre nye små
+storyer (8.0e, 8.10b og 8.19), rettelser i ordlista og en ny rekkefølge.
+
+**Før godkjenning:**
+
+1. README-prøven 13.–16.10, og funnene i punkt 5
+2. Rådet leser forslaget og gir tekstene i spørsmål 4
+3. Marian svarer på spørsmålene i punkt 7
+
+**Hvis Marian sier ja:**
+
+1. `prd.md` med memloggen, i én commit
+2. `epics.md` med `sprint-status.yaml`, i én commit
+3. `designregler.md` §4, i én commit
+4. Testene i punkt 4.5, én commit per sak, hvis de tas rett på main
+5. Status `final` her, og en datert linje i samlelista om hvor hvert punkt ble
+   tatt
+
+**Suksesskriterier:**
+
+- PRD-en, malene og hjelpen bruker samme ord for signalstyrke, trend og retning
+- Ingen tekst fra tavla kommer inn i appen uten å være kontrollert mot koden
+- Ordlista i `designregler.md` §4 strider ikke mot §1–3 eller mot noe krav
+- Rekkefølgen bryter ingen «Avhenger av»-linje
+- Kravlista og dekningstabellen i `epics.md` har samme FR-er og titler som
+  `prd.md`
