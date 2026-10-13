@@ -28,6 +28,7 @@ from markedsoversikt import (
 )
 from oversiktsdata import Oversiktspost
 from signalberegning import NEGATIV, POSITIV, Parametre, STANDARD, nodvendige_dager, sjekker_fra
+from tallformat import fortegn
 from tilstand import Art, Tilstand
 from vurderingsdata import Grunn, Vurdering
 
@@ -64,7 +65,7 @@ class SjekkVisning:
 
     @property
     def fortegn(self) -> str:
-        return f"{self.verdi:+d}" if self.verdi else "0"
+        return fortegn(self.verdi)
 
     @property
     def ord(self) -> str:

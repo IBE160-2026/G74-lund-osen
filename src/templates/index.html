@@ -1,4 +1,35 @@
 {% from "_hjelp.html" import hjelpestil, hjelpeknapp, hjelpevindu with context -%}
+{% macro tabellrad(rad) %}
+          <tr {% if rad.skiller_seg_ut %}class="utslag"{% endif %}>
+            <td class="selskap"><a href="/aksje/{{ rad.aksje.symbol }}">{{ rad.aksje.navn }}</a>{% if rad.aksje.symbol in eget %}<span class="hentet">hentet {{ rad.sist_hentet|norsk_tid }}</span>{% endif %}</td>
+
+            <td class="tall">{{ rad.sluttkurs|tall('kurs') }}</td>
+
+            {# Fargen foelger tallet slik det vises: 0,00 % har ingen farge (story 8.0). #}
+            {% set vist_endring = rad.endring_prosent|round(2) if rad.endring_prosent is not none else none %}
+            <td class="tall {% if vist_endring is not none %}{{ 'opp' if vist_endring > 0 else 'ned' if vist_endring < 0 else '' }}{% endif %}">
+              {% if rad.endring_prosent is not none %}
+                {{ rad.endring_prosent|tall('endring') }}
+              {% else %}
+                –
+              {% endif %}
+            </td>
+
+            <td class="tall styrke">
+              {% if rad.styrke is not none %}
+                <span class="pille{% if rad.styrke == antall_sjekker %} tre-av-tre{% endif %}">{{ rad.styrke }} av {{ antall_sjekker }}</span>
+                <span class="sjekker">{% for bokstav, navn, verdi in rad.sjekker %}<span class="sjekk"><abbr title="{{ navn }}">{{ bokstav }}</abbr> {{ verdi }}</span>{% if not loop.last %} {% endif %}{% endfor %}</span>
+                {% if rad.skiller_seg_ut %}<span class="merke">skiller seg ut</span>{% endif %}
+              {% else %}
+                – <span class="merke mangler">{{ rad.tekst }}</span>
+              {% endif %}
+            </td>
+
+            <td class="retning {{ rad.retning.klasse }}">
+              <span class="symbol" aria-hidden="true">{{ rad.retning.symbol }}</span>{{ rad.retning.tekst }}
+            </td>
+          </tr>
+{% endmacro -%}
 <!DOCTYPE html>
 <html lang="no">
 <head>
@@ -13,6 +44,7 @@
       --ned: #b3261e;
       --blandet: #8a5a00;
       --gul: #a67c00;
+      --fyll: #000000;
     }
     body {
       font-family: system-ui, sans-serif;
@@ -52,7 +84,15 @@
     .styrke { font-variant-numeric: tabular-nums; }
     /* designregler §3: gult betyr 3 av 3, med gul ring rundt pillen. */
     .pille { white-space: nowrap; padding: 0.05rem 0.45rem; border-radius: 999px; }
-    .pille.tre-av-tre { border: 2px solid var(--gul); }
+    /* Story 8.0e, svar 8: svart fyll og hvit tekst inne i den gule ringen,
+       som i designforslaget. 2 av 3 faar ikke fyll. */
+    .pille.tre-av-tre { border: 2px solid var(--gul); background: var(--fyll); color: #ffffff; }
+    /* Story 8.0e: T, B og I under «N av 3», lest fra vurderingen. */
+    .sjekker { display: block; font-size: 0.75rem; font-weight: normal; color: var(--dempet); white-space: nowrap; }
+    .sjekker abbr { text-decoration: none; }
+    /* Story 8.0e: overskriften for hver del av tabellen. */
+    tr.del th { color: var(--tekst); font-size: 0.9rem; padding-top: 1rem; }
+    tr.del td { border-bottom: none; }
     p.ingen-utslag { margin: 0.6rem 0; }
     /* FR-705 med tekst, ikke bare farge (story 8.0). */
     .merke { display: block; font-size: 0.75rem; font-weight: 600; }
@@ -82,13 +122,6 @@
       {% if hentet %}· data hentet {{ hentet|norsk_tid }} {{ hjelpeknapp("hjelp-hentet", "Hjelp: data hentet") }}{% endif %}
     </p>
 
-    {% if ingen_skilte_seg_ut %}
-      <p class="ingen-utslag">Ingen aksjer skilte seg ut: ingen fikk {{ parametre.terskel }} av {{ antall_sjekker }} eller mer.</p>
-      {% if antall_vurdert < rader|length %}
-        <p class="ingen-utslag">{{ antall_vurdert }} av {{ rader|length }} aksjer ble vurdert.</p>
-      {% endif %}
-    {% endif %}
-
     <table>
       <thead>
         <tr>
@@ -99,38 +132,33 @@
           <th>Retning {{ hjelpeknapp("hjelp-retning", "Hjelp: retning") }}</th>
         </tr>
       </thead>
+      {#- Story 8.0e: to deler i samme tabell, hver med sin overskrift i en
+          rad over alle fem kolonnene, og hver i FR-102-rekkefoelgen fra
+          del_i_to. Skilte ingen seg ut, staar setningene fra 8.0c der
+          «Skilte seg ut» ellers staar. Uten en eneste vurdering er det bare
+          én del, uten overskrift. #}
+      {% set foerste_del = skilte_seg_ut or ingen_skilte_seg_ut %}
+      {% if skilte_seg_ut %}
       <tbody>
-        {% for rad in rader %}
-          <tr {% if rad.skiller_seg_ut %}class="utslag"{% endif %}>
-            <td class="selskap"><a href="/aksje/{{ rad.aksje.symbol }}">{{ rad.aksje.navn }}</a>{% if rad.aksje.symbol in eget %}<span class="hentet">hentet {{ rad.sist_hentet|norsk_tid }}</span>{% endif %}</td>
-
-            <td class="tall">{{ rad.sluttkurs|tall('kurs') }}</td>
-
-            {# Fargen foelger tallet slik det vises: 0,00 % har ingen farge (story 8.0). #}
-            {% set vist_endring = rad.endring_prosent|round(2) if rad.endring_prosent is not none else none %}
-            <td class="tall {% if vist_endring is not none %}{{ 'opp' if vist_endring > 0 else 'ned' if vist_endring < 0 else '' }}{% endif %}">
-              {% if rad.endring_prosent is not none %}
-                {{ rad.endring_prosent|tall('endring') }}
-              {% else %}
-                –
-              {% endif %}
-            </td>
-
-            <td class="tall styrke">
-              {% if rad.styrke is not none %}
-                <span class="pille{% if rad.styrke == antall_sjekker %} tre-av-tre{% endif %}">{{ rad.styrke }} av {{ antall_sjekker }}</span>
-                {% if rad.skiller_seg_ut %}<span class="merke">skiller seg ut</span>{% endif %}
-              {% else %}
-                – <span class="merke mangler">{{ rad.tekst }}</span>
-              {% endif %}
-            </td>
-
-            <td class="retning {{ rad.retning.klasse }}">
-              <span class="symbol" aria-hidden="true">{{ rad.retning.symbol }}</span>{{ rad.retning.tekst }}
-            </td>
-          </tr>
-        {% endfor %}
+        <tr class="del"><th colspan="5" scope="rowgroup">Skilte seg ut</th></tr>
+        {% for rad in skilte_seg_ut %}{{ tabellrad(rad) }}{% endfor %}
       </tbody>
+      {% elif ingen_skilte_seg_ut %}
+      <tbody>
+        <tr class="del ingen-utslag"><td colspan="5">
+          <p class="ingen-utslag">Ingen aksjer skilte seg ut: ingen fikk {{ parametre.terskel }} av {{ antall_sjekker }} eller mer.</p>
+          {% if antall_vurdert < rader|length %}
+            <p class="ingen-utslag">{{ antall_vurdert }} av {{ rader|length }} aksjer ble vurdert.</p>
+          {% endif %}
+        </td></tr>
+      </tbody>
+      {% endif %}
+      {% if oevrige %}
+      <tbody>
+        {% if foerste_del %}<tr class="del"><th colspan="5" scope="rowgroup">Øvrige aksjer</th></tr>{% endif %}
+        {% for rad in oevrige %}{{ tabellrad(rad) }}{% endfor %}
+      </tbody>
+      {% endif %}
     </table>
 
     {% if ikke_vurdert %}

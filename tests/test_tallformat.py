@@ -140,3 +140,11 @@ class TestDato:
         from tallformat import dato
         assert dato(date(2025, 9, 29), 2026) == "29.09.2025"
         assert dato(date(2027, 1, 4), 2026) == "04.01.2027"
+
+
+def test_fortegn_som_i_ga_kolonnen():
+    """Story 8.0e: T, B og I i oversikten og Ga paa aksjesiden har samme
+    form. Vanlig bindestrek som minus (regel 21), og 0 uten fortegn."""
+    from tallformat import fortegn
+
+    assert (fortegn(1), fortegn(0), fortegn(-1)) == ("+1", "0", "-1")

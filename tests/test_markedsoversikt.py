@@ -462,3 +462,56 @@ def test_norsk_tid_rundt_nyttaar():
     tid = datetime(2026, 12, 31, 23, 30, tzinfo=timezone.utc)
     assert norsk_tid(tid, 2027) == "01.01 kl. 00.30"
     assert norsk_tid(tid, 2026) == "01.01.2027 kl. 00.30"
+
+
+def _lagret(trend: int, bevegelse: int, interesse: int) -> Vurdering:
+    """En vurdering med de tre fortegnene, slik den kunne staatt i basen."""
+    utslag = [v for v in (trend, bevegelse, interesse) if v]
+    if not utslag:
+        retning = INGEN
+    elif all(v > 0 for v in utslag):
+        retning = POSITIV
+    elif all(v < 0 for v in utslag):
+        retning = NEGATIV
+    else:
+        retning = BLANDET
+    return Vurdering(
+        styrke=len(utslag), retning=retning, trend=trend, bevegelse=bevegelse,
+        interesse=interesse, slutt=100.0, justert_slutt=100.0, trend_avvik=0.0,
+        dagens_endring=0.0, standardavvik=0.01, volumforhold=1.0,
+    )
+
+
+class TestStory80e:
+    """T, B og I og de to delene i oversikten, uten HTML."""
+
+    def test_sjekkene_leses_fra_den_lagrede_vurderingen(self):
+        """En flat serie ville gitt 0 paa alle tre. Vurderingen sier noe
+        annet, og raden viser den. Ville feilet hvis T, B og I ble regnet av
+        kursene."""
+        rader = serie([100.0] * 6)
+        rad = bygg_rad(post(EQNR, rader, innhold=_lagret(1, -1, 0)), IDAG, KORT)
+        assert rad.sjekker == (("T", "trend", "+1"), ("B", "bevegelse", "-1"),
+                               ("I", "interesse", "0"))
+
+    @pytest.mark.parametrize("innhold", [None, Grunn.SYMBOL_FEILET])
+    def test_ingen_sjekker_uten_vurdering(self, innhold):
+        rad = bygg_rad(post(EQNR, serie([100.0] * 6), innhold=innhold), IDAG, KORT)
+        assert rad.vurdering is None
+        assert rad.sjekker == ()
+
+    def test_delingen_bruker_terskelen_og_beholder_rekkefoelgen(self):
+        """Styrke paa terskelen skiller seg ut (FR-705). Ville feilet med >
+        i stedet for >=, eller med terskelen skrevet fast."""
+        from markedsoversikt import del_i_to
+
+        poster = [
+            post(EQNR, serie([100.0] * 6), innhold=_lagret(1, 1, 0)),   # 2
+            post(DNB, serie([100.0] * 6), innhold=_lagret(1, 0, 0)),    # 1
+        ]
+        ut, oevrige = del_i_to(bygg_oversikt(poster, IDAG, KORT))
+        assert [r.aksje.symbol for r in ut] == ["EQNR"]
+        assert [r.aksje.symbol for r in oevrige] == ["DNB"]
+        hoey = Parametre(ma_vindu=5, volatilitet_vindu=3, volum_vindu=3, terskel=3)
+        ut, oevrige = del_i_to(bygg_oversikt(poster, IDAG, hoey))
+        assert ut == [] and [r.aksje.symbol for r in oevrige] == ["EQNR", "DNB"]

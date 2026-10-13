@@ -87,6 +87,15 @@ def dato(dag, i_aar: int) -> str:
     return tekst
 
 
+def fortegn(verdi: int) -> str:
+    """En sjekks verdi med fortegn: «+1», «0» eller «-1» - story 8.0e.
+
+    Vanlig bindestrek som minus (regel 21), og 0 uten fortegn. Samme form
+    i Ga-kolonnen paa aksjesiden og i T, B og I i oversikten.
+    """
+    return f"{verdi:+d}" if verdi else "0"
+
+
 def desimaler_mot_grense(maaling: float, grense: float, minst: int = 1) -> int:
     """Faerrest desimaler, minst minst, som skiller maalingen fra grensen.
 
