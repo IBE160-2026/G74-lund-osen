@@ -319,7 +319,12 @@ class TestSidene:
         oversikt = klient.get("/").data.decode("utf-8")
         detalj = klient.get("/aksje/BRFE").data.decode("utf-8")
         assert "Eksempeltall" in oversikt and "Eksempeltall" in detalj
-        assert "Oslo Børs · 2026-10-09 · 14 aksjer" in oversikt
+        # Story 8.0c (4a): linja over tabellen sier «Eksempeltall», ikke
+        # «Oslo Børs», og merket har «Demoversjon.» foran.
+        assert "Eksempeltall · 2026-10-09 · 14 aksjer" in oversikt
+        assert "Oslo Børs · " not in oversikt
+        assert f"Demoversjon. {app_modul.EKSEMPELTALL_MERKE}" in oversikt
+        assert f"Demoversjon. {app_modul.EKSEMPELTALL_MERKE}" in detalj
         for tekst in ("Brattfjell Energi", "skiller seg ut",
                       "signalet kunne ikke regnes", "Matfjord Merkevarer"):
             assert tekst in oversikt, tekst
@@ -348,9 +353,12 @@ class TestSidene:
         tekster = hjelpetekster()
         monkeypatch.setenv(app_modul.I_DEMO, "1")
         for adresse, vinduer, noekler in (
-            ("/", ("hjelp-oversikt", "hjelp-signalstyrke"), ("signalstyrke", "trend", "ukjent")),
-            ("/aksje/BRFE", ("hjelp-aksje",), ("grafen", "trend", "ukjent_aksje")),
-            ("/aksje/VRDS", ("hjelp-aksje",), ("antall_dager", "ukjent_aksje")),
+            # Story 8.0c: hvert «?» ved det det forklarer.
+            ("/", ("hjelp-signalstyrke", "hjelp-retning"), ("signalstyrke", "ukjent")),
+            ("/aksje/BRFE", ("hjelp-graf", "hjelp-trend", "hjelp-retning-aksje"),
+             ("grafen", "trend", "ukjent_aksje")),
+            ("/aksje/VRDS", ("hjelp-sjekkene", "hjelp-retning-aksje"),
+             ("antall_dager", "ukjent_aksje")),
         ):
             html = klient.get(adresse).data.decode("utf-8")
             assert "Eksempeltall" in html, adresse
@@ -440,6 +448,10 @@ class TestSidene:
         monkeypatch.setattr(app_modul, "hent_oversiktsleser", feiler)
         svar = klient.get("/")
         assert svar.status_code == 503 and "Eksempeltall" in svar.data.decode("utf-8")
+        # Story 8.0c: «Demoversjon.» og linja nederst ogsaa paa feilsiden.
+        html = svar.data.decode("utf-8")
+        assert f"Demoversjon. {app_modul.EKSEMPELTALL_MERKE}" in html
+        assert app_modul.UNDER_ARBEID_TEKST in html
 
     def test_en_demobase_som_ose_db_migreres_ikke(self, klient, mal, monkeypatch):
         """BH6: uten bryteren, med en demobase der den ekte skal ligge, viser
@@ -485,3 +497,48 @@ class TestSidene:
         html = klient.get("/").data.decode("utf-8")
         assert f"<code>{demo.DEMOKOMMANDO_DOCKER}</code>" in html
         assert demo.DEMOKOMMANDO not in html and app_modul.HENTEKOMMANDO_DOCKER not in html
+
+
+class TestStory80cIDemoen:
+    """FR-411, tverrgaaende fra 8.0c: det storyen viser, vises ogsaa med
+    demobasen."""
+
+    def test_merkingen_og_ordene_i_demoen(self, klient, monkeypatch, demobase):
+        import re
+
+        from test_hjelpetekster import VALGT_BORT, synlig_tekst
+
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        oversikt = klient.get("/").data.decode("utf-8")
+        detalj = klient.get("/aksje/BRFE").data.decode("utf-8")
+        assert re.search(r'<span class="pille[^"]*">\d av 3</span>', oversikt)
+        assert '<tr class="utslag">' in oversikt
+        assert re.search(r'<span class="ord">(positiv|negativ|ingen utslag)</span>', detalj)
+        assert "Signalstyrken sier ikke om du bør kjøpe eller selge." in detalj
+        for html in (oversikt, detalj):
+            assert app_modul.UNDER_ARBEID_TEKST in html
+            assert f"Demoversjon. {app_modul.EKSEMPELTALL_MERKE}" in html
+            assert "popovertarget=" in html
+            for ord_ in VALGT_BORT:
+                assert not re.search(ord_, synlig_tekst(html), re.IGNORECASE), ord_
+
+    def test_setningene_om_ingen_utslag_i_demoen(self, klient, monkeypatch, demobase):
+        """Svar 3 paa BH1/ECH2 med demobasen (FR-411). Demobasen har aksjer
+        som skiller seg ut, saa testen tar bort de vurderingene i kopien i
+        tmp (regel 22). VRDS har ingen vurdering, saa begge setningene staar."""
+        import re
+        import sqlite3
+
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        foer = klient.get("/").data.decode("utf-8")
+        assert "Ingen aksjer skilte seg ut" not in foer and "ble vurdert." not in foer
+        tilkobling = sqlite3.connect(demo_sti())
+        with tilkobling:
+            siste = tilkobling.execute("SELECT MAX(dato) FROM vurdering").fetchone()[0]
+            tilkobling.execute("DELETE FROM vurdering WHERE dato = ? AND styrke >= ?",
+                               (siste, app_modul.STANDARD.terskel))
+        tilkobling.close()
+        html = klient.get("/").data.decode("utf-8")
+        assert "Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer." in html
+        treff = re.search(r"(\d+) av (\d+) aksjer ble vurdert\.", html)
+        assert treff and int(treff.group(1)) < int(treff.group(2)), treff

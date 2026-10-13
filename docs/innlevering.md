@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-10-12T20:44
+updated: 2026-10-13T14:50
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -262,6 +262,10 @@ målingene og datakildenes vilkår. Linjen kom ikke med i versjon 6.
 det også viktig at prosjektet og utviklingen ligger fortløpende i GitHub, slik
 at vi kan følge progresjonen deres.» (hjelpelæreren, svaret 05.10, under
 «Spørsmål sendt hjelpelærer 2026-10-04»).
+
+*Lagt til 2026-10-13 (story 8.0c):* før innleveringen avgjøres linja
+«Appen er under utvikling og ikke ferdig.» nederst på sidene. Den styres av
+`UNDER_ARBEID` i `src/app.py`. Står den på `True`, vises linja.
 
 ---
 

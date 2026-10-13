@@ -4,101 +4,166 @@
 
 ## Goal
 
-En person utenfor gruppen skal forstå begge skjermbildene, markedsoversikten og
+En person utenfor gruppen skal forstå skjermbildene, markedsoversikten og
 aksjedetaljen, uten hjelp, og designet skal være vurdert, ikke bare arvet fra
 kravene. Epicen innfrir suksessmålet «Brukerutfall»: minst én person utenfor
 gruppen gjennomfører hovedflyten og forklarer uoppfordret hvorfor en aksje
-skiller seg ut, på under 5 minutter, før prosjektinnlevering. Hovedflyten er å
-åpne oversikten, se hvilke aksjer som skiller seg ut, åpne én og lese hvorfor.
-Epicen har ingen nye FR-er, men prøver FR-101–103, FR-201–204 og FR-706 fra
-utsiden, under NFR-05 og NFR-06. Den er skilt fra Epic 3 fordi brukertesten ikke
-skal vente på Dockerfilen. *Status 30.09:* alle tre storyene står som `backlog`
-i sprint-status. 8.0 ble lagt til 29.09.
+skiller seg ut, på under 5 minutter, før prosjektinnlevering. Etter
+endringsforslaget 08.10 er Epic 8 den største epicen og oppfyller også FR-106–110,
+FR-206, FR-207 og tilleggene til FR-101, FR-102, FR-201, FR-202 og FR-407.
+Endringsforslaget 13.10 (godkjent av Marian kl. 12:46) la til 8.0e, 8.10b og
+8.19, flere kontrollpunkter i 8.0c, 8.0d, 8.6, 8.9 og 8.15, og ny ordlyd i
+FR-701, FR-703 og FR-704. Ingen ny epic: faglærer ba 06.10 om at antall epics
+ikke vokser. *Status 13.10:* 8.0 står i review, 8.0b er ferdig (PR #29), 8.0c er
+i arbeid, resten er backlog.
 
 ## Stories
 
 - Story 8.0: De rene feilene i de to skjermbildene
+- Story 8.0b: Hjelp bak et spørsmålstegn
+- Story 8.0c: Tydelig merking, ord ved sjekkene og datoer på grafen
+- Story 8.0e: Oversikten fra designforslaget
+- Story 8.0d: Utseendet fra designforslaget
 - Story 8.1: Brukertest rett etter Epic 2
 - Story 8.2: UX-gjennomgang av de to skjermbildene med `[CU] bmad-ux`
+- Story 8.3: Min liste: eget skjermbilde med stjerne og filter
+- Story 8.4: Se nærmere i aksjedetaljen
+- Story 8.5: Endring i kroner, og høy og lav i aksjedetaljen
+- Story 8.6: Børsometeret
+- Story 8.7: Sjekk 2 og 3 i kursgrafen
+- Story 8.8: Signaldager i kursgrafen
+- Story 8.9: «Vis meg rundt»
+- Story 8.10: Innstillinger øverst (med «Vis hjelp»)
+- Story 8.10b: «Vis KI-tekst» i Innstillinger
+- Story 8.11: Ferdige lister og filter på signalet
+- Story 8.12: Endret signalstyrke siden forrige børsdag
+- Story 8.13: Lær noe nytt
+- Story 8.14: Justeringsdager i kursgrafen
+- Story 8.15: Sortering ved klikk i kolonneraden
+- Story 8.16: Regelen for startdagen, og periodene i kursgrafen
+- Story 8.17: Periodevalget i oversikten, Min liste og børsometeret
+- Story 8.18: Kommende eks.dato i kursgrafen
+- Story 8.19: Neste henting i stripa øverst
 
 ## Requirements & Constraints
 
-- **Tall skrives norsk der de leses** (regel 21): desimalkomma, hardt
-  mellomrom som tusenskille og foran %, vanlig bindestrek som minus. Hvor mange
-  desimaler hver type tall har, avgjøres i **én funksjon med tester**, ikke i
-  hver mal. Avrunding skjer bare ved visning; «-0,00» vises aldri. Endringen i
-  oversikten beholder to desimaler, så rekkefølgen etter absolutt endring kan
-  leses av. En måling som blir lik grensen etter avrunding uten å være det, får
-  så mange desimaler at forskjellen synes.
-- **Oversikten har nøyaktig fem kolonner:** selskap, sluttkurs (`close`),
-  endring (på `adjusted_close`), signalstyrke og retning. Selskapsnavnet er
-  lenken til aksjedetaljen, og aksjedetaljen har en synlig vei tilbake. En
-  sjette kolonne er utelukket, også for merking eller navigasjon.
+- **Oversikten har nøyaktig fem kolonner** (selskap, sluttkurs, endring,
+  signalstyrke, retning). Alt nytt i oversikten (T/B/I, kroner, «var 1 mandag»)
+  legges i cellene som finnes. Selskapsnavnet er lenken, og aksjedetaljen har en
+  synlig vei tilbake.
 - **Sortering:** styrke fallende, så absolutt endring; aksjer uten gyldig signal
-  sist; tidsstempelet påvirker ikke sorteringen. Datoen over tabellen skal ikke
-  avhenge av sorteringen. Sidens tidsstempel er det eldste `sist_hentet`, i norsk
-  tid.
-- **Retningen vises i tre kanaler:** tekst, symbol og farge, med FR-704s ord
-  uendret (Positiv, Negativ, Blandet, Ingen). Teksten bærer; symbolet skjules
-  for skjermlesere. «Ukjent» er fraværet av en vurdering, ikke en femte retning.
-- **En aksje skiller seg ut ved styrke 2 eller høyere** (FR-705), og det skal
-  merkes med tekst, ikke bare farge.
-- **Aksjedetaljen viser alle tre sjekkene**, også de som ga 0, med navn, verdi
-  og målingen bak verdien, slik at brukeren kan regne etter. Uten gyldig signal:
-  svar 200, grafen så langt dataene rekker, og en beskjed med grunnen i stedet
-  for sjekkene. Tegnforklaringen sier at linjene er utbyttejustert kurs.
-- **NFR-05:** all brukervendt tekst er norsk, med æ, ø og å. **NFR-06:** ingen
-  formulering skal kunne leses som en anbefaling om kjøp eller salg. Ordlyden
-  leses mot begge i hver story.
-- **Brukertesten (8.1)** bruker ekte data fra siste henting og begge
-  skjermbildene. Tiden måles fra første skjermbilde til forklaringen er gitt,
-  forklaringen noteres ordrett, og personen får aldri spørsmålet om hvorfor en
-  aksje skiller seg ut. Testen skal også svare på om 15 rader er for tett, ved
-  observasjon, ikke ved å spørre. Funnene føres i `docs/` med dato.
-- **UX-gjennomgangen (8.2)** er en gjennomgang av skjermbildene som finnes, ikke
-  design fra bunnen: ingen nye skjermbilder og ingen ny funksjonalitet. Hver
-  forbedring knyttes til et skjermbilde og et krav og blir en egen liten endring
-  med test. Den skal også si på papir hvordan et tredje skjermbilde ville passet
-  inn i navigasjonen, uten å bygge det.
-- **Hver story** har en «ville feilet hvis»-kontroll og tester uten nett.
+  sist. Klikksortering (8.15) gjelder innenfor hver del når tabellen er delt.
+- **Signalet regnes aldri på nytt.** Alt som viser en vurdering (T/B/I,
+  signaldager, «Velg dag», endret styrke), leser den lagrede vurderingen. En
+  børsdag uten rad er «ikke vurdert», en rad med grunn viser grunnen, og en dag
+  som ikke er børsdag er «ikke børsdag».
+- **En aksje skiller seg ut ved styrke på terskelen eller mer** (FR-705, i dag
+  2). Terskelen hentes fra `Parametre`, aldri skrevet fast. En dag uten slike
+  aksjer står setningen «Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller
+  mer.», men ikke når ingen rad har vurdering.
+- **Antall telles alltid** fra radene og lista, aldri fast 15. Lister testes
+  også med færre enn 15 aksjer. Grensen for hele lista er 18.
+- **Ny kravordlyd 13.10 (koden er fasit):** signalstyrken er hvor mange av de 3
+  sjekkene som slo ut, ikke «hvor kraftig». Trend måles på utbyttejustert kurs.
+  Retningen: Positiv = alle utslag +1, Negativ = alle -1, Blandet = noen +1 og
+  noen -1, Ingen = styrke 0. Fotnoten under oversikten slutter med
+  «Signalstyrken sier hvor mange av de 3 sjekkene som slo ut, ikke om du bør
+  kjøpe eller selge.» Aksjesiden sier «Signalstyrken er hvor mange sjekker som
+  slo ut:».
+- **Hjelpetekstene** ligger i én fil (`src/hjelpetekster.py`), er fast tekst uten
+  KI og nettkall, og tall i dem kommer fra `Parametre` med tester. Høyst 3
+  setninger bak hvert «?», unntatt «Grensene» og «Hvorfor retningen oftere er
+  positiv». «Vis meg rundt» har høyst 7 steg. Tekster fra designtavla brukes
+  bare etter kontroll mot koden og PRD-en, med rettet ordlyd der endringsforslaget
+  13.10 har rettet dem (for eksempel «kurs og volum», ikke «sluttkurs og volum»).
+  Råd-ord («bør», «kjøp», «selg») er bare tillatt i «ikke_raad» og i malen.
+- **NFR-05:** all brukervendt tekst norsk, med æ, ø og å. **NFR-06:** ingenting
+  kan leses som råd om kjøp eller salg, eller som spådom; forbeholdet står synlig.
+  **NFR-08:** et tall som mangler eller ikke består kontrollen, vises som «–» med
+  grunnen. **FR-411 (fra 8.0c):** alt en visningsstory viser, vises også med
+  demobasen, og en test krever det; «Eksempeltall» skal synes.
+- **Tall og datoer** (regel 21): desimalkomma, hardt mellomrom som tusenskille og
+  foran %, bindestrek som minus, antall desimaler i én funksjon med tester,
+  aldri «-0,00». Tall med sifre («de 3 sjekkene»). Datoer som «22.09», med år
+  bare når året er et annet. Formen bestemmes ett sted.
+- **Ingen API-kall** fra noe i denne epicen, og ingen nettkall i tester. Hver
+  story har en «Ville feilet hvis»-kontroll.
+- **Brukertesten (8.1):** ekte data, tiden måles, forklaringen noteres ordrett,
+  personen spørres aldri om hvorfor. Observeres også: er 15 rader for tett, og
+  legger personen merke til indeksen og søylene. Funnene i `docs/` med dato.
 
 ## Technical Decisions
 
-- **Kjernen er ren logikk** (`markedsoversikt.py`, `aksjedetalj.py`,
-  `graf.py`, `signalberegning.py` m.fl.): ingen I/O og ingen HTML. `app.py` og
-  malene under `src/templates/` bærer en stor del av visningskravene (blant annet
-  FR-103, FR-202, FR-204 og FR-706), så endringer i visningen treffer ofte både
-  kjerne og mal.
-- **Én formateringsfunksjon** eies av 8.0 og brukes av 2.1c når forklaringen
-  lages av `maaling` og `grense`. I kode, base, JSON og CSV er tall punktum uten
-  tusenskille, lagret med full presisjon.
-- **Plan B (28.09):** meldinger, hendelser og KI over meldinger er ute av v1.
-  Aksjedetaljen får i stedet KI-tekst under regelforklaringen (Epic 10) og én
-  lenke til selskapets side på NewsWeb. Fotnoten i aksjedetaljen og
-  docstringene i `app.py` og `aksjedetalj.py` skal si det som stemmer etter
-  plan B (8.0).
+- **Kjernen er ren logikk** (`markedsoversikt.py`, `aksjedetalj.py`, `graf.py`,
+  `signalberegning.py`), uten I/O og HTML. Malene under `src/templates/` bærer
+  mye av visningskravene, så endringer treffer ofte både kjerne og mal.
+- **Webserveren skriver bare egne små tabeller** (Min liste i 8.3, valgene i
+  8.10/8.10b), hver med egen port og ny migrasjon, og henter aldri.
+- **«bransje» der brukeren ser det, `sektor` i koden** (feltet `sektor` står).
+  De 13 bransjene står som én konstant, og hver aksje har en av dem.
+- **Gult betyr bare 3 av 3:** gul ring rundt pillen «3 av 3» i tabellen, gul
+  ramme med hvit kant i børsometeret, gult bransjesymbol over søylen. Gjelder
+  også når en annen dag eller periode vises. 2 av 3 merkes tydelig uten gult, og
+  bare for siste børsdag. Det viktigste på siden merkes med fet skrift; sjekkede
+  tall i KI-teksten har prikket strek i tekstfargen.
+- **Skrift:** IBM Plex Sans til tekst og tall med tabelltall, Newsreader bare til
+  overskrifter og titler. Hele skriftfiler med lisens (SIL OFL 1.1) i appen,
+  ikke IBMs `split`-filer; ingen skrift eller skript fra nettet. Tester: ingen
+  mal viser til nettskrift, tallcellene har tabelltall, filene har `tnum`. Tas
+  inn i 8.0d.
+- **Periodevalg, likt overalt:** første knapp («I går», «I dag» eller ukedagen),
+  1 uke, 1 mnd, 3 mnd, 6 mnd, I år, 1 år, «Velg dag». Kursgrafen åpner med 6 mnd.
+  Startdagen følger én skriftlig regel i én funksjon, skrevet i `designregler.md`
+  §2 før koden (8.16).
+- **Kursgrafen:** linja har lik avstand per børsdag, så månedsmerker plasseres på
+  punktets x, ikke etter kalenderen. 50-dagers snittet er heltrukket; stiplet er
+  bare hovedindeksen.
 - **Låste signalparametre** (terskel 2, volumfaktor 1,5, nøytralsone ±2 %,
-  vinduer 20 og MA 50) endres ikke uten ny måling.
+  vinduer 20, MA 50) endres ikke uten ny måling.
 
 ## UX & Interaction Patterns
 
-- Det finnes ingen egne UX-DR-er; UX-innholdet ligger i FR-ene over. Designet
-  ble bevisst ikke laget på forhånd, og 8.2 er oppfølgingen av det valget.
-- Fokus og lenker: selskapsnavnet skal se ut som en lenke og ha synlig fokus, og
-  veien tilbake skal være like tydelig.
-- To v1.1-idéer bør ifølge PRD-en bygges før 8.1, så testen viser om de brukes:
-  «Hjelp bak et spørsmålstegn» og «Lær noe nytt». Begge er fast tekst uten
-  nettkall, og tall i teksten hentes fra parametrene i `signalberegning.py`. De
-  er ikke stories i Epic 8.
+- **Ordlista** (`designregler.md` §4, rettet 13.10) gjelder alle sider. Ord endres
+  der, med dato og grunn. Valgt bort: «peker opp», «peker ned», «alle tre»,
+  «kroner» (beløp skrives i NOK); en test leter etter dem i malene og hjelpen.
+- **Sjekkene** heter trend (T), bevegelse (B) og interesse (I). I oversikten
+  skrives de «T +1»; på aksjesiden står navnet og et ord: positiv ved +1,
+  negativ ved -1, ingen utslag ved 0. Retning forklares med tall, ikke «peker
+  hver sin vei».
+- **Pilene er bare for retning.** Tilbakelenken har tekst uten pil, sortering
+  vises med vinkler i den svarte kolonneraden, og «var 1 mandag» har ingen pil.
+- **Oversikten etter 8.0e:** overskrift «N av M aksjer skilte seg ut <ukedag>»
+  (børsdagen vurderingene gjelder), innledningen fra tavla med rettet ordlyd og
+  tellede tall, «3 av 3» med navnene, «Slik leser du tabellen» med 3 punkter, og
+  tabellen delt i «Skilte seg ut» og «Øvrige aksjer». «Dine egne aksjer» kommer
+  med 2.12.
+- **Utseendet (8.0d):** planen skriver reglene inn i `designregler.md` (farger,
+  skrift, svart stripe øverst, kolonneraden, avstander, fokus, rekkefølgen av
+  delene på hver side og det grå feltet) og gruppen godkjenner før bygging.
+  Kontrast minst 4,5:1, og farger som skal skilles, skiller seg også i lyshet.
+  Uten farger skal retning, endring og sjekkene stå som tekst, fortegn eller pil.
+- **Ikke «v1.1» eller «(idé)»** i tekst brukeren leser. NewsWeb og Oslo Børs
+  nevnes uten lenke; lenken går til selskapets investorside.
+- **De 13 bransjene** (navn, med aksjene i lista i dag): Energi (EQNR, VAR, AKRBP,
+  DNO), Finans (DNB, GJF), Industri (KOG), Materialer (NHY, YAR), Shipping (FRO,
+  MPCC), Telekom (TEL), Sjømat (MOWI, SALM), Konsum (ORK), og nye uten aksjer:
+  Forbruk, Teknologi, Helse, Eiendom og Kraft. Hver får et symbol (8.0d), brukt
+  i børsometeret (8.6). En bransje med én aksje merkes «1 aksje».
 
 ## Cross-Story Dependencies
 
-- **8.0 → 8.1 → 8.2.** 8.0 har ingen avhengigheter og rydder kjente feil, så
-  8.1 tester skjermbildene og ikke dem. 8.2 bygger på funnene fra 8.1.
-- **8.1 venter på Epic 2**, ikke Epic 3: den trenger ekte data og begge
-  skjermbildene, ikke Docker. Etter endringsforslaget 28.09 kan den tas når 2.2
-  og 2.7 er ferdige, uten å vente på 2.4 og 2.6. Planlagt tidlig i uke 42, med
-  historikk fra uke 40 og 41.
-- **2.1c** bruker formateringsfunksjonen fra 8.0.
-- **Epic 10.4** (måle KI-bidraget) er en egen brukertest etter 8.1.
-- **Kutt:** 8.2 står først i lista over hva som kan kuttes.
+- **Rekkefølgen nå:** 8.0 → 8.0b + 8.0c → 8.0e → 8.0d, før KI-laget. 8.0d
+  avhenger av 8.0b, 8.0c og 8.0e, så utseendet legges på den nye oversikten.
+  8.19 avhenger av 8.0d for stripa. Plassen til 8.19, 8.10b og resten avgjøres
+  etter README-prøven 13.–16.10.
+- **8.1** krever 8.0b og 8.0c, og at 2.9 og 2.9b er ferdige. 8.2 kommer etter 8.1;
+  8.3 står i dag som bygget etter 8.1 og før 8.2 (om det endres, avgjøres etter
+  prøven). Epic 10.4 er en egen brukertest etter 8.1.
+- **Epic 2:** 8.5 ← 2.10; 8.6 ← 2.9b; 8.8 og 8.12 ← 2.7; 8.14 ← 2.6; 8.18 ← 2.14
+  og 2.6; 8.11 ← 2.12 og 2.13. 2.11 og 2.12 gir bransjen til nye aksjer, og 2.12
+  gir «Dine egne aksjer».
+- **Innad:** 8.16 → 8.17 (← 8.3 og 8.6) → 8.12 (← 8.3). 8.0b → 8.9 og 8.13; 8.9
+  bygges etter sidene den viser. 8.10 ← 8.3 og 8.0b; 8.10b ← 8.10 og 10.3. 8.4 ←
+  10.5, FR-104/FR-410 og 2.5; «Hva du kan sjekke selv» hører til 8.4.
+- **Utbytte (2.15, N1)** kan endre merket under kursen i 8.14 til «utbytte» når
+  EODHD-data har utbytte den dagen, ellers «justeringsdag». Føres etter prøven.

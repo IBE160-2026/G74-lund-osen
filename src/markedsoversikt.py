@@ -244,6 +244,24 @@ def sidens_dato(rader: list[Rad]) -> date | None:
     return min((rad.dato for rad in rader), default=None)
 
 
+def ingen_skilte_seg_ut(rader: list[Rad]) -> bool:
+    """Skal oversikten si at ingen aksjer skilte seg ut? - story 8.0c.
+
+    Ja naar minst én rad har en vurdering og ingen rad har styrke paa
+    terskelen eller mer (FR-705). Uten en eneste vurdering sier setningen
+    ingenting sant, og da staar den ikke (tillegget 05.10).
+    """
+    vurdert = [rad for rad in rader if rad.styrke is not None]
+    return bool(vurdert) and not any(rad.skiller_seg_ut for rad in vurdert)
+
+
+def antall_vurdert(rader: list[Rad]) -> int:
+    """Hvor mange rader som har en vurdering - story 8.0c, svar 3 paa
+    BH1/ECH2. Siden sier «N av M aksjer ble vurdert.» naar det er faerre
+    enn alle."""
+    return sum(1 for rad in rader if rad.styrke is not None)
+
+
 def eldre_enn_nyeste(rader: list[Rad]) -> set[str]:
     """Symbolene som skal vise sitt eget tidsstempel under selskapsnavnet.
 

@@ -105,7 +105,7 @@ class TestGrensene:
 
     def test_teksten_om_maalingen_nevner_de_maalte_grensene(self):
         forventet = (f"2{NB}%, 1,5 ganger, de to vinduene på 20 børsdager og terskelen 2 "
-                     f"ble kontrollert mot 15 aksjer over 199 børsdager")
+                     f"ble kontrollert mot 15 aksjer på Oslo Børs over 199 børsdager")
         assert forventet in hjelpetekster()["grensene"].tekst
         assert forventet in hjelpetekster(ANDRE)["grensene"].tekst
 
@@ -135,6 +135,15 @@ class TestTekstenSierDetKodenGjoer:
     def test_trend(self, siste, verdi, setning):
         assert trend(_serie(siste, 50)).verdi == verdi
         assert setning in hjelpetekster()["trend"].tekst
+
+    @pytest.mark.parametrize("siste, verdi, setning", [(110.0, 1, "+1 når kursen steg"), (90.0, -1, "-1 når den falt")])
+    def test_bevegelse(self, siste, verdi, setning):
+        """VG8 i gjennomgangen av PR #35: setningen om fortegnet i bevegelse
+        er bundet til koden, som trend og interesse."""
+        from signalberegning import bevegelse
+        kurser = [100.0 + (i % 2) for i in range(30)] + [siste]
+        assert bevegelse(kurser).verdi == verdi
+        assert setning in hjelpetekster()["bevegelse"].tekst
 
 
 class TestRetningen:
@@ -279,11 +288,82 @@ class TestSidene:
             _side(klient, adresse)
         assert bedt_om == set(hjelpetekster())
 
-    def test_spoersmaalstegn_ved_overskriften_paa_begge_sidene(self, klient, base):
+    def test_hvert_spoersmaalstegn_staar_ved_det_det_forklarer(self, klient, base):
+        """Story 8.0c, den nye delen 2 (godkjent 13.10 kl. 15:36): «?» ved
+        hver kolonne og ved «data hentet» i oversikten, og ved nøkkeltallene,
+        grafen, «Hvorfor signalet ble …», hver sjekk, Ga og Målt mot paa
+        aksjesiden. Ingen «?» ved overskriften lenger. Ville feilet hvis et
+        «?» sto et annet sted enn ved det det forklarer."""
+        knapp = r'<button type="button" class="hjelpeknapp" popovertarget="{}"'
         oversikt = _side(klient, "/")
+        for tekst, vindu in (("<th>Selskap ", "hjelp-selskap"),
+                             ('<th class="tall">Sluttkurs ', "hjelp-sluttkurs"),
+                             ('<th class="tall">Endring ', "hjelp-endring"),
+                             ('<th class="tall">Signalstyrke ', "hjelp-signalstyrke"),
+                             ("<th>Retning ", "hjelp-retning")):
+            assert re.search(re.escape(tekst) + knapp.format(vindu), oversikt), vindu
+        assert re.search(r"data hentet [^<]+ " + knapp.format("hjelp-hentet"), oversikt)
+        assert re.search(r"<h1>OSE Signal</h1>\s*<p", oversikt)
         detalj = _side(klient, "/aksje/BRFE")
-        assert re.search(r'<h1>OSE Signal</h1>\s*<button type="button" class="hjelpeknapp" popovertarget="hjelp-oversikt"', oversikt)
-        assert re.search(r'<h1>Brattfjell Energi</h1>\s*<button type="button" class="hjelpeknapp" popovertarget="hjelp-aksje"', detalj)
+        for tekst, vindu in (('<span class="etikett">Sluttkurs ', "hjelp-kurs"),
+                             ('<span class="etikett">Signalstyrke ', "hjelp-styrke"),
+                             ('<span class="etikett">Retning ', "hjelp-retning-aksje"),
+                             ("<h2>Kursutvikling, 6 måneder ", "hjelp-graf"),
+                             ('<th class="fortegn">Ga ', "hjelp-ga"),
+                             ("<th>Målt mot ", "hjelp-maalt"),
+                             ("<td>Trend ", "hjelp-trend"),
+                             ("<td>Bevegelse ", "hjelp-bevegelse"),
+                             ("<td>Interesse ", "hjelp-interesse")):
+            assert re.search(re.escape(tekst) + knapp.format(vindu), detalj), vindu
+        assert re.search(r"<h2>Hvorfor signalet ble [^<]* " + knapp.format("hjelp-sjekkene"), detalj)
+        assert "Tallene og signalet" not in oversikt + detalj
+
+    def test_hvert_vindu_har_bare_sine_tekster(self, klient, base):
+        """Den nye delen 2: vinduene og tekstene i dem, i rekkefoelge. «Ikke et
+        raad» staar i vinduet for signalstyrken paa begge sidene, og skjevhet
+        i vinduet for retning paa aksjesiden."""
+        tekster = hjelpetekster()
+
+        from markupsafe import escape
+
+        def vindu(html, id_):
+            del_ = html.split(f'<div id="{id_}" class="hjelpevindu" popover>', 1)[1].split('<div id="hjelp-')[0].split("</body>")[0]
+            avsnitt = re.findall(r"<p>(.*?)</p>", del_, flags=re.DOTALL)
+            funnet = []
+            for p_ in avsnitt:
+                treff = [n for n, t in tekster.items() if t.tekst and str(escape(t.tekst)) in p_]
+                assert len(treff) == 1, (id_, p_)
+                funnet.append(treff[0])
+            return funnet
+
+        forventet = {
+            "/": {
+                "hjelp-selskap": ["selskap"],
+                "hjelp-sluttkurs": ["sluttkurs"],
+                "hjelp-endring": ["endring", "utbyttejustert"],
+                "hjelp-signalstyrke": ["signalstyrke", "uten_styrke", "ikke_raad"],
+                "hjelp-retning": ["retning", "positiv", "negativ", "blandet", "ingen", "ukjent"],
+                "hjelp-hentet": ["data_hentet", "uten_data"],
+            },
+            "/aksje/BRFE": {
+                "hjelp-kurs": ["sluttkurs", "utbyttejustert", "data_hentet_aksje"],
+                "hjelp-graf": ["grafen"],
+                "hjelp-styrke": ["signalstyrke", "ikke_raad"],
+                "hjelp-retning-aksje": ["retning", "positiv", "negativ", "blandet", "ingen",
+                                        "ukjent_aksje", "skjevhet"],
+                "hjelp-sjekkene": ["hvorfor_tre", "antall_dager"],
+                "hjelp-trend": ["trend"],
+                "hjelp-bevegelse": ["bevegelse"],
+                "hjelp-interesse": ["interesse"],
+                "hjelp-ga": ["ga"],
+                "hjelp-maalt": ["maalt_mot", "grensene"],
+            },
+        }
+        for adresse, vinduer in forventet.items():
+            html = _side(klient, adresse)
+            assert set(re.findall(r'<div id="(hjelp-[a-z-]+)" class="hjelpevindu"', html)) == set(vinduer), adresse
+            for id_, noekler in vinduer.items():
+                assert vindu(html, id_) == noekler, (adresse, id_)
 
     def test_spoersmaalstegn_ved_signalstyrke_i_oversikten(self, klient, base):
         """Tillegget 05.10: «?» ved overskriften Signalstyrke, med teksten
@@ -342,12 +422,12 @@ class TestSidene:
             assert tekster[noekkel].tekst in brfe, noekkel
             assert tekster[noekkel].tekst not in vrds, noekkel
 
-    def test_tom_base_har_ogsaa_hjelpen(self, klient):
-        """Uten kurser er det ingen tabell, men «?» ved overskriften virker."""
+    def test_tom_base_har_ingen_hjelp(self, klient):
+        """Story 8.0c: uten kurser er det ingen tabell og ingen tall aa
+        forklare, saa det staar ingen «?» og ingen vinduer."""
         html = _side(klient, "/")
-        assert 'popovertarget="hjelp-oversikt"' in html
-        assert 'id="hjelp-oversikt"' in html
-        assert 'popovertarget="hjelp-signalstyrke"' not in html
+        assert "popovertarget" not in html
+        assert 'class="hjelpevindu"' not in html
 
 
 class TestSnittetIGrafen:
@@ -363,3 +443,92 @@ class TestSnittetIGrafen:
         # Hjelpen foelger samme parametre som tegnforklaringen.
         assert "snittet av de siste 40 børsdagene" in html
         assert "de siste 50 børsdagene" not in html
+
+
+# Story 8.0c: hoeyst 3 setninger per tekst, og ordene ordlista har valgt bort
+# (designregler.md §4, rettet 13.10).
+UNNTAK_LENGDE = {"grensene", "skjevhet"}
+VALGT_BORT = (
+    r"peker opp", r"peker ned", r"peker hver sin vei", r"\bspriker\b",
+    r"\balle tre\b", r"\bde tre\b", r"hvor kraftig", r"summen av tallene",
+    r"\bkroner\b", r"\bkr\b", r"v1\.1", r"\(idé\)", r"lys bakgrunn",
+)
+
+
+def synlig_tekst(html: str) -> str:
+    """Teksten paa siden uten <style> og tagger, med mellomrom slaatt sammen,
+    saa et ord som er delt over to linjer i malen ogsaa blir funnet (ECH3), og
+    et klassenavn i CSS ikke gir treff (ECH4)."""
+    html = re.sub(r"<style>.*?</style>", " ", html, flags=re.DOTALL)
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html))
+
+
+def _setninger(tekst: str) -> int:
+    """Setninger som slutter med punktum, spoersmaalstegn eller utropstegn."""
+    return len(re.findall(r"[.?!][»)\"]*(?=\s|$)", tekst.strip()))
+
+
+class TestStory80c:
+    def test_setningstelleren(self):
+        assert _setninger("En. To? Tre!") == 3
+        assert _setninger("1,5 ganger og 2 %.") == 1
+        assert _setninger("Slutt.» Ny. (Se FR-703.)") == 3
+
+    @pytest.mark.parametrize("p", [STANDARD, ANDRE], ids=["standard", "andre"])
+    def test_hoeyst_tre_setninger_per_tekst(self, p):
+        """Svar 6 og 2: hoeyst 3 setninger, utenom grensene og skjevhet, som
+        forklarer en maaling. Ville feilet med signalstyrke paa 4 setninger,
+        som foer 8.0c."""
+        for noekkel, tekst in hjelpetekster(p).items():
+            if noekkel in UNNTAK_LENGDE:
+                continue
+            assert _setninger(tekst.tekst) <= 3, (noekkel, tekst.tekst)
+
+    def test_ingen_tekst_har_ord_ordlista_har_valgt_bort(self):
+        """Ville feilet med «peker opp» i hjelpen for retning, som foer 8.0c."""
+        for noekkel, tekst in hjelpetekster().items():
+            for ord_ in VALGT_BORT:
+                assert not re.search(ord_, f"{tekst.tittel} {tekst.tekst}", re.IGNORECASE), (noekkel, ord_)
+
+    def test_ingen_side_har_ord_ordlista_har_valgt_bort(self, klient, base):
+        """Malene ogsaa: fotnotene sa «hvor kraftig» og «summen av tallene»
+        foer 8.0c. Sidene leses med testbasen her og med demobasen i
+        test_demo.py."""
+        for adresse in SIDENE:
+            tekst = synlig_tekst(_side(klient, adresse))
+            for ord_ in VALGT_BORT:
+                assert not re.search(ord_, tekst, re.IGNORECASE), (adresse, ord_)
+
+    def test_hver_sjekk_har_en_noekkel_som_gir_en_gyldig_id(self):
+        """ECH6: «?» per sjekk bruker navnet med smaa bokstaver som id og som
+        noekkel. Ville feilet med et navn med mellomrom eller æøå, eller et
+        som kolliderer med et fast vindu."""
+        import aksjedetalj  # noqa: F401
+        from signalberegning import beregn_signal
+
+        faste = {"kurs", "graf", "styrke", "retning-aksje", "sjekkene", "ga", "maalt"}
+        from datetime import date, timedelta
+
+        from kursdata import Kursrad
+        rader = [Kursrad(dato=date(2026, 9, 1) + timedelta(days=i), slutt=k, justert_slutt=k, volum=1000)
+                 for i, k in enumerate([100.0] * 60 + [104.0])]
+        signal = beregn_signal(rader)
+        tekster = hjelpetekster()
+        for sjekk in signal.sjekker:
+            noekkel = sjekk.navn.lower()
+            assert re.fullmatch(r"[a-z]+", noekkel), sjekk.navn
+            assert noekkel in tekster and noekkel not in faste, noekkel
+
+    def test_antall_sjekker_er_antallet_i_koden(self):
+        """ECH7: «N av 3» og den gule ringen bygger paa ANTALL_SJEKKER. Ville
+        feilet hvis en fjerde sjekk kom til uten at konstanten ble rettet."""
+        from hjelpetekster import ANTALL_SJEKKER
+        from signalberegning import beregn_signal
+
+        from datetime import date, timedelta
+
+        from kursdata import Kursrad
+        rader = [Kursrad(dato=date(2026, 9, 1) + timedelta(days=i), slutt=k, justert_slutt=k, volum=1000)
+                 for i, k in enumerate([100.0] * 60 + [104.0])]
+        signal = beregn_signal(rader)
+        assert len(signal.sjekker) == ANTALL_SJEKKER

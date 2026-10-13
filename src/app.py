@@ -38,7 +38,7 @@ from boersdag import norsk_dato
 from graf import bygg_graf
 from kursdata import Kursleser
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER
-from hjelpetekster import Hjelp, hjelpetekster
+from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster
 from lagring_sqlite import (
     DEMOMERKE,
     SqliteKurslager,
@@ -50,7 +50,9 @@ from lagring_sqlite import (
 )
 from markedsoversikt import (
     bygg_oversikt,
+    antall_vurdert,
     eldre_enn_nyeste,
+    ingen_skilte_seg_ut,
     norsk_tid,
     sidens_dato,
     sidens_tidsstempel,
@@ -58,7 +60,7 @@ from markedsoversikt import (
 )
 from migrering import MigrasjonsFeil
 from oversiktsdata import Oversiktsleser
-from signalberegning import STANDARD
+from signalberegning import BLANDET, STANDARD
 from tallformat import tall
 
 # Kommandoen den tomme siden ber brukeren kjoere. Den staar ogsaa i README, og
@@ -206,10 +208,26 @@ def _aapne_basen() -> None:
         g.basefeil = _basefeil(feil)
 
 
+# Story 8.0c: merket staar ett sted, ikke kopiert i tre maler, og demoen
+# sier «Demoversjon.» foran det (tillegget 11.10).
+EKSEMPELTALL_MERKE = "Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs."
+
+# Story 8.0c (tillegget 11.10, svar 4): linja nederst paa alle sidene. Én
+# innstilling avgjoer den, og docs/innlevering.md §5 sier at den avgjoeres
+# ved innleveringen.
+UNDER_ARBEID = True
+UNDER_ARBEID_TEKST = "Appen er under utvikling og ikke ferdig."
+
+
 @app.context_processor
 def _eksempeltall():
-    """«Eksempeltall» paa hver side som viser en base med demomerket."""
-    return {"eksempeltall": g.get("eksempeltall", False)}
+    """«Eksempeltall» paa hver side som viser en base med demomerket, og
+    linja om at appen er under arbeid."""
+    return {
+        "eksempeltall": g.get("eksempeltall", False),
+        "eksempeltall_merke": EKSEMPELTALL_MERKE,
+        "under_arbeid": UNDER_ARBEID_TEKST if UNDER_ARBEID else None,
+    }
 
 
 # Story 8.0b: tekstene bak «?», med tallene fra parametrene som gjelder i
@@ -220,8 +238,14 @@ def _eksempeltall():
 
 @app.context_processor
 def _hjelp():
-    """Hjelpetekstene og parametrene paa hver side, laget av samme objekt."""
-    return {"hjelp": Hjelp(hjelpetekster(STANDARD)), "parametre": STANDARD}
+    """Hjelpetekstene og parametrene paa hver side, laget av samme objekt.
+    antall_sjekker er «3» i «N av 3» (story 8.0c), fra samme sted som hjelpen."""
+    return {
+        "hjelp": Hjelp(hjelpetekster(STANDARD)),
+        "parametre": STANDARD,
+        "antall_sjekker": ANTALL_SJEKKER,
+        "blandet": BLANDET,
+    }
 
 
 @app.teardown_appcontext
@@ -333,6 +357,8 @@ def markedsoversikt():
         eget=eldre_enn_nyeste(rader),
         mangler=uten_kurser(poster),
         ikke_vurdert=any(rad.ikke_vurdert for rad in rader),
+        ingen_skilte_seg_ut=ingen_skilte_seg_ut(rader),
+        antall_vurdert=antall_vurdert(rader),
         hentekommando=hentekommando(),
     )
 

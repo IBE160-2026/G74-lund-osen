@@ -12,6 +12,7 @@
       --opp: #0a7d32;
       --ned: #b3261e;
       --blandet: #8a5a00;
+      --gul: #a67c00;
     }
     body {
       font-family: system-ui, sans-serif;
@@ -25,8 +26,13 @@
     table { border-collapse: collapse; width: 100%; }
     th, td { text-align: left; padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--strek); }
     th { font-weight: 600; font-size: 0.85rem; color: var(--dempet); }
+    /* Story 8.0c: overskriften staar over tallene. */
+    th.tall { text-align: right; }
     td.tall { text-align: right; font-variant-numeric: tabular-nums; }
-    tr.utslag td { background: #fafafa; }
+    /* Story 8.0c: 2 av 3 eller mer merkes med fet skrift og en strek til
+       venstre i tekstfargen, ikke med lys bakgrunn og ikke med gult. */
+    tr.utslag td { font-weight: 600; }
+    tr.utslag td:first-child { box-shadow: inset 3px 0 0 var(--tekst); }
     td.selskap { font-weight: 500; }
     /* Story 8.0: navnet ser ut som en lenke, og fokus synes. */
     td.selskap a { color: inherit; text-decoration: underline; }
@@ -44,11 +50,16 @@
     .ingen, .ukjent { color: var(--dempet); }
 
     .styrke { font-variant-numeric: tabular-nums; }
+    /* designregler §3: gult betyr 3 av 3, med gul ring rundt pillen. */
+    .pille { white-space: nowrap; padding: 0.05rem 0.45rem; border-radius: 999px; }
+    .pille.tre-av-tre { border: 2px solid var(--gul); }
+    p.ingen-utslag { margin: 0.6rem 0; }
     /* FR-705 med tekst, ikke bare farge (story 8.0). */
     .merke { display: block; font-size: 0.75rem; font-weight: 600; }
     .mangler { color: var(--dempet); font-style: italic; font-size: 0.85rem; }
     .merke.mangler { font-weight: normal; }
     p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
+    p.under-arbeid { color: #666; font-size: 0.8rem; margin-top: 2rem; }
     .eksempeltall {
       background: #fff3cd;
       border: 1px solid #c9a227;
@@ -61,27 +72,31 @@
 </head>
 <body>
   {% if eksempeltall %}
-  <p class="eksempeltall">Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.</p>
+  <p class="eksempeltall">Demoversjon. {{ eksempeltall_merke }}</p>
   {% endif %}
-  <div class="tittelrad">
-    <h1>OSE Signal</h1>
-    {{ hjelpeknapp("hjelp-oversikt", "Hjelp: tallene og signalet") }}
-  </div>
+  <h1>OSE Signal</h1>
 
   {% if rader %}
     <p class="meta">
-      Oslo Børs · {{ dato }} · {{ rader|length }} aksjer
-      {% if hentet %}· data hentet {{ hentet|norsk_tid }}{% endif %}
+      {% if eksempeltall %}Eksempeltall{% else %}Oslo Børs{% endif %} · {{ dato }} · {{ rader|length }} aksjer
+      {% if hentet %}· data hentet {{ hentet|norsk_tid }} {{ hjelpeknapp("hjelp-hentet", "Hjelp: data hentet") }}{% endif %}
     </p>
+
+    {% if ingen_skilte_seg_ut %}
+      <p class="ingen-utslag">Ingen aksjer skilte seg ut: ingen fikk {{ parametre.terskel }} av {{ antall_sjekker }} eller mer.</p>
+      {% if antall_vurdert < rader|length %}
+        <p class="ingen-utslag">{{ antall_vurdert }} av {{ rader|length }} aksjer ble vurdert.</p>
+      {% endif %}
+    {% endif %}
 
     <table>
       <thead>
         <tr>
-          <th>Selskap</th>
-          <th class="tall">Sluttkurs</th>
-          <th class="tall">Endring</th>
+          <th>Selskap {{ hjelpeknapp("hjelp-selskap", "Hjelp: selskap") }}</th>
+          <th class="tall">Sluttkurs {{ hjelpeknapp("hjelp-sluttkurs", "Hjelp: sluttkurs") }}</th>
+          <th class="tall">Endring {{ hjelpeknapp("hjelp-endring", "Hjelp: endring") }}</th>
           <th class="tall">Signalstyrke {{ hjelpeknapp("hjelp-signalstyrke", "Hjelp: signalstyrken") }}</th>
-          <th>Retning</th>
+          <th>Retning {{ hjelpeknapp("hjelp-retning", "Hjelp: retning") }}</th>
         </tr>
       </thead>
       <tbody>
@@ -103,7 +118,7 @@
 
             <td class="tall styrke">
               {% if rad.styrke is not none %}
-                {{ rad.styrke }}
+                <span class="pille{% if rad.styrke == antall_sjekker %} tre-av-tre{% endif %}">{{ rad.styrke }} av {{ antall_sjekker }}</span>
                 {% if rad.skiller_seg_ut %}<span class="merke">skiller seg ut</span>{% endif %}
               {% else %}
                 – <span class="merke mangler">{{ rad.tekst }}</span>
@@ -134,8 +149,8 @@
     <p class="fotnote">
       Sluttkursen er den ujusterte kursen aksjen omsettes til. Endringen er
       regnet på utbyttejustert kurs, slik at et ordinært utbytte ikke ser ut
-      som et kursfall. Signalstyrken er 0–3 og sier hvor kraftig de tre
-      sjekkene slår ut — ikke om aksjen bør kjøpes eller selges.
+      som et kursfall.
+      Signalstyrken sier hvor mange av de {{ antall_sjekker }} sjekkene som slo ut, ikke om du bør kjøpe eller selge.
     </p>
   {% elif demokommando %}
     <p>
@@ -147,18 +162,24 @@
     </p>
   {% endif %}
 
-  {{ hjelpevindu("hjelp-oversikt", "Tallene og signalet", [
-    ("Tallene", ["sluttkurs", "endring", "utbyttejustert", "data_hentet", "uten_data"]),
-    ("Signalstyrke", ["signalstyrke", "uten_styrke"]),
-    ("Retning", ["retning", "positiv", "negativ", "blandet", "ingen", "ukjent"]),
-    ("De tre sjekkene", ["trend", "bevegelse", "interesse", "antall_dager", "hvorfor_tre"]),
-    ("Grensene", ["grensene", "skjevhet"]),
-    ("Ikke et råd", ["ikke_raad"]),
-  ]) }}
+  {#- Story 8.0c: hvert «?» staar ved det det forklarer, og vinduet har bare
+      tekstene for det. Sjekkene og grensene forklares paa aksjesiden. #}
   {% if rader %}
+    {{ hjelpevindu("hjelp-selskap", "Selskap", [("", ["selskap"])]) }}
+    {{ hjelpevindu("hjelp-sluttkurs", "Sluttkurs", [("", ["sluttkurs"])]) }}
+    {{ hjelpevindu("hjelp-endring", "Endring", [("", ["endring", "utbyttejustert"])]) }}
     {{ hjelpevindu("hjelp-signalstyrke", "Signalstyrke", [
       ("", ["signalstyrke", "uten_styrke", "ikke_raad"]),
     ]) }}
+    {{ hjelpevindu("hjelp-retning", "Retning", [
+      ("", ["retning", "positiv", "negativ", "blandet", "ingen", "ukjent"]),
+    ]) }}
+    {% if hentet %}
+      {{ hjelpevindu("hjelp-hentet", "Data hentet", [("", ["data_hentet", "uten_data"])]) }}
+    {% endif %}
+  {% endif %}
+  {% if under_arbeid %}
+  <p class="under-arbeid">{{ under_arbeid }}</p>
   {% endif %}
 </body>
 </html>

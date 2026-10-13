@@ -49,9 +49,15 @@
     table { border-collapse: collapse; width: 100%; }
     th, td { text-align: left; padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--strek); }
     th { font-weight: 600; font-size: 0.85rem; color: var(--dempet); }
+    /* Story 8.0c: overskriften staar over tallene. */
+    th.fortegn { text-align: center; }
     td.fortegn { text-align: center; font-variant-numeric: tabular-nums;
-                 font-weight: 700; width: 4rem; }
-    tr.bidro td { background: #fafafa; }
+                 font-weight: 700; width: 9rem; white-space: nowrap; }
+    td.fortegn .ord { font-weight: normal; }
+    /* Story 8.0c: sjekkene som slo ut, merkes som 2 av 3 i oversikten: fet
+       skrift og en strek til venstre i tekstfargen, ikke lys bakgrunn. */
+    tr.bidro td { font-weight: 600; }
+    tr.bidro td:first-child { box-shadow: inset 3px 0 0 var(--tekst); }
     .opp { color: var(--opp); }
     .ned { color: var(--ned); }
     .blandet { color: var(--blandet); }
@@ -59,6 +65,7 @@
     .regnestykke { font-variant-numeric: tabular-nums; }
     p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
     .mangler { color: var(--dempet); font-style: italic; }
+    p.under-arbeid { color: #666; font-size: 0.8rem; margin-top: 2rem; }
     .eksempeltall {
       background: #fff3cd;
       border: 1px solid #c9a227;
@@ -71,14 +78,11 @@
 </head>
 <body>
   {% if eksempeltall %}
-  <p class="eksempeltall">Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.</p>
+  <p class="eksempeltall">Demoversjon. {{ eksempeltall_merke }}</p>
   {% endif %}
   <a class="tilbake" href="/">← Markedsoversikt</a>
 
-  <div class="tittelrad">
-    <h1>{{ detalj.aksje.navn }}</h1>
-    {{ hjelpeknapp("hjelp-aksje", "Hjelp: tallene og signalet") }}
-  </div>
+  <h1>{{ detalj.aksje.navn }}</h1>
   <p class="meta">
     {{ detalj.aksje.ticker }} · {{ detalj.aksje.sektor }} · {{ detalj.dato }}
     {% if hentet %}· data hentet {{ hentet|norsk_tid }}{% endif %}
@@ -86,24 +90,25 @@
 
   <div class="sammendrag">
     <div class="noekkeltall">
-      <span class="etikett">Sluttkurs</span>
+      <span class="etikett">Sluttkurs {{ hjelpeknapp("hjelp-kurs", "Hjelp: sluttkurs") }}</span>
       <span class="verdi">{{ detalj.sluttkurs|tall('kurs') }}</span>
     </div>
     <div class="noekkeltall">
-      <span class="etikett">Signalstyrke</span>
+      <span class="etikett">Signalstyrke {{ hjelpeknapp("hjelp-styrke", "Hjelp: signalstyrken") }}</span>
       <span class="verdi">
-        {% if detalj.styrke is not none %}{{ detalj.styrke }} av 3{% else %}–{% endif %}
+        {% if detalj.styrke is not none %}{{ detalj.styrke }} av {{ antall_sjekker }}{% else %}–{% endif %}
       </span>
     </div>
     <div class="noekkeltall">
-      <span class="etikett">Retning</span>
+      <span class="etikett">Retning {{ hjelpeknapp("hjelp-retning-aksje", "Hjelp: retning") }}</span>
       <span class="verdi {{ detalj.retning.klasse }}">
         <span aria-hidden="true">{{ detalj.retning.symbol }}</span> {{ detalj.retning.tekst }}
       </span>
     </div>
   </div>
 
-  <h2>Kursutvikling, seks måneder</h2>
+  {%- set vis_grafhjelp = graf and graf.har_ma50 and detalj.sjekker %}
+  <h2>Kursutvikling, 6 måneder{% if vis_grafhjelp %} {{ hjelpeknapp("hjelp-graf", "Hjelp: kursgrafen") }}{% endif %}</h2>
   {% if graf %}
     <figure>
       <svg viewBox="0 0 {{ graf.bredde }} {{ graf.hoyde }}" role="img"
@@ -138,22 +143,22 @@
     <p class="mangler">For få kursdager til å tegne en graf.</p>
   {% endif %}
 
-  <h2>Hvorfor signalet ble {% if detalj.styrke is not none %}{{ detalj.styrke }}{% else %}ukjent{% endif %}</h2>
+  <h2>Hvorfor signalet ble {% if detalj.styrke is not none %}{{ detalj.styrke }}{% else %}ukjent{% endif %} {{ hjelpeknapp("hjelp-sjekkene", "Hjelp: sjekkene") }}</h2>
 
   {% if detalj.sjekker %}
     <table>
       <thead>
         <tr>
           <th>Sjekk</th>
-          <th class="fortegn">Ga</th>
-          <th>Målt mot</th>
+          <th class="fortegn">Ga {{ hjelpeknapp("hjelp-ga", "Hjelp: ga") }}</th>
+          <th>Målt mot {{ hjelpeknapp("hjelp-maalt", "Hjelp: målt mot") }}</th>
         </tr>
       </thead>
       <tbody>
         {% for sjekk in detalj.sjekker %}
           <tr {% if sjekk.bidro %}class="bidro"{% endif %}>
-            <td>{{ sjekk.navn }}</td>
-            <td class="fortegn {{ sjekk.klasse }}">{{ sjekk.fortegn }}</td>
+            <td>{{ sjekk.navn }} {{ hjelpeknapp("hjelp-" ~ sjekk.navn|lower, "Hjelp: " ~ sjekk.navn|lower) }}</td>
+            <td class="fortegn {{ sjekk.klasse }}">{{ sjekk.fortegn }} <span class="ord">{{ sjekk.ord }}</span></td>
             <td class="regnestykke">{{ sjekk.maaling }}</td>
           </tr>
         {% endfor %}
@@ -161,10 +166,8 @@
     </table>
 
     <p class="fotnote">
-      Signalstyrken er summen av tallene uten fortegn:
-      {{ detalj.bidragsytere|length }} av 3 sjekker ga utslag, så styrken er
-      {{ detalj.styrke }}. Retningen leses av fortegnene til de sjekkene som ga
-      utslag — er de ikke enige, er retningen blandet.
+      Signalstyrken er hvor mange sjekker som slo ut: {{ detalj.bidragsytere|length }} av {{ antall_sjekker }} ga utslag.
+      Ga noen +1 og noen -1, er retningen {{ blandet }}.
       Ingen vekting og ingen skjult formel.
     </p>
   {% elif detalj.for_kort_serie %}
@@ -186,6 +189,8 @@
     {% endif %}
   {% endif %}
 
+  <p class="fotnote">Signalstyrken sier ikke om du bør kjøpe eller selge.</p>
+
   <p class="fotnote">
     Signalet bygger bare på kurs og volum. Børsmeldinger og kommende
     finansielle hendelser er ikke med i denne versjonen.
@@ -193,17 +198,26 @@
 
   {#- grafen bare med grafen og snittet, ga og maalt_mot bare med tabellen
       (gjennomgangen av 8.0b): ellers forklarer hjelpen noe siden ikke viser. #}
-  {{ hjelpevindu("hjelp-aksje", "Tallene og signalet", [
-    ("Tallene", ["sluttkurs", "utbyttejustert"]
-      + (["grafen"] if graf and graf.har_ma50 and detalj.sjekker else [])
-      + ["data_hentet_aksje"]),
-    ("Signalstyrke", ["signalstyrke"]),
-    ("Retning", ["retning", "positiv", "negativ", "blandet", "ingen", "ukjent_aksje"]),
-    ("De tre sjekkene", ["trend", "bevegelse", "interesse"]
-      + (["ga", "maalt_mot"] if detalj.sjekker else [])
-      + ["antall_dager", "hvorfor_tre"]),
-    ("Grensene", ["grensene", "skjevhet"]),
-    ("Ikke et råd", ["ikke_raad"]),
+  {#- Story 8.0c: hvert «?» staar ved det det forklarer. Grafen bare med
+      grafen og snittet, og Ga, Maalt mot og hver sjekk bare med tabellen. #}
+  {{ hjelpevindu("hjelp-kurs", "Sluttkurs", [("", ["sluttkurs", "utbyttejustert", "data_hentet_aksje"])]) }}
+  {% if vis_grafhjelp %}
+    {{ hjelpevindu("hjelp-graf", "Kursgrafen", [("", ["grafen"])]) }}
+  {% endif %}
+  {{ hjelpevindu("hjelp-styrke", "Signalstyrke", [("", ["signalstyrke", "ikke_raad"])]) }}
+  {{ hjelpevindu("hjelp-retning-aksje", "Retning", [
+    ("", ["retning", "positiv", "negativ", "blandet", "ingen", "ukjent_aksje", "skjevhet"]),
   ]) }}
+  {{ hjelpevindu("hjelp-sjekkene", "Sjekkene", [("", ["hvorfor_tre", "antall_dager"])]) }}
+  {% if detalj.sjekker %}
+    {% for sjekk in detalj.sjekker %}
+      {{ hjelpevindu("hjelp-" ~ sjekk.navn|lower, sjekk.navn, [("", [sjekk.navn|lower])]) }}
+    {% endfor %}
+    {{ hjelpevindu("hjelp-ga", "Ga", [("", ["ga"])]) }}
+    {{ hjelpevindu("hjelp-maalt", "Målt mot", [("", ["maalt_mot", "grensene"])]) }}
+  {% endif %}
+  {% if under_arbeid %}
+  <p class="under-arbeid">{{ under_arbeid }}</p>
+  {% endif %}
 </body>
 </html>

@@ -173,6 +173,16 @@ class TestByggDetalj:
         fortegn = {s.fortegn for s in d.sjekker}
         assert fortegn <= {"+1", "0", "-1"}
 
+    def test_ordet_bygges_av_konstantene_i_signalberegning(self):
+        """Story 8.0c. Ville feilet hvis ordet var skrevet fast eller sa
+        «opp» og «ned»."""
+        import signalberegning
+        from aksjedetalj import INGEN_UTSLAG, SjekkVisning
+
+        assert SjekkVisning("Trend", 1, "").ord == signalberegning.POSITIV.lower()
+        assert SjekkVisning("Trend", -1, "").ord == signalberegning.NEGATIV.lower()
+        assert SjekkVisning("Trend", 0, "").ord == INGEN_UTSLAG == "ingen utslag"
+
     def test_for_kort_serie_gir_detalj_uten_signal(self):
         d = detalj(serie([100.0, 101.0]))
 

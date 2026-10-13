@@ -726,13 +726,19 @@ class TestReadmeForNybegynnere:
         assert "](docs/hjelp.md)" in dokumentene
 
     def test_merket_i_demoen_er_det_samme_som_i_malene(self):
-        """Regel 19: 8.0c kan ikke endre merket uten at README-en rettes."""
+        """Regel 19: 8.0c kan ikke endre merket uten at README-en rettes.
+        Fra 8.0c staar merket ett sted, EKSEMPELTALL_MERKE i app.py, med
+        «Demoversjon.» foran i malene (tillegget 11.10). Sitatet i README-en
+        staar fortsatt ordrett oeverst paa siden."""
+        import app as app_modul
+
         sitert = _steg("Demoen", 6).split("Øverst står «", 1)[1].split("»", 1)[0]
+        assert sitert == app_modul.EKSEMPELTALL_MERKE
         for mal in ("index.html", "aksje.html", "basefeil.html"):
             tekst = (ROT / "src" / "templates" / mal).read_text(encoding="utf-8")
             treff = re.search(r'<p class="eksempeltall">([^<]+)</p>', tekst)
             assert treff, f"{mal} har ikke merket"
-            assert sitert == treff.group(1), mal
+            assert treff.group(1) == "Demoversjon. {{ eksempeltall_merke }}", mal
 
     def test_linja_som_viser_at_appen_er_klar(self):
         """Linja er kopiert fra en kjoering 11.10. Ville feilet hvis porten i
@@ -858,9 +864,9 @@ class TestReadmeForNybegynnere:
         flettet, neste = status.split("Flettet til main:", 1)[1].split("Neste:", 1)
         neste = neste.split("KI-laget", 1)[0]
         for sak in ("hentingen", "kallene som er igjen", "Docker", "demoen", "README-en",
-                    "hjelp bak «?»"):
+                    "hjelp bak «?»", "tydeligere merking"):
             assert sak in flettet, sak
-        for sak in ("README-prøven 13.–16.10", "tydeligere merking",
+        for sak in ("README-prøven 13.–16.10", "datoene og månedsmerkene i grafen",
                     "utseendet fra designforslaget"):
             assert sak in neste and sak not in flettet, sak
 

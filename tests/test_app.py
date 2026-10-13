@@ -935,8 +935,8 @@ class TestStory80:
         tabell = _tabell(klient.get("/").data.decode("utf-8"))
         styrke = {rad[0]: rad[3] for rad in tabell.rader}
 
-        assert styrke["Equinor"] == "2 skiller seg ut"
-        assert styrke["DNB Bank"] == "1"
+        assert styrke["Equinor"] == "2 av 3 skiller seg ut"
+        assert styrke["DNB Bank"] == "1 av 3"
 
     def test_fortsatt_noeyaktig_fem_kolonner(self, klient, monkeypatch):
         monter(monkeypatch, snapshot({
@@ -1102,7 +1102,7 @@ class TestVurderingenPaaOversikten:
 
         rad = _rader_per_selskap(klient.get("/").data.decode("utf-8"))["Equinor"]
 
-        assert rad[3] == "0"
+        assert rad[3] == "0 av 3"
         assert "Ingen" in rad[4]
 
     def test_gaarsdagens_vurdering_naar_dagens_rad_har_grunn(self, klient):
@@ -1260,3 +1260,264 @@ def test_app_har_ingen_sql_og_regner_ikke_signalet():
         assert ord_ not in kode, ord_
     for navn in ("AKSJEUNIVERS", "beregn_signal", "vurder"):
         assert not hasattr(app_modul, navn), navn
+
+
+class TestStory80c:
+    """Story 8.0c, PR 1: merkingen i oversikten."""
+
+    def test_styrken_staar_som_n_av_3(self, klient, monkeypatch):
+        """Ville feilet hvis oversikten viste bare tallet, som foer 8.0c."""
+        monter(monkeypatch, snapshot({
+            "EQNR": serie([100.0] * 60 + [104.0]),   # styrke 2
+            "DNB": serie([100.0] * 60 + [100.0]),    # styrke 0
+        }))
+        styrke = {rad[0]: rad[3] for rad in _tabell(klient.get("/").data.decode("utf-8")).rader}
+        assert styrke["Equinor"].startswith("2 av 3")
+        assert styrke["DNB Bank"] == "0 av 3"
+
+    def test_tre_av_tre_har_gul_ring_og_to_av_tre_ikke(self, klient, monkeypatch):
+        """designregler §3. Ville feilet uten ringen, eller med gult ved 2 av 3."""
+        monter(monkeypatch, snapshot({
+            "EQNR": serie([100.0] * 60 + [104.0], [1000] * 60 + [5000]),  # 3 av 3
+            "DNB": serie([100.0] * 60 + [104.0]),                              # 2 av 3
+        }))
+        html = klient.get("/").data.decode("utf-8")
+        assert html.count('class="pille tre-av-tre"') == 1
+        assert '<span class="pille tre-av-tre">3 av 3</span>' in html
+        assert '<span class="pille">2 av 3</span>' in html
+        ring = _regel(_stil(html), ".pille.tre-av-tre")
+        assert "border" in ring and "var(--gul)" in ring
+
+    def test_to_av_tre_merkes_med_mer_enn_lys_bakgrunn(self, klient, monkeypatch):
+        """Svar 2: fet skrift og en strek til venstre i tekstfargen, uten gult.
+        Ville feilet hvis raden bare hadde #fafafa, som foer 8.0c."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))
+        html = klient.get("/").data.decode("utf-8")
+        stil = _stil(html)
+        assert '<tr class="utslag">' in html
+        assert "font-weight: 600" in _regel(stil, "tr.utslag td")
+        strek = _regel(stil, "tr.utslag td:first-child")
+        assert "inset 3px 0 0 var(--tekst)" in strek
+        assert "#fafafa" not in stil
+        assert "gul" not in _regel(stil, "tr.utslag td") + strek
+
+    def test_overskriftene_staar_over_tallene(self, klient, monkeypatch):
+        """Tillegget 11.10. Ville feilet hvis th.tall ble venstrejustert av
+        regelen for th, td, som foer 8.0c."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}))
+        stil = _stil(klient.get("/").data.decode("utf-8"))
+        assert "text-align: right" in _regel(stil, "th.tall")
+        assert stil.index("th.tall") > stil.index("th, td")
+
+    def test_setningen_naar_ingen_skilte_seg_ut(self, klient, monkeypatch):
+        """Tillegget 05.10. Ville feilet hvis setningen manglet en dag der alle
+        hadde 0 eller 1."""
+        monter(monkeypatch, snapshot({
+            "EQNR": serie([100.0] * 60 + [101.0]),   # styrke 1
+            "DNB": serie([100.0] * 61),              # styrke 0
+        }))
+        html = klient.get("/").data.decode("utf-8")
+        assert "Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer." in html
+
+    def test_setningen_staar_ikke_med_tre_av_tre_og_ingen_paa_to(self, klient, monkeypatch):
+        """Presiseringen kl. 14:33: én aksje paa 3 av 3 og ingen paa 2. Ville
+        feilet hvis setningen bare saa etter styrke 2."""
+        monter(monkeypatch, snapshot({
+            "EQNR": serie([100.0] * 60 + [104.0], [1000] * 60 + [5000]),  # 3 av 3
+            "DNB": serie([100.0] * 61),                                        # 0
+        }))
+        html = klient.get("/").data.decode("utf-8")
+        assert "3 av 3" in html
+        assert "Ingen aksjer skilte seg ut" not in html
+
+    def test_setningen_staar_ikke_uten_en_eneste_vurdering(self, klient, monkeypatch):
+        """Tillegget 05.10: ikke naar ingen rad har en vurdering."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}), vurdert=False)
+        html = klient.get("/").data.decode("utf-8")
+        assert "Equinor" in html
+        assert "Ingen aksjer skilte seg ut" not in html
+
+    def test_terskelen_i_setningen_kommer_fra_parametre(self, klient, monkeypatch):
+        """Ville feilet hvis 2 sto fast i malen."""
+        import dataclasses
+
+        import app as app_modul
+        andre = dataclasses.replace(app_modul.STANDARD, terskel=3)
+        monkeypatch.setattr(app_modul, "STANDARD", andre)
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))  # 2 av 3
+        html = klient.get("/").data.decode("utf-8")
+        assert "Ingen aksjer skilte seg ut: ingen fikk 3 av 3 eller mer." in html
+
+    # Del b: aksjesiden og fotnotene.
+
+    def test_ga_kolonnen_har_tallet_og_ordet(self, klient, monkeypatch):
+        """Tillegget 05.10. Ville feilet hvis Ga viste bare fortegnet, eller
+        sa opp eller ned."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        celler = re.findall(r'<td class="fortegn [a-z]+">([^<]*) <span class="ord">([^<]*)</span></td>', html)
+        assert len(celler) == 3, celler
+        par = {(tall, ord_) for tall, ord_ in celler}
+        assert ("+1", "positiv") in par
+        assert ("0", "ingen utslag") in par
+        assert not re.search(r'class="ord">\s*(opp|ned)\b', html)
+
+    def test_sjekkene_som_slo_ut_merkes_som_i_oversikten(self, klient, monkeypatch):
+        """Tillegget 11.10. Ville feilet hvis radene bare hadde #fafafa."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        stil = _stil(html)
+        assert '<tr class="bidro">' in html
+        assert "font-weight: 600" in _regel(stil, "tr.bidro td")
+        assert "inset 3px 0 0 var(--tekst)" in _regel(stil, "tr.bidro td:first-child")
+        assert "#fafafa" not in stil
+
+    def test_overskriften_ga_staar_over_tallene(self, klient, monkeypatch):
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))
+        stil = _stil(klient.get("/aksje/EQNR").data.decode("utf-8"))
+        assert "text-align: center" in _regel(stil, "th.fortegn")
+
+    def test_fotnoten_i_oversikten_sier_hvor_mange_som_slo_ut(self, klient, monkeypatch):
+        """Punkt 4.4 i endringsforslaget 13.10. Ville feilet med «hvor kraftig»."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}))
+        html = klient.get("/").data.decode("utf-8")
+        assert "Signalstyrken sier hvor mange av de 3 sjekkene som slo ut, ikke om du bør kjøpe eller selge." in html
+        assert "Sluttkursen er den ujusterte kursen" in html
+        assert "hvor kraftig" not in html
+
+    def test_fotnoten_paa_aksjesiden_har_forbeholdet(self, klient, monkeypatch):
+        """Presiseringen kl. 14:33 og tillegget 11.10: forbeholdet staar
+        synlig. Ville feilet med «summen av tallene uten fortegn»."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert "Signalstyrken er hvor mange sjekker som slo ut: 2 av 3 ga utslag." in html
+        assert "Ga noen +1 og noen -1, er retningen Blandet." in html
+        assert "Signalstyrken sier ikke om du bør kjøpe eller selge." in html
+        assert "summen av tallene" not in html
+
+    # Del c: linja nederst og linja over tabellen.
+
+    def test_under_arbeid_staar_nederst_paa_begge_sidene(self, klient, monkeypatch):
+        """Tillegget 11.10, svar 4. Ville feilet hvis linja manglet paa en side."""
+        import app as app_modul
+        monkeypatch.setattr(app_modul, "UNDER_ARBEID", True)
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}))
+        for sti in ("/", "/aksje/EQNR"):
+            html = klient.get(sti).data.decode("utf-8")
+            assert '<p class="under-arbeid">Appen er under utvikling og ikke ferdig.</p>' in html, sti
+            assert html.index('class="under-arbeid"') > html.index("<table"), sti
+
+    def test_under_arbeid_styres_av_en_innstilling(self, klient, monkeypatch):
+        """Ville feilet hvis linja sto fast i malene og ikke kom fra UNDER_ARBEID."""
+        import app as app_modul
+        monkeypatch.setattr(app_modul, "UNDER_ARBEID", False)
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}))
+        for sti in ("/", "/aksje/EQNR"):
+            assert "<p class=\"under-arbeid\">" not in klient.get(sti).data.decode("utf-8"), sti
+
+    def test_den_ekte_basen_sier_oslo_boers_over_tabellen(self, klient, monkeypatch):
+        """4a gjelder bare demoen. Ville feilet hvis «Eksempeltall» sto over
+        tabellen uten demomerket."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}))
+        html = klient.get("/").data.decode("utf-8")
+        assert "Oslo Børs · " in html
+        assert "Eksempeltall" not in html and "Demoversjon" not in html
+
+    # Etter gjennomgangen av PR #35.
+
+    def test_setningen_staar_ikke_med_to_av_tre(self, klient, monkeypatch):
+        """VG1: med STANDARD og én aksje paa 2 av 3 staar ikke setningen.
+        Ville feilet hvis funksjonen saa etter 3 av 3 i stedet for terskelen."""
+        monter(monkeypatch, snapshot({
+            "EQNR": serie([100.0] * 60 + [104.0]),   # 2 av 3
+            "DNB": serie([100.0] * 61),              # 0
+        }))
+        html = klient.get("/").data.decode("utf-8")
+        assert "2 av 3" in html
+        assert "Ingen aksjer skilte seg ut" not in html
+
+    def test_bare_radene_over_terskelen_er_merket(self, klient, monkeypatch):
+        """VG2: en rad med 1 av 3 skal ikke ha merkingen. Ville feilet hvis
+        alle rader fikk class="utslag"."""
+        monter(monkeypatch, snapshot({
+            "EQNR": serie([100.0] * 60 + [104.0]),   # 2 av 3
+            "DNB": serie([100.0] * 60 + [101.0]),    # 1 av 3
+        }))
+        html = klient.get("/").data.decode("utf-8")
+        assert html.count('<tr class="utslag">') == 1
+        dnb = html.split("DNB Bank")[0].rsplit("<tr", 1)[1]
+        assert "utslag" not in dnb
+
+    def test_bare_sjekkene_som_slo_ut_er_merket(self, klient, monkeypatch):
+        """VG2: like mange rader med class="bidro" som sjekker som slo ut."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))  # 2 av 3
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert html.count('<tr class="bidro">') == 2
+
+    def test_den_gule_ringen_har_minst_3_til_1_mot_hvit(self, klient, monkeypatch):
+        """BH3, WCAG 1.4.11. Ville feilet med #d4a000, som har om lag 2,3:1."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}))
+        stil = _stil(klient.get("/").data.decode("utf-8"))
+        farge = re.search(r"--gul:\s*#([0-9a-fA-F]{6})", stil).group(1)
+
+        def lin(c):
+            c = c / 255
+            return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+
+        r, g, b = (int(farge[i:i + 2], 16) for i in (0, 2, 4))
+        lys = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
+        assert (1.0 + 0.05) / (lys + 0.05) >= 3.0, farge
+
+    def test_forbeholdet_staar_ogsaa_uten_tabellen(self, klient, monkeypatch):
+        """VG6: forbeholdet staar synlig ogsaa naar sjekkene ikke vises."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0, 101.0])}))  # for kort serie
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert "Signalet kunne ikke regnes" in html
+        assert "Signalstyrken sier ikke om du bør kjøpe eller selge." in html
+
+    # Svar 3 paa BH1/ECH2 (13.10 kl. 16:42).
+
+    def test_noen_mangler_vurdering_gir_begge_setningene(self, klient, monkeypatch):
+        """Ville feilet hvis «N av M aksjer ble vurdert.» manglet."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [101.0])}))   # 1 av 3
+        monter(monkeypatch, snapshot({"DNB": serie([100.0] * 61)}), vurdert=False)
+        html = klient.get("/").data.decode("utf-8")
+        assert "Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer." in html
+        assert "1 av 2 aksjer ble vurdert." in html
+        assert html.index("Ingen aksjer skilte seg ut") < html.index("1 av 2 aksjer ble vurdert.")
+
+    def test_alle_vurdert_gir_bare_setningen_fra_0510(self, klient, monkeypatch):
+        monter(monkeypatch, snapshot({
+            "EQNR": serie([100.0] * 60 + [101.0]),
+            "DNB": serie([100.0] * 61),
+        }))
+        html = klient.get("/").data.decode("utf-8")
+        assert "Ingen aksjer skilte seg ut" in html
+        assert "ble vurdert." not in html
+
+    def test_ingen_ny_setning_naar_en_skiller_seg_ut_og_en_mangler(self, klient, monkeypatch):
+        """VG paa svar 3: «ble vurdert.» staar bare under setningen fra 05.10.
+        Ville feilet hvis den nye setningen ble flyttet ut av den ytre if-en."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))   # 2 av 3
+        monter(monkeypatch, snapshot({"DNB": serie([100.0] * 61)}), vurdert=False)
+        html = klient.get("/").data.decode("utf-8")
+        assert "2 av 3" in html
+        assert "Ingen aksjer skilte seg ut" not in html
+        assert "ble vurdert." not in html
+
+    def test_ingen_vurdert_gir_ingen_av_setningene(self, klient, monkeypatch):
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}), vurdert=False)
+        html = klient.get("/").data.decode("utf-8")
+        assert "Ingen aksjer skilte seg ut" not in html
+        assert "ble vurdert." not in html
+
+    def test_antall_vurdert_teller_radene_med_styrke(self):
+        """Enhetstest: 0, 1 og alle."""
+        from types import SimpleNamespace
+
+        from markedsoversikt import antall_vurdert
+
+        rad = lambda s: SimpleNamespace(styrke=s)  # noqa: E731
+        assert antall_vurdert([]) == 0
+        assert antall_vurdert([rad(None), rad(1)]) == 1
+        assert antall_vurdert([rad(0), rad(3)]) == 2
