@@ -2833,6 +2833,8 @@ demoen sensor ser, har det utseendet vi har valgt.
 
 *Lagt til 2026-10-14:* PR 2 flettet i `179b415`, PR #40. Fargene ved en aksje er som i originalen (`designregler.md` §3, 14.10).
 
+*Lagt til 2026-10-14:* PR 2b flettet i `8c9f8b7`, PR #41.
+
 ### Story 8.1: Brukertest rett etter Epic 2
 
 Som **gruppe**, vil vi se en person utenfor gruppen bruke løsningen tidlig, så
