@@ -2,7 +2,7 @@
 title: 'Story 8.0e: Oversikten fra designforslaget'
 type: 'feature'
 created: '2026-10-13'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '4c4b420f3ef2bd6ef07d1ae24d301632d721544c'
