@@ -290,3 +290,36 @@ class TestVurderingenIDetaljen:
 
         assert not hasattr(aksjedetalj, "beregn_signal")
         assert not hasattr(aksjedetalj, "vurder")
+
+
+class TestSkalaen:
+    """Story 8.0d, PR 3: det grå feltet i sjekkortene (utdraget §8, svar 20)."""
+
+    def test_trend_gaar_til_tre_ganger_grensen(self):
+        from aksjedetalj import bygg_skala
+
+        s = bygg_skala("Trend", 0.0, None)
+        assert (round(s.felt_fra, 4), round(s.felt_til, 4), s.prikk) == (round(100 / 3, 4), round(200 / 3, 4), 50.0)
+        assert (s.lav_tekst, s.hoy_tekst) == ("-2,0 %", "+2,0 %")
+        assert bygg_skala("Trend", 0.04, None).prikk == pytest.approx(100 * 5 / 6)
+
+    def test_bevegelse_bruker_standardavviket_og_prikken_staar_ved_enden(self):
+        """Svar 20. Ville feilet hvis prikken havnet utenfor sporet."""
+        from aksjedetalj import bygg_skala
+
+        s = bygg_skala("Bevegelse", 0.5, 0.01)
+        assert s.prikk == 100.0
+        assert bygg_skala("Bevegelse", -0.5, 0.01).prikk == 0.0
+        assert bygg_skala("Bevegelse", 0.01, 0.01).prikk == pytest.approx(200 / 3)
+        assert bygg_skala("Bevegelse", 0.01, 0.0) is None
+        assert bygg_skala("Bevegelse", 0.01, None) is None
+
+    def test_interesse_gaar_fra_0_til_fire_ganger_volumfaktoren(self):
+        """Utdraget §8: feltet fra 0 til 1,5 ×, skalaen fra 0 til 6 ×."""
+        from aksjedetalj import bygg_skala
+
+        s = bygg_skala("Interesse", 3.0, None)
+        assert (s.felt_fra, s.felt_til, s.prikk) == (0.0, 25.0, 50.0)
+        assert (s.lav_tekst, s.hoy_tekst) == ("0", "1,5 ×")
+        assert bygg_skala("Interesse", None, None).prikk is None
+        assert bygg_skala("Interesse", 1.0, None, Parametre(volumfaktor=2.0)).felt_til == 25.0

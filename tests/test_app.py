@@ -345,15 +345,16 @@ class TestTidsstempler:
         eqnr = klient.get("/aksje/EQNR").data.decode("utf-8")
         dnb = klient.get("/aksje/DNB").data.decode("utf-8")
 
-        assert "data hentet 24.09 kl. 20.05" in eqnr
-        assert "data hentet 22.09 kl. 20.05" in dnb
+        # Story 8.0d, PR 3: tidspunktet står bare i stripa (ECH8 i PR 2).
+        assert "Oppdatert torsdag 24.09 kl. 20.05" in eqnr and "data hentet" not in eqnr
+        assert "Oppdatert tirsdag 22.09 kl. 20.05" in dnb and "data hentet" not in dnb
 
     def test_detaljen_i_vintertid(self, klient, monkeypatch):
         monter_lager(monkeypatch, {"EQNR": datetime(2026, 11, 16, 22, 30, tzinfo=timezone.utc)})
 
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
 
-        assert "data hentet 16.11 kl. 23.30" in html
+        assert "Oppdatert mandag 16.11 kl. 23.30" in html
 
 
 def test_rutene_gjoer_ingen_nettverkskall(klient, monkeypatch, tmp_path):
@@ -466,7 +467,8 @@ class TestAksjedetalj:
 
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
 
-        assert "Energi · 19.11" in html
+        # Story 8.0d, PR 3 (svar 18): «Oslo Børs · dato» under h1.
+        assert "Oslo Børs · 19.11" in html
         assert "01.09 til 19.11" in html
 
     def test_uleselig_symbol_gir_404(self, klient, monkeypatch):
@@ -1039,7 +1041,7 @@ class TestStory80:
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
 
         assert f'<span class="verdi">1{NB}250,00</span>' in html
-        regnestykker = re.findall(r'<td class="regnestykke">([^<]*)</td>', html)
+        regnestykker = re.findall(r'<p class="regnestykke">([^<]*)</p>', html)
         assert len(regnestykker) == 3
         for sjekk in regnestykker:
             assert "." not in sjekk, sjekk
@@ -1334,8 +1336,10 @@ class TestStory80c:
         tabell = html[html.index("<table"):]
         assert tabell.count('class="pille tre-av-tre"') == 1
         assert '<span class="pille tre-av-tre">3 av 3</span>' in tabell
-        assert '<span class="pille">2 av 3</span>' in html
+        # Story 8.0d, PR 3: hvit pille ved 2 av 3 (gruppen 14.10 kl. 19:59).
+        assert '<span class="pille to-av-tre">2 av 3</span>' in html
         ring = _regel(_stil(html), ".pille.tre-av-tre")
+        assert "oransje" not in _regel(_stil(html), ".pille.to-av-tre")
         # Story 8.0d, PR 2: ringen i sterk oransje (designregler §3, 14.10).
         assert "border" in ring and "var(--oransje)" in ring
 
@@ -1409,7 +1413,8 @@ class TestStory80c:
         sa opp eller ned."""
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
-        celler = re.findall(r'<td class="fortegn [a-z]+">([^<]*) <span class="ord">([^<]*)</span></td>', html)
+        # Story 8.0d, PR 3: tallet og ordet i resultatpillen i hvert sjekkort.
+        celler = re.findall(r'<span class="resultat fortegn [a-z]+">([^<]*) <span class="ord">([^<]*)</span></span>', html)
         assert len(celler) == 3, celler
         par = {(tall, ord_) for tall, ord_ in celler}
         assert ("+1", "positiv") in par
@@ -1417,19 +1422,15 @@ class TestStory80c:
         assert not re.search(r'class="ord">\s*(opp|ned)\b', html)
 
     def test_sjekkene_som_slo_ut_merkes_som_i_oversikten(self, klient, monkeypatch):
-        """Tillegget 11.10. Ville feilet hvis radene bare hadde #fafafa."""
+        """Tillegget 11.10. Ville feilet hvis radene bare hadde #fafafa.
+        Story 8.0d, PR 3: sjekkene står som kort, og resultatet står i en
+        pille med farge etter fortegnet (utdraget §8)."""
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
         stil = _stil(html)
-        assert '<tr class="bidro">' in html
-        assert "font-weight: 600" in _regel(stil, "tr.bidro td")
-        assert "inset 3px 0 0 var(--tekst)" in _regel(stil, "tr.bidro td:first-child")
+        assert '<section class="sjekkort bidro"' in html
+        assert "background: var(--opp-bakgrunn)" in _regel(stil, ".sjekkort .resultat.opp")
         assert "#fafafa" not in stil
-
-    def test_overskriften_ga_staar_over_tallene(self, klient, monkeypatch):
-        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))
-        stil = _stil(klient.get("/aksje/EQNR").data.decode("utf-8"))
-        assert "text-align: center" in _regel(stil, "th.fortegn")
 
     def test_fotnoten_i_oversikten_sier_hvor_mange_som_slo_ut(self, klient, monkeypatch):
         """Punkt 4.4 i endringsforslaget 13.10. Ville feilet med «hvor kraftig»."""
@@ -1459,7 +1460,8 @@ class TestStory80c:
         for sti in ("/", "/aksje/EQNR"):
             html = klient.get(sti).data.decode("utf-8")
             assert '<p class="under-arbeid">Appen er under utvikling og ikke ferdig.</p>' in html, sti
-            assert html.index('class="under-arbeid"') > html.index("<table"), sti
+            # Story 8.0d, PR 3: aksjesiden har sjekkort, ikke en tabell.
+            assert html.index('class="under-arbeid"') > html.index("<table" if sti == "/" else "<figure"), sti
 
     def test_under_arbeid_styres_av_en_innstilling(self, klient, monkeypatch):
         """Ville feilet hvis linja sto fast i malene og ikke kom fra UNDER_ARBEID."""
@@ -1506,7 +1508,8 @@ class TestStory80c:
         """VG2: like mange rader med class="bidro" som sjekker som slo ut."""
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))  # 2 av 3
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
-        assert html.count('<tr class="bidro">') == 2
+        assert html.count('<section class="sjekkort bidro"') == 2
+        assert html.count('<section class="sjekkort"') == 1
 
     def test_ringen_er_sterk_oransje_og_teksten_sier_det_samme(self, klient, monkeypatch):
         """Story 8.0d, PR 2, designregler §3 (14.10): testen fra 8.0c for 3:1
@@ -1537,10 +1540,10 @@ class TestStory80c:
         assert html.index("Ingen aksjer skilte seg ut") < html.index("1 av 15 aksjer ble vurdert.")
 
     def test_alle_vurdert_gir_bare_setningen_fra_0510(self, klient, monkeypatch):
-        monter(monkeypatch, snapshot({
-            "EQNR": serie([100.0] * 60 + [101.0]),
-            "DNB": serie([100.0] * 61),
-        }))
+        # Story 8.0d, PR 3: alle aksjene i lista har kurser og vurdering.
+        from kursdata import AKSJEUNIVERS
+
+        monter(monkeypatch, snapshot({a.symbol: serie([100.0] * 61) for a in AKSJEUNIVERS}))
         html = klient.get("/").data.decode("utf-8")
         assert "Ingen aksjer skilte seg ut" in html
         assert "ble vurdert." not in html
@@ -1584,7 +1587,7 @@ class TestStory80c:
         assert re.search(r"Oppdatert [a-zø]+ \d\d\.\d\d\.2026 kl\. \d\d\.\d\d", html)
         # VG4: aksjesiden ogsaa, med datoen i meta-linja og grafens fra-til.
         detalj = klient.get("/aksje/EQNR").data.decode("utf-8")
-        assert re.search(r"Energi · \d\d\.\d\d\.2026", detalj)
+        assert re.search(r"Oslo Børs · \d\d\.\d\d\.2026", detalj)
         assert re.search(r"\d\d\.\d\d\.2026 til \d\d\.\d\d\.2026\.", detalj)
 
     def test_ingen_synlig_iso_dato_paa_sidene(self, klient, monkeypatch):
@@ -1735,11 +1738,45 @@ class TestStory80e:
     def test_bare_setningen_fra_0510_naar_alle_er_vurdert(self, klient):
         """BH11: med alle vurdert staar bare den foerste setningen, og den
         staar i tabellen."""
+        # Story 8.0d, PR 3: alle de 15 aksjene i lista er vurdert.
+        from kursdata import AKSJEUNIVERS
+
         _lagret("EQNR", 1.0, 1, 0, 0)
-        _lagret("DNB", 1.0, 0, 0, 0)
+        for aksje in AKSJEUNIVERS:
+            if aksje.symbol != "EQNR":
+                _lagret(aksje.symbol, 1.0, 0, 0, 0)
         assert _tabell(klient.get("/").data.decode("utf-8")).deler == [
             "Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer.", "Øvrige aksjer",
         ]
+
+    def test_ble_vurdert_ogsaa_naar_en_aksje_mangler_kurser(self, klient):
+        """Story 8.0d, PR 3 (BH1 i PR 2b, svar 8): alle radene er vurdert,
+        men én aksje i lista har ingen kurser. Ville feilet hvis setningen
+        ble regnet fra radene igjen."""
+        from kursdata import AKSJEUNIVERS
+
+        mangler, *med_kurser = AKSJEUNIVERS
+        for aksje in med_kurser:
+            _lagret(aksje.symbol, 1.0, 0, 0, 0)
+        html = klient.get("/").data.decode("utf-8")
+        m = len(AKSJEUNIVERS)
+        assert _tabell(html).deler[0] == (
+            f"Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer. {m - 1} av {m} aksjer ble vurdert.")
+        assert f"Uten data i denne kilden: {mangler.navn}." in _synlig(html)
+
+    def test_oevrige_sier_hvor_mange_som_er_uten_signal(self, klient):
+        """Story 8.0d, PR 3 (BH2 i PR 2, svar 7): «og 1 uten signal» også når
+        det er én, og pillen teller alle radene i båndet."""
+        _lagret("KOG", 0.0, 1, 1, 0)
+        _lagret("EQNR", 0.0, 1, 0, 0)
+        _lagret("DNB", 0.0, 0, 0, 0, vurdert=False)
+        tabell = _tabell(klient.get("/").data.decode("utf-8"))
+        assert tabell.ekstra["bak"] == ["signalstyrke 2 eller mer", "signalstyrke 0 eller 1 og 1 uten signal"]
+        assert tabell.ekstra["antall"] == ["1", "2"]
+        _lagret("MOWI", 0.0, 0, 0, 0, vurdert=False)
+        tabell = _tabell(klient.get("/").data.decode("utf-8"))
+        assert tabell.ekstra["bak"][1] == "signalstyrke 0 eller 1 og 2 uten signal"
+        assert tabell.ekstra["antall"] == ["1", "3"]
 
     def test_alle_over_terskelen_gir_bare_skilte_seg_ut(self, klient):
         _lagret("EQNR", 1.0, 1, 1, 0)
@@ -1768,7 +1805,10 @@ class TestStory80e:
         assert re.search(r"--fyll:\s*#16181D", stil)
         assert "background" not in _regel(stil, ".pille")
         assert '<span class="pille tre-av-tre">3 av 3</span>' in html
-        assert '<span class="pille">2 av 3</span>' in html
+        # Story 8.0d, PR 3: hvit pille med tekst og kant i blekk ved 2 av 3.
+        to = _regel(stil, ".pille.to-av-tre")
+        assert "background: var(--hvit)" in to and "solid var(--blekk)" in to and "color: var(--blekk)" in to
+        assert '<span class="pille to-av-tre">2 av 3</span>' in html
 
     def test_kontrasten_paa_pillen_med_fyll(self, klient):
         """WCAG 1.4.3: teksten mot fyllet minst 4,5:1. WCAG 1.4.11: den gule
@@ -1923,3 +1963,93 @@ class TestStory80eTekst:
         ]
         assert "Klikk på T" not in html
         assert html.index("Slik leser du tabellen") < html.index("<table")
+
+
+class TestStory80dAksjesiden:
+    """Story 8.0d, PR 3: aksjesiden etter del C og svarene 14.10 kl. 22:50."""
+
+    def test_overskriften_med_markering_naar_aksjen_skilte_seg_ut(self, klient):
+        """Beslutning 7 og designregler §3 (14.10). Ville feilet uten
+        markeringen, eller med «skilte seg ut» under terskelen."""
+        _lagret("KOG", 0.0, 1, 1, 0)
+        _lagret("EQNR", 0.0, 1, 0, 0)
+        kog = klient.get("/aksje/KOG").data.decode("utf-8")
+        assert '<h1 class="overskrift">Kongsberg Gruppen <mark>skilte seg ut lørdag</mark></h1>' in kog
+        eqnr = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert '<h1 class="overskrift">Equinor</h1>' in eqnr
+        assert "skilte seg ut" not in _synlig(eqnr)
+        assert "linear-gradient(transparent 60%, var(--lys-oransje) 60%)" in _regel(_stil(kog), "h1.overskrift mark")
+
+    def test_merkene_over_h1_og_linja_under(self, klient):
+        """Svar 18: ticker og bransje i merkene over h1, og «Oslo Børs ·
+        dato» under."""
+        _lagret("EQNR", 0.0, 1, 0, 0)
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        merkene = html.index('<div class="merkene">')
+        assert merkene < html.index("<h1") < html.index('<p class="meta">')
+        assert re.search(r'<span class="merke">EQNR</span>\s*<span class="merke"><svg class="bransjesymbol"[^>]*aria-hidden="true"', html)
+        assert '<p class="meta">Oslo Børs · 31.10</p>' in html
+        assert "data hentet" not in html
+
+    def test_endringen_er_det_fjerde_kortet_med_ukedagene(self, klient):
+        """Plan 8 og svar 21. Ville feilet uten endringskortet."""
+        _lagret("EQNR", 2.0, 1, 0, 0)
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        kort = re.findall(r'<div class="noekkeltall[^"]*">\s*<span class="etikett">([A-Za-zæøå]+)', html)
+        assert kort == ["Sluttkurs", "Endring", "Signalstyrke", "Retning"]
+        endring = html.split('<div class="noekkeltall endring">', 1)[1].split("</div>", 1)[0]
+        assert f'<span class="verdi opp">+2,00{NB}%</span>' in endring
+        assert "fra torsdag til fredag" in endring or "fra fredag til lørdag" in endring
+
+    def test_signalstyrken_har_brikkene(self, klient):
+        _lagret("EQNR", 0.0, 1, -1, 0)
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        styrke = html.split('<span class="etikett">Signalstyrke', 1)[1].split("</div>", 1)[0]
+        assert '<span class="sjekker stor">' in styrke
+        assert re.findall(r'class="sjekk brikke ([a-z]+)"', styrke) == ["pluss", "minus", "null"]
+
+    def test_sjekkene_staar_som_kort_foer_grafen(self, klient):
+        """Del 5 og del G, mutant g: kortene med det grå feltet står foran
+        grafen, og skalaen er skjult for skjermlesere."""
+        _lagret("EQNR", 0.0, 1, 0, 0)
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        kort = re.findall(r'<section class="sjekkort[^"]*" aria-label="Sjekk (\d): (\w+)">', html)
+        assert kort == [("1", "Trend"), ("2", "Bevegelse"), ("3", "Interesse")]
+        assert html.index('class="sjekkort') < html.index("<figure")
+        skalaer = re.findall(r'<div class="skala"([^>]*)>(.*?)</div>', html, re.DOTALL)
+        assert len(skalaer) == 3
+        for attr, innhold in skalaer:
+            assert 'aria-hidden="true"' in attr
+            assert "gir 0" in innhold
+            prikk = re.search(r'class="prikk [a-z]+" style="left: ([\d.]+)%;"', innhold)
+            assert prikk and 0.0 <= float(prikk.group(1)) <= 100.0
+
+    def test_det_graa_feltet_har_fargen_fra_designreglene(self, klient):
+        """Del 5 og mutant k: feltet #8A847A på sporet #F1EFEA (3,23:1)."""
+        _lagret("EQNR", 0.0, 1, 0, 0)
+        stil = _stil(klient.get("/aksje/EQNR").data.decode("utf-8"))
+        assert re.search(r"--felt:\s*#8A847A", stil) and re.search(r"--spor:\s*#F1EFEA", stil)
+        assert "var(--felt)" in _regel(stil, ".skala .felt")
+        assert "#D9D5CB" not in stil.upper()
+
+    def test_grafen_har_heltrukket_snitt_og_navnene_ved_enden(self, klient):
+        """Del G, mutant b, og svar 19: ingen stiplet linje, ingen
+        tegnforklaring, og navnene står i linjefargen."""
+        _lagret("EQNR", 0.0, 1, 0, 0)
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        stil = _stil(html)
+        assert "dasharray" not in stil and "dashed" not in stil
+        assert "stroke-width: 1.75" in _regel(stil, ".ma50linje")
+        assert "stroke-width: 2.5" in _regel(stil, ".kurslinje")
+        assert "tegnforklaring" not in html
+        assert '<text class="linjenavn kurs" text-anchor="end"' in html
+        assert '<text class="linjenavn snitt" text-anchor="end"' in html
+        assert "var(--snitt)" in _regel(stil, ".linjenavn.snitt")
+        assert "stipl" not in _synlig(html).lower()
+
+    def test_tilbakelenken_er_markedsoversikt_uten_pil(self, klient):
+        """Del C og mutant d."""
+        _lagret("EQNR", 0.0, 1, 0, 0)
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert '<a class="tilbake" href="/">Markedsoversikt</a>' in html
+        assert not re.search(r"[←→›]", _synlig(html))
