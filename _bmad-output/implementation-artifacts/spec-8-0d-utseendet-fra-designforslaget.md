@@ -2,7 +2,7 @@
 title: 'Story 8.0d: Utseendet fra designforslaget'
 type: 'feature'
 created: '2026-10-14'
-status: 'in-progress'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '9f8471341e466df1b34e9112882ec02bff710d3e'
@@ -83,11 +83,11 @@ Planen ble vist i chatten 13.10 kl. 23:27 (del A–G) og er ført kort i Utført
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `designregler.md` -- del 5 -- reglene før utseendet bygges
-- [ ] `src/static/fonts/` -- skriftfilene og lisensene -- §1
-- [ ] `src/templates/_ramme.html` og de tre malene -- rammen, stripa, fargene, fokus, bunnlinja og demomerket -- ett sted for utseendet
-- [ ] `src/templates/_hjelp.html`, `basefeil.html` -- hjelpevinduet og feilsiden i rammen
-- [ ] `tests/test_utseende.py` -- kontrasten, ingenting fra nettet, tabelltall, sifrene og `tnum` i filene, merket i stripa, lenkene
+- [x] `designregler.md` -- del 5 -- reglene før utseendet bygges
+- [x] `src/static/fonts/` -- skriftfilene og lisensene -- §1
+- [x] `src/templates/_ramme.html` og de tre malene -- rammen, stripa, fargene, fokus, bunnlinja og demomerket -- ett sted for utseendet
+- [x] `src/templates/_hjelp.html`, `basefeil.html` -- hjelpevinduet og feilsiden i rammen
+- [x] `tests/test_utseende.py` -- kontrasten, ingenting fra nettet, tabelltall, sifrene og `tnum` i filene, merket i stripa, lenkene
 
 **Acceptance Criteria:**
 - Given en side, when den vises, then hver farge i testlista har minst 4,5:1 for tekst og 3:1 for streker, ringen og fokus.
@@ -111,11 +111,52 @@ Planen ble vist i chatten 13.10 kl. 23:27 (del A–G) og er ført kort i Utført
 - Newsreader har ingen utgivelser på GitHub. Filene er hentet fra repoet på siste commit, `cfcb4f7` fra 01.03.2021, og adressen er låst til den. Repoet har statiske WOFF-filer i tre optiske størrelser (6pt, 16pt og 72pt). 16pt er valgt, fordi overskriftene er fra 23 til 56 px.
 - **IBM Plex Sans har ingen `tnum`** i GSUB-tabellen. Sifrene 0–9 er like brede som standard (600 enheter i alle fire vektene), så tallene står likevel rett under hverandre. Newsreader har `tnum` og `pnum`, og sifrene er like brede (1140 og 1185). Testen krever like brede sifre i hver fil, og `tnum` i filene som har GSUB med `pnum`. `designregler.md` §1 sier «en test sjekker at filene vi bruker, har den». Det stemmer ikke for Plex, og del 5 sier det med dato.
 
+**PR 1, 14.10 (grenen `8-0d-grunnlag`):** `bec0a70` spesifikasjonen, `6c59659` del 5 i `designregler.md`, `88f9de3` skriftfilene og testene for dem, `82a18cb` rammen, `d6e3ad1` hjelpen, `a77a62a` testene for utseendet, `a82552c` rettingene fra gjennomgangen, `dc45df8` den daterte linja under §1 og `bc99062` punktet i `deferred-work.md`.
+
+- Rammen er `_ramme.html`. De tre sidene begynner med `{% extends "_ramme.html" %}` og fyller blokkene `tittel`, `stil` og `innhold`. Fargene står bare i `:root` i rammen, og hvitt heter `--hvit`.
+- «Oppdatert …» i stripa kommer fra `oppdatert()` i `markedsoversikt.py`, med ukedagen i norsk tid. Linja «data hentet …» under tittelen står fortsatt, og PR 2 avgjør den (`deferred-work.md`).
+- Testen som forbød `url(` på sidene, tillater nå bare `/static/`. Testen for merket i malene ser nå i rammen. Fyllet i «3 av 3» er blekk (`#16181D`), ikke `#000000`, og testene fra 8.0e er rettet etter det.
+- Feilsiden for en demo.db som ikke kan leses, har ikke merket, fordi ingen kan si at basen er en demobase. Feilsiden for en demobase har merket i stripa (`test_feilsiden_har_eksempeltall_for_en_demobase`).
+
 ## Spec Change Log
 
 ## Review Triage Log
 
+Gjennomgang av PR 1 (diffen `main...8-0d-grunnlag` på `a77a62a`, 14.10), med Blind Hunter (BH, 12 funn), Edge Case Hunter (ECH, 10) og Verification Gap (VG, 1). Rettingene står i `a82552c`, `dc45df8` og `bc99062`.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| VG1, BH3 | «Oppdatert …» var en lambda uten test, og bare begynnelsen av teksten var prøvd | medium | patch: `oppdatert()` med test over midnatt, og hele teksten i stripa på begge sidene |
+| BH4, ECH5 | Hvitt sto fast, og testen fant ikke farger med tre sifre, `rgb()` eller attributter | low | patch: `--hvit`, og testen ser etter alle tre |
+| BH5, ECH6 | Fargepar på bakgrunnen og `blandet` mot kort var ikke prøvd | low | patch: parene i `KONTRAST` |
+| BH6 | §1 sier fortsatt at filene har `tnum`, og Newsreader var ikke krevd å ha den | low | patch: datert linje under §1, og `tnum` krevd i Newsreader |
+| BH10 | Kortet på feilsiden var ikke prøvd | low | patch |
+| BH11 | Raden med demomerket brukte en strek §5 ikke nevner | low | patch: `--stripe-strek` |
+| ECH2, ECH3 | Klikkflaten til «?» gikk 11 px inn i teksten etter, og kommentaren stemte ikke | low | patch: 5 px luft på hver side, og ny kommentar |
+| ECH7, ECH8 | Testene for skriftfilene feilet uten en klar melding hvis et siffer eller GSUB manglet | low | patch |
+| BH8, ECH9 | Sidene importerte `hjelpestil`, som bare rammen bruker | low | patch |
+| BH2 | Tidspunktet står to ganger, i stripa og i linja under tittelen | low | utsatt: `deferred-work.md`, avgjøres i planen for PR 2 |
+| ECH4 | 404-siden er Flasks standardside, uten rammen | low | utsatt fra før: ECH9 i 8.0c står i `deferred-work.md` |
+| BH1 | README-en sier «Øverst står «Eksempeltall: …»» | false | merket står i stripa, øverst på siden, med samme ordlyd. `test_merket_i_demoen_er_det_samme_som_i_malene` holder sitatet lik konstanten |
+| BH7 | Feilsiden har `<h1>OSE Signal</h1>` under logoen | avvist | overskriften er sidens struktur for skjermlesere. Overskriftene på oversikten avgjøres i PR 2 |
+| BH9 | Klikkflaten kan overlappe en lenke ved siden av | maybe-false, avvist | marginene gir 5 px luft. Det som avgjør det, er en prøve i nettleseren i PR 2, der tabellen får nytt utseende |
+| BH12 | Spesifikasjonen manglet avkryssing, triage og testtall | avvist | rettingen er å skrive i spesifikasjonen, som gjøres her |
+| ECH1 | «Oppdatert» på aksjesiden er aksjens egen tid, ikke sidens eldste | avvist | aksjesiden viser én aksje, og tiden er dens egen, som linja «data hentet» der i dag |
+| ECH10 | Fokus på hjelpeknappen kommer bare fra rammen | avvist | alle sidene bruker rammen, og testen krever regelen på hver side |
+
 ## Verification
 
 **Commands:**
-- `uv run pytest -q` -- expected: grønn. Før: 1491 bestått og 16 hoppet over på main (`7bb4c3e`, 14.10).
+- `uv run pytest -q` -- expected: grønn. Før: 1491 bestått og 16 hoppet over på main (`7bb4c3e`, 14.10). Etter: 1517 bestått og 16 hoppet over på `a82552c`.
+
+**Mutantene** (14.10, på `a77a62a`) ble kjørt én om gangen mot hele testsettet med `-x`, og fila ble satt tilbake og kontrollert med sha256. Alle 7 ble fanget:
+
+| # | Mutant | Fanget av |
+|---|---|---|
+| D1 | skrift fra Google Fonts | `tests/test_hjelpetekster.py::TestSidene::test_ingen_skript_og_ingenting_fra_nettet` |
+| D2 | blekk byttet til en lys farge | `tests/test_utseende.py::TestRammen::test_kontrasten_regnet_fra_fargene_i_stilen` |
+| D3 | `tabular-nums` fjernet fra tallcellene | `tests/test_utseende.py::TestRammen::test_tabelltall_i_tallcellene` |
+| D4 | merket borte fra stripa i demoen | `tests/test_demo.py::TestSidene::test_bryteren_med_demobase_viser_eksempeltall` |
+| D5 | gult fokus på lys bakgrunn | `tests/test_utseende.py::TestRammen::test_fokus_i_blekk_paa_lys_bakgrunn_og_lys_gul_i_stripa` |
+| D6 | ringen i `#F2B53A` | `tests/test_app.py::TestStory80c::test_den_gule_ringen_har_minst_3_til_1_mot_hvit` |
+| D7 | en lenke til `/min-liste` | `tests/test_utseende.py::TestRammen::test_hver_lenke_gaar_til_en_side_som_finnes` |
