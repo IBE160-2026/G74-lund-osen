@@ -77,6 +77,24 @@ Planen ble vist i chatten 14.10 kl. 17:16 og er ført kort i Utført-linja for d
 
 Mutanten: M fra radene igjen.
 
+**PR 2b, 14.10 (grenen `8-0d-antall`, PR #41):** `fe730b4` beslutningen, `77e6f51` endringen (`antall_aksjer=len(poster)` i `app.py`, brukt i overskriften, linja under og setningen om vurdert), `4fc313e` testene og `ebfebef` rettingene fra gjennomgangen. Lista er tabellen `aksje` i basen (AD-21), som også gir «Uten data i denne kilden». Setningen «… av M aksjer ble vurdert.» står fortsatt bare når en rad mangler vurdering.
+
+`uv run pytest -q`: før 1532 bestått og 16 hoppet over på main (`4637004`), etter 1533 og 16 på `4fc313e`. Mutanten «M fra radene igjen» (`antall_aksjer=len(rader)`) ble kjørt med `-x` og bare `tests/test_app.py`, og fanget av `tests/test_app.py::TestStory80c::test_noen_mangler_vurdering_gir_begge_setningene`. Fila var lik HEAD etterpå (sha256 og blob).
+
+Gjennomgang av PR 2b (diffen `main...4fc313e`), med Blind Hunter (BH, 6 funn), Edge Case Hunter (ECH, 3) og Verification Gap (VG, 3). Rettingene står i `ebfebef`.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| VG1 | M kunne vært fast 15 eller `len(AKSJEUNIVERS)` uten at en test feilet | medium | patch: testen der DNO og MPCC er fjernet fra `aksje`, krever «0 av 13» og «13 aksjer» |
+| VG2 | Antallet i båndet «Øvrige aksjer» var ikke festet | medium | patch: den nye testen krever antallene i begge båndene |
+| BH3 | Testnavnet sa at M telles fra radene | low | patch: `test_overskriften_teller_n_fra_radene_og_m_fra_lista` |
+| BH1, ECH1, VG3 | Setningen om vurdert står ikke når alle radene er vurdert og en aksje mangler kurser | medium | utsatt: `deferred-work.md`. Beslutningen gjelder M, ikke når setningen står |
+| BH2 | Ingen test for tilfellet over | low | utsatt sammen med BH1 |
+| BH4 | Demotesten krever «5 av 15 aksjer skilte seg ut fredag» ordrett | avvist | instruksjonen kl. 21:08 sier at demoen skal vise nettopp det |
+| BH5 | Den nye testen antar rekkefølgen i `AKSJEUNIVERS` og datoen 31.10 | avvist | testbasen og de andre testene i klassen bruker samme dato, og hvilken aksje som mangler, spiller ingen rolle |
+| BH6, ECH2 | M teller tabellen `aksje`, ikke `AKSJEUNIVERS` | avvist | lista er `aksje` (AD-21), som fotnoten, og VG1-testen krever det |
+| ECH3 | Linja under overskriften har datoen fra radene og antallet fra lista | avvist | fotnoten «Uten data i denne kilden» står på samme side, og beslutningen sier «15 aksjer» i linja |
+
 ## Boundaries & Constraints
 
 **Always:**
