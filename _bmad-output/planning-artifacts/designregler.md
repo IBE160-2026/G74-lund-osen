@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-10-13T22:49
+updated: 2026-10-14T14:44
 ---
 
 # Designregler
@@ -128,3 +128,56 @@ Ord kan endres rett i tavla. I appen samles hjelpetekstene i én fil (8.0b).
 | Helse | Legemidler, bioteknologi, medisinsk utstyr og helsetjenester | Health Care | Ny |
 | Eiendom | Selskaper som eier, leier ut eller utvikler eiendom | Real Estate | Ny |
 | Kraft | Strøm og fornybar kraft, vann og avfall | Utilities | Ny |
+
+## 5. Utseendet
+
+*Avgjort 2026-10-13 kl. 23:39, gruppen, etter planen for story 8.0d (kl. 23:27) og [utdraget fra designtavla 13.10](designutdrag-2026-10-13.md). Rettet kl. 23:43: det viktigste i en overskrift merkes med fet skrift. Ført 2026-10-14 i PR 1 av 8.0d.*
+
+**Hvorfor:** sidene skal se ut som forslaget gruppen valgte. Der tavla ikke holder WCAG, eller strider mot §3 og §4, går reglene her foran tavla.
+
+**Fargene.** Hver farge har ett navn i stilen, og ingen farge skrives fast i en mal.
+
+- Blekk `#16181D`: hovedtekst, stripa, kolonneraden, fyllet i «3 av 3» og fokus.
+- Tekst `#3C4048`: brødtekst og innledning.
+- Dempet `#5F646C`: etiketter, linja under navnet, fotnoter og aksetekst.
+- Dempet 2 `#70757D`: en sjekk som ga 0.
+- Bakgrunn `#F3F2EE`, Kort `#FFFFFF`, Strek `#E4E2DB`, Strek 2 `#D6D3CA` og Rutenett `#ECEAE4`.
+- Positiv `#13703C` på `#E4F4EA`, Negativ `#B42318` på `#FBE9E6`, Blandet `#6A46A0` på `#F0EBF8` og Ingen `#5F646C` på `#EEEDEA`.
+- Gul ring `#a67c00`: ringen rundt «3 av 3» og streken på 4 px til venstre i en rad med 3 av 3, på lys bakgrunn. Kontrasten er 3,82 mot hvitt, 3,41 mot Bakgrunn og 4,65 mot blekk.
+- Lys gul `#F2B53A`: bare på blekk, det vil si logoens høyeste søyle, klokka og fokus i stripa (9,68:1).
+- Båndet «Skilte seg ut» `#ECE9E1`, en nøytral, varm grå, med kant i Strek og tekst i blekk (14,64:1). Radene under er hvite. Båndet «Øvrige aksjer» `#F7F6F2`, med kant i Strek og tekst i Tekst (9,62:1). Gult står ved en aksje bare ved 3 av 3 (§3), og «Skilte seg ut» har også 2 av 3.
+- Hjelp `#6B4E00` på `#FFF1CC`: merket «Hjelp» i hjelpevinduet (6,89:1).
+- Kurs `#1F4E8C`. Snitt `#9A5A0E`, både streken og navnet (5,46:1 mot hvitt).
+- Det grå feltet: sporet `#F1EFEA` og feltet `#8A847A` (3,23:1).
+- I stripa: tekst `#DADDE2`, `#C9CCD2` og `#A9AEB8`, og kantene `#3A3E47` og `#2A2E36`. Under kolonnenavnene: `#B9BDC5`.
+
+**Kontrast.** Tekst har minst 4,5:1 mot bakgrunnen den står på. Streker, felt og fokus som må ses for å forstå siden, har minst 3:1 (WCAG 1.4.11). En test regner det ut fra fargene i stilen. Retningsfargene er nesten like lyse, så retningen står alltid med ord og symbol (§4).
+
+**Skriften** følger §1. Newsreader brukes til logoen (27 px, 600), overskriftene (oversikten 52 px og aksjesiden 56 px, 500), delene på aksjesiden (36 px), navnet på en sjekk (30 px, 600) og tittelen i hjelpen (23 px, 600). Resten er IBM Plex Sans, med størrelsene i utdraget §3. Alle tall har tabelltall. Det viktigste i en overskrift har fet skrift, ikke gul understrek (§4, rettet 13.10).
+
+*Målt 2026-10-14, da filene ble hentet:* IBM Plex Sans har ikke OpenType-funksjonen `tnum`, i motsetning til det §1 sier. Sifrene 0–9 er like brede som standard (600 enheter i alle fire vektene), så tallene står rett under hverandre uten den. Newsreader har `tnum`. Testen krever like brede sifre i hver fil, og `tnum` der filen har proporsjonale sifre som valg (`pnum`).
+
+**Stripa øverst.** Den har blekk over hele bredden og to rader. Den første raden er 72 px med logoen: tre søyler, den høyeste i lys gul, og «OSE Signal» i hvitt. Den andre er 38 px med klokka og «Oppdatert …». Mellom radene står en strek i `#2A2E36`. I demoen står hele merket «Demoversjon. Eksempeltall: …» som egen rad i stripa, med samme ordlyd (13,04:1). Stripa har ingen knapper før sidene de viser til, finnes (8.3, 8.9 og 8.10).
+
+**Kolonneraden og båndene.** Kolonneraden er 64 px i blekk, med navnene i hvitt og en linje under i `#B9BDC5`. Båndet «Skilte seg ut» og båndet «Øvrige aksjer» har antallet i en pille. Radene under «Skilte seg ut» er hvite og 66 px, og en rad med 3 av 3 har en strek på 4 px i Gul ring til venstre. Radene under «Øvrige aksjer» er hvite og 54 px.
+
+**Pillene og brikkene.**
+
+- «3 av 3» er en pille med fyll i blekk, hvit tekst og en ring på 2 px i Gul ring.
+- «2 av 3» har fet skrift og strek, uten fyll og uten gult (§3, beslutningen 13.10 kl. 21:27).
+- «1 av 3» og «0 av 3» er tekst uten pille.
+- T, B og I står i brikker på 34 × 24 px med radius 6. +1 har grønt fyll og -1 rødt, begge med hvit tekst. 0 er hvit med tekst i Dempet 2 og kant i Strek 2.
+- Retningen står i en pille på 28 px med symbolet først.
+
+**Avstander.** Sidemargen er 120 px ved 1280 px og 16 px ved 390 px. Det er 40–44 px mellom delene i oversikten og 60 px på aksjesiden. Kort har radius 16, kant i Strek og luft 18–22 px. Brikker har radius 6, merker 8 og piller 999. Klikkflater er minst 44 px.
+
+**Fokus.** På lys bakgrunn er fokus `outline: 3px solid` i blekk med `outline-offset: 2px` (15,85:1). I stripa er fokus lys gul (9,68:1).
+
+**Rekkefølgen av delene.**
+
+- Oversikten: stripa, så overskriften og innledningen med kortet «Slik leser du tabellen» til høyre for dem, så tabellen, og til slutt bunnlinja. På smal skjerm står kortet under innledningen.
+- Aksjesiden: stripa, så merkene med overskriften og innledningen, nøkkeltallene, de 3 sjekkene, kursgrafen, fotnotene og bunnlinja.
+- Feilsiden: stripa, så meldingen og bunnlinja.
+- Delene som hører til senere stories, settes inn på sin plass når de bygges (utdraget §11).
+
+**Det grå feltet.** Hvert sjekkort har et spor på 10 px med runde ender, og feltet der sjekken gir 0. Grensene står over feltet og «gir 0» under. Målingen er en prikk på 20 px i resultatfargen. Skalaen er `aria-hidden`, fordi teksten i kortet sier det samme.
