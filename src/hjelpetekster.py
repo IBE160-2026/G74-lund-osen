@@ -162,7 +162,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
              (AKSJE_MAL, "Begge linjene er tegnet på utbyttejustert kurs")),
         ),
         "data_hentet": Hjelpetekst(
-            "Data hentet:",
+            # Story 8.0d, PR 2, svar 5: tidspunktet heter «Oppdatert» i stripa.
+            "Oppdatert:",
             "når kursene sist ble hentet, i norsk tid. Øverst står det eldste "
             "tidspunktet blant aksjene. En aksje som ble hentet tidligere enn "
             "de nyeste, har sitt eget tidspunkt under navnet.",

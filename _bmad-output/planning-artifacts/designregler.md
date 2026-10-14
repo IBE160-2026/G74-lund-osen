@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-10-14T16:14
+updated: 2026-10-14T17:34
 ---
 
 # Designregler
@@ -60,6 +60,8 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 
 *Lagt til 2026-10-13 (story 8.0e, svar 8 kl. 21:27):* pillen «3 av 3» i oversikten har svart fyll og hvit tekst inne i den gule ringen, som i designforslaget, med kontrast på minst 4,5:1. 2 av 3 merkes som før, med fet skrift og strek, uten fyll og uten gult.
 
+*Lagt til 2026-10-14 (gruppen 14.10 kl. 17:17 og skissen gruppen valgte like etter, instruksjonen kl. 17:31):* fargene er som i originalen, med oransje som grunnfarge. 3 av 3 har strek på 4 px til venstre i raden og ring rundt pillen i sterk oransje `#F2B53A`. 2 av 3 har strek på 4 px i lys oransje `#F8DE9C`, og fet «2 av 3» som før. 1 av 3 og 0 av 3 har ingen strek og ingen farge. **Hvorfor:** gruppen vil ha utseendet fra originalen. Teksten sier alltid det samme (FR-103), og pillen har svart fyll siden 8.0e, så ringen og strekene trenger ikke 3:1 mot hvitt.
+
 ## 4. Ordliste – samme ord på alle sidene (01.10)
 
 *Ført 2026-10-13 ordrett fra designtavla i Claude, versjon 1791623938-3408, med «-» for «•». Ordlista er ikke kontrollert mot koden og PRD-en etter 02.10. Det gjør den samlede endringen (samlelista punkt 8 og 10) før noe herfra brukes i appen.*
@@ -72,6 +74,7 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 - Retning: Positiv, Negativ, Blandet eller Ingen, med pil (FR-103). Pilene brukes ikke til noe annet.
 - Skilte seg ut: signalstyrke 2 eller mer. Signalstyrken skrives «3 av 3», og 3 av 3 er fylt med gul ring.
   *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* 3 av 3 merkes med gul ring rundt, som i §3.
+  *Lagt til 2026-10-14 (gruppen 14.10 kl. 17:17 og skissen gruppen valgte like etter, instruksjonen kl. 17:31):* ringen og streken ved 3 av 3 er sterk oransje `#F2B53A`, og streken ved 2 av 3 lys oransje `#F8DE9C` (§3).
 - Tall med sifre, også små: «3 av 3 sjekker», ikke «alle tre».
 - Endring: fra forrige børsdag, utbyttejustert, med fortegn. Kolonnehodet sier «i går», som den første knappen i periodevalget.
   *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* endringen gjelder siste børsdag. Kolonnehodet følger den første knappen i periodevalget, som heter «I går», «I dag» eller ukedagen (§2).
@@ -100,6 +103,7 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 - Hjelp: faste tekster vi har skrevet og sjekket.
 - Gul strek: det viktigste på siden. I KI-teksten har tall som er sjekket mot grunnlaget, prikket strek og farge etter retning.
   *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* det viktigste på siden merkes med fet skrift. I KI-teksten har tall som er sjekket mot grunnlaget, prikket strek i tekstfargen (svar 7). Gult betyr bare 3 av 3 (§3).
+  *Lagt til 2026-10-14 (gruppen 14.10 kl. 17:17 og skissen gruppen valgte like etter, instruksjonen kl. 17:31):* i overskriften har det viktigste en lys oransje markering, `#F8DE9C` fra 60 % av høyden, som i originalen, uten fet skrift. I oversikten er det «N av M aksjer», og på aksjesiden «skilte seg ut <ukedag>» (PR 3 av 8.0d).
 - Antall: telles alltid og står aldri fast som 15, så tallene følger lista når egne aksjer kommer med.
 - Hvor mange aksjer: én grense for hele lista, «opptil 18 aksjer», vist som «16 av 18 aksjer». Ikke «opptil 3 i tillegg».
 - Hjelp bak «?»: forklaringer som ellers ville stått som løs tekst, samme utseende som «Vis meg rundt».
@@ -183,3 +187,14 @@ Ord kan endres rett i tavla. I appen samles hjelpetekstene i én fil (8.0b).
 - Delene som hører til senere stories, settes inn på sin plass når de bygges (utdraget §11).
 
 **Det grå feltet.** Hvert sjekkort har et spor på 10 px med runde ender, og feltet der sjekken gir 0. Grensene står over feltet og «gir 0» under. Målingen er en prikk på 20 px i resultatfargen. Skalaen er `aria-hidden`, fordi teksten i kortet sier det samme.
+
+*Lagt til 2026-10-14 (gruppen 14.10 kl. 17:17 og skissen gruppen valgte like etter, instruksjonen kl. 17:31, PR 2 av 8.0d):* fargene ved en aksje er som i originalen, og linjene over om gul ring `#a67c00`, båndet `#ECE9E1` og fet skrift i overskriften gjelder ikke lenger for oversikten.
+
+- Sterk oransje `#F2B53A`: ringen rundt «3 av 3» og streken på 4 px til venstre i en rad med 3 av 3.
+- Lys oransje `#F8DE9C`: streken på 4 px i en rad med 2 av 3, og markeringen under det viktigste i overskriften (fra 60 % av høyden). Overskriften har ikke fet skrift.
+- 1 av 3 og 0 av 3: ingen strek og ingen farge.
+- Båndet «Skilte seg ut» `#FFF6DC` med kant `#F0E3BD`, og tekst og pille i `#6B4E00`, med «signalstyrke 2 eller mer» etter pillen. «Øvrige aksjer» har «signalstyrke 0 eller 1». Tallene kommer fra Parametre. Radene er hvite.
+- Kontrasten for teksten i båndet, pillen og markeringen regnes i testen. Ringen og strekene trenger ikke 3:1 mot hvitt, fordi teksten sier det samme (FR-103) og pillen har svart fyll.
+- Overskriften på 52 og 56 px er Newsreader i optisk størrelse 72pt, Medium. Resten av Newsreader er 16pt.
+- Under kolonnenavnene står bare «NOK» under Sluttkurs, i `#B9BDC5`.
+- Tidspunktet står én gang, som «Oppdatert …» i stripa, med «?» ved siden av.

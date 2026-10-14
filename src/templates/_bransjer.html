@@ -1,0 +1,22 @@
+{#- Story 8.0d, PR 2: symbolene for de 13 bransjene, ordrett fra utdraget
+    §12 (tavla «Bransjer»), og designregler §4. Strektegninger uten fyll,
+    i tekstfargen. Symbolet er aria-hidden, fordi bransjen står med ord ved
+    siden av. En bransje uten symbol står bare med ord. -#}
+{% set SYMBOLER = {
+  'Energi': '<ellipse cx="12" cy="5" rx="6" ry="2"></ellipse><path d="M6 5v14c0 1.1 2.7 2 6 2s6-.9 6-2V5"></path><path d="M6 10c0 1.1 2.7 2 6 2s6-.9 6-2"></path><path d="M6 15c0 1.1 2.7 2 6 2s6-.9 6-2"></path>',
+  'Finans': '<path d="M3 9l9-5 9 5"></path><path d="M5 10v7"></path><path d="M9.7 10v7"></path><path d="M14.3 10v7"></path><path d="M19 10v7"></path><path d="M3 20h18"></path>',
+  'Industri': '<circle cx="12" cy="12" r="3"></circle><circle cx="12" cy="12" r="6.5"></circle><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"></path>',
+  'Materialer': '<path d="M3 19l2-4h6l2 4z"></path><path d="M11 19l2-4h6l2 4z"></path><path d="M7 15l2-4h6l2 4"></path>',
+  'Shipping': '<path d="M3 15h18l-2.5 5h-13z"></path><path d="M5.5 15v-4h5v4"></path><path d="M10.5 15v-4h5v4"></path><path d="M15.5 11V7h3v8"></path>',
+  'Telekom': '<path d="M12 10v11"></path><path d="M8 21h8"></path><circle cx="12" cy="8" r="2"></circle><path d="M7.8 3.8a6 6 0 0 0 0 8.4"></path><path d="M16.2 3.8a6 6 0 0 1 0 8.4"></path>',
+  'Sjømat': '<path d="M2 12c2.5-4 8-6 12-3 1 .7 2 1.8 2.5 3-.5 1.2-1.5 2.3-2.5 3-4 3-9.5 1-12-3z"></path><path d="M16.5 12l5.5-4v8z"></path><circle cx="7" cy="11" r="0.9"></circle>',
+  'Konsum': '<path d="M4 9h16l-1.5 10h-13z"></path><path d="M8 9l3-5"></path><path d="M16 9l-3-5"></path><path d="M9 13v3M12 13v3M15 13v3"></path>',
+  'Forbruk': '<path d="M3 11.5v-7A1.5 1.5 0 0 1 4.5 3h7l9.5 9.5-8.5 8.5z"></path><circle cx="8" cy="8" r="1.6"></circle>',
+  'Teknologi': '<rect x="6.5" y="6.5" width="11" height="11" rx="1.5"></rect><rect x="9.5" y="9.5" width="5" height="5" rx="0.5"></rect><path d="M9.5 3v3.5M14.5 3v3.5M9.5 17.5V21M14.5 17.5V21M3 9.5h3.5M3 14.5h3.5M17.5 9.5H21M17.5 14.5H21"></path>',
+  'Helse': '<path d="M9 3.5h6v5.5h5.5v6H15v5.5H9V15H3.5V9H9z"></path>',
+  'Eiendom': '<path d="M5 21V4.5A1.5 1.5 0 0 1 6.5 3h11A1.5 1.5 0 0 1 19 4.5V21"></path><path d="M3 21h18"></path><path d="M9 7h1.5M13.5 7H15M9 11h1.5M13.5 11H15"></path><path d="M10.5 21v-4.5h3V21"></path>',
+  'Kraft': '<path d="M13 2.5L5 13.5h6l-1 8 8-11h-6z"></path>',
+} %}
+{% macro bransjesymbol(navn) -%}
+{% if navn in SYMBOLER %}<svg class="bransjesymbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">{{ SYMBOLER[navn]|safe }}</svg>{% endif %}
+{%- endmacro %}
