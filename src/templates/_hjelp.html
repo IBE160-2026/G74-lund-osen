@@ -8,12 +8,13 @@
 
 {% macro hjelpestil() -%}
     /* Story 8.0d (designregler §5, utdraget §7): «?» er en svart sirkel på
-       22 px i en klikkflate på 44 × 44 px. Marginene holder raden like høy
-       som før. */
+       22 px i en klikkflate på 44 × 44 px. De negative marginene gjør at
+       flaten ikke skyver teksten rundt fra hverandre, og 5 px luft står
+       igjen på hver side av sirkelen. */
     button.hjelpeknapp {
       font: inherit; font-size: 13px; font-weight: 700; line-height: 1;
-      width: 44px; height: 44px; padding: 0; margin: -11px -11px -11px -6px;
-      border: 0; border-radius: 50%; color: #FFFFFF; cursor: pointer; vertical-align: middle;
+      width: 44px; height: 44px; padding: 0; margin: -11px -6px -11px -6px;
+      border: 0; border-radius: 50%; color: var(--hvit); cursor: pointer; vertical-align: middle;
       background: radial-gradient(circle, var(--blekk) 10.5px, transparent 11px);
     }
     .hjelpevindu {

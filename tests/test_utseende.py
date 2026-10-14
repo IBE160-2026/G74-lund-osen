@@ -57,7 +57,8 @@ def _glyfer(cmap: bytes, tegn: range) -> list[int]:
             forskyvning = struct.unpack(f">{n}H", t[fra:fra + dobbel])
             glyfer = []
             for c in tegn:
-                k = next(k for k in range(n) if begynn[k] <= c <= slutt[k])
+                k = next((k for k in range(n) if begynn[k] <= c <= slutt[k]), None)
+                assert k is not None, hex(c)
                 if forskyvning[k] == 0:
                     glyfer.append((c + delta[k]) & 0xFFFF)
                 else:
@@ -92,9 +93,12 @@ class TestSkriftfilene:
         """§1 sier tnum. IBM Plex Sans har ikke funksjonen, men sifrene er
         like brede uten den (målt 14.10, §5). Har filen pnum, skal den også
         ha tnum, så tabular-nums i stilen gir tabelltall."""
-        funksjoner = _funksjoner(_tabeller((FONTS / fil).read_bytes())["GSUB"])
+        gsub = _tabeller((FONTS / fil).read_bytes()).get("GSUB")
+        funksjoner = _funksjoner(gsub) if gsub else set()
         if "pnum" in funksjoner:
             assert "tnum" in funksjoner
+        if fil.startswith("newsreader/"):
+            assert "tnum" in funksjoner, fil
 
     def test_hele_filer_med_stilvariantene(self):
         """§1: hele filer, ikke split, så ss01 og ss02 er med (IBM/plex
@@ -135,7 +139,10 @@ KONTRAST = [
     ("blekk", "baand-ut", 4.5), ("tekst", "baand-oevrige", 4.5),
     ("hjelp", "hjelp-bakgrunn", 4.5), ("kurs", "kort", 4.5), ("snitt", "kort", 4.5),
     ("stripe-tekst", "blekk", 4.5), ("stripe-tekst-2", "blekk", 4.5),
-    ("kort", "fyll", 4.5),
+    ("kort", "fyll", 4.5), ("hvit", "blekk", 4.5),
+    # Gjennomgangen (ECH6, BH5): tabellen og grafen står også på bakgrunnen.
+    ("blandet", "kort", 4.5), ("opp", "bakgrunn", 4.5), ("ned", "bakgrunn", 4.5),
+    ("blandet", "bakgrunn", 4.5), ("kurs", "bakgrunn", 4.5), ("snitt", "bakgrunn", 4.5),
     ("gul", "kort", 3.0), ("gul", "bakgrunn", 3.0), ("gul", "fyll", 3.0),
     ("lys-gul", "blekk", 3.0),
 ]
@@ -197,8 +204,12 @@ class TestRammen:
         for navn, html in sidene.items():
             stil = _stil(html)
             utenom_rot = stil.replace(_regel(stil, ":root"), "")
-            fast = {f.upper() for f in re.findall(r"#[0-9a-fA-F]{6}\b", utenom_rot)} - {"#FFFFFF"}
+            fast = re.findall(r"#(?:[0-9a-fA-F]{3}){1,2}\b", utenom_rot)
             assert not fast, (navn, fast)
+            # rgba() bare i skyggene fra utdraget (utdraget §5 og §7).
+            for regel in re.findall(r"[^;{}]*rgba?\([^;{}]*", utenom_rot):
+                assert "box-shadow" in regel or regel.strip().startswith("0 2px"), (navn, regel)
+            assert not re.search(r'(?:style|fill|stroke)="[^"]*#', html), navn
 
     def test_ingenting_fra_nettet(self, sidene):
         """Ville feilet med skrift eller stil fra Google Fonts, et skript,
@@ -251,8 +262,13 @@ class TestRammen:
             assert "OSE Signal" in stripe and 'aria-hidden="true"' in stripe, navn
             assert (html.index("</header>") < html.index("<main>")
                     < html.index('<footer class="bunnlinje">')), navn
-        assert "Oppdatert " in _stripa(sidene["oversikten"])
+        # VG1: hele teksten, også på aksjesiden. HENTET er 15.40 UTC
+        # mandag 21.09, 17.40 i Norge.
+        for navn in ("oversikten", "aksjesiden"):
+            assert "Oppdatert mandag 21.09 kl. 17.40" in _stripa(sidene[navn]), navn
         assert "Oppdatert " not in _stripa(sidene["tom base"])
+        # BH10: meldingen på feilsiden står i et kort.
+        assert '<div class="kort">' in sidene["feilsiden"]
 
     def test_merket_staar_i_stripa_i_demoen(self, sidene):
         """FR-411 og svar 3: hele merket som egen rad i stripa, uten det gule

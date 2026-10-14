@@ -21,7 +21,7 @@ from kursdata import Aksje, Kursrad
 from oversiktsdata import Oversiktspost
 from signalberegning import BLANDET, INGEN, NEGATIV, POSITIV, Parametre, STANDARD
 from tilstand import Art, Tilstand, tilstand
-from tallformat import dato, fortegn
+from tallformat import dato, fortegn, ukedag
 from vurderingsdata import Grunn, Vurdering
 
 
@@ -324,3 +324,13 @@ def norsk_tid(tid: datetime, i_aar: int) -> str:
     """
     lokal = tid.astimezone(NORSK_TID)
     return f"{dato(lokal.date(), i_aar)} kl. {lokal:%H.%M}"
+
+
+def oppdatert(tid: datetime, i_aar: int) -> str:
+    """Tidspunktet i stripa: «tirsdag 13.10 kl. 22.15» - story 8.0d.
+
+    Ukedagen er dagen i norsk tid, som datoen og klokkeslettet fra
+    norsk_tid. En henting kl. 22.30 UTC en torsdag om sommeren er fredag i
+    Norge, og ukedagen sier fredag.
+    """
+    return f"{ukedag(tid.astimezone(NORSK_TID).date())} {norsk_tid(tid, i_aar)}"

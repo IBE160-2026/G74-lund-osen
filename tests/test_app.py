@@ -1725,7 +1725,8 @@ class TestStory80e:
         stil = _stil(html)
         fyll = _regel(stil, ".pille.tre-av-tre")
         assert "var(--gul)" in fyll and "background: var(--fyll)" in fyll
-        assert "color: #ffffff" in fyll
+        # Story 8.0d: hvitt står som navn i rammen (designregler §5).
+        assert "color: var(--hvit)" in fyll
         # Story 8.0d: fyllet er blekk (designregler §5), ikke rent svart.
         assert re.search(r"--fyll:\s*#16181D", stil)
         assert "background" not in _regel(stil, ".pille")
@@ -1740,7 +1741,8 @@ class TestStory80e:
         stil = _stil(klient.get("/").data.decode("utf-8"))
         fyll = re.search(r"--fyll:\s*#([0-9a-fA-F]{6})", stil).group(1)
         gul = re.search(r"--gul:\s*#([0-9a-fA-F]{6})", stil).group(1)
-        tekst = re.search(r"(?<!-)color:\s*#([0-9a-fA-F]{6})", _regel(stil, ".pille.tre-av-tre")).group(1)
+        navn = re.search(r"(?<!-)color:\s*var\(--([a-z-]+)\)", _regel(stil, ".pille.tre-av-tre")).group(1)
+        tekst = re.search(rf"--{navn}:\s*#([0-9a-fA-F]{{6}})", stil).group(1)
 
         def lys(farge):
             def lin(c):

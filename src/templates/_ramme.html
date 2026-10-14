@@ -35,6 +35,7 @@
       --dempet-2: #70757D;
       --bakgrunn: #F3F2EE;
       --kort: #FFFFFF;
+      --hvit: #FFFFFF;
       --strek: #E4E2DB;
       --strek-2: #D6D3CA;
       --rutenett: #ECEAE4;
@@ -75,21 +76,21 @@
     header.stripe *:focus-visible { outline-color: var(--lys-gul); }
 
     /* Stripa øverst. */
-    header.stripe { background: var(--blekk); color: #FFFFFF; }
+    header.stripe { background: var(--blekk); color: var(--hvit); }
     header.stripe .rad { max-width: 65rem; margin: 0 auto; padding: 0 16px; box-sizing: border-box;
                          display: flex; align-items: center; gap: 0.6rem; }
     header.stripe .topp { min-height: 72px; }
     header.stripe .logo { font-family: "Newsreader", Georgia, serif; font-size: 27px; font-weight: 600;
                           letter-spacing: -0.01em; display: flex; align-items: center; gap: 0.6rem; margin: 0; }
     header.stripe .logo svg { width: 28px; height: 24px; }
-    header.stripe .logo .soeyle { fill: #FFFFFF; }
+    header.stripe .logo .soeyle { fill: var(--hvit); }
     header.stripe .logo .soeyle.hoey { fill: var(--lys-gul); }
     header.stripe .oppdatert { min-height: 38px; border-top: 1px solid var(--stripe-strek);
                                font-size: 13.5px; font-weight: 600; color: var(--stripe-tekst); }
     header.stripe .oppdatert svg { width: 16px; height: 16px; fill: none; stroke: var(--lys-gul); stroke-width: 2; }
     header.stripe .eksempeltall { margin: 0; padding: 0.5rem 0; font-size: 13.5px; font-weight: 600;
                                   color: var(--stripe-tekst); }
-    header.stripe .demo { border-top: 1px solid var(--stripe-kant); }
+    header.stripe .demo { border-top: 1px solid var(--stripe-strek); }
 
     footer.bunnlinje { max-width: 65rem; margin: 2rem auto 0; padding: 0 16px 2rem; box-sizing: border-box; }
     footer.bunnlinje p { border-top: 1px solid var(--strek); padding-top: 1rem; margin: 0;

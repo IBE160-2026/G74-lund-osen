@@ -515,3 +515,13 @@ class TestStory80e:
         hoey = Parametre(ma_vindu=5, volatilitet_vindu=3, volum_vindu=3, terskel=3)
         ut, oevrige = del_i_to(bygg_oversikt(poster, IDAG, hoey))
         assert ut == [] and [r.aksje.symbol for r in oevrige] == ["EQNR", "DNB"]
+
+
+def test_oppdatert_med_ukedagen_i_norsk_tid():
+    """Story 8.0d (VG1 i gjennomgangen): kl. 22.30 UTC torsdag 24.09 er
+    fredag 25.09 kl. 00.30 i Norge, og ukedagen følger datoen."""
+    from markedsoversikt import oppdatert
+
+    tid = datetime(2026, 9, 24, 22, 30, tzinfo=timezone.utc)
+    assert oppdatert(tid, 2026) == "fredag 25.09 kl. 00.30"
+    assert oppdatert(datetime(2025, 11, 16, 22, 30, tzinfo=timezone.utc), 2026) == "søndag 16.11.2025 kl. 23.30"

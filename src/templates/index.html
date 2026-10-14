@@ -1,5 +1,5 @@
 {% extends "_ramme.html" %}
-{% from "_hjelp.html" import hjelpestil, hjelpeknapp, hjelpevindu with context -%}
+{% from "_hjelp.html" import hjelpeknapp, hjelpevindu with context -%}
 {% macro tabellrad(rad) %}
           <tr {% if rad.skiller_seg_ut %}class="utslag"{% endif %}>
             <td class="selskap"><a href="/aksje/{{ rad.aksje.symbol }}">{{ rad.aksje.navn }}</a>{% if rad.aksje.symbol in eget %}<span class="hentet">hentet {{ rad.sist_hentet|norsk_tid }}</span>{% endif %}</td>
@@ -65,7 +65,7 @@
     .pille { white-space: nowrap; padding: 0.05rem 0.45rem; border-radius: 999px; }
     /* Story 8.0e, svar 8: svart fyll og hvit tekst inne i den gule ringen,
        som i designforslaget. 2 av 3 faar ikke fyll. */
-    .pille.tre-av-tre { border: 2px solid var(--gul); background: var(--fyll); color: #ffffff; }
+    .pille.tre-av-tre { border: 2px solid var(--gul); background: var(--fyll); color: var(--hvit); }
     /* Story 8.0e: T, B og I under «N av 3», lest fra vurderingen. */
     .sjekker { display: block; font-size: 0.75rem; font-weight: normal; color: var(--dempet); white-space: nowrap; }
     .sjekker abbr { text-decoration: none; }
