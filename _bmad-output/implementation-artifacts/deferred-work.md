@@ -1,3 +1,6 @@
+- source_spec: `_bmad-output/implementation-artifacts/spec-8-0d-utseendet-fra-designforslaget.md`
+  summary: «X av M aksjer ble vurdert.» står bare når en rad i tabellen mangler vurdering. Er alle radene vurdert, men én aksje i lista mangler kurser, står ingen slik setning, selv om bare 14 av 15 ble vurdert.
+  evidence: BH1, ECH1 og VG3 i gjennomgangen av PR 2b av 8.0d (14.10). Beslutningen 14.10 kl. 21:04 og 21:06 gjelder M i setningen, ikke når den står. Aksjen uten kurser står under tabellen som «Uten data i denne kilden». Testen `test_alle_vurdert_gir_bare_setningen_fra_0510` låser at setningen ikke står når alle radene er vurdert. Avgjøres av gruppen.
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-4a-lesegrensen-kursleser-og-oversetteren.md`
   summary: Tre konsumenter faller fortsatt tilbake fra adjusted_close til close (aksjedetalj.py:106, markedsoversikt.py:99, signalberegning.py:86).
   evidence: Bekreftet med grep 2026-09-24. Fantes foer 1.4a; AD-19 sier at oversettelsen skjer ett sted. Story 1.4b flytter konsumentene til Kursrad, og testene der boer kreve at fallbacken er borte.
