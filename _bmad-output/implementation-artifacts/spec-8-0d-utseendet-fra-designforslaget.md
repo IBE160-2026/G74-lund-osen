@@ -2,7 +2,7 @@
 title: 'Story 8.0d: Utseendet fra designforslaget'
 type: 'feature'
 created: '2026-10-14'
-status: 'in-review'
+status: 'in-progress'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '9f8471341e466df1b34e9112882ec02bff710d3e'
@@ -94,6 +94,25 @@ Gjennomgang av PR 2b (diffen `main...4fc313e`), med Blind Hunter (BH, 6 funn), E
 | BH5 | Den nye testen antar rekkefølgen i `AKSJEUNIVERS` og datoen 31.10 | avvist | testbasen og de andre testene i klassen bruker samme dato, og hvilken aksje som mangler, spiller ingen rolle |
 | BH6, ECH2 | M teller tabellen `aksje`, ikke `AKSJEUNIVERS` | avvist | lista er `aksje` (AD-21), som fotnoten, og VG1-testen krever det |
 | ECH3 | Linja under overskriften har datoen fra radene og antallet fra lista | avvist | fotnoten «Uten data i denne kilden» står på samme side, og beslutningen sier «15 aksjer» i linja |
+
+## PR 3: aksjesiden, og brikkene og pillene i oversikten
+
+*Lagt til 2026-10-14 (planen kl. 22:28, svarene kl. 22:50, beslutningen kl. 19:59):* grenen `8-0d-aksjesiden`. Planen er vist i chatten og ført kort i Utført-linja for kl. 22:28 i `docs/ai-prompts/2026-10-14.md`. Svarene er beslutninger:
+
+18. Under h1 på aksjesiden står «Oslo Børs · 14.10», og «Demo Børs» i demoen. Ticker og bransje står i merkene over h1.
+19. Tegnforklaringen under grafen fjernes når navnene står ved enden av linjene. Teksten for skjermleseren sier fortsatt hvilken linje som er hva.
+20. Bevegelse får tre ganger grensen på hver side, som trend, og prikken står ved enden når målingen er utenfor skalaen.
+21. Endringskortet sier ukedagene, som på tavla, for eksempel «fra tirsdag til onsdag». Datoen står i linja under h1.
+22. I sjekkortene står «?» ved navnet på sjekken, ved «Ga»-pillen og ved «Målt mot».
+23. «Ukjent» retning står som tekst uten pille, i Dempet.
+24. «Øvrige aksjer» får «og N uten signal» etter grensen når rader uten signal står der, også «og 1 uten signal». Pillen teller alle radene i båndet.
+25. Setningen «… av M aksjer ble vurdert.» står bare når ingen skilte seg ut, nå når færre enn alle aksjene i lista ble vurdert. «Uten data i denne kilden» dekker resten.
+26. README-statusen: «utseendet fra designforslaget» flyttes til «Flettet til main», og «Neste:» blir «sortering ved klikk i kolonneraden, hovedindeksen, Min liste, periodene i kursgrafen, og så KI-laget». Endres i PR 3.
+27. «2 av 3» i oversikten er den hvite pillen med tekst og kant i blekk, uten ring, med den lys oransje streken som før (gruppen kl. 19:59).
+
+Resten av planen gjelder som vist: merkene over h1, overskriften «<navn> skilte seg ut <ukedag>» med lys oransje markering i 72pt når styrken er på terskelen eller over (beslutning 7), tidspunktet bare i stripa, fire nøkkeltallkort med endringen som det fjerde og T, B og I som brikker, de 3 sjekkene som kort med det grå feltet foran grafen, grafen med heltrukket snitt og navnene ved enden av linjene, og «Markedsoversikt» uten pil. I oversikten: T, B og I som brikker og retningen i en pille.
+
+**Mutantene for PR 3** (planen kl. 22:28; b, c, d, g og k er nr. 2, 3, 4, 7 og 11 i del G fra 13.10): M1 `stroke-dasharray` tilbake på snittet; M2 hjelpeteksten sier «stiplede»; M3 «← » tilbake i lenken; M4 grafen før sjekkene; M5 det grå feltet tilbake til `#D9D5CB`; M6 «data hentet» tilbake på aksjesiden; M7 markeringen borte fra overskriften på aksjesiden; M8 «skilte seg ut» også under terskelen; M9 endringskortet borte; M10 skalaen uten `aria-hidden`; M11 brikken for 0 med grønt fyll; M12 «2 av 3» uten pille; M13 setningen om vurdert regnet fra radene igjen; M14 «uten signal» teller alle radene i «Øvrige».
 
 ## Boundaries & Constraints
 
