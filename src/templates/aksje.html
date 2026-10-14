@@ -1,72 +1,136 @@
 {% extends "_ramme.html" %}
 {% from "_hjelp.html" import hjelpeknapp, hjelpevindu with context -%}
+{% from "_bransjer.html" import bransjesymbol -%}
+{% from "_brikker.html" import brikker -%}
 {% block tittel %}{{ detalj.aksje.navn }} — OSE Signal{% endblock %}
+{#- Story 8.0d, PR 3: tidspunktet står bare i stripa, med «?» ved siden av
+    (ECH8 i PR 2). #}
+{% block oppdatert_hjelp %} {{ hjelpeknapp("hjelp-hentet", "Hjelp: oppdatert") }}{% endblock %}
 {% block stil %}
-    /* Story 8.0: like tydelig som lenken fra oversikten. */
+    /* Story 8.0: like tydelig som lenken fra oversikten. Story 8.0d, PR 3:
+       teksten er «Markedsoversikt», uten pil (del C). */
     a.tilbake { color: inherit; font-size: 0.9rem; text-decoration: underline; }
     a.tilbake:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
-    h1 { font-size: 1.4rem; margin: 0.6rem 0 0.2rem; }
+
+    /* Story 8.0d, PR 3: merkene for ticker og bransje over h1 (utdraget §6). */
+    .merkene { display: flex; gap: 8px; flex-wrap: wrap; margin: 1.2rem 0 0.8rem; }
+    .merkene .merke { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px;
+                      box-sizing: border-box; border-radius: 8px; background: var(--hvit);
+                      border: 1px solid var(--strek-2); font-size: 13.5px; font-weight: 600; color: var(--tekst); }
+    .merkene .bransjesymbol { width: 15px; height: 15px; }
+    /* Overskriften i 72pt med lys oransje markering under «skilte seg ut
+       <ukedag>» (designregler §3, 14.10). Ikke fet. */
+    h1.overskrift { font-family: "Newsreader 72", "Newsreader", Georgia, serif; font-weight: 500; color: var(--blekk);
+                    font-size: clamp(34px, 4.5vw + 16px, 56px); line-height: 1.1; margin: 0 0 0.5rem; }
+    h1.overskrift mark { background: linear-gradient(transparent 60%, var(--lys-oransje) 60%); color: inherit; }
     p.meta { color: var(--dempet); font-size: 0.9rem; margin-top: 0; }
 
-    .sammendrag { display: flex; gap: 2rem; margin: 1.2rem 0; flex-wrap: wrap; }
-    .noekkeltall .etikett { color: var(--dempet); font-size: 0.8rem; display: block; }
-    .noekkeltall .verdi { font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+    /* Nøkkeltallene: fire hvite kort på rad, 2 og 2 på smal skjerm. */
+    .sammendrag { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin: 1.5rem 0 0; }
+    @media (max-width: 760px) { .sammendrag { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    .noekkeltall { background: var(--kort); border: 1px solid var(--strek); border-radius: 16px;
+                   padding: 18px 20px; min-height: 136px; box-sizing: border-box;
+                   display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+    .noekkeltall .etikett { color: var(--dempet); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+    .noekkeltall .verdi { font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.15; }
+    .noekkeltall .verdi .av { font-size: 15px; font-weight: 500; color: var(--dempet); }
+    .noekkeltall .forklaring { margin-top: auto; color: var(--dempet); font-size: 12.5px; }
 
-    h2 { font-size: 1.05rem; margin: 1.8rem 0 0.5rem; }
-    figure { margin: 0; }
-    svg { width: 100%; height: auto; display: block; }
-    .rute { stroke: var(--strek); stroke-width: 1; }
-    .rutetekst { fill: var(--dempet); font-size: 10px; }
-    .maanedsstrek { stroke: var(--strek); stroke-width: 1; }
-    .maanedstekst { fill: var(--dempet); font-size: 10px; }
-    .kurslinje { fill: none; stroke: var(--kurs); stroke-width: 1.8; }
-    .ma50linje { fill: none; stroke: var(--snitt); stroke-width: 1.5; stroke-dasharray: 5 3; }
-    figcaption { color: var(--dempet); font-size: 0.85rem; margin-top: 0.4rem; }
-    .tegnforklaring { display: flex; gap: 1.2rem; font-size: 0.85rem; margin: 0.4rem 0; }
-    .prikk { display: inline-block; width: 1.6rem; height: 0; vertical-align: middle;
-             border-top-width: 2px; margin-right: 0.35rem; }
-    .prikk.kurs { border-top: 2px solid var(--kurs); }
-    .prikk.ma50 { border-top: 2px dashed var(--snitt); }
+    h2 { font-size: 36px; margin: 60px 0 16px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
-    table { border-collapse: collapse; width: 100%; }
-    th, td { text-align: left; padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--strek); }
-    th { font-weight: 600; font-size: 0.85rem; color: var(--dempet); }
-    /* Story 8.0c: overskriften staar over tallene. */
-    th.fortegn { text-align: center; }
-    td.fortegn { text-align: center; font-variant-numeric: tabular-nums;
-                 font-weight: 700; width: 9rem; white-space: nowrap; }
-    td.fortegn .ord { font-weight: normal; }
-    /* Story 8.0c: sjekkene som slo ut, merkes som 2 av 3 i oversikten: fet
-       skrift og en strek til venstre i tekstfargen, ikke lys bakgrunn. */
-    tr.bidro td { font-weight: 600; }
-    tr.bidro td:first-child { box-shadow: inset 3px 0 0 var(--tekst); }
+    /* De 3 sjekkene som kort side om side (utdraget §8), under hverandre på
+       smal skjerm. */
+    .sjekkort-rad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    @media (max-width: 860px) { .sjekkort-rad { grid-template-columns: minmax(0, 1fr); } }
+    .sjekkort { background: var(--kort); border: 1px solid var(--strek); border-radius: 16px; padding: 20px 22px;
+                display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+    .sjekkort .topp { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+                      color: var(--dempet); font-size: 13px; font-weight: 600; }
+    .sjekkort .ga { display: inline-flex; align-items: center; gap: 4px; }
+    .sjekkort .resultat { display: inline-flex; align-items: center; gap: 4px; height: 26px; padding: 0 10px;
+                          border-radius: 999px; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .sjekkort .resultat .ord { font-weight: 600; }
+    .sjekkort .resultat.opp { background: var(--opp-bakgrunn); color: var(--opp); }
+    .sjekkort .resultat.ned { background: var(--ned-bakgrunn); color: var(--ned); }
+    .sjekkort .resultat.ingen { background: var(--ingen-bakgrunn); color: var(--dempet); }
+    .sjekkort h3 { font-family: "Newsreader", Georgia, serif; font-size: 30px; font-weight: 600; margin: 0;
+                   display: flex; align-items: center; gap: 6px; }
+    .sjekkort .maaler, .sjekkort .regel { color: var(--tekst); font-size: 13.5px; margin: 0; }
+    .sjekkort .regel { color: var(--dempet); margin-top: auto; }
+    .sjekkort .maalt { color: var(--dempet); font-size: 12.5px; font-weight: 600; margin: 4px 0 0;
+                       display: flex; align-items: center; gap: 4px; }
+    .sjekkort .regnestykke { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; margin: 0; }
+    /* Det grå feltet: sporet, feltet der sjekken gir 0, og prikken. */
+    .skala { position: relative; height: 54px; margin: 4px 10px; }
+    .skala .spor { position: absolute; left: 0; right: 0; top: 22px; height: 10px; border-radius: 999px; background: var(--spor); }
+    .skala .felt { position: absolute; top: 22px; height: 10px; background: var(--felt); }
+    .skala .grense { position: absolute; top: 0; font-size: 11.5px; color: var(--dempet); transform: translateX(-50%); white-space: nowrap; }
+    .skala .gir-null { position: absolute; top: 36px; font-size: 11.5px; font-weight: 600; color: var(--dempet);
+                       transform: translateX(-50%); white-space: nowrap; }
+    .skala .prikk { position: absolute; top: 17px; width: 20px; height: 20px; border-radius: 50%; box-sizing: border-box;
+                    border: 3px solid var(--hvit); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25); transform: translateX(-50%); }
+    .skala .prikk.opp { background: var(--opp); }
+    .skala .prikk.ned { background: var(--ned); }
+    .skala .prikk.ingen { background: var(--dempet-2); }
+
+    /* Kursgrafen (utdraget §8): kurslinja 2,5 px, snittet 1,75 px og
+       heltrukket, og navnene ved enden av linjene (svar 19). */
+    figure { margin: 0; background: var(--kort); border: 1px solid var(--strek); border-radius: 16px; padding: 20px 22px; }
+    svg.graf { width: 100%; height: auto; display: block; }
+    .rute { stroke: var(--rutenett); stroke-width: 1; }
+    .rutetekst { fill: var(--dempet); font-size: 12px; }
+    .maanedsstrek { stroke: var(--strek-2); stroke-width: 1; }
+    .maanedstekst { fill: var(--dempet); font-size: 12px; }
+    .kurslinje { fill: none; stroke: var(--kurs); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+    .ma50linje { fill: none; stroke: var(--snitt); stroke-width: 1.75; }
+    .sistepunkt { fill: var(--kurs); stroke: var(--hvit); stroke-width: 2; }
+    .linjenavn { font-size: 12px; font-weight: 600; }
+    .linjenavn.kurs { fill: var(--kurs); }
+    .linjenavn.snitt { fill: var(--snitt); }
+    figcaption { color: var(--dempet); font-size: 0.85rem; margin-top: 0.6rem; }
+
     .opp { color: var(--opp); }
     .ned { color: var(--ned); }
     .blandet { color: var(--blandet); }
     .ingen, .ukjent { color: var(--dempet); }
-    .regnestykke { font-variant-numeric: tabular-nums; }
     p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
     .mangler { color: var(--dempet); font-style: italic; }
 {% endblock %}
-{% block innhold %}
-  <a class="tilbake" href="/">← Markedsoversikt</a>
 
-  <h1>{{ detalj.aksje.navn }}</h1>
-  <p class="meta">
-    {{ detalj.aksje.ticker }} · {{ detalj.aksje.sektor }} · {{ detalj.dato|dato }}
-    {% if hentet %}· data hentet {{ hentet|norsk_tid }}{% endif %}
-  </p>
+{% block innhold %}
+  <a class="tilbake" href="/">Markedsoversikt</a>
+
+  {#- Story 8.0d, PR 3: merkene over h1, og overskriften med markering når
+      aksjen skilte seg ut (beslutning 7). Ellers bare navnet. #}
+  <div class="merkene">
+    <span class="merke">{{ detalj.aksje.symbol }}</span>
+    {% if detalj.aksje.sektor %}<span class="merke">{{ bransjesymbol(detalj.aksje.sektor) }}{{ detalj.aksje.sektor }}</span>{% endif %}
+  </div>
+  {% if detalj.skilte_seg_ut %}
+    <h1 class="overskrift">{{ detalj.aksje.navn }} <mark>skilte seg ut {{ detalj.dato|ukedag }}</mark></h1>
+  {% else %}
+    <h1 class="overskrift">{{ detalj.aksje.navn }}</h1>
+  {% endif %}
+  {#- Svar 18: børsen og datoen, «Demo Børs» i demoen. #}
+  <p class="meta">{{ "Demo Børs" if eksempeltall else "Oslo Børs" }} · {{ detalj.dato|dato }}</p>
 
   <div class="sammendrag">
     <div class="noekkeltall">
       <span class="etikett">Sluttkurs {{ hjelpeknapp("hjelp-kurs", "Hjelp: sluttkurs") }}</span>
       <span class="verdi">{{ detalj.sluttkurs|tall('kurs') }}</span>
+      <span class="forklaring">NOK</span>
+    </div>
+    {#- Plan 8 og svar 21: endringen i prosent, med ukedagene. #}
+    {% set vist_endring = detalj.endring|round(2) if detalj.endring is not none else none %}
+    <div class="noekkeltall endring">
+      <span class="etikett">Endring {{ hjelpeknapp("hjelp-endring", "Hjelp: endring") }}</span>
+      <span class="verdi {% if vist_endring is not none %}{{ 'opp' if vist_endring > 0 else 'ned' if vist_endring < 0 else '' }}{% endif %}">{% if detalj.endring is not none %}{{ detalj.endring|tall('endring') }}{% else %}–{% endif %}</span>
+      {% if detalj.forrige_dato %}<span class="forklaring">fra {{ detalj.forrige_dato|ukedag }} til {{ detalj.dato|ukedag }}</span>{% endif %}
     </div>
     <div class="noekkeltall">
       <span class="etikett">Signalstyrke {{ hjelpeknapp("hjelp-styrke", "Hjelp: signalstyrken") }}</span>
-      <span class="verdi">
-        {% if detalj.styrke is not none %}{{ detalj.styrke }} av {{ antall_sjekker }}{% else %}–{% endif %}
-      </span>
+      <span class="verdi">{% if detalj.styrke is not none %}{{ detalj.styrke }} <span class="av">av {{ antall_sjekker }}</span>{% else %}–{% endif %}</span>
+      {% if detalj.sjekkbrikker %}{{ brikker(detalj.sjekkbrikker, stor=true) }}{% endif %}
     </div>
     <div class="noekkeltall">
       <span class="etikett">Retning {{ hjelpeknapp("hjelp-retning-aksje", "Hjelp: retning") }}</span>
@@ -76,74 +140,38 @@
     </div>
   </div>
 
-  {%- set vis_grafhjelp = graf and graf.har_ma50 and detalj.sjekker %}
-  <h2>Kursutvikling, 6 måneder{% if vis_grafhjelp %} {{ hjelpeknapp("hjelp-graf", "Hjelp: kursgrafen") }}{% endif %}</h2>
-  {% if graf %}
-    <figure>
-      <svg viewBox="0 0 {{ graf.bredde }} {{ graf.hoyde }}" role="img"
-           aria-label="Kursutvikling for {{ detalj.aksje.navn }} med {{ parametre.ma_vindu }}-dagers glidende snitt">
-        {% for linje in graf.rutenett %}
-          <line class="rute" x1="0" y1="{{ "%.1f"|format(linje.y) }}"
-                x2="{{ graf.bredde }}" y2="{{ "%.1f"|format(linje.y) }}"></line>
-          <text class="rutetekst" x="2" y="{{ "%.1f"|format(linje.y - 3) }}">
-            {{ linje.verdi|tall('akse') }}
-          </text>
-        {% endfor %}
-        {#- Story 8.0c: et merke ved foerste boersdag i hver maaned, tegnet foer
-            linjene saa streken ligger under kurslinja. #}
-        {% for merke in graf.maanedsmerker %}
-          <line class="maanedsstrek" x1="{{ "%.1f"|format(merke.x) }}" y1="0"
-                x2="{{ "%.1f"|format(merke.x) }}" y2="{{ graf.hoyde }}"></line>
-          {% if merke.til_venstre %}
-            <text class="maanedstekst" text-anchor="end" x="{{ "%.1f"|format(merke.x - 3) }}" y="{{ graf.hoyde - 3 }}">{{ merke.navn }}</text>
-          {% else %}
-            <text class="maanedstekst" x="{{ "%.1f"|format(merke.x + 3) }}" y="{{ graf.hoyde - 3 }}">{{ merke.navn }}</text>
-          {% endif %}
-        {% endfor %}
-        {% if graf.ma50linje %}
-          <polyline class="ma50linje" points="{{ graf.ma50linje }}"></polyline>
-        {% endif %}
-        <polyline class="kurslinje" points="{{ graf.kurslinje }}"></polyline>
-      </svg>
-
-      <div class="tegnforklaring">
-        <span><span class="prikk kurs"></span>Utbyttejustert kurs</span>
-        {% if graf.har_ma50 %}
-          <span><span class="prikk ma50"></span>{{ parametre.ma_vindu }}-dagers snitt (sjekk 1)</span>
-        {% endif %}
-      </div>
-
-      <figcaption>
-        {{ graf.forste_dato|dato }} til {{ graf.siste_dato|dato }}.
-        Begge linjene er tegnet på utbyttejustert kurs, så de ligger på samme
-        skala. Sjekk 2 og 3 tegnes ikke — de står som tall under.
-      </figcaption>
-    </figure>
-  {% else %}
-    <p class="mangler">For få kursdager til å tegne en graf.</p>
-  {% endif %}
-
+  {#- Del 5: de 3 sjekkene står foran grafen. #}
   <h2>Hvorfor signalet ble {% if detalj.styrke is not none %}{{ detalj.styrke }}{% else %}ukjent{% endif %} {{ hjelpeknapp("hjelp-sjekkene", "Hjelp: sjekkene") }}</h2>
 
   {% if detalj.sjekker %}
-    <table>
-      <thead>
-        <tr>
-          <th>Sjekk</th>
-          <th class="fortegn">Ga {{ hjelpeknapp("hjelp-ga", "Hjelp: ga") }}</th>
-          <th>Målt mot {{ hjelpeknapp("hjelp-maalt", "Hjelp: målt mot") }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for sjekk in detalj.sjekker %}
-          <tr {% if sjekk.bidro %}class="bidro"{% endif %}>
-            <td>{{ sjekk.navn }} {{ hjelpeknapp("hjelp-" ~ sjekk.navn|lower, "Hjelp: " ~ sjekk.navn|lower) }}</td>
-            <td class="fortegn {{ sjekk.klasse }}">{{ sjekk.fortegn }} <span class="ord">{{ sjekk.ord }}</span></td>
-            <td class="regnestykke">{{ sjekk.maaling }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    {#- Svar 22: «?» ved navnet, ved «Ga»-pillen og ved «Målt mot», i det
+        første kortet for Ga og Målt mot, så hvert vindu har én knapp. #}
+    <div class="sjekkort-rad">
+      {% for sjekk in detalj.sjekker %}
+        <section class="sjekkort{% if sjekk.bidro %} bidro{% endif %}" aria-label="Sjekk {{ sjekk.nummer }}: {{ sjekk.navn }}">
+          <div class="topp">
+            <span>Sjekk {{ sjekk.nummer }}</span>
+            <span class="ga">Ga{% if loop.first %} {{ hjelpeknapp("hjelp-ga", "Hjelp: ga") }}{% endif %}
+              <span class="resultat fortegn {{ sjekk.klasse }}">{{ sjekk.fortegn }} <span class="ord">{{ sjekk.ord }}</span></span></span>
+          </div>
+          <h3>{{ sjekk.navn }} {{ hjelpeknapp("hjelp-" ~ sjekk.navn|lower, "Hjelp: " ~ sjekk.navn|lower) }}</h3>
+          <p class="maaler">{{ sjekk.maaler }}</p>
+          <p class="maalt">Målt mot{% if loop.first %} {{ hjelpeknapp("hjelp-maalt", "Hjelp: målt mot") }}{% endif %}</p>
+          <p class="regnestykke">{{ sjekk.maaling }}</p>
+          {% if sjekk.skala %}
+            <div class="skala" aria-hidden="true">
+              <span class="spor"></span>
+              <span class="felt" style="left: {{ '%.1f'|format(sjekk.skala.felt_fra) }}%; width: {{ '%.1f'|format(sjekk.skala.felt_til - sjekk.skala.felt_fra) }}%;"></span>
+              <span class="grense" style="left: {{ '%.1f'|format(sjekk.skala.felt_fra) }}%;">{{ sjekk.skala.lav_tekst }}</span>
+              <span class="grense" style="left: {{ '%.1f'|format(sjekk.skala.felt_til) }}%;">{{ sjekk.skala.hoy_tekst }}</span>
+              <span class="gir-null" style="left: {{ '%.1f'|format((sjekk.skala.felt_fra + sjekk.skala.felt_til) / 2) }}%;">gir 0</span>
+              {% if sjekk.skala.prikk is not none %}<span class="prikk {{ sjekk.klasse }}" style="left: {{ '%.1f'|format(sjekk.skala.prikk) }}%;"></span>{% endif %}
+            </div>
+          {% endif %}
+          <p class="regel">{{ sjekk.regel }}</p>
+        </section>
+      {% endfor %}
+    </div>
 
     <p class="fotnote">
       Signalstyrken er hvor mange sjekker som slo ut: {{ detalj.bidragsytere|length }} av {{ antall_sjekker }} ga utslag.
@@ -169,6 +197,51 @@
     {% endif %}
   {% endif %}
 
+  {%- set vis_grafhjelp = graf and graf.har_ma50 and detalj.sjekker %}
+  <h2>Kursutvikling, 6 måneder{% if vis_grafhjelp %} {{ hjelpeknapp("hjelp-graf", "Hjelp: kursgrafen") }}{% endif %}</h2>
+  {% if graf %}
+    <figure>
+      {#- Svar 19: navnene står ved enden av linjene, og etiketten sier
+          hvilken linje som er hva for skjermleseren. #}
+      <svg class="graf" viewBox="0 0 {{ graf.bredde }} {{ graf.hoyde }}" role="img"
+           aria-label="Kursutvikling for {{ detalj.aksje.navn }}: den tykke blå linja er utbyttejustert kurs{% if graf.har_ma50 %}, og den tynne brune er {{ parametre.ma_vindu }}-dagers snitt (sjekk 1){% endif %}">
+        {% for linje in graf.rutenett %}
+          <line class="rute" x1="0" y1="{{ "%.1f"|format(linje.y) }}"
+                x2="{{ graf.bredde }}" y2="{{ "%.1f"|format(linje.y) }}"></line>
+          <text class="rutetekst" x="2" y="{{ "%.1f"|format(linje.y - 3) }}">
+            {{ linje.verdi|tall('akse') }}
+          </text>
+        {% endfor %}
+        {#- Story 8.0c: et merke ved foerste boersdag i hver maaned, tegnet foer
+            linjene saa streken ligger under kurslinja. #}
+        {% for merke in graf.maanedsmerker %}
+          <line class="maanedsstrek" x1="{{ "%.1f"|format(merke.x) }}" y1="0"
+                x2="{{ "%.1f"|format(merke.x) }}" y2="{{ graf.hoyde }}"></line>
+          {% if merke.til_venstre %}
+            <text class="maanedstekst" text-anchor="end" x="{{ "%.1f"|format(merke.x - 3) }}" y="{{ graf.hoyde - 3 }}">{{ merke.navn }}</text>
+          {% else %}
+            <text class="maanedstekst" x="{{ "%.1f"|format(merke.x + 3) }}" y="{{ graf.hoyde - 3 }}">{{ merke.navn }}</text>
+          {% endif %}
+        {% endfor %}
+        {% if graf.ma50linje %}
+          <polyline class="ma50linje" points="{{ graf.ma50linje }}"></polyline>
+        {% endif %}
+        <polyline class="kurslinje" points="{{ graf.kurslinje }}"></polyline>
+        {% if graf.siste %}<circle class="sistepunkt" cx="{{ "%.1f"|format(graf.siste.x) }}" cy="{{ "%.1f"|format(graf.siste.y) }}" r="4.5"></circle>{% endif %}
+        {% if graf.kursnavn %}<text class="linjenavn kurs" text-anchor="end" x="{{ "%.1f"|format(graf.kursnavn.x) }}" y="{{ "%.1f"|format(graf.kursnavn.y) }}">Utbyttejustert kurs</text>{% endif %}
+        {% if graf.snittnavn %}<text class="linjenavn snitt" text-anchor="end" x="{{ "%.1f"|format(graf.snittnavn.x) }}" y="{{ "%.1f"|format(graf.snittnavn.y) }}">{{ parametre.ma_vindu }}-dagers snitt (sjekk 1)</text>{% endif %}
+      </svg>
+
+      <figcaption>
+        {{ graf.forste_dato|dato }} til {{ graf.siste_dato|dato }}.
+        Begge linjene er tegnet på utbyttejustert kurs, så de ligger på samme
+        skala. Sjekk 2 og 3 tegnes ikke — de står i kortene over.
+      </figcaption>
+    </figure>
+  {% else %}
+    <p class="mangler">For få kursdager til å tegne en graf.</p>
+  {% endif %}
+
   <p class="fotnote">Signalstyrken sier ikke om du bør kjøpe eller selge.</p>
 
   <p class="fotnote">
@@ -176,11 +249,12 @@
     finansielle hendelser er ikke med i denne versjonen.
   </p>
 
-  {#- grafen bare med grafen og snittet, ga og maalt_mot bare med tabellen
-      (gjennomgangen av 8.0b): ellers forklarer hjelpen noe siden ikke viser. #}
-  {#- Story 8.0c: hvert «?» staar ved det det forklarer. Grafen bare med
-      grafen og snittet, og Ga, Maalt mot og hver sjekk bare med tabellen. #}
-  {{ hjelpevindu("hjelp-kurs", "Sluttkurs", [("", ["sluttkurs", "utbyttejustert", "data_hentet_aksje"])]) }}
+  {#- grafen bare med grafen og snittet, ga og maalt_mot bare med sjekkene
+      (gjennomgangen av 8.0b): ellers forklarer hjelpen noe siden ikke viser.
+      Story 8.0d, PR 3: «data hentet» står i vinduet ved «Oppdatert». #}
+  {{ hjelpevindu("hjelp-hentet", "Oppdatert", [("", ["data_hentet_aksje"])]) }}
+  {{ hjelpevindu("hjelp-kurs", "Sluttkurs", [("", ["sluttkurs", "utbyttejustert"])]) }}
+  {{ hjelpevindu("hjelp-endring", "Endring", [("", ["endring", "utbyttejustert"])]) }}
   {% if vis_grafhjelp %}
     {{ hjelpevindu("hjelp-graf", "Kursgrafen", [("", ["grafen"])]) }}
   {% endif %}

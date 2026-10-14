@@ -135,7 +135,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "",
             "Klikk for å se sjekkene, tallene bak og kursgrafen.",
             ((INDEX_MAL, '<a href="/aksje/{{ rad.aksje.symbol }}">'),
-             (AKSJE_MAL, "<th>Målt mot"),
+             (AKSJE_MAL, '<p class="maalt">Målt mot'),
              (AKSJE_MAL, 'class="kurslinje"')),
         ),
         "sluttkurs": Hjelpetekst(
@@ -309,9 +309,9 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         ),
         "grafen": Hjelpetekst(
             "Kursgrafen:",
-            f"den heltrukne linja er utbyttejustert kurs, og den stiplede er "
+            f"den tykke blå linja er utbyttejustert kurs, og den tynne brune er "
             f"snittet av de siste {ma} børsdagene, som trendsjekken måler mot. "
-            f"Sjekk 2 og 3 står som tall i tabellen under.",
+            f"Navnet står ved enden av hver linje. Sjekk 2 og 3 står i kortene over.",
             ((AKSJE_MAL, "Sjekk 2 og 3 tegnes ikke"),
              (AKSJEDETALJ, "glidende_snitt(kurser, p.ma_vindu)")),
         ),
@@ -320,18 +320,18 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             f"det hver sjekk ga: +1 {POSITIV.lower()}, -1 {NEGATIV.lower()} eller "
             f"0 {INGEN_UTSLAG}.",
             ((PRD, "#### FR-706"),
-             (AKSJE_MAL, "<th class=\"fortegn\">Ga"),
+             (AKSJE_MAL, '<span class="ga">Ga'),
              (AKSJEDETALJ, 'INGEN_UTSLAG = "ingen utslag"')),
         ),
         "maalt_mot": Hjelpetekst(
             "Målt mot:",
             "tallet sjekken ble avgjort av, og hva det ble målt mot. "
-            "Sjekkene som slo ut, står med fet skrift og en strek til venstre.",
+            "Feltet under tallet viser hvor sjekken gir 0, og prikken er målingen.",
             ((PRD, "#### FR-706"),
              (PRD, "se hva hvert fortegn ble målt mot"),
-             (AKSJE_MAL, "<th>Målt mot"),
-             (AKSJE_MAL, "class=\"bidro\""),
-             (AKSJE_MAL, "tr.bidro td:first-child")),
+             (AKSJE_MAL, '<p class="maalt">Målt mot'),
+             (AKSJE_MAL, '<div class="skala" aria-hidden="true">'),
+             (AKSJEDETALJ, "def bygg_skala(")),
         ),
         "ikke_raad": Hjelpetekst(
             "",

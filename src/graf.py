@@ -47,6 +47,18 @@ class Maanedsmerke:
     til_venstre: bool = False
 
 
+# Story 8.0d, PR 3 (svar 19): navnene staar ved enden av linjene. Den
+# hoeyeste linja faar navnet over seg og den laveste under, og under denne
+# avstanden skyves de fra hverandre, saa de ikke ligger oppaa hverandre.
+NAVNEAVSTAND = 16
+
+
+@dataclass(frozen=True)
+class Navn:
+    x: float
+    y: float
+
+
 @dataclass(frozen=True)
 class Graf:
     bredde: int
@@ -59,6 +71,9 @@ class Graf:
     siste_dato: date
     rutenett: tuple[Rutelinje, ...]
     maanedsmerker: tuple[Maanedsmerke, ...] = ()
+    kursnavn: Navn | None = None
+    snittnavn: Navn | None = None
+    siste: Navn | None = None
 
     @property
     def har_ma50(self) -> bool:
@@ -142,6 +157,35 @@ def _maanedsmerker(punkter: tuple[Punkt, ...], bredde: int) -> tuple[Maanedsmerk
     return tuple(merker)
 
 
+def _siste(punkter: str) -> tuple[float, float] | None:
+    """Det siste punktet i en punktstreng, eller None naar den er tom."""
+    if not punkter:
+        return None
+    x, y = punkter.split()[-1].split(",")
+    return float(x), float(y)
+
+
+def _navnene(kurs: str, snitt: str, hoyde: int) -> tuple[Navn | None, Navn | None]:
+    """Hvor navnene paa kurslinja og snittet staar: ved enden av linja, over
+    den hoeyeste og under den laveste, innenfor tegneflaten."""
+    k, s = _siste(kurs), _siste(snitt)
+    if k is None:
+        return None, None
+    x = k[0]
+    if s is None:
+        return Navn(x, max(MARG_Y, k[1] - 8)), None
+    kurs_over = k[1] <= s[1]
+    oeverst, nederst = (k[1], s[1]) if kurs_over else (s[1], k[1])
+    over = oeverst - 8
+    under = max(nederst + 16, over + NAVNEAVSTAND)
+    if over < MARG_Y:
+        over, under = MARG_Y, max(under, MARG_Y + NAVNEAVSTAND)
+    if under > hoyde - 2:
+        under = hoyde - 2
+        over = min(over, under - NAVNEAVSTAND)
+    return (Navn(x, over), Navn(x, under)) if kurs_over else (Navn(x, under), Navn(x, over))
+
+
 def _rutenett(lav: float, hoy: float, hoyde: int, linjer: int = 3) -> tuple[Rutelinje, ...]:
     tegne_hoyde = hoyde - 2 * MARG_Y
     ut = []
@@ -164,12 +208,19 @@ def bygg_graf(
         return None
 
     lav, hoy = _spenn(punkter)
+    kurslinje = _koordinater(punkter, lambda p: p.kurs, lav, hoy, bredde, hoyde)
+    ma50linje = _koordinater(punkter, lambda p: p.ma50, lav, hoy, bredde, hoyde)
+    kursnavn, snittnavn = _navnene(kurslinje, ma50linje, hoyde)
+    siste = _siste(kurslinje)
 
     return Graf(
         bredde=bredde,
         hoyde=hoyde,
-        kurslinje=_koordinater(punkter, lambda p: p.kurs, lav, hoy, bredde, hoyde),
-        ma50linje=_koordinater(punkter, lambda p: p.ma50, lav, hoy, bredde, hoyde),
+        kurslinje=kurslinje,
+        ma50linje=ma50linje,
+        kursnavn=kursnavn,
+        snittnavn=snittnavn,
+        siste=Navn(*siste) if siste else None,
         lav=lav,
         hoy=hoy,
         forste_dato=punkter[0].dato,
