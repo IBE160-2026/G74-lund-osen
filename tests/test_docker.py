@@ -868,7 +868,7 @@ class TestReadmeForNybegynnere:
         assert "```" not in status and "~~~" not in status and "`" not in status
         assert not re.search(r"docker[ -]compose|uv run", status, re.IGNORECASE)
         for innhold in ("Under arbeid", "Flettet til main:", "hentingen", "Docker", "demoen", "README-en",
-                        "README-prøven", "kallene som er igjen", "hjelp bak «?»",
+                        "kallene som er igjen", "hjelp bak «?»",
                         "tydeligere merking", "utseendet fra designforslaget", "KI-laget", "Euronext",
                         "](_bmad-output/implementation-artifacts/sprint-status.yaml)"):
             assert innhold in status, innhold
@@ -879,11 +879,11 @@ class TestReadmeForNybegynnere:
         neste = neste.split("KI-laget", 1)[0]
         for sak in ("hentingen", "kallene som er igjen", "Docker", "demoen", "README-en",
                     "hjelp bak «?»", "tydeligere merking", "datoene og månedsmerkene i grafen",
-                    "oversikten fra designforslaget"):
+                    "oversikten fra designforslaget", "utseendet fra designforslaget"):
             assert sak in flettet, sak
-        # Story 8.0e PR 2: README-prøven tas etter at 8.0d er flettet
-        # (beslutningen 13.10 kl. 23:40).
-        for sak in ("utseendet fra designforslaget", "README-prøven", "periodene i kursgrafen"):
+        # Story 8.0d, PR 3 (svar 9 kl. 22:50): «Neste:» følger rekkefølgen
+        # etter 8.0d (gruppen 14.10 kl. 22:19 og 22:25).
+        for sak in ("sortering ved klikk i kolonneraden", "hovedindeksen", "Min liste", "periodene i kursgrafen"):
             assert sak in neste and sak not in flettet, sak
 
     def test_lenken_til_staar_du_fast_sier_lenger_ned(self):
