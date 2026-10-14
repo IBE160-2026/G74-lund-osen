@@ -71,6 +71,12 @@ Planen ble vist i chatten 14.10 kl. 17:16 og er ført kort i Utført-linja for d
 - Ticker og bransje med symbol under navnet (avvik 11).
 - **Mutantene:** kortet flyttet under tabellen; `aria-hidden` fjernet fra symbolene; musepekeren byttet til en pil; «?» i kolonneraden i blekk; fokus i kolonneraden i blekk; ringen på klikkflaten; `overflow-x` fjernet; sterk oransje ved 2 av 3; strek ved 1 av 3; markeringen borte fra overskriften; «data hentet» tilbake i linja under tittelen; to h1; små overskrifter i Newsreader.
 
+## PR 2b: antallet i overskriften
+
+*Lagt til 2026-10-14 (gruppen 14.10 kl. 21:04 og 21:06, instruksjonen kl. 21:08):* M i «N av M aksjer» er alle aksjene i lista, også de uten kurser, ikke bare radene i tabellen. Det gjelder overskriften, linja under den og «… av M aksjer ble vurdert». I demoen blir det «5 av 15 aksjer skilte seg ut fredag» og «Demo Børs · 09.10 · 15 aksjer». Aksjer uten kurser står fortsatt under tabellen som «Uten data i denne kilden», og båndene teller radene sine som før. Dette erstatter beslutningen i 8.0e (svar 3) om at M telles fra radene.
+
+Mutanten: M fra radene igjen.
+
 ## Boundaries & Constraints
 
 **Always:**

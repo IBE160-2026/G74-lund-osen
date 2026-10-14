@@ -2799,6 +2799,8 @@ Delen «Dine egne aksjer» kommer med 2.12 (svar 11).
 
 *Lagt til 2026-10-14:* PR 2 flettet i `cfc373e`, PR #38. Begge PR-ene er flettet, og 8.0e er ferdig.
 
+*Lagt til 2026-10-14 (gruppen 14.10 kl. 21:04 og 21:06):* M i «N av M aksjer» er alle aksjene i lista, også de uten kurser, ikke bare radene. Det gjelder overskriften, linja under den og «… av M aksjer ble vurdert». Dette erstatter «N og M telles fra radene» over for M. Bygges i 8.0d, PR 2b (spesifikasjonen for 8.0d).
+
 ### Story 8.0d: Utseendet fra designforslaget
 
 *Lagt til 2026-10-11, Marians beslutning kl. 12:13.*
