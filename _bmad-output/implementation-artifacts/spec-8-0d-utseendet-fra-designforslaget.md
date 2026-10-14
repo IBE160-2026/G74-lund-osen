@@ -135,6 +135,8 @@ Planen ble vist i chatten 14.10 kl. 17:16 og er ført kort i Utført-linja for d
 
 *Presisert 2026-10-14:* LICENSE.txt i zip-fila fra IBM har CRLF, og sha256 i tabellen gjelder den. Git lagrer OFL.txt med LF og samme tekst, sha256 `37784b44044a4ffd9256702b7c0982c37e5c8887ba90c6dca0479aea93dc898d`.
 
+*Lagt til 2026-10-14 (PR 2):* `newsreader/Newsreader72pt-Medium.woff`, fra `https://raw.githubusercontent.com/productiontype/Newsreader/cfcb4f7af0e52c25e8df2a2431814c8e5fe2e155/fonts/static/woff/Newsreader72pt-Medium.woff`, sha256 `1b37a7e21e1c729b8fa16c5de7da360da256afa5e5268d2716ea5f7f1f91ce42`. Hentet med curl 14.10 kl. 17:21, til sammenligningen i planen.
+
 - Newsreader har ingen utgivelser på GitHub. Filene er hentet fra repoet på siste commit, `cfcb4f7` fra 01.03.2021, og adressen er låst til den. Repoet har statiske WOFF-filer i tre optiske størrelser (6pt, 16pt og 72pt). 16pt er valgt, fordi overskriftene er fra 23 til 56 px.
 - **IBM Plex Sans har ingen `tnum`** i GSUB-tabellen. Sifrene 0–9 er like brede som standard (600 enheter i alle fire vektene), så tallene står likevel rett under hverandre. Newsreader har `tnum` og `pnum`, og sifrene er like brede (1140 og 1185). Testen krever like brede sifre i hver fil, og `tnum` i filene som har GSUB med `pnum`. `designregler.md` §1 sier «en test sjekker at filene vi bruker, har den». Det stemmer ikke for Plex, og del 5 sier det med dato.
 

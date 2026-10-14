@@ -20,6 +20,8 @@ SKRIFTFILENE = {
     "ibm-plex-sans/IBMPlexSans-Bold.woff": 700,
     "newsreader/Newsreader16pt-Medium.woff": 500,
     "newsreader/Newsreader16pt-SemiBold.woff": 600,
+    # Story 8.0d, PR 2: de store overskriftene (svar 1 på planen 14.10).
+    "newsreader/Newsreader72pt-Medium.woff": 500,
 }
 
 
