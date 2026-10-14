@@ -413,7 +413,9 @@ class TestSidene:
 
     def test_vinduet_passer_paa_en_telefon(self, klient, base):
         html = _side(klient, "/")
-        assert "width: min(32rem, calc(100vw - 2rem)); max-height: 80vh; overflow: auto;" in html
+        # Story 8.0d: hoeyst 440 px bred (utdraget §7), og aldri bredere enn
+        # skjermen minus 2rem.
+        assert "width: min(440px, calc(100vw - 2rem)); max-height: 80vh; overflow: auto;" in html
 
     def test_grafen_og_tabellen_forklares_bare_naar_de_vises(self, klient, base):
         """Gjennomgangen av 8.0b: VRDS har for kort serie til signal og
