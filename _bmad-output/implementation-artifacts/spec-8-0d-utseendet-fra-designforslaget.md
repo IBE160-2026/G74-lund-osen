@@ -2,7 +2,7 @@
 title: 'Story 8.0d: Utseendet fra designforslaget'
 type: 'feature'
 created: '2026-10-14'
-status: 'in-progress'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '9f8471341e466df1b34e9112882ec02bff710d3e'
@@ -147,6 +147,14 @@ Planen ble vist i chatten 14.10 kl. 17:16 og er ført kort i Utført-linja for d
 - Testen som forbød `url(` på sidene, tillater nå bare `/static/`. Testen for merket i malene ser nå i rammen. Fyllet i «3 av 3» er blekk (`#16181D`), ikke `#000000`, og testene fra 8.0e er rettet etter det.
 - Feilsiden for en demo.db som ikke kan leses, har ikke merket, fordi ingen kan si at basen er en demobase. Feilsiden for en demobase har merket i stripa (`test_feilsiden_har_eksempeltall_for_en_demobase`).
 
+**PR 2, 14.10 (grenen `8-0d-oversikten`, PR #40):** `5d8a728` svarene og fargene i spesifikasjonen, `27e9043` de daterte linjene i `designregler.md`, `1d18817` skriftfila Newsreader 72pt Medium, `d3411af` h1 på feilsiden, `c55e340` oversikten, `d8936c4` testene for oversikten, `61b6cb9` den skjulte teksten inne i tabellboksen, `9f0a010` rettingene fra gjennomgangen og `f6202a7` punktene i `deferred-work.md`.
+
+- Fargenavnene i rammen: `--gul` og `--lys-gul` er byttet med `--oransje` (`#F2B53A`) og `--lys-oransje` (`#F8DE9C`), `--hjelp` heter `--brun` fordi båndet bruker samme farge, og `--baand-ut` er `#FFF6DC` med `--baand-ut-kant`. Under kolonnenavnene står `--kolonne-tekst-2`.
+- Symbolene for bransjene ligger i `_bransjer.html`, ordrett fra utdraget §12.
+- Vinduet ved «Oppdatert» bruker hjelpeteksten `data_hentet`, med tittelen «Oppdatert:» (svar 5). `data_hentet_aksje` venter til PR 3.
+- Testparseren `_Tabell` i `test_app.py` legger linja under navnet, antallet og grensen i båndene og «NOK» i `ekstra`, så cellene er som før.
+- Målt i Edge 14.10: Edge uten vindu går ikke under 504 px, så 390 px ble målt i en iframe. Der var siden 409 px bred, fordi den skjulte teksten «skiller seg ut» er `position: absolute`. Rettet i `61b6cb9` med `position: relative` på boksen.
+
 ## Spec Change Log
 
 ## Review Triage Log
@@ -173,6 +181,31 @@ Gjennomgang av PR 1 (diffen `main...8-0d-grunnlag` på `a77a62a`, 14.10), med Bl
 | ECH1 | «Oppdatert» på aksjesiden er aksjens egen tid, ikke sidens eldste | avvist | aksjesiden viser én aksje, og tiden er dens egen, som linja «data hentet» der i dag |
 | ECH10 | Fokus på hjelpeknappen kommer bare fra rammen | avvist | alle sidene bruker rammen, og testen krever regelen på hver side |
 
+Gjennomgang av PR 2 (diffen `main...61b6cb9`, 14.10), med Blind Hunter (BH, 12 funn), Edge Case Hunter (ECH, 8) og Verification Gap (VG, 8 og to andre). Rettingene står i `9f0a010` og `f6202a7`.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH1 | Den hvite sirkelen og det oransje fokuset gjaldt hver `thead`, også den lyse på aksjesiden | high | patch: bare `.tabellboks thead`, og testen krever det |
+| BH3, BH11, ECH4 | Ord, antall og grense i båndene, og tidspunktet under navnet, sto uten mellomrom | medium | patch |
+| ECH6 | En tom bransje ga « · » under navnet | low | patch, uten egen test: kolonnen er `NOT NULL`, og alle aksjene har bransje |
+| BH12 | Overskriften hadde ikke blekk selv, så paret i kontrasttesten gjaldt en arvet farge | low | patch |
+| VG1, BH7 | Testene sjekket ikke at kortet står i rutenettet og tabellen i boksen | medium | patch: `_innhold()` |
+| VG2 | Hvilket som helst brudd for smal skjerm ble godtatt | medium | patch: minst 816 px |
+| VG3, BH6 | Ingen test for kolonneraden i blekk | medium | patch |
+| VG4 | Bare `--oransje` var festet | medium | patch: `test_fargene_fra_beslutningen` |
+| VG5 | Ingen test for at overskriften ikke er fet | medium | patch |
+| VG6 | Den skjulte teksten kunne skjules for skjermlesere | medium | patch |
+| VG7 | Ringen i regelen for blekk var ikke prøvd | medium | patch |
+| VG8 | h1 når demobasen er tom, var ikke prøvd | low | patch |
+| BH8, BH9, BH10 | Svakere sjekker etter omskrivingen: tidspunktet, «NOK» og grensene med en annen terskel | low | patch |
+| VG, andre | Docstringen om `#F2B53A`, og raden `<tr >` som regexen ikke traff | low | patch |
+| BH2, ECH1, ECH2, ECH3 | «Øvrige aksjer» sier «signalstyrke 0 eller 1» også når rader uten vurdering står der, og strekene forutsetter terskel 2 | medium | utsatt: `deferred-work.md`. Ordlyden er gruppens, og terskelen er 2 |
+| ECH8 | Aksjesiden viser tidspunktet to ganger | low | utsatt fra før: BH2 fra PR 1, PR 3 |
+| BH4 | Lys oransje mot hvitt er 1,3:1 | avvist | beslutning 12: teksten sier det samme (FR-103), og strekene trenger ikke 3:1 |
+| BH5 | Testen for 3:1 mot hvitt ble byttet med en fast fargeverdi | avvist | instruksjonen kl. 17:31 bytter den ut med grunnen. Ringen mot fyllet står i `KONTRAST` |
+| ECH5 | Boksen er et ekstra stopp for tastaturet når ingenting ruller | avvist | `tabindex="0"` på et område som ruller, er det som lar det rulles med tastaturet (WCAG 2.1.1) |
+| ECH7 | Markeringen står også ved «0 av 15 aksjer» | avvist | beslutning 12 sier markering under «N av M aksjer», og M teller alle radene (8.0e, svar 3) |
+
 ## Verification
 
 **Commands:**
@@ -189,3 +222,23 @@ Gjennomgang av PR 1 (diffen `main...8-0d-grunnlag` på `a77a62a`, 14.10), med Bl
 | D5 | gult fokus på lys bakgrunn | `tests/test_utseende.py::TestRammen::test_fokus_i_blekk_paa_lys_bakgrunn_og_lys_gul_i_stripa` |
 | D6 | ringen i `#F2B53A` | `tests/test_app.py::TestStory80c::test_den_gule_ringen_har_minst_3_til_1_mot_hvit` |
 | D7 | en lenke til `/min-liste` | `tests/test_utseende.py::TestRammen::test_hver_lenke_gaar_til_en_side_som_finnes` |
+
+**PR 2:** `uv run pytest -q`: før 1517 bestått og 16 hoppet over på main (`2e274d0`), etter 1532 og 16 på `9f0a010`.
+
+**Mutantene for PR 2** (14.10, på `9f0a010`), kjørt på samme måte. Mutant 8 i planen er byttet med E8a–E8c (instruksjonen kl. 17:31). Kjøringen ble stoppet av Claude Code etter E8c fordi maskinen hadde for lite minne. E9–E11 er ikke kjørt, og fila ble satt tilbake fra kopien.
+
+| # | Mutant | Fanget av |
+|---|---|---|
+| E1 | kortet flyttet under tabellen | `tests/test_utseende.py::TestOversikten::test_kortet_slik_leser_staar_ved_siden_av_overskriften` |
+| E2 | `aria-hidden` fjernet fra symbolene | `tests/test_app.py::TestStory80eTekst::test_slik_leser_du_tabellen_har_3_punkter` |
+| E3 | musepekeren byttet til en pil | `tests/test_utseende.py::TestOversikten::test_symbolene_i_kortet_er_skjult_og_ingen_pil_ved_navnet` |
+| E4 | «?» i kolonneraden i blekk | `tests/test_utseende.py::TestOversikten::test_hjelpeknappen_er_hvit_paa_blekk_med_oransje_fokus` |
+| E5 | fokus i kolonneraden i blekk | `tests/test_utseende.py::TestOversikten::test_hjelpeknappen_er_hvit_paa_blekk_med_oransje_fokus` |
+| E6 | ringen på klikkflaten | `tests/test_utseende.py::TestOversikten::test_fokusringen_staar_rundt_sirkelen` |
+| E7 | `overflow-x` fjernet | `tests/test_utseende.py::TestOversikten::test_tabellen_ruller_i_sin_egen_boks` |
+| E8a | sterk oransje ved 2 av 3 | `tests/test_app.py::TestStory80c::test_to_av_tre_merkes_med_mer_enn_lys_bakgrunn` |
+| E8b | strek ved 1 av 3 | `tests/test_app.py::TestStory80c::test_bare_radene_over_terskelen_er_merket` |
+| E8c | markeringen borte fra overskriften | `tests/test_app.py::TestStory80eTekst::test_overskriften_teller_fra_radene` |
+| E9 | «data hentet» tilbake under tittelen | ikke kjørt |
+| E10 | to h1 | ikke kjørt |
+| E11 | små overskrifter i Newsreader | ikke kjørt |
