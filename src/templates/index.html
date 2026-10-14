@@ -1,3 +1,4 @@
+{% extends "_ramme.html" %}
 {% from "_hjelp.html" import hjelpestil, hjelpeknapp, hjelpevindu with context -%}
 {% macro tabellrad(rad) %}
           <tr {% if rad.skiller_seg_ut %}class="utslag"{% endif %}>
@@ -30,29 +31,7 @@
             </td>
           </tr>
 {% endmacro -%}
-<!DOCTYPE html>
-<html lang="no">
-<head>
-  <meta charset="utf-8">
-  <title>OSE Signal</title>
-  <style>
-    :root {
-      --tekst: #1a1a1a;
-      --dempet: #666;
-      --strek: #e0e0e0;
-      --opp: #0a7d32;
-      --ned: #b3261e;
-      --blandet: #8a5a00;
-      --gul: #a67c00;
-      --fyll: #000000;
-    }
-    body {
-      font-family: system-ui, sans-serif;
-      margin: 2rem auto;
-      max-width: 54rem;
-      padding: 0 1rem;
-      color: var(--tekst);
-    }
+{% block stil %}
     h1 { font-size: 1.4rem; margin-bottom: 0.2rem; }
     p.meta { color: var(--dempet); font-size: 0.9rem; margin-top: 0; }
     table { border-collapse: collapse; width: 100%; }
@@ -68,7 +47,7 @@
     td.selskap { font-weight: 500; }
     /* Story 8.0: navnet ser ut som en lenke, og fokus synes. */
     td.selskap a { color: inherit; text-decoration: underline; }
-    td.selskap a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+    td.selskap a:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
     td.selskap .hentet { display: block; font-weight: normal; color: var(--dempet); font-size: 0.8rem; }
 
     /* FR-103: tekst, symbol og farge samtidig. Teksten baerer alene hvis
@@ -109,21 +88,8 @@
     .mangler { color: var(--dempet); font-style: italic; font-size: 0.85rem; }
     .merke.mangler { font-weight: normal; }
     p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
-    p.under-arbeid { color: #666; font-size: 0.8rem; margin-top: 2rem; }
-    .eksempeltall {
-      background: #fff3cd;
-      border: 1px solid #c9a227;
-      padding: 0.5rem 1rem;
-      font-weight: bold;
-    }
-    /* Story 8.0b: hjelpen bak «?». */
-    {{ hjelpestil() }}
-  </style>
-</head>
-<body>
-  {% if eksempeltall %}
-  <p class="eksempeltall">Demoversjon. {{ eksempeltall_merke }}</p>
-  {% endif %}
+{% endblock %}
+{% block innhold %}
   <h1>OSE Signal</h1>
 
   {% if rader %}
@@ -247,8 +213,4 @@
       {{ hjelpevindu("hjelp-hentet", "Data hentet", [("", ["data_hentet", "uten_data"])]) }}
     {% endif %}
   {% endif %}
-  {% if under_arbeid %}
-  <p class="under-arbeid">{{ under_arbeid }}</p>
-  {% endif %}
-</body>
-</html>
+{% endblock %}

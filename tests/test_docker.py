@@ -746,11 +746,13 @@ class TestReadmeForNybegynnere:
 
         sitert = _steg("Demoen", 6).split("Øverst står «", 1)[1].split("»", 1)[0]
         assert sitert == app_modul.EKSEMPELTALL_MERKE
+        # Story 8.0d: merket staar i rammen, som alle tre malene bruker.
+        ramme = (ROT / "src" / "templates" / "_ramme.html").read_text(encoding="utf-8")
+        assert re.findall(r'<p class="eksempeltall">([^<]+)</p>', ramme) == [
+            "Demoversjon. {{ eksempeltall_merke }}"]
         for mal in ("index.html", "aksje.html", "basefeil.html"):
             tekst = (ROT / "src" / "templates" / mal).read_text(encoding="utf-8")
-            treff = re.search(r'<p class="eksempeltall">([^<]+)</p>', tekst)
-            assert treff, f"{mal} har ikke merket"
-            assert treff.group(1) == "Demoversjon. {{ eksempeltall_merke }}", mal
+            assert tekst.startswith('{% extends "_ramme.html" %}'), mal
 
     def test_linja_som_viser_at_appen_er_klar(self):
         """Linja er kopiert fra en kjoering 11.10. Ville feilet hvis porten i

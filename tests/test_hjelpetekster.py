@@ -384,7 +384,11 @@ class TestSidene:
             html = _side(klient, adresse)
             assert "<script" not in html.lower(), adresse
             assert not re.search(r'(src|href)\s*=\s*"(https?:)?//', html), adresse
-            assert "url(" not in html and "@import" not in html, adresse
+            # Story 8.0d: skriften ligger i appen, saa url( er lov bare til
+            # /static/ (designregler §1).
+            adresser = re.findall(r"""url\(\s*["']?([^"')]+)""", html)
+            assert all(u.startswith("/static/") for u in adresser), adresse
+            assert "@import" not in html, adresse
 
     def test_hver_knapp_aapner_et_vindu_paa_samme_side(self, klient, base):
         """Ville feilet hvis knappen pekte paa et id som ikke finnes, og

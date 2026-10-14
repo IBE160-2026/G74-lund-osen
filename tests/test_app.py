@@ -1726,7 +1726,8 @@ class TestStory80e:
         fyll = _regel(stil, ".pille.tre-av-tre")
         assert "var(--gul)" in fyll and "background: var(--fyll)" in fyll
         assert "color: #ffffff" in fyll
-        assert re.search(r"--fyll:\s*#000000", stil)
+        # Story 8.0d: fyllet er blekk (designregler §5), ikke rent svart.
+        assert re.search(r"--fyll:\s*#16181D", stil)
         assert "background" not in _regel(stil, ".pille")
         assert '<span class="pille tre-av-tre">3 av 3</span>' in html
         assert '<span class="pille">2 av 3</span>' in html
