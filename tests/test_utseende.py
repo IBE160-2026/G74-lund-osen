@@ -305,3 +305,173 @@ class TestRammen:
         assert '"Newsreader"' in _regel(stil, ".hjelpevindu h2")
         for navn in ("oversikten", "oversikten i demoen"):
             assert '<span class="hjelpemerke">Hjelp</span>' in sidene[navn], navn
+
+
+def _synlig(html: str) -> str:
+    html = re.sub(r"<style>.*?</style>", "", html, flags=re.DOTALL)
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html))
+
+
+class TestOversikten:
+    """Story 8.0d, PR 2: oversikten fra designforslaget (spesifikasjonen,
+    beslutning 11-17, og designregler del 5)."""
+
+    OVERSIKTENE = ("oversikten", "oversikten i demoen")
+
+    def test_kortet_slik_leser_staar_ved_siden_av_overskriften(self, sidene):
+        """Beslutning 11: kortet til høyre for overskriften og innledningen,
+        og under dem på smal skjerm. Ville feilet med kortet under tabellen."""
+        stil = _stil(sidene["oversikten"])
+        assert "390px" in _regel(stil, ".topp-del")
+        assert re.search(r"@media \(max-width: \d+px\) \{ \.topp-del \{ grid-template-columns: minmax\(0, 1fr\);", stil)
+        assert "border-radius: 16px" in _regel(stil, "section.slik-leser")
+        for navn in self.OVERSIKTENE:
+            html = sidene[navn]
+            topp = html.index('<div class="topp-del">')
+            assert (topp < html.index("<h1") < html.index('class="innledning"')
+                    < html.index('<section class="slik-leser"') < html.index('<div class="tabellboks"')), navn
+            # Kortet står i rutenettet, ikke etter det.
+            assert html.index('<section class="slik-leser"') < html.index("</section>") < html.index('<div class="tabellboks"')
+
+    def test_symbolene_i_kortet_er_skjult_og_ingen_pil_ved_navnet(self, sidene):
+        """Beslutning 11: en grønn brikke med T +1, de tre retningssymbolene og
+        en musepeker, alle aria-hidden. Ville feilet uten aria-hidden, eller
+        med en pil ved navnet (pilene er bare for retning, FR-103)."""
+        html = sidene["oversikten"]
+        kortet = html.split('<section class="slik-leser"', 1)[1].split("</section>", 1)[0]
+        felt = re.findall(r'<span class="symbolfelt"([^>]*)>(.*?)</span><span><strong>', kortet, re.DOTALL)
+        assert len(felt) == 3
+        for attributter, _ in felt:
+            assert 'aria-hidden="true"' in attributter
+        brikke, retning, peker = (innhold for _, innhold in felt)
+        assert '<span class="brikke">T +1</span>' in brikke
+        assert "var(--opp)" in _regel(_stil(html), ".symbolfelt .brikke")
+        assert [s for s in "↑↔↓" if s in retning] == list("↑↔↓")
+        assert '<svg class="peker"' in peker
+        assert not re.search("[←→↑↓↔↗↘↖↙›»]", peker), peker
+
+    def test_hjelpeknappen_er_hvit_paa_blekk_med_oransje_fokus(self, sidene):
+        """«?» i stripa og kolonneraden er en hvit sirkel med blekk «?», og
+        fokus er oransje som i stripa. Ville feilet med en sort sirkel på
+        blekk, eller fokus i blekk på blekk."""
+        stil = _stil(sidene["oversikten"])
+        farger = _farger(stil)
+        blekk = _regel(stil, "header.stripe button.hjelpeknapp, thead button.hjelpeknapp")
+        sirkel = re.search(r"radial-gradient\(circle, var\(--([a-z-]+)\) 10\.5px", blekk).group(1)
+        tegn = re.search(r"(?<!-)color: var\(--([a-z-]+)\)", blekk).group(1)
+        assert _kontrast(farger[sirkel], farger["blekk"]) >= 3.0, sirkel
+        assert _kontrast(farger[tegn], farger[sirkel]) >= 4.5, (tegn, sirkel)
+        fokus = _regel(stil, "header.stripe button.hjelpeknapp:focus-visible, thead button.hjelpeknapp:focus-visible")
+        ring = re.findall(r"var\(--([a-z-]+)\) 1[3-6](?:\.5)?px", fokus)
+        assert ring and all(_kontrast(farger[f], farger["blekk"]) >= 3.0 for f in ring), ring
+        assert "thead" in sidene["oversikten"].split('<table>', 1)[1][:20] or "<thead>" in sidene["oversikten"]
+        stripa = _stripa(sidene["oversikten"])
+        assert 'popovertarget="hjelp-hentet"' in stripa
+
+    def test_fokusringen_staar_rundt_sirkelen(self, sidene):
+        """Ringen fulgte klikkflaten på 44 px og dekket en del av «Selskap».
+        Nå står den 2 px utenfor sirkelen på 22 px og er 3 px bred. Ville
+        feilet med vanlig outline på knappen."""
+        stil = _stil(sidene["oversikten"])
+        fokus = _regel(stil, "button.hjelpeknapp:focus-visible")
+        assert "outline: none" in fokus
+        stopp = [float(x) for x in re.findall(r"([\d.]+)px", fokus)]
+        assert stopp[0] == 10.5 and max(stopp) <= 17, stopp
+        assert "var(--blekk) 13.5px, var(--blekk) 16px" in fokus
+        assert re.search(r"@media \(forced-colors: active\) \{\s*button\.hjelpeknapp:focus-visible \{ outline: 3px solid; \}", stil)
+
+    def test_tabellen_ruller_i_sin_egen_boks(self, sidene):
+        """Avvik 8: ved 390 px ruller tabellen i en boks, ikke siden. Ville
+        feilet uten overflow-x."""
+        for navn in self.OVERSIKTENE:
+            html = sidene[navn]
+            assert "overflow-x: auto" in _regel(_stil(html), ".tabellboks"), navn
+            boks = html.index('<div class="tabellboks" role="region" aria-label="Aksjene" tabindex="0">')
+            assert boks < html.index("<table>") < html.index("</table>") < html.index("</div>", html.index("</table>"))
+
+    def test_strekene_og_ringen_i_oransje_bare_ved_2_og_3_av_3(self, sidene):
+        """Designregler §3 (14.10): sterk oransje ved 3 av 3, lys oransje ved
+        2 av 3, og ingen strek ved 1 og 0. Ville feilet med sterk oransje ved
+        2 av 3, eller strek ved 1 av 3."""
+        stil = _stil(sidene["oversikten i demoen"])
+        assert "inset 4px 0 0 var(--oransje)" in _regel(stil, "tr.utslag.alle td:first-child")
+        assert "inset 4px 0 0 var(--lys-oransje)" in _regel(stil, "tr.utslag td:first-child")
+        assert len(re.findall(r"inset 4px", stil)) == 2
+        for rad in re.findall(r"<tr( class=\"[^\"]*\")?>\s*<td class=\"selskap\">(.*?)</tr>", sidene["oversikten i demoen"], re.DOTALL):
+            klasse, innhold = rad
+            styrke = re.search(r"(\d) av 3</span>", innhold)
+            if not styrke:
+                continue
+            forventet = {"3": ' class="utslag alle"', "2": ' class="utslag"'}.get(styrke.group(1), "")
+            assert klasse == forventet, (styrke.group(1), klasse)
+
+    def test_markeringen_under_tallene_i_overskriften(self, sidene):
+        """Designregler §4 (14.10): lys oransje markering fra 60 % av høyden
+        under «N av M aksjer», uten fet skrift. Ville feilet uten markeringen.
+        Oversikten uten demoen har ingen vurdering i fixturen og heter
+        «Markedsoversikt» (test_en_h1_paa_hver_side_og_ikke_i_stripa)."""
+        h1 = re.search(r"<h1[^>]*>(.*?)</h1>", sidene["oversikten i demoen"], re.DOTALL).group(1)
+        assert re.fullmatch(r"<mark>\d+ av \d+ aksjer</mark> skilte seg ut [a-zø]+", h1.strip()), h1
+        assert "<strong>" not in h1
+        stil = _stil(sidene["oversikten"])
+        assert "linear-gradient(transparent 60%, var(--lys-oransje) 60%)" in _regel(stil, "h1.overskrift mark")
+        assert '"Newsreader 72"' in _regel(stil, "h1.overskrift")
+
+    def test_tidspunktet_staar_en_gang(self, sidene):
+        """BH2 og svar 5: «Oppdatert …» i stripa, og ikke «data hentet» under
+        overskriften. Ville feilet med tidspunktet to ganger."""
+        for navn in self.OVERSIKTENE:
+            html = sidene[navn]
+            tid = re.search(r"Oppdatert [a-zø]+ (\d\d\.\d\d kl\. \d\d\.\d\d)", _stripa(html)).group(1)
+            assert _synlig(html).count(tid) == 1, navn
+            assert "data hentet" not in html, navn
+            assert re.search(r'<div id="hjelp-hentet" class="hjelpevindu" popover>.*?<h2>Oppdatert</h2>', html, re.DOTALL)
+
+    def test_en_h1_paa_hver_side_og_ikke_i_stripa(self, sidene):
+        """BH7 og svar 3: «OSE Signal» er logoen i stripa og ikke en
+        overskrift. Ville feilet med to h1."""
+        for navn, html in sidene.items():
+            assert html.count("<h1") == 1, navn
+            assert "<h1" not in _stripa(html), navn
+        assert "<h1>Siden kan ikke vises</h1>" in sidene["feilsiden"]
+        assert '<h1 class="overskrift">Markedsoversikt</h1>' in sidene["tom base"]
+
+    def test_de_smaa_overskriftene_er_i_plex(self, sidene):
+        """Utdraget §3: «Slik leser du tabellen» i IBM Plex Sans 12,5 px og 700,
+        ikke Newsreader fra regelen for h2 i rammen."""
+        regel = _regel(_stil(sidene["oversikten"]), "section.slik-leser h2")
+        assert '"IBM Plex Sans"' in regel and "Newsreader" not in regel
+        assert "font-size: 12.5px" in regel and "font-weight: 700" in regel and "uppercase" in regel
+
+    def test_baandene_med_antallet_og_grensen_fra_parametre(self, sidene):
+        """Designregler del 5 (14.10): antallet i en pille og grensen etter,
+        med tallene fra Parametre. Merket «skiller seg ut» er skjult for
+        synet, men står i cellen (svar 4)."""
+        from signalberegning import Parametre
+        terskel = Parametre().terskel
+        html = sidene["oversikten i demoen"]
+        ut = re.search(r'<tr class="del ut"><th[^>]*>Skilte seg ut<span class="antall">(\d+)</span>'
+                       r'<span class="bak">([^<]+)</span>', html)
+        assert ut and ut.group(2) == f"signalstyrke {terskel} eller mer"
+        assert int(ut.group(1)) == html.count('<span class="merke skjult">skiller seg ut</span>')
+        oevrige = re.search(r'<tr class="del oevrige"><th[^>]*>Øvrige aksjer<span class="antall">\d+</span>'
+                            r'<span class="bak">([^<]+)</span>', html)
+        assert oevrige and oevrige.group(1) == "signalstyrke 0 eller 1"
+        stil = _stil(html)
+        assert "var(--brun)" in _regel(stil, "tr.del.ut .antall")
+        assert "clip-path: inset(50%)" in _regel(stil, ".merke.skjult")
+
+    def test_ticker_og_bransje_med_symbol_under_navnet(self, sidene):
+        """Avvik 11 og utdraget §12: ticker og bransje under navnet, med
+        symbolet for hver bransje i lista og i demoen."""
+        from demo import DEMOUNIVERS
+        from kursdata import AKSJEUNIVERS
+        mal = (Path(__file__).resolve().parent.parent / "src" / "templates" / "_bransjer.html").read_text(encoding="utf-8")
+        symboler = set(re.findall(r"^  '([^']+)': '", mal, re.M))
+        assert len(symboler) == 13
+        assert {a.sektor for a in AKSJEUNIVERS} | {a.sektor for a in DEMOUNIVERS} <= symboler
+        html = sidene["oversikten"]
+        assert re.search(r'<span class="linje">EQNR · <svg class="bransjesymbol"[^>]*aria-hidden="true"[^>]*>.*?</svg>Energi</span>',
+                         html, re.DOTALL)
+        assert '<span class="under">NOK</span>' in html
+        assert html.count('class="under"') == 1
