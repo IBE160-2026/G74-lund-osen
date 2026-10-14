@@ -77,8 +77,9 @@
     .symbolfelt svg { width: 18px; height: 18px; }
 
     /* Tabellen i et kort med svart topp. Boksen ruller sidelengs på smal
-       skjerm, så siden ikke gjør det (avvik 8). */
-    .tabellboks { overflow-x: auto; background: var(--kort); border: 1px solid var(--strek);
+       skjerm, så siden ikke gjør det (avvik 8). position: relative holder
+       også den skjulte teksten i cellene inne i boksen. */
+    .tabellboks { position: relative; overflow-x: auto; background: var(--kort); border: 1px solid var(--strek);
                   border-top-color: var(--blekk); border-radius: 16px;
                   box-shadow: 0 1px 2px rgba(22, 24, 29, 0.04), 0 10px 28px rgba(22, 24, 29, 0.05); }
     table { border-collapse: collapse; width: 100%; min-width: 600px; }

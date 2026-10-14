@@ -385,7 +385,11 @@ class TestOversikten:
         feilet uten overflow-x."""
         for navn in self.OVERSIKTENE:
             html = sidene[navn]
-            assert "overflow-x: auto" in _regel(_stil(html), ".tabellboks"), navn
+            boksen = _regel(_stil(html), ".tabellboks")
+            assert "overflow-x: auto" in boksen, navn
+            # Den skjulte teksten «skiller seg ut» er position: absolute. Uten
+            # en posisjonert boks rundt gjorde den siden 409 px bred ved 390.
+            assert "position: relative" in boksen, navn
             boks = html.index('<div class="tabellboks" role="region" aria-label="Aksjene" tabindex="0">')
             assert boks < html.index("<table>") < html.index("</table>") < html.index("</div>", html.index("</table>"))
 
