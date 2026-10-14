@@ -112,3 +112,169 @@ class TestSkriftfilene:
     def test_bare_filene_som_brukes(self):
         filer = {p.relative_to(FONTS).as_posix() for p in FONTS.rglob("*") if p.is_file()}
         assert filer == set(SKRIFTFILENE) | {"ibm-plex-sans/OFL.txt", "newsreader/OFL.txt"}
+
+
+# Sidene i alle tilstandene: den ekte versjonen med og uten kurser, demoen
+# og feilsiden (FR-411, designregler §5). Fixturene er demotestenes.
+import re  # noqa: E402
+
+import app as app_modul  # noqa: E402
+from lagring_sqlite import demo_sti  # noqa: E402
+from test_app import _regel, _stil, monter, serie, snapshot  # noqa: E402
+from test_demo import demobase, fast_klokke, klient, mal  # noqa: E402,F401
+
+# Fargene i designregler §5 som maa holde kontrasten: forgrunn, bakgrunn og
+# minste forhold. 4,5 for tekst og 3 for streker, ringen og fokus.
+KONTRAST = [
+    ("blekk", "bakgrunn", 4.5), ("blekk", "kort", 4.5),
+    ("tekst", "bakgrunn", 4.5), ("tekst", "kort", 4.5),
+    ("dempet", "bakgrunn", 4.5), ("dempet", "kort", 4.5), ("dempet-2", "kort", 4.5),
+    ("opp", "kort", 4.5), ("opp", "opp-bakgrunn", 4.5),
+    ("ned", "kort", 4.5), ("ned", "ned-bakgrunn", 4.5),
+    ("blandet", "blandet-bakgrunn", 4.5), ("dempet", "ingen-bakgrunn", 4.5),
+    ("blekk", "baand-ut", 4.5), ("tekst", "baand-oevrige", 4.5),
+    ("hjelp", "hjelp-bakgrunn", 4.5), ("kurs", "kort", 4.5), ("snitt", "kort", 4.5),
+    ("stripe-tekst", "blekk", 4.5), ("stripe-tekst-2", "blekk", 4.5),
+    ("kort", "fyll", 4.5),
+    ("gul", "kort", 3.0), ("gul", "bakgrunn", 3.0), ("gul", "fyll", 3.0),
+    ("lys-gul", "blekk", 3.0),
+]
+
+
+def _farger(stil: str) -> dict[str, str]:
+    return dict(re.findall(r"--([a-z0-9-]+):\s*#([0-9a-fA-F]{6})", _regel(stil, ":root")))
+
+
+def _stripa(html: str) -> str:
+    return html.split('<header class="stripe">', 1)[1].split("</header>", 1)[0]
+
+
+def _kontrast(a: str, b: str) -> float:
+    def lys(farge):
+        def lin(c):
+            c = c / 255
+            return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+        r, g, b_ = (int(farge[i:i + 2], 16) for i in (0, 2, 4))
+        return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b_)
+    hoey, lav = sorted((lys(a), lys(b)), reverse=True)
+    return (hoey + 0.05) / (lav + 0.05)
+
+
+@pytest.fixture
+def sidene(klient, monkeypatch, demobase):
+    """Hver side som finnes, i hver tilstand: {navn: html}."""
+    sider = {"tom base": klient.get("/").data.decode("utf-8")}
+    monter(monkeypatch, snapshot({
+        "EQNR": serie([100.0] * 60 + [104.0], [1000] * 60 + [5000]),
+        "DNB": serie([100.0] * 61),
+    }))
+    sider["oversikten"] = klient.get("/").data.decode("utf-8")
+    sider["aksjesiden"] = klient.get("/aksje/EQNR").data.decode("utf-8")
+    monkeypatch.setenv(app_modul.I_DEMO, "1")
+    sider["oversikten i demoen"] = klient.get("/").data.decode("utf-8")
+    sider["aksjesiden i demoen"] = klient.get("/aksje/BRFE").data.decode("utf-8")
+    demo_sti().write_bytes(b"ikke en sqlite-base" * 10)
+    svar = klient.get("/")
+    assert svar.status_code == 503
+    sider["feilsiden"] = svar.data.decode("utf-8")
+    return sider
+
+
+class TestRammen:
+    """Designregler §5: samme ramme på alle sidene, også i demoen."""
+
+    def test_kontrasten_regnet_fra_fargene_i_stilen(self, sidene):
+        """Ville feilet hvis blekk ble byttet til en lys farge, eller ringen
+        fikk tavlas #F2B53A (1,83:1 mot hvitt)."""
+        for navn, html in sidene.items():
+            farger = _farger(_stil(html))
+            for forgrunn, bakgrunn, minst in KONTRAST:
+                forhold = _kontrast(farger[forgrunn], farger[bakgrunn])
+                assert forhold >= minst, (navn, forgrunn, bakgrunn, round(forhold, 2))
+
+    def test_ingen_farge_skrevet_fast_i_en_side(self, sidene):
+        """Fargene står som navn i rammen, og sidene bruker navnene."""
+        for navn, html in sidene.items():
+            stil = _stil(html)
+            utenom_rot = stil.replace(_regel(stil, ":root"), "")
+            fast = {f.upper() for f in re.findall(r"#[0-9a-fA-F]{6}\b", utenom_rot)} - {"#FFFFFF"}
+            assert not fast, (navn, fast)
+
+    def test_ingenting_fra_nettet(self, sidene):
+        """Ville feilet med skrift eller stil fra Google Fonts, et skript,
+        eller en adresse med http."""
+        for navn, html in sidene.items():
+            assert "<script" not in html.lower(), navn
+            assert "@import" not in html, navn
+            assert not re.search(r"https?:|//[a-z]", _stil(html)), navn
+            for verdi in re.findall(r'(?:src|href)="([^"]*)"', html):
+                assert not re.match(r"(https?:)?//", verdi), (navn, verdi)
+            for adresse in re.findall(r"""url\(\s*["']?([^"')]+)""", html):
+                assert adresse.startswith("/static/fonts/"), (navn, adresse)
+
+    def test_skriften_er_den_i_appen(self, sidene):
+        for navn, html in sidene.items():
+            stil = _stil(html)
+            assert '"IBM Plex Sans"' in _regel(stil, "body"), navn
+            assert '"Newsreader"' in _regel(stil, "h1, h2"), navn
+            for fil in SKRIFTFILENE:
+                assert f'url("/static/fonts/{fil}")' in stil, (navn, fil)
+
+    def test_hver_lenke_gaar_til_en_side_som_finnes(self, sidene):
+        """Ville feilet med en lenke til /min-liste før 8.3."""
+        for navn, html in sidene.items():
+            for href in re.findall(r'href="([^"]*)"', html):
+                assert href == "/" or re.fullmatch(r"/aksje/[A-Z0-9]+", href), (navn, href)
+
+    def test_tabelltall_i_tallcellene(self, sidene):
+        """Ville feilet hvis tabular-nums ble fjernet fra tallcellene."""
+        oversikt = _stil(sidene["oversikten"])
+        for velger in ("td.tall", ".styrke"):
+            assert "tabular-nums" in _regel(oversikt, velger), velger
+        aksje = _stil(sidene["aksjesiden"])
+        for velger in (".noekkeltall .verdi", "td.fortegn", ".regnestykke"):
+            assert "tabular-nums" in _regel(aksje, velger), velger
+
+    def test_fokus_i_blekk_paa_lys_bakgrunn_og_lys_gul_i_stripa(self, sidene):
+        """Ville feilet med gult fokus på lys bakgrunn (1,64:1)."""
+        for navn, html in sidene.items():
+            stil = _stil(html)
+            assert "outline: 3px solid var(--blekk)" in _regel(stil, "*:focus-visible"), navn
+            assert "var(--lys-gul)" in _regel(stil, "header.stripe *:focus-visible"), navn
+            for velger, regel in re.findall(r"([^{}]*focus-visible[^{}]*)\{([^}]*)\}", stil):
+                if "stripe" not in velger:
+                    assert "gul" not in regel and "currentColor" not in regel, (navn, velger)
+
+    def test_stripa_og_bunnlinja_paa_alle_sidene(self, sidene):
+        for navn, html in sidene.items():
+            stripe = _stripa(html)
+            assert "OSE Signal" in stripe and 'aria-hidden="true"' in stripe, navn
+            assert (html.index("</header>") < html.index("<main>")
+                    < html.index('<footer class="bunnlinje">')), navn
+        assert "Oppdatert " in _stripa(sidene["oversikten"])
+        assert "Oppdatert " not in _stripa(sidene["tom base"])
+
+    def test_merket_staar_i_stripa_i_demoen(self, sidene):
+        """FR-411 og svar 3: hele merket som egen rad i stripa, uten det gule
+        banneret. Ville feilet hvis merket ble borte fra stripa."""
+        merket = f'<p class="eksempeltall">Demoversjon. {app_modul.EKSEMPELTALL_MERKE}</p>'
+        # Feilsiden her har en demo.db som ikke kan leses, og ingen kan si at
+        # den er en demobase. Feilsiden for en demobase har merket
+        # (test_demo.py, test_feilsiden_har_eksempeltall_for_en_demobase).
+        for navn in ("oversikten i demoen", "aksjesiden i demoen"):
+            assert merket in _stripa(sidene[navn]), navn
+        for navn in ("oversikten", "aksjesiden", "tom base"):
+            assert "eksempeltall" not in _stripa(sidene[navn]), navn
+        for html in sidene.values():
+            assert "#fff3cd" not in html.lower() and "#c9a227" not in html.lower()
+
+    def test_hjelpeknappen_og_vinduet(self, sidene):
+        """Utdraget §7: svart sirkel på 22 px i en klikkflate på 44 px, og
+        vinduet med merket «Hjelp» og tittelen i Newsreader."""
+        stil = _stil(sidene["oversikten"])
+        knapp = _regel(stil, "button.hjelpeknapp")
+        assert "width: 44px; height: 44px" in knapp
+        assert "radial-gradient(circle, var(--blekk) 10.5px" in knapp
+        assert '"Newsreader"' in _regel(stil, ".hjelpevindu h2")
+        for navn in ("oversikten", "oversikten i demoen"):
+            assert '<span class="hjelpemerke">Hjelp</span>' in sidene[navn], navn
