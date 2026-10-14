@@ -1,6 +1,7 @@
 {% extends "_ramme.html" %}
 {% from "_hjelp.html" import hjelpeknapp, hjelpevindu with context -%}
 {% from "_bransjer.html" import bransjesymbol -%}
+{% from "_brikker.html" import brikker, retningspille -%}
 {% macro tabellrad(rad) %}
           {#- Story 8.0d, PR 2: strek til venstre i sterk oransje ved 3 av 3 og
               i lys oransje ved 2 av 3, og ingen ved 1 og 0 (designregler §3,
@@ -25,8 +26,12 @@
 
             <td class="tall styrke">
               {% if rad.styrke is not none %}
-                <span class="pille{% if rad.styrke == antall_sjekker %} tre-av-tre{% endif %}">{{ rad.styrke }} av {{ antall_sjekker }}</span>
-                <span class="sjekker">{% for bokstav, navn, verdi in rad.sjekker %}<span class="sjekk"><abbr title="{{ navn }}">{{ bokstav }}</abbr> {{ verdi }}</span>{% if not loop.last %} {% endif %}{% endfor %}</span>
+                {#- Story 8.0d, PR 3: hvit pille ved 2 av 3 (gruppen 14.10 kl.
+                    19:59), og tekst uten pille ved 1 og 0 (utdraget §6). #}
+                {% if rad.styrke == antall_sjekker %}<span class="pille tre-av-tre">{{ rad.styrke }} av {{ antall_sjekker }}</span>
+                {%- elif rad.skiller_seg_ut %}<span class="pille to-av-tre">{{ rad.styrke }} av {{ antall_sjekker }}</span>
+                {%- else %}<span class="styrketall">{{ rad.styrke }} av {{ antall_sjekker }}</span>{% endif %}
+                {{ brikker(rad.sjekker) }}
                 {#- Svar 4 på planen for PR 2: merket er skjult for synet, men
                     hver rad sier det med ord. #}
                 {% if rad.skiller_seg_ut %}<span class="merke skjult">skiller seg ut</span>{% endif %}
@@ -35,9 +40,7 @@
               {% endif %}
             </td>
 
-            <td class="retning {{ rad.retning.klasse }}">
-              <span class="symbol" aria-hidden="true">{{ rad.retning.symbol }}</span>{{ rad.retning.tekst }}
-            </td>
+            <td class="retning">{{ retningspille(rad.retning) }}</td>
           </tr>
 {% endmacro -%}
 {% block oppdatert_hjelp %}{% if rader and hentet %} {{ hjelpeknapp("hjelp-hentet", "Hjelp: oppdatert") }}{% endif %}{% endblock %}
@@ -123,9 +126,11 @@
     /* Story 8.0e, svar 8: svart fyll og hvit tekst inne i ringen, som i
        designforslaget. 2 av 3 faar ikke fyll. */
     .pille.tre-av-tre { border: 2px solid var(--oransje); background: var(--fyll); color: var(--hvit); }
-    /* Story 8.0e: T, B og I under «N av 3», lest fra vurderingen. */
-    .sjekker { display: block; font-size: 0.75rem; font-weight: normal; color: var(--dempet); white-space: nowrap; }
-    .sjekker abbr { text-decoration: none; }
+    /* Story 8.0d, PR 3: 2 av 3 er en hvit pille med tekst og kant i blekk,
+       uten ring (gruppen 14.10 kl. 19:59). 1 og 0 av 3 er tekst. */
+    .pille.to-av-tre { border: 1.5px solid var(--blekk); background: var(--hvit); color: var(--blekk); }
+    .styrketall { font-weight: 700; color: var(--tekst); white-space: nowrap; }
+    td.styrke .pille, td.styrke .styrketall { font-size: 13px; font-weight: 700; }
     /* Båndene øverst i hver del (designregler del 5, 14.10). */
     tr.del th, tr.del td { font-size: 14.5px; font-weight: 700; height: 46px; box-sizing: border-box; }
     tr.del.ut th { background: var(--baand-ut); color: var(--brun); border-top: 1px solid var(--baand-ut-kant);
@@ -223,7 +228,9 @@
       <tbody>
         <tr class="del ingen-utslag"><td colspan="5">
           <p class="ingen-utslag">Ingen aksjer skilte seg ut: ingen fikk {{ parametre.terskel }} av {{ antall_sjekker }} eller mer.</p>
-          {% if antall_vurdert < rader|length %}
+          {#- Story 8.0d, PR 3 (BH1 i PR 2b, svar 8): når færre enn alle
+              aksjene i lista ble vurdert, også når en aksje mangler kurser. #}
+          {% if antall_vurdert < antall_aksjer %}
             <p class="ingen-utslag">{{ antall_vurdert }} av {{ antall_aksjer }} aksjer ble vurdert.</p>
           {% endif %}
         </td></tr>
@@ -231,7 +238,7 @@
       {% endif %}
       {% if oevrige %}
       <tbody>
-        {% if foerste_del %}<tr class="del oevrige"><th colspan="5" scope="rowgroup">Øvrige aksjer <span class="antall">{{ oevrige|length }}</span> <span class="bak">signalstyrke 0{% if parametre.terskel == 2 %} eller 1{% elif parametre.terskel > 2 %} til {{ parametre.terskel - 1 }}{% endif %}</span></th></tr>{% endif %}
+        {% if foerste_del %}<tr class="del oevrige"><th colspan="5" scope="rowgroup">Øvrige aksjer <span class="antall">{{ oevrige|length }}</span> <span class="bak">signalstyrke 0{% if parametre.terskel == 2 %} eller 1{% elif parametre.terskel > 2 %} til {{ parametre.terskel - 1 }}{% endif %}{% set uten_signal = oevrige|selectattr("styrke", "none")|list|length %}{% if uten_signal %} og {{ uten_signal }} uten signal{% endif %}</span></th></tr>{% endif %}
         {% for rad in oevrige %}{{ tabellrad(rad) }}{% endfor %}
       </tbody>
       {% endif %}
