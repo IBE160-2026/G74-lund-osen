@@ -2829,6 +2829,8 @@ demoen sensor ser, har det utseendet vi har valgt.
 
 *Lagt til 2026-10-14:* PR 1 flettet i `e862743`, PR #39. IBM Plex Sans har ikke `tnum`, men sifrene er like brede, så testen fra 8.2 krever like brede sifre i hver fil og `tnum` i Newsreader (`designregler.md` §1 og §5).
 
+*Lagt til 2026-10-14:* PR 2 flettet i `179b415`, PR #40. Fargene ved en aksje er som i originalen (`designregler.md` §3, 14.10).
+
 ### Story 8.1: Brukertest rett etter Epic 2
 
 Som **gruppe**, vil vi se en person utenfor gruppen bruke løsningen tidlig, så
