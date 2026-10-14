@@ -2827,6 +2827,8 @@ demoen sensor ser, har det utseendet vi har valgt.
 - 8.0d avhenger også av 8.0e, så utseendet legges på den nye oversikten
 - **Ville feilet hvis:** snittet var stiplet, hjelpen sa noe annet enn grafen, eller en pil sto ved noe annet enn retningen
 
+*Lagt til 2026-10-14:* PR 1 flettet i `e862743`, PR #39. IBM Plex Sans har ikke `tnum`, men sifrene er like brede, så testen fra 8.2 krever like brede sifre i hver fil og `tnum` i Newsreader (`designregler.md` §1 og §5).
+
 ### Story 8.1: Brukertest rett etter Epic 2
 
 Som **gruppe**, vil vi se en person utenfor gruppen bruke løsningen tidlig, så
