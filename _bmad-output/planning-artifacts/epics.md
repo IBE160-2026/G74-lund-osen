@@ -2797,6 +2797,8 @@ Delen «Dine egne aksjer» kommer med 2.12 (svar 11).
 
 *Lagt til 2026-10-13:* PR 1 flettet i `85fe8a4`, PR #37.
 
+*Lagt til 2026-10-14:* PR 2 flettet i `cfc373e`, PR #38. Begge PR-ene er flettet, og 8.0e er ferdig.
+
 ### Story 8.0d: Utseendet fra designforslaget
 
 *Lagt til 2026-10-11, Marians beslutning kl. 12:13.*
