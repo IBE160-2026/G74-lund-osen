@@ -367,6 +367,9 @@ def markedsoversikt():
         hentet=sidens_tidsstempel(rader),
         eget=eldre_enn_nyeste(rader),
         mangler=uten_kurser(poster),
+        # Story 8.0d, PR 2b: M i «N av M aksjer» er alle aksjene i lista,
+        # også de uten kurser (beslutningen 14.10).
+        antall_aksjer=len(poster),
         ikke_vurdert=any(rad.ikke_vurdert for rad in rader),
         ingen_skilte_seg_ut=ingen_skilte_seg_ut(rader),
         antall_vurdert=antall_vurdert(rader),

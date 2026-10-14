@@ -159,16 +159,17 @@
         overskrift med tall og ingen setning «Hos …» (svar 3).
 
         Story 8.0d, PR 2: overskriften er sidens h1, «Markedsoversikt» uten
-        vurdering (svar 3). Tidspunktet står bare i stripa (svar 5). #}
+        vurdering (svar 3). Tidspunktet står bare i stripa (svar 5).
+        PR 2b: M er alle aksjene i lista, også de uten kurser (14.10). #}
     {% set n = skilte_seg_ut|length %}
     <div class="topp-del">
       <div>
         {% if antall_vurdert %}
-          <h1 class="overskrift"><mark>{{ n }} av {{ rader|length }} aksjer</mark> skilte seg ut {{ dato|ukedag }}</h1>
+          <h1 class="overskrift"><mark>{{ n }} av {{ antall_aksjer }} aksjer</mark> skilte seg ut {{ dato|ukedag }}</h1>
         {% else %}
           <h1 class="overskrift">Markedsoversikt</h1>
         {% endif %}
-        <p class="meta">{{ boers }} · {{ dato|dato }} · {{ rader|length }} aksjer</p>
+        <p class="meta">{{ boers }} · {{ dato|dato }} · {{ antall_aksjer }} aksjer</p>
         <p class="innledning">
           OSE Signal er et regelbasert signal for aksjer på {{ boers }}: {{ antall_sjekker }} faste sjekker måler kurs og volum mot aksjens egen historikk.
           {%- if n == 1 %} Hos 1 aksje slo minst {{ parametre.terskel }} av {{ antall_sjekker }} ut.
@@ -223,7 +224,7 @@
         <tr class="del ingen-utslag"><td colspan="5">
           <p class="ingen-utslag">Ingen aksjer skilte seg ut: ingen fikk {{ parametre.terskel }} av {{ antall_sjekker }} eller mer.</p>
           {% if antall_vurdert < rader|length %}
-            <p class="ingen-utslag">{{ antall_vurdert }} av {{ rader|length }} aksjer ble vurdert.</p>
+            <p class="ingen-utslag">{{ antall_vurdert }} av {{ antall_aksjer }} aksjer ble vurdert.</p>
           {% endif %}
         </td></tr>
       </tbody>
