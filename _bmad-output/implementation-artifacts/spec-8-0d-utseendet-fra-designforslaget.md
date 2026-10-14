@@ -225,7 +225,7 @@ Gjennomgang av PR 2 (diffen `main...61b6cb9`, 14.10), med Blind Hunter (BH, 12 f
 
 **PR 2:** `uv run pytest -q`: før 1517 bestått og 16 hoppet over på main (`2e274d0`), etter 1532 og 16 på `9f0a010`.
 
-**Mutantene for PR 2** (14.10, på `9f0a010`), kjørt på samme måte. Mutant 8 i planen er byttet med E8a–E8c (instruksjonen kl. 17:31). Kjøringen ble stoppet av Claude Code etter E8c fordi maskinen hadde for lite minne. E9–E11 er ikke kjørt, og fila ble satt tilbake fra kopien.
+**Mutantene for PR 2** (14.10, på `9f0a010`), kjørt på samme måte. Mutant 8 i planen er byttet med E8a–E8c (instruksjonen kl. 17:31). Kjøringen ble stoppet av Claude Code etter E8c fordi maskinen hadde for lite minne. E9–E11 er ikke kjørt, og fila ble satt tilbake fra kopien. *Lagt til 2026-10-14:* E9–E11 ble kjørt kl. 20:49 på `df2e77d`, én om gangen med `-x` og bare `tests/test_utseende.py`. Fila ble satt tilbake etter hver og var lik HEAD (sha256 og blob). Alle 13 er fanget.
 
 | # | Mutant | Fanget av |
 |---|---|---|
@@ -239,6 +239,6 @@ Gjennomgang av PR 2 (diffen `main...61b6cb9`, 14.10), med Blind Hunter (BH, 12 f
 | E8a | sterk oransje ved 2 av 3 | `tests/test_app.py::TestStory80c::test_to_av_tre_merkes_med_mer_enn_lys_bakgrunn` |
 | E8b | strek ved 1 av 3 | `tests/test_app.py::TestStory80c::test_bare_radene_over_terskelen_er_merket` |
 | E8c | markeringen borte fra overskriften | `tests/test_app.py::TestStory80eTekst::test_overskriften_teller_fra_radene` |
-| E9 | «data hentet» tilbake under tittelen | ikke kjørt |
-| E10 | to h1 | ikke kjørt |
-| E11 | små overskrifter i Newsreader | ikke kjørt |
+| E9 | «data hentet» tilbake under tittelen | `tests/test_utseende.py::TestOversikten::test_tidspunktet_staar_en_gang` |
+| E10 | to h1 | `tests/test_utseende.py::TestOversikten::test_kortet_slik_leser_staar_ved_siden_av_overskriften` |
+| E11 | små overskrifter i Newsreader | `tests/test_utseende.py::TestOversikten::test_de_smaa_overskriftene_er_i_plex` |
