@@ -1190,6 +1190,9 @@ class TestVurderingenPaaOversikten:
 
         html = klient.get("/").data.decode("utf-8")
         fotnote = html.split("Uten data i denne kilden:")[1].split("</p>")[0]
+        # Story 8.0d, PR 2b (VG1): M telles fra aksje, ikke fast 15 eller
+        # AKSJEUNIVERS. Basen har 13 aksjer igjen.
+        assert "<mark>0 av 13 aksjer</mark>" in html and " · 13 aksjer" in _synlig(html)
 
         assert "Bank fra basen" in fotnote
         assert "DNO" not in fotnote
@@ -1529,8 +1532,9 @@ class TestStory80c:
         monter(monkeypatch, snapshot({"DNB": serie([100.0] * 61)}), vurdert=False)
         html = klient.get("/").data.decode("utf-8")
         assert "Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer." in html
-        assert "1 av 2 aksjer ble vurdert." in html
-        assert html.index("Ingen aksjer skilte seg ut") < html.index("1 av 2 aksjer ble vurdert.")
+        # Story 8.0d, PR 2b: M er alle de 15 aksjene i lista (14.10).
+        assert "1 av 15 aksjer ble vurdert." in html
+        assert html.index("Ingen aksjer skilte seg ut") < html.index("1 av 15 aksjer ble vurdert.")
 
     def test_alle_vurdert_gir_bare_setningen_fra_0510(self, klient, monkeypatch):
         monter(monkeypatch, snapshot({
@@ -1721,7 +1725,7 @@ class TestStory80e:
         html = klient.get("/").data.decode("utf-8")
         tabell = _tabell(html)
         assert tabell.deler == [
-            "Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer. 1 av 2 aksjer ble vurdert.",
+            "Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer. 1 av 15 aksjer ble vurdert.",
             "Øvrige aksjer",
         ]
         assert set(tabell.del_av) == {"Øvrige aksjer"}
@@ -1802,13 +1806,35 @@ def _synlig(html: str) -> str:
 class TestStory80eTekst:
     """Story 8.0e, PR 2: teksten over tabellen."""
 
-    def test_overskriften_teller_fra_radene(self, klient):
-        """Svar 3. Ville feilet hvis M var skrevet fast som 15."""
+    def test_overskriften_teller_n_fra_radene_og_m_fra_lista(self, klient):
+        """Svar 3: N telles fra radene. Story 8.0d, PR 2b: M er alle aksjene
+        i lista, også de uten kurser (14.10). Testbasen har 15 aksjer, og 2
+        har kurser."""
         _lagret("KOG", 0.0, 1, 1, 0)
         _lagret("EQNR", 0.0, 1, 0, 0)
         html = klient.get("/").data.decode("utf-8")
         # Story 8.0d, PR 2: h1, med markering og uten fet skrift (§4, 14.10).
-        assert '<h1 class="overskrift"><mark>1 av 2 aksjer</mark> skilte seg ut lørdag</h1>' in html
+        assert '<h1 class="overskrift"><mark>1 av 15 aksjer</mark> skilte seg ut lørdag</h1>' in html
+
+    def test_aksjen_uten_kurser_telles_med(self, klient):
+        """Story 8.0d, PR 2b (14.10). Ville feilet hvis M ble telt fra radene
+        igjen: alle aksjene i lista utenom én har kurser, og den ene står
+        under tabellen, ikke som rad, men telles i overskriften og linja."""
+        from kursdata import AKSJEUNIVERS
+
+        mangler, rolig, *med_kurser = AKSJEUNIVERS
+        _lagret(rolig.symbol, 0.0, 0, 0, 0)
+        for aksje in med_kurser:
+            _lagret(aksje.symbol, 0.0, 1, 1, 0)
+        html = klient.get("/").data.decode("utf-8")
+        tekst = _synlig(html)
+        m = len(AKSJEUNIVERS)
+        assert len(_tabell(html).rader) == m - 1
+        assert f"<mark>{m - 2} av {m} aksjer</mark>" in html
+        # VG2: båndene teller radene sine som før.
+        assert _tabell(html).ekstra["antall"] == [str(m - 2), "1"]
+        assert f"Oslo Børs · 31.10 · {m} aksjer" in tekst
+        assert f"Uten data i denne kilden: {mangler.navn}." in tekst
 
     def test_ukedagen_er_datoen_i_linja_over_tabellen(self, klient):
         """Svar 5: den eldste datoen, som linja over tabellen (story 8.0), og
@@ -1817,14 +1843,14 @@ class TestStory80eTekst:
         rader = serie([100.0] * 60)    # siste dag 30.10, fredag
         skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET), vurdert=False)
         html = klient.get("/").data.decode("utf-8")
-        assert "Oslo Børs · 30.10 · 2 aksjer" in _synlig(html)
+        assert "Oslo Børs · 30.10 · 15 aksjer" in _synlig(html)
         assert "skilte seg ut fredag</h1>" in html
 
     def test_ingen_over_terskelen_gir_0_og_ingen_setning_hos(self, klient):
         _lagret("KOG", 0.0, 1, 0, 0)
         _lagret("EQNR", 0.0, 0, 0, 0)
         tekst = _synlig(klient.get("/").data.decode("utf-8"))
-        assert "0 av 2 aksjer skilte seg ut lørdag" in tekst
+        assert "0 av 15 aksjer skilte seg ut lørdag" in tekst
         assert "Hos " not in tekst
         # Svar 3: setningen fra 8.0c staar fortsatt i tabellen (BH4).
         assert "Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer." in tekst

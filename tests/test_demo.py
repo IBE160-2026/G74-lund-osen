@@ -329,7 +329,8 @@ class TestSidene:
         # Story 8.0c (4a): linja over tabellen sier ikke «Oslo Børs», og
         # merket har «Demoversjon.» foran. Story 8.0e, svar 1: linja sier
         # «Demo Børs», som endrer beslutning 3 i 8.0c.
-        assert "Demo Børs · 09.10 · 14 aksjer" in oversikt
+        # Story 8.0d, PR 2b: alle de 15 aksjene, også den uten kurser (14.10).
+        assert "Demo Børs · 09.10 · 15 aksjer" in oversikt
         assert "Oslo Børs · " not in oversikt
         assert f"Demoversjon. {app_modul.EKSEMPELTALL_MERKE}" in oversikt
         assert f"Demoversjon. {app_modul.EKSEMPELTALL_MERKE}" in detalj
@@ -604,7 +605,8 @@ class TestStory80eTekstIDemoen:
         monkeypatch.setenv(app_modul.I_DEMO, "1")
         html = klient.get("/").data.decode("utf-8")
         tekst = _synlig(html)
-        assert re.search(r"\d+ av 14 aksjer skilte seg ut (mandag|tirsdag|onsdag|torsdag|fredag)", tekst)
+        # Story 8.0d, PR 2b: M er alle de 15 aksjene i lista (14.10).
+        assert "5 av 15 aksjer skilte seg ut fredag" in tekst
         assert "OSE Signal er et regelbasert signal for aksjer på Demo Børs: 3 faste sjekker" in tekst
         assert "Hos disse" in tekst or "Hos 1 aksje" in tekst
         assert "fikk utslag på alle 3 sjekkene." in tekst
