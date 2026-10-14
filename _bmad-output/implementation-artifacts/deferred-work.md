@@ -161,3 +161,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-8-0c-tydelig-merking-ord-ved-sjekkene-og-datoer-paa-grafen.md`
   summary: Månedsmerkene kan overlappe når et langt hull gjør to måneder til naboer i serien, og navnene står uten år når serien går over et årsskifte.
   evidence: ECH3 og BH6 i gjennomgangen av PR #36 (13.10). Kan tas i 8.0d sammen med utseendet. Ikke rettet nå.
+- source_spec: `_bmad-output/implementation-artifacts/spec-8-0d-utseendet-fra-designforslaget.md`
+  summary: Oversikten og aksjesiden viser tidspunktet to ganger, som «Oppdatert …» i stripa og som «data hentet …» i linja under tittelen.
+  evidence: BH2 i gjennomgangen av PR 1 av 8.0d (14.10). Stripa kom i PR 1, og linja under tittelen hører til oversikten og aksjesiden, som er PR 2 og PR 3. Hjelpen bak «?» ved «data hentet» står i den linja, så den må flyttes med hvis linja tas bort. Avgjøres i planen for PR 2.
