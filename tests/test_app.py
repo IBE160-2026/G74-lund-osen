@@ -1296,8 +1296,10 @@ class TestStory80c:
             "DNB": serie([100.0] * 60 + [104.0]),                              # 2 av 3
         }))
         html = klient.get("/").data.decode("utf-8")
-        assert html.count('class="pille tre-av-tre"') == 1
-        assert '<span class="pille tre-av-tre">3 av 3</span>' in html
+        # Story 8.0e PR 2: pillen staar ogsaa i linja over tabellen.
+        tabell = html[html.index("<table"):]
+        assert tabell.count('class="pille tre-av-tre"') == 1
+        assert '<span class="pille tre-av-tre">3 av 3</span>' in tabell
         assert '<span class="pille">2 av 3</span>' in html
         ring = _regel(_stil(html), ".pille.tre-av-tre")
         assert "border" in ring and "var(--gul)" in ring
@@ -1753,3 +1755,103 @@ class TestStory80e:
 
         assert kontrast(tekst, fyll) >= 4.5, (tekst, fyll)
         assert kontrast(gul, fyll) >= 3.0, (gul, fyll)
+
+
+def _synlig(html: str) -> str:
+    """Teksten paa siden uten stil, merker og ekstra blanktegn."""
+    html = re.sub(r"<style>.*?</style>", "", html, flags=re.DOTALL)
+    return re.sub(r"[ \t\r\n]+", " ", re.sub(r"<[^>]+>", "", html))
+
+
+class TestStory80eTekst:
+    """Story 8.0e, PR 2: teksten over tabellen."""
+
+    def test_overskriften_teller_fra_radene(self, klient):
+        """Svar 3. Ville feilet hvis M var skrevet fast som 15."""
+        _lagret("KOG", 0.0, 1, 1, 0)
+        _lagret("EQNR", 0.0, 1, 0, 0)
+        html = klient.get("/").data.decode("utf-8")
+        assert '<h2 class="overskrift"><strong>1 av 2 aksjer</strong> skilte seg ut lørdag</h2>' in html
+
+    def test_ukedagen_er_datoen_i_linja_over_tabellen(self, klient):
+        """Svar 5: den eldste datoen, som linja over tabellen (story 8.0), og
+        ikke dagen siden aapnes (klokka staar paa torsdag 31.12)."""
+        _lagret("KOG", 0.0, 1, 1, 0)  # siste dag 31.10, lørdag
+        rader = serie([100.0] * 60)    # siste dag 30.10, fredag
+        skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET), vurdert=False)
+        html = klient.get("/").data.decode("utf-8")
+        assert "Oslo Børs · 30.10 · 2 aksjer" in _synlig(html)
+        assert "skilte seg ut fredag</h2>" in html
+
+    def test_ingen_over_terskelen_gir_0_og_ingen_setning_hos(self, klient):
+        _lagret("KOG", 0.0, 1, 0, 0)
+        _lagret("EQNR", 0.0, 0, 0, 0)
+        tekst = _synlig(klient.get("/").data.decode("utf-8"))
+        assert "0 av 2 aksjer skilte seg ut lørdag" in tekst
+        assert "Hos " not in tekst
+        # Svar 3: setningen fra 8.0c staar fortsatt i tabellen (BH4).
+        assert "Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer." in tekst
+        assert "fikk utslag på alle" not in tekst
+
+    def test_uten_en_eneste_vurdering_staar_ingen_overskrift(self, klient):
+        _lagret("KOG", 0.0, 0, 0, 0, vurdert=False)
+        html = klient.get("/").data.decode("utf-8")
+        assert 'class="overskrift"' not in html and "Hos " not in _synlig(html)
+
+    def test_innledningen_med_én_aksje(self, klient):
+        """Svar 4. Ville feilet med «Hos 1 aksjer»."""
+        _lagret("KOG", 0.0, 1, 1, 0)
+        _lagret("EQNR", 0.0, 0, 0, 0)
+        assert ("OSE Signal er et regelbasert signal for aksjer på Oslo Børs: 3 faste sjekker "
+                "måler kurs og volum mot aksjens egen historikk. Hos 1 aksje slo minst 2 av 3 ut. "
+                "Det viser hvor du kan se nærmere, ikke hva du bør kjøpe eller selge."
+                ) in _synlig(klient.get("/").data.decode("utf-8"))
+
+    def test_innledningen_med_flere_og_terskelen_fra_parametre(self, klient, monkeypatch):
+        import dataclasses
+
+        _lagret("KOG", 0.0, 1, 1, 1)
+        _lagret("EQNR", 0.0, -1, -1, -1)
+        assert "Hos disse 2 slo minst 2 av 3 ut." in _synlig(klient.get("/").data.decode("utf-8"))
+        monkeypatch.setattr(app_modul, "STANDARD", dataclasses.replace(app_modul.STANDARD, terskel=3))
+        assert "Hos disse 2 slo minst 3 av 3 ut." in _synlig(klient.get("/").data.decode("utf-8"))
+
+    def test_linja_om_3_av_3_med_navnene_fra_radene(self, klient):
+        """Ville feilet hvis linja sto uten en aksje paa 3 av 3."""
+        _lagret("KOG", 0.0, 1, 1, 1)
+        _lagret("EQNR", 0.0, 1, 1, 0)
+        tekst = _synlig(klient.get("/").data.decode("utf-8"))
+        assert "3 av 3 Bare Kongsberg Gruppen fikk utslag på alle 3 sjekkene." in tekst
+        _lagret("DNB", 5.0, -1, -1, -1)
+        tekst = _synlig(klient.get("/").data.decode("utf-8"))
+        assert "Bare DNB Bank og Kongsberg Gruppen fikk utslag på alle 3 sjekkene." in tekst
+
+    def test_linja_om_3_av_3_ogsaa_naar_terskelen_er_over_3(self, klient, monkeypatch):
+        """ECH3 i gjennomgangen: navnene tas fra alle radene, ikke bare fra
+        «Skilte seg ut»."""
+        import dataclasses
+
+        monkeypatch.setattr(app_modul, "STANDARD", dataclasses.replace(app_modul.STANDARD, terskel=4))
+        _lagret("KOG", 0.0, 1, 1, 1)
+        assert "Bare Kongsberg Gruppen fikk utslag på alle 3 sjekkene." in _synlig(klient.get("/").data.decode("utf-8"))
+
+    def test_ingen_linje_uten_3_av_3(self, klient):
+        _lagret("KOG", 0.0, 1, 1, 0)
+        html = klient.get("/").data.decode("utf-8")
+        assert "fikk utslag på alle" not in html and 'class="alle-sjekkene"' not in html
+
+    def test_slik_leser_du_tabellen_har_3_punkter(self, klient):
+        """Svar 2 og tavlas tekster (endringsforslaget 13.10, punkt 4.2).
+        Ville feilet med setningen om klikk paa T, B eller I."""
+        _lagret("KOG", 0.0, 1, 1, 0)
+        html = klient.get("/").data.decode("utf-8")
+        del_ = html.split('<section class="slik-leser"', 1)[1].split("</section>", 1)[0]
+        punkter = [_synlig(p).strip() for p in re.findall(r"<li>(.*?)</li>", del_, re.DOTALL)]
+        assert punkter == [
+            "Signalstyrke 0–3 T, B og I er trend, bevegelse og interesse, og hver gir +1, 0 eller -1. "
+            "Øverst i cellen står hvor mange som slo ut, fra 0 av 3 til 3 av 3.",
+            "Retning Om sjekkene som slo ut, ga +1 eller -1. Ikke et råd om å kjøpe eller selge.",
+            "Selskapsnavnet Klikk for å se sjekkene, tallene bak og kursgrafen.",
+        ]
+        assert "Klikk på T" not in html
+        assert html.index("Slik leser du tabellen") < html.index("<table")

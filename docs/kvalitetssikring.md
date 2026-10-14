@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-13T15:23
+updated: 2026-10-13T23:51
 ---
 
 # Kvalitetssikring
@@ -515,6 +515,8 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
 
 *Lagt til 2026-10-12 (flettingen av 2.3b):* etter PR #30 står teksten ikke lenger i README-en, men under «Når kan jeg hente?» i `docs/hjelp.md`. Endringen fra 2.3b er ført der. Ingen kommando i «Kom i gang» er endret.
 
+*Lagt til 2026-10-13 (story 8.0e, PR 2):* steg 2 i README-en slutter nå med setningen fra «Jeg har fått koden fra før» i `docs/hjelp.md`, og steg 4 med «Har mappa et annet navn, drar du den mappa der README og compose ligger.» Rad 2 og 4 i Prøve 1 er rettet etter det. Ingen kommando i «Kom i gang» er endret. Prøve 1 og 2 tas etter at 8.0d er flettet, så testeren ser det nye utseendet (beslutningen 13.10 kl. 23:40), og ikke 13.–16.10 som over. Prøven før innleveringen bruker ZIP-fila som faktisk leveres (beslutningen 13.10 kl. 23:22).
+
 ### Prøve 1
 
 - **Hvem som prøver:** åpent.
@@ -529,9 +531,9 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
 | # | Kommando eller steg i README-en | Det som skjedde |
 |---|---|---|
 | 1 | Steg 1: installer og start Docker Desktop uten å logge inn, og vent til det står «Engine running». Ba installasjonen om administrator eller omstart? | |
-| 2 | Steg 2: «Code» → «Download ZIP» på GitHub, og pakk ut med «Pakk ut alle» (Windows) eller dobbeltklikk (Mac). Lå det en mappe med samme navn inni? Viste Windows filene som README og compose? | |
+| 2 | Steg 2: «Code» → «Download ZIP» på GitHub, og pakk ut med «Pakk ut alle» (Windows) eller dobbeltklikk (Mac). Lå det en mappe med samme navn inni? Viste Windows filene som README og compose? Fikk prøveren koden som mappe eller ZIP-fil fra før, ble den pakket ut og prøven fortsatt fra steg 3? | |
 | 3 | Steg 3: åpne «Windows PowerShell», ikke «Windows PowerShell ISE» (Windows), eller Terminal (Mac) | |
-| 4 | Steg 4: `cd`, mellomrom, og den innerste mappa dratt inn i vinduet. Fikk en sti med mellomrom anførselstegn? | |
+| 4 | Steg 4: `cd`, mellomrom, og den innerste mappa dratt inn i vinduet. Fikk en sti med mellomrom anførselstegn? Hadde mappa et annet navn, ble mappa der README og compose ligger, dratt inn? | |
 | 5 | Den ekte versjonen, steg 5: nøkkelen hos EODHD. Hoppes over i prøven, som gjøres uten nøkkel | |
 | 6 | Den ekte versjonen, steg 6: `cp .env.example .env`, så `notepad .env` (Windows) eller `open -e .env` (Mac), uten å fylle inn nøkkelen | |
 | 7 | Den ekte versjonen, steg 7: `docker compose up --build` og http://127.0.0.1:5000. Var oversikten tom, med kommandoen som henter? | |

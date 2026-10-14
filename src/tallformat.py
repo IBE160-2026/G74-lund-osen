@@ -87,6 +87,26 @@ def dato(dag, i_aar: int) -> str:
     return tekst
 
 
+# Ukedagene paa norsk, i rekkefoelgen date.weekday() gir dem (mandag er 0).
+UKEDAGER = ("mandag", "tirsdag", "onsdag", "torsdag", "fredag", "lørdag", "søndag")
+
+
+def ukedag(dag) -> str:
+    """Ukedagen for en dato, som «tirsdag» - story 8.0e, svar 5.
+
+    Smaa bokstaver, fordi den staar inne i overskriften: «4 av 15 aksjer
+    skilte seg ut tirsdag». dag er en datetime.date eller noe med weekday().
+    """
+    return UKEDAGER[dag.weekday()]
+
+
+def med_og(navn: list[str]) -> str:
+    """Navnene bundet med komma og «og»: «A», «A og B», «A, B og C»."""
+    if len(navn) < 2:
+        return "".join(navn)
+    return f"{', '.join(navn[:-1])} og {navn[-1]}"
+
+
 def fortegn(verdi: int) -> str:
     """En sjekks verdi med fortegn: «+1», «0» eller «-1» - story 8.0e.
 

@@ -94,6 +94,16 @@
     tr.del th { color: var(--tekst); font-size: 0.9rem; padding-top: 1rem; }
     tr.del td { border-bottom: none; }
     p.ingen-utslag { margin: 0.6rem 0; }
+    /* Story 8.0e, PR 2: teksten over tabellen. Det viktigste i overskriften
+       er fet skrift, ikke gult (designregler §4, rettet 13.10). */
+    h2.overskrift { font-size: 1.3rem; font-weight: 500; margin: 1.2rem 0 0.4rem; }
+    h2.overskrift strong { font-weight: 700; }
+    p.innledning { max-width: 36rem; line-height: 1.5; margin: 0.4rem 0; }
+    p.alle-sjekkene { margin: 0.4rem 0 1rem; }
+    section.slik-leser { margin: 1rem 0 1.4rem; }
+    section.slik-leser h2 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--dempet); margin: 0 0 0.4rem; }
+    section.slik-leser ul { margin: 0; padding-left: 1.2rem; font-size: 0.9rem; line-height: 1.45; }
+    section.slik-leser strong { display: block; }
     /* FR-705 med tekst, ikke bare farge (story 8.0). */
     .merke { display: block; font-size: 0.75rem; font-weight: 600; }
     .mangler { color: var(--dempet); font-style: italic; font-size: 0.85rem; }
@@ -117,10 +127,41 @@
   <h1>OSE Signal</h1>
 
   {% if rader %}
+    {#- Story 8.0e, svar 1: demoen sier «Demo Børs» der den ekte versjonen
+        sier «Oslo Børs», i linja over tabellen og i innledningen. #}
+    {% set boers = "Demo Børs" if eksempeltall else "Oslo Børs" %}
     <p class="meta">
-      {% if eksempeltall %}Eksempeltall{% else %}Oslo Børs{% endif %} · {{ dato|dato }} · {{ rader|length }} aksjer
+      {{ boers }} · {{ dato|dato }} · {{ rader|length }} aksjer
       {% if hentet %}· data hentet {{ hentet|norsk_tid }} {{ hjelpeknapp("hjelp-hentet", "Hjelp: data hentet") }}{% endif %}
     </p>
+
+    {#- Story 8.0e, PR 2: overskriften, innledningen, linja om «3 av 3» og
+        «Slik leser du tabellen». N og M telles fra radene, ukedagen er
+        datoen i linja over (svar 5), og tallene i teksten kommer fra
+        Parametre og antall_sjekker. Uten en eneste vurdering staar ingen
+        overskrift og ingen setning «Hos …» (svar 3). #}
+    {% set n = skilte_seg_ut|length %}
+    {% if antall_vurdert %}
+      <h2 class="overskrift"><strong>{{ n }} av {{ rader|length }} aksjer</strong> skilte seg ut {{ dato|ukedag }}</h2>
+    {% endif %}
+    <p class="innledning">
+      OSE Signal er et regelbasert signal for aksjer på {{ boers }}: {{ antall_sjekker }} faste sjekker måler kurs og volum mot aksjens egen historikk.
+      {%- if n == 1 %} Hos 1 aksje slo minst {{ parametre.terskel }} av {{ antall_sjekker }} ut.
+      {%- elif n > 1 %} Hos disse {{ n }} slo minst {{ parametre.terskel }} av {{ antall_sjekker }} ut.{% endif %}
+      Det viser hvor du kan se nærmere, ikke hva du bør kjøpe eller selge.
+    </p>
+    {% if tre_av_tre %}
+      <p class="alle-sjekkene"><span class="pille tre-av-tre">{{ antall_sjekker }} av {{ antall_sjekker }}</span> Bare {{ tre_av_tre|med_og }} fikk utslag på alle {{ antall_sjekker }} sjekkene.</p>
+    {% endif %}
+
+    <section class="slik-leser" aria-labelledby="slik-leser">
+      <h2 id="slik-leser">Slik leser du tabellen</h2>
+      <ul>
+        <li><strong>Signalstyrke 0–{{ antall_sjekker }}</strong> T, B og I er trend, bevegelse og interesse, og hver gir +1, 0 eller -1. Øverst i cellen står hvor mange som slo ut, fra 0 av {{ antall_sjekker }} til {{ antall_sjekker }} av {{ antall_sjekker }}.</li>
+        <li><strong>Retning</strong> Om sjekkene som slo ut, ga +1 eller -1. Ikke et råd om å kjøpe eller selge.</li>
+        <li><strong>Selskapsnavnet</strong> Klikk for å se sjekkene, tallene bak og kursgrafen.</li>
+      </ul>
+    </section>
 
     <table>
       <thead>

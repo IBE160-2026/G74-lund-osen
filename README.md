@@ -27,9 +27,9 @@ Appen finnes i to versjoner, med samme kode. Vi anbefaler den ekte versjonen. Vi
 ### Felles for begge
 
 1. **Installer og start Docker Desktop** fra [docker.com](https://www.docker.com/products/docker-desktop/). Hopp over innloggingen. Det er klart når det står «Engine running» nederst i vinduet. La det være åpent.
-2. **Last ned koden.** Trykk den grønne knappen «Code» på [GitHub-siden](https://github.com/IBE160-2026/G74-lund-osen) og «Download ZIP» nederst i menyen. Windows: høyreklikk fila i Nedlastinger (Downloads) og velg «Pakk ut alle» (Extract All). Mac: dobbeltklikk fila. Det er klart når du har en mappe som heter `G74-lund-osen-main`.
+2. **Last ned koden.** Trykk den grønne knappen «Code» på [GitHub-siden](https://github.com/IBE160-2026/G74-lund-osen) og «Download ZIP» nederst i menyen. Windows: høyreklikk fila i Nedlastinger (Downloads) og velg «Pakk ut alle» (Extract All). Mac: dobbeltklikk fila. Det er klart når du har en mappe som heter `G74-lund-osen-main`. Har du fått koden som mappe eller ZIP-fil, pakker du den ut og går til steg 3.
 3. **Åpne PowerShell** (Windows: trykk Start, skriv PowerShell og velg «Windows PowerShell», ikke ISE) **eller Terminal** (Mac: trykk Cmd+mellomrom og skriv Terminal). Det er klart når et vindu venter på at du skriver.
-4. **Skriv `cd` og et mellomrom**, dra mappa `G74-lund-osen-main` der README og compose ligger (den innerste hvis det er to) fra Filutforsker eller Finder inn i vinduet, og trykk Enter. Det er klart når mappenavnet står foran `>` eller `%`.
+4. **Skriv `cd` og et mellomrom**, dra mappa `G74-lund-osen-main` der README og compose ligger (den innerste hvis det er to) fra Filutforsker eller Finder inn i vinduet, og trykk Enter. Det er klart når mappenavnet står foran `>` eller `%`. Har mappa et annet navn, drar du den mappa der README og compose ligger.
 
 ### Den ekte versjonen (anbefalt)
 
@@ -227,7 +227,7 @@ Basen, demobasen og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo`
 
 ## Status
 
-Under arbeid, og ingenting er endelig. Flettet til main: hentingen av kurser med kontroll av børsdagen, nye forsøk med kallene som er igjen etter hentingen, Docker, demoen, denne README-en, hjelp bak «?» på sidene, tydeligere merking i tabellene, og datoene og månedsmerkene i grafen. Neste: README-prøven 13.–16.10, oversikten fra designforslaget, periodene i kursgrafen, utseendet fra designforslaget, og så KI-laget. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
+Under arbeid, og ingenting er endelig. Flettet til main: hentingen av kurser med kontroll av børsdagen, nye forsøk med kallene som er igjen etter hentingen, Docker, demoen, denne README-en, hjelp bak «?» på sidene, tydeligere merking i tabellene, datoene og månedsmerkene i grafen, og oversikten fra designforslaget. Neste: utseendet fra designforslaget, README-prøven, periodene i kursgrafen, og så KI-laget. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
 
 ## Tester
 

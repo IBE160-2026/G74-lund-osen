@@ -326,9 +326,10 @@ class TestSidene:
         oversikt = klient.get("/").data.decode("utf-8")
         detalj = klient.get("/aksje/BRFE").data.decode("utf-8")
         assert "Eksempeltall" in oversikt and "Eksempeltall" in detalj
-        # Story 8.0c (4a): linja over tabellen sier «Eksempeltall», ikke
-        # «Oslo Børs», og merket har «Demoversjon.» foran.
-        assert "Eksempeltall · 09.10 · 14 aksjer" in oversikt
+        # Story 8.0c (4a): linja over tabellen sier ikke «Oslo Børs», og
+        # merket har «Demoversjon.» foran. Story 8.0e, svar 1: linja sier
+        # «Demo Børs», som endrer beslutning 3 i 8.0c.
+        assert "Demo Børs · 09.10 · 14 aksjer" in oversikt
         assert "Oslo Børs · " not in oversikt
         assert f"Demoversjon. {app_modul.EKSEMPELTALL_MERKE}" in oversikt
         assert f"Demoversjon. {app_modul.EKSEMPELTALL_MERKE}" in detalj
@@ -584,3 +585,25 @@ class TestStory80eIDemoen:
         assert "background: var(--fyll)" in _regel(_stil(html), ".pille.tre-av-tre")
         # BH5 og ECH1 i gjennomgangen: pillen med fyll staar ogsaa i demoen.
         assert '<span class="pille tre-av-tre">3 av 3</span>' in html
+
+
+class TestStory80eTekstIDemoen:
+    """FR-411 og svar 1: teksten over tabellen ogsaa med demobasen, med
+    «Demo Børs» der den ekte versjonen sier «Oslo Børs»."""
+
+    def test_teksten_over_tabellen_i_demoen(self, klient, monkeypatch, demobase):
+        import re
+
+        from test_app import _synlig
+
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        html = klient.get("/").data.decode("utf-8")
+        tekst = _synlig(html)
+        assert re.search(r"\d+ av 14 aksjer skilte seg ut (mandag|tirsdag|onsdag|torsdag|fredag)", tekst)
+        assert "OSE Signal er et regelbasert signal for aksjer på Demo Børs: 3 faste sjekker" in tekst
+        assert "Hos disse" in tekst or "Hos 1 aksje" in tekst
+        assert "fikk utslag på alle 3 sjekkene." in tekst
+        assert "Slik leser du tabellen" in tekst
+        # Merket sier «ikke data fra Oslo Børs», og det staar. Innledningen og
+        # linja over tabellen sier «Demo Børs».
+        assert "aksjer på Oslo Børs" not in tekst and "Oslo Børs ·" not in tekst

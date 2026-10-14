@@ -33,6 +33,19 @@ Planen ble vist i chatten 13.10 og er ført kort i `docs/ai-prompts/2026-10-13.m
 7. **Demoen har samme logo og utseende** som den ekte versjonen, nå og når 8.0d kommer. Bare merket øverst og «Demo Børs» skiller dem (FR-411).
 8. **Pillen «3 av 3»** får svart fyll og hvit tekst inne i den gule ringen (`#a67c00`), som i designforslaget. 2 av 3 merkes som i dag, med fet skrift og strek, uten fyll og uten gult. PR 1, med en test for kontrasten, og `designregler.md` §3 får en datert linje.
 
+## PR 2: teksten over tabellen
+
+Instruksjonen kl. 23:43 13.10 (grenen `8-0e-tekst`, fra main etter `85fe8a4`). Svarene 1–5 over er beslutningene, med disse i tillegg:
+
+- **Overskriften** «N av M aksjer skilte seg ut <ukedag>», med «N av M aksjer» i fet skrift. N og M telles fra radene, og ukedagen er datoen i linja over tabellen (svar 3 og 5). Den gule understreken fra tavla tas ikke med: det viktigste merkes med fet skrift (`designregler.md` §4, rettet 13.10), og gult betyr bare 3 av 3 (beslutningen kl. 23:43).
+- **Innledningen** med ordlyden i `epics.md`, tallene fra radene, `Parametre` og `antall_sjekker`, «Hos 1 aksje» når N er 1, og ingen setning «Hos …» når N er 0 (svar 3 og 4).
+- **Linja om «3 av 3»:** «Bare <navn> fikk utslag på alle 3 sjekkene.», med navnene fra radene bundet med «og». Har ingen 3 av 3, står ikke linja.
+- **«Slik leser du tabellen»** med 3 punkter: «Signalstyrke 0–3» med ordlyden i svar 2, og tavlas tekster om retning og selskapsnavnet fra endringsforslaget 13.10, punkt 4.2 («Kan tas som de står»). Ingen setning om klikk på T, B eller I.
+- **«Demo Børs»** i innledningen og linja over tabellen i demoen (svar 1). Ingen tekst bak «?» endres.
+- **README-en:** statuslinja ordrett fra instruksjonen, steg 2 får setningen fra «Jeg har fått koden fra før» i `docs/hjelp.md`, og steg 4 får «Har mappa et annet navn, drar du den mappa der README og compose ligger.» `docs/kvalitetssikring.md` §9 rettes i samme commit, med en datert linje om at Prøve 1 og 2 tas etter at 8.0d er flettet (beslutningen kl. 23:40), og at prøven før innleveringen bruker ZIP-fila som faktisk leveres (kl. 23:22).
+- **Ordene i et steg i README-en** telles slik leseren ser dem, med lenketeksten og uten adressen bak, og grensen er 65, ikke 60 (svaret i chatten kl. 23:50, ført i dagsfila på main i `bb56d61`). Setningen fra `docs/hjelp.md` gjorde steg 2 til 70 ord, 8 av dem i adressen til GitHub.
+- **Mutantene:** M skrevet fast som 15; ukedagen fra dagen siden åpnes; feil indeks i lista over ukedager; linja med «3 av 3» uten 3 av 3; «Oslo Børs» i innledningen i demoen; «Hos 1 aksjer»; setningen om klikk i første punkt; setningen borte fra steg 2 i README-en.
+
 ## Boundaries & Constraints
 
 **Always:**
@@ -95,6 +108,8 @@ Planen ble vist i chatten 13.10 og er ført kort i `docs/ai-prompts/2026-10-13.m
 - `_Tabell` i `test_app.py` legger overskriftsradene i `deler` og ikke i `rader`, og `del_av` sier hvilken del hver rad står under. Fire tester som sammenlignet hele cellen med styrken, krever nå også T, B og I.
 - Demobasen har både «Skilte seg ut» og «Øvrige aksjer», og minst én rad med 3 av 3.
 - Epic 8-konteksten er ikke laget på nytt: den eneste endringen i planleggingsmappa etter den, er linja om at 8.0c er ferdig (`3ad2922`).
+- *PR 2, 13.–14.10 (grenen `8-0e-tekst`):* `b6468af` PR 2 i spesifikasjonen, `72e5210` teksten over tabellen og testene, `c235631` README-en, `kvalitetssikring.md` §9 og testene for dem, `a4a93bb` rettingene fra gjennomgangen og `bb81b7b` den daterte linja om README-prøven i `epics.md`. `ukedag()` og `med_og()` står i `tallformat.py`. Overskriften står bare når minst én rad har en vurdering. Innledningen og «Slik leser du tabellen» står uansett. Tavlas tekster om retning og selskapsnavnet er tatt fra endringsforslaget 13.10, punkt 4.2.
+- Pillen «3 av 3» står også i linja over tabellen, så testen for ringen i 8.0c ser nå bare i tabellen.
 
 ## Spec Change Log
 
@@ -117,6 +132,22 @@ Gjennomgang av PR 1 (diffen `4c4b420...4ad1013`, 13.10), med Blind Hunter (BH, 1
 | BH8 | Fyllet har ingen mørk modus | avvist | sidene har ingen mørk modus i dag, og utseendet hører til 8.0d |
 | BH9 | Demotesten importerer hjelpere fra `test_app` | low, avvist | samme mønster som importen fra `test_hjelpetekster` i 8.0c |
 | BH10 | CSS-testene ser etter eksakt tekst | low, avvist | samme form som testene for ringen og streken i 8.0c |
+
+Gjennomgang av PR 2 (diffen `main...8-0e-tekst` på `c235631`, 13.10), med Blind Hunter (BH, 9 funn), Edge Case Hunter (ECH, 3) og Verification Gap (VG, ingen hull). Rettingene står i `a4a93bb` og `bb81b7b`.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH3 | Pillen i 8.0c-testen kunne finnes i linja over tabellen | low | patch: sjekket i tabellen |
+| BH4 | Setningen fra 8.0c er ikke prøvd ved N lik 0 | low | patch |
+| ECH3 | Linja om «3 av 3» tok navnene bare fra «Skilte seg ut» | low | patch: fra alle radene, med test for terskel over 3 |
+| BH5 | `epics.md` sier fortsatt «README-prøven 13.–16.10 gjenstår» | low | patch: datert linje under 3.4 |
+| BH1 | Grensen på 65 ord viser til et svar som ikke er ført | false | svaret er ført i dagsfila på main i `bb56d61`. Det står nå også i PR 2-delen av spesifikasjonen |
+| BH2, ECH1 | Ukedagen kommer fra den eldste datoen, også fra rader uten vurdering | avvist | svar 5: samme dato som linja over tabellen, altså den eldste |
+| ECH2 | M teller også rader uten vurdering | avvist | `epics.md` og svar 3: N og M telles fra radene, og «N av M aksjer ble vurdert.» står når noen mangler |
+| BH6 | Innledningen og «Slik leser du tabellen» står uten en eneste vurdering | avvist | svar 3 tar bare bort overskriften, og innledningen er sann uten vurderinger |
+| BH7 | Setningen i steg 2 står etter sjekken og sier «pakker ut» også om en mappe | avvist | instruksjonen: ordrett fra `docs/hjelp.md`, til slutt i steget |
+| BH8 | Demotesten krever en aksje på 3 av 3 i demobasen | avvist | demobasen er laget av faste tall, og testen fra PR 1 krever det samme |
+| BH9 | «Eksempeltall» og «Demo Børs» er ikke prøvd sammen i demoen | false | `test_bryteren_med_demobase_viser_eksempeltall` krever merket og «Demo Børs · 09.10 · 14 aksjer» på samme side |
 
 ## Design Notes
 
@@ -149,3 +180,16 @@ Overskriften for hver del er en rad `<tr class="del"><th colspan="5" scope="rowg
 | M6 | «Skilte seg ut» sammen med setningen fra 8.0c | `tests/test_app.py::TestStory80e::test_setningene_fra_8_0c_der_skilte_seg_ut_ellers_staar` |
 | M7 | sorteringen snudd i én del | `tests/test_app.py::TestStory80e::test_to_deler_hver_sortert_etter_fr_102` |
 | M8 | «3 av 3» uten svart fyll | `tests/test_app.py::TestStory80e::test_tre_av_tre_har_svart_fyll_og_hvit_tekst` |
+
+**PR 2:** før 1478 bestått og 16 hoppet over på main (`63ac793`), etter 1491 og 16 på `a4a93bb`. Mutantene for PR 2 (13.10, på `c235631`), kjørt på samme måte. Alle 8 ble fanget:
+
+| # | Mutant | Fanget av |
+|---|---|---|
+| P1 | M skrevet fast som 15 | `tests/test_app.py::TestStory80eTekst::test_overskriften_teller_fra_radene` |
+| P2 | ukedagen fra dagen siden åpnes | `tests/test_app.py::TestStory80eTekst::test_overskriften_teller_fra_radene` |
+| P3 | feil indeks i lista over ukedager | `tests/test_app.py::TestStory80eTekst::test_overskriften_teller_fra_radene` |
+| P4 | linja med «3 av 3» uten 3 av 3 | `tests/test_app.py::TestStory80eTekst::test_linja_om_3_av_3_med_navnene_fra_radene` |
+| P5 | «Oslo Børs» i innledningen i demoen | `tests/test_demo.py::TestStory80eTekstIDemoen::test_teksten_over_tabellen_i_demoen` |
+| P6 | «Hos 1 aksjer» | `tests/test_app.py::TestStory80eTekst::test_innledningen_med_én_aksje` |
+| P7 | setningen om klikk i første punkt | `tests/test_app.py::TestStory80eTekst::test_slik_leser_du_tabellen_har_3_punkter` |
+| P8 | setningen borte fra steg 2 i README-en | `tests/test_docker.py::TestReadmeForNybegynnere::test_zip_fila_maa_pakkes_ut` |
