@@ -164,3 +164,7 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-8-0d-utseendet-fra-designforslaget.md`
   summary: Oversikten og aksjesiden viser tidspunktet to ganger, som «Oppdatert …» i stripa og som «data hentet …» i linja under tittelen.
   evidence: BH2 i gjennomgangen av PR 1 av 8.0d (14.10). Stripa kom i PR 1, og linja under tittelen hører til oversikten og aksjesiden, som er PR 2 og PR 3. Hjelpen bak «?» ved «data hentet» står i den linja, så den må flyttes med hvis linja tas bort. Avgjøres i planen for PR 2.
+  resolved: Oversikten er løst i PR 2 av 8.0d (14.10): tidspunktet står bare som «Oppdatert …» i stripa, med «?» ved siden av (svar 5). Aksjesiden gjenstår til PR 3.
+- source_spec: `_bmad-output/implementation-artifacts/spec-8-0d-utseendet-fra-designforslaget.md`
+  summary: Båndet «Øvrige aksjer» sier «signalstyrke 0 eller 1», men rader uten vurdering («Ikke vurdert» eller en grunn) står også der og telles i pillen. Strekene og båndteksten forutsetter terskel 2: med en annen terskel følger strekene «Skilte seg ut» og ikke nivået, og ingenting holder terskelen mellom 1 og 3.
+  evidence: BH2, ECH1, ECH2 og ECH3 i gjennomgangen av PR 2 av 8.0d (14.10). Ordlyden i båndet er gruppens beslutning (instruksjonen kl. 17:31), så en endring avgjøres av gruppen. Terskelen er 2 i Parametre i dag. Grensene i båndene følger terskelen (testen med terskel 3).
