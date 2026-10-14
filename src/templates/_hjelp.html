@@ -19,18 +19,20 @@
     }
     /* PR 2 av 8.0d: fokusringen står rundt sirkelen, 2 px utenfor og 3 px
        bred, og ikke rundt klikkflaten, som dekket en del av ordet ved
-       siden av. På blekk, i stripa og kolonneraden, er sirkelen hvit og
-       ringen oransje, som fokus i stripa. */
+       siden av. På blekk, i stripa og kolonneraden i oversikten, er
+       sirkelen hvit og ringen oransje, som fokus i stripa. Tabellen på
+       aksjesiden har lys kolonnerad og beholder den svarte sirkelen
+       (gjennomgangen, BH1). */
     button.hjelpeknapp:focus-visible {
       outline: none;
       background: radial-gradient(circle, var(--blekk) 10.5px, transparent 11px, transparent 13px,
                                   var(--blekk) 13.5px, var(--blekk) 16px, transparent 16.5px);
     }
-    header.stripe button.hjelpeknapp, thead button.hjelpeknapp {
+    header.stripe button.hjelpeknapp, .tabellboks thead button.hjelpeknapp {
       color: var(--blekk);
       background: radial-gradient(circle, var(--hvit) 10.5px, transparent 11px);
     }
-    header.stripe button.hjelpeknapp:focus-visible, thead button.hjelpeknapp:focus-visible {
+    header.stripe button.hjelpeknapp:focus-visible, .tabellboks thead button.hjelpeknapp:focus-visible {
       background: radial-gradient(circle, var(--hvit) 10.5px, transparent 11px, transparent 13px,
                                   var(--oransje) 13.5px, var(--oransje) 16px, transparent 16.5px);
     }

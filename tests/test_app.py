@@ -177,9 +177,9 @@ def test_viser_selskapsnavn_og_de_fem_kolonnene(klient, monkeypatch):
 
     for overskrift in ("Selskap", "Sluttkurs", "Endring", "Signalstyrke", "Retning"):
         # Signalstyrke har «?» etter ordet fra story 8.0b, i samme celle.
-        # Story 8.0d, PR 2: «NOK» under Sluttkurs (svar 2).
-        assert re.search(rf"<th[^>]*>{overskrift}( <button[^<]*>\?</button>)?(<span class=\"under\">NOK</span>)?</th>",
-                         html), overskrift
+        # Story 8.0d, PR 2: «NOK» bare under Sluttkurs (svar 2, BH9).
+        nok = '(<span class="under">NOK</span>)' if overskrift == "Sluttkurs" else ""
+        assert re.search(rf"<th[^>]*>{overskrift}( <button[^<]*>\?</button>)?{nok}</th>", html), overskrift
     assert "Equinor" in html
 
 
@@ -289,7 +289,8 @@ class TestTidsstempler:
         html = klient.get("/").data.decode("utf-8")
 
         assert "Oppdatert tirsdag 22.09 kl. 20.05" in html
-        assert "24.09" not in html.split("</header>")[0]
+        # BH8: det nyeste tidspunktet står ingen steder på siden.
+        assert "24.09" not in _synlig(html)
 
     def test_den_eldste_raden_viser_sin_egen_tid_under_navnet(self, klient, monkeypatch):
         monter_lager(monkeypatch, {"EQNR": self.FERSK, "DNB": self.GAMMEL})
@@ -1705,9 +1706,12 @@ class TestStory80e:
         monkeypatch.setattr(app_modul, "STANDARD", dataclasses.replace(app_modul.STANDARD, terskel=3))
         _lagret("KOG", 0.0, 1, 1, 1)
         _lagret("EQNR", 0.0, 1, 1, 0)
-        assert _deler(klient.get("/").data.decode("utf-8")) == {
+        html = klient.get("/").data.decode("utf-8")
+        assert _deler(html) == {
             "Skilte seg ut": ["Kongsberg Gruppen"], "Øvrige aksjer": ["Equinor"],
         }
+        # Story 8.0d, PR 2 (BH10): grensene i båndene følger terskelen.
+        assert _tabell(html).ekstra["bak"] == ["signalstyrke 3 eller mer", "signalstyrke 0 til 2"]
 
     def test_setningene_fra_8_0c_der_skilte_seg_ut_ellers_staar(self, klient):
         """Svar 3. Ville feilet hvis «Skilte seg ut» stod sammen med

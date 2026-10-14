@@ -8,8 +8,8 @@
           <tr {% if rad.skiller_seg_ut %}class="utslag{% if rad.styrke == antall_sjekker %} alle{% endif %}"{% endif %}>
             <td class="selskap"><a href="/aksje/{{ rad.aksje.symbol }}">{{ rad.aksje.navn }}</a>
               {#- Avvik 11: ticker og bransje med symbol under navnet. #}
-              <span class="linje">{{ rad.aksje.symbol }} · {{ bransjesymbol(rad.aksje.sektor) }}{{ rad.aksje.sektor }}</span>
-              {%- if rad.aksje.symbol in eget %}<span class="hentet">hentet {{ rad.sist_hentet|norsk_tid }}</span>{% endif %}</td>
+              <span class="linje">{{ rad.aksje.symbol }}{% if rad.aksje.sektor %} · {{ bransjesymbol(rad.aksje.sektor) }}{{ rad.aksje.sektor }}{% endif %}</span>
+              {% if rad.aksje.symbol in eget %}<span class="hentet">hentet {{ rad.sist_hentet|norsk_tid }}</span>{% endif %}</td>
 
             <td class="tall">{{ rad.sluttkurs|tall('kurs') }}</td>
 
@@ -50,7 +50,7 @@
     @media (max-width: 860px) { .topp-del { grid-template-columns: minmax(0, 1fr); gap: 24px; } }
     /* Svar 1: Newsreader i 72pt på den store overskriften. Det viktigste har
        lys oransje markering fra 60 % av høyden, uten fet skrift (§4, 14.10). */
-    h1.overskrift { font-family: "Newsreader 72", "Newsreader", Georgia, serif; font-weight: 500;
+    h1.overskrift { font-family: "Newsreader 72", "Newsreader", Georgia, serif; font-weight: 500; color: var(--blekk);
                     font-size: clamp(34px, 4.5vw + 16px, 52px); line-height: 1.06; letter-spacing: -0.015em;
                     margin: 0 0 0.5rem; }
     h1.overskrift mark { background: linear-gradient(transparent 60%, var(--lys-oransje) 60%); color: inherit; }
@@ -131,11 +131,11 @@
     tr.del.ut th { background: var(--baand-ut); color: var(--brun); border-top: 1px solid var(--baand-ut-kant);
                    border-bottom-color: var(--baand-ut-kant); }
     tr.del.oevrige th { background: var(--baand-oevrige); color: var(--tekst); }
-    tr.del .antall { display: inline-block; min-width: 1.5em; margin-left: 0.5rem; padding: 0.1rem 0.5rem;
+    tr.del .antall { display: inline-block; min-width: 1.5em; margin-left: 0.25rem; padding: 0.1rem 0.5rem;
                      border-radius: 999px; font-size: 12.5px; text-align: center; color: var(--hvit); }
     tr.del.ut .antall { background: var(--brun); }
     tr.del.oevrige .antall { background: var(--tekst); }
-    tr.del .bak { margin-left: 0.5rem; font-size: 13.5px; font-weight: 400; }
+    tr.del .bak { margin-left: 0.25rem; font-size: 13.5px; font-weight: 400; }
     tr.del.ingen-utslag td { border-bottom: none; font-weight: 400; height: auto; }
     p.ingen-utslag { margin: 0.6rem 0; }
     /* FR-705 med tekst, ikke bare farge (story 8.0). */
@@ -215,7 +215,7 @@
       {% set foerste_del = skilte_seg_ut or ingen_skilte_seg_ut %}
       {% if skilte_seg_ut %}
       <tbody>
-        <tr class="del ut"><th colspan="5" scope="rowgroup">Skilte seg ut<span class="antall">{{ skilte_seg_ut|length }}</span><span class="bak">signalstyrke {{ parametre.terskel }} eller mer</span></th></tr>
+        <tr class="del ut"><th colspan="5" scope="rowgroup">Skilte seg ut <span class="antall">{{ skilte_seg_ut|length }}</span> <span class="bak">signalstyrke {{ parametre.terskel }} eller mer</span></th></tr>
         {% for rad in skilte_seg_ut %}{{ tabellrad(rad) }}{% endfor %}
       </tbody>
       {% elif ingen_skilte_seg_ut %}
@@ -230,7 +230,7 @@
       {% endif %}
       {% if oevrige %}
       <tbody>
-        {% if foerste_del %}<tr class="del oevrige"><th colspan="5" scope="rowgroup">Øvrige aksjer<span class="antall">{{ oevrige|length }}</span><span class="bak">signalstyrke 0{% if parametre.terskel == 2 %} eller 1{% elif parametre.terskel > 2 %} til {{ parametre.terskel - 1 }}{% endif %}</span></th></tr>{% endif %}
+        {% if foerste_del %}<tr class="del oevrige"><th colspan="5" scope="rowgroup">Øvrige aksjer <span class="antall">{{ oevrige|length }}</span> <span class="bak">signalstyrke 0{% if parametre.terskel == 2 %} eller 1{% elif parametre.terskel > 2 %} til {{ parametre.terskel - 1 }}{% endif %}</span></th></tr>{% endif %}
         {% for rad in oevrige %}{{ tabellrad(rad) }}{% endfor %}
       </tbody>
       {% endif %}

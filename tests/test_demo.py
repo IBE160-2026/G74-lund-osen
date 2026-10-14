@@ -503,6 +503,8 @@ class TestSidene:
         c.close()
         html = klient.get("/").data.decode("utf-8")
         assert demo.DEMOKOMMANDO in html and app_modul.HENTEKOMMANDO not in html
+        # Story 8.0d, PR 2 (VG8): én h1, «Markedsoversikt» (svar 3).
+        assert html.count("<h1") == 1 and '<h1 class="overskrift">Markedsoversikt</h1>' in html
         # VG1 i gjennomgangen av PR 2: i Docker er det Docker-kommandoen ogsaa her.
         monkeypatch.setenv(app_modul.I_DOCKER, "1")
         html = klient.get("/").data.decode("utf-8")
