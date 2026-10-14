@@ -1190,6 +1190,9 @@ class TestVurderingenPaaOversikten:
 
         html = klient.get("/").data.decode("utf-8")
         fotnote = html.split("Uten data i denne kilden:")[1].split("</p>")[0]
+        # Story 8.0d, PR 2b (VG1): M telles fra aksje, ikke fast 15 eller
+        # AKSJEUNIVERS. Basen har 13 aksjer igjen.
+        assert "<mark>0 av 13 aksjer</mark>" in html and " · 13 aksjer" in _synlig(html)
 
         assert "Bank fra basen" in fotnote
         assert "DNO" not in fotnote
@@ -1803,7 +1806,7 @@ def _synlig(html: str) -> str:
 class TestStory80eTekst:
     """Story 8.0e, PR 2: teksten over tabellen."""
 
-    def test_overskriften_teller_fra_radene(self, klient):
+    def test_overskriften_teller_n_fra_radene_og_m_fra_lista(self, klient):
         """Svar 3: N telles fra radene. Story 8.0d, PR 2b: M er alle aksjene
         i lista, også de uten kurser (14.10). Testbasen har 15 aksjer, og 2
         har kurser."""
@@ -1819,14 +1822,17 @@ class TestStory80eTekst:
         under tabellen, ikke som rad, men telles i overskriften og linja."""
         from kursdata import AKSJEUNIVERS
 
-        mangler, *med_kurser = AKSJEUNIVERS
+        mangler, rolig, *med_kurser = AKSJEUNIVERS
+        _lagret(rolig.symbol, 0.0, 0, 0, 0)
         for aksje in med_kurser:
             _lagret(aksje.symbol, 0.0, 1, 1, 0)
         html = klient.get("/").data.decode("utf-8")
         tekst = _synlig(html)
         m = len(AKSJEUNIVERS)
         assert len(_tabell(html).rader) == m - 1
-        assert f"<mark>{m - 1} av {m} aksjer</mark>" in html
+        assert f"<mark>{m - 2} av {m} aksjer</mark>" in html
+        # VG2: båndene teller radene sine som før.
+        assert _tabell(html).ekstra["antall"] == [str(m - 2), "1"]
         assert f"Oslo Børs · 31.10 · {m} aksjer" in tekst
         assert f"Uten data i denne kilden: {mangler.navn}." in tekst
 
