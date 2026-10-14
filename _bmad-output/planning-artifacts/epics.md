@@ -507,6 +507,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Lagt til 2026-10-13, endringsforslaget 13.10 ([`sprint-change-proposal-2026-10-13.md`](sprint-change-proposal-2026-10-13.md)), godkjent av Marian kl. 12:46:* 8.0e kommer etter 8.0c og før 8.0d. 10.6 kommer etter 2.9, fordi den trenger hovedindeksen (svar 16). Plassen til 8.19, 8.10b og resten avgjøres etter README-prøven (spørsmål 14 og 15). 2.15, endringen i 8.14 og tillegget i 10.1 og 10.2 føres etter prøven i kveld (N1, svar 6 og 23).
 
+*Lagt til 2026-10-14 (gruppen kl. 22:19 og 22:25, «ja» og «1 ja mest mulig inn før readme prøven og 2 = ja»):* Rekkefølgen etter 8.0d er 8.15, så 2.8, 2.9 og 2.9b, 8.3, 8.10, 8.16 og 8.17, 2.7 og 8.8, 10.1–10.3, 8.10b, 10.6, og til slutt 2.11 og 2.12. README-prøven tas når mest mulig av dette er bygget, og senest én uke før innleveringen. Det erstatter linja under story 3.4 om at prøven tas etter at 8.0d er flettet (§9 i `docs/kvalitetssikring.md`).
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -1985,6 +1987,8 @@ avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 *Lagt til 2026-10-12:* PR 3 er flettet i `4464a10`, PR #30. README-en har en tabell over de to versjonene, felles steg 1–4, den ekte versjonen og demoen, «Står du fast?» og `docs/hjelp.md`, uten bilder (svar 4 11.10). README-prøven 13.–16.10 gjenstår (§9 i `docs/kvalitetssikring.md`).
 
 *Lagt til 2026-10-13 (story 8.0e, PR 2):* README-prøven tas etter at 8.0d er flettet, så testeren ser det nye utseendet, og ikke 13.–16.10 (beslutningen kl. 23:40, §9 i `docs/kvalitetssikring.md`).
+
+*Lagt til 2026-10-14 (gruppen kl. 22:19 og 22:25):* README-prøven tas når mest mulig av rekkefølgen etter 8.0d er bygget (se «Prioritering» øverst), og senest én uke før innleveringen. Det erstatter linja over om at prøven tas etter at 8.0d er flettet.
 
 ### Story 3.4b: KI-tekstene i demoen
 
