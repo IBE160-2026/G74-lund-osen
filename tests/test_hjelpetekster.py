@@ -302,8 +302,11 @@ class TestSidene:
                              ('<th class="tall">Signalstyrke ', "hjelp-signalstyrke"),
                              ("<th>Retning ", "hjelp-retning")):
             assert re.search(re.escape(tekst) + knapp.format(vindu), oversikt), vindu
-        assert re.search(r"data hentet [^<]+ " + knapp.format("hjelp-hentet"), oversikt)
-        assert re.search(r"<h1>OSE Signal</h1>\s*<p", oversikt)
+        # Story 8.0d, PR 2: tidspunktet står bare i stripa, som «Oppdatert»,
+        # med «?» ved siden av (BH2, svar 5).
+        stripa = oversikt.split('<header class="stripe">', 1)[1].split("</header>", 1)[0]
+        assert re.search(r"Oppdatert [^<]+</span>\s*" + knapp.format("hjelp-hentet"), stripa)
+        assert "data hentet" not in oversikt
         detalj = _side(klient, "/aksje/BRFE")
         for tekst, vindu in (('<span class="etikett">Sluttkurs ', "hjelp-kurs"),
                              ('<span class="etikett">Signalstyrke ', "hjelp-styrke"),

@@ -1,8 +1,15 @@
 {% extends "_ramme.html" %}
 {% from "_hjelp.html" import hjelpeknapp, hjelpevindu with context -%}
+{% from "_bransjer.html" import bransjesymbol -%}
 {% macro tabellrad(rad) %}
-          <tr {% if rad.skiller_seg_ut %}class="utslag"{% endif %}>
-            <td class="selskap"><a href="/aksje/{{ rad.aksje.symbol }}">{{ rad.aksje.navn }}</a>{% if rad.aksje.symbol in eget %}<span class="hentet">hentet {{ rad.sist_hentet|norsk_tid }}</span>{% endif %}</td>
+          {#- Story 8.0d, PR 2: strek til venstre i sterk oransje ved 3 av 3 og
+              i lys oransje ved 2 av 3, og ingen ved 1 og 0 (designregler §3,
+              14.10). #}
+          <tr {% if rad.skiller_seg_ut %}class="utslag{% if rad.styrke == antall_sjekker %} alle{% endif %}"{% endif %}>
+            <td class="selskap"><a href="/aksje/{{ rad.aksje.symbol }}">{{ rad.aksje.navn }}</a>
+              {#- Avvik 11: ticker og bransje med symbol under navnet. #}
+              <span class="linje">{{ rad.aksje.symbol }} · {{ bransjesymbol(rad.aksje.sektor) }}{{ rad.aksje.sektor }}</span>
+              {%- if rad.aksje.symbol in eget %}<span class="hentet">hentet {{ rad.sist_hentet|norsk_tid }}</span>{% endif %}</td>
 
             <td class="tall">{{ rad.sluttkurs|tall('kurs') }}</td>
 
@@ -20,7 +27,9 @@
               {% if rad.styrke is not none %}
                 <span class="pille{% if rad.styrke == antall_sjekker %} tre-av-tre{% endif %}">{{ rad.styrke }} av {{ antall_sjekker }}</span>
                 <span class="sjekker">{% for bokstav, navn, verdi in rad.sjekker %}<span class="sjekk"><abbr title="{{ navn }}">{{ bokstav }}</abbr> {{ verdi }}</span>{% if not loop.last %} {% endif %}{% endfor %}</span>
-                {% if rad.skiller_seg_ut %}<span class="merke">skiller seg ut</span>{% endif %}
+                {#- Svar 4 på planen for PR 2: merket er skjult for synet, men
+                    hver rad sier det med ord. #}
+                {% if rad.skiller_seg_ut %}<span class="merke skjult">skiller seg ut</span>{% endif %}
               {% else %}
                 – <span class="merke mangler">{{ rad.tekst }}</span>
               {% endif %}
@@ -31,23 +40,70 @@
             </td>
           </tr>
 {% endmacro -%}
+{% block oppdatert_hjelp %}{% if rader and hentet %} {{ hjelpeknapp("hjelp-hentet", "Hjelp: oppdatert") }}{% endif %}{% endblock %}
 {% block stil %}
-    h1 { font-size: 1.4rem; margin-bottom: 0.2rem; }
-    p.meta { color: var(--dempet); font-size: 0.9rem; margin-top: 0; }
-    table { border-collapse: collapse; width: 100%; }
+    /* Story 8.0d, PR 2: overskriften, innledningen og kortet «Slik leser du
+       tabellen» står i et rutenett, kortet til høyre, og under på smal
+       skjerm (designregler §5). */
+    .topp-del { display: grid; grid-template-columns: minmax(0, 1fr) 390px; gap: 36px; align-items: start;
+                margin: 0.5rem 0 40px; }
+    @media (max-width: 860px) { .topp-del { grid-template-columns: minmax(0, 1fr); gap: 24px; } }
+    /* Svar 1: Newsreader i 72pt på den store overskriften. Det viktigste har
+       lys oransje markering fra 60 % av høyden, uten fet skrift (§4, 14.10). */
+    h1.overskrift { font-family: "Newsreader 72", "Newsreader", Georgia, serif; font-weight: 500;
+                    font-size: clamp(34px, 4.5vw + 16px, 52px); line-height: 1.06; letter-spacing: -0.015em;
+                    margin: 0 0 0.5rem; }
+    h1.overskrift mark { background: linear-gradient(transparent 60%, var(--lys-oransje) 60%); color: inherit; }
+    p.meta { color: var(--dempet); font-size: 0.9rem; margin: 0 0 0.75rem; }
+    p.innledning { max-width: 560px; font-size: 17px; line-height: 1.55; color: var(--tekst); margin: 0.4rem 0; }
+    p.alle-sjekkene { margin: 0.75rem 0 0; }
+
+    /* Kortet «Slik leser du tabellen» (beslutning 11). */
+    section.slik-leser { background: var(--kort); border: 1px solid var(--strek); border-radius: 16px;
+                         padding: 20px 22px; }
+    /* Utdraget §3: de små overskriftene i IBM Plex Sans, ikke Newsreader. */
+    section.slik-leser h2 { font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 12.5px; font-weight: 700;
+                            text-transform: uppercase; letter-spacing: 0.07em; color: var(--dempet); margin: 0 0 0.75rem; }
+    section.slik-leser ul { list-style: none; margin: 0; padding: 0; }
+    section.slik-leser li { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; align-items: start;
+                            font-size: 13.5px; line-height: 1.45; color: var(--dempet); }
+    section.slik-leser li + li { margin-top: 14px; }
+    section.slik-leser strong { display: block; font-size: 15px; font-weight: 600; color: var(--blekk); }
+    .symbolfelt { width: 36px; height: 36px; border-radius: 10px; background: var(--bakgrunn);
+                  display: flex; align-items: center; justify-content: center; gap: 1px; color: var(--tekst); }
+    .symbolfelt .brikke { font-size: 10px; font-weight: 700; padding: 2px 3px; border-radius: 6px;
+                          background: var(--opp); color: var(--hvit); white-space: nowrap; }
+    .symbolfelt .pil { font-size: 12px; font-weight: 700; }
+    .symbolfelt svg { width: 18px; height: 18px; }
+
+    /* Tabellen i et kort med svart topp. Boksen ruller sidelengs på smal
+       skjerm, så siden ikke gjør det (avvik 8). */
+    .tabellboks { overflow-x: auto; background: var(--kort); border: 1px solid var(--strek);
+                  border-top-color: var(--blekk); border-radius: 16px;
+                  box-shadow: 0 1px 2px rgba(22, 24, 29, 0.04), 0 10px 28px rgba(22, 24, 29, 0.05); }
+    table { border-collapse: collapse; width: 100%; min-width: 600px; }
     th, td { text-align: left; padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--strek); }
-    th { font-weight: 600; font-size: 0.85rem; color: var(--dempet); }
+    td:last-child, th:last-child { padding-right: 22px; }
+    td:first-child, th:first-child { padding-left: 22px; }
+    /* Kolonneraden i blekk med navnene i hvitt. */
+    thead th { background: var(--blekk); color: var(--hvit); font-size: 14px; font-weight: 700; height: 64px;
+               box-sizing: border-box; border-bottom: 0; vertical-align: middle; white-space: nowrap; }
+    thead th .under { display: block; font-size: 12px; font-weight: 400; color: var(--kolonne-tekst-2); }
     /* Story 8.0c: overskriften staar over tallene. */
     th.tall { text-align: right; }
     td.tall { text-align: right; font-variant-numeric: tabular-nums; }
-    /* Story 8.0c: 2 av 3 eller mer merkes med fet skrift og en strek til
-       venstre i tekstfargen, ikke med lys bakgrunn og ikke med gult. */
-    tr.utslag td { font-weight: 600; }
-    tr.utslag td:first-child { box-shadow: inset 3px 0 0 var(--tekst); }
-    td.selskap { font-weight: 500; }
+    tbody tr:not(.del) td { background: var(--kort); }
+    tr.utslag td { font-weight: 600; height: 66px; box-sizing: border-box; }
+    /* Designregler §3 (14.10): sterk oransje ved 3 av 3, lys ved 2 av 3. */
+    tr.utslag td:first-child { box-shadow: inset 4px 0 0 var(--lys-oransje); }
+    tr.utslag.alle td:first-child { box-shadow: inset 4px 0 0 var(--oransje); }
+    td.selskap { font-weight: 600; }
     /* Story 8.0: navnet ser ut som en lenke, og fokus synes. */
-    td.selskap a { color: inherit; text-decoration: underline; }
+    td.selskap a { color: inherit; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
     td.selskap a:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+    td.selskap .linje { display: flex; align-items: center; gap: 4px; margin-top: 2px;
+                        font-size: 12.5px; font-weight: 400; color: var(--dempet); white-space: nowrap; }
+    td.selskap .bransjesymbol { width: 15px; height: 15px; }
     td.selskap .hentet { display: block; font-weight: normal; color: var(--dempet); font-size: 0.8rem; }
 
     /* FR-103: tekst, symbol og farge samtidig. Teksten baerer alene hvis
@@ -61,79 +117,87 @@
     .ingen, .ukjent { color: var(--dempet); }
 
     .styrke { font-variant-numeric: tabular-nums; }
-    /* designregler §3: gult betyr 3 av 3, med gul ring rundt pillen. */
+    /* designregler §3: ringen rundt 3 av 3, i sterk oransje (14.10). */
     .pille { white-space: nowrap; padding: 0.05rem 0.45rem; border-radius: 999px; }
-    /* Story 8.0e, svar 8: svart fyll og hvit tekst inne i den gule ringen,
-       som i designforslaget. 2 av 3 faar ikke fyll. */
-    .pille.tre-av-tre { border: 2px solid var(--gul); background: var(--fyll); color: var(--hvit); }
+    /* Story 8.0e, svar 8: svart fyll og hvit tekst inne i ringen, som i
+       designforslaget. 2 av 3 faar ikke fyll. */
+    .pille.tre-av-tre { border: 2px solid var(--oransje); background: var(--fyll); color: var(--hvit); }
     /* Story 8.0e: T, B og I under «N av 3», lest fra vurderingen. */
     .sjekker { display: block; font-size: 0.75rem; font-weight: normal; color: var(--dempet); white-space: nowrap; }
     .sjekker abbr { text-decoration: none; }
-    /* Story 8.0e: overskriften for hver del av tabellen. */
-    tr.del th { color: var(--tekst); font-size: 0.9rem; padding-top: 1rem; }
-    tr.del td { border-bottom: none; }
+    /* Båndene øverst i hver del (designregler del 5, 14.10). */
+    tr.del th, tr.del td { font-size: 14.5px; font-weight: 700; height: 46px; box-sizing: border-box; }
+    tr.del.ut th { background: var(--baand-ut); color: var(--brun); border-top: 1px solid var(--baand-ut-kant);
+                   border-bottom-color: var(--baand-ut-kant); }
+    tr.del.oevrige th { background: var(--baand-oevrige); color: var(--tekst); }
+    tr.del .antall { display: inline-block; min-width: 1.5em; margin-left: 0.5rem; padding: 0.1rem 0.5rem;
+                     border-radius: 999px; font-size: 12.5px; text-align: center; color: var(--hvit); }
+    tr.del.ut .antall { background: var(--brun); }
+    tr.del.oevrige .antall { background: var(--tekst); }
+    tr.del .bak { margin-left: 0.5rem; font-size: 13.5px; font-weight: 400; }
+    tr.del.ingen-utslag td { border-bottom: none; font-weight: 400; height: auto; }
     p.ingen-utslag { margin: 0.6rem 0; }
-    /* Story 8.0e, PR 2: teksten over tabellen. Det viktigste i overskriften
-       er fet skrift, ikke gult (designregler §4, rettet 13.10). */
-    h2.overskrift { font-size: 1.3rem; font-weight: 500; margin: 1.2rem 0 0.4rem; }
-    h2.overskrift strong { font-weight: 700; }
-    p.innledning { max-width: 36rem; line-height: 1.5; margin: 0.4rem 0; }
-    p.alle-sjekkene { margin: 0.4rem 0 1rem; }
-    section.slik-leser { margin: 1rem 0 1.4rem; }
-    section.slik-leser h2 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--dempet); margin: 0 0 0.4rem; }
-    section.slik-leser ul { margin: 0; padding-left: 1.2rem; font-size: 0.9rem; line-height: 1.45; }
-    section.slik-leser strong { display: block; }
     /* FR-705 med tekst, ikke bare farge (story 8.0). */
     .merke { display: block; font-size: 0.75rem; font-weight: 600; }
+    .merke.skjult { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);
+                    clip-path: inset(50%); white-space: nowrap; }
     .mangler { color: var(--dempet); font-style: italic; font-size: 0.85rem; }
     .merke.mangler { font-weight: normal; }
     p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 {% endblock %}
 {% block innhold %}
-  <h1>OSE Signal</h1>
-
   {% if rader %}
     {#- Story 8.0e, svar 1: demoen sier «Demo Børs» der den ekte versjonen
         sier «Oslo Børs», i linja over tabellen og i innledningen. #}
     {% set boers = "Demo Børs" if eksempeltall else "Oslo Børs" %}
-    <p class="meta">
-      {{ boers }} · {{ dato|dato }} · {{ rader|length }} aksjer
-      {% if hentet %}· data hentet {{ hentet|norsk_tid }} {{ hjelpeknapp("hjelp-hentet", "Hjelp: data hentet") }}{% endif %}
-    </p>
 
     {#- Story 8.0e, PR 2: overskriften, innledningen, linja om «3 av 3» og
         «Slik leser du tabellen». N og M telles fra radene, ukedagen er
-        datoen i linja over (svar 5), og tallene i teksten kommer fra
+        datoen i linja under (svar 5), og tallene i teksten kommer fra
         Parametre og antall_sjekker. Uten en eneste vurdering staar ingen
-        overskrift og ingen setning «Hos …» (svar 3). #}
+        overskrift med tall og ingen setning «Hos …» (svar 3).
+
+        Story 8.0d, PR 2: overskriften er sidens h1, «Markedsoversikt» uten
+        vurdering (svar 3). Tidspunktet står bare i stripa (svar 5). #}
     {% set n = skilte_seg_ut|length %}
-    {% if antall_vurdert %}
-      <h2 class="overskrift"><strong>{{ n }} av {{ rader|length }} aksjer</strong> skilte seg ut {{ dato|ukedag }}</h2>
-    {% endif %}
-    <p class="innledning">
-      OSE Signal er et regelbasert signal for aksjer på {{ boers }}: {{ antall_sjekker }} faste sjekker måler kurs og volum mot aksjens egen historikk.
-      {%- if n == 1 %} Hos 1 aksje slo minst {{ parametre.terskel }} av {{ antall_sjekker }} ut.
-      {%- elif n > 1 %} Hos disse {{ n }} slo minst {{ parametre.terskel }} av {{ antall_sjekker }} ut.{% endif %}
-      Det viser hvor du kan se nærmere, ikke hva du bør kjøpe eller selge.
-    </p>
-    {% if tre_av_tre %}
-      <p class="alle-sjekkene"><span class="pille tre-av-tre">{{ antall_sjekker }} av {{ antall_sjekker }}</span> Bare {{ tre_av_tre|med_og }} fikk utslag på alle {{ antall_sjekker }} sjekkene.</p>
-    {% endif %}
+    <div class="topp-del">
+      <div>
+        {% if antall_vurdert %}
+          <h1 class="overskrift"><mark>{{ n }} av {{ rader|length }} aksjer</mark> skilte seg ut {{ dato|ukedag }}</h1>
+        {% else %}
+          <h1 class="overskrift">Markedsoversikt</h1>
+        {% endif %}
+        <p class="meta">{{ boers }} · {{ dato|dato }} · {{ rader|length }} aksjer</p>
+        <p class="innledning">
+          OSE Signal er et regelbasert signal for aksjer på {{ boers }}: {{ antall_sjekker }} faste sjekker måler kurs og volum mot aksjens egen historikk.
+          {%- if n == 1 %} Hos 1 aksje slo minst {{ parametre.terskel }} av {{ antall_sjekker }} ut.
+          {%- elif n > 1 %} Hos disse {{ n }} slo minst {{ parametre.terskel }} av {{ antall_sjekker }} ut.{% endif %}
+          Det viser hvor du kan se nærmere, ikke hva du bør kjøpe eller selge.
+        </p>
+        {% if tre_av_tre %}
+          <p class="alle-sjekkene"><span class="pille tre-av-tre">{{ antall_sjekker }} av {{ antall_sjekker }}</span> Bare {{ tre_av_tre|med_og }} fikk utslag på alle {{ antall_sjekker }} sjekkene.</p>
+        {% endif %}
+      </div>
 
-    <section class="slik-leser" aria-labelledby="slik-leser">
-      <h2 id="slik-leser">Slik leser du tabellen</h2>
-      <ul>
-        <li><strong>Signalstyrke 0–{{ antall_sjekker }}</strong> T, B og I er trend, bevegelse og interesse, og hver gir +1, 0 eller -1. Øverst i cellen står hvor mange som slo ut, fra 0 av {{ antall_sjekker }} til {{ antall_sjekker }} av {{ antall_sjekker }}.</li>
-        <li><strong>Retning</strong> Om sjekkene som slo ut, ga +1 eller -1. Ikke et råd om å kjøpe eller selge.</li>
-        <li><strong>Selskapsnavnet</strong> Klikk for å se sjekkene, tallene bak og kursgrafen.</li>
-      </ul>
-    </section>
+      {#- Beslutning 11: kortet til høyre, under på smal skjerm. Symbolene er
+          pynt for synet, og teksten sier det samme. #}
+      <section class="slik-leser" aria-labelledby="slik-leser">
+        <h2 id="slik-leser">Slik leser du tabellen</h2>
+        <ul>
+          <li><span class="symbolfelt" aria-hidden="true"><span class="brikke">T +1</span></span><span><strong>Signalstyrke 0–{{ antall_sjekker }}</strong> T, B og I er trend, bevegelse og interesse, og hver gir +1, 0 eller -1. Øverst i cellen står hvor mange som slo ut, fra 0 av {{ antall_sjekker }} til {{ antall_sjekker }} av {{ antall_sjekker }}.</span></li>
+          <li><span class="symbolfelt" aria-hidden="true"><span class="pil opp">↑</span><span class="pil blandet">↔</span><span class="pil ned">↓</span></span><span><strong>Retning</strong> Om sjekkene som slo ut, ga +1 eller -1. Ikke et råd om å kjøpe eller selge.</span></li>
+          <li><span class="symbolfelt" aria-hidden="true"><svg class="peker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" focusable="false"><path d="M6 3.5v15.5l4.2-4.1 2.9 6.4 2.6-1.2-2.9-6.3h5.9z"/></svg></span><span><strong>Selskapsnavnet</strong> Klikk for å se sjekkene, tallene bak og kursgrafen.</span></li>
+        </ul>
+      </section>
+    </div>
 
+    <div class="tabellboks" role="region" aria-label="Aksjene" tabindex="0">
     <table>
       <thead>
         <tr>
           <th>Selskap {{ hjelpeknapp("hjelp-selskap", "Hjelp: selskap") }}</th>
-          <th class="tall">Sluttkurs {{ hjelpeknapp("hjelp-sluttkurs", "Hjelp: sluttkurs") }}</th>
+          {#- Svar 2: bare «NOK» under et kolonnenavn. #}
+          <th class="tall">Sluttkurs {{ hjelpeknapp("hjelp-sluttkurs", "Hjelp: sluttkurs") }}<span class="under">NOK</span></th>
           <th class="tall">Endring {{ hjelpeknapp("hjelp-endring", "Hjelp: endring") }}</th>
           <th class="tall">Signalstyrke {{ hjelpeknapp("hjelp-signalstyrke", "Hjelp: signalstyrken") }}</th>
           <th>Retning {{ hjelpeknapp("hjelp-retning", "Hjelp: retning") }}</th>
@@ -143,11 +207,14 @@
           rad over alle fem kolonnene, og hver i FR-102-rekkefoelgen fra
           del_i_to. Skilte ingen seg ut, staar setningene fra 8.0c der
           «Skilte seg ut» ellers staar. Uten en eneste vurdering er det bare
-          én del, uten overskrift. #}
+          én del, uten overskrift.
+
+          Story 8.0d, PR 2: antallet i en pille og grensen bak, med tallene
+          fra Parametre. #}
       {% set foerste_del = skilte_seg_ut or ingen_skilte_seg_ut %}
       {% if skilte_seg_ut %}
       <tbody>
-        <tr class="del"><th colspan="5" scope="rowgroup">Skilte seg ut</th></tr>
+        <tr class="del ut"><th colspan="5" scope="rowgroup">Skilte seg ut<span class="antall">{{ skilte_seg_ut|length }}</span><span class="bak">signalstyrke {{ parametre.terskel }} eller mer</span></th></tr>
         {% for rad in skilte_seg_ut %}{{ tabellrad(rad) }}{% endfor %}
       </tbody>
       {% elif ingen_skilte_seg_ut %}
@@ -162,11 +229,12 @@
       {% endif %}
       {% if oevrige %}
       <tbody>
-        {% if foerste_del %}<tr class="del"><th colspan="5" scope="rowgroup">Øvrige aksjer</th></tr>{% endif %}
+        {% if foerste_del %}<tr class="del oevrige"><th colspan="5" scope="rowgroup">Øvrige aksjer<span class="antall">{{ oevrige|length }}</span><span class="bak">signalstyrke 0{% if parametre.terskel == 2 %} eller 1{% elif parametre.terskel > 2 %} til {{ parametre.terskel - 1 }}{% endif %}</span></th></tr>{% endif %}
         {% for rad in oevrige %}{{ tabellrad(rad) }}{% endfor %}
       </tbody>
       {% endif %}
     </table>
+    </div>
 
     {% if ikke_vurdert %}
       <p class="fotnote">
@@ -188,10 +256,12 @@
       Signalstyrken sier hvor mange av de {{ antall_sjekker }} sjekkene som slo ut, ikke om du bør kjøpe eller selge.
     </p>
   {% elif demokommando %}
+    <h1 class="overskrift">Markedsoversikt</h1>
     <p>
       Demobasen finnes ikke ennå. Lag den med <code>{{ demokommando }}</code>.
     </p>
   {% else %}
+    <h1 class="overskrift">Markedsoversikt</h1>
     <p>
       Ingen kurser i basen ennå. Hent dem med <code>{{ hentekommando }}</code>.
     </p>
@@ -210,7 +280,8 @@
       ("", ["retning", "positiv", "negativ", "blandet", "ingen", "ukjent"]),
     ]) }}
     {% if hentet %}
-      {{ hjelpevindu("hjelp-hentet", "Data hentet", [("", ["data_hentet", "uten_data"])]) }}
+      {#- Svar 5: vinduet heter «Oppdatert», som i ordlista (§4). #}
+      {{ hjelpevindu("hjelp-hentet", "Oppdatert", [("", ["data_hentet", "uten_data"])]) }}
     {% endif %}
   {% endif %}
 {% endblock %}

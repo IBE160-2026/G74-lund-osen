@@ -177,7 +177,9 @@ def test_viser_selskapsnavn_og_de_fem_kolonnene(klient, monkeypatch):
 
     for overskrift in ("Selskap", "Sluttkurs", "Endring", "Signalstyrke", "Retning"):
         # Signalstyrke har «?» etter ordet fra story 8.0b, i samme celle.
-        assert re.search(rf"<th[^>]*>{overskrift}( <button[^<]*>\?</button>)?</th>", html), overskrift
+        # Story 8.0d, PR 2: «NOK» under Sluttkurs (svar 2).
+        assert re.search(rf"<th[^>]*>{overskrift}( <button[^<]*>\?</button>)?(<span class=\"under\">NOK</span>)?</th>",
+                         html), overskrift
     assert "Equinor" in html
 
 
@@ -264,7 +266,8 @@ def test_data_hentet_leses_fra_oeyeblikksbildet(klient, monkeypatch):
 
     html = klient.get("/").data.decode("utf-8")
 
-    assert "data hentet 21.09 kl. 17.40" in html
+    # Story 8.0d, PR 2: i stripa, som «Oppdatert» (svar 5).
+    assert "Oppdatert mandag 21.09 kl. 17.40" in html
     assert 'class="hentet"' not in html
 
 
@@ -285,8 +288,8 @@ class TestTidsstempler:
 
         html = klient.get("/").data.decode("utf-8")
 
-        assert "data hentet 22.09 kl. 20.05" in html
-        assert "data hentet 2026-09-24" not in html
+        assert "Oppdatert tirsdag 22.09 kl. 20.05" in html
+        assert "24.09" not in html.split("</header>")[0]
 
     def test_den_eldste_raden_viser_sin_egen_tid_under_navnet(self, klient, monkeypatch):
         monter_lager(monkeypatch, {"EQNR": self.FERSK, "DNB": self.GAMMEL})
@@ -301,7 +304,7 @@ class TestTidsstempler:
 
         html = klient.get("/").data.decode("utf-8")
 
-        assert "data hentet 24.09 kl. 20.05" in html
+        assert "Oppdatert torsdag 24.09 kl. 20.05" in html
         assert 'class="hentet"' not in html
 
     def test_fortsatt_fem_kolonner(self, klient, monkeypatch):
@@ -324,7 +327,7 @@ class TestTidsstempler:
 
         html = klient.get("/").data.decode("utf-8")
 
-        assert "data hentet 25.09 kl. 00.30" in html
+        assert "Oppdatert fredag 25.09 kl. 00.30" in html
 
     def test_vintertid(self, klient, monkeypatch):
         """Demonstrasjonen er etter 25.10. Da er Oslo UTC+1, ikke +2."""
@@ -332,7 +335,7 @@ class TestTidsstempler:
 
         html = klient.get("/").data.decode("utf-8")
 
-        assert "data hentet 16.11 kl. 23.30" in html
+        assert "Oppdatert mandag 16.11 kl. 23.30" in html
 
     def test_detaljen_viser_symbolets_egen_tid(self, klient, monkeypatch):
         """Ikke sidens eldste: detaljen gjelder ett symbol."""
@@ -854,7 +857,13 @@ class _Tabell(HTMLParser):
 
     Story 8.0e: en rad med class="del" er overskriften for en del av
     tabellen, eller setningene fra 8.0c. Den staar i deler og ikke i rader,
-    og del_av sier hvilken del hver rad i rader staar under ("" uten)."""
+    og del_av sier hvilken del hver rad i rader staar under ("" uten).
+
+    Story 8.0d, PR 2: linja under navnet (ticker og bransje), antallet og
+    grensen i baandene og «NOK» under kolonnenavnet staar i ekstra, med
+    klassen som noekkel, og ikke i cellen. Cellen er det den var foer."""
+
+    EKSTRA = ("linje", "antall", "bak", "under")
 
     def __init__(self):
         super().__init__()
@@ -862,11 +871,22 @@ class _Tabell(HTMLParser):
         self.rader: list[list[str]] = []
         self.deler: list[str] = []
         self.del_av: list[str] = []
+        self.ekstra: dict[str, list[str]] = {k: [] for k in self.EKSTRA}
         self._i_kropp = False
         self._i_del = False
         self._celle: list[str] | None = None
+        self._ekstra: tuple[str, int, list[str]] | None = None
 
     def handle_starttag(self, tag, attrs):
+        if self._ekstra:
+            navn, dybde, tekst = self._ekstra
+            self._ekstra = (navn, dybde + 1, tekst)
+            return
+        klasser = (dict(attrs).get("class") or "").split()
+        ekstra = next((k for k in self.EKSTRA if k in klasser), None)
+        if ekstra and self._celle is not None:
+            self._ekstra = (ekstra, 1, [])
+            return
         if tag == "tbody":
             self._i_kropp = True
         elif tag == "tr" and self._i_kropp:
@@ -878,6 +898,14 @@ class _Tabell(HTMLParser):
             self._celle = []
 
     def handle_endtag(self, tag):
+        if self._ekstra:
+            navn, dybde, tekst = self._ekstra
+            if dybde > 1:
+                self._ekstra = (navn, dybde - 1, tekst)
+            else:
+                self.ekstra[navn].append(re.sub(r"[ \t\r\n]+", " ", "".join(tekst)).strip())
+                self._ekstra = None
+            return
         if tag == "tbody":
             self._i_kropp = False
         elif tag in ("td", "th") and self._celle is not None:
@@ -893,7 +921,9 @@ class _Tabell(HTMLParser):
             self._celle = None
 
     def handle_data(self, data):
-        if self._celle is not None:
+        if self._ekstra:
+            self._ekstra[2].append(data)
+        elif self._celle is not None:
             self._celle.append(data)
 
 
@@ -1302,20 +1332,24 @@ class TestStory80c:
         assert '<span class="pille tre-av-tre">3 av 3</span>' in tabell
         assert '<span class="pille">2 av 3</span>' in html
         ring = _regel(_stil(html), ".pille.tre-av-tre")
-        assert "border" in ring and "var(--gul)" in ring
+        # Story 8.0d, PR 2: ringen i sterk oransje (designregler §3, 14.10).
+        assert "border" in ring and "var(--oransje)" in ring
 
     def test_to_av_tre_merkes_med_mer_enn_lys_bakgrunn(self, klient, monkeypatch):
-        """Svar 2: fet skrift og en strek til venstre i tekstfargen, uten gult.
-        Ville feilet hvis raden bare hadde #fafafa, som foer 8.0c."""
+        """Svar 2: fet skrift og en strek til venstre. Ville feilet hvis raden
+        bare hadde #fafafa, som foer 8.0c.
+
+        Story 8.0d, PR 2: streken er 4 px i lys oransje ved 2 av 3, og i
+        sterk oransje bare ved 3 av 3 (designregler §3, 14.10)."""
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))
         html = klient.get("/").data.decode("utf-8")
         stil = _stil(html)
         assert '<tr class="utslag">' in html
         assert "font-weight: 600" in _regel(stil, "tr.utslag td")
         strek = _regel(stil, "tr.utslag td:first-child")
-        assert "inset 3px 0 0 var(--tekst)" in strek
+        assert "inset 4px 0 0 var(--lys-oransje)" in strek
         assert "#fafafa" not in stil
-        assert "gul" not in _regel(stil, "tr.utslag td") + strek
+        assert "var(--oransje)" not in _regel(stil, "tr.utslag td") + strek
 
     def test_overskriftene_staar_over_tallene(self, klient, monkeypatch):
         """Tillegget 11.10. Ville feilet hvis th.tall ble venstrejustert av
@@ -1470,19 +1504,14 @@ class TestStory80c:
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
         assert html.count('<tr class="bidro">') == 2
 
-    def test_den_gule_ringen_har_minst_3_til_1_mot_hvit(self, klient, monkeypatch):
-        """BH3, WCAG 1.4.11. Ville feilet med #d4a000, som har om lag 2,3:1."""
+    def test_ringen_er_sterk_oransje_og_teksten_sier_det_samme(self, klient, monkeypatch):
+        """Story 8.0d, PR 2, designregler §3 (14.10): testen fra 8.0c for 3:1
+        mot hvitt er byttet ut. Ringen er tavlas #F2B53A, og teksten «3 av 3»
+        sier det samme (FR-103). Ville feilet med ringen i en annen farge."""
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}))
         stil = _stil(klient.get("/").data.decode("utf-8"))
-        farge = re.search(r"--gul:\s*#([0-9a-fA-F]{6})", stil).group(1)
-
-        def lin(c):
-            c = c / 255
-            return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
-
-        r, g, b = (int(farge[i:i + 2], 16) for i in (0, 2, 4))
-        lys = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
-        assert (1.0 + 0.05) / (lys + 0.05) >= 3.0, farge
+        assert re.search(r"--oransje:\s*#F2B53A", stil)
+        assert "var(--oransje)" in _regel(stil, ".pille.tre-av-tre")
 
     def test_forbeholdet_staar_ogsaa_uten_tabellen(self, klient, monkeypatch):
         """VG6: forbeholdet staar synlig ogsaa naar sjekkene ikke vises."""
@@ -1547,7 +1576,7 @@ class TestStory80c:
         monkeypatch.setattr(app_modul, "naa", lambda: datetime(2027, 1, 4, 12, 0, tzinfo=timezone.utc))
         html = klient.get("/").data.decode("utf-8")
         assert re.search(r"Oslo Børs · \d\d\.\d\d\.2026 ·", html)
-        assert re.search(r"data hentet \d\d\.\d\d\.2026 kl\. \d\d\.\d\d", html)
+        assert re.search(r"Oppdatert [a-zø]+ \d\d\.\d\d\.2026 kl\. \d\d\.\d\d", html)
         # VG4: aksjesiden ogsaa, med datoen i meta-linja og grafens fra-til.
         detalj = klient.get("/aksje/EQNR").data.decode("utf-8")
         assert re.search(r"Energi · \d\d\.\d\d\.2026", detalj)
@@ -1724,7 +1753,7 @@ class TestStory80e:
         html = klient.get("/").data.decode("utf-8")
         stil = _stil(html)
         fyll = _regel(stil, ".pille.tre-av-tre")
-        assert "var(--gul)" in fyll and "background: var(--fyll)" in fyll
+        assert "var(--oransje)" in fyll and "background: var(--fyll)" in fyll
         # Story 8.0d: hvitt står som navn i rammen (designregler §5).
         assert "color: var(--hvit)" in fyll
         # Story 8.0d: fyllet er blekk (designregler §5), ikke rent svart.
@@ -1740,7 +1769,7 @@ class TestStory80e:
         _lagret("KOG", 0.0, 1, 1, 1)
         stil = _stil(klient.get("/").data.decode("utf-8"))
         fyll = re.search(r"--fyll:\s*#([0-9a-fA-F]{6})", stil).group(1)
-        gul = re.search(r"--gul:\s*#([0-9a-fA-F]{6})", stil).group(1)
+        gul = re.search(r"--oransje:\s*#([0-9a-fA-F]{6})", stil).group(1)
         navn = re.search(r"(?<!-)color:\s*var\(--([a-z-]+)\)", _regel(stil, ".pille.tre-av-tre")).group(1)
         tekst = re.search(rf"--{navn}:\s*#([0-9a-fA-F]{{6}})", stil).group(1)
 
@@ -1774,7 +1803,8 @@ class TestStory80eTekst:
         _lagret("KOG", 0.0, 1, 1, 0)
         _lagret("EQNR", 0.0, 1, 0, 0)
         html = klient.get("/").data.decode("utf-8")
-        assert '<h2 class="overskrift"><strong>1 av 2 aksjer</strong> skilte seg ut lørdag</h2>' in html
+        # Story 8.0d, PR 2: h1, med markering og uten fet skrift (§4, 14.10).
+        assert '<h1 class="overskrift"><mark>1 av 2 aksjer</mark> skilte seg ut lørdag</h1>' in html
 
     def test_ukedagen_er_datoen_i_linja_over_tabellen(self, klient):
         """Svar 5: den eldste datoen, som linja over tabellen (story 8.0), og
@@ -1784,7 +1814,7 @@ class TestStory80eTekst:
         skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET), vurdert=False)
         html = klient.get("/").data.decode("utf-8")
         assert "Oslo Børs · 30.10 · 2 aksjer" in _synlig(html)
-        assert "skilte seg ut fredag</h2>" in html
+        assert "skilte seg ut fredag</h1>" in html
 
     def test_ingen_over_terskelen_gir_0_og_ingen_setning_hos(self, klient):
         _lagret("KOG", 0.0, 1, 0, 0)
@@ -1799,7 +1829,9 @@ class TestStory80eTekst:
     def test_uten_en_eneste_vurdering_staar_ingen_overskrift(self, klient):
         _lagret("KOG", 0.0, 0, 0, 0, vurdert=False)
         html = klient.get("/").data.decode("utf-8")
-        assert 'class="overskrift"' not in html and "Hos " not in _synlig(html)
+        # Story 8.0d, PR 2, svar 3: «Markedsoversikt» uten tall.
+        assert '<h1 class="overskrift">Markedsoversikt</h1>' in html
+        assert "<mark>" not in html and "Hos " not in _synlig(html)
 
     def test_innledningen_med_én_aksje(self, klient):
         """Svar 4. Ville feilet med «Hos 1 aksjer»."""
@@ -1849,6 +1881,9 @@ class TestStory80eTekst:
         _lagret("KOG", 0.0, 1, 1, 0)
         html = klient.get("/").data.decode("utf-8")
         del_ = html.split('<section class="slik-leser"', 1)[1].split("</section>", 1)[0]
+        # Story 8.0d, PR 2: symbolene er aria-hidden og ikke en del av teksten.
+        del_ = re.sub(r'<span class="symbolfelt" aria-hidden="true">.*?</span></span>|'
+                      r'<span class="symbolfelt" aria-hidden="true">.*?</svg></span>', "", del_, flags=re.DOTALL)
         punkter = [_synlig(p).strip() for p in re.findall(r"<li>(.*?)</li>", del_, re.DOTALL)]
         assert punkter == [
             "Signalstyrke 0–3 T, B og I er trend, bevegelse og interesse, og hver gir +1, 0 eller -1. "

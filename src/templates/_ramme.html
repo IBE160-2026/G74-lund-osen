@@ -49,12 +49,14 @@
       --blandet: #6A46A0;
       --blandet-bakgrunn: #F0EBF8;
       --ingen-bakgrunn: #EEEDEA;
-      --gul: #a67c00;
-      --lys-gul: #F2B53A;
+      /* PR 2: oransje som i originalen (designregler §3 og del 5, 14.10). */
+      --oransje: #F2B53A;
+      --lys-oransje: #F8DE9C;
       --fyll: #16181D;
-      --baand-ut: #ECE9E1;
+      --baand-ut: #FFF6DC;
+      --baand-ut-kant: #F0E3BD;
       --baand-oevrige: #F7F6F2;
-      --hjelp: #6B4E00;
+      --brun: #6B4E00;
       --hjelp-bakgrunn: #FFF1CC;
       --kurs: #1F4E8C;
       --snitt: #9A5A0E;
@@ -62,6 +64,7 @@
       --stripe-tekst-2: #C9CCD2;
       --stripe-kant: #3A3E47;
       --stripe-strek: #2A2E36;
+      --kolonne-tekst-2: #B9BDC5;
     }
 
     body {
@@ -74,9 +77,9 @@
     main { max-width: 65rem; margin: 0 auto; padding: 1.5rem 16px 0; box-sizing: border-box; }
     code { font-family: ui-monospace, Consolas, monospace; }
 
-    /* Designregler §5: fokus i blekk på lys bakgrunn, lys gul i stripa. */
+    /* Designregler §5: fokus i blekk på lys bakgrunn, oransje på blekk. */
     *:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
-    header.stripe *:focus-visible { outline-color: var(--lys-gul); }
+    header.stripe *:focus-visible { outline-color: var(--oransje); }
 
     /* Stripa øverst. */
     header.stripe { background: var(--blekk); color: var(--hvit); }
@@ -87,10 +90,10 @@
                           letter-spacing: -0.01em; display: flex; align-items: center; gap: 0.6rem; margin: 0; }
     header.stripe .logo svg { width: 28px; height: 24px; }
     header.stripe .logo .soeyle { fill: var(--hvit); }
-    header.stripe .logo .soeyle.hoey { fill: var(--lys-gul); }
+    header.stripe .logo .soeyle.hoey { fill: var(--oransje); }
     header.stripe .oppdatert { min-height: 38px; border-top: 1px solid var(--stripe-strek);
                                font-size: 13.5px; font-weight: 600; color: var(--stripe-tekst); }
-    header.stripe .oppdatert svg { width: 16px; height: 16px; fill: none; stroke: var(--lys-gul); stroke-width: 2; }
+    header.stripe .oppdatert svg { width: 16px; height: 16px; fill: none; stroke: var(--oransje); stroke-width: 2; }
     header.stripe .eksempeltall { margin: 0; padding: 0.5rem 0; font-size: 13.5px; font-weight: 600;
                                   color: var(--stripe-tekst); }
     header.stripe .demo { border-top: 1px solid var(--stripe-strek); }
@@ -120,6 +123,8 @@
     <div class="rad oppdatert">
       <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 1.5"/></svg>
       <span>Oppdatert {{ hentet|oppdatert }}</span>
+      {#- PR 2: «?» ved tidspunktet, på sidene som har vinduet. #}
+      {% block oppdatert_hjelp %}{% endblock %}
     </div>
     {% endif %}
     {% if eksempeltall %}

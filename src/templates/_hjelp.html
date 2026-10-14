@@ -17,6 +17,27 @@
       border: 0; border-radius: 50%; color: var(--hvit); cursor: pointer; vertical-align: middle;
       background: radial-gradient(circle, var(--blekk) 10.5px, transparent 11px);
     }
+    /* PR 2 av 8.0d: fokusringen står rundt sirkelen, 2 px utenfor og 3 px
+       bred, og ikke rundt klikkflaten, som dekket en del av ordet ved
+       siden av. På blekk, i stripa og kolonneraden, er sirkelen hvit og
+       ringen oransje, som fokus i stripa. */
+    button.hjelpeknapp:focus-visible {
+      outline: none;
+      background: radial-gradient(circle, var(--blekk) 10.5px, transparent 11px, transparent 13px,
+                                  var(--blekk) 13.5px, var(--blekk) 16px, transparent 16.5px);
+    }
+    header.stripe button.hjelpeknapp, thead button.hjelpeknapp {
+      color: var(--blekk);
+      background: radial-gradient(circle, var(--hvit) 10.5px, transparent 11px);
+    }
+    header.stripe button.hjelpeknapp:focus-visible, thead button.hjelpeknapp:focus-visible {
+      background: radial-gradient(circle, var(--hvit) 10.5px, transparent 11px, transparent 13px,
+                                  var(--oransje) 13.5px, var(--oransje) 16px, transparent 16.5px);
+    }
+    /* Uten bakgrunner (Windows med høy kontrast) står vanlig fokus. */
+    @media (forced-colors: active) {
+      button.hjelpeknapp:focus-visible { outline: 3px solid; }
+    }
     .hjelpevindu {
       width: min(440px, calc(100vw - 2rem)); max-height: 80vh; overflow: auto;
       margin: auto; padding: 16px 20px 18px 22px; box-sizing: border-box;
@@ -27,7 +48,7 @@
     .hjelpevindu .hjelpetopp { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
     .hjelpevindu .hjelpemerke {
       display: inline-block; font-size: 12.5px; font-weight: 700; padding: 0.15rem 0.5rem;
-      border-radius: 8px; background: var(--hjelp-bakgrunn); color: var(--hjelp);
+      border-radius: 8px; background: var(--hjelp-bakgrunn); color: var(--brun);
     }
     .hjelpevindu h2 { font-family: "Newsreader", Georgia, serif; font-size: 23px; font-weight: 600;
                       line-height: 1.2; color: var(--blekk); margin: 0.5rem 0 0; }

@@ -139,14 +139,21 @@ KONTRAST = [
     ("ned", "kort", 4.5), ("ned", "ned-bakgrunn", 4.5),
     ("blandet", "blandet-bakgrunn", 4.5), ("dempet", "ingen-bakgrunn", 4.5),
     ("blekk", "baand-ut", 4.5), ("tekst", "baand-oevrige", 4.5),
-    ("hjelp", "hjelp-bakgrunn", 4.5), ("kurs", "kort", 4.5), ("snitt", "kort", 4.5),
+    ("brun", "hjelp-bakgrunn", 4.5), ("kurs", "kort", 4.5), ("snitt", "kort", 4.5),
     ("stripe-tekst", "blekk", 4.5), ("stripe-tekst-2", "blekk", 4.5),
     ("kort", "fyll", 4.5), ("hvit", "blekk", 4.5),
     # Gjennomgangen (ECH6, BH5): tabellen og grafen står også på bakgrunnen.
     ("blandet", "kort", 4.5), ("opp", "bakgrunn", 4.5), ("ned", "bakgrunn", 4.5),
     ("blandet", "bakgrunn", 4.5), ("kurs", "bakgrunn", 4.5), ("snitt", "bakgrunn", 4.5),
-    ("gul", "kort", 3.0), ("gul", "bakgrunn", 3.0), ("gul", "fyll", 3.0),
-    ("lys-gul", "blekk", 3.0),
+    # Story 8.0d, PR 2 (designregler §3, 14.10): ringen og strekene i
+    # oransje trenger ikke 3:1 mot hvitt og bakgrunnen, fordi teksten sier
+    # det samme (FR-103) og pillen har svart fyll. Parene for den gule
+    # ringen mot hvitt og bakgrunnen er tatt ut med den grunnen. Ringen mot
+    # fyllet og fokus på blekk står.
+    ("oransje", "fyll", 3.0), ("oransje", "blekk", 3.0),
+    # Teksten i båndet, pillene, markeringen, «NOK» og brikken i kortet.
+    ("brun", "baand-ut", 4.5), ("hvit", "brun", 4.5), ("hvit", "tekst", 4.5),
+    ("blekk", "lys-oransje", 4.5), ("kolonne-tekst-2", "blekk", 4.5), ("hvit", "opp", 4.5),
 ]
 
 
@@ -249,14 +256,16 @@ class TestRammen:
             assert "tabular-nums" in _regel(aksje, velger), velger
 
     def test_fokus_i_blekk_paa_lys_bakgrunn_og_lys_gul_i_stripa(self, sidene):
-        """Ville feilet med gult fokus på lys bakgrunn (1,64:1)."""
+        """Ville feilet med gult fokus på lys bakgrunn (1,64:1).
+
+        PR 2: fargen heter oransje, og kolonneraden er blekk som stripa."""
         for navn, html in sidene.items():
             stil = _stil(html)
             assert "outline: 3px solid var(--blekk)" in _regel(stil, "*:focus-visible"), navn
-            assert "var(--lys-gul)" in _regel(stil, "header.stripe *:focus-visible"), navn
+            assert "var(--oransje)" in _regel(stil, "header.stripe *:focus-visible"), navn
             for velger, regel in re.findall(r"([^{}]*focus-visible[^{}]*)\{([^}]*)\}", stil):
-                if "stripe" not in velger:
-                    assert "gul" not in regel and "currentColor" not in regel, (navn, velger)
+                if "stripe" not in velger and "thead" not in velger:
+                    assert not re.search(r"gul|oransje|currentColor", regel), (navn, velger)
 
     def test_stripa_og_bunnlinja_paa_alle_sidene(self, sidene):
         for navn, html in sidene.items():
