@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-10-14T14:44
+updated: 2026-10-14T16:14
 ---
 
 # Designregler
@@ -23,6 +23,8 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 **I dag:** malene bruker systemets skrift, og noen tallceller har allerede tabelltall. Regelen tas inn i story 8.2.
 
 **Testene når den tas inn:** ingen mal viser til en skrift på nettet, tallcellene i tabellene har tabelltall, og skriftfilene har OpenType-funksjonen `tnum`.
+
+*Lagt til 2026-10-14 (story 8.0d, PR 1):* IBM Plex Sans har ikke `tnum`, men sifrene er like brede som standard, så tallene står rett under hverandre uten den. Testen krever like brede sifre i hver fil, og `tnum` i Newsreader, som har den. Se målingen i §5.
 
 ## 2. Periodevalg
 
