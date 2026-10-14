@@ -2,7 +2,7 @@
 title: 'Story 8.0d: Utseendet fra designforslaget'
 type: 'feature'
 created: '2026-10-14'
-status: 'in-review'
+status: 'in-progress'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '9f8471341e466df1b34e9112882ec02bff710d3e'
@@ -45,6 +45,31 @@ Planen ble vist i chatten 13.10 kl. 23:27 (del A–G) og er ført kort i Utført
 - Feilsiden og hjelpevinduet i rammen: «?» som svart sirkel på 22 px i en klikkflate på minst 44 px, og vinduet med merket «Hjelp» og tittelen i Newsreader.
 - Tabellen, kortet «Slik leser du tabellen» og kortene på aksjesiden endres ikke. README-en endres ikke, med mindre en test krever det.
 - **Mutantene:** skrift fra Google Fonts; blekk byttet til en lys farge; `tabular-nums` fjernet fra tallcellene; merket borte fra stripa i demoen; gult fokus på lys bakgrunn; ringen i `#F2B53A`; en lenke til `/min-liste`.
+
+## PR 2: oversikten
+
+Planen ble vist i chatten 14.10 kl. 17:16 og er ført kort i Utført-linja for den instruksjonen i `docs/ai-prompts/2026-10-14.md`. Svarene står i instruksjonen kl. 17:31 og er beslutninger. Resten av planen gjelder som vist.
+
+12. **Fargene som i originalen** (gruppen 14.10 kl. 17:17, og skissen gruppen valgte like etter). Ført med daterte linjer i `designregler.md` §3, §4 og del 5:
+    - 3 av 3: strek på 4 px til venstre i raden og ring rundt pillen i sterk oransje `#F2B53A`.
+    - 2 av 3: strek på 4 px i lys oransje `#F8DE9C`, og fet «2 av 3» som før.
+    - 1 av 3 og 0 av 3: ingen strek og ingen farge.
+    - Overskriften: lys oransje markering under «N av M aksjer» (`#F8DE9C` fra 60 % av høyden), uten fet skrift. Aksjesiden får det samme under «skilte seg ut <ukedag>» i PR 3.
+    - Båndet «Skilte seg ut»: `#FFF6DC` med kant `#F0E3BD`, og tekst og pille i `#6B4E00`, med «signalstyrke 2 eller mer» etter pillen. «Øvrige aksjer» får «signalstyrke 0 eller 1». Tallene kommer fra Parametre. Radene er hvite.
+    - Hvorfor: gruppen vil ha utseendet fra originalen. Teksten sier alltid det samme (FR-103), og pillen har svart fyll siden 8.0e, så ringen og strekene trenger ikke 3:1 mot hvitt. Testen fra 8.0c for ringen og parene for ringen mot hvitt og bakgrunn i PR 1 byttes ut med denne grunnen.
+13. **Newsreader 72pt Medium** til de to store overskriftene. SemiBold i 72pt trengs ikke, fordi overskriftene ikke har fet skrift.
+14. **Linja under kolonnenavnene:** bare «NOK» under Sluttkurs. «i går» er feil på mandager, og «hva sjekkene peker mot» kan leses som en spådom (NFR-06).
+15. **h1:** overskriften med tallene. «Markedsoversikt» uten vurdering. Feilsiden får h1 «Siden kan ikke vises». «OSE Signal» står bare som logo i stripa.
+16. **Merket «skiller seg ut»** tas bort fra synet, men står igjen som skjult tekst i cellen, så hver rad sier det med ord.
+17. **Tidspunktet** står én gang, som «Oppdatert …» i stripa. «?» med vinduet flyttes dit, og vinduet heter «Oppdatert», som i ordlista (§4).
+
+- Kortet «Slik leser du tabellen» etter beslutning 11, i et rutenett med overskriften og innledningen.
+- De små overskriftene i IBM Plex Sans 12,5 px og 700.
+- Tabellen i et kort med kolonneraden i blekk. «?» der er hvit med fokus i lys gul, som i stripa.
+- Fokusringen rundt sirkelen i «?», ikke rundt klikkflaten på 44 px.
+- Ved 390 px ruller tabellen i en egen boks, og siden ruller ikke sidelengs.
+- Ticker og bransje med symbol under navnet (avvik 11).
+- **Mutantene:** kortet flyttet under tabellen; `aria-hidden` fjernet fra symbolene; musepekeren byttet til en pil; «?» i kolonneraden i blekk; fokus i kolonneraden i blekk; ringen på klikkflaten; `overflow-x` fjernet; sterk oransje ved 2 av 3; strek ved 1 av 3; markeringen borte fra overskriften; «data hentet» tilbake i linja under tittelen; to h1; små overskrifter i Newsreader.
 
 ## Boundaries & Constraints
 
