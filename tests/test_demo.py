@@ -458,6 +458,9 @@ class TestSidene:
         assert svar.status_code == 503 and "Eksempeltall" in svar.data.decode("utf-8")
         # Story 8.0c: «Demoversjon.» og linja nederst ogsaa paa feilsiden.
         html = svar.data.decode("utf-8")
+        # Story 8.0d: merket staar som egen rad i stripa ogsaa her.
+        stripe = html.split('<header class="stripe">', 1)[1].split("</header>", 1)[0]
+        assert f'<p class="eksempeltall">Demoversjon. {app_modul.EKSEMPELTALL_MERKE}</p>' in stripe
         assert f"Demoversjon. {app_modul.EKSEMPELTALL_MERKE}" in html
         assert app_modul.UNDER_ARBEID_TEKST in html
 

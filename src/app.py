@@ -55,6 +55,7 @@ from markedsoversikt import (
     eldre_enn_nyeste,
     ingen_skilte_seg_ut,
     norsk_tid,
+    oppdatert,
     sidens_dato,
     sidens_tidsstempel,
     uten_kurser,
@@ -123,6 +124,8 @@ app.jinja_env.filters["tall"] = tall
 # Story 8.0e: ukedagen i overskriften og navnene i linja om «3 av 3».
 app.jinja_env.filters["ukedag"] = ukedag
 app.jinja_env.filters["med_og"] = med_og
+# Story 8.0d: «Oppdatert tirsdag 13.10 kl. 22.15» i stripa, i norsk tid.
+app.jinja_env.filters["oppdatert"] = lambda tid: oppdatert(tid, idag().year)
 
 def naa() -> datetime:
     """Klokka sidene regner dagens dato av, i UTC (AD-20). Egen funksjon, saa

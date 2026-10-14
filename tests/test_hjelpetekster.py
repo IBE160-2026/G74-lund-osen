@@ -384,7 +384,11 @@ class TestSidene:
             html = _side(klient, adresse)
             assert "<script" not in html.lower(), adresse
             assert not re.search(r'(src|href)\s*=\s*"(https?:)?//', html), adresse
-            assert "url(" not in html and "@import" not in html, adresse
+            # Story 8.0d: skriften ligger i appen, saa url( er lov bare til
+            # /static/ (designregler §1).
+            adresser = re.findall(r"""url\(\s*["']?([^"')]+)""", html)
+            assert all(u.startswith("/static/") for u in adresser), adresse
+            assert "@import" not in html, adresse
 
     def test_hver_knapp_aapner_et_vindu_paa_samme_side(self, klient, base):
         """Ville feilet hvis knappen pekte paa et id som ikke finnes, og
@@ -409,7 +413,9 @@ class TestSidene:
 
     def test_vinduet_passer_paa_en_telefon(self, klient, base):
         html = _side(klient, "/")
-        assert "width: min(32rem, calc(100vw - 2rem)); max-height: 80vh; overflow: auto;" in html
+        # Story 8.0d: hoeyst 440 px bred (utdraget §7), og aldri bredere enn
+        # skjermen minus 2rem.
+        assert "width: min(440px, calc(100vw - 2rem)); max-height: 80vh; overflow: auto;" in html
 
     def test_grafen_og_tabellen_forklares_bare_naar_de_vises(self, klient, base):
         """Gjennomgangen av 8.0b: VRDS har for kort serie til signal og
