@@ -131,6 +131,8 @@
     .pille.to-av-tre { border: 1.5px solid var(--blekk); background: var(--hvit); color: var(--blekk); }
     .styrketall { font-weight: 700; color: var(--tekst); white-space: nowrap; }
     td.styrke .pille, td.styrke .styrketall { font-size: 13px; font-weight: 700; }
+    /* Brikkene står under tallet, høyrestilt som det. */
+    td.styrke .sjekker { justify-content: flex-end; }
     /* Båndene øverst i hver del (designregler del 5, 14.10). */
     tr.del th, tr.del td { font-size: 14.5px; font-weight: 700; height: 46px; box-sizing: border-box; }
     tr.del.ut th { background: var(--baand-ut); color: var(--brun); border-top: 1px solid var(--baand-ut-kant);

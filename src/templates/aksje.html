@@ -84,7 +84,8 @@
     .kurslinje { fill: none; stroke: var(--kurs); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
     .ma50linje { fill: none; stroke: var(--snitt); stroke-width: 1.75; }
     .sistepunkt { fill: var(--kurs); stroke: var(--hvit); stroke-width: 2; }
-    .linjenavn { font-size: 12px; font-weight: 600; }
+    /* En hvit kant rundt navnene, så de leses der linjene krysser. */
+    .linjenavn { font-size: 12px; font-weight: 600; paint-order: stroke; stroke: var(--hvit); stroke-width: 4px; stroke-linejoin: round; }
     .linjenavn.kurs { fill: var(--kurs); }
     .linjenavn.snitt { fill: var(--snitt); }
     figcaption { color: var(--dempet); font-size: 0.85rem; margin-top: 0.6rem; }
