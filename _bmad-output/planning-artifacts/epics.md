@@ -2835,6 +2835,8 @@ demoen sensor ser, har det utseendet vi har valgt.
 
 *Lagt til 2026-10-14:* PR 2b flettet i `8c9f8b7`, PR #41.
 
+*Lagt til 2026-10-14 (gruppen kl. 19:59, «ja til begge»):* «2 av 3» får den hvite pillen med svart kant fra originalen (utdraget §6), med den lys oransje streken som før (`designregler.md` del 5). Sorteringen (8.15) kommer rett etter 8.0d.
+
 ### Story 8.1: Brukertest rett etter Epic 2
 
 Som **gruppe**, vil vi se en person utenfor gruppen bruke løsningen tidlig, så

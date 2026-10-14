@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-10-14T17:34
+updated: 2026-10-14T22:29
 ---
 
 # Designregler
@@ -198,3 +198,5 @@ Ord kan endres rett i tavla. I appen samles hjelpetekstene i én fil (8.0b).
 - Overskriften på 52 og 56 px er Newsreader i optisk størrelse 72pt, Medium. Resten av Newsreader er 16pt.
 - Under kolonnenavnene står bare «NOK» under Sluttkurs, i `#B9BDC5`.
 - Tidspunktet står én gang, som «Oppdatert …» i stripa, med «?» ved siden av.
+
+*Lagt til 2026-10-14 (gruppen 14.10 kl. 19:59, «ja til begge»):* «2 av 3» er den hvite pillen fra originalen (utdraget §6): samme form som «3 av 3», hvit, med tekst og kant i blekk og uten ring. Den lys oransje streken på 4 px til venstre i raden står som før. Linja over om at «2 av 3» har fet skrift og strek, uten fyll, gjelder ikke lenger.
