@@ -2283,6 +2283,8 @@ historikken.
 
 **Én økt:** ja. Kan bygges før 28.09, fordi den ikke sender noe.
 
+*Lagt til 2026-10-15:* flettet i `6855861`, PR #47.
+
 ### Story 10.2: Teksten lages i hentekommandoen og lagres i `KILogg`
 
 *Het Story 5B.2 til 28.09.*
