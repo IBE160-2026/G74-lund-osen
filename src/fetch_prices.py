@@ -43,6 +43,13 @@ kallene som er igjen av dagens og aldri bonuskvoten. Forsoeket lagres i
 forsoek<n>-raa-<dato>.json, og fila for boersdagen skrives aldri om (AD-6).
 Har basen alle kursene, men mangler rader i vurdering for dagen, skrives de
 uten kall.
+
+Story 10.2 (PR F): etter vurderingene lager hentingen KI-teksten for hver
+aksje med en vurdering, med modellen OSE_KI_TJENESTE velger (ki_tekst.py).
+Det skjer ogsaa naar basen alt har kursene, og etter et nytt forsoek, for
+radene som mangler i KILogg. Steget gjoer ingen kall til EODHD, og en feil
+der endrer ikke utgangskoden (NFR-04). Uten modell (OSE_KI_TJENESTE=av)
+skjer ingenting.
 """
 
 import argparse
@@ -69,6 +76,8 @@ from boersdag import (
     norsk_dato,
 )
 from eodhd import UgyldigSerie, serie_fra_eodhd
+from ki_modell import Modell
+from ki_tekst import ki_innstillinger, lag_ki_tekster, velg_modell
 from kursdata import AKSJEUNIVERS, Aksje, Kursrad
 from lagring_fil import (
     KURSPREFIKS,
@@ -656,6 +665,7 @@ def kjoer(
     hent_foer_kl_22: bool = False,
     les_kvote: Callable[[str], object],
     lista: tuple[Aksje, ...] = AKSJEUNIVERS,
+    modell: Modell | None = None,
 ) -> Path | None:
     """En henting. Returnerer fila som ble skrevet, eller None hvis
     tidskontrollen eller basen sa nei foer foerste kall (story 2.3). Story
@@ -797,6 +807,8 @@ def kjoer(
                     bare=set(uten_rad),
                 ):
                     sys.exit(1)
+            # Story 10.2: KI-radene som mangler, uten kall til EODHD.
+            lag_ki_tekster(base_sti, dato, klokke, modell, skriv, lista)
             return None
 
     # Filvakten (AD-6, K8): fila heter etter boersdagen, ikke kjoeredagen.
@@ -808,7 +820,7 @@ def kjoer(
             # forsoek henter dem, i en egen fil.
             return nytt_forsoek(
                 data_katalog, base_sti, oeyeblikk, dag, dato, mangler,
-                api_nokkel, hent, skriv, klokke, les_kvote, lista,
+                api_nokkel, hent, skriv, klokke, les_kvote, lista, modell=modell,
             )
         skriv(
             f"Oeyeblikksbildet for boersdagen {dato.isoformat()}, {fil.name}, "
@@ -902,6 +914,9 @@ def kjoer(
     if not skriv_vurderinger(base_sti, dato, dag, skrevne, klokke, skriv, lista):
         sys.exit(1)
 
+    # Story 10.2: KI-teksten etter vurderingene (AD-17), aldri foer.
+    lag_ki_tekster(base_sti, dato, klokke, modell, skriv, lista)
+
     # FR-402: svaret er ikke fra boersdagen for noen av aksjene. Kursene og
     # fila staar, og vurderingen har grunnen kurs_ikke_fra_dagen. Samme
     # kommando kjoert igjen samme kveld proever dem (story 2.3b).
@@ -973,6 +988,7 @@ def nytt_forsoek(
     klokke: Callable[[], datetime],
     les_kvote: Callable[[str], object],
     lista: tuple[Aksje, ...] = AKSJEUNIVERS,
+    modell: Modell | None = None,
 ) -> Path:
     """Et nytt forsoek for aksjene som mangler dagens kurs - story 2.3b.
 
@@ -1125,6 +1141,7 @@ def nytt_forsoek(
             base_sti, dato, dag, skrevne, klokke, skriv, lista, bare=skrevne
         ):
             sys.exit(1)
+        lag_ki_tekster(base_sti, dato, klokke, modell, skriv, lista)
 
     fortsatt = sorted(
         symbol for symbol in mangler
@@ -1227,6 +1244,8 @@ def main(argv: list[str] | None = None) -> None:
     if argumenter.les_inn is not None:
         les_inn(argumenter.les_inn, lagring_sqlite.BASE_STI)
         return
+    # Story 10.2: tjenesten fra OSE_KI_TJENESTE (svar 5), lest foer kjoeringen.
+    modell = velg_modell(ki_innstillinger(PROSJEKTROT / ".env", os.environ))
     kjoer(
         lagring_fil.RAA_KATALOG,
         lagring_sqlite.BASE_STI,
@@ -1235,6 +1254,7 @@ def main(argv: list[str] | None = None) -> None:
         klokke=naa,
         hent_foer_kl_22=argumenter.hent_foer_kl_22,
         les_kvote=hent_kvote,
+        modell=modell,
     )
 
 

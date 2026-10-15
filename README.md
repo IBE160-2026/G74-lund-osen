@@ -225,6 +225,43 @@ Basen, demobasen og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo`
 
 </details>
 
+<details>
+<summary>Den lokale modellen (KI-teksten)</summary>
+
+Hentingen kan lage en KI-tekst for hver aksje, med en modell som kjører på maskinen: Gemma i Ollama, i Docker, med grafikkortet. Ingenting sendes ut. KI-teksten er av i `.env.example`, og hentingen går som før uten den.
+
+Bare første gang: start Ollama, og hent modellen til volumet `ose-ki-ollama`.
+
+```
+docker compose --profile ki up -d ollama
+```
+
+```
+docker compose exec ollama ollama pull gemma4:e4b
+```
+
+Slå på KI-teksten: sett `OSE_KI_TJENESTE=lokal` i `.env`. Står variabelen ikke i `.env` i det hele tatt, er den også på.
+
+Før hver henting med KI-tekst må Ollama kjøre:
+
+```
+docker compose --profile ki up -d ollama
+```
+
+Så hentes det som vanlig. Med uv når hentingen Ollama på http://127.0.0.1:11434, og i Docker på tjenestenavnet. Stopp Ollama etterpå:
+
+```
+docker compose --profile ki down
+```
+
+Kjører ikke Ollama når hentingen går, får hver aksje en rad om at modellen feilet, og den dagen er uten KI-tekst. Raden står, så en ny henting samme kveld lager ikke teksten (FR-604).
+
+Slå av KI-teksten: sett `OSE_KI_TJENESTE=av` i `.env`.
+
+Modellen ble prøvd på en maskin med 15,7 GB minne og et grafikkort med 8 GB, der Docker Desktop hadde 8,2 GB (`malinger.md` §19).
+
+</details>
+
 ## Status
 
 Under arbeid, og ingenting er endelig. Flettet til main: hentingen av kurser med kontroll av børsdagen, nye forsøk med kallene som er igjen etter hentingen, Docker, demoen, denne README-en, hjelp bak «?» på sidene, tydeligere merking i tabellene, datoene og månedsmerkene i grafen, oversikten fra designforslaget, utseendet fra designforslaget, og sortering ved klikk i kolonneraden. Neste: hovedindeksen, Min liste, periodene i kursgrafen, og så KI-laget. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).

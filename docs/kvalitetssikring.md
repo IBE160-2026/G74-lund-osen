@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-14T22:29
+updated: 2026-10-15T22:43
 ---
 
 # Kvalitetssikring
@@ -596,6 +596,27 @@ hentingen kan gi kurser, se «Når kan jeg hente?» i
 | 7 | Den ekte versjonen, steg 9: Ctrl+C i vinduet med appen, så `docker compose down`. Stod det «Removed»? | |
 | 8 | `docker ps -a` til slutt: står det containere igjen fra prøven? | |
 | 9 | Ble et spørsmål i «Står du fast?» eller i `docs/hjelp.md` brukt? Hvilket, og hjalp svaret? | |
+
+- **Det som ikke stemte:**
+- **Rettet i** (commit eller story):
+
+### Prøve 3: den lokale modellen
+
+*Lagt til 2026-10-15 (story 10.2, PR F, planen for KI-laget 15.10 kl. 15:43):* «Den lokale modellen (KI-teksten)» under «Mer for den som vil» i README-en. Prøven tas på en maskin med grafikkort, etter Prøve 2, med den ekte versjonen og egen nøkkel.
+
+- **Dato:**
+- **Maskin og grafikkort:**
+- **Commit som ble prøvd:**
+
+| # | Kommando eller steg i README-en | Det som skjedde |
+|---|---|---|
+| 1 | `docker compose --profile ki up -d ollama`. Startet Ollama, og hvor lang tid tok det første gang? | |
+| 2 | `docker compose exec ollama ollama pull gemma4:e4b`. Hvor lang tid tok det? | |
+| 3 | `OSE_KI_TJENESTE=lokal` i `.env` | |
+| 4 | Hentingen som i Prøve 2. Sa utskriften hvor mange KI-tekster som besto kontrollen? | |
+| 5 | `docker compose --profile ki down`. Stod det «Removed»? | |
+| 6 | En henting uten Ollama: sa utskriften at modellen feilet, og gikk hentingen som før? | |
+| 7 | `OSE_KI_TJENESTE=av` i `.env` til slutt | |
 
 - **Det som ikke stemte:**
 - **Rettet i** (commit eller story):

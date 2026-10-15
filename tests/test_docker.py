@@ -74,6 +74,12 @@ def _tjenester() -> dict[str, dict[str, list[str]]]:
     return {navn: _blokk(linjer[1:], 4) for navn, linjer in tjenester.items()}
 
 
+def _apptjenester() -> dict[str, dict[str, list[str]]]:
+    """Tjenestene som kjoerer appen fra imaget ose-signal. Story 10.2 la til
+    ollama, et ferdig image med sine egne regler (TestOllama)."""
+    return {navn: felt for navn, felt in _tjenester().items() if navn != "ollama"}
+
+
 def _verdier(felt: list[str]) -> list[str]:
     """Verdien til et felt: listepunktene under det, eller verdien paa samme linje."""
     hode = felt[0].split(":", 1)[1].strip()
@@ -183,17 +189,17 @@ class TestDockerignore:
 
 class TestCompose:
     def test_alle_tjenestene_fra_samme_image(self):
-        """Story 3.4 la til demo-lag og demo, fra samme image."""
-        tjenester = _tjenester()
-        assert set(tjenester) == {"app", "hent", "demo-lag", "demo"}
-        for navn, felt in tjenester.items():
+        """Story 3.4 la til demo-lag og demo, fra samme image. Story 10.2 la
+        til ollama, fra sitt eget image (TestOllama)."""
+        assert set(_tjenester()) == {"app", "hent", "demo-lag", "demo", "ollama"}
+        for navn, felt in _apptjenester().items():
             assert _verdier(felt["image"]) == ["ose-signal"], navn
 
     def test_begge_bygger_fra_repoet_og_henter_aldri_imaget(self):
         """Ville feilet hvis hent manglet build. Da ville docker compose run
         --rm hent paa en ny maskin hentet et image som heter ose-signal fra et
         register, og gitt det .env med noekkelen (BH2, ECH6)."""
-        for navn, felt in _tjenester().items():
+        for navn, felt in _apptjenester().items():
             assert _verdier(felt["build"]) == ["."], navn
             assert _verdier(felt["pull_policy"]) == ["build"], navn
 
@@ -227,7 +233,10 @@ class TestCompose:
         for navn in ("demo-lag", "demo"):
             assert "env_file" not in tjenester[navn], navn
         assert _verdier(tjenester["hent"]["env_file"]) == [".env"]
-        assert "environment" not in tjenester["hent"]
+        # Story 10.2 (svar 8): bare adressen til Ollama, ingen noekkel.
+        assert [l.strip() for l in tjenester["hent"]["environment"][1:]] == [
+            "OSE_KI_OLLAMA_URL: http://ollama:11434"]
+        assert "env_file" not in tjenester["ollama"] and "environment" not in tjenester["ollama"]
         assert "EODHD" not in "\n".join(_linjer(COMPOSE)).upper()
 
     def test_porten_er_bare_paa_maskinen(self):
@@ -248,7 +257,7 @@ class TestCompose:
         assert _verdier(tjenester["hent"]["volumes"]) == ["ose-db:/app/data/db", "ose-raa:/app/data/raa"]
         assert _verdier(tjenester["app"]["volumes"]) == ["ose-db:/app/data/db"]
         toppvolumer = _blokk(_toppnivaa()["volumes"][1:], 2)
-        assert set(toppvolumer) == {"ose-db", "ose-raa", "ose-demo"}
+        assert set(toppvolumer) == {"ose-db", "ose-raa", "ose-demo", "ose-ki-ollama"}
         assert all(len(linjer) == 1 for linjer in toppvolumer.values()), "volumene skal ikke ha name:"
 
     def test_webserveren_har_ikke_oeyeblikksbildene(self):
@@ -260,7 +269,7 @@ class TestCompose:
         """Story 3.2 og AD-11: ett volum over hele data/ tar med seg baade det
         som kan bygges opp igjen og det uerstattelige. Ville feilet med
         ose-data:/app/data, eller med to volumer paa samme mappe."""
-        for navn, felt in _tjenester().items():
+        for navn, felt in _apptjenester().items():
             maal = [v.split(":")[1] for v in _verdier(felt["volumes"])]
             assert len(set(maal)) == len(maal), (navn, maal)
             for m in maal:
@@ -273,7 +282,7 @@ class TestCompose:
         """Svar 2 i 3.2: bare volumene og /tmp kan skrives. Ville feilet uten
         read_only, eller uten /tmp, som waitress trenger for svar over
         outbuf_overflow."""
-        for navn, felt in _tjenester().items():
+        for navn, felt in _apptjenester().items():
             assert _verdier(felt["read_only"]) == ["true"], navn
             assert _verdier(felt["tmpfs"]) == ["/tmp"], navn
 
@@ -345,9 +354,46 @@ class TestCompose:
         assert miljoe == [f'{app.I_DEMO}: "1"']
         assert "entrypoint" not in tjenester["demo"] and "command" not in tjenester["demo"]
 
-    def test_ingen_ollama_i_31(self):
-        """Rettelsen 05.10 kl. 16:53: Ollama kommer i 10.2."""
-        assert "ollama" not in "\n".join(_linjer(COMPOSE)).lower()
+
+
+class TestOllama:
+    """Story 10.2, PR F: Ollama i compose som et eget valg (beslutningen
+    05.10 kl. 16:53, svar 1 og 8 kl. 15:53). Erstatter testen fra 3.1 om at
+    Ollama ikke var med ennaa."""
+
+    def test_eget_valg_i_profilen_ki(self):
+        """Ville feilet hvis docker compose up startet modellen."""
+        ollama = _tjenester()["ollama"]
+        assert ollama["profiles"][0].split(":", 1)[1].strip() == '["ki"]'
+
+    def test_porten_bare_paa_maskinen(self):
+        """Svar 8: porten publiseres bare paa 127.0.0.1."""
+        assert _verdier(_tjenester()["ollama"]["ports"]) == ["127.0.0.1:11434:11434"]
+
+    def test_modellen_i_eget_volum_aldri_i_imaget(self):
+        """AD-9: modellen ligger i ose-ki-ollama."""
+        ollama = _tjenester()["ollama"]
+        assert _verdier(ollama["volumes"]) == ["ose-ki-ollama:/root/.ollama"]
+        assert "build" not in ollama
+
+    def test_versjonen_er_laast(self):
+        """FR-605: Ollama-versjonen foeres i raden. Ville feilet med latest
+        eller uten tag, saa versjonen kunne skifte uten at noen visste det."""
+        bilde = _verdier(_tjenester()["ollama"]["image"])[0]
+        assert re.fullmatch(r"ollama/ollama:\d+\.\d+\.\d+", bilde), bilde
+
+    def test_grafikkortet(self):
+        """Svar 1: alltid med grafikkort."""
+        tekst = "\n".join(_tjenester()["ollama"]["deploy"])
+        assert "driver: nvidia" in tekst and "capabilities: [gpu]" in tekst
+
+    def test_hent_naar_ollama_paa_tjenestenavnet(self):
+        miljoe = [l.strip() for l in _tjenester()["hent"]["environment"][1:]]
+        assert miljoe == ["OSE_KI_OLLAMA_URL: http://ollama:11434"]
+
+    def test_ingen_noekkel_i_compose(self):
+        assert "EODHD" not in "\n".join(_linjer(COMPOSE)).upper()
+        assert "NOKKEL" not in "\n".join(_linjer(COMPOSE)).upper()
 
 
 README = ROT / "README.md"
@@ -465,7 +511,8 @@ class TestReadme:
                     (felt.get("profiles") for felt in _tjenester().values()) if f}
         # Ogsaa docs/hjelp.md, der stoppkommandoen for demoen staar (VG).
         brukt = set(re.findall(r"docker compose --profile ([\w-]+)", tekst + _hjelp()))
-        assert brukt == {"demo"} and brukt <= profiler
+        # Story 10.2: profilen ki for Ollama.
+        assert brukt == {"demo", "ki"} and brukt <= profiler
 
     def test_uv_med_demo_flagget_som_appen_leser(self, monkeypatch):
         """uv-veien: README-en viser --demo, og det er flagget les_flagg kjenner."""
@@ -797,7 +844,9 @@ class TestReadmeForNybegynnere:
     def test_mer_for_den_som_vil_er_lukket(self):
         """22:32: Bytte og uv staar, lukket i <details> under én overskrift."""
         mer = _seksjon("Mer for den som vil")
-        assert set(_detaljer(mer)) == {"Bytte mellom demoen og den ekte versjonen", "Uten Docker, med uv"}
+        # Story 10.2: den lokale modellen, ogsaa lukket.
+        assert set(_detaljer(mer)) == {"Bytte mellom demoen og den ekte versjonen", "Uten Docker, med uv",
+                                       "Den lokale modellen (KI-teksten)"}
 
     def test_svarene_beholdt_innholdet(self):
         """Gjennomgangen 11.10 (VG): bare overskriftene ble sjekket etter
