@@ -1,5 +1,5 @@
-"""SQLite-adapterne for kursdata og vurderinger - story 1.3 og 1.6, FR-406,
-FR-408, AD-4, AD-5 og AD-7.
+"""SQLite-adapterne for kursdata, vurderinger og KI-loggen - story 1.3, 1.6
+og 4.3, FR-406, FR-408, FR-604, AD-4, AD-5 og AD-7.
 
 Skall: dette er en av filene som kjenner teknologi. Kjernen ser bare
 portene, Kurslager med Kursrad og Vurderingslager med Vurdering og Grunn.
@@ -19,12 +19,14 @@ Oversettelsen skjer her og ingen andre steder: dato er date inne i systemet og
 UTC-offset i basen. Ingen tekst slipper ut av porten.
 """
 
+import json
 import sqlite3
 from collections.abc import Callable
 from datetime import date, datetime
 from pathlib import Path
 
 from boersdag import innevaerende_boersdag, norsk_dato
+from kilogg import Emne, IkkeInnevaerendeBoersdag, KIRad
 from kursdata import AKSJEUNIVERS, Aksje, Kursrad, kontroller_skriving
 from lagring_fil import DATA_KATALOG
 from migrering import MigrasjonsFeil, migrer, siste_versjon, versjon
@@ -417,4 +419,115 @@ def _post(rad) -> Oversiktspost:
         forrige=forrige,
         hentet=datetime.fromisoformat(hentet) if hentet is not None else None,
         innhold=_innhold(felt, grunn) if har_rad else None,
+    )
+
+
+# Story 4.3: KI-loggen (0005). Kolonnene i samme rekkefoelge som i tabellen.
+_KI_KOLONNER = (
+    "slag", "dato", "symbol", "melding_id", "grunnlag", "regelen", "tekst", "besto",
+    "grunn", "promptversjon", "tjeneste", "modell", "modell_id", "seed", "temperatur",
+    "maskinvare", "ollama_versjon",
+)
+
+# ON CONFLICT DO NOTHING, ikke INSERT OR IGNORE: IGNORE ville ogsaa svelget en
+# CHECK som feiler. Raden som finnes, staar (FR-604, svar 2 kl. 15:53).
+_KI_SKRIV = (
+    "INSERT INTO ki_logg (" + ", ".join(_KI_KOLONNER) + ") VALUES ("
+    + ", ".join("?" for _ in _KI_KOLONNER) + ") ON CONFLICT DO NOTHING"
+)
+
+_KI_LES = "SELECT " + ", ".join(_KI_KOLONNER) + " FROM ki_logg "
+
+_KI_EMNE = (
+    "WHERE slag = ? AND dato = ? AND ifnull(symbol, '') = ? AND ifnull(melding_id, '') = ?"
+)
+
+
+class SqliteKILogg:
+    """KILogg i SQLite - story 4.3, FR-604, AD-4, AD-7, AD-16.
+
+    Samme regler som MinneKILogg (kilogg_minne.py), og de samme testene
+    (fixturen logg_lager i tests/test_kilogg.py). Tabellen lages av
+    migrasjonen 0005, aldri her. Adapteren skriver bare med INSERT, og
+    triggerne i 0005 avviser UPDATE og DELETE, saa en eldre rad kan leses,
+    men aldri endres.
+    """
+
+    def __init__(self, tilkobling: sqlite3.Connection, klokke: Callable[[], datetime]):
+        if not callable(klokke):
+            raise TypeError(f"klokke maa kunne kalles, fikk {klokke!r}")
+        _krev_siste_versjon(tilkobling)
+        self._tilkobling = tilkobling
+        self._klokke = klokke
+
+    def skriv(self, rad: KIRad) -> bool:
+        if not isinstance(rad, KIRad):
+            raise TypeError(f"rad maa vaere KIRad, fikk {rad!r}")
+        naa = self._klokke()
+        if not isinstance(naa, datetime) or naa.tzinfo is None:
+            raise TypeError(f"klokka maa gi et tidspunkt med sone, ga {naa!r}")
+        dagens = innevaerende_boersdag(norsk_dato(naa))
+        if rad.emne.dato != dagens:
+            raise IkkeInnevaerendeBoersdag(
+                f"{rad.emne.dato.isoformat()} er ikke inneveerende boersdag "
+                f"({dagens.isoformat()}). En eldre rad kan ikke skrives (AD-7)."
+            )
+        if self._tilkobling.in_transaction:
+            raise RuntimeError(
+                "Tilkoblingen har en aapen transaksjon. Adapteren styrer "
+                "transaksjonen selv - avslutt kallerens foerst."
+            )
+        verdier = (
+            rad.emne.slag, rad.emne.dato.isoformat(), rad.emne.symbol, rad.emne.melding_id,
+            rad.grunnlag_som_json(), rad.regelen, rad.tekst, int(rad.besto), rad.grunn,
+            rad.promptversjon, rad.tjeneste, rad.modell, rad.modell_id, rad.seed,
+            rad.temperatur, rad.maskinvare, rad.ollama_versjon,
+        )
+        try:
+            self._tilkobling.execute("BEGIN")
+            skrevet = self._tilkobling.execute(_KI_SKRIV, verdier).rowcount
+            self._tilkobling.execute("COMMIT")
+        except BaseException:
+            # En ROLLBACK som feiler, skal ikke skjule den opprinnelige feilen
+            # (gjennomgangen av 4.3).
+            if self._tilkobling.in_transaction:
+                try:
+                    self._tilkobling.execute("ROLLBACK")
+                except sqlite3.Error:
+                    pass
+            raise
+        return skrevet > 0
+
+    def les(self, emne: Emne) -> KIRad | None:
+        if not isinstance(emne, Emne):
+            raise TypeError(f"emne maa vaere Emne, fikk {emne!r}")
+        rad = self._tilkobling.execute(
+            _KI_LES + _KI_EMNE,
+            (emne.slag, emne.dato.isoformat(), emne.symbol or "", emne.melding_id or ""),
+        ).fetchone()
+        return _kirad(rad) if rad is not None else None
+
+    def les_alle(self) -> list[KIRad]:
+        return [_kirad(rad) for rad in self._tilkobling.execute(_KI_LES + "ORDER BY dato, nr")]
+
+
+def _kirad(rad) -> KIRad:
+    (slag, dato, symbol, melding_id, grunnlag, regelen, tekst, besto, grunn,
+     promptversjon, tjeneste, modell, modell_id, seed, temperatur, maskinvare,
+     ollama_versjon) = rad
+    return KIRad(
+        emne=Emne(slag, date.fromisoformat(dato), symbol=symbol, melding_id=melding_id),
+        grunnlag=json.loads(grunnlag),
+        regelen=regelen,
+        tekst=tekst,
+        besto=bool(besto),
+        grunn=grunn,
+        promptversjon=promptversjon,
+        tjeneste=tjeneste,
+        modell=modell,
+        modell_id=modell_id,
+        seed=seed,
+        temperatur=temperatur,
+        maskinvare=maskinvare,
+        ollama_versjon=ollama_versjon,
     )

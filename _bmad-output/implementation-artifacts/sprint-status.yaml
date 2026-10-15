@@ -96,7 +96,7 @@ development_status:
   4-0-nettsperren-dekker-hele-testkjøringen: done
   4-1-velg-modelltjeneste-og-dokumentér-betingelse-4: done
   4-2-kilogg-porten-med-minneimplementasjon: done
-  4-3-sqlite-adapter-for-kilogg: backlog
+  4-3-sqlite-adapter-for-kilogg: in-progress
   epic-4-retrospective: optional
 
   # Ute av v1 fra 2026-09-28 (plan B). Staar som plan for en senere versjon.
