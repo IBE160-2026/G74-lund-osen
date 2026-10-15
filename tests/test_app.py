@@ -179,7 +179,12 @@ def test_viser_selskapsnavn_og_de_fem_kolonnene(klient, monkeypatch):
         # Signalstyrke har «?» etter ordet fra story 8.0b, i samme celle.
         # Story 8.0d, PR 2: «NOK» bare under Sluttkurs (svar 2, BH9).
         nok = '(<span class="under">NOK</span>)' if overskrift == "Sluttkurs" else ""
-        assert re.search(rf"<th[^>]*>{overskrift}( <button[^<]*>\?</button>)?{nok}</th>", html), overskrift
+        # Story 8.15: navnet er en lenke som sorterer, med en vinkel.
+        # Gjennomgangen (BH5): lenken er påkrevd ved de fire som kan sorteres.
+        lenke = r'<a class="sorter[^"]*" href="[^"]*">' if overskrift != "Selskap" else ""
+        etter = (r'<span class="skjult">[^<]*</span><svg class="vinkel"[^>]*><path[^>]*/></svg></a>'
+                 if overskrift != "Selskap" else "")
+        assert re.search(rf"<th[^>]*>{lenke}{overskrift}{etter}( <button[^<]*>\?</button>)?{nok}</th>", html), overskrift
     assert "Equinor" in html
 
 
@@ -1992,6 +1997,145 @@ def _endringsforklaring(klient, symbol: str) -> str:
     assert svar.status_code == 200
     endring = svar.data.decode("utf-8").split('<div class="noekkeltall endring">', 1)[1].split("</div>", 1)[0]
     return re.search(r'<span class="forklaring">(.*?)</span>', endring).group(1)
+
+
+def _deler_i_rekkefoelge(html: str) -> tuple[list[str], list[str]]:
+    """Symbolene i «Skilte seg ut» og i «Øvrige aksjer», i rekkefølgen de
+    står - story 8.15."""
+    tbody = html.split("</thead>", 1)[1].split("</table>", 1)[0]
+    ut, oevrige = tbody.split("Øvrige aksjer", 1) if "Øvrige aksjer" in tbody else (tbody, "")
+    finn = lambda del_: re.findall(r'<span class="linje">([A-Z0-9]+)', del_)
+    return finn(ut), finn(oevrige)
+
+
+class TestStory815Sortering:
+    """Story 8.15: sortering ved klikk i kolonneraden, svarene på planen kl.
+    13:44 (instruksjonen kl. 14:01)."""
+
+    @pytest.fixture
+    def tabell(self, klient):
+        """Fem aksjer: tre som skilte seg ut og to øvrige, den ene uten
+        vurdering."""
+        _lagret("KOG", 1.0, 1, 1, 1)      # 3 Positiv
+        _lagret("DNB", -4.0, -1, -1, 0)   # 2 Negativ
+        _lagret("EQNR", 2.0, 1, -1, 0)    # 2 Blandet
+        _lagret("MOWI", 3.0, 1, 0, 0)     # 1 Positiv
+        _lagret("NHY", -1.0, 0, 0, 0, vurdert=False)
+        return klient
+
+    def _side(self, klient, adresse):
+        svar = klient.get(adresse)
+        assert svar.status_code == 200, adresse
+        return svar.data.decode("utf-8")
+
+    def test_uten_klikk_er_rekkefoelgen_fr_102(self, tabell):
+        """Ville feilet hvis ukjent eller manglende parameter ga en annen
+        rekkefølge eller en feil (S7)."""
+        standard = _deler_i_rekkefoelge(self._side(tabell, "/"))
+        assert standard == (["KOG", "DNB", "EQNR"], ["MOWI", "NHY"])
+        for adresse in ("/?sorter=endring", "/?orden=stigende", "/?sorter=navn&orden=synkende",
+                        "/?sorter=endring&orden=opp", "/?sorter=&orden="):
+            assert _deler_i_rekkefoelge(self._side(tabell, adresse)) == standard, adresse
+
+    @pytest.mark.parametrize("adresse, ut, oevrige", [
+        ("/?sorter=endring&orden=synkende", ["EQNR", "KOG", "DNB"], ["MOWI", "NHY"]),
+        ("/?sorter=endring&orden=stigende", ["DNB", "KOG", "EQNR"], ["NHY", "MOWI"]),
+        ("/?sorter=signal&orden=stigende", ["DNB", "EQNR", "KOG"], ["MOWI", "NHY"]),
+        ("/?sorter=retning&orden=stigende", ["EQNR", "DNB", "KOG"], ["MOWI", "NHY"]),
+        ("/?sorter=retning&orden=synkende", ["KOG", "DNB", "EQNR"], ["MOWI", "NHY"]),
+    ])
+    def test_hver_del_sorteres_for_seg(self, tabell, adresse, ut, oevrige):
+        """Tillegget 13.10: ingen rad flytter seg mellom delene (S1). Rader
+        uten verdi står sist i begge retninger (S2), og endringen har
+        fortegn (S4)."""
+        assert _deler_i_rekkefoelge(self._side(tabell, adresse)) == (ut, oevrige)
+
+    def test_lenken_snur_og_aria_sort_staar_paa_kolonnen(self, tabell):
+        """Første klikk synkende, A til Å for Retning, og et nytt klikk
+        snur (S5). aria-sort står bare på kolonnen som er valgt (S6)."""
+        html = self._side(tabell, "/")
+        thead = html.split("<thead>", 1)[1].split("</thead>", 1)[0]
+        assert "aria-sort" not in thead
+        lenker = dict(re.findall(r'href="/\?sorter=(\w+)&amp;orden=(\w+)"', thead))
+        assert lenker == {"kurs": "synkende", "endring": "synkende", "signal": "synkende", "retning": "stigende"}
+        valgt = self._side(tabell, "/?sorter=endring&orden=synkende")
+        thead = valgt.split("<thead>", 1)[1].split("</thead>", 1)[0]
+        assert re.findall(r'<th[^>]*aria-sort="(\w+)"[^>]*><a class="sorter valgt" href="/\?sorter=(\w+)&amp;orden=(\w+)"', thead) == [
+            ("descending", "endring", "stigende")]
+        stigende = self._side(tabell, "/?sorter=retning&orden=stigende")
+        assert re.search(r'<th aria-sort="ascending"><a class="sorter valgt" href="/\?sorter=retning&amp;orden=synkende">', stigende)
+
+    def test_skjermleseren_hoerer_kolonnen_og_retningen(self, tabell):
+        """Kontrollpunktet og svar 8: «stigende (A til Å)» eller «synkende
+        (Å til A)» for Retning, ikke «alfabetisk»."""
+        valgt = self._side(tabell, "/?sorter=retning&orden=stigende")
+        assert ('Retning<span class="skjult">, sortert stigende (A til Å). Velg for synkende (Å til A).</span>'
+                in valgt)
+        assert 'Retning<span class="skjult">, sorter stigende (A til Å)</span>' in self._side(tabell, "/")
+        assert "alfabetisk" not in valgt
+        assert 'Endring<span class="skjult">, sorter synkende</span>' in valgt
+        endring = self._side(tabell, "/?sorter=endring&orden=stigende")
+        assert 'Endring<span class="skjult">, sortert stigende. Velg for synkende.</span>' in endring
+
+    def test_linja_over_tabellen_bare_med_valg(self, tabell):
+        """Svar 5. Ville feilet hvis linja sto også uten valg (S12)."""
+        assert 'class="sortert"' not in self._side(tabell, "/")
+        html = self._side(tabell, "/?sorter=signal&orden=stigende")
+        assert ('<p class="sortert">Sortert på signalstyrke, stigende, innenfor hver del. '
+                '<a href="/">Standard rekkefølge</a></p>') in html
+        assert html.index('<p class="sortert">') < html.index('<div class="tabellboks"')
+        # Gjennomgangen (VG2): navnet for hver kolonne. Svar 9: «innenfor hver del».
+        for kolonne, navn in (("kurs", "sluttkurs"), ("endring", "endring")):
+            html = self._side(tabell, f"/?sorter={kolonne}&orden=synkende")
+            assert f'<p class="sortert">Sortert på {navn}, synkende, innenfor hver del. ' in html, kolonne
+
+    def test_linja_og_skjermleseren_sier_det_samme(self, tabell):
+        """Svar 8 (BH1, ECH1): for Retning sier linja over tabellen det
+        samme som teksten for skjermleseren, i begge retninger."""
+        for orden, ord in (("stigende", "stigende (A til Å)"), ("synkende", "synkende (Å til A)")):
+            html = self._side(tabell, f"/?sorter=retning&orden={orden}")
+            assert f'<p class="sortert">Sortert på retning, {ord}, innenfor hver del. ' in html, orden
+            assert f'Retning<span class="skjult">, sortert {ord}. ' in html, orden
+
+    def test_vinkelen_peker_etter_retningen(self, tabell):
+        """Gjennomgangen (VG1): den valgte kolonnen viser retningen som
+        gjelder, og de andre retningen et klikk gir."""
+        ned, opp = "M2.5 4.5 6 8l3.5-3.5", "M2.5 7.5 6 4l3.5 3.5"
+
+        def vinkler(adresse):
+            thead = self._side(tabell, adresse).split("<thead>", 1)[1].split("</thead>", 1)[0]
+            return dict(re.findall(r'href="/\?sorter=(\w+)&amp;[^"]*">.*?<path d="([^"]+)"', thead))
+
+        assert vinkler("/") == {"kurs": ned, "endring": ned, "signal": ned, "retning": opp}
+        assert vinkler("/?sorter=endring&orden=synkende")["endring"] == ned
+        assert vinkler("/?sorter=endring&orden=stigende")["endring"] == opp
+        assert vinkler("/?sorter=retning&orden=synkende")["retning"] == ned
+
+    def test_rad_uten_endring_sist_i_skilte_seg_ut(self, tabell, monkeypatch):
+        """Gjennomgangen (BH14): en rad med vurdering, men bare én kursdag,
+        står sist i «Skilte seg ut» i begge retninger."""
+        rader = serie([100.0])
+        skriv_serie("ORK", rader, datetime.fromisoformat(HENTET), vurdert=False)
+        skriv_vurdering("ORK", rader[-1].dato, Vurdering(
+            styrke=2, retning="Positiv", trend=1, bevegelse=1, interesse=0, slutt=100.0,
+            justert_slutt=100.0, trend_avvik=0.0, dagens_endring=0.0, standardavvik=0.01,
+            volumforhold=1.0))
+        for orden in ("synkende", "stigende"):
+            ut, _ = _deler_i_rekkefoelge(self._side(tabell, f"/?sorter=endring&orden={orden}"))
+            assert ut[-1] == "ORK" and len(ut) == 4, (orden, ut)
+
+    def test_tre_av_tre_og_antallet_foelger_fr_102(self, tabell):
+        """Svar 7: linja om 3 av 3 og «N av M aksjer» endres ikke av et klikk."""
+        def topp(html):
+            return html.split('<div class="tabellboks"', 1)[0].split("<main>", 1)[1]
+        standard = topp(self._side(tabell, "/"))
+        valgt = topp(self._side(tabell, "/?sorter=signal&orden=stigende"))
+        assert valgt.split('<p class="sortert">', 1)[0].rstrip() == standard.rstrip()
+
+    def test_tilbakelenken_paa_aksjesiden_gaar_til_standarden(self, tabell):
+        """Svar 3."""
+        html = self._side(tabell, "/aksje/KOG")
+        assert '<a class="tilbake" href="/">Markedsoversikt</a>' in html
 
 
 class TestStory80dAksjesiden:

@@ -249,7 +249,9 @@ class TestRammen:
         """Ville feilet med en lenke til /min-liste før 8.3."""
         for navn, html in sidene.items():
             for href in re.findall(r'href="([^"]*)"', html):
-                assert href == "/" or re.fullmatch(r"/aksje/[A-Z0-9]+", href), (navn, href)
+                # Story 8.15: sorteringen er en parameter på /.
+                assert (href == "/" or re.fullmatch(r"/aksje/[A-Z0-9]+", href)
+                        or re.fullmatch(r"/\?sorter=(kurs|endring|signal|retning)&amp;orden=(synkende|stigende)", href)), (navn, href)
 
     def test_tabelltall_i_tallcellene(self, sidene):
         """Ville feilet hvis tabular-nums ble fjernet fra tallcellene."""
@@ -271,7 +273,9 @@ class TestRammen:
             assert "outline: 3px solid var(--blekk)" in _regel(stil, "*:focus-visible"), navn
             assert "var(--oransje)" in _regel(stil, "header.stripe *:focus-visible"), navn
             for velger, regel in re.findall(r"([^{}]*focus-visible[^{}]*)\{([^}]*)\}", stil):
-                if "stripe" not in velger:
+                # Story 8.15: lenkene i kolonneraden står på blekk, som stripa.
+                # Gjennomgangen (BH6): bare akkurat den regelen.
+                if "stripe" not in velger and velger.strip() != ".tabellboks thead a.sorter:focus-visible":
                     assert not re.search(r"gul|oransje|currentColor", regel), (navn, velger)
 
     def test_stripa_og_bunnlinja_paa_alle_sidene(self, sidene):
@@ -563,6 +567,43 @@ class TestOversikten:
                          html, re.DOTALL)
         assert '<span class="under">NOK</span>' in html
         assert html.count('class="under"') == 1
+
+
+class TestSorteringen:
+    """Story 8.15: vinklene og fokus i den svarte kolonneraden (svar 4)."""
+
+    def test_vinkelen_er_en_svg_dempet_eller_hvit(self, sidene):
+        """Ville feilet med ↑ eller ↓ som vinkel (S8), eller med den dempede
+        vinkelen i hvitt (S13)."""
+        html = sidene["oversikten"]
+        thead = html.split("<thead>", 1)[1].split("</thead>", 1)[0]
+        lenker = re.findall(r'<a class="sorter[^"]*"[^>]*>(.*?)</a>', thead, re.DOTALL)
+        assert len(lenker) == 4
+        for lenke in lenker:
+            assert re.search(r'<svg class="vinkel"[^>]*aria-hidden="true"', lenke), lenke
+            assert not re.search("[←→↑↓↔↗↘↖↙▲▼]", lenke), lenke
+        stil = _stil(html)
+        assert "color: var(--kolonne-tekst-2)" in _regel(stil, ".tabellboks thead a.sorter .vinkel")
+        assert "color: var(--hvit)" in _regel(stil, ".tabellboks thead a.sorter.valgt .vinkel")
+        assert re.search(r"--kolonne-tekst-2:\s*#B9BDC5", stil, re.I)
+
+    def test_fokus_er_oransje_paa_blekk_og_klikkflaten_44_px(self, sidene):
+        """Ville feilet med fokus i blekk på blekk (S9)."""
+        regel = _regel(_stil(sidene["oversikten"]), ".tabellboks thead a.sorter:focus-visible")
+        assert "outline: 3px solid var(--oransje)" in regel
+        assert "min-height: 44px" in _regel(_stil(sidene["oversikten"]), ".tabellboks thead a.sorter")
+
+    def test_lenken_standard_rekkefoelge_er_i_blekk(self, sidene):
+        """Svar 5: lenken over tabellen har en farge fra designreglene, ikke
+        nettleserens blå (designregler §5, ingen farge skrevet fast)."""
+        assert "color: var(--blekk)" in _regel(_stil(sidene["oversikten"]), "p.sortert a")
+
+    def test_sorteringen_virker_i_demoen(self, klient, demobase, monkeypatch):
+        """FR-411: samme rute og mal i demoen, med merket som før."""
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        html = klient.get("/?sorter=endring&orden=stigende").data.decode("utf-8")
+        assert '<p class="sortert">Sortert på endring, stigende, innenfor hver del.' in html
+        assert "Eksempeltall" in html
 
 
 class TestBrikkene:

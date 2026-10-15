@@ -286,6 +286,101 @@ def del_i_to(rader: list[Rad]) -> tuple[list[Rad], list[Rad]]:
     return ut, oevrige
 
 
+# Story 8.15: kolonnene som kan sorteres ved klikk, med navnet i linja over
+# tabellen («Sortert på endring, synkende») og retningen ved første klikk.
+# Svar 1: synkende først, størst først. Svar 2: Retning er en gruppering i
+# alfabetisk rekkefølge, A til Å først, ikke en rangering (NFR-06).
+SYNKENDE = "synkende"
+STIGENDE = "stigende"
+SORTERBARE: dict[str, tuple[str, str]] = {
+    "kurs": ("sluttkurs", SYNKENDE),
+    "endring": ("endring", SYNKENDE),
+    "signal": ("signalstyrke", SYNKENDE),
+    "retning": ("retning", STIGENDE),
+}
+RETNINGSGRUPPER = tuple(sorted((POSITIV, NEGATIV, BLANDET, INGEN)))
+
+
+@dataclass(frozen=True)
+class Sortering:
+    """Kolonnen og retningen fra adressen - story 8.15.
+
+    fra_adressen gir None for alt den ikke kjenner, også en kolonne uten
+    retning. Da gjelder FR-102, og siden feiler ikke."""
+
+    kolonne: str
+    orden: str
+
+    def __post_init__(self) -> None:
+        # Gjennomgangen (BH9): en Sortering laget direkte, for eksempel i
+        # Min liste (8.3), kan ikke ha en kolonne navn og neste_orden ikke
+        # kjenner.
+        if self.kolonne not in SORTERBARE or self.orden not in (SYNKENDE, STIGENDE):
+            raise ValueError(f"ukjent sortering: {self.kolonne!r}, {self.orden!r}")
+
+    @classmethod
+    def fra_adressen(cls, kolonne: str | None, orden: str | None) -> "Sortering | None":
+        if kolonne in SORTERBARE and orden in (SYNKENDE, STIGENDE):
+            return cls(kolonne, orden)
+        return None
+
+    @property
+    def navn(self) -> str:
+        return SORTERBARE[self.kolonne][0]
+
+
+def neste_orden(kolonne: str, valgt: Sortering | None) -> str:
+    """Retningen et klikk på kolonnen gir: den motsatte når kolonnen er
+    valgt, ellers første klikk (svar 1 og 2)."""
+    if valgt is not None and valgt.kolonne == kolonne:
+        return STIGENDE if valgt.orden == SYNKENDE else SYNKENDE
+    return SORTERBARE[kolonne][1]
+
+
+def _verdi(rad: Rad, kolonne: str) -> float | int | None:
+    """Verdien raden sorteres på, eller None når den mangler. Endring er i
+    prosent med fortegn (FR-101, svar 1). Retning er plassen i alfabetet, og
+    Ukjent har ingen."""
+    if kolonne == "kurs":
+        return rad.sluttkurs
+    if kolonne == "endring":
+        return rad.endring_prosent
+    if kolonne == "signal":
+        return rad.styrke
+    if rad.vurdering is None or rad.vurdering.retning not in RETNINGSGRUPPER:
+        return None
+    return RETNINGSGRUPPER.index(rad.vurdering.retning)
+
+
+# Gjennomgangen (ECH4): navnet ved lik verdi sorteres i norsk alfabet, med
+# Æ, Ø og Å etter Z, og uten forskjell på store og små bokstaver.
+_NORSK = str.maketrans({"æ": "{", "ø": "|", "å": "}"})
+
+
+def _navn(rad: Rad) -> str:
+    return rad.aksje.navn.casefold().translate(_NORSK)
+
+
+def sorter(rader: list[Rad], sortering: Sortering | None) -> list[Rad]:
+    """Én del av tabellen sortert på kolonnen - story 8.15.
+
+    Først FR-102 og så navnet, så lik verdi alltid står likt. Så kolonnen,
+    der bare den snus. Rader uten verdi står sist i begge retninger. Uten
+    sortering er rekkefølgen den samme som før, FR-102 fra bygg_oversikt.
+    Ruten kaller den for hver del etter del_i_to, så ingen rad flytter seg
+    mellom delene (tillegget 13.10)."""
+    if sortering is None:
+        return list(rader)
+    grunn = sorted(rader, key=lambda rad: (_sorteringsnokkel(rad), _navn(rad)))
+    med = [rad for rad in grunn if _verdi(rad, sortering.kolonne) is not None]
+    uten = [rad for rad in grunn if _verdi(rad, sortering.kolonne) is None]
+    # Gjennomgangen (BH8): sort er stabil også med reverse=True, så lik
+    # verdi beholder rekkefølgen fra grunn, FR-102 og navnet, i begge
+    # retninger. Snus grunn eller nøkkelen i stedet, går det tapt.
+    med.sort(key=lambda rad: _verdi(rad, sortering.kolonne), reverse=sortering.orden == SYNKENDE)
+    return med + uten
+
+
 def antall_vurdert(rader: list[Rad]) -> int:
     """Hvor mange rader som har en vurdering - story 8.0c, svar 3 paa
     BH1/ECH2. Siden sier «N av M aksjer ble vurdert.» naar det er faerre

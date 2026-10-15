@@ -2,6 +2,27 @@
 {% from "_hjelp.html" import hjelpeknapp, hjelpevindu with context -%}
 {% from "_bransjer.html" import bransjesymbol -%}
 {% from "_brikker.html" import brikker, retningspille -%}
+{#- Story 8.15: navnet i kolonneraden er en lenke som sorterer, med en vinkel
+    som SVG (pilene er bare for retning, designregler §4). Vinkelen viser
+    retningen et klikk gir, eller den som gjelder når kolonnen er valgt.
+    Dempet når kolonnen ikke er valgt, hvit når den er det (svar 4).
+    Skjermleseren hører kolonnen og retningen, og linja over tabellen sier
+    det samme: «stigende (A til Å)» eller «synkende (Å til A)» for Retning
+    (svar 8). #}
+{% macro ordens_ord(kolonne, orden) -%}
+  {{- orden }}{% if kolonne == "retning" %} {{ "(A til Å)" if orden == "stigende" else "(Å til A)" }}{% endif -%}
+{%- endmacro %}
+{% macro ariasort(kolonne) -%}
+  {%- if sortering and sortering.kolonne == kolonne %} aria-sort="{{ 'descending' if sortering.orden == 'synkende' else 'ascending' }}"{% endif -%}
+{%- endmacro %}
+{% macro sorterlenke(kolonne, tekst) -%}
+  {%- set valgt = sortering and sortering.kolonne == kolonne -%}
+  {%- set neste = neste_orden(kolonne, sortering) -%}
+  {%- set vist = sortering.orden if valgt else neste -%}
+  <a class="sorter{% if valgt %} valgt{% endif %}" href="/?sorter={{ kolonne }}&amp;orden={{ neste }}">{{ tekst }}<span class="skjult">
+  {%- if valgt %}, sortert {{ ordens_ord(kolonne, sortering.orden) }}. Velg for {{ ordens_ord(kolonne, neste) }}.{% else %}, sorter {{ ordens_ord(kolonne, neste) }}{% endif -%}
+  </span><svg class="vinkel" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false"><path d="{{ 'M2.5 4.5 6 8l3.5-3.5' if vist == 'synkende' else 'M2.5 7.5 6 4l3.5 3.5' }}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+{%- endmacro %}
 {% macro tabellrad(rad) %}
           {#- Story 8.0d, PR 2: strek til venstre i sterk oransje ved 3 av 3 og
               i lys oransje ved 2 av 3, og ingen ved 1 og 0 (designregler §3,
@@ -110,6 +131,19 @@
     /* Story 8.0: navnet ser ut som en lenke, og fokus synes. */
     td.selskap a { color: inherit; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
     td.selskap a:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+    /* Story 8.15: navnet i kolonneraden sorterer. Vinkelen er dempet når
+       kolonnen ikke er valgt og hvit når den er det (svar 4). Fokus er den
+       oransje ringen på blekk, som «?», og klikkflaten er 44 px høy. */
+    .tabellboks thead a.sorter { color: inherit; text-decoration: none; display: inline-flex; align-items: center;
+                                 gap: 4px; min-height: 44px; vertical-align: middle; }
+    .tabellboks thead a.sorter .vinkel { color: var(--kolonne-tekst-2); flex: none; }
+    .tabellboks thead a.sorter.valgt .vinkel { color: var(--hvit); }
+    .tabellboks thead a.sorter:focus-visible { outline: 3px solid var(--oransje); outline-offset: 2px; }
+    .skjult { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);
+              clip-path: inset(50%); white-space: nowrap; }
+    /* Svar 5: linja over tabellen når en kolonne er valgt. */
+    p.sortert { margin: 0 0 0.6rem; font-size: 14px; color: var(--tekst); }
+    p.sortert a { color: var(--blekk); text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
     td.selskap .linje { display: flex; align-items: center; gap: 4px; margin-top: 2px;
                         font-size: 12.5px; font-weight: 400; color: var(--dempet); white-space: nowrap; }
     td.selskap .bransjesymbol { width: 15px; height: 15px; }
@@ -205,16 +239,19 @@
       </section>
     </div>
 
+    {#- Story 8.15, svar 5: linja står bare når en kolonne er valgt. #}
+    {% if sortering %}<p class="sortert">Sortert på {{ sortering.navn }}, {{ ordens_ord(sortering.kolonne, sortering.orden) }}, innenfor hver del. <a href="/">Standard rekkefølge</a></p>{% endif %}
     <div class="tabellboks" role="region" aria-label="Aksjene" tabindex="0">
     <table>
       <thead>
         <tr>
           <th>Selskap {{ hjelpeknapp("hjelp-selskap", "Hjelp: selskap") }}</th>
-          {#- Svar 2: bare «NOK» under et kolonnenavn. #}
-          <th class="tall">Sluttkurs {{ hjelpeknapp("hjelp-sluttkurs", "Hjelp: sluttkurs") }}<span class="under">NOK</span></th>
-          <th class="tall">Endring {{ hjelpeknapp("hjelp-endring", "Hjelp: endring") }}</th>
-          <th class="tall">Signalstyrke {{ hjelpeknapp("hjelp-signalstyrke", "Hjelp: signalstyrken") }}</th>
-          <th>Retning {{ hjelpeknapp("hjelp-retning", "Hjelp: retning") }}</th>
+          {#- Svar 2: bare «NOK» under et kolonnenavn. Story 8.15: «?» står
+              ved siden av lenken, ikke inne i den. #}
+          <th class="tall"{{ ariasort("kurs") }}>{{ sorterlenke("kurs", "Sluttkurs") }} {{ hjelpeknapp("hjelp-sluttkurs", "Hjelp: sluttkurs") }}<span class="under">NOK</span></th>
+          <th class="tall"{{ ariasort("endring") }}>{{ sorterlenke("endring", "Endring") }} {{ hjelpeknapp("hjelp-endring", "Hjelp: endring") }}</th>
+          <th class="tall"{{ ariasort("signal") }}>{{ sorterlenke("signal", "Signalstyrke") }} {{ hjelpeknapp("hjelp-signalstyrke", "Hjelp: signalstyrken") }}</th>
+          <th{{ ariasort("retning") }}>{{ sorterlenke("retning", "Retning") }} {{ hjelpeknapp("hjelp-retning", "Hjelp: retning") }}</th>
         </tr>
       </thead>
       {#- Story 8.0e: to deler i samme tabell, hver med sin overskrift i en

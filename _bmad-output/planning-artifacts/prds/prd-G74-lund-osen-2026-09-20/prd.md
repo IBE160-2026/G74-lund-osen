@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-13T14:06
+updated: 2026-10-15T15:27
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -346,6 +346,19 @@ kolonnen, og et nytt klikk snur rekkefølgen. Endring sorteres på prosent. Rade
 uten verdi står sist i begge retninger. Kolonneraden sier hvilken kolonne og
 retning som gjelder, også til skjermleseren. Det er fortsatt fem kolonner
 (FR-101). Gjelder også Min liste.
+
+*Lagt til 2026-10-15 (gruppens svar 1 og 2 på planen for story 8.15, instruksjonen kl. 14:01):*
+første klikk sorterer synkende (høyest kurs, størst oppgang og sterkest signal
+først), og neste klikk stigende. Endring sorteres med fortegn ved klikk.
+Standarden over står som før. Retning kan også sorteres, som en gruppering i
+alfabetisk rekkefølge, Blandet, Ingen, Negativ og Positiv, med standarden over
+innenfor hver gruppe og Ukjent sist i begge retninger. Første klikk gir A til Å,
+og teksten for skjermleseren sier «alfabetisk». Rekkefølgen er ikke en
+rangering fra godt til dårlig (NFR-06).
+
+*Lagt til 2026-10-15 (gruppens svar 8 på funnene i PR #43 for story 8.15, instruksjonen kl. 15:25):*
+for Retning sier teksten for skjermleseren «stigende (A til Å)» eller «synkende
+(Å til A)», ikke «alfabetisk», og linja over tabellen sier det samme.
 
 #### FR-103 — Retning vises i tre redundante kanaler
 
