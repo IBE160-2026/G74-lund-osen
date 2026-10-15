@@ -23,6 +23,7 @@ innstillingene og bruker samme kapsel.
 """
 
 import re
+import unicodedata
 from collections.abc import Mapping
 from dataclasses import dataclass
 
@@ -33,8 +34,12 @@ KAPSEL = "ose_ki"
 PAA = "paa"
 AV = "av"
 
-# NFR-06: ordene vakten stopper, uansett boeyning.
-_VAKT = re.compile(r"(?<![a-zæøå])(kjøp|selg|anbefal)", re.IGNORECASE)
+# NFR-06: ordene vakten stopper, uansett boeyning og ogsaa inni et
+# sammensatt ord («salgsanbefaling», «aksjekjøp»). Vakten er grov: den
+# stopper ogsaa en beskrivelse som «mange kjøpere», og da er dagen uten
+# KI-tekst, ikke feil (gjennomgangen av 10.3, BH3, ECH, VG4).
+_VAKT = re.compile(r"(kjøp|kjop|selg|solg|salg|anbefal|tilr[åa]d)", re.IGNORECASE)
+_USYNLIGE = dict.fromkeys(map(ord, "\u00ad\u200b\u200c\u200d\u2060\ufeff"))
 
 VIST = "vist"
 INGEN_RAD = "ingen_rad"
@@ -68,7 +73,9 @@ class KIVisning:
 
 
 def stemmer(grunnlag: Mapping[str, object], vurdering: Vurdering) -> bool:
-    """FR-602: samme styrke, samme retning og samme fortegn for de tre."""
+    """FR-602: samme styrke, samme retning og samme fortegn for de tre.
+    Verdiene for de tre er fortegnene selv (-1, 0 eller 1), saa de
+    sammenlignes som de er."""
     return all(grunnlag.get(navn) == getattr(vurdering, navn)
                for navn in ("trend", "bevegelse", "interesse", "styrke", "retning"))
 
@@ -81,9 +88,14 @@ def bygg_ki_visning(rad: KIRad | None, vurdering: object) -> KIVisning:
         return KIVisning(MODELLEN_FEILET)
     if not rad.besto:
         return KIVisning(BESTO_IKKE)
-    if not isinstance(vurdering, Vurdering) or not stemmer(rad.grunnlag, vurdering):
+    if not isinstance(vurdering, Vurdering):
+        # Ingen vurdering aa forklare. Siden viser da ingen KI-del, men skulle
+        # den, er dette den riktige grunnen (gjennomgangen, BH5).
+        return KIVisning(INGEN_RAD)
+    if not stemmer(rad.grunnlag, vurdering):
         return KIVisning(STEMMER_IKKE)
-    if _VAKT.search(rad.tekst):
+    tekst = unicodedata.normalize("NFC", rad.tekst).translate(_USYNLIGE)
+    if _VAKT.search(tekst):
         return KIVisning(STOPPET_AV_VAKTEN)
     return KIVisning(VIST, tekst=rad.tekst, modell=f"{rad.modell}, {rad.tjeneste}")
 

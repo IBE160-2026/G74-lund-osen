@@ -227,9 +227,9 @@
       </section>
     {% endif %}
     <form class="ki-bryter" method="post" action="/ki">
-      <input type="hidden" name="til" value="{{ 'av' if ki_er_paa else 'paa' }}">
+      <input type="hidden" name="til" value="{{ ki_til }}">
       <input type="hidden" name="tilbake" value="/aksje/{{ detalj.aksje.symbol }}">
-      <button type="submit">{{ 'Skjul KI-teksten' if ki_er_paa else 'Vis KI-teksten' }}</button>
+      <button type="submit" aria-pressed="{{ 'true' if ki_er_paa else 'false' }}">{{ 'Skjul KI-teksten' if ki_er_paa else 'Vis KI-teksten' }}</button>
     </form>
   {% endif %}
 

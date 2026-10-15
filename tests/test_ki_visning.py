@@ -101,6 +101,8 @@ class TestVisningen:
         dict(trend=0, bevegelse=0, interesse=-1, styrke=1, retning="Negativ"),
         dict(trend=1, bevegelse=1, interesse=-1, styrke=3, retning="Blandet"),
         dict(trend=1, bevegelse=0, interesse=1, styrke=2, retning="Positiv"),
+        # Gjennomgangen (VG1): samme styrke og retning, men andre fortegn.
+        dict(trend=-1, bevegelse=0, interesse=1, styrke=2, retning="Blandet"),
     ])
     def test_grunnlaget_stemmer_ikke_med_vurderingen(self, endret):
         """FR-602 og svar 3: en vurdering skrevet paa nytt samme dag."""
@@ -108,9 +110,12 @@ class TestVisningen:
         assert bygg_ki_visning(kirad(), annen).tilstand == STEMMER_IKKE
 
     def test_en_grunn_i_stedet_for_vurdering(self):
-        assert bygg_ki_visning(kirad(), Grunn.KURS_IKKE_FRA_DAGEN).tilstand == STEMMER_IKKE
+        """Gjennomgangen (BH5): ingen vurdering aa forklare, ikke «skrevet paa nytt»."""
+        assert bygg_ki_visning(kirad(), Grunn.KURS_IKKE_FRA_DAGEN).tilstand == INGEN_RAD
 
-    @pytest.mark.parametrize("ord_", ["Kjøp", "selger", "anbefales", "KJØPSSIGNAL"])
+    @pytest.mark.parametrize("ord_", ["Kjøp", "selger", "anbefales", "KJØPSSIGNAL", "salgssignal",
+                                      "salgsanbefaling", "aksjekjøp", "kj\u00adøpssignal", "solgt",
+                                      "tilrådd", "kjop"])
     def test_vakten_stopper_raad(self, ord_):
         """NFR-06: vakten paa vaar side, ogsaa for en tekst som besto."""
         ki = bygg_ki_visning(kirad(tekst=f"Signalet er et {ord_}."), VURDERING)
@@ -200,7 +205,9 @@ class TestBryteren:
         kapsel = svar.headers["Set-Cookie"]
         assert kapsel.startswith(f"{KAPSEL}=av") and "HttpOnly" in kapsel and "SameSite=Lax" in kapsel
 
-    @pytest.mark.parametrize("tilbake", ["https://eksempel.no", "//eksempel.no", "/\\\\eksempel.no", "aksje"])
+    @pytest.mark.parametrize("tilbake", [
+        "https://eksempel.no", "//eksempel.no", "/\\\\eksempel.no", "aksje", "/\t/eksempel.no",
+        "/\n/eksempel.no", "/%2F/eksempel.no", "/aksje/EQNR\r\nSet-Cookie: x=1", "/", "/aksje/"])
     def test_bare_en_sti_paa_samme_side(self, klient, tilbake):
         svar = klient.post("/ki", data={"til": "paa", "tilbake": tilbake})
         assert svar.headers["Location"] in ("/", "http://localhost/")
@@ -218,3 +225,68 @@ def test_webserveren_importerer_ingen_modell():
             "if m in sys.modules))")
     ut = subprocess.run([sys.executable, "-c", kode, str(src)], capture_output=True, text=True, check=True)
     assert ut.stdout.strip() == "[]"
+
+
+class TestEtterGjennomgangen:
+    @pytest.mark.parametrize("tekst", ["Trenden er positiv.", "Selskapet hadde en stor dag.",
+                                       "Retningen er blandet."])
+    def test_vakten_slipper_en_vanlig_forklaring(self, tekst):
+        """BH13: vakten stopper ikke alt. «Selskapet» er ikke «selg»."""
+        assert bygg_ki_visning(kirad(tekst=tekst), VURDERING).tilstand == VIST
+
+    def test_skjemaet_paa_siden_snur_bryteren(self, klient, aksje):
+        """VG2: verdiene skjemaet sender, ikke bare teksten paa knappen."""
+        skriv_kirad(kirad(aksje))
+        paa = side(klient, "paa")
+        assert 'name="til" value="av"' in paa and 'name="tilbake" value="/aksje/EQNR"' in paa
+        assert 'aria-pressed="true"' in paa
+        av = side(klient, "av")
+        assert 'name="til" value="paa"' in av and 'aria-pressed="false"' in av
+
+    def test_en_runde_med_bryteren(self, klient, aksje):
+        """VG2: av og paa igjen gjennom skjemaet, slik nettleseren gjoer."""
+        skriv_kirad(kirad(aksje))
+        assert TEKST in side(klient)
+        svar = klient.post("/ki", data={"til": "av", "tilbake": "/aksje/EQNR"})
+        assert svar.status_code == 303
+        assert TEKST not in klient.get("/aksje/EQNR").data.decode("utf-8")
+        klient.post("/ki", data={"til": "paa", "tilbake": "/aksje/EQNR"})
+        assert TEKST in klient.get("/aksje/EQNR").data.decode("utf-8")
+
+    def test_en_annen_side_kan_ikke_slaa_bryteren(self, klient):
+        """BH2, ECH: Origin fra en annen side gir 403."""
+        svar = klient.post("/ki", data={"til": "av", "tilbake": "/"}, headers={"Origin": "https://eksempel.no"})
+        assert svar.status_code == 403 and "Set-Cookie" not in svar.headers
+        svar = klient.post("/ki", data={"til": "av", "tilbake": "/"}, headers={"Origin": "http://localhost"})
+        assert svar.status_code == 303
+
+    def test_siden_varierer_med_kapselen(self, klient, aksje):
+        """BH10: en mellomlagring skal ikke gi siden med KI paa til en med KI av."""
+        assert "Cookie" in klient.get("/aksje/EQNR").headers.get("Vary", "")
+
+    def test_demoen_viser_ingen_ki_tekst(self, klient, tmp_path, monkeypatch):
+        """VG3 og svar 7: demoen har ingen KI-rader foer 3.4b, og sier det."""
+        from demo import lag_demobase
+        from lagring_sqlite import demo_sti
+
+        lag_demobase(demo_sti(), skriv=lambda *a: None)
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        oversikt = klient.get("/").data.decode("utf-8")
+        import re
+        symbol = re.search(r'href="/aksje/([A-Z]+)"', oversikt).group(1)
+        html = klient.get(f"/aksje/{symbol}").data.decode("utf-8")
+        assert "Eksempeltall" in html
+        assert '<p class="uten">Ingen KI-tekst for denne dagen.</p>' in html
+
+
+def test_webserveren_importerer_ingen_modell_heller_ikke_under_en_forespoersel(tmp_path):
+    """BH14: ogsaa naar en side vises, og uansett hva en ny modellfil heter.
+    Underprosessen faar en testbase i tmp_path (regel 22)."""
+    src = Path(app_modul.__file__).resolve().parent
+    kode = ("import sys, pathlib; sys.path.insert(0, sys.argv[1]); import lagring_sqlite; "
+            "lagring_sqlite.BASE_STI = pathlib.Path(sys.argv[2]) / 'db' / 'ose.db'; import app; "
+            "app.app.config['TESTING'] = True; app.app.test_client().get('/aksje/EQNR'); "
+            "print(sorted(m for m in sys.modules if m.startswith('ki_') and m != 'ki_visning'))")
+    ut = subprocess.run([sys.executable, "-c", kode, str(src), str(tmp_path)],
+                        capture_output=True, text=True, check=True)
+    assert ut.stdout.strip().splitlines()[-1] == "[]"

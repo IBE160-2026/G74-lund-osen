@@ -23,6 +23,7 @@ stier. Bare de to rutene roerer basen.
 """
 
 import os
+import re
 import sqlite3
 import sys
 import threading
@@ -426,14 +427,18 @@ def aksjedetalj(symbol: str):
     ki_er_paa = ki_paa(request.cookies.get(KAPSEL))
     ki = _ki_visning(post, detalj) if ki_er_paa and detalj.sjekker else None
 
-    return render_template(
+    svar = app.make_response(render_template(
         "aksje.html",
         detalj=detalj,
         graf=bygg_graf(detalj.punkter),
         hentet=post.hentet,
         ki=ki,
         ki_er_paa=ki_er_paa,
-    )
+        ki_til=AV if ki_er_paa else PAA,
+    ))
+    # Siden avhenger av bryteren (gjennomgangen av 10.3, BH10).
+    svar.vary.add("Cookie")
+    return svar
 
 
 def _ki_visning(post, detalj) -> KIVisning:
@@ -443,23 +448,38 @@ def _ki_visning(post, detalj) -> KIVisning:
     base fra foer 0005, vises dagen uten KI-tekst (NFR-04).
     """
     try:
-        logg = SqliteKILogg(g.tilkobling, lambda: datetime.now(timezone.utc))
+        logg = SqliteKILogg(g.tilkobling, naa)
         rad = logg.les(Emne.aksje(post.aksje.symbol, detalj.dato))
-    except (RuntimeError, sqlite3.Error, UgyldigKIRad, ValueError):
+    except (RuntimeError, sqlite3.Error, UgyldigKIRad, ValueError) as feil:
+        # Siden sier det samme som en dag uten rad, og loggen sier hvorfor
+        # (gjennomgangen, BH6, BH19).
+        app.logger.warning("KI-loggen kunne ikke leses: %s: %s", type(feil).__name__, feil)
         return KIVisning(INGEN_RAD)
     return bygg_ki_visning(rad, post.innhold)
+
+
+# Bare aksjesiden kan vaere maalet for bryteren. Alt annet gaar til /, ogsaa
+# en adresse med tabulator eller linjeskift, som nettleseren ellers ville
+# lest som en annen side (gjennomgangen, BH1, ECH).
+_TILBAKE = re.compile(r"/aksje/[A-Za-z0-9.\-]{1,20}")
 
 
 @app.post("/ki")
 def ki_bryter():
     """Bryteren for KI-teksten (FR-601, svar 4): en informasjonskapsel, og
     tilbake til siden den kom fra. Bare en sti paa samme side godtas."""
+    # En annen side kan ikke slaa bryteren: kommer forespoerselen med Origin,
+    # maa den vaere denne siden (gjennomgangen, BH2, ECH).
+    opphav = request.headers.get("Origin")
+    if opphav is not None and opphav.rstrip("/") != request.host_url.rstrip("/"):
+        abort(403)
     til = AV if request.form.get("til") == AV else PAA
     tilbake = request.form.get("tilbake", "/")
-    if not tilbake.startswith("/") or tilbake.startswith("//") or "\\" in tilbake:
+    if not _TILBAKE.fullmatch(tilbake):
         tilbake = "/"
     svar = redirect(tilbake, code=303)
-    svar.set_cookie(KAPSEL, til, max_age=365 * 24 * 3600, samesite="Lax", httponly=True)
+    svar.set_cookie(KAPSEL, til, max_age=365 * 24 * 3600, samesite="Lax", httponly=True,
+                    secure=request.is_secure)
     return svar
 
 
