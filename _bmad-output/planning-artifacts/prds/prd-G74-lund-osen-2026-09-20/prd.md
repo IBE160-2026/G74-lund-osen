@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-15T14:02
+updated: 2026-10-15T15:27
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -355,6 +355,10 @@ alfabetisk rekkefølge, Blandet, Ingen, Negativ og Positiv, med standarden over
 innenfor hver gruppe og Ukjent sist i begge retninger. Første klikk gir A til Å,
 og teksten for skjermleseren sier «alfabetisk». Rekkefølgen er ikke en
 rangering fra godt til dårlig (NFR-06).
+
+*Lagt til 2026-10-15 (gruppens svar 8 på funnene i PR #43 for story 8.15, instruksjonen kl. 15:25):*
+for Retning sier teksten for skjermleseren «stigende (A til Å)» eller «synkende
+(Å til A)», ikke «alfabetisk», og linja over tabellen sier det samme.
 
 #### FR-103 — Retning vises i tre redundante kanaler
 

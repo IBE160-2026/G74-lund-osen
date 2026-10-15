@@ -46,6 +46,12 @@ Planen ble vist i chatten 15.10 kl. 13:44 og er ført kort i Utført-linja for d
 
 Resten av planen gjelder som vist.
 
+*Lagt til 2026-10-15 (gruppens svar kl. 14:47 på de åpne funnene i PR #43, instruksjonen kl. 15:25):* svarene er beslutninger:
+
+8. BH1 og ECH1: linja over tabellen og teksten for skjermleseren i kolonneraden sier det samme. For tallkolonnene står «stigende» eller «synkende» som nå. For Retning står «stigende (A til Å)» eller «synkende (Å til A)», både i linja og for skjermleseren. Erstatter «alfabetisk» i svar 2 og utfyller ordlyden i svar 5. Ført også under FR-102 i PRD-en og i designregler §5.
+9. ECH2: linja over tabellen får «innenfor hver del» til slutt, for eksempel «Sortert på endring, synkende, innenfor hver del.» `aria-sort` står som nå. Ført også i designregler §5.
+10. Rekkefølgen etter 8.15: KI-laget kommer først, med 4.2, 4.3 og 10.1–10.3, så resten i rekkefølgen fra 14.10 kl. 22:19 og 22:25. Grunnen er suksesskriteriet «KI-forklaringen» i briefen v8: én ukes drift skal være logget før demonstrasjonen. Ført i `epics.md` når 8.15 er flettet.
+
 **Mutantene** (planen kl. 13:44 og instruksjonen kl. 14:01): S1 sortering over hele tabellen, ikke per del; S2 rader uten verdi først når rekkefølgen snus; S3 endring sortert på kroner; S4 endring sortert på absoluttverdi; S5 lenken snur ikke; S6 `aria-sort` mangler eller står på feil kolonne; S7 ukjent parameter gir feil eller en annen rekkefølge enn FR-102; S8 vinkelen som tegnet ↑ eller ↓; S9 fokus i blekk; S10 uten FR-102 ved lik verdi; S11 Retning sortert med Positiv først; S12 linja over tabellen står også uten valg; S13 den dempede vinkelen er hvit.
 
 ## Boundaries & Constraints
