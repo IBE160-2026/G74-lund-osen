@@ -180,8 +180,10 @@ def test_viser_selskapsnavn_og_de_fem_kolonnene(klient, monkeypatch):
         # Story 8.0d, PR 2: «NOK» bare under Sluttkurs (svar 2, BH9).
         nok = '(<span class="under">NOK</span>)' if overskrift == "Sluttkurs" else ""
         # Story 8.15: navnet er en lenke som sorterer, med en vinkel.
-        lenke = r'(<a class="sorter[^"]*" href="[^"]*">)?'
-        etter = r'(<span class="skjult">[^<]*</span><svg class="vinkel"[^>]*><path[^>]*/></svg></a>)?'
+        # Gjennomgangen (BH5): lenken er påkrevd ved de fire som kan sorteres.
+        lenke = r'<a class="sorter[^"]*" href="[^"]*">' if overskrift != "Selskap" else ""
+        etter = (r'<span class="skjult">[^<]*</span><svg class="vinkel"[^>]*><path[^>]*/></svg></a>'
+                 if overskrift != "Selskap" else "")
         assert re.search(rf"<th[^>]*>{lenke}{overskrift}{etter}( <button[^<]*>\?</button>)?{nok}</th>", html), overskrift
     assert "Equinor" in html
 
@@ -2078,6 +2080,37 @@ class TestStory815Sortering:
         html = self._side(tabell, "/?sorter=signal&orden=stigende")
         assert '<p class="sortert">Sortert på signalstyrke, stigende. <a href="/">Standard rekkefølge</a></p>' in html
         assert html.index('<p class="sortert">') < html.index('<div class="tabellboks"')
+        # Gjennomgangen (VG2): navnet for hver kolonne.
+        for kolonne, navn in (("kurs", "sluttkurs"), ("endring", "endring"), ("retning", "retning")):
+            html = self._side(tabell, f"/?sorter={kolonne}&orden=synkende")
+            assert f'<p class="sortert">Sortert på {navn}, synkende.' in html, kolonne
+
+    def test_vinkelen_peker_etter_retningen(self, tabell):
+        """Gjennomgangen (VG1): den valgte kolonnen viser retningen som
+        gjelder, og de andre retningen et klikk gir."""
+        ned, opp = "M2.5 4.5 6 8l3.5-3.5", "M2.5 7.5 6 4l3.5 3.5"
+
+        def vinkler(adresse):
+            thead = self._side(tabell, adresse).split("<thead>", 1)[1].split("</thead>", 1)[0]
+            return dict(re.findall(r'href="/\?sorter=(\w+)&amp;[^"]*">.*?<path d="([^"]+)"', thead))
+
+        assert vinkler("/") == {"kurs": ned, "endring": ned, "signal": ned, "retning": opp}
+        assert vinkler("/?sorter=endring&orden=synkende")["endring"] == ned
+        assert vinkler("/?sorter=endring&orden=stigende")["endring"] == opp
+        assert vinkler("/?sorter=retning&orden=synkende")["retning"] == ned
+
+    def test_rad_uten_endring_sist_i_skilte_seg_ut(self, tabell, monkeypatch):
+        """Gjennomgangen (BH14): en rad med vurdering, men bare én kursdag,
+        står sist i «Skilte seg ut» i begge retninger."""
+        rader = serie([100.0])
+        skriv_serie("ORK", rader, datetime.fromisoformat(HENTET), vurdert=False)
+        skriv_vurdering("ORK", rader[-1].dato, Vurdering(
+            styrke=2, retning="Positiv", trend=1, bevegelse=1, interesse=0, slutt=100.0,
+            justert_slutt=100.0, trend_avvik=0.0, dagens_endring=0.0, standardavvik=0.01,
+            volumforhold=1.0))
+        for orden in ("synkende", "stigende"):
+            ut, _ = _deler_i_rekkefoelge(self._side(tabell, f"/?sorter=endring&orden={orden}"))
+            assert ut[-1] == "ORK" and len(ut) == 4, (orden, ut)
 
     def test_tre_av_tre_og_antallet_foelger_fr_102(self, tabell):
         """Svar 7: linja om 3 av 3 og «N av M aksjer» endres ikke av et klikk."""

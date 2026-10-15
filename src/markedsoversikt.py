@@ -311,6 +311,13 @@ class Sortering:
     kolonne: str
     orden: str
 
+    def __post_init__(self) -> None:
+        # Gjennomgangen (BH9): en Sortering laget direkte, for eksempel i
+        # Min liste (8.3), kan ikke ha en kolonne navn og neste_orden ikke
+        # kjenner.
+        if self.kolonne not in SORTERBARE or self.orden not in (SYNKENDE, STIGENDE):
+            raise ValueError(f"ukjent sortering: {self.kolonne!r}, {self.orden!r}")
+
     @classmethod
     def fra_adressen(cls, kolonne: str | None, orden: str | None) -> "Sortering | None":
         if kolonne in SORTERBARE and orden in (SYNKENDE, STIGENDE):
@@ -345,6 +352,15 @@ def _verdi(rad: Rad, kolonne: str) -> float | int | None:
     return RETNINGSGRUPPER.index(rad.vurdering.retning)
 
 
+# Gjennomgangen (ECH4): navnet ved lik verdi sorteres i norsk alfabet, med
+# Æ, Ø og Å etter Z, og uten forskjell på store og små bokstaver.
+_NORSK = str.maketrans({"æ": "{", "ø": "|", "å": "}"})
+
+
+def _navn(rad: Rad) -> str:
+    return rad.aksje.navn.casefold().translate(_NORSK)
+
+
 def sorter(rader: list[Rad], sortering: Sortering | None) -> list[Rad]:
     """Én del av tabellen sortert på kolonnen - story 8.15.
 
@@ -355,9 +371,12 @@ def sorter(rader: list[Rad], sortering: Sortering | None) -> list[Rad]:
     mellom delene (tillegget 13.10)."""
     if sortering is None:
         return list(rader)
-    grunn = sorted(rader, key=lambda rad: (_sorteringsnokkel(rad), rad.aksje.navn))
+    grunn = sorted(rader, key=lambda rad: (_sorteringsnokkel(rad), _navn(rad)))
     med = [rad for rad in grunn if _verdi(rad, sortering.kolonne) is not None]
     uten = [rad for rad in grunn if _verdi(rad, sortering.kolonne) is None]
+    # Gjennomgangen (BH8): sort er stabil også med reverse=True, så lik
+    # verdi beholder rekkefølgen fra grunn, FR-102 og navnet, i begge
+    # retninger. Snus grunn eller nøkkelen i stedet, går det tapt.
     med.sort(key=lambda rad: _verdi(rad, sortering.kolonne), reverse=sortering.orden == SYNKENDE)
     return med + uten
 

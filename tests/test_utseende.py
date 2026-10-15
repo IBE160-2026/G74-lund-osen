@@ -274,7 +274,8 @@ class TestRammen:
             assert "var(--oransje)" in _regel(stil, "header.stripe *:focus-visible"), navn
             for velger, regel in re.findall(r"([^{}]*focus-visible[^{}]*)\{([^}]*)\}", stil):
                 # Story 8.15: lenkene i kolonneraden står på blekk, som stripa.
-                if "stripe" not in velger and ".tabellboks thead a.sorter" not in velger:
+                # Gjennomgangen (BH6): bare akkurat den regelen.
+                if "stripe" not in velger and velger.strip() != ".tabellboks thead a.sorter:focus-visible":
                     assert not re.search(r"gul|oransje|currentColor", regel), (navn, velger)
 
     def test_stripa_og_bunnlinja_paa_alle_sidene(self, sidene):

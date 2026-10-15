@@ -609,9 +609,30 @@ class TestSorteringVedKlikk:
         assert neste_orden("retning", Sortering("retning", "stigende")) == "synkende"
 
     def test_retningene_i_alfabetisk_rekkefoelge(self):
+        """Gjennomgangen (BH7): også teksten som vises, står alfabetisk."""
         from markedsoversikt import RETNINGSGRUPPER
 
         assert RETNINGSGRUPPER == (BLANDET, INGEN, NEGATIV, POSITIV)
+        vist = [RETNINGSVISNING[r].tekst for r in RETNINGSGRUPPER]
+        assert vist == sorted(vist) == ["Blandet", "Ingen", "Negativ", "Positiv"]
+
+    def test_sortering_laget_direkte_maa_vaere_kjent(self):
+        """Gjennomgangen (BH9)."""
+        from markedsoversikt import Sortering
+
+        with pytest.raises(ValueError):
+            Sortering("navn", "synkende")
+        with pytest.raises(ValueError):
+            Sortering("endring", "opp")
+
+    def test_navnet_ved_lik_verdi_i_norsk_alfabet(self):
+        """Gjennomgangen (ECH4): Æ, Ø og Å etter Z, og små som store."""
+        from markedsoversikt import Sortering, sorter
+
+        lik = _lagret(1, 1, 0)
+        rader = [_rad(navn, 100.0, 1.0, lik) for navn in ("Åsen", "Ørje", "zeta", "Ærø", "Alfa")]
+        sortert = sorter(rader, Sortering("kurs", "synkende"))
+        assert [r.aksje.navn for r in sortert] == ["Alfa", "zeta", "Ærø", "Ørje", "Åsen"]
 
 
 def test_oppdatert_med_ukedagen_i_norsk_tid():
