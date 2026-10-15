@@ -517,6 +517,103 @@ class TestStory80e:
         assert ut == [] and [r.aksje.symbol for r in oevrige] == ["EQNR", "DNB"]
 
 
+def _rad(navn: str, kurs: float, endring: float | None, vurdering: Vurdering | None):
+    """En rad med akkurat de verdiene testen trenger - story 8.15."""
+    from markedsoversikt import Rad
+    from tilstand import Tilstand
+
+    aksje = Aksje(navn.upper(), f"{navn.upper()}.OL", navn, "Energi")
+    return Rad(aksje=aksje, dato=IDAG, sluttkurs=kurs, endring_prosent=endring,
+               tilstand=Tilstand(Art.SVAR, vurdering) if vurdering else None,
+               tekst=None if vurdering else IKKE_VURDERT)
+
+
+# Story 8.15. FR-102 gir E, A, B, F, C, D. Endringen i kroner (kurs ×
+# prosent) og i absoluttverdi gir en annen rekkefølge enn prosent med
+# fortegn. D og F har lik kurs og lik endring, så FR-102 avgjør mellom dem.
+_RADENE = {
+    "A": _rad("Alfa", 400.0, -2.0, _lagret(1, 1, 0)),    # 2 Positiv
+    "B": _rad("Beta", 200.0, 3.5, _lagret(-1, 0, 0)),    # 1 Negativ
+    "C": _rad("Ceta", 120.0, None, _lagret(0, 0, 0)),    # 0 Ingen, én kursdag
+    "D": _rad("Delta", 80.0, 1.0, None),                 # ikke vurdert, Ukjent
+    "E": _rad("Eps", 10.0, -3.0, _lagret(1, -1, 0)),     # 2 Blandet
+    "F": _rad("Fi", 80.0, 1.0, _lagret(0, -1, 0)),       # 1 Negativ
+}
+
+
+class TestSorteringVedKlikk:
+    """Story 8.15: sortering ved klikk, svar 1 og 2 på planen kl. 13:44."""
+
+    @staticmethod
+    def _sortert(kolonne, orden):
+        from markedsoversikt import Sortering, sorter
+
+        # Rekkefølgen inn er ikke FR-102, så testen ser at sorter selv
+        # bruker FR-102 ved lik verdi.
+        inn = [_RADENE[n] for n in "DCFBAE"]
+        sortering = Sortering.fra_adressen(kolonne, orden)
+        return "".join(n for rad in sorter(inn, sortering)
+                       for n, r in _RADENE.items() if r is rad)
+
+    @pytest.mark.parametrize("kolonne, orden, forventet", [
+        ("kurs", "synkende", "ABCFDE"),
+        ("kurs", "stigende", "EFDCBA"),
+        ("endring", "synkende", "BFDAEC"),
+        ("endring", "stigende", "EAFDBC"),
+        ("signal", "synkende", "EABFCD"),
+        ("signal", "stigende", "CBFEAD"),
+        ("retning", "stigende", "ECBFAD"),
+        ("retning", "synkende", "ABFCED"),
+    ])
+    def test_kolonnen_og_retningen(self, kolonne, orden, forventet):
+        """Svar 1 og 2. Ville feilet med endringen i kroner eller i
+        absoluttverdi, uten FR-102 ved lik verdi, med en rad uten verdi
+        først når rekkefølgen snus, eller med Positiv først."""
+        assert self._sortert(kolonne, orden) == forventet
+
+    def test_rader_uten_verdi_staar_sist_i_begge_retninger(self):
+        """«Ville feilet hvis» i storyen: en rad uten signal først når
+        rekkefølgen snus."""
+        for orden in ("synkende", "stigende"):
+            assert self._sortert("signal", orden)[-1] == "D", orden
+            assert self._sortert("endring", orden)[-1] == "C", orden
+            assert self._sortert("retning", orden)[-1] == "D", orden
+
+    def test_uten_valg_er_rekkefoelgen_uendret(self):
+        from markedsoversikt import sorter
+
+        inn = [_RADENE[n] for n in "EABFCD"]
+        assert sorter(inn, None) == inn
+        assert sorter(inn, None) is not inn
+
+    @pytest.mark.parametrize("kolonne, orden", [
+        (None, None), ("endring", None), (None, "synkende"), ("navn", "synkende"),
+        ("endring", "opp"), ("ENDRING", "synkende"), ("", ""),
+    ])
+    def test_ukjent_i_adressen_gir_ingen_sortering(self, kolonne, orden):
+        from markedsoversikt import Sortering
+
+        assert Sortering.fra_adressen(kolonne, orden) is None
+
+    def test_foerste_klikk_og_neste_klikk(self):
+        """Svar 1: synkende først, svar 2: A til Å først for Retning, og et
+        nytt klikk på samme kolonne snur."""
+        from markedsoversikt import Sortering, neste_orden
+
+        for kolonne in ("kurs", "endring", "signal"):
+            assert neste_orden(kolonne, None) == "synkende"
+            assert neste_orden(kolonne, Sortering(kolonne, "synkende")) == "stigende"
+            assert neste_orden(kolonne, Sortering(kolonne, "stigende")) == "synkende"
+            assert neste_orden(kolonne, Sortering("retning", "stigende")) == "synkende"
+        assert neste_orden("retning", None) == "stigende"
+        assert neste_orden("retning", Sortering("retning", "stigende")) == "synkende"
+
+    def test_retningene_i_alfabetisk_rekkefoelge(self):
+        from markedsoversikt import RETNINGSGRUPPER
+
+        assert RETNINGSGRUPPER == (BLANDET, INGEN, NEGATIV, POSITIV)
+
+
 def test_oppdatert_med_ukedagen_i_norsk_tid():
     """Story 8.0d (VG1 i gjennomgangen): kl. 22.30 UTC torsdag 24.09 er
     fredag 25.09 kl. 00.30 i Norge, og ukedagen følger datoen."""
