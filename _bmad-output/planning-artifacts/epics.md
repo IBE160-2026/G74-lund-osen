@@ -2386,6 +2386,8 @@ så jeg alltid ser hva signalet faktisk bygger på.
 
 *Lagt til 2026-10-15:* flettet i `e728c37`, PR #50. Står som review: kontrollpunktet om at siden sier hvorfor når tjenesten ikke er tilgjengelig (FR-601), er ikke oppfylt. Med svar c kl. 23:32 skriver hentingen ingen rad når Ollama ikke svarer, og siden viser da bare «Ingen KI-tekst for denne dagen.» uten grunnen. Det trengs et sted der hentingen fører at tjenesten ikke svarte for dagen, og det avgjøres av gruppen.
 
+*Lagt til 2026-10-15 (gruppens svar kl. 23:57 på spørsmålet i Utført-linja kl. 23:51, instruksjonen kl. 23:58):* siden sier hvorfor med det loggen kan vise. Har dagen ingen rader i `ki_logg` i det hele tatt, står det «Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.» Har andre aksjer rader for dagen, men ikke denne, sier siden at teksten for denne aksjen ikke ble laget i hentingen. Den nøyaktige grunnen står i utskriften fra hentingen og i Utført-linja for den kvelden. Med dette regnes kontrollpunktet fra 05.10 om at siden sier hvorfor (FR-601), som oppfylt.
+
 ### Story 10.4: Måle bidraget — egen brukertest, etter 8.1
 
 *Het Story 5B.4 til 28.09.*

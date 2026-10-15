@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-15T23:34
+updated: 2026-10-15T23:59
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1263,6 +1263,8 @@ demonstrasjonen mens noen ser på.
 I v1 slår bryteren av og på KI-teksten i aksjedetaljen (FR-602). *Lagt til 2026-10-02:* Bryteren gjelder også KI-teksten om dagen på forsiden (FR-607). Én bryter styrer begge.
 
 *Lagt til 2026-10-05:* Bryteren slår av KI-teksten uansett hvilken tjeneste som er valgt (FR-608). Er tjenesten ikke tilgjengelig, også når Ollama ikke kjører, er KI av, og siden sier hvorfor.
+
+*Lagt til 2026-10-15 (gruppens svar kl. 23:57 på spørsmålet i Utført-linja kl. 23:51, instruksjonen kl. 23:58):* siden sier hvorfor med det loggen kan vise. Har dagen ingen rader i `ki_logg` i det hele tatt, står det «Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.» Har andre aksjer rader for dagen, men ikke denne, sier siden at teksten for denne aksjen ikke ble laget i hentingen. Den nøyaktige grunnen står i utskriften fra hentingen og i Utført-linja for den kvelden. Med dette regnes kontrollpunktet fra 05.10 om at siden sier hvorfor (FR-601), som oppfylt.
 
 #### FR-602 — Visningen når KI-laget er av
 
