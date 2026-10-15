@@ -74,8 +74,13 @@
     section.slik-leser strong { display: block; font-size: 15px; font-weight: 600; color: var(--blekk); }
     .symbolfelt { width: 36px; height: 36px; border-radius: 10px; background: var(--bakgrunn);
                   display: flex; align-items: center; justify-content: center; gap: 1px; color: var(--tekst); }
-    .symbolfelt .brikke { font-size: 10px; font-weight: 700; padding: 2px 3px; border-radius: 6px;
-                          background: var(--opp); color: var(--hvit); white-space: nowrap; }
+    /* Svaret kl. 12:15 (15.10, BH20): en grønn +1 over en rød -1, med en egen
+       klasse, så regelen for .brikke i rammen ikke virker inn. */
+    .utslagsfelt { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .utslagsfelt span { font-size: 10px; font-weight: 700; line-height: 1; padding: 2px 4px; border-radius: 4px;
+                        color: var(--hvit); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .utslagsfelt .pluss { background: var(--opp); }
+    .utslagsfelt .minus { background: var(--ned); }
     .symbolfelt .pil { font-size: 12px; font-weight: 700; }
     .symbolfelt svg { width: 18px; height: 18px; }
 
@@ -193,8 +198,8 @@
       <section class="slik-leser" aria-labelledby="slik-leser">
         <h2 id="slik-leser">Slik leser du tabellen</h2>
         <ul>
-          <li><span class="symbolfelt" aria-hidden="true"><span class="brikke">T +1</span></span><span><strong>Signalstyrke 0–{{ antall_sjekker }}</strong> T, B og I er trend, bevegelse og interesse, og hver gir +1, 0 eller -1. Øverst i cellen står hvor mange som slo ut, fra 0 av {{ antall_sjekker }} til {{ antall_sjekker }} av {{ antall_sjekker }}.</span></li>
-          <li><span class="symbolfelt" aria-hidden="true"><span class="pil opp">↑</span><span class="pil blandet">↔</span><span class="pil ned">↓</span></span><span><strong>Retning</strong> Om sjekkene som slo ut, ga +1 eller -1. Ikke et råd om å kjøpe eller selge.</span></li>
+          <li><span class="symbolfelt" aria-hidden="true"><span class="utslagsfelt"><span class="pluss">+1</span><span class="minus">-1</span></span></span><span><strong>Signalstyrke 0–{{ antall_sjekker }}</strong> T, B og I er trend, bevegelse og interesse, og hver gir +1, 0 eller -1. Både +1 og -1 teller som utslag. Øverst i cellen står hvor mange som slo ut, fra 0 av {{ antall_sjekker }} til {{ antall_sjekker }} av {{ antall_sjekker }}.</span></li>
+          <li><span class="symbolfelt" aria-hidden="true"><span class="pil opp">↑</span><span class="pil blandet">↔</span><span class="pil ned">↓</span></span><span><strong>Retning</strong> Om sjekkene som slo ut, ga +1 eller -1. Ga noen +1 og noen -1, står det {{ blandet }}. Ikke et råd om å kjøpe eller selge.</span></li>
           <li><span class="symbolfelt" aria-hidden="true"><svg class="peker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" focusable="false"><path d="M6 3.5v15.5l4.2-4.1 2.9 6.4 2.6-1.2-2.9-6.3h5.9z"/></svg></span><span><strong>Selskapsnavnet</strong> Klikk for å se sjekkene, tallene bak og kursgrafen.</span></li>
         </ul>
       </section>

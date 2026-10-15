@@ -1959,7 +1959,8 @@ class TestStory80eTekst:
 
     def test_slik_leser_du_tabellen_har_3_punkter(self, klient):
         """Svar 2 og tavlas tekster (endringsforslaget 13.10, punkt 4.2).
-        Ville feilet med setningen om klikk paa T, B eller I."""
+        Ville feilet med setningen om klikk paa T, B eller I. Svaret kl. 12:15
+        (15.10, BH20): de to setningene om +1 og -1."""
         _lagret("KOG", 0.0, 1, 1, 0)
         html = klient.get("/").data.decode("utf-8")
         del_ = html.split('<section class="slik-leser"', 1)[1].split("</section>", 1)[0]
@@ -1969,8 +1970,10 @@ class TestStory80eTekst:
         punkter = [_synlig(p).strip() for p in re.findall(r"<li>(.*?)</li>", del_, re.DOTALL)]
         assert punkter == [
             "Signalstyrke 0–3 T, B og I er trend, bevegelse og interesse, og hver gir +1, 0 eller -1. "
+            "Både +1 og -1 teller som utslag. "
             "Øverst i cellen står hvor mange som slo ut, fra 0 av 3 til 3 av 3.",
-            "Retning Om sjekkene som slo ut, ga +1 eller -1. Ikke et råd om å kjøpe eller selge.",
+            "Retning Om sjekkene som slo ut, ga +1 eller -1. Ga noen +1 og noen -1, står det Blandet. "
+            "Ikke et råd om å kjøpe eller selge.",
             "Selskapsnavnet Klikk for å se sjekkene, tallene bak og kursgrafen.",
         ]
         assert "Klikk på T" not in html

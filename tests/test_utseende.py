@@ -360,8 +360,8 @@ class TestOversikten:
             assert '<section class="slik-leser"' in rutenett and "<h1" in rutenett, navn
 
     def test_symbolene_i_kortet_er_skjult_og_ingen_pil_ved_navnet(self, sidene):
-        """Beslutning 11: en grønn brikke med T +1, de tre retningssymbolene og
-        en musepeker, alle aria-hidden. Ville feilet uten aria-hidden, eller
+        """Beslutning 11: et symbol for signalstyrken, de tre retningssymbolene
+        og en musepeker, alle aria-hidden. Ville feilet uten aria-hidden, eller
         med en pil ved navnet (pilene er bare for retning, FR-103)."""
         html = sidene["oversikten"]
         kortet = html.split('<section class="slik-leser"', 1)[1].split("</section>", 1)[0]
@@ -370,8 +370,15 @@ class TestOversikten:
         for attributter, _ in felt:
             assert 'aria-hidden="true"' in attributter
         brikke, retning, peker = (innhold for _, innhold in felt)
-        assert '<span class="brikke">T +1</span>' in brikke
-        assert "var(--opp)" in _regel(_stil(html), ".symbolfelt .brikke")
+        # Svaret kl. 12:15 (15.10, BH20): en grønn +1 over en rød -1, med en
+        # egen klasse, så regelen for brikkene i rammen ikke virker inn.
+        assert '<span class="utslagsfelt"><span class="pluss">+1</span><span class="minus">-1</span></span>' in brikke
+        assert "brikke" not in kortet
+        stil = _stil(html)
+        assert "flex-direction: column" in _regel(stil, ".utslagsfelt")
+        assert "background: var(--opp)" in _regel(stil, ".utslagsfelt .pluss")
+        assert "background: var(--ned)" in _regel(stil, ".utslagsfelt .minus")
+        assert "color: var(--hvit)" in _regel(stil, ".utslagsfelt span")
         assert [s for s in "↑↔↓" if s in retning] == list("↑↔↓")
         assert '<svg class="peker"' in peker
         assert not re.search("[←→↑↓↔↗↘↖↙›»]", peker), peker
