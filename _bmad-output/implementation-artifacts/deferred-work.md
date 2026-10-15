@@ -1,6 +1,7 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-8-0d-utseendet-fra-designforslaget.md`
   summary: «X av M aksjer ble vurdert.» står bare når en rad i tabellen mangler vurdering. Er alle radene vurdert, men én aksje i lista mangler kurser, står ingen slik setning, selv om bare 14 av 15 ble vurdert.
   evidence: BH1, ECH1 og VG3 i gjennomgangen av PR 2b av 8.0d (14.10). Beslutningen 14.10 kl. 21:04 og 21:06 gjelder M i setningen, ikke når den står. Aksjen uten kurser står under tabellen som «Uten data i denne kilden». Testen `test_alle_vurdert_gir_bare_setningen_fra_0510` låser at setningen ikke står når alle radene er vurdert. Avgjøres av gruppen.
+  resolved: Løst i PR 3 av 8.0d (14.10, svar 8): setningen står under «Ingen aksjer skilte seg ut» når færre enn alle aksjene i lista ble vurdert, også når en aksje mangler kurser (`test_ble_vurdert_ogsaa_naar_en_aksje_mangler_kurser`).
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-4a-lesegrensen-kursleser-og-oversetteren.md`
   summary: Tre konsumenter faller fortsatt tilbake fra adjusted_close til close (aksjedetalj.py:106, markedsoversikt.py:99, signalberegning.py:86).
   evidence: Bekreftet med grep 2026-09-24. Fantes foer 1.4a; AD-19 sier at oversettelsen skjer ett sted. Story 1.4b flytter konsumentene til Kursrad, og testene der boer kreve at fallbacken er borte.
@@ -168,6 +169,8 @@
   summary: Oversikten og aksjesiden viser tidspunktet to ganger, som «Oppdatert …» i stripa og som «data hentet …» i linja under tittelen.
   evidence: BH2 i gjennomgangen av PR 1 av 8.0d (14.10). Stripa kom i PR 1, og linja under tittelen hører til oversikten og aksjesiden, som er PR 2 og PR 3. Hjelpen bak «?» ved «data hentet» står i den linja, så den må flyttes med hvis linja tas bort. Avgjøres i planen for PR 2.
   resolved: Oversikten er løst i PR 2 av 8.0d (14.10): tidspunktet står bare som «Oppdatert …» i stripa, med «?» ved siden av (svar 5). Aksjesiden gjenstår til PR 3.
+  resolved: Aksjesiden er løst i PR 3 av 8.0d (14.10): «data hentet» er borte fra linja under h1, og hjelpen `data_hentet_aksje` står bak «?» ved «Oppdatert» i stripa.
 - source_spec: `_bmad-output/implementation-artifacts/spec-8-0d-utseendet-fra-designforslaget.md`
   summary: Båndet «Øvrige aksjer» sier «signalstyrke 0 eller 1», men rader uten vurdering («Ikke vurdert» eller en grunn) står også der og telles i pillen. Strekene og båndteksten forutsetter terskel 2: med en annen terskel følger strekene «Skilte seg ut» og ikke nivået, og ingenting holder terskelen mellom 1 og 3.
   evidence: BH2, ECH1, ECH2 og ECH3 i gjennomgangen av PR 2 av 8.0d (14.10). Ordlyden i båndet er gruppens beslutning (instruksjonen kl. 17:31), så en endring avgjøres av gruppen. Terskelen er 2 i Parametre i dag. Grensene i båndene følger terskelen (testen med terskel 3).
+  resolved: Ordlyden er løst i PR 3 av 8.0d (14.10, svar 7): båndet sier «og N uten signal» etter grensen når rader uten signal står der, og pillen teller alle radene. Strekene og terskelen står som før.
