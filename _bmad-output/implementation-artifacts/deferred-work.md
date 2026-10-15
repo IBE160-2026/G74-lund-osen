@@ -203,3 +203,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-4-3-sqlite-adapter-for-kilogg.md`
   summary: Emnet for en melding (plan A) har datoen i nøkkelen, så samme melding kan få én rad per dag.
   evidence: BH8 i gjennomgangen 15.10 av 4.3. Story 4.2 sier at hva plan A lagrer, avgjøres når plan A bygges. Plan A er utenfor v1.
+- source_spec: `_bmad-output/implementation-artifacts/spec-10-2a-modellen-prompten-og-kontrollen.md`
+  summary: Kontrollen i FR-603 ser ikke på lengden, språket eller om en tekst for en aksje utenfor målingen sier at grensene ikke er målt på den, selv om prompten ber om to eller tre setninger på norsk og den setningen.
+  evidence: BH16 i gjennomgangen 15.10 av PR E. FR-603 har fire punkter, og ingen av dem gjelder dette. Tas når 10.2b (PR F) gir de første ekte tekstene, eller i 10.4: om det trengs et femte punkt, avgjøres av gruppen.
