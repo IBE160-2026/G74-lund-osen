@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-24-2026 19:26
-last_updated: 10-16-2026 00:21
+last_updated: 10-16-2026 00:26
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -63,15 +63,15 @@ development_status:
 
   epic-2: backlog
   2-0-hentingen-lekker-ikke-nøkkelen-og-skriver-ikke-over-et-øyeblikksbilde: done
-  2-1-børsdag-i-oslo-tidsstempel-i-utc: review
-  2-1b-basen-åpnes-ett-sted-og-hentingen-skriver-kursene-dit: review
-  2-1c-vurderingen-lagrer-målingene-bak-de-tre-sjekkene: review
-  2-2-hentekommandoen-som-egen-inngang: review
-  2-2b-sidene-leser-dagens-vurdering: review
-  2-3-børsdagskontroll-før-kvoten-brukes: review
+  2-1-børsdag-i-oslo-tidsstempel-i-utc: done
+  2-1b-basen-åpnes-ett-sted-og-hentingen-skriver-kursene-dit: done
+  2-1c-vurderingen-lagrer-målingene-bak-de-tre-sjekkene: done
+  2-2-hentekommandoen-som-egen-inngang: done
+  2-2b-sidene-leser-dagens-vurdering: done
+  2-3-børsdagskontroll-før-kvoten-brukes: done
   2-3b-kallene-som-er-igjen-brukes-på-nye-forsøk: done
   2-4-etterfylling-av-hull-i-kursserien: backlog
-  2-5-vurderingen-skrives-i-samme-kjøring: review
+  2-5-vurderingen-skrives-i-samme-kjøring: done
   2-6-utbyttedager-merkes: backlog
   2-7-historikken-i-aksjedetaljen: backlog
   2-8-hovedindeksen-hentes-i-samme-kjøring: backlog
@@ -85,8 +85,8 @@ development_status:
   epic-2-retrospective: optional
 
   epic-3: backlog
-  3-1-dockerfile-med-to-innganger: review
-  3-2-to-volumer-og-ingenting-uerstattelig-i-imaget: review
+  3-1-dockerfile-med-to-innganger: done
+  3-2-to-volumer-og-ingenting-uerstattelig-i-imaget: done
   3-3-readme-slik-kjører-du-den: review
   3-4-demoversjonen: review
   3-4b-ki-tekstene-i-demoen: backlog
@@ -124,7 +124,7 @@ development_status:
   epic-7-retrospective: optional
 
   epic-8: backlog
-  8-0-de-rene-feilene-i-de-to-skjermbildene: review
+  8-0-de-rene-feilene-i-de-to-skjermbildene: done
   8-0b-hjelp-bak-et-spørsmålstegn: done
   8-0c-tydelig-merking-ord-ved-sjekkene-og-datoer-på-grafen: done
   8-0d-utseendet-fra-designforslaget: done
