@@ -179,3 +179,9 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-8-0d-utseendet-fra-designforslaget.md`
   summary: Aksjesiden leser aksjen og vurderingen (`post`) og serien (`leser.serie`) i to lesinger. Skriver kveldshentingen mellom dem, kan endringen og «fra … til …» gjelde en annen dag enn sluttkursen og datoen på siden.
   evidence: ECH1 i gjennomgangen 15.10 av PR 3 av 8.0d. Grafen leser serien slik også på main (`punkter=bygg_punkter(rader, p)`), og PR 3 regner også endringen av den (`bygg_detalj` i `src/aksjedetalj.py`, ruten i `src/app.py`). Luken er mellom to lesinger i samme forespørsel, og neste visning er riktig. Rettingen er i koden, ikke i tester eller dokumenter, og hører ikke til denne instruksjonen.
+- source_spec: `_bmad-output/implementation-artifacts/spec-8-0d-utseendet-fra-designforslaget.md`
+  summary: Stilen for brikkene står i rammen siden PR 3 av 8.0d og gjelder `.brikke` på alle sidene. Symbolet «T +1» i kortet «Slik leser du tabellen» har samme klasse og arver nå `min-width: 34px`, `height: 24px`, `inline-flex` og en gjennomsiktig kant.
+  evidence: BH20 i gjennomgangen 15.10 av PR 3 av 8.0d. Regelen `.symbolfelt .brikke` i `src/templates/index.html` er fra PR 2, og planen for PR 3 nevner ikke kortet. En retting endrer det som vises, og avgjøres av gruppen.
+- source_spec: `_bmad-output/implementation-artifacts/spec-8-0d-utseendet-fra-designforslaget.md`
+  summary: Grensene over skalaen for bevegelse vises med én desimal (`bygg_skala` i `src/aksjedetalj.py`), så et standardavvik under 0,05 % står som «-0,0 %» og «+0,0 %», mens tallet i kortet har så mange desimaler som trengs (`desimaler_mot_grense`).
+  evidence: ECH3 i gjennomgangen 15.10 av PR 3 av 8.0d. En retting endrer teksten på siden og avgjøres av gruppen.
