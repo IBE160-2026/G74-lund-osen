@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-15T15:54
+updated: 2026-10-15T23:34
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1352,6 +1352,8 @@ Loggen skrives i hentekommandoen. Siden skriver aldri i den.
 
 Loggingen starter ved første kjøring, ikke når eksempelsettet skal lages. Skrus
 loggingen på i etterkant, finnes ikke uka målet krever.
+
+*Lagt til 2026-10-15 (gruppens svar kl. 23:32 på spørsmålene i PR F og G, instruksjonen kl. 23:33):* a) G (story 10.3) flettes i kveld, fordi hentingen for 15.10 er ferdig. b) «lokal» gjelder fortsatt når `OSE_KI_TJENESTE` mangler (svar 5 kl. 15:53 står). c) Hentingen sjekker først at Ollama svarer og har modellen. Gjør den ikke det, skrives ingen rader i `ki_logg` for dagen, og utskriften sier hvorfor og at samme kommando kan kjøres igjen samme kveld, med 0 kall til EODHD. Svarer den, skrives rader som før, også når modellen feiler for en aksje (svar 2). Grunnen: formålet med FR-604, at en tekst ikke kan lages på nytt til man får en man liker, holder, fordi ingen tekst ble laget.
 
 #### FR-605 — Promptversjon og modell lagres med hver KI-tekst
 
