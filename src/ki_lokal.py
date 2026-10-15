@@ -84,6 +84,21 @@ class OllamaModell:
             ollama_versjon=self._versjon(),
         )
 
+    def sjekk(self) -> str | None:
+        """Svar c kl. 23:32: svarer Ollama, og har den modellen? Gir grunnen
+        naar ikke, uten adressen, ellers None. Kalles foer foerste tekst."""
+        try:
+            status, svar = self._kall("GET", "/api/tags")
+        except requests.RequestException:
+            return "Ollama svarer ikke (kjoerer den?)"
+        if status != 200 or not isinstance(svar, dict):
+            return f"Ollama svarte HTTP {status} paa listen over modeller"
+        modeller = svar.get("models")
+        navn = {m.get("name") for m in modeller if isinstance(m, dict)} if isinstance(modeller, list) else set()
+        if self.modell not in navn:
+            return f"modellen {self.modell} er ikke hentet (ollama pull {self.modell})"
+        return None
+
     def _les(self, sti: str):
         try:
             status, svar = self._kall("GET", sti)

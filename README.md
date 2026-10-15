@@ -256,7 +256,7 @@ Så hentes det som vanlig. Med uv når hentingen Ollama på http://127.0.0.1:114
 docker compose --profile ki down
 ```
 
-Kjører ikke Ollama når hentingen går, får hver aksje en rad om at modellen feilet, og den dagen er uten KI-tekst. Raden står, så en ny henting samme kveld lager ikke teksten (FR-604).
+Hentingen sjekker først at Ollama svarer og har modellen. Gjør den ikke det, lages ingen KI-tekst, og utskriften sier hvorfor. Start Ollama og kjør samme kommando igjen samme kveld: da lages tekstene, uten nye kall til EODHD. Svarer Ollama, men modellen feiler for en aksje, får aksjen en rad om det, og den raden står (FR-604).
 
 Slå av KI-teksten: sett `OSE_KI_TJENESTE=av` i `.env`.
 

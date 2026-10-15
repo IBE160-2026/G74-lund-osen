@@ -362,3 +362,62 @@ class TestEtterGjennomgangen:
         kjoer(raa, base, None)
         with pytest.raises(NettverkISTest):
             lag_ki_tekster(base, TIRSDAG, lambda: OEYEBLIKK, OllamaModell(), lambda _: None)
+
+
+class SjekketModell(FalskModell):
+    """En falsk modell med sjekken fra svar c. grunn er det sjekken svarer."""
+
+    def __init__(self, grunn=None, **kw):
+        super().__init__(**kw)
+        self.grunn, self.sjekker = grunn, 0
+
+    def sjekk(self):
+        self.sjekker += 1
+        return self.grunn
+
+
+class TestForhaandssjekken:
+    """Svar c kl. 23:32: svarer ikke tjenesten eller mangler modellen, skrives
+    ingen rader, og samme kommando kan kjoeres igjen samme kveld."""
+
+    @pytest.mark.parametrize("grunn", ["Ollama svarer ikke (kjoerer den?)",
+                                       "modellen gemma4:e4b er ikke hentet (ollama pull gemma4:e4b)"])
+    def test_ingen_rader_og_utskriften_sier_hvorfor(self, stier, grunn):
+        raa, base = stier
+        modell = SjekketModell(grunn)
+        kode, _, ut = kjoer(raa, base, modell)
+        assert kode == 0 and modell.kall == 0
+        assert all(r is None for r in radene(base).values())
+        assert f"Ingen KI-tekst for boersdagen 2026-09-22 ennaa: {grunn}. Ingen rader er skrevet" in ut
+        assert "kjoer samme kommando igjen i kveld. Det gir 0 kall til EODHD." in ut
+
+    def test_samme_kveld_etter_at_ollama_er_startet(self, stier):
+        """Foerst svarer ikke Ollama, saa er den startet: samme kommando lager
+        tekstene, med 0 kall til EODHD."""
+        raa, base = stier
+        kjoer(raa, base, SjekketModell("Ollama svarer ikke (kjoerer den?)"))
+        modell = SjekketModell(None)
+        kode, kall, ut = kjoer(raa, base, modell)
+        assert (kode, kall, modell.kall) == (0, [], 15)
+        assert all(r is not None and r.besto for r in radene(base).values())
+        assert "15 besto kontrollen" in ut
+
+    def test_naar_den_svarer_skrives_rader_som_foer_ogsaa_naar_modellen_feiler(self, stier):
+        """Svar 2 staar: sjekken gikk, men modellen feilet for en aksje."""
+        raa, base = stier
+        modell = SjekketModell(None, feil=ModellFeilet("tidsavbrudd etter 180 s"))
+        kjoer(raa, base, modell)
+        assert all(r.modellen_feilet for r in radene(base).values())
+
+    def test_ingen_sjekk_naar_ingen_rader_mangler(self, stier):
+        raa, base = stier
+        kjoer(raa, base, FalskModell())
+        modell = SjekketModell("skal ikke brukes")
+        kjoer(raa, base, modell)
+        assert modell.sjekker == 0
+
+    def test_sjekken_foer_noe_kall_til_modellen(self, stier):
+        raa, base = stier
+        modell = SjekketModell(None)
+        kjoer(raa, base, modell)
+        assert modell.sjekker == 1 and modell.kall == 15

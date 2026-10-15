@@ -615,9 +615,9 @@ hentingen kan gi kurser, se «Når kan jeg hente?» i
 | 3 | `OSE_KI_TJENESTE=lokal` i `.env` | |
 | 4 | Hentingen som i Prøve 2. Sa utskriften hvor mange KI-tekster som besto kontrollen? | |
 | 5 | `docker compose --profile ki down`. Stod det «Removed»? | |
-| 6 | En henting uten Ollama: sa utskriften at modellen feilet, og gikk hentingen som før? | |
+| 6 | En henting uten Ollama: sa utskriften at Ollama ikke svarer og at ingen KI-tekst er laget, og gikk hentingen som før? | |
 | 7 | En henting med Ollama i gang, men uten modellen hentet: sa utskriften at modellen ikke er hentet? | |
-| 8 | Hentingen kjørt igjen samme kveld etter steg 6: ble det ingen ny tekst, som README-en sier? | |
+| 8 | Ollama startet og hentingen kjørt igjen samme kveld etter steg 6: ble KI-tekstene laget, med 0 kall til EODHD? | |
 | 9 | `OSE_KI_TJENESTE=av` i `.env` til slutt | |
 
 - **Det som ikke stemte:**

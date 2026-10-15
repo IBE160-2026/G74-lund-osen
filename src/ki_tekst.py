@@ -8,9 +8,15 @@ skrives. Finnes raden, staar den, ogsaa naar modellen feilet, og modellen
 kalles ikke (FR-604, svar 2 kl. 15:53). En aksje med en grunn i stedet for
 vurdering faar ingen KI-tekst: det er ingenting aa forklare.
 
-Feiler modellen for én aksje, kalles den ikke for resten den kvelden. De
-faar en rad om at den feilet, som FR-604 krever, uten aa vente paa en
-tidsfrist til for hver (gjennomgangen av PR F, BH3).
+Foer foerste kall sjekkes det at tjenesten svarer og har modellen (svar c
+kl. 23:32). Gjoer den ikke det, skrives ingen rader for dagen, og utskriften
+sier hvorfor og at samme kommando kan kjoeres igjen samme kveld, med 0 kall
+til EODHD. Formaalet med FR-604, at en tekst ikke kan lages paa nytt til man
+faar en man liker, holder, fordi ingen tekst ble laget. Svarer den, skrives
+radene som foer: feiler modellen for én aksje, faar den en rad om det (svar
+2), og modellen kalles ikke for resten den kvelden. De faar en rad om at den
+feilet, uten aa vente paa en tidsfrist til for hver (gjennomgangen av PR F,
+BH3).
 
 Rekkefoelgen er vurdering, saa KI-rad, hver i sin transaksjon (punktet i
 deferred-work.md fra 4.3). Stopper kjoeringen mellom dem, lager samme
@@ -130,6 +136,13 @@ def _rad_uten_kall(emne: Emne, vurdering: Vurdering, modell: Modell, foerste: st
     )
 
 
+def _ikke_klar(modell: Modell) -> str | None:
+    """Grunnen til at tjenesten ikke kan brukes i kveld, eller None. En modell
+    uten sjekk (som de falske i testene) regnes som klar."""
+    sjekk = getattr(modell, "sjekk", None)
+    return sjekk() if callable(sjekk) else None
+
+
 def lag_ki_tekster(
     base_sti: Path,
     dato: date,
@@ -155,15 +168,27 @@ def lag_ki_tekster(
     try:
         vurderinger = SqliteVurderingslager(tilkobling, klokke, lista)
         logg = SqliteKILogg(tilkobling, klokke)
-        feilet_for: str | None = None
+        mangler: list[tuple[Aksje, Vurdering]] = []
         for aksje in lista:
             vurdering = vurderinger.les(aksje.symbol, dato)
             if not isinstance(vurdering, Vurdering):
                 continue
-            emne = Emne.aksje(aksje.symbol, dato)
-            if logg.les(emne) is not None:
+            if logg.les(Emne.aksje(aksje.symbol, dato)) is not None:
                 sto += 1
                 continue
+            mangler.append((aksje, vurdering))
+        # Svar c kl. 23:32: svarer ikke tjenesten, eller mangler modellen,
+        # skrives ingen rader, og samme kommando kan kjoeres igjen.
+        if mangler and (grunn := _ikke_klar(modell)):
+            skriv(
+                f"Ingen KI-tekst for boersdagen {dato.isoformat()} ennaa: {grunn}. Ingen rader er "
+                f"skrevet i KI-loggen. Start Ollama (docker compose --profile ki up -d ollama), og "
+                f"kjoer samme kommando igjen i kveld. Det gir 0 kall til EODHD."
+            )
+            return
+        feilet_for: str | None = None
+        for aksje, vurdering in mangler:
+            emne = Emne.aksje(aksje.symbol, dato)
             if innevaerende_boersdag(norsk_dato(klokke())) != dato:
                 raise IkkeInnevaerendeBoersdag(dato.isoformat())
             if feilet_for is None:

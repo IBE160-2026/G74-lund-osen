@@ -158,3 +158,37 @@ class TestHttp:
         """Story 4.0: ingen test kan naa en Ollama som kjoerer paa maskinen."""
         with pytest.raises(NettverkISTest):
             OllamaModell().lag_tekst("p")
+
+
+class TestSjekken:
+    """Svar c kl. 23:32: svarer Ollama, og har den modellen?"""
+
+    def test_klar(self):
+        assert OllamaModell(hent=FalskOllama()).sjekk() is None
+
+    def test_ollama_svarer_ikke(self):
+        def hent(*_a):
+            raise requests.ConnectionError("http://127.0.0.1:11434 nede")
+
+        grunn = OllamaModell(hent=hent).sjekk()
+        assert grunn == "Ollama svarer ikke (kjoerer den?)"
+        assert "127.0.0.1" not in grunn
+
+    def test_tidsavbrudd(self):
+        def hent(*_a):
+            raise requests.Timeout()
+
+        assert OllamaModell(hent=hent).sjekk() == "Ollama svarer ikke (kjoerer den?)"
+
+    def test_modellen_mangler(self):
+        assert OllamaModell(hent=FalskOllama(tags=False)).sjekk() == \
+            "modellen gemma4:e4b er ikke hentet (ollama pull gemma4:e4b)"
+
+    @pytest.mark.parametrize("svar", [(500, None), (200, None), (200, {"models": 5})])
+    def test_svar_som_ikke_kan_leses(self, svar):
+        assert OllamaModell(hent=lambda *_a: svar).sjekk() is not None
+
+    def test_sjekken_spoer_bare_listen(self):
+        falsk = FalskOllama()
+        OllamaModell(hent=falsk).sjekk()
+        assert [k[:2] for k in falsk.kall] == [("GET", "http://127.0.0.1:11434/api/tags")]
