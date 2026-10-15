@@ -61,6 +61,57 @@ Planen for KI-laget ble vist i chatten 15.10 kl. 15:43 og er ført kort i Utfør
 
 ## Spec Change Log
 
+## Commitene
+
+Grenen `4-2-kilogg`, PR #45: `39ff578` spesifikasjonen og 4-2 til in-progress; `4c4d1b9` porten, `MinneKILogg` og testene; `49de30e` rettingene fra gjennomgangen.
+
 ## Review Triage Log
 
+Gjennomgang 15.10 på diffen `main...4c4d1b9`, med Blind Hunter (BH, 15 funn), Edge Case Hunter (ECH, 15) og Verification Gap (VG, 4). Rettingene står i `49de30e`, og punktet i `deferred-work.md` i samme commit som denne triagen. Ingen funn må avgjøres av gruppen.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH2, ECH, VG4 | Grunnlaget var bare fryst på øverste nivå, så en liste eller mapping inni kunne endres etter at raden var skrevet | medium | patch: `_frys` på alle nivåer, mapping til `MappingProxyType` og liste til `tuple` |
+| BH3, ECH | Nøkler som ikke er tekst inni grunnlaget, og tupler, ble endret av JSON i stedet for å avvises | medium | patch: `_frys` godtar bare det JSON kan holde uten å endre det |
+| BH1, ECH | «EQNR», «eqnr» og «EQNR » var tre ulike emner, så samme aksje kunne få to rader | medium | patch: symbol og melding-id uten mellomrom, og symbolet med store bokstaver |
+| BH5, ECH | Feil dag, en klokke uten sone, `UtenforKalenderen` og en ugyldig rad var alle `ValueError` | medium | patch: `IkkeInnevaerendeBoersdag` for feil dag, og `TypeError` for en klokke uten sone |
+| VG1 | Ingen test så at `les_alle` ordner etter dato, fordi radene ble skrevet i datorekkefølge | low | patch: `test_ordnet_etter_dato_ikke_etter_skrivingen` |
+| VG2, BH12 | Ingen test så at dagen regnes i Oslo, eller en helligdag | low | patch: `test_dagen_regnes_i_oslo`, `test_en_helligdag_hoerer_til_dagen_foer`, `test_klokke_uten_sone_avvises` |
+| VG3 | Ingen test så at `temperatur` blir `float` | low | patch: `type(rad.temperatur) is float` |
+| BH4, ECH | `regelen` kunne være tom | low | patch: må være tekst som ikke er tom |
+| BH8, ECH | Maskinvaren og Ollama-versjonen ble godtatt for en tjeneste på nettet | low | patch: bare for `lokal` (FR-605). For `lokal` kan de mangle, fordi de ikke kan vites når Ollama ikke kjører |
+| BH9, ECH | `hash(rad)` ga `TypeError`, fordi grunnlaget ikke kan hashes | low | patch: `field(hash=False)` på grunnlaget, `test_raden_kan_hashes` |
+| BH10, ECH | «Modellen feilet» og «besto ikke kontrollen» kunne bare skilles på fritekst | low | patch: `modellen_feilet` er `tekst is None`, og testene viser begge |
+| BH15, ECH | En seed utenfor 64 bit ble godtatt, og ville feilet i SQLite (4.3) | low | patch: grensen i `KIRad` |
+| ECH | `temperatur=10**400` ga `OverflowError`, og et svært dypt grunnlag `RecursionError` | low | patch: begge gir `UgyldigKIRad` |
+| ECH | `les` sjekket ikke typen | low | patch: `TypeError` |
+| BH6 | Porten sa ikke hva nøkkelen er | low | patch: hele emnet, i docstringen, og `test_dagen_og_meldingen_har_ogsaa_bare_en_rad` |
+| BH7 | Testene for porten kunne ikke brukes av adapteren i 4.3 | low | patch: fixturen `logg_lager` |
+| BH11 | Testen for «ingen slett» så ikke etter `__delitem__` eller endring gjennom lista fra `les_alle` | low | patch: begge testet |
+| BH13 | Klokka ble ikke sjekket før første `skriv` | low | patch: `TypeError` i `__init__` hvis den ikke kan kalles |
+| BH14 | Verification var tom | low | patch: fylt ut under |
+| ECH | Passerer hentingen midnatt mellom modellkallet og `skriv`, reiser `skriv` for resten | low | utsatt: `deferred-work.md`, tas i 10.2b, der hentekommandoen kaller `skriv` |
+| ECH | En klokke etter 2026 gir `UtenforKalenderen` ved hver `skriv` | avvist | slik virker kalenderen overalt (`boersdag.py`): den gjetter ikke en dag lista ikke dekker |
+| BH15 (del) | `temperatur` har ingen øvre grense | avvist | grensen er tjenestens. Raden logger det som ble brukt |
+
+
 ## Verification
+
+**Commands:**
+- `uv run pytest -q` -- før 1633 bestått og 17 hoppet over på main (`de94bc9`). 1695 og 17 på `4c4d1b9`. Etter rettingene 1721 og 17 på `49de30e`.
+
+**Mutantene**, kjørt én om gangen med `-x` og bare `tests/test_kilogg.py`, med kopi før og sha256 mot HEAD etter hver. Fila var lik HEAD etter hver. K1–K5 ble først kjørt på `4c4d1b9` og fanget alle, og så på nytt på `49de30e` med KR1–KR6. Alle er fanget:
+
+| # | Mutant | Fanget av |
+|---|---|---|
+| K1 | promptversjon kan mangle | `test_promptversjon_og_modell_kan_ikke_mangle` |
+| K2 | begge emnene godtas | `test_begge_emnene_avvises` |
+| K3 | porten har `slett` | `test_bare_skriv_og_lesemetoder` |
+| K4 | en eldre dato godtas | `test_bare_inneveerende_boersdag` |
+| K5 | en rad som finnes, skrives over | `test_raden_staar_naar_den_finnes` |
+| KR1 | lister i grunnlaget kan endres | `test_grunnlaget_er_en_kopi_som_ikke_kan_endres` |
+| KR2 | symbolet med små bokstaver godtas | `test_samme_noekkel_kan_ikke_skrives_paa_to_maater` |
+| KR3 | dagen regnes ikke i Oslo | `test_dagen_regnes_i_oslo` |
+| KR4 | `les_alle` i rekkefølgen radene ble skrevet | `test_ordnet_etter_dato_ikke_etter_skrivingen` |
+| KR5 | maskinvaren godtas for en tjeneste på nettet | `test_maskinvaren_og_ollama_bare_for_den_lokale` |
+| KR6 | `regelen` kan være tom | `test_ugyldige_verdier` |

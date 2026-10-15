@@ -194,3 +194,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-4-0-nettsperren-dekker-hele-testkjoeringen.md`
   summary: Nettsperren gjelder prosessen pytest kjører i. En underprosess som en test starter (`subprocess`, eller `multiprocessing`, som starter nye prosesser på Windows), får den ikke.
   evidence: BH7 og ECH i gjennomgangen 15.10 av 4.0. Den eneste testen som starter en underprosess i dag, `test_stiene_er_data_raa_og_data_db_ose_db` i `tests/test_lagring_sqlite.py`, leser to konstanter og bruker ikke nett. Grensen står i docstringen i `tests/conftest.py`. Tas når en test skal starte en underprosess som kan bruke nett, for eksempel med en `sitecustomize` som setter sperren i barneprosessen.
+- source_spec: `_bmad-output/implementation-artifacts/spec-4-2-kilogg-porten-med-minneimplementasjon.md`
+  summary: Passerer hentingen midnatt i Oslo mellom modellkallet og `skriv`, gir `skriv` `IkkeInnevaerendeBoersdag` for resten av radene den kvelden.
+  evidence: ECH i gjennomgangen 15.10 av 4.2. Porten reiser en egen type for feil dag, så kalleren kan skille den fra en feil i klokka eller kalenderen. Tas i 10.2b (PR F): hentekommandoen må fange den per rad og la hentingen gå videre (NFR-04).
