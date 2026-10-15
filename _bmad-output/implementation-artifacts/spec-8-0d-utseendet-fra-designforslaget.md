@@ -121,7 +121,7 @@ Resten av planen gjelder som vist: merkene over h1, overskriften «<navn> skilte
 
 **Mutantene for PR 3** (planen kl. 22:28; b, c, d, g og k er nr. 2, 3, 4, 7 og 11 i del G fra 13.10): M1 `stroke-dasharray` tilbake på snittet; M2 hjelpeteksten sier «stiplede»; M3 «← » tilbake i lenken; M4 grafen før sjekkene; M5 det grå feltet tilbake til `#D9D5CB`; M6 «data hentet» tilbake på aksjesiden; M7 markeringen borte fra overskriften på aksjesiden; M8 «skilte seg ut» også under terskelen; M9 endringskortet borte; M10 skalaen uten `aria-hidden`; M11 brikken for 0 med grønt fyll; M12 «2 av 3» uten pille; M13 setningen om vurdert regnet fra radene igjen; M14 «uten signal» teller alle radene i «Øvrige».
 
-**PR 3, 14.–15.10 (grenen `8-0d-aksjesiden`, PR #42):** `4e68153` svarene og planen, `30e6d97` oversikten, `cec8c53` aksjesiden, `c503654` testene, `c8ed4aa` README-statusen (svar 26), `fcfbdc2` navnene i grafen med hvit kant og brikkene høyrestilt, `8323d3c` tre punkter i `deferred-work.md`, `f889bcd` og `ee27d53` rettingene og testene fra gjennomgangen i natt. *Lagt til 2026-10-15:* `fae3e24` testene, og `1deed86` og `58f385c` punktene i `deferred-work.md` fra gjennomgangen 15.10. `0962974` triagen, mutantene og testtallene.
+**PR 3, 14.–15.10 (grenen `8-0d-aksjesiden`, PR #42):** `4e68153` svarene og planen, `30e6d97` oversikten, `cec8c53` aksjesiden, `c503654` testene, `c8ed4aa` README-statusen (svar 26), `fcfbdc2` navnene i grafen med hvit kant og brikkene høyrestilt, `8323d3c` tre punkter i `deferred-work.md`, `f889bcd` og `ee27d53` rettingene og testene fra gjennomgangen i natt. *Lagt til 2026-10-15:* `fae3e24` testene, og `1deed86` og `58f385c` punktene i `deferred-work.md` fra gjennomgangen 15.10. `0962974` triagen, mutantene og testtallene. *Lagt til 2026-10-15 (svarene kl. 12:15):* `a094dec` svarene 28–31, `138ef80` kortet «Slik leser du tabellen» (svar 28), `07b4ff6` datoene i endringskortet (svar 29), `70d47f6` grensene for bevegelse (svar 30), `7626449` resolved-linjene i `deferred-work.md`, og fra gjennomgangen av svarene `f9ab017` helgene utenfor kalenderen, `7a5bc55` desimalene for bevegelse og `8f385c3` rettelinja i designregler §4.
 
 ## Boundaries & Constraints
 
@@ -291,6 +291,25 @@ Gjennomgang av PR 3. Gjennomgangen natt til 15.10 er ikke ført med funnene. Ret
 | ECH3 | Grensen over skalaen for bevegelse vises med én desimal, «0,0 %» under 0,05 %, mens tallet i kortet har så mange desimaler som trengs (`desimaler_mot_grense`) | low | **avgjøres av gruppen**: en retting endrer teksten på siden. Ført i `deferred-work.md` |
 | ECH8 | Merket viser symbolet, ikke tickeren fra EODHD | avvist | oversikten viser også symbolet (avvik 11) |
 
+*Lagt til 2026-10-15:* gjennomgangen av svarene kl. 12:15 på diffen `113ba08..7626449`, med Blind Hunter (BH, 15 funn), Edge Case Hunter (ECH, 4) og Verification Gap (VG, 1). Rettingene står i `f9ab017`, `7a5bc55` og `8f385c3`. Funnene som endrer noe utover svar 28–30, eller som gruppen må avgjøre, er ikke rettet, og PR-en flettes ikke før de er avgjort.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH5 | Hjelpen ved «Endring» sier «fra børsdagen før», mens kortet viser datoene for et hull i kilden, for eksempel «fra fredag 02.10 til fredag 09.10» | medium | **avgjøres av gruppen**: en retting endrer hjelpeteksten `endring` i `src/hjelpetekster.py`, som svar 29 ikke nevner. PR-en flettes ikke før det er avgjort |
+| BH1, ECH1, ECH3 | Et standardavvik over 0, men under 0,0000005 %, vises som null med seks desimaler, «0,000000 %», fordi taket er `MEST_DESIMALER` | low | **avgjøres av gruppen**: svar 30 sier både «aldri som 0,0» og «høyst `MEST_DESIMALER`», og de to strider mot hverandre her. Docstringen sier nå hva som vises (`7a5bc55`) |
+| ECH2, ECH4, BH6 | Fra 2027 kaster `er_boersdag` også for lørdag og søndag, så fredag til mandag fikk datoene | medium | patch: helgene slås ikke opp (`f9ab017`), `test_en_helg_utenfor_kalenderen_gir_ukedagene` |
+| VG1, BH10 | Ingen test prøvde grensene for bevegelse gjennom ruten med en måling som krever flere desimaler enn grensen alene | medium | patch: DNB med 1,23 % mot 1,234 % i `test_grensene_for_bevegelse_er_tallet_i_teksten` (`7a5bc55`). Uten målingen i `bygg_detalj` feiler testen |
+| BH2 | `desimaler_uten_null` ga færre desimaler enn `minst` når `minst` er over taket | low | patch (`7a5bc55`) |
+| BH13 | Ordlista i designregler §4 sier «T +1» overalt | low | patch: rettelinje som viser til tillegget i §5 (`8f385c3`) |
+| BH15 | Commitene fra svarene sto ikke i lista under PR 3 | low | patch: ført over |
+| BH3, BH4 | Sluttdatoen i `boersdag_mellom` kommer fra `post.nyeste.dato`, ikke fra serien | avvist | det er datoen kortet viser (`detalj.dato`), og en annen dag i serien er luken ECH1, som er utsatt i `deferred-work.md` |
+| BH7 | Grensene over skalaen for trend har fortsatt én desimal | avvist | svar 30 gjelder bevegelse. Grensen for trend er nøytralsonen i Parametre (2 %), og teksten for trend har ingen grense |
+| BH8 | Seks desimaler kan gjøre grensene over skalaen lange | avvist | bare når målingen og standardavviket er like med fem desimaler, og svar 30 sier høyst `MEST_DESIMALER` |
+| BH9 | «fra onsdag 30.12.2026 til mandag 04.01» har året bare på den første datoen | avvist | svar 29 sier samme form som linja under h1, og filteret `dato` viser året bare når det er et annet enn i år (designregler §4) |
+| BH11 | De to merkene kan flyte ut av feltet på 36 px ved forstørret tekst | avvist | to linjer på 10 px med luft er 30 px. Feltet er `aria-hidden`, og teksten ved siden av sier det samme |
+| BH12 | Grønt og rødt i kortet kan leses som retning | avvist | svar 28 sier grønn «+1» over rød «-1», og teksten sier at begge teller som utslag |
+| BH14 | Mutantene for svar 28–30 og en test for svar 31 | avvist | M15–M25 står under Verification. Svar 31 endrer ingen kode, og retningen Blandet regnes i `signalberegning.py` som før (`finn_retning` med +1 og -1 gir Blandet i `tests/test_signalberegning.py`) |
+
 ## Verification
 
 **Commands:**
@@ -350,3 +369,25 @@ Gjennomgang av PR 3. Gjennomgangen natt til 15.10 er ikke ført med funnene. Ret
 | M14 | «uten signal» teller alle radene i «Øvrige» | `tests/test_app.py::TestStory80e::test_delingen_bruker_terskelen_fra_parametre` |
 
 M2 ble kjørt med `tests/test_hjelpetekster.py` og `tests/test_app.py`, M8 med `tests/test_aksjedetalj.py` og `tests/test_app.py`, og M5, M6, M10 og M12 med to filer. Den første fila fanget ikke M2 og M8. To av testene fra gjennomgangen 15.10 ble prøvd på samme måte: uten `terskel=p.terskel` i `bygg_detalj` feilet `test_terskelen_i_overskriften_kommer_fra_parametre`, og med 50 fast i teksten for trend feilet `test_hva_sjekken_maaler_og_regelen_kommer_fra_parametre`.
+
+**Svarene kl. 12:15 (15.10):** `uv run pytest -q`: før 1558 bestått og 16 hoppet over (`fae3e24`), etter 1568 og 16 på `8f385c3`.
+
+**Mutantene for svarene** (15.10, på `7626449`), kjørt én om gangen med `-x` og bare testfilene som skulle fange dem, med kopi før og sha256 mot HEAD etter hver. Fila var lik HEAD etter hver (sha256 uten CRLF, og ingen endring i `git status`). Alle 11 er fanget.
+
+| # | Mutant | Fanget av |
+|---|---|---|
+| M15 | kortet med klassen `brikke` igjen | `tests/test_utseende.py::TestOversikten::test_symbolene_i_kortet_er_skjult_og_ingen_pil_ved_navnet` |
+| M16 | uten den røde | `tests/test_utseende.py::TestOversikten::test_symbolene_i_kortet_er_skjult_og_ingen_pil_ved_navnet` |
+| M17 | uten «Både +1 og -1 teller som utslag.» | `tests/test_app.py::TestStory80eTekst::test_slik_leser_du_tabellen_har_3_punkter` |
+| M18 | uten «Ga noen +1 og noen -1, står det Blandet.» | `tests/test_app.py::TestStory80eTekst::test_slik_leser_du_tabellen_har_3_punkter` |
+| M19 | alltid ukedager | `tests/test_app.py::TestStory80dAksjesiden::test_endringen_med_datoene_naar_en_boersdag_ligger_mellom` |
+| M20 | alltid datoer | `tests/test_app.py::TestStory80dAksjesiden::test_endringen_er_det_fjerde_kortet_med_ukedagene` |
+| M21 | kalenderdager i stedet for børsdager | `tests/test_aksjedetalj.py::TestBoersdagMellom::test_boersdager_ikke_kalenderdager` |
+| M22 | `UtenforKalenderen` ikke fanget | `tests/test_aksjedetalj.py::TestBoersdagMellom::test_datoene_naar_kalenderen_ikke_dekker_dagene` |
+| M23 | grensene med én desimal igjen | `tests/test_aksjedetalj.py::TestSkalaen::test_grensene_for_bevegelse_er_tallet_i_teksten` |
+| M24 | en grense på 0,03 % som 0,0 over skalaen | `tests/test_aksjedetalj.py::TestSkalaen::test_grensene_for_bevegelse_er_tallet_i_teksten` |
+| M25 | det samme i teksten | `tests/test_aksjedetalj.py::TestSkalaen::test_grensene_for_bevegelse_er_tallet_i_teksten` |
+
+M15 og M16 ble kjørt med `tests/test_utseende.py`, M17–M20 med `tests/test_app.py`, og M21–M25 med `tests/test_aksjedetalj.py` og `tests/test_app.py`. Rettingene fra gjennomgangen ble prøvd på samme måte: uten sjekken for helgen feilet `test_en_helg_utenfor_kalenderen_gir_ukedagene`, uten målingen i `bygg_detalj` feilet `test_grensene_for_bevegelse_er_tallet_i_teksten` i `tests/test_app.py`, og uten `max(minst, …)` feilet `test_null_som_foer_og_hoeyst_mest_desimaler`. Testene for a, b og c feilet uten rettingen før hver commit.
+
+Bildene av oversikten og aksjesiden i demoen ved 1280 og 390 px ligger bare i scratchpad. Ved 390 px er de tatt i en ramme på 390 px, fordi Edge uten vindu har en minste bredde over 390 px.
