@@ -92,6 +92,25 @@ Fra gjennomgangen. Begge gjelder svar 2 og 5 kl. 15:53 og FR-604, så de rettes 
 
 Rettingen gjør det så lite vondt som mulig innenfor svarene: feiler modellen for én aksje, kalles den ikke for resten den kvelden, og de får en rad med grunnen «ikke kalt» (BH3). Det er også en del av spørsmål 2: gruppen kan velge at modellen prøves for hver aksje.
 
+*Besvart 2026-10-15 kl. 23:32 (instruksjonen kl. 23:33), ført under FR-604 i PRD-en og under story 10.2 i `epics.md`:*
+- b) Spørsmål 1: «lokal» gjelder fortsatt når `OSE_KI_TJENESTE` mangler (svar 5 står).
+- c) Spørsmål 2: hentingen sjekker først at Ollama svarer og har modellen. Gjør den ikke det, skrives ingen rader i `ki_logg` for dagen, og utskriften sier hvorfor og at samme kommando kan kjøres igjen samme kveld, med 0 kall til EODHD. Svarer den, skrives rader som før, også når modellen feiler for en aksje (svar 2). Grunnen: formålet med FR-604, at en tekst ikke kan lages på nytt til man får en man liker, holder, fordi ingen tekst ble laget.
+- F flettes ikke i kveld, men etter prøvekjøringen lørdag 17.10. «Ikke kalt»-radene etter en feil hos modellen står som før, fordi sjekken har gått og modellen svarte.
+
+Bygd i denne PR-en etter svar c: `OllamaModell.sjekk` spør `/api/tags` og gir grunnen når Ollama ikke svarer eller modellen mangler, og `lag_ki_tekster` skriver da ingen rader. Sjekken kjøres bare når en aksje mangler raden, og før første kall til modellen.
+
+## Prøvekjøringen
+
+Forslaget fra instruksjonen kl. 22:36, med steget fra svar c. En dag uten henting (lørdag 17.10), med grenen `10-2b-teksten-i-hentingen` sjekket ut, uten kall til EODHD og uten at `data/db/ose.db` røres:
+
+1. Kopier basen: `cp data/db/ose.db data/db/ki-proeve.db`. Kopien ligger i `data/`, som ikke spores (regel 10).
+2. Start Ollama med grafikkortet og hent modellen: `docker compose --profile ki up -d ollama` og `docker compose exec ollama ollama pull gemma4:e4b`.
+3. Kjør bare KI-steget mot kopien, for børsdagen 16.10, med `lag_ki_tekster(Path("data/db/ki-proeve.db"), date(2026, 10, 16), …, OllamaModell(), print)`. Sjekken fra svar c går først.
+4. `docker compose exec ollama ollama ps` viser «100% GPU».
+5. Les resultatet uten kurser: per aksje i `ki_logg` i kopien `besto`, `grunn`, `maskinvare`, `modell_id`, `ollama_versjon` og lengden på teksten. Tekstene kan leses på skjermen, men føres ikke i en sporet fil.
+6. Før resultatet med dato i `malinger.md`: antall som besto, ikke besto og der modellen feilet, maskinvaren, median tid per tekst, modell-ID og Ollama-versjon, men uten tekstene.
+7. Stopp Ollama: `docker compose --profile ki down`.
+
 ## Review Triage Log
 
 Gjennomgang 15.10 på diffen `main...9bc8b3b`, med Blind Hunter (BH, 16 funn), Edge Case Hunter (ECH, 13) og Verification Gap (VG, 5). Rettingene står i `5dd8a00` og `48838a7`.
