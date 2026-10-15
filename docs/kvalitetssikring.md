@@ -602,7 +602,7 @@ hentingen kan gi kurser, se «Når kan jeg hente?» i
 
 ### Prøve 3: den lokale modellen
 
-*Lagt til 2026-10-15 (story 10.2, PR F, planen for KI-laget 15.10 kl. 15:43):* «Den lokale modellen (KI-teksten)» under «Mer for den som vil» i README-en. Prøven tas på en maskin med grafikkort, etter Prøve 2, med den ekte versjonen og egen nøkkel.
+*Lagt til 2026-10-15 (story 10.2, PR F, planen for KI-laget 15.10 kl. 15:43):* «Den lokale modellen (KI-teksten)» under «Mer for den som vil» i README-en. Prøven tas på en maskin med grafikkort fra NVIDIA, etter Prøve 2, med den ekte versjonen og egen EODHD-nøkkel. Ollama trenger ingen nøkkel.
 
 - **Dato:**
 - **Maskin og grafikkort:**
@@ -616,7 +616,9 @@ hentingen kan gi kurser, se «Når kan jeg hente?» i
 | 4 | Hentingen som i Prøve 2. Sa utskriften hvor mange KI-tekster som besto kontrollen? | |
 | 5 | `docker compose --profile ki down`. Stod det «Removed»? | |
 | 6 | En henting uten Ollama: sa utskriften at modellen feilet, og gikk hentingen som før? | |
-| 7 | `OSE_KI_TJENESTE=av` i `.env` til slutt | |
+| 7 | En henting med Ollama i gang, men uten modellen hentet: sa utskriften at modellen ikke er hentet? | |
+| 8 | Hentingen kjørt igjen samme kveld etter steg 6: ble det ingen ny tekst, som README-en sier? | |
+| 9 | `OSE_KI_TJENESTE=av` i `.env` til slutt | |
 
 - **Det som ikke stemte:**
 - **Rettet i** (commit eller story):

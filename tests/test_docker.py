@@ -392,8 +392,13 @@ class TestOllama:
         assert miljoe == ["OSE_KI_OLLAMA_URL: http://ollama:11434"]
 
     def test_ingen_noekkel_i_compose(self):
-        assert "EODHD" not in "\n".join(_linjer(COMPOSE)).upper()
-        assert "NOKKEL" not in "\n".join(_linjer(COMPOSE)).upper()
+        """Gjennomgangen (BH7): ingen variabel i compose utenom adressen."""
+        tekst = "\n".join(l for l in _linjer(COMPOSE) if not l.lstrip().startswith("#")).upper()
+        for ord_ in ("EODHD", "NOEKKEL", "NØKKEL", "KEY", "TOKEN"):
+            assert ord_ not in tekst, ord_
+        for navn, felt in _tjenester().items():
+            miljoe = [l.strip() for l in felt.get("environment", ["environment:"])[1:]]
+            assert all(m.split(":", 1)[0] in ("OSE_DEMO", "OSE_KI_OLLAMA_URL") for m in miljoe), (navn, miljoe)
 
 
 README = ROT / "README.md"

@@ -77,7 +77,7 @@ from boersdag import (
 )
 from eodhd import UgyldigSerie, serie_fra_eodhd
 from ki_modell import Modell
-from ki_tekst import ki_innstillinger, lag_ki_tekster, velg_modell
+from ki_tekst import lag_ki_tekster, modell_fra_miljoeet
 from kursdata import AKSJEUNIVERS, Aksje, Kursrad
 from lagring_fil import (
     KURSPREFIKS,
@@ -817,7 +817,10 @@ def kjoer(
     if fil.exists():
         if mangler is not None:
             # Story 2.3b: basen mangler dagens kurs for noen aksjer. Et nytt
-            # forsoek henter dem, i en egen fil.
+            # forsoek henter dem, i en egen fil. Story 10.2: foerst KI-radene
+            # som mangler for aksjene som alt er vurdert, uten kall til EODHD,
+            # saa de ikke venter paa at forsoeket kommer gjennom.
+            lag_ki_tekster(base_sti, dato, klokke, modell, skriv, lista)
             return nytt_forsoek(
                 data_katalog, base_sti, oeyeblikk, dag, dato, mangler,
                 api_nokkel, hent, skriv, klokke, les_kvote, lista, modell=modell,
@@ -1245,7 +1248,7 @@ def main(argv: list[str] | None = None) -> None:
         les_inn(argumenter.les_inn, lagring_sqlite.BASE_STI)
         return
     # Story 10.2: tjenesten fra OSE_KI_TJENESTE (svar 5), lest foer kjoeringen.
-    modell = velg_modell(ki_innstillinger(PROSJEKTROT / ".env", os.environ))
+    modell = modell_fra_miljoeet(PROSJEKTROT / ".env", os.environ)
     kjoer(
         lagring_fil.RAA_KATALOG,
         lagring_sqlite.BASE_STI,

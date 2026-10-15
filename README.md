@@ -228,7 +228,9 @@ Basen, demobasen og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo`
 <details>
 <summary>Den lokale modellen (KI-teksten)</summary>
 
-Hentingen kan lage en KI-tekst for hver aksje, med en modell som kjører på maskinen: Gemma i Ollama, i Docker, med grafikkortet. Ingenting sendes ut. KI-teksten er av i `.env.example`, og hentingen går som før uten den.
+Hentingen kan lage en KI-tekst for hver aksje, med en modell som kjører på maskinen: Gemma i Ollama, i Docker, med grafikkortet. Med adressen som står som standard, sendes ingenting ut. KI-teksten er av i `.env.example`, og hentingen går som før uten den.
+
+Det trengs et grafikkort fra NVIDIA med driver, og at Docker Desktop kan bruke det. Uten det starter ikke Ollama, og KI-teksten bør stå av.
 
 Bare første gang: start Ollama, og hent modellen til volumet `ose-ki-ollama`.
 

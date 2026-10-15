@@ -9,10 +9,13 @@ from datetime import date, datetime, timezone
 
 import pytest
 
+import sqlite3
+
 import fetch_prices as fp
+import ki_tekst
 from ki_lokal import OllamaModell
 from ki_modell import ModellFeilet, Modellsvar
-from ki_tekst import ki_innstillinger, lag_ki_tekster, regeltekst, velg_modell
+from ki_tekst import ki_innstillinger, lag_ki_tekster, modell_fra_miljoeet, regeltekst, velg_modell
 from kilogg import Emne
 from kursdata import AKSJEUNIVERS
 from lagring_sqlite import SqliteKILogg, aapne_base
@@ -203,7 +206,8 @@ class TestTjenesten:
         assert modell.url == "http://ollama:11434"
 
     @pytest.mark.parametrize("tjeneste, tekst", [
-        ("gemini", "ikke bygget ennaa"), ("chatgpt", "ukjent verdi"),
+        ("gemini", "ikke bygget ennaa"), ("chatgpt", "ukjent eller tom verdi"),
+        ("", "ukjent eller tom verdi"), ("   ", "ukjent eller tom verdi"),
     ])
     def test_ingen_stille_overgang(self, tjeneste, tekst):
         """FR-608: én tjeneste per kjoering, aldri en annen i stedet."""
@@ -234,3 +238,119 @@ class TestTjenesten:
             trend, bevegelse, interesse, styrke, retning = 1, 0, -1, 2, "Blandet"
 
         assert regeltekst(V()) == "Trend +1, bevegelse 0, interesse -1. Styrke 2, retning Blandet."
+
+
+class TestEtterGjennomgangen:
+    """Gjennomgangen av PR F."""
+
+    def test_modellen_kalles_ikke_igjen_etter_en_feil(self, stier):
+        """BH3: én tidsfrist, ikke femten. Resten faar en rad om at modellen
+        feilet (FR-604), uten kall."""
+        raa, base = stier
+        modell = FalskModell(feil=ModellFeilet("tidsavbrudd etter 180 s"))
+        kode, _, ut = kjoer(raa, base, modell)
+        assert kode == 0 and modell.kall == 1
+        rader = radene(base)
+        assert all(r.modellen_feilet for r in rader.values())
+        andre = [r for s, r in rader.items() if "ikke kalt" in r.grunn]
+        assert len(andre) == 14
+        assert "modellen feilet for 15." in ut
+
+    def test_et_nytt_forsoek_faar_ki_tekst(self, stier):
+        """VG1: en aksje som faar kursen i et nytt forsoek samme kveld, faar
+        KI-teksten der."""
+        raa, base = stier
+
+        def hent(ticker, *a):
+            return serie_til(date(2026, 9, 21)) if ticker == "EQNR.OL" else serie_med_utslag(TIRSDAG)
+
+        kjoer(raa, base, FalskModell(), hent)
+        assert radene(base)["EQNR"] is None
+        modell = FalskModell()
+        kode, kall, _ = kjoer(raa, base, modell)
+        assert kall == ["EQNR.OL"]
+        assert radene(base)["EQNR"] is not None and modell.kall == 1
+
+    def test_ki_radene_som_mangler_lages_foer_et_nytt_forsoek(self, stier):
+        """ECH: vurderte aksjer faar KI-raden selv om forsoeket stopper."""
+        raa, base = stier
+
+        def hent(ticker, *a):
+            return serie_til(date(2026, 9, 21)) if ticker == "EQNR.OL" else serie_med_utslag(TIRSDAG)
+
+        kjoer(raa, base, None, hent)
+        modell = FalskModell()
+        kjoer(raa, base, modell, hent)
+        rader = radene(base)
+        assert sum(r is not None for r in rader.values()) == 14 and rader["EQNR"] is None
+
+    def test_main_leser_av_fra_env(self, monkeypatch, tmp_path):
+        """VG2: .env.example sier av, og main maa lese det fra .env."""
+        fanget = {}
+        monkeypatch.setattr(fp, "kjoer", lambda *a, **k: fanget.update(k))
+        monkeypatch.setattr(fp, "PROSJEKTROT", tmp_path)
+        monkeypatch.delenv("OSE_KI_TJENESTE")
+        (tmp_path / ".env").write_text("OSE_KI_TJENESTE=av\n", encoding="utf-8")
+        fp.main([])
+        assert fanget["modell"] is None
+
+    def test_miljoeet_vinner_per_noekkel(self, tmp_path):
+        """VG3 og ECH: adressen i miljoeet foer den i .env, og adressen i .env
+        naar miljoeet bare har tjenesten."""
+        env = tmp_path / ".env"
+        env.write_text("OSE_KI_TJENESTE=lokal\nOSE_KI_OLLAMA_URL=http://x:1\n", encoding="utf-8")
+        assert ki_innstillinger(env, {"OSE_KI_OLLAMA_URL": "http://y:2"})["OSE_KI_OLLAMA_URL"] == "http://y:2"
+        assert ki_innstillinger(env, {"OSE_KI_TJENESTE": "lokal"})["OSE_KI_OLLAMA_URL"] == "http://x:1"
+
+    @pytest.mark.parametrize("url", ["127.0.0.1:11434", "   ", "ftp://x", "http://"])
+    def test_en_adresse_som_ikke_er_en_adresse(self, url):
+        linjer = []
+        assert velg_modell({"OSE_KI_TJENESTE": "lokal", "OSE_KI_OLLAMA_URL": url}, linjer.append) is None \
+            or url.strip() == ""
+        if url.strip():
+            assert "ikke en adresse" in linjer[0]
+
+    def test_en_adresse_utenfor_maskinen_gir_beskjed(self):
+        """BH13: prompten sendes dit, og hentingen sier fra."""
+        linjer = []
+        modell = velg_modell({"OSE_KI_TJENESTE": "lokal", "OSE_KI_OLLAMA_URL": "http://ki.example.com:11434"},
+                             linjer.append)
+        assert modell is not None and "ki.example.com" in linjer[0]
+
+    def test_innstillinger_som_ikke_kan_leses(self, tmp_path, monkeypatch):
+        """ECH: en feil i innstillingene stopper ikke hentingen (NFR-04)."""
+        monkeypatch.setattr(ki_tekst, "dotenv_values", lambda *_: 1 / 0)
+        (tmp_path / ".env").write_text("x", encoding="utf-8")
+        linjer = []
+        assert modell_fra_miljoeet(tmp_path / ".env", {}, linjer.append) is None
+        assert "innstillingene kunne ikke leses (ZeroDivisionError)" in linjer[0]
+
+    def test_basen_som_ikke_kan_aapnes(self, stier, monkeypatch):
+        """VG4: NFR-04 ogsaa naar basen ikke kan aapnes for steget."""
+        raa, base = stier
+
+        def feil(*_a, **_k):
+            raise sqlite3.OperationalError("laast")
+
+        monkeypatch.setattr(ki_tekst, "aapne_base", feil)
+        linjer = []
+        lag_ki_tekster(base, TIRSDAG, lambda: OEYEBLIKK, FalskModell(), linjer.append)
+        assert linjer == ["KI-teksten: basen kunne ikke aapnes (OperationalError). Ingen KI-tekst i kveld."]
+
+    def test_modellen_kalles_ikke_etter_midnatt(self, stier):
+        """ECH: ny boersdag sjekkes foer kallet, ikke foerst ved skriv."""
+        raa, base = stier
+        kjoer(raa, base, None)
+        modell = FalskModell()
+        linjer = []
+        lag_ki_tekster(base, TIRSDAG, lambda: ONSDAG_KL_22, modell, linjer.append)
+        assert modell.kall == 0 and linjer[0].startswith("KI-teksten stoppet: det er blitt en ny boersdag")
+
+    def test_nettsperren_svelges_ikke(self, stier):
+        """ECH: NettverkISTest fra en ekte modell i en test skal synes."""
+        from conftest import NettverkISTest
+
+        raa, base = stier
+        kjoer(raa, base, None)
+        with pytest.raises(NettverkISTest):
+            lag_ki_tekster(base, TIRSDAG, lambda: OEYEBLIKK, OllamaModell(), lambda _: None)

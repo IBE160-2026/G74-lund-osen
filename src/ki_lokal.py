@@ -71,6 +71,9 @@ class OllamaModell:
             raise ModellFeilet("Ollama svarer ikke (kjoerer den?)") from feil
         except requests.RequestException as feil:
             raise ModellFeilet(type(feil).__name__) from feil
+        if status == 404:
+            # Ollama svarer 404 naar modellen ikke er hentet (gjennomgangen, BH8).
+            raise ModellFeilet(f"modellen er ikke hentet (ollama pull {self.modell})")
         if status != 200:
             raise ModellFeilet(f"Ollama svarte HTTP {status}")
         if not isinstance(svar, dict) or not isinstance(svar.get("response"), str):
@@ -93,20 +96,23 @@ class OllamaModell:
         versjon = svar.get("version") if svar else None
         return versjon if isinstance(versjon, str) and versjon.strip() else None
 
+    def _modeller(self, sti: str) -> list:
+        modeller = (self._les(sti) or {}).get("models")
+        return modeller if isinstance(modeller, list) else []
+
     def _modell_id(self) -> str | None:
-        svar = self._les("/api/tags")
-        for modell in (svar or {}).get("models") or []:
+        for modell in self._modeller("/api/tags"):
             if isinstance(modell, dict) and modell.get("name") == self.modell:
                 digest = modell.get("digest")
-                if isinstance(digest, str) and len(digest) >= 12:
-                    return digest.split(":")[-1][:12]
+                kort = digest.split(":")[-1] if isinstance(digest, str) else ""
+                if len(kort) >= 12:
+                    return kort[:12]
         return None
 
     def _maskinvare(self) -> str | None:
         """gpu naar hele modellen ligger paa grafikkortet, cpu naar ingenting
         gjoer det, og None naar den er delt eller ikke kan leses."""
-        svar = self._les("/api/ps")
-        for modell in (svar or {}).get("models") or []:
+        for modell in self._modeller("/api/ps"):
             if isinstance(modell, dict) and modell.get("name") == self.modell:
                 stoerrelse, vram = modell.get("size"), modell.get("size_vram")
                 if not isinstance(stoerrelse, int) or not isinstance(vram, int) or stoerrelse <= 0:

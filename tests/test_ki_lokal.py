@@ -91,10 +91,39 @@ class TestFeil:
         assert grunn in str(svar.value)
         assert "127.0.0.1" not in str(svar.value)
 
-    @pytest.mark.parametrize("status", [404, 500])
-    def test_status_som_ikke_er_200(self, status):
-        with pytest.raises(ModellFeilet, match=str(status)):
-            OllamaModell(hent=FalskOllama(status=status)).lag_tekst("p")
+    def test_status_som_ikke_er_200(self):
+        with pytest.raises(ModellFeilet, match="500"):
+            OllamaModell(hent=FalskOllama(status=500)).lag_tekst("p")
+
+    def test_404_er_at_modellen_ikke_er_hentet(self):
+        """Gjennomgangen (BH8): grunnen sier hva som mangler."""
+        with pytest.raises(ModellFeilet, match=r"modellen er ikke hentet \(ollama pull gemma4:e4b\)"):
+            OllamaModell(hent=FalskOllama(status=404)).lag_tekst("p")
+
+    @pytest.mark.parametrize("models", [5, "x", {"a": 1}, None])
+    def test_models_som_ikke_er_en_liste(self, models):
+        """Gjennomgangen (ECH): feltene blir None, og teksten staar."""
+        falsk = FalskOllama()
+
+        def hent(metode, url, json, tidsfrist):
+            if url.endswith(("/api/tags", "/api/ps")):
+                return 200, {"models": models}
+            return falsk(metode, url, json, tidsfrist)
+
+        svar = OllamaModell(hent=hent).lag_tekst("p")
+        assert svar.tekst == "En tekst." and svar.modell_id is None and svar.maskinvare is None
+
+    @pytest.mark.parametrize("digest", ["sha256:abc", "sha256:", "abcdef"])
+    def test_kort_digest_gir_ingen_modell_id(self, digest):
+        """Gjennomgangen (BH9, ECH): lengden sjekkes etter «sha256:»."""
+        falsk = FalskOllama()
+
+        def hent(metode, url, json, tidsfrist):
+            if url.endswith("/api/tags"):
+                return 200, {"models": [{"name": MODELL, "digest": digest}]}
+            return falsk(metode, url, json, tidsfrist)
+
+        assert OllamaModell(hent=hent).lag_tekst("p").modell_id is None
 
     def test_svar_uten_tekst(self):
         with pytest.raises(ModellFeilet):
