@@ -460,9 +460,9 @@ class TestSnittetIGrafen:
         html = _side(klient, "/aksje/BRFE")
         assert "40-dagers snitt (sjekk 1)" in html
         # Story 8.0d, PR 3 (svar 19): etiketten for skjermleseren.
-        assert "den tynne brune er 40-dagers snitt (sjekk 1)" in html
+        assert "den tynne er 40-dagers snitt (sjekk 1)" in html
         assert "50-dagers" not in html
-        # Hjelpen foelger samme parametre som tegnforklaringen.
+        # Hjelpen foelger samme parametre som navnet paa linja i grafen.
         assert "snittet av de siste 40 børsdagene" in html
         assert "de siste 50 børsdagene" not in html
 

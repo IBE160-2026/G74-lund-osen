@@ -1979,6 +1979,9 @@ class TestStory80dAksjesiden:
         assert '<h1 class="overskrift">Equinor</h1>' in eqnr
         assert "skilte seg ut" not in _synlig(eqnr)
         assert "linear-gradient(transparent 60%, var(--lys-oransje) 60%)" in _regel(_stil(kog), "h1.overskrift mark")
+        # Gjennomgangen (VG3): 3 av 3 er også over terskelen.
+        _lagret("DNB", 0.0, 1, 1, 1)
+        assert "<mark>skilte seg ut lørdag</mark>" in klient.get("/aksje/DNB").data.decode("utf-8")
 
     def test_merkene_over_h1_og_linja_under(self, klient):
         """Svar 18: ticker og bransje i merkene over h1, og «Oslo Børs ·
@@ -1991,6 +1994,19 @@ class TestStory80dAksjesiden:
         assert '<p class="meta">Oslo Børs · 31.10</p>' in html
         assert "data hentet" not in html
 
+    def test_demo_boers_paa_aksjesiden_i_demoen(self, klient, monkeypatch):
+        """Svar 18 og FR-411 (gjennomgangen, VG1)."""
+        from demo import lag_demobase
+        from lagring_sqlite import demo_sti
+
+        sti = demo_sti()
+        sti.parent.mkdir(parents=True, exist_ok=True)
+        lag_demobase(sti, skriv=lambda *a: None)
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        html = klient.get("/aksje/BRFE").data.decode("utf-8")
+        assert re.search(r'<p class="meta">Demo Børs · \d\d\.\d\d</p>', html)
+        assert "Oslo Børs ·" not in html
+
     def test_endringen_er_det_fjerde_kortet_med_ukedagene(self, klient):
         """Plan 8 og svar 21. Ville feilet uten endringskortet."""
         _lagret("EQNR", 2.0, 1, 0, 0)
@@ -1999,7 +2015,12 @@ class TestStory80dAksjesiden:
         assert kort == ["Sluttkurs", "Endring", "Signalstyrke", "Retning"]
         endring = html.split('<div class="noekkeltall endring">', 1)[1].split("</div>", 1)[0]
         assert f'<span class="verdi opp">+2,00{NB}%</span>' in endring
-        assert "fra torsdag til fredag" in endring or "fra fredag til lørdag" in endring
+        # Gjennomgangen (VG6): serien ender lørdag 31.10, og dagen før er
+        # fredag. En nedgang er rød.
+        assert "fra fredag til lørdag" in endring
+        _lagret("DNB", -2.0, 1, 0, 0)
+        ned = klient.get("/aksje/DNB").data.decode("utf-8")
+        assert f'<span class="verdi ned">-2,00{NB}%</span>' in ned
 
     def test_signalstyrken_har_brikkene(self, klient):
         _lagret("EQNR", 0.0, 1, -1, 0)
@@ -2023,6 +2044,16 @@ class TestStory80dAksjesiden:
             assert "gir 0" in innhold
             prikk = re.search(r'class="prikk [a-z]+" style="left: ([\d.]+)%;"', innhold)
             assert prikk and 0.0 <= float(prikk.group(1)) <= 100.0
+            # Gjennomgangen (VG5): feltet er like bredt som avstanden mellom
+            # grensene, og den lave grensen står til venstre.
+            felt = re.search(r'class="felt" style="left: ([\d.]+)%; width: ([\d.]+)%;"', innhold)
+            grenser = [float(x) for x in re.findall(r'class="grense" style="left: ([\d.]+)%;"', innhold)]
+            assert grenser[0] < grenser[1]
+            assert abs(float(felt.group(1)) + float(felt.group(2)) - grenser[1]) < 0.15
+        # Prikken har fargen til resultatet i samme kort.
+        for kort in re.findall(r'<section class="sjekkort.*?</section>', html, re.DOTALL):
+            klasse = re.search(r'class="resultat fortegn ([a-z]+)"', kort).group(1)
+            assert f'class="prikk {klasse}"' in kort
 
     def test_det_graa_feltet_har_fargen_fra_designreglene(self, klient):
         """Del 5 og mutant k: feltet #8A847A på sporet #F1EFEA (3,23:1)."""
@@ -2046,6 +2077,10 @@ class TestStory80dAksjesiden:
         assert '<text class="linjenavn snitt" text-anchor="end"' in html
         assert "var(--snitt)" in _regel(stil, ".linjenavn.snitt")
         assert "stipl" not in _synlig(html).lower()
+        # Gjennomgangen (VG4, BH5): etiketten sier hvilken linje som er hva,
+        # med tykkelsen og ikke fargen.
+        assert re.search(r'aria-label="Kursutvikling for Equinor: den tykke linja er utbyttejustert kurs, '
+                         r'og den tynne er \d+-dagers snitt \(sjekk 1\)"', html)
 
     def test_tilbakelenken_er_markedsoversikt_uten_pil(self, klient):
         """Del C og mutant d."""

@@ -323,3 +323,12 @@ class TestSkalaen:
         assert (s.lav_tekst, s.hoy_tekst) == ("0", "1,5 ×")
         assert bygg_skala("Interesse", None, None).prikk is None
         assert bygg_skala("Interesse", 1.0, None, Parametre(volumfaktor=2.0)).felt_til == 25.0
+
+
+    def test_ingen_prikk_for_en_maaling_som_ikke_er_et_tall(self):
+        """Gjennomgangen (ECH3, ECH4): NaN gir ingen prikk, og en volumfaktor
+        som ikke er positiv gir ingen skala."""
+        from aksjedetalj import bygg_skala
+
+        assert bygg_skala("Trend", float("nan"), None).prikk is None
+        assert bygg_skala("Interesse", 1.0, None, Parametre(volumfaktor=0.0)) is None

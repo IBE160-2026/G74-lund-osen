@@ -883,8 +883,12 @@ class TestReadmeForNybegynnere:
             assert sak in flettet, sak
         # Story 8.0d, PR 3 (svar 9 kl. 22:50): «Neste:» følger rekkefølgen
         # etter 8.0d (gruppen 14.10 kl. 22:19 og 22:25).
-        for sak in ("sortering ved klikk i kolonneraden", "hovedindeksen", "Min liste", "periodene i kursgrafen"):
+        saker = ("sortering ved klikk i kolonneraden", "hovedindeksen", "Min liste", "periodene i kursgrafen")
+        for sak in saker:
             assert sak in neste and sak not in flettet, sak
+        # Gjennomgangen (VG7): i den rekkefølgen, og det flettede står ikke i «Neste».
+        assert [neste.index(s) for s in saker] == sorted(neste.index(s) for s in saker)
+        assert "utseendet fra designforslaget" not in neste
 
     def test_lenken_til_staar_du_fast_sier_lenger_ned(self):
         """Kl. 23:46: «se «Står du fast?» lenger ned»."""

@@ -154,9 +154,11 @@ KONTRAST = [
     # Teksten i båndet, pillene, markeringen, «NOK» og brikken i kortet.
     ("brun", "baand-ut", 4.5), ("hvit", "brun", 4.5), ("hvit", "tekst", 4.5),
     ("blekk", "lys-oransje", 4.5), ("kolonne-tekst-2", "blekk", 4.5), ("hvit", "opp", 4.5),
-    # Story 8.0d, PR 3: brikken for -1, den hvite pillen ved 2 av 3 og
-    # resultatpillene i sjekkortene.
+    # Story 8.0d, PR 3: brikken for -1 og den hvite pillen ved 2 av 3.
+    # Resultatpillene i sjekkortene bruker parene for retningen over.
     ("hvit", "ned", 4.5), ("blekk", "hvit", 4.5), ("dempet-2", "hvit", 4.5),
+    # Gjennomgangen av PR 3 (VG8): det grå feltet mot sporet (del 5, 3,23:1).
+    ("felt", "spor", 3.0),
 ]
 
 

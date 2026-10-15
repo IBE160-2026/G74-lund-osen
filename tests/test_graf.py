@@ -167,3 +167,38 @@ class TestMaanedsmerkerEtterGjennomgangen:
     def test_merket_langt_fra_kanten_staar_til_hoeyre(self):
         ps = boersdagspunkter(date(2026, 9, 15), date(2026, 11, 10))
         assert not bygg_graf(ps).maanedsmerker[0].til_venstre
+
+
+class TestNavneneVedEnden:
+    """Story 8.0d, PR 3 (svar 19, gjennomgangen VG2, BH2 og ECH1): navnene
+    staar ved enden av linjene, den hoeyeste over og den laveste under,
+    innenfor tegneflaten og over maanedsnavnene."""
+
+    @staticmethod
+    def _punkter(kurser, snitt):
+        start = date(2026, 1, 5)
+        return tuple(Punkt(dato=start + timedelta(days=i), kurs=k, ma50=s)
+                     for i, (k, s) in enumerate(zip(kurser, snitt)))
+
+    def test_navnene_staar_ved_enden_og_kursen_over_naar_den_er_hoeyest(self):
+        graf = bygg_graf(self._punkter([100, 110, 120], [100, 100, 100]))
+        assert graf.kursnavn.x == graf.snittnavn.x == BREDDE - MARG_X
+        assert graf.kursnavn.y < graf.snittnavn.y
+
+    def test_snittet_over_naar_kursen_er_lavest(self):
+        graf = bygg_graf(self._punkter([120, 110, 100], [110, 110, 110]))
+        assert graf.snittnavn.y < graf.kursnavn.y
+
+    def test_navnene_holder_seg_innenfor_og_over_maanedsnavnene(self):
+        """Kursen ender helt nederst: begge navnene staar over bunnen der
+        maanedsnavnene staar, og minst NAVNEAVSTAND fra hverandre."""
+        from graf import NAVNEAVSTAND
+
+        graf = bygg_graf(self._punkter([120, 119, 50], [120, 119.5, 119]))
+        for navn in (graf.kursnavn, graf.snittnavn):
+            assert MARG_Y <= navn.y <= HOYDE - NAVNEAVSTAND
+        assert abs(graf.kursnavn.y - graf.snittnavn.y) >= NAVNEAVSTAND
+
+    def test_uten_snitt_bare_kursnavnet(self):
+        graf = bygg_graf(self._punkter([100, 110], [None, None]))
+        assert graf.kursnavn is not None and graf.snittnavn is None
