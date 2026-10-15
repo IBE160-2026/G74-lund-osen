@@ -391,6 +391,15 @@ class TestOllama:
         miljoe = [l.strip() for l in _tjenester()["hent"]["environment"][1:]]
         assert miljoe == ["OSE_KI_OLLAMA_URL: http://ollama:11434"]
 
+    def test_readme_lover_0_kall_bare_naar_basen_har_kursene(self):
+        """Instruksjonen kl. 23:58: README-en sier det samme som utskriften
+        fra hentingen, 0 kall bare naar basen har dagens kurs for alle."""
+        tekst = README.read_text(encoding="utf-8")
+        modell = tekst.split("<summary>Den lokale modellen (KI-teksten)</summary>", 1)[1].split("</details>", 1)[0]
+        assert "uten nye kall til EODHD" not in modell
+        assert "Har basen dagens kurs for alle aksjene, gir det 0 kall til EODHD." in modell
+        assert "Mangler noen aksjer dagens kurs, gjør samme kommando et nytt forsøk for dem, og det bruker kall." in modell
+
     def test_ingen_noekkel_i_compose(self):
         """Gjennomgangen (BH7): ingen variabel i compose utenom adressen."""
         tekst = "\n".join(l for l in _linjer(COMPOSE) if not l.lstrip().startswith("#")).upper()
