@@ -145,12 +145,17 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             ((PRD, "| Sluttkurs | `close` for siste børsdag |"),
              (INDEX_MAL, "Sluttkursen er den ujusterte kursen")),
         ),
+        # Svar 32 i 8.0d (rettet kl. 13:05): én tekst for oversikten og
+        # aksjesiden, og datoene står bare ved endringen på aksjesiden.
         "endring": Hjelpetekst(
             "Endring:",
-            "endringen i prosent fra børsdagen før, regnet på utbyttejustert "
-            "kurs.",
+            "endringen i prosent fra forrige dag med kurs, regnet på "
+            "utbyttejustert kurs. Mangler kilden kurser for noen børsdager, "
+            "står datoene ved endringen på aksjesiden.",
             ((PRD, "| Endring | Endring i prosent, regnet på "),
-             (MARKEDSOVERSIKT, "def endring_i_prosent(")),
+             (MARKEDSOVERSIKT, "def endring_i_prosent("),
+             (AKSJEDETALJ, "def boersdag_mellom("),
+             (AKSJE_MAL, "{% if detalj.endring_med_datoer %}")),
         ),
         "utbyttejustert": Hjelpetekst(
             "Utbyttejustert kurs:",

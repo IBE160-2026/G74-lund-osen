@@ -145,6 +145,17 @@ class TestTekstenSierDetKodenGjoer:
         assert bevegelse(kurser).verdi == verdi
         assert setning in hjelpetekster()["bevegelse"].tekst
 
+    def test_endringen_sier_hvor_datoene_staar(self):
+        """Svar 32 i 8.0d (rettet kl. 13:05): én tekst for oversikten og
+        aksjesiden, som sier det samme som endringskortet etter svar 29.
+        Ville feilet med «fra børsdagen før»."""
+        tekst = hjelpetekster()["endring"]
+        assert (tekst.tittel, tekst.tekst) == (
+            "Endring:",
+            "endringen i prosent fra forrige dag med kurs, regnet på utbyttejustert kurs. "
+            "Mangler kilden kurser for noen børsdager, står datoene ved endringen på aksjesiden.",
+        )
+
 
 class TestRetningen:
     @pytest.mark.parametrize(
