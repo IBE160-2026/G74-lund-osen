@@ -292,6 +292,33 @@ class TestVurderingenIDetaljen:
         assert not hasattr(aksjedetalj, "vurder")
 
 
+class TestBoersdagMellom:
+    """Svar 29 (15.10, BH6 og ECH2): datoene står i endringskortet når det
+    ligger en børsdag mellom de to kursradene."""
+
+    def test_boersdager_ikke_kalenderdager(self):
+        from aksjedetalj import boersdag_mellom
+
+        assert boersdag_mellom(date(2026, 10, 2), date(2026, 10, 9))
+        assert not boersdag_mellom(date(2026, 10, 2), date(2026, 10, 5)), "fredag til mandag"
+        assert not boersdag_mellom(date(2026, 10, 8), date(2026, 10, 9))
+        # Skjærtorsdag, langfredag og 2. påskedag er stengt, og helgen ligger mellom.
+        assert not boersdag_mellom(date(2026, 4, 1), date(2026, 4, 7))
+
+    def test_datoene_naar_kalenderen_ikke_dekker_dagene(self):
+        """01.01.2027 er utenfor kalenderen: da står datoene."""
+        from aksjedetalj import boersdag_mellom
+
+        assert boersdag_mellom(date(2026, 12, 30), date(2027, 1, 4))
+
+    def test_detaljen_har_svaret(self):
+        rader = serie([100.0] * 6 + [101.0], start=date(2026, 9, 21))
+        assert detalj(rader).endring_med_datoer is False
+        hull = rader[:-1] + [Kursrad(dato=date(2026, 10, 5), slutt=101.0, justert_slutt=101.0, volum=1000)]
+        assert detalj(hull).endring_med_datoer is True
+        assert detalj(rader[:1]).endring_med_datoer is False
+
+
 class TestSkalaen:
     """Story 8.0d, PR 3: det grå feltet i sjekkortene (utdraget §8, svar 20)."""
 

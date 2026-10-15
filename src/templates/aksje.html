@@ -121,12 +121,13 @@
       <span class="verdi">{{ detalj.sluttkurs|tall('kurs') }}</span>
       <span class="forklaring">NOK</span>
     </div>
-    {#- Plan 8 og svar 21: endringen i prosent, med ukedagene. #}
+    {#- Plan 8 og svar 21: endringen i prosent, med ukedagene. Svar 29: med
+        datoene også når det ligger en børsdag mellom de to kursradene. #}
     {% set vist_endring = detalj.endring|round(2) if detalj.endring is not none else none %}
     <div class="noekkeltall endring">
       <span class="etikett">Endring {{ hjelpeknapp("hjelp-endring", "Hjelp: endring") }}</span>
       <span class="verdi {% if vist_endring is not none %}{{ 'opp' if vist_endring > 0 else 'ned' if vist_endring < 0 else '' }}{% endif %}">{% if detalj.endring is not none %}{{ detalj.endring|tall('endring') }}{% else %}–{% endif %}</span>
-      {% if detalj.forrige_dato %}<span class="forklaring">fra {{ detalj.forrige_dato|ukedag }} til {{ detalj.dato|ukedag }}</span>{% endif %}
+      {% if detalj.forrige_dato %}<span class="forklaring">{% if detalj.endring_med_datoer %}fra {{ detalj.forrige_dato|ukedag }} {{ detalj.forrige_dato|dato }} til {{ detalj.dato|ukedag }} {{ detalj.dato|dato }}{% else %}fra {{ detalj.forrige_dato|ukedag }} til {{ detalj.dato|ukedag }}{% endif %}</span>{% endif %}
     </div>
     <div class="noekkeltall">
       <span class="etikett">Signalstyrke {{ hjelpeknapp("hjelp-styrke", "Hjelp: signalstyrken") }}</span>

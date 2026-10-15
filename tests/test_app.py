@@ -1980,6 +1980,20 @@ class TestStory80eTekst:
         assert html.index("Slik leser du tabellen") < html.index("<table")
 
 
+def _med_siste(foer: date, siste: date) -> list[Kursrad]:
+    """60 kursrader som ender på foer, og så én rad på siste (svar 29)."""
+    rader = [Kursrad(dato=foer - timedelta(days=59 - i), slutt=100.0, justert_slutt=100.0, volum=1000)
+             for i in range(60)]
+    return rader + [Kursrad(dato=siste, slutt=101.0, justert_slutt=101.0, volum=1000)]
+
+
+def _endringsforklaring(klient, symbol: str) -> str:
+    svar = klient.get(f"/aksje/{symbol}")
+    assert svar.status_code == 200
+    endring = svar.data.decode("utf-8").split('<div class="noekkeltall endring">', 1)[1].split("</div>", 1)[0]
+    return re.search(r'<span class="forklaring">(.*?)</span>', endring).group(1)
+
+
 class TestStory80dAksjesiden:
     """Story 8.0d, PR 3: aksjesiden etter del C og svarene 14.10 kl. 22:50."""
 
@@ -2036,6 +2050,27 @@ class TestStory80dAksjesiden:
         _lagret("DNB", -2.0, 1, 0, 0)
         ned = klient.get("/aksje/DNB").data.decode("utf-8")
         assert f'<span class="verdi ned">-2,00{NB}%</span>' in ned
+
+    def test_endringen_med_datoene_naar_en_boersdag_ligger_mellom(self, klient, monkeypatch):
+        """Svar 29 (15.10, BH6 og ECH2): datoene ved ukedagene når det ligger
+        en børsdag mellom de to kursradene. Fredag til mandag og en uke med
+        bare stengte dager har ingen. Ville feilet med alltid ukedager,
+        alltid datoer, eller kalenderdager i stedet for børsdager."""
+        monter(monkeypatch, snapshot({
+            "EQNR": _med_siste(date(2026, 10, 2), date(2026, 10, 9)),
+            "DNB": _med_siste(date(2026, 10, 2), date(2026, 10, 5)),
+            "KOG": _med_siste(date(2026, 4, 1), date(2026, 4, 7)),
+        }))
+        assert _endringsforklaring(klient, "EQNR") == "fra fredag 02.10 til fredag 09.10"
+        assert _endringsforklaring(klient, "DNB") == "fra fredag til mandag"
+        assert _endringsforklaring(klient, "KOG") == "fra onsdag til tirsdag"
+
+    def test_endringen_med_datoene_naar_kalenderen_ikke_dekker_dagene(self, klient, monkeypatch):
+        """Svar 29: kan boersdag.py ikke avgjøre det (UtenforKalenderen),
+        står datoene, og siden feiler ikke. 01.01.2027 er ikke i kalenderen."""
+        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2027, 1, 5, 12, 0, tzinfo=timezone.utc))
+        monter(monkeypatch, snapshot({"EQNR": _med_siste(date(2026, 12, 30), date(2027, 1, 4))}))
+        assert _endringsforklaring(klient, "EQNR") == "fra onsdag 30.12.2026 til mandag 04.01"
 
     def test_signalstyrken_har_brikkene(self, klient):
         _lagret("EQNR", 0.0, 1, -1, 0)

@@ -19,6 +19,7 @@ import math
 from dataclasses import dataclass
 from datetime import date, timedelta
 
+from boersdag import UtenforKalenderen, er_boersdag
 from kursdata import Aksje, Kursrad
 from markedsoversikt import (
     IKKE_VURDERT,
@@ -201,6 +202,9 @@ class Detalj:
     # terskelen for overskriften (beslutning 7).
     endring: float | None = None
     forrige_dato: date | None = None
+    # Svar 29 (15.10, BH6 og ECH2): datoene står ved ukedagene når det
+    # ligger en børsdag mellom de to kursradene.
+    endring_med_datoer: bool = False
     terskel: int = STANDARD.terskel
 
     @property
@@ -303,6 +307,19 @@ def bygg_punkter(
     )
 
 
+def boersdag_mellom(fra: date, til: date) -> bool:
+    """Om det ligger en børsdag mellom fra og til, uten dem selv (svar 29).
+
+    Fredag til mandag har ingen, og heller ikke en uke med bare stengte
+    dager. Kan kalenderen ikke avgjøre det (UtenforKalenderen), gis True,
+    så datoene står og siden ikke feiler.
+    """
+    try:
+        return any(er_boersdag(fra + timedelta(days=i)) for i in range(1, (til - fra).days))
+    except UtenforKalenderen:
+        return True
+
+
 def bygg_detalj(
     post: Oversiktspost, rader: list[Kursrad], idag: date, p: Parametre = STANDARD
 ) -> Detalj | None:
@@ -340,6 +357,7 @@ def bygg_detalj(
         noedvendige_dager=nodvendige_dager(p),
         endring=endring_i_prosent(rader),
         forrige_dato=rader[-2].dato if len(rader) >= 2 else None,
+        endring_med_datoer=len(rader) >= 2 and boersdag_mellom(rader[-2].dato, post.nyeste.dato),
         terskel=p.terskel,
     )
 
