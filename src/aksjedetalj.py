@@ -15,6 +15,7 @@ styrken ble 2 og ikke 1, uten aa kjenne formelen paa forhaand. Derfor baerer
 hver sjekk maalingen sin hit ut, ikke bare fortegnet den endte paa.
 """
 
+import math
 from dataclasses import dataclass
 from datetime import date, timedelta
 
@@ -70,16 +71,26 @@ def _andel(verdi: float, lav: float, hoy: float) -> float:
     return max(0.0, min(100.0, (verdi - lav) / (hoy - lav) * 100))
 
 
+def _prikk(maaling: float | None, lav: float, hoy: float) -> float | None:
+    """Prikken, eller None naar maalingen mangler eller ikke er et tall
+    (gjennomgangen, ECH4): da tegnes ingen prikk, og teksten sier resten."""
+    if maaling is None or not math.isfinite(maaling):
+        return None
+    return _andel(maaling, lav, hoy)
+
+
 def bygg_skala(navn: str, maaling: float | None, grense: float | None, p: Parametre = STANDARD) -> Skala | None:
     """Skalaen for en sjekk, regnet fra målingen og grensen i den lagrede
     vurderingen og Parametre. Signalet regnes ikke på nytt (FR-101). None
     når grensen ikke er et positivt tall, så skalaen ikke kan tegnes."""
     if navn == "Interesse":
+        if p.volumfaktor <= 0:
+            return None
         hoy = p.volumfaktor * SKALA_INTERESSE_GANGER
         return Skala(
             felt_fra=0.0,
             felt_til=_andel(p.volumfaktor, 0.0, hoy),
-            prikk=None if maaling is None else _andel(maaling, 0.0, hoy),
+            prikk=_prikk(maaling, 0.0, hoy),
             lav_tekst="0",
             hoy_tekst=f"{tall(p.volumfaktor, 'faktor')} ×",
         )
@@ -91,7 +102,7 @@ def bygg_skala(navn: str, maaling: float | None, grense: float | None, p: Parame
     return Skala(
         felt_fra=_andel(-grense, lav, hoy),
         felt_til=_andel(grense, lav, hoy),
-        prikk=None if maaling is None else _andel(maaling, lav, hoy),
+        prikk=_prikk(maaling, lav, hoy),
         lav_tekst="-" + tekst,
         hoy_tekst="+" + tekst,
     )

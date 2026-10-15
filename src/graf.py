@@ -180,9 +180,12 @@ def _navnene(kurs: str, snitt: str, hoyde: int) -> tuple[Navn | None, Navn | Non
     under = max(nederst + 16, over + NAVNEAVSTAND)
     if over < MARG_Y:
         over, under = MARG_Y, max(under, MARG_Y + NAVNEAVSTAND)
-    if under > hoyde - 2:
-        under = hoyde - 2
-        over = min(over, under - NAVNEAVSTAND)
+    # Gjennomgangen (BH2, ECH1): over maanedsnavnene nederst, og innenfor
+    # tegneflaten oeverst etter at det nederste er flyttet opp.
+    bunn = hoyde - NAVNEAVSTAND
+    if under > bunn:
+        under = bunn
+        over = max(MARG_Y, min(over, under - NAVNEAVSTAND))
     return (Navn(x, over), Navn(x, under)) if kurs_over else (Navn(x, under), Navn(x, over))
 
 

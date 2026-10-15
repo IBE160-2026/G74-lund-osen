@@ -5,7 +5,7 @@
 {% block tittel %}{{ detalj.aksje.navn }} — OSE Signal{% endblock %}
 {#- Story 8.0d, PR 3: tidspunktet står bare i stripa, med «?» ved siden av
     (ECH8 i PR 2). #}
-{% block oppdatert_hjelp %} {{ hjelpeknapp("hjelp-hentet", "Hjelp: oppdatert") }}{% endblock %}
+{% block oppdatert_hjelp %}{% if hentet %} {{ hjelpeknapp("hjelp-hentet", "Hjelp: oppdatert") }}{% endif %}{% endblock %}
 {% block stil %}
     /* Story 8.0: like tydelig som lenken fra oversikten. Story 8.0d, PR 3:
        teksten er «Markedsoversikt», uten pil (del C). */
@@ -205,7 +205,7 @@
       {#- Svar 19: navnene står ved enden av linjene, og etiketten sier
           hvilken linje som er hva for skjermleseren. #}
       <svg class="graf" viewBox="0 0 {{ graf.bredde }} {{ graf.hoyde }}" role="img"
-           aria-label="Kursutvikling for {{ detalj.aksje.navn }}: den tykke blå linja er utbyttejustert kurs{% if graf.har_ma50 %}, og den tynne brune er {{ parametre.ma_vindu }}-dagers snitt (sjekk 1){% endif %}">
+           aria-label="Kursutvikling for {{ detalj.aksje.navn }}: den tykke linja er utbyttejustert kurs{% if graf.har_ma50 %}, og den tynne er {{ parametre.ma_vindu }}-dagers snitt (sjekk 1){% endif %}">
         {% for linje in graf.rutenett %}
           <line class="rute" x1="0" y1="{{ "%.1f"|format(linje.y) }}"
                 x2="{{ graf.bredde }}" y2="{{ "%.1f"|format(linje.y) }}"></line>
@@ -253,7 +253,7 @@
   {#- grafen bare med grafen og snittet, ga og maalt_mot bare med sjekkene
       (gjennomgangen av 8.0b): ellers forklarer hjelpen noe siden ikke viser.
       Story 8.0d, PR 3: «data hentet» står i vinduet ved «Oppdatert». #}
-  {{ hjelpevindu("hjelp-hentet", "Oppdatert", [("", ["data_hentet_aksje"])]) }}
+  {% if hentet %}{{ hjelpevindu("hjelp-hentet", "Oppdatert", [("", ["data_hentet_aksje"])]) }}{% endif %}
   {{ hjelpevindu("hjelp-kurs", "Sluttkurs", [("", ["sluttkurs", "utbyttejustert"])]) }}
   {{ hjelpevindu("hjelp-endring", "Endring", [("", ["endring", "utbyttejustert"])]) }}
   {% if vis_grafhjelp %}

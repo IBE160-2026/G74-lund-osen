@@ -309,7 +309,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         ),
         "grafen": Hjelpetekst(
             "Kursgrafen:",
-            f"den tykke blå linja er utbyttejustert kurs, og den tynne brune er "
+            f"den tykke linja er utbyttejustert kurs, og den tynne er "
             f"snittet av de siste {ma} børsdagene, som trendsjekken måler mot. "
             f"Navnet står ved enden av hver linje. Sjekk 2 og 3 står i kortene over.",
             ((AKSJE_MAL, "Sjekk 2 og 3 tegnes ikke"),
