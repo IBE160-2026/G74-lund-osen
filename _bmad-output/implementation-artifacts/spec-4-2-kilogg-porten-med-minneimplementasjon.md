@@ -2,7 +2,7 @@
 title: 'Story 4.2: KILogg-porten med minneimplementasjon'
 type: 'feature'
 created: '2026-10-15'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'de94bc9'

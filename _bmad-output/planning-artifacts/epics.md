@@ -2125,6 +2125,8 @@ via meldings-id, avgjøres da. FR-604 står uendret til 28.09.
 **Én økt:** ja. **Ingen avhengighet til Epic 1** — porten vet ikke om
 lagringsformen.
 
+*Lagt til 2026-10-15:* flettet i `a1d22f1`, PR #45.
+
 ### Story 4.3: SQLite-adapter for `KILogg`
 
 Som **gruppe**, vil jeg at KI-loggen overlever en omstart, så eksempelsettet fra
