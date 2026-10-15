@@ -11,7 +11,7 @@ from pathlib import Path
 import pytest
 
 from tallformat import HARDT_MELLOMROM as NB
-from tallformat import desimaler_mot_grense, tall
+from tallformat import MEST_DESIMALER, desimaler_mot_grense, desimaler_uten_null, tall
 
 
 class TestTall:
@@ -112,6 +112,22 @@ class TestDesimalerMotGrense:
 
     def test_minst_kan_hoeynes(self):
         assert desimaler_mot_grense(-3.4, 1.2, minst=2) == 2
+
+
+class TestDesimalerUtenNull:
+    """Svar 30 (15.10, ECH3): en grense over 0 vises aldri som 0,0."""
+
+    def test_flere_desimaler_naar_tallet_ellers_er_null(self):
+        assert desimaler_uten_null(1.2) == 1
+        assert desimaler_uten_null(0.03) == 2
+        assert desimaler_uten_null(0.04) == 2, "0,04 rundes ikke opp til 0,1"
+        assert desimaler_uten_null(-0.0004) == 4
+        assert desimaler_uten_null(0.03, minst=3) == 3
+
+    def test_null_som_foer_og_hoeyst_mest_desimaler(self):
+        assert desimaler_uten_null(0.0) == 1
+        assert desimaler_uten_null(float("nan")) == 1
+        assert desimaler_uten_null(1e-9) == MEST_DESIMALER
 
 
 def test_tallformat_er_en_loevnode():

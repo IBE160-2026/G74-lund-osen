@@ -341,6 +341,26 @@ class TestSkalaen:
         assert bygg_skala("Bevegelse", 0.01, 0.0) is None
         assert bygg_skala("Bevegelse", 0.01, None) is None
 
+    def test_grensene_for_bevegelse_er_tallet_i_teksten(self):
+        """Svar 30 (15.10, ECH3): grensene over skalaen viser samme tall som
+        standardavviket i teksten i kortet, og en grense over 0 vises aldri
+        som 0,0. Ville feilet med én desimal over skalaen, eller med 0,03 %
+        som 0,0 over skalaen eller i teksten."""
+        from aksjedetalj import bygg_skala
+        from signalberegning import _bevegelsesforklaring
+
+        NB = "\u00a0"
+        for dagens, avvik, vist in [(0.01, 0.0003, "0,03"), (0.0123, 0.01234, "1,234"),
+                                    (0.05, 0.012, "1,2"), (0.0, 0.0000001, "0,00001")]:
+            s = bygg_skala("Bevegelse", dagens, avvik)
+            assert (s.lav_tekst, s.hoy_tekst) == (f"-{vist}{NB}%", f"+{vist}{NB}%"), (dagens, avvik)
+            assert f"mot {vist}{NB}% standardavvik" in _bevegelsesforklaring(dagens, avvik), (dagens, avvik)
+        # Uten måling: nok desimaler til at grensen ikke er 0,0.
+        assert bygg_skala("Bevegelse", None, 0.0003).hoy_tekst == f"+0,03{NB}%"
+        # En grense som er 0, vises som før: ingen skala, og 0,0 i teksten.
+        assert bygg_skala("Bevegelse", 0.01, 0.0) is None
+        assert _bevegelsesforklaring(0.01, 0.0) == f"+1,0{NB}% mot 0,0{NB}% standardavvik"
+
     def test_interesse_gaar_fra_0_til_fire_ganger_volumfaktoren(self):
         """Utdraget §8: feltet fra 0 til 1,5 ×, skalaen fra 0 til 6 ×."""
         from aksjedetalj import bygg_skala

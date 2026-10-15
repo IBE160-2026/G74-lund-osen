@@ -31,8 +31,8 @@ from markedsoversikt import (
     les_tilstand,
 )
 from oversiktsdata import Oversiktspost
-from signalberegning import NEGATIV, POSITIV, Parametre, STANDARD, nodvendige_dager, sjekker_fra
-from tallformat import fortegn, tall
+from signalberegning import NEGATIV, POSITIV, Parametre, STANDARD, bevegelsesdesimaler, nodvendige_dager, sjekker_fra
+from tallformat import desimaler_uten_null, fortegn, tall
 from tilstand import Art, Tilstand
 from vurderingsdata import Grunn, Vurdering
 
@@ -99,7 +99,15 @@ def bygg_skala(navn: str, maaling: float | None, grense: float | None, p: Parame
     if grense is None or grense <= 0:
         return None
     lav, hoy = -grense * SKALA_GANGER, grense * SKALA_GANGER
-    tekst = tall(grense * 100, "maaling", 1, fortegn=False)
+    # Svar 30 (15.10, ECH3): grensene for bevegelse viser samme tall som
+    # standardavviket i teksten i kortet, og aldri 0,0.
+    antall = 1
+    if navn == "Bevegelse":
+        if maaling is not None:
+            antall = bevegelsesdesimaler(maaling, grense)
+        else:
+            antall = desimaler_uten_null(grense * 100)
+    tekst = tall(grense * 100, "maaling", antall, fortegn=False)
     return Skala(
         felt_fra=_andel(-grense, lav, hoy),
         felt_til=_andel(grense, lav, hoy),

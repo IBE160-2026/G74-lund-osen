@@ -25,7 +25,7 @@ from datetime import date
 from statistics import median, stdev
 
 from kursdata import Kursrad
-from tallformat import desimaler_mot_grense, tall
+from tallformat import desimaler_mot_grense, desimaler_uten_null, tall
 from vurderingsdata import Grunn, Vurdering
 
 MA_VINDU = 50
@@ -136,11 +136,19 @@ def _trendforklaring(avvik: float, p: Parametre) -> str:
     return f"{tall(avvik * 100, 'maaling', antall)} mot MA{p.ma_vindu}"
 
 
+def bevegelsesdesimaler(dagens: float, avvik: float) -> int:
+    """Desimalene for dagens endring og standardavviket i prosent: nok til at
+    de skilles (story 8.0), og nok til at et standardavvik over 0 ikke vises
+    som 0,0 (svaret kl. 12:15, 15.10, ECH3). Teksten i sjekkortet og grensene
+    over skalaen bruker begge denne, saa de viser samme tall."""
+    return max(desimaler_mot_grense(dagens * 100, avvik * 100), desimaler_uten_null(avvik * 100))
+
+
 def _bevegelsesforklaring(dagens: float, avvik: float) -> str:
     """Dagens endring mot standardavviket, med like mange desimaler paa begge,
     nok til at de skilles. Ville feilet hvis «-1,2 % mot 1,2 %
     standardavvik» sto ved en sjekk som ga -1 (story 8.0)."""
-    antall = desimaler_mot_grense(dagens * 100, avvik * 100)
+    antall = bevegelsesdesimaler(dagens, avvik)
     return (
         f"{tall(dagens * 100, 'maaling', antall)} mot "
         f"{tall(avvik * 100, 'maaling', antall, fortegn=False)} standardavvik"

@@ -116,6 +116,21 @@ def fortegn(verdi: int) -> str:
     return f"{verdi:+d}" if verdi else "0"
 
 
+def desimaler_uten_null(verdi: float, minst: int = 1) -> int:
+    """Faerrest desimaler, minst minst, som viser et tall over 0 som noe
+    annet enn 0 - svaret kl. 12:15 (15.10, ECH3): en grense over 0 vises
+    aldri som «0,0».
+
+    Hoeyst MEST_DESIMALER. Er tallet 0 ogsaa da, gis MEST_DESIMALER, saa det
+    ikke staar som «0,0». 0, og et tall som ikke er endelig, faar minst.
+    """
+    a = abs(verdi)
+    for antall in range(minst, MEST_DESIMALER + 1):
+        if float(f"{a:.{antall}f}") != 0:
+            return antall
+    return MEST_DESIMALER if a > 0 else minst
+
+
 def desimaler_mot_grense(maaling: float, grense: float, minst: int = 1) -> int:
     """Faerrest desimaler, minst minst, som skiller maalingen fra grensen.
 

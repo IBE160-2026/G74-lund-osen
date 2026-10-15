@@ -1630,7 +1630,7 @@ class TestStory80c:
 
 
 def _lagret(symbol: str, endring: float, trend: int, bevegelse: int, interesse: int,
-            vurdert: bool = True) -> None:
+            vurdert: bool = True, standardavvik: float = 0.01) -> None:
     """En flat serie der siste dag endrer seg med endring prosent, og en
     lagret vurdering med de tre fortegnene. Kursene ville gitt noe annet,
     saa siden viser bare det vurderingen sier. vurdert=False gir ingen rad i
@@ -1645,7 +1645,7 @@ def _lagret(symbol: str, endring: float, trend: int, bevegelse: int, interesse: 
     skriv_vurdering(symbol, rader[-1].dato, Vurdering(
         styrke=len(utslag), retning=retning, trend=trend, bevegelse=bevegelse,
         interesse=interesse, slutt=rader[-1].slutt, justert_slutt=rader[-1].justert_slutt,
-        trend_avvik=0.0, dagens_endring=endring / 100, standardavvik=0.01, volumforhold=1.0,
+        trend_avvik=0.0, dagens_endring=endring / 100, standardavvik=standardavvik, volumforhold=1.0,
     ))
 
 
@@ -2071,6 +2071,16 @@ class TestStory80dAksjesiden:
         monkeypatch.setattr(app_modul, "naa", lambda: datetime(2027, 1, 5, 12, 0, tzinfo=timezone.utc))
         monter(monkeypatch, snapshot({"EQNR": _med_siste(date(2026, 12, 30), date(2027, 1, 4))}))
         assert _endringsforklaring(klient, "EQNR") == "fra onsdag 30.12.2026 til mandag 04.01"
+
+    def test_grensene_for_bevegelse_er_tallet_i_teksten(self, klient):
+        """Svar 30 (15.10, ECH3): et standardavvik på 0,03 % står som 0,03
+        både over skalaen og i teksten i kortet, ikke som 0,0."""
+        _lagret("EQNR", 1.0, 0, 1, 0, standardavvik=0.0003)
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        kort = html.split('aria-label="Sjekk 2: Bevegelse">', 1)[1].split("</section>", 1)[0]
+        assert re.findall(r'<span class="grense"[^>]*>([^<]*)</span>', kort) == [f"-0,03{NB}%", f"+0,03{NB}%"]
+        assert f"mot 0,03{NB}% standardavvik" in kort
+        assert "0,0" + NB not in kort
 
     def test_signalstyrken_har_brikkene(self, klient):
         _lagret("EQNR", 0.0, 1, -1, 0)
