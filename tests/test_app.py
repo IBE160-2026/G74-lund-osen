@@ -2081,6 +2081,13 @@ class TestStory80dAksjesiden:
         assert re.findall(r'<span class="grense"[^>]*>([^<]*)</span>', kort) == [f"-0,03{NB}%", f"+0,03{NB}%"]
         assert f"mot 0,03{NB}% standardavvik" in kort
         assert "0,0" + NB not in kort
+        # Gjennomgangen av svarene 15.10 (VG1): gjennom ruten med en måling
+        # som må skilles fra grensen med tre desimaler.
+        _lagret("DNB", 1.23, 0, 1, 0, standardavvik=0.01234)
+        html = klient.get("/aksje/DNB").data.decode("utf-8")
+        kort = html.split('aria-label="Sjekk 2: Bevegelse">', 1)[1].split("</section>", 1)[0]
+        assert re.findall(r'<span class="grense"[^>]*>([^<]*)</span>', kort) == [f"-1,234{NB}%", f"+1,234{NB}%"]
+        assert f"mot 1,234{NB}% standardavvik" in kort
 
     def test_signalstyrken_har_brikkene(self, klient):
         _lagret("EQNR", 0.0, 1, -1, 0)

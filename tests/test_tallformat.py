@@ -128,6 +128,8 @@ class TestDesimalerUtenNull:
         assert desimaler_uten_null(0.0) == 1
         assert desimaler_uten_null(float("nan")) == 1
         assert desimaler_uten_null(1e-9) == MEST_DESIMALER
+        # Gjennomgangen av svarene 15.10 (BH2): minst over taket gjelder.
+        assert desimaler_uten_null(1e-9, minst=MEST_DESIMALER + 1) == MEST_DESIMALER + 1
 
 
 def test_tallformat_er_en_loevnode():
