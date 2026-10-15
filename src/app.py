@@ -30,17 +30,20 @@ from collections.abc import Callable
 from datetime import date, datetime, timezone
 from pathlib import Path
 
-from flask import Flask, abort, g, render_template, request
+from flask import Flask, abort, g, redirect, render_template, request
 
 import lagring_sqlite
 from aksjedetalj import bygg_detalj, normaliser_symbol
 from boersdag import norsk_dato
 from graf import bygg_graf
+from ki_visning import AV, INGEN_RAD, KAPSEL, PAA, KIVisning, bygg_ki_visning, ki_paa
+from kilogg import Emne, UgyldigKIRad
 from kursdata import Kursleser
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER
 from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster
 from lagring_sqlite import (
     DEMOMERKE,
+    SqliteKILogg,
     SqliteKurslager,
     SqliteOversiktsleser,
     aapne_base,
@@ -396,7 +399,8 @@ def aksjedetalj(symbol: str):
 
     Meldinger og kommende hendelser er ikke med: Euronext ga ikke
     tillatelse innen fristen, saa plan B gjelder fra 28.09 (Epic 10 i
-    epics.md). KI-forklaringen av signalet kommer med Epic 10.
+    epics.md). KI-forklaringen av signalet staar under regelforklaringen
+    (story 10.3).
     """
     if g.get("basefeil"):
         return _basen_kan_ikke_aapnes()
@@ -417,12 +421,46 @@ def aksjedetalj(symbol: str):
     if detalj is None:
         abort(404)
 
+    # Story 10.3: KI-teksten under regelforklaringen, bare naar det er en
+    # vurdering aa forklare og bryteren er paa (FR-601, FR-602).
+    ki_er_paa = ki_paa(request.cookies.get(KAPSEL))
+    ki = _ki_visning(post, detalj) if ki_er_paa and detalj.sjekker else None
+
     return render_template(
         "aksje.html",
         detalj=detalj,
         graf=bygg_graf(detalj.punkter),
         hentet=post.hentet,
+        ki=ki,
+        ki_er_paa=ki_er_paa,
     )
+
+
+def _ki_visning(post, detalj) -> KIVisning:
+    """Raden i KILogg for aksjen og dagen, mot vurderingen som vises.
+
+    Webserveren leser bare (AD-10). Kan loggen ikke leses, for eksempel i en
+    base fra foer 0005, vises dagen uten KI-tekst (NFR-04).
+    """
+    try:
+        logg = SqliteKILogg(g.tilkobling, lambda: datetime.now(timezone.utc))
+        rad = logg.les(Emne.aksje(post.aksje.symbol, detalj.dato))
+    except (RuntimeError, sqlite3.Error, UgyldigKIRad, ValueError):
+        return KIVisning(INGEN_RAD)
+    return bygg_ki_visning(rad, post.innhold)
+
+
+@app.post("/ki")
+def ki_bryter():
+    """Bryteren for KI-teksten (FR-601, svar 4): en informasjonskapsel, og
+    tilbake til siden den kom fra. Bare en sti paa samme side godtas."""
+    til = AV if request.form.get("til") == AV else PAA
+    tilbake = request.form.get("tilbake", "/")
+    if not tilbake.startswith("/") or tilbake.startswith("//") or "\\" in tilbake:
+        tilbake = "/"
+    svar = redirect(tilbake, code=303)
+    svar.set_cookie(KAPSEL, til, max_age=365 * 24 * 3600, samesite="Lax", httponly=True)
+    return svar
 
 
 if __name__ == "__main__":

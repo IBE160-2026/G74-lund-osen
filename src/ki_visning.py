@@ -1,0 +1,93 @@
+"""KI-teksten i aksjedetaljen - story 10.3, FR-601, FR-602, NFR-04, NFR-05,
+NFR-06.
+
+Ren logikk: av raden i KILogg og vurderingen som vises, regnes det som skal
+staa paa siden. Regelforklaringen (FR-706) staar alltid foerst, og
+KI-teksten under den, merket som laget av KI, med modellnavnet og
+tjenesten (FR-602). En dag uten KI-tekst sier det, og hvorfor, i stedet for
+aa vise et tomt felt.
+
+KI-teksten vises bare naar grunnlaget i raden stemmer med vurderingen som
+vises: samme styrke, samme retning og samme fortegn for de tre sjekkene
+(FR-602). Er vurderingen skrevet paa nytt samme dag, vises dagen uten
+KI-tekst (svar 3 kl. 15:53).
+
+En vakt paa vaar side (NFR-06): en tekst med «kjøp», «selg» eller «anbefal»
+vises ikke, selv om den besto kontrollen i FR-603. Den staar i loggen.
+
+Webserveren skriver aldri i loggen og kaller aldri en modell (AD-10), saa
+denne fila importerer verken ki_modell eller ki_lokal.
+
+Bryteren (FR-601, svar 4) er en informasjonskapsel. 8.10b flytter den til
+innstillingene og bruker samme kapsel.
+"""
+
+import re
+from collections.abc import Mapping
+from dataclasses import dataclass
+
+from kilogg import KIRad
+from vurderingsdata import Vurdering
+
+KAPSEL = "ose_ki"
+PAA = "paa"
+AV = "av"
+
+# NFR-06: ordene vakten stopper, uansett boeyning.
+_VAKT = re.compile(r"(?<![a-zæøå])(kjøp|selg|anbefal)", re.IGNORECASE)
+
+VIST = "vist"
+INGEN_RAD = "ingen_rad"
+MODELLEN_FEILET = "modellen_feilet"
+BESTO_IKKE = "besto_ikke"
+STEMMER_IKKE = "stemmer_ikke"
+STOPPET_AV_VAKTEN = "stoppet_av_vakten"
+
+GRUNNER = {
+    INGEN_RAD: "Ingen KI-tekst for denne dagen.",
+    MODELLEN_FEILET: "Ingen KI-tekst for denne dagen: modellen svarte ikke da hentingen gikk.",
+    BESTO_IKKE: "Ingen KI-tekst for denne dagen: teksten sa mer enn regelen, og ble ikke vist.",
+    STEMMER_IKKE: "Ingen KI-tekst for denne dagen: vurderingen er skrevet på nytt etter at teksten ble laget.",
+    STOPPET_AV_VAKTEN: "Ingen KI-tekst for denne dagen: teksten ble stoppet, fordi den kunne leses som et råd.",
+}
+
+
+@dataclass(frozen=True)
+class KIVisning:
+    tilstand: str
+    tekst: str | None = None
+    modell: str | None = None
+
+    @property
+    def vist(self) -> bool:
+        return self.tilstand == VIST
+
+    @property
+    def grunn(self) -> str | None:
+        return GRUNNER.get(self.tilstand)
+
+
+def stemmer(grunnlag: Mapping[str, object], vurdering: Vurdering) -> bool:
+    """FR-602: samme styrke, samme retning og samme fortegn for de tre."""
+    return all(grunnlag.get(navn) == getattr(vurdering, navn)
+               for navn in ("trend", "bevegelse", "interesse", "styrke", "retning"))
+
+
+def bygg_ki_visning(rad: KIRad | None, vurdering: object) -> KIVisning:
+    """Det siden viser under regelforklaringen."""
+    if rad is None:
+        return KIVisning(INGEN_RAD)
+    if rad.modellen_feilet:
+        return KIVisning(MODELLEN_FEILET)
+    if not rad.besto:
+        return KIVisning(BESTO_IKKE)
+    if not isinstance(vurdering, Vurdering) or not stemmer(rad.grunnlag, vurdering):
+        return KIVisning(STEMMER_IKKE)
+    if _VAKT.search(rad.tekst):
+        return KIVisning(STOPPET_AV_VAKTEN)
+    return KIVisning(VIST, tekst=rad.tekst, modell=f"{rad.modell}, {rad.tjeneste}")
+
+
+def ki_paa(kapsel: str | None) -> bool:
+    """Bryteren: paa naar kapselen mangler eller sier paa (FR-601)."""
+    return kapsel != AV
