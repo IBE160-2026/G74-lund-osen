@@ -79,6 +79,17 @@
     svg.graf { width: 100%; height: auto; display: block; }
     .rute { stroke: var(--rutenett); stroke-width: 1; }
     .rutetekst { fill: var(--dempet); font-size: 12px; }
+    /* Story 10.3: KI-teksten under regelforklaringen, som et tillegg. */
+    .ki { margin: 18px 0 8px; padding: 14px 16px; border: 1px solid var(--strek-2); border-radius: 8px; }
+    .ki h2 { margin: 0 0 6px; font-size: 16px; }
+    .ki .merke-ki { color: var(--dempet); font-size: 13px; margin: 0 0 8px; }
+    .ki p.ki-tekst { margin: 0; }
+    .ki .uten { color: var(--dempet); margin: 0; }
+    .ki-bryter { margin: 10px 0 0; }
+    .ki-bryter button { font: inherit; font-size: 13.5px; padding: 6px 10px; min-height: 36px;
+                        border: 1px solid var(--strek-2); border-radius: 6px; background: transparent;
+                        color: var(--tekst); cursor: pointer; }
+    .ki-bryter button:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
     .maanedsstrek { stroke: var(--strek-2); stroke-width: 1; }
     .maanedstekst { fill: var(--dempet); font-size: 12px; }
     .kurslinje { fill: none; stroke: var(--kurs); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
@@ -197,6 +208,29 @@
         dagen, for eksempel fordi kursene er lest inn med <code>--les-inn</code>.
       </p>
     {% endif %}
+  {% endif %}
+
+  {#- Story 10.3: KI-teksten står under regelforklaringen, aldri før og
+      aldri i stedet for den (FR-602). Bryteren er synlig for brukeren
+      (FR-601), og med KI av er siden lik den var før 10.3, bortsett fra
+      bryteren. #}
+  {% if detalj.sjekker %}
+    {% if ki_er_paa and ki %}
+      <section class="ki" aria-label="KI-tekst">
+        <h2>Med KI-ens ord</h2>
+        {% if ki.vist %}
+          <p class="merke-ki">Laget av KI · {{ ki.modell }}. Regelforklaringen over er det signalet bygger på.</p>
+          <p class="ki-tekst">{{ ki.tekst }}</p>
+        {% else %}
+          <p class="uten">{{ ki.grunn }}</p>
+        {% endif %}
+      </section>
+    {% endif %}
+    <form class="ki-bryter" method="post" action="/ki">
+      <input type="hidden" name="til" value="{{ ki_til }}">
+      <input type="hidden" name="tilbake" value="/aksje/{{ detalj.aksje.symbol }}">
+      <button type="submit" aria-pressed="{{ 'true' if ki_er_paa else 'false' }}">{{ 'Skjul KI-teksten' if ki_er_paa else 'Vis KI-teksten' }}</button>
+    </form>
   {% endif %}
 
   {%- set vis_grafhjelp = graf and graf.har_ma50 and detalj.sjekker %}
