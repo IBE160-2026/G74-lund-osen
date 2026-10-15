@@ -47,7 +47,7 @@ def stier(tmp_path):
     return tmp_path / "raa", tmp_path / "db" / "ose.db"
 
 
-def kjoer(raa, base, modell, hent=None, oeyeblikk=OEYEBLIKK):
+def kjoer(raa, base, modell, hent=None, oeyeblikk=OEYEBLIKK, les_kvote=nok_kvote):
     """kjoer med utskriften samlet og kallene til EODHD talt."""
     linjer, kall = [], []
 
@@ -57,7 +57,7 @@ def kjoer(raa, base, modell, hent=None, oeyeblikk=OEYEBLIKK):
 
     kode = 0
     try:
-        fp.kjoer(raa, base, oeyeblikk, NOEKKEL, tell, linjer.append, les_kvote=nok_kvote, modell=modell)
+        fp.kjoer(raa, base, oeyeblikk, NOEKKEL, tell, linjer.append, les_kvote=les_kvote, modell=modell)
     except SystemExit as slutt:
         kode = slutt.code
     return kode, kall, "\n".join(linjer)
@@ -272,17 +272,25 @@ class TestEtterGjennomgangen:
         assert radene(base)["EQNR"] is not None and modell.kall == 1
 
     def test_ki_radene_som_mangler_lages_foer_et_nytt_forsoek(self, stier):
-        """ECH: vurderte aksjer faar KI-raden selv om forsoeket stopper."""
+        """ECH: vurderte aksjer faar KI-raden selv om forsoeket stopper foer
+        foerste kall, her fordi dagens kvote er brukt opp. Ville feilet hvis
+        radene bare ble laget etter forsoeket (FR2)."""
         raa, base = stier
 
         def hent(ticker, *a):
             return serie_til(date(2026, 9, 21)) if ticker == "EQNR.OL" else serie_med_utslag(TIRSDAG)
 
         kjoer(raa, base, None, hent)
+
+        def brukt_opp(_noekkel):
+            return {"apiRequests": 20, "apiRequestsDate": "2026-09-22", "dailyRateLimit": 20, "extraLimit": 0}
+
         modell = FalskModell()
-        kjoer(raa, base, modell, hent)
+        kode, kall, _ = kjoer(raa, base, modell, hent, les_kvote=brukt_opp)
+        assert kode == 1 and kall == []
         rader = radene(base)
         assert sum(r is not None for r in rader.values()) == 14 and rader["EQNR"] is None
+        assert modell.kall == 14
 
     def test_main_leser_av_fra_env(self, monkeypatch, tmp_path):
         """VG2: .env.example sier av, og main maa lese det fra .env."""
