@@ -37,7 +37,7 @@ import lagring_sqlite
 from aksjedetalj import bygg_detalj, normaliser_symbol
 from boersdag import norsk_dato
 from graf import bygg_graf
-from ki_visning import AV, INGEN_RAD, KAPSEL, PAA, KIVisning, bygg_ki_visning, ki_paa
+from ki_visning import AV, KAPSEL, PAA, UKJENT, KIVisning, bygg_ki_visning, ki_paa
 from kilogg import Emne, UgyldigKIRad
 from kursdata import Kursleser
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER
@@ -48,6 +48,7 @@ from lagring_sqlite import (
     SqliteKurslager,
     SqliteOversiktsleser,
     aapne_base,
+    andre_aksjer_har_ki_rad,
     demo_sti,
     har_kurser,
     les_merket,
@@ -450,12 +451,16 @@ def _ki_visning(post, detalj) -> KIVisning:
     try:
         logg = SqliteKILogg(g.tilkobling, naa)
         rad = logg.les(Emne.aksje(post.aksje.symbol, detalj.dato))
+        # Svar kl. 23:57: har andre aksjer rader for dagen? Bare lesing (AD-10),
+        # og bare naar denne aksjen ikke har en rad.
+        andre_har_rader = rad is None and andre_aksjer_har_ki_rad(
+            g.tilkobling, detalj.dato, post.aksje.symbol)
     except (RuntimeError, sqlite3.Error, UgyldigKIRad, ValueError) as feil:
-        # Siden sier det samme som en dag uten rad, og loggen sier hvorfor
-        # (gjennomgangen, BH6, BH19).
+        # Siden vet ikke hvorfor, og sier ingen grunn. Loggen sier hvorfor
+        # (gjennomgangen, BH6, BH19, og av PR 2, BH3, ECH, VG3).
         app.logger.warning("KI-loggen kunne ikke leses: %s: %s", type(feil).__name__, feil)
-        return KIVisning(INGEN_RAD)
-    return bygg_ki_visning(rad, post.innhold)
+        return KIVisning(UKJENT)
+    return bygg_ki_visning(rad, post.innhold, andre_har_rader=andre_har_rader)
 
 
 # Bare aksjesiden kan vaere maalet for bryteren. Alt annet gaar til /, ogsaa
