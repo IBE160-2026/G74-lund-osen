@@ -52,6 +52,9 @@ from markedsoversikt import (
     bygg_oversikt,
     antall_vurdert,
     del_i_to,
+    neste_orden,
+    Sortering,
+    sorter,
     eldre_enn_nyeste,
     ingen_skilte_seg_ut,
     norsk_tid,
@@ -124,6 +127,8 @@ app.jinja_env.filters["tall"] = tall
 # Story 8.0e: ukedagen i overskriften og navnene i linja om «3 av 3».
 app.jinja_env.filters["ukedag"] = ukedag
 app.jinja_env.filters["med_og"] = med_og
+# Story 8.15: retningen et klikk på en kolonne gir.
+app.jinja_env.globals["neste_orden"] = neste_orden
 # Story 8.0d: «Oppdatert tirsdag 13.10 kl. 22.15» i stripa, i norsk tid.
 app.jinja_env.filters["oppdatert"] = lambda tid: oppdatert(tid, idag().year)
 
@@ -358,7 +363,11 @@ def markedsoversikt():
 
     poster = _leser_eller_basefeil(hent_oversiktsleser).oversikt()
     rader = bygg_oversikt(poster, idag(), STANDARD)
-    skilte_seg_ut, oevrige = del_i_to(rader)
+    # Story 8.15: hver del sorteres for seg, så ingen rad flytter seg
+    # mellom delene (tillegget 13.10). Linja om 3 av 3 og «N av M» bruker
+    # rader, som står i FR-102 (svar 7).
+    sortering = Sortering.fra_adressen(request.args.get("sorter"), request.args.get("orden"))
+    skilte_seg_ut, oevrige = (sorter(del_, sortering) for del_ in del_i_to(rader))
 
     return render_template(
         "index.html",
@@ -375,6 +384,7 @@ def markedsoversikt():
         antall_vurdert=antall_vurdert(rader),
         skilte_seg_ut=skilte_seg_ut,
         oevrige=oevrige,
+        sortering=sortering,
         tre_av_tre=[rad.aksje.navn for rad in rader if rad.styrke == ANTALL_SJEKKER],
         hentekommando=hentekommando(),
     )

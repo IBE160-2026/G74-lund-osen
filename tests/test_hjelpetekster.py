@@ -307,12 +307,14 @@ class TestSidene:
         «?» sto et annet sted enn ved det det forklarer."""
         knapp = r'<button type="button" class="hjelpeknapp" popovertarget="{}"'
         oversikt = _side(klient, "/")
-        for tekst, vindu in (("<th>Selskap ", "hjelp-selskap"),
-                             ('<th class="tall">Sluttkurs ', "hjelp-sluttkurs"),
-                             ('<th class="tall">Endring ', "hjelp-endring"),
-                             ('<th class="tall">Signalstyrke ', "hjelp-signalstyrke"),
-                             ("<th>Retning ", "hjelp-retning")):
-            assert re.search(re.escape(tekst) + knapp.format(vindu), oversikt), vindu
+        # Story 8.15: navnet er en lenke som sorterer, og «?» står etter den.
+        lenke = r'<a class="sorter[^"]*" href="[^"]*">{}<span class="skjult">[^<]*</span><svg[^>]*><path[^>]*/></svg></a> '
+        for tekst, vindu in ((re.escape("<th>Selskap "), "hjelp-selskap"),
+                             (r'<th class="tall"[^>]*>' + lenke.format("Sluttkurs"), "hjelp-sluttkurs"),
+                             (r'<th class="tall"[^>]*>' + lenke.format("Endring"), "hjelp-endring"),
+                             (r'<th class="tall"[^>]*>' + lenke.format("Signalstyrke"), "hjelp-signalstyrke"),
+                             (r"<th[^>]*>" + lenke.format("Retning"), "hjelp-retning")):
+            assert re.search(tekst + knapp.format(vindu), oversikt), vindu
         # Story 8.0d, PR 2: tidspunktet står bare i stripa, som «Oppdatert»,
         # med «?» ved siden av (BH2, svar 5).
         stripa = oversikt.split('<header class="stripe">', 1)[1].split("</header>", 1)[0]
@@ -395,7 +397,8 @@ class TestSidene:
         """Tillegget 05.10: «?» ved overskriften Signalstyrke, med teksten
         om styrken. Det er fortsatt fem kolonner (FR-101)."""
         html = _side(klient, "/")
-        assert re.search(r'<th class="tall">Signalstyrke <button type="button" class="hjelpeknapp" popovertarget="hjelp-signalstyrke"[^>]*>\?</button></th>', html)
+        assert re.search(r'<th class="tall"><a class="sorter" href="[^"]*">Signalstyrke<span class="skjult">[^<]*</span><svg[^>]*><path[^>]*/></svg></a> '
+                         r'<button type="button" class="hjelpeknapp" popovertarget="hjelp-signalstyrke"[^>]*>\?</button></th>', html)
         thead = html.split("<thead>")[1].split("</thead>")[0]
         assert thead.count("<th") == 5
         vindu = html.split('<div id="hjelp-signalstyrke"')[1].split("</body>")[0]
