@@ -2,7 +2,7 @@
 title: 'Story 8.15: Sortering ved klikk i kolonneraden'
 type: 'feature'
 created: '2026-10-15'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'c33fd96'

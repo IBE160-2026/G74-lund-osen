@@ -3224,6 +3224,8 @@ jeg finner det jeg leter etter.
 - Når tabellen er delt i «Skilte seg ut» og «Øvrige aksjer» (8.0e), gjelder sorteringen innenfor hver del
 - **Ville feilet hvis:** en rad fra «Øvrige aksjer» havnet under «Skilte seg ut» etter et klikk
 
+*Lagt til 2026-10-15:* flettet i `a13d273`, PR #43.
+
 ### Story 8.16: Regelen for startdagen, og periodene i kursgrafen
 
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 15).*
