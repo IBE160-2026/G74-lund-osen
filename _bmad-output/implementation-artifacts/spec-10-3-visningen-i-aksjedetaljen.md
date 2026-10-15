@@ -125,3 +125,16 @@ Under rettingen laget den nye testen for AD-10 først en tom `data/db/ose.db` i 
 | VR4 | siden varierer ikke med kapselen | `test_siden_varierer_med_kapselen` |
 
 **Bildene** av aksjesiden i demoen ved 1280 og 390 px, med en KI-rad som besto, en som ikke besto, ingen rad og bryteren av, ligger bare i scratchpad. De er tatt på `c0ff812`. Rettingene endret ikke det som vises, bortsett fra `aria-pressed`. KI-radene i bildene er skrevet rett i en demobase i scratchpad.
+
+## PR 2: grunnen på siden når hentingen ikke laget KI-tekst
+
+*Lagt til 2026-10-16 (gruppens svar kl. 23:57 15.10, instruksjonen kl. 23:58, ført også under FR-601 i PRD-en og under story 10.3 i `epics.md`):* siden sier hvorfor med det loggen kan vise. Har dagen ingen rader i `ki_logg` i det hele tatt, står det «Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.» Har andre aksjer rader for dagen, men ikke denne, sier siden at teksten for denne aksjen ikke ble laget i hentingen. Den nøyaktige grunnen står i utskriften fra hentingen og i Utført-linja for den kvelden. Med dette regnes kontrollpunktet fra 05.10 om at siden sier hvorfor (FR-601), som oppfylt.
+
+Bygd på grenen `10-3b-grunnen-paa-siden` fra main (`085832e`):
+- `src/ki_visning.py`: `INGEN_FOR_AKSJEN` og de to tekstene, og `bygg_ki_visning` tar `dagen_har_rader`.
+- `src/app.py`: `_ki_visning` leser `les_alle` bare når aksjen ikke har en rad, og teller bare rader for aksjer på samme dag. Siden leser bare (AD-10).
+
+**Mutantene:** B1 siden gir alltid grunnen for dagen; B2 en rad for en annen dag teller; B3 dagsteksten (10.6) teller som en aksje.
+
+Testtallet før: 2091 bestått og 17 hoppet over etter flettingen av PR 1 (CI på main: 2108 bestått på `a6a476e`).
+
