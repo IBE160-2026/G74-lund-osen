@@ -41,6 +41,12 @@ def http(metode: str, url: str, json: dict | None, tidsfrist: float) -> tuple[in
     return svar.status_code, innhold
 
 
+def _med_tag(navn) -> str | None:
+    if not isinstance(navn, str):
+        return None
+    return navn if ":" in navn else navn + ":latest"
+
+
 class OllamaModell:
     """Modell (porten i ki_modell.py) mot Ollama, tjenesten «lokal»."""
 
@@ -91,11 +97,15 @@ class OllamaModell:
             status, svar = self._kall("GET", "/api/tags")
         except requests.RequestException:
             return "Ollama svarer ikke (kjoerer den?)"
-        if status != 200 or not isinstance(svar, dict):
+        if status != 200:
             return f"Ollama svarte HTTP {status} paa listen over modeller"
-        modeller = svar.get("models")
-        navn = {m.get("name") for m in modeller if isinstance(m, dict)} if isinstance(modeller, list) else set()
-        if self.modell not in navn:
+        modeller = svar.get("models") if isinstance(svar, dict) else None
+        if not isinstance(modeller, list):
+            return "Ollama ga en liste over modeller som ikke kunne leses"
+        # Navnet staar i name eller model, og uten tag betyr det :latest
+        # (gjennomgangen av svar c, ECH, BH8).
+        navn = {_med_tag(m.get(felt)) for m in modeller if isinstance(m, dict) for felt in ("name", "model")}
+        if _med_tag(self.modell) not in navn:
             return f"modellen {self.modell} er ikke hentet (ollama pull {self.modell})"
         return None
 

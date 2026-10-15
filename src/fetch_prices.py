@@ -820,7 +820,9 @@ def kjoer(
             # forsoek henter dem, i en egen fil. Story 10.2: foerst KI-radene
             # som mangler for aksjene som alt er vurdert, uten kall til EODHD,
             # saa de ikke venter paa at forsoeket kommer gjennom.
-            lag_ki_tekster(base_sti, dato, klokke, modell, skriv, lista)
+            # Sa sjekken nei, sjekkes det ikke paa nytt etter forsoeket.
+            if not lag_ki_tekster(base_sti, dato, klokke, modell, skriv, lista, basen_har_kursene=False):
+                modell = None
             return nytt_forsoek(
                 data_katalog, base_sti, oeyeblikk, dag, dato, mangler,
                 api_nokkel, hent, skriv, klokke, les_kvote, lista, modell=modell,
@@ -917,8 +919,11 @@ def kjoer(
     if not skriv_vurderinger(base_sti, dato, dag, skrevne, klokke, skriv, lista):
         sys.exit(1)
 
-    # Story 10.2: KI-teksten etter vurderingene (AD-17), aldri foer.
-    lag_ki_tekster(base_sti, dato, klokke, modell, skriv, lista)
+    # Story 10.2: KI-teksten etter vurderingene (AD-17), aldri foer. Mangler
+    # noen aksjer dagens kurs, gir en ny kjoering kall til EODHD.
+    alle_har_dagen = not resultat.feil and skrevne == set(serier) and all(
+        any(rad.dato == dato for rad in serier[symbol]) for symbol in skrevne)
+    lag_ki_tekster(base_sti, dato, klokke, modell, skriv, lista, basen_har_kursene=alle_har_dagen)
 
     # FR-402: svaret er ikke fra boersdagen for noen av aksjene. Kursene og
     # fila staar, og vurderingen har grunnen kurs_ikke_fra_dagen. Samme
@@ -1144,7 +1149,7 @@ def nytt_forsoek(
             base_sti, dato, dag, skrevne, klokke, skriv, lista, bare=skrevne
         ):
             sys.exit(1)
-        lag_ki_tekster(base_sti, dato, klokke, modell, skriv, lista)
+        lag_ki_tekster(base_sti, dato, klokke, modell, skriv, lista, basen_har_kursene=False)
 
     fortsatt = sorted(
         symbol for symbol in mangler

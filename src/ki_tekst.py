@@ -138,9 +138,18 @@ def _rad_uten_kall(emne: Emne, vurdering: Vurdering, modell: Modell, foerste: st
 
 def _ikke_klar(modell: Modell) -> str | None:
     """Grunnen til at tjenesten ikke kan brukes i kveld, eller None. En modell
-    uten sjekk (som de falske i testene) regnes som klar."""
+    uten sjekk regnes som klar: de falske i testene, og tjenestene i 10.7 til
+    de faar sin egen. En sjekk som ikke gir en tekst, regnes ogsaa som klar."""
     sjekk = getattr(modell, "sjekk", None)
-    return sjekk() if callable(sjekk) else None
+    grunn = sjekk() if callable(sjekk) else None
+    return grunn if isinstance(grunn, str) and grunn.strip() else None
+
+
+def _hva_naa(grunn: str) -> str:
+    """Det brukeren gjoer foer neste kjoering, etter grunnen (BH1, ECH)."""
+    if "ikke hentet" in grunn:
+        return "Hent modellen, se «Den lokale modellen» i README-en"
+    return "Start Ollama, se «Den lokale modellen» i README-en"
 
 
 def lag_ki_tekster(
@@ -150,10 +159,17 @@ def lag_ki_tekster(
     modell: Modell | None,
     skriv: Callable[[str], None] = print,
     lista: tuple[Aksje, ...] = AKSJEUNIVERS,
-) -> None:
-    """KI-raden for hver aksje som har en vurdering og mangler raden."""
+    basen_har_kursene: bool = True,
+) -> bool:
+    """KI-raden for hver aksje som har en vurdering og mangler raden.
+
+    Gir False bare naar sjekken fra svar c sa nei, saa kalleren kan la vaere
+    aa sjekke paa nytt i samme kjoering. basen_har_kursene sier om en ny
+    kjoering samme kveld gir 0 kall til EODHD: det gjoer den bare naar basen
+    har dagens kurs for alle aksjene.
+    """
     if modell is None:
-        return
+        return True
     besto = stoppet = feilet = sto = 0
 
     def antall() -> str:
@@ -164,7 +180,7 @@ def lag_ki_tekster(
         tilkobling = aapne_base(base_sti)
     except Exception as feil:  # NFR-04: KI-laget stopper aldri hentingen.
         skriv(f"KI-teksten: basen kunne ikke aapnes ({type(feil).__name__}). Ingen KI-tekst i kveld.")
-        return
+        return True
     try:
         vurderinger = SqliteVurderingslager(tilkobling, klokke, lista)
         logg = SqliteKILogg(tilkobling, klokke)
@@ -179,13 +195,17 @@ def lag_ki_tekster(
             mangler.append((aksje, vurdering))
         # Svar c kl. 23:32: svarer ikke tjenesten, eller mangler modellen,
         # skrives ingen rader, og samme kommando kan kjoeres igjen.
+        if mangler and innevaerende_boersdag(norsk_dato(klokke())) != dato:
+            raise IkkeInnevaerendeBoersdag(dato.isoformat())
         if mangler and (grunn := _ikke_klar(modell)):
             skriv(
                 f"Ingen KI-tekst for boersdagen {dato.isoformat()} ennaa: {grunn}. Ingen rader er "
-                f"skrevet i KI-loggen. Start Ollama (docker compose --profile ki up -d ollama), og "
-                f"kjoer samme kommando igjen i kveld. Det gir 0 kall til EODHD."
+                f"skrevet i KI-loggen, og {len(mangler)} aksjer venter paa teksten"
+                + (f" ({sto} har den fra foer)" if sto else "") + ". "
+                f"{_hva_naa(grunn)}, og kjoer samme kommando igjen foer midnatt"
+                + (". Det gir 0 kall til EODHD." if basen_har_kursene else ".")
             )
-            return
+            return False
         feilet_for: str | None = None
         for aksje, vurdering in mangler:
             emne = Emne.aksje(aksje.symbol, dato)
@@ -212,14 +232,14 @@ def lag_ki_tekster(
             f"KI-teksten stoppet: det er blitt en ny boersdag siden kjoeringen startet, og "
             f"radene for {dato.isoformat()} kan ikke skrives lenger (AD-7). {antall()}."
         )
-        return
+        return True
     except AssertionError:
         # Nettsperren i testene (NettverkISTest) skal synes, ikke svelges.
         raise
     except Exception as feil:  # NFR-04: KI-laget stopper aldri hentingen.
         skriv(f"KI-teksten stoppet etter {besto + stoppet + feilet} rader: {type(feil).__name__}. {antall()}.")
         traceback.print_exc(file=sys.stderr)
-        return
+        return True
     finally:
         tilkobling.close()
     skriv(
@@ -227,3 +247,4 @@ def lag_ki_tekster(
         f"{besto} besto kontrollen, {stoppet} ble stoppet av kontrollen, og modellen feilet "
         f"for {feilet}." + (f" {sto} rader sto fra foer og er ikke laget paa nytt." if sto else "")
     )
+    return True

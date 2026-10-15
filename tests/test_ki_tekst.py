@@ -380,25 +380,33 @@ class TestForhaandssjekken:
     """Svar c kl. 23:32: svarer ikke tjenesten eller mangler modellen, skrives
     ingen rader, og samme kommando kan kjoeres igjen samme kveld."""
 
-    @pytest.mark.parametrize("grunn", ["Ollama svarer ikke (kjoerer den?)",
-                                       "modellen gemma4:e4b er ikke hentet (ollama pull gemma4:e4b)"])
-    def test_ingen_rader_og_utskriften_sier_hvorfor(self, stier, grunn):
+    @pytest.mark.parametrize("grunn, hva", [
+        ("Ollama svarer ikke (kjoerer den?)", "Start Ollama"),
+        ("modellen gemma4:e4b er ikke hentet (ollama pull gemma4:e4b)", "Hent modellen"),
+    ])
+    def test_ingen_rader_og_utskriften_sier_hvorfor(self, stier, grunn, hva):
+        """Og hva brukeren gjoer, etter grunnen (gjennomgangen, BH1, ECH)."""
         raa, base = stier
         modell = SjekketModell(grunn)
         kode, _, ut = kjoer(raa, base, modell)
         assert kode == 0 and modell.kall == 0
-        assert all(r is None for r in radene(base).values())
-        assert f"Ingen KI-tekst for boersdagen 2026-09-22 ennaa: {grunn}. Ingen rader er skrevet" in ut
-        assert "kjoer samme kommando igjen i kveld. Det gir 0 kall til EODHD." in ut
+        rader = radene(base)
+        assert len(rader) == 15 and all(r is None for r in rader.values())
+        assert (f"Ingen KI-tekst for boersdagen 2026-09-22 ennaa: {grunn}. Ingen rader er skrevet i "
+                f"KI-loggen, og 15 aksjer venter paa teksten. {hva}, se «Den lokale modellen» i "
+                f"README-en, og kjoer samme kommando igjen foer midnatt. Det gir 0 kall til EODHD.") in ut
 
     def test_samme_kveld_etter_at_ollama_er_startet(self, stier):
         """Foerst svarer ikke Ollama, saa er den startet: samme kommando lager
         tekstene, med 0 kall til EODHD."""
         raa, base = stier
-        kjoer(raa, base, SjekketModell("Ollama svarer ikke (kjoerer den?)"))
+        foerste = SjekketModell("Ollama svarer ikke (kjoerer den?)")
+        kjoer(raa, base, foerste)
+        assert foerste.sjekker == 1 and all(r is None for r in radene(base).values())
         modell = SjekketModell(None)
         kode, kall, ut = kjoer(raa, base, modell)
-        assert (kode, kall, modell.kall) == (0, [], 15)
+        assert (kode, kall, modell.kall, modell.sjekker) == (0, [], 15, 1)
+        assert len(radene(base)) == 15
         assert all(r is not None and r.besto for r in radene(base).values())
         assert "15 besto kontrollen" in ut
 
@@ -407,7 +415,10 @@ class TestForhaandssjekken:
         raa, base = stier
         modell = SjekketModell(None, feil=ModellFeilet("tidsavbrudd etter 180 s"))
         kjoer(raa, base, modell)
-        assert all(r.modellen_feilet for r in radene(base).values())
+        rader = radene(base)
+        assert len(rader) == 15 and all(r.modellen_feilet for r in rader.values())
+        assert modell.kall == 1
+        assert sum("ikke kalt" in r.grunn for r in rader.values()) == 14
 
     def test_ingen_sjekk_naar_ingen_rader_mangler(self, stier):
         raa, base = stier
@@ -421,3 +432,83 @@ class TestForhaandssjekken:
         modell = SjekketModell(None)
         kjoer(raa, base, modell)
         assert modell.sjekker == 1 and modell.kall == 15
+
+
+class TestSjekkenEtterGjennomgangen:
+    """Gjennomgangen av svar c."""
+
+    def test_den_ekte_modellen_naar_sjekken(self, stier):
+        """VG1: OllamaModell (med falsk http) gjennom hele steget."""
+        from test_ki_lokal import FalskOllama
+
+        raa, base = stier
+        kjoer(raa, base, None)
+        linjer = []
+        lag_ki_tekster(base, TIRSDAG, lambda: OEYEBLIKK, OllamaModell(hent=FalskOllama(tags=False)), linjer.append)
+        assert all(r is None for r in radene(base).values())
+        assert "ennaa: modellen gemma4:e4b er ikke hentet" in linjer[0]
+
+        def nede(*_a):
+            import requests
+            raise requests.ConnectionError("nede")
+
+        linjer = []
+        lag_ki_tekster(base, TIRSDAG, lambda: OEYEBLIKK, OllamaModell(hent=nede), linjer.append)
+        assert "ennaa: Ollama svarer ikke (kjoerer den?)" in linjer[0]
+        assert all(r is None for r in radene(base).values())
+
+    def test_ikke_0_kall_naar_kurser_mangler_og_bare_en_sjekk(self, stier):
+        """ECH, VG2: mangler en aksje dagens kurs, gir en ny kjoering kall,
+        og sjekken kjoeres ikke paa nytt etter forsoeket."""
+        raa, base = stier
+
+        def hent(ticker, *a):
+            return serie_til(date(2026, 9, 21)) if ticker == "EQNR.OL" else serie_med_utslag(TIRSDAG)
+
+        kjoer(raa, base, None, hent)
+        modell = SjekketModell("Ollama svarer ikke (kjoerer den?)")
+        _, kall, ut = kjoer(raa, base, modell, hent)
+        assert kall == ["EQNR.OL"]
+        assert modell.sjekker == 1 and ut.count("Ingen KI-tekst for boersdagen") == 1
+        assert "0 kall til EODHD" not in ut
+
+    def test_datoen_sjekkes_foer_tjenesten(self, stier):
+        """BH4, ECH: etter midnatt sjekkes ikke tjenesten, og beskjeden er om dagen."""
+        raa, base = stier
+        kjoer(raa, base, None)
+        modell = SjekketModell("Ollama svarer ikke (kjoerer den?)")
+        linjer = []
+        lag_ki_tekster(base, TIRSDAG, lambda: ONSDAG_KL_22, modell, linjer.append)
+        assert modell.sjekker == 0 and linjer[0].startswith("KI-teksten stoppet: det er blitt en ny boersdag")
+
+    def test_bare_de_som_mangler_og_sjekken_en_gang(self, stier):
+        """BH23: noen rader finnes fra foer."""
+        raa, base = stier
+        kjoer(raa, base, None)
+        tilkobling = aapne_base(base)
+        try:
+            logg = SqliteKILogg(tilkobling, lambda: OEYEBLIKK)
+            from ki_modell import lag_ki_rad
+            from ki_grunnlag import ki_grunnlag
+            vurd = vurderingene(base, TIRSDAG)
+            for aksje in AKSJEUNIVERS[:5]:
+                v = vurd[aksje.symbol][0]
+                logg.skriv(lag_ki_rad(Emne.aksje(aksje.symbol, TIRSDAG), ki_grunnlag(v, utenfor_maalingen=False),
+                                      regeltekst(v), FalskModell()))
+        finally:
+            tilkobling.close()
+        nede = SjekketModell("Ollama svarer ikke (kjoerer den?)")
+        linjer = []
+        lag_ki_tekster(base, TIRSDAG, lambda: OEYEBLIKK, nede, linjer.append)
+        assert nede.sjekker == 1 and "10 aksjer venter paa teksten (5 har den fra foer)" in linjer[0]
+        oppe = SjekketModell(None)
+        lag_ki_tekster(base, TIRSDAG, lambda: OEYEBLIKK, oppe, lambda _: None)
+        assert oppe.kall == 10 and all(r is not None for r in radene(base).values())
+
+    @pytest.mark.parametrize("svar", ["", "  ", 0, False, ["x"]])
+    def test_en_sjekk_som_ikke_gir_en_tekst_regnes_som_klar(self, stier, svar):
+        raa, base = stier
+        kjoer(raa, base, None)
+        modell = SjekketModell(svar)
+        lag_ki_tekster(base, TIRSDAG, lambda: OEYEBLIKK, modell, lambda _: None)
+        assert modell.kall == 15

@@ -184,9 +184,24 @@ class TestSjekken:
         assert OllamaModell(hent=FalskOllama(tags=False)).sjekk() == \
             "modellen gemma4:e4b er ikke hentet (ollama pull gemma4:e4b)"
 
-    @pytest.mark.parametrize("svar", [(500, None), (200, None), (200, {"models": 5})])
+    @pytest.mark.parametrize("svar", [(500, None), (500, {"models": [{"name": MODELL}]})])
+    def test_status_som_ikke_er_200(self, svar):
+        """VG4: ogsaa naar svaret har modellen."""
+        assert OllamaModell(hent=lambda *_a: svar).sjekk() == "Ollama svarte HTTP 500 paa listen over modeller"
+
+    @pytest.mark.parametrize("svar", [(200, None), (200, {"models": 5}), (200, {})])
     def test_svar_som_ikke_kan_leses(self, svar):
-        assert OllamaModell(hent=lambda *_a: svar).sjekk() is not None
+        """ECH, BH9: ikke «ikke hentet», som ville sendt brukeren til ollama pull."""
+        assert OllamaModell(hent=lambda *_a: svar).sjekk() == "Ollama ga en liste over modeller som ikke kunne leses"
+
+    @pytest.mark.parametrize("modeller, konfigurert", [
+        ([{"model": MODELL}], MODELL),
+        ([{"name": "gemma4:latest"}], "gemma4"),
+        ([{"name": "gemma4"}], "gemma4:latest"),
+    ])
+    def test_navnet_i_name_eller_model_og_latest(self, modeller, konfigurert):
+        """ECH, BH8."""
+        assert OllamaModell(modell=konfigurert, hent=lambda *_a: (200, {"models": modeller})).sjekk() is None
 
     def test_sjekken_spoer_bare_listen(self):
         falsk = FalskOllama()
