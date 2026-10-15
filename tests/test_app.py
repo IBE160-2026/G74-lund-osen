@@ -1461,7 +1461,11 @@ class TestStory80c:
             html = klient.get(sti).data.decode("utf-8")
             assert '<p class="under-arbeid">Appen er under utvikling og ikke ferdig.</p>' in html, sti
             # Story 8.0d, PR 3: aksjesiden har sjekkort, ikke en tabell.
-            assert html.index('class="under-arbeid"') > html.index("<table" if sti == "/" else "<figure"), sti
+            # Gjennomgangen 15.10 (BH18): merket finnes, så testen feiler med
+            # en melding og ikke ValueError hvis grafen mangler.
+            siste = "<table" if sti == "/" else "<figure"
+            assert siste in html, sti
+            assert html.index('class="under-arbeid"') > html.index(siste), sti
 
     def test_under_arbeid_styres_av_en_innstilling(self, klient, monkeypatch):
         """Ville feilet hvis linja sto fast i malene og ikke kom fra UNDER_ARBEID."""
@@ -1510,6 +1514,14 @@ class TestStory80c:
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
         assert html.count('<section class="sjekkort bidro"') == 2
         assert html.count('<section class="sjekkort"') == 1
+        # Gjennomgangen 15.10 (BH12, ECH7): det som skiller kortene for synet,
+        # er pillen med farge etter fortegnet (utdraget §8). Kortet uten
+        # utslag har den grå pillen.
+        kortene = re.findall(r'<section class="sjekkort( bidro)?"(.*?)</section>', html, re.DOTALL)
+        assert len(kortene) == 3
+        for bidro, innhold in kortene:
+            klasse = re.search(r'class="resultat fortegn ([a-z]+)"', innhold).group(1)
+            assert (klasse in ("opp", "ned")) == bool(bidro), (bidro, klasse)
 
     def test_ringen_er_sterk_oransje_og_teksten_sier_det_samme(self, klient, monkeypatch):
         """Story 8.0d, PR 2, designregler §3 (14.10): testen fra 8.0c for 3:1
@@ -2077,6 +2089,8 @@ class TestStory80dAksjesiden:
         assert '<text class="linjenavn snitt" text-anchor="end"' in html
         assert "var(--snitt)" in _regel(stil, ".linjenavn.snitt")
         assert "stipl" not in _synlig(html).lower()
+        # Gjennomgangen 15.10 (VG4): prikken ved enden av kurslinja.
+        assert '<circle class="sistepunkt"' in html
         # Gjennomgangen (VG4, BH5): etiketten sier hvilken linje som er hva,
         # med tykkelsen og ikke fargen.
         assert re.search(r'aria-label="Kursutvikling for Equinor: den tykke linja er utbyttejustert kurs, '
@@ -2088,3 +2102,55 @@ class TestStory80dAksjesiden:
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
         assert '<a class="tilbake" href="/">Markedsoversikt</a>' in html
         assert not re.search(r"[←→›]", _synlig(html))
+
+    def test_terskelen_i_overskriften_kommer_fra_parametre(self, klient, monkeypatch):
+        """Gjennomgangen 15.10 (VG1): med terskel 3 skiller 2 av 3 seg ikke ut
+        på aksjesiden heller, og 3 av 3 gjør det. Ville feilet hvis terskelen
+        sto fast eller falt tilbake til standarden."""
+        import dataclasses
+
+        monkeypatch.setattr(app_modul, "STANDARD", dataclasses.replace(app_modul.STANDARD, terskel=3))
+        _lagret("EQNR", 0.0, 1, 1, 0)
+        _lagret("KOG", 0.0, 1, 1, 1)
+        eqnr = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert '<h1 class="overskrift">Equinor</h1>' in eqnr
+        assert "skilte seg ut" not in _synlig(eqnr)
+        assert "<mark>skilte seg ut lørdag</mark>" in klient.get("/aksje/KOG").data.decode("utf-8")
+
+    def test_hva_sjekken_maaler_og_regelen_kommer_fra_parametre(self, klient, monkeypatch):
+        """Gjennomgangen 15.10 (VG2): kortene sier vinduene og grensene fra
+        Parametre, i riktig kort. Ville feilet med faste tall, uten avsnittene
+        eller med tekstene byttet mellom kortene."""
+        import dataclasses
+
+        from aksjedetalj import hva_den_maaler, regelen
+
+        andre = dataclasses.replace(app_modul.STANDARD, ma_vindu=40, volatilitet_vindu=15, volum_vindu=25,
+                                    noytralsone=0.03, volumfaktor=2.5)
+        monkeypatch.setattr(app_modul, "STANDARD", andre)
+        _lagret("EQNR", 0.0, 1, 0, 0)
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        kortene = re.findall(r'<section class="sjekkort[^"]*" aria-label="Sjekk \d: (\w+)">(.*?)</section>',
+                             html, re.DOTALL)
+        assert [navn for navn, _ in kortene] == ["Trend", "Bevegelse", "Interesse"]
+        for navn, innhold in kortene:
+            assert f'<p class="maaler">{hva_den_maaler(navn, andre)}</p>' in innhold, navn
+            assert f'<p class="regel">{regelen(navn, andre)}</p>' in innhold, navn
+        trend, bevegelse, interesse = (innhold for _, innhold in kortene)
+        assert "de siste 40 børsdagene" in trend and f"Mer enn 3{NB}% over snittet gir +1" in trend
+        assert "de siste 15 børsdagene" in bevegelse
+        assert "de siste 25 børsdagene" in interesse and "Mer enn 2,5 × medianen" in interesse
+
+    def test_endringen_uten_farge_naar_den_vises_som_null_og_strek_uten_dagen_foer(self, klient, monkeypatch):
+        """Gjennomgangen 15.10 (VG3): en endring som vises som 0,00 % har
+        ingen farge, som i oversikten, og med én kursdag står «–» uten
+        «fra … til …»."""
+        _lagret("EQNR", 0.003, 1, 0, 0)
+        endring = klient.get("/aksje/EQNR").data.decode("utf-8").split(
+            '<div class="noekkeltall endring">', 1)[1].split("</div>", 1)[0]
+        assert re.search(rf'<span class="verdi\s*">0,00{NB}%</span>', endring)
+        monter(monkeypatch, snapshot({"DNB": serie([100.0])}))
+        html = klient.get("/aksje/DNB").data.decode("utf-8")
+        en_dag = html.split('<div class="noekkeltall endring">', 1)[1].split("</div>", 1)[0]
+        assert '<span class="verdi ">–</span>' in en_dag
+        assert "fra " not in en_dag

@@ -185,6 +185,15 @@ class TestNavneneVedEnden:
         assert graf.kursnavn.x == graf.snittnavn.x == BREDDE - MARG_X
         assert graf.kursnavn.y < graf.snittnavn.y
 
+    def test_prikken_staar_paa_det_siste_kurspunktet(self):
+        """Gjennomgangen 15.10 (VG4): prikken ved enden følger kurslinja, ikke
+        det første punktet eller snittet."""
+        graf = bygg_graf(self._punkter([100, 110, 120], [100, 100, 100]))
+        x, y = graf.kurslinje.split()[-1].split(",")
+        assert (graf.siste.x, graf.siste.y) == (float(x), float(y))
+        assert graf.siste.x == BREDDE - MARG_X
+        assert graf.siste.y != float(graf.ma50linje.split()[-1].split(",")[1])
+
     def test_snittet_over_naar_kursen_er_lavest(self):
         graf = bygg_graf(self._punkter([120, 110, 100], [110, 110, 110]))
         assert graf.snittnavn.y < graf.kursnavn.y
