@@ -2066,10 +2066,13 @@ class TestStory815Sortering:
         assert re.search(r'<th aria-sort="ascending"><a class="sorter valgt" href="/\?sorter=retning&amp;orden=synkende">', stigende)
 
     def test_skjermleseren_hoerer_kolonnen_og_retningen(self, tabell):
-        """Kontrollpunktet og svar 2: «alfabetisk» for Retning."""
+        """Kontrollpunktet og svar 8: «stigende (A til Å)» eller «synkende
+        (Å til A)» for Retning, ikke «alfabetisk»."""
         valgt = self._side(tabell, "/?sorter=retning&orden=stigende")
-        assert ('Retning<span class="skjult">, sortert alfabetisk, A til Å. Velg for alfabetisk, Å til A.</span>'
+        assert ('Retning<span class="skjult">, sortert stigende (A til Å). Velg for synkende (Å til A).</span>'
                 in valgt)
+        assert 'Retning<span class="skjult">, sorter stigende (A til Å)</span>' in self._side(tabell, "/")
+        assert "alfabetisk" not in valgt
         assert 'Endring<span class="skjult">, sorter synkende</span>' in valgt
         endring = self._side(tabell, "/?sorter=endring&orden=stigende")
         assert 'Endring<span class="skjult">, sortert stigende. Velg for synkende.</span>' in endring
@@ -2078,12 +2081,21 @@ class TestStory815Sortering:
         """Svar 5. Ville feilet hvis linja sto også uten valg (S12)."""
         assert 'class="sortert"' not in self._side(tabell, "/")
         html = self._side(tabell, "/?sorter=signal&orden=stigende")
-        assert '<p class="sortert">Sortert på signalstyrke, stigende. <a href="/">Standard rekkefølge</a></p>' in html
+        assert ('<p class="sortert">Sortert på signalstyrke, stigende, innenfor hver del. '
+                '<a href="/">Standard rekkefølge</a></p>') in html
         assert html.index('<p class="sortert">') < html.index('<div class="tabellboks"')
-        # Gjennomgangen (VG2): navnet for hver kolonne.
-        for kolonne, navn in (("kurs", "sluttkurs"), ("endring", "endring"), ("retning", "retning")):
+        # Gjennomgangen (VG2): navnet for hver kolonne. Svar 9: «innenfor hver del».
+        for kolonne, navn in (("kurs", "sluttkurs"), ("endring", "endring")):
             html = self._side(tabell, f"/?sorter={kolonne}&orden=synkende")
-            assert f'<p class="sortert">Sortert på {navn}, synkende.' in html, kolonne
+            assert f'<p class="sortert">Sortert på {navn}, synkende, innenfor hver del. ' in html, kolonne
+
+    def test_linja_og_skjermleseren_sier_det_samme(self, tabell):
+        """Svar 8 (BH1, ECH1): for Retning sier linja over tabellen det
+        samme som teksten for skjermleseren, i begge retninger."""
+        for orden, ord in (("stigende", "stigende (A til Å)"), ("synkende", "synkende (Å til A)")):
+            html = self._side(tabell, f"/?sorter=retning&orden={orden}")
+            assert f'<p class="sortert">Sortert på retning, {ord}, innenfor hver del. ' in html, orden
+            assert f'Retning<span class="skjult">, sortert {ord}. ' in html, orden
 
     def test_vinkelen_peker_etter_retningen(self, tabell):
         """Gjennomgangen (VG1): den valgte kolonnen viser retningen som

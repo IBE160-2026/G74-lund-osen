@@ -6,10 +6,11 @@
     som SVG (pilene er bare for retning, designregler §4). Vinkelen viser
     retningen et klikk gir, eller den som gjelder når kolonnen er valgt.
     Dempet når kolonnen ikke er valgt, hvit når den er det (svar 4).
-    Skjermleseren hører kolonnen, retningen og «alfabetisk» for Retning
-    (svar 2). #}
+    Skjermleseren hører kolonnen og retningen, og linja over tabellen sier
+    det samme: «stigende (A til Å)» eller «synkende (Å til A)» for Retning
+    (svar 8). #}
 {% macro ordens_ord(kolonne, orden) -%}
-  {%- if kolonne == "retning" %}alfabetisk, {{ "A til Å" if orden == "stigende" else "Å til A" }}{% else %}{{ orden }}{% endif -%}
+  {{- orden }}{% if kolonne == "retning" %} {{ "(A til Å)" if orden == "stigende" else "(Å til A)" }}{% endif -%}
 {%- endmacro %}
 {% macro ariasort(kolonne) -%}
   {%- if sortering and sortering.kolonne == kolonne %} aria-sort="{{ 'descending' if sortering.orden == 'synkende' else 'ascending' }}"{% endif -%}
@@ -239,7 +240,7 @@
     </div>
 
     {#- Story 8.15, svar 5: linja står bare når en kolonne er valgt. #}
-    {% if sortering %}<p class="sortert">Sortert på {{ sortering.navn }}, {{ sortering.orden }}. <a href="/">Standard rekkefølge</a></p>{% endif %}
+    {% if sortering %}<p class="sortert">Sortert på {{ sortering.navn }}, {{ ordens_ord(sortering.kolonne, sortering.orden) }}, innenfor hver del. <a href="/">Standard rekkefølge</a></p>{% endif %}
     <div class="tabellboks" role="region" aria-label="Aksjene" tabindex="0">
     <table>
       <thead>

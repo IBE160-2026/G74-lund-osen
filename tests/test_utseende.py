@@ -602,7 +602,7 @@ class TestSorteringen:
         """FR-411: samme rute og mal i demoen, med merket som før."""
         monkeypatch.setenv(app_modul.I_DEMO, "1")
         html = klient.get("/?sorter=endring&orden=stigende").data.decode("utf-8")
-        assert '<p class="sortert">Sortert på endring, stigende.' in html
+        assert '<p class="sortert">Sortert på endring, stigende, innenfor hver del.' in html
         assert "Eksempeltall" in html
 
 
