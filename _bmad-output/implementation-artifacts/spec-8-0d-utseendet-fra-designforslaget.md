@@ -114,7 +114,7 @@ Resten av planen gjelder som vist: merkene over h1, overskriften «<navn> skilte
 
 **Mutantene for PR 3** (planen kl. 22:28; b, c, d, g og k er nr. 2, 3, 4, 7 og 11 i del G fra 13.10): M1 `stroke-dasharray` tilbake på snittet; M2 hjelpeteksten sier «stiplede»; M3 «← » tilbake i lenken; M4 grafen før sjekkene; M5 det grå feltet tilbake til `#D9D5CB`; M6 «data hentet» tilbake på aksjesiden; M7 markeringen borte fra overskriften på aksjesiden; M8 «skilte seg ut» også under terskelen; M9 endringskortet borte; M10 skalaen uten `aria-hidden`; M11 brikken for 0 med grønt fyll; M12 «2 av 3» uten pille; M13 setningen om vurdert regnet fra radene igjen; M14 «uten signal» teller alle radene i «Øvrige».
 
-**PR 3, 14.–15.10 (grenen `8-0d-aksjesiden`, PR #42):** `4e68153` svarene og planen, `30e6d97` oversikten, `cec8c53` aksjesiden, `c503654` testene, `c8ed4aa` README-statusen (svar 26), `fcfbdc2` navnene i grafen med hvit kant og brikkene høyrestilt, `8323d3c` tre punkter i `deferred-work.md`, `f889bcd` og `ee27d53` rettingene og testene fra gjennomgangen i natt. *Lagt til 2026-10-15:* `fae3e24` testene og `1deed86` punktene i `deferred-work.md` fra gjennomgangen 15.10.
+**PR 3, 14.–15.10 (grenen `8-0d-aksjesiden`, PR #42):** `4e68153` svarene og planen, `30e6d97` oversikten, `cec8c53` aksjesiden, `c503654` testene, `c8ed4aa` README-statusen (svar 26), `fcfbdc2` navnene i grafen med hvit kant og brikkene høyrestilt, `8323d3c` tre punkter i `deferred-work.md`, `f889bcd` og `ee27d53` rettingene og testene fra gjennomgangen i natt. *Lagt til 2026-10-15:* `fae3e24` testene, og `1deed86` og `58f385c` punktene i `deferred-work.md` fra gjennomgangen 15.10. `0962974` triagen, mutantene og testtallene.
 
 ## Boundaries & Constraints
 
@@ -253,7 +253,7 @@ Gjennomgang av PR 2 (diffen `main...61b6cb9`, 14.10), med Blind Hunter (BH, 12 f
 
 Gjennomgang av PR 3. Gjennomgangen natt til 15.10 er ikke ført med funnene. Rettingene står i `f889bcd` og `ee27d53`, med merkene i kommentarene: BH2 og ECH1 (navnene over månedsnavnene), ECH3 og ECH4 (ingen prikk og ingen skala for en måling eller volumfaktor som ikke er et tall), BH5 og VG4 (etiketten sier tykkelsen, ikke fargen), VG1 («Demo Børs»), VG3 (3 av 3 over terskelen), VG5 (feltet mellom grensene), VG6 (ukedagene i endringen), VG7 (rekkefølgen i README-en) og VG8 (feltet mot sporet). «?» ved «Oppdatert» står bare når siden har et tidspunkt (`f889bcd`).
 
-*Lagt til 2026-10-15:* gjennomgangen ble kjørt på nytt på diffen `main...ee27d53`, med Blind Hunter (BH, 20 funn), Edge Case Hunter (ECH, 8) og Verification Gap (VG, 4). Rettingene står i `fae3e24` og `1deed86`. Bare tester og dokumenter er rettet (instruksjonen 15.10 kl. 11:09).
+*Lagt til 2026-10-15:* gjennomgangen ble kjørt på nytt på diffen `main...ee27d53`, med Blind Hunter (BH, 20 funn), Edge Case Hunter (ECH, 8) og Verification Gap (VG, 4). Rettingene står i `fae3e24`, `1deed86` og `58f385c`. Bare tester og dokumenter er rettet (instruksjonen 15.10 kl. 11:09).
 
 | # | Funn | Dom | Rute |
 |---|---|---|---|
