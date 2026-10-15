@@ -2623,6 +2623,36 @@ Det vi lærte: en tekst som KI lager på nytt, må diffes mot forrige versjon, o
 
 ---
 
+## 14.10.2026 – Fargene fra originalen, og 14 som skulle vært 15
+
+*Joakim og Marian.*
+
+Story 8.0d skulle gi appen utseendet fra designforslaget. PR 1 med rammen og skriften og PR 2 med oversikten ble flettet. Underveis så vi at kortet «Slik leser du tabellen» sto feil og manglet ramme, og at fargene ikke var som i originalen. Vi bestemte at sterk oransje betyr 3 av 3, lys oransje 2 av 3, og ingenting ved 1 og 0. Det erstattet regelen om at bare 3 av 3 er gult.
+
+Overskriften sa «5 av 14 aksjer», men lista har 15. Én aksje manglet kurser og falt ut av tellingen. PR 2b teller nå alle aksjene i lista.
+
+Rådet bommet i planen for PR 2: brikkene for T, B og I og pillene for retning sto i designreglene, men kom ikke med. Det ble sett etter flettingen og lagt til PR 3.
+
+Om kvelden bestemte vi rekkefølgen etter 8.0d, og at README-prøven tas når mest mulig er bygget, senest én uke før innleveringen. Hentingen ga alle 15 aksjene.
+
+Det vi lærte: designtavla ligger utenfor repoet, så det byggingen ikke ser, må tas med i planen ord for ord. Et antall må telles fra lista, ikke fra det som står i tabellen.
+
+---
+
+## 15.10.2026 – Minus teller også, og KI-laget fram i køen
+
+*Joakim og Marian.*
+
+Gjennomgangen av PR 3 fant tre ting som endret det som vises, og vi svarte på dem. Samtidig spurte vi hvorfor to minus og ett pluss gir 3 av 3. Regelen var riktig: styrken teller hvor mange sjekker som slo ut, og retningen viser «Blandet». Men kortet som skal forklare tabellen, sa ikke at minus også teller. Nå viser det en grønn +1 over en rød -1, og to setninger forklarer det. 8.0d ble ferdig, og sorteringen ved klikk (8.15) ble bygget og flettet samme ettermiddag. Retning kan sorteres, men alfabetisk, så rekkefølgen ikke ser ut som godt og dårlig.
+
+Så leste vi sensorveiledningen for del 1. Det svakeste var ikke koden, men det briefen lover: KI-forklaringen og brukertesten var ikke gjort. Vi flyttet KI-laget fram til rett etter 8.15. Fire av de første fem PR-ene ble flettet samme kveld. Den femte venter, fordi migrasjonen endrer den ekte basen ved neste henting.
+
+Vi brukte to KI-chatter samme dag. Claude Code stoppet endringsforslaget fra den ene to ganger, fordi påstander i det ikke stemte med repoet. Om kvelden skrev Claude Code selv at hentingen trenger Docker. Den går med uv.
+
+Det vi lærte: en forklaring på skjermen må si det som er lett å lese feil, ikke bare det som er riktig. En påstand fra KI om repoet sjekkes mot repoet, også når den kommer fra en annen KI-økt.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
