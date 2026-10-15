@@ -45,6 +45,9 @@ VIST = "vist"
 INGEN_RAD = "ingen_rad"
 # Svar kl. 23:57: andre aksjer har rader for dagen, men ikke denne.
 INGEN_FOR_AKSJEN = "ingen_for_aksjen"
+# Loggen kunne ikke leses, eller det er ingen vurdering aa forklare. Da vet
+# siden ikke hvorfor, og sier ingen grunn (gjennomgangen av PR 2, BH3, ECH, VG3).
+UKJENT = "ukjent"
 MODELLEN_FEILET = "modellen_feilet"
 BESTO_IKKE = "besto_ikke"
 STEMMER_IKKE = "stemmer_ikke"
@@ -55,6 +58,7 @@ GRUNNER = {
     # noeyaktige grunnen staar i utskriften fra hentingen (FR-601).
     INGEN_RAD: "Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.",
     INGEN_FOR_AKSJEN: "Ingen KI-tekst for denne aksjen: teksten ble ikke laget i hentingen.",
+    UKJENT: "Ingen KI-tekst for denne dagen.",
     MODELLEN_FEILET: "Ingen KI-tekst for denne dagen: modellen svarte ikke da hentingen gikk.",
     BESTO_IKKE: "Ingen KI-tekst for denne dagen: teksten sa mer enn regelen, og ble ikke vist.",
     STEMMER_IKKE: "Ingen KI-tekst for denne dagen: vurderingen er skrevet på nytt etter at teksten ble laget.",
@@ -85,19 +89,20 @@ def stemmer(grunnlag: Mapping[str, object], vurdering: Vurdering) -> bool:
                for navn in ("trend", "bevegelse", "interesse", "styrke", "retning"))
 
 
-def bygg_ki_visning(rad: KIRad | None, vurdering: object, dagen_har_rader: bool = False) -> KIVisning:
-    """Det siden viser under regelforklaringen. dagen_har_rader sier om andre
-    aksjer har rader i KI-loggen for dagen (svar kl. 23:57)."""
+def bygg_ki_visning(rad: KIRad | None, vurdering: object, *, andre_har_rader: bool) -> KIVisning:
+    """Det siden viser under regelforklaringen. andre_har_rader sier om andre
+    aksjer har rader i KI-loggen for dagen (svar kl. 23:57). Hver kaller maa
+    si det (gjennomgangen av PR 2, BH6)."""
     if rad is None:
-        return KIVisning(INGEN_FOR_AKSJEN if dagen_har_rader else INGEN_RAD)
+        return KIVisning(INGEN_FOR_AKSJEN if andre_har_rader else INGEN_RAD)
     if rad.modellen_feilet:
         return KIVisning(MODELLEN_FEILET)
     if not rad.besto:
         return KIVisning(BESTO_IKKE)
     if not isinstance(vurdering, Vurdering):
         # Ingen vurdering aa forklare. Siden viser da ingen KI-del, men skulle
-        # den, er dette den riktige grunnen (gjennomgangen, BH5).
-        return KIVisning(INGEN_RAD)
+        # den, sier den ingen grunn (gjennomgangen, BH5, og av PR 2, ECH).
+        return KIVisning(UKJENT)
     if not stemmer(rad.grunnlag, vurdering):
         return KIVisning(STEMMER_IKKE)
     tekst = unicodedata.normalize("NFC", rad.tekst).translate(_USYNLIGE)

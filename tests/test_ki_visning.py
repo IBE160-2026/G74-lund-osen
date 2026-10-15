@@ -4,9 +4,10 @@ KI-radene skrives rett i testbasen med SQL, fordi testseriene ikke ligger paa
 inneveerende boersdag og KILogg.skriv avviser alle andre dager.
 """
 
+import sqlite3
 import subprocess
 import sys
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -14,10 +15,10 @@ import pytest
 import app as app_modul
 import lagring_sqlite
 from ki_visning import (
-    BESTO_IKKE, INGEN_FOR_AKSJEN, INGEN_RAD, KAPSEL, MODELLEN_FEILET, STEMMER_IKKE, STOPPET_AV_VAKTEN, VIST,
+    BESTO_IKKE, INGEN_FOR_AKSJEN, INGEN_RAD, UKJENT, KAPSEL, MODELLEN_FEILET, STEMMER_IKKE, STOPPET_AV_VAKTEN, VIST,
     bygg_ki_visning, ki_paa,
 )
-from kilogg import Emne, KIRad
+from kilogg import Emne, KIRad, UgyldigKIRad
 from lagring_sqlite import aapne_base
 from test_app import HENTET, serie, skriv_serie, skriv_vurdering
 from vurderingsdata import Grunn, Vurdering
@@ -82,19 +83,19 @@ def side(klient, kapsel=None) -> str:
 
 class TestVisningen:
     def test_ingen_rad(self):
-        assert bygg_ki_visning(None, VURDERING).tilstand == INGEN_RAD
+        assert bygg_ki_visning(None, VURDERING, andre_har_rader=False).tilstand == INGEN_RAD
 
     def test_vist_med_modellnavnet_og_tjenesten(self):
         """FR-602: «gemma4:e4b, lokal»."""
-        ki = bygg_ki_visning(kirad(), VURDERING)
+        ki = bygg_ki_visning(kirad(), VURDERING, andre_har_rader=False)
         assert (ki.tilstand, ki.tekst, ki.modell) == (VIST, TEKST, "gemma4:e4b, lokal")
 
     def test_modellen_feilet(self):
-        ki = bygg_ki_visning(kirad(tekst=None, besto=False, grunn="modellen feilet"), VURDERING)
+        ki = bygg_ki_visning(kirad(tekst=None, besto=False, grunn="modellen feilet"), VURDERING, andre_har_rader=False)
         assert ki.tilstand == MODELLEN_FEILET and ki.grunn
 
     def test_besto_ikke(self):
-        ki = bygg_ki_visning(kirad(besto=False, grunn="3: «kjøp»"), VURDERING)
+        ki = bygg_ki_visning(kirad(besto=False, grunn="3: «kjøp»"), VURDERING, andre_har_rader=False)
         assert ki.tilstand == BESTO_IKKE and ki.tekst is None
 
     @pytest.mark.parametrize("endret", [
@@ -107,18 +108,18 @@ class TestVisningen:
     def test_grunnlaget_stemmer_ikke_med_vurderingen(self, endret):
         """FR-602 og svar 3: en vurdering skrevet paa nytt samme dag."""
         annen = Vurdering(**{**VURDERING.__dict__, **endret})
-        assert bygg_ki_visning(kirad(), annen).tilstand == STEMMER_IKKE
+        assert bygg_ki_visning(kirad(), annen, andre_har_rader=False).tilstand == STEMMER_IKKE
 
     def test_en_grunn_i_stedet_for_vurdering(self):
         """Gjennomgangen (BH5): ingen vurdering aa forklare, ikke «skrevet paa nytt»."""
-        assert bygg_ki_visning(kirad(), Grunn.KURS_IKKE_FRA_DAGEN).tilstand == INGEN_RAD
+        assert bygg_ki_visning(kirad(), Grunn.KURS_IKKE_FRA_DAGEN, andre_har_rader=False).tilstand == UKJENT
 
     @pytest.mark.parametrize("ord_", ["Kjøp", "selger", "anbefales", "KJØPSSIGNAL", "salgssignal",
                                       "salgsanbefaling", "aksjekjøp", "kj\u00adøpssignal", "solgt",
                                       "tilrådd", "kjop"])
     def test_vakten_stopper_raad(self, ord_):
         """NFR-06: vakten paa vaar side, ogsaa for en tekst som besto."""
-        ki = bygg_ki_visning(kirad(tekst=f"Signalet er et {ord_}."), VURDERING)
+        ki = bygg_ki_visning(kirad(tekst=f"Signalet er et {ord_}."), VURDERING, andre_har_rader=False)
         assert ki.tilstand == STOPPET_AV_VAKTEN and ki.tekst is None
 
     def test_bryteren_er_paa_uten_kapsel(self):
@@ -195,7 +196,8 @@ class TestSiden:
             raise RuntimeError("Basen er ikke migrert til siste versjon")
 
         monkeypatch.setattr(app_modul, "SqliteKILogg", feil)
-        assert '<p class="uten">Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.</p>' in side(klient)
+        html = side(klient)
+        assert '<p class="uten">Ingen KI-tekst for denne dagen.</p>' in html and "KI var slått av" not in html
 
 
 class TestBryteren:
@@ -232,7 +234,7 @@ class TestEtterGjennomgangen:
                                        "Retningen er blandet."])
     def test_vakten_slipper_en_vanlig_forklaring(self, tekst):
         """BH13: vakten stopper ikke alt. «Selskapet» er ikke «selg»."""
-        assert bygg_ki_visning(kirad(tekst=tekst), VURDERING).tilstand == VIST
+        assert bygg_ki_visning(kirad(tekst=tekst), VURDERING, andre_har_rader=False).tilstand == VIST
 
     def test_skjemaet_paa_siden_snur_bryteren(self, klient, aksje):
         """VG2: verdiene skjemaet sender, ikke bare teksten paa knappen."""
@@ -300,11 +302,11 @@ class TestGrunnenPaaSiden:
     """Svar kl. 23:57 15.10: siden sier hvorfor med det loggen kan vise (FR-601)."""
 
     def test_uten_rad_og_uten_andre_rader(self):
-        ki = bygg_ki_visning(None, VURDERING, dagen_har_rader=False)
+        ki = bygg_ki_visning(None, VURDERING, andre_har_rader=False)
         assert ki.tilstand == INGEN_RAD and ki.grunn == DAGEN
 
     def test_uten_rad_men_med_andre_rader(self):
-        ki = bygg_ki_visning(None, VURDERING, dagen_har_rader=True)
+        ki = bygg_ki_visning(None, VURDERING, andre_har_rader=True)
         assert ki.tilstand == INGEN_FOR_AKSJEN and ki.grunn == AKSJEN
 
     def test_ingen_rader_for_dagen_paa_siden(self, klient, aksje):
@@ -318,8 +320,6 @@ class TestGrunnenPaaSiden:
 
     def test_en_rad_for_en_annen_dag_teller_ikke(self, klient, aksje):
         """Bare rader for samme dag sier at hentingen laget tekster den dagen."""
-        from datetime import timedelta
-
         skriv_kirad(kirad(aksje - timedelta(days=1), emne=Emne.aksje("DNB", aksje - timedelta(days=1))))
         assert f'<p class="uten">{DAGEN}</p>' in side(klient)
 
@@ -344,12 +344,48 @@ class TestGrunnenPaaSiden:
         skriv_kirad(kirad(aksje, emne=Emne.aksje("DNB", aksje)))
         tilkobling = aapne_base(lagring_sqlite.BASE_STI)
         try:
-            foer = tilkobling.execute("SELECT * FROM ki_logg").fetchall()
+            foer = tilkobling.execute("SELECT * FROM ki_logg ORDER BY nr").fetchall()
         finally:
             tilkobling.close()
         side(klient)
         tilkobling = aapne_base(lagring_sqlite.BASE_STI)
         try:
-            assert tilkobling.execute("SELECT * FROM ki_logg").fetchall() == foer
+            assert tilkobling.execute("SELECT * FROM ki_logg ORDER BY nr").fetchall() == foer
+            assert tilkobling.total_changes == 0
         finally:
             tilkobling.close()
+
+    def test_en_melding_teller_ikke_som_en_aksje(self, klient, aksje):
+        """VG1: bare rader for andre aksjer gir grunnen for aksjen."""
+        skriv_kirad(kirad(aksje, emne=Emne.melding("x", aksje)))
+        assert f'<p class="uten">{DAGEN}</p>' in side(klient)
+
+    def test_en_rad_som_ikke_kan_leses_endrer_ikke_svaret(self, klient, aksje, monkeypatch):
+        """BH2, ECH, VG2: radene for andre aksjer og dager tolkes ikke."""
+        skriv_kirad(kirad(aksje, emne=Emne.aksje("DNB", aksje)))
+        skriv_kirad(kirad(aksje - timedelta(days=1), emne=Emne.aksje("DNB", aksje - timedelta(days=1))))
+
+        def ugyldig(_rad):
+            raise UgyldigKIRad("raden kan ikke leses")
+
+        # Ingen rad i loggen kan tolkes. Basen stopper ugyldig JSON (CHECK),
+        # saa feilen settes inn der radene tolkes.
+        monkeypatch.setattr(lagring_sqlite, "_kirad", ugyldig)
+        assert f'<p class="uten">{AKSJEN}</p>' in side(klient)
+
+    def test_sjekken_av_andre_kjoeres_bare_uten_egen_rad(self, klient, aksje, monkeypatch):
+        """BH7, BH15, VG2: med en rad for aksjen sjekkes ikke de andre."""
+        kall = []
+        monkeypatch.setattr(app_modul, "andre_aksjer_har_ki_rad", lambda *a: kall.append(a) or True)
+        skriv_kirad(kirad(aksje))
+        assert TEKST in side(klient) and kall == []
+
+    def test_en_feil_i_sjekken_av_andre_gir_ingen_grunn(self, klient, aksje, monkeypatch):
+        """VG2: en feil i sjekken gir 200 og ingen grunn, ikke 500."""
+        def feil(*_a):
+            raise sqlite3.OperationalError("no such table: ki_logg")
+
+        monkeypatch.setattr(app_modul, "andre_aksjer_har_ki_rad", feil)
+        html = side(klient)
+        assert '<p class="uten">Ingen KI-tekst for denne dagen.</p>' in html and DAGEN not in html
+

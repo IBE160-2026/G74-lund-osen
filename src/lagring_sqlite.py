@@ -26,7 +26,7 @@ from datetime import date, datetime
 from pathlib import Path
 
 from boersdag import innevaerende_boersdag, norsk_dato
-from kilogg import Emne, IkkeInnevaerendeBoersdag, KIRad
+from kilogg import AKSJE, Emne, IkkeInnevaerendeBoersdag, KIRad
 from kursdata import AKSJEUNIVERS, Aksje, Kursrad, kontroller_skriving
 from lagring_fil import DATA_KATALOG
 from migrering import MigrasjonsFeil, migrer, siste_versjon, versjon
@@ -509,6 +509,17 @@ class SqliteKILogg:
 
     def les_alle(self) -> list[KIRad]:
         return [_kirad(rad) for rad in self._tilkobling.execute(_KI_LES + "ORDER BY dato, nr")]
+
+
+def andre_aksjer_har_ki_rad(tilkobling: sqlite3.Connection, dato: date, symbol: str) -> bool:
+    """Har en annen aksje en rad i KI-loggen for dagen? Bare lesing (AD-10),
+    og utenfor porten, som bare har skriv og lesemetodene for emner (svar
+    kl. 23:57 15.10). Radene tolkes ikke, saa en rad som ikke kan leses for en
+    annen dag eller aksje endrer ikke svaret (gjennomgangen av PR 2, BH1, ECH)."""
+    return tilkobling.execute(
+        "SELECT EXISTS(SELECT 1 FROM ki_logg WHERE slag = ? AND dato = ? AND ifnull(symbol, '') != ?)",
+        (AKSJE, dato.isoformat(), symbol),
+    ).fetchone()[0] == 1
 
 
 def _kirad(rad) -> KIRad:
