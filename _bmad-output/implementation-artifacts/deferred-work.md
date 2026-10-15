@@ -197,3 +197,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-4-2-kilogg-porten-med-minneimplementasjon.md`
   summary: Passerer hentingen midnatt i Oslo mellom modellkallet og `skriv`, gir `skriv` `IkkeInnevaerendeBoersdag` for resten av radene den kvelden.
   evidence: ECH i gjennomgangen 15.10 av 4.2. Porten reiser en egen type for feil dag, så kalleren kan skille den fra en feil i klokka eller kalenderen. Tas i 10.2b (PR F): hentekommandoen må fange den per rad og la hentingen gå videre (NFR-04).
+- source_spec: `_bmad-output/implementation-artifacts/spec-10-2a-modellen-prompten-og-kontrollen.md`
+  summary: Kontrollen i FR-603 ser ikke på lengden, språket eller om en tekst for en aksje utenfor målingen sier at grensene ikke er målt på den, selv om prompten ber om to eller tre setninger på norsk og den setningen.
+  evidence: BH16 i gjennomgangen 15.10 av PR E. FR-603 har fire punkter, og ingen av dem gjelder dette. Tas når 10.2b (PR F) gir de første ekte tekstene, eller i 10.4: om det trengs et femte punkt, avgjøres av gruppen.
