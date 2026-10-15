@@ -11,6 +11,7 @@ Til faglærer:
 - Plan og krav: [PRD](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md), [arkitektur](_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md) og [epics og stories](_bmad-output/planning-artifacts/epics.md)
 - [Leveranselista](docs/innlevering.md): kravene i emnet, og hvor hvert av dem står
 - Prosessen og KI-bruken: [kvalitetssikringen](docs/kvalitetssikring.md), [refleksjonsloggen](docs/reflection-log.md) og [de lagrede KI-promptene](docs/ai-prompts/)
+- [Vurderingsmatrisen for del 1](docs/vurderingsmatrise.md): status per kriterium, med bevis og neste tiltak
 
 ## Kom i gang
 
@@ -265,6 +266,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 
 - [Sprintstatus og story-spesifikasjoner](_bmad-output/implementation-artifacts/)
 - [Kvalitetssikring](docs/kvalitetssikring.md)
+- [Vurderingsmatrise for del 1](docs/vurderingsmatrise.md)
 - [Kontrollrapport 22.09](docs/kontroll-2026-09-22.md), med [rettingsplanen](docs/kontroll-2026-09-22-plan.md)
 - [Kontrollrapport 26.09](docs/kontroll-2026-09-26.md)
 - [Refleksjonslogg](docs/reflection-log.md) og [lagrede KI-prompts](docs/ai-prompts/)
