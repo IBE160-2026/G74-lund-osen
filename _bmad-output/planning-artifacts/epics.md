@@ -2063,6 +2063,8 @@ kontrollert; `httpx` er ikke installert.
 
 **Én økt:** ja.
 
+*Lagt til 2026-10-15:* flettet i `dc43569`, PR #44.
+
 ### Story 4.1: Velg modelltjeneste og dokumentér betingelse 4
 
 Som **gruppe**, vil jeg ha modelltjenestens egne vilkår sitert og datert, så vi
