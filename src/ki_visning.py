@@ -43,13 +43,18 @@ _USYNLIGE = dict.fromkeys(map(ord, "\u00ad\u200b\u200c\u200d\u2060\ufeff"))
 
 VIST = "vist"
 INGEN_RAD = "ingen_rad"
+# Svar kl. 23:57: andre aksjer har rader for dagen, men ikke denne.
+INGEN_FOR_AKSJEN = "ingen_for_aksjen"
 MODELLEN_FEILET = "modellen_feilet"
 BESTO_IKKE = "besto_ikke"
 STEMMER_IKKE = "stemmer_ikke"
 STOPPET_AV_VAKTEN = "stoppet_av_vakten"
 
 GRUNNER = {
-    INGEN_RAD: "Ingen KI-tekst for denne dagen.",
+    # Svar kl. 23:57 15.10: siden sier hvorfor med det loggen kan vise. Den
+    # noeyaktige grunnen staar i utskriften fra hentingen (FR-601).
+    INGEN_RAD: "Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.",
+    INGEN_FOR_AKSJEN: "Ingen KI-tekst for denne aksjen: teksten ble ikke laget i hentingen.",
     MODELLEN_FEILET: "Ingen KI-tekst for denne dagen: modellen svarte ikke da hentingen gikk.",
     BESTO_IKKE: "Ingen KI-tekst for denne dagen: teksten sa mer enn regelen, og ble ikke vist.",
     STEMMER_IKKE: "Ingen KI-tekst for denne dagen: vurderingen er skrevet på nytt etter at teksten ble laget.",
@@ -80,10 +85,11 @@ def stemmer(grunnlag: Mapping[str, object], vurdering: Vurdering) -> bool:
                for navn in ("trend", "bevegelse", "interesse", "styrke", "retning"))
 
 
-def bygg_ki_visning(rad: KIRad | None, vurdering: object) -> KIVisning:
-    """Det siden viser under regelforklaringen."""
+def bygg_ki_visning(rad: KIRad | None, vurdering: object, dagen_har_rader: bool = False) -> KIVisning:
+    """Det siden viser under regelforklaringen. dagen_har_rader sier om andre
+    aksjer har rader i KI-loggen for dagen (svar kl. 23:57)."""
     if rad is None:
-        return KIVisning(INGEN_RAD)
+        return KIVisning(INGEN_FOR_AKSJEN if dagen_har_rader else INGEN_RAD)
     if rad.modellen_feilet:
         return KIVisning(MODELLEN_FEILET)
     if not rad.besto:

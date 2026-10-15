@@ -14,7 +14,7 @@ import pytest
 import app as app_modul
 import lagring_sqlite
 from ki_visning import (
-    BESTO_IKKE, INGEN_RAD, KAPSEL, MODELLEN_FEILET, STEMMER_IKKE, STOPPET_AV_VAKTEN, VIST,
+    BESTO_IKKE, INGEN_FOR_AKSJEN, INGEN_RAD, KAPSEL, MODELLEN_FEILET, STEMMER_IKKE, STOPPET_AV_VAKTEN, VIST,
     bygg_ki_visning, ki_paa,
 )
 from kilogg import Emne, KIRad
@@ -149,7 +149,7 @@ class TestSiden:
     def test_en_dag_uten_rad_sier_det(self, klient, aksje):
         """Ville feilet med et tomt felt (V3)."""
         html = side(klient)
-        assert '<p class="uten">Ingen KI-tekst for denne dagen.</p>' in html
+        assert '<p class="uten">Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.</p>' in html
 
     @pytest.mark.parametrize("endret, ord_", [
         (dict(tekst=None, besto=False, grunn="modellen feilet"), "modellen svarte ikke"),
@@ -195,7 +195,7 @@ class TestSiden:
             raise RuntimeError("Basen er ikke migrert til siste versjon")
 
         monkeypatch.setattr(app_modul, "SqliteKILogg", feil)
-        assert '<p class="uten">Ingen KI-tekst for denne dagen.</p>' in side(klient)
+        assert '<p class="uten">Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.</p>' in side(klient)
 
 
 class TestBryteren:
@@ -276,7 +276,7 @@ class TestEtterGjennomgangen:
         symbol = re.search(r'href="/aksje/([A-Z]+)"', oversikt).group(1)
         html = klient.get(f"/aksje/{symbol}").data.decode("utf-8")
         assert "Eksempeltall" in html
-        assert '<p class="uten">Ingen KI-tekst for denne dagen.</p>' in html
+        assert '<p class="uten">Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.</p>' in html
 
 
 def test_webserveren_importerer_ingen_modell_heller_ikke_under_en_forespoersel(tmp_path):
@@ -290,3 +290,66 @@ def test_webserveren_importerer_ingen_modell_heller_ikke_under_en_forespoersel(t
     ut = subprocess.run([sys.executable, "-c", kode, str(src), str(tmp_path)],
                         capture_output=True, text=True, check=True)
     assert ut.stdout.strip().splitlines()[-1] == "[]"
+
+
+DAGEN = "Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk."
+AKSJEN = "Ingen KI-tekst for denne aksjen: teksten ble ikke laget i hentingen."
+
+
+class TestGrunnenPaaSiden:
+    """Svar kl. 23:57 15.10: siden sier hvorfor med det loggen kan vise (FR-601)."""
+
+    def test_uten_rad_og_uten_andre_rader(self):
+        ki = bygg_ki_visning(None, VURDERING, dagen_har_rader=False)
+        assert ki.tilstand == INGEN_RAD and ki.grunn == DAGEN
+
+    def test_uten_rad_men_med_andre_rader(self):
+        ki = bygg_ki_visning(None, VURDERING, dagen_har_rader=True)
+        assert ki.tilstand == INGEN_FOR_AKSJEN and ki.grunn == AKSJEN
+
+    def test_ingen_rader_for_dagen_paa_siden(self, klient, aksje):
+        assert f'<p class="uten">{DAGEN}</p>' in side(klient)
+
+    def test_rader_for_andre_aksjer_men_ikke_denne(self, klient, aksje):
+        """Ville feilet hvis siden ga grunnen for dagen (B1)."""
+        skriv_kirad(kirad(aksje, emne=Emne.aksje("DNB", aksje)))
+        html = side(klient)
+        assert f'<p class="uten">{AKSJEN}</p>' in html and DAGEN not in html
+
+    def test_en_rad_for_en_annen_dag_teller_ikke(self, klient, aksje):
+        """Bare rader for samme dag sier at hentingen laget tekster den dagen."""
+        from datetime import timedelta
+
+        skriv_kirad(kirad(aksje - timedelta(days=1), emne=Emne.aksje("DNB", aksje - timedelta(days=1))))
+        assert f'<p class="uten">{DAGEN}</p>' in side(klient)
+
+    def test_dagsteksten_teller_ikke_som_en_aksje(self, klient, aksje):
+        """En rad for dagen (10.6) er ikke en tekst for en aksje."""
+        skriv_kirad(kirad(aksje, emne=Emne.dagen(aksje)))
+        assert f'<p class="uten">{DAGEN}</p>' in side(klient)
+
+    def test_rader_som_foer(self, klient, aksje):
+        skriv_kirad(kirad(aksje))
+        skriv_kirad(kirad(aksje, emne=Emne.aksje("DNB", aksje)))
+        html = side(klient)
+        assert TEKST in html and DAGEN not in html and AKSJEN not in html
+
+    def test_bryteren_av_viser_ingen_grunn(self, klient, aksje):
+        skriv_kirad(kirad(aksje, emne=Emne.aksje("DNB", aksje)))
+        html = side(klient, "av")
+        assert DAGEN not in html and AKSJEN not in html and "Med KI-ens ord" not in html
+
+    def test_siden_leser_bare(self, klient, aksje):
+        """AD-10: aksjesiden skriver ingenting i KI-loggen."""
+        skriv_kirad(kirad(aksje, emne=Emne.aksje("DNB", aksje)))
+        tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+        try:
+            foer = tilkobling.execute("SELECT * FROM ki_logg").fetchall()
+        finally:
+            tilkobling.close()
+        side(klient)
+        tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+        try:
+            assert tilkobling.execute("SELECT * FROM ki_logg").fetchall() == foer
+        finally:
+            tilkobling.close()
