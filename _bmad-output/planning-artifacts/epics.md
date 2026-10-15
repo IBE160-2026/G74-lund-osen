@@ -2347,6 +2347,8 @@ starter ikke av seg selv.
 
 **Én økt:** ja.
 
+*Lagt til 2026-10-15 (gruppens svar kl. 23:32 på spørsmålene i PR F og G, instruksjonen kl. 23:33):* a) G (story 10.3) flettes i kveld, fordi hentingen for 15.10 er ferdig. b) «lokal» gjelder fortsatt når `OSE_KI_TJENESTE` mangler (svar 5 kl. 15:53 står). c) Hentingen sjekker først at Ollama svarer og har modellen. Gjør den ikke det, skrives ingen rader i `ki_logg` for dagen, og utskriften sier hvorfor og at samme kommando kan kjøres igjen samme kveld, med 0 kall til EODHD. Svarer den, skrives rader som før, også når modellen feiler for en aksje (svar 2). Grunnen: formålet med FR-604, at en tekst ikke kan lages på nytt til man får en man liker, holder, fordi ingen tekst ble laget.
+
 ### Story 10.3: Visningen i aksjedetaljen
 
 *Het Story 5B.3 til 28.09.*
@@ -2381,6 +2383,8 @@ så jeg alltid ser hva signalet faktisk bygger på.
 - Er tjenesten ikke tilgjengelig, er KI av, og siden sier hvorfor (FR-601)
 
 **Én økt:** ja.
+
+*Lagt til 2026-10-15:* flettet i `e728c37`, PR #50. Står som review: kontrollpunktet om at siden sier hvorfor når tjenesten ikke er tilgjengelig (FR-601), er ikke oppfylt. Med svar c kl. 23:32 skriver hentingen ingen rad når Ollama ikke svarer, og siden viser da bare «Ingen KI-tekst for denne dagen.» uten grunnen. Det trengs et sted der hentingen fører at tjenesten ikke svarte for dagen, og det avgjøres av gruppen.
 
 ### Story 10.4: Måle bidraget — egen brukertest, etter 8.1
 
