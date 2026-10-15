@@ -154,6 +154,11 @@ KONTRAST = [
     # Teksten i båndet, pillene, markeringen, «NOK» og brikken i kortet.
     ("brun", "baand-ut", 4.5), ("hvit", "brun", 4.5), ("hvit", "tekst", 4.5),
     ("blekk", "lys-oransje", 4.5), ("kolonne-tekst-2", "blekk", 4.5), ("hvit", "opp", 4.5),
+    # Story 8.0d, PR 3: brikken for -1 og den hvite pillen ved 2 av 3.
+    # Resultatpillene i sjekkortene bruker parene for retningen over.
+    ("hvit", "ned", 4.5), ("blekk", "hvit", 4.5), ("dempet-2", "hvit", 4.5),
+    # Gjennomgangen av PR 3 (VG8): det grå feltet mot sporet (del 5, 3,23:1).
+    ("felt", "spor", 3.0),
 ]
 
 
@@ -252,7 +257,8 @@ class TestRammen:
         for velger in ("td.tall", ".styrke"):
             assert "tabular-nums" in _regel(oversikt, velger), velger
         aksje = _stil(sidene["aksjesiden"])
-        for velger in (".noekkeltall .verdi", "td.fortegn", ".regnestykke"):
+        # Story 8.0d, PR 3: resultatpillen i sjekkortene erstatter Ga-cellen.
+        for velger in (".noekkeltall .verdi", ".sjekkort .resultat", ".sjekkort .regnestykke", ".brikke"):
             assert "tabular-nums" in _regel(aksje, velger), velger
 
     def test_fokus_i_blekk_paa_lys_bakgrunn_og_lys_gul_i_stripa(self, sidene):
@@ -354,8 +360,8 @@ class TestOversikten:
             assert '<section class="slik-leser"' in rutenett and "<h1" in rutenett, navn
 
     def test_symbolene_i_kortet_er_skjult_og_ingen_pil_ved_navnet(self, sidene):
-        """Beslutning 11: en grønn brikke med T +1, de tre retningssymbolene og
-        en musepeker, alle aria-hidden. Ville feilet uten aria-hidden, eller
+        """Beslutning 11: et symbol for signalstyrken, de tre retningssymbolene
+        og en musepeker, alle aria-hidden. Ville feilet uten aria-hidden, eller
         med en pil ved navnet (pilene er bare for retning, FR-103)."""
         html = sidene["oversikten"]
         kortet = html.split('<section class="slik-leser"', 1)[1].split("</section>", 1)[0]
@@ -364,8 +370,15 @@ class TestOversikten:
         for attributter, _ in felt:
             assert 'aria-hidden="true"' in attributter
         brikke, retning, peker = (innhold for _, innhold in felt)
-        assert '<span class="brikke">T +1</span>' in brikke
-        assert "var(--opp)" in _regel(_stil(html), ".symbolfelt .brikke")
+        # Svaret kl. 12:15 (15.10, BH20): en grønn +1 over en rød -1, med en
+        # egen klasse, så regelen for brikkene i rammen ikke virker inn.
+        assert '<span class="utslagsfelt"><span class="pluss">+1</span><span class="minus">-1</span></span>' in brikke
+        assert "brikke" not in kortet
+        stil = _stil(html)
+        assert "flex-direction: column" in _regel(stil, ".utslagsfelt")
+        assert "background: var(--opp)" in _regel(stil, ".utslagsfelt .pluss")
+        assert "background: var(--ned)" in _regel(stil, ".utslagsfelt .minus")
+        assert "color: var(--hvit)" in _regel(stil, ".utslagsfelt span")
         assert [s for s in "↑↔↓" if s in retning] == list("↑↔↓")
         assert '<svg class="peker"' in peker
         assert not re.search("[←→↑↓↔↗↘↖↙›»]", peker), peker
@@ -401,7 +414,9 @@ class TestOversikten:
                         assert del_.strip().startswith(".tabellboks thead"), (navn, del_)
         aksje = sidene["aksjesiden i demoen"]
         assert 'class="tabellboks"' not in aksje
-        assert '<thead>' in aksje and 'popovertarget="hjelp-ga"' in aksje
+        # Story 8.0d, PR 3: aksjesiden har sjekkort og ingen kolonnerad, og
+        # «?» ved Ga står i det første kortet med den svarte sirkelen.
+        assert '<thead>' not in aksje and 'popovertarget="hjelp-ga"' in aksje
         stripa = _stripa(sidene["oversikten"])
         assert 'popovertarget="hjelp-hentet"' in stripa
 
@@ -520,7 +535,9 @@ class TestOversikten:
         assert int(ut.group(1)) == html.count('<span class="merke skjult">skiller seg ut</span>')
         oevrige = re.search(r'<tr class="del oevrige"><th[^>]*>Øvrige aksjer <span class="antall">\d+</span>'
                             r' <span class="bak">([^<]+)</span>', html)
-        assert oevrige and oevrige.group(1) == "signalstyrke 0 eller 1"
+        # Story 8.0d, PR 3: «og N uten signal» når rader uten signal står der.
+        uten = html.count('<span class="merke mangler">')
+        assert oevrige and oevrige.group(1) == "signalstyrke 0 eller 1" + (f" og {uten} uten signal" if uten else "")
         stil = _stil(html)
         assert "var(--brun)" in _regel(stil, "tr.del.ut .antall")
         skjult = _regel(stil, ".merke.skjult")
@@ -546,3 +563,53 @@ class TestOversikten:
                          html, re.DOTALL)
         assert '<span class="under">NOK</span>' in html
         assert html.count('class="under"') == 1
+
+
+class TestBrikkene:
+    """Story 8.0d, PR 3: T, B og I som brikker og retningen i en pille, i
+    oversikten og på aksjesiden (utdraget §6, designregler del 5)."""
+
+    KLASSE = {"+1": "pluss", "-1": "minus", "0": "null"}
+
+    def test_brikkene_har_klassen_etter_verdien(self, sidene):
+        """Ville feilet hvis brikken for 0 fikk grønt fyll, eller en brikke
+        sto uten klasse."""
+        # «oversikten» har ingen vurdering i fiksturen, så demoen brukes.
+        for navn in ("oversikten i demoen", "aksjesiden i demoen"):
+            brikker = re.findall(r'<span class="sjekk brikke ([a-z]+)"><abbr title="[a-z]+">[TBI]</abbr> ([+-]?\d)</span>',
+                                 sidene[navn])
+            assert brikker, navn
+            for klasse, verdi in brikker:
+                assert klasse == self.KLASSE[verdi], (navn, klasse, verdi)
+        stil = _stil(sidene["oversikten i demoen"])
+        assert "background: var(--opp)" in _regel(stil, ".brikke.pluss")
+        assert "background: var(--ned)" in _regel(stil, ".brikke.minus")
+        null = _regel(stil, ".brikke.null")
+        assert "background: var(--hvit)" in null and "var(--dempet-2)" in null and "var(--strek-2)" in null
+        assert "border-radius: 6px" in _regel(stil, ".brikke")
+
+    def test_retningen_staar_i_en_pille(self, sidene):
+        """Utdraget §6 og svar 6: pillen har symbolet først og fargen etter
+        retningen. «Ukjent» står som tekst uten pille, i Dempet."""
+        for navn in ("oversikten", "oversikten i demoen"):
+            celler = re.findall(r'<td class="retning">(.*?)</td>', sidene[navn], re.DOTALL)
+            assert celler, navn
+            for celle in celler:
+                assert re.fullmatch(r'<span class="retningspille (opp|ned|blandet|ingen)"><span class="symbol" aria-hidden="true">[↑↓↔–]</span>(Positiv|Negativ|Blandet|Ingen)</span>'
+                                    r'|<span class="retningstekst ukjent"><span class="symbol" aria-hidden="true">–</span> Ukjent</span>',
+                                    celle.strip()), celle
+        stil = _stil(sidene["oversikten i demoen"])
+        assert "border-radius: 999px" in _regel(stil, ".retningspille")
+        assert "background: var(--opp-bakgrunn)" in _regel(stil, ".retningspille.opp")
+        assert "var(--dempet)" in _regel(stil, ".retningstekst.ukjent")
+        assert "background" not in _regel(stil, ".retningstekst.ukjent")
+
+    def test_to_av_tre_er_en_hvit_pille_og_en_av_tre_er_tekst(self, sidene):
+        """Gruppen 14.10 kl. 19:59: hvit pille med kant i blekk ved 2 av 3,
+        uten ring. 1 og 0 av 3 står uten pille. Ville feilet hvis «2 av 3»
+        mistet pillen."""
+        html = sidene["oversikten i demoen"]
+        assert '<span class="pille to-av-tre">2 av 3</span>' in html
+        assert not re.search(r'<span class="pille[^"]*">[01] av 3</span>', html)
+        assert re.search(r'<span class="styrketall">[01] av 3</span>', html)
+        assert "oransje" not in _regel(_stil(html), ".pille.to-av-tre")

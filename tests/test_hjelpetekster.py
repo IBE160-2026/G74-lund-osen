@@ -145,6 +145,17 @@ class TestTekstenSierDetKodenGjoer:
         assert bevegelse(kurser).verdi == verdi
         assert setning in hjelpetekster()["bevegelse"].tekst
 
+    def test_endringen_sier_hvor_datoene_staar(self):
+        """Svar 32 i 8.0d (rettet kl. 13:05): én tekst for oversikten og
+        aksjesiden, som sier det samme som endringskortet etter svar 29.
+        Ville feilet med «fra børsdagen før»."""
+        tekst = hjelpetekster()["endring"]
+        assert (tekst.tittel, tekst.tekst) == (
+            "Endring:",
+            "endringen i prosent fra forrige dag med kurs, regnet på utbyttejustert kurs. "
+            "Mangler kilden kurser for noen børsdager, står datoene ved endringen på aksjesiden.",
+        )
+
 
 class TestRetningen:
     @pytest.mark.parametrize(
@@ -311,15 +322,23 @@ class TestSidene:
         for tekst, vindu in (('<span class="etikett">Sluttkurs ', "hjelp-kurs"),
                              ('<span class="etikett">Signalstyrke ', "hjelp-styrke"),
                              ('<span class="etikett">Retning ', "hjelp-retning-aksje"),
+                             ('<span class="etikett">Endring ', "hjelp-endring"),
                              ("<h2>Kursutvikling, 6 måneder ", "hjelp-graf"),
-                             ('<th class="fortegn">Ga ', "hjelp-ga"),
-                             ("<th>Målt mot ", "hjelp-maalt"),
-                             ("<td>Trend ", "hjelp-trend"),
-                             ("<td>Bevegelse ", "hjelp-bevegelse"),
-                             ("<td>Interesse ", "hjelp-interesse")):
+                             # Story 8.0d, PR 3 (svar 22): i sjekkortene.
+                             ('<span class="ga">Ga ', "hjelp-ga"),
+                             ('<p class="maalt">Målt mot ', "hjelp-maalt"),
+                             ("<h3>Trend ", "hjelp-trend"),
+                             ("<h3>Bevegelse ", "hjelp-bevegelse"),
+                             ("<h3>Interesse ", "hjelp-interesse")):
             assert re.search(re.escape(tekst) + knapp.format(vindu), detalj), vindu
         assert re.search(r"<h2>Hvorfor signalet ble [^<]* " + knapp.format("hjelp-sjekkene"), detalj)
         assert "Tallene og signalet" not in oversikt + detalj
+        # Story 8.0d, PR 3: «?» ved «Oppdatert» i stripa også på aksjesiden,
+        # og hvert vindu har én knapp.
+        stripa = detalj.split('<header class="stripe">', 1)[1].split("</header>", 1)[0]
+        assert re.search(r"Oppdatert [^<]+</span>\s*" + knapp.format("hjelp-hentet"), stripa)
+        for vindu in ("hjelp-ga", "hjelp-maalt"):
+            assert detalj.count(f'class="hjelpeknapp" popovertarget="{vindu}"') == 1, vindu
 
     def test_hvert_vindu_har_bare_sine_tekster(self, klient, base):
         """Den nye delen 2: vinduene og tekstene i dem, i rekkefoelge. «Ikke et
@@ -349,7 +368,11 @@ class TestSidene:
                 "hjelp-hentet": ["data_hentet", "uten_data"],
             },
             "/aksje/BRFE": {
-                "hjelp-kurs": ["sluttkurs", "utbyttejustert", "data_hentet_aksje"],
+                # Story 8.0d, PR 3: «data hentet» står ved «Oppdatert» i stripa,
+                # og endringen er et eget nøkkeltall.
+                "hjelp-hentet": ["data_hentet_aksje"],
+                "hjelp-kurs": ["sluttkurs", "utbyttejustert"],
+                "hjelp-endring": ["endring", "utbyttejustert"],
                 "hjelp-graf": ["grafen"],
                 "hjelp-styrke": ["signalstyrke", "ikke_raad"],
                 "hjelp-retning-aksje": ["retning", "positiv", "negativ", "blandet", "ingen",
@@ -447,9 +470,10 @@ class TestSnittetIGrafen:
         monkeypatch.setattr(app_modul, "STANDARD", Parametre(ma_vindu=40))
         html = _side(klient, "/aksje/BRFE")
         assert "40-dagers snitt (sjekk 1)" in html
-        assert "med 40-dagers glidende snitt" in html
+        # Story 8.0d, PR 3 (svar 19): etiketten for skjermleseren.
+        assert "den tynne er 40-dagers snitt (sjekk 1)" in html
         assert "50-dagers" not in html
-        # Hjelpen foelger samme parametre som tegnforklaringen.
+        # Hjelpen foelger samme parametre som navnet paa linja i grafen.
         assert "snittet av de siste 40 børsdagene" in html
         assert "de siste 50 børsdagene" not in html
 

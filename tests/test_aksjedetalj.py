@@ -290,3 +290,99 @@ class TestVurderingenIDetaljen:
 
         assert not hasattr(aksjedetalj, "beregn_signal")
         assert not hasattr(aksjedetalj, "vurder")
+
+
+class TestBoersdagMellom:
+    """Svar 29 (15.10, BH6 og ECH2): datoene står i endringskortet når det
+    ligger en børsdag mellom de to kursradene."""
+
+    def test_boersdager_ikke_kalenderdager(self):
+        from aksjedetalj import boersdag_mellom
+
+        assert boersdag_mellom(date(2026, 10, 2), date(2026, 10, 9))
+        assert not boersdag_mellom(date(2026, 10, 2), date(2026, 10, 5)), "fredag til mandag"
+        assert not boersdag_mellom(date(2026, 10, 8), date(2026, 10, 9))
+        # Skjærtorsdag, langfredag og 2. påskedag er stengt, og helgen ligger mellom.
+        assert not boersdag_mellom(date(2026, 4, 1), date(2026, 4, 7))
+
+    def test_datoene_naar_kalenderen_ikke_dekker_dagene(self):
+        """01.01.2027 er utenfor kalenderen: da står datoene."""
+        from aksjedetalj import boersdag_mellom
+
+        assert boersdag_mellom(date(2026, 12, 30), date(2027, 1, 4))
+
+    def test_en_helg_utenfor_kalenderen_gir_ukedagene(self):
+        """Gjennomgangen av svarene 15.10 (ECH2 og BH6): lørdag og søndag
+        slås ikke opp, så fredag til mandag i 2027 gir ukedagene."""
+        from aksjedetalj import boersdag_mellom
+
+        assert not boersdag_mellom(date(2027, 1, 8), date(2027, 1, 11))
+
+    def test_detaljen_har_svaret(self):
+        rader = serie([100.0] * 6 + [101.0], start=date(2026, 9, 21))
+        assert detalj(rader).endring_med_datoer is False
+        hull = rader[:-1] + [Kursrad(dato=date(2026, 10, 5), slutt=101.0, justert_slutt=101.0, volum=1000)]
+        assert detalj(hull).endring_med_datoer is True
+        assert detalj(rader[:1]).endring_med_datoer is False
+
+
+class TestSkalaen:
+    """Story 8.0d, PR 3: det grå feltet i sjekkortene (utdraget §8, svar 20)."""
+
+    def test_trend_gaar_til_tre_ganger_grensen(self):
+        from aksjedetalj import bygg_skala
+
+        s = bygg_skala("Trend", 0.0, None)
+        assert (round(s.felt_fra, 4), round(s.felt_til, 4), s.prikk) == (round(100 / 3, 4), round(200 / 3, 4), 50.0)
+        assert (s.lav_tekst, s.hoy_tekst) == ("-2,0 %", "+2,0 %")
+        assert bygg_skala("Trend", 0.04, None).prikk == pytest.approx(100 * 5 / 6)
+
+    def test_bevegelse_bruker_standardavviket_og_prikken_staar_ved_enden(self):
+        """Svar 20. Ville feilet hvis prikken havnet utenfor sporet."""
+        from aksjedetalj import bygg_skala
+
+        s = bygg_skala("Bevegelse", 0.5, 0.01)
+        assert s.prikk == 100.0
+        assert bygg_skala("Bevegelse", -0.5, 0.01).prikk == 0.0
+        assert bygg_skala("Bevegelse", 0.01, 0.01).prikk == pytest.approx(200 / 3)
+        assert bygg_skala("Bevegelse", 0.01, 0.0) is None
+        assert bygg_skala("Bevegelse", 0.01, None) is None
+
+    def test_grensene_for_bevegelse_er_tallet_i_teksten(self):
+        """Svar 30 (15.10, ECH3): grensene over skalaen viser samme tall som
+        standardavviket i teksten i kortet, og en grense over 0 vises aldri
+        som 0,0. Ville feilet med én desimal over skalaen, eller med 0,03 %
+        som 0,0 over skalaen eller i teksten."""
+        from aksjedetalj import bygg_skala
+        from signalberegning import _bevegelsesforklaring
+
+        NB = "\u00a0"
+        for dagens, avvik, vist in [(0.01, 0.0003, "0,03"), (0.0123, 0.01234, "1,234"),
+                                    (0.05, 0.012, "1,2"), (0.0, 0.0000001, "0,00001")]:
+            s = bygg_skala("Bevegelse", dagens, avvik)
+            assert (s.lav_tekst, s.hoy_tekst) == (f"-{vist}{NB}%", f"+{vist}{NB}%"), (dagens, avvik)
+            assert f"mot {vist}{NB}% standardavvik" in _bevegelsesforklaring(dagens, avvik), (dagens, avvik)
+        # Uten måling: nok desimaler til at grensen ikke er 0,0.
+        assert bygg_skala("Bevegelse", None, 0.0003).hoy_tekst == f"+0,03{NB}%"
+        # En grense som er 0, vises som før: ingen skala, og 0,0 i teksten.
+        assert bygg_skala("Bevegelse", 0.01, 0.0) is None
+        assert _bevegelsesforklaring(0.01, 0.0) == f"+1,0{NB}% mot 0,0{NB}% standardavvik"
+
+    def test_interesse_gaar_fra_0_til_fire_ganger_volumfaktoren(self):
+        """Utdraget §8: feltet fra 0 til 1,5 ×, skalaen fra 0 til 6 ×."""
+        from aksjedetalj import bygg_skala
+
+        s = bygg_skala("Interesse", 3.0, None)
+        assert (s.felt_fra, s.felt_til, s.prikk) == (0.0, 25.0, 50.0)
+        assert (s.lav_tekst, s.hoy_tekst) == ("0", "1,5 ×")
+        assert bygg_skala("Interesse", None, None).prikk is None
+        assert bygg_skala("Interesse", 1.0, None, Parametre(volumfaktor=2.0)).felt_til == 25.0
+
+
+    def test_ingen_prikk_for_en_maaling_som_ikke_er_et_tall(self):
+        """Gjennomgangen (ECH3, ECH4): NaN gir ingen prikk, og en volumfaktor
+        som ikke er positiv gir ingen skala."""
+        from aksjedetalj import bygg_skala
+
+        assert bygg_skala("Trend", float("nan"), None).prikk is None
+        assert bygg_skala("Interesse", 1.0, None, Parametre(volumfaktor=0.0)) is None

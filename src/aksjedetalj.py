@@ -15,20 +15,24 @@ styrken ble 2 og ikke 1, uten aa kjenne formelen paa forhaand. Derfor baerer
 hver sjekk maalingen sin hit ut, ikke bare fortegnet den endte paa.
 """
 
+import math
 from dataclasses import dataclass
 from datetime import date, timedelta
 
+from boersdag import UtenforKalenderen, er_boersdag
 from kursdata import Aksje, Kursrad
 from markedsoversikt import (
     IKKE_VURDERT,
     RETNINGSVISNING,
+    SJEKKBOKSTAVER,
     UKJENT_RETNING,
     Retningsvisning,
+    endring_i_prosent,
     les_tilstand,
 )
 from oversiktsdata import Oversiktspost
-from signalberegning import NEGATIV, POSITIV, Parametre, STANDARD, nodvendige_dager, sjekker_fra
-from tallformat import fortegn
+from signalberegning import NEGATIV, POSITIV, Parametre, STANDARD, bevegelsesdesimaler, nodvendige_dager, sjekker_fra
+from tallformat import desimaler_uten_null, fortegn, tall
 from tilstand import Art, Tilstand
 from vurderingsdata import Grunn, Vurdering
 
@@ -39,6 +43,97 @@ GRAFVINDU_DAGER = 182
 # Story 8.0c: ordet ved 0 i Ga-kolonnen. «Ingen» er en retning (FR-704), ikke
 # det en sjekk ga, saa ordet er et eget.
 INGEN_UTSLAG = "ingen utslag"
+
+# Story 8.0d, PR 3 (utdraget §8, svar 20): skalaen i sjekkortene går til tre
+# ganger grensen på hver side for trend og bevegelse, og fra 0 til fire
+# ganger volumfaktoren for interesse (0 til 6 × med 1,5 ×).
+SKALA_GANGER = 3
+SKALA_INTERESSE_GANGER = 4
+
+
+@dataclass(frozen=True)
+class Skala:
+    """Det grå feltet i et sjekkort, i prosent av bredden (0-100).
+
+    felt_fra og felt_til er feltet der sjekken gir 0. prikk er målingen,
+    lagt ved enden når den er utenfor skalaen (svar 20), og None når
+    målingen mangler. Tekstene er grensene over feltet. Skalaen er bare
+    for synet: teksten i kortet sier det samme (aria-hidden i malen)."""
+
+    felt_fra: float
+    felt_til: float
+    prikk: float | None
+    lav_tekst: str
+    hoy_tekst: str
+
+
+def _andel(verdi: float, lav: float, hoy: float) -> float:
+    """Plassen til verdi mellom lav og hoy, i prosent og innenfor 0-100."""
+    return max(0.0, min(100.0, (verdi - lav) / (hoy - lav) * 100))
+
+
+def _prikk(maaling: float | None, lav: float, hoy: float) -> float | None:
+    """Prikken, eller None naar maalingen mangler eller ikke er et tall
+    (gjennomgangen, ECH4): da tegnes ingen prikk, og teksten sier resten."""
+    if maaling is None or not math.isfinite(maaling):
+        return None
+    return _andel(maaling, lav, hoy)
+
+
+def bygg_skala(navn: str, maaling: float | None, grense: float | None, p: Parametre = STANDARD) -> Skala | None:
+    """Skalaen for en sjekk, regnet fra målingen og grensen i den lagrede
+    vurderingen og Parametre. Signalet regnes ikke på nytt (FR-101). None
+    når grensen ikke er et positivt tall, så skalaen ikke kan tegnes."""
+    if navn == "Interesse":
+        if p.volumfaktor <= 0:
+            return None
+        hoy = p.volumfaktor * SKALA_INTERESSE_GANGER
+        return Skala(
+            felt_fra=0.0,
+            felt_til=_andel(p.volumfaktor, 0.0, hoy),
+            prikk=_prikk(maaling, 0.0, hoy),
+            lav_tekst="0",
+            hoy_tekst=f"{tall(p.volumfaktor, 'faktor')} ×",
+        )
+    grense = p.noytralsone if navn == "Trend" else grense
+    if grense is None or grense <= 0:
+        return None
+    lav, hoy = -grense * SKALA_GANGER, grense * SKALA_GANGER
+    # Svar 30 (15.10, ECH3): grensene for bevegelse viser samme tall som
+    # standardavviket i teksten i kortet, og aldri 0,0.
+    antall = 1
+    if navn == "Bevegelse":
+        if maaling is not None:
+            antall = bevegelsesdesimaler(maaling, grense)
+        else:
+            antall = desimaler_uten_null(grense * 100)
+    tekst = tall(grense * 100, "maaling", antall, fortegn=False)
+    return Skala(
+        felt_fra=_andel(-grense, lav, hoy),
+        felt_til=_andel(grense, lav, hoy),
+        prikk=_prikk(maaling, lav, hoy),
+        lav_tekst="-" + tekst,
+        hoy_tekst="+" + tekst,
+    )
+
+
+def hva_den_maaler(navn: str, p: Parametre = STANDARD) -> str:
+    """Kort om hva sjekken måler, med vinduene fra Parametre."""
+    return {
+        "Trend": f"Sluttkursen mot snittet av de siste {p.ma_vindu} børsdagene.",
+        "Bevegelse": f"Dagens endring mot hvor mye aksjen har svingt de siste {p.volatilitet_vindu} børsdagene.",
+        "Interesse": f"Dagens volum mot medianvolumet de siste {p.volum_vindu} børsdagene.",
+    }[navn]
+
+
+def regelen(navn: str, p: Parametre = STANDARD) -> str:
+    """Regelen nederst i sjekkortet, med grensene fra Parametre."""
+    return {
+        "Trend": f"Mer enn {tall(p.noytralsone * 100, 'grense')} over snittet gir +1, og mer enn "
+                 f"{tall(p.noytralsone * 100, 'grense')} under gir -1.",
+        "Bevegelse": "En endring større enn ett standardavvik gir +1 eller -1, etter retningen.",
+        "Interesse": f"Mer enn {tall(p.volumfaktor, 'faktor')} × medianen gir +1 eller -1, etter dagens kursendring.",
+    }[navn]
 
 
 @dataclass(frozen=True)
@@ -62,6 +157,11 @@ class SjekkVisning:
     navn: str
     verdi: int
     maaling: str
+    # Story 8.0d, PR 3: kortet med det grå feltet (utdraget §8).
+    nummer: int = 0
+    skala: Skala | None = None
+    maaler: str = ""
+    regel: str = ""
 
     @property
     def fortegn(self) -> str:
@@ -106,6 +206,14 @@ class Detalj:
     punkter: tuple[Punkt, ...]
     antall_dager: int = 0
     noedvendige_dager: int = 0
+    # Story 8.0d, PR 3: endringen som fjerde nøkkeltall, med dagen før, og
+    # terskelen for overskriften (beslutning 7).
+    endring: float | None = None
+    forrige_dato: date | None = None
+    # Svar 29 (15.10, BH6 og ECH2): datoene står ved ukedagene når det
+    # ligger en børsdag mellom de to kursradene.
+    endring_med_datoer: bool = False
+    terskel: int = STANDARD.terskel
 
     @property
     def vurdering(self) -> Vurdering | None:
@@ -122,6 +230,22 @@ class Detalj:
         if not self.vurdering:
             return UKJENT_RETNING
         return RETNINGSVISNING.get(self.vurdering.retning, UKJENT_RETNING)
+
+    @property
+    def skilte_seg_ut(self) -> bool:
+        """Styrken er på terskelen eller over (beslutning 7)."""
+        return self.styrke is not None and self.styrke >= self.terskel
+
+    @property
+    def sjekkbrikker(self) -> tuple[tuple[str, str, str], ...]:
+        """T, B og I som i oversikten (story 8.0d, PR 3), lest fra den
+        lagrede vurderingen. Tom uten vurdering."""
+        if not self.vurdering:
+            return ()
+        return tuple(
+            (bokstav, felt, fortegn(getattr(self.vurdering, felt)))
+            for bokstav, felt in SJEKKBOKSTAVER
+        )
 
     @property
     def for_kort_serie(self) -> bool:
@@ -191,6 +315,22 @@ def bygg_punkter(
     )
 
 
+def boersdag_mellom(fra: date, til: date) -> bool:
+    """Om det ligger en børsdag mellom fra og til, uten dem selv (svar 29).
+
+    Fredag til mandag har ingen, og heller ikke en uke med bare stengte
+    dager. Kan kalenderen ikke avgjøre det (UtenforKalenderen), gis True,
+    så datoene står og siden ikke feiler. Lørdag og søndag er aldri
+    børsdager og slås ikke opp, så en helg i et år kalenderen ikke dekker,
+    gir ukedagene (gjennomgangen av svarene 15.10, ECH2 og BH6).
+    """
+    dagene = (fra + timedelta(days=i) for i in range(1, (til - fra).days))
+    try:
+        return any(dag.weekday() < 5 and er_boersdag(dag) for dag in dagene)
+    except UtenforKalenderen:
+        return True
+
+
 def bygg_detalj(
     post: Oversiktspost, rader: list[Kursrad], idag: date, p: Parametre = STANDARD
 ) -> Detalj | None:
@@ -208,8 +348,12 @@ def bygg_detalj(
     sjekker: tuple[SjekkVisning, ...] = ()
     if utfall is not None and utfall.art is Art.SVAR:
         sjekker = tuple(
-            SjekkVisning(navn=s.navn, verdi=s.verdi, maaling=s.forklaring)
-            for s in sjekker_fra(utfall.innhold, p)
+            SjekkVisning(
+                navn=s.navn, verdi=s.verdi, maaling=s.forklaring, nummer=i,
+                skala=bygg_skala(s.navn, s.maaling, s.grense, p),
+                maaler=hva_den_maaler(s.navn, p), regel=regelen(s.navn, p),
+            )
+            for i, s in enumerate(sjekker_fra(utfall.innhold, p), start=1)
         )
 
     return Detalj(
@@ -222,6 +366,10 @@ def bygg_detalj(
         punkter=bygg_punkter(rader, p),
         antall_dager=len(rader),
         noedvendige_dager=nodvendige_dager(p),
+        endring=endring_i_prosent(rader),
+        forrige_dato=rader[-2].dato if len(rader) >= 2 else None,
+        endring_med_datoer=len(rader) >= 2 and boersdag_mellom(rader[-2].dato, post.nyeste.dato),
+        terskel=p.terskel,
     )
 
 

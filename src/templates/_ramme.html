@@ -7,6 +7,7 @@
     rad i stripa, med samme ordlyd som før, i stedet for det gule banneret
     (svar 3 på planen for 8.0d). -#}
 {% from "_hjelp.html" import hjelpestil with context -%}
+{% from "_brikker.html" import brikkestil -%}
 <!DOCTYPE html>
 <html lang="no">
 <head>
@@ -65,6 +66,9 @@
       --stripe-kant: #3A3E47;
       --stripe-strek: #2A2E36;
       --kolonne-tekst-2: #B9BDC5;
+      /* Story 8.0d, PR 3: det grå feltet i sjekkortene (designregler del 5). */
+      --spor: #F1EFEA;
+      --felt: #8A847A;
     }
 
     body {
@@ -104,6 +108,8 @@
 
     /* Story 8.0b og 8.0d: hjelpen bak «?». */
     {{ hjelpestil() }}
+    /* Story 8.0d, PR 3: brikkene og retningspillen. */
+    {{ brikkestil() }}
     {% block stil %}{% endblock %}
   </style>
 </head>

@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-10-14T22:29
+updated: 2026-10-15T12:44
 ---
 
 # Designregler
@@ -71,6 +71,7 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 - Signalstyrke 0–3: hvor mange av de 3 sjekkene som slo ut.
 - Sjekkene: trend (T), bevegelse (B) og interesse (I). Hver gir +1, 0 eller -1, skrevet «T +1» overalt, som kolonnen «Ga» i appen.
   *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* sjekkene skrives «T +1» i oversikten. På aksjesiden står navnet på sjekken og ordet, som i 8.0c (svar 8).
+  *Rettet 2026-10-15 (gruppens svar kl. 12:15, svar 28 i 8.0d):* symbolet ved Signalstyrke i kortet «Slik leser du tabellen» er en grønn «+1» over en rød «-1», uten bokstav. Se tillegget 15.10 nederst i §5.
 - Retning: Positiv, Negativ, Blandet eller Ingen, med pil (FR-103). Pilene brukes ikke til noe annet.
 - Skilte seg ut: signalstyrke 2 eller mer. Signalstyrken skrives «3 av 3», og 3 av 3 er fylt med gul ring.
   *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* 3 av 3 merkes med gul ring rundt, som i §3.
@@ -200,3 +201,5 @@ Ord kan endres rett i tavla. I appen samles hjelpetekstene i én fil (8.0b).
 - Tidspunktet står én gang, som «Oppdatert …» i stripa, med «?» ved siden av.
 
 *Lagt til 2026-10-14 (gruppen 14.10 kl. 19:59, «ja til begge»):* «2 av 3» er den hvite pillen fra originalen (utdraget §6): samme form som «3 av 3», hvit, med tekst og kant i blekk og uten ring. Den lys oransje streken på 4 px til venstre i raden står som før. Linja over om at «2 av 3» har fet skrift og strek, uten fyll, gjelder ikke lenger.
+
+*Lagt til 2026-10-15 (gruppens svar kl. 12:15, BH20 i gjennomgangen av PR 3 av 8.0d):* i kortet «Slik leser du tabellen» viser feltet ved Signalstyrke en grønn «+1» over en rød «-1», med en egen klasse i kortet, så regelen for brikkene i tabellen ikke virker inn. Teksten ved Signalstyrke sier «Både +1 og -1 teller som utslag.», og teksten ved Retning sier «Ga noen +1 og noen -1, står det Blandet.».
