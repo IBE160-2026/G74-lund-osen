@@ -592,6 +592,11 @@ class TestSorteringen:
         assert "outline: 3px solid var(--oransje)" in regel
         assert "min-height: 44px" in _regel(_stil(sidene["oversikten"]), ".tabellboks thead a.sorter")
 
+    def test_lenken_standard_rekkefoelge_er_i_blekk(self, sidene):
+        """Svar 5: lenken over tabellen har en farge fra designreglene, ikke
+        nettleserens blå (designregler §5, ingen farge skrevet fast)."""
+        assert "color: var(--blekk)" in _regel(_stil(sidene["oversikten"]), "p.sortert a")
+
     def test_sorteringen_virker_i_demoen(self, klient, demobase, monkeypatch):
         """FR-411: samme rute og mal i demoen, med merket som før."""
         monkeypatch.setenv(app_modul.I_DEMO, "1")
