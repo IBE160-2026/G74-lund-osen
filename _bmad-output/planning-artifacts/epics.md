@@ -509,6 +509,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Lagt til 2026-10-14 (gruppen kl. 22:19 og 22:25, «ja» og «1 ja mest mulig inn før readme prøven og 2 = ja»):* Rekkefølgen etter 8.0d er 8.15, så 2.8, 2.9 og 2.9b, 8.3, 8.10, 8.16 og 8.17, 2.7 og 8.8, 10.1–10.3, 8.10b, 10.6, og til slutt 2.11 og 2.12. README-prøven tas når mest mulig av dette er bygget, og senest én uke før innleveringen. Det erstatter linja under story 3.4 om at prøven tas etter at 8.0d er flettet (§9 i `docs/kvalitetssikring.md`).
 
+*Lagt til 2026-10-15 (gruppens svar 10 kl. 14:47, spesifikasjonen for 8.15):* etter 8.15 kommer KI-laget først, med 4.2, 4.3 og 10.1–10.3, så resten i rekkefølgen fra 14.10 kl. 22:19 og 22:25. Grunnen er suksesskriteriet «KI-forklaringen» i briefen v8: én ukes drift skal være logget før demonstrasjonen.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
