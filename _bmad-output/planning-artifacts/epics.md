@@ -2143,6 +2143,8 @@ Som **gruppe**, vil jeg at KI-loggen overlever en omstart, så eksempelsettet fr
 
 **Én økt:** ja. **Avhenger av Epic 1.**
 
+*Lagt til 2026-10-15:* flettet i `3a089c8`, PR #46. Hentingen 16.10 kjører migrasjonen 0005 på ose.db.
+
 ---
 
 ## Epic 5: KI-laget i drift 🔒
