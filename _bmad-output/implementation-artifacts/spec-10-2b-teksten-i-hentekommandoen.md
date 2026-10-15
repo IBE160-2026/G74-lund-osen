@@ -79,6 +79,66 @@ Planen for KI-laget ble vist i chatten 15.10 kl. 15:43 og er ført kort i Utfør
 
 ## Spec Change Log
 
+## Commitene
+
+Grenen `10-2b-teksten-i-hentingen`, PR #49: `3b592ac` spesifikasjonen; `9bc8b3b` modellen, steget, hentingen, compose, `.env.example`, README og Prøve 3 med testene; `5dd8a00` rettingene fra gjennomgangen; `48838a7` testen som fanger FR2.
+
+## Må avgjøres av gruppen før flettingen
+
+Fra gjennomgangen. Begge gjelder svar 2 og 5 kl. 15:53 og FR-604, så de rettes ikke uten et svar:
+
+1. **Uten `OSE_KI_TJENESTE` gjelder `lokal` (svar 5).** Den ekte `.env` har ikke variabelen. Etter flettingen bruker hver kveldshenting Ollama, også når ingen har startet den (BH1, ECH).
+2. **Kjører ikke Ollama, får hver aksje en rad om at modellen feilet, og raden står (FR-604, svar 2).** Da er KI-teksten borte for den dagen, også om Ollama startes og hentingen kjøres igjen. En forhåndssjekk som ikke skriver rader når Ollama ikke svarer, ville gått mot FR-604 og tillegget 05.10 i 10.2, som sier at det blir en rad i loggen (BH2, BH12).
+
+Rettingen gjør det så lite vondt som mulig innenfor svarene: feiler modellen for én aksje, kalles den ikke for resten den kvelden, og de får en rad med grunnen «ikke kalt» (BH3). Det er også en del av spørsmål 2: gruppen kan velge at modellen prøves for hver aksje.
+
 ## Review Triage Log
 
+Gjennomgang 15.10 på diffen `main...9bc8b3b`, med Blind Hunter (BH, 16 funn), Edge Case Hunter (ECH, 13) og Verification Gap (VG, 5). Rettingene står i `5dd8a00` og `48838a7`.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH1, ECH | Uten variabelen er KI på, og den ekte `.env` har den ikke | high | **avgjøres av gruppen** (spørsmål 1 over) |
+| BH2, BH12 | Kjører ikke Ollama, blir 15 rader om at modellen feilet stående | high | **avgjøres av gruppen** (spørsmål 2 over) |
+| BH3 | Henger Ollama, venter hver aksje på tidsfristen, opptil om lag 50 minutter | high | patch: etter første feil kalles ikke modellen for resten, `test_modellen_kalles_ikke_igjen_etter_en_feil` |
+| BH4, ECH, VG1 | Et nytt forsøk som stopper tidlig, lot vurderte aksjer stå uten KI-rad, og veien var ikke testet | medium | patch: KI-radene som mangler, lages før et nytt forsøk, `test_et_nytt_forsoek_faar_ki_tekst`, `test_ki_radene_som_mangler_lages_foer_et_nytt_forsoek` |
+| BH6, ECH | `OSE_KI_TJENESTE=` (tom) slo KI på | medium | patch: tom eller ukjent verdi gir ingen KI-tekst og en beskjed |
+| ECH | `main` kunne stoppe på en `.env` som ikke kan leses, før hentingen | medium | patch: `modell_fra_miljoeet` fanger det (NFR-04) |
+| ECH | `except Exception` svelget nettsperren i testene | medium | patch: `AssertionError` går videre, `test_nettsperren_svelges_ikke` |
+| ECH | `models` som ikke er en liste ga `TypeError` | medium | patch: `_modeller` sjekker typen |
+| BH9, ECH | En kort digest ga en modell-ID kortere enn 12 tegn | low | patch: lengden sjekkes etter «sha256:» |
+| ECH, VG3 | Med tjenesten i miljøet ble adressen i `.env` ikke lest, og miljøet vant ikke per nøkkel | medium | patch: per nøkkel, `test_miljoeet_vinner_per_noekkel` |
+| ECH | En adresse uten skjema ga 15 rader om at modellen feilet | low | patch: adressen sjekkes, og gir ingen KI-tekst og en beskjed |
+| BH13 | En adresse utenfor maskinen sender prompten ut uten beskjed | low | patch: beskjed i utskriften, og README sier «med adressen som står som standard» |
+| ECH | Modellen ble kalt etter midnatt før `skriv` avviste datoen | low | patch: børsdagen sjekkes før kallet |
+| BH8 | 404 fra Ollama sa ikke at modellen mangler | low | patch: «modellen er ikke hentet (ollama pull gemma4:e4b)» |
+| BH10 | En feil i KI-laget ga bare én linje | low | patch: sporet på stderr, utgangskoden som før |
+| ECH | Meldingen ved stopp tok ikke med radene som sto fra før | low | patch: tatt med |
+| BH11 | Uten grafikkort fra NVIDIA starter ikke Ollama | low | patch: README og Prøve 3 sier det |
+| BH14 | Prøve 3 manglet modellen uten pull og en ny kjøring etter en feil | low | patch: steg 7 og 8 |
+| BH7 | Testen for nøkler i compose så etter «NOKKEL» | low | patch: «NOEKKEL», «NØKKEL», «KEY», «TOKEN», og ingen variabel utenom adressen og `OSE_DEMO` |
+| VG2 | Ingen test så at `main` leser `av` fra `.env` | low | patch: `test_main_leser_av_fra_env` |
+| VG4 | Ingen test for en base som ikke kan åpnes i steget | low | patch: `test_basen_som_ikke_kan_aapnes` |
+| ECH | Når `skriv_vurderinger` feiler for én aksje, avslutter hentingen før KI-steget | low | avvist: da har basen feilet eller midnatt passert, og KI-steget ville feilet likt. Neste kjøring lager radene |
+| BH15 | Tilkoblingen er åpen under modellkallene | avvist | ingen transaksjon er åpen mellom skrivingene: `SqliteKILogg.skriv` styrer sin egen, og lesingen åpner ingen |
+| BH16 | Matrisen manglet flere tilfeller | low | patch: testene over. Matrisen er frosset |
+
+
 ## Verification
+
+**Commands:**
+- `uv run pytest -q` -- før 2037 bestått og 17 hoppet over på main (`808948c`). 2082 og 17 på `9bc8b3b`. Etter rettingene 2105 og 17 på `5dd8a00`, og samme antall på `48838a7`.
+
+**Mutantene**, kjørt én om gangen med `-x` og bare `tests/test_ki_tekst.py`, med kopi før og sha256 mot HEAD etter hver. Fila var lik HEAD etter hver. F1–F5 ble først kjørt på `9bc8b3b` og fanget alle, og så på nytt på `5dd8a00` med FR1–FR4. FR2 overlevde først, og testen ble skrevet om (`48838a7`) og fanget den. Alle er fanget:
+
+| # | Mutant | Fanget av |
+|---|---|---|
+| F1 | en feil hos modellen stopper hentingen | `test_en_annen_feil_stopper_steget_ikke_hentingen` |
+| F2 | modellen kalles på nytt når raden finnes | `test_raden_staar_og_modellen_kalles_ikke_igjen` |
+| F3 | KI-steget kjører før vurderingene | `test_en_rad_per_aksje_etter_vurderingene` |
+| F4 | en tekst som ikke besto, logges som bestått | `test_en_tekst_som_ikke_bestaar_logges_med_grunnen` |
+| F5 | KI-steget gjør et kall til EODHD | `test_ingen_kall_til_eodhd_fra_steget` |
+| FR1 | modellen kalles igjen etter en feil | `test_modellen_kalles_ikke_igjen_etter_en_feil` |
+| FR2 | ingen KI-rader før et nytt forsøk | `test_ki_radene_som_mangler_lages_foer_et_nytt_forsoek` |
+| FR3 | en tom `OSE_KI_TJENESTE` gir `lokal` | `test_ingen_stille_overgang` |
+| FR4 | ny børsdag sjekkes ikke før kallet | `test_modellen_kalles_ikke_etter_midnatt` |
