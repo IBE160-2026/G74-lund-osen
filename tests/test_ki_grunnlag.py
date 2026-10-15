@@ -172,7 +172,9 @@ class TestKontrollen:
     def test_retning_utenfor_den_lukkede_lista(self, retning):
         """Gjennomgangen (VG2): retning er den eneste teksten som sendes."""
         signal = Signal(styrke=1, retning=retning, sjekker=_signal(1, 0, 0).sjekker, skiller_seg_ut=False)
-        with pytest.raises(ValueError):
+        # Kontrollen av den lukkede lista stopper den, foer samsvaret med
+        # sjekkene sjekkes (mutant GR2).
+        with pytest.raises(ValueError, match="retning maa vaere en av"):
             ki_grunnlag(signal, utenfor_maalingen=False)
 
     @pytest.mark.parametrize("navn", [
