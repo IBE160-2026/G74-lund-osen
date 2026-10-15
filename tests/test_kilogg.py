@@ -2,10 +2,12 @@
 
 Hele porten proeves mot MinneKILogg, uten database. Testene for porten tar
 loggen fra fixturen logg_lager, saa SQLite-adapteren i 4.3 kan proeves mot de
-samme testene (gjennomgangen av 4.2, BH7).
+samme testene (gjennomgangen av 4.2, BH7). Story 4.3: SqliteKILogg proeves
+mot de samme testene, med en base i minnet.
 """
 
 import json
+import sqlite3
 from datetime import date, datetime, timezone
 from zoneinfo import ZoneInfo
 
@@ -15,6 +17,8 @@ from kilogg import (
     AKSJE, DAG, MELDING, Emne, IkkeInnevaerendeBoersdag, KILogg, KIRad, UgyldigKIRad,
 )
 from kilogg_minne import MinneKILogg
+from lagring_sqlite import MIGRASJONSKATALOG, SqliteKILogg
+from migrering import migrer
 
 OSLO = ZoneInfo("Europe/Oslo")
 TORSDAG = date(2026, 10, 15)
@@ -224,10 +228,24 @@ def _minne(klokke):
     return MinneKILogg(klokke)
 
 
-@pytest.fixture(params=[_minne], ids=["minne"])
+@pytest.fixture(params=["minne", "sqlite"])
 def logg_lager(request):
-    """Lager en KILogg med en klokke. 4.3 legger til SQLite-adapteren her."""
-    return request.param
+    """Lager en KILogg med en klokke: i minnet, eller i SQLite med en base i
+    minnet som er migrert til siste versjon (story 4.3)."""
+    if request.param == "minne":
+        yield _minne
+        return
+    tilkoblinger = []
+
+    def _sqlite(klokke):
+        tilkobling = sqlite3.connect(":memory:", isolation_level=None)
+        tilkoblinger.append(tilkobling)
+        migrer(tilkobling, MIGRASJONSKATALOG)
+        return SqliteKILogg(tilkobling, klokke)
+
+    yield _sqlite
+    for tilkobling in tilkoblinger:
+        tilkobling.close()
 
 
 class TestPorten:
@@ -235,10 +253,11 @@ class TestPorten:
         """AD-7: ingen slett og ingen endre, i porten og i minnet."""
         offentlige = {navn for navn in vars(KILogg) if not navn.startswith("_")}
         assert offentlige == {"skriv", "les", "les_alle"}
-        minnet = {navn for navn in dir(MinneKILogg) if not navn.startswith("_")}
-        assert minnet == {"skriv", "les", "les_alle"}
+        for klasse in (MinneKILogg, SqliteKILogg):
+            assert {navn for navn in dir(klasse) if not navn.startswith("_")} == {"skriv", "les", "les_alle"}
         for navn in ("__setitem__", "__delitem__"):
-            assert not hasattr(KILogg, navn) and not hasattr(MinneKILogg, navn)
+            for klasse in (KILogg, MinneKILogg, SqliteKILogg):
+                assert not hasattr(klasse, navn)
 
     def test_oppfyller_porten(self, logg_lager):
         assert isinstance(logg_lager(Klokke()), KILogg)
