@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-10-14T22:29
+updated: 2026-10-15T12:28
 ---
 
 # Designregler
@@ -200,3 +200,5 @@ Ord kan endres rett i tavla. I appen samles hjelpetekstene i én fil (8.0b).
 - Tidspunktet står én gang, som «Oppdatert …» i stripa, med «?» ved siden av.
 
 *Lagt til 2026-10-14 (gruppen 14.10 kl. 19:59, «ja til begge»):* «2 av 3» er den hvite pillen fra originalen (utdraget §6): samme form som «3 av 3», hvit, med tekst og kant i blekk og uten ring. Den lys oransje streken på 4 px til venstre i raden står som før. Linja over om at «2 av 3» har fet skrift og strek, uten fyll, gjelder ikke lenger.
+
+*Lagt til 2026-10-15 (gruppens svar kl. 12:15, BH20 i gjennomgangen av PR 3 av 8.0d):* i kortet «Slik leser du tabellen» viser feltet ved Signalstyrke en grønn «+1» over en rød «-1», med en egen klasse i kortet, så regelen for brikkene i tabellen ikke virker inn. Teksten ved Signalstyrke sier «Både +1 og -1 teller som utslag.», og teksten ved Retning sier «Ga noen +1 og noen -1, står det Blandet.».
