@@ -2388,6 +2388,8 @@ så jeg alltid ser hva signalet faktisk bygger på.
 
 *Lagt til 2026-10-15 (gruppens svar kl. 23:57 på spørsmålet i Utført-linja kl. 23:51, instruksjonen kl. 23:58):* siden sier hvorfor med det loggen kan vise. Har dagen ingen rader i `ki_logg` i det hele tatt, står det «Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.» Har andre aksjer rader for dagen, men ikke denne, sier siden at teksten for denne aksjen ikke ble laget i hentingen. Den nøyaktige grunnen står i utskriften fra hentingen og i Utført-linja for den kvelden. Med dette regnes kontrollpunktet fra 05.10 om at siden sier hvorfor (FR-601), som oppfylt.
 
+*Lagt til 2026-10-16 kl. 00:21:* PR 2 flettet i `4a22199`, PR #51 (ja kl. 00:16). Alle kontrollpunktene er oppfylt på main, og 10-3 er done. At siden med KI av er lik den som fantes, ble sjekket ved å sammenligne aksjesiden i demoen med kapselen av mot siden fra `8c3a58b`, før 10.3: eneste forskjell er bryteren og stilen dens, som kontrollpunktet over krever. At teksten vakten stopper «logges», er raden i `ki_logg`, som står (AD-7).
+
 ### Story 10.4: Måle bidraget — egen brukertest, etter 8.1
 
 *Het Story 5B.4 til 28.09.*

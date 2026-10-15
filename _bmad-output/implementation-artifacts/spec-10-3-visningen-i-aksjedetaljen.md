@@ -2,7 +2,7 @@
 title: 'Story 10.3: Visningen i aksjedetaljen'
 type: 'feature'
 created: '2026-10-15'
-status: 'review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '5586924'
