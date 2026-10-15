@@ -101,15 +101,16 @@ Bygd i denne PR-en etter svar c: `OllamaModell.sjekk` spør `/api/tags` og gir g
 
 ## Prøvekjøringen
 
-Forslaget fra instruksjonen kl. 22:36, med steget fra svar c. En dag uten henting (lørdag 17.10), med grenen `10-2b-teksten-i-hentingen` sjekket ut, uten kall til EODHD og uten at `data/db/ose.db` røres:
+Forslaget fra instruksjonen kl. 22:36, med steget fra svar c, og rettet etter gjennomgangen av svar c (BH20–BH22). En dag uten henting (lørdag 17.10), uten kall til EODHD og uten at `data/db/ose.db` røres:
 
-1. Kopier basen: `cp data/db/ose.db data/db/ki-proeve.db`. Kopien ligger i `data/`, som ikke spores (regel 10).
-2. Start Ollama med grafikkortet og hent modellen: `docker compose --profile ki up -d ollama` og `docker compose exec ollama ollama pull gemma4:e4b`.
-3. Kjør bare KI-steget mot kopien, for børsdagen 16.10, med `lag_ki_tekster(Path("data/db/ki-proeve.db"), date(2026, 10, 16), …, OllamaModell(), print)`. Sjekken fra svar c går først.
-4. `docker compose exec ollama ollama ps` viser «100% GPU».
-5. Les resultatet uten kurser: per aksje i `ki_logg` i kopien `besto`, `grunn`, `maskinvare`, `modell_id`, `ollama_versjon` og lengden på teksten. Tekstene kan leses på skjermen, men føres ikke i en sporet fil.
-6. Før resultatet med dato i `malinger.md`: antall som besto, ikke besto og der modellen feilet, maskinvaren, median tid per tekst, modell-ID og Ollama-versjon, men uten tekstene.
-7. Stopp Ollama: `docker compose --profile ki down`.
+1. På main, før grenen sjekkes ut: kopier basen med `cp data/db/ose.db data/db/ki-proeve.db`. Kopien lages av skallet, ikke av kode på grenen (regel 22), og ligger i `data/`, som ikke spores (regel 10). Lørdag har ingen henting, så basen endres ikke mens kopien lages.
+2. Sjekk ut grenen `10-2b-teksten-i-hentingen`.
+3. Start Ollama med grafikkortet og hent modellen: `docker compose --profile ki up -d ollama` og `docker compose exec ollama ollama pull gemma4:e4b`.
+4. Kjør bare KI-steget mot kopien, for børsdagen fredag 16.10, med den ekte klokka. Lørdag 17.10 er ikke børsdag, så inneværende børsdag er 16.10, og `KILogg` godtar den. Et lite skript utenfor repoet (i scratchpad) kaller `lag_ki_tekster(Path("data/db/ki-proeve.db"), date(2026, 10, 16), lambda: datetime.now(timezone.utc), modell, print)`, der `modell` er en `OllamaModell` med en innpakning rundt `lag_tekst` som tar tiden per kall med `time.monotonic()` og skriver ut medianen til slutt. Sjekken fra svar c går først.
+5. `docker compose exec ollama ollama ps` viser «100% GPU».
+6. Les resultatet uten kurser: per aksje i `ki_logg` i kopien `besto`, `grunn`, `maskinvare`, `modell_id`, `ollama_versjon` og lengden på teksten. Tekstene kan leses på skjermen, men føres ikke i en sporet fil.
+7. Før resultatet med dato i `malinger.md`: antall som besto, ikke besto og der modellen feilet, maskinvaren, median tid per tekst fra steg 4, modell-ID og Ollama-versjon, men uten tekstene.
+8. Stopp Ollama: `docker compose --profile ki down`.
 
 ## Review Triage Log
 
@@ -143,6 +144,32 @@ Gjennomgang 15.10 på diffen `main...9bc8b3b`, med Blind Hunter (BH, 16 funn), E
 | BH16 | Matrisen manglet flere tilfeller | low | patch: testene over. Matrisen er frosset |
 
 
+## Gjennomgangen av svar c
+
+Gjennomgang 15.10 på diffen `e208bef..cd688c2`, med Blind Hunter (BH, 23 funn), Edge Case Hunter (ECH, 10) og Verification Gap (VG, 4). Rettingene står i commiten etter `cd688c2`. Ingen funn må avgjøres av gruppen.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| ECH, VG2 | Beskjeden lovet 0 kall til EODHD også når en aksje manglet dagens kurs, og sjekken kunne gå to ganger i samme kjøring | high | patch: `basen_har_kursene`, og `lag_ki_tekster` gir `False` når sjekken sa nei, så den ikke sjekkes igjen etter forsøket. `test_ikke_0_kall_naar_kurser_mangler_og_bare_en_sjekk` |
+| BH1, BH2, ECH, VG3 | Beskjeden sa «Start Ollama» også når modellen manglet, og ga bare docker-kommandoen | medium | patch: «Hent modellen» eller «Start Ollama», etter grunnen, og en henvisning til README-en |
+| BH3, BH4, ECH | Sjekken kom før datoen, og «i kveld» hadde ingen frist | medium | patch: datoen sjekkes først, og beskjeden sier «før midnatt». `test_datoen_sjekkes_foer_tjenesten` |
+| BH9, ECH | Et svar som ikke kunne leses, ble meldt som «ikke hentet» | medium | patch: egen grunn |
+| BH8, ECH | Navnet ble bare lest fra `name`, og `gemma4` mot `gemma4:latest` ga «ikke hentet» | medium | patch: `name` og `model`, og `:latest` når taggen mangler |
+| VG1 | Ingen test kjørte den ekte `OllamaModell` gjennom sjekken i steget | medium | patch: `test_den_ekte_modellen_naar_sjekken` |
+| VG4 | HTTP-status ble ikke skilt fra et svar som ikke kunne leses | low | patch: `test_status_som_ikke_er_200` med modellen i svaret |
+| BH6 | Beskjeden sa ikke hvor mange som venter | low | patch: «N aksjer venter på teksten (M har den fra før)» |
+| ECH | En sjekk som ga noe annet enn en tekst | low | patch: regnes som klar, `test_en_sjekk_som_ikke_gir_en_tekst_regnes_som_klar` |
+| BH14–BH16, BH23 | Testene sjekket ikke antallet rader, kallene og sjekkene | low | patch: `len(...) == 15`, `modell.kall == 1`, «ikke kalt» for 14, sjekkene per kjøring, og `test_bare_de_som_mangler_og_sjekken_en_gang` |
+| BH17 | README-en sa ikke at resten får «ikke kalt» | low | patch |
+| BH18, BH19 | Prøve 3 sa ikke hvordan 0 kall måles, og manglet modellen hentet og kjørt igjen | low | patch: `/api/user` før og etter, og rad 9 |
+| BH20–BH22 | Prøvekjøringen sa ikke hvordan tiden måles, steg 3 kunne ikke kjøres som skrevet, og kopien ble laget med grenen sjekket ut | low | patch: «Prøvekjøringen» over |
+| BH5 | Utgangskoden viser ikke at KI-steget ble hoppet over | avvist | NFR-04: KI-laget endrer aldri utgangskoden. Utskriften sier det |
+| BH7 | Sjekken kan gå, og modellen likevel feile på første kall | avvist | svar c: «Svarer den, skrives rader som før, også når modellen feiler for en aksje (svar 2)» |
+| BH10 | Feil som ikke er nettfeil, fanges ikke i sjekken | avvist | `http` gir `None` for et svar som ikke er JSON, og en annen feil fanges av `except Exception` i steget (NFR-04) |
+| BH11 | Sjekken kunne skjule nettsperren | avvist | `NettverkISTest` er en `AssertionError`, ikke en `RequestException`, og `test_nettsperren_svelges_ikke` står |
+| BH12 | Tidsfristen for sjekken | avvist | `_kall` gir 10 s når ingen annen er gitt |
+| BH13, VG1 (del) | `sjekk` står ikke i porten `Modell` | avvist | porten er flettet i PR E, og tjenestene i 10.7 får sin egen sjekk. En modell uten sjekk regnes som klar, og den ekte `OllamaModell` er nå testet gjennom steget |
+
 ## Verification
 
 **Commands:**
@@ -161,3 +188,5 @@ Gjennomgang 15.10 på diffen `main...9bc8b3b`, med Blind Hunter (BH, 16 funn), E
 | FR2 | ingen KI-rader før et nytt forsøk | `test_ki_radene_som_mangler_lages_foer_et_nytt_forsoek` |
 | FR3 | en tom `OSE_KI_TJENESTE` gir `lokal` | `test_ingen_stille_overgang` |
 | FR4 | ny børsdag sjekkes ikke før kallet | `test_modellen_kalles_ikke_etter_midnatt` |
+
+**Etter svar c** (instruksjonen kl. 23:33): main flettet inn i `e208bef`, svarene i `f904c8b`, sjekken i `cd688c2`, og rettingene fra gjennomgangen i `45f7eb9`. `uv run pytest -q` én gang på hele settet: 2187 bestått og 17 hoppet over på `45f7eb9` (main hadde 2091 og 17 etter flettingen av G). Mutantene, kjørt én om gangen med `-x` og bare `tests/test_ki_tekst.py` og `tests/test_ki_lokal.py`, med kopi før og sha256 mot HEAD etter hver, ble fanget alle: FC1 sjekken kjøres ikke (`test_ingen_rader_og_utskriften_sier_hvorfor`), FC2 sjekken ser ikke etter modellen (`test_den_ekte_modellen_naar_sjekken`), FC3 rader skrives selv om tjenesten ikke svarer (`test_ingen_rader_og_utskriften_sier_hvorfor`), FC4 sjekken også når ingen rader mangler (`test_ingen_sjekk_naar_ingen_rader_mangler`), FC5 0 kall lovet også når kurser mangler og FC6 sjekken igjen etter forsøket (`test_ikke_0_kall_naar_kurser_mangler_og_bare_en_sjekk`), FC7 datoen sjekkes ikke før tjenesten (`test_datoen_sjekkes_foer_tjenesten`), og FC8 «Start Ollama» også når modellen mangler (`test_ingen_rader_og_utskriften_sier_hvorfor`). F2b (modellen kalles på nytt når raden finnes) ble kjørt på `cd688c2` og fanget av `test_raden_staar_og_modellen_kalles_ikke_igjen`.
