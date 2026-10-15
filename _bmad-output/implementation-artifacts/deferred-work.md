@@ -191,3 +191,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-8-15-sortering-ved-klikk-i-kolonneraden.md`
   summary: Lenkene i kolonneraden bygger adressen som `/?sorter=…&orden=…` og tar ikke med andre parametre. Når perioden eller «Velg dag» kommer i adressen (8.17), nullstiller et klikk på en kolonne dem, og «Standard rekkefølge» går til /.
   evidence: BH4 i gjennomgangen 15.10 av 8.15. I dag har oversikten ingen andre parametre, og `test_hver_lenke_gaar_til_en_side_som_finnes` godtar bare `/?sorter=…&orden=…`. Tas når 8.17 bygges: lenkene må ta med de andre parametrene.
+- source_spec: `_bmad-output/implementation-artifacts/spec-4-0-nettsperren-dekker-hele-testkjoeringen.md`
+  summary: Nettsperren gjelder prosessen pytest kjører i. En underprosess som en test starter (`subprocess`, eller `multiprocessing`, som starter nye prosesser på Windows), får den ikke.
+  evidence: BH7 og ECH i gjennomgangen 15.10 av 4.0. Den eneste testen som starter en underprosess i dag, `test_stiene_er_data_raa_og_data_db_ose_db` i `tests/test_lagring_sqlite.py`, leser to konstanter og bruker ikke nett. Grensen står i docstringen i `tests/conftest.py`. Tas når en test skal starte en underprosess som kan bruke nett, for eksempel med en `sitecustomize` som setter sperren i barneprosessen.
