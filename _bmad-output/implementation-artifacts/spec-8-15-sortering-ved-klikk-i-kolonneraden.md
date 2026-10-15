@@ -83,7 +83,7 @@ Resten av planen gjelder som vist.
 
 ## Commitene
 
-Grenen `8-15-sortering`, PR #43: `370441c` spesifikasjonen med svarene, de daterte linjene i PRD-en, memloggen og designreglene, og 8-15 til in-progress; `1ba1cf0` `sorter`, `Sortering` og `neste_orden`; `8f82f84` lenkene i kolonneraden og sorteringen i ruten; `dd3f361` README-statusen; `9976ddc` lenken «Standard rekkefølge» i blekk, ikke nettleserens blå; `385bb6b` rettingene fra gjennomgangen; `c97c5fe` punktet i `deferred-work.md` (BH4).
+Grenen `8-15-sortering`, PR #43: `370441c` spesifikasjonen med svarene, de daterte linjene i PRD-en, memloggen og designreglene, og 8-15 til in-progress; `1ba1cf0` `sorter`, `Sortering` og `neste_orden`; `8f82f84` lenkene i kolonneraden og sorteringen i ruten; `dd3f361` README-statusen; `9976ddc` lenken «Standard rekkefølge» i blekk, ikke nettleserens blå; `385bb6b` rettingene fra gjennomgangen; `c97c5fe` punktet i `deferred-work.md` (BH4); `2bb73b9` triagen, mutantene og testtallene; `515c412` svar 8–10 i spesifikasjonen, PRD-en og designreglene; `588152c` retting 8 og 9 med testene.
 
 ## Spec Change Log
 
@@ -91,10 +91,12 @@ Grenen `8-15-sortering`, PR #43: `370441c` spesifikasjonen med svarene, de dater
 
 Gjennomgang 15.10 på diffen `main...9976ddc`, med Blind Hunter (BH, 14 funn), Edge Case Hunter (ECH, 4) og Verification Gap (VG, 2). Rettingene står i `385bb6b` og `c97c5fe`. To funn må avgjøres av gruppen, så PR-en flettes ikke før det er avgjort.
 
+*Lagt til 2026-10-15:* gruppen svarte kl. 14:47 (svar 8 og 9). Rettingen står i `588152c`.
+
 | # | Funn | Dom | Rute |
 |---|---|---|---|
-| BH1, ECH1 | Linja over tabellen sier «Sortert på retning, stigende», mens skjermleseren hører «alfabetisk, A til Å» i kolonneraden | medium | **avgjøres av gruppen**: svar 5 gir ordlyden «synkende» eller «stigende», og svar 2 sier «alfabetisk» for skjermleseren. En retting endrer teksten på siden |
-| ECH2 | `aria-sort` sier at hele kolonnen er sortert, men sorteringen gjelder innenfor hver del, så verdiene begynner på nytt ved «Øvrige aksjer» | medium | **avgjøres av gruppen**: en retting endrer det skjermleseren hører, for eksempel «innenfor hver del» i den skjulte teksten, som planen viste uten det |
+| BH1, ECH1 | Linja over tabellen sier «Sortert på retning, stigende», mens skjermleseren hører «alfabetisk, A til Å» i kolonneraden | medium | patch etter svar 8: linja og skjermleseren sier det samme, «stigende (A til Å)» eller «synkende (Å til A)» for Retning (`588152c`, `test_linja_og_skjermleseren_sier_det_samme`) |
+| ECH2 | `aria-sort` sier at hele kolonnen er sortert, men sorteringen gjelder innenfor hver del, så verdiene begynner på nytt ved «Øvrige aksjer» | medium | patch etter svar 9: linja over tabellen slutter med «innenfor hver del», og `aria-sort` står som før (`588152c`, `test_linja_over_tabellen_bare_med_valg`) |
 | VG1 | Ingen test så hvilken vei vinkelen peker | medium | patch: `test_vinkelen_peker_etter_retningen` |
 | VG2 | Navnet i linja over tabellen var bare prøvd for signal og endring | low | patch: alle kolonnene i `test_linja_over_tabellen_bare_med_valg` |
 | BH5 | Lenken var valgfri i regexen i `test_viser_selskapsnavn_og_de_fem_kolonnene` | low | patch: påkrevd ved de fire som kan sorteres |
@@ -117,6 +119,7 @@ Gjennomgang 15.10 på diffen `main...9976ddc`, med Blind Hunter (BH, 14 funn), E
 
 **Commands:**
 - `uv run pytest -q` -- før 1569 bestått og 16 hoppet over på main (`73cdc45`). Før PR-en 1603 og 16 på `9976ddc`. Etter rettingene 1607 og 16 på `c97c5fe`.
+- *Lagt til 2026-10-15 (svar 8 og 9):* før 1607 bestått og 16 hoppet over, etter 1608 og 16 på `588152c`.
 
 **Mutantene** (15.10, på `dd3f361`), kjørt én om gangen med `-x` og bare testfilene som skulle fange dem, med kopi før og sha256 mot HEAD etter hver. Fila var lik HEAD etter hver (sha256 uten CRLF, og ingen endring i `git status`). Alle 13 er fanget.
 
@@ -137,5 +140,13 @@ Gjennomgang 15.10 på diffen `main...9976ddc`, med Blind Hunter (BH, 14 funn), E
 | S13 | den dempede vinkelen er hvit | `tests/test_utseende.py::TestSorteringen::test_vinkelen_er_en_svg_dempet_eller_hvit` |
 
 Testene fra gjennomgangen ble prøvd på samme måte på `385bb6b`, og alle fem ble fanget: vinkelen med retningen et klikk gir også på den valgte kolonnen (`test_vinkelen_peker_etter_retningen`), «kurs» som navn i linja (`test_linja_over_tabellen_bare_med_valg`), navnet uten norsk alfabet (`test_navnet_ved_lik_verdi_i_norsk_alfabet`), `Sortering` uten kontroll (`test_sortering_laget_direkte_maa_vaere_kjent`) og rader uten verdi først i stigende (`test_hver_del_sorteres_for_seg`).
+
+*Lagt til 2026-10-15 (svar 8 og 9):* mutantene for rettingen ble kjørt på `588152c` på samme måte, med `tests/test_app.py`. Fila var lik HEAD etter hver, og alle tre er fanget.
+
+| # | Mutant | Fanget av |
+|---|---|---|
+| T1 | «alfabetisk» tilbake for skjermleseren | `tests/test_app.py::TestStory815Sortering::test_skjermleseren_hoerer_kolonnen_og_retningen` |
+| T2 | «stigende» uten «(A til Å)» i linja for Retning | `tests/test_app.py::TestStory815Sortering::test_linja_og_skjermleseren_sier_det_samme` |
+| T3 | linja uten «innenfor hver del» | `tests/test_app.py::TestStory815Sortering::test_linja_over_tabellen_bare_med_valg` |
 
 Bildene av oversikten i demoen ved 1280 og 390 px, med og uten valgt kolonne (`?sorter=endring&orden=synkende`), ligger bare i scratchpad. Ved 390 px er de tatt i en ramme på 390 px, fordi Edge uten vindu har en minste bredde over 390 px.
