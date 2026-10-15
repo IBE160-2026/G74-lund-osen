@@ -488,8 +488,13 @@ class SqliteKILogg:
             skrevet = self._tilkobling.execute(_KI_SKRIV, verdier).rowcount
             self._tilkobling.execute("COMMIT")
         except BaseException:
+            # En ROLLBACK som feiler, skal ikke skjule den opprinnelige feilen
+            # (gjennomgangen av 4.3).
             if self._tilkobling.in_transaction:
-                self._tilkobling.execute("ROLLBACK")
+                try:
+                    self._tilkobling.execute("ROLLBACK")
+                except sqlite3.Error:
+                    pass
             raise
         return skrevet > 0
 

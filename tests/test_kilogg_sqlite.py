@@ -78,11 +78,10 @@ class TestMigrasjonen:
     def test_tabellen_lages_bare_i_migrasjonen(self):
         """Ville feilet hvis tabellen ble opprettet utenfor
         migrasjonsloeperen. Da har to utviklere hvert sitt skjema (AD-16)."""
-        for fil in SRC.glob("*.py"):
-            tekst = fil.read_text(encoding="utf-8")
-            assert not re.search(r"CREATE\s+TABLE[^;]*ki_logg", tekst, re.IGNORECASE), fil.name
-        filer = [f.name for f in MIGRASJONSKATALOG.glob("*.sql")
-                 if re.search(r"CREATE\s+TABLE\s+ki_logg", f.read_text(encoding="utf-8"))]
+        lager = re.compile(r"CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?[\"`]?ki_logg\b", re.IGNORECASE)
+        for fil in SRC.rglob("*.py"):
+            assert not lager.search(fil.read_text(encoding="utf-8")), fil.name
+        filer = [f.name for f in MIGRASJONSKATALOG.glob("*.sql") if lager.search(f.read_text(encoding="utf-8"))]
         assert filer == ["0005_ki_logg.sql"]
 
     def test_adapteren_avviser_en_base_paa_versjon_4(self, tmp_path):
@@ -142,29 +141,37 @@ class TestIngenEndring:
         for ord_ in ("UPDATE", "REPLACE", "DELETE", "OR IGNORE"):
             assert ord_ not in kilde.upper(), ord_
 
-    @pytest.mark.parametrize("sql", [
-        "UPDATE ki_logg SET tekst = 'endret'",
-        "DELETE FROM ki_logg",
-        "INSERT OR REPLACE INTO ki_logg (slag, dato, symbol, grunnlag, regelen, tekst, besto, "
-        "promptversjon, tjeneste, modell) VALUES ('aksje', '2026-10-15', 'EQNR', '{}', 'r', "
-        "'ny', 1, '1', 'lokal', 'm')",
-    ])
+    @pytest.mark.parametrize("sql", ["UPDATE ki_logg SET tekst = 'endret'", "DELETE FROM ki_logg"])
     def test_basen_avviser_endring_og_sletting(self, base, sql):
-        """Triggerne i 0005: ogsaa en annen vei inn i basen kan ikke endre en
-        rad (AD-7). REPLACE sletter foerst, og stoppes av triggeren for DELETE
-        naar recursive_triggers er paa, ellers av den unike indeksen."""
+        """Triggerne i 0005: UPDATE og DELETE med SQL avvises (AD-7)."""
         SqliteKILogg(base, klokke).skriv(_rad())
         foer = base.execute("SELECT * FROM ki_logg").fetchall()
-        base.execute("PRAGMA recursive_triggers = ON")
         with pytest.raises(sqlite3.DatabaseError):
             base.execute(sql)
         assert base.execute("SELECT * FROM ki_logg").fetchall() == foer
 
+    @pytest.mark.parametrize("rekursive", ["OFF", "ON"])
+    @pytest.mark.parametrize("verb", ["INSERT OR REPLACE", "REPLACE", "INSERT OR IGNORE", "INSERT"])
+    def test_replace_erstatter_ikke_en_rad(self, base, rekursive, verb):
+        """Gjennomgangen av 4.3 (BH1, ECH, VG1): med recursive_triggers av,
+        som er standard, slettet REPLACE raden uten DELETE-triggeren.
+        Triggeren ki_logg_erstattes_ikke stopper den foer konflikten loeses."""
+        SqliteKILogg(base, klokke).skriv(_rad())
+        foer = base.execute("SELECT * FROM ki_logg").fetchall()
+        base.execute(f"PRAGMA recursive_triggers = {rekursive}")
+        base.execute(
+            f"{verb} INTO ki_logg (slag, dato, symbol, grunnlag, regelen, tekst, besto, "
+            "promptversjon, tjeneste, modell) VALUES ('aksje', '2026-10-15', 'EQNR', '{}', 'r', "
+            "'ny', 1, '1', 'lokal', 'm')"
+        )
+        assert base.execute("SELECT * FROM ki_logg").fetchall() == foer
+
     def test_en_rad_per_emne_ogsaa_uten_symbol(self, base):
-        """SQLite regner to NULL som ulike i UNIQUE, saa indeksen bruker ifnull."""
+        """SQLite regner to NULL som ulike i UNIQUE, saa indeksen og triggeren
+        bruker ifnull."""
         _rad_rett_i_basen(base, slag="dag", symbol=None)
-        with pytest.raises(sqlite3.IntegrityError):
-            _rad_rett_i_basen(base, slag="dag", symbol=None)
+        _rad_rett_i_basen(base, slag="dag", symbol=None, tekst="en annen")
+        assert base.execute("SELECT tekst FROM ki_logg").fetchall() == [("t",)]
 
     @pytest.mark.parametrize("endret", [
         dict(slag="aksje", symbol="EQNR", melding_id="m-1"),
@@ -178,6 +185,22 @@ class TestIngenEndring:
         dict(promptversjon=""),
         dict(modell=""),
         dict(maskinvare="tpu"),
+        dict(dato="20261015"),
+        dict(dato="2026-10-32"),
+        dict(grunnlag="ikke json"),
+        dict(grunnlag="[1, 2]"),
+        dict(regelen=" "),
+        dict(tjeneste="av"),
+        dict(symbol=""),
+        dict(symbol="eqnr"),
+        dict(symbol="EQNR "),
+        dict(slag="melding", symbol=None, melding_id=""),
+        dict(seed=1.5),
+        dict(seed="x"),
+        dict(temperatur="x"),
+        dict(temperatur=-0.5),
+        dict(tekst=" "),
+        dict(besto=0, grunn=" "),
     ])
     def test_basen_sjekker_formen(self, base, endret):
         with pytest.raises(sqlite3.IntegrityError):
@@ -190,3 +213,45 @@ class TestIngenEndring:
                    "gemma4:e4b", None, None, None, None, None)
         with pytest.raises(sqlite3.IntegrityError):
             base.execute(lagring_sqlite._KI_SKRIV, verdier)
+
+    def test_en_tekst_som_ikke_besto_staar_med_grunnen(self, base):
+        """besto = 0 med tekst er en tekst kontrollen stoppet (FR-604)."""
+        _rad_rett_i_basen(base, besto=0, tekst="t", grunn="feil retning")
+        rad = SqliteKILogg(base, klokke).les(Emne.aksje("EQNR", TORSDAG))
+        assert not rad.besto and not rad.modellen_feilet
+
+
+class TestTransaksjonen:
+    def test_en_feil_rulles_tilbake(self, base):
+        """Gjennomgangen (VG2): en INSERT som feiler, etterlater ingen aapen
+        transaksjon, og neste skriv virker."""
+        base.execute(
+            "CREATE TEMP TRIGGER stopp BEFORE INSERT ON ki_logg "
+            "BEGIN SELECT RAISE(ABORT, 'stopp'); END"
+        )
+        logg = SqliteKILogg(base, klokke)
+        with pytest.raises(sqlite3.IntegrityError):
+            logg.skriv(_rad())
+        assert not base.in_transaction
+        base.execute("DROP TRIGGER stopp")
+        assert logg.skriv(_rad())
+
+    def test_kallerens_aapne_transaksjon_avvises(self, base):
+        base.execute("BEGIN")
+        try:
+            with pytest.raises(RuntimeError, match="aapen transaksjon"):
+                SqliteKILogg(base, klokke).skriv(_rad())
+        finally:
+            base.execute("ROLLBACK")
+
+    def test_bare_begin_insert_og_commit(self, base):
+        """Gjennomgangen (BH13): det adapteren faktisk sender til basen."""
+        setninger = []
+        logg = SqliteKILogg(base, klokke)
+        base.set_trace_callback(setninger.append)
+        logg.skriv(_rad())
+        logg.skriv(_rad())
+        base.set_trace_callback(None)
+        assert setninger
+        for setning in setninger:
+            assert setning.split()[0].upper() in {"BEGIN", "INSERT", "COMMIT"}, setning

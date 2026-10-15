@@ -7,7 +7,6 @@ mot de samme testene, med en base i minnet.
 """
 
 import json
-import sqlite3
 from datetime import date, datetime, timezone
 from zoneinfo import ZoneInfo
 
@@ -17,8 +16,7 @@ from kilogg import (
     AKSJE, DAG, MELDING, Emne, IkkeInnevaerendeBoersdag, KILogg, KIRad, UgyldigKIRad,
 )
 from kilogg_minne import MinneKILogg
-from lagring_sqlite import MIGRASJONSKATALOG, SqliteKILogg
-from migrering import migrer
+from lagring_sqlite import SqliteKILogg, aapne_base
 
 OSLO = ZoneInfo("Europe/Oslo")
 TORSDAG = date(2026, 10, 15)
@@ -230,17 +228,18 @@ def _minne(klokke):
 
 @pytest.fixture(params=["minne", "sqlite"])
 def logg_lager(request):
-    """Lager en KILogg med en klokke: i minnet, eller i SQLite med en base i
-    minnet som er migrert til siste versjon (story 4.3)."""
+    """Lager en KILogg med en klokke: i minnet, eller i SQLite med en base
+    aapnet med aapne_base i tmp_path, migrert til siste versjon (story 4.3)."""
     if request.param == "minne":
         yield _minne
         return
     tilkoblinger = []
+    katalog = request.getfixturevalue("tmp_path")
 
     def _sqlite(klokke):
-        tilkobling = sqlite3.connect(":memory:", isolation_level=None)
+        # Gjennomgangen av 4.3 (BH16): samme tilkobling som hentingen bruker.
+        tilkobling = aapne_base(katalog / f"ki{len(tilkoblinger)}.db")
         tilkoblinger.append(tilkobling)
-        migrer(tilkobling, MIGRASJONSKATALOG)
         return SqliteKILogg(tilkobling, klokke)
 
     yield _sqlite
@@ -262,9 +261,9 @@ class TestPorten:
     def test_oppfyller_porten(self, logg_lager):
         assert isinstance(logg_lager(Klokke()), KILogg)
 
-    def test_klokka_maa_kunne_kalles(self):
+    def test_klokka_maa_kunne_kalles(self, logg_lager):
         with pytest.raises(TypeError):
-            MinneKILogg(_klokka(TORSDAG))
+            logg_lager(_klokka(TORSDAG))
 
     def test_skriv_og_les(self, logg_lager):
         logg = logg_lager(Klokke())
