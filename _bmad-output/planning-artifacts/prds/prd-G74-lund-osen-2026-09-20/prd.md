@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-15T15:27
+updated: 2026-10-15T15:54
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1252,6 +1252,8 @@ EODHD eller ikke?»). Story 10.2 er blokkert til det er avgjort.
 
 *Avgjort 2026-10-04:* vi spør ikke. Modellen får bare våre egne resultater: fortegn, styrke, retning og antall, og ingen prosenter, forholdstall, kurser eller volumer. Det gjelder også FR-607. `malinger.md` §19 viste at målingene ikke ga bedre tekst. Se punktet under «Å følge opp» i `docs/kilder-og-rettigheter.md`.
 
+*Lagt til 2026-10-15 (gruppens svar 10 på planen for KI-laget, instruksjonen kl. 15:53):* «antall» gjelder dagsteksten i FR-607 (story 10.6). Grunnlaget for én aksje (story 10.1) er fortegnet for de tre sjekkene, styrken og retningen, uten antall.
+
 #### FR-601 — Av/på-bryteren er brukersynlig
 
 KI-laget skal kunne slås av og på fra grensesnittet. Bryteren er ikke et
@@ -1399,6 +1401,8 @@ Under tabellen i markedsoversikten står noen setninger om hele børsdagen, skre
 Tjenesten velges i `.env` med `OSE_KI_TJENESTE`: `lokal` er standard, eller `gemini`, `anthropic` eller `openai`. Det er én tjeneste per kjøring, uten stille overgang til en annen. Feiler tjenesten, blir det ingen tekst og en rad i loggen (FR-604, NFR-04). Nøklene heter `OSE_KI_GEMINI_NOKKEL`, `OSE_KI_ANTHROPIC_NOKKEL` og `OSE_KI_OPENAI_NOKKEL`, og ingen nøkkel følger med appen eller repoet (`AD-12`). Hver kobler bare til sin egen, på sine egne vilkår.
 
 ChatGPT Plus eller Pro med «Sign in with ChatGPT» kommer senere (story 10.8). Et Claude-abonnement kan ikke brukes.
+
+*Lagt til 2026-10-15 (gruppens svar 5 på planen for KI-laget, instruksjonen kl. 15:53):* `av` er et eget valg i `OSE_KI_TJENESTE`. Da lages ingen KI-tekst, og hentingen går som før. `.env.example` har `av`, og README-en sier hvordan KI slås på. Uten variabelen gjelder `lokal`.
 
 ### 4.6A Plan A: KI-laget over meldinger (utenfor v1)
 

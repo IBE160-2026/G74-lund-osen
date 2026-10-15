@@ -2020,6 +2020,13 @@ FR-604, FR-605, `AD-8`, `AD-9`
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
 
+*Lagt til 2026-10-15 (gruppens svar på de ti spørsmålene i planen for KI-laget, instruksjonen kl. 15:53):* svarene er beslutninger. De som gjelder Epic 4:
+- Svar 2: raden i `KILogg` står når den finnes, også når modellen feilet (FR-604).
+- Svar 6: `0005` gir plass til dagsteksten i 10.6, med en dato som eneste emne. Et emne er da en meldings-id (plan A), et `(symbol, dato)`-par (plan B) eller en dato alene (FR-607).
+- Svar 9: 4.0 er første PR i KI-laget.
+
+Alle ti svarene står under Epic 10.
+
 ### Story 4.0: Nettsperren dekker hele testkjøringen
 
 *Lagt til 2026-09-24.*
@@ -2217,6 +2224,20 @@ på papir.
 
 > **Utløses av nei eller taushet fra Euronext 28.09.** 5B.1 kan bygges før
 > det, fordi den ikke sender noe. Plan A og B utelukker ikke hverandre.
+
+*Lagt til 2026-10-15 (gruppens svar på de ti spørsmålene i planen for KI-laget, instruksjonen kl. 15:53):* svarene er beslutninger:
+1. Kveldshentingen går på PC-en den går på i dag (15,7 GB og RTX 4070), med Ollama i Docker som i `malinger.md` §19, alltid med grafikkort. Ingenting installeres på Windows.
+2. Raden står når den finnes, også når modellen feilet (FR-604).
+3. Kjøres hentingen på nytt samme dag og vurderingen endrer seg, vises dagen uten KI-tekst (FR-602).
+4. Bryteren huskes i en informasjonskapsel nå. 8.10b flytter bryteren til innstillingene og bruker samme kapsel.
+5. «av» er et eget valg i `OSE_KI_TJENESTE`. `.env.example` har «av», og README-en sier hvordan KI slås på. Uten variabelen gjelder «lokal», som i FR-608. Ført også under FR-608 i PRD-en.
+6. `0005` gir plass til dagsteksten i 10.6, med en dato som eneste emne.
+7. 3.4b kommer rett etter 10.3. Demotekstene lages med Gemma lokalt av de oppdiktede demodataene, i en egen avtalt kjøring.
+8. Adressen til Ollama er `OSE_KI_OLLAMA_URL`, med `http://127.0.0.1:11434` som standard og `http://ollama:11434` i compose. Porten publiseres bare på 127.0.0.1.
+9. 4.0 er første PR.
+10. «Antall» gjelder dagsteksten i 10.6, og 10.1 sender ikke antall. Ført også under §4.6 i PRD-en.
+
+Rekkefølgen er PR A (4.0), B (4.2), C (4.3), D (10.1), E (10.2a: porten `Modell`, prompten og kontrollen i FR-603), F (10.2b: teksten i hentekommandoen) og G (10.3).
 
 ### Story 10.1: Grunnlaget som sendes — bare utledede verdier
 
