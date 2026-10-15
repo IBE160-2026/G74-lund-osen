@@ -8,22 +8,27 @@ from collections.abc import Callable
 from datetime import datetime
 
 from boersdag import innevaerende_boersdag, norsk_dato
-from kilogg import Emne, KIRad
+from kilogg import Emne, IkkeInnevaerendeBoersdag, KIRad
 
 
 class MinneKILogg:
     """KILogg i minnet. Klokka leses ved hvert kall til skriv."""
 
     def __init__(self, klokke: Callable[[], datetime]):
+        if not callable(klokke):
+            raise TypeError(f"klokke maa kunne kalles, fikk {klokke!r}")
         self._klokke = klokke
         self._rader: dict[Emne, KIRad] = {}
 
     def skriv(self, rad: KIRad) -> bool:
         if not isinstance(rad, KIRad):
             raise TypeError(f"rad maa vaere KIRad, fikk {rad!r}")
-        dagens = innevaerende_boersdag(norsk_dato(self._klokke()))
+        naa = self._klokke()
+        if not isinstance(naa, datetime) or naa.tzinfo is None:
+            raise TypeError(f"klokka maa gi et tidspunkt med sone, ga {naa!r}")
+        dagens = innevaerende_boersdag(norsk_dato(naa))
         if rad.emne.dato != dagens:
-            raise ValueError(
+            raise IkkeInnevaerendeBoersdag(
                 f"{rad.emne.dato.isoformat()} er ikke inneveerende boersdag "
                 f"({dagens.isoformat()}). En eldre rad kan ikke skrives (AD-7)."
             )
@@ -33,6 +38,8 @@ class MinneKILogg:
         return True
 
     def les(self, emne: Emne) -> KIRad | None:
+        if not isinstance(emne, Emne):
+            raise TypeError(f"emne maa vaere Emne, fikk {emne!r}")
         return self._rader.get(emne)
 
     def les_alle(self) -> list[KIRad]:
