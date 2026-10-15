@@ -2384,6 +2384,8 @@ så jeg alltid ser hva signalet faktisk bygger på.
 
 **Én økt:** ja.
 
+*Lagt til 2026-10-15:* flettet i `e728c37`, PR #50. Står som review: kontrollpunktet om at siden sier hvorfor når tjenesten ikke er tilgjengelig (FR-601), er ikke oppfylt. Med svar c kl. 23:32 skriver hentingen ingen rad når Ollama ikke svarer, og siden viser da bare «Ingen KI-tekst for denne dagen.» uten grunnen. Det trengs et sted der hentingen fører at tjenesten ikke svarte for dagen, og det avgjøres av gruppen.
+
 ### Story 10.4: Måle bidraget — egen brukertest, etter 8.1
 
 *Het Story 5B.4 til 28.09.*
