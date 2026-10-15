@@ -311,6 +311,13 @@ class TestBoersdagMellom:
 
         assert boersdag_mellom(date(2026, 12, 30), date(2027, 1, 4))
 
+    def test_en_helg_utenfor_kalenderen_gir_ukedagene(self):
+        """Gjennomgangen av svarene 15.10 (ECH2 og BH6): lørdag og søndag
+        slås ikke opp, så fredag til mandag i 2027 gir ukedagene."""
+        from aksjedetalj import boersdag_mellom
+
+        assert not boersdag_mellom(date(2027, 1, 8), date(2027, 1, 11))
+
     def test_detaljen_har_svaret(self):
         rader = serie([100.0] * 6 + [101.0], start=date(2026, 9, 21))
         assert detalj(rader).endring_med_datoer is False

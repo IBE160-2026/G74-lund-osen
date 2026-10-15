@@ -320,10 +320,13 @@ def boersdag_mellom(fra: date, til: date) -> bool:
 
     Fredag til mandag har ingen, og heller ikke en uke med bare stengte
     dager. Kan kalenderen ikke avgjøre det (UtenforKalenderen), gis True,
-    så datoene står og siden ikke feiler.
+    så datoene står og siden ikke feiler. Lørdag og søndag er aldri
+    børsdager og slås ikke opp, så en helg i et år kalenderen ikke dekker,
+    gir ukedagene (gjennomgangen av svarene 15.10, ECH2 og BH6).
     """
+    dagene = (fra + timedelta(days=i) for i in range(1, (til - fra).days))
     try:
-        return any(er_boersdag(fra + timedelta(days=i)) for i in range(1, (til - fra).days))
+        return any(dag.weekday() < 5 and er_boersdag(dag) for dag in dagene)
     except UtenforKalenderen:
         return True
 
