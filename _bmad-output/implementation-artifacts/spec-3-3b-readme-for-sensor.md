@@ -29,6 +29,8 @@ Instruksjonen 16.10 kl. 15:59 (`docs/ai-prompts/2026-10-16.md`) sier at gruppen 
 - **d) «Kom i gang»:** på dagtid en børsdag er demoen veien for å se appen med en gang. Steg 8 i den ekte versjonen og raden «Klar» i tabellen nevner også helgen, slik `docs/hjelp.md` gjør.
 - **e) «Du trenger»:** versjonene, Docker Desktop slik den er prøvd, og Python for veien uten Docker.
 
+*Lagt til 2026-10-16 kl. 16:34 (instruksjonen kl. 16:31):* ja-et 15.10 kl. 22:54 ble gitt i chatten med rådet, ikke i Claude Code, og derfor ikke ført i dagsfila. Kilden er instruksjonen 16.10 kl. 15:59 (`docs/ai-prompts/2026-10-16.md`). Dagsfila for 15.10 endres ikke.
+
 Skjermbildet erstatter «uten bilder» (svar 4, 11.10). Regelen fra 25.09 står: bildet viser bare demoen, aldri ekte kurser (regel 16). Svar 3 i 3.3 står også: `--hent-foer-kl-22` står verken i README-en eller i `docs/hjelp.md`, fordi en henting før dagens kurser finnes, kan låse dagen.
 
 **Plassen til bildet:** testen fra beslutningen kl. 23:41 (`test_til_faglaerer_og_kom_i_gang_foer_status`) krever at ingenting står mellom beskrivelsen og «Til faglærer». Bildet står derfor rett under lista «Til faglærer» og over «Kom i gang», øverst i README-en, og den beslutningen står.
