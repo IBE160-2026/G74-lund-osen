@@ -31,8 +31,9 @@ HOLDES_UTE = [
     "local-tests/proeve.py",
     "_privat/utkast.md",
 ]
-# Stier som skal kunne spores.
-SPORES = [".env.example", "src/app.py", "docs/vurderingsmatrise.md"]
+# Stier som skal kunne spores. docs/data er en fil, ikke en mappe: data/
+# gjelder bare mapper (mutant R14).
+SPORES = [".env.example", "src/app.py", "docs/vurderingsmatrise.md", "docs/data"]
 
 UTEN_GIT = "ingen git her (for eksempel ZIP-fila som leveres), saa det som er sporet, kan ikke sjekkes"
 
