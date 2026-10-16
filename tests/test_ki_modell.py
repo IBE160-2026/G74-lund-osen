@@ -27,7 +27,8 @@ GOD_TEKST = ("Kursen ligger over snittet for de siste 50 dagene, men det ble han
 
 # sha256 av promptteksten for hver versjon (FR-605). Endres teksten, maa
 # PROMPTVERSJON opp og en ny linje inn her.
-AVTRYKK = {"1": "8fa4608965a356110f97963f65ba85bb44c79e913d47b5b911dc06b51af7be72"}
+AVTRYKK = {"1": "8fa4608965a356110f97963f65ba85bb44c79e913d47b5b911dc06b51af7be72",
+           "2": "4c697052292bf7069ed7ba0cb7600a8c67574c969fd4fcd184f4b854876df660"}
 
 
 class FalskModell:
@@ -73,6 +74,16 @@ class TestPrompten:
     def test_interessen_foelger_kursendringen(self):
         """Laerdommen fra C-med i malinger.md §19."""
         assert "Fortegnet for interessen følger dagens kursendring, ikke volumet" in lag_prompt(BLANDET)
+
+    def test_regelen_forklares_med_fordi(self):
+        """Versjon 2 (gruppen 16.10 kl. 22:33): i proevekjoeringen stoppet
+        punkt 4 i kontrollen 9 av 15 tekster, paa «skyldes» og «indikerer»
+        (malinger.md §32). Prompten ber om «fordi» i stedet. Ville feilet hvis
+        linja ble tatt ut, eller kom utenfor reglene for teksten."""
+        assert PROMPTVERSJON == "2"
+        linje = "- Når du forklarer regelen, bruk «fordi». Ikke bruk «skyldes» eller «indikerer»."
+        assert linje in REGLER.split("Regler for teksten:", 1)[1].splitlines()
+        assert linje in lag_prompt(BLANDET)
 
     def test_ingen_raad_og_ingen_gjetning(self):
         prompt = lag_prompt(BLANDET)
