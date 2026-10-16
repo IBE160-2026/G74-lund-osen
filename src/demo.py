@@ -30,6 +30,13 @@ Vurderingene: for hver boersdag og hver aksje er raden det vurder() gir for
 serien fram til dagen, skrevet med SqliteVurderingslager.skriv uendret og
 lagerets klokke stilt paa dagen (AD-7, merknaden 2026-10-03).
 
+Hovedindeksen (story 2.8, PR 1): DEMOINDEKS, «Demoindeksen», er oppdiktet,
+som selskapene. Den starter paa INDEKS_START, og dagens endring er snittet av
+endringen i justert sluttkurs for demoaksjene som har kurs baade dagen foer og
+dagen, saa indeksen foelger demoaksjene. Den har en rad for hver demodag og
+lagres med SqliteIndekslager i tabellen indeks, ikke i aksje eller kurs, saa
+«x av N» ikke teller den. Volumet er summen av volumet for aksjene med kurs.
+
 Merket: PRAGMA application_id = DEMOMERKE. Bare denne kommandoen setter det.
 Kommandoen nekter en fil uten merket, ogsaa en tom fil, og lager en demobase
 paa nytt fra bunnen. Hentingen nekter en base med merket.
@@ -46,9 +53,11 @@ from zoneinfo import ZoneInfo
 
 import lagring_sqlite
 from boersdag import er_boersdag
+from indeksdata import Indeks
 from kursdata import Aksje, Kursrad
 from lagring_sqlite import (
     DEMOMERKE,
+    SqliteIndekslager,
     SqliteKurslager,
     SqliteVurderingslager,
     aapne_base,
@@ -90,6 +99,11 @@ DEMOUNIVERS: tuple[Aksje, ...] = (
     Aksje("TROY", "TROY.OL", "Tareøy Havbruk", "Sjømat"),
     Aksje("MTFJ", "MTFJ.OL", "Matfjord Merkevarer", "Konsum"),
 )
+
+# Oppdiktet, som selskapene. Ikke sjekket mot lista hos Euronext ennå
+# (spesifikasjonen 2.8a, «Valgene i PR 1»).
+DEMOINDEKS = Indeks("DEMIX", "DEMIX.OL", "Demoindeksen")
+INDEKS_START = 1400.0
 
 NYLIG_NOTERT = "VRDS"
 UTEN_KURSER = "MTFJ"
@@ -154,6 +168,23 @@ def serie(nummer: int, aksje: Aksje, dager: list[date]) -> list[Kursrad]:
         rader = rader[-NYLIG_NOTERT_DAGER:]
     elif aksje.symbol == UTEN_KURSER:
         rader = []
+    return rader
+
+
+def indeksserie(serier: dict[str, list[Kursrad]], dager: list[date]) -> list[Kursrad]:
+    """Demoindeksen etter regelen i modulens docstring, en rad per dag."""
+    paa_dag = {symbol: {r.dato: r for r in rader} for symbol, rader in serier.items()}
+    nivaa, rader = INDEKS_START, []
+    for i, dag in enumerate(dager):
+        med_kurs = [d for d in paa_dag.values() if dag in d]
+        if i > 0:
+            endringer = [d[dag].justert_slutt / d[dager[i - 1]].justert_slutt - 1
+                         for d in med_kurs if dager[i - 1] in d]
+            if endringer:
+                nivaa *= 1 + sum(endringer) / len(endringer)
+        slutt = round(nivaa, 2)
+        rader.append(Kursrad(dato=dag, slutt=slutt, justert_slutt=slutt,
+                             volum=sum(d[dag].volum for d in med_kurs)))
     return rader
 
 
@@ -233,6 +264,8 @@ def _bygg(sti: Path) -> None:
         for symbol, rader in serier.items():
             if rader:
                 kurslager.erstatt_serie(symbol, rader, hentet)
+        SqliteIndekslager(tilkobling, (DEMOINDEKS,)).erstatt_serie(
+            DEMOINDEKS.symbol, indeksserie(serier, dager), hentet)
 
         for dag in dager:
             lager = SqliteVurderingslager(tilkobling, _klokke_for(dag), DEMOUNIVERS)
