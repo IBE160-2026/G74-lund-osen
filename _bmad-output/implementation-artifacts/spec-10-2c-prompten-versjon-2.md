@@ -41,6 +41,12 @@ context:
 
 **Utfallet** (på `f8a22d4`, i en fersk klone, med sha256 mot HEAD etter hver): H1 fanget av `test_regelen_forklares_med_fordi`, H2 av `test_versjonen_foelger_teksten`, H3 av `test_ordene_fr_603_nevner[skyldes-4]`, og H4, lagt til etter gjennomgangen (`indikerer` tatt ut av kontrollen), av `test_ordene_fr_603_nevner[indikerer-4]`.
 
+## Beslutningene etter prøvekjøringen
+
+*Avgjort 2026-10-16, gruppens beslutninger kl. 23:51 (svarene på de to spørsmålene fra instruksjonen kl. 23:35):* 1) Kontrollen strammes inn i en liten PR neste uke: et «fordi»-ledd må nevne en av sjekkene, ellers stoppes teksten. Ført også i `deferred-work.md`. 2) En ny promptversjon flettes når den består minst like mange tekster som versjonen før, i en prøvekjøring på samme dags data, og ingen tekst gjetter på en årsak utenfor regelen.
+
+De to funnene som måtte avgjøres av gruppen i triagen under (ECH og BH1, og BH4), er avgjort med dette.
+
 ## Gjennomgangen
 
 Gjennomgang 16.10 på diffen `main...382c214`, med Blind Hunter (BH, 14 funn), Edge Case Hunter (ECH, 7) og Verification Gap (VG, 4). Rettingene står i `f8a22d4`.

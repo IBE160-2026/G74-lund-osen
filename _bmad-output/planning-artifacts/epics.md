@@ -2388,6 +2388,8 @@ starter ikke av seg selv.
 
 *Lagt til 2026-10-16:* prompten versjon 2 (PR H, 10.2c) er flettet i `cafe067`, PR #55, etter gruppens ja kl. 23:51. CI var grønn på head-en `f3e52bd` (kjøring 38972334506). I prøvekjøringen 16.10 kl. 23:43–23:44 (`malinger.md` §34) besto 15 av 15 tekster, mot 6 med versjon 1 (§32), og modellen feilet for 0. Mandagens henting går med versjon 2, så reserven med `OSE_KI_TJENESTE=av` fra beslutningen kl. 22:33 trengs ikke. Med PR E, F og H er kontrollpunktene i storyen oppfylt, og 10-2 er done. Innstrammingen av kontrollen fra beslutningen kl. 23:51 under er en egen liten PR, ført i `deferred-work.md`.
 
+*Avgjort 2026-10-16, gruppens beslutninger kl. 23:51 (svarene på de to spørsmålene fra instruksjonen kl. 23:35):* 1) Kontrollen strammes inn i en liten PR neste uke: et «fordi»-ledd må nevne en av sjekkene, ellers stoppes teksten. Føres også i `deferred-work.md`. 2) En ny promptversjon flettes når den består minst like mange tekster som versjonen før, i en prøvekjøring på samme dags data, og ingen tekst gjetter på en årsak utenfor regelen.
+
 ### Story 10.3: Visningen i aksjedetaljen
 
 *Het Story 5B.3 til 28.09.*

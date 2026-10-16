@@ -208,3 +208,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-10-2a-modellen-prompten-og-kontrollen.md`
   summary: Kontrollen i FR-603 ser ikke på lengden, språket eller om en tekst for en aksje utenfor målingen sier at grensene ikke er målt på den, selv om prompten ber om to eller tre setninger på norsk og den setningen.
   evidence: BH16 i gjennomgangen 15.10 av PR E. FR-603 har fire punkter, og ingen av dem gjelder dette. Tas når 10.2b (PR F) gir de første ekte tekstene, eller i 10.4: om det trengs et femte punkt, avgjøres av gruppen.
+- source_spec: `_bmad-output/implementation-artifacts/spec-10-2c-prompten-versjon-2.md`
+  summary: Kontrollen i FR-603 fanger ikke en gjettet årsak etter «fordi». «Kursen steg fordi markedet var urolig.» består (prøvd 16.10). Kontrollen strammes inn: et «fordi»-ledd må nevne en av sjekkene, ellers stoppes teksten.
+  evidence: ECH og BH1 i gjennomgangen 16.10 av PR H (10.2c). Ingen av de 15 tekstene i `malinger.md` §34 gjør det. Gruppens beslutning 16.10 kl. 23:51 (under story 10.2 i `epics.md`): en liten PR neste uke.
