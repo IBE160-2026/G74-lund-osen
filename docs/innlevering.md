@@ -2,10 +2,12 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-10-13T14:50
+updated: 2026-10-16T00:28
 ---
 
 # Leveranseliste — IBE160, gruppe G74
+
+*Lagt til 2026-10-16:* status per kriterium for del 1, med bevis og neste tiltak, står i [vurderingsmatrisen](vurderingsmatrise.md).
 
 **Kvalitetssikringsdokumentasjonen — kontrollrapporter, mutanttester,
 memlogger, refleksjonslogg — er del av de 70 prosentene, ikke bare de 30:
