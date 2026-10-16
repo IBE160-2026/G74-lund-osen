@@ -36,6 +36,7 @@ HOLDES_UTE = [
 SPORES = [".env.example", "src/app.py", "docs/vurderingsmatrise.md", "docs/data"]
 
 UTEN_GIT = "ingen git her (for eksempel ZIP-fila som leveres), saa det som er sporet, kan ikke sjekkes"
+UTEN_GIT_TOLKNING = "ingen git her (for eksempel ZIP-fila som leveres), saa tolkningen sjekkes ikke mot git"
 
 
 def _monstre(tekst: str) -> list[tuple[str, bool, bool, bool]]:
@@ -102,7 +103,7 @@ def test_gitignore_slipper_inn_env_example_og_koden(sti):
     assert not ignorert(_gitignore(), sti), f"{sti} holdes ute av .gitignore"
 
 
-@pytest.mark.skipif(not har_git(ROT), reason=UTEN_GIT)
+@pytest.mark.skipif(not har_git(ROT), reason=UTEN_GIT_TOLKNING)
 @pytest.mark.parametrize("sti", HOLDES_UTE + SPORES)
 def test_tolkningen_stemmer_med_git(sti):
     """Tolkningen over sjekkes mot git selv, saa testen ikke hviler paa en
