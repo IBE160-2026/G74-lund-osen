@@ -13,9 +13,6 @@ Til faglærer:
 - Prosessen og KI-bruken: [kvalitetssikringen](docs/kvalitetssikring.md), [refleksjonsloggen](docs/reflection-log.md) og [de lagrede KI-promptene](docs/ai-prompts/)
 - [Vurderingsmatrisen for del 1](docs/vurderingsmatrise.md): status per kriterium, med bevis og neste tiltak
 
-![Oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/bilder/readme/oversikten-demo.png)
-*Oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»).*
-
 ## Kom i gang
 
 Appen finnes i to versjoner, med samme kode. Vi anbefaler den ekte versjonen. Vil du bare se hvordan appen virker, er demoen raskest. Første gang før kl. 22 på en børsdag, også på dagtid, er demoen veien for å se appen med en gang, fordi den ekte versjonen henter dagens kurser først etter kl. 22.
@@ -324,7 +321,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 ## Mappestruktur
 
 - `src/` og `tests/` — applikasjonen og testene
-- `docs/` — arbeidsprosessen, `docs/hjelp.md` med spørsmål og svar til «Kom i gang», og skjermbildet av demoen i `docs/bilder/readme/`
+- `docs/` — arbeidsprosessen, og `docs/hjelp.md` med spørsmål og svar til «Kom i gang»
 - `_bmad-output/` — Product Brief, plan, krav og sprintstatus
 - `.github/` — testkjøringen og morgensjekken
 - `Dockerfile`, `compose.yaml` og `.dockerignore` — imaget og tjenestene: webserveren, hentingen og demoen
