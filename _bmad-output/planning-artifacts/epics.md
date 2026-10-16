@@ -2386,6 +2386,8 @@ starter ikke av seg selv.
 
 *Avgjort 2026-10-16, gruppens beslutning kl. 22:33:* i prøvekjøringen (`malinger.md` §32) stoppet regel 4 i kontrollen 9 av 15 tekster, 8 på «skyldes» og 1 på «indikerer», også der ordet bare forklarte regelen. Prompten får versjon 2, som ber modellen forklare regelen med «fordi» og ikke bruke «skyldes» eller «indikerer». Kontrollen endres ikke. Det bygges lørdag 17.10, med en ny prøvekjøring på en fersk kopi av basen, og flettes før hentingen mandag 19.10. Er det ikke flettet da, går mandagens henting med `OSE_KI_TJENESTE=av`, så ingen dag får tekster med versjon 1.
 
+*Lagt til 2026-10-16:* prompten versjon 2 (PR H, 10.2c) er flettet i `cafe067`, PR #55, etter gruppens ja kl. 23:51. CI var grønn på head-en `f3e52bd` (kjøring 38972334506). I prøvekjøringen 16.10 kl. 23:43–23:44 (`malinger.md` §34) besto 15 av 15 tekster, mot 6 med versjon 1 (§32), og modellen feilet for 0. Mandagens henting går med versjon 2, så reserven med `OSE_KI_TJENESTE=av` fra beslutningen kl. 22:33 trengs ikke. Med PR E, F og H er kontrollpunktene i storyen oppfylt, og 10-2 er done. Innstrammingen av kontrollen fra beslutningen kl. 23:51 under er en egen liten PR, ført i `deferred-work.md`.
+
 ### Story 10.3: Visningen i aksjedetaljen
 
 *Het Story 5B.3 til 28.09.*
