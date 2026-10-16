@@ -61,7 +61,7 @@ development_status:
   1-9-aksjene-i-basen-og-tabellene-peker-på-dem: done
   epic-1-retrospective: optional
 
-  epic-2: backlog
+  epic-2: in-progress
   2-0-hentingen-lekker-ikke-nøkkelen-og-skriver-ikke-over-et-øyeblikksbilde: done
   2-1-børsdag-i-oslo-tidsstempel-i-utc: done
   2-1b-basen-åpnes-ett-sted-og-hentingen-skriver-kursene-dit: done
@@ -84,7 +84,7 @@ development_status:
   2-14-eksdatoer-føres-inn-for-hånd: backlog
   epic-2-retrospective: optional
 
-  epic-3: backlog
+  epic-3: in-progress
   3-1-dockerfile-med-to-innganger: done
   3-2-to-volumer-og-ingenting-uerstattelig-i-imaget: done
   3-3-readme-slik-kjører-du-den: done
@@ -92,7 +92,7 @@ development_status:
   3-4b-ki-tekstene-i-demoen: backlog
   epic-3-retrospective: optional
 
-  epic-4: backlog
+  epic-4: in-progress
   4-0-nettsperren-dekker-hele-testkjøringen: done
   4-1-velg-modelltjeneste-og-dokumentér-betingelse-4: done
   4-2-kilogg-porten-med-minneimplementasjon: done
@@ -123,7 +123,7 @@ development_status:
   7-3-når-kalenderen-ikke-svarer: backlog
   epic-7-retrospective: optional
 
-  epic-8: backlog
+  epic-8: in-progress
   8-0-de-rene-feilene-i-de-to-skjermbildene: done
   8-0b-hjelp-bak-et-spørsmålstegn: done
   8-0c-tydelig-merking-ord-ved-sjekkene-og-datoer-på-grafen: done
@@ -162,7 +162,7 @@ development_status:
   9-6-product-brief-v8-etter-plan-b: done
   epic-9-retrospective: optional
 
-  epic-10: backlog
+  epic-10: in-progress
   10-1-grunnlaget-som-sendes-bare-utledede-verdier: done
   10-2-teksten-lages-i-hentekommandoen-og-lagres-i-kilogg: in-progress
   10-3-visningen-i-aksjedetaljen: done
