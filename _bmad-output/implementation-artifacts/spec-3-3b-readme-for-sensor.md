@@ -37,6 +37,8 @@ Skjermbildet erstatter «uten bilder» (svar 4, 11.10). Regelen fra 25.09 står:
 
 **Bildet tas på nytt når oversikten endres.** Fremgangsmåten står under «Bildet», og en test feiler når malene eller demodataene bak bildet endres.
 
+*Avgjort 2026-10-16 kl. 22:45:* gruppen tok 16.10 kl. 21:38 skjermbildet av oversikten i demoen ut av README-en igjen. Det snur punkt b i 3.3b (ja 15.10 kl. 22:54, flettet i `6b9dc2f`, PR #53). Bildet og teksten under det er tatt ut, `docs/bilder/readme/oversikten-demo.png` er slettet, og testene godtar igjen ingen bilder i README-en og i `docs/bilder/` utenom CI-merket (`f9e6f59` på grenen `readme-uten-bilde`). Regelen står: bilder i README-en kommer bare fra `docs/bilder/readme/` og viser aldri den ekte versjonen. Bildene som kommer i «Kom i gang» søndag, er ikke berørt, og PR 1 for hovedindeksen trenger ikke ta bildet på nytt. Fremgangsmåten under «Bildet» og avtrykket `AVTRYKK_BAK_BILDET` gjelder ikke lenger, fordi bildet og testen er tatt ut.
+
 ## Boundaries & Constraints
 
 - Ingen API-kall utover kvotesjekken i regel 15. `src/fetch_prices.py` kjøres ikke.
