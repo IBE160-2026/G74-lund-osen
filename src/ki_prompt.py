@@ -17,7 +17,8 @@ staar der.
 Versjon 2 (gruppens beslutning 16.10 kl. 22:33): i proevekjoeringen
 (malinger.md §32) stoppet punkt 4 i kontrollen 9 av 15 tekster, paa
 «skyldes» og «indikerer», ogsaa der ordet bare forklarte regelen. Prompten
-ber derfor modellen forklare regelen med «fordi». Kontrollen er uendret.
+ber derfor modellen forklare regelen med «fordi». Kontrollen ble ikke endret
+i versjon 2.
 """
 
 import json
