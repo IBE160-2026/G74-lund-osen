@@ -43,5 +43,42 @@ context:
 - `data/db/ose.db` røres ikke (regel 22). Testene bruker midlertidige baser.
 - Etter flettingen migreres den ekte basen til 6 neste gang webserveren eller hentingen skriver. Sjekken av basen før kallene (`manglende_i_basen`) avviser en base som står en versjon bak, og hentingen går da videre uten den, med filvakten som vakt (Utført-linja for hentingen 16.10). Det rettes i PR 2 (beslutningen kl. 22:16).
 - Flettes ikke uten ja fra gruppen.
+- **Navnet og symbolet til demoindeksen sjekkes av gruppen mot lista hos Euronext før flettingen** (gjennomgangen, BH13).
 
 **Testtallet før:** 2236 bestått og 17 hoppet over (grenen til PR #55 på `1efe816`, samme kode som main etter `cafe067`).
+
+*Lagt til 2026-10-17 (gjennomgangen, BH12):* `baseline_commit` er main på `e978511`. Testtallet før er målt på `1efe816`, og koden og testene er de samme som på main etter flettingen av PR #55 i `cafe067`, så tallet gjelder for `e978511`.
+
+## Mutantene
+
+Én om gangen med `-x` og bare `tests/test_indeks.py`, i en fersk klone, med sha256 mot HEAD etter hver, på `5054f76` og igjen på `ebf8235` etter rettingene. Alle fanget begge gangene:
+- I1, indeksen skrevet i `kurs`: `test_serien_byttes_ut_ikke_skjoetes_paa[sqlite]` (triggeren fra `0003` avviser `OSEBX` i `kurs`).
+- I2, en lørdag lagret: `test_en_loerdag_og_en_helligdag_lagres_ikke[minne]`.
+- I3, serien skjøtt på i stedet for byttet ut: `test_serien_byttes_ut_ikke_skjoetes_paa[sqlite]`.
+- I4, demobasen uten indeks: `test_indeksen_for_alle_demodagene`.
+
+## Gjennomgangen
+
+Gjennomgang 17.10 på diffen `main...5054f76`, med Blind Hunter (BH, 15 funn), Edge Case Hunter (ECH, 4) og Verification Gap (VG, 3). Rettingene står i `9efcef4` og `ebf8235`.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| ECH | En `Indeks` med symbolet til en aksje ble godtatt, og basen har ingen trigger for `indeks` | medium | patch: porten avviser et symbol i `AKSJEUNIVERS`, `test_en_aksje_avvises_ogsaa_naar_den_er_gitt_som_indeks` |
+| VG3, BH10 | Bare `IntegrityError` var prøvd for tilbakerullingen | medium | patch: `test_en_annen_feil_midt_i_transaksjonen_ruller_tilbake` |
+| VG1 | Øyeblikksbildet av demobasen i `test_demo.py` tok ikke med `indeks` | medium | patch: `indeks` og `indeksserie` i `_tabeller` |
+| VG2, ECH, BH8 | Testen av demoindeksen så bare siste dag, med en toleranse som kunne glippe på avrundingen, og ikke volumet | low | patch: hver dag med relativ toleranse, volumet, og en egenskap (alle opp 1 % gir indeksen opp 1 %) |
+| BH10 | Tid i norsk sone og rader i omvendt rekkefølge var ikke prøvd | low | patch: `test_tid_i_norsk_sone_leses_som_utc`, `test_radene_leses_i_rekkefoelge` |
+| BH14 | Merknaden i spinen sa ikke at symbolet bare håndheves i porten | low | patch |
+| BH15 | Importer midt i fila, og to sjekker i én test | low | patch: importene øverst, testen delt i to |
+| BH12 | To grunnlag for testtallet før | low | patch: linja over |
+| BH13 | Navnet og symbolet til demoindeksen er ikke sjekket mot lista hos Euronext | medium | **må gjøres av gruppen** før flettingen (Boundaries) |
+| BH1 | Ved et årsskifte uten ny kalender faller alle nye dager bort, mens `hentet` blir fersk | medium | defer til PR 2: hentekommandoen stopper alt i dag med `UtenforKalenderen` når dagen ligger utenfor `DEKKEDE_AAR`, så den henter ikke. Kallet og utskriften kommer i PR 2 |
+| BH2 | Dagene som tas bort, telles ikke | low | defer til PR 2, der hentingen skriver ut det den lagret |
+| BH6 | Sjekken av basen før kallene avviser en base som står en versjon bak, til PR 2 | medium | avvist: beslutningen 16.10 kl. 22:16 legger rettingen i PR 2, og filvakten holdt 16.10. Står i PR-en |
+| BH3 | Ingen CHECK i `indeks` | low | avvist: samme form som `kurs`, og `Kursrad` avviser tall som ikke er endelige, null eller under null, og negativt volum, før noe lagres |
+| BH4 | NaN, uendelig og negative tall | low | avvist: `Kursrad.__post_init__` avviser dem (`UgyldigKursrad`) |
+| BH5 | `volum` kan mangle for en indeks | low | avvist: §14 i `malinger.md` sier at `volume` finnes på alle radene for `OSEBX.OL` og er 0 på én. 0 er lovlig i `Kursrad` |
+| BH7 | Demoindeksen avrundes til to desimaler når den lagres (regel 21) | low | avvist: som demoaksjene, etter regelen i `demo.py`, fordi kilden gir to desimaler. Nivået regnes videre uavrundet |
+| BH9, ECH | Et hull i en aksjeserie, og deling på null | low | avvist: demoseriene har ingen hull (Varde Systemer begynner sent, og Matfjord Merkevarer har ingen kurser), og `Kursrad` avviser en kurs på null |
+| BH11 | Lesesiden sjekker ikke symbolet | low | avvist: som `Kursleser`, der et ukjent symbol gir en tom serie |
+| ECH | En tom liste over indekser gir en feilmelding om ukjent indeks | low | avvist: meldingen er riktig |
