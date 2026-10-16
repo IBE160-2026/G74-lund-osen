@@ -1903,6 +1903,8 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 
 *Ferdig 2026-10-10:* flettet i `5816bc2`, PR #25.
 
+*Lagt til 2026-10-16 kl. 11:54:* kontrollpunktet «Demoen står først» fra 05.10 ble snudd 11.10 kl. 22:32: README-en anbefaler den ekte versjonen og har den før demoen (spesifikasjonen for 3.4, `spec-3-4-demoversjonen.md`, «2026-10-11 kl. 22:32», og testen `tests/test_docker.py::TestReadme::test_ekte_versjonen_foerst_og_zip_foer_kommandoene`). Docker som hovedmåten og uv som alternativet står. Kontrollpunktene er gått gjennom igjen mot main, og alle er oppfylt. At 20 kall i døgnet holder til én henting, står i `docs/hjelp.md`, som README-en lenker til, etter omskrivingen i 3.4, PR 3. 3-3 er done.
+
 ### Story 3.4: Demoversjonen
 
 *Lagt til 2026-10-03, Marians beslutning kl. 18:10.*
