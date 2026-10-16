@@ -1063,7 +1063,8 @@ class TestReadmeForNybegynnere:
         for innhold in ("Under arbeid", "Flettet til main:", "hentingen", "Docker", "demoen", "README-en",
                         "kallene som er igjen", "hjelp bak «?»",
                         "tydeligere merking", "utseendet fra designforslaget", "KI-laget", "Euronext",
-                        "Selve teksten lages ikke ennå",
+                        "og at hentingen lager teksten med en lokal modell",
+                        "aksjesiden viser bare tekster som besto kontrollen",
                         "](_bmad-output/implementation-artifacts/sprint-status.yaml)"):
             assert innhold in status, innhold
         # Gjennomgangen av flettingen 12.10 (VG): hver sak staar i riktig liste.
@@ -1075,14 +1076,18 @@ class TestReadmeForNybegynnere:
                     "hjelp bak «?»", "tydeligere merking", "datoene og månedsmerkene i grafen",
                     "oversikten fra designforslaget", "utseendet fra designforslaget",
                     "sortering ved klikk i kolonneraden", "den første delen av KI-laget",
-                    "en bryter som slår den av og på"):
+                    "en bryter som slår den av og på",
+                    "at hentingen lager teksten med en lokal modell"):
             assert sak in flettet, sak
         # Story 8.0d, PR 3 (svar 9 kl. 22:50): «Neste:» følger rekkefølgen
         # etter 8.0d (gruppen 14.10 kl. 22:19 og 22:25).
         # Story 8.15: sorteringen er flyttet til «Flettet til main».
         # 3.3b, punkt a: resten av KI-laget først (svar 10 15.10 kl. 14:47),
         # så rekkefølgen fra 14.10.
-        saker = ("resten av KI-laget", "hovedindeksen", "Min liste", "innstillingene", "periodene i kursgrafen",
+        # PR #49 flettet 16.10: teksten fra hentingen er flyttet til «Flettet
+        # til main», og «Neste:» begynner med hovedindeksen.
+        assert "resten av KI-laget" not in status and "Selve teksten lages ikke ennå" not in status
+        saker = ("hovedindeksen", "Min liste", "innstillingene", "periodene i kursgrafen",
                  "historikken og signaldagene", "«Vis KI-tekst» i innstillingene", "KI-teksten om dagen",
                  "velge og bytte aksjer")
         for sak in saker:
