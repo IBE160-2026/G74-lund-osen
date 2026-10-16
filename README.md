@@ -13,17 +13,20 @@ Til faglærer:
 - Prosessen og KI-bruken: [kvalitetssikringen](docs/kvalitetssikring.md), [refleksjonsloggen](docs/reflection-log.md) og [de lagrede KI-promptene](docs/ai-prompts/)
 - [Vurderingsmatrisen for del 1](docs/vurderingsmatrise.md): status per kriterium, med bevis og neste tiltak
 
+![Oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/bilder/readme/oversikten-demo.png)
+*Oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»).*
+
 ## Kom i gang
 
-Appen finnes i to versjoner, med samme kode. Vi anbefaler den ekte versjonen. Vil du bare se hvordan appen virker, er demoen raskest.
+Appen finnes i to versjoner, med samme kode. Vi anbefaler den ekte versjonen. Vil du bare se hvordan appen virker, er demoen raskest. Første gang før kl. 22 på en børsdag, også på dagtid, er demoen veien for å se appen med en gang, fordi den ekte versjonen henter dagens kurser først etter kl. 22.
 
 | | Den ekte versjonen (anbefalt) | Demoen |
 |---|---|---|
 | Kurser | Ekte sluttkurser fra Oslo Børs, hentet fra EODHD hver børsdag. Dagens vurdering lagres per aksje | Oppdiktede selskaper og kurser («Eksempeltall») |
 | Trenger | Docker Desktop og en gratis nøkkel fra EODHD | Bare Docker Desktop |
-| Klar | Viser kurser etter første henting om kvelden | Med en gang |
+| Klar | Viser kurser etter første henting, etter kl. 22 på en børsdag, eller i helgen og andre dager børsen er stengt | Med en gang |
 
-**Du trenger** en Windows-maskin eller en Mac, lov til å installere programmer, nett og noen GB ledig plass, men verken git eller Docker-konto. Første gang tar det en stund. På Linux bruker du Docker Engine med Compose i stedet for Docker Desktop. Står du fast, se [«Står du fast?»](#står-du-fast) lenger ned.
+**Du trenger** en Windows-maskin eller en Mac, lov til å installere programmer, nett og noen GB ledig plass, men verken git eller Docker-konto. Første gang tar det en stund. På Linux bruker du Docker Engine med Compose i stedet for Docker Desktop. Vi prøvde 10.10 med Docker Desktop 4.91.0 (motor 29.8.0, Compose v5.5.1) på Windows, og imaget bruker Python 3.13.15. Mac er ikke prøvd ennå. Uten Docker trenger du bare [uv](https://docs.astral.sh/uv/), som henter Python 3.13 eller nyere hvis maskinen ikke har den, se «Uten Docker, med uv» under «Mer for den som vil». Står du fast, se [«Står du fast?»](#står-du-fast) lenger ned.
 
 ### Felles for begge
 
@@ -59,7 +62,7 @@ open -e .env
 docker compose up --build
 ```
 
-8. **Hent kursene** etter kl. 22 og før midnatt på en børsdag. Åpne et nytt terminalvindu i samme mappe (steg 3 og 4), og lim inn denne. Det er klart når utskriften sier hvilken børsdag vurderingene gjelder. Last siden på nytt når hentingen er ferdig.
+8. **Hent kursene** etter kl. 22 og før midnatt på en børsdag. Første gang går det også i helgen og andre dager børsen er stengt. Åpne et nytt terminalvindu i samme mappe (steg 3 og 4), og lim inn denne. Det er klart når utskriften sier hvilken børsdag vurderingene gjelder. Last siden på nytt når hentingen er ferdig.
 
 ```
 docker compose run --rm hent
@@ -228,13 +231,21 @@ Basen, demobasen og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo`
 
 ## Status
 
-Under arbeid, og ingenting er endelig. Flettet til main: hentingen av kurser med kontroll av børsdagen, nye forsøk med kallene som er igjen etter hentingen, Docker, demoen, denne README-en, hjelp bak «?» på sidene, tydeligere merking i tabellene, datoene og månedsmerkene i grafen, oversikten fra designforslaget, utseendet fra designforslaget, og sortering ved klikk i kolonneraden. Neste: hovedindeksen, Min liste, periodene i kursgrafen, og så KI-laget. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
+Under arbeid, og ingenting er endelig. Flettet til main: hentingen av kurser med kontroll av børsdagen, nye forsøk med kallene som er igjen etter hentingen, Docker, demoen, denne README-en, hjelp bak «?» på sidene, tydeligere merking i tabellene, datoene og månedsmerkene i grafen, oversikten fra designforslaget, utseendet fra designforslaget, sortering ved klikk i kolonneraden, og den første delen av KI-laget: plassen for KI-teksten under regelforklaringen på aksjesiden, med en bryter som slår den av og på, loggen der tekstene lagres, og kontrollen av teksten mot regelen. Selve teksten lages ikke ennå, så aksjesiden viser ingen KI-tekst. Neste: resten av KI-laget, der hentingen lager teksten med en lokal modell, så hovedindeksen, Min liste, innstillingene, periodene i kursgrafen, historikken og signaldagene i grafen, «Vis KI-tekst» i innstillingene, KI-teksten om dagen på forsiden, og til slutt å velge og bytte aksjer. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
 
 ## Tester
+
+**På en ren maskin uten Docker** trenger du bare [uv](https://docs.astral.sh/uv/). Appen krever Python 3.13 eller nyere (`requires-python` i `pyproject.toml`), og uv henter den hvis maskinen ikke har den. Stå i mappa der README og `pyproject.toml` ligger, og kjør:
+
+```
+uv sync
+```
 
 ```
 uv run pytest
 ```
+
+Alle testene skal bestå. Noen hoppes over, med grunnen i utskriften når du legger til `-rs`: på Windows testene som bytter tidssone, fordi `time.tzset` ikke finnes der (de kjøres i CI), og testen for Unix-sokler, som Python på Windows ikke har. På en maskin uten IPv6 (`::1`) hoppes testen for den over. I en mappe fra ZIP-fila, uten git, hoppes også testene som sjekker hva som er sporet i git, over.
 
 - Ingen nettkall: `tests/conftest.py` sperrer nettverket i hver test.
 - `data/` røres ikke: testene bruker en midlertidig mappe.
@@ -274,7 +285,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 ## Mappestruktur
 
 - `src/` og `tests/` — applikasjonen og testene
-- `docs/` — arbeidsprosessen, og `docs/hjelp.md` med spørsmål og svar til «Kom i gang»
+- `docs/` — arbeidsprosessen, `docs/hjelp.md` med spørsmål og svar til «Kom i gang», og skjermbildet av demoen i `docs/bilder/readme/`
 - `_bmad-output/` — Product Brief, plan, krav og sprintstatus
 - `.github/` — testkjøringen og morgensjekken
 - `Dockerfile`, `compose.yaml` og `.dockerignore` — imaget og tjenestene: webserveren, hentingen og demoen

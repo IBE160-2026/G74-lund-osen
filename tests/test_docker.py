@@ -427,6 +427,37 @@ class TestReadme:
         assert "--hent-foer-kl-22" not in tekst and "--hent-foer-kl-22" not in _hjelp()
         assert "etter kl. 22" in _kom_i_gang() and "helgen" in _hjelp()
 
+    def test_du_trenger_versjonene(self):
+        """3.3b, punkt e: Docker Desktop slik den er prøvd (spesifikasjonen
+        for 3.4, 10.10), Python i imaget fra Dockerfile, at Mac ikke er
+        prøvd (svar 3 11.10), og Python for veien uten Docker fra
+        pyproject.toml."""
+        trenger = [a for a in _kom_i_gang().split("\n\n") if a.startswith("**Du trenger**")]
+        assert len(trenger) == 1
+        trenger = trenger[0]
+        assert "Vi prøvde 10.10 med Docker Desktop 4.91.0 (motor 29.8.0, Compose v5.5.1) på Windows" in trenger
+        bilde = re.search(r"python:(\d+\.\d+\.\d+)-slim", (README.parent / "Dockerfile").read_text(encoding="utf-8"))
+        assert bilde, "fant ikke python-imaget i Dockerfile"
+        assert f"imaget bruker Python {bilde.group(1)}" in trenger
+        assert "Mac er ikke prøvd ennå" in trenger
+        # uv henter Python, så de to avsnittene sier det samme (BH1, ECH).
+        assert f"bare [uv](https://docs.astral.sh/uv/), som henter Python {_python_krav()} eller nyere" in trenger
+        assert "«Uten Docker, med uv»" in trenger
+        assert "Uten Docker, med uv" in _detaljer(_seksjon("Mer for den som vil"))
+
+    def test_demoen_paa_dagtid_og_helgen_i_steg_8(self):
+        """3.3b, punkt d: på dagtid en børsdag er demoen veien for å se appen
+        med en gang, og steg 8 og raden «Klar» nevner helgen, slik
+        docs/hjelp.md gjør. Ville feilet hvis helgen falt ut av steg 8."""
+        topp = _kom_i_gang().split("### Felles for begge", 1)[0]
+        assert "Første gang før kl. 22 på en børsdag, også på dagtid, er demoen veien for å se appen med en gang" in topp
+        klar = [l for l in topp.splitlines() if l.startswith("| Klar |")]
+        assert len(klar) == 1 and "helgen" in klar[0] and "etter kl. 22" in klar[0]
+        assert "andre dager børsen er stengt" in klar[0]
+        steg8 = _steg("Den ekte versjonen (anbefalt)", 8)
+        assert "Første gang går det også i helgen og andre dager børsen er stengt." in steg8
+        assert "Første gang kan du også hente i helgen" in _hjelp()
+
     def test_ekte_versjonen_foerst_og_zip_foer_kommandoene(self):
         """Story 3.4: fra 11.10 kl. 22:32 anbefaler README-en den ekte
         versjonen, og den staar foerst. Demoen virker fortsatt uten .env.
@@ -525,15 +556,111 @@ class TestReadme:
         """Story 3.4, PR 2: siden oppdateres ikke av seg selv."""
         assert "Last siden på nytt når hentingen er ferdig" in _steg("Den ekte versjonen (anbefalt)", 8)
 
+    def test_testene_uten_docker(self):
+        """3.3b, punkt c: hvordan testene kjøres på en ren maskin uten Docker,
+        med Python-versjonen fra pyproject.toml, og hva man skal se. Ikke et
+        fast testtall, som blir usant ved neste story."""
+        tester = README.read_text(encoding="utf-8").split("\n## Tester\n", 1)[1].split("\n## ", 1)[0]
+        assert f"Python {_python_krav()} eller nyere" in tester and "`requires-python`" in tester
+        # Én rekkefølge: uv sync, så uv run pytest, og ingen annen blokk
+        # foran (gjennomgangen, BH2).
+        blokker = [b.strip() for _, b in _blokkene(tester)]
+        assert blokker == ["uv sync", "uv run pytest"], blokker
+        assert "uten Docker" in tester and "Alle testene skal bestå" in tester
+        # Grunnene for det som hoppes over, slik testene sier dem (VG4).
+        for grunn in ("time.tzset", "Unix-sokler", "`::1`", "uten git"):
+            assert grunn in tester, grunn
+        assert "hoppes over" in tester and "Windows" in tester
+        # Ikke et fast testtall (gjennomgangen, BH3, VG3).
+        assert not re.search(r"\b\d+\s+(tester|testene|hoppes|hoppet|består|bestått|passed|skipped)\b", tester)
+        assert not re.search(r"\b(alle|de)\s+\d+\b", tester, re.IGNORECASE)
+
     def test_ingen_bilder_utenom_ci_merket(self):
         """Story 3.3: skjermbilder med ekte data publiserer dataene. Ville feilet
-        med et bilde i README-en."""
+        med et bilde i README-en.
+
+        3.3b, punkt b (instruksjonen 16.10 kl. 15:59): CI-merket og det ene
+        skjermbildet av demoen, og ingen flere. Ville feilet med et bilde til."""
         tekst = README.read_text(encoding="utf-8")
         bilder = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", tekst)
-        assert all(b.endswith("tester.yml/badge.svg") for b in bilder), bilder
+        assert [b for b in bilder if not b.endswith("tester.yml/badge.svg")] == [SKJERMBILDET], bilder
         # Ogsaa HTML-bilder og bilder med referanse (BH7).
         assert "<img" not in tekst.lower()
         assert not re.search(r"!\[[^\]]*\]\[", tekst)
+
+
+SKJERMBILDET = "docs/bilder/readme/oversikten-demo.png"
+BILDEFILER = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"}
+# Malene og demodataene bak bildet. Endres de, tas bildet på nytt
+# (spesifikasjonen 3.3b, «Bildet»), og avtrykket under oppdateres.
+MALENE_BAK_BILDET = ["src/templates/index.html", "src/templates/_ramme.html", "src/templates/_brikker.html",
+                     "src/templates/_bransjer.html", "src/templates/_hjelp.html", "src/demo.py"]
+AVTRYKK_BAK_BILDET = "9c8716524ade00abd779810cfda90cd2cd7cdf5f55757a3572c05bedccbf6488"
+
+
+def _python_krav() -> str:
+    """Versjonen i requires-python i pyproject.toml, for eksempel «3.13»."""
+    import tomllib
+
+    krav = tomllib.loads((README.parent / "pyproject.toml").read_text(encoding="utf-8"))["project"]["requires-python"]
+    treff = re.fullmatch(r">=(\d+\.\d+)", krav)
+    assert treff, f"requires-python har en form testene ikke kjenner: {krav}"
+    return treff.group(1)
+
+
+class TestSkjermbildet:
+    """3.3b, punkt b: skjermbildet av oversikten i demoen, øverst, 1280 px
+    bredt, med en alt-tekst som sier at det er demoen. Regelen fra 25.09:
+    bildet viser bare demoen."""
+
+    def _bildet(self) -> tuple[str, str]:
+        tekst = README.read_text(encoding="utf-8")
+        treff = [(a, s) for a, s in re.findall(r"!\[([^\]]*)\]\(([^)]+)\)", tekst) if s == SKJERMBILDET]
+        assert len(treff) == 1, treff
+        return treff[0]
+
+    def test_fila_finnes_og_er_1280_x_1000_px(self):
+        """Gjennomgangen (VG2, BH7): også høyden i spesifikasjonen."""
+        data = (README.parent / SKJERMBILDET).read_bytes()
+        assert data[:8] == b"\x89PNG\r\n\x1a\n"
+        assert int.from_bytes(data[16:20], "big") == 1280
+        assert int.from_bytes(data[20:24], "big") == 1000
+
+    def test_teksten_under_bildet_sier_at_det_er_demoen(self):
+        """Gjennomgangen (BH6): alt-teksten vises ikke når bildet lastes."""
+        tekst = README.read_text(encoding="utf-8")
+        etter = tekst.split(SKJERMBILDET + ")\n", 1)[1].split("\n", 1)[0]
+        assert etter == "*Oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»).*"
+
+    def test_bildet_tas_paa_nytt_naar_oversikten_endres(self):
+        """Gjennomgangen (VG1, BH8, ECH): endres malene eller demodataene bak
+        bildet, feiler testen til bildet er tatt på nytt og avtrykket er
+        oppdatert, i samme commit."""
+        import hashlib
+
+        avtrykk = hashlib.sha256(b"".join((README.parent / m).read_bytes().replace(b"\r\n", b"\n")
+                                          for m in MALENE_BAK_BILDET)).hexdigest()
+        assert avtrykk == AVTRYKK_BAK_BILDET, (
+            "Oversikten er endret: ta skjermbildet på nytt (spesifikasjonen 3.3b, «Bildet») og oppdater AVTRYKK_BAK_BILDET")
+
+    def test_alt_teksten_sier_at_det_er_demoen(self):
+        alt, _ = self._bildet()
+        assert "demoen" in alt and "Eksempeltall" in alt and "ikke data fra Oslo Børs" in alt
+
+    def test_bildet_staar_under_til_faglaerer_og_over_kom_i_gang(self):
+        tekst = README.read_text(encoding="utf-8")
+        assert tekst.index("Til faglærer:") < tekst.index(SKJERMBILDET) < tekst.index("\n## Kom i gang\n")
+
+    def test_ingen_andre_bilder_i_docs_bilder(self):
+        """Hvert bilde i mappa skal være det i README-en, så ingen bilder med
+        ekte data blir liggende. Bilder i README-en bare fra
+        docs/bilder/readme/ (svar 4 11.10, spesifikasjonen for 3.4)."""
+        mappe = README.parent / "docs" / "bilder"
+        # Bare bildefiler: Thumbs.db og .DS_Store fra Utforsker og Finder
+        # skal ikke felle testen hos sensor (gjennomgangen, BH4, ECH).
+        filer = sorted(p.relative_to(README.parent).as_posix() for p in mappe.rglob("*")
+                       if p.is_file() and p.suffix.lower() in BILDEFILER)
+        assert filer == [SKJERMBILDET]
 
 
 def _proevetabellen(proeve: str | None = None) -> str:
@@ -850,8 +977,11 @@ class TestReadmeForNybegynnere:
                 < tekst.index("\n## Status\n") < tekst.index("\n## Tester\n"))
         topp = tekst.split("\n## Kom i gang\n", 1)[0]
         avsnitt = [a.strip() for a in topp.split("\n\n") if a.strip()]
-        assert avsnitt[-1].startswith("Til faglærer:"), avsnitt[-1]
-        assert avsnitt[-2].startswith("OSE Signal viser"), avsnitt[-2]
+        # 3.3b, punkt b: skjermbildet står rett under «Til faglærer», så
+        # ingenting kommer mellom beskrivelsen og «Til faglærer».
+        assert avsnitt[-1].startswith("![") and SKJERMBILDET in avsnitt[-1], avsnitt[-1]
+        assert avsnitt[-2].startswith("Til faglærer:"), avsnitt[-2]
+        assert avsnitt[-3].startswith("OSE Signal viser"), avsnitt[-3]
         assert "\n## " not in topp
 
     def test_status_uten_storynumre_og_uten_kommando(self):
@@ -870,22 +1000,28 @@ class TestReadmeForNybegynnere:
         for innhold in ("Under arbeid", "Flettet til main:", "hentingen", "Docker", "demoen", "README-en",
                         "kallene som er igjen", "hjelp bak «?»",
                         "tydeligere merking", "utseendet fra designforslaget", "KI-laget", "Euronext",
+                        "Selve teksten lages ikke ennå",
                         "](_bmad-output/implementation-artifacts/sprint-status.yaml)"):
             assert innhold in status, innhold
         # Gjennomgangen av flettingen 12.10 (VG): hver sak staar i riktig liste.
         # Ville feilet hvis noe som ikke er flettet, sto under «Flettet til
         # main», slik grenen 8-0b sa om 2.3b.
         flettet, neste = status.split("Flettet til main:", 1)[1].split("Neste:", 1)
-        neste = neste.split("KI-laget", 1)[0]
+        neste = neste.split("Det som bygges etter demoen", 1)[0]
         for sak in ("hentingen", "kallene som er igjen", "Docker", "demoen", "README-en",
                     "hjelp bak «?»", "tydeligere merking", "datoene og månedsmerkene i grafen",
                     "oversikten fra designforslaget", "utseendet fra designforslaget",
-                    "sortering ved klikk i kolonneraden"):
+                    "sortering ved klikk i kolonneraden", "den første delen av KI-laget",
+                    "en bryter som slår den av og på"):
             assert sak in flettet, sak
         # Story 8.0d, PR 3 (svar 9 kl. 22:50): «Neste:» følger rekkefølgen
         # etter 8.0d (gruppen 14.10 kl. 22:19 og 22:25).
         # Story 8.15: sorteringen er flyttet til «Flettet til main».
-        saker = ("hovedindeksen", "Min liste", "periodene i kursgrafen")
+        # 3.3b, punkt a: resten av KI-laget først (svar 10 15.10 kl. 14:47),
+        # så rekkefølgen fra 14.10.
+        saker = ("resten av KI-laget", "hovedindeksen", "Min liste", "innstillingene", "periodene i kursgrafen",
+                 "historikken og signaldagene", "«Vis KI-tekst» i innstillingene", "KI-teksten om dagen",
+                 "velge og bytte aksjer")
         for sak in saker:
             assert sak in neste and sak not in flettet, sak
         # Gjennomgangen (VG7): i den rekkefølgen, og det flettede står ikke i «Neste».
