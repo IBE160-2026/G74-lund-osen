@@ -427,6 +427,23 @@ class TestReadme:
         assert "--hent-foer-kl-22" not in tekst and "--hent-foer-kl-22" not in _hjelp()
         assert "etter kl. 22" in _kom_i_gang() and "helgen" in _hjelp()
 
+    def test_du_trenger_versjonene(self):
+        """3.3b, punkt e: Docker Desktop slik den er prøvd (spesifikasjonen
+        for 3.4, 10.10), Python i imaget fra Dockerfile, at Mac ikke er
+        prøvd (svar 3 11.10), og Python for veien uten Docker fra
+        pyproject.toml."""
+        import tomllib
+
+        trenger = [a for a in _kom_i_gang().split("\n\n") if a.startswith("**Du trenger**")]
+        assert len(trenger) == 1
+        trenger = trenger[0]
+        assert "Docker Desktop 4.91.0 (motor 29.8.0, Compose v5.5.1) på Windows" in trenger
+        bilde = re.search(r"python:(\d+\.\d+\.\d+)-slim", (README.parent / "Dockerfile").read_text(encoding="utf-8")).group(1)
+        assert f"imaget bruker Python {bilde}" in trenger
+        assert "Mac er ikke prøvd ennå" in trenger
+        krav = tomllib.loads((README.parent / "pyproject.toml").read_text(encoding="utf-8"))["project"]["requires-python"]
+        assert f"Python {krav.removeprefix('>=')} eller nyere" in trenger and "«Uten Docker, med uv»" in trenger
+
     def test_demoen_paa_dagtid_og_helgen_i_steg_8(self):
         """3.3b, punkt d: på dagtid en børsdag er demoen veien for å se appen
         med en gang, og steg 8 og raden «Klar» nevner helgen, slik

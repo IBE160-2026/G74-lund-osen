@@ -25,7 +25,7 @@ Appen finnes i to versjoner, med samme kode. Vi anbefaler den ekte versjonen. Vi
 | Trenger | Docker Desktop og en gratis nøkkel fra EODHD | Bare Docker Desktop |
 | Klar | Viser kurser etter første henting, etter kl. 22 på en børsdag eller i helgen | Med en gang |
 
-**Du trenger** en Windows-maskin eller en Mac, lov til å installere programmer, nett og noen GB ledig plass, men verken git eller Docker-konto. Første gang tar det en stund. På Linux bruker du Docker Engine med Compose i stedet for Docker Desktop. Står du fast, se [«Står du fast?»](#står-du-fast) lenger ned.
+**Du trenger** en Windows-maskin eller en Mac, lov til å installere programmer, nett og noen GB ledig plass, men verken git eller Docker-konto. Første gang tar det en stund. På Linux bruker du Docker Engine med Compose i stedet for Docker Desktop. Vi har prøvd med Docker Desktop 4.91.0 (motor 29.8.0, Compose v5.5.1) på Windows, og imaget bruker Python 3.13.15. Mac er ikke prøvd ennå. Uten Docker trenger du Python 3.13 eller nyere og [uv](https://docs.astral.sh/uv/) i stedet, se «Uten Docker, med uv» under «Mer for den som vil». Står du fast, se [«Står du fast?»](#står-du-fast) lenger ned.
 
 ### Felles for begge
 
