@@ -1926,7 +1926,7 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 
 *Lagt til 2026-10-16 kl. 16:33:* README-en for sensor (3.3b) er flettet i `6b9dc2f`, PR #53 (ja kl. 16:31). Spesifikasjonen `spec-3-3b-readme-for-sensor.md` og 3-3b i sprintstatusen er done. README-prøven står igjen under story 3.4.
 
-*Avgjort 2026-10-16:* gruppen tok 16.10 kl. 21:38 skjermbildet av oversikten i demoen ut av README-en igjen. Det snur punkt b i 3.3b (ja 15.10 kl. 22:54, flettet i `6b9dc2f`, PR #53). Bildet og teksten under det er tatt ut, `docs/bilder/readme/oversikten-demo.png` er slettet, og testene godtar igjen ingen bilder i README-en og i `docs/bilder/` utenom CI-merket (`f9e6f59` på grenen `readme-uten-bilde`). Regelen står: bilder i README-en kommer bare fra `docs/bilder/readme/` og viser aldri den ekte versjonen. Bildene som kommer i «Kom i gang» søndag, er ikke berørt, og PR 1 for hovedindeksen trenger ikke ta bildet på nytt.
+*Avgjort 2026-10-16:* gruppen tok 16.10 kl. 21:38 skjermbildet av oversikten i demoen ut av README-en igjen. Det snur punkt b i 3.3b (ja 15.10 kl. 22:54, flettet i `6b9dc2f`, PR #53). Bildet og teksten under det er tatt ut, `docs/bilder/readme/oversikten-demo.png` er slettet, og testene godtar igjen ingen bilder i README-en og i `docs/bilder/` utenom CI-merket (PR #54). Regelen står: bilder i README-en kommer bare fra `docs/bilder/readme/` og viser aldri den ekte versjonen. Bildene som kommer i «Kom i gang» søndag, er ikke berørt, men PR-en med dem må endre de to testene, med stien og alt-teksten som sier at det er demoen, og PR 1 for hovedindeksen trenger ikke ta bildet på nytt.
 
 ### Story 3.4: Demoversjonen
 
