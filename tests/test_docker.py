@@ -569,7 +569,7 @@ class TestReadme:
         assert not re.search(r"!\[[^\]]*\]\[", tekst)
 
 
-SKJERMBILDET = "docs/bilder/oversikten-demo.png"
+SKJERMBILDET = "docs/bilder/readme/oversikten-demo.png"
 
 
 class TestSkjermbildet:
@@ -597,8 +597,11 @@ class TestSkjermbildet:
 
     def test_ingen_andre_bilder_i_docs_bilder(self):
         """Hvert bilde i mappa skal være det i README-en, så ingen bilder med
-        ekte data blir liggende."""
-        assert sorted(p.name for p in (README.parent / "docs" / "bilder").iterdir()) == ["oversikten-demo.png"]
+        ekte data blir liggende. Bilder i README-en bare fra
+        docs/bilder/readme/ (svar 4 11.10, spesifikasjonen for 3.4)."""
+        mappe = README.parent / "docs" / "bilder"
+        filer = sorted(p.relative_to(README.parent).as_posix() for p in mappe.rglob("*") if p.is_file())
+        assert filer == [SKJERMBILDET]
 
 
 def _proevetabellen(proeve: str | None = None) -> str:

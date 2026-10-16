@@ -13,7 +13,7 @@ Til faglærer:
 - Prosessen og KI-bruken: [kvalitetssikringen](docs/kvalitetssikring.md), [refleksjonsloggen](docs/reflection-log.md) og [de lagrede KI-promptene](docs/ai-prompts/)
 - [Vurderingsmatrisen for del 1](docs/vurderingsmatrise.md): status per kriterium, med bevis og neste tiltak
 
-![Oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/bilder/oversikten-demo.png)
+![Oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/bilder/readme/oversikten-demo.png)
 
 ## Kom i gang
 
@@ -288,7 +288,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 ## Mappestruktur
 
 - `src/` og `tests/` — applikasjonen og testene
-- `docs/` — arbeidsprosessen, `docs/hjelp.md` med spørsmål og svar til «Kom i gang», og skjermbildet av demoen i `docs/bilder/`
+- `docs/` — arbeidsprosessen, `docs/hjelp.md` med spørsmål og svar til «Kom i gang», og skjermbildet av demoen i `docs/bilder/readme/`
 - `_bmad-output/` — Product Brief, plan, krav og sprintstatus
 - `.github/` — testkjøringen og morgensjekken
 - `Dockerfile`, `compose.yaml` og `.dockerignore` — imaget og tjenestene: webserveren, hentingen og demoen
