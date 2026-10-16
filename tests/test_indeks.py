@@ -243,3 +243,52 @@ class TestIndeksenErIkkeEnAksje:
                 SqliteIndekslager(tilkobling)
         finally:
             tilkobling.close()
+
+
+# --- Demoindeksen (punkt c) ---------------------------------------------------
+
+import demo  # noqa: E402
+
+
+@pytest.fixture(scope="module")
+def demobasen(tmp_path_factory):
+    sti = tmp_path_factory.mktemp("demoindeks") / "demo.db"
+    demo.lag_demobase(sti, skriv=lambda _: None)
+    tilkobling = sqlite3.connect(f"file:{sti.as_posix()}?mode=ro", uri=True)
+    yield tilkobling
+    tilkobling.close()
+
+
+class TestDemoindeksen:
+    def test_indeksen_for_alle_demodagene(self, demobasen):
+        """FR-411 og beslutningen 16.10 kl. 11:46. Ville feilet hvis demobasen
+        ble laget uten indeks, eller manglet en dag."""
+        dager = [r[0] for r in demobasen.execute(
+            "SELECT dato FROM indeks WHERE symbol = ? ORDER BY dato", (demo.DEMOINDEKS.symbol,))]
+        assert dager == [d.isoformat() for d in demo.handelsdager()]
+        assert demobasen.execute("SELECT DISTINCT symbol FROM indeks").fetchall() == [(demo.DEMOINDEKS.symbol,)]
+        assert demobasen.execute("SELECT count(*) FROM indeksserie").fetchone()[0] == 1
+
+    def test_indeksen_er_ikke_en_demoaksje(self, demobasen):
+        """«x av N» teller den ikke: den står ikke i aksje eller kurs."""
+        symbol = demo.DEMOINDEKS.symbol
+        assert symbol not in {a.symbol for a in demo.DEMOUNIVERS}
+        assert symbol not in {a.symbol for a in AKSJEUNIVERS} and symbol != HOVEDINDEKS.symbol
+        for tabell in ("aksje", "kurs", "kursserie", "vurdering"):
+            assert demobasen.execute(f"SELECT count(*) FROM {tabell} WHERE symbol = ?", (symbol,)).fetchone()[0] == 0
+        assert demobasen.execute("SELECT count(*) FROM aksje").fetchone()[0] == len(demo.DEMOUNIVERS)
+
+    def test_indeksen_foelger_demoaksjene(self):
+        """Dagens endring er snittet av endringen for aksjene som har kurs
+        begge dagene."""
+        dager = demo.handelsdager()
+        serier = {a.symbol: demo.serie(n, a, dager) for n, a in enumerate(demo.DEMOUNIVERS)}
+        indeks = demo.indeksserie(serier, dager)
+        siste, forrige = dager[-1], dager[-2]
+        endringer = [
+            {r.dato: r for r in rader}[siste].justert_slutt / {r.dato: r for r in rader}[forrige].justert_slutt - 1
+            for rader in serier.values() if {siste, forrige} <= {r.dato for r in rader}
+        ]
+        ventet = indeks[-2].slutt * (1 + sum(endringer) / len(endringer))
+        assert indeks[-1].slutt == pytest.approx(ventet, abs=0.01)
+        assert indeks[0].slutt == demo.INDEKS_START
