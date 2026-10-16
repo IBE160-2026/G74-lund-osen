@@ -1461,6 +1461,8 @@ Oppgaveplanlegging beskrives i README (regel 19).
 
 *Ferdig 2026-10-08:* flettet i `249853e`, PR #22.
 
+*Avgjort 2026-10-16, gruppens beslutning kl. 21:09:* hentingen på børsdager flyttes fra kl. 22:00 til kl. 21:00, på betingelse av at radene fra prøvene kl. 20:30 og 21:00 er like raden i kursfila etter kveldens henting (`malinger.md` §31). Er de ulike, tas spørsmålet opp igjen. Endringen bygges som en egen PR søndag 18.10 og gjelder fra mandag 19.10. Mangler noen aksjer raden kl. 21, henter et nytt forsøk dem senere samme kveld med kallene som er igjen (2.3b).
+
 ### Story 2.3b: Kallene som er igjen, brukes på nye forsøk
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 19:17.*
