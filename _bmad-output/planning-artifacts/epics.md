@@ -2370,6 +2370,8 @@ starter ikke av seg selv.
 
 *Lagt til 2026-10-15 (gruppens svar kl. 23:32 på spørsmålene i PR F og G, instruksjonen kl. 23:33):* a) G (story 10.3) flettes i kveld, fordi hentingen for 15.10 er ferdig. b) «lokal» gjelder fortsatt når `OSE_KI_TJENESTE` mangler (svar 5 kl. 15:53 står). c) Hentingen sjekker først at Ollama svarer og har modellen. Gjør den ikke det, skrives ingen rader i `ki_logg` for dagen, og utskriften sier hvorfor og at samme kommando kan kjøres igjen samme kveld, med 0 kall til EODHD. Svarer den, skrives rader som før, også når modellen feiler for en aksje (svar 2). Grunnen: formålet med FR-604, at en tekst ikke kan lages på nytt til man får en man liker, holder, fordi ingen tekst ble laget.
 
+*Lagt til 2026-10-16:* PR F (10.2b), der hentekommandoen lager KI-teksten, er flettet i `b13e50f`, PR #49, etter prøvekjøringen kl. 22:26–22:27 (`malinger.md` §32) og gruppens ja kl. 22:33. CI var grønn på head-en `26cf89c` (kjøring 38963318061). Storyen står som in-progress, fordi prompten versjon 2 (beslutningen kl. 22:33 under) bygges i 10.2.
+
 ### Story 10.3: Visningen i aksjedetaljen
 
 *Het Story 5B.3 til 28.09.*

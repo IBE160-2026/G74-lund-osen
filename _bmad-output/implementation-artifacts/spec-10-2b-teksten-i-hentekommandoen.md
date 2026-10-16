@@ -2,7 +2,7 @@
 title: 'Story 10.2, PR F (10.2b): teksten lages i hentekommandoen og lagres i KILogg'
 type: 'feature'
 created: '2026-10-15'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '5586924'
