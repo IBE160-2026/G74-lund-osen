@@ -527,13 +527,48 @@ class TestReadme:
 
     def test_ingen_bilder_utenom_ci_merket(self):
         """Story 3.3: skjermbilder med ekte data publiserer dataene. Ville feilet
-        med et bilde i README-en."""
+        med et bilde i README-en.
+
+        3.3b, punkt b (instruksjonen 16.10 kl. 15:59): CI-merket og det ene
+        skjermbildet av demoen, og ingen flere. Ville feilet med et bilde til."""
         tekst = README.read_text(encoding="utf-8")
         bilder = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", tekst)
-        assert all(b.endswith("tester.yml/badge.svg") for b in bilder), bilder
+        assert [b for b in bilder if not b.endswith("tester.yml/badge.svg")] == [SKJERMBILDET], bilder
         # Ogsaa HTML-bilder og bilder med referanse (BH7).
         assert "<img" not in tekst.lower()
         assert not re.search(r"!\[[^\]]*\]\[", tekst)
+
+
+SKJERMBILDET = "docs/bilder/oversikten-demo.png"
+
+
+class TestSkjermbildet:
+    """3.3b, punkt b: skjermbildet av oversikten i demoen, øverst, 1280 px
+    bredt, med en alt-tekst som sier at det er demoen. Regelen fra 25.09:
+    bildet viser bare demoen."""
+
+    def _bildet(self) -> tuple[str, str]:
+        tekst = README.read_text(encoding="utf-8")
+        (alt, sti), = [(a, s) for a, s in re.findall(r"!\[([^\]]*)\]\(([^)]+)\)", tekst) if s == SKJERMBILDET]
+        return alt, sti
+
+    def test_fila_finnes_og_er_1280_px_bred(self):
+        data = (README.parent / SKJERMBILDET).read_bytes()
+        assert data[:8] == b"\x89PNG\r\n\x1a\n"
+        assert int.from_bytes(data[16:20], "big") == 1280
+
+    def test_alt_teksten_sier_at_det_er_demoen(self):
+        alt, _ = self._bildet()
+        assert "demoen" in alt and "Eksempeltall" in alt and "ikke data fra Oslo Børs" in alt
+
+    def test_bildet_staar_under_til_faglaerer_og_over_kom_i_gang(self):
+        tekst = README.read_text(encoding="utf-8")
+        assert tekst.index("Til faglærer:") < tekst.index(SKJERMBILDET) < tekst.index("\n## Kom i gang\n")
+
+    def test_ingen_andre_bilder_i_docs_bilder(self):
+        """Hvert bilde i mappa skal være det i README-en, så ingen bilder med
+        ekte data blir liggende."""
+        assert sorted(p.name for p in (README.parent / "docs" / "bilder").iterdir()) == ["oversikten-demo.png"]
 
 
 def _proevetabellen(proeve: str | None = None) -> str:
@@ -850,8 +885,11 @@ class TestReadmeForNybegynnere:
                 < tekst.index("\n## Status\n") < tekst.index("\n## Tester\n"))
         topp = tekst.split("\n## Kom i gang\n", 1)[0]
         avsnitt = [a.strip() for a in topp.split("\n\n") if a.strip()]
-        assert avsnitt[-1].startswith("Til faglærer:"), avsnitt[-1]
-        assert avsnitt[-2].startswith("OSE Signal viser"), avsnitt[-2]
+        # 3.3b, punkt b: skjermbildet står rett under «Til faglærer», så
+        # ingenting kommer mellom beskrivelsen og «Til faglærer».
+        assert avsnitt[-1].startswith("![") and SKJERMBILDET in avsnitt[-1], avsnitt[-1]
+        assert avsnitt[-2].startswith("Til faglærer:"), avsnitt[-2]
+        assert avsnitt[-3].startswith("OSE Signal viser"), avsnitt[-3]
         assert "\n## " not in topp
 
     def test_status_uten_storynumre_og_uten_kommando(self):

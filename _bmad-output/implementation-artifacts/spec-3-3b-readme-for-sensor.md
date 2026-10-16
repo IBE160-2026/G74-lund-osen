@@ -41,3 +41,15 @@ Skjermbildet erstatter «uten bilder» (svar 4, 11.10). Regelen fra 25.09 står:
 - Bildet lages fra demobasen i en midlertidig mappe, aldri fra `data/db/ose.db` (regel 16 og 22).
 - Ingen kode i `src/` endres.
 - Ingen kommando i «Kom i gang» endres, så tabellene i §9 i `docs/kvalitetssikring.md` står.
+
+## Bildet
+
+`docs/bilder/oversikten-demo.png` er toppen av oversikten i demoen, 1280 × 1000 px, tatt 16.10 med Edge uten vindu (headless). **Bildet tas på nytt når oversikten endres,** i samme commit som endringen, slik:
+
+1. Lag demobasen i en midlertidig mappe (`tempfile.TemporaryDirectory()`), med `lagring_sqlite.BASE_STI` satt dit før `demo.lag_demobase(demo_sti())`, aldri i `data/`.
+2. Sett `OSE_DEMO=1`, importer `app`, og start `waitress.server.create_server(app.app, host="127.0.0.1", port=...)` i en tråd, med en port som er ledig (`socket.bind(("127.0.0.1", 0))`). Ingen server som kjører, stoppes.
+3. Sjekk at siden har «Eksempeltall», og ta bildet med `msedge --headless --disable-gpu --hide-scrollbars --window-size=1280,1000 --screenshot=<fil> http://127.0.0.1:<port>/`, med en egen `--user-data-dir` i den midlertidige mappa.
+4. Lukk serveren. Den midlertidige mappa slettes med basen.
+
+Testene i `TestSkjermbildet` krever at fila er en PNG som er 1280 px bred, at alt-teksten sier at det er demoen, at bildet står under «Til faglærer» og over «Kom i gang», og at `docs/bilder/` bare har dette bildet.
+
