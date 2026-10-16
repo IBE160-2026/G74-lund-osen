@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-16T21:00
+updated: 2026-10-16T22:11
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -3411,3 +3411,9 @@ i henteinstruksjonen 16.10.
 
 **Kostnad.** 2 kall. Kvoten etter kallet kl. 21:00: 2 brukt i dag, 18 igjen,
 `extraLimit` 463, uendret. Bonuskvoten er ikke brukt.
+
+*Lagt til 2026-10-16, etter kveldens henting kl. 22:10:* raden for 16.10 i prøvene
+kl. 20:30 og 21:00 er lik raden for EQNR.OL i kursfila `kurser-raa-2026-10-16.json`,
+i alle sju feltene (`date`, `open`, `high`, `low`, `close`, `adjusted_close` og
+`volume`). Betingelsen for å flytte hentingen til kl. 21:00 (beslutningen kl. 21:09,
+punkt 23 i PRD-en) holder for EQNR.OL denne dagen.
