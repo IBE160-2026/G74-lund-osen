@@ -1928,6 +1928,8 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 
 *Avgjort 2026-10-16:* gruppen tok 16.10 kl. 21:38 skjermbildet av oversikten i demoen ut av README-en igjen. Det snur punkt b i 3.3b (ja 15.10 kl. 22:54, flettet i `6b9dc2f`, PR #53). Bildet og teksten under det er tatt ut, `docs/bilder/readme/oversikten-demo.png` er slettet, og testene godtar igjen ingen bilder i README-en og i `docs/bilder/` utenom CI-merket (PR #54). Regelen står: bilder i README-en kommer bare fra `docs/bilder/readme/` og viser aldri den ekte versjonen. Bildene som kommer i «Kom i gang» søndag, er ikke berørt, men PR-en med dem må endre de to testene, med stien og alt-teksten som sier at det er demoen, og PR 1 for hovedindeksen trenger ikke ta bildet på nytt.
 
+*Lagt til 2026-10-16:* uttaket av skjermbildet er flettet i `1a95495`, PR #54, etter gruppens ja kl. 22:55. CI var grønn på head-en `cecf94e` (kjøring 38965865603).
+
 ### Story 3.4: Demoversjonen
 
 *Lagt til 2026-10-03, Marians beslutning kl. 18:10.*
