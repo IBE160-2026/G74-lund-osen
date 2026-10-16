@@ -2372,6 +2372,8 @@ starter ikke av seg selv.
 
 *Lagt til 2026-10-16:* PR F (10.2b), der hentekommandoen lager KI-teksten, er flettet i `b13e50f`, PR #49, etter prøvekjøringen kl. 22:26–22:27 (`malinger.md` §32) og gruppens ja kl. 22:33. CI var grønn på head-en `26cf89c` (kjøring 38963318061). Storyen står som in-progress, fordi prompten versjon 2 (beslutningen kl. 22:33 under) bygges i 10.2.
 
+*Avgjort 2026-10-16, gruppens beslutning kl. 22:33:* i prøvekjøringen (`malinger.md` §32) stoppet regel 4 i kontrollen 9 av 15 tekster, 8 på «skyldes» og 1 på «indikerer», også der ordet bare forklarte regelen. Prompten får versjon 2, som ber modellen forklare regelen med «fordi» og ikke bruke «skyldes» eller «indikerer». Kontrollen endres ikke. Det bygges lørdag 17.10, med en ny prøvekjøring på en fersk kopi av basen, og flettes før hentingen mandag 19.10. Er det ikke flettet da, går mandagens henting med `OSE_KI_TJENESTE=av`, så ingen dag får tekster med versjon 1.
+
 ### Story 10.3: Visningen i aksjedetaljen
 
 *Het Story 5B.3 til 28.09.*

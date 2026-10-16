@@ -114,6 +114,8 @@ Forslaget fra instruksjonen kl. 22:36, med steget fra svar c, og rettet etter gj
 
 *Lagt til 2026-10-16:* prøvekjøringen ble tatt fredag 16.10 etter kveldens henting, ikke lørdag 17.10, etter gruppens ja kl. 21:37, så #49 kan flettes før PR 1 og PR 2 for hovedindeksen. Basen endres ikke mer etter hentingen, så kopien er den samme som en kopi lørdag ville vært. Resultatet står i `malinger.md` §32: 6 besto, 9 ble stoppet av regel 4 i kontrollen (gjetning og årsaker), og modellen feilet for 0, på `gpu`, med `gemma4:e4b` (`dc35e8d9c606`), Ollama 0.35.1 og 0,84 s i median per tekst. 0 kall til EODHD, og `data/db/ose.db` ble ikke rørt.
 
+*Avgjort 2026-10-16, gruppens beslutning kl. 22:33:* i prøvekjøringen (`malinger.md` §32) stoppet regel 4 i kontrollen 9 av 15 tekster, 8 på «skyldes» og 1 på «indikerer», også der ordet bare forklarte regelen. Prompten får versjon 2, som ber modellen forklare regelen med «fordi» og ikke bruke «skyldes» eller «indikerer». Kontrollen endres ikke. Det bygges lørdag 17.10, med en ny prøvekjøring på en fersk kopi av basen, og flettes før hentingen mandag 19.10. Er det ikke flettet da, går mandagens henting med `OSE_KI_TJENESTE=av`, så ingen dag får tekster med versjon 1.
+
 ## Review Triage Log
 
 Gjennomgang 15.10 på diffen `main...9bc8b3b`, med Blind Hunter (BH, 16 funn), Edge Case Hunter (ECH, 13) og Verification Gap (VG, 5). Rettingene står i `5dd8a00` og `48838a7`.
