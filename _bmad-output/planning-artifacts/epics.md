@@ -1611,6 +1611,8 @@ tall kan sammenlignes med børsen som helhet.
 - **Henteinstruksjonen** fra mandag 19.10 har 16 kall, versjon 6 og 4 kall til nye forsøk. Rådet skriver den.
 - **README-henvisningen:** «README (linje 82, «15 kall»)» i kontrollen over gjelder nå `docs/hjelp.md`, som rettes i PR 2 (regel 19).
 
+*Avgjort 2026-10-16 kl. 22:16 (gruppens beslutning, gitt i chatten med rådet):* sjekken av basen før kallene skal virke også når basen står en versjon bak, som 16.10 med `0005`: «Basen ose.db kunne ikke leses (RuntimeError). Henter likevel», og filvakten holdt (Utført-linja for hentingen 16.10, `6b07a53`). Det rettes i PR 2 lørdag 17.10, som egen commit med en test, før migrasjonen `0006` møter den ekte basen.
+
 **Avhenger av:** 2.3 og 4.3 (`ki_logg` er `0005`). **Én økt:** ja.
 
 ### Story 2.9: Hovedindeksen i markedsoversikten
