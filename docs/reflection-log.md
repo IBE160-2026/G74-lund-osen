@@ -2653,6 +2653,22 @@ Det vi lærte: en forklaring på skjermen må si det som er lett å lese feil, i
 
 ---
 
+## 16.10.2026 – Målt før vi flyttet, og en kontroll som sa nei
+
+*Joakim og Marian.*
+
+Vi ville flytte hentingen fra kl. 22 til kl. 21, men målte først. Prøvekallene kl. 20:30 og 21:00 hadde alt dagens rad, og etter kveldens henting var den lik raden i kursfila, i alle sju feltene (`malinger.md` §31, `66710c3`). Kl. 21:09, før svaret kom, bestemte vi at ulike rader ville stoppe flyttingen. De var like, så hentingen går kl. 21 fra mandag 19.10.
+
+Prøvekjøringen av KI-teksten gikk på grafikkortet, med under ett sekund per tekst i median (§32). Men kontrollen stoppet 9 av 15, på «skyldes» og «indikerer», også der ordet bare forklarte regelen. Kl. 22:33 valgte vi å be modellen bruke «fordi» i stedet for å gjøre kontrollen mildere. En kontroll som fanger ord, er lettere å stole på enn en som gjetter på mening.
+
+Hentingen viste at sjekken av basen ble hoppet over når basen står en versjon bak. Filvakten holdt, så det ble ikke hentet to ganger. Kl. 22:16 bestemte vi at det rettes lørdag, før migrasjonen `0006` møter den ekte basen. Claude Code rettet også selv et tidspunkt den hadde ført feil på en beslutning (`6990100`).
+
+Vi gikk gjennom «Kom i gang» selv kl. 20:40–21:11, som en som aldri har gjort det, og fant fire ting ingen test fant. Fordi faglærer prøver demoen, er skjermbildet tatt ut (PR #54), og demoen skal stå først fra README-PR-en søndag (kl. 21:16). Begge snur tidligere beslutninger, og begge er ført med tidspunkt.
+
+Det vi lærte: mål før en regel som koster noe, endres. Når en grov kontroll sier nei, tilpass det som skrives. Prøv README-en selv, som den som skal lese den.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
