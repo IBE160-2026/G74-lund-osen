@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-14T22:29
+updated: 2026-10-16T11:55
 ---
 
 # Kvalitetssikring
@@ -623,6 +623,8 @@ og at alle fire kriteriene står her.
 
 *Lagt til 2026-10-13:* håndregningen for TEL 08.10, en dag med utslag på
 interesse, står i `malinger.md` §6, ved siden av EQNR 05.10 og GJF 02.10.
+
+*Lagt til 2026-10-16:* raden «KI-forklaringen» sier «KI-laget er ikke bygget». Det stemte 13.10, men nå finnes testene for kontrollen, loggen og visningen. Kontrollen i FR-603 (story 10.2a, PR #48, `77ebf31`): `tests/test_ki_modell.py`, med `TestKontrollen` og `TestRaden`. Loggen i FR-604 (story 4.2 og 4.3): `tests/test_kilogg.py`, der kontrakttestene kjøres mot både minnet og SQLite, og `tests/test_kilogg_sqlite.py`. Visningen (story 10.3, PR #50 og #51): `tests/test_ki_visning.py`, med `TestSiden::test_vakten_paa_siden` og `TestGrunnenPaaSiden`. Talt 16.10: 207 tester i `test_ki_modell.py`, 106 i `test_kilogg.py`, 49 i `test_kilogg_sqlite.py` og 67 i `test_ki_visning.py`. Teksten lages ennå ikke i hentingen (story 10.2b, PR #49, ikke flettet), så ingen KI-tekst er laget med ekte data. Én ukes logget drift begynner når PR #49 er flettet, og målingen av bidraget er story 10.4.
 
 ## Vedlegg: hver mutant
 
