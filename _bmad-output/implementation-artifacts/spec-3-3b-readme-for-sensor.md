@@ -105,3 +105,23 @@ Gjennomgang 16.10 på diffen `main...5072d78`, uten bildet, med Blind Hunter (BH
 
 **Testene:** `uv run pytest -q` én gang på hele settet, etter gjennomgangene: 2140 bestått og 17 hoppet over på `47ea051`.
 
+## Gjennomgangen av uttaket
+
+*Lagt til 2026-10-16.* Gjennomgang av PR #54 (grenen `readme-uten-bilde`, uttaket av skjermbildet etter gruppen kl. 21:38), på diffen `main...bedb97b`, med Blind Hunter (BH, 13 funn), Edge Case Hunter (ECH, 4) og Verification Gap (VG, 2). Rettingene står i `26baa94` og `6990100`. Ingen funn må avgjøres av gruppen.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| VG1, BH1, ECH | Regelen om `docs/bilder/readme/` og demoen står i dokumentene, men ingen test sjekker den, og søndagens bilder i «Kom i gang» feller begge testene | medium | patch: docstringene sier at testene bare sjekker at det ikke er noen bilder, og beslutningen sier at PR-en med bildene søndag endrer de to testene, med stien og alt-teksten |
+| ECH, BH9 | Grenhashen `f9e6f59` blir borte ved squash-flettingen | medium | patch: PR #54 i de tre dokumentene |
+| BH7 | «Avgjort … kl. 22:45» i spesifikasjonen ga skrivetidspunktet som beslutningstid | low | patch: «Lagt til», og 21:38 står i teksten |
+| ECH, BH5 | «Bildet», avtrykket og punkt b i spesifikasjonen leses som gjeldende | low | patch: «Opphevet»-linje under «Bildet». Ingen linje fjernet |
+| ECH, BH2, BH4 | Testen for `docs/bilder/` består når mappa mangler, og docstringen sa noe testen ikke sjekker | low | patch: docstringen sier at en tom mappe ikke finnes i git, og at testen sjekker at det ikke er bilder, ikke hvor de ligger |
+| VG2, BH3 | Merket godtas på endelsen, og testen består uten merke | defer | uendret fra før denne PR-en. Tas med når testene endres for søndagens bilder |
+| BH11 | Andre henvisninger til bildet | avvist | `git grep` etter filnavnet og konstantene: bare historikken i denne spesifikasjonen, som nå er merket opphevet |
+| BH6 | `updated` i `epics.md` og spesifikasjonen | avvist | ingen av dem har feltet. `docs/vurderingsmatrise.md` har det, og det er satt fra klokka |
+| BH8 | 22:54 mot 15:59 | avvist | begge stemmer: ja-et ble gitt 15.10 kl. 22:54 i chatten med rådet, og instruksjonen 16.10 kl. 15:59 er kilden (`ae55733`) |
+| BH10 | Samme avsnitt på tre steder | avvist | instruksjonen 16.10 kl. 22:42 ber om alle tre |
+| BH12 | Linja kl. 16:33 i matrisen sier i nåtid at README-en har bildet | avvist | matrisen fjerner ingen linjer uten en Rettet-linje. Linja kl. 22:45 under sier at bildet er borte når PR #54 flettes |
+| BH13 | Rekkefølgetesten avhenger av at lista står tett under «Til faglærer:» | avvist | slik var testen før 3.3b (kl. 23:41), og den står |
+
+Konflikt, ført her og ikke avgjort: bildene i «Kom i gang» søndag står bare i instruksjonen 16.10 kl. 22:42. `spec-3-4-demoversjonen.md` sier «PR 3, bilder: ingen (beslutning 4)». Den PR-en er flettet, så de to strider ikke, men ingen spesifikasjon beskriver søndagens bilder ennå (VG1).
