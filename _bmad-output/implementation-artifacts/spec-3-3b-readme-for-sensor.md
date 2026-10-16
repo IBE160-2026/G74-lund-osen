@@ -2,7 +2,7 @@
 title: 'Story 3.3b: README-en for sensor'
 type: 'docs'
 created: '2026-10-16'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '1806484'

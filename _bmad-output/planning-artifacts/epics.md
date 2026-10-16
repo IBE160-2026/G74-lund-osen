@@ -1911,6 +1911,8 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 
 *Lagt til 2026-10-16 kl. 16:02 (instruksjonen kl. 15:59, som sier at gruppen sa ja 15.10 kl. 22:54; det svaret er ikke ført i dagsfila for 15.10):* fem forbedringer i README-en for sensor er beslutninger, i `spec-3-3b-readme-for-sensor.md`: a) «Status» med det som er flettet siden sist, og «Neste:» i rekkefølgen her; b) et skjermbilde av oversikten i demoen, 1280 px bredt med «Eksempeltall» synlig, i `docs/bilder/`; c) under «Tester», hvordan testene kjøres uten Docker med uv, og hva man skal se; d) i «Kom i gang», at demoen er veien for å se appen med en gang på dagtid en børsdag, og helgen i steg 8 og raden «Klar»; e) under «Du trenger», versjonene, Docker Desktop slik den er prøvd, og Python. Skjermbildet erstatter «uten bilder» (svar 4, 11.10). Regelen fra 25.09 står: bildet viser bare demoen. Svar 3 står: `--hent-foer-kl-22` står verken i README-en eller i `docs/hjelp.md`, fordi en henting før dagens kurser finnes, kan låse dagen.
 
+*Lagt til 2026-10-16 kl. 16:33:* README-en for sensor (3.3b) er flettet i `6b9dc2f`, PR #53 (ja kl. 16:31). Spesifikasjonen `spec-3-3b-readme-for-sensor.md` og 3-3b i sprintstatusen er done. README-prøven står igjen under story 3.4.
+
 ### Story 3.4: Demoversjonen
 
 *Lagt til 2026-10-03, Marians beslutning kl. 18:10.*
