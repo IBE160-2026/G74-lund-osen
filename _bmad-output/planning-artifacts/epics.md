@@ -1326,6 +1326,8 @@ så en vurdering kan etterprøves og sjekkes. Et fortegn uten måling kan ikke d
 
 *Ferdig 2026-10-01:* flettet i `4b7e074`, PR #16.
 
+*Lagt til 2026-10-16 kl. 11:54:* delen av kontrollpunkt 2 om grunnlaget i 10.1 og kontrollen i FR-603 ble trukket 05.10: grunnlaget har ingen målinger lenger (avgjort 04.10, `prd.md` §4.6). Se «Rettet 2026-10-05» under story 10.1 og kontrollpunktet om sammenligningen i FR-602 under story 10.3. Delen om visningen i FR-706 står, og er oppfylt.
+
 ### Story 2.2: Hentekommandoen som egen inngang
 
 Som **sensor som kjører containeren**, vil jeg at oppstart ikke bruker et eneste
