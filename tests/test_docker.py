@@ -525,6 +525,24 @@ class TestReadme:
         """Story 3.4, PR 2: siden oppdateres ikke av seg selv."""
         assert "Last siden på nytt når hentingen er ferdig" in _steg("Den ekte versjonen (anbefalt)", 8)
 
+    def test_testene_uten_docker(self):
+        """3.3b, punkt c: hvordan testene kjøres på en ren maskin uten Docker,
+        med Python-versjonen fra pyproject.toml, og hva man skal se. Ikke et
+        fast testtall, som blir usant ved neste story."""
+        import tomllib
+
+        tester = README.read_text(encoding="utf-8").split("\n## Tester\n", 1)[1].split("\n## ", 1)[0]
+        krav = tomllib.loads((README.parent / "pyproject.toml").read_text(encoding="utf-8"))["project"]["requires-python"]
+        versjon = re.fullmatch(r">=(\d+\.\d+)", krav).group(1)
+        assert f"Python {versjon} eller nyere" in tester and "`requires-python`" in tester
+        blokker = [b.strip() for _, b in _blokkene(tester)]
+        assert "uv sync" in blokker and "uv run pytest" in blokker
+        assert blokker.index("uv sync") < len(blokker) - 1 - blokker[::-1].index("uv run pytest")
+        assert "uten Docker" in tester and "Alle testene skal bestå" in tester
+        assert "hoppes over" in tester and "Windows" in tester and "time.tzset" in tester
+        assert "uten git" in tester
+        assert not re.search(r"\b\d{3,}\b", tester), "fast testtall"
+
     def test_ingen_bilder_utenom_ci_merket(self):
         """Story 3.3: skjermbilder med ekte data publiserer dataene. Ville feilet
         med et bilde i README-en.

@@ -238,6 +238,18 @@ Under arbeid, og ingenting er endelig. Flettet til main: hentingen av kurser med
 uv run pytest
 ```
 
+**På en ren maskin uten Docker** trenger du bare [uv](https://docs.astral.sh/uv/). Appen krever Python 3.13 eller nyere (`requires-python` i `pyproject.toml`), og uv henter den hvis maskinen ikke har den. Stå i mappa der README og `pyproject.toml` ligger, og kjør:
+
+```
+uv sync
+```
+
+```
+uv run pytest
+```
+
+Alle testene skal bestå. Noen hoppes over, med grunnen i utskriften når du legger til `-rs`: på Windows testene som bytter tidssone, fordi `time.tzset` ikke finnes der (de kjøres i CI), og testen for Unix-sokler, som Python på Windows ikke har. I en mappe fra ZIP-fila, uten git, hoppes også testene som sjekker hva som er sporet i git, over.
+
 - Ingen nettkall: `tests/conftest.py` sperrer nettverket i hver test.
 - `data/` røres ikke: testene bruker en midlertidig mappe.
 - CI kjører på hver push og pull request mot `main`, uten hemmeligheter og uten API-nøkkel.
