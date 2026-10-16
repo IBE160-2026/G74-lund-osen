@@ -427,6 +427,18 @@ class TestReadme:
         assert "--hent-foer-kl-22" not in tekst and "--hent-foer-kl-22" not in _hjelp()
         assert "etter kl. 22" in _kom_i_gang() and "helgen" in _hjelp()
 
+    def test_demoen_paa_dagtid_og_helgen_i_steg_8(self):
+        """3.3b, punkt d: på dagtid en børsdag er demoen veien for å se appen
+        med en gang, og steg 8 og raden «Klar» nevner helgen, slik
+        docs/hjelp.md gjør. Ville feilet hvis helgen falt ut av steg 8."""
+        topp = _kom_i_gang().split("### Felles for begge", 1)[0]
+        assert "På dagtid en børsdag er demoen veien for å se appen med en gang" in topp
+        klar = [l for l in topp.splitlines() if l.startswith("| Klar |")]
+        assert len(klar) == 1 and "helgen" in klar[0] and "etter kl. 22" in klar[0]
+        steg8 = _steg("Den ekte versjonen (anbefalt)", 8)
+        assert "Første gang går det også i helgen." in steg8
+        assert "Første gang kan du også hente i helgen" in _hjelp()
+
     def test_ekte_versjonen_foerst_og_zip_foer_kommandoene(self):
         """Story 3.4: fra 11.10 kl. 22:32 anbefaler README-en den ekte
         versjonen, og den staar foerst. Demoen virker fortsatt uten .env.

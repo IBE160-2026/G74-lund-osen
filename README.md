@@ -17,13 +17,13 @@ Til faglærer:
 
 ## Kom i gang
 
-Appen finnes i to versjoner, med samme kode. Vi anbefaler den ekte versjonen. Vil du bare se hvordan appen virker, er demoen raskest.
+Appen finnes i to versjoner, med samme kode. Vi anbefaler den ekte versjonen. Vil du bare se hvordan appen virker, er demoen raskest. På dagtid en børsdag er demoen veien for å se appen med en gang, fordi den ekte versjonen henter dagens kurser først etter kl. 22.
 
 | | Den ekte versjonen (anbefalt) | Demoen |
 |---|---|---|
 | Kurser | Ekte sluttkurser fra Oslo Børs, hentet fra EODHD hver børsdag. Dagens vurdering lagres per aksje | Oppdiktede selskaper og kurser («Eksempeltall») |
 | Trenger | Docker Desktop og en gratis nøkkel fra EODHD | Bare Docker Desktop |
-| Klar | Viser kurser etter første henting om kvelden | Med en gang |
+| Klar | Viser kurser etter første henting, etter kl. 22 på en børsdag eller i helgen | Med en gang |
 
 **Du trenger** en Windows-maskin eller en Mac, lov til å installere programmer, nett og noen GB ledig plass, men verken git eller Docker-konto. Første gang tar det en stund. På Linux bruker du Docker Engine med Compose i stedet for Docker Desktop. Står du fast, se [«Står du fast?»](#står-du-fast) lenger ned.
 
@@ -61,7 +61,7 @@ open -e .env
 docker compose up --build
 ```
 
-8. **Hent kursene** etter kl. 22 og før midnatt på en børsdag. Åpne et nytt terminalvindu i samme mappe (steg 3 og 4), og lim inn denne. Det er klart når utskriften sier hvilken børsdag vurderingene gjelder. Last siden på nytt når hentingen er ferdig.
+8. **Hent kursene** etter kl. 22 og før midnatt på en børsdag. Første gang går det også i helgen. Åpne et nytt terminalvindu i samme mappe (steg 3 og 4), og lim inn denne. Det er klart når utskriften sier hvilken børsdag vurderingene gjelder. Last siden på nytt når hentingen er ferdig.
 
 ```
 docker compose run --rm hent
