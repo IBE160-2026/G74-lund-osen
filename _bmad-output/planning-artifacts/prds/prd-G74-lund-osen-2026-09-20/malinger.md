@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-16T22:11
+updated: 2026-10-16T22:28
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -3417,3 +3417,33 @@ kl. 20:30 og 21:00 er lik raden for EQNR.OL i kursfila `kurser-raa-2026-10-16.js
 i alle sju feltene (`date`, `open`, `high`, `low`, `close`, `adjusted_close` og
 `volume`). Betingelsen for å flytte hentingen til kl. 21:00 (beslutningen kl. 21:09,
 punkt 23 i PRD-en) holder for EQNR.OL denne dagen.
+
+## 32. Prøvekjøringen av KI-steget i hentekommandoen (2026-10-16)
+
+**Metode.** Prøvekjøringen av PR #49 (story 10.2, PR F), etter stegene under
+«Prøvekjøringen» i `spec-10-2b-teksten-i-hentekommandoen.md`. Gruppen sa ja kl.
+21:37 til å ta den fredag 16.10 etter kveldens henting, i stedet for lørdag.
+Basen ble kopiert med skallet på main til `data/db/ki-proeve.db` (regel 22), og
+bare KI-steget (`lag_ki_tekster`) ble kjørt mot kopien for børsdagen 16.10, med
+den ekte klokka, fra et skript utenfor repoet. Tiden per kall til modellen ble
+tatt med `time.monotonic()`. Ollama kjørte i Docker med grafikkortet. Sjekken
+fra svar c gikk først og sa at tjenesten var klar. Ingen kall til EODHD:
+kvoten sto på 17 brukt før og etter. `data/db/ose.db` ble ikke rørt.
+
+| | |
+|---|---|
+| Kjørt | 22:26–22:27 |
+| Besto kontrollen | 6 |
+| Stoppet av kontrollen | 9 (8 på regel 4, «skyldes», og 1 på regel 4, «indikerer») |
+| Modellen feilet | 0 |
+| Maskinvare i `ki_logg` | `gpu` for alle 15, og `ollama ps` viste «100% GPU» |
+| Grafikkort | NVIDIA GeForce RTX 4070 Laptop GPU, 8,0 GiB |
+| Modell | `gemma4:e4b`, `modell_id` `dc35e8d9c606` |
+| Ollama-versjon | 0.35.1 |
+| Median tid per tekst | 0,84 s over 15 kall |
+| Korteste og lengste kall | 0,69 s og 78,65 s. Det lengste var det første, med innlasting av modellen |
+
+**Resultat.** Steget skrev 15 rader i `ki_logg` i kopien, én per aksje, og
+modellen svarte for alle. 9 av 15 tekster ble stoppet av regel 4 i
+kontrollen, på ordene «skyldes» og «indikerer». Tekstene står bare i kopien og
+er ikke ført her.
