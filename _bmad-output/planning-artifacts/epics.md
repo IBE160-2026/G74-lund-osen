@@ -1723,6 +1723,8 @@ følger aksjene jeg bryr meg om.
 - Oversikten får delen «Dine egne aksjer» for aksjene brukeren har valgt selv (8.0e). Hva «egen» betyr, avgjøres i planen, som før
 - **Ville feilet hvis:** en valgt aksje sto uten bransje, eller sto under «Øvrige aksjer» i stedet for «Dine egne aksjer»
 
+*Lagt til 2026-10-16 (gruppens beslutning kl. 11:46, instruksjonen kl. 15:59):* demoen skal være mest mulig lik den ekte versjonen. Der demoen ikke kan gjøre det samme, fordi den ikke henter (FR-411), forklarer en boks hvordan det er i den ekte versjonen, gjerne med et bilde som blir stort ved klikk, trykk eller tastatur, ikke bare når musa holdes over. Bildet kan vise hele siden, for eksempel «Min liste» i den ekte versjonen, men lages fra testdata, aldri med ekte kurser (regelen 25.09 under story 3.3 i `epics.md`). For 2.12 betyr det noen ekstra oppdiktede selskaper i demobasen som kan velges, og at valget, «x av 18» og «Dine egne aksjer» virker likt i begge versjonene. Detaljene avgjøres i planen for 2.12.
+
 ### Story 2.13: Kommandoen som måler omsetning
 
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 13).*

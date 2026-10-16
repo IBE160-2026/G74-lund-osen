@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-15T23:59
+updated: 2026-10-16T16:01
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1053,6 +1053,8 @@ nok til at signaldagene, merket for endret signalstyrke og «Velg dag» har noe 
 vise. Lista i demoen kan byttes, men det hentes aldri (story 3.4).
 
 *Lagt til 2026-10-13, Marians ja kl. 13:44, etter faglærers tilbakemelding 06.10 (`tilbakemelding-product-brief.md`):* alt brukeren ser i v1, vises også i demoen, også KI-laget av og på (story 3.4b). Faglærer skrev: «sørg for at alle funksjoner i v1, også KI-laget i av-modus, kan vises der.»
+
+*Lagt til 2026-10-16 (gruppens beslutning kl. 11:46, instruksjonen kl. 15:59):* demoen skal være mest mulig lik den ekte versjonen. Der demoen ikke kan gjøre det samme, fordi den ikke henter (FR-411), forklarer en boks hvordan det er i den ekte versjonen, gjerne med et bilde som blir stort ved klikk, trykk eller tastatur, ikke bare når musa holdes over. Bildet kan vise hele siden, for eksempel «Min liste» i den ekte versjonen, men lages fra testdata, aldri med ekte kurser (regelen 25.09 under story 3.3 i `epics.md`). For 2.12 betyr det noen ekstra oppdiktede selskaper i demobasen som kan velges, og at valget, «x av 18» og «Dine egne aksjer» virker likt i begge versjonene. Detaljene avgjøres i planen for 2.12.
 
 #### FR-412 — Lista over aksjer
 
