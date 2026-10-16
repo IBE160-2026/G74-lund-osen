@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-10-16T22:57
+updated: 2026-10-16T23:55
 ---
 
 # Vurderingsmatrise for del 1
@@ -51,3 +51,5 @@ Statusen i tabellen er ikke endret. README-prøven (story 3.4) og avsnittet «St
 *Lagt til 2026-10-16 kl. 22:45:* README-raden: gruppen tok 16.10 kl. 21:38 skjermbildet av oversikten i demoen ut av README-en igjen. Det snur punkt b i 3.3b (ja 15.10 kl. 22:54, flettet i `6b9dc2f`, PR #53). Bildet og teksten under det er tatt ut, `docs/bilder/readme/oversikten-demo.png` er slettet, og testene godtar igjen ingen bilder i README-en og i `docs/bilder/` utenom CI-merket (PR #54). Regelen står: bilder i README-en kommer bare fra `docs/bilder/readme/` og viser aldri den ekte versjonen. Bildene som kommer i «Kom i gang» søndag, er ikke berørt, men PR-en med dem må endre de to testene, med stien og alt-teksten som sier at det er demoen, og PR 1 for hovedindeksen trenger ikke ta bildet på nytt. Skjermbildet som linja kl. 16:33 nevner, er dermed borte når grenen flettes. Statusen i tabellen er ikke endret.
 
 *Lagt til 2026-10-16 kl. 22:57:* README-raden: skjermbildet av demoen er nå borte fra main. PR #54 ble flettet i `1a95495` etter gruppens ja kl. 22:55, og README-en har ingen bilder utenom CI-merket. Statusen i tabellen er ikke endret.
+
+*Lagt til 2026-10-16 kl. 23:55:* KI-laget: prompten versjon 2 er flettet i `cafe067`, PR #55 (story 10.2, PR H). I prøvekjøringen mot en kopi av basen, ført i `malinger.md` §34, besto 15 av 15 tekster kontrollen, mot 6 med versjon 1 (§32), og modellen feilet for 0, på grafikkortet. Story 10.2 er done. Innstrammingen av kontrollen for «fordi» er en egen liten PR neste uke (beslutningen kl. 23:51). Statusen i tabellen er ikke endret.
