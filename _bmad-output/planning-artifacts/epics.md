@@ -1602,6 +1602,13 @@ tall kan sammenlignes med børsen som helhet.
 - README (linje 82, «15 kall») og diagrammet i spinen («15 kall, bevisst») rettes til 16 i samme commit som koden (regel 19)
 - **Ville feilet hvis:** indeksen ble lagt i `kurs` eller `AKSJEUNIVERS` for å slippe en ny tabell. Da teller den som en aksje i signalet og i «x av N»
 
+*Avgjort 2026-10-16, gruppens svar kl. 18:04 på planen for hovedindeksen (instruksjonen kl. 17:45):*
+- **PR 1** (tabellen `indeks`, porten og demoindeksen) flettes etter PR #49, ikke før: prøvekjøringen av #49 bruker grenen, som bare kjenner versjon 5 av basen.
+- **Demobasen** får en oppdiktet hovedindeks i PR 1, så 2.9 kan vises i demoen før kallet er flettet (beslutningen kl. 11:46 under story 2.12).
+- **PR 2** (kallet for indeksen i hentingen) flettes lørdag 17.10, etter at PR #49 er flettet. Lørdag er det ingen henting.
+- **Henteinstruksjonen** fra mandag 19.10 har 16 kall, versjon 6 og 4 kall til nye forsøk. Rådet skriver den.
+- **README-henvisningen:** «README (linje 82, «15 kall»)» i kontrollen over gjelder nå `docs/hjelp.md`, som rettes i PR 2 (regel 19).
+
 **Avhenger av:** 2.3 og 4.3 (`ki_logg` er `0005`). **Én økt:** ja.
 
 ### Story 2.9: Hovedindeksen i markedsoversikten
@@ -1642,6 +1649,8 @@ med en gang hvilke som trakk opp og ned.
 - Bare dagens søyler. Periodene og «Velg dag» fra designtavla er idé til v1.1
 - Bransjesymbolet er gult når aksjen har 3 av 3 på siste børsdag (`designregler.md` §3) *(lagt til 2026-10-01)*
 - **Ville feilet hvis:** søylene trengte et nytt kall eller en ny tabell. Endringen er den i FR-101, og bransjen står i `AKSJEUNIVERS`
+
+*Avgjort 2026-10-16, gruppens svar kl. 18:04 på planen for hovedindeksen (instruksjonen kl. 17:45):* søylene viser bare dagens tall. Periodene og «Velg dag» kommer med 8.17.
 
 **Avhenger av:** 2.9. **Én økt:** ja.
 
