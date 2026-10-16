@@ -6,19 +6,42 @@ kursserie eller vurdering, og staar ikke i AKSJEUNIVERS. Kallet i hentingen
 kommer i PR 2.
 """
 
+import ast
 import re
 import shutil
 import sqlite3
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import pytest
 
+import boersdag
+import demo
 import lagring_sqlite
-from lagring_sqlite import MIGRASJONSKATALOG
+from boersdag import er_boersdag
+from indeksdata import (
+    HOVEDINDEKS,
+    Indeks,
+    Indekslager,
+    Indeksleser,
+    MinneIndekslager,
+    bare_boersdager,
+)
+from kursdata import AKSJEUNIVERS, Kursrad
+from lagring_sqlite import MIGRASJONSKATALOG, SqliteIndekslager, SqliteKurslager, aapne_base
 from migrering import migrer, siste_versjon, versjon
 
 SRC = Path(lagring_sqlite.__file__).resolve().parent
 TABELLENE_FOER_0006 = {"aksje", "grunn", "ki_logg", "kurs", "kursserie", "skjema_versjon", "vurdering"}
+
+HENTET = datetime(2026, 10, 16, 20, 10, tzinfo=timezone.utc)
+FREDAG = date(2026, 10, 16)
+LOERDAG = date(2026, 10, 17)
+JULEDAG = date(2026, 12, 25)
+I_FJOR = date(2025, 12, 30)
+# malinger.md §14: datoene indeksen har og aksjene ikke har.
+PARAGRAF_14 = [date(2025, 12, 24), date(2025, 12, 31), date(2026, 4, 2), date(2026, 5, 14), date(2026, 5, 25)]
 
 
 def tabeller(tilkobling) -> set[str]:
@@ -37,6 +60,39 @@ def katalog_til(tmp_path: Path, siste: int) -> Path:
         if int(fil.name[:4]) <= siste:
             shutil.copyfile(fil, katalog / fil.name)
     return katalog
+
+
+def rad(dag: date, slutt: float = 1500.0) -> Kursrad:
+    return Kursrad(dato=dag, slutt=slutt, justert_slutt=slutt, volum=1000)
+
+
+def boersdager_fram_til(siste: date, antall: int) -> list[date]:
+    dager, dag = [], siste
+    while len(dager) < antall:
+        if er_boersdag(dag):
+            dager.append(dag)
+        dag -= timedelta(days=1)
+    return sorted(dager)
+
+
+@pytest.fixture
+def sqlite_base(tmp_path):
+    tilkobling = aapne_base(tmp_path / "test.db")
+    yield tilkobling
+    tilkobling.close()
+
+
+@pytest.fixture(params=["minne", "sqlite"])
+def lager(request, tmp_path):
+    if request.param == "minne":
+        yield MinneIndekslager()
+    else:
+        tilkobling = aapne_base(tmp_path / "lager.db")
+        yield SqliteIndekslager(tilkobling)
+        tilkobling.close()
+
+
+# --- Migrasjonen (punkt a) ----------------------------------------------------
 
 
 class TestMigrasjonen:
@@ -94,52 +150,6 @@ class TestMigrasjonen:
 
 # --- Porten (punkt b) ---------------------------------------------------------
 
-from datetime import date, datetime, timedelta, timezone  # noqa: E402
-
-from boersdag import er_boersdag  # noqa: E402
-from indeksdata import (  # noqa: E402
-    HOVEDINDEKS, Indekslager, Indeksleser, MinneIndekslager, bare_boersdager)
-from kursdata import AKSJEUNIVERS, Kursrad  # noqa: E402
-from lagring_sqlite import SqliteIndekslager, SqliteKurslager, aapne_base  # noqa: E402
-
-HENTET = datetime(2026, 10, 16, 20, 10, tzinfo=timezone.utc)
-FREDAG = date(2026, 10, 16)
-LOERDAG = date(2026, 10, 17)
-JULEDAG = date(2026, 12, 25)
-I_FJOR = date(2025, 12, 30)
-# malinger.md §14: datoene indeksen har og aksjene ikke har.
-PARAGRAF_14 = [date(2025, 12, 24), date(2025, 12, 31), date(2026, 4, 2), date(2026, 5, 14), date(2026, 5, 25)]
-
-
-def rad(dag: date, slutt: float = 1500.0) -> Kursrad:
-    return Kursrad(dato=dag, slutt=slutt, justert_slutt=slutt, volum=1000)
-
-
-def boersdager_fram_til(siste: date, antall: int) -> list[date]:
-    dager, dag = [], siste
-    while len(dager) < antall:
-        if er_boersdag(dag):
-            dager.append(dag)
-        dag -= timedelta(days=1)
-    return sorted(dager)
-
-
-@pytest.fixture
-def sqlite_base(tmp_path):
-    tilkobling = aapne_base(tmp_path / "test.db")
-    yield tilkobling
-    tilkobling.close()
-
-
-@pytest.fixture(params=["minne", "sqlite"])
-def lager(request, tmp_path):
-    if request.param == "minne":
-        yield MinneIndekslager()
-    else:
-        tilkobling = aapne_base(tmp_path / "lager.db")
-        yield SqliteIndekslager(tilkobling)
-        tilkobling.close()
-
 
 class TestPorten:
     def test_lagrene_oppfyller_porten(self, lager):
@@ -188,6 +198,19 @@ class TestPorten:
             lager.erstatt_serie("EQNR", [rad(FREDAG)], HENTET)
         assert lager.serie("EQNR") == [] and lager.sist_hentet("EQNR") is None
 
+    def test_en_aksje_avvises_ogsaa_naar_den_er_gitt_som_indeks(self, tmp_path):
+        """Gjennomgangen av 2.8a (ECH): en Indeks med symbolet til en aksje
+        avvises i porten, fordi basen ikke har noen trigger for indeks."""
+        som_indeks = (Indeks("EQNR", "EQNR.OL", "Equinor"),)
+        tilkobling = aapne_base(tmp_path / "eqnr.db")
+        try:
+            for lageret in (MinneIndekslager(som_indeks), SqliteIndekslager(tilkobling, som_indeks)):
+                with pytest.raises(ValueError):
+                    lageret.erstatt_serie("EQNR", [rad(FREDAG)], HENTET)
+                assert lageret.serie("EQNR") == []
+        finally:
+            tilkobling.close()
+
     def test_to_rader_samme_dag_avvises_og_endrer_ingenting(self, lager):
         lager.erstatt_serie("OSEBX", [rad(FREDAG)], HENTET)
         with pytest.raises(ValueError):
@@ -199,15 +222,58 @@ class TestPorten:
         with pytest.raises(ValueError):
             lager.erstatt_serie("OSEBX", [rad(FREDAG)], datetime(2026, 10, 16, 22, 0))
 
-    def test_bare_boersdager_har_ikke_noe_fast_aar(self, monkeypatch):
+    def test_tid_i_norsk_sone_leses_som_utc(self, lager):
+        """AD-20 (gjennomgangen av 2.8a, BH10)."""
+        norsk = datetime(2026, 10, 16, 22, 10, tzinfo=ZoneInfo("Europe/Oslo"))
+        lager.erstatt_serie("OSEBX", [rad(FREDAG)], norsk)
+        assert lager.sist_hentet("OSEBX") == norsk
+        assert lager.sist_hentet("OSEBX").utcoffset() == timedelta(0)
+
+    def test_radene_leses_i_rekkefoelge(self, lager):
+        """Kronologisk, nyeste sist, også når radene kom i omvendt rekkefølge (BH10)."""
+        dager = boersdager_fram_til(FREDAG, 3)
+        lager.erstatt_serie("OSEBX", [rad(d) for d in reversed(dager)], HENTET)
+        assert [r.dato for r in lager.serie("OSEBX")] == dager
+
+    def test_en_annen_feil_midt_i_transaksjonen_ruller_tilbake(self, sqlite_base):
+        """Gjennomgangen av 2.8a (VG3, BH10): ville feilet hvis bare
+        IntegrityError rullet tilbake. Da sto transaksjonen åpen, og neste
+        skriving ga RuntimeError."""
+        lageret = SqliteIndekslager(sqlite_base)
+        lageret.erstatt_serie("OSEBX", [rad(FREDAG)], HENTET)
+
+        class Avbrutt(Exception):
+            pass
+
+        class Avbrytende:
+            def __init__(self, ekte):
+                self._ekte = ekte
+
+            def __getattr__(self, navn):
+                return getattr(self._ekte, navn)
+
+            def executemany(self, *args):
+                raise Avbrutt()
+
+        avbrytende = SqliteIndekslager.__new__(SqliteIndekslager)
+        avbrytende._tilkobling = Avbrytende(sqlite_base)
+        avbrytende._indekser = (HOVEDINDEKS,)
+        with pytest.raises(Avbrutt):
+            avbrytende.erstatt_serie("OSEBX", [rad(date(2026, 10, 15))], HENTET + timedelta(days=1))
+        assert not sqlite_base.in_transaction
+        assert [r.dato for r in lageret.serie("OSEBX")] == [FREDAG]
+        assert lageret.sist_hentet("OSEBX") == HENTET
+
+    def test_bare_boersdager_leser_aarene_fra_kalenderen(self, monkeypatch):
         """Året leses fra DEKKEDE_AAR når serien skrives. Ville feilet hvis
-        koden hadde 2026 fast: med 2025 tatt bort fra kalenderens år er
-        fredagen 16.10.2026 heller ikke med."""
-        import boersdag
+        koden hadde 2026 fast: med bare 2025 i kalenderens år er fredagen
+        16.10.2026 ikke med."""
         monkeypatch.setattr(boersdag, "DEKKEDE_AAR", frozenset({2025}))
         assert bare_boersdager([rad(FREDAG)]) == []
-        # Ingen årstall som tall i koden (datoer i docstringene teller ikke).
-        import ast
+
+    def test_ingen_aarstall_i_koden(self):
+        """Ingen årstall som tall i indeksdata.py (datoer i docstringene
+        teller ikke)."""
         tre = ast.parse((SRC / "indeksdata.py").read_text(encoding="utf-8"))
         assert not [n.value for n in ast.walk(tre)
                     if isinstance(n, ast.Constant) and isinstance(n.value, int) and 1900 <= n.value <= 2100]
@@ -247,8 +313,6 @@ class TestIndeksenErIkkeEnAksje:
 
 # --- Demoindeksen (punkt c) ---------------------------------------------------
 
-import demo  # noqa: E402
-
 
 @pytest.fixture(scope="module")
 def demobasen(tmp_path_factory):
@@ -257,6 +321,11 @@ def demobasen(tmp_path_factory):
     tilkobling = sqlite3.connect(f"file:{sti.as_posix()}?mode=ro", uri=True)
     yield tilkobling
     tilkobling.close()
+
+
+def _demoserier() -> tuple[list[date], dict[str, list[Kursrad]]]:
+    dager = demo.handelsdager()
+    return dager, {a.symbol: demo.serie(n, a, dager) for n, a in enumerate(demo.DEMOUNIVERS)}
 
 
 class TestDemoindeksen:
@@ -278,17 +347,26 @@ class TestDemoindeksen:
             assert demobasen.execute(f"SELECT count(*) FROM {tabell} WHERE symbol = ?", (symbol,)).fetchone()[0] == 0
         assert demobasen.execute("SELECT count(*) FROM aksje").fetchone()[0] == len(demo.DEMOUNIVERS)
 
-    def test_indeksen_foelger_demoaksjene(self):
+    def test_indeksen_foelger_demoaksjene_hver_dag(self):
         """Dagens endring er snittet av endringen for aksjene som har kurs
-        begge dagene."""
-        dager = demo.handelsdager()
-        serier = {a.symbol: demo.serie(n, a, dager) for n, a in enumerate(demo.DEMOUNIVERS)}
+        begge dagene, og volumet er summen for aksjene med kurs. Hver dag,
+        med relativ toleranse fordi radene er avrundet til to desimaler
+        (gjennomgangen av 2.8a, ECH, BH8, VG2)."""
+        dager, serier = _demoserier()
         indeks = demo.indeksserie(serier, dager)
-        siste, forrige = dager[-1], dager[-2]
-        endringer = [
-            {r.dato: r for r in rader}[siste].justert_slutt / {r.dato: r for r in rader}[forrige].justert_slutt - 1
-            for rader in serier.values() if {siste, forrige} <= {r.dato for r in rader}
-        ]
-        ventet = indeks[-2].slutt * (1 + sum(endringer) / len(endringer))
-        assert indeks[-1].slutt == pytest.approx(ventet, abs=0.01)
+        paa_dag = [{r.dato: r for r in rader} for rader in serier.values()]
         assert indeks[0].slutt == demo.INDEKS_START
+        for i in range(1, len(dager)):
+            endringer = [d[dager[i]].justert_slutt / d[dager[i - 1]].justert_slutt - 1
+                         for d in paa_dag if dager[i] in d and dager[i - 1] in d]
+            assert endringer, dager[i]
+            ventet = indeks[i - 1].slutt * (1 + sum(endringer) / len(endringer))
+            assert indeks[i].slutt == pytest.approx(ventet, rel=1e-5), dager[i]
+            assert indeks[i].volum == sum(d[dager[i]].volum for d in paa_dag if dager[i] in d)
+
+    def test_alle_opp_en_prosent_gir_indeksen_opp_en_prosent(self):
+        """En egenskap, ikke formelen på nytt (BH8)."""
+        dager = boersdager_fram_til(FREDAG, 2)
+        serier = {s: [rad(dager[0], 100.0), rad(dager[1], 101.0)] for s in ("A", "B", "C")}
+        indeks = demo.indeksserie(serier, dager)
+        assert indeks[1].slutt == pytest.approx(demo.INDEKS_START * 1.01, abs=0.01)

@@ -76,7 +76,7 @@ def _tabeller(sti: Path) -> dict:
     c = sqlite3.connect(sti)
     try:
         ut = {t: c.execute(f"SELECT * FROM {t} ORDER BY rowid").fetchall()
-              for t in ("aksje", "kurs", "kursserie", "vurdering")}
+              for t in ("aksje", "kurs", "kursserie", "vurdering", "indeks", "indeksserie")}
         # Tidspunktet migrasjonen ble kjoert, er ikke data. Resten av raden skal
         # vaere lik.
         ut["skjema_versjon"] = c.execute(

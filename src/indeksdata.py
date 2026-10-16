@@ -21,7 +21,7 @@ from datetime import datetime, timezone
 from typing import Protocol, runtime_checkable
 
 import boersdag
-from kursdata import Kursrad
+from kursdata import AKSJEUNIVERS, Kursrad
 
 
 @dataclass(frozen=True)
@@ -83,6 +83,10 @@ def kontroller_indeksskriving(
     hentet i UTC. Kjoeres foer noe lagres, saa en avvist skriving etterlater
     lageret slik det var. Like datoer kontrolleres ikke her, men av
     primaernoekkelen i SQLite og av MinneIndekslager, som for kursene."""
+    # En aksje er aldri en indeks, ogsaa naar kalleren gir en Indeks med
+    # symbolet til en aksje (gjennomgangen av 2.8a, ECH).
+    if symbol in {aksje.symbol for aksje in AKSJEUNIVERS}:
+        raise ValueError(f"{symbol!r} er en aksje i AKSJEUNIVERS og lagres i kurs, ikke her (AD-21)")
     if symbol not in {indeks.symbol for indeks in indekser}:
         raise ValueError(
             f"{symbol!r} er ikke en kjent indeks. Symbolet er uten .OL (OSEBX), "
