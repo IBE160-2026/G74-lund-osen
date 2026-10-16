@@ -1613,6 +1613,8 @@ tall kan sammenlignes med børsen som helhet.
 
 *Avgjort 2026-10-16 kl. 22:16 (gruppens beslutning, gitt i chatten med rådet):* sjekken av basen før kallene skal virke også når basen står en versjon bak, som 16.10 med `0005`: «Basen ose.db kunne ikke leses (RuntimeError). Henter likevel», og filvakten holdt (Utført-linja for hentingen 16.10, `6b07a53`). Det rettes i PR 2 lørdag 17.10, som egen commit med en test, før migrasjonen `0006` møter den ekte basen.
 
+*Lagt til 2026-10-17:* PR 1 (2.8a), tabellen `indeks` i migrering `0006`, porten og demoindeksen, er flettet i `1d3a21d`, PR #56, etter gruppens ja kl. 00:25 og sjekken for hånd samme minutt av `DEMIX` og «Demoindeksen» mot lista hos Euronext. CI var grønn på head-en `114a380` (kjøring 38975808686). Storyen står som in-progress til PR 2, kallet i hentingen, er flettet.
+
 **Avhenger av:** 2.3 og 4.3 (`ki_logg` er `0005`). **Én økt:** ja.
 
 ### Story 2.9: Hovedindeksen i markedsoversikten

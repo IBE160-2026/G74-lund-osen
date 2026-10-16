@@ -2,7 +2,7 @@
 title: 'Story 2.8, PR 1 (2.8a): tabellen indeks, porten og demoindeksen'
 type: 'feature'
 created: '2026-10-17'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'e978511'
@@ -44,6 +44,8 @@ context:
 - Etter flettingen migreres den ekte basen til 6 neste gang webserveren eller hentingen skriver. Sjekken av basen før kallene (`manglende_i_basen`) avviser en base som står en versjon bak, og hentingen går da videre uten den, med filvakten som vakt (Utført-linja for hentingen 16.10). Det rettes i PR 2 (beslutningen kl. 22:16).
 - Flettes ikke uten ja fra gruppen.
 - **Navnet og symbolet til demoindeksen sjekkes av gruppen mot lista hos Euronext før flettingen** (gjennomgangen, BH13).
+
+*Lagt til 2026-10-17:* gruppen sjekket for hånd kl. 00:25 at verken symbolet `DEMIX` eller navnet «Demoindeksen» finnes i lista hos Euronext, og sa ja til flettingen samme minutt. PR #56 er flettet i `1d3a21d`.
 
 **Testtallet før:** 2236 bestått og 17 hoppet over (grenen til PR #55 på `1efe816`, samme kode som main etter `cafe067`).
 
