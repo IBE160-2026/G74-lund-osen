@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-10-16T11:55
+updated: 2026-10-16T16:33
 ---
 
 # Vurderingsmatrise for del 1
@@ -43,3 +43,5 @@ Tallene er talt 16.10 kl. 00:27: 46 flettede pull requests (`gh pr list --state 
 - `074325b`: under tabellen i §10 i [kvalitetssikringen](kvalitetssikring.md) står testene som nå finnes for kontrollen, loggen og visningen. Tiltaket i raden «Kvalitetssikring og testing» om raden «KI-forklaringen» er ferdig med det. Én ukes logget drift og story 10.4 står igjen.
 
 Statusen i tabellen er ikke endret. README-prøven (story 3.4) og avsnittet «Status» i README-en står igjen.
+
+*Lagt til 2026-10-16 kl. 16:33:* README-raden: [README-en](../README.md) ble skrevet for sensor i PR #53, flettet i `6b9dc2f`. Den har nå et skjermbilde av oversikten i demoen, hvordan testene kjøres uten Docker, at demoen er veien før kl. 22 på en børsdag, Docker Desktop slik den ble prøvd 10.10, og en status med den første delen av KI-laget. Statusen i raden er fortsatt «delvis»: README-prøven, Prøve 1 og 2 i §9 i [kvalitetssikringen](kvalitetssikring.md), er ikke tatt. Tiltaket om avsnittet «Status» i README-en er ferdig med `6b9dc2f`.
