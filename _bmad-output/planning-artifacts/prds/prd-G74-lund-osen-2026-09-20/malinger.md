@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-15T22:26
+updated: 2026-10-16T21:00
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -3381,3 +3381,33 @@ RING.
 
 Målingen endrer ikke universet. Parametrene i signalet er låst og målt på de
 15 (AD-13).
+
+## 31. Når dagens rad kommer hos EODHD: prøvekall for EQNR.OL (2026-10-16)
+
+**Metode.** Ett `/api/eod`-kall per klokkeslett for EQNR.OL alene, fra 09.10 til
+16.10, med `hent_api_nokkel` og `hent_ett_symbol` importert fra
+`src/fetch_prices.py`, så kallet er det samme som i hentingen. Skriptet lå
+utenfor repoet. `src/fetch_prices.py` ble ikke kjørt, og basen ble ikke åpnet.
+Svarene ligger urørt i `data/proever/`, som ikke spores (regel 10), og ikke i
+`data/raa/`, som hentingen leser. Gruppen sa ja 15.10 kl. 22:21 til fire kall
+fredag 16.10, kl. 19:30, 20:00, 20:30 og 21:00 (punkt 23 i PRD-en).
+
+Kallene kl. 19:30 og 20:00 ble ikke gjort. Instruksjonen ble lagret kl. 20:06
+(`d210ef6`), etter begge klokkeslettene, og de ble ikke tatt igjen senere.
+
+| Klokkeslett (`date`) | Rad for 16.10 | Siste dato i svaret |
+|---|---|---|
+| 19:30 | ikke kalt | – |
+| 20:00 | ikke kalt | – |
+| 20:30:00 | ja | 2026-10-16 |
+| 21:00:00 | ja | 2026-10-16 |
+
+**Resultat.** Kl. 20:30 fredag 16.10 hadde EODHD dagens rad for EQNR.OL. Kl.
+19:04 den 23.09 hadde ingen av de 15 dagens rad (§11), og kl. 21:31 den 24.09
+hadde alle 15 den (§12). Målt for ett symbol 16.10 kom raden altså før 20:30.
+Når mellom 19:04 og 20:30, er ikke målt, fordi de to tidligste kallene falt
+bort. Om raden kl. 20:30 og 21:00 er lik raden i kursfila etter kl. 22, sjekkes
+i henteinstruksjonen 16.10.
+
+**Kostnad.** 2 kall. Kvoten etter kallet kl. 21:00: 2 brukt i dag, 18 igjen,
+`extraLimit` 463, uendret. Bonuskvoten er ikke brukt.
