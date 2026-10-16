@@ -1326,6 +1326,8 @@ så en vurdering kan etterprøves og sjekkes. Et fortegn uten måling kan ikke d
 
 *Ferdig 2026-10-01:* flettet i `4b7e074`, PR #16.
 
+*Lagt til 2026-10-16 kl. 11:54:* delen av kontrollpunkt 2 om grunnlaget i 10.1 og kontrollen i FR-603 ble trukket 05.10: grunnlaget har ingen målinger lenger (avgjort 04.10, `prd.md` §4.6). Se «Rettet 2026-10-05» under story 10.1 og kontrollpunktet om sammenligningen i FR-602 under story 10.3. Delen om visningen i FR-706 står, og er oppfylt.
+
 ### Story 2.2: Hentekommandoen som egen inngang
 
 Som **sensor som kjører containeren**, vil jeg at oppstart ikke bruker et eneste
@@ -1458,6 +1460,8 @@ Oppgaveplanlegging beskrives i README (regel 19).
 **Én økt:** ja.
 
 *Ferdig 2026-10-08:* flettet i `249853e`, PR #22.
+
+*Avgjort 2026-10-16, gruppens beslutning kl. 21:09:* hentingen på børsdager flyttes fra kl. 22:00 til kl. 21:00, på betingelse av at radene fra prøvene kl. 20:30 og 21:00 er like raden i kursfila etter kveldens henting (`malinger.md` §31). Er de ulike, tas spørsmålet opp igjen. Endringen bygges som en egen PR søndag 18.10 og gjelder fra mandag 19.10. Mangler noen aksjer raden kl. 21, henter et nytt forsøk dem senere samme kveld med kallene som er igjen (2.3b).
 
 ### Story 2.3b: Kallene som er igjen, brukes på nye forsøk
 
@@ -1600,6 +1604,13 @@ tall kan sammenlignes med børsen som helhet.
 - README (linje 82, «15 kall») og diagrammet i spinen («15 kall, bevisst») rettes til 16 i samme commit som koden (regel 19)
 - **Ville feilet hvis:** indeksen ble lagt i `kurs` eller `AKSJEUNIVERS` for å slippe en ny tabell. Da teller den som en aksje i signalet og i «x av N»
 
+*Avgjort 2026-10-16, gruppens svar kl. 18:04 på planen for hovedindeksen (instruksjonen kl. 17:45):*
+- **PR 1** (tabellen `indeks`, porten og demoindeksen) flettes etter PR #49, ikke før: prøvekjøringen av #49 bruker grenen, som bare kjenner versjon 5 av basen.
+- **Demobasen** får en oppdiktet hovedindeks i PR 1, så 2.9 kan vises i demoen før kallet er flettet (beslutningen kl. 11:46 under story 2.12).
+- **PR 2** (kallet for indeksen i hentingen) flettes lørdag 17.10, etter at PR #49 er flettet. Lørdag er det ingen henting.
+- **Henteinstruksjonen** fra mandag 19.10 har 16 kall, versjon 6 og 4 kall til nye forsøk. Rådet skriver den.
+- **README-henvisningen:** «README (linje 82, «15 kall»)» i kontrollen over gjelder nå `docs/hjelp.md`, som rettes i PR 2 (regel 19).
+
 **Avhenger av:** 2.3 og 4.3 (`ki_logg` er `0005`). **Én økt:** ja.
 
 ### Story 2.9: Hovedindeksen i markedsoversikten
@@ -1640,6 +1651,8 @@ med en gang hvilke som trakk opp og ned.
 - Bare dagens søyler. Periodene og «Velg dag» fra designtavla er idé til v1.1
 - Bransjesymbolet er gult når aksjen har 3 av 3 på siste børsdag (`designregler.md` §3) *(lagt til 2026-10-01)*
 - **Ville feilet hvis:** søylene trengte et nytt kall eller en ny tabell. Endringen er den i FR-101, og bransjen står i `AKSJEUNIVERS`
+
+*Avgjort 2026-10-16, gruppens svar kl. 18:04 på planen for hovedindeksen (instruksjonen kl. 17:45):* søylene viser bare dagens tall. Periodene og «Velg dag» kommer med 8.17.
 
 **Avhenger av:** 2.9. **Én økt:** ja.
 
@@ -1720,6 +1733,8 @@ følger aksjene jeg bryr meg om.
 - En aksje som velges, får en av de 13 bransjene, og det brukeren ser, heter «bransje»
 - Oversikten får delen «Dine egne aksjer» for aksjene brukeren har valgt selv (8.0e). Hva «egen» betyr, avgjøres i planen, som før
 - **Ville feilet hvis:** en valgt aksje sto uten bransje, eller sto under «Øvrige aksjer» i stedet for «Dine egne aksjer»
+
+*Lagt til 2026-10-16 (gruppens beslutning kl. 11:46, instruksjonen kl. 15:59):* demoen skal være mest mulig lik den ekte versjonen. Der demoen ikke kan gjøre det samme, fordi den ikke henter (FR-411), forklarer en boks hvordan det er i den ekte versjonen, gjerne med et bilde som blir stort ved klikk, trykk eller tastatur, ikke bare når musa holdes over. Bildet kan vise hele siden, for eksempel «Min liste» i den ekte versjonen, men lages fra testdata, aldri med ekte kurser (regelen 25.09 under story 3.3 i `epics.md`). For 2.12 betyr det noen ekstra oppdiktede selskaper i demobasen som kan velges, og at valget, «x av 18» og «Dine egne aksjer» virker likt i begge versjonene. Detaljene avgjøres i planen for 2.12.
 
 ### Story 2.13: Kommandoen som måler omsetning
 
@@ -1902,6 +1917,12 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 **Avhenger av:** 3.1. **Én økt:** ja.
 
 *Ferdig 2026-10-10:* flettet i `5816bc2`, PR #25.
+
+*Lagt til 2026-10-16 kl. 11:54:* kontrollpunktet «Demoen står først» fra 05.10 ble snudd 11.10 kl. 22:32: README-en anbefaler den ekte versjonen og har den før demoen (spesifikasjonen for 3.4, `spec-3-4-demoversjonen.md`, «2026-10-11 kl. 22:32», og testen `tests/test_docker.py::TestReadme::test_ekte_versjonen_foerst_og_zip_foer_kommandoene`). Docker som hovedmåten og uv som alternativet står. Kontrollpunktene er gått gjennom igjen mot main, og alle er oppfylt. At 20 kall i døgnet holder til én henting, står i `docs/hjelp.md`, som README-en lenker til, etter omskrivingen i 3.4, PR 3. 3-3 er done.
+
+*Lagt til 2026-10-16 kl. 16:02 (instruksjonen kl. 15:59, som sier at gruppen sa ja 15.10 kl. 22:54; det svaret er ikke ført i dagsfila for 15.10):* fem forbedringer i README-en for sensor er beslutninger, i `spec-3-3b-readme-for-sensor.md`: a) «Status» med det som er flettet siden sist, og «Neste:» i rekkefølgen her; b) et skjermbilde av oversikten i demoen, 1280 px bredt med «Eksempeltall» synlig, i `docs/bilder/`; c) under «Tester», hvordan testene kjøres uten Docker med uv, og hva man skal se; d) i «Kom i gang», at demoen er veien for å se appen med en gang på dagtid en børsdag, og helgen i steg 8 og raden «Klar»; e) under «Du trenger», versjonene, Docker Desktop slik den er prøvd, og Python. Skjermbildet erstatter «uten bilder» (svar 4, 11.10). Regelen fra 25.09 står: bildet viser bare demoen. Svar 3 står: `--hent-foer-kl-22` står verken i README-en eller i `docs/hjelp.md`, fordi en henting før dagens kurser finnes, kan låse dagen.
+
+*Lagt til 2026-10-16 kl. 16:33:* README-en for sensor (3.3b) er flettet i `6b9dc2f`, PR #53 (ja kl. 16:31). Spesifikasjonen `spec-3-3b-readme-for-sensor.md` og 3-3b i sprintstatusen er done. README-prøven står igjen under story 3.4.
 
 ### Story 3.4: Demoversjonen
 
@@ -2385,6 +2406,10 @@ så jeg alltid ser hva signalet faktisk bygger på.
 **Én økt:** ja.
 
 *Lagt til 2026-10-15:* flettet i `e728c37`, PR #50. Står som review: kontrollpunktet om at siden sier hvorfor når tjenesten ikke er tilgjengelig (FR-601), er ikke oppfylt. Med svar c kl. 23:32 skriver hentingen ingen rad når Ollama ikke svarer, og siden viser da bare «Ingen KI-tekst for denne dagen.» uten grunnen. Det trengs et sted der hentingen fører at tjenesten ikke svarte for dagen, og det avgjøres av gruppen.
+
+*Lagt til 2026-10-15 (gruppens svar kl. 23:57 på spørsmålet i Utført-linja kl. 23:51, instruksjonen kl. 23:58):* siden sier hvorfor med det loggen kan vise. Har dagen ingen rader i `ki_logg` i det hele tatt, står det «Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.» Har andre aksjer rader for dagen, men ikke denne, sier siden at teksten for denne aksjen ikke ble laget i hentingen. Den nøyaktige grunnen står i utskriften fra hentingen og i Utført-linja for den kvelden. Med dette regnes kontrollpunktet fra 05.10 om at siden sier hvorfor (FR-601), som oppfylt.
+
+*Lagt til 2026-10-16 kl. 00:21:* PR 2 flettet i `4a22199`, PR #51 (ja kl. 00:16). Alle kontrollpunktene er oppfylt på main, og 10-3 er done. At siden med KI av er lik den som fantes, ble sjekket ved å sammenligne aksjesiden i demoen med kapselen av mot siden fra `8c3a58b`, før 10.3: eneste forskjell er bryteren og stilen dens, som kontrollpunktet over krever. At teksten vakten stopper «logges», er raden i `ki_logg`, som står (AD-7).
 
 ### Story 10.4: Måle bidraget — egen brukertest, etter 8.1
 

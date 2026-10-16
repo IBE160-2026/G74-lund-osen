@@ -2,7 +2,7 @@
 title: 'Story 10.3: Visningen i aksjedetaljen'
 type: 'feature'
 created: '2026-10-15'
-status: 'review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '5586924'
@@ -125,3 +125,39 @@ Under rettingen laget den nye testen for AD-10 først en tom `data/db/ose.db` i 
 | VR4 | siden varierer ikke med kapselen | `test_siden_varierer_med_kapselen` |
 
 **Bildene** av aksjesiden i demoen ved 1280 og 390 px, med en KI-rad som besto, en som ikke besto, ingen rad og bryteren av, ligger bare i scratchpad. De er tatt på `c0ff812`. Rettingene endret ikke det som vises, bortsett fra `aria-pressed`. KI-radene i bildene er skrevet rett i en demobase i scratchpad.
+
+## PR 2: grunnen på siden når hentingen ikke laget KI-tekst
+
+*Lagt til 2026-10-16 (gruppens svar kl. 23:57 15.10, instruksjonen kl. 23:58, ført også under FR-601 i PRD-en og under story 10.3 i `epics.md`):* siden sier hvorfor med det loggen kan vise. Har dagen ingen rader i `ki_logg` i det hele tatt, står det «Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.» Har andre aksjer rader for dagen, men ikke denne, sier siden at teksten for denne aksjen ikke ble laget i hentingen. Den nøyaktige grunnen står i utskriften fra hentingen og i Utført-linja for den kvelden. Med dette regnes kontrollpunktet fra 05.10 om at siden sier hvorfor (FR-601), som oppfylt.
+
+Bygd på grenen `10-3b-grunnen-paa-siden` fra main (`085832e`):
+- `src/ki_visning.py`: `INGEN_FOR_AKSJEN` og de to tekstene, og `bygg_ki_visning` tar `dagen_har_rader`.
+- `src/app.py`: `_ki_visning` leser `les_alle` bare når aksjen ikke har en rad, og teller bare rader for aksjer på samme dag. Siden leser bare (AD-10).
+- *Etter gjennomgangen:* `les_alle` er byttet ut med `andre_aksjer_har_ki_rad` i `src/lagring_sqlite.py`, én lesing med `SELECT EXISTS` som ikke tolker radene. Funksjonen står utenfor porten, som bare har `skriv`, `les` og `les_alle` (`tests/test_kilogg.py`). Flagget heter `andre_har_rader` og må gis av hver kaller.
+
+**Mutantene** (på `cb35c69`, én om gangen med `-x` og bare `tests/test_ki_visning.py`, kopi før og sha256 mot HEAD etter hver), alle fanget: B1 siden gir alltid grunnen for dagen (`test_rader_for_andre_aksjer_men_ikke_denne`), B2 en rad for en annen dag teller (`test_en_rad_for_en_annen_dag_teller_ikke`), B3 dagsteksten og meldingene teller som en aksje (`test_dagsteksten_teller_ikke_som_en_aksje`), B4 en logg som ikke kan leses gir grunnen for dagen (`test_en_logg_som_ikke_kan_leses_gir_en_dag_uten_tekst`), B5 de andre sjekkes også når aksjen har en rad (`test_sjekken_av_andre_kjoeres_bare_uten_egen_rad`), B6 radene tolkes i sjekken (`test_en_rad_som_ikke_kan_leses_endrer_ikke_svaret`), og B7 ingen vurdering å forklare gir grunnen for dagen (`test_en_grunn_i_stedet_for_vurdering`). B1–B3 ble også kjørt og fanget på `5eee68e`, før rettingene.
+
+**Testtallene:** main før grenen er ikke kjørt lokalt; CI på main ga 2108 bestått på `a6a476e` (38811104240). `uv run pytest -q` én gang på hele settet: 2104 bestått og 17 hoppet over på `cb35c69`.
+
+**Bildene** av de to nye tekstene ved 1280 og 390 px er laget fra en demobase i scratchpad, bare der.
+
+### Gjennomgangen av PR 2
+
+Gjennomgang 16.10 på diffen `main...5eee68e`, med Blind Hunter (BH, 15 funn), Edge Case Hunter (ECH, 7) og Verification Gap (VG, 3). Rettingene står i `cb35c69`.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH1, ECH | `les_alle` tolket hele loggen for hver side, og vokser for hver kveld | medium | patch: `andre_aksjer_har_ki_rad` med `SELECT EXISTS` |
+| BH2, ECH, VG2 | Én rad som ikke kunne leses, for en hvilken som helst dag, endret grunnen | medium | patch: radene tolkes ikke. `test_en_rad_som_ikke_kan_leses_endrer_ikke_svaret` |
+| BH3, ECH, VG3 | En logg som ikke kunne leses, og en rad uten vurdering, ga «KI var slått av …», som loggen ikke viser | medium | patch: `UKJENT` med den gamle teksten «Ingen KI-tekst for denne dagen.» |
+| BH6 | Flagget hadde en standardverdi, så en ny kaller fikk grunnen for dagen uten å velge | low | patch: nøkkelordargument uten standard |
+| BH7, BH15, VG2 | At de andre bare sjekkes uten egen rad, var ikke testet, og flagget betydde to ting | low | patch: `andre_har_rader = rad is None and …`, `test_sjekken_av_andre_kjoeres_bare_uten_egen_rad`, `test_en_feil_i_sjekken_av_andre_gir_ingen_grunn` |
+| VG1 | Meldingsrader var ikke testet | low | patch: `test_en_melding_teller_ikke_som_en_aksje` |
+| BH9 | `test_siden_leser_bare` sammenlignet uten rekkefølge | low | patch: `ORDER BY nr` og `total_changes == 0` |
+| BH11 | Import inne i en test | low | patch |
+| BH12 | Testtallet «2091 og 17» var ikke målt | low | patch: tallene over er de målte |
+| BH4, BH5, BH13, BH14 | Teksten for dagen nevner to grunner, overlapper «modellen svarte ikke», og kontrollpunktet regnes som oppfylt | avvist | ordlyden og at kontrollpunktet er oppfylt, er gruppens beslutning kl. 23:57 |
+| BH10 | Tekstene står ordrett i testene | avvist | ordlyden er besluttet, og testene skal låse den |
+| ECH | Siden kan vise «ble ikke laget i hentingen» mens kveldshentingen ennå skriver radene | defer | et vindu på minutter, mens hentingen går. Ny visning av siden etter hentingen viser riktig grunn |
+| ECH | En dag med bare dagstekst eller meldingsrader (10.6 og senere) gir teksten for dagen, selv om KI gikk | defer | kan ikke skje før 10.6, fordi hentingen bare skriver aksjerader. Tas med i 10.6 |
+
