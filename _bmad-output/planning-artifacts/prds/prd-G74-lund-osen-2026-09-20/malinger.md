@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-16T23:11
+updated: 2026-10-16T23:45
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -3622,3 +3622,38 @@ RING, og POL foran GKP.
 
 Målingen endrer ikke universet. Parametrene i signalet er låst og målt på de
 15 (AD-13).
+
+## 34. Prøvekjøringen av prompten versjon 2 (2026-10-16)
+
+**Metode.** Som i §32, med prompten versjon 2 fra grenen
+`10-2c-prompten-versjon-2` (story 10.2, gruppens beslutning kl. 22:33 og ja kl.
+23:27 til å bygge og prøvekjøre den i kveld). Prompten ber modellen forklare
+regelen med «fordi» og ikke bruke «skyldes» eller «indikerer». Kontrollen er
+den samme som i §32. Basen ble kopiert med skallet på main til
+`data/db/ki-proeve-v2.db` før grenen ble laget (regel 22), og bare KI-steget
+ble kjørt mot kopien for børsdagen 16.10, med den ekte klokka, fra et skript
+utenfor repoet. Tiden per kall ble tatt med `time.monotonic()`. Sjekken fra
+svar c gikk først og sa at tjenesten var klar. Ingen kall til EODHD: kvoten
+sto på 20 brukt før og etter. sha256 for `data/db/ose.db` var den samme før og
+etter.
+
+| | §32, versjon 1 | §34, versjon 2 |
+|---|---:|---:|
+| Kjørt | 22:26–22:27 | 23:43–23:44 |
+| Besto kontrollen | 6 | 15 |
+| Stoppet av kontrollen | 9 | 0 |
+| Modellen feilet | 0 | 0 |
+| Median tid per tekst | 0,84 s | 0,77 s |
+| Lengste kall (det første, med innlasting) | 78,65 s | 81,36 s |
+
+Begge kjøringene: `maskinvare` `gpu` for alle 15 og «100% GPU» i `ollama ps`,
+NVIDIA GeForce RTX 4070 Laptop GPU, `gemma4:e4b` med `modell_id`
+`dc35e8d9c606`, og Ollama 0.35.1. Alle 15 radene i §34 har `promptversjon` 2.
+
+**Resultat.** Alle 15 tekstene har ett «fordi»-ledd, og hvert av dem forklarer
+regelen: hvor mange av de tre sjekkene som ga utslag, eller hvilke. Ingen av
+dem gir en årsak utenfor regelen. Det er sjekket fordi kontrollen ikke fanger
+en gjettet årsak etter «fordi» (gjennomgangen av 10.2c). Tre av tekstene ble
+lest mot vurderingen, blant dem EQNR, som ble stoppet på «skyldes» i §32, og
+styrke, retning og de tre sjekkene stemte. Tekstene står bare i kopien og er
+ikke ført her.

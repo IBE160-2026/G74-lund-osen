@@ -26,8 +26,10 @@ GOD_TEKST = ("Kursen ligger over snittet for de siste 50 dagene, men det ble han
              "kursen falt. To av de tre sjekkene ga utslag, i hver sin retning, så retningen er blandet.")
 
 # sha256 av promptteksten for hver versjon (FR-605). Endres teksten, maa
-# PROMPTVERSJON opp og en ny linje inn her.
-AVTRYKK = {"1": "8fa4608965a356110f97963f65ba85bb44c79e913d47b5b911dc06b51af7be72"}
+# PROMPTVERSJON opp og en ny linje inn her. Teksten til versjon 1 finnes bare
+# i historikken, i src/ki_prompt.py paa 77ebf31 (gjennomgangen av 10.2c, ECH, BH9).
+AVTRYKK = {"1": "8fa4608965a356110f97963f65ba85bb44c79e913d47b5b911dc06b51af7be72",
+           "2": "4c697052292bf7069ed7ba0cb7600a8c67574c969fd4fcd184f4b854876df660"}
 
 
 class FalskModell:
@@ -74,6 +76,28 @@ class TestPrompten:
         """Laerdommen fra C-med i malinger.md §19."""
         assert "Fortegnet for interessen følger dagens kursendring, ikke volumet" in lag_prompt(BLANDET)
 
+    def test_regelen_forklares_med_fordi(self):
+        """Versjon 2 (gruppen 16.10 kl. 22:33): i proevekjoeringen stoppet
+        punkt 4 i kontrollen 9 av 15 tekster, paa «skyldes» og «indikerer»
+        (malinger.md §32). Prompten ber om «fordi» i stedet. Ville feilet hvis
+        linja ble tatt ut, eller kom utenfor reglene for teksten."""
+        # Ikke et fast versjonsnummer: en versjon 3 kan beholde linja
+        # (gjennomgangen av 10.2c, BH6, ECH, VG4).
+        assert int(PROMPTVERSJON) >= 2
+        linje = "- Når du forklarer regelen, bruk «fordi». Ikke bruk «skyldes» eller «indikerer»."
+        assert "Regler for teksten:" in REGLER
+        blokk = REGLER.split("Regler for teksten:", 1)[1].split("\n\n", 1)[0]
+        assert linje in blokk.splitlines()
+        assert linje in lag_prompt(BLANDET)
+        assert linje in lag_prompt({**BLANDET, "merke": "Utenfor målingen"})
+
+    def test_avtrykket_for_versjon_1_staar(self):
+        """Radene med promptversjon 1 skal kunne spores til teksten (FR-605).
+        Ville feilet hvis versjon 1 ble ryddet bort fra AVTRYKK (gjennomgangen
+        av 10.2c, VG1)."""
+        assert {"1", "2"} <= AVTRYKK.keys()
+        assert AVTRYKK["1"] == "8fa4608965a356110f97963f65ba85bb44c79e913d47b5b911dc06b51af7be72"
+
     def test_ingen_raad_og_ingen_gjetning(self):
         prompt = lag_prompt(BLANDET)
         assert "Ikke gi råd" in prompt and "Ikke gjett" in prompt
@@ -104,6 +128,12 @@ class TestKontrollen:
         svar = kontroller(GOD_TEKST, BLANDET)
         assert svar.besto, svar.grunner
         assert svar.grunn is None
+
+    def test_en_forklaring_med_fordi_bestaar(self):
+        """Versjon 2 ber om «fordi»: en forklaring av regelen med «fordi»
+        bestaar når sjekkene ga utslag (gjennomgangen av 10.2c, VG3)."""
+        assert kontroller("Retningen er blandet fordi to av de tre sjekkene ga utslag, i hver sin retning.",
+                          BLANDET).besto
 
     def test_regelen_selv_kan_forklares(self):
         """FR-603 punkt 4: «fordi ingen sjekk ga utslag» er lov naar ingen ga det."""
@@ -205,7 +235,7 @@ class TestKontrollen:
         ("kjøp", "3"), ("selg", "3"), ("anbefaler", "3"), ("alternativ for investorer", "3"),
         ("investeringsråd", "3"), ("rådgiver", "3"),
         ("trolig", "4"), ("sannsynligvis", "4"), ("kan tyde på", "4"), ("forventes", "4"),
-        ("antyder", "4"), ("skyldes", "4"), ("kanskje", "4"), ("muligens", "4"), ("spår", "4"),
+        ("antyder", "4"), ("skyldes", "4"), ("indikerer", "4"), ("kanskje", "4"), ("muligens", "4"), ("spår", "4"),
         ("nyheter", "4"), ("kontrakter", "4"), ("kvartalstall", "4"), ("oppkjøp", "4"),
         ("utbytte", "4"), ("børsmelding", "4"), ("renter", "4"), ("oljeprisen", "4"),
     ])
