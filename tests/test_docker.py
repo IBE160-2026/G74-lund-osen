@@ -641,9 +641,12 @@ class TestReadme:
         med et bilde i README-en.
 
         Gruppen 16.10 kl. 21:38: skjermbildet av demoen fra 3.3b, punkt b, er
-        tatt ut igjen, så bare CI-merket står. Regelen står: bilder i
-        README-en kommer bare fra docs/bilder/readme/ og viser aldri den ekte
-        versjonen (svar 4 11.10, regelen 25.09 under story 3.3)."""
+        tatt ut igjen, så testen godtar ingen bilder utenom CI-merket. Regelen
+        står i dokumentene: bilder i README-en kommer bare fra
+        docs/bilder/readme/ og viser aldri den ekte versjonen (svar 4 11.10,
+        regelen 25.09 under story 3.3). Testen sjekker bare at det ikke er
+        noen. Kommer det bilder i «Kom i gang», endres testen i samme PR, med
+        stien og alt-teksten som sier at det er demoen (gjennomgangen, VG1, BH1)."""
         tekst = README.read_text(encoding="utf-8")
         bilder = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", tekst)
         assert all(b.endswith("tester.yml/badge.svg") for b in bilder), bilder
@@ -669,8 +672,9 @@ class TestIngenBilderIDocs:
     def test_ingen_bilder_i_docs_bilder(self):
         """Gruppen 16.10 kl. 21:38: skjermbildet er tatt ut, og ingen
         bildefiler ligger under docs/bilder/, så ingen bilder med ekte data
-        blir liggende. Bilder i README-en kommer bare fra docs/bilder/readme/
-        (svar 4 11.10, spesifikasjonen for 3.4)."""
+        blir liggende. Mappa finnes ikke når den er tom, fordi git ikke sporer
+        tomme mapper, og da er det heller ingen bilder (gjennomgangen, ECH,
+        BH4). Testen sjekker at det ikke er noen, ikke hvor de ligger."""
         mappe = README.parent / "docs" / "bilder"
         # Bare bildefiler: Thumbs.db og .DS_Store fra Utforsker og Finder
         # skal ikke felle testen hos sensor (gjennomgangen av 3.3b, BH4, ECH).
