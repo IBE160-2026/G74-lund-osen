@@ -1736,6 +1736,8 @@ følger aksjene jeg bryr meg om.
 
 *Lagt til 2026-10-16 (gruppens beslutning kl. 11:46, instruksjonen kl. 15:59):* demoen skal være mest mulig lik den ekte versjonen. Der demoen ikke kan gjøre det samme, fordi den ikke henter (FR-411), forklarer en boks hvordan det er i den ekte versjonen, gjerne med et bilde som blir stort ved klikk, trykk eller tastatur, ikke bare når musa holdes over. Bildet kan vise hele siden, for eksempel «Min liste» i den ekte versjonen, men lages fra testdata, aldri med ekte kurser (regelen 25.09 under story 3.3 i `epics.md`). For 2.12 betyr det noen ekstra oppdiktede selskaper i demobasen som kan velges, og at valget, «x av 18» og «Dine egne aksjer» virker likt i begge versjonene. Detaljene avgjøres i planen for 2.12.
 
+*Avgjort 2026-10-16, gruppens beslutning kl. 21:49:* demoen viser alle 10 fargekombinasjonene av de tre sjekkene på siste dag, fra 3 grønne til 3 grå, og en test krever dem. De to aksjene som viser en grunn i stedet for en vurdering (`NYLIG_NOTERT` og `UTEN_KURSER` i `src/demo.py`), blir stående. Det bygges lørdag 17.10 etter PR 1 og PR 2 for hovedindeksen, fordi PR 1 også endrer demobasen.
+
 ### Story 2.13: Kommandoen som måler omsetning
 
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 13).*
