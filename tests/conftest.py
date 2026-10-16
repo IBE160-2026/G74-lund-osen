@@ -274,6 +274,15 @@ def ingen_nettverk(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def ki_av(monkeypatch):
+    """Story 10.2: KI-laget er av i testene, saa main aldri velger Ollama og
+    aldri leser .env for OSE_KI_TJENESTE. En test som proever KI-laget, setter
+    variabelen selv eller gir kjoer en falsk modell."""
+    monkeypatch.setenv("OSE_KI_TJENESTE", "av")
+    monkeypatch.delenv("OSE_KI_OLLAMA_URL", raising=False)
+
+
+@pytest.fixture(autouse=True)
 def stiene_i_tmp_path(monkeypatch, tmp_path):
     """Autouse, story 2.1b: ingen test roerer data/.
 

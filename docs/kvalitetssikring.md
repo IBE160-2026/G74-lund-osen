@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-16T11:55
+updated: 2026-10-16T22:17
 ---
 
 # Kvalitetssikring
@@ -596,6 +596,30 @@ hentingen kan gi kurser, se «Når kan jeg hente?» i
 | 7 | Den ekte versjonen, steg 9: Ctrl+C i vinduet med appen, så `docker compose down`. Stod det «Removed»? | |
 | 8 | `docker ps -a` til slutt: står det containere igjen fra prøven? | |
 | 9 | Ble et spørsmål i «Står du fast?» eller i `docs/hjelp.md` brukt? Hvilket, og hjalp svaret? | |
+
+- **Det som ikke stemte:**
+- **Rettet i** (commit eller story):
+
+### Prøve 3: den lokale modellen
+
+*Lagt til 2026-10-15 (story 10.2, PR F, planen for KI-laget 15.10 kl. 15:43):* «Den lokale modellen (KI-teksten)» under «Mer for den som vil» i README-en. Prøven tas på en maskin med grafikkort fra NVIDIA, etter Prøve 2, med den ekte versjonen og egen EODHD-nøkkel. Ollama trenger ingen nøkkel.
+
+- **Dato:**
+- **Maskin og grafikkort:**
+- **Commit som ble prøvd:**
+
+| # | Kommando eller steg i README-en | Det som skjedde |
+|---|---|---|
+| 1 | `docker compose --profile ki up -d ollama`. Startet Ollama, og hvor lang tid tok det første gang? | |
+| 2 | `docker compose exec ollama ollama pull gemma4:e4b`. Hvor lang tid tok det? | |
+| 3 | `OSE_KI_TJENESTE=lokal` i `.env` | |
+| 4 | Hentingen som i Prøve 2. Sa utskriften hvor mange KI-tekster som besto kontrollen? | |
+| 5 | `docker compose --profile ki down`. Stod det «Removed»? | |
+| 6 | En henting uten Ollama: sa utskriften at Ollama ikke svarer, at ingen rader er skrevet i KI-loggen, og gikk hentingen som før? | |
+| 7 | En henting med Ollama i gang, men uten modellen hentet: sa utskriften at modellen ikke er hentet, og at ingen rader er skrevet? | |
+| 8 | Ollama startet og hentingen kjørt igjen samme kveld etter steg 6: ble KI-tekstene laget? Les `/api/user` før og etter: `apiRequests` skal være uendret | |
+| 9 | Modellen hentet og hentingen kjørt igjen etter steg 7: ble KI-tekstene laget? | |
+| 10 | `OSE_KI_TJENESTE=av` i `.env` til slutt | |
 
 - **Det som ikke stemte:**
 - **Rettet i** (commit eller story):

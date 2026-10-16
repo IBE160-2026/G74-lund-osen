@@ -197,9 +197,11 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-4-2-kilogg-porten-med-minneimplementasjon.md`
   summary: Passerer hentingen midnatt i Oslo mellom modellkallet og `skriv`, gir `skriv` `IkkeInnevaerendeBoersdag` for resten av radene den kvelden.
   evidence: ECH i gjennomgangen 15.10 av 4.2. Porten reiser en egen type for feil dag, så kalleren kan skille den fra en feil i klokka eller kalenderen. Tas i 10.2b (PR F): hentekommandoen må fange den per rad og la hentingen gå videre (NFR-04).
+  resolved: Løst i 10.2b (PR F, `5dd8a00`): `lag_ki_tekster` sjekker børsdagen før hvert kall og fanger `IkkeInnevaerendeBoersdag`, og steget stopper med beskjed uten å endre utgangskoden (`test_midnatt_stopper_steget_med_beskjed`, `test_modellen_kalles_ikke_etter_midnatt`).
 - source_spec: `_bmad-output/implementation-artifacts/spec-4-3-sqlite-adapter-for-kilogg.md`
   summary: `SqliteKILogg.skriv` styrer sin egen transaksjon og avviser kallerens, så en rad i `ki_logg` kan ikke skrives i samme transaksjon som vurderingen den forklarer.
   evidence: BH10 i gjennomgangen 15.10 av 4.3. Vurderingen skrives før modellen kalles (10.2), og FR-602 viser bare en KI-tekst når grunnlaget stemmer med vurderingen. Tas i 10.2b (PR F): om rekkefølgen skal være vurdering, så KI-rad, hver for seg, og hva som skjer når kjøringen stopper mellom dem.
+  resolved: Løst i 10.2b (PR F, `9bc8b3b` og `5dd8a00`): rekkefølgen er vurdering, så KI-rad, hver i sin transaksjon. Stopper kjøringen mellom dem, lager samme kommando radene som mangler, med 0 kall til EODHD når basen har kursene, og før et nytt forsøk ellers (`test_radene_som_mangler_lages_med_null_kall_til_eodhd`, `test_ki_radene_som_mangler_lages_foer_et_nytt_forsoek`).
 - source_spec: `_bmad-output/implementation-artifacts/spec-4-3-sqlite-adapter-for-kilogg.md`
   summary: Emnet for en melding (plan A) har datoen i nøkkelen, så samme melding kan få én rad per dag.
   evidence: BH8 i gjennomgangen 15.10 av 4.3. Story 4.2 sier at hva plan A lagrer, avgjøres når plan A bygges. Plan A er utenfor v1.

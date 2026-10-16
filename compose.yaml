@@ -60,6 +60,11 @@ services:
     # hent --les-inn FIL gir python src/fetch_prices.py --les-inn FIL (3.3).
     entrypoint: ["python", "src/fetch_prices.py"]
     env_file: .env
+    # Story 10.2 (svar 8 kl. 15:53): i compose naar hentingen Ollama paa
+    # tjenestenavnet. Uten Ollama, eller med OSE_KI_TJENESTE=av i .env, gaar
+    # hentingen som foer, og KI-teksten mangler den dagen (NFR-04).
+    environment:
+      OSE_KI_OLLAMA_URL: http://ollama:11434
     volumes:
       - ose-db:/app/data/db
       - ose-raa:/app/data/raa
@@ -105,6 +110,30 @@ services:
     volumes:
       - ose-demo:/app/data/db
 
+  # Den lokale modellen (story 10.2, svar 1 og 8 kl. 15:53): Gemma i Ollama,
+  # med grafikkortet. Et eget valg i profilen ki, saa docker compose up ikke
+  # starter den (beslutningen 05.10 kl. 16:53). Porten publiseres bare paa
+  # 127.0.0.1. Modellen ligger i volumet ose-ki-ollama, aldri i imaget
+  # (AD-9), og hentes foerste gang med ollama pull. Ollama trenger ingen
+  # noekkel, saa tjenesten har ikke .env. Versjonen er den fra malinger.md §19.
+  # Ollama er et ferdig image og skriver i sin egen rot, saa build, read_only
+  # og tmpfs fra de andre tjenestene gjelder ikke her.
+  ollama:
+    image: ollama/ollama:0.35.1
+    init: true
+    profiles: ["ki"]
+    ports:
+      - "127.0.0.1:11434:11434"
+    volumes:
+      - ose-ki-ollama:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
 volumes:
   # Basen kan IKKE slettes og bygges opp igjen: vurdering ligger her og kan
   # ikke lages paa nytt, fordi en omregning gir dagens svar, ikke datidens
@@ -115,3 +144,5 @@ volumes:
   # Bare demobasen (story 3.4). Den kan alltid lages paa nytt, og
   # docker compose up --build demo gjoer det hver gang.
   ose-demo:
+  # Den lokale modellen (story 10.2). Den kan hentes paa nytt med ollama pull.
+  ose-ki-ollama:
