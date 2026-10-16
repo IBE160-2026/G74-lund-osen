@@ -112,6 +112,8 @@ Forslaget fra instruksjonen kl. 22:36, med steget fra svar c, og rettet etter gj
 7. Før resultatet med dato i `malinger.md`: antall som besto, ikke besto og der modellen feilet, maskinvaren, median tid per tekst fra steg 4, modell-ID og Ollama-versjon, men uten tekstene.
 8. Stopp Ollama: `docker compose --profile ki down`.
 
+*Lagt til 2026-10-16:* prøvekjøringen ble tatt fredag 16.10 etter kveldens henting, ikke lørdag 17.10, etter gruppens ja kl. 21:37, så #49 kan flettes før PR 1 og PR 2 for hovedindeksen. Basen endres ikke mer etter hentingen, så kopien er den samme som en kopi lørdag ville vært. Resultatet står i `malinger.md` §32: 6 besto, 9 ble stoppet av regel 4 i kontrollen (gjetning og årsaker), og modellen feilet for 0, på `gpu`, med `gemma4:e4b` (`dc35e8d9c606`), Ollama 0.35.1 og 0,84 s i median per tekst. 0 kall til EODHD, og `data/db/ose.db` ble ikke rørt.
+
 ## Review Triage Log
 
 Gjennomgang 15.10 på diffen `main...9bc8b3b`, med Blind Hunter (BH, 16 funn), Edge Case Hunter (ECH, 13) og Verification Gap (VG, 5). Rettingene står i `5dd8a00` og `48838a7`.
