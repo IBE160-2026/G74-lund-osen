@@ -27,6 +27,7 @@ from pathlib import Path
 
 from boersdag import innevaerende_boersdag, norsk_dato
 from kilogg import AKSJE, Emne, IkkeInnevaerendeBoersdag, KIRad
+from indeksdata import HOVEDINDEKS, Indeks, kontroller_indeksskriving
 from kursdata import AKSJEUNIVERS, Aksje, Kursrad, kontroller_skriving
 from lagring_fil import DATA_KATALOG
 from migrering import MigrasjonsFeil, migrer, siste_versjon, versjon
@@ -230,6 +231,64 @@ class SqliteKurslager:
     def sist_hentet(self, symbol: str) -> datetime | None:
         rad = self._tilkobling.execute(
             "SELECT hentet FROM kursserie WHERE symbol = ?", (symbol,)
+        ).fetchone()
+        return datetime.fromisoformat(rad[0]) if rad else None
+
+    def _rull_tilbake(self) -> None:
+        if self._tilkobling.in_transaction:
+            self._tilkobling.execute("ROLLBACK")
+
+
+class SqliteIndekslager:
+    """Indekslager i SQLite, tabellene indeks og indeksserie fra 0006 (story
+    2.8). Samme kontrakt som MinneIndekslager, og samme transaksjon som
+    SqliteKurslager: radene byttes ut og hentet settes i ett (AD-5). Dager
+    som ikke er boersdager i DEKKEDE_AAR, tas bort i porten foer noe lagres."""
+
+    def __init__(self, tilkobling: sqlite3.Connection, indekser: tuple[Indeks, ...] = (HOVEDINDEKS,)):
+        _krev_siste_versjon(tilkobling)
+        self._tilkobling = tilkobling
+        self._indekser = indekser
+
+    def erstatt_serie(self, symbol: str, rader: list[Kursrad], hentet: datetime) -> None:
+        beholdt, tid = kontroller_indeksskriving(symbol, list(rader), hentet, self._indekser)
+        if self._tilkobling.in_transaction:
+            raise RuntimeError(
+                "Tilkoblingen har en aapen transaksjon. Adapteren styrer "
+                "transaksjonen selv - avslutt kallerens foerst."
+            )
+        try:
+            self._tilkobling.execute("BEGIN")
+            self._tilkobling.execute("DELETE FROM indeks WHERE symbol = ?", (symbol,))
+            self._tilkobling.executemany(
+                "INSERT INTO indeks (symbol, dato, slutt, justert_slutt, volum) VALUES (?, ?, ?, ?, ?)",
+                [(symbol, rad.dato.isoformat(), rad.slutt, rad.justert_slutt, rad.volum) for rad in beholdt],
+            )
+            self._tilkobling.execute(
+                "INSERT INTO indeksserie (symbol, hentet) VALUES (?, ?) "
+                "ON CONFLICT (symbol) DO UPDATE SET hentet = excluded.hentet",
+                (symbol, tid.isoformat()),
+            )
+            self._tilkobling.execute("COMMIT")
+        except sqlite3.IntegrityError as feil:
+            self._rull_tilbake()
+            raise ValueError(f"Serien for {symbol} ble avvist og rullet tilbake: {feil}") from feil
+        except BaseException:
+            self._rull_tilbake()
+            raise
+
+    def serie(self, symbol: str) -> list[Kursrad]:
+        return [
+            Kursrad(dato=date.fromisoformat(dato), slutt=slutt, justert_slutt=justert_slutt, volum=volum)
+            for dato, slutt, justert_slutt, volum in self._tilkobling.execute(
+                "SELECT dato, slutt, justert_slutt, volum FROM indeks WHERE symbol = ? ORDER BY dato",
+                (symbol,),
+            )
+        ]
+
+    def sist_hentet(self, symbol: str) -> datetime | None:
+        rad = self._tilkobling.execute(
+            "SELECT hentet FROM indeksserie WHERE symbol = ?", (symbol,)
         ).fetchone()
         return datetime.fromisoformat(rad[0]) if rad else None
 

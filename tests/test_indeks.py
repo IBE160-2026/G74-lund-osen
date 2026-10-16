@@ -90,3 +90,156 @@ class TestMigrasjonen:
             assert not lager.search(fil.read_text(encoding="utf-8")), fil.name
         filer = [f.name for f in MIGRASJONSKATALOG.glob("*.sql") if lager.search(f.read_text(encoding="utf-8"))]
         assert filer == ["0006_indeks.sql"]
+
+
+# --- Porten (punkt b) ---------------------------------------------------------
+
+from datetime import date, datetime, timedelta, timezone  # noqa: E402
+
+from boersdag import er_boersdag  # noqa: E402
+from indeksdata import (  # noqa: E402
+    HOVEDINDEKS, Indekslager, Indeksleser, MinneIndekslager, bare_boersdager)
+from kursdata import AKSJEUNIVERS, Kursrad  # noqa: E402
+from lagring_sqlite import SqliteIndekslager, SqliteKurslager, aapne_base  # noqa: E402
+
+HENTET = datetime(2026, 10, 16, 20, 10, tzinfo=timezone.utc)
+FREDAG = date(2026, 10, 16)
+LOERDAG = date(2026, 10, 17)
+JULEDAG = date(2026, 12, 25)
+I_FJOR = date(2025, 12, 30)
+# malinger.md §14: datoene indeksen har og aksjene ikke har.
+PARAGRAF_14 = [date(2025, 12, 24), date(2025, 12, 31), date(2026, 4, 2), date(2026, 5, 14), date(2026, 5, 25)]
+
+
+def rad(dag: date, slutt: float = 1500.0) -> Kursrad:
+    return Kursrad(dato=dag, slutt=slutt, justert_slutt=slutt, volum=1000)
+
+
+def boersdager_fram_til(siste: date, antall: int) -> list[date]:
+    dager, dag = [], siste
+    while len(dager) < antall:
+        if er_boersdag(dag):
+            dager.append(dag)
+        dag -= timedelta(days=1)
+    return sorted(dager)
+
+
+@pytest.fixture
+def sqlite_base(tmp_path):
+    tilkobling = aapne_base(tmp_path / "test.db")
+    yield tilkobling
+    tilkobling.close()
+
+
+@pytest.fixture(params=["minne", "sqlite"])
+def lager(request, tmp_path):
+    if request.param == "minne":
+        yield MinneIndekslager()
+    else:
+        tilkobling = aapne_base(tmp_path / "lager.db")
+        yield SqliteIndekslager(tilkobling)
+        tilkobling.close()
+
+
+class TestPorten:
+    def test_lagrene_oppfyller_porten(self, lager):
+        assert isinstance(lager, Indekslager) and isinstance(lager, Indeksleser)
+
+    def test_serien_byttes_ut_ikke_skjoetes_paa(self, lager):
+        """AD-5. Ville feilet hvis serien ble skjøtt på: da sto de tre gamle
+        dagene igjen ved siden av de to nye."""
+        gamle = boersdager_fram_til(date(2026, 10, 9), 3)
+        nye = boersdager_fram_til(FREDAG, 2)
+        lager.erstatt_serie("OSEBX", [rad(d) for d in gamle], HENTET)
+        senere = HENTET + timedelta(days=1)
+        lager.erstatt_serie("OSEBX", [rad(d, 1600.0) for d in nye], senere)
+        assert [r.dato for r in lager.serie("OSEBX")] == nye
+        assert {r.slutt for r in lager.serie("OSEBX")} == {1600.0}
+        assert lager.sist_hentet("OSEBX") == senere
+
+    def test_en_loerdag_og_en_helligdag_lagres_ikke(self, lager):
+        """Bare børsdager i DEKKEDE_AAR. Ville feilet hvis lørdagen eller
+        juledagen ble lagret."""
+        assert not er_boersdag(LOERDAG) and not er_boersdag(JULEDAG)
+        lager.erstatt_serie("OSEBX", [rad(FREDAG), rad(LOERDAG), rad(JULEDAG)], HENTET)
+        assert [r.dato for r in lager.serie("OSEBX")] == [FREDAG]
+
+    def test_en_dag_i_et_aar_utenfor_kalenderen_hoppes_over_uten_feil(self, lager):
+        """Serien fra EODHD går ett år bakover. Ville feilet hvis dagen i 2025
+        ga UtenforKalenderen, eller ble lagret."""
+        lager.erstatt_serie("OSEBX", [rad(I_FJOR), rad(FREDAG)], HENTET)
+        assert [r.dato for r in lager.serie("OSEBX")] == [FREDAG]
+
+    def test_dagene_i_paragraf_14_faller_bort(self, lager):
+        """De fem datoene i §14 som aksjene ikke har."""
+        lager.erstatt_serie("OSEBX", [rad(d) for d in PARAGRAF_14] + [rad(FREDAG)], HENTET)
+        assert [r.dato for r in lager.serie("OSEBX")] == [FREDAG]
+
+    def test_en_serie_uten_boersdager_avvises_og_endrer_ingenting(self, lager):
+        lager.erstatt_serie("OSEBX", [rad(FREDAG)], HENTET)
+        with pytest.raises(ValueError):
+            lager.erstatt_serie("OSEBX", [rad(LOERDAG), rad(I_FJOR)], HENTET + timedelta(days=1))
+        assert [r.dato for r in lager.serie("OSEBX")] == [FREDAG]
+        assert lager.sist_hentet("OSEBX") == HENTET
+
+    def test_en_aksje_avvises(self, lager):
+        """Ville feilet hvis porten tok imot en aksje som indeks."""
+        with pytest.raises(ValueError):
+            lager.erstatt_serie("EQNR", [rad(FREDAG)], HENTET)
+        assert lager.serie("EQNR") == [] and lager.sist_hentet("EQNR") is None
+
+    def test_to_rader_samme_dag_avvises_og_endrer_ingenting(self, lager):
+        lager.erstatt_serie("OSEBX", [rad(FREDAG)], HENTET)
+        with pytest.raises(ValueError):
+            lager.erstatt_serie("OSEBX", [rad(date(2026, 10, 15)), rad(date(2026, 10, 15))], HENTET + timedelta(days=1))
+        assert [r.dato for r in lager.serie("OSEBX")] == [FREDAG]
+        assert lager.sist_hentet("OSEBX") == HENTET
+
+    def test_tid_uten_sone_avvises(self, lager):
+        with pytest.raises(ValueError):
+            lager.erstatt_serie("OSEBX", [rad(FREDAG)], datetime(2026, 10, 16, 22, 0))
+
+    def test_bare_boersdager_har_ikke_noe_fast_aar(self, monkeypatch):
+        """Året leses fra DEKKEDE_AAR når serien skrives. Ville feilet hvis
+        koden hadde 2026 fast: med 2025 tatt bort fra kalenderens år er
+        fredagen 16.10.2026 heller ikke med."""
+        import boersdag
+        monkeypatch.setattr(boersdag, "DEKKEDE_AAR", frozenset({2025}))
+        assert bare_boersdager([rad(FREDAG)]) == []
+        # Ingen årstall som tall i koden (datoer i docstringene teller ikke).
+        import ast
+        tre = ast.parse((SRC / "indeksdata.py").read_text(encoding="utf-8"))
+        assert not [n.value for n in ast.walk(tre)
+                    if isinstance(n, ast.Constant) and isinstance(n.value, int) and 1900 <= n.value <= 2100]
+
+
+class TestIndeksenErIkkeEnAksje:
+    def test_ikke_i_aksjeuniverset(self):
+        """Ville feilet hvis indeksen ble lagt i AKSJEUNIVERS for å slippe en
+        ny tabell. Da teller den som en aksje i signalet og i «x av N»."""
+        assert HOVEDINDEKS.symbol not in {a.symbol for a in AKSJEUNIVERS}
+        assert HOVEDINDEKS.ticker not in {a.ticker for a in AKSJEUNIVERS}
+
+    def test_aldri_i_kurs_kursserie_aksje_eller_vurdering(self, sqlite_base):
+        """Ville feilet hvis SqliteIndekslager skrev til kurs."""
+        SqliteIndekslager(sqlite_base).erstatt_serie("OSEBX", [rad(FREDAG)], HENTET)
+        for tabell in ("kurs", "kursserie", "vurdering"):
+            assert sqlite_base.execute(f"SELECT count(*) FROM {tabell}").fetchone()[0] == 0, tabell
+        assert sqlite_base.execute("SELECT count(*) FROM aksje WHERE symbol = 'OSEBX'").fetchone()[0] == 0
+        assert sqlite_base.execute("SELECT symbol, dato FROM indeks").fetchall() == [("OSEBX", "2026-10-16")]
+
+    def test_kurslageret_avviser_indeksen(self, sqlite_base):
+        """Porten til kursene og triggerne fra 0003 stopper OSEBX i kurs."""
+        with pytest.raises(ValueError):
+            SqliteKurslager(sqlite_base).erstatt_serie("OSEBX", [rad(FREDAG)], HENTET)
+        with pytest.raises(sqlite3.IntegrityError):
+            sqlite_base.execute("INSERT INTO kurs VALUES ('OSEBX', '2026-10-16', 1.0, 1.0, 1)")
+
+    def test_adapteren_avviser_en_base_paa_versjon_5(self, tmp_path):
+        tilkobling = sqlite3.connect(tmp_path / "v5.db", isolation_level=None)
+        try:
+            migrer(tilkobling, katalog_til(tmp_path, 5))
+            with pytest.raises(RuntimeError):
+                SqliteIndekslager(tilkobling)
+        finally:
+            tilkobling.close()
