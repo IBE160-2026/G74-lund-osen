@@ -93,3 +93,9 @@ Gjennomgang 16.10 på diffen `main...5072d78`, uten bildet, med Blind Hunter (BH
 | BH15 | «Status» er ett langt avsnitt | avvist | formen er besluttet kl. 23:41 («Status» i vanlige ord), og testen holder den |
 | BH8 (del) | Skriptet er ikke committet | avvist | fremgangsmåten står under «Bildet», og avtrykket fanger at bildet må tas på nytt |
 
+## Verifikasjonen
+
+**Mutantene**, én om gangen med `-x` og bare `tests/test_docker.py`, med kopi før og sha256 mot HEAD etter hver, ble fanget alle, på `47ea051`: S1 et bilde til i README-en, S2 helgen borte fra steg 8, S3 helgen borte fra raden «Klar», S4 demoen før kl. 22 borte, S5 et fast testtall og S5b et tosifret testtall under «Tester», S6 «Neste:» i feil rekkefølge, S7 bildet borte, S8 alt-teksten uten demoen, S9 `uv sync` borte, S10 Mac ikke nevnt, S11 KI-delen ikke flettet, S12 grunnen uten git borte, S13 bildet flyttet mellom beskrivelsen og «Til faglærer», S14 teksten under bildet borte, S15 malen for oversikten endret uten nytt bilde, S16 8.10b borte fra «Neste:», S17 grunnen for `::1` borte, S18 den gamle blokken tilbake i «Tester», S19 «Du trenger» krever Python igjen, og S20 dager børsen er stengt borte fra steg 8. S1–S13 ble også kjørt og fanget på `5072d78`, før rettingene.
+
+**Testene:** `uv run pytest -q` én gang på hele settet, etter gjennomgangene: 2140 bestått og 17 hoppet over på `47ea051`.
+
