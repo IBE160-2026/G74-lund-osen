@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-10-16T11:50
+updated: 2026-10-16T11:55
 ---
 
 # Vurderingsmatrise for del 1
@@ -35,3 +35,11 @@ Tallene er talt 16.10 kl. 00:27: 46 flettede pull requests (`gh pr list --state 
 | **Kodekvalitet og arkitektur** (10 %) | Briefen: regler sorterer, KI forklarer, og appen virker med reglene alene. PRD-en: KI-laget kan ikke ta ned hovedflyten (NFR-04) | [Arkitekturen](../_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md). Porter og adaptere, for eksempel [`kilogg.py`](../src/kilogg.py), [`kilogg_minne.py`](../src/kilogg_minne.py) og [`lagring_sqlite.py`](../src/lagring_sqlite.py), med `tests/test_kilogg.py::TestPorten::test_bare_skriv_og_lesemetoder`. Nummererte migrasjoner i [`src/migrasjoner/`](../src/migrasjoner/). Webserveren henter ikke og importerer ingen modell: `tests/test_konsumentene.py::test_webserveren_importerer_ikke_hentingen` og `tests/test_ki_visning.py::test_webserveren_importerer_ingen_modell`. Utsatte funn står i [`deferred-work.md`](../_bmad-output/implementation-artifacts/deferred-work.md) | oppfylt | Gjennomgangen med tre linser og mutantene fortsetter for hver story (§3 og §5 i kvalitetssikringen) |
 | **README og kjørbarhet** (10 %) | Briefen, «Kjørbar for andre»: README-oppskriften fullføres gratis på en ren maskin, uten gruppens nøkler, med demoen uten konto og den ekte versjonen med egen gratiskonto hos EODHD | [README-en](../README.md) med «Kom i gang» og [hjelpen](hjelp.md). [`Dockerfile`](../Dockerfile), [`compose.yaml`](../compose.yaml) og [`.env.example`](../.env.example). `tests/test_docker.py::TestImaget::test_ingen_noekkel_i_imaget`, `tests/test_docker.py::TestReadme::test_kommandoene_er_de_samme_som_i_koden_og_compose` og `tests/test_readme.py::test_hver_lenke_i_readme_peker_paa_noe_som_finnes` | delvis | README-prøven, Prøve 1 og 2 i §9 i [kvalitetssikringen](kvalitetssikring.md), er ikke tatt. Den tas senest én uke før innleveringen, og story 3.4 står i review til den er tatt. Avsnittet «Status» i README-en nevner ikke KI-teksten på aksjesiden, som er flettet |
 | **Ryddighet i repoet** (5 %) | Briefen og README-en: nøkler, rådata, basen og den private mappa ligger ikke i repoet | [`.gitignore`](../.gitignore) holder ute `.env`, `data/`, `local-tests/` og `_privat/`. [`.env.example`](../.env.example) uten nøkkel. «Dokumentene» og «Mappestruktur» i [README-en](../README.md), og regel 10 og 19 i [`CLAUDE.md`](../CLAUDE.md). [`test_ryddighet.py`](../tests/test_ryddighet.py): `test_gitignore_holder_ute_noekler_data_og_private_mapper`, `test_gitignore_slipper_inn_env_example_og_koden`, `test_tolkningen_stemmer_med_git` og `test_ingenting_av_det_er_sporet_i_git` | oppfylt | Holdes ved like med regel 19: README-en rettes i samme commit som det den nevner |
+
+*Lagt til 2026-10-16 kl. 11:55:* matrisen og testen for ryddigheten ([`test_ryddighet.py`](../tests/test_ryddighet.py)) ble flettet i `81d8f37`, PR #52. Etterpå, på main:
+- `6c90d3a`: under story 3.3 i [epics.md](../_bmad-output/planning-artifacts/epics.md) står at «Demoen står først» ble snudd 11.10, og 3-3 er done.
+- `2996ead`: under story 2.1c står at delen av kontrollpunkt 2 om 10.1 og FR-603 ble trukket 05.10.
+- `26c64d7`: epic-2, epic-3, epic-4, epic-8 og epic-10 er in-progress i [sprintstatusen](../_bmad-output/implementation-artifacts/sprint-status.yaml).
+- `074325b`: under tabellen i §10 i [kvalitetssikringen](kvalitetssikring.md) står testene som nå finnes for kontrollen, loggen og visningen. Tiltaket i raden «Kvalitetssikring og testing» om raden «KI-forklaringen» er ferdig med det. Én ukes logget drift og story 10.4 står igjen.
+
+Statusen i tabellen er ikke endret. README-prøven (story 3.4) og avsnittet «Status» i README-en står igjen.
