@@ -640,23 +640,19 @@ class TestReadme:
         """Story 3.3: skjermbilder med ekte data publiserer dataene. Ville feilet
         med et bilde i README-en.
 
-        3.3b, punkt b (instruksjonen 16.10 kl. 15:59): CI-merket og det ene
-        skjermbildet av demoen, og ingen flere. Ville feilet med et bilde til."""
+        Gruppen 16.10 kl. 21:38: skjermbildet av demoen fra 3.3b, punkt b, er
+        tatt ut igjen, så bare CI-merket står. Regelen står: bilder i
+        README-en kommer bare fra docs/bilder/readme/ og viser aldri den ekte
+        versjonen (svar 4 11.10, regelen 25.09 under story 3.3)."""
         tekst = README.read_text(encoding="utf-8")
         bilder = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", tekst)
-        assert [b for b in bilder if not b.endswith("tester.yml/badge.svg")] == [SKJERMBILDET], bilder
+        assert all(b.endswith("tester.yml/badge.svg") for b in bilder), bilder
         # Ogsaa HTML-bilder og bilder med referanse (BH7).
         assert "<img" not in tekst.lower()
         assert not re.search(r"!\[[^\]]*\]\[", tekst)
 
 
-SKJERMBILDET = "docs/bilder/readme/oversikten-demo.png"
 BILDEFILER = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"}
-# Malene og demodataene bak bildet. Endres de, tas bildet på nytt
-# (spesifikasjonen 3.3b, «Bildet»), og avtrykket under oppdateres.
-MALENE_BAK_BILDET = ["src/templates/index.html", "src/templates/_ramme.html", "src/templates/_brikker.html",
-                     "src/templates/_bransjer.html", "src/templates/_hjelp.html", "src/demo.py"]
-AVTRYKK_BAK_BILDET = "9c8716524ade00abd779810cfda90cd2cd7cdf5f55757a3572c05bedccbf6488"
 
 
 def _python_krav() -> str:
@@ -669,59 +665,18 @@ def _python_krav() -> str:
     return treff.group(1)
 
 
-class TestSkjermbildet:
-    """3.3b, punkt b: skjermbildet av oversikten i demoen, øverst, 1280 px
-    bredt, med en alt-tekst som sier at det er demoen. Regelen fra 25.09:
-    bildet viser bare demoen."""
-
-    def _bildet(self) -> tuple[str, str]:
-        tekst = README.read_text(encoding="utf-8")
-        treff = [(a, s) for a, s in re.findall(r"!\[([^\]]*)\]\(([^)]+)\)", tekst) if s == SKJERMBILDET]
-        assert len(treff) == 1, treff
-        return treff[0]
-
-    def test_fila_finnes_og_er_1280_x_1000_px(self):
-        """Gjennomgangen (VG2, BH7): også høyden i spesifikasjonen."""
-        data = (README.parent / SKJERMBILDET).read_bytes()
-        assert data[:8] == b"\x89PNG\r\n\x1a\n"
-        assert int.from_bytes(data[16:20], "big") == 1280
-        assert int.from_bytes(data[20:24], "big") == 1000
-
-    def test_teksten_under_bildet_sier_at_det_er_demoen(self):
-        """Gjennomgangen (BH6): alt-teksten vises ikke når bildet lastes."""
-        tekst = README.read_text(encoding="utf-8")
-        etter = tekst.split(SKJERMBILDET + ")\n", 1)[1].split("\n", 1)[0]
-        assert etter == "*Oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»).*"
-
-    def test_bildet_tas_paa_nytt_naar_oversikten_endres(self):
-        """Gjennomgangen (VG1, BH8, ECH): endres malene eller demodataene bak
-        bildet, feiler testen til bildet er tatt på nytt og avtrykket er
-        oppdatert, i samme commit."""
-        import hashlib
-
-        avtrykk = hashlib.sha256(b"".join((README.parent / m).read_bytes().replace(b"\r\n", b"\n")
-                                          for m in MALENE_BAK_BILDET)).hexdigest()
-        assert avtrykk == AVTRYKK_BAK_BILDET, (
-            "Oversikten er endret: ta skjermbildet på nytt (spesifikasjonen 3.3b, «Bildet») og oppdater AVTRYKK_BAK_BILDET")
-
-    def test_alt_teksten_sier_at_det_er_demoen(self):
-        alt, _ = self._bildet()
-        assert "demoen" in alt and "Eksempeltall" in alt and "ikke data fra Oslo Børs" in alt
-
-    def test_bildet_staar_under_til_faglaerer_og_over_kom_i_gang(self):
-        tekst = README.read_text(encoding="utf-8")
-        assert tekst.index("Til faglærer:") < tekst.index(SKJERMBILDET) < tekst.index("\n## Kom i gang\n")
-
-    def test_ingen_andre_bilder_i_docs_bilder(self):
-        """Hvert bilde i mappa skal være det i README-en, så ingen bilder med
-        ekte data blir liggende. Bilder i README-en bare fra
-        docs/bilder/readme/ (svar 4 11.10, spesifikasjonen for 3.4)."""
+class TestIngenBilderIDocs:
+    def test_ingen_bilder_i_docs_bilder(self):
+        """Gruppen 16.10 kl. 21:38: skjermbildet er tatt ut, og ingen
+        bildefiler ligger under docs/bilder/, så ingen bilder med ekte data
+        blir liggende. Bilder i README-en kommer bare fra docs/bilder/readme/
+        (svar 4 11.10, spesifikasjonen for 3.4)."""
         mappe = README.parent / "docs" / "bilder"
         # Bare bildefiler: Thumbs.db og .DS_Store fra Utforsker og Finder
-        # skal ikke felle testen hos sensor (gjennomgangen, BH4, ECH).
+        # skal ikke felle testen hos sensor (gjennomgangen av 3.3b, BH4, ECH).
         filer = sorted(p.relative_to(README.parent).as_posix() for p in mappe.rglob("*")
                        if p.is_file() and p.suffix.lower() in BILDEFILER)
-        assert filer == [SKJERMBILDET]
+        assert filer == []
 
 
 def _proevetabellen(proeve: str | None = None) -> str:
@@ -1040,11 +995,10 @@ class TestReadmeForNybegynnere:
                 < tekst.index("\n## Status\n") < tekst.index("\n## Tester\n"))
         topp = tekst.split("\n## Kom i gang\n", 1)[0]
         avsnitt = [a.strip() for a in topp.split("\n\n") if a.strip()]
-        # 3.3b, punkt b: skjermbildet står rett under «Til faglærer», så
-        # ingenting kommer mellom beskrivelsen og «Til faglærer».
-        assert avsnitt[-1].startswith("![") and SKJERMBILDET in avsnitt[-1], avsnitt[-1]
-        assert avsnitt[-2].startswith("Til faglærer:"), avsnitt[-2]
-        assert avsnitt[-3].startswith("OSE Signal viser"), avsnitt[-3]
+        # Gruppen 16.10 kl. 21:38: skjermbildet under «Til faglærer» er tatt
+        # ut, så «Til faglærer» er igjen siste avsnitt før «Kom i gang».
+        assert avsnitt[-1].startswith("Til faglærer:"), avsnitt[-1]
+        assert avsnitt[-2].startswith("OSE Signal viser"), avsnitt[-2]
         assert "\n## " not in topp
 
     def test_status_uten_storynumre_og_uten_kommando(self):
