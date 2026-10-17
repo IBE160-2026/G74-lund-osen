@@ -43,6 +43,7 @@ MARKEDSOVERSIKT = "src/markedsoversikt.py"
 AKSJEDETALJ = "src/aksjedetalj.py"
 APP = "src/app.py"
 INDEX_MAL = "src/templates/index.html"
+HOVEDINDEKS = "src/hovedindeks.py"
 AKSJE_MAL = "src/templates/aksje.html"
 
 # FR-701: tre sjekker, ingen fjerde.
@@ -137,6 +138,17 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             ((INDEX_MAL, '<a href="/aksje/{{ rad.aksje.symbol }}">'),
              (AKSJE_MAL, '<p class="maalt">Målt mot'),
              (AKSJE_MAL, 'class="kurslinje"')),
+        ),
+        # Story 2.9 (FR-104): delen over tabellen.
+        "hovedindeksen": Hjelpetekst(
+            "Hovedindeksen:",
+            "verdien siste børsdag indeksen har, og endringen i prosent fra "
+            "børsdagen før. «Gikk bedre» teller aksjene med kurs samme dag "
+            "som hadde større endring enn indeksen, slik tallene vises, og "
+            "lik teller ikke.",
+            ((PRD, "#### FR-104 — Hovedindeksen i markedsoversikten"),
+             (PRD, "«Bedre» avgjøres på endringen slik den vises, og lik er ikke bedre."),
+             (HOVEDINDEKS, "def er_bedre(")),
         ),
         "sluttkurs": Hjelpetekst(
             "Sluttkurs:",

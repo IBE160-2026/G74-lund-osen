@@ -105,6 +105,26 @@
     .symbolfelt .pil { font-size: 12px; font-weight: 700; }
     .symbolfelt svg { width: 18px; height: 18px; }
 
+    /* Story 2.9: hovedindeksen i et kort mellom innledningen og tabellen
+       (utdraget §11). Linjene brytes på smal skjerm. */
+    section.hovedindeks { background: var(--kort); border: 1px solid var(--strek); border-radius: 16px;
+                          padding: 18px 22px; margin: 0 0 40px; }
+    section.hovedindeks h2 { font-family: "Newsreader", Georgia, serif; font-size: 23px; font-weight: 600;
+                             color: var(--blekk); margin: 0 0 0.5rem; display: flex; flex-wrap: wrap;
+                             align-items: center; gap: 0.5rem; }
+    section.hovedindeks .indekssymbol { font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 13.5px;
+                                        font-weight: 600; color: var(--tekst); border: 1px solid var(--strek-2);
+                                        border-radius: 8px; padding: 2px 8px; }
+    section.hovedindeks .indekstall { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 1rem;
+                                      margin: 0 0 0.4rem; font-variant-numeric: tabular-nums; }
+    section.hovedindeks .indeksverdi { font-size: 28px; font-weight: 600; color: var(--blekk); }
+    section.hovedindeks .indeksendring { font-size: 17px; font-weight: 600; }
+    section.hovedindeks .indeksendring.opp { color: var(--opp); }
+    section.hovedindeks .indeksendring.ned { color: var(--ned); }
+    section.hovedindeks .indeksdato, section.hovedindeks .uten, section.hovedindeks .mangler-endring
+      { color: var(--dempet); font-size: 14px; }
+    section.hovedindeks p { margin: 0.25rem 0; color: var(--tekst); }
+
     /* Tabellen i et kort med svart topp. Boksen ruller sidelengs på smal
        skjerm, så siden ikke gjør det (avvik 8). position: relative holder
        også den skjulte teksten i cellene inne i boksen. */
@@ -239,6 +259,32 @@
       </section>
     </div>
 
+    {#- Story 2.9 (FR-104): hovedindeksen mellom innledningen og tabellen
+        (utdraget §11). Teksten bærer, og fargen ved endringen følger tallet
+        slik det vises, som i tabellen. Ingen piler: de er bare for retning
+        (FR-103). Datoen står ved verdien når indeksen står på en annen dag
+        enn tabellen. #}
+    <section class="hovedindeks" aria-labelledby="hovedindeks-tittel">
+      <h2 id="hovedindeks-tittel">Hovedindeksen{% if hovedindeks %} <span class="indekssymbol">{{ hovedindeks.symbol }}</span>{% endif %} {{ hjelpeknapp("hjelp-hovedindeks", "Hjelp: hovedindeksen") }}</h2>
+      {% if hovedindeks %}
+        <p class="indekstall"><span class="indeksverdi">{{ hovedindeks.verdi|tall('kurs') }}</span>
+          {%- if hovedindeks.dato != dato %} <span class="indeksdato">{{ hovedindeks.dato|dato }}</span>{% endif %}
+          {%- if hovedindeks.endring is not none %}
+            {%- set vist = hovedindeks.endring|avrundet('endring') %}
+            <span class="indeksendring{{ ' opp' if vist > 0 else ' ned' if vist < 0 else '' }}">{{ hovedindeks.endring|tall('endring') }}</span>
+          {%- else %} <span class="mangler-endring">Endringen vises ikke: indeksen mangler børsdagen før.</span>{% endif %}</p>
+        {% set s = hovedindeks.sammenligning %}
+        {% if s %}
+          <p class="bedre"><strong>{{ s.bedre }} av {{ s.med }}</strong> gikk bedre enn indeksen.</p>
+          {% if s.uten %}<p class="uten">Ikke med, uten kurs {{ hovedindeks.dato|dato }}: {{ s.uten|med_og }}.</p>{% endif %}
+        {% endif %}
+      {% elif indeks_feilet %}
+        <p>Hovedindeksen kunne ikke leses. Tabellen under vises som vanlig.</p>
+      {% else %}
+        <p>Hovedindeksen er ikke hentet ennå.</p>
+      {% endif %}
+    </section>
+
     {#- Story 8.15, svar 5: linja står bare når en kolonne er valgt. #}
     {% if sortering %}<p class="sortert">Sortert på {{ sortering.navn }}, {{ ordens_ord(sortering.kolonne, sortering.orden) }}, innenfor hver del. <a href="/">Standard rekkefølge</a></p>{% endif %}
     <div class="tabellboks" role="region" aria-label="Aksjene" tabindex="0">
@@ -323,6 +369,7 @@
   {#- Story 8.0c: hvert «?» staar ved det det forklarer, og vinduet har bare
       tekstene for det. Sjekkene og grensene forklares paa aksjesiden. #}
   {% if rader %}
+    {{ hjelpevindu("hjelp-hovedindeks", "Hovedindeksen", [("", ["hovedindeksen"])]) }}
     {{ hjelpevindu("hjelp-selskap", "Selskap", [("", ["selskap"])]) }}
     {{ hjelpevindu("hjelp-sluttkurs", "Sluttkurs", [("", ["sluttkurs"])]) }}
     {{ hjelpevindu("hjelp-endring", "Endring", [("", ["endring", "utbyttejustert"])]) }}

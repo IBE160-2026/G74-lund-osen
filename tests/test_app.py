@@ -2353,3 +2353,145 @@ class TestStory80dAksjesiden:
         en_dag = html.split('<div class="noekkeltall endring">', 1)[1].split("</div>", 1)[0]
         assert '<span class="verdi ">–</span>' in en_dag
         assert "fra " not in en_dag
+
+
+# Story 2.9 (FR-104): hovedindeksen over tabellen. Tallene er testet i
+# tests/test_hovedindeks.py, og her siden.
+
+FREDAG_09_10 = date(2026, 10, 9)
+TORSDAG_08_10 = date(2026, 10, 8)
+
+
+def _boersdager_til(siste: date, antall: int) -> list[date]:
+    from boersdag import er_boersdag
+
+    dager, dag = [], siste
+    while len(dager) < antall:
+        if er_boersdag(dag):
+            dager.append(dag)
+        dag -= timedelta(days=1)
+    return sorted(dager)
+
+
+def _aksjeserie(siste: date, endring: float) -> list[Kursrad]:
+    """60 boersdager med kurs 100, og siste dag endringen i prosent."""
+    dager = _boersdager_til(siste, 61)
+    kurser = [100.0] * 60 + [round(100.0 * (1 + endring / 100), 4)]
+    return [Kursrad(dato=d, slutt=k, justert_slutt=k, volum=1000) for d, k in zip(dager, kurser)]
+
+
+def _legg_inn_indeks(rader: list[Kursrad], symbol: str = "OSEBX") -> None:
+    from lagring_sqlite import SqliteIndekslager
+
+    tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+    try:
+        SqliteIndekslager(tilkobling).erstatt_serie(symbol, rader, datetime.fromisoformat(HENTET))
+    finally:
+        tilkobling.close()
+
+
+def _indeks(datoer_og_verdier) -> list[Kursrad]:
+    return [Kursrad(dato=d, slutt=v, justert_slutt=v, volum=0) for d, v in datoer_og_verdier]
+
+
+def _delen(html: str) -> str:
+    return html.split('<section class="hovedindeks"', 1)[1].split("</section>", 1)[0]
+
+
+class TestHovedindeksenPaaForsiden:
+    """Kontrollen under story 2.9, paa siden. Mutantene staar i spesifikasjonen 2.9."""
+
+    def _to_aksjer(self, siste=FREDAG_09_10):
+        skriv_serie("EQNR", _aksjeserie(siste, 2.0), datetime.fromisoformat(HENTET))
+        skriv_serie("DNB", _aksjeserie(siste, -1.0), datetime.fromisoformat(HENTET))
+
+    def test_verdien_endringen_og_x_av_n_med_en_kortere_liste(self, klient):
+        """To av 15 har kurs fredag, og de andre navngis. Ville feilet med N
+        som et fast 15."""
+        self._to_aksjer()
+        _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, 1005.0)]))
+        html = klient.get("/").data.decode("utf-8")
+        delen = _delen(html)
+        tekst = _synlig(delen)
+        assert "Hovedindeksen OSEBX" in tekst
+        assert "1\u00a0005,00" in tekst and "+0,50\u00a0%" in tekst
+        assert "1 av 2 gikk bedre enn indeksen." in tekst
+        assert "Ikke med, uten kurs 09.10:" in tekst and "Kongsberg Gruppen" in tekst
+        assert "Equinor" not in tekst.split("Ikke med", 1)[1]
+        # Samme dag som tabellen, saa ingen dato ved verdien.
+        assert 'class="indeksdato"' not in delen
+
+    def test_delen_staar_mellom_innledningen_og_tabellen(self, klient):
+        self._to_aksjer()
+        _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, 1005.0)]))
+        html = klient.get("/").data.decode("utf-8")
+        assert html.index('class="slik-leser"') < html.index('class="hovedindeks"') < html.index('class="tabellboks"')
+
+    def test_tabellen_har_fortsatt_fem_kolonner(self, klient):
+        """FR-101: indeksen er ingen kolonne."""
+        self._to_aksjer()
+        _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, 1005.0)]))
+        html = klient.get("/").data.decode("utf-8")
+        thead = html.split("<thead>", 1)[1].split("</thead>", 1)[0]
+        assert thead.count("<th") == 5
+
+    def test_en_indeks_en_dag_bak_tabellen_har_datoen_ved_verdien(self, klient):
+        """Ville feilet uten datoen, eller med indeksen sammenlignet paa
+        tabellens dag."""
+        self._to_aksjer()
+        _legg_inn_indeks(_indeks([(date(2026, 10, 7), 1000.0), (TORSDAG_08_10, 990.0)]))
+        delen = _delen(klient.get("/").data.decode("utf-8"))
+        assert '<span class="indeksdato">08.10</span>' in delen
+        # Aksjene har kurs 100 torsdag og onsdag, altsaa 0,00 %, og indeksen
+        # falt 1 %: begge gikk bedre.
+        assert "2 av 2 gikk bedre enn indeksen." in _synlig(delen)
+
+    def test_et_hull_foer_indeksens_dato_gir_ingen_endring(self, klient):
+        """Torsdag mangler i indeksen. Ville feilet med endringen mot forrige rad."""
+        self._to_aksjer()
+        _legg_inn_indeks(_indeks([(date(2026, 10, 7), 1000.0), (FREDAG_09_10, 1005.0)]))
+        tekst = _synlig(_delen(klient.get("/").data.decode("utf-8")))
+        assert "Endringen vises ikke: indeksen mangler børsdagen før." in tekst
+        assert "gikk bedre" not in tekst and "%" not in tekst
+
+    def test_uten_indeks_sier_siden_det_og_tabellen_vises(self, klient):
+        """NFR-03. Ville feilet hvis siden feilet eller skjulte tabellen."""
+        self._to_aksjer()
+        svar = klient.get("/")
+        html = svar.data.decode("utf-8")
+        assert svar.status_code == 200
+        assert "Hovedindeksen er ikke hentet ennå." in _synlig(_delen(html))
+        assert "Equinor" in html.split('class="tabellboks"', 1)[1]
+
+    def test_en_indeks_som_ikke_kan_leses_stopper_ikke_siden(self, klient, monkeypatch):
+        import sqlite3
+
+        self._to_aksjer()
+        _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, 1005.0)]))
+
+        def feiler(_self):
+            raise sqlite3.OperationalError("database is locked")
+
+        monkeypatch.setattr(lagring_sqlite.SqliteIndekslager, "symboler", feiler)
+        svar = klient.get("/")
+        html = svar.data.decode("utf-8")
+        assert svar.status_code == 200
+        assert "Hovedindeksen kunne ikke leses." in _synlig(_delen(html))
+        assert "Equinor" in html.split('class="tabellboks"', 1)[1]
+
+    def test_fargen_foelger_endringen_slik_den_vises_og_ingen_piler(self, klient):
+        """-0,004 % vises som 0,00 % uten farge, som i tabellen (story 8.0).
+        Pilene er bare for retning (FR-103)."""
+        self._to_aksjer()
+        _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, 999.96)]))
+        delen = _delen(klient.get("/").data.decode("utf-8"))
+        assert '<span class="indeksendring">0,00\u00a0%</span>' in delen
+        assert not any(pil in delen for pil in "↑↓↔")
+
+    def test_delen_bryter_linjene_paa_smal_skjerm(self, klient):
+        """390 px: linjene i delen brytes, og ingen fast bredde."""
+        self._to_aksjer()
+        _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, 1005.0)]))
+        stil = _stil(klient.get("/").data.decode("utf-8"))
+        assert "flex-wrap: wrap" in _regel(stil, "section.hovedindeks .indekstall")
+        assert "width" not in _regel(stil, "section.hovedindeks ")

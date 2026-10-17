@@ -42,8 +42,10 @@ from kilogg import Emne, UgyldigKIRad
 from kursdata import Kursleser
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER
 from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster
+from hovedindeks import Hovedindeksvisning, bygg_hovedindeks
 from lagring_sqlite import (
     DEMOMERKE,
+    SqliteIndekslager,
     SqliteKILogg,
     SqliteKurslager,
     SqliteOversiktsleser,
@@ -71,7 +73,7 @@ from markedsoversikt import (
 from migrering import MigrasjonsFeil
 from oversiktsdata import Oversiktsleser
 from signalberegning import BLANDET, STANDARD
-from tallformat import dato, med_og, tall, ukedag
+from tallformat import avrundet, dato, med_og, tall, ukedag
 
 # Kommandoen den tomme siden ber brukeren kjoere. Den staar ogsaa i README, og
 # en test krever at de to er like (story 3.3). Kommer kommandoen for Docker i
@@ -129,6 +131,8 @@ app.jinja_env.filters["norsk_tid"] = lambda tid: norsk_tid(tid, idag().year)
 app.jinja_env.filters["dato"] = lambda dag: dato(dag, idag().year)
 # Regel 21: tallene formateres ett sted, ikke med "%.2f" i malene (story 8.0).
 app.jinja_env.filters["tall"] = tall
+# Story 2.9: tallet slik det vises, til fargen ved endringen for indeksen.
+app.jinja_env.filters["avrundet"] = avrundet
 # Story 8.0e: ukedagen i overskriften og navnene i linja om «3 av 3».
 app.jinja_env.filters["ukedag"] = ukedag
 app.jinja_env.filters["med_og"] = med_og
@@ -342,6 +346,27 @@ def _basen_feilet_under_lesingen(feil):
     return _basen_kan_ikke_aapnes()
 
 
+def _hovedindeks(kurslager: Kursleser, poster: list) -> tuple[Hovedindeksvisning | None, bool]:
+    """Hovedindeksen over tabellen - story 2.9, FR-104.
+
+    Indeksen er den basen sist hentet (SqliteIndekslager.symboler): OSEBX i
+    den ekte basen og DEMIX i demobasen. Aksjene er de i aksje i basen, i
+    samme rekkefoelge, med seriene fra kurslageret. Gir (visningen, feilet).
+    Visningen er None naar basen ikke har en indeks. Kan indeksen ikke
+    leses, er feilet True, og tabellen vises likevel (NFR-03). Ingen
+    nettkall (AD-10).
+    """
+    try:
+        lager = SqliteIndekslager(g.tilkobling)
+        symboler = lager.symboler()
+        if not symboler:
+            return None, False
+        aksjer = [(post.aksje.navn, kurslager.serie(post.aksje.symbol)) for post in poster]
+        return bygg_hovedindeks(symboler[0], lager.serie(symboler[0]), aksjer), False
+    except BASEFEIL:
+        return None, True
+
+
 @app.route("/")
 def markedsoversikt():
     if g.get("basefeil"):
@@ -373,10 +398,13 @@ def markedsoversikt():
     # rader, som står i FR-102 (svar 7).
     sortering = Sortering.fra_adressen(request.args.get("sorter"), request.args.get("orden"))
     skilte_seg_ut, oevrige = (sorter(del_, sortering) for del_ in del_i_to(rader))
+    hovedindeks, indeks_feilet = _hovedindeks(leser, poster)
 
     return render_template(
         "index.html",
         rader=rader,
+        hovedindeks=hovedindeks,
+        indeks_feilet=indeks_feilet,
         dato=sidens_dato(rader),
         hentet=sidens_tidsstempel(rader),
         eget=eldre_enn_nyeste(rader),
