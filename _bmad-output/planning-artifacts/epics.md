@@ -1619,6 +1619,8 @@ tall kan sammenlignes med børsen som helhet.
 
 *Lagt til 2026-10-17 kl. 12:30:* PR 2 (2.8b), kallet for `OSEBX.OL` i hentingen med 16 kall, kode 3 når bare hovedindeksen feiler, og sjekken av basen som leser en base en versjon bak, er flettet i `bcac2b5`, PR #57. CI var grønn på head-en `b4a0721` (kjøring 39025050482). Storyen er done.
 
+*Lagt til 2026-10-17:* gruppen godtok kl. 12:44 at et nytt forsøk gir kode 3 når indeksen feilet i kveldens hovedhenting (rettingen etter gjennomgangen, `a15f234`), som går ut over beslutningen kl. 11:58.
+
 **Avhenger av:** 2.3 og 4.3 (`ki_logg` er `0005`). **Én økt:** ja.
 
 ### Story 2.9: Hovedindeksen i markedsoversikten
