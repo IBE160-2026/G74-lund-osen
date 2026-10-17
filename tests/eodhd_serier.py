@@ -12,8 +12,15 @@ proevde i story 2.0. Ingen tall her er kursdata fra en kilde.
 
 
 def rad(dato: str = "2026-09-21", close=100.0, adjusted_close=98.0, volume=1000) -> dict:
-    return {"date": dato, "open": 99.0, "high": 101.0, "low": 97.0,
-            "close": close, "adjusted_close": adjusted_close, "volume": volume}
+    return {
+        "date": dato,
+        "open": 99.0,
+        "high": 101.0,
+        "low": 97.0,
+        "close": close,
+        "adjusted_close": adjusted_close,
+        "volume": volume,
+    }
 
 
 def _uten(felt: str) -> dict:

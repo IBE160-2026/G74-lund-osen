@@ -31,9 +31,9 @@ from vurderingsdata import Grunn, Vurdering
 MA_VINDU = 50
 
 # Laast 21.09.2026 mot 199 handelsdager, se malinger.md §7.4.
-NOYTRALSONE = 0.02   # +/-1 % gir bare 5,6 % styrke 0, +/-4 % gir 25,7 %
-VOLUMFAKTOR = 1.5    # 1,25x utloeser nesten alltid, 2,0x toemmer terskel 3
-TERSKEL = 2          # gir 4,6 av 15 per dag; terskel 3 gir 1,1 og 87 tomme dager
+NOYTRALSONE = 0.02  # +/-1 % gir bare 5,6 % styrke 0, +/-4 % gir 25,7 %
+VOLUMFAKTOR = 1.5  # 1,25x utloeser nesten alltid, 2,0x toemmer terskel 3
+TERSKEL = 2  # gir 4,6 av 15 per dag; terskel 3 gir 1,1 og 87 tomme dager
 
 # Maalt 22.09.2026 mot 2985 aksjedager til og med 21.09, se malinger.md §9. Alt
 # mellom 15 og 30 oppfoerer seg tilnaermet likt; under 15 blir valget ustabilt.
@@ -312,9 +312,7 @@ def beregn_signal(rader: list[Kursrad], p: Parametre = STANDARD) -> Signal:
     """
     nodvendig = _nodvendige_dager(p)
     if len(rader) < nodvendig:
-        raise ValueError(
-            f"Trenger {nodvendig} dager for å regne signal, fikk {len(rader)}"
-        )
+        raise ValueError(f"Trenger {nodvendig} dager for å regne signal, fikk {len(rader)}")
 
     kurser = _justerte_kurser(rader)
     volumer = _volumer(rader)

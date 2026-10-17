@@ -30,8 +30,7 @@ def skriv_migrasjon(katalog, nummer: int, navn: str, sql: str):
 def skjema(tilkobling) -> list[tuple]:
     """Alt som finnes i basen, uten versjonstabellen."""
     return tilkobling.execute(
-        "SELECT type, name, sql FROM sqlite_master "
-        "WHERE name != 'skjema_versjon' ORDER BY type, name"
+        "SELECT type, name, sql FROM sqlite_master WHERE name != 'skjema_versjon' ORDER BY type, name"
     ).fetchall()
 
 
@@ -208,9 +207,7 @@ class TestFeilMidtveis:
 
     def test_en_retting_av_fila_kan_kjoeres_etterpaa(self, base, katalog):
         """Tilbakerullingen er hele poenget: neste kjoering starter rent."""
-        sti = skriv_migrasjon(
-            katalog, 1, "a", "CREATE TABLE a (x INTEGER);\nDETTE ER IKKE SQL;"
-        )
+        sti = skriv_migrasjon(katalog, 1, "a", "CREATE TABLE a (x INTEGER);\nDETTE ER IKKE SQL;")
         with pytest.raises(MigrasjonsFeil):
             migrer(base, katalog)
 
@@ -306,13 +303,10 @@ class TestAnvendteFiler:
         """e: en base fra foer 1.5b oppgraderes ikke stille."""
         skriv_migrasjon(katalog, 1, "a", "CREATE TABLE a (x INTEGER);")
         base.execute(
-            "CREATE TABLE skjema_versjon ("
-            "versjon INTEGER PRIMARY KEY, fil TEXT NOT NULL, anvendt TEXT NOT NULL)"
+            "CREATE TABLE skjema_versjon (versjon INTEGER PRIMARY KEY, fil TEXT NOT NULL, anvendt TEXT NOT NULL)"
         )
         base.execute("CREATE TABLE a (x INTEGER)")
-        base.execute(
-            "INSERT INTO skjema_versjon VALUES (1, '0001_a.sql', '2026-09-23T00:00:00+00:00')"
-        )
+        base.execute("INSERT INTO skjema_versjon VALUES (1, '0001_a.sql', '2026-09-23T00:00:00+00:00')")
         base.commit()
 
         with pytest.raises(MigrasjonsFeil, match="laget foer 1.5b"):
@@ -330,8 +324,7 @@ class TestTransaksjonskontrollIFila:
             katalog,
             1,
             "commit",
-            "CREATE TABLE foer (x INTEGER);\nCOMMIT;\n"
-            "CREATE TABLE etter (y INTEGER);\nDETTE ER IKKE SQL;",
+            "CREATE TABLE foer (x INTEGER);\nCOMMIT;\nCREATE TABLE etter (y INTEGER);\nDETTE ER IKKE SQL;",
         )
 
         with pytest.raises(MigrasjonsFeil, match="begynner med COMMIT"):
@@ -340,9 +333,7 @@ class TestTransaksjonskontrollIFila:
         assert alt_i_basen(base) == 0
         assert not base.in_transaction
 
-    @pytest.mark.parametrize(
-        "ord_", ["BEGIN", "COMMIT", "END", "ROLLBACK", "SAVEPOINT s", "RELEASE s"]
-    )
+    @pytest.mark.parametrize("ord_", ["BEGIN", "COMMIT", "END", "ROLLBACK", "SAVEPOINT s", "RELEASE s"])
     def test_alle_seks_transaksjonsordene_avvises(self, base, katalog, ord_):
         """Lista staar her som tekst, ikke som migrering.TRANSAKSJONSORD, saa
         et ord som faller ut av settet, faar testen til aa feile."""
@@ -374,8 +365,7 @@ class TestTransaksjonskontrollIFila:
             katalog,
             1,
             "kommentar",
-            "CREATE TABLE foer (x INTEGER);\n-- en kommentar\n/* og en til */ COMMIT;\n"
-            "CREATE TABLE etter (y INTEGER);",
+            "CREATE TABLE foer (x INTEGER);\n-- en kommentar\n/* og en til */ COMMIT;\nCREATE TABLE etter (y INTEGER);",
         )
 
         with pytest.raises(MigrasjonsFeil, match="begynner med COMMIT"):
@@ -413,9 +403,7 @@ class TestTransaksjonskontrollIFila:
         assert migrer(base, katalog) == 1
         assert "t_logg" in tabeller(base)
 
-    def test_ekstra_sikring_stopper_fila_naar_forhaandssjekken_ikke_gjoer_det(
-        self, base, katalog, monkeypatch
-    ):
+    def test_ekstra_sikring_stopper_fila_naar_forhaandssjekken_ikke_gjoer_det(self, base, katalog, monkeypatch):
         """Sjekken av in_transaction etter hver setning, fra storyen, proeves
         alene: forhaandssjekken byttes ut med en som slipper alt gjennom."""
         monkeypatch.setattr(migrering, "_forhaandssjekk", lambda setninger, sti: None)
@@ -580,9 +568,7 @@ class TestToMigratorerOverlapper:
         assert utfall == {"foerste": 1, "andre": 1}
         kontroll = sqlite3.connect(sti)
         try:
-            assert kontroll.execute(
-                "SELECT versjon, fil FROM skjema_versjon"
-            ).fetchall() == [(1, "0001_a.sql")]
+            assert kontroll.execute("SELECT versjon, fil FROM skjema_versjon").fetchall() == [(1, "0001_a.sql")]
         finally:
             kontroll.close()
 
@@ -686,18 +672,14 @@ MAALINGENE = ("trend_avvik", "dagens_endring", "standardavvik", "volumforhold")
 # kolonnen eller tabellen. Alle tre er godtatt, som i test_aksje.py. Uten
 # hjelpetabellen ville ADD COLUMN feilet med en annen CHECK, og da ville
 # meldingen ikke nevnt kontroll_0004.
-KONTROLLFEIL_0004 = (
-    r"0004_maalinger\.sql.*CHECK constraint failed.*(vurderinger_uten_grunn|kontroll_0004)"
-)
+KONTROLLFEIL_0004 = r"0004_maalinger\.sql.*CHECK constraint failed.*(vurderinger_uten_grunn|kontroll_0004)"
 
 VURDERING_UTEN_GRUNN = (
     "INSERT INTO vurdering (symbol, dato, styrke, retning, trend, bevegelse, "
     "interesse, slutt, justert_slutt) "
     "VALUES ('EQNR', '2026-09-23', 1, 'Positiv', 1, 0, 0, 300.0, 290.0)"
 )
-VURDERING_MED_GRUNN = (
-    "INSERT INTO vurdering (symbol, dato, grunn) VALUES ('DNB', '2026-09-23', 'symbol_feilet')"
-)
+VURDERING_MED_GRUNN = "INSERT INTO vurdering (symbol, dato, grunn) VALUES ('DNB', '2026-09-23', 'symbol_feilet')"
 
 
 def base_paa_versjon_3(tmp_path) -> sqlite3.Connection:
@@ -737,9 +719,7 @@ class TestMaalingene0004:
             assert tilkobling.execute(
                 "SELECT symbol, dato, grunn, " + ", ".join(MAALINGENE) + " FROM vurdering"
             ).fetchall() == [("DNB", "2026-09-23", "symbol_feilet", None, None, None, None)]
-            assert tilkobling.execute(
-                "SELECT * FROM vurdering"
-            ).fetchall() == [rad + (None,) * 4 for rad in foer]
+            assert tilkobling.execute("SELECT * FROM vurdering").fetchall() == [rad + (None,) * 4 for rad in foer]
             assert "kontroll_0004" not in tabeller(tilkobling)
         finally:
             tilkobling.close()
@@ -759,9 +739,7 @@ class TestMaalingene0004:
                 migrer(tilkobling, MIGRASJONSKATALOG)
 
             assert versjon(tilkobling) == 3
-            assert tilkobling.execute(
-                "SELECT * FROM vurdering ORDER BY symbol"
-            ).fetchall() == foer
+            assert tilkobling.execute("SELECT * FROM vurdering ORDER BY symbol").fetchall() == foer
             assert kolonner(tilkobling, "vurdering") == kolonner_foer
             assert "kontroll_0004" not in tabeller(tilkobling)
         finally:
@@ -787,10 +765,7 @@ class TestMaalingene0004:
             with pytest.raises(sqlite3.IntegrityError, match="ukjent aksje"):
                 ny.execute(gyldig, ("EQNR.OL",))
             with pytest.raises(sqlite3.IntegrityError, match="ukjent grunn"):
-                ny.execute(
-                    "INSERT INTO vurdering (symbol, dato, grunn) "
-                    "VALUES ('EQNR', '2026-09-23', 'noe_annet')"
-                )
+                ny.execute("INSERT INTO vurdering (symbol, dato, grunn) VALUES ('EQNR', '2026-09-23', 'noe_annet')")
             ny.execute(gyldig, ("EQNR",))
             assert ny.execute("SELECT count(*) FROM vurdering").fetchone() == (1,)
         finally:

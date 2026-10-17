@@ -23,8 +23,7 @@ def test_hver_lenke_i_readme_peker_paa_noe_som_finnes():
     mangler = [
         maal
         for maal in LENKE.findall(tekst)
-        if not maal.startswith(UTENFOR)
-        and not (ROT / maal.split("#", 1)[0]).exists()
+        if not maal.startswith(UTENFOR) and not (ROT / maal.split("#", 1)[0]).exists()
     ]
 
     assert not mangler, f"Lenker i README.md som ikke finnes: {mangler}"

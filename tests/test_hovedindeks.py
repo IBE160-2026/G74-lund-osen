@@ -45,8 +45,7 @@ class TestEndringen:
         """Raden for torsdag mangler. Ville feilet med endringen mot forrige
         rad (mutant H2): da var den regnet mot onsdag."""
         assert indeksendring([rad(ONSDAG, 1000.0), rad(FREDAG, 1010.0)]) is None
-        visning = bygg_hovedindeks("OSEBX", [rad(ONSDAG, 1000.0), rad(FREDAG, 1010.0)],
-                                   [("A", med_endring(5.0))])
+        visning = bygg_hovedindeks("OSEBX", [rad(ONSDAG, 1000.0), rad(FREDAG, 1010.0)], [("A", med_endring(5.0))])
         assert visning.endring is None and visning.sammenligning is None
         assert visning.verdi == 1010.0 and visning.dato == FREDAG
 
@@ -70,8 +69,11 @@ class TestSammenligningen:
     def test_n_er_aksjene_med_kurs_og_en_uten_navngis(self):
         """En kortere liste enn 15, og Gamma har ikke kurs for fredag. Ville
         feilet med N som et fast 15 (mutant H1)."""
-        aksjer = [("Alfa", med_endring(2.0)), ("Beta", med_endring(-1.0)),
-                  ("Gamma", [rad(ONSDAG, 50.0), rad(TORSDAG, 51.0)])]
+        aksjer = [
+            ("Alfa", med_endring(2.0)),
+            ("Beta", med_endring(-1.0)),
+            ("Gamma", [rad(ONSDAG, 50.0), rad(TORSDAG, 51.0)]),
+        ]
         s = sammenlign(FREDAG, 0.5, aksjer)
         assert (s.bedre, s.med, s.uten) == (1, 2, ("Gamma",))
 
@@ -158,10 +160,31 @@ class TestAvrundingenErDenSomVises:
     """Gjennomgangen, BH9 og BH10: «bedre» og fargen bruker avrundet, og
     teksten tall. De to maa gi samme tall, ogsaa paa halvveien og rundt null."""
 
-    @pytest.mark.parametrize("verdi", [
-        1.005, -1.005, 1.015, 2.675, -2.675, 0.004, -0.004, 0.005, -0.005, 0.0049, -0.0049,
-        0.0, -0.0, 12.345, -12.345, 0.125, -0.125, 99.995, 1e-9, -1e-9,
-    ])
+    @pytest.mark.parametrize(
+        "verdi",
+        [
+            1.005,
+            -1.005,
+            1.015,
+            2.675,
+            -2.675,
+            0.004,
+            -0.004,
+            0.005,
+            -0.005,
+            0.0049,
+            -0.0049,
+            0.0,
+            -0.0,
+            12.345,
+            -12.345,
+            0.125,
+            -0.125,
+            99.995,
+            1e-9,
+            -1e-9,
+        ],
+    )
     def test_tall_og_avrundet_gir_samme_tall(self, verdi):
         assert tall(verdi, "endring") == tall(avrundet(verdi, "endring"), "endring")
 

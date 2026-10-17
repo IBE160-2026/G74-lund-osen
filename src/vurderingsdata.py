@@ -35,9 +35,9 @@ class Grunn(StrEnum):
     her og en INSERT INTO grunn i en ny migrasjon.
     """
 
-    SYMBOL_FEILET = "symbol_feilet"            # AD-15
+    SYMBOL_FEILET = "symbol_feilet"  # AD-15
     KURS_IKKE_FRA_DAGEN = "kurs_ikke_fra_dagen"  # FR-402, punkt 23
-    SIGNAL_IKKE_REGNET = "signal_ikke_regnet"    # FR-204
+    SIGNAL_IKKE_REGNET = "signal_ikke_regnet"  # FR-204
 
 
 class UgyldigVurdering(ValueError):
@@ -122,16 +122,11 @@ class Vurdering:
             raise UgyldigVurdering(f"styrke maa vaere et heltall, fikk {self.styrke!r}")
         sum_sjekker = sum(abs(verdi) for verdi in sjekker)
         if self.styrke != sum_sjekker:
-            raise UgyldigVurdering(
-                f"styrke {self.styrke} stemmer ikke med sjekkene, som gir {sum_sjekker}"
-            )
+            raise UgyldigVurdering(f"styrke {self.styrke} stemmer ikke med sjekkene, som gir {sum_sjekker}")
         if self.retning not in RETNINGER:
             raise UgyldigVurdering(f"retning maa vaere en av {RETNINGER}, fikk {self.retning!r}")
         if self.retning != _retning(sjekker):
-            raise UgyldigVurdering(
-                f"retning {self.retning!r} stemmer ikke med sjekkene, som gir "
-                f"{_retning(sjekker)!r}"
-            )
+            raise UgyldigVurdering(f"retning {self.retning!r} stemmer ikke med sjekkene, som gir {_retning(sjekker)!r}")
         for navn in ("slutt", "justert_slutt"):
             verdi = getattr(self, navn)
             if isinstance(verdi, bool) or not isinstance(verdi, (int, float)):
@@ -144,28 +139,21 @@ class Vurdering:
             except OverflowError:
                 kurs = math.inf
             if not math.isfinite(kurs) or kurs <= 0:
-                raise UgyldigVurdering(
-                    f"{navn} maa vaere et endelig tall over null, fikk {verdi!r}"
-                )
+                raise UgyldigVurdering(f"{navn} maa vaere et endelig tall over null, fikk {verdi!r}")
             object.__setattr__(self, navn, kurs)
         for navn in ("trend_avvik", "dagens_endring", "standardavvik"):
             object.__setattr__(self, navn, _endelig(navn, getattr(self, navn)))
         if self.standardavvik < 0:
-            raise UgyldigVurdering(
-                f"standardavvik kan ikke vaere negativt, fikk {self.standardavvik!r}"
-            )
+            raise UgyldigVurdering(f"standardavvik kan ikke vaere negativt, fikk {self.standardavvik!r}")
         if self.volumforhold is None:
             if self.interesse != 0:
                 raise UgyldigVurdering(
-                    "volumforhold kan mangle bare naar interesse er 0, "
-                    f"interesse er {self.interesse}"
+                    f"volumforhold kan mangle bare naar interesse er 0, interesse er {self.interesse}"
                 )
         else:
             forhold = _endelig("volumforhold", self.volumforhold)
             if forhold < 0:
-                raise UgyldigVurdering(
-                    f"volumforhold kan ikke vaere negativt, fikk {self.volumforhold!r}"
-                )
+                raise UgyldigVurdering(f"volumforhold kan ikke vaere negativt, fikk {self.volumforhold!r}")
             object.__setattr__(self, "volumforhold", forhold)
 
 

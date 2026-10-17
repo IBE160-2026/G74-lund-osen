@@ -13,7 +13,14 @@ from zoneinfo import ZoneInfo
 import pytest
 
 from kilogg import (
-    AKSJE, DAG, MELDING, Emne, IkkeInnevaerendeBoersdag, KILogg, KIRad, UgyldigKIRad,
+    AKSJE,
+    DAG,
+    MELDING,
+    Emne,
+    IkkeInnevaerendeBoersdag,
+    KILogg,
+    KIRad,
+    UgyldigKIRad,
 )
 from kilogg_minne import MinneKILogg
 from lagring_sqlite import SqliteKILogg, aapne_base
@@ -79,9 +86,15 @@ class TestRaden:
     @pytest.mark.parametrize("felt", ["promptversjon", "modell", "tjeneste", "regelen", "grunnlag"])
     def test_feltene_er_paakrevd(self, felt):
         argumenter = dict(
-            emne=Emne.aksje("EQNR", TORSDAG), grunnlag={}, regelen="Ingen sjekk ga utslag.",
-            tekst=None, besto=False, grunn="modellen feilet", promptversjon="1",
-            tjeneste="lokal", modell="gemma4:e4b",
+            emne=Emne.aksje("EQNR", TORSDAG),
+            grunnlag={},
+            regelen="Ingen sjekk ga utslag.",
+            tekst=None,
+            besto=False,
+            grunn="modellen feilet",
+            promptversjon="1",
+            tjeneste="lokal",
+            modell="gemma4:e4b",
         )
         del argumenter[felt]
         with pytest.raises(TypeError):
@@ -92,25 +105,49 @@ class TestRaden:
         Ollama-versjonen (FR-604, FR-605)."""
         rad = _rad()
         assert (rad.tjeneste, rad.modell_id, rad.seed, rad.temperatur, rad.maskinvare, rad.ollama_versjon) == (
-            "lokal", "dc35e8d9c606", 42, 0.0, "gpu", "0.35.1")
+            "lokal",
+            "dc35e8d9c606",
+            42,
+            0.0,
+            "gpu",
+            "0.35.1",
+        )
         assert type(rad.temperatur) is float
         tom = _rad(tjeneste="gemini", modell_id=None, seed=None, temperatur=None, maskinvare=None, ollama_versjon=None)
         assert tom.maskinvare is None
 
-    @pytest.mark.parametrize("felt, verdi", [
-        ("tjeneste", "av"), ("tjeneste", "chatgpt"), ("maskinvare", "tpu"), ("seed", True),
-        ("seed", 1.5), ("seed", 2**63), ("seed", -(2**63) - 1), ("temperatur", float("nan")),
-        ("temperatur", -0.1), ("temperatur", "0"), ("temperatur", 10**400), ("modell_id", ""),
-        ("ollama_versjon", ""), ("regelen", None), ("regelen", ""), ("regelen", "  "),
-    ])
+    @pytest.mark.parametrize(
+        "felt, verdi",
+        [
+            ("tjeneste", "av"),
+            ("tjeneste", "chatgpt"),
+            ("maskinvare", "tpu"),
+            ("seed", True),
+            ("seed", 1.5),
+            ("seed", 2**63),
+            ("seed", -(2**63) - 1),
+            ("temperatur", float("nan")),
+            ("temperatur", -0.1),
+            ("temperatur", "0"),
+            ("temperatur", 10**400),
+            ("modell_id", ""),
+            ("ollama_versjon", ""),
+            ("regelen", None),
+            ("regelen", ""),
+            ("regelen", "  "),
+        ],
+    )
     def test_ugyldige_verdier(self, felt, verdi):
         with pytest.raises(UgyldigKIRad):
             _rad(**{felt: verdi})
 
-    @pytest.mark.parametrize("endret", [
-        dict(maskinvare="gpu", ollama_versjon=None),
-        dict(maskinvare=None, ollama_versjon="0.35.1"),
-    ])
+    @pytest.mark.parametrize(
+        "endret",
+        [
+            dict(maskinvare="gpu", ollama_versjon=None),
+            dict(maskinvare=None, ollama_versjon="0.35.1"),
+        ],
+    )
     def test_maskinvaren_og_ollama_bare_for_den_lokale(self, endret):
         """Gjennomgangen (BH8): en tjeneste paa nettet har ikke dem (FR-605)."""
         with pytest.raises(UgyldigKIRad):
@@ -127,13 +164,16 @@ class TestRaden:
         assert rad.tekst and rad.grunn
         assert not rad.modellen_feilet
 
-    @pytest.mark.parametrize("endret", [
-        dict(besto=False, grunn=None),
-        dict(besto=True, grunn="feil tall"),
-        dict(besto=True, tekst=None),
-        dict(besto=1),
-        dict(tekst=""),
-    ])
+    @pytest.mark.parametrize(
+        "endret",
+        [
+            dict(besto=False, grunn=None),
+            dict(besto=True, grunn="feil tall"),
+            dict(besto=True, tekst=None),
+            dict(besto=1),
+            dict(tekst=""),
+        ],
+    )
     def test_besto_tekst_og_grunn_hoerer_sammen(self, endret):
         with pytest.raises(UgyldigKIRad):
             _rad(**endret)
@@ -154,10 +194,18 @@ class TestRaden:
         rad = _rad(grunnlag={"b": [1, {"c": None}], "a": "Ø"})
         assert json.loads(rad.grunnlag_som_json()) == {"a": "Ø", "b": [1, {"c": None}]}
 
-    @pytest.mark.parametrize("grunnlag", [
-        {"x": float("nan")}, {"x": object()}, {1: "tall som noekkel"}, ["ikke", "mapping"],
-        {"x": {1: "tall som noekkel inni"}}, {"x": (1, 2)}, {"x": {"y": float("inf")}},
-    ])
+    @pytest.mark.parametrize(
+        "grunnlag",
+        [
+            {"x": float("nan")},
+            {"x": object()},
+            {1: "tall som noekkel"},
+            ["ikke", "mapping"],
+            {"x": {1: "tall som noekkel inni"}},
+            {"x": (1, 2)},
+            {"x": {"y": float("inf")}},
+        ],
+    )
     def test_grunnlaget_maa_kunne_skrives_som_json(self, grunnlag):
         with pytest.raises(UgyldigKIRad):
             _rad(grunnlag=grunnlag)
@@ -183,36 +231,56 @@ class TestEmnet:
         assert Emne.melding("m-1", TORSDAG) == Emne(MELDING, TORSDAG, melding_id="m-1")
         assert Emne.dagen(TORSDAG) == Emne(DAG, TORSDAG)
 
-    @pytest.mark.parametrize("slag, symbol, melding_id", [
-        (AKSJE, "EQNR", "m-1"),
-        (MELDING, "EQNR", "m-1"),
-        (DAG, "EQNR", None),
-        (DAG, None, "m-1"),
-    ])
+    @pytest.mark.parametrize(
+        "slag, symbol, melding_id",
+        [
+            (AKSJE, "EQNR", "m-1"),
+            (MELDING, "EQNR", "m-1"),
+            (DAG, "EQNR", None),
+            (DAG, None, "m-1"),
+        ],
+    )
     def test_begge_emnene_avvises(self, slag, symbol, melding_id):
         """En rad med begge, eller med et emne slaget ikke har, avvises (4.2)."""
         with pytest.raises(UgyldigKIRad):
             Emne(slag, TORSDAG, symbol=symbol, melding_id=melding_id)
 
-    @pytest.mark.parametrize("slag, symbol, melding_id", [
-        (AKSJE, None, None), (AKSJE, "", None), (MELDING, None, None), (MELDING, None, " "),
-    ])
+    @pytest.mark.parametrize(
+        "slag, symbol, melding_id",
+        [
+            (AKSJE, None, None),
+            (AKSJE, "", None),
+            (MELDING, None, None),
+            (MELDING, None, " "),
+        ],
+    )
     def test_ingen_av_dem_avvises_for_aksje_og_melding(self, slag, symbol, melding_id):
         with pytest.raises(UgyldigKIRad):
             Emne(slag, TORSDAG, symbol=symbol, melding_id=melding_id)
 
-    @pytest.mark.parametrize("emne", [
-        lambda: Emne.aksje("eqnr", TORSDAG), lambda: Emne.aksje("EQNR ", TORSDAG),
-        lambda: Emne.aksje(" EQNR", TORSDAG), lambda: Emne.melding("m-1 ", TORSDAG),
-    ])
+    @pytest.mark.parametrize(
+        "emne",
+        [
+            lambda: Emne.aksje("eqnr", TORSDAG),
+            lambda: Emne.aksje("EQNR ", TORSDAG),
+            lambda: Emne.aksje(" EQNR", TORSDAG),
+            lambda: Emne.melding("m-1 ", TORSDAG),
+        ],
+    )
     def test_samme_noekkel_kan_ikke_skrives_paa_to_maater(self, emne):
         """Gjennomgangen (BH1): ellers kunne samme aksje faatt to rader."""
         with pytest.raises(UgyldigKIRad):
             emne()
 
-    @pytest.mark.parametrize("slag, dato", [
-        ("aksjer", TORSDAG), ("", TORSDAG), (AKSJE, datetime(2026, 10, 15, 12)), (AKSJE, "2026-10-15"),
-    ])
+    @pytest.mark.parametrize(
+        "slag, dato",
+        [
+            ("aksjer", TORSDAG),
+            ("", TORSDAG),
+            (AKSJE, datetime(2026, 10, 15, 12)),
+            (AKSJE, "2026-10-15"),
+        ],
+    )
     def test_ukjent_slag_og_dato_som_ikke_er_date(self, slag, dato):
         with pytest.raises(UgyldigKIRad):
             Emne(slag, dato, symbol="EQNR")
@@ -340,8 +408,7 @@ class TestPorten:
         """Plan A og plan B i samme logg (story 4.2, AD-3)."""
         klokke = Klokke(TORSDAG)
         logg = logg_lager(klokke)
-        torsdag = [_rad(Emne.aksje("EQNR", TORSDAG)), _rad(Emne.melding("m-1", TORSDAG)),
-                   _rad(Emne.dagen(TORSDAG))]
+        torsdag = [_rad(Emne.aksje("EQNR", TORSDAG)), _rad(Emne.melding("m-1", TORSDAG)), _rad(Emne.dagen(TORSDAG))]
         for rad in torsdag:
             assert logg.skriv(rad)
         klokke.naa = _klokka(FREDAG)

@@ -244,9 +244,17 @@ class TestVurderingenIDetaljen:
     """Story 2.2b, FR-706, FR-204: sjekkene og maalingene kommer fra raden."""
 
     LAGRET = Vurdering(
-        styrke=3, retning="Blandet", trend=1, bevegelse=-1, interesse=-1,
-        slutt=101.0, justert_slutt=101.0, trend_avvik=0.031,
-        dagens_endring=-0.035, standardavvik=0.011, volumforhold=4.95,
+        styrke=3,
+        retning="Blandet",
+        trend=1,
+        bevegelse=-1,
+        interesse=-1,
+        slutt=101.0,
+        justert_slutt=101.0,
+        trend_avvik=0.031,
+        dagens_endring=-0.035,
+        standardavvik=0.011,
+        volumforhold=4.95,
     )
 
     def test_sjekkene_og_maalingene_fra_raden_ikke_fra_serien(self):
@@ -256,7 +264,9 @@ class TestVurderingenIDetaljen:
         d = detalj(serie([100.0] * 6), innhold=self.LAGRET)
 
         assert [(s.navn, s.verdi) for s in d.sjekker] == [
-            ("Trend", 1), ("Bevegelse", -1), ("Interesse", -1),
+            ("Trend", 1),
+            ("Bevegelse", -1),
+            ("Interesse", -1),
         ]
         maalinger = [s.maaling for s in d.sjekker]
         assert maalinger[0] == f"+3,1{NB}% mot MA5"
@@ -357,8 +367,12 @@ class TestSkalaen:
         from signalberegning import _bevegelsesforklaring
 
         NB = "\u00a0"
-        for dagens, avvik, vist in [(0.01, 0.0003, "0,03"), (0.0123, 0.01234, "1,234"),
-                                    (0.05, 0.012, "1,2"), (0.0, 0.0000001, "0,00001")]:
+        for dagens, avvik, vist in [
+            (0.01, 0.0003, "0,03"),
+            (0.0123, 0.01234, "1,234"),
+            (0.05, 0.012, "1,2"),
+            (0.0, 0.0000001, "0,00001"),
+        ]:
             s = bygg_skala("Bevegelse", dagens, avvik)
             assert (s.lav_tekst, s.hoy_tekst) == (f"-{vist}{NB}%", f"+{vist}{NB}%"), (dagens, avvik)
             assert f"mot {vist}{NB}% standardavvik" in _bevegelsesforklaring(dagens, avvik), (dagens, avvik)
@@ -377,7 +391,6 @@ class TestSkalaen:
         assert (s.lav_tekst, s.hoy_tekst) == ("0", "1,5 ×")
         assert bygg_skala("Interesse", None, None).prikk is None
         assert bygg_skala("Interesse", 1.0, None, Parametre(volumfaktor=2.0)).felt_til == 25.0
-
 
     def test_ingen_prikk_for_en_maaling_som_ikke_er_et_tall(self):
         """Gjennomgangen (ECH3, ECH4): NaN gir ingen prikk, og en volumfaktor

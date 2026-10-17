@@ -51,10 +51,17 @@ def kurser(siste: date, antall: int = 3, start: float = 100.0) -> list[Kursrad]:
 
 def vurdering(styrke: int = 1, trend: int = 1) -> Vurdering:
     return Vurdering(
-        styrke=styrke, retning="Positiv" if trend else "Ingen", trend=trend,
-        bevegelse=0, interesse=0, slutt=102.0, justert_slutt=101.5,
-        trend_avvik=0.03 if trend else 0.0, dagens_endring=0.001,
-        standardavvik=0.01, volumforhold=1.0,
+        styrke=styrke,
+        retning="Positiv" if trend else "Ingen",
+        trend=trend,
+        bevegelse=0,
+        interesse=0,
+        slutt=102.0,
+        justert_slutt=101.5,
+        trend_avvik=0.03 if trend else 0.0,
+        dagens_endring=0.001,
+        standardavvik=0.01,
+        volumforhold=1.0,
     )
 
 
@@ -67,15 +74,13 @@ def skriv(tilkobling, symbol: str, dato: date, innhold) -> None:
 class TestPorten:
     def test_porten_har_bare_lesemetoder(self):
         metoder = {
-            navn for navn, _ in inspect.getmembers(Oversiktsleser, inspect.isfunction)
-            if not navn.startswith("_")
+            navn for navn, _ in inspect.getmembers(Oversiktsleser, inspect.isfunction) if not navn.startswith("_")
         }
         assert metoder == {"oversikt", "post"}
 
     def test_adapteren_har_ingen_skrivemetode(self):
         metoder = {
-            navn for navn, _ in inspect.getmembers(SqliteOversiktsleser, inspect.isfunction)
-            if not navn.startswith("_")
+            navn for navn, _ in inspect.getmembers(SqliteOversiktsleser, inspect.isfunction) if not navn.startswith("_")
         }
         assert metoder == {"oversikt", "post"}
 

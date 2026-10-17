@@ -26,18 +26,20 @@ DEKKEDE_AAR = frozenset({2026})
 # Handelskalenderen. 2026-04-01 er halv handelsdag og regnes som boersdag, saa
 # den staar ikke her. Dagene for 2027 foeres inn naar Euronext publiserer dem,
 # og 2027 legges til i DEKKEDE_AAR samtidig.
-STENGT = frozenset({
-    date(2026, 1, 1),
-    date(2026, 4, 2),
-    date(2026, 4, 3),
-    date(2026, 4, 6),
-    date(2026, 5, 1),
-    date(2026, 5, 14),
-    date(2026, 5, 25),
-    date(2026, 12, 24),
-    date(2026, 12, 25),
-    date(2026, 12, 31),
-})
+STENGT = frozenset(
+    {
+        date(2026, 1, 1),
+        date(2026, 4, 2),
+        date(2026, 4, 3),
+        date(2026, 4, 6),
+        date(2026, 5, 1),
+        date(2026, 5, 14),
+        date(2026, 5, 25),
+        date(2026, 12, 24),
+        date(2026, 12, 25),
+        date(2026, 12, 31),
+    }
+)
 
 
 class UtenforKalenderen(ValueError):
@@ -65,9 +67,7 @@ def innevaerende_boersdag(dag: date) -> date:
                 hva += f" krever {oppslag.isoformat()}, og"
             else:
                 hva += ":"
-            raise UtenforKalenderen(
-                f"{hva} lista over stengte dager dekker bare {sorted(DEKKEDE_AAR)}"
-            )
+            raise UtenforKalenderen(f"{hva} lista over stengte dager dekker bare {sorted(DEKKEDE_AAR)}")
         if oppslag.weekday() < 5 and oppslag not in STENGT:
             return oppslag
         oppslag -= timedelta(days=1)
@@ -83,10 +83,7 @@ def er_boersdag(dag: date) -> bool:
     if not isinstance(dag, date) or isinstance(dag, datetime):
         raise TypeError(f"dag maa vaere datetime.date, fikk {dag!r}")
     if dag.year not in DEKKEDE_AAR:
-        raise UtenforKalenderen(
-            f"{dag.isoformat()}: lista over stengte dager dekker bare "
-            f"{sorted(DEKKEDE_AAR)}"
-        )
+        raise UtenforKalenderen(f"{dag.isoformat()}: lista over stengte dager dekker bare {sorted(DEKKEDE_AAR)}")
     return dag.weekday() < 5 and dag not in STENGT
 
 

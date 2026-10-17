@@ -33,8 +33,12 @@ STANDARDTALL = (
 )
 
 ANDRE = Parametre(
-    ma_vindu=40, noytralsone=0.03, volatilitet_vindu=15, volum_vindu=25,
-    volumfaktor=2.5, terskel=3,
+    ma_vindu=40,
+    noytralsone=0.03,
+    volatilitet_vindu=15,
+    volum_vindu=25,
+    volumfaktor=2.5,
+    terskel=3,
 )
 
 
@@ -84,10 +88,7 @@ class TestTalleneFraParametre:
         vist = tall(verdi, slag).replace(NB, "").removesuffix("%").replace(",", ".")
         assert float(vist) == pytest.approx(verdi, abs=1e-12)
 
-
-    @pytest.mark.parametrize(
-        "p", [Parametre(volumfaktor=1.25), Parametre(noytralsone=0.025)]
-    )
+    @pytest.mark.parametrize("p", [Parametre(volumfaktor=1.25), Parametre(noytralsone=0.025)])
     def test_en_parameter_som_maatte_rundes_av_stopper(self, p):
         """Gjennomgangen av 8.0b: en volumfaktor paa 1,25 ville staatt som
         «1,2» med én desimal. Da feiler tekstene i stedet for aa vise et
@@ -104,8 +105,10 @@ class TestGrensene:
             assert getattr(STANDARD, felt) == getattr(MAALTE_GRENSER, felt), felt
 
     def test_teksten_om_maalingen_nevner_de_maalte_grensene(self):
-        forventet = (f"2{NB}%, 1,5 ganger, de to vinduene på 20 børsdager og terskelen 2 "
-                     f"ble kontrollert mot 15 aksjer på Oslo Børs over 199 børsdager")
+        forventet = (
+            f"2{NB}%, 1,5 ganger, de to vinduene på 20 børsdager og terskelen 2 "
+            f"ble kontrollert mot 15 aksjer på Oslo Børs over 199 børsdager"
+        )
         assert forventet in hjelpetekster()["grensene"].tekst
         assert forventet in hjelpetekster(ANDRE)["grensene"].tekst
 
@@ -120,8 +123,7 @@ class TestTekstenSierDetKodenGjoer:
 
     @pytest.mark.parametrize(
         "siste, verdi, setning",
-        [(103.0, 1, "+1 en dag kursen steg"), (97.0, -1, "-1 en dag den falt"),
-         (100.0, 0, "0 når kursen var uendret")],
+        [(103.0, 1, "+1 en dag kursen steg"), (97.0, -1, "-1 en dag den falt"), (100.0, 0, "0 når kursen var uendret")],
     )
     def test_interesse(self, siste, verdi, setning):
         volumer = [100.0] * 21 + [200.0]
@@ -141,6 +143,7 @@ class TestTekstenSierDetKodenGjoer:
         """VG8 i gjennomgangen av PR #35: setningen om fortegnet i bevegelse
         er bundet til koden, som trend og interesse."""
         from signalberegning import bevegelse
+
         kurser = [100.0 + (i % 2) for i in range(30)] + [siste]
         assert bevegelse(kurser).verdi == verdi
         assert setning in hjelpetekster()["bevegelse"].tekst
@@ -191,9 +194,21 @@ class TestRetningen:
 # Ord som kan leses som et raad (NFR-06). Bare ikke_raad kan si kjoepe og
 # selge, fordi den sier at signalet ikke er et raad.
 RAADSORD = (
-    r"\bbør\b", r"\banbefal", r"\bkjøp", r"\bselg", r"\blønn", r"\bmulighet",
-    r"\btips", r"\bvil stige", r"\bvil falle", r"\bkurspotensial", r"\bgevinst",
-    r"\bsalg", r"\bhandl", r"\binvester", r"\bverdt å",
+    r"\bbør\b",
+    r"\banbefal",
+    r"\bkjøp",
+    r"\bselg",
+    r"\blønn",
+    r"\bmulighet",
+    r"\btips",
+    r"\bvil stige",
+    r"\bvil falle",
+    r"\bkurspotensial",
+    r"\bgevinst",
+    r"\bsalg",
+    r"\bhandl",
+    r"\binvester",
+    r"\bverdt å",
 )
 
 
@@ -235,6 +250,7 @@ class TestHjelp:
 
 
 # --- Sidene (del c) --------------------------------------------------------
+
 
 @pytest.fixture(scope="module")
 def basemal(tmp_path_factory):
@@ -308,33 +324,42 @@ class TestSidene:
         knapp = r'<button type="button" class="hjelpeknapp" popovertarget="{}"'
         oversikt = _side(klient, "/")
         # Story 8.15: navnet er en lenke som sorterer, og «?» står etter den.
-        lenke = r'<a class="sorter[^"]*" href="[^"]*">{}<span class="skjult">[^<]*</span><svg[^>]*><path[^>]*/></svg></a> '
-        for tekst, vindu in ((re.escape("<th>Selskap "), "hjelp-selskap"),
-                             (r'<th class="tall"[^>]*>' + lenke.format("Sluttkurs"), "hjelp-sluttkurs"),
-                             (r'<th class="tall"[^>]*>' + lenke.format("Endring"), "hjelp-endring"),
-                             (r'<th class="tall"[^>]*>' + lenke.format("Signalstyrke"), "hjelp-signalstyrke"),
-                             (r"<th[^>]*>" + lenke.format("Retning"), "hjelp-retning")):
+        lenke = (
+            r'<a class="sorter[^"]*" href="[^"]*">{}<span class="skjult">[^<]*</span><svg[^>]*><path[^>]*/></svg></a> '
+        )
+        for tekst, vindu in (
+            (re.escape("<th>Selskap "), "hjelp-selskap"),
+            (r'<th class="tall"[^>]*>' + lenke.format("Sluttkurs"), "hjelp-sluttkurs"),
+            (r'<th class="tall"[^>]*>' + lenke.format("Endring"), "hjelp-endring"),
+            (r'<th class="tall"[^>]*>' + lenke.format("Signalstyrke"), "hjelp-signalstyrke"),
+            (r"<th[^>]*>" + lenke.format("Retning"), "hjelp-retning"),
+        ):
             assert re.search(tekst + knapp.format(vindu), oversikt), vindu
         # Story 2.9: «?» ved overskriften til hovedindeksen.
-        assert re.search(r'<h2><span id="hovedindeks-tittel">Hovedindeksen</span>(\s*<span class="indekssymbol">[^<]*</span>)? '
-                         + knapp.format("hjelp-hovedindeks"), oversikt)
+        assert re.search(
+            r'<h2><span id="hovedindeks-tittel">Hovedindeksen</span>(\s*<span class="indekssymbol">[^<]*</span>)? '
+            + knapp.format("hjelp-hovedindeks"),
+            oversikt,
+        )
         # Story 8.0d, PR 2: tidspunktet står bare i stripa, som «Oppdatert»,
         # med «?» ved siden av (BH2, svar 5).
         stripa = oversikt.split('<header class="stripe">', 1)[1].split("</header>", 1)[0]
         assert re.search(r"Oppdatert [^<]+</span>\s*" + knapp.format("hjelp-hentet"), stripa)
         assert "data hentet" not in oversikt
         detalj = _side(klient, "/aksje/BRFE")
-        for tekst, vindu in (('<span class="etikett">Sluttkurs ', "hjelp-kurs"),
-                             ('<span class="etikett">Signalstyrke ', "hjelp-styrke"),
-                             ('<span class="etikett">Retning ', "hjelp-retning-aksje"),
-                             ('<span class="etikett">Endring ', "hjelp-endring"),
-                             ("<h2>Kursutvikling, 6 måneder ", "hjelp-graf"),
-                             # Story 8.0d, PR 3 (svar 22): i sjekkortene.
-                             ('<span class="ga">Ga ', "hjelp-ga"),
-                             ('<p class="maalt">Målt mot ', "hjelp-maalt"),
-                             ("<h3>Trend ", "hjelp-trend"),
-                             ("<h3>Bevegelse ", "hjelp-bevegelse"),
-                             ("<h3>Interesse ", "hjelp-interesse")):
+        for tekst, vindu in (
+            ('<span class="etikett">Sluttkurs ', "hjelp-kurs"),
+            ('<span class="etikett">Signalstyrke ', "hjelp-styrke"),
+            ('<span class="etikett">Retning ', "hjelp-retning-aksje"),
+            ('<span class="etikett">Endring ', "hjelp-endring"),
+            ("<h2>Kursutvikling, 6 måneder ", "hjelp-graf"),
+            # Story 8.0d, PR 3 (svar 22): i sjekkortene.
+            ('<span class="ga">Ga ', "hjelp-ga"),
+            ('<p class="maalt">Målt mot ', "hjelp-maalt"),
+            ("<h3>Trend ", "hjelp-trend"),
+            ("<h3>Bevegelse ", "hjelp-bevegelse"),
+            ("<h3>Interesse ", "hjelp-interesse"),
+        ):
             assert re.search(re.escape(tekst) + knapp.format(vindu), detalj), vindu
         assert re.search(r"<h2>Hvorfor signalet ble [^<]* " + knapp.format("hjelp-sjekkene"), detalj)
         assert "Tallene og signalet" not in oversikt + detalj
@@ -354,7 +379,11 @@ class TestSidene:
         from markupsafe import escape
 
         def vindu(html, id_):
-            del_ = html.split(f'<div id="{id_}" class="hjelpevindu" popover>', 1)[1].split('<div id="hjelp-')[0].split("</body>")[0]
+            del_ = (
+                html.split(f'<div id="{id_}" class="hjelpevindu" popover>', 1)[1]
+                .split('<div id="hjelp-')[0]
+                .split("</body>")[0]
+            )
             avsnitt = re.findall(r"<p>(.*?)</p>", del_, flags=re.DOTALL)
             funnet = []
             for p_ in avsnitt:
@@ -382,8 +411,15 @@ class TestSidene:
                 "hjelp-endring": ["endring", "utbyttejustert"],
                 "hjelp-graf": ["grafen"],
                 "hjelp-styrke": ["signalstyrke", "ikke_raad"],
-                "hjelp-retning-aksje": ["retning", "positiv", "negativ", "blandet", "ingen",
-                                        "ukjent_aksje", "skjevhet"],
+                "hjelp-retning-aksje": [
+                    "retning",
+                    "positiv",
+                    "negativ",
+                    "blandet",
+                    "ingen",
+                    "ukjent_aksje",
+                    "skjevhet",
+                ],
                 "hjelp-sjekkene": ["hvorfor_tre", "antall_dager"],
                 "hjelp-trend": ["trend"],
                 "hjelp-bevegelse": ["bevegelse"],
@@ -402,8 +438,11 @@ class TestSidene:
         """Tillegget 05.10: «?» ved overskriften Signalstyrke, med teksten
         om styrken. Det er fortsatt fem kolonner (FR-101)."""
         html = _side(klient, "/")
-        assert re.search(r'<th class="tall"><a class="sorter" href="[^"]*">Signalstyrke<span class="skjult">[^<]*</span><svg[^>]*><path[^>]*/></svg></a> '
-                         r'<button type="button" class="hjelpeknapp" popovertarget="hjelp-signalstyrke"[^>]*>\?</button></th>', html)
+        assert re.search(
+            r'<th class="tall"><a class="sorter" href="[^"]*">Signalstyrke<span class="skjult">[^<]*</span><svg[^>]*><path[^>]*/></svg></a> '
+            r'<button type="button" class="hjelpeknapp" popovertarget="hjelp-signalstyrke"[^>]*>\?</button></th>',
+            html,
+        )
         thead = html.split("<thead>")[1].split("</thead>")[0]
         assert thead.count("<th") == 5
         vindu = html.split('<div id="hjelp-signalstyrke"')[1].split("</body>")[0]
@@ -490,9 +529,19 @@ class TestSnittetIGrafen:
 # (designregler.md §4, rettet 13.10).
 UNNTAK_LENGDE = {"grensene", "skjevhet"}
 VALGT_BORT = (
-    r"peker opp", r"peker ned", r"peker hver sin vei", r"\bspriker\b",
-    r"\balle tre\b", r"\bde tre\b", r"hvor kraftig", r"summen av tallene",
-    r"\bkroner\b", r"\bkr\b", r"v1\.1", r"\(idé\)", r"lys bakgrunn",
+    r"peker opp",
+    r"peker ned",
+    r"peker hver sin vei",
+    r"\bspriker\b",
+    r"\balle tre\b",
+    r"\bde tre\b",
+    r"hvor kraftig",
+    r"summen av tallene",
+    r"\bkroner\b",
+    r"\bkr\b",
+    r"v1\.1",
+    r"\(idé\)",
+    r"lys bakgrunn",
 )
 
 
@@ -551,8 +600,11 @@ class TestStory80c:
         from datetime import date, timedelta
 
         from kursdata import Kursrad
-        rader = [Kursrad(dato=date(2026, 9, 1) + timedelta(days=i), slutt=k, justert_slutt=k, volum=1000)
-                 for i, k in enumerate([100.0] * 60 + [104.0])]
+
+        rader = [
+            Kursrad(dato=date(2026, 9, 1) + timedelta(days=i), slutt=k, justert_slutt=k, volum=1000)
+            for i, k in enumerate([100.0] * 60 + [104.0])
+        ]
         signal = beregn_signal(rader)
         tekster = hjelpetekster()
         for sjekk in signal.sjekker:
@@ -569,7 +621,10 @@ class TestStory80c:
         from datetime import date, timedelta
 
         from kursdata import Kursrad
-        rader = [Kursrad(dato=date(2026, 9, 1) + timedelta(days=i), slutt=k, justert_slutt=k, volum=1000)
-                 for i, k in enumerate([100.0] * 60 + [104.0])]
+
+        rader = [
+            Kursrad(dato=date(2026, 9, 1) + timedelta(days=i), slutt=k, justert_slutt=k, volum=1000)
+            for i, k in enumerate([100.0] * 60 + [104.0])
+        ]
         signal = beregn_signal(rader)
         assert len(signal.sjekker) == ANTALL_SJEKKER

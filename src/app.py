@@ -121,6 +121,7 @@ def demokommando() -> str:
     """Kommandoen som lager demobasen, valgt som hentekommandoen (story 3.4, ECH7)."""
     return DEMOKOMMANDO_DOCKER if os.environ.get(I_DOCKER) == "1" else DEMOKOMMANDO
 
+
 # Feil som betyr at basen ikke kan aapnes eller migreres, som BASEFEIL i
 # hentingen. Siden svarer da 503 med grunnen i stedet for en traceback.
 BASEFEIL = (sqlite3.Error, OSError, MigrasjonsFeil, RuntimeError)
@@ -141,6 +142,7 @@ app.jinja_env.filters["med_og"] = med_og
 app.jinja_env.globals["neste_orden"] = neste_orden
 # Story 8.0d: «Oppdatert tirsdag 13.10 kl. 22.15» i stripa, i norsk tid.
 app.jinja_env.filters["oppdatert"] = lambda tid: oppdatert(tid, idag().year)
+
 
 def naa() -> datetime:
     """Klokka sidene regner dagens dato av, i UTC (AD-20). Egen funksjon, saa
@@ -283,7 +285,9 @@ def _lukk_basen(_unntak) -> None:
 def _basen_kan_ikke_aapnes():
     return (
         render_template(
-            "basefeil.html", feil=g.basefeil, base=_base_sti().name,
+            "basefeil.html",
+            feil=g.basefeil,
+            base=_base_sti().name,
             demokommando=demokommando() if demo_paa() else None,
         ),
         503,
@@ -377,7 +381,12 @@ def markedsoversikt():
         return _basen_kan_ikke_aapnes()
     if g.get("demo_mangler"):
         return render_template(
-            "index.html", rader=[], dato=None, hentet=None, mangler=[], eget=set(),
+            "index.html",
+            rader=[],
+            dato=None,
+            hentet=None,
+            mangler=[],
+            eget=set(),
             demokommando=demokommando(),
         )
     leser = _leser_eller_basefeil()
@@ -460,15 +469,17 @@ def aksjedetalj(symbol: str):
     ki_er_paa = ki_paa(request.cookies.get(KAPSEL))
     ki = _ki_visning(post, detalj) if ki_er_paa and detalj.sjekker else None
 
-    svar = app.make_response(render_template(
-        "aksje.html",
-        detalj=detalj,
-        graf=bygg_graf(detalj.punkter),
-        hentet=post.hentet,
-        ki=ki,
-        ki_er_paa=ki_er_paa,
-        ki_til=AV if ki_er_paa else PAA,
-    ))
+    svar = app.make_response(
+        render_template(
+            "aksje.html",
+            detalj=detalj,
+            graf=bygg_graf(detalj.punkter),
+            hentet=post.hentet,
+            ki=ki,
+            ki_er_paa=ki_er_paa,
+            ki_til=AV if ki_er_paa else PAA,
+        )
+    )
     # Siden avhenger av bryteren (gjennomgangen av 10.3, BH10).
     svar.vary.add("Cookie")
     return svar
@@ -485,8 +496,7 @@ def _ki_visning(post, detalj) -> KIVisning:
         rad = logg.les(Emne.aksje(post.aksje.symbol, detalj.dato))
         # Svar kl. 23:57: har andre aksjer rader for dagen? Bare lesing (AD-10),
         # og bare naar denne aksjen ikke har en rad.
-        andre_har_rader = rad is None and andre_aksjer_har_ki_rad(
-            g.tilkobling, detalj.dato, post.aksje.symbol)
+        andre_har_rader = rad is None and andre_aksjer_har_ki_rad(g.tilkobling, detalj.dato, post.aksje.symbol)
     except (RuntimeError, sqlite3.Error, UgyldigKIRad, ValueError) as feil:
         # Siden vet ikke hvorfor, og sier ingen grunn. Loggen sier hvorfor
         # (gjennomgangen, BH6, BH19, og av PR 2, BH3, ECH, VG3).
@@ -515,8 +525,7 @@ def ki_bryter():
     if not _TILBAKE.fullmatch(tilbake):
         tilbake = "/"
     svar = redirect(tilbake, code=303)
-    svar.set_cookie(KAPSEL, til, max_age=365 * 24 * 3600, samesite="Lax", httponly=True,
-                    secure=request.is_secure)
+    svar.set_cookie(KAPSEL, til, max_age=365 * 24 * 3600, samesite="Lax", httponly=True, secure=request.is_secure)
     return svar
 
 

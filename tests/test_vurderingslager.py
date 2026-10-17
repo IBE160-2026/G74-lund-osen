@@ -35,7 +35,13 @@ from vurderingsdata import (
 )
 
 VURDERINGSFELT = (
-    "styrke", "retning", "trend", "bevegelse", "interesse", "slutt", "justert_slutt",
+    "styrke",
+    "retning",
+    "trend",
+    "bevegelse",
+    "interesse",
+    "slutt",
+    "justert_slutt",
 )
 
 # Story 2.1c, 0004. volumforhold kan mangle naar interesse er 0, de tre andre
@@ -57,17 +63,25 @@ def klokke(tidspunkt: str):
 
 
 def vurdering(**endret) -> Vurdering:
-    felt = dict(styrke=2, retning="Positiv", trend=1, bevegelse=1, interesse=0,
-                slutt=300.0, justert_slutt=290.0, trend_avvik=0.035,
-                dagens_endring=0.021, standardavvik=0.012, volumforhold=1.2)
+    felt = dict(
+        styrke=2,
+        retning="Positiv",
+        trend=1,
+        bevegelse=1,
+        interesse=0,
+        slutt=300.0,
+        justert_slutt=290.0,
+        trend_avvik=0.035,
+        dagens_endring=0.021,
+        standardavvik=0.012,
+        volumforhold=1.2,
+    )
     felt.update(endret)
     return Vurdering(**felt)
 
 
 def rader(tilkobling) -> list[tuple]:
-    return tilkobling.execute(
-        "SELECT symbol, dato, styrke, grunn FROM vurdering ORDER BY symbol, dato"
-    ).fetchall()
+    return tilkobling.execute("SELECT symbol, dato, styrke, grunn FROM vurdering ORDER BY symbol, dato").fetchall()
 
 
 @pytest.fixture
@@ -89,8 +103,7 @@ class TestDatoavvisning:
         assert lager(tilkobling).skriv("EQNR", date(2026, 9, 23), vurdering()) is True
         assert lager(tilkobling).les("EQNR", date(2026, 9, 23)) == vurdering()
 
-    @pytest.mark.parametrize("dato", [date(2026, 9, 22), date(2026, 9, 24)],
-                             ids=["i_gaar", "i_morgen"])
+    @pytest.mark.parametrize("dato", [date(2026, 9, 22), date(2026, 9, 24)], ids=["i_gaar", "i_morgen"])
     def test_i_gaar_og_i_morgen_reiser(self, tilkobling, dato):
         with pytest.raises(ValueError, match="inneveerende boersdag"):
             lager(tilkobling).skriv("EQNR", dato, vurdering())
@@ -107,10 +120,14 @@ class TestDatoavvisning:
             vurderinger.skriv("EQNR", date(2026, 9, 22), vurdering(styrke=3, interesse=1))
         assert vurderinger.les("EQNR", date(2026, 9, 22)) == vurdering()
 
-    @pytest.mark.parametrize("tidspunkt, godtatt, avvist", [
-        (SOMMER_0030, date(2026, 9, 25), date(2026, 9, 24)),
-        (VINTER_0030, date(2026, 12, 11), date(2026, 12, 10)),
-    ], ids=["sommertid", "vintertid"])
+    @pytest.mark.parametrize(
+        "tidspunkt, godtatt, avvist",
+        [
+            (SOMMER_0030, date(2026, 9, 25), date(2026, 9, 24)),
+            (VINTER_0030, date(2026, 12, 11), date(2026, 12, 10)),
+        ],
+        ids=["sommertid", "vintertid"],
+    )
     def test_0030_norsk_tid_er_dagen_i_oslo(self, tilkobling, tidspunkt, godtatt, avvist):
         """Ville feilet hvis datogrensen ble regnet i UTC: da er 00:30 norsk tid
         fortsatt dagen foer, og kjoeringen skrev paa gaarsdagen."""
@@ -142,8 +159,7 @@ class TestDatoavvisning:
 
     def test_tidspunkt_som_dato_reiser(self, tilkobling):
         with pytest.raises(TypeError, match="date"):
-            lager(tilkobling).skriv("EQNR", datetime(2026, 9, 23, 10, tzinfo=timezone.utc),
-                                    vurdering())
+            lager(tilkobling).skriv("EQNR", datetime(2026, 9, 23, 10, tzinfo=timezone.utc), vurdering())
         assert rader(tilkobling) == []
 
 
@@ -154,9 +170,7 @@ class TestSisteVinner:
     def test_to_skriv_gir_en_rad_og_den_siste_vinner(self, tilkobling):
         vurderinger = lager(tilkobling)
         vurderinger.skriv("EQNR", date(2026, 9, 23), vurdering())
-        assert vurderinger.skriv(
-            "EQNR", date(2026, 9, 23), vurdering(styrke=3, interesse=1)
-        ) is True
+        assert vurderinger.skriv("EQNR", date(2026, 9, 23), vurdering(styrke=3, interesse=1)) is True
         assert rader(tilkobling) == [("EQNR", "2026-09-23", 3, None)]
         assert vurderinger.les("EQNR", date(2026, 9, 23)) == vurdering(styrke=3, interesse=1)
 
@@ -220,9 +234,7 @@ class TestLes:
 
     def test_rad_med_grunn_har_ingen_kurs(self, tilkobling):
         lager(tilkobling).skriv("EQNR", date(2026, 9, 23), Grunn.KURS_IKKE_FRA_DAGEN)
-        assert tilkobling.execute(
-            "SELECT slutt, justert_slutt FROM vurdering"
-        ).fetchone() == (None, None)
+        assert tilkobling.execute("SELECT slutt, justert_slutt FROM vurdering").fetchone() == (None, None)
 
 
 class TestProtokollen:
@@ -258,8 +270,7 @@ class TestSymbol:
         """En feil midt i skrivingen etterlater ingen aapen transaksjon, og
         lageret kan brukes etterpaa."""
         tilkobling.execute(
-            "CREATE TEMP TRIGGER stopp BEFORE INSERT ON vurdering "
-            "BEGIN SELECT RAISE(ABORT, 'stoppet av testen'); END"
+            "CREATE TEMP TRIGGER stopp BEFORE INSERT ON vurdering BEGIN SELECT RAISE(ABORT, 'stoppet av testen'); END"
         )
         vurderinger = lager(tilkobling)
         with pytest.raises(sqlite3.IntegrityError, match="stoppet av testen"):
@@ -319,11 +330,7 @@ class TestSkjemaet:
         assert "CREATE TABLE grunn" in tekst
 
     def test_migrer_lager_tabellene_foer_noen_adapter_finnes(self, tilkobling):
-        tabeller = {
-            navn for (navn,) in tilkobling.execute(
-                "SELECT name FROM sqlite_master WHERE type = 'table'"
-            )
-        }
+        tabeller = {navn for (navn,) in tilkobling.execute("SELECT name FROM sqlite_master WHERE type = 'table'")}
         assert {"vurdering", "grunn"} <= tabeller
 
     def test_adapteren_lager_ingenting(self, tilkobling):
@@ -334,9 +341,7 @@ class TestSkjemaet:
     def test_base_paa_versjon_1_avvises(self, tmp_path):
         katalog = tmp_path / "bare_0001"
         katalog.mkdir()
-        (katalog / "0001_kurs.sql").write_bytes(
-            (MIGRASJONSKATALOG / "0001_kurs.sql").read_bytes()
-        )
+        (katalog / "0001_kurs.sql").write_bytes((MIGRASJONSKATALOG / "0001_kurs.sql").read_bytes())
         tilkobling = sqlite3.connect(":memory:")
         try:
             assert migrer(tilkobling, katalog) == 1
@@ -347,9 +352,7 @@ class TestSkjemaet:
             tilkobling.close()
 
     def test_grunn_i_basen_er_grunn_i_porten(self, tilkobling):
-        assert {navn for (navn,) in tilkobling.execute("SELECT navn FROM grunn")} == {
-            grunn.value for grunn in Grunn
-        }
+        assert {navn for (navn,) in tilkobling.execute("SELECT navn FROM grunn")} == {grunn.value for grunn in Grunn}
 
     def _sett_inn(self, tilkobling, **felt):
         kolonner = ", ".join(["symbol", "dato", *felt])
@@ -359,9 +362,19 @@ class TestSkjemaet:
             ("EQNR", "2026-09-23", *felt.values()),
         )
 
-    GYLDIG = dict(styrke=2, retning="Positiv", trend=1, bevegelse=1, interesse=0,
-                  slutt=300.0, justert_slutt=290.0, trend_avvik=0.035,
-                dagens_endring=0.021, standardavvik=0.012, volumforhold=1.2)
+    GYLDIG = dict(
+        styrke=2,
+        retning="Positiv",
+        trend=1,
+        bevegelse=1,
+        interesse=0,
+        slutt=300.0,
+        justert_slutt=290.0,
+        trend_avvik=0.035,
+        dagens_endring=0.021,
+        standardavvik=0.012,
+        volumforhold=1.2,
+    )
 
     def test_gyldige_rader_godtas_av_basen(self, tilkobling):
         self._sett_inn(tilkobling, **self.GYLDIG)
@@ -387,8 +400,7 @@ class TestSkjemaet:
     @pytest.mark.parametrize("felt", VURDERINGSFELT)
     def test_et_vurderingsfelt_ved_siden_av_grunn_stoppes(self, tilkobling, felt):
         with pytest.raises(sqlite3.IntegrityError, match="CHECK"):
-            self._sett_inn(tilkobling, grunn=Grunn.SYMBOL_FEILET.value,
-                           **{felt: self.GYLDIG[felt]})
+            self._sett_inn(tilkobling, grunn=Grunn.SYMBOL_FEILET.value, **{felt: self.GYLDIG[felt]})
 
     @pytest.mark.parametrize("felt", PAAKREVDE_MAALINGER)
     def test_en_maaling_som_mangler_stoppes(self, tilkobling, felt):
@@ -401,8 +413,7 @@ class TestSkjemaet:
     @pytest.mark.parametrize("felt", MAALINGER)
     def test_en_maaling_ved_siden_av_grunn_stoppes(self, tilkobling, felt):
         with pytest.raises(sqlite3.IntegrityError, match="CHECK"):
-            self._sett_inn(tilkobling, grunn=Grunn.SYMBOL_FEILET.value,
-                           **{felt: self.GYLDIG[felt]})
+            self._sett_inn(tilkobling, grunn=Grunn.SYMBOL_FEILET.value, **{felt: self.GYLDIG[felt]})
 
     def test_volumforhold_kan_mangle_med_interesse_0(self, tilkobling):
         self._sett_inn(tilkobling, **dict(self.GYLDIG, volumforhold=None))
@@ -411,8 +422,7 @@ class TestSkjemaet:
     @pytest.mark.parametrize("interesse", [1, -1])
     def test_volumforhold_mangler_med_interesse_stoppes(self, tilkobling, interesse):
         with pytest.raises(sqlite3.IntegrityError, match="CHECK"):
-            self._sett_inn(tilkobling, **dict(self.GYLDIG, interesse=interesse,
-                                              volumforhold=None))
+            self._sett_inn(tilkobling, **dict(self.GYLDIG, interesse=interesse, volumforhold=None))
 
     @pytest.mark.parametrize("felt", ["standardavvik", "volumforhold"])
     def test_negativ_maaling_stoppes(self, tilkobling, felt):
@@ -424,8 +434,7 @@ class TestSkjemaet:
         self._sett_inn(tilkobling, **dict(self.GYLDIG, standardavvik=0.0, volumforhold=0.0))
 
     def test_negativt_avvik_og_negativ_endring_godtas(self, tilkobling):
-        self._sett_inn(tilkobling, **dict(self.GYLDIG, trend_avvik=-0.05,
-                                          dagens_endring=-0.03))
+        self._sett_inn(tilkobling, **dict(self.GYLDIG, trend_avvik=-0.05, dagens_endring=-0.03))
 
     def test_ukjent_grunn_stoppes_ved_insert(self, tilkobling):
         with pytest.raises(sqlite3.IntegrityError, match="ukjent grunn"):
@@ -452,9 +461,7 @@ class TestSkjemaet:
 
     def test_en_grunn_endres_ikke(self, tilkobling):
         with pytest.raises(sqlite3.IntegrityError, match="endres ikke"):
-            tilkobling.execute(
-                "UPDATE grunn SET navn = 'noe_annet' WHERE navn = 'symbol_feilet'"
-            )
+            tilkobling.execute("UPDATE grunn SET navn = 'noe_annet' WHERE navn = 'symbol_feilet'")
 
     def test_kolonne_for_meldinger_krever_ingen_ombygging(self, tilkobling):
         """Beslutningen: «Relevante meldinger» kan komme som en kolonne som kan
@@ -465,12 +472,9 @@ class TestSkjemaet:
         assert lager(tilkobling).les("EQNR", date(2026, 9, 23)) == vurdering()
         assert tilkobling.execute("SELECT meldinger FROM vurdering").fetchone() == (None,)
         with pytest.raises(sqlite3.IntegrityError, match="CHECK"):
-            self._sett_inn(tilkobling,
-                           **self.GYLDIG, grunn=Grunn.SYMBOL_FEILET.value)
+            self._sett_inn(tilkobling, **self.GYLDIG, grunn=Grunn.SYMBOL_FEILET.value)
         with pytest.raises(sqlite3.IntegrityError, match="ukjent grunn"):
-            tilkobling.execute(
-                "INSERT INTO vurdering (symbol, dato, grunn) VALUES ('DNB', '2026-09-23', 'x')"
-            )
+            tilkobling.execute("INSERT INTO vurdering (symbol, dato, grunn) VALUES ('DNB', '2026-09-23', 'x')")
 
     def test_ny_grunn_er_en_insert(self, tilkobling):
         """Beslutningen: en ny grunn krever ingen ombygging av vurdering."""
@@ -481,8 +485,10 @@ class TestSkjemaet:
 class TestVurdering:
     def test_retningene_er_signalberegningens(self):
         assert set(RETNINGER) == {
-            signalberegning.POSITIV, signalberegning.NEGATIV,
-            signalberegning.BLANDET, signalberegning.INGEN,
+            signalberegning.POSITIV,
+            signalberegning.NEGATIV,
+            signalberegning.BLANDET,
+            signalberegning.INGEN,
         }
 
     def test_tre_grunner(self):
@@ -491,12 +497,11 @@ class TestVurdering:
     @pytest.mark.parametrize("sjekker", list(itertools.product((-1, 0, 1), repeat=3)))
     def test_retningen_er_den_finn_retning_gir(self, sjekker):
         """Alle 27 kombinasjonene: porten godtar bare retningen kjernen gir."""
-        riktig = signalberegning.finn_retning(tuple(
-            signalberegning.Sjekk(navn="", verdi=verdi, forklaring="") for verdi in sjekker
-        ))
+        riktig = signalberegning.finn_retning(
+            tuple(signalberegning.Sjekk(navn="", verdi=verdi, forklaring="") for verdi in sjekker)
+        )
         trend, bevegelse, interesse = sjekker
-        felt = dict(styrke=sum(map(abs, sjekker)), trend=trend, bevegelse=bevegelse,
-                    interesse=interesse)
+        felt = dict(styrke=sum(map(abs, sjekker)), trend=trend, bevegelse=bevegelse, interesse=interesse)
         vurdering(retning=riktig, **felt)
         for annen in set(RETNINGER) - {riktig}:
             with pytest.raises(UgyldigVurdering, match="stemmer ikke"):
@@ -506,9 +511,7 @@ class TestVurdering:
     def test_styrken_er_den_finn_styrke_gir(self, sjekker):
         """Story 1.8 (G5), som testen for retningen over: alle 27
         kombinasjonene, og porten godtar bare styrken kjernen gir."""
-        som_sjekker = tuple(
-            signalberegning.Sjekk(navn="", verdi=verdi, forklaring="") for verdi in sjekker
-        )
+        som_sjekker = tuple(signalberegning.Sjekk(navn="", verdi=verdi, forklaring="") for verdi in sjekker)
         riktig = signalberegning.finn_styrke(som_sjekker)
         retning = signalberegning.finn_retning(som_sjekker)
         trend, bevegelse, interesse = sjekker
@@ -518,38 +521,42 @@ class TestVurdering:
             with pytest.raises(UgyldigVurdering, match="stemmer ikke"):
                 vurdering(styrke=annen, **felt)
 
-    @pytest.mark.parametrize("endret", [
-        dict(styrke=4, trend=1, bevegelse=1, interesse=1),
-        dict(styrke=-1),
-        dict(styrke=True, trend=1, bevegelse=0, interesse=0),
-        dict(styrke=2.0),
-        dict(styrke=1),
-        dict(retning="positiv"),
-        dict(retning=None),
-        dict(trend=2, styrke=3),
-        dict(bevegelse=-2),
-        dict(interesse=True),
-        dict(slutt=0.0),
-        dict(slutt=-1.0),
-        dict(slutt=math.nan),
-        dict(justert_slutt=math.inf),
-        dict(justert_slutt="290"),
-        dict(slutt=True),
-        dict(slutt=10**400),
-        dict(trend_avvik=math.nan),
-        dict(dagens_endring=math.inf),
-        dict(standardavvik=-math.inf),
-        dict(volumforhold=math.nan),
-        dict(trend_avvik=None),
-        dict(dagens_endring=True),
-        dict(standardavvik="0.012"),
-        dict(volumforhold="1.2"),
-        dict(trend_avvik=10**400),
-        dict(standardavvik=-0.001),
-        dict(volumforhold=-0.001),
-        dict(volumforhold=None, interesse=1, styrke=3),
-        dict(volumforhold=None, interesse=-1, styrke=3, retning="Blandet"),
-    ], ids=repr)
+    @pytest.mark.parametrize(
+        "endret",
+        [
+            dict(styrke=4, trend=1, bevegelse=1, interesse=1),
+            dict(styrke=-1),
+            dict(styrke=True, trend=1, bevegelse=0, interesse=0),
+            dict(styrke=2.0),
+            dict(styrke=1),
+            dict(retning="positiv"),
+            dict(retning=None),
+            dict(trend=2, styrke=3),
+            dict(bevegelse=-2),
+            dict(interesse=True),
+            dict(slutt=0.0),
+            dict(slutt=-1.0),
+            dict(slutt=math.nan),
+            dict(justert_slutt=math.inf),
+            dict(justert_slutt="290"),
+            dict(slutt=True),
+            dict(slutt=10**400),
+            dict(trend_avvik=math.nan),
+            dict(dagens_endring=math.inf),
+            dict(standardavvik=-math.inf),
+            dict(volumforhold=math.nan),
+            dict(trend_avvik=None),
+            dict(dagens_endring=True),
+            dict(standardavvik="0.012"),
+            dict(volumforhold="1.2"),
+            dict(trend_avvik=10**400),
+            dict(standardavvik=-0.001),
+            dict(volumforhold=-0.001),
+            dict(volumforhold=None, interesse=1, styrke=3),
+            dict(volumforhold=None, interesse=-1, styrke=3, retning="Blandet"),
+        ],
+        ids=repr,
+    )
     def test_ugyldige_verdier_avvises(self, endret):
         with pytest.raises(UgyldigVurdering):
             vurdering(**endret)
@@ -561,8 +568,7 @@ class TestVurdering:
         heltall = vurdering(trend_avvik=0, dagens_endring=-1, standardavvik=0, volumforhold=2)
         for felt in MAALINGER:
             assert type(getattr(heltall, felt)) is float, felt
-        assert heltall == vurdering(trend_avvik=0.0, dagens_endring=-1.0,
-                                    standardavvik=0.0, volumforhold=2.0)
+        assert heltall == vurdering(trend_avvik=0.0, dagens_endring=-1.0, standardavvik=0.0, volumforhold=2.0)
 
     def test_volumforhold_kan_mangle_med_interesse_0(self):
         assert vurdering(volumforhold=None).volumforhold is None
@@ -594,11 +600,17 @@ class TestMaalingeneRundt:
         signal = signalberegning.beregn_signal(rader)
         trend, bevegelse, interesse = signal.sjekker
         return Vurdering(
-            styrke=signal.styrke, retning=signal.retning,
-            trend=trend.verdi, bevegelse=bevegelse.verdi, interesse=interesse.verdi,
-            slutt=rader[-1].slutt, justert_slutt=rader[-1].justert_slutt,
-            trend_avvik=trend.maaling, dagens_endring=bevegelse.maaling,
-            standardavvik=bevegelse.grense, volumforhold=interesse.maaling,
+            styrke=signal.styrke,
+            retning=signal.retning,
+            trend=trend.verdi,
+            bevegelse=bevegelse.verdi,
+            interesse=interesse.verdi,
+            slutt=rader[-1].slutt,
+            justert_slutt=rader[-1].justert_slutt,
+            trend_avvik=trend.maaling,
+            dagens_endring=bevegelse.maaling,
+            standardavvik=bevegelse.grense,
+            volumforhold=interesse.maaling,
         )
 
     @staticmethod
@@ -607,15 +619,18 @@ class TestMaalingeneRundt:
         kurser = [100.0 + (nummer * 7 % 11) * 0.37 + nummer * 0.13 for nummer in range(61)]
         start = date(2026, 6, 1)
         return [
-            Kursrad(dato=start + timedelta(days=nummer), slutt=kurs + 1.0,
-                    justert_slutt=kurs, volum=volum)
+            Kursrad(dato=start + timedelta(days=nummer), slutt=kurs + 1.0, justert_slutt=kurs, volum=volum)
             for nummer, (kurs, volum) in enumerate(zip(kurser, volumer))
         ]
 
-    @pytest.mark.parametrize("volumer", [
-        [1_000 + nummer * 37 % 501 for nummer in range(60)] + [2_345],
-        [0] * 60 + [2_345],
-    ], ids=["vanlig dag", "medianvolum 0"])
+    @pytest.mark.parametrize(
+        "volumer",
+        [
+            [1_000 + nummer * 37 % 501 for nummer in range(60)] + [2_345],
+            [0] * 60 + [2_345],
+        ],
+        ids=["vanlig dag", "medianvolum 0"],
+    )
     def test_de_fire_flyttallene_er_noeyaktig_like(self, tilkobling, volumer):
         skrevet = self.fra_signal(self.rader(volumer))
         assert lager(tilkobling).skriv("EQNR", date(2026, 9, 23), skrevet) is True

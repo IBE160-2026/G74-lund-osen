@@ -38,8 +38,15 @@ class FalskModell:
         self.kall += 1
         if self.feil is not None:
             raise self.feil
-        return Modellsvar(tekst=self.tekst, modell="gemma4:e4b", modell_id="dc35e8d9c606",
-                          seed=42, temperatur=0.0, maskinvare="gpu", ollama_versjon="0.35.1")
+        return Modellsvar(
+            tekst=self.tekst,
+            modell="gemma4:e4b",
+            modell_id="dc35e8d9c606",
+            seed=42,
+            temperatur=0.0,
+            maskinvare="gpu",
+            ollama_versjon="0.35.1",
+        )
 
 
 @pytest.fixture
@@ -90,9 +97,13 @@ class TestSteget:
         kjoer(raa, base, FalskModell())
         vurdering = vurderingene(base, TIRSDAG)["EQNR"][0]
         rad = radene(base)["EQNR"]
-        assert dict(rad.grunnlag) == {"trend": vurdering.trend, "bevegelse": vurdering.bevegelse,
-                                      "interesse": vurdering.interesse, "styrke": vurdering.styrke,
-                                      "retning": vurdering.retning}
+        assert dict(rad.grunnlag) == {
+            "trend": vurdering.trend,
+            "bevegelse": vurdering.bevegelse,
+            "interesse": vurdering.interesse,
+            "styrke": vurdering.styrke,
+            "retning": vurdering.retning,
+        }
         assert rad.regelen == regeltekst(vurdering)
 
     def test_ingen_kall_til_eodhd_fra_steget(self, stier, tmp_path):
@@ -205,10 +216,15 @@ class TestTjenesten:
         modell = velg_modell({"OSE_KI_TJENESTE": "lokal", "OSE_KI_OLLAMA_URL": "http://ollama:11434"})
         assert modell.url == "http://ollama:11434"
 
-    @pytest.mark.parametrize("tjeneste, tekst", [
-        ("gemini", "ikke bygget ennaa"), ("chatgpt", "ukjent eller tom verdi"),
-        ("", "ukjent eller tom verdi"), ("   ", "ukjent eller tom verdi"),
-    ])
+    @pytest.mark.parametrize(
+        "tjeneste, tekst",
+        [
+            ("gemini", "ikke bygget ennaa"),
+            ("chatgpt", "ukjent eller tom verdi"),
+            ("", "ukjent eller tom verdi"),
+            ("   ", "ukjent eller tom verdi"),
+        ],
+    )
     def test_ingen_stille_overgang(self, tjeneste, tekst):
         """FR-608: én tjeneste per kjoering, aldri en annen i stedet."""
         linjer = []
@@ -217,8 +233,9 @@ class TestTjenesten:
 
     def test_miljoeet_foer_env_og_bare_ki_noeklene(self, tmp_path):
         env = tmp_path / ".env"
-        env.write_text("EODHD_API_KEY=hemmelig\nOSE_KI_TJENESTE=lokal\nOSE_KI_OLLAMA_URL=http://x:1\n",
-                       encoding="utf-8")
+        env.write_text(
+            "EODHD_API_KEY=hemmelig\nOSE_KI_TJENESTE=lokal\nOSE_KI_OLLAMA_URL=http://x:1\n", encoding="utf-8"
+        )
         assert ki_innstillinger(env, {}) == {"OSE_KI_TJENESTE": "lokal", "OSE_KI_OLLAMA_URL": "http://x:1"}
         assert ki_innstillinger(env, {"OSE_KI_TJENESTE": "av"}) == {"OSE_KI_TJENESTE": "av"}
         assert ki_innstillinger(tmp_path / "finnes-ikke", {}) == {}
@@ -313,16 +330,19 @@ class TestEtterGjennomgangen:
     @pytest.mark.parametrize("url", ["127.0.0.1:11434", "   ", "ftp://x", "http://"])
     def test_en_adresse_som_ikke_er_en_adresse(self, url):
         linjer = []
-        assert velg_modell({"OSE_KI_TJENESTE": "lokal", "OSE_KI_OLLAMA_URL": url}, linjer.append) is None \
+        assert (
+            velg_modell({"OSE_KI_TJENESTE": "lokal", "OSE_KI_OLLAMA_URL": url}, linjer.append) is None
             or url.strip() == ""
+        )
         if url.strip():
             assert "ikke en adresse" in linjer[0]
 
     def test_en_adresse_utenfor_maskinen_gir_beskjed(self):
         """BH13: prompten sendes dit, og hentingen sier fra."""
         linjer = []
-        modell = velg_modell({"OSE_KI_TJENESTE": "lokal", "OSE_KI_OLLAMA_URL": "http://ki.example.com:11434"},
-                             linjer.append)
+        modell = velg_modell(
+            {"OSE_KI_TJENESTE": "lokal", "OSE_KI_OLLAMA_URL": "http://ki.example.com:11434"}, linjer.append
+        )
         assert modell is not None and "ki.example.com" in linjer[0]
 
     def test_innstillinger_som_ikke_kan_leses(self, tmp_path, monkeypatch):
@@ -380,10 +400,13 @@ class TestForhaandssjekken:
     """Svar c kl. 23:32: svarer ikke tjenesten eller mangler modellen, skrives
     ingen rader, og samme kommando kan kjoeres igjen samme kveld."""
 
-    @pytest.mark.parametrize("grunn, hva", [
-        ("Ollama svarer ikke (kjoerer den?)", "Start Ollama"),
-        ("modellen gemma4:e4b er ikke hentet (ollama pull gemma4:e4b)", "Hent modellen"),
-    ])
+    @pytest.mark.parametrize(
+        "grunn, hva",
+        [
+            ("Ollama svarer ikke (kjoerer den?)", "Start Ollama"),
+            ("modellen gemma4:e4b er ikke hentet (ollama pull gemma4:e4b)", "Hent modellen"),
+        ],
+    )
     def test_ingen_rader_og_utskriften_sier_hvorfor(self, stier, grunn, hva):
         """Og hva brukeren gjoer, etter grunnen (gjennomgangen, BH1, ECH)."""
         raa, base = stier
@@ -392,9 +415,11 @@ class TestForhaandssjekken:
         assert kode == 0 and modell.kall == 0
         rader = radene(base)
         assert len(rader) == 15 and all(r is None for r in rader.values())
-        assert (f"Ingen KI-tekst for boersdagen 2026-09-22 ennaa: {grunn}. Ingen rader er skrevet i "
-                f"KI-loggen, og 15 aksjer venter paa teksten. {hva}, se «Den lokale modellen» i "
-                f"README-en, og kjoer samme kommando igjen foer midnatt. Det gir 0 kall til EODHD.") in ut
+        assert (
+            f"Ingen KI-tekst for boersdagen 2026-09-22 ennaa: {grunn}. Ingen rader er skrevet i "
+            f"KI-loggen, og 15 aksjer venter paa teksten. {hva}, se «Den lokale modellen» i "
+            f"README-en, og kjoer samme kommando igjen foer midnatt. Det gir 0 kall til EODHD."
+        ) in ut
 
     def test_samme_kveld_etter_at_ollama_er_startet(self, stier):
         """Foerst svarer ikke Ollama, saa er den startet: samme kommando lager
@@ -450,6 +475,7 @@ class TestSjekkenEtterGjennomgangen:
 
         def nede(*_a):
             import requests
+
             raise requests.ConnectionError("nede")
 
         linjer = []
@@ -490,11 +516,18 @@ class TestSjekkenEtterGjennomgangen:
             logg = SqliteKILogg(tilkobling, lambda: OEYEBLIKK)
             from ki_modell import lag_ki_rad
             from ki_grunnlag import ki_grunnlag
+
             vurd = vurderingene(base, TIRSDAG)
             for aksje in AKSJEUNIVERS[:5]:
                 v = vurd[aksje.symbol][0]
-                logg.skriv(lag_ki_rad(Emne.aksje(aksje.symbol, TIRSDAG), ki_grunnlag(v, utenfor_maalingen=False),
-                                      regeltekst(v), FalskModell()))
+                logg.skriv(
+                    lag_ki_rad(
+                        Emne.aksje(aksje.symbol, TIRSDAG),
+                        ki_grunnlag(v, utenfor_maalingen=False),
+                        regeltekst(v),
+                        FalskModell(),
+                    )
+                )
         finally:
             tilkobling.close()
         nede = SjekketModell("Ollama svarer ikke (kjoerer den?)")

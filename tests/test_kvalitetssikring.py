@@ -145,10 +145,13 @@ def test_hver_story_som_deles_har_egen_merkelapp():
         assert len(uten) <= 1, (merke, uten)
 
 
-@pytest.mark.parametrize("overskrift, kolonne", [
-    ("### Per story", "Story"),
-    ("### Gjennomgangen av hver story", "Story"),
-])
+@pytest.mark.parametrize(
+    "overskrift, kolonne",
+    [
+        ("### Per story", "Story"),
+        ("### Gjennomgangen av hver story", "Story"),
+    ],
+)
 def test_hver_ferdige_spesifikasjon_har_en_rad(overskrift, kolonne):
     """Ville feilet hvis raden for en spesifikasjon med status done ble tatt
     bort fra tabellen i §3 eller §5, eller en spesifikasjon ble satt til done
@@ -201,9 +204,13 @@ def test_hver_test_dokumentene_nevner_finnes(dokument):
     som ikke finnes, står i lista, ikke som en feil midt i sjekken."""
     nevnt = TESTNAVN.findall(dokument.read_text(encoding="utf-8"))
     assert nevnt, dokument.name
-    borte = sorted({f"tests/{fil}::{navn}" for fil, navn in nevnt
-                    if navn not in _testene_i_fila(TESTER / fil)
-                    and f"tests/{fil}::{navn}" not in OMDOEPT})
+    borte = sorted(
+        {
+            f"tests/{fil}::{navn}"
+            for fil, navn in nevnt
+            if navn not in _testene_i_fila(TESTER / fil) and f"tests/{fil}::{navn}" not in OMDOEPT
+        }
+    )
     assert not borte, borte
 
 

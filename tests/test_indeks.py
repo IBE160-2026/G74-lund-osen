@@ -49,8 +49,10 @@ def tabeller(tilkobling) -> set[str]:
 
 
 def triggere_paa(tilkobling, tabell: str) -> list[str]:
-    return [r[0] for r in tilkobling.execute(
-        "SELECT name FROM sqlite_master WHERE type = 'trigger' AND tbl_name = ?", (tabell,))]
+    return [
+        r[0]
+        for r in tilkobling.execute("SELECT name FROM sqlite_master WHERE type = 'trigger' AND tbl_name = ?", (tabell,))
+    ]
 
 
 def katalog_til(tmp_path: Path, siste: int) -> Path:
@@ -103,7 +105,12 @@ class TestMigrasjonen:
             assert migrer(tilkobling, MIGRASJONSKATALOG) == 6 == siste_versjon(MIGRASJONSKATALOG)
             assert tabeller(tilkobling) == TABELLENE_FOER_0006 | {"indeks", "indeksserie"}
             assert [k[1] for k in tilkobling.execute("PRAGMA table_info(indeks)")] == [
-                "symbol", "dato", "slutt", "justert_slutt", "volum"]
+                "symbol",
+                "dato",
+                "slutt",
+                "justert_slutt",
+                "volum",
+            ]
             assert [k[1] for k in tilkobling.execute("PRAGMA table_info(indeksserie)")] == ["symbol", "hentet"]
         finally:
             tilkobling.close()
@@ -121,8 +128,12 @@ class TestMigrasjonen:
             assert migrer(tilkobling, MIGRASJONSKATALOG) == 6
             assert versjon(tilkobling) == 6
             etter_skjema = {r for r in tilkobling.execute("SELECT type, name, sql FROM sqlite_master")}
-            assert {r[1] for r in etter_skjema - foer_skjema} == {"indeks", "indeksserie", "sqlite_autoindex_indeks_1",
-                                                                  "sqlite_autoindex_indeksserie_1"}
+            assert {r[1] for r in etter_skjema - foer_skjema} == {
+                "indeks",
+                "indeksserie",
+                "sqlite_autoindex_indeks_1",
+                "sqlite_autoindex_indeksserie_1",
+            }
             assert foer_skjema <= etter_skjema
             assert tilkobling.execute("SELECT * FROM kurs").fetchall() == foer_kurs
         finally:
@@ -275,8 +286,11 @@ class TestPorten:
         """Ingen årstall som tall i indeksdata.py (datoer i docstringene
         teller ikke)."""
         tre = ast.parse((SRC / "indeksdata.py").read_text(encoding="utf-8"))
-        assert not [n.value for n in ast.walk(tre)
-                    if isinstance(n, ast.Constant) and isinstance(n.value, int) and 1900 <= n.value <= 2100]
+        assert not [
+            n.value
+            for n in ast.walk(tre)
+            if isinstance(n, ast.Constant) and isinstance(n.value, int) and 1900 <= n.value <= 2100
+        ]
 
 
 class TestIndeksenErIkkeEnAksje:
@@ -332,8 +346,12 @@ class TestDemoindeksen:
     def test_indeksen_for_alle_demodagene(self, demobasen):
         """FR-411 og beslutningen 16.10 kl. 11:46. Ville feilet hvis demobasen
         ble laget uten indeks, eller manglet en dag."""
-        dager = [r[0] for r in demobasen.execute(
-            "SELECT dato FROM indeks WHERE symbol = ? ORDER BY dato", (demo.DEMOINDEKS.symbol,))]
+        dager = [
+            r[0]
+            for r in demobasen.execute(
+                "SELECT dato FROM indeks WHERE symbol = ? ORDER BY dato", (demo.DEMOINDEKS.symbol,)
+            )
+        ]
         assert dager == [d.isoformat() for d in demo.handelsdager()]
         assert demobasen.execute("SELECT DISTINCT symbol FROM indeks").fetchall() == [(demo.DEMOINDEKS.symbol,)]
         assert demobasen.execute("SELECT count(*) FROM indeksserie").fetchone()[0] == 1
@@ -357,8 +375,11 @@ class TestDemoindeksen:
         paa_dag = [{r.dato: r for r in rader} for rader in serier.values()]
         assert indeks[0].slutt == demo.INDEKS_START
         for i in range(1, len(dager)):
-            endringer = [d[dager[i]].justert_slutt / d[dager[i - 1]].justert_slutt - 1
-                         for d in paa_dag if dager[i] in d and dager[i - 1] in d]
+            endringer = [
+                d[dager[i]].justert_slutt / d[dager[i - 1]].justert_slutt - 1
+                for d in paa_dag
+                if dager[i] in d and dager[i - 1] in d
+            ]
             assert endringer, dager[i]
             ventet = indeks[i - 1].slutt * (1 + sum(endringer) / len(endringer))
             assert indeks[i].slutt == pytest.approx(ventet, rel=1e-5), dager[i]

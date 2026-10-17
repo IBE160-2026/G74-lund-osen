@@ -69,8 +69,15 @@ def _grunn(tekst: str) -> str:
 
 def _uten_tekst(emne, grunnlag, regelen, modell, grunn) -> KIRad:
     return KIRad(
-        emne=emne, grunnlag=grunnlag, regelen=regelen, tekst=None, besto=False, grunn=grunn,
-        promptversjon=PROMPTVERSJON, tjeneste=modell.tjeneste, modell=modell.modell,
+        emne=emne,
+        grunnlag=grunnlag,
+        regelen=regelen,
+        tekst=None,
+        besto=False,
+        grunn=grunn,
+        promptversjon=PROMPTVERSJON,
+        tjeneste=modell.tjeneste,
+        modell=modell.modell,
     )
 
 
@@ -92,16 +99,35 @@ def lag_ki_rad(emne: Emne, grunnlag: Mapping[str, object], regelen: str, modell:
         return _uten_tekst(emne, grunnlag, regelen, modell, _grunn("svaret var ikke et Modellsvar"))
     tekst = svar.tekst.strip() if isinstance(svar.tekst, str) else ""
     kjoering = dict(
-        promptversjon=PROMPTVERSJON, tjeneste=modell.tjeneste, modell=svar.modell,
-        modell_id=svar.modell_id, seed=svar.seed, temperatur=svar.temperatur,
-        maskinvare=svar.maskinvare, ollama_versjon=svar.ollama_versjon,
+        promptversjon=PROMPTVERSJON,
+        tjeneste=modell.tjeneste,
+        modell=svar.modell,
+        modell_id=svar.modell_id,
+        seed=svar.seed,
+        temperatur=svar.temperatur,
+        maskinvare=svar.maskinvare,
+        ollama_versjon=svar.ollama_versjon,
     )
     try:
         if not tekst:
-            return KIRad(emne=emne, grunnlag=grunnlag, regelen=regelen, tekst=None, besto=False,
-                         grunn=_grunn("tom tekst"), **kjoering)
+            return KIRad(
+                emne=emne,
+                grunnlag=grunnlag,
+                regelen=regelen,
+                tekst=None,
+                besto=False,
+                grunn=_grunn("tom tekst"),
+                **kjoering,
+            )
         kontroll = kontroller(tekst, grunnlag)
-        return KIRad(emne=emne, grunnlag=grunnlag, regelen=regelen, tekst=tekst,
-                     besto=kontroll.besto, grunn=kontroll.grunn, **kjoering)
+        return KIRad(
+            emne=emne,
+            grunnlag=grunnlag,
+            regelen=regelen,
+            tekst=tekst,
+            besto=kontroll.besto,
+            grunn=kontroll.grunn,
+            **kjoering,
+        )
     except UgyldigKIRad:
         return _uten_tekst(emne, grunnlag, regelen, modell, _grunn("ugyldige verdier i svaret"))

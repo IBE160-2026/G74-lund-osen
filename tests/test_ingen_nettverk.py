@@ -239,9 +239,15 @@ def test_udp_blokkeres():
         sock.close()
 
 
-@pytest.mark.parametrize("funksjon", [
-    "gethostbyname", "gethostbyname_ex", "gethostbyaddr", "getfqdn",
-])
+@pytest.mark.parametrize(
+    "funksjon",
+    [
+        "gethostbyname",
+        "gethostbyname_ex",
+        "gethostbyaddr",
+        "getfqdn",
+    ],
+)
 def test_navneoppslag_blokkeres(funksjon):
     """Funksjonen sjekkes foer den kalles, saa en sperre som mangler, ikke
     gir et ekte oppslag."""

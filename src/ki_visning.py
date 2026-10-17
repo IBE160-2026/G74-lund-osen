@@ -85,8 +85,10 @@ def stemmer(grunnlag: Mapping[str, object], vurdering: Vurdering) -> bool:
     """FR-602: samme styrke, samme retning og samme fortegn for de tre.
     Verdiene for de tre er fortegnene selv (-1, 0 eller 1), saa de
     sammenlignes som de er."""
-    return all(grunnlag.get(navn) == getattr(vurdering, navn)
-               for navn in ("trend", "bevegelse", "interesse", "styrke", "retning"))
+    return all(
+        grunnlag.get(navn) == getattr(vurdering, navn)
+        for navn in ("trend", "bevegelse", "interesse", "styrke", "retning")
+    )
 
 
 def bygg_ki_visning(rad: KIRad | None, vurdering: object, *, andre_har_rader: bool) -> KIVisning:

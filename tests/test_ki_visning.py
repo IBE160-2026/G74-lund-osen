@@ -15,8 +15,17 @@ import pytest
 import app as app_modul
 import lagring_sqlite
 from ki_visning import (
-    BESTO_IKKE, INGEN_FOR_AKSJEN, INGEN_RAD, UKJENT, KAPSEL, MODELLEN_FEILET, STEMMER_IKKE, STOPPET_AV_VAKTEN, VIST,
-    bygg_ki_visning, ki_paa,
+    BESTO_IKKE,
+    INGEN_FOR_AKSJEN,
+    INGEN_RAD,
+    UKJENT,
+    KAPSEL,
+    MODELLEN_FEILET,
+    STEMMER_IKKE,
+    STOPPET_AV_VAKTEN,
+    VIST,
+    bygg_ki_visning,
+    ki_paa,
 )
 from kilogg import Emne, KIRad, UgyldigKIRad
 from lagring_sqlite import aapne_base
@@ -24,17 +33,34 @@ from test_app import HENTET, serie, skriv_serie, skriv_vurdering
 from vurderingsdata import Grunn, Vurdering
 
 VURDERING = Vurdering(
-    styrke=2, retning="Blandet", trend=1, bevegelse=0, interesse=-1,
-    slutt=100.0, justert_slutt=100.0, trend_avvik=0.031,
-    dagens_endring=-0.035, standardavvik=0.011, volumforhold=4.95,
+    styrke=2,
+    retning="Blandet",
+    trend=1,
+    bevegelse=0,
+    interesse=-1,
+    slutt=100.0,
+    justert_slutt=100.0,
+    trend_avvik=0.031,
+    dagens_endring=-0.035,
+    standardavvik=0.011,
+    volumforhold=4.95,
 )
 GRUNNLAG = {"trend": 1, "bevegelse": 0, "interesse": -1, "styrke": 2, "retning": "Blandet"}
 TEKST = "Kursen ligger over snittet, men det ble handlet mye på en dag kursen falt."
 
 
 def kirad(dato=date(2026, 10, 31), **endret) -> KIRad:
-    felt = dict(emne=Emne.aksje("EQNR", dato), grunnlag=GRUNNLAG, regelen="r", tekst=TEKST, besto=True,
-                grunn=None, promptversjon="1", tjeneste="lokal", modell="gemma4:e4b")
+    felt = dict(
+        emne=Emne.aksje("EQNR", dato),
+        grunnlag=GRUNNLAG,
+        regelen="r",
+        tekst=TEKST,
+        besto=True,
+        grunn=None,
+        promptversjon="1",
+        tjeneste="lokal",
+        modell="gemma4:e4b",
+    )
     felt.update(endret)
     return KIRad(**felt)
 
@@ -43,11 +69,28 @@ def skriv_kirad(rad: KIRad) -> None:
     """Rett i basen, med adapterens egen INSERT, uten datokontrollen."""
     tilkobling = aapne_base(lagring_sqlite.BASE_STI)
     try:
-        tilkobling.execute(lagring_sqlite._KI_SKRIV, (
-            rad.emne.slag, rad.emne.dato.isoformat(), rad.emne.symbol, rad.emne.melding_id,
-            rad.grunnlag_som_json(), rad.regelen, rad.tekst, int(rad.besto), rad.grunn,
-            rad.promptversjon, rad.tjeneste, rad.modell, None, None, None, None, None,
-        ))
+        tilkobling.execute(
+            lagring_sqlite._KI_SKRIV,
+            (
+                rad.emne.slag,
+                rad.emne.dato.isoformat(),
+                rad.emne.symbol,
+                rad.emne.melding_id,
+                rad.grunnlag_som_json(),
+                rad.regelen,
+                rad.tekst,
+                int(rad.besto),
+                rad.grunn,
+                rad.promptversjon,
+                rad.tjeneste,
+                rad.modell,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+        )
         tilkobling.commit()
     finally:
         tilkobling.close()
@@ -98,13 +141,16 @@ class TestVisningen:
         ki = bygg_ki_visning(kirad(besto=False, grunn="3: «kjøp»"), VURDERING, andre_har_rader=False)
         assert ki.tilstand == BESTO_IKKE and ki.tekst is None
 
-    @pytest.mark.parametrize("endret", [
-        dict(trend=0, bevegelse=0, interesse=-1, styrke=1, retning="Negativ"),
-        dict(trend=1, bevegelse=1, interesse=-1, styrke=3, retning="Blandet"),
-        dict(trend=1, bevegelse=0, interesse=1, styrke=2, retning="Positiv"),
-        # Gjennomgangen (VG1): samme styrke og retning, men andre fortegn.
-        dict(trend=-1, bevegelse=0, interesse=1, styrke=2, retning="Blandet"),
-    ])
+    @pytest.mark.parametrize(
+        "endret",
+        [
+            dict(trend=0, bevegelse=0, interesse=-1, styrke=1, retning="Negativ"),
+            dict(trend=1, bevegelse=1, interesse=-1, styrke=3, retning="Blandet"),
+            dict(trend=1, bevegelse=0, interesse=1, styrke=2, retning="Positiv"),
+            # Gjennomgangen (VG1): samme styrke og retning, men andre fortegn.
+            dict(trend=-1, bevegelse=0, interesse=1, styrke=2, retning="Blandet"),
+        ],
+    )
     def test_grunnlaget_stemmer_ikke_med_vurderingen(self, endret):
         """FR-602 og svar 3: en vurdering skrevet paa nytt samme dag."""
         annen = Vurdering(**{**VURDERING.__dict__, **endret})
@@ -114,9 +160,22 @@ class TestVisningen:
         """Gjennomgangen (BH5): ingen vurdering aa forklare, ikke «skrevet paa nytt»."""
         assert bygg_ki_visning(kirad(), Grunn.KURS_IKKE_FRA_DAGEN, andre_har_rader=False).tilstand == UKJENT
 
-    @pytest.mark.parametrize("ord_", ["Kjøp", "selger", "anbefales", "KJØPSSIGNAL", "salgssignal",
-                                      "salgsanbefaling", "aksjekjøp", "kj\u00adøpssignal", "solgt",
-                                      "tilrådd", "kjop"])
+    @pytest.mark.parametrize(
+        "ord_",
+        [
+            "Kjøp",
+            "selger",
+            "anbefales",
+            "KJØPSSIGNAL",
+            "salgssignal",
+            "salgsanbefaling",
+            "aksjekjøp",
+            "kj\u00adøpssignal",
+            "solgt",
+            "tilrådd",
+            "kjop",
+        ],
+    )
     def test_vakten_stopper_raad(self, ord_):
         """NFR-06: vakten paa vaar side, ogsaa for en tekst som besto."""
         ki = bygg_ki_visning(kirad(tekst=f"Signalet er et {ord_}."), VURDERING, andre_har_rader=False)
@@ -150,12 +209,18 @@ class TestSiden:
     def test_en_dag_uten_rad_sier_det(self, klient, aksje):
         """Ville feilet med et tomt felt (V3)."""
         html = side(klient)
-        assert '<p class="uten">Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.</p>' in html
+        assert (
+            '<p class="uten">Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.</p>'
+            in html
+        )
 
-    @pytest.mark.parametrize("endret, ord_", [
-        (dict(tekst=None, besto=False, grunn="modellen feilet"), "modellen svarte ikke"),
-        (dict(besto=False, grunn="1: retningen"), "teksten sa mer enn regelen"),
-    ])
+    @pytest.mark.parametrize(
+        "endret, ord_",
+        [
+            (dict(tekst=None, besto=False, grunn="modellen feilet"), "modellen svarte ikke"),
+            (dict(besto=False, grunn="1: retningen"), "teksten sa mer enn regelen"),
+        ],
+    )
     def test_grunnen_naar_teksten_ikke_vises(self, klient, aksje, endret, ord_):
         skriv_kirad(kirad(aksje, **endret))
         html = side(klient)
@@ -192,6 +257,7 @@ class TestSiden:
 
     def test_en_logg_som_ikke_kan_leses_gir_en_dag_uten_tekst(self, klient, aksje, monkeypatch):
         """NFR-04: for eksempel en base fra foer 0005."""
+
         def feil(*_a, **_k):
             raise RuntimeError("Basen er ikke migrert til siste versjon")
 
@@ -207,9 +273,21 @@ class TestBryteren:
         kapsel = svar.headers["Set-Cookie"]
         assert kapsel.startswith(f"{KAPSEL}=av") and "HttpOnly" in kapsel and "SameSite=Lax" in kapsel
 
-    @pytest.mark.parametrize("tilbake", [
-        "https://eksempel.no", "//eksempel.no", "/\\\\eksempel.no", "aksje", "/\t/eksempel.no",
-        "/\n/eksempel.no", "/%2F/eksempel.no", "/aksje/EQNR\r\nSet-Cookie: x=1", "/", "/aksje/"])
+    @pytest.mark.parametrize(
+        "tilbake",
+        [
+            "https://eksempel.no",
+            "//eksempel.no",
+            "/\\\\eksempel.no",
+            "aksje",
+            "/\t/eksempel.no",
+            "/\n/eksempel.no",
+            "/%2F/eksempel.no",
+            "/aksje/EQNR\r\nSet-Cookie: x=1",
+            "/",
+            "/aksje/",
+        ],
+    )
     def test_bare_en_sti_paa_samme_side(self, klient, tilbake):
         svar = klient.post("/ki", data={"til": "paa", "tilbake": tilbake})
         assert svar.headers["Location"] in ("/", "http://localhost/")
@@ -222,16 +300,17 @@ class TestBryteren:
 def test_webserveren_importerer_ingen_modell():
     """AD-10: siden kaller aldri en modell, og demoen heller ikke (FR-411)."""
     src = Path(app_modul.__file__).resolve().parent
-    kode = ("import sys; sys.path.insert(0, sys.argv[1]); import app; "
-            "print(sorted(m for m in ('ki_modell', 'ki_lokal', 'ki_tekst', 'ki_kontroll', 'ki_prompt') "
-            "if m in sys.modules))")
+    kode = (
+        "import sys; sys.path.insert(0, sys.argv[1]); import app; "
+        "print(sorted(m for m in ('ki_modell', 'ki_lokal', 'ki_tekst', 'ki_kontroll', 'ki_prompt') "
+        "if m in sys.modules))"
+    )
     ut = subprocess.run([sys.executable, "-c", kode, str(src)], capture_output=True, text=True, check=True)
     assert ut.stdout.strip() == "[]"
 
 
 class TestEtterGjennomgangen:
-    @pytest.mark.parametrize("tekst", ["Trenden er positiv.", "Selskapet hadde en stor dag.",
-                                       "Retningen er blandet."])
+    @pytest.mark.parametrize("tekst", ["Trenden er positiv.", "Selskapet hadde en stor dag.", "Retningen er blandet."])
     def test_vakten_slipper_en_vanlig_forklaring(self, tekst):
         """BH13: vakten stopper ikke alt. «Selskapet» er ikke «selg»."""
         assert bygg_ki_visning(kirad(tekst=tekst), VURDERING, andre_har_rader=False).tilstand == VIST
@@ -275,22 +354,29 @@ class TestEtterGjennomgangen:
         monkeypatch.setenv(app_modul.I_DEMO, "1")
         oversikt = klient.get("/").data.decode("utf-8")
         import re
+
         symbol = re.search(r'href="/aksje/([A-Z]+)"', oversikt).group(1)
         html = klient.get(f"/aksje/{symbol}").data.decode("utf-8")
         assert "Eksempeltall" in html
-        assert '<p class="uten">Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.</p>' in html
+        assert (
+            '<p class="uten">Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.</p>'
+            in html
+        )
 
 
 def test_webserveren_importerer_ingen_modell_heller_ikke_under_en_forespoersel(tmp_path):
     """BH14: ogsaa naar en side vises, og uansett hva en ny modellfil heter.
     Underprosessen faar en testbase i tmp_path (regel 22)."""
     src = Path(app_modul.__file__).resolve().parent
-    kode = ("import sys, pathlib; sys.path.insert(0, sys.argv[1]); import lagring_sqlite; "
-            "lagring_sqlite.BASE_STI = pathlib.Path(sys.argv[2]) / 'db' / 'ose.db'; import app; "
-            "app.app.config['TESTING'] = True; app.app.test_client().get('/aksje/EQNR'); "
-            "print(sorted(m for m in sys.modules if m.startswith('ki_') and m != 'ki_visning'))")
-    ut = subprocess.run([sys.executable, "-c", kode, str(src), str(tmp_path)],
-                        capture_output=True, text=True, check=True)
+    kode = (
+        "import sys, pathlib; sys.path.insert(0, sys.argv[1]); import lagring_sqlite; "
+        "lagring_sqlite.BASE_STI = pathlib.Path(sys.argv[2]) / 'db' / 'ose.db'; import app; "
+        "app.app.config['TESTING'] = True; app.app.test_client().get('/aksje/EQNR'); "
+        "print(sorted(m for m in sys.modules if m.startswith('ki_') and m != 'ki_visning'))"
+    )
+    ut = subprocess.run(
+        [sys.executable, "-c", kode, str(src), str(tmp_path)], capture_output=True, text=True, check=True
+    )
     assert ut.stdout.strip().splitlines()[-1] == "[]"
 
 
@@ -382,10 +468,10 @@ class TestGrunnenPaaSiden:
 
     def test_en_feil_i_sjekken_av_andre_gir_ingen_grunn(self, klient, aksje, monkeypatch):
         """VG2: en feil i sjekken gir 200 og ingen grunn, ikke 500."""
+
         def feil(*_a):
             raise sqlite3.OperationalError("no such table: ki_logg")
 
         monkeypatch.setattr(app_modul, "andre_aksjer_har_ki_rad", feil)
         html = side(klient)
         assert '<p class="uten">Ingen KI-tekst for denne dagen.</p>' in html and DAGEN not in html
-

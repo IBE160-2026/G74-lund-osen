@@ -95,9 +95,7 @@ def er_bedre(aksje: float | None, indeks: float) -> bool:
     return aksje is not None and avrundet(aksje, "endring") > avrundet(indeks, "endring")
 
 
-def sammenlign(
-    dag: date, indeks: float | None, aksjer: list[tuple[str, list[Kursrad]]]
-) -> Sammenligning | None:
+def sammenlign(dag: date, indeks: float | None, aksjer: list[tuple[str, list[Kursrad]]]) -> Sammenligning | None:
     """«x av N» for dag. aksjer er (navn, serie) for hver aksje i lista, i
     lista sin rekkefoelge. None naar indeksen ikke har en endring, eller
     ingen aksje har kurs for dagen."""

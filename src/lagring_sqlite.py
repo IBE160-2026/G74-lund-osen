@@ -79,6 +79,7 @@ def er_demobase(sti: Path) -> bool:
     except (sqlite3.Error, OSError):
         return False
 
+
 # Hvor lenge en tilkobling venter paa en laas foer den gir opp (story 2.2,
 # BH7 i 2.1b). 5 sekunder er standarden i sqlite3, skrevet ut her saa den er et
 # valg og ikke en tilfeldighet. Hentingen og webserveren kan naa bruke basen
@@ -86,9 +87,7 @@ def er_demobase(sti: Path) -> bool:
 VENTETID_SEKUNDER = 5.0
 
 
-def aapne_base(
-    sti: Path, *, kjoer_migrasjoner: bool = True, skrivebeskyttet: bool = False
-) -> sqlite3.Connection:
+def aapne_base(sti: Path, *, kjoer_migrasjoner: bool = True, skrivebeskyttet: bool = False) -> sqlite3.Connection:
     """Den ene aapningen av basen - story 2.1b og 2.2.
 
     Med kjoer_migrasjoner (standard) lages mappa, basen kobles til og
@@ -111,9 +110,7 @@ def aapne_base(
         # Story 3.4: skrivebeskyttet aapner med mode=ro. Det bruker
         # er_demobase, som bare leser merket.
         modus = "ro" if skrivebeskyttet else "rw"
-        return sqlite3.connect(
-            sti.resolve().as_uri() + f"?mode={modus}", uri=True, timeout=VENTETID_SEKUNDER
-        )
+        return sqlite3.connect(sti.resolve().as_uri() + f"?mode={modus}", uri=True, timeout=VENTETID_SEKUNDER)
     if skrivebeskyttet:
         raise ValueError("skrivebeskyttet krever kjoer_migrasjoner=False")
     sti.parent.mkdir(parents=True, exist_ok=True)
@@ -135,9 +132,7 @@ def har_kurser(tilkobling: sqlite3.Connection) -> bool:
     return tilkobling.execute("SELECT 1 FROM kursserie LIMIT 1").fetchone() is not None
 
 
-def _krev_siste_versjon(
-    tilkobling: sqlite3.Connection, *, godta_en_versjon_bak: bool = False
-) -> None:
+def _krev_siste_versjon(tilkobling: sqlite3.Connection, *, godta_en_versjon_bak: bool = False) -> None:
     """Felles for begge adapterne: basen skal staa paa siste versjon.
 
     Story 1.5b, c: ikke bare vaere migrert en gang. Med 0002 ville en base paa
@@ -154,9 +149,7 @@ def _krev_siste_versjon(
     try:
         siste = siste_versjon(MIGRASJONSKATALOG)
     except MigrasjonsFeil as feil:
-        raise RuntimeError(
-            f"Migrasjonskatalogen {MIGRASJONSKATALOG} er ikke i orden: {feil}"
-        ) from feil
+        raise RuntimeError(f"Migrasjonskatalogen {MIGRASJONSKATALOG} er ikke i orden: {feil}") from feil
     naa = versjon(tilkobling)
     if naa < siste - (1 if godta_en_versjon_bak else 0):
         raise RuntimeError(
@@ -199,20 +192,15 @@ class SqliteKurslager:
         tid = kontroller_skriving(symbol, rader, hentet, self._univers)
         if self._tilkobling.in_transaction:
             raise RuntimeError(
-                "Tilkoblingen har en aapen transaksjon. Adapteren styrer "
-                "transaksjonen selv - avslutt kallerens foerst."
+                "Tilkoblingen har en aapen transaksjon. Adapteren styrer transaksjonen selv - avslutt kallerens foerst."
             )
 
         try:
             self._tilkobling.execute("BEGIN")
             self._tilkobling.execute("DELETE FROM kurs WHERE symbol = ?", (symbol,))
             self._tilkobling.executemany(
-                "INSERT INTO kurs (symbol, dato, slutt, justert_slutt, volum) "
-                "VALUES (?, ?, ?, ?, ?)",
-                [
-                    (symbol, rad.dato.isoformat(), rad.slutt, rad.justert_slutt, rad.volum)
-                    for rad in rader
-                ],
+                "INSERT INTO kurs (symbol, dato, slutt, justert_slutt, volum) VALUES (?, ?, ?, ?, ?)",
+                [(symbol, rad.dato.isoformat(), rad.slutt, rad.justert_slutt, rad.volum) for rad in rader],
             )
             self._tilkobling.execute(
                 "INSERT INTO kursserie (symbol, hentet) VALUES (?, ?) "
@@ -222,9 +210,7 @@ class SqliteKurslager:
             self._tilkobling.execute("COMMIT")
         except sqlite3.IntegrityError as feil:
             self._rull_tilbake()
-            raise ValueError(
-                f"Serien for {symbol} ble avvist og rullet tilbake: {feil}"
-            ) from feil
+            raise ValueError(f"Serien for {symbol} ble avvist og rullet tilbake: {feil}") from feil
         except BaseException:
             self._rull_tilbake()
             raise
@@ -238,16 +224,13 @@ class SqliteKurslager:
                 volum=volum,
             )
             for dato, slutt, justert_slutt, volum in self._tilkobling.execute(
-                "SELECT dato, slutt, justert_slutt, volum FROM kurs "
-                "WHERE symbol = ? ORDER BY dato",
+                "SELECT dato, slutt, justert_slutt, volum FROM kurs WHERE symbol = ? ORDER BY dato",
                 (symbol,),
             )
         ]
 
     def sist_hentet(self, symbol: str) -> datetime | None:
-        rad = self._tilkobling.execute(
-            "SELECT hentet FROM kursserie WHERE symbol = ?", (symbol,)
-        ).fetchone()
+        rad = self._tilkobling.execute("SELECT hentet FROM kursserie WHERE symbol = ?", (symbol,)).fetchone()
         return datetime.fromisoformat(rad[0]) if rad else None
 
     def _rull_tilbake(self) -> None:
@@ -270,8 +253,7 @@ class SqliteIndekslager:
         beholdt, tid = kontroller_indeksskriving(symbol, list(rader), hentet, self._indekser)
         if self._tilkobling.in_transaction:
             raise RuntimeError(
-                "Tilkoblingen har en aapen transaksjon. Adapteren styrer "
-                "transaksjonen selv - avslutt kallerens foerst."
+                "Tilkoblingen har en aapen transaksjon. Adapteren styrer transaksjonen selv - avslutt kallerens foerst."
             )
         try:
             self._tilkobling.execute("BEGIN")
@@ -303,9 +285,7 @@ class SqliteIndekslager:
         ]
 
     def sist_hentet(self, symbol: str) -> datetime | None:
-        rad = self._tilkobling.execute(
-            "SELECT hentet FROM indeksserie WHERE symbol = ?", (symbol,)
-        ).fetchone()
+        rad = self._tilkobling.execute("SELECT hentet FROM indeksserie WHERE symbol = ?", (symbol,)).fetchone()
         return datetime.fromisoformat(rad[0]) if rad else None
 
     def symboler(self) -> tuple[str, ...]:
@@ -324,8 +304,17 @@ SYMBOLER = frozenset(aksje.symbol for aksje in AKSJEUNIVERS)
 # Maalingene fra 0004 (story 2.1c) staar her, saa _UPSERT, skriv og les tar
 # dem med uten egen kode.
 VURDERINGSKOLONNER = (
-    "styrke", "retning", "trend", "bevegelse", "interesse", "slutt", "justert_slutt",
-    "trend_avvik", "dagens_endring", "standardavvik", "volumforhold",
+    "styrke",
+    "retning",
+    "trend",
+    "bevegelse",
+    "interesse",
+    "slutt",
+    "justert_slutt",
+    "trend_avvik",
+    "dagens_endring",
+    "standardavvik",
+    "volumforhold",
 )
 
 # Siste vinner, med ett unntak: en grunn skriver aldri over en vurdering
@@ -375,10 +364,7 @@ class SqliteVurderingslager:
         self._tilkobling = tilkobling
         self._klokke = klokke
         # Story 3.4: lista som skrives, med AKSJEUNIVERS som standard.
-        self._symboler = (
-            SYMBOLER if univers is AKSJEUNIVERS
-            else frozenset(aksje.symbol for aksje in univers)
-        )
+        self._symboler = SYMBOLER if univers is AKSJEUNIVERS else frozenset(aksje.symbol for aksje in univers)
 
     def skriv(self, symbol: str, dato: date, innhold: Vurdering | Grunn) -> bool:
         _kontroller_noekkel(symbol, dato, self._symboler)
@@ -387,9 +373,7 @@ class SqliteVurderingslager:
         elif isinstance(innhold, Grunn):
             verdier = (*(None for _ in VURDERINGSKOLONNER), innhold.value)
         else:
-            raise TypeError(
-                f"innhold maa vaere Vurdering eller Grunn, fikk {type(innhold).__name__}"
-            )
+            raise TypeError(f"innhold maa vaere Vurdering eller Grunn, fikk {type(innhold).__name__}")
         dagens = innevaerende_boersdag(norsk_dato(self._klokke()))
         if dato != dagens:
             raise ValueError(
@@ -398,15 +382,12 @@ class SqliteVurderingslager:
             )
         if self._tilkobling.in_transaction:
             raise RuntimeError(
-                "Tilkoblingen har en aapen transaksjon. Adapteren styrer "
-                "transaksjonen selv - avslutt kallerens foerst."
+                "Tilkoblingen har en aapen transaksjon. Adapteren styrer transaksjonen selv - avslutt kallerens foerst."
             )
 
         try:
             self._tilkobling.execute("BEGIN")
-            skrevet = self._tilkobling.execute(
-                _UPSERT, (symbol, dato.isoformat(), *verdier)
-            ).rowcount
+            skrevet = self._tilkobling.execute(_UPSERT, (symbol, dato.isoformat(), *verdier)).rowcount
             self._tilkobling.execute("COMMIT")
         except BaseException:
             if self._tilkobling.in_transaction:
@@ -419,8 +400,7 @@ class SqliteVurderingslager:
         # gitt None, som leses som at kommandoen ikke ble kjoert (FR-409).
         _kontroller_noekkel(symbol, dato, self._symboler)
         rad = self._tilkobling.execute(
-            "SELECT " + ", ".join(VURDERINGSKOLONNER) + ", grunn FROM vurdering "
-            "WHERE symbol = ? AND dato = ?",
+            "SELECT " + ", ".join(VURDERINGSKOLONNER) + ", grunn FROM vurdering WHERE symbol = ? AND dato = ?",
             (symbol, dato.isoformat()),
         ).fetchone()
         if rad is None:
@@ -444,9 +424,12 @@ def _innhold(felt, grunn) -> Vurdering | Grunn:
 _KURSFELT = "dato, slutt, justert_slutt, volum"
 _OVERSIKT = (
     "SELECT a.symbol, a.ticker, a.navn, a.sektor, ks.hentet, "
-    + ", ".join(f"n.{k}" for k in _KURSFELT.split(", ")) + ", "
-    + ", ".join(f"f.{k}" for k in _KURSFELT.split(", ")) + ", "
-    + ", ".join(f"v.{k}" for k in VURDERINGSKOLONNER) + ", v.grunn "
+    + ", ".join(f"n.{k}" for k in _KURSFELT.split(", "))
+    + ", "
+    + ", ".join(f"f.{k}" for k in _KURSFELT.split(", "))
+    + ", "
+    + ", ".join(f"v.{k}" for k in VURDERINGSKOLONNER)
+    + ", v.grunn "
     "FROM aksje a "
     "LEFT JOIN kursserie ks ON ks.symbol = a.symbol "
     "LEFT JOIN kurs n ON n.symbol = a.symbol "
@@ -460,9 +443,7 @@ _OVERSIKT = (
 def _kursrad(dato, slutt, justert_slutt, volum) -> Kursrad | None:
     if dato is None:
         return None
-    return Kursrad(
-        dato=date.fromisoformat(dato), slutt=slutt, justert_slutt=justert_slutt, volum=volum
-    )
+    return Kursrad(dato=date.fromisoformat(dato), slutt=slutt, justert_slutt=justert_slutt, volum=volum)
 
 
 class SqliteOversiktsleser:
@@ -478,15 +459,10 @@ class SqliteOversiktsleser:
         self._tilkobling = tilkobling
 
     def oversikt(self) -> list[Oversiktspost]:
-        return [
-            _post(rad)
-            for rad in self._tilkobling.execute(_OVERSIKT + "ORDER BY a.rowid")
-        ]
+        return [_post(rad) for rad in self._tilkobling.execute(_OVERSIKT + "ORDER BY a.rowid")]
 
     def post(self, symbol: str) -> Oversiktspost | None:
-        rad = self._tilkobling.execute(
-            _OVERSIKT + "WHERE a.symbol = ?", (symbol,)
-        ).fetchone()
+        rad = self._tilkobling.execute(_OVERSIKT + "WHERE a.symbol = ?", (symbol,)).fetchone()
         return _post(rad) if rad is not None else None
 
 
@@ -507,23 +483,38 @@ def _post(rad) -> Oversiktspost:
 
 # Story 4.3: KI-loggen (0005). Kolonnene i samme rekkefoelge som i tabellen.
 _KI_KOLONNER = (
-    "slag", "dato", "symbol", "melding_id", "grunnlag", "regelen", "tekst", "besto",
-    "grunn", "promptversjon", "tjeneste", "modell", "modell_id", "seed", "temperatur",
-    "maskinvare", "ollama_versjon",
+    "slag",
+    "dato",
+    "symbol",
+    "melding_id",
+    "grunnlag",
+    "regelen",
+    "tekst",
+    "besto",
+    "grunn",
+    "promptversjon",
+    "tjeneste",
+    "modell",
+    "modell_id",
+    "seed",
+    "temperatur",
+    "maskinvare",
+    "ollama_versjon",
 )
 
 # ON CONFLICT DO NOTHING, ikke INSERT OR IGNORE: IGNORE ville ogsaa svelget en
 # CHECK som feiler. Raden som finnes, staar (FR-604, svar 2 kl. 15:53).
 _KI_SKRIV = (
-    "INSERT INTO ki_logg (" + ", ".join(_KI_KOLONNER) + ") VALUES ("
-    + ", ".join("?" for _ in _KI_KOLONNER) + ") ON CONFLICT DO NOTHING"
+    "INSERT INTO ki_logg ("
+    + ", ".join(_KI_KOLONNER)
+    + ") VALUES ("
+    + ", ".join("?" for _ in _KI_KOLONNER)
+    + ") ON CONFLICT DO NOTHING"
 )
 
 _KI_LES = "SELECT " + ", ".join(_KI_KOLONNER) + " FROM ki_logg "
 
-_KI_EMNE = (
-    "WHERE slag = ? AND dato = ? AND ifnull(symbol, '') = ? AND ifnull(melding_id, '') = ?"
-)
+_KI_EMNE = "WHERE slag = ? AND dato = ? AND ifnull(symbol, '') = ? AND ifnull(melding_id, '') = ?"
 
 
 class SqliteKILogg:
@@ -557,14 +548,26 @@ class SqliteKILogg:
             )
         if self._tilkobling.in_transaction:
             raise RuntimeError(
-                "Tilkoblingen har en aapen transaksjon. Adapteren styrer "
-                "transaksjonen selv - avslutt kallerens foerst."
+                "Tilkoblingen har en aapen transaksjon. Adapteren styrer transaksjonen selv - avslutt kallerens foerst."
             )
         verdier = (
-            rad.emne.slag, rad.emne.dato.isoformat(), rad.emne.symbol, rad.emne.melding_id,
-            rad.grunnlag_som_json(), rad.regelen, rad.tekst, int(rad.besto), rad.grunn,
-            rad.promptversjon, rad.tjeneste, rad.modell, rad.modell_id, rad.seed,
-            rad.temperatur, rad.maskinvare, rad.ollama_versjon,
+            rad.emne.slag,
+            rad.emne.dato.isoformat(),
+            rad.emne.symbol,
+            rad.emne.melding_id,
+            rad.grunnlag_som_json(),
+            rad.regelen,
+            rad.tekst,
+            int(rad.besto),
+            rad.grunn,
+            rad.promptversjon,
+            rad.tjeneste,
+            rad.modell,
+            rad.modell_id,
+            rad.seed,
+            rad.temperatur,
+            rad.maskinvare,
+            rad.ollama_versjon,
         )
         try:
             self._tilkobling.execute("BEGIN")
@@ -599,16 +602,35 @@ def andre_aksjer_har_ki_rad(tilkobling: sqlite3.Connection, dato: date, symbol: 
     og utenfor porten, som bare har skriv og lesemetodene for emner (svar
     kl. 23:57 15.10). Radene tolkes ikke, saa en rad som ikke kan leses for en
     annen dag eller aksje endrer ikke svaret (gjennomgangen av PR 2, BH1, ECH)."""
-    return tilkobling.execute(
-        "SELECT EXISTS(SELECT 1 FROM ki_logg WHERE slag = ? AND dato = ? AND ifnull(symbol, '') != ?)",
-        (AKSJE, dato.isoformat(), symbol),
-    ).fetchone()[0] == 1
+    return (
+        tilkobling.execute(
+            "SELECT EXISTS(SELECT 1 FROM ki_logg WHERE slag = ? AND dato = ? AND ifnull(symbol, '') != ?)",
+            (AKSJE, dato.isoformat(), symbol),
+        ).fetchone()[0]
+        == 1
+    )
 
 
 def _kirad(rad) -> KIRad:
-    (slag, dato, symbol, melding_id, grunnlag, regelen, tekst, besto, grunn,
-     promptversjon, tjeneste, modell, modell_id, seed, temperatur, maskinvare,
-     ollama_versjon) = rad
+    (
+        slag,
+        dato,
+        symbol,
+        melding_id,
+        grunnlag,
+        regelen,
+        tekst,
+        besto,
+        grunn,
+        promptversjon,
+        tjeneste,
+        modell,
+        modell_id,
+        seed,
+        temperatur,
+        maskinvare,
+        ollama_versjon,
+    ) = rad
     return KIRad(
         emne=Emne(slag, date.fromisoformat(dato), symbol=symbol, melding_id=melding_id),
         grunnlag=json.loads(grunnlag),

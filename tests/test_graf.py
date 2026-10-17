@@ -11,8 +11,7 @@ from graf import BREDDE, HOYDE, MARG_X, MARG_Y, bygg_graf
 def punkter(kurser, ma50=None):
     ma50 = ma50 or [None] * len(kurser)
     return tuple(
-        Punkt(dato=date(2026, 1, 1) + timedelta(days=i), kurs=k, ma50=m)
-        for i, (k, m) in enumerate(zip(kurser, ma50))
+        Punkt(dato=date(2026, 1, 1) + timedelta(days=i), kurs=k, ma50=m) for i, (k, m) in enumerate(zip(kurser, ma50))
     )
 
 
@@ -112,6 +111,7 @@ def boersdagspunkter(fra: date, til: date, uten=()):
     """Et punkt per boersdag fra og med fra til og med til, som serien i
     appen har, uten dagene i uten."""
     from boersdag import er_boersdag
+
     dager = []
     dag = fra
     while dag <= til:
@@ -177,8 +177,9 @@ class TestNavneneVedEnden:
     @staticmethod
     def _punkter(kurser, snitt):
         start = date(2026, 1, 5)
-        return tuple(Punkt(dato=start + timedelta(days=i), kurs=k, ma50=s)
-                     for i, (k, s) in enumerate(zip(kurser, snitt)))
+        return tuple(
+            Punkt(dato=start + timedelta(days=i), kurs=k, ma50=s) for i, (k, s) in enumerate(zip(kurser, snitt))
+        )
 
     def test_navnene_staar_ved_enden_og_kursen_over_naar_den_er_hoeyest(self):
         graf = bygg_graf(self._punkter([100, 110, 120], [100, 100, 100]))

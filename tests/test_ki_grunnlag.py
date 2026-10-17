@@ -21,12 +21,14 @@ def _serie(antall: int = 60) -> list[Kursrad]:
     kurs = 101.37
     for nummer in range(antall):
         kurs = round(kurs * (1.0123 if nummer % 3 else 0.9917), 4)
-        rader.append(Kursrad(
-            dato=date(2026, 7, 1) + timedelta(days=nummer),
-            slutt=round(kurs * 1.0311, 4),
-            justert_slutt=kurs,
-            volum=1_000_003 + nummer * 7_919 + (900_000 if nummer == antall - 1 else 0),
-        ))
+        rader.append(
+            Kursrad(
+                dato=date(2026, 7, 1) + timedelta(days=nummer),
+                slutt=round(kurs * 1.0311, 4),
+                justert_slutt=kurs,
+                volum=1_000_003 + nummer * 7_919 + (900_000 if nummer == antall - 1 else 0),
+            )
+        )
     return rader
 
 
@@ -58,7 +60,9 @@ class TestBareUtledet:
 
     def test_vurderingen_gir_det_samme(self):
         rader = _serie()
-        assert ki_grunnlag(_vurderingen(rader), utenfor_maalingen=False) == ki_grunnlag(beregn_signal(rader), utenfor_maalingen=False)
+        assert ki_grunnlag(_vurderingen(rader), utenfor_maalingen=False) == ki_grunnlag(
+            beregn_signal(rader), utenfor_maalingen=False
+        )
 
     @pytest.mark.parametrize("hvor", ["signal", "vurdering"])
     def test_ingen_desimaltall(self, hvor):
@@ -77,11 +81,16 @@ class TestBareUtledet:
         vurdering = _vurderingen(rader)
         signal = beregn_signal(rader)
         forbudt = {r.slutt for r in rader} | {r.justert_slutt for r in rader} | {r.volum for r in rader}
-        forbudt |= {vurdering.trend_avvik, vurdering.dagens_endring, vurdering.standardavvik,
-                    vurdering.volumforhold, vurdering.slutt, vurdering.justert_slutt}
+        forbudt |= {
+            vurdering.trend_avvik,
+            vurdering.dagens_endring,
+            vurdering.standardavvik,
+            vurdering.volumforhold,
+            vurdering.slutt,
+            vurdering.justert_slutt,
+        }
         forbudt |= {s.maaling for s in signal.sjekker} | {s.grense for s in signal.sjekker}
-        forbudt |= {round(v * 100, d) for v in (vurdering.dagens_endring, vurdering.trend_avvik)
-                    for d in (1, 2)}
+        forbudt |= {round(v * 100, d) for v in (vurdering.dagens_endring, vurdering.trend_avvik) for d in (1, 2)}
         forbudt.discard(None)
         # Serien er laget slik at ingen av de forbudte verdiene er et fortegn
         # eller en styrke.
@@ -127,9 +136,17 @@ def _signal(trend, bevegelse, interesse, styrke=None, retning=None, navn=("Trend
 
 def _vurdering(trend, bevegelse, interesse, retning):
     return Vurdering(
-        styrke=abs(trend) + abs(bevegelse) + abs(interesse), retning=retning, trend=trend,
-        bevegelse=bevegelse, interesse=interesse, slutt=101.37, justert_slutt=99.11,
-        trend_avvik=0.0123, dagens_endring=-0.0045, standardavvik=0.0167, volumforhold=1.53,
+        styrke=abs(trend) + abs(bevegelse) + abs(interesse),
+        retning=retning,
+        trend=trend,
+        bevegelse=bevegelse,
+        interesse=interesse,
+        slutt=101.37,
+        justert_slutt=99.11,
+        trend_avvik=0.0123,
+        dagens_endring=-0.0045,
+        standardavvik=0.0167,
+        volumforhold=1.53,
     )
 
 
@@ -138,11 +155,22 @@ class TestFortegnene:
 
     def test_signal_med_ulike_fortegn(self):
         assert ki_grunnlag(_signal(-1, 0, 1), utenfor_maalingen=False) == {
-            "trend": -1, "bevegelse": 0, "interesse": 1, "styrke": 2, "retning": "Blandet"}
+            "trend": -1,
+            "bevegelse": 0,
+            "interesse": 1,
+            "styrke": 2,
+            "retning": "Blandet",
+        }
 
-    @pytest.mark.parametrize("fortegn, retning", [
-        ((-1, 0, 1), "Blandet"), ((0, -1, 0), "Negativ"), ((1, 0, 0), "Positiv"), ((0, 0, 0), "Ingen"),
-    ])
+    @pytest.mark.parametrize(
+        "fortegn, retning",
+        [
+            ((-1, 0, 1), "Blandet"),
+            ((0, -1, 0), "Negativ"),
+            ((1, 0, 0), "Positiv"),
+            ((0, 0, 0), "Ingen"),
+        ],
+    )
     def test_vurdering_med_ulike_fortegn(self, fortegn, retning):
         grunnlag = ki_grunnlag(_vurdering(*fortegn, retning), utenfor_maalingen=False)
         assert [grunnlag[s] for s in SJEKKENE] == list(fortegn)
@@ -177,10 +205,14 @@ class TestKontrollen:
         with pytest.raises(ValueError, match="retning maa vaere en av"):
             ki_grunnlag(signal, utenfor_maalingen=False)
 
-    @pytest.mark.parametrize("navn", [
-        ("Trend", "Trend", "Interesse"), ("TREND", "Bevegelse", "Interesse"),
-        ("Interesse", "Bevegelse", "Trend"),
-    ])
+    @pytest.mark.parametrize(
+        "navn",
+        [
+            ("Trend", "Trend", "Interesse"),
+            ("TREND", "Bevegelse", "Interesse"),
+            ("Interesse", "Bevegelse", "Trend"),
+        ],
+    )
     def test_sjekkene_maa_vaere_de_tre_en_av_hver(self, navn):
         """Gjennomgangen (BH5, ECH): et dobbelt navn ga stille én av verdiene."""
         with pytest.raises(ValueError):
@@ -189,8 +221,9 @@ class TestKontrollen:
     def test_fire_sjekker_avvises(self):
         sjekker = _signal(1, 0, 0).sjekker + (Sjekk("Volum", 1, ""),)
         with pytest.raises(ValueError):
-            ki_grunnlag(Signal(styrke=2, retning="Positiv", sjekker=sjekker, skiller_seg_ut=False),
-                        utenfor_maalingen=False)
+            ki_grunnlag(
+                Signal(styrke=2, retning="Positiv", sjekker=sjekker, skiller_seg_ut=False), utenfor_maalingen=False
+            )
 
     @pytest.mark.parametrize("styrke, retning", [(3, "Blandet"), (2, "Positiv")])
     def test_et_signal_som_ikke_stemmer_med_sjekkene(self, styrke, retning):
@@ -216,16 +249,23 @@ class TestKontrollen:
     def test_ukjent_sjekk_avvises(self):
         sjekker = (Sjekk("Trend", 1, ""), Sjekk("Bevegelse", 0, ""), Sjekk("Volum", 1, ""))
         with pytest.raises(ValueError):
-            ki_grunnlag(Signal(styrke=2, retning="Positiv", sjekker=sjekker, skiller_seg_ut=False),
-                        utenfor_maalingen=False)
+            ki_grunnlag(
+                Signal(styrke=2, retning="Positiv", sjekker=sjekker, skiller_seg_ut=False), utenfor_maalingen=False
+            )
 
     def test_grunnlaget_kan_logges(self):
         """Grunnlaget er det KIRad.grunnlag lagrer (story 4.2)."""
         from kilogg import Emne, KIRad
 
         rad = KIRad(
-            emne=Emne.aksje("EQNR", date(2026, 10, 15)), grunnlag=ki_grunnlag(beregn_signal(_serie()), utenfor_maalingen=False),
-            regelen="r", tekst=None, besto=False, grunn="modellen feilet", promptversjon="1",
-            tjeneste="lokal", modell="gemma4:e4b",
+            emne=Emne.aksje("EQNR", date(2026, 10, 15)),
+            grunnlag=ki_grunnlag(beregn_signal(_serie()), utenfor_maalingen=False),
+            regelen="r",
+            tekst=None,
+            besto=False,
+            grunn="modellen feilet",
+            promptversjon="1",
+            tjeneste="lokal",
+            modell="gemma4:e4b",
         )
         assert set(rad.grunnlag) == NOEKLENE

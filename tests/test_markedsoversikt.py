@@ -94,10 +94,7 @@ def boersdager(kurser) -> list[Kursrad]:
     """Kursrader paa boersdager som slutter fredag 02.10.2026, mandag til
     fredag uten helg i mellom naar de er fem eller faerre."""
     start = date(2026, 10, 2) - timedelta(days=len(kurser) - 1)
-    return [
-        Kursrad(dato=start + timedelta(days=i), slutt=k, justert_slutt=k, volum=1000)
-        for i, k in enumerate(kurser)
-    ]
+    return [Kursrad(dato=start + timedelta(days=i), slutt=k, justert_slutt=k, volum=1000) for i, k in enumerate(kurser)]
 
 
 class TestEndringIProsent:
@@ -235,9 +232,7 @@ class TestSortering:
         )
 
     def test_rader_uten_signal_sorteres_sist(self):
-        kilde = lager(
-            {"EQNR": serie([100.0, 101.0]), "DNB": serie([100.0] * 5 + [130.0])}
-        )
+        kilde = lager({"EQNR": serie([100.0, 101.0]), "DNB": serie([100.0] * 5 + [130.0])})
 
         rader = bygg_oversikt(kilde, IDAG, KORT)
 
@@ -350,10 +345,12 @@ class TestSidensDato:
 
     def _rader(self):
         # EQNR har sterkere signal og sorteres foerst, men DNB har eldre dato.
-        kilde = lager({
-            "EQNR": serie([100.0] * 5 + [104.0], fra_dato=3),
-            "DNB": serie([100.0] * 6, fra_dato=1),
-        })
+        kilde = lager(
+            {
+                "EQNR": serie([100.0] * 5 + [104.0], fra_dato=3),
+                "DNB": serie([100.0] * 6, fra_dato=1),
+            }
+        )
         return bygg_oversikt(kilde, IDAG, KORT)
 
     def test_radene_i_to_rekkefoelger_gir_samme_dato(self):
@@ -431,9 +428,17 @@ class TestTilstandene:
         """Raden avgjoer, ogsaa naar serien ville gitt noe annet. Her en rad
         med styrke 3 paa en flat serie, som ville gitt styrke 0."""
         lagret = Vurdering(
-            styrke=3, retning=NEGATIV, trend=-1, bevegelse=-1, interesse=-1,
-            slutt=100.0, justert_slutt=100.0, trend_avvik=-0.05,
-            dagens_endring=-0.04, standardavvik=0.01, volumforhold=0.2,
+            styrke=3,
+            retning=NEGATIV,
+            trend=-1,
+            bevegelse=-1,
+            interesse=-1,
+            slutt=100.0,
+            justert_slutt=100.0,
+            trend_avvik=-0.05,
+            dagens_endring=-0.04,
+            standardavvik=0.01,
+            volumforhold=0.2,
         )
         rad = bygg_rad(post(EQNR, serie([100.0] * 6), innhold=lagret), IDAG, KORT)
         assert rad.styrke == 3
@@ -476,9 +481,17 @@ def _lagret(trend: int, bevegelse: int, interesse: int) -> Vurdering:
     else:
         retning = BLANDET
     return Vurdering(
-        styrke=len(utslag), retning=retning, trend=trend, bevegelse=bevegelse,
-        interesse=interesse, slutt=100.0, justert_slutt=100.0, trend_avvik=0.0,
-        dagens_endring=0.0, standardavvik=0.01, volumforhold=1.0,
+        styrke=len(utslag),
+        retning=retning,
+        trend=trend,
+        bevegelse=bevegelse,
+        interesse=interesse,
+        slutt=100.0,
+        justert_slutt=100.0,
+        trend_avvik=0.0,
+        dagens_endring=0.0,
+        standardavvik=0.01,
+        volumforhold=1.0,
     )
 
 
@@ -491,8 +504,7 @@ class TestStory80e:
         kursene."""
         rader = serie([100.0] * 6)
         rad = bygg_rad(post(EQNR, rader, innhold=_lagret(1, -1, 0)), IDAG, KORT)
-        assert rad.sjekker == (("T", "trend", "+1"), ("B", "bevegelse", "-1"),
-                               ("I", "interesse", "0"))
+        assert rad.sjekker == (("T", "trend", "+1"), ("B", "bevegelse", "-1"), ("I", "interesse", "0"))
 
     @pytest.mark.parametrize("innhold", [None, Grunn.SYMBOL_FEILET])
     def test_ingen_sjekker_uten_vurdering(self, innhold):
@@ -506,8 +518,8 @@ class TestStory80e:
         from markedsoversikt import del_i_to
 
         poster = [
-            post(EQNR, serie([100.0] * 6), innhold=_lagret(1, 1, 0)),   # 2
-            post(DNB, serie([100.0] * 6), innhold=_lagret(1, 0, 0)),    # 1
+            post(EQNR, serie([100.0] * 6), innhold=_lagret(1, 1, 0)),  # 2
+            post(DNB, serie([100.0] * 6), innhold=_lagret(1, 0, 0)),  # 1
         ]
         ut, oevrige = del_i_to(bygg_oversikt(poster, IDAG, KORT))
         assert [r.aksje.symbol for r in ut] == ["EQNR"]
@@ -523,21 +535,26 @@ def _rad(navn: str, kurs: float, endring: float | None, vurdering: Vurdering | N
     from tilstand import Tilstand
 
     aksje = Aksje(navn.upper(), f"{navn.upper()}.OL", navn, "Energi")
-    return Rad(aksje=aksje, dato=IDAG, sluttkurs=kurs, endring_prosent=endring,
-               tilstand=Tilstand(Art.SVAR, vurdering) if vurdering else None,
-               tekst=None if vurdering else IKKE_VURDERT)
+    return Rad(
+        aksje=aksje,
+        dato=IDAG,
+        sluttkurs=kurs,
+        endring_prosent=endring,
+        tilstand=Tilstand(Art.SVAR, vurdering) if vurdering else None,
+        tekst=None if vurdering else IKKE_VURDERT,
+    )
 
 
 # Story 8.15. FR-102 gir E, A, B, F, C, D. Endringen i kroner (kurs ×
 # prosent) og i absoluttverdi gir en annen rekkefølge enn prosent med
 # fortegn. D og F har lik kurs og lik endring, så FR-102 avgjør mellom dem.
 _RADENE = {
-    "A": _rad("Alfa", 400.0, -2.0, _lagret(1, 1, 0)),    # 2 Positiv
-    "B": _rad("Beta", 200.0, 3.5, _lagret(-1, 0, 0)),    # 1 Negativ
-    "C": _rad("Ceta", 120.0, None, _lagret(0, 0, 0)),    # 0 Ingen, én kursdag
-    "D": _rad("Delta", 80.0, 1.0, None),                 # ikke vurdert, Ukjent
-    "E": _rad("Eps", 10.0, -3.0, _lagret(1, -1, 0)),     # 2 Blandet
-    "F": _rad("Fi", 80.0, 1.0, _lagret(0, -1, 0)),       # 1 Negativ
+    "A": _rad("Alfa", 400.0, -2.0, _lagret(1, 1, 0)),  # 2 Positiv
+    "B": _rad("Beta", 200.0, 3.5, _lagret(-1, 0, 0)),  # 1 Negativ
+    "C": _rad("Ceta", 120.0, None, _lagret(0, 0, 0)),  # 0 Ingen, én kursdag
+    "D": _rad("Delta", 80.0, 1.0, None),  # ikke vurdert, Ukjent
+    "E": _rad("Eps", 10.0, -3.0, _lagret(1, -1, 0)),  # 2 Blandet
+    "F": _rad("Fi", 80.0, 1.0, _lagret(0, -1, 0)),  # 1 Negativ
 }
 
 
@@ -552,19 +569,21 @@ class TestSorteringVedKlikk:
         # bruker FR-102 ved lik verdi.
         inn = [_RADENE[n] for n in "DCFBAE"]
         sortering = Sortering.fra_adressen(kolonne, orden)
-        return "".join(n for rad in sorter(inn, sortering)
-                       for n, r in _RADENE.items() if r is rad)
+        return "".join(n for rad in sorter(inn, sortering) for n, r in _RADENE.items() if r is rad)
 
-    @pytest.mark.parametrize("kolonne, orden, forventet", [
-        ("kurs", "synkende", "ABCFDE"),
-        ("kurs", "stigende", "EFDCBA"),
-        ("endring", "synkende", "BFDAEC"),
-        ("endring", "stigende", "EAFDBC"),
-        ("signal", "synkende", "EABFCD"),
-        ("signal", "stigende", "CBFEAD"),
-        ("retning", "stigende", "ECBFAD"),
-        ("retning", "synkende", "ABFCED"),
-    ])
+    @pytest.mark.parametrize(
+        "kolonne, orden, forventet",
+        [
+            ("kurs", "synkende", "ABCFDE"),
+            ("kurs", "stigende", "EFDCBA"),
+            ("endring", "synkende", "BFDAEC"),
+            ("endring", "stigende", "EAFDBC"),
+            ("signal", "synkende", "EABFCD"),
+            ("signal", "stigende", "CBFEAD"),
+            ("retning", "stigende", "ECBFAD"),
+            ("retning", "synkende", "ABFCED"),
+        ],
+    )
     def test_kolonnen_og_retningen(self, kolonne, orden, forventet):
         """Svar 1 og 2. Ville feilet med endringen i kroner eller i
         absoluttverdi, uten FR-102 ved lik verdi, med en rad uten verdi
@@ -586,10 +605,18 @@ class TestSorteringVedKlikk:
         assert sorter(inn, None) == inn
         assert sorter(inn, None) is not inn
 
-    @pytest.mark.parametrize("kolonne, orden", [
-        (None, None), ("endring", None), (None, "synkende"), ("navn", "synkende"),
-        ("endring", "opp"), ("ENDRING", "synkende"), ("", ""),
-    ])
+    @pytest.mark.parametrize(
+        "kolonne, orden",
+        [
+            (None, None),
+            ("endring", None),
+            (None, "synkende"),
+            ("navn", "synkende"),
+            ("endring", "opp"),
+            ("ENDRING", "synkende"),
+            ("", ""),
+        ],
+    )
     def test_ukjent_i_adressen_gir_ingen_sortering(self, kolonne, orden):
         from markedsoversikt import Sortering
 

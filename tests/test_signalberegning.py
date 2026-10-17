@@ -341,9 +341,7 @@ class TestForklaringenPaaNorsk:
     def test_interesse_uten_median_viser_strek_og_grunnen(self):
         """NFR-08: aldri 0 og aldri et anslag. Vinduet kommer fra
         parametrene, ikke fra teksten."""
-        assert _interesseforklaring(None, STANDARD) == (
-            "–, medianvolumet de 20 dagene før er 0"
-        )
+        assert _interesseforklaring(None, STANDARD) == ("–, medianvolumet de 20 dagene før er 0")
         assert _interesseforklaring(None, KORT) == "–, medianvolumet de 5 dagene før er 0"
 
     def test_interesse_gjennom_beregn_signal(self):
@@ -472,11 +470,7 @@ class TestMaalingen:
 
         assert t.verdi == (0 if abs(t.maaling) <= KORT.noytralsone else fortegn(t.maaling))
         assert b.verdi == (fortegn(b.maaling) if abs(b.maaling) > b.grense else 0)
-        assert i.verdi == (
-            fortegn(b.maaling)
-            if i.maaling is not None and i.maaling > KORT.volumfaktor
-            else 0
-        )
+        assert i.verdi == (fortegn(b.maaling) if i.maaling is not None and i.maaling > KORT.volumfaktor else 0)
 
     def test_sjekk_uten_maaling_kan_fortsatt_lages(self):
         """maaling og grense har standardverdi, saa Sjekk(navn, verdi,
@@ -528,9 +522,7 @@ class TestVurder:
     def test_nyeste_kurs_ikke_fra_dagen(self):
         """Ville feilet hvis vurderingen ble regnet av gaarsdagens kurs."""
         rader = self.rader()
-        assert vurder(rader, rader[-1].dato + timedelta(days=1), KORT) == (
-            Grunn.KURS_IKKE_FRA_DAGEN
-        )
+        assert vurder(rader, rader[-1].dato + timedelta(days=1), KORT) == (Grunn.KURS_IKKE_FRA_DAGEN)
         assert vurder(rader, rader[-2].dato, KORT) == Grunn.KURS_IKKE_FRA_DAGEN
 
     def test_tom_serie_er_ikke_fra_dagen(self):

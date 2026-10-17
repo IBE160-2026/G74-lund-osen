@@ -123,9 +123,9 @@ SKILLER_SEG_UT = "BRFE"
 # Siste dag for tre aksjer: (endring fra sluttkursen dagen foer, volumet som
 # faktor av volumnivaaet i START). Regelen staar i modulens docstring.
 SISTE_DAG = {
-    "KVST": (0.035, 3.0),   # 3 groenne
-    "LKSV": (0.03, 2.5),    # 2 groenne og 1 roed
-    "LSTF": (0.025, 1.0),   # 1 groenn og 2 graa
+    "KVST": (0.035, 3.0),  # 3 groenne
+    "LKSV": (0.03, 2.5),  # 2 groenne og 1 roed
+    "LSTF": (0.025, 1.0),  # 1 groenn og 2 graa
 }
 
 # Daglig drift og volatilitet i logavkastningen, etter sektor.
@@ -142,10 +142,21 @@ SEKTOR = {
 
 # Startkurs og volumnivaa per aksje, i samme rekkefoelge som DEMOUNIVERS.
 START = (
-    (212.0, 3_200_000), (148.5, 1_100_000), (36.4, 2_600_000), (88.0, 900_000),
-    (174.2, 1_800_000), (205.0, 600_000), (61.5, 400_000), (119.0, 1_500_000),
-    (402.0, 700_000), (164.0, 1_200_000), (27.9, 2_100_000), (131.5, 1_000_000),
-    (226.0, 800_000), (79.4, 500_000), (102.0, 300_000),
+    (212.0, 3_200_000),
+    (148.5, 1_100_000),
+    (36.4, 2_600_000),
+    (88.0, 900_000),
+    (174.2, 1_800_000),
+    (205.0, 600_000),
+    (61.5, 400_000),
+    (119.0, 1_500_000),
+    (402.0, 700_000),
+    (164.0, 1_200_000),
+    (27.9, 2_100_000),
+    (131.5, 1_000_000),
+    (226.0, 800_000),
+    (79.4, 500_000),
+    (102.0, 300_000),
 )
 
 
@@ -201,13 +212,13 @@ def indeksserie(serier: dict[str, list[Kursrad]], dager: list[date]) -> list[Kur
     for i, dag in enumerate(dager):
         med_kurs = [d for d in paa_dag.values() if dag in d]
         if i > 0:
-            endringer = [d[dag].justert_slutt / d[dager[i - 1]].justert_slutt - 1
-                         for d in med_kurs if dager[i - 1] in d]
+            endringer = [
+                d[dag].justert_slutt / d[dager[i - 1]].justert_slutt - 1 for d in med_kurs if dager[i - 1] in d
+            ]
             if endringer:
                 nivaa *= 1 + sum(endringer) / len(endringer)
         slutt = round(nivaa, 2)
-        rader.append(Kursrad(dato=dag, slutt=slutt, justert_slutt=slutt,
-                             volum=sum(d[dag].volum for d in med_kurs)))
+        rader.append(Kursrad(dato=dag, slutt=slutt, justert_slutt=slutt, volum=sum(d[dag].volum for d in med_kurs)))
     return rader
 
 
@@ -292,7 +303,8 @@ def _bygg(sti: Path) -> None:
             if rader:
                 kurslager.erstatt_serie(symbol, rader, hentet)
         SqliteIndekslager(tilkobling, (DEMOINDEKS,)).erstatt_serie(
-            DEMOINDEKS.symbol, indeksserie(serier, dager), hentet)
+            DEMOINDEKS.symbol, indeksserie(serier, dager), hentet
+        )
 
         for dag in dager:
             lager = SqliteVurderingslager(tilkobling, _klokke_for(dag), DEMOUNIVERS)
@@ -304,9 +316,9 @@ def _bygg(sti: Path) -> None:
 
 
 def main(argv: list[str] | None = None) -> None:
-    argparse.ArgumentParser(
-        description="Lager demobasen data/db/demo.db med oppdiktede tall (FR-411)."
-    ).parse_args(argv)
+    argparse.ArgumentParser(description="Lager demobasen data/db/demo.db med oppdiktede tall (FR-411).").parse_args(
+        argv
+    )
     sti = lagring_sqlite.demo_sti()
     try:
         lag_demobase(sti)
@@ -314,8 +326,10 @@ def main(argv: list[str] | None = None) -> None:
         print(f"{feil} Ingenting er skrevet.")
         sys.exit(1)
     except OSError as feil:
-        print(f"{sti.name} kunne ikke lages: {type(feil).__name__}. Er den aapen i "
-              "et annet program, for eksempel webserveren?")
+        print(
+            f"{sti.name} kunne ikke lages: {type(feil).__name__}. Er den aapen i "
+            "et annet program, for eksempel webserveren?"
+        )
         sys.exit(1)
 
 

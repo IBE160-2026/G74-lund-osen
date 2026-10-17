@@ -244,7 +244,8 @@ def pytest_configure(config):
         from asyncio import windows_events
 
         _sperren.setattr(
-            windows_events.IocpProactor, "connect",
+            windows_events.IocpProactor,
+            "connect",
             _sperret_proactor_connect(windows_events.IocpProactor.connect),
         )
 

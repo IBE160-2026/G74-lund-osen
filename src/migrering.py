@@ -68,9 +68,7 @@ def versjon(tilkobling: sqlite3.Connection) -> int:
     ).fetchone()
     if not finnes:
         return 0
-    return tilkobling.execute(
-        "SELECT COALESCE(MAX(versjon), 0) FROM skjema_versjon"
-    ).fetchone()[0]
+    return tilkobling.execute("SELECT COALESCE(MAX(versjon), 0) FROM skjema_versjon").fetchone()[0]
 
 
 def siste_versjon(katalog: Path) -> int:
@@ -104,8 +102,7 @@ def migrer(tilkobling: sqlite3.Connection, katalog: Path) -> int:
     """
     if tilkobling.in_transaction:
         raise MigrasjonsFeil(
-            "Tilkoblingen har en aapen transaksjon. Loeperen styrer "
-            "transaksjonen selv - avslutt kallerens foerst."
+            "Tilkoblingen har en aapen transaksjon. Loeperen styrer transaksjonen selv - avslutt kallerens foerst."
         )
 
     filer = _migrasjoner(Path(katalog))
@@ -157,24 +154,16 @@ def _migrasjoner(katalog: Path) -> list[tuple[int, Path]]:
             continue
         if sti.suffix != ".sql":
             raise MigrasjonsFeil(
-                f"{sti.name} har filendelsen {sti.suffix}. En migrasjon skal "
-                "ha .sql med smaa bokstaver (NNNN_navn.sql)"
+                f"{sti.name} har filendelsen {sti.suffix}. En migrasjon skal ha .sql med smaa bokstaver (NNNN_navn.sql)"
             )
         treff = FILNAVN.match(sti.name)
         if not treff:
-            raise MigrasjonsFeil(
-                f"{sti.name} er ikke navngitt som en migrasjon (NNNN_navn.sql)"
-            )
+            raise MigrasjonsFeil(f"{sti.name} er ikke navngitt som en migrasjon (NNNN_navn.sql)")
         nummer = int(treff.group(1))
         if nummer == 0:
-            raise MigrasjonsFeil(
-                f"{sti.name}: 0000 er ikke et gyldig nummer, foerste migrasjon er 0001"
-            )
+            raise MigrasjonsFeil(f"{sti.name}: 0000 er ikke et gyldig nummer, foerste migrasjon er 0001")
         if nummer in etter_nummer:
-            raise MigrasjonsFeil(
-                f"To migrasjoner har nummer {nummer:04d}: "
-                f"{etter_nummer[nummer].name} og {sti.name}"
-            )
+            raise MigrasjonsFeil(f"To migrasjoner har nummer {nummer:04d}: {etter_nummer[nummer].name} og {sti.name}")
         etter_nummer[nummer] = sti
 
     if not etter_nummer:
@@ -227,9 +216,7 @@ def _anvendte(tilkobling: sqlite3.Connection) -> list[tuple[int, str, str]]:
     stille, fordi en oppgradering maatte stolt paa filene slik de er naa, og
     det er nettopp endrede filer hashen skal avsloere.
     """
-    kolonner = {
-        rad[1] for rad in tilkobling.execute("PRAGMA table_info(skjema_versjon)")
-    }
+    kolonner = {rad[1] for rad in tilkobling.execute("PRAGMA table_info(skjema_versjon)")}
     if not kolonner:
         return []
     if "sha256" not in kolonner:
@@ -238,14 +225,10 @@ def _anvendte(tilkobling: sqlite3.Connection) -> list[tuple[int, str, str]]:
             "Bygg den paa nytt fra raadatafilene (AD-6) i stedet for aa "
             "oppgradere den."
         )
-    return tilkobling.execute(
-        "SELECT versjon, fil, sha256 FROM skjema_versjon ORDER BY versjon"
-    ).fetchall()
+    return tilkobling.execute("SELECT versjon, fil, sha256 FROM skjema_versjon ORDER BY versjon").fetchall()
 
 
-def _kontroller(
-    anvendt: list[tuple[int, str, str]], filer: list[tuple[int, Path]], katalog: Path
-) -> None:
+def _kontroller(anvendt: list[tuple[int, str, str]], filer: list[tuple[int, Path]], katalog: Path) -> None:
     """Basen og katalogen skal beskrive samme historikk."""
     if len(anvendt) > len(filer):
         raise MigrasjonsFeil(
@@ -260,8 +243,7 @@ def _kontroller(
             )
         if sha != _sha256(_tekst(sti)):
             raise MigrasjonsFeil(
-                f"{fil} er endret etter at den ble kjoert. En kjoert migrasjon "
-                "endres ikke; skriv en ny."
+                f"{fil} er endret etter at den ble kjoert. En kjoert migrasjon endres ikke; skriv en ny."
             )
 
 
@@ -310,10 +292,8 @@ def _kjoer(tilkobling: sqlite3.Connection, nummer: int, sti: Path) -> None:
                     f"og maa bygges paa nytt."
                 )
         tilkobling.execute(
-            "INSERT INTO skjema_versjon (versjon, fil, sha256, anvendt) "
-            "VALUES (?, ?, ?, ?)",
-            (nummer, sti.name, _sha256(tekst),
-             datetime.now(timezone.utc).isoformat(timespec="seconds")),
+            "INSERT INTO skjema_versjon (versjon, fil, sha256, anvendt) VALUES (?, ?, ?, ?)",
+            (nummer, sti.name, _sha256(tekst), datetime.now(timezone.utc).isoformat(timespec="seconds")),
         )
     except sqlite3.Error as feil:
         if tilkobling.in_transaction:
@@ -323,6 +303,5 @@ def _kjoer(tilkobling: sqlite3.Connection, nummer: int, sti: Path) -> None:
         # nytt her: etter ROLLBACK er laasen sluppet, og en feil i lesingen
         # ville skjult den opprinnelige feilen.
         raise MigrasjonsFeil(
-            f"{sti.name} feilet og er rullet tilbake: {feil}. "
-            f"Basen staar paa versjon {nummer - 1}."
+            f"{sti.name} feilet og er rullet tilbake: {feil}. Basen staar paa versjon {nummer - 1}."
         ) from feil

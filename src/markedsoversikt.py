@@ -57,8 +57,7 @@ _SYMBOL_OG_KLASSE: dict[str, tuple[str, str]] = {
 }
 
 RETNINGSVISNING: dict[str, Retningsvisning] = {
-    retning: Retningsvisning(retning, symbol, klasse)
-    for retning, (symbol, klasse) in _SYMBOL_OG_KLASSE.items()
+    retning: Retningsvisning(retning, symbol, klasse) for retning, (symbol, klasse) in _SYMBOL_OG_KLASSE.items()
 }
 
 # Ikke en retning, men fravaeret av en vurdering. Se FR-101 og FR-102 om
@@ -80,9 +79,7 @@ UTENFOR_KALENDEREN = "utenfor børskalenderen"
 ETTER_I_DAG = "datoen er etter i dag"
 
 
-def les_tilstand(
-    innhold: Vurdering | Grunn | None, dato: date, idag: date
-) -> tuple[Tilstand | None, str | None]:
+def les_tilstand(innhold: Vurdering | Grunn | None, dato: date, idag: date) -> tuple[Tilstand | None, str | None]:
     """Tilstanden for raden, og teksten som vises under «–».
 
     Teksten er None bare for en vurdering, ogsaa med styrke 0. En dato
@@ -162,10 +159,7 @@ class Rad:
         med en grunn ikke viser noen."""
         if not self.vurdering:
             return ()
-        return tuple(
-            (bokstav, felt, fortegn(getattr(self.vurdering, felt)))
-            for bokstav, felt in SJEKKBOKSTAVER
-        )
+        return tuple((bokstav, felt, fortegn(getattr(self.vurdering, felt))) for bokstav, felt in SJEKKBOKSTAVER)
 
 
 def endring_i_prosent(rader: list[Kursrad]) -> float | None:
@@ -197,9 +191,7 @@ def bygg_rad(post: Oversiktspost, idag: date, p: Parametre = STANDARD) -> Rad | 
 
     utfall, tekst = les_tilstand(post.innhold, siste.dato, idag)
     rader = [r for r in (post.forrige, siste) if r is not None]
-    styrke = (
-        utfall.innhold.styrke if utfall is not None and utfall.art is Art.SVAR else None
-    )
+    styrke = utfall.innhold.styrke if utfall is not None and utfall.art is Art.SVAR else None
     return Rad(
         aksje=post.aksje,
         dato=siste.dato,
@@ -224,9 +216,7 @@ def _sorteringsnokkel(rad: Rad) -> tuple[int, float]:
     return (-styrke, -endring)
 
 
-def bygg_oversikt(
-    poster: list[Oversiktspost], idag: date, p: Parametre = STANDARD
-) -> list[Rad]:
+def bygg_oversikt(poster: list[Oversiktspost], idag: date, p: Parametre = STANDARD) -> list[Rad]:
     """Alle radene, sortert etter FR-102.
 
     Aksjer uten kurser faller ut, og navngis av uten_kurser. Hver rad faar
@@ -398,11 +388,7 @@ def eldre_enn_nyeste(rader: list[Rad]) -> set[str]:
     if not tider:
         return set()
     nyeste = max(tider)
-    return {
-        rad.aksje.symbol
-        for rad in rader
-        if rad.sist_hentet is not None and rad.sist_hentet < nyeste
-    }
+    return {rad.aksje.symbol for rad in rader if rad.sist_hentet is not None and rad.sist_hentet < nyeste}
 
 
 NORSK_TID = ZoneInfo("Europe/Oslo")
