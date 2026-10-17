@@ -753,8 +753,6 @@ class TestSoeyleneIDemoen:
         søylene, og stiger fra venstre."""
         import re
 
-        from tallformat import avrundet
-
         _, figur = self._figur(klient, monkeypatch)
         liste = figur.split('<ol class="skjult">', 1)[1].split("</ol>", 1)[0]
         tall = [
@@ -763,7 +761,6 @@ class TestSoeyleneIDemoen:
         ]
         assert len(tall) == 14
         assert tall == sorted(tall)
-        assert [avrundet(t, "endring") for t in tall] == tall
 
     def test_gult_bransjesymbol_der_tabellen_har_3_av_3(self, klient, monkeypatch, demobase):
         """Designregler §3: gult ved 3 av 3 på siste børsdag. Ville feilet
@@ -780,6 +777,14 @@ class TestSoeyleneIDemoen:
             re.findall(r'<span class="etikett tre-av-tre">.*?<span class="ticker">([^<]+)</span>', figur, re.DOTALL)
         )
         assert i_tabellen and gule == i_tabellen
+        # Gjennomgangen (BH2): «3 av 3» står også i lista for skjermleser.
+        liste = figur.split('<ol class="skjult">', 1)[1].split("</ol>", 1)[0]
+        for symbol in i_tabellen:
+            assert re.search(rf"\({symbol}, [^)]*\): [^<]*, 3 av 3\.</li>", liste), symbol
+        # Gjennomgangen (VG2): fargen på det gule symbolet er Gult symbol.
+        from test_app import _regel, _stil
+
+        assert "color: var(--gul-symbol)" in _regel(_stil(html), ".soeyler .etikett.tre-av-tre .bransjesymbol")
 
 
 class TestKlokkeslettetSomDenEkte:

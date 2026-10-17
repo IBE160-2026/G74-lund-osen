@@ -270,3 +270,24 @@ class TestSoeylene:
         assert visning.soeyler.linje == pytest.approx(25.0)
         assert visning.soeyler.soeyler[0].endring == pytest.approx(2.0)
         assert bygg_hovedindeks("OSEBX", [rad(FREDAG, 1010.0)], []).soeyler is None
+
+    def test_hoeyden_er_paa_endringen_slik_den_vises(self):
+        """Gjennomgangen (BH7, ECH6): +0,001 % vises som 0,00 % og har ingen
+        lengde."""
+        soeyler = bygg_soeyler(
+            FREDAG, None, [(aksje("A"), med_endring(0.001), False), (aksje("B"), med_endring(1.0), False)]
+        )
+        assert [s.hoeyde for s in soeyler.soeyler] == [0.0, 50.0]
+
+    def test_har_soeyler_er_usant_uten_soeyler(self):
+        """Gjennomgangen (BH13): én egenskap for malen, også når alle mangler
+        raden før dagen."""
+        uten = bygg_hovedindeks(
+            "OSEBX", [rad(TORSDAG, 1000.0), rad(FREDAG, 1010.0)], [], [(aksje("A"), [rad(FREDAG, 100.0)], False)]
+        )
+        assert uten.soeyler.soeyler == () and uten.soeyler.uten_endring == ("Selskap A",)
+        assert not uten.har_soeyler
+        med = bygg_hovedindeks(
+            "OSEBX", [rad(TORSDAG, 1000.0), rad(FREDAG, 1010.0)], [], [(aksje("A"), med_endring(1.0), False)]
+        )
+        assert med.har_soeyler

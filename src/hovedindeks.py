@@ -83,6 +83,12 @@ class Hovedindeksvisning:
     sammenligning: Sammenligning | None
     soeyler: Soeyler | None = None
 
+    @property
+    def har_soeyler(self) -> bool:
+        """Om minst én aksje har soeyle. Malen bruker den baade for soeylene
+        og for teksten om dem bak «?» (gjennomgangen, BH13)."""
+        return self.soeyler is not None and bool(self.soeyler.soeyler)
+
 
 def forrige_boersdag(dag: date) -> date | None:
     """Boersdagen foer dag etter kalenderen, eller None naar den ligger
@@ -152,7 +158,12 @@ def bygg_soeyler(dag: date, indeks: float | None, aksjer: list[tuple[Aksje, list
     med = [(aksje, endring, tre) for aksje, endring, tre in endringer if endring is not None]
     # sorted er stabil, saa like endringer staar i rekkefoelgen fra lista.
     med.sort(key=lambda par: par[1])
-    skala = max([abs(endring) for _, endring, _ in med] + [abs(indeks or 0.0)]) or 1.0
+    # Gjennomgangen (BH7, ECH6): hoeyden og linja regnes paa endringen slik
+    # den vises, saa en soeyle som viser 0,00 % ikke har lengde, og retning,
+    # farge og tall sier det samme.
+    vist = {id(aksje): avrundet(endring, "endring") for aksje, endring, _ in med}
+    vist_indeks = None if indeks is None else avrundet(indeks, "endring")
+    skala = max([abs(v) for v in vist.values()] + [abs(vist_indeks or 0.0)]) or 1.0
     soeyler = tuple(
         Soeyle(
             symbol=aksje.symbol,
@@ -160,11 +171,11 @@ def bygg_soeyler(dag: date, indeks: float | None, aksjer: list[tuple[Aksje, list
             bransje=aksje.sektor,
             endring=endring,
             tre_av_tre=tre,
-            hoeyde=abs(endring) / skala * 50,
+            hoeyde=abs(vist[id(aksje)]) / skala * 50,
         )
         for aksje, endring, tre in med
     )
-    linje = None if indeks is None else 50 - indeks / skala * 50
+    linje = None if vist_indeks is None else 50 - vist_indeks / skala * 50
     return Soeyler(soeyler=soeyler, linje=linje, uten_endring=uten_endring)
 
 

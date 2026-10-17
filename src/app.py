@@ -352,7 +352,7 @@ def _basen_feilet_under_lesingen(feil):
 
 
 def _hovedindeks(
-    kurslager: Kursleser, poster: list, tre_av_tre: frozenset[str] = frozenset()
+    kurslager: Kursleser, poster: list, tre_av_tre: frozenset[str]
 ) -> tuple[Hovedindeksvisning | None, bool]:
     """Hovedindeksen over tabellen - story 2.9, FR-104.
 

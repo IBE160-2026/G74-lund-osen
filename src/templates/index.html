@@ -133,7 +133,7 @@
     .soeyler .etiketter, .soeyler .felt { display: flex; gap: 2px; }
     .soeyler .etikett { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center;
                         gap: 3px; color: var(--dempet); }
-    .soeyler .etikett .bransjesymbol { width: 14px; height: 14px; }
+    .soeyler .etikett .bransjesymbol { width: 14px; height: 14px; max-width: 100%; }
     .soeyler .etikett.tre-av-tre .bransjesymbol { color: var(--gul-symbol); stroke-width: 2.4; }
     .soeyler .ticker { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 11px; font-weight: 600;
                        letter-spacing: 0.02em; color: var(--tekst); }
@@ -143,7 +143,8 @@
     .soeyler .stolpe { position: absolute; left: 15%; right: 15%; border-radius: 2px; background: var(--dempet); }
     .soeyler .stolpe.opp { background: var(--opp); }
     .soeyler .stolpe.ned { background: var(--ned); }
-    .soeyler .indekslinje { position: absolute; left: 0; right: 0; border-top: 2px dashed var(--dempet); }
+    .soeyler .indekslinje { position: absolute; left: 0; right: 0; margin-top: -1px;
+                            border-top: 2px dashed var(--dempet); }
     .soeyler .indekslinje.opp { border-top-color: var(--opp); }
     .soeyler .indekslinje.ned { border-top-color: var(--ned); }
     .soeyler .forklaring, .soeyler .uten-endring { font-size: 14px; color: var(--dempet); margin: 0.4rem 0 0; }
@@ -308,10 +309,13 @@
             slik den vises, og den stiplede linja er indeksen. Søylene er
             aria-hidden, og lista under har alle tallene for skjermleser. #}
         {% set sy = hovedindeks.soeyler %}
-        {% if sy and sy.soeyler %}
+        {#- Gjennomgangen (BH3): figuren står også når ingen aksje fikk søyle,
+            så aksjene uten kurs dagen før navngis. #}
+        {% if sy %}
           {%- macro fortegn(verdi) %}{% set vist = verdi|avrundet('endring') %}{{ 'opp' if vist > 0 else 'ned' if vist < 0 else 'null' }}{% endmacro %}
           <figure class="soeyler">
-            <figcaption class="soeyletittel">Dagens endring per aksje{% if sy.linje is not none %}, med indeksen som stiplet linje{% endif %}</figcaption>
+            <figcaption class="soeyletittel">{% if hovedindeks.dato != dato %}Endring per aksje {{ hovedindeks.dato|dato }}{% else %}Dagens endring per aksje{% endif %}{% if sy.linje is not none %}, med indeksen som stiplet linje{% endif %}</figcaption>
+            {% if sy.soeyler %}
             <div aria-hidden="true">
               <div class="etiketter">
                 {%- for soeyle in sy.soeyler %}
@@ -320,23 +324,26 @@
               </div>
               <div class="felt">
                 {%- for soeyle in sy.soeyler %}
-                <span class="spor"><span class="stolpe {{ fortegn(soeyle.endring) }}" style="{{ 'bottom' if soeyle.endring >= 0 else 'top' }}: 50%; height: {{ '%.2f'|format(soeyle.hoeyde) }}%;"></span></span>
+                <span class="spor"><span class="stolpe {{ fortegn(soeyle.endring) }}" style="{{ 'bottom' if soeyle.endring|avrundet('endring') >= 0 else 'top' }}: 50%; height: {{ '%.2f'|format(soeyle.hoeyde) }}%;"></span></span>
                 {%- endfor %}
                 {%- if sy.linje is not none %}
                 <span class="indekslinje {{ fortegn(hovedindeks.endring) }}" style="top: {{ '%.2f'|format(sy.linje) }}%;"></span>
                 {%- endif %}
               </div>
             </div>
+            {#- Gjennomgangen (BH9): overskriften og indeksen står utenfor lista,
+                så lista har én linje per aksje. #}
+            <p class="skjult">Søyler for {{ sy.soeyler|length }} aksjer {{ hovedindeks.dato|dato }}, fra størst fall til størst stigning.</p>
             <ol class="skjult">
-              <li>Søyler for {{ sy.soeyler|length }} aksjer {{ hovedindeks.dato|dato }}, fra størst fall til størst stigning.</li>
               {%- for soeyle in sy.soeyler %}
-              <li>{{ soeyle.navn }} ({{ soeyle.symbol }}, {{ soeyle.bransje }}): {{ soeyle.endring|tall('endring') }}{% if soeyle.tre_av_tre %}, {{ antall_sjekker }} av {{ antall_sjekker }}{% endif %}.</li>
+              <li>{{ soeyle.navn }} ({{ soeyle.symbol }}{% if soeyle.bransje %}, {{ soeyle.bransje }}{% endif %}): {{ soeyle.endring|tall('endring') }}{% if soeyle.tre_av_tre %}, {{ antall_sjekker }} av {{ antall_sjekker }}{% endif %}.</li>
               {%- endfor %}
-              {%- if sy.linje is not none %}
-              <li>Indeksen, den stiplede linja: {{ hovedindeks.endring|tall('endring') }}.</li>
-              {%- endif %}
             </ol>
+            {%- if sy.linje is not none %}
+            <p class="skjult">Indeksen, den stiplede linja: {{ hovedindeks.endring|tall('endring') }}.</p>
+            {%- endif %}
             {% if sy.linje is none %}<p class="forklaring">Ingen stiplet linje: indeksen har ingen endring for dagen.</p>{% endif %}
+            {% endif %}
             {% if sy.uten_endring %}<p class="uten-endring">Uten søyle, mangler kursen dagen før: {{ sy.uten_endring|med_og }}.</p>{% endif %}
           </figure>
         {% endif %}
@@ -432,7 +439,7 @@
       tekstene for det. Sjekkene og grensene forklares paa aksjesiden. #}
   {% if rader %}
     {#- Story 2.9b: teksten om søylene står bare når søylene vises. #}
-    {{ hjelpevindu("hjelp-hovedindeks", "Hovedindeksen", [("", ["hovedindeksen", "soeylene"] if hovedindeks and hovedindeks.soeyler and hovedindeks.soeyler.soeyler else ["hovedindeksen"])]) }}
+    {{ hjelpevindu("hjelp-hovedindeks", "Hovedindeksen", [("", ["hovedindeksen", "soeylene"] if hovedindeks and hovedindeks.har_soeyler else ["hovedindeksen"])]) }}
     {{ hjelpevindu("hjelp-selskap", "Selskap", [("", ["selskap"])]) }}
     {{ hjelpevindu("hjelp-sluttkurs", "Sluttkurs", [("", ["sluttkurs"])]) }}
     {{ hjelpevindu("hjelp-endring", "Endring", [("", ["endring", "utbyttejustert"])]) }}
