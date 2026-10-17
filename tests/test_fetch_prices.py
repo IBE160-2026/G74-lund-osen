@@ -3397,3 +3397,61 @@ class TestKode3:
         fil, _, ut = kjoer_23(raa, base, OEYEBLIKK_22_09)
         assert fil is not None and "Hovedindeksen OSEBX: hoppet over" in ut
         assert indeksen_i(base)[1] == nyere and "Kode 3" not in ut
+
+
+class TestKode3EtterGjennomgangen:
+    """Gjennomgangen av kode 3: BH4/ECH2 og VG1."""
+
+    def test_et_nytt_forsoek_etter_en_aksje_og_indeksen_gir_kode_3(self, stier):
+        """BH4, ECH2: DNB og indeksen feilet, saa hovedhentingen ga 1. Forsoeket
+        henter DNB, men ikke indeksen, og gir 3, saa kvelden ikke ender som en
+        vellykket kjoering. Ville feilet hvis forsoeket ga 0 (mutant K4)."""
+        raa, base = stier
+        hovedhenting(stier, feiler=("DNB", "OSEBX"))
+        les, _ = kvoter(svar(brukt=16))
+        kode, kall, ut = kjoer_23_kode(raa, base, ETTER_30_MIN, les_kvote=les)
+        assert kode == 3 and kall == ["DNB.OL"]
+        assert "Alle 15 aksjene har kursen" in ut
+        assert "Hovedindeksen OSEBX feilet i kveldens henting" in ut and "Kode 3" in ut
+        assert indeksen_i(base) == ([], None)
+
+    def test_et_nytt_forsoek_naar_indeksen_ble_lagret_gir_kode_0(self, stier):
+        """Bare DNB feilet. Forsoeket fullfoerer, og indeksen fra kvelden staar,
+        saa kode 0. Ville feilet hvis forsoeket alltid ga 3."""
+        raa, base = stier
+        hovedhenting(stier, feiler=("DNB",))
+        les, _ = kvoter(svar(brukt=16))
+        fil, kall, ut = kjoer_23(raa, base, ETTER_30_MIN, les_kvote=les)
+        assert fil is not None and kall == ["DNB.OL"] and "Kode 3" not in ut
+
+    def test_en_fil_fra_foer_indeksen_gir_ikke_kode_3(self, stier):
+        """En kursfil uten noekkelen indeks er fra foer 2.8. Forsoeket vet ikke
+        om indeksen, og sier ikke mer enn det vet."""
+        raa, base = stier
+        hovedhenting(stier, feiler=("DNB", "OSEBX"))
+        kursfil = raa / "kurser-raa-2026-09-22.json"
+        bilde = json.loads(kursfil.read_text(encoding="utf-8"))
+        del bilde["indeks"]
+        kursfil.write_text(json.dumps(bilde), encoding="utf-8")
+        les, _ = kvoter(svar(brukt=16))
+        fil, kall, _ = kjoer_23(raa, base, ETTER_30_MIN, les_kvote=les)
+        assert fil is not None and kall == ["DNB.OL"]
+
+    def test_basen_kan_ikke_aapnes_for_indeksen_gir_kode_3(self, stier, monkeypatch):
+        """VG1: aapne_base feiler bare for indeksen. Ville feilet hvis greina
+        ga True, og kjoeringen kode 0."""
+        import sys as _sys
+
+        raa, base = stier
+        ekte = fp.aapne_base
+
+        def aapne(sti, **kw):
+            if _sys._getframe(1).f_code.co_name == "skriv_indeksen_til_basen":
+                raise sqlite3.OperationalError("unable to open database file")
+            return ekte(sti, **kw)
+
+        monkeypatch.setattr(fp, "aapne_base", aapne)
+        kode, _, ut = kjoer_23_kode(raa, base, OEYEBLIKK_22_09)
+        assert kode == 3
+        assert "Hovedindeksen OSEBX: basen kunne ikke aapnes (OperationalError)" in ut
+        assert antall_rader(base, "vurdering") == len(AKSJEUNIVERS)

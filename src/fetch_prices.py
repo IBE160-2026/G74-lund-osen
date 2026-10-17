@@ -849,7 +849,9 @@ def kjoer(
     hovedindeksen feilet i kjoeringen (kallet feilet, porten avviste serien
     eller basen feilet), gir kjoeringen kode 3, KODE_BARE_INDEKSEN. Kode 1
     gaar foran: mangler ogsaa en aksje dagens kurs, gir kjoeringen 1. En
-    eldre fil som hoppes over for indeksen, er ingen feil. Kodene er altsaa
+    eldre fil som hoppes over for indeksen, er ingen feil. Et nytt forsoek
+    som fullfoerer aksjene, gir ogsaa 3 hvis indeksen feilet i kveldens
+    hovedhenting (nytt_forsoek). Kodene er altsaa
     0 (alt i orden, eller ingenting aa gjoere), 1 (noe mangler eller feilet,
     eller kjoeringen ble stoppet), 2 (feil i argumentene, fra argparse) og 3.
 
@@ -1120,11 +1122,42 @@ def kjoer(
     if indeksen_feilet:
         skriv(
             f"Aksjene er i orden, men {HOVEDINDEKS.navn.lower()} feilet. Kode "
-            f"{KODE_BARE_INDEKSEN} (beslutningen 17.10 kl. 11:58). En ny kjoering "
-            "i kveld gir 0 kall."
+            f"{KODE_BARE_INDEKSEN} (beslutningen 17.10 kl. 11:58). Indeksen proeves "
+            "ikke igjen i kveld (AD-15), og neste henting bytter ut hele serien."
         )
         sys.exit(KODE_BARE_INDEKSEN)
     return fil
+
+
+def _indeksen_feilet_i_kveld(kursfil: Path, base_sti: Path, indeks: Indeks = HOVEDINDEKS) -> bool:
+    """Om indeksen feilet i kveldens hovedhenting - story 2.8, gjennomgangen
+    av kode 3 (BH4, ECH2).
+
+    Et nytt forsoek henter ikke indeksen. Feilet indeksen og en aksje samme
+    kveld, ga hovedhentingen kode 1, og et forsoek som fullfoerer aksjene,
+    skal da gi kode 3, ikke 0. Indeksen feilet naar kursfila har noekkelen
+    indeks, og basen ikke har en serie hentet like sent som fila: kallet
+    feilet, porten avviste serien eller basen feilet. En eldre fil som ble
+    hoppet over, har en nyere serie i basen og er ingen feil. En fil fra foer
+    2.8 uten noekkelen indeks, og en fil eller base som ikke kan leses, gir
+    False, saa forsoeket ikke sier mer enn det vet.
+    """
+    try:
+        bilde = json.loads(kursfil.read_text(encoding="utf-8"))
+        hentet = _hentet_fra_tekst(bilde.get("hentet"))
+    except (OSError, ValueError, AttributeError):
+        return False
+    if hentet is None or not isinstance(bilde.get("indeks"), dict):
+        return False
+    try:
+        tilkobling = _aapne_for_sjekken(base_sti)
+        try:
+            sist = SqliteIndekslager(tilkobling, (indeks,)).sist_hentet(indeks.symbol)
+        finally:
+            tilkobling.close()
+    except BASEFEIL:
+        return False
+    return sist is None or sist < hentet
 
 
 def eldste_foerst(
@@ -1193,6 +1226,10 @@ def nytt_forsoek(
     en grunn skriver aldri over en vurdering (AD-7). En dag boersen er
     stengt, staar en rad som finnes (svar 3). Mangler noen aksje fortsatt
     dagens kurs, gir kjoeringen kode 1 (svar 5).
+
+    Story 2.8: har alle aksjene kursen etter forsoeket, men indeksen feilet i
+    kveldens hovedhenting (_indeksen_feilet_i_kveld), gir forsoeket kode 3,
+    KODE_BARE_INDEKSEN, saa kvelden ikke ender som en vellykket kjoering.
     """
     kursfil = data_katalog / filnavn(dato)
     skriv(
@@ -1342,6 +1379,13 @@ def nytt_forsoek(
         )
         sys.exit(1)
     skriv(f"Alle {len(lista)} aksjene har kursen for boersdagen {dato.isoformat()}.")
+    if _indeksen_feilet_i_kveld(kursfil, base_sti):
+        skriv(
+            f"{HOVEDINDEKS.navn} {HOVEDINDEKS.symbol} feilet i kveldens henting, "
+            "og et nytt forsoek henter den ikke (AD-15). Kode "
+            f"{KODE_BARE_INDEKSEN} (beslutningen 17.10 kl. 11:58)."
+        )
+        sys.exit(KODE_BARE_INDEKSEN)
     return fil
 
 
