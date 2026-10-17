@@ -1469,6 +1469,8 @@ Oppgaveplanlegging beskrives i README (regel 19).
 
 *Lagt til 2026-10-17:* betingelsen holdt for EQNR.OL 16.10, i alle sju feltene (tillegget til §31 i `malinger.md`). Fra 19.10 er grensen kl. 21:00, og kl. 22:00 i kontrollpunktene og avgjørelsene over gjelder til da. Flagget som slipper forbi tidskontrollen, heter `--uten-tidskontroll` (spesifikasjonen `spec-2-3-hentingen-fra-kl-21.md`).
 
+*Lagt til 2026-10-17 kl. 21:38:* grensen kl. 21:00 og flagget `--uten-tidskontroll` er flettet i `336204f`, PR #60. PR-en ble bygget lørdag kveld 17.10 etter gruppens svar kl. 21:01, i stedet for søndag 18.10. CI var grønn på head-en `f506133` (kjøring 39063125455) og på main (39063214018). Den gjelder fra første henting mandag 19.10.
+
 ### Story 2.3b: Kallene som er igjen, brukes på nye forsøk
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 19:17.*

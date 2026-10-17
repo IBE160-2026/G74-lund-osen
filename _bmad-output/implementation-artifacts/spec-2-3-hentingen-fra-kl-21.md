@@ -2,7 +2,7 @@
 title: 'Story 2.3, tillegg: hentingen fra kl. 21:00 på børsdager'
 type: 'feature'
 created: '2026-10-17'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'e6ceb34'
@@ -53,6 +53,8 @@ Dette er et tillegg til story 2.3 (børsdagskontrollen før kvoten brukes), ikke
 - det gamle flaggnavnet godtatt
 
 **Testtallet før:** 2358 bestått og 17 hoppet over (head-en til PR #59, `bdfd412`, samme kode og tester som main på `e6ceb34`).
+
+*Lagt til 2026-10-17 kl. 21:38:* PR #60 er squash-flettet i `336204f`, låst til head-en `f506133`. CI var grønn på head-en (39063125455) og på main (39063214018).
 
 ## Mutantene
 
