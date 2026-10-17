@@ -1640,6 +1640,8 @@ gikk bedre, før jeg leser tabellen.
 - Uten indeks i basen viser siden det, og resten av siden virker (NFR-03). Webserveren gjør ingen nettkall (`AD-10`)
 - **Ville feilet hvis:** N var et fast 15. Da står det «x av 15» en dag én aksje mangler kurs
 
+*Lagt til 2026-10-17 kl. 19:55:* PR 3 for hovedindeksen, «Hovedindeksen» over tabellen på forsiden (FR-104), er flettet i `b44284f`, PR #59. CI var grønn på head-en `bdfd412` (kjøring 39055685375) og på main (39055792414). Spesifikasjonen er `spec-2-9-hovedindeksen-paa-forsiden.md`. Søylene (2.9b) kommer i PR 4.
+
 **Avhenger av:** 2.2 og 2.8. **Én økt:** ja.
 
 ### Story 2.9b: Søylene under hovedindeksen

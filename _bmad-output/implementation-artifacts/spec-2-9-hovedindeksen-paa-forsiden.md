@@ -2,7 +2,7 @@
 title: 'Story 2.9, PR 3 for hovedindeksen: «Hovedindeksen» over tabellen på forsiden'
 type: 'feature'
 created: '2026-10-17'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '5d38173'
@@ -67,6 +67,8 @@ Etter kontrollen i story 2.9, hver med «Ville feilet hvis»:
 - Flettes i instruksjonen kl. 19:31 når ingen test feiler, ingen mutant overlever, CI er grønn på head-en, og hvert funn med dom medium eller høyere er rettet.
 
 **Testtallet før:** 2309 bestått og 17 hoppet over (head-en til PR #58, `33ca133`, samme kode og tester som main på `5d38173`).
+
+*Lagt til 2026-10-17 kl. 19:55:* PR #59 er squash-flettet i `b44284f`, låst til head-en `bdfd412`. CI var grønn på head-en (39055685375) og på main (39055792414).
 
 ## Mutantene
 
