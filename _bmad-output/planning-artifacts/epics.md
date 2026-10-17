@@ -3649,3 +3649,5 @@ Som **gruppe**, vil vi at ruff finner ubrukte importer, rot i importene og vanli
 - **Ville feilet hvis:** en ubrukt import eller en linje som ikke er formattert, slapp gjennom testene
 
 **Avhenger av:** ingen. **Én økt:** ja.
+
+*Lagt til 2026-10-17 kl. 23:41:* ruff er i CI og i pytest, flettet i `faaa36c`, PR #62 (spesifikasjonen `spec-9-7-linter-og-formatterer-i-ci.md`). Reglene er pyflakes, importene og bugbear, med B905 slått av. CI var grønn på head-en `4cf27a9` (kjøring 39071749356) og på main (39071843876).
