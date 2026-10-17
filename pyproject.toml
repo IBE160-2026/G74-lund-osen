@@ -27,6 +27,9 @@ faulthandler_timeout = 120
 # Story 9.7: ruff sjekker og formatterer src/ og tests/. Kjoeres foer en
 # commit (CLAUDE.md regel 23), og CI og tests/test_ruff.py kjoerer det samme.
 [tool.ruff]
+# Samme versjon som i uv.lock, saa formatteringen ikke endres av en
+# oppgradering ingen har bestemt (gjennomgangen, BH2).
+required-version = "==0.17.1"
 include = ["src/**/*.py", "tests/**/*.py"]
 src = ["src", "tests"]
 # 120, ikke 88: naermest koden slik den var skrevet, og minst omformattering

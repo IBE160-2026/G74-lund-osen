@@ -46,7 +46,9 @@ jobs:
         run: uv run ruff format --check
 
       - name: Kjoer testene
-        # Samme kommando som lokalt, jf. README.
+        # Samme kommando som lokalt, jf. README. Ogsaa naar ruff har feilet,
+        # saa en glemt formattering ikke skjuler resultatet av testene.
+        if: success() || failure()
         run: uv run pytest -q
 
   # Story 3.1: imaget bygges og proeves, uten hemmeligheter og uten EODHD.
