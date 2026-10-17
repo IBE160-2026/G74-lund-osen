@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-10-17T12:30
+updated: 2026-10-17T19:56
 ---
 
 # Vurderingsmatrise for del 1
@@ -57,3 +57,5 @@ Statusen i tabellen er ikke endret. README-prøven (story 3.4) og avsnittet «St
 *Lagt til 2026-10-17 kl. 00:28:* hovedindeksen (story 2.8): tabellen `indeks` i migrering `0006`, porten og en oppdiktet demoindeks er på main, flettet i `1d3a21d`, PR #56. Kallet for `OSEBX.OL` i hentingen kommer i PR 2, og visningen i 2.9 og 2.9b etter det. Statusen i tabellen er ikke endret.
 
 *Lagt til 2026-10-17 kl. 12:30:* hovedindeksen (story 2.8): kallet for `OSEBX.OL` i hentingen er på main, flettet i `bcac2b5`, PR #57. En henting bruker 16 kall, 15 aksjer og indeksen, og gir kode 3 når bare indeksen feiler (beslutningen kl. 11:58). Visningen kommer i PR 3 (story 2.9). Statusen i tabellen er ikke endret.
+
+*Lagt til 2026-10-17 kl. 19:56:* hovedindeksen (story 2.9, FR-104): «Hovedindeksen» står over tabellen på forsiden, med symbolet, verdien, endringen mot forrige børsdag og «x av N gikk bedre enn indeksen», også i demoen med DEMIX. Flettet i `b44284f`, PR #59. Søylene (FR-105, story 2.9b) kommer i PR 4. Statusen i tabellen er ikke endret.
