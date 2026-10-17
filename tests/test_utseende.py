@@ -206,7 +206,7 @@ def _kontrast(a: str, b: str) -> float:
 
 
 @pytest.fixture
-def sidene(klient, monkeypatch, demobase):
+def sidene(klient, monkeypatch, demobase):  # noqa: F811 - fikstur fra test_demo
     """Hver side som finnes, i hver tilstand: {navn: html}."""
     sider = {"tom base": klient.get("/").data.decode("utf-8")}
     monter(
@@ -614,10 +614,10 @@ class TestOversikten:
         from demo import DEMOUNIVERS
         from kursdata import AKSJEUNIVERS
 
-        mal = (Path(__file__).resolve().parent.parent / "src" / "templates" / "_bransjer.html").read_text(
+        bransjemal = (Path(__file__).resolve().parent.parent / "src" / "templates" / "_bransjer.html").read_text(
             encoding="utf-8"
         )
-        symboler = set(re.findall(r"^  '([^']+)': '", mal, re.M))
+        symboler = set(re.findall(r"^  '([^']+)': '", bransjemal, re.M))
         assert len(symboler) == 13
         assert {a.sektor for a in AKSJEUNIVERS} | {a.sektor for a in DEMOUNIVERS} <= symboler
         html = sidene["oversikten"]
@@ -659,7 +659,7 @@ class TestSorteringen:
         nettleserens blå (designregler §5, ingen farge skrevet fast)."""
         assert "color: var(--blekk)" in _regel(_stil(sidene["oversikten"]), "p.sortert a")
 
-    def test_sorteringen_virker_i_demoen(self, klient, demobase, monkeypatch):
+    def test_sorteringen_virker_i_demoen(self, klient, demobase, monkeypatch):  # noqa: F811 - fikstur fra test_demo
         """FR-411: samme rute og mal i demoen, med merket som før."""
         monkeypatch.setenv(app_modul.I_DEMO, "1")
         html = klient.get("/?sorter=endring&orden=stigende").data.decode("utf-8")

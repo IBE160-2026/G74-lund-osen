@@ -611,8 +611,6 @@ class TestStory80eTekstIDemoen:
     «Demo Børs» der den ekte versjonen sier «Oslo Børs»."""
 
     def test_teksten_over_tabellen_i_demoen(self, klient, monkeypatch, demobase):
-        import re
-
         from test_app import _synlig
 
         monkeypatch.setenv(app_modul.I_DEMO, "1")

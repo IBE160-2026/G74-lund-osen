@@ -35,4 +35,7 @@ line-length = 120
 target-version = "py313"
 
 [tool.ruff.lint]
-select = []
+# Bare regler som finner feil eller rot, ikke smak (story 9.7).
+select = [
+    "F",  # pyflakes: ubrukte importer og navn, navn som ikke finnes
+]
