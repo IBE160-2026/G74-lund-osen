@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-10-17T19:56
+updated: 2026-10-17T22:14
 ---
 
 # Vurderingsmatrise for del 1
@@ -21,6 +21,20 @@ Status per kriterium for del 1 av mappen i IBE160 høsten 2026: hva vi leverer, 
 **Kilden for kriteriene:** «Sensorveiledning – Del 1» for IBE160 høsten 2026, som gruppen har fått. Den ligger ikke i repoet og er ikke lest i økta som laget matrisen, så ingenting her siteres fra den. Kriteriene og vektene står i instruksjonen 16.10 kl. 00:17 ([`ai-prompts/2026-10-16.md`](ai-prompts/2026-10-16.md)), og de samme sju med de samme vektene står i [tilbakemeldingen på briefen](../_bmad-output/planning-artifacts/tilbakemelding-product-brief.md), del 2.
 
 «Hva vi leverer» bygger på [briefen v8](../_bmad-output/planning-artifacts/product-brief.md) (taggen `arbeidskrav-product-brief-v8`) og [PRD-en](../_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md).
+
+## Status 17.10.2026
+
+Tallene er talt 17.10 kl. 22:12: 56 flettede pull requests (`gh pr list --state merged`), 24 dagsfiler i `docs/ai-prompts/` og 451 Utført-linjer i dem. Storyene er ført som i [sprintstatusen](../_bmad-output/implementation-artifacts/sprint-status.yaml) etter `319d341`. Hver celle er sjekket mot main kl. 22:12, og hvert testnavn finnes. Flettet etter tellingen 16.10 kl. 00:27: PR #49 og #52–#60.
+
+| Kriterium (vekt) | Hva vi leverer | Bevis i repoet | Status | Neste tiltak |
+|---|---|---|---|---|
+| **Prosess og KI-styring** (30 %) | Som 16.10. Hver instruksjon lagres ordrett før den utføres, med en Utført-linje etterpå, og flettingen har vilkår som stopper den | Som 16.10. I tillegg: spesifikasjonene for 2.8b, 2.9, alle 10 kombinasjonene og kl. 21:00 i [`implementation-artifacts/`](../_bmad-output/implementation-artifacts/), med triagen etter gjennomgangen. Beslutningene 17.10 kl. 11:58, 12:44, 21:01, 22:00 og 22:06 under story 2.3, 2.8 og 3.4b og under «Prioritering» i [epics.md](../_bmad-output/planning-artifacts/epics.md). Oppføringen for 17.10 i [refleksjonsloggen](reflection-log.md) (`319d341`) | delvis | Story 9.2 og 9.5 står i backlog i sprintstatusen |
+| **Funksjonalitet og omfang** (20 %) | Som 16.10, og nå også KI-teksten i hentingen og hovedindeksen i hentingen og over tabellen på forsiden. Demoen viser alle 10 fargekombinasjonene av de tre sjekkene på siste dag | KI-teksten i hentingen: PR #49 (`b13e50f`) og prompten versjon 2, PR #55 (`cafe067`). Hovedindeksen: PR #56 (`1d3a21d`), #57 (`bcac2b5`) og #59 (`b44284f`), [`hovedindeks.py`](../src/hovedindeks.py), `tests/test_hovedindeks.py::TestSammenligningen::test_n_er_aksjene_med_kurs_og_en_uten_navngis` og `tests/test_app.py::TestHovedindeksenPaaForsiden::test_uten_indeks_sier_siden_det_og_tabellen_vises`. Demoen: PR #58 (`f21f927`) og `tests/test_demo.py::TestAlleTiKombinasjonene::test_alle_ti_kombinasjonene_paa_sluttdato`. Det fra 16.10 står | delvis | Historikken (2.7), søylene under hovedindeksen (2.9b), «Min liste» (8.3), KI-tekstene i demoen (3.4b) og lenken til investorsiden (10.5) står i backlog. 3.4b bygges søndag 18.10 før 2.9b (beslutningen kl. 22:06) |
+| **Kvalitetssikring og testing** (15 %) | Som 16.10 | Som 16.10. I tillegg mutantene og triagen i hver spesifikasjon fra 17.10, for eksempel kode 3 (`tests/test_fetch_prices.py::TestKode3::test_en_aksje_og_indeksen_feiler_gir_kode_1`) og grensen kl. 21:00 (`tests/test_fetch_prices.py::TestTidskontrollen::test_kl_21_presis_henter`). CI på main etter `53aa220`: 2383 bestått (kjøring 39065681423) | delvis | Én ukes logget drift av KI-laget og målingen av bidraget (story 10.4, backlog). Målingen av fire aksjer etter hentingen mandag 19.10 (beslutningen kl. 22:00 under story 2.3) |
+| **Design og brukeropplevelse** (10 %) | Som 16.10, og hovedindeksen over tabellen etter §11 i utdraget fra designtavla, uten piler og med «?» | Som 16.10. Hovedindeksen: delen i [`index.html`](../src/templates/index.html) og `tests/test_app.py::TestHovedindeksenPaaForsiden::test_uten_indeks_sier_siden_det_og_tabellen_vises` | delvis | Brukertesten (story 8.1) og UX-gjennomgangen (8.2) står i backlog |
+| **Kodekvalitet og arkitektur** (10 %) | Som 16.10 | Som 16.10. Porten for indeksen i [`indeksdata.py`](../src/indeksdata.py) og tallene i den rene modulen [`hovedindeks.py`](../src/hovedindeks.py), uten SQL i webserveren (`tests/test_app.py::test_app_har_ingen_sql_og_regner_ikke_signalet`) | oppfylt | Gjennomgangen med tre linser og mutantene fortsetter for hver story |
+| **README og kjørbarhet** (10 %) | Som 16.10. Hentingen går fra kl. 21 på en børsdag (PR #60, `336204f`), og README-en og hjelpen sier det | Som 16.10. `tests/test_docker.py::TestReadme::test_kommandoene_er_de_samme_som_i_koden_og_compose` og `tests/test_readme.py::test_hver_lenke_i_readme_peker_paa_noe_som_finnes` | delvis | README-prøven, Prøve 1 og 2 i §9 i [kvalitetssikringen](kvalitetssikring.md), er ikke tatt, og story 3.4 står i review til den er tatt. De to README-PR-ene kommer søndag 18.10 (beslutningen kl. 22:06). «Neste» i avsnittet «Status» i README-en nevner verken søylene (2.9b) eller KI-tekstene i demoen (3.4b) |
+| **Ryddighet i repoet** (5 %) | Som 16.10 | Som 16.10. [`test_ryddighet.py`](../tests/test_ryddighet.py) står | oppfylt | Holdes ved like med regel 19 |
 
 ## Status 16.10.2026
 
