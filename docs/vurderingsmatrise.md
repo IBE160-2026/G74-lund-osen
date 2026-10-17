@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-10-17T00:28
+updated: 2026-10-17T12:30
 ---
 
 # Vurderingsmatrise for del 1
@@ -55,3 +55,5 @@ Statusen i tabellen er ikke endret. README-prøven (story 3.4) og avsnittet «St
 *Lagt til 2026-10-16 kl. 23:55:* KI-laget: prompten versjon 2 er flettet i `cafe067`, PR #55 (story 10.2, PR H). I prøvekjøringen mot en kopi av basen, ført i `malinger.md` §34, besto 15 av 15 tekster kontrollen, mot 6 med versjon 1 (§32), og modellen feilet for 0, på grafikkortet. Story 10.2 er done. Innstrammingen av kontrollen for «fordi» er en egen liten PR neste uke (beslutningen kl. 23:51). Statusen i tabellen er ikke endret.
 
 *Lagt til 2026-10-17 kl. 00:28:* hovedindeksen (story 2.8): tabellen `indeks` i migrering `0006`, porten og en oppdiktet demoindeks er på main, flettet i `1d3a21d`, PR #56. Kallet for `OSEBX.OL` i hentingen kommer i PR 2, og visningen i 2.9 og 2.9b etter det. Statusen i tabellen er ikke endret.
+
+*Lagt til 2026-10-17 kl. 12:30:* hovedindeksen (story 2.8): kallet for `OSEBX.OL` i hentingen er på main, flettet i `bcac2b5`, PR #57. En henting bruker 16 kall, 15 aksjer og indeksen, og gir kode 3 når bare indeksen feiler (beslutningen kl. 11:58). Visningen kommer i PR 3 (story 2.9). Statusen i tabellen er ikke endret.
