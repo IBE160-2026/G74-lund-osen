@@ -105,11 +105,11 @@ jobs:
           [ "$ok" = 1 ] && [ "$base" = ja ] && [ "$noekler" = 0 ]
 
       - name: Hentingen uten nøkkel og uten nett stopper før første kall
-        # --hent-foer-kl-22 slipper forbi tidskontrollen uansett klokke, saa
+        # --uten-tidskontroll slipper forbi tidskontrollen uansett klokke, saa
         # kjoeringen gaar gjennom basen og filvakten til noekkelen.
         run: |
           set +e
-          ut=$(docker run --rm --network none ose-signal:ci python src/fetch_prices.py --hent-foer-kl-22 2>&1)
+          ut=$(docker run --rm --network none ose-signal:ci python src/fetch_prices.py --uten-tidskontroll 2>&1)
           kode=$?
           set -e
           echo "$ut"
@@ -283,7 +283,7 @@ jobs:
           set +e
           ut=$(docker run --rm --network none --read-only --tmpfs /tmp \
             -v ose-ci-ro-db:/app/data/db -v ose-ci-ro-raa:/app/data/raa \
-            ose-signal:ci python src/fetch_prices.py --hent-foer-kl-22 2>&1)
+            ose-signal:ci python src/fetch_prices.py --uten-tidskontroll 2>&1)
           kode=$?
           set -e
           echo "$ut"
