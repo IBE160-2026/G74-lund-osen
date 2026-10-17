@@ -1,9 +1,10 @@
 """Henter sluttkurser for OSE Signal sitt aksjeunivers fra EODHD.
 
 Dette scriptet er det eneste stedet i prosjektet som bruker API-kvote.
-Ett kall per symbol, 15 symboler, altsaa 15 kall per kjoering. Gratisnivaaet
-gir 20 kall i doegnet, saa det er plass til EN kjoering per dag og litt til.
-Kjoer det bevisst - ikke i loekke, og aldri fra websiden.
+Ett kall per symbol, 15 aksjer og hovedindeksen, altsaa 16 kall per
+kjoering (story 2.8). Gratisnivaaet gir 20 kall i doegnet, saa det er plass
+til EN kjoering per dag og litt til. Kjoer det bevisst - ikke i loekke, og
+aldri fra websiden.
 
 Hvert kall henter et helt aar. Det koster noeyaktig det samme som aa hente
 fjorten dager - ett kall per symbol uansett intervallengde, maalt og foert i
@@ -50,6 +51,13 @@ Det skjer ogsaa naar basen alt har kursene, og etter et nytt forsoek, for
 radene som mangler i KILogg. Steget gjoer ingen kall til EODHD, og en feil
 der endrer ikke utgangskoden (NFR-04). Uten modell (OSE_KI_TJENESTE=av)
 skjer ingenting.
+
+Story 2.8 (FR-410): etter aksjene henter kjoer() hovedindeksen OSEBX.OL med
+ett kall, med samme intervall. Raadataene staar i samme oeyeblikksbilde,
+under noekkelen indeks, og indeksen lagres i tabellen indeks gjennom
+SqliteIndekslager, aldri i kurs eller vurdering (AD-21). Feiler kallet,
+lagres og vurderes aksjene som vanlig, og indeksen faar ingen ny sjanse
+(AD-15). Nye forsoek henter bare aksjene.
 """
 
 import argparse
@@ -67,6 +75,7 @@ import requests
 from dotenv import load_dotenv
 
 import lagring_fil
+import boersdag
 import lagring_sqlite
 from boersdag import (
     OSLO,
@@ -76,6 +85,7 @@ from boersdag import (
     norsk_dato,
 )
 from eodhd import UgyldigSerie, serie_fra_eodhd
+from indeksdata import HOVEDINDEKS, Indeks, bare_boersdager
 from ki_modell import Modell
 from ki_tekst import lag_ki_tekster, modell_fra_miljoeet
 from kursdata import AKSJEUNIVERS, Aksje, Kursrad
@@ -86,7 +96,7 @@ from lagring_fil import (
     SnapshotLeser,
     _hentet_fra_tekst,
 )
-from lagring_sqlite import SqliteKurslager, SqliteVurderingslager, aapne_base
+from lagring_sqlite import SqliteIndekslager, SqliteKurslager, SqliteVurderingslager, aapne_base
 from migrering import MigrasjonsFeil
 from signalberegning import vurder
 from vurderingsdata import Grunn
@@ -351,10 +361,56 @@ def hent_universet(
     return resultat
 
 
-def lag_oyeblikksbilde(resultat: Resultat, fra: str, til: str, naa: str) -> dict:
+def hent_indeksen(
+    api_nokkel: str,
+    fra: str,
+    til: str,
+    hent: Callable[[str, str, str, str], list[dict]] = hent_ett_symbol,
+    skriv: Callable[[str], None] = print,
+    indeks: Indeks = HOVEDINDEKS,
+) -> Resultat:
+    """Ett kall for indeksen - story 2.8, FR-410.
+
+    Samme henter, samme intervall og samme kontroll av formen som aksjene.
+    Resultatet har indeksens symbol i serier eller i feil. En feil stopper
+    ingenting og gir ingen ny sjanse (AD-15).
+    """
+    resultat = Resultat()
+    navn = f"{indeks.symbol} ({indeks.navn.lower()})"
+    try:
+        rader = hent(indeks.ticker, api_nokkel, fra, til)
+        resultat.kall_brukt += 1
+    except Exception as feil:  # noqa: BLE001 - alt som feiler har kostet kallet
+        resultat.kall_brukt += 1
+        resultat.feil[indeks.symbol] = _uten_noekkel(f"{type(feil).__name__}: {feil}", api_nokkel)
+        skriv(f"  {navn}: FEIL {_uten_noekkel(str(feil), api_nokkel)}")
+        return resultat
+    try:
+        serie = serie_fra_eodhd(rader)
+    except UgyldigSerie:
+        resultat.feil[indeks.symbol] = "svar med feil form"
+        skriv(f"  {navn}: svar med feil form")
+        return resultat
+    if not serie:
+        resultat.feil[indeks.symbol] = "tomt svar"
+        skriv(f"  {navn}: ingen data")
+        return resultat
+    resultat.serier[indeks.symbol] = rader
+    skriv(f"  {navn}: {len(serie)} dager, siste {serie[-1].dato.isoformat()}")
+    return resultat
+
+
+def lag_oyeblikksbilde(
+    resultat: Resultat, fra: str, til: str, naa: str, indeks: Resultat | None = None
+) -> dict:
     """Formatet visningen leser gjennom lagring_fil.SnapshotLeser. Skrives
-    aldri om etterpaa."""
-    return {
+    aldri om etterpaa.
+
+    Story 2.8: indeksen staar under noekkelen indeks, med serier og feil i
+    samme form, aldri blant aksjene. Et nytt forsoek henter ikke indeksen, og
+    fila har da ingen indeks.
+    """
+    bilde = {
         "hentet": naa,
         "from": fra,
         "to": til,
@@ -362,6 +418,9 @@ def lag_oyeblikksbilde(resultat: Resultat, fra: str, til: str, naa: str) -> dict
         "serier": resultat.serier,
         "feil": resultat.feil,
     }
+    if indeks is not None:
+        bilde["indeks"] = {"serier": indeks.serier, "feil": indeks.feil}
+    return bilde
 
 
 def filnavn(i_dag: date) -> str:
@@ -465,6 +524,56 @@ def skriv_til_basen(
 
     skriv(f"Skrev {len(skrevne)} serier til basen {base_sti.name}.")
     return skrevne
+
+
+def skriv_indeksen_til_basen(
+    base_sti: Path,
+    rader: list[Kursrad],
+    hentet: datetime,
+    fil: Path,
+    skriv: Callable[[str], None] = print,
+    indeks: Indeks = HOVEDINDEKS,
+) -> bool:
+    """Indeksens serie til tabellen indeks - story 2.8, AD-5, AD-21.
+
+    Gjennom SqliteIndekslager, aldri kurs eller vurdering. Porten tar bort
+    dagene som ikke er boersdager i aarene DEKKEDE_AAR dekker, og utskriften
+    sier hvor mange som ble lagret og tatt bort (BH2 i 2.8a), regnet med samme
+    funksjon. En eldre fil skriver ikke over en nyere serie, som for aksjene.
+    Returnerer True hvis serien ble lagret. En feil her stopper ikke aksjene
+    (AD-15).
+    """
+    lagret = len(bare_boersdager(rader))
+    aarene = ", ".join(str(aar) for aar in sorted(boersdag.DEKKEDE_AAR))
+    try:
+        tilkobling = aapne_base(base_sti)
+    except BASEFEIL as feil:
+        skriv(f"{indeks.navn} {indeks.symbol}: basen kunne ikke aapnes ({type(feil).__name__}). Ikke lagret.")
+        return False
+    try:
+        lager = SqliteIndekslager(tilkobling, (indeks,))
+        forrige = lager.sist_hentet(indeks.symbol)
+        if forrige is not None and hentet < forrige:
+            skriv(
+                f"{indeks.navn} {indeks.symbol}: hoppet over. {fil.name} er hentet "
+                f"{hentet.isoformat()}, og basen har en serie hentet "
+                f"{forrige.isoformat()}. En eldre fil skriver ikke over en nyere serie."
+            )
+            return False
+        lager.erstatt_serie(indeks.symbol, rader, hentet)
+    except ValueError as feil:
+        skriv(f"{indeks.navn} {indeks.symbol}: avvist og ikke lagret: {feil}")
+        return False
+    except BASEFEIL as feil:
+        skriv(f"{indeks.navn} {indeks.symbol}: basen kunne ikke skrives ({type(feil).__name__}). Ikke lagret.")
+        return False
+    finally:
+        tilkobling.close()
+    skriv(
+        f"{indeks.navn} {indeks.symbol}: lagret {lagret} dager, tok bort "
+        f"{len(rader) - lagret} som ikke er boersdager i {aarene}."
+    )
+    return True
 
 
 def _basen_feilet(
@@ -861,7 +970,8 @@ def kjoer(
         api_nokkel = api_nokkel()
 
     # Kvoten (regel 15): /api/user er gratis. Dagens dato regnes i GMT.
-    behov = len(lista)
+    # Story 2.8: aksjene i lista og hovedindeksen, 16 med de 15.
+    behov = len(lista) + 1
     try:
         igjen, bonus = tolk_kvote(les_kvote(api_nokkel), hentet_tid.date())
     except UlesbarKvote as feil:
@@ -900,24 +1010,29 @@ def kjoer(
             sys.exit(1)
 
     fra, til = bygg_intervall(dag)
-    skriv(f"Henter {len(lista)} symboler, {fra} til {til}.")
-    skriv(f"Dette koster {len(lista)} kall.\n")
+    skriv(f"Henter {len(lista)} aksjer og {HOVEDINDEKS.navn.lower()}, {fra} til {til}.")
+    skriv(f"Dette koster {behov} kall.\n")
 
     resultat = hent_universet(api_nokkel, fra, til, hent, skriv, lista)
+    # Story 2.8: indeksen etter aksjene, med ett kall. En feil stopper ingenting.
+    indeks = hent_indeksen(api_nokkel, fra, til, hent, skriv)
+    kall_brukt = resultat.kall_brukt + indeks.kall_brukt
 
-    tekst = json.dumps(lag_oyeblikksbilde(resultat, fra, til, hentet), ensure_ascii=False)
+    tekst = json.dumps(
+        lag_oyeblikksbilde(resultat, fra, til, hentet, indeks), ensure_ascii=False
+    )
     try:
         with open(fil, "x", encoding="utf-8") as ut:
             ut.write(tekst)
     except FileExistsError:
         skriv(
             f"{fil.name} dukket opp mens hentingen paagikk, og er ikke skrevet "
-            f"over (AD-6). {resultat.kall_brukt} kall er brukt, og ingenting er lagret."
+            f"over (AD-6). {kall_brukt} kall er brukt, og ingenting er lagret."
         )
         sys.exit(1)
 
     skriv(f"\nLagret {fil.name} i {data_katalog.name}/")
-    skriv(f"API-kall brukt: {resultat.kall_brukt}")
+    skriv(f"API-kall brukt: {kall_brukt}")
     if resultat.feil:
         skriv(f"Symboler uten data: {', '.join(sorted(resultat.feil))}")
 
@@ -930,6 +1045,20 @@ def kjoer(
             f"skriver ingen. {_kan_skrives_til(dato)}"
         )
         sys.exit(1)
+
+    # Story 2.8: indeksen til tabellen indeks. Feilet den, faar den ingen ny
+    # sjanse (AD-15), og aksjene gaar videre som vanlig.
+    if HOVEDINDEKS.symbol in indeks.serier:
+        skriv_indeksen_til_basen(
+            base_sti, serie_fra_eodhd(indeks.serier[HOVEDINDEKS.symbol]), hentet_tid, fil, skriv
+        )
+    else:
+        skriv(
+            f"{HOVEDINDEKS.navn} {HOVEDINDEKS.symbol} feilet i hentingen "
+            f"({indeks.feil[HOVEDINDEKS.symbol]}) og faar ingen ny sjanse i kveld "
+            "(AD-15). Aksjene lagres og vurderes som vanlig, og et nytt forsoek "
+            "henter bare aksjene. Neste henting bytter ut hele serien."
+        )
 
     # Vurderingene etter kursene (AD-17), med datoen fra oeyeblikket.
     if norsk_dato(klokke()) != dag:
@@ -1078,8 +1207,10 @@ def nytt_forsoek(
         )
         sys.exit(1)
     igjen = max(grense - brukt, 0)
-    # Med indeksen (2.8) blir antallet len(lista) + 1 (NFR-01, tillegget 08.10).
-    antall = kall_til_nye_forsoek(igjen, grense, len(lista))
+    # Story 2.8: hovedhentingen er aksjene og indeksen, len(lista) + 1, saa det
+    # er 4 kall til nye forsoek med de 15 (NFR-01, tillegget 08.10). Forsoeket
+    # henter bare aksjene.
+    antall = kall_til_nye_forsoek(igjen, grense, len(lista) + 1)
     if antall == 0:
         skriv(
             f"Kvoten: {igjen} kall igjen av dagens, og 0 til nye forsoek. "

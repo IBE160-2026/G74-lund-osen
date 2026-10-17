@@ -100,7 +100,7 @@ class TestSteget:
         raa, base = stier
         _, med, _ = kjoer(raa, base, FalskModell())
         _, uten, _ = kjoer(tmp_path / "raa2", tmp_path / "db2" / "ose.db", None)
-        assert med == uten and len(med) == 15
+        assert med == uten and len(med) == 16  # 15 aksjer og indeksen (story 2.8)
 
     def test_uten_modell_ingen_rader(self, stier):
         """OSE_KI_TJENESTE=av (svar 5): hentingen gaar som foer."""
