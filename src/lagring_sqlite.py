@@ -308,6 +308,12 @@ class SqliteIndekslager:
         ).fetchone()
         return datetime.fromisoformat(rad[0]) if rad else None
 
+    def symboler(self) -> tuple[str, ...]:
+        # Tiden sammenlignes som tidspunkt, ikke som tekst, saa en tid med
+        # annen skrivemaate ikke avgjoer rekkefoelgen.
+        rader = self._tilkobling.execute("SELECT symbol, hentet FROM indeksserie").fetchall()
+        return tuple(s for s, _ in sorted(rader, key=lambda r: (-datetime.fromisoformat(r[1]).timestamp(), r[0])))
+
     def _rull_tilbake(self) -> None:
         if self._tilkobling.in_transaction:
             self._tilkobling.execute("ROLLBACK")

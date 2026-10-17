@@ -39,6 +39,18 @@ PROSENT = {"endring", "maaling", "grense", "andel"}
 MEST_DESIMALER = 6
 
 
+def avrundet(verdi: float, slag: str) -> float:
+    """Tallet slik det vises, som tall - story 2.9 (FR-104).
+
+    Rundet til desimalene for slaget, som tall() viser det. Brukes der en
+    sammenligning skal avgjoeres paa tallet slik det vises, som «bedre enn
+    indeksen», og til fargen ved endringen.
+    """
+    if slag not in DESIMALER:
+        raise ValueError(f"Ukjent slag {slag!r}. Kjente slag: {', '.join(DESIMALER)}")
+    return round(verdi, DESIMALER[slag])
+
+
 def tall(
     verdi: float,
     slag: str,

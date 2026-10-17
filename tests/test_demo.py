@@ -694,3 +694,23 @@ class TestAlleTiKombinasjonene:
         assert len(kurs) - len(uten) == len(demo.SISTE_DAG) == 3
         assert hashlib.sha256(repr(uten).encode()).hexdigest() == FINGERAVTRYKK_KURS_UTEN_SISTE_DAG
         assert hashlib.sha256(repr(vurdering).encode()).hexdigest() == FINGERAVTRYKK_VURDERING_FOER_SISTE_DAG
+
+
+class TestHovedindeksenIDemoen:
+    """Story 2.9: demoen viser demoindeksen som den ekte versjonen viser
+    OSEBX. Matfjord Merkevarer har ingen kurser og navngis."""
+
+    def test_demix_og_matfjord_navngis(self, klient, monkeypatch, demobase):
+        import re
+
+        from test_app import _synlig
+
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        html = klient.get("/").data.decode("utf-8")
+        delen = html.split('<section class="hovedindeks"', 1)[1].split("</section>", 1)[0]
+        tekst = _synlig(delen)
+        # Gjennomgangen, BH17: OSEBX sjekkes bare i delen.
+        assert "Hovedindeksen DEMIX" in tekst and "OSEBX" not in delen
+        assert re.search(r"\d+ av 14 gikk bedre enn indeksen\.", tekst), tekst
+        assert "Ikke med, uten kurs 09.10: Matfjord Merkevarer." in tekst
+        assert 'class="indeksdato"' not in delen

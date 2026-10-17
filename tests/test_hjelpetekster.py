@@ -315,6 +315,9 @@ class TestSidene:
                              (r'<th class="tall"[^>]*>' + lenke.format("Signalstyrke"), "hjelp-signalstyrke"),
                              (r"<th[^>]*>" + lenke.format("Retning"), "hjelp-retning")):
             assert re.search(tekst + knapp.format(vindu), oversikt), vindu
+        # Story 2.9: «?» ved overskriften til hovedindeksen.
+        assert re.search(r'<h2><span id="hovedindeks-tittel">Hovedindeksen</span>(\s*<span class="indekssymbol">[^<]*</span>)? '
+                         + knapp.format("hjelp-hovedindeks"), oversikt)
         # Story 8.0d, PR 2: tidspunktet står bare i stripa, som «Oppdatert»,
         # med «?» ved siden av (BH2, svar 5).
         stripa = oversikt.split('<header class="stripe">', 1)[1].split("</header>", 1)[0]
@@ -362,6 +365,8 @@ class TestSidene:
 
         forventet = {
             "/": {
+                # Story 2.9: delen over tabellen.
+                "hjelp-hovedindeks": ["hovedindeksen"],
                 "hjelp-selskap": ["selskap"],
                 "hjelp-sluttkurs": ["sluttkurs"],
                 "hjelp-endring": ["endring", "utbyttejustert"],
