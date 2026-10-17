@@ -714,3 +714,31 @@ class TestHovedindeksenIDemoen:
         assert re.search(r"\d+ av 14 gikk bedre enn indeksen\.", tekst), tekst
         assert "Ikke med, uten kurs 09.10: Matfjord Merkevarer." in tekst
         assert 'class="indeksdato"' not in delen
+
+
+class TestKlokkeslettetSomDenEkte:
+    """Story 2.3, hentingen fra kl. 21:00 (beslutningen 16.10 kl. 21:09):
+    demoen er lik den ekte (beslutningen 16.10 kl. 11:46), saa hentingen i
+    demobasen er kl. 21:15 og vurderingene kl. 21:30, ikke 22:15 og 22:30.
+    Ingen fingeravtrykk endres: kurs og vurdering har ingen klokkeslett, og
+    FINGERAVTRYKK_KURS og FINGERAVTRYKK_VURDERING_FOER_SISTE_DAG staar."""
+
+    def test_hentet_er_kl_21_15_i_oslo(self, mal):
+        c = sqlite3.connect(mal)
+        try:
+            tider = {datetime.fromisoformat(h) for (h,) in c.execute(
+                "SELECT hentet FROM kursserie UNION SELECT hentet FROM indeksserie")}
+        finally:
+            c.close()
+        ventet = datetime(2026, 10, 9, 21, 15, tzinfo=demo.OSLO)
+        assert tider == {ventet}
+
+    def test_vurderingene_er_etter_tidsgrensen(self):
+        """Klokka vurderingene skrives med, er etter grensen i hentingen, som
+        en kveldshenting. Ville feilet med 22:30 igjen, eller med en tid foer
+        grensen."""
+        import fetch_prices
+
+        oeyeblikk = demo._klokke_for(demo.SLUTTDATO)()
+        assert oeyeblikk == datetime(2026, 10, 9, 21, 30, tzinfo=demo.OSLO)
+        assert oeyeblikk.timetz().replace(tzinfo=None) >= fetch_prices.TIDSGRENSE
