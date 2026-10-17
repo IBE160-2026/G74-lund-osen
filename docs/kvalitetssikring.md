@@ -241,11 +241,40 @@ sist i dokumentet.
 | 8.0 De rene feilene | `33317df` (#15) | 6 (17 mutanter, 1–12 på én linje) | 2 lagt til etter gjennomgangen | `S/spec-8-0-…`, Implementation Notes og triage |
 | 9.0 Fem tester sjekker det de lover | `c2c26ba` (#7) | 6 | – | `S/spec-9-0-…`, Implementation Notes |
 | AD-8, nettsperren | `982b216` | 2 | – | commitmeldingen |
+| 2.2 Hentekommandoen som egen inngang | `1570ae9` (#19) | 1 (18 mutanter, M1–M18) | M7 og M11 overlevde først, og testene ble rettet i `e4f1be8`. M15 ble ikke fanget av testen den var laget for, men av to andre | `S/spec-2-2-hentekommandoen-som-egen-inngang.md`, tabellen over mutantene |
+| 2.2b Sidene leser dagens vurdering | `ff58ecf` (#20) | 1 (15, M1–M15) | M15 overlevde først, og en ny test tar bort tabellen `vurdering` | `S/spec-2-2b-sidene-leser-dagens-vurdering.md`, Implementation Notes |
+| 2.3 Børsdagskontrollen | `249853e` (#22) | 1 (32 kjøringer, 28 navn) | To flyttinger overlevde før testene fra gjennomgangen (VG1). M4 hang én gang og ble delt i M4a og M4b | `S/spec-2-3-boersdagskontroll-foer-kvoten-brukes.md` |
+| 2.3, kl. 21 Hentingen fra kl. 21:00 | `336204f` (#60) | 1 (3, T1–T3) | – | `S/spec-2-3-hentingen-fra-kl-21.md`, «Mutantene» |
+| 2.3b Nye forsøk | `c3d6660` (#28) | 1 (28) | M10 og M20 overlevde første kjøring, og to tester kom til i `bf41134` | `S/spec-2-3b-kallene-som-er-igjen-brukes-paa-nye-forsoek.md` |
+| 2.8a Tabellen indeks og porten | `1d3a21d` (#56) | 1 (4, I1–I4) | – | `S/spec-2-8a-indeks-tabellen-og-porten.md`, «Mutantene» |
+| 2.8b Kallet for hovedindeksen | `bcac2b5` (#57) | 1 (11) | – Første kjøring i en klone med CRLF ble gjort om, fordi sha256 ble sammenlignet mot andre linjeskift | `S/spec-2-8b-indekskallet-i-hentingen.md`, «Mutantene» og «Kode 3» |
+| 2.9 Hovedindeksen på forsiden | `b44284f` (#59) | 1 (4, H1–H4) | – | `S/spec-2-9-hovedindeksen-paa-forsiden.md`, «Mutantene» |
+| 3.1 Dockerfile med to innganger | `a2ecee8` (#23) | 1 (24 statiske og 9 i imaget) | I5 overlevde først (uv lastet ned 3.13), og `UV_PYTHON_DOWNLOADS=never` kom til. D21 overlevde først | `S/spec-3-1-dockerfile-med-to-innganger.md` |
+| 3.2 To volumer | `088c885` (#24) | 1 (10 statiske og 8 i CI) | C3, S8, S9 og S10 overlevde først. Første forsøk med C7 bygget ikke | `S/spec-3-2-to-volumer-og-ingenting-uerstattelig-i-imaget.md` |
+| 3.3 README | `5816bc2` (#25) | 1 (15 statiske og 1 i CI) | – | `S/spec-3-3-readme-slik-kjoerer-du-den.md` |
+| 3.3b README for sensor | `6b9dc2f` (#53), `1a95495` (#54) | 1 (21 i PR #53) | – | `S/spec-3-3b-readme-for-sensor.md` |
+| 3.4 Demoversjonen | `0ed87be` (#26), `59c0baf` (#27), `4464a10` (#30), `4c01a7e` (#31), `41a9df7` (#32), `1ead55a` (#33), `dfe6884` (#34) | 1 (#26: 24, #27: 28, #30: 17, 16, 16, 10 og 6, #31: 4, #32–#34: 2 hver) | M20 i #26 og H12 og H13 i #30 overlevde først. T9 ble forkastet, og B6 ble ikke kjørt ferdig. Spesifikasjonen står i review | `S/spec-3-4-demoversjonen.md` |
+| 3.4, alle 10 Kombinasjonene på siste demodag | `f21f927` (#58) | 1 (4, R1–R4) | – | `S/spec-3-4-alle-ti-kombinasjonene-paa-siste-demodag.md`, «Mutantene» |
+| 4.0 Nettsperren dekker hele testkjøringen | `dc43569` (#44) | 1 (10) | – Under N1 og N4 ble det gjort ekte oppslag og tilkoblingsforsøk (BH10) | `S/spec-4-0-nettsperren-dekker-hele-testkjoeringen.md` |
+| 4.2 KILogg-porten | `a1d22f1` (#45) | 1 (11) | – | `S/spec-4-2-kilogg-porten-med-minneimplementasjon.md` |
+| 4.3 SQLite-adapter for KILogg | `3a089c8` (#46) | 1 (7) | – | `S/spec-4-3-sqlite-adapter-for-kilogg.md` |
+| 8.0b Hjelp bak «?» | `8d70762` (#29) | 1 (19) | M12 overlevde først, og testen ble rettet i `ccdd7ee` | `S/spec-8-0b-hjelp-bak-et-spoersmaalstegn.md` |
+| 8.0c Tydelig merking | `82271fb` (#35), `16e18d8` (#36) | 1 (25) | – | `S/spec-8-0c-tydelig-merking-ord-ved-sjekkene-og-datoer-paa-grafen.md` |
+| 8.0d Utseendet | `e862743` (#39), `179b415` (#40), `8c9f8b7` (#41), `f7c5e64` (#42) | 1 (47) | – E9–E11 ble kjørt senere, fordi maskinen hadde for lite minne. M2 og M8 trengte en testfil til | `S/spec-8-0d-utseendet-fra-designforslaget.md` |
+| 8.0e Oversikten | `85fe8a4` (#37), `cfc373e` (#38) | 1 (16) | – | `S/spec-8-0e-oversikten-fra-designforslaget.md` |
+| 8.15 Sortering | `a13d273` (#43) | 1 (16, og 5 tester fra gjennomgangen prøvd som mutanter) | – | `S/spec-8-15-sortering-ved-klikk-i-kolonneraden.md` |
+| 10.1 Grunnlaget som sendes | `6855861` (#47) | 1 (8) | GR2 overlevde først, og testen ble endret i `2ae86b4` | `S/spec-10-1-grunnlaget-som-sendes-bare-utledede-verdier.md` |
+| 10.2a Modellen, prompten og kontrollen | `77ebf31` (#48) | 1 (12) | – Spesifikasjonen står in-progress | `S/spec-10-2a-modellen-prompten-og-kontrollen.md` |
+| 10.2b Teksten i hentekommandoen | `b13e50f` (#49) | 1 (18) | FR2 overlevde først, og testen ble skrevet om i `48838a7` | `S/spec-10-2b-teksten-i-hentekommandoen.md` |
+| 10.2c Prompten versjon 2 | `cafe067` (#55) | 1 (4) | – | `S/spec-10-2c-prompten-versjon-2.md` |
+| 10.3 Visningen i aksjedetaljen | `e728c37` (#50), `4a22199` (#51) | 1 (15) | – | `S/spec-10-3-visningen-i-aksjedetaljen.md` |
 
 **Ingen story mangler.** Lista er satt sammen fra storyene med status `done`
 eller `review` i `sprint-status.yaml` (21 storyer) og squash-commitene med
 `(#NN)` i git-loggen. 9.3 og 9.4 har ingen rad: de er dokumentasjon og et
 eksperiment uten kode i `src/`, og ingen mutanter er kjørt.
+
+*Rettet 2026-10-17:* setningen gjaldt 03.10. Lista sluttet ved 2.5, 8.0, 9.0 og nettsperren. 27 rader kom til 17.10, én for hver spesifikasjon fra 2.2 til 10.3, også 3.4 (review) og 10.2a (in-progress). Tallene er hentet fra spesifikasjonene, og vedlegget har én linje per spesifikasjon for dem. `tests/test_kvalitetssikring.py` krever en rad for hver spesifikasjon med status `done`, så en ny spesifikasjon kan ikke settes til done uten rad.
 
 **Åpne punkter i kildene** (regel 12):
 
@@ -266,6 +295,23 @@ eksperiment uten kode i `src/`, og ingen mutanter er kjørt.
   kontrollpunkt.
 - **2.5, triagen:** spesifikasjonen gir 10 rettet og 8 avvist, mens
   `D/2026-10-02.md` sier 11 rettet og 7 avvist.
+
+*Lagt til 2026-10-17, fra radene som kom til:*
+
+- **2.2:** spesifikasjonen har 18 mutanter (M1–M18). Utført-linja kl. 18:05 i `D/2026-10-03.md` sier «**Mutantene:** 17». M18 kom til før flettingen og er nevnt kl. 19:30. Triagen har 15 rader med 10 rettet i spesifikasjonen, og Rettet-linja i dagsfila sier 14 rader med 9 rettet. Raden «Rådet 03.10» kom til kl. 19:30.
+- **2.2b:** spesifikasjonen sier ulikt med seg selv: lista under Verification har 11 mutanter, og tabellen i Implementation Notes har 15.
+- **2.3:** dagsfila teller funn («26 funn. 18 er rettet …»), og spesifikasjonen teller rader (20 rader, 15 rettet). Begge kan stemme.
+- **2.8a:** lista over avviste i `D/2026-10-17.md` nevner BH6 to ganger og ikke de to ECH-radene spesifikasjonen avviser. BH10 står i to rader i spesifikasjonen.
+- **2.8b:** `D/2026-10-17.md` kl. 11:37 sier «Defer: BH7». Spesifikasjonen har BH7 som patch, med en Rettet-linje om at ruten var defer (kode 3, beslutningen kl. 11:58).
+- **3.2:** dagsfila sier at fire overlevde først (C3, S8, S9 og S10). Spesifikasjonen sier i tillegg at `sitecustomize` overlevde i C7, og den første tabellen sier «8 av 8 drept» med S8, mens avsnittet etter gjennomgangen sier at S8 overlevde først.
+- **3.3b, PR #54:** mutantene U1 og U2 står bare i `D/2026-10-16.md`, ikke i spesifikasjonen.
+- **3.4, PR #26 og #27:** dagsfila sier 15 og 12 rettet. Spesifikasjonen har 14 og 11 rader med patch, og én rad hver med en annen rute (status satt til in-review, og en Rettet-linje).
+- **3.4, PR #33:** spesifikasjonen har to mutanter, og `D/2026-10-12.md` har tre.
+- **8.0b:** `D/2026-10-12.md` har to mutanter til ved flettingen, som spesifikasjonen ikke nevner.
+- **8.0c:** spesifikasjonen sier «Alle 19 ble fanget», men tabellen har 20 rader for PR 1 og 25 i alt. M24 kom til kl. 16:42. For PR #36 sier `D/2026-10-13.md` «11 er rettet», og spesifikasjonen har 10 rader med patch.
+- **10.2b:** spesifikasjonen og dagsfila sier begge 16 funn fra BH og 5 fra VG i første runde, men BH5 og VG5 står ikke i tabellen.
+- **10.2c:** dagsfila sier at to ting ble utsatt, og spesifikasjonen har tre rader med defer.
+- **10.3, PR #51:** spesifikasjonen sier «BH, 15 funn», men BH8 står ikke i tabellen for PR 2.
 
 ### Mutanter som overlevde
 
@@ -370,6 +416,48 @@ funn. Antall rader i loggen:
 | 2.5 | 18 | 10 | 8 | – |
 | 8.0 | 17 | 9 | 7 | 1 |
 | 9.0 | 11 | 4 | 7 | – |
+| 2.2 | 15 | 10 | 3 | 2 |
+| 2.2b | 18 | 9 | 8 | 1 |
+| 2.3 | 20 | 15 | – | 5 |
+| 2.3, kl. 21 | 13 | 8 | 5 | – |
+| 2.3b | 21 | 16 | 4 | 1 |
+| 2.8a | 19 | 8 | 8 | 2 |
+| 2.8b, del 1 | 18 | 10 | 8 | – |
+| 2.8b, kode 3 | 15 | 5 | 10 | – |
+| 2.9 | 20 | 8 | 12 | – |
+| 3.1 | 17 | 15 | 1 | 1 |
+| 3.2 | 16 | 9 | 7 | – |
+| 3.3 | 13 | 10 | 2 | 1 |
+| 3.3b, PR #53 | 22 | 16 | 5 | 1 |
+| 3.3b, PR #54 | 12 | 5 | 6 | 1 |
+| 3.4, PR #26 | 21 | 14 | 5 | 1 |
+| 3.4, PR #27 | 22 | 12 | 8 | 2 |
+| 3.4, PR #30, første runde | 29 | 25 | 4 | – |
+| 3.4, PR #30, kort form | 26 | 21 | 5 | – |
+| 3.4, PR #30, helhetlig form | 24 | 19 | 5 | – |
+| 3.4, PR #30, rekkefølgen | 11 | 10 | 1 | – |
+| 3.4, alle 10 | 16 | 9 | 7 | – |
+| 4.0 | 21 | 14 | 6 | 1 |
+| 4.2 | 22 | 19 | 2 | 1 |
+| 4.3 | 16 | 13 | 1 | 2 |
+| 8.0b | 23 | 12 | 10 | 1 |
+| 8.0c, PR #35 | 32 | 17 | 9 | 5 |
+| 8.0c, PR #36 | 16 | 10 | 3 | 2 |
+| 8.0d, PR 1 | 17 | 9 | 6 | 2 |
+| 8.0d, PR 2 | 20 | 14 | 4 | 2 |
+| 8.0d, PR 2b | 9 | 3 | 4 | 2 |
+| 8.0d, PR 3 | 26 | 7 | 14 | 2 |
+| 8.0d, svarene 15.10 | 14 | 5 | 7 | – |
+| 8.0e, PR 1 | 13 | 7 | 6 | – |
+| 8.0e, PR 2 | 11 | 4 | 7 | – |
+| 8.15 | 19 | 11 | 7 | 1 |
+| 10.1 | 15 | 13 | 2 | – |
+| 10.2a | 25 | 20 | 4 | 1 |
+| 10.2b, første runde | 24 | 20 | 2 | – |
+| 10.2b, svar c | 19 | 13 | 6 | – |
+| 10.2c | 17 | 8 | 4 | 3 |
+| 10.3, PR #50 | 21 | 13 | 8 | – |
+| 10.3, PR #51 | 13 | 9 | 2 | 2 |
 
 Noen rader slår sammen flere funn, så kolonnene summerer ikke alltid til
 radtallet. 1.6 har i tillegg seks rader med «ingen endring», og BH2 ble avvist
@@ -378,6 +466,10 @@ for 1.6, men ført i `deferred-work.md` for 2.5. 1.9 har 18 funn i 15 rader:
 for `docs/innlevering.md`. 1.1–1.3 har ingen spesifikasjon, og en gjennomgang av dem
 23.09 står i `S/kodegjennomgang-epic-1.md`. Tallene for 8.0 ble rettet etter
 tabellen 03.10.
+
+*Lagt til 2026-10-17:* radene fra 2.2 til 10.3 er talt rad for rad i spesifikasjonene. «Rettet» er rader med patch, også en Rettet-linje og en delvis patch. «Avvist» tar også med rader med «ikke endret», «false» og «ingen». Rader som går til gruppen, et spørsmål eller «info», står ikke i noen av de tre kolonnene, så summen kan bli mindre enn radtallet: 2.8a har 1 til gruppen, 3.4 PR #26 1 med status satt til in-review, 8.0c PR #35 1 spørsmål, 8.0c PR #36 1 info, 8.0d PR 3 3 til gruppen, 8.0d svarene 2 avgjort av gruppen, 10.2b første runde 2 til gruppen og 10.2c 2 til gruppen. Der spesifikasjonen og dagsfila sier ulikt, står det under «Åpne punkter i kildene» i §3.
+
+*Lagt til 2026-10-17:* fra story 9.1 (17.10) får hver PR triagen fra spesifikasjonen som kommentar, med lenke til spesifikasjonen. PR #56–#60 fikk den i ettertid 17.10, satt sammen fra triagen i spesifikasjonene.
 
 ### Kodegjennomgangen av Epic 1
 
@@ -908,3 +1000,37 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 9.0 | Sluttkursen fjernet fra `aksje.html` | K3-testen (`test_kort_serie_viser_kurs_men_sier_at_signalet_mangler`) og `test_rutene_gjoer_ingen_nettverkskall` | `spec-9-0-….md:43,80` |
 | 9.0 | `hent_leser` kaller `requests.get` | `test_rutene_gjoer_ingen_nettverkskall` og de to testene i `TestHentLeser` | `spec-9-0-….md:81` |
 | 9.0 | andresortering på navn i stedet for `abs` (BH1) | bare `test_absolutt_endring_avgjoer_ved_lik_styrke`; lagt til etter gjennomgangen | `spec-9-0-….md:82`, triage BH1 `:92` |
+
+### Fra 2.2 til 10.3, én linje per spesifikasjon
+
+*Lagt til 2026-10-17.* Mutantene står med testene som fanget dem, slik spesifikasjonen navngir dem. Der testene er mange, viser linja til tabellen i spesifikasjonen, der hver mutant står med sin test.
+
+| Story | Mutantene | Fanget av | Kilde |
+|---|---|---|---|
+| 2.2 | M1–M18 | M1 `test_oppstart_med_tom_base_gjoer_ingen_nettkall`, M2 `test_migrer_kjoeres_en_gang_for_to_forespoersler`, M3 `test_tilkoblingen_lukkes_etter_forespoerselen`, M7 `test_en_base_som_mangler_lages_ikke`, M10 og M15 `test_basen_nyere_enn_koden_gir_503_med_grunnen`, M14 `test_slettet_base_lages_paa_nytt`, M16 `test_feilsiden_viser_ingen_stier`, M17 `test_andre_ruter_roerer_ikke_basen`, M18 `test_feil_mens_sidene_leser_gir_503`; resten i tabellen | `S/spec-2-2-…` |
+| 2.2b | M1–M15 | M4, M8 og M10 blant andre `test_app_har_ingen_sql_og_regner_ikke_signalet`, M6 `test_styrke_0_vises_som_0`, M9 `test_utenfor_boerskalenderen_gir_tekst_ikke_feil`, M13 `test_dato_etter_i_dag_gir_tekst_ikke_feil`, M15 `test_feil_i_spoerringen_gir_503_paa_begge_rutene`; resten i tabellen | `S/spec-2-2b-…` |
+| 2.3 | M1–M8, K1–K4 og V1–V4, så 15 mot hver sin test og B4 | M1 og M5 `TestTidskontrollen::test_boersdag_foer_kl_22_gir_0_kall_og_nevner_flagget`, K1 `test_dagen_regnes_i_gmt_ikke_i_oslo`, K4 `TestRekkefoelgen::test_noekkelen_og_kvoten_kommer_foer_foerste_kall`, V2 `TestVintertid::test_kl_21_59_i_oslo_i_november_nekter`; resten i tabellen. Fra 17.10 heter de to tidstestene `test_boersdag_kl_20_59_59_gir_0_kall_og_nevner_flagget` og `test_kl_20_59_i_oslo_i_november_nekter` | `S/spec-2-3-boersdagskontroll-…` |
+| 2.3, kl. 21 | T1–T3 | T1 `test_grensen_er_kl_21`, T2 `test_kl_21_presis_henter`, T3 `test_det_gamle_flaggnavnet_godtas_ikke` | `S/spec-2-3-hentingen-fra-kl-21.md` |
+| 2.3b | 28 | M1, M2, M6 og M13 `TestNyttForsoek::test_bare_de_som_mangler_hentes_eldste_foerst`, M10 `test_fredag_over_midnatt_skriver_ingen_rad`, M20 `test_ingen_kall_gir_ingen_fil`, M22 `test_dagens_kall_brukt_opp_underveis_stopper`, M23 `test_fil_som_dukker_opp_gir_neste_n`; resten i tabellen | `S/spec-2-3b-…` |
+| 2.8a | I1–I4 | I1 og I3 `test_serien_byttes_ut_ikke_skjoetes_paa[sqlite]`, I2 `test_en_loerdag_og_en_helligdag_lagres_ikke[minne]`, I4 `test_indeksen_for_alle_demodagene` | `S/spec-2-8a-…` |
+| 2.8b | A1, B2–B5, V1, V2, K1–K4 | A1 `test_de_tre_sjekkene_virker_en_versjon_bak_og_fila_er_uendret`, B2 `test_indeksen_lagres_i_indeks_aldri_i_kurs_eller_vurdering`, B3 `test_15_igjen_holder_ikke_for_16_uten_bonus`, B4, K1 og K2 `test_et_feilet_indekskall_stopper_ikke_aksjene[feil]`, B5 `test_bare_de_som_mangler_hentes_eldste_foerst`, V1 `test_en_serie_porten_avviser_stopper_ikke_aksjene`, V2 `test_en_eldre_fil_skriver_ikke_over_en_nyere_indeks`, K3 `TestOyeblikksbilde::test_formatet_kan_leses_av_visningen`, K4 `test_et_nytt_forsoek_etter_en_aksje_og_indeksen_gir_kode_3` | `S/spec-2-8b-…` |
+| 2.9 | H1–H4 | H1 `test_n_er_aksjene_med_kurs_og_en_uten_navngis`, H2 `test_et_hull_foer_indeksens_dato_gir_ingen_endring`, H3 `test_lik_er_ikke_bedre`, H4 `test_like_foerst_etter_avrundingen_er_ikke_bedre` | `S/spec-2-9-…` |
+| 3.1 | D1–D24 og I1–I9 | D1 `test_python_er_313_som_ci`, D4 `test_ingen_noekkel_i_imaget`, D5 og D23 `test_ikke_root`, D12 `test_bare_hent_har_noekkelen`, D18 `test_uv_laster_aldri_ned_en_egen_python`; I1–I9 fanges av stegene i CI, ikke av tester | `S/spec-3-1-…` |
+| 3.2 | S1–S10 og C1–C8 | S1 og S2 `test_navngitte_volumer_aldri_data_paa_maskinen` og `test_volumene_overlapper_ikke`, S6 `test_skrivebeskyttet_rot_med_tmp_som_tmpfs`; C1–C8 fanges av stegene i CI. For S9 og S10 navngir tabellen ingen test | `S/spec-3-2-…` |
+| 3.3 | R1–R15 og C1 | R1 `test_kommandoen_paa_den_tomme_siden_staar_i_readme`, R8 `test_tjenestene_i_readme_finnes_i_compose`, R9 `test_raadet_om_tidspunkt_uten_flagget`; for R13–R15 står bare «drept» | `S/spec-3-3-…` |
+| 3.3b | S1–S20 og S5b (PR #53) | ikke navngitt per mutant i spesifikasjonen | `S/spec-3-3b-…` |
+| 3.4 | PR #26–#34 | testene står per mutant i tabellene i spesifikasjonen for PR #26, #27 og #30; for #31–#34 nevner avsnittene testen, som `test_hvorfor_bare_15_aksjer` og `test_til_faglaerer_lenker_til_briefen_med_gjeldende_tag` | `S/spec-3-4-demoversjonen.md` |
+| 3.4, alle 10 | R1–R4 | med hele fila `test_kursene_har_samme_fingeravtrykk_paa_alle_plattformer`, med bare klassen `test_alle_ti_kombinasjonene_paa_sluttdato` | `S/spec-3-4-alle-ti-…` |
+| 4.0 | N1–N5 og R1–R5 | N1, N3 og N5 `test_innsamlingen_er_sperret`, N2 `test_navneoppslag_blokkeres[gethostbyname]`, N4 `test_connect_ex_blokkeres`, R1 `test_asyncio_blokkeres`, R2 `test_udp_blokkeres` | `S/spec-4-0-…` |
+| 4.2 | K1–K5 og KR1–KR6 | K3 `test_bare_skriv_og_lesemetoder`, K4 `test_bare_inneveerende_boersdag`, KR3 `test_dagen_regnes_i_oslo`; resten i tabellen | `S/spec-4-2-…` |
+| 4.3 | C1–C3 og CR1–CR4 | C1 `test_tabellen_lages_bare_i_migrasjonen`, C2 `test_adapteren_skriver_bare_med_insert`, C3, CR2 og CR3 `test_basen_sjekker_formen`, CR1 `test_replace_erstatter_ikke_en_rad`, CR4 `test_en_feil_rulles_tilbake` | `S/spec-4-3-…` |
+| 8.0b | M1–M19 | M12 `test_hjelpen_virker_ogsaa_i_demoen`; resten i tabellen | `S/spec-8-0b-…` |
+| 8.0c | 25, i PR #35 og #36 | M7 og M8 `test_merket_staar_paa_samme_x_som_punktet_for_dagen`, M24 `test_noen_mangler_vurdering_gir_begge_setningene`, M25 `test_datoen_skrives_som_dd_mm`; resten i tabellen | `S/spec-8-0c-…` |
+| 8.0d | 47, i PR 1, 2, 2b og 3 | testene står per mutant i tabellene i spesifikasjonen | `S/spec-8-0d-…` |
+| 8.0e | M1–M8 og P1–P8 | testene står per mutant i tabellene i spesifikasjonen | `S/spec-8-0e-…` |
+| 8.15 | S1–S13 og T1–T3 | testene står per mutant i tabellen i spesifikasjonen | `S/spec-8-15-…` |
+| 10.1 | G1–G4 og GR1–GR4 | G1–G4 `test_signalet_gir_bare_fortegn_styrke_og_retning`; resten i tabellen | `S/spec-10-1-…` |
+| 10.2a | E1–E6 og ER1–ER6 | testene står per mutant i tabellen i spesifikasjonen | `S/spec-10-2a-…` |
+| 10.2b | F1–F5, FR1–FR4, FC1–FC8 og F2b | testene står per mutant i tabellen i spesifikasjonen | `S/spec-10-2b-…` |
+| 10.2c | H1–H4 | testene står per mutant i tabellen i spesifikasjonen | `S/spec-10-2c-…` |
+| 10.3 | V1–V4, VR1–VR4 og B1–B7 | testene står per mutant i tabellene i spesifikasjonen | `S/spec-10-3-…` |
