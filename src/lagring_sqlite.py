@@ -26,8 +26,8 @@ from datetime import date, datetime
 from pathlib import Path
 
 from boersdag import innevaerende_boersdag, norsk_dato
-from kilogg import AKSJE, Emne, IkkeInnevaerendeBoersdag, KIRad
 from indeksdata import HOVEDINDEKS, Indeks, kontroller_indeksskriving
+from kilogg import AKSJE, Emne, IkkeInnevaerendeBoersdag, KIRad
 from kursdata import AKSJEUNIVERS, Aksje, Kursrad, kontroller_skriving
 from lagring_fil import DATA_KATALOG
 from migrering import MigrasjonsFeil, migrer, siste_versjon, versjon

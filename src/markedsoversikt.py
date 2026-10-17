@@ -19,9 +19,9 @@ from zoneinfo import ZoneInfo
 from boersdag import UtenforKalenderen
 from kursdata import Aksje, Kursrad
 from oversiktsdata import Oversiktspost
-from signalberegning import BLANDET, INGEN, NEGATIV, POSITIV, Parametre, STANDARD
-from tilstand import Art, Tilstand, tilstand
+from signalberegning import BLANDET, INGEN, NEGATIV, POSITIV, STANDARD, Parametre
 from tallformat import dato, fortegn, ukedag
+from tilstand import Art, Tilstand, tilstand
 from vurderingsdata import Grunn, Vurdering
 
 

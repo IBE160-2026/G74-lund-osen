@@ -21,8 +21,8 @@ import requests
 import fetch_prices as fp
 import lagring_fil
 import lagring_sqlite
-from eodhd_serier import AVVISTE, AVVISTE_IDER
 from boersdag import innevaerende_boersdag, norsk_dato
+from eodhd_serier import AVVISTE, AVVISTE_IDER
 from kursdata import AKSJEUNIVERS, Aksje
 from lagring_fil import SnapshotKilde, nyeste_leser, nyeste_snapshot
 from lagring_sqlite import SqliteKurslager, SqliteVurderingslager, aapne_base
@@ -3173,7 +3173,8 @@ def base_paa_versjon(tmp_path, base, versjon: int, uten_kurs=(), uten_vurdering=
     """En base migrert til versjon med en katalog som bare har de foerste
     migrasjonene, med kurs, kursserie og vurdering skrevet med SQL, fordi
     adapterne krever siste versjon for aa skrive."""
-    from migrering import migrer, versjon as versjon_av
+    from migrering import migrer
+    from migrering import versjon as versjon_av
 
     katalog = tmp_path / f"migrasjoner_til_{versjon}"
     katalog.mkdir()

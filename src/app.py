@@ -36,14 +36,14 @@ from flask import Flask, abort, g, redirect, render_template, request
 import lagring_sqlite
 from aksjedetalj import bygg_detalj, normaliser_symbol
 from boersdag import norsk_dato
-from graf import bygg_graf
-from ki_visning import AV, KAPSEL, PAA, UKJENT, KIVisning, bygg_ki_visning, ki_paa
-from kilogg import Emne, UgyldigKIRad
-from kursdata import Kursleser
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER
+from graf import bygg_graf
 from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster
 from hovedindeks import Hovedindeksvisning, bygg_hovedindeks
 from indeksdata import HOVEDINDEKS
+from ki_visning import AV, KAPSEL, PAA, UKJENT, KIVisning, bygg_ki_visning, ki_paa
+from kilogg import Emne, UgyldigKIRad
+from kursdata import Kursleser
 from lagring_sqlite import (
     DEMOMERKE,
     SqliteIndekslager,
@@ -57,18 +57,18 @@ from lagring_sqlite import (
     les_merket,
 )
 from markedsoversikt import (
-    bygg_oversikt,
-    antall_vurdert,
-    del_i_to,
-    neste_orden,
     Sortering,
-    sorter,
+    antall_vurdert,
+    bygg_oversikt,
+    del_i_to,
     eldre_enn_nyeste,
     ingen_skilte_seg_ut,
+    neste_orden,
     norsk_tid,
     oppdatert,
     sidens_dato,
     sidens_tidsstempel,
+    sorter,
     uten_kurser,
 )
 from migrering import MigrasjonsFeil

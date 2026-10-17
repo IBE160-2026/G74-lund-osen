@@ -5,11 +5,10 @@ kjoer med en falsk EODHD (hent) og en falsk modell (AD-8). Ingen test kaller
 Ollama eller EODHD.
 """
 
+import sqlite3
 from datetime import date, datetime, timezone
 
 import pytest
-
-import sqlite3
 
 import fetch_prices as fp
 import ki_tekst
@@ -514,8 +513,8 @@ class TestSjekkenEtterGjennomgangen:
         tilkobling = aapne_base(base)
         try:
             logg = SqliteKILogg(tilkobling, lambda: OEYEBLIKK)
-            from ki_modell import lag_ki_rad
             from ki_grunnlag import ki_grunnlag
+            from ki_modell import lag_ki_rad
 
             vurd = vurderingene(base, TIRSDAG)
             for aksje in AKSJEUNIVERS[:5]:

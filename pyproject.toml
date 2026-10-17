@@ -38,4 +38,5 @@ target-version = "py313"
 # Bare regler som finner feil eller rot, ikke smak (story 9.7).
 select = [
     "F",  # pyflakes: ubrukte importer og navn, navn som ikke finnes
+    "I",  # importene: sortert og gruppert, saa en dobbel eller glemt import synes
 ]

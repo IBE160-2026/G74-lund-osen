@@ -6,9 +6,9 @@ from datetime import date, timedelta
 
 import pytest
 
-from kursdata import Kursrad
 from ki_grunnlag import RETNINGER, SJEKKENE, UTENFOR_MAALINGEN, ki_grunnlag
-from signalberegning import Sjekk, Signal, beregn_signal, vurder
+from kursdata import Kursrad
+from signalberegning import Signal, Sjekk, beregn_signal, vurder
 from vurderingsdata import Vurdering
 
 NOEKLENE = {*SJEKKENE, "styrke", "retning"}

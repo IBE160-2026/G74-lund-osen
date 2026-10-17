@@ -615,12 +615,11 @@ class TestStory80c:
     def test_antall_sjekker_er_antallet_i_koden(self):
         """ECH7: «N av 3» og den gule ringen bygger paa ANTALL_SJEKKER. Ville
         feilet hvis en fjerde sjekk kom til uten at konstanten ble rettet."""
-        from hjelpetekster import ANTALL_SJEKKER
-        from signalberegning import beregn_signal
-
         from datetime import date, timedelta
 
+        from hjelpetekster import ANTALL_SJEKKER
         from kursdata import Kursrad
+        from signalberegning import beregn_signal
 
         rader = [
             Kursrad(dato=date(2026, 9, 1) + timedelta(days=i), slutt=k, justert_slutt=k, volum=1000)

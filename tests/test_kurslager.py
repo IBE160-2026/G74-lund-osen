@@ -23,8 +23,8 @@ import pytest
 
 from kursdata import (
     AKSJEUNIVERS,
-    Kursleser,
     Kurslager,
+    Kursleser,
     Kursrad,
     MinneKurslager,
     UgyldigKursrad,

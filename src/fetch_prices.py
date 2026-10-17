@@ -76,11 +76,10 @@ from urllib.parse import quote, quote_plus
 import requests
 from dotenv import load_dotenv
 
-import lagring_fil
-
 # Modulen, ikke DEKKEDE_AAR alene: aarene leses naar indeksen skrives, slik
 # porten gjoer, saa en test som bytter ut boersdag.DEKKEDE_AAR, gjelder ogsaa her.
 import boersdag
+import lagring_fil
 import lagring_sqlite
 from boersdag import (
     OSLO,

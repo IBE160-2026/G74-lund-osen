@@ -31,7 +31,7 @@ from markedsoversikt import (
     les_tilstand,
 )
 from oversiktsdata import Oversiktspost
-from signalberegning import NEGATIV, POSITIV, Parametre, STANDARD, bevegelsesdesimaler, nodvendige_dager, sjekker_fra
+from signalberegning import NEGATIV, POSITIV, STANDARD, Parametre, bevegelsesdesimaler, nodvendige_dager, sjekker_fra
 from tallformat import desimaler_uten_null, fortegn, tall
 from tilstand import Art, Tilstand
 from vurderingsdata import Grunn, Vurdering

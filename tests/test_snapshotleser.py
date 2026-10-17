@@ -20,7 +20,7 @@ import pytest
 
 from eodhd import UgyldigSerie, kursrad_fra_eodhd, serie_fra_eodhd
 from eodhd_serier import AVVISTE, AVVISTE_IDER
-from kursdata import Kursleser, Kurslager, Kursrad, UgyldigKursrad
+from kursdata import Kurslager, Kursleser, Kursrad, UgyldigKursrad
 from lagring_fil import SnapshotKilde, SnapshotLeser
 
 HENTET = datetime(2026, 9, 23, 17, 4, 11, tzinfo=timezone.utc)
