@@ -726,6 +726,62 @@ class TestHovedindeksenIDemoen:
         assert 'class="indeksdato"' not in delen
 
 
+class TestSoeyleneIDemoen:
+    """Story 2.9b: demoen viser søylene mot DEMIX, som den ekte versjonen
+    viser dem mot OSEBX. Matfjord Merkevarer har ingen kurser og får ingen
+    søyle."""
+
+    def _figur(self, klient, monkeypatch):
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        html = klient.get("/").data.decode("utf-8")
+        delen = html.split('<section class="hovedindeks"', 1)[1].split("</section>", 1)[0]
+        return html, delen.split('<figure class="soeyler">', 1)[1].split("</figure>", 1)[0]
+
+    def test_soeylene_mot_demix(self, klient, monkeypatch, demobase):
+        import re
+
+        from test_app import _synlig
+
+        _, figur = self._figur(klient, monkeypatch)
+        tickere = re.findall(r'<span class="ticker">([^<]+)</span>', figur)
+        assert len(tickere) == 14 and "MTFJ" not in tickere
+        assert len(re.findall(r'<span class="indekslinje (?:opp|ned|null)"', figur)) == 1
+        assert "Søyler for 14 aksjer 09.10, fra størst fall til størst stigning." in _synlig(figur)
+
+    def test_soeylene_staar_fra_stoerst_fall_som_tallene_for_skjermleser(self, klient, monkeypatch, demobase):
+        """Endringene i lista for skjermleser står i samme rekkefølge som
+        søylene, og stiger fra venstre."""
+        import re
+
+        from tallformat import avrundet
+
+        _, figur = self._figur(klient, monkeypatch)
+        liste = figur.split('<ol class="skjult">', 1)[1].split("</ol>", 1)[0]
+        tall = [
+            float(t.replace(" ", "").replace(",", ".").replace("%", ""))
+            for t in re.findall(r"\): ([+-]?\d+,\d+ %)", liste)
+        ]
+        assert len(tall) == 14
+        assert tall == sorted(tall)
+        assert [avrundet(t, "endring") for t in tall] == tall
+
+    def test_gult_bransjesymbol_der_tabellen_har_3_av_3(self, klient, monkeypatch, demobase):
+        """Designregler §3: gult ved 3 av 3 på siste børsdag. Ville feilet
+        hvis 3 av 3 ble regnet et annet sted enn i tabellen."""
+        import re
+
+        html, figur = self._figur(klient, monkeypatch)
+        tabell = html.split('class="tabellboks"', 1)[1]
+        i_tabellen = set()
+        for rad in re.findall(r"<tr [^>]*>.*?</tr>", tabell, re.DOTALL):
+            if 'class="pille tre-av-tre"' in rad:
+                i_tabellen.add(re.search(r'href="/aksje/([^"]+)"', rad).group(1))
+        gule = set(
+            re.findall(r'<span class="etikett tre-av-tre">.*?<span class="ticker">([^<]+)</span>', figur, re.DOTALL)
+        )
+        assert i_tabellen and gule == i_tabellen
+
+
 class TestKlokkeslettetSomDenEkte:
     """Story 2.3, hentingen fra kl. 21:00 (beslutningen 16.10 kl. 21:09):
     demoen er lik den ekte (beslutningen 16.10 kl. 11:46), saa hentingen i
