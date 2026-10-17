@@ -264,8 +264,10 @@
         slik det vises, som i tabellen. Ingen piler: de er bare for retning
         (FR-103). Datoen står ved verdien når indeksen står på en annen dag
         enn tabellen. #}
+    {#- Gjennomgangen (BH12): navnet på delen er bare «Hovedindeksen», uten
+        symbolet og knappen. #}
     <section class="hovedindeks" aria-labelledby="hovedindeks-tittel">
-      <h2 id="hovedindeks-tittel">Hovedindeksen{% if hovedindeks %} <span class="indekssymbol">{{ hovedindeks.symbol }}</span>{% endif %} {{ hjelpeknapp("hjelp-hovedindeks", "Hjelp: hovedindeksen") }}</h2>
+      <h2><span id="hovedindeks-tittel">Hovedindeksen</span>{% if hovedindeks %} <span class="indekssymbol">{{ hovedindeks.symbol }}</span>{% endif %} {{ hjelpeknapp("hjelp-hovedindeks", "Hjelp: hovedindeksen") }}</h2>
       {% if hovedindeks %}
         <p class="indekstall"><span class="indeksverdi">{{ hovedindeks.verdi|tall('kurs') }}</span>
           {%- if hovedindeks.dato != dato %} <span class="indeksdato">{{ hovedindeks.dato|dato }}</span>{% endif %}

@@ -2415,6 +2415,8 @@ class TestHovedindeksenPaaForsiden:
         tekst = _synlig(delen)
         assert "Hovedindeksen OSEBX" in tekst
         assert "1\u00a0005,00" in tekst and "+0,50\u00a0%" in tekst
+        # Gjennomgangen, VG1: fargen forsterker fortegnet, som i tabellen.
+        assert '<span class="indeksendring opp">+0,50\u00a0%</span>' in delen
         assert "1 av 2 gikk bedre enn indeksen." in tekst
         assert "Ikke med, uten kurs 09.10:" in tekst and "Kongsberg Gruppen" in tekst
         assert "Equinor" not in tekst.split("Ikke med", 1)[1]
@@ -2442,6 +2444,7 @@ class TestHovedindeksenPaaForsiden:
         _legg_inn_indeks(_indeks([(date(2026, 10, 7), 1000.0), (TORSDAG_08_10, 990.0)]))
         delen = _delen(klient.get("/").data.decode("utf-8"))
         assert '<span class="indeksdato">08.10</span>' in delen
+        assert '<span class="indeksendring ned">-1,00\u00a0%</span>' in delen
         # Aksjene har kurs 100 torsdag og onsdag, altsaa 0,00 %, og indeksen
         # falt 1 %: begge gikk bedre.
         assert "2 av 2 gikk bedre enn indeksen." in _synlig(delen)
@@ -2489,9 +2492,50 @@ class TestHovedindeksenPaaForsiden:
         assert not any(pil in delen for pil in "↑↓↔")
 
     def test_delen_bryter_linjene_paa_smal_skjerm(self, klient):
-        """390 px: linjene i delen brytes, og ingen fast bredde."""
+        """390 px: linjene i delen brytes, og ingen regel for delen har en
+        fast bredde eller hindrer at linjene brytes (gjennomgangen, BH16)."""
         self._to_aksjer()
         _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, 1005.0)]))
         stil = _stil(klient.get("/").data.decode("utf-8"))
         assert "flex-wrap: wrap" in _regel(stil, "section.hovedindeks .indekstall")
-        assert "width" not in _regel(stil, "section.hovedindeks ")
+        assert "flex-wrap: wrap" in _regel(stil, "section.hovedindeks h2")
+        regler = re.findall(r"(section\.hovedindeks[^{]*)\{([^}]*)\}", stil)
+        assert len(regler) >= 8, regler
+        for velger, innhold in regler:
+            assert not re.search(r"(^|[;\s])(min-)?width\s*:", innhold), velger
+            assert "nowrap" not in innhold, velger
+
+    def test_en_rad_som_ikke_kan_tolkes_stopper_ikke_siden(self, klient, monkeypatch):
+        """Gjennomgangen, ECH1 og ECH5: en ValueError fra en rad i indeksen
+        gir «kunne ikke leses», ikke 500 (NFR-03). Ville feilet med bare
+        BASEFEIL i _hovedindeks."""
+        from kursdata import UgyldigKursrad
+
+        self._to_aksjer()
+        _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, 1005.0)]))
+
+        def feiler(_self, _symbol):
+            raise UgyldigKursrad("slutt er ikke et tall")
+
+        monkeypatch.setattr(lagring_sqlite.SqliteIndekslager, "serie", feiler)
+        svar = klient.get("/")
+        assert svar.status_code == 200
+        assert "Hovedindeksen kunne ikke leses." in _synlig(_delen(svar.data.decode("utf-8")))
+
+    def test_hovedindeksen_vises_foran_en_annen_indeks(self, klient):
+        """Gjennomgangen, BH13: har basen OSEBX og en annen indeks som er
+        hentet senere, viser forsiden OSEBX."""
+        from indeksdata import HOVEDINDEKS, Indeks
+        from lagring_sqlite import SqliteIndekslager
+
+        self._to_aksjer()
+        _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, 1005.0)]))
+        annen = Indeks("OBX", "OBX.OL", "OBX")
+        tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+        try:
+            SqliteIndekslager(tilkobling, (HOVEDINDEKS, annen)).erstatt_serie(
+                "OBX", _indeks([(FREDAG_09_10, 1200.0)]), datetime.fromisoformat(HENTET) + timedelta(hours=1))
+        finally:
+            tilkobling.close()
+        tekst = _synlig(_delen(klient.get("/").data.decode("utf-8")))
+        assert "Hovedindeksen OSEBX" in tekst and "OBX " not in tekst

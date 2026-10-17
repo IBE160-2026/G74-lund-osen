@@ -316,7 +316,7 @@ class TestSidene:
                              (r"<th[^>]*>" + lenke.format("Retning"), "hjelp-retning")):
             assert re.search(tekst + knapp.format(vindu), oversikt), vindu
         # Story 2.9: «?» ved overskriften til hovedindeksen.
-        assert re.search(r'<h2 id="hovedindeks-tittel">Hovedindeksen[^<]*(<span class="indekssymbol">[^<]*</span>)? '
+        assert re.search(r'<h2><span id="hovedindeks-tittel">Hovedindeksen</span>(\s*<span class="indekssymbol">[^<]*</span>)? '
                          + knapp.format("hjelp-hovedindeks"), oversikt)
         # Story 8.0d, PR 2: tidspunktet står bare i stripa, som «Oppdatert»,
         # med «?» ved siden av (BH2, svar 5).

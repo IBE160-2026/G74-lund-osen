@@ -709,7 +709,8 @@ class TestHovedindeksenIDemoen:
         html = klient.get("/").data.decode("utf-8")
         delen = html.split('<section class="hovedindeks"', 1)[1].split("</section>", 1)[0]
         tekst = _synlig(delen)
-        assert "Hovedindeksen DEMIX" in tekst and "OSEBX" not in html
+        # Gjennomgangen, BH17: OSEBX sjekkes bare i delen.
+        assert "Hovedindeksen DEMIX" in tekst and "OSEBX" not in delen
         assert re.search(r"\d+ av 14 gikk bedre enn indeksen\.", tekst), tekst
         assert "Ikke med, uten kurs 09.10: Matfjord Merkevarer." in tekst
         assert 'class="indeksdato"' not in delen

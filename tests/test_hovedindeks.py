@@ -137,7 +137,9 @@ class TestPorten:
         assert lager.symboler() == ("OSEBX",)
 
     def test_sist_hentet_foerst(self, tmp_path):
-        """To indekser: den sist hentede foerst, ogsaa naar tidene har ulik sone."""
+        """To indekser: den sist hentede foerst. Porten lagrer tiden i UTC
+        (kontroller_indeksskriving), saa tidene har samme sone (gjennomgangen,
+        BH3: her sto «ogsaa naar tidene har ulik sone»)."""
         from indeksdata import Indeks
 
         a, b = Indeks("AAA", "AAA.OL", "A"), Indeks("BBB", "BBB.OL", "B")
@@ -150,3 +152,20 @@ class TestPorten:
             assert lager.symboler() == ("BBB", "AAA")
         finally:
             tilkobling.close()
+
+
+class TestAvrundingenErDenSomVises:
+    """Gjennomgangen, BH9 og BH10: «bedre» og fargen bruker avrundet, og
+    teksten tall. De to maa gi samme tall, ogsaa paa halvveien og rundt null."""
+
+    @pytest.mark.parametrize("verdi", [
+        1.005, -1.005, 1.015, 2.675, -2.675, 0.004, -0.004, 0.005, -0.005, 0.0049, -0.0049,
+        0.0, -0.0, 12.345, -12.345, 0.125, -0.125, 99.995, 1e-9, -1e-9,
+    ])
+    def test_tall_og_avrundet_gir_samme_tall(self, verdi):
+        assert tall(verdi, "endring") == tall(avrundet(verdi, "endring"), "endring")
+
+    def test_mange_tall(self):
+        for i in range(-2000, 2001):
+            verdi = i / 997
+            assert tall(verdi, "endring") == tall(avrundet(verdi, "endring"), "endring"), verdi
