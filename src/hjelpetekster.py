@@ -44,6 +44,7 @@ AKSJEDETALJ = "src/aksjedetalj.py"
 APP = "src/app.py"
 INDEX_MAL = "src/templates/index.html"
 HOVEDINDEKS = "src/hovedindeks.py"
+GRAF = "src/graf.py"
 AKSJE_MAL = "src/templates/aksje.html"
 
 # FR-701: tre sjekker, ingen fjerde.
@@ -350,6 +351,19 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             f"snittet av de siste {ma} børsdagene, som trendsjekken måler mot. "
             f"Navnet står ved enden av hver linje. Sjekk 2 og 3 står i kortene over.",
             ((AKSJE_MAL, "Sjekk 2 og 3 tegnes ikke"), (AKSJEDETALJ, "glidende_snitt(kurser, p.ma_vindu)")),
+        ),
+        # Story 2.9c: hovedindeksen som stiplet linje i kursgrafen.
+        "indekslinja": Hjelpetekst(
+            "Den stiplede linja:",
+            "hovedindeksen, regnet om så den starter på aksjens kurs første dag i "
+            "grafen og følger indeksens endring derfra. Ligger aksjens linje over den, "
+            "gikk aksjen bedre enn indeksen i perioden, og under den dårligere. Det "
+            "sier ikke noe om hva aksjen gjør videre.",
+            (
+                (GRAF, "def indeksverdier("),
+                (GRAF, "faar kurs(start) x indeks(dag) / indeks(start)"),
+                (AKSJE_MAL, 'class="indekslinje"'),
+            ),
         ),
         "ga": Hjelpetekst(
             "Ga:",

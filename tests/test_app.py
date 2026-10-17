@@ -2434,7 +2434,12 @@ class TestStory80dAksjesiden:
         _lagret("EQNR", 0.0, 1, 0, 0)
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
         stil = _stil(html)
-        assert "dasharray" not in stil and "dashed" not in stil
+        # Story 2.9c: stiplet bare for hovedindeksen (designregler §5), så
+        # regelen for den tas ut før sjekken.
+        indeks = _regel(stil, ".indekslinje")
+        assert "stroke-dasharray" in indeks
+        utenom = stil.replace(indeks, "")
+        assert "dasharray" not in utenom and "dashed" not in utenom
         assert "stroke-width: 1.75" in _regel(stil, ".ma50linje")
         assert "stroke-width: 2.5" in _regel(stil, ".kurslinje")
         assert "tegnforklaring" not in html
@@ -2897,3 +2902,106 @@ class TestSoeylenePaaForsiden:
         assert re.search(r"Uten søyle, mangler kursen dagen før: Yara[^.]*\.", _synlig(figur))
         vinduet = html.split('<div id="hjelp-hovedindeks"', 1)[1].split('<div id="hjelp-', 1)[0]
         assert "Hovedindeksen:" in vinduet and "Søylene:" not in vinduet
+
+
+def _punktene(html: str, klasse: str) -> list[tuple[float, float]]:
+    treff = re.search(rf'<polyline class="{klasse}" points="([^"]*)">', html)
+    if not treff:
+        return []
+    return [tuple(float(t) for t in par.split(",")) for par in treff.group(1).split()]
+
+
+class TestIndekslinjaPaaAksjesiden:
+    """Story 2.9c: hovedindeksen som stiplet linje i kursgrafen. Kontrollen
+    under storyen i epics.md, på siden. Mutantene står i spesifikasjonen 2.9c."""
+
+    def _aksjen(self):
+        skriv_serie("EQNR", _aksjeserie(FREDAG_09_10, 2.0), datetime.fromisoformat(HENTET))
+
+    def _indeksen(self, foer: int = 0):
+        """Indeksen for de 61 dagene i aksjens serie, og foer dager til foran."""
+        dager = _boersdager_til(FREDAG_09_10, 61 + foer)
+        _legg_inn_indeks(_indeks([(d, 1000.0 + 10 * i) for i, d in enumerate(dager)]))
+
+    def test_linja_starter_paa_aksjens_kurs(self, klient):
+        """Ville feilet hvis indeksen ble tegnet i sine egne poeng (mutant
+        C1): første punkt på den stiplede linja er første punkt på kurslinja."""
+        self._aksjen()
+        self._indeksen()
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        indeks, kurs = _punktene(html, "indekslinje"), _punktene(html, "kurslinje")
+        assert len(indeks) == len(kurs) == 61
+        assert indeks[0] == kurs[0]
+        # Indeksen stiger hele veien og aksjen står stille: linja går opp.
+        assert indeks[-1][1] < indeks[0][1]
+
+    def test_startdagen_er_grafens_foerste_dag(self, klient):
+        """Indeksen har 20 dager før grafen. Ville feilet med indeksens
+        første dag som startdag (mutant C2)."""
+        self._aksjen()
+        self._indeksen(foer=20)
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert _punktene(html, "indekslinje")[0] == _punktene(html, "kurslinje")[0]
+
+    def test_teksten_sier_hva_linja_er_uten_raad(self, klient):
+        self._aksjen()
+        self._indeksen()
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        start = _boersdager_til(FREDAG_09_10, 61)[0].strftime("%d.%m")
+        tekst = _synlig(html.split("<figcaption>", 1)[1].split("</figcaption>", 1)[0])
+        assert f"Den stiplede linja er hovedindeksen OSEBX, regnet om så den starter på aksjens kurs {start}." in tekst
+        assert "Ligger aksjens linje over den, gikk aksjen bedre enn indeksen fra den dagen." in tekst
+        etikett = re.search(r'<svg class="graf"[^>]*aria-label="([^"]*)"', html).group(1)
+        assert f"Den stiplede er hovedindeksen OSEBX, regnet om så den starter på aksjens kurs {start}" in etikett
+        for ord_ in ("kjøp", "selg", "bør"):
+            assert ord_ not in tekst.lower() and ord_ not in etikett.lower(), ord_
+
+    def test_uten_indeks_ingen_linje_og_grafen_sier_det(self, klient):
+        """Ville feilet hvis en linje ble tegnet uten indeks (mutant C3)."""
+        self._aksjen()
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert 'class="indekslinje"' not in html.split("</style>", 1)[1]
+        assert "Hovedindeksen mangler for perioden, så den er ikke tegnet." in _synlig(html)
+        assert "stiplede" not in re.search(r'<svg class="graf"[^>]*aria-label="([^"]*)"', html).group(1)
+
+    def test_en_indeks_med_en_dag_i_grafen_gir_ingen_linje(self, klient):
+        self._aksjen()
+        _legg_inn_indeks(_indeks([(FREDAG_09_10, 1000.0)]))
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert _punktene(html, "indekslinje") == []
+        assert "Hovedindeksen mangler for perioden, så den er ikke tegnet." in _synlig(html)
+
+    def test_en_indeks_som_ikke_kan_leses_stopper_ikke_siden(self, klient, monkeypatch):
+        """NFR-03: grafen vises uten linja, og siden sier hvorfor."""
+        import sqlite3
+
+        self._aksjen()
+        self._indeksen()
+
+        def feiler(_self):
+            raise sqlite3.OperationalError("database is locked")
+
+        monkeypatch.setattr(lagring_sqlite.SqliteIndekslager, "symboler", feiler)
+        svar = klient.get("/aksje/EQNR")
+        html = svar.data.decode("utf-8")
+        assert svar.status_code == 200
+        assert _punktene(html, "kurslinje") and not _punktene(html, "indekslinje")
+        assert "Hovedindeksen kunne ikke leses, så den er ikke tegnet." in _synlig(html)
+
+    def test_linja_er_stiplet_og_tynnere_enn_kursen(self, klient):
+        self._aksjen()
+        self._indeksen()
+        stil = _stil(klient.get("/aksje/EQNR").data.decode("utf-8"))
+        regel = _regel(stil, ".indekslinje")
+        assert "stroke-dasharray: 6 4" in regel and "stroke: var(--dempet)" in regel
+        assert "stroke-width: 1.5" in regel
+
+    def test_ved_390_px_skaleres_grafen_med_linja(self, klient):
+        """Grafen er en SVG med viewBox og bredde 100 %, så den stiplede linja
+        skaleres med kurslinja, og siden ruller ikke sideveis."""
+        self._aksjen()
+        self._indeksen()
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert "width: 100%" in _regel(_stil(html), "svg.graf")
+        assert re.search(r'<svg class="graf" viewBox="0 0 \d+ \d+"', html)
+        assert 'width="' not in html.split('<svg class="graf"', 1)[1].split(">", 1)[0]

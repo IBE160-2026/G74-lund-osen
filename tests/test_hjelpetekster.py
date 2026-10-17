@@ -410,7 +410,8 @@ class TestSidene:
                 "hjelp-hentet": ["data_hentet_aksje"],
                 "hjelp-kurs": ["sluttkurs", "utbyttejustert"],
                 "hjelp-endring": ["endring", "utbyttejustert"],
-                "hjelp-graf": ["grafen"],
+                # Story 2.9c: den stiplede linja, når basen har indeksen.
+                "hjelp-graf": ["grafen", "indekslinja"],
                 "hjelp-styrke": ["signalstyrke", "ikke_raad"],
                 "hjelp-retning-aksje": [
                     "retning",
