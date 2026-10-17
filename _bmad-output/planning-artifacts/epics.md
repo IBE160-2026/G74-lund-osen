@@ -515,6 +515,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-17 kl. 22:06 (gruppens svar i chatten med rådet):* KI-tekstene i demoen (story 3.4b) bygges søndag 18.10 rett etter de to README-PR-ene og før 2.9b, fordi demoen i dag ikke har noen KI-tekst.
 
+*Avgjort 2026-10-17 kl. 22:38, 22:41 og 22:42 (gruppens svar):* fire ting kommer inn: linter og formatterer i CI (story 9.7), tester i ekte nettleser, UX-gjennomgangen (8.2) med bilder av designarbeidet, og tabellen på smal skjerm. Søylene (2.9b) bygges før KI-tekstene i demoen (3.4b), og det erstatter rekkefølgen mellom de to i linja over fra kl. 22:06. Hovedindeksen blir en stiplet linje i kursgrafen på aksjesiden, som story 2.9c etter 2.9b. I natt bygges 9.7, 2.9b og 2.9c i den rekkefølgen, én PR hver.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
