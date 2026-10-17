@@ -447,6 +447,8 @@ graph LR
     web -->|"leser"| db
 ```
 
+*Rettet 2026-10-17:* her sto «15 kall, bevisst» før PR #57 (story 2.8), da hentingen bare hentet aksjene. Med hovedindeksen er det 16.
+
 Kjerneentiteter:
 
 ```mermaid
