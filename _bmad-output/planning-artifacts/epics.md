@@ -513,6 +513,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Lagt til 2026-10-15 (gruppens svar 10 kl. 14:47, spesifikasjonen for 8.15):* etter 8.15 kommer KI-laget først, med 4.2, 4.3 og 10.1–10.3, så resten i rekkefølgen fra 14.10 kl. 22:19 og 22:25. Grunnen er suksesskriteriet «KI-forklaringen» i briefen v8: én ukes drift skal være logget før demonstrasjonen.
 
+*Avgjort 2026-10-17 kl. 22:06 (gruppens svar i chatten med rådet):* KI-tekstene i demoen (story 3.4b) bygges søndag 18.10 rett etter de to README-PR-ene og før 2.9b, fordi demoen i dag ikke har noen KI-tekst.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -2070,6 +2072,8 @@ FR-604, FR-605, `AD-8`, `AD-9`
   KI en annen dag enn den siden viser
 
 **Avhenger av:** 3.4, 10.2 og 10.3. **Én økt:** ja.
+
+*Avgjort 2026-10-17 kl. 22:06 (gruppens svar i chatten med rådet):* KI-tekstene i demoen (story 3.4b) bygges søndag 18.10 rett etter de to README-PR-ene og før 2.9b, fordi demoen i dag ikke har noen KI-tekst.
 
 ---
 
