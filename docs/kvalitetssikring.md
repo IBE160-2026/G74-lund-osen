@@ -870,6 +870,22 @@ interesse, står i `malinger.md` §6, ved siden av EQNR 05.10 og GJF 02.10.
 - **Kvoten leses før kallene.** Nøkkelen og kvoten kommer før første kall, og en kvote som ikke holder, gir 0 kall: `tests/test_fetch_prices.py::TestRekkefoelgen::test_noekkelen_og_kvoten_kommer_foer_foerste_kall`, `tests/test_fetch_prices.py::TestKvoten::test_under_15_uten_nok_bonus_gir_0_kall_og_kode_1` og `tests/test_fetch_prices.py::TestKvoten::test_15_igjen_holder_ikke_for_16_uten_bonus`.
 - **Vaktene mot demobasen.** Hentingen nekter en demobase før alt annet, og demokommandoen nekter en ekte base og en tom fil: `tests/test_demo.py::TestVaktene::test_hentingen_nekter_en_demobase_foer_alt_annet`, `tests/test_demo.py::TestVaktene::test_demokommandoen_nekter_en_ekte_base` og `tests/test_demo.py::TestVaktene::test_demokommandoen_nekter_en_tom_fil`.
 
+## 13. Manuelle tester og testplaner
+
+*Lagt til 2026-10-17.* Det som er prøvd for hånd eller er planlagt, med dato og resultat der det finnes.
+
+| Hva | Dato | Resultat | Kilde |
+|---|---|---|---|
+| README-prøven, Prøve 1 (demoen uten nøkkel), Prøve 2 (den ekte versjonen med egen nøkkel) og Prøve 3 (den lokale modellen) | Ikke tatt. Tas senest én uke før innleveringen | Ingen ennå | §9 |
+| Kontrollregningen av de tre sjekkene i et regneark | Dagene 05.10 (EQNR), 02.10 (GJF, utslag på bevegelse) og 08.10 (TEL, utslag på interesse), ført 06.10 og 13.10 | De fire målingene, de tre verdiene, styrken og retningen i regnearket er like det appen lagret | `malinger.md` §6; §6 og §10 her |
+| Kursene mot Oslo Børs, for hånd | OSEBX 01.10 | Sluttverdien for OSEBX er kontrollert én gang. Kontrollen av aksjene gjenstår | `malinger.md` §6 og §14 |
+| Navnene i demoen mot lista hos Euronext, for hånd | 10.10 kl. 12:25 | Kontrollert av en av oss, og av rådet med et søk på nettet samme dag. Resultatet per navn står ikke i kommentaren | kommentaren ved `DEMOUNIVERS` i `src/demo.py` |
+| `DEMIX` og «Demoindeksen» mot lista hos Euronext, for hånd | 17.10 kl. 00:25 | Verken symbolet eller navnet finnes der, og PR #56 ble flettet | `S/spec-2-8a-indeks-tabellen-og-porten.md` |
+| Vår egen gjennomgang av «Kom i gang», som en som aldri har gjort det | 16.10 kl. 20:40–21:11 | Fire ting som ingen test fant (§11, eksempel 12). De bygges i README-PR-en søndag 18.10 | under story 3.3 i `epics.md`; `docs/reflection-log.md`, 16.10 |
+| Prøvekjøringene av KI-teksten mot en kopi av basen | 16.10 kl. 22:26–22:27 og kl. 23:43–23:44 | 6 av 15 besto med prompten versjon 1, og 15 av 15 med versjon 2 | `malinger.md` §32 og §34 |
+| Grensen kl. 21:00: fire aksjer hentes på nytt og sammenlignes med kursfila | Planlagt mandag 19.10, etter kl. 22 | Ingen ennå | beslutningen 17.10 kl. 22:00 under story 2.3 i `epics.md` |
+| Brukertesten (story 8.1) | Ikke tatt | Ingen ennå. Den måler også suksesskriteriet «Brukerutfall» (§10) | `sprint-status.yaml`, 8-1 i backlog |
+
 ## Vedlegg: hver mutant
 
 Én linje per mutant: storyen, mutanten slik kilden beskriver den, testene som
