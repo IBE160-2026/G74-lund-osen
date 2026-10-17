@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-16T23:45
+updated: 2026-10-17T23:11
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -3657,3 +3657,219 @@ en gjettet årsak etter «fordi» (gjennomgangen av 10.2c). Tre av tekstene ble
 lest mot vurderingen, blant dem EQNR, som ble stoppet på «skyldes» i §32, og
 styrke, retning og de tre sjekkene stemte. Tekstene står bare i kopien og er
 ikke ført her.
+
+## 35. Lørdagsmåling: 20 til fra rådets liste, og alle 142 rangert (2026-10-17)
+
+**Metode.** Som i §26–§33: ett `/api/eod`-kall per symbol, med
+`from=2026-07-02` og `to=2026-10-02`, samme vindu. Omsetning regnes som
+`volume × close` per handelsdag, og medianen tas over perioden. Målingen ble
+kjørt lørdag 17.10 kl. 23:09, en dag uten henting, så alle 20 kallene i
+dagskvoten 17.10 i GMT gikk til målingen (regelen fra 02.10 kl. 23:26). Gruppen
+sa ja kl. 22:24. Bonuskvoten er ikke brukt (NFR-01, tillegget 08.10).
+
+De 20 er de neste etter markedsverdi på rådets liste 02.10, satt sammen fra
+stockanalysis.com, uten dem som alt er målt. Grieg Seafood, plass 124, er målt i
+§20. Plassen på lista står i tabellen. Lista finnes ikke i repoet.
+Markedsverdien er bare brukt som en rekkefølge for målingen, og er ikke et tall
+appen bruker.
+
+**Kostnad.** 20 kall, tatt av dagskvoten 17.10. Før målingen sto `apiRequests`
+på 20 for 2026-10-16, altså 0 brukt 17.10 i GMT (regel 15), og `extraLimit` på
+463. Etter første kall sto den på 1 for 2026-10-17, med `extraLimit` uendret på
+463. Etter målingen er `apiRequests` 20 og `extraLimit` fortsatt 463. Ingen kall
+feilet, og alle 20 ga rader.
+
+**Rådata.** `data/raa/maaling-raa-2026-10-17.json`. Fila finnes **bare
+lokalt** og er ikke sporet i git. Bare tallene under er regnet ut og ført her.
+
+| Symbol | Selskap | Plass på lista | Handelsdager | Median omsetning | Over 32 MNOK | Over 25 MNOK | Plass av 142 |
+|---|---|---:|---:|---:|---|---|---:|
+| PLT | poLight | 125 | 67 | 8,3 MNOK | Nei | Nei | 74 |
+| HUNT | Hunter Group | 126 | 67 | 29,4 MNOK | Nei | Ja | 40 |
+| OTL | Odfjell Technology | 127 | 67 | 2,0 MNOK | Nei | Nei | 114 |
+| INSTA | Instabank | 128 | 67 | 1,4 MNOK | Nei | Nei | 117 |
+| IWS | Integrated Wind Solutions | 129 | 67 | 0,1 MNOK | Nei | Nei | 135 |
+| NOL | Northern Ocean | 130 | 67 | 0,4 MNOK | Nei | Nei | 126 |
+| ARCH | Archer | 131 | 67 | 2,3 MNOK | Nei | Nei | 112 |
+| BINT | Bevest | 132 | 67 | 0,1 MNOK | Nei | Nei | 140 |
+| ENVIP | Envipco | 133 | 67 | 6,8 MNOK | Nei | Nei | 81 |
+| ZAL | Zalaris | 134 | 67 | 0,1 MNOK | Nei | Nei | 139 |
+| REACH | Reach Subsea | 135 | 67 | 1,2 MNOK | Nei | Nei | 119 |
+| AGLX | Agilyx | 136 | 67 | 0,3 MNOK | Nei | Nei | 131 |
+| OMC | OMC Tankers | 137 | 25 | 10,2 MNOK | Nei | Nei | 62 |
+| NORAM | NorAm Drilling | 138 | 67 | 2,7 MNOK | Nei | Nei | 104 |
+| NORDH | Nordhealth | 139 | 67 | 0,1 MNOK | Nei | Nei | 137 |
+| DVD | Deep Value Driller | 140 | 67 | 2,6 MNOK | Nei | Nei | 108 |
+| TRMED | Thor Medical | 141 | 67 | 16,7 MNOK | Nei | Nei | 53 |
+| SKUE | Skue Sparebank | 142 | 67 | 0,1 MNOK | Nei | Nei | 138 |
+| KOA | Kongsberg Automotive | 143 | 67 | 2,7 MNOK | Nei | Nei | 106 |
+| NRC | NRC Group | 144 | 67 | 3,0 MNOK | Nei | Nei | 103 |
+
+19 av de 20 har 67 handelsdager, fra 2026-07-02 til 2026-10-02. OMC har bare
+25, fra 2026-08-31, så medianen for OMC er tatt over de 25 dagene. IWS og BINT
+har volum 0 to av dagene; de dagene er tatt med i medianen med omsetning 0,
+som de andre dagene. Ingen av de 20 er over 32 MNOK, og én, HUNT, er over 25
+MNOK. Med de 20 er 37 av de 142 over 32 MNOK, og 41 over 25 MNOK.
+
+### Alle 142, rangert
+
+De 122 fra §33 og de 20 over, alle i samme vindu. Tallene for de 122 er de samme
+som i §33, i samme rekkefølge. Der en av de 20 har samme avrundede median som en
+av de 122, er den uavrundede medianen for den regnet på nytt fra de lokale
+råfilene. Ingen av de 20 over er i OBX, fordi alle 25 i OBX er blant de 40 i §17
+(se §18). Der to aksjer har samme avrundede median, står den med høyest
+uavrundet median først: TRMED står foran LINK, NORAM foran VTURA og KOA, VTURA
+foran KOA, ACR foran DVD, GENO foran ARCH, INSTA foran BEWI, MAS foran NOL og
+CAMBI, NOL foran CAMBI, ROGS, SNM og AKVA foran AGLX, og IWS foran SOAG, NORDH,
+SKUE, ZAL og BINT, i den rekkefølgen. SNI og WWI finnes ikke i noen lokal råfil
+med samme vindu, så den uavrundede medianen for dem kan ikke regnes på nytt.
+PLT står etter dem, slik at de 122 beholder rekkefølgen fra §33, og rekkefølgen
+mellom PLT og de to er et åpent punkt.
+
+| # | Symbol | Selskap | Median omsetning (MNOK) | Blant de 15 | I OBX | Fra |
+|---|---|---|---:|---|---|---|
+| 1 | EQNR | Equinor | 937,9 | Ja | Ja | §17 |
+| 2 | DNB | DNB Bank | 391,2 | Ja | Ja | §17 |
+| 3 | KOG | Kongsberg Gruppen | 363,6 | Ja | Ja | §17 |
+| 4 | AKRBP | Aker BP | 312,1 | Ja | Ja | §17 |
+| 5 | FRO | Frontline | 303,2 | Ja | Ja | §17 |
+| 6 | NHY | Norsk Hydro | 276,7 | Ja | Ja | §17 |
+| 7 | VAR | Vår Energi | 252,9 | Ja | Ja | §17 |
+| 8 | TEL | Telenor | 226,2 | Ja | Ja | §17 |
+| 9 | YAR | Yara International | 213,1 | Ja | Ja | §17 |
+| 10 | MOWI | Mowi | 187,5 | Ja | Ja | §17 |
+| 11 | AKER | Aker | 150,5 | Nei | Ja | §15 |
+| 12 | ORK | Orkla | 140,3 | Ja | Ja | §17 |
+| 13 | NOD | Nordic Semiconductor | 132,5 | Nei | Ja | §16 |
+| 14 | VEND | Vend Marketplaces | 108,7 | Nei | Ja | §16 |
+| 15 | STB | Storebrand | 87,8 | Nei | Ja | §15 |
+| 16 | SUBC | Subsea 7 | 83,7 | Nei | Ja | §15 |
+| 17 | SALM | SalMar | 83,3 | Ja | Ja | §17 |
+| 18 | BNOR | BlueNord | 78,4 | Nei | Ja | §16 |
+| 19 | BWLPG | BW LPG | 70,4 | Nei | Ja | §15 |
+| 20 | NAS | Norwegian Air Shuttle | 70,2 | Nei | Ja | §16 |
+| 21 | GJF | Gjensidige Forsikring | 60,5 | Ja | Ja | §17 |
+| 22 | KMAR | Kongsberg Maritime | 58,3 | Nei | Ja | §15 |
+| 23 | HAUTO | Höegh Autoliners | 57,0 | Nei | Ja | §16 |
+| 24 | KIT | Kitron | 56,5 | Nei | Nei | §18 |
+| 25 | AUTO | AutoStore | 52,1 | Nei | Nei | §16 |
+| 26 | TGS | TGS | 49,7 | Nei | Ja | §16 |
+| 27 | WAWI | Wallenius Wilhelmsen | 47,6 | Nei | Nei | §16 |
+| 28 | CMBTO | CMB.TECH | 47,6 | Nei | Nei | §16 |
+| 29 | CRNA | Circio Holding | 47,5 | Nei | Nei | §30 |
+| 30 | OET | Okeanis Eco Tankers | 46,1 | Nei | Nei | §16 |
+| 31 | TOM | Tomra | 45,7 | Nei | Ja | §16 |
+| 32 | DNO | DNO | 40,5 | Ja | Nei | §17 |
+| 33 | BAKKA | Bakkafrost | 36,2 | Nei | Nei | §20 |
+| 34 | HAFNI | Hafnia | 35,0 | Nei | Nei | §16 |
+| 35 | DOFG | DOF Group | 34,0 | Nei | Nei | §16 |
+| 36 | MPCC | MPC Container Ships | 33,9 | Ja | Nei | §17 |
+| 37 | SCATC | Scatec | 33,2 | Nei | Nei | §18 |
+| 38 | SB1NO | SpareBank 1 Sør-Norge | 31,7 | Nei | Nei | §16 |
+| 39 | PROT | Protector Forsikring | 30,7 | Nei | Nei | §16 |
+| 40 | HUNT | Hunter Group | 29,4 | Nei | Nei | §35 |
+| 41 | CAPT | Capital Tankers | 28,4 | Nei | Nei | §18 |
+| 42 | ELK | Elkem | 24,5 | Nei | Nei | §18 |
+| 43 | ODL | Odfjell Drilling | 23,9 | Nei | Nei | §18 |
+| 44 | NORBT | Norbit | 22,8 | Nei | Nei | §21 |
+| 45 | HSHP | Himalaya Shipping | 22,1 | Nei | Nei | §23 |
+| 46 | CADLR | Cadeler | 21,2 | Nei | Nei | §18 |
+| 47 | SBNOR | Sparebanken Norge | 19,1 | Nei | Nei | §16 |
+| 48 | MING | SpareBank 1 SMN | 17,8 | Nei | Nei | §16 |
+| 49 | LSG | Lerøy Seafood Group | 17,5 | Nei | Nei | §20 |
+| 50 | PEN | Panoro Energy | 17,5 | Nei | Nei | §27 |
+| 51 | ZAP | Zaptec | 17,3 | Nei | Nei | §27 |
+| 52 | ENH | SED Energy Holdings | 16,9 | Nei | Nei | §26 |
+| 53 | TRMED | Thor Medical | 16,7 | Nei | Nei | §35 |
+| 54 | LINK | LINK Mobility | 16,7 | Nei | Nei | §24 |
+| 55 | HEX | Hexagon Composites | 16,2 | Nei | Nei | §27 |
+| 56 | AKSO | Aker Solutions | 14,8 | Nei | Nei | §18 |
+| 57 | COSH | Constellation Oil Services | 14,3 | Nei | Nei | §18 |
+| 58 | EPR | Europris | 13,4 | Nei | Nei | §18 |
+| 59 | SATS | Sats | 11,6 | Nei | Nei | §23 |
+| 60 | NSKOG | Norske Skog | 10,9 | Nei | Nei | §27 |
+| 61 | NAPA | Napatech | 10,3 | Nei | Nei | §27 |
+| 62 | OMC | OMC Tankers | 10,2 | Nei | Nei | §35 |
+| 63 | B2I | B2 Impact | 10,1 | Nei | Nei | §23 |
+| 64 | OKEA | OKEA | 10,1 | Nei | Nei | §28 |
+| 65 | VEI | Veidekke | 10,0 | Nei | Nei | §16 |
+| 66 | AUSS | Austevoll Seafood | 9,7 | Nei | Nei | §20 |
+| 67 | ENDUR | Endúr | 9,6 | Nei | Nei | §27 |
+| 68 | ATEA | Atea | 9,4 | Nei | Nei | §18 |
+| 69 | NONG | SpareBank 1 Nord-Norge | 9,2 | Nei | Nei | §18 |
+| 70 | BRG | Borregaard | 8,8 | Nei | Nei | §18 |
+| 71 | PEXIP | Pexip | 8,6 | Nei | Nei | §24 |
+| 72 | SNI | Stolt-Nielsen | 8,3 | Nei | Nei | §18 |
+| 73 | WWI | Wilh. Wilhelmsen Holding | 8,3 | Nei | Nei | §16 |
+| 74 | PLT | poLight | 8,3 | Nei | Nei | §35 |
+| 75 | ELMRA | Elmera Group | 8,0 | Nei | Nei | §27 |
+| 76 | PLSV | Paratus Energy Services | 7,7 | Nei | Nei | §24 |
+| 77 | BRUT | Bruton | 7,5 | Nei | Nei | §33 |
+| 78 | SMOP | Smartoptics | 7,3 | Nei | Nei | §27 |
+| 79 | NORCO | Norconsult | 7,0 | Nei | Nei | §18 |
+| 80 | ELO | Elopak | 7,0 | Nei | Nei | §23 |
+| 81 | ENVIP | Envipco | 6,8 | Nei | Nei | §35 |
+| 82 | GSF | Grieg Seafood | 6,7 | Nei | Nei | §20 |
+| 83 | SOFF | Solstad Offshore | 6,3 | Nei | Nei | §26 |
+| 84 | SNTIA | Sentia | 5,9 | Nei | Nei | §23 |
+| 85 | SPOL | SpareBank 1 Østlandet | 5,2 | Nei | Nei | §16 |
+| 86 | ODF | Odfjell SE | 5,2 | Nei | Nei | §21 |
+| 87 | KCC | Klaveness Combination Carriers | 5,1 | Nei | Nei | §26 |
+| 88 | MORLD | Moreld | 5,0 | Nei | Nei | §27 |
+| 89 | SWON | SoftwareOne | 4,8 | Nei | Nei | §18 |
+| 90 | ENTRA | Entra | 4,8 | Nei | Nei | §18 |
+| 91 | BORR | Borr Drilling | 4,8 | Nei | Nei | §18 |
+| 92 | BOUV | Bouvet | 4,5 | Nei | Nei | §27 |
+| 93 | AFG | AF Gruppen | 4,3 | Nei | Nei | §18 |
+| 94 | AKAST | Akastor | 4,1 | Nei | Nei | §30 |
+| 95 | NEL | Nel | 4,1 | Nei | Nei | §28 |
+| 96 | KID | Kid | 3,8 | Nei | Nei | §27 |
+| 97 | PARB | Pareto Bank | 3,6 | Nei | Nei | §27 |
+| 98 | BONHR | Bonheur | 3,6 | Nei | Nei | §21 |
+| 99 | SOMA | Solstad Maritime | 3,5 | Nei | Nei | §18 |
+| 100 | BWE | BW Energy | 3,4 | Nei | Nei | §18 |
+| 101 | SEA1 | Sea1 Offshore | 3,3 | Nei | Nei | §27 |
+| 102 | BWO | BW Offshore | 3,2 | Nei | Nei | §24 |
+| 103 | NRC | NRC Group | 3,0 | Nei | Nei | §35 |
+| 104 | NORAM | NorAm Drilling | 2,7 | Nei | Nei | §35 |
+| 105 | VTURA | Ventura Offshore | 2,7 | Nei | Nei | §29 |
+| 106 | KOA | Kongsberg Automotive | 2,7 | Nei | Nei | §35 |
+| 107 | ACR | Axactor | 2,6 | Nei | Nei | §29 |
+| 108 | DVD | Deep Value Driller | 2,6 | Nei | Nei | §35 |
+| 109 | SALME | Salmon Evolution | 2,5 | Nei | Nei | §20 |
+| 110 | MEDI | Medistim | 2,4 | Nei | Nei | §27 |
+| 111 | GENO | General Oceans | 2,3 | Nei | Nei | §30 |
+| 112 | ARCH | Archer | 2,3 | Nei | Nei | §35 |
+| 113 | BOHUS | Bohus | 2,2 | Nei | Nei | §29 |
+| 114 | OTL | Odfjell Technology | 2,0 | Nei | Nei | §35 |
+| 115 | CLOUD | Cloudberry Clean Energy | 1,7 | Nei | Nei | §28 |
+| 116 | ABG | ABG Sundal Collier | 1,7 | Nei | Nei | §29 |
+| 117 | INSTA | Instabank | 1,4 | Nei | Nei | §35 |
+| 118 | BEWI | BEWI | 1,4 | Nei | Nei | §27 |
+| 119 | REACH | Reach Subsea | 1,2 | Nei | Nei | §35 |
+| 120 | MORG | Sparebanken Møre | 1,0 | Nei | Nei | §26 |
+| 121 | AKBM | Aker BioMarine | 0,9 | Nei | Nei | §21 |
+| 122 | MULTI | Multiconsult | 0,7 | Nei | Nei | §28 |
+| 123 | AFK | Arendals Fossekompani | 0,6 | Nei | Nei | §21 |
+| 124 | SBO | Selvaag Bolig | 0,5 | Nei | Nei | §33 |
+| 125 | MAS | Måsøval | 0,4 | Nei | Nei | §27 |
+| 126 | NOL | Northern Ocean | 0,4 | Nei | Nei | §35 |
+| 127 | CAMBI | Cambi | 0,4 | Nei | Nei | §29 |
+| 128 | ROGS | Rogaland Sparebank | 0,3 | Nei | Nei | §30 |
+| 129 | SNM | ShaMaran Petroleum | 0,3 | Nei | Nei | §28 |
+| 130 | AKVA | AKVA group | 0,3 | Nei | Nei | §27 |
+| 131 | AGLX | Agilyx | 0,3 | Nei | Nei | §35 |
+| 132 | ANDF | Andfjord Salmon | 0,2 | Nei | Nei | §30 |
+| 133 | HELG | SpareBank 1 Helgeland | 0,2 | Nei | Nei | §27 |
+| 134 | RING | SpareBank 1 Ringerike Hadeland | 0,2 | Nei | Nei | §24 |
+| 135 | IWS | Integrated Wind Solutions | 0,1 | Nei | Nei | §35 |
+| 136 | SOAG | SpareBank 1 Østfold Akershus | 0,1 | Nei | Nei | §26 |
+| 137 | NORDH | Nordhealth | 0,1 | Nei | Nei | §35 |
+| 138 | SKUE | Skue Sparebank | 0,1 | Nei | Nei | §35 |
+| 139 | ZAL | Zalaris | 0,1 | Nei | Nei | §35 |
+| 140 | BINT | Bevest | 0,1 | Nei | Nei | §35 |
+| 141 | POL | Polaris Media | 0,0 | Nei | Nei | §33 |
+| 142 | GKP | Gulf Keystone Petroleum | 0,0 | Nei | Nei | §27 |
+
+Målingen endrer ikke universet. Parametrene i signalet er låst og målt på de
+15 (AD-13).
