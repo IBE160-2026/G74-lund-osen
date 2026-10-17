@@ -38,7 +38,14 @@ SRC = Path(demo.__file__).resolve().parent
 # sha256 av repr() av kurs-tabellen, sortert, regnet paa Windows med Python
 # 3.13 10.10. CI kjoerer paa Linux, saa testen viser om kursene blir like paa
 # tvers av plattformene (gjennomgangen av PR 1, BH11).
-FINGERAVTRYKK_KURS = "73c277d2007d448f19ed95bd58ae30fac9bb7f43d60234455496aa1e0dbdec16"
+# Endret 17.10 (alle 10 kombinasjonene, spesifikasjonen under story 3.4): tre
+# rader paa SLUTTDATO er nye. Foer var det 73c277d2...dbdec16.
+FINGERAVTRYKK_KURS = "e92012b8df47f6b0e00b7cae9c0a833956da3c90d668f7ac58173410c44159dc"
+# Tabellen uten de tre radene for SISTE_DAG paa SLUTTDATO, og vurderingene foer
+# SLUTTDATO, regnet med koden foer og etter 17.10: like, saa frøet og de andre
+# dagene staar som foer.
+FINGERAVTRYKK_KURS_UTEN_SISTE_DAG = "f3bb1e35ae082562dafb38e0aa5667fede6cf9d8dc296d6ac73d55b57a762e02"
+FINGERAVTRYKK_VURDERING_FOER_SISTE_DAG = "74aaaa152d4676b882e9149c4f726911fcb86a5d002bed3c777e26a84986def9"
 
 
 @pytest.fixture(autouse=True)
@@ -606,7 +613,8 @@ class TestStory80eTekstIDemoen:
         html = klient.get("/").data.decode("utf-8")
         tekst = _synlig(html)
         # Story 8.0d, PR 2b: M er alle de 15 aksjene i lista (14.10).
-        assert "5 av 15 aksjer skilte seg ut fredag" in tekst
+        # 17.10: 7 med alle 10 kombinasjonene (spesifikasjonen under story 3.4).
+        assert "7 av 15 aksjer skilte seg ut fredag" in tekst
         assert "OSE Signal er et regelbasert signal for aksjer på Demo Børs: 3 faste sjekker" in tekst
         assert "Hos disse" in tekst or "Hos 1 aksje" in tekst
         assert "fikk utslag på alle 3 sjekkene." in tekst
@@ -614,3 +622,68 @@ class TestStory80eTekstIDemoen:
         # Merket sier «ikke data fra Oslo Børs», og det staar. Innledningen og
         # linja over tabellen sier «Demo Børs».
         assert "aksjer på Oslo Børs" not in tekst and "Oslo Børs ·" not in tekst
+
+
+class TestAlleTiKombinasjonene:
+    """Beslutningen 16.10 kl. 21:49 under story 2.12: alle 10
+    fargekombinasjonene av de tre sjekkene paa siste demodag, fra 3 groenne til
+    3 graa. Lest fra vurdering i demobasen, ikke regnet paa nytt. Mutantene
+    staar i spesifikasjonen under story 3.4."""
+
+    @staticmethod
+    def _siste_dag(mal):
+        c = sqlite3.connect(mal)
+        try:
+            return {s: (t, b, i, styrke, grunn) for s, t, b, i, styrke, grunn in c.execute(
+                "SELECT symbol, trend, bevegelse, interesse, styrke, grunn FROM vurdering WHERE dato = ?",
+                (demo.SLUTTDATO.isoformat(),))}
+        finally:
+            c.close()
+
+    def test_alle_ti_kombinasjonene_paa_sluttdato(self, mal):
+        """Ville feilet hvis en av reglene i SISTE_DAG ble tatt bort (mutantene
+        R1-R3): da mangler 3 groenne, 2 groenne og 1 roed, eller 1 groenn og 2
+        graa."""
+        rader = self._siste_dag(mal)
+        kombinasjoner = {
+            (sum(v == 1 for v in r[:3]), sum(v == -1 for v in r[:3]), sum(v == 0 for v in r[:3]))
+            for r in rader.values() if r[4] is None
+        }
+        alle = {(g, r, 3 - g - r) for g in range(4) for r in range(4 - g)}
+        assert len(alle) == 10
+        assert kombinasjoner == alle, sorted(alle - kombinasjoner)
+
+    def test_de_to_med_grunn_og_brattfjell_staar(self, mal):
+        rader = self._siste_dag(mal)
+        assert rader[demo.NYLIG_NOTERT][4] == Grunn.SIGNAL_IKKE_REGNET.value
+        assert rader[demo.UTEN_KURSER][4] == Grunn.KURS_IKKE_FRA_DAGEN.value
+        assert rader[demo.SKILLER_SEG_UT][3] >= 2
+        assert sum(1 for r in rader.values() if r[4] is None) == 13
+
+    def test_minst_sju_av_tretten_skiller_seg_ut(self, mal):
+        """7 av de 10 kombinasjonene har minst to sjekker som slaar ut."""
+        rader = self._siste_dag(mal)
+        assert sum(1 for r in rader.values() if r[4] is None and r[3] >= 2) >= 7
+
+    def test_de_tre_reglene_gir_kombinasjonen_de_lover(self, mal):
+        """Kommentaren ved hver regel i SISTE_DAG stemmer med basen."""
+        rader = self._siste_dag(mal)
+        assert rader["KVST"][:3] == (1, 1, 1)
+        assert rader["LKSV"][:3] == (-1, 1, 1)
+        assert sorted(rader["LSTF"][:3]) == [0, 0, 1]
+
+    def test_froeet_og_de_andre_dagene_staar_som_foer(self, mal):
+        """Ville feilet hvis en ny regel endret en annen dag eller en annen
+        aksje, eller trakk et tall mindre fra frøet."""
+        c = sqlite3.connect(mal)
+        try:
+            kurs = c.execute(
+                "SELECT symbol, dato, slutt, justert_slutt, volum FROM kurs ORDER BY symbol, dato").fetchall()
+            vurdering = c.execute("SELECT * FROM vurdering WHERE dato < ? ORDER BY symbol, dato",
+                                  (demo.SLUTTDATO.isoformat(),)).fetchall()
+        finally:
+            c.close()
+        uten = [r for r in kurs if not (r[1] == demo.SLUTTDATO.isoformat() and r[0] in demo.SISTE_DAG)]
+        assert len(kurs) - len(uten) == len(demo.SISTE_DAG) == 3
+        assert hashlib.sha256(repr(uten).encode()).hexdigest() == FINGERAVTRYKK_KURS_UTEN_SISTE_DAG
+        assert hashlib.sha256(repr(vurdering).encode()).hexdigest() == FINGERAVTRYKK_VURDERING_FOER_SISTE_DAG
