@@ -159,6 +159,20 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (HOVEDINDEKS, "def er_bedre("),
             ),
         ),
+        # Story 2.9b (FR-105): søylene under indeksen, i samme vindu.
+        "soeylene": Hjelpetekst(
+            "Søylene:",
+            "dagens endring for hver aksje med kurs samme dag som indeksen, fra "
+            "størst fall til venstre til størst stigning til høyre. Den stiplede "
+            "linja er indeksens endring, grønn når den steg og rød når den falt. "
+            "Et gult bransjesymbol betyr at aksjen fikk 3 av 3 siste børsdag.",
+            (
+                (PRD, "#### FR-105 — Søylene under hovedindeksen"),
+                (PRD, "Indeksens endring er en stiplet linje, grønn når indeksen steg og rød når den"),
+                (HOVEDINDEKS, "def bygg_soeyler("),
+                (INDEX_MAL, 'class="indekslinje'),
+            ),
+        ),
         "sluttkurs": Hjelpetekst(
             "Sluttkurs:",
             "kursen ved børsens stengning siste børsdag i dataene, uten utbyttejustering.",

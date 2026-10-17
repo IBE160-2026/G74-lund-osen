@@ -204,8 +204,8 @@ class TestSoeylene:
     Mutantene staar i spesifikasjonen 2.9b."""
 
     def test_antallet_telles_med_en_kortere_liste(self):
-        """Tre aksjer, og C har ikke kurs fredag. Ville feilet med et fast
-        antall 15 (mutant S1)."""
+        """Tre aksjer, og C har ikke kurs fredag. Ville feilet hvis antallet
+        ikke ble telt fra lista."""
         grunnlag = [
             (aksje("A"), med_endring(1.0), False),
             (aksje("B"), med_endring(-2.0), False),
