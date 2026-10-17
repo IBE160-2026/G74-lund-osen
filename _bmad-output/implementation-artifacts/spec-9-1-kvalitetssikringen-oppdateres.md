@@ -2,7 +2,7 @@
 title: 'Story 9.1, oppdatering 17.10: docs/kvalitetssikring.md følger repoet'
 type: 'docs'
 created: '2026-10-17'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '3699a16'
@@ -47,6 +47,8 @@ context:
 - **Steg 4 i instruksjonen** ber om at kommentarene i PR #56–#60 merkes «satt sammen 18.10». De settes sammen 17.10, så de merkes med den datoen. Det er et avvik fra instruksjonen, og det står i svaret til gruppen.
 
 **Testtallet før:** 2366 bestått og 17 hoppet over lokalt, og 2383 bestått i CI (kjøring 39066471455 på `3699a16`).
+
+*Lagt til 2026-10-17 kl. 22:59:* PR #61 er squash-flettet i `eca81b4`, låst til head-en `d1a1d0d`. CI var grønn på head-en (39068835003) og på main (39068954002). Triagen står som kommentar i PR #61, og PR #56–#60 fikk sin, satt sammen 17.10 fra spesifikasjonene.
 
 ## Mutantene
 

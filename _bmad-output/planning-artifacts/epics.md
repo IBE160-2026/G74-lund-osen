@@ -3479,6 +3479,8 @@ som ikke er det, så jeg ikke må sette det sammen fra commit-meldinger.
 
 *Ferdig 2026-10-03:* skrevet i `2208ae1`, uten PR, fordi bare dokumenter endres. Står i review til Marian eller Joakim har lest dokumentet.
 
+*Lagt til 2026-10-17 kl. 22:59:* dokumentet er oppdatert og flettet i `eca81b4`, PR #61 (spesifikasjonen `spec-9-1-kvalitetssikringen-oppdateres.md`). Tallene er talt på nytt, §3 og §5 har en rad for hver spesifikasjon fra 2.2 til 10.3, §6 har Rettet-linjer, og §11–§13 er nye. `tests/test_kvalitetssikring.py` holder radene og testnavnene. CI var grønn på head-en `d1a1d0d` (kjøring 39068835003) og på main (39068954002).
+
 *Lest 2026-10-03:* Marian svarte kl. 01:05 at dokumentet er lest, og 9-1 er done.
 
 ### Story 9.2: `docs/ai-prompts/bygging/`
