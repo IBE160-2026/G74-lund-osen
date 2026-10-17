@@ -14,6 +14,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=8.0",
+    "ruff>=0.17.1",
 ]
 
 [tool.pytest.ini_options]
@@ -22,3 +23,16 @@ pythonpath = ["src"]
 # Story 2.3: hele suiten hang 07.10 og under mutant M4 08.10, uten at det kunne
 # gjenskapes. Henger en test i over 120 s, skriver faulthandler stakken.
 faulthandler_timeout = 120
+
+# Story 9.7: ruff sjekker og formatterer src/ og tests/. Kjoeres foer en
+# commit (CLAUDE.md regel 23), og CI og tests/test_ruff.py kjoerer det samme.
+[tool.ruff]
+include = ["src/**/*.py", "tests/**/*.py"]
+src = ["src", "tests"]
+# 120, ikke 88: naermest koden slik den var skrevet, og minst omformattering
+# (spesifikasjonen for 9.7).
+line-length = 120
+target-version = "py313"
+
+[tool.ruff.lint]
+select = []
