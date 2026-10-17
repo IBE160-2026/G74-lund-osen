@@ -38,7 +38,7 @@ context:
 
 ## Valgene i PR 2
 
-- **Utgangskoden** er 3 (`KODE_BARE_INDEKSEN`) når aksjene er i orden, men indeksen feilet i kjøringen: kallet feilet, porten avviste serien, eller basen feilet. Da ser en feil med indeksen ikke ut som en vellykket kjøring (beslutningen 17.10 kl. 11:58 under story 2.8, BH7). Ikke 2, fordi argparse bruker 2 for feil i argumentene. Kode 1 går foran: mangler også en aksje dagens kurs, gir kjøringen 1, fordi aksjen kan prøves igjen samme kveld (2.3b), og et nytt forsøk tar ikke indeksen. En eldre fil som hoppes over for indeksen, er ingen feil. En ny kjøring etter kode 3 gir 0 kall og kode 0 (AD-15). *Rettet 2026-10-17:* her sto at utgangskoden er 0 når bare indeksen feiler, som rådet anbefalte.
+- **Utgangskoden** er 3 (`KODE_BARE_INDEKSEN`) når aksjene er i orden, men indeksen feilet i kjøringen: kallet feilet, porten avviste serien, eller basen feilet. Da ser en feil med indeksen ikke ut som en vellykket kjøring (beslutningen 17.10 kl. 11:58 under story 2.8, BH7). Ikke 2, fordi argparse bruker 2 for feil i argumentene. Kode 1 går foran: mangler også en aksje dagens kurs, gir kjøringen 1, fordi aksjen kan prøves igjen samme kveld (2.3b), og et nytt forsøk tar ikke indeksen. En eldre fil som hoppes over for indeksen, er ingen feil. En ny kjøring etter kode 3 gir 0 kall og kode 0 (AD-15). Et nytt forsøk som fullfører aksjene, gir 3 når indeksen feilet i kveldens hovedhenting, fordi hovedhentingen da ga 1 (gjennomgangen av kode 3, BH4 og ECH2). *Rettet 2026-10-17:* her sto at utgangskoden er 0 når bare indeksen feiler, som rådet anbefalte.
 - **`--les-inn` leser ikke indeksen.** Innlesingen er for kursene når basen feilet. Indeksen hentes for hele året hver kveld og byttes ut, så neste henting gir den igjen. Utsatt, ikke avvist: kommer i en egen story hvis gruppen vil.
 - **Sjekken av basen ser bare på aksjene.** Har basen alle aksjene for børsdagen, men ingen indeks, hentes ingenting. Det følger av at indeksen ikke får en ny sjanse (AD-15).
 - **Én versjon bak, ikke vilkårlig mange:** beslutningen kl. 22:16 gjelder tilfellet der en ny migrasjon er flettet og basen ennå ikke er migrert. En base som står lenger bak, kan ha et skjema lesingen ikke kjenner, og da er det tryggere å hente og la skrivingen migrere den.
@@ -90,3 +90,33 @@ Gjennomgang 17.10 på diffen `main...51cf452`, med Blind Hunter (BH, 14 funn), E
 | BH12 | Spesifikasjonen og testen sier ulikt om versjonen 16.10 | low | avvist: basen sto på 4 med `0005` flettet, altså en bak, og begge sier det |
 | BH14 | Nye forsøk holder av et kall til indeksen også når hovedhentingen ikke tok den | low | avvist: svarene 16.10 kl. 18:04 sier 4 kall til nye forsøk |
 | ECH2 | En indeks uten dagens rad lagres uten varsel | low | avvist: linja for kallet sier siste dato, og serien byttes ut neste kveld (AD-5). Visningen i 2.9 avgjør hva siden sier |
+
+## Kode 3 (beslutningen 17.10 kl. 11:58)
+
+Instruksjonen kl. 12:07: feiler bare hovedindeksen, gir hentingen kode 3, `KODE_BARE_INDEKSEN`. Koden står i `8b93d83`, spesifikasjonen i `3b0e092` og Rettet-linja i spinen i `5d946f3`. Main ble flettet inn i grenen i `8c118e1`.
+
+**Mutantene,** én om gangen med `-x` og bare `tests/test_fetch_prices.py`, i den ferske klonen med `core.autocrlf=false`, med kopi før og sha256 mot HEAD etter hver. Alle ble fanget på `5d946f3`, og igjen på `a15f234` med K4:
+- K1, kode 0 når bare indeksen feiler: `test_et_feilet_indekskall_stopper_ikke_aksjene[feil]`.
+- K2, kode 3 foran kode 1: `test_et_feilet_indekskall_stopper_ikke_aksjene[feil]`. Med `-x` stopper kjøringen på første test som feiler, og `test_en_aksje_og_indeksen_feiler_gir_kode_1` kommer senere i fila.
+- K3, kode 3 også når indeksen ble lagret: `TestOyeblikksbilde::test_formatet_kan_leses_av_visningen`.
+- K4, et nytt forsøk gir 0 etter at indeksen feilet: `test_et_nytt_forsoek_etter_en_aksje_og_indeksen_gir_kode_3`.
+
+**Gjennomgangen** på diffen `8c118e1...5d946f3`, med Blind Hunter (BH, 14 funn), Edge Case Hunter (ECH, 4) og Verification Gap (VG, 2). Rettingene står i `a15f234`.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH4, ECH2 | Feiler en aksje og indeksen, gir kjøringen 1, og et nytt forsøk som retter aksjen, gir 0. Feilen med indeksen ser da ut som en vellykket kveld, som BH7 skulle hindre | medium | patch: forsøket gir 3 når kursfila har `indeks` og basen ikke har en serie fra kvelden (`_indeksen_feilet_i_kveld`). Tre tester, og K4 |
+| VG1 | Ingen test for at basen ikke kan åpnes for indeksen | low | patch: `test_basen_kan_ikke_aapnes_for_indeksen_gir_kode_3` |
+| VG2, ECH3 | Testene viser til K1–K3 i spesifikasjonen, men de sto ikke der | low | patch: avsnittet over |
+| BH6, ECH4 | Utskriften lovet 0 kall ved neste kjøring, og det holder ikke når basen ikke kan leses | low | patch: «Indeksen prøves ikke igjen i kveld (AD-15)» |
+| BH1 | `kjoer` avslutter med `sys.exit` i stedet for å gi koden tilbake | low | avvist: som kode 1 i `kjoer` fra før, og `main` kaller bare `kjoer` |
+| BH2 | `indeksen_feilet` kan være ubundet | low | avvist: variabelen settes i både if og else, og den blokken går alltid foran slutten |
+| BH3, BH14 | Et nytt forsøk gir falsk kode 3 eller KeyError, fordi indeksen ikke er hentet | low | avvist: `nytt_forsoek` avslutter kjøringen før slutten av `kjoer`. Hovedhentingen prøver alltid indeksen |
+| BH5 | `True` betyr nå «ingen feil», ikke «lagret» | low | avvist: står i docstringen, og `kjoer` er den eneste som kaller |
+| BH7 | `navn.lower()` | low | avvist: samme form som «Henter 15 aksjer og hovedindeksen» |
+| BH8 | Ingenting som leser utgangskoden, kjenner 3 | low | avvist: ingen skript eller arbeidsflyt i repoet leser koden (VG). Henteinstruksjonen får den fra PR-en |
+| BH9 | Diagrammet sier fortsatt 15 | low | avvist: diagrammet sier 16 fra `51cf452`, og linja under forteller hva det sto |
+| BH10, BH11 | Den andre kjøringen sjekker ikke koden, og fila slås opp med navn | low | avvist: `kjoer_23` slipper `SystemExit` gjennom, så en annen kode enn 0 feiler testen. Navnet er det `filnavn` gir |
+| BH12 | Tilfeller som mangler i testene | low | delvis patch med BH4 og VG1. Resten avvist: `--les-inn` leser ikke indeksen og har ingen kode 3 |
+| BH13 | `fp.main(["--ukjent"])` skriver til stderr | low | avvist: pytest fanger utskriften |
+| ECH1 | En indeks uten dagens rad gir kode 0 | low | avvist: beslutningen lister kallet, porten og basen. Linja for kallet viser siste dato, som ECH2 i den første gjennomgangen |
