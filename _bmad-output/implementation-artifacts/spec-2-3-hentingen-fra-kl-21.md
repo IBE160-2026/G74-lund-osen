@@ -82,3 +82,5 @@ Gjennomgang 17.10 på diffen `main...e0ab79e`, med Blind Hunter (BH, 13 funn), E
 | BH6 | Dokumentene sier «fra 19.10», og koden har ingen dato | low | avvist: PR-en flettes lørdag 17.10, og ingen børsdag ligger mellom flettingen og mandag 19.10 |
 | BH1, BH2 | Andre som bruker `KL_22` eller det gamle flagget | low | avvist: Verification Gap fant ingen. Stripa «Neste: …» i 8.19 er ikke bygget, og linja under den i `epics.md` sier at konstanten heter `TIDSGRENSE` |
 | BH10 | Tabellen i README-prøven sier fortsatt «kl. 22» i steg 4 | low | avvist: ingen linje fjernes (instruksjonen kl. 21:11), og den daterte linja over tabellen sier at det gjelder steg 4 |
+
+*Lagt til 2026-10-17:* gruppen svarte på ECH2 og BH7 kl. 22:00. Hentingen går kl. 21:00 mandag 19.10, som avgjort, og trenger ingen aksje et nytt forsøk, sammenlignes fire aksjer med kursfila fra kl. 21 med kallene som er igjen av dagens kvote etter kl. 22. Se «Avgjort 2026-10-17 kl. 22:00» under story 2.3 i `epics.md`.
