@@ -75,6 +75,8 @@ import requests
 from dotenv import load_dotenv
 
 import lagring_fil
+# Modulen, ikke DEKKEDE_AAR alene: aarene leses naar indeksen skrives, slik
+# porten gjoer, saa en test som bytter ut boersdag.DEKKEDE_AAR, gjelder ogsaa her.
 import boersdag
 import lagring_sqlite
 from boersdag import (
@@ -266,9 +268,9 @@ def kall_til_nye_forsoek(igjen: int, grense: int, antall: int) -> int:
 
     Det minste av kallene som er igjen av dagens (igjen) og dailyRateLimit
     minus antallet hovedhentingen trenger. antall er aksjene i lista pluss
-    indeksen naar den hentes (2.8), og gis av den som kaller. Med 15 og 20
-    er det 5, med 18 aksjer og indeksen 1. Bonuskvoten er aldri med
-    (beslutningen 08.10 kl. 08:06).
+    indeksen naar den hentes (2.8), og gis av den som kaller. Med 15 aksjer,
+    indeksen og 20 er det 4, med 18 aksjer og indeksen 1. Bonuskvoten er
+    aldri med (beslutningen 08.10 kl. 08:06).
     """
     return max(0, min(igjen, grense - antall))
 
@@ -1042,7 +1044,9 @@ def kjoer(
     if skrevne is None:
         skriv(
             f"Ingen vurdering er skrevet for {dato.isoformat()}, og --les-inn "
-            f"skriver ingen. {_kan_skrives_til(dato)}"
+            f"skriver ingen. {_kan_skrives_til(dato)} {HOVEDINDEKS.navn} "
+            f"{HOVEDINDEKS.symbol} er heller ikke lagret, og --les-inn leser den "
+            "ikke. Neste henting bytter ut hele serien."
         )
         sys.exit(1)
 
