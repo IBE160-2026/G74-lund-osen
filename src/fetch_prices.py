@@ -599,20 +599,38 @@ def skriv_vurderinger(
     return True
 
 
+def _aapne_for_sjekken(base_sti: Path) -> sqlite3.Connection:
+    """Basen for sjekkene foer kallene - story 2.8, beslutningen 16.10 kl. 22:16.
+
+    Uten migrering, skrivebeskyttet (mode=ro) og med PRAGMA query_only, saa
+    ingenting skrives. Adapterne godtar da en base en versjon bak
+    (godta_en_versjon_bak), slik den ekte basen staar naar en ny migrasjon er
+    flettet, og foer hentingen har skrevet. Kalleren lukker tilkoblingen.
+    """
+    tilkobling = aapne_base(base_sti, kjoer_migrasjoner=False, skrivebeskyttet=True)
+    try:
+        tilkobling.execute("PRAGMA query_only = ON")
+    except BaseException:
+        tilkobling.close()
+        raise
+    return tilkobling
+
+
 def manglende_i_basen(
     base_sti: Path, dato: date, lista: tuple[Aksje, ...] = AKSJEUNIVERS
 ) -> list[str]:
     """Aksjene i lista som ikke har en kurs for dato i basen - story 2.3.
 
-    Finnes ikke basen, mangler alle. Basen aapnes uten migrering, saa
-    ingenting skrives. En base som ikke kan aapnes eller leses, gir en feil
-    fra BASEFEIL; kjoer henter da likevel.
+    Finnes ikke basen, mangler alle. Basen aapnes med _aapne_for_sjekken, saa
+    ingenting skrives, og en base en versjon bak leses (story 2.8). En base
+    som ikke kan aapnes eller leses, gir en feil fra BASEFEIL; kjoer henter
+    da likevel.
     """
     if not base_sti.exists():
         return [aksje.symbol for aksje in lista]
-    tilkobling = aapne_base(base_sti, kjoer_migrasjoner=False)
+    tilkobling = _aapne_for_sjekken(base_sti)
     try:
-        lager = SqliteKurslager(tilkobling, lista)
+        lager = SqliteKurslager(tilkobling, lista, godta_en_versjon_bak=True)
         return [
             aksje.symbol
             for aksje in lista
@@ -627,12 +645,13 @@ def manglende_vurderinger(
 ) -> list[str]:
     """Aksjene i lista uten rad i vurdering for dato - story 2.3b, svar 6.
 
-    Basen aapnes uten migrering, saa ingenting skrives. En base som ikke kan
-    aapnes eller leses, gir en feil fra BASEFEIL.
+    Basen aapnes med _aapne_for_sjekken, saa ingenting skrives, og en base en
+    versjon bak leses (story 2.8). En base som ikke kan aapnes eller leses,
+    gir en feil fra BASEFEIL.
     """
-    tilkobling = aapne_base(base_sti, kjoer_migrasjoner=False)
+    tilkobling = _aapne_for_sjekken(base_sti)
     try:
-        lager = SqliteVurderingslager(tilkobling, naa, lista)
+        lager = SqliteVurderingslager(tilkobling, naa, lista, godta_en_versjon_bak=True)
         return [aksje.symbol for aksje in lista if lager.les(aksje.symbol, dato) is None]
     finally:
         tilkobling.close()
@@ -958,14 +977,15 @@ def eldste_foerst(
 
     En aksje uten serie kommer foerst av alle, og ellers gjelder rekkefoelgen
     i lista. En aksje som feilet, faar ingen ny tid, og staar derfor foerst
-    ogsaa neste gang. Basen aapnes uten migrering, saa ingenting skrives.
+    ogsaa neste gang. Basen aapnes med _aapne_for_sjekken, saa ingenting
+    skrives, og en base en versjon bak leses (story 2.8).
     """
     plass = {aksje.symbol: i for i, aksje in enumerate(lista)}
     if not base_sti.exists():
         return sorted(symboler, key=plass.__getitem__)
-    tilkobling = aapne_base(base_sti, kjoer_migrasjoner=False)
+    tilkobling = _aapne_for_sjekken(base_sti)
     try:
-        lager = SqliteKurslager(tilkobling, lista)
+        lager = SqliteKurslager(tilkobling, lista, godta_en_versjon_bak=True)
         tider = {symbol: lager.sist_hentet(symbol) for symbol in symboler}
     finally:
         tilkobling.close()

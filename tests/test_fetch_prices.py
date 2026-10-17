@@ -2952,3 +2952,95 @@ class TestNyttForsoekEtterMutantene:
         assert kode == 1 and kall == []
         assert "ingen fil er skrevet" in ut
         assert raa_filer(raa) == ["kurser-raa-2026-09-22.json"]
+
+
+# Story 2.8, PR 2, punkt a (beslutningen 16.10 kl. 22:16): sjekken av basen
+# foer kallene leser ogsaa en base en versjon bak, uten aa skrive. 16.10 sto
+# basen paa versjon 4 med 0005 flettet, og sjekken ga «Basen ose.db kunne ikke
+# leses (RuntimeError)». Den ekte basen staar paa 5 naar 0006 er flettet.
+
+
+def base_paa_versjon(tmp_path, base, versjon: int, uten_kurs=(), uten_vurdering=(),
+                     dato: date = TIRSDAG_22_09):
+    """En base migrert til versjon med en katalog som bare har de foerste
+    migrasjonene, med kurs, kursserie og vurdering skrevet med SQL, fordi
+    adapterne krever siste versjon for aa skrive."""
+    from migrering import migrer, versjon as versjon_av
+
+    katalog = tmp_path / f"migrasjoner_til_{versjon}"
+    katalog.mkdir()
+    for fil in sorted(lagring_sqlite.MIGRASJONSKATALOG.glob("*.sql")):
+        if int(fil.name[:4]) <= versjon:
+            katalog.joinpath(fil.name).write_bytes(fil.read_bytes())
+    base.parent.mkdir(parents=True, exist_ok=True)
+    tilkobling = sqlite3.connect(base, isolation_level=None)
+    try:
+        assert migrer(tilkobling, katalog) == versjon == versjon_av(tilkobling)
+        for nr, aksje in enumerate(AKSJEUNIVERS):
+            if aksje.symbol in uten_kurs:
+                continue
+            tilkobling.execute("INSERT INTO kurs VALUES (?, ?, 1.0, 1.0, 10)",
+                               (aksje.symbol, dato.isoformat()))
+            tilkobling.execute("INSERT INTO kursserie VALUES (?, ?)",
+                               (aksje.symbol, _utc(2026, 9, 22, 20, nr).isoformat()))
+            if aksje.symbol not in uten_vurdering:
+                tilkobling.execute(
+                    "INSERT INTO vurdering (symbol, dato, grunn) VALUES (?, ?, 'signal_ikke_regnet')",
+                    (aksje.symbol, dato.isoformat()))
+    finally:
+        tilkobling.close()
+
+
+class TestSjekkenLeserEnBaseEnVersjonBak:
+    """Story 2.8, punkt a. Ville feilet hvis sjekken krevde siste versjon
+    igjen (mutant A1): da gir den RuntimeError paa en base paa versjon 5."""
+
+    def test_de_tre_sjekkene_virker_paa_versjon_5_og_fila_er_uendret(self, tmp_path, stier):
+        _, base = stier
+        siste = len(list(lagring_sqlite.MIGRASJONSKATALOG.glob("*.sql")))
+        base_paa_versjon(tmp_path, base, siste - 1, uten_kurs=("DNB",), uten_vurdering=("EQNR",))
+        foer = sha(base)
+
+        assert fp.manglende_i_basen(base, TIRSDAG_22_09) == ["DNB"]
+        assert fp.manglende_vurderinger(base, TIRSDAG_22_09) == ["EQNR", "DNB"]
+        # DNB har ingen serie og kommer foerst, saa kursserie.hentet avgjoer.
+        assert fp.eldste_foerst(base, ["NHY", "DNB", "EQNR"]) == ["DNB", "EQNR", "NHY"]
+        assert sha(base) == foer
+
+    def test_hentingen_ser_at_basen_har_dagen_og_gjoer_0_kall(self, tmp_path, stier):
+        """Som 16.10, men med basen paa versjon 5 og 0006 flettet. Ville feilet
+        hvis sjekken ga RuntimeError og hentingen gikk videre til filvakten."""
+        raa, base = stier
+        base_paa_versjon(tmp_path, base, 5)
+        foer = sha(base)
+
+        fil, kall, ut = kjoer_23(raa, base, OEYEBLIKK_22_09 + timedelta(minutes=30),
+                                 ingen_kall, ingen_noekkel, ingen_kall)
+        assert fil is None and kall == []
+        assert "Basen har alt kursene for boersdagen 2026-09-22" in ut
+        assert "kunne ikke leses" not in ut
+        assert sha(base) == foer
+
+    def test_to_versjoner_bak_avvises_som_foer(self, tmp_path, stier):
+        """En base som staar lenger bak, kan ha et skjema lesingen ikke
+        kjenner. Den avvises, og hentingen henter og migrerer den."""
+        _, base = stier
+        base_paa_versjon(tmp_path, base, 4)
+        with pytest.raises(RuntimeError, match="versjon 4"):
+            fp.manglende_i_basen(base, TIRSDAG_22_09)
+
+    def test_en_skriver_faar_aldri_en_base_en_versjon_bak(self, tmp_path, stier):
+        """Flagget godtas bare paa en tilkobling med query_only. Ville feilet
+        hvis et lager kunne skrive til en base med et skjema det ikke kjenner."""
+        _, base = stier
+        base_paa_versjon(tmp_path, base, 5)
+        tilkobling = aapne_base(base, kjoer_migrasjoner=False)
+        try:
+            with pytest.raises(ValueError, match="query_only"):
+                SqliteKurslager(tilkobling, godta_en_versjon_bak=True)
+            with pytest.raises(ValueError, match="query_only"):
+                SqliteVurderingslager(tilkobling, fp.naa, godta_en_versjon_bak=True)
+            with pytest.raises(RuntimeError):
+                SqliteKurslager(tilkobling)
+        finally:
+            tilkobling.close()
