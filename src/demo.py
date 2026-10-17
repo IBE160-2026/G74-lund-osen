@@ -20,6 +20,17 @@ Regelen for kursene (spesifikasjonen til 3.4, Boundaries):
   avrundes til to desimaler og volumet til heltall.
 - Siste dag faller Brattfjell Energi 6 % med tre ganger volumet, saa minst en
   aksje skiller seg ut.
+- Siste dag har tre aksjer til en fast endring fra sluttkursen dagen foer og
+  et volum som er en faktor av volumnivaaet i START (SISTE_DAG). Ulikt regelen
+  for Brattfjell Energi, som tar 6 % av dagens trukne kurs, er endringen
+  regnet fra gaarsdagens avrundede sluttkurs, saa den blir noeyaktig. Alle de 10
+  fargekombinasjonene av de tre sjekkene finnes paa SLUTTDATO, fra 3 groenne
+  til 3 graa (beslutningen 16.10 kl. 21:49 under story 2.12): Kvitstein Mineral
+  +3,5 % med tre ganger volumet gir 3 groenne, Laksevik Sjoemat +3 % med 2,5
+  ganger gir 2 groenne og 1 roed, og Lastfjord Container +2,5 % med vanlig
+  volum gir 1 groenn og 2 graa. Tallene fra froeet trekkes ogsaa den dagen, og
+  de andre dagene og de andre aksjene er som foer. Ingen av de tre er
+  SKILLER_SEG_UT, NYLIG_NOTERT eller UTEN_KURSER.
 - Varde Systemer har bare de siste 30 dagene (nylig notert), og Matfjord
   Merkevarer har ingen kurser. Da viser sidene ogsaa «signalet kunne ikke
   regnes», «Trenger 51 dager» og «Uten data». (En aksje uten siste dag ble
@@ -109,6 +120,14 @@ NYLIG_NOTERT = "VRDS"
 UTEN_KURSER = "MTFJ"
 SKILLER_SEG_UT = "BRFE"
 
+# Siste dag for tre aksjer: (endring fra sluttkursen dagen foer, volumet som
+# faktor av volumnivaaet i START). Regelen staar i modulens docstring.
+SISTE_DAG = {
+    "KVST": (0.035, 3.0),   # 3 groenne
+    "LKSV": (0.03, 2.5),    # 2 groenne og 1 roed
+    "LSTF": (0.025, 1.0),   # 1 groenn og 2 graa
+}
+
 # Daglig drift og volatilitet i logavkastningen, etter sektor.
 SEKTOR = {
     "Energi": (0.0002, 0.018),
@@ -162,6 +181,10 @@ def serie(nummer: int, aksje: Aksje, dager: list[date]) -> list[Kursrad]:
         if aksje.symbol == SKILLER_SEG_UT and dag == SLUTTDATO:
             kurs *= 0.94
             volum = volumnivaa * 3
+        if aksje.symbol in SISTE_DAG and dag == SLUTTDATO:
+            endring, faktor = SISTE_DAG[aksje.symbol]
+            kurs = rader[-1].slutt * (1 + endring)
+            volum = volumnivaa * faktor
         slutt = round(kurs, 2)
         rader.append(Kursrad(dato=dag, slutt=slutt, justert_slutt=slutt, volum=int(round(volum))))
     if aksje.symbol == NYLIG_NOTERT:
