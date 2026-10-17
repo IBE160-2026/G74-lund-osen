@@ -38,7 +38,7 @@ context:
 
 ## Valgene i PR 2
 
-- **Utgangskoden** er 0 når bare indeksen feiler. Kode 1 betyr i hentingen at samme kommando kjørt igjen samme kveld prøver det som mangler (2.3b), og et nytt forsøk tar ikke indeksen. Utskriften sier at indeksen feilet og ikke prøves igjen før neste kveld, da serien byttes ut for hele året (AD-5).
+- **Utgangskoden** er 3 (`KODE_BARE_INDEKSEN`) når aksjene er i orden, men indeksen feilet i kjøringen: kallet feilet, porten avviste serien, eller basen feilet. Da ser en feil med indeksen ikke ut som en vellykket kjøring (beslutningen 17.10 kl. 11:58 under story 2.8, BH7). Ikke 2, fordi argparse bruker 2 for feil i argumentene. Kode 1 går foran: mangler også en aksje dagens kurs, gir kjøringen 1, fordi aksjen kan prøves igjen samme kveld (2.3b), og et nytt forsøk tar ikke indeksen. En eldre fil som hoppes over for indeksen, er ingen feil. En ny kjøring etter kode 3 gir 0 kall og kode 0 (AD-15). *Rettet 2026-10-17:* her sto at utgangskoden er 0 når bare indeksen feiler, som rådet anbefalte.
 - **`--les-inn` leser ikke indeksen.** Innlesingen er for kursene når basen feilet. Indeksen hentes for hele året hver kveld og byttes ut, så neste henting gir den igjen. Utsatt, ikke avvist: kommer i en egen story hvis gruppen vil.
 - **Sjekken av basen ser bare på aksjene.** Har basen alle aksjene for børsdagen, men ingen indeks, hentes ingenting. Det følger av at indeksen ikke får en ny sjanse (AD-15).
 - **Én versjon bak, ikke vilkårlig mange:** beslutningen kl. 22:16 gjelder tilfellet der en ny migrasjon er flettet og basen ennå ikke er migrert. En base som står lenger bak, kan ha et skjema lesingen ikke kjenner, og da er det tryggere å hente og la skrivingen migrere den.
@@ -85,7 +85,7 @@ Gjennomgang 17.10 på diffen `main...51cf452`, med Blind Hunter (BH, 14 funn), E
 | BH2, BH3 | Et unntak utenfor `ValueError`, `BASEFEIL` og `UgyldigSerie` fra indeksen stopper kjøringen | low | avvist: som for aksjene i `hent_universet`. Et bredere unntak ville skjult programmeringsfeil (gjennomgangen av 2.3, BH3) |
 | BH5, ECH4 | `query_only` kan slås av etter at adapteren er laget | low | avvist: bare `_aapne_for_sjekken` gir flagget, og den slår aldri av `query_only` |
 | BH6 | `mode=ro` kan feile med WAL | low | avvist: basen bruker ikke WAL, og `skrivebeskyttet` finnes i `aapne_base` fra før. En feil gir «Henter likevel», som før |
-| BH7 | Kode 0 når bare indeksen feiler, så en varig feil kan gå lenge | low | defer: morgensjekken kan se etter linja «Hovedindeksen OSEBX feilet». Valget står over |
+| BH7 | Kode 0 når bare indeksen feiler, så en varig feil kan gå lenge | low | patch: kode 3, beslutningen 17.10 kl. 11:58. *Rettet 2026-10-17:* ruten var defer, med at morgensjekken kunne se etter linja «Hovedindeksen OSEBX feilet» |
 | BH11 | Antallet lagret regnes ved siden av porten | low | avvist: samme funksjon, `bare_boersdager`, som porten bruker |
 | BH12 | Spesifikasjonen og testen sier ulikt om versjonen 16.10 | low | avvist: basen sto på 4 med `0005` flettet, altså en bak, og begge sier det |
 | BH14 | Nye forsøk holder av et kall til indeksen også når hovedhentingen ikke tok den | low | avvist: svarene 16.10 kl. 18:04 sier 4 kall til nye forsøk |
