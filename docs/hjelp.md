@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-12T10:26
+updated: 2026-10-17T10:29
 ---
 
 # Hjelp til «Kom i gang»
@@ -93,15 +93,15 @@ Svar OK. Ellers får ikke Terminal åpne mappa.
 
 ### Hva med nøkkelen?
 
-Du trenger en egen gratis API-nøkkel fra [EODHD](https://eodhd.com/register), fordi vilkårene ikke lar oss dele vår. Den gir 20 kall i døgnet, og en henting bruker 15. Åpne `.env` i en teksteditor (`notepad .env` på Windows, `open -e .env` på macOS, `nano .env` på Linux) og lim den inn etter `EODHD_API_KEY=`. `cp` skriver over en `.env` som finnes, så kopier bare første gang. Webserveren starter uten `.env` og bruker aldri kvote: den leser bare fra basen. Bare hentingen trenger nøkkelen, og `docker compose run --rm hent` starter ikke uten `.env`.
+Du trenger en egen gratis API-nøkkel fra [EODHD](https://eodhd.com/register), fordi vilkårene ikke lar oss dele vår. Den gir 20 kall i døgnet, og en henting bruker 16: ett per aksje og ett for hovedindeksen. Åpne `.env` i en teksteditor (`notepad .env` på Windows, `open -e .env` på macOS, `nano .env` på Linux) og lim den inn etter `EODHD_API_KEY=`. `cp` skriver over en `.env` som finnes, så kopier bare første gang. Webserveren starter uten `.env` og bruker aldri kvote: den leser bare fra basen. Bare hentingen trenger nøkkelen, og `docker compose run --rm hent` starter ikke uten `.env`.
 
 ### Hvorfor bare 15 aksjer?
 
-Kursene kommer fra EODHD, og den gratis nøkkelen gir 20 kall i døgnet. Hver aksje koster ett kall, så med 15 aksjer er det kall til overs hvis noe må hentes på nytt. Planen er at du senere kan velge opptil 18 aksjer selv.
+Kursene kommer fra EODHD, og den gratis nøkkelen gir 20 kall i døgnet. Hver aksje koster ett kall, og hovedindeksen ett til, så med 15 aksjer er det kall til overs hvis noe må hentes på nytt. Planen er at du senere kan velge opptil 18 aksjer selv.
 
 ### Når kan jeg hente?
 
-Hent etter kl. 22 og før midnatt på en børsdag. Første gang kan du også hente i helgen: da henter den siste børsdag, fordi basen mangler den. På dagtid en børsdag stopper hentingen med 0 kall og sier hvorfor: dagens sluttkurs er ikke klar ennå, og en vurdering kan ikke fylles inn senere. Har basen alt kursene for børsdagen, bruker den også 0 kall. På en dag børsen er stengt henter den bare hvis basen mangler forrige børsdag. Mangler noen aksjer dagens kurs etter hentingen, sier den hvilke. Kjør samme kommando igjen senere samme kveld, så prøver den bare dem, med kallene som er til overs etter hentingen (20 minus én per aksje, altså 5 med de 15), aldri bonuskvoten og ikke etter kl. 23:50. Før kallene leser den kvoten med `/api/user`, som er gratis.
+Hent etter kl. 22 og før midnatt på en børsdag. Første gang kan du også hente i helgen: da henter den siste børsdag, fordi basen mangler den. På dagtid en børsdag stopper hentingen med 0 kall og sier hvorfor: dagens sluttkurs er ikke klar ennå, og en vurdering kan ikke fylles inn senere. Har basen alt kursene for børsdagen, bruker den også 0 kall. På en dag børsen er stengt henter den bare hvis basen mangler forrige børsdag. Mangler noen aksjer dagens kurs etter hentingen, sier den hvilke. Kjør samme kommando igjen senere samme kveld, så prøver den bare dem, med kallene som er til overs etter hentingen (20 minus ett per aksje og ett for hovedindeksen, altså 4 med de 15), aldri bonuskvoten og ikke etter kl. 23:50. Hovedindeksen prøves ikke på nytt samme kveld. Før kallene leser den kvoten med `/api/user`, som er gratis.
 
 ### Oversikten er tom.
 
