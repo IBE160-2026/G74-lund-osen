@@ -3230,3 +3230,30 @@ class TestHovedindeksen:
         finally:
             tilkobling.close()
         assert indeksen_i(base)[1] == OEYEBLIKK_22_09 + timedelta(minutes=30)
+
+
+class TestAarsskiftet:
+    """Story 2.8, punkt c (BH1 i 2.8a): ligger dagen utenfor DEKKEDE_AAR,
+    stopper hentingen med 0 kall foer noekkelen og kvoten, saa indeksen aldri
+    faar en fersk hentet uten rader. Porten ville ellers tatt bort alle de
+    nye dagene og satt en ny tid paa serien."""
+
+    def test_en_dag_utenfor_kalenderen_gir_0_kall_og_indeksen_staar(self, stier):
+        from boersdag import DEKKEDE_AAR
+
+        raa, base = stier
+        siste_aar = max(DEKKEDE_AAR)
+        siste_dag = innevaerende_boersdag(date(siste_aar, 12, 31))
+        foerste_kjoering = datetime(siste_dag.year, siste_dag.month, siste_dag.day, 21, 0,
+                                    tzinfo=timezone.utc)
+        kjoer_23(raa, base, foerste_kjoering, lambda *_: serie_til(siste_dag))
+        foer = indeksen_i(base)
+        assert foer[1] == foerste_kjoering
+        filene = raa_filer(raa)
+
+        neste_aar = datetime(siste_aar + 1, 1, 5, 21, 0, tzinfo=timezone.utc)
+        kode, kall, ut = kjoer_23_kode(raa, base, neste_aar, ingen_kall, ingen_noekkel, ingen_kall)
+        assert kode == 1 and kall == []
+        assert "0 kall brukt" in ut and "NFR-08" in ut
+        assert indeksen_i(base) == foer
+        assert raa_filer(raa) == filene
