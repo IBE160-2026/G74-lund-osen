@@ -1,9 +1,10 @@
 """Henter sluttkurser for OSE Signal sitt aksjeunivers fra EODHD.
 
 Dette scriptet er det eneste stedet i prosjektet som bruker API-kvote.
-Ett kall per symbol, 15 symboler, altsaa 15 kall per kjoering. Gratisnivaaet
-gir 20 kall i doegnet, saa det er plass til EN kjoering per dag og litt til.
-Kjoer det bevisst - ikke i loekke, og aldri fra websiden.
+Ett kall per symbol, 15 aksjer og hovedindeksen, altsaa 16 kall per
+kjoering (story 2.8). Gratisnivaaet gir 20 kall i doegnet, saa det er plass
+til EN kjoering per dag og litt til. Kjoer det bevisst - ikke i loekke, og
+aldri fra websiden.
 
 Hvert kall henter et helt aar. Det koster noeyaktig det samme som aa hente
 fjorten dager - ett kall per symbol uansett intervallengde, maalt og foert i
@@ -50,6 +51,14 @@ Det skjer ogsaa naar basen alt har kursene, og etter et nytt forsoek, for
 radene som mangler i KILogg. Steget gjoer ingen kall til EODHD, og en feil
 der endrer ikke utgangskoden (NFR-04). Uten modell (OSE_KI_TJENESTE=av)
 skjer ingenting.
+
+Story 2.8 (FR-410): etter aksjene henter kjoer() hovedindeksen OSEBX.OL med
+ett kall, med samme intervall. Raadataene staar i samme oeyeblikksbilde,
+under noekkelen indeks, og indeksen lagres i tabellen indeks gjennom
+SqliteIndekslager, aldri i kurs eller vurdering (AD-21). Feiler kallet,
+lagres og vurderes aksjene som vanlig, og indeksen faar ingen ny sjanse
+(AD-15). Nye forsoek henter bare aksjene. Feilet bare indeksen, gir
+kjoeringen kode 3 (KODE_BARE_INDEKSEN, beslutningen 17.10 kl. 11:58).
 """
 
 import argparse
@@ -67,6 +76,9 @@ import requests
 from dotenv import load_dotenv
 
 import lagring_fil
+# Modulen, ikke DEKKEDE_AAR alene: aarene leses naar indeksen skrives, slik
+# porten gjoer, saa en test som bytter ut boersdag.DEKKEDE_AAR, gjelder ogsaa her.
+import boersdag
 import lagring_sqlite
 from boersdag import (
     OSLO,
@@ -76,6 +88,7 @@ from boersdag import (
     norsk_dato,
 )
 from eodhd import UgyldigSerie, serie_fra_eodhd
+from indeksdata import HOVEDINDEKS, Indeks, bare_boersdager
 from ki_modell import Modell
 from ki_tekst import lag_ki_tekster, modell_fra_miljoeet
 from kursdata import AKSJEUNIVERS, Aksje, Kursrad
@@ -86,7 +99,7 @@ from lagring_fil import (
     SnapshotLeser,
     _hentet_fra_tekst,
 )
-from lagring_sqlite import SqliteKurslager, SqliteVurderingslager, aapne_base
+from lagring_sqlite import SqliteIndekslager, SqliteKurslager, SqliteVurderingslager, aapne_base
 from migrering import MigrasjonsFeil
 from signalberegning import vurder
 from vurderingsdata import Grunn
@@ -110,6 +123,12 @@ DAGER_TILBAKE = 364
 
 # MA50 spiser 50 dager. Under dette kan ingen aksje faa et signal.
 MINST_HANDELSDAGER = 51
+
+# Story 2.8, beslutningen 17.10 kl. 11:58: aksjene er i orden, men
+# hovedindeksen feilet i kjoeringen (kallet, porten eller basen). Ikke 2,
+# som argparse bruker for feil i argumentene. Kode 1 gaar foran, fordi en
+# aksje som mangler, kan proeves igjen samme kveld; indeksen kan ikke det.
+KODE_BARE_INDEKSEN = 3
 
 
 @dataclass
@@ -256,9 +275,9 @@ def kall_til_nye_forsoek(igjen: int, grense: int, antall: int) -> int:
 
     Det minste av kallene som er igjen av dagens (igjen) og dailyRateLimit
     minus antallet hovedhentingen trenger. antall er aksjene i lista pluss
-    indeksen naar den hentes (2.8), og gis av den som kaller. Med 15 og 20
-    er det 5, med 18 aksjer og indeksen 1. Bonuskvoten er aldri med
-    (beslutningen 08.10 kl. 08:06).
+    indeksen naar den hentes (2.8), og gis av den som kaller. Med 15 aksjer,
+    indeksen og 20 er det 4, med 18 aksjer og indeksen 1. Bonuskvoten er
+    aldri med (beslutningen 08.10 kl. 08:06).
     """
     return max(0, min(igjen, grense - antall))
 
@@ -351,10 +370,56 @@ def hent_universet(
     return resultat
 
 
-def lag_oyeblikksbilde(resultat: Resultat, fra: str, til: str, naa: str) -> dict:
+def hent_indeksen(
+    api_nokkel: str,
+    fra: str,
+    til: str,
+    hent: Callable[[str, str, str, str], list[dict]] = hent_ett_symbol,
+    skriv: Callable[[str], None] = print,
+    indeks: Indeks = HOVEDINDEKS,
+) -> Resultat:
+    """Ett kall for indeksen - story 2.8, FR-410.
+
+    Samme henter, samme intervall og samme kontroll av formen som aksjene.
+    Resultatet har indeksens symbol i serier eller i feil. En feil stopper
+    ingenting og gir ingen ny sjanse (AD-15).
+    """
+    resultat = Resultat()
+    navn = f"{indeks.symbol} ({indeks.navn.lower()})"
+    try:
+        rader = hent(indeks.ticker, api_nokkel, fra, til)
+        resultat.kall_brukt += 1
+    except Exception as feil:  # noqa: BLE001 - alt som feiler har kostet kallet
+        resultat.kall_brukt += 1
+        resultat.feil[indeks.symbol] = _uten_noekkel(f"{type(feil).__name__}: {feil}", api_nokkel)
+        skriv(f"  {navn}: FEIL {_uten_noekkel(str(feil), api_nokkel)}")
+        return resultat
+    try:
+        serie = serie_fra_eodhd(rader)
+    except UgyldigSerie:
+        resultat.feil[indeks.symbol] = "svar med feil form"
+        skriv(f"  {navn}: svar med feil form")
+        return resultat
+    if not serie:
+        resultat.feil[indeks.symbol] = "tomt svar"
+        skriv(f"  {navn}: ingen data")
+        return resultat
+    resultat.serier[indeks.symbol] = rader
+    skriv(f"  {navn}: {len(serie)} dager, siste {serie[-1].dato.isoformat()}")
+    return resultat
+
+
+def lag_oyeblikksbilde(
+    resultat: Resultat, fra: str, til: str, naa: str, indeks: Resultat | None = None
+) -> dict:
     """Formatet visningen leser gjennom lagring_fil.SnapshotLeser. Skrives
-    aldri om etterpaa."""
-    return {
+    aldri om etterpaa.
+
+    Story 2.8: indeksen staar under noekkelen indeks, med serier og feil i
+    samme form, aldri blant aksjene. Et nytt forsoek henter ikke indeksen, og
+    fila har da ingen indeks.
+    """
+    bilde = {
         "hentet": naa,
         "from": fra,
         "to": til,
@@ -362,6 +427,9 @@ def lag_oyeblikksbilde(resultat: Resultat, fra: str, til: str, naa: str) -> dict
         "serier": resultat.serier,
         "feil": resultat.feil,
     }
+    if indeks is not None:
+        bilde["indeks"] = {"serier": indeks.serier, "feil": indeks.feil}
+    return bilde
 
 
 def filnavn(i_dag: date) -> str:
@@ -465,6 +533,57 @@ def skriv_til_basen(
 
     skriv(f"Skrev {len(skrevne)} serier til basen {base_sti.name}.")
     return skrevne
+
+
+def skriv_indeksen_til_basen(
+    base_sti: Path,
+    rader: list[Kursrad],
+    hentet: datetime,
+    fil: Path,
+    skriv: Callable[[str], None] = print,
+    indeks: Indeks = HOVEDINDEKS,
+) -> bool:
+    """Indeksens serie til tabellen indeks - story 2.8, AD-5, AD-21.
+
+    Gjennom SqliteIndekslager, aldri kurs eller vurdering. Porten tar bort
+    dagene som ikke er boersdager i aarene DEKKEDE_AAR dekker, og utskriften
+    sier hvor mange som ble lagret og tatt bort (BH2 i 2.8a), regnet med samme
+    funksjon. En eldre fil skriver ikke over en nyere serie, som for aksjene.
+    Returnerer False hvis indeksen feilet: serien ble avvist, eller basen
+    feilet. En eldre fil som hoppes over, er ingen feil og gir True, som en
+    serie som ble lagret. En feil her stopper ikke aksjene (AD-15).
+    """
+    lagret = len(bare_boersdager(rader))
+    aarene = ", ".join(str(aar) for aar in sorted(boersdag.DEKKEDE_AAR))
+    try:
+        tilkobling = aapne_base(base_sti)
+    except BASEFEIL as feil:
+        skriv(f"{indeks.navn} {indeks.symbol}: basen kunne ikke aapnes ({type(feil).__name__}). Ikke lagret.")
+        return False
+    try:
+        lager = SqliteIndekslager(tilkobling, (indeks,))
+        forrige = lager.sist_hentet(indeks.symbol)
+        if forrige is not None and hentet < forrige:
+            skriv(
+                f"{indeks.navn} {indeks.symbol}: hoppet over. {fil.name} er hentet "
+                f"{hentet.isoformat()}, og basen har en serie hentet "
+                f"{forrige.isoformat()}. En eldre fil skriver ikke over en nyere serie."
+            )
+            return True
+        lager.erstatt_serie(indeks.symbol, rader, hentet)
+    except ValueError as feil:
+        skriv(f"{indeks.navn} {indeks.symbol}: avvist og ikke lagret: {feil}")
+        return False
+    except BASEFEIL as feil:
+        skriv(f"{indeks.navn} {indeks.symbol}: basen kunne ikke skrives ({type(feil).__name__}). Ikke lagret.")
+        return False
+    finally:
+        tilkobling.close()
+    skriv(
+        f"{indeks.navn} {indeks.symbol}: lagret {lagret} dager, tok bort "
+        f"{len(rader) - lagret} som ikke er boersdager i {aarene}."
+    )
+    return True
 
 
 def _basen_feilet(
@@ -599,20 +718,38 @@ def skriv_vurderinger(
     return True
 
 
+def _aapne_for_sjekken(base_sti: Path) -> sqlite3.Connection:
+    """Basen for sjekkene foer kallene - story 2.8, beslutningen 16.10 kl. 22:16.
+
+    Uten migrering, skrivebeskyttet (mode=ro) og med PRAGMA query_only, saa
+    ingenting skrives. Adapterne godtar da en base en versjon bak
+    (godta_en_versjon_bak), slik den ekte basen staar naar en ny migrasjon er
+    flettet, og foer hentingen har skrevet. Kalleren lukker tilkoblingen.
+    """
+    tilkobling = aapne_base(base_sti, kjoer_migrasjoner=False, skrivebeskyttet=True)
+    try:
+        tilkobling.execute("PRAGMA query_only = ON")
+    except BaseException:
+        tilkobling.close()
+        raise
+    return tilkobling
+
+
 def manglende_i_basen(
     base_sti: Path, dato: date, lista: tuple[Aksje, ...] = AKSJEUNIVERS
 ) -> list[str]:
     """Aksjene i lista som ikke har en kurs for dato i basen - story 2.3.
 
-    Finnes ikke basen, mangler alle. Basen aapnes uten migrering, saa
-    ingenting skrives. En base som ikke kan aapnes eller leses, gir en feil
-    fra BASEFEIL; kjoer henter da likevel.
+    Finnes ikke basen, mangler alle. Basen aapnes med _aapne_for_sjekken, saa
+    ingenting skrives, og en base en versjon bak leses (story 2.8). En base
+    som ikke kan aapnes eller leses, gir en feil fra BASEFEIL; kjoer henter
+    da likevel.
     """
     if not base_sti.exists():
         return [aksje.symbol for aksje in lista]
-    tilkobling = aapne_base(base_sti, kjoer_migrasjoner=False)
+    tilkobling = _aapne_for_sjekken(base_sti)
     try:
-        lager = SqliteKurslager(tilkobling, lista)
+        lager = SqliteKurslager(tilkobling, lista, godta_en_versjon_bak=True)
         return [
             aksje.symbol
             for aksje in lista
@@ -627,12 +764,13 @@ def manglende_vurderinger(
 ) -> list[str]:
     """Aksjene i lista uten rad i vurdering for dato - story 2.3b, svar 6.
 
-    Basen aapnes uten migrering, saa ingenting skrives. En base som ikke kan
-    aapnes eller leses, gir en feil fra BASEFEIL.
+    Basen aapnes med _aapne_for_sjekken, saa ingenting skrives, og en base en
+    versjon bak leses (story 2.8). En base som ikke kan aapnes eller leses,
+    gir en feil fra BASEFEIL.
     """
-    tilkobling = aapne_base(base_sti, kjoer_migrasjoner=False)
+    tilkobling = _aapne_for_sjekken(base_sti)
     try:
-        lager = SqliteVurderingslager(tilkobling, naa, lista)
+        lager = SqliteVurderingslager(tilkobling, naa, lista, godta_en_versjon_bak=True)
         return [aksje.symbol for aksje in lista if lager.les(aksje.symbol, dato) is None]
     finally:
         tilkobling.close()
@@ -706,6 +844,16 @@ def kjoer(
     kursen for boersdagen for noen aksjer (FR-402), nevner utskriften dem,
     og kjoeringen gir kode 1; en ny kjoering samme kveld stopper ved
     filvakten.
+
+    Story 2.8 (beslutningen 17.10 kl. 11:58): er aksjene i orden, men
+    hovedindeksen feilet i kjoeringen (kallet feilet, porten avviste serien
+    eller basen feilet), gir kjoeringen kode 3, KODE_BARE_INDEKSEN. Kode 1
+    gaar foran: mangler ogsaa en aksje dagens kurs, gir kjoeringen 1. En
+    eldre fil som hoppes over for indeksen, er ingen feil. Et nytt forsoek
+    som fullfoerer aksjene, gir ogsaa 3 hvis indeksen feilet i kveldens
+    hovedhenting (nytt_forsoek). Kodene er altsaa
+    0 (alt i orden, eller ingenting aa gjoere), 1 (noe mangler eller feilet,
+    eller kjoeringen ble stoppet), 2 (feil i argumentene, fra argparse) og 3.
 
     Alt om tid utledes av oeyeblikk, som maa ha sone (AD-20, story 2.1):
     dagen er norsk kalenderdato (boersdag.norsk_dato) og gir filnavnet og
@@ -842,7 +990,8 @@ def kjoer(
         api_nokkel = api_nokkel()
 
     # Kvoten (regel 15): /api/user er gratis. Dagens dato regnes i GMT.
-    behov = len(lista)
+    # Story 2.8: aksjene i lista og hovedindeksen, 16 med de 15.
+    behov = len(lista) + 1
     try:
         igjen, bonus = tolk_kvote(les_kvote(api_nokkel), hentet_tid.date())
     except UlesbarKvote as feil:
@@ -881,24 +1030,29 @@ def kjoer(
             sys.exit(1)
 
     fra, til = bygg_intervall(dag)
-    skriv(f"Henter {len(lista)} symboler, {fra} til {til}.")
-    skriv(f"Dette koster {len(lista)} kall.\n")
+    skriv(f"Henter {len(lista)} aksjer og {HOVEDINDEKS.navn.lower()}, {fra} til {til}.")
+    skriv(f"Dette koster {behov} kall.\n")
 
     resultat = hent_universet(api_nokkel, fra, til, hent, skriv, lista)
+    # Story 2.8: indeksen etter aksjene, med ett kall. En feil stopper ingenting.
+    indeks = hent_indeksen(api_nokkel, fra, til, hent, skriv)
+    kall_brukt = resultat.kall_brukt + indeks.kall_brukt
 
-    tekst = json.dumps(lag_oyeblikksbilde(resultat, fra, til, hentet), ensure_ascii=False)
+    tekst = json.dumps(
+        lag_oyeblikksbilde(resultat, fra, til, hentet, indeks), ensure_ascii=False
+    )
     try:
         with open(fil, "x", encoding="utf-8") as ut:
             ut.write(tekst)
     except FileExistsError:
         skriv(
             f"{fil.name} dukket opp mens hentingen paagikk, og er ikke skrevet "
-            f"over (AD-6). {resultat.kall_brukt} kall er brukt, og ingenting er lagret."
+            f"over (AD-6). {kall_brukt} kall er brukt, og ingenting er lagret."
         )
         sys.exit(1)
 
     skriv(f"\nLagret {fil.name} i {data_katalog.name}/")
-    skriv(f"API-kall brukt: {resultat.kall_brukt}")
+    skriv(f"API-kall brukt: {kall_brukt}")
     if resultat.feil:
         skriv(f"Symboler uten data: {', '.join(sorted(resultat.feil))}")
 
@@ -908,9 +1062,26 @@ def kjoer(
     if skrevne is None:
         skriv(
             f"Ingen vurdering er skrevet for {dato.isoformat()}, og --les-inn "
-            f"skriver ingen. {_kan_skrives_til(dato)}"
+            f"skriver ingen. {_kan_skrives_til(dato)} {HOVEDINDEKS.navn} "
+            f"{HOVEDINDEKS.symbol} er heller ikke lagret, og --les-inn leser den "
+            "ikke. Neste henting bytter ut hele serien."
         )
         sys.exit(1)
+
+    # Story 2.8: indeksen til tabellen indeks. Feilet den, faar den ingen ny
+    # sjanse (AD-15), og aksjene gaar videre som vanlig.
+    if HOVEDINDEKS.symbol in indeks.serier:
+        indeksen_feilet = not skriv_indeksen_til_basen(
+            base_sti, serie_fra_eodhd(indeks.serier[HOVEDINDEKS.symbol]), hentet_tid, fil, skriv
+        )
+    else:
+        indeksen_feilet = True
+        skriv(
+            f"{HOVEDINDEKS.navn} {HOVEDINDEKS.symbol} feilet i hentingen "
+            f"({indeks.feil[HOVEDINDEKS.symbol]}) og faar ingen ny sjanse i kveld "
+            "(AD-15). Aksjene lagres og vurderes som vanlig, og et nytt forsoek "
+            "henter bare aksjene. Neste henting bytter ut hele serien."
+        )
 
     # Vurderingene etter kursene (AD-17), med datoen fra oeyeblikket.
     if norsk_dato(klokke()) != dag:
@@ -948,7 +1119,45 @@ def kjoer(
         )
     if uten_dagen or feilet or skrevne != set(serier):
         sys.exit(1)
+    if indeksen_feilet:
+        skriv(
+            f"Aksjene er i orden, men {HOVEDINDEKS.navn.lower()} feilet. Kode "
+            f"{KODE_BARE_INDEKSEN} (beslutningen 17.10 kl. 11:58). Indeksen proeves "
+            "ikke igjen i kveld (AD-15), og neste henting bytter ut hele serien."
+        )
+        sys.exit(KODE_BARE_INDEKSEN)
     return fil
+
+
+def _indeksen_feilet_i_kveld(kursfil: Path, base_sti: Path, indeks: Indeks = HOVEDINDEKS) -> bool:
+    """Om indeksen feilet i kveldens hovedhenting - story 2.8, gjennomgangen
+    av kode 3 (BH4, ECH2).
+
+    Et nytt forsoek henter ikke indeksen. Feilet indeksen og en aksje samme
+    kveld, ga hovedhentingen kode 1, og et forsoek som fullfoerer aksjene,
+    skal da gi kode 3, ikke 0. Indeksen feilet naar kursfila har noekkelen
+    indeks, og basen ikke har en serie hentet like sent som fila: kallet
+    feilet, porten avviste serien eller basen feilet. En eldre fil som ble
+    hoppet over, har en nyere serie i basen og er ingen feil. En fil fra foer
+    2.8 uten noekkelen indeks, og en fil eller base som ikke kan leses, gir
+    False, saa forsoeket ikke sier mer enn det vet.
+    """
+    try:
+        bilde = json.loads(kursfil.read_text(encoding="utf-8"))
+        hentet = _hentet_fra_tekst(bilde.get("hentet"))
+    except (OSError, ValueError, AttributeError):
+        return False
+    if hentet is None or not isinstance(bilde.get("indeks"), dict):
+        return False
+    try:
+        tilkobling = _aapne_for_sjekken(base_sti)
+        try:
+            sist = SqliteIndekslager(tilkobling, (indeks,)).sist_hentet(indeks.symbol)
+        finally:
+            tilkobling.close()
+    except BASEFEIL:
+        return False
+    return sist is None or sist < hentet
 
 
 def eldste_foerst(
@@ -958,14 +1167,15 @@ def eldste_foerst(
 
     En aksje uten serie kommer foerst av alle, og ellers gjelder rekkefoelgen
     i lista. En aksje som feilet, faar ingen ny tid, og staar derfor foerst
-    ogsaa neste gang. Basen aapnes uten migrering, saa ingenting skrives.
+    ogsaa neste gang. Basen aapnes med _aapne_for_sjekken, saa ingenting
+    skrives, og en base en versjon bak leses (story 2.8).
     """
     plass = {aksje.symbol: i for i, aksje in enumerate(lista)}
     if not base_sti.exists():
         return sorted(symboler, key=plass.__getitem__)
-    tilkobling = aapne_base(base_sti, kjoer_migrasjoner=False)
+    tilkobling = _aapne_for_sjekken(base_sti)
     try:
-        lager = SqliteKurslager(tilkobling, lista)
+        lager = SqliteKurslager(tilkobling, lista, godta_en_versjon_bak=True)
         tider = {symbol: lager.sist_hentet(symbol) for symbol in symboler}
     finally:
         tilkobling.close()
@@ -1016,6 +1226,10 @@ def nytt_forsoek(
     en grunn skriver aldri over en vurdering (AD-7). En dag boersen er
     stengt, staar en rad som finnes (svar 3). Mangler noen aksje fortsatt
     dagens kurs, gir kjoeringen kode 1 (svar 5).
+
+    Story 2.8: har alle aksjene kursen etter forsoeket, men indeksen feilet i
+    kveldens hovedhenting (_indeksen_feilet_i_kveld), gir forsoeket kode 3,
+    KODE_BARE_INDEKSEN, saa kvelden ikke ender som en vellykket kjoering.
     """
     kursfil = data_katalog / filnavn(dato)
     skriv(
@@ -1058,8 +1272,10 @@ def nytt_forsoek(
         )
         sys.exit(1)
     igjen = max(grense - brukt, 0)
-    # Med indeksen (2.8) blir antallet len(lista) + 1 (NFR-01, tillegget 08.10).
-    antall = kall_til_nye_forsoek(igjen, grense, len(lista))
+    # Story 2.8: hovedhentingen er aksjene og indeksen, len(lista) + 1, saa det
+    # er 4 kall til nye forsoek med de 15 (NFR-01, tillegget 08.10). Forsoeket
+    # henter bare aksjene.
+    antall = kall_til_nye_forsoek(igjen, grense, len(lista) + 1)
     if antall == 0:
         skriv(
             f"Kvoten: {igjen} kall igjen av dagens, og 0 til nye forsoek. "
@@ -1163,6 +1379,13 @@ def nytt_forsoek(
         )
         sys.exit(1)
     skriv(f"Alle {len(lista)} aksjene har kursen for boersdagen {dato.isoformat()}.")
+    if _indeksen_feilet_i_kveld(kursfil, base_sti):
+        skriv(
+            f"{HOVEDINDEKS.navn} {HOVEDINDEKS.symbol} feilet i kveldens henting, "
+            "og et nytt forsoek henter den ikke (AD-15). Kode "
+            f"{KODE_BARE_INDEKSEN} (beslutningen 17.10 kl. 11:58)."
+        )
+        sys.exit(KODE_BARE_INDEKSEN)
     return fil
 
 

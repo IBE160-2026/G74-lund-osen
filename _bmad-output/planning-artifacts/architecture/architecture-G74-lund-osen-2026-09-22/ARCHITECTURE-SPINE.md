@@ -388,6 +388,7 @@ FR-408. At dagen mangler, skal kunne skilles i lageret: `FR-409`. *Rettet
 - **Føring 2026-10-01 (hovedindeksen OSEBX i v1, Marians beslutning):** indeksen er ikke en aksje. Den lagres i en egen tabell, `indeks`, aldri i `aksje`, `kurs`, `kursserie` eller `vurdering`, og står ikke i `AKSJEUNIVERS`. Triggerne over gjelder ikke tabellen, og en henting av `OSEBX.OL` i story 2.8 er derfor ikke det AD-21 skal hindre. Migreringen er `0006`, etter `ki_logg` i `0005` (AD-16). Kravene står i FR-104, FR-105 og FR-410 i PRD-en.
 - **Merknad 2026-10-03 (FR-411, story 3.4):** AD-21 gjelder uendret for den ekte basen, og testen som holder `aksje` lik `AKSJEUNIVERS`, står. Demobasen har de oppdiktede selskapene i `DEMOUNIVERS`, og en ny test holder `aksje` i demobasen lik den. Lesing og skriving er delt: sidene leser selskapene fra `aksje` i basen, slik spørringen med join i story 2.2b legger opp til, og portene som skriver, tar lista som parameter, med `AKSJEUNIVERS` som standard (føringen 2026-09-30 over). Demokommandoen gir dem `DEMOUNIVERS`. De 15 som `0003` legger inn, fjerner demokommandoen før den skriver noe. Det er lov fordi de ikke har rader.
 - **Bygget 2026-10-17, story 2.8, PR 1 (spesifikasjonen 2.8a):** `0006_indeks.sql` lager `indeks`, med feltene `kurs` har for en dag, og `indeksserie` med `hentet`, som `kursserie`. Ingen trigger mot `aksje`, etter føringen 2026-10-01 over. Porten står i `src/indeksdata.py`: `Indeksleser` og `Indekslager` i samme form som `Kursleser` og `Kurslager`, `HOVEDINDEKS` (`OSEBX`, `OSEBX.OL`) og `MinneIndekslager`. `SqliteIndekslager` i `lagring_sqlite.py` bytter ut serien i én transaksjon (AD-5). Porten avviser et symbol som ikke er en kjent indeks, og en aksje, også når den er gitt som indeks. Det håndheves bare i porten, ikke i basen, fordi `indeks` ikke har triggere (gjennomgangen av 2.8a, BH14). Porten tar bort dager som ikke er børsdager i årene `DEKKEDE_AAR` dekker, før noe lagres, uten feil. Demobasen har `DEMOINDEKS`, «Demoindeksen», over alle demodagene. Kallet for `OSEBX.OL` i hentingen, 16 kall og `docs/hjelp.md` kommer i PR 2.
+- **Bygget 2026-10-17, story 2.8, PR 2 (spesifikasjonen 2.8b):** hentingen henter `OSEBX.OL` med ett kall etter aksjene, med samme intervall, og bruker 16 kall med de 15. Rådataene står i samme øyeblikksbilde under nøkkelen `indeks`, og indeksen lagres med `SqliteIndekslager`. Et feilet indekskall stopper ikke aksjene og får ingen ny sjanse (AD-15). Nye forsøk henter bare aksjene, med 4 kall. Sjekken av basen før kallene åpner basen skrivebeskyttet og godtar en base en versjon bak (beslutningen 16.10 kl. 22:16).
 - **Endret 2026-10-08 (lista kan byttes, FR-412, story 2.11 og 2.12), Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, punkt 4.3):** regelen over om at `aksje` har «de samme femten som `AKSJEUNIVERS`, i samme rekkefølge. En test holder dem like» erstattes, og merknaden 03.10 om at den testen står, gjelder til 2.11 er bygget. Ny regel: `aksje` har alle aksjene som har vært i lista, med når de kom inn og når de gikk ut, i en ny migrasjon (AD-16). De 15 som står i dag, får datoen for den første raden sin. `AKSJEUNIVERS` er lista appen starter med, og testen som holdt `aksje` lik den, byttes mot en som holder de 15 i `0003` like. Triggerne, at en aksje med rader ikke kan slettes, at symbolet aldri endres, og at ingen aksje kan erstattes, står. En aksje som tas ut, beholder radene sine i `kurs`, `kursserie` og `vurdering`. Føringen 2026-09-30 blir regel: koden teller aksjene og antar aldri at det er 15. Lista har opptil 18 aksjer, og med hovedindeksen gir det 19 kall (NFR-01). Binder i tillegg FR-412 og FR-409 (tillegget 08.10).
 
 ## Consistency Conventions
@@ -436,7 +437,7 @@ graph LR
     end
     subgraph img["Image — ingen data"]
         web["docker run<br/>Flask, 0 kall"]
-        hent["docker run … hent<br/>15 kall, bevisst"]
+        hent["docker run … hent<br/>16 kall, bevisst"]
     end
     eodhd["EODHD /api/eod"]
 
@@ -445,6 +446,8 @@ graph LR
     hent -.->|"kun her"| eodhd
     web -->|"leser"| db
 ```
+
+*Rettet 2026-10-17:* her sto «15 kall, bevisst» før PR #57 (story 2.8), da hentingen bare hentet aksjene. Med hovedindeksen er det 16.
 
 Kjerneentiteter:
 

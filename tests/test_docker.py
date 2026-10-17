@@ -1035,7 +1035,8 @@ class TestReadmeForNybegynnere:
                     "oversikten fra designforslaget", "utseendet fra designforslaget",
                     "sortering ved klikk i kolonneraden", "den første delen av KI-laget",
                     "en bryter som slår den av og på",
-                    "at hentingen lager teksten med en lokal modell"):
+                    "at hentingen lager teksten med en lokal modell",
+                    "at hovedindeksen hentes i samme kjøring"):
             assert sak in flettet, sak
         # Story 8.0d, PR 3 (svar 9 kl. 22:50): «Neste:» følger rekkefølgen
         # etter 8.0d (gruppen 14.10 kl. 22:19 og 22:25).
@@ -1044,8 +1045,10 @@ class TestReadmeForNybegynnere:
         # så rekkefølgen fra 14.10.
         # PR #49 flettet 16.10: teksten fra hentingen er flyttet til «Flettet
         # til main», og «Neste:» begynner med hovedindeksen.
+        # Story 2.8, PR 2: at indeksen hentes, er flettet, og visningen
+        # («hovedindeksen på forsiden») står først under «Neste:».
         assert "resten av KI-laget" not in status and "Selve teksten lages ikke ennå" not in status
-        saker = ("hovedindeksen", "Min liste", "innstillingene", "periodene i kursgrafen",
+        saker = ("hovedindeksen på forsiden", "Min liste", "innstillingene", "periodene i kursgrafen",
                  "historikken og signaldagene", "«Vis KI-tekst» i innstillingene", "KI-teksten om dagen",
                  "velge og bytte aksjer")
         for sak in saker:
@@ -1110,7 +1113,8 @@ class TestReadmeForNybegynnere:
         # foelger ogsaa lista.
         nokkel = ekte.split("### Hva med nøkkelen?\n\n", 1)[1].split("\n\n", 1)[0]
         # Ordgrense etter tallet, saa 1 ikke godtar «15» (Verification Gap 12.10).
-        assert re.search(rf"en henting bruker {antall}\b", nokkel), nokkel
+        # Story 2.8: en henting er aksjene og hovedindeksen.
+        assert re.search(rf"en henting bruker {antall + 1}\b", nokkel), nokkel
 
     def test_til_faglaerer_lenker_til_briefen_med_gjeldende_tag(self):
         """12.10 kl. 12:12: briefen var gjemt langt nede. Lista under

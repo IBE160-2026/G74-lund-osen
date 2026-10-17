@@ -135,12 +135,22 @@ def har_kurser(tilkobling: sqlite3.Connection) -> bool:
     return tilkobling.execute("SELECT 1 FROM kursserie LIMIT 1").fetchone() is not None
 
 
-def _krev_siste_versjon(tilkobling: sqlite3.Connection) -> None:
+def _krev_siste_versjon(
+    tilkobling: sqlite3.Connection, *, godta_en_versjon_bak: bool = False
+) -> None:
     """Felles for begge adapterne: basen skal staa paa siste versjon.
 
     Story 1.5b, c: ikke bare vaere migrert en gang. Med 0002 ville en base paa
     versjon 1 ellers blitt godtatt og lest med et skjema den ikke har.
+
+    Story 2.8 (beslutningen 16.10 kl. 22:16): med godta_en_versjon_bak godtas
+    ogsaa en base en versjon bak, til sjekken av basen foer kallene, saa den
+    virker naar en ny migrasjon er flettet og basen ennaa ikke er migrert.
+    Bare paa en tilkobling med PRAGMA query_only, saa en skriver aldri faar en
+    base med et skjema den ikke kjenner.
     """
+    if godta_en_versjon_bak and tilkobling.execute("PRAGMA query_only").fetchone()[0] != 1:
+        raise ValueError("godta_en_versjon_bak krever en tilkobling med PRAGMA query_only")
     try:
         siste = siste_versjon(MIGRASJONSKATALOG)
     except MigrasjonsFeil as feil:
@@ -148,7 +158,7 @@ def _krev_siste_versjon(tilkobling: sqlite3.Connection) -> None:
             f"Migrasjonskatalogen {MIGRASJONSKATALOG} er ikke i orden: {feil}"
         ) from feil
     naa = versjon(tilkobling)
-    if naa < siste:
+    if naa < siste - (1 if godta_en_versjon_bak else 0):
         raise RuntimeError(
             f"Basen er ikke migrert til siste versjon: den staar paa "
             f"versjon {naa}, og {MIGRASJONSKATALOG} har {siste} "
@@ -173,8 +183,14 @@ class SqliteKurslager:
     kjoert - rulles alt tilbake, og symbolet har gammel serie og gammel tid.
     """
 
-    def __init__(self, tilkobling: sqlite3.Connection, univers: tuple[Aksje, ...] = AKSJEUNIVERS):
-        _krev_siste_versjon(tilkobling)
+    def __init__(
+        self,
+        tilkobling: sqlite3.Connection,
+        univers: tuple[Aksje, ...] = AKSJEUNIVERS,
+        *,
+        godta_en_versjon_bak: bool = False,
+    ):
+        _krev_siste_versjon(tilkobling, godta_en_versjon_bak=godta_en_versjon_bak)
         self._tilkobling = tilkobling
         self._univers = univers
 
@@ -346,8 +362,10 @@ class SqliteVurderingslager:
         tilkobling: sqlite3.Connection,
         klokke: Callable[[], datetime],
         univers: tuple[Aksje, ...] = AKSJEUNIVERS,
+        *,
+        godta_en_versjon_bak: bool = False,
     ):
-        _krev_siste_versjon(tilkobling)
+        _krev_siste_versjon(tilkobling, godta_en_versjon_bak=godta_en_versjon_bak)
         self._tilkobling = tilkobling
         self._klokke = klokke
         # Story 3.4: lista som skrives, med AKSJEUNIVERS som standard.
