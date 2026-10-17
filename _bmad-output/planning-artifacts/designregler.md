@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-10-15T15:27
+updated: 2026-10-17T23:54
 ---
 
 # Designregler
@@ -61,6 +61,8 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 *Lagt til 2026-10-13 (story 8.0e, svar 8 kl. 21:27):* pillen «3 av 3» i oversikten har svart fyll og hvit tekst inne i den gule ringen, som i designforslaget, med kontrast på minst 4,5:1. 2 av 3 merkes som før, med fet skrift og strek, uten fyll og uten gult.
 
 *Lagt til 2026-10-14 (gruppen 14.10 kl. 17:17 og skissen gruppen valgte like etter, instruksjonen kl. 17:31):* fargene er som i originalen, med oransje som grunnfarge. 3 av 3 har strek på 4 px til venstre i raden og ring rundt pillen i sterk oransje `#F2B53A`. 2 av 3 har strek på 4 px i lys oransje `#F8DE9C`, og fet «2 av 3» som før. 1 av 3 og 0 av 3 har ingen strek og ingen farge. **Hvorfor:** gruppen vil ha utseendet fra originalen. Teksten sier alltid det samme (FR-103), og pillen har svart fyll siden 8.0e, så ringen og strekene trenger ikke 3:1 mot hvitt.
+
+*Lagt til 2026-10-17 (story 2.9b, spesifikasjonen `spec-2-9b-soeylene-under-hovedindeksen.md`):* bransjesymbolet over søylen under hovedindeksen er gult ved 3 av 3 i `#a67c00`, ikke i sterk oransje `#F2B53A`. Symbolet står på det hvite kortet, der `#F2B53A` har 1,83:1 og `#a67c00` 3,82:1, og grafikk som bærer mening skal ha minst 3:1 (WCAG 1.4.11). «3 av 3» står også i teksten for skjermleser.
 
 ## 4. Ordliste – samme ord på alle sidene (01.10)
 
@@ -177,6 +179,8 @@ Ord kan endres rett i tavla. I appen samles hjelpetekstene i én fil (8.0b).
 - Retningen står i en pille på 28 px med symbolet først.
 
 **Avstander.** Sidemargen er 120 px ved 1280 px og 16 px ved 390 px. Det er 40–44 px mellom delene i oversikten og 60 px på aksjesiden. Kort har radius 16, kant i Strek og luft 18–22 px. Brikker har radius 6, merker 8 og piller 999. Klikkflater er minst 44 px.
+
+*Lagt til 2026-10-17 (story 2.9b):* **Søylene under hovedindeksen.** Fargen følger endringen slik den vises, med to desimaler, som i tabellen: over 0,00 % Positiv `#13703C`, under 0,00 % Negativ `#B42318`, og 0,00 % Ingen `#5F646C`. Det samme gjelder den stiplede linja for indeksen. Det er de eneste fargegrensene: lengden på søylen viser hvor stor endringen er, med null midt i feltet og den største endringen av søylene og indeksen på halve høyden. Stiplet linje brukes bare for indeksen. Bransjesymbolet ved 3 av 3 heter Gult symbol `#a67c00` i stilen (`--gul-symbol`, §3).
 
 **Fokus.** På lys bakgrunn er fokus `outline: 3px solid` i blekk med `outline-offset: 2px` (15,85:1). I stripa er fokus lys gul (9,68:1).
 
