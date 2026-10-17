@@ -21,13 +21,16 @@ Regelen for kursene (spesifikasjonen til 3.4, Boundaries):
 - Siste dag faller Brattfjell Energi 6 % med tre ganger volumet, saa minst en
   aksje skiller seg ut.
 - Siste dag har tre aksjer til en fast endring fra sluttkursen dagen foer og
-  et volum som er en faktor av volumnivaaet i START (SISTE_DAG), saa alle de 10
+  et volum som er en faktor av volumnivaaet i START (SISTE_DAG). Ulikt regelen
+  for Brattfjell Energi, som tar 6 % av dagens trukne kurs, er endringen
+  regnet fra gaarsdagens avrundede sluttkurs, saa den blir noeyaktig. Alle de 10
   fargekombinasjonene av de tre sjekkene finnes paa SLUTTDATO, fra 3 groenne
   til 3 graa (beslutningen 16.10 kl. 21:49 under story 2.12): Kvitstein Mineral
   +3,5 % med tre ganger volumet gir 3 groenne, Laksevik Sjoemat +3 % med 2,5
   ganger gir 2 groenne og 1 roed, og Lastfjord Container +2,5 % med vanlig
-  volum gir 1 groenn og 2 graa. Tallene fra frøet trekkes ogsaa den dagen, saa
-  de andre dagene og de andre aksjene er som foer.
+  volum gir 1 groenn og 2 graa. Tallene fra froeet trekkes ogsaa den dagen, og
+  de andre dagene og de andre aksjene er som foer. Ingen av de tre er
+  SKILLER_SEG_UT, NYLIG_NOTERT eller UTEN_KURSER.
 - Varde Systemer har bare de siste 30 dagene (nylig notert), og Matfjord
   Merkevarer har ingen kurser. Da viser sidene ogsaa «signalet kunne ikke
   regnes», «Trenger 51 dager» og «Uten data». (En aksje uten siste dag ble

@@ -42,8 +42,9 @@ SRC = Path(demo.__file__).resolve().parent
 # rader paa SLUTTDATO er nye. Foer var det 73c277d2...dbdec16.
 FINGERAVTRYKK_KURS = "e92012b8df47f6b0e00b7cae9c0a833956da3c90d668f7ac58173410c44159dc"
 # Tabellen uten de tre radene for SISTE_DAG paa SLUTTDATO, og vurderingene foer
-# SLUTTDATO, regnet med koden foer og etter 17.10: like, saa frøet og de andre
-# dagene staar som foer.
+# SLUTTDATO, regnet med koden foer (src/demo.py paa main, 43de066, som ga det
+# gamle FINGERAVTRYKK_KURS) og etter 17.10: like, saa froeet og de andre dagene
+# staar som foer (gjennomgangen, BH5).
 FINGERAVTRYKK_KURS_UTEN_SISTE_DAG = "f3bb1e35ae082562dafb38e0aa5667fede6cf9d8dc296d6ac73d55b57a762e02"
 FINGERAVTRYKK_VURDERING_FOER_SISTE_DAG = "74aaaa152d4676b882e9149c4f726911fcb86a5d002bed3c777e26a84986def9"
 
@@ -670,11 +671,17 @@ class TestAlleTiKombinasjonene:
         rader = self._siste_dag(mal)
         assert rader["KVST"][:3] == (1, 1, 1)
         assert rader["LKSV"][:3] == (-1, 1, 1)
-        assert sorted(rader["LSTF"][:3]) == [0, 0, 1]
+        assert rader["LSTF"][:3] == (0, 1, 0)
+
+    def test_reglene_gjelder_ikke_aksjene_med_egen_regel(self):
+        """Gjennomgangen, BH1 og ECH2-3: en regel i SISTE_DAG for Brattfjell
+        Energi eller en av de to med grunn ville skrevet over eller blitt borte."""
+        assert not set(demo.SISTE_DAG) & {demo.SKILLER_SEG_UT, demo.NYLIG_NOTERT, demo.UTEN_KURSER}
 
     def test_froeet_og_de_andre_dagene_staar_som_foer(self, mal):
         """Ville feilet hvis en ny regel endret en annen dag eller en annen
-        aksje, eller trakk et tall mindre fra frøet."""
+        aksje. Et tall mindre fra froeet paa SLUTTDATO kan ingen test se, fordi
+        det er siste dag (gjennomgangen, VG1)."""
         c = sqlite3.connect(mal)
         try:
             kurs = c.execute(
