@@ -24,7 +24,7 @@ Dette er et tillegg til story 3.4 (Demoversjonen), ikke story 3.4b (KI-tekstene 
 
 ## Planen
 
-**a) Reglene for siste demodag** står i `SISTE_DAG` i `src/demo.py`, i samme form som regelen for Brattfjell Energi. Hver regel er en endring fra sluttkursen dagen før og et volum som er en faktor av volumnivået i `START`. De gjelder for tre aksjer som i dag gir en kombinasjon som en annen aksje også gir:
+**a) Reglene for siste demodag** står i `SISTE_DAG` i `src/demo.py`, i samme form som regelen for Brattfjell Energi: en fast regel for én aksje på `SLUTTDATO`. Hver regel er en endring fra sluttkursen dagen før og et volum som er en faktor av volumnivået i `START`. *Rettet 2026-10-17 (gjennomgangen, BH4 og ECH4):* her sto bare «i samme form som regelen for Brattfjell Energi». Brattfjell Energi tar 6 % av dagens trukne kurs, så endringen fra dagen før er ikke nøyaktig -6 % (-5,53 %). De nye reglene regner fra gårsdagens avrundede sluttkurs, så endringen blir nøyaktig. De gjelder for tre aksjer som i dag gir en kombinasjon som en annen aksje også gir:
 - Kvitstein Mineral: +3,5 % med tre ganger volumet gir 3 grønne. I dag gir den 3 grå, som Sølvbank Petroleum og Lastfjord Container.
 - Laksevik Sjømat: +3 % med 2,5 ganger volumet gir 2 grønne og 1 rød. I dag gir den 1 rød og 2 grå, som fire andre.
 - Lastfjord Container: +2,5 % med vanlig volum gir 1 grønn og 2 grå. I dag gir den 3 grå.
@@ -74,6 +74,43 @@ Testen leser kombinasjonene fra basen, så en endring i parametrene som flytter 
 
 - Ingen kall til EODHD utover kvotesjekken i regel 15. `src/fetch_prices.py` kjøres ikke, og `data/db/ose.db` og `data/db/demo.db` røres ikke (regel 22). Demobasene lages bare i midlertidige mapper.
 - Frøet, de andre dagene, `NYLIG_NOTERT` og `UTEN_KURSER` står som før.
-- Flettes i instruksjonen kl. 18:44 når vilkårene i steg 5 holder.
+- Flettes i instruksjonen kl. 18:44 når ingen test feiler, ingen mutant overlever, CI er grønn på head-en, og hvert funn med dom medium eller høyere er rettet (steg 5 i instruksjonen).
 
 **Testtallet før:** 2303 bestått og 17 hoppet over (head-en til PR #57, `b4a0721`, samme kode og tester som main på `43de066`).
+
+*Lagt til 2026-10-17 (gjennomgangen, BH13):* `b4a0721` er head-en til PR #57, `bcac2b5` er flettecommiten på main, og `43de066` er main da grenen ble laget. Etter `bcac2b5` har main bare fått dokumenter, så `src` og `tests` er like i alle tre (`git diff b4a0721 main -- src tests` er tom). Testtallet ble målt på `b4a0721` i instruksjonen kl. 12:07.
+
+**Fingeravtrykkene (BH5):** `FINGERAVTRYKK_KURS_UTEN_SISTE_DAG` og `FINGERAVTRYKK_VURDERING_FOER_SISTE_DAG` er regnet med et skript i scratchpad, én gang med `src/demo.py` fra main (`43de066`) og én gang med koden på grenen. Den gamle koden ga det gamle `FINGERAVTRYKK_KURS` (`73c277d2…`), og begge ga de samme to nye fingeravtrykkene.
+
+## Mutantene
+
+Én om gangen med `-x`, i den ferske klonen med `core.autocrlf=false`, med kopi før og sha256 mot HEAD etter hver. Alle ble fanget på `074cd6f`, først med hele `tests/test_demo.py` og så med bare `TestAlleTiKombinasjonene`:
+- R1, regelen for Kvitstein Mineral tatt bort
+- R2, regelen for Laksevik Sjømat tatt bort
+- R3, regelen for Lastfjord Container tatt bort
+- R4, reglene ikke brukt
+
+Med hele fila ble alle fire fanget av `test_kursene_har_samme_fingeravtrykk_paa_alle_plattformer`, som kommer først. Med bare klassen ble de fanget av `test_alle_ti_kombinasjonene_paa_sluttdato`.
+
+## Gjennomgangen
+
+Gjennomgang 17.10 på diffen `main...074cd6f`, med Blind Hunter (BH, 15 funn), Edge Case Hunter (ECH, 5) og Verification Gap (VG, 2). Ingen funn med dom medium eller høyere. Rettingene står i `d63d45c` og i denne spesifikasjonen.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH4, ECH4 | «I samme form som Brattfjell Energi» stemmer ikke helt: den regner fra dagens trukne kurs | low | patch: docstringen og Rettet-linja over |
+| BH5 | Ingenting viser hvordan fingeravtrykkene fra før ble regnet | low | patch: kommentaren i testen og avsnittet over |
+| BH7, VG2 | Testene viser til mutantene R1–R3, men de sto ikke i spesifikasjonen | low | patch: avsnittet over |
+| BH8 | Testen for Lastfjord Container så bare at én sjekk var grønn | low | patch: `(0, 1, 0)` |
+| BH1, ECH2, ECH3 | En regel for Brattfjell Energi eller en av de to med grunn ville skrevet over eller blitt borte | low | patch: `test_reglene_gjelder_ikke_aksjene_med_egen_regel` |
+| VG1 | Docstringen lovet at testen ser et tall mindre fra frøet | low | patch: det kan ingen test se på siste dag |
+| BH12 | «Steg 5» var ikke forklart | low | patch: vilkårene står i Boundaries |
+| BH13 | Tre commits for grunnlaget uten forklaring | low | patch: avsnittet over |
+| BH14 | «frø» med ø midt i ASCII-tekst | low | patch: «froeet» i koden og testene |
+| BH2, ECH1 | `rader[-1]` når `SLUTTDATO` er første dag | low | avvist: `handelsdager()` begynner 2026-01-02, og regelen for Brattfjell har samme forutsetning |
+| BH3 | Kursen fortsetter fra regelen hvis dagene går forbi `SLUTTDATO` | low | avvist: `SLUTTDATO` er siste dag i `handelsdager()` |
+| BH6 | `SELECT *` i fingeravtrykket av `vurdering` | low | avvist: en ny kolonne skal få testen til å feile, så fingeravtrykket regnes på nytt med vilje |
+| BH9, ECH5 | `>= 7` i testen og «nøyaktig 7» her | low | avvist: instruksjonen sier minst 7, og «7 av 15 aksjer skilte seg ut fredag» i `test_demo.py` holder tallet |
+| BH10 | Marginen for Lastfjord Container er liten | low | avvist: parametrene er låst (§7.4 i `malinger.md`), og testen feiler hvis kombinasjonen flytter seg |
+| BH11 | Ingen test av demoindeksen på siste dag | low | avvist: `test_indeksen_foelger_demoaksjene_hver_dag` i `test_indeks.py` regner indeksen fra `demo.serie` for hver dag (VG) |
+| BH15 | Setningen i «Status» blir lang | low | avvist: samme form som de andre sakene i lista |
