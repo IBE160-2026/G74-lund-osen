@@ -1036,7 +1036,8 @@ class TestReadmeForNybegynnere:
                     "sortering ved klikk i kolonneraden", "den første delen av KI-laget",
                     "en bryter som slår den av og på",
                     "at hentingen lager teksten med en lokal modell",
-                    "at hovedindeksen hentes i samme kjøring"):
+                    "at hovedindeksen hentes i samme kjøring",
+                    "vises over tabellen på forsiden"):
             assert sak in flettet, sak
         # Story 8.0d, PR 3 (svar 9 kl. 22:50): «Neste:» følger rekkefølgen
         # etter 8.0d (gruppen 14.10 kl. 22:19 og 22:25).
@@ -1047,8 +1048,9 @@ class TestReadmeForNybegynnere:
         # til main», og «Neste:» begynner med hovedindeksen.
         # Story 2.8, PR 2: at indeksen hentes, er flettet, og visningen
         # («hovedindeksen på forsiden») står først under «Neste:».
+        # Story 2.9: visningen er flettet, og «Neste:» begynner med Min liste.
         assert "resten av KI-laget" not in status and "Selve teksten lages ikke ennå" not in status
-        saker = ("hovedindeksen på forsiden", "Min liste", "innstillingene", "periodene i kursgrafen",
+        saker = ("Min liste", "innstillingene", "periodene i kursgrafen",
                  "historikken og signaldagene", "«Vis KI-tekst» i innstillingene", "KI-teksten om dagen",
                  "velge og bytte aksjer")
         for sak in saker:
@@ -1056,6 +1058,8 @@ class TestReadmeForNybegynnere:
         # Gjennomgangen (VG7): i den rekkefølgen, og det flettede står ikke i «Neste».
         assert [neste.index(s) for s in saker] == sorted(neste.index(s) for s in saker)
         assert "utseendet fra designforslaget" not in neste
+        # Story 2.9: hovedindeksen står ikke lenger under «Neste:».
+        assert "hovedindeksen" not in neste
         assert "sortering ved klikk i kolonneraden" not in neste
 
     def test_lenken_til_staar_du_fast_sier_lenger_ned(self):
