@@ -46,8 +46,9 @@ jobs:
         run: uv run ruff format --check
 
       - name: Kjoer testene
-        # Samme kommando som lokalt, jf. README. Ogsaa naar ruff har feilet,
-        # saa en glemt formattering ikke skjuler resultatet av testene.
+        # Samme kommando som lokalt, jf. README.
+        # Story 9.7 (BH14, ECH1): ogsaa naar ruff har feilet, saa en glemt
+        # formattering ikke skjuler resultatet av testene.
         if: success() || failure()
         run: uv run pytest -q
 
