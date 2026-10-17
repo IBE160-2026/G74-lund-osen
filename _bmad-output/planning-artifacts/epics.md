@@ -2033,6 +2033,8 @@ avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 
 *Lagt til 2026-10-14 (gruppen kl. 22:19 og 22:25):* README-prøven tas når mest mulig av rekkefølgen etter 8.0d er bygget (se «Prioritering» øverst), og senest én uke før innleveringen. Det erstatter linja over om at prøven tas etter at 8.0d er flettet.
 
+*Lagt til 2026-10-17 kl. 19:03:* demoen viser alle 10 fargekombinasjonene av de tre sjekkene på siste demodag (beslutningen 16.10 kl. 21:49 under story 2.12), flettet i `f21f927`, PR #58. Spesifikasjonen er `spec-3-4-alle-ti-kombinasjonene-paa-siste-demodag.md`. CI var grønn på head-en `33ca133` (kjøring 39051824634) og på main (39051953417).
+
 ### Story 3.4b: KI-tekstene i demoen
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 16:53.*

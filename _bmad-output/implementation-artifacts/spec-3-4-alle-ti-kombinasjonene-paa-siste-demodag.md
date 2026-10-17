@@ -2,7 +2,7 @@
 title: 'Story 3.4, tillegg: alle de 10 fargekombinasjonene på siste demodag'
 type: 'feature'
 created: '2026-10-17'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '43de066'
@@ -81,6 +81,8 @@ Testen leser kombinasjonene fra basen, så en endring i parametrene som flytter 
 *Lagt til 2026-10-17 (gjennomgangen, BH13):* `b4a0721` er head-en til PR #57, `bcac2b5` er flettecommiten på main, og `43de066` er main da grenen ble laget. Etter `bcac2b5` har main bare fått dokumenter, så `src` og `tests` er like i alle tre (`git diff b4a0721 main -- src tests` er tom). Testtallet ble målt på `b4a0721` i instruksjonen kl. 12:07.
 
 **Fingeravtrykkene (BH5):** `FINGERAVTRYKK_KURS_UTEN_SISTE_DAG` og `FINGERAVTRYKK_VURDERING_FOER_SISTE_DAG` er regnet med et skript i scratchpad, én gang med `src/demo.py` fra main (`43de066`) og én gang med koden på grenen. Den gamle koden ga det gamle `FINGERAVTRYKK_KURS` (`73c277d2…`), og begge ga de samme to nye fingeravtrykkene.
+
+*Lagt til 2026-10-17 kl. 19:03:* PR #58 er squash-flettet i `f21f927`, låst til head-en `33ca133`. CI var grønn på head-en (39051824634) og på main (39051953417). Mutantene R1–R4 ble fanget igjen på `33ca133`, med bare `TestAlleTiKombinasjonene`.
 
 ## Mutantene
 
