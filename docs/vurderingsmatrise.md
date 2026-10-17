@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-10-17T22:14
+updated: 2026-10-17T22:59
 ---
 
 # Vurderingsmatrise for del 1
@@ -73,3 +73,5 @@ Statusen i tabellen er ikke endret. README-prøven (story 3.4) og avsnittet «St
 *Lagt til 2026-10-17 kl. 12:30:* hovedindeksen (story 2.8): kallet for `OSEBX.OL` i hentingen er på main, flettet i `bcac2b5`, PR #57. En henting bruker 16 kall, 15 aksjer og indeksen, og gir kode 3 når bare indeksen feiler (beslutningen kl. 11:58). Visningen kommer i PR 3 (story 2.9). Statusen i tabellen er ikke endret.
 
 *Lagt til 2026-10-17 kl. 19:56:* hovedindeksen (story 2.9, FR-104): «Hovedindeksen» står over tabellen på forsiden, med symbolet, verdien, endringen mot forrige børsdag og «x av N gikk bedre enn indeksen», også i demoen med DEMIX. Flettet i `b44284f`, PR #59. Søylene (FR-105, story 2.9b) kommer i PR 4. Statusen i tabellen er ikke endret.
+
+*Lagt til 2026-10-17 kl. 22:59:* raden «Kvalitetssikring og testing»: [kvalitetssikringen](kvalitetssikring.md) er oppdatert og flettet i `eca81b4`, PR #61 (story 9.1). Tallene er talt på nytt (2383 tester på `3699a16`, og 2393 med den nye testfila), §3 og §5 har en rad for hver spesifikasjon fra 2.2 til 10.3, §6 har Rettet-linjer og nye hull, og §11–§13 er nye: feil vi fant og rettet, feilhåndtering og hemmeligheter, og manuelle tester. `tests/test_kvalitetssikring.py` holder radene og testnavnene i kvalitetssikringen og i denne matrisen. Statusen i tabellen er ikke endret.
