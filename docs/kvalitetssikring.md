@@ -688,7 +688,7 @@ Dokumentet oppdateres ved hver epic, sammen med kodegjennomgangen av den
 så dokumentet kan oppdateres uten hull. Det var ikke gjort for alle storyene
 før 03.10 (§3, «Åpne punkter i kildene»).
 
-*Lagt til 2026-10-17 (story 9.7):* ruff kjøres før en commit, `uv run ruff format` og så `uv run ruff check`, med pyflakes, importene og bugbear (`pyproject.toml`). CI kjører `ruff check` og `ruff format --check` før testene, og `tests/test_ruff.py` gjør det samme, så pytest feiler lokalt også.
+*Lagt til 2026-10-17 (story 9.7):* ruff kjøres før en commit, `uv run ruff check --fix` og så `uv run ruff format`, med pyflakes, importene og bugbear (`pyproject.toml`). CI kjører `ruff check` og `ruff format --check` før testene, og `tests/test_ruff.py` gjør det samme, så pytest feiler lokalt også.
 
 *Lagt til 2026-10-17:* `tests/test_kvalitetssikring.py` passer på to av punktene: hver spesifikasjon med status `done` har en rad i §3 og i §5, og hver test dette dokumentet og `vurderingsmatrise.md` nevner med fil og navn, finnes. Hver PR får triagen som kommentar (§5).
 
