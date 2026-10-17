@@ -57,6 +57,11 @@ class Indeksleser(Protocol):
     def sist_hentet(self, symbol: str) -> datetime | None:
         """Naar indeksens serie sist ble erstattet, i UTC. None hvis aldri."""
 
+    def symboler(self) -> tuple[str, ...]:
+        """Indeksene lageret har en serie for, sist hentet foerst og saa
+        etter symbolet - story 2.9. Forsiden viser den foerste, saa den ekte
+        basen viser OSEBX og demobasen DEMIX. Tom naar lageret ikke har noen."""
+
 
 @runtime_checkable
 class Indekslager(Indeksleser, Protocol):
@@ -128,3 +133,6 @@ class MinneIndekslager:
 
     def sist_hentet(self, symbol: str) -> datetime | None:
         return self._hentet.get(symbol)
+
+    def symboler(self) -> tuple[str, ...]:
+        return tuple(sorted(self._hentet, key=lambda s: (-self._hentet[s].timestamp(), s)))
