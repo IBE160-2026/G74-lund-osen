@@ -26,6 +26,7 @@ from boersdag import innevaerende_boersdag, norsk_dato
 from kursdata import AKSJEUNIVERS, Aksje
 from lagring_fil import SnapshotKilde, nyeste_leser, nyeste_snapshot
 from lagring_sqlite import SqliteKurslager, SqliteVurderingslager, aapne_base
+from migrering import siste_versjon
 from signalberegning import beregn_signal, vurder
 from vurderingsdata import Grunn, Vurdering
 
@@ -3005,8 +3006,10 @@ def base_paa_versjon(tmp_path, base, versjon: int, uten_kurs=(), uten_vurdering=
                 continue
             tilkobling.execute("INSERT INTO kurs VALUES (?, ?, 1.0, 1.0, 10)",
                                (aksje.symbol, dato.isoformat()))
+            # Tidene gaar mot rekkefoelgen i lista: den siste i lista er eldst
+            # (gjennomgangen av 2.8b, VG3).
             tilkobling.execute("INSERT INTO kursserie VALUES (?, ?)",
-                               (aksje.symbol, _utc(2026, 9, 22, 20, nr).isoformat()))
+                               (aksje.symbol, _utc(2026, 9, 22, 20, 59 - nr).isoformat()))
             if aksje.symbol not in uten_vurdering:
                 tilkobling.execute(
                     "INSERT INTO vurdering (symbol, dato, grunn) VALUES (?, ?, 'signal_ikke_regnet')",
@@ -3015,27 +3018,32 @@ def base_paa_versjon(tmp_path, base, versjon: int, uten_kurs=(), uten_vurdering=
         tilkobling.close()
 
 
+# Versjonene regnes fra katalogen, saa testene gjelder ogsaa naar neste
+# migrasjon kommer (gjennomgangen av 2.8b, BH9).
+SISTE = siste_versjon(lagring_sqlite.MIGRASJONSKATALOG)
+
+
 class TestSjekkenLeserEnBaseEnVersjonBak:
     """Story 2.8, punkt a. Ville feilet hvis sjekken krevde siste versjon
     igjen (mutant A1): da gir den RuntimeError paa en base paa versjon 5."""
 
-    def test_de_tre_sjekkene_virker_paa_versjon_5_og_fila_er_uendret(self, tmp_path, stier):
+    def test_de_tre_sjekkene_virker_en_versjon_bak_og_fila_er_uendret(self, tmp_path, stier):
         _, base = stier
-        siste = len(list(lagring_sqlite.MIGRASJONSKATALOG.glob("*.sql")))
-        base_paa_versjon(tmp_path, base, siste - 1, uten_kurs=("DNB",), uten_vurdering=("EQNR",))
+        base_paa_versjon(tmp_path, base, SISTE - 1, uten_kurs=("DNB",), uten_vurdering=("EQNR",))
         foer = sha(base)
 
         assert fp.manglende_i_basen(base, TIRSDAG_22_09) == ["DNB"]
         assert fp.manglende_vurderinger(base, TIRSDAG_22_09) == ["EQNR", "DNB"]
-        # DNB har ingen serie og kommer foerst, saa kursserie.hentet avgjoer.
-        assert fp.eldste_foerst(base, ["NHY", "DNB", "EQNR"]) == ["DNB", "EQNR", "NHY"]
+        # DNB har ingen serie og kommer foerst, saa kursserie.hentet avgjoer:
+        # NHY er hentet foer EQNR, mot rekkefoelgen i lista (VG3).
+        assert fp.eldste_foerst(base, ["NHY", "DNB", "EQNR"]) == ["DNB", "NHY", "EQNR"]
         assert sha(base) == foer
 
     def test_hentingen_ser_at_basen_har_dagen_og_gjoer_0_kall(self, tmp_path, stier):
         """Som 16.10, men med basen paa versjon 5 og 0006 flettet. Ville feilet
         hvis sjekken ga RuntimeError og hentingen gikk videre til filvakten."""
         raa, base = stier
-        base_paa_versjon(tmp_path, base, 5)
+        base_paa_versjon(tmp_path, base, SISTE - 1)
         foer = sha(base)
 
         fil, kall, ut = kjoer_23(raa, base, OEYEBLIKK_22_09 + timedelta(minutes=30),
@@ -3049,15 +3057,15 @@ class TestSjekkenLeserEnBaseEnVersjonBak:
         """En base som staar lenger bak, kan ha et skjema lesingen ikke
         kjenner. Den avvises, og hentingen henter og migrerer den."""
         _, base = stier
-        base_paa_versjon(tmp_path, base, 4)
-        with pytest.raises(RuntimeError, match="versjon 4"):
+        base_paa_versjon(tmp_path, base, SISTE - 2)
+        with pytest.raises(RuntimeError, match=f"versjon {SISTE - 2}"):
             fp.manglende_i_basen(base, TIRSDAG_22_09)
 
     def test_en_skriver_faar_aldri_en_base_en_versjon_bak(self, tmp_path, stier):
         """Flagget godtas bare paa en tilkobling med query_only. Ville feilet
         hvis et lager kunne skrive til en base med et skjema det ikke kjenner."""
         _, base = stier
-        base_paa_versjon(tmp_path, base, 5)
+        base_paa_versjon(tmp_path, base, SISTE - 1)
         tilkobling = aapne_base(base, kjoer_migrasjoner=False)
         try:
             with pytest.raises(ValueError, match="query_only"):
@@ -3153,7 +3161,8 @@ class TestHovedindeksen:
         lagret = sum(1 for d in datoer if d.year in DEKKEDE_AAR and er_boersdag(d))
         assert any(d.year not in DEKKEDE_AAR for d in datoer)
         assert len(indeksen_i(base)[0]) == lagret
-        assert f"lagret {lagret} dager, tok bort {300 - lagret} som ikke er boersdager i 2026." in ut
+        aarene = ", ".join(str(aar) for aar in sorted(DEKKEDE_AAR))
+        assert f"lagret {lagret} dager, tok bort {300 - lagret} som ikke er boersdager i {aarene}." in ut
 
     @pytest.mark.parametrize("svaret", ["feil", "tomt", "form"])
     def test_et_feilet_indekskall_stopper_ikke_aksjene(self, stier, svaret):
@@ -3214,22 +3223,24 @@ class TestHovedindeksen:
         assert "indeks" not in json.loads(fil.read_text(encoding="utf-8"))
         assert indeksen_i(base) == foer
 
-    def test_en_base_paa_versjon_5_migreres_og_faar_indeksen(self, tmp_path, stier):
-        """Mandag 19.10: den ekte basen staar paa 5. Sjekken leser den (punkt
-        a), hentingen henter det som mangler, og basen migreres til 6 naar
-        hentingen skriver."""
+    def test_en_base_en_versjon_bak_migreres_og_faar_indeksen(self, tmp_path, stier):
+        """Mandag 19.10: den ekte basen staar paa 5, en bak. Sjekken leser den
+        (punkt a), hentingen henter det som mangler, og basen migreres til
+        siste versjon naar hentingen skriver."""
         from migrering import versjon
 
         raa, base = stier
-        base_paa_versjon(tmp_path, base, 5, uten_kurs=("DNB",))
-        fil, kall, ut = kjoer_23(raa, base, OEYEBLIKK_22_09 + timedelta(minutes=30))
+        base_paa_versjon(tmp_path, base, SISTE - 1, uten_kurs=("DNB",))
+        # Etter tidene i kursserie (20:45-20:59 UTC), saa ingen serie er nyere.
+        oeyeblikk = OEYEBLIKK_22_09 + timedelta(hours=1, minutes=30)
+        fil, kall, ut = kjoer_23(raa, base, oeyeblikk)
         assert fil is not None and len(kall) == 16 and "kunne ikke leses" not in ut
         tilkobling = sqlite3.connect(base)
         try:
-            assert versjon(tilkobling) == 6
+            assert versjon(tilkobling) == SISTE
         finally:
             tilkobling.close()
-        assert indeksen_i(base)[1] == OEYEBLIKK_22_09 + timedelta(minutes=30)
+        assert indeksen_i(base)[1] == oeyeblikk
 
 
 class TestAarsskiftet:
@@ -3257,3 +3268,72 @@ class TestAarsskiftet:
         assert "0 kall brukt" in ut and "NFR-08" in ut
         assert indeksen_i(base) == foer
         assert raa_filer(raa) == filene
+
+
+class TestHovedindeksenEtterGjennomgangen:
+    """Gjennomgangen av 2.8b: VG1, VG2 og BH4/ECH3."""
+
+    def test_en_serie_porten_avviser_stopper_ikke_aksjene(self, stier):
+        """VG1: bare helgedager, saa porten avviser serien som tom. Aksjene
+        lagres og vurderes, og kjoeringen gir kode 0. Ville feilet uten
+        except ValueError i skriv_indeksen_til_basen."""
+        raa, base = stier
+        helg = [r for r in serie_til(TIRSDAG_22_09) if date.fromisoformat(r["date"]).weekday() >= 5]
+
+        def hent(ticker, *_):
+            return copy.deepcopy(helg) if ticker == "OSEBX.OL" else serie_til(TIRSDAG_22_09)
+
+        fil, kall, ut = kjoer_23(raa, base, OEYEBLIKK_22_09, hent)
+        assert fil is not None and len(kall) == 16
+        assert "Hovedindeksen OSEBX: avvist og ikke lagret" in ut
+        assert antall_rader(base, "vurdering") == len(AKSJEUNIVERS)
+        assert indeksen_i(base) == ([], None)
+
+    def test_en_feil_i_basen_for_indeksen_stopper_ikke_aksjene(self, stier, monkeypatch):
+        """VG1: basen feiler bare for indeksen. Ville feilet uten except
+        BASEFEIL i skriv_indeksen_til_basen."""
+        raa, base = stier
+
+        def feiler(*_):
+            raise sqlite3.OperationalError("disk I/O error")
+
+        monkeypatch.setattr(lagring_sqlite.SqliteIndekslager, "erstatt_serie", feiler)
+        fil, _, ut = kjoer_23(raa, base, OEYEBLIKK_22_09)
+        assert fil is not None
+        assert "Hovedindeksen OSEBX: basen kunne ikke skrives (OperationalError)" in ut
+        assert antall_rader(base, "vurdering") == len(AKSJEUNIVERS)
+
+    def test_en_eldre_fil_skriver_ikke_over_en_nyere_indeks(self, stier):
+        """VG2: som for aksjene. Ville feilet uten sammenligningen, eller med
+        den snudd."""
+        from lagring_sqlite import SqliteIndekslager
+
+        _, base = stier
+        rader = fp.serie_fra_eodhd(serie_til(TIRSDAG_22_09))
+        nyere, eldre = OEYEBLIKK_22_09 + timedelta(hours=1), OEYEBLIKK_22_09
+        tilkobling = aapne_base(base)
+        try:
+            SqliteIndekslager(tilkobling).erstatt_serie("OSEBX", rader, nyere)
+        finally:
+            tilkobling.close()
+        linjer = []
+        fil = base.parent / "kurser-raa-2026-09-22.json"
+        assert fp.skriv_indeksen_til_basen(base, rader, eldre, fil, linjer.append) is False
+        assert indeksen_i(base)[1] == nyere
+        assert fil.name in linjer[0] and eldre.isoformat() in linjer[0] and nyere.isoformat() in linjer[0]
+        # Lik tid godtas, som for aksjene.
+        assert fp.skriv_indeksen_til_basen(base, rader, nyere, fil, linjer.append) is True
+
+    def test_siste_migrasjon_roerer_ikke_tabellene_sjekken_leser(self):
+        """BH4 og ECH3: sjekken leser en base en versjon bak med skjemaet til
+        siste versjon. Det holder bare saa lenge siste migrasjon ikke endrer
+        kurs, kursserie, vurdering eller aksje. Feiler testen, maa sjekken
+        vurderes paa nytt foer migrasjonen flettes."""
+        import re
+
+        siste = sorted(lagring_sqlite.MIGRASJONSKATALOG.glob("*.sql"))[-1]
+        sql = re.sub(r"--[^\n]*", "", siste.read_text(encoding="utf-8")).lower()
+        for tabell in ("kurs", "kursserie", "vurdering", "aksje"):
+            assert not re.search(rf"\b(alter|drop)\s+table\s+(if\s+exists\s+)?{tabell}\b", sql), (siste.name, tabell)
+            assert not re.search(rf"\b(update|delete\s+from|insert\s+into)\s+{tabell}\b", sql), (siste.name, tabell)
+            assert not re.search(rf"\bcreate\s+trigger\b[^;]*\bon\s+{tabell}\b", sql), (siste.name, tabell)
