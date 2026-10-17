@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-17T23:25
+updated: 2026-10-17T23:40
 ---
 
 # Kvalitetssikring
@@ -272,6 +272,7 @@ sist i dokumentet.
 | 10.2c Prompten versjon 2 | `cafe067` (#55) | 1 (4) | – | `S/spec-10-2c-prompten-versjon-2.md` |
 | 10.3 Visningen i aksjedetaljen | `e728c37` (#50), `4a22199` (#51) | 1 (15) | – | `S/spec-10-3-visningen-i-aksjedetaljen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
+| 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
 
 **Ingen story mangler.** Lista er satt sammen fra storyene med status `done`
 eller `review` i `sprint-status.yaml` (21 storyer) og squash-commitene med
@@ -463,6 +464,7 @@ funn. Antall rader i loggen:
 | 10.3, PR #50 | 21 | 13 | 8 | – |
 | 10.3, PR #51 | 13 | 9 | 2 | 2 |
 | 9.1, oppdatering 17.10 | 19 | 17 | 2 | – |
+| 9.7 | 19 | 13 | 6 | – |
 
 Noen rader slår sammen flere funn, så kolonnene summerer ikke alltid til
 radtallet. 1.6 har i tillegg seks rader med «ingen endring», og BH2 ble avvist
@@ -1135,3 +1137,4 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 10.2c | H1–H4 | testene står per mutant i tabellen i spesifikasjonen | `S/spec-10-2c-…` |
 | 10.3 | V1–V4, VR1–VR4 og B1–B7 | testene står per mutant i tabellene i spesifikasjonen | `S/spec-10-3-…` |
 | 9.1 | Q1–Q4 | Q1, Q3 og Q4 `test_hver_ferdige_spesifikasjon_har_en_rad`, Q2 `test_hver_test_dokumentene_nevner_finnes` | `S/spec-9-1-…` |
+| 9.7 | A1–A5 | A1 `test_ruff_check_finner_ingenting`, A2 og A3 `test_ruff_format_er_kjoert`, A4 `test_ci_kjoerer_ruff_foer_testene`, A5 `test_ingen_modul_i_src_bruker_meldinger` | `S/spec-9-7-…` |
