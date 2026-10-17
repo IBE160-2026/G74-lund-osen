@@ -2,7 +2,7 @@
 title: 'Story 2.8, PR 2 (2.8b): kallet for hovedindeksen i hentingen, 16 kall, og sjekken av basen før kallene'
 type: 'feature'
 created: '2026-10-17'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '0665703'
@@ -48,6 +48,8 @@ context:
 - Ingen kall til EODHD utover kvotesjekken i regel 15. `src/fetch_prices.py` kjøres ikke mot EODHD, og `data/db/ose.db` røres ikke (regel 22). Testene bruker midlertidige baser og falske hentere.
 - Den ekte basen migreres til versjon 6 første gang hentingen skriver, mandag 19.10 etter flettingen.
 - Flettes ikke uten ja fra gruppen.
+
+*Lagt til 2026-10-17 kl. 12:30:* PR #57 er squash-flettet i `bcac2b5`, låst til head-en `b4a0721`, etter gruppens ja kl. 11:58 (gitt for når kode 3 var gjort). CI var grønn på head-en (kjøring 39025050482).
 
 **Testtallet før:** 2274 bestått og 17 hoppet over (head-en til PR #56, `59020e2`, samme kode og tester som main etter `1d3a21d`).
 

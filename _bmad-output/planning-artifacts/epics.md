@@ -1617,6 +1617,8 @@ tall kan sammenlignes med børsen som helhet.
 
 *Avgjort 2026-10-17 kl. 11:58 (gruppens svar om PR #57):* feiler bare hovedindeksen, gir hentingen kode 3, så en feil med indeksen ikke ser ut som en vellykket kjøring (BH7 i gjennomgangen av 2.8b). Ikke 2, fordi argparse bruker 2 for feil i argumentene. Kode 1 går foran: mangler også en aksje dagens kurs, gir kjøringen 1, fordi aksjen kan prøves igjen samme kveld. Rådet anbefalte 0. Ja til flettingen når det er gjort.
 
+*Lagt til 2026-10-17 kl. 12:30:* PR 2 (2.8b), kallet for `OSEBX.OL` i hentingen med 16 kall, kode 3 når bare hovedindeksen feiler, og sjekken av basen som leser en base en versjon bak, er flettet i `bcac2b5`, PR #57. CI var grønn på head-en `b4a0721` (kjøring 39025050482). Storyen er done.
+
 **Avhenger av:** 2.3 og 4.3 (`ki_logg` er `0005`). **Én økt:** ja.
 
 ### Story 2.9: Hovedindeksen i markedsoversikten
