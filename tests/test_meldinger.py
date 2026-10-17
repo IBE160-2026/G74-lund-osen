@@ -5,6 +5,9 @@ som hentes er testdata som endrer seg, og da tester vi boersen i stedet for
 koden vaar.
 """
 
+import ast
+from pathlib import Path
+
 import pytest
 
 from meldinger import (
@@ -254,3 +257,19 @@ class TestUkjentKategoriGaarIkkeTilKi:
         ]
 
         assert [m.id for m in til_ki_vurdering(filtrer(meldinger))] == ["a"]
+
+
+def test_ingen_modul_i_src_bruker_meldinger():
+    """Story 9.7 (gjennomgangen, BH12): docstringen i meldinger.py sier at den
+    ikke brukes i v1. Ville feilet hvis en modul i src/ importerte den, saa
+    docstringen ikke stemte lenger."""
+    src = Path(__file__).resolve().parent.parent / "src"
+    brukere = []
+    for fil in sorted(src.rglob("*.py")):
+        for node in ast.walk(ast.parse(fil.read_text(encoding="utf-8"))):
+            navn = [a.name for a in node.names] if isinstance(node, ast.Import) else []
+            if isinstance(node, ast.ImportFrom) and node.module:
+                navn = [node.module]
+            if any(n.split(".")[0] == "meldinger" for n in navn):
+                brukere.append(fil.name)
+    assert brukere == []
