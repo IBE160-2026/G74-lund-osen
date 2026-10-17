@@ -7,6 +7,13 @@ sparer oss for en frontend-avhengighet vi ellers maatte forsvart.
 Aarsaken til at dette ligger i en egen fil, er at koordinatregning er lett aa
 teste og vanskelig aa se feil i. En linje som ligger noen piksler galt, ser
 riktig ut.
+
+Story 2.9c: hovedindeksen er en stiplet linje i grafen. Den regnes om til
+aksjens kurs: startdagen er den foerste dagen i grafen indeksen ogsaa har, og
+hver dag indeksen har, faar kurs(start) x indeks(dag) / indeks(start). Saa
+starter linja paa aksjens kurs, og aksjens linje over den betyr at aksjen
+gikk bedre enn indeksen i perioden. Dager indeksen ikke har, faar ikke noe
+punkt. Kursen, snittet og indeksen deler skala.
 """
 
 from dataclasses import dataclass
@@ -86,14 +93,33 @@ class Graf:
     kursnavn: Navn | None = None
     snittnavn: Navn | None = None
     siste: Navn | None = None
+    indekslinje: str = ""
+    indeksstart: date | None = None
 
     @property
     def har_ma50(self) -> bool:
         return bool(self.ma50linje)
 
+    @property
+    def har_indeks(self) -> bool:
+        return bool(self.indekslinje)
 
-def _spenn(punkter: tuple[Punkt, ...]) -> tuple[float, float]:
-    """Laveste og hoyeste verdi som skal faa plass - baade kurs og snitt.
+
+def indeksverdier(punkter: tuple[Punkt, ...], indeks: dict[date, float] | None) -> dict[date, float]:
+    """Indeksen regnet om til aksjens kurs, for hver dag i grafen indeksen
+    har - story 2.9c. Tom naar indeksen har faerre enn to dager i grafen."""
+    if not indeks:
+        return {}
+    felles = [p for p in punkter if p.dato in indeks]
+    if len(felles) < 2:
+        return {}
+    start = felles[0]
+    return {p.dato: start.kurs * indeks[p.dato] / indeks[start.dato] for p in felles}
+
+
+def _spenn(punkter: tuple[Punkt, ...], ekstra: tuple[float, ...] = ()) -> tuple[float, float]:
+    """Laveste og hoyeste verdi som skal faa plass - baade kurs og snitt, og
+    indeksen regnet om (ekstra, story 2.9c).
 
     Snittet maa vaere med i regnestykket. Var det ikke det, kunne MA50-linja
     havnet utenfor tegneflaten uten at noe feilet, og sjekk 1 ville blitt
@@ -101,6 +127,7 @@ def _spenn(punkter: tuple[Punkt, ...]) -> tuple[float, float]:
     """
     verdier = [p.kurs for p in punkter]
     verdier += [p.ma50 for p in punkter if p.ma50 is not None]
+    verdier += list(ekstra)
 
     lav, hoy = min(verdier), max(verdier)
     if lav == hoy:
@@ -214,14 +241,22 @@ def _rutenett(lav: float, hoy: float, hoyde: int, linjer: int = 3) -> tuple[Rute
     return tuple(ut)
 
 
-def bygg_graf(punkter: tuple[Punkt, ...], bredde: int = BREDDE, hoyde: int = HOYDE) -> Graf | None:
-    """Koordinatene for kurs og MA50. None naar det ikke er noe aa tegne."""
+def bygg_graf(
+    punkter: tuple[Punkt, ...],
+    bredde: int = BREDDE,
+    hoyde: int = HOYDE,
+    indeks: dict[date, float] | None = None,
+) -> Graf | None:
+    """Koordinatene for kurs og MA50, og for indeksen naar den er gitt som
+    {dato: verdi} (story 2.9c). None naar det ikke er noe aa tegne."""
     if len(punkter) < 2:
         return None
 
-    lav, hoy = _spenn(punkter)
+    omregnet = indeksverdier(punkter, indeks)
+    lav, hoy = _spenn(punkter, tuple(omregnet.values()))
     kurslinje = _koordinater(punkter, lambda p: p.kurs, lav, hoy, bredde, hoyde)
     ma50linje = _koordinater(punkter, lambda p: p.ma50, lav, hoy, bredde, hoyde)
+    indekslinje = _koordinater(punkter, lambda p: omregnet.get(p.dato), lav, hoy, bredde, hoyde)
     kursnavn, snittnavn = _navnene(kurslinje, ma50linje, hoyde)
     siste = _siste(kurslinje)
 
@@ -239,4 +274,6 @@ def bygg_graf(punkter: tuple[Punkt, ...], bredde: int = BREDDE, hoyde: int = HOY
         siste_dato=punkter[-1].dato,
         maanedsmerker=_maanedsmerker(punkter, bredde),
         rutenett=_rutenett(lav, hoy, hoyde),
+        indekslinje=indekslinje,
+        indeksstart=min(omregnet) if omregnet else None,
     )
