@@ -570,6 +570,9 @@ har sju punkter uten `resolved:` 03.10:
   og hvert kall bruker kvote (docstringen i `src/fetch_prices.py`). Testene
   kjører den bare med `requests.get` byttet ut (`tests/test_fetch_prices.py`).
   Om EODHD svarer som vi venter, prøves bare av den daglige hentingen (§4).
+  *Lagt til 2026-10-17:* det samme gjelder kallet for hovedindeksen,
+  `hent_indeksen` (story 2.8, `bcac2b5`), som bruker `hent_ett_symbol`. Første
+  ekte henting med indeksen er mandag 19.10.
 - **Nettsperren dekker ikke hele testkjøringen.** Den er en autouse-fixture med
   funksjonsscope og gjelder bare inne i testfunksjonene. En fixture med
   `scope="module"` nådde nettet 23.09, og `gethostbyname`, `gethostbyname_ex`
@@ -577,8 +580,14 @@ har sju punkter uten `resolved:` 03.10:
   for `connect_ex` og en fixture med module-scope (`epics.md`, story 4.0).
   Sperren stopper heller ikke UDP. Det er K11 i kontrollen 26.09, og rapporten
   legger det til story 4.0 (`docs/kontroll-2026-09-26.md`, linje 211 og 443).
+  *Rettet 2026-10-17:* story 4.0 (`dc43569`, PR #44) la sperren over hele
+  testkjøringen, også innsamlingen, navneoppslagene og UDP. Testene står i §2,
+  blant dem `tests/test_ingen_nettverk.py::test_innsamlingen_er_sperret` og
+  `tests/test_ingen_nettverk.py::test_udp_blokkeres`.
 - **TZ-testene lokalt.** De 16 testene som hoppes over på Windows, kjøres bare
   i CI (§2).
+  *Lagt til 2026-10-17:* nå hoppes 17 over, med testen for `AF_UNIX` fra story
+  4.0 (§2).
 - **Vurderingslageret mot to adaptere.** Det finnes bare `SqliteVurderingslager`,
   med vilje (§2).
 - **Skriptene for morgensjekken.** `.github/scripts/morgensjekk.py` og
@@ -586,11 +595,25 @@ har sju punkter uten `resolved:` 03.10:
 - **Det appen viser fra basen.** Webserveren leser fortsatt øyeblikksbildene,
   ikke basen (README, «Kom i gang»). Vurderingene som lagres fra 02.10, vises
   ikke ennå (story 2.2 og 2.7).
+  *Rettet 2026-10-17:* webserveren leser basen fra story 2.2 (`1570ae9`, PR #19),
+  og sidene viser dagens vurdering fra 2.2b (`ff58ecf`, PR #20), med
+  `tests/test_app.py::test_rutene_gjoer_ingen_nettverkskall`. Historikken, de
+  lagrede vurderingene dag for dag, vises ennå ikke (story 2.7, backlog).
 - **Det som ikke er bygget.** Docker finnes ikke (ingen `Dockerfile`).
   KI-laget er ikke bygget (Epic 10), og `src/` har ingen KI-kode.
   Børsdagskontrollen (2.3) og hovedindeksen (2.8) er ikke bygget.
+  *Rettet 2026-10-17:* alt i punktet er bygget og flettet. Docker: story 3.1
+  (`a2ecee8`, PR #23) og 3.2 (`088c885`, PR #24), og CI bygger og kjører imaget
+  i jobben `docker` i `.github/workflows/tester.yml`. KI-laget: 4.2 (`a1d22f1`),
+  4.3 (`3a089c8`), 10.1 (`6855861`), 10.2 (`77ebf31`, `b13e50f` og `cafe067`) og
+  10.3 (`e728c37` og `4a22199`). Børsdagskontrollen: 2.3 (`249853e`, PR #22),
+  med grensen kl. 21:00 fra `336204f`. Hovedindeksen: 2.8 (`1d3a21d` og
+  `bcac2b5`) og visningen i 2.9 (`b44284f`). Søylene (2.9b), historikken (2.7),
+  «Min liste» (8.3) og KI-tekstene i demoen (3.4b) står i backlog.
 - **Brukere.** Ingen brukertest er gjort ennå (story 8.1). Sidene er bare
   prøvd med Flask sin testklient, ikke i en nettleser.
+  *Lagt til 2026-10-17:* står fortsatt. 8.1 står i backlog, og ingen test i
+  `tests/` starter en nettleser. Vi har gått gjennom «Kom i gang» selv 16.10 (§13).
 - **To kontroller for hånd** står som gjenstående i `malinger.md` §6: de tre
   sjekkene i et regneark, og kursene mot Oslo Børs. Ingenting viser at de er
   gjort. Sluttverdien for OSEBX er kontrollert for hånd én gang (`malinger.md`
@@ -612,6 +635,24 @@ har sju punkter uten `resolved:` 03.10:
   [`docs/kontroll-2026-09-26.md`](kontroll-2026-09-26.md#etterkontroll-0310)).
   *Rettet 2026-10-03, senere samme dag:* nå er 20 lukket, 4 delvis og 50 står.
   *Rettet 2026-10-03, etter svarene fra gruppa:* nå er 24 lukket, 4 delvis og 46 står.
+
+*Lagt til 2026-10-17, nye hull:*
+
+- **Ekte svar fra den lokale modellen.** Testene for `OllamaModell` bruker en
+  falsk Ollama (`tests/test_ki_lokal.py`), og ingen test kaller modellen. Den
+  er bare prøvd i prøvekjøringene mot en kopi av basen, ført i `malinger.md`
+  §32 og §34.
+- **At CI kjører uten hemmeligheter, har ingen test.** Arbeidsflyten har
+  `permissions: contents: read` og ingen `secrets.`, sjekket for hånd 17.10 mot
+  `.github/workflows/tester.yml`. Ingen test leser det.
+- **README-prøven er ikke tatt.** Prøve 1, 2 og 3 i §9 står uten dato og
+  resultat, og story 3.4 står i review til den er tatt (§9 og §13).
+- **Hovedindeksen med ekte data.** Kallet, lagringen og visningen er prøvd
+  med testserier. Første ekte henting med indeksen er mandag 19.10, og verdien
+  for OSEBX er kontrollert for hånd én gang (`malinger.md` §14).
+- **Grensen kl. 21:00 er prøvd for én aksje én dag** (`malinger.md` §31).
+  Mandag 19.10 sammenlignes fire aksjer med kursfila etter kl. 22, med kallene
+  som er igjen (beslutningen 17.10 kl. 22:00 under story 2.3 i `epics.md`).
 
 ## 7. Hvordan KI-arbeidet kontrolleres
 
