@@ -8,6 +8,12 @@ relevansvurdering.
 Rekkefoelgen er bestemt: deduplisering foerst, kategorifilter etterpaa
 (FR-501). Motsatt rekkefoelge ville talt dubletter som passerte filteret to
 ganger.
+
+Brukes ikke i v1. Boersmeldingene er ute av v1 fra 2026-09-28 (plan B,
+punkt 1 i prd.md §8): KI-laget forklarer signalet i stedet (Epic 10), og
+ingen modul i src/ importerer denne. Den er beholdt med testene i
+tests/test_meldinger.py, som plan for en senere versjon, slik storyene i
+Epic 6 (Boersmeldinger i oversikten) staar i epics.md.
 """
 
 from dataclasses import dataclass

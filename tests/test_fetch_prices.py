@@ -21,8 +21,8 @@ import requests
 import fetch_prices as fp
 import lagring_fil
 import lagring_sqlite
-from eodhd_serier import AVVISTE, AVVISTE_IDER
 from boersdag import innevaerende_boersdag, norsk_dato
+from eodhd_serier import AVVISTE, AVVISTE_IDER
 from kursdata import AKSJEUNIVERS, Aksje
 from lagring_fil import SnapshotKilde, nyeste_leser, nyeste_snapshot
 from lagring_sqlite import SqliteKurslager, SqliteVurderingslager, aapne_base
@@ -54,8 +54,8 @@ KALL = len(AKSJEUNIVERS) + 1
 
 def nok_kvote(_noekkel):
     """Svar fra /api/user med hele dagskvoten igjen (story 2.3)."""
-    return {"apiRequests": 0, "apiRequestsDate": "2026-01-01",
-            "dailyRateLimit": 20, "extraLimit": 0}
+    return {"apiRequests": 0, "apiRequestsDate": "2026-01-01", "dailyRateLimit": 20, "extraLimit": 0}
+
 
 # 22:00 i Oslo 22.09.2026. kjoer tar et oeyeblikk med sone (story 2.1).
 OEYEBLIKK_22_09 = datetime(2026, 9, 22, 20, 0, tzinfo=timezone.utc)
@@ -78,7 +78,8 @@ class TestNoekkelenLekkerIkke:
 
     def test_http_feil_gir_statuskode_uten_adresse(self, monkeypatch):
         monkeypatch.setattr(
-            fp.requests, "get",
+            fp.requests,
+            "get",
             lambda url, params, timeout: falsk_respons(500, "DNB.OL", params["api_token"]),
         )
 
@@ -200,8 +201,9 @@ class TestSkriverIkkeOver:
         # da mangler dagen. Story 2.3b: basen mangler alle, saa det blir et
         # nytt forsoek; med dagens 20 brukt er det 0 kall til det.
         with pytest.raises(SystemExit) as slutt:
-            fp.kjoer(tmp_path, tmp_path / "ose.db", self.OEYEBLIKK, NOEKKEL, hent,
-                     linjer.append, les_kvote=kvote(brukt=20))
+            fp.kjoer(
+                tmp_path, tmp_path / "ose.db", self.OEYEBLIKK, NOEKKEL, hent, linjer.append, les_kvote=kvote(brukt=20)
+            )
         assert slutt.value.code == 1
         assert fil.read_text(encoding="utf-8") == '{"gammel": true}'
         assert any("finnes og skrives aldri om" in l for l in linjer)
@@ -223,10 +225,7 @@ class TestSkriverIkkeOver:
 
         assert slutt.value.code == 1
         assert fil.read_text(encoding="utf-8") == '{"annen kjoering": true}'
-        assert any(
-            "ikke skrevet over" in l and f"{KALL} kall er brukt" in l
-            for l in linjer
-        )
+        assert any("ikke skrevet over" in l and f"{KALL} kall er brukt" in l for l in linjer)
 
 
 class TestSvarMedFeilForm:
@@ -329,7 +328,9 @@ class TestHentUniverset:
         """Lista hadde fem aksjer fra tidlige tester. Den skal foelge universet."""
         hentet = []
         fp.hent_universet(
-            "noekkel", "a", "b",
+            "noekkel",
+            "a",
+            "b",
             lambda t, n, f, ti: hentet.append(t) or falsk_serie(),
             lambda _: None,
         )
@@ -340,9 +341,7 @@ class TestHentUniverset:
 
     def test_serier_lagres_paa_symbol_ikke_ticker(self):
         """Kursdata slaar opp paa EQNR, ikke EQNR.OL."""
-        resultat = fp.hent_universet(
-            "noekkel", "a", "b", lambda *_: falsk_serie(), lambda _: None
-        )
+        resultat = fp.hent_universet("noekkel", "a", "b", lambda *_: falsk_serie(), lambda _: None)
 
         assert "EQNR" in resultat.serier
         assert "EQNR.OL" not in resultat.serier
@@ -409,30 +408,22 @@ class TestHentUniverset:
         # endring paa stedet ville ellers ogsaa endret det testen sammenligner med.
         forventet = copy.deepcopy(svar)
 
-        resultat = fp.hent_universet(
-            "noekkel", "a", "b", lambda ticker, *_: svar[ticker], lambda _: None
-        )
+        resultat = fp.hent_universet("noekkel", "a", "b", lambda ticker, *_: svar[ticker], lambda _: None)
 
-        assert resultat.serier == {
-            aksje.symbol: forventet[aksje.ticker] for aksje in AKSJEUNIVERS
-        }
+        assert resultat.serier == {aksje.symbol: forventet[aksje.ticker] for aksje in AKSJEUNIVERS}
 
     def test_utskriften_viser_siste_dato_fra_serien(self):
         """Serien er usortert, saa siste dato maa komme fra den oversatte
         serien, ikke fra siste raa rad."""
         linjer = []
-        fp.hent_universet(
-            "noekkel", "a", "b", lambda *_: falsk_serie(60)[::-1], linjer.append
-        )
+        fp.hent_universet("noekkel", "a", "b", lambda *_: falsk_serie(60)[::-1], linjer.append)
 
         assert any("60 dager, siste 2026-07-30" in linje for linje in linjer)
 
     def test_kort_serie_merkes_i_utskriften(self):
         """En serie under 51 dager kan ikke gi signal. Det skal vaere synlig."""
         linjer = []
-        fp.hent_universet(
-            "noekkel", "a", "b", lambda *_: falsk_serie(10), linjer.append
-        )
+        fp.hent_universet("noekkel", "a", "b", lambda *_: falsk_serie(10), linjer.append)
 
         assert any("for kort for MA50" in linje for linje in linjer)
 
@@ -460,16 +451,16 @@ class TestOyeblikksbilde:
                 for i in range(60)
             ]
 
-        fil = fp.kjoer(tmp_path, tmp_path / "ose.db", OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None, les_kvote=nok_kvote)
+        fil = fp.kjoer(
+            tmp_path, tmp_path / "ose.db", OEYEBLIKK_22_09, NOEKKEL, hent, lambda _: None, les_kvote=nok_kvote
+        )
         assert fil is not None and fil.parent == tmp_path
 
         leser = nyeste_leser(tmp_path)
         assert leser is not None
         for aksje in AKSJEUNIVERS:
             tid = leser.sist_hentet(aksje.symbol)
-            assert tid is not None, (
-                f"{aksje.symbol}: visningen kan ikke lese hentet-tiden i fila"
-            )
+            assert tid is not None, f"{aksje.symbol}: visningen kan ikke lese hentet-tiden i fila"
             assert len(leser.serie(aksje.symbol)) == 60, (
                 f"{aksje.symbol}: visningen leser ikke alle radene hentingen skrev"
             )
@@ -501,13 +492,9 @@ class TestOyeblikksbilde:
 
 def test_ingen_test_her_roerer_nettet(monkeypatch):
     """Vakt: gaar en test forbi den injiserte henteren, skal den feile."""
-    monkeypatch.setattr(
-        fp.requests, "get", lambda *a, **k: pytest.fail("ingen test skal kalle nettet")
-    )
+    monkeypatch.setattr(fp.requests, "get", lambda *a, **k: pytest.fail("ingen test skal kalle nettet"))
 
-    resultat = fp.hent_universet(
-        "noekkel", "a", "b", lambda *_: falsk_serie(), lambda _: None
-    )
+    resultat = fp.hent_universet("noekkel", "a", "b", lambda *_: falsk_serie(), lambda _: None)
     assert resultat.kall_brukt == len(AKSJEUNIVERS)
 
 
@@ -561,9 +548,16 @@ def _kjoer_matrisen(tmp_path, rad):
     for nr, (oeyeblikk, dato, hentet) in enumerate(rad):
         katalog = tmp_path / str(nr)
         boersdag = innevaerende_boersdag(date.fromisoformat(dato))
-        fil = fp.kjoer(katalog, tmp_path / f"ose-{nr}.db", oeyeblikk, NOEKKEL,
-                       lambda *_: serie_til(boersdag), lambda _: None,
-                       uten_tidskontroll=True, les_kvote=nok_kvote)
+        fil = fp.kjoer(
+            katalog,
+            tmp_path / f"ose-{nr}.db",
+            oeyeblikk,
+            NOEKKEL,
+            lambda *_, boersdag=boersdag: serie_til(boersdag),
+            lambda _: None,
+            uten_tidskontroll=True,
+            les_kvote=nok_kvote,
+        )
 
         assert fil == katalog / f"kurser-raa-{boersdag.isoformat()}.json"
         bilde = json.loads(fil.read_text(encoding="utf-8"))
@@ -590,7 +584,15 @@ class TestBoersdagIOsloTidsstempelIUtc:
             pytest.fail("ingen kall skal brukes naar oeyeblikket mangler sone")
 
         with pytest.raises(ValueError):
-            fp.kjoer(tmp_path, tmp_path / "ose.db", datetime(2026, 9, 25, 0, 30), NOEKKEL, hent, lambda _: None, les_kvote=nok_kvote)
+            fp.kjoer(
+                tmp_path,
+                tmp_path / "ose.db",
+                datetime(2026, 9, 25, 0, 30),
+                NOEKKEL,
+                hent,
+                lambda _: None,
+                les_kvote=nok_kvote,
+            )
 
         assert list(tmp_path.iterdir()) == []
 
@@ -633,8 +635,14 @@ class TestMaskinensSoneSpillerIngenRolle:
 
     def test_oeyeblikk_uten_sone_avvises_ogsaa_her(self, tmp_path, maskinsone):
         with pytest.raises(ValueError):
-            fp.kjoer(tmp_path, tmp_path / "ose.db", datetime(2026, 9, 25, 0, 30), NOEKKEL,
-                lambda *_: pytest.fail("ingen kall"), lambda _: None, les_kvote=nok_kvote,
+            fp.kjoer(
+                tmp_path,
+                tmp_path / "ose.db",
+                datetime(2026, 9, 25, 0, 30),
+                NOEKKEL,
+                lambda *_: pytest.fail("ingen kall"),
+                lambda _: None,
+                les_kvote=nok_kvote,
             )
         assert list(tmp_path.iterdir()) == []
 
@@ -756,7 +764,15 @@ class TestHentingenSkriverBasen:
         """K1 og K3: fila i raa/, basen i db/ose.db, og hver serie i basen har
         samme hentet som fila. Ville feilet hvis hentet kom fra klokka (M5)."""
         raa, base = stier
-        fil = fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, lambda *_: serie_til(TIRSDAG_22_09), lambda _: None, les_kvote=nok_kvote)
+        fil = fp.kjoer(
+            raa,
+            base,
+            OEYEBLIKK_22_09,
+            NOEKKEL,
+            lambda *_: serie_til(TIRSDAG_22_09),
+            lambda _: None,
+            les_kvote=nok_kvote,
+        )
 
         assert fil == raa / "kurser-raa-2026-09-22.json"
         assert base.is_file()
@@ -766,9 +782,7 @@ class TestHentingenSkriverBasen:
             for aksje in AKSJEUNIVERS:
                 assert lager.sist_hentet(aksje.symbol) == OEYEBLIKK_22_09
                 assert lager.sist_hentet(aksje.symbol) == datetime.fromisoformat(bilde["hentet"])
-                assert lager.serie(aksje.symbol) == fp.serie_fra_eodhd(
-                    bilde["serier"][aksje.symbol]
-                )
+                assert lager.serie(aksje.symbol) == fp.serie_fra_eodhd(bilde["serier"][aksje.symbol])
         finally:
             tilkobling.close()
         assert antall_rader(base, "kursserie") == len(AKSJEUNIVERS) == 15
@@ -915,10 +929,7 @@ class TestHentingenSkriverBasen:
         tilkobling, lager = lager_i(base)
         try:
             assert lager.sist_hentet("DNB") is None
-            assert all(
-                lager.sist_hentet(a.symbol) == OEYEBLIKK_22_09
-                for a in AKSJEUNIVERS if a.symbol != "DNB"
-            )
+            assert all(lager.sist_hentet(a.symbol) == OEYEBLIKK_22_09 for a in AKSJEUNIVERS if a.symbol != "DNB")
         finally:
             tilkobling.close()
 
@@ -928,8 +939,15 @@ class TestHentingenSkriverBasen:
         symboler som ikke finnes i basen (M12)."""
         raa, base = stier
         # Mandag 21.09, saa fredag 25.09, begge kl. 22 i Oslo: 22.-25. mangler.
-        fp.kjoer(raa, base, _utc(2026, 9, 21, 20), NOEKKEL,
-                 lambda *_: serie_til(date(2026, 9, 21)), lambda _: None, les_kvote=nok_kvote)
+        fp.kjoer(
+            raa,
+            base,
+            _utc(2026, 9, 21, 20),
+            NOEKKEL,
+            lambda *_: serie_til(date(2026, 9, 21)),
+            lambda _: None,
+            les_kvote=nok_kvote,
+        )
         kall = []
 
         def hent(ticker, *_):
@@ -960,7 +978,15 @@ class TestHentingenSkriverBasen:
             return ekte(base_sti, serier, hentet, fil, skriv, *resten)
 
         monkeypatch.setattr(fp, "skriv_til_basen", spion)
-        fil = fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, lambda *_: serie_til(TIRSDAG_22_09), lambda _: None, les_kvote=nok_kvote)
+        fil = fp.kjoer(
+            raa,
+            base,
+            OEYEBLIKK_22_09,
+            NOEKKEL,
+            lambda *_: serie_til(TIRSDAG_22_09),
+            lambda _: None,
+            les_kvote=nok_kvote,
+        )
         fp.les_inn(fil, base, lambda _: None)
 
         assert len(kall) == 2
@@ -981,9 +1007,7 @@ def uten_noekkel_og_nett(monkeypatch):
 def lag_bilde(katalog, hentet: datetime, siste: date = date(2026, 9, 22)):
     """Et oeyeblikksbilde med 15 serier, i formatet kjoer skriver."""
     katalog.mkdir(parents=True, exist_ok=True)
-    resultat = fp.Resultat(
-        serier={a.symbol: serie_til(siste) for a in AKSJEUNIVERS}, kall_brukt=15
-    )
+    resultat = fp.Resultat(serier={a.symbol: serie_til(siste) for a in AKSJEUNIVERS}, kall_brukt=15)
     fil = katalog / fp.filnavn(norsk_dato(hentet))
     bilde = fp.lag_oyeblikksbilde(resultat, "a", siste.isoformat(), hentet.isoformat())
     fil.write_text(json.dumps(bilde), encoding="utf-8")
@@ -993,9 +1017,7 @@ def lag_bilde(katalog, hentet: datetime, siste: date = date(2026, 9, 22)):
 class TestInnlesing:
     """Story 2.1b, K5 og K6: et oeyeblikksbilde som finnes, inn i basen uten kall."""
 
-    def test_innlesing_gir_15_serier_uten_vurdering_noekkel_eller_kall(
-        self, stier, uten_noekkel_og_nett
-    ):
+    def test_innlesing_gir_15_serier_uten_vurdering_noekkel_eller_kall(self, stier, uten_noekkel_og_nett):
         """Ville feilet hvis innlesingen leste noekkelen (M8)."""
         raa, base = stier
         fil = lag_bilde(raa, OEYEBLIKK_22_09)
@@ -1100,9 +1122,7 @@ class TestInnlesing:
 
     def test_symbol_utenfor_universet_nevnes_og_gir_kode_1(self, stier):
         raa, base = stier
-        fil = self._endret_bilde(
-            raa, lambda b: b["serier"].__setitem__("EQNR.OL", serie_til(date(2026, 9, 22)))
-        )
+        fil = self._endret_bilde(raa, lambda b: b["serier"].__setitem__("EQNR.OL", serie_til(date(2026, 9, 22))))
         linjer = []
 
         with pytest.raises(SystemExit) as slutt:
@@ -1174,10 +1194,7 @@ def vurderingene(base, dato: date, klokke: datetime = OEYEBLIKK_22_09) -> dict:
     try:
         lager = SqliteVurderingslager(tilkobling, lambda: klokke)
         kurslager = SqliteKurslager(tilkobling)
-        return {
-            a.symbol: (lager.les(a.symbol, dato), kurslager.serie(a.symbol))
-            for a in AKSJEUNIVERS
-        }
+        return {a.symbol: (lager.les(a.symbol, dato), kurslager.serie(a.symbol)) for a in AKSJEUNIVERS}
     finally:
         tilkobling.close()
 
@@ -1198,8 +1215,15 @@ class TestVurderingenISammeKjoering:
         med maalingene fra Signal av serien i basen. Ville feilet hvis
         standardavvik og dagens_endring var byttet om (M1)."""
         raa, base = stier
-        fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
-                 lambda *_: serie_med_utslag(TIRSDAG_22_09), lambda _: None, les_kvote=nok_kvote)
+        fp.kjoer(
+            raa,
+            base,
+            OEYEBLIKK_22_09,
+            NOEKKEL,
+            lambda *_: serie_med_utslag(TIRSDAG_22_09),
+            lambda _: None,
+            les_kvote=nok_kvote,
+        )
 
         rader = vurderingene(base, TIRSDAG_22_09)
         assert antall_rader(base, "vurdering") == 15
@@ -1211,7 +1235,9 @@ class TestVurderingenISammeKjoering:
             trend_sjekk, bevegelse_sjekk, interesse_sjekk = signal.sjekker
             assert (innhold.styrke, innhold.retning) == (signal.styrke, signal.retning)
             assert (innhold.trend, innhold.bevegelse, innhold.interesse) == (
-                trend_sjekk.verdi, bevegelse_sjekk.verdi, interesse_sjekk.verdi
+                trend_sjekk.verdi,
+                bevegelse_sjekk.verdi,
+                interesse_sjekk.verdi,
             )
             assert innhold.trend_avvik == trend_sjekk.maaling
             assert innhold.dagens_endring == bevegelse_sjekk.maaling
@@ -1225,16 +1251,24 @@ class TestVurderingenISammeKjoering:
         kjoeringen vurderer den nye serien. Ville feilet hvis vurderingen ble
         regnet foer kursene var skrevet (M2)."""
         raa, base = stier
-        fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
-                 lambda *_: serie_til(TIRSDAG_22_09), lambda _: None, les_kvote=nok_kvote)
+        fp.kjoer(
+            raa,
+            base,
+            OEYEBLIKK_22_09,
+            NOEKKEL,
+            lambda *_: serie_til(TIRSDAG_22_09),
+            lambda _: None,
+            les_kvote=nok_kvote,
+        )
         (raa / "kurser-raa-2026-09-22.json").unlink()
         senere = OEYEBLIKK_22_09 + timedelta(minutes=30)
         # Story 2.3: basesjekken ville stoppet kjoering nummer to, fordi basen
         # har dagen. Den slaas av her, som et nytt forsoek i 2.3b.
         monkeypatch.setattr(fp, "manglende_i_basen", lambda *_: ["alle"])
 
-        fp.kjoer(raa, base, senere, NOEKKEL,
-                 lambda *_: serie_med_utslag(TIRSDAG_22_09), lambda _: None, les_kvote=nok_kvote)
+        fp.kjoer(
+            raa, base, senere, NOEKKEL, lambda *_: serie_med_utslag(TIRSDAG_22_09), lambda _: None, les_kvote=nok_kvote
+        )
 
         for symbol, (innhold, serie) in vurderingene(base, TIRSDAG_22_09, senere).items():
             assert serie == fp.serie_fra_eodhd(serie_med_utslag(TIRSDAG_22_09))
@@ -1273,8 +1307,15 @@ class TestVurderingenISammeKjoering:
         monkeypatch.setattr(fp, "SqliteKurslager", Avvisende)
 
         with pytest.raises(SystemExit) as slutt:
-            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
-                     lambda *_: serie_til(TIRSDAG_22_09), lambda _: None, les_kvote=nok_kvote)
+            fp.kjoer(
+                raa,
+                base,
+                OEYEBLIKK_22_09,
+                NOEKKEL,
+                lambda *_: serie_til(TIRSDAG_22_09),
+                lambda _: None,
+                les_kvote=nok_kvote,
+            )
 
         assert slutt.value.code == 1
         rader = vurderingene(base, TIRSDAG_22_09)
@@ -1294,8 +1335,7 @@ class TestVurderingenISammeKjoering:
         # grunn skrives, utskriften nevner EQNR, og kjoeringen gir kode 1.
         linjer = []
         with pytest.raises(SystemExit) as slutt:
-            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, hent, linjer.append,
-                     les_kvote=nok_kvote)
+            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, hent, linjer.append, les_kvote=nok_kvote)
         assert slutt.value.code == 1
 
         rader = vurderingene(base, TIRSDAG_22_09)
@@ -1326,8 +1366,18 @@ class TestVurderingenISammeKjoering:
         foer = vurderingene(base, TIRSDAG_22_09)
         kall = []
 
-        assert fp.kjoer(raa, base, OEYEBLIKK_22_09 + timedelta(minutes=5), NOEKKEL,
-                        lambda *a: kall.append(a), lambda _: None, les_kvote=nok_kvote) is None
+        assert (
+            fp.kjoer(
+                raa,
+                base,
+                OEYEBLIKK_22_09 + timedelta(minutes=5),
+                NOEKKEL,
+                lambda *a: kall.append(a),
+                lambda _: None,
+                les_kvote=nok_kvote,
+            )
+            is None
+        )
 
         assert kall == []
         assert antall_rader(base, "vurdering") == 15
@@ -1338,8 +1388,15 @@ class TestVurderingenISammeKjoering:
         Vurderingen fra den foerste staar, og utskriften sier det. Ville
         feilet hvis upserten skrev en grunn over en vurdering (M6)."""
         raa, base = stier
-        fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
-                 lambda *_: serie_med_utslag(TIRSDAG_22_09), lambda _: None, les_kvote=nok_kvote)
+        fp.kjoer(
+            raa,
+            base,
+            OEYEBLIKK_22_09,
+            NOEKKEL,
+            lambda *_: serie_med_utslag(TIRSDAG_22_09),
+            lambda _: None,
+            les_kvote=nok_kvote,
+        )
         dnb_foer = vurderingene(base, TIRSDAG_22_09)["DNB"][0]
         (raa / "kurser-raa-2026-09-22.json").unlink()
         # Story 2.3: basesjekken ville stoppet kjoering nummer to, fordi basen
@@ -1384,13 +1441,21 @@ class TestVurderingenISammeKjoering:
         Leser koden klokka oftere, flytter punktet seg, og testen maa telles
         paa nytt."""
         raa, base = stier
-        start = _utc(2026, 9, 22, 21, 59, 50)   # 23:59:50 i Oslo
+        start = _utc(2026, 9, 22, 21, 59, 50)  # 23:59:50 i Oslo
         klokke = self._klokke(start, start, start, _utc(2026, 9, 22, 22, 0, 10))
         linjer = []
 
         with pytest.raises(SystemExit) as slutt:
-            fp.kjoer(raa, base, start, NOEKKEL, lambda *_: serie_til(TIRSDAG_22_09),
-                     linjer.append, klokke=klokke, les_kvote=nok_kvote)
+            fp.kjoer(
+                raa,
+                base,
+                start,
+                NOEKKEL,
+                lambda *_: serie_til(TIRSDAG_22_09),
+                linjer.append,
+                klokke=klokke,
+                les_kvote=nok_kvote,
+            )
 
         assert slutt.value.code == 1
         assert datoene_i_vurdering(base) == ["2026-09-22"]
@@ -1409,8 +1474,16 @@ class TestVurderingenISammeKjoering:
         linjer = []
 
         with pytest.raises(SystemExit) as slutt:
-            fp.kjoer(raa, base, start, NOEKKEL, lambda *_: serie_til(date(2026, 9, 25)),
-                     linjer.append, klokke=klokke, les_kvote=nok_kvote)
+            fp.kjoer(
+                raa,
+                base,
+                start,
+                NOEKKEL,
+                lambda *_: serie_til(date(2026, 9, 25)),
+                linjer.append,
+                klokke=klokke,
+                les_kvote=nok_kvote,
+            )
 
         assert slutt.value.code == 1
         assert antall_rader(base, "vurdering") == 0
@@ -1425,9 +1498,7 @@ class TestVurderingenISammeKjoering:
         base = tmp_path / "data" / "db" / "ose.db"
         monkeypatch.setattr(lagring_fil, "RAA_KATALOG", raa)
         monkeypatch.setattr(lagring_sqlite, "BASE_STI", base)
-        monkeypatch.setattr(fp, "naa", self._klokke(
-            _utc(2026, 9, 22, 21, 59, 50), _utc(2026, 9, 22, 22, 0, 10)
-        ))
+        monkeypatch.setattr(fp, "naa", self._klokke(_utc(2026, 9, 22, 21, 59, 50), _utc(2026, 9, 22, 22, 0, 10)))
 
         def get(url, params, timeout):
             ticker = url.rsplit("/", 1)[1]
@@ -1447,8 +1518,15 @@ class TestVurderingenISammeKjoering:
         gjennom main endrer ingen rad og skriver ingen ny. Ville feilet hvis
         innlesingen skrev vurderinger (M9)."""
         raa, base = stier
-        fil = fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
-                       lambda *_: serie_med_utslag(TIRSDAG_22_09), lambda _: None, les_kvote=nok_kvote)
+        fil = fp.kjoer(
+            raa,
+            base,
+            OEYEBLIKK_22_09,
+            NOEKKEL,
+            lambda *_: serie_med_utslag(TIRSDAG_22_09),
+            lambda _: None,
+            les_kvote=nok_kvote,
+        )
         foer = vurderingene(base, TIRSDAG_22_09)
         tilkobling = aapne_base(base)
         try:
@@ -1465,9 +1543,7 @@ class TestVurderingenISammeKjoering:
 
         etter = vurderingene(base, TIRSDAG_22_09)
         assert etter["DNB"][0] is None
-        assert {s: v for s, (v, _) in etter.items() if s != "DNB"} == {
-            s: v for s, (v, _) in foer.items() if s != "DNB"
-        }
+        assert {s: v for s, (v, _) in etter.items() if s != "DNB"} == {s: v for s, (v, _) in foer.items() if s != "DNB"}
         assert antall_rader(base, "vurdering") == 14
 
     def test_utskriften_har_antall_dag_og_grunner_men_ingen_kurser(self, stier):
@@ -1489,8 +1565,7 @@ class TestVurderingenISammeKjoering:
         fil = raa / fp.filnavn(TIRSDAG_22_09)
 
         assert any(
-            "Skrev 15 rader i vurdering for boersdagen 2026-09-22" in l
-            and "14 vurderinger og 1 med grunn" in l
+            "Skrev 15 rader i vurdering for boersdagen 2026-09-22" in l and "14 vurderinger og 1 med grunn" in l
             for l in linjer
         )
         assert any("Med grunn: DNB (symbol_feilet)" in l for l in linjer)
@@ -1504,9 +1579,14 @@ class TestVurderingenISammeKjoering:
         for innhold, _ in vurderingene(base, TIRSDAG_22_09).values():
             if isinstance(innhold, Vurdering):
                 verdier |= {
-                    str(getattr(innhold, felt)) for felt in (
-                        "slutt", "justert_slutt", "trend_avvik", "dagens_endring",
-                        "standardavvik", "volumforhold",
+                    str(getattr(innhold, felt))
+                    for felt in (
+                        "slutt",
+                        "justert_slutt",
+                        "trend_avvik",
+                        "dagens_endring",
+                        "standardavvik",
+                        "volumforhold",
                     )
                 }
         assert verdier
@@ -1528,8 +1608,15 @@ class TestVurderingenISammeKjoering:
         linjer = []
 
         with pytest.raises(SystemExit) as slutt:
-            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
-                     lambda *_: serie_til(TIRSDAG_22_09), linjer.append, les_kvote=nok_kvote)
+            fp.kjoer(
+                raa,
+                base,
+                OEYEBLIKK_22_09,
+                NOEKKEL,
+                lambda *_: serie_til(TIRSDAG_22_09),
+                linjer.append,
+                les_kvote=nok_kvote,
+            )
 
         assert slutt.value.code == 1
         assert antall_rader(base, "vurdering") == 0
@@ -1552,15 +1639,20 @@ class TestVurderingenISammeKjoering:
         linjer = []
 
         with pytest.raises(SystemExit) as slutt:
-            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
-                     lambda *_: serie_til(TIRSDAG_22_09), linjer.append, les_kvote=nok_kvote)
+            fp.kjoer(
+                raa,
+                base,
+                OEYEBLIKK_22_09,
+                NOEKKEL,
+                lambda *_: serie_til(TIRSDAG_22_09),
+                linjer.append,
+                les_kvote=nok_kvote,
+            )
 
         assert slutt.value.code == 1
         assert antall_rader(base, "vurdering") == 2
         assert antall_rader(base, "kursserie") == 15
-        assert any(
-            "feilet etter 2 vurderinger" in l and "database is locked" in l for l in linjer
-        )
+        assert any("feilet etter 2 vurderinger" in l and "database is locked" in l for l in linjer)
 
     def test_basen_kan_ikke_aapnes_for_vurderingene_kode_1(self, stier, monkeypatch):
         """K10 og G11: basen aapnes for kursene, men ikke for vurderingene.
@@ -1579,8 +1671,15 @@ class TestVurderingenISammeKjoering:
         linjer = []
 
         with pytest.raises(SystemExit) as slutt:
-            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL,
-                     lambda *_: serie_til(TIRSDAG_22_09), linjer.append, les_kvote=nok_kvote)
+            fp.kjoer(
+                raa,
+                base,
+                OEYEBLIKK_22_09,
+                NOEKKEL,
+                lambda *_: serie_til(TIRSDAG_22_09),
+                linjer.append,
+                les_kvote=nok_kvote,
+            )
 
         assert slutt.value.code == 1
         assert antall_rader(base, "vurdering") == 0
@@ -1600,9 +1699,7 @@ class TestVurderingenISammeKjoering:
         assert datoene_i_vurdering(base) == ["2026-09-25"]
         rader = vurderingene(base, fredag, loerdag)
         assert all(isinstance(v, Vurdering) for v, _ in rader.values())
-        assert any(
-            "boersdagen 2026-09-25 (boersen er stengt 2026-09-26)" in l for l in linjer
-        )
+        assert any("boersdagen 2026-09-25 (boersen er stengt 2026-09-26)" in l for l in linjer)
 
     def test_stengt_dag_lar_raden_fra_foer_staa(self, stier, monkeypatch):
         """K12, svar 1: fredagens rad finnes fra fredag kveld. Loerdagens
@@ -1610,8 +1707,15 @@ class TestVurderingenISammeKjoering:
         hvis raden ble skrevet over (M12)."""
         raa, base = stier
         fredag = date(2026, 9, 25)
-        fp.kjoer(raa, base, _utc(2026, 9, 25, 20, 0), NOEKKEL,
-                 lambda *_: serie_til(fredag), lambda _: None, les_kvote=nok_kvote)
+        fp.kjoer(
+            raa,
+            base,
+            _utc(2026, 9, 25, 20, 0),
+            NOEKKEL,
+            lambda *_: serie_til(fredag),
+            lambda _: None,
+            les_kvote=nok_kvote,
+        )
         loerdag = _utc(2026, 9, 26, 20, 0)
         foer = vurderingene(base, fredag, loerdag)
         linjer = []
@@ -1620,8 +1724,7 @@ class TestVurderingenISammeKjoering:
         (raa / "kurser-raa-2026-09-25.json").unlink()
         monkeypatch.setattr(fp, "manglende_i_basen", lambda *_: ["alle"])
 
-        fp.kjoer(raa, base, loerdag, NOEKKEL,
-                 lambda *_: serie_med_utslag(fredag), linjer.append, les_kvote=nok_kvote)
+        fp.kjoer(raa, base, loerdag, NOEKKEL, lambda *_: serie_med_utslag(fredag), linjer.append, les_kvote=nok_kvote)
 
         etter = vurderingene(base, fredag, loerdag)
         assert {s: v for s, (v, _) in etter.items()} == {s: v for s, (v, _) in foer.items()}
@@ -1638,8 +1741,15 @@ class TestVurderingenISammeKjoering:
         linjer = []
 
         with pytest.raises(SystemExit) as slutt:
-            fp.kjoer(raa, base, _utc(2027, 1, 4, 21, 0), NOEKKEL,
-                     lambda *a: kall.append(a), linjer.append, les_kvote=nok_kvote)
+            fp.kjoer(
+                raa,
+                base,
+                _utc(2027, 1, 4, 21, 0),
+                NOEKKEL,
+                lambda *a: kall.append(a),
+                linjer.append,
+                les_kvote=nok_kvote,
+            )
 
         assert slutt.value.code == 1
         assert kall == []
@@ -1665,8 +1775,8 @@ def ingen_kall(*_):
 
 def kvote(brukt=0, dato="2026-09-22", grense=20, bonus=0, **mer):
     def les(_noekkel):
-        return {"apiRequests": brukt, "apiRequestsDate": dato,
-                "dailyRateLimit": grense, "extraLimit": bonus, **mer}
+        return {"apiRequests": brukt, "apiRequestsDate": dato, "dailyRateLimit": grense, "extraLimit": bonus, **mer}
+
     return les
 
 
@@ -1678,8 +1788,7 @@ def kjoer_23(raa, base, oeyeblikk, hent=None, nokkel=NOEKKEL, les_kvote=nok_kvot
         kall.append(ticker)
         return (hent or (lambda *_: serie_til(norsk_dato(oeyeblikk))))(ticker, *a)
 
-    fil = fp.kjoer(raa, base, oeyeblikk, nokkel, tell, linjer.append,
-                   les_kvote=les_kvote, **kw)
+    fil = fp.kjoer(raa, base, oeyeblikk, nokkel, tell, linjer.append, les_kvote=les_kvote, **kw)
     return fil, kall, "\n".join(linjer)
 
 
@@ -1692,8 +1801,7 @@ def kjoer_23_kode(raa, base, oeyeblikk, hent=None, nokkel=NOEKKEL, les_kvote=nok
         return (hent or (lambda *_: serie_til(norsk_dato(oeyeblikk))))(ticker, *a)
 
     with pytest.raises(SystemExit) as slutt:
-        fp.kjoer(raa, base, oeyeblikk, nokkel, tell, linjer.append,
-                 les_kvote=les_kvote, **kw)
+        fp.kjoer(raa, base, oeyeblikk, nokkel, tell, linjer.append, les_kvote=les_kvote, **kw)
     return slutt.value.code, kall, "\n".join(linjer)
 
 
@@ -1712,8 +1820,7 @@ class TestTidskontrollen:
         """20:59:59 i Oslo er for tidlig. Ville feilet uten tidskontrollen (M1),
         med noekkelen lest foerst (M5), eller med grensen paa 20:59."""
         raa, base = stier
-        fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 18, 59, 59),
-                                 ingen_kall, ingen_noekkel, ingen_kall)
+        fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 18, 59, 59), ingen_kall, ingen_noekkel, ingen_kall)
         assert fil is None and kall == []
         assert "--uten-tidskontroll" in ut and "0 kall brukt" in ut
         assert "klokka er ikke 21:00 i Oslo" in ut and "Kjoer etter kl. 21:00" in ut
@@ -1722,8 +1829,7 @@ class TestTidskontrollen:
     def test_kl_20_59_gir_0_kall(self, stier):
         """Stoppet av tidskontrollen, ikke av noe annet (gjennomgangen, BH12)."""
         raa, base = stier
-        fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 18, 59),
-                                 ingen_kall, ingen_noekkel, ingen_kall)
+        fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 18, 59), ingen_kall, ingen_noekkel, ingen_kall)
         assert fil is None and kall == []
         assert "klokka er ikke 21:00 i Oslo" in ut and "--uten-tidskontroll" in ut
 
@@ -1749,8 +1855,7 @@ class TestTidskontrollen:
     def test_flagget_henter_foer_grensen_med_dagens_navn(self, stier):
         """Ville feilet hvis flagget ble ignorert (M6)."""
         raa, base = stier
-        fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 10, 0),
-                                 uten_tidskontroll=True)
+        fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 10, 0), uten_tidskontroll=True)
         assert fil == raa / "kurser-raa-2026-09-22.json"
         assert len(kall) == KALL
         assert "Henter foer kl. 21:00 (--uten-tidskontroll)" in ut
@@ -1759,8 +1864,7 @@ class TestTidskontrollen:
         """Loerdag kl. 12: basen avgjoer. Ville feilet hvis tidskontrollen
         gjaldt alle dager (M7)."""
         raa, base = stier
-        fil, kall, _ = kjoer_23(raa, base, LOERDAG_26_09_KL_12,
-                                lambda *_: serie_til(FREDAG_25_09))
+        fil, kall, _ = kjoer_23(raa, base, LOERDAG_26_09_KL_12, lambda *_: serie_til(FREDAG_25_09))
         assert fil == raa / "kurser-raa-2026-09-25.json"
         assert len(kall) == KALL
 
@@ -1790,8 +1894,16 @@ class TestTidskontrollen:
         # Gjennomgangen, BH3: feilen gjelder navnet, og stiene er midlertidige.
         assert "hent_foer_kl_22" not in inspect.signature(ekte).parameters
         with pytest.raises(TypeError, match="hent_foer_kl_22"):
-            ekte(tmp_path / "raa", tmp_path / "ose.db", OEYEBLIKK_22_09, NOEKKEL, ingen_kall,
-                 lambda _: None, hent_foer_kl_22=True, les_kvote=nok_kvote)
+            ekte(
+                tmp_path / "raa",
+                tmp_path / "ose.db",
+                OEYEBLIKK_22_09,
+                NOEKKEL,
+                ingen_kall,
+                lambda _: None,
+                hent_foer_kl_22=True,
+                les_kvote=nok_kvote,
+            )
 
     def test_main_gir_noekkelen_som_funksjon(self, monkeypatch):
         """Noekkelen leses i kjoer, etter filvakten, ikke i main."""
@@ -1810,8 +1922,9 @@ class TestBasenAvgjoer:
         kjoer_23(raa, base, OEYEBLIKK_22_09)
         (raa / "kurser-raa-2026-09-22.json").unlink()
 
-        fil, kall, ut = kjoer_23(raa, base, OEYEBLIKK_22_09 + timedelta(minutes=30),
-                                 ingen_kall, ingen_noekkel, ingen_kall)
+        fil, kall, ut = kjoer_23(
+            raa, base, OEYEBLIKK_22_09 + timedelta(minutes=30), ingen_kall, ingen_noekkel, ingen_kall
+        )
         assert fil is None and kall == []
         assert "2026-09-22" in ut and "FR-402" in ut and "0 kall brukt" in ut
 
@@ -1844,8 +1957,7 @@ class TestBasenAvgjoer:
             return serie_til(TIRSDAG_22_09)
 
         with pytest.raises(SystemExit) as slutt:
-            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, hent, linjer.append,
-                     les_kvote=nok_kvote)
+            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, hent, linjer.append, les_kvote=nok_kvote)
         assert slutt.value.code == 1
         assert len(kall) == KALL
         # Gjennomgangen, VG8: meldingen om basen, ikke om kvoten.
@@ -1861,16 +1973,14 @@ class TestHelgen:
         kjoer_23(raa, base, _utc(2026, 9, 25, 20, 0))
         (raa / "kurser-raa-2026-09-25.json").unlink()
 
-        fil, kall, ut = kjoer_23(raa, base, LOERDAG_26_09_KL_12,
-                                 ingen_kall, ingen_noekkel, ingen_kall)
+        fil, kall, ut = kjoer_23(raa, base, LOERDAG_26_09_KL_12, ingen_kall, ingen_noekkel, ingen_kall)
         assert fil is None and kall == []
         assert "2026-09-25" in ut
 
     def test_loerdag_uten_fredagens_kurser_henter_med_fredagens_navn(self, stier):
         """Ville feilet hvis fila fikk kjoeredagens navn (M4)."""
         raa, base = stier
-        fil, kall, _ = kjoer_23(raa, base, LOERDAG_26_09_KL_12,
-                                lambda *_: serie_til(FREDAG_25_09))
+        fil, kall, _ = kjoer_23(raa, base, LOERDAG_26_09_KL_12, lambda *_: serie_til(FREDAG_25_09))
         assert fil == raa / "kurser-raa-2026-09-25.json"
         assert len(kall) == KALL
         assert datoene_i_vurdering(base) == ["2026-09-25"]
@@ -1887,9 +1997,9 @@ class TestHelgen:
 
         # Story 2.3b: basen mangler fredagen, saa det blir et nytt forsoek. Med
         # dagens 20 brukt er det 0 kall til det.
-        kode, kall, ut = kjoer_23_kode(raa, base, LOERDAG_26_09_KL_12,
-                                       ingen_kall, NOEKKEL,
-                                       kvote(brukt=20, dato="2026-09-26"))
+        kode, kall, ut = kjoer_23_kode(
+            raa, base, LOERDAG_26_09_KL_12, ingen_kall, NOEKKEL, kvote(brukt=20, dato="2026-09-26")
+        )
         # Beslutningen 08.10 (BH4): fredagen er ikke komplett, saa kode 1.
         # Ville feilet hvis filvakten ga kode 0 igjen (B4).
         assert kode == 1 and kall == []
@@ -1934,8 +2044,7 @@ class TestKvoten:
         feilet med 15 i kvotesjekken (mutant B3): da hentes det med 15 igjen,
         og kall nummer 16 tas fra bonuskvoten uten at sjekken sa ja."""
         raa, base = stier
-        kode, kall, ut = kjoer_23_kode(raa, base, OEYEBLIKK_22_09, ingen_kall,
-                                       les_kvote=kvote(brukt=5, bonus=0))
+        kode, kall, ut = kjoer_23_kode(raa, base, OEYEBLIKK_22_09, ingen_kall, les_kvote=kvote(brukt=5, bonus=0))
         assert kode == 1 and kall == []
         assert "15 kall igjen av dagens og 0 i bonuskvoten. Hentingen trenger 16. 0 kall brukt." in ut
 
@@ -1948,8 +2057,7 @@ class TestKvoten:
     def test_under_15_med_bonus_henter_og_sier_hvor_mange(self, stier):
         """Ville feilet hvis bonusen ikke ble talt med (K2)."""
         raa, base = stier
-        fil, kall, ut = kjoer_23(raa, base, OEYEBLIKK_22_09,
-                                 les_kvote=kvote(brukt=10, bonus=463))
+        fil, kall, ut = kjoer_23(raa, base, OEYEBLIKK_22_09, les_kvote=kvote(brukt=10, bonus=463))
         assert fil is not None and len(kall) == 16
         assert "6 kall tas fra bonuskvoten" in ut
 
@@ -1957,16 +2065,14 @@ class TestKvoten:
         raa, base = stier
         linjer = []
         with pytest.raises(SystemExit) as stopp:
-            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, ingen_kall, linjer.append,
-                     les_kvote=kvote(brukt=10, bonus=4))
+            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, ingen_kall, linjer.append, les_kvote=kvote(brukt=10, bonus=4))
         assert stopp.value.code == 1
         assert any("0 kall brukt" in l for l in linjer)
         assert list(raa.iterdir()) == []
 
     def test_tidligere_dato_i_gmt_betyr_0_brukt(self, stier):
         raa, base = stier
-        fil, kall, ut = kjoer_23(raa, base, OEYEBLIKK_22_09,
-                                 les_kvote=kvote(brukt=20, dato="2026-09-21"))
+        fil, kall, ut = kjoer_23(raa, base, OEYEBLIKK_22_09, les_kvote=kvote(brukt=20, dato="2026-09-21"))
         assert fil is not None and len(kall) == 16
         assert "20 kall igjen" in ut
 
@@ -1976,20 +2082,35 @@ class TestKvoten:
         raa, base = stier
         linjer = []
         with pytest.raises(SystemExit) as stopp:
-            fp.kjoer(raa, base, _utc(2026, 9, 22, 22, 30), NOEKKEL, ingen_kall,
-                     linjer.append, uten_tidskontroll=True,
-                     les_kvote=kvote(brukt=20, dato="2026-09-22"))
+            fp.kjoer(
+                raa,
+                base,
+                _utc(2026, 9, 22, 22, 30),
+                NOEKKEL,
+                ingen_kall,
+                linjer.append,
+                uten_tidskontroll=True,
+                les_kvote=kvote(brukt=20, dato="2026-09-22"),
+            )
         assert stopp.value.code == 1
         ut = "\n".join(linjer)
         # Gjennomgangen, BH9: stoppet av kvoten, ikke av noe annet.
         assert "0 kall igjen av dagens" in ut and "trenger 16" in ut and "0 kall brukt" in ut
 
-    @pytest.mark.parametrize("svar", [
-        requests.ConnectionError("nett"), "tekst", [], {}, {"apiRequests": 1},
-        {"apiRequests": True, "apiRequestsDate": "2026-09-22", "dailyRateLimit": 20, "extraLimit": 0},
-        {"apiRequests": 1, "apiRequestsDate": "igaar", "dailyRateLimit": 20, "extraLimit": 0},
-        {"apiRequests": 1, "apiRequestsDate": None, "dailyRateLimit": 20, "extraLimit": 0},
-    ], ids=["unntak", "tekst", "liste", "tomt", "felt-mangler", "bool", "dato", "dato-none"])
+    @pytest.mark.parametrize(
+        "svar",
+        [
+            requests.ConnectionError("nett"),
+            "tekst",
+            [],
+            {},
+            {"apiRequests": 1},
+            {"apiRequests": True, "apiRequestsDate": "2026-09-22", "dailyRateLimit": 20, "extraLimit": 0},
+            {"apiRequests": 1, "apiRequestsDate": "igaar", "dailyRateLimit": 20, "extraLimit": 0},
+            {"apiRequests": 1, "apiRequestsDate": None, "dailyRateLimit": 20, "extraLimit": 0},
+        ],
+        ids=["unntak", "tekst", "liste", "tomt", "felt-mangler", "bool", "dato", "dato-none"],
+    )
     def test_svar_som_ikke_kan_leses_gir_henting(self, stier, svar):
         """Ville feilet hvis et ulesbart svar stoppet hentingen (K3)."""
         raa, base = stier
@@ -2007,12 +2128,12 @@ class TestKvoten:
     def test_navn_og_epost_staar_aldri_i_utskriften(self, stier, brukt, bonus):
         """Ville feilet hvis svaret ble skrevet ut (K4)."""
         raa, base = stier
-        les = kvote(brukt=brukt, bonus=bonus, name="Kari Testesen",
-                    email="kari@eksempel.no", subscriptionType="free")
+        les = kvote(brukt=brukt, bonus=bonus, name="Kari Testesen", email="kari@eksempel.no", subscriptionType="free")
         linjer = []
         try:
-            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, lambda *_: serie_til(TIRSDAG_22_09),
-                     linjer.append, les_kvote=les)
+            fp.kjoer(
+                raa, base, OEYEBLIKK_22_09, NOEKKEL, lambda *_: serie_til(TIRSDAG_22_09), linjer.append, les_kvote=les
+            )
         except SystemExit:
             pass
         ut = "\n".join(linjer)
@@ -2078,8 +2199,7 @@ class TestVintertid:
         UTC+2 (V2), som gir 21:59 og henter. Foer 19.10 var tidene 21:59 og
         20:59."""
         raa, base = stier
-        fil, kall, ut = kjoer_23(raa, base, _utc(2026, 11, 10, 19, 59),
-                                 ingen_kall, ingen_noekkel, ingen_kall)
+        fil, kall, ut = kjoer_23(raa, base, _utc(2026, 11, 10, 19, 59), ingen_kall, ingen_noekkel, ingen_kall)
         assert fil is None and kall == []
         assert "--uten-tidskontroll" in ut and "0 kall brukt" in ut
 
@@ -2104,8 +2224,7 @@ class TestSvaretIkkeFraBoersdagen:
         raa, base = stier
         linjer = []
         with pytest.raises(SystemExit) as slutt:
-            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, self._uten_dagen,
-                     linjer.append, les_kvote=nok_kvote)
+            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, self._uten_dagen, linjer.append, les_kvote=nok_kvote)
         assert slutt.value.code == 1
         varsel = [l for l in linjer if "FR-402" in l and "2026-09-22" in l]
         assert len(varsel) == 1
@@ -2117,12 +2236,12 @@ class TestSvaretIkkeFraBoersdagen:
     def test_ny_kjoering_samme_kveld_gir_0_kall(self, stier):
         raa, base = stier
         with pytest.raises(SystemExit):
-            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, self._uten_dagen,
-                     lambda _: None, les_kvote=nok_kvote)
+            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, self._uten_dagen, lambda _: None, les_kvote=nok_kvote)
 
         # Story 2.3b: et nytt forsoek, med dagens 20 brukt, gir 0 kall.
-        kode, kall, ut = kjoer_23_kode(raa, base, OEYEBLIKK_22_09 + timedelta(minutes=30),
-                                       ingen_kall, NOEKKEL, kvote(brukt=20))
+        kode, kall, ut = kjoer_23_kode(
+            raa, base, OEYEBLIKK_22_09 + timedelta(minutes=30), ingen_kall, NOEKKEL, kvote(brukt=20)
+        )
         assert kode == 1 and kall == []
         assert "0 kall brukt" in ut and "2.3b" in ut
 
@@ -2141,12 +2260,12 @@ class TestKvotenTarAntallet:
     @pytest.mark.parametrize(
         "igjen, bonus, antall, ventet",
         [
-            (12, 0, 10, 0),      # kortere liste: 12 igjen holder for 10
-            (12, 0, 15, None),   # de 15: 12 holder ikke, og ingen bonus
-            (12, 3, 15, 3),      # bonusen fullfoerer kveldens henting
+            (12, 0, 10, 0),  # kortere liste: 12 igjen holder for 10
+            (12, 0, 15, None),  # de 15: 12 holder ikke, og ingen bonus
+            (12, 3, 15, 3),  # bonusen fullfoerer kveldens henting
             (9, 1, 10, 1),
             (8, 1, 18, None),
-            (18, 0, 18, 0),      # 18 aksjer, uten indeksen
+            (18, 0, 18, 0),  # 18 aksjer, uten indeksen
             (0, 463, 15, 15),
         ],
     )
@@ -2199,8 +2318,7 @@ class TestEtterGjennomgangen:
             raise requests.HTTPError("HTTP 401 Unauthorized")
 
         with pytest.raises(SystemExit) as slutt:
-            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, ingen_kall, linjer.append,
-                     les_kvote=les)
+            fp.kjoer(raa, base, OEYEBLIKK_22_09, NOEKKEL, ingen_kall, linjer.append, les_kvote=les)
         assert slutt.value.code == 1
         ut = "\n".join(linjer)
         assert "HTTP 401" in ut and "EODHD_API_KEY" in ut and "0 kall brukt" in ut
@@ -2230,24 +2348,21 @@ class TestEtterGjennomgangen:
     @pytest.mark.parametrize("felt", ["apiRequests", "dailyRateLimit", "extraLimit"])
     def test_negativt_tall_er_ulesbart(self, felt):
         """ECH5: -5 brukt ga 25 igjen."""
-        svar = {"apiRequests": 1, "apiRequestsDate": "2026-09-22",
-                "dailyRateLimit": 20, "extraLimit": 0, felt: -5}
+        svar = {"apiRequests": 1, "apiRequestsDate": "2026-09-22", "dailyRateLimit": 20, "extraLimit": 0, felt: -5}
         with pytest.raises(fp.UlesbarKvote, match=felt):
             fp.tolk_kvote(svar, date(2026, 9, 22))
 
     def test_brukt_over_grensen_gir_0_igjen_og_bonusen_fullfoerer(self, stier):
         """VG2: etter kall 21 er apiRequests over 20. Ville feilet uten max(…, 0)."""
         raa, base = stier
-        fil, kall, ut = kjoer_23(raa, base, OEYEBLIKK_22_09,
-                                 les_kvote=kvote(brukt=25, bonus=463))
+        fil, kall, ut = kjoer_23(raa, base, OEYEBLIKK_22_09, les_kvote=kvote(brukt=25, bonus=463))
         assert fil is not None and len(kall) == KALL
         assert "Kvoten: 0 kall igjen av dagens. 16 kall tas fra bonuskvoten" in ut
 
     def test_ulesbart_svar_med_navn_og_epost_viser_ingen_verdier(self, stier):
         """VG6 og VG7: feilteksten nevner feltnavn, aldri en verdi fra svaret."""
         raa, base = stier
-        les = kvote(brukt="x", dato="igaar", name="Kari Testesen",
-                    email="kari@eksempel.no")
+        les = kvote(brukt="x", dato="igaar", name="Kari Testesen", email="kari@eksempel.no")
         _, _, ut = kjoer_23(raa, base, OEYEBLIKK_22_09, les_kvote=les)
         assert "Kvoten kunne ikke leses" in ut and "apiRequests" in ut
         for verdi in ("Kari", "kari@eksempel.no", "igaar", "'x'"):
@@ -2260,8 +2375,7 @@ class TestEtterGjennomgangen:
         raa, base = stier
         kjoer_23(raa, base, OEYEBLIKK_22_09)
         # Samme boersdag kl. 20 i Oslo: basen har dagen, og klokka er foer 21.
-        _, _, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 18, 0),
-                            ingen_kall, ingen_noekkel, ingen_kall)
+        _, _, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 18, 0), ingen_kall, ingen_noekkel, ingen_kall)
         assert "--uten-tidskontroll" in ut and "FR-402" not in ut
 
     def test_basen_kommer_foer_filvakten(self, stier):
@@ -2270,8 +2384,7 @@ class TestEtterGjennomgangen:
         raa, base = stier
         kjoer_23(raa, base, OEYEBLIKK_22_09)
         assert (raa / "kurser-raa-2026-09-22.json").exists()
-        _, _, ut = kjoer_23(raa, base, OEYEBLIKK_22_09 + timedelta(minutes=30),
-                            ingen_kall, ingen_noekkel, ingen_kall)
+        _, _, ut = kjoer_23(raa, base, OEYEBLIKK_22_09 + timedelta(minutes=30), ingen_kall, ingen_noekkel, ingen_kall)
         assert "FR-402" in ut and "AD-6" not in ut
 
     def test_basesjekken_migrerer_ikke(self, stier, tmp_path):
@@ -2334,14 +2447,12 @@ class TestKvotetallene:
     """les_kvotetall gir grensen ogsaa, og tolk_kvote gir det samme som foer."""
 
     def test_les_kvotetall_gir_brukt_grense_og_bonus(self):
-        svar = {"apiRequests": 7, "apiRequestsDate": "2026-09-22",
-                "dailyRateLimit": 20, "extraLimit": 463}
+        svar = {"apiRequests": 7, "apiRequestsDate": "2026-09-22", "dailyRateLimit": 20, "extraLimit": 463}
         assert fp.les_kvotetall(svar, date(2026, 9, 22)) == (7, 20, 463)
         assert fp.tolk_kvote(svar, date(2026, 9, 22)) == (13, 463)
 
     def test_tidligere_dato_i_gmt_gir_0_brukt(self):
-        svar = {"apiRequests": 20, "apiRequestsDate": "2026-09-21",
-                "dailyRateLimit": 20, "extraLimit": 463}
+        svar = {"apiRequests": 20, "apiRequestsDate": "2026-09-21", "dailyRateLimit": 20, "extraLimit": 463}
         assert fp.les_kvotetall(svar, date(2026, 9, 22)) == (0, 20, 463)
 
 
@@ -2352,16 +2463,16 @@ class TestKallTilNyeForsoek:
     @pytest.mark.parametrize(
         "igjen, grense, antall, ventet",
         [
-            (5, 20, 15, 5),     # etter kveldens henting med de 15
-            (20, 20, 15, 5),    # en dag uten henting: fortsatt bare marginen
-            (2, 20, 15, 2),     # noen kall er brukt til noe annet
+            (5, 20, 15, 5),  # etter kveldens henting med de 15
+            (20, 20, 15, 5),  # en dag uten henting: fortsatt bare marginen
+            (2, 20, 15, 2),  # noen kall er brukt til noe annet
             (0, 20, 15, 0),
-            (4, 20, 16, 4),     # de 15 og indeksen (2.8)
-            (20, 20, 18, 2),    # 18 aksjer, uten indeksen
-            (20, 20, 19, 1),    # 18 aksjer og indeksen
+            (4, 20, 16, 4),  # de 15 og indeksen (2.8)
+            (20, 20, 18, 2),  # 18 aksjer, uten indeksen
+            (20, 20, 19, 1),  # 18 aksjer og indeksen
             (1, 20, 19, 1),
             (0, 20, 19, 0),
-            (5, 20, 21, 0),     # aldri negativt
+            (5, 20, 21, 0),  # aldri negativt
         ],
     )
     def test_kall_til_nye_forsoek(self, igjen, grense, antall, ventet):
@@ -2411,15 +2522,15 @@ class TestEtSymbolSomFeilerGirKode1:
     def test_tomt_svar_gir_ogsaa_kode_1(self, stier):
         raa, base = stier
         kode, _, ut = kjoer_23_kode(
-            raa, base, OEYEBLIKK_22_09,
-            lambda t, *_: [] if t == "DNB.OL" else serie_til(TIRSDAG_22_09))
+            raa, base, OEYEBLIKK_22_09, lambda t, *_: [] if t == "DNB.OL" else serie_til(TIRSDAG_22_09)
+        )
         assert kode == 1 and "1 aksjer feilet i hentingen" in ut
 
     def test_svar_uten_dagen_sier_ikke_lenger_at_det_kommer_senere(self, stier):
         raa, base = stier
         kode, _, ut = kjoer_23_kode(
-            raa, base, OEYEBLIKK_22_09,
-            lambda t, *_: serie_til(date(2026, 9, 21) if t == "DNB.OL" else TIRSDAG_22_09))
+            raa, base, OEYEBLIKK_22_09, lambda t, *_: serie_til(date(2026, 9, 21) if t == "DNB.OL" else TIRSDAG_22_09)
+        )
         assert kode == 1
         assert "kommer med story 2.3b" not in ut
         assert "samme kommando igjen senere i kveld" in ut
@@ -2444,8 +2555,9 @@ class TestListaMedAtten:
 ETTER_30_MIN = OEYEBLIKK_22_09 + timedelta(minutes=30)
 
 
-def hovedhenting(stier, feiler=("DNB",), uten_dagen=(), oeyeblikk=OEYEBLIKK_22_09,
-                 dato=TIRSDAG_22_09, lista=AKSJEUNIVERS):
+def hovedhenting(
+    stier, feiler=("DNB",), uten_dagen=(), oeyeblikk=OEYEBLIKK_22_09, dato=TIRSDAG_22_09, lista=AKSJEUNIVERS
+):
     """Kveldens henting der noen aksjer feiler eller mangler dagen. Kode 1."""
     raa, base = stier
 
@@ -2479,8 +2591,7 @@ def kvoter(*svarene):
 
 
 def svar(brukt=0, bonus=463, dato="2026-09-22", grense=20):
-    return {"apiRequests": brukt, "apiRequestsDate": dato,
-            "dailyRateLimit": grense, "extraLimit": bonus}
+    return {"apiRequests": brukt, "apiRequestsDate": dato, "dailyRateLimit": grense, "extraLimit": bonus}
 
 
 def raa_filer(raa) -> list[str]:
@@ -2565,9 +2676,11 @@ class TestNyttForsoek:
         fil, kall, _ = kjoer_23(raa, base, ETTER_30_MIN + timedelta(minutes=30))
         assert fil == raa / "forsoek3-raa-2026-09-22.json" and kall == ["DNB.OL"]
         assert sha(raa / "forsoek2-raa-2026-09-22.json") == foer
-        assert raa_filer(raa) == ["forsoek2-raa-2026-09-22.json",
-                                  "forsoek3-raa-2026-09-22.json",
-                                  "kurser-raa-2026-09-22.json"]
+        assert raa_filer(raa) == [
+            "forsoek2-raa-2026-09-22.json",
+            "forsoek3-raa-2026-09-22.json",
+            "kurser-raa-2026-09-22.json",
+        ]
 
 
 class TestNyttForsoekKvoten:
@@ -2633,12 +2746,16 @@ class TestNyttForsoekKvoten:
         assert kode == 1 and kall == ["EQNR.OL"]
         assert "kunne ikke leses etter kallet" in ut
 
-    @pytest.mark.parametrize("feil", [
-        {},
-        svar(brukt="tjue"),
-        requests.ConnectionError("ConnectionError"),
-        requests.HTTPError("HTTP 500 Internal Server Error"),
-    ], ids=["tomt", "tekst", "nett", "http-500"])
+    @pytest.mark.parametrize(
+        "feil",
+        [
+            {},
+            svar(brukt="tjue"),
+            requests.ConnectionError("ConnectionError"),
+            requests.HTTPError("HTTP 500 Internal Server Error"),
+        ],
+        ids=["tomt", "tekst", "nett", "http-500"],
+    )
     def test_kvote_som_ikke_kan_leses_gir_0_kall(self, stier, feil):
         """Strengere enn hovedhentingen: et nytt forsoek tar ingen sjanse paa
         bonusen. Ville feilet hvis det ble hentet likevel (M7)."""
@@ -2721,11 +2838,9 @@ class TestNyttForsoekStengtDag:
 
     def test_loerdag_skriver_kursen_men_raden_staar(self, stier):
         raa, base = stier
-        hovedhenting(stier, feiler=("DNB",), oeyeblikk=_utc(2026, 9, 25, 20, 0),
-                     dato=FREDAG_25_09)
+        hovedhenting(stier, feiler=("DNB",), oeyeblikk=_utc(2026, 9, 25, 20, 0), dato=FREDAG_25_09)
         les, _ = kvoter(svar(brukt=0, dato="2026-09-26"))
-        fil, kall, ut = kjoer_23(raa, base, LOERDAG_26_09_KL_12,
-                                 lambda *_: serie_til(FREDAG_25_09), les_kvote=les)
+        fil, kall, ut = kjoer_23(raa, base, LOERDAG_26_09_KL_12, lambda *_: serie_til(FREDAG_25_09), les_kvote=les)
         assert kall == ["DNB.OL"]
         assert fil == raa / "forsoek2-raa-2026-09-25.json"
         rader = vurderingene(base, FREDAG_25_09, LOERDAG_26_09_KL_12)
@@ -2762,8 +2877,7 @@ class TestNyttForsoekVaktene:
         hovedhenting(stier, feiler=("DNB",))
         _, _, ut = kjoer_23(raa, base, ETTER_30_MIN, lambda *_: serie_med_utslag(TIRSDAG_22_09))
         assert NOEKKEL not in ut
-        verdier = {str(r[f]) for r in serie_med_utslag(TIRSDAG_22_09)
-                   for f in ("close", "adjusted_close", "volume")}
+        verdier = {str(r[f]) for r in serie_med_utslag(TIRSDAG_22_09) for f in ("close", "adjusted_close", "volume")}
         assert not [v for v in verdier if v in ut]
 
 
@@ -2815,8 +2929,7 @@ class TestVurderingeneSomMangler:
     def test_alle_radene_finnes_gir_ingen_skriving(self, stier, monkeypatch):
         raa, base = stier
         kjoer_23(raa, base, OEYEBLIKK_22_09)
-        monkeypatch.setattr(SqliteVurderingslager, "skriv",
-                            lambda *a: pytest.fail("ingen rad skal skrives"))
+        monkeypatch.setattr(SqliteVurderingslager, "skriv", lambda *a: pytest.fail("ingen rad skal skrives"))
         fil, kall, ut = kjoer_23(raa, base, ETTER_30_MIN, ingen_kall, ingen_noekkel, ingen_kall)
         assert fil is None and kall == [] and "mangler raden" not in ut
 
@@ -2826,8 +2939,14 @@ class TestVurderingeneSomMangler:
         raa, base = stier
         self._bare_kursene(stier)
         kode, kall, ut = kjoer_23_kode(
-            raa, base, _utc(2026, 9, 22, 21, 59), ingen_kall, ingen_noekkel, ingen_kall,
-            klokke=lambda: _utc(2026, 9, 22, 22, 1))
+            raa,
+            base,
+            _utc(2026, 9, 22, 21, 59),
+            ingen_kall,
+            ingen_noekkel,
+            ingen_kall,
+            klokke=lambda: _utc(2026, 9, 22, 22, 1),
+        )
         assert kode == 1 and kall == []
         assert antall_rader(base, "vurdering") == 0
 
@@ -2841,8 +2960,7 @@ class TestNyttForsoekEtterGjennomgangen:
         fordi serien ble skrevet. Ville feilet hvis bare feilene telte (M21)."""
         raa, base = stier
         hovedhenting(stier, feiler=("DNB",))
-        kode, kall, ut = kjoer_23_kode(raa, base, ETTER_30_MIN,
-                                       lambda *_: serie_til(date(2026, 9, 21)))
+        kode, kall, ut = kjoer_23_kode(raa, base, ETTER_30_MIN, lambda *_: serie_til(date(2026, 9, 21)))
         assert kode == 1 and kall == ["DNB.OL"]
         assert "Mangler fortsatt kursen" in ut and "1 aksjer: DNB" in ut
         assert "Alle 15 aksjene har kursen" not in ut
@@ -2926,9 +3044,15 @@ class TestNyttForsoekEtterGjennomgangen:
         """ECH6: grunnen i utskriften er den riktige."""
         raa, base = stier
         hovedhenting(stier, feiler=("DNB",))
-        kode, kall, ut = kjoer_23_kode(raa, base, _utc(2026, 9, 22, 21, 45), ingen_kall,
-                                       ingen_noekkel, ingen_kall,
-                                       klokke=lambda: _utc(2026, 9, 22, 22, 1))
+        kode, kall, ut = kjoer_23_kode(
+            raa,
+            base,
+            _utc(2026, 9, 22, 21, 45),
+            ingen_kall,
+            ingen_noekkel,
+            ingen_kall,
+            klokke=lambda: _utc(2026, 9, 22, 22, 1),
+        )
         assert kode == 1 and kall == []
         assert "ny dag i Oslo" in ut and "23:50" not in ut
 
@@ -2992,9 +3116,15 @@ class TestVurderingeneSomManglerEtterGjennomgangen:
         fil = lag_bilde(raa, _utc(2026, 9, 25, 20, 0), FREDAG_25_09)
         fp.les_inn(fil, base, lambda _: None)
         fil.unlink()
-        kode, kall, ut = kjoer_23_kode(raa, base, _utc(2026, 9, 25, 21, 59), ingen_kall,
-                                       ingen_noekkel, ingen_kall,
-                                       klokke=lambda: _utc(2026, 9, 25, 22, 1))
+        kode, kall, ut = kjoer_23_kode(
+            raa,
+            base,
+            _utc(2026, 9, 25, 21, 59),
+            ingen_kall,
+            ingen_noekkel,
+            ingen_kall,
+            klokke=lambda: _utc(2026, 9, 25, 22, 1),
+        )
         assert kode == 1 and kall == [] and "over midnatt" in ut
         assert antall_rader(base, "vurdering") == 0
 
@@ -3006,15 +3136,15 @@ class TestNyttForsoekEtterMutantene:
         """M10: fredag til loerdag godtar lageret fortsatt fredag, saa bare
         sjekken i forsoeket hindrer at raden skrives etter midnatt (AD-20)."""
         raa, base = stier
-        hovedhenting(stier, feiler=("DNB",), oeyeblikk=_utc(2026, 9, 25, 20, 0),
-                     dato=FREDAG_25_09)
+        hovedhenting(stier, feiler=("DNB",), oeyeblikk=_utc(2026, 9, 25, 20, 0), dato=FREDAG_25_09)
         tider = [_utc(2026, 9, 25, 21, 45), _utc(2026, 9, 25, 21, 45), _utc(2026, 9, 25, 22, 1)]
 
         def klokke():
             return tider.pop(0) if len(tider) > 1 else tider[0]
 
-        kode, kall, ut = kjoer_23_kode(raa, base, _utc(2026, 9, 25, 21, 45),
-                                       lambda *_: serie_til(FREDAG_25_09), klokke=klokke)
+        kode, kall, ut = kjoer_23_kode(
+            raa, base, _utc(2026, 9, 25, 21, 45), lambda *_: serie_til(FREDAG_25_09), klokke=klokke
+        )
         assert kode == 1 and kall == ["DNB.OL"] and "over midnatt" in ut
         assert vurderingene(base, FREDAG_25_09, LOERDAG_26_09_KL_12)["DNB"][0] == Grunn.SYMBOL_FEILET
 
@@ -3039,12 +3169,12 @@ class TestNyttForsoekEtterMutantene:
 # leses (RuntimeError)». Den ekte basen staar paa 5 naar 0006 er flettet.
 
 
-def base_paa_versjon(tmp_path, base, versjon: int, uten_kurs=(), uten_vurdering=(),
-                     dato: date = TIRSDAG_22_09):
+def base_paa_versjon(tmp_path, base, versjon: int, uten_kurs=(), uten_vurdering=(), dato: date = TIRSDAG_22_09):
     """En base migrert til versjon med en katalog som bare har de foerste
     migrasjonene, med kurs, kursserie og vurdering skrevet med SQL, fordi
     adapterne krever siste versjon for aa skrive."""
-    from migrering import migrer, versjon as versjon_av
+    from migrering import migrer
+    from migrering import versjon as versjon_av
 
     katalog = tmp_path / f"migrasjoner_til_{versjon}"
     katalog.mkdir()
@@ -3058,16 +3188,17 @@ def base_paa_versjon(tmp_path, base, versjon: int, uten_kurs=(), uten_vurdering=
         for nr, aksje in enumerate(AKSJEUNIVERS):
             if aksje.symbol in uten_kurs:
                 continue
-            tilkobling.execute("INSERT INTO kurs VALUES (?, ?, 1.0, 1.0, 10)",
-                               (aksje.symbol, dato.isoformat()))
+            tilkobling.execute("INSERT INTO kurs VALUES (?, ?, 1.0, 1.0, 10)", (aksje.symbol, dato.isoformat()))
             # Tidene gaar mot rekkefoelgen i lista: den siste i lista er eldst
             # (gjennomgangen av 2.8b, VG3).
-            tilkobling.execute("INSERT INTO kursserie VALUES (?, ?)",
-                               (aksje.symbol, _utc(2026, 9, 22, 20, 59 - nr).isoformat()))
+            tilkobling.execute(
+                "INSERT INTO kursserie VALUES (?, ?)", (aksje.symbol, _utc(2026, 9, 22, 20, 59 - nr).isoformat())
+            )
             if aksje.symbol not in uten_vurdering:
                 tilkobling.execute(
                     "INSERT INTO vurdering (symbol, dato, grunn) VALUES (?, ?, 'signal_ikke_regnet')",
-                    (aksje.symbol, dato.isoformat()))
+                    (aksje.symbol, dato.isoformat()),
+                )
     finally:
         tilkobling.close()
 
@@ -3100,8 +3231,9 @@ class TestSjekkenLeserEnBaseEnVersjonBak:
         base_paa_versjon(tmp_path, base, SISTE - 1)
         foer = sha(base)
 
-        fil, kall, ut = kjoer_23(raa, base, OEYEBLIKK_22_09 + timedelta(minutes=30),
-                                 ingen_kall, ingen_noekkel, ingen_kall)
+        fil, kall, ut = kjoer_23(
+            raa, base, OEYEBLIKK_22_09 + timedelta(minutes=30), ingen_kall, ingen_noekkel, ingen_kall
+        )
         assert fil is None and kall == []
         assert "Basen har alt kursene for boersdagen 2026-09-22" in ut
         assert "kunne ikke leses" not in ut
@@ -3194,8 +3326,7 @@ class TestHovedindeksen:
         raa, base = stier
         _, _, ut = kjoer_23(raa, base, OEYEBLIKK_22_09)
         serie, hentet = indeksen_i(base)
-        ventet = [rad for rad in fp.serie_fra_eodhd(serie_til(TIRSDAG_22_09))
-                  if rad.dato.weekday() < 5]
+        ventet = [rad for rad in fp.serie_fra_eodhd(serie_til(TIRSDAG_22_09)) if rad.dato.weekday() < 5]
         assert serie == ventet and hentet == OEYEBLIKK_22_09
         for tabell in ("aksje", "kurs", "kursserie", "vurdering"):
             assert "OSEBX" not in symbolene_i(base, tabell), tabell
@@ -3263,8 +3394,9 @@ class TestHovedindeksen:
 
         assert kjoer_23_kode(raa, base, OEYEBLIKK_22_09, uten_indeks)[0] == 3
         (raa / "kurser-raa-2026-09-22.json").unlink()
-        fil, kall, ut = kjoer_23(raa, base, OEYEBLIKK_22_09 + timedelta(minutes=30),
-                                 ingen_kall, ingen_noekkel, ingen_kall)
+        fil, kall, ut = kjoer_23(
+            raa, base, OEYEBLIKK_22_09 + timedelta(minutes=30), ingen_kall, ingen_noekkel, ingen_kall
+        )
         assert fil is None and kall == [] and "0 kall brukt" in ut
 
     def test_et_nytt_forsoek_tar_ikke_indeksen(self, stier):
@@ -3313,8 +3445,7 @@ class TestAarsskiftet:
         raa, base = stier
         siste_aar = max(DEKKEDE_AAR)
         siste_dag = innevaerende_boersdag(date(siste_aar, 12, 31))
-        foerste_kjoering = datetime(siste_dag.year, siste_dag.month, siste_dag.day, 21, 0,
-                                    tzinfo=timezone.utc)
+        foerste_kjoering = datetime(siste_dag.year, siste_dag.month, siste_dag.day, 21, 0, tzinfo=timezone.utc)
         kjoer_23(raa, base, foerste_kjoering, lambda *_: serie_til(siste_dag))
         foer = indeksen_i(base)
         assert foer[1] == foerste_kjoering
@@ -3444,8 +3575,7 @@ class TestKode3:
         nyere = OEYEBLIKK_22_09 + timedelta(hours=1)
         tilkobling = aapne_base(base)
         try:
-            SqliteIndekslager(tilkobling).erstatt_serie(
-                "OSEBX", fp.serie_fra_eodhd(serie_til(TIRSDAG_22_09)), nyere)
+            SqliteIndekslager(tilkobling).erstatt_serie("OSEBX", fp.serie_fra_eodhd(serie_til(TIRSDAG_22_09)), nyere)
         finally:
             tilkobling.close()
         fil, _, ut = kjoer_23(raa, base, OEYEBLIKK_22_09)

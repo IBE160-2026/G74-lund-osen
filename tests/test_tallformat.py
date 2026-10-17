@@ -137,9 +137,7 @@ def test_tallformat_er_en_loevnode():
     bruke den uten aa trekke med seg noe annet."""
     kilde = Path(__file__).resolve().parent.parent / "src" / "tallformat.py"
     tre = ast.parse(kilde.read_text(encoding="utf-8"))
-    assert not [
-        node for node in ast.walk(tre) if isinstance(node, (ast.Import, ast.ImportFrom))
-    ]
+    assert not [node for node in ast.walk(tre) if isinstance(node, (ast.Import, ast.ImportFrom))]
 
 
 class TestDato:
@@ -149,6 +147,7 @@ class TestDato:
         from datetime import date
 
         from tallformat import dato
+
         assert dato(date(2026, 9, 22), 2026) == "22.09"
         assert dato(date(2026, 1, 5), 2026) == "05.01"
 
@@ -156,6 +155,7 @@ class TestDato:
         from datetime import date
 
         from tallformat import dato
+
         assert dato(date(2025, 9, 29), 2026) == "29.09.2025"
         assert dato(date(2027, 1, 4), 2026) == "04.01.2027"
 
@@ -176,7 +176,13 @@ def test_ukedagene_paa_norsk():
 
     mandag = date(2026, 10, 12)
     assert [ukedag(mandag + timedelta(days=i)) for i in range(7)] == [
-        "mandag", "tirsdag", "onsdag", "torsdag", "fredag", "lørdag", "søndag",
+        "mandag",
+        "tirsdag",
+        "onsdag",
+        "torsdag",
+        "fredag",
+        "lørdag",
+        "søndag",
     ]
 
 

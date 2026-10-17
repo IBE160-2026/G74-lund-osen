@@ -55,9 +55,7 @@ class TestTabellen:
         """SQLite lover ingen rekkefoelge uten ORDER BY, saa rowid gir den."""
         felt = [f.name for f in dataclasses.fields(AKSJEUNIVERS[0])]
         assert felt == ["symbol", "ticker", "navn", "sektor"]
-        i_basen = ny.execute(
-            f"SELECT {', '.join(felt)} FROM aksje ORDER BY rowid"
-        ).fetchall()
+        i_basen = ny.execute(f"SELECT {', '.join(felt)} FROM aksje ORDER BY rowid").fetchall()
         assert i_basen == [dataclasses.astuple(aksje) for aksje in AKSJEUNIVERS]
 
     def test_kolonnene_er_feltene_i_aksje(self, ny):
@@ -67,16 +65,9 @@ class TestTabellen:
 
 # En gyldig rad per tabell, med symbolet som parameter. Verdiene er oppdiktet.
 RAD = {
-    "kurs": (
-        "INSERT INTO kurs (symbol, dato, slutt, justert_slutt, volum) "
-        "VALUES (?, '2026-09-23', 1.0, 1.0, 1)"
-    ),
-    "kursserie": (
-        "INSERT INTO kursserie (symbol, hentet) VALUES (?, '2026-09-23T16:00:00+00:00')"
-    ),
-    "vurdering": (
-        "INSERT INTO vurdering (symbol, dato, grunn) VALUES (?, '2026-09-23', 'symbol_feilet')"
-    ),
+    "kurs": ("INSERT INTO kurs (symbol, dato, slutt, justert_slutt, volum) VALUES (?, '2026-09-23', 1.0, 1.0, 1)"),
+    "kursserie": ("INSERT INTO kursserie (symbol, hentet) VALUES (?, '2026-09-23T16:00:00+00:00')"),
+    "vurdering": ("INSERT INTO vurdering (symbol, dato, grunn) VALUES (?, '2026-09-23', 'symbol_feilet')"),
 }
 TABELLER = list(RAD)
 UKJENTE = ["EQNR.OL", "eqnr", "XXX", "", " EQNR"]
@@ -154,36 +145,32 @@ class TestAksjenStaarFast:
     def test_symbol_kan_ikke_endres_uten_rader(self, ny):
         with pytest.raises(sqlite3.IntegrityError, match="symbolet til en aksje endres ikke"):
             ny.execute("UPDATE aksje SET symbol = 'EQNR.OL' WHERE symbol = 'EQNR'")
-        assert ny.execute(
-            "SELECT count(*) FROM aksje WHERE symbol = 'EQNR'"
-        ).fetchone()[0] == 1
+        assert ny.execute("SELECT count(*) FROM aksje WHERE symbol = 'EQNR'").fetchone()[0] == 1
 
     def test_symbol_kan_ikke_endres_med_rader(self, ny):
         ny.execute(RAD["vurdering"], ("EQNR",))
         ny.commit()
         with pytest.raises(sqlite3.IntegrityError, match="symbolet til en aksje endres ikke"):
             ny.execute("UPDATE aksje SET symbol = 'EQUINOR' WHERE symbol = 'EQNR'")
-        assert ny.execute(
-            "SELECT a.navn FROM vurdering v JOIN aksje a USING (symbol)"
-        ).fetchall() == [("Equinor",)]
+        assert ny.execute("SELECT a.navn FROM vurdering v JOIN aksje a USING (symbol)").fetchall() == [("Equinor",)]
 
     def test_navn_og_sektor_kan_endres(self, ny):
         ny.execute(RAD["kurs"], ("EQNR",))
         ny.execute("UPDATE aksje SET navn = 'Nytt navn', sektor = 'Ny' WHERE symbol = 'EQNR'")
-        assert ny.execute(
-            "SELECT navn, sektor FROM aksje WHERE symbol = 'EQNR'"
-        ).fetchone() == ("Nytt navn", "Ny")
+        assert ny.execute("SELECT navn, sektor FROM aksje WHERE symbol = 'EQNR'").fetchone() == ("Nytt navn", "Ny")
 
-    @pytest.mark.parametrize("sql", [
-        "INSERT OR REPLACE INTO aksje VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi')",
-        "INSERT OR REPLACE INTO aksje VALUES ('EQNR', 'NY.OL', 'Ny', 'Energi')",
-        "REPLACE INTO aksje VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi')",
-        "INSERT OR REPLACE INTO aksje VALUES ('NY', 'DNB.OL', 'Ny', 'Finans')",
-        "INSERT INTO aksje VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi') "
-        "ON CONFLICT DO NOTHING",
-        "INSERT OR IGNORE INTO aksje VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi')",
-        "UPDATE OR REPLACE aksje SET ticker = 'EQNR.OL' WHERE symbol = 'DNB'",
-    ])
+    @pytest.mark.parametrize(
+        "sql",
+        [
+            "INSERT OR REPLACE INTO aksje VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi')",
+            "INSERT OR REPLACE INTO aksje VALUES ('EQNR', 'NY.OL', 'Ny', 'Energi')",
+            "REPLACE INTO aksje VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi')",
+            "INSERT OR REPLACE INTO aksje VALUES ('NY', 'DNB.OL', 'Ny', 'Finans')",
+            "INSERT INTO aksje VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi') ON CONFLICT DO NOTHING",
+            "INSERT OR IGNORE INTO aksje VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi')",
+            "UPDATE OR REPLACE aksje SET ticker = 'EQNR.OL' WHERE symbol = 'DNB'",
+        ],
+    )
     def test_aksje_erstattes_ikke(self, ny, sql):
         """REPLACE sletter raden som er i veien uten DELETE-triggeren. Triggeren
         avviser derfor enhver INSERT som kolliderer paa symbol eller ticker,
@@ -194,24 +181,16 @@ class TestAksjenStaarFast:
         ny.commit()
         with pytest.raises(sqlite3.IntegrityError, match="en aksje erstattes ikke"):
             ny.execute(sql)
-        assert ny.execute(
-            "SELECT symbol, ticker FROM aksje WHERE symbol = 'EQNR'"
-        ).fetchall() == [("EQNR", "EQNR.OL")]
-        assert ny.execute(
-            "SELECT symbol, ticker FROM aksje WHERE symbol = 'DNB'"
-        ).fetchall() == [("DNB", "DNB.OL")]
+        assert ny.execute("SELECT symbol, ticker FROM aksje WHERE symbol = 'EQNR'").fetchall() == [("EQNR", "EQNR.OL")]
+        assert ny.execute("SELECT symbol, ticker FROM aksje WHERE symbol = 'DNB'").fetchall() == [("DNB", "DNB.OL")]
         assert antall(ny, "aksje") == 15
 
     @pytest.mark.parametrize("ticker", ["EQNR2.OL", "EQNR.OL"], ids=["ny", "samme"])
     def test_ticker_kan_endres_uten_kollisjon(self, ny, ticker):
         """Triggeren mot REPLACE stopper bare en ticker en annen aksje har."""
         ny.execute(RAD["kurs"], ("EQNR",))
-        ny.execute(
-            "UPDATE aksje SET ticker = ?, navn = 'Nytt navn' WHERE symbol = 'EQNR'", (ticker,)
-        )
-        assert ny.execute(
-            "SELECT ticker, navn FROM aksje WHERE symbol = 'EQNR'"
-        ).fetchone() == (ticker, "Nytt navn")
+        ny.execute("UPDATE aksje SET ticker = ?, navn = 'Nytt navn' WHERE symbol = 'EQNR'", (ticker,))
+        assert ny.execute("SELECT ticker, navn FROM aksje WHERE symbol = 'EQNR'").fetchone() == (ticker, "Nytt navn")
 
     def test_ny_aksje_kan_legges_til(self, ny):
         ny.execute("INSERT INTO aksje VALUES ('NY', 'NY.OL', 'Ny', 'Energi')")
@@ -231,10 +210,7 @@ def base_paa_versjon_2(tmp_path) -> sqlite3.Connection:
 
 
 def alle_rader(tilkobling) -> dict[str, list[tuple]]:
-    return {
-        tabell: tilkobling.execute(f"SELECT * FROM {tabell} ORDER BY 1, 2").fetchall()
-        for tabell in TABELLER
-    }
+    return {tabell: tilkobling.execute(f"SELECT * FROM {tabell} ORDER BY 1, 2").fetchall() for tabell in TABELLER}
 
 
 # Teksten i en CHECK-feil har varierert mellom SQLite-versjoner: uttrykket,
@@ -260,9 +236,9 @@ class TestBaseIVersjon2:
             foer["vurdering"] = [rad + (None,) * 4 for rad in foer["vurdering"]]
             assert alle_rader(tilkobling) == foer
             assert antall(tilkobling, "aksje") == 15
-            assert tilkobling.execute(
-                "SELECT count(*) FROM sqlite_master WHERE name = 'kontroll_0003'"
-            ).fetchone()[0] == 0
+            assert (
+                tilkobling.execute("SELECT count(*) FROM sqlite_master WHERE name = 'kontroll_0003'").fetchone()[0] == 0
+            )
         finally:
             tilkobling.close()
 
@@ -283,9 +259,12 @@ class TestBaseIVersjon2:
 
             assert versjon(tilkobling) == 2
             assert alle_rader(tilkobling) == foer
-            assert tilkobling.execute(
-                "SELECT count(*) FROM sqlite_master WHERE name IN ('aksje', 'kontroll_0003')"
-            ).fetchone()[0] == 0
+            assert (
+                tilkobling.execute(
+                    "SELECT count(*) FROM sqlite_master WHERE name IN ('aksje', 'kontroll_0003')"
+                ).fetchone()[0]
+                == 0
+            )
         finally:
             tilkobling.close()
 
@@ -309,9 +288,19 @@ def rad(dato: str = "2026-09-23") -> Kursrad:
 
 
 def vurdering() -> Vurdering:
-    return Vurdering(styrke=2, retning="Positiv", trend=1, bevegelse=1, interesse=0,
-                     slutt=300.0, justert_slutt=290.0, trend_avvik=0.035,
-                dagens_endring=0.021, standardavvik=0.012, volumforhold=1.2)
+    return Vurdering(
+        styrke=2,
+        retning="Positiv",
+        trend=1,
+        bevegelse=1,
+        interesse=0,
+        slutt=300.0,
+        justert_slutt=290.0,
+        trend_avvik=0.035,
+        dagens_endring=0.021,
+        standardavvik=0.012,
+        volumforhold=1.2,
+    )
 
 
 class TestAdapterne:
@@ -360,8 +349,10 @@ class TestIngenKoblingFraVurderingTilKurs:
             "SELECT name, sql FROM sqlite_master WHERE type = 'trigger' AND tbl_name = 'vurdering'"
         ).fetchall()
         assert {navn for navn, _ in triggere} == {
-            "vurdering_kjent_grunn_insert", "vurdering_kjent_grunn_update",
-            "vurdering_kjent_aksje_insert", "vurdering_kjent_aksje_update",
+            "vurdering_kjent_grunn_insert",
+            "vurdering_kjent_grunn_update",
+            "vurdering_kjent_aksje_insert",
+            "vurdering_kjent_aksje_update",
         }
         for _, sql in triggere:
             assert "kurs" not in sql.replace("kursserie", "")
@@ -381,4 +372,3 @@ class TestEnSpoerring:
         ).fetchall()
 
         assert rader == [("Equinor", "Energi", "2026-09-23", 2, "Positiv")]
-

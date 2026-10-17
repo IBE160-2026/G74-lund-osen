@@ -53,8 +53,13 @@ class TestKallet:
         OllamaModell(url="http://ollama:11434/", hent=falsk).lag_tekst("prompten")
         metode, url, kropp, tidsfrist = falsk.kall[0]
         assert (metode, url) == ("POST", "http://ollama:11434/api/generate")
-        assert kropp == {"model": "gemma4:e4b", "prompt": "prompten", "stream": False, "think": False,
-                         "options": {"temperature": 0.0, "seed": 42}}
+        assert kropp == {
+            "model": "gemma4:e4b",
+            "prompt": "prompten",
+            "stream": False,
+            "think": False,
+            "options": {"temperature": 0.0, "seed": 42},
+        }
         assert tidsfrist == ki_lokal.TIDSFRIST
 
     def test_standardadressen_er_loopback(self):
@@ -65,8 +70,15 @@ class TestKallet:
     def test_svaret_med_det_raden_trenger(self):
         """FR-604 og FR-605: modell-ID, seed, temperatur, maskinvare og versjon."""
         svar = OllamaModell(hent=FalskOllama()).lag_tekst("p")
-        assert (svar.tekst, svar.modell, svar.modell_id, svar.seed, svar.temperatur, svar.maskinvare,
-                svar.ollama_versjon) == ("En tekst.", "gemma4:e4b", "dc35e8d9c606", 42, 0.0, "gpu", "0.35.1")
+        assert (
+            svar.tekst,
+            svar.modell,
+            svar.modell_id,
+            svar.seed,
+            svar.temperatur,
+            svar.maskinvare,
+            svar.ollama_versjon,
+        ) == ("En tekst.", "gemma4:e4b", "dc35e8d9c606", 42, 0.0, "gpu", "0.35.1")
 
     @pytest.mark.parametrize("ps, maskinvare", [("gpu", "gpu"), ("cpu", "cpu"), ("delt", None), ("borte", None)])
     def test_maskinvaren_fra_api_ps(self, ps, maskinvare):
@@ -79,12 +91,15 @@ class TestKallet:
 
 
 class TestFeil:
-    @pytest.mark.parametrize("feil, grunn", [
-        (requests.Timeout(), "tidsavbrudd"),
-        (requests.ConnectTimeout(), "tidsavbrudd"),
-        (requests.ConnectionError("http://127.0.0.1:11434 nede"), "Ollama svarer ikke"),
-        (requests.RequestException(), "RequestException"),
-    ])
+    @pytest.mark.parametrize(
+        "feil, grunn",
+        [
+            (requests.Timeout(), "tidsavbrudd"),
+            (requests.ConnectTimeout(), "tidsavbrudd"),
+            (requests.ConnectionError("http://127.0.0.1:11434 nede"), "Ollama svarer ikke"),
+            (requests.RequestException(), "RequestException"),
+        ],
+    )
     def test_feil_i_kallet_gir_modellfeilet(self, feil, grunn):
         with pytest.raises(ModellFeilet) as svar:
             OllamaModell(hent=FalskOllama(feil=feil)).lag_tekst("p")
@@ -139,8 +154,7 @@ class TestHttp:
                 return {"response": "x"}
 
         kall = []
-        monkeypatch.setattr(ki_lokal.requests, "request",
-                            lambda *a, **k: kall.append((a, k)) or Svar())
+        monkeypatch.setattr(ki_lokal.requests, "request", lambda *a, **k: kall.append((a, k)) or Svar())
         assert http("POST", "http://ollama:11434/api/generate", {"a": 1}, 5) == (200, {"response": "x"})
         assert kall == [(("POST", "http://ollama:11434/api/generate"), {"json": {"a": 1}, "timeout": 5})]
 
@@ -181,8 +195,10 @@ class TestSjekken:
         assert OllamaModell(hent=hent).sjekk() == "Ollama svarer ikke (kjoerer den?)"
 
     def test_modellen_mangler(self):
-        assert OllamaModell(hent=FalskOllama(tags=False)).sjekk() == \
-            "modellen gemma4:e4b er ikke hentet (ollama pull gemma4:e4b)"
+        assert (
+            OllamaModell(hent=FalskOllama(tags=False)).sjekk()
+            == "modellen gemma4:e4b er ikke hentet (ollama pull gemma4:e4b)"
+        )
 
     @pytest.mark.parametrize("svar", [(500, None), (500, {"models": [{"name": MODELL}]})])
     def test_status_som_ikke_er_200(self, svar):
@@ -194,11 +210,14 @@ class TestSjekken:
         """ECH, BH9: ikke «ikke hentet», som ville sendt brukeren til ollama pull."""
         assert OllamaModell(hent=lambda *_a: svar).sjekk() == "Ollama ga en liste over modeller som ikke kunne leses"
 
-    @pytest.mark.parametrize("modeller, konfigurert", [
-        ([{"model": MODELL}], MODELL),
-        ([{"name": "gemma4:latest"}], "gemma4"),
-        ([{"name": "gemma4"}], "gemma4:latest"),
-    ])
+    @pytest.mark.parametrize(
+        "modeller, konfigurert",
+        [
+            ([{"model": MODELL}], MODELL),
+            ([{"name": "gemma4:latest"}], "gemma4"),
+            ([{"name": "gemma4"}], "gemma4:latest"),
+        ],
+    )
     def test_navnet_i_name_eller_model_og_latest(self, modeller, konfigurert):
         """ECH, BH8."""
         assert OllamaModell(modell=konfigurert, hent=lambda *_a: (200, {"models": modeller})).sjekk() is None

@@ -23,9 +23,19 @@ IDAG = date(2026, 9, 30)
 
 
 def vurdering(**endret) -> Vurdering:
-    felt = dict(styrke=2, retning="Positiv", trend=1, bevegelse=1, interesse=0,
-                slutt=300.0, justert_slutt=290.0, trend_avvik=0.035,
-                dagens_endring=0.021, standardavvik=0.012, volumforhold=1.2)
+    felt = dict(
+        styrke=2,
+        retning="Positiv",
+        trend=1,
+        bevegelse=1,
+        interesse=0,
+        slutt=300.0,
+        justert_slutt=290.0,
+        trend_avvik=0.035,
+        dagens_endring=0.021,
+        standardavvik=0.012,
+        volumforhold=1.2,
+    )
     felt.update(endret)
     return Vurdering(**felt)
 
@@ -50,9 +60,16 @@ class TestUtfallene:
     def test_ingen_rad_paa_en_boersdag_er_ikke_kjoert(self):
         assert tilstand(None, date(2026, 9, 25), IDAG) == Tilstand(Art.IKKE_KJOERT)
 
-    @pytest.mark.parametrize("dag", [
-        date(2026, 9, 26), date(2026, 9, 27), date(2026, 4, 3), date(2026, 12, 24),
-    ], ids=["loerdag", "soendag", "langfredag", "julaften"])
+    @pytest.mark.parametrize(
+        "dag",
+        [
+            date(2026, 9, 26),
+            date(2026, 9, 27),
+            date(2026, 4, 3),
+            date(2026, 12, 24),
+        ],
+        ids=["loerdag", "soendag", "langfredag", "julaften"],
+    )
     def test_ingen_rad_paa_en_dag_som_ikke_er_boersdag(self, dag):
         # Nyttaarsaften som dagens dato, saa julaften ogsaa har vaert.
         assert tilstand(None, dag, date(2026, 12, 31)) == Tilstand(Art.IKKE_BOERSDAG)
@@ -89,8 +106,7 @@ class TestIDag:
 
 
 class TestFremtid:
-    @pytest.mark.parametrize("dag", [date(2026, 10, 1), date(2026, 10, 3)],
-                             ids=["torsdag", "loerdag"])
+    @pytest.mark.parametrize("dag", [date(2026, 10, 1), date(2026, 10, 3)], ids=["torsdag", "loerdag"])
     def test_dato_etter_i_dag_reiser(self, dag):
         with pytest.raises(ValueError, match="etter"):
             tilstand(None, dag, IDAG)
@@ -111,20 +127,28 @@ class TestKalenderen:
         paa en dag lista kaller stengt, er et faktum om kjoeringen."""
         assert tilstand(vurdering(), date(2026, 4, 3), IDAG) == Tilstand(Art.SVAR, vurdering())
 
-    @pytest.mark.parametrize("dag, idag", [
-        (date(2025, 12, 31), IDAG),
-        (date(2027, 1, 4), date(2027, 1, 5)),
-    ], ids=["2025", "2027"])
+    @pytest.mark.parametrize(
+        "dag, idag",
+        [
+            (date(2025, 12, 31), IDAG),
+            (date(2027, 1, 4), date(2027, 1, 5)),
+        ],
+        ids=["2025", "2027"],
+    )
     def test_ingen_rad_utenfor_lista_reiser(self, dag, idag):
         with pytest.raises(UtenforKalenderen):
             tilstand(None, dag, idag)
 
 
 class TestTyper:
-    @pytest.mark.parametrize("dato, idag", [
-        (datetime(2026, 9, 25, 10, tzinfo=timezone.utc), IDAG),
-        (date(2026, 9, 25), datetime(2026, 9, 30, 10, tzinfo=timezone.utc)),
-    ], ids=["dato", "idag"])
+    @pytest.mark.parametrize(
+        "dato, idag",
+        [
+            (datetime(2026, 9, 25, 10, tzinfo=timezone.utc), IDAG),
+            (date(2026, 9, 25), datetime(2026, 9, 30, 10, tzinfo=timezone.utc)),
+        ],
+        ids=["dato", "idag"],
+    )
     def test_tidspunkt_avvises(self, dato, idag):
         with pytest.raises(TypeError, match="date"):
             tilstand(None, dato, idag)
@@ -157,9 +181,7 @@ class TestGjennomLageret:
         lager.skriv("DNB", fredag, Grunn.KURS_IKKE_FRA_DAGEN)
 
         assert tilstand(lager.les("EQNR", fredag), fredag, IDAG) == Tilstand(Art.SVAR, STYRKE_0)
-        assert tilstand(lager.les("DNB", fredag), fredag, IDAG) == Tilstand(
-            Art.GRUNN, Grunn.KURS_IKKE_FRA_DAGEN
-        )
+        assert tilstand(lager.les("DNB", fredag), fredag, IDAG) == Tilstand(Art.GRUNN, Grunn.KURS_IKKE_FRA_DAGEN)
         assert tilstand(lager.les("KOG", fredag), fredag, IDAG) == Tilstand(Art.IKKE_KJOERT)
         loerdag = date(2026, 9, 26)
         assert tilstand(lager.les("EQNR", loerdag), loerdag, IDAG) == Tilstand(Art.IKKE_BOERSDAG)
@@ -169,9 +191,7 @@ class TestGjennomLageret:
         skiller den fra et hull ogsaa naar dagen er en hverdag i STENGT."""
         lager = SqliteVurderingslager(tilkobling, lambda: datetime(2026, 9, 25, 18, tzinfo=timezone.utc))
         langfredag = date(2026, 4, 3)
-        assert tilstand(lager.les("EQNR", langfredag), langfredag, IDAG) == Tilstand(
-            Art.IKKE_BOERSDAG
-        )
+        assert tilstand(lager.les("EQNR", langfredag), langfredag, IDAG) == Tilstand(Art.IKKE_BOERSDAG)
 
     def test_boersdag_foer_foerste_kjoering_er_ikke_kjoert(self, tilkobling):
         """Startdatoen lagres ikke. Trengs den, er den datoen til foerste rad i

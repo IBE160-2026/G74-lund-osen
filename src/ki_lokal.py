@@ -52,8 +52,15 @@ class OllamaModell:
 
     tjeneste = "lokal"
 
-    def __init__(self, url: str = STANDARD_URL, modell: str = MODELL, hent: Http = http,
-                 seed: int = SEED, temperatur: float = TEMPERATUR, tidsfrist: float = TIDSFRIST):
+    def __init__(
+        self,
+        url: str = STANDARD_URL,
+        modell: str = MODELL,
+        hent: Http = http,
+        seed: int = SEED,
+        temperatur: float = TEMPERATUR,
+        tidsfrist: float = TIDSFRIST,
+    ):
         self.url = url.rstrip("/")
         self.modell = modell
         self._hent = hent
@@ -66,7 +73,10 @@ class OllamaModell:
 
     def lag_tekst(self, prompt: str) -> Modellsvar:
         kropp = {
-            "model": self.modell, "prompt": prompt, "stream": False, "think": False,
+            "model": self.modell,
+            "prompt": prompt,
+            "stream": False,
+            "think": False,
             "options": {"temperature": self._temperatur, "seed": self._seed},
         }
         try:
@@ -85,8 +95,12 @@ class OllamaModell:
         if not isinstance(svar, dict) or not isinstance(svar.get("response"), str):
             raise ModellFeilet("svaret fra Ollama hadde ingen tekst")
         return Modellsvar(
-            tekst=svar["response"], modell=self.modell, modell_id=self._modell_id(),
-            seed=self._seed, temperatur=self._temperatur, maskinvare=self._maskinvare(),
+            tekst=svar["response"],
+            modell=self.modell,
+            modell_id=self._modell_id(),
+            seed=self._seed,
+            temperatur=self._temperatur,
+            maskinvare=self._maskinvare(),
             ollama_versjon=self._versjon(),
         )
 

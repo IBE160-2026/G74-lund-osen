@@ -102,8 +102,9 @@ def velg_modell(innstillinger: Mapping[str, str], skriv: Callable[[str], None] =
     return None
 
 
-def modell_fra_miljoeet(env_fil: Path, miljoe: Mapping[str, str],
-                        skriv: Callable[[str], None] = print) -> Modell | None:
+def modell_fra_miljoeet(
+    env_fil: Path, miljoe: Mapping[str, str], skriv: Callable[[str], None] = print
+) -> Modell | None:
     """Det main kaller. Kan innstillingene ikke leses, blir det ingen KI-tekst,
     og hentingen gaar som foer (NFR-04)."""
     try:
@@ -115,6 +116,7 @@ def modell_fra_miljoeet(env_fil: Path, miljoe: Mapping[str, str],
 
 def regeltekst(vurdering: Vurdering) -> str:
     """Det regelen sa, med fortegnene, styrken og retningen (FR-604)."""
+
     def tegn(verdi: int) -> str:
         return f"+{verdi}" if verdi > 0 else str(verdi)
 
@@ -129,10 +131,15 @@ def _rad_uten_kall(emne: Emne, vurdering: Vurdering, modell: Modell, foerste: st
     from ki_prompt import PROMPTVERSJON
 
     return KIRad(
-        emne=emne, grunnlag=ki_grunnlag(vurdering, utenfor_maalingen=False),
-        regelen=regeltekst(vurdering), tekst=None, besto=False,
+        emne=emne,
+        grunnlag=ki_grunnlag(vurdering, utenfor_maalingen=False),
+        regelen=regeltekst(vurdering),
+        tekst=None,
+        besto=False,
         grunn=f"modellen feilet: ikke kalt, fordi den feilet for {foerste} i samme kjoering",
-        promptversjon=PROMPTVERSJON, tjeneste=modell.tjeneste, modell=modell.modell,
+        promptversjon=PROMPTVERSJON,
+        tjeneste=modell.tjeneste,
+        modell=modell.modell,
     )
 
 
@@ -201,7 +208,8 @@ def lag_ki_tekster(
             skriv(
                 f"Ingen KI-tekst for boersdagen {dato.isoformat()} ennaa: {grunn}. Ingen rader er "
                 f"skrevet i KI-loggen, og {len(mangler)} aksjer venter paa teksten"
-                + (f" ({sto} har den fra foer)" if sto else "") + ". "
+                + (f" ({sto} har den fra foer)" if sto else "")
+                + ". "
                 f"{_hva_naa(grunn)}, og kjoer samme kommando igjen foer midnatt"
                 + (". Det gir 0 kall til EODHD." if basen_har_kursene else ".")
             )
@@ -212,8 +220,7 @@ def lag_ki_tekster(
             if innevaerende_boersdag(norsk_dato(klokke())) != dato:
                 raise IkkeInnevaerendeBoersdag(dato.isoformat())
             if feilet_for is None:
-                rad = lag_ki_rad(emne, ki_grunnlag(vurdering, utenfor_maalingen=False),
-                                 regeltekst(vurdering), modell)
+                rad = lag_ki_rad(emne, ki_grunnlag(vurdering, utenfor_maalingen=False), regeltekst(vurdering), modell)
                 if rad.modellen_feilet:
                     feilet_for = aksje.symbol
             else:

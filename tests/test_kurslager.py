@@ -23,8 +23,8 @@ import pytest
 
 from kursdata import (
     AKSJEUNIVERS,
-    Kursleser,
     Kurslager,
+    Kursleser,
     Kursrad,
     MinneKurslager,
     UgyldigKursrad,
@@ -36,10 +36,8 @@ from migrering import migrer
 HENTET = datetime(2026, 9, 22, 8, 33, tzinfo=timezone.utc)
 
 
-def rad(dato: str = "2026-09-21", slutt: float = 100.0, justert: float = 98.0,
-        volum: int = 1000) -> Kursrad:
-    return Kursrad(dato=date.fromisoformat(dato), slutt=slutt,
-                   justert_slutt=justert, volum=volum)
+def rad(dato: str = "2026-09-21", slutt: float = 100.0, justert: float = 98.0, volum: int = 1000) -> Kursrad:
+    return Kursrad(dato=date.fromisoformat(dato), slutt=slutt, justert_slutt=justert, volum=volum)
 
 
 class TestKursrad:
@@ -87,8 +85,7 @@ class TestKursrad:
             Kursrad(dato=dato, slutt=100.0, justert_slutt=98.0, volum=1000)
 
     @pytest.mark.parametrize("felt", ["slutt", "justert_slutt"])
-    @pytest.mark.parametrize("verdi", [float("nan"), float("inf"), float("-inf")],
-                             ids=["nan", "inf", "-inf"])
+    @pytest.mark.parametrize("verdi", [float("nan"), float("inf"), float("-inf")], ids=["nan", "inf", "-inf"])
     def test_ikke_endelige_tall_avvises(self, felt, verdi):
         """NaN og uendelig er gyldige float, men ikke kurser. Minnelageret ville
         lagret NaN mens SQLite avviste den (NOT NULL); uendelig ville begge
@@ -109,8 +106,7 @@ class TestKursrad:
             ("volum", "1000"),
             ("volum", True),
         ],
-        ids=["slutt-tekst", "justert-tekst", "slutt-bool", "volum-float",
-             "volum-tekst", "volum-bool"],
+        ids=["slutt-tekst", "justert-tekst", "slutt-bool", "volum-float", "volum-tekst", "volum-bool"],
     )
     def test_feil_type_avvises(self, felt, verdi):
         verdier = {"dato": date(2026, 9, 21), "slutt": 100.0, "justert_slutt": 98.0, "volum": 1000}
@@ -167,10 +163,7 @@ class TestKursrad:
 
 class TestKurslagerProtokollen:
     def test_har_erstatt_serie_serie_og_sist_hentet_og_ingenting_annet(self):
-        metoder = {
-            navn for navn, _ in inspect.getmembers(Kurslager, inspect.isfunction)
-            if not navn.startswith("_")
-        }
+        metoder = {navn for navn, _ in inspect.getmembers(Kurslager, inspect.isfunction) if not navn.startswith("_")}
 
         assert metoder == {"erstatt_serie", "serie", "sist_hentet"}
 
@@ -190,7 +183,10 @@ class TestKurslagerProtokollen:
         assert hint["rader"] == list[Kursrad]
         assert hint["hentet"] is datetime
         assert list(inspect.signature(Kurslager.erstatt_serie).parameters) == [
-            "self", "symbol", "rader", "hentet",
+            "self",
+            "symbol",
+            "rader",
+            "hentet",
         ]
 
     def test_sist_hentet_lover_datetime_eller_none(self):
@@ -200,8 +196,7 @@ class TestKurslagerProtokollen:
         """Story 1.4a: Kurslager arver lesesiden og legger bare til skrivingen."""
         assert Kursleser in Kurslager.__mro__
         egne = {
-            navn for navn, verdi in vars(Kurslager).items()
-            if inspect.isfunction(verdi) and not navn.startswith("_")
+            navn for navn, verdi in vars(Kurslager).items() if inspect.isfunction(verdi) and not navn.startswith("_")
         }
 
         assert egne == {"erstatt_serie"}
@@ -209,10 +204,7 @@ class TestKurslagerProtokollen:
 
 class TestKursleserProtokollen:
     def test_har_noeyaktig_serie_og_sist_hentet(self):
-        metoder = {
-            navn for navn, _ in inspect.getmembers(Kursleser, inspect.isfunction)
-            if not navn.startswith("_")
-        }
+        metoder = {navn for navn, _ in inspect.getmembers(Kursleser, inspect.isfunction) if not navn.startswith("_")}
 
         assert metoder == {"serie", "sist_hentet"}
 
@@ -244,10 +236,7 @@ class TestKurslagerKontrakt:
     def test_oppfyller_protokollen(self, lager):
         assert isinstance(lager, Kurslager)
         for navn in ("erstatt_serie", "serie", "sist_hentet"):
-            assert (
-                inspect.signature(getattr(type(lager), navn))
-                == inspect.signature(getattr(Kurslager, navn))
-            )
+            assert inspect.signature(getattr(type(lager), navn)) == inspect.signature(getattr(Kurslager, navn))
 
     def test_erstatt_serie_erstatter_ikke_skjoeter(self, lager):
         """Ville feilet hvis adapteren skjoetet paa (AD-5)."""
@@ -273,8 +262,9 @@ class TestKurslagerKontrakt:
     def test_dict_med_eodhds_noekler_avvises(self, lager):
         """Porten slipper ikke inn det gamle formatet bakveien."""
         with pytest.raises(TypeError):
-            lager.erstatt_serie("EQNR", [{"date": "2026-09-21", "close": 100.0,
-                                          "adjusted_close": 98.0, "volume": 1000}], HENTET)
+            lager.erstatt_serie(
+                "EQNR", [{"date": "2026-09-21", "close": 100.0, "adjusted_close": 98.0, "volume": 1000}], HENTET
+            )
 
         assert lager.serie("EQNR") == []
 
@@ -384,8 +374,7 @@ class TestSistHentet:
 
 def eodhd(r: Kursrad) -> dict:
     """Kursrad tilbake til EODHDs form, slik et oeyeblikksbilde lagrer den."""
-    return {"date": r.dato.isoformat(), "close": r.slutt,
-            "adjusted_close": r.justert_slutt, "volume": r.volum}
+    return {"date": r.dato.isoformat(), "close": r.slutt, "adjusted_close": r.justert_slutt, "volume": r.volum}
 
 
 @pytest.fixture(params=["minne", "sqlite", "snapshot"])
@@ -403,10 +392,12 @@ def leser(request, tmp_path):
     def fyll(serier: dict[str, list[Kursrad]], hentet: datetime = HENTET):
         nonlocal tilkobling
         if request.param == "snapshot":
-            return SnapshotLeser(SnapshotKilde(
-                hentet=hentet.isoformat(),
-                serier={s: [eodhd(r) for r in rader] for s, rader in serier.items()},
-            ))
+            return SnapshotLeser(
+                SnapshotKilde(
+                    hentet=hentet.isoformat(),
+                    serier={s: [eodhd(r) for r in rader] for s, rader in serier.items()},
+                )
+            )
         if request.param == "minne":
             lager = MinneKurslager()
         else:
@@ -430,10 +421,7 @@ class TestKursleserKontrakt:
 
         assert isinstance(lest, Kursleser)
         for navn in ("serie", "sist_hentet"):
-            assert (
-                inspect.signature(getattr(type(lest), navn))
-                == inspect.signature(getattr(Kursleser, navn))
-            )
+            assert inspect.signature(getattr(type(lest), navn)) == inspect.signature(getattr(Kursleser, navn))
 
     def test_serie_gir_kursrader_med_samme_verdier(self, leser):
         inn = [rad("2026-09-18", 101.5, 99.25, 1234), rad("2026-09-21", 102.0, 100.0, 5678)]

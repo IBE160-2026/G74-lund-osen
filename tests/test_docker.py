@@ -177,8 +177,15 @@ class TestDockerignore:
         COPY src/ src/ tar med alt under src/. Ville feilet hvis en base,
         en raadatafil eller __pycache__ under src/ kunne komme med (ECH1)."""
         moenstre = set(_linjer(DOCKERIGNORE))
-        for krav in ("**/.env", "**/*.db", "**/*-raa-*.json", "**/*-raw-*.json",
-                     "**/raadata-*.json", "**/newsweb-*.json", "**/__pycache__/"):
+        for krav in (
+            "**/.env",
+            "**/*.db",
+            "**/*-raa-*.json",
+            "**/*-raw-*.json",
+            "**/raadata-*.json",
+            "**/newsweb-*.json",
+            "**/__pycache__/",
+        ):
             assert krav in moenstre, krav
 
     def test_env_example_er_unntaket(self):
@@ -234,8 +241,7 @@ class TestCompose:
             assert "env_file" not in tjenester[navn], navn
         assert _verdier(tjenester["hent"]["env_file"]) == [".env"]
         # Story 10.2 (svar 8): bare adressen til Ollama, ingen noekkel.
-        assert [l.strip() for l in tjenester["hent"]["environment"][1:]] == [
-            "OSE_KI_OLLAMA_URL: http://ollama:11434"]
+        assert [l.strip() for l in tjenester["hent"]["environment"][1:]] == ["OSE_KI_OLLAMA_URL: http://ollama:11434"]
         assert "env_file" not in tjenester["ollama"] and "environment" not in tjenester["ollama"]
         assert "EODHD" not in "\n".join(_linjer(COMPOSE)).upper()
 
@@ -355,7 +361,6 @@ class TestCompose:
         assert "entrypoint" not in tjenester["demo"] and "command" not in tjenester["demo"]
 
 
-
 class TestOllama:
     """Story 10.2, PR F: Ollama i compose som et eget valg (beslutningen
     05.10 kl. 16:53, svar 1 og 8 kl. 15:53). Erstatter testen fra 3.1 om at
@@ -398,7 +403,9 @@ class TestOllama:
         modell = tekst.split("<summary>Den lokale modellen (KI-teksten)</summary>", 1)[1].split("</details>", 1)[0]
         assert "uten nye kall til EODHD" not in modell
         assert "Har basen dagens kurs for alle aksjene, gir det 0 kall til EODHD." in modell
-        assert "Mangler noen aksjer dagens kurs, gjør samme kommando et nytt forsøk for dem, og det bruker kall." in modell
+        assert (
+            "Mangler noen aksjer dagens kurs, gjør samme kommando et nytt forsøk for dem, og det bruker kall." in modell
+        )
 
     def test_ingen_noekkel_i_compose(self):
         """Gjennomgangen (BH7): ingen variabel i compose utenom adressen."""
@@ -433,8 +440,7 @@ def _blokkene(tekst: str) -> list[tuple[str, str]]:
 def _kommandoene() -> list[str]:
     """Hver kommando i kodeblokkene uten spraak i «Kom i gang». Fra PR 3 har
     ingen linje kommentar med #, og testen for det staar for seg."""
-    return [l.strip() for spraak, b in _blokkene(_kom_i_gang()) if not spraak
-            for l in b.splitlines() if l.strip()]
+    return [l.strip() for spraak, b in _blokkene(_kom_i_gang()) if not spraak for l in b.splitlines() if l.strip()]
 
 
 class TestReadme:
@@ -453,8 +459,14 @@ class TestReadme:
         kom foerst, eller en av kommandoene manglet."""
         del_ = _kom_i_gang()
         # Fra 3.4 PR 3 hentes koden med «Download ZIP», ikke git clone (svar 1 11.10).
-        for kommando in ("«Download ZIP»", "cp .env.example .env", "docker compose up --build",
-                         "http://127.0.0.1:5000", "docker compose run --rm hent", "docker compose down"):
+        for kommando in (
+            "«Download ZIP»",
+            "cp .env.example .env",
+            "docker compose up --build",
+            "http://127.0.0.1:5000",
+            "docker compose run --rm hent",
+            "docker compose down",
+        ):
             assert kommando in del_, kommando
         assert del_.index("docker compose up --build") < del_.index("uv run python src/app.py")
 
@@ -522,7 +534,9 @@ class TestReadme:
         med en gang, og steg 8 og raden «Klar» nevner helgen, slik
         docs/hjelp.md gjør. Ville feilet hvis helgen falt ut av steg 8."""
         topp = _kom_i_gang().split("### Felles for begge", 1)[0]
-        assert "Første gang før kl. 21 på en børsdag, også på dagtid, er demoen veien for å se appen med en gang" in topp
+        assert (
+            "Første gang før kl. 21 på en børsdag, også på dagtid, er demoen veien for å se appen med en gang" in topp
+        )
         klar = [l for l in topp.splitlines() if l.startswith("| Klar |")]
         assert len(klar) == 1 and "helgen" in klar[0] and "etter kl. 21" in klar[0]
         assert "andre dager børsen er stengt" in klar[0]
@@ -564,8 +578,11 @@ class TestReadme:
         assert lag == '["' + '", "'.join(demo.DEMOKOMMANDO.split()[2:]) + '"]'
         assert demo.DEMOKOMMANDO_DOCKER == "docker compose run --rm demo-lag"
         # Profilene README-en bruker, finnes i compose.yaml.
-        profiler = {f[0].split(":", 1)[1].strip().strip('[]"') for f in
-                    (felt.get("profiles") for felt in _tjenester().values()) if f}
+        profiler = {
+            f[0].split(":", 1)[1].strip().strip('[]"')
+            for f in (felt.get("profiles") for felt in _tjenester().values())
+            if f
+        }
         # Ogsaa docs/hjelp.md, der stoppkommandoen for demoen staar (VG).
         brukt = set(re.findall(r"docker compose --profile ([\w-]+)", tekst + _hjelp()))
         # Story 10.2: profilen ki for Ollama.
@@ -605,8 +622,20 @@ class TestReadme:
         antall selskaper uten at README-en ble rettet."""
         import demo
 
-        maaneder = ("januar", "februar", "mars", "april", "mai", "juni", "juli",
-                    "august", "september", "oktober", "november", "desember")
+        maaneder = (
+            "januar",
+            "februar",
+            "mars",
+            "april",
+            "mai",
+            "juni",
+            "juli",
+            "august",
+            "september",
+            "oktober",
+            "november",
+            "desember",
+        )
         dag = demo.SLUTTDATO
         ukedag = ("mandag", "tirsdag", "onsdag", "torsdag", "fredag", "lørdag", "søndag")[dag.weekday()]
         # «Hva er demoen?» staar i docs/hjelp.md fra 22:32.
@@ -690,8 +719,11 @@ class TestIngenBilderIDocs:
         mappe = README.parent / "docs" / "bilder"
         # Bare bildefiler: Thumbs.db og .DS_Store fra Utforsker og Finder
         # skal ikke felle testen hos sensor (gjennomgangen av 3.3b, BH4, ECH).
-        filer = sorted(p.relative_to(README.parent).as_posix() for p in mappe.rglob("*")
-                       if p.is_file() and p.suffix.lower() in BILDEFILER)
+        filer = sorted(
+            p.relative_to(README.parent).as_posix()
+            for p in mappe.rglob("*")
+            if p.is_file() and p.suffix.lower() in BILDEFILER
+        )
         assert filer == []
 
 
@@ -711,9 +743,7 @@ def _seksjon(navn: str) -> str:
     return _kom_i_gang().split(f"### {navn}\n", 1)[1].split("\n### ", 1)[0]
 
 
-SEKSJONENE = {"Felles for begge": [1, 2, 3, 4],
-              "Den ekte versjonen (anbefalt)": [5, 6, 7, 8, 9],
-              "Demoen": [5, 6, 7]}
+SEKSJONENE = {"Felles for begge": [1, 2, 3, 4], "Den ekte versjonen (anbefalt)": [5, 6, 7, 8, 9], "Demoen": [5, 6, 7]}
 
 
 def _steg(seksjon: str, nummer: int) -> str:
@@ -750,21 +780,38 @@ def _ankrene(tekst: str) -> set[str]:
 # Spoersmaalene i «Står du fast?» foer 22:32 (76b68cb), og punktene under den
 # ekte versjonen som ble flyttet til docs/hjelp.md.
 TEMAENE = (
-    "Må jeg logge inn eller lage konto?", "Hvilken Docker Desktop skal jeg velge?",
-    "Hva skjer under installasjonen?", "Installasjonen ber om administrator.",
-    "Docker Desktop sier at virtualisering mangler.", "Docker Desktop ber om å oppdatere WSL (Windows).",
-    "Det står ikke «Engine running» etter noen minutter.", "ZIP-fila ser ut som en vanlig mappe.",
-    "Det er to mapper med samme navn.", "Jeg finner ikke ZIP-fila på Mac.", "Jeg har fått koden fra før.",
-    "Mappa finnes fra før.", "Hvilket vindu skal jeg åpne?", "Ingenting skjer når jeg limer inn.",
-    "Hva betyr cd, og hvordan ser jeg at det gikk?", "Mappa lar seg ikke dra inn i vinduet.",
-    "Stien har mellomrom og fikk ikke anførselstegn.", "Terminal spør om tilgang til Nedlastinger (Mac).",
-    "Hva skal jeg se etter i vinduet?", "«docker» er ikke gjenkjent, eller «command not found: docker».",
+    "Må jeg logge inn eller lage konto?",
+    "Hvilken Docker Desktop skal jeg velge?",
+    "Hva skjer under installasjonen?",
+    "Installasjonen ber om administrator.",
+    "Docker Desktop sier at virtualisering mangler.",
+    "Docker Desktop ber om å oppdatere WSL (Windows).",
+    "Det står ikke «Engine running» etter noen minutter.",
+    "ZIP-fila ser ut som en vanlig mappe.",
+    "Det er to mapper med samme navn.",
+    "Jeg finner ikke ZIP-fila på Mac.",
+    "Jeg har fått koden fra før.",
+    "Mappa finnes fra før.",
+    "Hvilket vindu skal jeg åpne?",
+    "Ingenting skjer når jeg limer inn.",
+    "Hva betyr cd, og hvordan ser jeg at det gikk?",
+    "Mappa lar seg ikke dra inn i vinduet.",
+    "Stien har mellomrom og fikk ikke anførselstegn.",
+    "Terminal spør om tilgang til Nedlastinger (Mac).",
+    "Hva skal jeg se etter i vinduet?",
+    "«docker» er ikke gjenkjent, eller «command not found: docker».",
     "«Cannot connect to the Docker daemon», «error during connect» eller «dockerDesktopLinuxEngine».",
-    "To kommandoer havnet på samme linje.", "«no configuration file provided: not found».",
+    "To kommandoer havnet på samme linje.",
+    "«no configuration file provided: not found».",
     "«toomanyrequests» fra Docker Hub.",
     "«port is already allocated», «address already in use» eller «ports are not available».",
-    "Siden åpnes ikke.", "Hva er demoen?", "Hvordan starter jeg neste gang?",
-    "Hva med nøkkelen?", "Når kan jeg hente?", "Oversikten er tom.", "Hvor ligger dataene?",
+    "Siden åpnes ikke.",
+    "Hva er demoen?",
+    "Hvordan starter jeg neste gang?",
+    "Hva med nøkkelen?",
+    "Når kan jeg hente?",
+    "Oversikten er tom.",
+    "Hvor ligger dataene?",
     "Kan appen nås fra nettet?",
 )
 
@@ -777,12 +824,12 @@ class TestReadmeForNybegynnere:
 
     def test_ingen_kommentar_paa_kommandolinjene(self):
         """Linjene skal virke ogsaa i Ledetekst, der # ikke er en kommentar."""
-        for spraak, blokk in _blokkene(_kom_i_gang()):
+        for _spraak, blokk in _blokkene(_kom_i_gang()):
             assert "#" not in blokk, blokk
 
     def test_en_kommando_per_boks(self):
         """En av oss fikk to kommandoer paa samme linje 11.10."""
-        for spraak, blokk in _blokkene(_kom_i_gang()):
+        for _spraak, blokk in _blokkene(_kom_i_gang()):
             assert len([l for l in blokk.splitlines() if l.strip()]) == 1, blokk
 
     def test_bare_kommandoer_i_kom_i_gang(self):
@@ -834,8 +881,11 @@ class TestReadmeForNybegynnere:
         svar = _hjelp().split("### Jeg har fått koden fra før.", 1)[1].strip().split("\n\n", 1)[0]
         assert svar == "Har du fått koden som mappe eller ZIP-fil, pakker du den ut og går til steg 3."
         assert steg.strip().endswith(svar)
-        assert _steg("Felles for begge", 4).strip().endswith(
-            "Har mappa et annet navn, drar du den mappa der README og compose ligger.")
+        assert (
+            _steg("Felles for begge", 4)
+            .strip()
+            .endswith("Har mappa et annet navn, drar du den mappa der README og compose ligger.")
+        )
         assert "Du må pakke ut" in _detaljer(_faq())["ZIP-fila ser ut som en vanlig mappe."]
 
     def test_advarselen_mot_down_v_staar_synlig(self):
@@ -907,8 +957,7 @@ class TestReadmeForNybegynnere:
         assert sitert == app_modul.EKSEMPELTALL_MERKE
         # Story 8.0d: merket staar i rammen, som alle tre malene bruker.
         ramme = (ROT / "src" / "templates" / "_ramme.html").read_text(encoding="utf-8")
-        assert re.findall(r'<p class="eksempeltall">([^<]+)</p>', ramme) == [
-            "Demoversjon. {{ eksempeltall_merke }}"]
+        assert re.findall(r'<p class="eksempeltall">([^<]+)</p>', ramme) == ["Demoversjon. {{ eksempeltall_merke }}"]
         for mal in ("index.html", "aksje.html", "basefeil.html"):
             tekst = (ROT / "src" / "templates" / mal).read_text(encoding="utf-8")
             assert tekst.startswith('{% extends "_ramme.html" %}'), mal
@@ -957,22 +1006,49 @@ class TestReadmeForNybegynnere:
         """22:32: Bytte og uv staar, lukket i <details> under én overskrift."""
         mer = _seksjon("Mer for den som vil")
         # Story 10.2: den lokale modellen, ogsaa lukket.
-        assert set(_detaljer(mer)) == {"Bytte mellom demoen og den ekte versjonen", "Uten Docker, med uv",
-                                       "Den lokale modellen (KI-teksten)"}
+        assert set(_detaljer(mer)) == {
+            "Bytte mellom demoen og den ekte versjonen",
+            "Uten Docker, med uv",
+            "Den lokale modellen (KI-teksten)",
+        }
 
     def test_svarene_beholdt_innholdet(self):
         """Gjennomgangen 11.10 (VG): bare overskriftene ble sjekket etter
         flyttingen. Innholdet fra svarene foer 22:32 staar i README-en eller
         docs/hjelp.md. Ville feilet hvis et svar ble tomt eller mistet en del."""
         tekst = _faq() + _hjelp()
-        for innhold in ("wsl --update", "AirPlay", "Quit Docker Desktop", "hvalen ved klokka",
-                        "AMD64", "Apple Silicon", "Safari", "administrator, og da sperrer Windows dra og slipp",
-                        "`.env` med nøkkelen", "port 5000", "Ledetekst", "Ikke velg «Windows PowerShell ISE»",
-                        "filene README og compose", "uten filendelsen", "virtualisering", "toomanyrequests",
-                        "samme IP-adresse", "Dataene ligger i to Docker-volumer", "20 kall i døgnet",
-                        "notepad .env", "open -e .env", "nano .env", "før midnatt", "helgen",
-                        "Appen kan ikke nås fra nettet", "lim inn stoppkommandoen", "Cmd+mellomrom",
-                        "Svar OK", "Pakk ut alle", "glidelås"):
+        for innhold in (
+            "wsl --update",
+            "AirPlay",
+            "Quit Docker Desktop",
+            "hvalen ved klokka",
+            "AMD64",
+            "Apple Silicon",
+            "Safari",
+            "administrator, og da sperrer Windows dra og slipp",
+            "`.env` med nøkkelen",
+            "port 5000",
+            "Ledetekst",
+            "Ikke velg «Windows PowerShell ISE»",
+            "filene README og compose",
+            "uten filendelsen",
+            "virtualisering",
+            "toomanyrequests",
+            "samme IP-adresse",
+            "Dataene ligger i to Docker-volumer",
+            "20 kall i døgnet",
+            "notepad .env",
+            "open -e .env",
+            "nano .env",
+            "før midnatt",
+            "helgen",
+            "Appen kan ikke nås fra nettet",
+            "lim inn stoppkommandoen",
+            "Cmd+mellomrom",
+            "Svar OK",
+            "Pakk ut alle",
+            "glidelås",
+        ):
             assert innhold in tekst, innhold
 
     def test_like_spoersmaal_har_samme_svar(self):
@@ -1007,8 +1083,12 @@ class TestReadmeForNybegynnere:
         tekst = README.read_text(encoding="utf-8")
         for del_ in ("Til faglærer:", "\n## Kom i gang\n", "\n## Status\n", "\n## Tester\n"):
             assert del_ in tekst, del_
-        assert (tekst.index("Til faglærer:") < tekst.index("\n## Kom i gang\n")
-                < tekst.index("\n## Status\n") < tekst.index("\n## Tester\n"))
+        assert (
+            tekst.index("Til faglærer:")
+            < tekst.index("\n## Kom i gang\n")
+            < tekst.index("\n## Status\n")
+            < tekst.index("\n## Tester\n")
+        )
         topp = tekst.split("\n## Kom i gang\n", 1)[0]
         avsnitt = [a.strip() for a in topp.split("\n\n") if a.strip()]
         # Gruppen 16.10 kl. 21:38: skjermbildet under «Til faglærer» er tatt
@@ -1030,26 +1110,47 @@ class TestReadmeForNybegynnere:
         assert not re.search(r"\b[Ss]tor(y|ies|yen)\b|PR #\d", status), status
         assert "```" not in status and "~~~" not in status and "`" not in status
         assert not re.search(r"docker[ -]compose|uv run", status, re.IGNORECASE)
-        for innhold in ("Under arbeid", "Flettet til main:", "hentingen", "Docker", "demoen", "README-en",
-                        "kallene som er igjen", "hjelp bak «?»",
-                        "tydeligere merking", "utseendet fra designforslaget", "KI-laget", "Euronext",
-                        "og at hentingen lager teksten med en lokal modell",
-                        "aksjesiden viser bare tekster som besto kontrollen",
-                        "](_bmad-output/implementation-artifacts/sprint-status.yaml)"):
+        for innhold in (
+            "Under arbeid",
+            "Flettet til main:",
+            "hentingen",
+            "Docker",
+            "demoen",
+            "README-en",
+            "kallene som er igjen",
+            "hjelp bak «?»",
+            "tydeligere merking",
+            "utseendet fra designforslaget",
+            "KI-laget",
+            "Euronext",
+            "og at hentingen lager teksten med en lokal modell",
+            "aksjesiden viser bare tekster som besto kontrollen",
+            "](_bmad-output/implementation-artifacts/sprint-status.yaml)",
+        ):
             assert innhold in status, innhold
         # Gjennomgangen av flettingen 12.10 (VG): hver sak staar i riktig liste.
         # Ville feilet hvis noe som ikke er flettet, sto under «Flettet til
         # main», slik grenen 8-0b sa om 2.3b.
         flettet, neste = status.split("Flettet til main:", 1)[1].split("Neste:", 1)
         neste = neste.split("Det som bygges etter demoen", 1)[0]
-        for sak in ("hentingen", "kallene som er igjen", "Docker", "demoen", "README-en",
-                    "hjelp bak «?»", "tydeligere merking", "datoene og månedsmerkene i grafen",
-                    "oversikten fra designforslaget", "utseendet fra designforslaget",
-                    "sortering ved klikk i kolonneraden", "den første delen av KI-laget",
-                    "en bryter som slår den av og på",
-                    "at hentingen lager teksten med en lokal modell",
-                    "at hovedindeksen hentes i samme kjøring",
-                    "vises over tabellen på forsiden"):
+        for sak in (
+            "hentingen",
+            "kallene som er igjen",
+            "Docker",
+            "demoen",
+            "README-en",
+            "hjelp bak «?»",
+            "tydeligere merking",
+            "datoene og månedsmerkene i grafen",
+            "oversikten fra designforslaget",
+            "utseendet fra designforslaget",
+            "sortering ved klikk i kolonneraden",
+            "den første delen av KI-laget",
+            "en bryter som slår den av og på",
+            "at hentingen lager teksten med en lokal modell",
+            "at hovedindeksen hentes i samme kjøring",
+            "vises over tabellen på forsiden",
+        ):
             assert sak in flettet, sak
         # Story 8.0d, PR 3 (svar 9 kl. 22:50): «Neste:» følger rekkefølgen
         # etter 8.0d (gruppen 14.10 kl. 22:19 og 22:25).
@@ -1062,9 +1163,15 @@ class TestReadmeForNybegynnere:
         # («hovedindeksen på forsiden») står først under «Neste:».
         # Story 2.9: visningen er flettet, og «Neste:» begynner med Min liste.
         assert "resten av KI-laget" not in status and "Selve teksten lages ikke ennå" not in status
-        saker = ("Min liste", "innstillingene", "periodene i kursgrafen",
-                 "historikken og signaldagene", "«Vis KI-tekst» i innstillingene", "KI-teksten om dagen",
-                 "velge og bytte aksjer")
+        saker = (
+            "Min liste",
+            "innstillingene",
+            "periodene i kursgrafen",
+            "historikken og signaldagene",
+            "«Vis KI-tekst» i innstillingene",
+            "KI-teksten om dagen",
+            "velge og bytte aksjer",
+        )
         for sak in saker:
             assert sak in neste and sak not in flettet, sak
         # Gjennomgangen (VG7): i den rekkefølgen, og det flettede står ikke i «Neste».
@@ -1100,7 +1207,9 @@ class TestReadmeForNybegynnere:
         assert f"{tall[antall]} enkle sjekker" in beskrivelse
         # Styrken er summen av sjekkene uten fortegn (FR-703), saa den hoeyeste er antallet.
         assert f"signalstyrke fra 0 til {antall}" in beskrivelse
-        assert "– " + ", ".join(n.lower() for n in navn[:antall - 1]) + f" og {navn[antall - 1].lower()} –" in beskrivelse
+        assert (
+            "– " + ", ".join(n.lower() for n in navn[: antall - 1]) + f" og {navn[antall - 1].lower()} –" in beskrivelse
+        )
         assert "Appen gir ikke råd om å kjøpe eller selge." in beskrivelse
         # 12.10 kl. 11:12: at appen er under utvikling, staar ogsaa oeverst,
         # ikke bare i «Status» etter hele «Kom i gang».

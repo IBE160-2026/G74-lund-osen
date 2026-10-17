@@ -3631,3 +3631,21 @@ Som **gruppe**, vil vi ha en brief som beskriver appen vi leverer, så sensor ka
 *Lagt til 2026-10-06, Marians beslutning:* v8 lover ikke lenker til NewsWeb eller Oslo Børs, men kan nevne lenken til investorsiden (10.5).
 
 *Lagt til 2026-10-06:* v8 er lagt inn i `product-brief.md` i `52023c9`, med taggen `arbeidskrav-product-brief-v8`, etter at Marian og Joakim leste utkastet og sa ja.
+
+### Story 9.7: Linter og formatterer i CI
+
+*Lagt til 2026-10-17, gruppens svar kl. 22:38, 22:41 og 22:42 (instruksjonen kl. 23:13).*
+
+Som **gruppe**, vil vi at ruff finner ubrukte importer, rot i importene og vanlige feil før en commit, og at CI stopper det som slipper gjennom, så sensor ser kode som er formattert på én måte og sjekket av et verktøy.
+
+**Oppfyller:** svaret kl. 22:38–22:42 under «Prioritering» · **Begrenses av:** regel 8 og 19 i `CLAUDE.md`, AD-8
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- ruff er en utviklingsavhengighet i `uv.lock`, og reglene står i `pyproject.toml`. Bare regler som finner feil eller rot: pyflakes (`F`), importene (`I`) og bugbear (`B`), ikke smak
+- Først én commit med `ruff format` på `src/` og `tests/`, uten endring i oppførsel, så én commit per regelgruppe
+- CI kjører `ruff check` og `ruff format --check`, og en test gjør det samme, så `uv run pytest` feiler lokalt også
+- README («Tester»), `docs/kvalitetssikring.md` og `CLAUDE.md` sier at ruff kjøres før en commit
+- `src/meldinger.py` sier i docstringen at den ikke brukes i v1 (plan B), og at den er beholdt med testene
+- **Ville feilet hvis:** en ubrukt import eller en linje som ikke er formattert, slapp gjennom testene
+
+**Avhenger av:** ingen. **Én økt:** ja.

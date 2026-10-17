@@ -31,8 +31,20 @@ class Rutelinje:
 
 
 # Story 8.0c: fullt norsk maanedsnavn, smaa bokstaver (designregler §4).
-MAANEDER = ("januar", "februar", "mars", "april", "mai", "juni", "juli",
-            "august", "september", "oktober", "november", "desember")
+MAANEDER = (
+    "januar",
+    "februar",
+    "mars",
+    "april",
+    "mai",
+    "juni",
+    "juli",
+    "august",
+    "september",
+    "oktober",
+    "november",
+    "desember",
+)
 
 
 # Plassen et maanedsnavn trenger med 10px skrift. Naermere hoeyre kant enn
@@ -152,8 +164,7 @@ def _maanedsmerker(punkter: tuple[Punkt, ...], bredde: int) -> tuple[Maanedsmerk
         if foerste is None or foerste not in indeks:
             continue
         x = MARG_X + tegne_bredde * indeks[foerste] / (len(punkter) - 1)
-        merker.append(Maanedsmerke(x=x, navn=MAANEDER[foerste.month - 1],
-                                   til_venstre=x > bredde - NAVNEBREDDE))
+        merker.append(Maanedsmerke(x=x, navn=MAANEDER[foerste.month - 1], til_venstre=x > bredde - NAVNEBREDDE))
     return tuple(merker)
 
 
@@ -203,9 +214,7 @@ def _rutenett(lav: float, hoy: float, hoyde: int, linjer: int = 3) -> tuple[Rute
     return tuple(ut)
 
 
-def bygg_graf(
-    punkter: tuple[Punkt, ...], bredde: int = BREDDE, hoyde: int = HOYDE
-) -> Graf | None:
+def bygg_graf(punkter: tuple[Punkt, ...], bredde: int = BREDDE, hoyde: int = HOYDE) -> Graf | None:
     """Koordinatene for kurs og MA50. None naar det ikke er noe aa tegne."""
     if len(punkter) < 2:
         return None

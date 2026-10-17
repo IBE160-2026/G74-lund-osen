@@ -111,11 +111,12 @@ def test_nyeste_leser_gir_kursleser_for_nyeste_fil(tmp_path):
         encoding="utf-8",
     )
     (tmp_path / "kurser-raa-2026-09-22.json").write_text(
-        json.dumps({
-            "hentet": "2026-09-22T15:40:00+00:00",
-            "serier": {"DNB": [{"date": "2026-09-22", "close": 250.0,
-                                "adjusted_close": 245.0, "volume": 10}]},
-        }),
+        json.dumps(
+            {
+                "hentet": "2026-09-22T15:40:00+00:00",
+                "serier": {"DNB": [{"date": "2026-09-22", "close": 250.0, "adjusted_close": 245.0, "volume": 10}]},
+            }
+        ),
         encoding="utf-8",
     )
 
@@ -135,11 +136,12 @@ def _kursfil(katalog, dato: str, hentet: str):
     katalog.mkdir(parents=True, exist_ok=True)
     fil = katalog / f"kurser-raa-{dato}.json"
     fil.write_text(
-        json.dumps({
-            "hentet": hentet,
-            "serier": {"DNB": [{"date": dato, "close": 250.0,
-                                "adjusted_close": 245.0, "volume": 10}]},
-        }),
+        json.dumps(
+            {
+                "hentet": hentet,
+                "serier": {"DNB": [{"date": dato, "close": 250.0, "adjusted_close": 245.0, "volume": 10}]},
+            }
+        ),
         encoding="utf-8",
     )
     return fil

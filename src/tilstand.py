@@ -26,9 +26,9 @@ from vurderingsdata import Grunn, Vurdering
 
 
 class Art(StrEnum):
-    SVAR = "svar"                    # rad med vurdering, ogsaa styrke 0
-    GRUNN = "grunn"                  # rad med grunn (punkt 24)
-    IKKE_KJOERT = "ikke_kjoert"      # ingen rad, og dagen var boersdag
+    SVAR = "svar"  # rad med vurdering, ogsaa styrke 0
+    GRUNN = "grunn"  # rad med grunn (punkt 24)
+    IKKE_KJOERT = "ikke_kjoert"  # ingen rad, og dagen var boersdag
     IKKE_BOERSDAG = "ikke_boersdag"  # ingen rad, og dagen var ikke boersdag
 
 
@@ -67,9 +67,7 @@ def tilstand(innhold: Vurdering | Grunn | None, dato: date, idag: date) -> Tilst
     den datoen til foerste rad i tabellen.
     """
     if innhold is not None and not isinstance(innhold, (Vurdering, Grunn)):
-        raise TypeError(
-            f"innhold maa vaere Vurdering, Grunn eller None, fikk {type(innhold).__name__}"
-        )
+        raise TypeError(f"innhold maa vaere Vurdering, Grunn eller None, fikk {type(innhold).__name__}")
     _kontroller_dag("dato", dato)
     _kontroller_dag("idag", idag)
     if dato > idag:

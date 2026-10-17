@@ -36,8 +36,15 @@ KJERNEMODULER = (
 # Kjernen gjoer ikke I/O og importerer ikke skallet (spinen, lagtabellen).
 # Skallet ble lagt til i story 1.7, der spinen sier det for tilstand.py.
 FORBUDTE_MODULER = {
-    "sqlite3", "pathlib", "requests", "flask",
-    "app", "fetch_prices", "lagring_sqlite", "lagring_fil", "eodhd",
+    "sqlite3",
+    "pathlib",
+    "requests",
+    "flask",
+    "app",
+    "fetch_prices",
+    "lagring_sqlite",
+    "lagring_fil",
+    "eodhd",
 }
 
 EODHD_NOEKLER = ("adjusted_close", "close", "volume", "date")
@@ -47,7 +54,12 @@ EODHD_NOEKLER = ("adjusted_close", "close", "volume", "date")
 # vurderingsdata.py, som derfor ikke kan regne boersdagen selv.
 PORTMODULER = ("kursdata.py", "vurderingsdata.py")
 FORBUDT_I_PORTEN = {
-    "json", "pathlib", "sqlite3", "lagring_fil", "lagring_sqlite", "eodhd",
+    "json",
+    "pathlib",
+    "sqlite3",
+    "lagring_fil",
+    "lagring_sqlite",
+    "eodhd",
     *(navn.removesuffix(".py") for navn in KJERNEMODULER),
 }
 
@@ -58,7 +70,10 @@ UTEN_EODHD = KJERNEMODULER + PORTMODULER
 # fallbackvakten: lagring_sqlite.py leser rad[0] fra basen, og det er lovlig.
 # Story 1.8: fetch_prices.py oversetter gjennom eodhd.py og er med her.
 UTEN_EODHD_STRENGER = UTEN_EODHD + (
-    "lagring_fil.py", "lagring_sqlite.py", "app.py", "fetch_prices.py",
+    "lagring_fil.py",
+    "lagring_sqlite.py",
+    "app.py",
+    "fetch_prices.py",
 )
 
 # De to som leser en serie fra EODHD. Begge skal bruke samme regel (story 1.8).
@@ -92,7 +107,9 @@ def test_signalberegning_importerer_bare_porten_og_loevnodene():
     det bare kursdata, tallformat og vurderingsdata, aldri et lager."""
     prosjektet = {sti.stem for sti in SRC.glob("*.py")}
     assert _importerte_moduler(_tre("signalberegning.py")) & prosjektet == {
-        "kursdata", "tallformat", "vurderingsdata",
+        "kursdata",
+        "tallformat",
+        "vurderingsdata",
     }
 
 
@@ -101,9 +118,7 @@ def test_ingen_eodhd_noekler_i_kildeteksten(navn):
     """Ingen streng i modulen er en av EODHDs feltnavn. Staar den der, leser
     modulen kildens rader i stedet for Kursrad."""
     strenger = {
-        node.value
-        for node in ast.walk(_tre(navn))
-        if isinstance(node, ast.Constant) and isinstance(node.value, str)
+        node.value for node in ast.walk(_tre(navn)) if isinstance(node, ast.Constant) and isinstance(node.value, str)
     }
     assert strenger & set(EODHD_NOEKLER) == set()
 
@@ -151,7 +166,11 @@ def test_app_velger_ikke_oeyeblikksbilde_selv():
     SnapshotKilde, SnapshotLeser, DATA_KATALOG eller RAA_KATALOG.
     Kursleseren kommer fra filadapteren (story 1.5 og 2.1b)."""
     forbudt = {
-        "nyeste_snapshot", "SnapshotKilde", "SnapshotLeser", "DATA_KATALOG", "RAA_KATALOG",
+        "nyeste_snapshot",
+        "SnapshotKilde",
+        "SnapshotLeser",
+        "DATA_KATALOG",
+        "RAA_KATALOG",
     }
     assert _navn_i(_tre("app.py")) & forbudt == set()
 
@@ -194,9 +213,5 @@ def test_bare_aapne_base_kobler_til_basen():
     """Story 2.1b, K2: basen aapnes ett sted. Ingen annen kode i src/
     kaller sqlite3.connect. Ville feilet hvis fetch_prices koblet til selv
     (M4)."""
-    kall = {
-        (sti.name, funksjon)
-        for sti in sorted(SRC.glob("*.py"))
-        for funksjon in _connect_kall(_tre(sti.name))
-    }
+    kall = {(sti.name, funksjon) for sti in sorted(SRC.glob("*.py")) for funksjon in _connect_kall(_tre(sti.name))}
     assert kall == {("lagring_sqlite.py", "aapne_base")}

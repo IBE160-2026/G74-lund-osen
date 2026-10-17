@@ -41,11 +41,36 @@ ANTALL_SJEKKER = 3
 FASTE_TALL = frozenset({ANTALL_SJEKKER, MA_VINDU, VOLATILITET_VINDU, VOLUM_VINDU, TERSKEL})
 
 TALLORD = {
-    "null": 0, "to": 2, "tre": 3, "fire": 4, "fem": 5, "seks": 6,
-    "sju": 7, "syv": 7, "åtte": 8, "ni": 9, "ti": 10, "elleve": 11, "tolv": 12,
-    "tretten": 13, "fjorten": 14, "femten": 15, "seksten": 16, "sytten": 17,
-    "atten": 18, "nitten": 19, "tjue": 20, "tyve": 20, "tretti": 30, "førti": 40,
-    "femti": 50, "seksti": 60, "sytti": 70, "åtti": 80, "nitti": 90, "hundre": 100,
+    "null": 0,
+    "to": 2,
+    "tre": 3,
+    "fire": 4,
+    "fem": 5,
+    "seks": 6,
+    "sju": 7,
+    "syv": 7,
+    "åtte": 8,
+    "ni": 9,
+    "ti": 10,
+    "elleve": 11,
+    "tolv": 12,
+    "tretten": 13,
+    "fjorten": 14,
+    "femten": 15,
+    "seksten": 16,
+    "sytten": 17,
+    "atten": 18,
+    "nitten": 19,
+    "tjue": 20,
+    "tyve": 20,
+    "tretti": 30,
+    "førti": 40,
+    "femti": 50,
+    "seksti": 60,
+    "sytti": 70,
+    "åtti": 80,
+    "nitti": 90,
+    "hundre": 100,
     "tusen": 1000,
 }
 
@@ -74,36 +99,96 @@ _ENHETER = re.compile(
 
 _UTFYLLING = r"(?:altså\s+|derfor\s+|samlet\s+|dermed\s+)?"
 _RETNING_UTSAGN = (
-    re.compile(r"(?<![a-zæøå])((?:\w+\s+)?)retning(?:en)?\s+(?:er|var|blir|ble)\s+" + _UTFYLLING
-               + r"(ikke\s+)?(positiv|negativ|blandet|ingen)", re.IGNORECASE),
+    re.compile(
+        r"(?<![a-zæøå])((?:\w+\s+)?)retning(?:en)?\s+(?:er|var|blir|ble)\s+"
+        + _UTFYLLING
+        + r"(ikke\s+)?(positiv|negativ|blandet|ingen)",
+        re.IGNORECASE,
+    ),
     re.compile(r"(?<![a-zæøå])()()(positiv|negativ|blandet|ingen)\s+retning", re.IGNORECASE),
 )
 # Et ord foran «retning» som sier at det gjelder én sjekk eller kursen.
 _ANNEN_RETNING = re.compile(r"^(trendens|bevegelsens|interessens|kursens|dagens|sjekkens)\s+$", re.IGNORECASE)
 
 _STYRKE_UTSAGN = (
-    re.compile(r"(?<![a-zæøå])(?:signal)?styrken?(?:\s+(?:på|til)\s+signalet)?\s+(?:er|var|blir|ble|på)\s+"
-               + _UTFYLLING + r"(\w+)", re.IGNORECASE),
+    re.compile(
+        r"(?<![a-zæøå])(?:signal)?styrken?(?:\s+(?:på|til)\s+signalet)?\s+(?:er|var|blir|ble|på)\s+"
+        + _UTFYLLING
+        + r"(\w+)",
+        re.IGNORECASE,
+    ),
     re.compile(r"(?<![a-zæøå])(\w+)\s+av\s+(?:de\s+)?(?:tre|3)\s+sjekk", re.IGNORECASE),
-    re.compile(r"(?<![a-zæøå])(?<!de )(\w+)\s+(?:av\s+)?(?:(?:de\s+)?(?:tre|3)\s+)?sjekk\w*\s+(?:ga|slo|gir|slår)\b",
-               re.IGNORECASE),
+    re.compile(
+        r"(?<![a-zæøå])(?<!de )(\w+)\s+(?:av\s+)?(?:(?:de\s+)?(?:tre|3)\s+)?sjekk\w*\s+(?:ga|slo|gir|slår)\b",
+        re.IGNORECASE,
+    ),
 )
 
 RAAD = (
-    r"kjøp", r"selg", r"salgs", r"anbefal", r"bør\b", r"råd\b", r"rådgiv", r"investerings\w*",
-    r"alternativ for investorer", r"kursmål", r"behold", r"hold(?:e|er)?\b", r"oppside",
-    r"nedside", r"undervurdert", r"overvurdert", r"attraktiv", r"buy\b", r"sell\b", r"should\b",
+    r"kjøp",
+    r"selg",
+    r"salgs",
+    r"anbefal",
+    r"bør\b",
+    r"råd\b",
+    r"rådgiv",
+    r"investerings\w*",
+    r"alternativ for investorer",
+    r"kursmål",
+    r"behold",
+    r"hold(?:e|er)?\b",
+    r"oppside",
+    r"nedside",
+    r"undervurdert",
+    r"overvurdert",
+    r"attraktiv",
+    r"buy\b",
+    r"sell\b",
+    r"should\b",
 )
 GJETNING = (
-    r"trolig", r"sannsynlig", r"kan tyde på", r"tyder på", r"forvent", r"ventes", r"antyde",
-    r"skyld(?:es|tes)", r"på grunn av", r"grunnet", r"som følge av", r"drevet av", r"kanskje",
-    r"mulig", r"vil (?:fortsette|stige|falle|øke|synke)", r"kommer til å", r"spår", r"prognose",
-    r"neste (?:dag|uke|måned|børsdag)", r"i morgen", r"fremover", r"framover", r"kommende",
-    r"kan bety", r"indikerer", r"tegn på", r"likely\b", r"due to\b", r"expected\b",
+    r"trolig",
+    r"sannsynlig",
+    r"kan tyde på",
+    r"tyder på",
+    r"forvent",
+    r"ventes",
+    r"antyde",
+    r"skyld(?:es|tes)",
+    r"på grunn av",
+    r"grunnet",
+    r"som følge av",
+    r"drevet av",
+    r"kanskje",
+    r"mulig",
+    r"vil (?:fortsette|stige|falle|øke|synke)",
+    r"kommer til å",
+    r"spår",
+    r"prognose",
+    r"neste (?:dag|uke|måned|børsdag)",
+    r"i morgen",
+    r"fremover",
+    r"framover",
+    r"kommende",
+    r"kan bety",
+    r"indikerer",
+    r"tegn på",
+    r"likely\b",
+    r"due to\b",
+    r"expected\b",
 )
 AARSAKER = (
-    r"nyhet", r"kontrakt", r"kvartal", r"rapport", r"oppkjøp", r"fusjon", r"emisjon",
-    r"utbytte", r"børsmelding", r"rente", r"oljepris",
+    r"nyhet",
+    r"kontrakt",
+    r"kvartal",
+    r"rapport",
+    r"oppkjøp",
+    r"fusjon",
+    r"emisjon",
+    r"utbytte",
+    r"børsmelding",
+    r"rente",
+    r"oljepris",
 )
 
 _RAAD = re.compile(r"(?<![a-zæøå])(" + "|".join(RAAD) + r")", re.IGNORECASE)
@@ -167,7 +252,7 @@ def kontroller(tekst: str, grunnlag: Mapping[str, object]) -> Kontrollsvar:
     for treff in _SIFFER.finditer(tekst):
         tall = treff.group(0)
         if "," in tall or "." in tall or len(tall) > _LENGSTE_TALL or int(tall) not in lovlige:
-            grunner.append(f"2: tallet «{tall[:_LENGSTE_TALL + 1]}»")
+            grunner.append(f"2: tallet «{tall[: _LENGSTE_TALL + 1]}»")
     if "%" in tekst or "‰" in tekst:
         grunner.append("2: en prosent")
     for treff in _ENHETER.finditer(tekst):

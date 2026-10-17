@@ -36,8 +36,16 @@ def _rad(emne=None, **endret):
         grunnlag={"trend": 1, "bevegelse": 0, "interesse": -1, "styrke": 2, "retning": "Blandet"},
         regelen="Trenden og interessen ga utslag.",
         tekst="Trenden peker opp, mens interessen trekker ned.",
-        besto=True, grunn=None, promptversjon="1", tjeneste="lokal", modell="gemma4:e4b",
-        modell_id="dc35e8d9c606", seed=42, temperatur=0.0, maskinvare="gpu", ollama_versjon="0.35.1",
+        besto=True,
+        grunn=None,
+        promptversjon="1",
+        tjeneste="lokal",
+        modell="gemma4:e4b",
+        modell_id="dc35e8d9c606",
+        seed=42,
+        temperatur=0.0,
+        maskinvare="gpu",
+        ollama_versjon="0.35.1",
     )
     felt.update(endret)
     return KIRad(**felt)
@@ -54,8 +62,17 @@ def base():
 def _rad_rett_i_basen(tilkobling, **endret):
     """En rad skrevet med SQL, utenom adapteren og KIRad."""
     verdier = dict(
-        slag="aksje", dato="2026-10-15", symbol="EQNR", melding_id=None, grunnlag="{}",
-        regelen="r", tekst="t", besto=1, grunn=None, promptversjon="1", tjeneste="lokal",
+        slag="aksje",
+        dato="2026-10-15",
+        symbol="EQNR",
+        melding_id=None,
+        grunnlag="{}",
+        regelen="r",
+        tekst="t",
+        besto=1,
+        grunn=None,
+        promptversjon="1",
+        tjeneste="lokal",
         modell="gemma4:e4b",
     )
     verdier.update(endret)
@@ -71,9 +88,7 @@ class TestMigrasjonen:
         """Tabellen lages av en nummerert migrasjon (AD-16). Basen staar paa 6
         etter 0006 (story 2.8)."""
         assert versjon(base) == 6
-        assert base.execute(
-            "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'ki_logg'"
-        ).fetchone()
+        assert base.execute("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'ki_logg'").fetchone()
         assert (MIGRASJONSKATALOG / "0005_ki_logg.sql").is_file()
 
     def test_tabellen_lages_bare_i_migrasjonen(self):
@@ -121,9 +136,18 @@ class TestOmstart:
         rader = [
             _rad(),
             _rad(Emne.melding("m-1", TORSDAG), grunnlag={"a": [1, {"b": None}], "c": "Ø"}),
-            _rad(Emne.dagen(TORSDAG), tekst=None, besto=False, grunn="modellen svarte ikke",
-                 tjeneste="gemini", modell_id=None, seed=None, temperatur=None, maskinvare=None,
-                 ollama_versjon=None),
+            _rad(
+                Emne.dagen(TORSDAG),
+                tekst=None,
+                besto=False,
+                grunn="modellen svarte ikke",
+                tjeneste="gemini",
+                modell_id=None,
+                seed=None,
+                temperatur=None,
+                maskinvare=None,
+                ollama_versjon=None,
+            ),
         ]
         for rad in rader:
             assert logg.skriv(rad)
@@ -174,35 +198,38 @@ class TestIngenEndring:
         _rad_rett_i_basen(base, slag="dag", symbol=None, tekst="en annen")
         assert base.execute("SELECT tekst FROM ki_logg").fetchall() == [("t",)]
 
-    @pytest.mark.parametrize("endret", [
-        dict(slag="aksje", symbol="EQNR", melding_id="m-1"),
-        dict(slag="aksje", symbol=None),
-        dict(slag="melding", symbol="EQNR", melding_id="m-1"),
-        dict(slag="dag", symbol="EQNR"),
-        dict(slag="aksjer"),
-        dict(besto=1, tekst=None),
-        dict(besto=0, grunn=None),
-        dict(besto=2),
-        dict(promptversjon=""),
-        dict(modell=""),
-        dict(maskinvare="tpu"),
-        dict(dato="20261015"),
-        dict(dato="2026-10-32"),
-        dict(grunnlag="ikke json"),
-        dict(grunnlag="[1, 2]"),
-        dict(regelen=" "),
-        dict(tjeneste="av"),
-        dict(symbol=""),
-        dict(symbol="eqnr"),
-        dict(symbol="EQNR "),
-        dict(slag="melding", symbol=None, melding_id=""),
-        dict(seed=1.5),
-        dict(seed="x"),
-        dict(temperatur="x"),
-        dict(temperatur=-0.5),
-        dict(tekst=" "),
-        dict(besto=0, grunn=" "),
-    ])
+    @pytest.mark.parametrize(
+        "endret",
+        [
+            dict(slag="aksje", symbol="EQNR", melding_id="m-1"),
+            dict(slag="aksje", symbol=None),
+            dict(slag="melding", symbol="EQNR", melding_id="m-1"),
+            dict(slag="dag", symbol="EQNR"),
+            dict(slag="aksjer"),
+            dict(besto=1, tekst=None),
+            dict(besto=0, grunn=None),
+            dict(besto=2),
+            dict(promptversjon=""),
+            dict(modell=""),
+            dict(maskinvare="tpu"),
+            dict(dato="20261015"),
+            dict(dato="2026-10-32"),
+            dict(grunnlag="ikke json"),
+            dict(grunnlag="[1, 2]"),
+            dict(regelen=" "),
+            dict(tjeneste="av"),
+            dict(symbol=""),
+            dict(symbol="eqnr"),
+            dict(symbol="EQNR "),
+            dict(slag="melding", symbol=None, melding_id=""),
+            dict(seed=1.5),
+            dict(seed="x"),
+            dict(temperatur="x"),
+            dict(temperatur=-0.5),
+            dict(tekst=" "),
+            dict(besto=0, grunn=" "),
+        ],
+    )
     def test_basen_sjekker_formen(self, base, endret):
         with pytest.raises(sqlite3.IntegrityError):
             _rad_rett_i_basen(base, **endret)
@@ -210,8 +237,25 @@ class TestIngenEndring:
     def test_en_check_som_feiler_svelges_ikke(self, base):
         """ON CONFLICT DO NOTHING gjelder bare den unike indeksen. INSERT OR
         IGNORE ville ogsaa svelget en CHECK som feiler."""
-        verdier = ("aksje", "2026-10-15", "EQNR", "m-1", "{}", "r", "t", 1, None, "1", "lokal",
-                   "gemma4:e4b", None, None, None, None, None)
+        verdier = (
+            "aksje",
+            "2026-10-15",
+            "EQNR",
+            "m-1",
+            "{}",
+            "r",
+            "t",
+            1,
+            None,
+            "1",
+            "lokal",
+            "gemma4:e4b",
+            None,
+            None,
+            None,
+            None,
+            None,
+        )
         with pytest.raises(sqlite3.IntegrityError):
             base.execute(lagring_sqlite._KI_SKRIV, verdier)
 
@@ -226,10 +270,7 @@ class TestTransaksjonen:
     def test_en_feil_rulles_tilbake(self, base):
         """Gjennomgangen (VG2): en INSERT som feiler, etterlater ingen aapen
         transaksjon, og neste skriv virker."""
-        base.execute(
-            "CREATE TEMP TRIGGER stopp BEFORE INSERT ON ki_logg "
-            "BEGIN SELECT RAISE(ABORT, 'stopp'); END"
-        )
+        base.execute("CREATE TEMP TRIGGER stopp BEFORE INSERT ON ki_logg BEGIN SELECT RAISE(ABORT, 'stopp'); END")
         logg = SqliteKILogg(base, klokke)
         with pytest.raises(sqlite3.IntegrityError):
             logg.skriv(_rad())

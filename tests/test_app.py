@@ -80,10 +80,7 @@ def snapshot(serier: dict[str, list], hentet: str | None = HENTET) -> SnapshotKi
     rad oversettelsen ikke godtar."""
     return SnapshotKilde(
         hentet=hentet,
-        serier={
-            symbol: [eodhd(r) if isinstance(r, Kursrad) else r for r in rader]
-            for symbol, rader in serier.items()
-        },
+        serier={symbol: [eodhd(r) if isinstance(r, Kursrad) else r for r in rader] for symbol, rader in serier.items()},
     )
 
 
@@ -182,9 +179,14 @@ def test_viser_selskapsnavn_og_de_fem_kolonnene(klient, monkeypatch):
         # Story 8.15: navnet er en lenke som sorterer, med en vinkel.
         # Gjennomgangen (BH5): lenken er påkrevd ved de fire som kan sorteres.
         lenke = r'<a class="sorter[^"]*" href="[^"]*">' if overskrift != "Selskap" else ""
-        etter = (r'<span class="skjult">[^<]*</span><svg class="vinkel"[^>]*><path[^>]*/></svg></a>'
-                 if overskrift != "Selskap" else "")
-        assert re.search(rf"<th[^>]*>{lenke}{overskrift}{etter}( <button[^<]*>\?</button>)?{nok}</th>", html), overskrift
+        etter = (
+            r'<span class="skjult">[^<]*</span><svg class="vinkel"[^>]*><path[^>]*/></svg></a>'
+            if overskrift != "Selskap"
+            else ""
+        )
+        assert re.search(rf"<th[^>]*>{lenke}{overskrift}{etter}( <button[^<]*>\?</button>)?{nok}</th>", html), (
+            overskrift
+        )
     assert "Equinor" in html
 
 
@@ -237,9 +239,7 @@ def test_uleselig_symbol_navngis_i_fotnoten(klient, monkeypatch):
     assert 'href="/aksje/DNB"' not in html
 
 
-@pytest.mark.parametrize(
-    "hentet", [None, "2026-09-21T15:40:00"], ids=["mangler", "uten-tidssone"]
-)
+@pytest.mark.parametrize("hentet", [None, "2026-09-21T15:40:00"], ids=["mangler", "uten-tidssone"])
 def test_uleselig_hentet_gjoer_hele_oeyeblikksbildet_manglende(klient, monkeypatch, hentet):
     """SnapshotLeser (1.4a): kan hentet ikke leses, er hele oeyeblikksbildet
     manglende. Ingen rader vises, siden sier at kursdata mangler, og det
@@ -278,7 +278,7 @@ def test_data_hentet_leses_fra_oeyeblikksbildet(klient, monkeypatch):
 
 def _selskapscelle(html: str, symbol: str) -> str:
     start = html.index(f'href="/aksje/{symbol}"')
-    return html[start: html.index("</td>", start)]
+    return html[start : html.index("</td>", start)]
 
 
 class TestTidsstempler:
@@ -318,9 +318,9 @@ class TestTidsstempler:
         monter_lager(monkeypatch, {"EQNR": self.FERSK, "DNB": self.GAMMEL})
 
         html = klient.get("/").data.decode("utf-8")
-        hode = html[html.index("<thead>"): html.index("</thead>")]
+        hode = html[html.index("<thead>") : html.index("</thead>")]
         # Story 8.0e: to tbody, og overskriften for hver del er en egen rad.
-        kropp = html[html.index("<tbody>"): html.rindex("</tbody>")]
+        kropp = html[html.index("<tbody>") : html.rindex("</tbody>")]
 
         assert hode.count("</th>") == 5
         rader = re.findall(r'<tr(?! class="del)[^>]*>.*?</tr>', kropp, re.DOTALL)
@@ -385,9 +385,7 @@ def test_rutene_gjoer_ingen_nettverkskall(klient, monkeypatch, tmp_path):
 
     detalj = klient.get("/aksje/EQNR")
     assert detalj.status_code == 200
-    assert '<span class="verdi">101,00</span>' in detalj.data.decode("utf-8"), (
-        "detaljen viser ikke dataene"
-    )
+    assert '<span class="verdi">101,00</span>' in detalj.data.decode("utf-8"), "detaljen viser ikke dataene"
 
 
 class TestAksjedetalj:
@@ -527,9 +525,7 @@ class TestBasenIWebserveren:
         """K5. Ville feilet hvis sidene fortsatt leste data/raa/ (M5)."""
         fyll_basen({"EQNR": serie([100.0] * 60 + [101.0])})
         (tmp_path / "kurser-raa-2026-09-21.json").write_text(
-            json.dumps(
-                {"hentet": HENTET, "serier": {"EQNR": [eodhd(r) for r in serie([200.0] * 60 + [202.0])]}}
-            ),
+            json.dumps({"hentet": HENTET, "serier": {"EQNR": [eodhd(r) for r in serie([200.0] * 60 + [202.0])]}}),
             encoding="utf-8",
         )
         monkeypatch.setattr(lagring_fil, "RAA_KATALOG", tmp_path)
@@ -589,8 +585,11 @@ class TestBasenIWebserveren:
 
     def test_bare_verdien_1_gir_docker_kommandoen(self, monkeypatch):
         """Ville feilet hvis enhver verdi, ogsaa tom eller 0, ga Docker-kommandoen."""
-        for verdi, forventet in (("1", app_modul.HENTEKOMMANDO_DOCKER), ("0", app_modul.HENTEKOMMANDO),
-                                 ("", app_modul.HENTEKOMMANDO)):
+        for verdi, forventet in (
+            ("1", app_modul.HENTEKOMMANDO_DOCKER),
+            ("0", app_modul.HENTEKOMMANDO),
+            ("", app_modul.HENTEKOMMANDO),
+        ):
             monkeypatch.setenv(app_modul.I_DOCKER, verdi)
             assert app_modul.hentekommando() == forventet, verdi
         monkeypatch.delenv(app_modul.I_DOCKER)
@@ -942,7 +941,7 @@ def _tabell(html: str) -> _Tabell:
 
 
 def _stil(html: str) -> str:
-    return html[html.index("<style>"): html.index("</style>")]
+    return html[html.index("<style>") : html.index("</style>")]
 
 
 def _regel(stil: str, velger: str) -> str:
@@ -963,10 +962,15 @@ class TestStory80:
         assert endring == f"0,00{NB}%", "en endring som rundes til null, har ikke fortegn"
 
     def test_ingen_tallcelle_har_punktum(self, klient, monkeypatch):
-        monter(monkeypatch, snapshot({
-            "EQNR": serie([100.0] * 60 + [104.0]),
-            "DNB": serie([200.0] * 60 + [197.5]),
-        }))
+        monter(
+            monkeypatch,
+            snapshot(
+                {
+                    "EQNR": serie([100.0] * 60 + [104.0]),
+                    "DNB": serie([200.0] * 60 + [197.5]),
+                }
+            ),
+        )
 
         tabell = _tabell(klient.get("/").data.decode("utf-8"))
 
@@ -979,10 +983,15 @@ class TestStory80:
     def test_aksjen_som_skiller_seg_ut_er_merket_med_tekst(self, klient, monkeypatch):
         """Ville feilet hvis en rad med styrke 2 og en med styrke 1 saa like ut
         for en som ikke ser farger. Testen leser bare teksten i cellene."""
-        monter(monkeypatch, snapshot({
-            "EQNR": serie([100.0] * 60 + [104.0]),   # styrke 2
-            "DNB": serie([100.0] * 60 + [101.0]),    # styrke 1
-        }))
+        monter(
+            monkeypatch,
+            snapshot(
+                {
+                    "EQNR": serie([100.0] * 60 + [104.0]),  # styrke 2
+                    "DNB": serie([100.0] * 60 + [101.0]),  # styrke 1
+                }
+            ),
+        )
 
         tabell = _tabell(klient.get("/").data.decode("utf-8"))
         styrke = {rad[0]: rad[3] for rad in tabell.rader}
@@ -991,10 +1000,15 @@ class TestStory80:
         assert styrke["DNB Bank"] == "1 av 3 T 0 B +1 I 0"
 
     def test_fortsatt_noeyaktig_fem_kolonner(self, klient, monkeypatch):
-        monter(monkeypatch, snapshot({
-            "EQNR": serie([100.0] * 60 + [104.0]),
-            "DNB": serie([100.0] * 60 + [101.0]),
-        }))
+        monter(
+            monkeypatch,
+            snapshot(
+                {
+                    "EQNR": serie([100.0] * 60 + [104.0]),
+                    "DNB": serie([100.0] * 60 + [101.0]),
+                }
+            ),
+        )
 
         tabell = _tabell(klient.get("/").data.decode("utf-8"))
 
@@ -1069,10 +1083,15 @@ class TestStory80:
 
     def test_rad_uten_signal_er_ikke_merket(self, klient, monkeypatch):
         """Den andre veien av FR-705: uten signal staar ikke merket."""
-        monter(monkeypatch, snapshot({
-            "EQNR": serie([100.0] * 60 + [104.0]),   # styrke 2
-            "DNB": serie([100.0, 101.0, 102.0]),     # for kort, uten signal
-        }))
+        monter(
+            monkeypatch,
+            snapshot(
+                {
+                    "EQNR": serie([100.0] * 60 + [104.0]),  # styrke 2
+                    "DNB": serie([100.0, 101.0, 102.0]),  # for kort, uten signal
+                }
+            ),
+        )
 
         tabell = _tabell(klient.get("/").data.decode("utf-8"))
         styrke = {rad[0]: rad[3] for rad in tabell.rader}
@@ -1102,11 +1121,23 @@ class TestVurderingenPaaOversikten:
         """En flat serie ville gitt styrke 0. Raden sier 3, og siden viser 3."""
         rader = serie([100.0] * 60 + [100.0])
         skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET), vurdert=False)
-        skriv_vurdering("EQNR", rader[-1].dato, Vurdering(
-            styrke=3, retning="Negativ", trend=-1, bevegelse=-1, interesse=-1,
-            slutt=100.0, justert_slutt=100.0, trend_avvik=-0.05,
-            dagens_endring=-0.04, standardavvik=0.01, volumforhold=0.2,
-        ))
+        skriv_vurdering(
+            "EQNR",
+            rader[-1].dato,
+            Vurdering(
+                styrke=3,
+                retning="Negativ",
+                trend=-1,
+                bevegelse=-1,
+                interesse=-1,
+                slutt=100.0,
+                justert_slutt=100.0,
+                trend_avvik=-0.05,
+                dagens_endring=-0.04,
+                standardavvik=0.01,
+                volumforhold=0.2,
+            ),
+        )
 
         rad = _rader_per_selskap(klient.get("/").data.decode("utf-8"))["Equinor"]
 
@@ -1131,11 +1162,14 @@ class TestVurderingenPaaOversikten:
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [110.0])}))
         assert "hentekommandoen har ikke skrevet" not in klient.get("/").data.decode("utf-8")
 
-    @pytest.mark.parametrize("grunn,tekst", [
-        (Grunn.SYMBOL_FEILET, "hentingen feilet"),
-        (Grunn.KURS_IKKE_FRA_DAGEN, "ingen kurs fra dagen"),
-        (Grunn.SIGNAL_IKKE_REGNET, "signalet kunne ikke regnes"),
-    ])
+    @pytest.mark.parametrize(
+        "grunn,tekst",
+        [
+            (Grunn.SYMBOL_FEILET, "hentingen feilet"),
+            (Grunn.KURS_IKKE_FRA_DAGEN, "ingen kurs fra dagen"),
+            (Grunn.SIGNAL_IKKE_REGNET, "signalet kunne ikke regnes"),
+        ],
+    )
     def test_grunnen_staar_synlig_under_streken(self, klient, grunn, tekst):
         """Beslutning 3: synlig liten tekst under «–», ikke i title. Ville
         feilet hvis en rad med grunn ble vist som styrke 0 (M5)."""
@@ -1189,9 +1223,9 @@ class TestVurderingenPaaOversikten:
 
         tilkobling = aapne_base(lagring_sqlite.BASE_STI)
         try:
-            uten_kurser = [n for (n,) in tilkobling.execute(
-                "SELECT navn FROM aksje WHERE symbol != 'EQNR' ORDER BY rowid"
-            )]
+            uten_kurser = [
+                n for (n,) in tilkobling.execute("SELECT navn FROM aksje WHERE symbol != 'EQNR' ORDER BY rowid")
+            ]
         finally:
             tilkobling.close()
 
@@ -1215,9 +1249,17 @@ class TestVurderingenIDetaljen:
     med grafen og tilstanden (FR-204)."""
 
     LAGRET = Vurdering(
-        styrke=3, retning="Blandet", trend=1, bevegelse=-1, interesse=-1,
-        slutt=100.0, justert_slutt=100.0, trend_avvik=0.031,
-        dagens_endring=-0.035, standardavvik=0.011, volumforhold=4.95,
+        styrke=3,
+        retning="Blandet",
+        trend=1,
+        bevegelse=-1,
+        interesse=-1,
+        slutt=100.0,
+        justert_slutt=100.0,
+        trend_avvik=0.031,
+        dagens_endring=-0.035,
+        standardavvik=0.011,
+        volumforhold=4.95,
     )
 
     def test_sjekkene_fra_raden_ikke_fra_kursene(self, klient):
@@ -1322,23 +1364,33 @@ class TestStory80c:
 
     def test_styrken_staar_som_n_av_3(self, klient, monkeypatch):
         """Ville feilet hvis oversikten viste bare tallet, som foer 8.0c."""
-        monter(monkeypatch, snapshot({
-            "EQNR": serie([100.0] * 60 + [104.0]),   # styrke 2
-            "DNB": serie([100.0] * 60 + [100.0]),    # styrke 0
-        }))
+        monter(
+            monkeypatch,
+            snapshot(
+                {
+                    "EQNR": serie([100.0] * 60 + [104.0]),  # styrke 2
+                    "DNB": serie([100.0] * 60 + [100.0]),  # styrke 0
+                }
+            ),
+        )
         styrke = {rad[0]: rad[3] for rad in _tabell(klient.get("/").data.decode("utf-8")).rader}
         assert styrke["Equinor"].startswith("2 av 3")
         assert styrke["DNB Bank"] == "0 av 3 T 0 B 0 I 0"
 
     def test_tre_av_tre_har_gul_ring_og_to_av_tre_ikke(self, klient, monkeypatch):
         """designregler §3. Ville feilet uten ringen, eller med gult ved 2 av 3."""
-        monter(monkeypatch, snapshot({
-            "EQNR": serie([100.0] * 60 + [104.0], [1000] * 60 + [5000]),  # 3 av 3
-            "DNB": serie([100.0] * 60 + [104.0]),                              # 2 av 3
-        }))
+        monter(
+            monkeypatch,
+            snapshot(
+                {
+                    "EQNR": serie([100.0] * 60 + [104.0], [1000] * 60 + [5000]),  # 3 av 3
+                    "DNB": serie([100.0] * 60 + [104.0]),  # 2 av 3
+                }
+            ),
+        )
         html = klient.get("/").data.decode("utf-8")
         # Story 8.0e PR 2: pillen staar ogsaa i linja over tabellen.
-        tabell = html[html.index("<table"):]
+        tabell = html[html.index("<table") :]
         assert tabell.count('class="pille tre-av-tre"') == 1
         assert '<span class="pille tre-av-tre">3 av 3</span>' in tabell
         # Story 8.0d, PR 3: hvit pille ved 2 av 3 (gruppen 14.10 kl. 19:59).
@@ -1375,20 +1427,30 @@ class TestStory80c:
     def test_setningen_naar_ingen_skilte_seg_ut(self, klient, monkeypatch):
         """Tillegget 05.10. Ville feilet hvis setningen manglet en dag der alle
         hadde 0 eller 1."""
-        monter(monkeypatch, snapshot({
-            "EQNR": serie([100.0] * 60 + [101.0]),   # styrke 1
-            "DNB": serie([100.0] * 61),              # styrke 0
-        }))
+        monter(
+            monkeypatch,
+            snapshot(
+                {
+                    "EQNR": serie([100.0] * 60 + [101.0]),  # styrke 1
+                    "DNB": serie([100.0] * 61),  # styrke 0
+                }
+            ),
+        )
         html = klient.get("/").data.decode("utf-8")
         assert "Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer." in html
 
     def test_setningen_staar_ikke_med_tre_av_tre_og_ingen_paa_to(self, klient, monkeypatch):
         """Presiseringen kl. 14:33: én aksje paa 3 av 3 og ingen paa 2. Ville
         feilet hvis setningen bare saa etter styrke 2."""
-        monter(monkeypatch, snapshot({
-            "EQNR": serie([100.0] * 60 + [104.0], [1000] * 60 + [5000]),  # 3 av 3
-            "DNB": serie([100.0] * 61),                                        # 0
-        }))
+        monter(
+            monkeypatch,
+            snapshot(
+                {
+                    "EQNR": serie([100.0] * 60 + [104.0], [1000] * 60 + [5000]),  # 3 av 3
+                    "DNB": serie([100.0] * 61),  # 0
+                }
+            ),
+        )
         html = klient.get("/").data.decode("utf-8")
         assert "3 av 3" in html
         assert "Ingen aksjer skilte seg ut" not in html
@@ -1405,6 +1467,7 @@ class TestStory80c:
         import dataclasses
 
         import app as app_modul
+
         andre = dataclasses.replace(app_modul.STANDARD, terskel=3)
         monkeypatch.setattr(app_modul, "STANDARD", andre)
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))  # 2 av 3
@@ -1419,7 +1482,9 @@ class TestStory80c:
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
         # Story 8.0d, PR 3: tallet og ordet i resultatpillen i hvert sjekkort.
-        celler = re.findall(r'<span class="resultat fortegn [a-z]+">([^<]*) <span class="ord">([^<]*)</span></span>', html)
+        celler = re.findall(
+            r'<span class="resultat fortegn [a-z]+">([^<]*) <span class="ord">([^<]*)</span></span>', html
+        )
         assert len(celler) == 3, celler
         par = {(tall, ord_) for tall, ord_ in celler}
         assert ("+1", "positiv") in par
@@ -1460,6 +1525,7 @@ class TestStory80c:
     def test_under_arbeid_staar_nederst_paa_begge_sidene(self, klient, monkeypatch):
         """Tillegget 11.10, svar 4. Ville feilet hvis linja manglet paa en side."""
         import app as app_modul
+
         monkeypatch.setattr(app_modul, "UNDER_ARBEID", True)
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}))
         for sti in ("/", "/aksje/EQNR"):
@@ -1475,10 +1541,11 @@ class TestStory80c:
     def test_under_arbeid_styres_av_en_innstilling(self, klient, monkeypatch):
         """Ville feilet hvis linja sto fast i malene og ikke kom fra UNDER_ARBEID."""
         import app as app_modul
+
         monkeypatch.setattr(app_modul, "UNDER_ARBEID", False)
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}))
         for sti in ("/", "/aksje/EQNR"):
-            assert "<p class=\"under-arbeid\">" not in klient.get(sti).data.decode("utf-8"), sti
+            assert '<p class="under-arbeid">' not in klient.get(sti).data.decode("utf-8"), sti
 
     def test_den_ekte_basen_sier_oslo_boers_over_tabellen(self, klient, monkeypatch):
         """4a gjelder bare demoen. Ville feilet hvis «Eksempeltall» sto over
@@ -1493,10 +1560,15 @@ class TestStory80c:
     def test_setningen_staar_ikke_med_to_av_tre(self, klient, monkeypatch):
         """VG1: med STANDARD og én aksje paa 2 av 3 staar ikke setningen.
         Ville feilet hvis funksjonen saa etter 3 av 3 i stedet for terskelen."""
-        monter(monkeypatch, snapshot({
-            "EQNR": serie([100.0] * 60 + [104.0]),   # 2 av 3
-            "DNB": serie([100.0] * 61),              # 0
-        }))
+        monter(
+            monkeypatch,
+            snapshot(
+                {
+                    "EQNR": serie([100.0] * 60 + [104.0]),  # 2 av 3
+                    "DNB": serie([100.0] * 61),  # 0
+                }
+            ),
+        )
         html = klient.get("/").data.decode("utf-8")
         assert "2 av 3" in html
         assert "Ingen aksjer skilte seg ut" not in html
@@ -1504,10 +1576,15 @@ class TestStory80c:
     def test_bare_radene_over_terskelen_er_merket(self, klient, monkeypatch):
         """VG2: en rad med 1 av 3 skal ikke ha merkingen. Ville feilet hvis
         alle rader fikk class="utslag"."""
-        monter(monkeypatch, snapshot({
-            "EQNR": serie([100.0] * 60 + [104.0]),   # 2 av 3
-            "DNB": serie([100.0] * 60 + [101.0]),    # 1 av 3
-        }))
+        monter(
+            monkeypatch,
+            snapshot(
+                {
+                    "EQNR": serie([100.0] * 60 + [104.0]),  # 2 av 3
+                    "DNB": serie([100.0] * 60 + [101.0]),  # 1 av 3
+                }
+            ),
+        )
         html = klient.get("/").data.decode("utf-8")
         assert html.count('<tr class="utslag">') == 1
         dnb = html.split("DNB Bank")[0].rsplit("<tr", 1)[1]
@@ -1548,7 +1625,7 @@ class TestStory80c:
 
     def test_noen_mangler_vurdering_gir_begge_setningene(self, klient, monkeypatch):
         """Ville feilet hvis «N av M aksjer ble vurdert.» manglet."""
-        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [101.0])}))   # 1 av 3
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [101.0])}))  # 1 av 3
         monter(monkeypatch, snapshot({"DNB": serie([100.0] * 61)}), vurdert=False)
         html = klient.get("/").data.decode("utf-8")
         assert "Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer." in html
@@ -1568,7 +1645,7 @@ class TestStory80c:
     def test_ingen_ny_setning_naar_en_skiller_seg_ut_og_en_mangler(self, klient, monkeypatch):
         """VG paa svar 3: «ble vurdert.» staar bare under setningen fra 05.10.
         Ville feilet hvis den nye setningen ble flyttet ut av den ytre if-en."""
-        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))   # 2 av 3
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))  # 2 av 3
         monter(monkeypatch, snapshot({"DNB": serie([100.0] * 61)}), vurdert=False)
         html = klient.get("/").data.decode("utf-8")
         assert "2 av 3" in html
@@ -1597,6 +1674,7 @@ class TestStory80c:
     def test_aaret_vises_naar_det_er_et_annet_enn_i_aar(self, klient, monkeypatch):
         """Ville feilet hvis dato() aldri viste aaret, eller viste det i samme aar."""
         import app as app_modul
+
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}))
         monkeypatch.setattr(app_modul, "naa", lambda: datetime(2027, 1, 4, 12, 0, tzinfo=timezone.utc))
         html = klient.get("/").data.decode("utf-8")
@@ -1611,11 +1689,16 @@ class TestStory80c:
         """Beslutning 12: ingen synlig tekst har en dato som 2026-10-13.
         Ville feilet hvis en dato gikk utenom dato() eller norsk_tid."""
         from test_hjelpetekster import synlig_tekst
-        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0]),
-                                      "DNB": serie([100.0, 101.0])}))
+
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0]), "DNB": serie([100.0, 101.0])}))
         # VG3: ulike tider, saa tidsstempelet under navnet ogsaa vises.
-        monter_lager(monkeypatch, {"KOG": datetime(2026, 9, 20, 18, 0, tzinfo=timezone.utc),
-                                   "TEL": datetime(2026, 9, 22, 18, 0, tzinfo=timezone.utc)})
+        monter_lager(
+            monkeypatch,
+            {
+                "KOG": datetime(2026, 9, 20, 18, 0, tzinfo=timezone.utc),
+                "TEL": datetime(2026, 9, 22, 18, 0, tzinfo=timezone.utc),
+            },
+        )
         assert 'class="hentet">hentet ' in klient.get("/").data.decode("utf-8")
         for sti in ("/", "/aksje/EQNR", "/aksje/DNB"):
             tekst = synlig_tekst(klient.get(sti).data.decode("utf-8"))
@@ -1634,8 +1717,15 @@ class TestStory80c:
         assert "01.09 til" in html
 
 
-def _lagret(symbol: str, endring: float, trend: int, bevegelse: int, interesse: int,
-            vurdert: bool = True, standardavvik: float = 0.01) -> None:
+def _lagret(
+    symbol: str,
+    endring: float,
+    trend: int,
+    bevegelse: int,
+    interesse: int,
+    vurdert: bool = True,
+    standardavvik: float = 0.01,
+) -> None:
     """En flat serie der siste dag endrer seg med endring prosent, og en
     lagret vurdering med de tre fortegnene. Kursene ville gitt noe annet,
     saa siden viser bare det vurderingen sier. vurdert=False gir ingen rad i
@@ -1645,13 +1735,32 @@ def _lagret(symbol: str, endring: float, trend: int, bevegelse: int, interesse: 
     if not vurdert:
         return
     utslag = [v for v in (trend, bevegelse, interesse) if v]
-    retning = ("Ingen" if not utslag else "Positiv" if all(v > 0 for v in utslag)
-               else "Negativ" if all(v < 0 for v in utslag) else "Blandet")
-    skriv_vurdering(symbol, rader[-1].dato, Vurdering(
-        styrke=len(utslag), retning=retning, trend=trend, bevegelse=bevegelse,
-        interesse=interesse, slutt=rader[-1].slutt, justert_slutt=rader[-1].justert_slutt,
-        trend_avvik=0.0, dagens_endring=endring / 100, standardavvik=standardavvik, volumforhold=1.0,
-    ))
+    retning = (
+        "Ingen"
+        if not utslag
+        else "Positiv"
+        if all(v > 0 for v in utslag)
+        else "Negativ"
+        if all(v < 0 for v in utslag)
+        else "Blandet"
+    )
+    skriv_vurdering(
+        symbol,
+        rader[-1].dato,
+        Vurdering(
+            styrke=len(utslag),
+            retning=retning,
+            trend=trend,
+            bevegelse=bevegelse,
+            interesse=interesse,
+            slutt=rader[-1].slutt,
+            justert_slutt=rader[-1].justert_slutt,
+            trend_avvik=0.0,
+            dagens_endring=endring / 100,
+            standardavvik=standardavvik,
+            volumforhold=1.0,
+        ),
+    )
 
 
 def _deler(html: str) -> dict[str, list[str]]:
@@ -1697,12 +1806,12 @@ class TestStory80e:
         """Styrke 2 er paa terskelen og staar under «Skilte seg ut». Ville
         feilet med > i stedet for >=, en rad med 1 av 3 under «Skilte seg
         ut», eller sorteringen snudd i én del."""
-        _lagret("KOG", 0.5, 1, 1, 1)       # 3 av 3
-        _lagret("EQNR", -5.0, 1, 1, 0)     # 2, stor endring
-        _lagret("DNB", 1.0, -1, -1, 0)     # 2, liten endring
-        _lagret("AKRBP", 0.2, 1, 0, 0)     # 1, liten endring
-        _lagret("NHY", -3.0, 0, 1, 0)      # 1, stor endring
-        _lagret("FRO", 10.0, 0, 0, 0)      # 0
+        _lagret("KOG", 0.5, 1, 1, 1)  # 3 av 3
+        _lagret("EQNR", -5.0, 1, 1, 0)  # 2, stor endring
+        _lagret("DNB", 1.0, -1, -1, 0)  # 2, liten endring
+        _lagret("AKRBP", 0.2, 1, 0, 0)  # 1, liten endring
+        _lagret("NHY", -3.0, 0, 1, 0)  # 1, stor endring
+        _lagret("FRO", 10.0, 0, 0, 0)  # 0
         _lagret("VAR", 20.0, 0, 0, 0, vurdert=False)
         html = klient.get("/").data.decode("utf-8")
         assert _tabell(html).deler == ["Skilte seg ut", "Øvrige aksjer"]
@@ -1732,7 +1841,8 @@ class TestStory80e:
         _lagret("EQNR", 0.0, 1, 1, 0)
         html = klient.get("/").data.decode("utf-8")
         assert _deler(html) == {
-            "Skilte seg ut": ["Kongsberg Gruppen"], "Øvrige aksjer": ["Equinor"],
+            "Skilte seg ut": ["Kongsberg Gruppen"],
+            "Øvrige aksjer": ["Equinor"],
         }
         # Story 8.0d, PR 2 (BH10): grensene i båndene følger terskelen.
         assert _tabell(html).ekstra["bak"] == ["signalstyrke 3 eller mer", "signalstyrke 0 til 2"]
@@ -1763,7 +1873,8 @@ class TestStory80e:
             if aksje.symbol != "EQNR":
                 _lagret(aksje.symbol, 1.0, 0, 0, 0)
         assert _tabell(klient.get("/").data.decode("utf-8")).deler == [
-            "Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer.", "Øvrige aksjer",
+            "Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer.",
+            "Øvrige aksjer",
         ]
 
     def test_ble_vurdert_ogsaa_naar_en_aksje_mangler_kurser(self, klient):
@@ -1778,7 +1889,8 @@ class TestStory80e:
         html = klient.get("/").data.decode("utf-8")
         m = len(AKSJEUNIVERS)
         assert _tabell(html).deler[0] == (
-            f"Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer. {m - 1} av {m} aksjer ble vurdert.")
+            f"Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer. {m - 1} av {m} aksjer ble vurdert."
+        )
         assert f"Uten data i denne kilden: {mangler.navn}." in _synlig(html)
 
     def test_oevrige_sier_hvor_mange_som_er_uten_signal(self, klient):
@@ -1843,7 +1955,7 @@ class TestStory80e:
                 c = c / 255
                 return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
 
-            r, g, b = (int(farge[i:i + 2], 16) for i in (0, 2, 4))
+            r, g, b = (int(farge[i : i + 2], 16) for i in (0, 2, 4))
             return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
 
         def kontrast(a, b):
@@ -1897,7 +2009,7 @@ class TestStory80eTekst:
         """Svar 5: den eldste datoen, som linja over tabellen (story 8.0), og
         ikke dagen siden aapnes (klokka staar paa torsdag 31.12)."""
         _lagret("KOG", 0.0, 1, 1, 0)  # siste dag 31.10, lørdag
-        rader = serie([100.0] * 60)    # siste dag 30.10, fredag
+        rader = serie([100.0] * 60)  # siste dag 30.10, fredag
         skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET), vurdert=False)
         html = klient.get("/").data.decode("utf-8")
         assert "Oslo Børs · 30.10 · 15 aksjer" in _synlig(html)
@@ -1924,10 +2036,11 @@ class TestStory80eTekst:
         """Svar 4. Ville feilet med «Hos 1 aksjer»."""
         _lagret("KOG", 0.0, 1, 1, 0)
         _lagret("EQNR", 0.0, 0, 0, 0)
-        assert ("OSE Signal er et regelbasert signal for aksjer på Oslo Børs: 3 faste sjekker "
-                "måler kurs og volum mot aksjens egen historikk. Hos 1 aksje slo minst 2 av 3 ut. "
-                "Det viser hvor du kan se nærmere, ikke hva du bør kjøpe eller selge."
-                ) in _synlig(klient.get("/").data.decode("utf-8"))
+        assert (
+            "OSE Signal er et regelbasert signal for aksjer på Oslo Børs: 3 faste sjekker "
+            "måler kurs og volum mot aksjens egen historikk. Hos 1 aksje slo minst 2 av 3 ut. "
+            "Det viser hvor du kan se nærmere, ikke hva du bør kjøpe eller selge."
+        ) in _synlig(klient.get("/").data.decode("utf-8"))
 
     def test_innledningen_med_flere_og_terskelen_fra_parametre(self, klient, monkeypatch):
         import dataclasses
@@ -1970,8 +2083,13 @@ class TestStory80eTekst:
         html = klient.get("/").data.decode("utf-8")
         del_ = html.split('<section class="slik-leser"', 1)[1].split("</section>", 1)[0]
         # Story 8.0d, PR 2: symbolene er aria-hidden og ikke en del av teksten.
-        del_ = re.sub(r'<span class="symbolfelt" aria-hidden="true">.*?</span></span>|'
-                      r'<span class="symbolfelt" aria-hidden="true">.*?</svg></span>', "", del_, flags=re.DOTALL)
+        del_ = re.sub(
+            r'<span class="symbolfelt" aria-hidden="true">.*?</span></span>|'
+            r'<span class="symbolfelt" aria-hidden="true">.*?</svg></span>',
+            "",
+            del_,
+            flags=re.DOTALL,
+        )
         punkter = [_synlig(p).strip() for p in re.findall(r"<li>(.*?)</li>", del_, re.DOTALL)]
         assert punkter == [
             "Signalstyrke 0–3 T, B og I er trend, bevegelse og interesse, og hver gir +1, 0 eller -1. "
@@ -1987,8 +2105,9 @@ class TestStory80eTekst:
 
 def _med_siste(foer: date, siste: date) -> list[Kursrad]:
     """60 kursrader som ender på foer, og så én rad på siste (svar 29)."""
-    rader = [Kursrad(dato=foer - timedelta(days=59 - i), slutt=100.0, justert_slutt=100.0, volum=1000)
-             for i in range(60)]
+    rader = [
+        Kursrad(dato=foer - timedelta(days=59 - i), slutt=100.0, justert_slutt=100.0, volum=1000) for i in range(60)
+    ]
     return rader + [Kursrad(dato=siste, slutt=101.0, justert_slutt=101.0, volum=1000)]
 
 
@@ -2016,10 +2135,10 @@ class TestStory815Sortering:
     def tabell(self, klient):
         """Fem aksjer: tre som skilte seg ut og to øvrige, den ene uten
         vurdering."""
-        _lagret("KOG", 1.0, 1, 1, 1)      # 3 Positiv
-        _lagret("DNB", -4.0, -1, -1, 0)   # 2 Negativ
-        _lagret("EQNR", 2.0, 1, -1, 0)    # 2 Blandet
-        _lagret("MOWI", 3.0, 1, 0, 0)     # 1 Positiv
+        _lagret("KOG", 1.0, 1, 1, 1)  # 3 Positiv
+        _lagret("DNB", -4.0, -1, -1, 0)  # 2 Negativ
+        _lagret("EQNR", 2.0, 1, -1, 0)  # 2 Blandet
+        _lagret("MOWI", 3.0, 1, 0, 0)  # 1 Positiv
         _lagret("NHY", -1.0, 0, 0, 0, vurdert=False)
         return klient
 
@@ -2033,17 +2152,25 @@ class TestStory815Sortering:
         rekkefølge eller en feil (S7)."""
         standard = _deler_i_rekkefoelge(self._side(tabell, "/"))
         assert standard == (["KOG", "DNB", "EQNR"], ["MOWI", "NHY"])
-        for adresse in ("/?sorter=endring", "/?orden=stigende", "/?sorter=navn&orden=synkende",
-                        "/?sorter=endring&orden=opp", "/?sorter=&orden="):
+        for adresse in (
+            "/?sorter=endring",
+            "/?orden=stigende",
+            "/?sorter=navn&orden=synkende",
+            "/?sorter=endring&orden=opp",
+            "/?sorter=&orden=",
+        ):
             assert _deler_i_rekkefoelge(self._side(tabell, adresse)) == standard, adresse
 
-    @pytest.mark.parametrize("adresse, ut, oevrige", [
-        ("/?sorter=endring&orden=synkende", ["EQNR", "KOG", "DNB"], ["MOWI", "NHY"]),
-        ("/?sorter=endring&orden=stigende", ["DNB", "KOG", "EQNR"], ["NHY", "MOWI"]),
-        ("/?sorter=signal&orden=stigende", ["DNB", "EQNR", "KOG"], ["MOWI", "NHY"]),
-        ("/?sorter=retning&orden=stigende", ["EQNR", "DNB", "KOG"], ["MOWI", "NHY"]),
-        ("/?sorter=retning&orden=synkende", ["KOG", "DNB", "EQNR"], ["MOWI", "NHY"]),
-    ])
+    @pytest.mark.parametrize(
+        "adresse, ut, oevrige",
+        [
+            ("/?sorter=endring&orden=synkende", ["EQNR", "KOG", "DNB"], ["MOWI", "NHY"]),
+            ("/?sorter=endring&orden=stigende", ["DNB", "KOG", "EQNR"], ["NHY", "MOWI"]),
+            ("/?sorter=signal&orden=stigende", ["DNB", "EQNR", "KOG"], ["MOWI", "NHY"]),
+            ("/?sorter=retning&orden=stigende", ["EQNR", "DNB", "KOG"], ["MOWI", "NHY"]),
+            ("/?sorter=retning&orden=synkende", ["KOG", "DNB", "EQNR"], ["MOWI", "NHY"]),
+        ],
+    )
     def test_hver_del_sorteres_for_seg(self, tabell, adresse, ut, oevrige):
         """Tillegget 13.10: ingen rad flytter seg mellom delene (S1). Rader
         uten verdi står sist i begge retninger (S2), og endringen har
@@ -2060,17 +2187,19 @@ class TestStory815Sortering:
         assert lenker == {"kurs": "synkende", "endring": "synkende", "signal": "synkende", "retning": "stigende"}
         valgt = self._side(tabell, "/?sorter=endring&orden=synkende")
         thead = valgt.split("<thead>", 1)[1].split("</thead>", 1)[0]
-        assert re.findall(r'<th[^>]*aria-sort="(\w+)"[^>]*><a class="sorter valgt" href="/\?sorter=(\w+)&amp;orden=(\w+)"', thead) == [
-            ("descending", "endring", "stigende")]
+        assert re.findall(
+            r'<th[^>]*aria-sort="(\w+)"[^>]*><a class="sorter valgt" href="/\?sorter=(\w+)&amp;orden=(\w+)"', thead
+        ) == [("descending", "endring", "stigende")]
         stigende = self._side(tabell, "/?sorter=retning&orden=stigende")
-        assert re.search(r'<th aria-sort="ascending"><a class="sorter valgt" href="/\?sorter=retning&amp;orden=synkende">', stigende)
+        assert re.search(
+            r'<th aria-sort="ascending"><a class="sorter valgt" href="/\?sorter=retning&amp;orden=synkende">', stigende
+        )
 
     def test_skjermleseren_hoerer_kolonnen_og_retningen(self, tabell):
         """Kontrollpunktet og svar 8: «stigende (A til Å)» eller «synkende
         (Å til A)» for Retning, ikke «alfabetisk»."""
         valgt = self._side(tabell, "/?sorter=retning&orden=stigende")
-        assert ('Retning<span class="skjult">, sortert stigende (A til Å). Velg for synkende (Å til A).</span>'
-                in valgt)
+        assert 'Retning<span class="skjult">, sortert stigende (A til Å). Velg for synkende (Å til A).</span>' in valgt
         assert 'Retning<span class="skjult">, sorter stigende (A til Å)</span>' in self._side(tabell, "/")
         assert "alfabetisk" not in valgt
         assert 'Endring<span class="skjult">, sorter synkende</span>' in valgt
@@ -2081,8 +2210,10 @@ class TestStory815Sortering:
         """Svar 5. Ville feilet hvis linja sto også uten valg (S12)."""
         assert 'class="sortert"' not in self._side(tabell, "/")
         html = self._side(tabell, "/?sorter=signal&orden=stigende")
-        assert ('<p class="sortert">Sortert på signalstyrke, stigende, innenfor hver del. '
-                '<a href="/">Standard rekkefølge</a></p>') in html
+        assert (
+            '<p class="sortert">Sortert på signalstyrke, stigende, innenfor hver del. '
+            '<a href="/">Standard rekkefølge</a></p>'
+        ) in html
         assert html.index('<p class="sortert">') < html.index('<div class="tabellboks"')
         # Gjennomgangen (VG2): navnet for hver kolonne. Svar 9: «innenfor hver del».
         for kolonne, navn in (("kurs", "sluttkurs"), ("endring", "endring")):
@@ -2116,18 +2247,33 @@ class TestStory815Sortering:
         står sist i «Skilte seg ut» i begge retninger."""
         rader = serie([100.0])
         skriv_serie("ORK", rader, datetime.fromisoformat(HENTET), vurdert=False)
-        skriv_vurdering("ORK", rader[-1].dato, Vurdering(
-            styrke=2, retning="Positiv", trend=1, bevegelse=1, interesse=0, slutt=100.0,
-            justert_slutt=100.0, trend_avvik=0.0, dagens_endring=0.0, standardavvik=0.01,
-            volumforhold=1.0))
+        skriv_vurdering(
+            "ORK",
+            rader[-1].dato,
+            Vurdering(
+                styrke=2,
+                retning="Positiv",
+                trend=1,
+                bevegelse=1,
+                interesse=0,
+                slutt=100.0,
+                justert_slutt=100.0,
+                trend_avvik=0.0,
+                dagens_endring=0.0,
+                standardavvik=0.01,
+                volumforhold=1.0,
+            ),
+        )
         for orden in ("synkende", "stigende"):
             ut, _ = _deler_i_rekkefoelge(self._side(tabell, f"/?sorter=endring&orden={orden}"))
             assert ut[-1] == "ORK" and len(ut) == 4, (orden, ut)
 
     def test_tre_av_tre_og_antallet_foelger_fr_102(self, tabell):
         """Svar 7: linja om 3 av 3 og «N av M aksjer» endres ikke av et klikk."""
+
         def topp(html):
             return html.split('<div class="tabellboks"', 1)[0].split("<main>", 1)[1]
+
         standard = topp(self._side(tabell, "/"))
         valgt = topp(self._side(tabell, "/?sorter=signal&orden=stigende"))
         assert valgt.split('<p class="sortert">', 1)[0].rstrip() == standard.rstrip()
@@ -2163,7 +2309,10 @@ class TestStory80dAksjesiden:
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
         merkene = html.index('<div class="merkene">')
         assert merkene < html.index("<h1") < html.index('<p class="meta">')
-        assert re.search(r'<span class="merke">EQNR</span>\s*<span class="merke"><svg class="bransjesymbol"[^>]*aria-hidden="true"', html)
+        assert re.search(
+            r'<span class="merke">EQNR</span>\s*<span class="merke"><svg class="bransjesymbol"[^>]*aria-hidden="true"',
+            html,
+        )
         assert '<p class="meta">Oslo Børs · 31.10</p>' in html
         assert "data hentet" not in html
 
@@ -2200,11 +2349,16 @@ class TestStory80dAksjesiden:
         en børsdag mellom de to kursradene. Fredag til mandag og en uke med
         bare stengte dager har ingen. Ville feilet med alltid ukedager,
         alltid datoer, eller kalenderdager i stedet for børsdager."""
-        monter(monkeypatch, snapshot({
-            "EQNR": _med_siste(date(2026, 10, 2), date(2026, 10, 9)),
-            "DNB": _med_siste(date(2026, 10, 2), date(2026, 10, 5)),
-            "KOG": _med_siste(date(2026, 4, 1), date(2026, 4, 7)),
-        }))
+        monter(
+            monkeypatch,
+            snapshot(
+                {
+                    "EQNR": _med_siste(date(2026, 10, 2), date(2026, 10, 9)),
+                    "DNB": _med_siste(date(2026, 10, 2), date(2026, 10, 5)),
+                    "KOG": _med_siste(date(2026, 4, 1), date(2026, 4, 7)),
+                }
+            ),
+        )
         assert _endringsforklaring(klient, "EQNR") == "fra fredag 02.10 til fredag 09.10"
         assert _endringsforklaring(klient, "DNB") == "fra fredag til mandag"
         assert _endringsforklaring(klient, "KOG") == "fra onsdag til tirsdag"
@@ -2292,8 +2446,11 @@ class TestStory80dAksjesiden:
         assert '<circle class="sistepunkt"' in html
         # Gjennomgangen (VG4, BH5): etiketten sier hvilken linje som er hva,
         # med tykkelsen og ikke fargen.
-        assert re.search(r'aria-label="Kursutvikling for Equinor: den tykke linja er utbyttejustert kurs, '
-                         r'og den tynne er \d+-dagers snitt \(sjekk 1\)"', html)
+        assert re.search(
+            r'aria-label="Kursutvikling for Equinor: den tykke linja er utbyttejustert kurs, '
+            r'og den tynne er \d+-dagers snitt \(sjekk 1\)"',
+            html,
+        )
 
     def test_tilbakelenken_er_markedsoversikt_uten_pil(self, klient):
         """Del C og mutant d."""
@@ -2324,13 +2481,15 @@ class TestStory80dAksjesiden:
 
         from aksjedetalj import hva_den_maaler, regelen
 
-        andre = dataclasses.replace(app_modul.STANDARD, ma_vindu=40, volatilitet_vindu=15, volum_vindu=25,
-                                    noytralsone=0.03, volumfaktor=2.5)
+        andre = dataclasses.replace(
+            app_modul.STANDARD, ma_vindu=40, volatilitet_vindu=15, volum_vindu=25, noytralsone=0.03, volumfaktor=2.5
+        )
         monkeypatch.setattr(app_modul, "STANDARD", andre)
         _lagret("EQNR", 0.0, 1, 0, 0)
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
-        kortene = re.findall(r'<section class="sjekkort[^"]*" aria-label="Sjekk \d: (\w+)">(.*?)</section>',
-                             html, re.DOTALL)
+        kortene = re.findall(
+            r'<section class="sjekkort[^"]*" aria-label="Sjekk \d: (\w+)">(.*?)</section>', html, re.DOTALL
+        )
         assert [navn for navn, _ in kortene] == ["Trend", "Bevegelse", "Interesse"]
         for navn, innhold in kortene:
             assert f'<p class="maaler">{hva_den_maaler(navn, andre)}</p>' in innhold, navn
@@ -2345,8 +2504,12 @@ class TestStory80dAksjesiden:
         ingen farge, som i oversikten, og med én kursdag står «–» uten
         «fra … til …»."""
         _lagret("EQNR", 0.003, 1, 0, 0)
-        endring = klient.get("/aksje/EQNR").data.decode("utf-8").split(
-            '<div class="noekkeltall endring">', 1)[1].split("</div>", 1)[0]
+        endring = (
+            klient.get("/aksje/EQNR")
+            .data.decode("utf-8")
+            .split('<div class="noekkeltall endring">', 1)[1]
+            .split("</div>", 1)[0]
+        )
         assert re.search(rf'<span class="verdi\s*">0,00{NB}%</span>', endring)
         monter(monkeypatch, snapshot({"DNB": serie([100.0])}))
         html = klient.get("/aksje/DNB").data.decode("utf-8")
@@ -2534,7 +2697,8 @@ class TestHovedindeksenPaaForsiden:
         tilkobling = aapne_base(lagring_sqlite.BASE_STI)
         try:
             SqliteIndekslager(tilkobling, (HOVEDINDEKS, annen)).erstatt_serie(
-                "OBX", _indeks([(FREDAG_09_10, 1200.0)]), datetime.fromisoformat(HENTET) + timedelta(hours=1))
+                "OBX", _indeks([(FREDAG_09_10, 1200.0)]), datetime.fromisoformat(HENTET) + timedelta(hours=1)
+            )
         finally:
             tilkobling.close()
         tekst = _synlig(_delen(klient.get("/").data.decode("utf-8")))

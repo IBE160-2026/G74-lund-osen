@@ -153,9 +153,7 @@ def nyeste_snapshot(katalog: Path | None = None) -> Path | None:
         return None
 
     datert = [
-        (treff.group(1), sti)
-        for sti in katalog.glob("*-raa-*.json")
-        if (treff := _SNAPSHOT_MONSTER.search(sti.name))
+        (treff.group(1), sti) for sti in katalog.glob("*-raa-*.json") if (treff := _SNAPSHOT_MONSTER.search(sti.name))
     ]
     if not datert:
         return None

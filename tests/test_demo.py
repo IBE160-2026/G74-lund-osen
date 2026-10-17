@@ -83,12 +83,13 @@ def klient(monkeypatch):
 def _tabeller(sti: Path) -> dict:
     c = sqlite3.connect(sti)
     try:
-        ut = {t: c.execute(f"SELECT * FROM {t} ORDER BY rowid").fetchall()
-              for t in ("aksje", "kurs", "kursserie", "vurdering", "indeks", "indeksserie")}
+        ut = {
+            t: c.execute(f"SELECT * FROM {t} ORDER BY rowid").fetchall()
+            for t in ("aksje", "kurs", "kursserie", "vurdering", "indeks", "indeksserie")
+        }
         # Tidspunktet migrasjonen ble kjoert, er ikke data. Resten av raden skal
         # vaere lik.
-        ut["skjema_versjon"] = c.execute(
-            "SELECT versjon, fil, sha256 FROM skjema_versjon ORDER BY versjon").fetchall()
+        ut["skjema_versjon"] = c.execute("SELECT versjon, fil, sha256 FROM skjema_versjon ORDER BY versjon").fetchall()
         ut["application_id"] = c.execute("PRAGMA application_id").fetchone()[0]
         return ut
     finally:
@@ -126,7 +127,8 @@ class TestDemokommandoen:
         c = sqlite3.connect(mal)
         try:
             rader = c.execute(
-                "SELECT symbol, dato, slutt, justert_slutt, volum FROM kurs ORDER BY symbol, dato").fetchall()
+                "SELECT symbol, dato, slutt, justert_slutt, volum FROM kurs ORDER BY symbol, dato"
+            ).fetchall()
         finally:
             c.close()
         assert hashlib.sha256(repr(rader).encode()).hexdigest() == FINGERAVTRYKK_KURS
@@ -198,8 +200,10 @@ class TestDemokommandoen:
             lager = SqliteVurderingslager(c, lambda: datetime.now(timezone.utc), demo.DEMOUNIVERS)
             siste = {a.symbol: lager.les(a.symbol, demo.SLUTTDATO) for a in demo.DEMOUNIVERS}
             antall_kurs = dict(c.execute("SELECT symbol, COUNT(*) FROM kurs GROUP BY symbol").fetchall())
-            sist_dato = {s: date.fromisoformat(d) for s, d in c.execute(
-                "SELECT symbol, MAX(dato) FROM kurs GROUP BY symbol").fetchall()}
+            sist_dato = {
+                s: date.fromisoformat(d)
+                for s, d in c.execute("SELECT symbol, MAX(dato) FROM kurs GROUP BY symbol").fetchall()
+            }
         finally:
             c.close()
         assert siste["BRFE"].styrke >= 2
@@ -214,8 +218,7 @@ class TestDemokommandoen:
     def test_bare_demokommandoen_setter_merket(self):
         """Ville feilet hvis hentingen eller webserveren satte application_id."""
         setter = sorted(
-            sti.name for sti in SRC.glob("*.py")
-            if "PRAGMA application_id =" in sti.read_text(encoding="utf-8")
+            sti.name for sti in SRC.glob("*.py") if "PRAGMA application_id =" in sti.read_text(encoding="utf-8")
         )
         assert setter == ["demo.py"]
 
@@ -289,8 +292,13 @@ class TestVaktene:
         kall, ut = [], []
         with pytest.raises(SystemExit) as slutt:
             fetch_prices.kjoer(
-                tmp_path / "raa", base, datetime(2026, 10, 9, 22, 30), "noekkel",
-                lambda *a: kall.append(a) or [], ut.append, les_kvote=lambda _: kall.append("kvote"),
+                tmp_path / "raa",
+                base,
+                datetime(2026, 10, 9, 22, 30),
+                "noekkel",
+                lambda *a: kall.append(a) or [],
+                ut.append,
+                les_kvote=lambda _: kall.append("kvote"),
             )
         assert slutt.value.code == 1 and kall == [] and _sha(base) == foer
         assert "demobase" in ut[0] and "0 kall" in ut[0]
@@ -342,8 +350,7 @@ class TestSidene:
         assert "Oslo Børs · " not in oversikt
         assert f"Demoversjon. {app_modul.EKSEMPELTALL_MERKE}" in oversikt
         assert f"Demoversjon. {app_modul.EKSEMPELTALL_MERKE}" in detalj
-        for tekst in ("Brattfjell Energi", "skiller seg ut",
-                      "signalet kunne ikke regnes", "Matfjord Merkevarer"):
+        for tekst in ("Brattfjell Energi", "skiller seg ut", "signalet kunne ikke regnes", "Matfjord Merkevarer"):
             assert tekst in oversikt, tekst
         assert "Trenger 51 dager" in klient.get("/aksje/VRDS").data.decode("utf-8")
         assert not Path(lagring_sqlite.BASE_STI).exists()
@@ -372,10 +379,8 @@ class TestSidene:
         for adresse, vinduer, noekler in (
             # Story 8.0c: hvert «?» ved det det forklarer.
             ("/", ("hjelp-signalstyrke", "hjelp-retning"), ("signalstyrke", "ukjent")),
-            ("/aksje/BRFE", ("hjelp-graf", "hjelp-trend", "hjelp-retning-aksje"),
-             ("grafen", "trend", "ukjent_aksje")),
-            ("/aksje/VRDS", ("hjelp-sjekkene", "hjelp-retning-aksje"),
-             ("antall_dager", "ukjent_aksje")),
+            ("/aksje/BRFE", ("hjelp-graf", "hjelp-trend", "hjelp-retning-aksje"), ("grafen", "trend", "ukjent_aksje")),
+            ("/aksje/VRDS", ("hjelp-sjekkene", "hjelp-retning-aksje"), ("antall_dager", "ukjent_aksje")),
         ):
             html = klient.get(adresse).data.decode("utf-8")
             assert "Eksempeltall" in html, adresse
@@ -445,8 +450,7 @@ class TestSidene:
 
     def test_bare_verdien_1_gir_docker_kommandoen_for_demobasen(self, monkeypatch):
         """Som hentekommandoen: ville feilet hvis enhver verdi ga Docker-kommandoen."""
-        for verdi, forventet in (("1", demo.DEMOKOMMANDO_DOCKER), ("0", demo.DEMOKOMMANDO),
-                                 ("", demo.DEMOKOMMANDO)):
+        for verdi, forventet in (("1", demo.DEMOKOMMANDO_DOCKER), ("0", demo.DEMOKOMMANDO), ("", demo.DEMOKOMMANDO)):
             monkeypatch.setenv(app_modul.I_DOCKER, verdi)
             assert app_modul.demokommando() == forventet, verdi
         monkeypatch.delenv(app_modul.I_DOCKER)
@@ -557,8 +561,9 @@ class TestStory80cIDemoen:
         tilkobling = sqlite3.connect(demo_sti())
         with tilkobling:
             siste = tilkobling.execute("SELECT MAX(dato) FROM vurdering").fetchone()[0]
-            tilkobling.execute("DELETE FROM vurdering WHERE dato = ? AND styrke >= ?",
-                               (siste, app_modul.STANDARD.terskel))
+            tilkobling.execute(
+                "DELETE FROM vurdering WHERE dato = ? AND styrke >= ?", (siste, app_modul.STANDARD.terskel)
+            )
         tilkobling.close()
         html = klient.get("/").data.decode("utf-8")
         assert "Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer." in html
@@ -606,8 +611,6 @@ class TestStory80eTekstIDemoen:
     «Demo Børs» der den ekte versjonen sier «Oslo Børs»."""
 
     def test_teksten_over_tabellen_i_demoen(self, klient, monkeypatch, demobase):
-        import re
-
         from test_app import _synlig
 
         monkeypatch.setenv(app_modul.I_DEMO, "1")
@@ -635,9 +638,13 @@ class TestAlleTiKombinasjonene:
     def _siste_dag(mal):
         c = sqlite3.connect(mal)
         try:
-            return {s: (t, b, i, styrke, grunn) for s, t, b, i, styrke, grunn in c.execute(
-                "SELECT symbol, trend, bevegelse, interesse, styrke, grunn FROM vurdering WHERE dato = ?",
-                (demo.SLUTTDATO.isoformat(),))}
+            return {
+                s: (t, b, i, styrke, grunn)
+                for s, t, b, i, styrke, grunn in c.execute(
+                    "SELECT symbol, trend, bevegelse, interesse, styrke, grunn FROM vurdering WHERE dato = ?",
+                    (demo.SLUTTDATO.isoformat(),),
+                )
+            }
         finally:
             c.close()
 
@@ -648,7 +655,8 @@ class TestAlleTiKombinasjonene:
         rader = self._siste_dag(mal)
         kombinasjoner = {
             (sum(v == 1 for v in r[:3]), sum(v == -1 for v in r[:3]), sum(v == 0 for v in r[:3]))
-            for r in rader.values() if r[4] is None
+            for r in rader.values()
+            if r[4] is None
         }
         alle = {(g, r, 3 - g - r) for g in range(4) for r in range(4 - g)}
         assert len(alle) == 10
@@ -685,9 +693,11 @@ class TestAlleTiKombinasjonene:
         c = sqlite3.connect(mal)
         try:
             kurs = c.execute(
-                "SELECT symbol, dato, slutt, justert_slutt, volum FROM kurs ORDER BY symbol, dato").fetchall()
-            vurdering = c.execute("SELECT * FROM vurdering WHERE dato < ? ORDER BY symbol, dato",
-                                  (demo.SLUTTDATO.isoformat(),)).fetchall()
+                "SELECT symbol, dato, slutt, justert_slutt, volum FROM kurs ORDER BY symbol, dato"
+            ).fetchall()
+            vurdering = c.execute(
+                "SELECT * FROM vurdering WHERE dato < ? ORDER BY symbol, dato", (demo.SLUTTDATO.isoformat(),)
+            ).fetchall()
         finally:
             c.close()
         uten = [r for r in kurs if not (r[1] == demo.SLUTTDATO.isoformat() and r[0] in demo.SISTE_DAG)]
@@ -726,8 +736,10 @@ class TestKlokkeslettetSomDenEkte:
     def test_hentet_er_kl_21_15_i_oslo(self, mal):
         c = sqlite3.connect(mal)
         try:
-            tider = {datetime.fromisoformat(h) for (h,) in c.execute(
-                "SELECT hentet FROM kursserie UNION SELECT hentet FROM indeksserie")}
+            tider = {
+                datetime.fromisoformat(h)
+                for (h,) in c.execute("SELECT hentet FROM kursserie UNION SELECT hentet FROM indeksserie")
+            }
         finally:
             c.close()
         ventet = datetime(2026, 10, 9, 21, 15, tzinfo=demo.OSLO)

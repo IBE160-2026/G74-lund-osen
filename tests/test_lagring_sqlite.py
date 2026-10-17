@@ -26,8 +26,7 @@ HENTET = datetime(2026, 9, 22, 8, 33, tzinfo=timezone.utc)
 
 
 def rad(dato: str, slutt: float = 100.0) -> Kursrad:
-    return Kursrad(dato=date.fromisoformat(dato), slutt=slutt,
-                   justert_slutt=slutt - 1, volum=1000)
+    return Kursrad(dato=date.fromisoformat(dato), slutt=slutt, justert_slutt=slutt - 1, volum=1000)
 
 
 @pytest.fixture
@@ -56,11 +55,7 @@ class TestMigrasjonen:
         tilkobling = sqlite3.connect(tmp_path / "ny.db")
         try:
             assert migrer(tilkobling, MIGRASJONSKATALOG) >= 1
-            tabeller = {
-                navn for (navn,) in tilkobling.execute(
-                    "SELECT name FROM sqlite_master WHERE type = 'table'"
-                )
-            }
+            tabeller = {navn for (navn,) in tilkobling.execute("SELECT name FROM sqlite_master WHERE type = 'table'")}
             assert {"kurs", "kursserie"} <= tabeller
         finally:
             tilkobling.close()
@@ -71,16 +66,15 @@ class TestOverleverOmstart:
 
     def test_serie_og_tid_finnes_etter_ny_tilkobling(self, basefil):
         foerste = sqlite3.connect(basefil)
-        SqliteKurslager(foerste).erstatt_serie(
-            "EQNR", [rad("2026-09-18"), rad("2026-09-21")], HENTET
-        )
+        SqliteKurslager(foerste).erstatt_serie("EQNR", [rad("2026-09-18"), rad("2026-09-21")], HENTET)
         foerste.close()
 
         andre = sqlite3.connect(basefil)
         try:
             lager = SqliteKurslager(andre)
             assert [r.dato for r in lager.serie("EQNR")] == [
-                date(2026, 9, 18), date(2026, 9, 21),
+                date(2026, 9, 18),
+                date(2026, 9, 21),
             ]
             assert lager.sist_hentet("EQNR") == HENTET
         finally:
@@ -127,7 +121,8 @@ class TestFeilISisteSteg:
 
         with pytest.raises(ValueError, match="stoppet av testen"):
             lager.erstatt_serie(
-                "EQNR", [rad("2026-09-21"), rad("2026-09-22")],
+                "EQNR",
+                [rad("2026-09-21"), rad("2026-09-22")],
                 HENTET + timedelta(days=1),
             )
 
@@ -151,9 +146,7 @@ class TestOversettelsenVedGrensen:
         oslo = HENTET.astimezone(timezone(timedelta(hours=2)))
         SqliteKurslager(tilkobling).erstatt_serie("EQNR", [rad("2026-09-21")], oslo)
 
-        (lagret,) = tilkobling.execute(
-            "SELECT hentet FROM kursserie WHERE symbol = 'EQNR'"
-        ).fetchone()
+        (lagret,) = tilkobling.execute("SELECT hentet FROM kursserie WHERE symbol = 'EQNR'").fetchone()
 
         assert lagret == "2026-09-22T08:33:00+00:00"
 
@@ -162,9 +155,7 @@ class TestOversettelsenVedGrensen:
         lager.erstatt_serie("EQNR", [rad("2026-09-18")], HENTET)
         lager.erstatt_serie("EQNR", [rad("2026-09-21")], HENTET + timedelta(days=1))
 
-        (antall,) = tilkobling.execute(
-            "SELECT count(*) FROM kursserie WHERE symbol = 'EQNR'"
-        ).fetchone()
+        (antall,) = tilkobling.execute("SELECT count(*) FROM kursserie WHERE symbol = 'EQNR'").fetchone()
 
         assert antall == 1
 
@@ -181,15 +172,11 @@ class TestBaseSomIkkeErKlar:
             # Story 1.5b, h: versjonen alene ville ikke sett en tabell som
             # adapteren laget uten aa migrere.
             assert versjon(tilkobling) == 0
-            assert tilkobling.execute(
-                "SELECT count(*) FROM sqlite_master"
-            ).fetchone()[0] == 0
+            assert tilkobling.execute("SELECT count(*) FROM sqlite_master").fetchone()[0] == 0
         finally:
             tilkobling.close()
 
-    def test_base_paa_eldre_versjon_enn_katalogen_avvises(
-        self, tilkobling, tmp_path, monkeypatch
-    ):
+    def test_base_paa_eldre_versjon_enn_katalogen_avvises(self, tilkobling, tmp_path, monkeypatch):
         """Story 1.5b, c: med en migrasjon til i katalogen er basen ikke
         klar. Adapteren sjekket foer bare at basen var migrert en gang.
 
@@ -200,21 +187,15 @@ class TestBaseSomIkkeErKlar:
         katalog.mkdir()
         for fil in MIGRASJONSKATALOG.glob("*.sql"):
             (katalog / fil.name).write_bytes(fil.read_bytes())
-        (katalog / f"{siste + 1:04d}_ny.sql").write_text(
-            "CREATE TABLE ny (x INTEGER);", encoding="utf-8"
-        )
+        (katalog / f"{siste + 1:04d}_ny.sql").write_text("CREATE TABLE ny (x INTEGER);", encoding="utf-8")
         monkeypatch.setattr(lagring_sqlite, "MIGRASJONSKATALOG", katalog)
 
-        with pytest.raises(
-            RuntimeError, match=rf"versjon {siste}, og .* har {siste + 1} migrasjoner"
-        ):
+        with pytest.raises(RuntimeError, match=rf"versjon {siste}, og .* har {siste + 1} migrasjoner"):
             SqliteKurslager(tilkobling)
 
         # Adapteren migrerer ikke selv, og lager ingen tabeller.
         assert versjon(tilkobling) == siste
-        assert tilkobling.execute(
-            "SELECT count(*) FROM sqlite_master WHERE name = 'ny'"
-        ).fetchone()[0] == 0
+        assert tilkobling.execute("SELECT count(*) FROM sqlite_master WHERE name = 'ny'").fetchone()[0] == 0
 
     def test_base_paa_nyere_versjon_enn_katalogen_avvises(self, tmp_path, monkeypatch):
         """Story 1.5b, c: en base migrert av en nyere utgave av koden har et
@@ -224,9 +205,7 @@ class TestBaseSomIkkeErKlar:
         ny.mkdir()
         for fil in MIGRASJONSKATALOG.glob("*.sql"):
             (ny / fil.name).write_bytes(fil.read_bytes())
-        (ny / f"{siste + 1:04d}_ny.sql").write_text(
-            "CREATE TABLE ny (x INTEGER);", encoding="utf-8"
-        )
+        (ny / f"{siste + 1:04d}_ny.sql").write_text("CREATE TABLE ny (x INTEGER);", encoding="utf-8")
         tilkobling = sqlite3.connect(tmp_path / "nyere.db")
         try:
             assert migrer(tilkobling, ny) == siste + 1
@@ -239,9 +218,7 @@ class TestBaseSomIkkeErKlar:
         finally:
             tilkobling.close()
 
-    def test_katalog_som_ikke_er_i_orden_gir_runtimeerror(
-        self, tilkobling, tmp_path, monkeypatch
-    ):
+    def test_katalog_som_ikke_er_i_orden_gir_runtimeerror(self, tilkobling, tmp_path, monkeypatch):
         """Adapteren sier fra paa samme maate som ellers naar basen ikke er
         klar, i stedet for aa slippe MigrasjonsFeil ut av konstruktoeren."""
         tom = tmp_path / "tom"
@@ -295,9 +272,7 @@ class TestAapneBase:
         finally:
             andre.close()
 
-    def test_feil_i_migreringen_lukker_tilkoblingen_og_gaar_videre(
-        self, tmp_path, monkeypatch
-    ):
+    def test_feil_i_migreringen_lukker_tilkoblingen_og_gaar_videre(self, tmp_path, monkeypatch):
         aapnet = []
         ekte_connect = sqlite3.connect
 
@@ -326,9 +301,7 @@ class TestAapneBase:
         ny.mkdir()
         for fil in MIGRASJONSKATALOG.glob("*.sql"):
             (ny / fil.name).write_bytes(fil.read_bytes())
-        (ny / f"{siste + 1:04d}_ny.sql").write_text(
-            "CREATE TABLE ny (x INTEGER);", encoding="utf-8"
-        )
+        (ny / f"{siste + 1:04d}_ny.sql").write_text("CREATE TABLE ny (x INTEGER);", encoding="utf-8")
         sti = tmp_path / "nyere.db"
         tilkobling = sqlite3.connect(sti)
         migrer(tilkobling, ny)

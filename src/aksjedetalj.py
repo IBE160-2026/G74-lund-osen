@@ -31,7 +31,7 @@ from markedsoversikt import (
     les_tilstand,
 )
 from oversiktsdata import Oversiktspost
-from signalberegning import NEGATIV, POSITIV, Parametre, STANDARD, bevegelsesdesimaler, nodvendige_dager, sjekker_fra
+from signalberegning import NEGATIV, POSITIV, STANDARD, Parametre, bevegelsesdesimaler, nodvendige_dager, sjekker_fra
 from tallformat import desimaler_uten_null, fortegn, tall
 from tilstand import Art, Tilstand
 from vurderingsdata import Grunn, Vurdering
@@ -130,7 +130,7 @@ def regelen(navn: str, p: Parametre = STANDARD) -> str:
     """Regelen nederst i sjekkortet, med grensene fra Parametre."""
     return {
         "Trend": f"Mer enn {tall(p.noytralsone * 100, 'grense')} over snittet gir +1, og mer enn "
-                 f"{tall(p.noytralsone * 100, 'grense')} under gir -1.",
+        f"{tall(p.noytralsone * 100, 'grense')} under gir -1.",
         "Bevegelse": "En endring større enn ett standardavvik gir +1 eller -1, etter retningen.",
         "Interesse": f"Mer enn {tall(p.volumfaktor, 'faktor')} × medianen gir +1 eller -1, etter dagens kursendring.",
     }[navn]
@@ -242,10 +242,7 @@ class Detalj:
         lagrede vurderingen. Tom uten vurdering."""
         if not self.vurdering:
             return ()
-        return tuple(
-            (bokstav, felt, fortegn(getattr(self.vurdering, felt)))
-            for bokstav, felt in SJEKKBOKSTAVER
-        )
+        return tuple((bokstav, felt, fortegn(getattr(self.vurdering, felt))) for bokstav, felt in SJEKKBOKSTAVER)
 
     @property
     def for_kort_serie(self) -> bool:
@@ -292,9 +289,7 @@ def _innenfor_vindu(rader: list[Kursrad], dager: int) -> int:
     return 0
 
 
-def bygg_punkter(
-    rader: list[Kursrad], p: Parametre = STANDARD, dager: int = GRAFVINDU_DAGER
-) -> tuple[Punkt, ...]:
+def bygg_punkter(rader: list[Kursrad], p: Parametre = STANDARD, dager: int = GRAFVINDU_DAGER) -> tuple[Punkt, ...]:
     """Grafpunktene for de siste seks maanedene, med MA50 oppaa (FR-202).
 
     Kursen og snittet tegnes fra SAMME serie - den utbyttejusterte. Tegnet
@@ -310,8 +305,7 @@ def bygg_punkter(
     start = _innenfor_vindu(rader, dager)
 
     return tuple(
-        Punkt(dato=rad.dato, kurs=kurs, ma50=ma)
-        for rad, kurs, ma in zip(rader[start:], kurser[start:], snitt[start:])
+        Punkt(dato=rad.dato, kurs=kurs, ma50=ma) for rad, kurs, ma in zip(rader[start:], kurser[start:], snitt[start:])
     )
 
 
@@ -331,9 +325,7 @@ def boersdag_mellom(fra: date, til: date) -> bool:
         return True
 
 
-def bygg_detalj(
-    post: Oversiktspost, rader: list[Kursrad], idag: date, p: Parametre = STANDARD
-) -> Detalj | None:
+def bygg_detalj(post: Oversiktspost, rader: list[Kursrad], idag: date, p: Parametre = STANDARD) -> Detalj | None:
     """Detaljen for en aksje, eller None hvis den ikke har en eneste kursrad.
 
     post er aksjen og raden i vurdering fra Oversiktsleser, rader er serien i
@@ -349,9 +341,13 @@ def bygg_detalj(
     if utfall is not None and utfall.art is Art.SVAR:
         sjekker = tuple(
             SjekkVisning(
-                navn=s.navn, verdi=s.verdi, maaling=s.forklaring, nummer=i,
+                navn=s.navn,
+                verdi=s.verdi,
+                maaling=s.forklaring,
+                nummer=i,
                 skala=bygg_skala(s.navn, s.maaling, s.grense, p),
-                maaler=hva_den_maaler(s.navn, p), regel=regelen(s.navn, p),
+                maaler=hva_den_maaler(s.navn, p),
+                regel=regelen(s.navn, p),
             )
             for i, s in enumerate(sjekker_fra(utfall.innhold, p), start=1)
         )

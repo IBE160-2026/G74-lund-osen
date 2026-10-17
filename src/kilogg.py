@@ -109,9 +109,7 @@ class Emne:
         if self.slag == MELDING:
             _noekkeltekst("melding_id", self.melding_id)
         elif self.melding_id is not None:
-            raise UgyldigKIRad(
-                f"et emne av slaget {self.slag} har ikke melding_id, fikk {self.melding_id!r}"
-            )
+            raise UgyldigKIRad(f"et emne av slaget {self.slag} har ikke melding_id, fikk {self.melding_id!r}")
 
     @classmethod
     def aksje(cls, symbol: str, dato: date) -> "Emne":

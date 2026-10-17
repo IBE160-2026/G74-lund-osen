@@ -31,8 +31,8 @@ def _tabeller(data: bytes) -> dict[str, bytes]:
     antall = struct.unpack(">H", data[12:14])[0]
     tabeller = {}
     for i in range(antall):
-        tag, start, pakket, hel, _ = struct.unpack(">4sIIII", data[44 + 20 * i:64 + 20 * i])
-        raa = data[start:start + pakket]
+        tag, start, pakket, hel, _ = struct.unpack(">4sIIII", data[44 + 20 * i : 64 + 20 * i])
+        raa = data[start : start + pakket]
         tabeller[tag.decode("ascii")] = zlib.decompress(raa) if pakket < hel else raa
     return tabeller
 
@@ -40,23 +40,23 @@ def _tabeller(data: bytes) -> dict[str, bytes]:
 def _funksjoner(gsub: bytes) -> set[str]:
     """OpenType-funksjonene i FeatureList i GSUB, som «tnum» og «ss01»."""
     liste = struct.unpack(">H", gsub[6:8])[0]
-    antall = struct.unpack(">H", gsub[liste:liste + 2])[0]
-    return {gsub[liste + 2 + 6 * i:liste + 6 + 6 * i].decode("ascii") for i in range(antall)}
+    antall = struct.unpack(">H", gsub[liste : liste + 2])[0]
+    return {gsub[liste + 2 + 6 * i : liste + 6 + 6 * i].decode("ascii") for i in range(antall)}
 
 
 def _glyfer(cmap: bytes, tegn: range) -> list[int]:
     """Glyfnumrene for tegnene, fra cmap format 4 (Windows Unicode)."""
     for i in range(struct.unpack(">H", cmap[2:4])[0]):
-        plattform, koding, start = struct.unpack(">HHI", cmap[4 + 8 * i:12 + 8 * i])
-        if (plattform, koding) in ((3, 1), (0, 3)) and struct.unpack(">H", cmap[start:start + 2])[0] == 4:
+        plattform, koding, start = struct.unpack(">HHI", cmap[4 + 8 * i : 12 + 8 * i])
+        if (plattform, koding) in ((3, 1), (0, 3)) and struct.unpack(">H", cmap[start : start + 2])[0] == 4:
             t = cmap[start:]
             dobbel = struct.unpack(">H", t[6:8])[0]
             n = dobbel // 2
-            slutt = struct.unpack(f">{n}H", t[14:14 + dobbel])
-            begynn = struct.unpack(f">{n}H", t[16 + dobbel:16 + 2 * dobbel])
-            delta = struct.unpack(f">{n}h", t[16 + 2 * dobbel:16 + 3 * dobbel])
+            slutt = struct.unpack(f">{n}H", t[14 : 14 + dobbel])
+            begynn = struct.unpack(f">{n}H", t[16 + dobbel : 16 + 2 * dobbel])
+            delta = struct.unpack(f">{n}h", t[16 + 2 * dobbel : 16 + 3 * dobbel])
             fra = 16 + 3 * dobbel
-            forskyvning = struct.unpack(f">{n}H", t[fra:fra + dobbel])
+            forskyvning = struct.unpack(f">{n}H", t[fra : fra + dobbel])
             glyfer = []
             for c in tegn:
                 k = next((k for k in range(n) if begynn[k] <= c <= slutt[k]), None)
@@ -65,7 +65,7 @@ def _glyfer(cmap: bytes, tegn: range) -> list[int]:
                     glyfer.append((c + delta[k]) & 0xFFFF)
                 else:
                     p = fra + 2 * k + forskyvning[k] + 2 * (c - begynn[k])
-                    g = struct.unpack(">H", t[p:p + 2])[0]
+                    g = struct.unpack(">H", t[p : p + 2])[0]
                     glyfer.append((g + delta[k]) & 0xFFFF if g else 0)
             return glyfer
     raise AssertionError("ingen cmap i format 4")
@@ -75,8 +75,7 @@ def _bredder(tabeller: dict[str, bytes], glyfer: list[int]) -> list[int]:
     """Bredden hver glyf rykker fram, fra hmtx."""
     metrikker = struct.unpack(">H", tabeller["hhea"][34:36])[0]
     hmtx = tabeller["hmtx"]
-    return [struct.unpack(">H", hmtx[4 * min(g, metrikker - 1):4 * min(g, metrikker - 1) + 2])[0]
-            for g in glyfer]
+    return [struct.unpack(">H", hmtx[4 * min(g, metrikker - 1) : 4 * min(g, metrikker - 1) + 2])[0] for g in glyfer]
 
 
 class TestSkriftfilene:
@@ -132,31 +131,54 @@ from test_demo import demobase, fast_klokke, klient, mal  # noqa: E402,F401
 # Fargene i designregler §5 som maa holde kontrasten: forgrunn, bakgrunn og
 # minste forhold. 4,5 for tekst og 3 for streker, ringen og fokus.
 KONTRAST = [
-    ("blekk", "bakgrunn", 4.5), ("blekk", "kort", 4.5),
-    ("tekst", "bakgrunn", 4.5), ("tekst", "kort", 4.5),
-    ("dempet", "bakgrunn", 4.5), ("dempet", "kort", 4.5), ("dempet-2", "kort", 4.5),
-    ("opp", "kort", 4.5), ("opp", "opp-bakgrunn", 4.5),
-    ("ned", "kort", 4.5), ("ned", "ned-bakgrunn", 4.5),
-    ("blandet", "blandet-bakgrunn", 4.5), ("dempet", "ingen-bakgrunn", 4.5),
-    ("blekk", "baand-ut", 4.5), ("tekst", "baand-oevrige", 4.5),
-    ("brun", "hjelp-bakgrunn", 4.5), ("kurs", "kort", 4.5), ("snitt", "kort", 4.5),
-    ("stripe-tekst", "blekk", 4.5), ("stripe-tekst-2", "blekk", 4.5),
-    ("kort", "fyll", 4.5), ("hvit", "blekk", 4.5),
+    ("blekk", "bakgrunn", 4.5),
+    ("blekk", "kort", 4.5),
+    ("tekst", "bakgrunn", 4.5),
+    ("tekst", "kort", 4.5),
+    ("dempet", "bakgrunn", 4.5),
+    ("dempet", "kort", 4.5),
+    ("dempet-2", "kort", 4.5),
+    ("opp", "kort", 4.5),
+    ("opp", "opp-bakgrunn", 4.5),
+    ("ned", "kort", 4.5),
+    ("ned", "ned-bakgrunn", 4.5),
+    ("blandet", "blandet-bakgrunn", 4.5),
+    ("dempet", "ingen-bakgrunn", 4.5),
+    ("blekk", "baand-ut", 4.5),
+    ("tekst", "baand-oevrige", 4.5),
+    ("brun", "hjelp-bakgrunn", 4.5),
+    ("kurs", "kort", 4.5),
+    ("snitt", "kort", 4.5),
+    ("stripe-tekst", "blekk", 4.5),
+    ("stripe-tekst-2", "blekk", 4.5),
+    ("kort", "fyll", 4.5),
+    ("hvit", "blekk", 4.5),
     # Gjennomgangen (ECH6, BH5): tabellen og grafen står også på bakgrunnen.
-    ("blandet", "kort", 4.5), ("opp", "bakgrunn", 4.5), ("ned", "bakgrunn", 4.5),
-    ("blandet", "bakgrunn", 4.5), ("kurs", "bakgrunn", 4.5), ("snitt", "bakgrunn", 4.5),
+    ("blandet", "kort", 4.5),
+    ("opp", "bakgrunn", 4.5),
+    ("ned", "bakgrunn", 4.5),
+    ("blandet", "bakgrunn", 4.5),
+    ("kurs", "bakgrunn", 4.5),
+    ("snitt", "bakgrunn", 4.5),
     # Story 8.0d, PR 2 (designregler §3, 14.10): ringen og strekene i
     # oransje trenger ikke 3:1 mot hvitt og bakgrunnen, fordi teksten sier
     # det samme (FR-103) og pillen har svart fyll. Parene for den gule
     # ringen mot hvitt og bakgrunnen er tatt ut med den grunnen. Ringen mot
     # fyllet og fokus på blekk står.
-    ("oransje", "fyll", 3.0), ("oransje", "blekk", 3.0),
+    ("oransje", "fyll", 3.0),
+    ("oransje", "blekk", 3.0),
     # Teksten i båndet, pillene, markeringen, «NOK» og brikken i kortet.
-    ("brun", "baand-ut", 4.5), ("hvit", "brun", 4.5), ("hvit", "tekst", 4.5),
-    ("blekk", "lys-oransje", 4.5), ("kolonne-tekst-2", "blekk", 4.5), ("hvit", "opp", 4.5),
+    ("brun", "baand-ut", 4.5),
+    ("hvit", "brun", 4.5),
+    ("hvit", "tekst", 4.5),
+    ("blekk", "lys-oransje", 4.5),
+    ("kolonne-tekst-2", "blekk", 4.5),
+    ("hvit", "opp", 4.5),
     # Story 8.0d, PR 3: brikken for -1 og den hvite pillen ved 2 av 3.
     # Resultatpillene i sjekkortene bruker parene for retningen over.
-    ("hvit", "ned", 4.5), ("blekk", "hvit", 4.5), ("dempet-2", "hvit", 4.5),
+    ("hvit", "ned", 4.5),
+    ("blekk", "hvit", 4.5),
+    ("dempet-2", "hvit", 4.5),
     # Gjennomgangen av PR 3 (VG8): det grå feltet mot sporet (del 5, 3,23:1).
     ("felt", "spor", 3.0),
 ]
@@ -175,20 +197,27 @@ def _kontrast(a: str, b: str) -> float:
         def lin(c):
             c = c / 255
             return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
-        r, g, b_ = (int(farge[i:i + 2], 16) for i in (0, 2, 4))
+
+        r, g, b_ = (int(farge[i : i + 2], 16) for i in (0, 2, 4))
         return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b_)
+
     hoey, lav = sorted((lys(a), lys(b)), reverse=True)
     return (hoey + 0.05) / (lav + 0.05)
 
 
 @pytest.fixture
-def sidene(klient, monkeypatch, demobase):
+def sidene(klient, monkeypatch, demobase):  # noqa: F811 - fikstur fra test_demo
     """Hver side som finnes, i hver tilstand: {navn: html}."""
     sider = {"tom base": klient.get("/").data.decode("utf-8")}
-    monter(monkeypatch, snapshot({
-        "EQNR": serie([100.0] * 60 + [104.0], [1000] * 60 + [5000]),
-        "DNB": serie([100.0] * 61),
-    }))
+    monter(
+        monkeypatch,
+        snapshot(
+            {
+                "EQNR": serie([100.0] * 60 + [104.0], [1000] * 60 + [5000]),
+                "DNB": serie([100.0] * 61),
+            }
+        ),
+    )
     sider["oversikten"] = klient.get("/").data.decode("utf-8")
     sider["aksjesiden"] = klient.get("/aksje/EQNR").data.decode("utf-8")
     monkeypatch.setenv(app_modul.I_DEMO, "1")
@@ -250,8 +279,11 @@ class TestRammen:
         for navn, html in sidene.items():
             for href in re.findall(r'href="([^"]*)"', html):
                 # Story 8.15: sorteringen er en parameter på /.
-                assert (href == "/" or re.fullmatch(r"/aksje/[A-Z0-9]+", href)
-                        or re.fullmatch(r"/\?sorter=(kurs|endring|signal|retning)&amp;orden=(synkende|stigende)", href)), (navn, href)
+                assert (
+                    href == "/"
+                    or re.fullmatch(r"/aksje/[A-Z0-9]+", href)
+                    or re.fullmatch(r"/\?sorter=(kurs|endring|signal|retning)&amp;orden=(synkende|stigende)", href)
+                ), (navn, href)
 
     def test_tabelltall_i_tallcellene(self, sidene):
         """Ville feilet hvis tabular-nums ble fjernet fra tallcellene."""
@@ -282,8 +314,7 @@ class TestRammen:
         for navn, html in sidene.items():
             stripe = _stripa(html)
             assert "OSE Signal" in stripe and 'aria-hidden="true"' in stripe, navn
-            assert (html.index("</header>") < html.index("<main>")
-                    < html.index('<footer class="bunnlinje">')), navn
+            assert html.index("</header>") < html.index("<main>") < html.index('<footer class="bunnlinje">'), navn
         # VG1: hele teksten, også på aksjesiden. HENTET er 15.40 UTC
         # mandag 21.09, 17.40 i Norge.
         for navn in ("oversikten", "aksjesiden"):
@@ -348,7 +379,9 @@ class TestOversikten:
         og under dem på smal skjerm. Ville feilet med kortet under tabellen."""
         stil = _stil(sidene["oversikten"])
         assert "390px" in _regel(stil, ".topp-del")
-        brudd = re.search(r"@media \(max-width: (\d+)px\) \{ \.topp-del \{ grid-template-columns: minmax\(0, 1fr\);", stil)
+        brudd = re.search(
+            r"@media \(max-width: (\d+)px\) \{ \.topp-del \{ grid-template-columns: minmax\(0, 1fr\);", stil
+        )
         # VG2: kortet går under før de to kolonnene (390 + 36 px og tekst
         # like bred som kortet) blir for brede.
         assert brudd and int(brudd.group(1)) >= 390 + 36 + 390, brudd
@@ -357,8 +390,13 @@ class TestOversikten:
         for navn in self.OVERSIKTENE:
             html = sidene[navn]
             topp = html.index('<div class="topp-del">')
-            assert (topp < html.index("<h1") < html.index('class="innledning"')
-                    < html.index('<section class="slik-leser"') < html.index('<div class="tabellboks"')), navn
+            assert (
+                topp
+                < html.index("<h1")
+                < html.index('class="innledning"')
+                < html.index('<section class="slik-leser"')
+                < html.index('<div class="tabellboks"')
+            ), navn
             # VG1: kortet står inne i rutenettet, ikke etter det.
             rutenett = _innhold(html, '<div class="topp-del">')
             assert '<section class="slik-leser"' in rutenett and "<h1" in rutenett, navn
@@ -398,7 +436,9 @@ class TestOversikten:
         tegn = re.search(r"(?<!-)color: var\(--([a-z-]+)\)", blekk).group(1)
         assert _kontrast(farger[sirkel], farger["blekk"]) >= 3.0, sirkel
         assert _kontrast(farger[tegn], farger[sirkel]) >= 4.5, (tegn, sirkel)
-        fokus = _regel(stil, "header.stripe button.hjelpeknapp:focus-visible, .tabellboks thead button.hjelpeknapp:focus-visible")
+        fokus = _regel(
+            stil, "header.stripe button.hjelpeknapp:focus-visible, .tabellboks thead button.hjelpeknapp:focus-visible"
+        )
         ring = re.findall(r"var\(--([a-z-]+)\) 1[3-6](?:\.5)?px", fokus)
         assert ring and all(_kontrast(farger[f], farger["blekk"]) >= 3.0 for f in ring), ring
         # VG7: ingen outline rundt klikkflaten her heller.
@@ -420,7 +460,7 @@ class TestOversikten:
         assert 'class="tabellboks"' not in aksje
         # Story 8.0d, PR 3: aksjesiden har sjekkort og ingen kolonnerad, og
         # «?» ved Ga står i det første kortet med den svarte sirkelen.
-        assert '<thead>' not in aksje and 'popovertarget="hjelp-ga"' in aksje
+        assert "<thead>" not in aksje and 'popovertarget="hjelp-ga"' in aksje
         stripa = _stripa(sidene["oversikten"])
         assert 'popovertarget="hjelp-hentet"' in stripa
 
@@ -434,7 +474,9 @@ class TestOversikten:
         stopp = [float(x) for x in re.findall(r"([\d.]+)px", fokus)]
         assert stopp[0] == 10.5 and max(stopp) <= 17, stopp
         assert "var(--blekk) 13.5px, var(--blekk) 16px" in fokus
-        assert re.search(r"@media \(forced-colors: active\) \{\s*button\.hjelpeknapp:focus-visible \{ outline: 3px solid; \}", stil)
+        assert re.search(
+            r"@media \(forced-colors: active\) \{\s*button\.hjelpeknapp:focus-visible \{ outline: 3px solid; \}", stil
+        )
 
     def test_tabellen_ruller_i_sin_egen_boks(self, sidene):
         """Avvik 8: ved 390 px ruller tabellen i en boks, ikke siden. Ville
@@ -460,7 +502,9 @@ class TestOversikten:
         assert len(re.findall(r"inset 4px", stil)) == 2
         # Gjennomgangen: radene uten strek skrives «<tr >».
         sett = set()
-        for rad in re.findall(r"<tr ?( class=\"[^\"]*\")?>\s*<td class=\"selskap\">(.*?)</tr>", sidene["oversikten i demoen"], re.DOTALL):
+        for rad in re.findall(
+            r"<tr ?( class=\"[^\"]*\")?>\s*<td class=\"selskap\">(.*?)</tr>", sidene["oversikten i demoen"], re.DOTALL
+        ):
             klasse, innhold = rad
             styrke = re.search(r"(\d) av 3</span>", innhold)
             if not styrke:
@@ -486,7 +530,9 @@ class TestOversikten:
         # VG5 og BH12: ikke fet, og teksten i blekk, som paret i KONTRAST.
         assert "font-weight: 500" in overskrift and "font-weight" not in mark
         assert "color: var(--blekk)" in overskrift
-        assert re.search(r'@font-face \{ font-family: "Newsreader 72"; font-weight: 500;[^}]*Newsreader72pt-Medium\.woff', stil)
+        assert re.search(
+            r'@font-face \{ font-family: "Newsreader 72"; font-weight: 500;[^}]*Newsreader72pt-Medium\.woff', stil
+        )
 
     def test_fargene_fra_beslutningen(self, sidene):
         """VG4: fargene i beslutning 12 (designregler del 5, 14.10). Ville
@@ -508,7 +554,9 @@ class TestOversikten:
             tid = re.search(r"Oppdatert [a-zø]+ (\d\d\.\d\d kl\. \d\d\.\d\d)", _stripa(html)).group(1)
             assert _synlig(html).count(tid) == 1, navn
             assert "data hentet" not in html, navn
-            assert re.search(r'<div id="hjelp-hentet" class="hjelpevindu" popover>.*?<h2>Oppdatert</h2>', html, re.DOTALL)
+            assert re.search(
+                r'<div id="hjelp-hentet" class="hjelpevindu" popover>.*?<h2>Oppdatert</h2>', html, re.DOTALL
+            )
 
     def test_en_h1_paa_hver_side_og_ikke_i_stripa(self, sidene):
         """BH7 og svar 3: «OSE Signal» er logoen i stripa og ikke en
@@ -531,14 +579,21 @@ class TestOversikten:
         med tallene fra Parametre. Merket «skiller seg ut» er skjult for
         synet, men står i cellen (svar 4)."""
         from signalberegning import Parametre
+
         terskel = Parametre().terskel
         html = sidene["oversikten i demoen"]
-        ut = re.search(r'<tr class="del ut"><th[^>]*>Skilte seg ut <span class="antall">(\d+)</span>'
-                       r' <span class="bak">([^<]+)</span>', html)
+        ut = re.search(
+            r'<tr class="del ut"><th[^>]*>Skilte seg ut <span class="antall">(\d+)</span>'
+            r' <span class="bak">([^<]+)</span>',
+            html,
+        )
         assert ut and ut.group(2) == f"signalstyrke {terskel} eller mer"
         assert int(ut.group(1)) == html.count('<span class="merke skjult">skiller seg ut</span>')
-        oevrige = re.search(r'<tr class="del oevrige"><th[^>]*>Øvrige aksjer <span class="antall">\d+</span>'
-                            r' <span class="bak">([^<]+)</span>', html)
+        oevrige = re.search(
+            r'<tr class="del oevrige"><th[^>]*>Øvrige aksjer <span class="antall">\d+</span>'
+            r' <span class="bak">([^<]+)</span>',
+            html,
+        )
         # Story 8.0d, PR 3: «og N uten signal» når rader uten signal står der.
         uten = html.count('<span class="merke mangler">')
         assert oevrige and oevrige.group(1) == "signalstyrke 0 eller 1" + (f" og {uten} uten signal" if uten else "")
@@ -558,13 +613,19 @@ class TestOversikten:
         symbolet for hver bransje i lista og i demoen."""
         from demo import DEMOUNIVERS
         from kursdata import AKSJEUNIVERS
-        mal = (Path(__file__).resolve().parent.parent / "src" / "templates" / "_bransjer.html").read_text(encoding="utf-8")
-        symboler = set(re.findall(r"^  '([^']+)': '", mal, re.M))
+
+        bransjemal = (Path(__file__).resolve().parent.parent / "src" / "templates" / "_bransjer.html").read_text(
+            encoding="utf-8"
+        )
+        symboler = set(re.findall(r"^  '([^']+)': '", bransjemal, re.M))
         assert len(symboler) == 13
         assert {a.sektor for a in AKSJEUNIVERS} | {a.sektor for a in DEMOUNIVERS} <= symboler
         html = sidene["oversikten"]
-        assert re.search(r'<span class="linje">EQNR · <svg class="bransjesymbol"[^>]*aria-hidden="true"[^>]*>.*?</svg>Energi</span>',
-                         html, re.DOTALL)
+        assert re.search(
+            r'<span class="linje">EQNR · <svg class="bransjesymbol"[^>]*aria-hidden="true"[^>]*>.*?</svg>Energi</span>',
+            html,
+            re.DOTALL,
+        )
         assert '<span class="under">NOK</span>' in html
         assert html.count('class="under"') == 1
 
@@ -598,7 +659,7 @@ class TestSorteringen:
         nettleserens blå (designregler §5, ingen farge skrevet fast)."""
         assert "color: var(--blekk)" in _regel(_stil(sidene["oversikten"]), "p.sortert a")
 
-    def test_sorteringen_virker_i_demoen(self, klient, demobase, monkeypatch):
+    def test_sorteringen_virker_i_demoen(self, klient, demobase, monkeypatch):  # noqa: F811 - fikstur fra test_demo
         """FR-411: samme rute og mal i demoen, med merket som før."""
         monkeypatch.setenv(app_modul.I_DEMO, "1")
         html = klient.get("/?sorter=endring&orden=stigende").data.decode("utf-8")
@@ -617,8 +678,9 @@ class TestBrikkene:
         sto uten klasse."""
         # «oversikten» har ingen vurdering i fiksturen, så demoen brukes.
         for navn in ("oversikten i demoen", "aksjesiden i demoen"):
-            brikker = re.findall(r'<span class="sjekk brikke ([a-z]+)"><abbr title="[a-z]+">[TBI]</abbr> ([+-]?\d)</span>',
-                                 sidene[navn])
+            brikker = re.findall(
+                r'<span class="sjekk brikke ([a-z]+)"><abbr title="[a-z]+">[TBI]</abbr> ([+-]?\d)</span>', sidene[navn]
+            )
             assert brikker, navn
             for klasse, verdi in brikker:
                 assert klasse == self.KLASSE[verdi], (navn, klasse, verdi)
@@ -636,9 +698,11 @@ class TestBrikkene:
             celler = re.findall(r'<td class="retning">(.*?)</td>', sidene[navn], re.DOTALL)
             assert celler, navn
             for celle in celler:
-                assert re.fullmatch(r'<span class="retningspille (opp|ned|blandet|ingen)"><span class="symbol" aria-hidden="true">[↑↓↔–]</span>(Positiv|Negativ|Blandet|Ingen)</span>'
-                                    r'|<span class="retningstekst ukjent"><span class="symbol" aria-hidden="true">–</span> Ukjent</span>',
-                                    celle.strip()), celle
+                assert re.fullmatch(
+                    r'<span class="retningspille (opp|ned|blandet|ingen)"><span class="symbol" aria-hidden="true">[↑↓↔–]</span>(Positiv|Negativ|Blandet|Ingen)</span>'
+                    r'|<span class="retningstekst ukjent"><span class="symbol" aria-hidden="true">–</span> Ukjent</span>',
+                    celle.strip(),
+                ), celle
         stil = _stil(sidene["oversikten i demoen"])
         assert "border-radius: 999px" in _regel(stil, ".retningspille")
         assert "background: var(--opp-bakgrunn)" in _regel(stil, ".retningspille.opp")

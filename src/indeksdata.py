@@ -40,10 +40,7 @@ def bare_boersdager(rader: list[Kursrad]) -> list[Kursrad]:
     """Radene for boersdager i aarene DEKKEDE_AAR dekker. De andre tas bort
     uten feil: en dag i et annet aar kan ikke slaas opp i kalenderen, og en
     stengt dag er ikke en dag aksjene har kurs."""
-    return [
-        rad for rad in rader
-        if rad.dato.year in boersdag.DEKKEDE_AAR and boersdag.er_boersdag(rad.dato)
-    ]
+    return [rad for rad in rader if rad.dato.year in boersdag.DEKKEDE_AAR and boersdag.er_boersdag(rad.dato)]
 
 
 @runtime_checkable

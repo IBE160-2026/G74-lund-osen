@@ -20,18 +20,26 @@ import pytest
 
 from eodhd import UgyldigSerie, kursrad_fra_eodhd, serie_fra_eodhd
 from eodhd_serier import AVVISTE, AVVISTE_IDER
-from kursdata import Kursleser, Kurslager, Kursrad, UgyldigKursrad
+from kursdata import Kurslager, Kursleser, Kursrad, UgyldigKursrad
 from lagring_fil import SnapshotKilde, SnapshotLeser
 
 HENTET = datetime(2026, 9, 23, 17, 4, 11, tzinfo=timezone.utc)
+HENTET_TEKST = HENTET.isoformat()
 
 
 def raa(dato: str = "2026-09-21", close=100.0, adjusted_close=98.0, volume=1000) -> dict:
-    return {"date": dato, "open": 99.0, "high": 101.0, "low": 97.0,
-            "close": close, "adjusted_close": adjusted_close, "volume": volume}
+    return {
+        "date": dato,
+        "open": 99.0,
+        "high": 101.0,
+        "low": 97.0,
+        "close": close,
+        "adjusted_close": adjusted_close,
+        "volume": volume,
+    }
 
 
-def bilde(serier: dict, hentet=HENTET.isoformat()) -> SnapshotLeser:
+def bilde(serier: dict, hentet=HENTET_TEKST) -> SnapshotLeser:
     return SnapshotLeser(SnapshotKilde(hentet=hentet, serier=serier))
 
 
@@ -43,8 +51,7 @@ class TestOversetteren:
     def test_gyldig_rad(self):
         r = kursrad_fra_eodhd(raa("2026-09-21", 100.5, 98.25, 1234))
 
-        assert r == Kursrad(dato=date(2026, 9, 21), slutt=100.5,
-                            justert_slutt=98.25, volum=1234)
+        assert r == Kursrad(dato=date(2026, 9, 21), slutt=100.5, justert_slutt=98.25, volum=1234)
         assert type(r.dato) is date
 
     def test_close_gir_slutt_og_adjusted_close_gir_justert_slutt(self):
@@ -88,9 +95,20 @@ class TestOversetteren:
             ("volume", -1),
             ("close", 10**400),
         ],
-        ids=["close-nan", "justert-nan", "justert-inf", "close-none", "justert-none",
-             "volum-none", "close-tekst", "volum-tekst", "close-null",
-             "justert-negativ", "volum-negativt", "close-for-stort"],
+        ids=[
+            "close-nan",
+            "justert-nan",
+            "justert-inf",
+            "close-none",
+            "justert-none",
+            "volum-none",
+            "close-tekst",
+            "volum-tekst",
+            "close-null",
+            "justert-negativ",
+            "volum-negativt",
+            "close-for-stort",
+        ],
     )
     def test_ugyldig_verdi_gir_ugyldig_kursrad(self, felt, verdi):
         with pytest.raises(UgyldigKursrad):
@@ -98,17 +116,14 @@ class TestOversetteren:
 
     @pytest.mark.parametrize(
         "dato",
-        ["2026-9-1", "20260921", "2026-W39-1", "2026-09-31", 20260921, None,
-         date(2026, 9, 21)],
-        ids=["uten-nuller", "uten-streker", "ukedato", "umulig", "tall", "None",
-             "date-objekt"],
+        ["2026-9-1", "20260921", "2026-W39-1", "2026-09-31", 20260921, None, date(2026, 9, 21)],
+        ids=["uten-nuller", "uten-streker", "ukedato", "umulig", "tall", "None", "date-objekt"],
     )
     def test_ugyldig_dato_gir_ugyldig_kursrad(self, dato):
         with pytest.raises(UgyldigKursrad):
             kursrad_fra_eodhd(raa(dato=dato))
 
-    @pytest.mark.parametrize("rad", [[], ["2026-09-21", 100.0], 1, None],
-                             ids=["tom-liste", "liste", "tall", "None"])
+    @pytest.mark.parametrize("rad", [[], ["2026-09-21", 100.0], 1, None], ids=["tom-liste", "liste", "tall", "None"])
     def test_rad_som_ikke_er_et_objekt_gir_ugyldig_kursrad(self, rad):
         with pytest.raises(UgyldigKursrad):
             kursrad_fra_eodhd(rad)
@@ -122,7 +137,9 @@ class TestSerieFraEodhd:
         rader = serie_fra_eodhd([raa("2026-09-21"), raa("2026-09-17"), raa("2026-09-18")])
 
         assert [r.dato for r in rader] == [
-            date(2026, 9, 17), date(2026, 9, 18), date(2026, 9, 21),
+            date(2026, 9, 17),
+            date(2026, 9, 18),
+            date(2026, 9, 21),
         ]
         assert all(type(r) is Kursrad for r in rader)
 
@@ -130,8 +147,9 @@ class TestSerieFraEodhd:
         """Hentingen skiller «tomt svar» fra «svar med feil form»."""
         assert serie_fra_eodhd([]) == []
 
-    @pytest.mark.parametrize("verdi", [None, 1, "tekst", {}, ({"date": "2026-09-21"},)],
-                             ids=["None", "tall", "tekst", "objekt", "tuppel"])
+    @pytest.mark.parametrize(
+        "verdi", [None, 1, "tekst", {}, ({"date": "2026-09-21"},)], ids=["None", "tall", "tekst", "objekt", "tuppel"]
+    )
     def test_serie_som_ikke_er_en_liste_gir_ugyldig_serie(self, verdi):
         with pytest.raises(UgyldigSerie):
             serie_fra_eodhd(verdi)
@@ -184,7 +202,9 @@ class TestSnapshotLeser:
         leser = bilde({"EQNR": [raa("2026-09-21"), raa("2026-09-17"), raa("2026-09-18")]})
 
         assert [r.dato for r in leser.serie("EQNR")] == [
-            date(2026, 9, 17), date(2026, 9, 18), date(2026, 9, 21),
+            date(2026, 9, 17),
+            date(2026, 9, 18),
+            date(2026, 9, 21),
         ]
 
     def test_mangler_adjusted_close_gjoer_symbolet_manglende(self):
@@ -196,8 +216,14 @@ class TestSnapshotLeser:
 
     @pytest.mark.parametrize(
         "daarlig",
-        [raa(close=float("nan")), raa(adjusted_close=None), raa(close="100"),
-         raa(close=0), raa(volume=-1), raa(close=10**400)],
+        [
+            raa(close=float("nan")),
+            raa(adjusted_close=None),
+            raa(close="100"),
+            raa(close=0),
+            raa(volume=-1),
+            raa(close=10**400),
+        ],
         ids=["nan", "None", "tekst", "null", "negativt-volum", "for-stort"],
     )
     def test_ugyldig_verdi_gjoer_symbolet_manglende(self, daarlig):
@@ -240,11 +266,13 @@ class TestSnapshotLeser:
 
     def test_ett_daarlig_symbol_roerer_ikke_de_andre(self):
         """AD-15: ett symbol som ikke kan leses, stopper ikke de andre."""
-        leser = bilde({
-            "EQNR": [raa("2026-09-21", adjusted_close=float("nan"))],
-            "DNB": [raa("2026-09-18"), raa("2026-09-21")],
-            "KOG": [raa("2026-09-21")],
-        })
+        leser = bilde(
+            {
+                "EQNR": [raa("2026-09-21", adjusted_close=float("nan"))],
+                "DNB": [raa("2026-09-18"), raa("2026-09-21")],
+                "KOG": [raa("2026-09-21")],
+            }
+        )
 
         assert er_manglende(leser, "EQNR")
         assert len(leser.serie("DNB")) == 2
@@ -252,8 +280,7 @@ class TestSnapshotLeser:
         assert len(leser.serie("KOG")) == 1
         assert leser.sist_hentet("KOG") == HENTET
 
-    @pytest.mark.parametrize("verdi", [None, 1, "tekst", {}],
-                             ids=["None", "tall", "tekst", "objekt"])
+    @pytest.mark.parametrize("verdi", [None, 1, "tekst", {}], ids=["None", "tall", "tekst", "objekt"])
     def test_serie_som_ikke_er_en_liste_gjoer_bare_det_symbolet_manglende(self, verdi):
         """AD-15: ogsaa en serie av feil type stopper ikke de andre."""
         leser = bilde({"EQNR": verdi, "DNB": [raa("2026-09-18"), raa("2026-09-21")]})
@@ -301,8 +328,7 @@ class TestSnapshotLeser:
         """Formen i kurser-raa-2026-09-23.json: isoformat med mikrosekunder."""
         leser = bilde({"EQNR": [raa()]}, hentet="2026-09-23T17:04:11.296504+00:00")
 
-        assert leser.sist_hentet("EQNR") == datetime(
-            2026, 9, 23, 17, 4, 11, 296504, tzinfo=timezone.utc)
+        assert leser.sist_hentet("EQNR") == datetime(2026, 9, 23, 17, 4, 11, 296504, tzinfo=timezone.utc)
 
     def test_utlevert_serie_er_en_kopi(self):
         leser = bilde({"EQNR": [raa("2026-09-18")]})

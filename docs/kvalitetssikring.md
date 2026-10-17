@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-17T22:31
+updated: 2026-10-17T23:25
 ---
 
 # Kvalitetssikring
@@ -687,6 +687,8 @@ Dokumentet oppdateres ved hver epic, sammen med kodegjennomgangen av den
 **Fra 03.10 navngir hver spesifikasjon hver mutant og testen som fanget den**,
 så dokumentet kan oppdateres uten hull. Det var ikke gjort for alle storyene
 før 03.10 (§3, «Åpne punkter i kildene»).
+
+*Lagt til 2026-10-17 (story 9.7):* ruff kjøres før en commit, `uv run ruff check --fix` og så `uv run ruff format`, med pyflakes, importene og bugbear (`pyproject.toml`). CI kjører `ruff check` og `ruff format --check` før testene, og `tests/test_ruff.py` gjør det samme, så pytest feiler lokalt også.
 
 *Lagt til 2026-10-17:* `tests/test_kvalitetssikring.py` passer på to av punktene: hver spesifikasjon med status `done` har en rad i §3 og i §5, og hver test dette dokumentet og `vurderingsmatrise.md` nevner med fil og navn, finnes. Hver PR får triagen som kommentar (§5).
 

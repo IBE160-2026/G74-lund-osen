@@ -76,10 +76,10 @@ from urllib.parse import quote, quote_plus
 import requests
 from dotenv import load_dotenv
 
-import lagring_fil
 # Modulen, ikke DEKKEDE_AAR alene: aarene leses naar indeksen skrives, slik
 # porten gjoer, saa en test som bytter ut boersdag.DEKKEDE_AAR, gjelder ogsaa her.
 import boersdag
+import lagring_fil
 import lagring_sqlite
 from boersdag import (
     OSLO,
@@ -122,6 +122,7 @@ TIDSGRENSE = time(21, 0)
 def _grensen() -> str:
     """TIDSGRENSE slik utskriftene viser den, «21:00»."""
     return f"{TIDSGRENSE:%H:%M}"
+
 
 # Story 2.3b, svar 4 (10.10): et nytt forsoek starter ingen kall fra dette
 # klokkeslettet i Oslo.
@@ -347,9 +348,7 @@ def hent_universet(
             resultat.kall_brukt += 1
         except Exception as feil:  # noqa: BLE001 - alt som feiler har kostet kallet
             resultat.kall_brukt += 1
-            resultat.feil[aksje.symbol] = _uten_noekkel(
-                f"{type(feil).__name__}: {feil}", api_nokkel
-            )
+            resultat.feil[aksje.symbol] = _uten_noekkel(f"{type(feil).__name__}: {feil}", api_nokkel)
             skriv(f"  {aksje.symbol}: FEIL {_uten_noekkel(str(feil), api_nokkel)}")
             continue
 
@@ -373,10 +372,7 @@ def hent_universet(
         # Raadataene lagres uendret. Oversettelsen er bare kontrollen.
         resultat.serier[aksje.symbol] = rader
         merknad = "" if len(serie) >= MINST_HANDELSDAGER else "  ← for kort for MA50"
-        skriv(
-            f"  {aksje.symbol}: {len(serie)} dager, "
-            f"siste {serie[-1].dato.isoformat()}{merknad}"
-        )
+        skriv(f"  {aksje.symbol}: {len(serie)} dager, siste {serie[-1].dato.isoformat()}{merknad}")
 
     return resultat
 
@@ -420,9 +416,7 @@ def hent_indeksen(
     return resultat
 
 
-def lag_oyeblikksbilde(
-    resultat: Resultat, fra: str, til: str, naa: str, indeks: Resultat | None = None
-) -> dict:
+def lag_oyeblikksbilde(resultat: Resultat, fra: str, til: str, naa: str, indeks: Resultat | None = None) -> dict:
     """Formatet visningen leser gjennom lagring_fil.SnapshotLeser. Skrives
     aldri om etterpaa.
 
@@ -597,14 +591,8 @@ def skriv_indeksen_til_basen(
     return True
 
 
-def _basen_feilet(
-    feil: BaseException, base_sti: Path, fil: Path, skrevet: int, skriv
-) -> None:
-    alt = (
-        f"{skrevet} serier var alt skrevet; --les-inn skriver dem paa nytt.\n"
-        if skrevet
-        else ""
-    )
+def _basen_feilet(feil: BaseException, base_sti: Path, fil: Path, skrevet: int, skriv) -> None:
+    alt = f"{skrevet} serier var alt skrevet; --les-inn skriver dem paa nytt.\n" if skrevet else ""
     skriv(
         f"Basen {base_sti} kunne ikke skrives: {type(feil).__name__}: {feil}\n"
         f"{alt}"
@@ -614,10 +602,7 @@ def _basen_feilet(
 
 
 def _kan_skrives_til(dato: date) -> str:
-    return (
-        f"En rad for {dato.isoformat()} kan bare skrives saa lenge den er "
-        "inneveerende boersdag (AD-7)."
-    )
+    return f"En rad for {dato.isoformat()} kan bare skrives saa lenge den er inneveerende boersdag (AD-7)."
 
 
 def _stoppet_ved_midnatt(dato: date, skrevet: int, skriv, aarsak: str = "") -> None:
@@ -717,15 +702,9 @@ def skriv_vurderinger(
         f"{len(grunner)} med grunn."
     )
     if grunner:
-        skriv(
-            "  Med grunn: "
-            + ", ".join(f"{symbol} ({grunn.value})" for symbol, grunn in grunner.items())
-        )
+        skriv("  Med grunn: " + ", ".join(f"{symbol} ({grunn.value})" for symbol, grunn in grunner.items()))
     if sto_fra_foer:
-        skriv(
-            f"  Raden for {dato.isoformat()} sto fra foer og er ikke skrevet over: "
-            + ", ".join(sto_fra_foer)
-        )
+        skriv(f"  Raden for {dato.isoformat()} sto fra foer og er ikke skrevet over: " + ", ".join(sto_fra_foer))
     return True
 
 
@@ -746,9 +725,7 @@ def _aapne_for_sjekken(base_sti: Path) -> sqlite3.Connection:
     return tilkobling
 
 
-def manglende_i_basen(
-    base_sti: Path, dato: date, lista: tuple[Aksje, ...] = AKSJEUNIVERS
-) -> list[str]:
+def manglende_i_basen(base_sti: Path, dato: date, lista: tuple[Aksje, ...] = AKSJEUNIVERS) -> list[str]:
     """Aksjene i lista som ikke har en kurs for dato i basen - story 2.3.
 
     Finnes ikke basen, mangler alle. Basen aapnes med _aapne_for_sjekken, saa
@@ -761,18 +738,12 @@ def manglende_i_basen(
     tilkobling = _aapne_for_sjekken(base_sti)
     try:
         lager = SqliteKurslager(tilkobling, lista, godta_en_versjon_bak=True)
-        return [
-            aksje.symbol
-            for aksje in lista
-            if not any(rad.dato == dato for rad in lager.serie(aksje.symbol))
-        ]
+        return [aksje.symbol for aksje in lista if not any(rad.dato == dato for rad in lager.serie(aksje.symbol))]
     finally:
         tilkobling.close()
 
 
-def manglende_vurderinger(
-    base_sti: Path, dato: date, lista: tuple[Aksje, ...] = AKSJEUNIVERS
-) -> list[str]:
+def manglende_vurderinger(base_sti: Path, dato: date, lista: tuple[Aksje, ...] = AKSJEUNIVERS) -> list[str]:
     """Aksjene i lista uten rad i vurdering for dato - story 2.3b, svar 6.
 
     Basen aapnes med _aapne_for_sjekken, saa ingenting skrives, og en base en
@@ -905,8 +876,10 @@ def kjoer(
         )
         sys.exit(1)
     if klokke is None:
+
         def klokke():
             return oeyeblikk
+
     hentet_tid = oeyeblikk.astimezone(timezone.utc)
     hentet = hentet_tid.isoformat()
 
@@ -947,10 +920,7 @@ def kjoer(
             try:
                 uten_rad = manglende_vurderinger(base_sti, dato, lista)
             except BASEFEIL as feil:
-                skriv(
-                    f"Radene i vurdering kunne ikke leses ({type(feil).__name__}). "
-                    f"{_kan_skrives_til(dato)}"
-                )
+                skriv(f"Radene i vurdering kunne ikke leses ({type(feil).__name__}). {_kan_skrives_til(dato)}")
                 sys.exit(1)
             if uten_rad:
                 if norsk_dato(klokke()) != dag:
@@ -962,7 +932,13 @@ def kjoer(
                     "skrives av kursene i basen, uten kall (story 2.3b)."
                 )
                 if not skriv_vurderinger(
-                    base_sti, dato, dag, set(uten_rad), klokke, skriv, lista,
+                    base_sti,
+                    dato,
+                    dag,
+                    set(uten_rad),
+                    klokke,
+                    skriv,
+                    lista,
                     bare=set(uten_rad),
                 ):
                     sys.exit(1)
@@ -983,8 +959,19 @@ def kjoer(
             if not lag_ki_tekster(base_sti, dato, klokke, modell, skriv, lista, basen_har_kursene=False):
                 modell = None
             return nytt_forsoek(
-                data_katalog, base_sti, oeyeblikk, dag, dato, mangler,
-                api_nokkel, hent, skriv, klokke, les_kvote, lista, modell=modell,
+                data_katalog,
+                base_sti,
+                oeyeblikk,
+                dag,
+                dato,
+                mangler,
+                api_nokkel,
+                hent,
+                skriv,
+                klokke,
+                les_kvote,
+                lista,
+                modell=modell,
             )
         skriv(
             f"Oeyeblikksbildet for boersdagen {dato.isoformat()}, {fil.name}, "
@@ -1020,19 +1007,13 @@ def kjoer(
     except (requests.RequestException, ValueError) as feil:
         # Bare nett- og formfeil. En programmeringsfeil skal synes, ikke gi
         # henting uten kvotesjekk (gjennomgangen, BH3).
-        skriv(
-            f"Kvoten kunne ikke leses fra /api/user ({type(feil).__name__}). "
-            "Henter likevel."
-        )
+        skriv(f"Kvoten kunne ikke leses fra /api/user ({type(feil).__name__}). Henter likevel.")
     else:
         fra_bonus = vurder_kvote(igjen, bonus, behov)
         if fra_bonus == 0:
             skriv(f"Kvoten: {igjen} kall igjen av dagens.")
         elif fra_bonus is not None:
-            skriv(
-                f"Kvoten: {igjen} kall igjen av dagens. {fra_bonus} kall tas "
-                f"fra bonuskvoten, som har {bonus}."
-            )
+            skriv(f"Kvoten: {igjen} kall igjen av dagens. {fra_bonus} kall tas fra bonuskvoten, som har {bonus}.")
         else:
             skriv(
                 f"Kvoten: {igjen} kall igjen av dagens og {bonus} i bonuskvoten. "
@@ -1049,9 +1030,7 @@ def kjoer(
     indeks = hent_indeksen(api_nokkel, fra, til, hent, skriv)
     kall_brukt = resultat.kall_brukt + indeks.kall_brukt
 
-    tekst = json.dumps(
-        lag_oyeblikksbilde(resultat, fra, til, hentet, indeks), ensure_ascii=False
-    )
+    tekst = json.dumps(lag_oyeblikksbilde(resultat, fra, til, hentet, indeks), ensure_ascii=False)
     try:
         with open(fil, "x", encoding="utf-8") as ut:
             ut.write(tekst)
@@ -1103,17 +1082,17 @@ def kjoer(
 
     # Story 10.2: KI-teksten etter vurderingene (AD-17), aldri foer. Mangler
     # noen aksjer dagens kurs, gir en ny kjoering kall til EODHD.
-    alle_har_dagen = not resultat.feil and skrevne == set(serier) and all(
-        any(rad.dato == dato for rad in serier[symbol]) for symbol in skrevne)
+    alle_har_dagen = (
+        not resultat.feil
+        and skrevne == set(serier)
+        and all(any(rad.dato == dato for rad in serier[symbol]) for symbol in skrevne)
+    )
     lag_ki_tekster(base_sti, dato, klokke, modell, skriv, lista, basen_har_kursene=alle_har_dagen)
 
     # FR-402: svaret er ikke fra boersdagen for noen av aksjene. Kursene og
     # fila staar, og vurderingen har grunnen kurs_ikke_fra_dagen. Samme
     # kommando kjoert igjen samme kveld proever dem (story 2.3b).
-    uten_dagen = sorted(
-        symbol for symbol in skrevne
-        if not any(rad.dato == dato for rad in serier[symbol])
-    )
+    uten_dagen = sorted(symbol for symbol in skrevne if not any(rad.dato == dato for rad in serier[symbol]))
     if uten_dagen:
         skriv(
             f"Svaret har ikke kursen for boersdagen {dato.isoformat()} for "
@@ -1171,9 +1150,7 @@ def _indeksen_feilet_i_kveld(kursfil: Path, base_sti: Path, indeks: Indeks = HOV
     return sist is None or sist < hentet
 
 
-def eldste_foerst(
-    base_sti: Path, symboler: list[str], lista: tuple[Aksje, ...] = AKSJEUNIVERS
-) -> list[str]:
+def eldste_foerst(base_sti: Path, symboler: list[str], lista: tuple[Aksje, ...] = AKSJEUNIVERS) -> list[str]:
     """symboler med eldste kursserie.hentet foerst - story 2.3b, svar 2.
 
     En aksje uten serie kommer foerst av alle, og ellers gjelder rekkefoelgen
@@ -1264,10 +1241,7 @@ def nytt_forsoek(
         brukt, grense, bonus = kvotetall()
     except requests.HTTPError as feil:
         if str(feil).startswith(("HTTP 401", "HTTP 403")):
-            skriv(
-                f"EODHD avviste noekkelen ved /api/user ({feil}). Sjekk "
-                "EODHD_API_KEY i .env. 0 kall brukt."
-            )
+            skriv(f"EODHD avviste noekkelen ved /api/user ({feil}). Sjekk EODHD_API_KEY i .env. 0 kall brukt.")
         else:
             skriv(
                 f"Kvoten kunne ikke leses fra /api/user ({feil}). Et nytt "
@@ -1331,17 +1305,14 @@ def nytt_forsoek(
             break
         if brukt_naa >= grense:
             skriv(
-                f"Dagens {grense} kall er brukt. Forsoeket stopper, saa neste kall "
-                "ikke tas fra bonuskvoten (NFR-01)."
+                f"Dagens {grense} kall er brukt. Forsoeket stopper, saa neste kall ikke tas fra bonuskvoten (NFR-01)."
             )
             break
     if resultat.kall_brukt == 0:
         skriv("Ingen kall ble gjort, og ingen fil er skrevet. 0 kall brukt.")
         sys.exit(1)
 
-    tekst = json.dumps(
-        lag_oyeblikksbilde(resultat, fra, til, hentet_tid.isoformat()), ensure_ascii=False
-    )
+    tekst = json.dumps(lag_oyeblikksbilde(resultat, fra, til, hentet_tid.isoformat()), ensure_ascii=False)
     # Navnet er fritt, saa en fil som dukker opp underveis, gir neste n.
     for _ in range(10):
         fil = forsoeksfil(data_katalog, dato)
@@ -1372,16 +1343,12 @@ def nytt_forsoek(
         if norsk_dato(klokke()) != dag:
             _stoppet_ved_midnatt(dato, 0, skriv)
             sys.exit(1)
-        if not skriv_vurderinger(
-            base_sti, dato, dag, skrevne, klokke, skriv, lista, bare=skrevne
-        ):
+        if not skriv_vurderinger(base_sti, dato, dag, skrevne, klokke, skriv, lista, bare=skrevne):
             sys.exit(1)
         lag_ki_tekster(base_sti, dato, klokke, modell, skriv, lista, basen_har_kursene=False)
 
     fortsatt = sorted(
-        symbol for symbol in mangler
-        if symbol not in skrevne
-        or not any(rad.dato == dato for rad in serier[symbol])
+        symbol for symbol in mangler if symbol not in skrevne or not any(rad.dato == dato for rad in serier[symbol])
     )
     if fortsatt:
         skriv(
@@ -1447,10 +1414,7 @@ def les_inn(fil: Path, base_sti: Path, skriv: Callable[[str], None] = print) -> 
 
     skriv(f"Leser inn {len(serier)} serier fra {fil.name}, hentet {hentet.isoformat()}.")
     for symbol, rader in serier.items():
-        skriv(
-            f"  {symbol}: {len(rader)} dager, "
-            f"{rader[0].dato.isoformat()} til {rader[-1].dato.isoformat()}"
-        )
+        skriv(f"  {symbol}: {len(rader)} dager, {rader[0].dato.isoformat()} til {rader[-1].dato.isoformat()}")
     skrevne = skriv_til_basen(base_sti, serier, hentet, fil, skriv)
     if skrevne is None or skrevne != set(serier) or not alt_lest:
         sys.exit(1)
@@ -1465,9 +1429,7 @@ def main(argv: list[str] | None = None) -> None:
     Stiene slaas opp her, naar main kalles (story 2.1b), saa fixturen i
     tests/conftest.py flytter dem.
     """
-    parser = argparse.ArgumentParser(
-        description="Henter sluttkurser fra EODHD.", allow_abbrev=False
-    )
+    parser = argparse.ArgumentParser(description="Henter sluttkurser fra EODHD.", allow_abbrev=False)
     parser.add_argument(
         "--les-inn",
         metavar="FIL",

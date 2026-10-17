@@ -37,8 +37,19 @@ jobs:
         # Da skal kjoeringen stoppe, ikke stille loese det opp.
         run: uv sync --locked
 
+      # Story 9.7: ruff foer testene, med reglene i pyproject.toml. Samme
+      # kommandoer som tests/test_ruff.py og som README-en ber om foer en commit.
+      - name: ruff check
+        run: uv run ruff check
+
+      - name: ruff format --check
+        run: uv run ruff format --check
+
       - name: Kjoer testene
         # Samme kommando som lokalt, jf. README.
+        # Story 9.7 (BH14, ECH1): ogsaa naar ruff har feilet, saa en glemt
+        # formattering ikke skjuler resultatet av testene.
+        if: success() || failure()
         run: uv run pytest -q
 
   # Story 3.1: imaget bygges og proeves, uten hemmeligheter og uten EODHD.
