@@ -2582,7 +2582,8 @@ class TestHovedindeksenPaaForsiden:
         assert '<span class="indeksendring opp">+0,50\u00a0%</span>' in delen
         assert "1 av 2 gikk bedre enn indeksen." in tekst
         assert "Ikke med, uten kurs 09.10:" in tekst and "Kongsberg Gruppen" in tekst
-        assert "Equinor" not in tekst.split("Ikke med", 1)[1]
+        # Story 2.9b: søylene står under, så bare linja «Ikke med» leses.
+        assert "Equinor" not in _synlig(re.search(r'<p class="uten">(.*?)</p>', delen).group(1))
         # Samme dag som tabellen, saa ingen dato ved verdien.
         assert 'class="indeksdato"' not in delen
 
@@ -2616,7 +2617,9 @@ class TestHovedindeksenPaaForsiden:
         """Torsdag mangler i indeksen. Ville feilet med endringen mot forrige rad."""
         self._to_aksjer()
         _legg_inn_indeks(_indeks([(date(2026, 10, 7), 1000.0), (FREDAG_09_10, 1005.0)]))
-        tekst = _synlig(_delen(klient.get("/").data.decode("utf-8")))
+        # Story 2.9b: søylene for aksjene står under og har prosent, så bare
+        # delen over søylene leses for indeksen.
+        tekst = _synlig(_delen(klient.get("/").data.decode("utf-8")).split('<figure class="soeyler">', 1)[0])
         assert "Endringen vises ikke: indeksen mangler børsdagen før." in tekst
         assert "gikk bedre" not in tekst and "%" not in tekst
 
@@ -2703,3 +2706,194 @@ class TestHovedindeksenPaaForsiden:
             tilkobling.close()
         tekst = _synlig(_delen(klient.get("/").data.decode("utf-8")))
         assert "Hovedindeksen OSEBX" in tekst and "OBX " not in tekst
+
+
+def _soeylene(html: str) -> str:
+    return _delen(html).split('<figure class="soeyler">', 1)[1].split("</figure>", 1)[0]
+
+
+def _stolpene(figur: str) -> list[tuple[str, str]]:
+    """(fargeklassen, stilen) for hver stolpe, fra venstre."""
+    return re.findall(r'<span class="stolpe (\w+)" style="([^"]*)">', figur)
+
+
+def _tickerne(figur: str) -> list[str]:
+    return re.findall(r'<span class="ticker">([^<]+)</span>', figur)
+
+
+class TestSoeylenePaaForsiden:
+    """Story 2.9b (FR-105): kontrollen under storyen i epics.md, på siden.
+    Mutantene står i spesifikasjonen 2.9b."""
+
+    def _tre_aksjer(self):
+        hentet = datetime.fromisoformat(HENTET)
+        skriv_serie("EQNR", _aksjeserie(FREDAG_09_10, 2.0), hentet)
+        skriv_serie("DNB", _aksjeserie(FREDAG_09_10, -1.0), hentet)
+        skriv_serie("NHY", _aksjeserie(FREDAG_09_10, 0.001), hentet)
+
+    def test_en_soeyle_per_aksje_med_kurs_fra_stoerst_fall(self, klient):
+        """Tre av 15 har kurs fredag. Ville feilet med et fast antall 15 i
+        teksten for skjermleser (mutant S1), eller med en annen rekkefølge
+        (mutant S2)."""
+        self._tre_aksjer()
+        _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, 1005.0)]))
+        figur = _soeylene(klient.get("/").data.decode("utf-8"))
+        assert _tickerne(figur) == ["DNB", "NHY", "EQNR"]
+        assert "Søyler for 3 aksjer 09.10, fra størst fall til størst stigning." in _synlig(figur)
+        assert (
+            '<figcaption class="soeyletittel">Dagens endring per aksje, med indeksen som stiplet linje</figcaption>'
+            in figur
+        )
+
+    def test_fargen_foelger_endringen_slik_den_vises(self, klient):
+        """+0,001 % vises som 0,00 % og får ingen farge og ingen lengde, som i
+        tabellen (gjennomgangen, BH7). Den største endringen fyller halve
+        feltet, fra null-linja."""
+        self._tre_aksjer()
+        _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, 1005.0)]))
+        figur = _soeylene(klient.get("/").data.decode("utf-8"))
+        assert _stolpene(figur) == [
+            ("ned", "top: 50%; height: 25.00%;"),
+            ("null", "bottom: 50%; height: 0.00%;"),
+            ("opp", "bottom: 50%; height: 50.00%;"),
+        ]
+
+    @pytest.mark.parametrize(
+        ("slutt", "klasse", "tekst"),
+        [(1005.0, "opp", "+0,50 %"), (990.0, "ned", "-1,00 %"), (999.96, "null", "0,00 %")],
+    )
+    def test_den_stiplede_linja_er_groenn_naar_indeksen_steg_og_roed_naar_den_falt(self, klient, slutt, klasse, tekst):
+        """Ville feilet med feil farge på linja (mutant S3). 0,00 % gir
+        ingen farge, som endringen ved indeksen."""
+        self._tre_aksjer()
+        _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, slutt)]))
+        html = klient.get("/").data.decode("utf-8")
+        figur = _soeylene(html)
+        assert re.findall(r'<span class="indekslinje (\w+)"', figur) == [klasse]
+        assert f"Indeksen, den stiplede linja: {tekst}." in _synlig(figur)
+        stil = _stil(html)
+        assert "dashed" in _regel(stil, ".soeyler .indekslinje")
+        # Gjennomgangen (BH11, ECH4): linja står midt på verdien, også ved
+        # kanten av feltet.
+        assert "margin-top: -1px" in _regel(stil, ".soeyler .indekslinje")
+        # Gjennomgangen (VG3): fargene på søylene.
+        assert "var(--dempet)" in _regel(stil, ".soeyler .stolpe")
+        assert "var(--opp)" in _regel(stil, ".soeyler .stolpe.opp")
+        assert "var(--ned)" in _regel(stil, ".soeyler .stolpe.ned")
+        assert "var(--opp)" in _regel(stil, ".soeyler .indekslinje.opp")
+        assert "var(--ned)" in _regel(stil, ".soeyler .indekslinje.ned")
+
+    def test_uten_endring_for_indeksen_ingen_linje_og_siden_sier_det(self, klient):
+        """Torsdag mangler i indeksen: søylene står, uten linje."""
+        self._tre_aksjer()
+        _legg_inn_indeks(_indeks([(date(2026, 10, 7), 1000.0), (FREDAG_09_10, 1005.0)]))
+        figur = _soeylene(klient.get("/").data.decode("utf-8"))
+        assert "indekslinje" not in figur and len(_stolpene(figur)) == 3
+        assert "Ingen stiplet linje: indeksen har ingen endring for dagen." in _synlig(figur)
+        # Gjennomgangen (BH17): delen over søylene har ingen prosent, og
+        # ingenting står etter søylene.
+        html = klient.get("/").data.decode("utf-8")
+        assert "%" not in _synlig(_delen(html).split('<figure class="soeyler">', 1)[0])
+        assert _synlig(_delen(html).split("</figure>", 1)[1]).strip() == ""
+
+    def test_skjermleseren_faar_alle_tallene(self, klient):
+        """Søylene er skjult for skjermleser, og lista har navn, ticker,
+        bransje og endring for hver, og indeksens endring."""
+        self._tre_aksjer()
+        _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, 1005.0)]))
+        figur = _soeylene(klient.get("/").data.decode("utf-8"))
+        assert '<div aria-hidden="true">' in figur
+        liste = figur.split('<ol class="skjult">', 1)[1].split("</ol>", 1)[0]
+        # Gjennomgangen (BH9): lista har én linje per aksje, og overskriften og
+        # indeksen står utenfor.
+        assert liste.count("<li>") == 3
+        for linje in (
+            "(DNB, Finans): -1,00\u00a0%.",
+            "(NHY, Materialer): 0,00\u00a0%.",
+            "Equinor (EQNR, Energi): +2,00\u00a0%.",
+        ):
+            assert linje in _synlig(liste), (linje, liste)
+        assert '<p class="skjult">Indeksen, den stiplede linja: +0,50\u00a0%.</p>' in figur
+        assert '<p class="skjult">Søyler for 3 aksjer 09.10, fra størst fall til størst stigning.</p>' in figur
+
+    def test_bransjesymbolet_fra_malen_over_tickeren(self, klient):
+        """Symbolet ligger i malen (_bransjer.html) og hentes ikke fra nettet."""
+        self._tre_aksjer()
+        _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, 1005.0)]))
+        figur = _soeylene(klient.get("/").data.decode("utf-8"))
+        etiketter = re.findall(r'<span class="etikett[^"]*">(.*?)<span class="ticker">', figur, re.DOTALL)
+        assert len(etiketter) == 3
+        assert all(e.startswith('<svg class="bransjesymbol"') for e in etiketter)
+        assert "http" not in figur
+
+    def test_en_aksje_uten_rad_foer_dagen_navngis_under_soeylene(self, klient):
+        hentet = datetime.fromisoformat(HENTET)
+        self._tre_aksjer()
+        skriv_serie("YAR", [Kursrad(dato=FREDAG_09_10, slutt=300.0, justert_slutt=300.0, volum=1000)], hentet)
+        _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, 1005.0)]))
+        figur = _soeylene(klient.get("/").data.decode("utf-8"))
+        assert "YAR" not in _tickerne(figur)
+        assert re.search(r"Uten søyle, mangler kursen dagen før: Yara[^.]*\.", _synlig(figur)), _synlig(figur)
+
+    def test_soeylene_er_for_indeksens_dato(self, klient):
+        """Indeksen står på torsdag med en endring, og aksjene har kurs
+        fredag også. Søylene er for torsdag: 100 torsdag og onsdag gir
+        0,00 % for alle tre."""
+        self._tre_aksjer()
+        _legg_inn_indeks(_indeks([(date(2026, 10, 7), 1000.0), (TORSDAG_08_10, 990.0)]))
+        figur = _soeylene(klient.get("/").data.decode("utf-8"))
+        assert [k for k, _ in _stolpene(figur)] == ["null", "null", "null"]
+        # Gjennomgangen (ECH8): datoen står i overskriften, fordi tabellen er
+        # for fredag.
+        assert (
+            '<figcaption class="soeyletittel">Endring per aksje 08.10, med indeksen som stiplet linje</figcaption>'
+            in figur
+        )
+
+    def test_ved_390_px_deler_soeylene_bredden_uten_fast_bredde(self, klient):
+        """Ved 390 px ruller ikke siden sideveis. Søylene og etikettene deler
+        bredden likt, tickeren står loddrett, og ingen regel for søylene har
+        en fast bredde utenom bransjesymbolet. 15 symboler på 14 px med 2 px
+        mellom får plass i kortet: 390 - 2 × 16 (kanten av siden) - 2 × 22
+        (kortet) - 2 (rammen) = 312 px."""
+        self._tre_aksjer()
+        _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, 1005.0)]))
+        stil = _stil(klient.get("/").data.decode("utf-8"))
+        for velger in (".soeyler .etikett", ".soeyler .spor"):
+            regel = _regel(stil, velger)
+            assert "flex: 1 1 0" in regel and "min-width: 0" in regel, velger
+        assert "writing-mode: vertical-rl" in _regel(stil, ".soeyler .ticker")
+        regler = re.findall(r"((?:figure)?\.soeyler[^{]*)\{([^}]*)\}", stil)
+        assert len(regler) >= 15, regler
+        for velger, innhold in regler:
+            bredder = re.findall(r"(?:^|[;\s])(?:min-|max-)?width\s*:\s*([^;]+)", innhold)
+            if "bransjesymbol" in velger:
+                assert [b.strip() for b in bredder] in ([], ["14px", "100%"]), velger
+            else:
+                assert all(b.strip() == "0" for b in bredder), (velger, bredder)
+            assert "nowrap" not in innhold, velger
+        # Gjennomgangen (BH5, ECH9, VG4): tallene leses fra stilen.
+        side = int(re.search(r"padding: \S+ (\d+)px", _regel(stil, "main")).group(1))
+        kort = re.search(r"padding: \d+px (\d+)px", _regel(stil, "section.hovedindeks")).group(1)
+        ramme = re.search(r"border: (\d+)px", _regel(stil, "section.hovedindeks")).group(1)
+        mellom = re.search(r"gap: (\d+)px", _regel(stil, ".soeyler .etiketter, .soeyler .felt")).group(1)
+        symbol = re.search(r"width: (\d+)px", _regel(stil, ".soeyler .etikett .bransjesymbol")).group(1)
+        plass = 390 - 2 * side - 2 * int(kort) - 2 * int(ramme)
+        assert (side, plass) == (16, 312)
+        assert 15 * int(symbol) + 14 * int(mellom) <= plass
+        # Gjennomgangen (BH4): med flere enn 15 aksjer krymper symbolet.
+        assert "max-width: 100%" in _regel(stil, ".soeyler .etikett .bransjesymbol")
+
+    def test_ingen_aksje_med_rad_foer_dagen_navngis_uten_soeyler(self, klient):
+        """Gjennomgangen (BH3, VG5, VG6): alle med kurs fredag mangler kursen
+        torsdag. Ville feilet hvis figuren falt bort, så de ikke ble navngitt,
+        eller hvis teksten om søylene sto bak «?» uten søyler."""
+        hentet = datetime.fromisoformat(HENTET)
+        skriv_serie("YAR", [Kursrad(dato=FREDAG_09_10, slutt=300.0, justert_slutt=300.0, volum=1000)], hentet)
+        _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, 1005.0)]))
+        html = klient.get("/").data.decode("utf-8")
+        figur = _soeylene(html)
+        assert _stolpene(figur) == [] and "Søyler for" not in figur
+        assert re.search(r"Uten søyle, mangler kursen dagen før: Yara[^.]*\.", _synlig(figur))
+        vinduet = html.split('<div id="hjelp-hovedindeks"', 1)[1].split('<div id="hjelp-', 1)[0]
+        assert "Hovedindeksen:" in vinduet and "Søylene:" not in vinduet

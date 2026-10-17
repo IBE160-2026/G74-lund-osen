@@ -139,6 +139,8 @@ KONTRAST = [
     ("dempet", "kort", 4.5),
     ("dempet-2", "kort", 4.5),
     ("opp", "kort", 4.5),
+    # Story 2.9b: gult bransjesymbol ved 3 av 3 over søylene, grafikk (3:1).
+    ("gul-symbol", "kort", 3.0),
     ("opp", "opp-bakgrunn", 4.5),
     ("ned", "kort", 4.5),
     ("ned", "ned-bakgrunn", 4.5),

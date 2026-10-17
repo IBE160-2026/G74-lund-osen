@@ -11,13 +11,14 @@ import pytest
 from hovedindeks import (
     aksjeendring,
     bygg_hovedindeks,
+    bygg_soeyler,
     er_bedre,
     forrige_boersdag,
     indeksendring,
     sammenlign,
 )
 from indeksdata import MinneIndekslager
-from kursdata import Kursrad
+from kursdata import Aksje, Kursrad
 from lagring_sqlite import SqliteIndekslager, aapne_base
 from tallformat import avrundet, tall
 
@@ -192,3 +193,101 @@ class TestAvrundingenErDenSomVises:
         for i in range(-2000, 2001):
             verdi = i / 997
             assert tall(verdi, "endring") == tall(avrundet(verdi, "endring"), "endring"), verdi
+
+
+def aksje(symbol: str, sektor: str = "Energi") -> Aksje:
+    return Aksje(symbol=symbol, ticker=f"{symbol}.OL", navn=f"Selskap {symbol}", sektor=sektor)
+
+
+class TestSoeylene:
+    """Story 2.9b (FR-105): kontrollen under storyen i epics.md, i logikken.
+    Mutantene staar i spesifikasjonen 2.9b."""
+
+    def test_antallet_telles_med_en_kortere_liste(self):
+        """Tre aksjer, og C har ikke kurs fredag. Ville feilet hvis antallet
+        ikke ble telt fra lista."""
+        grunnlag = [
+            (aksje("A"), med_endring(1.0), False),
+            (aksje("B"), med_endring(-2.0), False),
+            (aksje("C"), med_endring(3.0, dag=TORSDAG, foer=ONSDAG), False),
+        ]
+        soeyler = bygg_soeyler(FREDAG, 0.5, grunnlag)
+        assert [s.symbol for s in soeyler.soeyler] == ["B", "A"]
+
+    def test_fra_stoerst_fall_til_stoerst_stigning(self):
+        """Ville feilet med rekkefoelgen fra lista, eller snudd (mutant S2).
+        Like endringer staar i rekkefoelgen fra lista."""
+        grunnlag = [
+            (aksje(navn), med_endring(prosent), False)
+            for navn, prosent in (("A", 2.0), ("B", -1.0), ("C", 0.5), ("D", -3.0), ("E", 0.5))
+        ]
+        soeyler = bygg_soeyler(FREDAG, None, grunnlag)
+        assert [s.symbol for s in soeyler.soeyler] == ["D", "B", "C", "E", "A"]
+
+    def test_en_aksje_uten_rad_foer_dagen_faar_ingen_soeyle_og_navngis(self):
+        grunnlag = [(aksje("A"), med_endring(1.0), False), (aksje("B"), [rad(FREDAG, 100.0)], False)]
+        soeyler = bygg_soeyler(FREDAG, 0.5, grunnlag)
+        assert [s.symbol for s in soeyler.soeyler] == ["A"]
+        assert soeyler.uten_endring == ("Selskap B",)
+
+    def test_ingen_aksje_med_kurs_gir_ingen_soeyler(self):
+        assert bygg_soeyler(FREDAG, 0.5, [(aksje("A"), med_endring(1.0, dag=TORSDAG, foer=ONSDAG), False)]) is None
+
+    def test_hoeyden_og_linja_med_null_midt_i_feltet(self):
+        """Den stoerste endringen, av soeylene og indeksen, fyller halve
+        hoeyden. Indeksen +1 % med stoerste endring -2 % gir linja en
+        firedel ned fra toppen."""
+        grunnlag = [(aksje("A"), med_endring(-2.0), False), (aksje("B"), med_endring(0.5), False)]
+        soeyler = bygg_soeyler(FREDAG, 1.0, grunnlag)
+        assert [s.hoeyde for s in soeyler.soeyler] == pytest.approx([50.0, 12.5])
+        assert soeyler.linje == pytest.approx(25.0)
+        # Indeksen stoerst: den fyller halve hoeyden, og soeylene maales mot den.
+        stoerst = bygg_soeyler(FREDAG, -4.0, grunnlag)
+        assert stoerst.linje == pytest.approx(100.0)
+        assert [s.hoeyde for s in stoerst.soeyler] == pytest.approx([25.0, 6.25])
+
+    def test_uten_endring_for_indeksen_er_det_ingen_linje(self):
+        soeyler = bygg_soeyler(FREDAG, None, [(aksje("A"), med_endring(1.0), False)])
+        assert soeyler.linje is None and soeyler.soeyler[0].hoeyde == pytest.approx(50.0)
+
+    def test_alle_null_gir_ingen_deling_paa_null(self):
+        soeyler = bygg_soeyler(FREDAG, 0.0, [(aksje("A"), med_endring(0.0), False)])
+        assert soeyler.soeyler[0].hoeyde == 0.0 and soeyler.linje == 50.0
+
+    def test_bransjen_og_3_av_3_foelger_aksjen(self):
+        grunnlag = [(aksje("A", "Sjømat"), med_endring(1.0), True), (aksje("B", "Finans"), med_endring(2.0), False)]
+        soeyler = bygg_soeyler(FREDAG, 0.5, grunnlag)
+        assert [(s.bransje, s.tre_av_tre) for s in soeyler.soeyler] == [("Sjømat", True), ("Finans", False)]
+
+    def test_bygg_hovedindeks_gir_soeylene_for_indeksens_dato(self):
+        """Indeksen staar paa fredag, og soeylene er for fredag."""
+        visning = bygg_hovedindeks(
+            "OSEBX",
+            [rad(TORSDAG, 1000.0), rad(FREDAG, 1010.0)],
+            [("Selskap A", med_endring(2.0))],
+            [(aksje("A"), med_endring(2.0), False)],
+        )
+        assert visning.soeyler.linje == pytest.approx(25.0)
+        assert visning.soeyler.soeyler[0].endring == pytest.approx(2.0)
+        assert bygg_hovedindeks("OSEBX", [rad(FREDAG, 1010.0)], []).soeyler is None
+
+    def test_hoeyden_er_paa_endringen_slik_den_vises(self):
+        """Gjennomgangen (BH7, ECH6): +0,001 % vises som 0,00 % og har ingen
+        lengde."""
+        soeyler = bygg_soeyler(
+            FREDAG, None, [(aksje("A"), med_endring(0.001), False), (aksje("B"), med_endring(1.0), False)]
+        )
+        assert [s.hoeyde for s in soeyler.soeyler] == [0.0, 50.0]
+
+    def test_har_soeyler_er_usant_uten_soeyler(self):
+        """Gjennomgangen (BH13): én egenskap for malen, også når alle mangler
+        raden før dagen."""
+        uten = bygg_hovedindeks(
+            "OSEBX", [rad(TORSDAG, 1000.0), rad(FREDAG, 1010.0)], [], [(aksje("A"), [rad(FREDAG, 100.0)], False)]
+        )
+        assert uten.soeyler.soeyler == () and uten.soeyler.uten_endring == ("Selskap A",)
+        assert not uten.har_soeyler
+        med = bygg_hovedindeks(
+            "OSEBX", [rad(TORSDAG, 1000.0), rad(FREDAG, 1010.0)], [], [(aksje("A"), med_endring(1.0), False)]
+        )
+        assert med.har_soeyler

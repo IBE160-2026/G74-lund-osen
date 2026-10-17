@@ -351,7 +351,9 @@ def _basen_feilet_under_lesingen(feil):
     return _basen_kan_ikke_aapnes()
 
 
-def _hovedindeks(kurslager: Kursleser, poster: list) -> tuple[Hovedindeksvisning | None, bool]:
+def _hovedindeks(
+    kurslager: Kursleser, poster: list, tre_av_tre: frozenset[str]
+) -> tuple[Hovedindeksvisning | None, bool]:
     """Hovedindeksen over tabellen - story 2.9, FR-104.
 
     Har basen HOVEDINDEKS (OSEBX), er det den. Ellers er det den basen sist
@@ -362,6 +364,9 @@ def _hovedindeks(kurslager: Kursleser, poster: list) -> tuple[Hovedindeksvisning
     leses, ogsaa naar en rad ikke kan tolkes (ValueError, gjennomgangen ECH1
     og ECH5), er feilet True, og tabellen vises likevel (NFR-03). Ingen
     nettkall (AD-10).
+
+    Story 2.9b: soeylene faar de samme seriene, og tre_av_tre er symbolene
+    med 3 av 3 paa siste boersdag, fra radene i tabellen.
     """
     try:
         lager = SqliteIndekslager(g.tilkobling)
@@ -369,8 +374,10 @@ def _hovedindeks(kurslager: Kursleser, poster: list) -> tuple[Hovedindeksvisning
         if not symboler:
             return None, False
         symbol = HOVEDINDEKS.symbol if HOVEDINDEKS.symbol in symboler else symboler[0]
-        aksjer = [(post.aksje.navn, kurslager.serie(post.aksje.symbol)) for post in poster]
-        return bygg_hovedindeks(symbol, lager.serie(symbol), aksjer), False
+        serier = [(post.aksje, kurslager.serie(post.aksje.symbol)) for post in poster]
+        aksjer = [(aksje.navn, serie) for aksje, serie in serier]
+        grunnlag = [(aksje, serie, aksje.symbol in tre_av_tre) for aksje, serie in serier]
+        return bygg_hovedindeks(symbol, lager.serie(symbol), aksjer, grunnlag), False
     except (*BASEFEIL, ValueError):
         return None, True
 
@@ -411,7 +418,8 @@ def markedsoversikt():
     # rader, som står i FR-102 (svar 7).
     sortering = Sortering.fra_adressen(request.args.get("sorter"), request.args.get("orden"))
     skilte_seg_ut, oevrige = (sorter(del_, sortering) for del_ in del_i_to(rader))
-    hovedindeks, indeks_feilet = _hovedindeks(leser, poster)
+    tre_av_tre = frozenset(rad.aksje.symbol for rad in rader if rad.styrke == ANTALL_SJEKKER)
+    hovedindeks, indeks_feilet = _hovedindeks(leser, poster, tre_av_tre)
 
     return render_template(
         "index.html",
