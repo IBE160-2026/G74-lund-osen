@@ -2,7 +2,7 @@
 title: 'Story 2.9b: søylene under hovedindeksen'
 type: 'feature'
 created: '2026-10-17'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'e0519b5'
@@ -49,6 +49,8 @@ context:
 
 - Ingen API-kall utover kvotesjekken i regel 15, og `src/fetch_prices.py` kjøres ikke mot EODHD. `data/db/ose.db` og `data/db/demo.db` røres ikke (regel 22). Demobaser lages bare i midlertidige mapper.
 - Ingen ny tabell og ingen nye kall: endringen er den i FR-101, og bransjen står i `AKSJEUNIVERS`.
+
+*Lagt til 2026-10-18 kl. 00:16:* PR #63 er squash-flettet i `73098ed`, låst til head-en `dbb6fe6`. CI var grønn på head-en (39074089927) og på main (39074214167). Triagen står som kommentar i PR #63.
 
 ## Mutantene
 

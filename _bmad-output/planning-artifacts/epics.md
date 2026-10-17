@@ -1682,6 +1682,8 @@ med en gang hvilke som trakk opp og ned.
 
 **Avhenger av:** 2.9. **Én økt:** ja.
 
+*Lagt til 2026-10-18 kl. 00:16:* søylene er flettet i `73098ed`, PR #63 (spesifikasjonen `spec-2-9b-soeylene-under-hovedindeksen.md`). Fargegrensene følger endringen slik den vises, og gult ved 3 av 3 er `#a67c00` (designregler §3 og §5). CI var grønn på head-en `dbb6fe6` (kjøring 39074089927) og på main (39074214167).
+
 ### Story 2.10: Høy og lav lagres med kursene
 
 *Lagt til 2026-10-07, Marians beslutning kl. 23:11.*
