@@ -442,6 +442,8 @@ kjøres fra main.
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 19:17:* rekkefølgen er 2.3, 3.1–3.4, 2.3b, og så KI-laget. Når jobben kjører fra en egen arbeidskopi av main (svar 3 under story 2.3), gjelder ikke lenger regelen over om at byggingen stopper kl. 22:00.
 
+*Lagt til 2026-10-17:* fra 19.10 går hentingen fra kl. 21:00 på børsdager (beslutningen 16.10 kl. 21:09 under story 2.3, `malinger.md` §31). Der regelen om at byggingen stopper, fortsatt gjelder, er klokkeslettet kl. 21:00.
+
 *Lagt til 2026-10-05, Marians beslutning kl. 21:23:* 8.0b og 8.0c bygges etter 2.3b og før KI-laget.
 
 *Lagt til 2026-10-06, Marians beslutning:* tilbakemeldingen på briefen ([`tilbakemelding-product-brief.md`](tilbakemelding-product-brief.md)) ber om at oversikten og aksjedetaljen er ferdige og stabile i demoen før KI-laget bygges ut, og at antall epics ikke vokser. Rekkefølgen fra 05.10 står: 2.3 først, fordi kveldshentingen da går fra egen arbeidskopi, og demoen kan bygges over flere dager uten stopp kl. 22:00. Så 9.6 og 3.1–3.4, før 2.3b, 8.0b, 8.0c og KI-laget.
@@ -1147,6 +1149,8 @@ epicen:
    hentekommandoen kjøres**, når dagens kurs ikke var publisert kl. 19:04? Ført
    som **åpent punkt 23** *(avgjort 28.09)* i `prd.md`, med frist før story 2.1.
    *Avgjort 2026-09-28:* på børsdager mellom kl. 22:00 og midnatt, norsk tid.
+   *Lagt til 2026-10-17:* mellom kl. 21:00 og midnatt fra 19.10 (beslutningen 16.10 kl. 21:09 under story 2.3,
+   `malinger.md` §31).
 
 *Lagt til 2026-09-25, fra planen for 1.5:* Ingen story i Epic 2 har som
 kontrollpunkt at hentekommandoen skriver kursene til basen gjennom
@@ -1462,6 +1466,8 @@ Oppgaveplanlegging beskrives i README (regel 19).
 *Ferdig 2026-10-08:* flettet i `249853e`, PR #22.
 
 *Avgjort 2026-10-16, gruppens beslutning kl. 21:09:* hentingen på børsdager flyttes fra kl. 22:00 til kl. 21:00, på betingelse av at radene fra prøvene kl. 20:30 og 21:00 er like raden i kursfila etter kveldens henting (`malinger.md` §31). Er de ulike, tas spørsmålet opp igjen. Endringen bygges som en egen PR søndag 18.10 og gjelder fra mandag 19.10. Mangler noen aksjer raden kl. 21, henter et nytt forsøk dem senere samme kveld med kallene som er igjen (2.3b).
+
+*Lagt til 2026-10-17:* betingelsen holdt for EQNR.OL 16.10, i alle sju feltene (tillegget til §31 i `malinger.md`). Fra 19.10 er grensen kl. 21:00, og kl. 22:00 i kontrollpunktene og avgjørelsene over gjelder til da. Flagget som slipper forbi tidskontrollen, heter `--uten-tidskontroll` (spesifikasjonen `spec-2-3-hentingen-fra-kl-21.md`).
 
 ### Story 2.3b: Kallene som er igjen, brukes på nye forsøk
 
@@ -3406,6 +3412,8 @@ NFR-08, `AD-10`
   komme: «Neste: <dag> etter kl. 22»
 - Klokkeslettet kommer fra `KL_22` i `fetch_prices.py`, og dagen fra
   `boersdag.py`, ikke skrevet fast
+  *Lagt til 2026-10-17:* konstanten heter `TIDSGRENSE` og er kl. 21:00 fra 19.10
+  (story 2.3, beslutningen 16.10 kl. 21:09), så stripa sier «etter kl. 21»
 - Ingen API-kall
 - **Ville feilet hvis:** stripa sa i morgen en fredag, eller klokkeslettet sto
   fast i malen
