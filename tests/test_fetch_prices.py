@@ -3166,9 +3166,10 @@ class TestHovedindeksen:
 
     @pytest.mark.parametrize("svaret", ["feil", "tomt", "form"])
     def test_et_feilet_indekskall_stopper_ikke_aksjene(self, stier, svaret):
-        """AD-15: aksjene lagres og vurderes, indeksen staar i feil, og
-        kjoeringen gir kode 0, fordi et nytt forsoek ikke tar indeksen. Ville
-        feilet hvis et feilet indekskall stoppet aksjene (mutant B4)."""
+        """AD-15: aksjene lagres og vurderes, og indeksen staar i feil.
+        Kjoeringen gir kode 3 (beslutningen 17.10 kl. 11:58), ikke 0 og ikke 1,
+        fordi et nytt forsoek ikke tar indeksen. Ville feilet hvis et feilet
+        indekskall stoppet aksjene (mutant B4), eller ga kode 0 (mutant K1)."""
         raa, base = stier
 
         def hent(ticker, noekkel, *_):
@@ -3178,8 +3179,10 @@ class TestHovedindeksen:
                 return [] if svaret == "tomt" else {"ikke": "en liste"}
             return serie_til(TIRSDAG_22_09)
 
-        fil, kall, ut = kjoer_23(raa, base, OEYEBLIKK_22_09, hent)
-        assert fil is not None and len(kall) == 16
+        kode, kall, ut = kjoer_23_kode(raa, base, OEYEBLIKK_22_09, hent)
+        assert kode == fp.KODE_BARE_INDEKSEN == 3 and len(kall) == 16
+        assert "Aksjene er i orden, men hovedindeksen feilet. Kode 3" in ut
+        fil = raa / "kurser-raa-2026-09-22.json"
         tekst = fil.read_text(encoding="utf-8")
         bilde = json.loads(tekst)
         assert set(bilde["indeks"]) == {"serier", "feil"} and bilde["indeks"]["serier"] == {}
@@ -3193,9 +3196,10 @@ class TestHovedindeksen:
         assert "Symboler uten data" not in ut and "feilet i hentingen og mangler" not in ut
 
     def test_en_andre_kjoering_samme_boersdag_gjoer_0_kall(self, stier):
-        """Testen i 2.3 med indekskallet, ogsaa naar indeksen feilet: den
-        faar ingen ny sjanse (AD-15). Ville feilet hvis sjekken av basen
-        krevde indeksen."""
+        """Testen i 2.3 med indekskallet, ogsaa naar indeksen feilet: etter
+        kode 3 gir en ny kjoering 0 kall og kode 0, fordi indeksen ikke faar
+        en ny sjanse (AD-15). Ville feilet hvis sjekken av basen krevde
+        indeksen."""
         raa, base = stier
 
         def uten_indeks(ticker, *_):
@@ -3203,7 +3207,7 @@ class TestHovedindeksen:
                 raise RuntimeError("nei")
             return serie_til(TIRSDAG_22_09)
 
-        kjoer_23(raa, base, OEYEBLIKK_22_09, uten_indeks)
+        assert kjoer_23_kode(raa, base, OEYEBLIKK_22_09, uten_indeks)[0] == 3
         (raa / "kurser-raa-2026-09-22.json").unlink()
         fil, kall, ut = kjoer_23(raa, base, OEYEBLIKK_22_09 + timedelta(minutes=30),
                                  ingen_kall, ingen_noekkel, ingen_kall)
@@ -3275,31 +3279,32 @@ class TestHovedindeksenEtterGjennomgangen:
 
     def test_en_serie_porten_avviser_stopper_ikke_aksjene(self, stier):
         """VG1: bare helgedager, saa porten avviser serien som tom. Aksjene
-        lagres og vurderes, og kjoeringen gir kode 0. Ville feilet uten
-        except ValueError i skriv_indeksen_til_basen."""
+        lagres og vurderes, og kjoeringen gir kode 3. Ville feilet uten
+        except ValueError i skriv_indeksen_til_basen, eller med kode 0."""
         raa, base = stier
         helg = [r for r in serie_til(TIRSDAG_22_09) if date.fromisoformat(r["date"]).weekday() >= 5]
 
         def hent(ticker, *_):
             return copy.deepcopy(helg) if ticker == "OSEBX.OL" else serie_til(TIRSDAG_22_09)
 
-        fil, kall, ut = kjoer_23(raa, base, OEYEBLIKK_22_09, hent)
-        assert fil is not None and len(kall) == 16
+        kode, kall, ut = kjoer_23_kode(raa, base, OEYEBLIKK_22_09, hent)
+        assert kode == 3 and len(kall) == 16
         assert "Hovedindeksen OSEBX: avvist og ikke lagret" in ut
         assert antall_rader(base, "vurdering") == len(AKSJEUNIVERS)
         assert indeksen_i(base) == ([], None)
 
     def test_en_feil_i_basen_for_indeksen_stopper_ikke_aksjene(self, stier, monkeypatch):
-        """VG1: basen feiler bare for indeksen. Ville feilet uten except
-        BASEFEIL i skriv_indeksen_til_basen."""
+        """VG1: basen feiler bare for indeksen, og kjoeringen gir kode 3.
+        Ville feilet uten except BASEFEIL i skriv_indeksen_til_basen, eller
+        med kode 0."""
         raa, base = stier
 
         def feiler(*_):
             raise sqlite3.OperationalError("disk I/O error")
 
         monkeypatch.setattr(lagring_sqlite.SqliteIndekslager, "erstatt_serie", feiler)
-        fil, _, ut = kjoer_23(raa, base, OEYEBLIKK_22_09)
-        assert fil is not None
+        kode, _, ut = kjoer_23_kode(raa, base, OEYEBLIKK_22_09)
+        assert kode == 3
         assert "Hovedindeksen OSEBX: basen kunne ikke skrives (OperationalError)" in ut
         assert antall_rader(base, "vurdering") == len(AKSJEUNIVERS)
 
@@ -3318,7 +3323,9 @@ class TestHovedindeksenEtterGjennomgangen:
             tilkobling.close()
         linjer = []
         fil = base.parent / "kurser-raa-2026-09-22.json"
-        assert fp.skriv_indeksen_til_basen(base, rader, eldre, fil, linjer.append) is False
+        # En eldre fil er ingen feil (beslutningen 17.10 kl. 11:58), saa True.
+        assert fp.skriv_indeksen_til_basen(base, rader, eldre, fil, linjer.append) is True
+        assert "hoppet over" in linjer[0]
         assert indeksen_i(base)[1] == nyere
         assert fil.name in linjer[0] and eldre.isoformat() in linjer[0] and nyere.isoformat() in linjer[0]
         # Lik tid godtas, som for aksjene.
@@ -3337,3 +3344,56 @@ class TestHovedindeksenEtterGjennomgangen:
             assert not re.search(rf"\b(alter|drop)\s+table\s+(if\s+exists\s+)?{tabell}\b", sql), (siste.name, tabell)
             assert not re.search(rf"\b(update|delete\s+from|insert\s+into)\s+{tabell}\b", sql), (siste.name, tabell)
             assert not re.search(rf"\bcreate\s+trigger\b[^;]*\bon\s+{tabell}\b", sql), (siste.name, tabell)
+
+
+class TestKode3:
+    """Beslutningen 17.10 kl. 11:58: feiler bare hovedindeksen, gir hentingen
+    kode 3. Kode 1 gaar foran. Mutantene K1-K3 staar i spesifikasjonen 2.8b."""
+
+    def test_konstanten_er_3_og_ikke_koden_til_argparse(self):
+        assert fp.KODE_BARE_INDEKSEN == 3
+        with pytest.raises(SystemExit) as slutt:
+            fp.main(["--ukjent"])
+        assert slutt.value.code == 2 != fp.KODE_BARE_INDEKSEN
+
+    def test_alt_i_orden_gir_kode_0(self, stier):
+        """Ville feilet med kode 3 ogsaa naar indeksen ble lagret (mutant K3)."""
+        raa, base = stier
+        fil, kall, ut = kjoer_23(raa, base, OEYEBLIKK_22_09)
+        assert fil is not None and len(kall) == 16
+        assert indeksen_i(base)[1] == OEYEBLIKK_22_09
+        assert "Kode 3" not in ut
+
+    def test_en_aksje_og_indeksen_feiler_gir_kode_1(self, stier):
+        """Kode 1 gaar foran, fordi aksjen kan proeves igjen samme kveld, og
+        linja om indeksen staar likevel. Ville feilet med kode 3 foran kode 1
+        (mutant K2)."""
+        raa, base = stier
+
+        def hent(ticker, *_):
+            if ticker in ("DNB.OL", "OSEBX.OL"):
+                raise RuntimeError("nei")
+            return serie_til(TIRSDAG_22_09)
+
+        kode, kall, ut = kjoer_23_kode(raa, base, OEYEBLIKK_22_09, hent)
+        assert kode == 1 and len(kall) == 16
+        assert any(l.startswith("Hovedindeksen OSEBX feilet i hentingen") for l in ut.splitlines())
+        assert "1 aksjer feilet i hentingen" in ut and "Kode 3" not in ut
+
+    def test_en_eldre_fil_for_indeksen_er_ingen_feil(self, stier):
+        """Basen har en nyere indeks enn kjoeringen. Indeksen hoppes over, og
+        kjoeringen gir kode 0. Ville feilet hvis vakten mot en eldre fil ga
+        kode 3."""
+        from lagring_sqlite import SqliteIndekslager
+
+        raa, base = stier
+        nyere = OEYEBLIKK_22_09 + timedelta(hours=1)
+        tilkobling = aapne_base(base)
+        try:
+            SqliteIndekslager(tilkobling).erstatt_serie(
+                "OSEBX", fp.serie_fra_eodhd(serie_til(TIRSDAG_22_09)), nyere)
+        finally:
+            tilkobling.close()
+        fil, _, ut = kjoer_23(raa, base, OEYEBLIKK_22_09)
+        assert fil is not None and "Hovedindeksen OSEBX: hoppet over" in ut
+        assert indeksen_i(base)[1] == nyere and "Kode 3" not in ut

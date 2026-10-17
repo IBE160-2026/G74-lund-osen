@@ -57,7 +57,8 @@ ett kall, med samme intervall. Raadataene staar i samme oeyeblikksbilde,
 under noekkelen indeks, og indeksen lagres i tabellen indeks gjennom
 SqliteIndekslager, aldri i kurs eller vurdering (AD-21). Feiler kallet,
 lagres og vurderes aksjene som vanlig, og indeksen faar ingen ny sjanse
-(AD-15). Nye forsoek henter bare aksjene.
+(AD-15). Nye forsoek henter bare aksjene. Feilet bare indeksen, gir
+kjoeringen kode 3 (KODE_BARE_INDEKSEN, beslutningen 17.10 kl. 11:58).
 """
 
 import argparse
@@ -122,6 +123,12 @@ DAGER_TILBAKE = 364
 
 # MA50 spiser 50 dager. Under dette kan ingen aksje faa et signal.
 MINST_HANDELSDAGER = 51
+
+# Story 2.8, beslutningen 17.10 kl. 11:58: aksjene er i orden, men
+# hovedindeksen feilet i kjoeringen (kallet, porten eller basen). Ikke 2,
+# som argparse bruker for feil i argumentene. Kode 1 gaar foran, fordi en
+# aksje som mangler, kan proeves igjen samme kveld; indeksen kan ikke det.
+KODE_BARE_INDEKSEN = 3
 
 
 @dataclass
@@ -542,8 +549,9 @@ def skriv_indeksen_til_basen(
     dagene som ikke er boersdager i aarene DEKKEDE_AAR dekker, og utskriften
     sier hvor mange som ble lagret og tatt bort (BH2 i 2.8a), regnet med samme
     funksjon. En eldre fil skriver ikke over en nyere serie, som for aksjene.
-    Returnerer True hvis serien ble lagret. En feil her stopper ikke aksjene
-    (AD-15).
+    Returnerer False hvis indeksen feilet: serien ble avvist, eller basen
+    feilet. En eldre fil som hoppes over, er ingen feil og gir True, som en
+    serie som ble lagret. En feil her stopper ikke aksjene (AD-15).
     """
     lagret = len(bare_boersdager(rader))
     aarene = ", ".join(str(aar) for aar in sorted(boersdag.DEKKEDE_AAR))
@@ -561,7 +569,7 @@ def skriv_indeksen_til_basen(
                 f"{hentet.isoformat()}, og basen har en serie hentet "
                 f"{forrige.isoformat()}. En eldre fil skriver ikke over en nyere serie."
             )
-            return False
+            return True
         lager.erstatt_serie(indeks.symbol, rader, hentet)
     except ValueError as feil:
         skriv(f"{indeks.navn} {indeks.symbol}: avvist og ikke lagret: {feil}")
@@ -837,6 +845,14 @@ def kjoer(
     og kjoeringen gir kode 1; en ny kjoering samme kveld stopper ved
     filvakten.
 
+    Story 2.8 (beslutningen 17.10 kl. 11:58): er aksjene i orden, men
+    hovedindeksen feilet i kjoeringen (kallet feilet, porten avviste serien
+    eller basen feilet), gir kjoeringen kode 3, KODE_BARE_INDEKSEN. Kode 1
+    gaar foran: mangler ogsaa en aksje dagens kurs, gir kjoeringen 1. En
+    eldre fil som hoppes over for indeksen, er ingen feil. Kodene er altsaa
+    0 (alt i orden, eller ingenting aa gjoere), 1 (noe mangler eller feilet,
+    eller kjoeringen ble stoppet), 2 (feil i argumentene, fra argparse) og 3.
+
     Alt om tid utledes av oeyeblikk, som maa ha sone (AD-20, story 2.1):
     dagen er norsk kalenderdato (boersdag.norsk_dato) og gir filnavnet og
     til-datoen i intervallet, og hentet er oeyeblikket i UTC med offset.
@@ -1053,10 +1069,11 @@ def kjoer(
     # Story 2.8: indeksen til tabellen indeks. Feilet den, faar den ingen ny
     # sjanse (AD-15), og aksjene gaar videre som vanlig.
     if HOVEDINDEKS.symbol in indeks.serier:
-        skriv_indeksen_til_basen(
+        indeksen_feilet = not skriv_indeksen_til_basen(
             base_sti, serie_fra_eodhd(indeks.serier[HOVEDINDEKS.symbol]), hentet_tid, fil, skriv
         )
     else:
+        indeksen_feilet = True
         skriv(
             f"{HOVEDINDEKS.navn} {HOVEDINDEKS.symbol} feilet i hentingen "
             f"({indeks.feil[HOVEDINDEKS.symbol]}) og faar ingen ny sjanse i kveld "
@@ -1100,6 +1117,13 @@ def kjoer(
         )
     if uten_dagen or feilet or skrevne != set(serier):
         sys.exit(1)
+    if indeksen_feilet:
+        skriv(
+            f"Aksjene er i orden, men {HOVEDINDEKS.navn.lower()} feilet. Kode "
+            f"{KODE_BARE_INDEKSEN} (beslutningen 17.10 kl. 11:58). En ny kjoering "
+            "i kveld gir 0 kall."
+        )
+        sys.exit(KODE_BARE_INDEKSEN)
     return fil
 
 
