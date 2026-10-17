@@ -50,3 +50,43 @@ context:
 - Flettes ikke uten ja fra gruppen.
 
 **Testtallet før:** 2274 bestått og 17 hoppet over (head-en til PR #56, `59020e2`, samme kode og tester som main etter `1d3a21d`).
+
+*Lagt til 2026-10-17:* arbeidet ble avbrutt kl. 10:10 med «API Error: The response stopped arriving» mens testene for punkt b ble skrevet, og fortsatt med instruksjonen kl. 10:25. Punkt b ble committet først etter det, i `f1aacb1`.
+
+## Mutantene
+
+Én om gangen med `-x` og bare `tests/test_fetch_prices.py`, i en fersk klone med `core.autocrlf=false`, med kopi før og sha256 mot HEAD etter hver. Første kjøring var i en klone med CRLF. Der ble alle fanget, men sha256 ble sammenlignet med en fil med andre linjeskift, så den ble gjort om på `51cf452`:
+- A1, sjekken krever siste versjon igjen: `test_de_tre_sjekkene_virker_paa_versjon_5_og_fila_er_uendret`.
+- B2, indeksen lagret i `kurs`: `test_indeksen_lagres_i_indeks_aldri_i_kurs_eller_vurdering`.
+- B3, 15 kall i kvotesjekken: `test_15_igjen_holder_ikke_for_16_uten_bonus`.
+- B4, et feilet indekskall stopper aksjene: `test_et_feilet_indekskall_stopper_ikke_aksjene[feil]`.
+- B5, et nytt forsøk tar med indeksen: `test_bare_de_som_mangler_hentes_eldste_foerst`.
+
+Igjen på `e6070a9`, etter rettingene fra gjennomgangen, med to til for de nye testene. Alle fanget, og sha256 lik HEAD etter hver. A1 ble fanget av testen med nytt navn, `test_de_tre_sjekkene_virker_en_versjon_bak_og_fila_er_uendret`, og B2–B5 av de samme testene som over:
+- V1, `except ValueError` fjernet fra `skriv_indeksen_til_basen`: `test_en_serie_porten_avviser_stopper_ikke_aksjene`.
+- V2, sammenligningen av tidene snudd: `test_en_eldre_fil_skriver_ikke_over_en_nyere_indeks`.
+
+## Gjennomgangen
+
+Gjennomgang 17.10 på diffen `main...51cf452`, med Blind Hunter (BH, 14 funn), Edge Case Hunter (ECH, 6) og Verification Gap (VG, 3). Rettingene står i `16ebdf8` og `e6070a9`.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| VG1 | Ingen test feiler lagringen av indeksen, bare kallet | medium | patch: en serie porten avviser (bare helgedager) og en `OperationalError` fra basen, begge med kode 0 og 15 vurderinger |
+| VG2 | Vakten mot en eldre fil for indeksen er ikke prøvd | medium | patch: `test_en_eldre_fil_skriver_ikke_over_en_nyere_indeks`, også lik tid |
+| VG3 | Rekkefølgen i testen av `eldste_foerst` var den samme med og uten tidene | low | patch: tidene i `kursserie` går mot rekkefølgen i lista |
+| BH4, ECH3 | En versjon bak er trygt bare så lenge siste migrasjon ikke endrer tabellene sjekken leser | medium | patch: `test_siste_migrasjon_roerer_ikke_tabellene_sjekken_leser` feiler når siste migrasjon endrer `kurs`, `kursserie`, `vurdering` eller `aksje`, så sjekken vurderes på nytt før den flettes |
+| BH8, ECH1 | Feiler basen for aksjene, sier utskriften ikke at indeksen ikke er lagret | low | patch: meldingen sier det, og at `--les-inn` ikke leser den |
+| BH9, ECH5 | Versjonene 4, 5 og 6 var skrevet inn i testene | low | patch: regnet fra `siste_versjon` |
+| BH10 | «2026» var skrevet inn i testen av utskriften | low | patch: fra `DEKKEDE_AAR` |
+| ECH6 | Docstringen til `kall_til_nye_forsoek` sa 5 | low | patch |
+| BH13 | `boersdag` importeres både som modul og med navn | low | patch: kommentar. Modulen trengs, fordi en test i `test_indeks.py` bytter ut `boersdag.DEKKEDE_AAR` |
+| BH1 | Med 15 kall igjen og ingen bonus hentes ingenting, selv om indeksen ellers ikke stopper aksjene | medium | avvist: kontrollpunktet og instruksjonen sier 16 kall også i kvotesjekken, og bonuskvoten fullfører hovedhentingen. 15 igjen og 0 i bonus har ikke skjedd, `extraLimit` er 463 |
+| BH2, BH3 | Et unntak utenfor `ValueError`, `BASEFEIL` og `UgyldigSerie` fra indeksen stopper kjøringen | low | avvist: som for aksjene i `hent_universet`. Et bredere unntak ville skjult programmeringsfeil (gjennomgangen av 2.3, BH3) |
+| BH5, ECH4 | `query_only` kan slås av etter at adapteren er laget | low | avvist: bare `_aapne_for_sjekken` gir flagget, og den slår aldri av `query_only` |
+| BH6 | `mode=ro` kan feile med WAL | low | avvist: basen bruker ikke WAL, og `skrivebeskyttet` finnes i `aapne_base` fra før. En feil gir «Henter likevel», som før |
+| BH7 | Kode 0 når bare indeksen feiler, så en varig feil kan gå lenge | low | defer: morgensjekken kan se etter linja «Hovedindeksen OSEBX feilet». Valget står over |
+| BH11 | Antallet lagret regnes ved siden av porten | low | avvist: samme funksjon, `bare_boersdager`, som porten bruker |
+| BH12 | Spesifikasjonen og testen sier ulikt om versjonen 16.10 | low | avvist: basen sto på 4 med `0005` flettet, altså en bak, og begge sier det |
+| BH14 | Nye forsøk holder av et kall til indeksen også når hovedhentingen ikke tok den | low | avvist: svarene 16.10 kl. 18:04 sier 4 kall til nye forsøk |
+| ECH2 | En indeks uten dagens rad lagres uten varsel | low | avvist: linja for kallet sier siste dato, og serien byttes ut neste kveld (AD-5). Visningen i 2.9 avgjør hva siden sier |
