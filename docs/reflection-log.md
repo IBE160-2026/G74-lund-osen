@@ -2669,6 +2669,22 @@ Det vi lærte: mål før en regel som koster noe, endres. Når en grov kontroll 
 
 ---
 
+## 17.10.2026 – Hovedindeksen på forsiden, og ja før arbeidet
+
+*Joakim og Marian.*
+
+Hovedindeksen kom inn i tre PR-er. Den første, tabellen og demoindeksen, ble flettet etter at vi kl. 00:25 sjekket for hånd at verken `DEMIX` eller «Demoindeksen» finnes hos Euronext (`1d3a21d`, PR #56). Den andre la kallet inn i hentingen (`bcac2b5`, PR #57). Kl. 11:58 valgte vi kode 3 når bare indeksen feiler, mot rådet, som anbefalte 0, så en feil med indeksen ikke ser ut som en vellykket kjøring. Gjennomgangen fant så at et nytt forsøk kunne avslutte kvelden på 0 når både en aksje og indeksen feilet. Det ble rettet (`a15f234`), og vi godtok rettingen kl. 12:44. Den tredje viser indeksen over tabellen på forsiden (`b44284f`, PR #59). Der fant gjennomgangen at en rad i indeksen som ikke kunne tolkes, ville gitt en feilside i stedet for tabellen, og det ble rettet før flettingen (`5539e4a`).
+
+Demoen viser nå alle 10 fargekombinasjonene av de tre sjekkene på siste dag (`f21f927`, PR #58). Da skiller minst 7 av 13 seg ut, fordi 7 av kombinasjonene har minst to sjekker som slår ut.
+
+Hentingen går fra kl. 21:00 fra mandag. Vi lot PR-en bygges lørdag i stedet for søndag (svaret kl. 21:01, `336204f`, PR #60). Gjennomgangen minnet oss om at betingelsen bare er prøvd for én aksje én dag. Kl. 22:00 svarte vi at hentingen går kl. 21 som avgjort, men at fire aksjer hentes på nytt etter kl. 22 mandag og sammenlignes med kursfila, med kallene som er igjen (`a0501b5`).
+
+Arbeidet stoppet kl. 10:10, da svaret fra modellen ikke kom fram, og ble fortsatt med en egen instruksjon kl. 10:25. Fra kl. 11:58 sa vi ja til flettingen før arbeidet begynte, med vilkår som stopper den: en test som feiler, en mutant som overlever, CI som ikke er grønn, eller et funn med dom medium eller høyere som ikke er rettet.
+
+Det vi lærte: et ja med vilkår sparer en runde, når vilkårene stopper det de skal. Gjennomgangen finner det vi ikke tenkte på, også i det vi selv valgte. En betingelse prøvd én gang er et første tegn, ikke et svar.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
