@@ -732,6 +732,10 @@ class TestKlokkeslettetSomDenEkte:
             c.close()
         ventet = datetime(2026, 10, 9, 21, 15, tzinfo=demo.OSLO)
         assert tider == {ventet}
+        # Gjennomgangen, ECH4: hentingen i demoen er ogsaa etter grensen.
+        import fetch_prices
+
+        assert ventet.timetz().replace(tzinfo=None) >= fetch_prices.TIDSGRENSE
 
     def test_vurderingene_er_etter_tidsgrensen(self):
         """Klokka vurderingene skrives med, er etter grensen i hentingen, som

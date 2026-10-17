@@ -112,7 +112,10 @@ KVOTE_URL = "https://eodhd.com/api/user"
 # uten flagget --uten-tidskontroll. En kjoering som kommer for tidlig, bruker
 # dagens kall uten aa faa dagens rad. Kl. 21:00 fra 19.10 (beslutningen 16.10
 # kl. 21:09, malinger.md §31); foer det kl. 22:00. Navnet har ikke
-# klokkeslettet i seg, saa neste endring er denne linja.
+# klokkeslettet i seg, saa i koden er neste endring denne linja. Tekstene for
+# brukeren (README-en og docs/hjelp.md), docstringene og klokkeslettene i
+# demoen staar for seg, og testene sier fra naar de ikke foelger med
+# (gjennomgangen, ECH5).
 TIDSGRENSE = time(21, 0)
 
 

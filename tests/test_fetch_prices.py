@@ -1720,10 +1720,17 @@ class TestTidskontrollen:
         assert not raa.exists() and not base.exists()
 
     def test_kl_20_59_gir_0_kall(self, stier):
+        """Stoppet av tidskontrollen, ikke av noe annet (gjennomgangen, BH12)."""
         raa, base = stier
-        fil, kall, _ = kjoer_23(raa, base, _utc(2026, 9, 22, 18, 59),
-                                ingen_kall, ingen_noekkel, ingen_kall)
+        fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 18, 59),
+                                 ingen_kall, ingen_noekkel, ingen_kall)
         assert fil is None and kall == []
+        assert "klokka er ikke 21:00 i Oslo" in ut and "--uten-tidskontroll" in ut
+
+    def test_grensen_er_foer_stoppen_for_nye_forsoek(self):
+        """Gjennomgangen, BH11: en endring av grensen kan ikke tomme vinduet
+        for nye forsoek (2.3b), som stopper kl. 23:50."""
+        assert fp.TIDSGRENSE < fp.KL_23_50
 
     def test_kl_21_presis_henter(self, stier):
         """Grensen er 21:00, ikke 21:01. Ville feilet med <= (M2, mutant T2)."""
@@ -1770,19 +1777,21 @@ class TestTidskontrollen:
             fp.main(["--uten"])
         assert stopp.value.code == 2
 
-    def test_det_gamle_flaggnavnet_godtas_ikke(self, monkeypatch):
+    def test_det_gamle_flaggnavnet_godtas_ikke(self, monkeypatch, tmp_path):
         """Fra 19.10 heter flagget --uten-tidskontroll. Ville feilet hvis det
         gamle navnet ble godtatt (mutant T3), for eksempel som et alias."""
-        from pathlib import Path
+        import inspect
 
         ekte = fp.kjoer
         monkeypatch.setattr(fp, "kjoer", lambda *a, **kw: pytest.fail("kjoer skal ikke kalles"))
         with pytest.raises(SystemExit) as stopp:
             fp.main(["--hent-foer-kl-22"])
         assert stopp.value.code == 2
-        with pytest.raises(TypeError):
-            ekte(Path("."), Path("x.db"), OEYEBLIKK_22_09, NOEKKEL, ingen_kall,
-                     lambda _: None, hent_foer_kl_22=True, les_kvote=nok_kvote)
+        # Gjennomgangen, BH3: feilen gjelder navnet, og stiene er midlertidige.
+        assert "hent_foer_kl_22" not in inspect.signature(ekte).parameters
+        with pytest.raises(TypeError, match="hent_foer_kl_22"):
+            ekte(tmp_path / "raa", tmp_path / "ose.db", OEYEBLIKK_22_09, NOEKKEL, ingen_kall,
+                 lambda _: None, hent_foer_kl_22=True, les_kvote=nok_kvote)
 
     def test_main_gir_noekkelen_som_funksjon(self, monkeypatch):
         """Noekkelen leses i kjoer, etter filvakten, ikke i main."""

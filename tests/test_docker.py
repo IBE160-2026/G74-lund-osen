@@ -490,8 +490,14 @@ class TestReadme:
         tekst = README.read_text(encoding="utf-8")
         for flagg in ("--uten-tidskontroll", "--hent-foer-kl-22"):
             assert flagg not in tekst and flagg not in _hjelp(), flagg
-        assert f"etter kl. {fetch_prices.TIDSGRENSE.hour}" in _kom_i_gang() and "helgen" in _hjelp()
-        assert "kl. 22" not in tekst and "kl. 22" not in _hjelp()
+        # Gjennomgangen, BH5 og ECH3: tekstene sier hele timer, saa grensen
+        # maa vaere en hel time, og timen staar med ordgrense.
+        grense = fetch_prices.TIDSGRENSE
+        assert grense.minute == 0
+        assert re.search(rf"etter kl\. {grense.hour}\b(?![:.]\d)", _kom_i_gang()) and "helgen" in _hjelp()
+        # BH4: bare tidspunktet for hentingen, ikke andre klokkeslett.
+        for gammel in (r"etter kl\. 22\b(?![:.]\d)", r"før kl\. 22\b(?![:.]\d)"):
+            assert not re.search(gammel, tekst) and not re.search(gammel, _hjelp()), gammel
 
     def test_du_trenger_versjonene(self):
         """3.3b, punkt e: Docker Desktop slik den er prøvd (spesifikasjonen
