@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-17T21:22
+updated: 2026-10-17T22:31
 ---
 
 # Kvalitetssikring
@@ -24,6 +24,7 @@ Forkortelser i kildene: `S/` er `_bmad-output/implementation-artifacts/`, og
 - 1074 tester i 22 testfiler. Lokalt på Windows består 1058, og 16 hoppes over.
   I CI på Linux består alle 1074 (kjøring 37072797767 på `74fc69b`, den siste
   på main da dette ble skrevet, med samme tester som `3803b4d`; `D/2026-10-03.md`).
+  *Oppdatert 2026-10-17:* 2383 tester i 38 testfiler, telt med `uv run pytest --collect-only -q` på `3699a16`. Lokalt på Windows består 2366, og 17 hoppes over (målt på `59976ee`, med samme kode og tester som `3699a16`). I CI på Linux består alle 2383 (kjøring 39066471455 på `3699a16`). Tabellen fra 17.10 står over den fra 03.10 i §2.
   *Oppdatert 2026-10-05:* 1148 tester i 23 testfiler, telt med `uv run pytest --collect-only -q` på `3fac7cc`. Lokalt på Windows består 1132, og 16 hoppes over. I CI på Linux består alle 1148 (kjøring 37348017033 på `3fac7cc`). Siden 03.10 har story 2.2 (`1570ae9`, PR #19) og 2.2b (`ff58ecf`, PR #20) kommet til, med den nye testfila `test_oversiktsleser.py`. Tabellen under er fra 03.10.
 - Testene kan ikke nå nettet. En sperre i `tests/conftest.py` stopper det
   (AD-8), men den dekker ikke hele testkjøringen ennå (§6).
@@ -39,6 +40,52 @@ Forkortelser i kildene: `S/` er `_bmad-output/implementation-artifacts/`, og
 ## 2. Testene
 
 ### Antall
+
+Talt med `uv run pytest --collect-only -q` 17.10.2026 kl. 22:31, på `3699a16`, med CI-kjøringen 39066471455 for samme commit (2383 bestått):
+
+| Fil | Tester |
+|---|---:|
+| `test_fetch_prices.py` | 304 |
+| `test_ki_modell.py` | 211 |
+| `test_app.py` | 175 |
+| `test_vurderingslager.py` | 170 |
+| `test_snapshotleser.py` | 133 |
+| `test_kurslager.py` | 113 |
+| `test_kilogg.py` | 106 |
+| `test_docker.py` | 81 |
+| `test_markedsoversikt.py` | 78 |
+| `test_ki_visning.py` | 67 |
+| `test_aksje.py` | 59 |
+| `test_signalberegning.py` | 52 |
+| `test_ki_tekst.py` | 51 |
+| `test_hjelpetekster.py` | 51 |
+| `test_migrering.py` | 49 |
+| `test_kilogg_sqlite.py` | 49 |
+| `test_boersdag.py` | 49 |
+| `test_demo.py` | 48 |
+| `test_utseende.py` | 47 |
+| `test_ki_grunnlag.py` | 42 |
+| `test_konsumentene.py` | 40 |
+| `test_ki_lokal.py` | 39 |
+| `test_indeks.py` | 38 |
+| `test_aksjedetalj.py` | 38 |
+| `test_hovedindeks.py` | 37 |
+| `test_ingen_nettverk.py` | 32 |
+| `test_tallformat.py` | 31 |
+| `test_meldinger.py` | 30 |
+| `test_tilstand.py` | 29 |
+| `test_ryddighet.py` | 27 |
+| `test_lagring_sqlite.py` | 26 |
+| `test_graf.py` | 25 |
+| `test_kursdata.py` | 19 |
+| `test_oversiktsleser.py` | 15 |
+| `test_lagring_fil.py` | 13 |
+| `test_tidssone.py` | 5 |
+| `test_suksesskriterier.py` | 3 |
+| `test_readme.py` | 1 |
+| **Sum** | **2383** |
+
+Tabellen fra 03.10 står under, som den var.
 
 Talt med `uv run pytest --collect-only -q` 03.10.2026, på `3803b4d`:
 
@@ -94,6 +141,8 @@ i `tests/test_fetch_prices.py`. De kjører hele hentingen med maskinen satt til
 Windows. Grunnen står i skip-meldingen: «time.tzset finnes ikke her (Windows);
 TZ-testene kjoeres i CI». I CI på Linux kjører de (story 2.1, spinen AD-20).
 
+*Oppdatert 2026-10-17:* 17 hoppes over på Windows: de 16 over, og 1 i `tests/test_ingen_nettverk.py` med grunnen «AF_UNIX finnes ikke i Python paa Windows» (story 4.0, `dc43569`). Talt med `uv run pytest -rs` 17.10.
+
 ### Nettsperren
 
 `tests/conftest.py` har fixturen `ingen_nettverk`, som gjelder hver test
@@ -105,6 +154,8 @@ Sperren prøves av 6 tester i `tests/test_ingen_nettverk.py`. Proxy-sperren og
 DNS-sperren ble tatt bort hver for seg, og testen for den delen feilet
 (`982b216`, vedlegget). `connect_ex` og `getproxies` i `urllib` har ingen egen
 test (§6).
+
+*Oppdatert 2026-10-17:* story 4.0 (`dc43569`, PR #44) la sperren over hele testkjøringen, også innsamlingen, og `tests/test_ingen_nettverk.py` har nå 32 tester, blant dem `tests/test_ingen_nettverk.py::test_innsamlingen_er_sperret`, `tests/test_ingen_nettverk.py::test_connect_ex_blokkeres`, `tests/test_ingen_nettverk.py::test_udp_blokkeres` og `tests/test_ingen_nettverk.py::test_navneoppslag_blokkeres`. Linja over om `connect_ex` gjelder 03.10.
 
 Grunnen er kvoten: 20 kall i døgnet hos EODHD. En test som kaller et ekte
 endepunkt, ville brukt av den på hver push (AD-8, README, «Tester»). Hullene
