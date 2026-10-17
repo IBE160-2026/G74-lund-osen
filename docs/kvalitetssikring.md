@@ -19,6 +19,8 @@ en dagsfil i [`docs/ai-prompts/`](ai-prompts/) eller en memlogg.
 Forkortelser i kildene: `S/` er `_bmad-output/implementation-artifacts/`, og
 `D/` er `docs/ai-prompts/`.
 
+*Oppdatert 2026-10-17:* tallene i §1 og §2, radene i §3 og §5 og linjene i §6 er talt og slått opp på nytt mot `3699a16`. §11–§13 er nye. Det som står uten en datert linje, gjelder fortsatt `3803b4d`.
+
 ## 1. Kort fortalt
 
 - 1074 tester i 22 testfiler. Lokalt på Windows består 1058, og 16 hoppes over.
@@ -682,6 +684,8 @@ Dokumentet oppdateres ved hver epic, sammen med kodegjennomgangen av den
 **Fra 03.10 navngir hver spesifikasjon hver mutant og testen som fanget den**,
 så dokumentet kan oppdateres uten hull. Det var ikke gjort for alle storyene
 før 03.10 (§3, «Åpne punkter i kildene»).
+
+*Lagt til 2026-10-17:* `tests/test_kvalitetssikring.py` passer på to av punktene: hver spesifikasjon med status `done` har en rad i §3 og i §5, og hver test dette dokumentet og `vurderingsmatrise.md` nevner med fil og navn, finnes. Hver PR får triagen som kommentar (§5).
 
 ## 9. README-prøven
 
