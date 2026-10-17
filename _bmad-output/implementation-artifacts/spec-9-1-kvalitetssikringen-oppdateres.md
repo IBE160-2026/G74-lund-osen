@@ -23,7 +23,7 @@ context:
 
 **a) §1 og §2:** testene telles på nytt med `uv run pytest --collect-only -q` på `3699a16`, med CI-kjøringen for samme commit, i en ny tabell med dato over den fra 03.10, som står. Antallet som hoppes over lokalt, og testene for nettsperren, får en datert linje.
 
-**b) §3 og §5:** en rad for hver spesifikasjon som mangler, 27 i alt: de 25 med status `done` fra 2.2 til 2.9 og 10.3, og 3.4 og 10.2a, som har en annen status. §3 har mutantene og hvilke som overlevde en stund, og vedlegget får én linje per spesifikasjon med mutantene og testene som fanget dem. §5 har radene i triagen (rettet, avvist, utsatt). Tallene er hentet fra spesifikasjonene. Der spesifikasjonen og dagsfila sier ulikt, føres det som et åpent punkt (regel 12). Tre agenter leste spesifikasjonene og dagsfilene, og et utvalg av påstandene deres er slått opp på nytt før de ble skrevet.
+**b) §3 og §5:** en rad for hver spesifikasjon som mangler, 27 i alt: de 25 med status `done` fra 2.2 til 10.3, og 3.4 og 10.2a, som har en annen status. §3 har mutantene og hvilke som overlevde en stund, og vedlegget får én linje per spesifikasjon med mutantene og testene som fanget dem. §5 har radene i triagen (rettet, avvist, utsatt). Tallene er hentet fra spesifikasjonene. Der spesifikasjonen og dagsfila sier ulikt, føres det som et åpent punkt (regel 12). Tre agenter leste spesifikasjonene og dagsfilene, og et utvalg av påstandene deres er slått opp på nytt før de ble skrevet.
 
 **c) §6:** hver linje som ikke stemmer lenger, får en Rettet-linje med commit. Nye hull føres inn: testene som bare bruker testklienten, ekte svar fra EODHD og Ollama, at CI kjører uten hemmeligheter uten egen test, og README-prøven.
 
@@ -44,6 +44,6 @@ context:
 - Bare det som står i repoet. Ingen karakter, intet anslag, og ingenting sitert fra sensorveiledningen.
 - Ingen linje fjernes, utenom status og `updated`. En linje som ikke stemmer lenger, får en Rettet-linje.
 - Ingen kall til EODHD utover kvotesjekken i regel 15, og `src/fetch_prices.py` kjøres ikke.
-- **Steg 4 i instruksjonen** ber om at kommentarene i PR #56–#60 merkes «satt sammen 18.10». De settes sammen 17.10, så de merkes med den datoen.
+- **Steg 4 i instruksjonen** ber om at kommentarene i PR #56–#60 merkes «satt sammen 18.10». De settes sammen 17.10, så de merkes med den datoen. Det er et avvik fra instruksjonen, og det står i svaret til gruppen.
 
 **Testtallet før:** 2366 bestått og 17 hoppet over lokalt, og 2383 bestått i CI (kjøring 39066471455 på `3699a16`).

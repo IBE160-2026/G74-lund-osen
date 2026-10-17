@@ -19,14 +19,15 @@ en dagsfil i [`docs/ai-prompts/`](ai-prompts/) eller en memlogg.
 Forkortelser i kildene: `S/` er `_bmad-output/implementation-artifacts/`, og
 `D/` er `docs/ai-prompts/`.
 
-*Oppdatert 2026-10-17:* tallene i §1 og §2, radene i §3 og §5 og linjene i §6 er talt og slått opp på nytt mot `3699a16`. §11–§13 er nye. Det som står uten en datert linje, gjelder fortsatt `3803b4d`.
+*Oppdatert 2026-10-17:* tallene i §1 og §2, radene i §3 og §5 og linjene i §6 er talt og slått opp på nytt mot `3699a16`. §11–§13 er nye. Det som står uten en datert linje, gjelder fortsatt `3803b4d`. `tests/test_kvalitetssikring.py` passer på radene i §3 og §5 og testnavnene (§8).
 
 ## 1. Kort fortalt
 
 - 1074 tester i 22 testfiler. Lokalt på Windows består 1058, og 16 hoppes over.
   I CI på Linux består alle 1074 (kjøring 37072797767 på `74fc69b`, den siste
   på main da dette ble skrevet, med samme tester som `3803b4d`; `D/2026-10-03.md`).
-  *Oppdatert 2026-10-17:* 2383 tester i 38 testfiler, telt med `uv run pytest --collect-only -q` på `3699a16`. Lokalt på Windows består 2366, og 17 hoppes over (målt på `59976ee`, med samme kode og tester som `3699a16`). I CI på Linux består alle 2383 (kjøring 39066471455 på `3699a16`). Tabellen fra 17.10 står over den fra 03.10 i §2.
+  *Oppdatert 2026-10-17:* 2383 tester i 38 testfiler, telt med `uv run pytest --collect-only -q` på `3699a16`. Lokalt på Windows består 2366, og 17 hoppes over (målt på `59976ee` etter gjennomgangene av PR #60, slik beskrivelsen av PR #60 sier; `git diff 59976ee 3699a16 -- src tests` er tom). I CI på Linux består alle 2383 (kjøring 39066471455 på `3699a16`). Tabellen fra 17.10 står over den fra 03.10 i §2.
+  *Lagt til 2026-10-17:* story 9.1 legger til `tests/test_kvalitetssikring.py` med 10 tester, så etter flettingen har main 2393 tester i 39 testfiler. Tabellen i §2 er talt før den kom til.
   *Oppdatert 2026-10-05:* 1148 tester i 23 testfiler, telt med `uv run pytest --collect-only -q` på `3fac7cc`. Lokalt på Windows består 1132, og 16 hoppes over. I CI på Linux består alle 1148 (kjøring 37348017033 på `3fac7cc`). Siden 03.10 har story 2.2 (`1570ae9`, PR #19) og 2.2b (`ff58ecf`, PR #20) kommet til, med den nye testfila `test_oversiktsleser.py`. Tabellen under er fra 03.10.
 - Testene kan ikke nå nettet. En sperre i `tests/conftest.py` stopper det
   (AD-8), men den dekker ikke hele testkjøringen ennå (§6).
@@ -43,7 +44,7 @@ Forkortelser i kildene: `S/` er `_bmad-output/implementation-artifacts/`, og
 
 ### Antall
 
-Talt med `uv run pytest --collect-only -q` 17.10.2026 kl. 22:31, på `3699a16`, med CI-kjøringen 39066471455 for samme commit (2383 bestått):
+Talt med `uv run pytest --collect-only -q` 17.10.2026, på `3699a16`, med CI-kjøringen 39066471455 for samme commit (2383 bestått):
 
 | Fil | Tester |
 |---|---:|
@@ -143,7 +144,7 @@ i `tests/test_fetch_prices.py`. De kjører hele hentingen med maskinen satt til
 Windows. Grunnen står i skip-meldingen: «time.tzset finnes ikke her (Windows);
 TZ-testene kjoeres i CI». I CI på Linux kjører de (story 2.1, spinen AD-20).
 
-*Oppdatert 2026-10-17:* 17 hoppes over på Windows: de 16 over, og 1 i `tests/test_ingen_nettverk.py` med grunnen «AF_UNIX finnes ikke i Python paa Windows» (story 4.0, `dc43569`). Talt med `uv run pytest -rs` 17.10.
+*Oppdatert 2026-10-17:* 17 hoppes over på Windows: de 16 over, og 1 i `tests/test_ingen_nettverk.py` med grunnen «AF_UNIX finnes ikke i Python paa Windows» (story 4.0, `dc43569`). Talt med `uv run pytest -rs` på grenen for story 9.1 17.10, med samme tester som `3699a16` (spesifikasjonen `S/spec-9-1-kvalitetssikringen-oppdateres.md`).
 
 ### Nettsperren
 
@@ -276,7 +277,7 @@ eller `review` i `sprint-status.yaml` (21 storyer) og squash-commitene med
 `(#NN)` i git-loggen. 9.3 og 9.4 har ingen rad: de er dokumentasjon og et
 eksperiment uten kode i `src/`, og ingen mutanter er kjørt.
 
-*Rettet 2026-10-17:* setningen gjaldt 03.10. Lista sluttet ved 2.5, 8.0, 9.0 og nettsperren. 27 rader kom til 17.10, én for hver spesifikasjon fra 2.2 til 10.3, også 3.4 (review) og 10.2a (in-progress). Tallene er hentet fra spesifikasjonene, og vedlegget har én linje per spesifikasjon for dem. `tests/test_kvalitetssikring.py` krever en rad for hver spesifikasjon med status `done`, så en ny spesifikasjon kan ikke settes til done uten rad.
+*Rettet 2026-10-17:* setningen gjaldt 03.10. Lista sluttet ved 2.5, 8.0, 9.0 og nettsperren. 27 rader kom til 17.10, én for hver spesifikasjon fra 2.2 til 10.3, også 3.4 (review) og 10.2a (in-progress). Tallene er hentet fra spesifikasjonene, og vedlegget har én linje per spesifikasjon for dem. `tests/test_kvalitetssikring.py` krever en egen rad for hver spesifikasjon med status `done`, så en spesifikasjon som settes til done uten rad, gjør testen rød.
 
 **Åpne punkter i kildene** (regel 12):
 
@@ -469,7 +470,7 @@ for `docs/innlevering.md`. 1.1–1.3 har ingen spesifikasjon, og en gjennomgang 
 23.09 står i `S/kodegjennomgang-epic-1.md`. Tallene for 8.0 ble rettet etter
 tabellen 03.10.
 
-*Lagt til 2026-10-17:* radene fra 2.2 til 10.3 er talt rad for rad i spesifikasjonene. «Rettet» er rader med patch, også en Rettet-linje og en delvis patch. «Avvist» tar også med rader med «ikke endret», «false» og «ingen». Rader som går til gruppen, et spørsmål eller «info», står ikke i noen av de tre kolonnene, så summen kan bli mindre enn radtallet: 2.8a har 1 til gruppen, 3.4 PR #26 1 med status satt til in-review, 8.0c PR #35 1 spørsmål, 8.0c PR #36 1 info, 8.0d PR 3 3 til gruppen, 8.0d svarene 2 avgjort av gruppen, 10.2b første runde 2 til gruppen og 10.2c 2 til gruppen. Der spesifikasjonen og dagsfila sier ulikt, står det under «Åpne punkter i kildene» i §3.
+*Lagt til 2026-10-17:* radene fra 2.2 til 10.3 er talt rad for rad i spesifikasjonene. «Rettet» er rader med patch, også en Rettet-linje, en delvis patch og raden BH2 i 2.3b, som har ruten «Verification under». «Avvist» tar også med rader med «ikke endret», «false» og «ingen». Rader som går til gruppen, et spørsmål eller «info», står ikke i noen av de tre kolonnene, så summen kan bli mindre enn radtallet: 2.8a har 1 til gruppen, 3.4 PR #26 1 med status satt til in-review, 8.0c PR #35 1 spørsmål, 8.0c PR #36 1 info, 8.0d PR 3 3 til gruppen, 8.0d svarene 2 avgjort av gruppen, 10.2b første runde 2 til gruppen og 10.2c 2 til gruppen. Der spesifikasjonen og dagsfila sier ulikt, står det under «Åpne punkter i kildene» i §3.
 
 *Lagt til 2026-10-17:* fra story 9.1 (17.10) får hver PR triagen fra spesifikasjonen som kommentar, med lenke til spesifikasjonen. PR #56–#60 fikk den i ettertid 17.10, satt sammen fra triagen i spesifikasjonene.
 
@@ -1104,7 +1105,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 |---|---|---|---|
 | 2.2 | M1–M18 | M1 `test_oppstart_med_tom_base_gjoer_ingen_nettkall`, M2 `test_migrer_kjoeres_en_gang_for_to_forespoersler`, M3 `test_tilkoblingen_lukkes_etter_forespoerselen`, M7 `test_en_base_som_mangler_lages_ikke`, M10 og M15 `test_basen_nyere_enn_koden_gir_503_med_grunnen`, M14 `test_slettet_base_lages_paa_nytt`, M16 `test_feilsiden_viser_ingen_stier`, M17 `test_andre_ruter_roerer_ikke_basen`, M18 `test_feil_mens_sidene_leser_gir_503`; resten i tabellen | `S/spec-2-2-…` |
 | 2.2b | M1–M15 | M4, M8 og M10 blant andre `test_app_har_ingen_sql_og_regner_ikke_signalet`, M6 `test_styrke_0_vises_som_0`, M9 `test_utenfor_boerskalenderen_gir_tekst_ikke_feil`, M13 `test_dato_etter_i_dag_gir_tekst_ikke_feil`, M15 `test_feil_i_spoerringen_gir_503_paa_begge_rutene`; resten i tabellen | `S/spec-2-2b-…` |
-| 2.3 | M1–M8, K1–K4 og V1–V4, så 15 mot hver sin test og B4 | M1 og M5 `TestTidskontrollen::test_boersdag_foer_kl_22_gir_0_kall_og_nevner_flagget`, K1 `test_dagen_regnes_i_gmt_ikke_i_oslo`, K4 `TestRekkefoelgen::test_noekkelen_og_kvoten_kommer_foer_foerste_kall`, V2 `TestVintertid::test_kl_21_59_i_oslo_i_november_nekter`; resten i tabellen. Fra 17.10 heter de to tidstestene `test_boersdag_kl_20_59_59_gir_0_kall_og_nevner_flagget` og `test_kl_20_59_i_oslo_i_november_nekter` | `S/spec-2-3-boersdagskontroll-…` |
+| 2.3 | M1–M8, K1–K4 og V1–V4, så 15 mot hver sin test og B4 | M1 og M5 `TestTidskontrollen::test_boersdag_kl_20_59_59_gir_0_kall_og_nevner_flagget` (før 17.10: `test_boersdag_foer_kl_22_gir_0_kall_og_nevner_flagget`), K1 `test_dagen_regnes_i_gmt_ikke_i_oslo`, K4 `TestRekkefoelgen::test_noekkelen_og_kvoten_kommer_foer_foerste_kall`, V2 `TestVintertid::test_kl_20_59_i_oslo_i_november_nekter` (før 17.10: `test_kl_21_59_i_oslo_i_november_nekter`); resten i tabellen. De to tidstestene fikk nytt navn med grensen kl. 21:00 (`336204f`) | `S/spec-2-3-boersdagskontroll-…` |
 | 2.3, kl. 21 | T1–T3 | T1 `test_grensen_er_kl_21`, T2 `test_kl_21_presis_henter`, T3 `test_det_gamle_flaggnavnet_godtas_ikke` | `S/spec-2-3-hentingen-fra-kl-21.md` |
 | 2.3b | 28 | M1, M2, M6 og M13 `TestNyttForsoek::test_bare_de_som_mangler_hentes_eldste_foerst`, M10 `test_fredag_over_midnatt_skriver_ingen_rad`, M20 `test_ingen_kall_gir_ingen_fil`, M22 `test_dagens_kall_brukt_opp_underveis_stopper`, M23 `test_fil_som_dukker_opp_gir_neste_n`; resten i tabellen | `S/spec-2-3b-…` |
 | 2.8a | I1–I4 | I1 og I3 `test_serien_byttes_ut_ikke_skjoetes_paa[sqlite]`, I2 `test_en_loerdag_og_en_helligdag_lagres_ikke[minne]`, I4 `test_indeksen_for_alle_demodagene` | `S/spec-2-8a-…` |
