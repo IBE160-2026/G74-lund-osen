@@ -1615,6 +1615,8 @@ tall kan sammenlignes med børsen som helhet.
 
 *Lagt til 2026-10-17:* PR 1 (2.8a), tabellen `indeks` i migrering `0006`, porten og demoindeksen, er flettet i `1d3a21d`, PR #56, etter gruppens ja kl. 00:25 og sjekken for hånd samme minutt av `DEMIX` og «Demoindeksen» mot lista hos Euronext. CI var grønn på head-en `114a380` (kjøring 38975808686). Storyen står som in-progress til PR 2, kallet i hentingen, er flettet.
 
+*Avgjort 2026-10-17 kl. 11:58 (gruppens svar om PR #57):* feiler bare hovedindeksen, gir hentingen kode 3, så en feil med indeksen ikke ser ut som en vellykket kjøring (BH7 i gjennomgangen av 2.8b). Ikke 2, fordi argparse bruker 2 for feil i argumentene. Kode 1 går foran: mangler også en aksje dagens kurs, gir kjøringen 1, fordi aksjen kan prøves igjen samme kveld. Rådet anbefalte 0. Ja til flettingen når det er gjort.
+
 **Avhenger av:** 2.3 og 4.3 (`ki_logg` er `0005`). **Én økt:** ja.
 
 ### Story 2.9: Hovedindeksen i markedsoversikten
