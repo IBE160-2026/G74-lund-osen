@@ -2,7 +2,7 @@
 title: 'Story 9.7: linter og formatterer i CI'
 type: 'chore'
 created: '2026-10-17'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '1892a53'
@@ -42,6 +42,8 @@ context:
 
 - Ingen API-kall utover kvotesjekken i regel 15, og `src/fetch_prices.py` kjøres ikke mot EODHD. `data/db/ose.db` og `data/db/demo.db` røres ikke (regel 22).
 - `.github/scripts/` er ikke med. Instruksjonen sier `src/` og `tests/`.
+
+*Lagt til 2026-10-17 kl. 23:40:* PR #62 er squash-flettet i `faaa36c`, låst til head-en `4cf27a9`. CI var grønn på head-en (39071749356) og på main (39071843876). Triagen står som kommentar i PR #62.
 
 ## Mutantene
 
