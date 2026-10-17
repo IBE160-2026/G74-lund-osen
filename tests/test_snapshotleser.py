@@ -24,6 +24,7 @@ from kursdata import Kurslager, Kursleser, Kursrad, UgyldigKursrad
 from lagring_fil import SnapshotKilde, SnapshotLeser
 
 HENTET = datetime(2026, 9, 23, 17, 4, 11, tzinfo=timezone.utc)
+HENTET_TEKST = HENTET.isoformat()
 
 
 def raa(dato: str = "2026-09-21", close=100.0, adjusted_close=98.0, volume=1000) -> dict:
@@ -38,7 +39,7 @@ def raa(dato: str = "2026-09-21", close=100.0, adjusted_close=98.0, volume=1000)
     }
 
 
-def bilde(serier: dict, hentet=HENTET.isoformat()) -> SnapshotLeser:
+def bilde(serier: dict, hentet=HENTET_TEKST) -> SnapshotLeser:
     return SnapshotLeser(SnapshotKilde(hentet=hentet, serier=serier))
 
 

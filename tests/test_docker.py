@@ -824,12 +824,12 @@ class TestReadmeForNybegynnere:
 
     def test_ingen_kommentar_paa_kommandolinjene(self):
         """Linjene skal virke ogsaa i Ledetekst, der # ikke er en kommentar."""
-        for spraak, blokk in _blokkene(_kom_i_gang()):
+        for _spraak, blokk in _blokkene(_kom_i_gang()):
             assert "#" not in blokk, blokk
 
     def test_en_kommando_per_boks(self):
         """En av oss fikk to kommandoer paa samme linje 11.10."""
-        for spraak, blokk in _blokkene(_kom_i_gang()):
+        for _spraak, blokk in _blokkene(_kom_i_gang()):
             assert len([l for l in blokk.splitlines() if l.strip()]) == 1, blokk
 
     def test_bare_kommandoer_i_kom_i_gang(self):

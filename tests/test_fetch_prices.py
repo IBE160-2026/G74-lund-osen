@@ -553,7 +553,7 @@ def _kjoer_matrisen(tmp_path, rad):
             tmp_path / f"ose-{nr}.db",
             oeyeblikk,
             NOEKKEL,
-            lambda *_: serie_til(boersdag),
+            lambda *_, boersdag=boersdag: serie_til(boersdag),
             lambda _: None,
             uten_tidskontroll=True,
             les_kvote=nok_kvote,

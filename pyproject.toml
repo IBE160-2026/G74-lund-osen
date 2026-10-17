@@ -39,4 +39,9 @@ target-version = "py313"
 select = [
     "F",  # pyflakes: ubrukte importer og navn, navn som ikke finnes
     "I",  # importene: sortert og gruppert, saa en dobbel eller glemt import synes
+    "B",  # bugbear: vanlige feil, som en loekkevariabel i en lambda
 ]
+# B905 (zip uten strict=) er en av bugbears meningsregler, av som standard i
+# flake8-bugbear. Flere steder er listene ment aa ha ulik lengde, som
+# zip(kurser, kurser[1:]), og strict=True ville gitt en feil der.
+ignore = ["B905"]
