@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-16T22:17
+updated: 2026-10-17T21:22
 ---
 
 # Kvalitetssikring
@@ -575,6 +575,8 @@ gruppens. EODHDs vilkår forbyr å dele kontoen (FR-411). Maskinen er den fra
 Prøve 1 eller en annen ren maskin, aldri PC-en gruppen utvikler på. Prøven tas når
 hentingen kan gi kurser, se «Når kan jeg hente?» i
 [`docs/hjelp.md`](hjelp.md): etter kl. 22 og før midnatt på en børsdag.
+
+*Lagt til 2026-10-17:* fra 19.10 er det etter kl. 21 og før midnatt, og `docs/hjelp.md` sier det (beslutningen 16.10 kl. 21:09 under story 2.3, `malinger.md` §31). Det gjelder også steg 4 i tabellen under.
 
 - **Hvem som prøver:** åpent.
 - **Dato og klokkeslett:**

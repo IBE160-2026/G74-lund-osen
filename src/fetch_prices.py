@@ -34,7 +34,8 @@ Boersdagen raden gjelder, regnes en gang, fra samme oeyeblikk som filnavnet.
 Story 2.3 (FR-401, FR-402): foer foerste kall sjekker kjoer() i fast
 rekkefoelge klokka, tidskontrollen, basen, filvakten, noekkelen og kvoten.
 Hver sjekk som sier nei, gir 0 kall og en utskrift som sier hvorfor. Paa en
-boersdag foer kl. 22:00 hentes ingenting uten --hent-foer-kl-22. Har basen
+boersdag foer TIDSGRENSE, kl. 21:00, hentes ingenting uten --uten-tidskontroll
+(beslutningen 16.10 kl. 21:09, fra 19.10; foer det kl. 22:00). Har basen
 alt kursene for boersdagen for alle aksjene, hentes ingenting. Kvoten leses
 med /api/user (gratis), den andre nettfunksjonen mot EODHD (AD-2).
 
@@ -108,9 +109,19 @@ BASE_URL = "https://eodhd.com/api/eod"
 KVOTE_URL = "https://eodhd.com/api/user"
 
 # Story 2.3: paa en boersdag hentes ingenting foer dette klokkeslettet i Oslo,
-# uten flagget --hent-foer-kl-22. En kjoering som kommer for tidlig, bruker
-# dagens kall uten aa faa dagens rad.
-KL_22 = time(22, 0)
+# uten flagget --uten-tidskontroll. En kjoering som kommer for tidlig, bruker
+# dagens kall uten aa faa dagens rad. Kl. 21:00 fra 19.10 (beslutningen 16.10
+# kl. 21:09, malinger.md §31); foer det kl. 22:00. Navnet har ikke
+# klokkeslettet i seg, saa i koden er neste endring denne linja. Tekstene for
+# brukeren (README-en og docs/hjelp.md), docstringene og klokkeslettene i
+# demoen staar for seg, og testene sier fra naar de ikke foelger med
+# (gjennomgangen, ECH5).
+TIDSGRENSE = time(21, 0)
+
+
+def _grensen() -> str:
+    """TIDSGRENSE slik utskriftene viser den, «21:00»."""
+    return f"{TIDSGRENSE:%H:%M}"
 
 # Story 2.3b, svar 4 (10.10): et nytt forsoek starter ingen kall fra dette
 # klokkeslettet i Oslo.
@@ -800,7 +811,7 @@ def kjoer(
     skriv: Callable[[str], None] = print,
     klokke: Callable[[], datetime] | None = None,
     *,
-    hent_foer_kl_22: bool = False,
+    uten_tidskontroll: bool = False,
     les_kvote: Callable[[str], object],
     lista: tuple[Aksje, ...] = AKSJEUNIVERS,
     modell: Modell | None = None,
@@ -826,7 +837,7 @@ def kjoer(
 
     Story 2.3: rekkefoelgen foer foerste kall er klokka (oeyeblikk),
     tidskontrollen, basen, filvakten, noekkelen og kvoten. Paa en boersdag
-    foer kl. 22:00 i Oslo hentes ingenting uten hent_foer_kl_22. Har hver
+    foer TIDSGRENSE i Oslo hentes ingenting uten uten_tidskontroll. Har hver
     aksje en kurs for boersdagen i basen, hentes ingenting (FR-402); mangler
     noen, hentes det, ogsaa paa en dag som ikke er boersdag (AD-7). Kan basen
     ikke leses, hentes det. Fila heter etter boersdagen vurderingene skrives
@@ -899,20 +910,20 @@ def kjoer(
     hentet_tid = oeyeblikk.astimezone(timezone.utc)
     hentet = hentet_tid.isoformat()
 
-    # Tidskontrollen (story 2.3): bare paa en boersdag, bare foer kl. 22:00.
-    if er_boersdag(dag) and oeyeblikk.astimezone(OSLO).time() < KL_22:
-        if not hent_foer_kl_22:
+    # Tidskontrollen (story 2.3): bare paa en boersdag, bare foer TIDSGRENSE.
+    if er_boersdag(dag) and oeyeblikk.astimezone(OSLO).time() < TIDSGRENSE:
+        if not uten_tidskontroll:
             skriv(
-                f"{dag.isoformat()} er boersdag, og klokka er ikke 22:00 i Oslo "
+                f"{dag.isoformat()} er boersdag, og klokka er ikke {_grensen()} i Oslo "
                 "ennaa. En henting naa bruker dagens kall uten aa faa dagens "
-                "rad. Kjoer etter kl. 22:00, eller med --hent-foer-kl-22 for aa "
-                "hente likevel. 0 kall brukt."
+                f"rad. Kjoer etter kl. {_grensen()}, eller med --uten-tidskontroll "
+                "for aa hente likevel. 0 kall brukt."
             )
             return None
         skriv(
-            "Henter foer kl. 22:00 (--hent-foer-kl-22). Har API-et ikke dagens "
-            "kurs ennaa, skrives fila likevel under dagens dato, og kveldens "
-            "henting stopper da ved filvakten med 0 kall."
+            f"Henter foer kl. {_grensen()} (--uten-tidskontroll). Har API-et ikke "
+            "dagens kurs ennaa, skrives fila likevel under dagens dato, og "
+            "kveldens henting stopper da ved filvakten med 0 kall."
         )
 
     # Basen (FR-402): har den boersdagen for alle aksjene, er det ingenting aa hente.
@@ -1447,8 +1458,9 @@ def les_inn(fil: Path, base_sti: Path, skriv: Callable[[str], None] = print) -> 
 
 def main(argv: list[str] | None = None) -> None:
     """Uten flagg: en henting. Med --les-inn <fil>: innlesing uten kall.
-    Med --hent-foer-kl-22: en henting paa en boersdag foer kl. 22:00 (story
-    2.3). Noekkelen gaar til kjoer som funksjon og leses etter filvakten.
+    Med --uten-tidskontroll: en henting paa en boersdag foer TIDSGRENSE, kl.
+    21:00 (story 2.3). Det gamle navnet, --hent-foer-kl-22, godtas ikke
+    lenger. Noekkelen gaar til kjoer som funksjon og leses etter filvakten.
 
     Stiene slaas opp her, naar main kalles (story 2.1b), saa fixturen i
     tests/conftest.py flytter dem.
@@ -1463,12 +1475,12 @@ def main(argv: list[str] | None = None) -> None:
         help="les et oeyeblikksbilde som finnes, inn i basen, uten API-kall",
     )
     parser.add_argument(
-        "--hent-foer-kl-22",
+        "--uten-tidskontroll",
         action="store_true",
         help=(
-            "hent paa en boersdag foer kl. 22:00 i Oslo (story 2.3). Har API-et "
-            "ikke dagens kurs ennaa, laaser fila dagen, og kveldens henting "
-            "stopper ved filvakten"
+            f"hent paa en boersdag foer kl. {_grensen()} i Oslo (story 2.3). Har "
+            "API-et ikke dagens kurs ennaa, laaser fila dagen, og kveldens "
+            "henting stopper ved filvakten"
         ),
     )
     argumenter = parser.parse_args(argv)
@@ -1483,7 +1495,7 @@ def main(argv: list[str] | None = None) -> None:
         naa(),
         hent_api_nokkel,
         klokke=naa,
-        hent_foer_kl_22=argumenter.hent_foer_kl_22,
+        uten_tidskontroll=argumenter.uten_tidskontroll,
         les_kvote=hent_kvote,
         modell=modell,
     )

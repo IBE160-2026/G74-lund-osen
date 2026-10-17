@@ -482,10 +482,22 @@ class TestReadme:
 
     def test_raadet_om_tidspunkt_uten_flagget(self):
         """Svar 3: README-en raader til kveld paa en boersdag eller helg, og
-        viser ikke --hent-foer-kl-22, som kan laase dagen."""
+        viser ikke flagget som slipper forbi tidskontrollen, som kan laase
+        dagen. Fra 19.10 heter det --uten-tidskontroll, og grensen er kl. 21
+        (beslutningen 16.10 kl. 21:09). Det gamle navnet staar heller ikke."""
+        import fetch_prices
+
         tekst = README.read_text(encoding="utf-8")
-        assert "--hent-foer-kl-22" not in tekst and "--hent-foer-kl-22" not in _hjelp()
-        assert "etter kl. 22" in _kom_i_gang() and "helgen" in _hjelp()
+        for flagg in ("--uten-tidskontroll", "--hent-foer-kl-22"):
+            assert flagg not in tekst and flagg not in _hjelp(), flagg
+        # Gjennomgangen, BH5 og ECH3: tekstene sier hele timer, saa grensen
+        # maa vaere en hel time, og timen staar med ordgrense.
+        grense = fetch_prices.TIDSGRENSE
+        assert grense.minute == 0
+        assert re.search(rf"etter kl\. {grense.hour}\b(?![:.]\d)", _kom_i_gang()) and "helgen" in _hjelp()
+        # BH4: bare tidspunktet for hentingen, ikke andre klokkeslett.
+        for gammel in (r"etter kl\. 22\b(?![:.]\d)", r"før kl\. 22\b(?![:.]\d)"):
+            assert not re.search(gammel, tekst) and not re.search(gammel, _hjelp()), gammel
 
     def test_du_trenger_versjonene(self):
         """3.3b, punkt e: Docker Desktop slik den er prøvd (spesifikasjonen
@@ -510,9 +522,9 @@ class TestReadme:
         med en gang, og steg 8 og raden «Klar» nevner helgen, slik
         docs/hjelp.md gjør. Ville feilet hvis helgen falt ut av steg 8."""
         topp = _kom_i_gang().split("### Felles for begge", 1)[0]
-        assert "Første gang før kl. 22 på en børsdag, også på dagtid, er demoen veien for å se appen med en gang" in topp
+        assert "Første gang før kl. 21 på en børsdag, også på dagtid, er demoen veien for å se appen med en gang" in topp
         klar = [l for l in topp.splitlines() if l.startswith("| Klar |")]
-        assert len(klar) == 1 and "helgen" in klar[0] and "etter kl. 22" in klar[0]
+        assert len(klar) == 1 and "helgen" in klar[0] and "etter kl. 21" in klar[0]
         assert "andre dager børsen er stengt" in klar[0]
         steg8 = _steg("Den ekte versjonen (anbefalt)", 8)
         assert "Første gang går det også i helgen og andre dager børsen er stengt." in steg8

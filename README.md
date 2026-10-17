@@ -15,13 +15,13 @@ Til faglærer:
 
 ## Kom i gang
 
-Appen finnes i to versjoner, med samme kode. Vi anbefaler den ekte versjonen. Vil du bare se hvordan appen virker, er demoen raskest. Første gang før kl. 22 på en børsdag, også på dagtid, er demoen veien for å se appen med en gang, fordi den ekte versjonen henter dagens kurser først etter kl. 22.
+Appen finnes i to versjoner, med samme kode. Vi anbefaler den ekte versjonen. Vil du bare se hvordan appen virker, er demoen raskest. Første gang før kl. 21 på en børsdag, også på dagtid, er demoen veien for å se appen med en gang, fordi den ekte versjonen henter dagens kurser først etter kl. 21.
 
 | | Den ekte versjonen (anbefalt) | Demoen |
 |---|---|---|
 | Kurser | Ekte sluttkurser fra Oslo Børs, hentet fra EODHD hver børsdag. Dagens vurdering lagres per aksje | Oppdiktede selskaper og kurser («Eksempeltall») |
 | Trenger | Docker Desktop og en gratis nøkkel fra EODHD | Bare Docker Desktop |
-| Klar | Viser kurser etter første henting, etter kl. 22 på en børsdag, eller i helgen og andre dager børsen er stengt | Med en gang |
+| Klar | Viser kurser etter første henting, etter kl. 21 på en børsdag, eller i helgen og andre dager børsen er stengt | Med en gang |
 
 **Du trenger** en Windows-maskin eller en Mac, lov til å installere programmer, nett og noen GB ledig plass, men verken git eller Docker-konto. Første gang tar det en stund. På Linux bruker du Docker Engine med Compose i stedet for Docker Desktop. Vi prøvde 10.10 med Docker Desktop 4.91.0 (motor 29.8.0, Compose v5.5.1) på Windows, og imaget bruker Python 3.13.15. Mac er ikke prøvd ennå. Uten Docker trenger du bare [uv](https://docs.astral.sh/uv/), som henter Python 3.13 eller nyere hvis maskinen ikke har den, se «Uten Docker, med uv» under «Mer for den som vil». Står du fast, se [«Står du fast?»](#står-du-fast) lenger ned.
 
@@ -59,7 +59,7 @@ open -e .env
 docker compose up --build
 ```
 
-8. **Hent kursene** etter kl. 22 og før midnatt på en børsdag. Første gang går det også i helgen og andre dager børsen er stengt. Åpne et nytt terminalvindu i samme mappe (steg 3 og 4), og lim inn denne. Det er klart når utskriften sier hvilken børsdag vurderingene gjelder. Last siden på nytt når hentingen er ferdig.
+8. **Hent kursene** etter kl. 21 og før midnatt på en børsdag. Første gang går det også i helgen og andre dager børsen er stengt. Åpne et nytt terminalvindu i samme mappe (steg 3 og 4), og lim inn denne. Det er klart når utskriften sier hvilken børsdag vurderingene gjelder. Last siden på nytt når hentingen er ferdig.
 
 ```
 docker compose run --rm hent
