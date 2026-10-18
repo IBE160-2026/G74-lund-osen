@@ -784,7 +784,10 @@ class TestReadme:
         merket = [b for _, b in bilder if b.endswith("/actions/workflows/tester.yml/badge.svg")]
         assert merket == ["https://github.com/IBE160-2026/G74-lund-osen/actions/workflows/tester.yml/badge.svg"]
         andre = [(alt, b) for alt, b in bilder if b not in merket]
-        assert sorted(b for _, b in andre) == sorted(f"docs/bilder/readme/{navn}" for navn in BILDENE.values())
+        # Story 3.3e: og bildet av oversikten under «Til faglærer».
+        assert sorted(b for _, b in andre) == sorted(
+            [*(f"docs/bilder/readme/{navn}" for navn in BILDENE.values()), SKJERMBILDET]
+        )
         for alt, sti in andre:
             assert alt.strip(), sti
             assert (ROT / sti).is_file(), sti
@@ -821,6 +824,91 @@ BILDEFILER = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"}
 # «Felles for begge».
 BILDENE = {1: "engine-running.png", 2: "github-download-zip.png", 4: "powershell-mappa.png"}
 
+# Story 3.3e (gruppens svar 18.10 kl. 00:20): bildet av oversikten i demoen,
+# tatt etter «Bildet» i spesifikasjonen 3.3b. Filene under bestemmer det
+# bildet viser: malene oversikten bygges av, med stilarket i <style> i
+# _ramme.html, skriftene i src/static/, demodataene og modulene som lager
+# tallene og tekstene. Endres en av dem, tas bildet paa nytt og avtrykket
+# oppdateres i samme commit (spesifikasjonen 3.3e, «Avgjort»).
+SKJERMBILDET = "docs/bilder/readme/oversikten-demo.png"
+MALENE_BAK_BILDET = (
+    "src/templates/index.html",
+    "src/templates/_ramme.html",
+    "src/templates/_brikker.html",
+    "src/templates/_bransjer.html",
+    "src/templates/_hjelp.html",
+    "src/demo.py",
+    "src/markedsoversikt.py",
+    "src/oversiktsdata.py",
+    "src/hovedindeks.py",
+    "src/tallformat.py",
+)
+AVTRYKK_BAK_BILDET = "f6b5b7dea4b9d10f5f4b059a018d7422d615c14ab9dcda7e2821e7a079dbeb4a"
+SLIK_TAS_BILDET = (
+    "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
+    f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
+    "midlertidig mappe (lagring_sqlite.BASE_STI dit), OSE_DEMO=1, waitress på en "
+    "ledig port, og msedge --headless --disable-gpu --hide-scrollbars "
+    "--window-size=1280,1000 med egen --user-data-dir. Oppdater så "
+    "AVTRYKK_BAK_BILDET til {avtrykk} i samme commit."
+)
+
+
+def _avtrykk_bak_bildet() -> str:
+    """sha256 av stien og innholdet, med LF, for hver fil bak bildet.
+    Thumbs.db og .DS_Store fra Utforsker og Finder telles ikke."""
+    import hashlib
+
+    filer = list(MALENE_BAK_BILDET) + [
+        p.relative_to(ROT).as_posix()
+        for p in (ROT / "src" / "static").rglob("*")
+        if p.is_file() and p.name not in ("Thumbs.db", ".DS_Store")
+    ]
+    sum_ = hashlib.sha256()
+    for fil in sorted(filer):
+        sum_.update(fil.encode("utf-8") + b"\0" + (ROT / fil).read_bytes().replace(b"\r\n", b"\n") + b"\0")
+    return sum_.hexdigest()
+
+
+class TestSkjermbildet:
+    """3.3b, punkt b, tilbake i 3.3e: skjermbildet av oversikten i demoen,
+    under «Til faglærer», 1280 px bredt, med en alt-tekst som sier at det er
+    demoen. Regelen fra 25.09: bildet viser bare demoen."""
+
+    def _bildet(self) -> tuple[str, str]:
+        tekst = README.read_text(encoding="utf-8")
+        treff = [(a, s) for a, s in re.findall(r"!\[([^\]]*)\]\(([^)]+)\)", tekst) if s == SKJERMBILDET]
+        assert len(treff) == 1, treff
+        return treff[0]
+
+    def test_fila_finnes_og_er_1280_x_1000_px(self):
+        """Ville feilet med et bilde i en annen storrelse enn i 3.3b."""
+        data = (ROT / SKJERMBILDET).read_bytes()
+        assert data[:8] == b"\x89PNG\r\n\x1a\n"
+        assert int.from_bytes(data[16:20], "big") == 1280
+        assert int.from_bytes(data[20:24], "big") == 1000
+
+    def test_teksten_under_bildet_sier_at_det_er_demoen(self):
+        """Alt-teksten vises ikke naar bildet lastes (3.3b, BH6)."""
+        tekst = README.read_text(encoding="utf-8")
+        etter = tekst.split(SKJERMBILDET + ")\n", 1)[1].split("\n", 1)[0]
+        assert etter == "*Oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»).*"
+
+    def test_bildet_tas_paa_nytt_naar_oversikten_endres(self):
+        """Ville feilet hvis en mal, stilarket, en skrift, demodataene eller en
+        modul bak oversikten ble endret uten at bildet ble tatt paa nytt.
+        Feilmeldingen sier hvordan."""
+        avtrykk = _avtrykk_bak_bildet()
+        assert avtrykk == AVTRYKK_BAK_BILDET, SLIK_TAS_BILDET.format(avtrykk=avtrykk)
+
+    def test_alt_teksten_sier_at_det_er_demoen(self):
+        alt, _ = self._bildet()
+        assert "demoen" in alt and "Eksempeltall" in alt and "ikke data fra Oslo Børs" in alt
+
+    def test_bildet_staar_under_til_faglaerer_og_over_kom_i_gang(self):
+        tekst = README.read_text(encoding="utf-8")
+        assert tekst.index("Til faglærer:") < tekst.index(SKJERMBILDET) < tekst.index("\n## Kom i gang\n")
+
 
 def _python_krav() -> str:
     """Versjonen i requires-python i pyproject.toml, for eksempel «3.13»."""
@@ -847,7 +935,9 @@ class TestBildeneIDocs:
             for p in mappe.rglob("*")
             if p.is_file() and p.suffix.lower() in BILDEFILER
         )
-        assert filer == sorted(f"docs/bilder/readme/{navn}" for navn in BILDENE.values()), filer
+        # Story 3.3e: og bildet av oversikten i demoen.
+        ventet = [*(f"docs/bilder/readme/{navn}" for navn in BILDENE.values()), SKJERMBILDET]
+        assert filer == sorted(ventet), filer
 
 
 def _proevetabellen(proeve: str | None = None) -> str:
@@ -1525,10 +1615,14 @@ class TestReadmeForNybegynnere:
         avsnitt = [a.strip() for a in topp.split("\n\n") if a.strip()]
         # Gruppen 16.10 kl. 21:38: skjermbildet under «Til faglærer» er tatt
         # ut, så «Til faglærer» er igjen siste avsnitt før «Kom i gang».
-        assert avsnitt[-1].startswith("Til faglærer:"), avsnitt[-1]
+        # Story 3.3e (gruppens svar 18.10 kl. 00:20): bildet av oversikten
+        # står igjen rett under «Til faglærer», som i 3.3b.
+        assert avsnitt[-1].startswith("![Oversikten i demoen"), avsnitt[-1]
+        assert SKJERMBILDET in avsnitt[-1]
+        assert avsnitt[-2].startswith("Til faglærer:"), avsnitt[-2]
         # Story 3.3d, punkt f: «Innhold» står rett under beskrivelsen.
-        assert avsnitt[-2].startswith("**Innhold:** "), avsnitt[-2]
-        assert avsnitt[-3].startswith("OSE Signal viser"), avsnitt[-3]
+        assert avsnitt[-3].startswith("**Innhold:** "), avsnitt[-3]
+        assert avsnitt[-4].startswith("OSE Signal viser"), avsnitt[-4]
         assert "\n## " not in topp
 
     def test_status_uten_storynumre_og_uten_kommando(self):
@@ -1750,12 +1844,14 @@ class TestReadmeForNybegynnere:
             assert "`" not in re.sub(r"\[`[^`]+`\]\([^)]+\)", "", punkt), punkt
         lenker = re.findall(r"\[`([^`]+)`\]\(([^)]+)\)", del_)
         # Alle lenkene, ogsaa uten kodeformat, er de i kodeformat.
-        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 15, lenker
+        # Story 3.3e: 16 med bildet av oversikten.
+        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 16, lenker
         sporet = _git_sporet()
         for tekst, maal in lenker:
             # Maalet er stien i teksten, relativ og uten «..» (BH4, ECH3).
             # Bildene staar med filnavnet, som foer 3.3d, etter mappa de ligger i.
-            assert maal == tekst or (tekst in BILDENE.values() and maal == f"docs/bilder/readme/{tekst}"), (
+            filnavn = [*BILDENE.values(), SKJERMBILDET.rsplit("/", 1)[1]]
+            assert maal == tekst or (tekst in filnavn and maal == f"docs/bilder/readme/{tekst}"), (
                 tekst,
                 maal,
             )
