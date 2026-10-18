@@ -245,6 +245,49 @@ class TestCompose:
         assert "env_file" not in tjenester["ollama"] and "environment" not in tjenester["ollama"]
         assert "EODHD" not in "\n".join(_linjer(COMPOSE)).upper()
 
+    def test_porten_er_den_samme_overalt_og_ikke_5000(self):
+        """Story 3.2b (gruppens svar 18.10 kl. 17:40): AirPlay-mottakeren på
+        Mac bruker port 5000, så appen bruker 8000. Porten er den samme i
+        Dockerfile, compose.yaml (begge tjenestene, inne og ute), app.run i
+        src/app.py, CI og README-en. Ville feilet hvis 5000 sto igjen i en av
+        dem, eller to av dem sa forskjellige porter."""
+        dockerfile = (ROT / "Dockerfile").read_text(encoding="utf-8")
+        compose = COMPOSE.read_text(encoding="utf-8")
+        app_py = (ROT / "src" / "app.py").read_text(encoding="utf-8")
+        ci = CI.read_text(encoding="utf-8")
+        readme = README.read_text(encoding="utf-8")
+        porter = {
+            "EXPOSE": re.findall(r"^EXPOSE (\d+)$", dockerfile, re.MULTILINE),
+            "waitress": re.findall(r"--listen=0\.0\.0\.0:(\d+)", dockerfile),
+            "app.run": re.findall(r"app\.run\([^)]*port=(\d+)", app_py),
+        }
+        for tjeneste in ("app", "demo"):
+            for verdi in _verdier(_tjenester()[tjeneste]["ports"]):
+                treff = re.fullmatch(r"127\.0\.0\.1:(\d+):(\d+)", verdi)
+                assert treff, (tjeneste, verdi)
+                porter[f"compose {tjeneste}"] = list(treff.groups())
+        porter["CI"] = re.findall(r"http://127\.0\.0\.1:(\d+)", ci)
+        # Adressen til Ollama (STANDARD_URL i ki_lokal.py) er en annen tjeneste.
+        from ki_lokal import STANDARD_URL
+
+        ollama = STANDARD_URL.rsplit(":", 1)[1]
+        porter["README, adressene"] = [p for p in re.findall(r"http://127\.0\.0\.1:(\d+)", readme) if p != ollama]
+        assert f"http://127.0.0.1:{ollama}" in readme and ollama != "8000"
+        porter["README, Serving on"] = re.findall(r"Serving on http://0\.0\.0\.0:(\d+)", readme)
+        porter["compose, kommentarene"] = re.findall(r"http://127\.0\.0\.1:(\d+)", compose)
+        for sted, funnet in porter.items():
+            assert funnet, sted
+        alle = {p for funnet in porter.values() for p in funnet}
+        assert alle == {"8000"}, porter
+        for navn, tekst in (
+            ("Dockerfile", dockerfile),
+            ("compose.yaml", compose),
+            ("src/app.py", app_py),
+            ("CI", ci),
+            ("README.md", readme),
+        ):
+            assert "5000" not in tekst, navn
+
     def test_porten_er_bare_paa_maskinen(self):
         """Betingelsen fra EODHD 21.09: lokalt, ikke publisert. Ville feilet
         med "8000:8000", som binder til alle adresser."""
