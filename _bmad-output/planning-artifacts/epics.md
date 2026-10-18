@@ -525,6 +525,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-18 kl. 11:20 (gruppens svar):* spørsmålet kl. 00:39 bygde på en feil fra rådet. Bryteren for KI-teksten finnes alt på aksjesiden («Vis KI-teksten», FR-601), så briefens av/på-bryter er bygget, og 8.10 og 8.10b er ikke et løfte i briefen. De kommer etter 2.7, 10.5 og 10.7, og før 8.16 og 8.17, 10.6, 2.11 og 2.12. «Min liste» i briefen er story 8.3, som bygges i dag. 8.17 er periodevalget i oversikten, Min liste og børsometeret, og det nevner ikke briefen. En video av demoen, under 2 minutter og 5 MB, tas opp med nettlesertestene neste uke og lenkes fra README-en.
 
+*Avgjort 2026-10-18 kl. 17:40 (gruppens svar):* appen bruker port 8000 i stedet for 5000, fordi AirPlay på Mac bruker 5000, i en egen PR i kveld (story 3.2b); og PR #67 flettes etter at spørsmålene om «Engine running» og «Cannot connect to the Docker daemon» er slått sammen til ett, fordi grunnen er den samme.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -1998,6 +2000,8 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 *Lagt til 2026-10-18 kl. 15:41:* tre skjermbilder i «Kom i gang», demoen først og fire rettelser fra gjennomgangen 16.10, flettet i `fdaf403`, PR #66 (spesifikasjonen `spec-3-3c-kom-i-gang-bilder-og-demoen-foerst.md`), etter gruppens ja kl. 15:35. CI var grønn på head-en `87e4f8e` (kjøring 39132413724) og på main (39132517882). Svarene på spørsmålene kl. 15:12 står i instruksjonen kl. 15:37: lenkene i «Til faglærer» kommer i README-ryddingen, og ryddingen tar «Står du fast?» ned til fem spørsmål, med svarene om mellomrommet etter `cd` og «Cannot find path» blant dem. Grensen på 10 gjelder bare til ryddingen. Instruksjonen sier at dette følger av beslutningene 16.10 og av gruppens svar kl. 21:56 og 21:57. De to svarene er ikke ført i repoet. Dagsfila 16.10 og `epics.md` nevner svaret kl. 21:57 bare ved rekkefølgen (beslutningen kl. 21:16), og de sier ikke hvilke fem spørsmål ryddingen beholder.
 
 *Lagt til 2026-10-18 (instruksjonen kl. 17:04, story 3.3d):* README-ryddingen fra beslutningen 16.10 kl. 21:53–21:58 bygges i `spec-3-3d-readme-ryddingen.md`. Hvilke fem spørsmål «Står du fast?» beholder, er rådets forslag her, ikke avgjort 16.10: «Engine running», ZIP-fila som ser ut som en vanlig mappe, «is not recognized as the name of a cmdlet», «Cannot find path» og «no configuration file provided». «Status» får to lister, «Ferdig» og «Neste», i stedet for «Flettet til main» og «Neste:».
+
+*Avgjort 2026-10-18 kl. 17:40 (gruppens svar):* appen bruker port 8000 i stedet for 5000, fordi AirPlay på Mac bruker 5000, i en egen PR i kveld (story 3.2b); og PR #67 flettes etter at spørsmålene om «Engine running» og «Cannot connect to the Docker daemon» er slått sammen til ett, fordi grunnen er den samme.
 
 ### Story 3.4: Demoversjonen
 
