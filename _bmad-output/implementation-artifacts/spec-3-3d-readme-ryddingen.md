@@ -2,7 +2,7 @@
 title: 'Story 3.3d: README-en blir lettere å finne fram i'
 type: 'docs'
 created: '2026-10-18'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'f7c0eed'
@@ -55,6 +55,7 @@ context:
 - N8, `powershell-mappa.png` uten lenke (BH3): `test_mappestrukturen_lenker_til_stier_i_repoet`.
 - N9, `../G74-lund-osen/src/` som mål for `src/` (ECH3): `test_lenkene_virker` i klonen, som har et annet mappenavn, og `test_mappestrukturen_lenker_til_stier_i_repoet` alene med `-k`.
 - N10, «fra kl. 21 på børsdager» tatt ut av «Ferdig» (VG1): `test_status_uten_storynumre_og_uten_kommando`.
+- *Lagt til 2026-10-18 (gruppens svar kl. 17:40):* N11, «Cannot connect to the Docker daemon» tatt ut av det første spørsmålet, fanget på `db9ffaf` av `test_staar_du_fast_har_hoeyst_5_spoersmaal`, og av `test_det_foerste_spoersmaalet_er_at_docker_ikke_kjoerer` alene med `-k`.
 
 ## Gjennomgangen
 
@@ -85,3 +86,5 @@ Gjennomgang 18.10 på diffen `f7c0eed..ff2f540`. Linsene var Blind Hunter (BH, 1
 | ECH8 | Linja kl. 15:42 i vurderingsmatrisen sier at kopieringen står under «Står du fast?» | low | utsatt: en ny linje i vurderingsmatrisen når PR-en flettes |
 
 *Rettet 2026-10-18 (gruppens svar kl. 17:40, BH5):* raden BH5 er rettet. Det første spørsmålet under «Står du fast?» er nå ett spørsmål om at Docker ikke kjører: «Engine running» kommer ikke, eller det står «Cannot connect to the Docker daemon» eller «error during connect». Svaret har det som sto i begge, og de to står fortsatt hver for seg i `docs/hjelp.md`. Det er fortsatt fem spørsmål. Testen er `test_det_foerste_spoersmaalet_er_at_docker_ikke_kjoerer`. Spørsmålet om porten står bare i `docs/hjelp.md`, og appen får port 8000 i story 3.2b.
+
+*Lagt til 2026-10-18 kl. 18:01:* PR #67 er squash-flettet i `1be3a57`, låst til head-en `8ffa969`. Main var flettet inn i `8ffa969`, med en konflikt i `epics.md`: linja for 3.3d og linja kl. 17:40 sto begge under linja kl. 15:41. Begge står. Mens PR-en hadde konflikten, startet ikke CI for `db9ffaf`. CI var grønn på `ec96388` (39140683606), på `8ffa969` (39142845474) og på main (39142953539). Triagen står som kommentar i PR #67. ECH8 er rettet med linja i vurderingsmatrisen.
