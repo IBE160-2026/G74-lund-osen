@@ -10,6 +10,25 @@ sikkerhetsscore fra modellen. Fire punkter:
    «positiv» og «negativ» staar naturlig i en tekst om retningen Blandet, og
    «ingen» er et vanlig ord. «Trendens retning er positiv» handler om én
    sjekk, ikke signalet, og sjekkes ikke.
+   Story 10.2d: retningen leses ogsaa der teksten sier den om hele
+   signalet, i formene Gemma skriver: «signalet er Negativt», «signalet er
+   av typen Ingen», «Signalet for MOWI er positivt», «Dagens signal er
+   blandet», med opptil to fyll- eller gradsord («signalet er altsaa
+   positivt», «samlet sett», «klart»), i anfoerselstegn eller fet skrift
+   («Positivt», **Negativt**), med omvendt ordstilling («Samlet er signalet
+   positivt», «Derfor er retningen negativ»), «retningen paa signalet er
+   blandet», og «et positivt signal» naar subjektet er signalet eller
+   teksten begynner med «Dette er» eller «Det er». Andre steder kan «det er
+   et positivt signal» vise til én sjekk, og da sjekkes det ikke.
+   «Signalet er ingen» leses bare med «av typen» foran eller et skilletegn
+   eller «fordi» etter, saa «Signalet er ingen garanti» ikke er en retning.
+   Styrken leses ogsaa i «av styrke tre» og «av signalstyrke tre». Det som
+   gjelder én sjekk, sjekkes fortsatt ikke: «Trenden ga et positivt utslag»
+   eller «signal», «Trend-signalet», «Trendens bidrag til signalet er
+   positivt», «Signalet er positivt for trenden» og «Hver sjekk er av
+   styrke én». Det kjennes paa ordene trend, bevegelse, interesse, sjekk,
+   kurs, volum og utslag i de tre ordene foran, eller etter «for» eller
+   «paa» rett etter retningen.
 2. Tallene. Bare antall fra grunnlaget (styrken) og regelens faste tall er
    lov: tre sjekker, 50 i MA50, 20 dager i vinduene og 2 i terskelen. Tall
    skrevet med ord sjekkes ogsaa, som «femti», «femdagssnittet» og
@@ -98,6 +117,28 @@ _ENHETER = re.compile(
 )
 
 _UTFYLLING = r"(?:altså\s+|derfor\s+|samlet\s+|dermed\s+)?"
+
+# Story 10.2d: formene Gemma skriver om hele signalet.
+# Opptil to fyll- eller gradsord mellom verbet og retningen.
+_FYLLORD = (
+    r"(?:(?:altså|derfor|samlet(?:\s+sett)?|totalt(?:\s+sett)?|dermed|nå|i\s+dag|"
+    r"klart|tydelig|svakt|sterkt|overveiende)\s+){0,2}"
+)
+# Anfoerselstegn og markdown rundt retningen: «Ingen», "Negativt", **Positivt**.
+_MERKE = r"[«»\"'*_]*"
+# Ord etter retningen som sier at den gjelder én sjekk: «positivt for trenden».
+_EN_SJEKK_ETTER = r"(?!(?:t|e)?" + _MERKE + r"\s+(?:for|på|i|fra|hos)\s+(?:trend|beveg|interess|sjekk|kurs|volum))"
+_RETNINGSORD = r"(positiv|negativ|blandet)(?=(?:t|e)?" + _MERKE + r"(?![a-zæøå]))" + _EN_SJEKK_ETTER
+_INGEN = r"(ingen)(?=" + _MERKE + r"\s*(?:[,.;:!?]|$|fordi(?![a-zæøå])))"
+# Signalet som subjekt, ogsaa «Signalet for MOWI», «Signalet i dag» og
+# «Dagens signal», men ikke «Trend-signalet» eller «Signalet for trenden».
+_SIGNALET = (
+    r"(?:(?<![\w-])signalet(?:\s+(?:for|i)\s+(?!trend|beveg|interess|sjekk|dag)(?:aksjen\s+)?[\w.-]+"
+    r"(?:\s+[A-ZÆØÅ][\w.-]*)?|\s+i\s+dag)?|(?<![\w-])dagens\s+signal)"
+)
+# Inntil tre ord foran, i samme ledd, saa en sjekk foran kan kjennes igjen.
+_FORAN = r"((?:[\w-]+\s+){0,3})"
+
 _RETNING_UTSAGN = (
     re.compile(
         r"(?<![a-zæøå])((?:\w+\s+)?)retning(?:en)?\s+(?:er|var|blir|ble)\s+"
@@ -106,9 +147,55 @@ _RETNING_UTSAGN = (
         re.IGNORECASE,
     ),
     re.compile(r"(?<![a-zæøå])()()(positiv|negativ|blandet|ingen)\s+retning", re.IGNORECASE),
+    # Story 10.2d: «Dette signalet er Negativt», «signalet er av typen Ingen»,
+    # og «retningen på signalet er blandet», som leses som «signalet er».
+    re.compile(
+        _FORAN
+        + _SIGNALET
+        + r"\s+(?:er|var|blir|ble)[\s:]+"
+        + _FYLLORD
+        + r"(ikke\s+)?"
+        + _MERKE
+        + r"(?:av\s+typen\s+"
+        + _MERKE
+        + r"(positiv|negativ|blandet|ingen)|"
+        + _RETNINGSORD
+        + r"|"
+        + _INGEN
+        + r")",
+        re.IGNORECASE,
+    ),
+    # Omvendt ordstilling: «Samlet er signalet positivt», «Derfor er retningen negativ».
+    re.compile(
+        r"()(?<![\w-])(?:altså|derfor|samlet(?:\s+sett)?|totalt(?:\s+sett)?|dermed|nå|i\s+dag)\s+"
+        r"(?:er|var|blir|ble)\s+(?:signalet|retningen(?:\s+(?:på|til)\s+signalet)?)\s+"
+        + _FYLLORD
+        + r"(ikke\s+)?"
+        + _MERKE
+        + r"(?:"
+        + _RETNINGSORD
+        + r"|"
+        + _INGEN
+        + r")",
+        re.IGNORECASE,
+    ),
+    # «et positivt signal» om hele signalet: med signalet som subjekt, eller
+    # «Dette er» / «Det er» foerst i teksten. Ellers kan «det» vise til én sjekk.
+    re.compile(
+        r"()(?:\A\s*(?:dette|det)|(?<![\w-])signalet)\s+(?:er|var|blir|ble)\s+"
+        + _FYLLORD
+        + r"(ikke\s+)?et\s+(?:(?:svakt|sterkt|klart|tydelig)\s+)?"
+        + _MERKE
+        + r"(positiv|negativ|blandet)t?"
+        + _MERKE
+        + r"\s+signal(?![\w])(?!\s+(?:for|på|i|fra)\s+(?:trend|beveg|interess|sjekk|kurs|volum))",
+        re.IGNORECASE,
+    ),
 )
 # Et ord foran «retning» som sier at det gjelder én sjekk eller kursen.
 _ANNEN_RETNING = re.compile(r"^(trendens|bevegelsens|interessens|kursens|dagens|sjekkens)\s+$", re.IGNORECASE)
+# Story 10.2d: et ord i de tre ordene foran som sier at det gjelder én sjekk.
+_EN_SJEKK_FORAN = re.compile(r"(?<![a-zæøå])(?:trend|beveg|interess|sjekk|kurs|volum|utslag)", re.IGNORECASE)
 
 _STYRKE_UTSAGN = (
     re.compile(
@@ -118,6 +205,8 @@ _STYRKE_UTSAGN = (
         re.IGNORECASE,
     ),
     re.compile(r"(?<![a-zæøå])(\w+)\s+av\s+(?:de\s+)?(?:tre|3)\s+sjekk", re.IGNORECASE),
+    # Story 10.2d: «Dette signalet er av styrke tre», ikke «Hver sjekk er av styrke én».
+    re.compile(_FORAN + r"(?<![a-zæøå])av\s+(?:signal)?styrke\s+(\w+)", re.IGNORECASE),
     re.compile(
         r"(?<![a-zæøå])(?<!de )(\w+)\s+(?:av\s+)?(?:(?:de\s+)?(?:tre|3)\s+)?sjekk\w*\s+(?:ga|slo|gir|slår)\b",
         re.IGNORECASE,
@@ -236,16 +325,21 @@ def kontroller(tekst: str, grunnlag: Mapping[str, object]) -> Kontrollsvar:
     # 1. Retning og styrke, der teksten sier dem.
     for moenster in _RETNING_UTSAGN:
         for treff in moenster.finditer(tekst):
-            foran, ikke, verdi = treff.group(1), treff.group(2), treff.group(3).lower()
-            if foran and _ANNEN_RETNING.match(foran):
+            foran, ikke = treff.group(1), treff.group(2)
+            verdi = next(v for v in treff.groups()[2:] if v).lower()
+            if foran and (_ANNEN_RETNING.match(foran) or _EN_SJEKK_FORAN.search(foran)):
                 continue
             if (verdi == retning.lower()) == bool(ikke):
-                grunner.append(f"1: retningen «{treff.group(0).strip()}», regelen sier {retning}")
+                grunner.append(f"1: retningen «{treff.group(0)[len(foran) :].strip()}», regelen sier {retning}")
     for moenster in _STYRKE_UTSAGN:
         for treff in moenster.finditer(tekst):
-            tall = _styrketall(treff.group(1))
+            # Med foran-gruppen («av styrke N») er tallet den siste gruppen.
+            if moenster.groups == 2 and _EN_SJEKK_FORAN.search(treff.group(1)):
+                continue
+            tall = _styrketall(treff.group(moenster.groups))
             if tall is not None and tall != styrke:
-                grunner.append(f"1: styrken «{treff.group(0)}», regelen sier {styrke}")
+                start = len(treff.group(1)) if moenster.groups == 2 else 0
+                grunner.append(f"1: styrken «{treff.group(0)[start:]}», regelen sier {styrke}")
 
     # 2. Tallene.
     lovlige = FASTE_TALL | {styrke}
