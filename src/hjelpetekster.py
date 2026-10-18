@@ -142,9 +142,13 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
     tekster = {
         "selskap": Hjelpetekst(
             "",
-            "Klikk for å se sjekkene, tallene bak og kursgrafen.",
+            # Story 8.15b (gjennomgangen, ECH2): «?» står ved en lenke som
+            # sorterer, så teksten sier hva hvert klikk gjør.
+            "Klikk på et selskapsnavn i tabellen for å se sjekkene, tallene bak og kursgrafen. "
+            "Klikk på «Selskap» for å sortere A til Å, og en gang til for Å til A.",
             (
                 (INDEX_MAL, '<a href="/aksje/{{ rad.aksje.symbol }}">'),
+                (INDEX_MAL, 'sorterlenke("selskap", "Selskap")'),
                 (AKSJE_MAL, '<p class="maalt">Målt mot'),
                 (AKSJE_MAL, 'class="kurslinje"'),
             ),

@@ -3413,10 +3413,23 @@ class TestStory815bSelskapOgMarkeringen:
 
     @pytest.fixture
     def tabell(self, klient):
+        """Gjennomgangen (VG1): Aker BP står under «Øvrige aksjer» og først i
+        alfabetet, så en sortering på tvers av delene ville flyttet den."""
         _lagret("KOG", 1.0, 1, 1, 1)
         _lagret("DNB", -4.0, -1, -1, 0)
         _lagret("MOWI", 3.0, 1, 0, 0)
+        _lagret("AKRBP", 2.0, 1, 0, 0)
         return klient
+
+    @pytest.mark.parametrize(
+        "orden, ut, oevrige",
+        [("stigende", ["DNB", "KOG"], ["AKRBP", "MOWI"]), ("synkende", ["KOG", "DNB"], ["MOWI", "AKRBP"])],
+    )
+    def test_selskap_sorteres_innenfor_hver_del(self, tabell, orden, ut, oevrige):
+        """Tillegget 13.10. Ville feilet hvis Aker BP flyttet seg til «Skilte
+        seg ut» fordi den kommer først i alfabetet."""
+        html = tabell.get(f"/?sorter=selskap&orden={orden}").data.decode("utf-8")
+        assert _deler_i_rekkefoelge(html) == (ut, oevrige)
 
     @staticmethod
     def _thead(klient, adresse):
@@ -3432,15 +3445,22 @@ class TestStory815bSelskapOgMarkeringen:
         assert "Sortert på selskap, stigende (A til Å), innenfor hver del." in html
         _, thead = self._thead(tabell, "/")
         assert ", sorter stigende (A til Å)" in thead
+        # Gjennomgangen (VG7): og synkende.
+        html, thead = self._thead(tabell, "/?sorter=selskap&orden=synkende")
+        assert "Sortert på selskap, synkende (Å til A), innenfor hver del." in html
+        assert 'href="/?sorter=selskap&amp;orden=stigende"' in thead
 
+    @pytest.mark.parametrize("orden, aria", [("stigende", "ascending"), ("synkende", "descending")])
     @pytest.mark.parametrize("kolonne", ["selskap", "kurs", "endring", "signal", "retning"])
-    def test_bare_den_sorterte_kolonnen_har_aria_sort(self, tabell, kolonne):
-        """aria-sort som før, og markeringen følger den. Ville feilet hvis en
-        annen kolonne enn den sorterte hadde aria-sort."""
-        _, thead = self._thead(tabell, f"/?sorter={kolonne}&orden=stigende")
+    def test_bare_den_sorterte_kolonnen_har_aria_sort(self, tabell, kolonne, orden, aria):
+        """aria-sort som før, i begge retninger (gjennomgangen, BH5), og
+        markeringen følger den. Ville feilet hvis en annen kolonne enn den
+        sorterte hadde aria-sort, eller verdien ikke fulgte retningen."""
+        _, thead = self._thead(tabell, f"/?sorter={kolonne}&orden={orden}")
         celler = re.findall(r"<th[^>]*>.*?</th>", thead, re.S)
         merket = [c for c in celler if "aria-sort" in c.split(">", 1)[0]]
         assert len(merket) == 1 and f"sorter={kolonne}&amp;" in merket[0]
+        assert f'aria-sort="{aria}"' in merket[0]
 
     def test_uten_sortering_har_ingen_kolonne_markeringen(self, tabell):
         """Ville feilet hvis en kolonne var markert uten sortering."""
@@ -3457,4 +3477,10 @@ class TestStory815bSelskapOgMarkeringen:
         assert "box-shadow: inset 0 -3px 0 var(--oransje)" in regel
         alle = _regel(stil, "thead th")
         assert "stripe-kant" not in alle and "var(--oransje)" not in alle
-        assert stil.count("var(--stripe-kant)") == 1
+        # Gjennomgangen (BH3, ECH10): hver regel i kolonneraden som bruker
+        # feltet, gjelder bare th[aria-sort].
+        for velger in re.findall(r"([^{}]+)\{[^}]*var\(--stripe-kant\)", stil):
+            if "thead" in velger:
+                assert "th[aria-sort]" in velger, velger
+        # BH6, ECH3: en gjennomsiktig kant som synes med tvungne farger.
+        assert "outline: 3px solid transparent" in regel

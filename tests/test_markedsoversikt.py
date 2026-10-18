@@ -698,3 +698,21 @@ class TestSelskapSorteres:
         from markedsoversikt import neste_orden
 
         assert neste_orden("selskap", None) == "stigende"
+
+    def test_navnet_ikke_tickeren(self):
+        """Gjennomgangen av 8.15b (BH2): ticker og navn gir ulik rekkefølge
+        her. Ville feilet hvis Selskap ble sortert på tickeren."""
+        from markedsoversikt import Rad, Sortering, sorter
+
+        def rad(symbol, navn):
+            return Rad(
+                aksje=Aksje(symbol, f"{symbol}.OL", navn, "Energi"),
+                dato=IDAG,
+                sluttkurs=100.0,
+                endring_prosent=1.0,
+                tilstand=None,
+                tekst=IKKE_VURDERT,
+            )
+
+        inn = [rad("AAA", "Beta"), rad("ZZZ", "Alfa")]
+        assert [r.aksje.navn for r in sorter(inn, Sortering("selskap", "stigende"))] == ["Alfa", "Beta"]

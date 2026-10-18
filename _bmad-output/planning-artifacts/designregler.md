@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-10-19T00:03
+updated: 2026-10-19T00:11
 ---
 
 # Designregler
@@ -222,7 +222,7 @@ Ord kan endres rett i tavla. I appen samles hjelpetekstene i én fil (8.0b).
 
 *Lagt til 2026-10-15 (gruppens svar 4 og 5 på planen for story 8.15, instruksjonen kl. 14:01):* kolonnene som kan sorteres, har en vinkel ved navnet i kolonneraden: dempet i `#B9BDC5` når kolonnen ikke er valgt, og hvit når den er valgt. Når en kolonne er valgt, står en linje rett over tabellen, «Sortert på <kolonne>, synkende» eller «stigende», og lenken «Standard rekkefølge» til /. Uten valg står ingen linje.
 
-*Lagt til 2026-10-18 (story 8.15b, gruppens svar kl. 22:06):* kolonnen tabellen er sortert på, får i tillegg et lysere felt i `#3A3E47`, kanten i stripa, og en strek på 3 px nederst i sterk oransje `#F2B53A`, som på designtavla. Uten sortering har ingen kolonne det. Hvit tekst har 10,71:1 mot feltet, `#B9BDC5` 5,69:1 og streken 5,84:1. **Hvorfor:** tavla har sorteringsmerket, og fargen på vinkelen alene skilte den sorterte kolonnen for lite fra de andre.
+*Lagt til 2026-10-18 (story 8.15b, gruppens svar kl. 22:06):* kolonnen tabellen er sortert på, får i tillegg et lysere felt i `#3A3E47`, kanten i stripa, og en strek på 3 px nederst i sterk oransje `#F2B53A`, som på designtavla. Uten sortering har ingen kolonne det. Hvit tekst har 10,71:1 mot feltet, `#B9BDC5` 5,69:1 og streken 5,84:1. Streken står på feltet og ikke på blekk, som et unntak fra «bare på blekk» for `#F2B53A` over, og feltet har 1,66:1 mot blekk, fordi streken og `aria-sort` bærer markeringen (gjennomgangen av 8.15b, VG4). **Hvorfor:** tavla har sorteringsmerket, og fargen på vinkelen alene skilte den sorterte kolonnen for lite fra de andre.
 
 *Lagt til 2026-10-15 (gruppens svar 8 og 9 på funnene i PR #43 for story 8.15, instruksjonen kl. 15:25):* linja over tabellen og teksten for skjermleseren i kolonneraden sier det samme. For Retning står «stigende (A til Å)» eller «synkende (Å til A)». Linja slutter med «innenfor hver del», for eksempel «Sortert på endring, synkende, innenfor hver del.»
 
