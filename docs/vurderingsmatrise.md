@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-10-17T22:59
+updated: 2026-10-18T12:10
 ---
 
 # Vurderingsmatrise for del 1
@@ -75,3 +75,5 @@ Statusen i tabellen er ikke endret. README-prøven (story 3.4) og avsnittet «St
 *Lagt til 2026-10-17 kl. 19:56:* hovedindeksen (story 2.9, FR-104): «Hovedindeksen» står over tabellen på forsiden, med symbolet, verdien, endringen mot forrige børsdag og «x av N gikk bedre enn indeksen», også i demoen med DEMIX. Flettet i `b44284f`, PR #59. Søylene (FR-105, story 2.9b) kommer i PR 4. Statusen i tabellen er ikke endret.
 
 *Lagt til 2026-10-17 kl. 22:59:* raden «Kvalitetssikring og testing»: [kvalitetssikringen](kvalitetssikring.md) er oppdatert og flettet i `eca81b4`, PR #61 (story 9.1). Tallene er talt på nytt (2383 tester på `3699a16`, og 2393 med den nye testfila), §3 og §5 har en rad for hver spesifikasjon fra 2.2 til 10.3, §6 har Rettet-linjer og nye hull, og §11–§13 er nye: feil vi fant og rettet, feilhåndtering og hemmeligheter, og manuelle tester. `tests/test_kvalitetssikring.py` holder radene og testnavnene i kvalitetssikringen og i denne matrisen. Statusen i tabellen er ikke endret.
+
+*Lagt til 2026-10-18 kl. 12:10:* raden «Ryddighet i repoet»: kopien `.agents/skills/` av BMAD-skillene, 242 filer, er tatt bort, manifestet har bare `claude-code`, «Mappestruktur» i README-en nevner bare `_bmad/` og `.claude/skills/`, `.gitignore` er uten delen for Next.js, og `.env.example` sier tre variabler og 16 av de 20 kallene. Flettet i `b5395e9`, PR #65 (story 9.8). [`test_ryddighet.py`](../tests/test_ryddighet.py) har åtte nye tester, blant dem `test_det_finnes_ingen_agents_i_rotmappa`, `test_ingen_fil_under_agents_er_sporet` og `test_manifestet_har_bare_claude_code`. Statusen i tabellen er ikke endret.
