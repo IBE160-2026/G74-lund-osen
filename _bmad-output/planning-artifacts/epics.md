@@ -517,6 +517,10 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-17 kl. 22:38, 22:41 og 22:42 (gruppens svar):* fire ting kommer inn: linter og formatterer i CI (story 9.7), tester i ekte nettleser, UX-gjennomgangen (8.2) med bilder av designarbeidet, og tabellen på smal skjerm. Søylene (2.9b) bygges før KI-tekstene i demoen (3.4b), og det erstatter rekkefølgen mellom de to i linja over fra kl. 22:06. Hovedindeksen blir en stiplet linje i kursgrafen på aksjesiden, som story 2.9c etter 2.9b. I natt bygges 9.7, 2.9b og 2.9c i den rekkefølgen, én PR hver.
 
+*Avgjort 2026-10-18 kl. 00:39 (gruppens svar):* etter søndagens arbeid kommer først det briefen v8 lover i v1: historikken (2.7), bryteren for KI-teksten på siden (8.10 og 8.10b), lenken til selskapets egen nettside (10.5) og egne nøkler (10.7). 8.16 og 8.17, 10.6, 2.11 og 2.12 kommer etter, siden briefen ikke nevner dem. Promptene fra 15.–23.09 føres inn denne uka som dagsfiler, merket som satt sammen i etterkant fra samtalene, uten nøkler, kurser eller andre navn enn medlemmene.
+
+*Avgjort 2026-10-18 kl. 11:20 (gruppens svar):* spørsmålet kl. 00:39 bygde på en feil fra rådet. Bryteren for KI-teksten finnes alt på aksjesiden («Vis KI-teksten», FR-601), så briefens av/på-bryter er bygget, og 8.10 og 8.10b er ikke et løfte i briefen. De kommer etter 2.7, 10.5 og 10.7, og før 8.16 og 8.17, 10.6, 2.11 og 2.12. «Min liste» i briefen er story 8.3, som bygges i dag. 8.17 er periodevalget i oversikten, Min liste og børsometeret, og det nevner ikke briefen. En video av demoen, under 2 minutter og 5 MB, tas opp med nettlesertestene neste uke og lenkes fra README-en.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
