@@ -278,9 +278,15 @@
 
       <figcaption>
         {{ graf.forste_dato|dato }} til {{ graf.siste_dato|dato }}.
+        {#- Story 2.9c (gjennomgangen, BH3): tre linjer når indeksen er med. #}
+        {% if graf.har_indeks %}
+        Kursen og snittet er tegnet på utbyttejustert kurs, og indeksen er regnet
+        om til samme skala.
+        {% else %}
         Begge linjene er tegnet på utbyttejustert kurs, så de ligger på samme
-        skala. Sjekk 2 og 3 tegnes ikke — de står i kortene over.
-        {#- Story 2.9c #}
+        skala.
+        {% endif %}
+        Sjekk 2 og 3 tegnes ikke — de står i kortene over.
         {% if graf.har_indeks %}
         <span class="indeksforklaring">Den stiplede linja er hovedindeksen {{ indeks_symbol }}, regnet om så den starter på aksjens kurs {{ graf.indeksstart|dato }}. Ligger aksjens linje over den stiplede, har aksjen gått bedre enn indeksen fra startdagen til den dagen.</span>
         {% elif indeks_feilet %}

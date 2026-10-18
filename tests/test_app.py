@@ -2954,6 +2954,9 @@ class TestIndekslinjaPaaAksjesiden:
             "Ligger aksjens linje over den stiplede, har aksjen gått bedre enn indeksen fra startdagen til den dagen."
             in tekst
         )
+        # Gjennomgangen (BH3, VG7): tre linjer, ikke «Begge linjene».
+        assert "Begge linjene" not in tekst
+        assert "Kursen og snittet er tegnet på utbyttejustert kurs, og indeksen er regnet om til samme skala." in tekst
         etikett = re.search(r'<svg class="graf"[^>]*aria-label="([^"]*)"', html).group(1)
         assert f"Den stiplede er hovedindeksen OSEBX, regnet om så den starter på aksjens kurs {start}" in etikett
         for ord_ in ("kjøp", "selg", "bør"):

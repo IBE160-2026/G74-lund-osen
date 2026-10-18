@@ -349,7 +349,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "Kursgrafen:",
             f"den tykke linja er utbyttejustert kurs, og den tynne er "
             f"snittet av de siste {ma} børsdagene, som trendsjekken måler mot. "
-            f"Navnet står ved enden av hver linje. Sjekk 2 og 3 står i kortene over.",
+            f"Navnet står ved enden av kurslinja og snittet. Sjekk 2 og 3 står i kortene over.",
             ((AKSJE_MAL, "Sjekk 2 og 3 tegnes ikke"), (AKSJEDETALJ, "glidende_snitt(kurser, p.ma_vindu)")),
         ),
         # Story 2.9c: hovedindeksen som stiplet linje i kursgrafen.
