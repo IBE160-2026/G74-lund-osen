@@ -1512,6 +1512,12 @@ class TestReadmeForNybegynnere:
             # 2.9b og 2.9c (instruksjonen 18.10 kl. 17:04).
             "søylene",
             "stiplet linje i kursgrafen",
+            # Gjennomgangen, VG1: resten av det som er flettet.
+            "fra kl. 21 på børsdager",
+            "bilder i «kom i gang» og demoen først",
+            "ruff",
+            "den oppdaterte kvalitetssikringen",
+            "uten kopien av bmad-skillene",
         ):
             assert sak in ferdig, sak
         assert "resten av KI-laget" not in status and "Selve teksten lages ikke ennå" not in status
