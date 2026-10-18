@@ -2166,6 +2166,9 @@ class TestStory815Sortering:
             ("/?sorter=signal&orden=stigende", ["DNB", "EQNR", "KOG"], ["MOWI", "NHY"]),
             ("/?sorter=retning&orden=stigende", ["EQNR", "DNB", "KOG"], ["MOWI", "NHY"]),
             ("/?sorter=retning&orden=synkende", ["KOG", "DNB", "EQNR"], ["MOWI", "NHY"]),
+            # Story 8.15b: Selskap, A til Å og Å til A, innenfor hver del.
+            ("/?sorter=selskap&orden=stigende", ["DNB", "EQNR", "KOG"], ["MOWI", "NHY"]),
+            ("/?sorter=selskap&orden=synkende", ["KOG", "EQNR", "DNB"], ["NHY", "MOWI"]),
         ],
     )
     def test_hver_del_sorteres_for_seg(self, tabell, adresse, ut, oevrige):
@@ -3403,3 +3406,55 @@ class TestPeriodeneIKursgrafen:
         for periode, tekst in (("1-uke", "1 uke"), ("1-mnd", "1 måned"), ("i-aar", "i år"), ("1-aar", "1 år")):
             html = klient.get(f"/aksje/EQNR?periode={periode}").data.decode("utf-8")
             assert f"<h2>Kursutvikling, {tekst} " in html, periode
+
+
+class TestStory815bSelskapOgMarkeringen:
+    """Story 8.15b: Selskap sorteres, og den sorterte kolonnen er markert."""
+
+    @pytest.fixture
+    def tabell(self, klient):
+        _lagret("KOG", 1.0, 1, 1, 1)
+        _lagret("DNB", -4.0, -1, -1, 0)
+        _lagret("MOWI", 3.0, 1, 0, 0)
+        return klient
+
+    @staticmethod
+    def _thead(klient, adresse):
+        html = klient.get(adresse).data.decode("utf-8")
+        return html, html.split("<thead>", 1)[1].split("</thead>", 1)[0]
+
+    def test_et_nytt_klikk_snur_og_teksten_sier_a_til_aa(self, tabell):
+        """Ville feilet hvis lenken på Selskap ikke snudde, eller linja og
+        teksten for skjermleseren ikke sa «(A til Å)» som for Retning."""
+        html, thead = self._thead(tabell, "/?sorter=selskap&orden=stigende")
+        assert 'href="/?sorter=selskap&amp;orden=synkende"' in thead
+        assert ", sortert stigende (A til Å). Velg for synkende (Å til A)." in thead
+        assert "Sortert på selskap, stigende (A til Å), innenfor hver del." in html
+        _, thead = self._thead(tabell, "/")
+        assert ", sorter stigende (A til Å)" in thead
+
+    @pytest.mark.parametrize("kolonne", ["selskap", "kurs", "endring", "signal", "retning"])
+    def test_bare_den_sorterte_kolonnen_har_aria_sort(self, tabell, kolonne):
+        """aria-sort som før, og markeringen følger den. Ville feilet hvis en
+        annen kolonne enn den sorterte hadde aria-sort."""
+        _, thead = self._thead(tabell, f"/?sorter={kolonne}&orden=stigende")
+        celler = re.findall(r"<th[^>]*>.*?</th>", thead, re.S)
+        merket = [c for c in celler if "aria-sort" in c.split(">", 1)[0]]
+        assert len(merket) == 1 and f"sorter={kolonne}&amp;" in merket[0]
+
+    def test_uten_sortering_har_ingen_kolonne_markeringen(self, tabell):
+        """Ville feilet hvis en kolonne var markert uten sortering."""
+        _, thead = self._thead(tabell, "/")
+        assert "aria-sort" not in thead
+
+    def test_markeringen_staar_bare_paa_den_sorterte_kolonnen(self, tabell):
+        """Designtavla: et lysere felt og en oransje strek under. Ville feilet
+        hvis markeringen sto på alle kolonnene, ikke bare den med aria-sort."""
+        html, _ = self._thead(tabell, "/")
+        stil = _stil(html)
+        regel = _regel(stil, ".tabellboks thead th[aria-sort]")
+        assert "background: var(--stripe-kant)" in regel
+        assert "box-shadow: inset 0 -3px 0 var(--oransje)" in regel
+        alle = _regel(stil, "thead th")
+        assert "stripe-kant" not in alle and "var(--oransje)" not in alle
+        assert stil.count("var(--stripe-kant)") == 1
