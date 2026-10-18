@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-18T18:01
+updated: 2026-10-18T18:08
 ---
 
 # Kvalitetssikring
@@ -744,20 +744,20 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
 | 3 | Steg 3: åpne «Windows PowerShell», ikke «Windows PowerShell ISE» (Windows), eller Terminal (Mac) | | |
 | 4 | Steg 4: `cd`, mellomrom, og den innerste mappa dratt inn i vinduet. Fikk en sti med mellomrom anførselstegn? Hadde mappa et annet navn, ble mappa der README og compose ligger, dratt inn? | | |
 | 5 | Demoen, steg 5: `docker compose up --build demo`, kopiert med knappen i boksen, til linja med «Serving on» kommer. Hvor lang tid tok det, og kom det en linje med valg under? | | |
-| 6 | Demoen, steg 6: åpne http://127.0.0.1:5000. Står «Eksempeltall» på siden? | | |
+| 6 | Demoen, steg 6: åpne http://127.0.0.1:8000. Står «Eksempeltall» på siden? | | |
 | 7 | En aksje i demoen åpnes fra oversikten | | |
 | 8 | `docker compose run --rm demo-lag`, i et nytt vindu mens demoen kjører | | |
 | 9 | Demoen, steg 7: `Ctrl+C` i vinduet med demoen, så `docker compose --profile demo down`. Stod det «Removed»? | | |
 | 10 | Den ekte versjonen, steg 5: nøkkelen hos EODHD. Hoppes over i prøven, som gjøres uten nøkkel | | |
 | 11 | Den ekte versjonen, steg 6: `cp .env.example .env`, så `notepad .env` (Windows) eller `open -e .env` (Mac), uten å fylle inn nøkkelen | | |
-| 12 | Den ekte versjonen, steg 7: `docker compose up --build` og http://127.0.0.1:5000. Var oversikten tom, med kommandoen som henter? | | |
+| 12 | Den ekte versjonen, steg 7: `docker compose up --build` og http://127.0.0.1:8000. Var oversikten tom, med kommandoen som henter? | | |
 | 13 | Den ekte versjonen, steg 8: `docker compose run --rm hent`, uten nøkkel | | |
 | 14 | Siden lastet på nytt | | |
 | 15 | Den ekte versjonen, steg 9: `docker compose down`. Stod det «Removed»? | | |
 | 16 | Byttet, fra den ekte versjonen til demoen og tilbake: `docker compose up --build`, så `docker compose down` og `docker compose up --build demo`, så `docker compose --profile demo down` og `docker compose up --build` igjen | | |
 | 17 | uv: `uv sync` | | |
 | 18 | `uv run python src/demo.py` | | |
-| 19 | `uv run python src/app.py --demo` og http://127.0.0.1:5000 | | |
+| 19 | `uv run python src/app.py --demo` og http://127.0.0.1:8000 | | |
 | 20 | `uv run python src/fetch_prices.py`, uten nøkkel | | |
 | 21 | `uv run python src/app.py` | | |
 | 22 | `docker ps -a` til slutt: står det containere igjen fra prøven? | | |
@@ -772,6 +772,8 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
 *Rettet 2026-10-18 (story 3.3c):* tabellen følger «Kom i gang» med demoen før den ekte versjonen (gruppen 16.10 kl. 21:16, svarene kl. 21:25). Radene for demoen, som var 11–15, er nå 5–9, og radene for den ekte versjonen, som var 5–10, er nå 10–15. Teksten i radene er den samme. Kolonnen «Tid» er ny: hvor lang tid hvert steg tok, i minutter.
 
 *Rettet 2026-10-18 (gjennomgangen av 3.3c, BH7 og BH8):* rad 16 er skrevet om etter den nye rekkefølgen. Før sto det «Byttet: `docker compose --profile demo down`, så `docker compose up --build`, så det samme tilbake til `docker compose up --build demo`», som begynte med å stoppe demoen, men nå er den ekte versjonen den siste som kjørte (rad 15). Kolonnen heter «Tid (min)», så enheten står i tabellen.
+
+*Rettet 2026-10-18 (story 3.2b):* appen bruker port 8000 fra 18.10, etter gruppens svar kl. 17:40, fordi AirPlay-mottakeren på Mac bruker 5000. Rad 6, 12 og 19 i Prøve 1 og rad 3 i Prøve 2 sa http://127.0.0.1:5000, og sier nå http://127.0.0.1:8000.
 
 - **Det som ikke stemte:**
 - **Rettet i** (commit eller story):
@@ -802,7 +804,7 @@ hentingen kan gi kurser, se «Når kan jeg hente?» i
 |---|---|---|
 | 1 | Den ekte versjonen, steg 5: lag en gratis bruker hos EODHD og kopier API-nøkkelen. Ba registreringen om kort eller betaling? | |
 | 2 | Den ekte versjonen, steg 6: `cp .env.example .env`, så `notepad .env` (Windows) eller `open -e .env` (Mac), og lim inn nøkkelen etter `EODHD_API_KEY=` | |
-| 3 | Den ekte versjonen, steg 7: `docker compose up --build` og http://127.0.0.1:5000. Var oversikten tom, med kommandoen som henter? | |
+| 3 | Den ekte versjonen, steg 7: `docker compose up --build` og http://127.0.0.1:8000. Var oversikten tom, med kommandoen som henter? | |
 | 4 | Den ekte versjonen, steg 8: `docker compose run --rm hent` i et nytt vindu, etter kl. 22 på en børsdag. Sa utskriften hvilken børsdag vurderingene gjelder? (Prøve 1 tar ikke denne sjekken) | |
 | 5 | Siden lastet på nytt: ble oversikten fylt med aksjene, signalstyrken og retningen? (Prøve 1 tar ikke denne sjekken) | |
 | 6 | En aksje åpnes fra oversikten | |

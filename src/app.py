@@ -569,4 +569,4 @@ if __name__ == "__main__":
     # Story 3.4: --demo setter bryteren, saa kommandoen er lik i PowerShell
     # og i bash.
     les_flagg(sys.argv[1:])
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=8000)

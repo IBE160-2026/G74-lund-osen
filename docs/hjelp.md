@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-18T15:04
+updated: 2026-10-18T18:59
 ---
 
 # Hjelp til «Kom i gang»
@@ -114,10 +114,10 @@ Svar OK. Ellers får ikke Terminal åpne mappa.
 Første gang bygger Docker appen, og det kommer mange linjer. Demoen er klar når denne linja kommer. Den skal du ikke kopiere, bare se etter:
 
 ```text
-demo-1  | INFO:waitress:Serving on http://0.0.0.0:5000
+demo-1  | INFO:waitress:Serving on http://0.0.0.0:8000
 ```
 
-Under den kan det komme en linje med valg fra Docker. La terminalvinduet stå åpent mens du bruker demoen. `0.0.0.0` er adressen inne i Docker, og du åpner http://127.0.0.1:5000 i steg 6 i demoen. «Serving on http://0.0.0.0:5000» betyr bare at appen kjører.
+Under den kan det komme en linje med valg fra Docker. La terminalvinduet stå åpent mens du bruker demoen. `0.0.0.0` er adressen inne i Docker, og du åpner http://127.0.0.1:8000 i steg 6 i demoen. «Serving on http://0.0.0.0:8000» betyr bare at appen kjører.
 
 ### Hva er demoen?
 
@@ -153,7 +153,7 @@ Nei. Porten er bare åpen på maskinen selv (127.0.0.1). Appen kan ikke nås fra
 
 ### Siden åpnes ikke.
 
-Vent til linja med «Serving on» har kommet, og sjekk at terminalvinduet fortsatt er åpent. Adressen er http://127.0.0.1:5000, ikke 0.0.0.0.
+Vent til linja med «Serving on» har kommet, og sjekk at terminalvinduet fortsatt er åpent. Adressen er http://127.0.0.1:8000, ikke 0.0.0.0.
 
 ### «docker» er ikke gjenkjent, eller «command not found: docker».
 
@@ -177,7 +177,9 @@ Docker Hub begrenser hvor ofte samme IP-adresse kan laste ned uten innlogging. P
 
 ### «port is already allocated», «address already in use» eller «ports are not available».
 
-Noe annet bruker port 5000. Kjører den andre versjonen, stopper du den først (se «Bytte mellom demoen og den ekte versjonen» under «Mer for den som vil»). På Mac bruker AirPlay-mottakeren (AirPlay Receiver) port 5000. Slå den av under Systeminnstillinger (System Settings) → Generelt (General) → AirDrop og Handoff (AirDrop & Handoff), og prøv igjen. «Mer for den som vil» står i [README-en](../README.md).
+Noe annet bruker port 8000. Kjører den andre versjonen, stopper du den først (se «Bytte mellom demoen og den ekte versjonen» under «Mer for den som vil»). «Mer for den som vil» står i [README-en](../README.md).
+
+*Rettet 2026-10-18 (story 3.2b):* appen bruker port 8000 fra 18.10, etter gruppens svar kl. 17:40. AirPlay-mottakeren bruker 5000 og er ikke i veien lenger, så setningen om AirPlay er tatt ut av svaret over (gruppens svar kl. 18:58). Før sto det: «På Mac bruker AirPlay-mottakeren (AirPlay Receiver) port 5000. Slå den av under Systeminnstillinger (System Settings) → Generelt (General) → AirDrop og Handoff (AirDrop & Handoff), og prøv igjen.»
 
 ## Stopp
 
