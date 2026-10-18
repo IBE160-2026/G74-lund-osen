@@ -525,12 +525,6 @@ class TestFormeneGemmaSkriver:
     """Story 10.2d (gruppens svar 18.10 kl. 21:03): kontrollen leser retningen
     og styrken i formene Gemma skriver. Hullet ble funnet med mutant K2 i 3.4b."""
 
-    @pytest.mark.xfail(
-        strict=True,
-        raises=AssertionError,
-        reason="10.2d punkt a: kontrollen leser ikke «Dette signalet er X» eller «av typen X», "
-        "så 12 av de 13 slipper gjennom på main. Tas bort med kontrollen i punkt b.",
-    )
     def test_feil_retning_i_demotekstene_stoppes(self):
         """Ville feilet hvis en av de 13 tekstene i demoen, med retningen den
         foerst sier byttet til en feil, besto kontrollen."""
