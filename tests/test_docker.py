@@ -803,6 +803,20 @@ def _detaljer(tekst: str) -> dict[str, str]:
     return dict(re.findall(r"<details>\n<summary>(.+?)</summary>\n\n(.*?)\n\n</details>", tekst, re.DOTALL))
 
 
+def _statuslister(status: str) -> dict[str, list[str]]:
+    """Listene i «Status» som {navn: punkter}, story 3.3d. En liste er en
+    linje i fet skrift alene, en tom linje, og så linjer som begynner med
+    «- », til neste tomme linje. Et punkt over flere linjer, eller noe annet
+    enn punkter mellom overskriften og den tomme linja, faar testen til aa
+    feile."""
+    lister = {}
+    for navn, kropp in re.findall(r"^\*\*([^*\n]+)\*\*\n\n((?:.+\n?)+)", status, re.MULTILINE):
+        linjer = kropp.rstrip("\n").split("\n")
+        assert all(l.startswith("- ") for l in linjer), (navn, linjer)
+        lister[navn] = [l[2:] for l in linjer]
+    return lister
+
+
 def _faq() -> str:
     return _seksjon("Står du fast?")
 
@@ -1310,7 +1324,6 @@ class TestReadmeForNybegynnere:
         assert not re.search(r"docker[ -]compose|uv run", status, re.IGNORECASE)
         for innhold in (
             "Under arbeid",
-            "Flettet til main:",
             "hentingen",
             "Docker",
             "demoen",
@@ -1325,59 +1338,73 @@ class TestReadmeForNybegynnere:
             "aksjesiden viser bare tekster som besto kontrollen",
             "](_bmad-output/implementation-artifacts/sprint-status.yaml)",
         ):
-            assert innhold in status, innhold
+            # Story 3.3d: punktene i listene begynner med stor bokstav.
+            assert innhold.lower() in status.lower(), innhold
+        # Story 3.3d (beslutningen 16.10 kl. 21:53-21:58): to lister, «Ferdig»
+        # og «Neste», med ett punkt per linje og hoeyst 8 punkter hver. Het
+        # «Flettet til main:» og «Neste:» i ett avsnitt til 3.3d.
         # Gjennomgangen av flettingen 12.10 (VG): hver sak staar i riktig liste.
-        # Ville feilet hvis noe som ikke er flettet, sto under «Flettet til
-        # main», slik grenen 8-0b sa om 2.3b.
-        flettet, neste = status.split("Flettet til main:", 1)[1].split("Neste:", 1)
-        neste = neste.split("Det som bygges etter demoen", 1)[0]
+        # Ville feilet hvis noe som ikke er flettet, sto under «Ferdig», slik
+        # grenen 8-0b sa om 2.3b.
+        assert "Flettet til main" not in status
+        lister = _statuslister(status)
+        assert list(lister) == ["Ferdig", "Neste"], list(lister)
+        for navn, punkter in lister.items():
+            assert 1 <= len(punkter) <= 8, (navn, len(punkter))
+        ferdig = "\n".join(lister["Ferdig"]).lower()
+        neste_punkter = lister["Neste"]
+        neste = "\n".join(neste_punkter).lower()
         for sak in (
             "hentingen",
             "kallene som er igjen",
-            "Docker",
+            "docker",
             "demoen",
-            "README-en",
+            "readme-en",
             "hjelp bak «?»",
             "tydeligere merking",
             "datoene og månedsmerkene i grafen",
             "oversikten fra designforslaget",
             "utseendet fra designforslaget",
             "sortering ved klikk i kolonneraden",
-            "den første delen av KI-laget",
+            "den første delen av ki-laget",
             "en bryter som slår den av og på",
             "at hentingen lager teksten med en lokal modell",
             "at hovedindeksen hentes i samme kjøring",
             "vises over tabellen på forsiden",
+            # 2.9b og 2.9c (instruksjonen 18.10 kl. 17:04).
+            "søylene",
+            "stiplet linje i kursgrafen",
         ):
-            assert sak in flettet, sak
-        # Story 8.0d, PR 3 (svar 9 kl. 22:50): «Neste:» følger rekkefølgen
-        # etter 8.0d (gruppen 14.10 kl. 22:19 og 22:25).
-        # Story 8.15: sorteringen er flyttet til «Flettet til main».
-        # 3.3b, punkt a: resten av KI-laget først (svar 10 15.10 kl. 14:47),
-        # så rekkefølgen fra 14.10.
-        # PR #49 flettet 16.10: teksten fra hentingen er flyttet til «Flettet
-        # til main», og «Neste:» begynner med hovedindeksen.
-        # Story 2.8, PR 2: at indeksen hentes, er flettet, og visningen
-        # («hovedindeksen på forsiden») står først under «Neste:».
-        # Story 2.9: visningen er flettet, og «Neste:» begynner med Min liste.
+            assert sak in ferdig, sak
         assert "resten av KI-laget" not in status and "Selve teksten lages ikke ennå" not in status
+        # «Neste» foelger rekkefoelgen under «Prioritering» i epics.md etter
+        # svarene 18.10 kl. 00:39 og 11:20, med KI-tekstene i demoen og Min
+        # liste foerst. Ett punkt per sak, i den rekkefoelgen.
         saker = (
-            "Min liste",
-            "innstillingene",
-            "periodene i kursgrafen",
+            "ki-tekstene i demoen",
+            "min liste",
             "historikken og signaldagene",
-            "«Vis KI-tekst» i innstillingene",
-            "KI-teksten om dagen",
+            "selskapets side på newsweb",
+            "egen nøkkel",
+            "«vis ki-tekst»",
+            "periodene i kursgrafen",
             "velge og bytte aksjer",
         )
-        for sak in saker:
-            assert sak in neste and sak not in flettet, sak
-        # Gjennomgangen (VG7): i den rekkefølgen, og det flettede står ikke i «Neste».
-        assert [neste.index(s) for s in saker] == sorted(neste.index(s) for s in saker)
-        assert "utseendet fra designforslaget" not in neste
-        # Story 2.9: hovedindeksen står ikke lenger under «Neste:».
-        assert "hovedindeksen" not in neste
-        assert "sortering ved klikk i kolonneraden" not in neste
+        assert len(neste_punkter) == len(saker), neste_punkter
+        for punkt, sak in zip(neste_punkter, saker):
+            assert sak in punkt.lower(), (sak, punkt)
+            assert sak not in ferdig, sak
+        for sak in ("utseendet fra designforslaget", "hovedindeksen", "sortering ved klikk i kolonneraden", "søylene"):
+            assert sak not in neste, sak
+        # Setningene om begge versjonene, boersmeldingene og detaljene staar
+        # under listene.
+        etter = status.split("**Neste**", 1)[1].split("\n\n", 2)[2]
+        for setning in (
+            "Det som bygges etter demoen, skal vises i begge versjonene.",
+            "Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B).",
+            "Detaljene står i [sprintstatusen](",
+        ):
+            assert setning in etter, setning
 
     def test_lenken_til_staar_du_fast_sier_lenger_ned(self):
         """Kl. 23:46: «se «Står du fast?» lenger ned»."""

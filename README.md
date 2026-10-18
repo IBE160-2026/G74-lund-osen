@@ -301,7 +301,31 @@ Modellen ble prøvd på en maskin med 15,7 GB minne og et grafikkort med 8 GB, d
 
 ## Status
 
-Under arbeid, og ingenting er endelig. Flettet til main: hentingen av kurser med kontroll av børsdagen, at hovedindeksen hentes i samme kjøring og vises over tabellen på forsiden, nye forsøk med kallene som er igjen etter hentingen, Docker, demoen, som viser alle 10 fargekombinasjonene av de tre sjekkene på siste dag, denne README-en, hjelp bak «?» på sidene, tydeligere merking i tabellene, datoene og månedsmerkene i grafen, oversikten fra designforslaget, utseendet fra designforslaget, sortering ved klikk i kolonneraden, og den første delen av KI-laget: plassen for KI-teksten under regelforklaringen på aksjesiden, med en bryter som slår den av og på, loggen der tekstene lagres, kontrollen av teksten mot regelen, og at hentingen lager teksten med en lokal modell. Teksten lages når KI er slått på og den lokale modellen kjører under hentingen, og aksjesiden viser bare tekster som besto kontrollen. Neste: Min liste, innstillingene, periodene i kursgrafen, historikken og signaldagene i grafen, «Vis KI-tekst» i innstillingene, KI-teksten om dagen på forsiden, og til slutt å velge og bytte aksjer. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
+Under arbeid, og ingenting er endelig.
+
+**Ferdig**
+
+- Hentingen av kurser med kontroll av børsdagen, og at hovedindeksen hentes i samme kjøring
+- Nye forsøk med kallene som er igjen etter hentingen
+- Docker, og demoen, som viser alle 10 fargekombinasjonene av de tre sjekkene på siste dag
+- Denne README-en, og hjelp bak «?» på sidene
+- Tydeligere merking i tabellene, datoene og månedsmerkene i grafen, oversikten fra designforslaget, utseendet fra designforslaget, og sortering ved klikk i kolonneraden
+- Hovedindeksen, som vises over tabellen på forsiden, med søylene under, og som en stiplet linje i kursgrafen på aksjesiden
+- Den første delen av KI-laget: plassen for KI-teksten under regelforklaringen på aksjesiden, med en bryter som slår den av og på, loggen der tekstene lagres, kontrollen av teksten mot regelen, og at hentingen lager teksten med en lokal modell. Teksten lages når KI er slått på og den lokale modellen kjører under hentingen, og aksjesiden viser bare tekster som besto kontrollen
+- Ruff, som finner feil og rot i koden og formatterer den, i CI og i testene
+
+**Neste**
+
+- KI-tekstene i demoen
+- Min liste
+- Historikken og signaldagene i grafen
+- Lenkene til selskapets side på NewsWeb og selskapets egen nettside
+- Egen nøkkel til Gemini, Anthropic og OpenAI
+- Innstillingene, med «Vis KI-tekst»
+- Periodene i kursgrafen, og på forsiden periodevalget, børsometeret og KI-teksten om dagen
+- Til slutt å velge og bytte aksjer
+
+Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
 
 ## Tester
 
