@@ -127,3 +127,5 @@ Gjennomgang 16.10 på diffen `main...5072d78`, uten bildet, med Blind Hunter (BH
 Konflikt, ført her og ikke avgjort: bildene i «Kom i gang» søndag står bare i instruksjonen 16.10 kl. 22:42. `spec-3-4-demoversjonen.md` sier «PR 3, bilder: ingen (beslutning 4)». Den PR-en er flettet, så de to strider ikke, men ingen spesifikasjon beskriver søndagens bilder ennå (VG1).
 
 *Lagt til 2026-10-18 (story 3.3d):* beslutningen 16.10 kl. 21:53–21:58 under story 3.3 i `epics.md` rydder delene 3.3b la til eller endret: «Status» blir to lister, «Ferdig» og «Neste», i stedet for avsnittet fra punkt a, og forklaringen under «Tester» fra punkt c legges delvis bak en knapp. Den bygges i `spec-3-3d-readme-ryddingen.md`.
+
+*Rettet 2026-10-18 (gjennomgangen av 3.3d, VG12):* linja over sier at «Status» kom «fra punkt a». Avsnittet «Flettet til main» kom inn 12.10 i `4464a10` (PR #30), og punkt a i 3.3b oppdaterte det.
