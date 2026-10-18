@@ -355,10 +355,11 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # Story 2.9c: hovedindeksen som stiplet linje i kursgrafen.
         "indekslinja": Hjelpetekst(
             "Den stiplede linja:",
-            "hovedindeksen, regnet om så den starter på aksjens kurs første dag i "
-            "grafen og følger indeksens endring derfra. Ligger aksjens linje over den, "
-            "gikk aksjen bedre enn indeksen i perioden, og under den dårligere. Det "
-            "sier ikke noe om hva aksjen gjør videre.",
+            "hovedindeksen, regnet om så den starter på aksjens kurs den første dagen "
+            "i grafen som indeksen har, og følger indeksens endring derfra. Ligger "
+            "aksjens linje over den stiplede, har aksjen gått bedre enn indeksen fra "
+            "startdagen til den dagen, og under den dårligere. Det sier ikke noe om "
+            "hva aksjen gjør videre.",
             (
                 (GRAF, "def indeksverdier("),
                 (GRAF, "faar kurs(start) x indeks(dag) / indeks(start)"),

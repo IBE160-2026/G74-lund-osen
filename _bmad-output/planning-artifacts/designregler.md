@@ -182,7 +182,7 @@ Ord kan endres rett i tavla. I appen samles hjelpetekstene i én fil (8.0b).
 
 *Lagt til 2026-10-17 (story 2.9b):* **Søylene under hovedindeksen.** Fargen følger endringen slik den vises, med to desimaler, som i tabellen: over 0,00 % Positiv `#13703C`, under 0,00 % Negativ `#B42318`, og 0,00 % Ingen `#5F646C`. Det samme gjelder den stiplede linja for indeksen. Det er de eneste fargegrensene: lengden på søylen viser hvor stor endringen er, med null midt i feltet og den største endringen av søylene og indeksen på halve høyden. Stiplet linje brukes bare for indeksen. Bransjesymbolet ved 3 av 3 tegnes i `#a67c00`, Gul ring i fargelista over, og heter `--gul-symbol` i stilen (§3).
 
-*Lagt til 2026-10-18 (story 2.9c, spesifikasjonen `spec-2-9c-hovedindeksen-i-kursgrafen.md`):* **Stiplet linje brukes bare for hovedindeksen,** under søylene på forsiden og i kursgrafen på aksjesiden. Kurslinja og snittet er heltrukne, som før. I kursgrafen er linja 1,5 px i Dempet `#5F646C` (5,96:1 mot hvitt), med 6 px strek og 4 px mellomrom, og regnet om så den starter på aksjens kurs første dag i grafen.
+*Lagt til 2026-10-18 (story 2.9c, spesifikasjonen `spec-2-9c-hovedindeksen-i-kursgrafen.md`):* **Stiplet linje brukes bare for hovedindeksen,** under søylene på forsiden og i kursgrafen på aksjesiden. Kurslinja og snittet er heltrukne, som før. I kursgrafen er linja 1,5 px i Dempet `#5F646C` (5,96:1 mot hvitt), med 6 px strek og 4 px mellomrom, og regnet om så den starter på aksjens kurs den første dagen i grafen som indeksen har.
 
 **Fokus.** På lys bakgrunn er fokus `outline: 3px solid` i blekk med `outline-offset: 2px` (15,85:1). I stripa er fokus lys gul (9,68:1).
 

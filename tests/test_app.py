@@ -2950,7 +2950,10 @@ class TestIndekslinjaPaaAksjesiden:
         start = _boersdager_til(FREDAG_09_10, 61)[0].strftime("%d.%m")
         tekst = _synlig(html.split("<figcaption>", 1)[1].split("</figcaption>", 1)[0])
         assert f"Den stiplede linja er hovedindeksen OSEBX, regnet om så den starter på aksjens kurs {start}." in tekst
-        assert "Ligger aksjens linje over den, gikk aksjen bedre enn indeksen fra den dagen." in tekst
+        assert (
+            "Ligger aksjens linje over den stiplede, har aksjen gått bedre enn indeksen fra startdagen til den dagen."
+            in tekst
+        )
         etikett = re.search(r'<svg class="graf"[^>]*aria-label="([^"]*)"', html).group(1)
         assert f"Den stiplede er hovedindeksen OSEBX, regnet om så den starter på aksjens kurs {start}" in etikett
         for ord_ in ("kjøp", "selg", "bør"):
@@ -3005,3 +3008,15 @@ class TestIndekslinjaPaaAksjesiden:
         assert "width: 100%" in _regel(_stil(html), "svg.graf")
         assert re.search(r'<svg class="graf" viewBox="0 0 \d+ \d+"', html)
         assert 'width="' not in html.split('<svg class="graf"', 1)[1].split(">", 1)[0]
+
+    def test_en_indeks_uten_grafens_foerste_dag_starter_paa_den_neste(self, klient):
+        """Gjennomgangen (BH4, ECH1, VG1): indeksen mangler grafens første dag.
+        Linja starter på aksjens kurs den andre dagen, og datoen i teksten er
+        den dagen."""
+        self._aksjen()
+        dager = _boersdager_til(FREDAG_09_10, 61)
+        _legg_inn_indeks(_indeks([(d, 1000.0 + 10 * i) for i, d in enumerate(dager) if i > 0]))
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        indeks, kurs = _punktene(html, "indekslinje"), _punktene(html, "kurslinje")
+        assert len(indeks) == 60 and indeks[0] == kurs[1]
+        assert f"starter på aksjens kurs {dager[1].strftime('%d.%m')}." in _synlig(html)

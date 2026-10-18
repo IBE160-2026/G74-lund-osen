@@ -282,7 +282,7 @@
         skala. Sjekk 2 og 3 tegnes ikke — de står i kortene over.
         {#- Story 2.9c #}
         {% if graf.har_indeks %}
-        <span class="indeksforklaring">Den stiplede linja er hovedindeksen {{ indeks_symbol }}, regnet om så den starter på aksjens kurs {{ graf.indeksstart|dato }}. Ligger aksjens linje over den, gikk aksjen bedre enn indeksen fra den dagen.</span>
+        <span class="indeksforklaring">Den stiplede linja er hovedindeksen {{ indeks_symbol }}, regnet om så den starter på aksjens kurs {{ graf.indeksstart|dato }}. Ligger aksjens linje over den stiplede, har aksjen gått bedre enn indeksen fra startdagen til den dagen.</span>
         {% elif indeks_feilet %}
         <span class="indeksforklaring">Hovedindeksen kunne ikke leses, så den er ikke tegnet.</span>
         {% else %}

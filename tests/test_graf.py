@@ -265,3 +265,13 @@ class TestIndekslinja:
         graf = bygg_graf(ps, indeks=indeks)
         assert graf.hoy >= 100.0
         assert all(MARG_Y - 0.05 <= y <= graf.hoyde - MARG_Y + 0.05 for _, y in koordinater(graf.indekslinje))
+
+    def test_uten_grafens_foerste_dag_starter_linja_paa_den_neste(self):
+        """Gjennomgangen (VG1): indeksen har bare dag 2 og 3. Startdagen er
+        dag 2, og linja starter på aksjens kurs den dagen."""
+        ps = self._punkter([50.0, 60.0, 40.0])
+        indeks = {ps[1].dato: 1000.0, ps[2].dato: 1100.0}
+        assert indeksverdier(ps, indeks) == pytest.approx({ps[1].dato: 60.0, ps[2].dato: 66.0})
+        graf = bygg_graf(ps, indeks=indeks)
+        assert graf.indeksstart == ps[1].dato
+        assert koordinater(graf.indekslinje)[0] == koordinater(graf.kurslinje)[1]
