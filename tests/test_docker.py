@@ -1621,6 +1621,11 @@ class TestReadmeForNybegynnere:
             assert maal.rstrip("/").endswith(tekst.rstrip("/").rsplit("/", 1)[-1]), (tekst, maal)
             sti = maal.rstrip("/")
             assert (ROT / sti).exists(), maal
+            # ignorert() leser stien som en fil, og «data/» i .gitignore
+            # gjelder bare mapper, saa en mappe sjekkes med en fil inni (mutant
+            # N6 overlevde foerst).
+            if maal.endswith("/") or (ROT / sti).is_dir():
+                sti = f"{sti}/x"
             assert not ignorert(gitignore, sti), maal
         # Linja om det som ikke er i repoet, har ingen lenker.
         ikke = [l for l in del_.splitlines() if l.startswith("Ikke i repoet:")]
