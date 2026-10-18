@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-18T15:41
+updated: 2026-10-18T18:01
 ---
 
 # Kvalitetssikring
@@ -257,6 +257,7 @@ sist i dokumentet.
 | 3.3 README | `5816bc2` (#25) | 1 (15 statiske og 1 i CI) | – | `S/spec-3-3-readme-slik-kjoerer-du-den.md` |
 | 3.3b README for sensor | `6b9dc2f` (#53), `1a95495` (#54) | 1 (21 i PR #53) | – | `S/spec-3-3b-readme-for-sensor.md` |
 | 3.3c Bilder i «Kom i gang», demoen først og fire rettelser | `fdaf403` (#66) | 1 (9, M1–M9) | – M1–M4 er fra instruksjonen, M5–M9 fra funnene med dom medium | `S/spec-3-3c-kom-i-gang-bilder-og-demoen-foerst.md` |
+| 3.3d README-ryddingen | `1be3a57` (#67) | 1 (11, N1–N11) | N6 overlevde først på `8dc1e8f` og ble fanget etter at testen ble rettet i `ff2f540` | `S/spec-3-3d-readme-ryddingen.md` |
 | 3.4 Demoversjonen | `0ed87be` (#26), `59c0baf` (#27), `4464a10` (#30), `4c01a7e` (#31), `41a9df7` (#32), `1ead55a` (#33), `dfe6884` (#34) | 1 (#26: 24, #27: 28, #30: 17, 16, 16, 10 og 6, #31: 4, #32–#34: 2 hver) | M20 i #26 og H12 og H13 i #30 overlevde først. T9 ble forkastet, og B6 ble ikke kjørt ferdig. Spesifikasjonen står i review | `S/spec-3-4-demoversjonen.md` |
 | 3.4, alle 10 Kombinasjonene på siste demodag | `f21f927` (#58) | 1 (4, R1–R4) | – | `S/spec-3-4-alle-ti-kombinasjonene-paa-siste-demodag.md`, «Mutantene» |
 | 4.0 Nettsperren dekker hele testkjøringen | `dc43569` (#44) | 1 (10) | – Under N1 og N4 ble det gjort ekte oppslag og tilkoblingsforsøk (BH10) | `S/spec-4-0-nettsperren-dekker-hele-testkjoeringen.md` |
@@ -440,6 +441,7 @@ funn. Antall rader i loggen:
 | 3.3b, PR #53 | 22 | 16 | 5 | 1 |
 | 3.3b, PR #54 | 12 | 5 | 6 | 1 |
 | 3.3c | 27 | 17 | 8 | 2 |
+| 3.3d | 21 | 15 | 5 | 1 |
 | 3.4, PR #26 | 21 | 14 | 5 | 1 |
 | 3.4, PR #27 | 22 | 12 | 8 | 2 |
 | 3.4, PR #30, første runde | 29 | 25 | 4 | – |
@@ -1140,6 +1142,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 3.3 | R1–R15 og C1 | R1 `test_kommandoen_paa_den_tomme_siden_staar_i_readme`, R8 `test_tjenestene_i_readme_finnes_i_compose`, R9 `test_raadet_om_tidspunkt_uten_flagget`; for R13–R15 står bare «drept» | `S/spec-3-3-…` |
 | 3.3b | S1–S20 og S5b (PR #53) | ikke navngitt per mutant i spesifikasjonen | `S/spec-3-3b-…` |
 | 3.3c | M1–M9 | M1 `test_bildene_er_de_tre_fra_gjennomgangen_og_ci_merket`, M2, M8 og M9 `test_steg_4_mappa_ikke_zip_fila`, M3 `test_svaret_om_mellomrommet_etter_cd`, M4 `test_demoen_foerst_og_zip_foer_kommandoene`, M5 og M6 `test_kopieringen_forklares_en_gang_og_hvert_steg_sier_hvor`, M7 `test_henvisningene_og_proevetabellen` | `S/spec-3-3c-…` |
+| 3.3d | N1–N11 | N1, N7 og N10 `test_status_uten_storynumre_og_uten_kommando`, N2 og N11 `test_staar_du_fast_har_hoeyst_5_spoersmaal` (N11 også `test_det_foerste_spoersmaalet_er_at_docker_ikke_kjoerer`), N3 `test_hvert_tema_staar_i_readme_eller_hjelp`, N4 `test_forklaringen_i_tester_staar_bak_en_knapp`, N5 og N9 `test_lenkene_virker`, N6, N8 og N9 `test_mappestrukturen_lenker_til_stier_i_repoet` | `S/spec-3-3d-…` |
 | 3.4 | PR #26–#34 | testene står per mutant i tabellene i spesifikasjonen for PR #26, #27 og #30; for #31–#34 nevner avsnittene testen, som `test_hvorfor_bare_15_aksjer` og `test_til_faglaerer_lenker_til_briefen_med_gjeldende_tag` | `S/spec-3-4-demoversjonen.md` |
 | 3.4, alle 10 | R1–R4 | med hele fila `test_kursene_har_samme_fingeravtrykk_paa_alle_plattformer`, med bare klassen `test_alle_ti_kombinasjonene_paa_sluttdato` | `S/spec-3-4-alle-ti-…` |
 | 4.0 | N1–N5 og R1–R5 | N1, N3 og N5 `test_innsamlingen_er_sperret`, N2 `test_navneoppslag_blokkeres[gethostbyname]`, N4 `test_connect_ex_blokkeres`, R1 `test_asyncio_blokkeres`, R2 `test_udp_blokkeres` | `S/spec-4-0-…` |
