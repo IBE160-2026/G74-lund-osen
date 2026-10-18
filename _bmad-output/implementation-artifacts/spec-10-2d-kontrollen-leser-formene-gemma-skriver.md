@@ -39,7 +39,7 @@ context:
 
 ## Avgjort underveis
 
-- **Testen i a** bytter den første retningen teksten sier, med stor forbokstav som Gemma skriver den. For LKSV sier første setning styrken («av styrke tre»), og retningen står først i andre setning («Retningen er Blandet»). Den byttes der, og det er den ene av de 13 som ble stoppet på main (gjennomgangen, VG5). Første versjon av testen (`6eab5f1`) hadde backspace i stedet for `` i mønsteret, så hjelpefunksjonen feilet på hver tekst og `xfail` godtok det. Rettet i `aae2eef`: hjelpefunksjonen kaster `ValueError`, og `xfail` krever `AssertionError`.
+- **Testen i a** bytter den første retningen teksten sier, med stor forbokstav som Gemma skriver den. For LKSV sier første setning styrken («av styrke tre»), og retningen står først i andre setning («Retningen er Blandet»). Den byttes der, og det er den ene av de 13 som ble stoppet på main (gjennomgangen, VG5). Første versjon av testen (`6eab5f1`) hadde backspace i stedet for `\b` i mønsteret, så hjelpefunksjonen feilet på hver tekst og `xfail` godtok det. Rettet i `aae2eef`: hjelpefunksjonen kaster `ValueError`, og `xfail` krever `AssertionError`.
 - **«Signalet er ingen»** leses bare som retningen Ingen med «av typen» foran eller et skilletegn eller «fordi» etter, så «Signalet er ingen garanti» ikke er en retning.
 - **«et X signal»** leses bare med signalet som subjekt, eller med «Dette er» eller «Det er» først i teksten. Andre steder viser «det er et positivt signal» ofte til én sjekk (gjennomgangen, BH1 og ECH1).
 - **Én sjekk** kjennes på ordene trend, bevegelse, interesse, sjekk, kurs, volum og utslag i de tre ordene foran, på bindestrek foran «signalet», og på «for» eller «på» en sjekk rett etter retningen. Da leses ikke utsagnet. Det samme gjelder «av styrke N».
@@ -52,7 +52,7 @@ Kontrollen fra main og den nye ble kjørt på alle KI-tekstene som står ordrett
 
 §32 og §34 sier at tekstene står bare i kopien av basen. `git grep` etter «signalet er», «retningen er» og «ga et positivt/negativt utslag» fant ellers bare beskrivelser av kontrollen og testtekster (gjennomgangen, VG4).
 
-**Ingen av de 79 tekstene fikk et annet svar eller andre grunner** med den nye kontrollen, verken på `6dcd18f` eller etter rettingene på `94fcdd8`. Tekstene i demoen lages ikke på nytt.
+**Ingen av de 79 tekstene fikk et annet svar eller andre grunner** med den nye kontrollen etter rettingene på `94fcdd8`. På `6dcd18f` ble de 73 uten «Dag»-tekstene kjørt, også med samme svar for alle. Tekstene i demoen lages ikke på nytt.
 
 ## Mutantene
 
