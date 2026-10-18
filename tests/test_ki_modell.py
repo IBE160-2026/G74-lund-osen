@@ -536,3 +536,85 @@ class TestFormeneGemmaSkriver:
             if kontroller(_med_feil_retning(tekst, grunnlag["retning"]), grunnlag).besto
         ]
         assert slapp == [], f"{len(slapp)} av 13 slapp gjennom: {slapp}"
+
+    def test_demotekstene_bestaar_som_de_er(self):
+        """Ville feilet hvis den nye kontrollen stoppet en av de 13 tekstene i
+        demoen slik de staar, saa de maatte lages paa nytt."""
+        for symbol, tekst, grunnlag in _demotekstene():
+            svar = kontroller(tekst, grunnlag)
+            assert svar.besto, (symbol, svar.grunner)
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            "Dette signalet er Positivt, fordi to av de tre sjekkene ga utslag.",
+            "Dette signalet er Negativt.",
+            "Signalet er positiv.",
+            "Signalet er altså positivt.",
+            "Signalet er derfor negativt.",
+            "Dette signalet er av typen Ingen.",
+            "Dette signalet er av typen Positiv, fordi to av de tre sjekkene ga utslag.",
+            "Signalet er ingen, fordi to av de tre sjekkene ga utslag.",
+            "Signalet er ikke blandet.",
+            "Retningen på signalet er positiv.",
+            "Retningen til signalet er negativ.",
+            "Dette er et positivt signal.",
+            "Det er altså et negativt signal.",
+            "Signalet er ikke et blandet signal.",
+        ],
+    )
+    def test_feil_retning_i_formene_stoppes(self, tekst):
+        """Grunnlaget sier Blandet. Ville feilet hvis en av formene i punkt b
+        slapp gjennom med feil retning."""
+        svar = kontroller(tekst, BLANDET)
+        assert not svar.besto and any(g.startswith("1: retningen") for g in svar.grunner), svar.grunner
+
+    @pytest.mark.parametrize(
+        "grunnlag, tekst",
+        [
+            (TRE_POSITIVE, "Dette signalet er Positivt, fordi alle tre sjekkene ga et positivt utslag."),
+            (BLANDET, "Dette signalet er Blandet, fordi to av de tre sjekkene ga utslag."),
+            (BLANDET, "Signalet er altså blandet."),
+            (INGEN, "Dette signalet er av typen Ingen, fordi ingen av de tre sjekkene ga et utslag."),
+            (INGEN, "Signalet er ingen, fordi ingen av de tre sjekkene ga utslag."),
+            (BLANDET, "Signalet er ikke positivt."),
+            (BLANDET, "Retningen på signalet er blandet."),
+            (EN_POSITIV, "Dette er et positivt signal."),
+            (BLANDET, "Dette signalet er av styrke to."),
+            (TRE_POSITIVE, "Dette signalet er av styrke tre."),
+            (INGEN, "Dette signalet er av styrke null."),
+        ],
+    )
+    def test_riktig_retning_og_styrke_i_formene_bestaar(self, grunnlag, tekst):
+        """Ville feilet hvis en av formene i punkt b stoppet en tekst med
+        riktig retning eller styrke."""
+        svar = kontroller(tekst, grunnlag)
+        assert svar.besto, svar.grunner
+
+    @pytest.mark.parametrize(
+        "tekst",
+        ["Dette signalet er av styrke tre.", "Signalet er av styrke 1.", "Det er et signal av signalstyrke null."],
+    )
+    def test_feil_styrke_i_av_styrke_stoppes(self, tekst):
+        """Grunnlaget sier styrke 2. Ville feilet hvis «av styrke N» med feil
+        N slapp gjennom."""
+        svar = kontroller(tekst, BLANDET)
+        assert not svar.besto and any(g.startswith("1: styrken") for g in svar.grunner), svar.grunner
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            "Trendens retning er positiv.",
+            "Trenden ga et positivt utslag.",
+            "Trenden ga et positivt signal.",
+            "Interessen ga et negativt signal, og bevegelsen ga et positivt utslag.",
+            "Trendsignalet er positivt.",
+            "Signalet er ingen garanti.",
+        ],
+    )
+    def test_formene_om_en_sjekk_stoppes_ikke(self, tekst):
+        """Grunnlaget sier Blandet. Ville feilet hvis kontrollen leste en form
+        som gjelder én sjekk som retningen paa hele signalet, eller «Signalet
+        er ingen garanti» som retningen Ingen."""
+        svar = kontroller(tekst, BLANDET)
+        assert svar.besto, svar.grunner
