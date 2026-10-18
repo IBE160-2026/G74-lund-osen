@@ -76,13 +76,15 @@ class TestPorten:
         metoder = {
             navn for navn, _ in inspect.getmembers(Oversiktsleser, inspect.isfunction) if not navn.startswith("_")
         }
-        assert metoder == {"oversikt", "post"}
+        # Story 8.16: vurdering for «Velg dag» er ogsaa en lesemetode.
+        assert metoder == {"oversikt", "post", "vurdering"}
 
     def test_adapteren_har_ingen_skrivemetode(self):
         metoder = {
             navn for navn, _ in inspect.getmembers(SqliteOversiktsleser, inspect.isfunction) if not navn.startswith("_")
         }
-        assert metoder == {"oversikt", "post"}
+        # Story 8.16: vurdering for «Velg dag» er ogsaa en lesemetode.
+        assert metoder == {"oversikt", "post", "vurdering"}
 
     def test_adapteren_oppfyller_porten(self, tilkobling):
         assert isinstance(SqliteOversiktsleser(tilkobling), Oversiktsleser)

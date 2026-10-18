@@ -14,6 +14,8 @@ er startdagen foerste hverdag paa eller etter den.
 """
 
 import calendar
+import re
+from dataclasses import dataclass
 from datetime import date, timedelta
 
 from boersdag import UtenforKalenderen, er_boersdag
@@ -83,3 +85,93 @@ def startdag(periode: str, siste: date) -> date:
     if periode in (SISTE, VELG):
         return startdag(SEKS_MND, siste)
     raise ValueError(f"ukjent periode: {periode!r}")
+
+
+# Overskriften over grafen for hver periode (FR-201). Siste boersdag og
+# «Velg dag» faar dagen etter seg i malen: «6 måneder fram til fredag 09.10».
+OVERSKRIFT = {
+    SISTE: "6 måneder fram til",
+    EN_UKE: "1 uke",
+    EN_MND: "1 måned",
+    TRE_MND: "3 måneder",
+    SEKS_MND: "6 måneder",
+    I_AAR: "i år",
+    ETT_AAR: "1 år",
+    VELG: "6 måneder fram til",
+}
+
+# Merkene paa aksen: dagene for 1 uke, mandagene (foerste boersdag i uka) for
+# 1 mnd, maanedene ellers, og navn paa annenhver maaned for 1 aar, saa de
+# faar plass.
+DAGER, UKER, MAANEDSNAVN, ANNENHVER_MAANED = "dager", "uker", "maaneder", "annenhver"
+AKSEMERKER = {EN_UKE: DAGER, EN_MND: UKER, ETT_AAR: ANNENHVER_MAANED}
+
+UKEDAGER = ("Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag")
+
+# Lengste del av en feil verdi som gjentas i beskjeden.
+_LENGSTE_I_BESKJED = 20
+
+# Bare ÅÅÅÅ-MM-DD. date.fromisoformat godtar ogsaa ukedatoer som 2026-W41-5.
+_DATO = re.compile(r"\d{4}-\d{2}-\d{2}")
+
+
+def foerste_knapp(siste: date, idag: date) -> str:
+    """Navnet paa den foerste knappen (designregler.md §2): «I dag» naar
+    siste boersdag i dataene er i dag, «I går» naar den var i gaar, og ellers
+    ukedagen, som «Fredag» paa en mandag."""
+    if siste == idag:
+        return "I dag"
+    if siste == idag - timedelta(days=1):
+        return "I går"
+    return UKEDAGER[siste.weekday()]
+
+
+def knappene(siste: date, idag: date) -> tuple[tuple[str, str], ...]:
+    """(kode, navn) for knappene foran «Velg dag», i rekkefoelgen i §2."""
+    return ((SISTE, foerste_knapp(siste, idag)),) + tuple((kode, NAVN[kode]) for kode in PERIODENE[1:-1])
+
+
+@dataclass(frozen=True)
+class Valg:
+    """Perioden i adressen, lest. dag er dagen for «Velg dag». beskjed er en
+    kort tekst naar adressen hadde en feil, og da er perioden 6 mnd."""
+
+    periode: str
+    dag: date | None = None
+    beskjed: str | None = None
+
+
+def _gjentatt(verdi: str) -> str:
+    verdi = " ".join(verdi.split())
+    return verdi if len(verdi) <= _LENGSTE_I_BESKJED else verdi[:_LENGSTE_I_BESKJED] + "…"
+
+
+def les_valg(periode: str | None, dag: str | None, foerste: date, idag: date) -> Valg:
+    """Perioden og dagen fra adressen, eller 6 mnd med en kort beskjed.
+
+    foerste er foerste dag i kursserien. En dag i adressen gir «Velg dag»,
+    ogsaa uten periode. En feil gir aldri en feilside: ukjent periode, en
+    dato som ikke kan leses, en dato fram i tid eller foer serien gir 6 mnd
+    og en beskjed. Datoen i beskjeden er paa formen 09.10.2026."""
+    if dag:
+        try:
+            if not _DATO.fullmatch(dag):
+                raise ValueError(dag)
+            valgt = date.fromisoformat(dag)
+        except ValueError:
+            return Valg(SEKS_MND, beskjed=f"Datoen «{_gjentatt(dag)}» kunne ikke leses, så grafen viser 6 mnd.")
+        if valgt > idag:
+            return Valg(SEKS_MND, beskjed=f"{valgt:%d.%m.%Y} er fram i tid, så grafen viser 6 mnd.")
+        if valgt < foerste:
+            return Valg(
+                SEKS_MND,
+                beskjed=f"Kursserien begynner {foerste:%d.%m.%Y}, så grafen viser 6 mnd.",
+            )
+        return Valg(VELG, dag=valgt)
+    if not periode:
+        return Valg(SEKS_MND)
+    if periode == VELG:
+        return Valg(SEKS_MND, beskjed="Velg en dag i feltet, så viser grafen 6 mnd fram til den.")
+    if periode in PERIODENE:
+        return Valg(periode)
+    return Valg(SEKS_MND, beskjed=f"Perioden «{_gjentatt(periode)}» finnes ikke, så grafen viser 6 mnd.")

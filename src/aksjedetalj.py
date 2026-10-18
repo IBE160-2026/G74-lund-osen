@@ -31,14 +31,15 @@ from markedsoversikt import (
     les_tilstand,
 )
 from oversiktsdata import Oversiktspost
+from perioder import SEKS_MND, startdag
 from signalberegning import NEGATIV, POSITIV, STANDARD, Parametre, bevegelsesdesimaler, nodvendige_dager, sjekker_fra
 from tallformat import desimaler_uten_null, fortegn, tall
 from tilstand import Art, Tilstand
 from vurderingsdata import Grunn, Vurdering
 
-# FR-201: seks maaneder. Regnet i kalenderdager fra siste boersdag, ikke i
-# antall rader - en boersdag er ikke en fast broekdel av en maaned.
-GRAFVINDU_DAGER = 182
+# FR-201 og story 8.16: grafen starter paa startdagen fra perioder.startdag,
+# 6 mnd naar ingen periode er valgt. Regnet etter kalenderen fra siste dag i
+# grafen, ikke i antall rader (designregler.md §2).
 
 # Story 8.0c: ordet ved 0 i Ga-kolonnen. «Ingen» er en retning (FR-704), ikke
 # det en sjekk ga, saa ordet er et eget.
@@ -277,20 +278,14 @@ def glidende_snitt(kurser: list[float], vindu: int) -> list[float | None]:
     return ut
 
 
-def _innenfor_vindu(rader: list[Kursrad], dager: int) -> int:
-    """Indeksen der grafvinduet starter. Regnet paa dato, ikke paa radtall."""
-    if not rader:
-        return 0
+def bygg_punkter(
+    rader: list[Kursrad], p: Parametre = STANDARD, start: date | None = None, slutt: date | None = None
+) -> tuple[Punkt, ...]:
+    """Grafpunktene fra start til og med slutt, med MA50 oppaa (FR-202).
 
-    grense = rader[-1].dato - timedelta(days=dager)
-    for i, rad in enumerate(rader):
-        if rad.dato >= grense:
-            return i
-    return 0
-
-
-def bygg_punkter(rader: list[Kursrad], p: Parametre = STANDARD, dager: int = GRAFVINDU_DAGER) -> tuple[Punkt, ...]:
-    """Grafpunktene for de siste seks maanedene, med MA50 oppaa (FR-202).
+    Story 8.16: slutt er siste dag i grafen, som standard siste rad, og
+    start er startdagen for perioden, som standard 6 mnd fra perioder.startdag
+    regnet fra siste rad paa eller foer slutt.
 
     Kursen og snittet tegnes fra SAMME serie - den utbyttejusterte. Tegnet
     vi slutt mot et snitt regnet paa justert_slutt, ville de to ligget paa
@@ -302,10 +297,17 @@ def bygg_punkter(rader: list[Kursrad], p: Parametre = STANDARD, dager: int = GRA
     """
     kurser = [float(rad.justert_slutt) for rad in rader]
     snitt = glidende_snitt(kurser, p.ma_vindu)
-    start = _innenfor_vindu(rader, dager)
+    if slutt is not None:
+        rader, kurser, snitt = (
+            [x for x, rad in zip(liste, rader) if rad.dato <= slutt] for liste in (rader, kurser, snitt)
+        )
+    if not rader:
+        return ()
+    if start is None:
+        start = startdag(SEKS_MND, rader[-1].dato)
 
     return tuple(
-        Punkt(dato=rad.dato, kurs=kurs, ma50=ma) for rad, kurs, ma in zip(rader[start:], kurser[start:], snitt[start:])
+        Punkt(dato=rad.dato, kurs=kurs, ma50=ma) for rad, kurs, ma in zip(rader, kurser, snitt) if rad.dato >= start
     )
 
 
@@ -325,7 +327,14 @@ def boersdag_mellom(fra: date, til: date) -> bool:
         return True
 
 
-def bygg_detalj(post: Oversiktspost, rader: list[Kursrad], idag: date, p: Parametre = STANDARD) -> Detalj | None:
+def bygg_detalj(
+    post: Oversiktspost,
+    rader: list[Kursrad],
+    idag: date,
+    p: Parametre = STANDARD,
+    start: date | None = None,
+    slutt: date | None = None,
+) -> Detalj | None:
     """Detaljen for en aksje, eller None hvis den ikke har en eneste kursrad.
 
     post er aksjen og raden i vurdering fra Oversiktsleser, rader er serien i
@@ -359,7 +368,7 @@ def bygg_detalj(post: Oversiktspost, rader: list[Kursrad], idag: date, p: Parame
         tilstand=utfall,
         tekst=tekst,
         sjekker=sjekker,
-        punkter=bygg_punkter(rader, p),
+        punkter=bygg_punkter(rader, p, start, slutt),
         antall_dager=len(rader),
         noedvendige_dager=nodvendige_dager(p),
         endring=endring_i_prosent(rader),
@@ -373,3 +382,38 @@ def normaliser_symbol(symbol: str) -> str:
     """Symbolet i ruta slik aksje har det: uten mellomrom, med store
     bokstaver. En ticker som EQNR.OL blir ikke et symbol."""
     return symbol.strip().upper()
+
+
+@dataclass(frozen=True)
+class Dagen:
+    """Dagen som er merket i grafen for siste boersdag og «Velg dag» (story
+    8.16, gruppens svar 18.10 kl. 21:50): endringen den dagen og signalet som
+    er lagret for den. tilstand og tekst er som i oversikten, fra
+    les_tilstand: tekst er None bare for en vurdering. Signalet regnes
+    aldri her (AD-7)."""
+
+    dato: date
+    endring: float | None
+    tilstand: Tilstand | None
+    tekst: str | None
+
+    @property
+    def vurdering(self) -> Vurdering | None:
+        if self.tilstand is not None and self.tilstand.art is Art.SVAR:
+            return self.tilstand.innhold
+        return None
+
+    @property
+    def retning(self) -> Retningsvisning:
+        if not self.vurdering:
+            return UKJENT_RETNING
+        return RETNINGSVISNING.get(self.vurdering.retning, UKJENT_RETNING)
+
+
+def bygg_dagen(rader: list[Kursrad], dag: date, innhold: Vurdering | Grunn | None, idag: date) -> Dagen:
+    """Dagen med endringen fra kursserien og den lagrede raden i vurdering.
+    Endringen er None naar serien ikke har dagen eller dagen foer."""
+    foer = [rad for rad in rader if rad.dato <= dag]
+    endring = endring_i_prosent(foer) if foer and foer[-1].dato == dag else None
+    tilstand_, tekst = les_tilstand(innhold, dag, idag)
+    return Dagen(dato=dag, endring=endring, tilstand=tilstand_, tekst=tekst)

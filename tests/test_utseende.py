@@ -10,6 +10,8 @@ from pathlib import Path
 
 import pytest
 
+from perioder import PERIODENE
+
 FONTS = Path(__file__).resolve().parent.parent / "src" / "static" / "fonts"
 
 # Filene i designregler §1 og §5, med vekten @font-face gir dem.
@@ -285,6 +287,8 @@ class TestRammen:
                     href == "/"
                     or re.fullmatch(r"/aksje/[A-Z0-9]+", href)
                     or re.fullmatch(r"/\?sorter=(kurs|endring|signal|retning)&amp;orden=(synkende|stigende)", href)
+                    # Story 8.16: periodene i kursgrafen er en parameter paa aksjesiden.
+                    or re.fullmatch(r"/aksje/[A-Z0-9]+\?periode=(" + "|".join(map(re.escape, PERIODENE)) + ")", href)
                 ), (navn, href)
 
     def test_tabelltall_i_tallcellene(self, sidene):

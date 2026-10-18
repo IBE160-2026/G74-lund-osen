@@ -10,7 +10,6 @@ from datetime import date, datetime, timedelta, timezone
 import pytest
 
 from aksjedetalj import (
-    GRAFVINDU_DAGER,
     bygg_detalj,
     bygg_punkter,
     glidende_snitt,
@@ -18,6 +17,7 @@ from aksjedetalj import (
 )
 from kursdata import Aksje, Kursrad
 from oversiktsdata import Oversiktspost
+from perioder import SEKS_MND, startdag
 from signalberegning import Parametre, vurder
 from tilstand import Art
 from vurderingsdata import Grunn, Vurdering
@@ -78,13 +78,14 @@ class TestGlidendeSnitt:
 
 class TestBjyggPunkter:
     def test_klipper_til_seks_maaneder(self):
-        """Ett aar inn, seks maaneder ut."""
+        """Ett aar inn, seks maaneder ut. Story 8.16: startdagen er den fra
+        perioder.startdag, ikke 182 dager (to perioder med hver sin regel)."""
         rader = serie([100.0] * 365, start=date(2025, 9, 21))
 
         punkter = bygg_punkter(rader, KORT)
 
         assert len(punkter) < len(rader)
-        assert (punkter[-1].dato - punkter[0].dato).days <= GRAFVINDU_DAGER
+        assert punkter[0].dato == startdag(SEKS_MND, punkter[-1].dato)
 
     def test_kort_serie_klippes_ikke(self):
         rader = serie([100.0] * 10)
