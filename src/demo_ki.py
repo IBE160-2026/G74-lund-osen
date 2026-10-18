@@ -43,7 +43,7 @@ from datetime import date, datetime
 from pathlib import Path
 
 from kilogg import AKSJE, Emne, KIRad
-from lagring_sqlite import SqliteKILogg
+from lagring_sqlite import SqliteKILogg, aapne_base
 
 FIL = Path(__file__).with_name("demo_ki_tekster.json")
 FORMAT = 1
@@ -171,7 +171,7 @@ def lag_tekstene(modell, fil: Path = FIL, skriv: Callable[[str], None] = print) 
         base = Path(mappe) / "demo.db"
         demo.lag_demobase(base, skriv=lambda _: None, med_ki=False)
         klar = lag_ki_tekster(base, dag, klokke, med_tid, skriv, lista=demo.DEMOUNIVERS)
-        tilkobling = sqlite3.connect(base)
+        tilkobling = aapne_base(base)
         try:
             lager = SqliteVurderingslager(tilkobling, klokke, demo.DEMOUNIVERS)
             ventet = {a.symbol for a in demo.DEMOUNIVERS if isinstance(lager.les(a.symbol, dag), Vurdering)}

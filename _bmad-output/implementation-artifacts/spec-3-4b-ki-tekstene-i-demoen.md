@@ -94,3 +94,5 @@ Gjennomgang 18.10 på diffen `a0afada..c0aefc6`. Linsene var Blind Hunter (BH, 1
 | VG8 | «Ferdig» før PR-en er flettet | low | avvist: regelen i spesifikasjonen for 3.4 sier at den som fletter, flytter saken, og det gjøres i PR-en som fletter |
 | VG11 | Spesifikasjonen har «siste demodag», storyen «de oppdiktede dagene» | low | avvist: begrunnet under «Avgjort i spesifikasjonen» |
 | ECH10 | `sprint-status.yaml` sier `backlog` for 3-4b | low | utsatt: settes til done etter flettingen (steg 4) |
+
+*Lagt til 2026-10-18 (hele testsettet på `c61266a`):* `test_konsumentene.py::test_bare_aapne_base_kobler_til_basen` feilet. `lag_tekstene` koblet til demobasen med `sqlite3.connect`, men bare `aapne_base` i `lagring_sqlite.py` skal gjøre det (story 2.1b, K2). Rettet: `lag_tekstene` bruker `aapne_base`.
