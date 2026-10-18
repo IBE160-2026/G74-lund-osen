@@ -863,7 +863,7 @@ SKRIFTFILER = {".woff", ".woff2", ".ttf", ".otf", ".css"}
 # raden under «Skilte seg ut», foer «Øvrige aksjer», saa signalstyrken og
 # fargene per aksje er med.
 HOEYDE_PAA_BILDET = 1573
-AVTRYKK_BAK_BILDET = "2b62f2d25bc231beadbf4e0dd827fbf5c20c3b9930ff628e83bea5f9ea93f1dd"
+AVTRYKK_BAK_BILDET = "85be056001523d23c439d7c9d11e4ef7846b54602b42bafe69df16ed21605140"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "

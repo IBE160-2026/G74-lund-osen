@@ -185,6 +185,11 @@ KONTRAST = [
     ("dempet-2", "hvit", 4.5),
     # Gjennomgangen av PR 3 (VG8): det grå feltet mot sporet (del 5, 3,23:1).
     ("felt", "spor", 3.0),
+    # Story 8.15b: den sorterte kolonnen. Navnet, «NOK» og streken mot det
+    # lysere feltet.
+    ("hvit", "stripe-kant", 4.5),
+    ("kolonne-tekst-2", "stripe-kant", 4.5),
+    ("oransje", "stripe-kant", 3.0),
 ]
 
 
