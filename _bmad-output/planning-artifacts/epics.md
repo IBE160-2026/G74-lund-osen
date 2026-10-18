@@ -2501,6 +2501,8 @@ starter ikke av seg selv.
 
 *Avgjort 2026-10-18 kl. 21:03 (gruppens svar):* hullet i kontrollen fra 3.4b rettes før byggestoppen mandag 19.10 kl. 20:40, så uka med logget drift går med den rettede kontrollen. Kontrollen i FR-603 leser da retningen og styrken også i formene Gemma skriver, som «Dette signalet er Negativt», «av typen Ingen» og «av styrke tre» (spesifikasjonen 10.2d). Prompten står, versjon 2.
 
+*Lagt til 2026-10-18 kl. 22:49:* kontrollen i FR-603 leser retningen og styrken også i formene Gemma skriver, flettet i `3c2bd51`, PR #71 (spesifikasjonen `spec-10-2d-kontrollen-leser-formene-gemma-skriver.md`), før byggestoppen mandag. Ingen av de 79 KI-tekstene i sporede filer fikk et annet svar, så tekstene i demoen står. Det åpne punktet i spesifikasjonen for 3.4b er dermed lukket.
+
 ### Story 10.3: Visningen i aksjedetaljen
 
 *Het Story 5B.3 til 28.09.*

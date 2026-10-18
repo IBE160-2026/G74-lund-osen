@@ -2,7 +2,7 @@
 title: 'Story 10.2 (10.2d): kontrollen i FR-603 leser formene Gemma skriver'
 type: 'feature'
 created: '2026-10-18'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '52d5107'
@@ -100,3 +100,4 @@ Gjennomgang 18.10 på diffen `d031e4e..6dcd18f`. Linsene var Blind Hunter (BH, 1
 | VG4 | Søket etter sporede filer var ikke nevnt | low | patch: over |
 | VG5 | LKSV byttes i andre setning | low | patch: forklart under «Avgjort underveis» |
 
+*Lagt til 2026-10-18 kl. 22:49:* PR #71 er squash-flettet i `3c2bd51`, låst til head-en `0bdd259`. Main hadde ikke gått videre. CI var grønn på head-en (39164796411) og på main (39164925044). Triagen står over og som kommentar på PR-en. Kontrollen er flettet før byggestoppen mandag 19.10 kl. 20:40.
