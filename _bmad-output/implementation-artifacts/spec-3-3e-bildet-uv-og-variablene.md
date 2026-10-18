@@ -2,7 +2,7 @@
 title: 'Story 3.3e: bildet av oversikten, uv i «Tester» og variablene i .env'
 type: 'docs'
 created: '2026-10-18'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'a2965ba'
@@ -93,3 +93,5 @@ Gjennomgang 18.10 på diffen `615e7b9..1f99e3f`, med bildet som stat. Linsene va
 | BH10, VG6, ECH9 | Lenken på `.env` går til overskriften | low | avvist: en `<details>` har ikke noe anker på GitHub, og steg 6 har 65 ord |
 | BH12 | Bildet skyver «Kom i gang» ned | low | avvist: plassen er fra 3.3b, som instruksjonen sier |
 | VG9 | Installasjonskommandoene kan ikke sjekkes uten nett | low | avvist: de er ordrett fra instruksjonen og siden den viser til |
+
+*Lagt til 2026-10-18 kl. 22:09:* PR #70 er squash-flettet i `c5464e7`, låst til head-en `084edb1`, der main var flettet inn og bildet er 1280 × 1573 (gruppens svar kl. 21:42). CI var grønn på head-en (39161781824), også demoen med compose, og på main (39161911749). Mutanten E8, bildet fra `f8e2ed2` tilbake, ble fanget av `test_fila_finnes_og_er_1280_px_bred_og_1573_px_hoey`. Triagen står over og som kommentar på PR-en.

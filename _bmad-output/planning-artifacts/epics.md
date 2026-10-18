@@ -2035,6 +2035,8 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 
 *Avgjort 2026-10-18 kl. 21:42 (gruppens svar):* bildet av oversikten tas høyere, så hele gruppen «Skilte seg ut» i tabellen er med, og PR #70 flettes etter det. Grunnen: i 1280 × 1000 slutter bildet der tabellen begynner, så signalstyrken og fargene per aksje er ikke med.
 
+*Lagt til 2026-10-18 kl. 22:09:* bildet av oversikten, uv i «Tester» og variablene i `.env` er flettet i `c5464e7`, PR #70 (spesifikasjonen `spec-3-3e-bildet-uv-og-variablene.md`). Bildet er tilbake under «Til faglærer», 1280 × 1573 px, til bunnen av «Skilte seg ut». «Tester» har installasjonen av uv for Windows og Mac og tiden for testene, og «Mer for den som vil» har tabellen over variablene.
+
 ### Story 3.4: Demoversjonen
 
 *Lagt til 2026-10-03, Marians beslutning kl. 18:10.*
