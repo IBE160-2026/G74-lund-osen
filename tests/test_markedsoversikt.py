@@ -670,3 +670,49 @@ def test_oppdatert_med_ukedagen_i_norsk_tid():
     tid = datetime(2026, 9, 24, 22, 30, tzinfo=timezone.utc)
     assert oppdatert(tid, 2026) == "fredag 25.09 kl. 00.30"
     assert oppdatert(datetime(2025, 11, 16, 22, 30, tzinfo=timezone.utc), 2026) == "søndag 16.11.2025 kl. 23.30"
+
+
+class TestSelskapSorteres:
+    """Story 8.15b (gruppens svar 18.10 kl. 22:06): Selskap sorteres A til Å
+    først, i norsk rekkefølge."""
+
+    @staticmethod
+    def _navnene(orden):
+        from markedsoversikt import Sortering, sorter
+
+        inn = [_rad(n, 100.0, 1.0, None) for n in ("Ålesund", "zeta", "Ørsta", "æble", "Bergen", "aker")]
+        return [rad.aksje.navn for rad in sorter(inn, Sortering("selskap", orden))]
+
+    def test_a_til_aa_i_norsk_rekkefoelge(self):
+        """Æ, Ø og Å etter Z, og uten forskjell på store og små bokstaver.
+        Ville feilet med navnet sortert på kodepunkt: da står store bokstaver
+        foer smaa, og Å foer Æ og Ø."""
+        assert self._navnene("stigende") == ["aker", "Bergen", "zeta", "æble", "Ørsta", "Ålesund"]
+
+    def test_et_nytt_klikk_snur(self):
+        """Ville feilet hvis synkende ga samme rekkefølge som stigende."""
+        assert self._navnene("synkende") == ["Ålesund", "Ørsta", "æble", "zeta", "Bergen", "aker"]
+
+    def test_foerste_klikk_er_a_til_aa(self):
+        """Ville feilet hvis Selskap begynte med Å til A, som tallkolonnene."""
+        from markedsoversikt import neste_orden
+
+        assert neste_orden("selskap", None) == "stigende"
+
+    def test_navnet_ikke_tickeren(self):
+        """Gjennomgangen av 8.15b (BH2): ticker og navn gir ulik rekkefølge
+        her. Ville feilet hvis Selskap ble sortert på tickeren."""
+        from markedsoversikt import Rad, Sortering, sorter
+
+        def rad(symbol, navn):
+            return Rad(
+                aksje=Aksje(symbol, f"{symbol}.OL", navn, "Energi"),
+                dato=IDAG,
+                sluttkurs=100.0,
+                endring_prosent=1.0,
+                tilstand=None,
+                tekst=IKKE_VURDERT,
+            )
+
+        inn = [rad("AAA", "Beta"), rad("ZZZ", "Alfa")]
+        assert [r.aksje.navn for r in sorter(inn, Sortering("selskap", "stigende"))] == ["Alfa", "Beta"]

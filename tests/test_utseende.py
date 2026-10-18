@@ -185,6 +185,11 @@ KONTRAST = [
     ("dempet-2", "hvit", 4.5),
     # Gjennomgangen av PR 3 (VG8): det grå feltet mot sporet (del 5, 3,23:1).
     ("felt", "spor", 3.0),
+    # Story 8.15b: den sorterte kolonnen. Navnet, «NOK» og streken mot det
+    # lysere feltet.
+    ("hvit", "stripe-kant", 4.5),
+    ("kolonne-tekst-2", "stripe-kant", 4.5),
+    ("oransje", "stripe-kant", 3.0),
 ]
 
 
@@ -286,7 +291,9 @@ class TestRammen:
                 assert (
                     href == "/"
                     or re.fullmatch(r"/aksje/[A-Z0-9]+", href)
-                    or re.fullmatch(r"/\?sorter=(kurs|endring|signal|retning)&amp;orden=(synkende|stigende)", href)
+                    or re.fullmatch(
+                        r"/\?sorter=(selskap|kurs|endring|signal|retning)&amp;orden=(synkende|stigende)", href
+                    )
                     # Story 8.16: periodene i kursgrafen er en parameter paa aksjesiden.
                     or re.fullmatch(r"/aksje/[A-Z0-9]+\?periode=(" + "|".join(map(re.escape, PERIODENE)) + ")", href)
                 ), (navn, href)
@@ -645,7 +652,8 @@ class TestSorteringen:
         html = sidene["oversikten"]
         thead = html.split("<thead>", 1)[1].split("</thead>", 1)[0]
         lenker = re.findall(r'<a class="sorter[^"]*"[^>]*>(.*?)</a>', thead, re.DOTALL)
-        assert len(lenker) == 4
+        # Story 8.15b: Selskap ogsaa.
+        assert len(lenker) == 5
         for lenke in lenker:
             assert re.search(r'<svg class="vinkel"[^>]*aria-hidden="true"', lenke), lenke
             assert not re.search("[←→↑↓↔↗↘↖↙▲▼]", lenke), lenke

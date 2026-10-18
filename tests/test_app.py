@@ -177,13 +177,10 @@ def test_viser_selskapsnavn_og_de_fem_kolonnene(klient, monkeypatch):
         # Story 8.0d, PR 2: «NOK» bare under Sluttkurs (svar 2, BH9).
         nok = '(<span class="under">NOK</span>)' if overskrift == "Sluttkurs" else ""
         # Story 8.15: navnet er en lenke som sorterer, med en vinkel.
-        # Gjennomgangen (BH5): lenken er påkrevd ved de fire som kan sorteres.
-        lenke = r'<a class="sorter[^"]*" href="[^"]*">' if overskrift != "Selskap" else ""
-        etter = (
-            r'<span class="skjult">[^<]*</span><svg class="vinkel"[^>]*><path[^>]*/></svg></a>'
-            if overskrift != "Selskap"
-            else ""
-        )
+        # Gjennomgangen (BH5): lenken er påkrevd ved de som kan sorteres.
+        # Story 8.15b: Selskap ogsaa, saa alle fem.
+        lenke = r'<a class="sorter[^"]*" href="[^"]*">'
+        etter = r'<span class="skjult">[^<]*</span><svg class="vinkel"[^>]*><path[^>]*/></svg></a>'
         assert re.search(rf"<th[^>]*>{lenke}{overskrift}{etter}( <button[^<]*>\?</button>)?{nok}</th>", html), (
             overskrift
         )
@@ -2169,6 +2166,9 @@ class TestStory815Sortering:
             ("/?sorter=signal&orden=stigende", ["DNB", "EQNR", "KOG"], ["MOWI", "NHY"]),
             ("/?sorter=retning&orden=stigende", ["EQNR", "DNB", "KOG"], ["MOWI", "NHY"]),
             ("/?sorter=retning&orden=synkende", ["KOG", "DNB", "EQNR"], ["MOWI", "NHY"]),
+            # Story 8.15b: Selskap, A til Å og Å til A, innenfor hver del.
+            ("/?sorter=selskap&orden=stigende", ["DNB", "EQNR", "KOG"], ["MOWI", "NHY"]),
+            ("/?sorter=selskap&orden=synkende", ["KOG", "EQNR", "DNB"], ["NHY", "MOWI"]),
         ],
     )
     def test_hver_del_sorteres_for_seg(self, tabell, adresse, ut, oevrige):
@@ -2184,7 +2184,14 @@ class TestStory815Sortering:
         thead = html.split("<thead>", 1)[1].split("</thead>", 1)[0]
         assert "aria-sort" not in thead
         lenker = dict(re.findall(r'href="/\?sorter=(\w+)&amp;orden=(\w+)"', thead))
-        assert lenker == {"kurs": "synkende", "endring": "synkende", "signal": "synkende", "retning": "stigende"}
+        # Story 8.15b: Selskap A til Å foerst.
+        assert lenker == {
+            "selskap": "stigende",
+            "kurs": "synkende",
+            "endring": "synkende",
+            "signal": "synkende",
+            "retning": "stigende",
+        }
         valgt = self._side(tabell, "/?sorter=endring&orden=synkende")
         thead = valgt.split("<thead>", 1)[1].split("</thead>", 1)[0]
         assert re.findall(
@@ -2237,7 +2244,7 @@ class TestStory815Sortering:
             thead = self._side(tabell, adresse).split("<thead>", 1)[1].split("</thead>", 1)[0]
             return dict(re.findall(r'href="/\?sorter=(\w+)&amp;[^"]*">.*?<path d="([^"]+)"', thead))
 
-        assert vinkler("/") == {"kurs": ned, "endring": ned, "signal": ned, "retning": opp}
+        assert vinkler("/") == {"selskap": opp, "kurs": ned, "endring": ned, "signal": ned, "retning": opp}
         assert vinkler("/?sorter=endring&orden=synkende")["endring"] == ned
         assert vinkler("/?sorter=endring&orden=stigende")["endring"] == opp
         assert vinkler("/?sorter=retning&orden=synkende")["retning"] == ned
@@ -3399,3 +3406,81 @@ class TestPeriodeneIKursgrafen:
         for periode, tekst in (("1-uke", "1 uke"), ("1-mnd", "1 måned"), ("i-aar", "i år"), ("1-aar", "1 år")):
             html = klient.get(f"/aksje/EQNR?periode={periode}").data.decode("utf-8")
             assert f"<h2>Kursutvikling, {tekst} " in html, periode
+
+
+class TestStory815bSelskapOgMarkeringen:
+    """Story 8.15b: Selskap sorteres, og den sorterte kolonnen er markert."""
+
+    @pytest.fixture
+    def tabell(self, klient):
+        """Gjennomgangen (VG1): Aker BP står under «Øvrige aksjer» og først i
+        alfabetet, så en sortering på tvers av delene ville flyttet den."""
+        _lagret("KOG", 1.0, 1, 1, 1)
+        _lagret("DNB", -4.0, -1, -1, 0)
+        _lagret("MOWI", 3.0, 1, 0, 0)
+        _lagret("AKRBP", 2.0, 1, 0, 0)
+        return klient
+
+    @pytest.mark.parametrize(
+        "orden, ut, oevrige",
+        [("stigende", ["DNB", "KOG"], ["AKRBP", "MOWI"]), ("synkende", ["KOG", "DNB"], ["MOWI", "AKRBP"])],
+    )
+    def test_selskap_sorteres_innenfor_hver_del(self, tabell, orden, ut, oevrige):
+        """Tillegget 13.10. Ville feilet hvis Aker BP flyttet seg til «Skilte
+        seg ut» fordi den kommer først i alfabetet."""
+        html = tabell.get(f"/?sorter=selskap&orden={orden}").data.decode("utf-8")
+        assert _deler_i_rekkefoelge(html) == (ut, oevrige)
+
+    @staticmethod
+    def _thead(klient, adresse):
+        html = klient.get(adresse).data.decode("utf-8")
+        return html, html.split("<thead>", 1)[1].split("</thead>", 1)[0]
+
+    def test_et_nytt_klikk_snur_og_teksten_sier_a_til_aa(self, tabell):
+        """Ville feilet hvis lenken på Selskap ikke snudde, eller linja og
+        teksten for skjermleseren ikke sa «(A til Å)» som for Retning."""
+        html, thead = self._thead(tabell, "/?sorter=selskap&orden=stigende")
+        assert 'href="/?sorter=selskap&amp;orden=synkende"' in thead
+        assert ", sortert stigende (A til Å). Velg for synkende (Å til A)." in thead
+        assert "Sortert på selskap, stigende (A til Å), innenfor hver del." in html
+        _, thead = self._thead(tabell, "/")
+        assert ", sorter stigende (A til Å)" in thead
+        # Gjennomgangen (VG7): og synkende.
+        html, thead = self._thead(tabell, "/?sorter=selskap&orden=synkende")
+        assert "Sortert på selskap, synkende (Å til A), innenfor hver del." in html
+        assert 'href="/?sorter=selskap&amp;orden=stigende"' in thead
+
+    @pytest.mark.parametrize("orden, aria", [("stigende", "ascending"), ("synkende", "descending")])
+    @pytest.mark.parametrize("kolonne", ["selskap", "kurs", "endring", "signal", "retning"])
+    def test_bare_den_sorterte_kolonnen_har_aria_sort(self, tabell, kolonne, orden, aria):
+        """aria-sort som før, i begge retninger (gjennomgangen, BH5), og
+        markeringen følger den. Ville feilet hvis en annen kolonne enn den
+        sorterte hadde aria-sort, eller verdien ikke fulgte retningen."""
+        _, thead = self._thead(tabell, f"/?sorter={kolonne}&orden={orden}")
+        celler = re.findall(r"<th[^>]*>.*?</th>", thead, re.S)
+        merket = [c for c in celler if "aria-sort" in c.split(">", 1)[0]]
+        assert len(merket) == 1 and f"sorter={kolonne}&amp;" in merket[0]
+        assert f'aria-sort="{aria}"' in merket[0]
+
+    def test_uten_sortering_har_ingen_kolonne_markeringen(self, tabell):
+        """Ville feilet hvis en kolonne var markert uten sortering."""
+        _, thead = self._thead(tabell, "/")
+        assert "aria-sort" not in thead
+
+    def test_markeringen_staar_bare_paa_den_sorterte_kolonnen(self, tabell):
+        """Designtavla: et lysere felt og en oransje strek under. Ville feilet
+        hvis markeringen sto på alle kolonnene, ikke bare den med aria-sort."""
+        html, _ = self._thead(tabell, "/")
+        stil = _stil(html)
+        regel = _regel(stil, ".tabellboks thead th[aria-sort]")
+        assert "background: var(--stripe-kant)" in regel
+        assert "box-shadow: inset 0 -3px 0 var(--oransje)" in regel
+        alle = _regel(stil, "thead th")
+        assert "stripe-kant" not in alle and "var(--oransje)" not in alle
+        # Gjennomgangen (BH3, ECH10): hver regel i kolonneraden som bruker
+        # feltet, gjelder bare th[aria-sort].
+        for velger in re.findall(r"([^{}]+)\{[^}]*var\(--stripe-kant\)", stil):
+            if "thead" in velger:
+                assert "th[aria-sort]" in velger, velger
+        # BH6, ECH3: en gjennomsiktig kant som synes med tvungne farger.
+        assert "outline: 3px solid transparent" in regel

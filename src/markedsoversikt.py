@@ -280,9 +280,12 @@ def del_i_to(rader: list[Rad]) -> tuple[list[Rad], list[Rad]]:
 # tabellen («Sortert på endring, synkende») og retningen ved første klikk.
 # Svar 1: synkende først, størst først. Svar 2: Retning er en gruppering i
 # alfabetisk rekkefølge, A til Å først, ikke en rangering (NFR-06).
+# Story 8.15b (gruppens svar 18.10 kl. 22:06): Selskap sorteres A til Å
+# først, i den norske rekkefølgen fra _navn.
 SYNKENDE = "synkende"
 STIGENDE = "stigende"
 SORTERBARE: dict[str, tuple[str, str]] = {
+    "selskap": ("selskap", STIGENDE),
     "kurs": ("sluttkurs", SYNKENDE),
     "endring": ("endring", SYNKENDE),
     "signal": ("signalstyrke", SYNKENDE),
@@ -327,10 +330,12 @@ def neste_orden(kolonne: str, valgt: Sortering | None) -> str:
     return SORTERBARE[kolonne][1]
 
 
-def _verdi(rad: Rad, kolonne: str) -> float | int | None:
+def _verdi(rad: Rad, kolonne: str) -> float | int | str | None:
     """Verdien raden sorteres på, eller None når den mangler. Endring er i
     prosent med fortegn (FR-101, svar 1). Retning er plassen i alfabetet, og
-    Ukjent har ingen."""
+    Ukjent har ingen. Selskap er navnet i norsk rekkefølge (story 8.15b)."""
+    if kolonne == "selskap":
+        return _navn(rad)
     if kolonne == "kurs":
         return rad.sluttkurs
     if kolonne == "endring":

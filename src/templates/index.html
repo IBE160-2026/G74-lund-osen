@@ -8,9 +8,9 @@
     Dempet når kolonnen ikke er valgt, hvit når den er det (svar 4).
     Skjermleseren hører kolonnen og retningen, og linja over tabellen sier
     det samme: «stigende (A til Å)» eller «synkende (Å til A)» for Retning
-    (svar 8). #}
+    (svar 8), og for Selskap (story 8.15b). #}
 {% macro ordens_ord(kolonne, orden) -%}
-  {{- orden }}{% if kolonne == "retning" %} {{ "(A til Å)" if orden == "stigende" else "(Å til A)" }}{% endif -%}
+  {{- orden }}{% if kolonne in ("retning", "selskap") %} {{ "(A til Å)" if orden == "stigende" else "(Å til A)" }}{% endif -%}
 {%- endmacro %}
 {% macro ariasort(kolonne) -%}
   {%- if sortering and sortering.kolonne == kolonne %} aria-sort="{{ 'descending' if sortering.orden == 'synkende' else 'ascending' }}"{% endif -%}
@@ -183,6 +183,15 @@
     .tabellboks thead a.sorter .vinkel { color: var(--kolonne-tekst-2); flex: none; }
     .tabellboks thead a.sorter.valgt .vinkel { color: var(--hvit); }
     .tabellboks thead a.sorter:focus-visible { outline: 3px solid var(--oransje); outline-offset: 2px; }
+    /* Story 8.15b (gruppens svar 18.10 kl. 22:06): kolonnen tabellen er
+       sortert på, har et lysere felt og en oransje strek under, som på
+       designtavla. Velgeren følger aria-sort, som bare står på den sorterte
+       kolonnen, så ingen kolonne har markeringen uten sortering. Kanten er
+       gjennomsiktig og synes bare med tvungne farger (Windows med høy
+       kontrast), der nettleseren tar bort bakgrunnen og skyggen
+       (gjennomgangen av 8.15b, BH6 og ECH3). */
+    .tabellboks thead th[aria-sort] { background: var(--stripe-kant); box-shadow: inset 0 -3px 0 var(--oransje);
+                                      outline: 3px solid transparent; outline-offset: -3px; }
     .skjult { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);
               clip-path: inset(50%); white-space: nowrap; }
     /* Svar 5: linja over tabellen når en kolonne er valgt. */
@@ -360,7 +369,8 @@
     <table>
       <thead>
         <tr>
-          <th>Selskap {{ hjelpeknapp("hjelp-selskap", "Hjelp: selskap") }}</th>
+          {#- Story 8.15b: Selskap sorterer også, med «?» ved siden av lenken. #}
+          <th{{ ariasort("selskap") }}>{{ sorterlenke("selskap", "Selskap") }} {{ hjelpeknapp("hjelp-selskap", "Hjelp: selskap") }}</th>
           {#- Svar 2: bare «NOK» under et kolonnenavn. Story 8.15: «?» står
               ved siden av lenken, ikke inne i den. #}
           <th class="tall"{{ ariasort("kurs") }}>{{ sorterlenke("kurs", "Sluttkurs") }} {{ hjelpeknapp("hjelp-sluttkurs", "Hjelp: sluttkurs") }}<span class="under">NOK</span></th>
