@@ -55,13 +55,13 @@ Appen finnes i to versjoner, med samme kode. Vi anbefaler den ekte versjonen. Vi
 
 ### Demoen
 
-5. **Start demoen.** Kopier kommandoen med knappen til høyre i boksen, lim den inn i PowerShell-vinduet fra steg 4 (Ctrl+V eller Cmd+V) og trykk Enter. Første gang tar det noen minutter. Demoen er klar når det står `Serving on http://0.0.0.0:5000`. Den linja betyr bare at demoen kjører. Den adressen skal du ikke åpne.
+5. **Start demoen.** Kopier kommandoen med knappen til høyre i boksen, lim den inn i PowerShell-vinduet fra steg 4 (Ctrl+V eller Cmd+V) og trykk Enter. Første gang tar det noen minutter. Demoen er klar når det står `Serving on http://0.0.0.0:8000`. Den linja betyr bare at demoen kjører. Den adressen skal du ikke åpne.
 
 ```
 docker compose up --build demo
 ```
 
-6. **Åpne http://127.0.0.1:5000** i en ny fane. Øverst står «Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.» Klikk på et selskapsnavn for å se en aksje.
+6. **Åpne http://127.0.0.1:8000** i en ny fane. Øverst står «Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.» Klikk på et selskapsnavn for å se en aksje.
 7. **Stopp** med Ctrl+C i terminalvinduet, også på Mac, og lim så inn denne i PowerShell-vinduet fra steg 4. Det er klart når det står at containerne er fjernet (Removed).
 
 ```
@@ -91,7 +91,7 @@ Mac:
 open -e .env
 ```
 
-7. **Start appen.** Lim inn denne i PowerShell-vinduet fra steg 4, og trykk Enter. Første gang tar det noen minutter. Det er klart når det står `Serving on http://0.0.0.0:5000`, som bare betyr at appen kjører. Åpne http://127.0.0.1:5000 i en ny fane. Første gang er oversikten tom og viser kommandoen som henter.
+7. **Start appen.** Lim inn denne i PowerShell-vinduet fra steg 4, og trykk Enter. Første gang tar det noen minutter. Det er klart når det står `Serving on http://0.0.0.0:8000`, som bare betyr at appen kjører. Åpne http://127.0.0.1:8000 i en ny fane. Første gang er oversikten tom og viser kommandoen som henter.
 
 ```
 docker compose up --build
@@ -157,7 +157,7 @@ Flere spørsmål og svar står i [docs/hjelp.md](docs/hjelp.md).
 <details>
 <summary>Bytte mellom demoen og den ekte versjonen</summary>
 
-Begge bruker port 5000, så bare én kan kjøre om gangen. `docker compose down` stopper ikke demoen, fordi demoen ligger i en egen profil. `docker compose --profile demo down` stopper begge.
+Begge bruker port 8000, så bare én kan kjøre om gangen. `docker compose down` stopper ikke demoen, fordi demoen ligger i en egen profil. `docker compose --profile demo down` stopper begge.
 
 Stopp demoen og den ekte versjonen:
 
@@ -200,7 +200,7 @@ uv sync
 uv run python src/demo.py
 ```
 
-3. Start demoen på http://127.0.0.1:5000:
+3. Start demoen på http://127.0.0.1:8000:
 
 ```
 uv run python src/app.py --demo
@@ -220,7 +220,7 @@ cp .env.example .env
 uv run python src/fetch_prices.py
 ```
 
-3. Start webserveren på http://127.0.0.1:5000:
+3. Start webserveren på http://127.0.0.1:8000:
 
 ```
 uv run python src/app.py

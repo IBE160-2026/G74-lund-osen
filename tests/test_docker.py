@@ -463,7 +463,7 @@ class TestReadme:
             "«Download ZIP»",
             "cp .env.example .env",
             "docker compose up --build",
-            "http://127.0.0.1:5000",
+            "http://127.0.0.1:8000",
             "docker compose run --rm hent",
             "docker compose down",
         ):
@@ -563,7 +563,7 @@ class TestReadme:
         assert "Demoen står først i stegene under, fordi den er raskest." in topp
         assert "git clone" not in del_.split("### Står du fast?", 1)[0]
         demo = _seksjon("Demoen")
-        assert "docker compose up --build demo" in demo and "http://127.0.0.1:5000" in demo
+        assert "docker compose up --build demo" in demo and "http://127.0.0.1:8000" in demo
         assert "Eksempeltall" in demo and ".env" not in demo
 
     def test_kommandoene_er_de_samme_som_i_koden_og_compose(self):
@@ -958,8 +958,9 @@ UTE_AV_README = {
         "Docker Desktop er ikke startet, eller motoren er ikke klar. Start Docker Desktop, vent til det "
         "står «Engine running» (steg 1), og prøv kommandoen igjen."
     ),
+    # Story 3.2b: porten er 8000, som i docs/hjelp.md. AirPlay bruker fortsatt 5000.
     "«port is already allocated», «address already in use» eller «ports are not available».": (
-        "Noe annet bruker port 5000. Kjører den andre versjonen, stopper du den først (se «Bytte mellom "
+        "Noe annet bruker port 8000. Kjører den andre versjonen, stopper du den først (se «Bytte mellom "
         "demoen og den ekte versjonen» under «Mer for den som vil»). På Mac bruker AirPlay-mottakeren "
         "(AirPlay Receiver) port 5000. Slå den av under Systeminnstillinger (System Settings) → Generelt "
         "(General) → AirDrop og Handoff (AirDrop & Handoff), og prøv igjen."
@@ -1150,7 +1151,7 @@ class TestReadmeForNybegynnere:
         assert "ikonet til høyre i den grå boksen" in innliming and "Ctrl+C" in innliming
         assert "skrive den inn" in innliming and "PowerShell-vinduet fra steg 4" in innliming
         vinduet = _hjelp().split("### Hva skal jeg se etter i vinduet?\n\n", 1)[1].split("\n### ", 1)[0]
-        assert "«Serving on http://0.0.0.0:5000» betyr bare at appen kjører." in vinduet
+        assert "«Serving on http://0.0.0.0:8000» betyr bare at appen kjører." in vinduet
 
     def test_stegene_nevner_powershell_og_terminal(self):
         steg = _steg("Felles for begge", 3)
@@ -1362,7 +1363,7 @@ class TestReadmeForNybegynnere:
             "Safari",
             "administrator, og da sperrer Windows dra og slipp",
             "`.env` med nøkkelen",
-            "port 5000",
+            "port 8000",
             "Ledetekst",
             "Ikke velg «Windows PowerShell ISE»",
             "filene README og compose",
