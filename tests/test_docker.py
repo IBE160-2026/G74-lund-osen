@@ -1463,6 +1463,50 @@ class TestReadmeForNybegynnere:
         assert [b.strip() for _, b in _blokkene(_steg("Demoen", 7))] == ["docker compose --profile demo down"]
         assert "Ctrl+C" in _steg("Demoen", 7) and "Ctrl+C" in _steg("Den ekte versjonen (anbefalt)", 9)
 
+    def test_installasjonen_av_uv_staar_foer_uv_sync(self):
+        """Story 3.3e, punkt b (gruppens svar 18.10 kl. 20:39): «Tester» har
+        installasjonen av uv foer uv sync, én boks for Windows (PowerShell) og
+        én for Mac (Terminal), og hva man gjoer naar uv ikke blir funnet.
+        «Uten Docker, med uv» viser dit og har ingen egen kopi, og
+        docs/hjelp.md har samme svar. Ville feilet hvis en av boksene manglet,
+        sto etter uv sync, eller sto ogsaa i «Uten Docker, med uv»."""
+        tester = README.read_text(encoding="utf-8").split("\n## Tester\n", 1)[1].split("\n## ", 1)[0]
+        assert "](https://docs.astral.sh/uv/getting-started/installation/)" in tester
+        assert f"Windows (PowerShell):\n\n```\n{UV_WINDOWS}\n```" in tester
+        assert f"Mac (Terminal):\n\n```\n{UV_MAC}\n```" in tester
+        assert tester.index(UV_WINDOWS) < tester.index(UV_MAC) < tester.index("```\nuv sync\n```")
+        funnet = "lukker du vinduet, åpner et nytt og går til mappa, som i steg 4"
+        assert "«The term 'uv' is not recognized» eller «command not found: uv»" in tester and funnet in tester
+        assert "Første `uv sync` laster ned Python og pakkene" in tester
+        assert re.search(r"Hele testsettet tok mellom \d+ og \d+ minutter", tester)
+        uv = _detaljer(_seksjon("Mer for den som vil"))["Uten Docker, med uv"]
+        assert "[«Tester»](#tester)" in uv
+        assert UV_WINDOWS not in uv and UV_MAC not in uv and "install.ps1" not in uv and "install.sh" not in uv
+        sporsmaal = "«The term 'uv' is not recognized» eller «command not found: uv»."
+        svar = _hjelp().split(f"### {sporsmaal}\n\n", 1)[1].split("\n\n", 1)[0]
+        assert funnet in svar and "](../README.md#tester)" in svar
+
+    def test_variablene_i_tabellen_er_de_i_env_example(self):
+        """Story 3.3e, punkt c: tabellen under «Variablene i .env» har de
+        samme variablene som .env.example, og hver av dem leses i src/.
+        Testen leser .env.example, aldri .env. Ville feilet med en variabel i
+        .env.example som ikke stod i tabellen, eller en i tabellen som koden
+        ikke leser."""
+        eksempel = (ROT / ".env.example").read_text(encoding="utf-8")
+        i_fila = set(re.findall(r"^#?\s*([A-Z][A-Z0-9_]+)=", eksempel, re.MULTILINE))
+        knapp = _detaljer(_seksjon("Mer for den som vil"))["Variablene i .env"]
+        rader = [l for l in knapp.splitlines() if l.startswith("| `")]
+        i_tabellen = [re.match(r"\| `([A-Z0-9_]+)` \|", l).group(1) for l in rader]
+        assert len(i_tabellen) == len(set(i_tabellen)) and set(i_tabellen) == i_fila, (i_tabellen, i_fila)
+        for rad in rader:
+            assert len([c for c in rad.strip("|").split("|")]) == 4, rad
+        kilde = "\n".join(p.read_text(encoding="utf-8") for p in sorted((ROT / "src").glob("*.py")))
+        for navn in i_tabellen:
+            assert f'"{navn}"' in kilde, navn
+        assert "`OSE_DEMO` og `OSE_I_DOCKER` settes av `compose.yaml` og `Dockerfile`" in knapp
+        # Steg 6 viser dit.
+        assert "[`.env`](#mer-for-den-som-vil)" in _steg("Den ekte versjonen (anbefalt)", 6)
+
     def test_mer_for_den_som_vil_er_lukket(self):
         """22:32: Bytte og uv staar, lukket i <details> under én overskrift."""
         mer = _seksjon("Mer for den som vil")
