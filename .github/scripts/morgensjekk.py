@@ -293,7 +293,7 @@ for f in filer:
         feil_filer.append(f)
     elif p.suffix in (".db", ".sqlite", ".sqlite3", ".parquet", ".pkl", ".xlsx"):
         feil_filer.append(f)
-    elif p.suffix in (".csv", ".json", ".jsonl") and not f.startswith((".agents/", ".claude/", "_bmad/")):
+    elif p.suffix in (".csv", ".json", ".jsonl") and not f.startswith((".claude/", "_bmad/")):
         feil_filer.append(f)
 MOENSTRE = {
     "EODHD_API_KEY med verdi": r"EODHD_API_KEY\s*=\s*[\"']?[A-Za-z0-9._-]{8,}",

@@ -326,7 +326,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - `_bmad-output/` — Product Brief, plan, krav og sprintstatus
 - `.github/` — testkjøringen og morgensjekken
 - `Dockerfile`, `compose.yaml` og `.dockerignore` — imaget og tjenestene: webserveren, hentingen og demoen
-- `_bmad/`, `.claude/skills/` og `.agents/skills/` — BMAD-rammeverket, ikke skrevet av oss
+- `_bmad/` og `.claude/skills/` — BMAD-rammeverket, ikke skrevet av oss
 
 Ikke i repoet: API-nøkkelen (`.env`), rådata, basen og demobasen (`data/`), lokale testskript (`local-tests/`) og den private arbeidsmappa (`_privat/`).
 
