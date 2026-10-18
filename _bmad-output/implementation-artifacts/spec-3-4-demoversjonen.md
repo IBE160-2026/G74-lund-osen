@@ -216,6 +216,7 @@ Fra instruksjonen kl. 16:54 i `docs/ai-prompts/2026-10-11.md` (planen) og kl. 20
     - Grenen 8-0b (PR #29) endrer den gamle statuslinja, som begynte med «Børsdagskontrollen (2.3) …». Den finnes ikke lenger etter PR 3. Når 8-0b henter main, må den nye statuslinja i stedet si at hjelpen bak «?» er ferdig.
     - PR #28 (2.3b) endrer punktet «Når du henter» i README-en. Det står nå i `docs/hjelp.md` under «Når kan jeg hente?», og endringen må føres der.
     - Generelt: den som fletter 2.3b, 8.0b, 8.0c eller 8.0d, flytter saken fra «Neste» til «Flettet til main» i statuslinja. Grenen 8-0b sin egen statuslinje sier også at 2.3b er flettet. Det føres bare hvis PR #28 faktisk er flettet først.
+    - *Lagt til 2026-10-18 (story 3.3d):* «Status» har nå to lister, «Ferdig» og «Neste». Den som fletter en sak, flytter den fra «Neste» til «Ferdig».
     - 8.0d står i statuslinja og i `epics.md`, men ikke i `sprint-status.yaml` før den planlegges (instruksjonen kl. 15:57). Derfor lenker statuslinja også til `epics.md`.
 
 - **2026-10-12, instruksjonen kl. 00:22, ny beskrivelse øverst:** Marian godkjente 11.10 kl. 23:50 en ny beskrivelse under gruppelinja. Den sier hva appen viser for en som ikke kjenner den: 15 aksjer som omsettes mye, de tre sjekkene ved navn, signalstyrken fra 0 til 3, og at appen ikke gir råd om å kjøpe eller selge (NFR-06). Den gamle sa «15 likvide Oslo Børs-aksjer» og nevnte verken sjekkene eller rådet. `test_beskrivelsen_foelger_koden_og_gir_ikke_raad` henter antallet aksjer fra `AKSJEUNIVERS`, og antallet sjekker og navnene deres fra `signalberegning.py`, så README-en må følge når lista endres (2.11 og 2.12). §9 er ikke rørt.
@@ -558,3 +559,5 @@ C3 la igjen volumet `ose-ci-34_ose-db`, fordi mutanten la til et volum trap ikke
 | P17 | rad 10 (steg 8) tatt ut av §9 | `test_stegene_og_henvisningene_til_dem`. Kommandoen står fortsatt i rad 16, så testen for kommandoene alene fanger den ikke |
 
 **Testene etter PR 3:** lokalt 1281 passed og 16 skipped, 1297 samlet. Før PR 3: lokalt 1269 passed og 16 skipped, i CI 1285.
+
+*Lagt til 2026-10-18 (story 3.3d):* beslutningen 16.10 kl. 21:53–21:58 under story 3.3 i `epics.md`: README-en ryddes i en egen PR etter README-PR-en, med «Status» som to lister, fem spørsmål under «Står du fast?», uv-delen som to lister, forklaringen under «Tester» bak en knapp, en linje «Innhold» og lenker i «Mappestruktur». Den bygges i `spec-3-3d-readme-ryddingen.md`. Grensen på 8 spørsmål fra 11.10 kl. 22:32, som ble 10 18.10 kl. 14:48, blir 5 der.

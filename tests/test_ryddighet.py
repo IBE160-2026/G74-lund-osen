@@ -256,7 +256,8 @@ def test_mappestrukturen_nevner_bmad_og_claude_skills_ikke_agents():
     «Mappestruktur» i README-en nevnte .agents/ igjen, eller ikke lenger
     nevnte _bmad/ og .claude/skills/ (regel 19)."""
     del_ = _avsnitt((ROT / "README.md").read_text(encoding="utf-8"), "Mappestruktur")
-    assert "`_bmad/` og `.claude/skills/` — BMAD-rammeverket" in del_
+    # Story 3.3d: stiene er lenker.
+    assert "[`_bmad/`](_bmad/) og [`.claude/skills/`](.claude/skills/) — BMAD-rammeverket" in del_
     assert ".agents" not in del_
 
 

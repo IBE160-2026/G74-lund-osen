@@ -684,6 +684,30 @@ class TestReadme:
         assert not re.search(r"\b\d+\s+(tester|testene|hoppes|hoppet|består|bestått|passed|skipped)\b", tester)
         assert not re.search(r"\b(alle|de)\s+\d+\b", tester, re.IGNORECASE)
 
+    def test_forklaringen_i_tester_staar_bak_en_knapp(self):
+        """Story 3.3d, punkt d: kommandoene, «Alle testene skal bestå»,
+        punktene og setningen om kvalitetssikringen står synlig, og
+        forklaringen om testene som hoppes over, står bak knappen «Hvorfor
+        hoppes noen over?», som de andre knappene. Ville feilet hvis
+        forklaringen sto utenfor knappen."""
+        tester = README.read_text(encoding="utf-8").split("\n## Tester\n", 1)[1].split("\n## ", 1)[0]
+        knapper = _detaljer(tester)
+        assert list(knapper) == ["Hvorfor hoppes noen over?"]
+        forklaring = knapper["Hvorfor hoppes noen over?"]
+        synlig = re.sub(r"<details>.*?</details>", "", tester, flags=re.DOTALL)
+        for grunn in ("time.tzset", "Unix-sokler", "`::1`", "uten git", "`-rs`"):
+            assert grunn in forklaring and grunn not in synlig, grunn
+        assert "Alle testene skal bestå." in synlig
+        assert [b.strip() for _, b in _blokkene(synlig)] == ["uv sync", "uv run pytest"]
+        assert "- Ingen nettkall:" in synlig and "- CI kjører" in synlig
+        assert "](docs/kvalitetssikring.md)" in synlig
+        # Gjennomgangen, BH10 og ECH7: indeksene i samme tekst, og knappen
+        # rett etter «Alle testene skal bestå», foer punktene.
+        assert tester.index("uv run pytest") < tester.index("Alle testene skal bestå.") < tester.index("<details>")
+        assert tester.index("</details>") < tester.index("\n- Ingen nettkall:")
+        assert "Alle testene skal bestå. Noen hoppes over, og knappen under sier hvorfor.\n\n<details>" in tester
+        assert not _blokkene(forklaring), forklaring
+
     def test_bildene_er_de_tre_fra_gjennomgangen_og_ci_merket(self):
         """Story 3.3: skjermbilder med ekte data publiserer dataene. Regelen
         står i dokumentene: bilder i README-en kommer bare fra
@@ -803,6 +827,20 @@ def _detaljer(tekst: str) -> dict[str, str]:
     return dict(re.findall(r"<details>\n<summary>(.+?)</summary>\n\n(.*?)\n\n</details>", tekst, re.DOTALL))
 
 
+def _statuslister(status: str) -> dict[str, list[str]]:
+    """Listene i «Status» som {navn: punkter}, story 3.3d. En liste er en
+    linje i fet skrift alene, en tom linje, og så linjer som begynner med
+    «- », til neste tomme linje. Et punkt over flere linjer, eller noe annet
+    enn punkter mellom overskriften og den tomme linja, faar testen til aa
+    feile."""
+    lister = {}
+    for navn, kropp in re.findall(r"^\*\*([^*\n]+)\*\*\n\n((?:.+\n?)+)", status, re.MULTILINE):
+        linjer = kropp.rstrip("\n").split("\n")
+        assert all(l.startswith("- ") for l in linjer), (navn, linjer)
+        lister[navn] = [l[2:] for l in linjer]
+    return lister
+
+
 def _faq() -> str:
     return _seksjon("Står du fast?")
 
@@ -838,6 +876,23 @@ def _bildetekst(tekst: str, navn: str) -> str:
         re.MULTILINE,
     )
     return treff.group(1) if treff else ""
+
+
+def _alle_ankrene(tekst: str) -> list[str]:
+    """Ankrene i den rekkefoelgen overskriftene staar, ogsaa de like."""
+    return [_anker(o) for o in re.findall(r"^#+ (.+)$", _uten_bokser(tekst), re.MULTILINE)]
+
+
+def _git_sporet() -> list[str] | None:
+    """Filene git sporer, eller None uten git (ZIP-fila)."""
+    import shutil
+    import subprocess
+
+    if shutil.which("git") is None or not (ROT / ".git").exists():
+        return None
+    svar = subprocess.run(["git", "-C", str(ROT), "ls-files", "-z"], capture_output=True, text=True)
+    assert svar.returncode == 0, svar.stderr
+    return [f for f in svar.stdout.split("\0") if f]
 
 
 def _ankrene(tekst: str) -> set[str]:
@@ -881,6 +936,53 @@ TEMAENE = (
     "Hvor ligger dataene?",
     "Kan appen nås fra nettet?",
 )
+
+
+# Story 3.3d: spoersmaalene som ble tatt ut av «Står du fast?», med svaret
+# README-en hadde. docs/hjelp.md har minst det samme svaret (punkt b).
+UTE_AV_README = {
+    "Mappa lar seg ikke dra inn i vinduet.": (
+        "PowerShell er trolig åpnet som administrator, og da sperrer Windows dra og slipp. Lukk vinduet "
+        "og åpne PowerShell på vanlig måte (steg 3)."
+    ),
+    "Ingenting skjer når jeg limer inn.": (
+        "Kommandoene skrives i PowerShell eller Terminal, ikke i Docker Desktop. Docker Desktop skal "
+        "bare være åpent, og du skriver ingenting i det. Ledetekst (Command Prompt) på Windows virker "
+        "også for demoen, men stegene er skrevet for PowerShell, og den ekte versjonen trenger "
+        "PowerShell.\n\nKopier kommandoen med ikonet til høyre i den grå boksen i README-en. Ikonet synes "
+        "først når musa er over boksen. Du kan også markere kommandoen og trykke Ctrl+C (Cmd+C på Mac), "
+        "eller skrive den inn. Lim den inn i PowerShell-vinduet fra steg 4 med Ctrl+V (Cmd+V på Mac), og "
+        "trykk Enter."
+    ),
+    "«Cannot connect to the Docker daemon», «error during connect» eller «dockerDesktopLinuxEngine».": (
+        "Docker Desktop er ikke startet, eller motoren er ikke klar. Start Docker Desktop, vent til det "
+        "står «Engine running» (steg 1), og prøv kommandoen igjen."
+    ),
+    "«port is already allocated», «address already in use» eller «ports are not available».": (
+        "Noe annet bruker port 5000. Kjører den andre versjonen, stopper du den først (se «Bytte mellom "
+        "demoen og den ekte versjonen» under «Mer for den som vil»). På Mac bruker AirPlay-mottakeren "
+        "(AirPlay Receiver) port 5000. Slå den av under Systeminnstillinger (System Settings) → Generelt "
+        "(General) → AirDrop og Handoff (AirDrop & Handoff), og prøv igjen."
+    ),
+    "Oversikten er tom.": (
+        "Uten henting starter appen med tom oversikt og viser kommandoen som henter. Hent kursene med "
+        "steg 8 i den ekte versjonen, og last siden på nytt."
+    ),
+}
+# Raadets forslag (instruksjonen 18.10 kl. 17:04), i rekkefoelgen i README-en.
+# Gruppens svar 18.10 kl. 17:40: «Engine running» og «Cannot connect to the
+# Docker daemon» er ett spoersmaal, fordi grunnen er den samme. Det staar
+# ikke i docs/hjelp.md, der de to spoersmaalene staar hver for seg.
+SAMMENSLAATT = (
+    "«Engine running» kommer ikke, eller det står «Cannot connect to the Docker daemon» eller «error during connect»."
+)
+BEHOLDT_I_README = [
+    SAMMENSLAATT,
+    "ZIP-fila ser ut som en vanlig mappe.",
+    "«is not recognized as the name of a cmdlet» etter cd.",
+    "«Cannot find path … because it does not exist».",
+    "«no configuration file provided: not found».",
+]
 
 
 class TestReadmeForNybegynnere:
@@ -1038,9 +1140,8 @@ class TestReadmeForNybegynnere:
                     assert "i PowerShell-vinduet fra steg 4" in steg, (seksjon, n)
         # BH11: demoen slutter i steg 7 og sier hvor den ekte versjonen begynner.
         assert "Vil du også prøve den ekte versjonen, går du videre til steg 5 under." in _steg("Demoen", 7)
-        # VG7: svaret under «Står du fast?» har kopieringen, likt med docs/hjelp.md.
-        faq = _detaljer(_faq())["Ingenting skjer når jeg limer inn."]
-        assert "ikonet til høyre i den grå boksen" in faq and "skrive den inn" in faq
+        # VG7: svaret om innlimingen har kopieringen. Fra 3.3d står det bare i
+        # docs/hjelp.md, som sjekkes under.
         # Linja i steg 7 og steg 5 i demoen sier hva den betyr.
         assert "som bare betyr at appen kjører" in _steg("Den ekte versjonen (anbefalt)", 7)
         assert "Den linja betyr bare at demoen kjører." in _steg("Demoen", 5)
@@ -1080,16 +1181,22 @@ class TestReadmeForNybegynnere:
         uten_detaljer = re.sub(r"<details>.*?</details>", "", _kom_i_gang(), flags=re.DOTALL)
         assert advarsel in uten_detaljer
 
-    def test_staar_du_fast_har_hoeyst_10_spoersmaal(self):
+    def test_staar_du_fast_har_hoeyst_5_spoersmaal(self):
         """22:32: FAQ-en var for lang. Hoeyst 8 spoersmaal, hvert som
         <details> med <summary>, og en lenke til docs/hjelp.md.
 
         Story 3.3c (svar 1 18.10 kl. 14:48): hoeyst 10, for svarene om
         mellomrommet etter cd og «Cannot find path» fra gjennomgangen 16.10.
-        Het test_staar_du_fast_har_hoeyst_8_spoersmaal til 3.3c."""
+
+        Story 3.3d (beslutningen 16.10 kl. 21:53-21:58, svarene 18.10 kl.
+        15:37): hoeyst 5. Hvilke fem er raadets forslag, ikke avgjort 16.10.
+        Het test_staar_du_fast_har_hoeyst_8_spoersmaal til 3.3c, og
+        test_staar_du_fast_har_hoeyst_10_spoersmaal til 3.3d. Ville feilet
+        med et sjette spoersmaal."""
         faq = _faq()
         sporsmaal = _detaljer(faq)
-        assert 1 <= len(sporsmaal) <= 10
+        assert 1 <= len(sporsmaal) <= 5
+        assert list(sporsmaal) == BEHOLDT_I_README, list(sporsmaal)
         assert faq.count("<details>") == faq.count("</details>") == faq.count("<summary>") == len(sporsmaal)
         rest = re.sub(r"<details>.*?</details>", "", faq, flags=re.DOTALL)
         assert [l for l in rest.splitlines() if l.strip()] == [
@@ -1210,6 +1317,36 @@ class TestReadmeForNybegynnere:
             "Den lokale modellen (KI-teksten)",
         }
 
+    def test_uv_delen_er_to_nummererte_lister(self):
+        """Story 3.3d, punkt c: uv-delen under «Mer for den som vil» er to
+        korte nummererte lister, «Demoen» og «Den ekte versjonen», med én
+        linje før hver boks. Kommandoene er de samme som før 3.3d. Ville
+        feilet hvis en liste manglet, et punkt fikk mer enn én linje, eller
+        en kommando ble endret."""
+        uv = _detaljer(_seksjon("Mer for den som vil"))["Uten Docker, med uv"]
+        forventet = {
+            "Demoen": ["uv sync", "uv run python src/demo.py", "uv run python src/app.py --demo"],
+            "Den ekte versjonen": [
+                "cp .env.example .env",
+                "uv run python src/fetch_prices.py",
+                "uv run python src/app.py",
+            ],
+        }
+        assert uv.index("**Demoen**\n\n") < uv.index("**Den ekte versjonen**\n\n")
+        demo, ekte = uv.split("**Demoen**\n\n", 1)[1].split("**Den ekte versjonen**\n\n", 1)
+        ekte, etter = ekte.split("\n\nBasen, demobasen", 1)
+        # Gjennomgangen, ECH6: setningene foer og etter listene staar.
+        assert uv.startswith("Med Python 3.13 og [uv](https://docs.astral.sh/uv/). Først demoen.\n\n**Demoen**")
+        assert etter.startswith(" og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo` åpner")
+        for navn, liste in (("Demoen", demo), ("Den ekte versjonen", ekte)):
+            punkter = re.findall(r"^(\d+)\. ([^\n]+)\n\n```\n([^\n]+)\n```$", liste, re.MULTILINE)
+            assert [int(n) for n, _, _ in punkter] == list(range(1, len(forventet[navn]) + 1)), (navn, punkter)
+            assert [k for _, _, k in punkter] == forventet[navn], navn
+            assert all(linje.endswith(":") for _, linje, _ in punkter), navn
+            # Ingenting annet i lista enn punktene og boksene.
+            rest = re.sub(r"^\d+\. [^\n]+\n\n```\n[^\n]+\n```$", "", liste, flags=re.MULTILINE)
+            assert not rest.strip(), (navn, rest)
+
     def test_svarene_beholdt_innholdet(self):
         """Gjennomgangen 11.10 (VG): bare overskriftene ble sjekket etter
         flyttingen. Innholdet fra svarene foer 22:32 staar i README-en eller
@@ -1249,6 +1386,40 @@ class TestReadmeForNybegynnere:
         ):
             assert innhold in tekst, innhold
 
+    def test_spoersmaalene_som_ble_tatt_ut_staar_i_hjelp(self):
+        """Story 3.3d, punkt b: hvert spoersmaal som ble tatt ut av «Står du
+        fast?», staar i docs/hjelp.md med minst det samme svaret som
+        README-en hadde. Ville feilet hvis et av dem ble tatt ut av README-en
+        uten aa staa i docs/hjelp.md."""
+        i_hjelp = dict(re.findall(r"^### ([^\n]+)\n\n(.*?)(?=\n\n### |\n\n## |\Z)", _hjelp(), re.MULTILINE | re.DOTALL))
+        i_readme = _detaljer(_faq())
+        for sporsmaal, svar in UTE_AV_README.items():
+            assert sporsmaal not in i_readme, sporsmaal
+            assert sporsmaal in i_hjelp, sporsmaal
+            assert i_hjelp[sporsmaal].strip().startswith(svar), sporsmaal
+
+    def test_det_foerste_spoersmaalet_er_at_docker_ikke_kjoerer(self):
+        """Gruppens svar 18.10 kl. 17:40: det første spørsmålet under «Står du
+        fast?» er ett spørsmål om at Docker ikke kjører, med begge meldingene
+        i overskriften. Svaret har det som sto i begge svarene i
+        docs/hjelp.md, som står hver for seg. Ville feilet hvis det første
+        spørsmålet ikke nevnte både «Engine running» og «Cannot connect to the
+        Docker daemon», eller svaret mistet noe fra et av de to."""
+        sporsmaal = list(_detaljer(_faq()))
+        assert "«Engine running»" in sporsmaal[0] and "«Cannot connect to the Docker daemon»" in sporsmaal[0]
+        assert "«error during connect»" in sporsmaal[0]
+        svar = _detaljer(_faq())[sporsmaal[0]]
+        i_hjelp = dict(re.findall(r"^### ([^\n]+)\n\n(.*?)(?=\n\n### |\n\n## |\Z)", _hjelp(), re.MULTILINE | re.DOTALL))
+        ikke_startet = i_hjelp[
+            "«Cannot connect to the Docker daemon», «error during connect» eller «dockerDesktopLinuxEngine»."
+        ]
+        engine = i_hjelp["Det står ikke «Engine running» etter noen minutter."]
+        assert svar.startswith(ikke_startet.strip())
+        # «Avslutt Docker Desktop helt:» er blitt «avslutter du Docker Desktop
+        # helt:» i samme setning. Resten står ordrett.
+        assert engine.startswith("Avslutt Docker Desktop helt: ")
+        assert "avslutter du Docker Desktop helt: " + engine.split("helt: ", 1)[1].strip() in svar
+
     def test_like_spoersmaal_har_samme_svar(self):
         """Et spoersmaal som staar baade i README-en og i docs/hjelp.md, har
         samme svar begge steder. Svaret i docs/hjelp.md kan ha mer etter."""
@@ -1257,7 +1428,9 @@ class TestReadmeForNybegynnere:
         # saa bare ett spoersmaal ble lest, og ingen ble sammenlignet.
         assert len(i_hjelp) == len(re.findall(r"^### ", _hjelp(), re.MULTILINE))
         felles = [s for s in _detaljer(_faq()) if s in i_hjelp]
-        assert len(felles) >= 7, felles
+        # Story 3.3d: alle i README-en står også i docs/hjelp.md, utenom det
+        # sammenslåtte spørsmålet (svaret kl. 17:40), som har sin egen test.
+        assert len(felles) == len(_detaljer(_faq())) - 1 and SAMMENSLAATT not in felles, felles
         for sporsmaal, svar in _detaljer(_faq()).items():
             if sporsmaal in i_hjelp:
                 assert i_hjelp[sporsmaal].strip().startswith(svar.strip()), sporsmaal
@@ -1292,7 +1465,9 @@ class TestReadmeForNybegynnere:
         # Gruppen 16.10 kl. 21:38: skjermbildet under «Til faglærer» er tatt
         # ut, så «Til faglærer» er igjen siste avsnitt før «Kom i gang».
         assert avsnitt[-1].startswith("Til faglærer:"), avsnitt[-1]
-        assert avsnitt[-2].startswith("OSE Signal viser"), avsnitt[-2]
+        # Story 3.3d, punkt f: «Innhold» står rett under beskrivelsen.
+        assert avsnitt[-2].startswith("**Innhold:** "), avsnitt[-2]
+        assert avsnitt[-3].startswith("OSE Signal viser"), avsnitt[-3]
         assert "\n## " not in topp
 
     def test_status_uten_storynumre_og_uten_kommando(self):
@@ -1310,7 +1485,6 @@ class TestReadmeForNybegynnere:
         assert not re.search(r"docker[ -]compose|uv run", status, re.IGNORECASE)
         for innhold in (
             "Under arbeid",
-            "Flettet til main:",
             "hentingen",
             "Docker",
             "demoen",
@@ -1325,59 +1499,88 @@ class TestReadmeForNybegynnere:
             "aksjesiden viser bare tekster som besto kontrollen",
             "](_bmad-output/implementation-artifacts/sprint-status.yaml)",
         ):
-            assert innhold in status, innhold
+            # Story 3.3d: punktene i listene begynner med stor bokstav.
+            assert innhold.lower() in status.lower(), innhold
+        # Story 3.3d (beslutningen 16.10 kl. 21:53-21:58): to lister, «Ferdig»
+        # og «Neste», med ett punkt per linje og hoeyst 8 punkter hver. Het
+        # «Flettet til main:» og «Neste:» i ett avsnitt til 3.3d.
         # Gjennomgangen av flettingen 12.10 (VG): hver sak staar i riktig liste.
-        # Ville feilet hvis noe som ikke er flettet, sto under «Flettet til
-        # main», slik grenen 8-0b sa om 2.3b.
-        flettet, neste = status.split("Flettet til main:", 1)[1].split("Neste:", 1)
-        neste = neste.split("Det som bygges etter demoen", 1)[0]
+        # Ville feilet hvis noe som ikke er flettet, sto under «Ferdig», slik
+        # grenen 8-0b sa om 2.3b.
+        assert "Flettet til main" not in status.split("«Ferdig» betyr flettet til main.", 1)[0]
+        lister = _statuslister(status)
+        assert list(lister) == ["Ferdig", "Neste"], list(lister)
+        for navn, punkter in lister.items():
+            assert 1 <= len(punkter) <= 8, (navn, len(punkter))
+        # Gjennomgangen, ECH2: listene staar samlet, uten tomme linjer inni,
+        # saa et punkt etter en tom linje ikke slipper unna grensen.
+        samlet = "\n\n".join(
+            f"**{navn}**\n\n" + "\n".join(f"- {p}" for p in punkter) for navn, punkter in lister.items()
+        )
+        assert samlet + "\n\n«Ferdig» betyr flettet til main." in status
+        ferdig = "\n".join(lister["Ferdig"]).lower()
+        neste_punkter = lister["Neste"]
+        neste = "\n".join(neste_punkter).lower()
         for sak in (
             "hentingen",
             "kallene som er igjen",
-            "Docker",
+            "docker",
             "demoen",
-            "README-en",
+            "readme-en",
             "hjelp bak «?»",
             "tydeligere merking",
             "datoene og månedsmerkene i grafen",
             "oversikten fra designforslaget",
             "utseendet fra designforslaget",
             "sortering ved klikk i kolonneraden",
-            "den første delen av KI-laget",
+            "den første delen av ki-laget",
             "en bryter som slår den av og på",
             "at hentingen lager teksten med en lokal modell",
             "at hovedindeksen hentes i samme kjøring",
             "vises over tabellen på forsiden",
+            # 2.9b og 2.9c (instruksjonen 18.10 kl. 17:04).
+            "søylene",
+            "stiplet linje i kursgrafen",
+            # Gjennomgangen, VG1: resten av det som er flettet.
+            "fra kl. 21 på børsdager",
+            "bilder i «kom i gang» og demoen først",
+            "ruff",
+            "den oppdaterte kvalitetssikringen",
+            "uten kopien av bmad-skillene",
         ):
-            assert sak in flettet, sak
-        # Story 8.0d, PR 3 (svar 9 kl. 22:50): «Neste:» følger rekkefølgen
-        # etter 8.0d (gruppen 14.10 kl. 22:19 og 22:25).
-        # Story 8.15: sorteringen er flyttet til «Flettet til main».
-        # 3.3b, punkt a: resten av KI-laget først (svar 10 15.10 kl. 14:47),
-        # så rekkefølgen fra 14.10.
-        # PR #49 flettet 16.10: teksten fra hentingen er flyttet til «Flettet
-        # til main», og «Neste:» begynner med hovedindeksen.
-        # Story 2.8, PR 2: at indeksen hentes, er flettet, og visningen
-        # («hovedindeksen på forsiden») står først under «Neste:».
-        # Story 2.9: visningen er flettet, og «Neste:» begynner med Min liste.
+            assert sak in ferdig, sak
         assert "resten av KI-laget" not in status and "Selve teksten lages ikke ennå" not in status
+        # «Neste» foelger rekkefoelgen under «Prioritering» i epics.md etter
+        # svarene 18.10 kl. 00:39 og 11:20, med KI-tekstene i demoen og Min
+        # liste foerst. Ett punkt per sak, i den rekkefoelgen.
         saker = (
-            "Min liste",
-            "innstillingene",
-            "periodene i kursgrafen",
+            "ki-tekstene i demoen",
+            "min liste",
             "historikken og signaldagene",
-            "«Vis KI-tekst» i innstillingene",
-            "KI-teksten om dagen",
+            "selskapets side på newsweb",
+            "egen nøkkel",
+            "«vis ki-tekst»",
+            "periodene i kursgrafen",
             "velge og bytte aksjer",
         )
-        for sak in saker:
-            assert sak in neste and sak not in flettet, sak
-        # Gjennomgangen (VG7): i den rekkefølgen, og det flettede står ikke i «Neste».
-        assert [neste.index(s) for s in saker] == sorted(neste.index(s) for s in saker)
-        assert "utseendet fra designforslaget" not in neste
-        # Story 2.9: hovedindeksen står ikke lenger under «Neste:».
-        assert "hovedindeksen" not in neste
-        assert "sortering ved klikk i kolonneraden" not in neste
+        assert len(neste_punkter) == len(saker), neste_punkter
+        for punkt, sak in zip(neste_punkter, saker):
+            assert sak in punkt.lower(), (sak, punkt)
+            assert sak not in ferdig, sak
+        for sak in ("utseendet fra designforslaget", "hovedindeksen", "sortering ved klikk i kolonneraden", "søylene"):
+            assert sak not in neste, sak
+        # Setningene om begge versjonene, boersmeldingene og detaljene staar
+        # under listene.
+        etter = status.split("**Neste**", 1)[1].split("\n\n", 2)[2]
+        for setning in (
+            # Gjennomgangen, ECH1: hva «Ferdig» betyr, fordi sprintstatusen kan
+            # si review for noe som er flettet.
+            "«Ferdig» betyr flettet til main.",
+            "Det som bygges etter demoen, skal vises i begge versjonene.",
+            "Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B).",
+            "Detaljene står i [sprintstatusen](",
+        ):
+            assert setning in etter, setning
 
     def test_lenken_til_staar_du_fast_sier_lenger_ned(self):
         """Kl. 23:46: «se «Står du fast?» lenger ned»."""
@@ -1391,7 +1594,10 @@ class TestReadmeForNybegynnere:
         import kursdata
 
         tekst = README.read_text(encoding="utf-8")
-        beskrivelse = tekst.split("Til faglærer:", 1)[0].strip().split("\n\n")[-1]
+        # Story 3.3d: «Innhold» står mellom beskrivelsen og «Til faglærer».
+        beskrivelse = [a for a in tekst.split("Til faglærer:", 1)[0].split("\n\n") if a.startswith("OSE Signal viser")]
+        assert len(beskrivelse) == 1
+        beskrivelse = beskrivelse[0]
         assert beskrivelse.startswith("OSE Signal viser")
         assert f"viser {len(kursdata.AKSJEUNIVERS)} aksjer på Oslo Børs" in beskrivelse
         # Antallet sjekker telles fra navnene i koden, ikke fra returtypen til
@@ -1444,6 +1650,96 @@ class TestReadmeForNybegynnere:
         # Ordgrense etter tallet, saa 1 ikke godtar «15» (Verification Gap 12.10).
         # Story 2.8: en henting er aksjene og hovedindeksen.
         assert re.search(rf"en henting bruker {antall + 1}\b", nokkel), nokkel
+
+    def test_innhold_lenker_til_hovedoverskriftene(self):
+        """Story 3.3d, punkt f (beslutningen 16.10 kl. 21:53-21:58): én linje
+        «Innhold» rett under beskrivelsen, med lenker til hovedoverskriftene
+        fra «Kom i gang» til «Medlemmer», i den rekkefølgen. Ville feilet med
+        en lenke til en overskrift som ikke finnes, eller en som mangler."""
+        tekst = README.read_text(encoding="utf-8")
+        innhold = [l for l in tekst.splitlines() if l.startswith("**Innhold:** ")]
+        assert len(innhold) == 1
+        lenker = re.findall(r"\[([^\]]+)\]\(#([^)]+)\)", innhold[0])
+        hoved = re.findall(r"^## (.+)$", _uten_bokser(tekst), re.MULTILINE)
+        hoved = hoved[hoved.index("Kom i gang") : hoved.index("Medlemmer") + 1]
+        assert [t for t, _ in lenker] == hoved, lenker
+        # Gjennomgangen, ECH5: hvert anker finnes én gang, ellers gir GitHub
+        # den neste «-1», og lenken gaar til den foerste.
+        alle = _alle_ankrene(tekst)
+        for tittel, anker in lenker:
+            assert anker == _anker(tittel) and alle.count(anker) == 1, anker
+        assert innhold[0] == "**Innhold:** " + " · ".join(f"[{t}](#{a})" for t, a in lenker)
+
+    def test_mappestrukturen_lenker_til_stier_i_repoet(self):
+        """Story 3.3d, punkt f: hver mappe og fil i «Mappestruktur» er en
+        relativ lenke med samme tekst som stien, og peker på noe som finnes
+        og ikke holdes ute av .gitignore. Det som ikke er i repoet, blir ikke
+        lenker. Ville feilet med en lenke til data/."""
+        from test_ryddighet import ignorert
+
+        gitignore = (ROT / ".gitignore").read_text(encoding="utf-8")
+        del_ = README.read_text(encoding="utf-8").split("\n## Mappestruktur\n", 1)[1].split("\n## ", 1)[0]
+        punkter = [l for l in del_.splitlines() if l.startswith("- ")]
+        assert len(punkter) == 7, punkter
+        for punkt in punkter:
+            # Hver sti i kodeformat i punktet er en lenke, ogsaa etter
+            # tankestreken (gjennomgangen, BH3 og ECH4).
+            assert "`" not in re.sub(r"\[`[^`]+`\]\([^)]+\)", "", punkt), punkt
+        lenker = re.findall(r"\[`([^`]+)`\]\(([^)]+)\)", del_)
+        # Alle lenkene, ogsaa uten kodeformat, er de i kodeformat.
+        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 15, lenker
+        sporet = _git_sporet()
+        for tekst, maal in lenker:
+            # Maalet er stien i teksten, relativ og uten «..» (BH4, ECH3).
+            # Bildene staar med filnavnet, som foer 3.3d, etter mappa de ligger i.
+            assert maal == tekst or (tekst in BILDENE.values() and maal == f"docs/bilder/readme/{tekst}"), (
+                tekst,
+                maal,
+            )
+            assert not re.match(r"[a-zA-Z]+:|/|#", maal) and ".." not in maal.split("/"), maal
+            sti = maal.rstrip("/")
+            assert (ROT / sti).exists(), maal
+            if sporet is not None:
+                # Store og smaa bokstaver som i git, og noe er sporet (ECH3).
+                assert any(f == sti or f.startswith(sti + "/") for f in sporet), maal
+            # ignorert() leser stien som en fil, og «data/» i .gitignore
+            # gjelder bare mapper, saa en mappe sjekkes med en fil inni (mutant
+            # N6 overlevde foerst).
+            if maal.endswith("/") or (ROT / sti).is_dir():
+                sti = f"{sti}/x"
+            assert not ignorert(gitignore, sti), maal
+        # Linja om det som ikke er i repoet, har ingen lenker.
+        ikke = [l for l in del_.splitlines() if l.startswith("Ikke i repoet:")]
+        assert len(ikke) == 1 and "](" not in ikke[0]
+
+    def test_til_faglaerer_begynner_med_demoen_den_ekte_versjonen_og_testene(self):
+        """Story 3.3d, punkt e (beslutningen 16.10 kl. 21:16, med svarene kl.
+        21:25 og 21:57, og svaret 18.10 kl. 15:37): først under «Til
+        faglærer» kommer tre lenker, hver med en kort forklaring foran, til
+        demoen, den ekte versjonen og «Tester». Ville feilet med en lenke til
+        en overskrift som ikke finnes."""
+        tekst = README.read_text(encoding="utf-8")
+        lista = tekst.split("Til faglærer:\n", 1)[1].split("\n\n", 1)[0].splitlines()
+        forventet = [
+            # Gjennomgangen, BH2: demolenken sier ogsaa hvor steg 1-4 staar.
+            (
+                "Se appen med oppdiktede tall, uten konto og nøkkel, etter [steg 1–4](#felles-for-begge)",
+                "demoen",
+                "Demoen",
+            ),
+            ("Ekte kurser, med en gratis nøkkel fra EODHD", "den ekte versjonen", "Den ekte versjonen (anbefalt)"),
+            ("De automatiske testene, med to kommandoer", "Tester", "Tester"),
+        ]
+        alle = _alle_ankrene(tekst)
+        for linje, (forklaring, lenketekst, overskrift) in zip(lista[:3], forventet, strict=True):
+            treff = re.fullmatch(r"- (.+): \[([^\]]+)\]\(#([^)]+)\)", linje)
+            assert treff, linje
+            assert treff.group(1) == forklaring and treff.group(2) == lenketekst, linje
+            assert treff.group(3) == _anker(overskrift), linje
+            # Hvert anker finnes én gang (ECH5).
+            for anker in [treff.group(3), *re.findall(r"\]\(#([^)]+)\)", treff.group(1))]:
+                assert alle.count(anker) == 1, (anker, linje)
+        assert _anker("Felles for begge") == "felles-for-begge"
 
     def test_til_faglaerer_lenker_til_briefen_med_gjeldende_tag(self):
         """12.10 kl. 12:12: briefen var gjemt langt nede. Lista under

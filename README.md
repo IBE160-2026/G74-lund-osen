@@ -6,7 +6,12 @@ Gruppe G74 (Ai Ai Ai) i IBE160 Programmering med KI, Høgskolen i Molde, høsten
 
 OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversikt. Tre enkle sjekker – trend, bevegelse og interesse – gir hver aksje en signalstyrke fra 0 til 3, så en vanlig sparer kan se hva som har endret seg, og hvorfor. Beregningene gjøres med vanlig programkode, og KI skal forklare signalet med ord. Appen gir ikke råd om å kjøpe eller selge. Den er under utvikling og ikke ferdig.
 
+**Innhold:** [Kom i gang](#kom-i-gang) · [Status](#status) · [Tester](#tester) · [Dokumentene](#dokumentene) · [Mappestruktur](#mappestruktur) · [Medlemmer](#medlemmer)
+
 Til faglærer:
+- Se appen med oppdiktede tall, uten konto og nøkkel, etter [steg 1–4](#felles-for-begge): [demoen](#demoen)
+- Ekte kurser, med en gratis nøkkel fra EODHD: [den ekte versjonen](#den-ekte-versjonen-anbefalt)
+- De automatiske testene, med to kommandoer: [Tester](#tester)
 - [Product Brief](_bmad-output/planning-artifacts/product-brief.md), arbeidskravet: versjon 8, laget etter [tilbakemeldingen 06.10](_bmad-output/planning-artifacts/tilbakemelding-product-brief.md) og låst i taggen `arbeidskrav-product-brief-v8`
 - Plan og krav: [PRD](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md), [arkitektur](_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md) og [epics og stories](_bmad-output/planning-artifacts/epics.md)
 - [Leveranselista](docs/innlevering.md): kravene i emnet, og hvor hvert av dem står
@@ -111,9 +116,9 @@ docker compose down
 Klikk på spørsmålet som passer.
 
 <details>
-<summary>Det står ikke «Engine running» etter noen minutter.</summary>
+<summary>«Engine running» kommer ikke, eller det står «Cannot connect to the Docker daemon» eller «error during connect».</summary>
 
-Avslutt Docker Desktop helt: høyreklikk hvalen ved klokka (Windows) eller klikk den i menylinja øverst (Mac), og velg «Quit Docker Desktop». Åpne det igjen og vent. Hjelper ikke det, starter du maskinen på nytt.
+Docker Desktop er ikke startet, eller motoren er ikke klar. Start Docker Desktop, vent til det står «Engine running» (steg 1), og prøv kommandoen igjen. Kommer det ikke etter noen minutter, avslutter du Docker Desktop helt: høyreklikk hvalen ved klokka (Windows) eller klikk den i menylinja øverst (Mac), og velg «Quit Docker Desktop». Åpne det igjen og vent. Hjelper ikke det, starter du maskinen på nytt.
 
 </details>
 
@@ -121,13 +126,6 @@ Avslutt Docker Desktop helt: høyreklikk hvalen ved klokka (Windows) eller klikk
 <summary>ZIP-fila ser ut som en vanlig mappe.</summary>
 
 Du må pakke ut. Står det «Komprimert størrelse» (Compressed size) som kolonne og «Pakk ut alle» (Extract All) øverst i vinduet, er du inne i ZIP-fila, og den er ikke pakket ut. Trykk «Pakk ut alle», og bruk mappa som lages. På Windows finner du Nedlastinger (Downloads) i Filutforsker (File Explorer), og etter «Pakk ut alle» trykker du «Pakk ut» (Extract).
-
-</details>
-
-<details>
-<summary>Mappa lar seg ikke dra inn i vinduet.</summary>
-
-PowerShell er trolig åpnet som administrator, og da sperrer Windows dra og slipp. Lukk vinduet og åpne PowerShell på vanlig måte (steg 3).
 
 </details>
 
@@ -146,39 +144,9 @@ Mappa ligger ikke der stien sier, for eksempel fordi den er flyttet, eller fordi
 </details>
 
 <details>
-<summary>Ingenting skjer når jeg limer inn.</summary>
-
-Kommandoene skrives i PowerShell eller Terminal, ikke i Docker Desktop. Docker Desktop skal bare være åpent, og du skriver ingenting i det. Ledetekst (Command Prompt) på Windows virker også for demoen, men stegene er skrevet for PowerShell, og den ekte versjonen trenger PowerShell.
-
-Kopier kommandoen med ikonet til høyre i den grå boksen i README-en. Ikonet synes først når musa er over boksen. Du kan også markere kommandoen og trykke Ctrl+C (Cmd+C på Mac), eller skrive den inn. Lim den inn i PowerShell-vinduet fra steg 4 med Ctrl+V (Cmd+V på Mac), og trykk Enter.
-
-</details>
-
-<details>
-<summary>«Cannot connect to the Docker daemon», «error during connect» eller «dockerDesktopLinuxEngine».</summary>
-
-Docker Desktop er ikke startet, eller motoren er ikke klar. Start Docker Desktop, vent til det står «Engine running» (steg 1), og prøv kommandoen igjen.
-
-</details>
-
-<details>
 <summary>«no configuration file provided: not found».</summary>
 
 Terminalvinduet står i feil mappe. Gjør steg 4 på nytt, og dra den mappa der fila compose ligger. Windows viser den uten filendelsen, som compose og ikke compose.yaml.
-
-</details>
-
-<details>
-<summary>«port is already allocated», «address already in use» eller «ports are not available».</summary>
-
-Noe annet bruker port 5000. Kjører den andre versjonen, stopper du den først (se «Bytte mellom demoen og den ekte versjonen» under «Mer for den som vil»). På Mac bruker AirPlay-mottakeren (AirPlay Receiver) port 5000. Slå den av under Systeminnstillinger (System Settings) → Generelt (General) → AirDrop og Handoff (AirDrop & Handoff), og prøv igjen.
-
-</details>
-
-<details>
-<summary>Oversikten er tom.</summary>
-
-Uten henting starter appen med tom oversikt og viser kommandoen som henter. Hent kursene med steg 8 i den ekte versjonen, og last siden på nytt.
 
 </details>
 
@@ -218,39 +186,41 @@ Volumene står når du bytter, også basen med vurderingene.
 
 Med Python 3.13 og [uv](https://docs.astral.sh/uv/). Først demoen.
 
-Installer avhengighetene:
+**Demoen**
+
+1. Installer avhengighetene:
 
 ```
 uv sync
 ```
 
-Lag demobasen, `data/db/demo.db`:
+2. Lag demobasen, `data/db/demo.db`:
 
 ```
 uv run python src/demo.py
 ```
 
-Start demoen på http://127.0.0.1:5000:
+3. Start demoen på http://127.0.0.1:5000:
 
 ```
 uv run python src/app.py --demo
 ```
 
-Så den ekte versjonen.
+**Den ekte versjonen**
 
-Bare første gang: kopier malen, og fyll inn `EODHD_API_KEY` i `.env`.
+1. Bare første gang: kopier malen, og fyll inn `EODHD_API_KEY` i `.env`:
 
 ```
 cp .env.example .env
 ```
 
-Hent kurser:
+2. Hent kurser:
 
 ```
 uv run python src/fetch_prices.py
 ```
 
-Start webserveren på http://127.0.0.1:5000:
+3. Start webserveren på http://127.0.0.1:5000:
 
 ```
 uv run python src/app.py
@@ -301,7 +271,31 @@ Modellen ble prøvd på en maskin med 15,7 GB minne og et grafikkort med 8 GB, d
 
 ## Status
 
-Under arbeid, og ingenting er endelig. Flettet til main: hentingen av kurser med kontroll av børsdagen, at hovedindeksen hentes i samme kjøring og vises over tabellen på forsiden, nye forsøk med kallene som er igjen etter hentingen, Docker, demoen, som viser alle 10 fargekombinasjonene av de tre sjekkene på siste dag, denne README-en, hjelp bak «?» på sidene, tydeligere merking i tabellene, datoene og månedsmerkene i grafen, oversikten fra designforslaget, utseendet fra designforslaget, sortering ved klikk i kolonneraden, og den første delen av KI-laget: plassen for KI-teksten under regelforklaringen på aksjesiden, med en bryter som slår den av og på, loggen der tekstene lagres, kontrollen av teksten mot regelen, og at hentingen lager teksten med en lokal modell. Teksten lages når KI er slått på og den lokale modellen kjører under hentingen, og aksjesiden viser bare tekster som besto kontrollen. Neste: Min liste, innstillingene, periodene i kursgrafen, historikken og signaldagene i grafen, «Vis KI-tekst» i innstillingene, KI-teksten om dagen på forsiden, og til slutt å velge og bytte aksjer. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
+Under arbeid, og ingenting er endelig.
+
+**Ferdig**
+
+- Hentingen av kurser fra kl. 21 på børsdager, med kontroll av børsdagen, og at hovedindeksen hentes i samme kjøring
+- Nye forsøk med kallene som er igjen etter hentingen
+- Docker, og demoen, som viser alle 10 fargekombinasjonene av de tre sjekkene på siste dag
+- Denne README-en, med bilder i «Kom i gang» og demoen først, og hjelp bak «?» på sidene
+- Tydeligere merking i tabellene, datoene og månedsmerkene i grafen, oversikten fra designforslaget, utseendet fra designforslaget, og sortering ved klikk i kolonneraden
+- Hovedindeksen, som vises over tabellen på forsiden, med søylene under, og som en stiplet linje i kursgrafen på aksjesiden
+- Den første delen av KI-laget: plassen for KI-teksten under regelforklaringen på aksjesiden, med en bryter som slår den av og på, loggen der tekstene lagres, kontrollen av teksten mot regelen, og at hentingen lager teksten med en lokal modell. Teksten lages når KI er slått på og den lokale modellen kjører under hentingen, og aksjesiden viser bare tekster som besto kontrollen
+- Ruff, som finner feil og rot i koden og formaterer den, i CI og i testene, den oppdaterte kvalitetssikringen, og et ryddigere repo uten kopien av BMAD-skillene
+
+**Neste**
+
+- KI-tekstene i demoen
+- Min liste
+- Historikken og signaldagene i grafen
+- Lenkene til selskapets side på NewsWeb og selskapets egen nettside
+- Egen nøkkel til Gemini, Anthropic og OpenAI
+- Innstillingene, med «Vis KI-tekst»
+- Periodene i kursgrafen, og på forsiden periodevalget, børsometeret og KI-teksten om dagen
+- Til slutt å velge og bytte aksjer
+
+«Ferdig» betyr flettet til main. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
 
 ## Tester
 
@@ -315,7 +309,14 @@ uv sync
 uv run pytest
 ```
 
-Alle testene skal bestå. Noen hoppes over, med grunnen i utskriften når du legger til `-rs`: på Windows testene som bytter tidssone, fordi `time.tzset` ikke finnes der (de kjøres i CI), og testen for Unix-sokler, som Python på Windows ikke har. På en maskin uten IPv6 (`::1`) hoppes testen for den over. I en mappe fra ZIP-fila, uten git, hoppes også testene som sjekker hva som er sporet i git, over.
+Alle testene skal bestå. Noen hoppes over, og knappen under sier hvorfor.
+
+<details>
+<summary>Hvorfor hoppes noen over?</summary>
+
+Noen hoppes over, med grunnen i utskriften når du legger til `-rs`: på Windows testene som bytter tidssone, fordi `time.tzset` ikke finnes der (de kjøres i CI), og testen for Unix-sokler, som Python på Windows ikke har. På en maskin uten IPv6 (`::1`) hoppes testen for den over. I en mappe fra ZIP-fila, uten git, hoppes også testene som sjekker hva som er sporet i git, over.
+
+</details>
 
 - Ingen nettkall: `tests/conftest.py` sperrer nettverket i hver test.
 - `data/` røres ikke: testene bruker en midlertidig mappe.
@@ -355,13 +356,13 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 
 ## Mappestruktur
 
-- `src/` og `tests/` — applikasjonen og testene
-- `docs/` — arbeidsprosessen, og `docs/hjelp.md` med spørsmål og svar til «Kom i gang»
-- `docs/bilder/readme/` — de tre skjermbildene i «Kom i gang»: `engine-running.png`, `github-download-zip.png` og `powershell-mappa.png`
-- `_bmad-output/` — Product Brief, plan, krav og sprintstatus
-- `.github/` — testkjøringen og morgensjekken
-- `Dockerfile`, `compose.yaml` og `.dockerignore` — imaget og tjenestene: webserveren, hentingen og demoen
-- `_bmad/` og `.claude/skills/` — BMAD-rammeverket, ikke skrevet av oss
+- [`src/`](src/) og [`tests/`](tests/) — applikasjonen og testene
+- [`docs/`](docs/) — arbeidsprosessen, og [`docs/hjelp.md`](docs/hjelp.md) med spørsmål og svar til «Kom i gang»
+- [`docs/bilder/readme/`](docs/bilder/readme/) — de tre skjermbildene i «Kom i gang»: [`engine-running.png`](docs/bilder/readme/engine-running.png), [`github-download-zip.png`](docs/bilder/readme/github-download-zip.png) og [`powershell-mappa.png`](docs/bilder/readme/powershell-mappa.png)
+- [`_bmad-output/`](_bmad-output/) — Product Brief, plan, krav og sprintstatus
+- [`.github/`](.github/) — testkjøringen og morgensjekken
+- [`Dockerfile`](Dockerfile), [`compose.yaml`](compose.yaml) og [`.dockerignore`](.dockerignore) — imaget og tjenestene: webserveren, hentingen og demoen
+- [`_bmad/`](_bmad/) og [`.claude/skills/`](.claude/skills/) — BMAD-rammeverket, ikke skrevet av oss
 
 Ikke i repoet: API-nøkkelen (`.env`), rådata, basen og demobasen (`data/`), lokale testskript (`local-tests/`) og den private arbeidsmappa (`_privat/`).
 
