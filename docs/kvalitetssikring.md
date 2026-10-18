@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-18T19:07
+updated: 2026-10-18T20:55
 ---
 
 # Kvalitetssikring
@@ -261,6 +261,7 @@ sist i dokumentet.
 | 3.3d README-ryddingen | `1be3a57` (#67) | 1 (11, N1–N11) | N6 overlevde først på `8dc1e8f` og ble fanget etter at testen ble rettet i `ff2f540` | `S/spec-3-3d-readme-ryddingen.md` |
 | 3.4 Demoversjonen | `0ed87be` (#26), `59c0baf` (#27), `4464a10` (#30), `4c01a7e` (#31), `41a9df7` (#32), `1ead55a` (#33), `dfe6884` (#34) | 1 (#26: 24, #27: 28, #30: 17, 16, 16, 10 og 6, #31: 4, #32–#34: 2 hver) | M20 i #26 og H12 og H13 i #30 overlevde først. T9 ble forkastet, og B6 ble ikke kjørt ferdig. Spesifikasjonen står i review | `S/spec-3-4-demoversjonen.md` |
 | 3.4, alle 10 Kombinasjonene på siste demodag | `f21f927` (#58) | 1 (4, R1–R4) | – | `S/spec-3-4-alle-ti-kombinasjonene-paa-siste-demodag.md`, «Mutantene» |
+| 3.4b KI-tekstene i demoen | `ab81d3f` (#69) | 1 (6, K1–K6) | K2 og K3 traff ikke første gang og ble laget på nytt. K6 ble fanget av fiksturen | `S/spec-3-4b-ki-tekstene-i-demoen.md` |
 | 4.0 Nettsperren dekker hele testkjøringen | `dc43569` (#44) | 1 (10) | – Under N1 og N4 ble det gjort ekte oppslag og tilkoblingsforsøk (BH10) | `S/spec-4-0-nettsperren-dekker-hele-testkjoeringen.md` |
 | 4.2 KILogg-porten | `a1d22f1` (#45) | 1 (11) | – | `S/spec-4-2-kilogg-porten-med-minneimplementasjon.md` |
 | 4.3 SQLite-adapter for KILogg | `3a089c8` (#46) | 1 (7) | – | `S/spec-4-3-sqlite-adapter-for-kilogg.md` |
@@ -451,6 +452,7 @@ funn. Antall rader i loggen:
 | 3.4, PR #30, helhetlig form | 24 | 19 | 5 | – |
 | 3.4, PR #30, rekkefølgen | 11 | 10 | 1 | – |
 | 3.4, alle 10 | 16 | 9 | 7 | – |
+| 3.4b | 24 | 13 | 9 | 2 |
 | 4.0 | 21 | 14 | 6 | 1 |
 | 4.2 | 22 | 19 | 2 | 1 |
 | 4.3 | 16 | 13 | 1 | 2 |
@@ -1150,6 +1152,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 3.3d | N1–N11 | N1, N7 og N10 `test_status_uten_storynumre_og_uten_kommando`, N2 og N11 `test_staar_du_fast_har_hoeyst_5_spoersmaal` (N11 også `test_det_foerste_spoersmaalet_er_at_docker_ikke_kjoerer`), N3 `test_hvert_tema_staar_i_readme_eller_hjelp`, N4 `test_forklaringen_i_tester_staar_bak_en_knapp`, N5 og N9 `test_lenkene_virker`, N6, N8 og N9 `test_mappestrukturen_lenker_til_stier_i_repoet` | `S/spec-3-3d-…` |
 | 3.4 | PR #26–#34 | testene står per mutant i tabellene i spesifikasjonen for PR #26, #27 og #30; for #31–#34 nevner avsnittene testen, som `test_hvorfor_bare_15_aksjer` og `test_til_faglaerer_lenker_til_briefen_med_gjeldende_tag` | `S/spec-3-4-demoversjonen.md` |
 | 3.4, alle 10 | R1–R4 | med hele fila `test_kursene_har_samme_fingeravtrykk_paa_alle_plattformer`, med bare klassen `test_alle_ti_kombinasjonene_paa_sluttdato` | `S/spec-3-4-alle-ti-…` |
+| 3.4b | K1–K6 | K1 `test_grunnlaget_stemmer_med_demodagen`, K2 `test_hver_tekst_demoen_viser_bestaar_kontrollen_slik_den_er_naa`, K3 `test_skriver_radene_uten_nett_og_uten_ollama`, K4 `test_en_kjoering_som_ikke_er_hel_skriver_ikke_fila`, K5 `test_en_oedelagt_fil_gir_en_demo_uten_ki_tekst`, K6 fiksturen `radene` i `tests/test_demo_ki.py` | `S/spec-3-4b-…` |
 | 4.0 | N1–N5 og R1–R5 | N1, N3 og N5 `test_innsamlingen_er_sperret`, N2 `test_navneoppslag_blokkeres[gethostbyname]`, N4 `test_connect_ex_blokkeres`, R1 `test_asyncio_blokkeres`, R2 `test_udp_blokkeres` | `S/spec-4-0-…` |
 | 4.2 | K1–K5 og KR1–KR6 | K3 `test_bare_skriv_og_lesemetoder`, K4 `test_bare_inneveerende_boersdag`, KR3 `test_dagen_regnes_i_oslo`; resten i tabellen | `S/spec-4-2-…` |
 | 4.3 | C1–C3 og CR1–CR4 | C1 `test_tabellen_lages_bare_i_migrasjonen`, C2 `test_adapteren_skriver_bare_med_insert`, C3, CR2 og CR3 `test_basen_sjekker_formen`, CR1 `test_replace_erstatter_ikke_en_rad`, CR4 `test_en_feil_rulles_tilbake` | `S/spec-4-3-…` |
