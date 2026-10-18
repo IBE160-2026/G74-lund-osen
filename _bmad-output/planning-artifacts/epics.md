@@ -517,6 +517,10 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-17 kl. 22:38, 22:41 og 22:42 (gruppens svar):* fire ting kommer inn: linter og formatterer i CI (story 9.7), tester i ekte nettleser, UX-gjennomgangen (8.2) med bilder av designarbeidet, og tabellen på smal skjerm. Søylene (2.9b) bygges før KI-tekstene i demoen (3.4b), og det erstatter rekkefølgen mellom de to i linja over fra kl. 22:06. Hovedindeksen blir en stiplet linje i kursgrafen på aksjesiden, som story 2.9c etter 2.9b. I natt bygges 9.7, 2.9b og 2.9c i den rekkefølgen, én PR hver.
 
+*Avgjort 2026-10-18 kl. 00:03 (gruppens svar):* kopien `.agents/skills/` tas bort (story 9.8), og README-prøven tas første gang i uke 43, etter at de to README-PR-ene er flettet, og på nytt senest én uke før innleveringen, med ZIP-fila som leveres.
+
+*Avgjort 2026-10-18 kl. 00:20 (gruppens svar):* et skjermbilde av oversikten i demoen kommer øverst i README-en igjen etter 3.4b, i en README-PR som stopper før flettingen (snur 16.10 kl. 21:38); arkitekturdokumentet oppdateres søndag etter 3.4b, med en test som krever at hver modul i `src/` står der, og `meldinger.py` tas bort med testene (story 9.9); de lange funksjonene i `fetch_prices.py` deles opp lørdag 24.10, uten endret oppførsel (story 9.10).
+
 *Avgjort 2026-10-18 kl. 00:39 (gruppens svar):* etter søndagens arbeid kommer først det briefen v8 lover i v1: historikken (2.7), bryteren for KI-teksten på siden (8.10 og 8.10b), lenken til selskapets egen nettside (10.5) og egne nøkler (10.7). 8.16 og 8.17, 10.6, 2.11 og 2.12 kommer etter, siden briefen ikke nevner dem. Promptene fra 15.–23.09 føres inn denne uka som dagsfiler, merket som satt sammen i etterkant fra samtalene, uten nøkler, kurser eller andre navn enn medlemmene.
 
 *Avgjort 2026-10-18 kl. 11:20 (gruppens svar):* spørsmålet kl. 00:39 bygde på en feil fra rådet. Bryteren for KI-teksten finnes alt på aksjesiden («Vis KI-teksten», FR-601), så briefens av/på-bryter er bygget, og 8.10 og 8.10b er ikke et løfte i briefen. De kommer etter 2.7, 10.5 og 10.7, og før 8.16 og 8.17, 10.6, 2.11 og 2.12. «Min liste» i briefen er story 8.3, som bygges i dag. 8.17 er periodevalget i oversikten, Min liste og børsometeret, og det nevner ikke briefen. En video av demoen, under 2 minutter og 5 MB, tas opp med nettlesertestene neste uke og lenkes fra README-en.
@@ -1986,6 +1990,8 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 *Avgjort 2026-10-16:* gruppen tok 16.10 kl. 21:38 skjermbildet av oversikten i demoen ut av README-en igjen. Det snur punkt b i 3.3b (ja 15.10 kl. 22:54, flettet i `6b9dc2f`, PR #53). Bildet og teksten under det er tatt ut, `docs/bilder/readme/oversikten-demo.png` er slettet, og testene godtar igjen ingen bilder i README-en og i `docs/bilder/` utenom CI-merket (PR #54). Regelen står: bilder i README-en kommer bare fra `docs/bilder/readme/` og viser aldri den ekte versjonen. Bildene som kommer i «Kom i gang» søndag, er ikke berørt, men PR-en med dem må endre de to testene, med stien og alt-teksten som sier at det er demoen, og PR 1 for hovedindeksen trenger ikke ta bildet på nytt.
 
 *Lagt til 2026-10-16:* uttaket av skjermbildet er flettet i `1a95495`, PR #54, etter gruppens ja kl. 22:55. CI var grønn på head-en `cecf94e` (kjøring 38965865603).
+
+*Avgjort 2026-10-18 kl. 00:03 (gruppens svar):* README-prøven tas første gang i uke 43 (19.–25.10), etter at de to README-PR-ene er flettet: Prøve 1, og Prøve 2 samtidig hvis testeren har egen gratiskonto. Den tas på nytt senest én uke før innleveringen, med ZIP-fila som leveres. Det endrer setningen fra 14.10 under story 3.4 om at prøven tas når mest mulig er bygget (§9 og §13 i `docs/kvalitetssikring.md`).
 
 ### Story 3.4: Demoversjonen
 

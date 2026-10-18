@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-18T11:04
+updated: 2026-10-18T11:42
 ---
 
 # Kvalitetssikring
@@ -718,6 +718,8 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
 
 *Lagt til 2026-10-14 (gruppen kl. 22:19 og 22:25):* Rekkefølgen etter 8.0d er 8.15, så 2.8, 2.9 og 2.9b, 8.3, 8.10, 8.16 og 8.17, 2.7 og 8.8, 10.1–10.3, 8.10b, 10.6, og til slutt 2.11 og 2.12. README-prøven tas når mest mulig av dette er bygget, og senest én uke før innleveringen. Det erstatter setningen over om at Prøve 1 og 2 tas etter at 8.0d er flettet. Rekkefølgen står i `epics.md`.
 
+*Lagt til 2026-10-18 (gruppens svar kl. 00:03):* Prøve 1 tas i uke 43 (19.–25.10), etter at de to README-PR-ene er flettet, og Prøve 2 samtidig hvis testeren har egen gratiskonto. Prøven tas på nytt senest én uke før innleveringen, med ZIP-fila som leveres. Det endrer setningen fra 14.10 over om at prøven tas når mest mulig er bygget. Beslutningen står under «Prioritering» og story 3.3 i `epics.md`.
+
 ### Prøve 1
 
 - **Hvem som prøver:** åpent.
@@ -900,6 +902,8 @@ interesse, står i `malinger.md` §6, ved siden av EQNR 05.10 og GJF 02.10.
 | Prøvekjøringene av KI-teksten mot en kopi av basen | 16.10 kl. 22:26–22:27 og kl. 23:43–23:44 | 6 av 15 besto med prompten versjon 1, og 15 av 15 med versjon 2 | `malinger.md` §32 og §34 |
 | Grensen kl. 21:00: fire aksjer hentes på nytt og sammenlignes med kursfila | Planlagt mandag 19.10, etter kl. 22 | Ingen ennå | beslutningen 17.10 kl. 22:00 under story 2.3 i `epics.md` |
 | Brukertesten (story 8.1) | Ikke tatt | Ingen ennå. Den måler også suksesskriteriet «Brukerutfall» (§10) | `sprint-status.yaml`, 8-1 i backlog |
+
+*Lagt til 2026-10-18 (gruppens svar kl. 00:03):* README-prøven i første rad tas første gang i uke 43 (19.–25.10), etter at de to README-PR-ene er flettet: Prøve 1, og Prøve 2 samtidig hvis testeren har egen gratiskonto. Den tas på nytt senest én uke før innleveringen, med ZIP-fila som leveres (§9).
 
 ## Vedlegg: hver mutant
 
