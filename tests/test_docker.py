@@ -969,6 +969,20 @@ class TestReadmeForNybegynnere:
         assert "«docker» er ikke gjenkjent" in i_hjelp
         assert "### «docker» er ikke gjenkjent, eller «command not found: docker»." in _hjelp()
 
+    def test_svaret_om_cannot_find_path(self):
+        """Story 3.3c, rettelse c: «Cannot find path» hadde ikke noe svar i
+        gjennomgangen 16.10. Spoersmaalet staar under «Står du fast?» og i
+        docs/hjelp.md under «Steg 4: mappa», med samme svar. Ville feilet
+        hvis svaret falt bort, eller ikke sa at mappa skal dras paa nytt."""
+        sporsmaal = "«Cannot find path … because it does not exist»."
+        svar = _detaljer(_faq())[sporsmaal]
+        assert svar.startswith("Mappa ligger ikke der stien sier,")
+        assert "flyttet" in svar and "ZIP-fila ble dratt inn" in svar
+        assert "dra mappa inn i vinduet på nytt (steg 4)" in svar
+        steg4 = _hjelp().split("\n## Steg 4: mappa\n", 1)[1].split("\n## ", 1)[0]
+        i_hjelp = steg4.split(f"### {sporsmaal}\n\n", 1)[1].split("\n\n", 1)[0]
+        assert i_hjelp.startswith(svar.strip())
+
     def test_stegene_nevner_powershell_og_terminal(self):
         steg = _steg("Felles for begge", 3)
         assert "PowerShell" in steg and "Terminal" in steg and "ikke ISE" in steg

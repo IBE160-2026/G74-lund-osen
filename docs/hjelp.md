@@ -91,6 +91,10 @@ PowerShell er trolig åpnet som administrator, og da sperrer Windows dra og slip
 
 Det mangler mellomrom etter `cd`. Står `cd` klistret til stien i meldingen, for eksempel `'cdC:\...'`, skriver du `cd`, et mellomrom, og drar mappa inn i vinduet på nytt (steg 4). Står det `'docker'` i meldingen, er det et annet problem: se «docker» er ikke gjenkjent lenger ned.
 
+### «Cannot find path … because it does not exist».
+
+Mappa ligger ikke der stien sier, for eksempel fordi den er flyttet, eller fordi ZIP-fila ble dratt inn i stedet for mappa. Skriv `cd` og et mellomrom, og dra mappa inn i vinduet på nytt (steg 4). Står det `.zip` til slutt i stien i meldingen, var det ZIP-fila: se «Står det .zip til slutt i linja.» over.
+
 ### Stien har mellomrom og fikk ikke anførselstegn.
 
 Får du en feil etter `cd` når mappa ligger i en mappe med mellomrom i navnet, skriver du anførselstegn rundt stien, for eksempel `cd "C:\Users\Ola Nordmann\Downloads\G74-lund-osen-main"`. På Mac setter Terminal `\` foran hvert mellomrom, og det virker også.

@@ -135,6 +135,13 @@ Det mangler mellomrom etter `cd`. Står `cd` klistret til stien i meldingen, for
 </details>
 
 <details>
+<summary>«Cannot find path … because it does not exist».</summary>
+
+Mappa ligger ikke der stien sier, for eksempel fordi den er flyttet, eller fordi ZIP-fila ble dratt inn i stedet for mappa. Skriv `cd` og et mellomrom, og dra mappa inn i vinduet på nytt (steg 4).
+
+</details>
+
+<details>
 <summary>Ingenting skjer når jeg limer inn.</summary>
 
 Kommandoene skrives i PowerShell eller Terminal, ikke i Docker Desktop. Docker Desktop skal bare være åpent, og du skriver ingenting i det. Ledetekst (Command Prompt) på Windows virker også for demoen, men stegene er skrevet for PowerShell, og den ekte versjonen trenger PowerShell.
