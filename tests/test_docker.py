@@ -957,6 +957,9 @@ class TestReadmeForNybegynnere:
         svar = steg4.split(f"### {sporsmaal}\n\n", 1)[1].split("\n\n", 1)[0]
         assert "Dra mappa du pakket ut i steg 2, ikke ZIP-fila." in svar
         assert "Står det `.zip` til slutt i linja" in svar and "trykker du Esc" in svar
+        # Gjennomgangen, VG8 og ECH1: Esc tømmer linja i PowerShell, men ikke
+        # i Terminal på Mac, der Ctrl+U gjør det.
+        assert "trykker du Esc (Windows) eller Ctrl+U (Mac), så linja blir tom" in svar
 
     def test_svaret_om_mellomrommet_etter_cd(self):
         """Story 3.3c, rettelse b: i gjennomgangen 16.10 ga `cd"C:\\..."`
