@@ -897,6 +897,47 @@ TEMAENE = (
 )
 
 
+# Story 3.3d: spoersmaalene som ble tatt ut av «Står du fast?», med svaret
+# README-en hadde. docs/hjelp.md har minst det samme svaret (punkt b).
+UTE_AV_README = {
+    "Mappa lar seg ikke dra inn i vinduet.": (
+        "PowerShell er trolig åpnet som administrator, og da sperrer Windows dra og slipp. Lukk vinduet "
+        "og åpne PowerShell på vanlig måte (steg 3)."
+    ),
+    "Ingenting skjer når jeg limer inn.": (
+        "Kommandoene skrives i PowerShell eller Terminal, ikke i Docker Desktop. Docker Desktop skal "
+        "bare være åpent, og du skriver ingenting i det. Ledetekst (Command Prompt) på Windows virker "
+        "også for demoen, men stegene er skrevet for PowerShell, og den ekte versjonen trenger "
+        "PowerShell.\n\nKopier kommandoen med ikonet til høyre i den grå boksen i README-en. Ikonet synes "
+        "først når musa er over boksen. Du kan også markere kommandoen og trykke Ctrl+C (Cmd+C på Mac), "
+        "eller skrive den inn. Lim den inn i PowerShell-vinduet fra steg 4 med Ctrl+V (Cmd+V på Mac), og "
+        "trykk Enter."
+    ),
+    "«Cannot connect to the Docker daemon», «error during connect» eller «dockerDesktopLinuxEngine».": (
+        "Docker Desktop er ikke startet, eller motoren er ikke klar. Start Docker Desktop, vent til det "
+        "står «Engine running» (steg 1), og prøv kommandoen igjen."
+    ),
+    "«port is already allocated», «address already in use» eller «ports are not available».": (
+        "Noe annet bruker port 5000. Kjører den andre versjonen, stopper du den først (se «Bytte mellom "
+        "demoen og den ekte versjonen» under «Mer for den som vil»). På Mac bruker AirPlay-mottakeren "
+        "(AirPlay Receiver) port 5000. Slå den av under Systeminnstillinger (System Settings) → Generelt "
+        "(General) → AirDrop og Handoff (AirDrop & Handoff), og prøv igjen."
+    ),
+    "Oversikten er tom.": (
+        "Uten henting starter appen med tom oversikt og viser kommandoen som henter. Hent kursene med "
+        "steg 8 i den ekte versjonen, og last siden på nytt."
+    ),
+}
+# Raadets forslag (instruksjonen 18.10 kl. 17:04), i rekkefoelgen i README-en.
+BEHOLDT_I_README = [
+    "Det står ikke «Engine running» etter noen minutter.",
+    "ZIP-fila ser ut som en vanlig mappe.",
+    "«is not recognized as the name of a cmdlet» etter cd.",
+    "«Cannot find path … because it does not exist».",
+    "«no configuration file provided: not found».",
+]
+
+
 class TestReadmeForNybegynnere:
     """Story 3.4, PR 3: «Kom i gang» for en som aldri har brukt Docker eller
     et terminalvindu. Formen fra 11.10 kl. 22:32: to versjoner i en tabell,
@@ -1052,9 +1093,8 @@ class TestReadmeForNybegynnere:
                     assert "i PowerShell-vinduet fra steg 4" in steg, (seksjon, n)
         # BH11: demoen slutter i steg 7 og sier hvor den ekte versjonen begynner.
         assert "Vil du også prøve den ekte versjonen, går du videre til steg 5 under." in _steg("Demoen", 7)
-        # VG7: svaret under «Står du fast?» har kopieringen, likt med docs/hjelp.md.
-        faq = _detaljer(_faq())["Ingenting skjer når jeg limer inn."]
-        assert "ikonet til høyre i den grå boksen" in faq and "skrive den inn" in faq
+        # VG7: svaret om innlimingen har kopieringen. Fra 3.3d står det bare i
+        # docs/hjelp.md, som sjekkes under.
         # Linja i steg 7 og steg 5 i demoen sier hva den betyr.
         assert "som bare betyr at appen kjører" in _steg("Den ekte versjonen (anbefalt)", 7)
         assert "Den linja betyr bare at demoen kjører." in _steg("Demoen", 5)
@@ -1094,16 +1134,22 @@ class TestReadmeForNybegynnere:
         uten_detaljer = re.sub(r"<details>.*?</details>", "", _kom_i_gang(), flags=re.DOTALL)
         assert advarsel in uten_detaljer
 
-    def test_staar_du_fast_har_hoeyst_10_spoersmaal(self):
+    def test_staar_du_fast_har_hoeyst_5_spoersmaal(self):
         """22:32: FAQ-en var for lang. Hoeyst 8 spoersmaal, hvert som
         <details> med <summary>, og en lenke til docs/hjelp.md.
 
         Story 3.3c (svar 1 18.10 kl. 14:48): hoeyst 10, for svarene om
         mellomrommet etter cd og «Cannot find path» fra gjennomgangen 16.10.
-        Het test_staar_du_fast_har_hoeyst_8_spoersmaal til 3.3c."""
+
+        Story 3.3d (beslutningen 16.10 kl. 21:53-21:58, svarene 18.10 kl.
+        15:37): hoeyst 5. Hvilke fem er raadets forslag, ikke avgjort 16.10.
+        Het test_staar_du_fast_har_hoeyst_8_spoersmaal til 3.3c, og
+        test_staar_du_fast_har_hoeyst_10_spoersmaal til 3.3d. Ville feilet
+        med et sjette spoersmaal."""
         faq = _faq()
         sporsmaal = _detaljer(faq)
-        assert 1 <= len(sporsmaal) <= 10
+        assert 1 <= len(sporsmaal) <= 5
+        assert list(sporsmaal) == BEHOLDT_I_README, list(sporsmaal)
         assert faq.count("<details>") == faq.count("</details>") == faq.count("<summary>") == len(sporsmaal)
         rest = re.sub(r"<details>.*?</details>", "", faq, flags=re.DOTALL)
         assert [l for l in rest.splitlines() if l.strip()] == [
@@ -1263,6 +1309,18 @@ class TestReadmeForNybegynnere:
         ):
             assert innhold in tekst, innhold
 
+    def test_spoersmaalene_som_ble_tatt_ut_staar_i_hjelp(self):
+        """Story 3.3d, punkt b: hvert spoersmaal som ble tatt ut av «Står du
+        fast?», staar i docs/hjelp.md med minst det samme svaret som
+        README-en hadde. Ville feilet hvis et av dem ble tatt ut av README-en
+        uten aa staa i docs/hjelp.md."""
+        i_hjelp = dict(re.findall(r"^### ([^\n]+)\n\n(.*?)(?=\n\n### |\n\n## |\Z)", _hjelp(), re.MULTILINE | re.DOTALL))
+        i_readme = _detaljer(_faq())
+        for sporsmaal, svar in UTE_AV_README.items():
+            assert sporsmaal not in i_readme, sporsmaal
+            assert sporsmaal in i_hjelp, sporsmaal
+            assert i_hjelp[sporsmaal].strip().startswith(svar), sporsmaal
+
     def test_like_spoersmaal_har_samme_svar(self):
         """Et spoersmaal som staar baade i README-en og i docs/hjelp.md, har
         samme svar begge steder. Svaret i docs/hjelp.md kan ha mer etter."""
@@ -1271,7 +1329,8 @@ class TestReadmeForNybegynnere:
         # saa bare ett spoersmaal ble lest, og ingen ble sammenlignet.
         assert len(i_hjelp) == len(re.findall(r"^### ", _hjelp(), re.MULTILINE))
         felles = [s for s in _detaljer(_faq()) if s in i_hjelp]
-        assert len(felles) >= 7, felles
+        # Story 3.3d: alle fem i README-en står også i docs/hjelp.md.
+        assert len(felles) == len(_detaljer(_faq())), felles
         for sporsmaal, svar in _detaljer(_faq()).items():
             if sporsmaal in i_hjelp:
                 assert i_hjelp[sporsmaal].strip().startswith(svar.strip()), sporsmaal

@@ -125,13 +125,6 @@ Du må pakke ut. Står det «Komprimert størrelse» (Compressed size) som kolon
 </details>
 
 <details>
-<summary>Mappa lar seg ikke dra inn i vinduet.</summary>
-
-PowerShell er trolig åpnet som administrator, og da sperrer Windows dra og slipp. Lukk vinduet og åpne PowerShell på vanlig måte (steg 3).
-
-</details>
-
-<details>
 <summary>«is not recognized as the name of a cmdlet» etter cd.</summary>
 
 Det mangler mellomrom etter `cd`. Står `cd` klistret til stien i meldingen, for eksempel `'cdC:\...'`, skriver du `cd`, et mellomrom, og drar mappa inn i vinduet på nytt (steg 4). Står det `'docker'` i meldingen, er Docker Desktop ikke installert, eller vinduet ble åpnet før installasjonen: lukk det og åpne et nytt (steg 3).
@@ -146,39 +139,9 @@ Mappa ligger ikke der stien sier, for eksempel fordi den er flyttet, eller fordi
 </details>
 
 <details>
-<summary>Ingenting skjer når jeg limer inn.</summary>
-
-Kommandoene skrives i PowerShell eller Terminal, ikke i Docker Desktop. Docker Desktop skal bare være åpent, og du skriver ingenting i det. Ledetekst (Command Prompt) på Windows virker også for demoen, men stegene er skrevet for PowerShell, og den ekte versjonen trenger PowerShell.
-
-Kopier kommandoen med ikonet til høyre i den grå boksen i README-en. Ikonet synes først når musa er over boksen. Du kan også markere kommandoen og trykke Ctrl+C (Cmd+C på Mac), eller skrive den inn. Lim den inn i PowerShell-vinduet fra steg 4 med Ctrl+V (Cmd+V på Mac), og trykk Enter.
-
-</details>
-
-<details>
-<summary>«Cannot connect to the Docker daemon», «error during connect» eller «dockerDesktopLinuxEngine».</summary>
-
-Docker Desktop er ikke startet, eller motoren er ikke klar. Start Docker Desktop, vent til det står «Engine running» (steg 1), og prøv kommandoen igjen.
-
-</details>
-
-<details>
 <summary>«no configuration file provided: not found».</summary>
 
 Terminalvinduet står i feil mappe. Gjør steg 4 på nytt, og dra den mappa der fila compose ligger. Windows viser den uten filendelsen, som compose og ikke compose.yaml.
-
-</details>
-
-<details>
-<summary>«port is already allocated», «address already in use» eller «ports are not available».</summary>
-
-Noe annet bruker port 5000. Kjører den andre versjonen, stopper du den først (se «Bytte mellom demoen og den ekte versjonen» under «Mer for den som vil»). På Mac bruker AirPlay-mottakeren (AirPlay Receiver) port 5000. Slå den av under Systeminnstillinger (System Settings) → Generelt (General) → AirDrop og Handoff (AirDrop & Handoff), og prøv igjen.
-
-</details>
-
-<details>
-<summary>Oversikten er tom.</summary>
-
-Uten henting starter appen med tom oversikt og viser kommandoen som henter. Hent kursene med steg 8 i den ekte versjonen, og last siden på nytt.
 
 </details>
 
