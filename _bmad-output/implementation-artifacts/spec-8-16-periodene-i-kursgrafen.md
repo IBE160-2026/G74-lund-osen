@@ -2,7 +2,7 @@
 title: 'Story 8.16: regelen for startdagen, og periodene i kursgrafen'
 type: 'feature'
 created: '2026-10-18'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'efa3224'
@@ -100,3 +100,5 @@ Gjennomgang 18.10 på diffen `7ae3e3a..697f459`, uten bildet. Linsene var Blind 
 | ECH7 | Den første knappen heter ukedagen også når siste rad er over en uke gammel | low | avvist: følger §2 slik den står |
 | VG6 | MA50 for «Velg dag» tidlig i serien er ikke testet | low | avvist: snittet begynner der serien har 50 dager (FR-406), og «Velg dag» er 6 mnd |
 | VG8 | «Ferdig» i README-en før flettingen | low | avvist: blir riktig når PR-en flettes, som i README-PR-ene før |
+
+*Lagt til 2026-10-18 kl. 23:28:* PR #72 er squash-flettet i `be05337`, låst til head-en `dca140b`. Main hadde ikke gått videre. CI var grønn på head-en (39167744300), også demoen i docker-jobben, og på main (39167870735). Triagen står over og som kommentar på PR-en.

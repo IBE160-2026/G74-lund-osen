@@ -3443,6 +3443,8 @@ knapper som ellers i appen.
 
 *Avgjort 2026-10-18 kl. 21:46, 21:49 og 21:50 (gruppens svar):* 8.16 bygges i kveld etter PR #70 og 10.2d, og 8.17 flyttes ikke. Grafen får alle åtte knappene i `designregler.md` §2, som PRD-en sier (FR-201). «I går» (siste børsdag) og «Velg dag» viser 6 mnd fram til dagen, med dagen merket, endringen den dagen og signalet som er lagret for den.
 
+*Lagt til 2026-10-18 kl. 23:28:* regelen for startdagen og periodene i kursgrafen er flettet i `be05337`, PR #72 (spesifikasjonen `spec-8-16-periodene-i-kursgrafen.md`). Regelen står i `designregler.md` §2, og `startdag` i `src/perioder.py` er funksjonen 8.17 skal bruke, sammen med delmalen `_perioder.html`.
+
 ### Story 8.17: Periodevalget i oversikten, Min liste og børsometeret
 
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 15).*
