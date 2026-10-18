@@ -21,6 +21,8 @@ from perioder import (
     TRE_MND,
     VELG,
     foerste_boersdag_fra,
+    foerste_knapp,
+    les_valg,
     maaneder_tilbake,
     startdag,
 )
@@ -91,27 +93,75 @@ class TestStartdagen:
 
     def test_1_aar_over_nyttaar_utenfor_kalenderen(self):
         """1 aar fra 09.10.2026 er 09.10.2025, et aar kalenderen ikke dekker.
-        Da er startdagen foerste hverdag paa eller etter datoen."""
+        Da er startdagen foerste hverdag paa eller etter datoen. Ville feilet
+        med en feil (UtenforKalenderen) eller en helgedag."""
         assert startdag(ETT_AAR, date(2026, 10, 9)) == date(2025, 10, 9)
         assert startdag(ETT_AAR, date(2026, 10, 12)) == date(2025, 10, 13)  # 12.10.2025 er soendag
 
     def test_1_uke_over_nyttaar(self):
         """05.01.2026 minus 7 dager er 29.12.2025, utenfor kalenderen: en
-        mandag, saa den er startdagen."""
+        mandag, saa den er startdagen. Ville feilet hvis 1 uke ble regnet i
+        boersdager i stedet for kalenderdager."""
         assert startdag(EN_UKE, date(2026, 1, 5)) == date(2025, 12, 29)
 
     def test_ukjent_periode_gir_valueerror(self):
+        """Ville feilet hvis en ukjent periode stille ga en startdag."""
         with pytest.raises(ValueError):
             startdag("2-aar", date(2026, 10, 9))
 
 
 class TestFoersteBoersdag:
     def test_hopper_over_helg_og_helligdager(self):
+        """Ville feilet hvis paasken eller julaften ble regnet som boersdag."""
         assert foerste_boersdag_fra(date(2026, 4, 2)) == date(2026, 4, 7)
         assert foerste_boersdag_fra(date(2026, 12, 24)) == date(2026, 12, 28)
 
     def test_en_boersdag_gis_tilbake(self):
+        """Ville feilet hvis startdagen alltid ble skjøvet en dag fram."""
         assert foerste_boersdag_fra(date(2026, 10, 9)) == date(2026, 10, 9)
 
     def test_utenfor_kalenderen_er_det_foerste_hverdag(self):
+        """Ville feilet med en feil eller en loerdag utenfor kalenderen."""
         assert foerste_boersdag_fra(date(2025, 10, 11)) == date(2025, 10, 13)
+
+
+class TestDenFoersteKnappen:
+    """designregler.md §2 (gjennomgangen av 8.16, VG2)."""
+
+    @pytest.mark.parametrize(
+        "siste, idag, navn",
+        [
+            (date(2026, 10, 9), date(2026, 10, 9), "I dag"),
+            (date(2026, 10, 8), date(2026, 10, 9), "I går"),
+            (date(2026, 10, 9), date(2026, 10, 12), "Fredag"),
+            (date(2026, 10, 9), date(2026, 10, 11), "Fredag"),  # soendag: i gaar var loerdag
+        ],
+    )
+    def test_i_dag_i_gaar_eller_ukedagen(self, siste, idag, navn):
+        """Ville feilet hvis «I dag» og «I går» var byttet om eller borte,
+        eller knappen het «I går» paa en mandag."""
+        assert foerste_knapp(siste, idag) == navn
+
+
+class TestValget:
+    """Gjennomgangen av 8.16 (BH1, BH3): «Velg dag» kan bare gi en dag som
+    grafen kan vise og merke."""
+
+    def test_en_dag_etter_siste_dag_i_serien_gir_6_mnd(self):
+        """Ville feilet hvis grafen sa «fram til 15.10» og sluttet 09.10."""
+        valg = les_valg(None, "2026-10-15", date(2026, 1, 2), date(2026, 10, 18), date(2026, 10, 9))
+        assert valg.periode == SEKS_MND and valg.beskjed == "Kursserien slutter 09.10.2026, så grafen viser 6 mnd."
+
+    def test_seriens_foerste_dag_gir_6_mnd(self):
+        """Ville feilet hvis seriens foerste dag ga en graf med ett punkt."""
+        valg = les_valg(None, "2026-01-02", date(2026, 1, 2), date(2026, 10, 18), date(2026, 10, 9))
+        assert valg.periode == SEKS_MND and valg.beskjed == "Kursserien begynner 02.01.2026, så grafen viser 6 mnd."
+
+    def test_en_dag_i_serien_gir_velg_dag(self):
+        valg = les_valg("1-uke", "2026-01-05", date(2026, 1, 2), date(2026, 10, 18), date(2026, 10, 9))
+        assert valg.periode == VELG and valg.dag == date(2026, 1, 5) and valg.beskjed is None
+
+    def test_andre_sifre_enn_0_til_9_gir_beskjed(self):
+        """Gjennomgangen, BH9. Ville feilet hvis arabisk-indiske sifre ble godtatt."""
+        valg = les_valg(None, "\u0662\u0660\u0662\u0666-10-01", date(2026, 1, 2), date(2026, 10, 18))
+        assert valg.periode == SEKS_MND and "kunne ikke leses" in valg.beskjed

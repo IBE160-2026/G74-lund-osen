@@ -3283,15 +3283,18 @@ class TestPeriodeneIKursgrafen:
         assert "Signal: 3 av 3," in dagen and "Blandet." in dagen
 
     def test_velg_dag_med_grunn_og_ikke_boersdag(self, klient):
-        """FR-409: en grunn vises, og en dag som ikke er boersdag, sier det."""
+        """FR-409: en grunn vises, og en dag som ikke er boersdag, sier det,
+        og at grafen slutter dagen foer (gjennomgangen, BH2). Ville feilet hvis
+        en grunn eller en loerdag ga «ikke vurdert» eller et signal."""
         from markedsoversikt import GRUNNTEKST
 
         self._aksjen()
         skriv_vurdering("EQNR", date(2026, 10, 2), Grunn.SIGNAL_IKKE_REGNET)
         grunn = _dagen(klient.get("/aksje/EQNR?dag=2026-10-02").data.decode("utf-8"))
         assert f"Signal: – {GRUNNTEKST[Grunn.SIGNAL_IKKE_REGNET]}." in grunn
-        loerdag = _dagen(klient.get("/aksje/EQNR?dag=2026-10-03").data.decode("utf-8"))
-        assert "Lørdag 03.10: endring –. Signal: – ikke børsdag." in loerdag
+        html = klient.get("/aksje/EQNR?dag=2026-10-03").data.decode("utf-8")
+        assert "Lørdag 03.10: endring –. Signal: – ikke børsdag." in _dagen(html)
+        assert "03.10 har ingen kurs, så grafen slutter 02.10." in _synlig(html)
 
     def test_siste_boersdag_merker_dagen_med_endringen_og_signalet(self, klient):
         """Gruppens svar 18.10 kl. 21:50. Ville feilet uten dagen merket,
@@ -3312,6 +3315,9 @@ class TestPeriodeneIKursgrafen:
             ("periode=velg&dag=2026-13-01", "Datoen «2026-13-01» kunne ikke leses, så grafen viser 6 mnd."),
             ("periode=velg", "Velg en dag i feltet, så viser grafen 6 mnd fram til den."),
             ("dag=2025-06-01", "Kursserien begynner 02.01.2026, så grafen viser 6 mnd."),
+            # Gjennomgangen, BH1 og BH3: etter siste dag, og seriens foerste dag.
+            ("dag=2026-10-15", "Kursserien slutter 09.10.2026, så grafen viser 6 mnd."),
+            ("dag=2026-01-02", "Kursserien begynner 02.01.2026, så grafen viser 6 mnd."),
         ],
     )
     def test_feil_i_adressen_gir_6_mnd_og_en_kort_beskjed(self, klient, spoerring, beskjed):
@@ -3334,7 +3340,8 @@ class TestPeriodeneIKursgrafen:
     def test_ved_390_px_bryter_knappene_linja(self, klient):
         """Knappene ligger i en flex med wrap, og datofeltet krymper, saa
         siden ikke ruller sidelengs. Testen leser bare stilen; det er ikke
-        maalt i en nettleser."""
+        maalt i en nettleser. Ville feilet uten wrap, eller med en fast bredde
+        paa 100 px eller mer i periodevalget."""
         self._aksjen()
         stil = _stil(klient.get("/aksje/EQNR").data.decode("utf-8"))
         assert "flex-wrap: wrap" in _regel(stil, "nav.periodevalg ul")
@@ -3354,12 +3361,18 @@ class TestPeriodeneIKursgrafen:
         assert fokus and "outline: 3px solid" in fokus.group(1)
 
     def test_velg_dag_er_et_skjema_uten_skript(self, klient):
-        """«Velg dag» er et datofelt i et skjema, og siden har ingen skript."""
+        """«Velg dag» er et datofelt i et skjema, og siden har ingen skript.
+        Feltet gaar fra andre dag i serien til siste (gjennomgangen, BH1 og
+        BH3). Ville feilet med et skript, uten skjemaet, eller med i dag som
+        siste dag i feltet."""
         self._aksjen()
         html = klient.get("/aksje/EQNR?dag=2026-10-01").data.decode("utf-8")
         nav = html.split('<nav class="periodevalg"', 1)[1].split("</nav>", 1)[0]
         assert '<form method="get" action="/aksje/EQNR">' in nav
-        assert '<input type="date" id="velg-dag" name="dag" required value="2026-10-01"' in nav
+        assert (
+            '<input type="date" id="velg-dag" name="dag" required value="2026-10-01" min="2026-01-05" max="2026-10-09">'
+            in nav
+        )
         assert "<script" not in html.lower()
 
     @pytest.mark.parametrize(
@@ -3369,6 +3382,8 @@ class TestPeriodeneIKursgrafen:
             ("1-mnd", ["09.09", "14.09", "21.09", "28.09", "05.10"]),
             ("6-mnd", ["mai", "juni", "juli", "august", "september", "oktober"]),
             ("1-aar", ["januar", "", "mars", "", "mai", "", "juli", "", "september", ""]),
+            # Gjennomgangen, BH4: I år med 10 maaneder tynnes som 1 år.
+            ("i-aar", ["januar", "", "mars", "", "mai", "", "juli", "", "september", ""]),
         ],
     )
     def test_merkene_paa_aksen_passer_perioden(self, klient, periode, ventet):

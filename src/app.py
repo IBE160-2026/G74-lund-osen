@@ -501,19 +501,21 @@ def aksjedetalj(symbol: str):
     rader = leser.serie(post.aksje.symbol)
     if not rader:
         abort(404)
-    valg = les_valg(request.args.get("periode"), request.args.get("dag"), rader[0].dato, idag())
+    # Gjennomgangen, BH10: dagen leses én gang, saa alt i svaret gjelder samme dag.
+    i_dag = idag()
+    valg = les_valg(request.args.get("periode"), request.args.get("dag"), rader[0].dato, i_dag, rader[-1].dato)
     slutt = valg.dag if valg.periode == VELG else rader[-1].dato
     siste_i_grafen = max(rad.dato for rad in rader if rad.dato <= slutt)
     start = startdag(valg.periode, siste_i_grafen)
 
-    detalj = bygg_detalj(post, rader, idag(), STANDARD, start=start, slutt=slutt)
+    detalj = bygg_detalj(post, rader, i_dag, STANDARD, start=start, slutt=slutt)
     if detalj is None:
         abort(404)
     # Siste boersdag og «Velg dag»: dagen er merket, med endringen og
     # signalet som er lagret for den. Signalet regnes aldri (AD-7).
     dagen = None
     if valg.periode in (SISTE, VELG):
-        dagen = bygg_dagen(rader, slutt, oversiktsleser.vurdering(post.aksje.symbol, slutt), idag())
+        dagen = bygg_dagen(rader, slutt, oversiktsleser.vurdering(post.aksje.symbol, slutt), i_dag)
 
     # Story 10.3: KI-teksten under regelforklaringen, bare naar det er en
     # vurdering aa forklare og bryteren er paa (FR-601, FR-602).
@@ -534,11 +536,13 @@ def aksjedetalj(symbol: str):
             valg=valg,
             dagen=dagen,
             overskrift=OVERSKRIFT[valg.periode],
-            knapper=knappene(rader[-1].dato, idag()),
+            knapper=knappene(rader[-1].dato, i_dag),
             # 1 aar og de andre periodene viser bare det serien har (FR-201).
             kort_serie=rader[0].dato > start,
             serien_begynner=rader[0].dato,
-            idag_dato=idag(),
+            # Datofeltet: fra andre dag i serien til siste (gjennomgangen, BH1 og BH3).
+            foerste_valgbare=rader[1].dato if len(rader) > 1 else rader[0].dato,
+            siste_i_serien=rader[-1].dato,
             indeks_symbol=indeks_symbol,
             indeks_feilet=indeks_feilet,
             hentet=post.hentet,

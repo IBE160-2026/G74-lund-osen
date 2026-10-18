@@ -100,9 +100,10 @@ OVERSKRIFT = {
     VELG: "6 måneder fram til",
 }
 
-# Merkene paa aksen: dagene for 1 uke, mandagene (foerste boersdag i uka) for
-# 1 mnd, maanedene ellers, og navn paa annenhver maaned for 1 aar, saa de
-# faar plass.
+# Merkene paa aksen: dagene for 1 uke, foerste dag serien har i hver uke for
+# 1 mnd (ogsaa den foerste, avkortede uka), og maanedene ellers. Med flere
+# enn 8 maaneder, som 1 aar og I aar fra september, faar annenhver maaned
+# navn, saa navnene faar plass (graf.aksemerker).
 DAGER, UKER, MAANEDSNAVN, ANNENHVER_MAANED = "dager", "uker", "maaneder", "annenhver"
 AKSEMERKER = {EN_UKE: DAGER, EN_MND: UKER, ETT_AAR: ANNENHVER_MAANED}
 
@@ -111,8 +112,9 @@ UKEDAGER = ("Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søn
 # Lengste del av en feil verdi som gjentas i beskjeden.
 _LENGSTE_I_BESKJED = 20
 
-# Bare ÅÅÅÅ-MM-DD. date.fromisoformat godtar ogsaa ukedatoer som 2026-W41-5.
-_DATO = re.compile(r"\d{4}-\d{2}-\d{2}")
+# Bare ÅÅÅÅ-MM-DD med sifrene 0-9. date.fromisoformat godtar ogsaa
+# ukedatoer som 2026-W41-5.
+_DATO = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
 
 
 def foerste_knapp(siste: date, idag: date) -> str:
@@ -146,13 +148,16 @@ def _gjentatt(verdi: str) -> str:
     return verdi if len(verdi) <= _LENGSTE_I_BESKJED else verdi[:_LENGSTE_I_BESKJED] + "…"
 
 
-def les_valg(periode: str | None, dag: str | None, foerste: date, idag: date) -> Valg:
+def les_valg(periode: str | None, dag: str | None, foerste: date, idag: date, siste: date | None = None) -> Valg:
     """Perioden og dagen fra adressen, eller 6 mnd med en kort beskjed.
 
-    foerste er foerste dag i kursserien. En dag i adressen gir «Velg dag»,
-    ogsaa uten periode. En feil gir aldri en feilside: ukjent periode, en
-    dato som ikke kan leses, en dato fram i tid eller foer serien gir 6 mnd
-    og en beskjed. Datoen i beskjeden er paa formen 09.10.2026."""
+    foerste og siste er foerste og siste dag i kursserien. En dag i adressen
+    gir «Velg dag», ogsaa uten periode. En feil gir aldri en feilside: ukjent
+    periode, en dato som ikke kan leses, en dato fram i tid, etter siste dag
+    i serien eller paa eller foer seriens foerste dag gir 6 mnd og en
+    beskjed. Seriens foerste dag ville gitt en graf med ett punkt
+    (gjennomgangen, BH3), og en dag etter siste dag en graf som slutter foer
+    dagen (BH1). Datoen i beskjeden er paa formen 09.10.2026."""
     if dag:
         try:
             if not _DATO.fullmatch(dag):
@@ -162,11 +167,13 @@ def les_valg(periode: str | None, dag: str | None, foerste: date, idag: date) ->
             return Valg(SEKS_MND, beskjed=f"Datoen «{_gjentatt(dag)}» kunne ikke leses, så grafen viser 6 mnd.")
         if valgt > idag:
             return Valg(SEKS_MND, beskjed=f"{valgt:%d.%m.%Y} er fram i tid, så grafen viser 6 mnd.")
-        if valgt < foerste:
+        if valgt <= foerste:
             return Valg(
                 SEKS_MND,
                 beskjed=f"Kursserien begynner {foerste:%d.%m.%Y}, så grafen viser 6 mnd.",
             )
+        if siste is not None and valgt > siste:
+            return Valg(SEKS_MND, beskjed=f"Kursserien slutter {siste:%d.%m.%Y}, så grafen viser 6 mnd.")
         return Valg(VELG, dag=valgt)
     if not periode:
         return Valg(SEKS_MND)

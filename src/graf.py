@@ -59,6 +59,10 @@ MAANEDER = (
 # dette staar teksten til venstre for streken, saa den ikke kuttes (ECH1).
 NAVNEBREDDE = 60
 
+# Story 8.16 (gjennomgangen, BH4): flere maanedsnavn enn dette faar ikke
+# plass, saa da faar annenhver maaned navn.
+MAKS_MAANEDSNAVN = 8
+
 
 @dataclass(frozen=True)
 class Maanedsmerke:
@@ -223,11 +227,13 @@ def _dagmerker(punkter: tuple[Punkt, ...], bredde: int, hvilke: str) -> tuple[Ma
 
 def aksemerker(punkter: tuple[Punkt, ...], bredde: int, hvilke: str = MAANEDSNAVN) -> tuple[Maanedsmerke, ...]:
     """Merkene paa aksen etter perioden (story 8.16): dagene, ukene,
-    maanedene, eller maanedene med navn paa annenhver for 1 aar."""
+    maanedene, eller maanedene med navn paa annenhver for 1 aar og for alle
+    perioder med flere enn MAKS_MAANEDSNAVN maaneder, som I aar fra september
+    (gjennomgangen, BH4)."""
     if hvilke in (DAGER, UKER):
         return _dagmerker(punkter, bredde, hvilke)
     merker = _maanedsmerker(punkter, bredde)
-    if hvilke == ANNENHVER_MAANED:
+    if hvilke == ANNENHVER_MAANED or len(merker) > MAKS_MAANEDSNAVN:
         merker = tuple(m if i % 2 == 0 else Maanedsmerke(m.x, "", m.til_venstre) for i, m in enumerate(merker))
     return merker
 
@@ -301,11 +307,16 @@ def bygg_graf(
     indekslinje = _koordinater(punkter, lambda p: omregnet.get(p.dato), lav, hoy, bredde, hoyde)
     kursnavn, snittnavn = _navnene(kurslinje, ma50linje, hoyde)
     siste = _siste(kurslinje)
+    # Story 8.16: punktet for dagen, regnet fra indeksen som de andre
+    # punktene (gjennomgangen, BH11).
     punktet = None
     datoene = [p.dato for p in punkter]
     if merket in datoene:
         i = datoene.index(merket)
-        punktet = Navn(*map(float, kurslinje.split()[i].split(",")))
+        punktet = Navn(
+            MARG_X + (bredde - 2 * MARG_X) * i / (len(punkter) - 1),
+            MARG_Y + (hoyde - 2 * MARG_Y) * (1 - (punkter[i].kurs - lav) / (hoy - lav)),
+        )
 
     return Graf(
         bredde=bredde,

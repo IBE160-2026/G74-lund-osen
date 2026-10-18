@@ -248,7 +248,7 @@
   {#- Story 8.16: periodevalget i designregler.md §2, og overskriften etter
       perioden. Siste børsdag og «Velg dag» viser 6 mnd fram til dagen. #}
   <h2>Kursutvikling, {{ overskrift }}{% if dagen %} {{ dagen.dato|ukedag }} {{ dagen.dato|dato }}{% endif %}{% if vis_grafhjelp %} {{ hjelpeknapp("hjelp-graf", "Hjelp: kursgrafen") }}{% endif %}</h2>
-  {{ periodevalg(knapper, valg.periode, "/aksje/" ~ detalj.aksje.symbol, valg.dag, serien_begynner, idag_dato, "Periode for kursgrafen") }}
+  {{ periodevalg(knapper, valg.periode, "/aksje/" ~ detalj.aksje.symbol, valg.dag, foerste_valgbare, siste_i_serien, "Periode for kursgrafen") }}
   {% if valg.beskjed %}<p class="periodebeskjed" role="status">{{ valg.beskjed }}</p>{% endif %}
   {% if dagen %}
     <p class="dagen"><strong>{{ dagen.dato|ukedag|capitalize }} {{ dagen.dato|dato }}:</strong>
@@ -299,7 +299,7 @@
         {{ graf.forste_dato|dato }} til {{ graf.siste_dato|dato }}.
         {#- FR-201: 1 år, og de andre periodene, viser bare det serien har. #}
         {% if kort_serie %}Kursserien begynner {{ serien_begynner|dato }}, så grafen viser bare det den har.{% endif %}
-        {% if dagen and graf.merket %}Dagen er merket med en strek.{% endif %}
+        {% if dagen and graf.merket %}Dagen er merket med en strek.{% elif dagen %}{{ dagen.dato|dato }} har ingen kurs, så grafen slutter {{ graf.siste_dato|dato }}.{% endif %}
         {#- Story 2.9c (gjennomgangen, BH3): tre linjer når indeksen er med. #}
         {% if graf.har_indeks %}
         Kursen og snittet er tegnet på utbyttejustert kurs, og indeksen er regnet

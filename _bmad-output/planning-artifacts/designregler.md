@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-10-18T22:58
+updated: 2026-10-18T23:17
 ---
 
 # Designregler
@@ -48,6 +48,8 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 **Hvorfor:** Samme knapp betyr det samme overalt, så brukeren lærer valget én gang. Den første knappen sier hvilken dag tallene gjelder, med ord brukeren kjenner.
 
 **I dag:** appen har ikke noe periodevalg. Kursgrafen har faste seks måneder (FR-201), og flere perioder står under «Hvis vi rekker».
+
+*Rettet 2026-10-18 (story 8.16, gjennomgangen VG3):* kursgrafen har periodevalget, med regelen for startdagen over. Oversikten og Min liste får det i 8.17.
 
 ## 3. Gult betyr 3 av 3
 

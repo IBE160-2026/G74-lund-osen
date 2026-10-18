@@ -298,9 +298,8 @@ def bygg_punkter(
     kurser = [float(rad.justert_slutt) for rad in rader]
     snitt = glidende_snitt(kurser, p.ma_vindu)
     if slutt is not None:
-        rader, kurser, snitt = (
-            [x for x, rad in zip(liste, rader) if rad.dato <= slutt] for liste in (rader, kurser, snitt)
-        )
+        antall = sum(1 for rad in rader if rad.dato <= slutt)
+        rader, kurser, snitt = rader[:antall], kurser[:antall], snitt[:antall]
     if not rader:
         return ()
     if start is None:
