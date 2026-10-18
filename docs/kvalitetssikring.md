@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-18T11:42
+updated: 2026-10-18T12:09
 ---
 
 # Kvalitetssikring
@@ -275,6 +275,7 @@ sist i dokumentet.
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
 | 2.9b Søylene under hovedindeksen | `73098ed` (#63) | 1 (6, S1–S6) | – | `S/spec-2-9b-soeylene-under-hovedindeksen.md` |
 | 2.9c Hovedindeksen i kursgrafen | `24849dd` (#64) | 1 (6, C1–C6) | – | `S/spec-2-9c-hovedindeksen-i-kursgrafen.md` |
+| 9.8 Kopien `.agents/skills/` tas bort | `b5395e9` (#65) | 1 (8, S1–S8) | – S5 ble først ikke brukt, fordi erstatningen ikke traff, og ble fanget da den ble kjørt på nytt | `S/spec-9-8-agents-kopien-bort.md` |
 
 **Ingen story mangler.** Lista er satt sammen fra storyene med status `done`
 eller `review` i `sprint-status.yaml` (21 storyer) og squash-commitene med
@@ -469,6 +470,7 @@ funn. Antall rader i loggen:
 | 9.7 | 19 | 13 | 6 | – |
 | 2.9b | 23 | 17 | 6 | – |
 | 2.9c | 15 | 8 | 7 | – |
+| 9.8 | 20 | 14 | 6 | – |
 
 Noen rader slår sammen flere funn, så kolonnene summerer ikke alltid til
 radtallet. 1.6 har i tillegg seks rader med «ingen endring», og BH2 ble avvist
@@ -1148,3 +1150,4 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 9.7 | A1–A5 | A1 `test_ruff_check_finner_ingenting`, A2 og A3 `test_ruff_format_er_kjoert`, A4 `test_ci_kjoerer_ruff_foer_testene`, A5 `test_ingen_modul_i_src_bruker_meldinger` | `S/spec-9-7-…` |
 | 2.9b | S1–S6 | S1 `test_en_soeyle_per_aksje_med_kurs_fra_stoerst_fall`, S2 `test_antallet_telles_med_en_kortere_liste`, S3 `test_den_stiplede_linja_er_groenn_naar_indeksen_steg_og_roed_naar_den_falt`, S4 og S5 `test_ingen_aksje_med_rad_foer_dagen_navngis_uten_soeyler`, S6 `test_hoeyden_er_paa_endringen_slik_den_vises` | `S/spec-2-9b-…` |
 | 2.9c | C1–C6 | C1 `test_linja_starter_paa_aksjens_kurs_og_foelger_indeksen`, C2 `test_startdagen_er_grafens_foerste_dag_ikke_indeksens`, C3 `test_uten_indeks_ingen_linje_og_grafen_sier_det`, C4 `test_uten_grafens_foerste_dag_starter_linja_paa_den_neste`, C5 `test_teksten_sier_hva_linja_er_uten_raad`, C6 `test_hjelpen_for_linja_ogsaa_uten_snitt` | `S/spec-2-9c-…` |
+| 9.8 | S1–S8 | S1 `test_ingen_fil_under_agents_er_sporet` og `test_det_finnes_ingen_agents_i_rotmappa`, S2 og S4 `test_manifestet_har_bare_claude_code`, S3 `test_det_finnes_ingen_agents_i_rotmappa`, S5 `test_mappestrukturen_nevner_bmad_og_claude_skills_ikke_agents`, S6 `test_lekkasjesjekken_unntar_ikke_agents`, S7 `test_gitignore_uten_nextjs_men_med_node_og_byggemappene`, S8 `test_env_example_har_variablene_koden_leser_og_kallene_en_henting_bruker` | `S/spec-9-8-…` |
