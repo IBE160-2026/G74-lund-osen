@@ -40,13 +40,13 @@ Appen finnes i to versjoner, med samme kode. Vi anbefaler den ekte versjonen. Vi
 *Menyen under den grønne knappen «Code». Trykk «Download ZIP» nederst. Adressen i boksen trenger du ikke.*
 
 3. **Åpne PowerShell** (Windows: trykk Start, skriv PowerShell og velg «Windows PowerShell», ikke ISE) **eller Terminal** (Mac: trykk Cmd+mellomrom og skriv Terminal). Det er klart når et vindu venter på at du skriver.
-4. **Skriv `cd` og et mellomrom**, dra mappa `G74-lund-osen-main` fra steg 2, ikke ZIP-fila, der README og compose ligger (den innerste hvis det er to) fra Filutforsker eller Finder inn i vinduet, og trykk Enter. [Står det `.zip` til slutt?](docs/hjelp.md#står-det-zip-til-slutt-i-linja) Det er klart når mappenavnet står foran `>` eller `%`. Har mappa et annet navn, drar du den mappa der README og compose ligger.
+4. **Skriv `cd` og et mellomrom**, dra mappa `G74-lund-osen-main` fra steg 2 (ikke ZIP-fila), der README og compose ligger (den innerste hvis det er to) fra Filutforsker eller Finder inn i vinduet, og trykk Enter. [Står det `.zip` til slutt?](docs/hjelp.md#står-det-zip-til-slutt-i-linja) Det er klart når mappenavnet står foran `>` eller `%`. Har mappa et annet navn, drar du den mappa der README og compose ligger.
 
 ![PowerShell med en linje som slutter med G74-lund-osen-main og >](docs/bilder/readme/powershell-mappa.png)
 
-*Slik ser det ut når steg 4 har gått bra. Stien blir en annen hos deg, men mappenavnet skal stå foran `>`.*
+*Slik ser det ut når steg 4 har gått bra. Stien blir en annen hos deg, men mappenavnet skal stå foran `>` (`%` på Mac).*
 
-**Slik limer du inn en kommando.** Stegene under har kommandoene i grå bokser. Kopier en kommando med ikonet til høyre i den grå boksen, som først synes når musa er over boksen, eller marker den og trykk Ctrl+C (Cmd+C på Mac). Du kan også skrive den inn. Lim den inn i PowerShell-vinduet fra steg 4 (Terminal på Mac) med Ctrl+V (Cmd+V på Mac), og trykk Enter. «Serving on http://0.0.0.0:5000» betyr bare at appen kjører. Adressen du åpner, er http://127.0.0.1:5000.
+**Slik limer du inn en kommando.** Kopier kommandoen med ikonet til høyre i den grå boksen. Ikonet, som stegene kaller knappen, synes først når musa er over boksen. Du kan også markere den og trykke Ctrl+C eller Cmd+C, eller skrive den inn. Lim den inn i PowerShell-vinduet fra steg 4 (Terminal på Mac) med Ctrl+V eller Cmd+V, og trykk Enter.
 
 ### Demoen
 
@@ -62,6 +62,8 @@ docker compose up --build demo
 ```
 docker compose --profile demo down
 ```
+
+Vil du også prøve den ekte versjonen, går du videre til steg 5 under.
 
 ### Den ekte versjonen (anbefalt)
 
@@ -90,7 +92,7 @@ open -e .env
 docker compose up --build
 ```
 
-8. **Hent kursene** etter kl. 21 og før midnatt på en børsdag. Første gang går det også i helgen og andre dager børsen er stengt. Åpne et nytt terminalvindu i samme mappe (steg 3 og 4), og lim inn denne i det nye PowerShell-vinduet fra steg 4. Det er klart når utskriften sier hvilken børsdag vurderingene gjelder. Last siden på nytt når hentingen er ferdig.
+8. **Hent kursene** etter kl. 21 og før midnatt på en børsdag. Første gang går det også i helgen og andre dager børsen er stengt. Åpne et nytt terminalvindu i samme mappe (steg 3 og 4), og lim inn denne i det nye PowerShell-vinduet. Det er klart når utskriften sier hvilken børsdag vurderingene gjelder. Last siden på nytt når hentingen er ferdig.
 
 ```
 docker compose run --rm hent
@@ -132,7 +134,7 @@ PowerShell er trolig åpnet som administrator, og da sperrer Windows dra og slip
 <details>
 <summary>«is not recognized as the name of a cmdlet» etter cd.</summary>
 
-Det mangler mellomrom etter `cd`. Står `cd` klistret til stien i meldingen, for eksempel `'cdC:\...'`, skriver du `cd`, et mellomrom, og drar mappa inn i vinduet på nytt (steg 4).
+Det mangler mellomrom etter `cd`. Står `cd` klistret til stien i meldingen, for eksempel `'cdC:\...'`, skriver du `cd`, et mellomrom, og drar mappa inn i vinduet på nytt (steg 4). Står det `'docker'` i meldingen, er Docker Desktop ikke installert, eller vinduet ble åpnet før installasjonen: lukk det og åpne et nytt (steg 3).
 
 </details>
 
@@ -147,6 +149,8 @@ Mappa ligger ikke der stien sier, for eksempel fordi den er flyttet, eller fordi
 <summary>Ingenting skjer når jeg limer inn.</summary>
 
 Kommandoene skrives i PowerShell eller Terminal, ikke i Docker Desktop. Docker Desktop skal bare være åpent, og du skriver ingenting i det. Ledetekst (Command Prompt) på Windows virker også for demoen, men stegene er skrevet for PowerShell, og den ekte versjonen trenger PowerShell.
+
+Kopier kommandoen med ikonet til høyre i den grå boksen i README-en. Ikonet synes først når musa er over boksen. Du kan også markere kommandoen og trykke Ctrl+C (Cmd+C på Mac), eller skrive den inn. Lim den inn i PowerShell-vinduet fra steg 4 med Ctrl+V (Cmd+V på Mac), og trykk Enter.
 
 </details>
 

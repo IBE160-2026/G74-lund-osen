@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-18T14:54
+updated: 2026-10-18T15:04
 ---
 
 # Hjelp til «Kom i gang»
@@ -10,6 +10,8 @@ updated: 2026-10-18T14:54
 Spørsmål og svar til «Kom i gang» i [README-en](../README.md), sortert etter steget de hører til. De vanligste står også i README-en, under «Står du fast?». Stegene 1–4 er felles for begge versjonene.
 
 *Rettet 2026-10-18 (story 3.3c):* «Demoen» står nå før «Den ekte versjonen», som i README-en, fordi faglærer prøver demoen (gruppen 16.10 kl. 21:16, svarene kl. 21:25). Svarene er de samme som før.
+
+*Rettet 2026-10-18 (gjennomgangen av 3.3c, BH10):* setningen over gjaldt flyttingen. Etter rettelsene i 3.3c er tre spørsmål nye under «Steg 4: mappa», og svarene «Ingenting skjer når jeg limer inn.» og «Hva skal jeg se etter i vinduet?» har fått mer tekst. Ingen svar har mistet tekst.
 
 ## Steg 1: Docker Desktop
 
@@ -83,7 +85,7 @@ Kopier kommandoen med ikonet til høyre i den grå boksen i README-en. Ikonet sy
 
 ### Står det .zip til slutt i linja.
 
-Du har dratt inn ZIP-fila, ikke mappa. Dra mappa du pakket ut i steg 2, ikke ZIP-fila. Står det `.zip` til slutt i linja før du har trykket Enter, trykker du Esc, så linja blir tom, og skriver `cd` og et mellomrom på nytt. Dra så mappa inn i vinduet. På Windows har ZIP-fila en glidelås på ikonet.
+Du har dratt inn ZIP-fila, ikke mappa. Dra mappa du pakket ut i steg 2, ikke ZIP-fila. Står det `.zip` til slutt i linja før du har trykket Enter, trykker du Esc (Windows) eller Ctrl+U (Mac), så linja blir tom, og skriver `cd` og et mellomrom på nytt. Dra så mappa inn i vinduet. På Windows har ZIP-fila en glidelås på ikonet.
 
 ### Mappa lar seg ikke dra inn i vinduet.
 
@@ -91,7 +93,7 @@ PowerShell er trolig åpnet som administrator, og da sperrer Windows dra og slip
 
 ### «is not recognized as the name of a cmdlet» etter cd.
 
-Det mangler mellomrom etter `cd`. Står `cd` klistret til stien i meldingen, for eksempel `'cdC:\...'`, skriver du `cd`, et mellomrom, og drar mappa inn i vinduet på nytt (steg 4). Står det `'docker'` i meldingen, er det et annet problem: se «docker» er ikke gjenkjent lenger ned.
+Det mangler mellomrom etter `cd`. Står `cd` klistret til stien i meldingen, for eksempel `'cdC:\...'`, skriver du `cd`, et mellomrom, og drar mappa inn i vinduet på nytt (steg 4). Står det `'docker'` i meldingen, er Docker Desktop ikke installert, eller vinduet ble åpnet før installasjonen: lukk det og åpne et nytt (steg 3).
 
 ### «Cannot find path … because it does not exist».
 

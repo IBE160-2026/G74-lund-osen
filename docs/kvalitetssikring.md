@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-18T14:51
+updated: 2026-10-18T15:04
 ---
 
 # Kvalitetssikring
@@ -733,7 +733,7 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
   `docker images` (ingen `ose-signal`) og at mappa `G74-lund-osen` ikke fantes.
 - **Commit som ble prøvd** (`git log -1 --oneline`):
 
-| # | Kommando eller steg i README-en | Det som skjedde | Tid |
+| # | Kommando eller steg i README-en | Det som skjedde | Tid (min) |
 |---|---|---|---|
 | 1 | Steg 1: installer og start Docker Desktop uten å logge inn, og vent til det står «Engine running». Ba installasjonen om administrator eller omstart? | | |
 | 2 | Steg 2: «Code» → «Download ZIP» på GitHub, og pakk ut med «Pakk ut alle» (Windows) eller dobbeltklikk (Mac). Lå det en mappe med samme navn inni? Viste Windows filene som README og compose? Fikk prøveren koden som mappe eller ZIP-fil fra før, ble den pakket ut og prøven fortsatt fra steg 3? | | |
@@ -750,7 +750,7 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
 | 13 | Den ekte versjonen, steg 8: `docker compose run --rm hent`, uten nøkkel | | |
 | 14 | Siden lastet på nytt | | |
 | 15 | Den ekte versjonen, steg 9: `docker compose down`. Stod det «Removed»? | | |
-| 16 | Byttet: `docker compose --profile demo down`, så `docker compose up --build`, så det samme tilbake til `docker compose up --build demo` | | |
+| 16 | Byttet, fra den ekte versjonen til demoen og tilbake: `docker compose up --build`, så `docker compose down` og `docker compose up --build demo`, så `docker compose --profile demo down` og `docker compose up --build` igjen | | |
 | 17 | uv: `uv sync` | | |
 | 18 | `uv run python src/demo.py` | | |
 | 19 | `uv run python src/app.py --demo` og http://127.0.0.1:5000 | | |
@@ -766,6 +766,8 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
 *Rettet 2026-10-11 (story 3.4, PR 3):* tabellen følger «Kom i gang» slik den ble etter instruksjonen kl. 22:32: steg 1–4 felles, så den ekte versjonen (steg 5–9) og demoen (steg 5–7), i den rekkefølgen README-en har dem. Før PR 3 sto `git clone https://github.com/IBE160-2026/G74-lund-osen.git` og `cd G74-lund-osen` som rad 2 og 3, demoen før den ekte versjonen, og `Ctrl+C` og `docker compose --profile demo down` som to rader. Nytt i PR 3: rad 1 (installer og start, slått sammen av to rader), rad 2–4 (Download ZIP, PowerShell eller Terminal, og `cd`), rad 5 (nøkkelen), `notepad .env` og `open -e .env` i rad 6, og rad 23 (spørsmålene i «Står du fast?» og `docs/hjelp.md`). Slått sammen: rad 15 (Ctrl+C og `docker compose --profile demo down`). Flyttet: radene for den ekte versjonen står nå før demoen, som 6–10 (før rad 10–14). De andre radene er de samme som før, med nytt nummer. Koden hentes nå med «Download ZIP», så prøveren har ikke git: commiten som ble prøvd, er den GitHub viser øverst på siden når ZIP-fila lastes ned, og mappa som ikke skal finnes, er `G74-lund-osen-main`, ikke `G74-lund-osen` som i punktet om maskinen over. Radene 2 og 3 følger Marians svar kl. 21:14 samme dag: ZIP-fila må pakkes ut med «Pakk ut alle», Windows viser filene uten filendelse, og «Windows PowerShell ISE» står også i lista.
 
 *Rettet 2026-10-18 (story 3.3c):* tabellen følger «Kom i gang» med demoen før den ekte versjonen (gruppen 16.10 kl. 21:16, svarene kl. 21:25). Radene for demoen, som var 11–15, er nå 5–9, og radene for den ekte versjonen, som var 5–10, er nå 10–15. Teksten i radene er den samme. Kolonnen «Tid» er ny: hvor lang tid hvert steg tok, i minutter.
+
+*Rettet 2026-10-18 (gjennomgangen av 3.3c, BH7 og BH8):* rad 16 er skrevet om etter den nye rekkefølgen. Før sto det «Byttet: `docker compose --profile demo down`, så `docker compose up --build`, så det samme tilbake til `docker compose up --build demo`», som begynte med å stoppe demoen, men nå er den ekte versjonen den siste som kjørte (rad 15). Kolonnen heter «Tid (min)», så enheten står i tabellen.
 
 - **Det som ikke stemte:**
 - **Rettet i** (commit eller story):

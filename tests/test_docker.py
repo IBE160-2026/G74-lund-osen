@@ -720,7 +720,7 @@ class TestReadme:
             under = _bildetekst(_steg("Felles for begge", nummer), navn)
             assert under, navn
             assert len(re.findall(r"\w+", under)) <= 25, (navn, under)
-        assert "Stien blir en annen hos deg, men mappenavnet skal stå foran `>`." in _bildetekst(
+        assert "Stien blir en annen hos deg, men mappenavnet skal stå foran `>` (`%` på Mac)." in _bildetekst(
             _steg("Felles for begge", 4), BILDENE[4]
         )
 
@@ -763,7 +763,7 @@ class TestBildeneIDocs:
             for p in mappe.rglob("*")
             if p.is_file() and p.suffix.lower() in BILDEFILER
         )
-        assert filer == sorted(f"docs/bilder/readme/{navn}" for navn in BILDENE.values())
+        assert filer == sorted(f"docs/bilder/readme/{navn}" for navn in BILDENE.values()), filer
 
 
 def _proevetabellen(proeve: str | None = None) -> str:
@@ -818,8 +818,9 @@ def _uten_bokser(tekst: str) -> str:
     return re.sub(r"^```.*?^```$", "", tekst, flags=re.MULTILINE | re.DOTALL)
 
 
-# Et bilde paa egen linje, og teksten under i kursiv som eget avsnitt.
-BILDE_MED_TEKST = r"^!\[[^\]]*\]\([^)]+\)[ \t]*\n(?:[ \t]*\n)*(?:\*[^*\n][^\n]*\*[ \t]*(?:\n|$))?"
+# Et bilde paa egen linje, og teksten under i kursiv som eget avsnitt, med
+# minst én tom linje imellom (gjennomgangen av 3.3c, BH12, ECH6).
+BILDE_MED_TEKST = r"^!\[[^\]]*\]\([^)]+\)[ \t]*\n(?:(?:[ \t]*\n)+\*[^*\n][^\n]*\*[ \t]*(?:\n|$))?"
 
 
 def _uten_bilder(tekst: str) -> str:
@@ -832,7 +833,7 @@ def _bildetekst(tekst: str, navn: str) -> str:
     """Teksten i kursiv i avsnittet rett under bildet navn, uten stjernene.
     Tom hvis avsnittet under ikke er i kursiv."""
     treff = re.search(
-        rf"^!\[[^\]]*\]\([^)]*/{re.escape(navn)}\)[ \t]*\n(?:[ \t]*\n)*\*([^*\n][^\n]*)\*[ \t]*$",
+        rf"^!\[[^\]]*\]\([^)]*/{re.escape(navn)}\)[ \t]*\n(?:[ \t]*\n)+\*([^*\n][^\n]*)\*[ \t]*$",
         tekst,
         re.MULTILINE,
     )
@@ -943,13 +944,13 @@ class TestReadmeForNybegynnere:
 
     def test_steg_4_mappa_ikke_zip_fila(self):
         """Story 3.3c, rettelse a: i gjennomgangen 16.10 ble ZIP-fila dratt
-        inn i stedet for mappa. Steg 4 sier mappa fra steg 2, ikke ZIP-fila,
+        inn i stedet for mappa. Steg 4 sier mappa fra steg 2 (ikke ZIP-fila),
         og lenker til svaret om .zip til slutt i linja i docs/hjelp.md, som
         sier Esc (svar 2 kl. 14:48: detaljene i docs/hjelp.md når steget
         ellers blir over 65 ord). Ville feilet hvis .zip-sjekken falt bort
         fra steg 4."""
         steg = _steg("Felles for begge", 4)
-        assert "dra mappa `G74-lund-osen-main` fra steg 2, ikke ZIP-fila," in steg
+        assert "dra mappa `G74-lund-osen-main` fra steg 2 (ikke ZIP-fila), der README og compose ligger" in steg
         sporsmaal = "Står det .zip til slutt i linja."
         assert f"[Står det `.zip` til slutt?](docs/hjelp.md#{_anker(sporsmaal)})" in steg
         steg4 = _hjelp().split("\n## Steg 4: mappa\n", 1)[1].split("\n## ", 1)[0]
@@ -971,8 +972,9 @@ class TestReadmeForNybegynnere:
         assert re.search(rf"^### {re.escape(sporsmaal)}$", steg4, re.MULTILINE)
         i_hjelp = steg4.split(f"### {sporsmaal}\n\n", 1)[1].split("\n\n", 1)[0]
         assert i_hjelp.startswith(svar.strip())
-        # «docker» er ikke gjenkjent har sitt eget svar, som står.
-        assert "«docker» er ikke gjenkjent" in i_hjelp
+        # Gjennomgangen, BH6: svaret i README-en sier ogsaa hva 'docker' i
+        # meldingen betyr. «docker» er ikke gjenkjent har sitt eget svar, som står.
+        assert "Står det `'docker'` i meldingen, er Docker Desktop ikke installert" in svar
         assert "### «docker» er ikke gjenkjent, eller «command not found: docker»." in _hjelp()
 
     def test_svaret_om_cannot_find_path(self):
@@ -996,28 +998,46 @@ class TestReadmeForNybegynnere:
         en kommando sier at den limes inn i PowerShell-vinduet fra steg 4.
         «Serving on» betyr bare at appen kjoerer. Ville feilet hvis et steg
         med en boks ikke sa hvor kommandoen limes inn, eller forklaringen
-        manglet en av de tre maatene aa kopiere paa."""
+        manglet en av de tre maatene aa kopiere paa.
+
+        Gjennomgangen av 3.3c: avsnittet er kort, hoeyst 65 ord som et steg
+        (VG6, ECH2), og sier at ikonet er knappen stegene nevner (BH3,
+        ECH12). «Serving on» forklares i stegene der linja staar, ikke i
+        avsnittet. Steg 8 bruker et nytt vindu, saa det sier «det nye
+        PowerShell-vinduet», ikke «fra steg 4» (BH1). Svaret under «Står du
+        fast?» har ogsaa kopieringen (VG7)."""
         del_ = _kom_i_gang()
         assert del_.count(KOPIERINGEN) == 1
         avsnitt = del_.split(KOPIERINGEN, 1)[1].split("\n\n", 1)[0]
         for innhold in (
-            "ikonet til høyre i den grå boksen, som først synes når musa er over boksen",
-            "marker den og trykk Ctrl+C",
-            "Du kan også skrive den inn.",
-            "Lim den inn i PowerShell-vinduet fra steg 4",
-            "«Serving on http://0.0.0.0:5000» betyr bare at appen kjører.",
-            "Adressen du åpner, er http://127.0.0.1:5000.",
+            "Kopier kommandoen med ikonet til høyre i den grå boksen.",
+            "Ikonet, som stegene kaller knappen, synes først når musa er over boksen.",
+            "markere den og trykke Ctrl+C eller Cmd+C",
+            "eller skrive den inn.",
+            "Lim den inn i PowerShell-vinduet fra steg 4 (Terminal på Mac)",
         ):
             assert innhold in avsnitt, innhold
+        assert len(re.findall(r"\w+", KOPIERINGEN + avsnitt)) <= 65
         # Rett foer det foerste steget med en kommando, og etter steg 4.
         foerste_boks = re.search(r"^```", del_, re.MULTILINE).start()
         assert del_.index("\n4. ") < del_.index(KOPIERINGEN) < del_.index("\n### Demoen\n") < foerste_boks
+        assert del_[del_.index(KOPIERINGEN) :].split("\n\n", 1)[1].startswith("### Demoen\n")
         # Hvert steg med en boks sier hvor den limes inn.
         for seksjon, numre in SEKSJONENE.items():
             for n in numre:
                 steg = _steg(seksjon, n)
-                if _blokkene(steg):
-                    assert re.search(r"i (det nye )?PowerShell-vinduet fra steg 4", steg), (seksjon, n)
+                if not _blokkene(steg):
+                    continue
+                if (seksjon, n) == ("Den ekte versjonen (anbefalt)", 8):
+                    assert "lim inn denne i det nye PowerShell-vinduet." in steg
+                    assert "nye PowerShell-vinduet fra steg 4" not in steg
+                else:
+                    assert "i PowerShell-vinduet fra steg 4" in steg, (seksjon, n)
+        # BH11: demoen slutter i steg 7 og sier hvor den ekte versjonen begynner.
+        assert "Vil du også prøve den ekte versjonen, går du videre til steg 5 under." in _steg("Demoen", 7)
+        # VG7: svaret under «Står du fast?» har kopieringen, likt med docs/hjelp.md.
+        faq = _detaljer(_faq())["Ingenting skjer når jeg limer inn."]
+        assert "ikonet til høyre i den grå boksen" in faq and "skrive den inn" in faq
         # Linja i steg 7 og steg 5 i demoen sier hva den betyr.
         assert "som bare betyr at appen kjører" in _steg("Den ekte versjonen (anbefalt)", 7)
         assert "Den linja betyr bare at demoen kjører." in _steg("Demoen", 5)
@@ -1154,7 +1174,14 @@ class TestReadmeForNybegynnere:
         tabell = _proevetabellen("Prøve 1")
         # Story 3.3c: demoen foer den ekte versjonen, som i README-en, og en
         # kolonne for tiden hvert steg tok.
-        assert tabell.splitlines()[0] == "| # | Kommando eller steg i README-en | Det som skjedde | Tid |"
+        assert tabell.splitlines()[0] == "| # | Kommando eller steg i README-en | Det som skjedde | Tid (min) |"
+        # Gjennomgangen, BH7: byttet begynner med den ekte versjonen, som kjoerte sist.
+        bytte = [l for l in tabell.splitlines() if "| Byttet" in l]
+        assert len(bytte) == 1
+        assert bytte[0].startswith(
+            "| 16 | Byttet, fra den ekte versjonen til demoen og tilbake: "
+            "`docker compose up --build`, så `docker compose down`"
+        ), bytte[0]
         assert tabell.index("| Demoen, steg 7:") < tabell.index("| Den ekte versjonen, steg 5:")
         assert [int(n) for n in re.findall(r"^\| (\d+) \|", tabell, re.MULTILINE)] == list(range(1, 24))
         assert [int(n) for n in re.findall(r"\| Steg (\d+):", tabell)] == [1, 2, 3, 4]
