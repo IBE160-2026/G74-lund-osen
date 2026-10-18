@@ -732,9 +732,10 @@ class TestReadme:
         tester = README.read_text(encoding="utf-8").split("\n## Tester\n", 1)[1].split("\n## ", 1)[0]
         assert f"Python {_python_krav()} eller nyere" in tester and "`requires-python`" in tester
         # Én rekkefølge: uv sync, så uv run pytest, og ingen annen blokk
-        # foran (gjennomgangen, BH2).
+        # foran (gjennomgangen, BH2). Story 3.3e (svaret 18.10 kl. 20:39):
+        # installasjonen av uv for Windows og Mac kommer foerst.
         blokker = [b.strip() for _, b in _blokkene(tester)]
-        assert blokker == ["uv sync", "uv run pytest"], blokker
+        assert blokker == [UV_WINDOWS, UV_MAC, "uv sync", "uv run pytest"], blokker
         assert "uten Docker" in tester and "Alle testene skal bestå" in tester
         # Grunnene for det som hoppes over, slik testene sier dem (VG4).
         for grunn in ("time.tzset", "Unix-sokler", "`::1`", "uten git"):
@@ -758,7 +759,7 @@ class TestReadme:
         for grunn in ("time.tzset", "Unix-sokler", "`::1`", "uten git", "`-rs`"):
             assert grunn in forklaring and grunn not in synlig, grunn
         assert "Alle testene skal bestå." in synlig
-        assert [b.strip() for _, b in _blokkene(synlig)] == ["uv sync", "uv run pytest"]
+        assert [b.strip() for _, b in _blokkene(synlig)] == [UV_WINDOWS, UV_MAC, "uv sync", "uv run pytest"]
         assert "- Ingen nettkall:" in synlig and "- CI kjører" in synlig
         assert "](docs/kvalitetssikring.md)" in synlig
         # Gjennomgangen, BH10 og ECH7: indeksene i samme tekst, og knappen
@@ -777,14 +778,19 @@ class TestReadme:
         Story 3.3c (instruksjonen 18.10 kl. 12:23): de tre skjermbildene fra
         gruppens gjennomgang 16.10 står i steg 1, 2 og 4, hvert med alt-tekst
         og en kort tekst under, og CI-merket står øverst (utsatt fra PR #54).
-        Ingen av dem viser appen. Ville feilet med et bilde til, et bilde
-        uten alt-tekst eller utenfor docs/bilder/readme/, eller uten CI-merket."""
+        Ingen av dem viser appen. Story 3.3e: og bildet av oversikten i demoen
+        under «Til faglærer», som viser demoen, aldri den ekte versjonen.
+        Ville feilet med et bilde til, et bilde uten alt-tekst eller utenfor
+        docs/bilder/readme/, eller uten CI-merket."""
         tekst = README.read_text(encoding="utf-8")
         bilder = re.findall(r"!\[([^\]]*)\]\(([^)]+)\)", tekst)
         merket = [b for _, b in bilder if b.endswith("/actions/workflows/tester.yml/badge.svg")]
         assert merket == ["https://github.com/IBE160-2026/G74-lund-osen/actions/workflows/tester.yml/badge.svg"]
         andre = [(alt, b) for alt, b in bilder if b not in merket]
-        assert sorted(b for _, b in andre) == sorted(f"docs/bilder/readme/{navn}" for navn in BILDENE.values())
+        # Story 3.3e: og bildet av oversikten under «Til faglærer».
+        assert sorted(b for _, b in andre) == sorted(
+            [*(f"docs/bilder/readme/{navn}" for navn in BILDENE.values()), SKJERMBILDET]
+        )
         for alt, sti in andre:
             assert alt.strip(), sti
             assert (ROT / sti).is_file(), sti
@@ -814,12 +820,136 @@ class TestReadme:
         assert "`docs/bilder/readme/`" in mappestruktur
         for navn in BILDENE.values():
             assert f"`{navn}`" in mappestruktur, navn
+        # Story 3.3e (gjennomgangen, VG4): og bildet av oversikten.
+        assert f"`{SKJERMBILDET.rsplit('/', 1)[1]}`" in mappestruktur
 
 
 BILDEFILER = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"}
 # Story 3.3c: skjermbildene fra gruppens gjennomgang 16.10, per steg i
 # «Felles for begge».
 BILDENE = {1: "engine-running.png", 2: "github-download-zip.png", 4: "powershell-mappa.png"}
+
+# Story 3.3e (gruppens svar 18.10 kl. 00:20): bildet av oversikten i demoen,
+# tatt etter «Bildet» i spesifikasjonen 3.3b. Filene under bestemmer det
+# bildet viser: malene oversikten bygges av, med stilarket i <style> i
+# _ramme.html, skriftene i src/static/, demodataene og modulene som lager
+# tallene og tekstene. Endres en av dem, tas bildet paa nytt og avtrykket
+# oppdateres i samme commit (spesifikasjonen 3.3e, «Avgjort»).
+SKJERMBILDET = "docs/bilder/readme/oversikten-demo.png"
+# Story 3.3e (svaret 18.10 kl. 20:39): installasjonen av uv i «Tester», fra
+# https://docs.astral.sh/uv/getting-started/installation/.
+UV_WINDOWS = 'powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"'
+UV_MAC = "curl -LsSf https://astral.sh/uv/install.sh | sh"
+# Gjennomgangen av 3.3e (BH6, VG1, ECH1-ECH3): ogsaa signalberegningen,
+# hjelpetekstene, boersdagene, indeksen og aksjene demoen bygges av, og hver
+# delmal (_*.html), saa en ny delmal kommer med. Fra src/static/ bare
+# skriftene, ikke OFL.txt eller filer Windows legger der. Merket
+# «Eksempeltall» i app.py er med som tekst, ikke hele app.py.
+MALENE_BAK_BILDET = (
+    "src/demo.py",
+    "src/markedsoversikt.py",
+    "src/oversiktsdata.py",
+    "src/hovedindeks.py",
+    "src/tallformat.py",
+    "src/signalberegning.py",
+    "src/hjelpetekster.py",
+    "src/boersdag.py",
+    "src/indeksdata.py",
+    "src/kursdata.py",
+    "src/templates/index.html",
+)
+SKRIFTFILER = {".woff", ".woff2", ".ttf", ".otf", ".css"}
+# Svaret 18.10 kl. 21:42: bildet er saa hoeyt at det slutter etter den siste
+# raden under «Skilte seg ut», foer «Øvrige aksjer», saa signalstyrken og
+# fargene per aksje er med.
+HOEYDE_PAA_BILDET = 1573
+AVTRYKK_BAK_BILDET = "dad3f7b9fe66e999755b1e346cde0ddefda61c55bfca660b309cf3a10826a3eb"
+SLIK_TAS_BILDET = (
+    "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
+    f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
+    "midlertidig mappe (lagring_sqlite.BASE_STI dit), OSE_DEMO=1, waitress på en "
+    "ledig port, og msedge --headless --disable-gpu --hide-scrollbars "
+    f"--window-size=1280,{HOEYDE_PAA_BILDET} med egen --user-data-dir. Bildet skal slutte "
+    "etter den siste raden under «Skilte seg ut», før «Øvrige aksjer»: mål bunnen av "
+    "den raden og endre HOEYDE_PAA_BILDET hvis den har flyttet seg. Oppdater så "
+    "AVTRYKK_BAK_BILDET til {avtrykk} i samme commit."
+)
+
+
+def _avtrykk_bak_bildet() -> str:
+    """sha256 av stien og innholdet, med LF, for hver fil bak bildet, og av
+    merket «Eksempeltall» fra app.py."""
+    import hashlib
+
+    import app as app_modul
+
+    filer = list(MALENE_BAK_BILDET)
+    filer += [p.relative_to(ROT).as_posix() for p in (ROT / "src" / "templates").glob("_*.html")]
+    filer += [
+        p.relative_to(ROT).as_posix()
+        for p in (ROT / "src" / "static").rglob("*")
+        if p.is_file() and p.suffix.lower() in SKRIFTFILER
+    ]
+    sum_ = hashlib.sha256()
+    for fil in sorted(set(filer)):
+        sum_.update(fil.encode("utf-8") + b"\0" + (ROT / fil).read_bytes().replace(b"\r\n", b"\n") + b"\0")
+    sum_.update(b"EKSEMPELTALL_MERKE\0" + app_modul.EKSEMPELTALL_MERKE.encode("utf-8"))
+    return sum_.hexdigest()
+
+
+class TestSkjermbildet:
+    """3.3b, punkt b, tilbake i 3.3e: skjermbildet av oversikten i demoen,
+    under «Til faglærer», 1280 px bredt, med en alt-tekst som sier at det er
+    demoen. Regelen fra 25.09: bildet viser bare demoen."""
+
+    def _bildet(self) -> tuple[str, str]:
+        tekst = README.read_text(encoding="utf-8")
+        treff = [(a, s) for a, s in re.findall(r"!\[([^\]]*)\]\(([^)]+)\)", tekst) if s == SKJERMBILDET]
+        assert len(treff) == 1, treff
+        return treff[0]
+
+    def test_fila_finnes_og_er_1280_px_bred_og_1573_px_hoey(self):
+        """Svaret 18.10 kl. 21:42: 1280 x 1573, til bunnen av «Skilte seg ut».
+        Ville feilet med bildet fra 3.3b (1280 x 1000), eller et bilde i en
+        annen hoeyde enn HOEYDE_PAA_BILDET."""
+        data = (ROT / SKJERMBILDET).read_bytes()
+        assert data[:8] == b"\x89PNG\r\n\x1a\n"
+        assert int.from_bytes(data[16:20], "big") == 1280
+        assert int.from_bytes(data[20:24], "big") == HOEYDE_PAA_BILDET == 1573
+
+    def test_bildet_har_ingen_tekstfelt(self):
+        """Regel 16 (gjennomgangen av 3.3e, BH8 og ECH10): ingen sti eller
+        brukernavn i metadataene. Ville feilet med et bilde tatt med et
+        verktoey som skriver tEXt, iTXt, zTXt eller eXIf."""
+        data = (ROT / SKJERMBILDET).read_bytes()
+        i, biter = 8, []
+        while i < len(data):
+            lengde = int.from_bytes(data[i : i + 4], "big")
+            biter.append(data[i + 4 : i + 8].decode("latin-1"))
+            i += 12 + lengde
+        assert biter[0] == "IHDR" and biter[-1] == "IEND", biter
+        assert not {"tEXt", "iTXt", "zTXt", "eXIf"} & set(biter), biter
+
+    def test_teksten_under_bildet_sier_at_det_er_demoen(self):
+        """Alt-teksten vises ikke naar bildet lastes (3.3b, BH6)."""
+        tekst = README.read_text(encoding="utf-8")
+        etter = tekst.split(SKJERMBILDET + ")\n", 1)[1].split("\n", 1)[0]
+        assert etter == "*Oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»).*"
+
+    def test_bildet_tas_paa_nytt_naar_oversikten_endres(self):
+        """Ville feilet hvis en mal, stilarket, en skrift, demodataene eller en
+        modul bak oversikten ble endret uten at bildet ble tatt paa nytt.
+        Feilmeldingen sier hvordan."""
+        avtrykk = _avtrykk_bak_bildet()
+        assert avtrykk == AVTRYKK_BAK_BILDET, SLIK_TAS_BILDET.format(avtrykk=avtrykk)
+
+    def test_alt_teksten_sier_at_det_er_demoen(self):
+        alt, _ = self._bildet()
+        assert "demoen" in alt and "Eksempeltall" in alt and "ikke data fra Oslo Børs" in alt
+
+    def test_bildet_staar_under_til_faglaerer_og_over_kom_i_gang(self):
+        tekst = README.read_text(encoding="utf-8")
+        assert tekst.index("Til faglærer:") < tekst.index(SKJERMBILDET) < tekst.index("\n## Kom i gang\n")
 
 
 def _python_krav() -> str:
@@ -837,8 +967,8 @@ class TestBildeneIDocs:
         """Gruppen 16.10 kl. 21:38: skjermbildet av oversikten er tatt ut, så
         ingen bilder med ekte data blir liggende. Story 3.3c: under
         docs/bilder/ ligger bare de tre skjermbildene i «Kom i gang», i
-        docs/bilder/readme/. Ville feilet med et bilde til, eller et av de tre
-        et annet sted."""
+        docs/bilder/readme/. Story 3.3e: og bildet av oversikten i demoen.
+        Ville feilet med et bilde til, eller et av de fire et annet sted."""
         mappe = README.parent / "docs" / "bilder"
         # Bare bildefiler: Thumbs.db og .DS_Store fra Utforsker og Finder
         # skal ikke felle testen hos sensor (gjennomgangen av 3.3b, BH4, ECH).
@@ -847,7 +977,9 @@ class TestBildeneIDocs:
             for p in mappe.rglob("*")
             if p.is_file() and p.suffix.lower() in BILDEFILER
         )
-        assert filer == sorted(f"docs/bilder/readme/{navn}" for navn in BILDENE.values()), filer
+        # Story 3.3e: og bildet av oversikten i demoen.
+        ventet = [*(f"docs/bilder/readme/{navn}" for navn in BILDENE.values()), SKJERMBILDET]
+        assert filer == sorted(ventet), filer
 
 
 def _proevetabellen(proeve: str | None = None) -> str:
@@ -1141,6 +1273,8 @@ class TestReadmeForNybegynnere:
         # Gjennomgangen, BH6: svaret i README-en sier ogsaa hva 'docker' i
         # meldingen betyr. «docker» er ikke gjenkjent har sitt eget svar, som står.
         assert "Står det `'docker'` i meldingen, er Docker Desktop ikke installert" in svar
+        # Story 3.3e (gjennomgangen, ECH8): og 'uv', som står under «Tester».
+        assert "Står det `'uv'` i meldingen, er uv ikke installert" in svar and "«Tester»" in svar
         assert "### «docker» er ikke gjenkjent, eller «command not found: docker»." in _hjelp()
 
     def test_svaret_om_cannot_find_path(self):
@@ -1368,13 +1502,86 @@ class TestReadmeForNybegynnere:
         assert [b.strip() for _, b in _blokkene(_steg("Demoen", 7))] == ["docker compose --profile demo down"]
         assert "Ctrl+C" in _steg("Demoen", 7) and "Ctrl+C" in _steg("Den ekte versjonen (anbefalt)", 9)
 
+    def test_installasjonen_av_uv_staar_foer_uv_sync(self):
+        """Story 3.3e, punkt b (gruppens svar 18.10 kl. 20:39): «Tester» har
+        installasjonen av uv foer uv sync, én boks for Windows (PowerShell) og
+        én for Mac (Terminal), og hva man gjoer naar uv ikke blir funnet.
+        «Uten Docker, med uv» viser dit og har ingen egen kopi, og
+        docs/hjelp.md har samme svar. Ville feilet hvis en av boksene manglet,
+        sto etter uv sync, eller sto ogsaa i «Uten Docker, med uv»."""
+        tester = README.read_text(encoding="utf-8").split("\n## Tester\n", 1)[1].split("\n## ", 1)[0]
+        assert "](https://docs.astral.sh/uv/getting-started/installation/)" in tester
+        assert f"Windows (PowerShell):\n\n```\n{UV_WINDOWS}\n```" in tester
+        assert f"Mac (Terminal):\n\n```\n{UV_MAC}\n```" in tester
+        assert tester.index(UV_WINDOWS) < tester.index(UV_MAC) < tester.index("```\nuv sync\n```")
+        funnet = "lukker du vinduet, åpner et nytt og går til mappa, som i steg 4"
+        assert "«The term 'uv' is not recognized» eller «command not found: uv»" in tester and funnet in tester
+        assert "Første `uv sync` laster ned Python og pakkene" in tester
+        # Gjennomgangen (BH1, VG2, ECH5): tidene som staar i dagsfila 18.10,
+        # 219-424 s, i hele minutter. 424 s er kjoeringen for 3.3e.
+        assert "Hele testsettet tok mellom 4 og 7 minutter på maskinen vår 18.10." in tester
+        uv = _detaljer(_seksjon("Mer for den som vil"))["Uten Docker, med uv"]
+        assert "[«Tester»](#tester)" in uv
+        assert UV_WINDOWS not in uv and UV_MAC not in uv and "install.ps1" not in uv and "install.sh" not in uv
+        sporsmaal = "«The term 'uv' is not recognized» eller «command not found: uv»."
+        svar = _hjelp().split(f"### {sporsmaal}\n\n", 1)[1].split("\n\n", 1)[0]
+        assert funnet in svar and "](../README.md#tester)" in svar
+
+    def test_variablene_i_tabellen_er_de_i_env_example(self):
+        """Story 3.3e, punkt c: tabellen under «Variablene i .env» har de
+        samme variablene som .env.example, og hver av dem leses i src/.
+        Testen leser .env.example, aldri .env. Ville feilet med en variabel i
+        .env.example som ikke stod i tabellen, eller en i tabellen som koden
+        ikke leser."""
+        eksempel = (ROT / ".env.example").read_text(encoding="utf-8")
+        # Ogsaa «export NAVN=» og mellomrom foer =, som dotenv godtar (ECH6).
+        i_fila = set(re.findall(r"^#?\s*(?:export\s+)?([A-Z][A-Z0-9_]+)\s*=", eksempel, re.MULTILINE))
+        knapp = _detaljer(_seksjon("Mer for den som vil"))["Variablene i .env"]
+        rader = [l for l in knapp.splitlines() if l.startswith("| `")]
+        i_tabellen = [re.match(r"\| `([A-Z0-9_]+)` \|", l).group(1) for l in rader]
+        assert len(i_tabellen) == len(set(i_tabellen)) and set(i_tabellen) == i_fila, (i_tabellen, i_fila)
+        for rad in rader:
+            assert len([c for c in rad.strip("|").split("|")]) == 4, rad
+        kilde = "\n".join(p.read_text(encoding="utf-8") for p in sorted((ROT / "src").glob("*.py")))
+        for navn in i_tabellen:
+            assert f'"{navn}"' in kilde, navn
+        assert "`OSE_DEMO` og `OSE_I_DOCKER` settes av `compose.yaml` og `Dockerfile`" in knapp
+        # Steg 6 viser dit.
+        assert "[`.env`](#mer-for-den-som-vil)" in _steg("Den ekte versjonen (anbefalt)", 6)
+
+    def test_standardene_i_tabellen_er_de_i_koden(self):
+        """Gjennomgangen av 3.3e (BH2, BH3, VG5): standardene i tabellen er
+        de koden, .env.example, compose.yaml og Dockerfile bruker. Ville
+        feilet hvis standardadressen til Ollama, adressen i compose,
+        OSE_KI_TJENESTE=av i .env.example eller lokal uten variabelen ble
+        endret uten at tabellen fulgte, eller OSE_DEMO og OSE_I_DOCKER ikke
+        ble satt der tabellen sier."""
+        from ki_lokal import STANDARD_URL
+        from ki_tekst import AV, LOKAL
+
+        knapp = _detaljer(_seksjon("Mer for den som vil"))["Variablene i .env"]
+        rader = {re.match(r"\| `([A-Z0-9_]+)` \|", l).group(1): l for l in knapp.splitlines() if l.startswith("| `")}
+        assert f"`{STANDARD_URL}`" in rader["OSE_KI_OLLAMA_URL"]
+        ollama_i_compose = [l.strip() for l in _tjenester()["hent"]["environment"]]
+        assert "OSE_KI_OLLAMA_URL: http://ollama:11434" in ollama_i_compose, ollama_i_compose
+        assert "`http://ollama:11434` i Docker" in rader["OSE_KI_OLLAMA_URL"]
+        eksempel = (ROT / ".env.example").read_text(encoding="utf-8")
+        assert re.search(rf"^OSE_KI_TJENESTE={AV}$", eksempel, re.MULTILINE)
+        assert f"`{AV}` etter steg 6" in rader["OSE_KI_TJENESTE"]
+        assert f"gjelder `{LOKAL}`" in rader["OSE_KI_TJENESTE"]
+        assert 'OSE_DEMO: "1"' in COMPOSE.read_text(encoding="utf-8")
+        assert "OSE_I_DOCKER=1" in (ROT / "Dockerfile").read_text(encoding="utf-8")
+        assert "Med uv slås demoen på med `--demo`." in knapp
+
     def test_mer_for_den_som_vil_er_lukket(self):
         """22:32: Bytte og uv staar, lukket i <details> under én overskrift."""
         mer = _seksjon("Mer for den som vil")
-        # Story 10.2: den lokale modellen, ogsaa lukket.
+        # Story 10.2: den lokale modellen, ogsaa lukket. Story 3.3e:
+        # variablene i .env.
         assert set(_detaljer(mer)) == {
             "Bytte mellom demoen og den ekte versjonen",
             "Uten Docker, med uv",
+            "Variablene i .env",
             "Den lokale modellen (KI-teksten)",
         }
 
@@ -1397,7 +1604,11 @@ class TestReadmeForNybegynnere:
         demo, ekte = uv.split("**Demoen**\n\n", 1)[1].split("**Den ekte versjonen**\n\n", 1)
         ekte, etter = ekte.split("\n\nBasen, demobasen", 1)
         # Gjennomgangen, ECH6: setningene foer og etter listene staar.
-        assert uv.startswith("Med Python 3.13 og [uv](https://docs.astral.sh/uv/). Først demoen.\n\n**Demoen**")
+        # Story 3.3e: installasjonen av uv står bare under «Tester».
+        assert uv.startswith(
+            "Med Python 3.13 og [uv](https://docs.astral.sh/uv/). Installasjonen av uv står under "
+            "[«Tester»](#tester). Først demoen.\n\n**Demoen**"
+        )
         assert etter.startswith(" og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo` åpner")
         for navn, liste in (("Demoen", demo), ("Den ekte versjonen", ekte)):
             punkter = re.findall(r"^(\d+)\. ([^\n]+)\n\n```\n([^\n]+)\n```$", liste, re.MULTILINE)
@@ -1525,10 +1736,14 @@ class TestReadmeForNybegynnere:
         avsnitt = [a.strip() for a in topp.split("\n\n") if a.strip()]
         # Gruppen 16.10 kl. 21:38: skjermbildet under «Til faglærer» er tatt
         # ut, så «Til faglærer» er igjen siste avsnitt før «Kom i gang».
-        assert avsnitt[-1].startswith("Til faglærer:"), avsnitt[-1]
+        # Story 3.3e (gruppens svar 18.10 kl. 00:20): bildet av oversikten
+        # står igjen rett under «Til faglærer», som i 3.3b.
+        assert avsnitt[-1].startswith("![Oversikten i demoen"), avsnitt[-1]
+        assert SKJERMBILDET in avsnitt[-1]
+        assert avsnitt[-2].startswith("Til faglærer:"), avsnitt[-2]
         # Story 3.3d, punkt f: «Innhold» står rett under beskrivelsen.
-        assert avsnitt[-2].startswith("**Innhold:** "), avsnitt[-2]
-        assert avsnitt[-3].startswith("OSE Signal viser"), avsnitt[-3]
+        assert avsnitt[-3].startswith("**Innhold:** "), avsnitt[-3]
+        assert avsnitt[-4].startswith("OSE Signal viser"), avsnitt[-4]
         assert "\n## " not in topp
 
     def test_status_uten_storynumre_og_uten_kommando(self):
@@ -1750,12 +1965,14 @@ class TestReadmeForNybegynnere:
             assert "`" not in re.sub(r"\[`[^`]+`\]\([^)]+\)", "", punkt), punkt
         lenker = re.findall(r"\[`([^`]+)`\]\(([^)]+)\)", del_)
         # Alle lenkene, ogsaa uten kodeformat, er de i kodeformat.
-        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 15, lenker
+        # Story 3.3e: 16 med bildet av oversikten.
+        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 16, lenker
         sporet = _git_sporet()
         for tekst, maal in lenker:
             # Maalet er stien i teksten, relativ og uten «..» (BH4, ECH3).
             # Bildene staar med filnavnet, som foer 3.3d, etter mappa de ligger i.
-            assert maal == tekst or (tekst in BILDENE.values() and maal == f"docs/bilder/readme/{tekst}"), (
+            filnavn = [*BILDENE.values(), SKJERMBILDET.rsplit("/", 1)[1]]
+            assert maal == tekst or (tekst in filnavn and maal == f"docs/bilder/readme/{tekst}"), (
                 tekst,
                 maal,
             )
@@ -1791,7 +2008,8 @@ class TestReadmeForNybegynnere:
                 "Demoen",
             ),
             ("Ekte kurser, med en gratis nøkkel fra EODHD", "den ekte versjonen", "Den ekte versjonen (anbefalt)"),
-            ("De automatiske testene, med to kommandoer", "Tester", "Tester"),
+            # Story 3.3e (gjennomgangen, VG7): uv installeres foerst.
+            ("De automatiske testene, med to kommandoer etter at uv er installert", "Tester", "Tester"),
         ]
         alle = _alle_ankrene(tekst)
         for linje, (forklaring, lenketekst, overskrift) in zip(lista[:3], forventet, strict=True):

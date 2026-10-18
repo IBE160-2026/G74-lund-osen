@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-18T20:11
+updated: 2026-10-18T21:25
 ---
 
 # Hjelp til «Kom i gang»
@@ -93,7 +93,7 @@ PowerShell er trolig åpnet som administrator, og da sperrer Windows dra og slip
 
 ### «is not recognized as the name of a cmdlet» etter cd.
 
-Det mangler mellomrom etter `cd`. Står `cd` klistret til stien i meldingen, for eksempel `'cdC:\...'`, skriver du `cd`, et mellomrom, og drar mappa inn i vinduet på nytt (steg 4). Står det `'docker'` i meldingen, er Docker Desktop ikke installert, eller vinduet ble åpnet før installasjonen: lukk det og åpne et nytt (steg 3).
+Det mangler mellomrom etter `cd`. Står `cd` klistret til stien i meldingen, for eksempel `'cdC:\...'`, skriver du `cd`, et mellomrom, og drar mappa inn i vinduet på nytt (steg 4). Står det `'docker'` i meldingen, er Docker Desktop ikke installert, eller vinduet ble åpnet før installasjonen: lukk det og åpne et nytt (steg 3). Står det `'uv'` i meldingen, er uv ikke installert, eller vinduet ble åpnet før installasjonen: se «Tester» i README-en.
 
 ### «Cannot find path … because it does not exist».
 
@@ -154,6 +154,10 @@ Nei. Porten er bare åpen på maskinen selv (127.0.0.1). Appen kan ikke nås fra
 ### Siden åpnes ikke.
 
 Vent til linja med «Serving on» har kommet, og sjekk at terminalvinduet fortsatt er åpent. Adressen er http://127.0.0.1:8000, ikke 0.0.0.0.
+
+### «The term 'uv' is not recognized» eller «command not found: uv».
+
+Blir `uv` ikke funnet etter installasjonen, lukker du vinduet, åpner et nytt og går til mappa, som i steg 4. Er uv ikke installert, står installasjonen for Windows og Mac under «Tester» i [README-en](../README.md#tester).
 
 ### «docker» er ikke gjenkjent, eller «command not found: docker».
 

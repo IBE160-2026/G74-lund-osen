@@ -11,12 +11,15 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 Til faglærer:
 - Se appen med oppdiktede tall, uten konto og nøkkel, etter [steg 1–4](#felles-for-begge): [demoen](#demoen)
 - Ekte kurser, med en gratis nøkkel fra EODHD: [den ekte versjonen](#den-ekte-versjonen-anbefalt)
-- De automatiske testene, med to kommandoer: [Tester](#tester)
+- De automatiske testene, med to kommandoer etter at uv er installert: [Tester](#tester)
 - [Product Brief](_bmad-output/planning-artifacts/product-brief.md), arbeidskravet: versjon 8, laget etter [tilbakemeldingen 06.10](_bmad-output/planning-artifacts/tilbakemelding-product-brief.md) og låst i taggen `arbeidskrav-product-brief-v8`
 - Plan og krav: [PRD](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md), [arkitektur](_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md) og [epics og stories](_bmad-output/planning-artifacts/epics.md)
 - [Leveranselista](docs/innlevering.md): kravene i emnet, og hvor hvert av dem står
 - Prosessen og KI-bruken: [kvalitetssikringen](docs/kvalitetssikring.md), [refleksjonsloggen](docs/reflection-log.md) og [de lagrede KI-promptene](docs/ai-prompts/)
 - [Vurderingsmatrisen for del 1](docs/vurderingsmatrise.md): status per kriterium, med bevis og neste tiltak
+
+![Oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/bilder/readme/oversikten-demo.png)
+*Oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»).*
 
 ## Kom i gang
 
@@ -73,7 +76,7 @@ Vil du også prøve den ekte versjonen, går du videre til steg 5 under.
 ### Den ekte versjonen (anbefalt)
 
 5. **Hent en nøkkel.** Lag en gratis bruker hos [EODHD](https://eodhd.com/register), og kopier API-nøkkelen din. Det er klart når du har nøkkelen.
-6. **Legg inn nøkkelen, bare første gang.** Kopier kommandoene med knappen til høyre i boksen, lim dem inn i PowerShell-vinduet fra steg 4 én om gangen (Ctrl+V eller Cmd+V) og trykk Enter. Den første lager fila `.env`, og den neste åpner den (Windows eller Mac). Lim inn nøkkelen etter `EODHD_API_KEY=`, lagre og lukk. Det er klart når nøkkelen står etter `EODHD_API_KEY=`.
+6. **Legg inn nøkkelen, bare første gang.** Kopier kommandoene med knappen til høyre i boksen, lim dem inn i PowerShell-vinduet fra steg 4 én om gangen (Ctrl+V eller Cmd+V) og trykk Enter. Den første lager fila [`.env`](#mer-for-den-som-vil), og den neste åpner den (Windows eller Mac). Lim inn nøkkelen etter `EODHD_API_KEY=`, lagre og lukk. Det er klart når nøkkelen står etter `EODHD_API_KEY=`.
 
 ```
 cp .env.example .env
@@ -132,7 +135,7 @@ Du må pakke ut. Står det «Komprimert størrelse» (Compressed size) som kolon
 <details>
 <summary>«is not recognized as the name of a cmdlet» etter cd.</summary>
 
-Det mangler mellomrom etter `cd`. Står `cd` klistret til stien i meldingen, for eksempel `'cdC:\...'`, skriver du `cd`, et mellomrom, og drar mappa inn i vinduet på nytt (steg 4). Står det `'docker'` i meldingen, er Docker Desktop ikke installert, eller vinduet ble åpnet før installasjonen: lukk det og åpne et nytt (steg 3).
+Det mangler mellomrom etter `cd`. Står `cd` klistret til stien i meldingen, for eksempel `'cdC:\...'`, skriver du `cd`, et mellomrom, og drar mappa inn i vinduet på nytt (steg 4). Står det `'docker'` i meldingen, er Docker Desktop ikke installert, eller vinduet ble åpnet før installasjonen: lukk det og åpne et nytt (steg 3). Står det `'uv'` i meldingen, er uv ikke installert, eller vinduet ble åpnet før installasjonen: se «Tester» i README-en.
 
 </details>
 
@@ -184,7 +187,7 @@ Volumene står når du bytter, også basen med vurderingene.
 <details>
 <summary>Uten Docker, med uv</summary>
 
-Med Python 3.13 og [uv](https://docs.astral.sh/uv/). Først demoen.
+Med Python 3.13 og [uv](https://docs.astral.sh/uv/). Installasjonen av uv står under [«Tester»](#tester). Først demoen.
 
 **Demoen**
 
@@ -227,6 +230,21 @@ uv run python src/app.py
 ```
 
 Basen, demobasen og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo` åpner webserveren den ekte basen.
+
+</details>
+
+<details>
+<summary>Variablene i .env</summary>
+
+`.env` lages fra `.env.example` i steg 6 i den ekte versjonen. Demoen trenger ingen av dem.
+
+| Variabel | Hva den gjør | Standard | Når den trengs |
+|---|---|---|---|
+| `EODHD_API_KEY` | Nøkkelen til EODHD, som hentingen bruker til sluttkursene | Ingen | Til hentingen i den ekte versjonen. Webserveren og demoen trenger den ikke |
+| `OSE_KI_TJENESTE` | Om hentingen lager KI-tekst: `av` eller `lokal` (Gemma i Ollama) | `av` etter steg 6, fordi `.env.example` har `OSE_KI_TJENESTE=av`. Står variabelen ikke i `.env`, gjelder `lokal`, og en tom verdi gir ingen KI-tekst | Når du vil slå KI-teksten på |
+| `OSE_KI_OLLAMA_URL` | Adressen til Ollama | `http://127.0.0.1:11434`, og `http://ollama:11434` i Docker | Bare med uv, når Ollama ikke svarer på standardadressen |
+
+`OSE_DEMO` og `OSE_I_DOCKER` settes av `compose.yaml` og `Dockerfile`, og skal ikke i `.env`. Med uv slås demoen på med `--demo`.
 
 </details>
 
@@ -298,7 +316,21 @@ Under arbeid, og ingenting er endelig.
 
 ## Tester
 
-**På en ren maskin uten Docker** trenger du bare [uv](https://docs.astral.sh/uv/). Appen krever Python 3.13 eller nyere (`requires-python` i `pyproject.toml`), og uv henter den hvis maskinen ikke har den. Stå i mappa der README og `pyproject.toml` ligger, og kjør:
+**På en ren maskin uten Docker** trenger du bare [uv](https://docs.astral.sh/uv/). Appen krever Python 3.13 eller nyere (`requires-python` i `pyproject.toml`), og uv henter den hvis maskinen ikke har den. Installer uv først, etter [fremgangsmåten hos uv](https://docs.astral.sh/uv/getting-started/installation/).
+
+Windows (PowerShell):
+
+```
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+Mac (Terminal):
+
+```
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Blir `uv` ikke funnet etterpå («The term 'uv' is not recognized» eller «command not found: uv»), lukker du vinduet, åpner et nytt og går til mappa, som i steg 4. Stå i mappa der README og `pyproject.toml` ligger, og kjør:
 
 ```
 uv sync
@@ -307,6 +339,8 @@ uv sync
 ```
 uv run pytest
 ```
+
+Første `uv sync` laster ned Python og pakkene. Hele testsettet tok mellom 4 og 7 minutter på maskinen vår 18.10.
 
 Alle testene skal bestå. Noen hoppes over, og knappen under sier hvorfor.
 
@@ -357,7 +391,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 
 - [`src/`](src/) og [`tests/`](tests/) — applikasjonen og testene
 - [`docs/`](docs/) — arbeidsprosessen, og [`docs/hjelp.md`](docs/hjelp.md) med spørsmål og svar til «Kom i gang»
-- [`docs/bilder/readme/`](docs/bilder/readme/) — de tre skjermbildene i «Kom i gang»: [`engine-running.png`](docs/bilder/readme/engine-running.png), [`github-download-zip.png`](docs/bilder/readme/github-download-zip.png) og [`powershell-mappa.png`](docs/bilder/readme/powershell-mappa.png)
+- [`docs/bilder/readme/`](docs/bilder/readme/) — de tre skjermbildene i «Kom i gang»: [`engine-running.png`](docs/bilder/readme/engine-running.png), [`github-download-zip.png`](docs/bilder/readme/github-download-zip.png) og [`powershell-mappa.png`](docs/bilder/readme/powershell-mappa.png), og bildet av oversikten i demoen øverst: [`oversikten-demo.png`](docs/bilder/readme/oversikten-demo.png)
 - [`_bmad-output/`](_bmad-output/) — Product Brief, plan, krav og sprintstatus
 - [`.github/`](.github/) — testkjøringen og morgensjekken
 - [`Dockerfile`](Dockerfile), [`compose.yaml`](compose.yaml) og [`.dockerignore`](.dockerignore) — imaget og tjenestene: webserveren, hentingen og demoen
