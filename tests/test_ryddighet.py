@@ -9,6 +9,10 @@ Den foerste delen leser .gitignore selv, saa den gaar ogsaa uten git, for
 eksempel i ZIP-fila som leveres. Naar git finnes, sjekkes tolkningen mot
 `git check-ignore`. Den andre delen trenger git, og hoppes over uten.
 Testene leser bare: de endrer verken .gitignore eller git-indeksen.
+
+Story 9.8: skillene til BMAD ligger bare i .claude/skills/. Ingen fil under
+.agents/ er sporet i git, og manifestet til BMAD har bare claude-code under
+ides, saa en ny installasjon ikke legger kopien for Codex inn igjen.
 """
 
 import shutil
@@ -19,6 +23,7 @@ from pathlib import Path
 import pytest
 
 ROT = Path(__file__).resolve().parent.parent
+MANIFEST = ROT / "_bmad" / "_config" / "manifest.yaml"
 
 # Stier som skal holdes ute. Filene trenger ikke finnes.
 HOLDES_UTE = [
@@ -143,3 +148,56 @@ def test_hvilke_stier_som_ikke_skal_spores():
         assert _skal_ikke_spores(sti), sti
     for sti in (".env.example", ".env.prod.example", "src/app.py", "docs/data.md", "src/lagring_fil.py"):
         assert not _skal_ikke_spores(sti), sti
+
+
+def ides(manifest: str) -> list[str]:
+    """Lista under ides: i manifestet til BMAD, lest som tekst til neste
+    noekkel paa toppnivaa. Delen av YAML en installasjon skriver: en liste med
+    eller uten innrykk, eller [a, b] paa samme linje, og kommentarer."""
+    verdier = []
+    inne = False
+    for linje in manifest.splitlines():
+        linje = linje.split(" #")[0].rstrip()
+        innhold = linje.strip()
+        if not innhold or innhold.startswith("#"):
+            continue
+        if not linje[0].isspace() and not innhold.startswith("-"):
+            noekkel, _, resten = innhold.partition(":")
+            inne = noekkel.strip().strip("'\"") == "ides"
+            resten = resten.strip()
+            if inne and resten.startswith("["):
+                verdier += [v.strip().strip("'\"") for v in resten.strip("[]").split(",") if v.strip()]
+            continue
+        if inne and innhold.startswith("-"):
+            verdier.append(innhold[1:].strip().strip("'\""))
+    return verdier
+
+
+@pytest.mark.skipif(not har_git(ROT), reason=UTEN_GIT)
+def test_ingen_fil_under_agents_er_sporet():
+    """Story 9.8: kopien for Codex er tatt ut. Ville feilet hvis en fil fra
+    .claude/skills/ ble kopiert til .agents/ og lagt inn med git add (mutant
+    S1). Indeksen leses, saa en fil som er lagt inn, men ikke committet,
+    teller ogsaa."""
+    svar = _git("ls-files", "-z")
+    assert svar.returncode == 0, svar.stderr
+    sporet = [sti for sti in svar.stdout.split("\0") if sti.lower().startswith(".agents/")]
+    assert sporet == [], f"sporet under .agents/: {sporet[:5]} ({len(sporet)} i alt)"
+
+
+def test_manifestet_har_bare_claude_code():
+    """Story 9.8: en ny BMAD-installasjon leser ides fra manifestet. Ville
+    feilet hvis «- codex» kom tilbake under ides (mutant S2), eller lista
+    var tom."""
+    assert ides(MANIFEST.read_text(encoding="utf-8")) == ["claude-code"]
+
+
+def test_ides_leses_i_formene_en_installasjon_skriver():
+    """Ville feilet hvis lesingen bare saa listen med innrykk, slik at
+    «- codex» uten innrykk eller [claude-code, codex] slapp gjennom."""
+    assert ides("modules:\n  - name: core\nides:\n  - claude-code\n  - codex\n") == ["claude-code", "codex"]
+    assert ides("ides:\n- claude-code\n- codex\nandre: 1\n") == ["claude-code", "codex"]
+    assert ides("ides: [claude-code, 'codex']\n") == ["claude-code", "codex"]
+    assert ides("ides:\n  # - codex\n  - claude-code # vi\n") == ["claude-code"]
+    assert ides("ides:\n  - claude-code\nmodules:\n  - name: codex\n") == ["claude-code"]
+    assert ides("modules:\n  - name: core\n") == []
