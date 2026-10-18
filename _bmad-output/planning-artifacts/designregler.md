@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-10-18T00:29
+updated: 2026-10-18T22:58
 ---
 
 # Designregler
@@ -36,6 +36,14 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
   *Rettet 2026-10-03 (story 2.2b, Marians beslutning kl. 22:30):* en dag uten rad viser «– ikke vurdert», samme tekst som oversikten og aksjedetaljen. Har raden en grunn, står grunnen i stedet.
   *Presisert 2026-10-04 (gjennomgangen av 2.2b):* «ikke vurdert» gjelder en børsdag uten rad. En dag som ikke er børsdag, viser «– ikke børsdag», så de to tilstandene i FR-409 ikke slås sammen.
 - Startdagen for periodene følger én skriftlig regel, lik for alle, som skrives og testes før et periodevalg bygges (NFR-08).
+  *Lagt til 2026-10-18 (story 8.16, gruppens svar kl. 21:46, 21:49 og 21:50):* regelen for startdagen:
+  - 1 uke, 1 mnd, 3 mnd, 6 mnd og 1 år regnes bakover fra siste dag i grafen etter kalenderen: 7 dager, eller samme dato 1, 3, 6 eller 12 måneder før. En dato måneden ikke har, blir månedens siste dag, så 31.03 minus 1 mnd er 28.02.
+  - Startdagen er første børsdag på eller etter den datoen.
+  - I år starter på årets første børsdag.
+  - Siste børsdag og «Velg dag» viser 6 mnd fram til dagen, med samme regel, og dagen er merket.
+  - Ligger datoen i et år børskalenderen ikke dekker (`boersdag.DEKKEDE_AAR`), er startdagen første hverdag på eller etter den, og I år starter på første hverdag etter 1. januar. Grafen starter uansett på første dag kursserien har fra startdagen, og serien har bare børsdager.
+  - Har serien ikke dager tilbake til startdagen, viser grafen det serien har, og sier det.
+  - Én funksjon gir startdagen for hver periode: `startdag` i `src/perioder.py`.
 
 **Hvorfor:** Samme knapp betyr det samme overalt, så brukeren lærer valget én gang. Den første knappen sier hvilken dag tallene gjelder, med ord brukeren kjenner.
 
