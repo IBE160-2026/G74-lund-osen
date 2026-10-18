@@ -45,3 +45,58 @@ context:
 - Ingen API-kall utover kvotesjekken i regel 15, og `src/fetch_prices.py` kjøres ikke.
 - `data/db/ose.db` og `data/db/demo.db` røres ikke (regel 22). Bildet tas fra en demobase i en midlertidig mappe.
 - Ingen skript fra nettet. 8.17 bygges ikke her, men delmalen skal kunne brukes der.
+
+## Avgjort underveis
+
+- **Merkene for 1 mnd** står ved første dag serien har i hver uke, også i den første, avkortede uka. 09.09 er derfor en onsdag (gjennomgangen, BH5, ECH3 og VG9). Det endrer «mandagene» i linja over. Med flere enn 8 måneder får annenhver måned navn, så I år fra september tynnes som 1 år (BH4).
+- **«Velg dag»** går fra andre dag i serien til siste dag i serien. Seriens første dag ville gitt en graf med ett punkt, og en dag etter siste rad en graf som slutter før dagen. Begge gir 6 mnd og en beskjed (BH1, ECH1, BH3, ECH2). En dag i serien uten kurs, som en lørdag, viser grafen fram til dagen før og sier det (BH2).
+- **Testen for bildet** feilet på commiten for b (`30783c9`), fordi den nye delmalen er en fil bak bildet. Bildet ble tatt på nytt i c (`7e824e9`), kl. 23:08 (tidspunktet fila ble skrevet), med samme fremgangsmåte og høyde (1280 × 1573). Det fikk samme sha256 som det forrige, `777eee6eab84dfed…`, så PNG-fila er ikke endret, og bare `AVTRYKK_BAK_BILDET` er nytt (VG7).
+- **«Status» i README-en:** punktet «Periodene i kursgrafen, og på forsiden …» under «Neste» er erstattet med «På forsiden periodevalget, børsometeret og KI-teksten om dagen», og periodene står på linja om grafen under «Ferdig», fordi «Ferdig» har 8 punkter, som er grensen. Det er den eneste linja som er tatt bort, og punkt c ber om den. `docs/hjelp.md` nevner ikke grafen og er ikke endret.
+
+## Mutantene
+
+Én om gangen med `-x` på `tests/test_perioder.py`, `tests/test_app.py` og `tests/test_oversiktsleser.py` (med `-k` for periodene), i en fersk klon med `core.autocrlf=false`, med kopi av fila før og sha256 mot HEAD etter hver, og `git status` tom etter hver. P1–P4 er fra instruksjonen og ble fanget på `697f459` og på nytt på `25cbf36`. Q1–Q4 er for funnene med dom medium, fanget på `25cbf36`:
+- P1, 1 mnd som 30 dager: `test_faste_datoer` (10.03 gir 09.02 i stedet for 10.02).
+- P2, «Velg dag» som regner signalet med `vurder`: `test_velg_dag_uten_vurdering_viser_ikke_vurdert`.
+- P3, indekslinja fast på 6 mnd: `test_indekslinja_foelger_perioden[i-aar]`.
+- P4, en ukjent periode som gir en feil: `test_feil_i_adressen_gir_6_mnd_og_en_kort_beskjed`.
+- Q1, en dag etter siste dag i serien godtas (BH1): `test_en_dag_etter_siste_dag_i_serien_gir_6_mnd`.
+- Q2, seriens første dag godtas (BH3): `test_seriens_foerste_dag_gir_6_mnd`.
+- Q3, I år tynnes ikke (BH4): `test_merkene_paa_aksen_passer_perioden[i-aar]`.
+- Q4, «I dag» og «I går» byttet om (VG2): `test_i_dag_i_gaar_eller_ukedagen`.
+
+## Gjennomgangen
+
+Gjennomgang 18.10 på diffen `7ae3e3a..697f459`, uten bildet. Linsene var Blind Hunter (BH, 18 funn, bare diffen), Edge Case Hunter (ECH, 7 funn og en liste over det som holdt, prøvd med test_client mot en demobase i en midlertidig mappe) og Verification Gap (VG, 11). Ingen av dem kjørte hele testsettet, en server eller et nettkall. Seks rader har dom medium, og alle er rettet i `25cbf36`, unntatt VG1, som er rettet her. Edge Case Hunter fant ingen vei til en feilside.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH1, ECH1 | «Velg dag» etter siste rad ga «fram til 15.10» og en graf som sluttet 09.10 | medium | patch: 6 mnd og beskjed, og `max` er siste dag i serien. Q1 |
+| BH3, ECH2 | Seriens første dag ga en graf med ett punkt | medium | patch: 6 mnd og beskjed, og `min` er andre dag. Q2 |
+| BH4 | I år hadde navn på alle 10 månedene | low–medium | patch: annenhver over 8 måneder. Q3 |
+| VG1 | Mutantene var ikke dokumentert | medium | patch: over |
+| VG2 | «I dag» og «I går» var ikke testet | medium | patch: `TestDenFoersteKnappen`. Q4 |
+| VG3 | «I dag:» i §2 sa at grafen har faste seks måneder | medium | patch: en datert linje under. Linja står, fordi ingen linje fjernes |
+| BH2 | En lørdag ga «fram til lørdag 03.10» uten forklaring | low | patch: «03.10 har ingen kurs, så grafen slutter 02.10.» |
+| BH5, ECH3, VG9 | «mandagene» for 1 mnd stemte ikke | low | patch: kommentaren og «Avgjort underveis» |
+| BH9 | `\d` godtok andre sifre | low | patch: `[0-9]`, og en test |
+| BH10 | `idag()` ble lest flere ganger i samme svar | low | patch: én gang i ruten |
+| BH11 | Det merkede punktet ble lest fra koordinatstrengen | low | patch: regnet fra indeksen |
+| BH12 | Klippingen i `bygg_punkter` var skjør | low | patch: én lengde for alle tre |
+| VG4 | Sju tester manglet «Ville feilet hvis» | low | patch |
+| VG7 | At bildet var likt, var ikke vist | low | patch: tid og sha256 over |
+| VG11 | Lesemetoden var ikke testet mot adapteren | low | patch: `TestVurderingForEnDag` |
+| BH13 | Knappen for «Velg dag» heter bare datoen når den er valgt | low | utsatt til 8.17, som bruker delmalen i flere sider |
+| BH6 | «Kursserien begynner» kan stå når startdagen utenfor kalenderen er en helligdag | low | avvist: bare utenfor `DEKKEDE_AAR`, og regelen i §2 sier det |
+| BH7 | Datoene mangler år over nyttår | low | avvist: `dato` viser året når det er et annet enn i år (designregler §4) |
+| BH8, ECH6, VG10 | `dag` i adressen overstyrer `periode` uten beskjed | low | avvist: skjemaet sender alltid `periode=velg`, og en dag er et valg av «Velg dag», som spesifikasjonen sier |
+| BH14 | Datofeltet er tomt for siste børsdag | low | avvist: dagen står i overskriften og på den første knappen |
+| BH15 | Hjelpen nevner ikke 7 dager og månedens siste dag | low | avvist: høyst tre setninger per hjelpetekst, og regelen står i §2 |
+| BH16, VG5 | Testene sammenligner med `startdag`, og 390 px er ikke målt i en nettleser | low | avvist: regelen er testet med faste datoer i `test_perioder.py`, og 390 px testes som før, i stilen |
+| BH17 | Andre implementasjoner av porten | low | avvist: bare `SqliteOversiktsleser` implementerer den, og spørringen er den samme som i `SqliteVurderingslager.les` |
+| BH18 | «– None» om `les_tilstand` ga tekst None | low | avvist: teksten er None bare for en vurdering, og da vises signalet |
+| ECH4 | `startdag` kan gi en stengt dag utenfor kalenderen | low | avvist: står i §2, og 2027 legges inn når Euronext publiserer dagene |
+| ECH5 | Mellomrom i `dag` vises ikke i beskjeden | low | avvist: verdien kunne ikke leses slik den sto |
+| ECH7 | Den første knappen heter ukedagen også når siste rad er over en uke gammel | low | avvist: følger §2 slik den står |
+| VG6 | MA50 for «Velg dag» tidlig i serien er ikke testet | low | avvist: snittet begynner der serien har 50 dager (FR-406), og «Velg dag» er 6 mnd |
+| VG8 | «Ferdig» i README-en før flettingen | low | avvist: blir riktig når PR-en flettes, som i README-PR-ene før |
