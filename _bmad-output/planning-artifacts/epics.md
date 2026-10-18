@@ -1684,6 +1684,25 @@ med en gang hvilke som trakk opp og ned.
 
 *Lagt til 2026-10-18 kl. 00:16:* søylene er flettet i `73098ed`, PR #63 (spesifikasjonen `spec-2-9b-soeylene-under-hovedindeksen.md`). Fargegrensene følger endringen slik den vises, og gult ved 3 av 3 er `#a67c00` (designregler §3 og §5). CI var grønn på head-en `dbb6fe6` (kjøring 39074089927) og på main (39074214167).
 
+### Story 2.9c: Hovedindeksen som stiplet linje i kursgrafen
+
+*Lagt til 2026-10-18, gruppens svar 17.10 kl. 22:38, 22:41 og 22:42 (instruksjonen 17.10 kl. 23:13, steg 5).*
+
+Som **bruker**, vil jeg se hovedindeksen i kursgrafen på aksjesiden, så jeg ser om aksjen gikk bedre eller dårligere enn børsen i perioden.
+
+**Oppfyller:** svaret kl. 22:38–22:42 under «Prioritering» · **Begrenses av:** FR-201, FR-104, `AD-10`, NFR-03, NFR-06, `designregler.md`
+
+**Kontroll — hva testen ser etter:**
+- Hovedindeksen er en stiplet linje i kursgrafen på aksjesiden. Stiplet linje brukes bare for indeksen (`designregler.md`)
+- Linja regnes om, så den starter på aksjens justerte sluttkurs første dag i grafen og følger indeksens endring derfra. Aksjens linje over den stiplede betyr at aksjen gikk bedre enn børsen i perioden
+- Bare dager indeksen har, uten nye kall. Indeksen leses fra basen gjennom porten, som på forsiden
+- Mangler indeksen for perioden, tegnes ingen linje, og grafen sier det
+- «?» og teksten for skjermleser forklarer linja, uten råd (NFR-06)
+- Virker i demoen med DEMIX og ved 390 px
+- **Ville feilet hvis:** indeksen ble tegnet i sine egne poeng, startet på en annen dag enn grafen, eller ble tegnet uten indeks
+
+**Avhenger av:** 2.9b. **Én økt:** ja.
+
 ### Story 2.10: Høy og lav lagres med kursene
 
 *Lagt til 2026-10-07, Marians beslutning kl. 23:11.*

@@ -373,13 +373,38 @@ def _hovedindeks(
         symboler = lager.symboler()
         if not symboler:
             return None, False
-        symbol = HOVEDINDEKS.symbol if HOVEDINDEKS.symbol in symboler else symboler[0]
+        symbol = _valgt_indeks(symboler)
         serier = [(post.aksje, kurslager.serie(post.aksje.symbol)) for post in poster]
         aksjer = [(aksje.navn, serie) for aksje, serie in serier]
         grunnlag = [(aksje, serie, aksje.symbol in tre_av_tre) for aksje, serie in serier]
         return bygg_hovedindeks(symbol, lager.serie(symbol), aksjer, grunnlag), False
     except (*BASEFEIL, ValueError):
         return None, True
+
+
+def _valgt_indeks(symboler: tuple[str, ...]) -> str:
+    """HOVEDINDEKS (OSEBX) naar basen har den, ellers den basen sist hentet,
+    som DEMIX i demobasen. Forsiden og kursgrafen viser samme indeks."""
+    return HOVEDINDEKS.symbol if HOVEDINDEKS.symbol in symboler else symboler[0]
+
+
+def _indeksen_for_grafen() -> tuple[str | None, dict | None, bool]:
+    """Indeksen for kursgrafen paa aksjesiden - story 2.9c.
+
+    Gir (symbolet, {dato: justert_slutt}, feilet). Symbolet og serien er
+    None naar basen ikke har en indeks. Kan indeksen ikke leses, er feilet
+    True, og grafen vises uten linja (NFR-03). Bare det som er hentet, og
+    ingen nettkall (AD-10).
+    """
+    try:
+        lager = SqliteIndekslager(g.tilkobling)
+        symboler = lager.symboler()
+        if not symboler:
+            return None, None, False
+        symbol = _valgt_indeks(symboler)
+        return symbol, {rad.dato: float(rad.justert_slutt) for rad in lager.serie(symbol)}, False
+    except (*BASEFEIL, ValueError):
+        return None, None, True
 
 
 @app.route("/")
@@ -476,12 +501,15 @@ def aksjedetalj(symbol: str):
     # vurdering aa forklare og bryteren er paa (FR-601, FR-602).
     ki_er_paa = ki_paa(request.cookies.get(KAPSEL))
     ki = _ki_visning(post, detalj) if ki_er_paa and detalj.sjekker else None
+    indeks_symbol, indeks, indeks_feilet = _indeksen_for_grafen()
 
     svar = app.make_response(
         render_template(
             "aksje.html",
             detalj=detalj,
-            graf=bygg_graf(detalj.punkter),
+            graf=bygg_graf(detalj.punkter, indeks=indeks),
+            indeks_symbol=indeks_symbol,
+            indeks_feilet=indeks_feilet,
             hentet=post.hentet,
             ki=ki,
             ki_er_paa=ki_er_paa,

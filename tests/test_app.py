@@ -2434,7 +2434,15 @@ class TestStory80dAksjesiden:
         _lagret("EQNR", 0.0, 1, 0, 0)
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
         stil = _stil(html)
-        assert "dasharray" not in stil and "dashed" not in stil
+        # Story 2.9c: stiplet bare for hovedindeksen (designregler §5), så
+        # regelen for den tas ut før sjekken.
+        stiplet = [
+            v.strip()
+            for v, innhold in re.findall(r"([^{}]+)\{([^}]*)\}", re.sub(r"/\*.*?\*/", "", stil, flags=re.DOTALL))
+            if "dasharray" in innhold or "dashed" in innhold
+        ]
+        assert stiplet == [".indekslinje"], stiplet
+        assert "stroke-dasharray" not in html.split("</style>", 1)[1]
         assert "stroke-width: 1.75" in _regel(stil, ".ma50linje")
         assert "stroke-width: 2.5" in _regel(stil, ".kurslinje")
         assert "tegnforklaring" not in html
@@ -2446,9 +2454,10 @@ class TestStory80dAksjesiden:
         assert '<circle class="sistepunkt"' in html
         # Gjennomgangen (VG4, BH5): etiketten sier hvilken linje som er hva,
         # med tykkelsen og ikke fargen.
+        # Story 2.9c (gjennomgangen, ECH8): uten indeks sier etiketten det til slutt.
         assert re.search(
             r'aria-label="Kursutvikling for Equinor: den tykke linja er utbyttejustert kurs, '
-            r'og den tynne er \d+-dagers snitt \(sjekk 1\)"',
+            r'og den tynne er \d+-dagers snitt \(sjekk 1\)\. Hovedindeksen mangler for perioden"',
             html,
         )
 
@@ -2897,3 +2906,224 @@ class TestSoeylenePaaForsiden:
         assert re.search(r"Uten søyle, mangler kursen dagen før: Yara[^.]*\.", _synlig(figur))
         vinduet = html.split('<div id="hjelp-hovedindeks"', 1)[1].split('<div id="hjelp-', 1)[0]
         assert "Hovedindeksen:" in vinduet and "Søylene:" not in vinduet
+
+
+def _punktene(html: str, klasse: str) -> list[tuple[float, float]]:
+    treff = re.search(rf'<polyline class="{klasse}" points="([^"]*)">', html)
+    if not treff:
+        return []
+    return [tuple(float(t) for t in par.split(",")) for par in treff.group(1).split()]
+
+
+class TestIndekslinjaPaaAksjesiden:
+    """Story 2.9c: hovedindeksen som stiplet linje i kursgrafen. Kontrollen
+    under storyen i epics.md, på siden. Mutantene står i spesifikasjonen 2.9c."""
+
+    def _aksjen(self):
+        skriv_serie("EQNR", _aksjeserie(FREDAG_09_10, 2.0), datetime.fromisoformat(HENTET))
+
+    def _indeksen(self, foer: int = 0):
+        """Indeksen for de 61 dagene i aksjens serie, og foer dager til foran."""
+        dager = _boersdager_til(FREDAG_09_10, 61 + foer)
+        _legg_inn_indeks(_indeks([(d, 1000.0 + 10 * i) for i, d in enumerate(dager)]))
+
+    def test_linja_starter_paa_aksjens_kurs(self, klient):
+        """Ville feilet hvis indeksen ble tegnet i sine egne poeng (mutant
+        C1): første punkt på den stiplede linja er første punkt på kurslinja."""
+        self._aksjen()
+        self._indeksen()
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        indeks, kurs = _punktene(html, "indekslinje"), _punktene(html, "kurslinje")
+        assert len(indeks) == len(kurs) == 61
+        assert indeks[0] == kurs[0]
+        # Indeksen stiger hele veien og aksjen står stille: linja går opp.
+        assert indeks[-1][1] < indeks[0][1]
+
+    def test_startdagen_er_grafens_foerste_dag(self, klient):
+        """Indeksen har 20 dager før grafen. Ville feilet med indeksens
+        første dag som startdag (mutant C2)."""
+        self._aksjen()
+        self._indeksen(foer=20)
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert _punktene(html, "indekslinje")[0] == _punktene(html, "kurslinje")[0]
+
+    def test_teksten_sier_hva_linja_er_uten_raad(self, klient):
+        self._aksjen()
+        self._indeksen()
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        start = _boersdager_til(FREDAG_09_10, 61)[0].strftime("%d.%m")
+        tekst = _synlig(html.split("<figcaption>", 1)[1].split("</figcaption>", 1)[0])
+        assert f"Den stiplede linja er hovedindeksen OSEBX, regnet om så den starter på aksjens kurs {start}." in tekst
+        assert (
+            "Ligger aksjens linje over den stiplede, har aksjen gått bedre enn indeksen fra startdagen til den dagen."
+            in tekst
+        )
+        # Gjennomgangen (BH3, VG7): tre linjer, ikke «Begge linjene».
+        assert "Begge linjene" not in tekst
+        assert "Kursen og snittet er tegnet på utbyttejustert kurs, og indeksen er regnet om til samme skala." in tekst
+        etikett = re.search(r'<svg class="graf"[^>]*aria-label="([^"]*)"', html).group(1)
+        assert f"Den stiplede er hovedindeksen OSEBX, regnet om så den starter på aksjens kurs {start}" in etikett
+        for ord_ in ("kjøp", "selg", "bør"):
+            assert ord_ not in tekst.lower() and ord_ not in etikett.lower(), ord_
+
+    def test_uten_indeks_ingen_linje_og_grafen_sier_det(self, klient):
+        """Ville feilet hvis en linje ble tegnet uten indeks (mutant C3)."""
+        self._aksjen()
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert 'class="indekslinje"' not in html.split("</style>", 1)[1]
+        assert "Hovedindeksen mangler for perioden, så den er ikke tegnet." in _synlig(html)
+        assert "stiplede" not in re.search(r'<svg class="graf"[^>]*aria-label="([^"]*)"', html).group(1)
+
+    def test_en_indeks_med_en_dag_i_grafen_gir_ingen_linje(self, klient):
+        self._aksjen()
+        _legg_inn_indeks(_indeks([(FREDAG_09_10, 1000.0)]))
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert _punktene(html, "indekslinje") == []
+        assert "Hovedindeksen mangler for perioden, så den er ikke tegnet." in _synlig(html)
+
+    def test_en_indeks_som_ikke_kan_leses_stopper_ikke_siden(self, klient, monkeypatch):
+        """NFR-03: grafen vises uten linja, og siden sier hvorfor."""
+        import sqlite3
+
+        self._aksjen()
+        self._indeksen()
+
+        def feiler(_self):
+            raise sqlite3.OperationalError("database is locked")
+
+        monkeypatch.setattr(lagring_sqlite.SqliteIndekslager, "symboler", feiler)
+        svar = klient.get("/aksje/EQNR")
+        html = svar.data.decode("utf-8")
+        assert svar.status_code == 200
+        assert _punktene(html, "kurslinje") and not _punktene(html, "indekslinje")
+        assert "Hovedindeksen kunne ikke leses, så den er ikke tegnet." in _synlig(html)
+
+    def test_linja_er_stiplet_og_tynnere_enn_kursen(self, klient):
+        self._aksjen()
+        self._indeksen()
+        stil = _stil(klient.get("/aksje/EQNR").data.decode("utf-8"))
+        regel = _regel(stil, ".indekslinje")
+        assert "stroke-dasharray: 6 4" in regel and "stroke: var(--dempet)" in regel
+        assert "stroke-width: 1.5" in regel
+
+    def test_ved_390_px_skaleres_grafen_med_linja(self, klient):
+        """Grafen er en SVG med viewBox og bredde 100 %, så den stiplede linja
+        skaleres med kurslinja. Testen leser bare stilen og SVG-en. At siden
+        ikke ruller sideveis ved 390 px, er ikke målt i en nettleser
+        (gjennomgangen, VG5)."""
+        self._aksjen()
+        self._indeksen()
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert "width: 100%" in _regel(_stil(html), "svg.graf")
+        assert re.search(r'<svg class="graf" viewBox="0 0 \d+ \d+"', html)
+        assert 'width="' not in html.split('<svg class="graf"', 1)[1].split(">", 1)[0]
+
+    def test_en_indeks_uten_grafens_foerste_dag_starter_paa_den_neste(self, klient):
+        """Gjennomgangen (BH4, ECH1, VG1): indeksen mangler grafens første dag.
+        Linja starter på aksjens kurs den andre dagen, og datoen i teksten er
+        den dagen."""
+        self._aksjen()
+        dager = _boersdager_til(FREDAG_09_10, 61)
+        _legg_inn_indeks(_indeks([(d, 1000.0 + 10 * i) for i, d in enumerate(dager) if i > 0]))
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        indeks, kurs = _punktene(html, "indekslinje"), _punktene(html, "kurslinje")
+        assert len(indeks) == 60 and indeks[0] == kurs[1]
+        assert f"starter på aksjens kurs {dager[1].strftime('%d.%m')}." in _synlig(html)
+
+    def test_indeksen_som_slutter_foer_aksjen_sier_det(self, klient):
+        """Gjennomgangen (BH9, ECH5): indeksen mangler de to siste dagene.
+        Ville feilet uten setningen om hvor indeksen slutter."""
+        self._aksjen()
+        dager = _boersdager_til(FREDAG_09_10, 61)
+        _legg_inn_indeks(_indeks([(d, 1000.0 + 10 * i) for i, d in enumerate(dager[:-2])]))
+        tekst = _synlig(klient.get("/aksje/EQNR").data.decode("utf-8"))
+        assert f"Indeksen går bare til {dager[-3].strftime('%d.%m')}." in tekst
+
+    def test_hjelpen_for_linja_ogsaa_uten_snitt(self, klient):
+        """Gjennomgangen (BH11, ECH4, VG8): 20 dager er for kort for snittet.
+        «?» står ved grafen og har bare teksten om den stiplede linja. Ville
+        feilet hvis hjelpen krevde sjekkene eller snittet."""
+        dager = _boersdager_til(FREDAG_09_10, 20)
+        skriv_serie(
+            "EQNR",
+            [Kursrad(dato=d, slutt=100.0, justert_slutt=100.0, volum=1000) for d in dager],
+            datetime.fromisoformat(HENTET),
+        )
+        _legg_inn_indeks(_indeks([(d, 1000.0 + i) for i, d in enumerate(dager)]))
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert 'popovertarget="hjelp-graf"' in html
+        vinduet = html.split('<div id="hjelp-graf"', 1)[1].split('<div id="hjelp-', 1)[0]
+        assert "Den stiplede linja:" in vinduet and "Kursgrafen:" not in vinduet
+
+    @pytest.mark.parametrize("metode", ["symboler", "serie"])
+    def test_en_feil_i_porten_gir_grafen_uten_linja(self, klient, monkeypatch, metode):
+        """Gjennomgangen (VG9, ECH8): både symboler og serie, og en rad som ikke
+        kan tolkes (ValueError). Ville feilet hvis en av dem ga 500, eller
+        etiketten ikke sa at indeksen ikke kunne leses."""
+        from kursdata import UgyldigKursrad
+
+        self._aksjen()
+        self._indeksen()
+
+        def feiler(*_):
+            raise UgyldigKursrad("slutt er ikke et tall")
+
+        monkeypatch.setattr(lagring_sqlite.SqliteIndekslager, metode, feiler)
+        svar = klient.get("/aksje/EQNR")
+        html = svar.data.decode("utf-8")
+        assert svar.status_code == 200 and _punktene(html, "kurslinje") and not _punktene(html, "indekslinje")
+        assert "Hovedindeksen kunne ikke leses, så den er ikke tegnet." in _synlig(html)
+        assert ". Hovedindeksen kunne ikke leses" in re.search(
+            r'<svg class="graf"[^>]*aria-label="([^"]*)"', html
+        ).group(1)
+
+    def test_indeksen_leses_paa_justert_slutt(self, klient):
+        """Gjennomgangen (VG2): slutt og justert_slutt er ulike i indeksen.
+        Med justert_slutt, som stiger der slutt faller, går linja opp. Ville
+        feilet hvis indeksen ble lest på slutt."""
+        self._aksjen()
+        dager = _boersdager_til(FREDAG_09_10, 61)
+        rader = [
+            Kursrad(dato=d, slutt=2000.0 - 10 * i, justert_slutt=1000.0 + 10 * i, volum=0) for i, d in enumerate(dager)
+        ]
+        _legg_inn_indeks(rader)
+        indeks = _punktene(klient.get("/aksje/EQNR").data.decode("utf-8"), "indekslinje")
+        assert indeks[-1][1] < indeks[0][1]
+
+    def test_samme_indeks_som_forsiden(self, klient):
+        """Gjennomgangen (VG3): OSEBX og en annen indeks som er hentet senere.
+        Kursgrafen viser OSEBX, som forsiden. Ville feilet hvis grafen tok den
+        som sist ble hentet."""
+        from indeksdata import HOVEDINDEKS, Indeks
+        from lagring_sqlite import SqliteIndekslager
+
+        self._aksjen()
+        self._indeksen()
+        dager = _boersdager_til(FREDAG_09_10, 61)
+        tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+        try:
+            SqliteIndekslager(tilkobling, (HOVEDINDEKS, Indeks("OBX", "OBX.OL", "OBX"))).erstatt_serie(
+                "OBX", _indeks([(d, 1200.0) for d in dager]), datetime.fromisoformat(HENTET) + timedelta(hours=1)
+            )
+        finally:
+            tilkobling.close()
+        tekst = _synlig(klient.get("/aksje/EQNR").data.decode("utf-8"))
+        assert "hovedindeksen OSEBX" in tekst and "hovedindeksen OBX" not in tekst
+
+
+class TestStipletBareForIndeksenPaaForsiden:
+    """Gjennomgangen av 2.9c (VG4): på forsiden er bare indekslinja under
+    søylene stiplet."""
+
+    def test_bare_indekslinja_er_stiplet(self, klient):
+        """Ville feilet hvis en annen regel på forsiden var stiplet."""
+        skriv_serie("EQNR", _aksjeserie(FREDAG_09_10, 2.0), datetime.fromisoformat(HENTET))
+        _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, 1005.0)]))
+        html = klient.get("/").data.decode("utf-8")
+        stil = _stil(html)
+        stiplet = [
+            v.strip()
+            for v, innhold in re.findall(r"([^{}]+)\{([^}]*)\}", re.sub(r"/\*.*?\*/", "", stil, flags=re.DOTALL))
+            if "dasharray" in innhold or "dashed" in innhold
+        ]
+        assert stiplet == [".soeyler .indekslinje"], stiplet

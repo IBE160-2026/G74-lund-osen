@@ -787,6 +787,31 @@ class TestSoeyleneIDemoen:
         assert "color: var(--gul-symbol)" in _regel(_stil(html), ".soeyler .etikett.tre-av-tre .bransjesymbol")
 
 
+class TestIndekslinjaIDemoen:
+    """Story 2.9c: aksjesiden i demoen viser DEMIX som stiplet linje."""
+
+    def test_demix_i_kursgrafen(self, klient, monkeypatch, demobase):
+        import re
+
+        from test_app import _synlig
+
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        html = klient.get("/aksje/BRFE").data.decode("utf-8")
+        indeks = re.search(r'<polyline class="indekslinje" points="([^"]*)">', html).group(1).split()
+        kurs = re.search(r'<polyline class="kurslinje" points="([^"]*)">', html).group(1).split()
+        assert indeks[0] == kurs[0] and len(indeks) > 20
+        # Gjennomgangen (BH15): linja er innenfor tegneflaten og flytter seg.
+        from graf import HOYDE, MARG_Y
+
+        y = [float(par.split(",")[1]) for par in indeks]
+        assert all(MARG_Y - 0.05 <= v <= HOYDE - MARG_Y + 0.05 for v in y)
+        assert y[-1] != y[0]
+        assert "Den stiplede linja er hovedindeksen DEMIX" in _synlig(html)
+        # «?» forklarer linja.
+        vinduet = html.split('<div id="hjelp-graf"', 1)[1].split('<div id="hjelp-', 1)[0]
+        assert "Den stiplede linja:" in vinduet
+
+
 class TestKlokkeslettetSomDenEkte:
     """Story 2.3, hentingen fra kl. 21:00 (beslutningen 16.10 kl. 21:09):
     demoen er lik den ekte (beslutningen 16.10 kl. 11:46), saa hentingen i

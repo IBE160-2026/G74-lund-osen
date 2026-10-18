@@ -5,7 +5,7 @@ from datetime import date, timedelta
 import pytest
 
 from aksjedetalj import Punkt
-from graf import BREDDE, HOYDE, MARG_X, MARG_Y, bygg_graf
+from graf import BREDDE, HOYDE, MARG_X, MARG_Y, bygg_graf, indeksverdier
 
 
 def punkter(kurser, ma50=None):
@@ -212,3 +212,66 @@ class TestNavneneVedEnden:
     def test_uten_snitt_bare_kursnavnet(self):
         graf = bygg_graf(self._punkter([100, 110], [None, None]))
         assert graf.kursnavn is not None and graf.snittnavn is None
+
+
+class TestIndekslinja:
+    """Story 2.9c: hovedindeksen som stiplet linje i kursgrafen. Kontrollen
+    under storyen i epics.md. Mutantene står i spesifikasjonen 2.9c."""
+
+    def _punkter(self, kurser):
+        start = date(2026, 1, 1)
+        return tuple(Punkt(dato=start + timedelta(days=i), kurs=k, ma50=None) for i, k in enumerate(kurser))
+
+    def test_linja_starter_paa_aksjens_kurs_og_foelger_indeksen(self):
+        """Indeksen 1000, 1100 og 1050 med aksjen på 50 første dag gir 50, 55
+        og 52,5. Ville feilet hvis indeksen ble tegnet i sine egne poeng
+        (mutant C1)."""
+        ps = self._punkter([50.0, 60.0, 40.0])
+        indeks = {p.dato: v for p, v in zip(ps, (1000.0, 1100.0, 1050.0))}
+        assert indeksverdier(ps, indeks) == pytest.approx({ps[0].dato: 50.0, ps[1].dato: 55.0, ps[2].dato: 52.5})
+        graf = bygg_graf(ps, indeks=indeks)
+        # Første punkt på den stiplede linja er første punkt på kurslinja.
+        assert koordinater(graf.indekslinje)[0] == koordinater(graf.kurslinje)[0]
+        assert graf.indeksstart == ps[0].dato and graf.har_indeks
+
+    def test_startdagen_er_grafens_foerste_dag_ikke_indeksens(self):
+        """Indeksen har dager før grafen. Ville feilet med indeksens første
+        dag, eller den siste, som startdag (mutant C2)."""
+        ps = self._punkter([50.0, 60.0, 40.0])
+        indeks = {ps[0].dato - timedelta(days=1): 500.0}
+        indeks.update({p.dato: v for p, v in zip(ps, (1000.0, 1100.0, 1050.0))})
+        assert indeksverdier(ps, indeks)[ps[0].dato] == pytest.approx(50.0)
+        assert indeksverdier(ps, indeks)[ps[2].dato] == pytest.approx(52.5)
+
+    def test_bare_dager_indeksen_har(self):
+        """Dag 2 mangler i indeksen: den får ikke noe punkt, og linja har to."""
+        ps = self._punkter([50.0, 60.0, 40.0])
+        indeks = {ps[0].dato: 1000.0, ps[2].dato: 1100.0}
+        assert set(indeksverdier(ps, indeks)) == {ps[0].dato, ps[2].dato}
+        assert len(koordinater(bygg_graf(ps, indeks=indeks).indekslinje)) == 2
+
+    def test_uten_indeks_ingen_linje(self):
+        """Ville feilet hvis en linje ble tegnet uten indeks (mutant C3)."""
+        ps = self._punkter([50.0, 60.0, 40.0])
+        for indeks in (None, {}, {ps[1].dato: 1000.0}):
+            graf = bygg_graf(ps, indeks=indeks)
+            assert graf.indekslinje == "" and not graf.har_indeks and graf.indeksstart is None
+
+    def test_indeksen_faar_plass_paa_skalaen(self):
+        """Indeksen stiger mer enn aksjen: skalaen tar den med, så linja
+        ikke går utenfor tegneflaten."""
+        ps = self._punkter([50.0, 50.0, 50.0])
+        indeks = {p.dato: v for p, v in zip(ps, (1000.0, 1500.0, 2000.0))}
+        graf = bygg_graf(ps, indeks=indeks)
+        assert graf.hoy >= 100.0
+        assert all(MARG_Y - 0.05 <= y <= graf.hoyde - MARG_Y + 0.05 for _, y in koordinater(graf.indekslinje))
+
+    def test_uten_grafens_foerste_dag_starter_linja_paa_den_neste(self):
+        """Gjennomgangen (VG1): indeksen har bare dag 2 og 3. Startdagen er
+        dag 2, og linja starter på aksjens kurs den dagen."""
+        ps = self._punkter([50.0, 60.0, 40.0])
+        indeks = {ps[1].dato: 1000.0, ps[2].dato: 1100.0}
+        assert indeksverdier(ps, indeks) == pytest.approx({ps[1].dato: 60.0, ps[2].dato: 66.0})
+        graf = bygg_graf(ps, indeks=indeks)
+        assert graf.indeksstart == ps[1].dato and graf.indeksslutt == ps[2].dato
+        assert koordinater(graf.indekslinje)[0] == koordinater(graf.kurslinje)[1]

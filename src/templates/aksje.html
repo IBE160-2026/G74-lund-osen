@@ -94,6 +94,9 @@
     .maanedstekst { fill: var(--dempet); font-size: 12px; }
     .kurslinje { fill: none; stroke: var(--kurs); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
     .ma50linje { fill: none; stroke: var(--snitt); stroke-width: 1.75; }
+    /* Story 2.9c: hovedindeksen, stiplet. Stiplet brukes bare for indeksen
+       (designregler §5). */
+    .indekslinje { fill: none; stroke: var(--dempet); stroke-width: 1.5; stroke-dasharray: 6 4; }
     .sistepunkt { fill: var(--kurs); stroke: var(--hvit); stroke-width: 2; }
     /* En hvit kant rundt navnene, så de leses der linjene krysser. */
     .linjenavn { font-size: 12px; font-weight: 600; paint-order: stroke; stroke: var(--hvit); stroke-width: 4px; stroke-linejoin: round; }
@@ -233,14 +236,16 @@
     </form>
   {% endif %}
 
-  {%- set vis_grafhjelp = graf and graf.har_ma50 and detalj.sjekker %}
+  {#- Story 2.9c: hjelpen forklarer også den stiplede linja når den vises. #}
+  {%- set grafhjelp = (["grafen"] if graf and graf.har_ma50 and detalj.sjekker else []) + (["indekslinja"] if graf and graf.har_indeks else []) %}
+  {%- set vis_grafhjelp = grafhjelp|length > 0 %}
   <h2>Kursutvikling, 6 måneder{% if vis_grafhjelp %} {{ hjelpeknapp("hjelp-graf", "Hjelp: kursgrafen") }}{% endif %}</h2>
   {% if graf %}
     <figure>
       {#- Svar 19: navnene står ved enden av linjene, og etiketten sier
           hvilken linje som er hva for skjermleseren. #}
       <svg class="graf" viewBox="0 0 {{ graf.bredde }} {{ graf.hoyde }}" role="img"
-           aria-label="Kursutvikling for {{ detalj.aksje.navn }}: den tykke linja er utbyttejustert kurs{% if graf.har_ma50 %}, og den tynne er {{ parametre.ma_vindu }}-dagers snitt (sjekk 1){% endif %}">
+           aria-label="Kursutvikling for {{ detalj.aksje.navn }}: den tykke linja er utbyttejustert kurs{% if graf.har_ma50 %}, og den tynne er {{ parametre.ma_vindu }}-dagers snitt (sjekk 1){% endif %}{% if graf.har_indeks %}. Den stiplede er hovedindeksen {{ indeks_symbol }}, regnet om så den starter på aksjens kurs {{ graf.indeksstart|dato }}{% elif indeks_feilet %}. Hovedindeksen kunne ikke leses{% else %}. Hovedindeksen mangler for perioden{% endif %}">
         {% for linje in graf.rutenett %}
           <line class="rute" x1="0" y1="{{ "%.1f"|format(linje.y) }}"
                 x2="{{ graf.bredde }}" y2="{{ "%.1f"|format(linje.y) }}"></line>
@@ -259,6 +264,10 @@
             <text class="maanedstekst" x="{{ "%.1f"|format(merke.x + 3) }}" y="{{ graf.hoyde - 3 }}">{{ merke.navn }}</text>
           {% endif %}
         {% endfor %}
+        {#- Story 2.9c: indeksen under kurslinja og snittet. #}
+        {% if graf.har_indeks %}
+          <polyline class="indekslinje" points="{{ graf.indekslinje }}"></polyline>
+        {% endif %}
         {% if graf.ma50linje %}
           <polyline class="ma50linje" points="{{ graf.ma50linje }}"></polyline>
         {% endif %}
@@ -270,8 +279,22 @@
 
       <figcaption>
         {{ graf.forste_dato|dato }} til {{ graf.siste_dato|dato }}.
+        {#- Story 2.9c (gjennomgangen, BH3): tre linjer når indeksen er med. #}
+        {% if graf.har_indeks %}
+        Kursen og snittet er tegnet på utbyttejustert kurs, og indeksen er regnet
+        om til samme skala.
+        {% else %}
         Begge linjene er tegnet på utbyttejustert kurs, så de ligger på samme
-        skala. Sjekk 2 og 3 tegnes ikke — de står i kortene over.
+        skala.
+        {% endif %}
+        Sjekk 2 og 3 tegnes ikke — de står i kortene over.
+        {% if graf.har_indeks %}
+        <span class="indeksforklaring">Den stiplede linja er hovedindeksen {{ indeks_symbol }}, regnet om så den starter på aksjens kurs {{ graf.indeksstart|dato }}. Ligger aksjens linje over den stiplede, har aksjen gått bedre enn indeksen fra startdagen til den dagen.{% if graf.indeksslutt and graf.indeksslutt < graf.siste_dato %} Indeksen går bare til {{ graf.indeksslutt|dato }}.{% endif %}</span>
+        {% elif indeks_feilet %}
+        <span class="indeksforklaring">Hovedindeksen kunne ikke leses, så den er ikke tegnet.</span>
+        {% else %}
+        <span class="indeksforklaring">Hovedindeksen mangler for perioden, så den er ikke tegnet.</span>
+        {% endif %}
       </figcaption>
     </figure>
   {% else %}
@@ -292,7 +315,7 @@
   {{ hjelpevindu("hjelp-kurs", "Sluttkurs", [("", ["sluttkurs", "utbyttejustert"])]) }}
   {{ hjelpevindu("hjelp-endring", "Endring", [("", ["endring", "utbyttejustert"])]) }}
   {% if vis_grafhjelp %}
-    {{ hjelpevindu("hjelp-graf", "Kursgrafen", [("", ["grafen"])]) }}
+    {{ hjelpevindu("hjelp-graf", "Kursgrafen", [("", grafhjelp)]) }}
   {% endif %}
   {{ hjelpevindu("hjelp-styrke", "Signalstyrke", [("", ["signalstyrke", "ikke_raad"])]) }}
   {{ hjelpevindu("hjelp-retning-aksje", "Retning", [
