@@ -48,7 +48,7 @@ context:
 
 ## Avgjort underveis
 
-- **Bildet** er tatt 18.10 kl. 21:15 med fremgangsmåten under «Bildet» i spesifikasjonen 3.3b. Teksten der sier «tatt 16.10» om bildet fra før (gjennomgangen, VG3). Demobasen lå i en midlertidig mappe, waitress på en ledig port (63214), og Edge kjørte uten vindu med egen `--user-data-dir`. Ingen server ble stoppet, og `data/db/demo.db` ble ikke laget. Bildet er 1280 × 1000 px, med bare `IHDR`, `IDAT` og `IEND`.
+- **Bildet** er tatt 18.10 kl. 21:13 (tidspunktet fila ble skrevet) med fremgangsmåten under «Bildet» i spesifikasjonen 3.3b. Teksten der sier «tatt 16.10» om bildet fra før (gjennomgangen, VG3). Demobasen lå i en midlertidig mappe, waitress på en ledig port (63214), og Edge kjørte uten vindu med egen `--user-data-dir`. Ingen server ble stoppet, og `data/db/demo.db` ble ikke laget. Bildet er 1280 × 1000 px, med bare `IHDR`, `IDAT` og `IEND`.
 - **Avtrykket bak bildet** dekker etter gjennomgangen også `signalberegning.py`, `hjelpetekster.py`, `boersdag.py`, `indeksdata.py` og `kursdata.py`, hver delmal (`_*.html`) og merket «Eksempeltall» fra `app.py`. Fra `src/static/` telles bare skriftfilene. Det endrer linja over om hva avtrykket dekker. Avtrykket fikk en ny verdi fordi det dekker flere filer, ikke fordi noe bildet viser er endret: ingen fil under `src/` er endret på grenen.
 - **Tiden for testene:** commitmeldingen i `c145939` sa 219–434 s og «mellom 4 og 7 minutter». 434 s var den første kjøringen av hele settet for 3.4b, som ikke står med tid i dagsfila. Tidene som står der, er 219–385 s, og README-en sier nå «mellom 4 og 6 minutter» (gjennomgangen, BH1, VG2 og ECH5).
 
