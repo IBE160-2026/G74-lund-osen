@@ -293,3 +293,21 @@ def test_gitignore_uten_nextjs_men_med_node_og_byggemappene():
         assert moenster in linjer, moenster
     for sti in ("node_modules/x/y.js", "dist/ose.whl", "build/lib/x.py", "npm-debug.log", "yarn-error.log"):
         assert ignorert(_gitignore(), sti), sti
+
+
+def test_env_example_har_variablene_koden_leser_og_kallene_en_henting_bruker():
+    """Story 9.8, punkt f (VG9 i gjennomgangen). Variablene er EODHD_API_KEY
+    (fetch_prices.py) og de ki_tekst.py leser fra .env, og kallene er ett per
+    aksje og ett for hovedindeksen (behov i fetch_prices.kjoer). Ville
+    feilet hvis en variabel kom til i koden uten aa staa i .env.example, eller
+    hvis tallet paa variablene eller kallene i teksten ikke stemte."""
+    from ki_tekst import _NOEKLER
+    from kursdata import AKSJEUNIVERS
+
+    tekst = (ROT / ".env.example").read_text(encoding="utf-8")
+    variabler = ("EODHD_API_KEY", *_NOEKLER)
+    for navn in variabler:
+        assert re.search(rf"^#? ?{navn}=", tekst, re.MULTILINE), navn
+    tall = {3: "tre"}
+    assert f"Det er {tall[len(variabler)]} variabler aa sette i .env" in tekst
+    assert f"bruker {len(AKSJEUNIVERS) + 1} av de 20 kallene" in tekst
