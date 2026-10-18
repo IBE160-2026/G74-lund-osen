@@ -6,6 +6,8 @@ Gruppe G74 (Ai Ai Ai) i IBE160 Programmering med KI, Høgskolen i Molde, høsten
 
 OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversikt. Tre enkle sjekker – trend, bevegelse og interesse – gir hver aksje en signalstyrke fra 0 til 3, så en vanlig sparer kan se hva som har endret seg, og hvorfor. Beregningene gjøres med vanlig programkode, og KI skal forklare signalet med ord. Appen gir ikke råd om å kjøpe eller selge. Den er under utvikling og ikke ferdig.
 
+**Innhold:** [Kom i gang](#kom-i-gang) · [Status](#status) · [Tester](#tester) · [Dokumentene](#dokumentene) · [Mappestruktur](#mappestruktur) · [Medlemmer](#medlemmer)
+
 Til faglærer:
 - Se appen med oppdiktede tall, uten konto og nøkkel, etter steg 1–4: [demoen](#demoen)
 - Ekte kurser, med en gratis nøkkel fra EODHD: [den ekte versjonen](#den-ekte-versjonen-anbefalt)
@@ -354,13 +356,13 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 
 ## Mappestruktur
 
-- `src/` og `tests/` — applikasjonen og testene
-- `docs/` — arbeidsprosessen, og `docs/hjelp.md` med spørsmål og svar til «Kom i gang»
-- `docs/bilder/readme/` — de tre skjermbildene i «Kom i gang»: `engine-running.png`, `github-download-zip.png` og `powershell-mappa.png`
-- `_bmad-output/` — Product Brief, plan, krav og sprintstatus
-- `.github/` — testkjøringen og morgensjekken
-- `Dockerfile`, `compose.yaml` og `.dockerignore` — imaget og tjenestene: webserveren, hentingen og demoen
-- `_bmad/` og `.claude/skills/` — BMAD-rammeverket, ikke skrevet av oss
+- [`src/`](src/) og [`tests/`](tests/) — applikasjonen og testene
+- [`docs/`](docs/) — arbeidsprosessen, og [`docs/hjelp.md`](docs/hjelp.md) med spørsmål og svar til «Kom i gang»
+- [`docs/bilder/readme/`](docs/bilder/readme/) — de tre skjermbildene i «Kom i gang»: [`engine-running.png`](docs/bilder/readme/engine-running.png), [`github-download-zip.png`](docs/bilder/readme/github-download-zip.png) og [`powershell-mappa.png`](docs/bilder/readme/powershell-mappa.png)
+- [`_bmad-output/`](_bmad-output/) — Product Brief, plan, krav og sprintstatus
+- [`.github/`](.github/) — testkjøringen og morgensjekken
+- [`Dockerfile`](Dockerfile), [`compose.yaml`](compose.yaml) og [`.dockerignore`](.dockerignore) — imaget og tjenestene: webserveren, hentingen og demoen
+- [`_bmad/`](_bmad/) og [`.claude/skills/`](.claude/skills/) — BMAD-rammeverket, ikke skrevet av oss
 
 Ikke i repoet: API-nøkkelen (`.env`), rådata, basen og demobasen (`data/`), lokale testskript (`local-tests/`) og den private arbeidsmappa (`_privat/`).
 

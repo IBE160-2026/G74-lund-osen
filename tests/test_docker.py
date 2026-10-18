@@ -1411,7 +1411,9 @@ class TestReadmeForNybegynnere:
         # Gruppen 16.10 kl. 21:38: skjermbildet under «Til faglærer» er tatt
         # ut, så «Til faglærer» er igjen siste avsnitt før «Kom i gang».
         assert avsnitt[-1].startswith("Til faglærer:"), avsnitt[-1]
-        assert avsnitt[-2].startswith("OSE Signal viser"), avsnitt[-2]
+        # Story 3.3d, punkt f: «Innhold» står rett under beskrivelsen.
+        assert avsnitt[-2].startswith("**Innhold:** "), avsnitt[-2]
+        assert avsnitt[-3].startswith("OSE Signal viser"), avsnitt[-3]
         assert "\n## " not in topp
 
     def test_status_uten_storynumre_og_uten_kommando(self):
@@ -1523,7 +1525,10 @@ class TestReadmeForNybegynnere:
         import kursdata
 
         tekst = README.read_text(encoding="utf-8")
-        beskrivelse = tekst.split("Til faglærer:", 1)[0].strip().split("\n\n")[-1]
+        # Story 3.3d: «Innhold» står mellom beskrivelsen og «Til faglærer».
+        beskrivelse = [a for a in tekst.split("Til faglærer:", 1)[0].split("\n\n") if a.startswith("OSE Signal viser")]
+        assert len(beskrivelse) == 1
+        beskrivelse = beskrivelse[0]
         assert beskrivelse.startswith("OSE Signal viser")
         assert f"viser {len(kursdata.AKSJEUNIVERS)} aksjer på Oslo Børs" in beskrivelse
         # Antallet sjekker telles fra navnene i koden, ikke fra returtypen til
@@ -1576,6 +1581,50 @@ class TestReadmeForNybegynnere:
         # Ordgrense etter tallet, saa 1 ikke godtar «15» (Verification Gap 12.10).
         # Story 2.8: en henting er aksjene og hovedindeksen.
         assert re.search(rf"en henting bruker {antall + 1}\b", nokkel), nokkel
+
+    def test_innhold_lenker_til_hovedoverskriftene(self):
+        """Story 3.3d, punkt f (beslutningen 16.10 kl. 21:53-21:58): én linje
+        «Innhold» rett under beskrivelsen, med lenker til hovedoverskriftene
+        fra «Kom i gang» til «Medlemmer», i den rekkefølgen. Ville feilet med
+        en lenke til en overskrift som ikke finnes, eller en som mangler."""
+        tekst = README.read_text(encoding="utf-8")
+        innhold = [l for l in tekst.splitlines() if l.startswith("**Innhold:** ")]
+        assert len(innhold) == 1
+        lenker = re.findall(r"\[([^\]]+)\]\(#([^)]+)\)", innhold[0])
+        hoved = re.findall(r"^## (.+)$", _uten_bokser(tekst), re.MULTILINE)
+        hoved = hoved[hoved.index("Kom i gang") : hoved.index("Medlemmer") + 1]
+        assert [t for t, _ in lenker] == hoved, lenker
+        ankrene = _ankrene(tekst)
+        for tittel, anker in lenker:
+            assert anker == _anker(tittel) and anker in ankrene, anker
+        assert innhold[0] == "**Innhold:** " + " · ".join(f"[{t}](#{a})" for t, a in lenker)
+
+    def test_mappestrukturen_lenker_til_stier_i_repoet(self):
+        """Story 3.3d, punkt f: hver mappe og fil i «Mappestruktur» er en
+        relativ lenke med samme tekst som stien, og peker på noe som finnes
+        og ikke holdes ute av .gitignore. Det som ikke er i repoet, blir ikke
+        lenker. Ville feilet med en lenke til data/."""
+        from test_ryddighet import ignorert
+
+        gitignore = (ROT / ".gitignore").read_text(encoding="utf-8")
+        del_ = README.read_text(encoding="utf-8").split("\n## Mappestruktur\n", 1)[1].split("\n## ", 1)[0]
+        punkter = [l for l in del_.splitlines() if l.startswith("- ")]
+        assert len(punkter) == 7, punkter
+        for punkt in punkter:
+            foer = punkt.split(" — ", 1)[0]
+            # Hver sti i kodeformat foran tankestreken er en lenke.
+            assert "`" not in re.sub(r"\[`[^`]+`\]\([^)]+\)", "", foer), punkt
+        lenker = re.findall(r"\[`([^`]+)`\]\(([^)]+)\)", del_)
+        assert len(lenker) >= 14, lenker
+        for tekst, maal in lenker:
+            assert not re.match(r"[a-z]+:|/|#", maal), maal
+            assert maal.rstrip("/").endswith(tekst.rstrip("/").rsplit("/", 1)[-1]), (tekst, maal)
+            sti = maal.rstrip("/")
+            assert (ROT / sti).exists(), maal
+            assert not ignorert(gitignore, sti), maal
+        # Linja om det som ikke er i repoet, har ingen lenker.
+        ikke = [l for l in del_.splitlines() if l.startswith("Ikke i repoet:")]
+        assert len(ikke) == 1 and "](" not in ikke[0]
 
     def test_til_faglaerer_begynner_med_demoen_den_ekte_versjonen_og_testene(self):
         """Story 3.3d, punkt e (beslutningen 16.10 kl. 21:16, med svarene kl.
