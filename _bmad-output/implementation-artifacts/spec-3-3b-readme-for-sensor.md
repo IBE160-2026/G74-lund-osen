@@ -49,6 +49,7 @@ Skjermbildet erstatter «uten bilder» (svar 4, 11.10). Regelen fra 25.09 står:
 ## Bildet
 
 *Opphevet 2026-10-16 (gruppen kl. 21:38, PR #54):* bildet og testene under er tatt ut. Fremgangsmåten og avtrykket under står som historikk.
+*Lagt til 2026-10-18 (gruppens svar kl. 00:20, instruksjonen kl. 21:11):* bildet kommer tilbake i 3.3e (`spec-3-3e-bildet-uv-og-variablene.md`), tatt etter fremgangsmåten under.
 
 `docs/bilder/readme/oversikten-demo.png` er toppen av oversikten i demoen, 1280 × 1000 px, tatt 16.10 med Edge uten vindu (headless). **Bildet tas på nytt når oversikten endres,** i samme commit som endringen, slik:
 
