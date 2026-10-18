@@ -245,7 +245,7 @@
       {#- Svar 19: navnene står ved enden av linjene, og etiketten sier
           hvilken linje som er hva for skjermleseren. #}
       <svg class="graf" viewBox="0 0 {{ graf.bredde }} {{ graf.hoyde }}" role="img"
-           aria-label="Kursutvikling for {{ detalj.aksje.navn }}: den tykke linja er utbyttejustert kurs{% if graf.har_ma50 %}, og den tynne er {{ parametre.ma_vindu }}-dagers snitt (sjekk 1){% endif %}{% if graf.har_indeks %}. Den stiplede er hovedindeksen {{ indeks_symbol }}, regnet om så den starter på aksjens kurs {{ graf.indeksstart|dato }}{% endif %}">
+           aria-label="Kursutvikling for {{ detalj.aksje.navn }}: den tykke linja er utbyttejustert kurs{% if graf.har_ma50 %}, og den tynne er {{ parametre.ma_vindu }}-dagers snitt (sjekk 1){% endif %}{% if graf.har_indeks %}. Den stiplede er hovedindeksen {{ indeks_symbol }}, regnet om så den starter på aksjens kurs {{ graf.indeksstart|dato }}{% elif indeks_feilet %}. Hovedindeksen kunne ikke leses{% else %}. Hovedindeksen mangler for perioden{% endif %}">
         {% for linje in graf.rutenett %}
           <line class="rute" x1="0" y1="{{ "%.1f"|format(linje.y) }}"
                 x2="{{ graf.bredde }}" y2="{{ "%.1f"|format(linje.y) }}"></line>

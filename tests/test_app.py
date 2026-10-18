@@ -2451,9 +2451,10 @@ class TestStory80dAksjesiden:
         assert '<circle class="sistepunkt"' in html
         # Gjennomgangen (VG4, BH5): etiketten sier hvilken linje som er hva,
         # med tykkelsen og ikke fargen.
+        # Story 2.9c (gjennomgangen, ECH8): uten indeks sier etiketten det til slutt.
         assert re.search(
             r'aria-label="Kursutvikling for Equinor: den tykke linja er utbyttejustert kurs, '
-            r'og den tynne er \d+-dagers snitt \(sjekk 1\)"',
+            r'og den tynne er \d+-dagers snitt \(sjekk 1\)\. Hovedindeksen mangler for perioden"',
             html,
         )
 
@@ -3048,3 +3049,25 @@ class TestIndekslinjaPaaAksjesiden:
         assert 'popovertarget="hjelp-graf"' in html
         vinduet = html.split('<div id="hjelp-graf"', 1)[1].split('<div id="hjelp-', 1)[0]
         assert "Den stiplede linja:" in vinduet and "Kursgrafen:" not in vinduet
+
+    @pytest.mark.parametrize("metode", ["symboler", "serie"])
+    def test_en_feil_i_porten_gir_grafen_uten_linja(self, klient, monkeypatch, metode):
+        """Gjennomgangen (VG9, ECH8): både symboler og serie, og en rad som ikke
+        kan tolkes (ValueError). Ville feilet hvis en av dem ga 500, eller
+        etiketten ikke sa at indeksen ikke kunne leses."""
+        from kursdata import UgyldigKursrad
+
+        self._aksjen()
+        self._indeksen()
+
+        def feiler(*_):
+            raise UgyldigKursrad("slutt er ikke et tall")
+
+        monkeypatch.setattr(lagring_sqlite.SqliteIndekslager, metode, feiler)
+        svar = klient.get("/aksje/EQNR")
+        html = svar.data.decode("utf-8")
+        assert svar.status_code == 200 and _punktene(html, "kurslinje") and not _punktene(html, "indekslinje")
+        assert "Hovedindeksen kunne ikke leses, så den er ikke tegnet." in _synlig(html)
+        assert ". Hovedindeksen kunne ikke leses" in re.search(
+            r'<svg class="graf"[^>]*aria-label="([^"]*)"', html
+        ).group(1)
