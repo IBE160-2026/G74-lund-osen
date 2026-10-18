@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-18T18:08
+updated: 2026-10-18T19:07
 ---
 
 # Kvalitetssikring
@@ -254,6 +254,7 @@ sist i dokumentet.
 | 2.9 Hovedindeksen på forsiden | `b44284f` (#59) | 1 (4, H1–H4) | – | `S/spec-2-9-hovedindeksen-paa-forsiden.md`, «Mutantene» |
 | 3.1 Dockerfile med to innganger | `a2ecee8` (#23) | 1 (24 statiske og 9 i imaget) | I5 overlevde først (uv lastet ned 3.13), og `UV_PYTHON_DOWNLOADS=never` kom til. D21 overlevde først | `S/spec-3-1-dockerfile-med-to-innganger.md` |
 | 3.2 To volumer | `088c885` (#24) | 1 (10 statiske og 8 i CI) | C3, S8, S9 og S10 overlevde først. Første forsøk med C7 bygget ikke | `S/spec-3-2-to-volumer-og-ingenting-uerstattelig-i-imaget.md` |
+| 3.2b Port 8000 | `3f1c789` (#68) | 1 (5, P1–P5) | – | `S/spec-3-2b-port-8000.md` |
 | 3.3 README | `5816bc2` (#25) | 1 (15 statiske og 1 i CI) | – | `S/spec-3-3-readme-slik-kjoerer-du-den.md` |
 | 3.3b README for sensor | `6b9dc2f` (#53), `1a95495` (#54) | 1 (21 i PR #53) | – | `S/spec-3-3b-readme-for-sensor.md` |
 | 3.3c Bilder i «Kom i gang», demoen først og fire rettelser | `fdaf403` (#66) | 1 (9, M1–M9) | – M1–M4 er fra instruksjonen, M5–M9 fra funnene med dom medium | `S/spec-3-3c-kom-i-gang-bilder-og-demoen-foerst.md` |
@@ -437,6 +438,7 @@ funn. Antall rader i loggen:
 | 2.9 | 20 | 8 | 12 | – |
 | 3.1 | 17 | 15 | 1 | 1 |
 | 3.2 | 16 | 9 | 7 | – |
+| 3.2b | 16 | 8 | 8 | – |
 | 3.3 | 13 | 10 | 2 | 1 |
 | 3.3b, PR #53 | 22 | 16 | 5 | 1 |
 | 3.3b, PR #54 | 12 | 5 | 6 | 1 |
@@ -1141,6 +1143,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 2.9 | H1–H4 | H1 `test_n_er_aksjene_med_kurs_og_en_uten_navngis`, H2 `test_et_hull_foer_indeksens_dato_gir_ingen_endring`, H3 `test_lik_er_ikke_bedre`, H4 `test_like_foerst_etter_avrundingen_er_ikke_bedre` | `S/spec-2-9-…` |
 | 3.1 | D1–D24 og I1–I9 | D1 `test_python_er_313_som_ci`, D4 `test_ingen_noekkel_i_imaget`, D5 og D23 `test_ikke_root`, D12 `test_bare_hent_har_noekkelen`, D18 `test_uv_laster_aldri_ned_en_egen_python`; I1–I9 fanges av stegene i CI, ikke av tester | `S/spec-3-1-…` |
 | 3.2 | S1–S10 og C1–C8 | S1 og S2 `test_navngitte_volumer_aldri_data_paa_maskinen` og `test_volumene_overlapper_ikke`, S6 `test_skrivebeskyttet_rot_med_tmp_som_tmpfs`; C1–C8 fanges av stegene i CI. For S9 og S10 navngir tabellen ingen test | `S/spec-3-2-…` |
+| 3.2b | P1–P5 | alle `test_porten_er_den_samme_overalt_og_ikke_5000` | `S/spec-3-2b-…` |
 | 3.3 | R1–R15 og C1 | R1 `test_kommandoen_paa_den_tomme_siden_staar_i_readme`, R8 `test_tjenestene_i_readme_finnes_i_compose`, R9 `test_raadet_om_tidspunkt_uten_flagget`; for R13–R15 står bare «drept» | `S/spec-3-3-…` |
 | 3.3b | S1–S20 og S5b (PR #53) | ikke navngitt per mutant i spesifikasjonen | `S/spec-3-3b-…` |
 | 3.3c | M1–M9 | M1 `test_bildene_er_de_tre_fra_gjennomgangen_og_ci_merket`, M2, M8 og M9 `test_steg_4_mappa_ikke_zip_fila`, M3 `test_svaret_om_mellomrommet_etter_cd`, M4 `test_demoen_foerst_og_zip_foer_kommandoene`, M5 og M6 `test_kopieringen_forklares_en_gang_og_hvert_steg_sier_hvor`, M7 `test_henvisningene_og_proevetabellen` | `S/spec-3-3c-…` |
