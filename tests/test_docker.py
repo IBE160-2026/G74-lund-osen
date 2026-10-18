@@ -701,7 +701,12 @@ class TestReadme:
         assert [b.strip() for _, b in _blokkene(synlig)] == ["uv sync", "uv run pytest"]
         assert "- Ingen nettkall:" in synlig and "- CI kjører" in synlig
         assert "](docs/kvalitetssikring.md)" in synlig
-        assert synlig.index("uv run pytest") < synlig.index("Alle testene skal bestå.") < tester.index("<details>")
+        # Gjennomgangen, BH10 og ECH7: indeksene i samme tekst, og knappen
+        # rett etter «Alle testene skal bestå», foer punktene.
+        assert tester.index("uv run pytest") < tester.index("Alle testene skal bestå.") < tester.index("<details>")
+        assert tester.index("</details>") < tester.index("\n- Ingen nettkall:")
+        assert "Alle testene skal bestå. Noen hoppes over, og knappen under sier hvorfor.\n\n<details>" in tester
+        assert not _blokkene(forklaring), forklaring
 
     def test_bildene_er_de_tre_fra_gjennomgangen_og_ci_merket(self):
         """Story 3.3: skjermbilder med ekte data publiserer dataene. Regelen
@@ -871,6 +876,23 @@ def _bildetekst(tekst: str, navn: str) -> str:
         re.MULTILINE,
     )
     return treff.group(1) if treff else ""
+
+
+def _alle_ankrene(tekst: str) -> list[str]:
+    """Ankrene i den rekkefoelgen overskriftene staar, ogsaa de like."""
+    return [_anker(o) for o in re.findall(r"^#+ (.+)$", _uten_bokser(tekst), re.MULTILINE)]
+
+
+def _git_sporet() -> list[str] | None:
+    """Filene git sporer, eller None uten git (ZIP-fila)."""
+    import shutil
+    import subprocess
+
+    if shutil.which("git") is None or not (ROT / ".git").exists():
+        return None
+    svar = subprocess.run(["git", "-C", str(ROT), "ls-files", "-z"], capture_output=True, text=True)
+    assert svar.returncode == 0, svar.stderr
+    return [f for f in svar.stdout.split("\0") if f]
 
 
 def _ankrene(tekst: str) -> set[str]:
@@ -1306,7 +1328,10 @@ class TestReadmeForNybegynnere:
         }
         assert uv.index("**Demoen**\n\n") < uv.index("**Den ekte versjonen**\n\n")
         demo, ekte = uv.split("**Demoen**\n\n", 1)[1].split("**Den ekte versjonen**\n\n", 1)
-        ekte = ekte.split("\n\nBasen, demobasen", 1)[0]
+        ekte, etter = ekte.split("\n\nBasen, demobasen", 1)
+        # Gjennomgangen, ECH6: setningene foer og etter listene staar.
+        assert uv.startswith("Med Python 3.13 og [uv](https://docs.astral.sh/uv/). Først demoen.\n\n**Demoen**")
+        assert etter.startswith(" og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo` åpner")
         for navn, liste in (("Demoen", demo), ("Den ekte versjonen", ekte)):
             punkter = re.findall(r"^(\d+)\. ([^\n]+)\n\n```\n([^\n]+)\n```$", liste, re.MULTILINE)
             assert [int(n) for n, _, _ in punkter] == list(range(1, len(forventet[navn]) + 1)), (navn, punkter)
@@ -1453,11 +1478,17 @@ class TestReadmeForNybegynnere:
         # Gjennomgangen av flettingen 12.10 (VG): hver sak staar i riktig liste.
         # Ville feilet hvis noe som ikke er flettet, sto under «Ferdig», slik
         # grenen 8-0b sa om 2.3b.
-        assert "Flettet til main" not in status
+        assert "Flettet til main" not in status.split("«Ferdig» betyr flettet til main.", 1)[0]
         lister = _statuslister(status)
         assert list(lister) == ["Ferdig", "Neste"], list(lister)
         for navn, punkter in lister.items():
             assert 1 <= len(punkter) <= 8, (navn, len(punkter))
+        # Gjennomgangen, ECH2: listene staar samlet, uten tomme linjer inni,
+        # saa et punkt etter en tom linje ikke slipper unna grensen.
+        samlet = "\n\n".join(
+            f"**{navn}**\n\n" + "\n".join(f"- {p}" for p in punkter) for navn, punkter in lister.items()
+        )
+        assert samlet + "\n\n«Ferdig» betyr flettet til main." in status
         ferdig = "\n".join(lister["Ferdig"]).lower()
         neste_punkter = lister["Neste"]
         neste = "\n".join(neste_punkter).lower()
@@ -1507,6 +1538,9 @@ class TestReadmeForNybegynnere:
         # under listene.
         etter = status.split("**Neste**", 1)[1].split("\n\n", 2)[2]
         for setning in (
+            # Gjennomgangen, ECH1: hva «Ferdig» betyr, fordi sprintstatusen kan
+            # si review for noe som er flettet.
+            "«Ferdig» betyr flettet til main.",
             "Det som bygges etter demoen, skal vises i begge versjonene.",
             "Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B).",
             "Detaljene står i [sprintstatusen](",
@@ -1594,9 +1628,11 @@ class TestReadmeForNybegynnere:
         hoved = re.findall(r"^## (.+)$", _uten_bokser(tekst), re.MULTILINE)
         hoved = hoved[hoved.index("Kom i gang") : hoved.index("Medlemmer") + 1]
         assert [t for t, _ in lenker] == hoved, lenker
-        ankrene = _ankrene(tekst)
+        # Gjennomgangen, ECH5: hvert anker finnes én gang, ellers gir GitHub
+        # den neste «-1», og lenken gaar til den foerste.
+        alle = _alle_ankrene(tekst)
         for tittel, anker in lenker:
-            assert anker == _anker(tittel) and anker in ankrene, anker
+            assert anker == _anker(tittel) and alle.count(anker) == 1, anker
         assert innhold[0] == "**Innhold:** " + " · ".join(f"[{t}](#{a})" for t, a in lenker)
 
     def test_mappestrukturen_lenker_til_stier_i_repoet(self):
@@ -1611,16 +1647,26 @@ class TestReadmeForNybegynnere:
         punkter = [l for l in del_.splitlines() if l.startswith("- ")]
         assert len(punkter) == 7, punkter
         for punkt in punkter:
-            foer = punkt.split(" — ", 1)[0]
-            # Hver sti i kodeformat foran tankestreken er en lenke.
-            assert "`" not in re.sub(r"\[`[^`]+`\]\([^)]+\)", "", foer), punkt
+            # Hver sti i kodeformat i punktet er en lenke, ogsaa etter
+            # tankestreken (gjennomgangen, BH3 og ECH4).
+            assert "`" not in re.sub(r"\[`[^`]+`\]\([^)]+\)", "", punkt), punkt
         lenker = re.findall(r"\[`([^`]+)`\]\(([^)]+)\)", del_)
-        assert len(lenker) >= 14, lenker
+        # Alle lenkene, ogsaa uten kodeformat, er de i kodeformat.
+        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 15, lenker
+        sporet = _git_sporet()
         for tekst, maal in lenker:
-            assert not re.match(r"[a-z]+:|/|#", maal), maal
-            assert maal.rstrip("/").endswith(tekst.rstrip("/").rsplit("/", 1)[-1]), (tekst, maal)
+            # Maalet er stien i teksten, relativ og uten «..» (BH4, ECH3).
+            # Bildene staar med filnavnet, som foer 3.3d, etter mappa de ligger i.
+            assert maal == tekst or (tekst in BILDENE.values() and maal == f"docs/bilder/readme/{tekst}"), (
+                tekst,
+                maal,
+            )
+            assert not re.match(r"[a-zA-Z]+:|/|#", maal) and ".." not in maal.split("/"), maal
             sti = maal.rstrip("/")
             assert (ROT / sti).exists(), maal
+            if sporet is not None:
+                # Store og smaa bokstaver som i git, og noe er sporet (ECH3).
+                assert any(f == sti or f.startswith(sti + "/") for f in sporet), maal
             # ignorert() leser stien som en fil, og «data/» i .gitignore
             # gjelder bare mapper, saa en mappe sjekkes med en fil inni (mutant
             # N6 overlevde foerst).
@@ -1640,17 +1686,25 @@ class TestReadmeForNybegynnere:
         tekst = README.read_text(encoding="utf-8")
         lista = tekst.split("Til faglærer:\n", 1)[1].split("\n\n", 1)[0].splitlines()
         forventet = [
-            ("Se appen med oppdiktede tall, uten konto og nøkkel, etter steg 1–4", "demoen", "Demoen"),
+            # Gjennomgangen, BH2: demolenken sier ogsaa hvor steg 1-4 staar.
+            (
+                "Se appen med oppdiktede tall, uten konto og nøkkel, etter [steg 1–4](#felles-for-begge)",
+                "demoen",
+                "Demoen",
+            ),
             ("Ekte kurser, med en gratis nøkkel fra EODHD", "den ekte versjonen", "Den ekte versjonen (anbefalt)"),
             ("De automatiske testene, med to kommandoer", "Tester", "Tester"),
         ]
-        ankrene = _ankrene(tekst)
+        alle = _alle_ankrene(tekst)
         for linje, (forklaring, lenketekst, overskrift) in zip(lista[:3], forventet, strict=True):
             treff = re.fullmatch(r"- (.+): \[([^\]]+)\]\(#([^)]+)\)", linje)
             assert treff, linje
             assert treff.group(1) == forklaring and treff.group(2) == lenketekst, linje
             assert treff.group(3) == _anker(overskrift), linje
-            assert treff.group(3) in ankrene, linje
+            # Hvert anker finnes én gang (ECH5).
+            for anker in [treff.group(3), *re.findall(r"\]\(#([^)]+)\)", treff.group(1))]:
+                assert alle.count(anker) == 1, (anker, linje)
+        assert _anker("Felles for begge") == "felles-for-begge"
 
     def test_til_faglaerer_lenker_til_briefen_med_gjeldende_tag(self):
         """12.10 kl. 12:12: briefen var gjemt langt nede. Lista under

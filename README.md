@@ -9,7 +9,7 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 **Innhold:** [Kom i gang](#kom-i-gang) · [Status](#status) · [Tester](#tester) · [Dokumentene](#dokumentene) · [Mappestruktur](#mappestruktur) · [Medlemmer](#medlemmer)
 
 Til faglærer:
-- Se appen med oppdiktede tall, uten konto og nøkkel, etter steg 1–4: [demoen](#demoen)
+- Se appen med oppdiktede tall, uten konto og nøkkel, etter [steg 1–4](#felles-for-begge): [demoen](#demoen)
 - Ekte kurser, med en gratis nøkkel fra EODHD: [den ekte versjonen](#den-ekte-versjonen-anbefalt)
 - De automatiske testene, med to kommandoer: [Tester](#tester)
 - [Product Brief](_bmad-output/planning-artifacts/product-brief.md), arbeidskravet: versjon 8, laget etter [tilbakemeldingen 06.10](_bmad-output/planning-artifacts/tilbakemelding-product-brief.md) og låst i taggen `arbeidskrav-product-brief-v8`
@@ -275,14 +275,14 @@ Under arbeid, og ingenting er endelig.
 
 **Ferdig**
 
-- Hentingen av kurser med kontroll av børsdagen, og at hovedindeksen hentes i samme kjøring
+- Hentingen av kurser fra kl. 21 på børsdager, med kontroll av børsdagen, og at hovedindeksen hentes i samme kjøring
 - Nye forsøk med kallene som er igjen etter hentingen
 - Docker, og demoen, som viser alle 10 fargekombinasjonene av de tre sjekkene på siste dag
-- Denne README-en, og hjelp bak «?» på sidene
+- Denne README-en, med bilder i «Kom i gang» og demoen først, og hjelp bak «?» på sidene
 - Tydeligere merking i tabellene, datoene og månedsmerkene i grafen, oversikten fra designforslaget, utseendet fra designforslaget, og sortering ved klikk i kolonneraden
 - Hovedindeksen, som vises over tabellen på forsiden, med søylene under, og som en stiplet linje i kursgrafen på aksjesiden
 - Den første delen av KI-laget: plassen for KI-teksten under regelforklaringen på aksjesiden, med en bryter som slår den av og på, loggen der tekstene lagres, kontrollen av teksten mot regelen, og at hentingen lager teksten med en lokal modell. Teksten lages når KI er slått på og den lokale modellen kjører under hentingen, og aksjesiden viser bare tekster som besto kontrollen
-- Ruff, som finner feil og rot i koden og formatterer den, i CI og i testene
+- Ruff, som finner feil og rot i koden og formaterer den, i CI og i testene, den oppdaterte kvalitetssikringen, og et ryddigere repo uten kopien av BMAD-skillene
 
 **Neste**
 
@@ -295,7 +295,7 @@ Under arbeid, og ingenting er endelig.
 - Periodene i kursgrafen, og på forsiden periodevalget, børsometeret og KI-teksten om dagen
 - Til slutt å velge og bytte aksjer
 
-Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
+«Ferdig» betyr flettet til main. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
 
 ## Tester
 
@@ -309,7 +309,7 @@ uv sync
 uv run pytest
 ```
 
-Alle testene skal bestå.
+Alle testene skal bestå. Noen hoppes over, og knappen under sier hvorfor.
 
 <details>
 <summary>Hvorfor hoppes noen over?</summary>
