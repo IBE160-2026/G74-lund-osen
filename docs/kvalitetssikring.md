@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-18T22:09
+updated: 2026-10-18T22:49
 ---
 
 # Kvalitetssikring
@@ -275,6 +275,7 @@ sist i dokumentet.
 | 10.2a Modellen, prompten og kontrollen | `77ebf31` (#48) | 1 (12) | – Spesifikasjonen står in-progress | `S/spec-10-2a-modellen-prompten-og-kontrollen.md` |
 | 10.2b Teksten i hentekommandoen | `b13e50f` (#49) | 1 (18) | FR2 overlevde først, og testen ble skrevet om i `48838a7` | `S/spec-10-2b-teksten-i-hentekommandoen.md` |
 | 10.2c Prompten versjon 2 | `cafe067` (#55) | 1 (4) | – | `S/spec-10-2c-prompten-versjon-2.md` |
+| 10.2d Kontrollen leser formene Gemma skriver | `3c2bd51` (#71) | 1 (12, D1–D12) | Testen i punkt a var først xfail av feil grunn, fordi `\b` i mønsteret var skrevet som backspace. Rettet i `aae2eef` før D1–D4 ble kjørt | `S/spec-10-2d-kontrollen-leser-formene-gemma-skriver.md` |
 | 10.3 Visningen i aksjedetaljen | `e728c37` (#50), `4a22199` (#51) | 1 (15) | – | `S/spec-10-3-visningen-i-aksjedetaljen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
@@ -474,6 +475,7 @@ funn. Antall rader i loggen:
 | 10.2b, første runde | 24 | 20 | 2 | – |
 | 10.2b, svar c | 19 | 13 | 6 | – |
 | 10.2c | 17 | 8 | 4 | 3 |
+| 10.2d | 23 | 17 | 6 | – |
 | 10.3, PR #50 | 21 | 13 | 8 | – |
 | 10.3, PR #51 | 13 | 9 | 2 | 2 |
 | 9.1, oppdatering 17.10 | 19 | 17 | 2 | – |
@@ -1168,6 +1170,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 10.2a | E1–E6 og ER1–ER6 | testene står per mutant i tabellen i spesifikasjonen | `S/spec-10-2a-…` |
 | 10.2b | F1–F5, FR1–FR4, FC1–FC8 og F2b | testene står per mutant i tabellen i spesifikasjonen | `S/spec-10-2b-…` |
 | 10.2c | H1–H4 | testene står per mutant i tabellen i spesifikasjonen | `S/spec-10-2c-…` |
+| 10.2d | D1–D12 | testene står per mutant i spesifikasjonen | `S/spec-10-2d-…` |
 | 10.3 | V1–V4, VR1–VR4 og B1–B7 | testene står per mutant i tabellene i spesifikasjonen | `S/spec-10-3-…` |
 | 9.1 | Q1–Q4 | Q1, Q3 og Q4 `test_hver_ferdige_spesifikasjon_har_en_rad`, Q2 `test_hver_test_dokumentene_nevner_finnes` | `S/spec-9-1-…` |
 | 9.7 | A1–A5 | A1 `test_ruff_check_finner_ingenting`, A2 og A3 `test_ruff_format_er_kjoert`, A4 `test_ci_kjoerer_ruff_foer_testene`, A5 `test_ingen_modul_i_src_bruker_meldinger` | `S/spec-9-7-…` |
