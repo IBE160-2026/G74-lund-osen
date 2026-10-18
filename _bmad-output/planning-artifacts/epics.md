@@ -3684,3 +3684,24 @@ Som **gruppe**, vil vi at ruff finner ubrukte importer, rot i importene og vanli
 **Avhenger av:** ingen. **Én økt:** ja.
 
 *Lagt til 2026-10-17 kl. 23:41:* ruff er i CI og i pytest, flettet i `faaa36c`, PR #62 (spesifikasjonen `spec-9-7-linter-og-formatterer-i-ci.md`). Reglene er pyflakes, importene og bugbear, med B905 slått av. CI var grønn på head-en `4cf27a9` (kjøring 39071749356) og på main (39071843876).
+
+### Story 9.8: Kopien `.agents/skills/` tas bort
+
+*Lagt til 2026-10-18, gruppens svar kl. 00:03 (instruksjonen kl. 11:40).*
+
+Som **gruppe**, vil vi at BMAD-skillene ligger én gang i repoet, så sensor ikke finner 242 filer som er kopier, og så rotmappa bare har det vi bruker.
+
+**Grunnen:** BMAD ble satt opp for Claude Code og Codex 15.09 (`59a90a2`). Installasjonen la de samme skillene i `.claude/skills/` for Claude Code og i `.agents/skills/` for Codex, 242 filer hver, med likt innhold. Gruppen bruker bare Claude Code.
+
+**Oppfyller:** svaret kl. 00:03 under «Prioritering», raden «Ryddighet i repoet» i `docs/vurderingsmatrise.md` · **Begrenses av:** regel 8, 10 og 19 i `CLAUDE.md`, AD-8
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- a) De 242 filene under `.agents/` er tatt ut av git, og `git diff` mot main er tom under `.claude/skills/`. Blir det igjen en lokal `.agents/` med bare `__pycache__`, slettes den; ellers står den, og det sies fra
+- b) `_bmad/_config/manifest.yaml` har bare `claude-code` under `ides`, så en ny BMAD-installasjon ikke legger kopien inn igjen
+- c) «Mappestruktur» i README-en nevner bare `_bmad/` og `.claude/skills/` (regel 19), og `.agents/` er tatt ut av unntaket i lekkasjesjekken i `.github/scripts/morgensjekk.py`
+- d) En test i `tests/test_ryddighet.py`: ingen fil under `.agents/` er sporet i git (uten git hoppes den over), og manifestet har bare `claude-code`
+- e) `.gitignore`: delen for Next.js fra malen er tatt bort (`.next/`, `out/`, `.vercel/`, `.turbo/`, `*.tsbuildinfo`, `next-env.d.ts` og loggene for npm, yarn og pnpm, som `*.log` dekker). `node_modules/`, `dist/` og `build/` står. Kommentarene er på norsk, og `test_ryddighet.py` består
+- f) `.env.example` sier at det er tre variabler å sette i `.env`, ikke én, og at en full henting bruker 16 av de 20 kallene
+- **Ville feilet hvis:** en fil under `.agents/` ble lagt inn i git igjen, eller `codex` kom tilbake under `ides` i manifestet
+
+**Avhenger av:** ingen. **Én økt:** ja.
