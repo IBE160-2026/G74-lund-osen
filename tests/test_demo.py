@@ -545,7 +545,11 @@ class TestStory80cIDemoen:
         # tekst, ikke KI-teksten, til prompten faar den i versjon 3. Bare
         # avsnittet med modellens ord tas ut. «Laget av KI» og resten av
         # delen sjekkes som foer.
-        assert detalj.count('<p class="ki-tekst">') == 1
+        # Gjennomgangen, ECH2: BRFE har teksten bare naar raden besto (FR-604).
+        from demo_ki import les_radene
+
+        vist = sum(1 for r in les_radene() if r.emne.symbol == "BRFE" and r.besto)
+        assert detalj.count('<p class="ki-tekst">') == vist
         detalj = re.sub(r'<p class="ki-tekst">.*?</p>', "", detalj, flags=re.DOTALL)
         for html in (oversikt, detalj):
             assert app_modul.UNDER_ARBEID_TEKST in html

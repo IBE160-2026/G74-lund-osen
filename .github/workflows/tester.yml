@@ -247,6 +247,10 @@ jobs:
           sider
           # Fra maskinen, gjennom porten paa 127.0.0.1, som README-en viser (VG4).
           curl -fsS --max-time 5 http://127.0.0.1:8000/ | grep -q Eksempeltall
+          # Story 3.4b (gjennomgangen, ECH7): demo-lag skrev KI-radene fra
+          # src/demo_ki_tekster.json, og aksjesiden viser teksten uten Ollama.
+          docker compose -f $f --profile demo logs demo-lag | grep -q "KI-tekst for "
+          curl -fsS --max-time 5 http://127.0.0.1:8000/aksje/BRFE | grep -q "Laget av KI"
           # Demobasen lages paa nytt mens demoen kjoerer, som README-en sier (VG2).
           docker compose -f $f run --rm demo-lag
           sider

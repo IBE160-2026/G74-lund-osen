@@ -357,7 +357,11 @@ class TestEtterGjennomgangen:
         oversikt = klient.get("/").data.decode("utf-8")
         import re
 
-        symbol = re.search(r'href="/aksje/([A-Z]+)"', oversikt).group(1)
+        assert re.search(r'href="/aksje/([A-Z]+)"', oversikt)
+        # Gjennomgangen, ECH2: en aksje med en tekst som besto (FR-604).
+        from demo_ki import les_radene
+
+        symbol = next(r.emne.symbol for r in les_radene() if r.besto)
         html = klient.get(f"/aksje/{symbol}").data.decode("utf-8")
         assert "Eksempeltall" in html
         assert "Laget av KI · " in html and '<p class="ki-tekst">' in html

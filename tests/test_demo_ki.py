@@ -6,9 +6,7 @@ testene som lager rader, gir en falsk modell. Demobasene ligger i tmp_path
 (regel 22), fordi conftest.py peker DATA_KATALOG dit.
 """
 
-import html
 import json
-import shutil
 import sqlite3
 import subprocess
 import sys
@@ -16,6 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
+from markupsafe import escape
 
 import app as app_modul
 import demo
@@ -149,21 +148,73 @@ class TestDemokommandoen:
             i_basen = SqliteKILogg(tilkobling, demo._klokke_for(demo.SLUTTDATO)).les_alle()
         finally:
             tilkobling.close()
-        assert [(r.emne, r.tekst, r.besto) for r in i_basen] == [(r.emne, r.tekst, r.besto) for r in radene]
+        # Hele raden, ikke bare emnet og teksten (gjennomgangen, BH8).
+        assert i_basen == radene
 
-    def test_importerer_verken_modellen_eller_requests(self):
+    def test_importerer_verken_modellen_eller_requests(self, tmp_path):
         """Ville feilet hvis demo.py eller lesingen i demo_ki.py importerte
         requests, ki_lokal eller ki_tekst, saa demokommandoen kunne naa
         Ollama. Kjoeres i en egen prosess, saa andre tester ikke har lastet
-        modulene foer. eodhd lastes fra foer 3.4b, gjennom lagring_sqlite og
-        lagring_fil, og tolker bare et svar uten aa importere requests."""
+        modulene foer, og prosessen lager ogsaa en demobase i tmp_path, saa
+        modulene sjekkes etter at radene er skrevet (gjennomgangen, BH8).
+        eodhd lastes fra foer 3.4b, gjennom lagring_sqlite og lagring_fil, og
+        tolker bare et svar uten aa importere requests."""
         kode = (
             "import sys; sys.path.insert(0, sys.argv[1]); import demo; "
+            "demo.lag_demobase(__import__('pathlib').Path(sys.argv[2]), skriv=lambda _: None); "
             "print(sorted(m for m in ('requests', 'ki_lokal', 'ki_tekst', 'fetch_prices') if m in sys.modules))"
         )
-        svar = subprocess.run([sys.executable, "-I", "-c", kode, str(SRC)], capture_output=True, text=True, timeout=60)
+        svar = subprocess.run(
+            [sys.executable, "-I", "-c", kode, str(SRC), str(tmp_path / "demo.db")],
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
         assert svar.returncode == 0, svar.stderr
         assert svar.stdout.strip() == "[]", svar.stdout
+        tilkobling = sqlite3.connect(tmp_path / "demo.db")
+        try:
+            assert tilkobling.execute("SELECT COUNT(*) FROM ki_logg").fetchone()[0] == len(demo_ki.les_radene())
+        finally:
+            tilkobling.close()
+
+    def test_en_oedelagt_fil_gir_en_demo_uten_ki_tekst(self, tmp_path, monkeypatch):
+        """NFR-04 (gjennomgangen, BH2 og ECH3): kan fila ikke leses, eller
+        stemmer den ikke med demoen, lages demobasen likevel, uten KI-rader,
+        og kommandoen sier hvorfor. Ville feilet hvis en ødelagt fil stoppet
+        hele demoen, ogsaa i compose."""
+        tilfeller = {
+            "mangler": None,
+            "ikke JSON": "{",
+            "feil format": json.dumps({"format": True, "radene": []}),
+        }
+        innhold = json.loads(demo_ki.FIL.read_text(encoding="utf-8"))
+        annen_dag = json.loads(json.dumps(innhold))
+        annen_dag["radene"][0]["dato"] = "2026-10-08"
+        tilfeller["en annen dag"] = json.dumps(annen_dag)
+        to_like = json.loads(json.dumps(innhold))
+        to_like["radene"].append(to_like["radene"][0])
+        tilfeller["to rader for en aksje"] = json.dumps(to_like)
+        for navn, tekst in tilfeller.items():
+            fil = tmp_path / f"{len(navn)}.json"
+            if tekst is not None:
+                fil.write_text(tekst, encoding="utf-8")
+            monkeypatch.setattr(demo, "les_radene", lambda fil=fil: demo_ki.les_radene(fil))
+            ut: list[str] = []
+            sti = tmp_path / f"demo-{len(navn)}.db"
+            demo.lag_demobase(sti, skriv=ut.append)
+            assert any("Demoen lages uten KI-tekst" in u for u in ut), (navn, ut)
+            tilkobling = sqlite3.connect(sti)
+            try:
+                assert tilkobling.execute("SELECT COUNT(*) FROM ki_logg").fetchone()[0] == 0, navn
+            finally:
+                tilkobling.close()
+
+    def test_en_bom_i_fila_stopper_ikke_demoen(self, tmp_path):
+        """ECH5: en editor kan legge en BOM foerst i fila."""
+        fil = tmp_path / "bom.json"
+        fil.write_bytes(b"\xef\xbb\xbf" + demo_ki.FIL.read_bytes())
+        assert demo_ki.les_radene(fil) == demo_ki.les_radene()
 
 
 class TestAksjesiden:
@@ -175,8 +226,37 @@ class TestAksjesiden:
         rad = next(r for r in radene if r.besto)
         side = klient.get(f"/aksje/{rad.emne.symbol}").data.decode("utf-8")
         assert "Eksempeltall" in side
-        assert f'<p class="ki-tekst">{html.escape(rad.tekst, quote=True)}</p>' in side
+        assert f'<p class="ki-tekst">{escape(rad.tekst)}</p>' in side
         assert f"Laget av KI · {rad.modell}, {rad.tjeneste}." in side
+
+    def test_en_tekst_som_ikke_besto_vises_ikke(self, klient, radene, monkeypatch):
+        """FR-604 (gjennomgangen, BH10 og ECH2): lages tekstene paa nytt, og
+        en ikke bestaar, viser siden grunnen og ikke modellens tekst. Ville
+        feilet hvis demoen viste en tekst som ikke besto kontrollen."""
+        from dataclasses import replace
+
+        rad = next(r for r in radene if r.besto)
+        endret = [replace(r, besto=False, grunn="1: retningen") if r is rad else r for r in radene]
+        monkeypatch.setattr(demo, "les_radene", lambda: endret)
+        demo.lag_demobase(demo_sti(), skriv=lambda _: None)
+        side = klient.get(f"/aksje/{rad.emne.symbol}").data.decode("utf-8")
+        assert escape(rad.tekst) not in side and '<p class="ki-tekst">' not in side
+        assert "teksten sa mer enn regelen" in side
+
+    def test_modellens_tekst_escapes(self, klient, radene, monkeypatch):
+        """Gjennomgangen, BH12: modellens tekst kommer fra en fil i repoet og
+        vises med autoescape i malen. Ville feilet hvis teksten kom ut som
+        HTML."""
+        from dataclasses import replace
+
+        rad = next(r for r in radene if r.besto)
+        farlig = rad.tekst + " <script>x</script> & 'a'"
+        endret = [replace(r, tekst=farlig) if r is rad else r for r in radene]
+        monkeypatch.setattr(demo, "les_radene", lambda: endret)
+        demo.lag_demobase(demo_sti(), skriv=lambda _: None)
+        side = klient.get(f"/aksje/{rad.emne.symbol}").data.decode("utf-8")
+        assert "<script>x</script>" not in side
+        assert f'<p class="ki-tekst">{escape(farlig)}</p>' in side
 
     def test_knappen_skjuler_og_viser_teksten(self, klient, radene):
         """FR-601: «Skjul KI-teksten» tar teksten bort, og «Vis KI-teksten»
@@ -184,7 +264,7 @@ class TestAksjesiden:
         demo.lag_demobase(demo_sti(), skriv=lambda _: None)
         rad = next(r for r in radene if r.besto)
         adresse = f"/aksje/{rad.emne.symbol}"
-        tekst = f'<p class="ki-tekst">{html.escape(rad.tekst, quote=True)}</p>'
+        tekst = f'<p class="ki-tekst">{escape(rad.tekst)}</p>'
         paa = klient.get(adresse).data.decode("utf-8")
         assert tekst in paa and ">Skjul KI-teksten</button>" in paa
         svar = klient.post("/ki", data={"til": "av", "tilbake": adresse})
@@ -238,10 +318,38 @@ class TestLagTekstene:
         demo_ki.lag_tekstene(_Falsk(), tmp_path / "radene.json", skriv=lambda _: None)
         assert not demo_sti().exists()
 
-    def test_rundtur_gjennom_fila(self, radene, tmp_path):
-        """Ville feilet hvis et felt falt bort mellom raden og fila."""
-        fil = tmp_path / "kopi.json"
-        shutil.copy(demo_ki.FIL, fil)
-        innhold = {"format": demo_ki.FORMAT, "radene": [demo_ki.til_json(r) for r in radene]}
-        fil.write_text(json.dumps(innhold, ensure_ascii=False), encoding="utf-8")
-        assert demo_ki.les_radene(fil) == radene
+    def test_rundtur_gjennom_fila(self, radene):
+        """Ville feilet hvis et felt falt bort mellom raden og fila: hvert
+        felt i KIRad utenom emnet og grunnlaget staar i FELTENE, og radene
+        skrevet paa nytt er de samme som det som staar i fila, tegn for tegn
+        i JSON (gjennomgangen, BH7)."""
+        from dataclasses import fields
+
+        from kilogg import KIRad
+
+        assert set(demo_ki.FELTENE) == {f.name for f in fields(KIRad)} - {"emne", "grunnlag"}
+        i_fila = json.loads(demo_ki.FIL.read_text(encoding="utf-8"))["radene"]
+        assert [demo_ki.til_json(r) for r in radene] == i_fila
+
+    def test_en_kjoering_som_ikke_er_hel_skriver_ikke_fila(self, tmp_path):
+        """Gjennomgangen, BH4, ECH1 og VG4: svarer ikke modellen, eller feiler
+        den for en aksje, staar den gamle fila. Ville feilet hvis
+        lag_tekstene skrev over fila med en tom eller avkortet liste."""
+        from ki_modell import ModellFeilet
+
+        class Feiler(_Falsk):
+            def lag_tekst(self, prompt):
+                self.kall += 1
+                raise ModellFeilet("Ollama svarer ikke (kjoerer den?)")
+
+        class IkkeKlar(_Falsk):
+            def sjekk(self):
+                return "Ollama svarer ikke (kjoerer den?)"
+
+        fil = tmp_path / "radene.json"
+        fil.write_text("den gamle", encoding="utf-8")
+        for modell in (Feiler(), IkkeKlar()):
+            with pytest.raises(demo_ki.UgyldigDemoKI, match="ikke endret"):
+                demo_ki.lag_tekstene(modell, fil, skriv=lambda _: None)
+            assert fil.read_text(encoding="utf-8") == "den gamle"
+            assert not fil.with_name(fil.name + ".ny").exists()

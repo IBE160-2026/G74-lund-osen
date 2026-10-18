@@ -16,9 +16,16 @@ EODHD. Ingen ny runde for aa faa en bedre tekst (FR-604): bestaar en tekst
 ikke kontrollen, staar raden som den ble.
 
 Hver rad har et avtrykk av grunnlaget (sha256 av grunnlaget som JSON med
-sorterte noekler). Avtrykket viser at grunnlaget ikke er endret i fila, og
-testene krever at grunnlaget stemmer med demodagen, saa en endret demo gjoer
-testene roede til tekstene lages paa nytt.
+sorterte noekler). Avtrykket fanger et grunnlag som er endret ved et uhell,
+ikke et som er endret med vilje: avtrykket kan regnes paa nytt, og det dekker
+ikke teksten (gjennomgangen, BH6 og ECH4). Det som binder radene til demoen,
+er testene: grunnlaget maa stemme med demodagen, saa en endret demo gjoer
+testene roede til tekstene lages paa nytt, og kontrollen kjoeres paa nytt paa
+hver tekst som er merket bestaatt.
+
+Gir kommandoen ikke en hel kjoering, én rad per aksje med vurdering og ingen
+der modellen feilet, skrives fila ikke, og den gamle staar. Fila skrives til
+en egen fil og byttes inn med os.replace (gjennomgangen, BH4, ECH1 og VG4).
 
 Lesingen og skrivingen i demobasen importerer verken requests, ki_lokal
 eller ki_tekst. De importeres bare inne i lag_tekstene.
@@ -26,6 +33,7 @@ eller ki_tekst. De importeres bare inne i lag_tekstene.
 
 import hashlib
 import json
+import os
 import sqlite3
 import sys
 import tempfile
@@ -97,10 +105,27 @@ def fra_json(verdi: dict) -> KIRad:
 
 def les_radene(fil: Path = FIL) -> list[KIRad]:
     """Radene i fila, i den rekkefoelgen de ble laget."""
-    innhold = json.loads(Path(fil).read_text(encoding="utf-8"))
-    if not isinstance(innhold, dict) or innhold.get("format") != FORMAT or not isinstance(innhold.get("radene"), list):
+    # utf-8-sig, saa en BOM fra en editor ikke stopper demoen (ECH5).
+    innhold = json.loads(Path(fil).read_text(encoding="utf-8-sig"))
+    format_ = innhold.get("format") if isinstance(innhold, dict) else None
+    # type(...) is int, saa true og 1.0 ikke godtas som 1 (ECH5).
+    if type(format_) is not int or format_ != FORMAT or not isinstance(innhold.get("radene"), list):
         raise UgyldigDemoKI(f"{Path(fil).name} har ikke format {FORMAT} med en liste radene")
     return [fra_json(verdi) for verdi in innhold["radene"]]
+
+
+def sjekk_radene(radene: list[KIRad], dag: date, symboler: set[str]) -> None:
+    """Hver rad gjelder dag og en aksje i demoen, og ingen aksje har to.
+    Reiser UgyldigDemoKI ellers (gjennomgangen, BH3, ECH3 og ECH5)."""
+    sett: set[str] = set()
+    for rad in radene:
+        if rad.emne.dato != dag:
+            raise UgyldigDemoKI(f"raden for {rad.emne.symbol} gjelder {rad.emne.dato}, ikke {dag}")
+        if rad.emne.symbol not in symboler:
+            raise UgyldigDemoKI(f"{rad.emne.symbol} er ikke en aksje i demoen")
+        if rad.emne.symbol in sett:
+            raise UgyldigDemoKI(f"{rad.emne.symbol} har to rader")
+        sett.add(rad.emne.symbol)
 
 
 def skriv_radene(tilkobling: sqlite3.Connection, radene: list[KIRad], klokke: Callable[[], datetime]) -> int:
@@ -136,6 +161,8 @@ def lag_tekstene(modell, fil: Path = FIL, skriv: Callable[[str], None] = print) 
     """
     import demo
     from ki_tekst import lag_ki_tekster
+    from lagring_sqlite import SqliteVurderingslager
+    from vurderingsdata import Vurdering
 
     dag = demo.SLUTTDATO
     klokke = demo._klokke_for(dag)
@@ -143,20 +170,33 @@ def lag_tekstene(modell, fil: Path = FIL, skriv: Callable[[str], None] = print) 
     with tempfile.TemporaryDirectory() as mappe:
         base = Path(mappe) / "demo.db"
         demo.lag_demobase(base, skriv=lambda _: None, med_ki=False)
-        lag_ki_tekster(base, dag, klokke, med_tid, skriv, lista=demo.DEMOUNIVERS)
+        klar = lag_ki_tekster(base, dag, klokke, med_tid, skriv, lista=demo.DEMOUNIVERS)
         tilkobling = sqlite3.connect(base)
         try:
-            radene = [r for r in SqliteKILogg(tilkobling, klokke).les_alle() if r.emne.dato == dag]
+            lager = SqliteVurderingslager(tilkobling, klokke, demo.DEMOUNIVERS)
+            ventet = {a.symbol for a in demo.DEMOUNIVERS if isinstance(lager.les(a.symbol, dag), Vurdering)}
+            # Bare rader for en aksje paa dagen (gjennomgangen, BH5).
+            radene = [
+                r for r in SqliteKILogg(tilkobling, klokke).les_alle() if r.emne.dato == dag and r.emne.slag == AKSJE
+            ]
         finally:
             tilkobling.close()
-    innhold = {"format": FORMAT, "radene": [til_json(rad) for rad in radene]}
-    Path(fil).write_text(json.dumps(innhold, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    tider = ""
     if med_tid.tider:
-        skriv(
-            f"{len(radene)} rader i {Path(fil).name}: {sum(r.besto for r in radene)} besto kontrollen. "
-            f"Tiden per tekst: {min(med_tid.tider):.1f}-{max(med_tid.tider):.1f} s, "
-            f"i alt {sum(med_tid.tider):.1f} s."
+        tider = (
+            f"Tiden per tekst: {min(med_tid.tider):.1f}-{max(med_tid.tider):.1f} s, i alt {sum(med_tid.tider):.1f} s."
         )
+    feilet = [r.emne.symbol for r in radene if r.modellen_feilet]
+    if not klar or {r.emne.symbol for r in radene} != ventet or feilet:
+        grunn = f"ikke en hel kjoering: {len(radene)} rader av {len(ventet)}"
+        if feilet:
+            grunn += f", og modellen feilet for {', '.join(feilet)}"
+        raise UgyldigDemoKI(f"{grunn}. {Path(fil).name} er ikke endret. {tider}".rstrip())
+    innhold = {"format": FORMAT, "radene": [til_json(rad) for rad in radene]}
+    ny = Path(fil).with_name(Path(fil).name + ".ny")
+    ny.write_text(json.dumps(innhold, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    os.replace(ny, fil)
+    skriv(f"{len(radene)} rader i {Path(fil).name}: {sum(r.besto for r in radene)} besto kontrollen. {tider}".rstrip())
     return radene
 
 
@@ -172,7 +212,11 @@ def main(argv: list[str] | None = None) -> None:
     if grunn := modell.sjekk():
         print(f"Ingen KI-tekster: {grunn}. Fila er ikke endret.")
         sys.exit(1)
-    lag_tekstene(modell)
+    try:
+        lag_tekstene(modell)
+    except UgyldigDemoKI as feil:
+        print(f"Ingen nye KI-tekster: {feil}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

@@ -69,7 +69,7 @@ from zoneinfo import ZoneInfo
 
 import lagring_sqlite
 from boersdag import er_boersdag
-from demo_ki import les_radene, skriv_radene
+from demo_ki import les_radene, sjekk_radene, skriv_radene
 from indeksdata import Indeks
 from kursdata import Aksje, Kursrad
 from lagring_sqlite import (
@@ -260,11 +260,12 @@ def lag_demobase(sti: Path, skriv=print, med_ki: bool = True) -> None:
             f"{sti.name} finnes og er ikke en demobase. Demokommandoen skriver "
             "aldri til en base uten demomerket (FR-411)."
         )
+    radene = _ki_radene(skriv) if med_ki else []
     ny = sti.with_name(sti.name + ".ny")
     for rest in _med_hjelpefiler(ny):
         rest.unlink(missing_ok=True)
     try:
-        _bygg(ny, med_ki)
+        _bygg(ny, radene)
     except BaseException:
         for rest in _med_hjelpefiler(ny):
             rest.unlink(missing_ok=True)
@@ -278,6 +279,22 @@ def lag_demobase(sti: Path, skriv=print, med_ki: bool = True) -> None:
         f"{len(dager)} handelsdager fra {dager[0]} til {dager[-1]}. Eksempeltall, "
         "ikke data fra Oslo Børs. Ingen nettkall."
     )
+    if radene:
+        skriv(f"KI-tekst for {len(radene)} aksjer paa siste dag, fra demo_ki_tekster.json. Ingen kall til modellen.")
+
+
+def _ki_radene(skriv) -> list:
+    """KI-radene fra fila, sjekket mot demoen. Kan fila ikke leses, eller
+    stemmer den ikke, lages demoen uten KI-tekst og sier hvorfor, som
+    hentingen (NFR-04): KI-laget stopper aldri demoen (gjennomgangen, BH2 og
+    ECH3)."""
+    try:
+        radene = les_radene()
+        sjekk_radene(radene, SLUTTDATO, {a.symbol for a in DEMOUNIVERS})
+    except (OSError, ValueError) as feil:
+        skriv(f"KI-tekstene i demoen kunne ikke leses ({type(feil).__name__}: {feil}). Demoen lages uten KI-tekst.")
+        return []
+    return radene
 
 
 def _med_hjelpefiler(sti: Path) -> list[Path]:
@@ -285,7 +302,7 @@ def _med_hjelpefiler(sti: Path) -> list[Path]:
     return [sti, *(sti.with_name(sti.name + ending) for ending in ("-journal", "-wal", "-shm"))]
 
 
-def _bygg(sti: Path, med_ki: bool = True) -> None:
+def _bygg(sti: Path, radene: list | None = None) -> None:
     """Skriver hele demobasen i sti, som ikke finnes fra foer."""
     tilkobling = aapne_base(sti)
     try:
@@ -321,9 +338,12 @@ def _bygg(sti: Path, med_ki: bool = True) -> None:
                 fram_til = [r for r in serier[aksje.symbol] if r.dato <= dag]
                 lager.skriv(aksje.symbol, dag, vurder(fram_til, dag))
 
-        # Story 3.4b: KI-radene for siste demodag, fra fila.
-        if med_ki:
-            skriv_radene(tilkobling, les_radene(), _klokke_for(SLUTTDATO))
+        # Story 3.4b: KI-radene for siste demodag, fra fila. Alle skal skrives
+        # (gjennomgangen, BH3): sjekk_radene har sett at hver aksje har én.
+        if radene:
+            skrevet = skriv_radene(tilkobling, radene, _klokke_for(SLUTTDATO))
+            if skrevet != len(radene):
+                raise RuntimeError(f"{skrevet} av {len(radene)} KI-rader ble skrevet i demobasen")
     finally:
         tilkobling.close()
 
