@@ -533,6 +533,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-18 kl. 21:42 (gruppens svar):* bildet av oversikten tas høyere, så hele gruppen «Skilte seg ut» i tabellen er med, og PR #70 flettes etter det. Grunnen: i 1280 × 1000 slutter bildet der tabellen begynner, så signalstyrken og fargene per aksje er ikke med.
 
+*Avgjort 2026-10-18 kl. 21:03 (gruppens svar):* hullet i kontrollen fra 3.4b rettes før byggestoppen mandag 19.10 kl. 20:40, så uka med logget drift går med den rettede kontrollen. Kontrollen i FR-603 leser da retningen og styrken også i formene Gemma skriver, som «Dette signalet er Negativt», «av typen Ingen» og «av styrke tre» (spesifikasjonen 10.2d). Prompten står, versjon 2.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -2496,6 +2498,8 @@ starter ikke av seg selv.
 *Lagt til 2026-10-16:* prompten versjon 2 (PR H, 10.2c) er flettet i `cafe067`, PR #55, etter gruppens ja kl. 23:51. CI var grønn på head-en `f3e52bd` (kjøring 38972334506). I prøvekjøringen 16.10 kl. 23:43–23:44 (`malinger.md` §34) besto 15 av 15 tekster, mot 6 med versjon 1 (§32), og modellen feilet for 0. Mandagens henting går med versjon 2, så reserven med `OSE_KI_TJENESTE=av` fra beslutningen kl. 22:33 trengs ikke. Med PR E, F og H er kontrollpunktene i storyen oppfylt, og 10-2 er done. Innstrammingen av kontrollen fra beslutningen kl. 23:51 under er en egen liten PR, ført i `deferred-work.md`.
 
 *Avgjort 2026-10-16, gruppens beslutninger kl. 23:51 (svarene på de to spørsmålene fra instruksjonen kl. 23:35):* 1) Kontrollen strammes inn i en liten PR neste uke: et «fordi»-ledd må nevne en av sjekkene, ellers stoppes teksten. Føres også i `deferred-work.md`. 2) En ny promptversjon flettes når den består minst like mange tekster som versjonen før, i en prøvekjøring på samme dags data, og ingen tekst gjetter på en årsak utenfor regelen.
+
+*Avgjort 2026-10-18 kl. 21:03 (gruppens svar):* hullet i kontrollen fra 3.4b rettes før byggestoppen mandag 19.10 kl. 20:40, så uka med logget drift går med den rettede kontrollen. Kontrollen i FR-603 leser da retningen og styrken også i formene Gemma skriver, som «Dette signalet er Negativt», «av typen Ingen» og «av styrke tre» (spesifikasjonen 10.2d). Prompten står, versjon 2.
 
 ### Story 10.3: Visningen i aksjedetaljen
 

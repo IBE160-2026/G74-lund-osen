@@ -55,6 +55,8 @@ context:
 
 - **Kontrollen i FR-603 slipper gjennom en feil retning skrevet som «Dette signalet er Positivt».** Funnet da mutant K2 ble laget: `kontroller("Dette signalet er Positivt, fordi alle sjekkene ga et positivt utslag.", grunnlaget for BRFE)` gir `besto=True`, selv om retningen er Negativ. «Retningen er Positiv» blir fanget. Hullet er i `ki_kontroll.py` fra før, og gjelder også den ekte versjonen. Alle de 13 tekstene i demoen har riktig retning, sjekket for hånd. Ikke rettet her, fordi det endrer kontrollen for alle tekster.
 
+*Lagt til 2026-10-18 (gruppens svar kl. 21:03):* hullet rettes i spesifikasjonen 10.2d under story 10.2, før byggestoppen mandag 19.10 kl. 20:40, så uka med logget drift går med den rettede kontrollen.
+
 ## Mutantene
 
 Én om gangen med `-x` på `tests/test_demo_ki.py`, i en fersk klon med `core.autocrlf=false`, med kopi av fila før og sha256 mot HEAD etter hver, og `git status` tom etter hver. K1–K3 er fra instruksjonen. K4–K6 er for funnene med dom medium. Alle seks ble fanget på `c06e8e4`, og K1–K3 også på `c0aefc6`:
