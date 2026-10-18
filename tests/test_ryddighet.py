@@ -242,3 +242,28 @@ def test_ides_leses_i_formene_en_installasjon_skriver():
     assert ides("﻿ides:\n  - claude-code\n") == ["claude-code"]
     assert ides("ides:\n  - claude-code\t# x\n---\n") == ["claude-code"]
     assert ides("ides:\r\n  - claude-code\r\n  - codex\r\n") == ["claude-code", "codex"]
+
+
+def _avsnitt(tekst: str, overskrift: str) -> str:
+    """Teksten under «## overskrift» til neste overskrift paa samme nivaa."""
+    start = tekst.index(f"\n## {overskrift}\n")
+    slutt = tekst.find("\n## ", start + 1)
+    return tekst[start : slutt if slutt != -1 else None]
+
+
+def test_mappestrukturen_nevner_bmad_og_claude_skills_ikke_agents():
+    """Story 9.8, punkt c (VG5 i gjennomgangen). Ville feilet hvis
+    «Mappestruktur» i README-en nevnte .agents/ igjen, eller ikke lenger
+    nevnte _bmad/ og .claude/skills/ (regel 19)."""
+    del_ = _avsnitt((ROT / "README.md").read_text(encoding="utf-8"), "Mappestruktur")
+    assert "`_bmad/` og `.claude/skills/` — BMAD-rammeverket" in del_
+    assert ".agents" not in del_
+
+
+def test_lekkasjesjekken_unntar_ikke_agents():
+    """Story 9.8, punkt c (VG5). Ville feilet hvis .agents/ kom tilbake i
+    unntaket for .csv, .json og .jsonl i morgensjekken."""
+    kilde = (ROT / ".github" / "scripts" / "morgensjekk.py").read_text(encoding="utf-8")
+    unntak = re.findall(r'"\.jsonl"\) and not f\.startswith\(\(([^)]*)\)\)', kilde)
+    assert unntak == ['".claude/", "_bmad/"']
+    assert ".agents" not in kilde
