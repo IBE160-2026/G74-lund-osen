@@ -1995,6 +1995,8 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 
 *Avgjort 2026-10-18 kl. 14:48 (gruppens svar, under instruksjonen kl. 12:23):* README-PR-en med bildene og rettelsene fra gjennomgangen 16.10 (`spec-3-3c-kom-i-gang-bilder-og-demoen-foerst.md`). «Står du fast?» kan ha høyst 10 spørsmål, ikke 8 som fra 11.10 kl. 22:32. Grensen på 65 ord per steg står for teksten i steget. Teksten under et bilde telles for seg, høyst 25 ord. Forklaringen av hvordan en kommando kopieres, står én gang, i et kort avsnitt rett før det første steget med en kommando, og hvert steg med en kommando sier bare at den limes inn i PowerShell-vinduet fra steg 4. Blir et steg fortsatt over 65 ord, flyttes detaljene til `docs/hjelp.md` med en lenke fra steget.
 
+*Lagt til 2026-10-18 kl. 15:41:* tre skjermbilder i «Kom i gang», demoen først og fire rettelser fra gjennomgangen 16.10, flettet i `fdaf403`, PR #66 (spesifikasjonen `spec-3-3c-kom-i-gang-bilder-og-demoen-foerst.md`), etter gruppens ja kl. 15:35. CI var grønn på head-en `87e4f8e` (kjøring 39132413724) og på main (39132517882). Svarene på spørsmålene kl. 15:12 står i instruksjonen kl. 15:37: lenkene i «Til faglærer» kommer i README-ryddingen, og ryddingen tar «Står du fast?» ned til fem spørsmål, med svarene om mellomrommet etter `cd` og «Cannot find path» blant dem. Grensen på 10 gjelder bare til ryddingen. Instruksjonen sier at dette følger av beslutningene 16.10 og av gruppens svar kl. 21:56 og 21:57. De to svarene er ikke ført i repoet. Dagsfila 16.10 og `epics.md` nevner svaret kl. 21:57 bare ved rekkefølgen (beslutningen kl. 21:16), og de sier ikke hvilke fem spørsmål ryddingen beholder.
+
 ### Story 3.4: Demoversjonen
 
 *Lagt til 2026-10-03, Marians beslutning kl. 18:10.*

@@ -2,7 +2,7 @@
 title: 'Story 3.3c: tre bilder i «Kom i gang», demoen først og fire rettelser'
 type: 'docs'
 created: '2026-10-18'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '2e2bcca'
@@ -49,6 +49,10 @@ context:
 
 - **«Til faglærer» (VG9, ECH3):** beslutningen 16.10 kl. 21:16 under story 3.3 sier også at «Til faglærer» får lenker til demoen, den ekte versjonen og testene, og at det bygges i README-PR-en søndag 18.10. Instruksjonen kl. 12:23 nevner det ikke, så det er ikke bygget her (regel 9). Spørsmål til gruppen: i denne PR-en, eller i PR-en som rydder README-en?
 - **Antallet spørsmål under «Står du fast?» (ECH4, regel 12):** beslutningen 16.10 kl. 21:53–21:58 sier «fem spørsmål under «Står du fast?»» i PR-en som rydder README-en, og svar 1 kl. 14:48 sier høyst 10. Her står 10. Hvilken som gjelder for oppryddingen, er åpent.
+
+*Besvart 2026-10-18 kl. 15:41:* Svarene på spørsmålene kl. 15:12 står i instruksjonen kl. 15:37: lenkene i «Til faglærer» kommer i README-ryddingen, og ryddingen tar «Står du fast?» ned til fem spørsmål, med svarene om mellomrommet etter `cd` og «Cannot find path» blant dem. Grensen på 10 gjelder bare til ryddingen. Instruksjonen sier at dette følger av beslutningene 16.10 og av gruppens svar kl. 21:56 og 21:57. De to svarene er ikke ført i repoet. Dagsfila 16.10 og `epics.md` nevner svaret kl. 21:57 bare ved rekkefølgen (beslutningen kl. 21:16), og de sier ikke hvilke fem spørsmål ryddingen beholder.
+
+*Lagt til 2026-10-18 kl. 15:41:* PR #66 er squash-flettet i `fdaf403` etter gruppens ja kl. 15:35, låst til head-en `87e4f8e`, etter at main var flettet inn. CI var grønn på head-en `cc81746` (39130420619), på `87e4f8e` (39132413724) og på main (39132517882). Triagen står som kommentar i PR #66.
 
 ## Mutantene
 
