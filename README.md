@@ -181,39 +181,41 @@ Volumene står når du bytter, også basen med vurderingene.
 
 Med Python 3.13 og [uv](https://docs.astral.sh/uv/). Først demoen.
 
-Installer avhengighetene:
+**Demoen**
+
+1. Installer avhengighetene:
 
 ```
 uv sync
 ```
 
-Lag demobasen, `data/db/demo.db`:
+2. Lag demobasen, `data/db/demo.db`:
 
 ```
 uv run python src/demo.py
 ```
 
-Start demoen på http://127.0.0.1:5000:
+3. Start demoen på http://127.0.0.1:5000:
 
 ```
 uv run python src/app.py --demo
 ```
 
-Så den ekte versjonen.
+**Den ekte versjonen**
 
-Bare første gang: kopier malen, og fyll inn `EODHD_API_KEY` i `.env`.
+1. Bare første gang: kopier malen, og fyll inn `EODHD_API_KEY` i `.env`:
 
 ```
 cp .env.example .env
 ```
 
-Hent kurser:
+2. Hent kurser:
 
 ```
 uv run python src/fetch_prices.py
 ```
 
-Start webserveren på http://127.0.0.1:5000:
+3. Start webserveren på http://127.0.0.1:5000:
 
 ```
 uv run python src/app.py

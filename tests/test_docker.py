@@ -1270,6 +1270,33 @@ class TestReadmeForNybegynnere:
             "Den lokale modellen (KI-teksten)",
         }
 
+    def test_uv_delen_er_to_nummererte_lister(self):
+        """Story 3.3d, punkt c: uv-delen under «Mer for den som vil» er to
+        korte nummererte lister, «Demoen» og «Den ekte versjonen», med én
+        linje før hver boks. Kommandoene er de samme som før 3.3d. Ville
+        feilet hvis en liste manglet, et punkt fikk mer enn én linje, eller
+        en kommando ble endret."""
+        uv = _detaljer(_seksjon("Mer for den som vil"))["Uten Docker, med uv"]
+        forventet = {
+            "Demoen": ["uv sync", "uv run python src/demo.py", "uv run python src/app.py --demo"],
+            "Den ekte versjonen": [
+                "cp .env.example .env",
+                "uv run python src/fetch_prices.py",
+                "uv run python src/app.py",
+            ],
+        }
+        assert uv.index("**Demoen**\n\n") < uv.index("**Den ekte versjonen**\n\n")
+        demo, ekte = uv.split("**Demoen**\n\n", 1)[1].split("**Den ekte versjonen**\n\n", 1)
+        ekte = ekte.split("\n\nBasen, demobasen", 1)[0]
+        for navn, liste in (("Demoen", demo), ("Den ekte versjonen", ekte)):
+            punkter = re.findall(r"^(\d+)\. ([^\n]+)\n\n```\n([^\n]+)\n```$", liste, re.MULTILINE)
+            assert [int(n) for n, _, _ in punkter] == list(range(1, len(forventet[navn]) + 1)), (navn, punkter)
+            assert [k for _, _, k in punkter] == forventet[navn], navn
+            assert all(linje.endswith(":") for _, linje, _ in punkter), navn
+            # Ingenting annet i lista enn punktene og boksene.
+            rest = re.sub(r"^\d+\. [^\n]+\n\n```\n[^\n]+\n```$", "", liste, flags=re.MULTILINE)
+            assert not rest.strip(), (navn, rest)
+
     def test_svarene_beholdt_innholdet(self):
         """Gjennomgangen 11.10 (VG): bare overskriftene ble sjekket etter
         flyttingen. Innholdet fra svarene foer 22:32 staar i README-en eller
