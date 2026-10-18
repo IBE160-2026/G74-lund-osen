@@ -79,6 +79,10 @@ Kommandoene skrives i PowerShell eller Terminal, ikke i Docker Desktop. Docker D
 
 `cd` betyr «gå til mappe», og kommandoene etter steg 4 virker bare fra mappa med koden. Når det har gått bra, står `G74-lund-osen-main` rett før `>` (Windows) eller `%` (Mac) på linja som venter.
 
+### Står det .zip til slutt i linja.
+
+Du har dratt inn ZIP-fila, ikke mappa. Dra mappa du pakket ut i steg 2, ikke ZIP-fila. Står det `.zip` til slutt i linja før du har trykket Enter, trykker du Esc, så linja blir tom, og skriver `cd` og et mellomrom på nytt. Dra så mappa inn i vinduet. På Windows har ZIP-fila en glidelås på ikonet.
+
 ### Mappa lar seg ikke dra inn i vinduet.
 
 PowerShell er trolig åpnet som administrator, og da sperrer Windows dra og slipp. Lukk vinduet og åpne PowerShell på vanlig måte (steg 3).
