@@ -277,7 +277,7 @@ Under arbeid, og ingenting er endelig.
 
 - Hentingen av kurser fra kl. 21 på børsdager, med kontroll av børsdagen, og at hovedindeksen hentes i samme kjøring
 - Nye forsøk med kallene som er igjen etter hentingen
-- Docker, og demoen, som viser alle 10 fargekombinasjonene av de tre sjekkene på siste dag
+- Docker, og demoen, som viser alle 10 fargekombinasjonene av de tre sjekkene på siste dag, og KI-teksten på aksjesiden, laget én gang med Gemma
 - Denne README-en, med bilder i «Kom i gang» og demoen først, og hjelp bak «?» på sidene
 - Tydeligere merking i tabellene, datoene og månedsmerkene i grafen, oversikten fra designforslaget, utseendet fra designforslaget, og sortering ved klikk i kolonneraden
 - Hovedindeksen, som vises over tabellen på forsiden, med søylene under, og som en stiplet linje i kursgrafen på aksjesiden
@@ -286,7 +286,6 @@ Under arbeid, og ingenting er endelig.
 
 **Neste**
 
-- KI-tekstene i demoen
 - Min liste
 - Historikken og signaldagene i grafen
 - Lenkene til selskapets side på NewsWeb og selskapets egen nettside

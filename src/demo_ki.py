@@ -142,7 +142,7 @@ def lag_tekstene(modell, fil: Path = FIL, skriv: Callable[[str], None] = print) 
     med_tid = _MedTid(modell)
     with tempfile.TemporaryDirectory() as mappe:
         base = Path(mappe) / "demo.db"
-        demo.lag_demobase(base, skriv=lambda _: None)
+        demo.lag_demobase(base, skriv=lambda _: None, med_ki=False)
         lag_ki_tekster(base, dag, klokke, med_tid, skriv, lista=demo.DEMOUNIVERS)
         tilkobling = sqlite3.connect(base)
         try:

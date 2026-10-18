@@ -1608,14 +1608,16 @@ class TestReadmeForNybegynnere:
             "ruff",
             "den oppdaterte kvalitetssikringen",
             "uten kopien av bmad-skillene",
+            # Story 3.4b: KI-teksten i demoen er flettet.
+            "ki-teksten på aksjesiden, laget én gang med gemma",
         ):
             assert sak in ferdig, sak
         assert "resten av KI-laget" not in status and "Selve teksten lages ikke ennå" not in status
         # «Neste» foelger rekkefoelgen under «Prioritering» i epics.md etter
         # svarene 18.10 kl. 00:39 og 11:20, med KI-tekstene i demoen og Min
         # liste foerst. Ett punkt per sak, i den rekkefoelgen.
+        # Story 3.4b: KI-tekstene i demoen er flyttet til «Ferdig».
         saker = (
-            "ki-tekstene i demoen",
             "min liste",
             "historikken og signaldagene",
             "selskapets side på newsweb",

@@ -48,6 +48,11 @@ dagen, saa indeksen foelger demoaksjene. Den har en rad for hver demodag og
 lagres med SqliteIndekslager i tabellen indeks, ikke i aksje eller kurs, saa
 «x av N» ikke teller den. Volumet er summen av volumet for aksjene med kurs.
 
+KI-tekstene (story 3.4b): radene for siste demodag ligger ferdige i
+src/demo_ki_tekster.json, laget én gang med Gemma (demo_ki.py). Kommandoen
+leser fila og skriver radene i KI-loggen med klokka stilt paa SLUTTDATO, saa
+aksjesiden viser KI-teksten uten Ollama og uten nett.
+
 Merket: PRAGMA application_id = DEMOMERKE. Bare denne kommandoen setter det.
 Kommandoen nekter en fil uten merket, ogsaa en tom fil, og lager en demobase
 paa nytt fra bunnen. Hentingen nekter en base med merket.
@@ -64,6 +69,7 @@ from zoneinfo import ZoneInfo
 
 import lagring_sqlite
 from boersdag import er_boersdag
+from demo_ki import les_radene, skriv_radene
 from indeksdata import Indeks
 from kursdata import Aksje, Kursrad
 from lagring_sqlite import (
@@ -234,8 +240,11 @@ class IkkeEnDemobase(Exception):
     """Fila finnes og har ikke demomerket. Demokommandoen roerer den ikke."""
 
 
-def lag_demobase(sti: Path, skriv=print) -> None:
+def lag_demobase(sti: Path, skriv=print, med_ki: bool = True) -> None:
     """Lager demobasen i sti. En demobase som finnes, lages paa nytt.
+
+    med_ki=False lager den uten KI-radene. Bare demo_ki.py bruker det, naar
+    tekstene lages paa nytt (story 3.4b).
 
     Reiser IkkeEnDemobase hvis fila finnes uten merket, ogsaa naar den er tom,
     foer noe er skrevet (FR-411, AD-7).
@@ -255,7 +264,7 @@ def lag_demobase(sti: Path, skriv=print) -> None:
     for rest in _med_hjelpefiler(ny):
         rest.unlink(missing_ok=True)
     try:
-        _bygg(ny)
+        _bygg(ny, med_ki)
     except BaseException:
         for rest in _med_hjelpefiler(ny):
             rest.unlink(missing_ok=True)
@@ -276,7 +285,7 @@ def _med_hjelpefiler(sti: Path) -> list[Path]:
     return [sti, *(sti.with_name(sti.name + ending) for ending in ("-journal", "-wal", "-shm"))]
 
 
-def _bygg(sti: Path) -> None:
+def _bygg(sti: Path, med_ki: bool = True) -> None:
     """Skriver hele demobasen i sti, som ikke finnes fra foer."""
     tilkobling = aapne_base(sti)
     try:
@@ -311,6 +320,10 @@ def _bygg(sti: Path) -> None:
             for aksje in DEMOUNIVERS:
                 fram_til = [r for r in serier[aksje.symbol] if r.dato <= dag]
                 lager.skriv(aksje.symbol, dag, vurder(fram_til, dag))
+
+        # Story 3.4b: KI-radene for siste demodag, fra fila.
+        if med_ki:
+            skriv_radene(tilkobling, les_radene(), _klokke_for(SLUTTDATO))
     finally:
         tilkobling.close()
 
