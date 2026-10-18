@@ -951,6 +951,24 @@ class TestReadmeForNybegynnere:
         assert "Dra mappa du pakket ut i steg 2, ikke ZIP-fila." in svar
         assert "Står det `.zip` til slutt i linja" in svar and "trykker du Esc" in svar
 
+    def test_svaret_om_mellomrommet_etter_cd(self):
+        """Story 3.3c, rettelse b: i gjennomgangen 16.10 ga `cd"C:\\..."`
+        feilen «The term 'cdC:\\...' is not recognized as the name of a
+        cmdlet». Spoersmaalet staar under «Står du fast?» og i docs/hjelp.md
+        under «Steg 4: mappa», med samme svar. Ville feilet hvis svaret om
+        mellomrommet falt bort."""
+        sporsmaal = "«is not recognized as the name of a cmdlet» etter cd."
+        svar = _detaljer(_faq())[sporsmaal]
+        assert svar.startswith("Det mangler mellomrom etter `cd`.")
+        assert "(steg 4)" in svar
+        steg4 = _hjelp().split("\n## Steg 4: mappa\n", 1)[1].split("\n## ", 1)[0]
+        assert re.search(rf"^### {re.escape(sporsmaal)}$", steg4, re.MULTILINE)
+        i_hjelp = steg4.split(f"### {sporsmaal}\n\n", 1)[1].split("\n\n", 1)[0]
+        assert i_hjelp.startswith(svar.strip())
+        # «docker» er ikke gjenkjent har sitt eget svar, som står.
+        assert "«docker» er ikke gjenkjent" in i_hjelp
+        assert "### «docker» er ikke gjenkjent, eller «command not found: docker»." in _hjelp()
+
     def test_stegene_nevner_powershell_og_terminal(self):
         steg = _steg("Felles for begge", 3)
         assert "PowerShell" in steg and "Terminal" in steg and "ikke ISE" in steg
@@ -980,12 +998,16 @@ class TestReadmeForNybegynnere:
         uten_detaljer = re.sub(r"<details>.*?</details>", "", _kom_i_gang(), flags=re.DOTALL)
         assert advarsel in uten_detaljer
 
-    def test_staar_du_fast_har_hoeyst_8_spoersmaal(self):
+    def test_staar_du_fast_har_hoeyst_10_spoersmaal(self):
         """22:32: FAQ-en var for lang. Hoeyst 8 spoersmaal, hvert som
-        <details> med <summary>, og en lenke til docs/hjelp.md."""
+        <details> med <summary>, og en lenke til docs/hjelp.md.
+
+        Story 3.3c (svar 1 18.10 kl. 14:48): hoeyst 10, for svarene om
+        mellomrommet etter cd og «Cannot find path» fra gjennomgangen 16.10.
+        Het test_staar_du_fast_har_hoeyst_8_spoersmaal til 3.3c."""
         faq = _faq()
         sporsmaal = _detaljer(faq)
-        assert 1 <= len(sporsmaal) <= 8
+        assert 1 <= len(sporsmaal) <= 10
         assert faq.count("<details>") == faq.count("</details>") == faq.count("<summary>") == len(sporsmaal)
         rest = re.sub(r"<details>.*?</details>", "", faq, flags=re.DOTALL)
         assert [l for l in rest.splitlines() if l.strip()] == [

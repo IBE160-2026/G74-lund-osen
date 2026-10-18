@@ -128,6 +128,13 @@ PowerShell er trolig åpnet som administrator, og da sperrer Windows dra og slip
 </details>
 
 <details>
+<summary>«is not recognized as the name of a cmdlet» etter cd.</summary>
+
+Det mangler mellomrom etter `cd`. Står `cd` klistret til stien i meldingen, for eksempel `'cdC:\...'`, skriver du `cd`, et mellomrom, og drar mappa inn i vinduet på nytt (steg 4).
+
+</details>
+
+<details>
 <summary>Ingenting skjer når jeg limer inn.</summary>
 
 Kommandoene skrives i PowerShell eller Terminal, ikke i Docker Desktop. Docker Desktop skal bare være åpent, og du skriver ingenting i det. Ledetekst (Command Prompt) på Windows virker også for demoen, men stegene er skrevet for PowerShell, og den ekte versjonen trenger PowerShell.
