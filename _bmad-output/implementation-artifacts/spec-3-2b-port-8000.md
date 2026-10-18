@@ -2,7 +2,7 @@
 title: 'Story 3.2b: port 8000 i stedet for 5000'
 type: 'chore'
 created: '2026-10-18'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '3dc5ba0'
@@ -72,3 +72,5 @@ Gjennomgang 18.10 på diffen `3dc5ba0..75b73f8`. Linsene var Blind Hunter (BH, 1
 | VG4 | Rettet-linja for Prøve 2 står under Prøve 1 | low | avvist: linja nevner begge |
 | ECH7 | 8000 er standardport for flere utviklerverktøy | low | avvist: ikke slått opp i repoet (regel 3), og svaret sier «Noe annet bruker port 8000» |
 | VG8 | «Hentingen og basene røres ikke» er sjekket med diffen | low | avvist: `src/fetch_prices.py`, migrasjonene og volumene er ikke i diffen |
+
+*Lagt til 2026-10-18 kl. 19:07:* PR #68 er squash-flettet i `3f1c789`, låst til head-en `b4eaa7d`, der main var flettet inn. CI var grønn på head-en (39147924016), også byggingen av imaget og demoen med compose, og på main (39148045129). Triagen står som kommentar i PR #68.
