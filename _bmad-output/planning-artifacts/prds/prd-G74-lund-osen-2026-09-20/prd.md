@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-17T21:22
+updated: 2026-10-18T22:55
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -551,6 +551,8 @@ Grafen åpner med 6 mnd. Startdagen for hver periode kommer fra én funksjon, og
 regelen skrives i `designregler.md` §2 før den bygges. Den testes med faste
 datoer rundt helger, helligdager og nyttår (NFR-08). 1 år viser bare det
 kursserien har, og grafen sier det når serien er kortere.
+
+*Lagt til 2026-10-18 (gruppens svar kl. 21:46, 21:49 og 21:50, story 8.16):* grafen får alle åtte knappene. Den første knappen, siste børsdag («I går» når den var i går), og «Velg dag» viser 6 mnd fram til dagen, med dagen merket, endringen den dagen og signalet som er lagret for den. Signalet regnes aldri på nytt (AD-7).
 
 #### FR-202 — MA50-linjen tegnes oppå kursen
 

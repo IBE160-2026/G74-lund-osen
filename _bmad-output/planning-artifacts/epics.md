@@ -535,6 +535,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-18 kl. 21:03 (gruppens svar):* hullet i kontrollen fra 3.4b rettes før byggestoppen mandag 19.10 kl. 20:40, så uka med logget drift går med den rettede kontrollen. Kontrollen i FR-603 leser da retningen og styrken også i formene Gemma skriver, som «Dette signalet er Negativt», «av typen Ingen» og «av styrke tre» (spesifikasjonen 10.2d). Prompten står, versjon 2.
 
+*Avgjort 2026-10-18 kl. 21:46, 21:49 og 21:50 (gruppens svar):* 8.16 bygges i kveld etter PR #70 og 10.2d, og 8.17 flyttes ikke. Grafen får alle åtte knappene i `designregler.md` §2, som PRD-en sier (FR-201). «I går» (siste børsdag) og «Velg dag» viser 6 mnd fram til dagen, med dagen merket, endringen den dagen og signalet som er lagret for den.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -3438,6 +3440,8 @@ knapper som ellers i appen.
 - **Ville feilet hvis:** to perioder regnet startdagen med hver sin regel
 
 **Avhenger av:** ingen åpne. **Én økt:** ja.
+
+*Avgjort 2026-10-18 kl. 21:46, 21:49 og 21:50 (gruppens svar):* 8.16 bygges i kveld etter PR #70 og 10.2d, og 8.17 flyttes ikke. Grafen får alle åtte knappene i `designregler.md` §2, som PRD-en sier (FR-201). «I går» (siste børsdag) og «Velg dag» viser 6 mnd fram til dagen, med dagen merket, endringen den dagen og signalet som er lagret for den.
 
 ### Story 8.17: Periodevalget i oversikten, Min liste og børsometeret
 
