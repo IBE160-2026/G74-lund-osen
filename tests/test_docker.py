@@ -684,6 +684,25 @@ class TestReadme:
         assert not re.search(r"\b\d+\s+(tester|testene|hoppes|hoppet|består|bestått|passed|skipped)\b", tester)
         assert not re.search(r"\b(alle|de)\s+\d+\b", tester, re.IGNORECASE)
 
+    def test_forklaringen_i_tester_staar_bak_en_knapp(self):
+        """Story 3.3d, punkt d: kommandoene, «Alle testene skal bestå»,
+        punktene og setningen om kvalitetssikringen står synlig, og
+        forklaringen om testene som hoppes over, står bak knappen «Hvorfor
+        hoppes noen over?», som de andre knappene. Ville feilet hvis
+        forklaringen sto utenfor knappen."""
+        tester = README.read_text(encoding="utf-8").split("\n## Tester\n", 1)[1].split("\n## ", 1)[0]
+        knapper = _detaljer(tester)
+        assert list(knapper) == ["Hvorfor hoppes noen over?"]
+        forklaring = knapper["Hvorfor hoppes noen over?"]
+        synlig = re.sub(r"<details>.*?</details>", "", tester, flags=re.DOTALL)
+        for grunn in ("time.tzset", "Unix-sokler", "`::1`", "uten git", "`-rs`"):
+            assert grunn in forklaring and grunn not in synlig, grunn
+        assert "Alle testene skal bestå." in synlig
+        assert [b.strip() for _, b in _blokkene(synlig)] == ["uv sync", "uv run pytest"]
+        assert "- Ingen nettkall:" in synlig and "- CI kjører" in synlig
+        assert "](docs/kvalitetssikring.md)" in synlig
+        assert synlig.index("uv run pytest") < synlig.index("Alle testene skal bestå.") < tester.index("<details>")
+
     def test_bildene_er_de_tre_fra_gjennomgangen_og_ci_merket(self):
         """Story 3.3: skjermbilder med ekte data publiserer dataene. Regelen
         står i dokumentene: bilder i README-en kommer bare fra

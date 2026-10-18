@@ -304,7 +304,14 @@ uv sync
 uv run pytest
 ```
 
-Alle testene skal bestå. Noen hoppes over, med grunnen i utskriften når du legger til `-rs`: på Windows testene som bytter tidssone, fordi `time.tzset` ikke finnes der (de kjøres i CI), og testen for Unix-sokler, som Python på Windows ikke har. På en maskin uten IPv6 (`::1`) hoppes testen for den over. I en mappe fra ZIP-fila, uten git, hoppes også testene som sjekker hva som er sporet i git, over.
+Alle testene skal bestå.
+
+<details>
+<summary>Hvorfor hoppes noen over?</summary>
+
+Noen hoppes over, med grunnen i utskriften når du legger til `-rs`: på Windows testene som bytter tidssone, fordi `time.tzset` ikke finnes der (de kjøres i CI), og testen for Unix-sokler, som Python på Windows ikke har. På en maskin uten IPv6 (`::1`) hoppes testen for den over. I en mappe fra ZIP-fila, uten git, hoppes også testene som sjekker hva som er sporet i git, over.
+
+</details>
 
 - Ingen nettkall: `tests/conftest.py` sperrer nettverket i hver test.
 - `data/` røres ikke: testene bruker en midlertidig mappe.
