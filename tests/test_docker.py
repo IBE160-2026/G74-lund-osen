@@ -859,13 +859,19 @@ MALENE_BAK_BILDET = (
     "src/templates/index.html",
 )
 SKRIFTFILER = {".woff", ".woff2", ".ttf", ".otf", ".css"}
+# Svaret 18.10 kl. 21:42: bildet er saa hoeyt at det slutter etter den siste
+# raden under «Skilte seg ut», foer «Øvrige aksjer», saa signalstyrken og
+# fargene per aksje er med.
+HOEYDE_PAA_BILDET = 1573
 AVTRYKK_BAK_BILDET = "dad3f7b9fe66e999755b1e346cde0ddefda61c55bfca660b309cf3a10826a3eb"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
     "midlertidig mappe (lagring_sqlite.BASE_STI dit), OSE_DEMO=1, waitress på en "
     "ledig port, og msedge --headless --disable-gpu --hide-scrollbars "
-    "--window-size=1280,1000 med egen --user-data-dir. Oppdater så "
+    f"--window-size=1280,{HOEYDE_PAA_BILDET} med egen --user-data-dir. Bildet skal slutte "
+    "etter den siste raden under «Skilte seg ut», før «Øvrige aksjer»: mål bunnen av "
+    "den raden og endre HOEYDE_PAA_BILDET hvis den har flyttet seg. Oppdater så "
     "AVTRYKK_BAK_BILDET til {avtrykk} i samme commit."
 )
 
@@ -902,12 +908,14 @@ class TestSkjermbildet:
         assert len(treff) == 1, treff
         return treff[0]
 
-    def test_fila_finnes_og_er_1280_x_1000_px(self):
-        """Ville feilet med et bilde i en annen storrelse enn i 3.3b."""
+    def test_fila_finnes_og_er_1280_px_bred_og_1573_px_hoey(self):
+        """Svaret 18.10 kl. 21:42: 1280 x 1573, til bunnen av «Skilte seg ut».
+        Ville feilet med bildet fra 3.3b (1280 x 1000), eller et bilde i en
+        annen hoeyde enn HOEYDE_PAA_BILDET."""
         data = (ROT / SKJERMBILDET).read_bytes()
         assert data[:8] == b"\x89PNG\r\n\x1a\n"
         assert int.from_bytes(data[16:20], "big") == 1280
-        assert int.from_bytes(data[20:24], "big") == 1000
+        assert int.from_bytes(data[20:24], "big") == HOEYDE_PAA_BILDET == 1573
 
     def test_bildet_har_ingen_tekstfelt(self):
         """Regel 16 (gjennomgangen av 3.3e, BH8 og ECH10): ingen sti eller
