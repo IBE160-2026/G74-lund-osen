@@ -362,7 +362,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "hva aksjen gjør videre.",
             (
                 (GRAF, "def indeksverdier("),
-                (GRAF, "faar kurs(start) x indeks(dag) / indeks(start)"),
+                (GRAF, "start.kurs * indeks[p.dato] / indeks[start.dato]"),
                 (AKSJE_MAL, 'class="indekslinje"'),
             ),
         ),
