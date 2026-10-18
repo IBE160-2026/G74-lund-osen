@@ -15,13 +15,13 @@ Til faglærer:
 
 ## Kom i gang
 
-Appen finnes i to versjoner, med samme kode. Vi anbefaler den ekte versjonen. Vil du bare se hvordan appen virker, er demoen raskest. Første gang før kl. 21 på en børsdag, også på dagtid, er demoen veien for å se appen med en gang, fordi den ekte versjonen henter dagens kurser først etter kl. 21.
+Appen finnes i to versjoner, med samme kode. Vi anbefaler den ekte versjonen. Vil du bare se hvordan appen virker, er demoen raskest. Første gang før kl. 21 på en børsdag, også på dagtid, er demoen veien for å se appen med en gang, fordi den ekte versjonen henter dagens kurser først etter kl. 21. Demoen står først i stegene under, fordi den er raskest.
 
-| | Den ekte versjonen (anbefalt) | Demoen |
+| | Demoen | Den ekte versjonen (anbefalt) |
 |---|---|---|
-| Kurser | Ekte sluttkurser fra Oslo Børs, hentet fra EODHD hver børsdag. Dagens vurdering lagres per aksje | Oppdiktede selskaper og kurser («Eksempeltall») |
-| Trenger | Docker Desktop og en gratis nøkkel fra EODHD | Bare Docker Desktop |
-| Klar | Viser kurser etter første henting, etter kl. 21 på en børsdag, eller i helgen og andre dager børsen er stengt | Med en gang |
+| Kurser | Oppdiktede selskaper og kurser («Eksempeltall») | Ekte sluttkurser fra Oslo Børs, hentet fra EODHD hver børsdag. Dagens vurdering lagres per aksje |
+| Trenger | Bare Docker Desktop | Docker Desktop og en gratis nøkkel fra EODHD |
+| Klar | Med en gang | Viser kurser etter første henting, etter kl. 21 på en børsdag, eller i helgen og andre dager børsen er stengt |
 
 **Du trenger** en Windows-maskin eller en Mac, lov til å installere programmer, nett og noen GB ledig plass, men verken git eller Docker-konto. Første gang tar det en stund. På Linux bruker du Docker Engine med Compose i stedet for Docker Desktop. Vi prøvde 10.10 med Docker Desktop 4.91.0 (motor 29.8.0, Compose v5.5.1) på Windows, og imaget bruker Python 3.13.15. Mac er ikke prøvd ennå. Uten Docker trenger du bare [uv](https://docs.astral.sh/uv/), som henter Python 3.13 eller nyere hvis maskinen ikke har den, se «Uten Docker, med uv» under «Mer for den som vil». Står du fast, se [«Står du fast?»](#står-du-fast) lenger ned.
 
@@ -45,6 +45,21 @@ Appen finnes i to versjoner, med samme kode. Vi anbefaler den ekte versjonen. Vi
 ![PowerShell med en linje som slutter med G74-lund-osen-main og >](docs/bilder/readme/powershell-mappa.png)
 
 *Slik ser det ut når steg 4 har gått bra. Stien blir en annen hos deg, men mappenavnet skal stå foran `>`.*
+
+### Demoen
+
+5. **Start demoen.** Kopier kommandoen med knappen til høyre i boksen, lim den inn (Ctrl+V eller Cmd+V) og trykk Enter. Første gang tar det noen minutter. Demoen er klar når det står `Serving on http://0.0.0.0:5000`. Den adressen skal du ikke åpne.
+
+```
+docker compose up --build demo
+```
+
+6. **Åpne http://127.0.0.1:5000** i en ny fane. Øverst står «Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.» Klikk på et selskapsnavn for å se en aksje.
+7. **Stopp** med Ctrl+C i terminalvinduet, også på Mac, og lim så inn denne. Det er klart når det står at containerne er fjernet (Removed).
+
+```
+docker compose --profile demo down
+```
 
 ### Den ekte versjonen (anbefalt)
 
@@ -86,21 +101,6 @@ docker compose down
 ```
 
 **Skriv aldri `docker compose down -v`.** Det sletter kursene og vurderingene, og vurderingene kan ikke lages på nytt.
-
-### Demoen
-
-5. **Start demoen.** Kopier kommandoen med knappen til høyre i boksen, lim den inn (Ctrl+V eller Cmd+V) og trykk Enter. Første gang tar det noen minutter. Demoen er klar når det står `Serving on http://0.0.0.0:5000`. Den adressen skal du ikke åpne.
-
-```
-docker compose up --build demo
-```
-
-6. **Åpne http://127.0.0.1:5000** i en ny fane. Øverst står «Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.» Klikk på et selskapsnavn for å se en aksje.
-7. **Stopp** med Ctrl+C i terminalvinduet, også på Mac, og lim så inn denne. Det er klart når det står at containerne er fjernet (Removed).
-
-```
-docker compose --profile demo down
-```
 
 ### Står du fast?
 

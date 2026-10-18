@@ -2,12 +2,14 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-17T10:29
+updated: 2026-10-18T14:51
 ---
 
 # Hjelp til «Kom i gang»
 
 Spørsmål og svar til «Kom i gang» i [README-en](../README.md), sortert etter steget de hører til. De vanligste står også i README-en, under «Står du fast?». Stegene 1–4 er felles for begge versjonene.
+
+*Rettet 2026-10-18 (story 3.3c):* «Demoen» står nå før «Den ekte versjonen», som i README-en, fordi faglærer prøver demoen (gruppen 16.10 kl. 21:16, svarene kl. 21:25). Svarene er de samme som før.
 
 ## Steg 1: Docker Desktop
 
@@ -89,6 +91,22 @@ Får du en feil etter `cd` når mappa ligger i en mappe med mellomrom i navnet, 
 
 Svar OK. Ellers får ikke Terminal åpne mappa.
 
+## Demoen
+
+### Hva skal jeg se etter i vinduet?
+
+Første gang bygger Docker appen, og det kommer mange linjer. Demoen er klar når denne linja kommer. Den skal du ikke kopiere, bare se etter:
+
+```text
+demo-1  | INFO:waitress:Serving on http://0.0.0.0:5000
+```
+
+Under den kan det komme en linje med valg fra Docker. La terminalvinduet stå åpent mens du bruker demoen. `0.0.0.0` er adressen inne i Docker, og du åpner http://127.0.0.1:5000 i steg 6 i demoen.
+
+### Hva er demoen?
+
+Sidene sier «Eksempeltall»: 15 oppdiktede selskaper med kurser til fredag 9. oktober 2026, ikke data fra Oslo Børs. Under merket står en tabell med aksjer, og du klikker på et selskapsnavn for å se aksjen. Demoen trenger verken `.env` eller nøkkel, og gjør ingen kall. Demobasen lages på nytt hver gang demoen starter, i sitt eget volum, `ose-demo`. Den ekte basen røres ikke. Mens demoen kjører, kan demobasen også lages på nytt med `docker compose run --rm demo-lag` i et nytt terminalvindu, fra samme mappe.
+
 ## Den ekte versjonen
 
 ### Hva med nøkkelen?
@@ -114,22 +132,6 @@ Dataene ligger i to Docker-volumer: `ose-db` med basen og `ose-raa` med øyeblik
 ### Kan appen nås fra nettet?
 
 Nei. Porten er bare åpen på maskinen selv (127.0.0.1). Appen kan ikke nås fra nettet.
-
-## Demoen
-
-### Hva skal jeg se etter i vinduet?
-
-Første gang bygger Docker appen, og det kommer mange linjer. Demoen er klar når denne linja kommer. Den skal du ikke kopiere, bare se etter:
-
-```text
-demo-1  | INFO:waitress:Serving on http://0.0.0.0:5000
-```
-
-Under den kan det komme en linje med valg fra Docker. La terminalvinduet stå åpent mens du bruker demoen. `0.0.0.0` er adressen inne i Docker, og du åpner http://127.0.0.1:5000 i steg 6 i demoen.
-
-### Hva er demoen?
-
-Sidene sier «Eksempeltall»: 15 oppdiktede selskaper med kurser til fredag 9. oktober 2026, ikke data fra Oslo Børs. Under merket står en tabell med aksjer, og du klikker på et selskapsnavn for å se aksjen. Demoen trenger verken `.env` eller nøkkel, og gjør ingen kall. Demobasen lages på nytt hver gang demoen starter, i sitt eget volum, `ose-demo`. Den ekte basen røres ikke. Mens demoen kjører, kan demobasen også lages på nytt med `docker compose run --rm demo-lag` i et nytt terminalvindu, fra samme mappe.
 
 ## Når appen kjører, eller ikke
 

@@ -544,16 +544,23 @@ class TestReadme:
         assert "Første gang går det også i helgen og andre dager børsen er stengt." in steg8
         assert "Første gang kan du også hente i helgen" in _hjelp()
 
-    def test_ekte_versjonen_foerst_og_zip_foer_kommandoene(self):
-        """Story 3.4: fra 11.10 kl. 22:32 anbefaler README-en den ekte
-        versjonen, og den staar foerst. Demoen virker fortsatt uten .env.
-        Koden hentes med «Download ZIP» foer den foerste kommandoen, ikke med
-        git clone (svar 1 11.10). Het test_demoen_er_den_foerste_kommandoen
-        fra PR 2 til gjennomgangen 11.10."""
+    def test_demoen_foerst_og_zip_foer_kommandoene(self):
+        """Story 3.3c: demoen står foerst, fordi faglaerer proever den (gruppen
+        16.10 kl. 21:16, svarene kl. 21:25). Det snur rekkefoelgen fra 11.10
+        kl. 22:32, ikke anbefalingen: README-en anbefaler fortsatt den ekte
+        versjonen. Demoen virker uten .env. Koden hentes med «Download ZIP»
+        foer den foerste kommandoen, ikke med git clone (svar 1 11.10). Het
+        test_ekte_versjonen_foerst_og_zip_foer_kommandoene fra 11.10 til 3.3c.
+        Ville feilet hvis den ekte versjonen kom foer demoen igjen."""
         del_ = _kom_i_gang()
         kommandoer = _kommandoene()
-        assert kommandoer[0] == "cp .env.example .env"
-        assert del_.index("«Download ZIP»") < del_.index("cp .env.example .env")
+        assert kommandoer[0] == "docker compose up --build demo"
+        assert del_.index("«Download ZIP»") < del_.index("docker compose up --build demo")
+        overskrifter = re.findall(r"^### (.+)$", del_, re.MULTILINE)
+        assert overskrifter[:3] == ["Felles for begge", "Demoen", "Den ekte versjonen (anbefalt)"], overskrifter
+        topp = del_.split("### Felles for begge", 1)[0]
+        assert "Vi anbefaler den ekte versjonen." in topp
+        assert "Demoen står først i stegene under, fordi den er raskest." in topp
         assert "git clone" not in del_.split("### Står du fast?", 1)[0]
         demo = _seksjon("Demoen")
         assert "docker compose up --build demo" in demo and "http://127.0.0.1:5000" in demo
@@ -903,6 +910,8 @@ class TestReadmeForNybegynnere:
         topp = _kom_i_gang().split("### Felles for begge", 1)[0]
         hode = [l for l in topp.splitlines() if l.startswith("|")][0]
         assert "Den ekte versjonen (anbefalt)" in hode and "| Demoen |" in hode
+        # Story 3.3c: demoen i første kolonne, som i stegene.
+        assert hode.startswith("| | Demoen | Den ekte versjonen (anbefalt) |"), hode
         assert "Vi anbefaler den ekte versjonen." in topp
         assert "(anbefalt)" not in hode.split("Den ekte versjonen (anbefalt)", 1)[1]
 
@@ -1046,6 +1055,11 @@ class TestReadmeForNybegynnere:
         for n in re.findall(r"steg (\d+) i den ekte versjonen", tekst):
             assert int(n) in SEKSJONENE["Den ekte versjonen (anbefalt)"], n
         tabell = _proevetabellen("Prøve 1")
+        # Story 3.3c: demoen foer den ekte versjonen, som i README-en, og en
+        # kolonne for tiden hvert steg tok.
+        assert tabell.splitlines()[0] == "| # | Kommando eller steg i README-en | Det som skjedde | Tid |"
+        assert tabell.index("| Demoen, steg 7:") < tabell.index("| Den ekte versjonen, steg 5:")
+        assert [int(n) for n in re.findall(r"^\| (\d+) \|", tabell, re.MULTILINE)] == list(range(1, 24))
         assert [int(n) for n in re.findall(r"\| Steg (\d+):", tabell)] == [1, 2, 3, 4]
         assert [int(n) for n in re.findall(r"\| Den ekte versjonen, steg (\d+):", tabell)] == [5, 6, 7, 8, 9]
         assert [int(n) for n in re.findall(r"\| Demoen, steg (\d+):", tabell)] == [5, 6, 7]
@@ -1282,6 +1296,12 @@ class TestReadmeForNybegynnere:
 
         antall = len(kursdata.AKSJEUNIVERS)
         hjelp = _hjelp()
+        # Story 3.3c: «Demoen» foer «Den ekte versjonen», som i README-en.
+        assert (
+            hjelp.index("\n## Steg 4: mappa\n")
+            < hjelp.index("\n## Demoen\n")
+            < hjelp.index("\n## Den ekte versjonen\n")
+        )
         ekte = hjelp.split("\n## Den ekte versjonen\n", 1)[1].split("\n## ", 1)[0]
         overskrifter = re.findall(r"^### (.+)$", ekte, re.MULTILINE)
         sporsmaal = f"Hvorfor bare {antall} aksjer?"
