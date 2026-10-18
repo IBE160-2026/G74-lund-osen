@@ -19,7 +19,7 @@ lagring_sqlite.py. Porten importerer ingen av dem og gjoer ingen I/O.
 """
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 from typing import Protocol, runtime_checkable
 
 from kursdata import Aksje, Kursrad
@@ -52,3 +52,7 @@ class Oversiktsleser(Protocol):
 
     def post(self, symbol: str) -> Oversiktspost | None:
         """Posten for symbolet, None hvis det ikke staar i aksje."""
+
+    def vurdering(self, symbol: str, dato: date) -> Vurdering | Grunn | None:
+        """Raden i vurdering for symbolet og dagen, None naar den mangler.
+        Story 8.16: «Velg dag» viser det som er lagret, og regner aldri (AD-7)."""

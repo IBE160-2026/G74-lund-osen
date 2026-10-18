@@ -76,13 +76,15 @@ class TestPorten:
         metoder = {
             navn for navn, _ in inspect.getmembers(Oversiktsleser, inspect.isfunction) if not navn.startswith("_")
         }
-        assert metoder == {"oversikt", "post"}
+        # Story 8.16: vurdering for «Velg dag» er ogsaa en lesemetode.
+        assert metoder == {"oversikt", "post", "vurdering"}
 
     def test_adapteren_har_ingen_skrivemetode(self):
         metoder = {
             navn for navn, _ in inspect.getmembers(SqliteOversiktsleser, inspect.isfunction) if not navn.startswith("_")
         }
-        assert metoder == {"oversikt", "post"}
+        # Story 8.16: vurdering for «Velg dag» er ogsaa en lesemetode.
+        assert metoder == {"oversikt", "post", "vurdering"}
 
     def test_adapteren_oppfyller_porten(self, tilkobling):
         assert isinstance(SqliteOversiktsleser(tilkobling), Oversiktsleser)
@@ -168,3 +170,23 @@ class TestVurderingen:
         leser = SqliteOversiktsleser(tilkobling)
         assert leser.post("EQNR.OL") is None
         assert leser.post("FINNESIKKE") is None
+
+
+class TestVurderingForEnDag:
+    """Story 8.16 (gjennomgangen, VG11): lesemetoden for «Velg dag», direkte
+    mot adapteren. Ville feilet hvis den ga dagens rad i stedet for dagens
+    dato, eller en tom rad i stedet for None."""
+
+    def test_rad_grunn_og_ingen_rad(self, tilkobling):
+        from datetime import date
+
+        from vurderingsdata import Grunn
+
+        leser = SqliteOversiktsleser(tilkobling)
+        assert leser.vurdering("EQNR", date(2026, 10, 1)) is None
+        tilkobling.execute(
+            "INSERT INTO vurdering (symbol, dato, grunn) VALUES (?, ?, ?)",
+            ("EQNR", "2026-10-02", Grunn.SIGNAL_IKKE_REGNET.value),
+        )
+        assert leser.vurdering("EQNR", date(2026, 10, 2)) is Grunn.SIGNAL_IKKE_REGNET
+        assert leser.vurdering("EQNR", date(2026, 10, 1)) is None

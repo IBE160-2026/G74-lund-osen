@@ -863,7 +863,7 @@ SKRIFTFILER = {".woff", ".woff2", ".ttf", ".otf", ".css"}
 # raden under «Skilte seg ut», foer «Øvrige aksjer», saa signalstyrken og
 # fargene per aksje er med.
 HOEYDE_PAA_BILDET = 1573
-AVTRYKK_BAK_BILDET = "dad3f7b9fe66e999755b1e346cde0ddefda61c55bfca660b309cf3a10826a3eb"
+AVTRYKK_BAK_BILDET = "e5fb79d820cced9fe9269427b662ef820c622f0abda0192afa1adbeedecbb925"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1825,6 +1825,8 @@ class TestReadmeForNybegynnere:
             "uten kopien av bmad-skillene",
             # Story 3.4b: KI-teksten i demoen er flettet.
             "ki-teksten på aksjesiden, laget én gang med gemma",
+            # Story 8.16: periodene i kursgrafen er flettet.
+            "periodene i kursgrafen med «velg dag»",
         ):
             assert sak in ferdig, sak
         assert "resten av KI-laget" not in status and "Selve teksten lages ikke ennå" not in status
@@ -1838,7 +1840,8 @@ class TestReadmeForNybegynnere:
             "selskapets side på newsweb",
             "egen nøkkel",
             "«vis ki-tekst»",
-            "periodene i kursgrafen",
+            # Story 8.16: periodene i kursgrafen er flyttet til «Ferdig».
+            "på forsiden periodevalget",
             "velge og bytte aksjer",
         )
         assert len(neste_punkter) == len(saker), neste_punkter

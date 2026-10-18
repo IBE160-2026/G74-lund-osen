@@ -21,6 +21,7 @@ from datetime import date
 
 from aksjedetalj import Punkt
 from boersdag import UtenforKalenderen, er_boersdag
+from perioder import ANNENHVER_MAANED, DAGER, MAANEDSNAVN, UKER
 
 BREDDE = 720
 HOYDE = 260
@@ -57,6 +58,10 @@ MAANEDER = (
 # Plassen et maanedsnavn trenger med 10px skrift. Naermere hoeyre kant enn
 # dette staar teksten til venstre for streken, saa den ikke kuttes (ECH1).
 NAVNEBREDDE = 60
+
+# Story 8.16 (gjennomgangen, BH4): flere maanedsnavn enn dette faar ikke
+# plass, saa da faar annenhver maaned navn.
+MAKS_MAANEDSNAVN = 8
 
 
 @dataclass(frozen=True)
@@ -96,6 +101,9 @@ class Graf:
     indekslinje: str = ""
     indeksstart: date | None = None
     indeksslutt: date | None = None
+    # Story 8.16: punktet for dagen som er merket (siste boersdag og «Velg
+    # dag»), None naar ingen dag er merket eller grafen ikke har den.
+    merket: Navn | None = None
 
     @property
     def har_ma50(self) -> bool:
@@ -196,6 +204,40 @@ def _maanedsmerker(punkter: tuple[Punkt, ...], bredde: int) -> tuple[Maanedsmerk
     return tuple(merker)
 
 
+def _dagmerker(punkter: tuple[Punkt, ...], bredde: int, hvilke: str) -> tuple[Maanedsmerke, ...]:
+    """Story 8.16: merkene for de korte periodene. DAGER gir et merke ved
+    hver dag (1 uke), UKER ved foerste dag i hver uke serien har (1 mnd).
+    Navnet er datoen, som «02.10» (designregler §4)."""
+    if len(punkter) < 2:
+        return ()
+    tegne_bredde = bredde - 2 * MARG_X
+    merker = []
+    forrige_uke = None
+    for i, p in enumerate(punkter):
+        uke = p.dato.isocalendar()[:2]
+        if hvilke == UKER and uke == forrige_uke:
+            continue
+        forrige_uke = uke
+        x = MARG_X + tegne_bredde * i / (len(punkter) - 1)
+        merker.append(
+            Maanedsmerke(x=x, navn=f"{p.dato.day:02d}.{p.dato.month:02d}", til_venstre=x > bredde - NAVNEBREDDE)
+        )
+    return tuple(merker)
+
+
+def aksemerker(punkter: tuple[Punkt, ...], bredde: int, hvilke: str = MAANEDSNAVN) -> tuple[Maanedsmerke, ...]:
+    """Merkene paa aksen etter perioden (story 8.16): dagene, ukene,
+    maanedene, eller maanedene med navn paa annenhver for 1 aar og for alle
+    perioder med flere enn MAKS_MAANEDSNAVN maaneder, som I aar fra september
+    (gjennomgangen, BH4)."""
+    if hvilke in (DAGER, UKER):
+        return _dagmerker(punkter, bredde, hvilke)
+    merker = _maanedsmerker(punkter, bredde)
+    if hvilke == ANNENHVER_MAANED or len(merker) > MAKS_MAANEDSNAVN:
+        merker = tuple(m if i % 2 == 0 else Maanedsmerke(m.x, "", m.til_venstre) for i, m in enumerate(merker))
+    return merker
+
+
 def _siste(punkter: str) -> tuple[float, float] | None:
     """Det siste punktet i en punktstreng, eller None naar den er tom."""
     if not punkter:
@@ -247,9 +289,14 @@ def bygg_graf(
     bredde: int = BREDDE,
     hoyde: int = HOYDE,
     indeks: dict[date, float] | None = None,
+    merker: str = MAANEDSNAVN,
+    merket: date | None = None,
 ) -> Graf | None:
     """Koordinatene for kurs og MA50, og for indeksen naar den er gitt som
-    {dato: verdi} (story 2.9c). None naar det ikke er noe aa tegne."""
+    {dato: verdi} (story 2.9c). None naar det ikke er noe aa tegne.
+
+    Story 8.16: merker sier hvilke merker aksen faar (aksemerker), og merket
+    er dagen som merkes, naar grafen har den."""
     if len(punkter) < 2:
         return None
 
@@ -260,6 +307,16 @@ def bygg_graf(
     indekslinje = _koordinater(punkter, lambda p: omregnet.get(p.dato), lav, hoy, bredde, hoyde)
     kursnavn, snittnavn = _navnene(kurslinje, ma50linje, hoyde)
     siste = _siste(kurslinje)
+    # Story 8.16: punktet for dagen, regnet fra indeksen som de andre
+    # punktene (gjennomgangen, BH11).
+    punktet = None
+    datoene = [p.dato for p in punkter]
+    if merket in datoene:
+        i = datoene.index(merket)
+        punktet = Navn(
+            MARG_X + (bredde - 2 * MARG_X) * i / (len(punkter) - 1),
+            MARG_Y + (hoyde - 2 * MARG_Y) * (1 - (punkter[i].kurs - lav) / (hoy - lav)),
+        )
 
     return Graf(
         bredde=bredde,
@@ -273,9 +330,10 @@ def bygg_graf(
         hoy=hoy,
         forste_dato=punkter[0].dato,
         siste_dato=punkter[-1].dato,
-        maanedsmerker=_maanedsmerker(punkter, bredde),
+        maanedsmerker=aksemerker(punkter, bredde, merker),
         rutenett=_rutenett(lav, hoy, hoyde),
         indekslinje=indekslinje,
         indeksstart=min(omregnet) if omregnet else None,
         indeksslutt=max(omregnet) if omregnet else None,
+        merket=punktet,
     )

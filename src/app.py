@@ -34,7 +34,7 @@ from pathlib import Path
 from flask import Flask, abort, g, redirect, render_template, request
 
 import lagring_sqlite
-from aksjedetalj import bygg_detalj, normaliser_symbol
+from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
 from boersdag import norsk_dato
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER
 from graf import bygg_graf
@@ -73,6 +73,7 @@ from markedsoversikt import (
 )
 from migrering import MigrasjonsFeil
 from oversiktsdata import Oversiktsleser
+from perioder import AKSEMERKER, MAANEDSNAVN, OVERSKRIFT, SISTE, VELG, knappene, les_valg, startdag
 from signalberegning import BLANDET, STANDARD
 from tallformat import avrundet, dato, med_og, tall, ukedag
 
@@ -489,13 +490,32 @@ def aksjedetalj(symbol: str):
     # Aksjen slaas opp i aksje i basen, ikke i lista i kursdata.py (story 2.2b,
     # merknaden 03.10 under AD-21). 404 bare for et symbol som ikke staar der,
     # og for en aksje uten kursrader (FR-204).
-    post = _leser_eller_basefeil(hent_oversiktsleser).post(normaliser_symbol(symbol))
+    oversiktsleser = _leser_eller_basefeil(hent_oversiktsleser)
+    post = oversiktsleser.post(normaliser_symbol(symbol))
     if post is None:
         abort(404)
 
-    detalj = bygg_detalj(post, leser.serie(post.aksje.symbol), idag(), STANDARD)
+    # Story 8.16: perioden i adressen. En feil gir 6 mnd og en kort beskjed,
+    # aldri en feilside. Startdagen kommer fra perioder.startdag, regnet fra
+    # siste dag i grafen: dagen for «Velg dag», ellers siste rad.
+    rader = leser.serie(post.aksje.symbol)
+    if not rader:
+        abort(404)
+    # Gjennomgangen, BH10: dagen leses én gang, saa alt i svaret gjelder samme dag.
+    i_dag = idag()
+    valg = les_valg(request.args.get("periode"), request.args.get("dag"), rader[0].dato, i_dag, rader[-1].dato)
+    slutt = valg.dag if valg.periode == VELG else rader[-1].dato
+    siste_i_grafen = max(rad.dato for rad in rader if rad.dato <= slutt)
+    start = startdag(valg.periode, siste_i_grafen)
+
+    detalj = bygg_detalj(post, rader, i_dag, STANDARD, start=start, slutt=slutt)
     if detalj is None:
         abort(404)
+    # Siste boersdag og «Velg dag»: dagen er merket, med endringen og
+    # signalet som er lagret for den. Signalet regnes aldri (AD-7).
+    dagen = None
+    if valg.periode in (SISTE, VELG):
+        dagen = bygg_dagen(rader, slutt, oversiktsleser.vurdering(post.aksje.symbol, slutt), i_dag)
 
     # Story 10.3: KI-teksten under regelforklaringen, bare naar det er en
     # vurdering aa forklare og bryteren er paa (FR-601, FR-602).
@@ -507,7 +527,22 @@ def aksjedetalj(symbol: str):
         render_template(
             "aksje.html",
             detalj=detalj,
-            graf=bygg_graf(detalj.punkter, indeks=indeks),
+            graf=bygg_graf(
+                detalj.punkter,
+                indeks=indeks,
+                merker=AKSEMERKER.get(valg.periode, MAANEDSNAVN),
+                merket=dagen.dato if dagen else None,
+            ),
+            valg=valg,
+            dagen=dagen,
+            overskrift=OVERSKRIFT[valg.periode],
+            knapper=knappene(rader[-1].dato, i_dag),
+            # 1 aar og de andre periodene viser bare det serien har (FR-201).
+            kort_serie=rader[0].dato > start,
+            serien_begynner=rader[0].dato,
+            # Datofeltet: fra andre dag i serien til siste (gjennomgangen, BH1 og BH3).
+            foerste_valgbare=rader[1].dato if len(rader) > 1 else rader[0].dato,
+            siste_i_serien=rader[-1].dato,
             indeks_symbol=indeks_symbol,
             indeks_feilet=indeks_feilet,
             hentet=post.hentet,

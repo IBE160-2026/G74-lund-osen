@@ -2,6 +2,7 @@
 {% from "_hjelp.html" import hjelpeknapp, hjelpevindu with context -%}
 {% from "_bransjer.html" import bransjesymbol -%}
 {% from "_brikker.html" import brikker -%}
+{% from "_perioder.html" import periodestil, periodevalg with context -%}
 {% block tittel %}{{ detalj.aksje.navn }} — OSE Signal{% endblock %}
 {#- Story 8.0d, PR 3: tidspunktet står bare i stripa, med «?» ved siden av
     (ECH8 i PR 2). #}
@@ -110,6 +111,11 @@
     .ingen, .ukjent { color: var(--dempet); }
     p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
     .mangler { color: var(--dempet); font-style: italic; }
+    /* Story 8.16: periodevalget, og dagen som er merket i grafen. */
+{{ periodestil() }}
+    .dagstrek { stroke: var(--blekk); stroke-width: 1.5; }
+    .dagpunkt { fill: var(--hvit); stroke: var(--blekk); stroke-width: 2.5; }
+    p.dagen { margin: 0 0 12px; }
 {% endblock %}
 
 {% block innhold %}
@@ -237,9 +243,19 @@
   {% endif %}
 
   {#- Story 2.9c: hjelpen forklarer også den stiplede linja når den vises. #}
-  {%- set grafhjelp = (["grafen"] if graf and graf.har_ma50 and detalj.sjekker else []) + (["indekslinja"] if graf and graf.har_indeks else []) %}
+  {%- set grafhjelp = (["grafen"] if graf and graf.har_ma50 and detalj.sjekker else []) + (["indekslinja"] if graf and graf.har_indeks else []) + (["perioden"] if graf else []) %}
   {%- set vis_grafhjelp = grafhjelp|length > 0 %}
-  <h2>Kursutvikling, 6 måneder{% if vis_grafhjelp %} {{ hjelpeknapp("hjelp-graf", "Hjelp: kursgrafen") }}{% endif %}</h2>
+  {#- Story 8.16: periodevalget i designregler.md §2, og overskriften etter
+      perioden. Siste børsdag og «Velg dag» viser 6 mnd fram til dagen. #}
+  <h2>Kursutvikling, {{ overskrift }}{% if dagen %} {{ dagen.dato|ukedag }} {{ dagen.dato|dato }}{% endif %}{% if vis_grafhjelp %} {{ hjelpeknapp("hjelp-graf", "Hjelp: kursgrafen") }}{% endif %}</h2>
+  {{ periodevalg(knapper, valg.periode, "/aksje/" ~ detalj.aksje.symbol, valg.dag, foerste_valgbare, siste_i_serien, "Periode for kursgrafen") }}
+  {% if valg.beskjed %}<p class="periodebeskjed" role="status">{{ valg.beskjed }}</p>{% endif %}
+  {% if dagen %}
+    <p class="dagen"><strong>{{ dagen.dato|ukedag|capitalize }} {{ dagen.dato|dato }}:</strong>
+      endring <span class="{{ 'opp' if dagen.endring and dagen.endring > 0 else 'ned' if dagen.endring and dagen.endring < 0 else '' }}">{% if dagen.endring is not none %}{{ dagen.endring|tall('endring') }}{% else %}–{% endif %}</span>.
+      Signal: {% if dagen.vurdering %}{{ dagen.vurdering.styrke }} av {{ antall_sjekker }}, <span class="{{ dagen.retning.klasse }}"><span aria-hidden="true">{{ dagen.retning.symbol }}</span> {{ dagen.retning.tekst }}</span>{% else %}– {{ dagen.tekst }}{% endif %}.
+    </p>
+  {% endif %}
   {% if graf %}
     <figure>
       {#- Svar 19: navnene står ved enden av linjene, og etiketten sier
@@ -272,13 +288,18 @@
           <polyline class="ma50linje" points="{{ graf.ma50linje }}"></polyline>
         {% endif %}
         <polyline class="kurslinje" points="{{ graf.kurslinje }}"></polyline>
+        {% if graf.merket %}<line class="dagstrek" x1="{{ "%.1f"|format(graf.merket.x) }}" y1="0" x2="{{ "%.1f"|format(graf.merket.x) }}" y2="{{ graf.hoyde }}"></line>{% endif %}
         {% if graf.siste %}<circle class="sistepunkt" cx="{{ "%.1f"|format(graf.siste.x) }}" cy="{{ "%.1f"|format(graf.siste.y) }}" r="4.5"></circle>{% endif %}
+        {% if graf.merket %}<circle class="dagpunkt" cx="{{ "%.1f"|format(graf.merket.x) }}" cy="{{ "%.1f"|format(graf.merket.y) }}" r="5.5"></circle>{% endif %}
         {% if graf.kursnavn %}<text class="linjenavn kurs" text-anchor="end" x="{{ "%.1f"|format(graf.kursnavn.x) }}" y="{{ "%.1f"|format(graf.kursnavn.y) }}">Utbyttejustert kurs</text>{% endif %}
         {% if graf.snittnavn %}<text class="linjenavn snitt" text-anchor="end" x="{{ "%.1f"|format(graf.snittnavn.x) }}" y="{{ "%.1f"|format(graf.snittnavn.y) }}">{{ parametre.ma_vindu }}-dagers snitt (sjekk 1)</text>{% endif %}
       </svg>
 
       <figcaption>
         {{ graf.forste_dato|dato }} til {{ graf.siste_dato|dato }}.
+        {#- FR-201: 1 år, og de andre periodene, viser bare det serien har. #}
+        {% if kort_serie %}Kursserien begynner {{ serien_begynner|dato }}, så grafen viser bare det den har.{% endif %}
+        {% if dagen and graf.merket %}Dagen er merket med en strek.{% elif dagen %}{{ dagen.dato|dato }} har ingen kurs, så grafen slutter {{ graf.siste_dato|dato }}.{% endif %}
         {#- Story 2.9c (gjennomgangen, BH3): tre linjer når indeksen er med. #}
         {% if graf.har_indeks %}
         Kursen og snittet er tegnet på utbyttejustert kurs, og indeksen er regnet

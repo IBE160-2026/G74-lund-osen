@@ -465,6 +465,17 @@ class SqliteOversiktsleser:
         rad = self._tilkobling.execute(_OVERSIKT + "WHERE a.symbol = ?", (symbol,)).fetchone()
         return _post(rad) if rad is not None else None
 
+    def vurdering(self, symbol: str, dato: date) -> Vurdering | Grunn | None:
+        # Story 8.16: bare lesing, som resten av porten. Signalet regnes aldri.
+        rad = self._tilkobling.execute(
+            "SELECT " + ", ".join(VURDERINGSKOLONNER) + ", grunn FROM vurdering WHERE symbol = ? AND dato = ?",
+            (symbol, dato.isoformat()),
+        ).fetchone()
+        if rad is None:
+            return None
+        *felt, grunn = rad
+        return _innhold(felt, grunn)
+
 
 def _post(rad) -> Oversiktspost:
     symbol, ticker, navn, sektor, hentet = rad[:5]

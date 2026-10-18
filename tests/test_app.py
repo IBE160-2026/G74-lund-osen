@@ -3127,3 +3127,275 @@ class TestStipletBareForIndeksenPaaForsiden:
             if "dasharray" in innhold or "dashed" in innhold
         ]
         assert stiplet == [".soeyler .indekslinje"], stiplet
+
+
+# Story 8.16: periodene i kursgrafen. Regelen for startdagen er testet i
+# tests/test_perioder.py, og her siden. Mutantene staar i spesifikasjonen 8.16.
+
+
+def _hele_aaret(siste: date = FREDAG_09_10) -> list[Kursrad]:
+    """Alle boersdagene i 2026 til siste, med kurs som stiger litt hver dag,
+    saa punktene er ulike."""
+    from boersdag import er_boersdag
+
+    dager = [date(2026, 1, 1) + timedelta(days=i) for i in range((siste - date(2026, 1, 1)).days + 1)]
+    dager = [d for d in dager if er_boersdag(d)]
+    return [
+        Kursrad(dato=d, slutt=100.0 + i / 10, justert_slutt=100.0 + i / 10, volum=1000) for i, d in enumerate(dager)
+    ]
+
+
+def _knappene(html: str) -> list[tuple[str, str, bool]]:
+    """(href eller «skjema», navn, valgt) for knappene i periodevalget."""
+    nav = html.split('<nav class="periodevalg"', 1)[1].split("</nav>", 1)[0]
+    ut = [
+        (href, navn, bool(valgt))
+        for href, valgt, navn in re.findall(r'<a href="([^"]*)"( aria-current="true")?>([^<]*)</a>', nav)
+    ]
+    knapp = re.search(r'<button type="submit"( aria-current="true")?>([^<]*)</button>', nav)
+    ut.append(("skjema", knapp.group(2), bool(knapp.group(1))))
+    return ut
+
+
+def _valgt(html: str) -> list[str]:
+    return [navn for _, navn, valgt in _knappene(html) if valgt]
+
+
+def _foerste_og_siste_dag(html: str) -> str:
+    return re.search(r"<figcaption>\s*(\S+ til \S+)\.", html).group(1)
+
+
+def _dagen(html: str) -> str:
+    return _synlig(re.search(r'<p class="dagen">(.*?)</p>', html, re.S).group(1))
+
+
+class TestPeriodeneIKursgrafen:
+    """Kontrollen under story 8.16 i epics.md og punkt b og d i
+    spesifikasjonen 8.16. Klokka i testene staar paa 31.12.2026, saa den
+    foerste knappen heter «Fredag» etter siste boersdag 09.10."""
+
+    def _aksjen(self, vurdert: bool = True):
+        skriv_serie("EQNR", _hele_aaret(), datetime.fromisoformat(HENTET), vurdert=vurdert)
+
+    def test_knappene_i_rekkefoelgen_og_med_navnene_i_paragraf_2(self, klient):
+        """designregler.md §2. Ville feilet hvis en knapp manglet, sto et annet
+        sted eller hadde et annet navn, eller lenka gikk til en annen periode."""
+        from perioder import PERIODENE
+
+        self._aksjen()
+        knappene = _knappene(klient.get("/aksje/EQNR").data.decode("utf-8"))
+        assert [navn for _, navn, _ in knappene] == [
+            "Fredag",
+            "1 uke",
+            "1 mnd",
+            "3 mnd",
+            "6 mnd",
+            "I år",
+            "1 år",
+            "Velg dag",
+        ]
+        assert [href for href, _, _ in knappene] == [f"/aksje/EQNR?periode={p}" for p in PERIODENE[:-1]] + ["skjema"]
+
+    def test_6_mnd_naar_siden_aapnes(self, klient):
+        """FR-201. Ville feilet hvis grafen aapnet med en annen periode, eller
+        den foerste knappen var valgt, som i oversikten."""
+        self._aksjen()
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert _valgt(html) == ["6 mnd"]
+        assert "<h2>Kursutvikling, 6 måneder " in html
+        assert _foerste_og_siste_dag(html) == "09.04 til 09.10"
+
+    @pytest.mark.parametrize("periode", ["siste", "1-uke", "1-mnd", "3-mnd", "6-mnd", "i-aar", "1-aar"])
+    def test_punktene_fra_startdagen_for_hver_periode(self, klient, periode):
+        """Ville feilet hvis en periode regnet startdagen med en annen regel
+        enn perioder.startdag, for eksempel 182 dager for 6 mnd."""
+        from perioder import startdag
+
+        self._aksjen()
+        html = klient.get(f"/aksje/EQNR?periode={periode}").data.decode("utf-8")
+        start = startdag(periode, FREDAG_09_10)
+        ventet = [r.dato for r in _hele_aaret() if r.dato >= start]
+        assert len(_punktene(html, "kurslinje")) == len(ventet)
+        assert _foerste_og_siste_dag(html) == f"{ventet[0]:%d.%m} til 09.10"
+
+    @pytest.mark.parametrize("periode", ["siste", "1-uke", "1-mnd", "3-mnd", "6-mnd"])
+    def test_ma50_fra_foerste_punkt_for_6_mnd_og_kortere(self, klient, periode):
+        """FR-406, kontrollen under 8.16. Ville feilet hvis snittet ble regnet
+        bare paa perioden, saa de foerste punktene mistet det."""
+        self._aksjen()
+        html = klient.get(f"/aksje/EQNR?periode={periode}").data.decode("utf-8")
+        assert len(_punktene(html, "ma50linje")) == len(_punktene(html, "kurslinje"))
+
+    @pytest.mark.parametrize("periode", ["1-mnd", "i-aar", "1-aar"])
+    def test_indekslinja_foelger_perioden(self, klient, periode):
+        """Ville feilet hvis indekslinja sto fast paa 6 mnd: for I år og 1 år
+        ville den da startet i april, ikke paa grafens foerste dag."""
+        self._aksjen()
+        _legg_inn_indeks(_indeks([(r.dato, 1000.0 + i) for i, r in enumerate(_hele_aaret())]))
+        html = klient.get(f"/aksje/EQNR?periode={periode}").data.decode("utf-8")
+        indeks, kurs = _punktene(html, "indekslinje"), _punktene(html, "kurslinje")
+        assert len(indeks) == len(kurs) and indeks[0] == kurs[0]
+
+    def test_1_aar_med_kortere_serie_sier_det(self, klient):
+        """FR-201. Serien begynner 02.01, og 1 år fra 09.10 er 09.10.2025.
+        Ville feilet hvis grafen ikke sa det, eller sa det for 6 mnd."""
+        self._aksjen()
+        aar = _synlig(klient.get("/aksje/EQNR?periode=1-aar").data.decode("utf-8"))
+        assert "Kursserien begynner 02.01, så grafen viser bare det den har." in aar
+        seks = _synlig(klient.get("/aksje/EQNR?periode=6-mnd").data.decode("utf-8"))
+        assert "Kursserien begynner" not in seks
+
+    def test_velg_dag_uten_vurdering_viser_ikke_vurdert(self, klient):
+        """designregler.md §2 og AD-7. 01.10 er en boersdag uten rad i
+        vurdering. Ville feilet hvis «Velg dag» regnet signalet for dagen."""
+        self._aksjen()
+        html = klient.get("/aksje/EQNR?periode=velg&dag=2026-10-01").data.decode("utf-8")
+        dagen = _dagen(html)
+        assert "Torsdag 01.10:" in dagen and "Signal: – ikke vurdert." in dagen
+        assert _valgt(html) == ["01.10"]
+        assert "<h2>Kursutvikling, 6 måneder fram til torsdag 01.10 " in html
+        assert 'class="dagstrek"' in html and 'class="dagpunkt"' in html
+        assert _foerste_og_siste_dag(html) == "01.04 til 01.10"
+
+    def test_velg_dag_viser_den_lagrede_vurderingen(self, klient):
+        """Ville feilet hvis signalet ble regnet paa nytt: kursene gir ikke 3
+        av 3 Blandet, men det er det som er lagret for 01.10."""
+        self._aksjen()
+        rad = next(r for r in _hele_aaret() if r.dato == date(2026, 10, 1))
+        skriv_vurdering(
+            "EQNR",
+            rad.dato,
+            Vurdering(
+                styrke=3,
+                retning="Blandet",
+                trend=1,
+                bevegelse=-1,
+                interesse=1,
+                slutt=rad.slutt,
+                justert_slutt=rad.justert_slutt,
+                trend_avvik=0.0,
+                dagens_endring=0.0,
+                standardavvik=0.01,
+                volumforhold=1.0,
+            ),
+        )
+        dagen = _dagen(klient.get("/aksje/EQNR?dag=2026-10-01").data.decode("utf-8"))
+        assert "Signal: 3 av 3," in dagen and "Blandet." in dagen
+
+    def test_velg_dag_med_grunn_og_ikke_boersdag(self, klient):
+        """FR-409: en grunn vises, og en dag som ikke er boersdag, sier det,
+        og at grafen slutter dagen foer (gjennomgangen, BH2). Ville feilet hvis
+        en grunn eller en loerdag ga «ikke vurdert» eller et signal."""
+        from markedsoversikt import GRUNNTEKST
+
+        self._aksjen()
+        skriv_vurdering("EQNR", date(2026, 10, 2), Grunn.SIGNAL_IKKE_REGNET)
+        grunn = _dagen(klient.get("/aksje/EQNR?dag=2026-10-02").data.decode("utf-8"))
+        assert f"Signal: – {GRUNNTEKST[Grunn.SIGNAL_IKKE_REGNET]}." in grunn
+        html = klient.get("/aksje/EQNR?dag=2026-10-03").data.decode("utf-8")
+        assert "Lørdag 03.10: endring –. Signal: – ikke børsdag." in _dagen(html)
+        assert "03.10 har ingen kurs, så grafen slutter 02.10." in _synlig(html)
+
+    def test_siste_boersdag_merker_dagen_med_endringen_og_signalet(self, klient):
+        """Gruppens svar 18.10 kl. 21:50. Ville feilet uten dagen merket,
+        endringen den dagen eller signalet som er lagret for den."""
+        self._aksjen()
+        html = klient.get("/aksje/EQNR?periode=siste").data.decode("utf-8")
+        dagen = _dagen(html)
+        assert dagen.startswith("Fredag 09.10: endring +") and "Signal: " in dagen
+        assert "ikke vurdert" not in dagen
+        assert _valgt(html) == ["Fredag"] and 'class="dagstrek"' in html
+
+    @pytest.mark.parametrize(
+        "spoerring, beskjed",
+        [
+            ("periode=tull", "Perioden «tull» finnes ikke, så grafen viser 6 mnd."),
+            ("dag=2027-01-05", "05.01.2027 er fram i tid, så grafen viser 6 mnd."),
+            ("dag=hei", "Datoen «hei» kunne ikke leses, så grafen viser 6 mnd."),
+            ("periode=velg&dag=2026-13-01", "Datoen «2026-13-01» kunne ikke leses, så grafen viser 6 mnd."),
+            ("periode=velg", "Velg en dag i feltet, så viser grafen 6 mnd fram til den."),
+            ("dag=2025-06-01", "Kursserien begynner 02.01.2026, så grafen viser 6 mnd."),
+            # Gjennomgangen, BH1 og BH3: etter siste dag, og seriens foerste dag.
+            ("dag=2026-10-15", "Kursserien slutter 09.10.2026, så grafen viser 6 mnd."),
+            ("dag=2026-01-02", "Kursserien begynner 02.01.2026, så grafen viser 6 mnd."),
+        ],
+    )
+    def test_feil_i_adressen_gir_6_mnd_og_en_kort_beskjed(self, klient, spoerring, beskjed):
+        """Ville feilet hvis en feil i adressen ga en feilside, en annen
+        periode enn 6 mnd, eller ingen beskjed."""
+        self._aksjen()
+        svar = klient.get(f"/aksje/EQNR?{spoerring}")
+        html = svar.data.decode("utf-8")
+        assert svar.status_code == 200
+        assert _valgt(html) == ["6 mnd"] and _foerste_og_siste_dag(html) == "09.04 til 09.10"
+        assert f'<p class="periodebeskjed" role="status">{beskjed}</p>' in html
+
+    def test_en_feil_periode_med_html_vises_som_tekst(self, klient):
+        """Ville feilet hvis beskjeden satte inn det som sto i adressen uten
+        aa escape det."""
+        self._aksjen()
+        html = klient.get("/aksje/EQNR?periode=<b>x</b>").data.decode("utf-8")
+        assert "<b>x</b>" not in html and "&lt;b&gt;x&lt;/b&gt;" in html
+
+    def test_ved_390_px_bryter_knappene_linja(self, klient):
+        """Knappene ligger i en flex med wrap, og datofeltet krymper, saa
+        siden ikke ruller sidelengs. Testen leser bare stilen; det er ikke
+        maalt i en nettleser. Ville feilet uten wrap, eller med en fast bredde
+        paa 100 px eller mer i periodevalget."""
+        self._aksjen()
+        stil = _stil(klient.get("/aksje/EQNR").data.decode("utf-8"))
+        assert "flex-wrap: wrap" in _regel(stil, "nav.periodevalg ul")
+        assert "flex-wrap: wrap" in _regel(stil, "nav.periodevalg form")
+        assert "max-width: 100%" in _regel(stil, 'nav.periodevalg input[type="date"]')
+        regler = stil.split("nav.periodevalg", 1)[1].split(".dagstrek", 1)[0]
+        assert not re.search(r"(?<![-\w])width:\s*\d{3,}px", regler)
+
+    def test_valgt_knapp_har_aria_current_og_fokus_synes(self, klient):
+        """Ville feilet med mer enn én valgt knapp, eller uten fokusring."""
+        self._aksjen()
+        html = klient.get("/aksje/EQNR?periode=3-mnd").data.decode("utf-8")
+        assert _valgt(html) == ["3 mnd"]
+        nav = html.split('<nav class="periodevalg"', 1)[1].split("</nav>", 1)[0]
+        assert nav.count("aria-current") == 1
+        fokus = re.search(r"nav\.periodevalg a:focus-visible[^{]*\{([^}]*)\}", _stil(html))
+        assert fokus and "outline: 3px solid" in fokus.group(1)
+
+    def test_velg_dag_er_et_skjema_uten_skript(self, klient):
+        """«Velg dag» er et datofelt i et skjema, og siden har ingen skript.
+        Feltet gaar fra andre dag i serien til siste (gjennomgangen, BH1 og
+        BH3). Ville feilet med et skript, uten skjemaet, eller med i dag som
+        siste dag i feltet."""
+        self._aksjen()
+        html = klient.get("/aksje/EQNR?dag=2026-10-01").data.decode("utf-8")
+        nav = html.split('<nav class="periodevalg"', 1)[1].split("</nav>", 1)[0]
+        assert '<form method="get" action="/aksje/EQNR">' in nav
+        assert (
+            '<input type="date" id="velg-dag" name="dag" required value="2026-10-01" min="2026-01-05" max="2026-10-09">'
+            in nav
+        )
+        assert "<script" not in html.lower()
+
+    @pytest.mark.parametrize(
+        "periode, ventet",
+        [
+            ("1-uke", ["02.10", "05.10", "06.10", "07.10", "08.10", "09.10"]),
+            ("1-mnd", ["09.09", "14.09", "21.09", "28.09", "05.10"]),
+            ("6-mnd", ["mai", "juni", "juli", "august", "september", "oktober"]),
+            ("1-aar", ["januar", "", "mars", "", "mai", "", "juli", "", "september", ""]),
+            # Gjennomgangen, BH4: I år med 10 maaneder tynnes som 1 år.
+            ("i-aar", ["januar", "", "mars", "", "mai", "", "juli", "", "september", ""]),
+        ],
+    )
+    def test_merkene_paa_aksen_passer_perioden(self, klient, periode, ventet):
+        """Ville feilet med maanedsnavn paa en uke, eller navn paa alle 10
+        maanedene for 1 år, der de ikke faar plass."""
+        self._aksjen()
+        html = klient.get(f"/aksje/EQNR?periode={periode}").data.decode("utf-8")
+        assert re.findall(r'class="maanedstekst"[^>]*>([^<]*)<', html) == ventet
+
+    def test_overskriften_passer_perioden(self, klient):
+        """Ville feilet hvis overskriften sto paa 6 måneder for en annen periode."""
+        self._aksjen()
+        for periode, tekst in (("1-uke", "1 uke"), ("1-mnd", "1 måned"), ("i-aar", "i år"), ("1-aar", "1 år")):
+            html = klient.get(f"/aksje/EQNR?periode={periode}").data.decode("utf-8")
+            assert f"<h2>Kursutvikling, {tekst} " in html, periode
