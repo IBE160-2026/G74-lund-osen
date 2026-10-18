@@ -732,9 +732,10 @@ class TestReadme:
         tester = README.read_text(encoding="utf-8").split("\n## Tester\n", 1)[1].split("\n## ", 1)[0]
         assert f"Python {_python_krav()} eller nyere" in tester and "`requires-python`" in tester
         # Én rekkefølge: uv sync, så uv run pytest, og ingen annen blokk
-        # foran (gjennomgangen, BH2).
+        # foran (gjennomgangen, BH2). Story 3.3e (svaret 18.10 kl. 20:39):
+        # installasjonen av uv for Windows og Mac kommer foerst.
         blokker = [b.strip() for _, b in _blokkene(tester)]
-        assert blokker == ["uv sync", "uv run pytest"], blokker
+        assert blokker == [UV_WINDOWS, UV_MAC, "uv sync", "uv run pytest"], blokker
         assert "uten Docker" in tester and "Alle testene skal bestå" in tester
         # Grunnene for det som hoppes over, slik testene sier dem (VG4).
         for grunn in ("time.tzset", "Unix-sokler", "`::1`", "uten git"):
@@ -758,7 +759,7 @@ class TestReadme:
         for grunn in ("time.tzset", "Unix-sokler", "`::1`", "uten git", "`-rs`"):
             assert grunn in forklaring and grunn not in synlig, grunn
         assert "Alle testene skal bestå." in synlig
-        assert [b.strip() for _, b in _blokkene(synlig)] == ["uv sync", "uv run pytest"]
+        assert [b.strip() for _, b in _blokkene(synlig)] == [UV_WINDOWS, UV_MAC, "uv sync", "uv run pytest"]
         assert "- Ingen nettkall:" in synlig and "- CI kjører" in synlig
         assert "](docs/kvalitetssikring.md)" in synlig
         # Gjennomgangen, BH10 og ECH7: indeksene i samme tekst, og knappen
@@ -831,6 +832,10 @@ BILDENE = {1: "engine-running.png", 2: "github-download-zip.png", 4: "powershell
 # tallene og tekstene. Endres en av dem, tas bildet paa nytt og avtrykket
 # oppdateres i samme commit (spesifikasjonen 3.3e, «Avgjort»).
 SKJERMBILDET = "docs/bilder/readme/oversikten-demo.png"
+# Story 3.3e (svaret 18.10 kl. 20:39): installasjonen av uv i «Tester», fra
+# https://docs.astral.sh/uv/getting-started/installation/.
+UV_WINDOWS = 'powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"'
+UV_MAC = "curl -LsSf https://astral.sh/uv/install.sh | sh"
 MALENE_BAK_BILDET = (
     "src/templates/index.html",
     "src/templates/_ramme.html",
@@ -1487,7 +1492,11 @@ class TestReadmeForNybegynnere:
         demo, ekte = uv.split("**Demoen**\n\n", 1)[1].split("**Den ekte versjonen**\n\n", 1)
         ekte, etter = ekte.split("\n\nBasen, demobasen", 1)
         # Gjennomgangen, ECH6: setningene foer og etter listene staar.
-        assert uv.startswith("Med Python 3.13 og [uv](https://docs.astral.sh/uv/). Først demoen.\n\n**Demoen**")
+        # Story 3.3e: installasjonen av uv står bare under «Tester».
+        assert uv.startswith(
+            "Med Python 3.13 og [uv](https://docs.astral.sh/uv/). Installasjonen av uv står under "
+            "[«Tester»](#tester). Først demoen.\n\n**Demoen**"
+        )
         assert etter.startswith(" og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo` åpner")
         for navn, liste in (("Demoen", demo), ("Den ekte versjonen", ekte)):
             punkter = re.findall(r"^(\d+)\. ([^\n]+)\n\n```\n([^\n]+)\n```$", liste, re.MULTILINE)

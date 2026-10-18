@@ -187,7 +187,7 @@ Volumene står når du bytter, også basen med vurderingene.
 <details>
 <summary>Uten Docker, med uv</summary>
 
-Med Python 3.13 og [uv](https://docs.astral.sh/uv/). Først demoen.
+Med Python 3.13 og [uv](https://docs.astral.sh/uv/). Installasjonen av uv står under [«Tester»](#tester). Først demoen.
 
 **Demoen**
 
@@ -301,7 +301,21 @@ Under arbeid, og ingenting er endelig.
 
 ## Tester
 
-**På en ren maskin uten Docker** trenger du bare [uv](https://docs.astral.sh/uv/). Appen krever Python 3.13 eller nyere (`requires-python` i `pyproject.toml`), og uv henter den hvis maskinen ikke har den. Stå i mappa der README og `pyproject.toml` ligger, og kjør:
+**På en ren maskin uten Docker** trenger du bare [uv](https://docs.astral.sh/uv/). Appen krever Python 3.13 eller nyere (`requires-python` i `pyproject.toml`), og uv henter den hvis maskinen ikke har den. Installer uv først, etter [fremgangsmåten hos uv](https://docs.astral.sh/uv/getting-started/installation/).
+
+Windows (PowerShell):
+
+```
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+Mac (Terminal):
+
+```
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Blir `uv` ikke funnet etterpå («The term 'uv' is not recognized» eller «command not found: uv»), lukker du vinduet, åpner et nytt og går til mappa, som i steg 4. Stå i mappa der README og `pyproject.toml` ligger, og kjør:
 
 ```
 uv sync
@@ -310,6 +324,8 @@ uv sync
 ```
 uv run pytest
 ```
+
+Første `uv sync` laster ned Python og pakkene, og kan ta noen minutter. Hele testsettet tok mellom 4 og 7 minutter på maskinen vår 18.10.
 
 Alle testene skal bestå. Noen hoppes over, og knappen under sier hvorfor.
 

@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-18T20:11
+updated: 2026-10-18T21:16
 ---
 
 # Hjelp til «Kom i gang»
@@ -154,6 +154,10 @@ Nei. Porten er bare åpen på maskinen selv (127.0.0.1). Appen kan ikke nås fra
 ### Siden åpnes ikke.
 
 Vent til linja med «Serving on» har kommet, og sjekk at terminalvinduet fortsatt er åpent. Adressen er http://127.0.0.1:8000, ikke 0.0.0.0.
+
+### «The term 'uv' is not recognized» eller «command not found: uv».
+
+Blir `uv` ikke funnet etter installasjonen, lukker du vinduet, åpner et nytt og går til mappa, som i steg 4. Er uv ikke installert, står installasjonen for Windows og Mac under «Tester» i [README-en](../README.md#tester).
 
 ### «docker» er ikke gjenkjent, eller «command not found: docker».
 
