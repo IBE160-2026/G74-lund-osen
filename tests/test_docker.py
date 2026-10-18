@@ -1577,6 +1577,27 @@ class TestReadmeForNybegynnere:
         # Story 2.8: en henting er aksjene og hovedindeksen.
         assert re.search(rf"en henting bruker {antall + 1}\b", nokkel), nokkel
 
+    def test_til_faglaerer_begynner_med_demoen_den_ekte_versjonen_og_testene(self):
+        """Story 3.3d, punkt e (beslutningen 16.10 kl. 21:16, med svarene kl.
+        21:25 og 21:57, og svaret 18.10 kl. 15:37): først under «Til
+        faglærer» kommer tre lenker, hver med en kort forklaring foran, til
+        demoen, den ekte versjonen og «Tester». Ville feilet med en lenke til
+        en overskrift som ikke finnes."""
+        tekst = README.read_text(encoding="utf-8")
+        lista = tekst.split("Til faglærer:\n", 1)[1].split("\n\n", 1)[0].splitlines()
+        forventet = [
+            ("Se appen med oppdiktede tall, uten konto og nøkkel, etter steg 1–4", "demoen", "Demoen"),
+            ("Ekte kurser, med en gratis nøkkel fra EODHD", "den ekte versjonen", "Den ekte versjonen (anbefalt)"),
+            ("De automatiske testene, med to kommandoer", "Tester", "Tester"),
+        ]
+        ankrene = _ankrene(tekst)
+        for linje, (forklaring, lenketekst, overskrift) in zip(lista[:3], forventet, strict=True):
+            treff = re.fullmatch(r"- (.+): \[([^\]]+)\]\(#([^)]+)\)", linje)
+            assert treff, linje
+            assert treff.group(1) == forklaring and treff.group(2) == lenketekst, linje
+            assert treff.group(3) == _anker(overskrift), linje
+            assert treff.group(3) in ankrene, linje
+
     def test_til_faglaerer_lenker_til_briefen_med_gjeldende_tag(self):
         """12.10 kl. 12:12: briefen var gjemt langt nede. Lista under
         «Til faglærer:» lenker til den, og taggen er den CLAUDE.md sier er
