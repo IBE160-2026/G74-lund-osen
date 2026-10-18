@@ -10,11 +10,14 @@ eksempel i ZIP-fila som leveres. Naar git finnes, sjekkes tolkningen mot
 `git check-ignore`. Den andre delen trenger git, og hoppes over uten.
 Testene leser bare: de endrer verken .gitignore eller git-indeksen.
 
-Story 9.8: skillene til BMAD ligger bare i .claude/skills/. Ingen fil under
-.agents/ er sporet i git, og manifestet til BMAD har bare claude-code under
-ides, saa en ny installasjon ikke legger kopien for Codex inn igjen.
+Story 9.8: skillene til BMAD ligger bare i .claude/skills/. Det finnes ingen
+.agents/ i rotmappa, ingen fil under den er sporet i git, og manifestet til
+BMAD har bare claude-code under ides. At en ny installasjon leser ides fra
+manifestet, er ikke slaatt opp, siden installasjonskoden ikke ligger i repoet.
+Kommer kopien tilbake, feiler testene for .agents/.
 """
 
+import re
 import shutil
 import subprocess
 from fnmatch import fnmatchcase
@@ -150,54 +153,92 @@ def test_hvilke_stier_som_ikke_skal_spores():
         assert not _skal_ikke_spores(sti), sti
 
 
+def _flytliste(tekst: str) -> list[str]:
+    """Verdiene i [a, b], uten anfoerselstegn."""
+    inni = tekst.strip().lstrip("[").split("]")[0]
+    return [v.strip().strip("'\"") for v in inni.split(",") if v.strip()]
+
+
 def ides(manifest: str) -> list[str]:
     """Lista under ides: i manifestet til BMAD, lest som tekst til neste
-    noekkel paa toppnivaa. Delen av YAML en installasjon skriver: en liste med
-    eller uten innrykk, eller [a, b] paa samme linje, og kommentarer."""
+    noekkel paa toppnivaa. Delen av YAML en installasjon kan skrive: en liste
+    med eller uten innrykk, [a, b] paa en eller flere linjer, en enkelt verdi
+    paa samme linje, kommentarer etter mellomrom eller tabulator, en BOM og
+    dokumentskilleren ---."""
     verdier = []
     inne = False
-    for linje in manifest.splitlines():
-        linje = linje.split(" #")[0].rstrip()
+    flyt = None
+    for linje in manifest.lstrip("﻿").splitlines():
+        linje = re.sub(r"(^|\s)#.*$", "", linje).rstrip()
         innhold = linje.strip()
-        if not innhold or innhold.startswith("#"):
+        if flyt is not None:
+            flyt += " " + innhold
+            if "]" in innhold:
+                verdier += _flytliste(flyt)
+                flyt = None
+            continue
+        if not innhold or innhold in ("---", "..."):
             continue
         if not linje[0].isspace() and not innhold.startswith("-"):
             noekkel, _, resten = innhold.partition(":")
             inne = noekkel.strip().strip("'\"") == "ides"
             resten = resten.strip()
             if inne and resten.startswith("["):
-                verdier += [v.strip().strip("'\"") for v in resten.strip("[]").split(",") if v.strip()]
+                if "]" in resten:
+                    verdier += _flytliste(resten)
+                else:
+                    flyt = resten
+            elif inne and resten:
+                verdier.append(resten.strip("'\""))
             continue
         if inne and innhold.startswith("-"):
             verdier.append(innhold[1:].strip().strip("'\""))
+    if flyt is not None:
+        verdier += _flytliste(flyt)
     return verdier
+
+
+def test_det_finnes_ingen_agents_i_rotmappa():
+    """Story 9.8 (BH3 i gjennomgangen): gaar ogsaa uten git, for eksempel i
+    ZIP-fila. Ville feilet hvis en ny BMAD-installasjon la kopien for Codex i
+    .agents/ igjen, ogsaa foer noen kjoerte git add."""
+    assert not (ROT / ".agents").exists(), ".agents/ finnes i rotmappa"
 
 
 @pytest.mark.skipif(not har_git(ROT), reason=UTEN_GIT)
 def test_ingen_fil_under_agents_er_sporet():
     """Story 9.8: kopien for Codex er tatt ut. Ville feilet hvis en fil fra
     .claude/skills/ ble kopiert til .agents/ og lagt inn med git add (mutant
-    S1). Indeksen leses, saa en fil som er lagt inn, men ikke committet,
+    S1), eller .agents ble lagt inn som en fil, en lenke eller en submodul
+    (ECH3). Indeksen leses, saa en fil som er lagt inn, men ikke committet,
     teller ogsaa."""
     svar = _git("ls-files", "-z")
     assert svar.returncode == 0, svar.stderr
-    sporet = [sti for sti in svar.stdout.split("\0") if sti.lower().startswith(".agents/")]
+    sporet = [s for s in svar.stdout.split("\0") if s.lower() == ".agents" or s.lower().startswith(".agents/")]
     assert sporet == [], f"sporet under .agents/: {sporet[:5]} ({len(sporet)} i alt)"
 
 
 def test_manifestet_har_bare_claude_code():
-    """Story 9.8: en ny BMAD-installasjon leser ides fra manifestet. Ville
-    feilet hvis «- codex» kom tilbake under ides (mutant S2), eller lista
-    var tom."""
+    """Story 9.8: manifestet oppgir bare Claude Code. Ville feilet hvis
+    «- codex» kom tilbake under ides (mutant S2), eller lista var tom."""
     assert ides(MANIFEST.read_text(encoding="utf-8")) == ["claude-code"]
 
 
 def test_ides_leses_i_formene_en_installasjon_skriver():
     """Ville feilet hvis lesingen bare saa listen med innrykk, slik at
-    «- codex» uten innrykk eller [claude-code, codex] slapp gjennom."""
+    «- codex» uten innrykk, [claude-code, codex] paa en eller flere linjer
+    (ECH1) eller «ides: codex» slapp gjennom, eller hvis en BOM, en kommentar
+    etter tabulator eller --- ga en falsk verdi (ECH2)."""
     assert ides("modules:\n  - name: core\nides:\n  - claude-code\n  - codex\n") == ["claude-code", "codex"]
     assert ides("ides:\n- claude-code\n- codex\nandre: 1\n") == ["claude-code", "codex"]
     assert ides("ides: [claude-code, 'codex']\n") == ["claude-code", "codex"]
     assert ides("ides:\n  # - codex\n  - claude-code # vi\n") == ["claude-code"]
     assert ides("ides:\n  - claude-code\nmodules:\n  - name: codex\n") == ["claude-code"]
     assert ides("modules:\n  - name: core\n") == []
+    assert ides("ides: [claude-code,\n  codex]\n") == ["claude-code", "codex"]
+    assert ides("ides: [\n  claude-code,\n  codex,\n]\nandre: 1\n") == ["claude-code", "codex"]
+    assert ides("ides: codex\n") == ["codex"]
+    assert ides("ides: []\n") == []
+    assert ides("﻿ides:\n  - claude-code\n") == ["claude-code"]
+    assert ides("ides:\n  - claude-code\t# x\n---\n") == ["claude-code"]
+    assert ides("ides:\r\n  - claude-code\r\n  - codex\r\n") == ["claude-code", "codex"]
