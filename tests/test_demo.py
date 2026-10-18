@@ -541,6 +541,16 @@ class TestStory80cIDemoen:
         assert '<tr class="utslag">' in oversikt
         assert re.search(r'<span class="ord">(positiv|negativ|ingen utslag)</span>', detalj)
         assert "Signalstyrken sier ikke om du bør kjøpe eller selge." in detalj
+        # Story 3.4b (gruppens svar 18.10 kl. 20:08): ordlista gjelder vår
+        # tekst, ikke KI-teksten, til prompten faar den i versjon 3. Bare
+        # avsnittet med modellens ord tas ut. «Laget av KI» og resten av
+        # delen sjekkes som foer.
+        # Gjennomgangen, ECH2: BRFE har teksten bare naar raden besto (FR-604).
+        from demo_ki import les_radene
+
+        vist = sum(1 for r in les_radene() if r.emne.symbol == "BRFE" and r.besto)
+        assert detalj.count('<p class="ki-tekst">') == vist
+        detalj = re.sub(r'<p class="ki-tekst">.*?</p>', "", detalj, flags=re.DOTALL)
         for html in (oversikt, detalj):
             assert app_modul.UNDER_ARBEID_TEKST in html
             assert f"Demoversjon. {app_modul.EKSEMPELTALL_MERKE}" in html

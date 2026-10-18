@@ -345,8 +345,10 @@ class TestEtterGjennomgangen:
         """BH10: en mellomlagring skal ikke gi siden med KI paa til en med KI av."""
         assert "Cookie" in klient.get("/aksje/EQNR").headers.get("Vary", "")
 
-    def test_demoen_viser_ingen_ki_tekst(self, klient, tmp_path, monkeypatch):
-        """VG3 og svar 7: demoen har ingen KI-rader foer 3.4b, og sier det."""
+    def test_demoen_viser_ki_teksten(self, klient, tmp_path, monkeypatch):
+        """VG3 og svar 7: demoen hadde ingen KI-rader foer 3.4b, og sa det.
+        Story 3.4b: demoen viser KI-teksten fra demo_ki_tekster.json. Het
+        test_demoen_viser_ingen_ki_tekst til 3.4b."""
         from demo import lag_demobase
         from lagring_sqlite import demo_sti
 
@@ -355,13 +357,15 @@ class TestEtterGjennomgangen:
         oversikt = klient.get("/").data.decode("utf-8")
         import re
 
-        symbol = re.search(r'href="/aksje/([A-Z]+)"', oversikt).group(1)
+        assert re.search(r'href="/aksje/([A-Z]+)"', oversikt)
+        # Gjennomgangen, ECH2: en aksje med en tekst som besto (FR-604).
+        from demo_ki import les_radene
+
+        symbol = next(r.emne.symbol for r in les_radene() if r.besto)
         html = klient.get(f"/aksje/{symbol}").data.decode("utf-8")
         assert "Eksempeltall" in html
-        assert (
-            '<p class="uten">Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.</p>'
-            in html
-        )
+        assert "Laget av KI · " in html and '<p class="ki-tekst">' in html
+        assert "Ingen KI-tekst for denne dagen" not in html
 
 
 def test_webserveren_importerer_ingen_modell_heller_ikke_under_en_forespoersel(tmp_path):

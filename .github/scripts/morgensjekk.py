@@ -293,6 +293,10 @@ for f in filer:
         feil_filer.append(f)
     elif p.suffix in (".db", ".sqlite", ".sqlite3", ".parquet", ".pkl", ".xlsx"):
         feil_filer.append(f)
+    # Story 3.4b: KI-radene i demoen er oppdiktede tall og tekster om dem, ikke
+    # raadata fra kildene (regel 16). Bare akkurat den stien.
+    elif f == "src/demo_ki_tekster.json":
+        pass
     elif p.suffix in (".csv", ".json", ".jsonl") and not f.startswith((".claude/", "_bmad/")):
         feil_filer.append(f)
 MOENSTRE = {

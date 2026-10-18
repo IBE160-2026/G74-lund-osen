@@ -48,6 +48,11 @@ dagen, saa indeksen foelger demoaksjene. Den har en rad for hver demodag og
 lagres med SqliteIndekslager i tabellen indeks, ikke i aksje eller kurs, saa
 «x av N» ikke teller den. Volumet er summen av volumet for aksjene med kurs.
 
+KI-tekstene (story 3.4b): radene for siste demodag ligger ferdige i
+src/demo_ki_tekster.json, laget én gang med Gemma (demo_ki.py). Kommandoen
+leser fila og skriver radene i KI-loggen med klokka stilt paa SLUTTDATO, saa
+aksjesiden viser KI-teksten uten Ollama og uten nett.
+
 Merket: PRAGMA application_id = DEMOMERKE. Bare denne kommandoen setter det.
 Kommandoen nekter en fil uten merket, ogsaa en tom fil, og lager en demobase
 paa nytt fra bunnen. Hentingen nekter en base med merket.
@@ -64,6 +69,7 @@ from zoneinfo import ZoneInfo
 
 import lagring_sqlite
 from boersdag import er_boersdag
+from demo_ki import les_radene, sjekk_radene, skriv_radene
 from indeksdata import Indeks
 from kursdata import Aksje, Kursrad
 from lagring_sqlite import (
@@ -234,8 +240,11 @@ class IkkeEnDemobase(Exception):
     """Fila finnes og har ikke demomerket. Demokommandoen roerer den ikke."""
 
 
-def lag_demobase(sti: Path, skriv=print) -> None:
+def lag_demobase(sti: Path, skriv=print, med_ki: bool = True) -> None:
     """Lager demobasen i sti. En demobase som finnes, lages paa nytt.
+
+    med_ki=False lager den uten KI-radene. Bare demo_ki.py bruker det, naar
+    tekstene lages paa nytt (story 3.4b).
 
     Reiser IkkeEnDemobase hvis fila finnes uten merket, ogsaa naar den er tom,
     foer noe er skrevet (FR-411, AD-7).
@@ -251,11 +260,12 @@ def lag_demobase(sti: Path, skriv=print) -> None:
             f"{sti.name} finnes og er ikke en demobase. Demokommandoen skriver "
             "aldri til en base uten demomerket (FR-411)."
         )
+    radene = _ki_radene(skriv) if med_ki else []
     ny = sti.with_name(sti.name + ".ny")
     for rest in _med_hjelpefiler(ny):
         rest.unlink(missing_ok=True)
     try:
-        _bygg(ny)
+        _bygg(ny, radene)
     except BaseException:
         for rest in _med_hjelpefiler(ny):
             rest.unlink(missing_ok=True)
@@ -269,6 +279,22 @@ def lag_demobase(sti: Path, skriv=print) -> None:
         f"{len(dager)} handelsdager fra {dager[0]} til {dager[-1]}. Eksempeltall, "
         "ikke data fra Oslo Børs. Ingen nettkall."
     )
+    if radene:
+        skriv(f"KI-tekst for {len(radene)} aksjer paa siste dag, fra demo_ki_tekster.json. Ingen kall til modellen.")
+
+
+def _ki_radene(skriv) -> list:
+    """KI-radene fra fila, sjekket mot demoen. Kan fila ikke leses, eller
+    stemmer den ikke, lages demoen uten KI-tekst og sier hvorfor, som
+    hentingen (NFR-04): KI-laget stopper aldri demoen (gjennomgangen, BH2 og
+    ECH3)."""
+    try:
+        radene = les_radene()
+        sjekk_radene(radene, SLUTTDATO, {a.symbol for a in DEMOUNIVERS})
+    except (OSError, ValueError) as feil:
+        skriv(f"KI-tekstene i demoen kunne ikke leses ({type(feil).__name__}: {feil}). Demoen lages uten KI-tekst.")
+        return []
+    return radene
 
 
 def _med_hjelpefiler(sti: Path) -> list[Path]:
@@ -276,7 +302,7 @@ def _med_hjelpefiler(sti: Path) -> list[Path]:
     return [sti, *(sti.with_name(sti.name + ending) for ending in ("-journal", "-wal", "-shm"))]
 
 
-def _bygg(sti: Path) -> None:
+def _bygg(sti: Path, radene: list | None = None) -> None:
     """Skriver hele demobasen i sti, som ikke finnes fra foer."""
     tilkobling = aapne_base(sti)
     try:
@@ -311,6 +337,13 @@ def _bygg(sti: Path) -> None:
             for aksje in DEMOUNIVERS:
                 fram_til = [r for r in serier[aksje.symbol] if r.dato <= dag]
                 lager.skriv(aksje.symbol, dag, vurder(fram_til, dag))
+
+        # Story 3.4b: KI-radene for siste demodag, fra fila. Alle skal skrives
+        # (gjennomgangen, BH3): sjekk_radene har sett at hver aksje har én.
+        if radene:
+            skrevet = skriv_radene(tilkobling, radene, _klokke_for(SLUTTDATO))
+            if skrevet != len(radene):
+                raise RuntimeError(f"{skrevet} av {len(radene)} KI-rader ble skrevet i demobasen")
     finally:
         tilkobling.close()
 

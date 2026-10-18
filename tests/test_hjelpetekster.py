@@ -587,7 +587,14 @@ class TestStory80c:
         foer 8.0c. Sidene leses med testbasen her og med demobasen i
         test_demo.py."""
         for adresse in SIDENE:
-            tekst = synlig_tekst(_side(klient, adresse))
+            # Story 3.4b (gruppens svar 18.10 kl. 20:08): ordlista gjelder vaar
+            # tekst, ikke KI-teksten, til prompten faar den i versjon 3. Bare
+            # avsnittet med modellens ord tas ut.
+            side = _side(klient, adresse)
+            # Gjennomgangen, BH11: hoeyst ett avsnitt, og bare paa aksjesiden.
+            assert side.count('<p class="ki-tekst">') <= (1 if adresse.startswith("/aksje/") else 0), adresse
+            html = re.sub(r'<p class="ki-tekst">.*?</p>', "", side, flags=re.DOTALL)
+            tekst = synlig_tekst(html)
             for ord_ in VALGT_BORT:
                 assert not re.search(ord_, tekst, re.IGNORECASE), (adresse, ord_)
 
