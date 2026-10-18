@@ -340,7 +340,7 @@ uv sync
 uv run pytest
 ```
 
-Første `uv sync` laster ned Python og pakkene. Hele testsettet tok mellom 4 og 6 minutter på maskinen vår 18.10.
+Første `uv sync` laster ned Python og pakkene. Hele testsettet tok mellom 4 og 7 minutter på maskinen vår 18.10.
 
 Alle testene skal bestå. Noen hoppes over, og knappen under sier hvorfor.
 

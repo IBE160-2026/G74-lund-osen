@@ -1510,8 +1510,8 @@ class TestReadmeForNybegynnere:
         assert "«The term 'uv' is not recognized» eller «command not found: uv»" in tester and funnet in tester
         assert "Første `uv sync` laster ned Python og pakkene" in tester
         # Gjennomgangen (BH1, VG2, ECH5): tidene som staar i dagsfila 18.10,
-        # 219-385 s, i hele minutter.
-        assert "Hele testsettet tok mellom 4 og 6 minutter på maskinen vår 18.10." in tester
+        # 219-424 s, i hele minutter. 424 s er kjoeringen for 3.3e.
+        assert "Hele testsettet tok mellom 4 og 7 minutter på maskinen vår 18.10." in tester
         uv = _detaljer(_seksjon("Mer for den som vil"))["Uten Docker, med uv"]
         assert "[«Tester»](#tester)" in uv
         assert UV_WINDOWS not in uv and UV_MAC not in uv and "install.ps1" not in uv and "install.sh" not in uv
