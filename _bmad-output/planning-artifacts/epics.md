@@ -1920,6 +1920,24 @@ igjen (dagsfila 04.10, instruksjonen kl. 21:29).
 
 *Ferdig 2026-10-09:* flettet i `088c885`, PR #24.
 
+### Story 3.2b: Port 8000 i stedet for 5000
+
+*Lagt til 2026-10-18, gruppens svar kl. 17:40 (instruksjonen kl. 18:05).*
+
+Som **bruker på Mac**, vil jeg at appen starter uten at jeg må slå av noe, så jeg ikke står fast fordi AirPlay-mottakeren bruker port 5000.
+
+**Oppfyller:** svaret kl. 17:40 under «Prioritering» · **Begrenses av:** `AD-10`, regel 19 i `CLAUDE.md`
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- a) `compose.yaml` (begge tjenestene og kommentarene øverst), `Dockerfile` (`EXPOSE` og waitress), `src/app.py` (`app.run`) og CI i `.github/workflows/tester.yml` bruker 8000. Porten er den samme inne i containeren og på maskinen, så «Serving on» og adressen man åpner, sier det samme tallet
+- b) README-en og `docs/hjelp.md`: hver adresse og «Serving on» sier 8000. Svaret om porten i `docs/hjelp.md` sier 8000, og setningen om AirPlay får en Rettet-linje
+- c) `docs/kvalitetssikring.md`: radene i Prøve 1 og 2 som sa 5000, sier 8000, med en Rettet-linje. Arkitekturdokumentet får en datert linje der det nevner 5000. Spesifikasjonene og dagsfilene står som de er
+- d) En test: porten er den samme i `compose.yaml`, `Dockerfile`, `src/app.py`, CI og README-en, og 5000 står ikke igjen i noen av dem
+- Hentingen og basene røres ikke
+- **Ville feilet hvis:** 5000 sto igjen i `compose.yaml`, README-en eller `Dockerfile`, eller to av dem sa forskjellige porter
+
+**Avhenger av:** ingen. **Én økt:** ja.
+
 
 ### Story 3.3: README — «Slik kjører du den»
 
