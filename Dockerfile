@@ -1,6 +1,6 @@
 # OSE Signal - ett image med to innganger (story 3.1, AD-10, AD-17).
 #
-# Standard er webserveren med waitress paa port 5000. Den gjoer null API-kall
+# Standard er webserveren med waitress paa port 8000. Den gjoer null API-kall
 # og starter uten noekkel. Hentingen er et eget valg mot samme image:
 #   docker compose run --rm hent
 #
@@ -49,8 +49,8 @@ ENV PATH=/opt/venv/bin:$PATH \
     PYTHONPATH=/app/src \
     OSE_I_DOCKER=1
 
-EXPOSE 5000
+EXPOSE 8000
 
 # waitress, aldri Flasks egen server og aldri debug. 0.0.0.0 gjelder inne i
 # containeren; compose.yaml binder porten bare til 127.0.0.1 paa maskinen.
-CMD ["waitress-serve", "--listen=0.0.0.0:5000", "app:app"]
+CMD ["waitress-serve", "--listen=0.0.0.0:8000", "app:app"]

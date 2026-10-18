@@ -140,7 +140,7 @@ class TestImaget:
         aldri debug. Ville feilet med flask run eller app.run."""
         cmd = [r for i, r in _instruksjoner() if i == "CMD"]
         assert len(cmd) == 1
-        assert cmd[0] == '["waitress-serve", "--listen=0.0.0.0:5000", "app:app"]'
+        assert cmd[0] == '["waitress-serve", "--listen=0.0.0.0:8000", "app:app"]'
         hele = "\n".join(_linjer(DOCKERFILE)).lower()
         assert "flask run" not in hele and "debug" not in hele
 
@@ -247,10 +247,10 @@ class TestCompose:
 
     def test_porten_er_bare_paa_maskinen(self):
         """Betingelsen fra EODHD 21.09: lokalt, ikke publisert. Ville feilet
-        med "5000:5000", som binder til alle adresser."""
+        med "8000:8000", som binder til alle adresser."""
         tjenester = _tjenester()
         porter = _verdier(tjenester["app"]["ports"])
-        assert porter == ["127.0.0.1:5000:5000"]
+        assert porter == ["127.0.0.1:8000:8000"]
         assert "ports" not in tjenester["hent"]
         # Story 3.4: demoen har samme port, saa app og demo kan ikke kjoere samtidig.
         assert _verdier(tjenester["demo"]["ports"]) == porter
