@@ -3032,3 +3032,19 @@ class TestIndekslinjaPaaAksjesiden:
         _legg_inn_indeks(_indeks([(d, 1000.0 + 10 * i) for i, d in enumerate(dager[:-2])]))
         tekst = _synlig(klient.get("/aksje/EQNR").data.decode("utf-8"))
         assert f"Indeksen går bare til {dager[-3].strftime('%d.%m')}." in tekst
+
+    def test_hjelpen_for_linja_ogsaa_uten_snitt(self, klient):
+        """Gjennomgangen (BH11, ECH4, VG8): 20 dager er for kort for snittet.
+        «?» står ved grafen og har bare teksten om den stiplede linja. Ville
+        feilet hvis hjelpen krevde sjekkene eller snittet."""
+        dager = _boersdager_til(FREDAG_09_10, 20)
+        skriv_serie(
+            "EQNR",
+            [Kursrad(dato=d, slutt=100.0, justert_slutt=100.0, volum=1000) for d in dager],
+            datetime.fromisoformat(HENTET),
+        )
+        _legg_inn_indeks(_indeks([(d, 1000.0 + i) for i, d in enumerate(dager)]))
+        html = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert 'popovertarget="hjelp-graf"' in html
+        vinduet = html.split('<div id="hjelp-graf"', 1)[1].split('<div id="hjelp-', 1)[0]
+        assert "Den stiplede linja:" in vinduet and "Kursgrafen:" not in vinduet

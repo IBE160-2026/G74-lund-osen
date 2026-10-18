@@ -237,7 +237,8 @@
   {% endif %}
 
   {#- Story 2.9c: hjelpen forklarer også den stiplede linja når den vises. #}
-  {%- set vis_grafhjelp = graf and (graf.har_ma50 or graf.har_indeks) and detalj.sjekker %}
+  {%- set grafhjelp = (["grafen"] if graf and graf.har_ma50 and detalj.sjekker else []) + (["indekslinja"] if graf and graf.har_indeks else []) %}
+  {%- set vis_grafhjelp = grafhjelp|length > 0 %}
   <h2>Kursutvikling, 6 måneder{% if vis_grafhjelp %} {{ hjelpeknapp("hjelp-graf", "Hjelp: kursgrafen") }}{% endif %}</h2>
   {% if graf %}
     <figure>
@@ -314,7 +315,7 @@
   {{ hjelpevindu("hjelp-kurs", "Sluttkurs", [("", ["sluttkurs", "utbyttejustert"])]) }}
   {{ hjelpevindu("hjelp-endring", "Endring", [("", ["endring", "utbyttejustert"])]) }}
   {% if vis_grafhjelp %}
-    {{ hjelpevindu("hjelp-graf", "Kursgrafen", [("", (["grafen"] if graf.har_ma50 else []) + (["indekslinja"] if graf.har_indeks else []))]) }}
+    {{ hjelpevindu("hjelp-graf", "Kursgrafen", [("", grafhjelp)]) }}
   {% endif %}
   {{ hjelpevindu("hjelp-styrke", "Signalstyrke", [("", ["signalstyrke", "ikke_raad"])]) }}
   {{ hjelpevindu("hjelp-retning-aksje", "Retning", [
