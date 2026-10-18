@@ -8,6 +8,7 @@ import hashlib
 import json
 import re
 from datetime import date
+from pathlib import Path
 
 import pytest
 
@@ -496,3 +497,46 @@ class TestRaden:
         with pytest.raises(ValueError):
             lag_ki_rad(emne, grunnlag, REGELEN, modell)
         assert modell.prompter == []
+
+
+# Story 10.2d: de 13 tekstene Gemma skrev til demoen (3.4b), og en feil
+# retning for hver retning.
+DEMOTEKSTENE = Path(__file__).resolve().parents[1] / "src" / "demo_ki_tekster.json"
+FEIL_RETNING = {"Positiv": "Negativ", "Negativ": "Positiv", "Blandet": "Positiv", "Ingen": "Positiv"}
+
+
+def _demotekstene() -> list[tuple[str, str, dict]]:
+    """(symbol, tekst, grunnlag) for hver rad i demo_ki_tekster.json."""
+    radene = json.loads(DEMOTEKSTENE.read_text(encoding="utf-8"))["radene"]
+    return [(r["symbol"], r["tekst"], r["grunnlag"]) for r in radene]
+
+
+def _med_feil_retning(tekst: str, retning: str) -> str:
+    """Bytter den foerste retningen teksten sier, med stor forbokstav som Gemma
+    skriver den («Negativt», «Blandet», «av typen Ingen»), til en feil retning,
+    og beholder boeyningen."""
+    treff = re.search(rf"{retning}(t?)", tekst)
+    assert treff, (retning, tekst[:80])
+    return tekst[: treff.start()] + FEIL_RETNING[retning] + treff.group(1) + tekst[treff.end() :]
+
+
+class TestFormeneGemmaSkriver:
+    """Story 10.2d (gruppens svar 18.10 kl. 21:03): kontrollen leser retningen
+    og styrken i formene Gemma skriver. Hullet ble funnet med mutant K2 i 3.4b."""
+
+    @pytest.mark.xfail(
+        strict=True,
+        reason="10.2d punkt a: kontrollen leser ikke «Dette signalet er X» eller «av typen X», "
+        "så 12 av de 13 slipper gjennom på main. Tas bort med kontrollen i punkt b.",
+    )
+    def test_feil_retning_i_demotekstene_stoppes(self):
+        """Ville feilet hvis en av de 13 tekstene i demoen, med retningen den
+        foerst sier byttet til en feil, besto kontrollen."""
+        tekstene = _demotekstene()
+        assert len(tekstene) == 13
+        slapp = [
+            symbol
+            for symbol, tekst, grunnlag in tekstene
+            if kontroller(_med_feil_retning(tekst, grunnlag["retning"]), grunnlag).besto
+        ]
+        assert slapp == []
