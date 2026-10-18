@@ -527,6 +527,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-18 kl. 17:40 (gruppens svar):* appen bruker port 8000 i stedet for 5000, fordi AirPlay på Mac bruker 5000, i en egen PR i kveld (story 3.2b); og PR #67 flettes etter at spørsmålene om «Engine running» og «Cannot connect to the Docker daemon» er slått sammen til ett, fordi grunnen er den samme.
 
+*Avgjort 2026-10-18 kl. 20:08 (gruppens svar, under instruksjonen kl. 19:51):* ordlista i `designregler.md` §4 gjelder vår tekst, ikke KI-teksten, til prompten får den. I PR-en for 3.4b ser testen for ordlista bort fra KI-teksten, med grunnen, og tekstene står som de ble (FR-604). Ordlista kommer inn i prompten i versjon 3, sammen med innstrammingen av «fordi», etter uka med logget drift som begynner mandag 19.10. Da lages tekstene i demoen på nytt.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
