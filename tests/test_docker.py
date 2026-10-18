@@ -250,41 +250,58 @@ class TestCompose:
         Mac bruker port 5000, så appen bruker 8000. Porten er den samme i
         Dockerfile, compose.yaml (begge tjenestene, inne og ute), app.run i
         src/app.py, CI og README-en. Ville feilet hvis 5000 sto igjen i en av
-        dem, eller to av dem sa forskjellige porter."""
+        dem, eller to av dem sa forskjellige porter.
+
+        Gjennomgangen (BH3, ECH2): ogsaa docs/hjelp.md, der 5000 bare kan
+        staa i en Rettet-linje (svaret 18.10 kl. 18:58 tok ut setningen om
+        AirPlay). Alle port-linjene i compose telles (BH5), og adresser med
+        localhost leses ogsaa (BH7)."""
+        from urllib.parse import urlsplit
+
+        from ki_lokal import STANDARD_URL
+
         dockerfile = (ROT / "Dockerfile").read_text(encoding="utf-8")
         compose = COMPOSE.read_text(encoding="utf-8")
         app_py = (ROT / "src" / "app.py").read_text(encoding="utf-8")
         ci = CI.read_text(encoding="utf-8")
         readme = README.read_text(encoding="utf-8")
+        hjelp = _hjelp()
+        # Adressen til Ollama (STANDARD_URL i ki_lokal.py) er en annen tjeneste (BH6).
+        ollama = str(urlsplit(STANDARD_URL).port)
+        assert ollama != "8000"
+
+        def adressene(tekst: str) -> list[str]:
+            return [p for p in re.findall(r"http://(?:127\.0\.0\.1|localhost):(\d+)", tekst) if p != ollama]
+
         porter = {
             "EXPOSE": re.findall(r"^EXPOSE (\d+)$", dockerfile, re.MULTILINE),
             "waitress": re.findall(r"--listen=0\.0\.0\.0:(\d+)", dockerfile),
             "app.run": re.findall(r"app\.run\([^)]*port=(\d+)", app_py),
         }
         for tjeneste in ("app", "demo"):
+            porter[f"compose {tjeneste}"] = []
             for verdi in _verdier(_tjenester()[tjeneste]["ports"]):
                 treff = re.fullmatch(r"127\.0\.0\.1:(\d+):(\d+)", verdi)
                 assert treff, (tjeneste, verdi)
-                porter[f"compose {tjeneste}"] = list(treff.groups())
-        porter["CI"] = re.findall(r"http://127\.0\.0\.1:(\d+)", ci)
-        # Adressen til Ollama (STANDARD_URL i ki_lokal.py) er en annen tjeneste.
-        from ki_lokal import STANDARD_URL
-
-        ollama = STANDARD_URL.rsplit(":", 1)[1]
-        porter["README, adressene"] = [p for p in re.findall(r"http://127\.0\.0\.1:(\d+)", readme) if p != ollama]
-        assert f"http://127.0.0.1:{ollama}" in readme and ollama != "8000"
+                porter[f"compose {tjeneste}"] += list(treff.groups())
+        porter["CI"] = adressene(ci)
+        porter["README, adressene"] = adressene(readme)
         porter["README, Serving on"] = re.findall(r"Serving on http://0\.0\.0\.0:(\d+)", readme)
-        porter["compose, kommentarene"] = re.findall(r"http://127\.0\.0\.1:(\d+)", compose)
+        porter["compose, kommentarene"] = adressene(compose)
+        porter["hjelp, adressene"] = adressene(hjelp)
+        porter["hjelp, Serving on"] = re.findall(r"Serving on http://0\.0\.0\.0:(\d+)", hjelp)
         for sted, funnet in porter.items():
             assert funnet, sted
         alle = {p for funnet in porter.values() for p in funnet}
         assert alle == {"8000"}, porter
+        uten_rettet = "\n".join(l for l in hjelp.splitlines() if not l.startswith("*Rettet "))
         for navn, tekst in (
             ("Dockerfile", dockerfile),
             ("compose.yaml", compose),
             ("src/app.py", app_py),
             ("CI", ci),
             ("README.md", readme),
+            ("docs/hjelp.md uten Rettet-linjene", uten_rettet),
         ):
             assert "5000" not in tekst, navn
 
@@ -1001,12 +1018,12 @@ UTE_AV_README = {
         "Docker Desktop er ikke startet, eller motoren er ikke klar. Start Docker Desktop, vent til det "
         "står «Engine running» (steg 1), og prøv kommandoen igjen."
     ),
-    # Story 3.2b: porten er 8000, som i docs/hjelp.md. AirPlay bruker fortsatt 5000.
+    # Story 3.2b: porten er 8000, som i docs/hjelp.md. Setningen om AirPlay,
+    # som bruker 5000, er tatt ut (gruppens svar 18.10 kl. 18:58), og står
+    # ordrett i Rettet-linja under svaret i docs/hjelp.md.
     "«port is already allocated», «address already in use» eller «ports are not available».": (
         "Noe annet bruker port 8000. Kjører den andre versjonen, stopper du den først (se «Bytte mellom "
-        "demoen og den ekte versjonen» under «Mer for den som vil»). På Mac bruker AirPlay-mottakeren "
-        "(AirPlay Receiver) port 5000. Slå den av under Systeminnstillinger (System Settings) → Generelt "
-        "(General) → AirDrop og Handoff (AirDrop & Handoff), og prøv igjen."
+        "demoen og den ekte versjonen» under «Mer for den som vil»)."
     ),
     "Oversikten er tom.": (
         "Uten henting starter appen med tom oversikt og viser kommandoen som henter. Hent kursene med "
