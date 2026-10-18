@@ -530,10 +530,14 @@ class TestFormeneGemmaSkriver:
         foerst sier byttet til en feil, besto kontrollen."""
         tekstene = _demotekstene()
         assert len(tekstene) == 13
+        # Gjennomgangen (BH10): stoppet av retningen, ikke av noe annet.
         slapp = [
             symbol
             for symbol, tekst, grunnlag in tekstene
-            if kontroller(_med_feil_retning(tekst, grunnlag["retning"]), grunnlag).besto
+            if not any(
+                g.startswith("1: retningen")
+                for g in kontroller(_med_feil_retning(tekst, grunnlag["retning"]), grunnlag).grunner
+            )
         ]
         assert slapp == [], f"{len(slapp)} av 13 slapp gjennom: {slapp}"
 
@@ -561,6 +565,21 @@ class TestFormeneGemmaSkriver:
             "Dette er et positivt signal.",
             "Det er altså et negativt signal.",
             "Signalet er ikke et blandet signal.",
+            # Gjennomgangen: omvendt ordstilling (BH2), ord mellom signalet og
+            # verbet (BH3), fyll- og gradsord (BH4, ECH5), og anfoerselstegn og
+            # fet skrift (BH5, ECH5).
+            "Samlet er signalet positivt.",
+            "Derfor er retningen positiv.",
+            "Signalet for MOWI er Positivt.",
+            "Signalet i dag er negativt.",
+            "Dagens signal er Positivt.",
+            "Signalet er samlet sett Negativt.",
+            "Signalet er klart negativt.",
+            "Dette er et sterkt positivt signal.",
+            "Signalet er **Positivt**.",
+            "Signalet er av typen «Ingen».",
+            'Signalet er "Negativt".',
+            "Signalet er: Negativt.",
         ],
     )
     def test_feil_retning_i_formene_stoppes(self, tekst):
@@ -583,6 +602,11 @@ class TestFormeneGemmaSkriver:
             (BLANDET, "Dette signalet er av styrke to."),
             (TRE_POSITIVE, "Dette signalet er av styrke tre."),
             (INGEN, "Dette signalet er av styrke null."),
+            (BLANDET, "Samlet er signalet blandet."),
+            (
+                {**BLANDET, "retning": "Negativ"},
+                "Signalet for MOWI er **Negativt**, fordi to av de tre sjekkene ga utslag.",
+            ),
         ],
     )
     def test_riktig_retning_og_styrke_i_formene_bestaar(self, grunnlag, tekst):
@@ -610,6 +634,17 @@ class TestFormeneGemmaSkriver:
             "Interessen ga et negativt signal, og bevegelsen ga et positivt utslag.",
             "Trendsignalet er positivt.",
             "Signalet er ingen garanti.",
+            # Gjennomgangen: «det er et positivt signal» om en sjekk (BH1,
+            # ECH1), en sjekk foran «signalet» (ECH2), bindestrek (BH7) og
+            # retningen for hver sjekk etter «for» eller «på» (BH6, ECH3).
+            "Kursen ligger over MA50, og det er et positivt signal.",
+            "Dette signalet er Blandet. Trenden ga et positivt utslag, og det er et positivt signal.",
+            "Volumet er høyt, og dette er et negativt signal for interessen.",
+            "Trendens bidrag til signalet er positivt.",
+            "Trendens retning på signalet er positiv.",
+            "Trend-signalet er negativt.",
+            "Signalet er positivt for trenden, men negativt for interessen.",
+            "Signalet er positivt på trend, men negativt på bevegelse.",
         ],
     )
     def test_formene_om_en_sjekk_stoppes_ikke(self, tekst):
@@ -618,3 +653,18 @@ class TestFormeneGemmaSkriver:
         er ingen garanti» som retningen Ingen."""
         svar = kontroller(tekst, BLANDET)
         assert svar.besto, svar.grunner
+
+    @pytest.mark.parametrize(
+        "tekst", ["Hver sjekk er av styrke én.", "Utslaget er av styrke tre.", "Trenden var av styrke én."]
+    )
+    def test_av_styrke_om_en_sjekk_stoppes_ikke(self, tekst):
+        """Gjennomgangen (ECH8): grunnlaget sier styrke 2. Ville feilet hvis «av
+        styrke N» om én sjekk eller et utslag ble lest som styrken paa hele
+        signalet."""
+        svar = kontroller(tekst, BLANDET)
+        assert not any(g.startswith("1: styrken") for g in svar.grunner), svar.grunner
+
+    def test_retningen_paa_signalet_gir_en_grunn(self):
+        """Gjennomgangen (ECH4, VG6): ville feilet hvis «Retningen på signalet
+        er positiv» ga samme grunn to ganger."""
+        assert len(kontroller("Retningen på signalet er positiv.", BLANDET).grunner) == 1
