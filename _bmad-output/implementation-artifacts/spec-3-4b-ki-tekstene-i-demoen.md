@@ -2,7 +2,7 @@
 title: 'Story 3.4b: KI-tekstene i demoen'
 type: 'feature'
 created: '2026-10-18'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '5d5dc87'
@@ -96,3 +96,5 @@ Gjennomgang 18.10 på diffen `a0afada..c0aefc6`. Linsene var Blind Hunter (BH, 1
 | ECH10 | `sprint-status.yaml` sier `backlog` for 3-4b | low | utsatt: settes til done etter flettingen (steg 4) |
 
 *Lagt til 2026-10-18 (hele testsettet på `c61266a`):* `test_konsumentene.py::test_bare_aapne_base_kobler_til_basen` feilet. `lag_tekstene` koblet til demobasen med `sqlite3.connect`, men bare `aapne_base` i `lagring_sqlite.py` skal gjøre det (story 2.1b, K2). Rettet: `lag_tekstene` bruker `aapne_base`.
+
+*Lagt til 2026-10-18 kl. 20:55:* PR #69 er squash-flettet i `ab81d3f`, låst til head-en `8d632b0`, der main var flettet inn. CI var grønn på head-en (39156153956), også demoen med compose og sjekken av KI-teksten, og på main (39156267219). Triagen står som kommentar i PR #69.

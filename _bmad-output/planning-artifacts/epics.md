@@ -2144,6 +2144,8 @@ FR-604, FR-605, `AD-8`, `AD-9`
 
 *Avgjort 2026-10-17 kl. 22:06 (gruppens svar i chatten med rådet):* KI-tekstene i demoen (story 3.4b) bygges søndag 18.10 rett etter de to README-PR-ene og før 2.9b, fordi demoen i dag ikke har noen KI-tekst.
 
+*Lagt til 2026-10-18 kl. 20:55:* KI-tekstene i demoen er flettet i `ab81d3f`, PR #69 (spesifikasjonen `spec-3-4b-ki-tekstene-i-demoen.md`). 13 rader for siste demodag, laget én gang med `gemma4:e4b`, og alle besto kontrollen. Ordlista gjelder ikke KI-teksten før prompten versjon 3 (gruppens svar kl. 20:08). CI var grønn på head-en `8d632b0` (kjøring 39156153956) og på main (39156267219).
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
