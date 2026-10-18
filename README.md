@@ -28,9 +28,23 @@ Appen finnes i to versjoner, med samme kode. Vi anbefaler den ekte versjonen. Vi
 ### Felles for begge
 
 1. **Installer og start Docker Desktop** fra [docker.com](https://www.docker.com/products/docker-desktop/). Hopp over innloggingen. Det er klart når det står «Engine running» nederst i vinduet. La det være åpent.
+
+![Docker Desktop med «Engine running» nederst i vinduet](docs/bilder/readme/engine-running.png)
+
+*Slik ser det ut nederst i Docker Desktop når det er klart. Står det «Engine starting», venter du litt til.*
+
 2. **Last ned koden.** Trykk den grønne knappen «Code» på [GitHub-siden](https://github.com/IBE160-2026/G74-lund-osen) og «Download ZIP» nederst i menyen. Windows: høyreklikk fila i Nedlastinger (Downloads) og velg «Pakk ut alle» (Extract All). Mac: dobbeltklikk fila. Det er klart når du har en mappe som heter `G74-lund-osen-main`. Har du fått koden som mappe eller ZIP-fil, pakker du den ut og går til steg 3.
+
+![Menyen under «Code» på GitHub, med «Download ZIP» nederst](docs/bilder/readme/github-download-zip.png)
+
+*Menyen under den grønne knappen «Code». Trykk «Download ZIP» nederst. Adressen i boksen trenger du ikke.*
+
 3. **Åpne PowerShell** (Windows: trykk Start, skriv PowerShell og velg «Windows PowerShell», ikke ISE) **eller Terminal** (Mac: trykk Cmd+mellomrom og skriv Terminal). Det er klart når et vindu venter på at du skriver.
 4. **Skriv `cd` og et mellomrom**, dra mappa `G74-lund-osen-main` der README og compose ligger (den innerste hvis det er to) fra Filutforsker eller Finder inn i vinduet, og trykk Enter. Det er klart når mappenavnet står foran `>` eller `%`. Har mappa et annet navn, drar du den mappa der README og compose ligger.
+
+![PowerShell med en linje som slutter med G74-lund-osen-main og >](docs/bilder/readme/powershell-mappa.png)
+
+*Slik ser det ut når steg 4 har gått bra. Stien blir en annen hos deg, men mappenavnet skal stå foran `>`.*
 
 ### Den ekte versjonen (anbefalt)
 
@@ -323,6 +337,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 
 - `src/` og `tests/` — applikasjonen og testene
 - `docs/` — arbeidsprosessen, og `docs/hjelp.md` med spørsmål og svar til «Kom i gang»
+- `docs/bilder/readme/` — de tre skjermbildene i «Kom i gang»: `engine-running.png`, `github-download-zip.png` og `powershell-mappa.png`
 - `_bmad-output/` — Product Brief, plan, krav og sprintstatus
 - `.github/` — testkjøringen og morgensjekken
 - `Dockerfile`, `compose.yaml` og `.dockerignore` — imaget og tjenestene: webserveren, hentingen og demoen

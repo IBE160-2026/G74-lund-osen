@@ -677,26 +677,58 @@ class TestReadme:
         assert not re.search(r"\b\d+\s+(tester|testene|hoppes|hoppet|består|bestått|passed|skipped)\b", tester)
         assert not re.search(r"\b(alle|de)\s+\d+\b", tester, re.IGNORECASE)
 
-    def test_ingen_bilder_utenom_ci_merket(self):
-        """Story 3.3: skjermbilder med ekte data publiserer dataene. Ville feilet
-        med et bilde i README-en.
-
-        Gruppen 16.10 kl. 21:38: skjermbildet av demoen fra 3.3b, punkt b, er
-        tatt ut igjen, så testen godtar ingen bilder utenom CI-merket. Regelen
+    def test_bildene_er_de_tre_fra_gjennomgangen_og_ci_merket(self):
+        """Story 3.3: skjermbilder med ekte data publiserer dataene. Regelen
         står i dokumentene: bilder i README-en kommer bare fra
         docs/bilder/readme/ og viser aldri den ekte versjonen (svar 4 11.10,
-        regelen 25.09 under story 3.3). Testen sjekker bare at det ikke er
-        noen. Kommer det bilder i «Kom i gang», endres testen i samme PR, med
-        stien og alt-teksten som sier at det er demoen (gjennomgangen, VG1, BH1)."""
+        regelen 25.09 under story 3.3).
+
+        Story 3.3c (instruksjonen 18.10 kl. 12:23): de tre skjermbildene fra
+        gruppens gjennomgang 16.10 står i steg 1, 2 og 4, hvert med alt-tekst
+        og en kort tekst under, og CI-merket står øverst (utsatt fra PR #54).
+        Ingen av dem viser appen. Ville feilet med et bilde til, et bilde
+        uten alt-tekst eller utenfor docs/bilder/readme/, eller uten CI-merket."""
         tekst = README.read_text(encoding="utf-8")
-        bilder = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", tekst)
-        assert all(b.endswith("tester.yml/badge.svg") for b in bilder), bilder
+        bilder = re.findall(r"!\[([^\]]*)\]\(([^)]+)\)", tekst)
+        merket = [b for _, b in bilder if b.endswith("/actions/workflows/tester.yml/badge.svg")]
+        assert merket == ["https://github.com/IBE160-2026/G74-lund-osen/actions/workflows/tester.yml/badge.svg"]
+        andre = [(alt, b) for alt, b in bilder if b not in merket]
+        assert sorted(b for _, b in andre) == sorted(f"docs/bilder/readme/{navn}" for navn in BILDENE.values())
+        for alt, sti in andre:
+            assert alt.strip(), sti
+            assert (ROT / sti).is_file(), sti
+        # Hvert bilde i sitt steg i «Felles for begge».
+        for nummer, navn in BILDENE.items():
+            assert f"](docs/bilder/readme/{navn})" in _steg("Felles for begge", nummer), navn
         # Ogsaa HTML-bilder og bilder med referanse (BH7).
         assert "<img" not in tekst.lower()
         assert not re.search(r"!\[[^\]]*\]\[", tekst)
 
+    def test_teksten_under_hvert_bilde(self):
+        """Svar 2 kl. 14:48: teksten under et bilde telles for seg, høyst 25
+        ord. Under bildet i steg 4 står at stien blir en annen, men at
+        mappenavnet skal stå foran >. Ville feilet hvis et bilde sto uten
+        tekst under, eller teksten ble for lang."""
+        for nummer, navn in BILDENE.items():
+            under = _bildetekst(_steg("Felles for begge", nummer), navn)
+            assert under, navn
+            assert len(re.findall(r"\w+", under)) <= 25, (navn, under)
+        assert "Stien blir en annen hos deg, men mappenavnet skal stå foran `>`." in _bildetekst(
+            _steg("Felles for begge", 4), BILDENE[4]
+        )
+
+    def test_mappestrukturen_nevner_bildene(self):
+        """Regel 19: «Mappestruktur» nevner docs/bilder/readme/ og hvert bilde."""
+        mappestruktur = README.read_text(encoding="utf-8").split("\n## Mappestruktur\n", 1)[1].split("\n## ", 1)[0]
+        assert "`docs/bilder/readme/`" in mappestruktur
+        for navn in BILDENE.values():
+            assert f"`{navn}`" in mappestruktur, navn
+
 
 BILDEFILER = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"}
+# Story 3.3c: skjermbildene fra gruppens gjennomgang 16.10, per steg i
+# «Felles for begge».
+BILDENE = {1: "engine-running.png", 2: "github-download-zip.png", 4: "powershell-mappa.png"}
 
 
 def _python_krav() -> str:
@@ -709,13 +741,13 @@ def _python_krav() -> str:
     return treff.group(1)
 
 
-class TestIngenBilderIDocs:
-    def test_ingen_bilder_i_docs_bilder(self):
-        """Gruppen 16.10 kl. 21:38: skjermbildet er tatt ut, og ingen
-        bildefiler ligger under docs/bilder/, så ingen bilder med ekte data
-        blir liggende. Mappa finnes ikke når den er tom, fordi git ikke sporer
-        tomme mapper, og da er det heller ingen bilder (gjennomgangen, ECH,
-        BH4). Testen sjekker at det ikke er noen, ikke hvor de ligger."""
+class TestBildeneIDocs:
+    def test_bare_de_tre_bildene_i_docs_bilder(self):
+        """Gruppen 16.10 kl. 21:38: skjermbildet av oversikten er tatt ut, så
+        ingen bilder med ekte data blir liggende. Story 3.3c: under
+        docs/bilder/ ligger bare de tre skjermbildene i «Kom i gang», i
+        docs/bilder/readme/. Ville feilet med et bilde til, eller et av de tre
+        et annet sted."""
         mappe = README.parent / "docs" / "bilder"
         # Bare bildefiler: Thumbs.db og .DS_Store fra Utforsker og Finder
         # skal ikke felle testen hos sensor (gjennomgangen av 3.3b, BH4, ECH).
@@ -724,7 +756,7 @@ class TestIngenBilderIDocs:
             for p in mappe.rglob("*")
             if p.is_file() and p.suffix.lower() in BILDEFILER
         )
-        assert filer == []
+        assert filer == sorted(f"docs/bilder/readme/{navn}" for navn in BILDENE.values())
 
 
 def _proevetabellen(proeve: str | None = None) -> str:
@@ -771,6 +803,27 @@ def _anker(overskrift: str) -> str:
 
 def _uten_bokser(tekst: str) -> str:
     return re.sub(r"^```.*?^```$", "", tekst, flags=re.MULTILINE | re.DOTALL)
+
+
+# Et bilde paa egen linje, og teksten under i kursiv som eget avsnitt.
+BILDE_MED_TEKST = r"^!\[[^\]]*\]\([^)]+\)[ \t]*\n(?:[ \t]*\n)*(?:\*[^*\n][^\n]*\*[ \t]*(?:\n|$))?"
+
+
+def _uten_bilder(tekst: str) -> str:
+    """Teksten uten bildene og teksten under dem, som telles for seg (svar 2
+    18.10 kl. 14:48)."""
+    return re.sub(BILDE_MED_TEKST, "", tekst, flags=re.MULTILINE)
+
+
+def _bildetekst(tekst: str, navn: str) -> str:
+    """Teksten i kursiv i avsnittet rett under bildet navn, uten stjernene.
+    Tom hvis avsnittet under ikke er i kursiv."""
+    treff = re.search(
+        rf"^!\[[^\]]*\]\([^)]*/{re.escape(navn)}\)[ \t]*\n(?:[ \t]*\n)*\*([^*\n][^\n]*)\*[ \t]*$",
+        tekst,
+        re.MULTILINE,
+    )
+    return treff.group(1) if treff else ""
 
 
 def _ankrene(tekst: str) -> set[str]:
@@ -860,12 +913,16 @@ class TestReadmeForNybegynnere:
         Rettet 2026-10-13 (story 8.0e PR 2, svaret kl. 23:50): ordene telles
         slik leseren ser dem, med lenketeksten og uten adressen bak, og
         grensen er 65, ikke 60. Setningen fra docs/hjelp.md i steg 2 gjorde
-        steget til 70 ord, 8 av dem i adressen til GitHub."""
+        steget til 70 ord, 8 av dem i adressen til GitHub.
+
+        Story 3.3c (svar 2 18.10 kl. 14:48): grensen gjelder teksten i
+        steget. Bildet og teksten under det telles for seg, i
+        test_teksten_under_hvert_bilde."""
         for seksjon, numre in SEKSJONENE.items():
             funnet = [int(n) for n in re.findall(r"^(\d+)\. ", _seksjon(seksjon), re.MULTILINE)]
             assert funnet == numre, (seksjon, funnet)
             for n in numre:
-                tekst = re.sub(r"\]\([^)]*\)", "]", _uten_bokser(_steg(seksjon, n)))
+                tekst = re.sub(r"\]\([^)]*\)", "]", _uten_bilder(_uten_bokser(_steg(seksjon, n))))
                 assert len(re.findall(r"\w+", tekst)) <= 65, (seksjon, n)
                 assert "klar" in tekst.lower() or "Øverst står" in tekst, (seksjon, n)
 
@@ -880,9 +937,9 @@ class TestReadmeForNybegynnere:
         # docs/hjelp.md staar ordrett til slutt i steg 2.
         svar = _hjelp().split("### Jeg har fått koden fra før.", 1)[1].strip().split("\n\n", 1)[0]
         assert svar == "Har du fått koden som mappe eller ZIP-fil, pakker du den ut og går til steg 3."
-        assert steg.strip().endswith(svar)
+        assert _uten_bilder(steg).strip().endswith(svar)
         assert (
-            _steg("Felles for begge", 4)
+            _uten_bilder(_steg("Felles for begge", 4))
             .strip()
             .endswith("Har mappa et annet navn, drar du den mappa der README og compose ligger.")
         )
