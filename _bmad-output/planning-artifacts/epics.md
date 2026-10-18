@@ -3425,6 +3425,8 @@ jeg finner det jeg leter etter.
 
 *Avgjort 2026-10-18 kl. 22:06 (gruppens svar):* Selskap kan sorteres A til Å, og kolonnen tabellen er sortert på, får et lysere felt og en oransje strek under, som på designtavla, i en liten PR etter 8.16 i kveld (spesifikasjonen 8.15b). Grunnen: tavla har sorteringsmerket på Selskap, og i appen skiller bare fargen på vinkelen den sorterte kolonnen fra de andre.
 
+*Lagt til 2026-10-19 kl. 00:22:* Selskap kan sorteres, og den sorterte kolonnen har et lysere felt og en oransje strek under, flettet i `b6449ac`, PR #73 (spesifikasjonen `spec-8-15b-selskap-og-den-sorterte-kolonnen.md`).
+
 ### Story 8.16: Regelen for startdagen, og periodene i kursgrafen
 
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 15).*

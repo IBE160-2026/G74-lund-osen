@@ -2,7 +2,7 @@
 title: 'Story 8.15 (8.15b): Selskap kan sorteres, og den sorterte kolonnen synes'
 type: 'feature'
 created: '2026-10-18'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'd6e2d1c'
@@ -90,3 +90,5 @@ Gjennomgang 19.10 på diffen `fb218a7..b5f2400`, uten bildet. Linsene var Blind 
 | ECH11 | Det runde hjørnet når Selskap er sortert | low | avvist: kosmetisk, og båndene treffes ikke |
 | VG6 | Testene for aria-sort | low | patch: begge retninger, se BH5 |
 | VG8 | `prd.md` nevner ikke Retning og Selskap under sorteringen | low | avvist: utenfor kontrollpunktene. Retning manglet alt fra 8.15 |
+
+*Lagt til 2026-10-19 kl. 00:22:* PR #73 er squash-flettet i `b6449ac`, låst til head-en `a698f71`. Main hadde ikke gått videre. CI var grønn på head-en (39171682987) og på main (39171808452). Triagen står over og som kommentar på PR-en.
