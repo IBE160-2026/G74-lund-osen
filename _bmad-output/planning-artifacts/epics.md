@@ -3705,3 +3705,5 @@ Som **gruppe**, vil vi at BMAD-skillene ligger én gang i repoet, så sensor ikk
 - **Ville feilet hvis:** en fil under `.agents/` ble lagt inn i git igjen, eller `codex` kom tilbake under `ides` i manifestet
 
 **Avhenger av:** ingen. **Én økt:** ja.
+
+*Lagt til 2026-10-18 kl. 12:09:* kopien `.agents/skills/` er tatt bort, flettet i `b5395e9`, PR #65 (spesifikasjonen `spec-9-8-agents-kopien-bort.md`). Manifestet har bare `claude-code`, og `tests/test_ryddighet.py` har åtte nye tester, også for README-en, morgensjekken, `.gitignore` og `.env.example`. CI var grønn på head-en `76eae1c` (kjøring 39117952490) og på main (39118029686).

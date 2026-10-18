@@ -2,7 +2,7 @@
 title: 'Story 9.8: kopien .agents/skills/ tas bort'
 type: 'chore'
 created: '2026-10-18'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'f05e1d7'
@@ -44,6 +44,8 @@ context:
 
 - Ingen API-kall utover kvotesjekken i regel 15, og `src/fetch_prices.py` kjøres ikke. `data/db/ose.db` og `data/db/demo.db` røres ikke (regel 22).
 - `.claude/skills/` endres ikke.
+
+*Lagt til 2026-10-18 kl. 12:09:* PR #65 er squash-flettet i `b5395e9`, låst til head-en `76eae1c`. CI var grønn på head-en (39117952490) og på main (39118029686). Triagen står som kommentar i PR #65.
 
 ## Mutantene
 
