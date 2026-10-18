@@ -273,5 +273,5 @@ class TestIndekslinja:
         indeks = {ps[1].dato: 1000.0, ps[2].dato: 1100.0}
         assert indeksverdier(ps, indeks) == pytest.approx({ps[1].dato: 60.0, ps[2].dato: 66.0})
         graf = bygg_graf(ps, indeks=indeks)
-        assert graf.indeksstart == ps[1].dato
+        assert graf.indeksstart == ps[1].dato and graf.indeksslutt == ps[2].dato
         assert koordinater(graf.indekslinje)[0] == koordinater(graf.kurslinje)[1]

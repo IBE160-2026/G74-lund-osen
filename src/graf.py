@@ -95,6 +95,7 @@ class Graf:
     siste: Navn | None = None
     indekslinje: str = ""
     indeksstart: date | None = None
+    indeksslutt: date | None = None
 
     @property
     def har_ma50(self) -> bool:
@@ -276,4 +277,5 @@ def bygg_graf(
         rutenett=_rutenett(lav, hoy, hoyde),
         indekslinje=indekslinje,
         indeksstart=min(omregnet) if omregnet else None,
+        indeksslutt=max(omregnet) if omregnet else None,
     )

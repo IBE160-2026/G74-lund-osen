@@ -3023,3 +3023,12 @@ class TestIndekslinjaPaaAksjesiden:
         indeks, kurs = _punktene(html, "indekslinje"), _punktene(html, "kurslinje")
         assert len(indeks) == 60 and indeks[0] == kurs[1]
         assert f"starter på aksjens kurs {dager[1].strftime('%d.%m')}." in _synlig(html)
+
+    def test_indeksen_som_slutter_foer_aksjen_sier_det(self, klient):
+        """Gjennomgangen (BH9, ECH5): indeksen mangler de to siste dagene.
+        Ville feilet uten setningen om hvor indeksen slutter."""
+        self._aksjen()
+        dager = _boersdager_til(FREDAG_09_10, 61)
+        _legg_inn_indeks(_indeks([(d, 1000.0 + 10 * i) for i, d in enumerate(dager[:-2])]))
+        tekst = _synlig(klient.get("/aksje/EQNR").data.decode("utf-8"))
+        assert f"Indeksen går bare til {dager[-3].strftime('%d.%m')}." in tekst
