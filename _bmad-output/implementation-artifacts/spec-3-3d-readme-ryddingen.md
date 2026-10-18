@@ -83,3 +83,5 @@ Gjennomgang 18.10 på diffen `f7c0eed..ff2f540`. Linsene var Blind Hunter (BH, 1
 | BH12 | Spesifikasjonen for 3.4 har den gamle regelen med «Flettet til main» | low | avvist: append-only, og linja rett under sier hva som gjelder nå |
 | VG2 | Rekkefølgen i «Neste» mot `epics.md` er sjekket for hånd | low | avvist: VG og ECH fant den riktig, og testen låser den |
 | ECH8 | Linja kl. 15:42 i vurderingsmatrisen sier at kopieringen står under «Står du fast?» | low | utsatt: en ny linje i vurderingsmatrisen når PR-en flettes |
+
+*Rettet 2026-10-18 (gruppens svar kl. 17:40, BH5):* raden BH5 er rettet. Det første spørsmålet under «Står du fast?» er nå ett spørsmål om at Docker ikke kjører: «Engine running» kommer ikke, eller det står «Cannot connect to the Docker daemon» eller «error during connect». Svaret har det som sto i begge, og de to står fortsatt hver for seg i `docs/hjelp.md`. Det er fortsatt fem spørsmål. Testen er `test_det_foerste_spoersmaalet_er_at_docker_ikke_kjoerer`. Spørsmålet om porten står bare i `docs/hjelp.md`, og appen får port 8000 i story 3.2b.

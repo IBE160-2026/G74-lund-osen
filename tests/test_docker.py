@@ -970,8 +970,14 @@ UTE_AV_README = {
     ),
 }
 # Raadets forslag (instruksjonen 18.10 kl. 17:04), i rekkefoelgen i README-en.
+# Gruppens svar 18.10 kl. 17:40: «Engine running» og «Cannot connect to the
+# Docker daemon» er ett spoersmaal, fordi grunnen er den samme. Det staar
+# ikke i docs/hjelp.md, der de to spoersmaalene staar hver for seg.
+SAMMENSLAATT = (
+    "«Engine running» kommer ikke, eller det står «Cannot connect to the Docker daemon» eller «error during connect»."
+)
 BEHOLDT_I_README = [
-    "Det står ikke «Engine running» etter noen minutter.",
+    SAMMENSLAATT,
     "ZIP-fila ser ut som en vanlig mappe.",
     "«is not recognized as the name of a cmdlet» etter cd.",
     "«Cannot find path … because it does not exist».",
@@ -1392,6 +1398,28 @@ class TestReadmeForNybegynnere:
             assert sporsmaal in i_hjelp, sporsmaal
             assert i_hjelp[sporsmaal].strip().startswith(svar), sporsmaal
 
+    def test_det_foerste_spoersmaalet_er_at_docker_ikke_kjoerer(self):
+        """Gruppens svar 18.10 kl. 17:40: det første spørsmålet under «Står du
+        fast?» er ett spørsmål om at Docker ikke kjører, med begge meldingene
+        i overskriften. Svaret har det som sto i begge svarene i
+        docs/hjelp.md, som står hver for seg. Ville feilet hvis det første
+        spørsmålet ikke nevnte både «Engine running» og «Cannot connect to the
+        Docker daemon», eller svaret mistet noe fra et av de to."""
+        sporsmaal = list(_detaljer(_faq()))
+        assert "«Engine running»" in sporsmaal[0] and "«Cannot connect to the Docker daemon»" in sporsmaal[0]
+        assert "«error during connect»" in sporsmaal[0]
+        svar = _detaljer(_faq())[sporsmaal[0]]
+        i_hjelp = dict(re.findall(r"^### ([^\n]+)\n\n(.*?)(?=\n\n### |\n\n## |\Z)", _hjelp(), re.MULTILINE | re.DOTALL))
+        ikke_startet = i_hjelp[
+            "«Cannot connect to the Docker daemon», «error during connect» eller «dockerDesktopLinuxEngine»."
+        ]
+        engine = i_hjelp["Det står ikke «Engine running» etter noen minutter."]
+        assert svar.startswith(ikke_startet.strip())
+        # «Avslutt Docker Desktop helt:» er blitt «avslutter du Docker Desktop
+        # helt:» i samme setning. Resten står ordrett.
+        assert engine.startswith("Avslutt Docker Desktop helt: ")
+        assert "avslutter du Docker Desktop helt: " + engine.split("helt: ", 1)[1].strip() in svar
+
     def test_like_spoersmaal_har_samme_svar(self):
         """Et spoersmaal som staar baade i README-en og i docs/hjelp.md, har
         samme svar begge steder. Svaret i docs/hjelp.md kan ha mer etter."""
@@ -1400,8 +1428,9 @@ class TestReadmeForNybegynnere:
         # saa bare ett spoersmaal ble lest, og ingen ble sammenlignet.
         assert len(i_hjelp) == len(re.findall(r"^### ", _hjelp(), re.MULTILINE))
         felles = [s for s in _detaljer(_faq()) if s in i_hjelp]
-        # Story 3.3d: alle fem i README-en står også i docs/hjelp.md.
-        assert len(felles) == len(_detaljer(_faq())), felles
+        # Story 3.3d: alle i README-en står også i docs/hjelp.md, utenom det
+        # sammenslåtte spørsmålet (svaret kl. 17:40), som har sin egen test.
+        assert len(felles) == len(_detaljer(_faq())) - 1 and SAMMENSLAATT not in felles, felles
         for sporsmaal, svar in _detaljer(_faq()).items():
             if sporsmaal in i_hjelp:
                 assert i_hjelp[sporsmaal].strip().startswith(svar.strip()), sporsmaal
