@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-18T15:04
+updated: 2026-10-18T15:41
 ---
 
 # Kvalitetssikring
@@ -256,6 +256,7 @@ sist i dokumentet.
 | 3.2 To volumer | `088c885` (#24) | 1 (10 statiske og 8 i CI) | C3, S8, S9 og S10 overlevde først. Første forsøk med C7 bygget ikke | `S/spec-3-2-to-volumer-og-ingenting-uerstattelig-i-imaget.md` |
 | 3.3 README | `5816bc2` (#25) | 1 (15 statiske og 1 i CI) | – | `S/spec-3-3-readme-slik-kjoerer-du-den.md` |
 | 3.3b README for sensor | `6b9dc2f` (#53), `1a95495` (#54) | 1 (21 i PR #53) | – | `S/spec-3-3b-readme-for-sensor.md` |
+| 3.3c Bilder i «Kom i gang», demoen først og fire rettelser | `fdaf403` (#66) | 1 (9, M1–M9) | – M1–M4 er fra instruksjonen, M5–M9 fra funnene med dom medium | `S/spec-3-3c-kom-i-gang-bilder-og-demoen-foerst.md` |
 | 3.4 Demoversjonen | `0ed87be` (#26), `59c0baf` (#27), `4464a10` (#30), `4c01a7e` (#31), `41a9df7` (#32), `1ead55a` (#33), `dfe6884` (#34) | 1 (#26: 24, #27: 28, #30: 17, 16, 16, 10 og 6, #31: 4, #32–#34: 2 hver) | M20 i #26 og H12 og H13 i #30 overlevde først. T9 ble forkastet, og B6 ble ikke kjørt ferdig. Spesifikasjonen står i review | `S/spec-3-4-demoversjonen.md` |
 | 3.4, alle 10 Kombinasjonene på siste demodag | `f21f927` (#58) | 1 (4, R1–R4) | – | `S/spec-3-4-alle-ti-kombinasjonene-paa-siste-demodag.md`, «Mutantene» |
 | 4.0 Nettsperren dekker hele testkjøringen | `dc43569` (#44) | 1 (10) | – Under N1 og N4 ble det gjort ekte oppslag og tilkoblingsforsøk (BH10) | `S/spec-4-0-nettsperren-dekker-hele-testkjoeringen.md` |
@@ -438,6 +439,7 @@ funn. Antall rader i loggen:
 | 3.3 | 13 | 10 | 2 | 1 |
 | 3.3b, PR #53 | 22 | 16 | 5 | 1 |
 | 3.3b, PR #54 | 12 | 5 | 6 | 1 |
+| 3.3c | 27 | 17 | 8 | 2 |
 | 3.4, PR #26 | 21 | 14 | 5 | 1 |
 | 3.4, PR #27 | 22 | 12 | 8 | 2 |
 | 3.4, PR #30, første runde | 29 | 25 | 4 | – |
@@ -911,6 +913,8 @@ interesse, står i `malinger.md` §6, ved siden av EQNR 05.10 og GJF 02.10.
 
 *Lagt til 2026-10-18 (gruppens svar kl. 00:03):* README-prøven i første rad tas første gang i uke 43 (19.–25.10), etter at de to README-PR-ene er flettet: Prøve 1, og Prøve 2 samtidig hvis testeren har egen gratiskonto. Den tas på nytt senest én uke før innleveringen, med ZIP-fila som leveres (§9).
 
+*Lagt til 2026-10-18 kl. 15:41 (story 3.3c, ECH16 i triagen):* README-en har nå tre skjermbilder i «Kom i gang», fra gruppens gjennomgang 16.10 kl. 20:40–21:11 (raden i tabellen over): «Engine running» i steg 1, menyen under «Code» med «Download ZIP» i steg 2, og PowerShell med mappenavnet foran `>` i steg 4. De ligger i `docs/bilder/readme/` og viser ikke appen. Demoen står før den ekte versjonen, og de fire tingene gjennomgangen fant, er rettet. Flettet i `fdaf403`, PR #66.
+
 ## Vedlegg: hver mutant
 
 Én linje per mutant: storyen, mutanten slik kilden beskriver den, testene som
@@ -1135,6 +1139,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 3.2 | S1–S10 og C1–C8 | S1 og S2 `test_navngitte_volumer_aldri_data_paa_maskinen` og `test_volumene_overlapper_ikke`, S6 `test_skrivebeskyttet_rot_med_tmp_som_tmpfs`; C1–C8 fanges av stegene i CI. For S9 og S10 navngir tabellen ingen test | `S/spec-3-2-…` |
 | 3.3 | R1–R15 og C1 | R1 `test_kommandoen_paa_den_tomme_siden_staar_i_readme`, R8 `test_tjenestene_i_readme_finnes_i_compose`, R9 `test_raadet_om_tidspunkt_uten_flagget`; for R13–R15 står bare «drept» | `S/spec-3-3-…` |
 | 3.3b | S1–S20 og S5b (PR #53) | ikke navngitt per mutant i spesifikasjonen | `S/spec-3-3b-…` |
+| 3.3c | M1–M9 | M1 `test_bildene_er_de_tre_fra_gjennomgangen_og_ci_merket`, M2, M8 og M9 `test_steg_4_mappa_ikke_zip_fila`, M3 `test_svaret_om_mellomrommet_etter_cd`, M4 `test_demoen_foerst_og_zip_foer_kommandoene`, M5 og M6 `test_kopieringen_forklares_en_gang_og_hvert_steg_sier_hvor`, M7 `test_henvisningene_og_proevetabellen` | `S/spec-3-3c-…` |
 | 3.4 | PR #26–#34 | testene står per mutant i tabellene i spesifikasjonen for PR #26, #27 og #30; for #31–#34 nevner avsnittene testen, som `test_hvorfor_bare_15_aksjer` og `test_til_faglaerer_lenker_til_briefen_med_gjeldende_tag` | `S/spec-3-4-demoversjonen.md` |
 | 3.4, alle 10 | R1–R4 | med hele fila `test_kursene_har_samme_fingeravtrykk_paa_alle_plattformer`, med bare klassen `test_alle_ti_kombinasjonene_paa_sluttdato` | `S/spec-3-4-alle-ti-…` |
 | 4.0 | N1–N5 og R1–R5 | N1, N3 og N5 `test_innsamlingen_er_sperret`, N2 `test_navneoppslag_blokkeres[gethostbyname]`, N4 `test_connect_ex_blokkeres`, R1 `test_asyncio_blokkeres`, R2 `test_udp_blokkeres` | `S/spec-4-0-…` |
