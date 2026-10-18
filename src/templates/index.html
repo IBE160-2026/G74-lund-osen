@@ -8,9 +8,9 @@
     Dempet når kolonnen ikke er valgt, hvit når den er det (svar 4).
     Skjermleseren hører kolonnen og retningen, og linja over tabellen sier
     det samme: «stigende (A til Å)» eller «synkende (Å til A)» for Retning
-    (svar 8). #}
+    (svar 8), og for Selskap (story 8.15b). #}
 {% macro ordens_ord(kolonne, orden) -%}
-  {{- orden }}{% if kolonne == "retning" %} {{ "(A til Å)" if orden == "stigende" else "(Å til A)" }}{% endif -%}
+  {{- orden }}{% if kolonne in ("retning", "selskap") %} {{ "(A til Å)" if orden == "stigende" else "(Å til A)" }}{% endif -%}
 {%- endmacro %}
 {% macro ariasort(kolonne) -%}
   {%- if sortering and sortering.kolonne == kolonne %} aria-sort="{{ 'descending' if sortering.orden == 'synkende' else 'ascending' }}"{% endif -%}
@@ -360,7 +360,8 @@
     <table>
       <thead>
         <tr>
-          <th>Selskap {{ hjelpeknapp("hjelp-selskap", "Hjelp: selskap") }}</th>
+          {#- Story 8.15b: Selskap sorterer også, med «?» ved siden av lenken. #}
+          <th{{ ariasort("selskap") }}>{{ sorterlenke("selskap", "Selskap") }} {{ hjelpeknapp("hjelp-selskap", "Hjelp: selskap") }}</th>
           {#- Svar 2: bare «NOK» under et kolonnenavn. Story 8.15: «?» står
               ved siden av lenken, ikke inne i den. #}
           <th class="tall"{{ ariasort("kurs") }}>{{ sorterlenke("kurs", "Sluttkurs") }} {{ hjelpeknapp("hjelp-sluttkurs", "Hjelp: sluttkurs") }}<span class="under">NOK</span></th>

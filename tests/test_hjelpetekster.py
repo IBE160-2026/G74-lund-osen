@@ -328,7 +328,8 @@ class TestSidene:
             r'<a class="sorter[^"]*" href="[^"]*">{}<span class="skjult">[^<]*</span><svg[^>]*><path[^>]*/></svg></a> '
         )
         for tekst, vindu in (
-            (re.escape("<th>Selskap "), "hjelp-selskap"),
+            # Story 8.15b: Selskap er en sorteringslenke, og «?» staar etter den.
+            (r"<th[^>]*>" + lenke.format("Selskap"), "hjelp-selskap"),
             (r'<th class="tall"[^>]*>' + lenke.format("Sluttkurs"), "hjelp-sluttkurs"),
             (r'<th class="tall"[^>]*>' + lenke.format("Endring"), "hjelp-endring"),
             (r'<th class="tall"[^>]*>' + lenke.format("Signalstyrke"), "hjelp-signalstyrke"),

@@ -177,13 +177,10 @@ def test_viser_selskapsnavn_og_de_fem_kolonnene(klient, monkeypatch):
         # Story 8.0d, PR 2: «NOK» bare under Sluttkurs (svar 2, BH9).
         nok = '(<span class="under">NOK</span>)' if overskrift == "Sluttkurs" else ""
         # Story 8.15: navnet er en lenke som sorterer, med en vinkel.
-        # Gjennomgangen (BH5): lenken er påkrevd ved de fire som kan sorteres.
-        lenke = r'<a class="sorter[^"]*" href="[^"]*">' if overskrift != "Selskap" else ""
-        etter = (
-            r'<span class="skjult">[^<]*</span><svg class="vinkel"[^>]*><path[^>]*/></svg></a>'
-            if overskrift != "Selskap"
-            else ""
-        )
+        # Gjennomgangen (BH5): lenken er påkrevd ved de som kan sorteres.
+        # Story 8.15b: Selskap ogsaa, saa alle fem.
+        lenke = r'<a class="sorter[^"]*" href="[^"]*">'
+        etter = r'<span class="skjult">[^<]*</span><svg class="vinkel"[^>]*><path[^>]*/></svg></a>'
         assert re.search(rf"<th[^>]*>{lenke}{overskrift}{etter}( <button[^<]*>\?</button>)?{nok}</th>", html), (
             overskrift
         )
@@ -2184,7 +2181,14 @@ class TestStory815Sortering:
         thead = html.split("<thead>", 1)[1].split("</thead>", 1)[0]
         assert "aria-sort" not in thead
         lenker = dict(re.findall(r'href="/\?sorter=(\w+)&amp;orden=(\w+)"', thead))
-        assert lenker == {"kurs": "synkende", "endring": "synkende", "signal": "synkende", "retning": "stigende"}
+        # Story 8.15b: Selskap A til Å foerst.
+        assert lenker == {
+            "selskap": "stigende",
+            "kurs": "synkende",
+            "endring": "synkende",
+            "signal": "synkende",
+            "retning": "stigende",
+        }
         valgt = self._side(tabell, "/?sorter=endring&orden=synkende")
         thead = valgt.split("<thead>", 1)[1].split("</thead>", 1)[0]
         assert re.findall(
@@ -2237,7 +2241,7 @@ class TestStory815Sortering:
             thead = self._side(tabell, adresse).split("<thead>", 1)[1].split("</thead>", 1)[0]
             return dict(re.findall(r'href="/\?sorter=(\w+)&amp;[^"]*">.*?<path d="([^"]+)"', thead))
 
-        assert vinkler("/") == {"kurs": ned, "endring": ned, "signal": ned, "retning": opp}
+        assert vinkler("/") == {"selskap": opp, "kurs": ned, "endring": ned, "signal": ned, "retning": opp}
         assert vinkler("/?sorter=endring&orden=synkende")["endring"] == ned
         assert vinkler("/?sorter=endring&orden=stigende")["endring"] == opp
         assert vinkler("/?sorter=retning&orden=synkende")["retning"] == ned

@@ -286,7 +286,9 @@ class TestRammen:
                 assert (
                     href == "/"
                     or re.fullmatch(r"/aksje/[A-Z0-9]+", href)
-                    or re.fullmatch(r"/\?sorter=(kurs|endring|signal|retning)&amp;orden=(synkende|stigende)", href)
+                    or re.fullmatch(
+                        r"/\?sorter=(selskap|kurs|endring|signal|retning)&amp;orden=(synkende|stigende)", href
+                    )
                     # Story 8.16: periodene i kursgrafen er en parameter paa aksjesiden.
                     or re.fullmatch(r"/aksje/[A-Z0-9]+\?periode=(" + "|".join(map(re.escape, PERIODENE)) + ")", href)
                 ), (navn, href)
@@ -645,7 +647,8 @@ class TestSorteringen:
         html = sidene["oversikten"]
         thead = html.split("<thead>", 1)[1].split("</thead>", 1)[0]
         lenker = re.findall(r'<a class="sorter[^"]*"[^>]*>(.*?)</a>', thead, re.DOTALL)
-        assert len(lenker) == 4
+        # Story 8.15b: Selskap ogsaa.
+        assert len(lenker) == 5
         for lenke in lenker:
             assert re.search(r'<svg class="vinkel"[^>]*aria-hidden="true"', lenke), lenke
             assert not re.search("[←→↑↓↔↗↘↖↙▲▼]", lenke), lenke
