@@ -1466,10 +1466,12 @@ class TestReadmeForNybegynnere:
     def test_mer_for_den_som_vil_er_lukket(self):
         """22:32: Bytte og uv staar, lukket i <details> under én overskrift."""
         mer = _seksjon("Mer for den som vil")
-        # Story 10.2: den lokale modellen, ogsaa lukket.
+        # Story 10.2: den lokale modellen, ogsaa lukket. Story 3.3e:
+        # variablene i .env.
         assert set(_detaljer(mer)) == {
             "Bytte mellom demoen og den ekte versjonen",
             "Uten Docker, med uv",
+            "Variablene i .env",
             "Den lokale modellen (KI-teksten)",
         }
 

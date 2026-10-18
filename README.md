@@ -76,7 +76,7 @@ Vil du også prøve den ekte versjonen, går du videre til steg 5 under.
 ### Den ekte versjonen (anbefalt)
 
 5. **Hent en nøkkel.** Lag en gratis bruker hos [EODHD](https://eodhd.com/register), og kopier API-nøkkelen din. Det er klart når du har nøkkelen.
-6. **Legg inn nøkkelen, bare første gang.** Kopier kommandoene med knappen til høyre i boksen, lim dem inn i PowerShell-vinduet fra steg 4 én om gangen (Ctrl+V eller Cmd+V) og trykk Enter. Den første lager fila `.env`, og den neste åpner den (Windows eller Mac). Lim inn nøkkelen etter `EODHD_API_KEY=`, lagre og lukk. Det er klart når nøkkelen står etter `EODHD_API_KEY=`.
+6. **Legg inn nøkkelen, bare første gang.** Kopier kommandoene med knappen til høyre i boksen, lim dem inn i PowerShell-vinduet fra steg 4 én om gangen (Ctrl+V eller Cmd+V) og trykk Enter. Den første lager fila [`.env`](#mer-for-den-som-vil), og den neste åpner den (Windows eller Mac). Lim inn nøkkelen etter `EODHD_API_KEY=`, lagre og lukk. Det er klart når nøkkelen står etter `EODHD_API_KEY=`.
 
 ```
 cp .env.example .env
@@ -230,6 +230,21 @@ uv run python src/app.py
 ```
 
 Basen, demobasen og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo` åpner webserveren den ekte basen.
+
+</details>
+
+<details>
+<summary>Variablene i .env</summary>
+
+`.env` lages fra `.env.example` i steg 6 i den ekte versjonen. Demoen trenger ingen av dem.
+
+| Variabel | Hva den gjør | Standard | Når den trengs |
+|---|---|---|---|
+| `EODHD_API_KEY` | Nøkkelen til EODHD, som hentingen bruker til sluttkursene | Ingen | Til hentingen i den ekte versjonen. Webserveren og demoen trenger den ikke |
+| `OSE_KI_TJENESTE` | Om hentingen lager KI-tekst: `av` eller `lokal` (Gemma i Ollama) | `lokal` når variabelen ikke står i `.env`, og `av` i `.env.example` | Når du vil slå KI-teksten på eller av |
+| `OSE_KI_OLLAMA_URL` | Adressen til Ollama | `http://127.0.0.1:11434`, og `http://ollama:11434` i Docker | Bare med uv, når Ollama ikke svarer på standardadressen |
+
+`OSE_DEMO` og `OSE_I_DOCKER` settes av `compose.yaml` og `Dockerfile`, og skal ikke i `.env`.
 
 </details>
 
