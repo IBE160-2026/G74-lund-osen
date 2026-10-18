@@ -544,16 +544,23 @@ class TestReadme:
         assert "Første gang går det også i helgen og andre dager børsen er stengt." in steg8
         assert "Første gang kan du også hente i helgen" in _hjelp()
 
-    def test_ekte_versjonen_foerst_og_zip_foer_kommandoene(self):
-        """Story 3.4: fra 11.10 kl. 22:32 anbefaler README-en den ekte
-        versjonen, og den staar foerst. Demoen virker fortsatt uten .env.
-        Koden hentes med «Download ZIP» foer den foerste kommandoen, ikke med
-        git clone (svar 1 11.10). Het test_demoen_er_den_foerste_kommandoen
-        fra PR 2 til gjennomgangen 11.10."""
+    def test_demoen_foerst_og_zip_foer_kommandoene(self):
+        """Story 3.3c: demoen står foerst, fordi faglaerer proever den (gruppen
+        16.10 kl. 21:16, svarene kl. 21:25). Det snur rekkefoelgen fra 11.10
+        kl. 22:32, ikke anbefalingen: README-en anbefaler fortsatt den ekte
+        versjonen. Demoen virker uten .env. Koden hentes med «Download ZIP»
+        foer den foerste kommandoen, ikke med git clone (svar 1 11.10). Het
+        test_ekte_versjonen_foerst_og_zip_foer_kommandoene fra 11.10 til 3.3c.
+        Ville feilet hvis den ekte versjonen kom foer demoen igjen."""
         del_ = _kom_i_gang()
         kommandoer = _kommandoene()
-        assert kommandoer[0] == "cp .env.example .env"
-        assert del_.index("«Download ZIP»") < del_.index("cp .env.example .env")
+        assert kommandoer[0] == "docker compose up --build demo"
+        assert del_.index("«Download ZIP»") < del_.index("docker compose up --build demo")
+        overskrifter = re.findall(r"^### (.+)$", del_, re.MULTILINE)
+        assert overskrifter[:3] == ["Felles for begge", "Demoen", "Den ekte versjonen (anbefalt)"], overskrifter
+        topp = del_.split("### Felles for begge", 1)[0]
+        assert "Vi anbefaler den ekte versjonen." in topp
+        assert "Demoen står først i stegene under, fordi den er raskest." in topp
         assert "git clone" not in del_.split("### Står du fast?", 1)[0]
         demo = _seksjon("Demoen")
         assert "docker compose up --build demo" in demo and "http://127.0.0.1:5000" in demo
@@ -677,26 +684,58 @@ class TestReadme:
         assert not re.search(r"\b\d+\s+(tester|testene|hoppes|hoppet|består|bestått|passed|skipped)\b", tester)
         assert not re.search(r"\b(alle|de)\s+\d+\b", tester, re.IGNORECASE)
 
-    def test_ingen_bilder_utenom_ci_merket(self):
-        """Story 3.3: skjermbilder med ekte data publiserer dataene. Ville feilet
-        med et bilde i README-en.
-
-        Gruppen 16.10 kl. 21:38: skjermbildet av demoen fra 3.3b, punkt b, er
-        tatt ut igjen, så testen godtar ingen bilder utenom CI-merket. Regelen
+    def test_bildene_er_de_tre_fra_gjennomgangen_og_ci_merket(self):
+        """Story 3.3: skjermbilder med ekte data publiserer dataene. Regelen
         står i dokumentene: bilder i README-en kommer bare fra
         docs/bilder/readme/ og viser aldri den ekte versjonen (svar 4 11.10,
-        regelen 25.09 under story 3.3). Testen sjekker bare at det ikke er
-        noen. Kommer det bilder i «Kom i gang», endres testen i samme PR, med
-        stien og alt-teksten som sier at det er demoen (gjennomgangen, VG1, BH1)."""
+        regelen 25.09 under story 3.3).
+
+        Story 3.3c (instruksjonen 18.10 kl. 12:23): de tre skjermbildene fra
+        gruppens gjennomgang 16.10 står i steg 1, 2 og 4, hvert med alt-tekst
+        og en kort tekst under, og CI-merket står øverst (utsatt fra PR #54).
+        Ingen av dem viser appen. Ville feilet med et bilde til, et bilde
+        uten alt-tekst eller utenfor docs/bilder/readme/, eller uten CI-merket."""
         tekst = README.read_text(encoding="utf-8")
-        bilder = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", tekst)
-        assert all(b.endswith("tester.yml/badge.svg") for b in bilder), bilder
+        bilder = re.findall(r"!\[([^\]]*)\]\(([^)]+)\)", tekst)
+        merket = [b for _, b in bilder if b.endswith("/actions/workflows/tester.yml/badge.svg")]
+        assert merket == ["https://github.com/IBE160-2026/G74-lund-osen/actions/workflows/tester.yml/badge.svg"]
+        andre = [(alt, b) for alt, b in bilder if b not in merket]
+        assert sorted(b for _, b in andre) == sorted(f"docs/bilder/readme/{navn}" for navn in BILDENE.values())
+        for alt, sti in andre:
+            assert alt.strip(), sti
+            assert (ROT / sti).is_file(), sti
+        # Hvert bilde i sitt steg i «Felles for begge».
+        for nummer, navn in BILDENE.items():
+            assert f"](docs/bilder/readme/{navn})" in _steg("Felles for begge", nummer), navn
         # Ogsaa HTML-bilder og bilder med referanse (BH7).
         assert "<img" not in tekst.lower()
         assert not re.search(r"!\[[^\]]*\]\[", tekst)
 
+    def test_teksten_under_hvert_bilde(self):
+        """Svar 2 kl. 14:48: teksten under et bilde telles for seg, høyst 25
+        ord. Under bildet i steg 4 står at stien blir en annen, men at
+        mappenavnet skal stå foran >. Ville feilet hvis et bilde sto uten
+        tekst under, eller teksten ble for lang."""
+        for nummer, navn in BILDENE.items():
+            under = _bildetekst(_steg("Felles for begge", nummer), navn)
+            assert under, navn
+            assert len(re.findall(r"\w+", under)) <= 25, (navn, under)
+        assert "Stien blir en annen hos deg, men mappenavnet skal stå foran `>` (`%` på Mac)." in _bildetekst(
+            _steg("Felles for begge", 4), BILDENE[4]
+        )
+
+    def test_mappestrukturen_nevner_bildene(self):
+        """Regel 19: «Mappestruktur» nevner docs/bilder/readme/ og hvert bilde."""
+        mappestruktur = README.read_text(encoding="utf-8").split("\n## Mappestruktur\n", 1)[1].split("\n## ", 1)[0]
+        assert "`docs/bilder/readme/`" in mappestruktur
+        for navn in BILDENE.values():
+            assert f"`{navn}`" in mappestruktur, navn
+
 
 BILDEFILER = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"}
+# Story 3.3c: skjermbildene fra gruppens gjennomgang 16.10, per steg i
+# «Felles for begge».
+BILDENE = {1: "engine-running.png", 2: "github-download-zip.png", 4: "powershell-mappa.png"}
 
 
 def _python_krav() -> str:
@@ -709,13 +748,13 @@ def _python_krav() -> str:
     return treff.group(1)
 
 
-class TestIngenBilderIDocs:
-    def test_ingen_bilder_i_docs_bilder(self):
-        """Gruppen 16.10 kl. 21:38: skjermbildet er tatt ut, og ingen
-        bildefiler ligger under docs/bilder/, så ingen bilder med ekte data
-        blir liggende. Mappa finnes ikke når den er tom, fordi git ikke sporer
-        tomme mapper, og da er det heller ingen bilder (gjennomgangen, ECH,
-        BH4). Testen sjekker at det ikke er noen, ikke hvor de ligger."""
+class TestBildeneIDocs:
+    def test_bare_de_tre_bildene_i_docs_bilder(self):
+        """Gruppen 16.10 kl. 21:38: skjermbildet av oversikten er tatt ut, så
+        ingen bilder med ekte data blir liggende. Story 3.3c: under
+        docs/bilder/ ligger bare de tre skjermbildene i «Kom i gang», i
+        docs/bilder/readme/. Ville feilet med et bilde til, eller et av de tre
+        et annet sted."""
         mappe = README.parent / "docs" / "bilder"
         # Bare bildefiler: Thumbs.db og .DS_Store fra Utforsker og Finder
         # skal ikke felle testen hos sensor (gjennomgangen av 3.3b, BH4, ECH).
@@ -724,7 +763,7 @@ class TestIngenBilderIDocs:
             for p in mappe.rglob("*")
             if p.is_file() and p.suffix.lower() in BILDEFILER
         )
-        assert filer == []
+        assert filer == sorted(f"docs/bilder/readme/{navn}" for navn in BILDENE.values()), filer
 
 
 def _proevetabellen(proeve: str | None = None) -> str:
@@ -746,9 +785,15 @@ def _seksjon(navn: str) -> str:
 SEKSJONENE = {"Felles for begge": [1, 2, 3, 4], "Den ekte versjonen (anbefalt)": [5, 6, 7, 8, 9], "Demoen": [5, 6, 7]}
 
 
+# Story 3.3c (svar 2 18.10 kl. 14:48): avsnittet som forklarer hvordan en
+# kommando kopieres, staar én gang, sist i «Felles for begge», og hoerer ikke
+# til steg 4.
+KOPIERINGEN = "**Slik limer du inn en kommando.**"
+
+
 def _steg(seksjon: str, nummer: int) -> str:
     """Steg nummer i seksjonen, med boksene som hoerer til det."""
-    deler = re.split(r"^(\d+)\. ", _seksjon(seksjon), flags=re.MULTILINE)
+    deler = re.split(r"^(\d+)\. ", _seksjon(seksjon).split(f"\n{KOPIERINGEN}", 1)[0], flags=re.MULTILINE)
     return dict(zip(deler[1::2], deler[2::2]))[str(nummer)]
 
 
@@ -771,6 +816,28 @@ def _anker(overskrift: str) -> str:
 
 def _uten_bokser(tekst: str) -> str:
     return re.sub(r"^```.*?^```$", "", tekst, flags=re.MULTILINE | re.DOTALL)
+
+
+# Et bilde paa egen linje, og teksten under i kursiv som eget avsnitt, med
+# minst én tom linje imellom (gjennomgangen av 3.3c, BH12, ECH6).
+BILDE_MED_TEKST = r"^!\[[^\]]*\]\([^)]+\)[ \t]*\n(?:(?:[ \t]*\n)+\*[^*\n][^\n]*\*[ \t]*(?:\n|$))?"
+
+
+def _uten_bilder(tekst: str) -> str:
+    """Teksten uten bildene og teksten under dem, som telles for seg (svar 2
+    18.10 kl. 14:48)."""
+    return re.sub(BILDE_MED_TEKST, "", tekst, flags=re.MULTILINE)
+
+
+def _bildetekst(tekst: str, navn: str) -> str:
+    """Teksten i kursiv i avsnittet rett under bildet navn, uten stjernene.
+    Tom hvis avsnittet under ikke er i kursiv."""
+    treff = re.search(
+        rf"^!\[[^\]]*\]\([^)]*/{re.escape(navn)}\)[ \t]*\n(?:[ \t]*\n)+\*([^*\n][^\n]*)\*[ \t]*$",
+        tekst,
+        re.MULTILINE,
+    )
+    return treff.group(1) if treff else ""
 
 
 def _ankrene(tekst: str) -> set[str]:
@@ -850,6 +917,8 @@ class TestReadmeForNybegynnere:
         topp = _kom_i_gang().split("### Felles for begge", 1)[0]
         hode = [l for l in topp.splitlines() if l.startswith("|")][0]
         assert "Den ekte versjonen (anbefalt)" in hode and "| Demoen |" in hode
+        # Story 3.3c: demoen i første kolonne, som i stegene.
+        assert hode.startswith("| | Demoen | Den ekte versjonen (anbefalt) |"), hode
         assert "Vi anbefaler den ekte versjonen." in topp
         assert "(anbefalt)" not in hode.split("Den ekte versjonen (anbefalt)", 1)[1]
 
@@ -860,14 +929,127 @@ class TestReadmeForNybegynnere:
         Rettet 2026-10-13 (story 8.0e PR 2, svaret kl. 23:50): ordene telles
         slik leseren ser dem, med lenketeksten og uten adressen bak, og
         grensen er 65, ikke 60. Setningen fra docs/hjelp.md i steg 2 gjorde
-        steget til 70 ord, 8 av dem i adressen til GitHub."""
+        steget til 70 ord, 8 av dem i adressen til GitHub.
+
+        Story 3.3c (svar 2 18.10 kl. 14:48): grensen gjelder teksten i
+        steget. Bildet og teksten under det telles for seg, i
+        test_teksten_under_hvert_bilde."""
         for seksjon, numre in SEKSJONENE.items():
             funnet = [int(n) for n in re.findall(r"^(\d+)\. ", _seksjon(seksjon), re.MULTILINE)]
             assert funnet == numre, (seksjon, funnet)
             for n in numre:
-                tekst = re.sub(r"\]\([^)]*\)", "]", _uten_bokser(_steg(seksjon, n)))
+                tekst = re.sub(r"\]\([^)]*\)", "]", _uten_bilder(_uten_bokser(_steg(seksjon, n))))
                 assert len(re.findall(r"\w+", tekst)) <= 65, (seksjon, n)
                 assert "klar" in tekst.lower() or "Øverst står" in tekst, (seksjon, n)
+
+    def test_steg_4_mappa_ikke_zip_fila(self):
+        """Story 3.3c, rettelse a: i gjennomgangen 16.10 ble ZIP-fila dratt
+        inn i stedet for mappa. Steg 4 sier mappa fra steg 2 (ikke ZIP-fila),
+        og lenker til svaret om .zip til slutt i linja i docs/hjelp.md, som
+        sier Esc (svar 2 kl. 14:48: detaljene i docs/hjelp.md når steget
+        ellers blir over 65 ord). Ville feilet hvis .zip-sjekken falt bort
+        fra steg 4."""
+        steg = _steg("Felles for begge", 4)
+        assert "dra mappa `G74-lund-osen-main` fra steg 2 (ikke ZIP-fila), der README og compose ligger" in steg
+        sporsmaal = "Står det .zip til slutt i linja."
+        assert f"[Står det `.zip` til slutt?](docs/hjelp.md#{_anker(sporsmaal)})" in steg
+        steg4 = _hjelp().split("\n## Steg 4: mappa\n", 1)[1].split("\n## ", 1)[0]
+        svar = steg4.split(f"### {sporsmaal}\n\n", 1)[1].split("\n\n", 1)[0]
+        assert "Dra mappa du pakket ut i steg 2, ikke ZIP-fila." in svar
+        assert "Står det `.zip` til slutt i linja" in svar and "trykker du Esc" in svar
+        # Gjennomgangen, VG8 og ECH1: Esc tømmer linja i PowerShell, men ikke
+        # i Terminal på Mac, der Ctrl+U gjør det.
+        assert "trykker du Esc (Windows) eller Ctrl+U (Mac), så linja blir tom" in svar
+
+    def test_svaret_om_mellomrommet_etter_cd(self):
+        """Story 3.3c, rettelse b: i gjennomgangen 16.10 ga `cd"C:\\..."`
+        feilen «The term 'cdC:\\...' is not recognized as the name of a
+        cmdlet». Spoersmaalet staar under «Står du fast?» og i docs/hjelp.md
+        under «Steg 4: mappa», med samme svar. Ville feilet hvis svaret om
+        mellomrommet falt bort."""
+        sporsmaal = "«is not recognized as the name of a cmdlet» etter cd."
+        svar = _detaljer(_faq())[sporsmaal]
+        assert svar.startswith("Det mangler mellomrom etter `cd`.")
+        assert "(steg 4)" in svar
+        steg4 = _hjelp().split("\n## Steg 4: mappa\n", 1)[1].split("\n## ", 1)[0]
+        assert re.search(rf"^### {re.escape(sporsmaal)}$", steg4, re.MULTILINE)
+        i_hjelp = steg4.split(f"### {sporsmaal}\n\n", 1)[1].split("\n\n", 1)[0]
+        assert i_hjelp.startswith(svar.strip())
+        # Gjennomgangen, BH6: svaret i README-en sier ogsaa hva 'docker' i
+        # meldingen betyr. «docker» er ikke gjenkjent har sitt eget svar, som står.
+        assert "Står det `'docker'` i meldingen, er Docker Desktop ikke installert" in svar
+        assert "### «docker» er ikke gjenkjent, eller «command not found: docker»." in _hjelp()
+
+    def test_svaret_om_cannot_find_path(self):
+        """Story 3.3c, rettelse c: «Cannot find path» hadde ikke noe svar i
+        gjennomgangen 16.10. Spoersmaalet staar under «Står du fast?» og i
+        docs/hjelp.md under «Steg 4: mappa», med samme svar. Ville feilet
+        hvis svaret falt bort, eller ikke sa at mappa skal dras paa nytt."""
+        sporsmaal = "«Cannot find path … because it does not exist»."
+        svar = _detaljer(_faq())[sporsmaal]
+        assert svar.startswith("Mappa ligger ikke der stien sier,")
+        assert "flyttet" in svar and "ZIP-fila ble dratt inn" in svar
+        assert "dra mappa inn i vinduet på nytt (steg 4)" in svar
+        steg4 = _hjelp().split("\n## Steg 4: mappa\n", 1)[1].split("\n## ", 1)[0]
+        i_hjelp = steg4.split(f"### {sporsmaal}\n\n", 1)[1].split("\n\n", 1)[0]
+        assert i_hjelp.startswith(svar.strip())
+
+    def test_kopieringen_forklares_en_gang_og_hvert_steg_sier_hvor(self):
+        """Story 3.3c, rettelse d, med svar 2 kl. 14:48: det var uklart hvor
+        kommandoen limes inn og hvor kopi-ikonet er. Forklaringen staar én
+        gang, rett foer det foerste steget med en kommando, og hvert steg med
+        en kommando sier at den limes inn i PowerShell-vinduet fra steg 4.
+        «Serving on» betyr bare at appen kjoerer. Ville feilet hvis et steg
+        med en boks ikke sa hvor kommandoen limes inn, eller forklaringen
+        manglet en av de tre maatene aa kopiere paa.
+
+        Gjennomgangen av 3.3c: avsnittet er kort, hoeyst 65 ord som et steg
+        (VG6, ECH2), og sier at ikonet er knappen stegene nevner (BH3,
+        ECH12). «Serving on» forklares i stegene der linja staar, ikke i
+        avsnittet. Steg 8 bruker et nytt vindu, saa det sier «det nye
+        PowerShell-vinduet», ikke «fra steg 4» (BH1). Svaret under «Står du
+        fast?» har ogsaa kopieringen (VG7)."""
+        del_ = _kom_i_gang()
+        assert del_.count(KOPIERINGEN) == 1
+        avsnitt = del_.split(KOPIERINGEN, 1)[1].split("\n\n", 1)[0]
+        for innhold in (
+            "Kopier kommandoen med ikonet til høyre i den grå boksen.",
+            "Ikonet, som stegene kaller knappen, synes først når musa er over boksen.",
+            "markere den og trykke Ctrl+C eller Cmd+C",
+            "eller skrive den inn.",
+            "Lim den inn i PowerShell-vinduet fra steg 4 (Terminal på Mac)",
+        ):
+            assert innhold in avsnitt, innhold
+        assert len(re.findall(r"\w+", KOPIERINGEN + avsnitt)) <= 65
+        # Rett foer det foerste steget med en kommando, og etter steg 4.
+        foerste_boks = re.search(r"^```", del_, re.MULTILINE).start()
+        assert del_.index("\n4. ") < del_.index(KOPIERINGEN) < del_.index("\n### Demoen\n") < foerste_boks
+        assert del_[del_.index(KOPIERINGEN) :].split("\n\n", 1)[1].startswith("### Demoen\n")
+        # Hvert steg med en boks sier hvor den limes inn.
+        for seksjon, numre in SEKSJONENE.items():
+            for n in numre:
+                steg = _steg(seksjon, n)
+                if not _blokkene(steg):
+                    continue
+                if (seksjon, n) == ("Den ekte versjonen (anbefalt)", 8):
+                    assert "lim inn denne i det nye PowerShell-vinduet." in steg
+                    assert "nye PowerShell-vinduet fra steg 4" not in steg
+                else:
+                    assert "i PowerShell-vinduet fra steg 4" in steg, (seksjon, n)
+        # BH11: demoen slutter i steg 7 og sier hvor den ekte versjonen begynner.
+        assert "Vil du også prøve den ekte versjonen, går du videre til steg 5 under." in _steg("Demoen", 7)
+        # VG7: svaret under «Står du fast?» har kopieringen, likt med docs/hjelp.md.
+        faq = _detaljer(_faq())["Ingenting skjer når jeg limer inn."]
+        assert "ikonet til høyre i den grå boksen" in faq and "skrive den inn" in faq
+        # Linja i steg 7 og steg 5 i demoen sier hva den betyr.
+        assert "som bare betyr at appen kjører" in _steg("Den ekte versjonen (anbefalt)", 7)
+        assert "Den linja betyr bare at demoen kjører." in _steg("Demoen", 5)
+        # Og docs/hjelp.md der svaret staar.
+        innliming = _hjelp().split("### Ingenting skjer når jeg limer inn.\n\n", 1)[1].split("\n### ", 1)[0]
+        assert "ikonet til høyre i den grå boksen" in innliming and "Ctrl+C" in innliming
+        assert "skrive den inn" in innliming and "PowerShell-vinduet fra steg 4" in innliming
+        vinduet = _hjelp().split("### Hva skal jeg se etter i vinduet?\n\n", 1)[1].split("\n### ", 1)[0]
+        assert "«Serving on http://0.0.0.0:5000» betyr bare at appen kjører." in vinduet
 
     def test_stegene_nevner_powershell_og_terminal(self):
         steg = _steg("Felles for begge", 3)
@@ -880,9 +1062,9 @@ class TestReadmeForNybegynnere:
         # docs/hjelp.md staar ordrett til slutt i steg 2.
         svar = _hjelp().split("### Jeg har fått koden fra før.", 1)[1].strip().split("\n\n", 1)[0]
         assert svar == "Har du fått koden som mappe eller ZIP-fil, pakker du den ut og går til steg 3."
-        assert steg.strip().endswith(svar)
+        assert _uten_bilder(steg).strip().endswith(svar)
         assert (
-            _steg("Felles for begge", 4)
+            _uten_bilder(_steg("Felles for begge", 4))
             .strip()
             .endswith("Har mappa et annet navn, drar du den mappa der README og compose ligger.")
         )
@@ -898,12 +1080,16 @@ class TestReadmeForNybegynnere:
         uten_detaljer = re.sub(r"<details>.*?</details>", "", _kom_i_gang(), flags=re.DOTALL)
         assert advarsel in uten_detaljer
 
-    def test_staar_du_fast_har_hoeyst_8_spoersmaal(self):
+    def test_staar_du_fast_har_hoeyst_10_spoersmaal(self):
         """22:32: FAQ-en var for lang. Hoeyst 8 spoersmaal, hvert som
-        <details> med <summary>, og en lenke til docs/hjelp.md."""
+        <details> med <summary>, og en lenke til docs/hjelp.md.
+
+        Story 3.3c (svar 1 18.10 kl. 14:48): hoeyst 10, for svarene om
+        mellomrommet etter cd og «Cannot find path» fra gjennomgangen 16.10.
+        Het test_staar_du_fast_har_hoeyst_8_spoersmaal til 3.3c."""
         faq = _faq()
         sporsmaal = _detaljer(faq)
-        assert 1 <= len(sporsmaal) <= 8
+        assert 1 <= len(sporsmaal) <= 10
         assert faq.count("<details>") == faq.count("</details>") == faq.count("<summary>") == len(sporsmaal)
         rest = re.sub(r"<details>.*?</details>", "", faq, flags=re.DOTALL)
         assert [l for l in rest.splitlines() if l.strip()] == [
@@ -989,6 +1175,18 @@ class TestReadmeForNybegynnere:
         for n in re.findall(r"steg (\d+) i den ekte versjonen", tekst):
             assert int(n) in SEKSJONENE["Den ekte versjonen (anbefalt)"], n
         tabell = _proevetabellen("Prøve 1")
+        # Story 3.3c: demoen foer den ekte versjonen, som i README-en, og en
+        # kolonne for tiden hvert steg tok.
+        assert tabell.splitlines()[0] == "| # | Kommando eller steg i README-en | Det som skjedde | Tid (min) |"
+        # Gjennomgangen, BH7: byttet begynner med den ekte versjonen, som kjoerte sist.
+        bytte = [l for l in tabell.splitlines() if "| Byttet" in l]
+        assert len(bytte) == 1
+        assert bytte[0].startswith(
+            "| 16 | Byttet, fra den ekte versjonen til demoen og tilbake: "
+            "`docker compose up --build`, så `docker compose down`"
+        ), bytte[0]
+        assert tabell.index("| Demoen, steg 7:") < tabell.index("| Den ekte versjonen, steg 5:")
+        assert [int(n) for n in re.findall(r"^\| (\d+) \|", tabell, re.MULTILINE)] == list(range(1, 24))
         assert [int(n) for n in re.findall(r"\| Steg (\d+):", tabell)] == [1, 2, 3, 4]
         assert [int(n) for n in re.findall(r"\| Den ekte versjonen, steg (\d+):", tabell)] == [5, 6, 7, 8, 9]
         assert [int(n) for n in re.findall(r"\| Demoen, steg (\d+):", tabell)] == [5, 6, 7]
@@ -1225,6 +1423,12 @@ class TestReadmeForNybegynnere:
 
         antall = len(kursdata.AKSJEUNIVERS)
         hjelp = _hjelp()
+        # Story 3.3c: «Demoen» foer «Den ekte versjonen», som i README-en.
+        assert (
+            hjelp.index("\n## Steg 4: mappa\n")
+            < hjelp.index("\n## Demoen\n")
+            < hjelp.index("\n## Den ekte versjonen\n")
+        )
         ekte = hjelp.split("\n## Den ekte versjonen\n", 1)[1].split("\n## ", 1)[0]
         overskrifter = re.findall(r"^### (.+)$", ekte, re.MULTILINE)
         sporsmaal = f"Hvorfor bare {antall} aksjer?"

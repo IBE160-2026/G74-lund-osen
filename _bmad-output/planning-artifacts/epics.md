@@ -1993,6 +1993,8 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 
 *Avgjort 2026-10-18 kl. 00:03 (gruppens svar):* README-prøven tas første gang i uke 43 (19.–25.10), etter at de to README-PR-ene er flettet: Prøve 1, og Prøve 2 samtidig hvis testeren har egen gratiskonto. Den tas på nytt senest én uke før innleveringen, med ZIP-fila som leveres. Det endrer setningen fra 14.10 under story 3.4 om at prøven tas når mest mulig er bygget (§9 og §13 i `docs/kvalitetssikring.md`).
 
+*Avgjort 2026-10-18 kl. 14:48 (gruppens svar, under instruksjonen kl. 12:23):* README-PR-en med bildene og rettelsene fra gjennomgangen 16.10 (`spec-3-3c-kom-i-gang-bilder-og-demoen-foerst.md`). «Står du fast?» kan ha høyst 10 spørsmål, ikke 8 som fra 11.10 kl. 22:32. Grensen på 65 ord per steg står for teksten i steget. Teksten under et bilde telles for seg, høyst 25 ord. Forklaringen av hvordan en kommando kopieres, står én gang, i et kort avsnitt rett før det første steget med en kommando, og hvert steg med en kommando sier bare at den limes inn i PowerShell-vinduet fra steg 4. Blir et steg fortsatt over 65 ord, flyttes detaljene til `docs/hjelp.md` med en lenke fra steget.
+
 ### Story 3.4: Demoversjonen
 
 *Lagt til 2026-10-03, Marians beslutning kl. 18:10.*
