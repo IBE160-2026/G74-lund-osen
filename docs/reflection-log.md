@@ -2685,6 +2685,20 @@ Det vi lærte: et ja med vilkår sparer en runde, når vilkårene stopper det de
 
 ---
 
+## 18.10.2026 – En mutant som viste et hull, og kontrollen rettet før mandag
+
+*Joakim og Marian.*
+
+Da KI-tekstene til demoen ble laget (3.4b), skulle mutanten K2 vise at testen fanger en tekst som ikke består kontrollen. Det første forsøket byttet retningen i BRFE med «Dette signalet er Positivt», og teksten besto. Kontrollen i FR-603 leste retningen bare i «retningen er …», mens Gemma skriver «Dette signalet er Negativt» i 12 av de 13 tekstene. Hullet var der fra før, også i den ekte versjonen.
+
+Kl. 21:03 bestemte vi at det rettes før byggestoppen mandag kl. 20:40. Grunnen er uka med logget drift: en rad i KI-loggen står når den er skrevet, og modellen kalles ikke på nytt for den dagen (FR-604). En tekst med feil retning ville da blitt vist og stått i loggen hele uka. Prompten står, versjon 2, så det er bare kontrollen som endres.
+
+Rettingen ble flettet i `3c2bd51` (PR #71). Gjennomgangen fant at den første versjonen gikk for langt den andre veien: «…, og det er et positivt signal» etter en setning om trenden ble lest som hele signalet. Det ville stoppet riktige tekster. Det ble rettet før flettingen, med en mutant for hvert funn. Kontrollen fra main og den nye ga samme svar på alle 79 KI-tekstene vi har ført, så tekstene i demoen står.
+
+Det vi lærte: en mutant som overlever, kan vise et hull i koden og ikke bare i testen. En kontroll som skal lese flere former, må prøves på riktige tekster også, ikke bare på feil. Rett det som skrives til en logg som ikke kan endres, før loggen starter.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
