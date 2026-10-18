@@ -785,9 +785,15 @@ def _seksjon(navn: str) -> str:
 SEKSJONENE = {"Felles for begge": [1, 2, 3, 4], "Den ekte versjonen (anbefalt)": [5, 6, 7, 8, 9], "Demoen": [5, 6, 7]}
 
 
+# Story 3.3c (svar 2 18.10 kl. 14:48): avsnittet som forklarer hvordan en
+# kommando kopieres, staar én gang, sist i «Felles for begge», og hoerer ikke
+# til steg 4.
+KOPIERINGEN = "**Slik limer du inn en kommando.**"
+
+
 def _steg(seksjon: str, nummer: int) -> str:
     """Steg nummer i seksjonen, med boksene som hoerer til det."""
-    deler = re.split(r"^(\d+)\. ", _seksjon(seksjon), flags=re.MULTILINE)
+    deler = re.split(r"^(\d+)\. ", _seksjon(seksjon).split(f"\n{KOPIERINGEN}", 1)[0], flags=re.MULTILINE)
     return dict(zip(deler[1::2], deler[2::2]))[str(nummer)]
 
 
@@ -982,6 +988,45 @@ class TestReadmeForNybegynnere:
         steg4 = _hjelp().split("\n## Steg 4: mappa\n", 1)[1].split("\n## ", 1)[0]
         i_hjelp = steg4.split(f"### {sporsmaal}\n\n", 1)[1].split("\n\n", 1)[0]
         assert i_hjelp.startswith(svar.strip())
+
+    def test_kopieringen_forklares_en_gang_og_hvert_steg_sier_hvor(self):
+        """Story 3.3c, rettelse d, med svar 2 kl. 14:48: det var uklart hvor
+        kommandoen limes inn og hvor kopi-ikonet er. Forklaringen staar én
+        gang, rett foer det foerste steget med en kommando, og hvert steg med
+        en kommando sier at den limes inn i PowerShell-vinduet fra steg 4.
+        «Serving on» betyr bare at appen kjoerer. Ville feilet hvis et steg
+        med en boks ikke sa hvor kommandoen limes inn, eller forklaringen
+        manglet en av de tre maatene aa kopiere paa."""
+        del_ = _kom_i_gang()
+        assert del_.count(KOPIERINGEN) == 1
+        avsnitt = del_.split(KOPIERINGEN, 1)[1].split("\n\n", 1)[0]
+        for innhold in (
+            "ikonet til høyre i den grå boksen, som først synes når musa er over boksen",
+            "marker den og trykk Ctrl+C",
+            "Du kan også skrive den inn.",
+            "Lim den inn i PowerShell-vinduet fra steg 4",
+            "«Serving on http://0.0.0.0:5000» betyr bare at appen kjører.",
+            "Adressen du åpner, er http://127.0.0.1:5000.",
+        ):
+            assert innhold in avsnitt, innhold
+        # Rett foer det foerste steget med en kommando, og etter steg 4.
+        foerste_boks = re.search(r"^```", del_, re.MULTILINE).start()
+        assert del_.index("\n4. ") < del_.index(KOPIERINGEN) < del_.index("\n### Demoen\n") < foerste_boks
+        # Hvert steg med en boks sier hvor den limes inn.
+        for seksjon, numre in SEKSJONENE.items():
+            for n in numre:
+                steg = _steg(seksjon, n)
+                if _blokkene(steg):
+                    assert re.search(r"i (det nye )?PowerShell-vinduet fra steg 4", steg), (seksjon, n)
+        # Linja i steg 7 og steg 5 i demoen sier hva den betyr.
+        assert "som bare betyr at appen kjører" in _steg("Den ekte versjonen (anbefalt)", 7)
+        assert "Den linja betyr bare at demoen kjører." in _steg("Demoen", 5)
+        # Og docs/hjelp.md der svaret staar.
+        innliming = _hjelp().split("### Ingenting skjer når jeg limer inn.\n\n", 1)[1].split("\n### ", 1)[0]
+        assert "ikonet til høyre i den grå boksen" in innliming and "Ctrl+C" in innliming
+        assert "skrive den inn" in innliming and "PowerShell-vinduet fra steg 4" in innliming
+        vinduet = _hjelp().split("### Hva skal jeg se etter i vinduet?\n\n", 1)[1].split("\n### ", 1)[0]
+        assert "«Serving on http://0.0.0.0:5000» betyr bare at appen kjører." in vinduet
 
     def test_stegene_nevner_powershell_og_terminal(self):
         steg = _steg("Felles for begge", 3)

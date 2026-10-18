@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-18T14:51
+updated: 2026-10-18T14:54
 ---
 
 # Hjelp til «Kom i gang»
@@ -73,6 +73,8 @@ Et terminalvindu, der du skriver kommandoer i stedet for å klikke. Windows: try
 
 Kommandoene skrives i PowerShell eller Terminal, ikke i Docker Desktop. Docker Desktop skal bare være åpent, og du skriver ingenting i det. Ledetekst (Command Prompt) på Windows virker også for demoen, men stegene er skrevet for PowerShell, og den ekte versjonen trenger PowerShell.
 
+Kopier kommandoen med ikonet til høyre i den grå boksen i README-en. Ikonet synes først når musa er over boksen. Du kan også markere kommandoen og trykke Ctrl+C (Cmd+C på Mac), eller skrive den inn. Lim den inn i PowerShell-vinduet fra steg 4 med Ctrl+V (Cmd+V på Mac), og trykk Enter.
+
 ## Steg 4: mappa
 
 ### Hva betyr cd, og hvordan ser jeg at det gikk?
@@ -113,7 +115,7 @@ Første gang bygger Docker appen, og det kommer mange linjer. Demoen er klar nå
 demo-1  | INFO:waitress:Serving on http://0.0.0.0:5000
 ```
 
-Under den kan det komme en linje med valg fra Docker. La terminalvinduet stå åpent mens du bruker demoen. `0.0.0.0` er adressen inne i Docker, og du åpner http://127.0.0.1:5000 i steg 6 i demoen.
+Under den kan det komme en linje med valg fra Docker. La terminalvinduet stå åpent mens du bruker demoen. `0.0.0.0` er adressen inne i Docker, og du åpner http://127.0.0.1:5000 i steg 6 i demoen. «Serving on http://0.0.0.0:5000» betyr bare at appen kjører.
 
 ### Hva er demoen?
 

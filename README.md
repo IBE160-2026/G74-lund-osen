@@ -46,16 +46,18 @@ Appen finnes i to versjoner, med samme kode. Vi anbefaler den ekte versjonen. Vi
 
 *Slik ser det ut når steg 4 har gått bra. Stien blir en annen hos deg, men mappenavnet skal stå foran `>`.*
 
+**Slik limer du inn en kommando.** Stegene under har kommandoene i grå bokser. Kopier en kommando med ikonet til høyre i den grå boksen, som først synes når musa er over boksen, eller marker den og trykk Ctrl+C (Cmd+C på Mac). Du kan også skrive den inn. Lim den inn i PowerShell-vinduet fra steg 4 (Terminal på Mac) med Ctrl+V (Cmd+V på Mac), og trykk Enter. «Serving on http://0.0.0.0:5000» betyr bare at appen kjører. Adressen du åpner, er http://127.0.0.1:5000.
+
 ### Demoen
 
-5. **Start demoen.** Kopier kommandoen med knappen til høyre i boksen, lim den inn (Ctrl+V eller Cmd+V) og trykk Enter. Første gang tar det noen minutter. Demoen er klar når det står `Serving on http://0.0.0.0:5000`. Den adressen skal du ikke åpne.
+5. **Start demoen.** Kopier kommandoen med knappen til høyre i boksen, lim den inn i PowerShell-vinduet fra steg 4 (Ctrl+V eller Cmd+V) og trykk Enter. Første gang tar det noen minutter. Demoen er klar når det står `Serving on http://0.0.0.0:5000`. Den linja betyr bare at demoen kjører. Den adressen skal du ikke åpne.
 
 ```
 docker compose up --build demo
 ```
 
 6. **Åpne http://127.0.0.1:5000** i en ny fane. Øverst står «Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.» Klikk på et selskapsnavn for å se en aksje.
-7. **Stopp** med Ctrl+C i terminalvinduet, også på Mac, og lim så inn denne. Det er klart når det står at containerne er fjernet (Removed).
+7. **Stopp** med Ctrl+C i terminalvinduet, også på Mac, og lim så inn denne i PowerShell-vinduet fra steg 4. Det er klart når det står at containerne er fjernet (Removed).
 
 ```
 docker compose --profile demo down
@@ -64,7 +66,7 @@ docker compose --profile demo down
 ### Den ekte versjonen (anbefalt)
 
 5. **Hent en nøkkel.** Lag en gratis bruker hos [EODHD](https://eodhd.com/register), og kopier API-nøkkelen din. Det er klart når du har nøkkelen.
-6. **Legg inn nøkkelen, bare første gang.** Kopier kommandoene med knappen til høyre i boksen, lim dem inn én om gangen (Ctrl+V eller Cmd+V) og trykk Enter. Den første lager fila `.env`, og den neste åpner den (Windows eller Mac). Lim inn nøkkelen etter `EODHD_API_KEY=`, lagre og lukk. Det er klart når nøkkelen står etter `EODHD_API_KEY=`.
+6. **Legg inn nøkkelen, bare første gang.** Kopier kommandoene med knappen til høyre i boksen, lim dem inn i PowerShell-vinduet fra steg 4 én om gangen (Ctrl+V eller Cmd+V) og trykk Enter. Den første lager fila `.env`, og den neste åpner den (Windows eller Mac). Lim inn nøkkelen etter `EODHD_API_KEY=`, lagre og lukk. Det er klart når nøkkelen står etter `EODHD_API_KEY=`.
 
 ```
 cp .env.example .env
@@ -82,19 +84,19 @@ Mac:
 open -e .env
 ```
 
-7. **Start appen.** Lim inn denne og trykk Enter. Første gang tar det noen minutter. Det er klart når det står `Serving on http://0.0.0.0:5000`. Åpne http://127.0.0.1:5000 i en ny fane. Første gang er oversikten tom og viser kommandoen som henter.
+7. **Start appen.** Lim inn denne i PowerShell-vinduet fra steg 4, og trykk Enter. Første gang tar det noen minutter. Det er klart når det står `Serving on http://0.0.0.0:5000`, som bare betyr at appen kjører. Åpne http://127.0.0.1:5000 i en ny fane. Første gang er oversikten tom og viser kommandoen som henter.
 
 ```
 docker compose up --build
 ```
 
-8. **Hent kursene** etter kl. 21 og før midnatt på en børsdag. Første gang går det også i helgen og andre dager børsen er stengt. Åpne et nytt terminalvindu i samme mappe (steg 3 og 4), og lim inn denne. Det er klart når utskriften sier hvilken børsdag vurderingene gjelder. Last siden på nytt når hentingen er ferdig.
+8. **Hent kursene** etter kl. 21 og før midnatt på en børsdag. Første gang går det også i helgen og andre dager børsen er stengt. Åpne et nytt terminalvindu i samme mappe (steg 3 og 4), og lim inn denne i det nye PowerShell-vinduet fra steg 4. Det er klart når utskriften sier hvilken børsdag vurderingene gjelder. Last siden på nytt når hentingen er ferdig.
 
 ```
 docker compose run --rm hent
 ```
 
-9. **Stopp** med Ctrl+C i vinduet med appen, og lim så inn denne. Det er klart når det står at containerne er fjernet (Removed).
+9. **Stopp** med Ctrl+C i vinduet med appen, og lim så inn denne i PowerShell-vinduet fra steg 4. Det er klart når det står at containerne er fjernet (Removed).
 
 ```
 docker compose down
