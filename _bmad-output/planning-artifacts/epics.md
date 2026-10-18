@@ -1703,6 +1703,8 @@ Som **bruker**, vil jeg se hovedindeksen i kursgrafen på aksjesiden, så jeg se
 
 **Avhenger av:** 2.9b. **Én økt:** ja.
 
+*Lagt til 2026-10-18 kl. 11:04:* linja er flettet i `24849dd`, PR #64 (spesifikasjonen `spec-2-9c-hovedindeksen-i-kursgrafen.md`). Startdagen er den første dagen i grafen som indeksen har, som er grafens første dag når indeksen har den (gjennomgangen, BH4 og VG1). CI var grønn på head-en `c41133e` (kjøring 39113646261) og på main (39113734933).
+
 ### Story 2.10: Høy og lav lagres med kursene
 
 *Lagt til 2026-10-07, Marians beslutning kl. 23:11.*

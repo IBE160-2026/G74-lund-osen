@@ -2,7 +2,7 @@
 title: 'Story 2.9c: hovedindeksen som stiplet linje i kursgrafen'
 type: 'feature'
 created: '2026-10-18'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'bf289a4'
@@ -42,6 +42,8 @@ context:
 
 - Ingen API-kall utover kvotesjekken i regel 15, og `src/fetch_prices.py` kjøres ikke mot EODHD. `data/db/ose.db` og `data/db/demo.db` røres ikke (regel 22). Demobaser lages bare i midlertidige mapper.
 - Ingen ny tabell og ingen nye kall: indeksen er den 2.8 henter.
+
+*Lagt til 2026-10-18 kl. 11:04:* PR #64 er squash-flettet i `24849dd`, låst til head-en `c41133e`. CI var grønn på head-en (39113646261) og på main (39113734933). Triagen står som kommentar i PR #64.
 
 ## Kjøringen som ble stoppet 18.10
 
