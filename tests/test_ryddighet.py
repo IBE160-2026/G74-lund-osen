@@ -267,3 +267,29 @@ def test_lekkasjesjekken_unntar_ikke_agents():
     unntak = re.findall(r'"\.jsonl"\) and not f\.startswith\(\(([^)]*)\)\)', kilde)
     assert unntak == ['".claude/", "_bmad/"']
     assert ".agents" not in kilde
+
+
+NEXTJS = [".next/", "out/", ".vercel/", ".turbo/", "*.tsbuildinfo", "next-env.d.ts"]
+NODE_LOGGER = ["npm-debug.log*", "yarn-debug.log*", "yarn-error.log*", ".pnpm-debug.log*"]
+ENGELSKE_OVERSKRIFTER = [
+    "# Next.js / Node",
+    "# Python environments, bytecode, packaging and caches",
+    "# Tests / coverage",
+    "# Secrets and local environment; keep example files",
+    "# BMAD: keep shared framework, skills, plans and documentation",
+    "# Operating system / editors",
+]
+
+
+def test_gitignore_uten_nextjs_men_med_node_og_byggemappene():
+    """Story 9.8, punkt e (VG7 i gjennomgangen). Ville feilet hvis et
+    moenster for Next.js eller loggene for npm, yarn og pnpm kom tilbake, hvis
+    node_modules/, dist/, build/ eller *.log ble tatt bort, eller hvis en av
+    de engelske overskriftene fra malen kom tilbake."""
+    linjer = [linje.strip() for linje in _gitignore().splitlines()]
+    for moenster in NEXTJS + NODE_LOGGER + ENGELSKE_OVERSKRIFTER:
+        assert moenster not in linjer, moenster
+    for moenster in ("node_modules/", "dist/", "build/", "*.log"):
+        assert moenster in linjer, moenster
+    for sti in ("node_modules/x/y.js", "dist/ose.whl", "build/lib/x.py", "npm-debug.log", "yarn-error.log"):
+        assert ignorert(_gitignore(), sti), sti

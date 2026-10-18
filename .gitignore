@@ -1,4 +1,5 @@
-# Node og byggemapper fra malen
+# Node fra malen, og byggemappene. dist/ og build/ er ogsaa der Python-pakkingen
+# legger filene
 node_modules/
 dist/
 build/
@@ -28,8 +29,9 @@ coverage.xml
 test-results/
 playwright-report/
 
-# Noekler og lokalt miljoe. Eksempelfilene spores, og *.log dekker loggene
-# for npm, yarn og pnpm
+# Noekler og lokalt miljoe. Eksempelfilene spores. *.log dekker npm-debug.log og
+# yarn-error.log, men ikke rullerte logger som npm-debug.log.1. Node brukes ikke
+# i repoet
 .env
 .env.*
 !.env.example
