@@ -297,7 +297,7 @@ Under arbeid, og ingenting er endelig.
 - Nye forsøk med kallene som er igjen etter hentingen
 - Docker, og demoen, som viser alle 10 fargekombinasjonene av de tre sjekkene på siste dag, og KI-teksten på aksjesiden, laget én gang med Gemma
 - Denne README-en, med bilder i «Kom i gang» og demoen først, og hjelp bak «?» på sidene
-- Tydeligere merking i tabellene, datoene og månedsmerkene i grafen, oversikten fra designforslaget, utseendet fra designforslaget, og sortering ved klikk i kolonneraden
+- Tydeligere merking i tabellene, datoene og månedsmerkene i grafen, periodene i kursgrafen med «Velg dag», oversikten fra designforslaget, utseendet fra designforslaget, og sortering ved klikk i kolonneraden
 - Hovedindeksen, som vises over tabellen på forsiden, med søylene under, og som en stiplet linje i kursgrafen på aksjesiden
 - Den første delen av KI-laget: plassen for KI-teksten under regelforklaringen på aksjesiden, med en bryter som slår den av og på, loggen der tekstene lagres, kontrollen av teksten mot regelen, og at hentingen lager teksten med en lokal modell. Teksten lages når KI er slått på og den lokale modellen kjører under hentingen, og aksjesiden viser bare tekster som besto kontrollen
 - Ruff, som finner feil og rot i koden og formaterer den, i CI og i testene, den oppdaterte kvalitetssikringen, og et ryddigere repo uten kopien av BMAD-skillene
@@ -309,7 +309,7 @@ Under arbeid, og ingenting er endelig.
 - Lenkene til selskapets side på NewsWeb og selskapets egen nettside
 - Egen nøkkel til Gemini, Anthropic og OpenAI
 - Innstillingene, med «Vis KI-tekst»
-- Periodene i kursgrafen, og på forsiden periodevalget, børsometeret og KI-teksten om dagen
+- På forsiden periodevalget, børsometeret og KI-teksten om dagen
 - Til slutt å velge og bytte aksjer
 
 «Ferdig» betyr flettet til main. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).

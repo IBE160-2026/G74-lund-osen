@@ -46,6 +46,8 @@ INDEX_MAL = "src/templates/index.html"
 HOVEDINDEKS = "src/hovedindeks.py"
 GRAF = "src/graf.py"
 AKSJE_MAL = "src/templates/aksje.html"
+PERIODER = "src/perioder.py"
+PERIODE_MAL = "src/templates/_perioder.html"
 
 # FR-701: tre sjekker, ingen fjerde.
 ANTALL_SJEKKER = 3
@@ -351,6 +353,15 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             f"snittet av de siste {ma} børsdagene, som trendsjekken måler mot. "
             f"Navnet står ved enden av kurslinja og snittet. Sjekk 2 og 3 står i kortene over.",
             ((AKSJE_MAL, "Sjekk 2 og 3 tegnes ikke"), (AKSJEDETALJ, "glidende_snitt(kurser, p.ma_vindu)")),
+        ),
+        # Story 8.16: periodene i kursgrafen og regelen for startdagen.
+        "perioden": Hjelpetekst(
+            "Periodene:",
+            "knappene over grafen velger hvor langt tilbake den går. Perioden starter på første "
+            "børsdag fra samme dato bakover etter kalenderen, og I år på årets første børsdag. "
+            "Den første knappen og «Velg dag» viser 6 måneder fram til dagen, med dagen merket "
+            "og signalet som er lagret for den.",
+            ((PERIODER, "def startdag("), (PERIODE_MAL, 'class="periodevalg"'), (AKSJE_MAL, 'class="dagstrek"')),
         ),
         # Story 2.9c: hovedindeksen som stiplet linje i kursgrafen.
         "indekslinja": Hjelpetekst(
