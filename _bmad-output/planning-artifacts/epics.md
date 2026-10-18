@@ -537,6 +537,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-18 kl. 21:46, 21:49 og 21:50 (gruppens svar):* 8.16 bygges i kveld etter PR #70 og 10.2d, og 8.17 flyttes ikke. Grafen får alle åtte knappene i `designregler.md` §2, som PRD-en sier (FR-201). «I går» (siste børsdag) og «Velg dag» viser 6 mnd fram til dagen, med dagen merket, endringen den dagen og signalet som er lagret for den.
 
+*Avgjort 2026-10-18 kl. 22:06 (gruppens svar):* Selskap kan sorteres A til Å, og kolonnen tabellen er sortert på, får et lysere felt og en oransje strek under, som på designtavla, i en liten PR etter 8.16 i kveld (spesifikasjonen 8.15b). Grunnen: tavla har sorteringsmerket på Selskap, og i appen skiller bare fargen på vinkelen den sorterte kolonnen fra de andre.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -3420,6 +3422,8 @@ jeg finner det jeg leter etter.
 - **Ville feilet hvis:** en rad fra «Øvrige aksjer» havnet under «Skilte seg ut» etter et klikk
 
 *Lagt til 2026-10-15:* flettet i `a13d273`, PR #43.
+
+*Avgjort 2026-10-18 kl. 22:06 (gruppens svar):* Selskap kan sorteres A til Å, og kolonnen tabellen er sortert på, får et lysere felt og en oransje strek under, som på designtavla, i en liten PR etter 8.16 i kveld (spesifikasjonen 8.15b). Grunnen: tavla har sorteringsmerket på Selskap, og i appen skiller bare fargen på vinkelen den sorterte kolonnen fra de andre.
 
 ### Story 8.16: Regelen for startdagen, og periodene i kursgrafen
 
