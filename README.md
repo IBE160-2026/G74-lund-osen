@@ -11,7 +11,7 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 Til faglærer:
 - Se appen med oppdiktede tall, uten konto og nøkkel, etter [steg 1–4](#felles-for-begge): [demoen](#demoen)
 - Ekte kurser, med en gratis nøkkel fra EODHD: [den ekte versjonen](#den-ekte-versjonen-anbefalt)
-- De automatiske testene, med to kommandoer: [Tester](#tester)
+- De automatiske testene, med to kommandoer etter at uv er installert: [Tester](#tester)
 - [Product Brief](_bmad-output/planning-artifacts/product-brief.md), arbeidskravet: versjon 8, laget etter [tilbakemeldingen 06.10](_bmad-output/planning-artifacts/tilbakemelding-product-brief.md) og låst i taggen `arbeidskrav-product-brief-v8`
 - Plan og krav: [PRD](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md), [arkitektur](_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md) og [epics og stories](_bmad-output/planning-artifacts/epics.md)
 - [Leveranselista](docs/innlevering.md): kravene i emnet, og hvor hvert av dem står
@@ -135,7 +135,7 @@ Du må pakke ut. Står det «Komprimert størrelse» (Compressed size) som kolon
 <details>
 <summary>«is not recognized as the name of a cmdlet» etter cd.</summary>
 
-Det mangler mellomrom etter `cd`. Står `cd` klistret til stien i meldingen, for eksempel `'cdC:\...'`, skriver du `cd`, et mellomrom, og drar mappa inn i vinduet på nytt (steg 4). Står det `'docker'` i meldingen, er Docker Desktop ikke installert, eller vinduet ble åpnet før installasjonen: lukk det og åpne et nytt (steg 3).
+Det mangler mellomrom etter `cd`. Står `cd` klistret til stien i meldingen, for eksempel `'cdC:\...'`, skriver du `cd`, et mellomrom, og drar mappa inn i vinduet på nytt (steg 4). Står det `'docker'` i meldingen, er Docker Desktop ikke installert, eller vinduet ble åpnet før installasjonen: lukk det og åpne et nytt (steg 3). Står det `'uv'` i meldingen, er uv ikke installert, eller vinduet ble åpnet før installasjonen: se «Tester» i README-en.
 
 </details>
 
@@ -241,10 +241,10 @@ Basen, demobasen og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo`
 | Variabel | Hva den gjør | Standard | Når den trengs |
 |---|---|---|---|
 | `EODHD_API_KEY` | Nøkkelen til EODHD, som hentingen bruker til sluttkursene | Ingen | Til hentingen i den ekte versjonen. Webserveren og demoen trenger den ikke |
-| `OSE_KI_TJENESTE` | Om hentingen lager KI-tekst: `av` eller `lokal` (Gemma i Ollama) | `lokal` når variabelen ikke står i `.env`, og `av` i `.env.example` | Når du vil slå KI-teksten på eller av |
+| `OSE_KI_TJENESTE` | Om hentingen lager KI-tekst: `av` eller `lokal` (Gemma i Ollama) | `av` etter steg 6, fordi `.env.example` har `OSE_KI_TJENESTE=av`. Står variabelen ikke i `.env`, gjelder `lokal`, og en tom verdi gir ingen KI-tekst | Når du vil slå KI-teksten på |
 | `OSE_KI_OLLAMA_URL` | Adressen til Ollama | `http://127.0.0.1:11434`, og `http://ollama:11434` i Docker | Bare med uv, når Ollama ikke svarer på standardadressen |
 
-`OSE_DEMO` og `OSE_I_DOCKER` settes av `compose.yaml` og `Dockerfile`, og skal ikke i `.env`.
+`OSE_DEMO` og `OSE_I_DOCKER` settes av `compose.yaml` og `Dockerfile`, og skal ikke i `.env`. Med uv slås demoen på med `--demo`.
 
 </details>
 
@@ -340,7 +340,7 @@ uv sync
 uv run pytest
 ```
 
-Første `uv sync` laster ned Python og pakkene, og kan ta noen minutter. Hele testsettet tok mellom 4 og 7 minutter på maskinen vår 18.10.
+Første `uv sync` laster ned Python og pakkene. Hele testsettet tok mellom 4 og 6 minutter på maskinen vår 18.10.
 
 Alle testene skal bestå. Noen hoppes over, og knappen under sier hvorfor.
 
