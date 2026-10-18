@@ -515,8 +515,9 @@ def _med_feil_retning(tekst: str, retning: str) -> str:
     """Bytter den foerste retningen teksten sier, med stor forbokstav som Gemma
     skriver den («Negativt», «Blandet», «av typen Ingen»), til en feil retning,
     og beholder boeyningen."""
-    treff = re.search(rf"{retning}(t?)", tekst)
-    assert treff, (retning, tekst[:80])
+    treff = re.search(rf"\b{retning}(t?)\b", tekst)
+    if not treff:
+        raise ValueError(f"teksten sier ikke retningen {retning}: {tekst[:80]}")
     return tekst[: treff.start()] + FEIL_RETNING[retning] + treff.group(1) + tekst[treff.end() :]
 
 
@@ -526,6 +527,7 @@ class TestFormeneGemmaSkriver:
 
     @pytest.mark.xfail(
         strict=True,
+        raises=AssertionError,
         reason="10.2d punkt a: kontrollen leser ikke «Dette signalet er X» eller «av typen X», "
         "så 12 av de 13 slipper gjennom på main. Tas bort med kontrollen i punkt b.",
     )
@@ -539,4 +541,4 @@ class TestFormeneGemmaSkriver:
             for symbol, tekst, grunnlag in tekstene
             if kontroller(_med_feil_retning(tekst, grunnlag["retning"]), grunnlag).besto
         ]
-        assert slapp == []
+        assert slapp == [], f"{len(slapp)} av 13 slapp gjennom: {slapp}"
