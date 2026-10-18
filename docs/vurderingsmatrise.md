@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-10-18T15:42
+updated: 2026-10-18T18:01
 ---
 
 # Vurderingsmatrise for del 1
@@ -79,3 +79,5 @@ Statusen i tabellen er ikke endret. README-prøven (story 3.4) og avsnittet «St
 *Lagt til 2026-10-18 kl. 12:10:* raden «Ryddighet i repoet»: kopien `.agents/skills/` av BMAD-skillene, 242 filer, er tatt bort, manifestet har bare `claude-code`, «Mappestruktur» i README-en nevner bare `_bmad/` og `.claude/skills/`, `.gitignore` er uten delen for Next.js, og `.env.example` sier tre variabler og 16 av de 20 kallene. Flettet i `b5395e9`, PR #65 (story 9.8). [`test_ryddighet.py`](../tests/test_ryddighet.py) har åtte nye tester, blant dem `test_det_finnes_ingen_agents_i_rotmappa`, `test_ingen_fil_under_agents_er_sporet` og `test_manifestet_har_bare_claude_code`. Statusen i tabellen er ikke endret.
 
 *Lagt til 2026-10-18 kl. 15:42:* raden «README og kjørbarhet»: README-en har nå tre skjermbilder i «Kom i gang», fra gruppens gjennomgang 16.10 (ECH16 i triagen for 3.3c). Det endrer linja fra 16.10 kl. 22:57 om at README-en ikke har bilder utenom CI-merket. Demoen står før den ekte versjonen, og svarene om ZIP-fila, mellomrommet etter `cd`, «Cannot find path» og kopieringen står i stegene, under «Står du fast?» og i [`docs/hjelp.md`](hjelp.md). Flettet i `fdaf403`, PR #66 (story 3.3c). Testene: `tests/test_docker.py::TestReadme::test_bildene_er_de_tre_fra_gjennomgangen_og_ci_merket` og `tests/test_docker.py::TestReadme::test_demoen_foerst_og_zip_foer_kommandoene`. Statusen i tabellen er ikke endret.
+
+*Lagt til 2026-10-18 kl. 18:01:* raden «README og kjørbarhet»: README-en er ryddet (story 3.3d, flettet i `1be3a57`, PR #67). «Til faglærer» begynner med lenker til demoen, den ekte versjonen og «Tester», og «Innhold» under beskrivelsen lenker til hovedoverskriftene. «Status» er to lister, «Ferdig» og «Neste». «Står du fast?» har fem spørsmål, og det første er ett spørsmål om at Docker ikke kjører («Engine running» og «Cannot connect to the Docker daemon», gruppens svar kl. 17:40). Resten står i [`docs/hjelp.md`](hjelp.md). Rettet: linja kl. 15:42 over sier at svaret om kopieringen står under «Står du fast?». Det står nå i avsnittet «Slik limer du inn en kommando.» i «Kom i gang» og i `docs/hjelp.md`, under «Ingenting skjer når jeg limer inn.», men ikke lenger under «Står du fast?». Testene: `tests/test_docker.py::TestReadmeForNybegynnere::test_innhold_lenker_til_hovedoverskriftene` og `tests/test_docker.py::TestReadmeForNybegynnere::test_staar_du_fast_har_hoeyst_5_spoersmaal`. Statusen i tabellen er ikke endret.
