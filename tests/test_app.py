@@ -2436,10 +2436,13 @@ class TestStory80dAksjesiden:
         stil = _stil(html)
         # Story 2.9c: stiplet bare for hovedindeksen (designregler §5), så
         # regelen for den tas ut før sjekken.
-        indeks = _regel(stil, ".indekslinje")
-        assert "stroke-dasharray" in indeks
-        utenom = stil.replace(indeks, "")
-        assert "dasharray" not in utenom and "dashed" not in utenom
+        stiplet = [
+            v.strip()
+            for v, innhold in re.findall(r"([^{}]+)\{([^}]*)\}", re.sub(r"/\*.*?\*/", "", stil, flags=re.DOTALL))
+            if "dasharray" in innhold or "dashed" in innhold
+        ]
+        assert stiplet == [".indekslinje"], stiplet
+        assert "stroke-dasharray" not in html.split("</style>", 1)[1]
         assert "stroke-width: 1.75" in _regel(stil, ".ma50linje")
         assert "stroke-width: 2.5" in _regel(stil, ".kurslinje")
         assert "tegnforklaring" not in html
@@ -3005,7 +3008,9 @@ class TestIndekslinjaPaaAksjesiden:
 
     def test_ved_390_px_skaleres_grafen_med_linja(self, klient):
         """Grafen er en SVG med viewBox og bredde 100 %, så den stiplede linja
-        skaleres med kurslinja, og siden ruller ikke sideveis."""
+        skaleres med kurslinja. Testen leser bare stilen og SVG-en. At siden
+        ikke ruller sideveis ved 390 px, er ikke målt i en nettleser
+        (gjennomgangen, VG5)."""
         self._aksjen()
         self._indeksen()
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
@@ -3071,3 +3076,54 @@ class TestIndekslinjaPaaAksjesiden:
         assert ". Hovedindeksen kunne ikke leses" in re.search(
             r'<svg class="graf"[^>]*aria-label="([^"]*)"', html
         ).group(1)
+
+    def test_indeksen_leses_paa_justert_slutt(self, klient):
+        """Gjennomgangen (VG2): slutt og justert_slutt er ulike i indeksen.
+        Med justert_slutt, som stiger der slutt faller, går linja opp. Ville
+        feilet hvis indeksen ble lest på slutt."""
+        self._aksjen()
+        dager = _boersdager_til(FREDAG_09_10, 61)
+        rader = [
+            Kursrad(dato=d, slutt=2000.0 - 10 * i, justert_slutt=1000.0 + 10 * i, volum=0) for i, d in enumerate(dager)
+        ]
+        _legg_inn_indeks(rader)
+        indeks = _punktene(klient.get("/aksje/EQNR").data.decode("utf-8"), "indekslinje")
+        assert indeks[-1][1] < indeks[0][1]
+
+    def test_samme_indeks_som_forsiden(self, klient):
+        """Gjennomgangen (VG3): OSEBX og en annen indeks som er hentet senere.
+        Kursgrafen viser OSEBX, som forsiden. Ville feilet hvis grafen tok den
+        som sist ble hentet."""
+        from indeksdata import HOVEDINDEKS, Indeks
+        from lagring_sqlite import SqliteIndekslager
+
+        self._aksjen()
+        self._indeksen()
+        dager = _boersdager_til(FREDAG_09_10, 61)
+        tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+        try:
+            SqliteIndekslager(tilkobling, (HOVEDINDEKS, Indeks("OBX", "OBX.OL", "OBX"))).erstatt_serie(
+                "OBX", _indeks([(d, 1200.0) for d in dager]), datetime.fromisoformat(HENTET) + timedelta(hours=1)
+            )
+        finally:
+            tilkobling.close()
+        tekst = _synlig(klient.get("/aksje/EQNR").data.decode("utf-8"))
+        assert "hovedindeksen OSEBX" in tekst and "hovedindeksen OBX" not in tekst
+
+
+class TestStipletBareForIndeksenPaaForsiden:
+    """Gjennomgangen av 2.9c (VG4): på forsiden er bare indekslinja under
+    søylene stiplet."""
+
+    def test_bare_indekslinja_er_stiplet(self, klient):
+        """Ville feilet hvis en annen regel på forsiden var stiplet."""
+        skriv_serie("EQNR", _aksjeserie(FREDAG_09_10, 2.0), datetime.fromisoformat(HENTET))
+        _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, 1005.0)]))
+        html = klient.get("/").data.decode("utf-8")
+        stil = _stil(html)
+        stiplet = [
+            v.strip()
+            for v, innhold in re.findall(r"([^{}]+)\{([^}]*)\}", re.sub(r"/\*.*?\*/", "", stil, flags=re.DOTALL))
+            if "dasharray" in innhold or "dashed" in innhold
+        ]
+        assert stiplet == [".soeyler .indekslinje"], stiplet
