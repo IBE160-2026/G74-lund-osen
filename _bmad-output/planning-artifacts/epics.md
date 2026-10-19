@@ -2073,6 +2073,8 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 
 *Avgjort 2026-10-19 kl. 16:46 (gruppens svar):* ja til flettingen av PR #77, etter at README-en før og etter er sett.
 
+*Lagt til 2026-10-19 kl. 16:55:* README-en anbefaler demoen for faglærer og sensor, den lokale modellen er merket valgfri, og «Status» har «Neste i v1» og «Ekstra, hvis tiden rekker», flettet i `855ba75`, PR #77 (spesifikasjonen `spec-3-3g-readme-demoen-anbefales.md`).
+
 ### Story 3.4: Demoversjonen
 
 *Lagt til 2026-10-03, Marians beslutning kl. 18:10.*

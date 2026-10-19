@@ -2,7 +2,7 @@
 title: 'Story 3.3 (3.3g): README-en anbefaler demoen, og regelen for omfanget'
 type: 'feature'
 created: '2026-10-19'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '9c3d8a1'
@@ -103,3 +103,5 @@ Gjennomgang 19.10 på diffen `9c3d8a1..364b781`. Linsene var Blind Hunter (BH, 1
 - Ingen kode i `src/` endres. Ingen API-kall, `src/fetch_prices.py` kjøres ikke, og `data/db/ose.db`, `data/db/demo.db` og den ekte `.env` røres ikke.
 - Ingen linje fjernes fra andre dokumenter enn README-en, utenom status og updated.
 - PR-en stopper før flettingen og venter på ja.
+
+*Lagt til 2026-10-19 kl. 16:55:* PR #77 er squash-flettet i `855ba75` etter gruppens ja kl. 16:46, låst til head-en `9e5b193`, der main var flettet inn (regel 7). Hele settet på `9e5b193`: 2697 bestått og 17 hoppet over. CI var grønn på head-en (39272900061), med pytest og docker. Grenen er slettet på GitHub.
