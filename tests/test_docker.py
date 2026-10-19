@@ -460,7 +460,9 @@ class TestOllama:
         """Instruksjonen kl. 23:58: README-en sier det samme som utskriften
         fra hentingen, 0 kall bare naar basen har dagens kurs for alle."""
         tekst = README.read_text(encoding="utf-8")
-        modell = tekst.split("<summary>Den lokale modellen (KI-teksten)</summary>", 1)[1].split("</details>", 1)[0]
+        modell = tekst.split("<summary>Den lokale modellen for KI-teksten (valgfri)</summary>", 1)[1].split(
+            "</details>", 1
+        )[0]
         assert "uten nye kall til EODHD" not in modell
         assert "Har basen dagens kurs for alle aksjene, gir det 0 kall til EODHD." in modell
         assert (
@@ -1784,7 +1786,7 @@ class TestReadmeForNybegynnere:
             "Bytte mellom demoen og den ekte versjonen",
             "Uten Docker, med uv",
             "Variablene i .env",
-            "Den lokale modellen (KI-teksten)",
+            "Den lokale modellen for KI-teksten (valgfri)",
         }
 
     def test_uv_delen_er_to_nummererte_lister(self):
