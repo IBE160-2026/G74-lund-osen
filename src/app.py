@@ -436,6 +436,29 @@ def _indeksen_for_grafen() -> tuple[str | None, dict | None, bool]:
 
 @app.route("/")
 def markedsoversikt():
+    return _tabellsiden(OVERSIKT)
+
+
+@app.route("/min-liste")
+def min_liste():
+    """Story 8.3, FR-101, FR-102: samme tabell som oversikten, i samme
+    rekkefoelge, med bare de merkede, eller alle med ?vis=alle."""
+    return _tabellsiden(MIN_LISTE_SIDE)
+
+
+# Story 8.3: siden man staar paa, som knapperaden i stripa fyller.
+OVERSIKT = "oversikt"
+MIN_LISTE_SIDE = "min_liste"
+
+
+def _tabellsiden(aktiv: str):
+    """Oversikten eller Min liste. Min liste filtrerer radene etter at hver
+    del er sortert, og sorterer dem aldri paa nytt, saa rekkefoelgen er den
+    samme som i oversikten, ogsaa sortert (FR-102, story 8.15)."""
+    i_lista = aktiv == MIN_LISTE_SIDE
+    alle = i_lista and request.args.get("vis") == ALLE
+    sti = MIN_LISTE if i_lista else OVERSIKTEN
+    felles = {"aktiv": aktiv, "sidesti": sti, "alle": alle}
     if g.get("basefeil"):
         return _basen_kan_ikke_aapnes()
     if g.get("demo_mangler"):
@@ -447,6 +470,7 @@ def markedsoversikt():
             mangler=[],
             eget=set(),
             demokommando=demokommando(),
+            **felles,
         )
     leser = _leser_eller_basefeil()
     if leser is None:
@@ -461,6 +485,7 @@ def markedsoversikt():
             eget=set(),
             hentekommando=hentekommando(),
             demokommando=demokommando() if demo_paa() else None,
+            **felles,
         )
 
     poster = _leser_eller_basefeil(hent_oversiktsleser).oversikt()
@@ -471,7 +496,15 @@ def markedsoversikt():
     sortering = Sortering.fra_adressen(request.args.get("sorter"), request.args.get("orden"))
     skilte_seg_ut, oevrige = (sorter(del_, sortering) for del_ in del_i_to(rader))
     tre_av_tre = frozenset(rad.aksje.symbol for rad in rader if rad.styrke == ANTALL_SJEKKER)
-    hovedindeks, indeks_feilet = _hovedindeks(leser, poster, tre_av_tre)
+    # Story 8.3: merkingen leses fra sin egen port, bare lesing her.
+    merkede = _leser_eller_basefeil(lambda: SqliteMinlistelager(g.tilkobling)).merkede()
+    i_aksje = {post.aksje.symbol for post in poster}
+    mangler = uten_kurser(poster)
+    if i_lista and not alle:
+        skilte_seg_ut = [rad for rad in skilte_seg_ut if rad.aksje.symbol in merkede]
+        oevrige = [rad for rad in oevrige if rad.aksje.symbol in merkede]
+        mangler = uten_kurser([post for post in poster if post.aksje.symbol in merkede])
+    hovedindeks, indeks_feilet = (None, False) if i_lista else _hovedindeks(leser, poster, tre_av_tre)
 
     return render_template(
         "index.html",
@@ -481,18 +514,22 @@ def markedsoversikt():
         dato=sidens_dato(rader),
         hentet=sidens_tidsstempel(rader),
         eget=eldre_enn_nyeste(rader),
-        mangler=uten_kurser(poster),
+        mangler=mangler,
         # Story 8.0d, PR 2b: M i «N av M aksjer» er alle aksjene i lista,
         # også de uten kurser (beslutningen 14.10).
         antall_aksjer=len(poster),
-        ikke_vurdert=any(rad.ikke_vurdert for rad in rader),
-        ingen_skilte_seg_ut=ingen_skilte_seg_ut(rader),
+        ikke_vurdert=any(rad.ikke_vurdert for rad in (*skilte_seg_ut, *oevrige)),
+        ingen_skilte_seg_ut=ingen_skilte_seg_ut(rader) and not i_lista,
         antall_vurdert=antall_vurdert(rader),
         skilte_seg_ut=skilte_seg_ut,
         oevrige=oevrige,
         sortering=sortering,
         tre_av_tre=[rad.aksje.navn for rad in rader if rad.styrke == ANTALL_SJEKKER],
         hentekommando=hentekommando(),
+        merkede=merkede,
+        antall_merket=len(merkede & i_aksje),
+        tilbake=side_adresse(sti, sortering, alle),
+        **felles,
     )
 
 

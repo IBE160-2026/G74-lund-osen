@@ -287,13 +287,18 @@ class TestRammen:
                 assert f'url("/static/fonts/{fil}")' in stil, (navn, fil)
 
     def test_hver_lenke_gaar_til_en_side_som_finnes(self, sidene):
-        """Ville feilet med en lenke til /min-liste før 8.3."""
+        """Ville feilet med en lenke til /min-liste før 8.3. Story 8.3: Min
+        liste finnes, med «Alle» og sorteringen som parametre."""
         for navn, html in sidene.items():
             for href in re.findall(r'href="([^"]*)"', html):
                 # Story 8.15: sorteringen er en parameter på /.
                 assert (
-                    href == "/"
+                    href in ("/", "/min-liste", "/min-liste?vis=alle")
                     or re.fullmatch(r"/aksje/[A-Z0-9]+", href)
+                    or re.fullmatch(
+                        r"/min-liste\?(vis=alle&amp;)?sorter=(selskap|kurs|endring|signal|retning)&amp;orden=(synkende|stigende)",
+                        href,
+                    )
                     or re.fullmatch(
                         r"/\?sorter=(selskap|kurs|endring|signal|retning)&amp;orden=(synkende|stigende)", href
                     )
@@ -645,7 +650,9 @@ class TestOversikten:
             re.DOTALL,
         )
         assert '<span class="under">NOK</span>' in html
-        assert html.count('class="under"') == 1
+        # Story 8.3: og «★ = Min liste» under Selskap.
+        assert '<span class="under">★ = Min liste</span>' in html
+        assert html.count('class="under"') == 2
 
 
 class TestSorteringen:

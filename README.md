@@ -305,14 +305,13 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 - Nye forsøk med kallene som er igjen etter hentingen
 - Docker, og demoen, som viser alle 10 fargekombinasjonene av de tre sjekkene på siste dag, og KI-teksten på aksjesiden, laget én gang med Gemma
 - Denne README-en, med bilder i «Kom i gang» og demoen først, og hjelp bak «?» på sidene
-- Tydeligere merking i tabellene, datoene og månedsmerkene i grafen, periodene i kursgrafen med «Velg dag», oversikten fra designforslaget, utseendet fra designforslaget, og sortering ved klikk i kolonneraden
+- Tydeligere merking i tabellene, datoene og månedsmerkene i grafen, periodene i kursgrafen med «Velg dag», oversikten fra designforslaget, utseendet fra designforslaget, sortering ved klikk i kolonneraden, og Min liste, med stjernen foran hvert selskap og knappene «Markedsoversikt» og «Min liste» øverst på sidene
 - Hovedindeksen, som vises over tabellen på forsiden, med søylene under, og som en stiplet linje i kursgrafen på aksjesiden
 - Den første delen av KI-laget: plassen for KI-teksten under regelforklaringen på aksjesiden, med en bryter som slår den av og på, loggen der tekstene lagres, kontrollen av teksten mot regelen, og at hentingen lager teksten med en lokal modell. Teksten lages når KI er slått på og den lokale modellen kjører under hentingen, og aksjesiden viser bare tekster som besto kontrollen
 - Ruff, som finner feil og rot i koden og formaterer den, i CI og i testene, den oppdaterte kvalitetssikringen, og et ryddigere repo uten kopien av BMAD-skillene
 
 **Neste i v1**
 
-- Min liste
 - Historikken i aksjedetaljen
 - Lenken til selskapets investorside
 - Egen nøkkel til Gemini, Anthropic og OpenAI

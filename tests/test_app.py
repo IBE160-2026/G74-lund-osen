@@ -176,6 +176,9 @@ def test_viser_selskapsnavn_og_de_fem_kolonnene(klient, monkeypatch):
         # Signalstyrke har «?» etter ordet fra story 8.0b, i samme celle.
         # Story 8.0d, PR 2: «NOK» bare under Sluttkurs (svar 2, BH9).
         nok = '(<span class="under">NOK</span>)' if overskrift == "Sluttkurs" else ""
+        # Story 8.3: «★ = Min liste» under Selskap.
+        if overskrift == "Selskap":
+            nok = '(<span class="under">★ = Min liste</span>)'
         # Story 8.15: navnet er en lenke som sorterer, med en vinkel.
         # Gjennomgangen (BH5): lenken er påkrevd ved de som kan sorteres.
         # Story 8.15b: Selskap ogsaa, saa alle fem.
@@ -865,9 +868,12 @@ class _Tabell(HTMLParser):
 
     Story 8.0d, PR 2: linja under navnet (ticker og bransje), antallet og
     grensen i baandene og «NOK» under kolonnenavnet staar i ekstra, med
-    klassen som noekkel, og ikke i cellen. Cellen er det den var foer."""
+    klassen som noekkel, og ikke i cellen. Cellen er det den var foer.
 
-    EKSTRA = ("linje", "antall", "bak", "under")
+    Story 8.3: stjernen foran navnet (skjemaet med klassen stjerne) staar
+    ogsaa i ekstra, saa cellen fortsatt er navnet."""
+
+    EKSTRA = ("linje", "antall", "bak", "under", "stjerne")
 
     def __init__(self):
         super().__init__()
@@ -882,6 +888,9 @@ class _Tabell(HTMLParser):
         self._ekstra: tuple[str, int, list[str]] | None = None
 
     def handle_starttag(self, tag, attrs):
+        # Story 8.3: <input> har ingen sluttag, saa den teller ikke i dybden.
+        if self._ekstra and tag == "input":
+            return
         if self._ekstra:
             navn, dybde, tekst = self._ekstra
             self._ekstra = (navn, dybde + 1, tekst)

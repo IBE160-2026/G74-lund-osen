@@ -97,6 +97,14 @@ header.stripe .oppdatert svg { width: 16px; height: 16px; fill: none; stroke: va
 header.stripe .eksempeltall { margin: 0; padding: 0.5rem 0; font-size: 13.5px; font-weight: 600;
                               color: var(--stripe-tekst); }
 header.stripe .demo { border-top: 1px solid var(--stripe-strek); }
+/* Story 8.3: knapperaden med Markedsoversikt og Min liste. Knappen for
+   siden man står på, er fylt (aria-current), og klikkflaten er 44 px høy.
+   To knapper får plass på 390 px, og raden brytes heller enn å rulle. */
+header.stripe .sider { flex-wrap: wrap; gap: 8px; padding-bottom: 12px; }
+header.stripe a.sideknapp { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; box-sizing: border-box;
+                            border: 1px solid var(--stripe-kant); border-radius: 999px; color: var(--stripe-tekst);
+                            font-size: 15px; font-weight: 600; text-decoration: none; }
+header.stripe a.sideknapp[aria-current="page"] { background: var(--hvit); border-color: var(--hvit); color: var(--blekk); }
 
 footer.bunnlinje { max-width: 65rem; margin: 2rem auto 0; padding: 0 16px 2rem; box-sizing: border-box; }
 footer.bunnlinje p { border-top: 1px solid var(--strek); padding-top: 1rem; margin: 0;
@@ -339,6 +347,27 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
                                   outline: 3px solid transparent; outline-offset: -3px; }
 :where(.side-oversikt) .skjult { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);
           clip-path: inset(50%); white-space: nowrap; }
+/* Story 8.3: stjernen foran navnet. Omrisset i dempet grått, fylt i gult
+   når aksjen er merket, minst 3:1 mot kortet (testen for kontrasten).
+   Klikkflaten er 40 px, og fokus er ringen i blekk. */
+:where(.side-oversikt) td.selskap form.stjerne { display: inline; margin: 0; }
+:where(.side-oversikt) button.stjerneknapp { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px;
+                                margin: -8px 0 -8px -10px; padding: 0; border: 0; border-radius: 8px; background: none;
+                                cursor: pointer; vertical-align: middle; }
+:where(.side-oversikt) button.stjerneknapp svg { width: 22px; height: 22px; fill: none; stroke: var(--dempet); stroke-width: 1.8;
+                                    stroke-linejoin: round; }
+:where(.side-oversikt) button.stjerneknapp.merket svg { fill: var(--gul-symbol); stroke: var(--gul-symbol); }
+:where(.side-oversikt) button.stjerneknapp:focus-visible { outline: 3px solid var(--blekk); outline-offset: 0; }
+/* Story 8.3: knappen «Alle / Min liste» i Min liste, med antallet. Valget
+   som gjelder, er fylt i blekk (aria-current). */
+:where(.side-oversikt) nav.visvalg { display: inline-flex; margin: 0 0 1rem; border: 1px solid var(--strek-2); border-radius: 999px;
+                        background: var(--kort); overflow: hidden; }
+:where(.side-oversikt) a.visknapp { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px;
+                       box-sizing: border-box; color: var(--blekk); font-size: 15px; font-weight: 600; text-decoration: none; }
+:where(.side-oversikt) a.visknapp[aria-current="page"] { background: var(--fyll); color: var(--hvit); }
+:where(.side-oversikt) a.visknapp:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+:where(.side-oversikt) p.tom-liste { margin: 0 0 1rem; padding: 1rem 1.25rem; border: 1px solid var(--strek); border-radius: 12px;
+                        background: var(--kort); color: var(--tekst); }
 /* Svar 5: linja over tabellen når en kolonne er valgt. */
 :where(.side-oversikt) p.sortert { margin: 0 0 0.6rem; font-size: 14px; color: var(--tekst); }
 :where(.side-oversikt) p.sortert a { color: var(--blekk); text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }

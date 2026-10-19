@@ -3,6 +3,11 @@
     har ingen knapp, lenke eller ikon til en side som ikke finnes
     (knapperaden er 8.3).
 
+    Story 8.3: knapperaden med Markedsoversikt og Min liste står i stripa på
+    alle sidene. Knappen for siden man står på, er fylt og har
+    aria-current. aktiv kommer fra ruta, og aksjesiden og feilsiden har
+    ingen, så ingen knapp er fylt der.
+
     Story 2.7a: all stilen står i src/static/stil.css, med fargene som navn
     der og ingen andre steder. Adressen har et avtrykk av fila (stilark fra
     app.py), så nettleseren aldri bruker en gammel utgave.
@@ -31,6 +36,10 @@
         OSE Signal
       </p>
     </div>
+    <nav class="rad sider" aria-label="Sidene">
+      <a class="sideknapp" href="/"{% if aktiv == "oversikt" %} aria-current="page"{% endif %}>Markedsoversikt</a>
+      <a class="sideknapp" href="/min-liste"{% if aktiv == "min_liste" %} aria-current="page"{% endif %}>Min liste</a>
+    </nav>
     {% if hentet %}
     <div class="rad oppdatert">
       <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 1.5"/></svg>

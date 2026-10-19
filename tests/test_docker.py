@@ -878,8 +878,9 @@ SKRIFTFILER = {".woff", ".woff2", ".ttf", ".otf", ".css"}
 # Svaret 18.10 kl. 21:42: bildet er saa hoeyt at det slutter etter den siste
 # raden under «Skilte seg ut», foer «Øvrige aksjer», saa signalstyrken og
 # fargene per aksje er med.
-HOEYDE_PAA_BILDET = 1573
-AVTRYKK_BAK_BILDET = "1f437edb74ee81b9d26f5dc614183a383ea81eaa0379f46cff5b882d125e596b"
+# Story 8.3: 1630, fordi knapperaden i stripa skyver tabellen ned. Var 1573.
+HOEYDE_PAA_BILDET = 1630
+AVTRYKK_BAK_BILDET = "249ed7d410738d8028abb9bed6e65761ccefa455584665c3aea7bb993354294f"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -931,8 +932,9 @@ FILENE_BAK_AKSJESIDEN = (
 # lagring_sqlite henter DATA_KATALOG fra lagring_fil, som importerer eodhd.
 IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py"}
 # Bildet er saa hoeyt at grafen, som staar under KI-teksten, er med til bunnen.
-HOEYDE_PAA_AKSJESIDEN = 1816
-AVTRYKK_BAK_AKSJESIDEN = "35c3a471bb891d15e8d4941b4936b3d2a681ae033cd2c7192ddb7c2abdd9a250"
+# Story 8.3: 1872 med knapperaden i stripa. Var 1816.
+HOEYDE_PAA_AKSJESIDEN = 1872
+AVTRYKK_BAK_AKSJESIDEN = "9213731c1cee2d8ec8396e9a7d2310bdfa2857d7748b4ef064cede8f4275d0fa"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "
@@ -982,11 +984,13 @@ class TestSkjermbildet:
     def test_fila_finnes_og_er_1280_px_bred_og_1573_px_hoey(self):
         """Svaret 18.10 kl. 21:42: 1280 x 1573, til bunnen av «Skilte seg ut».
         Ville feilet med bildet fra 3.3b (1280 x 1000), eller et bilde i en
-        annen hoeyde enn HOEYDE_PAA_BILDET."""
+        annen hoeyde enn HOEYDE_PAA_BILDET. Story 8.3: hoeyden er 1630 med
+        knapperaden, og navnet paa testen staar, fordi kvalitetssikringen
+        viser til det."""
         data = (ROT / SKJERMBILDET).read_bytes()
         assert data[:8] == b"\x89PNG\r\n\x1a\n"
         assert int.from_bytes(data[16:20], "big") == 1280
-        assert int.from_bytes(data[20:24], "big") == HOEYDE_PAA_BILDET == 1573
+        assert int.from_bytes(data[20:24], "big") == HOEYDE_PAA_BILDET == 1630
 
     def test_bildet_har_ingen_tekstfelt(self):
         """Regel 16 (gjennomgangen av 3.3e, BH8 og ECH10): ingen sti eller
@@ -2052,6 +2056,8 @@ class TestReadmeForNybegynnere:
             "ki-teksten på aksjesiden, laget én gang med gemma",
             # Story 8.16: periodene i kursgrafen er flettet.
             "periodene i kursgrafen med «velg dag»",
+            # Story 8.3: Min liste er flettet.
+            "min liste, med stjernen foran hvert selskap",
         ):
             assert sak in ferdig, sak
         assert "resten av KI-laget" not in status and "Selve teksten lages ikke ennå" not in status
@@ -2061,8 +2067,8 @@ class TestReadmeForNybegynnere:
         # Story 3.4b: KI-tekstene i demoen er flyttet til «Ferdig».
         # Story 3.3g: historikken og signaldagene er delt, NewsWeb er tatt ut
         # av lenkene, og fra signaldagene staar resten under «Ekstra».
+        # Story 8.3: Min liste er flyttet til «Ferdig».
         saker = (
-            "min liste",
             "historikken i aksjedetaljen",
             "lenken til selskapets investorside",
             "egen nøkkel",
@@ -2366,12 +2372,14 @@ class TestReadmeDemoenAnbefales:
         """Svaret kl. 14:48: det briefen ikke lover, står under «Ekstra,
         hvis tiden rekker». Svaret kl. 16:12: egen nøkkel er v1. Ville feilet
         hvis et ekstra punkt ble flyttet til «Neste i v1», eller NewsWeb kom
-        tilbake i punktet om lenkene."""
+        tilbake i punktet om lenkene. Story 8.3: Min liste er flyttet til
+        «Ferdig», og «Neste i v1» har de tre som er igjen."""
         tekst = README.read_text(encoding="utf-8")
         status = tekst.split("\n## Status\n", 1)[1].split("\n## ", 1)[0]
         lister = _statuslister(status)
         v1 = [p.lower() for p in lister["Neste i v1"]]
         ekstra = [p.lower() for p in lister["Ekstra, hvis tiden rekker"]]
+        assert sum("min liste" in p.lower() for p in lister["Ferdig"]) == 1, lister["Ferdig"]
         for saker in EKSTRA:
             for sak in saker:
                 assert not any(sak in p for p in v1), (sak, v1)
@@ -2381,8 +2389,9 @@ class TestReadmeDemoenAnbefales:
                 assert sak in punkt, (sak, punkt)
         # Gjennomgangen (BH2, VG1): lenken går til selskapets investorside,
         # som i briefen v8 og story 10.5 etter 06.10.
-        for sak in ("min liste", "historikken", "selskapets investorside", "egen nøkkel til gemini"):
+        for sak in ("historikken", "selskapets investorside", "egen nøkkel til gemini"):
             assert sum(sak in p for p in v1) == 1, (sak, v1)
-        assert len(v1) == 4, v1
+        assert not any("min liste" in p for p in v1), v1
+        assert len(v1) == 3, v1
         assert "newsweb" not in "\n".join(v1 + ekstra)
         assert REGELEN_FOR_EKSTRA in status

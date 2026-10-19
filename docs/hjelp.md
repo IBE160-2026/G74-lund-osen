@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-19T16:20
+updated: 2026-10-19T22:45
 ---
 
 # Hjelp til «Kom i gang»
@@ -124,6 +124,8 @@ Under den kan det komme en linje med valg fra Docker. La terminalvinduet stå å
 ### Hva er demoen?
 
 Sidene sier «Eksempeltall»: 15 oppdiktede selskaper med kurser til fredag 9. oktober 2026, ikke data fra Oslo Børs. Under merket står en tabell med aksjer, og du klikker på et selskapsnavn for å se aksjen. Demoen trenger verken `.env` eller nøkkel, og gjør ingen kall. Aksjesiden viser KI-teksten for siste dag, laget én gang med Gemma og lagret i repoet, så demoen trenger ikke Ollama. Demobasen lages på nytt hver gang demoen starter, i sitt eget volum, `ose-demo`. Den ekte basen røres ikke. Mens demoen kjører, kan demobasen også lages på nytt med `docker compose run --rm demo-lag` i et nytt terminalvindu, fra samme mappe.
+
+*Lagt til 2026-10-19 (story 8.3):* øverst på sidene står knappene «Markedsoversikt» og «Min liste», og knappen for siden du står på, er fylt. Stjernen foran et selskap legger aksjen i Min liste, og et nytt trykk tar den ut. Demoen starter med fem merket, og siden demobasen lages på nytt hver gang demoen starter, er det de samme fem neste gang. I den ekte versjonen starter lista tom, og merkingen blir liggende til du tar den bort.
 
 ## Den ekte versjonen
 
