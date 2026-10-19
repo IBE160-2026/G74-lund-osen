@@ -555,6 +555,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-19 kl. 16:12 (gruppens svar):* egne nøkler til Gemini, Anthropic og OpenAI (10.7) står i briefen v8 under «Data og kilder» og hører til v1. Svaret 18.10 kl. 00:39 står uten rettelse.
 
+*Avgjort 2026-10-19 kl. 15:43 (gruppens svar):* endelig v1 er det briefen v8 lover: kjernen, KI-teksten med bryter, historikken, hovedindeksen, Min liste, lenken til investorsiden og egne nøkler til Gemini, Anthropic og OpenAI (10.7, briefen under «Data og kilder», gruppens svar kl. 16:12), og det som alt er flettet. Det PRD-en ellers har under «Inne i v1», også de femten «Fast i v1» fra 08.10, flyttes til «Ekstra, hvis tiden rekker» og bygges etter regelen kl. 14:48; det som ikke er flettet ved funksjonsstoppen, står som plan for en senere versjon. Grunnen: tilbakemeldingen 06.10 om at omfanget ikke skal vokse, og at planen skal beskrive den appen som leveres. Endringsforslaget er `sprint-change-proposal-2026-10-19.md`.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -2657,6 +2659,8 @@ brevet 21.09 og purringen 22.09 ikke er besvart. Tittelen står.
 - I demoen er selskapene oppdiktet, så der vises ingen lenke. Hva som står i
   stedet, avgjøres når 10.5 planlegges
 - **Ville feilet hvis:** en lenke til et av Euronexts nettsteder kom inn i en mal
+
+*Avgjort 2026-10-19 kl. 16:03 (gruppens svar):* adressene til investorsidene er åpnet og godkjent: EQNR https://www.equinor.com/investors, DNB https://www.ir.dnb.no/, KOG https://www.kongsberg.com/investor-relations/, AKRBP https://akerbp.com/en/investor/, NHY https://www.hydro.com/en/global/investors/, FRO https://www.frontlineplc.cy/investor-relations/, VAR https://varenergi.no/en/investor/, TEL https://www.telenor.com/investors/, YAR https://www.yara.com/investor-relations/, MOWI https://mowi.com/investors/, ORK https://www.orkla.com/investors/, SALM https://www.salmar.no/en/investor/, GJF https://www.gjensidige.com/investor-relations/, DNO https://www.dno.no/en/investors/ og MPCC https://www.mpc-container.com/investors/.
 
 ### Story 10.6: KI-teksten om dagen på forsiden
 
