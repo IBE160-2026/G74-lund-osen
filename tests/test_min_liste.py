@@ -16,7 +16,7 @@ import lagring_sqlite
 from lagring_sqlite import SqliteMinlistelager, aapne_base, demo_sti
 from markedsoversikt import SORTERBARE, STIGENDE, SYNKENDE
 from minliste import Minlistelager, MinneMinlistelager, UkjentAksje
-from test_app import _deler_i_rekkefoelge, _regel, _stil
+from test_app import _deler_i_rekkefoelge, _regel, _stil, fyll_basen, serie
 from test_demo import demobase, fast_klokke, klient, mal  # noqa: F401
 from test_utseende import _farger, _kontrast
 
@@ -59,6 +59,11 @@ def _i_fila(sti: Path) -> set[str]:
         return {s for (s,) in c.execute("SELECT symbol FROM min_liste")}
     finally:
         c.close()
+
+
+def _lagret_for(symboler: list[str]) -> None:
+    """Kurser i den ekte basen i tmp_path for symbolene, så de har en rad."""
+    fyll_basen({s: serie([100.0] * 60 + [101.0]) for s in symboler})
 
 
 def _innhold(sti: Path) -> dict[str, list]:
@@ -119,6 +124,9 @@ class TestLagringen:
         ny = app_modul.app.test_client()
         assert _i_fila(lagring_sqlite.BASE_STI) == {"DNB"}
         assert ny.get("/min-liste").status_code == 200
+        # Gjennomgangen (BH12, VG10): og siden viser den, med fylt stjerne.
+        _lagret_for(["DNB", "EQNR"])
+        assert _merket(ny.get("/min-liste?vis=alle").data.decode("utf-8")) == ["DNB"]
 
     @pytest.mark.parametrize("symbol", ["XXX", "EQNR.OL", "eqnr", "", "EQNR "])
     def test_et_ukjent_symbol_avvises_i_porten(self, tmp_path, symbol):
@@ -140,8 +148,8 @@ class TestLagringen:
         assert minne.merkede() == frozenset()
 
     def test_et_ukjent_symbol_avvises_i_basen(self, tmp_path):
-        """Ville feilet uten triggeren i 0007: en INSERT eller UPDATE utenom
-        porten med et symbol som ikke står i aksje, stoppes av basen."""
+        """En INSERT eller UPDATE utenom porten med et symbol som ikke står i
+        aksje, stoppes av basen. Ville feilet hvis triggerne i 0007 manglet."""
         c = sqlite3.connect(_base(tmp_path), isolation_level=None)
         try:
             with pytest.raises(sqlite3.IntegrityError, match="ukjent aksje i min_liste"):
@@ -229,15 +237,17 @@ class TestMerkingen:
         tilbake = "/min-liste?vis=alle&sorter=signal&orden=synkende"
         svar = _merk(demo, "HVDO", tilbake=tilbake)
         assert svar.status_code == 303
-        assert svar.headers["Location"] == tilbake
+        # Gjennomgangen (BH5): tilbake til raden, med ankeret.
+        assert svar.headers["Location"] == tilbake + "#rad-HVDO"
+        assert 'id="rad-HVDO"' in demo.get(tilbake).data.decode("utf-8")
         assert "HVDO" in _merket(demo.get("/").data.decode("utf-8"))
         svar = _merk(demo, "HVDO", til="fjern", tilbake="/?sorter=kurs&orden=stigende")
-        assert svar.status_code == 303 and svar.headers["Location"] == "/?sorter=kurs&orden=stigende"
+        assert svar.status_code == 303 and svar.headers["Location"] == "/?sorter=kurs&orden=stigende#rad-HVDO"
         assert "HVDO" not in _merket(demo.get("/").data.decode("utf-8"))
 
     def test_en_post_fra_en_annen_side_gir_403(self, demo):
-        """Ville feilet uten Origin-sjekken: en annen side kunne merket for
-        brukeren. Ingenting er skrevet etter 403."""
+        """Ingenting er skrevet etter 403. Ville feilet hvis Origin-sjekken
+        manglet, så en annen side kunne merket for brukeren."""
         foer = _innhold(demo_sti()), _merket(demo.get("/").data.decode("utf-8"))
         for opphav in ("http://evil.example", "http://localhost.evil.example", "null"):
             assert _merk(demo, "HVDO", Origin=opphav).status_code == 403, opphav
@@ -267,7 +277,7 @@ class TestMerkingen:
         valg kom gjennom til Location."""
         svar = _merk(demo, "HVDO", tilbake=tilbake)
         assert svar.status_code == 303
-        assert svar.headers["Location"] == forventet
+        assert svar.headers["Location"] == forventet + "#rad-HVDO"
 
     def test_et_ukjent_symbol_eller_valg_gir_400(self, demo):
         """Ville feilet hvis ruta skrev et symbol som ikke står i aksje, eller
@@ -333,7 +343,8 @@ class TestSidene:
     @pytest.mark.parametrize("orden", [SYNKENDE, STIGENDE])
     def test_filteret_endrer_ikke_rekkefoelgen_sortert(self, demo, kolonne, orden):
         """Story 8.15: også sortert er Min liste oversikten med bare de
-        merkede, i samme rekkefølge innenfor hver del."""
+        merkede, i samme rekkefølge innenfor hver del. Ville feilet hvis Min
+        liste eller «Alle» sorterte på noe annet enn oversikten."""
         valg = f"sorter={kolonne}&orden={orden}"
         ut, oevrige = _deler_i_rekkefoelge(demo.get(f"/?{valg}").data.decode("utf-8"))
         l_ut, l_oevrige = _deler_i_rekkefoelge(demo.get(f"/min-liste?{valg}").data.decode("utf-8"))
@@ -386,7 +397,9 @@ class TestSidene:
             thead = html.split("<thead>", 1)[1].split("</thead>", 1)[0]
             assert thead.count("<th") == 5
             assert '<span class="under">★ = Min liste</span></th>' in thead.split("</th>", 1)[0] + "</th>"
-            for rad in re.findall(r"<tr (?:class=\"utslag[^\"]*\")?\s*>(.*?)</tr>", html, re.S):
+            rader = [r for r in re.findall(r"<tr[^>]*>(.*?)</tr>", html, re.S) if '<td class="selskap">' in r]
+            assert len(rader) == len(_rekkefoelge(html)) > 0
+            for rad in rader:
                 assert rad.count("<td") == 5
 
     def test_min_liste_har_overskriften_teksten_og_knappen_med_antallet(self, demo):
@@ -398,7 +411,7 @@ class TestSidene:
         assert "Stjernen foran et selskap legger aksjen i lista" in html
         assert "koster ingen API-kall" in html
         assert re.search(r'Alle <span class="antall">15</span>', html)
-        assert re.search(r'aria-current="page">Min liste <span class="antall">5</span>', html)
+        assert re.search(r'aria-current="true">Min liste <span class="antall">5</span>', html)
         assert "<title>Min liste — OSE Signal</title>" in html
 
     def test_den_tomme_lista_sier_hvordan_man_merker(self, demo):
@@ -424,7 +437,8 @@ class TestSidene:
 
     def test_kontrasten_til_stjernen(self, demo):
         """Stjernen er grafikk og trenger 3:1 mot kortet, både med omriss og
-        fylt (WCAG 1.4.11). Ville feilet med den lyse oransje, som har 1,9:1."""
+        fylt (WCAG 1.4.11). Ville feilet hvis stjernen fikk den lyse oransje,
+        som har 1,9:1. Alle radene har kortet som bakgrunn."""
         stil = _stil(demo.get("/").data.decode("utf-8"))
         farger = _farger(stil)
         omriss = re.search(r"stroke: var\(--([a-z0-9-]+)\)", _regel(stil, "button.stjerneknapp svg"))
@@ -434,3 +448,179 @@ class TestSidene:
         for farge in (omriss.group(1), fyll, strek):
             for bakgrunn in ("kort", "bakgrunn"):
                 assert _kontrast(farger[farge], farger[bakgrunn]) >= 3.0, (farge, bakgrunn)
+
+
+class TestGjennomgangen:
+    """Rettingene etter gjennomgangen av 8.3 (triagen i spesifikasjonen)."""
+
+    def test_alle_er_samme_tabell_ogsaa_naar_ingen_skilte_seg_ut(self, demo, monkeypatch):
+        """BH7, ECH1. Ville feilet hvis «Alle» i Min liste mistet setningen
+        om at ingen skilte seg ut, som oversikten har."""
+        monkeypatch.setattr(app_modul, "del_i_to", lambda rader: ([], list(rader)))
+        monkeypatch.setattr(app_modul, "ingen_skilte_seg_ut", lambda rader: True)
+        setningen = "Ingen aksjer skilte seg ut"
+        oversikten = demo.get("/").data.decode("utf-8")
+        alle = demo.get("/min-liste?vis=alle").data.decode("utf-8")
+        assert setningen in oversikten and setningen in alle
+        assert setningen not in demo.get("/min-liste").data.decode("utf-8")
+        assert _deler_i_rekkefoelge(alle) == _deler_i_rekkefoelge(oversikten)
+
+    def test_antallet_teller_bare_merkede_med_en_rad(self, demo):
+        """BH8, ECH2. Ville feilet hvis knappen talte en merket aksje som
+        ikke har en rad i tabellen, så antallet og tabellen sprikte."""
+        assert _merk(demo, "MTFJ").status_code == 303  # uten kurser
+        html = demo.get("/min-liste").data.decode("utf-8")
+        assert 'Min liste <span class="antall">5</span>' in html
+        for symbol in MERKET_I_DEMOEN:
+            assert _merk(demo, symbol, til="fjern").status_code == 303
+        html = demo.get("/min-liste").data.decode("utf-8")
+        assert 'Min liste <span class="antall">0</span>' in html
+        assert "Ingen aksjer i Min liste ennå" in html and "<table" not in html
+        # Og den kan tas ut igjen.
+        assert _merk(demo, "MTFJ", til="fjern").status_code == 303
+
+    def test_en_rad_for_en_aksje_som_er_tatt_ut_kan_fjernes(self, tmp_path):
+        """ECH3, BH16. Ville feilet hvis fjern bare godtok symbolene i aksje:
+        da ble raden liggende og aksjen merket igjen hvis den kom tilbake."""
+        sti = _base(tmp_path)
+        c = aapne_base(sti)
+        try:
+            SqliteMinlistelager(c).merk("AKRBP")
+            c.execute("DELETE FROM aksje WHERE symbol = 'AKRBP'")
+            c.commit()
+            lager = SqliteMinlistelager(c)
+            assert lager.merkede() == frozenset()
+            lager.fjern("AKRBP")
+            with pytest.raises(UkjentAksje):
+                lager.merk("AKRBP")
+        finally:
+            c.close()
+        assert _i_fila(sti) == set()
+        minne = MinneMinlistelager(["A"])
+        with pytest.raises(UkjentAksje):
+            minne.fjern("B")
+
+    def test_porten_avviser_selv_uten_triggeren(self, tmp_path):
+        """VG3. Ville feilet hvis porten slo opp i AKSJEUNIVERS og lot
+        triggeren gjøre jobben: uten triggeren avviser porten likevel et
+        symbol som ikke står i aksje i basen."""
+        sti = _base(tmp_path)
+        c = sqlite3.connect(sti, isolation_level=None)
+        try:
+            c.execute("DROP TRIGGER min_liste_kjent_aksje_insert")
+            c.execute("DELETE FROM aksje WHERE symbol = 'MOWI'")
+        finally:
+            c.close()
+        c = aapne_base(sti)
+        try:
+            for symbol in ("MOWI", "XXX"):
+                with pytest.raises(UkjentAksje):
+                    SqliteMinlistelager(c).merk(symbol)
+        finally:
+            c.close()
+        assert _i_fila(sti) == set()
+
+    def test_sidene_med_faerre_enn_15_aksjer(self, klient, monkeypatch):  # noqa: F811
+        """VG3, føringen 30.09 under AD-21. Ville feilet hvis sidene antok 15
+        aksjer i antallet eller tabellen."""
+        monkeypatch.delenv(app_modul.I_DEMO, raising=False)
+        aapne_base(lagring_sqlite.BASE_STI).close()
+        c = sqlite3.connect(lagring_sqlite.BASE_STI, isolation_level=None)
+        try:
+            c.execute("DELETE FROM aksje WHERE symbol NOT IN ('EQNR', 'DNB', 'KOG')")
+        finally:
+            c.close()
+        _lagret_for(["EQNR", "DNB", "KOG"])
+        assert _merk(klient, "KOG").status_code == 303
+        html = klient.get("/min-liste").data.decode("utf-8")
+        assert 'Alle <span class="antall">3</span>' in html
+        assert 'Min liste <span class="antall">1</span>' in html
+        assert _rekkefoelge(html) == ["KOG"]
+        alle = klient.get("/min-liste?vis=alle").data.decode("utf-8")
+        assert sorted(_rekkefoelge(alle)) == ["DNB", "EQNR", "KOG"]
+
+    def test_merkingen_naar_demobasen_mangler_gir_404(self, demo):
+        """ECH4. Ville feilet hvis ruta prøvde å skrive uten tilkobling og
+        ga 500."""
+        demo_sti().unlink()
+        assert _merk(demo, "BRFE").status_code == 404
+        assert not demo_sti().exists()
+
+    def test_oevrige_har_overskriften_naar_bare_de_er_merket(self, demo):
+        """ECH5. Ville feilet hvis «Øvrige aksjer» mistet overskriften i Min
+        liste når ingen av de merkede skilte seg ut."""
+        for symbol in ("BRFE", "KVST", "NLYS"):
+            assert _merk(demo, symbol, til="fjern").status_code == 303
+        html = demo.get("/min-liste").data.decode("utf-8")
+        assert "Skilte seg ut <span" not in html
+        assert "Øvrige aksjer <span" in html
+        assert _rekkefoelge(html) == ["LSTF", "SGNT"]
+
+    def test_lenkene_og_skjemaet_i_min_liste_beholder_valgene(self, demo):
+        """VG1, ECH6. Ville feilet hvis skjemaet sendte tilbake til / eller
+        uten sorteringen, eller lenkene mistet «Alle» eller sorteringen."""
+        html = demo.get("/min-liste?vis=alle&sorter=kurs&orden=synkende").data.decode("utf-8")
+        tilbake = set(re.findall(r'name="tilbake" value="([^"]*)"', html))
+        assert tilbake == {"/min-liste?vis=alle&amp;sorter=kurs&amp;orden=synkende"}
+        assert '<a href="/min-liste?vis=alle">Standard rekkefølge</a>' in html
+        assert re.search(r'class="visknapp" href="/min-liste\?sorter=kurs&amp;orden=synkende">Min liste', html)
+        assert re.search(
+            r'class="visknapp" href="/min-liste\?vis=alle&amp;sorter=kurs&amp;orden=synkende" aria-current', html
+        )
+        sorterlenker = re.findall(r'<a class="sorter[^"]*" href="([^"]*)"', html)
+        assert len(sorterlenker) == 5
+        assert all(h.startswith("/min-liste?vis=alle&amp;sorter=") for h in sorterlenker)
+        lista = demo.get("/min-liste?sorter=signal&orden=stigende").data.decode("utf-8")
+        assert set(re.findall(r'name="tilbake" value="([^"]*)"', lista)) == {
+            "/min-liste?sorter=signal&amp;orden=stigende"
+        }
+        assert '<a href="/min-liste">Standard rekkefølge</a>' in lista
+
+    def test_fotnotene_i_min_liste_gjelder_bare_lista(self, demo):
+        """ECH7, BH9. Ville feilet hvis Min liste viste fotnoten om en aksje
+        uten kurser som ikke er merket, eller fotnoter under en tom liste."""
+        uten = "Uten data i denne kilden: Matfjord Merkevarer"
+        assert uten in demo.get("/").data.decode("utf-8")
+        assert uten in demo.get("/min-liste?vis=alle").data.decode("utf-8")
+        assert uten not in demo.get("/min-liste").data.decode("utf-8")
+        for symbol in MERKET_I_DEMOEN:
+            _merk(demo, symbol, til="fjern")
+        tom = demo.get("/min-liste").data.decode("utf-8")
+        assert 'class="fotnote"' not in tom
+        assert "Stjernen foran et selskap legger aksjen i lista" in tom
+
+    def test_i_den_ekte_basen_skriver_merkingen_bare_min_liste(self, klient, monkeypatch):  # noqa: F811
+        """VG9, AD-7. Ville feilet hvis merkingen eller en side rørte en annen
+        tabell i den ekte basen, som åpnes for skriving for alle rutene."""
+        monkeypatch.delenv(app_modul.I_DEMO, raising=False)
+        _lagret_for(["EQNR", "DNB"])
+        klient.get("/")
+        foer = _innhold(lagring_sqlite.BASE_STI)
+        for adresse in ("/", "/min-liste", "/aksje/EQNR"):
+            assert klient.get(adresse).status_code == 200
+        assert _merk(klient, "EQNR").status_code == 303
+        assert _merk(klient, "DNB").status_code == 303
+        assert _merk(klient, "DNB", til="fjern").status_code == 303
+        assert _innhold(lagring_sqlite.BASE_STI) == foer
+        assert _i_fila(lagring_sqlite.BASE_STI) == {"EQNR"}
+
+    def test_bare_webserveren_og_demoen_skriver_min_liste(self):
+        """VG8, AD-3. Ville feilet hvis en annen modul i src/, for eksempel
+        hentingen, tok i bruk porten eller skrev tabellen."""
+        brukere = set()
+        for fil in (ROT / "src").glob("*.py"):
+            tekst = fil.read_text(encoding="utf-8")
+            if "SqliteMinlistelager(" in tekst or re.search(r"(INSERT INTO|DELETE FROM|UPDATE) min_liste", tekst):
+                brukere.add(fil.name)
+        assert brukere == {"app.py", "demo.py", "lagring_sqlite.py"}
+
+    def test_den_fylte_knappen_er_fylt_i_stilen_og_raden_brytes(self):
+        """VG5, VG2. Ville feilet hvis regelen som fyller knappen for siden
+        man står på, ble borte, eller knapperaden ikke kunne brytes på en
+        smal skjerm (390 px, målt i spesifikasjonen)."""
+        stil = (ROT / "src" / "static" / "stil.css").read_text(encoding="utf-8")
+        fylt = re.search(r'header\.stripe a\.sideknapp\[aria-current="page"\] \{([^}]*)\}', stil).group(1)
+        assert "background: var(--hvit)" in fylt and "color: var(--blekk)" in fylt
+        assert "flex-wrap: wrap" in re.search(r"header\.stripe \.sider \{([^}]*)\}", stil).group(1)
+        valgt = re.search(r'a\.visknapp\[aria-current="true"\] \{([^}]*)\}', stil).group(1)
+        assert "background: var(--fyll)" in valgt

@@ -498,8 +498,10 @@ def _tabellsiden(aktiv: str):
     tre_av_tre = frozenset(rad.aksje.symbol for rad in rader if rad.styrke == ANTALL_SJEKKER)
     # Story 8.3: merkingen leses fra sin egen port, bare lesing her.
     merkede = _leser_eller_basefeil(lambda: SqliteMinlistelager(g.tilkobling)).merkede()
-    i_aksje = {post.aksje.symbol for post in poster}
     mangler = uten_kurser(poster)
+    # Gjennomgangen (BH8, ECH2): antallet er de merkede som har en rad i
+    # tabellen, saa knappen og tabellen sier det samme.
+    antall_merket = sum(rad.aksje.symbol in merkede for rad in rader)
     if i_lista and not alle:
         skilte_seg_ut = [rad for rad in skilte_seg_ut if rad.aksje.symbol in merkede]
         oevrige = [rad for rad in oevrige if rad.aksje.symbol in merkede]
@@ -519,7 +521,9 @@ def _tabellsiden(aktiv: str):
         # også de uten kurser (beslutningen 14.10).
         antall_aksjer=len(poster),
         ikke_vurdert=any(rad.ikke_vurdert for rad in (*skilte_seg_ut, *oevrige)),
-        ingen_skilte_seg_ut=ingen_skilte_seg_ut(rader) and not i_lista,
+        # Gjennomgangen (BH7, ECH1): «Alle» i Min liste er samme tabell som
+        # oversikten, ogsaa naar ingen skilte seg ut.
+        ingen_skilte_seg_ut=ingen_skilte_seg_ut(rader) and not (i_lista and not alle),
         antall_vurdert=antall_vurdert(rader),
         skilte_seg_ut=skilte_seg_ut,
         oevrige=oevrige,
@@ -527,7 +531,7 @@ def _tabellsiden(aktiv: str):
         tre_av_tre=[rad.aksje.navn for rad in rader if rad.styrke == ANTALL_SJEKKER],
         hentekommando=hentekommando(),
         merkede=merkede,
-        antall_merket=len(merkede & i_aksje),
+        antall_merket=antall_merket,
         tilbake=side_adresse(sti, sortering, alle),
         **felles,
     )
@@ -748,15 +752,18 @@ def merk():
     til = request.form.get("til")
     if til not in (MERK, FJERN):
         abort(400)
+    symbol = request.form.get("symbol", "")
     try:
         lager = SqliteMinlistelager(g.tilkobling)
-        (lager.merk if til == MERK else lager.fjern)(request.form.get("symbol", ""))
+        (lager.merk if til == MERK else lager.fjern)(symbol)
     except UkjentAksje:
         abort(400)
     except BASEFEIL as feil:
         g.basefeil = _basefeil(feil)
         return _basen_kan_ikke_aapnes()
-    return redirect(tilbake_etter_merking(request.form.get("tilbake")), code=303)
+    # Gjennomgangen (BH5): tilbake til raden, ikke til toppen av siden.
+    # Symbolet er godtatt av porten, saa ankeret har bare kjente tegn.
+    return redirect(tilbake_etter_merking(request.form.get("tilbake")) + f"#rad-{symbol}", code=303)
 
 
 if __name__ == "__main__":

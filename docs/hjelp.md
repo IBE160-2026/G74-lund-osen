@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-19T22:45
+updated: 2026-10-19T23:19
 ---
 
 # Hjelp til «Kom i gang»
@@ -127,11 +127,15 @@ Sidene sier «Eksempeltall»: 15 oppdiktede selskaper med kurser til fredag 9. o
 
 *Lagt til 2026-10-19 (story 8.3):* øverst på sidene står knappene «Markedsoversikt» og «Min liste», og knappen for siden du står på, er fylt. Stjernen foran et selskap legger aksjen i Min liste, og et nytt trykk tar den ut. Demoen starter med fem merket, og siden demobasen lages på nytt hver gang demoen starter, er det de samme fem neste gang. I den ekte versjonen starter lista tom, og merkingen blir liggende til du tar den bort.
 
+*Lagt til 2026-10-19 (story 8.3, gjennomgangen):* har du en demobase fra før 8.3 utenfor Docker, viser sidene «Siden kan ikke vises» med `RuntimeError`. Lag den på nytt med `uv run python src/demo.py`. I Docker lages den på nytt hver gang demoen starter.
+
 ## Den ekte versjonen
 
 ### Hva med nøkkelen?
 
 Du trenger en egen gratis API-nøkkel fra [EODHD](https://eodhd.com/register), fordi vilkårene ikke lar oss dele vår. Den gir 20 kall i døgnet, og en henting bruker 16: ett per aksje og ett for hovedindeksen. Åpne `.env` i en teksteditor (`notepad .env` på Windows, `open -e .env` på macOS, `nano .env` på Linux) og lim den inn etter `EODHD_API_KEY=`. `cp` skriver over en `.env` som finnes, så kopier bare første gang. Webserveren starter uten `.env` og bruker aldri kvote: den leser bare fra basen. Bare hentingen trenger nøkkelen, og `docker compose run --rm hent` starter ikke uten `.env`.
+
+*Lagt til 2026-10-19 (story 8.3):* webserveren skriver nå én ting i basen, merkingen i Min liste, når du trykker på stjernen. Den henter fortsatt aldri og bruker aldri kvote.
 
 ### Hvorfor bare 15 aksjer?
 

@@ -635,13 +635,19 @@ class SqliteMinlistelager:
         self._skriv(symbol, "INSERT INTO min_liste (symbol) VALUES (?) ON CONFLICT (symbol) DO NOTHING")
 
     def fjern(self, symbol: str) -> None:
-        self._skriv(symbol, "DELETE FROM min_liste WHERE symbol = ?")
+        # Gjennomgangen (ECH3, BH16): en rad for en aksje som er tatt ut av
+        # aksje, kan ogsaa fjernes, saa den ikke er merket hvis aksjen kommer
+        # tilbake.
+        self._skriv(symbol, "DELETE FROM min_liste WHERE symbol = ?", self._merket_i_tabellen())
 
     def _symboler(self) -> list[str]:
         return [s for (s,) in self._tilkobling.execute("SELECT symbol FROM aksje")]
 
-    def _skriv(self, symbol: str, sql: str) -> None:
-        kontroller_symbol(symbol, self._symboler())
+    def _merket_i_tabellen(self) -> list[str]:
+        return [s for (s,) in self._tilkobling.execute("SELECT symbol FROM min_liste")]
+
+    def _skriv(self, symbol: str, sql: str, ogsaa: list[str] = ()) -> None:
+        kontroller_symbol(symbol, [*self._symboler(), *ogsaa])
         if self._tilkobling.in_transaction:
             raise RuntimeError(
                 "Tilkoblingen har en aapen transaksjon. Adapteren styrer transaksjonen selv - avslutt kallerens foerst."

@@ -6,9 +6,9 @@ Merkingen er et eget datasett med webserveren som eneste skriver (foeringen
 merket: ingen antall, beloep eller kurs. Merkingen gjelder maskinen, uten
 innlogging, og koster ingen API-kall.
 
-Lista tas som parameter og antas aldri aa ha 15 aksjer (foeringen 2026-09-30
-under AD-21). Et symbol som ikke staar i lista, avvises med UkjentAksje, i
-porten og, i SQLite, av triggeren i 0007.
+Lista tas som parameter, og koden antar aldri at den har akkurat 15 aksjer
+(foeringen 2026-09-30 under AD-21). Et symbol som ikke staar i lista, avvises
+med UkjentAksje, i porten og, i SQLite, av triggeren i 0007.
 
 Her staar porten og minneutgaven. SQLite-adapteren er SqliteMinlistelager i
 lagring_sqlite.py.
@@ -33,7 +33,8 @@ class Minlistelager(Protocol):
         """Merker aksjen. Er den merket fra foer, skjer ingenting."""
 
     def fjern(self, symbol: str) -> None:
-        """Tar merket bort. Er aksjen ikke merket, skjer ingenting."""
+        """Tar merket bort. Er aksjen ikke merket, skjer ingenting. Et symbol
+        som er merket, men ikke lenger staar i lista, kan ogsaa fjernes."""
 
 
 def kontroller_symbol(symbol: str, symboler: Iterable[str]) -> None:
@@ -57,5 +58,5 @@ class MinneMinlistelager:
         self._merket.add(symbol)
 
     def fjern(self, symbol: str) -> None:
-        kontroller_symbol(symbol, self._symboler)
+        kontroller_symbol(symbol, self._symboler | self._merket)
         self._merket.discard(symbol)

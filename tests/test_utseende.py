@@ -234,6 +234,10 @@ def sidene(klient, monkeypatch, demobase):  # noqa: F811 - fikstur fra test_demo
     monkeypatch.setenv(app_modul.I_DEMO, "1")
     sider["oversikten i demoen"] = klient.get("/").data.decode("utf-8")
     sider["aksjesiden i demoen"] = klient.get("/aksje/BRFE").data.decode("utf-8")
+    # Story 8.3 (gjennomgangen, BH4, VG1, VG4): Min liste, også med «Alle» og
+    # sortert, så rammetestene og lenkene prøves på den nye siden.
+    sider["min liste i demoen"] = klient.get("/min-liste").data.decode("utf-8")
+    sider["alle i min liste"] = klient.get("/min-liste?vis=alle&sorter=kurs&orden=synkende").data.decode("utf-8")
     demo_sti().write_bytes(b"ikke en sqlite-base" * 10)
     svar = klient.get("/")
     assert svar.status_code == 503

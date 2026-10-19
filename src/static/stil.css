@@ -364,7 +364,7 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
                         background: var(--kort); overflow: hidden; }
 :where(.side-oversikt) a.visknapp { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px;
                        box-sizing: border-box; color: var(--blekk); font-size: 15px; font-weight: 600; text-decoration: none; }
-:where(.side-oversikt) a.visknapp[aria-current="page"] { background: var(--fyll); color: var(--hvit); }
+:where(.side-oversikt) a.visknapp[aria-current="true"] { background: var(--fyll); color: var(--hvit); }
 :where(.side-oversikt) a.visknapp:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
 :where(.side-oversikt) p.tom-liste { margin: 0 0 1rem; padding: 1rem 1.25rem; border: 1px solid var(--strek); border-radius: 12px;
                         background: var(--kort); color: var(--tekst); }
