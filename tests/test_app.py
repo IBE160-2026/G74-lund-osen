@@ -3534,6 +3534,68 @@ class TestStory816bDagenPaaHeleSiden:
         assert "Signalstyrke ? 3 av 3" not in toppen
         assert 'class="tidligere-dag"' not in html
 
+    def test_endringen_er_dagens(self, klient):
+        """Gjennomgangen (VG1): 01.10 stiger 5 % og ingen annen dag stiger
+        mer enn 0,1. Ville feilet hvis endringen i kortet var fra siste
+        børsdag, med datoene for den valgte dagen."""
+        from dataclasses import replace
+
+        from tallformat import tall
+
+        rader = [
+            replace(r, slutt=r.slutt * 1.05, justert_slutt=r.justert_slutt * 1.05) if r.dato >= date(2026, 10, 1) else r
+            for r in _hele_aaret()
+        ]
+        skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET), vurdert=True)
+        forrige, dagen = (r for r in rader if r.dato in (date(2026, 9, 30), date(2026, 10, 1)))
+        ventet = tall((dagen.justert_slutt - forrige.justert_slutt) / forrige.justert_slutt * 100, "endring")
+        toppen = _toppen(klient.get("/aksje/EQNR?dag=2026-10-01").data.decode("utf-8"))
+        assert f"Endring ? {ventet} fra onsdag til torsdag" in toppen
+        assert ventet.startswith("+5,")
+
+    def test_en_boersdag_uten_kurs_i_serien(self, klient):
+        """Gjennomgangen (ECH1 og ECH2): tirsdag 06.10 mangler i kursserien.
+        Ville feilet hvis siden sa «Kursen vises likevel» eller pekte på
+        --les-inn for en dag uten kurs."""
+        skriv_serie(
+            "EQNR",
+            [r for r in _hele_aaret() if r.dato != date(2026, 10, 6)],
+            datetime.fromisoformat(HENTET),
+            vurdert=True,
+        )
+        for dag, tekst in (("2026-10-06", "ikke vurdert"), ("2026-10-03", "ikke børsdag")):
+            toppen = _toppen(klient.get(f"/aksje/EQNR?dag={dag}").data.decode("utf-8"))
+            assert f"Ingen vurdering for {dag[8:]}.10: {tekst}. Kursserien har ingen kurs for dagen." in toppen
+            assert "Kursen vises likevel" not in toppen and "--les-inn" not in toppen
+
+    @pytest.mark.parametrize("styrke, merket", [(2, False), (3, True)])
+    def test_en_tidligere_dag_merkes_bare_ved_3_av_3(self, klient, styrke, merket):
+        """Gjennomgangen (VG3): designregler.md §3 merker 2 av 3 bare for
+        siste børsdag. Ville feilet hvis en tidligere dag med 2 av 3 fikk
+        markeringen i overskriften, eller 3 av 3 mistet den."""
+        self._aksjen()
+        rad = self._lagret_for_01_10()
+        if styrke == 2:
+            to_av_tre = Vurdering(
+                styrke=2,
+                retning="Positiv",
+                trend=1,
+                bevegelse=1,
+                interesse=0,
+                slutt=rad.slutt,
+                justert_slutt=rad.justert_slutt,
+                trend_avvik=0.123,
+                dagens_endring=0.05,
+                standardavvik=0.01,
+                volumforhold=1.0,
+            )
+            skriv_vurdering("EQNR", date(2026, 10, 2), to_av_tre)
+        dag = "2026-10-01" if styrke == 3 else "2026-10-02"
+        html = klient.get(f"/aksje/EQNR?dag={dag}").data.decode("utf-8")
+        assert ("<mark>skilte seg ut" in html) is merket
+        # Siste børsdag har 2 av 3 og er merket som før.
+        assert "<mark>skilte seg ut fredag</mark>" in klient.get("/aksje/EQNR").data.decode("utf-8")
+
     def test_vurder_kalles_ikke_for_en_valgt_dag(self, klient, monkeypatch):
         """AD-7: signalet regnes aldri på nytt. Ville feilet hvis siden kalte
         vurder for dagen, med eller uten en rad i vurdering."""

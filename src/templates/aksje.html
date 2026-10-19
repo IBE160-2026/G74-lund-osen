@@ -140,7 +140,9 @@
     <span class="merke">{{ detalj.aksje.symbol }}</span>
     {% if detalj.aksje.sektor %}<span class="merke">{{ bransjesymbol(detalj.aksje.sektor) }}{{ detalj.aksje.sektor }}</span>{% endif %}
   </div>
-  {% if detalj.skilte_seg_ut %}
+  {#- Story 8.16b (gjennomgangen, VG3): designregler.md §3 merker 2 av 3 bare
+      for siste børsdag, så en tidligere dag merkes bare ved 3 av 3. #}
+  {% if detalj.skilte_seg_ut and (not tidligere_dag or detalj.styrke == antall_sjekker) %}
     <h1 class="overskrift">{{ detalj.aksje.navn }} <mark>skilte seg ut {{ detalj.dato|ukedag }}</mark></h1>
   {% else %}
     <h1 class="overskrift">{{ detalj.aksje.navn }}</h1>
@@ -227,9 +229,10 @@
   {% else %}
     <p class="mangler">
       Ingen vurdering for {{ detalj.dato|dato }}: {{ detalj.tekst }}.
-      Kursen vises likevel.
+      {#- Story 8.16b (gjennomgangen, ECH1 og ECH2): en valgt dag uten kurs. #}
+      {% if detalj.sluttkurs is not none %}Kursen vises likevel.{% else %}Kursserien har ingen kurs for dagen.{% endif %}
     </p>
-    {% if detalj.ikke_vurdert %}
+    {% if detalj.ikke_vurdert and detalj.sluttkurs is not none %}
       <p class="fotnote">
         «Ikke vurdert»: hentekommandoen har ikke skrevet en vurdering for
         dagen, for eksempel fordi kursene er lest inn med <code>--les-inn</code>.
