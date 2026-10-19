@@ -1,0 +1,500 @@
+/* Story 2.7a (gruppens svar 19.10 kl. 12:06): all stilen i én fil, lenket
+   fra _ramme.html med et avtrykk av fila i adressen. Rammen og delmalene
+   gjelder alle sidene. Reglene for én side er avgrenset med klassen på
+   <body> i :where(), som ikke gir velgeren mer vekt, så vektene er de samme
+   som da stilen sto i <style> i hver side. Rekkefølgen er den samme innenfor
+   hver side. Periodevalget og de seks felles reglene står nå foran reglene
+   for sidene; den beregnede stilen for hvert element er sammenlignet med
+   main, og ingen er endret (spesifikasjonen 2.7a, gjennomgangen). Fargene
+   står som navn i :root og ingen andre steder (designregler §5). */
+
+@font-face { font-family: "IBM Plex Sans"; font-weight: 400; font-style: normal; font-display: swap;
+             src: url("/static/fonts/ibm-plex-sans/IBMPlexSans-Regular.woff") format("woff"); }
+@font-face { font-family: "IBM Plex Sans"; font-weight: 500; font-style: normal; font-display: swap;
+             src: url("/static/fonts/ibm-plex-sans/IBMPlexSans-Medium.woff") format("woff"); }
+@font-face { font-family: "IBM Plex Sans"; font-weight: 600; font-style: normal; font-display: swap;
+             src: url("/static/fonts/ibm-plex-sans/IBMPlexSans-SemiBold.woff") format("woff"); }
+@font-face { font-family: "IBM Plex Sans"; font-weight: 700; font-style: normal; font-display: swap;
+             src: url("/static/fonts/ibm-plex-sans/IBMPlexSans-Bold.woff") format("woff"); }
+@font-face { font-family: "Newsreader"; font-weight: 500; font-style: normal; font-display: swap;
+             src: url("/static/fonts/newsreader/Newsreader16pt-Medium.woff") format("woff"); }
+@font-face { font-family: "Newsreader"; font-weight: 600; font-style: normal; font-display: swap;
+             src: url("/static/fonts/newsreader/Newsreader16pt-SemiBold.woff") format("woff"); }
+/* Story 8.0d, PR 2: de store overskriftene i optisk størrelse 72pt. */
+@font-face { font-family: "Newsreader 72"; font-weight: 500; font-style: normal; font-display: swap;
+             src: url("/static/fonts/newsreader/Newsreader72pt-Medium.woff") format("woff"); }
+
+/* Designregler §5: fargene med navn. */
+:root {
+  --blekk: #16181D;
+  --tekst: #3C4048;
+  --dempet: #5F646C;
+  --dempet-2: #70757D;
+  --bakgrunn: #F3F2EE;
+  --kort: #FFFFFF;
+  --hvit: #FFFFFF;
+  --strek: #E4E2DB;
+  --strek-2: #D6D3CA;
+  --rutenett: #ECEAE4;
+  --opp: #13703C;
+  --opp-bakgrunn: #E4F4EA;
+  --ned: #B42318;
+  --ned-bakgrunn: #FBE9E6;
+  --blandet: #6A46A0;
+  --blandet-bakgrunn: #F0EBF8;
+  --ingen-bakgrunn: #EEEDEA;
+  /* PR 2: oransje som i originalen (designregler §3 og del 5, 14.10). */
+  --oransje: #F2B53A;
+  /* Story 2.9b: gult bransjesymbol ved 3 av 3 over søylene, 3,82:1 mot
+     hvitt (designregler §3). */
+  --gul-symbol: #a67c00;
+  --lys-oransje: #F8DE9C;
+  --fyll: #16181D;
+  --baand-ut: #FFF6DC;
+  --baand-ut-kant: #F0E3BD;
+  --baand-oevrige: #F7F6F2;
+  --brun: #6B4E00;
+  --hjelp-bakgrunn: #FFF1CC;
+  --kurs: #1F4E8C;
+  --snitt: #9A5A0E;
+  --stripe-tekst: #DADDE2;
+  --stripe-tekst-2: #C9CCD2;
+  --stripe-kant: #3A3E47;
+  --stripe-strek: #2A2E36;
+  --kolonne-tekst-2: #B9BDC5;
+  /* Story 8.0d, PR 3: det grå feltet i sjekkortene (designregler del 5). */
+  --spor: #F1EFEA;
+  --felt: #8A847A;
+}
+
+body {
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  margin: 0;
+  background: var(--bakgrunn);
+  color: var(--blekk);
+}
+h1, h2 { font-family: "Newsreader", Georgia, serif; font-weight: 500; }
+main { max-width: 65rem; margin: 0 auto; padding: 1.5rem 16px 0; box-sizing: border-box; }
+code { font-family: ui-monospace, Consolas, monospace; }
+
+/* Designregler §5: fokus i blekk på lys bakgrunn, oransje på blekk. */
+*:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+header.stripe *:focus-visible { outline-color: var(--oransje); }
+
+/* Stripa øverst. */
+header.stripe { background: var(--blekk); color: var(--hvit); }
+header.stripe .rad { max-width: 65rem; margin: 0 auto; padding: 0 16px; box-sizing: border-box;
+                     display: flex; align-items: center; gap: 0.6rem; }
+header.stripe .topp { min-height: 72px; }
+header.stripe .logo { font-family: "Newsreader", Georgia, serif; font-size: 27px; font-weight: 600;
+                      letter-spacing: -0.01em; display: flex; align-items: center; gap: 0.6rem; margin: 0; }
+header.stripe .logo svg { width: 28px; height: 24px; }
+header.stripe .logo .soeyle { fill: var(--hvit); }
+header.stripe .logo .soeyle.hoey { fill: var(--oransje); }
+header.stripe .oppdatert { min-height: 38px; border-top: 1px solid var(--stripe-strek);
+                           font-size: 13.5px; font-weight: 600; color: var(--stripe-tekst); }
+header.stripe .oppdatert svg { width: 16px; height: 16px; fill: none; stroke: var(--oransje); stroke-width: 2; }
+header.stripe .eksempeltall { margin: 0; padding: 0.5rem 0; font-size: 13.5px; font-weight: 600;
+                              color: var(--stripe-tekst); }
+header.stripe .demo { border-top: 1px solid var(--stripe-strek); }
+
+footer.bunnlinje { max-width: 65rem; margin: 2rem auto 0; padding: 0 16px 2rem; box-sizing: border-box; }
+footer.bunnlinje p { border-top: 1px solid var(--strek); padding-top: 1rem; margin: 0;
+                     font-size: 13px; line-height: 1.5; color: var(--dempet); }
+
+/* Story 8.0b og 8.0d: hjelpen bak «?» (_hjelp.html). */
+/* Story 8.0d (designregler §5, utdraget §7): «?» er en svart sirkel på
+   22 px i en klikkflate på 44 × 44 px. De negative marginene gjør at
+   flaten ikke skyver teksten rundt fra hverandre, og 5 px luft står
+   igjen på hver side av sirkelen. */
+button.hjelpeknapp {
+  font: inherit; font-size: 13px; font-weight: 700; line-height: 1;
+  width: 44px; height: 44px; padding: 0; margin: -11px -6px -11px -6px;
+  border: 0; border-radius: 50%; color: var(--hvit); cursor: pointer; vertical-align: middle;
+  background: radial-gradient(circle, var(--blekk) 10.5px, transparent 11px);
+}
+/* PR 2 av 8.0d: fokusringen står rundt sirkelen, 2 px utenfor og 3 px
+   bred, og ikke rundt klikkflaten, som dekket en del av ordet ved
+   siden av. På blekk, i stripa og kolonneraden i oversikten, er
+   sirkelen hvit og ringen oransje, som fokus i stripa. Tabellen på
+   aksjesiden har lys kolonnerad og beholder den svarte sirkelen
+   (gjennomgangen, BH1). */
+button.hjelpeknapp:focus-visible {
+  outline: none;
+  background: radial-gradient(circle, var(--blekk) 10.5px, transparent 11px, transparent 13px,
+                              var(--blekk) 13.5px, var(--blekk) 16px, transparent 16.5px);
+}
+header.stripe button.hjelpeknapp, .tabellboks thead button.hjelpeknapp {
+  color: var(--blekk);
+  background: radial-gradient(circle, var(--hvit) 10.5px, transparent 11px);
+}
+header.stripe button.hjelpeknapp:focus-visible, .tabellboks thead button.hjelpeknapp:focus-visible {
+  background: radial-gradient(circle, var(--hvit) 10.5px, transparent 11px, transparent 13px,
+                              var(--oransje) 13.5px, var(--oransje) 16px, transparent 16.5px);
+}
+/* Uten bakgrunner (Windows med høy kontrast) står vanlig fokus. */
+@media (forced-colors: active) {
+  button.hjelpeknapp:focus-visible { outline: 3px solid; }
+}
+.hjelpevindu {
+  width: min(440px, calc(100vw - 2rem)); max-height: 80vh; overflow: auto;
+  margin: auto; padding: 16px 20px 18px 22px; box-sizing: border-box;
+  border: 0; border-radius: 16px;
+  background: var(--kort); color: var(--tekst);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.30), 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+.hjelpevindu .hjelpetopp { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.hjelpevindu .hjelpemerke {
+  display: inline-block; font-size: 12.5px; font-weight: 700; padding: 0.15rem 0.5rem;
+  border-radius: 8px; background: var(--hjelp-bakgrunn); color: var(--brun);
+}
+.hjelpevindu h2 { font-family: "Newsreader", Georgia, serif; font-size: 23px; font-weight: 600;
+                  line-height: 1.2; color: var(--blekk); margin: 0.5rem 0 0; }
+.hjelpevindu h3 { font-size: 0.9rem; margin: 1rem 0 0.3rem; }
+.hjelpevindu p { font-size: 15px; line-height: 1.55; margin: 0.4rem 0; }
+.hjelpevindu button.lukk {
+  font: inherit; font-size: 0.85rem; min-height: 44px; padding: 0 0.9rem; cursor: pointer;
+  border: 1px solid var(--strek-2); border-radius: 8px; background: var(--kort); color: var(--blekk);
+}
+
+/* Story 8.0d, PR 3: brikkene og retningspillen (_brikker.html). */
+.sjekker { display: flex; gap: 3px; margin-top: 4px; font-weight: 700; white-space: nowrap; }
+.brikke { display: inline-flex; align-items: center; justify-content: center; gap: 3px;
+          min-width: 34px; height: 24px; padding: 0 5px; box-sizing: border-box; border-radius: 6px;
+          font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; border: 1.5px solid transparent; }
+.brikke abbr { text-decoration: none; }
+.brikke.pluss { background: var(--opp); color: var(--hvit); border-color: var(--opp); }
+.brikke.minus { background: var(--ned); color: var(--hvit); border-color: var(--ned); }
+.brikke.null { background: var(--hvit); color: var(--dempet-2); border-color: var(--strek-2); }
+.stor .brikke { min-width: 36px; height: 26px; font-size: 12.5px; }
+/* Retningen i en pille med symbolet først. «Ukjent» står som tekst
+   uten pille (svar 6). */
+.retningspille { display: inline-flex; align-items: center; gap: 0.35rem; height: 28px; padding: 0 12px;
+                 box-sizing: border-box; border-radius: 999px; font-size: 14px; font-weight: 600; white-space: nowrap; }
+.retningspille .symbol { font-weight: 700; }
+.retningspille.opp { background: var(--opp-bakgrunn); color: var(--opp); }
+.retningspille.ned { background: var(--ned-bakgrunn); color: var(--ned); }
+.retningspille.blandet { background: var(--blandet-bakgrunn); color: var(--blandet); }
+.retningspille.ingen { background: var(--ingen-bakgrunn); color: var(--dempet); }
+.retningstekst.ukjent { color: var(--dempet); white-space: nowrap; }
+
+/* Story 8.16: periodevalget (_perioder.html). */
+/* Story 8.16: knappene bryter linja på smale skjermer (390 px), så
+   siden ikke ruller sidelengs. */
+nav.periodevalg { margin: 0 0 12px; }
+nav.periodevalg ul { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0; padding: 0; }
+nav.periodevalg li { margin: 0; }
+nav.periodevalg a, nav.periodevalg button {
+  display: inline-block; font: inherit; font-size: 14px; line-height: 1.2;
+  padding: 7px 12px; min-height: 32px; border: 1px solid var(--strek); border-radius: 999px;
+  color: var(--blekk); background: var(--kort); text-decoration: none; cursor: pointer;
+}
+nav.periodevalg [aria-current] { color: var(--hvit); background: var(--blekk); border-color: var(--blekk); font-weight: 600; }
+nav.periodevalg a:focus-visible, nav.periodevalg button:focus-visible, nav.periodevalg input:focus-visible {
+  outline: 3px solid var(--blekk); outline-offset: 2px;
+}
+nav.periodevalg form { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; }
+nav.periodevalg input[type="date"] {
+  font: inherit; font-size: 14px; padding: 5px 8px; min-height: 32px; max-width: 100%;
+  border: 1px solid var(--strek); border-radius: 8px; background: var(--kort); color: var(--blekk);
+}
+.periodebeskjed { margin: 0 0 12px; color: var(--tekst); }
+nav.periodevalg .skjult { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Story 2.7a: reglene som sto likt i oversikten og på aksjesiden. Det
+   viktigste i overskriften har lys oransje markering (§4, 14.10), og
+   retningen har tekst, symbol og farge samtidig (FR-103). */
+h1.overskrift mark { background: linear-gradient(transparent 60%, var(--lys-oransje) 60%); color: inherit; }
+.opp { color: var(--opp); }
+.ned { color: var(--ned); }
+.blandet { color: var(--blandet); }
+.ingen, .ukjent { color: var(--dempet); }
+p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
+
+/* Oversikten (index.html). */
+/* Story 8.0d, PR 2: overskriften, innledningen og kortet «Slik leser du
+   tabellen» står i et rutenett, kortet til høyre, og under på smal
+   skjerm (designregler §5). */
+:where(.side-oversikt) .topp-del { display: grid; grid-template-columns: minmax(0, 1fr) 390px; gap: 36px; align-items: start;
+            margin: 0.5rem 0 40px; }
+@media (max-width: 860px) { :where(.side-oversikt) .topp-del { grid-template-columns: minmax(0, 1fr); gap: 24px; } }
+/* Svar 1: Newsreader i 72pt på den store overskriften. Det viktigste har
+   lys oransje markering fra 60 % av høyden, uten fet skrift (§4, 14.10). */
+:where(.side-oversikt) h1.overskrift { font-family: "Newsreader 72", "Newsreader", Georgia, serif; font-weight: 500; color: var(--blekk);
+                font-size: clamp(34px, 4.5vw + 16px, 52px); line-height: 1.06; letter-spacing: -0.015em;
+                margin: 0 0 0.5rem; }
+:where(.side-oversikt) p.meta { color: var(--dempet); font-size: 0.9rem; margin: 0 0 0.75rem; }
+:where(.side-oversikt) p.innledning { max-width: 560px; font-size: 17px; line-height: 1.55; color: var(--tekst); margin: 0.4rem 0; }
+:where(.side-oversikt) p.alle-sjekkene { margin: 0.75rem 0 0; }
+
+/* Kortet «Slik leser du tabellen» (beslutning 11). */
+:where(.side-oversikt) section.slik-leser { background: var(--kort); border: 1px solid var(--strek); border-radius: 16px;
+                     padding: 20px 22px; }
+/* Utdraget §3: de små overskriftene i IBM Plex Sans, ikke Newsreader. */
+:where(.side-oversikt) section.slik-leser h2 { font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 12.5px; font-weight: 700;
+                        text-transform: uppercase; letter-spacing: 0.07em; color: var(--dempet); margin: 0 0 0.75rem; }
+:where(.side-oversikt) section.slik-leser ul { list-style: none; margin: 0; padding: 0; }
+:where(.side-oversikt) section.slik-leser li { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; align-items: start;
+                        font-size: 13.5px; line-height: 1.45; color: var(--dempet); }
+:where(.side-oversikt) section.slik-leser li + li { margin-top: 14px; }
+:where(.side-oversikt) section.slik-leser strong { display: block; font-size: 15px; font-weight: 600; color: var(--blekk); }
+:where(.side-oversikt) .symbolfelt { width: 36px; height: 36px; border-radius: 10px; background: var(--bakgrunn);
+              display: flex; align-items: center; justify-content: center; gap: 1px; color: var(--tekst); }
+/* Svaret kl. 12:15 (15.10, BH20): en grønn +1 over en rød -1, med en egen
+   klasse, så regelen for .brikke i rammen ikke virker inn. */
+:where(.side-oversikt) .utslagsfelt { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+:where(.side-oversikt) .utslagsfelt span { font-size: 10px; font-weight: 700; line-height: 1; padding: 2px 4px; border-radius: 4px;
+                    color: var(--hvit); white-space: nowrap; font-variant-numeric: tabular-nums; }
+:where(.side-oversikt) .utslagsfelt .pluss { background: var(--opp); }
+:where(.side-oversikt) .utslagsfelt .minus { background: var(--ned); }
+:where(.side-oversikt) .symbolfelt .pil { font-size: 12px; font-weight: 700; }
+:where(.side-oversikt) .symbolfelt svg { width: 18px; height: 18px; }
+
+/* Story 2.9: hovedindeksen i et kort mellom innledningen og tabellen
+   (utdraget §11). Linjene brytes på smal skjerm. */
+:where(.side-oversikt) section.hovedindeks { background: var(--kort); border: 1px solid var(--strek); border-radius: 16px;
+                      padding: 18px 22px; margin: 0 0 40px; }
+:where(.side-oversikt) section.hovedindeks h2 { font-family: "Newsreader", Georgia, serif; font-size: 23px; font-weight: 600;
+                         color: var(--blekk); margin: 0 0 0.5rem; display: flex; flex-wrap: wrap;
+                         align-items: center; gap: 0.5rem; }
+:where(.side-oversikt) section.hovedindeks .indekssymbol { font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 13.5px;
+                                    font-weight: 600; color: var(--tekst); border: 1px solid var(--strek-2);
+                                    border-radius: 8px; padding: 2px 8px; }
+:where(.side-oversikt) section.hovedindeks .indekstall { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 1rem;
+                                  margin: 0 0 0.4rem; font-variant-numeric: tabular-nums; }
+:where(.side-oversikt) section.hovedindeks .indeksverdi { font-size: 28px; font-weight: 600; color: var(--blekk); }
+:where(.side-oversikt) section.hovedindeks .indeksendring { font-size: 17px; font-weight: 600; }
+:where(.side-oversikt) section.hovedindeks .indeksendring.opp { color: var(--opp); }
+:where(.side-oversikt) section.hovedindeks .indeksendring.ned { color: var(--ned); }
+:where(.side-oversikt) section.hovedindeks .indeksdato, :where(.side-oversikt) section.hovedindeks .uten, :where(.side-oversikt) section.hovedindeks .mangler-endring
+  { color: var(--dempet); font-size: 14px; }
+:where(.side-oversikt) section.hovedindeks p { margin: 0.25rem 0; color: var(--tekst); }
+
+/* Story 2.9b (FR-105): søylene under indeksen. Hver søyle får like stor
+   del av bredden, og tickeren står loddrett, så 15 søyler får plass ved
+   390 px uten fast bredde. Null står midt i feltet. */
+:where(.side-oversikt) figure.soeyler { position: relative; margin: 0.9rem 0 0; }
+:where(.side-oversikt) .soeyler .soeyletittel { font-size: 14px; color: var(--dempet); margin: 0 0 0.4rem; }
+:where(.side-oversikt) .soeyler .etiketter, :where(.side-oversikt) .soeyler .felt { display: flex; gap: 2px; }
+:where(.side-oversikt) .soeyler .etikett { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center;
+                    gap: 3px; color: var(--dempet); }
+:where(.side-oversikt) .soeyler .etikett .bransjesymbol { width: 14px; height: 14px; max-width: 100%; }
+:where(.side-oversikt) .soeyler .etikett.tre-av-tre .bransjesymbol { color: var(--gul-symbol); stroke-width: 2.4; }
+:where(.side-oversikt) .soeyler .ticker { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 11px; font-weight: 600;
+                   letter-spacing: 0.02em; color: var(--tekst); }
+:where(.side-oversikt) .soeyler .felt { position: relative; height: 140px; margin-top: 4px;
+                 background: linear-gradient(var(--strek-2), var(--strek-2)) 0 50% / 100% 1px no-repeat; }
+:where(.side-oversikt) .soeyler .spor { flex: 1 1 0; min-width: 0; position: relative; }
+:where(.side-oversikt) .soeyler .stolpe { position: absolute; left: 15%; right: 15%; border-radius: 2px; background: var(--dempet); }
+:where(.side-oversikt) .soeyler .stolpe.opp { background: var(--opp); }
+:where(.side-oversikt) .soeyler .stolpe.ned { background: var(--ned); }
+:where(.side-oversikt) .soeyler .indekslinje { position: absolute; left: 0; right: 0; margin-top: -1px;
+                        border-top: 2px dashed var(--dempet); }
+:where(.side-oversikt) .soeyler .indekslinje.opp { border-top-color: var(--opp); }
+:where(.side-oversikt) .soeyler .indekslinje.ned { border-top-color: var(--ned); }
+:where(.side-oversikt) .soeyler .forklaring, :where(.side-oversikt) .soeyler .uten-endring { font-size: 14px; color: var(--dempet); margin: 0.4rem 0 0; }
+
+/* Tabellen i et kort med svart topp. Boksen ruller sidelengs på smal
+   skjerm, så siden ikke gjør det (avvik 8). position: relative holder
+   også den skjulte teksten i cellene inne i boksen. */
+:where(.side-oversikt) .tabellboks { position: relative; overflow-x: auto; background: var(--kort); border: 1px solid var(--strek);
+              border-top-color: var(--blekk); border-radius: 16px;
+              box-shadow: 0 1px 2px rgba(22, 24, 29, 0.04), 0 10px 28px rgba(22, 24, 29, 0.05); }
+:where(.side-oversikt) table { border-collapse: collapse; width: 100%; min-width: 600px; }
+:where(.side-oversikt) th, :where(.side-oversikt) td { text-align: left; padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--strek); }
+:where(.side-oversikt) td:last-child, :where(.side-oversikt) th:last-child { padding-right: 22px; }
+:where(.side-oversikt) td:first-child, :where(.side-oversikt) th:first-child { padding-left: 22px; }
+/* Kolonneraden i blekk med navnene i hvitt. */
+:where(.side-oversikt) thead th { background: var(--blekk); color: var(--hvit); font-size: 14px; font-weight: 700; height: 64px;
+           box-sizing: border-box; border-bottom: 0; vertical-align: middle; white-space: nowrap; }
+:where(.side-oversikt) thead th .under { display: block; font-size: 12px; font-weight: 400; color: var(--kolonne-tekst-2); }
+/* Story 8.0c: overskriften staar over tallene. */
+:where(.side-oversikt) th.tall { text-align: right; }
+:where(.side-oversikt) td.tall { text-align: right; font-variant-numeric: tabular-nums; }
+:where(.side-oversikt) tbody tr:not(.del) td { background: var(--kort); }
+:where(.side-oversikt) tr.utslag td { font-weight: 600; height: 66px; box-sizing: border-box; }
+/* Designregler §3 (14.10): sterk oransje ved 3 av 3, lys ved 2 av 3. */
+:where(.side-oversikt) tr.utslag td:first-child { box-shadow: inset 4px 0 0 var(--lys-oransje); }
+:where(.side-oversikt) tr.utslag.alle td:first-child { box-shadow: inset 4px 0 0 var(--oransje); }
+:where(.side-oversikt) td.selskap { font-weight: 600; }
+/* Story 8.0: navnet ser ut som en lenke, og fokus synes. */
+:where(.side-oversikt) td.selskap a { color: inherit; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
+:where(.side-oversikt) td.selskap a:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+/* Story 8.15: navnet i kolonneraden sorterer. Vinkelen er dempet når
+   kolonnen ikke er valgt og hvit når den er det (svar 4). Fokus er den
+   oransje ringen på blekk, som «?», og klikkflaten er 44 px høy. */
+:where(.side-oversikt) .tabellboks thead a.sorter { color: inherit; text-decoration: none; display: inline-flex; align-items: center;
+                             gap: 4px; min-height: 44px; vertical-align: middle; }
+:where(.side-oversikt) .tabellboks thead a.sorter .vinkel { color: var(--kolonne-tekst-2); flex: none; }
+:where(.side-oversikt) .tabellboks thead a.sorter.valgt .vinkel { color: var(--hvit); }
+:where(.side-oversikt) .tabellboks thead a.sorter:focus-visible { outline: 3px solid var(--oransje); outline-offset: 2px; }
+/* Story 8.15b (gruppens svar 18.10 kl. 22:06): kolonnen tabellen er
+   sortert på, har et lysere felt og en oransje strek under, som på
+   designtavla. Velgeren følger aria-sort, som bare står på den sorterte
+   kolonnen, så ingen kolonne har markeringen uten sortering. Kanten er
+   gjennomsiktig og synes bare med tvungne farger (Windows med høy
+   kontrast), der nettleseren tar bort bakgrunnen og skyggen
+   (gjennomgangen av 8.15b, BH6 og ECH3). */
+:where(.side-oversikt) .tabellboks thead th[aria-sort] { background: var(--stripe-kant); box-shadow: inset 0 -3px 0 var(--oransje);
+                                  outline: 3px solid transparent; outline-offset: -3px; }
+:where(.side-oversikt) .skjult { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);
+          clip-path: inset(50%); white-space: nowrap; }
+/* Svar 5: linja over tabellen når en kolonne er valgt. */
+:where(.side-oversikt) p.sortert { margin: 0 0 0.6rem; font-size: 14px; color: var(--tekst); }
+:where(.side-oversikt) p.sortert a { color: var(--blekk); text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
+:where(.side-oversikt) td.selskap .linje { display: flex; align-items: center; gap: 4px; margin-top: 2px;
+                    font-size: 12.5px; font-weight: 400; color: var(--dempet); white-space: nowrap; }
+:where(.side-oversikt) td.selskap .bransjesymbol { width: 15px; height: 15px; }
+:where(.side-oversikt) td.selskap .hentet { display: block; font-weight: normal; color: var(--dempet); font-size: 0.8rem; }
+
+/* FR-103: tekst, symbol og farge samtidig. Teksten baerer alene hvis
+   fargen faller bort, og symbolet staar ved siden av teksten - ikke
+   i stedet for den. */
+:where(.side-oversikt) .retning { white-space: nowrap; }
+:where(.side-oversikt) .retning .symbol { margin-right: 0.35rem; font-weight: 700; }
+
+:where(.side-oversikt) .styrke { font-variant-numeric: tabular-nums; }
+/* designregler §3: ringen rundt 3 av 3, i sterk oransje (14.10). */
+:where(.side-oversikt) .pille { white-space: nowrap; padding: 0.05rem 0.45rem; border-radius: 999px; }
+/* Story 8.0e, svar 8: svart fyll og hvit tekst inne i ringen, som i
+   designforslaget. 2 av 3 faar ikke fyll. */
+:where(.side-oversikt) .pille.tre-av-tre { border: 2px solid var(--oransje); background: var(--fyll); color: var(--hvit); }
+/* Story 8.0d, PR 3: 2 av 3 er en hvit pille med tekst og kant i blekk,
+   uten ring (gruppen 14.10 kl. 19:59). 1 og 0 av 3 er tekst. */
+:where(.side-oversikt) .pille.to-av-tre { border: 1.5px solid var(--blekk); background: var(--hvit); color: var(--blekk); }
+:where(.side-oversikt) .styrketall { font-weight: 700; color: var(--tekst); white-space: nowrap; }
+:where(.side-oversikt) td.styrke .pille, :where(.side-oversikt) td.styrke .styrketall { font-size: 13px; font-weight: 700; }
+/* Brikkene står under tallet, høyrestilt som det. */
+:where(.side-oversikt) td.styrke .sjekker { justify-content: flex-end; }
+/* Båndene øverst i hver del (designregler del 5, 14.10). */
+:where(.side-oversikt) tr.del th, :where(.side-oversikt) tr.del td { font-size: 14.5px; font-weight: 700; height: 46px; box-sizing: border-box; }
+:where(.side-oversikt) tr.del.ut th { background: var(--baand-ut); color: var(--brun); border-top: 1px solid var(--baand-ut-kant);
+               border-bottom-color: var(--baand-ut-kant); }
+:where(.side-oversikt) tr.del.oevrige th { background: var(--baand-oevrige); color: var(--tekst); }
+:where(.side-oversikt) tr.del .antall { display: inline-block; min-width: 1.5em; margin-left: 0.25rem; padding: 0.1rem 0.5rem;
+                 border-radius: 999px; font-size: 12.5px; text-align: center; color: var(--hvit); }
+:where(.side-oversikt) tr.del.ut .antall { background: var(--brun); }
+:where(.side-oversikt) tr.del.oevrige .antall { background: var(--tekst); }
+:where(.side-oversikt) tr.del .bak { margin-left: 0.25rem; font-size: 13.5px; font-weight: 400; }
+:where(.side-oversikt) tr.del.ingen-utslag td { border-bottom: none; font-weight: 400; height: auto; }
+:where(.side-oversikt) p.ingen-utslag { margin: 0.6rem 0; }
+/* FR-705 med tekst, ikke bare farge (story 8.0). */
+:where(.side-oversikt) .merke { display: block; font-size: 0.75rem; font-weight: 600; }
+:where(.side-oversikt) .merke.skjult { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);
+                clip-path: inset(50%); white-space: nowrap; }
+:where(.side-oversikt) .mangler { color: var(--dempet); font-style: italic; font-size: 0.85rem; }
+:where(.side-oversikt) .merke.mangler { font-weight: normal; }
+
+/* Aksjesiden (aksje.html). */
+/* Story 8.0: like tydelig som lenken fra oversikten. Story 8.0d, PR 3:
+   teksten er «Markedsoversikt», uten pil (del C). */
+:where(.side-aksje) a.tilbake { color: inherit; font-size: 0.9rem; text-decoration: underline; }
+:where(.side-aksje) a.tilbake:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+
+/* Story 8.16b: merket når siden viser en tidligere dag, med fargene til
+   merkene over h1. */
+:where(.side-aksje) p.tidligere-dag { margin: 1rem 0 0; padding: 8px 12px; border-radius: 8px; background: var(--hvit);
+                  border: 1px solid var(--strek-2); color: var(--tekst); font-size: 0.95rem; }
+:where(.side-aksje) p.tidligere-dag a { color: inherit; text-decoration: underline; }
+:where(.side-aksje) p.tidligere-dag a:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+
+/* Story 8.0d, PR 3: merkene for ticker og bransje over h1 (utdraget §6). */
+:where(.side-aksje) .merkene { display: flex; gap: 8px; flex-wrap: wrap; margin: 1.2rem 0 0.8rem; }
+:where(.side-aksje) .merkene .merke { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px;
+                  box-sizing: border-box; border-radius: 8px; background: var(--hvit);
+                  border: 1px solid var(--strek-2); font-size: 13.5px; font-weight: 600; color: var(--tekst); }
+:where(.side-aksje) .merkene .bransjesymbol { width: 15px; height: 15px; }
+/* Overskriften i 72pt med lys oransje markering under «skilte seg ut
+   <ukedag>» (designregler §3, 14.10). Ikke fet. */
+:where(.side-aksje) h1.overskrift { font-family: "Newsreader 72", "Newsreader", Georgia, serif; font-weight: 500; color: var(--blekk);
+                font-size: clamp(34px, 4.5vw + 16px, 56px); line-height: 1.1; margin: 0 0 0.5rem; }
+:where(.side-aksje) p.meta { color: var(--dempet); font-size: 0.9rem; margin-top: 0; }
+
+/* Nøkkeltallene: fire hvite kort på rad, 2 og 2 på smal skjerm. */
+:where(.side-aksje) .sammendrag { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin: 1.5rem 0 0; }
+@media (max-width: 760px) { :where(.side-aksje) .sammendrag { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+:where(.side-aksje) .noekkeltall { background: var(--kort); border: 1px solid var(--strek); border-radius: 16px;
+               padding: 18px 20px; min-height: 136px; box-sizing: border-box;
+               display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+:where(.side-aksje) .noekkeltall .etikett { color: var(--dempet); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+:where(.side-aksje) .noekkeltall .verdi { font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.15; }
+:where(.side-aksje) .noekkeltall .verdi .av { font-size: 15px; font-weight: 500; color: var(--dempet); }
+:where(.side-aksje) .noekkeltall .forklaring { margin-top: auto; color: var(--dempet); font-size: 12.5px; }
+
+:where(.side-aksje) h2 { font-size: 36px; margin: 60px 0 16px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* De 3 sjekkene som kort side om side (utdraget §8), under hverandre på
+   smal skjerm. */
+:where(.side-aksje) .sjekkort-rad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 860px) { :where(.side-aksje) .sjekkort-rad { grid-template-columns: minmax(0, 1fr); } }
+:where(.side-aksje) .sjekkort { background: var(--kort); border: 1px solid var(--strek); border-radius: 16px; padding: 20px 22px;
+            display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+:where(.side-aksje) .sjekkort .topp { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+                  color: var(--dempet); font-size: 13px; font-weight: 600; }
+:where(.side-aksje) .sjekkort .ga { display: inline-flex; align-items: center; gap: 4px; }
+:where(.side-aksje) .sjekkort .resultat { display: inline-flex; align-items: center; gap: 4px; height: 26px; padding: 0 10px;
+                      border-radius: 999px; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+:where(.side-aksje) .sjekkort .resultat .ord { font-weight: 600; }
+:where(.side-aksje) .sjekkort .resultat.opp { background: var(--opp-bakgrunn); color: var(--opp); }
+:where(.side-aksje) .sjekkort .resultat.ned { background: var(--ned-bakgrunn); color: var(--ned); }
+:where(.side-aksje) .sjekkort .resultat.ingen { background: var(--ingen-bakgrunn); color: var(--dempet); }
+:where(.side-aksje) .sjekkort h3 { font-family: "Newsreader", Georgia, serif; font-size: 30px; font-weight: 600; margin: 0;
+               display: flex; align-items: center; gap: 6px; }
+:where(.side-aksje) .sjekkort .maaler, :where(.side-aksje) .sjekkort .regel { color: var(--tekst); font-size: 13.5px; margin: 0; }
+:where(.side-aksje) .sjekkort .regel { color: var(--dempet); margin-top: auto; }
+:where(.side-aksje) .sjekkort .maalt { color: var(--dempet); font-size: 12.5px; font-weight: 600; margin: 4px 0 0;
+                   display: flex; align-items: center; gap: 4px; }
+:where(.side-aksje) .sjekkort .regnestykke { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; margin: 0; }
+/* Det grå feltet: sporet, feltet der sjekken gir 0, og prikken. */
+:where(.side-aksje) .skala { position: relative; height: 54px; margin: 4px 10px; }
+:where(.side-aksje) .skala .spor { position: absolute; left: 0; right: 0; top: 22px; height: 10px; border-radius: 999px; background: var(--spor); }
+:where(.side-aksje) .skala .felt { position: absolute; top: 22px; height: 10px; background: var(--felt); }
+:where(.side-aksje) .skala .grense { position: absolute; top: 0; font-size: 11.5px; color: var(--dempet); transform: translateX(-50%); white-space: nowrap; }
+:where(.side-aksje) .skala .gir-null { position: absolute; top: 36px; font-size: 11.5px; font-weight: 600; color: var(--dempet);
+                   transform: translateX(-50%); white-space: nowrap; }
+:where(.side-aksje) .skala .prikk { position: absolute; top: 17px; width: 20px; height: 20px; border-radius: 50%; box-sizing: border-box;
+                border: 3px solid var(--hvit); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25); transform: translateX(-50%); }
+:where(.side-aksje) .skala .prikk.opp { background: var(--opp); }
+:where(.side-aksje) .skala .prikk.ned { background: var(--ned); }
+:where(.side-aksje) .skala .prikk.ingen { background: var(--dempet-2); }
+
+/* Kursgrafen (utdraget §8): kurslinja 2,5 px, snittet 1,75 px og
+   heltrukket, og navnene ved enden av linjene (svar 19). */
+:where(.side-aksje) figure { margin: 0; background: var(--kort); border: 1px solid var(--strek); border-radius: 16px; padding: 20px 22px; }
+:where(.side-aksje) svg.graf { width: 100%; height: auto; display: block; }
+:where(.side-aksje) .rute { stroke: var(--rutenett); stroke-width: 1; }
+:where(.side-aksje) .rutetekst { fill: var(--dempet); font-size: 12px; }
+/* Story 10.3: KI-teksten under regelforklaringen, som et tillegg. */
+:where(.side-aksje) .ki { margin: 18px 0 8px; padding: 14px 16px; border: 1px solid var(--strek-2); border-radius: 8px; }
+:where(.side-aksje) .ki h2 { margin: 0 0 6px; font-size: 16px; }
+:where(.side-aksje) .ki .merke-ki { color: var(--dempet); font-size: 13px; margin: 0 0 8px; }
+:where(.side-aksje) .ki p.ki-tekst { margin: 0; }
+:where(.side-aksje) .ki .uten { color: var(--dempet); margin: 0; }
+:where(.side-aksje) .ki-bryter { margin: 10px 0 0; }
+:where(.side-aksje) .ki-bryter button { font: inherit; font-size: 13.5px; padding: 6px 10px; min-height: 36px;
+                    border: 1px solid var(--strek-2); border-radius: 6px; background: transparent;
+                    color: var(--tekst); cursor: pointer; }
+:where(.side-aksje) .ki-bryter button:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+:where(.side-aksje) .maanedsstrek { stroke: var(--strek-2); stroke-width: 1; }
+:where(.side-aksje) .maanedstekst { fill: var(--dempet); font-size: 12px; }
+:where(.side-aksje) .kurslinje { fill: none; stroke: var(--kurs); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+:where(.side-aksje) .ma50linje { fill: none; stroke: var(--snitt); stroke-width: 1.75; }
+/* Story 2.9c: hovedindeksen, stiplet. Stiplet brukes bare for indeksen
+   (designregler §5). */
+:where(.side-aksje) .indekslinje { fill: none; stroke: var(--dempet); stroke-width: 1.5; stroke-dasharray: 6 4; }
+:where(.side-aksje) .sistepunkt { fill: var(--kurs); stroke: var(--hvit); stroke-width: 2; }
+/* En hvit kant rundt navnene, så de leses der linjene krysser. */
+:where(.side-aksje) .linjenavn { font-size: 12px; font-weight: 600; paint-order: stroke; stroke: var(--hvit); stroke-width: 4px; stroke-linejoin: round; }
+:where(.side-aksje) .linjenavn.kurs { fill: var(--kurs); }
+:where(.side-aksje) .linjenavn.snitt { fill: var(--snitt); }
+:where(.side-aksje) figcaption { color: var(--dempet); font-size: 0.85rem; margin-top: 0.6rem; }
+
+:where(.side-aksje) .mangler { color: var(--dempet); font-style: italic; }
+/* Story 8.16: dagen som er merket i grafen. Periodevalget står over. */
+:where(.side-aksje) .dagstrek { stroke: var(--blekk); stroke-width: 1.5; }
+:where(.side-aksje) .dagpunkt { fill: var(--hvit); stroke: var(--blekk); stroke-width: 2.5; }
+:where(.side-aksje) p.dagen { margin: 0 0 12px; }
+
+/* Feilsiden (basefeil.html). */
+/* Story 8.0d: meldingen i et kort, i rammen som de andre sidene. */
+:where(.side-feil) .kort { background: var(--kort); border: 1px solid var(--strek); border-radius: 16px; padding: 18px 22px; }

@@ -22,6 +22,7 @@ i. Kan basen ikke aapnes eller leses, svarer siden 503 med feiltypen, uten
 stier. Bare de to rutene roerer basen.
 """
 
+import hashlib
 import os
 import re
 import sqlite3
@@ -128,6 +129,8 @@ def demokommando() -> str:
 BASEFEIL = (sqlite3.Error, OSError, MigrasjonsFeil, RuntimeError)
 
 app = Flask(__name__)
+# Story 2.7a: all stilen paa sidene, lenket fra _ramme.html.
+STILARK = Path(app.static_folder) / "stil.css"
 # Story 8.0c: datoene og tidspunktene med aar bare naar aaret er et annet
 # enn i dag. I dag kommer fra idag(), saa testene styrer det.
 app.jinja_env.filters["norsk_tid"] = lambda tid: norsk_tid(tid, idag().year)
@@ -245,6 +248,20 @@ EKSEMPELTALL_MERKE = "Eksempeltall: oppdiktede selskaper og kurser, ikke data fr
 # ved innleveringen.
 UNDER_ARBEID = True
 UNDER_ARBEID_TEKST = "Appen er under utvikling og ikke ferdig."
+
+
+@app.context_processor
+def _stilark():
+    """Story 2.7a: adressen til stilarket, med de foerste 16 tegnene av sha256
+    av fila. Regnes ved hver side, saa en endret fil gir ny adresse uten
+    omstart, og nettleseren aldri bruker en gammel utgave. Kan fila ikke
+    leses, staar lenken uten avtrykk, saa siden og feilsiden likevel vises
+    (gjennomgangen, BH3)."""
+    try:
+        avtrykk = hashlib.sha256(STILARK.read_bytes()).hexdigest()[:16]
+    except OSError:
+        return {"stilark": f"/static/{STILARK.name}"}
+    return {"stilark": f"/static/{STILARK.name}?v={avtrykk}"}
 
 
 @app.context_processor

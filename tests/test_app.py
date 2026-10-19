@@ -937,8 +937,59 @@ def _tabell(html: str) -> _Tabell:
     return tabell
 
 
+STATIC = Path(__file__).resolve().parent.parent / "src" / "static"
+# Story 2.7a: lenken til stilarket i _ramme.html, med avtrykket av fila.
+STILLENKE = re.compile(r'<link rel="stylesheet" href="/static/([a-z]+\.css)\?v=([0-9a-f]{16})">')
+
+
+def _uten_andre_sider(css: str, side: str) -> str:
+    """Stilarket uten reglene som er avgrenset til en annen side, ogsaa inne i
+    @media. Kommentarene staar, og resten er uendret."""
+    ut, i = [], 0
+    while i < len(css):
+        if css.startswith("/*", i):
+            j = css.index("*/", i) + 2
+            ut.append(css[i:j])
+            i = j
+            continue
+        if css[i].isspace():
+            ut.append(css[i])
+            i += 1
+            continue
+        j = css.index("{", i)
+        velger = css[i:j]
+        if velger.startswith("@"):
+            dybde, k = 1, j + 1
+            while dybde:
+                dybde += {"{": 1, "}": -1}.get(css[k], 0)
+                k += 1
+            if velger.startswith("@media"):
+                ut.append(velger + "{" + _uten_andre_sider(css[j + 1 : k - 1], side) + "}")
+            else:
+                ut.append(css[i:k])
+            i = k
+            continue
+        k = css.index("}", j) + 1
+        andre = set(re.findall(r":where\(\.(side-[a-z]+)\)", velger)) - {side}
+        if not andre:
+            ut.append(css[i:k])
+        i = k
+    return "".join(ut)
+
+
 def _stil(html: str) -> str:
-    return html[html.index("<style>") : html.index("</style>")]
+    """Stilen som gjelder siden. Story 2.7a: den staar i stilarket siden
+    lenker til, ikke i <style>. Reglene som er avgrenset til en annen side
+    (klassen paa <body>), er tatt bort, og avgrensningen til siden selv
+    er tatt av velgerne, saa testene stiller de samme kravene til hver side
+    som da stilen sto i siden."""
+    treff = STILLENKE.search(html)
+    assert treff, "siden lenker ikke til stilarket"
+    side = re.search(r'<body class="(side-[a-z]+)">', html)
+    assert side, "<body> har ikke klassen til siden"
+    css = _uten_andre_sider((STATIC / treff.group(1)).read_text(encoding="utf-8"), side.group(1))
+    # Velgerne står som de sto i siden, uten avgrensningen.
+    return css.replace(f":where(.{side.group(1)}) ", "")
 
 
 def _regel(stil: str, velger: str) -> str:
@@ -2449,7 +2500,7 @@ class TestStory80dAksjesiden:
             if "dasharray" in innhold or "dashed" in innhold
         ]
         assert stiplet == [".indekslinje"], stiplet
-        assert "stroke-dasharray" not in html.split("</style>", 1)[1]
+        assert "stroke-dasharray" not in html.split("</head>", 1)[1]
         assert "stroke-width: 1.75" in _regel(stil, ".ma50linje")
         assert "stroke-width: 2.5" in _regel(stil, ".kurslinje")
         assert "tegnforklaring" not in html
@@ -2977,7 +3028,7 @@ class TestIndekslinjaPaaAksjesiden:
         """Ville feilet hvis en linje ble tegnet uten indeks (mutant C3)."""
         self._aksjen()
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
-        assert 'class="indekslinje"' not in html.split("</style>", 1)[1]
+        assert 'class="indekslinje"' not in html.split("</head>", 1)[1]
         assert "Hovedindeksen mangler for perioden, så den er ikke tegnet." in _synlig(html)
         assert "stiplede" not in re.search(r'<svg class="graf"[^>]*aria-label="([^"]*)"', html).group(1)
 

@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-10-19T00:11
+updated: 2026-10-19T13:55
 ---
 
 # Designregler
@@ -169,6 +169,8 @@ Ord kan endres rett i tavla. I appen samles hjelpetekstene i én fil (8.0b).
 - Kurs `#1F4E8C`. Snitt `#9A5A0E`, både streken og navnet (5,46:1 mot hvitt).
 - Det grå feltet: sporet `#F1EFEA` og feltet `#8A847A` (3,23:1).
 - I stripa: tekst `#DADDE2`, `#C9CCD2` og `#A9AEB8`, og kantene `#3A3E47` og `#2A2E36`. Under kolonnenavnene: `#B9BDC5`.
+
+*Lagt til 2026-10-19 (story 2.7a, gruppens svar kl. 12:06):* all stilen står i én fil, `src/static/stil.css`, lenket fra `_ramme.html` med et avtrykk av fila i adressen. Fargene står som navn i `:root` der og ingen andre steder. Reglene for én side er avgrenset med klassen på `<body>` (`side-oversikt`, `side-aksje` og `side-feil`), og ingen mal har `<style>`.
 
 **Kontrast.** Tekst har minst 4,5:1 mot bakgrunnen den står på. Streker, felt og fokus som må ses for å forstå siden, har minst 3:1 (WCAG 1.4.11). En test regner det ut fra fargene i stilen. Retningsfargene er nesten like lyse, så retningen står alltid med ord og symbol (§4).
 

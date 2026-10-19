@@ -7,30 +7,6 @@
     vises, adresse er siden lenkene går til, og dag er dagen for «Velg dag».
     Den valgte knappen har aria-current, og fokus er synlig. -#}
 
-{% macro periodestil() -%}
-    /* Story 8.16: knappene bryter linja på smale skjermer (390 px), så
-       siden ikke ruller sidelengs. */
-    nav.periodevalg { margin: 0 0 12px; }
-    nav.periodevalg ul { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0; padding: 0; }
-    nav.periodevalg li { margin: 0; }
-    nav.periodevalg a, nav.periodevalg button {
-      display: inline-block; font: inherit; font-size: 14px; line-height: 1.2;
-      padding: 7px 12px; min-height: 32px; border: 1px solid var(--strek); border-radius: 999px;
-      color: var(--blekk); background: var(--kort); text-decoration: none; cursor: pointer;
-    }
-    nav.periodevalg [aria-current] { color: var(--hvit); background: var(--blekk); border-color: var(--blekk); font-weight: 600; }
-    nav.periodevalg a:focus-visible, nav.periodevalg button:focus-visible, nav.periodevalg input:focus-visible {
-      outline: 3px solid var(--blekk); outline-offset: 2px;
-    }
-    nav.periodevalg form { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; }
-    nav.periodevalg input[type="date"] {
-      font: inherit; font-size: 14px; padding: 5px 8px; min-height: 32px; max-width: 100%;
-      border: 1px solid var(--strek); border-radius: 8px; background: var(--kort); color: var(--blekk);
-    }
-    .periodebeskjed { margin: 0 0 12px; color: var(--tekst); }
-    nav.periodevalg .skjult { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-{%- endmacro %}
-
 {% macro periodevalg(knapper, valgt, adresse, dag=None, minst=None, maks=None, etikett="Periode") -%}
 <nav class="periodevalg" aria-label="{{ etikett }}">
   <ul>

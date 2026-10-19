@@ -1,28 +1,6 @@
 {#- Story 8.0d, PR 3: T, B og I som brikker, og retningen i en pille, likt i
     oversikten og på aksjesiden (utdraget §6, designregler del 5). Teksten
     «T +1» står i brikken, så det som leses opp, er det samme som før. -#}
-{% macro brikkestil() %}
-    .sjekker { display: flex; gap: 3px; margin-top: 4px; font-weight: 700; white-space: nowrap; }
-    .brikke { display: inline-flex; align-items: center; justify-content: center; gap: 3px;
-              min-width: 34px; height: 24px; padding: 0 5px; box-sizing: border-box; border-radius: 6px;
-              font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; border: 1.5px solid transparent; }
-    .brikke abbr { text-decoration: none; }
-    .brikke.pluss { background: var(--opp); color: var(--hvit); border-color: var(--opp); }
-    .brikke.minus { background: var(--ned); color: var(--hvit); border-color: var(--ned); }
-    .brikke.null { background: var(--hvit); color: var(--dempet-2); border-color: var(--strek-2); }
-    .stor .brikke { min-width: 36px; height: 26px; font-size: 12.5px; }
-    /* Retningen i en pille med symbolet først. «Ukjent» står som tekst
-       uten pille (svar 6). */
-    .retningspille { display: inline-flex; align-items: center; gap: 0.35rem; height: 28px; padding: 0 12px;
-                     box-sizing: border-box; border-radius: 999px; font-size: 14px; font-weight: 600; white-space: nowrap; }
-    .retningspille .symbol { font-weight: 700; }
-    .retningspille.opp { background: var(--opp-bakgrunn); color: var(--opp); }
-    .retningspille.ned { background: var(--ned-bakgrunn); color: var(--ned); }
-    .retningspille.blandet { background: var(--blandet-bakgrunn); color: var(--blandet); }
-    .retningspille.ingen { background: var(--ingen-bakgrunn); color: var(--dempet); }
-    .retningstekst.ukjent { color: var(--dempet); white-space: nowrap; }
-{% endmacro %}
-
 {% macro brikker(sjekker, stor=false) -%}
 <span class="sjekker{% if stor %} stor{% endif %}">{% for bokstav, navn, verdi in sjekker %}<span class="sjekk brikke {{ 'pluss' if verdi == '+1' else 'minus' if verdi == '-1' else 'null' }}"><abbr title="{{ navn }}">{{ bokstav }}</abbr> {{ verdi }}</span>{% if not loop.last %} {% endif %}{% endfor %}</span>
 {%- endmacro %}
