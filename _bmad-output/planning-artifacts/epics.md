@@ -521,6 +521,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-18 kl. 00:20 (gruppens svar):* et skjermbilde av oversikten i demoen kommer øverst i README-en igjen etter 3.4b, i en README-PR som stopper før flettingen (snur 16.10 kl. 21:38); arkitekturdokumentet oppdateres søndag etter 3.4b, med en test som krever at hver modul i `src/` står der, og `meldinger.py` tas bort med testene (story 9.9); de lange funksjonene i `fetch_prices.py` deles opp lørdag 24.10, uten endret oppførsel (story 9.10).
 
+*Endret 2026-10-19 (gruppens svar 18.10 kl. 23:03, spesifikasjonen 3.3f):* bildet av oversikten står ikke lenger under «Til faglærer», men bak en knapp rett under beskrivelsen, sammen med de andre bildene av appen, i en egen mappe for bilder og video.
+
 *Avgjort 2026-10-18 kl. 00:39 (gruppens svar):* etter søndagens arbeid kommer først det briefen v8 lover i v1: historikken (2.7), bryteren for KI-teksten på siden (8.10 og 8.10b), lenken til selskapets egen nettside (10.5) og egne nøkler (10.7). 8.16 og 8.17, 10.6, 2.11 og 2.12 kommer etter, siden briefen ikke nevner dem. Promptene fra 15.–23.09 føres inn denne uka som dagsfiler, merket som satt sammen i etterkant fra samtalene, uten nøkler, kurser eller andre navn enn medlemmene.
 
 *Avgjort 2026-10-18 kl. 11:20 (gruppens svar):* spørsmålet kl. 00:39 bygde på en feil fra rådet. Bryteren for KI-teksten finnes alt på aksjesiden («Vis KI-teksten», FR-601), så briefens av/på-bryter er bygget, og 8.10 og 8.10b er ikke et løfte i briefen. De kommer etter 2.7, 10.5 og 10.7, og før 8.16 og 8.17, 10.6, 2.11 og 2.12. «Min liste» i briefen er story 8.3, som bygges i dag. 8.17 er periodevalget i oversikten, Min liste og børsometeret, og det nevner ikke briefen. En video av demoen, under 2 minutter og 5 MB, tas opp med nettlesertestene neste uke og lenkes fra README-en.
@@ -538,6 +540,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 *Avgjort 2026-10-18 kl. 21:46, 21:49 og 21:50 (gruppens svar):* 8.16 bygges i kveld etter PR #70 og 10.2d, og 8.17 flyttes ikke. Grafen får alle åtte knappene i `designregler.md` §2, som PRD-en sier (FR-201). «I går» (siste børsdag) og «Velg dag» viser 6 mnd fram til dagen, med dagen merket, endringen den dagen og signalet som er lagret for den.
 
 *Avgjort 2026-10-18 kl. 22:06 (gruppens svar):* Selskap kan sorteres A til Å, og kolonnen tabellen er sortert på, får et lysere felt og en oransje strek under, som på designtavla, i en liten PR etter 8.16 i kveld (spesifikasjonen 8.15b). Grunnen: tavla har sorteringsmerket på Selskap, og i appen skiller bare fargen på vinkelen den sorterte kolonnen fra de andre.
+
+*Avgjort 2026-10-18 kl. 23:03 (gruppens svar):* bildene av appen står bak en knapp rett under beskrivelsen, i en egen mappe for bilder og video, fordi appen endres hele tiden; de endelige bildene og videoen legges inn før innleveringen (spesifikasjonen 3.3f). Det endrer plassen fra svaret 18.10 kl. 00:20 og svar 4 i spesifikasjonen for 3.4 (11.10) om at bildene bare ligger i `docs/bilder/readme/`.
 
 *Avgjort 2026-10-19 kl. 00:00 (gruppens svar):* når en dag er valgt med «Velg dag», viser hele aksjesiden den dagen: kortene øverst, «Hvorfor signalet ble», KI-teksten og grafen, lest fra det som er lagret for dagen, med et merke øverst og en lenke tilbake til siste børsdag (spesifikasjonen 8.16b). Grunnen: etter 8.16 viste toppen siste børsdag og linja over grafen den valgte dagen, to ulike signaler på samme side. Det utvider svaret 18.10 kl. 21:50.
 
@@ -2044,6 +2048,8 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 *Avgjort 2026-10-18 kl. 21:42 (gruppens svar):* bildet av oversikten tas høyere, så hele gruppen «Skilte seg ut» i tabellen er med, og PR #70 flettes etter det. Grunnen: i 1280 × 1000 slutter bildet der tabellen begynner, så signalstyrken og fargene per aksje er ikke med.
 
 *Lagt til 2026-10-18 kl. 22:09:* bildet av oversikten, uv i «Tester» og variablene i `.env` er flettet i `c5464e7`, PR #70 (spesifikasjonen `spec-3-3e-bildet-uv-og-variablene.md`). Bildet er tilbake under «Til faglærer», 1280 × 1573 px, til bunnen av «Skilte seg ut». «Tester» har installasjonen av uv for Windows og Mac og tiden for testene, og «Mer for den som vil» har tabellen over variablene.
+
+*Avgjort 2026-10-18 kl. 23:03 (gruppens svar):* bildene av appen står bak en knapp rett under beskrivelsen, i en egen mappe for bilder og video, fordi appen endres hele tiden; de endelige bildene og videoen legges inn før innleveringen (spesifikasjonen 3.3f). Det endrer plassen fra svaret 18.10 kl. 00:20 og svar 4 i spesifikasjonen for 3.4 (11.10) om at bildene bare ligger i `docs/bilder/readme/`.
 
 ### Story 3.4: Demoversjonen
 

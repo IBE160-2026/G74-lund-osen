@@ -126,6 +126,8 @@ Fra instruksjonen kl. 16:54 i `docs/ai-prompts/2026-10-11.md` (planen) og kl. 20
 4. Ingen bilder nå. Forbudet fra 3.3 og `test_ingen_bilder_utenom_ci_merket` står. Bilder kan tas inn senere, tidligst bildet av demosiden etter 8.0d, og da bare fra `docs/bilder/readme/`, med alt-tekst, og aldri av den ekte versjonen. Marian bekrefter «Engine running», «Pakk ut alle», «Windows PowerShell» og om en sti med mellomrom får anførselstegn, før gjennomgangen.
 5. Flettes før PR #28 og 8.0b: i kveld hvis den er klar og kontrollert, ellers mandag på dagtid. Aldri mellom kl. 21:40 og slutten av hentingen.
 
+*Endret 2026-10-19 (gruppens svar 18.10 kl. 23:03, spesifikasjonen 3.3f):* svar 4 om at bildene bare ligger i `docs/bilder/readme/` gjelder bildene i «Kom i gang». Bildene av appen, bare av demoen, ligger i `docs/appen/`, bak en knapp rett under beskrivelsen i README-en.
+
 **Marians ønske kl. 17:08:** «Før du begynner» øverst. Hvert steg begynner med det man skal gjøre, i én kort setning, og sier så hva man ser når det har gått bra. «Hvis noe går galt» blir en kort FAQ rett etter stegene, og steg 1, 2 og 6 peker dit.
 
 **Boundaries for PR 3:**
