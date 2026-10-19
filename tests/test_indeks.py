@@ -98,11 +98,12 @@ def lager(request, tmp_path):
 
 
 class TestMigrasjonen:
-    def test_0006_fra_tom_base(self):
-        """Ville feilet hvis 0006 manglet, eller ikke la til begge tabellene."""
+    def test_0006_fra_tom_base(self, tmp_path):
+        """Ville feilet hvis 0006 manglet, eller ikke la til begge tabellene.
+        Story 8.3: katalogen til og med 0006, fordi 0007 legger til min_liste."""
         tilkobling = sqlite3.connect(":memory:")
         try:
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 6 == siste_versjon(MIGRASJONSKATALOG)
+            assert migrer(tilkobling, katalog_til(tmp_path, 6)) == 6 < siste_versjon(MIGRASJONSKATALOG)
             assert tabeller(tilkobling) == TABELLENE_FOER_0006 | {"indeks", "indeksserie"}
             assert [k[1] for k in tilkobling.execute("PRAGMA table_info(indeks)")] == [
                 "symbol",
@@ -125,7 +126,8 @@ class TestMigrasjonen:
             tilkobling.execute("INSERT INTO kurs VALUES ('EQNR', '2026-10-16', 1.0, 1.0, 10)")
             foer_skjema = {r for r in tilkobling.execute("SELECT type, name, sql FROM sqlite_master")}
             foer_kurs = tilkobling.execute("SELECT * FROM kurs").fetchall()
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 6
+            # Story 8.3: til og med 0006, fordi 0007 legger til min_liste.
+            assert migrer(tilkobling, katalog_til(tmp_path, 6)) == 6
             assert versjon(tilkobling) == 6
             etter_skjema = {r for r in tilkobling.execute("SELECT type, name, sql FROM sqlite_master")}
             assert {r[1] for r in etter_skjema - foer_skjema} == {

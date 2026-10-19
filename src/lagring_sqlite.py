@@ -1,5 +1,6 @@
 """SQLite-adapterne for kursdata, vurderinger og KI-loggen - story 1.3, 1.6
-og 4.3, FR-406, FR-408, FR-604, AD-4, AD-5 og AD-7.
+og 4.3, FR-406, FR-408, FR-604, AD-4, AD-5 og AD-7. Story 8.3: merkingen i
+Min liste (SqliteMinlistelager).
 
 Skall: dette er en av filene som kjenner teknologi. Kjernen ser bare
 portene, Kurslager med Kursrad og Vurderingslager med Vurdering og Grunn.
@@ -31,6 +32,7 @@ from kilogg import AKSJE, Emne, IkkeInnevaerendeBoersdag, KIRad
 from kursdata import AKSJEUNIVERS, Aksje, Kursrad, kontroller_skriving
 from lagring_fil import DATA_KATALOG
 from migrering import MigrasjonsFeil, migrer, siste_versjon, versjon
+from minliste import UkjentAksje, kontroller_symbol
 from oversiktsdata import Oversiktspost
 from vurderingsdata import Grunn, Vurdering
 
@@ -606,6 +608,58 @@ class SqliteKILogg:
 
     def les_alle(self) -> list[KIRad]:
         return [_kirad(rad) for rad in self._tilkobling.execute(_KI_LES + "ORDER BY dato, nr")]
+
+
+class SqliteMinlistelager:
+    """Minlistelager i SQLite, tabellen min_liste fra 0007 - story 8.3, AD-3,
+    AD-10, AD-16.
+
+    Samme kontrakt som MinneMinlistelager. Lista er aksje i basen, saa
+    demobasen og den ekte har hver sin (merknaden 2026-10-03 under AD-21).
+    Webserveren er eneste skriver, og den skriver bare denne tabellen. Et
+    symbol som ikke staar i aksje, avvises her foer noe skrives, og av
+    triggeren i 0007 hvis noe annet proever.
+    """
+
+    def __init__(self, tilkobling: sqlite3.Connection):
+        _krev_siste_versjon(tilkobling)
+        self._tilkobling = tilkobling
+
+    def merkede(self) -> frozenset[str]:
+        return frozenset(
+            s
+            for (s,) in self._tilkobling.execute("SELECT m.symbol FROM min_liste m JOIN aksje a ON a.symbol = m.symbol")
+        )
+
+    def merk(self, symbol: str) -> None:
+        self._skriv(symbol, "INSERT INTO min_liste (symbol) VALUES (?) ON CONFLICT (symbol) DO NOTHING")
+
+    def fjern(self, symbol: str) -> None:
+        self._skriv(symbol, "DELETE FROM min_liste WHERE symbol = ?")
+
+    def _symboler(self) -> list[str]:
+        return [s for (s,) in self._tilkobling.execute("SELECT symbol FROM aksje")]
+
+    def _skriv(self, symbol: str, sql: str) -> None:
+        kontroller_symbol(symbol, self._symboler())
+        if self._tilkobling.in_transaction:
+            raise RuntimeError(
+                "Tilkoblingen har en aapen transaksjon. Adapteren styrer transaksjonen selv - avslutt kallerens foerst."
+            )
+        try:
+            self._tilkobling.execute("BEGIN")
+            self._tilkobling.execute(sql, (symbol,))
+            self._tilkobling.execute("COMMIT")
+        except sqlite3.IntegrityError as feil:
+            self._rull_tilbake()
+            raise UkjentAksje(f"{symbol!r} ble avvist av basen: {feil}") from feil
+        except BaseException:
+            self._rull_tilbake()
+            raise
+
+    def _rull_tilbake(self) -> None:
+        if self._tilkobling.in_transaction:
+            self._tilkobling.execute("ROLLBACK")
 
 
 def andre_aksjer_har_ki_rad(tilkobling: sqlite3.Connection, dato: date, symbol: str) -> bool:

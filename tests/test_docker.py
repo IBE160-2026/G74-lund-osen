@@ -923,6 +923,8 @@ FILENE_BAK_AKSJESIDEN = (
     # skjemaet demobasen lages med.
     "src/lagring_sqlite.py",
     "src/migrering.py",
+    # Story 8.3: porten for Min liste, som lagring_sqlite importerer.
+    "src/minliste.py",
     *sorted(p.relative_to(ROT).as_posix() for p in (ROT / "src" / "migrasjoner").glob("*.sql")),
 )
 # Moduler appen og demoen importerer, men som ikke lager noe aksjesiden viser:

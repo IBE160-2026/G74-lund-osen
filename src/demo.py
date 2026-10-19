@@ -48,6 +48,11 @@ dagen, saa indeksen foelger demoaksjene. Den har en rad for hver demodag og
 lagres med SqliteIndekslager i tabellen indeks, ikke i aksje eller kurs, saa
 «x av N» ikke teller den. Volumet er summen av volumet for aksjene med kurs.
 
+Min liste (story 8.3, gruppens svar 19.10 kl. 10:29): demoen starter med
+fem merket, MERKET_I_DEMOEN, tre fra «Skilte seg ut» og to fra «Øvrige
+aksjer» paa SLUTTDATO, saa begge delene av tabellen synes i lista. Den ekte
+basen starter med en tom liste.
+
 KI-tekstene (story 3.4b): radene for siste demodag ligger ferdige i
 src/demo_ki_tekster.json, laget én gang med Gemma (demo_ki.py). Kommandoen
 leser fila og skriver radene i KI-loggen med klokka stilt paa SLUTTDATO, saa
@@ -76,6 +81,7 @@ from lagring_sqlite import (
     DEMOMERKE,
     SqliteIndekslager,
     SqliteKurslager,
+    SqliteMinlistelager,
     SqliteVurderingslager,
     aapne_base,
     les_merket,
@@ -125,6 +131,10 @@ INDEKS_START = 1400.0
 NYLIG_NOTERT = "VRDS"
 UTEN_KURSER = "MTFJ"
 SKILLER_SEG_UT = "BRFE"
+
+# Story 8.3: de fem som er merket i Min liste naar demoen starter. BRFE, KVST
+# og NLYS skiller seg ut paa SLUTTDATO, LSTF og SGNT er blant de oevrige.
+MERKET_I_DEMOEN = ("BRFE", "KVST", "NLYS", "LSTF", "SGNT")
 
 # Siste dag for tre aksjer: (endring fra sluttkursen dagen foer, volumet som
 # faktor av volumnivaaet i START). Regelen staar i modulens docstring.
@@ -337,6 +347,11 @@ def _bygg(sti: Path, radene: list | None = None) -> None:
             for aksje in DEMOUNIVERS:
                 fram_til = [r for r in serier[aksje.symbol] if r.dato <= dag]
                 lager.skriv(aksje.symbol, dag, vurder(fram_til, dag))
+
+        # Story 8.3: fem merket i Min liste, gjennom porten webserveren bruker.
+        minliste = SqliteMinlistelager(tilkobling)
+        for symbol in MERKET_I_DEMOEN:
+            minliste.merk(symbol)
 
         # Story 3.4b: KI-radene for siste demodag, fra fila. Alle skal skrives
         # (gjennomgangen, BH3): sjekk_radene har sett at hver aksje har én.
