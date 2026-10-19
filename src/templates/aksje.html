@@ -13,6 +13,13 @@
     a.tilbake { color: inherit; font-size: 0.9rem; text-decoration: underline; }
     a.tilbake:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
 
+    /* Story 8.16b: merket når siden viser en tidligere dag, med fargene til
+       merkene over h1. */
+    p.tidligere-dag { margin: 1rem 0 0; padding: 8px 12px; border-radius: 8px; background: var(--hvit);
+                      border: 1px solid var(--strek-2); color: var(--tekst); font-size: 0.95rem; }
+    p.tidligere-dag a { color: inherit; text-decoration: underline; }
+    p.tidligere-dag a:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+
     /* Story 8.0d, PR 3: merkene for ticker og bransje over h1 (utdraget §6). */
     .merkene { display: flex; gap: 8px; flex-wrap: wrap; margin: 1.2rem 0 0.8rem; }
     .merkene .merke { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px;
@@ -121,13 +128,21 @@
 {% block innhold %}
   <a class="tilbake" href="/">Markedsoversikt</a>
 
+  {#- Story 8.16b (gruppens svar 19.10 kl. 00:00): med «Velg dag» viser hele
+      siden dagen, og merket sier det, med en lenke tilbake. #}
+  {% if tidligere_dag %}
+    <p class="tidligere-dag" role="note">Siden viser {{ detalj.dato|ukedag }} {{ detalj.dato|dato }}, ikke siste børsdag. <a href="/aksje/{{ detalj.aksje.symbol }}">Tilbake til siste børsdag</a></p>
+  {% endif %}
+
   {#- Story 8.0d, PR 3: merkene over h1, og overskriften med markering når
       aksjen skilte seg ut (beslutning 7). Ellers bare navnet. #}
   <div class="merkene">
     <span class="merke">{{ detalj.aksje.symbol }}</span>
     {% if detalj.aksje.sektor %}<span class="merke">{{ bransjesymbol(detalj.aksje.sektor) }}{{ detalj.aksje.sektor }}</span>{% endif %}
   </div>
-  {% if detalj.skilte_seg_ut %}
+  {#- Story 8.16b (gjennomgangen, VG3): designregler.md §3 merker 2 av 3 bare
+      for siste børsdag, så en tidligere dag merkes bare ved 3 av 3. #}
+  {% if detalj.skilte_seg_ut and (not tidligere_dag or detalj.styrke == antall_sjekker) %}
     <h1 class="overskrift">{{ detalj.aksje.navn }} <mark>skilte seg ut {{ detalj.dato|ukedag }}</mark></h1>
   {% else %}
     <h1 class="overskrift">{{ detalj.aksje.navn }}</h1>
@@ -138,8 +153,13 @@
   <div class="sammendrag">
     <div class="noekkeltall">
       <span class="etikett">Sluttkurs {{ hjelpeknapp("hjelp-kurs", "Hjelp: sluttkurs") }}</span>
-      <span class="verdi">{{ detalj.sluttkurs|tall('kurs') }}</span>
-      <span class="forklaring">NOK</span>
+      {#- Story 8.16b: «–» for en valgt dag uten kurs, som en lørdag. #}
+      {% if detalj.sluttkurs is not none %}
+        <span class="verdi">{{ detalj.sluttkurs|tall('kurs') }}</span>
+        <span class="forklaring">NOK</span>
+      {% else %}
+        <span class="verdi">–</span>
+      {% endif %}
     </div>
     {#- Plan 8 og svar 21: endringen i prosent, med ukedagene. Svar 29: med
         datoene også når det ligger en børsdag mellom de to kursradene. #}
@@ -209,9 +229,10 @@
   {% else %}
     <p class="mangler">
       Ingen vurdering for {{ detalj.dato|dato }}: {{ detalj.tekst }}.
-      Kursen vises likevel.
+      {#- Story 8.16b (gjennomgangen, ECH1 og ECH2): en valgt dag uten kurs. #}
+      {% if detalj.sluttkurs is not none %}Kursen vises likevel.{% else %}Kursserien har ingen kurs for dagen.{% endif %}
     </p>
-    {% if detalj.ikke_vurdert %}
+    {% if detalj.ikke_vurdert and detalj.sluttkurs is not none %}
       <p class="fotnote">
         «Ikke vurdert»: hentekommandoen har ikke skrevet en vurdering for
         dagen, for eksempel fordi kursene er lest inn med <code>--les-inn</code>.
@@ -237,7 +258,7 @@
     {% endif %}
     <form class="ki-bryter" method="post" action="/ki">
       <input type="hidden" name="til" value="{{ ki_til }}">
-      <input type="hidden" name="tilbake" value="/aksje/{{ detalj.aksje.symbol }}">
+      <input type="hidden" name="tilbake" value="{{ ki_tilbake }}">
       <button type="submit" aria-pressed="{{ 'true' if ki_er_paa else 'false' }}">{{ 'Skjul KI-teksten' if ki_er_paa else 'Vis KI-teksten' }}</button>
     </form>
   {% endif %}
@@ -250,7 +271,8 @@
   <h2>Kursutvikling, {{ overskrift }}{% if dagen %} {{ dagen.dato|ukedag }} {{ dagen.dato|dato }}{% endif %}{% if vis_grafhjelp %} {{ hjelpeknapp("hjelp-graf", "Hjelp: kursgrafen") }}{% endif %}</h2>
   {{ periodevalg(knapper, valg.periode, "/aksje/" ~ detalj.aksje.symbol, valg.dag, foerste_valgbare, siste_i_serien, "Periode for kursgrafen") }}
   {% if valg.beskjed %}<p class="periodebeskjed" role="status">{{ valg.beskjed }}</p>{% endif %}
-  {% if dagen %}
+  {#- Story 8.16b: for en valgt dag står endringen og signalet i kortene. #}
+  {% if dagen and dagen_i_linja %}
     <p class="dagen"><strong>{{ dagen.dato|ukedag|capitalize }} {{ dagen.dato|dato }}:</strong>
       endring <span class="{{ 'opp' if dagen.endring and dagen.endring > 0 else 'ned' if dagen.endring and dagen.endring < 0 else '' }}">{% if dagen.endring is not none %}{{ dagen.endring|tall('endring') }}{% else %}–{% endif %}</span>.
       Signal: {% if dagen.vurdering %}{{ dagen.vurdering.styrke }} av {{ antall_sjekker }}, <span class="{{ dagen.retning.klasse }}"><span aria-hidden="true">{{ dagen.retning.symbol }}</span> {{ dagen.retning.tekst }}</span>{% else %}– {{ dagen.tekst }}{% endif %}.

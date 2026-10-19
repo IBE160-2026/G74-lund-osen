@@ -363,9 +363,15 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "Periodene:",
             "knappene over grafen velger hvor langt tilbake den går. Perioden starter på første "
             "børsdag fra samme dato bakover etter kalenderen, og I år på årets første børsdag. "
-            "Den første knappen og «Velg dag» viser 6 måneder fram til dagen, med dagen merket "
-            "og signalet som er lagret for den.",
-            ((PERIODER, "def startdag("), (PERIODE_MAL, 'class="periodevalg"'), (AKSJE_MAL, 'class="dagstrek"')),
+            "Den første knappen viser 6 måneder fram til siste børsdag med dagen merket, og med "
+            "«Velg dag» viser hele siden dagen du velger, med signalet som er lagret for den.",
+            (
+                (PERIODER, "def startdag("),
+                (PERIODE_MAL, 'class="periodevalg"'),
+                (AKSJE_MAL, 'class="dagstrek"'),
+                # Story 8.16b: hele siden viser dagen, med merket øverst.
+                (AKSJE_MAL, 'class="tidligere-dag"'),
+            ),
         ),
         # Story 2.9c: hovedindeksen som stiplet linje i kursgrafen.
         "indekslinja": Hjelpetekst(

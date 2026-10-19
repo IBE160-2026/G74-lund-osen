@@ -3176,6 +3176,12 @@ def _dagen(html: str) -> str:
     return _synlig(re.search(r'<p class="dagen">(.*?)</p>', html, re.S).group(1))
 
 
+def _toppen(html: str) -> str:
+    """Story 8.16b: teksten fra merket og kortene til grafen, med sjekkene
+    og KI-teksten."""
+    return _synlig(html.split('<a class="tilbake"', 1)[1].split("<h2>Kursutvikling", 1)[0])
+
+
 class TestPeriodeneIKursgrafen:
     """Kontrollen under story 8.16 i epics.md og punkt b og d i
     spesifikasjonen 8.16. Klokka i testene staar paa 31.12.2026, saa den
@@ -3257,8 +3263,10 @@ class TestPeriodeneIKursgrafen:
         vurdering. Ville feilet hvis «Velg dag» regnet signalet for dagen."""
         self._aksjen()
         html = klient.get("/aksje/EQNR?periode=velg&dag=2026-10-01").data.decode("utf-8")
-        dagen = _dagen(html)
-        assert "Torsdag 01.10:" in dagen and "Signal: – ikke vurdert." in dagen
+        # Story 8.16b: dagen står i kortene, ikke i en linje over grafen.
+        toppen = _toppen(html)
+        assert "Oslo Børs · 01.10" in toppen and "Ingen vurdering for 01.10: ikke vurdert." in toppen
+        assert '<p class="dagen">' not in html
         assert _valgt(html) == ["01.10"]
         assert "<h2>Kursutvikling, 6 måneder fram til torsdag 01.10 " in html
         assert 'class="dagstrek"' in html and 'class="dagpunkt"' in html
@@ -3286,8 +3294,8 @@ class TestPeriodeneIKursgrafen:
                 volumforhold=1.0,
             ),
         )
-        dagen = _dagen(klient.get("/aksje/EQNR?dag=2026-10-01").data.decode("utf-8"))
-        assert "Signal: 3 av 3," in dagen and "Blandet." in dagen
+        toppen = _toppen(klient.get("/aksje/EQNR?dag=2026-10-01").data.decode("utf-8"))
+        assert "Signalstyrke ? 3 av 3" in toppen and "Retning ? ↔ Blandet" in toppen
 
     def test_velg_dag_med_grunn_og_ikke_boersdag(self, klient):
         """FR-409: en grunn vises, og en dag som ikke er boersdag, sier det,
@@ -3297,10 +3305,11 @@ class TestPeriodeneIKursgrafen:
 
         self._aksjen()
         skriv_vurdering("EQNR", date(2026, 10, 2), Grunn.SIGNAL_IKKE_REGNET)
-        grunn = _dagen(klient.get("/aksje/EQNR?dag=2026-10-02").data.decode("utf-8"))
-        assert f"Signal: – {GRUNNTEKST[Grunn.SIGNAL_IKKE_REGNET]}." in grunn
+        grunn = _toppen(klient.get("/aksje/EQNR?dag=2026-10-02").data.decode("utf-8"))
+        assert f"Ingen vurdering for 02.10: {GRUNNTEKST[Grunn.SIGNAL_IKKE_REGNET]}." in grunn
         html = klient.get("/aksje/EQNR?dag=2026-10-03").data.decode("utf-8")
-        assert "Lørdag 03.10: endring –. Signal: – ikke børsdag." in _dagen(html)
+        assert "Sluttkurs ? – Endring ? – Signalstyrke ? –" in _toppen(html)
+        assert "Ingen vurdering for 03.10: ikke børsdag." in _toppen(html)
         assert "03.10 har ingen kurs, så grafen slutter 02.10." in _synlig(html)
 
     def test_siste_boersdag_merker_dagen_med_endringen_og_signalet(self, klient):
@@ -3406,6 +3415,207 @@ class TestPeriodeneIKursgrafen:
         for periode, tekst in (("1-uke", "1 uke"), ("1-mnd", "1 måned"), ("i-aar", "i år"), ("1-aar", "1 år")):
             html = klient.get(f"/aksje/EQNR?periode={periode}").data.decode("utf-8")
             assert f"<h2>Kursutvikling, {tekst} " in html, periode
+
+
+class TestStory816bDagenPaaHeleSiden:
+    """Story 8.16b (gruppens svar 19.10 kl. 00:00): med «Velg dag» viser hele
+    aksjesiden dagen, lest fra det som er lagret. Testene for KI-teksten
+    står i tests/test_ki_visning.py. Mutantene står i spesifikasjonen 8.16b."""
+
+    def _aksjen(self):
+        skriv_serie("EQNR", _hele_aaret(), datetime.fromisoformat(HENTET), vurdert=True)
+
+    def _lagret_for_01_10(self):
+        """3 av 3 Blandet med målinger som kursene ikke gir, så et signal
+        regnet på nytt ville vist noe annet."""
+        rad = next(r for r in _hele_aaret() if r.dato == date(2026, 10, 1))
+        skriv_vurdering(
+            "EQNR",
+            rad.dato,
+            Vurdering(
+                styrke=3,
+                retning="Blandet",
+                trend=1,
+                bevegelse=-1,
+                interesse=1,
+                slutt=rad.slutt,
+                justert_slutt=rad.justert_slutt,
+                trend_avvik=0.123,
+                dagens_endring=-0.05,
+                standardavvik=0.01,
+                volumforhold=7.0,
+            ),
+        )
+        return rad
+
+    def test_kortene_og_sjekkene_viser_den_valgte_dagen(self, klient):
+        """Ville feilet hvis kortene, overskriften eller sjekkene viste siste
+        børsdag (09.10, 2 av 3 Positiv) med en valgt dag."""
+        from tallformat import tall
+
+        self._aksjen()
+        rad = self._lagret_for_01_10()
+        siste = _hele_aaret()[-1]
+        html = klient.get("/aksje/EQNR?periode=velg&dag=2026-10-01").data.decode("utf-8")
+        toppen = _toppen(html)
+        assert "Equinor skilte seg ut torsdag Oslo Børs · 01.10" in toppen
+        assert f"Sluttkurs ? {tall(rad.slutt, 'kurs')} NOK" in toppen
+        assert tall(siste.slutt, "kurs") not in toppen
+        assert "fra onsdag til torsdag" in toppen
+        assert "Signalstyrke ? 3 av 3 T +1 B -1 I +1" in toppen and "Retning ? ↔ Blandet" in toppen
+        assert "Hvorfor signalet ble 3" in toppen
+        assert "Sjekk 2 Ga -1 negativ" in toppen and "+12,3 % mot MA50" in toppen
+        assert "volum 7,00 × medianen" in toppen
+        assert "skilte seg ut fredag" not in toppen and "Positiv" not in toppen
+
+    @pytest.mark.parametrize(
+        "dag, ventet",
+        [
+            ("2026-10-01", "Ingen vurdering for 01.10: ikke vurdert."),
+            ("2026-10-02", "Ingen vurdering for 02.10: signalet kunne ikke regnes."),
+            ("2026-10-03", "Ingen vurdering for 03.10: ikke børsdag."),
+        ],
+    )
+    def test_en_dag_uten_vurdering_med_en_grunn_og_en_loerdag(self, klient, dag, ventet):
+        """FR-409. 01.10 har ingen rad, 02.10 har en grunn, og 03.10 er en
+        lørdag. Ville feilet hvis kortene viste signalet for siste børsdag,
+        eller et signal ble regnet for dagen."""
+        self._aksjen()
+        skriv_vurdering("EQNR", date(2026, 10, 2), Grunn.SIGNAL_IKKE_REGNET)
+        toppen = _toppen(klient.get(f"/aksje/EQNR?dag={dag}").data.decode("utf-8"))
+        assert ventet in toppen
+        assert "Signalstyrke ? – Retning ? – Ukjent" in toppen
+        assert "Hvorfor signalet ble ukjent" in toppen and "Sjekk 1" not in toppen
+        assert "Med KI-ens ord" not in toppen
+
+    def test_en_loerdag_har_ingen_sluttkurs_og_ingen_endring(self, klient):
+        """Ville feilet hvis lørdagen viste kursen fra fredagen før eller fra
+        siste børsdag."""
+        self._aksjen()
+        toppen = _toppen(klient.get("/aksje/EQNR?dag=2026-10-03").data.decode("utf-8"))
+        assert "Oslo Børs · 03.10 Sluttkurs ? – Endring ? – Signalstyrke ? –" in toppen
+        assert "NOK" not in toppen
+
+    def test_merket_og_lenken_tilbake(self, klient):
+        """Ville feilet uten merket øverst, med en lenke som ikke gikk til
+        siste børsdag, eller med merket på siden for siste børsdag."""
+        self._aksjen()
+        html = klient.get("/aksje/EQNR?dag=2026-10-01").data.decode("utf-8")
+        merket = (
+            '<p class="tidligere-dag" role="note">Siden viser torsdag 01.10, ikke siste børsdag. '
+            '<a href="/aksje/EQNR">Tilbake til siste børsdag</a></p>'
+        )
+        assert merket in html
+        assert html.index(merket) < html.index('<div class="sammendrag">')
+        tilbake = klient.get("/aksje/EQNR").data.decode("utf-8")
+        assert 'class="tidligere-dag"' not in tilbake and "Oslo Børs · 09.10" in _toppen(tilbake)
+        # Siste børsdag valgt med «Velg dag» er ikke en tidligere dag.
+        siste = klient.get("/aksje/EQNR?dag=2026-10-09").data.decode("utf-8")
+        assert 'class="tidligere-dag"' not in siste
+
+    def test_endringen_og_signalet_bare_i_kortene(self, klient):
+        """Ville feilet hvis linja over grafen fra 8.16 sto ved siden av
+        kortene for en valgt dag, eller dagen ikke var merket i grafen."""
+        self._aksjen()
+        html = klient.get("/aksje/EQNR?dag=2026-10-01").data.decode("utf-8")
+        assert '<p class="dagen">' not in html
+        assert 'class="dagstrek"' in html and 'class="dagpunkt"' in html
+        assert "Dagen er merket med en strek." in _synlig(html)
+
+    @pytest.mark.parametrize("spoerring", ["", "?periode=siste", "?periode=1-uke", "?periode=3-mnd", "?periode=1-aar"])
+    def test_med_en_periode_viser_toppen_siste_boersdag(self, klient, spoerring):
+        """Ville feilet hvis en periode eller den første knappen ga kortene
+        for en annen dag enn siste børsdag, eller merket om en tidligere dag."""
+        self._aksjen()
+        self._lagret_for_01_10()
+        html = klient.get(f"/aksje/EQNR{spoerring}").data.decode("utf-8")
+        toppen = _toppen(html)
+        assert "skilte seg ut fredag Oslo Børs · 09.10" in toppen
+        assert "Signalstyrke ? 3 av 3" not in toppen
+        assert 'class="tidligere-dag"' not in html
+
+    def test_endringen_er_dagens(self, klient):
+        """Gjennomgangen (VG1): 01.10 stiger 5 % og ingen annen dag stiger
+        mer enn 0,1. Ville feilet hvis endringen i kortet var fra siste
+        børsdag, med datoene for den valgte dagen."""
+        from dataclasses import replace
+
+        from tallformat import tall
+
+        rader = [
+            replace(r, slutt=r.slutt * 1.05, justert_slutt=r.justert_slutt * 1.05) if r.dato >= date(2026, 10, 1) else r
+            for r in _hele_aaret()
+        ]
+        skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET), vurdert=True)
+        forrige, dagen = (r for r in rader if r.dato in (date(2026, 9, 30), date(2026, 10, 1)))
+        ventet = tall((dagen.justert_slutt - forrige.justert_slutt) / forrige.justert_slutt * 100, "endring")
+        toppen = _toppen(klient.get("/aksje/EQNR?dag=2026-10-01").data.decode("utf-8"))
+        assert f"Endring ? {ventet} fra onsdag til torsdag" in toppen
+        assert ventet.startswith("+5,")
+
+    def test_en_boersdag_uten_kurs_i_serien(self, klient):
+        """Gjennomgangen (ECH1 og ECH2): tirsdag 06.10 mangler i kursserien.
+        Ville feilet hvis siden sa «Kursen vises likevel» eller pekte på
+        --les-inn for en dag uten kurs."""
+        skriv_serie(
+            "EQNR",
+            [r for r in _hele_aaret() if r.dato != date(2026, 10, 6)],
+            datetime.fromisoformat(HENTET),
+            vurdert=True,
+        )
+        for dag, tekst in (("2026-10-06", "ikke vurdert"), ("2026-10-03", "ikke børsdag")):
+            toppen = _toppen(klient.get(f"/aksje/EQNR?dag={dag}").data.decode("utf-8"))
+            assert f"Ingen vurdering for {dag[8:]}.10: {tekst}. Kursserien har ingen kurs for dagen." in toppen
+            assert "Kursen vises likevel" not in toppen and "--les-inn" not in toppen
+
+    @pytest.mark.parametrize("styrke, merket", [(2, False), (3, True)])
+    def test_en_tidligere_dag_merkes_bare_ved_3_av_3(self, klient, styrke, merket):
+        """Gjennomgangen (VG3): designregler.md §3 merker 2 av 3 bare for
+        siste børsdag. Ville feilet hvis en tidligere dag med 2 av 3 fikk
+        markeringen i overskriften, eller 3 av 3 mistet den."""
+        self._aksjen()
+        rad = self._lagret_for_01_10()
+        if styrke == 2:
+            to_av_tre = Vurdering(
+                styrke=2,
+                retning="Positiv",
+                trend=1,
+                bevegelse=1,
+                interesse=0,
+                slutt=rad.slutt,
+                justert_slutt=rad.justert_slutt,
+                trend_avvik=0.123,
+                dagens_endring=0.05,
+                standardavvik=0.01,
+                volumforhold=1.0,
+            )
+            skriv_vurdering("EQNR", date(2026, 10, 2), to_av_tre)
+        dag = "2026-10-01" if styrke == 3 else "2026-10-02"
+        html = klient.get(f"/aksje/EQNR?dag={dag}").data.decode("utf-8")
+        assert ("<mark>skilte seg ut" in html) is merket
+        # Siste børsdag har 2 av 3 og er merket som før.
+        assert "<mark>skilte seg ut fredag</mark>" in klient.get("/aksje/EQNR").data.decode("utf-8")
+
+    def test_vurder_kalles_ikke_for_en_valgt_dag(self, klient, monkeypatch):
+        """AD-7: signalet regnes aldri på nytt. Ville feilet hvis siden kalte
+        vurder for dagen, med eller uten en rad i vurdering."""
+        import sys
+
+        import signalberegning
+
+        self._aksjen()
+        self._lagret_for_01_10()
+
+        def regnet(*args, **kwargs):
+            raise AssertionError("vurder ble kalt")
+
+        # Overalt der vurder er importert, også i signalberegning selv.
+        ekte = signalberegning.vurder
+        for modul in list(sys.modules.values()):
+            if getattr(modul, "vurder", None) is ekte:
+                monkeypatch.setattr(modul, "vurder", regnet)
+        for dag in ("2026-10-01", "2026-10-02", "2026-10-03", "2026-09-30"):
+            assert klient.get(f"/aksje/EQNR?dag={dag}").status_code == 200
 
 
 class TestStory815bSelskapOgMarkeringen:
