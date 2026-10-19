@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-10-19T12:19
+updated: 2026-10-19T15:36
 ---
 
 # Vurderingsmatrise for del 1
@@ -89,3 +89,5 @@ Statusen i tabellen er ikke endret. README-prøven (story 3.4) og avsnittet «St
 *Lagt til 2026-10-19 kl. 11:23:* raden «README og kjørbarhet»: bildene av appen står bak knappen «Bilder av appen (demoen)» rett under beskrivelsen, i [`docs/appen/`](appen/), en egen mappe for bilder og senere video av demoen (story 3.3f, gruppens svar 18.10 kl. 23:03, på grenen `3-3f-bildene-av-appen` til den er flettet). Der står bildet av oversikten og et nytt bilde av aksjesiden for KVST, med grafen og KI-teksten. Bildet under «Til faglærer» er tatt bort, så linja 18.10 kl. 22:09 gjelder ikke lenger plassen. README-en har fem bilder og CI-merket.
 
 *Lagt til 2026-10-19 kl. 12:19:* raden «README og kjørbarhet»: bildene av appen bak knappen «Bilder av appen (demoen)», i [`docs/appen/`](appen/), står nå på main, flettet i `208d086`, PR #75, etter gruppens ja kl. 11:57.
+
+*Lagt til 2026-10-19 kl. 15:36:* raden «Ryddighet i repoet»: grenene som er flettet, er slettet på GitHub etter gruppens svar kl. 13:59. 72 grener ble slettet, alle med en flettet PR der tuppen var head-en i PR-en, så ingen commit gikk tapt. Ingen gren står igjen utenom `main`, fordi ingen hadde åpen PR, PR lukket uten fletting, ingen PR eller commits etter flettingen (`git ls-remote` etterpå). «Automatically delete head branches» (`delete_branch_on_merge`) er ikke slått på: GitHub svarte 404 på endringen fordi kontoen ikke har admin på repoet, så den slås på for hånd. Statusen i tabellen er ikke endret.
