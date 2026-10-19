@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-18T22:15
+updated: 2026-10-19T22:02
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -4107,3 +4107,36 @@ BINT, i den rekkefølgen; og SNOR, ISLAX, POL, GKP og PYRUM, i den rekkefølgen.
 
 Målingen endrer ikke universet. Parametrene i signalet er låst og målt på de
 15 (AD-13).
+
+## 37. Er raden fra kl. 21 den samme etter kl. 22? Fire aksjer hentet på nytt (2026-10-19)
+
+**Metode.** Ett `/api/eod`-kall per symbol for fire aksjer, med `hent_api_nokkel` og
+`hent_ett_symbol` importert fra `src/fetch_prices.py`, så kallet er det samme som i
+hentingen, og med `from` og `to` fra kursfila `kurser-raa-2026-10-19.json`. Skriptet lå
+utenfor repoet. `src/fetch_prices.py` ble ikke kjørt, og ingenting ble skrevet til
+basen. Svarene ligger urørt i `data/proever/`, som ikke spores (regel 10), og ikke i
+`data/raa/`, som hentingen leser. Raden for 19.10 i hvert svar er sammenlignet med
+raden i kursfila fra kl. 21 i alle sju feltene: `date`, `open`, `high`, `low`,
+`close`, `adjusted_close` og `volume`.
+
+Utvalget fulgte svaret 17.10 kl. 22:00 under story 2.3 i `epics.md`, og ble gjort før
+kallene: de fire med volumforholdet nærmest grensen for interesse (1,5) i kveldens
+vurderinger, fordi en endring i volumet der lettest endrer vurderingen. Det ble lest
+med en tilkobling som bare leser, og sha256 for basen var lik før og etter. Ingen av
+kveldens 15 rader hadde grunn eller manglet volumforhold. DNO, MOWI og GJF lå over
+grensen, AKRBP under.
+
+| Symbol | Klokkeslett for kallet (`date`) | Resultat |
+|---|---|---|
+| DNO | 22:00 | ulik i `volume`, lik i de seks andre |
+| MOWI | 22:00 | lik i alle sju |
+| GJF | 22:00 | lik i alle sju |
+| AKRBP | 22:00 | lik i alle sju |
+
+**Resultat.** For MOWI, GJF og AKRBP var raden fra kl. 21 den samme etter kl. 22. For
+DNO var volumet endret, og de seks andre feltene var like. Raden fra kl. 21 var altså
+ikke endelig for alle fire. Spørsmålet tas opp igjen før tirsdag, som svaret sier. Om
+forskjellen endrer vurderingen for DNO, er ikke regnet ut.
+
+**Kostnad.** 4 kall. Kvoten etter: 20 brukt i dag, 0 igjen, `extraLimit` uendret.
+Bonuskvoten er ikke brukt.
