@@ -254,8 +254,13 @@ UNDER_ARBEID_TEKST = "Appen er under utvikling og ikke ferdig."
 def _stilark():
     """Story 2.7a: adressen til stilarket, med de foerste 16 tegnene av sha256
     av fila. Regnes ved hver side, saa en endret fil gir ny adresse uten
-    omstart, og nettleseren aldri bruker en gammel utgave."""
-    avtrykk = hashlib.sha256(STILARK.read_bytes()).hexdigest()[:16]
+    omstart, og nettleseren aldri bruker en gammel utgave. Kan fila ikke
+    leses, staar lenken uten avtrykk, saa siden og feilsiden likevel vises
+    (gjennomgangen, BH3)."""
+    try:
+        avtrykk = hashlib.sha256(STILARK.read_bytes()).hexdigest()[:16]
+    except OSError:
+        return {"stilark": f"/static/{STILARK.name}"}
     return {"stilark": f"/static/{STILARK.name}?v={avtrykk}"}
 
 

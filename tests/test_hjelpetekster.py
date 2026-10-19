@@ -554,7 +554,8 @@ VALGT_BORT = (
 def synlig_tekst(html: str) -> str:
     """Teksten paa siden uten <style> og tagger, med mellomrom slaatt sammen,
     saa et ord som er delt over to linjer i malen ogsaa blir funnet (ECH3), og
-    et klassenavn i CSS ikke gir treff (ECH4)."""
+    et klassenavn i CSS ikke gir treff (ECH4). Story 2.7a: sidene har ingen
+    <style> lenger, saa det er bare en sikring."""
     html = re.sub(r"<style>.*?</style>", " ", html, flags=re.DOTALL)
     return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html))
 

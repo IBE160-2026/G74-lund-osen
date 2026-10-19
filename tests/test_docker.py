@@ -840,8 +840,8 @@ BILDENE = {1: "engine-running.png", 2: "github-download-zip.png", 4: "powershell
 
 # Story 3.3e (gruppens svar 18.10 kl. 00:20): bildet av oversikten i demoen,
 # tatt etter «Bildet» i spesifikasjonen 3.3b. Filene under bestemmer det
-# bildet viser: malene oversikten bygges av, med stilarket i <style> i
-# _ramme.html, skriftene i src/static/, demodataene og modulene som lager
+# bildet viser: malene oversikten bygges av, med stilarket (foer 2.7a i <style> i
+# _ramme.html), skriftene i src/static/, demodataene og modulene som lager
 # tallene og tekstene. Endres en av dem, tas bildet paa nytt og avtrykket
 # oppdateres i samme commit (spesifikasjonen 3.3e, «Avgjort»).
 # Story 3.3f (gruppens svar 18.10 kl. 23:03): i docs/appen/, mappa for bilder
@@ -877,7 +877,7 @@ SKRIFTFILER = {".woff", ".woff2", ".ttf", ".otf", ".css"}
 # raden under «Skilte seg ut», foer «Øvrige aksjer», saa signalstyrken og
 # fargene per aksje er med.
 HOEYDE_PAA_BILDET = 1573
-AVTRYKK_BAK_BILDET = "a8b5a296c7cfba465fd39ab873bcb6cf2e904fc130d5345735f897d7d635660c"
+AVTRYKK_BAK_BILDET = "1f437edb74ee81b9d26f5dc614183a383ea81eaa0379f46cff5b882d125e596b"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -928,7 +928,7 @@ FILENE_BAK_AKSJESIDEN = (
 IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py"}
 # Bildet er saa hoeyt at grafen, som staar under KI-teksten, er med til bunnen.
 HOEYDE_PAA_AKSJESIDEN = 1816
-AVTRYKK_BAK_AKSJESIDEN = "a85c86d3101e5112870cb19e6bc4c7f322b76695ca437638eba504be88671533"
+AVTRYKK_BAK_AKSJESIDEN = "35c3a471bb891d15e8d4941b4936b3d2a681ae033cd2c7192ddb7c2abdd9a250"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "

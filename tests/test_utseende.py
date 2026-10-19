@@ -742,6 +742,16 @@ class TestBrikkene:
 # Story 2.7a (gruppens svar 19.10 kl. 12:06): all stilen i src/static/stil.css.
 MALENE = Path(__file__).resolve().parent.parent / "src" / "templates"
 STILARKET = FONTS.parent / "stil.css"
+AVGRENSET = re.compile(r":where\(\.side-[a-z]+\) ")
+# De seks reglene som sto likt i index.html og aksje.html før 2.7a.
+FELLES = ("h1.overskrift mark", ".opp", ".ned", ".blandet", ".ingen, .ukjent", "p.fotnote")
+# Fargenavn etter et kolon eller mellomrom i en verdi. transparent,
+# currentColor og inherit er ikke farger med navn.
+FARGENAVN = re.compile(
+    r"(?<![\w-])(?:white|black|red|green|blue|yellow|orange|gray|grey|purple|pink|brown|navy|teal"
+    r"|silver|gold|maroon|olive|lime|aqua|fuchsia|cyan|magenta)(?![\w-])",
+    re.IGNORECASE,
+)
 
 
 def _reglene(css: str) -> list[tuple[str, str, str]]:
@@ -765,7 +775,9 @@ def _reglene(css: str) -> list[tuple[str, str, str]]:
                 i = k
                 continue
             k = tekst.index("}", j)
-            ut.append((ramme, velger, " ".join(tekst[j:k].split())))
+            # Gjennomgangen (BH8): uten det siste semikolonet, så en kopi
+            # uten det også er lik.
+            ut.append((ramme, velger, " ".join(tekst[j:k].split()).rstrip(";").rstrip()))
             i = k + 1
         assert not tekst[i:].strip(), tekst[i : i + 80]
 
@@ -802,23 +814,70 @@ class TestStilarket:
 
     def test_ingen_velger_staar_to_ganger_med_samme_kropp(self):
         """Ville feilet hvis en regel sto to ganger, som de seks som sto likt i
-        index.html og aksje.html før 2.7a."""
+        index.html og aksje.html før 2.7a. Gjennomgangen (VG1, BH8): også
+        når hver kopi er avgrenset til sin side."""
         reglene = _reglene(STILARKET.read_text(encoding="utf-8"))
         assert len(reglene) > 200
-        dobbelt = [regel for regel, antall in Counter(reglene).items() if antall > 1]
+        uten_side = [(ramme, AVGRENSET.sub("", velger), kropp) for ramme, velger, kropp in reglene]
+        dobbelt = [regel for regel, antall in Counter(uten_side).items() if antall > 1]
         assert not dobbelt, dobbelt
 
+    def test_de_seks_felles_reglene_staar_en_gang_for_alle_sidene(self):
+        """Ville feilet hvis en av de seks reglene som sto likt i index.html og
+        aksje.html, ble avgrenset til én side eller sto i hver side igjen
+        (gjennomgangen, VG1)."""
+        reglene = _reglene(STILARKET.read_text(encoding="utf-8"))
+        for velger in FELLES:
+            treff = [v for _, v, _ in reglene if AVGRENSET.sub("", v) == velger]
+            assert treff == [velger], (velger, treff)
+
+    def test_velgere_med_ulik_kropp_er_avgrenset_til_hver_sin_side(self):
+        """Ville feilet hvis en av h1.overskrift, p.meta og .mangler, eller en
+        annen velger med ulik kropp på to sider, mistet avgrensningen og
+        traff begge sidene (gjennomgangen, VG2)."""
+        reglene = _reglene(STILARKET.read_text(encoding="utf-8"))
+        kropper: dict[tuple[str, str], list[tuple[str, str]]] = {}
+        for ramme, velger, kropp in reglene:
+            kropper.setdefault((ramme, AVGRENSET.sub("", velger)), []).append((velger, kropp))
+        # @font-face står én gang per skriftfil, med ulik kropp.
+        ulike = {n: liste for n, liste in kropper.items() if len(liste) > 1 and not n[1].startswith("@")}
+        assert {velger for _, velger in ulike} >= {"h1.overskrift", "p.meta", ".mangler"}
+        for (_, uten), liste in ulike.items():
+            sidene = []
+            for velger, _ in liste:
+                deler = [d.strip() for d in velger.split(",")]
+                side = {m.group(1) for d in deler if (m := re.match(r":where\(\.(side-[a-z]+)\) ", d))}
+                assert len(side) == 1 and all(d.startswith(":where(.") for d in deler), (uten, velger)
+                sidene.append(side.pop())
+            assert len(set(sidene)) == len(sidene), (uten, sidene)
+
+    def test_hver_mal_som_bygger_paa_rammen_setter_klassen(self):
+        """Ville feilet hvis en ny side som bygger på rammen, glemte blokka
+        side: da får den ingen av sine egne regler (gjennomgangen, BH5)."""
+        brukt = set(re.findall(r":where\(\.(side-[a-z]+)\)", STILARKET.read_text(encoding="utf-8")))
+        sider = 0
+        for malfil in MALENE.glob("*.html"):
+            tekst = malfil.read_text(encoding="utf-8")
+            if '{% extends "_ramme.html" %}' not in tekst:
+                continue
+            sider += 1
+            treff = re.findall(r"\{% block side %\}(side-[a-z]+)\{% endblock %\}", tekst)
+            assert len(treff) == 1 and treff[0] in brukt, (malfil.name, treff)
+        assert sider == 3
+
     def test_fargene_staar_bare_i_root(self):
-        """Ville feilet med en farge skrevet fast utenfor :root i stilarket.
-        rgba() bare i skyggene, som i testen for hver side."""
+        """Ville feilet med en farge skrevet fast utenfor :root i stilarket,
+        også med fire eller åtte tegn eller med navn (gjennomgangen, VG3 og
+        BH7). rgba() bare i skyggene, som i testen for hver side."""
         reglene = _reglene(STILARKET.read_text(encoding="utf-8"))
         rot = [kropp for _, velger, kropp in reglene if velger == ":root"]
         assert len(rot) == 1 and "--blekk: #16181D" in rot[0]
         for ramme, velger, kropp in reglene:
             if velger == ":root":
                 continue
-            assert not re.search(r"#(?:[0-9a-fA-F]{3}){1,2}\b", kropp), (ramme, velger)
-            assert not re.search(r"\b(?:hsla?|rgb)\(", kropp), (ramme, velger)
+            assert not re.search(r"#[0-9a-fA-F]{3,8}\b", kropp), (ramme, velger)
+            assert not re.search(r"\b(?:hsla?|rgb|hwb|lab|lch|oklab|oklch|color)\(", kropp), (ramme, velger)
+            assert not FARGENAVN.search(kropp), (ramme, velger, FARGENAVN.search(kropp).group(0))
             for deklarasjon in re.findall(r"[^;]*rgba\([^;]*", kropp):
                 assert "box-shadow" in deklarasjon or deklarasjon.strip().startswith("0 2px"), (velger, deklarasjon)
 
@@ -827,11 +886,27 @@ class TestStilarket:
         finnes, eller en side mistet klassen på <body>."""
         brukt = set(re.findall(r":where\(\.(side-[a-z]+)\)", STILARKET.read_text(encoding="utf-8")))
         assert brukt == {"side-oversikt", "side-aksje", "side-feil"}
+        # Gjennomgangen (ECH5): en avgrenset regel er avgrenset i hver del
+        # av velgerlista, til samme side, så _stil i testene ser det
+        # nettleseren gjør.
+        for _, velger, _ in _reglene(STILARKET.read_text(encoding="utf-8")):
+            if ":where(" in velger:
+                deler = [d.strip() for d in velger.split(",")]
+                sider = {m.group(0) for d in deler if (m := AVGRENSET.match(d))}
+                assert len(sider) == 1 and all(AVGRENSET.match(d) for d in deler), velger
         for navn, html in sidene.items():
             assert re.search(r'<body class="side-(oversikt|aksje|feil)">', html), navn
         assert '<body class="side-feil">' in sidene["feilsiden"]
         assert '<body class="side-aksje">' in sidene["aksjesiden"]
         assert '<body class="side-oversikt">' in sidene["oversikten"]
+
+    def test_siden_vises_ogsaa_naar_fila_ikke_kan_leses(self, klient, monkeypatch, tmp_path):  # noqa: F811 - fikstur fra test_demo
+        """Ville feilet hvis en fil som mangler, ga 500 på hver side i stedet
+        for en lenke uten avtrykk (gjennomgangen, BH3 og ECH1)."""
+        monkeypatch.setattr(app_modul, "STILARK", tmp_path / "stil.css")
+        svar = klient.get("/")
+        assert svar.status_code == 200
+        assert '<link rel="stylesheet" href="/static/stil.css">' in svar.data.decode("utf-8")
 
     def test_stilarket_er_med_i_avtrykkene_bak_bildene(self):
         """Ville feilet hvis .css ble tatt ut av filene bak bildene i

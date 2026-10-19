@@ -1,9 +1,12 @@
 /* Story 2.7a (gruppens svar 19.10 kl. 12:06): all stilen i én fil, lenket
    fra _ramme.html med et avtrykk av fila i adressen. Rammen og delmalene
    gjelder alle sidene. Reglene for én side er avgrenset med klassen på
-   <body> i :where(), som ikke gir velgeren mer vekt, så rekkefølgen og
-   vektene er de samme som da stilen sto i <style> i hver side. Fargene står
-   som navn i :root og ingen andre steder (designregler §5). */
+   <body> i :where(), som ikke gir velgeren mer vekt, så vektene er de samme
+   som da stilen sto i <style> i hver side. Rekkefølgen er den samme innenfor
+   hver side. Periodevalget og de seks felles reglene står nå foran reglene
+   for sidene; den beregnede stilen for hvert element er sammenlignet med
+   main, og ingen er endret (spesifikasjonen 2.7a, gjennomgangen). Fargene
+   står som navn i :root og ingen andre steder (designregler §5). */
 
 @font-face { font-family: "IBM Plex Sans"; font-weight: 400; font-style: normal; font-display: swap;
              src: url("/static/fonts/ibm-plex-sans/IBMPlexSans-Regular.woff") format("woff"); }
