@@ -1521,6 +1521,8 @@ Oppgaveplanlegging beskrives i README (regel 19).
 
 *Avgjort 2026-10-17 kl. 22:00 (gruppens svar på ECH2 og BH7 i gjennomgangen av PR #60):* betingelsen for kl. 21:00 er prøvd for én aksje én dag. Hentingen går kl. 21:00 mandag 19.10, som avgjort. Trenger ingen aksje et nytt forsøk, brukes kallene som er igjen av dagens kvote etter kl. 22 til å hente fire aksjer på nytt og sammenligne radene for dagen med kursfila fra kl. 21, i alle sju feltene. Er noen ulike, tas spørsmålet opp igjen før tirsdag. Målingen bruker bare kallene som er igjen av dagens kvote, aldri bonuskvoten. Aksjene velges før kallene etter denne regelen: de fire med volumforholdet nærmest grensen for interesse (1,5) i kveldens vurderinger, fordi en endring i volumet der lettest endrer vurderingen. Verken kurser eller volum skrives av, bare om hvert felt er likt.
 
+*Lagt til 2026-10-19 (målingen etter svaret kl. 22:00, `malinger.md` §37):* DNO, MOWI, GJF og AKRBP, de fire med volumforholdet nærmest 1,5 i kveldens vurderinger, ble hentet på nytt kl. 22:00. MOWI, GJF og AKRBP er like kursfila fra kl. 21 i alle sju feltene. DNO er ulik i `volume` og lik i de seks andre. Raden fra kl. 21 var altså ikke endelig for volumet til DNO, og spørsmålet tas opp igjen før tirsdag, som svaret sier. Om forskjellen endrer vurderingen for DNO, er ikke regnet ut.
+
 ### Story 2.3b: Kallene som er igjen, brukes på nye forsøk
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 19:17.*
