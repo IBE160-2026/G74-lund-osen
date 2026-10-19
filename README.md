@@ -21,7 +21,7 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 
 Til faglærer:
 - Se appen med oppdiktede tall, uten konto og nøkkel, etter [steg 1–4](#felles-for-begge): [demoen](#demoen)
-- Ekte kurser, med en gratis nøkkel fra EODHD: [den ekte versjonen](#den-ekte-versjonen-anbefalt)
+- Ekte kurser, med en gratis nøkkel fra EODHD: [den ekte versjonen](#den-ekte-versjonen)
 - De automatiske testene, med to kommandoer etter at uv er installert: [Tester](#tester)
 - [Product Brief](_bmad-output/planning-artifacts/product-brief.md), arbeidskravet: versjon 8, laget etter [tilbakemeldingen 06.10](_bmad-output/planning-artifacts/tilbakemelding-product-brief.md) og låst i taggen `arbeidskrav-product-brief-v8`
 - Plan og krav: [PRD](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md), [arkitektur](_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md) og [epics og stories](_bmad-output/planning-artifacts/epics.md)
@@ -31,9 +31,9 @@ Til faglærer:
 
 ## Kom i gang
 
-Appen finnes i to versjoner, med samme kode. Vi anbefaler den ekte versjonen. Vil du bare se hvordan appen virker, er demoen raskest. Første gang før kl. 21 på en børsdag, også på dagtid, er demoen veien for å se appen med en gang, fordi den ekte versjonen henter dagens kurser først etter kl. 21. Demoen står først i stegene under, fordi den er raskest.
+Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og viser hovedfunksjonene med faste eksempeldata, også KI-teksten. Den ekte versjonen er for å prøve løsningen med kurser fra EODHD. Begge versjonene har samme kode. Første gang før kl. 21 på en børsdag, også på dagtid, er demoen veien for å se appen med en gang, fordi den ekte versjonen henter dagens kurser først etter kl. 21. Demoen står først i stegene under, fordi den er raskest.
 
-| | Demoen | Den ekte versjonen (anbefalt) |
+| | Demoen | Den ekte versjonen |
 |---|---|---|
 | Kurser | Oppdiktede selskaper og kurser («Eksempeltall») | Ekte sluttkurser fra Oslo Børs, hentet fra EODHD hver børsdag. Dagens vurdering lagres per aksje |
 | Trenger | Bare Docker Desktop | Docker Desktop og en gratis nøkkel fra EODHD |
@@ -81,7 +81,7 @@ docker compose --profile demo down
 
 Vil du også prøve den ekte versjonen, går du videre til steg 5 under.
 
-### Den ekte versjonen (anbefalt)
+### Den ekte versjonen
 
 5. **Hent en nøkkel.** Lag en gratis bruker hos [EODHD](https://eodhd.com/register), og kopier API-nøkkelen din. Det er klart når du har nøkkelen.
 6. **Legg inn nøkkelen, bare første gang.** Kopier kommandoene med knappen til høyre i boksen, lim dem inn i PowerShell-vinduet fra steg 4 én om gangen (Ctrl+V eller Cmd+V) og trykk Enter. Den første lager fila [`.env`](#mer-for-den-som-vil), og den neste åpner den (Windows eller Mac). Lim inn nøkkelen etter `EODHD_API_KEY=`, lagre og lukk. Det er klart når nøkkelen står etter `EODHD_API_KEY=`.

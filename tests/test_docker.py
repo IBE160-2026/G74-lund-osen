@@ -600,15 +600,15 @@ class TestReadme:
         klar = [l for l in topp.splitlines() if l.startswith("| Klar |")]
         assert len(klar) == 1 and "helgen" in klar[0] and "etter kl. 21" in klar[0]
         assert "andre dager børsen er stengt" in klar[0]
-        steg8 = _steg("Den ekte versjonen (anbefalt)", 8)
+        steg8 = _steg("Den ekte versjonen", 8)
         assert "Første gang går det også i helgen og andre dager børsen er stengt." in steg8
         assert "Første gang kan du også hente i helgen" in _hjelp()
 
     def test_demoen_foerst_og_zip_foer_kommandoene(self):
         """Story 3.3c: demoen står foerst, fordi faglaerer proever den (gruppen
         16.10 kl. 21:16, svarene kl. 21:25). Det snur rekkefoelgen fra 11.10
-        kl. 22:32, ikke anbefalingen: README-en anbefaler fortsatt den ekte
-        versjonen. Demoen virker uten .env. Koden hentes med «Download ZIP»
+        kl. 22:32. Story 3.3g (svaret 19.10 kl. 14:46): README-en anbefaler
+        demoen for faglaerer og sensor. Demoen virker uten .env. Koden hentes med «Download ZIP»
         foer den foerste kommandoen, ikke med git clone (svar 1 11.10). Het
         test_ekte_versjonen_foerst_og_zip_foer_kommandoene fra 11.10 til 3.3c.
         Ville feilet hvis den ekte versjonen kom foer demoen igjen."""
@@ -617,9 +617,9 @@ class TestReadme:
         assert kommandoer[0] == "docker compose up --build demo"
         assert del_.index("«Download ZIP»") < del_.index("docker compose up --build demo")
         overskrifter = re.findall(r"^### (.+)$", del_, re.MULTILINE)
-        assert overskrifter[:3] == ["Felles for begge", "Demoen", "Den ekte versjonen (anbefalt)"], overskrifter
+        assert overskrifter[:3] == ["Felles for begge", "Demoen", "Den ekte versjonen"], overskrifter
         topp = del_.split("### Felles for begge", 1)[0]
-        assert "Vi anbefaler den ekte versjonen." in topp
+        assert "Vi anbefaler demoen for faglærer og sensor" in topp
         assert "Demoen står først i stegene under, fordi den er raskest." in topp
         assert "git clone" not in del_.split("### Står du fast?", 1)[0]
         demo = _seksjon("Demoen")
@@ -723,7 +723,7 @@ class TestReadme:
 
     def test_siden_lastes_paa_nytt_etter_hentingen(self):
         """Story 3.4, PR 2: siden oppdateres ikke av seg selv."""
-        assert "Last siden på nytt når hentingen er ferdig" in _steg("Den ekte versjonen (anbefalt)", 8)
+        assert "Last siden på nytt når hentingen er ferdig" in _steg("Den ekte versjonen", 8)
 
     def test_testene_uten_docker(self):
         """3.3b, punkt c: hvordan testene kjøres på en ren maskin uten Docker,
@@ -1199,7 +1199,7 @@ def _seksjon(navn: str) -> str:
     return _kom_i_gang().split(f"### {navn}\n", 1)[1].split("\n### ", 1)[0]
 
 
-SEKSJONENE = {"Felles for begge": [1, 2, 3, 4], "Den ekte versjonen (anbefalt)": [5, 6, 7, 8, 9], "Demoen": [5, 6, 7]}
+SEKSJONENE = {"Felles for begge": [1, 2, 3, 4], "Den ekte versjonen": [5, 6, 7, 8, 9], "Demoen": [5, 6, 7]}
 
 
 # Story 3.3c (svar 2 18.10 kl. 14:48): avsnittet som forklarer hvordan en
@@ -1407,16 +1407,17 @@ class TestReadmeForNybegynnere:
             assert not re.match(r"^ +```|^ *~~~", linje), linje
 
     def test_tabellen_nevner_begge_og_hvilken_som_er_anbefalt(self):
-        """Kl. 22:21: to versjoner med forskjellen forklart, og vi
-        anbefaler den ekte. Ville feilet hvis tabellen manglet en versjon,
-        eller anbefalte demoen."""
+        """Kl. 22:21: to versjoner med forskjellen forklart. Story 3.3g
+        (svaret 19.10 kl. 14:46): vi anbefaler demoen, ikke den ekte, og
+        tabellen merker ingen av dem. Ville feilet hvis tabellen manglet en
+        versjon, eller anbefalte den ekte."""
         topp = _kom_i_gang().split("### Felles for begge", 1)[0]
         hode = [l for l in topp.splitlines() if l.startswith("|")][0]
-        assert "Den ekte versjonen (anbefalt)" in hode and "| Demoen |" in hode
+        assert "Den ekte versjonen" in hode and "| Demoen |" in hode
         # Story 3.3c: demoen i første kolonne, som i stegene.
-        assert hode.startswith("| | Demoen | Den ekte versjonen (anbefalt) |"), hode
-        assert "Vi anbefaler den ekte versjonen." in topp
-        assert "(anbefalt)" not in hode.split("Den ekte versjonen (anbefalt)", 1)[1]
+        assert hode == "| | Demoen | Den ekte versjonen |", hode
+        assert "Vi anbefaler demoen for faglærer og sensor" in topp
+        assert "Vi anbefaler den ekte versjonen" not in topp
 
     def test_stegene_er_nummerert_og_har_hoeyst_65_ord(self):
         """Felles 1-4, så 5-9 i den ekte versjonen og 5-7 i demoen, hvert
@@ -1529,7 +1530,7 @@ class TestReadmeForNybegynnere:
                 steg = _steg(seksjon, n)
                 if not _blokkene(steg):
                     continue
-                if (seksjon, n) == ("Den ekte versjonen (anbefalt)", 8):
+                if (seksjon, n) == ("Den ekte versjonen", 8):
                     assert "lim inn denne i det nye PowerShell-vinduet." in steg
                     assert "nye PowerShell-vinduet fra steg 4" not in steg
                 else:
@@ -1539,7 +1540,7 @@ class TestReadmeForNybegynnere:
         # VG7: svaret om innlimingen har kopieringen. Fra 3.3d står det bare i
         # docs/hjelp.md, som sjekkes under.
         # Linja i steg 7 og steg 5 i demoen sier hva den betyr.
-        assert "som bare betyr at appen kjører" in _steg("Den ekte versjonen (anbefalt)", 7)
+        assert "som bare betyr at appen kjører" in _steg("Den ekte versjonen", 7)
         assert "Den linja betyr bare at demoen kjører." in _steg("Demoen", 5)
         # Og docs/hjelp.md der svaret staar.
         innliming = _hjelp().split("### Ingenting skjer når jeg limer inn.\n\n", 1)[1].split("\n### ", 1)[0]
@@ -1570,7 +1571,7 @@ class TestReadmeForNybegynnere:
     def test_advarselen_mot_down_v_staar_synlig(self):
         """22:32: rett under stoppet i den ekte versjonen, synlig og ikke
         lukket. Ville feilet hvis advarselen sto i en <details>."""
-        ekte = _seksjon("Den ekte versjonen (anbefalt)")
+        ekte = _seksjon("Den ekte versjonen")
         advarsel = "**Skriv aldri `docker compose down -v`.**"
         assert advarsel in ekte
         assert ekte.index("docker compose down\n") < ekte.index(advarsel)
@@ -1660,7 +1661,7 @@ class TestReadmeForNybegynnere:
             felt = _tjenester()[tjeneste]
             assert "command" not in felt and "entrypoint" not in felt, tjeneste
         assert f"`Serving on http://{lytter}`" in _steg("Demoen", 5)
-        assert f"`Serving on http://{lytter}`" in _steg("Den ekte versjonen (anbefalt)", 7)
+        assert f"`Serving on http://{lytter}`" in _steg("Den ekte versjonen", 7)
         tekst = [b for spraak, b in _blokkene(_hjelp()) if spraak == "text"]
         assert len(tekst) == 1
         assert tekst[0].strip() == f"demo-1  | INFO:waitress:Serving on http://{lytter}"
@@ -1676,7 +1677,7 @@ class TestReadmeForNybegynnere:
         for n in re.findall(r"steg (\d+) i demoen", tekst):
             assert int(n) in SEKSJONENE["Demoen"], n
         for n in re.findall(r"steg (\d+) i den ekte versjonen", tekst):
-            assert int(n) in SEKSJONENE["Den ekte versjonen (anbefalt)"], n
+            assert int(n) in SEKSJONENE["Den ekte versjonen"], n
         tabell = _proevetabellen("Prøve 1")
         # Story 3.3c: demoen foer den ekte versjonen, som i README-en, og en
         # kolonne for tiden hvert steg tok.
@@ -1699,9 +1700,9 @@ class TestReadmeForNybegynnere:
         assert [int(n) for n in re.findall(r"\| Den ekte versjonen, steg (\d+):", tabell)] == [5, 6, 7, 8, 9]
 
     def test_stopp_i_begge_versjonene(self):
-        assert [b.strip() for _, b in _blokkene(_steg("Den ekte versjonen (anbefalt)", 9))] == ["docker compose down"]
+        assert [b.strip() for _, b in _blokkene(_steg("Den ekte versjonen", 9))] == ["docker compose down"]
         assert [b.strip() for _, b in _blokkene(_steg("Demoen", 7))] == ["docker compose --profile demo down"]
-        assert "Ctrl+C" in _steg("Demoen", 7) and "Ctrl+C" in _steg("Den ekte versjonen (anbefalt)", 9)
+        assert "Ctrl+C" in _steg("Demoen", 7) and "Ctrl+C" in _steg("Den ekte versjonen", 9)
 
     def test_installasjonen_av_uv_staar_foer_uv_sync(self):
         """Story 3.3e, punkt b (gruppens svar 18.10 kl. 20:39): «Tester» har
@@ -1748,7 +1749,7 @@ class TestReadmeForNybegynnere:
             assert f'"{navn}"' in kilde, navn
         assert "`OSE_DEMO` og `OSE_I_DOCKER` settes av `compose.yaml` og `Dockerfile`" in knapp
         # Steg 6 viser dit.
-        assert "[`.env`](#mer-for-den-som-vil)" in _steg("Den ekte versjonen (anbefalt)", 6)
+        assert "[`.env`](#mer-for-den-som-vil)" in _steg("Den ekte versjonen", 6)
 
     def test_standardene_i_tabellen_er_de_i_koden(self):
         """Gjennomgangen av 3.3e (BH2, BH3, VG5): standardene i tabellen er
@@ -2221,7 +2222,7 @@ class TestReadmeForNybegynnere:
                 "demoen",
                 "Demoen",
             ),
-            ("Ekte kurser, med en gratis nøkkel fra EODHD", "den ekte versjonen", "Den ekte versjonen (anbefalt)"),
+            ("Ekte kurser, med en gratis nøkkel fra EODHD", "den ekte versjonen", "Den ekte versjonen"),
             # Story 3.3e (gjennomgangen, VG7): uv installeres foerst.
             ("De automatiske testene, med to kommandoer etter at uv er installert", "Tester", "Tester"),
         ]
