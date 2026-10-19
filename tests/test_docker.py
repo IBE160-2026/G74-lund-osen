@@ -781,7 +781,11 @@ class TestReadme:
         Ingen av dem viser appen. Story 3.3e: og bildet av oversikten i demoen
         under «Til faglærer», som viser demoen, aldri den ekte versjonen.
         Ville feilet med et bilde til, et bilde uten alt-tekst eller utenfor
-        docs/bilder/readme/, eller uten CI-merket."""
+        docs/bilder/readme/, eller uten CI-merket.
+
+        Story 3.3f (gruppens svar 18.10 kl. 23:03): bildene av appen, av
+        oversikten og aksjesiden i demoen, ligger i docs/appen/ og står i
+        knappen «Bilder av appen (demoen)», ikke under «Til faglærer»."""
         tekst = README.read_text(encoding="utf-8")
         bilder = re.findall(r"!\[([^\]]*)\]\(([^)]+)\)", tekst)
         merket = [b for _, b in bilder if b.endswith("/actions/workflows/tester.yml/badge.svg")]
@@ -789,7 +793,7 @@ class TestReadme:
         andre = [(alt, b) for alt, b in bilder if b not in merket]
         # Story 3.3e: og bildet av oversikten under «Til faglærer».
         assert sorted(b for _, b in andre) == sorted(
-            [*(f"docs/bilder/readme/{navn}" for navn in BILDENE.values()), SKJERMBILDET]
+            [*(f"docs/bilder/readme/{navn}" for navn in BILDENE.values()), SKJERMBILDET, AKSJESIDEBILDET]
         )
         for alt, sti in andre:
             assert alt.strip(), sti
@@ -822,6 +826,11 @@ class TestReadme:
             assert f"`{navn}`" in mappestruktur, navn
         # Story 3.3e (gjennomgangen, VG4): og bildet av oversikten.
         assert f"`{SKJERMBILDET.rsplit('/', 1)[1]}`" in mappestruktur
+        # Story 3.3f (gjennomgangen, VG3 og ECH7): docs/appen/ og begge bildene
+        # av appen, i punktet for mappa.
+        punkt = next(l for l in mappestruktur.splitlines() if l.startswith("- [`docs/appen/`](docs/appen/)"))
+        for sti in (SKJERMBILDET, AKSJESIDEBILDET):
+            assert f"[`{sti.rsplit('/', 1)[1]}`]({sti})" in punkt, sti
 
 
 BILDEFILER = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"}
@@ -835,7 +844,9 @@ BILDENE = {1: "engine-running.png", 2: "github-download-zip.png", 4: "powershell
 # _ramme.html, skriftene i src/static/, demodataene og modulene som lager
 # tallene og tekstene. Endres en av dem, tas bildet paa nytt og avtrykket
 # oppdateres i samme commit (spesifikasjonen 3.3e, «Avgjort»).
-SKJERMBILDET = "docs/bilder/readme/oversikten-demo.png"
+# Story 3.3f (gruppens svar 18.10 kl. 23:03): i docs/appen/, mappa for bilder
+# og video av appen, bare av demoen.
+SKJERMBILDET = "docs/appen/oversikten-demo.png"
 # Story 3.3e (svaret 18.10 kl. 20:39): installasjonen av uv i «Tester», fra
 # https://docs.astral.sh/uv/getting-started/installation/.
 UV_WINDOWS = 'powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"'
@@ -875,15 +886,67 @@ SLIK_TAS_BILDET = (
     "AVTRYKK_BAK_BILDET til {avtrykk} i samme commit."
 )
 
+# Story 3.3f (gruppens svar 18.10 kl. 23:03): aksjesiden for KVST i demoen,
+# med grafen og KI-teksten, tatt med samme fremgangsmaate som oversikten.
+# Filene under bestemmer det bildet viser: malen og delmalene, skriftene,
+# demodataene med KI-tekstene, og modulene som lager tallene, grafen og
+# tekstene. Hele app.py er med, fordi ruta bygger siden der.
+AKSJESIDEBILDET = "docs/appen/aksjesiden-kvst-demo.png"
+FILENE_BAK_AKSJESIDEN = (
+    "src/app.py",
+    "src/aksjedetalj.py",
+    "src/graf.py",
+    "src/perioder.py",
+    "src/ki_visning.py",
+    "src/kilogg.py",
+    "src/demo.py",
+    "src/demo_ki.py",
+    "src/demo_ki_tekster.json",
+    "src/markedsoversikt.py",
+    "src/oversiktsdata.py",
+    "src/hovedindeks.py",
+    "src/indeksdata.py",
+    "src/tallformat.py",
+    "src/signalberegning.py",
+    "src/hjelpetekster.py",
+    "src/boersdag.py",
+    "src/kursdata.py",
+    "src/tilstand.py",
+    "src/vurderingsdata.py",
+    "src/templates/aksje.html",
+    # Gjennomgangen (BH1, ECH1): lagringslaget som leser det siden viser, og
+    # skjemaet demobasen lages med.
+    "src/lagring_sqlite.py",
+    "src/migrering.py",
+    *sorted(p.relative_to(ROT).as_posix() for p in (ROT / "src" / "migrasjoner").glob("*.sql")),
+)
+# Moduler appen og demoen importerer, men som ikke lager noe aksjesiden viser:
+# lagring_sqlite henter DATA_KATALOG fra lagring_fil, som importerer eodhd.
+IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py"}
+# Bildet er saa hoeyt at grafen, som staar under KI-teksten, er med til bunnen.
+HOEYDE_PAA_AKSJESIDEN = 1816
+AVTRYKK_BAK_AKSJESIDEN = "fd2257d28c6cf9a58ea6ad45732c10dadb885875ffb978a6e45d67422913b7fd"
+SLIK_TAS_AKSJESIDEN = (
+    "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
+    f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "
+    "demobasen i en midlertidig mappe (lagring_sqlite.BASE_STI dit), OSE_DEMO=1, "
+    "waitress på en ledig port, og msedge --headless --disable-gpu --hide-scrollbars "
+    f"--window-size=1280,{HOEYDE_PAA_AKSJESIDEN} med egen --user-data-dir. Bildet skal slutte "
+    "ved bunnen av grafen (figure), under KI-teksten: mål den og endre "
+    "HOEYDE_PAA_AKSJESIDEN hvis den har flyttet seg. Oppdater så "
+    "AVTRYKK_BAK_AKSJESIDEN til {avtrykk} i samme commit."
+)
 
-def _avtrykk_bak_bildet() -> str:
+
+def _avtrykk_bak_bildet(filene: tuple[str, ...] = MALENE_BAK_BILDET) -> str:
     """sha256 av stien og innholdet, med LF, for hver fil bak bildet, og av
-    merket «Eksempeltall» fra app.py."""
+    merket «Eksempeltall» fra app.py. Story 3.3f: filene er et argument, så
+    aksjesiden har sitt eget avtrykk."""
     import hashlib
 
     import app as app_modul
 
-    filer = list(MALENE_BAK_BILDET)
+    filer = list(filene)
     filer += [p.relative_to(ROT).as_posix() for p in (ROT / "src" / "templates").glob("_*.html")]
     filer += [
         p.relative_to(ROT).as_posix()
@@ -900,7 +963,8 @@ def _avtrykk_bak_bildet() -> str:
 class TestSkjermbildet:
     """3.3b, punkt b, tilbake i 3.3e: skjermbildet av oversikten i demoen,
     under «Til faglærer», 1280 px bredt, med en alt-tekst som sier at det er
-    demoen. Regelen fra 25.09: bildet viser bare demoen."""
+    demoen. Regelen fra 25.09: bildet viser bare demoen. Story 3.3f: i
+    docs/appen/ og i knappen «Bilder av appen (demoen)»."""
 
     def _bildet(self) -> tuple[str, str]:
         tekst = README.read_text(encoding="utf-8")
@@ -947,9 +1011,140 @@ class TestSkjermbildet:
         alt, _ = self._bildet()
         assert "demoen" in alt and "Eksempeltall" in alt and "ikke data fra Oslo Børs" in alt
 
-    def test_bildet_staar_under_til_faglaerer_og_over_kom_i_gang(self):
+    def test_bildet_staar_i_knappen_og_ikke_under_til_faglaerer(self):
+        """Story 3.3f: bildet står i knappen «Bilder av appen (demoen)» før
+        «Innhold», og ikke lenger under «Til faglærer». Ville feilet med
+        bildet der det sto før."""
         tekst = README.read_text(encoding="utf-8")
-        assert tekst.index("Til faglærer:") < tekst.index(SKJERMBILDET) < tekst.index("\n## Kom i gang\n")
+        knappen = tekst.split("<summary>Bilder av appen (demoen)</summary>", 1)[1].split("</details>", 1)[0]
+        assert SKJERMBILDET in knappen
+        assert tekst.index(SKJERMBILDET) < tekst.index("**Innhold:**") < tekst.index("Til faglærer:")
+
+
+class TestAksjesidebildet:
+    """Story 3.3f, punkt b: bildet av aksjesiden for KVST i demoen."""
+
+    def test_fila_er_1280_px_bred_og_like_hoey_som_maalt(self):
+        """Ville feilet med et bilde i en annen bredde, eller en annen høyde
+        enn den målt til bunnen av grafen."""
+        data = (ROT / AKSJESIDEBILDET).read_bytes()
+        assert data[:8] == b"\x89PNG\r\n\x1a\n"
+        assert int.from_bytes(data[16:20], "big") == 1280
+        assert int.from_bytes(data[20:24], "big") == HOEYDE_PAA_AKSJESIDEN
+
+    def test_bildet_har_ingen_tekstfelt(self):
+        """Regel 16: ingen sti eller brukernavn i metadataene. Ville feilet
+        med tEXt, iTXt, zTXt eller eXIf i fila."""
+        data = (ROT / AKSJESIDEBILDET).read_bytes()
+        i, biter = 8, []
+        while i < len(data):
+            lengde = int.from_bytes(data[i : i + 4], "big")
+            biter.append(data[i + 4 : i + 8].decode("latin-1"))
+            i += 12 + lengde
+        assert biter[0] == "IHDR" and biter[-1] == "IEND", biter
+        assert not {"tEXt", "iTXt", "zTXt", "eXIf"} & set(biter), biter
+
+    def test_bildet_tas_paa_nytt_naar_aksjesiden_endres(self):
+        """Ville feilet hvis malen, en delmal, en skrift, demodataene eller en
+        modul bak aksjesiden ble endret uten at bildet ble tatt på nytt.
+        Feilmeldingen sier hvordan."""
+        avtrykk = _avtrykk_bak_bildet(FILENE_BAK_AKSJESIDEN)
+        assert avtrykk == AVTRYKK_BAK_AKSJESIDEN, SLIK_TAS_AKSJESIDEN.format(avtrykk=avtrykk)
+
+
+VIDEOFILER = {".mp4", ".webm", ".mov"}
+# Filer Utforsker og Finder legger i en mappe, som ikke er bilder av appen.
+SYSTEMFILER = {"Thumbs.db", ".DS_Store", "desktop.ini"}
+
+
+def _knappen_med_bildene() -> str:
+    """Innholdet i knappen «Bilder av appen (demoen)», mellom <summary> og
+    </details>."""
+    tekst = README.read_text(encoding="utf-8")
+    deler = tekst.split("<summary>Bilder av appen (demoen)</summary>\n", 1)
+    assert len(deler) == 2, "knappen «Bilder av appen (demoen)» mangler"
+    return deler[1].split("</details>", 1)[0]
+
+
+class TestBildeneAvAppen:
+    """Story 3.3f (gruppens svar 18.10 kl. 23:03): bildene av appen står bak
+    en knapp rett under beskrivelsen, i docs/appen/, bare av demoen."""
+
+    def test_knappen_staar_rett_under_beskrivelsen_og_er_lukket(self):
+        """Ville feilet hvis knappen sto et annet sted, hadde et annet navn,
+        eller var åpen som standard (<details open>)."""
+        tekst = README.read_text(encoding="utf-8")
+        beskrivelse = next(a for a in tekst.split("\n\n") if a.startswith("OSE Signal viser"))
+        etter = tekst.split(beskrivelse + "\n\n", 1)[1]
+        assert etter.startswith("<details>\n<summary>Bilder av appen (demoen)</summary>\n\n"), etter[:80]
+        assert etter.split("</details>\n\n", 1)[1].startswith("**Innhold:** ")
+        # Lukket som de andre knappene: ingen <details> i README-en er åpen.
+        assert re.findall(r"<details[^>]*>", tekst) == ["<details>"] * tekst.count("<details")
+
+    def test_begge_bildene_ligger_i_docs_appen_med_alt_tekst_og_teksten_under(self):
+        """Ville feilet hvis et bilde lå utenfor docs/appen/, manglet
+        alt-tekst eller teksten under, eller ikke sa at det er demoen med
+        oppdiktede tall."""
+        knappen = _knappen_med_bildene()
+        bilder = re.findall(r"^!\[([^\]]*)\]\(([^)]+)\)\n(.*)$", knappen, re.MULTILINE)
+        assert [sti for _, sti, _ in bilder] == [SKJERMBILDET, AKSJESIDEBILDET]
+        for alt, sti, under in bilder:
+            assert sti.startswith("docs/appen/") and (ROT / sti).is_file(), sti
+            assert "i demoen" in alt and "«Eksempeltall»" in alt and "ikke data fra Oslo Børs" in alt, alt
+            assert under.startswith("*") and under.endswith("*"), under
+            assert "i demoen" in under and "oppdiktede" in under and "«Eksempeltall»" in under, under
+        # Ingen andre bilder i knappen, og ingen andre ord enn bildene.
+        rest = re.sub(r"^!\[[^\]]*\]\([^)]+\)\n\*[^\n]*\*$", "", knappen, flags=re.MULTILINE)
+        assert rest.strip() == "", rest
+
+    def test_bildene_av_appen_staar_bare_i_knappen(self):
+        """Ville feilet med et bilde fra docs/appen/ et annet sted i
+        README-en, for eksempel under «Til faglærer» som før."""
+        tekst = README.read_text(encoding="utf-8")
+        uten_knappen = tekst.replace(_knappen_med_bildene(), "")
+        assert "docs/appen/" in uten_knappen.split("\n## Mappestruktur\n", 1)[1]
+        assert "](docs/appen/" not in uten_knappen.split("\n## Mappestruktur\n", 1)[0]
+
+    def test_mappa_har_bare_bilder_og_video_av_appen(self):
+        """Regel 16: bare bilder og video av demoen. Ville feilet med en annen
+        fil i docs/appen/, en undermappe, eller et bilde i mappa som ikke står
+        i knappen."""
+        mappe = ROT / "docs" / "appen"
+        filer = [p for p in mappe.rglob("*") if p.name not in SYSTEMFILER]
+        assert all(p.is_file() and p.parent == mappe for p in filer), filer
+        assert all(p.suffix.lower() in (BILDEFILER | VIDEOFILER) - {".svg"} for p in filer), filer
+        bildene = sorted(p.relative_to(ROT).as_posix() for p in filer if p.suffix.lower() in BILDEFILER)
+        assert bildene == sorted([SKJERMBILDET, AKSJESIDEBILDET]), bildene
+
+    def test_avtrykket_dekker_modulene_appen_og_demoen_importerer(self):
+        """Gjennomgangen (BH1, ECH1): lista over filene bak aksjesiden er ført
+        for hånd. Ville feilet hvis appen eller demoen fikk en ny modul i src/
+        som verken var med eller unntatt med grunn i IKKE_BAK_AKSJESIDEN."""
+        import subprocess
+        import sys
+
+        skript = (
+            "import sys; from pathlib import Path; src = Path('src').resolve(); sys.path.insert(0, str(src)); "
+            "import app, demo; "
+            "print('\\n'.join(sorted('src/' + Path(m.__file__).resolve().relative_to(src).as_posix() "
+            "for m in list(sys.modules.values()) if getattr(m, '__file__', None) "
+            "and Path(m.__file__).resolve().is_relative_to(src))))"
+        )
+        ut = subprocess.run([sys.executable, "-c", skript], cwd=ROT, capture_output=True, text=True, check=True)
+        moduler = set(ut.stdout.split())
+        assert "src/app.py" in moduler and "src/aksjedetalj.py" in moduler, moduler
+        mangler = moduler - set(FILENE_BAK_AKSJESIDEN) - IKKE_BAK_AKSJESIDEN
+        assert not mangler, mangler
+        assert IKKE_BAK_AKSJESIDEN <= moduler
+
+    def test_hvert_bilde_har_sitt_eget_avtrykk(self):
+        """Ville feilet hvis aksjesiden brukte avtrykket for oversikten, så en
+        endret mal bak aksjesiden ikke ga rød test."""
+        assert _avtrykk_bak_bildet() == AVTRYKK_BAK_BILDET
+        assert _avtrykk_bak_bildet(FILENE_BAK_AKSJESIDEN) == AVTRYKK_BAK_AKSJESIDEN
+        assert AVTRYKK_BAK_BILDET != AVTRYKK_BAK_AKSJESIDEN
+        assert "src/templates/aksje.html" in FILENE_BAK_AKSJESIDEN
+        assert "src/templates/index.html" in MALENE_BAK_BILDET
 
 
 def _python_krav() -> str:
@@ -968,7 +1163,9 @@ class TestBildeneIDocs:
         ingen bilder med ekte data blir liggende. Story 3.3c: under
         docs/bilder/ ligger bare de tre skjermbildene i «Kom i gang», i
         docs/bilder/readme/. Story 3.3e: og bildet av oversikten i demoen.
-        Ville feilet med et bilde til, eller et av de fire et annet sted."""
+        Ville feilet med et bilde til, eller et av de fire et annet sted.
+        Story 3.3f: bildet av oversikten ligger i docs/appen/, så her er det
+        de tre."""
         mappe = README.parent / "docs" / "bilder"
         # Bare bildefiler: Thumbs.db og .DS_Store fra Utforsker og Finder
         # skal ikke felle testen hos sensor (gjennomgangen av 3.3b, BH4, ECH).
@@ -977,8 +1174,9 @@ class TestBildeneIDocs:
             for p in mappe.rglob("*")
             if p.is_file() and p.suffix.lower() in BILDEFILER
         )
-        # Story 3.3e: og bildet av oversikten i demoen.
-        ventet = [*(f"docs/bilder/readme/{navn}" for navn in BILDENE.values()), SKJERMBILDET]
+        # Story 3.3e: og bildet av oversikten i demoen. Story 3.3f: det ligger
+        # i docs/appen/.
+        ventet = [f"docs/bilder/readme/{navn}" for navn in BILDENE.values()]
         assert filer == sorted(ventet), filer
 
 
@@ -1733,16 +1931,21 @@ class TestReadmeForNybegynnere:
             < tekst.index("\n## Tester\n")
         )
         topp = tekst.split("\n## Kom i gang\n", 1)[0]
+        # Story 3.3f: knappen med bildene telles som ett avsnitt.
+        topp = re.sub(r"<details>.*?</details>", "<details>", topp, flags=re.DOTALL)
         avsnitt = [a.strip() for a in topp.split("\n\n") if a.strip()]
         # Gruppen 16.10 kl. 21:38: skjermbildet under «Til faglærer» er tatt
         # ut, så «Til faglærer» er igjen siste avsnitt før «Kom i gang».
         # Story 3.3e (gruppens svar 18.10 kl. 00:20): bildet av oversikten
-        # står igjen rett under «Til faglærer», som i 3.3b.
-        assert avsnitt[-1].startswith("![Oversikten i demoen"), avsnitt[-1]
-        assert SKJERMBILDET in avsnitt[-1]
-        assert avsnitt[-2].startswith("Til faglærer:"), avsnitt[-2]
-        # Story 3.3d, punkt f: «Innhold» står rett under beskrivelsen.
-        assert avsnitt[-3].startswith("**Innhold:** "), avsnitt[-3]
+        # står igjen rett under «Til faglærer», som i 3.3b. Story 3.3f
+        # (gruppens svar 18.10 kl. 23:03): bildene står i knappen rett under
+        # beskrivelsen, og «Til faglærer» er igjen siste avsnitt.
+        assert avsnitt[-1].startswith("Til faglærer:"), avsnitt[-1]
+        assert SKJERMBILDET not in avsnitt[-1]
+        # Story 3.3d, punkt f: «Innhold» står rett under beskrivelsen, og fra
+        # 3.3f rett under knappen.
+        assert avsnitt[-2].startswith("**Innhold:** "), avsnitt[-2]
+        assert avsnitt[-3] == "<details>", avsnitt[-3]
         assert avsnitt[-4].startswith("OSE Signal viser"), avsnitt[-4]
         assert "\n## " not in topp
 
@@ -1961,21 +2164,26 @@ class TestReadmeForNybegynnere:
         gitignore = (ROT / ".gitignore").read_text(encoding="utf-8")
         del_ = README.read_text(encoding="utf-8").split("\n## Mappestruktur\n", 1)[1].split("\n## ", 1)[0]
         punkter = [l for l in del_.splitlines() if l.startswith("- ")]
-        assert len(punkter) == 7, punkter
+        # Story 3.3f: 8 med docs/appen/.
+        assert len(punkter) == 8, punkter
         for punkt in punkter:
             # Hver sti i kodeformat i punktet er en lenke, ogsaa etter
             # tankestreken (gjennomgangen, BH3 og ECH4).
             assert "`" not in re.sub(r"\[`[^`]+`\]\([^)]+\)", "", punkt), punkt
         lenker = re.findall(r"\[`([^`]+)`\]\(([^)]+)\)", del_)
         # Alle lenkene, ogsaa uten kodeformat, er de i kodeformat.
-        # Story 3.3e: 16 med bildet av oversikten.
-        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 16, lenker
+        # Story 3.3e: 16 med bildet av oversikten. Story 3.3f: 18 med docs/appen/
+        # og bildet av aksjesiden.
+        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 18, lenker
         sporet = _git_sporet()
         for tekst, maal in lenker:
             # Maalet er stien i teksten, relativ og uten «..» (BH4, ECH3).
             # Bildene staar med filnavnet, som foer 3.3d, etter mappa de ligger i.
-            filnavn = [*BILDENE.values(), SKJERMBILDET.rsplit("/", 1)[1]]
-            assert maal == tekst or (tekst in filnavn and maal == f"docs/bilder/readme/{tekst}"), (
+            # Story 3.3f: bildet av oversikten etter docs/appen/.
+            filnavn = {navn: f"docs/bilder/readme/{navn}" for navn in BILDENE.values()}
+            filnavn[SKJERMBILDET.rsplit("/", 1)[1]] = SKJERMBILDET
+            filnavn[AKSJESIDEBILDET.rsplit("/", 1)[1]] = AKSJESIDEBILDET
+            assert maal == tekst or filnavn.get(tekst) == maal, (
                 tekst,
                 maal,
             )
