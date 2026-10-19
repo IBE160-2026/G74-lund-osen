@@ -314,7 +314,7 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 
 - Min liste
 - Historikken i aksjedetaljen
-- Lenken til selskapets egen nettside
+- Lenken til selskapets investorside
 - Egen nøkkel til Gemini, Anthropic og OpenAI
 
 **Ekstra, hvis tiden rekker**
@@ -324,7 +324,7 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 - På forsiden periodevalget, børsometeret og KI-teksten om dagen
 - Til slutt å velge og bytte aksjer
 
-Det under «Ekstra» lover ikke briefen, og det flettes bare ferdig og med testene grønne, før README-prøven senest én uke før innleveringen.
+Det som står under «Ekstra», er ikke lovet i briefen og kommer bare med hvis det er ferdig og testet før README-prøven, senest én uke før innleveringen.
 
 «Ferdig» betyr flettet til main. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
 

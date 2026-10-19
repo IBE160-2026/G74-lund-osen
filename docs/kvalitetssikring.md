@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-19T16:20
+updated: 2026-10-19T16:28
 ---
 
 # Kvalitetssikring
@@ -838,6 +838,8 @@ hentingen kan gi kurser, se «Når kan jeg hente?» i
 ### Prøve 3: den lokale modellen
 
 *Lagt til 2026-10-15 (story 10.2, PR F, planen for KI-laget 15.10 kl. 15:43):* «Den lokale modellen (KI-teksten)» under «Mer for den som vil» i README-en. Prøven tas på en maskin med grafikkort fra NVIDIA, etter Prøve 2, med den ekte versjonen og egen EODHD-nøkkel. Ollama trenger ingen nøkkel.
+
+*Lagt til 2026-10-19 (story 3.3g, gjennomgangen VG5):* knappen heter nå «Den lokale modellen for KI-teksten (valgfri)», og første setning sier at den ikke trengs for demoen eller for å vurdere appen. Prøven står som før.
 
 - **Dato:**
 - **Maskin og grafikkort:**

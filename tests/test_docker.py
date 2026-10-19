@@ -1225,8 +1225,8 @@ def _detaljer(tekst: str) -> dict[str, str]:
 # Story 3.3g: setningen om regelen kl. 14:48 (svaret 19.10 under
 # «Prioritering» i epics.md), rett under listene i «Status».
 REGELEN_FOR_EKSTRA = (
-    "Det under «Ekstra» lover ikke briefen, og det flettes bare ferdig og med testene grønne, "
-    "før README-prøven senest én uke før innleveringen."
+    "Det som står under «Ekstra», er ikke lovet i briefen og kommer bare med hvis det er ferdig og testet "
+    "før README-prøven, senest én uke før innleveringen."
 )
 
 
@@ -1392,7 +1392,7 @@ BEHOLDT_I_README = [
 class TestReadmeForNybegynnere:
     """Story 3.4, PR 3: «Kom i gang» for en som aldri har brukt Docker eller
     et terminalvindu. Formen fra 11.10 kl. 22:32: to versjoner i en tabell,
-    felles steg 1-4, den ekte versjonen (anbefalt) og demoen fra steg 5,
+    felles steg 1-4, den ekte versjonen (anbefalt til 3.3g) og demoen fra steg 5,
     høyst 8 spørsmål, og resten i docs/hjelp.md."""
 
     def test_ingen_kommentar_paa_kommandolinjene(self):
@@ -2062,7 +2062,7 @@ class TestReadmeForNybegynnere:
         saker = (
             "min liste",
             "historikken i aksjedetaljen",
-            "lenken til selskapets egen nettside",
+            "lenken til selskapets investorside",
             "egen nøkkel",
             "signaldagene i kursgrafen",
             "«vis ki-tekst»",
@@ -2118,11 +2118,13 @@ class TestReadmeForNybegynnere:
         assert f"{tall[antall]} enkle sjekker" in beskrivelse
         # Styrken er summen av sjekkene uten fortegn (FR-703), saa den hoeyeste er antallet.
         assert f"signalstyrke fra 0 til {antall}" in beskrivelse
-        # Story 3.3g: «interesse (handelsvolum)», så forklaringen telles ikke
-        # med i navnene.
-        assert "– " + ", ".join(
-            n.lower() for n in navn[: antall - 1]
-        ) + f" og {navn[antall - 1].lower()} –" in beskrivelse.replace(" (handelsvolum)", "")
+        # Story 3.3g: «interesse (handelsvolum)». Forklaringen er lov bare
+        # rett etter det siste navnet (gjennomgangen, BH8).
+        siste = navn[antall - 1].lower()
+        assert "– " + ", ".join(n.lower() for n in navn[: antall - 1]) + f" og {siste} –" in beskrivelse.replace(
+            f" og {siste} (handelsvolum) –", f" og {siste} –"
+        )
+        assert beskrivelse.count("(handelsvolum)") <= 1
         assert "Appen gir ikke råd om å kjøpe eller selge." in beskrivelse
         # 12.10 kl. 11:12: at appen er under utvikling, staar ogsaa oeverst,
         # ikke bare i «Status» etter hele «Kom i gang».
@@ -2273,9 +2275,22 @@ class TestReadmeForNybegynnere:
         assert re.findall(r"arbeidskrav-product-brief-v\d+", brief[0]) == [gjeldende], brief[0]
 
 
-# Story 3.3g: det under «Ekstra», ett ord eller uttrykk per punkt, i den
-# rekkefoelgen README-en har dem. Briefen v8 lover ikke noe av det.
-EKSTRA = ("signaldagene", "«vis ki-tekst»", "periodevalget", "velge og bytte aksjer")
+# Story 3.3g: det under «Ekstra», ordene i hvert punkt, i den rekkefoelgen
+# README-en har dem. Briefen v8 lover ikke noe av det. Gjennomgangen (BH11,
+# VG2, ECH5): alle sakene i punktet, og stammen «signaldag», saa ogsaa
+# «signaldager» fanges.
+EKSTRA = (
+    ("signaldag",),
+    ("«vis ki-tekst»",),
+    ("periodevalget", "børsometeret", "ki-teksten om dagen"),
+    ("velge og bytte aksjer",),
+)
+
+
+def _uten_daterte_linjer(tekst: str) -> str:
+    """Teksten uten de daterte linjene (*Lagt til …* og *Rettet …*), som er
+    historikk og kan sitere det gamle."""
+    return "\n".join(l for l in tekst.splitlines() if not re.match(r"\*(Lagt til|Rettet) ", l))
 
 
 class TestReadmeDemoenAnbefales:
@@ -2286,15 +2301,22 @@ class TestReadmeDemoenAnbefales:
 
     def test_kom_i_gang_anbefaler_demoen_for_faglaerer_og_sensor(self):
         """Ville feilet hvis «Vi anbefaler den ekte versjonen» kom tilbake,
-        eller hvis «Kom i gang» ikke begynte med anbefalingen av demoen."""
+        også med en annen ordlyd («Likevel anbefaler vi …», «… anbefales»,
+        «Anbefalt» i tabellen), eller hvis «Kom i gang» ikke begynte med
+        anbefalingen av demoen (gjennomgangen, ECH1 og ECH2)."""
         tekst = README.read_text(encoding="utf-8")
         foerste = _kom_i_gang().lstrip("\n").split("\n\n", 1)[0]
-        assert foerste.startswith(
+        anbefalingen = (
             "Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og viser "
-            "hovedfunksjonene med faste eksempeldata, også KI-teksten. "
-            "Den ekte versjonen er for å prøve løsningen med kurser fra EODHD."
+            "hovedfunksjonene med faste eksempeldata, også KI-teksten."
+        )
+        assert foerste.startswith(
+            anbefalingen + " Den ekte versjonen er for å prøve løsningen med kurser fra EODHD."
         ), foerste
-        assert "anbefaler den ekte" not in tekst.lower()
+        # «anbefal» står bare i den ene setningen, i hele README-en og i
+        # hjelpen utenom de daterte linjene.
+        assert re.findall(r"anbefal\w*", tekst, re.IGNORECASE) == ["anbefaler"], re.findall(r"\w*anbefal\w*", tekst)
+        assert re.search(r"anbefal", _uten_daterte_linjer(_hjelp()), re.IGNORECASE) is None
 
     def test_ingen_anbefalt_ved_den_ekte_versjonen(self):
         """Ville feilet hvis «(anbefalt)» sto igjen ved den ekte versjonen, i
@@ -2303,9 +2325,15 @@ class TestReadmeDemoenAnbefales:
         tekst = README.read_text(encoding="utf-8")
         assert "(anbefalt)" not in tekst
         assert "\n### Den ekte versjonen\n" in tekst
-        assert "#den-ekte-versjonen-anbefalt" not in tekst and "#den-ekte-versjonen-anbefalt" not in _hjelp()
         assert "](#den-ekte-versjonen)" in tekst
         assert _alle_ankrene(tekst).count("den-ekte-versjonen") == 1
+        # Gjennomgangen (BH1, ECH4): ingen lenke til det gamle ankeret, heller
+        # ikke fra dokumentene, utenom dagsfilene, som lagrer instruksjonene
+        # ordrett.
+        for sti in [README, *ROT.glob("docs/**/*.md"), *ROT.glob("_bmad-output/**/*.md")]:
+            if "ai-prompts" in sti.parts:
+                continue
+            assert "#den-ekte-versjonen-anbefalt" not in sti.read_text(encoding="utf-8"), sti
 
     def test_delen_om_den_lokale_modellen_sier_at_den_er_valgfri(self):
         """Ville feilet hvis «valgfri» ble tatt bort fra overskriften eller
@@ -2324,11 +2352,13 @@ class TestReadmeDemoenAnbefales:
 
     def test_interesse_handelsvolum_oeverst(self):
         """Ville feilet hvis beskrivelsen øverst sa «interesse» uten
-        forklaringen, eller hvis den sto et annet sted enn i beskrivelsen."""
+        forklaringen, eller hvis forklaringen sto et annet sted enn i
+        beskrivelsen (gjennomgangen, BH7 og VG3)."""
         tekst = README.read_text(encoding="utf-8")
         beskrivelse = [a for a in tekst.split("Til faglærer:", 1)[0].split("\n\n") if a.startswith("OSE Signal viser")]
         assert len(beskrivelse) == 1
         assert "trend, bevegelse og interesse (handelsvolum)" in beskrivelse[0]
+        assert tekst.count("(handelsvolum)") == 1
 
     def test_ingen_av_de_ekstra_staar_under_neste_i_v1(self):
         """Svaret kl. 14:48: det briefen ikke lover, står under «Ekstra,
@@ -2340,12 +2370,16 @@ class TestReadmeDemoenAnbefales:
         lister = _statuslister(status)
         v1 = [p.lower() for p in lister["Neste i v1"]]
         ekstra = [p.lower() for p in lister["Ekstra, hvis tiden rekker"]]
-        for sak in EKSTRA:
-            assert not any(sak in p for p in v1), (sak, v1)
+        for saker in EKSTRA:
+            for sak in saker:
+                assert not any(sak in p for p in v1), (sak, v1)
         assert len(ekstra) == len(EKSTRA), ekstra
-        for punkt, sak in zip(ekstra, EKSTRA, strict=True):
-            assert sak in punkt, (sak, punkt)
-        for sak in ("min liste", "historikken", "selskapets egen nettside", "egen nøkkel til gemini"):
+        for punkt, saker in zip(ekstra, EKSTRA, strict=True):
+            for sak in saker:
+                assert sak in punkt, (sak, punkt)
+        # Gjennomgangen (BH2, VG1): lenken går til selskapets investorside,
+        # som i briefen v8 og story 10.5 etter 06.10.
+        for sak in ("min liste", "historikken", "selskapets investorside", "egen nøkkel til gemini"):
             assert sum(sak in p for p in v1) == 1, (sak, v1)
         assert len(v1) == 4, v1
         assert "newsweb" not in "\n".join(v1 + ekstra)
