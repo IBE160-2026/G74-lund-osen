@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-10-19T16:28
+updated: 2026-10-19T16:55
 ---
 
 # Vurderingsmatrise for del 1
@@ -95,3 +95,5 @@ Statusen i tabellen er ikke endret. README-prøven (story 3.4) og avsnittet «St
 *Lagt til 2026-10-19 kl. 16:20:* raden «README og kjørbarhet»: i story 3.3g anbefaler «Kom i gang» demoen for faglærer og sensor, som briefen v8 og tilbakemeldingen 06.10 sier (gruppens svar kl. 14:46), og den lokale modellen er merket valgfri. «Status» begynner med at prosjektet er under utvikling, og «Neste» er delt i «Neste i v1» og «Ekstra, hvis tiden rekker» etter svaret kl. 14:48. Punktet om lenkene nevner ikke lenger NewsWeb. Statusen i tabellen er ikke endret.
 
 *Rettet 2026-10-19 (story 3.3g, gjennomgangen VG6):* «Neste tiltak» i raden «README og kjørbarhet» i tabellen for 17.10 sier at «Neste» i «Status» nevner verken søylene eller KI-tekstene i demoen. Begge står nå under «Ferdig», og «Neste» er delt i «Neste i v1» og «Ekstra, hvis tiden rekker». Lenken til selskapet i «Neste i v1» går til investorsiden, som i briefen v8.
+
+*Lagt til 2026-10-19 kl. 16:55:* raden «README og kjørbarhet»: endringene fra linja kl. 16:20 står på main, flettet i `855ba75`, PR #77 (story 3.3g), etter gruppens ja kl. 16:46. Statusen i tabellen er ikke endret.
