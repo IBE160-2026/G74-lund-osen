@@ -2,7 +2,7 @@
 title: 'Story 2.7 (2.7a): all stilen i én CSS-fil'
 type: 'refactor'
 created: '2026-10-19'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'a281bfd'
@@ -101,3 +101,5 @@ Gjennomgang 19.10 på diffen `a281bfd..8e69e53`. Linsene var Blind Hunter (BH, 1
 - Ingen API-kall utover kvotesjekken i regel 15, og `src/fetch_prices.py` kjøres ikke.
 - `data/db/ose.db` og `data/db/demo.db` røres ikke (regel 22). Bildene tas fra en demobase i en midlertidig mappe.
 - Sidene skal se nøyaktig ut som før.
+
+*Lagt til 2026-10-19 kl. 14:28:* PR #76 er squash-flettet i `dc521ff`, låst til head-en `625d044`. Main hadde ikke gått videre. CI var grønn på head-en (39251984445), med pytest og docker, også demoen i compose. Triagen står over og som kommentar på PR-en.

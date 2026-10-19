@@ -1631,6 +1631,8 @@ Som **bruker**, vil jeg se hva løsningen sa om aksjen de siste ukene, så FR-40
 
 *Avgjort 2026-10-19 kl. 12:06 (gruppens svar):* stilen flyttes til én CSS-fil nå, som første del av 2.7 (spesifikasjonen 2.7a), før 8.3 og historikken, fordi seks regler står likt i `index.html` og `aksje.html`, og kontrollpunktet i 2.7 sier én layout og én CSS-fil. Det erstatter svarene kl. 11:54 og 11:58 samme dag om at rammen skulle telle som felles stil til en egen PR senere i uka. Historikken blir 2.7b.
 
+*Lagt til 2026-10-19 kl. 14:28:* all stilen står i `src/static/stil.css`, lenket fra `_ramme.html` med et avtrykk av fila, og sidene ser ut som før, flettet i `dc521ff`, PR #76 (spesifikasjonen `spec-2-7a-stilen-i-en-css-fil.md`). Kontrollpunktet om én layout og én CSS-fil er oppfylt. Historikken er 2.7b.
+
 ### Story 2.8: Hovedindeksen hentes i samme kjøring
 
 *Lagt til 2026-10-01, Marians beslutning.*
