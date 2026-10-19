@@ -547,6 +547,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-19 kl. 12:06 (gruppens svar):* stilen flyttes til én CSS-fil nå, som første del av 2.7 (spesifikasjonen 2.7a), før 8.3 og historikken, fordi seks regler står likt i `index.html` og `aksje.html`, og kontrollpunktet i 2.7 sier én layout og én CSS-fil. Det erstatter svarene kl. 11:54 og 11:58 samme dag om at rammen skulle telle som felles stil til en egen PR senere i uka. Historikken blir 2.7b.
 
+*Avgjort 2026-10-19 kl. 13:59 (gruppens svar):* grenene som er flettet, slettes på GitHub, og «Automatically delete head branches» slås på, så lista over grener bare viser arbeid som pågår. PR-ene beholder commitene, og en slettet gren kan hentes tilbake fra PR-en.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
