@@ -1034,6 +1034,80 @@ class TestAksjesidebildet:
         assert avtrykk == AVTRYKK_BAK_AKSJESIDEN, SLIK_TAS_AKSJESIDEN.format(avtrykk=avtrykk)
 
 
+VIDEOFILER = {".mp4", ".webm", ".mov"}
+# Filer Utforsker og Finder legger i en mappe, som ikke er bilder av appen.
+SYSTEMFILER = {"Thumbs.db", ".DS_Store", "desktop.ini"}
+
+
+def _knappen_med_bildene() -> str:
+    """Innholdet i knappen «Bilder av appen (demoen)», mellom <summary> og
+    </details>."""
+    tekst = README.read_text(encoding="utf-8")
+    deler = tekst.split("<summary>Bilder av appen (demoen)</summary>\n", 1)
+    assert len(deler) == 2, "knappen «Bilder av appen (demoen)» mangler"
+    return deler[1].split("</details>", 1)[0]
+
+
+class TestBildeneAvAppen:
+    """Story 3.3f (gruppens svar 18.10 kl. 23:03): bildene av appen står bak
+    en knapp rett under beskrivelsen, i docs/appen/, bare av demoen."""
+
+    def test_knappen_staar_rett_under_beskrivelsen_og_er_lukket(self):
+        """Ville feilet hvis knappen sto et annet sted, hadde et annet navn,
+        eller var åpen som standard (<details open>)."""
+        tekst = README.read_text(encoding="utf-8")
+        beskrivelse = next(a for a in tekst.split("\n\n") if a.startswith("OSE Signal viser"))
+        etter = tekst.split(beskrivelse + "\n\n", 1)[1]
+        assert etter.startswith("<details>\n<summary>Bilder av appen (demoen)</summary>\n\n"), etter[:80]
+        assert etter.split("</details>\n\n", 1)[1].startswith("**Innhold:** ")
+        # Lukket som de andre knappene: ingen <details> i README-en er åpen.
+        assert re.findall(r"<details[^>]*>", tekst) == ["<details>"] * tekst.count("<details")
+
+    def test_begge_bildene_ligger_i_docs_appen_med_alt_tekst_og_teksten_under(self):
+        """Ville feilet hvis et bilde lå utenfor docs/appen/, manglet
+        alt-tekst eller teksten under, eller ikke sa at det er demoen med
+        oppdiktede tall."""
+        knappen = _knappen_med_bildene()
+        bilder = re.findall(r"^!\[([^\]]*)\]\(([^)]+)\)\n(.*)$", knappen, re.MULTILINE)
+        assert [sti for _, sti, _ in bilder] == [SKJERMBILDET, AKSJESIDEBILDET]
+        for alt, sti, under in bilder:
+            assert sti.startswith("docs/appen/") and (ROT / sti).is_file(), sti
+            assert "i demoen" in alt and "«Eksempeltall»" in alt and "ikke data fra Oslo Børs" in alt, alt
+            assert under.startswith("*") and under.endswith("*"), under
+            assert "i demoen" in under and "oppdiktede" in under and "«Eksempeltall»" in under, under
+        # Ingen andre bilder i knappen, og ingen andre ord enn bildene.
+        rest = re.sub(r"^!\[[^\]]*\]\([^)]+\)\n\*[^\n]*\*$", "", knappen, flags=re.MULTILINE)
+        assert rest.strip() == "", rest
+
+    def test_bildene_av_appen_staar_bare_i_knappen(self):
+        """Ville feilet med et bilde fra docs/appen/ et annet sted i
+        README-en, for eksempel under «Til faglærer» som før."""
+        tekst = README.read_text(encoding="utf-8")
+        uten_knappen = tekst.replace(_knappen_med_bildene(), "")
+        assert "docs/appen/" in uten_knappen.split("\n## Mappestruktur\n", 1)[1]
+        assert "](docs/appen/" not in uten_knappen.split("\n## Mappestruktur\n", 1)[0]
+
+    def test_mappa_har_bare_bilder_og_video_av_appen(self):
+        """Regel 16: bare bilder og video av demoen. Ville feilet med en annen
+        fil i docs/appen/, en undermappe, eller et bilde i mappa som ikke står
+        i knappen."""
+        mappe = ROT / "docs" / "appen"
+        filer = [p for p in mappe.rglob("*") if p.name not in SYSTEMFILER]
+        assert all(p.is_file() and p.parent == mappe for p in filer), filer
+        assert all(p.suffix.lower() in (BILDEFILER | VIDEOFILER) - {".svg"} for p in filer), filer
+        bildene = sorted(p.relative_to(ROT).as_posix() for p in filer if p.suffix.lower() in BILDEFILER)
+        assert bildene == sorted([SKJERMBILDET, AKSJESIDEBILDET]), bildene
+
+    def test_hvert_bilde_har_sitt_eget_avtrykk(self):
+        """Ville feilet hvis aksjesiden brukte avtrykket for oversikten, så en
+        endret mal bak aksjesiden ikke ga rød test."""
+        assert _avtrykk_bak_bildet() == AVTRYKK_BAK_BILDET
+        assert _avtrykk_bak_bildet(FILENE_BAK_AKSJESIDEN) == AVTRYKK_BAK_AKSJESIDEN
+        assert AVTRYKK_BAK_BILDET != AVTRYKK_BAK_AKSJESIDEN
+        assert "src/templates/aksje.html" in FILENE_BAK_AKSJESIDEN
+        assert "src/templates/index.html" in MALENE_BAK_BILDET
+
+
 def _python_krav() -> str:
     """Versjonen i requires-python i pyproject.toml, for eksempel «3.13»."""
     import tomllib
