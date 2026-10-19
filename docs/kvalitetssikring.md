@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-19T00:22
+updated: 2026-10-19T11:00
 ---
 
 # Kvalitetssikring
@@ -273,6 +273,7 @@ sist i dokumentet.
 | 8.15 Sortering | `a13d273` (#43) | 1 (16, og 5 tester fra gjennomgangen prøvd som mutanter) | – | `S/spec-8-15-sortering-ved-klikk-i-kolonneraden.md` |
 | 8.15b Selskap og den sorterte kolonnen | `b6449ac` (#73) | 1 (5, M1–M3 og N1–N2) | M1–M3 ble kjørt på `b5f2400` og på nytt etter rettingene | `S/spec-8-15b-selskap-og-den-sorterte-kolonnen.md` |
 | 8.16 Startdagen og periodene i kursgrafen | `be05337` (#72) | 1 (8, P1–P4 og Q1–Q4) | P1–P4 ble kjørt på `697f459` og på nytt etter rettingene. Testen for bildet feilet på commiten for b til bildet ble tatt på nytt i c | `S/spec-8-16-periodene-i-kursgrafen.md` |
+| 8.16b Dagen på hele aksjesiden | `4e43ba5` (#74) | 1 (6, K1–K3 og N1–N3) | K1–K3 ble kjørt på `f1e2fae` og på nytt etter rettingene | `S/spec-8-16b-dagen-paa-hele-siden.md` |
 | 10.1 Grunnlaget som sendes | `6855861` (#47) | 1 (8) | GR2 overlevde først, og testen ble endret i `2ae86b4` | `S/spec-10-1-grunnlaget-som-sendes-bare-utledede-verdier.md` |
 | 10.2a Modellen, prompten og kontrollen | `77ebf31` (#48) | 1 (12) | – Spesifikasjonen står in-progress | `S/spec-10-2a-modellen-prompten-og-kontrollen.md` |
 | 10.2b Teksten i hentekommandoen | `b13e50f` (#49) | 1 (18) | FR2 overlevde først, og testen ble skrevet om i `48838a7` | `S/spec-10-2b-teksten-i-hentekommandoen.md` |
@@ -474,6 +475,7 @@ funn. Antall rader i loggen:
 | 8.15 | 19 | 11 | 7 | 1 |
 | 8.15b | 26 | 11 | 15 | – |
 | 8.16 | 29 | 15 | 13 | 1 |
+| 8.16b | 20 | 5 | 14 | 1 |
 | 10.1 | 15 | 13 | 2 | – |
 | 10.2a | 25 | 20 | 4 | 1 |
 | 10.2b, første runde | 24 | 20 | 2 | – |
@@ -1172,6 +1174,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 8.15 | S1–S13 og T1–T3 | testene står per mutant i tabellen i spesifikasjonen | `S/spec-8-15-…` |
 | 8.15b | M1–M3 og N1–N2 | testene står per mutant i spesifikasjonen | `S/spec-8-15b-…` |
 | 8.16 | P1–P4 og Q1–Q4 | testene står per mutant i spesifikasjonen | `S/spec-8-16-…` |
+| 8.16b | K1–K3 og N1–N3 | testene står per mutant i spesifikasjonen | `S/spec-8-16b-…` |
 | 10.1 | G1–G4 og GR1–GR4 | G1–G4 `test_signalet_gir_bare_fortegn_styrke_og_retning`; resten i tabellen | `S/spec-10-1-…` |
 | 10.2a | E1–E6 og ER1–ER6 | testene står per mutant i tabellen i spesifikasjonen | `S/spec-10-2a-…` |
 | 10.2b | F1–F5, FR1–FR4, FC1–FC8 og F2b | testene står per mutant i tabellen i spesifikasjonen | `S/spec-10-2b-…` |
