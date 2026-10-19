@@ -143,6 +143,11 @@ et sitat som ikke fantes».
     eller skrives på nytt (AD-7), så en feil fra en gren kan ikke rettes.
     Besluttet av gruppen 05.10 kl. 19:17 (svar 3 under story 2.3 i
     `epics.md`), og ført her da 2.3 ble bygget.
+    *Lagt til 2026-10-19 (story 8.3, gruppens svar kl. 10:29):* fra 8.3 skriver
+    også webserveren fra main til basen, bare merkingen i Min liste (føringen
+    30.09 under AD-3). En gren med en ny migrasjon bygges i en egen worktree,
+    fordi appen som kjører fra repo-mappa, lastes på nytt ved en checkout og
+    kunne migrert basen.
 23. **ruff før en commit.** `uv run ruff check --fix` og så `uv run ruff format`
     før hver commit som endrer `src/` eller `tests/`. Reglene står i `pyproject.toml`
     og er bare de som finner feil eller rot: pyflakes, importene og bugbear.

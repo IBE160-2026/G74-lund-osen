@@ -557,6 +557,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-19 kl. 15:43 (gruppens svar):* endelig v1 er det briefen v8 lover: kjernen, KI-teksten med bryter, historikken, hovedindeksen, Min liste, lenken til investorsiden og egne nøkler til Gemini, Anthropic og OpenAI (10.7, briefen under «Data og kilder», gruppens svar kl. 16:12), og det som alt er flettet. Det PRD-en ellers har under «Inne i v1», også de femten «Fast i v1» fra 08.10, flyttes til «Ekstra, hvis tiden rekker» og bygges etter regelen kl. 14:48; det som ikke er flettet ved funksjonsstoppen, står som plan for en senere versjon. Grunnen: tilbakemeldingen 06.10 om at omfanget ikke skal vokse, og at planen skal beskrive den appen som leveres. Endringsforslaget er `sprint-change-proposal-2026-10-19.md`.
 
+*Avgjort 2026-10-19 kl. 10:29 (gruppens svar):* 8.3 bygges i dag og flettes etter kveldens henting og måling; stjernen står både i oversikten og i Min liste; demoen starter med fem merket, den ekte med en tom liste.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -3183,6 +3185,8 @@ skjermbildene som finnes · **Begrenses av:** FR-101–103, `AD-3`, `AD-10`,
 
 **Avhenger av:** 2.2. Bygges etter brukertesten i 8.1 og før UX-gjennomgangen i
 8.2, så 8.2 vurderer alle tre skjermbildene.
+
+*Avgjort 2026-10-19 kl. 10:29 (gruppens svar):* 8.3 bygges i dag og flettes etter kveldens henting og måling; stjernen står både i oversikten og i Min liste; demoen starter med fem merket, den ekte med en tom liste.
 
 ### Story 8.4: Se nærmere i aksjedetaljen
 
