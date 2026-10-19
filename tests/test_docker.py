@@ -781,7 +781,11 @@ class TestReadme:
         Ingen av dem viser appen. Story 3.3e: og bildet av oversikten i demoen
         under «Til faglærer», som viser demoen, aldri den ekte versjonen.
         Ville feilet med et bilde til, et bilde uten alt-tekst eller utenfor
-        docs/bilder/readme/, eller uten CI-merket."""
+        docs/bilder/readme/, eller uten CI-merket.
+
+        Story 3.3f (gruppens svar 18.10 kl. 23:03): bildene av appen, av
+        oversikten og aksjesiden i demoen, ligger i docs/appen/ og står i
+        knappen «Bilder av appen (demoen)», ikke under «Til faglærer»."""
         tekst = README.read_text(encoding="utf-8")
         bilder = re.findall(r"!\[([^\]]*)\]\(([^)]+)\)", tekst)
         merket = [b for _, b in bilder if b.endswith("/actions/workflows/tester.yml/badge.svg")]
@@ -822,6 +826,11 @@ class TestReadme:
             assert f"`{navn}`" in mappestruktur, navn
         # Story 3.3e (gjennomgangen, VG4): og bildet av oversikten.
         assert f"`{SKJERMBILDET.rsplit('/', 1)[1]}`" in mappestruktur
+        # Story 3.3f (gjennomgangen, VG3 og ECH7): docs/appen/ og begge bildene
+        # av appen, i punktet for mappa.
+        punkt = next(l for l in mappestruktur.splitlines() if l.startswith("- [`docs/appen/`](docs/appen/)"))
+        for sti in (SKJERMBILDET, AKSJESIDEBILDET):
+            assert f"[`{sti.rsplit('/', 1)[1]}`]({sti})" in punkt, sti
 
 
 BILDEFILER = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"}
@@ -905,10 +914,18 @@ FILENE_BAK_AKSJESIDEN = (
     "src/tilstand.py",
     "src/vurderingsdata.py",
     "src/templates/aksje.html",
+    # Gjennomgangen (BH1, ECH1): lagringslaget som leser det siden viser, og
+    # skjemaet demobasen lages med.
+    "src/lagring_sqlite.py",
+    "src/migrering.py",
+    *sorted(p.relative_to(ROT).as_posix() for p in (ROT / "src" / "migrasjoner").glob("*.sql")),
 )
+# Moduler appen og demoen importerer, men som ikke lager noe aksjesiden viser:
+# lagring_sqlite henter DATA_KATALOG fra lagring_fil, som importerer eodhd.
+IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py"}
 # Bildet er saa hoeyt at grafen, som staar under KI-teksten, er med til bunnen.
 HOEYDE_PAA_AKSJESIDEN = 1816
-AVTRYKK_BAK_AKSJESIDEN = "34c8cc1122c5d96a07c3ddcc9cbff4f10bae33d4e3b311676fb623ef59385a50"
+AVTRYKK_BAK_AKSJESIDEN = "fd2257d28c6cf9a58ea6ad45732c10dadb885875ffb978a6e45d67422913b7fd"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "
@@ -946,7 +963,8 @@ def _avtrykk_bak_bildet(filene: tuple[str, ...] = MALENE_BAK_BILDET) -> str:
 class TestSkjermbildet:
     """3.3b, punkt b, tilbake i 3.3e: skjermbildet av oversikten i demoen,
     under «Til faglærer», 1280 px bredt, med en alt-tekst som sier at det er
-    demoen. Regelen fra 25.09: bildet viser bare demoen."""
+    demoen. Regelen fra 25.09: bildet viser bare demoen. Story 3.3f: i
+    docs/appen/ og i knappen «Bilder av appen (demoen)»."""
 
     def _bildet(self) -> tuple[str, str]:
         tekst = README.read_text(encoding="utf-8")
@@ -1098,6 +1116,27 @@ class TestBildeneAvAppen:
         bildene = sorted(p.relative_to(ROT).as_posix() for p in filer if p.suffix.lower() in BILDEFILER)
         assert bildene == sorted([SKJERMBILDET, AKSJESIDEBILDET]), bildene
 
+    def test_avtrykket_dekker_modulene_appen_og_demoen_importerer(self):
+        """Gjennomgangen (BH1, ECH1): lista over filene bak aksjesiden er ført
+        for hånd. Ville feilet hvis appen eller demoen fikk en ny modul i src/
+        som verken var med eller unntatt med grunn i IKKE_BAK_AKSJESIDEN."""
+        import subprocess
+        import sys
+
+        skript = (
+            "import sys; from pathlib import Path; src = Path('src').resolve(); sys.path.insert(0, str(src)); "
+            "import app, demo; "
+            "print('\\n'.join(sorted('src/' + Path(m.__file__).resolve().relative_to(src).as_posix() "
+            "for m in list(sys.modules.values()) if getattr(m, '__file__', None) "
+            "and Path(m.__file__).resolve().is_relative_to(src))))"
+        )
+        ut = subprocess.run([sys.executable, "-c", skript], cwd=ROT, capture_output=True, text=True, check=True)
+        moduler = set(ut.stdout.split())
+        assert "src/app.py" in moduler and "src/aksjedetalj.py" in moduler, moduler
+        mangler = moduler - set(FILENE_BAK_AKSJESIDEN) - IKKE_BAK_AKSJESIDEN
+        assert not mangler, mangler
+        assert IKKE_BAK_AKSJESIDEN <= moduler
+
     def test_hvert_bilde_har_sitt_eget_avtrykk(self):
         """Ville feilet hvis aksjesiden brukte avtrykket for oversikten, så en
         endret mal bak aksjesiden ikke ga rød test."""
@@ -1124,7 +1163,9 @@ class TestBildeneIDocs:
         ingen bilder med ekte data blir liggende. Story 3.3c: under
         docs/bilder/ ligger bare de tre skjermbildene i «Kom i gang», i
         docs/bilder/readme/. Story 3.3e: og bildet av oversikten i demoen.
-        Ville feilet med et bilde til, eller et av de fire et annet sted."""
+        Ville feilet med et bilde til, eller et av de fire et annet sted.
+        Story 3.3f: bildet av oversikten ligger i docs/appen/, så her er det
+        de tre."""
         mappe = README.parent / "docs" / "bilder"
         # Bare bildefiler: Thumbs.db og .DS_Store fra Utforsker og Finder
         # skal ikke felle testen hos sensor (gjennomgangen av 3.3b, BH4, ECH).
