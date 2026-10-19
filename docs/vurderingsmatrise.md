@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-10-19T16:55
+updated: 2026-10-19T17:06
 ---
 
 # Vurderingsmatrise for del 1
@@ -97,3 +97,5 @@ Statusen i tabellen er ikke endret. README-prøven (story 3.4) og avsnittet «St
 *Rettet 2026-10-19 (story 3.3g, gjennomgangen VG6):* «Neste tiltak» i raden «README og kjørbarhet» i tabellen for 17.10 sier at «Neste» i «Status» nevner verken søylene eller KI-tekstene i demoen. Begge står nå under «Ferdig», og «Neste» er delt i «Neste i v1» og «Ekstra, hvis tiden rekker». Lenken til selskapet i «Neste i v1» går til investorsiden, som i briefen v8.
 
 *Lagt til 2026-10-19 kl. 16:55:* raden «README og kjørbarhet»: endringene fra linja kl. 16:20 står på main, flettet i `855ba75`, PR #77 (story 3.3g), etter gruppens ja kl. 16:46. Statusen i tabellen er ikke endret.
+
+*Lagt til 2026-10-19 kl. 17:06:* raden «Funksjonalitet og omfang»: endelig v1 er det briefen v8 lover, etter gruppens svar kl. 15:43 og endringsforslaget [`sprint-change-proposal-2026-10-19.md`](../_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-19.md). Av de 34 storyene som verken er done eller ute av v1, er 9 v1: 2.7, 8.3, 10.5 og 10.7 fra briefen, 3.4, 8.1 og 10.4 for suksessmålene, og 8.2 og 9.2. 24 er «Ekstra, hvis tiden rekker» og bygges etter regelen kl. 14:48, og 9.5 utgår, som avgjort 06.10. Det svarer på tilbakemeldingen 06.10 om at omfanget ikke skal vokse. Statusen i tabellen er ikke endret.
