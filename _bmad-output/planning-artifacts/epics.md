@@ -2051,6 +2051,8 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 
 *Avgjort 2026-10-18 kl. 23:03 (gruppens svar):* bildene av appen står bak en knapp rett under beskrivelsen, i en egen mappe for bilder og video, fordi appen endres hele tiden; de endelige bildene og videoen legges inn før innleveringen (spesifikasjonen 3.3f). Det endrer plassen fra svaret 18.10 kl. 00:20 og svar 4 i spesifikasjonen for 3.4 (11.10) om at bildene bare ligger i `docs/bilder/readme/`.
 
+*Avgjort 2026-10-19 kl. 11:57 (gruppens svar):* ja til flettingen av PR #75, etter at README-en før og etter og begge bildene er sett.
+
 ### Story 3.4: Demoversjonen
 
 *Lagt til 2026-10-03, Marians beslutning kl. 18:10.*
