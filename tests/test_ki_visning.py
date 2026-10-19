@@ -479,3 +479,75 @@ class TestGrunnenPaaSiden:
         monkeypatch.setattr(app_modul, "andre_aksjer_har_ki_rad", feil)
         html = side(klient)
         assert '<p class="uten">Ingen KI-tekst for denne dagen.</p>' in html and DAGEN not in html
+
+
+class TestStory816bDenValgteDagen:
+    """Story 8.16b (gruppens svar 19.10 kl. 00:00): med «Velg dag» er
+    KI-teksten raden i KI-loggen for dagen, og bryteren tar deg tilbake til
+    dagen. Mutantene står i spesifikasjonen 8.16b."""
+
+    DAGEN_TEKST = "Teksten for torsdag 22.10, ikke for siste dag."
+
+    @pytest.fixture
+    def dag(self, aksje):
+        """Torsdag 22.10 har samme vurdering som siste dag (31.10), så en
+        KI-rad for siste dag ville stemt mot den og blitt vist."""
+        dag = aksje - timedelta(days=9)
+        skriv_vurdering("EQNR", dag, VURDERING)
+        skriv_kirad(kirad(aksje))
+        return dag
+
+    def test_ki_teksten_for_den_valgte_dagen(self, klient, dag):
+        """Ville feilet hvis KI-teksten ble lest for siste børsdag med en
+        valgt dag."""
+        skriv_kirad(kirad(dag, tekst=self.DAGEN_TEKST))
+        html = klient.get(f"/aksje/EQNR?dag={dag.isoformat()}").data.decode("utf-8")
+        assert self.DAGEN_TEKST in html and TEKST not in html
+        assert TEKST in side(klient)
+
+    def test_en_dag_uten_ki_rad(self, klient, dag):
+        """Ville feilet hvis dagen uten KI-rad viste teksten for siste dag,
+        eller ikke teksten appen har for en dag uten KI-tekst."""
+        html = klient.get(f"/aksje/EQNR?dag={dag.isoformat()}").data.decode("utf-8")
+        assert f'<p class="uten">{DAGEN}</p>' in html
+        assert TEKST not in html
+
+    def test_ki_teksten_proeves_mot_vurderingen_for_dagen(self, klient, aksje):
+        """Ville feilet hvis KI-raden for dagen ble prøvd mot vurderingen for
+        siste dag: grunnlaget stemmer med dagen, ikke med siste dag."""
+        dag = aksje - timedelta(days=9)
+        from dataclasses import replace
+
+        annen = replace(VURDERING, trend=0, styrke=1, retning="Negativ")
+        skriv_vurdering("EQNR", dag, annen)
+        grunnlag = {"trend": 0, "bevegelse": 0, "interesse": -1, "styrke": 1, "retning": "Negativ"}
+        skriv_kirad(kirad(dag, grunnlag=grunnlag, tekst=self.DAGEN_TEKST))
+        html = klient.get(f"/aksje/EQNR?dag={dag.isoformat()}").data.decode("utf-8")
+        assert self.DAGEN_TEKST in html
+
+    def test_knappen_beholder_dagen(self, klient, dag):
+        """Ville feilet hvis bryteren sendte deg til siste børsdag fra en
+        valgt dag."""
+        adresse = f"/aksje/EQNR?dag={dag.isoformat()}"
+        html = klient.get(adresse).data.decode("utf-8")
+        assert f'<input type="hidden" name="tilbake" value="{adresse}">' in html
+        svar = klient.post("/ki", data={"til": "av", "tilbake": adresse})
+        assert svar.status_code == 303 and svar.headers["Location"] in (adresse, f"http://localhost{adresse}")
+        # Uten en valgt dag er adressen den samme som før.
+        assert '<input type="hidden" name="tilbake" value="/aksje/EQNR">' in side(klient)
+
+    @pytest.mark.parametrize(
+        "tilbake",
+        [
+            "/aksje/EQNR?dag=2026-10-22&x=1",
+            "/aksje/EQNR?periode=1-uke",
+            "/aksje/EQNR?dag=//eksempel.no",
+            "/aksje/EQNR?dag=2026-10-22\r\nSet-Cookie: x=1",
+            "/aksje/EQNR?dag=2026-10-2",
+        ],
+    )
+    def test_bryteren_godtar_bare_dagen_i_adressen(self, klient, tilbake):
+        """Ville feilet hvis bryteren godtok noe annet enn ?dag= med en dato
+        etter stien, for eksempel en annen side eller et linjeskift."""
+        svar = klient.post("/ki", data={"til": "paa", "tilbake": tilbake})
+        assert svar.headers["Location"] in ("/", "http://localhost/")
