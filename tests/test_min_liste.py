@@ -52,6 +52,15 @@ def _rekkefoelge(html: str) -> list[str]:
     return ut + oevrige
 
 
+def _i_fila(sti: Path) -> set[str]:
+    """Symbolene i min_liste, lest rett fra fila uten porten (mutanten M1)."""
+    c = sqlite3.connect(f"file:{sti.as_posix()}?mode=ro", uri=True)
+    try:
+        return {s for (s,) in c.execute("SELECT symbol FROM min_liste")}
+    finally:
+        c.close()
+
+
 def _innhold(sti: Path) -> dict[str, list]:
     """Hver tabell i basen utenom min_liste, rad for rad, og skjemaet."""
     c = sqlite3.connect(f"file:{sti.as_posix()}?mode=ro", uri=True)
@@ -98,6 +107,8 @@ class TestLagringen:
             assert SqliteMinlistelager(c).merkede() == {"EQNR"}
         finally:
             c.close()
+        # Mutanten M1: porten kunne husket lista i prosessen. Fila har den.
+        assert _i_fila(sti) == {"EQNR"}
 
     def test_merkingen_overlever_en_omstart_av_webserveren(self, klient, monkeypatch):  # noqa: F811
         """Ville feilet hvis stjernen bare ble husket i prosessen: etter at
@@ -106,11 +117,7 @@ class TestLagringen:
         assert _merk(klient, "DNB").status_code == 303
         monkeypatch.setattr(app_modul, "_migrerte", set())
         ny = app_modul.app.test_client()
-        c = aapne_base(lagring_sqlite.BASE_STI, kjoer_migrasjoner=False, skrivebeskyttet=True)
-        try:
-            assert SqliteMinlistelager(c).merkede() == {"DNB"}
-        finally:
-            c.close()
+        assert _i_fila(lagring_sqlite.BASE_STI) == {"DNB"}
         assert ny.get("/min-liste").status_code == 200
 
     @pytest.mark.parametrize("symbol", ["XXX", "EQNR.OL", "eqnr", "", "EQNR "])
@@ -307,13 +314,20 @@ class TestSidene:
     def test_filteret_endrer_ikke_rekkefoelgen(self, demo):
         """FR-102: Min liste har samme rekkefølge som oversikten. Ville feilet
         hvis Min liste sorterte radene på nytt, eller «Alle» ga en annen
-        rekkefølge."""
+        rekkefølge. Mutanten M2: de fem i demoen står tilfeldigvis i
+        alfabetisk rekkefølge i hver del, så Havdyp Olje og Trygghavn
+        Forsikring merkes også, og da gir navnet en annen rekkefølge."""
+        for symbol in ("HVDO", "TRHF"):
+            assert _merk(demo, symbol).status_code == 303
+        merket = (*MERKET_I_DEMOEN, "HVDO", "TRHF")
         oversikten = _rekkefoelge(demo.get("/").data.decode("utf-8"))
         alle = _rekkefoelge(demo.get("/min-liste?vis=alle").data.decode("utf-8"))
         lista = _rekkefoelge(demo.get("/min-liste").data.decode("utf-8"))
         assert alle == oversikten
-        assert lista == [s for s in oversikten if s in MERKET_I_DEMOEN]
-        assert sorted(lista) == sorted(MERKET_I_DEMOEN)
+        assert lista == [s for s in oversikten if s in merket]
+        assert sorted(lista) == sorted(merket)
+        navnene = re.findall(r'<a href="/aksje/[A-Z0-9]+">([^<]+)</a>', demo.get("/min-liste").data.decode("utf-8"))
+        assert navnene != sorted(navnene), "testen må ha en liste der navnet gir en annen rekkefølge"
 
     @pytest.mark.parametrize("kolonne", sorted(SORTERBARE))
     @pytest.mark.parametrize("orden", [SYNKENDE, STIGENDE])
