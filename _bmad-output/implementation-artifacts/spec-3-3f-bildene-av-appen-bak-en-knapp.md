@@ -2,7 +2,7 @@
 title: 'Story 3.3 (3.3f): bildene av appen bak en knapp, i en egen mappe'
 type: 'feature'
 created: '2026-10-19'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '88b305d'
@@ -88,3 +88,5 @@ Gjennomgang 19.10 på diffen `076305c..1dee45a`. Linsene var Blind Hunter (BH, 1
 - `data/db/ose.db` og `data/db/demo.db` røres ikke (regel 22). Bildene tas fra en demobase i en midlertidig mappe.
 - Bildene viser bare demoen (regel 16).
 - PR-en stopper før flettingen.
+
+*Lagt til 2026-10-19 kl. 12:19:* PR #75 er squash-flettet i `208d086` etter gruppens ja kl. 11:57, låst til head-en `58f91c9`, der main var flettet inn (regel 7). CI var grønn på head-en `c2ac2aa` (39230898283), på den nye head-en (39236178466) og på main (39236404820). Triagen står over og som kommentar på PR-en.
