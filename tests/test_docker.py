@@ -835,7 +835,9 @@ BILDENE = {1: "engine-running.png", 2: "github-download-zip.png", 4: "powershell
 # _ramme.html, skriftene i src/static/, demodataene og modulene som lager
 # tallene og tekstene. Endres en av dem, tas bildet paa nytt og avtrykket
 # oppdateres i samme commit (spesifikasjonen 3.3e, «Avgjort»).
-SKJERMBILDET = "docs/bilder/readme/oversikten-demo.png"
+# Story 3.3f (gruppens svar 18.10 kl. 23:03): i docs/appen/, mappa for bilder
+# og video av appen, bare av demoen.
+SKJERMBILDET = "docs/appen/oversikten-demo.png"
 # Story 3.3e (svaret 18.10 kl. 20:39): installasjonen av uv i «Tester», fra
 # https://docs.astral.sh/uv/getting-started/installation/.
 UV_WINDOWS = 'powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"'
@@ -977,8 +979,9 @@ class TestBildeneIDocs:
             for p in mappe.rglob("*")
             if p.is_file() and p.suffix.lower() in BILDEFILER
         )
-        # Story 3.3e: og bildet av oversikten i demoen.
-        ventet = [*(f"docs/bilder/readme/{navn}" for navn in BILDENE.values()), SKJERMBILDET]
+        # Story 3.3e: og bildet av oversikten i demoen. Story 3.3f: det ligger
+        # i docs/appen/.
+        ventet = [f"docs/bilder/readme/{navn}" for navn in BILDENE.values()]
         assert filer == sorted(ventet), filer
 
 
@@ -1961,21 +1964,24 @@ class TestReadmeForNybegynnere:
         gitignore = (ROT / ".gitignore").read_text(encoding="utf-8")
         del_ = README.read_text(encoding="utf-8").split("\n## Mappestruktur\n", 1)[1].split("\n## ", 1)[0]
         punkter = [l for l in del_.splitlines() if l.startswith("- ")]
-        assert len(punkter) == 7, punkter
+        # Story 3.3f: 8 med docs/appen/.
+        assert len(punkter) == 8, punkter
         for punkt in punkter:
             # Hver sti i kodeformat i punktet er en lenke, ogsaa etter
             # tankestreken (gjennomgangen, BH3 og ECH4).
             assert "`" not in re.sub(r"\[`[^`]+`\]\([^)]+\)", "", punkt), punkt
         lenker = re.findall(r"\[`([^`]+)`\]\(([^)]+)\)", del_)
         # Alle lenkene, ogsaa uten kodeformat, er de i kodeformat.
-        # Story 3.3e: 16 med bildet av oversikten.
-        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 16, lenker
+        # Story 3.3e: 16 med bildet av oversikten. Story 3.3f: 17 med docs/appen/.
+        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 17, lenker
         sporet = _git_sporet()
         for tekst, maal in lenker:
             # Maalet er stien i teksten, relativ og uten «..» (BH4, ECH3).
             # Bildene staar med filnavnet, som foer 3.3d, etter mappa de ligger i.
-            filnavn = [*BILDENE.values(), SKJERMBILDET.rsplit("/", 1)[1]]
-            assert maal == tekst or (tekst in filnavn and maal == f"docs/bilder/readme/{tekst}"), (
+            # Story 3.3f: bildet av oversikten etter docs/appen/.
+            filnavn = {navn: f"docs/bilder/readme/{navn}" for navn in BILDENE.values()}
+            filnavn[SKJERMBILDET.rsplit("/", 1)[1]] = SKJERMBILDET
+            assert maal == tekst or filnavn.get(tekst) == maal, (
                 tekst,
                 maal,
             )
