@@ -1177,6 +1177,8 @@ Som **gruppe**, vil vi at basen selv kjenner de femten, så en rad for et symbol
 
 ## Epic 2: Ferske data uten at kvoten sprenges
 
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* i v1 står 2.7, historikken, som briefen v8 lover. 2.4, 2.6, 2.10, 2.11, 2.12, 2.13 og 2.14 er «Ekstra, hvis tiden rekker», etter regelen kl. 14:48. Resten av epicen er flettet.
+
 **Føringer fra kvotemålingen 2026-09-23** (`malinger.md` §11). De gjelder hele
 epicen:
 
@@ -1554,6 +1556,8 @@ Med 2.8 er det 4 kall igjen, ikke 5.
 
 ### Story 2.4: Etterfylling av hull i kursserien
 
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
+
 Som **bruker som ikke åpnet løsningen på en uke**, vil jeg at grafen er hel når
 jeg kommer tilbake, så hullet ikke ser ut som en kursbevegelse.
 
@@ -1603,6 +1607,8 @@ så den ikke kan regnes av en serie som er byttet ut siden.
 *Ferdig 2026-10-02:* flettet i `c65f587`, PR #18.
 
 ### Story 2.6: Utbyttedager merkes
+
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
 
 Som **bruker som regner etter**, vil jeg vite når en kurs falt på grunn av
 utbytte, så avviket mellom vist kurs og vist prosent ikke ser ut som en feil.
@@ -1751,6 +1757,8 @@ Som **bruker**, vil jeg se hovedindeksen i kursgrafen på aksjesiden, så jeg se
 
 ### Story 2.10: Høy og lav lagres med kursene
 
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
+
 *Lagt til 2026-10-07, Marians beslutning kl. 23:11.*
 
 Som **bruker**, vil jeg at dagens høyeste og laveste kurs finnes i basen, så
@@ -1768,6 +1776,8 @@ aksjedetaljen kan vise dem uten et nytt kall.
 **Avhenger av:** ingen åpne. **Én økt:** ja.
 
 ### Story 2.11: Lista leses fra basen
+
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
 
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 6 og 10).*
 
@@ -1799,6 +1809,8 @@ byttes uten at koden endres.
 - **Ville feilet hvis:** en aksje kunne komme inn uten bransje, eller med en som ikke er blant de 13
 
 ### Story 2.12: Velge og bytte aksjer
+
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
 
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 6 og 10).*
 
@@ -1833,6 +1845,8 @@ følger aksjene jeg bryr meg om.
 
 ### Story 2.13: Kommandoen som måler omsetning
 
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
+
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 13).*
 
 Som **gruppe**, vil vi måle omsetningen for nye aksjer med kallene som er til
@@ -1859,6 +1873,8 @@ overs, så lista kan vise den før noen velger en aksje.
 **Avhenger av:** 2.3 og 2.8. **Én økt:** ja.
 
 ### Story 2.14: Eks.datoer føres inn for hånd
+
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
 
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 12, Marians beslutning kl. 08:06).*
 
@@ -2406,6 +2422,8 @@ på papir.
 
 ## Epic 10: KI forklarer signalet (plan B) 🔀
 
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* i v1 står 10.5, lenken til investorsiden, og 10.7, egne nøkler, som briefen v8 lover, og 10.4 for suksessmålet. 10.6 og 10.8 er «Ekstra, hvis tiden rekker», etter regelen kl. 14:48. 10.1–10.3 er flettet.
+
 *Het Epic 5B til 28.09.* *Utløst 2026-09-28:* Euronext ga ikke tillatelse innen fristen, og epicen bygges i v1. Nummeret ble endret fordi BMAD-skriptet bare leser epics med hele tall.
 
 > **Utløses av nei eller taushet fra Euronext 28.09.** 5B.1 kan bygges før
@@ -2664,6 +2682,8 @@ brevet 21.09 og purringen 22.09 ikke er besvart. Tittelen står.
 
 ### Story 10.6: KI-teksten om dagen på forsiden
 
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
+
 *Lagt til 2026-10-02, Marians beslutning.*
 
 Som **bruker**, vil jeg lese noen setninger om hele børsdagen under tabellen, så
@@ -2729,6 +2749,8 @@ FR-604, FR-605, NFR-04
 egne nøkler (regel 19). Punktet fra 3.3 om egne nøkler gjelder her.
 
 ### Story 10.8: ChatGPT med «Sign in with ChatGPT»
+
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
 
 *Lagt til 2026-10-05, gruppens beslutning 04.10.* **Kandidat til v1.1.**
 
@@ -2902,6 +2924,8 @@ Som **bruker**, vil jeg at resten av siden virker selv om kalenderen er nede, s�
 ---
 
 ## Epic 8: Tydelig for den som ikke har bygget den
+
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* i v1 står 8.3, Min liste, som briefen v8 lover, og 8.1 og 8.2. 8.4–8.14, 8.10b, 8.17, 8.18 og 8.19 er «Ekstra, hvis tiden rekker», etter regelen kl. 14:48. 8.0–8.0e, 8.15 og 8.16 er flettet.
 
 ### Story 8.0: De rene feilene i de to skjermbildene
 
@@ -3162,6 +3186,8 @@ skjermbildene som finnes · **Begrenses av:** FR-101–103, `AD-3`, `AD-10`,
 
 ### Story 8.4: Se nærmere i aksjedetaljen
 
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
+
 *Lagt til 2026-10-02, Marians beslutning.*
 
 Som **bruker**, vil jeg se hva jeg kan sjekke selv når en aksje skiller seg ut, så
@@ -3191,6 +3217,8 @@ vurderingen. Tekstene ligger i hjelpefila fra 8.0b.
 
 ### Story 8.5: Endring i kroner, og høy og lav i aksjedetaljen
 
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
+
 *Lagt til 2026-10-07, Marians beslutning kl. 23:11.*
 
 Som **bruker**, vil jeg se hvor mange kroner aksjen endret seg, og hvor høyt og
@@ -3209,6 +3237,8 @@ lavt den gikk, så jeg forstår dagen uten å regne selv.
 **Avhenger av:** 2.10 for høy og lav. **Én økt:** ja.
 
 ### Story 8.6: Børsometeret
+
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
 
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 1).*
 
@@ -3237,6 +3267,8 @@ dagen gjaldt hele børsen eller noen bransjer.
 
 ### Story 8.7: Sjekk 2 og 3 i kursgrafen
 
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
+
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 2).*
 
 Som **bruker**, vil jeg se volumet og bevegelsen i grafen, så jeg ser hvorfor
@@ -3262,6 +3294,8 @@ sjekk 2 og 3 slo ut, slik MA50-linjen viser sjekk 1.
 
 ### Story 8.8: Signaldager i kursgrafen
 
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
+
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 3).*
 
 Som **bruker**, vil jeg se hvilke dager aksjen skilte seg ut, så jeg ser hvordan
@@ -3281,6 +3315,8 @@ signalet har oppført seg over tid.
 **Avhenger av:** 2.7. **Én økt:** ja.
 
 ### Story 8.9: «Vis meg rundt»
+
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
 
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 4).*
 
@@ -3305,6 +3341,8 @@ del er før jeg leser tallene.
 
 ### Story 8.10: Innstillinger øverst
 
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
+
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 5).*
 
 Som **bruker**, vil jeg slå hjelpen og KI-teksten av og på ett sted, så valget
@@ -3328,6 +3366,8 @@ gjelder alle sidene og huskes.
 
 ### Story 8.10b: «Vis KI-tekst» i Innstillinger
 
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
+
 *Lagt til 2026-10-13, endringsforslaget 13.10 (punkt 4.1), godkjent av Marian kl. 12:46.*
 
 Som **bruker**, vil jeg slå KI-teksten av og på i Innstillinger, så valget
@@ -3345,6 +3385,8 @@ gjelder alle sidene og huskes.
 **Avhenger av:** 8.10 og 10.3. **Én økt:** ja.
 
 ### Story 8.11: Ferdige lister og filter på signalet
+
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
 
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 7).*
 
@@ -3366,6 +3408,8 @@ NFR-01, NFR-06
 **Avhenger av:** 2.12, og 2.13 for listene som må måles. **Én økt:** ja.
 
 ### Story 8.12: Endret signalstyrke siden forrige børsdag
+
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
 
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 8, skrevet om etter Marians beslutning 02.10 kl. 23:30).*
 
@@ -3393,6 +3437,8 @@ prøves skjult før «Sammenlign med» finnes.
 
 ### Story 8.13: Lær noe nytt
 
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
+
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 9).*
 
 Som **bruker**, vil jeg lære ett nytt begrep om dagen, så jeg forstår mer av det
@@ -3413,6 +3459,8 @@ appen viser.
 **Avhenger av:** 8.0b. **Én økt:** ja.
 
 ### Story 8.14: Justeringsdager i kursgrafen
+
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
 
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 11).*
 
@@ -3493,6 +3541,8 @@ knapper som ellers i appen.
 
 ### Story 8.17: Periodevalget i oversikten, Min liste og børsometeret
 
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
+
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 15).*
 
 Som **bruker**, vil jeg se endringen over en uke eller en måned i oversikten, og
@@ -3525,6 +3575,8 @@ avgjøres i planen.
 
 ### Story 8.18: Kommende eks.dato i kursgrafen
 
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
+
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 12, Marians beslutning kl. 08:06).*
 
 Som **bruker**, vil jeg se neste eks.dato i kursgrafen, så jeg vet det før jeg
@@ -3545,6 +3597,8 @@ handler, og ser hvor gammel opplysningen er.
 **Avhenger av:** 2.14, og 2.6 for «ikke bekreftet». **Én økt:** ja.
 
 ### Story 8.19: Neste henting i stripa øverst
+
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
 
 *Lagt til 2026-10-13, endringsforslaget 13.10 (punkt 4.6, nr. 5 A, svar 13), godkjent av Marian kl. 12:46.*
 
