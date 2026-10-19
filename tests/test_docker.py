@@ -846,6 +846,9 @@ BILDENE = {1: "engine-running.png", 2: "github-download-zip.png", 4: "powershell
 # oppdateres i samme commit (spesifikasjonen 3.3e, «Avgjort»).
 # Story 3.3f (gruppens svar 18.10 kl. 23:03): i docs/appen/, mappa for bilder
 # og video av appen, bare av demoen.
+# Story 2.7a: stilarket staar i src/static/stil.css, ikke i <style> i
+# _ramme.html. Det er med i begge avtrykkene, fordi .css er med i
+# SKRIFTFILER. Bildene ble tatt paa nytt og var like byte for byte.
 SKJERMBILDET = "docs/appen/oversikten-demo.png"
 # Story 3.3e (svaret 18.10 kl. 20:39): installasjonen av uv i «Tester», fra
 # https://docs.astral.sh/uv/getting-started/installation/.
@@ -874,7 +877,7 @@ SKRIFTFILER = {".woff", ".woff2", ".ttf", ".otf", ".css"}
 # raden under «Skilte seg ut», foer «Øvrige aksjer», saa signalstyrken og
 # fargene per aksje er med.
 HOEYDE_PAA_BILDET = 1573
-AVTRYKK_BAK_BILDET = "f8dccdb95e6a703eae6ffc46bb5d2f677c0b123dd4b204eedfbbedc0357d6115"
+AVTRYKK_BAK_BILDET = "a8b5a296c7cfba465fd39ab873bcb6cf2e904fc130d5345735f897d7d635660c"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -925,7 +928,7 @@ FILENE_BAK_AKSJESIDEN = (
 IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py"}
 # Bildet er saa hoeyt at grafen, som staar under KI-teksten, er med til bunnen.
 HOEYDE_PAA_AKSJESIDEN = 1816
-AVTRYKK_BAK_AKSJESIDEN = "fd2257d28c6cf9a58ea6ad45732c10dadb885875ffb978a6e45d67422913b7fd"
+AVTRYKK_BAK_AKSJESIDEN = "a85c86d3101e5112870cb19e6bc4c7f322b76695ca437638eba504be88671533"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "

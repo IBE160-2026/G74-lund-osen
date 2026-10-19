@@ -1,122 +1,25 @@
 {#- Story 8.0d, PR 1: den felles rammen for alle sidene, etter designregler
-    §5. Fargene står som navn her og ingen andre steder, skriften ligger i
-    appen (§1), og ingenting hentes fra nettet. Stripa har ingen knapp,
-    lenke eller ikon til en side som ikke finnes (knapperaden er 8.3).
+    §5. Skriften ligger i appen (§1), og ingenting hentes fra nettet. Stripa
+    har ingen knapp, lenke eller ikon til en side som ikke finnes
+    (knapperaden er 8.3).
 
-    Sidene fyller blokkene tittel, stil og innhold. Demomerket står som egen
+    Story 2.7a: all stilen står i src/static/stil.css, med fargene som navn
+    der og ingen andre steder. Adressen har et avtrykk av fila (stilark fra
+    app.py), så nettleseren aldri bruker en gammel utgave.
+
+    Sidene fyller blokkene tittel, side og innhold. side er klassen på
+    <body>, som reglene for én side i stilen er avgrenset med. Demomerket står som egen
     rad i stripa, med samme ordlyd som før, i stedet for det gule banneret
     (svar 3 på planen for 8.0d). -#}
-{% from "_hjelp.html" import hjelpestil with context -%}
-{% from "_brikker.html" import brikkestil -%}
 <!DOCTYPE html>
 <html lang="no">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block tittel %}OSE Signal{% endblock %}</title>
-  <style>
-    @font-face { font-family: "IBM Plex Sans"; font-weight: 400; font-style: normal; font-display: swap;
-                 src: url("/static/fonts/ibm-plex-sans/IBMPlexSans-Regular.woff") format("woff"); }
-    @font-face { font-family: "IBM Plex Sans"; font-weight: 500; font-style: normal; font-display: swap;
-                 src: url("/static/fonts/ibm-plex-sans/IBMPlexSans-Medium.woff") format("woff"); }
-    @font-face { font-family: "IBM Plex Sans"; font-weight: 600; font-style: normal; font-display: swap;
-                 src: url("/static/fonts/ibm-plex-sans/IBMPlexSans-SemiBold.woff") format("woff"); }
-    @font-face { font-family: "IBM Plex Sans"; font-weight: 700; font-style: normal; font-display: swap;
-                 src: url("/static/fonts/ibm-plex-sans/IBMPlexSans-Bold.woff") format("woff"); }
-    @font-face { font-family: "Newsreader"; font-weight: 500; font-style: normal; font-display: swap;
-                 src: url("/static/fonts/newsreader/Newsreader16pt-Medium.woff") format("woff"); }
-    @font-face { font-family: "Newsreader"; font-weight: 600; font-style: normal; font-display: swap;
-                 src: url("/static/fonts/newsreader/Newsreader16pt-SemiBold.woff") format("woff"); }
-    /* Story 8.0d, PR 2: de store overskriftene i optisk størrelse 72pt. */
-    @font-face { font-family: "Newsreader 72"; font-weight: 500; font-style: normal; font-display: swap;
-                 src: url("/static/fonts/newsreader/Newsreader72pt-Medium.woff") format("woff"); }
-
-    /* Designregler §5: fargene med navn. */
-    :root {
-      --blekk: #16181D;
-      --tekst: #3C4048;
-      --dempet: #5F646C;
-      --dempet-2: #70757D;
-      --bakgrunn: #F3F2EE;
-      --kort: #FFFFFF;
-      --hvit: #FFFFFF;
-      --strek: #E4E2DB;
-      --strek-2: #D6D3CA;
-      --rutenett: #ECEAE4;
-      --opp: #13703C;
-      --opp-bakgrunn: #E4F4EA;
-      --ned: #B42318;
-      --ned-bakgrunn: #FBE9E6;
-      --blandet: #6A46A0;
-      --blandet-bakgrunn: #F0EBF8;
-      --ingen-bakgrunn: #EEEDEA;
-      /* PR 2: oransje som i originalen (designregler §3 og del 5, 14.10). */
-      --oransje: #F2B53A;
-      /* Story 2.9b: gult bransjesymbol ved 3 av 3 over søylene, 3,82:1 mot
-         hvitt (designregler §3). */
-      --gul-symbol: #a67c00;
-      --lys-oransje: #F8DE9C;
-      --fyll: #16181D;
-      --baand-ut: #FFF6DC;
-      --baand-ut-kant: #F0E3BD;
-      --baand-oevrige: #F7F6F2;
-      --brun: #6B4E00;
-      --hjelp-bakgrunn: #FFF1CC;
-      --kurs: #1F4E8C;
-      --snitt: #9A5A0E;
-      --stripe-tekst: #DADDE2;
-      --stripe-tekst-2: #C9CCD2;
-      --stripe-kant: #3A3E47;
-      --stripe-strek: #2A2E36;
-      --kolonne-tekst-2: #B9BDC5;
-      /* Story 8.0d, PR 3: det grå feltet i sjekkortene (designregler del 5). */
-      --spor: #F1EFEA;
-      --felt: #8A847A;
-    }
-
-    body {
-      font-family: "IBM Plex Sans", system-ui, sans-serif;
-      margin: 0;
-      background: var(--bakgrunn);
-      color: var(--blekk);
-    }
-    h1, h2 { font-family: "Newsreader", Georgia, serif; font-weight: 500; }
-    main { max-width: 65rem; margin: 0 auto; padding: 1.5rem 16px 0; box-sizing: border-box; }
-    code { font-family: ui-monospace, Consolas, monospace; }
-
-    /* Designregler §5: fokus i blekk på lys bakgrunn, oransje på blekk. */
-    *:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
-    header.stripe *:focus-visible { outline-color: var(--oransje); }
-
-    /* Stripa øverst. */
-    header.stripe { background: var(--blekk); color: var(--hvit); }
-    header.stripe .rad { max-width: 65rem; margin: 0 auto; padding: 0 16px; box-sizing: border-box;
-                         display: flex; align-items: center; gap: 0.6rem; }
-    header.stripe .topp { min-height: 72px; }
-    header.stripe .logo { font-family: "Newsreader", Georgia, serif; font-size: 27px; font-weight: 600;
-                          letter-spacing: -0.01em; display: flex; align-items: center; gap: 0.6rem; margin: 0; }
-    header.stripe .logo svg { width: 28px; height: 24px; }
-    header.stripe .logo .soeyle { fill: var(--hvit); }
-    header.stripe .logo .soeyle.hoey { fill: var(--oransje); }
-    header.stripe .oppdatert { min-height: 38px; border-top: 1px solid var(--stripe-strek);
-                               font-size: 13.5px; font-weight: 600; color: var(--stripe-tekst); }
-    header.stripe .oppdatert svg { width: 16px; height: 16px; fill: none; stroke: var(--oransje); stroke-width: 2; }
-    header.stripe .eksempeltall { margin: 0; padding: 0.5rem 0; font-size: 13.5px; font-weight: 600;
-                                  color: var(--stripe-tekst); }
-    header.stripe .demo { border-top: 1px solid var(--stripe-strek); }
-
-    footer.bunnlinje { max-width: 65rem; margin: 2rem auto 0; padding: 0 16px 2rem; box-sizing: border-box; }
-    footer.bunnlinje p { border-top: 1px solid var(--strek); padding-top: 1rem; margin: 0;
-                         font-size: 13px; line-height: 1.5; color: var(--dempet); }
-
-    /* Story 8.0b og 8.0d: hjelpen bak «?». */
-    {{ hjelpestil() }}
-    /* Story 8.0d, PR 3: brikkene og retningspillen. */
-    {{ brikkestil() }}
-    {% block stil %}{% endblock %}
-  </style>
+  <link rel="stylesheet" href="{{ stilark }}">
 </head>
-<body>
+<body class="{% block side %}{% endblock %}">
   <header class="stripe">
     <div class="rad topp">
       <p class="logo">

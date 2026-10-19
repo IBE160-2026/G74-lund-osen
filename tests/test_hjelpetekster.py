@@ -19,6 +19,7 @@ from markedsoversikt import RETNINGSVISNING
 from signalberegning import BLANDET, INGEN, NEGATIV, POSITIV, STANDARD, Parametre, interesse, trend
 from tallformat import HARDT_MELLOMROM as NB
 from tallformat import tall
+from test_app import _stil
 
 ROT = Path(__file__).resolve().parent.parent
 
@@ -492,7 +493,8 @@ class TestSidene:
         html = _side(klient, "/")
         # Story 8.0d: hoeyst 440 px bred (utdraget §7), og aldri bredere enn
         # skjermen minus 2rem.
-        assert "width: min(440px, calc(100vw - 2rem)); max-height: 80vh; overflow: auto;" in html
+        # Story 2.7a: stilen står i stilarket.
+        assert "width: min(440px, calc(100vw - 2rem)); max-height: 80vh; overflow: auto;" in _stil(html)
 
     def test_grafen_og_tabellen_forklares_bare_naar_de_vises(self, klient, base):
         """Gjennomgangen av 8.0b: VRDS har for kort serie til signal og

@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-10-18T18:08'
+updated: '2026-10-19T13:55'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -493,6 +493,8 @@ G74-lund-osen/
   tests/                 # conftest.py sperrer nett
   Dockerfile             # [ny]
 ```
+
+*Lagt til 2026-10-19 (story 2.7a):* all stilen står i `src/static/stil.css`, lenket fra `src/templates/_ramme.html` med et avtrykk av fila i adressen (`stilark` fra `app.py`). Malene har ingen `<style>`, og reglene for én side er avgrenset med klassen på `<body>`. Fortsatt ingen frontend-avhengighet.
 
 ## Capability → Architecture Map
 

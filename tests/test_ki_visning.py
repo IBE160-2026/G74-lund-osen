@@ -253,7 +253,7 @@ class TestSiden:
         skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET), vurdert=False)
         skriv_vurdering("EQNR", rader[-1].dato, Grunn.KURS_IKKE_FRA_DAGEN)
         html = side(klient)
-        assert "Med KI-ens ord" not in html and "ki-bryter" not in html.split("</style>", 1)[1]
+        assert "Med KI-ens ord" not in html and "ki-bryter" not in html.split("</head>", 1)[1]
 
     def test_en_logg_som_ikke_kan_leses_gir_en_dag_uten_tekst(self, klient, aksje, monkeypatch):
         """NFR-04: for eksempel en base fra foer 0005."""

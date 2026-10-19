@@ -272,7 +272,8 @@ class TestRammen:
             assert not re.search(r"https?:|//[a-z]", _stil(html)), navn
             for verdi in re.findall(r'(?:src|href)="([^"]*)"', html):
                 assert not re.match(r"(https?:)?//", verdi), (navn, verdi)
-            for adresse in re.findall(r"""url\(\s*["']?([^"')]+)""", html):
+            # Story 2.7a: skriftene står i stilarket, ikke i siden.
+            for adresse in re.findall(r"""url\(\s*["']?([^"')]+)""", html + _stil(html)):
                 assert adresse.startswith("/static/fonts/"), (navn, adresse)
 
     def test_skriften_er_den_i_appen(self, sidene):
@@ -296,6 +297,8 @@ class TestRammen:
                     )
                     # Story 8.16: periodene i kursgrafen er en parameter paa aksjesiden.
                     or re.fullmatch(r"/aksje/[A-Z0-9]+\?periode=(" + "|".join(map(re.escape, PERIODENE)) + ")", href)
+                    # Story 2.7a: stilarket, med avtrykket av fila.
+                    or re.fullmatch(r"/static/stil\.css\?v=[0-9a-f]{16}", href)
                 ), (navn, href)
 
     def test_tabelltall_i_tallcellene(self, sidene):
