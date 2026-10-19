@@ -549,6 +549,12 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-19 kl. 13:59 (gruppens svar):* grenene som er flettet, slettes på GitHub, og «Automatically delete head branches» slås på, så lista over grener bare viser arbeid som pågår. PR-ene beholder commitene, og en slettet gren kan hentes tilbake fra PR-en.
 
+*Avgjort 2026-10-19 kl. 14:46 (gruppens svar):* README-en anbefaler demoen for faglærer og sensor, som briefen v8 og tilbakemeldingen 06.10 sier, og den lokale modellen merkes som valgfri. Det snur svaret 11.10 kl. 22:32 om å anbefale den ekte versjonen (`spec-3-4-demoversjonen.md`), og med det «den ekte versjonen er fortsatt anbefalt» i svaret 16.10 kl. 21:16 under story 3.3. Rekkefølgen i «Kom i gang» står. Det bygges i spesifikasjonen 3.3g.
+
+*Avgjort 2026-10-19 kl. 14:48 (gruppens svar):* det briefen ikke lover, bygges på egen gren og flettes bare ferdig og grønt; det som ikke er ferdig ved funksjonsstoppen, flettes ikke. Funksjonsstoppen er README-prøven med ZIP-fila, senest én uke før innleveringen. Briefens suksessmål går foran: README-prøven, brukertesten, én ukes drift og en stabil demo.
+
+*Avgjort 2026-10-19 kl. 16:12 (gruppens svar):* egne nøkler til Gemini, Anthropic og OpenAI (10.7) står i briefen v8 under «Data og kilder» og hører til v1. Svaret 18.10 kl. 00:39 står uten rettelse.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa

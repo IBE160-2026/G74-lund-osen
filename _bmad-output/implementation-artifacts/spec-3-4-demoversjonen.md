@@ -563,3 +563,5 @@ C3 la igjen volumet `ose-ci-34_ose-db`, fordi mutanten la til et volum trap ikke
 **Testene etter PR 3:** lokalt 1281 passed og 16 skipped, 1297 samlet. Før PR 3: lokalt 1269 passed og 16 skipped, i CI 1285.
 
 *Lagt til 2026-10-18 (story 3.3d):* beslutningen 16.10 kl. 21:53–21:58 under story 3.3 i `epics.md`: README-en ryddes i en egen PR etter README-PR-en, med «Status» som to lister, fem spørsmål under «Står du fast?», uv-delen som to lister, forklaringen under «Tester» bak en knapp, en linje «Innhold» og lenker i «Mappestruktur». Den bygges i `spec-3-3d-readme-ryddingen.md`. Grensen på 8 spørsmål fra 11.10 kl. 22:32, som ble 10 18.10 kl. 14:48, blir 5 der.
+
+*Lagt til 2026-10-19 (story 3.3g):* anbefalingen i svaret 2026-10-11 kl. 22:32 over, at README-en skal anbefale den ekte versjonen, er snudd av gruppens svar 19.10 kl. 14:46 under «Prioritering» i `epics.md`: README-en anbefaler demoen for faglærer og sensor, som briefen v8 og tilbakemeldingen 06.10 sier. Resten av svaret står.
