@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-24-2026 19:26
-last_updated: 10-19-2026 14:28
+last_updated: 10-19-2026 17:06
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -70,6 +70,8 @@ development_status:
   2-2b-sidene-leser-dagens-vurdering: done
   2-3-børsdagskontroll-før-kvoten-brukes: done
   2-3b-kallene-som-er-igjen-brukes-på-nye-forsøk: done
+  # Ekstra, hvis tiden rekker, fra 2026-10-19 (endringsforslaget 2026-10-19, gruppens svar kl. 15:43): 2-4, 2-6 og 2-10
+  # til 2-14. Briefen v8 lover dem ikke. 2-7 er v1. Statusen staar.
   2-4-etterfylling-av-hull-i-kursserien: backlog
   2-5-vurderingen-skrives-i-samme-kjøring: done
   2-6-utbyttedager-merkes: backlog
@@ -138,6 +140,8 @@ development_status:
   8-1-brukertest-rett-etter-epic-2: backlog
   8-2-ux-gjennomgang-av-de-to-skjermbildene-med-cu-bmad-ux: backlog
   8-3-min-liste-eget-skjermbilde-med-stjerne-og-filter: backlog
+  # Ekstra, hvis tiden rekker, fra 2026-10-19 (endringsforslaget 2026-10-19, gruppens svar kl. 15:43): 8-4 til 8-14,
+  # 8-10b, 8-17, 8-18 og 8-19. Briefen v8 lover dem ikke. 8-1, 8-2 og 8-3 er v1.
   8-4-se-nærmere-i-aksjedetaljen: backlog
   8-5-endring-i-kroner-og-høy-og-lav-i-aksjedetaljen: backlog
   8-6-børsometeret: backlog
@@ -164,6 +168,7 @@ development_status:
   9-3-arbeidsmønsteret: done
   9-4-relevanseksperimentet-del-1-utvalg-innsamling-og-merking: done
   # Utgaar fra 2026-10-06 (Marians beslutning kl. 21:11). Del 2 kjoeres ikke.
+  # UTGAAR, stadfestet 2026-10-19 (endringsforslaget 2026-10-19, gruppens svar kl. 15:43). Statusen staar.
   9-5-relevanseksperimentet-del-2-ki-kjøringen: backlog
   9-6-product-brief-v8-etter-plan-b: done
   9-7-linter-og-formatterer-i-ci: done
@@ -174,7 +179,10 @@ development_status:
   10-1-grunnlaget-som-sendes-bare-utledede-verdier: done
   10-2-teksten-lages-i-hentekommandoen-og-lagres-i-kilogg: done
   10-3-visningen-i-aksjedetaljen: done
+  # Fra 2026-10-19 (endringsforslaget 2026-10-19, gruppens svar kl. 15:43): 10-4, 10-5 og 10-7 er v1.
+  # Ekstra, hvis tiden rekker: 10-6 og 10-8. Briefen v8 lover dem ikke.
   10-4-måle-bidraget-egen-brukertest-etter-8-1: backlog
+  # 10-5 er lenken til selskapets investorside, ikke NewsWeb (2026-10-06). Navnet staar.
   10-5-lenke-til-selskapets-side-på-newsweb: backlog
   10-6-ki-teksten-om-dagen-på-forsiden: backlog
   10-7-egen-nøkkel-til-gemini-anthropic-og-openai: backlog
