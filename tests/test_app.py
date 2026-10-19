@@ -3176,6 +3176,12 @@ def _dagen(html: str) -> str:
     return _synlig(re.search(r'<p class="dagen">(.*?)</p>', html, re.S).group(1))
 
 
+def _toppen(html: str) -> str:
+    """Story 8.16b: teksten fra merket og kortene til grafen, med sjekkene
+    og KI-teksten."""
+    return _synlig(html.split('<a class="tilbake"', 1)[1].split("<h2>Kursutvikling", 1)[0])
+
+
 class TestPeriodeneIKursgrafen:
     """Kontrollen under story 8.16 i epics.md og punkt b og d i
     spesifikasjonen 8.16. Klokka i testene staar paa 31.12.2026, saa den
@@ -3257,8 +3263,10 @@ class TestPeriodeneIKursgrafen:
         vurdering. Ville feilet hvis «Velg dag» regnet signalet for dagen."""
         self._aksjen()
         html = klient.get("/aksje/EQNR?periode=velg&dag=2026-10-01").data.decode("utf-8")
-        dagen = _dagen(html)
-        assert "Torsdag 01.10:" in dagen and "Signal: – ikke vurdert." in dagen
+        # Story 8.16b: dagen står i kortene, ikke i en linje over grafen.
+        toppen = _toppen(html)
+        assert "Oslo Børs · 01.10" in toppen and "Ingen vurdering for 01.10: ikke vurdert." in toppen
+        assert '<p class="dagen">' not in html
         assert _valgt(html) == ["01.10"]
         assert "<h2>Kursutvikling, 6 måneder fram til torsdag 01.10 " in html
         assert 'class="dagstrek"' in html and 'class="dagpunkt"' in html
@@ -3286,8 +3294,8 @@ class TestPeriodeneIKursgrafen:
                 volumforhold=1.0,
             ),
         )
-        dagen = _dagen(klient.get("/aksje/EQNR?dag=2026-10-01").data.decode("utf-8"))
-        assert "Signal: 3 av 3," in dagen and "Blandet." in dagen
+        toppen = _toppen(klient.get("/aksje/EQNR?dag=2026-10-01").data.decode("utf-8"))
+        assert "Signalstyrke ? 3 av 3" in toppen and "Retning ? ↔ Blandet" in toppen
 
     def test_velg_dag_med_grunn_og_ikke_boersdag(self, klient):
         """FR-409: en grunn vises, og en dag som ikke er boersdag, sier det,
@@ -3297,10 +3305,11 @@ class TestPeriodeneIKursgrafen:
 
         self._aksjen()
         skriv_vurdering("EQNR", date(2026, 10, 2), Grunn.SIGNAL_IKKE_REGNET)
-        grunn = _dagen(klient.get("/aksje/EQNR?dag=2026-10-02").data.decode("utf-8"))
-        assert f"Signal: – {GRUNNTEKST[Grunn.SIGNAL_IKKE_REGNET]}." in grunn
+        grunn = _toppen(klient.get("/aksje/EQNR?dag=2026-10-02").data.decode("utf-8"))
+        assert f"Ingen vurdering for 02.10: {GRUNNTEKST[Grunn.SIGNAL_IKKE_REGNET]}." in grunn
         html = klient.get("/aksje/EQNR?dag=2026-10-03").data.decode("utf-8")
-        assert "Lørdag 03.10: endring –. Signal: – ikke børsdag." in _dagen(html)
+        assert "Sluttkurs ? – Endring ? – Signalstyrke ? –" in _toppen(html)
+        assert "Ingen vurdering for 03.10: ikke børsdag." in _toppen(html)
         assert "03.10 har ingen kurs, så grafen slutter 02.10." in _synlig(html)
 
     def test_siste_boersdag_merker_dagen_med_endringen_og_signalet(self, klient):

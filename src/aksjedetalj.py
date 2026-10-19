@@ -200,7 +200,8 @@ class Detalj:
 
     aksje: Aksje
     dato: date
-    sluttkurs: float
+    # Story 8.16b: None for en valgt dag uten kurs, som en loerdag.
+    sluttkurs: float | None
     tilstand: Tilstand | None
     tekst: str | None
     sjekker: tuple[SjekkVisning, ...]
@@ -333,6 +334,9 @@ def bygg_detalj(
     p: Parametre = STANDARD,
     start: date | None = None,
     slutt: date | None = None,
+    *,
+    dag: date | None = None,
+    innhold: Vurdering | Grunn | None = None,
 ) -> Detalj | None:
     """Detaljen for en aksje, eller None hvis den ikke har en eneste kursrad.
 
@@ -340,11 +344,25 @@ def bygg_detalj(
     kurs. Grafen tegnes av serien. Sjekkene kommer fra raden, med
     forklaringene laget av maalingene der (FR-706). Har raden ingen
     vurdering, er sjekkene tomme og teksten sier hvorfor (FR-204).
+
+    Story 8.16b (gruppens svar 19.10 kl. 00:00): med dag er det dagen som
+    vises, og innhold er raden i vurdering for dagen, None uten rad.
+    Sluttkursen og endringen er fra kursraden for dagen, og None naar serien
+    ikke har dagen, som en loerdag. Signalet regnes aldri her (AD-7).
     """
     if not rader or post.nyeste is None:
         return None
 
-    utfall, tekst = les_tilstand(post.innhold, post.nyeste.dato, idag)
+    if dag is None:
+        dato, innhold, serie = post.nyeste.dato, post.innhold, rader
+        sluttkurs: float | None = float(post.nyeste.slutt)
+        har_kurs = True
+    else:
+        dato, serie = dag, [rad for rad in rader if rad.dato <= dag]
+        har_kurs = bool(serie) and serie[-1].dato == dag
+        sluttkurs = float(serie[-1].slutt) if har_kurs else None
+
+    utfall, tekst = les_tilstand(innhold, dato, idag)
     sjekker: tuple[SjekkVisning, ...] = ()
     if utfall is not None and utfall.art is Art.SVAR:
         sjekker = tuple(
@@ -360,19 +378,20 @@ def bygg_detalj(
             for i, s in enumerate(sjekker_fra(utfall.innhold, p), start=1)
         )
 
+    to_rader = har_kurs and len(serie) >= 2
     return Detalj(
         aksje=post.aksje,
-        dato=post.nyeste.dato,
-        sluttkurs=float(post.nyeste.slutt),
+        dato=dato,
+        sluttkurs=sluttkurs,
         tilstand=utfall,
         tekst=tekst,
         sjekker=sjekker,
         punkter=bygg_punkter(rader, p, start, slutt),
-        antall_dager=len(rader),
+        antall_dager=len(serie),
         noedvendige_dager=nodvendige_dager(p),
-        endring=endring_i_prosent(rader),
-        forrige_dato=rader[-2].dato if len(rader) >= 2 else None,
-        endring_med_datoer=len(rader) >= 2 and boersdag_mellom(rader[-2].dato, post.nyeste.dato),
+        endring=endring_i_prosent(serie) if har_kurs else None,
+        forrige_dato=serie[-2].dato if to_rader else None,
+        endring_med_datoer=to_rader and boersdag_mellom(serie[-2].dato, dato),
         terskel=p.terskel,
     )
 

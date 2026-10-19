@@ -508,19 +508,31 @@ def aksjedetalj(symbol: str):
     siste_i_grafen = max(rad.dato for rad in rader if rad.dato <= slutt)
     start = startdag(valg.periode, siste_i_grafen)
 
-    detalj = bygg_detalj(post, rader, i_dag, STANDARD, start=start, slutt=slutt)
-    if detalj is None:
-        abort(404)
     # Siste boersdag og «Velg dag»: dagen er merket, med endringen og
     # signalet som er lagret for den. Signalet regnes aldri (AD-7).
+    # Story 8.16b (gruppens svar 19.10 kl. 00:00): med «Velg dag» viser hele
+    # siden dagen, med raden i vurdering lest én gang for kortene, sjekkene
+    # og merket i grafen.
     dagen = None
-    if valg.periode in (SISTE, VELG):
-        dagen = bygg_dagen(rader, slutt, oversiktsleser.vurdering(post.aksje.symbol, slutt), i_dag)
+    if valg.periode == VELG:
+        innhold = oversiktsleser.vurdering(post.aksje.symbol, slutt)
+        detalj = bygg_detalj(post, rader, i_dag, STANDARD, start=start, slutt=slutt, dag=slutt, innhold=innhold)
+        dagen = bygg_dagen(rader, slutt, innhold, i_dag)
+    else:
+        detalj = bygg_detalj(post, rader, i_dag, STANDARD, start=start, slutt=slutt)
+        if valg.periode == SISTE:
+            dagen = bygg_dagen(rader, slutt, oversiktsleser.vurdering(post.aksje.symbol, slutt), i_dag)
+    if detalj is None:
+        abort(404)
 
     # Story 10.3: KI-teksten under regelforklaringen, bare naar det er en
     # vurdering aa forklare og bryteren er paa (FR-601, FR-602).
     ki_er_paa = ki_paa(request.cookies.get(KAPSEL))
     ki = _ki_visning(post, detalj) if ki_er_paa and detalj.sjekker else None
+    # Story 8.16b: bryteren tar deg tilbake til den samme dagen.
+    tilbake = f"/aksje/{post.aksje.symbol}"
+    if valg.periode == VELG:
+        tilbake += f"?dag={slutt.isoformat()}"
     indeks_symbol, indeks, indeks_feilet = _indeksen_for_grafen()
 
     svar = app.make_response(
@@ -535,6 +547,12 @@ def aksjedetalj(symbol: str):
             ),
             valg=valg,
             dagen=dagen,
+            # Story 8.16b: merket øverst bare for en dag før siste børsdag.
+            tidligere_dag=valg.periode == VELG and slutt != rader[-1].dato,
+            # Linja over grafen bare for den første knappen: for en valgt dag
+            # står endringen og signalet i kortene.
+            dagen_i_linja=valg.periode == SISTE,
+            ki_tilbake=tilbake,
             overskrift=OVERSKRIFT[valg.periode],
             knapper=knappene(rader[-1].dato, i_dag),
             # 1 aar og de andre periodene viser bare det serien har (FR-201).
@@ -564,6 +582,7 @@ def _ki_visning(post, detalj) -> KIVisning:
     """
     try:
         logg = SqliteKILogg(g.tilkobling, naa)
+        # Story 8.16b: dagen detaljen viser, ogsaa en valgt dag.
         rad = logg.les(Emne.aksje(post.aksje.symbol, detalj.dato))
         # Svar kl. 23:57: har andre aksjer rader for dagen? Bare lesing (AD-10),
         # og bare naar denne aksjen ikke har en rad.
@@ -573,13 +592,16 @@ def _ki_visning(post, detalj) -> KIVisning:
         # (gjennomgangen, BH6, BH19, og av PR 2, BH3, ECH, VG3).
         app.logger.warning("KI-loggen kunne ikke leses: %s: %s", type(feil).__name__, feil)
         return KIVisning(UKJENT)
-    return bygg_ki_visning(rad, post.innhold, andre_har_rader=andre_har_rader)
+    # Proevd mot vurderingen som vises, ikke den for siste boersdag (8.16b).
+    return bygg_ki_visning(rad, detalj.vurdering, andre_har_rader=andre_har_rader)
 
 
 # Bare aksjesiden kan vaere maalet for bryteren. Alt annet gaar til /, ogsaa
 # en adresse med tabulator eller linjeskift, som nettleseren ellers ville
 # lest som en annen side (gjennomgangen, BH1, ECH).
-_TILBAKE = re.compile(r"/aksje/[A-Za-z0-9.\-]{1,20}")
+# Story 8.16b: med en valgt dag ogsaa ?dag= og en dato. Datoen leses paa nytt
+# av les_valg, saa en dag som ikke kan vises, gir 6 mnd og en beskjed.
+_TILBAKE = re.compile(r"/aksje/[A-Za-z0-9.\-]{1,20}(\?dag=[0-9]{4}-[0-9]{2}-[0-9]{2})?")
 
 
 @app.post("/ki")
