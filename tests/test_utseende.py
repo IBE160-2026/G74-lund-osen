@@ -4,8 +4,10 @@ Skriftfilene leses med standardbiblioteket alene: WOFF 1.0 er tabellene fra
 OpenType, hver pakket med zlib. Ingen test henter noe fra nettet (AD-8).
 """
 
+import hashlib
 import struct
 import zlib
+from collections import Counter
 from pathlib import Path
 
 import pytest
@@ -735,3 +737,106 @@ class TestBrikkene:
         assert not re.search(r'<span class="pille[^"]*">[01] av 3</span>', html)
         assert re.search(r'<span class="styrketall">[01] av 3</span>', html)
         assert "oransje" not in _regel(_stil(html), ".pille.to-av-tre")
+
+
+# Story 2.7a (gruppens svar 19.10 kl. 12:06): all stilen i src/static/stil.css.
+MALENE = Path(__file__).resolve().parent.parent / "src" / "templates"
+STILARKET = FONTS.parent / "stil.css"
+
+
+def _reglene(css: str) -> list[tuple[str, str, str]]:
+    """(@media, velger, kropp) for hver regel i stilarket, med blanktegnene
+    slått sammen og uten kommentarene. @font-face er en regel med navnet som
+    velger."""
+    css = re.sub(r"/\*.*?\*/", "", css, flags=re.DOTALL)
+    ut = []
+
+    def gaa(tekst: str, ramme: str) -> None:
+        i = 0
+        while m := re.match(r"\s*([^{}]+)\{", tekst[i:]):
+            velger = " ".join(m.group(1).split())
+            j = i + m.end()
+            if velger.startswith("@media"):
+                dybde, k = 1, j
+                while dybde:
+                    dybde += {"{": 1, "}": -1}.get(tekst[k], 0)
+                    k += 1
+                gaa(tekst[j : k - 1], velger)
+                i = k
+                continue
+            k = tekst.index("}", j)
+            ut.append((ramme, velger, " ".join(tekst[j:k].split())))
+            i = k + 1
+        assert not tekst[i:].strip(), tekst[i : i + 80]
+
+    gaa(css, "")
+    return ut
+
+
+class TestStilarket:
+    """Story 2.7a: én CSS-fil, lenket fra rammen med et avtrykk av fila."""
+
+    def test_ingen_style_i_malene(self, sidene):
+        """Ville feilet hvis en mal fikk <style> eller blokka stil tilbake."""
+        for malfil in MALENE.glob("*.html"):
+            tekst = malfil.read_text(encoding="utf-8")
+            assert not re.search(r"<style", tekst, re.IGNORECASE), malfil.name
+            assert "block stil" not in tekst and "stil()" not in tekst, malfil.name
+        for navn, html in sidene.items():
+            assert not re.search(r"<style", html, re.IGNORECASE), navn
+
+    def test_fila_svarer_200_fra_lenken_paa_hver_side(self, sidene, klient):  # noqa: F811 - fikstur fra test_demo
+        """Ville feilet hvis lenken ble tatt bort, pekte på en fil som ikke
+        finnes, eller hadde et avtrykk av en gammel utgave av fila."""
+        innhold = STILARKET.read_bytes()
+        for navn, html in sidene.items():
+            lenker = re.findall(r'<link rel="stylesheet" href="([^"]+)">', html)
+            assert len(lenker) == 1, (navn, lenker)
+            assert html.index(lenker[0]) < html.index("</head>"), navn
+            assert lenker[0] == f"/static/stil.css?v={hashlib.sha256(innhold).hexdigest()[:16]}", navn
+            svar = klient.get(lenker[0])
+            assert svar.status_code == 200, (navn, svar.status_code)
+            assert svar.mimetype == "text/css", navn
+            assert svar.data == innhold, navn
+            svar.close()
+
+    def test_ingen_velger_staar_to_ganger_med_samme_kropp(self):
+        """Ville feilet hvis en regel sto to ganger, som de seks som sto likt i
+        index.html og aksje.html før 2.7a."""
+        reglene = _reglene(STILARKET.read_text(encoding="utf-8"))
+        assert len(reglene) > 200
+        dobbelt = [regel for regel, antall in Counter(reglene).items() if antall > 1]
+        assert not dobbelt, dobbelt
+
+    def test_fargene_staar_bare_i_root(self):
+        """Ville feilet med en farge skrevet fast utenfor :root i stilarket.
+        rgba() bare i skyggene, som i testen for hver side."""
+        reglene = _reglene(STILARKET.read_text(encoding="utf-8"))
+        rot = [kropp for _, velger, kropp in reglene if velger == ":root"]
+        assert len(rot) == 1 and "--blekk: #16181D" in rot[0]
+        for ramme, velger, kropp in reglene:
+            if velger == ":root":
+                continue
+            assert not re.search(r"#(?:[0-9a-fA-F]{3}){1,2}\b", kropp), (ramme, velger)
+            assert not re.search(r"\b(?:hsla?|rgb)\(", kropp), (ramme, velger)
+            for deklarasjon in re.findall(r"[^;]*rgba\([^;]*", kropp):
+                assert "box-shadow" in deklarasjon or deklarasjon.strip().startswith("0 2px"), (velger, deklarasjon)
+
+    def test_hver_side_har_klassen_reglene_er_avgrenset_med(self, sidene):
+        """Ville feilet hvis en regel ble avgrenset til en side som ikke
+        finnes, eller en side mistet klassen på <body>."""
+        brukt = set(re.findall(r":where\(\.(side-[a-z]+)\)", STILARKET.read_text(encoding="utf-8")))
+        assert brukt == {"side-oversikt", "side-aksje", "side-feil"}
+        for navn, html in sidene.items():
+            assert re.search(r'<body class="side-(oversikt|aksje|feil)">', html), navn
+        assert '<body class="side-feil">' in sidene["feilsiden"]
+        assert '<body class="side-aksje">' in sidene["aksjesiden"]
+        assert '<body class="side-oversikt">' in sidene["oversikten"]
+
+    def test_stilarket_er_med_i_avtrykkene_bak_bildene(self):
+        """Ville feilet hvis .css ble tatt ut av filene bak bildene i
+        docs/appen/: da tas ikke bildene på nytt når stilen endres."""
+        from test_docker import SKRIFTFILER
+
+        assert ".css" in SKRIFTFILER
+        assert STILARKET.is_file()
