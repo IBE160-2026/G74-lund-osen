@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-10-19T11:23
+updated: 2026-10-19T12:19
 ---
 
 # Vurderingsmatrise for del 1
@@ -87,3 +87,5 @@ Statusen i tabellen er ikke endret. README-prøven (story 3.4) og avsnittet «St
 *Lagt til 2026-10-18 kl. 22:09:* raden «README og kjørbarhet»: bildet av oversikten i demoen er tilbake under «Til faglærer», nå med tabellen: 1280 × 1573 px, til bunnen av «Skilte seg ut», så signalstyrken og fargene per aksje er med (gruppens svar kl. 21:42). Flettet i `c5464e7`, PR #70. Det viser bare demoen, med «Eksempeltall». Det snur linjene 16.10 kl. 22:45 og 22:57 om at bildet var tatt ut, og README-en har nå fire bilder og CI-merket. «Tester» har også installasjonen av uv, og «Mer for den som vil» tabellen over variablene i `.env`.
 
 *Lagt til 2026-10-19 kl. 11:23:* raden «README og kjørbarhet»: bildene av appen står bak knappen «Bilder av appen (demoen)» rett under beskrivelsen, i [`docs/appen/`](appen/), en egen mappe for bilder og senere video av demoen (story 3.3f, gruppens svar 18.10 kl. 23:03, på grenen `3-3f-bildene-av-appen` til den er flettet). Der står bildet av oversikten og et nytt bilde av aksjesiden for KVST, med grafen og KI-teksten. Bildet under «Til faglærer» er tatt bort, så linja 18.10 kl. 22:09 gjelder ikke lenger plassen. README-en har fem bilder og CI-merket.
+
+*Lagt til 2026-10-19 kl. 12:19:* raden «README og kjørbarhet»: bildene av appen bak knappen «Bilder av appen (demoen)», i [`docs/appen/`](appen/), står nå på main, flettet i `208d086`, PR #75, etter gruppens ja kl. 11:57.
