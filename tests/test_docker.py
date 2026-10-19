@@ -1222,6 +1222,14 @@ def _detaljer(tekst: str) -> dict[str, str]:
     return dict(re.findall(r"<details>\n<summary>(.+?)</summary>\n\n(.*?)\n\n</details>", tekst, re.DOTALL))
 
 
+# Story 3.3g: setningen om regelen kl. 14:48 (svaret 19.10 under
+# «Prioritering» i epics.md), rett under listene i «Status».
+REGELEN_FOR_EKSTRA = (
+    "Det under «Ekstra» lover ikke briefen, og det flettes bare ferdig og med testene grønne, "
+    "før README-prøven senest én uke før innleveringen."
+)
+
+
 def _statuslister(status: str) -> dict[str, list[str]]:
     """Listene i «Status» som {navn: punkter}, story 3.3d. En liste er en
     linje i fet skrift alene, en tom linje, og så linjer som begynner med
@@ -1968,8 +1976,11 @@ class TestReadmeForNybegynnere:
         assert not re.search(r"\b[Ss]tor(y|ies|yen)\b|PR #\d", status), status
         assert "```" not in status and "~~~" not in status and "`" not in status
         assert not re.search(r"docker[ -]compose|uv run", status, re.IGNORECASE)
+        # Story 3.3g: «Status» begynner med at prosjektet er under utvikling.
+        assert status.startswith(
+            "\nProsjektet er under utvikling. Listene under viser hva som er ferdig på main, og hva som gjenstår.\n"
+        ), status[:200]
         for innhold in (
-            "Under arbeid",
             "hentingen",
             "Docker",
             "demoen",
@@ -1994,17 +2005,20 @@ class TestReadmeForNybegynnere:
         # grenen 8-0b sa om 2.3b.
         assert "Flettet til main" not in status.split("«Ferdig» betyr flettet til main.", 1)[0]
         lister = _statuslister(status)
-        assert list(lister) == ["Ferdig", "Neste"], list(lister)
+        # Story 3.3g (svaret 19.10 kl. 14:48): «Neste» er delt i det briefen
+        # lover og det ekstra.
+        assert list(lister) == ["Ferdig", "Neste i v1", "Ekstra, hvis tiden rekker"], list(lister)
         for navn, punkter in lister.items():
             assert 1 <= len(punkter) <= 8, (navn, len(punkter))
         # Gjennomgangen, ECH2: listene staar samlet, uten tomme linjer inni,
-        # saa et punkt etter en tom linje ikke slipper unna grensen.
+        # saa et punkt etter en tom linje ikke slipper unna grensen. Etter
+        # listene kommer setningen om regelen kl. 14:48 (3.3g).
         samlet = "\n\n".join(
             f"**{navn}**\n\n" + "\n".join(f"- {p}" for p in punkter) for navn, punkter in lister.items()
         )
-        assert samlet + "\n\n«Ferdig» betyr flettet til main." in status
+        assert samlet + "\n\n" + REGELEN_FOR_EKSTRA + "\n\n«Ferdig» betyr flettet til main." in status
         ferdig = "\n".join(lister["Ferdig"]).lower()
-        neste_punkter = lister["Neste"]
+        neste_punkter = lister["Neste i v1"] + lister["Ekstra, hvis tiden rekker"]
         neste = "\n".join(neste_punkter).lower()
         for sak in (
             "hentingen",
@@ -2043,11 +2057,14 @@ class TestReadmeForNybegynnere:
         # svarene 18.10 kl. 00:39 og 11:20, med KI-tekstene i demoen og Min
         # liste foerst. Ett punkt per sak, i den rekkefoelgen.
         # Story 3.4b: KI-tekstene i demoen er flyttet til «Ferdig».
+        # Story 3.3g: historikken og signaldagene er delt, NewsWeb er tatt ut
+        # av lenkene, og fra signaldagene staar resten under «Ekstra».
         saker = (
             "min liste",
-            "historikken og signaldagene",
-            "selskapets side på newsweb",
+            "historikken i aksjedetaljen",
+            "lenken til selskapets egen nettside",
             "egen nøkkel",
+            "signaldagene i kursgrafen",
             "«vis ki-tekst»",
             # Story 8.16: periodene i kursgrafen er flyttet til «Ferdig».
             "på forsiden periodevalget",
@@ -2061,7 +2078,7 @@ class TestReadmeForNybegynnere:
             assert sak not in neste, sak
         # Setningene om begge versjonene, boersmeldingene og detaljene staar
         # under listene.
-        etter = status.split("**Neste**", 1)[1].split("\n\n", 2)[2]
+        etter = status.split("**Ekstra, hvis tiden rekker**", 1)[1].split("\n\n", 2)[2]
         for setning in (
             # Gjennomgangen, ECH1: hva «Ferdig» betyr, fordi sprintstatusen kan
             # si review for noe som er flettet.
@@ -2101,9 +2118,11 @@ class TestReadmeForNybegynnere:
         assert f"{tall[antall]} enkle sjekker" in beskrivelse
         # Styrken er summen av sjekkene uten fortegn (FR-703), saa den hoeyeste er antallet.
         assert f"signalstyrke fra 0 til {antall}" in beskrivelse
-        assert (
-            "– " + ", ".join(n.lower() for n in navn[: antall - 1]) + f" og {navn[antall - 1].lower()} –" in beskrivelse
-        )
+        # Story 3.3g: «interesse (handelsvolum)», så forklaringen telles ikke
+        # med i navnene.
+        assert "– " + ", ".join(
+            n.lower() for n in navn[: antall - 1]
+        ) + f" og {navn[antall - 1].lower()} –" in beskrivelse.replace(" (handelsvolum)", "")
         assert "Appen gir ikke råd om å kjøpe eller selge." in beskrivelse
         # 12.10 kl. 11:12: at appen er under utvikling, staar ogsaa oeverst,
         # ikke bare i «Status» etter hele «Kom i gang».

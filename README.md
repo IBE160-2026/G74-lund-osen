@@ -4,7 +4,7 @@
 
 Gruppe G74 (Ai Ai Ai) i IBE160 Programmering med KI, Høgskolen i Molde, høsten 2026.
 
-OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversikt. Tre enkle sjekker – trend, bevegelse og interesse – gir hver aksje en signalstyrke fra 0 til 3, så en vanlig sparer kan se hva som har endret seg, og hvorfor. Beregningene gjøres med vanlig programkode, og KI skal forklare signalet med ord. Appen gir ikke råd om å kjøpe eller selge. Den er under utvikling og ikke ferdig.
+OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversikt. Tre enkle sjekker – trend, bevegelse og interesse (handelsvolum) – gir hver aksje en signalstyrke fra 0 til 3, så en vanlig sparer kan se hva som har endret seg, og hvorfor. Beregningene gjøres med vanlig programkode, og KI skal forklare signalet med ord. Appen gir ikke råd om å kjøpe eller selge. Den er under utvikling og ikke ferdig.
 
 <details>
 <summary>Bilder av appen (demoen)</summary>
@@ -297,7 +297,7 @@ Modellen ble prøvd på en maskin med 15,7 GB minne og et grafikkort med 8 GB, d
 
 ## Status
 
-Under arbeid, og ingenting er endelig.
+Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, og hva som gjenstår.
 
 **Ferdig**
 
@@ -310,15 +310,21 @@ Under arbeid, og ingenting er endelig.
 - Den første delen av KI-laget: plassen for KI-teksten under regelforklaringen på aksjesiden, med en bryter som slår den av og på, loggen der tekstene lagres, kontrollen av teksten mot regelen, og at hentingen lager teksten med en lokal modell. Teksten lages når KI er slått på og den lokale modellen kjører under hentingen, og aksjesiden viser bare tekster som besto kontrollen
 - Ruff, som finner feil og rot i koden og formaterer den, i CI og i testene, den oppdaterte kvalitetssikringen, og et ryddigere repo uten kopien av BMAD-skillene
 
-**Neste**
+**Neste i v1**
 
 - Min liste
-- Historikken og signaldagene i grafen
-- Lenkene til selskapets side på NewsWeb og selskapets egen nettside
+- Historikken i aksjedetaljen
+- Lenken til selskapets egen nettside
 - Egen nøkkel til Gemini, Anthropic og OpenAI
+
+**Ekstra, hvis tiden rekker**
+
+- Signaldagene i kursgrafen
 - Innstillingene, med «Vis KI-tekst»
 - På forsiden periodevalget, børsometeret og KI-teksten om dagen
 - Til slutt å velge og bytte aksjer
+
+Det under «Ekstra» lover ikke briefen, og det flettes bare ferdig og med testene grønne, før README-prøven senest én uke før innleveringen.
 
 «Ferdig» betyr flettet til main. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
 

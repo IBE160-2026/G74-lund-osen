@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-18T21:25
+updated: 2026-10-19T16:20
 ---
 
 # Hjelp til «Kom i gang»
@@ -12,6 +12,8 @@ Spørsmål og svar til «Kom i gang» i [README-en](../README.md), sortert etter
 *Rettet 2026-10-18 (story 3.3c):* «Demoen» står nå før «Den ekte versjonen», som i README-en, fordi faglærer prøver demoen (gruppen 16.10 kl. 21:16, svarene kl. 21:25). Svarene er de samme som før.
 
 *Rettet 2026-10-18 (gjennomgangen av 3.3c, BH10):* setningen over gjaldt flyttingen. Etter rettelsene i 3.3c er tre spørsmål nye under «Steg 4: mappa», og svarene «Ingenting skjer når jeg limer inn.» og «Hva skal jeg se etter i vinduet?» har fått mer tekst. Ingen svar har mistet tekst.
+
+*Lagt til 2026-10-19 (story 3.3g):* README-en anbefaler nå demoen for faglærer og sensor (gruppens svar kl. 14:46), og overskriften der heter «Den ekte versjonen», uten «(anbefalt)». Rekkefølgen og svarene her er de samme.
 
 ## Steg 1: Docker Desktop
 

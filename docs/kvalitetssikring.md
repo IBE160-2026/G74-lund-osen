@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-19T14:28
+updated: 2026-10-19T16:20
 ---
 
 # Kvalitetssikring
@@ -743,6 +743,8 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
 *Lagt til 2026-10-14 (gruppen kl. 22:19 og 22:25):* Rekkefølgen etter 8.0d er 8.15, så 2.8, 2.9 og 2.9b, 8.3, 8.10, 8.16 og 8.17, 2.7 og 8.8, 10.1–10.3, 8.10b, 10.6, og til slutt 2.11 og 2.12. README-prøven tas når mest mulig av dette er bygget, og senest én uke før innleveringen. Det erstatter setningen over om at Prøve 1 og 2 tas etter at 8.0d er flettet. Rekkefølgen står i `epics.md`.
 
 *Lagt til 2026-10-18 (gruppens svar kl. 00:03):* Prøve 1 tas i uke 43 (19.–25.10), etter at de to README-PR-ene er flettet, og Prøve 2 samtidig hvis testeren har egen gratiskonto. Prøven tas på nytt senest én uke før innleveringen, med ZIP-fila som leveres. Det endrer setningen fra 14.10 over om at prøven tas når mest mulig er bygget. Beslutningen står under «Prioritering» og story 3.3 i `epics.md`.
+
+*Lagt til 2026-10-19 (story 3.3g, gruppens svar kl. 14:46 og 14:48):* «Kom i gang» anbefaler nå demoen for faglærer og sensor, og «(anbefalt)» står ikke lenger ved den ekte versjonen. Knappen for den lokale modellen under «Mer for den som vil» heter «Den lokale modellen for KI-teksten (valgfri)» og sier at den ikke trengs for demoen eller for å vurdere appen. Ingen kommando i «Kom i gang» er endret. README-prøven med ZIP-fila, senest én uke før innleveringen, er også funksjonsstoppen: det briefen ikke lover og som ikke er ferdig da, flettes ikke.
 
 ### Prøve 1
 
