@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-19T22:02
+updated: 2026-10-19T22:23
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -4140,3 +4140,12 @@ forskjellen endrer vurderingen for DNO, er ikke regnet ut.
 
 **Kostnad.** 4 kall. Kvoten etter: 20 brukt i dag, 0 igjen, `extraLimit` uendret.
 Bonuskvoten er ikke brukt.
+
+*Lagt til 2026-10-19, uten kall:* vurderingen for DNO 19.10 er regnet på nytt med `vurder`
+fra `src/signalberegning.py`, på serien i basen lest med en tilkobling som bare leser,
+der bare volumet for 19.10 er byttet med volumet i svaret fra kl. 22. Volumet økte.
+Styrken, retningen og alle tre sjekkene (trend, bevegelse og interesse) blir de samme
+som i den lagrede raden. Den uendrede serien gir den lagrede raden, som kontroll.
+Skriptet lå utenfor repoet, sha256 for basen var lik før og etter, og ingenting ble
+skrevet til basen (AD-7). Forskjellen i volumet endret altså ikke vurderingen for DNO
+denne dagen.
