@@ -388,6 +388,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [Endringsforslag 28.09](_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-28.md), godkjent samme dag
 - [Endringsforslag 08.10](_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-08.md): femten idéer inn i v1, godkjent samme dag
 - [Endringsforslag 13.10](_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-13.md): den samlede endringen fra samlelista, godkjent samme dag
+- [Endringsforslag 19.10](_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-19.md): endelig v1 er det briefen v8 lover, og resten er ekstra, godkjent samme dag
 - [Kilder og bruksvilkår](docs/kilder-og-rettigheter.md), med e-postene til [EODHD](docs/epost-til-eodhd.md) og [Euronext](docs/epost-til-euronext.md)
 - [Leveranseliste](docs/innlevering.md)
 - [Hjelp til «Kom i gang»](docs/hjelp.md): spørsmål og svar, sortert etter steg
