@@ -2071,6 +2071,8 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 
 *Lagt til 2026-10-19 kl. 12:19:* bildene av appen står bak knappen «Bilder av appen (demoen)» rett under beskrivelsen, i `docs/appen/`, med bildet av oversikten og et nytt bilde av aksjesiden for KVST, flettet i `208d086`, PR #75 (spesifikasjonen `spec-3-3f-bildene-av-appen-bak-en-knapp.md`).
 
+*Avgjort 2026-10-19 kl. 16:46 (gruppens svar):* ja til flettingen av PR #77, etter at README-en før og etter er sett.
+
 ### Story 3.4: Demoversjonen
 
 *Lagt til 2026-10-03, Marians beslutning kl. 18:10.*
