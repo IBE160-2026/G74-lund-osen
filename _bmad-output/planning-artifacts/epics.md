@@ -3455,6 +3455,8 @@ knapper som ellers i appen.
 
 *Avgjort 2026-10-19 kl. 00:00 (gruppens svar):* når en dag er valgt med «Velg dag», viser hele aksjesiden den dagen: kortene øverst, «Hvorfor signalet ble», KI-teksten og grafen, lest fra det som er lagret for dagen, med et merke øverst og en lenke tilbake til siste børsdag (spesifikasjonen 8.16b). Grunnen: etter 8.16 viste toppen siste børsdag og linja over grafen den valgte dagen, to ulike signaler på samme side. Det utvider svaret 18.10 kl. 21:50.
 
+*Lagt til 2026-10-19 kl. 11:00:* med «Velg dag» viser hele aksjesiden dagen, lest fra det som er lagret, med et merke øverst og en lenke tilbake til siste børsdag, flettet i `4e43ba5`, PR #74 (spesifikasjonen `spec-8-16b-dagen-paa-hele-siden.md`).
+
 ### Story 8.17: Periodevalget i oversikten, Min liste og børsometeret
 
 *Lagt til 2026-10-08, Marians beslutning, endringsforslaget 08.10 (`sprint-change-proposal-2026-10-08.md`, rad 15).*

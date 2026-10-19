@@ -2,7 +2,7 @@
 title: 'Story 8.16 (8.16b): når en dag er valgt, viser hele aksjesiden den dagen'
 type: 'feature'
 created: '2026-10-19'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '3adf22d'
@@ -88,3 +88,5 @@ Gjennomgang 19.10 på diffen `6caf967..f1e2fae`. Linsene var Blind Hunter (BH, 1
 - Alt leses fra det som er lagret, og signalet regnes aldri på nytt (AD-7).
 - Ingen API-kall utover kvotesjekken i regel 15, og `src/fetch_prices.py` kjøres ikke.
 - `data/db/ose.db` og `data/db/demo.db` røres ikke (regel 22). Bildet tas fra en demobase i en midlertidig mappe.
+
+*Lagt til 2026-10-19 kl. 11:00:* PR #74 er squash-flettet i `4e43ba5`, låst til head-en `1c67d18`. Main hadde ikke gått videre. CI var grønn på head-en (39226380784), også demoen i docker-jobben, og på main (39226610477). Triagen står over og som kommentar på PR-en.
