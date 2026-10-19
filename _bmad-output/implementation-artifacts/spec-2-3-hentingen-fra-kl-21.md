@@ -84,3 +84,5 @@ Gjennomgang 17.10 på diffen `main...e0ab79e`, med Blind Hunter (BH, 13 funn), E
 | BH10 | Tabellen i README-prøven sier fortsatt «kl. 22» i steg 4 | low | avvist: ingen linje fjernes (instruksjonen kl. 21:11), og den daterte linja over tabellen sier at det gjelder steg 4 |
 
 *Lagt til 2026-10-17:* gruppen svarte på ECH2 og BH7 kl. 22:00. Hentingen går kl. 21:00 mandag 19.10, som avgjort, og trenger ingen aksje et nytt forsøk, sammenlignes fire aksjer med kursfila fra kl. 21 med kallene som er igjen av dagens kvote etter kl. 22. Se «Avgjort 2026-10-17 kl. 22:00» under story 2.3 i `epics.md`.
+
+*Lagt til 2026-10-19 (målingen etter svaret kl. 22:00, `malinger.md` §37):* DNO, MOWI, GJF og AKRBP, de fire med volumforholdet nærmest 1,5 i kveldens vurderinger, ble hentet på nytt kl. 22:00. MOWI, GJF og AKRBP er like kursfila fra kl. 21 i alle sju feltene. DNO er ulik i `volume` og lik i de seks andre. Raden fra kl. 21 var altså ikke endelig for volumet til DNO, og spørsmålet tas opp igjen før tirsdag, som svaret sier. Om forskjellen endrer vurderingen for DNO, er ikke regnet ut.
