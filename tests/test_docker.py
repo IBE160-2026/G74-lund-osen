@@ -2271,3 +2271,82 @@ class TestReadmeForNybegynnere:
         brief = [l for l in lista.splitlines() if "](_bmad-output/planning-artifacts/product-brief.md)" in l]
         assert len(brief) == 1, lista
         assert re.findall(r"arbeidskrav-product-brief-v\d+", brief[0]) == [gjeldende], brief[0]
+
+
+# Story 3.3g: det under «Ekstra», ett ord eller uttrykk per punkt, i den
+# rekkefoelgen README-en har dem. Briefen v8 lover ikke noe av det.
+EKSTRA = ("signaldagene", "«vis ki-tekst»", "periodevalget", "velge og bytte aksjer")
+
+
+class TestReadmeDemoenAnbefales:
+    """Story 3.3g, punkt d (gruppens svar 19.10 kl. 14:46, 14:48 og 16:12):
+    README-en anbefaler demoen for faglaerer og sensor, som briefen v8 og
+    tilbakemeldingen 06.10 sier, den lokale modellen er valgfri, og «Neste i
+    v1» har bare det briefen lover."""
+
+    def test_kom_i_gang_anbefaler_demoen_for_faglaerer_og_sensor(self):
+        """Ville feilet hvis «Vi anbefaler den ekte versjonen» kom tilbake,
+        eller hvis «Kom i gang» ikke begynte med anbefalingen av demoen."""
+        tekst = README.read_text(encoding="utf-8")
+        foerste = _kom_i_gang().lstrip("\n").split("\n\n", 1)[0]
+        assert foerste.startswith(
+            "Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og viser "
+            "hovedfunksjonene med faste eksempeldata, også KI-teksten. "
+            "Den ekte versjonen er for å prøve løsningen med kurser fra EODHD."
+        ), foerste
+        assert "anbefaler den ekte" not in tekst.lower()
+
+    def test_ingen_anbefalt_ved_den_ekte_versjonen(self):
+        """Ville feilet hvis «(anbefalt)» sto igjen ved den ekte versjonen, i
+        overskriften eller tabellen, eller hvis en lenke gikk til det gamle
+        ankeret."""
+        tekst = README.read_text(encoding="utf-8")
+        assert "(anbefalt)" not in tekst
+        assert "\n### Den ekte versjonen\n" in tekst
+        assert "#den-ekte-versjonen-anbefalt" not in tekst and "#den-ekte-versjonen-anbefalt" not in _hjelp()
+        assert "](#den-ekte-versjonen)" in tekst
+        assert _alle_ankrene(tekst).count("den-ekte-versjonen") == 1
+
+    def test_delen_om_den_lokale_modellen_sier_at_den_er_valgfri(self):
+        """Ville feilet hvis «valgfri» ble tatt bort fra overskriften eller
+        første setning, eller hvis innholdet under falt ut."""
+        knappene = _detaljer(_seksjon("Mer for den som vil"))
+        modell = [s for s in knappene if s.startswith("Den lokale modellen")]
+        assert modell == ["Den lokale modellen for KI-teksten (valgfri)"], list(knappene)
+        tekst = knappene[modell[0]]
+        assert tekst.startswith(
+            "Den lokale modellen er valgfri og trengs verken for demoen eller for å vurdere appen, "
+            "fordi demoen har ferdig KI-tekst og bare trenger Docker. "
+        ), tekst[:200]
+        # Innholdet står.
+        assert "docker compose exec ollama ollama pull gemma4:e4b" in tekst
+        assert "Slå av KI-teksten: sett `OSE_KI_TJENESTE=av` i `.env`." in tekst
+
+    def test_interesse_handelsvolum_oeverst(self):
+        """Ville feilet hvis beskrivelsen øverst sa «interesse» uten
+        forklaringen, eller hvis den sto et annet sted enn i beskrivelsen."""
+        tekst = README.read_text(encoding="utf-8")
+        beskrivelse = [a for a in tekst.split("Til faglærer:", 1)[0].split("\n\n") if a.startswith("OSE Signal viser")]
+        assert len(beskrivelse) == 1
+        assert "trend, bevegelse og interesse (handelsvolum)" in beskrivelse[0]
+
+    def test_ingen_av_de_ekstra_staar_under_neste_i_v1(self):
+        """Svaret kl. 14:48: det briefen ikke lover, står under «Ekstra,
+        hvis tiden rekker». Svaret kl. 16:12: egen nøkkel er v1. Ville feilet
+        hvis et ekstra punkt ble flyttet til «Neste i v1», eller NewsWeb kom
+        tilbake i punktet om lenkene."""
+        tekst = README.read_text(encoding="utf-8")
+        status = tekst.split("\n## Status\n", 1)[1].split("\n## ", 1)[0]
+        lister = _statuslister(status)
+        v1 = [p.lower() for p in lister["Neste i v1"]]
+        ekstra = [p.lower() for p in lister["Ekstra, hvis tiden rekker"]]
+        for sak in EKSTRA:
+            assert not any(sak in p for p in v1), (sak, v1)
+        assert len(ekstra) == len(EKSTRA), ekstra
+        for punkt, sak in zip(ekstra, EKSTRA, strict=True):
+            assert sak in punkt, (sak, punkt)
+        for sak in ("min liste", "historikken", "selskapets egen nettside", "egen nøkkel til gemini"):
+            assert sum(sak in p for p in v1) == 1, (sak, v1)
+        assert len(v1) == 4, v1
+        assert "newsweb" not in "\n".join(v1 + ekstra)
+        assert REGELEN_FOR_EKSTRA in status
