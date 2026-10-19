@@ -545,6 +545,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-19 kl. 00:00 (gruppens svar):* når en dag er valgt med «Velg dag», viser hele aksjesiden den dagen: kortene øverst, «Hvorfor signalet ble», KI-teksten og grafen, lest fra det som er lagret for dagen, med et merke øverst og en lenke tilbake til siste børsdag (spesifikasjonen 8.16b). Grunnen: etter 8.16 viste toppen siste børsdag og linja over grafen den valgte dagen, to ulike signaler på samme side. Det utvider svaret 18.10 kl. 21:50.
 
+*Avgjort 2026-10-19 kl. 12:06 (gruppens svar):* stilen flyttes til én CSS-fil nå, som første del av 2.7 (spesifikasjonen 2.7a), før 8.3 og historikken, fordi seks regler står likt i `index.html` og `aksje.html`, og kontrollpunktet i 2.7 sier én layout og én CSS-fil. Det erstatter svarene kl. 11:54 og 11:58 samme dag om at rammen skulle telle som felles stil til en egen PR senere i uka. Historikken blir 2.7b.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -1626,6 +1628,8 @@ Som **bruker**, vil jeg se hva løsningen sa om aksjen de siste ukene, så FR-40
 **Avhenger av:** 2.2 og 2.5. **Én økt:** ja.
 
 *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3, nr. 22), godkjent av Marian kl. 12:46:* her sto «ikke kjørt» i første kontrollpunkt. Teksten brukeren ser, er «ikke vurdert», som i `designregler.md` §2. `Art.IKKE_KJOERT` i koden står.
+
+*Avgjort 2026-10-19 kl. 12:06 (gruppens svar):* stilen flyttes til én CSS-fil nå, som første del av 2.7 (spesifikasjonen 2.7a), før 8.3 og historikken, fordi seks regler står likt i `index.html` og `aksje.html`, og kontrollpunktet i 2.7 sier én layout og én CSS-fil. Det erstatter svarene kl. 11:54 og 11:58 samme dag om at rammen skulle telle som felles stil til en egen PR senere i uka. Historikken blir 2.7b.
 
 ### Story 2.8: Hovedindeksen hentes i samme kjøring
 
