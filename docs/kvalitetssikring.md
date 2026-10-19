@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-19T14:28
+updated: 2026-10-19T16:28
 ---
 
 # Kvalitetssikring
@@ -744,6 +744,8 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
 
 *Lagt til 2026-10-18 (gruppens svar kl. 00:03):* Prøve 1 tas i uke 43 (19.–25.10), etter at de to README-PR-ene er flettet, og Prøve 2 samtidig hvis testeren har egen gratiskonto. Prøven tas på nytt senest én uke før innleveringen, med ZIP-fila som leveres. Det endrer setningen fra 14.10 over om at prøven tas når mest mulig er bygget. Beslutningen står under «Prioritering» og story 3.3 i `epics.md`.
 
+*Lagt til 2026-10-19 (story 3.3g, gruppens svar kl. 14:46 og 14:48):* «Kom i gang» anbefaler nå demoen for faglærer og sensor, og «(anbefalt)» står ikke lenger ved den ekte versjonen. Knappen for den lokale modellen under «Mer for den som vil» heter «Den lokale modellen for KI-teksten (valgfri)» og sier at den ikke trengs for demoen eller for å vurdere appen. Ingen kommando i «Kom i gang» er endret. README-prøven med ZIP-fila, senest én uke før innleveringen, er også funksjonsstoppen: det briefen ikke lover og som ikke er ferdig da, flettes ikke.
+
 ### Prøve 1
 
 - **Hvem som prøver:** åpent.
@@ -836,6 +838,8 @@ hentingen kan gi kurser, se «Når kan jeg hente?» i
 ### Prøve 3: den lokale modellen
 
 *Lagt til 2026-10-15 (story 10.2, PR F, planen for KI-laget 15.10 kl. 15:43):* «Den lokale modellen (KI-teksten)» under «Mer for den som vil» i README-en. Prøven tas på en maskin med grafikkort fra NVIDIA, etter Prøve 2, med den ekte versjonen og egen EODHD-nøkkel. Ollama trenger ingen nøkkel.
+
+*Lagt til 2026-10-19 (story 3.3g, gjennomgangen VG5):* knappen heter nå «Den lokale modellen for KI-teksten (valgfri)», og første setning sier at den ikke trengs for demoen eller for å vurdere appen. Prøven står som før.
 
 - **Dato:**
 - **Maskin og grafikkort:**

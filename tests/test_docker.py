@@ -460,7 +460,9 @@ class TestOllama:
         """Instruksjonen kl. 23:58: README-en sier det samme som utskriften
         fra hentingen, 0 kall bare naar basen har dagens kurs for alle."""
         tekst = README.read_text(encoding="utf-8")
-        modell = tekst.split("<summary>Den lokale modellen (KI-teksten)</summary>", 1)[1].split("</details>", 1)[0]
+        modell = tekst.split("<summary>Den lokale modellen for KI-teksten (valgfri)</summary>", 1)[1].split(
+            "</details>", 1
+        )[0]
         assert "uten nye kall til EODHD" not in modell
         assert "Har basen dagens kurs for alle aksjene, gir det 0 kall til EODHD." in modell
         assert (
@@ -600,15 +602,15 @@ class TestReadme:
         klar = [l for l in topp.splitlines() if l.startswith("| Klar |")]
         assert len(klar) == 1 and "helgen" in klar[0] and "etter kl. 21" in klar[0]
         assert "andre dager børsen er stengt" in klar[0]
-        steg8 = _steg("Den ekte versjonen (anbefalt)", 8)
+        steg8 = _steg("Den ekte versjonen", 8)
         assert "Første gang går det også i helgen og andre dager børsen er stengt." in steg8
         assert "Første gang kan du også hente i helgen" in _hjelp()
 
     def test_demoen_foerst_og_zip_foer_kommandoene(self):
         """Story 3.3c: demoen står foerst, fordi faglaerer proever den (gruppen
         16.10 kl. 21:16, svarene kl. 21:25). Det snur rekkefoelgen fra 11.10
-        kl. 22:32, ikke anbefalingen: README-en anbefaler fortsatt den ekte
-        versjonen. Demoen virker uten .env. Koden hentes med «Download ZIP»
+        kl. 22:32. Story 3.3g (svaret 19.10 kl. 14:46): README-en anbefaler
+        demoen for faglaerer og sensor. Demoen virker uten .env. Koden hentes med «Download ZIP»
         foer den foerste kommandoen, ikke med git clone (svar 1 11.10). Het
         test_ekte_versjonen_foerst_og_zip_foer_kommandoene fra 11.10 til 3.3c.
         Ville feilet hvis den ekte versjonen kom foer demoen igjen."""
@@ -617,9 +619,9 @@ class TestReadme:
         assert kommandoer[0] == "docker compose up --build demo"
         assert del_.index("«Download ZIP»") < del_.index("docker compose up --build demo")
         overskrifter = re.findall(r"^### (.+)$", del_, re.MULTILINE)
-        assert overskrifter[:3] == ["Felles for begge", "Demoen", "Den ekte versjonen (anbefalt)"], overskrifter
+        assert overskrifter[:3] == ["Felles for begge", "Demoen", "Den ekte versjonen"], overskrifter
         topp = del_.split("### Felles for begge", 1)[0]
-        assert "Vi anbefaler den ekte versjonen." in topp
+        assert "Vi anbefaler demoen for faglærer og sensor" in topp
         assert "Demoen står først i stegene under, fordi den er raskest." in topp
         assert "git clone" not in del_.split("### Står du fast?", 1)[0]
         demo = _seksjon("Demoen")
@@ -723,7 +725,7 @@ class TestReadme:
 
     def test_siden_lastes_paa_nytt_etter_hentingen(self):
         """Story 3.4, PR 2: siden oppdateres ikke av seg selv."""
-        assert "Last siden på nytt når hentingen er ferdig" in _steg("Den ekte versjonen (anbefalt)", 8)
+        assert "Last siden på nytt når hentingen er ferdig" in _steg("Den ekte versjonen", 8)
 
     def test_testene_uten_docker(self):
         """3.3b, punkt c: hvordan testene kjøres på en ren maskin uten Docker,
@@ -1199,7 +1201,7 @@ def _seksjon(navn: str) -> str:
     return _kom_i_gang().split(f"### {navn}\n", 1)[1].split("\n### ", 1)[0]
 
 
-SEKSJONENE = {"Felles for begge": [1, 2, 3, 4], "Den ekte versjonen (anbefalt)": [5, 6, 7, 8, 9], "Demoen": [5, 6, 7]}
+SEKSJONENE = {"Felles for begge": [1, 2, 3, 4], "Den ekte versjonen": [5, 6, 7, 8, 9], "Demoen": [5, 6, 7]}
 
 
 # Story 3.3c (svar 2 18.10 kl. 14:48): avsnittet som forklarer hvordan en
@@ -1218,6 +1220,14 @@ def _detaljer(tekst: str) -> dict[str, str]:
     """Hver <details> i teksten som {summary: svar}. Tomme linjer rundt svaret
     kreves, ellers viser ikke GitHub markdown i det."""
     return dict(re.findall(r"<details>\n<summary>(.+?)</summary>\n\n(.*?)\n\n</details>", tekst, re.DOTALL))
+
+
+# Story 3.3g: setningen om regelen kl. 14:48 (svaret 19.10 under
+# «Prioritering» i epics.md), rett under listene i «Status».
+REGELEN_FOR_EKSTRA = (
+    "Det som står under «Ekstra», er ikke lovet i briefen og kommer bare med hvis det er ferdig og testet "
+    "før README-prøven, senest én uke før innleveringen."
+)
 
 
 def _statuslister(status: str) -> dict[str, list[str]]:
@@ -1382,7 +1392,7 @@ BEHOLDT_I_README = [
 class TestReadmeForNybegynnere:
     """Story 3.4, PR 3: «Kom i gang» for en som aldri har brukt Docker eller
     et terminalvindu. Formen fra 11.10 kl. 22:32: to versjoner i en tabell,
-    felles steg 1-4, den ekte versjonen (anbefalt) og demoen fra steg 5,
+    felles steg 1-4, den ekte versjonen (anbefalt til 3.3g) og demoen fra steg 5,
     høyst 8 spørsmål, og resten i docs/hjelp.md."""
 
     def test_ingen_kommentar_paa_kommandolinjene(self):
@@ -1407,16 +1417,17 @@ class TestReadmeForNybegynnere:
             assert not re.match(r"^ +```|^ *~~~", linje), linje
 
     def test_tabellen_nevner_begge_og_hvilken_som_er_anbefalt(self):
-        """Kl. 22:21: to versjoner med forskjellen forklart, og vi
-        anbefaler den ekte. Ville feilet hvis tabellen manglet en versjon,
-        eller anbefalte demoen."""
+        """Kl. 22:21: to versjoner med forskjellen forklart. Story 3.3g
+        (svaret 19.10 kl. 14:46): vi anbefaler demoen, ikke den ekte, og
+        tabellen merker ingen av dem. Ville feilet hvis tabellen manglet en
+        versjon, eller anbefalte den ekte."""
         topp = _kom_i_gang().split("### Felles for begge", 1)[0]
         hode = [l for l in topp.splitlines() if l.startswith("|")][0]
-        assert "Den ekte versjonen (anbefalt)" in hode and "| Demoen |" in hode
+        assert "Den ekte versjonen" in hode and "| Demoen |" in hode
         # Story 3.3c: demoen i første kolonne, som i stegene.
-        assert hode.startswith("| | Demoen | Den ekte versjonen (anbefalt) |"), hode
-        assert "Vi anbefaler den ekte versjonen." in topp
-        assert "(anbefalt)" not in hode.split("Den ekte versjonen (anbefalt)", 1)[1]
+        assert hode == "| | Demoen | Den ekte versjonen |", hode
+        assert "Vi anbefaler demoen for faglærer og sensor" in topp
+        assert "Vi anbefaler den ekte versjonen" not in topp
 
     def test_stegene_er_nummerert_og_har_hoeyst_65_ord(self):
         """Felles 1-4, så 5-9 i den ekte versjonen og 5-7 i demoen, hvert
@@ -1529,7 +1540,7 @@ class TestReadmeForNybegynnere:
                 steg = _steg(seksjon, n)
                 if not _blokkene(steg):
                     continue
-                if (seksjon, n) == ("Den ekte versjonen (anbefalt)", 8):
+                if (seksjon, n) == ("Den ekte versjonen", 8):
                     assert "lim inn denne i det nye PowerShell-vinduet." in steg
                     assert "nye PowerShell-vinduet fra steg 4" not in steg
                 else:
@@ -1539,7 +1550,7 @@ class TestReadmeForNybegynnere:
         # VG7: svaret om innlimingen har kopieringen. Fra 3.3d står det bare i
         # docs/hjelp.md, som sjekkes under.
         # Linja i steg 7 og steg 5 i demoen sier hva den betyr.
-        assert "som bare betyr at appen kjører" in _steg("Den ekte versjonen (anbefalt)", 7)
+        assert "som bare betyr at appen kjører" in _steg("Den ekte versjonen", 7)
         assert "Den linja betyr bare at demoen kjører." in _steg("Demoen", 5)
         # Og docs/hjelp.md der svaret staar.
         innliming = _hjelp().split("### Ingenting skjer når jeg limer inn.\n\n", 1)[1].split("\n### ", 1)[0]
@@ -1570,7 +1581,7 @@ class TestReadmeForNybegynnere:
     def test_advarselen_mot_down_v_staar_synlig(self):
         """22:32: rett under stoppet i den ekte versjonen, synlig og ikke
         lukket. Ville feilet hvis advarselen sto i en <details>."""
-        ekte = _seksjon("Den ekte versjonen (anbefalt)")
+        ekte = _seksjon("Den ekte versjonen")
         advarsel = "**Skriv aldri `docker compose down -v`.**"
         assert advarsel in ekte
         assert ekte.index("docker compose down\n") < ekte.index(advarsel)
@@ -1660,7 +1671,7 @@ class TestReadmeForNybegynnere:
             felt = _tjenester()[tjeneste]
             assert "command" not in felt and "entrypoint" not in felt, tjeneste
         assert f"`Serving on http://{lytter}`" in _steg("Demoen", 5)
-        assert f"`Serving on http://{lytter}`" in _steg("Den ekte versjonen (anbefalt)", 7)
+        assert f"`Serving on http://{lytter}`" in _steg("Den ekte versjonen", 7)
         tekst = [b for spraak, b in _blokkene(_hjelp()) if spraak == "text"]
         assert len(tekst) == 1
         assert tekst[0].strip() == f"demo-1  | INFO:waitress:Serving on http://{lytter}"
@@ -1676,7 +1687,7 @@ class TestReadmeForNybegynnere:
         for n in re.findall(r"steg (\d+) i demoen", tekst):
             assert int(n) in SEKSJONENE["Demoen"], n
         for n in re.findall(r"steg (\d+) i den ekte versjonen", tekst):
-            assert int(n) in SEKSJONENE["Den ekte versjonen (anbefalt)"], n
+            assert int(n) in SEKSJONENE["Den ekte versjonen"], n
         tabell = _proevetabellen("Prøve 1")
         # Story 3.3c: demoen foer den ekte versjonen, som i README-en, og en
         # kolonne for tiden hvert steg tok.
@@ -1699,9 +1710,9 @@ class TestReadmeForNybegynnere:
         assert [int(n) for n in re.findall(r"\| Den ekte versjonen, steg (\d+):", tabell)] == [5, 6, 7, 8, 9]
 
     def test_stopp_i_begge_versjonene(self):
-        assert [b.strip() for _, b in _blokkene(_steg("Den ekte versjonen (anbefalt)", 9))] == ["docker compose down"]
+        assert [b.strip() for _, b in _blokkene(_steg("Den ekte versjonen", 9))] == ["docker compose down"]
         assert [b.strip() for _, b in _blokkene(_steg("Demoen", 7))] == ["docker compose --profile demo down"]
-        assert "Ctrl+C" in _steg("Demoen", 7) and "Ctrl+C" in _steg("Den ekte versjonen (anbefalt)", 9)
+        assert "Ctrl+C" in _steg("Demoen", 7) and "Ctrl+C" in _steg("Den ekte versjonen", 9)
 
     def test_installasjonen_av_uv_staar_foer_uv_sync(self):
         """Story 3.3e, punkt b (gruppens svar 18.10 kl. 20:39): «Tester» har
@@ -1748,7 +1759,7 @@ class TestReadmeForNybegynnere:
             assert f'"{navn}"' in kilde, navn
         assert "`OSE_DEMO` og `OSE_I_DOCKER` settes av `compose.yaml` og `Dockerfile`" in knapp
         # Steg 6 viser dit.
-        assert "[`.env`](#mer-for-den-som-vil)" in _steg("Den ekte versjonen (anbefalt)", 6)
+        assert "[`.env`](#mer-for-den-som-vil)" in _steg("Den ekte versjonen", 6)
 
     def test_standardene_i_tabellen_er_de_i_koden(self):
         """Gjennomgangen av 3.3e (BH2, BH3, VG5): standardene i tabellen er
@@ -1783,7 +1794,7 @@ class TestReadmeForNybegynnere:
             "Bytte mellom demoen og den ekte versjonen",
             "Uten Docker, med uv",
             "Variablene i .env",
-            "Den lokale modellen (KI-teksten)",
+            "Den lokale modellen for KI-teksten (valgfri)",
         }
 
     def test_uv_delen_er_to_nummererte_lister(self):
@@ -1965,8 +1976,11 @@ class TestReadmeForNybegynnere:
         assert not re.search(r"\b[Ss]tor(y|ies|yen)\b|PR #\d", status), status
         assert "```" not in status and "~~~" not in status and "`" not in status
         assert not re.search(r"docker[ -]compose|uv run", status, re.IGNORECASE)
+        # Story 3.3g: «Status» begynner med at prosjektet er under utvikling.
+        assert status.startswith(
+            "\nProsjektet er under utvikling. Listene under viser hva som er ferdig på main, og hva som gjenstår.\n"
+        ), status[:200]
         for innhold in (
-            "Under arbeid",
             "hentingen",
             "Docker",
             "demoen",
@@ -1991,17 +2005,20 @@ class TestReadmeForNybegynnere:
         # grenen 8-0b sa om 2.3b.
         assert "Flettet til main" not in status.split("«Ferdig» betyr flettet til main.", 1)[0]
         lister = _statuslister(status)
-        assert list(lister) == ["Ferdig", "Neste"], list(lister)
+        # Story 3.3g (svaret 19.10 kl. 14:48): «Neste» er delt i det briefen
+        # lover og det ekstra.
+        assert list(lister) == ["Ferdig", "Neste i v1", "Ekstra, hvis tiden rekker"], list(lister)
         for navn, punkter in lister.items():
             assert 1 <= len(punkter) <= 8, (navn, len(punkter))
         # Gjennomgangen, ECH2: listene staar samlet, uten tomme linjer inni,
-        # saa et punkt etter en tom linje ikke slipper unna grensen.
+        # saa et punkt etter en tom linje ikke slipper unna grensen. Etter
+        # listene kommer setningen om regelen kl. 14:48 (3.3g).
         samlet = "\n\n".join(
             f"**{navn}**\n\n" + "\n".join(f"- {p}" for p in punkter) for navn, punkter in lister.items()
         )
-        assert samlet + "\n\n«Ferdig» betyr flettet til main." in status
+        assert samlet + "\n\n" + REGELEN_FOR_EKSTRA + "\n\n«Ferdig» betyr flettet til main." in status
         ferdig = "\n".join(lister["Ferdig"]).lower()
-        neste_punkter = lister["Neste"]
+        neste_punkter = lister["Neste i v1"] + lister["Ekstra, hvis tiden rekker"]
         neste = "\n".join(neste_punkter).lower()
         for sak in (
             "hentingen",
@@ -2040,11 +2057,14 @@ class TestReadmeForNybegynnere:
         # svarene 18.10 kl. 00:39 og 11:20, med KI-tekstene i demoen og Min
         # liste foerst. Ett punkt per sak, i den rekkefoelgen.
         # Story 3.4b: KI-tekstene i demoen er flyttet til «Ferdig».
+        # Story 3.3g: historikken og signaldagene er delt, NewsWeb er tatt ut
+        # av lenkene, og fra signaldagene staar resten under «Ekstra».
         saker = (
             "min liste",
-            "historikken og signaldagene",
-            "selskapets side på newsweb",
+            "historikken i aksjedetaljen",
+            "lenken til selskapets investorside",
             "egen nøkkel",
+            "signaldagene i kursgrafen",
             "«vis ki-tekst»",
             # Story 8.16: periodene i kursgrafen er flyttet til «Ferdig».
             "på forsiden periodevalget",
@@ -2058,7 +2078,7 @@ class TestReadmeForNybegynnere:
             assert sak not in neste, sak
         # Setningene om begge versjonene, boersmeldingene og detaljene staar
         # under listene.
-        etter = status.split("**Neste**", 1)[1].split("\n\n", 2)[2]
+        etter = status.split("**Ekstra, hvis tiden rekker**", 1)[1].split("\n\n", 2)[2]
         for setning in (
             # Gjennomgangen, ECH1: hva «Ferdig» betyr, fordi sprintstatusen kan
             # si review for noe som er flettet.
@@ -2098,9 +2118,13 @@ class TestReadmeForNybegynnere:
         assert f"{tall[antall]} enkle sjekker" in beskrivelse
         # Styrken er summen av sjekkene uten fortegn (FR-703), saa den hoeyeste er antallet.
         assert f"signalstyrke fra 0 til {antall}" in beskrivelse
-        assert (
-            "– " + ", ".join(n.lower() for n in navn[: antall - 1]) + f" og {navn[antall - 1].lower()} –" in beskrivelse
+        # Story 3.3g: «interesse (handelsvolum)». Forklaringen er lov bare
+        # rett etter det siste navnet (gjennomgangen, BH8).
+        siste = navn[antall - 1].lower()
+        assert "– " + ", ".join(n.lower() for n in navn[: antall - 1]) + f" og {siste} –" in beskrivelse.replace(
+            f" og {siste} (handelsvolum) –", f" og {siste} –"
         )
+        assert beskrivelse.count("(handelsvolum)") <= 1
         assert "Appen gir ikke råd om å kjøpe eller selge." in beskrivelse
         # 12.10 kl. 11:12: at appen er under utvikling, staar ogsaa oeverst,
         # ikke bare i «Status» etter hele «Kom i gang».
@@ -2221,7 +2245,7 @@ class TestReadmeForNybegynnere:
                 "demoen",
                 "Demoen",
             ),
-            ("Ekte kurser, med en gratis nøkkel fra EODHD", "den ekte versjonen", "Den ekte versjonen (anbefalt)"),
+            ("Ekte kurser, med en gratis nøkkel fra EODHD", "den ekte versjonen", "Den ekte versjonen"),
             # Story 3.3e (gjennomgangen, VG7): uv installeres foerst.
             ("De automatiske testene, med to kommandoer etter at uv er installert", "Tester", "Tester"),
         ]
@@ -2249,3 +2273,114 @@ class TestReadmeForNybegynnere:
         brief = [l for l in lista.splitlines() if "](_bmad-output/planning-artifacts/product-brief.md)" in l]
         assert len(brief) == 1, lista
         assert re.findall(r"arbeidskrav-product-brief-v\d+", brief[0]) == [gjeldende], brief[0]
+
+
+# Story 3.3g: det under «Ekstra», ordene i hvert punkt, i den rekkefoelgen
+# README-en har dem. Briefen v8 lover ikke noe av det. Gjennomgangen (BH11,
+# VG2, ECH5): alle sakene i punktet, og stammen «signaldag», saa ogsaa
+# «signaldager» fanges.
+EKSTRA = (
+    ("signaldag",),
+    ("«vis ki-tekst»",),
+    ("periodevalget", "børsometeret", "ki-teksten om dagen"),
+    ("velge og bytte aksjer",),
+)
+
+
+def _uten_daterte_linjer(tekst: str) -> str:
+    """Teksten uten de daterte linjene (*Lagt til …* og *Rettet …*), som er
+    historikk og kan sitere det gamle."""
+    return "\n".join(l for l in tekst.splitlines() if not re.match(r"\*(Lagt til|Rettet) ", l))
+
+
+class TestReadmeDemoenAnbefales:
+    """Story 3.3g, punkt d (gruppens svar 19.10 kl. 14:46, 14:48 og 16:12):
+    README-en anbefaler demoen for faglaerer og sensor, som briefen v8 og
+    tilbakemeldingen 06.10 sier, den lokale modellen er valgfri, og «Neste i
+    v1» har bare det briefen lover."""
+
+    def test_kom_i_gang_anbefaler_demoen_for_faglaerer_og_sensor(self):
+        """Ville feilet hvis «Vi anbefaler den ekte versjonen» kom tilbake,
+        også med en annen ordlyd («Likevel anbefaler vi …», «… anbefales»,
+        «Anbefalt» i tabellen), eller hvis «Kom i gang» ikke begynte med
+        anbefalingen av demoen (gjennomgangen, ECH1 og ECH2)."""
+        tekst = README.read_text(encoding="utf-8")
+        foerste = _kom_i_gang().lstrip("\n").split("\n\n", 1)[0]
+        anbefalingen = (
+            "Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og viser "
+            "hovedfunksjonene med faste eksempeldata, også KI-teksten."
+        )
+        assert foerste.startswith(
+            anbefalingen + " Den ekte versjonen er for å prøve løsningen med kurser fra EODHD."
+        ), foerste
+        # «anbefal» står bare i den ene setningen, i hele README-en og i
+        # hjelpen utenom de daterte linjene.
+        assert re.findall(r"anbefal\w*", tekst, re.IGNORECASE) == ["anbefaler"], re.findall(r"\w*anbefal\w*", tekst)
+        assert re.search(r"anbefal", _uten_daterte_linjer(_hjelp()), re.IGNORECASE) is None
+
+    def test_ingen_anbefalt_ved_den_ekte_versjonen(self):
+        """Ville feilet hvis «(anbefalt)» sto igjen ved den ekte versjonen, i
+        overskriften eller tabellen, eller hvis en lenke gikk til det gamle
+        ankeret."""
+        tekst = README.read_text(encoding="utf-8")
+        assert "(anbefalt)" not in tekst
+        assert "\n### Den ekte versjonen\n" in tekst
+        assert "](#den-ekte-versjonen)" in tekst
+        assert _alle_ankrene(tekst).count("den-ekte-versjonen") == 1
+        # Gjennomgangen (BH1, ECH4): ingen lenke til det gamle ankeret, heller
+        # ikke fra dokumentene, utenom dagsfilene, som lagrer instruksjonene
+        # ordrett.
+        for sti in [README, *ROT.glob("docs/**/*.md"), *ROT.glob("_bmad-output/**/*.md")]:
+            if "ai-prompts" in sti.parts:
+                continue
+            assert "#den-ekte-versjonen-anbefalt" not in sti.read_text(encoding="utf-8"), sti
+
+    def test_delen_om_den_lokale_modellen_sier_at_den_er_valgfri(self):
+        """Ville feilet hvis «valgfri» ble tatt bort fra overskriften eller
+        første setning, eller hvis innholdet under falt ut."""
+        knappene = _detaljer(_seksjon("Mer for den som vil"))
+        modell = [s for s in knappene if s.startswith("Den lokale modellen")]
+        assert modell == ["Den lokale modellen for KI-teksten (valgfri)"], list(knappene)
+        tekst = knappene[modell[0]]
+        assert tekst.startswith(
+            "Den lokale modellen er valgfri og trengs verken for demoen eller for å vurdere appen, "
+            "fordi demoen har ferdig KI-tekst og bare trenger Docker. "
+        ), tekst[:200]
+        # Innholdet står.
+        assert "docker compose exec ollama ollama pull gemma4:e4b" in tekst
+        assert "Slå av KI-teksten: sett `OSE_KI_TJENESTE=av` i `.env`." in tekst
+
+    def test_interesse_handelsvolum_oeverst(self):
+        """Ville feilet hvis beskrivelsen øverst sa «interesse» uten
+        forklaringen, eller hvis forklaringen sto et annet sted enn i
+        beskrivelsen (gjennomgangen, BH7 og VG3)."""
+        tekst = README.read_text(encoding="utf-8")
+        beskrivelse = [a for a in tekst.split("Til faglærer:", 1)[0].split("\n\n") if a.startswith("OSE Signal viser")]
+        assert len(beskrivelse) == 1
+        assert "trend, bevegelse og interesse (handelsvolum)" in beskrivelse[0]
+        assert tekst.count("(handelsvolum)") == 1
+
+    def test_ingen_av_de_ekstra_staar_under_neste_i_v1(self):
+        """Svaret kl. 14:48: det briefen ikke lover, står under «Ekstra,
+        hvis tiden rekker». Svaret kl. 16:12: egen nøkkel er v1. Ville feilet
+        hvis et ekstra punkt ble flyttet til «Neste i v1», eller NewsWeb kom
+        tilbake i punktet om lenkene."""
+        tekst = README.read_text(encoding="utf-8")
+        status = tekst.split("\n## Status\n", 1)[1].split("\n## ", 1)[0]
+        lister = _statuslister(status)
+        v1 = [p.lower() for p in lister["Neste i v1"]]
+        ekstra = [p.lower() for p in lister["Ekstra, hvis tiden rekker"]]
+        for saker in EKSTRA:
+            for sak in saker:
+                assert not any(sak in p for p in v1), (sak, v1)
+        assert len(ekstra) == len(EKSTRA), ekstra
+        for punkt, saker in zip(ekstra, EKSTRA, strict=True):
+            for sak in saker:
+                assert sak in punkt, (sak, punkt)
+        # Gjennomgangen (BH2, VG1): lenken går til selskapets investorside,
+        # som i briefen v8 og story 10.5 etter 06.10.
+        for sak in ("min liste", "historikken", "selskapets investorside", "egen nøkkel til gemini"):
+            assert sum(sak in p for p in v1) == 1, (sak, v1)
+        assert len(v1) == 4, v1
+        assert "newsweb" not in "\n".join(v1 + ekstra)
+        assert REGELEN_FOR_EKSTRA in status

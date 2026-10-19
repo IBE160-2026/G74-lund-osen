@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-10-19T15:36
+updated: 2026-10-19T16:28
 ---
 
 # Vurderingsmatrise for del 1
@@ -91,3 +91,7 @@ Statusen i tabellen er ikke endret. README-prøven (story 3.4) og avsnittet «St
 *Lagt til 2026-10-19 kl. 12:19:* raden «README og kjørbarhet»: bildene av appen bak knappen «Bilder av appen (demoen)», i [`docs/appen/`](appen/), står nå på main, flettet i `208d086`, PR #75, etter gruppens ja kl. 11:57.
 
 *Lagt til 2026-10-19 kl. 15:36:* raden «Ryddighet i repoet»: grenene som er flettet, er slettet på GitHub etter gruppens svar kl. 13:59. 72 grener ble slettet, alle med en flettet PR der tuppen var head-en i PR-en, så ingen commit gikk tapt. Ingen gren står igjen utenom `main`, fordi ingen hadde åpen PR, PR lukket uten fletting, ingen PR eller commits etter flettingen (`git ls-remote` etterpå). «Automatically delete head branches» (`delete_branch_on_merge`) er ikke slått på: GitHub svarte 404 på endringen fordi kontoen ikke har admin på repoet, så den slås på for hånd. Statusen i tabellen er ikke endret.
+
+*Lagt til 2026-10-19 kl. 16:20:* raden «README og kjørbarhet»: i story 3.3g anbefaler «Kom i gang» demoen for faglærer og sensor, som briefen v8 og tilbakemeldingen 06.10 sier (gruppens svar kl. 14:46), og den lokale modellen er merket valgfri. «Status» begynner med at prosjektet er under utvikling, og «Neste» er delt i «Neste i v1» og «Ekstra, hvis tiden rekker» etter svaret kl. 14:48. Punktet om lenkene nevner ikke lenger NewsWeb. Statusen i tabellen er ikke endret.
+
+*Rettet 2026-10-19 (story 3.3g, gjennomgangen VG6):* «Neste tiltak» i raden «README og kjørbarhet» i tabellen for 17.10 sier at «Neste» i «Status» nevner verken søylene eller KI-tekstene i demoen. Begge står nå under «Ferdig», og «Neste» er delt i «Neste i v1» og «Ekstra, hvis tiden rekker». Lenken til selskapet i «Neste i v1» går til investorsiden, som i briefen v8.
