@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-19T10:32
+updated: 2026-10-19T17:05
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -109,6 +109,8 @@ koden.
 - Endringen i kroner, under prosenten i markedsoversikten og ved prosenten i aksjedetaljen (FR-101, FR-203) *(lagt til 2026-10-07, Marians beslutning)*
 - Høy og lav for siste børsdag ved sluttkursen i aksjedetaljen (FR-203) *(lagt til 2026-10-07, Marians beslutning)*
 
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* endelig v1 er det briefen v8 lover: kjernen, KI-teksten med bryter, historikken, hovedindeksen, Min liste, lenken til investorsiden og egne nøkler til Gemini, Anthropic og OpenAI (FR-608, svaret kl. 16:12), og det som alt er flettet. Resten av lista over, «Se nærmere» (FR-205), KI-teksten om dagen (FR-607), endringen i kroner og høy og lav (FR-101, FR-203), er «Ekstra, hvis tiden rekker». Det bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Det som ikke er flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står som plan for en senere versjon. Kravene står.
+
 *Lagt til 2026-10-08, Marians beslutning kl. 07:15–07:29, godkjent kl. 08:04 med endringene kl. 08:06* (`sprint-change-proposal-2026-10-08.md`). Femten idéer er «Fast i v1», ikke «Hvis vi rekker». Tretten er rader fra v1.1 i §8, og to er fra designforslaget:
 
 - Børsometeret: endringen per sektor for lista som er aktiv (FR-106, story 8.6) *(lagt til 2026-10-08, Marians beslutning)*
@@ -126,6 +128,8 @@ koden.
 - Måling av omsetning med kall til overs, som egen kommando (FR-413, story 2.13) *(lagt til 2026-10-08, Marians beslutning)*
 - Sortering ved klikk på Sluttkurs, Endring og Signalstyrke i kolonneraden (FR-102, story 8.15) *(lagt til 2026-10-08, Marians beslutning, fra designforslaget)*
 - Periodevalg likt overalt, også i kursgrafen (FR-101, FR-201, story 8.16 og 8.17) *(lagt til 2026-10-08, Marians beslutning, fra designforslaget)*
+
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* de femten over er «Ekstra, hvis tiden rekker», ikke v1. Sorteringen (8.15) og periodene i kursgrafen (8.16) er flettet og står. Resten, også periodevalget i oversikten (8.17), bygges etter regelen kl. 14:48, og det som ikke er flettet ved funksjonsstoppen, står som plan for en senere versjon.
 
 *Plan B, 2026-09-28:* KI-laget forklarer signalet i stedet for børsmeldingene, ut fra tall regnet av kursene (Epic 10). Av/på-bryteren står. FR-601–606 er skrevet om for plan B 2026-09-28, og meldingsversjonen står i §4.6A. *Her sto:* «FR-601–606 skrives om for plan B i en egen runde.»
 
@@ -1413,6 +1417,8 @@ Under tabellen i markedsoversikten står noen setninger om hele børsdagen, skre
 Tjenesten velges i `.env` med `OSE_KI_TJENESTE`: `lokal` er standard, eller `gemini`, `anthropic` eller `openai`. Det er én tjeneste per kjøring, uten stille overgang til en annen. Feiler tjenesten, blir det ingen tekst og en rad i loggen (FR-604, NFR-04). Nøklene heter `OSE_KI_GEMINI_NOKKEL`, `OSE_KI_ANTHROPIC_NOKKEL` og `OSE_KI_OPENAI_NOKKEL`, og ingen nøkkel følger med appen eller repoet (`AD-12`). Hver kobler bare til sin egen, på sine egne vilkår.
 
 ChatGPT Plus eller Pro med «Sign in with ChatGPT» kommer senere (story 10.8). Et Claude-abonnement kan ikke brukes.
+
+*Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* egen nøkkel til Gemini, Anthropic og OpenAI (story 10.7) er v1, fordi briefen v8 nevner den under «Data og kilder» (svaret kl. 16:12). ChatGPT med «Sign in with ChatGPT» (story 10.8) er «Ekstra, hvis tiden rekker».
 
 *Lagt til 2026-10-15 (gruppens svar 5 på planen for KI-laget, instruksjonen kl. 15:53):* `av` er et eget valg i `OSE_KI_TJENESTE`. Da lages ingen KI-tekst, og hentingen går som før. `.env.example` har `av`, og README-en sier hvordan KI slås på. Uten variabelen gjelder `lokal`.
 
