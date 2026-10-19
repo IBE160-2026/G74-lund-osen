@@ -789,7 +789,7 @@ class TestReadme:
         andre = [(alt, b) for alt, b in bilder if b not in merket]
         # Story 3.3e: og bildet av oversikten under «Til faglærer».
         assert sorted(b for _, b in andre) == sorted(
-            [*(f"docs/bilder/readme/{navn}" for navn in BILDENE.values()), SKJERMBILDET]
+            [*(f"docs/bilder/readme/{navn}" for navn in BILDENE.values()), SKJERMBILDET, AKSJESIDEBILDET]
         )
         for alt, sti in andre:
             assert alt.strip(), sti
@@ -877,15 +877,59 @@ SLIK_TAS_BILDET = (
     "AVTRYKK_BAK_BILDET til {avtrykk} i samme commit."
 )
 
+# Story 3.3f (gruppens svar 18.10 kl. 23:03): aksjesiden for KVST i demoen,
+# med grafen og KI-teksten, tatt med samme fremgangsmaate som oversikten.
+# Filene under bestemmer det bildet viser: malen og delmalene, skriftene,
+# demodataene med KI-tekstene, og modulene som lager tallene, grafen og
+# tekstene. Hele app.py er med, fordi ruta bygger siden der.
+AKSJESIDEBILDET = "docs/appen/aksjesiden-kvst-demo.png"
+FILENE_BAK_AKSJESIDEN = (
+    "src/app.py",
+    "src/aksjedetalj.py",
+    "src/graf.py",
+    "src/perioder.py",
+    "src/ki_visning.py",
+    "src/kilogg.py",
+    "src/demo.py",
+    "src/demo_ki.py",
+    "src/demo_ki_tekster.json",
+    "src/markedsoversikt.py",
+    "src/oversiktsdata.py",
+    "src/hovedindeks.py",
+    "src/indeksdata.py",
+    "src/tallformat.py",
+    "src/signalberegning.py",
+    "src/hjelpetekster.py",
+    "src/boersdag.py",
+    "src/kursdata.py",
+    "src/tilstand.py",
+    "src/vurderingsdata.py",
+    "src/templates/aksje.html",
+)
+# Bildet er saa hoeyt at grafen, som staar under KI-teksten, er med til bunnen.
+HOEYDE_PAA_AKSJESIDEN = 1816
+AVTRYKK_BAK_AKSJESIDEN = "34c8cc1122c5d96a07c3ddcc9cbff4f10bae33d4e3b311676fb623ef59385a50"
+SLIK_TAS_AKSJESIDEN = (
+    "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
+    f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "
+    "demobasen i en midlertidig mappe (lagring_sqlite.BASE_STI dit), OSE_DEMO=1, "
+    "waitress på en ledig port, og msedge --headless --disable-gpu --hide-scrollbars "
+    f"--window-size=1280,{HOEYDE_PAA_AKSJESIDEN} med egen --user-data-dir. Bildet skal slutte "
+    "ved bunnen av grafen (figure), under KI-teksten: mål den og endre "
+    "HOEYDE_PAA_AKSJESIDEN hvis den har flyttet seg. Oppdater så "
+    "AVTRYKK_BAK_AKSJESIDEN til {avtrykk} i samme commit."
+)
 
-def _avtrykk_bak_bildet() -> str:
+
+def _avtrykk_bak_bildet(filene: tuple[str, ...] = MALENE_BAK_BILDET) -> str:
     """sha256 av stien og innholdet, med LF, for hver fil bak bildet, og av
-    merket «Eksempeltall» fra app.py."""
+    merket «Eksempeltall» fra app.py. Story 3.3f: filene er et argument, så
+    aksjesiden har sitt eget avtrykk."""
     import hashlib
 
     import app as app_modul
 
-    filer = list(MALENE_BAK_BILDET)
+    filer = list(filene)
     filer += [p.relative_to(ROT).as_posix() for p in (ROT / "src" / "templates").glob("_*.html")]
     filer += [
         p.relative_to(ROT).as_posix()
@@ -949,9 +993,45 @@ class TestSkjermbildet:
         alt, _ = self._bildet()
         assert "demoen" in alt and "Eksempeltall" in alt and "ikke data fra Oslo Børs" in alt
 
-    def test_bildet_staar_under_til_faglaerer_og_over_kom_i_gang(self):
+    def test_bildet_staar_i_knappen_og_ikke_under_til_faglaerer(self):
+        """Story 3.3f: bildet står i knappen «Bilder av appen (demoen)» før
+        «Innhold», og ikke lenger under «Til faglærer». Ville feilet med
+        bildet der det sto før."""
         tekst = README.read_text(encoding="utf-8")
-        assert tekst.index("Til faglærer:") < tekst.index(SKJERMBILDET) < tekst.index("\n## Kom i gang\n")
+        knappen = tekst.split("<summary>Bilder av appen (demoen)</summary>", 1)[1].split("</details>", 1)[0]
+        assert SKJERMBILDET in knappen
+        assert tekst.index(SKJERMBILDET) < tekst.index("**Innhold:**") < tekst.index("Til faglærer:")
+
+
+class TestAksjesidebildet:
+    """Story 3.3f, punkt b: bildet av aksjesiden for KVST i demoen."""
+
+    def test_fila_er_1280_px_bred_og_like_hoey_som_maalt(self):
+        """Ville feilet med et bilde i en annen bredde, eller en annen høyde
+        enn den målt til bunnen av grafen."""
+        data = (ROT / AKSJESIDEBILDET).read_bytes()
+        assert data[:8] == b"\x89PNG\r\n\x1a\n"
+        assert int.from_bytes(data[16:20], "big") == 1280
+        assert int.from_bytes(data[20:24], "big") == HOEYDE_PAA_AKSJESIDEN
+
+    def test_bildet_har_ingen_tekstfelt(self):
+        """Regel 16: ingen sti eller brukernavn i metadataene. Ville feilet
+        med tEXt, iTXt, zTXt eller eXIf i fila."""
+        data = (ROT / AKSJESIDEBILDET).read_bytes()
+        i, biter = 8, []
+        while i < len(data):
+            lengde = int.from_bytes(data[i : i + 4], "big")
+            biter.append(data[i + 4 : i + 8].decode("latin-1"))
+            i += 12 + lengde
+        assert biter[0] == "IHDR" and biter[-1] == "IEND", biter
+        assert not {"tEXt", "iTXt", "zTXt", "eXIf"} & set(biter), biter
+
+    def test_bildet_tas_paa_nytt_naar_aksjesiden_endres(self):
+        """Ville feilet hvis malen, en delmal, en skrift, demodataene eller en
+        modul bak aksjesiden ble endret uten at bildet ble tatt på nytt.
+        Feilmeldingen sier hvordan."""
+        avtrykk = _avtrykk_bak_bildet(FILENE_BAK_AKSJESIDEN)
+        assert avtrykk == AVTRYKK_BAK_AKSJESIDEN, SLIK_TAS_AKSJESIDEN.format(avtrykk=avtrykk)
 
 
 def _python_krav() -> str:
@@ -1736,16 +1816,21 @@ class TestReadmeForNybegynnere:
             < tekst.index("\n## Tester\n")
         )
         topp = tekst.split("\n## Kom i gang\n", 1)[0]
+        # Story 3.3f: knappen med bildene telles som ett avsnitt.
+        topp = re.sub(r"<details>.*?</details>", "<details>", topp, flags=re.DOTALL)
         avsnitt = [a.strip() for a in topp.split("\n\n") if a.strip()]
         # Gruppen 16.10 kl. 21:38: skjermbildet under «Til faglærer» er tatt
         # ut, så «Til faglærer» er igjen siste avsnitt før «Kom i gang».
         # Story 3.3e (gruppens svar 18.10 kl. 00:20): bildet av oversikten
-        # står igjen rett under «Til faglærer», som i 3.3b.
-        assert avsnitt[-1].startswith("![Oversikten i demoen"), avsnitt[-1]
-        assert SKJERMBILDET in avsnitt[-1]
-        assert avsnitt[-2].startswith("Til faglærer:"), avsnitt[-2]
-        # Story 3.3d, punkt f: «Innhold» står rett under beskrivelsen.
-        assert avsnitt[-3].startswith("**Innhold:** "), avsnitt[-3]
+        # står igjen rett under «Til faglærer», som i 3.3b. Story 3.3f
+        # (gruppens svar 18.10 kl. 23:03): bildene står i knappen rett under
+        # beskrivelsen, og «Til faglærer» er igjen siste avsnitt.
+        assert avsnitt[-1].startswith("Til faglærer:"), avsnitt[-1]
+        assert SKJERMBILDET not in avsnitt[-1]
+        # Story 3.3d, punkt f: «Innhold» står rett under beskrivelsen, og fra
+        # 3.3f rett under knappen.
+        assert avsnitt[-2].startswith("**Innhold:** "), avsnitt[-2]
+        assert avsnitt[-3] == "<details>", avsnitt[-3]
         assert avsnitt[-4].startswith("OSE Signal viser"), avsnitt[-4]
         assert "\n## " not in topp
 
@@ -1972,8 +2057,9 @@ class TestReadmeForNybegynnere:
             assert "`" not in re.sub(r"\[`[^`]+`\]\([^)]+\)", "", punkt), punkt
         lenker = re.findall(r"\[`([^`]+)`\]\(([^)]+)\)", del_)
         # Alle lenkene, ogsaa uten kodeformat, er de i kodeformat.
-        # Story 3.3e: 16 med bildet av oversikten. Story 3.3f: 17 med docs/appen/.
-        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 17, lenker
+        # Story 3.3e: 16 med bildet av oversikten. Story 3.3f: 18 med docs/appen/
+        # og bildet av aksjesiden.
+        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 18, lenker
         sporet = _git_sporet()
         for tekst, maal in lenker:
             # Maalet er stien i teksten, relativ og uten «..» (BH4, ECH3).
@@ -1981,6 +2067,7 @@ class TestReadmeForNybegynnere:
             # Story 3.3f: bildet av oversikten etter docs/appen/.
             filnavn = {navn: f"docs/bilder/readme/{navn}" for navn in BILDENE.values()}
             filnavn[SKJERMBILDET.rsplit("/", 1)[1]] = SKJERMBILDET
+            filnavn[AKSJESIDEBILDET.rsplit("/", 1)[1]] = AKSJESIDEBILDET
             assert maal == tekst or filnavn.get(tekst) == maal, (
                 tekst,
                 maal,
