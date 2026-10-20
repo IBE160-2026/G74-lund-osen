@@ -2470,3 +2470,255 @@ class TestReadmeDemoenAnbefales:
         assert len(v1) == 3, v1
         assert "newsweb" not in "\n".join(v1 + ekstra)
         assert REGELEN_FOR_EKSTRA in status
+
+
+# Story 3.3h (gruppens svar 20.10 kl. 10:14-10:19): det README-en hadde foer
+# pilene kom, telt i README-en paa main foer grenen (013be41). Stegene med
+# tittelen i fet skrift, eller hele linja i lista for uv, kommandoene i
+# boksene uten spraak og maalene for lenkene, med antallet.
+STEGENE_FOER_3_3H = (
+    "1. **Installer og start Docker Desktop**",
+    "2. **Last ned koden.**",
+    "3. **Åpne PowerShell**",
+    "4. **Skriv `cd` og et mellomrom**",
+    "5. **Start demoen.**",
+    "6. **Åpne http://127.0.0.1:8000**",
+    "7. **Stopp**",
+    "5. **Hent en nøkkel.**",
+    "6. **Legg inn nøkkelen, bare første gang.**",
+    "7. **Start appen.**",
+    "8. **Hent kursene**",
+    "9. **Stopp**",
+    "1. Installer avhengighetene:",
+    "2. Lag demobasen, `data/db/demo.db`:",
+    "3. Start demoen på http://127.0.0.1:8000:",
+    "1. Bare første gang: kopier malen, og fyll inn `EODHD_API_KEY` i `.env`:",
+    "2. Hent kurser:",
+    "3. Start webserveren på http://127.0.0.1:8000:",
+)
+KOMMANDOENE_FOER_3_3H = {
+    "docker compose up --build demo": 2,
+    "docker compose --profile demo down": 2,
+    "cp .env.example .env": 2,
+    "notepad .env": 1,
+    "open -e .env": 1,
+    "docker compose up --build": 2,
+    "docker compose run --rm hent": 1,
+    "docker compose down": 1,
+    "uv sync": 2,
+    "uv run python src/demo.py": 1,
+    "uv run python src/app.py --demo": 1,
+    "uv run python src/fetch_prices.py": 1,
+    "uv run python src/app.py": 1,
+    "docker compose --profile ki up -d ollama": 2,
+    "docker compose exec ollama ollama pull gemma4:e4b": 1,
+    "docker compose --profile ki down": 1,
+    'powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"': 1,
+    "curl -LsSf https://astral.sh/uv/install.sh | sh": 1,
+    "uv run pytest": 1,
+}
+LENKENE_FOER_3_3H = {
+    "https://github.com/IBE160-2026/G74-lund-osen/actions/workflows/tester.yml/badge.svg": 1,
+    "https://github.com/IBE160-2026/G74-lund-osen/actions/workflows/tester.yml": 1,
+    "docs/appen/oversikten-demo.png": 2,
+    "docs/appen/aksjesiden-kvst-demo.png": 2,
+    "#kom-i-gang": 1,
+    "#status": 1,
+    "#tester": 3,
+    "#dokumentene": 1,
+    "#mappestruktur": 1,
+    "#medlemmer": 1,
+    "#felles-for-begge": 1,
+    "#demoen": 1,
+    "#den-ekte-versjonen": 1,
+    "_bmad-output/planning-artifacts/product-brief.md": 2,
+    "_bmad-output/planning-artifacts/tilbakemelding-product-brief.md": 2,
+    "_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md": 1,
+    "_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md": 2,
+    "_bmad-output/planning-artifacts/epics.md": 3,
+    "docs/innlevering.md": 2,
+    "docs/kvalitetssikring.md": 3,
+    "docs/reflection-log.md": 2,
+    "docs/ai-prompts/": 2,
+    "docs/vurderingsmatrise.md": 2,
+    "https://docs.astral.sh/uv/": 3,
+    "#står-du-fast": 1,
+    "https://www.docker.com/products/docker-desktop/": 1,
+    "docs/bilder/readme/engine-running.png": 2,
+    "https://github.com/IBE160-2026/G74-lund-osen": 1,
+    "docs/bilder/readme/github-download-zip.png": 2,
+    "docs/hjelp.md#står-det-zip-til-slutt-i-linja": 1,
+    "docs/bilder/readme/powershell-mappa.png": 2,
+    "https://eodhd.com/register": 1,
+    "#mer-for-den-som-vil": 1,
+    "docs/hjelp.md": 3,
+    "_bmad-output/implementation-artifacts/sprint-status.yaml": 1,
+    "https://docs.astral.sh/uv/getting-started/installation/": 1,
+    "_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/": 1,
+    "_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/relevanseksperiment.md": 1,
+    "_bmad-output/planning-artifacts/designregler.md": 1,
+    "_bmad-output/planning-artifacts/designutdrag-2026-10-13.md": 1,
+    "_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-28.md": 1,
+    "_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-08.md": 1,
+    "_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-13.md": 1,
+    "_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-19.md": 1,
+    "docs/kilder-og-rettigheter.md": 1,
+    "docs/epost-til-eodhd.md": 1,
+    "docs/epost-til-euronext.md": 1,
+    "_bmad-output/implementation-artifacts/": 1,
+    "docs/ux-logg.md": 1,
+    "docs/kontroll-2026-09-22.md": 1,
+    "docs/kontroll-2026-09-22-plan.md": 1,
+    "docs/kontroll-2026-09-26.md": 1,
+    "src/": 1,
+    "tests/": 1,
+    "docs/": 1,
+    "docs/bilder/readme/": 1,
+    "docs/appen/": 1,
+    "_bmad-output/": 1,
+    ".github/": 1,
+    "Dockerfile": 1,
+    "compose.yaml": 1,
+    ".dockerignore": 1,
+    "_bmad/": 1,
+    ".claude/skills/": 1,
+}
+
+# Paa GitHub vises markdown i en pil bare med en tom linje etter </summary>
+# og foer </details>. <summary> staar paa linja under <details>, paa én linje,
+# uten markdown, som GitHub ikke viser der.
+PIL = re.compile(r"^<details>\n<summary>([^\n]+)</summary>\n\n(.*?)\n\n</details>$", re.MULTILINE | re.DOTALL)
+
+
+def _utenfor_pilene(tekst: str) -> str:
+    """Teksten med hver pil tatt bort, slik den synes foer noe er åpnet."""
+    return re.sub(r"<details>.*?</details>", "", tekst, flags=re.DOTALL)
+
+
+def _seksjonen(tekst: str, overskrift: str) -> str:
+    return tekst.split(f"\n## {overskrift}\n", 1)[1].split("\n## ", 1)[0]
+
+
+class TestReadmeBakPiler:
+    """Story 3.3h (gruppens svar 20.10 kl. 10:14, 10:15, 10:18 og 10:19, og
+    kl. 16:19): README-en er kortere å lese, med mer bak en pil, og
+    docs/hjelp.md er et levende dokument."""
+
+    def test_demoen_den_ekte_versjonen_dokumentlista_og_mappestrukturen_bak_hver_sin_pil(self):
+        """Ville feilet hvis demoen, den ekte versjonen, dokumentlista eller
+        mappestrukturen sto åpent, eller hvis overskriften til dokumentlista
+        eller mappestrukturen sto inne i pila."""
+        tekst = README.read_text(encoding="utf-8")
+        synlig = _utenfor_pilene(tekst)
+        for navn in PILENE:
+            innhold = _pil(navn)
+            assert innhold and innhold not in synlig, navn
+        assert "**Start demoen.**" not in synlig and "**Hent en nøkkel.**" not in synlig
+        for overskrift, summary in (
+            ("Dokumentene", "Dokumentlista: plan og krav, arbeidsprosess og kvalitet"),
+            ("Mappestruktur", "Mappene og filene i repoet"),
+        ):
+            assert f"\n## {overskrift}\n" in synlig, overskrift
+            seksjon = _seksjonen(tekst, overskrift).strip("\n")
+            treff = PIL.fullmatch(seksjon)
+            assert treff, overskrift
+            assert treff.group(1) == summary, treff.group(1)
+        assert "**Plan og krav**" not in synlig and "[`src/`](src/)" not in synlig
+        # «Velg vei» står rett etter de felles stegene og sier hvor forskjellen står.
+        assert f"{VELG_VEI} Klikk på pila for den versjonen du vil prøve. Tabellen over viser forskjellen." in synlig
+
+    def test_de_felles_stegene_staar_ikke_bak_en_pil(self):
+        """Ville feilet hvis de felles stegene 1–4, bildene eller avsnittet
+        om å lime inn sto bak en pil."""
+        synlig = _utenfor_pilene(_kom_i_gang())
+        felles = _seksjon("Felles for begge")
+        assert "<details>" not in felles
+        assert "### Felles for begge\n" in synlig
+        for steg in STEGENE_FOER_3_3H[:4]:
+            assert f"\n{steg}" in synlig, steg
+        for bilde in BILDENE.values():
+            assert f"docs/bilder/readme/{bilde})" in synlig, bilde
+        assert KOPIERINGEN in synlig and VELG_VEI in synlig
+
+    def test_pila_til_demoen_sier_at_den_er_anbefalt_for_faglaerer_og_sensor(self):
+        """Svaret 19.10 kl. 14:46. Ville feilet hvis «anbefalt» falt ut av pila
+        til demoen, eller kom i pila til den ekte versjonen."""
+        tekst = _kom_i_gang()
+        pilene = {
+            re.sub(ANKER_I_PIL, "", s): (re.search(ANKER_I_PIL, s) or [None, None])[1] for s, _ in PIL.findall(tekst)
+        }
+        assert pilene.get("Demoen: anbefalt for faglærer og sensor, uten nøkkel") == "demoen", pilene
+        assert pilene.get("Den ekte versjonen: kurser fra EODHD, med egen nøkkel") == "den-ekte-versjonen", pilene
+        assert "anbefal" not in _pil("Den ekte versjonen").lower()
+
+    def test_under_tester_staar_kommandoene_og_lenken_synlig(self):
+        """Ville feilet hvis uv sync, uv run pytest eller lenken til
+        kvalitetssikringen sto bak en pil, eller installasjonen av uv sto
+        åpent."""
+        tester = _seksjonen(README.read_text(encoding="utf-8"), "Tester")
+        synlig = _utenfor_pilene(tester)
+        assert [b.strip() for _, b in _blokkene(synlig)] == ["uv sync", "uv run pytest"]
+        assert "[`docs/kvalitetssikring.md`](docs/kvalitetssikring.md)" in synlig
+        for punkt in ("- Ingen nettkall:", "- `data/` røres ikke:", "- CI kjører", "- ruff kjøres før en commit:"):
+            assert punkt in synlig, punkt
+        uv = _detaljer(tester)[UV_PILA]
+        for innhold in (UV_WINDOWS, UV_MAC, "«The term 'uv' is not recognized»", "**På en ren maskin uten Docker**"):
+            assert innhold in uv and innhold not in synlig, innhold
+        assert synlig.index("bak pila under") < tester.index(UV_PILA) < synlig.index("```\nuv sync\n```")
+
+    def test_hvert_steg_hver_kommando_og_hver_lenke_fra_foer_finnes(self):
+        """Ville feilet hvis et steg, en kommando eller en lenke fra
+        README-en foer pilene falt ut, i pilene eller utenfor dem."""
+        from collections import Counter
+
+        tekst = README.read_text(encoding="utf-8")
+        steg = []
+        for linje in re.findall(r"^\d+\. .*$", tekst, re.MULTILINE):
+            tittel = re.match(r"^(\d+\. \*\*[^*]+\*\*)", linje)
+            steg.append(tittel.group(1) if tittel else linje)
+        assert steg == list(STEGENE_FOER_3_3H), steg
+        kommandoer = Counter(b.strip() for spraak, b in _blokkene(tekst) if not spraak)
+        assert not Counter(KOMMANDOENE_FOER_3_3H) - kommandoer, Counter(KOMMANDOENE_FOER_3_3H) - kommandoer
+        lenker = Counter(re.findall(r"\]\(([^)\s]+)\)", tekst))
+        assert not Counter(LENKENE_FOER_3_3H) - lenker, Counter(LENKENE_FOER_3_3H) - lenker
+        # Ankrene lenkene går til, finnes én gang.
+        alle = _alle_ankrene(tekst)
+        for maal in LENKENE_FOER_3_3H:
+            if maal.startswith("#"):
+                assert alle.count(maal[1:]) == 1, maal
+
+    def test_hjelpen_sier_klokkeslettet_fra_tidsgrensen_og_har_ingen_daterte_linjer(self):
+        """Gruppens svar kl. 16:19: hjelpen rettes der teksten står, og
+        historikken ligger i git. Ville feilet med en linje som begynner med
+        *Rettet eller *Lagt til, eller hvis svaret om når man kan hente, sa
+        en annen time enn TIDSGRENSE."""
+        import fetch_prices
+
+        hjelp = _hjelp()
+        daterte = re.findall(r"^\s*[*_]+(?:Rettet|Lagt til)\b.*$", hjelp, re.MULTILINE | re.IGNORECASE)
+        assert not daterte, daterte
+        grense = fetch_prices.TIDSGRENSE
+        svar = hjelp.split("### Når kan jeg hente?\n\n", 1)[1].split("\n### ", 1)[0]
+        assert svar.startswith(f"Hent etter kl. {grense.hour} og før midnatt på en børsdag.")
+        timer = set(re.findall(r"\bkl\. (\d{1,2})\b(?![:.]\d)", svar))
+        assert timer == {str(grense.hour)}, timer
+
+    def test_markdown_inne_i_pilene_vises_riktig_paa_github(self):
+        """Ville feilet hvis en pil i README-en eller docs/hjelp.md manglet
+        den tomme linja etter </summary> eller foer </details>, hadde
+        <summary> på flere linjer eller med markdown, lå inni en annen pil,
+        eller hadde en boks som ikke var lukket."""
+        for navn, tekst in (("README.md", README.read_text(encoding="utf-8")), ("docs/hjelp.md", _hjelp())):
+            aapne = re.findall(r"<details\b", tekst)
+            hele = PIL.findall(tekst)
+            assert len(hele) == len(aapne) == tekst.count("</details>"), (navn, len(hele), len(aapne))
+            for summary, innhold in hele:
+                assert "<details" not in innhold, (navn, summary)
+                assert not re.search(r"\*\*|`|\]\(", re.sub(ANKER_I_PIL, "", summary)), (navn, summary)
+                assert len(re.findall(r"^```", innhold, re.MULTILINE)) % 2 == 0, (navn, summary)
+                # Fire mellomrom foran gjør en linje til kode på GitHub.
+                assert not re.search(r"^ {4,}\S", _uten_bokser(innhold), re.MULTILINE), (navn, summary)
+            # <details> og </details> står alene på linja.
+            for linje in tekst.splitlines():
+                if "details>" in linje:
+                    assert linje in ("<details>", "</details>"), (navn, linje)
