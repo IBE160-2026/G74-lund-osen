@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-10-19T17:06
+updated: 2026-10-20T10:19
 ---
 
 # Vurderingsmatrise for del 1
@@ -99,3 +99,5 @@ Statusen i tabellen er ikke endret. README-prøven (story 3.4) og avsnittet «St
 *Lagt til 2026-10-19 kl. 16:55:* raden «README og kjørbarhet»: endringene fra linja kl. 16:20 står på main, flettet i `855ba75`, PR #77 (story 3.3g), etter gruppens ja kl. 16:46. Statusen i tabellen er ikke endret.
 
 *Lagt til 2026-10-19 kl. 17:06:* raden «Funksjonalitet og omfang»: endelig v1 er det briefen v8 lover, etter gruppens svar kl. 15:43 og endringsforslaget [`sprint-change-proposal-2026-10-19.md`](../_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-19.md). Av de 34 storyene som verken er done eller ute av v1, er 9 v1: 2.7, 8.3, 10.5 og 10.7 fra briefen, 3.4, 8.1 og 10.4 for suksessmålene, og 8.2 og 9.2. 24 er «Ekstra, hvis tiden rekker» og bygges etter regelen kl. 14:48, og 9.5 utgår, som avgjort 06.10. Det svarer på tilbakemeldingen 06.10 om at omfanget ikke skal vokse. Statusen i tabellen er ikke endret.
+
+*Lagt til 2026-10-20 kl. 10:19:* raden «Funksjonalitet og omfang»: «Min liste» (story 8.3) står på main, flettet i `e02240a`, PR #78, etter gruppens svar 19.10 kl. 10:29 om å flette etter hentingen og målingen. Stjernen står i oversikten, og Min liste er en egen side med samme tabell ([`minliste.py`](../src/minliste.py), migrasjonen 0007 og `tests/test_min_liste.py::test_merkingen_overlever_en_omstart`). 8.3 er en av de ni storyene i v1 fra linja 19.10 kl. 17:06, og nå står åtte igjen. Statusen i tabellen er ikke endret.
