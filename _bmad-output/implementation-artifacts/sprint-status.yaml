@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-24-2026 19:26
-last_updated: 10-19-2026 17:06
+last_updated: 10-20-2026 10:18
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -139,7 +139,7 @@ development_status:
   8-0e-oversikten-fra-designforslaget: done
   8-1-brukertest-rett-etter-epic-2: backlog
   8-2-ux-gjennomgang-av-de-to-skjermbildene-med-cu-bmad-ux: backlog
-  8-3-min-liste-eget-skjermbilde-med-stjerne-og-filter: backlog
+  8-3-min-liste-eget-skjermbilde-med-stjerne-og-filter: done
   # Ekstra, hvis tiden rekker, fra 2026-10-19 (endringsforslaget 2026-10-19, gruppens svar kl. 15:43): 8-4 til 8-14,
   # 8-10b, 8-17, 8-18 og 8-19. Briefen v8 lover dem ikke. 8-1, 8-2 og 8-3 er v1.
   8-4-se-nærmere-i-aksjedetaljen: backlog
