@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-20T15:54
+updated: 2026-10-20T16:07
 ---
 
 # Kvalitetssikring
@@ -248,6 +248,7 @@ sist i dokumentet.
 | 2.2b Sidene leser dagens vurdering | `ff58ecf` (#20) | 1 (15, M1–M15) | M15 overlevde først, og en ny test tar bort tabellen `vurdering` | `S/spec-2-2b-sidene-leser-dagens-vurdering.md`, Implementation Notes |
 | 2.3 Børsdagskontrollen | `249853e` (#22) | 1 (32 kjøringer, 28 navn) | To flyttinger overlevde før testene fra gjennomgangen (VG1). M4 hang én gang og ble delt i M4a og M4b | `S/spec-2-3-boersdagskontroll-foer-kvoten-brukes.md` |
 | 2.3, kl. 21 Hentingen fra kl. 21:00 | `336204f` (#60) | 1 (3, T1–T3) | – | `S/spec-2-3-hentingen-fra-kl-21.md`, «Mutantene» |
+| 2.3, kl. 22 Hentingen tilbake til kl. 22:00 | `54a4c51` (#79) | 1 (2, G1–G2) | – | `S/spec-2-3-hentingen-fra-kl-22.md`, «Mutantene» |
 | 2.3b Nye forsøk | `c3d6660` (#28) | 1 (28) | M10 og M20 overlevde første kjøring, og to tester kom til i `bf41134` | `S/spec-2-3b-kallene-som-er-igjen-brukes-paa-nye-forsoek.md` |
 | 2.7a All stilen i én CSS-fil | `dc521ff` (#76) | 1 (6, M1–M3 og N1–N3) | – Skjermbildene, den beregnede stilen og bildene i `docs/appen/` ble sammenlignet med main | `S/spec-2-7a-stilen-i-en-css-fil.md` |
 | 2.8a Tabellen indeks og porten | `1d3a21d` (#56) | 1 (4, I1–I4) | – | `S/spec-2-8a-indeks-tabellen-og-porten.md`, «Mutantene» |
@@ -441,6 +442,7 @@ funn. Antall rader i loggen:
 | 2.2b | 18 | 9 | 8 | 1 |
 | 2.3 | 20 | 15 | – | 5 |
 | 2.3, kl. 21 | 13 | 8 | 5 | – |
+| 2.3, kl. 22 | 19 | 12 | 6 | – |
 | 2.3b | 21 | 16 | 4 | 1 |
 | 2.7a | 19 | 10 | 9 | – |
 | 2.8a | 19 | 8 | 8 | 2 |
@@ -1170,6 +1172,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 2.2b | M1–M15 | M4, M8 og M10 blant andre `test_app_har_ingen_sql_og_regner_ikke_signalet`, M6 `test_styrke_0_vises_som_0`, M9 `test_utenfor_boerskalenderen_gir_tekst_ikke_feil`, M13 `test_dato_etter_i_dag_gir_tekst_ikke_feil`, M15 `test_feil_i_spoerringen_gir_503_paa_begge_rutene`; resten i tabellen | `S/spec-2-2b-…` |
 | 2.3 | M1–M8, K1–K4 og V1–V4, så 15 mot hver sin test og B4 | M1 og M5 `TestTidskontrollen::test_boersdag_kl_20_59_59_gir_0_kall_og_nevner_flagget` (før 17.10: `test_boersdag_foer_kl_22_gir_0_kall_og_nevner_flagget`), K1 `test_dagen_regnes_i_gmt_ikke_i_oslo`, K4 `TestRekkefoelgen::test_noekkelen_og_kvoten_kommer_foer_foerste_kall`, V2 `TestVintertid::test_kl_20_59_i_oslo_i_november_nekter` (før 17.10: `test_kl_21_59_i_oslo_i_november_nekter`); resten i tabellen. De to tidstestene fikk nytt navn med grensen kl. 21:00 (`336204f`) | `S/spec-2-3-boersdagskontroll-…` |
 | 2.3, kl. 21 | T1–T3 | T1 `test_grensen_er_kl_21`, T2 `test_kl_21_presis_henter`, T3 `test_det_gamle_flaggnavnet_godtas_ikke` | `S/spec-2-3-hentingen-fra-kl-21.md` |
+| 2.3, kl. 22 | G1–G2 | G1 `test_boersdag_kl_21_59_59_gir_0_kall_og_nevner_flagget` (i hele fila først `test_grensen_er_kl_22`), G2 `test_kl_22_presis_henter` | `S/spec-2-3-hentingen-fra-kl-22.md` |
 | 2.3b | 28 | M1, M2, M6 og M13 `TestNyttForsoek::test_bare_de_som_mangler_hentes_eldste_foerst`, M10 `test_fredag_over_midnatt_skriver_ingen_rad`, M20 `test_ingen_kall_gir_ingen_fil`, M22 `test_dagens_kall_brukt_opp_underveis_stopper`, M23 `test_fil_som_dukker_opp_gir_neste_n`; resten i tabellen | `S/spec-2-3b-…` |
 | 2.7a | M1–M3 og N1–N3 | M1 `test_ingen_style_i_malene`, M2 `test_ingen_velger_staar_to_ganger_med_samme_kropp`, M3 `test_fila_svarer_200_fra_lenken_paa_hver_side`, N1 `test_siden_vises_ogsaa_naar_fila_ikke_kan_leses`, N2 `test_de_seks_felles_reglene_staar_en_gang_for_alle_sidene`, N3 `test_velgere_med_ulik_kropp_er_avgrenset_til_hver_sin_side` | `S/spec-2-7a-…` |
 | 2.8a | I1–I4 | I1 og I3 `test_serien_byttes_ut_ikke_skjoetes_paa[sqlite]`, I2 `test_en_loerdag_og_en_helligdag_lagres_ikke[minne]`, I4 `test_indeksen_for_alle_demodagene` | `S/spec-2-8a-…` |
