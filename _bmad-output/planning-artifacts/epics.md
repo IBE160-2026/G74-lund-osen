@@ -3190,6 +3190,8 @@ skjermbildene som finnes · **Begrenses av:** FR-101–103, `AD-3`, `AD-10`,
 
 *Avgjort 2026-10-19 kl. 10:29 (gruppens svar):* 8.3 bygges i dag og flettes etter kveldens henting og måling; stjernen står både i oversikten og i Min liste; demoen starter med fem merket, den ekte med en tom liste.
 
+*Lagt til 2026-10-20 kl. 10:17:* PR #78 er squash-flettet i `e02240a`, etter gruppens svar 19.10 kl. 10:29 om å flette etter hentingen og målingen, låst til head-en `dca69d0`, der main var flettet inn (regel 7). Hele settet på `dca69d0`: 2761 bestått og 17 hoppet over. CI var grønn på head-en (39391917414). Grenen er slettet på GitHub. Basen ble kopiert til `data/db/ose-kopi-2026-10-20-foer-0007.db` før pullen, og migrasjonene på en kopi av kopien ga versjon 7 med like mange rader i kurs, vurdering, indeks og ki_logg (regel 22).
+
 ### Story 8.4: Se nærmere i aksjedetaljen
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.

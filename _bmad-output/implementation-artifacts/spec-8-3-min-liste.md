@@ -2,7 +2,7 @@
 title: 'Story 8.3: Min liste, med stjerne i oversikten og en egen side'
 type: 'feature'
 created: '2026-10-19'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '7f2c11c'
