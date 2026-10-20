@@ -1533,6 +1533,8 @@ Oppgaveplanlegging beskrives i README (regel 19).
 
 *Lagt til 2026-10-20 kl. 16:07:* hentingen tilbake til kl. 22:00 på børsdager er squash-flettet i `54a4c51`, PR #79, låst til head-en `1eb5f6c` (spesifikasjonen `spec-2-3-hentingen-fra-kl-22.md`). Hele settet på `1eb5f6c`: 2763 bestått og 17 hoppet over. CI var grønn på head-en (39435878366). Grenen er slettet på GitHub. Mutantene G1 (grensen tilbake på kl. 21:00) og G2 (grensen på kl. 22:01) ble fanget.
 
+*Lagt til 2026-10-20 kl. 22:48 (målingen etter svaret 20.10 kl. 22:41 og 22:42, `malinger.md` §38):* FRO, MOWI, TEL og AKRBP, de fire med volumforholdet nærmest 1,5 i vurderingene for 20.10, ble hentet på nytt kl. 22:48. Alle fire er like kursfila fra kl. 22 i alle sju feltene, så ingen vurdering måtte regnes på nytt. 4 kall av dagskvoten, og bonuskvoten er ikke brukt.
+
 ### Story 2.3b: Kallene som er igjen, brukes på nye forsøk
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 19:17.*
