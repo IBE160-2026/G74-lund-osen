@@ -444,6 +444,8 @@ kjøres fra main.
 
 *Lagt til 2026-10-17:* fra 19.10 går hentingen fra kl. 21:00 på børsdager (beslutningen 16.10 kl. 21:09 under story 2.3, `malinger.md` §31). Der regelen om at byggingen stopper, fortsatt gjelder, er klokkeslettet kl. 21:00.
 
+*Lagt til 2026-10-20 kl. 15:24:* fra 20.10 går hentingen fra kl. 22:00 på børsdager igjen (gruppens svar 19.10 kl. 22:19 under story 2.3, `malinger.md` §37). Der regelen om at byggingen stopper, fortsatt gjelder, er klokkeslettet kl. 21:40.
+
 *Lagt til 2026-10-05, Marians beslutning kl. 21:23:* 8.0b og 8.0c bygges etter 2.3b og før KI-laget.
 
 *Lagt til 2026-10-06, Marians beslutning:* tilbakemeldingen på briefen ([`tilbakemelding-product-brief.md`](tilbakemelding-product-brief.md)) ber om at oversikten og aksjedetaljen er ferdige og stabile i demoen før KI-laget bygges ut, og at antall epics ikke vokser. Rekkefølgen fra 05.10 står: 2.3 først, fordi kveldshentingen da går fra egen arbeidskopi, og demoen kan bygges over flere dager uten stopp kl. 22:00. Så 9.6 og 3.1–3.4, før 2.3b, 8.0b, 8.0c og KI-laget.
@@ -1199,6 +1201,8 @@ epicen:
    *Avgjort 2026-09-28:* på børsdager mellom kl. 22:00 og midnatt, norsk tid.
    *Lagt til 2026-10-17:* mellom kl. 21:00 og midnatt fra 19.10 (beslutningen 16.10 kl. 21:09 under story 2.3,
    `malinger.md` §31).
+   *Lagt til 2026-10-20:* mellom kl. 22:00 og midnatt fra 20.10 (gruppens svar 19.10 kl. 22:19 under story 2.3,
+   `malinger.md` §37).
 
 *Lagt til 2026-09-25, fra planen for 1.5:* Ingen story i Epic 2 har som
 kontrollpunkt at hentekommandoen skriver kursene til basen gjennom
@@ -3627,6 +3631,8 @@ NFR-08, `AD-10`
   `boersdag.py`, ikke skrevet fast
   *Lagt til 2026-10-17:* konstanten heter `TIDSGRENSE` og er kl. 21:00 fra 19.10
   (story 2.3, beslutningen 16.10 kl. 21:09), så stripa sier «etter kl. 21»
+  *Lagt til 2026-10-20:* fra 20.10 er `TIDSGRENSE` kl. 22:00 igjen (story 2.3, gruppens
+  svar 19.10 kl. 22:19), så stripa sier «etter kl. 22»
 - Ingen API-kall
 - **Ville feilet hvis:** stripa sa i morgen en fredag, eller klokkeslettet sto
   fast i malen

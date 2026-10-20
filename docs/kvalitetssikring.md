@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-20T10:18
+updated: 2026-10-20T15:24
 ---
 
 # Kvalitetssikring
@@ -649,6 +649,8 @@ har sju punkter uten `resolved:` 03.10:
   med grensen kl. 21:00 fra `336204f`. Hovedindeksen: 2.8 (`1d3a21d` og
   `bcac2b5`) og visningen i 2.9 (`b44284f`). Søylene (2.9b), historikken (2.7),
   «Min liste» (8.3) og KI-tekstene i demoen (3.4b) står i backlog.
+  *Lagt til 2026-10-20:* grensen er kl. 22:00 igjen fra 20.10 (gruppens svar 19.10 kl. 22:19 under story 2.3, `malinger.md` §37),
+  i PR-en for `spec-2-3-hentingen-fra-kl-22.md`.
 - **Brukere.** Ingen brukertest er gjort ennå (story 8.1). Sidene er bare
   prøvd med Flask sin testklient, ikke i en nettleser.
   *Lagt til 2026-10-17:* står fortsatt. 8.1 står i backlog, og ingen test i
@@ -692,6 +694,9 @@ har sju punkter uten `resolved:` 03.10:
 - **Grensen kl. 21:00 er prøvd for én aksje én dag** (`malinger.md` §31).
   Mandag 19.10 sammenlignes fire aksjer med kursfila etter kl. 22, med kallene
   som er igjen (beslutningen 17.10 kl. 22:00 under story 2.3 i `epics.md`).
+  *Lagt til 2026-10-20:* målingen er tatt (`malinger.md` §37). DNO var ulik i
+  `volume` etter kl. 22, så raden fra kl. 21 var ikke endelig, og grensen er
+  kl. 22:00 igjen fra 20.10 (gruppens svar 19.10 kl. 22:19 under story 2.3).
 
 ## 7. Hvordan KI-arbeidet kontrolleres
 
@@ -814,6 +819,8 @@ hentingen kan gi kurser, se «Når kan jeg hente?» i
 [`docs/hjelp.md`](hjelp.md): etter kl. 22 og før midnatt på en børsdag.
 
 *Lagt til 2026-10-17:* fra 19.10 er det etter kl. 21 og før midnatt, og `docs/hjelp.md` sier det (beslutningen 16.10 kl. 21:09 under story 2.3, `malinger.md` §31). Det gjelder også steg 4 i tabellen under.
+
+*Lagt til 2026-10-20:* fra 20.10 er det etter kl. 22 og før midnatt igjen, og `docs/hjelp.md` sier det i en Rettet-linje under svaret (gruppens svar 19.10 kl. 22:19 under story 2.3, `malinger.md` §37). Det gjelder også steg 4 i tabellen under.
 
 - **Hvem som prøver:** åpent.
 - **Dato og klokkeslett:**
@@ -940,6 +947,8 @@ interesse, står i `malinger.md` §6, ved siden av EQNR 05.10 og GJF 02.10.
 | Prøvekjøringene av KI-teksten mot en kopi av basen | 16.10 kl. 22:26–22:27 og kl. 23:43–23:44 | 6 av 15 besto med prompten versjon 1, og 15 av 15 med versjon 2 | `malinger.md` §32 og §34 |
 | Grensen kl. 21:00: fire aksjer hentes på nytt og sammenlignes med kursfila | Planlagt mandag 19.10, etter kl. 22 | Ingen ennå | beslutningen 17.10 kl. 22:00 under story 2.3 i `epics.md` |
 | Brukertesten (story 8.1) | Ikke tatt | Ingen ennå. Den måler også suksesskriteriet «Brukerutfall» (§10) | `sprint-status.yaml`, 8-1 i backlog |
+
+*Lagt til 2026-10-20:* raden «Grensen kl. 21:00»: målingen ble tatt 19.10 etter kl. 22 (`malinger.md` §37). MOWI, GJF og AKRBP var like kursfila fra kl. 21 i alle sju feltene, og DNO var ulik i `volume`. Grensen er kl. 22:00 igjen fra 20.10 (gruppens svar 19.10 kl. 22:19 under story 2.3). Raden i tabellen er ikke endret.
 
 *Lagt til 2026-10-18 (gruppens svar kl. 00:03):* README-prøven i første rad tas første gang i uke 43 (19.–25.10), etter at de to README-PR-ene er flettet: Prøve 1, og Prøve 2 samtidig hvis testeren har egen gratiskonto. Den tas på nytt senest én uke før innleveringen, med ZIP-fila som leveres (§9).
 
