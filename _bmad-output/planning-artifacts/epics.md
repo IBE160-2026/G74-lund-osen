@@ -1515,6 +1515,8 @@ Oppgaveplanlegging beskrives i README (regel 19).
 
 *Avgjort 2026-10-16, gruppens beslutning kl. 21:09:* hentingen på børsdager flyttes fra kl. 22:00 til kl. 21:00, på betingelse av at radene fra prøvene kl. 20:30 og 21:00 er like raden i kursfila etter kveldens henting (`malinger.md` §31). Er de ulike, tas spørsmålet opp igjen. Endringen bygges som en egen PR søndag 18.10 og gjelder fra mandag 19.10. Mangler noen aksjer raden kl. 21, henter et nytt forsøk dem senere samme kveld med kallene som er igjen (2.3b).
 
+*Lagt til 2026-10-20 kl. 15:12:* beslutningen er snudd av gruppens svar 19.10 kl. 22:19 (under): hentingen på børsdager går tilbake til kl. 22:00 fra tirsdag 20.10, fordi raden fra kl. 21 ikke var endelig for DNO (`malinger.md` §37). Byggestoppen blir kl. 21:40.
+
 *Lagt til 2026-10-17:* betingelsen holdt for EQNR.OL 16.10, i alle sju feltene (tillegget til §31 i `malinger.md`). Fra 19.10 er grensen kl. 21:00, og kl. 22:00 i kontrollpunktene og avgjørelsene over gjelder til da. Flagget som slipper forbi tidskontrollen, heter `--uten-tidskontroll` (spesifikasjonen `spec-2-3-hentingen-fra-kl-21.md`).
 
 *Lagt til 2026-10-17 kl. 21:38:* grensen kl. 21:00 og flagget `--uten-tidskontroll` er flettet i `336204f`, PR #60. PR-en ble bygget lørdag kveld 17.10 etter gruppens svar kl. 21:01, i stedet for søndag 18.10. CI var grønn på head-en `f506133` (kjøring 39063125455) og på main (39063214018). Den gjelder fra første henting mandag 19.10.
@@ -1522,6 +1524,8 @@ Oppgaveplanlegging beskrives i README (regel 19).
 *Avgjort 2026-10-17 kl. 22:00 (gruppens svar på ECH2 og BH7 i gjennomgangen av PR #60):* betingelsen for kl. 21:00 er prøvd for én aksje én dag. Hentingen går kl. 21:00 mandag 19.10, som avgjort. Trenger ingen aksje et nytt forsøk, brukes kallene som er igjen av dagens kvote etter kl. 22 til å hente fire aksjer på nytt og sammenligne radene for dagen med kursfila fra kl. 21, i alle sju feltene. Er noen ulike, tas spørsmålet opp igjen før tirsdag. Målingen bruker bare kallene som er igjen av dagens kvote, aldri bonuskvoten. Aksjene velges før kallene etter denne regelen: de fire med volumforholdet nærmest grensen for interesse (1,5) i kveldens vurderinger, fordi en endring i volumet der lettest endrer vurderingen. Verken kurser eller volum skrives av, bare om hvert felt er likt.
 
 *Lagt til 2026-10-19 (målingen etter svaret kl. 22:00, `malinger.md` §37):* DNO, MOWI, GJF og AKRBP, de fire med volumforholdet nærmest 1,5 i kveldens vurderinger, ble hentet på nytt kl. 22:00. MOWI, GJF og AKRBP er like kursfila fra kl. 21 i alle sju feltene. DNO er ulik i `volume` og lik i de seks andre. Raden fra kl. 21 var altså ikke endelig for volumet til DNO, og spørsmålet tas opp igjen før tirsdag, som svaret sier. Om forskjellen endrer vurderingen for DNO, er ikke regnet ut.
+
+*Avgjort 2026-10-19 kl. 22:19 (gruppens svar):* hentingen på børsdager går tilbake til kl. 22:00 fra tirsdag 20.10, fordi raden fra kl. 21 ikke var endelig for DNO (`malinger.md` §37), og en vurdering kan ikke skrives om (AD-7). Byggestoppen blir kl. 21:40. Det snur beslutningen 16.10 kl. 21:09.
 
 ### Story 2.3b: Kallene som er igjen, brukes på nye forsøk
 

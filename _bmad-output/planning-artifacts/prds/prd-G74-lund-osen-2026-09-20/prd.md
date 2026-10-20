@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-19T17:05
+updated: 2026-10-20T15:12
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -769,6 +769,8 @@ helst, og etter 2.5 er en dag uten henting en vurdering som mangler for alltid
 *Lagt til 2026-10-05, gruppens svar kl. 19:17 på planen for story 2.3:* jobben kjører hver dag kl. 22:15, ikke bare på hverdager. På en dag som ikke er børsdag avgjør basen om det hentes: mangler siste børsdag for noen av aksjene, hentes den, fordi raden for den dagen fortsatt kan skrives (AD-7). Jobben kjører fra en egen arbeidskopi av main, som deler `data/` og `.env` med hovedkopien uten at nøkkelen kopieres.
 
 *Lagt til 2026-10-17:* fra mandag 19.10 nekter tidskontrollen i hentingen bare før kl. 21:00 på en børsdag, ikke før kl. 22:00, så punkt 23 legger kjøringen til kl. 21:00–midnatt (beslutningen 16.10 kl. 21:09 under story 2.3, `malinger.md` §31). Når jobben i Oppgaveplanlegging skal kjøre, avgjøres i planen for den.
+
+*Lagt til 2026-10-20 kl. 15:12:* fra tirsdag 20.10 nekter tidskontrollen igjen før kl. 22:00 på en børsdag, så punkt 23 legger kjøringen til kl. 22:00–midnatt, som før 19.10. Det snur beslutningen 16.10 kl. 21:09, etter gruppens svar 19.10 kl. 22:19 under story 2.3: raden fra kl. 21 var ikke endelig for DNO (`malinger.md` §37), og en vurdering kan ikke skrives om (AD-7).
 
 #### FR-402 — Kontroll mot forventet børsdag, ikke mot klokkeslett
 
