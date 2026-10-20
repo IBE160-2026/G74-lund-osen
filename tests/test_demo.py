@@ -823,13 +823,14 @@ class TestIndekslinjaIDemoen:
 
 
 class TestKlokkeslettetSomDenEkte:
-    """Story 2.3, hentingen fra kl. 21:00 (beslutningen 16.10 kl. 21:09):
-    demoen er lik den ekte (beslutningen 16.10 kl. 11:46), saa hentingen i
-    demobasen er kl. 21:15 og vurderingene kl. 21:30, ikke 22:15 og 22:30.
+    """Story 2.3, hentingen fra kl. 22:00 fra 20.10 (gruppens svar 19.10
+    kl. 22:19): demoen er lik den ekte (beslutningen 16.10 kl. 11:46), saa
+    hentingen i demobasen er kl. 22:15 og vurderingene kl. 22:30, som foer
+    19.10. 19.10 var de kl. 21:15 og 21:30.
     Ingen fingeravtrykk endres: kurs og vurdering har ingen klokkeslett, og
     FINGERAVTRYKK_KURS og FINGERAVTRYKK_VURDERING_FOER_SISTE_DAG staar."""
 
-    def test_hentet_er_kl_21_15_i_oslo(self, mal):
+    def test_hentet_er_kl_22_15_i_oslo(self, mal):
         c = sqlite3.connect(mal)
         try:
             tider = {
@@ -838,7 +839,7 @@ class TestKlokkeslettetSomDenEkte:
             }
         finally:
             c.close()
-        ventet = datetime(2026, 10, 9, 21, 15, tzinfo=demo.OSLO)
+        ventet = datetime(2026, 10, 9, 22, 15, tzinfo=demo.OSLO)
         assert tider == {ventet}
         # Gjennomgangen, ECH4: hentingen i demoen er ogsaa etter grensen.
         import fetch_prices
@@ -847,10 +848,10 @@ class TestKlokkeslettetSomDenEkte:
 
     def test_vurderingene_er_etter_tidsgrensen(self):
         """Klokka vurderingene skrives med, er etter grensen i hentingen, som
-        en kveldshenting. Ville feilet med 22:30 igjen, eller med en tid foer
+        en kveldshenting. Ville feilet med 21:30 igjen, eller med en tid foer
         grensen."""
         import fetch_prices
 
         oeyeblikk = demo._klokke_for(demo.SLUTTDATO)()
-        assert oeyeblikk == datetime(2026, 10, 9, 21, 30, tzinfo=demo.OSLO)
+        assert oeyeblikk == datetime(2026, 10, 9, 22, 30, tzinfo=demo.OSLO)
         assert oeyeblikk.timetz().replace(tzinfo=None) >= fetch_prices.TIDSGRENSE

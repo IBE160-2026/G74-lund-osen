@@ -884,7 +884,8 @@ SKRIFTFILER = {".woff", ".woff2", ".ttf", ".otf", ".css"}
 # fargene per aksje er med.
 # Story 8.3: 1630, fordi knapperaden i stripa skyver tabellen ned. Var 1573.
 HOEYDE_PAA_BILDET = 1630
-AVTRYKK_BAK_BILDET = "6113f1d5c21a848728bde456fac18b53618dca42bd782207a45a862979e18b3c"
+# Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
+AVTRYKK_BAK_BILDET = "dcf02e087e2abe190f5425768ed6e8fb71954822d944fbeaeb5e7691bca66110"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -938,7 +939,8 @@ IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py"}
 # Bildet er saa hoeyt at grafen, som staar under KI-teksten, er med til bunnen.
 # Story 8.3: 1872 med knapperaden i stripa. Var 1816.
 HOEYDE_PAA_AKSJESIDEN = 1872
-AVTRYKK_BAK_AKSJESIDEN = "c66d7defb6527a425c9a273d69d550674a33525e97600cab91cd20b40c72d3b9"
+# Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
+AVTRYKK_BAK_AKSJESIDEN = "8429ff15ea3f42dc52e73082ca1abfa453aaa1c7560aa5f8d67a57485058a1a8"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "
