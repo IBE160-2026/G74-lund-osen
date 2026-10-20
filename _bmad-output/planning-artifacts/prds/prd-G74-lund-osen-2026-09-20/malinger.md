@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-19T22:23
+updated: 2026-10-20T22:48
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -4149,3 +4149,41 @@ som i den lagrede raden. Den uendrede serien gir den lagrede raden, som kontroll
 Skriptet lå utenfor repoet, sha256 for basen var lik før og etter, og ingenting ble
 skrevet til basen (AD-7). Forskjellen i volumet endret altså ikke vurderingen for DNO
 denne dagen.
+
+## 38. Er raden fra kl. 22 den samme senere på kvelden? Fire aksjer hentet på nytt (2026-10-20)
+
+**Metode.** Ett `/api/eod`-kall per symbol for fire aksjer, med `hent_api_nokkel` og
+`hent_ett_symbol` importert fra `src/fetch_prices.py`, så kallet er det samme som i
+hentingen, og med `from` og `to` fra kursfila `kurser-raa-2026-10-20.json`. Skriptet lå
+utenfor repoet og leste kvoten før hvert kall. Det skulle stoppe hvis `apiRequestsDate`
+ikke var 2026-10-20 eller 20 kall var brukt, så verken bonuskvoten eller morgendagens
+kvote kunne brukes. `src/fetch_prices.py` ble ikke kjørt, og ingenting ble skrevet til
+basen (AD-7). Svarene ligger urørt i `data/proever/`, som ikke spores (regel 10), og
+ikke i `data/raa/`, som hentingen leser. Raden for 20.10 i hvert svar er sammenlignet
+med raden i kursfila fra kl. 22 i alle sju feltene: `date`, `open`, `high`, `low`,
+`close`, `adjusted_close` og `volume`. Gruppens svar 20.10 kl. 22:41 og 22:42 ga
+kallene.
+
+Utvalget fulgte svaret 17.10 kl. 22:00 under story 2.3 i `epics.md`, som i §37, og ble
+gjort før kallene: de fire med volumforholdet nærmest grensen for interesse (1,5) i
+vurderingene for 20.10, fordi en endring i volumet der lettest endrer vurderingen.
+Det ble lest med en tilkobling som bare leser, og sha256 for basen var lik før og
+etter. Ingen av de 15 radene for 20.10 hadde grunn eller manglet volumforhold. FRO lå
+over grensen, MOWI, TEL og AKRBP under. Den neste var DNB.
+
+| Symbol | Klokkeslett for kallet (`date`) | Resultat |
+|---|---|---|
+| FRO | 22:48 | lik i alle sju |
+| MOWI | 22:48 | lik i alle sju |
+| TEL | 22:48 | lik i alle sju |
+| AKRBP | 22:48 | lik i alle sju |
+
+**Resultat.** For alle fire var raden fra kl. 22 den samme kl. 22:48, i alle sju
+feltene. Ingen vurdering måtte regnes på nytt. Målingen gjelder fire aksjer én kveld,
+og sier ikke at raden fra kl. 22 alltid er endelig. Fra kl. 22:00 til 22:48 var det
+ingen endring for disse fire, mens volumet for DNO 19.10 endret seg mellom kl. 21 og
+kl. 22 (§37).
+
+**Kostnad.** 4 kall. Kvoten før: 16 brukt, 4 igjen, `apiRequestsDate` 2026-10-20 og
+`extraLimit` 463. Kvoten etter: 20 brukt, 0 igjen, `extraLimit` uendret 463.
+Bonuskvoten er ikke brukt.
