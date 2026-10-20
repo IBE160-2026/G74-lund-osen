@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-20T18:02
+updated: 2026-10-20T18:13
 ---
 
 # Hjelp til «Kom i gang»
@@ -121,7 +121,7 @@ Sidene sier «Eksempeltall»: 15 oppdiktede selskaper med kurser til fredag 9. o
 
 Øverst på sidene står knappene «Markedsoversikt» og «Min liste», og knappen for siden du står på, er fylt. Stjernen foran et selskap legger aksjen i Min liste, og et nytt trykk tar den ut. Demoen starter med fem merket, og siden demobasen lages på nytt hver gang demoen starter, er det de samme fem neste gang. I den ekte versjonen starter lista tom, og merkingen blir liggende til du tar den bort.
 
-Har du laget demobasen utenfor Docker før Min liste kom, viser sidene «Siden kan ikke vises» med `RuntimeError`. Lag den på nytt med `uv run python src/demo.py`. I Docker lages den på nytt hver gang demoen starter.
+Har du laget demobasen utenfor Docker før 20.10, da Min liste kom, viser sidene «Siden kan ikke vises» med `RuntimeError`. Lag den på nytt med `uv run python src/demo.py`. I Docker lages den på nytt hver gang demoen starter.
 
 ## Den ekte versjonen
 

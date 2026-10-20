@@ -82,7 +82,7 @@ docker compose up --build demo
 docker compose --profile demo down
 ```
 
-Vil du også prøve den ekte versjonen, går du videre til steg 5 i [den ekte versjonen](#den-ekte-versjonen).
+Vil du også prøve den ekte versjonen, går du videre til steg 5 i [den ekte versjonen](#den-ekte-versjonen) og klikker på pila.
 
 </details>
 
@@ -309,13 +309,13 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 
 **Ferdig**
 
-- Hentingen av kursene og hovedindeksen fra kl. 22 på børsdager, og signalstyrken for hver aksje
+- Hentingen av kursene og hovedindeksen fra kl. 22 på børsdager, med kontroll av børsdagen
 - Nye forsøk med kallene som er igjen etter hentingen
 - Oversikten og utseendet fra designforslaget, med tydeligere merking, hjelp bak «?» og sortering ved klikk i kolonneraden
 - Hovedindeksen over tabellen på forsiden, med søylene under, og som stiplet linje i kursgrafen
 - Periodene i kursgrafen med «Velg dag», og datoene og månedsmerkene i grafen
 - Min liste, med stjernen foran hvert selskap og knappene «Markedsoversikt» og «Min liste» øverst
-- KI-teksten på aksjesiden, laget av en lokal modell, kontrollert mot regelen og med en bryter
+- KI-teksten fra en lokal modell på aksjesiden, med bryter, og bare tekster som besto kontrollen
 - Docker for begge versjonene, og demoen med alle 10 fargekombinasjonene og KI-tekst laget med Gemma
 
 **Neste i v1**
@@ -333,7 +333,7 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 
 Det som står under «Ekstra», er ikke lovet i briefen og kommer bare med hvis det er ferdig og testet før README-prøven, senest én uke før innleveringen.
 
-«Ferdig» betyr flettet til main. Rundt appen er også README-en med bilder i «Kom i gang» og demoen først, ruff i CI og i testene, den oppdaterte kvalitetssikringen og et ryddigere repo uten kopien av BMAD-skillene ferdige. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
+«Ferdig» betyr flettet til main. Rundt appen er dette også ferdig: README-en med bilder i «Kom i gang» og demoen først, ruff i CI og i testene, den oppdaterte kvalitetssikringen og et ryddigere repo uten kopien av BMAD-skillene. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
 
 ## Tester
 
