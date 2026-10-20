@@ -126,9 +126,9 @@ docker compose run --rm hent
 docker compose down
 ```
 
-**Skriv aldri `docker compose down -v`.** Det sletter kursene og vurderingene, og vurderingene kan ikke lages på nytt.
-
 </details>
+
+**Skriv aldri `docker compose down -v`.** Det sletter kursene og vurderingene, og vurderingene kan ikke lages på nytt.
 
 ### Står du fast?
 

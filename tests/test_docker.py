@@ -1646,18 +1646,19 @@ class TestReadmeForNybegynnere:
 
     def test_advarselen_mot_down_v_staar_synlig(self):
         """22:32: rett under stoppet i den ekte versjonen, synlig og ikke
-        lukket. Fra 3.3h (gruppens svar 20.10 kl. 10:14-10:19) står den
-        uendret i pila til den ekte versjonen, og synes når pila er åpnet.
-        Ville feilet hvis advarselen sto i en pil til inni den, eller ikke
-        sist i den ekte versjonen."""
-        ekte = _seksjon("Den ekte versjonen")
-        advarsel = "**Skriv aldri `docker compose down -v`.**"
-        assert advarsel in ekte
-        assert ekte.index("docker compose down\n") < ekte.index(advarsel)
-        assert "<details>" not in ekte
-        assert ekte.split("\n\n")[-1] == (
-            advarsel + " Det sletter kursene og vurderingene, og vurderingene kan ikke lages på nytt."
-        )
+        lukket. Fra 3.3h (gruppens svar 20.10 kl. 20:20) står den uendret
+        rett under pila til den ekte versjonen, utenfor alle piler, så den
+        kommer rett etter steg 9 når pila er åpen, og synes for alle når den
+        er lukket. Ville feilet hvis advarselen sto i en pil, ikke kom rett
+        etter pila til den ekte versjonen, eller var endret."""
+        tekst = _kom_i_gang()
+        advarsel = ADVARSELEN_MOT_DOWN_V.split(".**", 1)[0] + ".**"
+        assert tekst.count(advarsel) == 1
+        assert advarsel not in _pil("Den ekte versjonen")
+        assert ADVARSELEN_MOT_DOWN_V in _utenfor_pilene(tekst)
+        assert _pil("Den ekte versjonen").endswith("```\ndocker compose down\n```")
+        etter_pila = tekst.split('<a name="den-ekte-versjonen"></a>', 1)[1].split("\n</details>\n\n", 1)[1]
+        assert etter_pila.split("\n\n", 1)[0] == ADVARSELEN_MOT_DOWN_V
 
     def test_staar_du_fast_har_hoeyst_5_spoersmaal(self):
         """22:32: FAQ-en var for lang. Hoeyst 8 spoersmaal, hvert som
@@ -2599,6 +2600,10 @@ AVTRYKK_I_PILENE = {
     "Mappestruktur": "d157a1706be8d24e7235f8d89c39c464609032c63ce5443adf2c40d1916758cd",
 }
 
+# Svaret 20.10 kl. 20:20: advarselen staar rett under pila til den ekte
+# versjonen, uendret fra 22:32.
+ADVARSELEN_MOT_DOWN_V = "**Skriv aldri `docker compose down -v`.** Det sletter kursene og vurderingene, og vurderingene kan ikke lages på nytt."
+
 # Paa GitHub vises markdown i en pil bare med en tom linje etter </summary>
 # og foer </details>. <summary> staar paa linja under <details>, paa én linje,
 # uten markdown, som GitHub ikke viser der.
@@ -2648,14 +2653,16 @@ class TestReadmeBakPiler:
         ekte versjonen, dokumentlista eller mappestrukturen ble endret eller
         tatt bort, eller et steg ble flyttet til den andre pila. Avtrykket er
         sha256 av delen under overskriften på main foer grenen (013be41), for
-        demoen uten linja om den ekte versjonen, som fikk lenken. Endres
-        innholdet senere, settes avtrykket på nytt i samme commit."""
+        demoen uten linja om den ekte versjonen, som fikk lenken. Fra svaret
+        20.10 kl. 20:20 står advarselen mot down -v rett under pila til den
+        ekte versjonen, så den regnes med etter pila. Endres innholdet
+        senere, settes avtrykket på nytt i samme commit."""
         import hashlib
 
         tekst = README.read_text(encoding="utf-8")
         innhold = {
             "Demoen": _pil("Demoen").rsplit("\n\n", 1)[0],
-            "Den ekte versjonen": _pil("Den ekte versjonen"),
+            "Den ekte versjonen": _pil("Den ekte versjonen") + "\n\n" + ADVARSELEN_MOT_DOWN_V,
             "Dokumentene": PIL.fullmatch(_seksjonen(tekst, "Dokumentene").strip("\n")).group(2),
             "Mappestruktur": PIL.fullmatch(_seksjonen(tekst, "Mappestruktur").strip("\n")).group(2),
         }
