@@ -827,8 +827,10 @@ class TestKlokkeslettetSomDenEkte:
     kl. 22:19): demoen er lik den ekte (beslutningen 16.10 kl. 11:46), saa
     hentingen i demobasen er kl. 22:15 og vurderingene kl. 22:30, som foer
     19.10. 19.10 var de kl. 21:15 og 21:30.
-    Ingen fingeravtrykk endres: kurs og vurdering har ingen klokkeslett, og
-    FINGERAVTRYKK_KURS og FINGERAVTRYKK_VURDERING_FOER_SISTE_DAG staar."""
+    Fingeravtrykkene av demobasen endres ikke: kurs og vurdering har ingen
+    klokkeslett, og FINGERAVTRYKK_KURS og FINGERAVTRYKK_VURDERING_FOER_SISTE_DAG
+    staar. Avtrykkene bak de to bildene i test_docker.py endres, fordi stripa
+    sier kl. 22.15 (gjennomgangen 20.10, BH9)."""
 
     def test_hentet_er_kl_22_15_i_oslo(self, mal):
         c = sqlite3.connect(mal)

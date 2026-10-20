@@ -1837,16 +1837,24 @@ class TestTidskontrollen:
 
     def test_kl_21_30_gir_0_kall(self, stier):
         """Mellom 21:00 og 22:00, som 19.10 ble hentet, nektes fra 20.10. Ville
-        feilet med grensen tilbake paa 21:00 (mutant G1)."""
+        feilet med grensen tilbake paa 21:00 (mutant G1), eller hvis noe ble
+        skrevet foer tidskontrollen sa nei (gjennomgangen 20.10, BH8)."""
         raa, base = stier
         fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 19, 30), ingen_kall, ingen_noekkel, ingen_kall)
         assert fil is None and kall == []
         assert "klokka er ikke 22:00 i Oslo" in ut
+        assert "--uten-tidskontroll" in ut and "0 kall brukt" in ut
+        assert not raa.exists() and not base.exists()
 
     def test_grensen_er_foer_stoppen_for_nye_forsoek(self):
         """Gjennomgangen 17.10, BH11: en endring av grensen kan ikke tomme
         vinduet for nye forsoek (2.3b), som stopper kl. 23:50."""
         assert fp.TIDSGRENSE < fp.KL_23_50
+        # Gjennomgangen 20.10, ECH6: minst en time til nye forsoek, ikke bare
+        # et minutt. Fra 20.10 er vinduet 22:00-23:50.
+        grense = fp.TIDSGRENSE.hour * 60 + fp.TIDSGRENSE.minute
+        stopp = fp.KL_23_50.hour * 60 + fp.KL_23_50.minute
+        assert stopp - grense >= 60
 
     def test_kl_22_presis_henter(self, stier):
         """Grensen er 22:00, ikke 22:01. Ville feilet med <= (M2) eller med
@@ -1857,7 +1865,8 @@ class TestTidskontrollen:
         assert len(kall) == KALL
 
     def test_kl_22_30_henter(self, stier):
-        """En halvtime etter grensen henter."""
+        """En halvtime etter grensen henter: hentingen proeves ogsaa et stykke
+        etter grensen, ikke bare paa den (gjennomgangen 20.10, BH7)."""
         raa, base = stier
         fil, kall, _ = kjoer_23(raa, base, _utc(2026, 9, 22, 20, 30))
         assert fil == raa / "kurser-raa-2026-09-22.json" and len(kall) == KALL

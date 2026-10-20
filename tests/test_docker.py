@@ -575,7 +575,18 @@ class TestReadme:
         # BH4: bare tidspunktet for hentingen, ikke andre klokkeslett.
         for gammel in (r"etter kl\. 21\b(?![:.]\d)", r"før kl\. 21\b(?![:.]\d)"):
             assert not re.search(gammel, tekst), gammel
-        assert "*Rettet 2026-10-20:* fra tirsdag 20.10 henter du etter kl. 22 og før midnatt" in _hjelp()
+        # Gjennomgangen 20.10, BH4 og VG3: Rettet-linja foelger TIDSGRENSE, og
+        # ingen annen linje i hjelpen sier den gamle timen.
+        rettet = f"*Rettet 2026-10-20:* fra tirsdag 20.10 henter du etter kl. {grense.hour} og før midnatt"
+        hjelp = _hjelp()
+        assert rettet in hjelp
+        uten_de_kjente = (
+            hjelp.replace("Hent etter kl. 21 og før midnatt på en børsdag.", "")
+            .replace("ikke etter kl. 21.", "")
+            .replace("Også mellom kl. 21 og 22 stopper hentingen", "")
+        )
+        for gammel in (r"etter kl\. 21\b(?![:.]\d)", r"før kl\. 21\b(?![:.]\d)", r"kl\. 21 og 22"):
+            assert not re.search(gammel, uten_de_kjente), gammel
 
     def test_du_trenger_versjonene(self):
         """3.3b, punkt e: Docker Desktop slik den er prøvd (spesifikasjonen

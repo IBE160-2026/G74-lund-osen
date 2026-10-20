@@ -113,12 +113,13 @@ KVOTE_URL = "https://eodhd.com/api/user"
 # dagens kall uten aa faa dagens rad. Kl. 22:00 fra 20.10 (gruppens svar 19.10
 # kl. 22:19): raden fra kl. 21 var ikke endelig for DNO, volumet var endret
 # kl. 22 (malinger.md §37), og en vurdering kan ikke skrives om (AD-7).
+# Vurderingen for DNO ble den samme, men det kunne den ikke vaert sikker paa.
 # 19.10 var grensen kl. 21:00 (beslutningen 16.10 kl. 21:09, malinger.md
-# §31); foer det kl. 22:00. Navnet har ikke
-# klokkeslettet i seg, saa i koden er neste endring denne linja. Tekstene for
-# brukeren (README-en og docs/hjelp.md), docstringene og klokkeslettene i
-# demoen staar for seg, og testene sier fra naar de ikke foelger med
-# (gjennomgangen, ECH5).
+# §31); foer det kl. 22:00. Navnet har ikke klokkeslettet i seg, saa i
+# koden er neste endring denne linja. Tekstene for brukeren (README-en og
+# docs/hjelp.md) og klokkeslettene i demoen staar for seg, og testene sier
+# fra naar de ikke foelger med (gjennomgangen 17.10, ECH5). Docstringene
+# her sier kl. 22:00, og ingen test leser dem (gjennomgangen 20.10, BH6).
 TIDSGRENSE = time(22, 0)
 
 

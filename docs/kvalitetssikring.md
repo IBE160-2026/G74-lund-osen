@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-20T15:24
+updated: 2026-10-20T15:54
 ---
 
 # Kvalitetssikring
@@ -1211,3 +1211,5 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 2.9b | S1–S6 | S1 `test_en_soeyle_per_aksje_med_kurs_fra_stoerst_fall`, S2 `test_antallet_telles_med_en_kortere_liste`, S3 `test_den_stiplede_linja_er_groenn_naar_indeksen_steg_og_roed_naar_den_falt`, S4 og S5 `test_ingen_aksje_med_rad_foer_dagen_navngis_uten_soeyler`, S6 `test_hoeyden_er_paa_endringen_slik_den_vises` | `S/spec-2-9b-…` |
 | 2.9c | C1–C6 | C1 `test_linja_starter_paa_aksjens_kurs_og_foelger_indeksen`, C2 `test_startdagen_er_grafens_foerste_dag_ikke_indeksens`, C3 `test_uten_indeks_ingen_linje_og_grafen_sier_det`, C4 `test_uten_grafens_foerste_dag_starter_linja_paa_den_neste`, C5 `test_teksten_sier_hva_linja_er_uten_raad`, C6 `test_hjelpen_for_linja_ogsaa_uten_snitt` | `S/spec-2-9c-…` |
 | 9.8 | S1–S8 | S1 `test_ingen_fil_under_agents_er_sporet` og `test_det_finnes_ingen_agents_i_rotmappa`, S2 og S4 `test_manifestet_har_bare_claude_code`, S3 `test_det_finnes_ingen_agents_i_rotmappa`, S5 `test_mappestrukturen_nevner_bmad_og_claude_skills_ikke_agents`, S6 `test_lekkasjesjekken_unntar_ikke_agents`, S7 `test_gitignore_uten_nextjs_men_med_node_og_byggemappene`, S8 `test_env_example_har_variablene_koden_leser_og_kallene_en_henting_bruker` | `S/spec-9-8-…` |
+
+*Lagt til 2026-10-20 (story 2.3, kl. 22):* testene for grensen fikk nye navn da grensen gikk tilbake til kl. 22:00 fra 20.10. I radene «2.3» og «2.3, kl. 21» over er `test_boersdag_kl_20_59_59_gir_0_kall_og_nevner_flagget` nå `test_boersdag_kl_21_59_59_gir_0_kall_og_nevner_flagget`, `test_kl_20_59_i_oslo_i_november_nekter` nå `test_kl_21_59_i_oslo_i_november_nekter`, `test_grensen_er_kl_21` nå `test_grensen_er_kl_22` og `test_kl_21_presis_henter` nå `test_kl_22_presis_henter`. De gamle navnene står i `OMDOEPT` i `tests/test_kvalitetssikring.py`.
