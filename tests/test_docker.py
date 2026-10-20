@@ -252,10 +252,10 @@ class TestCompose:
         src/app.py, CI og README-en. Ville feilet hvis 5000 sto igjen i en av
         dem, eller to av dem sa forskjellige porter.
 
-        Gjennomgangen (BH3, ECH2): ogsaa docs/hjelp.md, der 5000 bare kan
-        staa i en Rettet-linje (svaret 18.10 kl. 18:58 tok ut setningen om
-        AirPlay). Alle port-linjene i compose telles (BH5), og adresser med
-        localhost leses ogsaa (BH7)."""
+        Gjennomgangen (BH3, ECH2): ogsaa docs/hjelp.md (svaret 18.10 kl.
+        18:58 tok ut setningen om AirPlay). Fra 3.3h har hjelpen ingen
+        Rettet-linjer, saa 5000 staar ingen steder i den. Alle port-linjene i
+        compose telles (BH5), og adresser med localhost leses ogsaa (BH7)."""
         from urllib.parse import urlsplit
 
         from ki_lokal import STANDARD_URL
@@ -294,14 +294,13 @@ class TestCompose:
             assert funnet, sted
         alle = {p for funnet in porter.values() for p in funnet}
         assert alle == {"8000"}, porter
-        uten_rettet = "\n".join(l for l in hjelp.splitlines() if not l.startswith("*Rettet "))
         for navn, tekst in (
             ("Dockerfile", dockerfile),
             ("compose.yaml", compose),
             ("src/app.py", app_py),
             ("CI", ci),
             ("README.md", readme),
-            ("docs/hjelp.md uten Rettet-linjene", uten_rettet),
+            ("docs/hjelp.md", hjelp),
         ):
             assert "5000" not in tekst, navn
 
@@ -559,9 +558,9 @@ class TestReadme:
         viser ikke flagget som slipper forbi tidskontrollen, som kan laase
         dagen. Fra 19.10 heter det --uten-tidskontroll. Grensen var kl. 21
         19.10 (beslutningen 16.10 kl. 21:09) og er kl. 22 fra 20.10 (gruppens
-        svar 19.10 kl. 22:19). Det gamle navnet staar heller ikke. I
-        docs/hjelp.md staar kl. 22 i en Rettet-linje under svaret, fordi ingen
-        linje fjernes der, saa der kreves den linja."""
+        svar 19.10 kl. 22:19). Det gamle navnet staar heller ikke. Fra 3.3h
+        (gruppens svar 20.10 kl. 16:19) er docs/hjelp.md et levende dokument,
+        og svaret «Når kan jeg hente?» sier selv timen fra TIDSGRENSE."""
         import fetch_prices
 
         tekst = README.read_text(encoding="utf-8")
@@ -575,18 +574,14 @@ class TestReadme:
         # BH4: bare tidspunktet for hentingen, ikke andre klokkeslett.
         for gammel in (r"etter kl\. 21\b(?![:.]\d)", r"før kl\. 21\b(?![:.]\d)"):
             assert not re.search(gammel, tekst), gammel
-        # Gjennomgangen 20.10, BH4 og VG3: Rettet-linja foelger TIDSGRENSE, og
-        # ingen annen linje i hjelpen sier den gamle timen.
-        rettet = f"*Rettet 2026-10-20:* fra tirsdag 20.10 henter du etter kl. {grense.hour} og før midnatt"
+        # Gjennomgangen 20.10, BH4 og VG3: hjelpen foelger TIDSGRENSE, og
+        # ingen linje i den sier den gamle timen. Story 3.3h: i selve svaret.
         hjelp = _hjelp()
-        assert rettet in hjelp
-        uten_de_kjente = (
-            hjelp.replace("Hent etter kl. 21 og før midnatt på en børsdag.", "")
-            .replace("ikke etter kl. 21.", "")
-            .replace("Også mellom kl. 21 og 22 stopper hentingen", "")
-        )
+        svar = hjelp.split("### Når kan jeg hente?\n\n", 1)[1].split("\n\n", 1)[0]
+        assert svar.startswith(f"Hent etter kl. {grense.hour} og før midnatt på en børsdag."), svar[:80]
+        assert f"Før kl. {grense.hour} en børsdag stopper hentingen med 0 kall og sier hvorfor" in svar
         for gammel in (r"etter kl\. 21\b(?![:.]\d)", r"før kl\. 21\b(?![:.]\d)", r"kl\. 21 og 22"):
-            assert not re.search(gammel, uten_de_kjente), gammel
+            assert not re.search(gammel, hjelp), gammel
 
     def test_du_trenger_versjonene(self):
         """3.3b, punkt e: Docker Desktop slik den er prøvd (spesifikasjonen
@@ -778,19 +773,21 @@ class TestReadme:
         forklaringen sto utenfor knappen."""
         tester = README.read_text(encoding="utf-8").split("\n## Tester\n", 1)[1].split("\n## ", 1)[0]
         knapper = _detaljer(tester)
-        assert list(knapper) == ["Hvorfor hoppes noen over?"]
+        # Story 3.3h: installasjonen av uv staar bak sin egen pil, foerst.
+        assert list(knapper) == [UV_PILA, "Hvorfor hoppes noen over?"], list(knapper)
         forklaring = knapper["Hvorfor hoppes noen over?"]
         synlig = re.sub(r"<details>.*?</details>", "", tester, flags=re.DOTALL)
         for grunn in ("time.tzset", "Unix-sokler", "`::1`", "uten git", "`-rs`"):
             assert grunn in forklaring and grunn not in synlig, grunn
         assert "Alle testene skal bestå." in synlig
-        assert [b.strip() for _, b in _blokkene(synlig)] == [UV_WINDOWS, UV_MAC, "uv sync", "uv run pytest"]
+        assert [b.strip() for _, b in _blokkene(synlig)] == ["uv sync", "uv run pytest"]
         assert "- Ingen nettkall:" in synlig and "- CI kjører" in synlig
         assert "](docs/kvalitetssikring.md)" in synlig
         # Gjennomgangen, BH10 og ECH7: indeksene i samme tekst, og knappen
         # rett etter «Alle testene skal bestå», foer punktene.
-        assert tester.index("uv run pytest") < tester.index("Alle testene skal bestå.") < tester.index("<details>")
-        assert tester.index("</details>") < tester.index("\n- Ingen nettkall:")
+        hvorfor = tester.index("<details>\n<summary>Hvorfor hoppes noen over?</summary>")
+        assert tester.index("uv run pytest") < tester.index("Alle testene skal bestå.") < hvorfor
+        assert tester.rindex("</details>") < tester.index("\n- Ingen nettkall:")
         assert "Alle testene skal bestå. Noen hoppes over, og knappen under sier hvorfor.\n\n<details>" in tester
         assert not _blokkene(forklaring), forklaring
 
@@ -879,6 +876,8 @@ SKJERMBILDET = "docs/appen/oversikten-demo.png"
 # https://docs.astral.sh/uv/getting-started/installation/.
 UV_WINDOWS = 'powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"'
 UV_MAC = "curl -LsSf https://astral.sh/uv/install.sh | sh"
+# Story 3.3h: pila under «Tester» med installasjonen av uv og tipset.
+UV_PILA = "Installere uv, og når uv ikke blir funnet"
 # Gjennomgangen av 3.3e (BH6, VG1, ECH1-ECH3): ogsaa signalberegningen,
 # hjelpetekstene, boersdagene, indeksen og aksjene demoen bygges av, og hver
 # delmal (_*.html), saa en ny delmal kommer med. Fra src/static/ bare
@@ -1421,8 +1420,8 @@ UTE_AV_README = {
         "står «Engine running» (steg 1), og prøv kommandoen igjen."
     ),
     # Story 3.2b: porten er 8000, som i docs/hjelp.md. Setningen om AirPlay,
-    # som bruker 5000, er tatt ut (gruppens svar 18.10 kl. 18:58), og står
-    # ordrett i Rettet-linja under svaret i docs/hjelp.md.
+    # som bruker 5000, er tatt ut (gruppens svar 18.10 kl. 18:58). Fra 3.3h
+    # står den bare i git, fordi hjelpen er et levende dokument.
     "«port is already allocated», «address already in use» eller «ports are not available».": (
         "Noe annet bruker port 8000. Kjører den andre versjonen, stopper du den først (se «Bytte mellom "
         "demoen og den ekte versjonen» under «Mer for den som vil»)."
@@ -1907,7 +1906,6 @@ class TestReadmeForNybegynnere:
         tekst = _faq() + _hjelp()
         for innhold in (
             "wsl --update",
-            "AirPlay",
             "Quit Docker Desktop",
             "hvalen ved klokka",
             "AMD64",
@@ -2058,10 +2056,10 @@ class TestReadmeForNybegynnere:
             "hjelp bak «?»",
             "tydeligere merking",
             "utseendet fra designforslaget",
-            "KI-laget",
+            "KI-teksten",
             "Euronext",
-            "og at hentingen lager teksten med en lokal modell",
-            "aksjesiden viser bare tekster som besto kontrollen",
+            "laget av en lokal modell",
+            "kontrollert mot regelen",
             "](_bmad-output/implementation-artifacts/sprint-status.yaml)",
         ):
             # Story 3.3d: punktene i listene begynner med stor bokstav.
@@ -2079,6 +2077,10 @@ class TestReadmeForNybegynnere:
         assert list(lister) == ["Ferdig", "Neste i v1", "Ekstra, hvis tiden rekker"], list(lister)
         for navn, punkter in lister.items():
             assert 1 <= len(punkter) <= 8, (navn, len(punkter))
+        # Story 3.3h (gruppens svar 20.10 kl. 10:14-10:19): «Ferdig» er en
+        # kort liste over det appen kan, og hvert punkt er kort.
+        for punkt in lister["Ferdig"]:
+            assert len(re.findall(r"\w+", punkt)) <= 16, punkt
         # Gjennomgangen, ECH2: listene staar samlet, uten tomme linjer inni,
         # saa et punkt etter en tom linje ikke slipper unna grensen. Etter
         # listene kommer setningen om regelen kl. 14:48 (3.3g).
@@ -2089,40 +2091,46 @@ class TestReadmeForNybegynnere:
         ferdig = "\n".join(lister["Ferdig"]).lower()
         neste_punkter = lister["Neste i v1"] + lister["Ekstra, hvis tiden rekker"]
         neste = "\n".join(neste_punkter).lower()
+        # Story 3.3h: det appen kan, med det samme som er flettet som før,
+        # kortere sagt.
         for sak in (
             "hentingen",
             "kallene som er igjen",
-            "docker",
+            "docker for begge versjonene",
             "demoen",
-            "readme-en",
             "hjelp bak «?»",
             "tydeligere merking",
             "datoene og månedsmerkene i grafen",
-            "oversikten fra designforslaget",
-            "utseendet fra designforslaget",
+            "oversikten og utseendet fra designforslaget",
             "sortering ved klikk i kolonneraden",
-            "den første delen av ki-laget",
-            "en bryter som slår den av og på",
-            "at hentingen lager teksten med en lokal modell",
-            "at hovedindeksen hentes i samme kjøring",
-            "vises over tabellen på forsiden",
+            "ki-teksten på aksjesiden, laget av en lokal modell",
+            "kontrollert mot regelen",
+            "en bryter",
+            "kursene og hovedindeksen",
+            "over tabellen på forsiden",
             # 2.9b og 2.9c (instruksjonen 18.10 kl. 17:04).
             "søylene",
             "stiplet linje i kursgrafen",
             # Gjennomgangen, VG1: resten av det som er flettet.
             "fra kl. 22 på børsdager",
-            "bilder i «kom i gang» og demoen først",
-            "ruff",
-            "den oppdaterte kvalitetssikringen",
-            "uten kopien av bmad-skillene",
+            "signalstyrken for hver aksje",
             # Story 3.4b: KI-teksten i demoen er flettet.
-            "ki-teksten på aksjesiden, laget én gang med gemma",
+            "alle 10 fargekombinasjonene og ki-tekst laget med gemma",
             # Story 8.16: periodene i kursgrafen er flettet.
             "periodene i kursgrafen med «velg dag»",
             # Story 8.3: Min liste er flettet.
             "min liste, med stjernen foran hvert selskap",
         ):
             assert sak in ferdig, sak
+        # Story 3.3h: det rundt appen står i én setning under listene, ikke
+        # i «Ferdig».
+        rundt = (
+            "Rundt appen er også README-en med bilder i «Kom i gang» og demoen først, ruff i CI og i testene, "
+            "den oppdaterte kvalitetssikringen og et ryddigere repo uten kopien av BMAD-skillene ferdige."
+        )
+        assert rundt in status
+        for sak in ("readme-en", "ruff", "kvalitetssikringen", "bmad"):
+            assert sak not in ferdig, sak
         assert "resten av KI-laget" not in status and "Selve teksten lages ikke ennå" not in status
         # «Neste» foelger rekkefoelgen under «Prioritering» i epics.md etter
         # svarene 18.10 kl. 00:39 og 11:20, med KI-tekstene i demoen og Min

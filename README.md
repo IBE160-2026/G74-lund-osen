@@ -309,14 +309,14 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 
 **Ferdig**
 
-- Hentingen av kurser fra kl. 22 på børsdager, med kontroll av børsdagen, og at hovedindeksen hentes i samme kjøring
+- Hentingen av kursene og hovedindeksen fra kl. 22 på børsdager, og signalstyrken for hver aksje
 - Nye forsøk med kallene som er igjen etter hentingen
-- Docker, og demoen, som viser alle 10 fargekombinasjonene av de tre sjekkene på siste dag, og KI-teksten på aksjesiden, laget én gang med Gemma
-- Denne README-en, med bilder i «Kom i gang» og demoen først, og hjelp bak «?» på sidene
-- Tydeligere merking i tabellene, datoene og månedsmerkene i grafen, periodene i kursgrafen med «Velg dag», oversikten fra designforslaget, utseendet fra designforslaget, sortering ved klikk i kolonneraden, og Min liste, med stjernen foran hvert selskap og knappene «Markedsoversikt» og «Min liste» øverst på sidene
-- Hovedindeksen, som vises over tabellen på forsiden, med søylene under, og som en stiplet linje i kursgrafen på aksjesiden
-- Den første delen av KI-laget: plassen for KI-teksten under regelforklaringen på aksjesiden, med en bryter som slår den av og på, loggen der tekstene lagres, kontrollen av teksten mot regelen, og at hentingen lager teksten med en lokal modell. Teksten lages når KI er slått på og den lokale modellen kjører under hentingen, og aksjesiden viser bare tekster som besto kontrollen
-- Ruff, som finner feil og rot i koden og formaterer den, i CI og i testene, den oppdaterte kvalitetssikringen, og et ryddigere repo uten kopien av BMAD-skillene
+- Oversikten og utseendet fra designforslaget, med tydeligere merking, hjelp bak «?» og sortering ved klikk i kolonneraden
+- Hovedindeksen over tabellen på forsiden, med søylene under, og som stiplet linje i kursgrafen
+- Periodene i kursgrafen med «Velg dag», og datoene og månedsmerkene i grafen
+- Min liste, med stjernen foran hvert selskap og knappene «Markedsoversikt» og «Min liste» øverst
+- KI-teksten på aksjesiden, laget av en lokal modell, kontrollert mot regelen og med en bryter
+- Docker for begge versjonene, og demoen med alle 10 fargekombinasjonene og KI-tekst laget med Gemma
 
 **Neste i v1**
 
@@ -333,9 +333,14 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 
 Det som står under «Ekstra», er ikke lovet i briefen og kommer bare med hvis det er ferdig og testet før README-prøven, senest én uke før innleveringen.
 
-«Ferdig» betyr flettet til main. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
+«Ferdig» betyr flettet til main. Rundt appen er også README-en med bilder i «Kom i gang» og demoen først, ruff i CI og i testene, den oppdaterte kvalitetssikringen og et ryddigere repo uten kopien av BMAD-skillene ferdige. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
 
 ## Tester
+
+Testene kjøres med [uv](https://docs.astral.sh/uv/), uten Docker. Har du ikke uv, står installasjonen bak pila under.
+
+<details>
+<summary>Installere uv, og når uv ikke blir funnet</summary>
 
 **På en ren maskin uten Docker** trenger du bare [uv](https://docs.astral.sh/uv/). Appen krever Python 3.13 eller nyere (`requires-python` i `pyproject.toml`), og uv henter den hvis maskinen ikke har den. Installer uv først, etter [fremgangsmåten hos uv](https://docs.astral.sh/uv/getting-started/installation/).
 
@@ -351,7 +356,11 @@ Mac (Terminal):
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-Blir `uv` ikke funnet etterpå («The term 'uv' is not recognized» eller «command not found: uv»), lukker du vinduet, åpner et nytt og går til mappa, som i steg 4. Stå i mappa der README og `pyproject.toml` ligger, og kjør:
+Blir `uv` ikke funnet etterpå («The term 'uv' is not recognized» eller «command not found: uv»), lukker du vinduet, åpner et nytt og går til mappa, som i steg 4.
+
+</details>
+
+Stå i mappa der README og `pyproject.toml` ligger, og kjør:
 
 ```
 uv sync
@@ -380,6 +389,9 @@ Noen hoppes over, med grunnen i utskriften når du legger til `-rs`: på Windows
 Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan KI-generert kode kvalitetssikres, og alt står i [`docs/kvalitetssikring.md`](docs/kvalitetssikring.md).
 
 ## Dokumentene
+
+<details>
+<summary>Dokumentlista: plan og krav, arbeidsprosess og kvalitet</summary>
 
 `docs/` viser hvordan vi kom fram til noe og hvilken rolle KI spilte, og `_bmad-output/` viser hva vi kom fram til.
 
@@ -410,7 +422,12 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [Kontrollrapport 26.09](docs/kontroll-2026-09-26.md)
 - [Refleksjonslogg](docs/reflection-log.md) og [lagrede KI-prompts](docs/ai-prompts/)
 
+</details>
+
 ## Mappestruktur
+
+<details>
+<summary>Mappene og filene i repoet</summary>
 
 - [`src/`](src/) og [`tests/`](tests/) — applikasjonen og testene
 - [`docs/`](docs/) — arbeidsprosessen, og [`docs/hjelp.md`](docs/hjelp.md) med spørsmål og svar til «Kom i gang»
@@ -422,6 +439,8 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [`_bmad/`](_bmad/) og [`.claude/skills/`](.claude/skills/) — BMAD-rammeverket, ikke skrevet av oss
 
 Ikke i repoet: API-nøkkelen (`.env`), rådata, basen og demobasen (`data/`), lokale testskript (`local-tests/`) og den private arbeidsmappa (`_privat/`).
+
+</details>
 
 ## Medlemmer
 
