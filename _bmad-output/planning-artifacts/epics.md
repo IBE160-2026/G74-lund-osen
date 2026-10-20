@@ -1531,6 +1531,8 @@ Oppgaveplanlegging beskrives i README (regel 19).
 
 *Avgjort 2026-10-19 kl. 22:19 (gruppens svar):* hentingen på børsdager går tilbake til kl. 22:00 fra tirsdag 20.10, fordi raden fra kl. 21 ikke var endelig for DNO (`malinger.md` §37), og en vurdering kan ikke skrives om (AD-7). Byggestoppen blir kl. 21:40. Det snur beslutningen 16.10 kl. 21:09.
 
+*Lagt til 2026-10-20 kl. 16:07:* hentingen tilbake til kl. 22:00 på børsdager er squash-flettet i `54a4c51`, PR #79, låst til head-en `1eb5f6c` (spesifikasjonen `spec-2-3-hentingen-fra-kl-22.md`). Hele settet på `1eb5f6c`: 2763 bestått og 17 hoppet over. CI var grønn på head-en (39435878366). Grenen er slettet på GitHub. Mutantene G1 (grensen tilbake på kl. 21:00) og G2 (grensen på kl. 22:01) ble fanget.
+
 ### Story 2.3b: Kallene som er igjen, brukes på nye forsøk
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 19:17.*

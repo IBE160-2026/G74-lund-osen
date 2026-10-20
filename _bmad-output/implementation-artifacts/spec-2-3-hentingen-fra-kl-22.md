@@ -2,7 +2,7 @@
 title: 'Story 2.3, tillegg: hentingen tilbake til kl. 22:00 på børsdager'
 type: 'feature'
 created: '2026-10-20'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'ddf828f'
