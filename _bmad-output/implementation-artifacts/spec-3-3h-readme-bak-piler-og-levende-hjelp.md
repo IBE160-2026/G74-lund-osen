@@ -79,6 +79,8 @@ Tabellen over viser forskjellen. Inne i hver pil står stegene fra 5, kommandoen
 - **Innholdet i de fire pilene er låst med sha256** mot delen under overskriften på main før grenen (`AVTRYKK_I_PILENE`). Demoen er uten linja om den ekte versjonen, som fikk lenken.
 - **README-en blir ikke kortere i linjer** (447 mot 419 etter `wc -l`), men kortere å lese, fordi stegene for den andre versjonen, dokumentlista, mappestrukturen og installasjonen av uv er lukket.
 - **De andre dokumentene** fikk en datert linje der de sa noe om Rettet-linjene i hjelpen: `docs/kvalitetssikring.md` (også om pilene i README-prøven), `docs/ux-logg.md` (U7) og story 3.2b i `epics.md`.
+- *Rettet 2026-10-20 (gruppens svar kl. 20:20):* advarselen om `docker compose down -v` står ikke lenger i pila, men uendret rett under pila til den ekte versjonen, utenfor alle piler. Den kommer rett etter steg 9 når pila er åpen, og synes for alle når den er lukket (`48d6d7a`). `test_advarselen_mot_down_v_staar_synlig` krever det, og avtrykket for den ekte versjonen i `test_innholdet_i_pilene_er_det_samme_som_foer` regnes av pila og advarselen etter den, så det er det samme som fra `013be41`.
+- *Rettet 2026-10-20 (rådets funn):* «Ferdig» manglet selve signalet. Det første punktet er nå de tre sjekkene, trend, bevegelse og interesse, og styrken for hver aksje hver børsdag, med regelforklaringen på aksjesiden, med ordene fra `src/aksjedetalj.py` og `src/templates/aksje.html`. Demolinja har igjen «av de tre sjekkene» (`94db900`). Lista har fortsatt høyst 8 punkter (3.3d), så hentingen og de nye forsøkene står i ett punkt, og grensen per punkt er 20 ord, ikke 16, fordi signalet og demolinja ikke fikk plass innenfor 16. Testen er `test_ferdig_begynner_med_signalet`.
 
 ## Mutantene
 
@@ -91,6 +93,8 @@ Tabellen over viser forskjellen. Inne i hver pil står stegene fra 5, kommandoen
 | M3 | Steg 8 tatt bort fra den ekte versjonen, og 9 blir 8 | `test_docker_foerst_og_uv_som_alternativ` | `test_hvert_steg_hver_kommando_og_hver_lenke_fra_foer_finnes` feiler |
 | M4 | Den tomme linja etter `</summary>` i pila til demoen tatt bort | `test_demoen_foerst_og_zip_foer_kommandoene` | `test_markdown_inne_i_pilene_vises_riktig_paa_github` feiler |
 | M5 | En Rettet-linje lagt tilbake i hjelpen | `test_raadet_om_tidspunkt_uten_flagget` | `test_hjelpen_sier_klokkeslettet_fra_tidsgrensen_og_har_ingen_daterte_linjer` feiler |
+| M6 | Advarselen om `down -v` tilbake i pila, kjørt på `94db900` | `test_advarselen_mot_down_v_staar_synlig` | den samme feiler |
+| M7 | Signalet tatt bort fra «Ferdig», kjørt på `94db900` | `test_ferdig_begynner_med_signalet` | den samme feiler |
 
 ## Gjennomgangen
 
@@ -124,3 +128,5 @@ Gjennomgang 20.10 på diffen `013be41..3042a7f`. Linsene var:
 | BH14 | «Tabellen over» er langt over | nit | avvist: tabellen står i innledningen til «Kom i gang», og VG fant det riktig |
 | BH15 | Mutantene sto under «Boundaries», og 419 linjer hadde ingen kilde | nit | rettet: egen del, og `wc -l` står ved tallet |
 | VG7 | Utført-linja, PR-en og CI gjenstår | nit | gjøres i steg 3–5 |
+| BH4, ECH8 | Advarselen om `down -v` synes først når pila er åpnet | medium | rettet etter gruppens svar 20.10 kl. 20:20, som snur avvisningen i raden lenger opp: advarselen står rett under pila (`48d6d7a`) |
+| Rådet, 20.10 | «Ferdig» manglet selve signalet: de tre sjekkene, styrken og regelforklaringen | medium | rettet: først i lista, og demolinja har igjen «av de tre sjekkene» (`94db900`) |
