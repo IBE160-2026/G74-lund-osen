@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-10-20T15:54
+updated: 2026-10-20T16:33
 ---
 
 # Vurderingsmatrise for del 1
@@ -103,3 +103,5 @@ Statusen i tabellen er ikke endret. README-prøven (story 3.4) og avsnittet «St
 *Lagt til 2026-10-20 kl. 10:19:* raden «Funksjonalitet og omfang»: «Min liste» (story 8.3) står på main, flettet i `e02240a`, PR #78, etter gruppens svar 19.10 kl. 10:29 om å flette etter hentingen og målingen. Stjernen står i oversikten, og Min liste er en egen side med samme tabell ([`minliste.py`](../src/minliste.py), migrasjonen 0007 og `tests/test_min_liste.py::TestLagringen::test_merkingen_overlever_en_omstart`). 8.3 er en av de ni storyene i v1 fra linja 19.10 kl. 17:06, og nå står åtte igjen. Statusen i tabellen er ikke endret.
 
 *Lagt til 2026-10-20 kl. 15:54:* raden «Funksjonalitet og omfang» i tabellen for 17.10: grensen i hentingen er kl. 22:00 igjen fra 20.10, etter gruppens svar 19.10 kl. 22:19 under story 2.3 (`malinger.md` §37). Testen `tests/test_fetch_prices.py::TestTidskontrollen::test_kl_21_presis_henter` heter nå `tests/test_fetch_prices.py::TestTidskontrollen::test_kl_22_presis_henter`. Statusen i tabellen er ikke endret.
+
+*Lagt til 2026-10-20 kl. 16:33:* raden «Design og brukeropplevelse»: [`docs/ux-logg.md`](ux-logg.md) samler det vi har sett og gjort for brukeropplevelsen fra starten, 444 rader fra 2026-09-25, eldst først, med hvem som så det og kilden. Den har også sju åpne funn før brukertesten (8.1) og UX-gjennomgangen (8.2), U1–U7, slått opp i koden 20.10. Statusen i tabellen er ikke endret.
