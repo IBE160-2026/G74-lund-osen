@@ -239,10 +239,10 @@ def indeksserie(serier: dict[str, list[Kursrad]], dager: list[date]) -> list[Kur
 
 
 def _klokke_for(dag: date):
-    # Story 2.3: kl. 21:30, en halvtime etter TIDSGRENSE i hentingen, som den
-    # ekte versjonen fra 19.10 (beslutningen 16.10 kl. 11:46 om at demoen er
-    # lik den ekte). Foer 19.10 var det kl. 22:30.
-    oeyeblikk = datetime(dag.year, dag.month, dag.day, 21, 30, tzinfo=OSLO)
+    # Story 2.3: kl. 22:30, en halvtime etter TIDSGRENSE i hentingen, som den
+    # ekte versjonen fra 20.10 (gruppens svar 19.10 kl. 22:19, og beslutningen
+    # 16.10 kl. 11:46 om at demoen er lik den ekte). 19.10 var det kl. 21:30.
+    oeyeblikk = datetime(dag.year, dag.month, dag.day, 22, 30, tzinfo=OSLO)
     return lambda: oeyeblikk
 
 
@@ -332,8 +332,8 @@ def _bygg(sti: Path, radene: list | None = None) -> None:
 
         dager = handelsdager()
         serier = {a.symbol: serie(n, a, dager) for n, a in enumerate(DEMOUNIVERS)}
-        # Kl. 21:15 fra 19.10, som hentingen (story 2.3); foer det kl. 22:15.
-        hentet = datetime(SLUTTDATO.year, SLUTTDATO.month, SLUTTDATO.day, 21, 15, tzinfo=OSLO)
+        # Kl. 22:15 fra 20.10, som hentingen (story 2.3); 19.10 var det kl. 21:15.
+        hentet = datetime(SLUTTDATO.year, SLUTTDATO.month, SLUTTDATO.day, 22, 15, tzinfo=OSLO)
         kurslager = SqliteKurslager(tilkobling, DEMOUNIVERS)
         for symbol, rader in serier.items():
             if rader:

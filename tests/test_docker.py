@@ -557,8 +557,11 @@ class TestReadme:
     def test_raadet_om_tidspunkt_uten_flagget(self):
         """Svar 3: README-en raader til kveld paa en boersdag eller helg, og
         viser ikke flagget som slipper forbi tidskontrollen, som kan laase
-        dagen. Fra 19.10 heter det --uten-tidskontroll, og grensen er kl. 21
-        (beslutningen 16.10 kl. 21:09). Det gamle navnet staar heller ikke."""
+        dagen. Fra 19.10 heter det --uten-tidskontroll. Grensen var kl. 21
+        19.10 (beslutningen 16.10 kl. 21:09) og er kl. 22 fra 20.10 (gruppens
+        svar 19.10 kl. 22:19). Det gamle navnet staar heller ikke. I
+        docs/hjelp.md staar kl. 22 i en Rettet-linje under svaret, fordi ingen
+        linje fjernes der, saa der kreves den linja."""
         import fetch_prices
 
         tekst = README.read_text(encoding="utf-8")
@@ -570,8 +573,20 @@ class TestReadme:
         assert grense.minute == 0
         assert re.search(rf"etter kl\. {grense.hour}\b(?![:.]\d)", _kom_i_gang()) and "helgen" in _hjelp()
         # BH4: bare tidspunktet for hentingen, ikke andre klokkeslett.
-        for gammel in (r"etter kl\. 22\b(?![:.]\d)", r"før kl\. 22\b(?![:.]\d)"):
-            assert not re.search(gammel, tekst) and not re.search(gammel, _hjelp()), gammel
+        for gammel in (r"etter kl\. 21\b(?![:.]\d)", r"før kl\. 21\b(?![:.]\d)"):
+            assert not re.search(gammel, tekst), gammel
+        # Gjennomgangen 20.10, BH4 og VG3: Rettet-linja foelger TIDSGRENSE, og
+        # ingen annen linje i hjelpen sier den gamle timen.
+        rettet = f"*Rettet 2026-10-20:* fra tirsdag 20.10 henter du etter kl. {grense.hour} og før midnatt"
+        hjelp = _hjelp()
+        assert rettet in hjelp
+        uten_de_kjente = (
+            hjelp.replace("Hent etter kl. 21 og før midnatt på en børsdag.", "")
+            .replace("ikke etter kl. 21.", "")
+            .replace("Også mellom kl. 21 og 22 stopper hentingen", "")
+        )
+        for gammel in (r"etter kl\. 21\b(?![:.]\d)", r"før kl\. 21\b(?![:.]\d)", r"kl\. 21 og 22"):
+            assert not re.search(gammel, uten_de_kjente), gammel
 
     def test_du_trenger_versjonene(self):
         """3.3b, punkt e: Docker Desktop slik den er prøvd (spesifikasjonen
@@ -597,10 +612,10 @@ class TestReadme:
         docs/hjelp.md gjør. Ville feilet hvis helgen falt ut av steg 8."""
         topp = _kom_i_gang().split("### Felles for begge", 1)[0]
         assert (
-            "Første gang før kl. 21 på en børsdag, også på dagtid, er demoen veien for å se appen med en gang" in topp
+            "Første gang før kl. 22 på en børsdag, også på dagtid, er demoen veien for å se appen med en gang" in topp
         )
         klar = [l for l in topp.splitlines() if l.startswith("| Klar |")]
-        assert len(klar) == 1 and "helgen" in klar[0] and "etter kl. 21" in klar[0]
+        assert len(klar) == 1 and "helgen" in klar[0] and "etter kl. 22" in klar[0]
         assert "andre dager børsen er stengt" in klar[0]
         steg8 = _steg("Den ekte versjonen", 8)
         assert "Første gang går det også i helgen og andre dager børsen er stengt." in steg8
@@ -880,7 +895,8 @@ SKRIFTFILER = {".woff", ".woff2", ".ttf", ".otf", ".css"}
 # fargene per aksje er med.
 # Story 8.3: 1630, fordi knapperaden i stripa skyver tabellen ned. Var 1573.
 HOEYDE_PAA_BILDET = 1630
-AVTRYKK_BAK_BILDET = "6113f1d5c21a848728bde456fac18b53618dca42bd782207a45a862979e18b3c"
+# Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
+AVTRYKK_BAK_BILDET = "dcf02e087e2abe190f5425768ed6e8fb71954822d944fbeaeb5e7691bca66110"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -934,7 +950,8 @@ IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py"}
 # Bildet er saa hoeyt at grafen, som staar under KI-teksten, er med til bunnen.
 # Story 8.3: 1872 med knapperaden i stripa. Var 1816.
 HOEYDE_PAA_AKSJESIDEN = 1872
-AVTRYKK_BAK_AKSJESIDEN = "c66d7defb6527a425c9a273d69d550674a33525e97600cab91cd20b40c72d3b9"
+# Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
+AVTRYKK_BAK_AKSJESIDEN = "8429ff15ea3f42dc52e73082ca1abfa453aaa1c7560aa5f8d67a57485058a1a8"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "
@@ -2047,7 +2064,7 @@ class TestReadmeForNybegynnere:
             "søylene",
             "stiplet linje i kursgrafen",
             # Gjennomgangen, VG1: resten av det som er flettet.
-            "fra kl. 21 på børsdager",
+            "fra kl. 22 på børsdager",
             "bilder i «kom i gang» og demoen først",
             "ruff",
             "den oppdaterte kvalitetssikringen",

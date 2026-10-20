@@ -34,8 +34,8 @@ Boersdagen raden gjelder, regnes en gang, fra samme oeyeblikk som filnavnet.
 Story 2.3 (FR-401, FR-402): foer foerste kall sjekker kjoer() i fast
 rekkefoelge klokka, tidskontrollen, basen, filvakten, noekkelen og kvoten.
 Hver sjekk som sier nei, gir 0 kall og en utskrift som sier hvorfor. Paa en
-boersdag foer TIDSGRENSE, kl. 21:00, hentes ingenting uten --uten-tidskontroll
-(beslutningen 16.10 kl. 21:09, fra 19.10; foer det kl. 22:00). Har basen
+boersdag foer TIDSGRENSE, kl. 22:00, hentes ingenting uten --uten-tidskontroll
+(gruppens svar 19.10 kl. 22:19, fra 20.10; 19.10 var den kl. 21:00). Har basen
 alt kursene for boersdagen for alle aksjene, hentes ingenting. Kvoten leses
 med /api/user (gratis), den andre nettfunksjonen mot EODHD (AD-2).
 
@@ -110,17 +110,21 @@ KVOTE_URL = "https://eodhd.com/api/user"
 
 # Story 2.3: paa en boersdag hentes ingenting foer dette klokkeslettet i Oslo,
 # uten flagget --uten-tidskontroll. En kjoering som kommer for tidlig, bruker
-# dagens kall uten aa faa dagens rad. Kl. 21:00 fra 19.10 (beslutningen 16.10
-# kl. 21:09, malinger.md §31); foer det kl. 22:00. Navnet har ikke
-# klokkeslettet i seg, saa i koden er neste endring denne linja. Tekstene for
-# brukeren (README-en og docs/hjelp.md), docstringene og klokkeslettene i
-# demoen staar for seg, og testene sier fra naar de ikke foelger med
-# (gjennomgangen, ECH5).
-TIDSGRENSE = time(21, 0)
+# dagens kall uten aa faa dagens rad. Kl. 22:00 fra 20.10 (gruppens svar 19.10
+# kl. 22:19): raden fra kl. 21 var ikke endelig for DNO, volumet var endret
+# kl. 22 (malinger.md §37), og en vurdering kan ikke skrives om (AD-7).
+# Vurderingen for DNO ble den samme, men det kunne den ikke vaert sikker paa.
+# 19.10 var grensen kl. 21:00 (beslutningen 16.10 kl. 21:09, malinger.md
+# §31); foer det kl. 22:00. Navnet har ikke klokkeslettet i seg, saa i
+# koden er neste endring denne linja. Tekstene for brukeren (README-en og
+# docs/hjelp.md) og klokkeslettene i demoen staar for seg, og testene sier
+# fra naar de ikke foelger med (gjennomgangen 17.10, ECH5). Docstringene
+# her sier kl. 22:00, og ingen test leser dem (gjennomgangen 20.10, BH6).
+TIDSGRENSE = time(22, 0)
 
 
 def _grensen() -> str:
-    """TIDSGRENSE slik utskriftene viser den, «21:00»."""
+    """TIDSGRENSE slik utskriftene viser den, «22:00»."""
     return f"{TIDSGRENSE:%H:%M}"
 
 
@@ -1423,7 +1427,7 @@ def les_inn(fil: Path, base_sti: Path, skriv: Callable[[str], None] = print) -> 
 def main(argv: list[str] | None = None) -> None:
     """Uten flagg: en henting. Med --les-inn <fil>: innlesing uten kall.
     Med --uten-tidskontroll: en henting paa en boersdag foer TIDSGRENSE, kl.
-    21:00 (story 2.3). Det gamle navnet, --hent-foer-kl-22, godtas ikke
+    22:00 (story 2.3). Det gamle navnet, --hent-foer-kl-22, godtas ikke
     lenger. Noekkelen gaar til kjoer som funksjon og leses etter filvakten.
 
     Stiene slaas opp her, naar main kalles (story 2.1b), saa fixturen i

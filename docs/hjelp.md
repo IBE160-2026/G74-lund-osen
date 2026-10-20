@@ -145,6 +145,8 @@ Kursene kommer fra EODHD, og den gratis nøkkelen gir 20 kall i døgnet. Hver ak
 
 Hent etter kl. 21 og før midnatt på en børsdag. Første gang kan du også hente i helgen: da henter den siste børsdag, fordi basen mangler den. På dagtid en børsdag stopper hentingen med 0 kall og sier hvorfor: dagens sluttkurs er ikke klar ennå, og en vurdering kan ikke fylles inn senere. Har basen alt kursene for børsdagen, bruker den også 0 kall. På en dag børsen er stengt henter den bare hvis basen mangler forrige børsdag. Mangler noen aksjer dagens kurs etter hentingen, sier den hvilke. Kjør samme kommando igjen senere samme kveld, så prøver den bare dem, med kallene som er til overs etter hentingen (20 minus ett per aksje og ett for hovedindeksen, altså 4 med de 15), aldri bonuskvoten og ikke etter kl. 23:50. Hovedindeksen prøves ikke på nytt samme kveld. Før kallene leser den kvoten med `/api/user`, som er gratis.
 
+*Rettet 2026-10-20:* fra tirsdag 20.10 henter du etter kl. 22 og før midnatt på en børsdag, ikke etter kl. 21. Også mellom kl. 21 og 22 stopper hentingen med 0 kall og sier hvorfor, som på dagtid. Raden fra kl. 21 var ikke alltid endelig, og en vurdering kan ikke fylles inn på nytt. Resten av svaret står.
+
 ### Oversikten er tom.
 
 Uten henting starter appen med tom oversikt og viser kommandoen som henter. Hent kursene med steg 8 i den ekte versjonen, og last siden på nytt. Utskriften fra hentingen sier hvilken børsdag vurderingene gjelder, og hvilke aksjer som fikk en grunn i stedet for en vurdering.

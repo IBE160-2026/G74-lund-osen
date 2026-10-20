@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-20T10:18
+updated: 2026-10-20T15:54
 ---
 
 # Kvalitetssikring
@@ -649,6 +649,8 @@ har sju punkter uten `resolved:` 03.10:
   med grensen kl. 21:00 fra `336204f`. Hovedindeksen: 2.8 (`1d3a21d` og
   `bcac2b5`) og visningen i 2.9 (`b44284f`). Søylene (2.9b), historikken (2.7),
   «Min liste» (8.3) og KI-tekstene i demoen (3.4b) står i backlog.
+  *Lagt til 2026-10-20:* grensen er kl. 22:00 igjen fra 20.10 (gruppens svar 19.10 kl. 22:19 under story 2.3, `malinger.md` §37),
+  i PR-en for `spec-2-3-hentingen-fra-kl-22.md`.
 - **Brukere.** Ingen brukertest er gjort ennå (story 8.1). Sidene er bare
   prøvd med Flask sin testklient, ikke i en nettleser.
   *Lagt til 2026-10-17:* står fortsatt. 8.1 står i backlog, og ingen test i
@@ -692,6 +694,9 @@ har sju punkter uten `resolved:` 03.10:
 - **Grensen kl. 21:00 er prøvd for én aksje én dag** (`malinger.md` §31).
   Mandag 19.10 sammenlignes fire aksjer med kursfila etter kl. 22, med kallene
   som er igjen (beslutningen 17.10 kl. 22:00 under story 2.3 i `epics.md`).
+  *Lagt til 2026-10-20:* målingen er tatt (`malinger.md` §37). DNO var ulik i
+  `volume` etter kl. 22, så raden fra kl. 21 var ikke endelig, og grensen er
+  kl. 22:00 igjen fra 20.10 (gruppens svar 19.10 kl. 22:19 under story 2.3).
 
 ## 7. Hvordan KI-arbeidet kontrolleres
 
@@ -814,6 +819,8 @@ hentingen kan gi kurser, se «Når kan jeg hente?» i
 [`docs/hjelp.md`](hjelp.md): etter kl. 22 og før midnatt på en børsdag.
 
 *Lagt til 2026-10-17:* fra 19.10 er det etter kl. 21 og før midnatt, og `docs/hjelp.md` sier det (beslutningen 16.10 kl. 21:09 under story 2.3, `malinger.md` §31). Det gjelder også steg 4 i tabellen under.
+
+*Lagt til 2026-10-20:* fra 20.10 er det etter kl. 22 og før midnatt igjen, og `docs/hjelp.md` sier det i en Rettet-linje under svaret (gruppens svar 19.10 kl. 22:19 under story 2.3, `malinger.md` §37). Det gjelder også steg 4 i tabellen under.
 
 - **Hvem som prøver:** åpent.
 - **Dato og klokkeslett:**
@@ -940,6 +947,8 @@ interesse, står i `malinger.md` §6, ved siden av EQNR 05.10 og GJF 02.10.
 | Prøvekjøringene av KI-teksten mot en kopi av basen | 16.10 kl. 22:26–22:27 og kl. 23:43–23:44 | 6 av 15 besto med prompten versjon 1, og 15 av 15 med versjon 2 | `malinger.md` §32 og §34 |
 | Grensen kl. 21:00: fire aksjer hentes på nytt og sammenlignes med kursfila | Planlagt mandag 19.10, etter kl. 22 | Ingen ennå | beslutningen 17.10 kl. 22:00 under story 2.3 i `epics.md` |
 | Brukertesten (story 8.1) | Ikke tatt | Ingen ennå. Den måler også suksesskriteriet «Brukerutfall» (§10) | `sprint-status.yaml`, 8-1 i backlog |
+
+*Lagt til 2026-10-20:* raden «Grensen kl. 21:00»: målingen ble tatt 19.10 etter kl. 22 (`malinger.md` §37). MOWI, GJF og AKRBP var like kursfila fra kl. 21 i alle sju feltene, og DNO var ulik i `volume`. Grensen er kl. 22:00 igjen fra 20.10 (gruppens svar 19.10 kl. 22:19 under story 2.3). Raden i tabellen er ikke endret.
 
 *Lagt til 2026-10-18 (gruppens svar kl. 00:03):* README-prøven i første rad tas første gang i uke 43 (19.–25.10), etter at de to README-PR-ene er flettet: Prøve 1, og Prøve 2 samtidig hvis testeren har egen gratiskonto. Den tas på nytt senest én uke før innleveringen, med ZIP-fila som leveres (§9).
 
@@ -1202,3 +1211,5 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 2.9b | S1–S6 | S1 `test_en_soeyle_per_aksje_med_kurs_fra_stoerst_fall`, S2 `test_antallet_telles_med_en_kortere_liste`, S3 `test_den_stiplede_linja_er_groenn_naar_indeksen_steg_og_roed_naar_den_falt`, S4 og S5 `test_ingen_aksje_med_rad_foer_dagen_navngis_uten_soeyler`, S6 `test_hoeyden_er_paa_endringen_slik_den_vises` | `S/spec-2-9b-…` |
 | 2.9c | C1–C6 | C1 `test_linja_starter_paa_aksjens_kurs_og_foelger_indeksen`, C2 `test_startdagen_er_grafens_foerste_dag_ikke_indeksens`, C3 `test_uten_indeks_ingen_linje_og_grafen_sier_det`, C4 `test_uten_grafens_foerste_dag_starter_linja_paa_den_neste`, C5 `test_teksten_sier_hva_linja_er_uten_raad`, C6 `test_hjelpen_for_linja_ogsaa_uten_snitt` | `S/spec-2-9c-…` |
 | 9.8 | S1–S8 | S1 `test_ingen_fil_under_agents_er_sporet` og `test_det_finnes_ingen_agents_i_rotmappa`, S2 og S4 `test_manifestet_har_bare_claude_code`, S3 `test_det_finnes_ingen_agents_i_rotmappa`, S5 `test_mappestrukturen_nevner_bmad_og_claude_skills_ikke_agents`, S6 `test_lekkasjesjekken_unntar_ikke_agents`, S7 `test_gitignore_uten_nextjs_men_med_node_og_byggemappene`, S8 `test_env_example_har_variablene_koden_leser_og_kallene_en_henting_bruker` | `S/spec-9-8-…` |
+
+*Lagt til 2026-10-20 (story 2.3, kl. 22):* testene for grensen fikk nye navn da grensen gikk tilbake til kl. 22:00 fra 20.10. I radene «2.3» og «2.3, kl. 21» over er `test_boersdag_kl_20_59_59_gir_0_kall_og_nevner_flagget` nå `test_boersdag_kl_21_59_59_gir_0_kall_og_nevner_flagget`, `test_kl_20_59_i_oslo_i_november_nekter` nå `test_kl_21_59_i_oslo_i_november_nekter`, `test_grensen_er_kl_21` nå `test_grensen_er_kl_22` og `test_kl_21_presis_henter` nå `test_kl_22_presis_henter`. De gamle navnene står i `OMDOEPT` i `tests/test_kvalitetssikring.py`.
