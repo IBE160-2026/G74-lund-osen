@@ -397,6 +397,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [Sprintstatus og story-spesifikasjoner](_bmad-output/implementation-artifacts/)
 - [Kvalitetssikring](docs/kvalitetssikring.md)
 - [Vurderingsmatrise for del 1](docs/vurderingsmatrise.md)
+- [UX-loggen](docs/ux-logg.md): hva vi har sett og gjort for brukeropplevelsen fra starten, og funnene som står åpne før brukertesten
 - [Kontrollrapport 22.09](docs/kontroll-2026-09-22.md), med [rettingsplanen](docs/kontroll-2026-09-22-plan.md)
 - [Kontrollrapport 26.09](docs/kontroll-2026-09-26.md)
 - [Refleksjonslogg](docs/reflection-log.md) og [lagrede KI-prompts](docs/ai-prompts/)
