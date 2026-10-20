@@ -64,7 +64,10 @@ Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og v
 
 **Slik limer du inn en kommando.** Kopier kommandoen med ikonet til høyre i den grå boksen. Ikonet, som stegene kaller knappen, synes først når musa er over boksen. Du kan også markere den og trykke Ctrl+C eller Cmd+C, eller skrive den inn. Lim den inn i PowerShell-vinduet fra steg 4 (Terminal på Mac) med Ctrl+V eller Cmd+V, og trykk Enter.
 
-### Demoen
+**Velg vei.** Klikk på pila for den versjonen du vil prøve. Tabellen over viser forskjellen.
+
+<details>
+<summary><a name="demoen"></a>Demoen: anbefalt for faglærer og sensor, uten nøkkel</summary>
 
 5. **Start demoen.** Kopier kommandoen med knappen til høyre i boksen, lim den inn i PowerShell-vinduet fra steg 4 (Ctrl+V eller Cmd+V) og trykk Enter. Første gang tar det noen minutter. Demoen er klar når det står `Serving on http://0.0.0.0:8000`. Den linja betyr bare at demoen kjører. Den adressen skal du ikke åpne.
 
@@ -79,9 +82,12 @@ docker compose up --build demo
 docker compose --profile demo down
 ```
 
-Vil du også prøve den ekte versjonen, går du videre til steg 5 under.
+Vil du også prøve den ekte versjonen, går du videre til steg 5 i [den ekte versjonen](#den-ekte-versjonen).
 
-### Den ekte versjonen
+</details>
+
+<details>
+<summary><a name="den-ekte-versjonen"></a>Den ekte versjonen: kurser fra EODHD, med egen nøkkel</summary>
 
 5. **Hent en nøkkel.** Lag en gratis bruker hos [EODHD](https://eodhd.com/register), og kopier API-nøkkelen din. Det er klart når du har nøkkelen.
 6. **Legg inn nøkkelen, bare første gang.** Kopier kommandoene med knappen til høyre i boksen, lim dem inn i PowerShell-vinduet fra steg 4 én om gangen (Ctrl+V eller Cmd+V) og trykk Enter. Den første lager fila [`.env`](#mer-for-den-som-vil), og den neste åpner den (Windows eller Mac). Lim inn nøkkelen etter `EODHD_API_KEY=`, lagre og lukk. Det er klart når nøkkelen står etter `EODHD_API_KEY=`.
@@ -121,6 +127,8 @@ docker compose down
 ```
 
 **Skriv aldri `docker compose down -v`.** Det sletter kursene og vurderingene, og vurderingene kan ikke lages på nytt.
+
+</details>
 
 ### Står du fast?
 

@@ -634,7 +634,15 @@ class TestReadme:
         assert kommandoer[0] == "docker compose up --build demo"
         assert del_.index("«Download ZIP»") < del_.index("docker compose up --build demo")
         overskrifter = re.findall(r"^### (.+)$", del_, re.MULTILINE)
-        assert overskrifter[:3] == ["Felles for begge", "Demoen", "Den ekte versjonen"], overskrifter
+        # Story 3.3h: demoen og den ekte versjonen står bak hver sin pil
+        # mellom de felles stegene og «Står du fast?», demoen først.
+        assert overskrifter[:2] == ["Felles for begge", "Står du fast?"], overskrifter
+        assert (
+            del_.index("### Felles for begge")
+            < del_.index('<a name="demoen">')
+            < del_.index('<a name="den-ekte-versjonen">')
+            < del_.index("### Står du fast?")
+        )
         topp = del_.split("### Felles for begge", 1)[0]
         assert "Vi anbefaler demoen for faglærer og sensor" in topp
         assert "Demoen står først i stegene under, fordi den er raskest." in topp
@@ -1219,9 +1227,31 @@ def _proevetabellen(proeve: str | None = None) -> str:
     return "\n".join(l for l in seksjon.splitlines() if l.startswith("|"))
 
 
+# Story 3.3h (gruppens svar 20.10 kl. 10:14-10:19): etter de felles stegene
+# kommer linja «Velg vei», og demoen og den ekte versjonen staar bak hver sin
+# pil, med ankeret i pila.
+VELG_VEI = "**Velg vei.**"
+PILENE = {"Demoen": "demoen", "Den ekte versjonen": "den-ekte-versjonen"}
+
+
+def _pil(navn: str) -> str:
+    """Innholdet i pila for demoen eller den ekte versjonen i «Kom i gang»."""
+    treff = re.search(
+        rf'^<details>\n<summary><a name="{PILENE[navn]}"></a>{re.escape(navn)}: [^\n]*</summary>\n\n'
+        r"(.*?)\n\n</details>$",
+        _kom_i_gang(),
+        re.MULTILINE | re.DOTALL,
+    )
+    assert treff, navn
+    return treff.group(1)
+
+
 def _seksjon(navn: str) -> str:
-    """Delen under «### navn» i «Kom i gang», til neste ###."""
-    return _kom_i_gang().split(f"### {navn}\n", 1)[1].split("\n### ", 1)[0]
+    """Delen under «### navn» i «Kom i gang», til neste ### eller «Velg vei».
+    Fra 3.3h er demoen og den ekte versjonen innholdet i pila."""
+    if navn in PILENE:
+        return _pil(navn)
+    return _kom_i_gang().split(f"### {navn}\n", 1)[1].split("\n### ", 1)[0].split(f"\n{VELG_VEI}", 1)[0]
 
 
 SEKSJONENE = {"Felles for begge": [1, 2, 3, 4], "Den ekte versjonen": [5, 6, 7, 8, 9], "Demoen": [5, 6, 7]}
@@ -1304,9 +1334,15 @@ def _bildetekst(tekst: str, navn: str) -> str:
     return treff.group(1) if treff else ""
 
 
+# Story 3.3h: ankeret i en pil, som GitHub beholder med «user-content-» foran.
+ANKER_I_PIL = r'<a name="([^"]+)"></a>'
+
+
 def _alle_ankrene(tekst: str) -> list[str]:
-    """Ankrene i den rekkefoelgen overskriftene staar, ogsaa de like."""
-    return [_anker(o) for o in re.findall(r"^#+ (.+)$", _uten_bokser(tekst), re.MULTILINE)]
+    """Ankrene i den rekkefoelgen overskriftene staar, ogsaa de like, og så
+    ankrene i pilene."""
+    uten = _uten_bokser(tekst)
+    return [_anker(o) for o in re.findall(r"^#+ (.+)$", uten, re.MULTILINE)] + re.findall(ANKER_I_PIL, uten)
 
 
 def _git_sporet() -> list[str] | None:
@@ -1322,7 +1358,7 @@ def _git_sporet() -> list[str] | None:
 
 
 def _ankrene(tekst: str) -> set[str]:
-    return {_anker(o) for o in re.findall(r"^#+ (.+)$", _uten_bokser(tekst), re.MULTILINE)}
+    return set(_alle_ankrene(tekst))
 
 
 # Spoersmaalene i «Står du fast?» foer 22:32 (76b68cb), og punktene under den
@@ -1555,8 +1591,9 @@ class TestReadmeForNybegynnere:
         assert len(re.findall(r"\w+", KOPIERINGEN + avsnitt)) <= 65
         # Rett foer det foerste steget med en kommando, og etter steg 4.
         foerste_boks = re.search(r"^```", del_, re.MULTILINE).start()
-        assert del_.index("\n4. ") < del_.index(KOPIERINGEN) < del_.index("\n### Demoen\n") < foerste_boks
-        assert del_[del_.index(KOPIERINGEN) :].split("\n\n", 1)[1].startswith("### Demoen\n")
+        # Story 3.3h: rett foer «Velg vei» og pilene.
+        assert del_.index("\n4. ") < del_.index(KOPIERINGEN) < del_.index(f"\n{VELG_VEI}") < foerste_boks
+        assert del_[del_.index(KOPIERINGEN) :].split("\n\n", 1)[1].startswith(VELG_VEI)
         # Hvert steg med en boks sier hvor den limes inn.
         for seksjon, numre in SEKSJONENE.items():
             for n in numre:
@@ -1568,8 +1605,12 @@ class TestReadmeForNybegynnere:
                     assert "nye PowerShell-vinduet fra steg 4" not in steg
                 else:
                     assert "i PowerShell-vinduet fra steg 4" in steg, (seksjon, n)
-        # BH11: demoen slutter i steg 7 og sier hvor den ekte versjonen begynner.
-        assert "Vil du også prøve den ekte versjonen, går du videre til steg 5 under." in _steg("Demoen", 7)
+        # BH11: demoen slutter i steg 7 og sier hvor den ekte versjonen
+        # begynner. Fra 3.3h med lenken til pila.
+        assert (
+            "Vil du også prøve den ekte versjonen, går du videre til steg 5 i "
+            "[den ekte versjonen](#den-ekte-versjonen)." in _steg("Demoen", 7)
+        )
         # VG7: svaret om innlimingen har kopieringen. Fra 3.3d står det bare i
         # docs/hjelp.md, som sjekkes under.
         # Linja i steg 7 og steg 5 i demoen sier hva den betyr.
@@ -1603,13 +1644,18 @@ class TestReadmeForNybegynnere:
 
     def test_advarselen_mot_down_v_staar_synlig(self):
         """22:32: rett under stoppet i den ekte versjonen, synlig og ikke
-        lukket. Ville feilet hvis advarselen sto i en <details>."""
+        lukket. Fra 3.3h (gruppens svar 20.10 kl. 10:14-10:19) står den
+        uendret i pila til den ekte versjonen, og synes når pila er åpnet.
+        Ville feilet hvis advarselen sto i en pil til inni den, eller ikke
+        sist i den ekte versjonen."""
         ekte = _seksjon("Den ekte versjonen")
         advarsel = "**Skriv aldri `docker compose down -v`.**"
         assert advarsel in ekte
         assert ekte.index("docker compose down\n") < ekte.index(advarsel)
-        uten_detaljer = re.sub(r"<details>.*?</details>", "", _kom_i_gang(), flags=re.DOTALL)
-        assert advarsel in uten_detaljer
+        assert "<details>" not in ekte
+        assert ekte.split("\n\n")[-1] == (
+            advarsel + " Det sletter kursene og vurderingene, og vurderingene kan ikke lages på nytt."
+        )
 
     def test_staar_du_fast_har_hoeyst_5_spoersmaal(self):
         """22:32: FAQ-en var for lang. Hoeyst 8 spoersmaal, hvert som
@@ -2339,8 +2385,11 @@ class TestReadmeDemoenAnbefales:
             anbefalingen + " Den ekte versjonen er for å prøve løsningen med kurser fra EODHD."
         ), foerste
         # «anbefal» står bare i den ene setningen, i hele README-en og i
-        # hjelpen utenom de daterte linjene.
-        assert re.findall(r"anbefal\w*", tekst, re.IGNORECASE) == ["anbefaler"], re.findall(r"\w*anbefal\w*", tekst)
+        # hjelpen utenom de daterte linjene. Fra 3.3h også i pila til demoen.
+        assert re.findall(r"anbefal\w*", tekst, re.IGNORECASE) == ["anbefaler", "anbefalt"], re.findall(
+            r"\w*anbefal\w*", tekst
+        )
+        assert '<a name="demoen"></a>Demoen: anbefalt for faglærer og sensor' in tekst
         assert re.search(r"anbefal", _uten_daterte_linjer(_hjelp()), re.IGNORECASE) is None
 
     def test_ingen_anbefalt_ved_den_ekte_versjonen(self):
@@ -2349,7 +2398,8 @@ class TestReadmeDemoenAnbefales:
         ankeret."""
         tekst = README.read_text(encoding="utf-8")
         assert "(anbefalt)" not in tekst
-        assert "\n### Den ekte versjonen\n" in tekst
+        # Story 3.3h: pila til den ekte versjonen, med ankeret.
+        assert '<summary><a name="den-ekte-versjonen"></a>Den ekte versjonen: ' in tekst
         assert "](#den-ekte-versjonen)" in tekst
         assert _alle_ankrene(tekst).count("den-ekte-versjonen") == 1
         # Gjennomgangen (BH1, ECH4): ingen lenke til det gamle ankeret, heller
