@@ -29,6 +29,7 @@ TESTNAVN = re.compile(r"tests/((?:\w+/)*test_\w+\.py)::((?:\w+::)*\w+)(?:\[[^\]`
 # (ECH3): uten dette kunne raden for en spesifikasjon dekke en annens.
 EGEN_MERKELAPP = {
     "spec-2-3-hentingen-fra-kl-21": "2.3, kl. 21",
+    "spec-2-3-hentingen-fra-kl-22": "2.3, kl. 22",
     "spec-3-4-alle-ti-kombinasjonene-paa-siste-demodag": "3.4, alle 10",
 }
 
