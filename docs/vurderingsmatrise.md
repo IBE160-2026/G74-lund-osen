@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-10-20T16:33
+updated: 2026-10-20T17:54
 ---
 
 # Vurderingsmatrise for del 1
@@ -101,6 +101,8 @@ Statusen i tabellen er ikke endret. README-prøven (story 3.4) og avsnittet «St
 *Lagt til 2026-10-19 kl. 17:06:* raden «Funksjonalitet og omfang»: endelig v1 er det briefen v8 lover, etter gruppens svar kl. 15:43 og endringsforslaget [`sprint-change-proposal-2026-10-19.md`](../_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-19.md). Av de 34 storyene som verken er done eller ute av v1, er 9 v1: 2.7, 8.3, 10.5 og 10.7 fra briefen, 3.4, 8.1 og 10.4 for suksessmålene, og 8.2 og 9.2. 24 er «Ekstra, hvis tiden rekker» og bygges etter regelen kl. 14:48, og 9.5 utgår, som avgjort 06.10. Det svarer på tilbakemeldingen 06.10 om at omfanget ikke skal vokse. Statusen i tabellen er ikke endret.
 
 *Lagt til 2026-10-20 kl. 10:19:* raden «Funksjonalitet og omfang»: «Min liste» (story 8.3) står på main, flettet i `e02240a`, PR #78, etter gruppens svar 19.10 kl. 10:29 om å flette etter hentingen og målingen. Stjernen står i oversikten, og Min liste er en egen side med samme tabell ([`minliste.py`](../src/minliste.py), migrasjonen 0007 og `tests/test_min_liste.py::TestLagringen::test_merkingen_overlever_en_omstart`). 8.3 er en av de ni storyene i v1 fra linja 19.10 kl. 17:06, og nå står åtte igjen. Statusen i tabellen er ikke endret.
+
+*Rettet 2026-10-20:* stien til testen i linja over ble byttet i `597e093` uten en Rettet-linje. Før sto den uten klassen `TestLagringen`, som `test_min_liste.py::test_merkingen_overlever_en_omstart` under `tests/`, og den stien finnes ikke, så CI feilet på main.
 
 *Lagt til 2026-10-20 kl. 15:54:* raden «Funksjonalitet og omfang» i tabellen for 17.10: grensen i hentingen er kl. 22:00 igjen fra 20.10, etter gruppens svar 19.10 kl. 22:19 under story 2.3 (`malinger.md` §37). Testen `tests/test_fetch_prices.py::TestTidskontrollen::test_kl_21_presis_henter` heter nå `tests/test_fetch_prices.py::TestTidskontrollen::test_kl_22_presis_henter`. Statusen i tabellen er ikke endret.
 
