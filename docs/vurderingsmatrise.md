@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-10-20T17:54
+updated: 2026-10-20T20:42
 ---
 
 # Vurderingsmatrise for del 1
@@ -107,3 +107,5 @@ Statusen i tabellen er ikke endret. README-prøven (story 3.4) og avsnittet «St
 *Lagt til 2026-10-20 kl. 15:54:* raden «Funksjonalitet og omfang» i tabellen for 17.10: grensen i hentingen er kl. 22:00 igjen fra 20.10, etter gruppens svar 19.10 kl. 22:19 under story 2.3 (`malinger.md` §37). Testen `tests/test_fetch_prices.py::TestTidskontrollen::test_kl_21_presis_henter` heter nå `tests/test_fetch_prices.py::TestTidskontrollen::test_kl_22_presis_henter`. Statusen i tabellen er ikke endret.
 
 *Lagt til 2026-10-20 kl. 16:33:* raden «Design og brukeropplevelse»: [`docs/ux-logg.md`](ux-logg.md) samler det vi har sett og gjort for brukeropplevelsen fra starten, 444 rader fra 2026-09-25, eldst først, med hvem som så det og kilden. Den har også sju åpne funn før brukertesten (8.1) og UX-gjennomgangen (8.2), U1–U7, slått opp i koden 20.10. Statusen i tabellen er ikke endret.
+
+*Lagt til 2026-10-20 kl. 20:42:* raden «README og kjørbarhet»: README-en er kortere å lese, med demoen, den ekte versjonen, dokumentlista, mappestrukturen og installasjonen av uv bak piler, og [`docs/hjelp.md`](hjelp.md) er et levende dokument uten daterte linjer (story 3.3h, gruppens svar kl. 10:14–10:19 og 16:19). Advarselen mot `docker compose down -v` står synlig rett under pila til den ekte versjonen (svaret kl. 20:20), og «Ferdig» begynner med signalet. Flettet i `fdbdf20`, PR #80. Testene: `tests/test_docker.py::TestReadmeBakPiler::test_innholdet_i_pilene_er_det_samme_som_foer`, `tests/test_docker.py::TestReadmeForNybegynnere::test_advarselen_mot_down_v_staar_synlig` og `tests/test_docker.py::TestReadmeBakPiler::test_ferdig_begynner_med_signalet`. Statusen i tabellen er ikke endret.
