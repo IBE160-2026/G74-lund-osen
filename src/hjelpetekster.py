@@ -144,10 +144,13 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "",
             # Story 8.15b (gjennomgangen, ECH2): «?» står ved en lenke som
             # sorterer, så teksten sier hva hvert klikk gjør.
+            # Story 8.3: stjernen foran navnet, i samme celle.
             "Klikk på et selskapsnavn i tabellen for å se sjekkene, tallene bak og kursgrafen. "
-            "Klikk på «Selskap» for å sortere A til Å, og en gang til for Å til A.",
+            "Klikk på «Selskap» for å sortere A til Å, og en gang til for Å til A. "
+            "Stjernen foran navnet legger aksjen i Min liste, og et nytt trykk tar den ut.",
             (
                 (INDEX_MAL, '<a href="/aksje/{{ rad.aksje.symbol }}">'),
+                (INDEX_MAL, 'class="stjerneknapp'),
                 (INDEX_MAL, 'sorterlenke("selskap", "Selskap")'),
                 (AKSJE_MAL, '<p class="maalt">Målt mot'),
                 (AKSJE_MAL, 'class="kurslinje"'),

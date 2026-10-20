@@ -15,11 +15,13 @@
 {% macro ariasort(kolonne) -%}
   {%- if sortering and sortering.kolonne == kolonne %} aria-sort="{{ 'descending' if sortering.orden == 'synkende' else 'ascending' }}"{% endif -%}
 {%- endmacro %}
+{#- Story 8.3: lenken sorterer på siden man står på, og «Alle» i Min liste
+    står. #}
 {% macro sorterlenke(kolonne, tekst) -%}
   {%- set valgt = sortering and sortering.kolonne == kolonne -%}
   {%- set neste = neste_orden(kolonne, sortering) -%}
   {%- set vist = sortering.orden if valgt else neste -%}
-  <a class="sorter{% if valgt %} valgt{% endif %}" href="/?sorter={{ kolonne }}&amp;orden={{ neste }}">{{ tekst }}<span class="skjult">
+  <a class="sorter{% if valgt %} valgt{% endif %}" href="{{ sidesti }}?{% if alle %}vis=alle&amp;{% endif %}sorter={{ kolonne }}&amp;orden={{ neste }}">{{ tekst }}<span class="skjult">
   {%- if valgt %}, sortert {{ ordens_ord(kolonne, sortering.orden) }}. Velg for {{ ordens_ord(kolonne, neste) }}.{% else %}, sorter {{ ordens_ord(kolonne, neste) }}{% endif -%}
   </span><svg class="vinkel" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false"><path d="{{ 'M2.5 4.5 6 8l3.5-3.5' if vist == 'synkende' else 'M2.5 7.5 6 4l3.5 3.5' }}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
 {%- endmacro %}
@@ -27,8 +29,14 @@
           {#- Story 8.0d, PR 2: strek til venstre i sterk oransje ved 3 av 3 og
               i lys oransje ved 2 av 3, og ingen ved 1 og 0 (designregler §3,
               14.10). #}
+          {#- Story 8.3: stjernen foran navnet, i cellen for Selskap, så
+              tabellen har fem kolonner (FR-101). Fylt når aksjen er merket.
+              Knappen sender skjemaet, og aria-pressed og navnet sier hva den
+              gjør for skjermleseren. Gjennomgangen (BH5): id-en på skjemaet er
+              ankeret merkingen sender tilbake til. #}
+          {%- set merket = rad.aksje.symbol in merkede %}
           <tr {% if rad.skiller_seg_ut %}class="utslag{% if rad.styrke == antall_sjekker %} alle{% endif %}"{% endif %}>
-            <td class="selskap"><a href="/aksje/{{ rad.aksje.symbol }}">{{ rad.aksje.navn }}</a>
+            <td class="selskap"><form id="rad-{{ rad.aksje.symbol }}" class="stjerne" method="post" action="/min-liste/merk"><input type="hidden" name="symbol" value="{{ rad.aksje.symbol }}"><input type="hidden" name="til" value="{{ 'fjern' if merket else 'merk' }}"><input type="hidden" name="tilbake" value="{{ tilbake }}"><button type="submit" class="stjerneknapp{% if merket %} merket{% endif %}" aria-pressed="{{ 'true' if merket else 'false' }}"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><span class="skjult">Min liste: {{ rad.aksje.navn }}</span></button></form><a href="/aksje/{{ rad.aksje.symbol }}">{{ rad.aksje.navn }}</a>
               {#- Avvik 11: ticker og bransje med symbol under navnet. #}
               <span class="linje">{{ rad.aksje.symbol }}{% if rad.aksje.sektor %} · {{ bransjesymbol(rad.aksje.sektor) }}{{ rad.aksje.sektor }}{% endif %}</span>
               {% if rad.aksje.symbol in eget %}<span class="hentet">hentet {{ rad.sist_hentet|norsk_tid }}</span>{% endif %}</td>
@@ -65,9 +73,31 @@
           </tr>
 {% endmacro -%}
 {% block oppdatert_hjelp %}{% if rader and hentet %} {{ hjelpeknapp("hjelp-hentet", "Hjelp: oppdatert") }}{% endif %}{% endblock %}
+{% block tittel %}{% if aktiv == "min_liste" %}Min liste — OSE Signal{% else %}OSE Signal{% endif %}{% endblock %}
 {% block side %}side-oversikt{% endblock %}
 {% block innhold %}
-  {% if rader %}
+  {#- Story 8.3: Min liste har overskriften, en kort tekst, knappen «Alle /
+      Min liste» med antallet, og samme tabell i samme rekkefølge (FR-102).
+      Uten noe merket står det hvordan man merker. #}
+  {#- Gjennomgangen (BH9, BH20): teksten om stjernen og fotnotene står bare
+      når det er noe å merke, og fotnotene bare når tabellen står. Valget i
+      «Alle / Min liste» har aria-current="true", fordi knappen i stripa
+      alt er siden (BH10). #}
+  {% set vist_tabell = rader and (skilte_seg_ut or oevrige or ingen_skilte_seg_ut) %}
+  {% if aktiv == "min_liste" %}
+    <h1 class="overskrift">Min liste</h1>
+    {% if rader %}
+    <p class="innledning">Stjernen foran et selskap legger aksjen i lista, og et nytt trykk tar den ut. Lista lagres på denne maskinen og koster ingen API-kall.</p>
+    <nav class="visvalg" aria-label="Vis">
+      <a class="visknapp" href="{{ sidesti }}?vis=alle{% if sortering %}&amp;sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}"{% if alle %} aria-current="true"{% endif %}>Alle <span class="antall">{{ antall_aksjer }}</span></a>
+      <a class="visknapp" href="{{ sidesti }}{% if sortering %}?sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}"{% if not alle %} aria-current="true"{% endif %}>Min liste <span class="antall">{{ antall_merket }}</span></a>
+    </nav>
+    {% if not vist_tabell %}
+      <p class="tom-liste">Ingen aksjer i Min liste ennå. Trykk på stjernen ☆ foran et selskap, under «Alle» her eller i markedsoversikten, for å legge det i lista.</p>
+    {% endif %}
+    {% endif %}
+  {% endif %}
+  {% if rader and aktiv != "min_liste" %}
     {#- Story 8.0e, svar 1: demoen sier «Demo Børs» der den ekte versjonen
         sier «Oslo Børs», i linja over tabellen og i innledningen. #}
     {% set boers = "Demo Børs" if eksempeltall else "Oslo Børs" %}
@@ -184,14 +214,16 @@
       {% endif %}
     </section>
 
+  {% endif %}
+  {% if vist_tabell %}
     {#- Story 8.15, svar 5: linja står bare når en kolonne er valgt. #}
-    {% if sortering %}<p class="sortert">Sortert på {{ sortering.navn }}, {{ ordens_ord(sortering.kolonne, sortering.orden) }}, innenfor hver del. <a href="/">Standard rekkefølge</a></p>{% endif %}
+    {% if sortering %}<p class="sortert">Sortert på {{ sortering.navn }}, {{ ordens_ord(sortering.kolonne, sortering.orden) }}, innenfor hver del. <a href="{{ sidesti }}{% if alle %}?vis=alle{% endif %}">Standard rekkefølge</a></p>{% endif %}
     <div class="tabellboks" role="region" aria-label="Aksjene" tabindex="0">
     <table>
       <thead>
         <tr>
           {#- Story 8.15b: Selskap sorterer også, med «?» ved siden av lenken. #}
-          <th{{ ariasort("selskap") }}>{{ sorterlenke("selskap", "Selskap") }} {{ hjelpeknapp("hjelp-selskap", "Hjelp: selskap") }}</th>
+          <th{{ ariasort("selskap") }}>{{ sorterlenke("selskap", "Selskap") }} {{ hjelpeknapp("hjelp-selskap", "Hjelp: selskap") }}<span class="under">★ = Min liste</span></th>
           {#- Svar 2: bare «NOK» under et kolonnenavn. Story 8.15: «?» står
               ved siden av lenken, ikke inne i den. #}
           <th class="tall"{{ ariasort("kurs") }}>{{ sorterlenke("kurs", "Sluttkurs") }} {{ hjelpeknapp("hjelp-sluttkurs", "Hjelp: sluttkurs") }}<span class="under">NOK</span></th>
@@ -208,7 +240,9 @@
 
           Story 8.0d, PR 2: antallet i en pille og grensen bak, med tallene
           fra Parametre. #}
-      {% set foerste_del = skilte_seg_ut or ingen_skilte_seg_ut %}
+      {#- Story 8.3: i Min liste har «Øvrige aksjer» overskriften også når
+          ingen av de merkede skilte seg ut. #}
+      {% set foerste_del = skilte_seg_ut or ingen_skilte_seg_ut or (aktiv == "min_liste" and antall_vurdert) %}
       {% if skilte_seg_ut %}
       <tbody>
         <tr class="del ut"><th colspan="5" scope="rowgroup">Skilte seg ut <span class="antall">{{ skilte_seg_ut|length }}</span> <span class="bak">signalstyrke {{ parametre.terskel }} eller mer</span></th></tr>
@@ -234,6 +268,9 @@
       {% endif %}
     </table>
     </div>
+  {% endif %}
+  {% if rader %}
+    {% if vist_tabell %}
 
     {% if ikke_vurdert %}
       <p class="fotnote">
@@ -254,13 +291,14 @@
       som et kursfall.
       Signalstyrken sier hvor mange av de {{ antall_sjekker }} sjekkene som slo ut, ikke om du bør kjøpe eller selge.
     </p>
+    {% endif %}
   {% elif demokommando %}
-    <h1 class="overskrift">Markedsoversikt</h1>
+    {% if aktiv != "min_liste" %}<h1 class="overskrift">Markedsoversikt</h1>{% endif %}
     <p>
       Demobasen finnes ikke ennå. Lag den med <code>{{ demokommando }}</code>.
     </p>
   {% else %}
-    <h1 class="overskrift">Markedsoversikt</h1>
+    {% if aktiv != "min_liste" %}<h1 class="overskrift">Markedsoversikt</h1>{% endif %}
     <p>
       Ingen kurser i basen ennå. Hent dem med <code>{{ hentekommando }}</code>.
     </p>
@@ -270,7 +308,9 @@
       tekstene for det. Sjekkene og grensene forklares paa aksjesiden. #}
   {% if rader %}
     {#- Story 2.9b: teksten om søylene står bare når søylene vises. #}
+    {% if aktiv != "min_liste" %}
     {{ hjelpevindu("hjelp-hovedindeks", "Hovedindeksen", [("", ["hovedindeksen", "soeylene"] if hovedindeks and hovedindeks.har_soeyler else ["hovedindeksen"])]) }}
+    {% endif %}
     {{ hjelpevindu("hjelp-selskap", "Selskap", [("", ["selskap"])]) }}
     {{ hjelpevindu("hjelp-sluttkurs", "Sluttkurs", [("", ["sluttkurs"])]) }}
     {{ hjelpevindu("hjelp-endring", "Endring", [("", ["endring", "utbyttejustert"])]) }}

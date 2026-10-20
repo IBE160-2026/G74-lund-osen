@@ -43,11 +43,12 @@ def ny(basefil):
 
 class TestTabellen:
     def test_tom_base_migreres_til_siste_versjon(self):
-        """Versjon 6 fra story 2.8 (0006_indeks.sql)."""
+        """Versjon 7 fra story 8.3 (0007_min_liste.sql). Foer det 6 fra story
+        2.8 (0006_indeks.sql)."""
         tilkobling = sqlite3.connect(":memory:")
         try:
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 6
-            assert siste_versjon(MIGRASJONSKATALOG) == 6
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 7
+            assert siste_versjon(MIGRASJONSKATALOG) == 7
         finally:
             tilkobling.close()
 
@@ -230,7 +231,8 @@ class TestBaseIVersjon2:
             tilkobling.commit()
             foer = alle_rader(tilkobling)
 
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 6  # 0005 (story 4.3) ki_logg, 0006 (story 2.8) indeks
+            # 0005 (story 4.3) ki_logg, 0006 (story 2.8) indeks, 0007 (story 8.3) min_liste
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 7
             # 0004 (story 2.1c) legger fire maalinger til vurdering. En rad
             # med grunn har ingen, saa de er NULL.
             foer["vurdering"] = [rad + (None,) * 4 for rad in foer["vurdering"]]

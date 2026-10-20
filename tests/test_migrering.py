@@ -713,7 +713,8 @@ class TestMaalingene0004:
             tilkobling.commit()
             foer = tilkobling.execute("SELECT * FROM vurdering").fetchall()
 
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 6  # 0005 (story 4.3) ki_logg, 0006 (story 2.8) indeks
+            # 0005 (story 4.3) ki_logg, 0006 (story 2.8) indeks, 0007 (story 8.3) min_liste
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 7
 
             assert kolonner(tilkobling, "vurdering")[-4:] == list(MAALINGENE)
             assert tilkobling.execute(
@@ -750,7 +751,8 @@ class TestMaalingene0004:
         fortsatt, paa en ny tilkobling uten noe slaatt paa."""
         tilkobling = base_paa_versjon_3(tmp_path)
         try:
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 6  # 0005 (story 4.3) ki_logg, 0006 (story 2.8) indeks
+            # 0005 (story 4.3) ki_logg, 0006 (story 2.8) indeks, 0007 (story 8.3) min_liste
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 7
         finally:
             tilkobling.close()
         ny = sqlite3.connect(tmp_path / "v3.db")

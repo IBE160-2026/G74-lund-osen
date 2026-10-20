@@ -234,6 +234,10 @@ def sidene(klient, monkeypatch, demobase):  # noqa: F811 - fikstur fra test_demo
     monkeypatch.setenv(app_modul.I_DEMO, "1")
     sider["oversikten i demoen"] = klient.get("/").data.decode("utf-8")
     sider["aksjesiden i demoen"] = klient.get("/aksje/BRFE").data.decode("utf-8")
+    # Story 8.3 (gjennomgangen, BH4, VG1, VG4): Min liste, også med «Alle» og
+    # sortert, så rammetestene og lenkene prøves på den nye siden.
+    sider["min liste i demoen"] = klient.get("/min-liste").data.decode("utf-8")
+    sider["alle i min liste"] = klient.get("/min-liste?vis=alle&sorter=kurs&orden=synkende").data.decode("utf-8")
     demo_sti().write_bytes(b"ikke en sqlite-base" * 10)
     svar = klient.get("/")
     assert svar.status_code == 503
@@ -287,13 +291,18 @@ class TestRammen:
                 assert f'url("/static/fonts/{fil}")' in stil, (navn, fil)
 
     def test_hver_lenke_gaar_til_en_side_som_finnes(self, sidene):
-        """Ville feilet med en lenke til /min-liste før 8.3."""
+        """Ville feilet med en lenke til /min-liste før 8.3. Story 8.3: Min
+        liste finnes, med «Alle» og sorteringen som parametre."""
         for navn, html in sidene.items():
             for href in re.findall(r'href="([^"]*)"', html):
                 # Story 8.15: sorteringen er en parameter på /.
                 assert (
-                    href == "/"
+                    href in ("/", "/min-liste", "/min-liste?vis=alle")
                     or re.fullmatch(r"/aksje/[A-Z0-9]+", href)
+                    or re.fullmatch(
+                        r"/min-liste\?(vis=alle&amp;)?sorter=(selskap|kurs|endring|signal|retning)&amp;orden=(synkende|stigende)",
+                        href,
+                    )
                     or re.fullmatch(
                         r"/\?sorter=(selskap|kurs|endring|signal|retning)&amp;orden=(synkende|stigende)", href
                     )
@@ -645,7 +654,9 @@ class TestOversikten:
             re.DOTALL,
         )
         assert '<span class="under">NOK</span>' in html
-        assert html.count('class="under"') == 1
+        # Story 8.3: og «★ = Min liste» under Selskap.
+        assert '<span class="under">★ = Min liste</span>' in html
+        assert html.count('class="under"') == 2
 
 
 class TestSorteringen:

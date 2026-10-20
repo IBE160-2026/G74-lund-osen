@@ -31,6 +31,7 @@ import threading
 from collections.abc import Callable
 from datetime import date, datetime, timezone
 from pathlib import Path
+from urllib.parse import parse_qs, urlsplit
 
 from flask import Flask, abort, g, redirect, render_template, request
 
@@ -50,6 +51,7 @@ from lagring_sqlite import (
     SqliteIndekslager,
     SqliteKILogg,
     SqliteKurslager,
+    SqliteMinlistelager,
     SqliteOversiktsleser,
     aapne_base,
     andre_aksjer_har_ki_rad,
@@ -73,6 +75,7 @@ from markedsoversikt import (
     uten_kurser,
 )
 from migrering import MigrasjonsFeil
+from minliste import UkjentAksje
 from oversiktsdata import Oversiktsleser
 from perioder import AKSEMERKER, MAANEDSNAVN, OVERSKRIFT, SISTE, VELG, knappene, les_valg, startdag
 from signalberegning import BLANDET, STANDARD
@@ -177,8 +180,12 @@ def _migrer_en_gang(sti: Path) -> None:
 
 
 # Rutene som leser basen. Andre forespoersler (404, statiske filer) roerer den
-# ikke.
-_RUTER_MED_BASE = {"markedsoversikt", "aksjedetalj"}
+# ikke. Story 8.3: Min liste og merkingen, som er den eneste ruta som skriver.
+_RUTER_MED_BASE = {"markedsoversikt", "aksjedetalj", "min_liste", "merk"}
+
+# Story 8.3: ruta som skriver merkingen. Bare den aapner en demobase for
+# skriving, og bare tabellen min_liste skrives (AD-3, AD-10).
+_SKRIVER = "merk"
 
 
 def _basefeil(feil: BaseException) -> str:
@@ -208,7 +215,9 @@ def _aapne_basen() -> None:
             g.demo_mangler = True
             return
         try:
-            g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False, skrivebeskyttet=True)
+            # Story 8.3: stjernen virker ogsaa i demoen. Bare merkingen
+            # aapner demobasen for skriving, og den migreres fortsatt ikke.
+            g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False, skrivebeskyttet=request.endpoint != _SKRIVER)
             g.eksempeltall = les_merket(g.tilkobling) == DEMOMERKE
         except BASEFEIL as feil:
             g.basefeil = _basefeil(feil)
@@ -217,7 +226,7 @@ def _aapne_basen() -> None:
         # Gjennomgangen av PR 1 (BH6): en demobase der den ekte skal ligge,
         # migreres ikke. Den vises skrivebeskyttet, med «Eksempeltall».
         try:
-            g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False, skrivebeskyttet=True)
+            g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False, skrivebeskyttet=request.endpoint != _SKRIVER)
             g.eksempeltall = True
         except BASEFEIL as feil:
             g.basefeil = _basefeil(feil)
@@ -427,6 +436,29 @@ def _indeksen_for_grafen() -> tuple[str | None, dict | None, bool]:
 
 @app.route("/")
 def markedsoversikt():
+    return _tabellsiden(OVERSIKT)
+
+
+@app.route("/min-liste")
+def min_liste():
+    """Story 8.3, FR-101, FR-102: samme tabell som oversikten, i samme
+    rekkefoelge, med bare de merkede, eller alle med ?vis=alle."""
+    return _tabellsiden(MIN_LISTE_SIDE)
+
+
+# Story 8.3: siden man staar paa, som knapperaden i stripa fyller.
+OVERSIKT = "oversikt"
+MIN_LISTE_SIDE = "min_liste"
+
+
+def _tabellsiden(aktiv: str):
+    """Oversikten eller Min liste. Min liste filtrerer radene etter at hver
+    del er sortert, og sorterer dem aldri paa nytt, saa rekkefoelgen er den
+    samme som i oversikten, ogsaa sortert (FR-102, story 8.15)."""
+    i_lista = aktiv == MIN_LISTE_SIDE
+    alle = i_lista and request.args.get("vis") == ALLE
+    sti = MIN_LISTE if i_lista else OVERSIKTEN
+    felles = {"aktiv": aktiv, "sidesti": sti, "alle": alle}
     if g.get("basefeil"):
         return _basen_kan_ikke_aapnes()
     if g.get("demo_mangler"):
@@ -438,6 +470,7 @@ def markedsoversikt():
             mangler=[],
             eget=set(),
             demokommando=demokommando(),
+            **felles,
         )
     leser = _leser_eller_basefeil()
     if leser is None:
@@ -452,6 +485,7 @@ def markedsoversikt():
             eget=set(),
             hentekommando=hentekommando(),
             demokommando=demokommando() if demo_paa() else None,
+            **felles,
         )
 
     poster = _leser_eller_basefeil(hent_oversiktsleser).oversikt()
@@ -462,7 +496,17 @@ def markedsoversikt():
     sortering = Sortering.fra_adressen(request.args.get("sorter"), request.args.get("orden"))
     skilte_seg_ut, oevrige = (sorter(del_, sortering) for del_ in del_i_to(rader))
     tre_av_tre = frozenset(rad.aksje.symbol for rad in rader if rad.styrke == ANTALL_SJEKKER)
-    hovedindeks, indeks_feilet = _hovedindeks(leser, poster, tre_av_tre)
+    # Story 8.3: merkingen leses fra sin egen port, bare lesing her.
+    merkede = _leser_eller_basefeil(lambda: SqliteMinlistelager(g.tilkobling)).merkede()
+    mangler = uten_kurser(poster)
+    # Gjennomgangen (BH8, ECH2): antallet er de merkede som har en rad i
+    # tabellen, saa knappen og tabellen sier det samme.
+    antall_merket = sum(rad.aksje.symbol in merkede for rad in rader)
+    if i_lista and not alle:
+        skilte_seg_ut = [rad for rad in skilte_seg_ut if rad.aksje.symbol in merkede]
+        oevrige = [rad for rad in oevrige if rad.aksje.symbol in merkede]
+        mangler = uten_kurser([post for post in poster if post.aksje.symbol in merkede])
+    hovedindeks, indeks_feilet = (None, False) if i_lista else _hovedindeks(leser, poster, tre_av_tre)
 
     return render_template(
         "index.html",
@@ -472,18 +516,24 @@ def markedsoversikt():
         dato=sidens_dato(rader),
         hentet=sidens_tidsstempel(rader),
         eget=eldre_enn_nyeste(rader),
-        mangler=uten_kurser(poster),
+        mangler=mangler,
         # Story 8.0d, PR 2b: M i «N av M aksjer» er alle aksjene i lista,
         # også de uten kurser (beslutningen 14.10).
         antall_aksjer=len(poster),
-        ikke_vurdert=any(rad.ikke_vurdert for rad in rader),
-        ingen_skilte_seg_ut=ingen_skilte_seg_ut(rader),
+        ikke_vurdert=any(rad.ikke_vurdert for rad in (*skilte_seg_ut, *oevrige)),
+        # Gjennomgangen (BH7, ECH1): «Alle» i Min liste er samme tabell som
+        # oversikten, ogsaa naar ingen skilte seg ut.
+        ingen_skilte_seg_ut=ingen_skilte_seg_ut(rader) and not (i_lista and not alle),
         antall_vurdert=antall_vurdert(rader),
         skilte_seg_ut=skilte_seg_ut,
         oevrige=oevrige,
         sortering=sortering,
         tre_av_tre=[rad.aksje.navn for rad in rader if rad.styrke == ANTALL_SJEKKER],
         hentekommando=hentekommando(),
+        merkede=merkede,
+        antall_merket=antall_merket,
+        tilbake=side_adresse(sti, sortering, alle),
+        **felles,
     )
 
 
@@ -637,6 +687,83 @@ def ki_bryter():
     svar = redirect(tilbake, code=303)
     svar.set_cookie(KAPSEL, til, max_age=365 * 24 * 3600, samesite="Lax", httponly=True, secure=request.is_secure)
     return svar
+
+
+# Story 8.3: bare oversikten og Min liste kan vaere maalet etter en merking,
+# med sorteringen og «Alle» i Min liste. Adressen bygges paa nytt av det som
+# er kjent, og alt annet gaar til samme side uten valg, eller til /. Tegnene
+# sjekkes foerst, fordi urlsplit fjerner tabulator og linjeskift, som
+# nettleseren ellers kunne lest som en annen side (som _TILBAKE over).
+_TILBAKE_TEGN = re.compile(r"[A-Za-z0-9/?=&\-]{1,100}")
+OVERSIKTEN = "/"
+MIN_LISTE = "/min-liste"
+ALLE = "alle"
+# Det skjemaet sender i «til»: merk aksjen, eller ta merket bort.
+MERK = "merk"
+FJERN = "fjern"
+
+
+def tilbake_etter_merking(tekst: str | None) -> str:
+    """Adressen merkingen sender tilbake til: samme side med sorteringen."""
+    if not tekst or not _TILBAKE_TEGN.fullmatch(tekst):
+        return OVERSIKTEN
+    deler = urlsplit(tekst)
+    if deler.scheme or deler.netloc or deler.path not in (OVERSIKTEN, MIN_LISTE):
+        return OVERSIKTEN
+    valg = parse_qs(deler.query)
+    return side_adresse(
+        deler.path,
+        Sortering.fra_adressen(_ett(valg, "sorter"), _ett(valg, "orden")),
+        deler.path == MIN_LISTE and _ett(valg, "vis") == ALLE,
+    )
+
+
+def _ett(valg: dict[str, list[str]], navn: str) -> str | None:
+    verdier = valg.get(navn, [])
+    return verdier[0] if len(verdier) == 1 else None
+
+
+def side_adresse(sti: str, sortering: Sortering | None, alle: bool = False) -> str:
+    """Adressen til oversikten eller Min liste, med «Alle» og sorteringen."""
+    valg = []
+    if alle:
+        valg.append(f"vis={ALLE}")
+    if sortering is not None:
+        valg += [f"sorter={sortering.kolonne}", f"orden={sortering.orden}"]
+    return sti + ("?" + "&".join(valg) if valg else "")
+
+
+@app.post("/min-liste/merk")
+def merk():
+    """Stjernen - story 8.3, FR-101, AD-3, AD-10. Merker aksjen eller tar
+    merket bort, og sender tilbake til samme side med sorteringen (303).
+
+    Som bryteren for KI-teksten: kommer forespoerselen med Origin, maa den
+    vaere denne siden. Webserveren skriver bare tabellen min_liste, gjennom
+    porten, og henter aldri noe (AD-10).
+    """
+    opphav = request.headers.get("Origin")
+    if opphav is not None and opphav.rstrip("/") != request.host_url.rstrip("/"):
+        abort(403)
+    if g.get("basefeil"):
+        return _basen_kan_ikke_aapnes()
+    if g.get("tilkobling") is None:
+        abort(404)
+    til = request.form.get("til")
+    if til not in (MERK, FJERN):
+        abort(400)
+    symbol = request.form.get("symbol", "")
+    try:
+        lager = SqliteMinlistelager(g.tilkobling)
+        (lager.merk if til == MERK else lager.fjern)(symbol)
+    except UkjentAksje:
+        abort(400)
+    except BASEFEIL as feil:
+        g.basefeil = _basefeil(feil)
+        return _basen_kan_ikke_aapnes()
+    # Gjennomgangen (BH5): tilbake til raden, ikke til toppen av siden.
+    # Symbolet er godtatt av porten, saa ankeret har bare kjente tegn.
+    return redirect(tilbake_etter_merking(request.form.get("tilbake")) + f"#rad-{symbol}", code=303)
 
 
 if __name__ == "__main__":
