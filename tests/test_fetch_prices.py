@@ -1806,50 +1806,60 @@ def kjoer_23_kode(raa, base, oeyeblikk, hent=None, nokkel=NOEKKEL, les_kvote=nok
 
 
 class TestTidskontrollen:
-    """Foer TIDSGRENSE, kl. 21:00 fra 19.10 (beslutningen 16.10 kl. 21:09),
-    paa en boersdag: 0 kall, med mindre flagget er gitt. Foer 19.10 var
-    grensen kl. 22:00."""
+    """Foer TIDSGRENSE, kl. 22:00 fra 20.10 (gruppens svar 19.10 kl. 22:19,
+    malinger.md §37), paa en boersdag: 0 kall, med mindre flagget er gitt.
+    19.10 var grensen kl. 21:00, og foer det kl. 22:00."""
 
-    def test_grensen_er_kl_21(self):
-        """Ville feilet med grensen tilbake paa 22:00 (mutant T1)."""
+    def test_grensen_er_kl_22(self):
+        """Ville feilet med grensen tilbake paa 21:00 (mutant G1) eller paa
+        22:01 (mutant G2)."""
         from datetime import time as klokkeslett
 
-        assert fp.TIDSGRENSE == klokkeslett(21, 0)
+        assert fp.TIDSGRENSE == klokkeslett(22, 0)
 
-    def test_boersdag_kl_20_59_59_gir_0_kall_og_nevner_flagget(self, stier):
-        """20:59:59 i Oslo er for tidlig. Ville feilet uten tidskontrollen (M1),
-        med noekkelen lest foerst (M5), eller med grensen paa 20:59."""
+    def test_boersdag_kl_21_59_59_gir_0_kall_og_nevner_flagget(self, stier):
+        """21:59:59 i Oslo er for tidlig. Ville feilet uten tidskontrollen (M1),
+        med noekkelen lest foerst (M5), eller med grensen paa 21:00 (G1)."""
         raa, base = stier
-        fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 18, 59, 59), ingen_kall, ingen_noekkel, ingen_kall)
+        fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 19, 59, 59), ingen_kall, ingen_noekkel, ingen_kall)
         assert fil is None and kall == []
         assert "--uten-tidskontroll" in ut and "0 kall brukt" in ut
-        assert "klokka er ikke 21:00 i Oslo" in ut and "Kjoer etter kl. 21:00" in ut
+        assert "klokka er ikke 22:00 i Oslo" in ut and "Kjoer etter kl. 22:00" in ut
         assert not raa.exists() and not base.exists()
 
-    def test_kl_20_59_gir_0_kall(self, stier):
-        """Stoppet av tidskontrollen, ikke av noe annet (gjennomgangen, BH12)."""
+    def test_kl_21_59_gir_0_kall(self, stier):
+        """Stoppet av tidskontrollen, ikke av noe annet (gjennomgangen 17.10,
+        BH12)."""
         raa, base = stier
-        fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 18, 59), ingen_kall, ingen_noekkel, ingen_kall)
+        fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 19, 59), ingen_kall, ingen_noekkel, ingen_kall)
         assert fil is None and kall == []
-        assert "klokka er ikke 21:00 i Oslo" in ut and "--uten-tidskontroll" in ut
+        assert "klokka er ikke 22:00 i Oslo" in ut and "--uten-tidskontroll" in ut
+
+    def test_kl_21_30_gir_0_kall(self, stier):
+        """Mellom 21:00 og 22:00, som 19.10 ble hentet, nektes fra 20.10. Ville
+        feilet med grensen tilbake paa 21:00 (mutant G1)."""
+        raa, base = stier
+        fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 19, 30), ingen_kall, ingen_noekkel, ingen_kall)
+        assert fil is None and kall == []
+        assert "klokka er ikke 22:00 i Oslo" in ut
 
     def test_grensen_er_foer_stoppen_for_nye_forsoek(self):
-        """Gjennomgangen, BH11: en endring av grensen kan ikke tomme vinduet
-        for nye forsoek (2.3b), som stopper kl. 23:50."""
+        """Gjennomgangen 17.10, BH11: en endring av grensen kan ikke tomme
+        vinduet for nye forsoek (2.3b), som stopper kl. 23:50."""
         assert fp.TIDSGRENSE < fp.KL_23_50
 
-    def test_kl_21_presis_henter(self, stier):
-        """Grensen er 21:00, ikke 21:01. Ville feilet med <= (M2, mutant T2)."""
+    def test_kl_22_presis_henter(self, stier):
+        """Grensen er 22:00, ikke 22:01. Ville feilet med <= (M2) eller med
+        grensen paa 22:01 (mutant G2)."""
         raa, base = stier
-        fil, kall, _ = kjoer_23(raa, base, _utc(2026, 9, 22, 19, 0))
+        fil, kall, _ = kjoer_23(raa, base, _utc(2026, 9, 22, 20, 0))
         assert fil == raa / "kurser-raa-2026-09-22.json"
         assert len(kall) == KALL
 
-    def test_kl_21_30_henter(self, stier):
-        """Mellom 21:00 og 22:00, som foer 19.10 ble nektet. Ville feilet med
-        grensen tilbake paa 22:00 (mutant T1)."""
+    def test_kl_22_30_henter(self, stier):
+        """En halvtime etter grensen henter."""
         raa, base = stier
-        fil, kall, _ = kjoer_23(raa, base, _utc(2026, 9, 22, 19, 30))
+        fil, kall, _ = kjoer_23(raa, base, _utc(2026, 9, 22, 20, 30))
         assert fil == raa / "kurser-raa-2026-09-22.json" and len(kall) == KALL
 
     def test_flagget_henter_foer_grensen_med_dagens_navn(self, stier):
@@ -1858,7 +1868,7 @@ class TestTidskontrollen:
         fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 10, 0), uten_tidskontroll=True)
         assert fil == raa / "kurser-raa-2026-09-22.json"
         assert len(kall) == KALL
-        assert "Henter foer kl. 21:00 (--uten-tidskontroll)" in ut
+        assert "Henter foer kl. 22:00 (--uten-tidskontroll)" in ut
 
     def test_dag_som_ikke_er_boersdag_har_ingen_tidskontroll(self, stier):
         """Loerdag kl. 12: basen avgjoer. Ville feilet hvis tidskontrollen
@@ -2185,28 +2195,29 @@ class TestVintertid:
     etter at sommertiden slutter 25.10. Ville feilet med klokka regnet i UTC
     (V1) eller med fast UTC+2 (V2)."""
 
-    def test_kl_21_30_i_oslo_etter_25_10_er_20_30_utc_og_henter(self, stier):
-        """Tirsdag 27.10 kl. 21:30 i Oslo er 20:30 UTC. Ville feilet med
-        klokka regnet i UTC (V1), som gir 20:30 og nekter. Foer 19.10 var
-        tidene 22:30 og 21:30."""
+    def test_kl_22_30_i_oslo_etter_25_10_er_21_30_utc_og_henter(self, stier):
+        """Tirsdag 27.10 kl. 22:30 i Oslo er 21:30 UTC. Ville feilet med
+        klokka regnet i UTC (V1), som gir 21:30 og nekter. 19.10 var tidene
+        21:30 og 20:30."""
         raa, base = stier
-        fil, kall, _ = kjoer_23(raa, base, _utc(2026, 10, 27, 20, 30))
+        fil, kall, _ = kjoer_23(raa, base, _utc(2026, 10, 27, 21, 30))
         assert fil == raa / "kurser-raa-2026-10-27.json"
         assert len(kall) == KALL
 
-    def test_kl_20_59_i_oslo_i_november_nekter(self, stier):
-        """Tirsdag 10.11 kl. 20:59 i Oslo er 19:59 UTC. Ville feilet med fast
-        UTC+2 (V2), som gir 21:59 og henter. Foer 19.10 var tidene 21:59 og
-        20:59."""
+    def test_kl_21_59_i_oslo_i_november_nekter(self, stier):
+        """Tirsdag 10.11 kl. 21:59 i Oslo er 20:59 UTC. Ville feilet med fast
+        UTC+2 (V2), som gir 22:59 og henter, eller med grensen paa 21:00 (G1).
+        19.10 var tidene 20:59 og 19:59."""
         raa, base = stier
-        fil, kall, ut = kjoer_23(raa, base, _utc(2026, 11, 10, 19, 59), ingen_kall, ingen_noekkel, ingen_kall)
+        fil, kall, ut = kjoer_23(raa, base, _utc(2026, 11, 10, 20, 59), ingen_kall, ingen_noekkel, ingen_kall)
         assert fil is None and kall == []
         assert "--uten-tidskontroll" in ut and "0 kall brukt" in ut
 
-    def test_kl_21_i_oslo_i_november_henter(self, stier):
-        """Tirsdag 10.11 kl. 21:00 i Oslo er 20:00 UTC, og er tidsnok."""
+    def test_kl_22_i_oslo_i_november_henter(self, stier):
+        """Tirsdag 10.11 kl. 22:00 i Oslo er 21:00 UTC, og er tidsnok. Ville
+        feilet med grensen paa 22:01 (G2)."""
         raa, base = stier
-        fil, kall, _ = kjoer_23(raa, base, _utc(2026, 11, 10, 20, 0))
+        fil, kall, _ = kjoer_23(raa, base, _utc(2026, 11, 10, 21, 0))
         assert fil == raa / "kurser-raa-2026-11-10.json" and len(kall) == KALL
 
 
