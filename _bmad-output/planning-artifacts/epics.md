@@ -2115,6 +2115,8 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 
 *Avgjort 2026-10-20 kl. 20:20 (gruppens svar):* advarselen mot `docker compose down -v` står synlig rett under pila til den ekte versjonen, så den kommer rett etter steg 9 når pila er åpen, og synes for alle når den er lukket. Det snur avvisningen av BH4 og ECH8 i triagen til 3.3h.
 
+*Lagt til 2026-10-20 kl. 20:42:* 3.3h er flettet i `fdbdf20`, PR #80, etter rettingene som svaret kl. 20:20 ba om: advarselen rett under pila til den ekte versjonen, og signalet først i «Ferdig» (rådets funn). Spesifikasjonen er `done`.
+
 ### Story 3.4: Demoversjonen
 
 *Lagt til 2026-10-03, Marians beslutning kl. 18:10.*

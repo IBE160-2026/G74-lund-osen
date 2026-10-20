@@ -2,7 +2,7 @@
 title: 'Story 3.3 (3.3h): README-en bak piler, og hjelpen som levende dokument'
 type: 'feature'
 created: '2026-10-20'
-status: 'review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 1
 baseline_commit: '013be41'
