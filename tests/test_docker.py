@@ -2082,9 +2082,11 @@ class TestReadmeForNybegynnere:
         for navn, punkter in lister.items():
             assert 1 <= len(punkter) <= 8, (navn, len(punkter))
         # Story 3.3h (gruppens svar 20.10 kl. 10:14-10:19): «Ferdig» er en
-        # kort liste over det appen kan, og hvert punkt er kort.
+        # kort liste over det appen kan, og hvert punkt er kort. Høyst 20
+        # ord fra 20.10, da signalet kom først i lista og demoen fikk tilbake
+        # «av de tre sjekkene» (rådets funn), innenfor 8 punkter. Var 16.
         for punkt in lister["Ferdig"]:
-            assert len(re.findall(r"\w+", punkt)) <= 16, punkt
+            assert len(re.findall(r"\w+", punkt)) <= 20, punkt
         # Gjennomgangen, ECH2: listene staar samlet, uten tomme linjer inni,
         # saa et punkt etter en tom linje ikke slipper unna grensen. Etter
         # listene kommer setningen om regelen kl. 14:48 (3.3g).
@@ -2112,7 +2114,7 @@ class TestReadmeForNybegynnere:
             # besto kontrollen vises, og kontrollen av børsdagen, står.
             "bare tekster som besto kontrollen",
             "med bryter",
-            "med kontroll av børsdagen",
+            "med børsdagskontroll",
             "kursene og hovedindeksen",
             "over tabellen på forsiden",
             # 2.9b og 2.9c (instruksjonen 18.10 kl. 17:04).
@@ -2121,7 +2123,8 @@ class TestReadmeForNybegynnere:
             # Gjennomgangen, VG1: resten av det som er flettet.
             "fra kl. 22 på børsdager",
             # Story 3.4b: KI-teksten i demoen er flettet.
-            "alle 10 fargekombinasjonene og ki-tekst laget med gemma",
+            # Rådets funn 20.10: demoen viser kombinasjonene av de tre sjekkene.
+            "alle 10 fargekombinasjonene av de tre sjekkene og ki-tekst laget med gemma",
             # Story 8.16: periodene i kursgrafen er flettet.
             "periodene i kursgrafen med «velg dag»",
             # Story 8.3: Min liste er flettet.
@@ -2681,6 +2684,26 @@ class TestReadmeBakPiler:
         for bilde in BILDENE.values():
             assert f"docs/bilder/readme/{bilde})" in synlig, bilde
         assert KOPIERINGEN in synlig and VELG_VEI in synlig
+
+    def test_ferdig_begynner_med_signalet(self):
+        """Rådets funn 20.10: «Ferdig» manglet selve signalet. Ville feilet
+        hvis det første punktet ikke nevnte de tre sjekkene trend, bevegelse
+        og interesse, styrken for hver aksje hver børsdag og
+        regelforklaringen på aksjesiden, eller hvis demolinja ikke sa «av de
+        tre sjekkene». Ordene er de koden bruker: sjekkene i aksjedetalj.py og
+        «Signalstyrke» og regelforklaringen på aksjesiden."""
+        status = _seksjonen(README.read_text(encoding="utf-8"), "Status")
+        ferdig = _statuslister(status)["Ferdig"]
+        foerste = ferdig[0].lower()
+        for ord_ in ("de tre sjekkene", "trend", "bevegelse", "interesse", "styrken for hver aksje", "hver børsdag"):
+            assert ord_ in foerste, ord_
+        assert "regelforklaringen på aksjesiden" in foerste
+        assert any("demoen med alle 10 fargekombinasjonene av de tre sjekkene" in p for p in ferdig), ferdig
+        aksjedetalj = (ROT / "src" / "aksjedetalj.py").read_text(encoding="utf-8")
+        for navn in ("Trend", "Bevegelse", "Interesse"):
+            assert f'"{navn}": f"' in aksjedetalj, navn
+        mal = (ROT / "src" / "templates" / "aksje.html").read_text(encoding="utf-8")
+        assert "Signalstyrke" in mal and "Regelforklaringen" in mal
 
     def test_pila_til_demoen_sier_at_den_er_anbefalt_for_faglaerer_og_sensor(self):
         """Svaret 19.10 kl. 14:46. Ville feilet hvis «anbefalt» falt ut av pila
