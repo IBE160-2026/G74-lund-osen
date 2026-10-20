@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-20T16:07
+updated: 2026-10-20T18:14
 ---
 
 # Kvalitetssikring
@@ -757,6 +757,8 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
 
 *Lagt til 2026-10-19 (story 3.3g, gruppens svar kl. 14:46 og 14:48):* «Kom i gang» anbefaler nå demoen for faglærer og sensor, og «(anbefalt)» står ikke lenger ved den ekte versjonen. Knappen for den lokale modellen under «Mer for den som vil» heter «Den lokale modellen for KI-teksten (valgfri)» og sier at den ikke trengs for demoen eller for å vurdere appen. Ingen kommando i «Kom i gang» er endret. README-prøven med ZIP-fila, senest én uke før innleveringen, er også funksjonsstoppen: det briefen ikke lover og som ikke er ferdig da, flettes ikke.
 
+*Lagt til 2026-10-20 (story 3.3h, gjennomgangen ECH7):* i «Kom i gang» står demoen og den ekte versjonen nå bak hver sin pil etter linja «Velg vei», og testeren klikker på pila før steg 5 i hver av dem. Stegene og kommandoene er de samme, så ingen rad i tabellene endres.
+
 ### Prøve 1
 
 - **Hvem som prøver:** åpent.
@@ -823,6 +825,8 @@ hentingen kan gi kurser, se «Når kan jeg hente?» i
 *Lagt til 2026-10-17:* fra 19.10 er det etter kl. 21 og før midnatt, og `docs/hjelp.md` sier det (beslutningen 16.10 kl. 21:09 under story 2.3, `malinger.md` §31). Det gjelder også steg 4 i tabellen under.
 
 *Lagt til 2026-10-20:* fra 20.10 er det etter kl. 22 og før midnatt igjen, og `docs/hjelp.md` sier det i en Rettet-linje under svaret (gruppens svar 19.10 kl. 22:19 under story 2.3, `malinger.md` §37). Det gjelder også steg 4 i tabellen under.
+
+*Rettet 2026-10-20 (story 3.3h, gjennomgangen ECH1 og VG1):* linja over sier at `docs/hjelp.md` har kl. 22 i en Rettet-linje under svaret. Fra 3.3h er hjelpen et levende dokument (gruppens svar 20.10 kl. 16:19), og selve svaret «Når kan jeg hente?» sier kl. 22. Rettet-linja er tatt ut.
 
 - **Hvem som prøver:** åpent.
 - **Dato og klokkeslett:**
