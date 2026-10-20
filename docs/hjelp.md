@@ -2,18 +2,12 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-19T23:19
+updated: 2026-10-20T18:13
 ---
 
 # Hjelp til «Kom i gang»
 
-Spørsmål og svar til «Kom i gang» i [README-en](../README.md), sortert etter steget de hører til. De vanligste står også i README-en, under «Står du fast?». Stegene 1–4 er felles for begge versjonene.
-
-*Rettet 2026-10-18 (story 3.3c):* «Demoen» står nå før «Den ekte versjonen», som i README-en, fordi faglærer prøver demoen (gruppen 16.10 kl. 21:16, svarene kl. 21:25). Svarene er de samme som før.
-
-*Rettet 2026-10-18 (gjennomgangen av 3.3c, BH10):* setningen over gjaldt flyttingen. Etter rettelsene i 3.3c er tre spørsmål nye under «Steg 4: mappa», og svarene «Ingenting skjer når jeg limer inn.» og «Hva skal jeg se etter i vinduet?» har fått mer tekst. Ingen svar har mistet tekst.
-
-*Lagt til 2026-10-19 (story 3.3g):* README-en anbefaler nå demoen for faglærer og sensor (gruppens svar kl. 14:46), og overskriften der heter «Den ekte versjonen», uten «(anbefalt)». Rekkefølgen og svarene her er de samme.
+Spørsmål og svar til «Kom i gang» i [README-en](../README.md), sortert etter steget de hører til. De vanligste står også i README-en, under «Står du fast?». Stegene 1–4 er felles for begge versjonene, og demoen står før den ekte versjonen, som i README-en.
 
 ## Steg 1: Docker Desktop
 
@@ -125,17 +119,15 @@ Under den kan det komme en linje med valg fra Docker. La terminalvinduet stå å
 
 Sidene sier «Eksempeltall»: 15 oppdiktede selskaper med kurser til fredag 9. oktober 2026, ikke data fra Oslo Børs. Under merket står en tabell med aksjer, og du klikker på et selskapsnavn for å se aksjen. Demoen trenger verken `.env` eller nøkkel, og gjør ingen kall. Aksjesiden viser KI-teksten for siste dag, laget én gang med Gemma og lagret i repoet, så demoen trenger ikke Ollama. Demobasen lages på nytt hver gang demoen starter, i sitt eget volum, `ose-demo`. Den ekte basen røres ikke. Mens demoen kjører, kan demobasen også lages på nytt med `docker compose run --rm demo-lag` i et nytt terminalvindu, fra samme mappe.
 
-*Lagt til 2026-10-19 (story 8.3):* øverst på sidene står knappene «Markedsoversikt» og «Min liste», og knappen for siden du står på, er fylt. Stjernen foran et selskap legger aksjen i Min liste, og et nytt trykk tar den ut. Demoen starter med fem merket, og siden demobasen lages på nytt hver gang demoen starter, er det de samme fem neste gang. I den ekte versjonen starter lista tom, og merkingen blir liggende til du tar den bort.
+Øverst på sidene står knappene «Markedsoversikt» og «Min liste», og knappen for siden du står på, er fylt. Stjernen foran et selskap legger aksjen i Min liste, og et nytt trykk tar den ut. Demoen starter med fem merket, og siden demobasen lages på nytt hver gang demoen starter, er det de samme fem neste gang. I den ekte versjonen starter lista tom, og merkingen blir liggende til du tar den bort.
 
-*Lagt til 2026-10-19 (story 8.3, gjennomgangen):* har du en demobase fra før 8.3 utenfor Docker, viser sidene «Siden kan ikke vises» med `RuntimeError`. Lag den på nytt med `uv run python src/demo.py`. I Docker lages den på nytt hver gang demoen starter.
+Har du laget demobasen utenfor Docker før 20.10, da Min liste kom, viser sidene «Siden kan ikke vises» med `RuntimeError`. Lag den på nytt med `uv run python src/demo.py`. I Docker lages den på nytt hver gang demoen starter.
 
 ## Den ekte versjonen
 
 ### Hva med nøkkelen?
 
-Du trenger en egen gratis API-nøkkel fra [EODHD](https://eodhd.com/register), fordi vilkårene ikke lar oss dele vår. Den gir 20 kall i døgnet, og en henting bruker 16: ett per aksje og ett for hovedindeksen. Åpne `.env` i en teksteditor (`notepad .env` på Windows, `open -e .env` på macOS, `nano .env` på Linux) og lim den inn etter `EODHD_API_KEY=`. `cp` skriver over en `.env` som finnes, så kopier bare første gang. Webserveren starter uten `.env` og bruker aldri kvote: den leser bare fra basen. Bare hentingen trenger nøkkelen, og `docker compose run --rm hent` starter ikke uten `.env`.
-
-*Lagt til 2026-10-19 (story 8.3):* webserveren skriver nå én ting i basen, merkingen i Min liste, når du trykker på stjernen. Den henter fortsatt aldri og bruker aldri kvote.
+Du trenger en egen gratis API-nøkkel fra [EODHD](https://eodhd.com/register), fordi vilkårene ikke lar oss dele vår. Den gir 20 kall i døgnet, og en henting bruker 16: ett per aksje og ett for hovedindeksen. Åpne `.env` i en teksteditor (`notepad .env` på Windows, `open -e .env` på macOS, `nano .env` på Linux) og lim den inn etter `EODHD_API_KEY=`. `cp` skriver over en `.env` som finnes, så kopier bare første gang. Webserveren starter uten `.env`, henter aldri og bruker aldri kvote. Den skriver bare én ting i basen, merkingen i Min liste, når du trykker på stjernen. Bare hentingen trenger nøkkelen, og `docker compose run --rm hent` starter ikke uten `.env`.
 
 ### Hvorfor bare 15 aksjer?
 
@@ -143,9 +135,7 @@ Kursene kommer fra EODHD, og den gratis nøkkelen gir 20 kall i døgnet. Hver ak
 
 ### Når kan jeg hente?
 
-Hent etter kl. 21 og før midnatt på en børsdag. Første gang kan du også hente i helgen: da henter den siste børsdag, fordi basen mangler den. På dagtid en børsdag stopper hentingen med 0 kall og sier hvorfor: dagens sluttkurs er ikke klar ennå, og en vurdering kan ikke fylles inn senere. Har basen alt kursene for børsdagen, bruker den også 0 kall. På en dag børsen er stengt henter den bare hvis basen mangler forrige børsdag. Mangler noen aksjer dagens kurs etter hentingen, sier den hvilke. Kjør samme kommando igjen senere samme kveld, så prøver den bare dem, med kallene som er til overs etter hentingen (20 minus ett per aksje og ett for hovedindeksen, altså 4 med de 15), aldri bonuskvoten og ikke etter kl. 23:50. Hovedindeksen prøves ikke på nytt samme kveld. Før kallene leser den kvoten med `/api/user`, som er gratis.
-
-*Rettet 2026-10-20:* fra tirsdag 20.10 henter du etter kl. 22 og før midnatt på en børsdag, ikke etter kl. 21. Også mellom kl. 21 og 22 stopper hentingen med 0 kall og sier hvorfor, som på dagtid. Raden fra kl. 21 var ikke alltid endelig, og en vurdering kan ikke fylles inn på nytt. Resten av svaret står.
+Hent etter kl. 22 og før midnatt på en børsdag. Første gang kan du også hente i helgen: da henter den siste børsdag, fordi basen mangler den. Før kl. 22 en børsdag stopper hentingen med 0 kall og sier hvorfor: dagens sluttkurs er ikke klar ennå, og en vurdering kan ikke fylles inn senere. Har basen alt kursene for børsdagen, bruker den også 0 kall. På en dag børsen er stengt henter den bare hvis basen mangler forrige børsdag. Mangler noen aksjer dagens kurs etter hentingen, sier den hvilke. Kjør samme kommando igjen senere samme kveld, så prøver den bare dem, med kallene som er til overs etter hentingen (20 minus ett per aksje og ett for hovedindeksen, altså 4 med de 15), aldri bonuskvoten og ikke etter kl. 23:50. Hovedindeksen prøves ikke på nytt samme kveld. Før kallene leser den kvoten med `/api/user`, som er gratis.
 
 ### Oversikten er tom.
 
@@ -192,8 +182,6 @@ Docker Hub begrenser hvor ofte samme IP-adresse kan laste ned uten innlogging. P
 ### «port is already allocated», «address already in use» eller «ports are not available».
 
 Noe annet bruker port 8000. Kjører den andre versjonen, stopper du den først (se «Bytte mellom demoen og den ekte versjonen» under «Mer for den som vil»). «Mer for den som vil» står i [README-en](../README.md).
-
-*Rettet 2026-10-18 (story 3.2b):* appen bruker port 8000 fra 18.10, etter gruppens svar kl. 17:40. AirPlay-mottakeren bruker 5000 og er ikke i veien lenger, så setningen om AirPlay er tatt ut av svaret over (gruppens svar kl. 18:58). Før sto det: «På Mac bruker AirPlay-mottakeren (AirPlay Receiver) port 5000. Slå den av under Systeminnstillinger (System Settings) → Generelt (General) → AirDrop og Handoff (AirDrop & Handoff), og prøv igjen.»
 
 ## Stopp
 

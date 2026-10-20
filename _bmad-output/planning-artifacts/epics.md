@@ -2004,6 +2004,8 @@ Som **bruker på Mac**, vil jeg at appen starter uten at jeg må slå av noe, s�
 
 *Lagt til 2026-10-18 kl. 19:07:* appen bruker port 8000, flettet i `3f1c789`, PR #68 (spesifikasjonen `spec-3-2b-port-8000.md`). Setningen om AirPlay er tatt ut av svaret om porten i `docs/hjelp.md` (gruppens svar kl. 18:58), og står ordrett i en Rettet-linje. CI var grønn på head-en `b4eaa7d` (kjøring 39147924016) og på main (39148045129).
 
+*Lagt til 2026-10-20 (story 3.3h, gjennomgangen ECH4):* punkt b over og linja over sier at setningen om AirPlay får eller står i en Rettet-linje i `docs/hjelp.md`. Fra 3.3h er hjelpen et levende dokument (gruppens svar 20.10 kl. 16:19 under story 3.3), og setningen står bare i git.
+
 
 ### Story 3.3: README — «Slik kjører du den»
 
