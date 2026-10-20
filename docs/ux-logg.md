@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-10-20T16:32
+updated: 2026-10-20T18:14
 ---
 
 # UX-loggen
@@ -480,3 +480,5 @@ Hvert funn er slått opp i koden 20.10 før det ble skrevet.
 | U5 | 19.10, gjennomgangen av 8.16b (ECH4) | Aksjesiden | Hjelpen ved «?» på Sluttkurs sier «siste børsdag i dataene», også når en annen dag er valgt, og sier ikke hvilken dag siden viser. | `"sluttkurs"` i [`hjelpetekster.py`](../src/hjelpetekster.py); ECH4 i [`spec-8-16b-dagen-paa-hele-siden.md`](../_bmad-output/implementation-artifacts/spec-8-16b-dagen-paa-hele-siden.md) | 2.7b, etter instruksjonen 20.10 kl. 16:23. 2.7b står ikke i `epics.md` ennå |
 | U6 | 19.10, rådet | Aksjesiden (demoen) | For en tidligere dag sier KI-delen «Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.» Demoen har KI-tekst bare for siste dag, så grunnen stemmer ikke der. | `INGEN_RAD` i [`ki_visning.py`](../src/ki_visning.py); prøvd på `/aksje/KVST?dag=2026-10-08` i en demobase i en midlertidig mappe | 8.2 |
 | U7 | 20.10, gruppen | README-en | README-en er lang å lese: 419 linjer og om lag 3 800 ord 20.10. | [`README.md`](../README.md) | 3.3h, etter instruksjonen 20.10 kl. 16:23, avgjort kl. 10:14–10:19. Verken 3.3h eller avgjørelsen står i `epics.md` ennå |
+
+*Lagt til 2026-10-20 (story 3.3h, gjennomgangen VG6 og ECH10):* avgjørelsen kl. 10:14, 10:15, 10:18 og 10:19 og svaret kl. 16:19 står under story 3.3 i `epics.md` fra `49e9041`, og U7 bygges i [`spec-3-3h-readme-bak-piler-og-levende-hjelp.md`](../_bmad-output/implementation-artifacts/spec-3-3h-readme-bak-piler-og-levende-hjelp.md). Fra 3.3h har `docs/hjelp.md` ingen Rettet-linjer, så radene i del a som nevner en Rettet-linje i hjelpen, om AirPlay og om kl. 22, beskriver det som gjaldt før 3.3h. Svaret «Når kan jeg hente?» sier kl. 22 selv. README-en hadde 419 linjer etter `wc -l` og om lag 3 800 ord. Den blir ikke kortere i linjer, men kortere å lese, fordi mer står bak en pil.
