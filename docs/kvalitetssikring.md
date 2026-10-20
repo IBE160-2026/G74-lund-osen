@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-19T16:55
+updated: 2026-10-20T10:18
 ---
 
 # Kvalitetssikring
@@ -273,6 +273,7 @@ sist i dokumentet.
 | 8.0c Tydelig merking | `82271fb` (#35), `16e18d8` (#36) | 1 (25) | – | `S/spec-8-0c-tydelig-merking-ord-ved-sjekkene-og-datoer-paa-grafen.md` |
 | 8.0d Utseendet | `e862743` (#39), `179b415` (#40), `8c9f8b7` (#41), `f7c5e64` (#42) | 1 (47) | – E9–E11 ble kjørt senere, fordi maskinen hadde for lite minne. M2 og M8 trengte en testfil til | `S/spec-8-0d-utseendet-fra-designforslaget.md` |
 | 8.0e Oversikten | `85fe8a4` (#37), `cfc373e` (#38) | 1 (16) | – | `S/spec-8-0e-oversikten-fra-designforslaget.md` |
+| 8.3 Min liste | `e02240a` (#78) | 1 (6, M1–M3 og N1–N3) | M1 og M2 ble først fanget av hele fila, men ikke av testen sin alene, på `203be21`. Testene ble gjort sterkere i `9b3f7fa`, og alle seks ble kjørt på `b01871f` | `S/spec-8-3-min-liste.md` |
 | 8.15 Sortering | `a13d273` (#43) | 1 (16, og 5 tester fra gjennomgangen prøvd som mutanter) | – | `S/spec-8-15-sortering-ved-klikk-i-kolonneraden.md` |
 | 8.15b Selskap og den sorterte kolonnen | `b6449ac` (#73) | 1 (5, M1–M3 og N1–N2) | M1–M3 ble kjørt på `b5f2400` og på nytt etter rettingene | `S/spec-8-15b-selskap-og-den-sorterte-kolonnen.md` |
 | 8.16 Startdagen og periodene i kursgrafen | `be05337` (#72) | 1 (8, P1–P4 og Q1–Q4) | P1–P4 ble kjørt på `697f459` og på nytt etter rettingene. Testen for bildet feilet på commiten for b til bildet ble tatt på nytt i c | `S/spec-8-16-periodene-i-kursgrafen.md` |
@@ -478,6 +479,7 @@ funn. Antall rader i loggen:
 | 8.0d, svarene 15.10 | 14 | 5 | 7 | – |
 | 8.0e, PR 1 | 13 | 7 | 6 | – |
 | 8.0e, PR 2 | 11 | 4 | 7 | – |
+| 8.3 | 33 | 20 | 13 | – |
 | 8.15 | 19 | 11 | 7 | 1 |
 | 8.15b | 26 | 11 | 15 | – |
 | 8.16 | 29 | 15 | 13 | 1 |
@@ -1184,6 +1186,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 8.0c | 25, i PR #35 og #36 | M7 og M8 `test_merket_staar_paa_samme_x_som_punktet_for_dagen`, M24 `test_noen_mangler_vurdering_gir_begge_setningene`, M25 `test_datoen_skrives_som_dd_mm`; resten i tabellen | `S/spec-8-0c-…` |
 | 8.0d | 47, i PR 1, 2, 2b og 3 | testene står per mutant i tabellene i spesifikasjonen | `S/spec-8-0d-…` |
 | 8.0e | M1–M8 og P1–P8 | testene står per mutant i tabellene i spesifikasjonen | `S/spec-8-0e-…` |
+| 8.3 | M1–M3 og N1–N3 | M1 `test_merkingen_overlever_en_omstart`, M2 `test_filteret_endrer_ikke_rekkefoelgen`, M3 `test_en_post_fra_en_annen_side_gir_403`, N1 `test_alle_er_samme_tabell_ogsaa_naar_ingen_skilte_seg_ut`, N2 `test_oevrige_har_overskriften_naar_bare_de_er_merket`, N3 `test_antallet_teller_bare_merkede_med_en_rad` | `S/spec-8-3-…` |
 | 8.15 | S1–S13 og T1–T3 | testene står per mutant i tabellen i spesifikasjonen | `S/spec-8-15-…` |
 | 8.15b | M1–M3 og N1–N2 | testene står per mutant i spesifikasjonen | `S/spec-8-15b-…` |
 | 8.16 | P1–P4 og Q1–Q4 | testene står per mutant i spesifikasjonen | `S/spec-8-16-…` |
