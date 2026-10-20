@@ -2699,6 +2699,38 @@ Det vi lærte: en mutant som overlever, kan vise et hull i koden og ikke bare i 
 
 ---
 
+## 19.10.2026 – Den norske investorsiden, og tilbake til kl. 22
+
+*Joakim og Marian.*
+
+Kl. 16:03 godkjente vi adressene til investorsidene for de 15 aksjene etter rådets forslag (`6f8bd2d`, story 10.5). Lista fulgte ikke designregelen om at lenken går til den norske siden når den finnes (`designregler.md`). Etter en sjekk av alle 15 byttet vi tre: AKRBP, VAR og GJF. EQNR og NHY har bare en norsk side som viser til den engelske, og de andre tolv står (svaret kl. 19:49, ført i `cac8abd`). Rådet sjekket ikke dette før lista kl. 16:03. Lenken bygges i 10.5, som ikke er påbegynt.
+
+«Kom i gang» anbefaler nå demoen for faglærer og sensor, og den lokale modellen er merket valgfri (svaret kl. 14:46). «Neste» i «Status» er delt i det briefen v8 lover og det som kommer i tillegg (svaret kl. 14:48). Det ble flettet i `855ba75` (3.3g, PR #77). Samme ettermiddag ble endelig v1 det briefen v8 lover, og 24 storyer ble ekstra (svaret kl. 15:43, `6ec047f`).
+
+Kveldens henting var den første fra kl. 21:00 og den første dagen med KI-tekst i uka med logget drift: kode 0, 16 kall, og 15 tekster fra `gemma4:e4b` som alle besto kontrollen (`21f904c`). Med de 4 kallene som var igjen, hentet vi DNO, MOWI, GJF og AKRBP på nytt kl. 22:00. For DNO var volumet endret, så raden fra kl. 21 var ikke endelig (`1640b97`, `malinger.md` §37). Vurderingen for DNO ble den samme da den ble regnet på nytt uten kall (`53b598d`). Likevel valgte vi kl. 22:19 å gå tilbake til kl. 22:00 fra 20.10, fordi en vurdering ikke kan skrives om (AD-7).
+
+Min liste (8.3) stoppet etter spesifikasjonen kl. 20:22, fordi koden ikke rakk å bli bygget og testet før byggestoppen. Den ble bygget ferdig etter målingen, og PR #78 sto klar kl. 23:35 med alle seks mutantene fanget (`7bcebf5`).
+
+Det vi lærte: et forslag fra KI-en sjekkes mot våre egne regler før vi sier ja, også en liste med adresser vi har åpnet. Én aksje med en annen rad er nok til å flytte hentingen, når det som skrives, ikke kan rettes. Et stopp før byggestoppen er bedre enn kode som ikke er testet.
+
+---
+
+## 20.10.2026 – En retting som tok bort signalet, og kallene til måling
+
+*Joakim og Marian.*
+
+Min liste ble flettet i `e02240a` (8.3, PR #78) etter at migrasjonen 0007 ble prøvd på en kopi av basen. Den ga versjon 7 med like mange rader i kurs, vurdering, indeks og ki_logg, og en tom `min_liste`. Like etter var CI rød på main. En linje i vurderingsmatrisen viste til testen for omstarten uten klassen `TestLagringen`, så `test_hver_test_dokumentene_nevner_finnes` fant den ikke. Testene for dokumentene var kjørt før linja ble skrevet, ikke etter. Stien ble rettet i `597e093`, uten en Rettet-linje, og Rettet-linja kom i `013be41`.
+
+Hentingen gikk tilbake til kl. 22:00 på børsdager (`54a4c51`, PR #79). UX-loggen samler det vi har sett og gjort for brukeropplevelsen fra starten, og har sju åpne funn, U1–U7, før brukertesten (`2206a0d`).
+
+README-en står nå bak piler: demoen, den ekte versjonen, dokumentlista, mappestrukturen og installasjonen av uv (3.3h). `docs/hjelp.md` er et levende dokument som rettes der teksten står, uten daterte linjer (svaret kl. 16:19). I triagen var funnet BH4/ECH8 avvist: advarselen mot `docker compose down -v` synes først når pila til den ekte versjonen åpnes. Kl. 20:20 snudde vi det, og advarselen står nå synlig rett under pila (`48d6d7a`). Rådet så også at en retting fra gjennomgangen hadde tatt signalet ut av «Ferdig». Nå begynner lista med de tre sjekkene, styrken og regelforklaringen (`94db900`). PR #80 ble flettet i `fdbdf20`.
+
+Kveldens henting var den andre dagen med KI-tekst: kode 0, 16 kall, og 15 tekster som alle besto kontrollen (`1a2e7b7`). Rådet foreslo å la de 4 kallene som var igjen, gå ut. Kl. 22:41 holdt vi fast ved regelen om at kallene som er igjen etter hentingen, går til måling, og kl. 22:42 avgjorde vi hva de skulle måle. FRO, MOWI, TEL og AKRBP ble hentet på nytt kl. 22:48 og var like kursfila fra kl. 22 i alle sju feltene (`884252e`, `malinger.md` §38).
+
+Det vi lærte: en avvisning i triagen er et forslag, og det er vi som bestemmer. En retting kan ta bort noe viktig, så vi leser resultatet og ikke bare rettingen. Tekst for brukere rettes der den står, og historikken ligger i git. Testene for dokumentene kjøres etter siste endring, også etter en liten linje.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
