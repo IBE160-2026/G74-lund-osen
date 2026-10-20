@@ -2107,6 +2107,10 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 
 *Lagt til 2026-10-19 kl. 16:55:* README-en anbefaler demoen for faglærer og sensor, den lokale modellen er merket valgfri, og «Status» har «Neste i v1» og «Ekstra, hvis tiden rekker», flettet i `855ba75`, PR #77 (spesifikasjonen `spec-3-3g-readme-demoen-anbefales.md`).
 
+*Avgjort 2026-10-20 kl. 10:14, 10:15, 10:18 og 10:19 (gruppens svar):* README-en blir kortere å lese, med mer bak en pil som foldes ut: de felles stegene står åpent, og demoen og den ekte versjonen står bak hver sin pil; «Dokumentene», «Mappestruktur» og installasjonen av uv står bak en pil; «Status» står åpent, og «Ferdig» blir en kort liste over det appen kan. Alt står i én fil, som virker fra ZIP-fila (spesifikasjonen 3.3h).
+
+*Avgjort 2026-10-20 kl. 16:19 (gruppens svar):* `docs/hjelp.md` er et levende dokument som README-en: teksten rettes der den står, og historikken ligger i git, fordi hjelpen leses av brukere. De andre dokumentene får fortsatt en Rettet-linje.
+
 ### Story 3.4: Demoversjonen
 
 *Lagt til 2026-10-03, Marians beslutning kl. 18:10.*

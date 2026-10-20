@@ -105,6 +105,10 @@ et sitat som ikke fantes».
     trenger ikke egen linje. Endres koden slik at noe README-en sier om den,
     ikke lenger stemmer, rettes README-en i samme commit. `tests/test_readme.py`
     sjekker at hver lenke i README-en peker på noe som finnes.
+    *Lagt til 2026-10-20 (gruppens svar kl. 16:19):* `docs/hjelp.md` er et
+    levende dokument som README-en. Teksten rettes der den står, og
+    historikken ligger i git, fordi hjelpen leses av brukere. De andre
+    dokumentene får fortsatt en Rettet-linje.
 20. **Felles arbeid står på begge.** Vi diskuterer og avgjør arbeidet sammen, og
     det meste skrives inn på én maskin. Hver commit får derfor den av oss som
     ikke committer, som medforfatter. Linjen står nederst i meldingen, i samme
