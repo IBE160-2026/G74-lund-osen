@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-20T18:14
+updated: 2026-10-20T20:42
 ---
 
 # Kvalitetssikring
@@ -264,6 +264,7 @@ sist i dokumentet.
 | 3.3e Bildet av oversikten, uv i «Tester» og variablene i .env | `c5464e7` (#70) | 1 (8, E1–E8) | E5 traff ikke linja første gang og ble kjørt på nytt. E8 er bildet fra før gruppens svar kl. 21:42 | `S/spec-3-3e-bildet-uv-og-variablene.md` |
 | 3.3f Bildene av appen bak en knapp | `208d086` (#75) | 1 (4, M1–M3 og N1) | Første forsøk på å kjøre M1–M3 på nytt la ikke inn noen mutant (feil i skriptet) og ble gjort om | `S/spec-3-3f-bildene-av-appen-bak-en-knapp.md` |
 | 3.3g README-en anbefaler demoen, og regelen for omfanget | `855ba75` (#77) | 1 (7, M1, M2a, M2b, M3 og N1–N3) | Med `-x` fanget en eldre test M1 og M2a først. Alle sju ble også kjørt mot de nye testene alene | `S/spec-3-3g-readme-demoen-anbefales.md` |
+| 3.3h README-en bak piler, og hjelpen som levende dokument | `fdbdf20` (#80) | 1 (7, M1–M7) | – M1–M5 ble kjørt på `3042a7f` og `8e551a1`, M6 og M7 på `94db900` etter svaret kl. 20:20 | `S/spec-3-3h-readme-bak-piler-og-levende-hjelp.md` |
 | 3.4 Demoversjonen | `0ed87be` (#26), `59c0baf` (#27), `4464a10` (#30), `4c01a7e` (#31), `41a9df7` (#32), `1ead55a` (#33), `dfe6884` (#34) | 1 (#26: 24, #27: 28, #30: 17, 16, 16, 10 og 6, #31: 4, #32–#34: 2 hver) | M20 i #26 og H12 og H13 i #30 overlevde først. T9 ble forkastet, og B6 ble ikke kjørt ferdig. Spesifikasjonen står i review | `S/spec-3-4-demoversjonen.md` |
 | 3.4, alle 10 Kombinasjonene på siste demodag | `f21f927` (#58) | 1 (4, R1–R4) | – | `S/spec-3-4-alle-ti-kombinasjonene-paa-siste-demodag.md`, «Mutantene» |
 | 3.4b KI-tekstene i demoen | `ab81d3f` (#69) | 1 (6, K1–K6) | K2 og K3 traff ikke første gang og ble laget på nytt. K6 ble fanget av fiksturen | `S/spec-3-4b-ki-tekstene-i-demoen.md` |
@@ -460,6 +461,7 @@ funn. Antall rader i loggen:
 | 3.3e | 22 | 15 | 7 | 0 |
 | 3.3f | 22 | 6 | 15 | 1 |
 | 3.3g | 29 | 13 | 16 | – |
+| 3.3h | 25 | 20 | 4 | – |
 | 3.4, PR #26 | 21 | 14 | 5 | 1 |
 | 3.4, PR #27 | 22 | 12 | 8 | 2 |
 | 3.4, PR #30, første runde | 29 | 25 | 4 | – |
@@ -1192,6 +1194,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 3.3e | E1–E8 | E1 `test_bildene_er_de_tre_fra_gjennomgangen_og_ci_merket`, E2 og E5 `test_bildet_tas_paa_nytt_naar_oversikten_endres`, E3 `test_testene_uten_docker`, E4 `test_variablene_i_tabellen_er_de_i_env_example`, E6 `test_installasjonen_av_uv_staar_foer_uv_sync`, E7 `test_porten_er_den_samme_overalt_og_ikke_5000` og `test_standardene_i_tabellen_er_de_i_koden`, E8 `test_fila_finnes_og_er_1280_px_bred_og_1573_px_hoey` | `S/spec-3-3e-…` |
 | 3.3f | M1–M3 og N1 | testene står per mutant i spesifikasjonen | `S/spec-3-3f-…` |
 | 3.3g | M1, M2a, M2b, M3 og N1–N3 | M1 og N1 `test_kom_i_gang_anbefaler_demoen_for_faglaerer_og_sensor`, M2a og M2b `test_delen_om_den_lokale_modellen_sier_at_den_er_valgfri`, M3, N2 og N3 `test_ingen_av_de_ekstra_staar_under_neste_i_v1` | `S/spec-3-3g-…` |
+| 3.3h | M1–M7 | M1 `test_de_felles_stegene_staar_ikke_bak_en_pil`, M2 `test_pila_til_demoen_sier_at_den_er_anbefalt_for_faglaerer_og_sensor`, M3 `test_hvert_steg_hver_kommando_og_hver_lenke_fra_foer_finnes`, M4 `test_markdown_inne_i_pilene_vises_riktig_paa_github`, M5 `test_hjelpen_sier_klokkeslettet_fra_tidsgrensen_og_har_ingen_daterte_linjer`, M6 `test_advarselen_mot_down_v_staar_synlig`, M7 `test_ferdig_begynner_med_signalet` | `S/spec-3-3h-…` |
 | 3.4 | PR #26–#34 | testene står per mutant i tabellene i spesifikasjonen for PR #26, #27 og #30; for #31–#34 nevner avsnittene testen, som `test_hvorfor_bare_15_aksjer` og `test_til_faglaerer_lenker_til_briefen_med_gjeldende_tag` | `S/spec-3-4-demoversjonen.md` |
 | 3.4, alle 10 | R1–R4 | med hele fila `test_kursene_har_samme_fingeravtrykk_paa_alle_plattformer`, med bare klassen `test_alle_ti_kombinasjonene_paa_sluttdato` | `S/spec-3-4-alle-ti-…` |
 | 3.4b | K1–K6 | K1 `test_grunnlaget_stemmer_med_demodagen`, K2 `test_hver_tekst_demoen_viser_bestaar_kontrollen_slik_den_er_naa`, K3 `test_skriver_radene_uten_nett_og_uten_ollama`, K4 `test_en_kjoering_som_ikke_er_hel_skriver_ikke_fila`, K5 `test_en_oedelagt_fil_gir_en_demo_uten_ki_tekst`, K6 fiksturen `radene` i `tests/test_demo_ki.py` | `S/spec-3-4b-…` |
