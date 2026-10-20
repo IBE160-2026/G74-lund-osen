@@ -2113,6 +2113,8 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 
 *Avgjort 2026-10-20 kl. 16:19 (gruppens svar):* `docs/hjelp.md` er et levende dokument som README-en: teksten rettes der den står, og historikken ligger i git, fordi hjelpen leses av brukere. De andre dokumentene får fortsatt en Rettet-linje.
 
+*Avgjort 2026-10-20 kl. 20:20 (gruppens svar):* advarselen mot `docker compose down -v` står synlig rett under pila til den ekte versjonen, så den kommer rett etter steg 9 når pila er åpen, og synes for alle når den er lukket. Det snur avvisningen av BH4 og ECH8 i triagen til 3.3h.
+
 ### Story 3.4: Demoversjonen
 
 *Lagt til 2026-10-03, Marians beslutning kl. 18:10.*
