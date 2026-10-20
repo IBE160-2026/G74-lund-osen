@@ -1533,6 +1533,8 @@ Oppgaveplanlegging beskrives i README (regel 19).
 
 *Lagt til 2026-10-20 kl. 16:07:* hentingen tilbake til kl. 22:00 på børsdager er squash-flettet i `54a4c51`, PR #79, låst til head-en `1eb5f6c` (spesifikasjonen `spec-2-3-hentingen-fra-kl-22.md`). Hele settet på `1eb5f6c`: 2763 bestått og 17 hoppet over. CI var grønn på head-en (39435878366). Grenen er slettet på GitHub. Mutantene G1 (grensen tilbake på kl. 21:00) og G2 (grensen på kl. 22:01) ble fanget.
 
+*Avgjort 2026-10-20 kl. 22:41 (gruppens svar):* kallene som er igjen etter kveldens henting, brukes til måling, som regelen om måling med kall til overs i `prd.md` sier. Rådet foreslo å la de fire gå ut, fordi ingen av de 20 i §36 var over 25 MNOK, og vi holdt fast ved regelen. Hva de skulle måle, avgjorde vi kl. 22:42 (§38).
+
 *Lagt til 2026-10-20 kl. 22:48 (målingen etter svaret 20.10 kl. 22:41 og 22:42, `malinger.md` §38):* FRO, MOWI, TEL og AKRBP, de fire med volumforholdet nærmest 1,5 i vurderingene for 20.10, ble hentet på nytt kl. 22:48. Alle fire er like kursfila fra kl. 22 i alle sju feltene, så ingen vurdering måtte regnes på nytt. 4 kall av dagskvoten, og bonuskvoten er ikke brukt.
 
 ### Story 2.3b: Kallene som er igjen, brukes på nye forsøk
@@ -2705,6 +2707,8 @@ brevet 21.09 og purringen 22.09 ikke er besvart. Tittelen står.
 - **Ville feilet hvis:** en lenke til et av Euronexts nettsteder kom inn i en mal
 
 *Avgjort 2026-10-19 kl. 16:03 (gruppens svar):* adressene til investorsidene er åpnet og godkjent: EQNR https://www.equinor.com/investors, DNB https://www.ir.dnb.no/, KOG https://www.kongsberg.com/investor-relations/, AKRBP https://akerbp.com/en/investor/, NHY https://www.hydro.com/en/global/investors/, FRO https://www.frontlineplc.cy/investor-relations/, VAR https://varenergi.no/en/investor/, TEL https://www.telenor.com/investors/, YAR https://www.yara.com/investor-relations/, MOWI https://mowi.com/investors/, ORK https://www.orkla.com/investors/, SALM https://www.salmar.no/en/investor/, GJF https://www.gjensidige.com/investor-relations/, DNO https://www.dno.no/en/investors/ og MPCC https://www.mpc-container.com/investors/.
+
+*Avgjort 2026-10-19 kl. 19:49 (gruppens svar):* `designregler.md` sier at lenken går til den norske investorsiden når den finnes, og tre har en: AKRBP https://akerbp.com/investor/, VAR https://varenergi.no/no/investor/ og GJF https://www.gjensidige.com/no/investorinformasjon. De tre byttes, og de andre tolv står. EQNR og NHY har bare en norsk side som viser til den engelske. Rådet sjekket ikke dette før lista kl. 16:03. I demoen står en kort tekst der lenken står: selskapet er oppdiktet og har ingen investorside, og i den ekte versjonen står lenken her. Det bygges i 10.5.
 
 ### Story 10.6: KI-teksten om dagen på forsiden
 
