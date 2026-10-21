@@ -2731,6 +2731,22 @@ Det vi lærte: en avvisning i triagen er et forslag, og det er vi som bestemmer.
 
 ---
 
+## 21.10.2026 – Et svar som ikke var ført, og historikken på aksjesiden
+
+*Joakim og Marian.*
+
+Instruksjonen om 2.7b kom 20.10 kl. 23:24 og stoppet i steg 0, før noe ble skrevet. Den bygde på svarene 19.10 kl. 11:24 og 11:54. Story 2.7 sier at svaret kl. 11:54 er erstattet av avgjørelsen kl. 12:06, og svaret kl. 11:24 står ikke i repoet. Økta fikk så en API-feil før instruksjonen var lagret, så den ble ført i dagsfila for 20.10 morgenen etter (`fa169a1`).
+
+Aksjedetaljen lenker nå til selskapets investorside, den norske når den finnes (10.5, PR #81, flettet i `bd19380`). «Ferdig» i README-en har høyst 8 punkter på høyst 20 ord, og «Tester» sier hvor lang tid hele testsettet tar (svaret 20.10 kl. 20:54, `4baa247`). Kl. 16:47 satte vi taket for egne aksjer i 2.12 til 18, fordi 18 aksjer og hovedindeksen er 19 kall, og ett holdes igjen til et nytt forsøk (`958ecd6`).
+
+Før 2.7b ble bygget, førte vi utformingen som en avgjørelse under «Prioritering» og story 2.7 (`7c55e44`): historikken er månedsvisningen fra tavla, med piler så langt kursserien går tilbake. «Signalet dag for dag» står nederst på aksjesiden, med en rad per uke og tallene for uka og måneden. Gjennomgangen ga 38 funn, og 30 ble rettet. Alle 13 mutantene ble fanget. En av rettingene skrev «skilte seg ut» i ingressen, og CI ble rød fordi to eldre tester ikke godtar de ordene. PR #82 ble flettet i `d4c2441` kl. 17:58.
+
+Kl. 18:33 utsatte vi README-prøven på en ren maskin til v1 er ferdig bygget, fordi prøven skal gjelde den appen som leveres (`3ec2ddc`). Den er fortsatt funksjonsstoppen, senest én uke før innleveringen. Den siste daterte gjennomgangen av oppskriften på egen maskin som står i repoet, er fra 16.10, og de fire tingene den fant, ble rettet 18.10 (`fdaf403`, PR #66). Kl. 18:38 fordelte vi de 20 kallene: 1 til hovedindeksen, 15 til aksjene, 3 til egne aksjer og 1 i reserve (`edc3f06`). Kveldens henting og målingen §39 i `malinger.md` er ikke kjørt når dette skrives, og de kommer i oppføringen for 22.10.
+
+Det vi lærte: en avgjørelse må stå i repoet før en instruksjon kan bygge på den, og et stopp av den grunn er vernet som virker. 2.7b ble bygget samme dag, på en linje vi hadde ført. En prøve skal gjelde den appen som leveres, men til den er tatt, er oppskriften ikke gått gjennom på nytt siden 16.10. Kallene er fordelt på forhånd, så vi vet hva som er igjen til nye forsøk før kvelden begynner.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
