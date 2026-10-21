@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-10-20T20:42
+updated: 2026-10-21T18:33
 ---
 
 # Vurderingsmatrise for del 1
@@ -109,3 +109,5 @@ Statusen i tabellen er ikke endret. README-prøven (story 3.4) og avsnittet «St
 *Lagt til 2026-10-20 kl. 16:33:* raden «Design og brukeropplevelse»: [`docs/ux-logg.md`](ux-logg.md) samler det vi har sett og gjort for brukeropplevelsen fra starten, 444 rader fra 2026-09-25, eldst først, med hvem som så det og kilden. Den har også sju åpne funn før brukertesten (8.1) og UX-gjennomgangen (8.2), U1–U7, slått opp i koden 20.10. Statusen i tabellen er ikke endret.
 
 *Lagt til 2026-10-20 kl. 20:42:* raden «README og kjørbarhet»: README-en er kortere å lese, med demoen, den ekte versjonen, dokumentlista, mappestrukturen og installasjonen av uv bak piler, og [`docs/hjelp.md`](hjelp.md) er et levende dokument uten daterte linjer (story 3.3h, gruppens svar kl. 10:14–10:19 og 16:19). Advarselen mot `docker compose down -v` står synlig rett under pila til den ekte versjonen (svaret kl. 20:20), og «Ferdig» begynner med signalet. Flettet i `fdbdf20`, PR #80. Testene: `tests/test_docker.py::TestReadmeBakPiler::test_innholdet_i_pilene_er_det_samme_som_foer`, `tests/test_docker.py::TestReadmeForNybegynnere::test_advarselen_mot_down_v_staar_synlig` og `tests/test_docker.py::TestReadmeBakPiler::test_ferdig_begynner_med_signalet`. Statusen i tabellen er ikke endret.
+
+*Lagt til 2026-10-21 kl. 18:33:* raden «README og kjørbarhet», neste tiltak: README-prøven på en ren maskin tas når v1 er ferdig bygget, og senest én uke før innleveringen, som funksjonsstoppen (avgjørelsen 2026-10-21 kl. 18:33 under «Prioritering» og story 3.3 i `epics.md`). Til da er oppskriften kjørt på egen maskin, sist datert 16.10 kl. 20:40–21:11 (§13 i `docs/kvalitetssikring.md`), og 3.4 står i review.

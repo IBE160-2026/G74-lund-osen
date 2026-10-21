@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-10-21T17:59
+updated: 2026-10-21T18:33
 ---
 
 # UX-loggen
@@ -466,6 +466,11 @@ Eldst først, 444 rader fra 2026-09-25. Radene kommer fra «Avgjort»-, «Rettet
 | 2026-10-19 | Ordlyden i README-en: «for å vurdere appen», første setning i «Status», tre ord for eksempeldataene, «raskest» som grunn og «bare trenger Docker». | en gjennomgang | avvist: ordlyden står i instruksjonen (story 3.3g, PR #77) | [`spec-3-3g-…`](../_bmad-output/implementation-artifacts/spec-3-3g-readme-demoen-anbefales.md) BH4, BH6, BH16, BH17, VG9 |
 | 2026-10-20 | Tidsgrensen for hentingen er kl. 22:00 igjen fra 20.10 (story 2.3). | gruppen | Stripa øverst sier «etter kl. 22» (story 8.19). | [`epics.md`](../_bmad-output/planning-artifacts/epics.md), story 8.19, «*Lagt til 2026-10-20*» |
 | 2026-10-20 | `docs/hjelp.md` åpnet svaret med «Hent etter kl. 21», og timen 21–22 var ikke nevnt. | en gjennomgang | rettet: Rettet-linja under svaret sier kl. 22 og at timen 21–22 gir 0 kall (story 2.3, PR #79) | [`spec-2-3-hentingen-fra-kl-22`](../_bmad-output/implementation-artifacts/spec-2-3-hentingen-fra-kl-22.md) VG2, ECH1, BH5 |
+| 2026-10-21 | README-prøven skulle gjelde den appen som leveres, og flere deler skulle inn. | gruppen | README-prøven på en ren maskin er utsatt til v1 er ferdig bygget, og er fortsatt funksjonsstoppen, senest én uke før innleveringen. Oppskriften er kjørt på egen maskin; siste daterte gjennomgang i repoet er 16.10 kl. 20:40–21:11. | [`epics.md`](../_bmad-output/planning-artifacts/epics.md), «Prioritering» og story 3.3, «*Avgjort 2026-10-21 kl. 18:33*» |
+
+*Rettet 2026-10-21 kl. 18:33:* Raden 2026-10-13 «Testeren av README-en skulle se det nye utseendet.» over: delen om README-prøven i uke 43 (gruppens svar 18.10 kl. 00:03) gjelder ikke lenger. Prøven på en ren maskin er utsatt til v1 er ferdig bygget, etter avgjørelsen 2026-10-21 kl. 18:33 under «Prioritering» og story 3.3 i `epics.md`.
+
+*Rettet 2026-10-21 kl. 18:33:* Raden 2026-10-18 «README-en skulle prøves av andre etter at de to README-PR-ene var flettet.» over om README-prøven i uke 43 (gruppens svar 18.10 kl. 00:03) gjelder ikke lenger. Prøven på en ren maskin er utsatt til v1 er ferdig bygget, etter avgjørelsen 2026-10-21 kl. 18:33 under «Prioritering» og story 3.3 i `epics.md`.
 
 ## Åpne funn før brukertesten
 

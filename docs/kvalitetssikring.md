@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-21T17:59
+updated: 2026-10-21T18:33
 ---
 
 # Kvalitetssikring
@@ -761,9 +761,13 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
 
 *Lagt til 2026-10-18 (gruppens svar kl. 00:03):* Prøve 1 tas i uke 43 (19.–25.10), etter at de to README-PR-ene er flettet, og Prøve 2 samtidig hvis testeren har egen gratiskonto. Prøven tas på nytt senest én uke før innleveringen, med ZIP-fila som leveres. Det endrer setningen fra 14.10 over om at prøven tas når mest mulig er bygget. Beslutningen står under «Prioritering» og story 3.3 i `epics.md`.
 
+*Rettet 2026-10-21 kl. 18:33:* Linja over om README-prøven i uke 43 (gruppens svar 18.10 kl. 00:03) gjelder ikke lenger. Prøven på en ren maskin er utsatt til v1 er ferdig bygget, etter avgjørelsen 2026-10-21 kl. 18:33 under «Prioritering» og story 3.3 i `epics.md`.
+
 *Lagt til 2026-10-19 (story 3.3g, gruppens svar kl. 14:46 og 14:48):* «Kom i gang» anbefaler nå demoen for faglærer og sensor, og «(anbefalt)» står ikke lenger ved den ekte versjonen. Knappen for den lokale modellen under «Mer for den som vil» heter «Den lokale modellen for KI-teksten (valgfri)» og sier at den ikke trengs for demoen eller for å vurdere appen. Ingen kommando i «Kom i gang» er endret. README-prøven med ZIP-fila, senest én uke før innleveringen, er også funksjonsstoppen: det briefen ikke lover og som ikke er ferdig da, flettes ikke.
 
 *Lagt til 2026-10-20 (story 3.3h, gjennomgangen ECH7):* i «Kom i gang» står demoen og den ekte versjonen nå bak hver sin pil etter linja «Velg vei», og testeren klikker på pila før steg 5 i hver av dem. Stegene og kommandoene er de samme, så ingen rad i tabellene endres.
+
+*Avgjort 2026-10-21 kl. 18:33 (gruppens svar):* README-prøven på en ren maskin er utsatt til v1 er ferdig bygget, fordi flere deler skal inn (historikken 2.7b, som ble flettet i `d4c2441` kl. 17:58 samme dag, og egne nøkler 10.7), og prøven skal gjelde den appen som leveres. Gruppen har kjørt oppskriften på egen maskin, og den virker. Den siste daterte gjennomgangen på egen maskin som står i repoet, er 16.10 kl. 20:40–21:11, under story 3.3 i `epics.md` (avgjørelsen 16.10 kl. 21:16), i tabellen i §13 i `docs/kvalitetssikring.md` og i `docs/reflection-log.md` 16.10. Den fant fire ting, som ble rettet i `fdaf403`, PR #66, 18.10. Prøven på en ren maskin er fortsatt funksjonsstoppen, senest én uke før innleveringen (svaret 19.10 kl. 14:48), og 3.4 står i review til den er tatt.
 
 ### Prøve 1
 
@@ -963,6 +967,10 @@ interesse, står i `malinger.md` §6, ved siden av EQNR 05.10 og GJF 02.10.
 *Lagt til 2026-10-20:* raden «Grensen kl. 21:00»: målingen ble tatt 19.10 etter kl. 22 (`malinger.md` §37). MOWI, GJF og AKRBP var like kursfila fra kl. 21 i alle sju feltene, og DNO var ulik i `volume`. Grensen er kl. 22:00 igjen fra 20.10 (gruppens svar 19.10 kl. 22:19 under story 2.3). Raden i tabellen er ikke endret.
 
 *Lagt til 2026-10-18 (gruppens svar kl. 00:03):* README-prøven i første rad tas første gang i uke 43 (19.–25.10), etter at de to README-PR-ene er flettet: Prøve 1, og Prøve 2 samtidig hvis testeren har egen gratiskonto. Den tas på nytt senest én uke før innleveringen, med ZIP-fila som leveres (§9).
+
+*Rettet 2026-10-21 kl. 18:33:* Linja over om README-prøven i uke 43 (gruppens svar 18.10 kl. 00:03) gjelder ikke lenger. Prøven på en ren maskin er utsatt til v1 er ferdig bygget, etter avgjørelsen 2026-10-21 kl. 18:33 under «Prioritering» og story 3.3 i `epics.md`.
+
+*Avgjort 2026-10-21 kl. 18:33 (gruppens svar):* README-prøven på en ren maskin er utsatt til v1 er ferdig bygget, fordi flere deler skal inn (historikken 2.7b, som ble flettet i `d4c2441` kl. 17:58 samme dag, og egne nøkler 10.7), og prøven skal gjelde den appen som leveres. Gruppen har kjørt oppskriften på egen maskin, og den virker. Den siste daterte gjennomgangen på egen maskin som står i repoet, er 16.10 kl. 20:40–21:11, under story 3.3 i `epics.md` (avgjørelsen 16.10 kl. 21:16), i tabellen i §13 i `docs/kvalitetssikring.md` og i `docs/reflection-log.md` 16.10. Den fant fire ting, som ble rettet i `fdaf403`, PR #66, 18.10. Prøven på en ren maskin er fortsatt funksjonsstoppen, senest én uke før innleveringen (svaret 19.10 kl. 14:48), og 3.4 står i review til den er tatt.
 
 *Lagt til 2026-10-18 kl. 15:41 (story 3.3c, ECH16 i triagen):* README-en har nå tre skjermbilder i «Kom i gang», fra gruppens gjennomgang 16.10 kl. 20:40–21:11 (raden i tabellen over): «Engine running» i steg 1, menyen under «Code» med «Download ZIP» i steg 2, og PowerShell med mappenavnet foran `>` i steg 4. De ligger i `docs/bilder/readme/` og viser ikke appen. Demoen står før den ekte versjonen, og de fire tingene gjennomgangen fant, er rettet. Flettet i `fdaf403`, PR #66.
 

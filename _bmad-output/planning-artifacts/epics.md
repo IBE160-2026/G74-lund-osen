@@ -521,6 +521,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-18 kl. 00:03 (gruppens svar):* kopien `.agents/skills/` tas bort (story 9.8), og README-prøven tas første gang i uke 43, etter at de to README-PR-ene er flettet, og på nytt senest én uke før innleveringen, med ZIP-fila som leveres.
 
+*Rettet 2026-10-21 kl. 18:33:* Delen av linja over om README-prøven i uke 43 (gruppens svar 18.10 kl. 00:03) gjelder ikke lenger. Prøven på en ren maskin er utsatt til v1 er ferdig bygget, etter avgjørelsen 2026-10-21 kl. 18:33 under «Prioritering» og story 3.3 i `epics.md`.
+
 *Avgjort 2026-10-18 kl. 00:20 (gruppens svar):* et skjermbilde av oversikten i demoen kommer øverst i README-en igjen etter 3.4b, i en README-PR som stopper før flettingen (snur 16.10 kl. 21:38); arkitekturdokumentet oppdateres søndag etter 3.4b, med en test som krever at hver modul i `src/` står der, og `meldinger.py` tas bort med testene (story 9.9); de lange funksjonene i `fetch_prices.py` deles opp lørdag 24.10, uten endret oppførsel (story 9.10).
 
 *Endret 2026-10-19 (gruppens svar 18.10 kl. 23:03, spesifikasjonen 3.3f):* bildet av oversikten står ikke lenger under «Til faglærer», men bak en knapp rett under beskrivelsen, sammen med de andre bildene av appen, i en egen mappe for bilder og video.
@@ -562,6 +564,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 *Avgjort 2026-10-19 kl. 10:29 (gruppens svar):* 8.3 bygges i dag og flettes etter kveldens henting og måling; stjernen står både i oversikten og i Min liste; demoen starter med fem merket, den ekte med en tom liste.
 
 *Avgjort 2026-10-21 (gruppens svar):* historikken er månedsvisningen fra tavla, med piler så langt kursserien går tilbake. Målingene står på siden for dagen (8.16b), som hver dag lenker til, med en datert linje ved kontrollpunktet om målingene. Avgjørelsen 19.10 kl. 12:06 erstattet svaret kl. 11:54 om stilen; denne linja fører innholdet i historikken, så det ikke hviler på et svar som ikke står i repoet.
+
+*Avgjort 2026-10-21 kl. 18:33 (gruppens svar):* README-prøven på en ren maskin er utsatt til v1 er ferdig bygget, fordi flere deler skal inn (historikken 2.7b, som ble flettet i `d4c2441` kl. 17:58 samme dag, og egne nøkler 10.7), og prøven skal gjelde den appen som leveres. Gruppen har kjørt oppskriften på egen maskin, og den virker. Den siste daterte gjennomgangen på egen maskin som står i repoet, er 16.10 kl. 20:40–21:11, under story 3.3 i `epics.md` (avgjørelsen 16.10 kl. 21:16), i tabellen i §13 i `docs/kvalitetssikring.md` og i `docs/reflection-log.md` 16.10. Den fant fire ting, som ble rettet i `fdaf403`, PR #66, 18.10. Prøven på en ren maskin er fortsatt funksjonsstoppen, senest én uke før innleveringen (svaret 19.10 kl. 14:48), og 3.4 står i review til den er tatt.
 
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
@@ -2097,6 +2101,8 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 
 *Avgjort 2026-10-18 kl. 00:03 (gruppens svar):* README-prøven tas første gang i uke 43 (19.–25.10), etter at de to README-PR-ene er flettet: Prøve 1, og Prøve 2 samtidig hvis testeren har egen gratiskonto. Den tas på nytt senest én uke før innleveringen, med ZIP-fila som leveres. Det endrer setningen fra 14.10 under story 3.4 om at prøven tas når mest mulig er bygget (§9 og §13 i `docs/kvalitetssikring.md`).
 
+*Rettet 2026-10-21 kl. 18:33:* Linja over om README-prøven i uke 43 (gruppens svar 18.10 kl. 00:03) gjelder ikke lenger. Prøven på en ren maskin er utsatt til v1 er ferdig bygget, etter avgjørelsen 2026-10-21 kl. 18:33 under «Prioritering» og story 3.3 i `epics.md`.
+
 *Avgjort 2026-10-18 kl. 14:48 (gruppens svar, under instruksjonen kl. 12:23):* README-PR-en med bildene og rettelsene fra gjennomgangen 16.10 (`spec-3-3c-kom-i-gang-bilder-og-demoen-foerst.md`). «Står du fast?» kan ha høyst 10 spørsmål, ikke 8 som fra 11.10 kl. 22:32. Grensen på 65 ord per steg står for teksten i steget. Teksten under et bilde telles for seg, høyst 25 ord. Forklaringen av hvordan en kommando kopieres, står én gang, i et kort avsnitt rett før det første steget med en kommando, og hvert steg med en kommando sier bare at den limes inn i PowerShell-vinduet fra steg 4. Blir et steg fortsatt over 65 ord, flyttes detaljene til `docs/hjelp.md` med en lenke fra steget.
 
 *Lagt til 2026-10-18 kl. 15:41:* tre skjermbilder i «Kom i gang», demoen først og fire rettelser fra gjennomgangen 16.10, flettet i `fdaf403`, PR #66 (spesifikasjonen `spec-3-3c-kom-i-gang-bilder-og-demoen-foerst.md`), etter gruppens ja kl. 15:35. CI var grønn på head-en `87e4f8e` (kjøring 39132413724) og på main (39132517882). Svarene på spørsmålene kl. 15:12 står i instruksjonen kl. 15:37: lenkene i «Til faglærer» kommer i README-ryddingen, og ryddingen tar «Står du fast?» ned til fem spørsmål, med svarene om mellomrommet etter `cd` og «Cannot find path» blant dem. Grensen på 10 gjelder bare til ryddingen. Instruksjonen sier at dette følger av beslutningene 16.10 og av gruppens svar kl. 21:56 og 21:57. De to svarene er ikke ført i repoet. Dagsfila 16.10 og `epics.md` nevner svaret kl. 21:57 bare ved rekkefølgen (beslutningen kl. 21:16), og de sier ikke hvilke fem spørsmål ryddingen beholder.
@@ -2132,6 +2138,8 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 *Lagt til 2026-10-20 kl. 20:42:* 3.3h er flettet i `fdbdf20`, PR #80, etter rettingene som svaret kl. 20:20 ba om: advarselen rett under pila til den ekte versjonen, og signalet først i «Ferdig» (rådets funn). Spesifikasjonen er `done`.
 
 *Avgjort 2026-10-20 kl. 20:54 (gruppens svar):* «Ferdig» har høyst 8 punkter på høyst 20 ord (`fdbdf20`).
+
+*Avgjort 2026-10-21 kl. 18:33 (gruppens svar):* README-prøven på en ren maskin er utsatt til v1 er ferdig bygget, fordi flere deler skal inn (historikken 2.7b, som ble flettet i `d4c2441` kl. 17:58 samme dag, og egne nøkler 10.7), og prøven skal gjelde den appen som leveres. Gruppen har kjørt oppskriften på egen maskin, og den virker. Den siste daterte gjennomgangen på egen maskin som står i repoet, er 16.10 kl. 20:40–21:11, under story 3.3 i `epics.md` (avgjørelsen 16.10 kl. 21:16), i tabellen i §13 i `docs/kvalitetssikring.md` og i `docs/reflection-log.md` 16.10. Den fant fire ting, som ble rettet i `fdaf403`, PR #66, 18.10. Prøven på en ren maskin er fortsatt funksjonsstoppen, senest én uke før innleveringen (svaret 19.10 kl. 14:48), og 3.4 står i review til den er tatt.
 
 ### Story 3.4: Demoversjonen
 
