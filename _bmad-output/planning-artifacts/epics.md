@@ -561,6 +561,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-19 kl. 10:29 (gruppens svar):* 8.3 bygges i dag og flettes etter kveldens henting og måling; stjernen står både i oversikten og i Min liste; demoen starter med fem merket, den ekte med en tom liste.
 
+*Avgjort 2026-10-21 (gruppens svar):* historikken er månedsvisningen fra tavla, med piler så langt kursserien går tilbake. Målingene står på siden for dagen (8.16b), som hver dag lenker til, med en datert linje ved kontrollpunktet om målingene. Avgjørelsen 19.10 kl. 12:06 erstattet svaret kl. 11:54 om stilen; denne linja fører innholdet i historikken, så det ikke hviler på et svar som ikke står i repoet.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -1653,6 +1655,7 @@ Som **bruker**, vil jeg se hva løsningen sa om aksjen de siste ukene, så FR-40
 **Kontroll — hva testen ser etter:**
 - De siste fire ukene, dag for dag: styrke og retning, eller grunnen, «ikke vurdert» eller «ikke børsdag»
 - Målingene vises dag for dag, avrundet som i FR-706 (2.1c) *(lagt til 2026-09-29)*
+  - *Lagt til 2026-10-21 (avgjørelsen 21.10 under):* målingene står ikke i historikken, men på siden for dagen (8.16b), som hver dag i historikken lenker til.
 - Hver dag går gjennom `tilstand`, så styrke 0, en grunn og en manglende rad aldri ser like ut
 - `Vurderingslager` får en lesemetode for en periode, og ingen slette- eller endremetode (`AD-7`)
 - Dagens rad som ikke er skrevet ennå, vises ikke som et hull
@@ -1666,6 +1669,8 @@ Som **bruker**, vil jeg se hva løsningen sa om aksjen de siste ukene, så FR-40
 *Avgjort 2026-10-19 kl. 12:06 (gruppens svar):* stilen flyttes til én CSS-fil nå, som første del av 2.7 (spesifikasjonen 2.7a), før 8.3 og historikken, fordi seks regler står likt i `index.html` og `aksje.html`, og kontrollpunktet i 2.7 sier én layout og én CSS-fil. Det erstatter svarene kl. 11:54 og 11:58 samme dag om at rammen skulle telle som felles stil til en egen PR senere i uka. Historikken blir 2.7b.
 
 *Lagt til 2026-10-19 kl. 14:28:* all stilen står i `src/static/stil.css`, lenket fra `_ramme.html` med et avtrykk av fila, og sidene ser ut som før, flettet i `dc521ff`, PR #76 (spesifikasjonen `spec-2-7a-stilen-i-en-css-fil.md`). Kontrollpunktet om én layout og én CSS-fil er oppfylt. Historikken er 2.7b.
+
+*Avgjort 2026-10-21 (gruppens svar):* historikken er månedsvisningen fra tavla, med piler så langt kursserien går tilbake. Målingene står på siden for dagen (8.16b), som hver dag lenker til, med en datert linje ved kontrollpunktet om målingene. Avgjørelsen 19.10 kl. 12:06 erstattet svaret kl. 11:54 om stilen; denne linja fører innholdet i historikken, så det ikke hviler på et svar som ikke står i repoet.
 
 ### Story 2.8: Hovedindeksen hentes i samme kjøring
 
