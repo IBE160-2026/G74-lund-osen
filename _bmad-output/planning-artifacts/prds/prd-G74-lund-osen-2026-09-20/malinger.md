@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-20T22:48
+updated: 2026-10-21T23:30
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -4185,5 +4185,45 @@ ingen endring for disse fire, mens volumet for DNO 19.10 endret seg mellom kl. 2
 kl. 22 (§37).
 
 **Kostnad.** 4 kall. Kvoten før: 16 brukt, 4 igjen, `apiRequestsDate` 2026-10-20 og
+`extraLimit` 463. Kvoten etter: 20 brukt, 0 igjen, `extraLimit` uendret 463.
+Bonuskvoten er ikke brukt.
+
+## 39. Er raden fra kl. 22 den samme kl. 23:30? Fire aksjer hentet på nytt (2026-10-21)
+
+**Metode.** Ett `/api/eod`-kall per symbol for fire aksjer, med `hent_api_nokkel` og
+`hent_ett_symbol` importert fra `src/fetch_prices.py`, så kallet er det samme som i
+hentingen, og med `from` og `to` fra kursfila `kurser-raa-2026-10-21.json`. Skriptet lå
+utenfor repoet og leste kvoten før hvert kall. Det skulle stoppe hvis `apiRequestsDate`
+ikke var 2026-10-21 eller 20 kall var brukt, så verken bonuskvoten eller morgendagens
+kvote kunne brukes. `src/fetch_prices.py` ble ikke kjørt, og ingenting ble skrevet til
+basen (AD-7). Svarene ligger urørt i `data/proever/`, som ikke spores (regel 10), og
+ikke i `data/raa/`, som hentingen leser. Raden for 21.10 i hvert svar er sammenlignet
+med raden i kursfila fra kl. 22 i alle sju feltene: `date`, `open`, `high`, `low`,
+`close`, `adjusted_close` og `volume`. Kallene er de 4 som var igjen etter hentingen:
+de 3 som er holdt av til egne aksjer, og reserven (fordelingen 21.10 kl. 18:38 under
+«Prioritering» i `epics.md`). De gikk til måling etter regelen fra 20.10 kl. 22:41 og
+gruppens svar 21.10 kl. 21:00. Svaret kl. 21:00 står i instruksjonen kl. 22:13 i
+`docs/ai-prompts/2026-10-21.md`, ikke i andre dokumenter.
+
+Utvalget fulgte svaret 17.10 kl. 22:00 under story 2.3 i `epics.md`, som i §37 og §38,
+og ble gjort før kallene: de fire med volumforholdet nærmest grensen for interesse (1,5)
+i vurderingene for 21.10, fordi en endring i volumet der lettest endrer vurderingen.
+Det ble lest med en tilkobling som bare leser, og sha256 for basen var lik før og
+etter. Ingen av de 15 radene for 21.10 hadde grunn eller manglet volumforhold. Alle
+fire lå under grensen. Den neste var DNB.
+
+| Symbol | Klokkeslett for kallet (`date`) | Resultat |
+|---|---|---|
+| EQNR | 23:30 | lik i alle sju |
+| MOWI | 23:30 | lik i alle sju |
+| GJF | 23:30 | lik i alle sju |
+| VAR | 23:30 | lik i alle sju |
+
+**Resultat.** For alle fire var raden fra kl. 22 den samme kl. 23:30, i alle sju
+feltene. Ingen vurdering måtte regnes på nytt. Målingen gjelder fire aksjer én kveld,
+og sier ikke at raden fra kl. 22 alltid er endelig. Sammen med §38 er åtte rader hentet
+på nytt etter kl. 22 to kvelder, og ingen av dem var endret.
+
+**Kostnad.** 4 kall. Kvoten før: 16 brukt, 4 igjen, `apiRequestsDate` 2026-10-21 og
 `extraLimit` 463. Kvoten etter: 20 brukt, 0 igjen, `extraLimit` uendret 463.
 Bonuskvoten er ikke brukt.

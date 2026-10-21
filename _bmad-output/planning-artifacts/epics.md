@@ -1545,6 +1545,8 @@ Oppgaveplanlegging beskrives i README (regel 19).
 
 *Lagt til 2026-10-20 kl. 22:48 (målingen etter svaret 20.10 kl. 22:41 og 22:42, `malinger.md` §38):* FRO, MOWI, TEL og AKRBP, de fire med volumforholdet nærmest 1,5 i vurderingene for 20.10, ble hentet på nytt kl. 22:48. Alle fire er like kursfila fra kl. 22 i alle sju feltene, så ingen vurdering måtte regnes på nytt. 4 kall av dagskvoten, og bonuskvoten er ikke brukt.
 
+*Lagt til 2026-10-21 kl. 23:30 (målingen etter gruppens svar 21.10 kl. 21:00, `malinger.md` §39):* EQNR, MOWI, GJF og VAR, de fire med volumforholdet nærmest 1,5 i vurderingene for 21.10, ble hentet på nytt kl. 23:30. Alle fire er like kursfila fra kl. 22 i alle sju feltene, så ingen vurdering måtte regnes på nytt. 4 kall av dagskvoten, de 3 som er holdt av til egne aksjer og reserven (fordelingen kl. 18:38), og bonuskvoten er ikke brukt. Svaret kl. 21:00 står i instruksjonen kl. 22:13 i dagsfila 21.10.
+
 ### Story 2.3b: Kallene som er igjen, brukes på nye forsøk
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 19:17.*
