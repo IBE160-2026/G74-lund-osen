@@ -235,6 +235,19 @@
     finansielle hendelser er ikke med i denne versjonen.
   </p>
 
+  {#- Story 10.5 (gruppens svar 19.10 kl. 16:03 og 19:49): lenken til
+      selskapets investorside, med navnet i lenketeksten. NewsWeb nevnes uten
+      lenke (designregler.md). I demoen er selskapet oppdiktet, så der står
+      en tekst i stedet. En aksje i en ekte base uten adresse får setningen
+      uten lenke (gjennomgangen, ECH5). #}
+  {% if eksempeltall %}
+    <p class="fotnote investorside">Børsmeldingene står på NewsWeb. {{ detalj.aksje.navn }} er oppdiktet og har ingen investorside. I den ekte versjonen står lenken til selskapets investorside her.</p>
+  {% elif investorside %}
+    <p class="fotnote investorside">Børsmeldingene står på NewsWeb og ofte også på <a href="{{ investorside }}" rel="noreferrer">investorsiden til {{ detalj.aksje.navn }}</a>.</p>
+  {% else %}
+    <p class="fotnote investorside">Børsmeldingene står på NewsWeb og ofte også på selskapets investorside.</p>
+  {% endif %}
+
   {#- grafen bare med grafen og snittet, ga og maalt_mot bare med sjekkene
       (gjennomgangen av 8.0b): ellers forklarer hjelpen noe siden ikke viser.
       Story 8.0d, PR 3: «data hentet» står i vinduet ved «Oppdatert». #}

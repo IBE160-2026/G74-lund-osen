@@ -907,7 +907,9 @@ SKRIFTFILER = {".woff", ".woff2", ".ttf", ".otf", ".css"}
 # Story 8.3: 1630, fordi knapperaden i stripa skyver tabellen ned. Var 1573.
 HOEYDE_PAA_BILDET = 1630
 # Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
-AVTRYKK_BAK_BILDET = "dcf02e087e2abe190f5425768ed6e8fb71954822d944fbeaeb5e7691bca66110"
+# Story 10.5: investorsidene i kursdata.py. Bildet ble tatt på nytt og er
+# byte for byte det samme. Avtrykket er av kildefilene, ikke av PNG-en.
+AVTRYKK_BAK_BILDET = "002f7e2d394cb2a3be4d1ad1c9178c12a523317b67f5af0450092679c5b756fc"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -962,7 +964,11 @@ IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py"}
 # Story 8.3: 1872 med knapperaden i stripa. Var 1816.
 HOEYDE_PAA_AKSJESIDEN = 1872
 # Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
-AVTRYKK_BAK_AKSJESIDEN = "8429ff15ea3f42dc52e73082ca1abfa453aaa1c7560aa5f8d67a57485058a1a8"
+# Story 10.5: lenken til investorsiden står under grafen, ved 1980 px målt i
+# Edge uten vindu, så bildet, som slutter ved bunnen av grafen (1872 px), ble
+# byte for byte det samme da det ble tatt på nytt. Avtrykket er sha256 av
+# kildefilene bak bildet, ikke av PNG-en, så det er nytt (gjennomgangen, BH11).
+AVTRYKK_BAK_AKSJESIDEN = "475a0f88eb12400fd130e755781fb74c16ebebd3c911fd96a75520c8b5f8c86e"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "

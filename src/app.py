@@ -45,7 +45,7 @@ from hovedindeks import Hovedindeksvisning, bygg_hovedindeks
 from indeksdata import HOVEDINDEKS
 from ki_visning import AV, KAPSEL, PAA, UKJENT, KIVisning, bygg_ki_visning, ki_paa
 from kilogg import Emne, UgyldigKIRad
-from kursdata import Kursleser
+from kursdata import Kursleser, investorside
 from lagring_sqlite import (
     DEMOMERKE,
     SqliteIndekslager,
@@ -634,6 +634,9 @@ def aksjedetalj(symbol: str):
             ki=ki,
             ki_er_paa=ki_er_paa,
             ki_til=AV if ki_er_paa else PAA,
+            # Story 10.5: lenken til investorsiden for aksjen siden viser,
+            # slaatt opp paa symbolet. Siden henter ingenting derfra (AD-2).
+            investorside=investorside(post.aksje.symbol),
         )
     )
     # Siden avhenger av bryteren (gjennomgangen av 10.3, BH10).

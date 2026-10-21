@@ -56,6 +56,35 @@ AKSJEUNIVERS: tuple[Aksje, ...] = (
     Aksje("MPCC", "MPCC.OL", "MPC Container Ships", "Shipping"),
 )
 
+# Story 10.5 (gruppens svar 19.10 kl. 16:03 og 19:49): investorsiden til hver
+# av de 15, den norske naar den finnes (designregler.md), knyttet til symbolet
+# fra Oslo Boers og ikke til tickeren hos EODHD. Adressene staar her, ved navn
+# og bransje, og ikke i Aksje, fordi Aksje er raden i tabellen aksje. Ingen
+# kode henter fra dem (AD-2): siden lenker bare.
+INVESTORSIDER: dict[str, str] = {
+    "EQNR": "https://www.equinor.com/investors",
+    "DNB": "https://www.ir.dnb.no/",
+    "KOG": "https://www.kongsberg.com/investor-relations/",
+    "AKRBP": "https://akerbp.com/investor/",
+    "NHY": "https://www.hydro.com/en/global/investors/",
+    "FRO": "https://www.frontlineplc.cy/investor-relations/",
+    "VAR": "https://varenergi.no/no/investor/",
+    "TEL": "https://www.telenor.com/investors/",
+    "YAR": "https://www.yara.com/investor-relations/",
+    "MOWI": "https://mowi.com/investors/",
+    "ORK": "https://www.orkla.com/investors/",
+    "SALM": "https://www.salmar.no/en/investor/",
+    "GJF": "https://www.gjensidige.com/no/investorinformasjon",
+    "DNO": "https://www.dno.no/en/investors/",
+    "MPCC": "https://www.mpc-container.com/investors/",
+}
+
+
+def investorside(symbol: str) -> str | None:
+    """Adressen til investorsiden for symbolet, eller None, som for
+    demoselskapene, som er oppdiktet."""
+    return INVESTORSIDER.get(symbol)
+
 
 class UgyldigKursrad(ValueError):
     """En verdi Kursrad ikke godtar.

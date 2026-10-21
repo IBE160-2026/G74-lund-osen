@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-20T18:13
+updated: 2026-10-21T10:34
 ---
 
 # Hjelp til «Kom i gang»
@@ -148,6 +148,10 @@ Dataene ligger i to Docker-volumer: `ose-db` med basen og `ose-raa` med øyeblik
 ### Kan appen nås fra nettet?
 
 Nei. Porten er bare åpen på maskinen selv (127.0.0.1). Appen kan ikke nås fra nettet.
+
+### Hvor finner jeg børsmeldingene?
+
+Appen viser ikke børsmeldingene. De står på NewsWeb og ofte også på selskapets investorside. Nederst på aksjesiden står en lenke til investorsiden for aksjen siden viser. Appen henter ingenting derfra. I demoen er selskapene oppdiktet og har ingen investorside, så der står det i stedet at lenken står der i den ekte versjonen.
 
 ## Når appen kjører, eller ikke
 
