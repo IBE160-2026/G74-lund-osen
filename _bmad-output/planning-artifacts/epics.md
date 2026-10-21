@@ -2712,6 +2712,8 @@ brevet 21.09 og purringen 22.09 ikke er besvart. Tittelen står.
 
 *Avgjort 2026-10-19 kl. 19:49 (gruppens svar):* `designregler.md` sier at lenken går til den norske investorsiden når den finnes, og tre har en: AKRBP https://akerbp.com/investor/, VAR https://varenergi.no/no/investor/ og GJF https://www.gjensidige.com/no/investorinformasjon. De tre byttes, og de andre tolv står. EQNR og NHY har bare en norsk side som viser til den engelske. Rådet sjekket ikke dette før lista kl. 16:03. I demoen står en kort tekst der lenken står: selskapet er oppdiktet og har ingen investorside, og i den ekte versjonen står lenken her. Det bygges i 10.5.
 
+*Lagt til 2026-10-21 kl. 11:20:* lenken til investorsiden er squash-flettet i `bd19380`, PR #81, låst til head-en `4cb9266` (spesifikasjonen `spec-10-5-investorsiden.md`). Adressene står i `INVESTORSIDER` i `src/kursdata.py`, knyttet til symbolet, og demoen har teksten fra svaret kl. 19:49. Hele settet: 2797 bestått og 17 hoppet over, og CI var grønn på head-en (39575824580). Alle seks mutantene ble fanget. Spesifikasjonen er `done`.
+
 ### Story 10.6: KI-teksten om dagen på forsiden
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.

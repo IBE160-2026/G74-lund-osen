@@ -2,7 +2,7 @@
 title: 'Story 10.5: lenken til selskapets investorside i aksjedetaljen'
 type: 'feature'
 created: '2026-10-21'
-status: 'review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 1
 baseline_commit: '4baa247'
