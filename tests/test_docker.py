@@ -911,7 +911,7 @@ HOEYDE_PAA_BILDET = 1630
 # byte for byte det samme. Avtrykket er av kildefilene, ikke av PNG-en.
 # Story 2.7b: hjelpen til Sluttkurs og historikken i hjelpetekster.py. Bildet
 # ble tatt på nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "126adaf2c143c2da5bc3832d8f56aa8028605c302ee7b3874a6278dd9f7b2e4c"
+AVTRYKK_BAK_BILDET = "6568924cf169b0eea3b6844e92a838c1d598fec0659e5be4966c69132c33fa5b"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -974,7 +974,7 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # kildefilene bak bildet, ikke av PNG-en, så det er nytt (gjennomgangen, BH11).
 # Story 2.7b: historikken står nederst, under avsnittet om investorsiden, og
 # bildet ble byte for byte det samme da det ble tatt på nytt.
-AVTRYKK_BAK_AKSJESIDEN = "af999323626cd7498f4b08ee7e5843cd85321bae34eafd749eac1fe80ee8e8a9"
+AVTRYKK_BAK_AKSJESIDEN = "22705ff00628a560e33e6898878733c9a1059ffa926676266ed1fcc3371ec9dc"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "

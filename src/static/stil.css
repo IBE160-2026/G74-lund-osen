@@ -548,6 +548,8 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-aksje) li.dag.tom .dato { color: var(--dempet); font-weight: 400; }
 :where(.side-aksje) li.dag .tilstand { color: var(--dempet); }
 :where(.side-aksje) li.dag .retningspille { height: 24px; padding: 0 8px; font-size: 12.5px; }
+/* Gjennomgangen, BH3: brikkene brytes heller enn å gå ut av en smal rute. */
+:where(.side-aksje) li.dag .sjekker { flex-wrap: wrap; }
 :where(.side-aksje) .historikk .pille { white-space: nowrap; padding: 0.05rem 0.45rem; border-radius: 999px; font-weight: 700;
                                         border: 1.5px solid var(--strek-2); }
 :where(.side-aksje) .historikk .pille.tre-av-tre { border: 2px solid var(--oransje); background: var(--fyll); color: var(--hvit); }
