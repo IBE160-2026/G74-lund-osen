@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 
+from kursdata import INVESTORSIDER
 from perioder import PERIODENE
 
 FONTS = Path(__file__).resolve().parent.parent / "src" / "static" / "fonts"
@@ -271,12 +272,19 @@ class TestRammen:
 
     def test_ingenting_fra_nettet(self, sidene):
         """Ville feilet med skrift eller stil fra Google Fonts, et skript,
-        eller en adresse med http."""
+        eller en adresse med http. Story 10.5 (gruppens svar 19.10 kl. 16:03
+        og 19:49): bare en lenke (<a href>) til en av de 15 investorsidene
+        går ut av appen. Den laster ingenting, så siden henter fortsatt
+        ingenting fra nettet. Ville feilet med en annen adresse utenfor
+        appen, eller en investorside i src eller i et stilark."""
         for navn, html in sidene.items():
             assert "<script" not in html.lower(), navn
             assert "@import" not in html, navn
             assert not re.search(r"https?:|//[a-z]", _stil(html)), navn
+            lenker = re.findall(r'<a\s[^>]*?href="([^"]*)"', html)
             for verdi in re.findall(r'(?:src|href)="([^"]*)"', html):
+                if verdi in INVESTORSIDER.values() and verdi in lenker:
+                    continue
                 assert not re.match(r"(https?:)?//", verdi), (navn, verdi)
             # Story 2.7a: skriftene står i stilarket, ikke i siden.
             for adresse in re.findall(r"""url\(\s*["']?([^"')]+)""", html + _stil(html)):
@@ -298,6 +306,8 @@ class TestRammen:
                 # Story 8.15: sorteringen er en parameter på /.
                 assert (
                     href in ("/", "/min-liste", "/min-liste?vis=alle")
+                    # Story 10.5: lenken til investorsiden for aksjen.
+                    or href in INVESTORSIDER.values()
                     or re.fullmatch(r"/aksje/[A-Z0-9]+", href)
                     or re.fullmatch(
                         r"/min-liste\?(vis=alle&amp;)?sorter=(selskap|kurs|endring|signal|retning)&amp;orden=(synkende|stigende)",
