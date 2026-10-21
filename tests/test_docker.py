@@ -2117,7 +2117,9 @@ class TestReadmeForNybegynnere:
             "demoen",
             "hjelp bak «?»",
             "tydeligere merking",
-            "datoene og månedsmerkene i grafen",
+            "datoene og månedsmerkene",
+            # Story 10.5: lenken til investorsiden er flettet.
+            "lenken til investorsiden",
             "oversikten og utseendet fra designforslaget",
             "sortering ved klikk i kolonneraden",
             "ki-teksten fra en lokal modell på aksjesiden",
@@ -2159,9 +2161,9 @@ class TestReadmeForNybegynnere:
         # Story 3.3g: historikken og signaldagene er delt, NewsWeb er tatt ut
         # av lenkene, og fra signaldagene staar resten under «Ekstra».
         # Story 8.3: Min liste er flyttet til «Ferdig».
+        # Story 10.5: lenken til investorsiden er flyttet til «Ferdig».
         saker = (
             "historikken i aksjedetaljen",
-            "lenken til selskapets investorside",
             "egen nøkkel",
             "signaldagene i kursgrafen",
             "«vis ki-tekst»",
@@ -2469,7 +2471,8 @@ class TestReadmeDemoenAnbefales:
         hvis tiden rekker». Svaret kl. 16:12: egen nøkkel er v1. Ville feilet
         hvis et ekstra punkt ble flyttet til «Neste i v1», eller NewsWeb kom
         tilbake i punktet om lenkene. Story 8.3: Min liste er flyttet til
-        «Ferdig», og «Neste i v1» har de tre som er igjen."""
+        «Ferdig», og «Neste i v1» har de tre som er igjen. Story 10.5: lenken
+        til investorsiden er flyttet til «Ferdig», og to står igjen."""
         tekst = README.read_text(encoding="utf-8")
         status = tekst.split("\n## Status\n", 1)[1].split("\n## ", 1)[0]
         lister = _statuslister(status)
@@ -2485,10 +2488,11 @@ class TestReadmeDemoenAnbefales:
                 assert sak in punkt, (sak, punkt)
         # Gjennomgangen (BH2, VG1): lenken går til selskapets investorside,
         # som i briefen v8 og story 10.5 etter 06.10.
-        for sak in ("historikken", "selskapets investorside", "egen nøkkel til gemini"):
+        for sak in ("historikken", "egen nøkkel til gemini"):
             assert sum(sak in p for p in v1) == 1, (sak, v1)
-        assert not any("min liste" in p for p in v1), v1
-        assert len(v1) == 3, v1
+        assert not any("min liste" in p or "investorside" in p for p in v1), v1
+        assert sum("lenken til investorsiden" in p.lower() for p in lister["Ferdig"]) == 1, lister["Ferdig"]
+        assert len(v1) == 2, v1
         assert "newsweb" not in "\n".join(v1 + ekstra)
         assert REGELEN_FOR_EKSTRA in status
 
