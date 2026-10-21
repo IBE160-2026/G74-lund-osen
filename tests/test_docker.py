@@ -974,7 +974,7 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # kildefilene bak bildet, ikke av PNG-en, så det er nytt (gjennomgangen, BH11).
 # Story 2.7b: historikken står nederst, under avsnittet om investorsiden, og
 # bildet ble byte for byte det samme da det ble tatt på nytt.
-AVTRYKK_BAK_AKSJESIDEN = "22705ff00628a560e33e6898878733c9a1059ffa926676266ed1fcc3371ec9dc"
+AVTRYKK_BAK_AKSJESIDEN = "7ab216b4162ac68fb2446e8fbf4e699cee884fd2c0bc92f24b4077ceb6f824aa"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "
