@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-10-20T20:42
+updated: 2026-10-21T17:59
 ---
 
 # UX-loggen
@@ -484,3 +484,5 @@ Hvert funn er slått opp i koden 20.10 før det ble skrevet.
 *Lagt til 2026-10-20 (story 3.3h, gjennomgangen VG6 og ECH10):* avgjørelsen kl. 10:14, 10:15, 10:18 og 10:19 og svaret kl. 16:19 står under story 3.3 i `epics.md` fra `49e9041`, og U7 bygges i [`spec-3-3h-readme-bak-piler-og-levende-hjelp.md`](../_bmad-output/implementation-artifacts/spec-3-3h-readme-bak-piler-og-levende-hjelp.md). Fra 3.3h har `docs/hjelp.md` ingen Rettet-linjer, så radene i del a som nevner en Rettet-linje i hjelpen, om AirPlay og om kl. 22, beskriver det som gjaldt før 3.3h. Svaret «Når kan jeg hente?» sier kl. 22 selv. README-en hadde 419 linjer etter `wc -l` og om lag 3 800 ord. Den blir ikke kortere i linjer, men kortere å lese, fordi mer står bak en pil.
 
 *Lagt til 2026-10-20 kl. 20:42:* U7 er flettet i `fdbdf20`, PR #80 (story 3.3h). Advarselen mot `docker compose down -v` står synlig rett under pila til den ekte versjonen, etter gruppens svar kl. 20:20.
+
+*Lagt til 2026-10-21 kl. 17:59:* U5 er flettet i `d4c2441`, PR #82 (story 2.7b). Hjelpen ved «?» på Sluttkurs på aksjesiden har en egen tekst, «kursen ved børsens stengning den dagen siden viser», og vinduet sier dagen, som «Siden viser fredag 09.10.», også for en dag valgt med «Velg dag».
