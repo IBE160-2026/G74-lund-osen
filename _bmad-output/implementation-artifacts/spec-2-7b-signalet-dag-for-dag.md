@@ -104,6 +104,8 @@ Blind Hunter fant 14 funn, Edge Case Hunter 12 og Verification Gap 12, til samme
 
 *Rettet 2026-10-21 kl. 17:46:* BH4, med dom lav–medium, er rettet i `979041e` og ikke avvist, fordi steg 4 i instruksjonen krever at funn med dom medium er rettet. Ingressen sier nå at en dag skilte seg ut når signalstyrken var 2 eller mer, som i oversikten, og at 3 av 3 er merket med strek og ring. En test krever setningen. Det gir 30 rettet, 3 avvist og 5 uten endring. Bildene ble tatt på nytt og var byte for byte de samme.
 
+*Rettet 2026-10-21 kl. 17:49:* setningen i linja over brøt to eldre tester i `tests/test_app.py`, som krever at «skilte seg ut» ikke står på siden når aksjen ikke skilte seg ut (CI 39628737448). I `4b97c37` sier ingressen i stedet «Tallene for uka og måneden teller dagene med signalstyrke 2 eller mer, som i oversikten, og 3 av 3 er merket med strek og ring.»
+
 ## Mutantene
 
 Én om gangen med `-x` på `tests/test_historikken.py`, i en fersk klon med `core.autocrlf=false`, med kopi av fila før og sha256 lik HEAD etter hver, og `git status` tom. M1–M3 er fra instruksjonen, kjørt på `41f7594` og igjen på `4289d93`. N1–N10 er mutantene fra Edge Case Hunter som overlevde, og to til, kjørt på `4289d93`. Alle ble fanget.
