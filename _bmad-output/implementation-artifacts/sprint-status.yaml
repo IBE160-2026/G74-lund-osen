@@ -183,7 +183,7 @@ development_status:
   # Ekstra, hvis tiden rekker: 10-6 og 10-8. Briefen v8 lover dem ikke.
   10-4-måle-bidraget-egen-brukertest-etter-8-1: backlog
   # 10-5 er lenken til selskapets investorside, ikke NewsWeb (2026-10-06). Navnet staar.
-  10-5-lenke-til-selskapets-side-på-newsweb: backlog
+  10-5-lenke-til-selskapets-side-på-newsweb: done
   10-6-ki-teksten-om-dagen-på-forsiden: backlog
   10-7-egen-nøkkel-til-gemini-anthropic-og-openai: backlog
   10-8-chatgpt-med-sign-in-with-chatgpt: backlog
