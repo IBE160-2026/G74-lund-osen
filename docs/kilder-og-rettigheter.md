@@ -2,7 +2,7 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-13T22:13
+updated: 2026-10-21T23:59
 ---
 
 # Kilder og rettigheter
@@ -339,6 +339,8 @@ og ingen artikkeltekst. Betingelse 4 ble stilt for artikkeltekst fra
 `/api/news`. Det vi sender nå, er ikke EODHDs innhold. Vilkårene for hver
 tjeneste står likevel her, fordi story 4.1 krever dem, og fordi godkjenningen
 skal kunne brukes hvis artikkeltekst sendes senere (plan A).
+
+*Lagt til 2026-10-21 (gruppens svar kl. 23:51, under «Prioritering» og story 10.1 i `epics.md`):* «Bare egne resultater». I den nye promptversjonen får modellen bare våre egne resultater. I tillegg til det den får i dag, fortegnet for de tre sjekkene, styrken og retningen (`ki_grunnlag` i `src/ki_grunnlag.py`), er det hvor lenge signalet har vært slik, retningen på hovedindeksen og børsometeret (8.6) når det er bygget. Modellen får ingen kurser, volumer, prosenter eller forholdstall, heller ikke tallene som står på siden. Teksten kan vise til tallene på siden uten å gjenta dem, og hvert tall i teksten kontrolleres fortsatt mot grunnlaget. Delen av linja 2026-10-21 kl. 22:57 om «tallene som alt står på siden» gjelder ikke lenger, og det åpne punktet i den er lukket. Grunnlaget holder seg innenfor avgjørelsen 04.10 (fortegn, styrke, retning og antall), som står, og EODHD spørres ikke. Fra den nye versjonen får grunnlaget for én aksje et antall (dagene), ulikt linja 15.10 (svar 10 kl. 15:53), der grunnlaget for én aksje er uten antall.
 
 Alt under er lest 04.10.2026.
 
