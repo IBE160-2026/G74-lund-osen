@@ -909,7 +909,9 @@ HOEYDE_PAA_BILDET = 1630
 # Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
 # Story 10.5: investorsidene i kursdata.py. Bildet ble tatt på nytt og er
 # byte for byte det samme. Avtrykket er av kildefilene, ikke av PNG-en.
-AVTRYKK_BAK_BILDET = "002f7e2d394cb2a3be4d1ad1c9178c12a523317b67f5af0450092679c5b756fc"
+# Story 2.7b: hjelpen til Sluttkurs og historikken i hjelpetekster.py. Bildet
+# ble tatt på nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "9a5bf8fe8a085fab67b46d19ba3b6d8ac037312d1c76996bb0f4602a94d5164f"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -948,6 +950,8 @@ FILENE_BAK_AKSJESIDEN = (
     "src/kursdata.py",
     "src/tilstand.py",
     "src/vurderingsdata.py",
+    # Story 2.7b: historikken nederst paa aksjesiden.
+    "src/historikk.py",
     "src/templates/aksje.html",
     # Gjennomgangen (BH1, ECH1): lagringslaget som leser det siden viser, og
     # skjemaet demobasen lages med.
@@ -968,7 +972,9 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # Edge uten vindu, så bildet, som slutter ved bunnen av grafen (1872 px), ble
 # byte for byte det samme da det ble tatt på nytt. Avtrykket er sha256 av
 # kildefilene bak bildet, ikke av PNG-en, så det er nytt (gjennomgangen, BH11).
-AVTRYKK_BAK_AKSJESIDEN = "475a0f88eb12400fd130e755781fb74c16ebebd3c911fd96a75520c8b5f8c86e"
+# Story 2.7b: historikken står nederst, under avsnittet om investorsiden, og
+# bildet ble byte for byte det samme da det ble tatt på nytt.
+AVTRYKK_BAK_AKSJESIDEN = "86ad400d4dd8a558ccf78250797b6884b6105be9133526b2de965400dc79fca0"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "
@@ -2120,6 +2126,8 @@ class TestReadmeForNybegynnere:
             "datoene og månedsmerkene",
             # Story 10.5: lenken til investorsiden er flettet.
             "lenken til investorsiden",
+            # Story 2.7b: historikken på aksjesiden.
+            "signalet dag for dag",
             "oversikten og utseendet fra designforslaget",
             "sortering ved klikk i kolonneraden",
             "ki-teksten fra en lokal modell på aksjesiden",
@@ -2162,8 +2170,8 @@ class TestReadmeForNybegynnere:
         # av lenkene, og fra signaldagene staar resten under «Ekstra».
         # Story 8.3: Min liste er flyttet til «Ferdig».
         # Story 10.5: lenken til investorsiden er flyttet til «Ferdig».
+        # Story 2.7b: historikken er flyttet til «Ferdig».
         saker = (
-            "historikken i aksjedetaljen",
             "egen nøkkel",
             "signaldagene i kursgrafen",
             "«vis ki-tekst»",
@@ -2472,7 +2480,8 @@ class TestReadmeDemoenAnbefales:
         hvis et ekstra punkt ble flyttet til «Neste i v1», eller NewsWeb kom
         tilbake i punktet om lenkene. Story 8.3: Min liste er flyttet til
         «Ferdig», og «Neste i v1» har de tre som er igjen. Story 10.5: lenken
-        til investorsiden er flyttet til «Ferdig», og to står igjen."""
+        til investorsiden er flyttet til «Ferdig», og to står igjen. Story
+        2.7b: historikken er flyttet til «Ferdig», og én står igjen."""
         tekst = README.read_text(encoding="utf-8")
         status = tekst.split("\n## Status\n", 1)[1].split("\n## ", 1)[0]
         lister = _statuslister(status)
@@ -2488,11 +2497,11 @@ class TestReadmeDemoenAnbefales:
                 assert sak in punkt, (sak, punkt)
         # Gjennomgangen (BH2, VG1): lenken går til selskapets investorside,
         # som i briefen v8 og story 10.5 etter 06.10.
-        for sak in ("historikken", "egen nøkkel til gemini"):
+        for sak in ("egen nøkkel til gemini",):
             assert sum(sak in p for p in v1) == 1, (sak, v1)
-        assert not any("min liste" in p or "investorside" in p for p in v1), v1
+        assert not any("min liste" in p or "investorside" in p or "historikk" in p for p in v1), v1
         assert sum("lenken til investorsiden" in p.lower() for p in lister["Ferdig"]) == 1, lister["Ferdig"]
-        assert len(v1) == 2, v1
+        assert len(v1) == 1, v1
         assert "newsweb" not in "\n".join(v1 + ekstra)
         assert REGELEN_FOR_EKSTRA in status
 

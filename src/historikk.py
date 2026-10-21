@@ -85,6 +85,12 @@ class Uke:
     vurdert: int
     skilte_seg_ut: int
 
+    @property
+    def tom(self) -> bool:
+        """Alle dagene i maaneden er etter siste kursrad, uten rad. Da har
+        uka ingen tekst, saa den ikke ser ut som et hull."""
+        return all(dag.tom for dag in self.dager if dag is not None)
+
 
 @dataclass(frozen=True)
 class Maaned:

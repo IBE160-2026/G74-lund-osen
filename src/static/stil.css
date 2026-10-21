@@ -524,6 +524,41 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-aksje) .dagpunkt { fill: var(--hvit); stroke: var(--blekk); stroke-width: 2.5; }
 :where(.side-aksje) p.dagen { margin: 0 0 12px; }
 
+/* Story 2.7b: historikken, en uke per rad med mandag til fredag. 3 av 3 har
+   pillen og streken fra oversikten (designregler §3), 2 av 3 merkes ikke.
+   På smal skjerm står dagene under hverandre. */
+:where(.side-aksje) .historikk .ingress { margin: 0 0 12px; }
+:where(.side-aksje) .maanedspiler { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 12px; }
+:where(.side-aksje) .maanedspiler .maaned { font-weight: 700; }
+:where(.side-aksje) .maanedspiler a.pil { color: inherit; text-decoration: underline; }
+:where(.side-aksje) .historikk a:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+:where(.side-aksje) ol.uker, :where(.side-aksje) ol.dager { list-style: none; margin: 0; padding: 0; }
+:where(.side-aksje) li.uke { display: grid; grid-template-columns: 4.5rem repeat(5, minmax(0, 1fr)); gap: 8px;
+                             padding: 10px 0; border-top: 1px solid var(--strek); }
+:where(.side-aksje) li.uke ol.dager { display: contents; }
+:where(.side-aksje) .ukenummer { margin: 0; font-weight: 700; font-size: 13.5px; color: var(--dempet); }
+:where(.side-aksje) .ukesum { grid-column: 2 / -1; margin: 0; font-size: 13px; color: var(--dempet); }
+:where(.side-aksje) li.dag { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0;
+                             padding: 8px; border: 1px solid var(--strek); border-radius: 8px; background: var(--kort);
+                             font-size: 13px; }
+:where(.side-aksje) li.dag.alle { box-shadow: inset 4px 0 0 var(--oransje); }
+:where(.side-aksje) li.dag.tom, :where(.side-aksje) li.dag.utenfor { background: transparent; border-color: transparent; }
+:where(.side-aksje) li.dag .dato { font-weight: 600; color: inherit; }
+:where(.side-aksje) li.dag a.dato { text-decoration: underline; }
+:where(.side-aksje) li.dag.tom .dato { color: var(--dempet); font-weight: 400; }
+:where(.side-aksje) li.dag .tilstand { color: var(--dempet); }
+:where(.side-aksje) li.dag .retningspille { height: 24px; padding: 0 8px; font-size: 12.5px; }
+:where(.side-aksje) .historikk .pille { white-space: nowrap; padding: 0.05rem 0.45rem; border-radius: 999px; font-weight: 700;
+                                        border: 1.5px solid var(--strek-2); }
+:where(.side-aksje) .historikk .pille.tre-av-tre { border: 2px solid var(--oransje); background: var(--fyll); color: var(--hvit); }
+:where(.side-aksje) .maanedssum { margin: 12px 0 0; }
+@media (max-width: 760px) {
+  :where(.side-aksje) li.uke { display: block; }
+  :where(.side-aksje) li.uke ol.dager { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; margin: 6px 0; }
+  :where(.side-aksje) li.dag { flex-direction: row; flex-wrap: wrap; align-items: center; }
+  :where(.side-aksje) li.dag.utenfor { display: none; }
+}
+
 /* Feilsiden (basefeil.html). */
 /* Story 8.0d: meldingen i et kort, i rammen som de andre sidene. */
 :where(.side-feil) .kort { background: var(--kort); border: 1px solid var(--strek); border-radius: 16px; padding: 18px 22px; }

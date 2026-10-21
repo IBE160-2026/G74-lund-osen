@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-21T10:34
+updated: 2026-10-21T17:14
 ---
 
 # Hjelp til «Kom i gang»
@@ -123,6 +123,10 @@ Sidene sier «Eksempeltall»: 15 oppdiktede selskaper med kurser til fredag 9. o
 
 Har du laget demobasen utenfor Docker før 20.10, da Min liste kom, viser sidene «Siden kan ikke vises» med `RuntimeError`. Lag den på nytt med `uv run python src/demo.py`. I Docker lages den på nytt hver gang demoen starter.
 
+### Hva sa appen om en aksje tidligere?
+
+Nederst på aksjesiden står «Signalet dag for dag»: det appen skrev om aksjen hver børsdag, en måned om gangen, med retningen, T, B, I og styrken. Pilene viser måneden før og etter, så langt kursserien går. Klikk på en dag for å se hele siden for den dagen, med målingene. En dag uten vurdering står med «–» og grunnen, og dagene etter siste kurs står tomme. Det gjelder både demoen og den ekte versjonen.
+
 ## Den ekte versjonen
 
 ### Hva med nøkkelen?
@@ -151,7 +155,7 @@ Nei. Porten er bare åpen på maskinen selv (127.0.0.1). Appen kan ikke nås fra
 
 ### Hvor finner jeg børsmeldingene?
 
-Appen viser ikke børsmeldingene. De står på NewsWeb og ofte også på selskapets investorside. Nederst på aksjesiden står en lenke til investorsiden for aksjen siden viser. Appen henter ingenting derfra. I demoen er selskapene oppdiktet og har ingen investorside, så der står det i stedet at lenken står der i den ekte versjonen.
+Appen viser ikke børsmeldingene. De står på NewsWeb og ofte også på selskapets investorside. Under kursgrafen på aksjesiden står en lenke til investorsiden for aksjen siden viser. Appen henter ingenting derfra. I demoen er selskapene oppdiktet og har ingen investorside, så der står det i stedet at lenken står der i den ekte versjonen.
 
 ## Når appen kjører, eller ikke
 
