@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-21T18:38
+updated: 2026-10-21T23:41
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1267,6 +1267,8 @@ EODHD eller ikke?»). Story 10.2 er blokkert til det er avgjort.
 *Avgjort 2026-10-04:* vi spør ikke. Modellen får bare våre egne resultater: fortegn, styrke, retning og antall, og ingen prosenter, forholdstall, kurser eller volumer. Det gjelder også FR-607. `malinger.md` §19 viste at målingene ikke ga bedre tekst. Se punktet under «Å følge opp» i `docs/kilder-og-rettigheter.md`.
 
 *Lagt til 2026-10-15 (gruppens svar 10 på planen for KI-laget, instruksjonen kl. 15:53):* «antall» gjelder dagsteksten i FR-607 (story 10.6). Grunnlaget for én aksje (story 10.1) er fortegnet for de tre sjekkene, styrken og retningen, uten antall.
+
+*Lagt til 2026-10-21 (gruppens svar kl. 22:57, under «Prioritering» og story 10.1 i `epics.md`):* fra en ny promptversjon etter uka med logget drift får KI-teksten også hvor lenge signalet har vært slik, tallene som alt står på siden, og retningen på hovedindeksen. Det endrer avgjørelsen 04.10 over fra den nye versjonen, og versjon 2 gjelder til da. Fortsatt ingen råd (NFR-06), hvert tall i teksten kontrolleres mot grunnlaget, og børsometeret (8.6) kommer med når det er bygget. Åpent punkt: avgjørelsen 04.10 om ikke å spørre EODHD bygde på at modellen bare får våre egne resultater, og ingen prosenter, forholdstall, kurser eller volumer («Betingelse 4 og KI-tjenestene (2026-10-04)» i `docs/kilder-og-rettigheter.md`). Om tallene som står på siden, kan sendes til Gemini, Anthropic eller OpenAI med egen nøkkel uten å spørre, er ikke avgjort.
 
 #### FR-601 — Av/på-bryteren er brukersynlig
 

@@ -569,6 +569,16 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-21 kl. 18:38 (gruppens svar):* de 20 kallene i døgnet hos EODHD er fordelt slik: 1 til hovedindeksen, 15 til de 15 aksjene, 3 holdt av til egne aksjer (story 2.12, taket på 18) og 1 i reserve, til et nytt forsøk hvis noe feiler eller til noe annet som trenger et kall. Brukes reserven til noe annet, er det ikke kall igjen til et nytt forsøk den kvelden. Til 2.12 er bygget, kan de 3 brukes til nye forsøk, som hentingen gjør i dag (`kall_til_nye_forsoek` i `src/fetch_prices.py`, som gir 4 med 15 aksjer og indeksen: de 3 og reserven). Taket på 18 står i linja kl. 16:47 under story 2.12.
 
+*Avgjort 2026-10-21 kl. 22:47 (gruppens svar):* hjelpen ved «?» åpnes i et fast felt på siden, som blir stående åpent og ikke dekker det den forklarer. Hvordan feltet ser ut på smal skjerm, er ikke avgjort. I dag åpnes hjelpen som et vindu med attributtet `popover` (`src/templates/_hjelp.html`, story 8.0b). Datert linje også ved «Hjelp bak «?»» i `designregler.md` §4.
+
+*Avgjort 2026-10-21 kl. 22:51 (gruppens svar):* rekkefølgen er 10.7 (egne nøkler), så README-rettingen etter gjennomgangen av demoen 21.10, så 2.12. README-rettingen står ikke som egen story i repoet ennå.
+
+*Avgjort 2026-10-21 kl. 22:57 (gruppens svar):* KI-teksten får mer å bygge på i en ny promptversjon etter uka med logget drift, som går med prompten versjon 2 (`PROMPTVERSJON` i `src/ki_prompt.py`, flettet 16.10 i `cafe067`, PR #55, og i drift fra 19.10): hvor lenge signalet har vært slik, tallene som alt står på siden, og retningen på hovedindeksen. Fortsatt ingen råd (NFR-06), og hvert tall i teksten kontrolleres mot grunnlaget. Børsometeret (8.6) kommer med når det er bygget. Det endrer grunnlaget fra 04.10 fra den nye versjonen, med en datert linje under «Avgjort 2026-10-04» i `prd.md`. Åpent punkt: avgjørelsen 04.10 om ikke å spørre EODHD bygde på at modellen bare får våre egne resultater, og ingen prosenter, forholdstall, kurser eller volumer («Betingelse 4 og KI-tjenestene (2026-10-04)» i `docs/kilder-og-rettigheter.md`). Om tallene som står på siden, kan sendes til Gemini, Anthropic eller OpenAI med egen nøkkel uten å spørre, er ikke avgjort.
+
+*Avgjort 2026-10-21 kl. 23:09 (gruppens svar):* historikken i demoen («Signalet dag for dag», 2.7b) viser det samme bildet som den ekte: signal bare fra en startdag noen uker før siste demodag, og «ikke vurdert» før. Det må passe med de 10 fargekombinasjonene på siste demodag (avgjørelsen 16.10 kl. 21:49, 3.4) og KI-tekstene i demoen (3.4b).
+
+*Avgjort 2026-10-21 kl. 23:33 (gruppens svar):* når basen er tom, henter første henting siste fullførte børsdag også på dagtid en hverdag, så en ny bruker ser kursene og signalet med en gang. Dagens rad skrives aldri før `TIDSGRENSE` (kl. 22:00 i `src/fetch_prices.py`), kallene er da brukt for dagen, og en base som ikke er tom, hentes som før. Bygges med README-rettingen, før 2.12 (rekkefølgen kl. 22:51). Det endrer tidskontrollen i 2.3, som i dag ikke henter noe på en børsdag før `TIDSGRENSE` uten `--uten-tidskontroll`, og må passe med FR-402 (kontroll mot forventet børsdag) og AD-7 (ingen slette- eller endremetode).
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -1547,6 +1557,8 @@ Oppgaveplanlegging beskrives i README (regel 19).
 
 *Lagt til 2026-10-21 kl. 23:30 (målingen etter gruppens svar 21.10 kl. 21:00, `malinger.md` §39):* EQNR, MOWI, GJF og VAR, de fire med volumforholdet nærmest 1,5 i vurderingene for 21.10, ble hentet på nytt kl. 23:30. Alle fire er like kursfila fra kl. 22 i alle sju feltene, så ingen vurdering måtte regnes på nytt. 4 kall av dagskvoten, de 3 som er holdt av til egne aksjer og reserven (fordelingen kl. 18:38), og bonuskvoten er ikke brukt. Svaret kl. 21:00 står i instruksjonen kl. 22:13 i dagsfila 21.10.
 
+*Avgjort 2026-10-21 kl. 23:33 (gruppens svar):* når basen er tom, henter første henting siste fullførte børsdag også på dagtid en hverdag, så en ny bruker ser kursene og signalet med en gang. Dagens rad skrives aldri før `TIDSGRENSE` (kl. 22:00 i `src/fetch_prices.py`), kallene er da brukt for dagen, og en base som ikke er tom, hentes som før. Bygges med README-rettingen, før 2.12 (rekkefølgen kl. 22:51). Det endrer tidskontrollen i 2.3, som i dag ikke henter noe på en børsdag før `TIDSGRENSE` uten `--uten-tidskontroll`, og må passe med FR-402 (kontroll mot forventet børsdag) og AD-7 (ingen slette- eller endremetode).
+
 ### Story 2.3b: Kallene som er igjen, brukes på nye forsøk
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 19:17.*
@@ -1881,6 +1893,8 @@ følger aksjene jeg bryr meg om.
 
 *Avgjort 2026-10-21 kl. 18:38 (gruppens svar):* de 20 kallene i døgnet hos EODHD er fordelt slik: 1 til hovedindeksen, 15 til de 15 aksjene, 3 holdt av til egne aksjer (story 2.12, taket på 18) og 1 i reserve, til et nytt forsøk hvis noe feiler eller til noe annet som trenger et kall. Brukes reserven til noe annet, er det ikke kall igjen til et nytt forsøk den kvelden. Til 2.12 er bygget, kan de 3 brukes til nye forsøk, som hentingen gjør i dag (`kall_til_nye_forsoek` i `src/fetch_prices.py`, som gir 4 med 15 aksjer og indeksen: de 3 og reserven). Taket på 18 står i linja kl. 16:47 over.
 
+*Avgjort 2026-10-21 kl. 22:51 (gruppens svar):* rekkefølgen er 10.7 (egne nøkler), så README-rettingen etter gjennomgangen av demoen 21.10, så 2.12. README-rettingen står ikke som egen story i repoet ennå.
+
 ### Story 2.13: Kommandoen som måler omsetning
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
@@ -2147,6 +2161,8 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 
 *Avgjort 2026-10-21 kl. 18:33 (gruppens svar):* README-prøven på en ren maskin er utsatt til v1 er ferdig bygget, fordi flere deler skal inn (historikken 2.7b, som ble flettet i `d4c2441` kl. 17:58 samme dag, og egne nøkler 10.7), og prøven skal gjelde den appen som leveres. Gruppen har kjørt oppskriften på egen maskin, og den virker. Den siste daterte gjennomgangen på egen maskin som står i repoet, er 16.10 kl. 20:40–21:11, under story 3.3 i `epics.md` (avgjørelsen 16.10 kl. 21:16), i tabellen i §13 i `docs/kvalitetssikring.md` og i `docs/reflection-log.md` 16.10. Den fant fire ting, som ble rettet i `fdaf403`, PR #66, 18.10. Prøven på en ren maskin er fortsatt funksjonsstoppen, senest én uke før innleveringen (svaret 19.10 kl. 14:48), og 3.4 står i review til den er tatt.
 
+*Avgjort 2026-10-21 kl. 22:51 (gruppens svar):* rekkefølgen er 10.7 (egne nøkler), så README-rettingen etter gjennomgangen av demoen 21.10, så 2.12. README-rettingen står ikke som egen story i repoet ennå.
+
 ### Story 3.4: Demoversjonen
 
 *Lagt til 2026-10-03, Marians beslutning kl. 18:10.*
@@ -2237,6 +2253,8 @@ avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 *Lagt til 2026-10-14 (gruppen kl. 22:19 og 22:25):* README-prøven tas når mest mulig av rekkefølgen etter 8.0d er bygget (se «Prioritering» øverst), og senest én uke før innleveringen. Det erstatter linja over om at prøven tas etter at 8.0d er flettet.
 
 *Lagt til 2026-10-17 kl. 19:03:* demoen viser alle 10 fargekombinasjonene av de tre sjekkene på siste demodag (beslutningen 16.10 kl. 21:49 under story 2.12), flettet i `f21f927`, PR #58. Spesifikasjonen er `spec-3-4-alle-ti-kombinasjonene-paa-siste-demodag.md`. CI var grønn på head-en `33ca133` (kjøring 39051824634) og på main (39051953417).
+
+*Avgjort 2026-10-21 kl. 23:09 (gruppens svar):* historikken i demoen («Signalet dag for dag», 2.7b) viser det samme bildet som den ekte: signal bare fra en startdag noen uker før siste demodag, og «ikke vurdert» før. Det må passe med de 10 fargekombinasjonene på siste demodag (avgjørelsen 16.10 kl. 21:49, 3.4) og KI-tekstene i demoen (3.4b).
 
 ### Story 3.4b: KI-tekstene i demoen
 
@@ -2539,6 +2557,8 @@ historikken.
 
 *Lagt til 2026-10-15:* flettet i `6855861`, PR #47.
 
+*Avgjort 2026-10-21 kl. 22:57 (gruppens svar):* KI-teksten får mer å bygge på i en ny promptversjon etter uka med logget drift, som går med prompten versjon 2 (`PROMPTVERSJON` i `src/ki_prompt.py`, flettet 16.10 i `cafe067`, PR #55, og i drift fra 19.10): hvor lenge signalet har vært slik, tallene som alt står på siden, og retningen på hovedindeksen. Fortsatt ingen råd (NFR-06), og hvert tall i teksten kontrolleres mot grunnlaget. Børsometeret (8.6) kommer med når det er bygget. Det endrer grunnlaget fra 04.10 fra den nye versjonen, med en datert linje under «Avgjort 2026-10-04» i `prd.md`. Åpent punkt: avgjørelsen 04.10 om ikke å spørre EODHD bygde på at modellen bare får våre egne resultater, og ingen prosenter, forholdstall, kurser eller volumer («Betingelse 4 og KI-tjenestene (2026-10-04)» i `docs/kilder-og-rettigheter.md`). Om tallene som står på siden, kan sendes til Gemini, Anthropic eller OpenAI med egen nøkkel uten å spørre, er ikke avgjort.
+
 ### Story 10.2: Teksten lages i hentekommandoen og lagres i `KILogg`
 
 *Het Story 5B.2 til 28.09.*
@@ -2806,6 +2826,8 @@ FR-604, FR-605, NFR-04
 *Lagt til 2026-10-05, gruppens beslutning kl. 16:53:* README-en får avsnittet om
 egne nøkler (regel 19). Punktet fra 3.3 om egne nøkler gjelder her.
 
+*Avgjort 2026-10-21 kl. 22:51 (gruppens svar):* rekkefølgen er 10.7 (egne nøkler), så README-rettingen etter gjennomgangen av demoen 21.10, så 2.12. README-rettingen står ikke som egen story i repoet ennå.
+
 ### Story 10.8: ChatGPT med «Sign in with ChatGPT»
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
@@ -3043,6 +3065,8 @@ sted. Min liste (8.3) bruker de samme.
 *Lagt til 2026-10-11, Marians beslutning:* fotnotene under tabellene (funn 23 i gjennomgangen av 8.0b, `deferred-work.md`) tas i 8.0c, ikke før flettingen.
 
 *Ferdig 2026-10-12:* flettet i `8d70762`, PR #29.
+
+*Avgjort 2026-10-21 kl. 22:47 (gruppens svar):* hjelpen ved «?» åpnes i et fast felt på siden, som blir stående åpent og ikke dekker det den forklarer. Hvordan feltet ser ut på smal skjerm, er ikke avgjort. I dag åpnes hjelpen som et vindu med attributtet `popover` (`src/templates/_hjelp.html`, story 8.0b). Datert linje også ved «Hjelp bak «?»» i `designregler.md` §4.
 
 ### Story 8.0c: Tydelig merking, ord ved sjekkene og datoer på grafen
 

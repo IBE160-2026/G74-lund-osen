@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-10-19T13:55
+updated: 2026-10-21T23:41
 ---
 
 # Designregler
@@ -120,6 +120,7 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 - Antall: telles alltid og står aldri fast som 15, så tallene følger lista når egne aksjer kommer med.
 - Hvor mange aksjer: én grense for hele lista, «opptil 18 aksjer», vist som «16 av 18 aksjer». Ikke «opptil 3 i tillegg».
 - Hjelp bak «?»: forklaringer som ellers ville stått som løs tekst, samme utseende som «Vis meg rundt».
+  *Lagt til 2026-10-21 (gruppens svar kl. 22:47):* hjelpen ved «?» åpnes i et fast felt på siden, som blir stående åpent og ikke dekker det den forklarer. Hvordan feltet ser ut på smal skjerm, er ikke avgjort (under «Prioritering» og story 8.0b i `epics.md`).
 - Ikke «v1.1» eller «(idé)» i tekster brukeren leser. De stiplede merkene på tavla («Idé til v1.1», «Ønsket», «Planlagt») er for gruppa.
 - Lenken går til selskapets investorside, den norske når den finnes, uten å skrive «på norsk» (Marian 02.10 kl. 21.56 og 06.10 kl. 20.42). NewsWeb og Oslo Børs nevnes uten lenke.
 - Skrift (valgt 01.10): IBM Plex Sans til all tekst og alle tall, med tabelltall. Newsreader bare til overskrifter og titler, også når det står et tall i dem.
