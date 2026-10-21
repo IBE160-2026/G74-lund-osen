@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-10-22T00:15
+updated: 2026-10-22T00:34
 ---
 
 # UX-loggen
@@ -552,6 +552,7 @@ Hvert funn er slått opp i koden 20.10 før det ble skrevet.
 | U67 | 21.10 kl. 23:18, rådet (designtavla mot demoen) | Aksjesiden, KI-teksten | Tavla har en større boks med egen tittel, den gule bryteren øverst til høyre i boksen, og tallene i teksten prikket understreket. Appen har en liten boks med knappen under. Se U33 og U46. | designtavla 13.10, ikke i utdraget (B11) | 8.2 |
 | U68 | 21.10 kl. 23:18, rådet (designtavla mot demoen) | Aksjesiden, «Signalet dag for dag» | Tavla har en kompakt tabell med man–fre og en kolonne for uka, månedsvelgeren som én knapp med piler, «Velg dag» øverst til høyre, en kort ingress og antallet per sjekk i sumlinja. Appen har store kort, summen under hver uke, tekstlenker som piler og en lang ingress. Se U16, U43 og U44. | designtavla 13.10, ikke i utdraget; utdraget §14 nevner bare at historikken ikke er i 8.0d (B12) | 8.2 |
 | U69 | 21.10 kl. 23:18, rådet (designtavla mot demoen) | Min liste | Tavla har en tittel om hvor mange i lista som skilte seg ut, og valget mellom Alle og Min liste øverst til høyre. Appen har tittelen «Min liste», og valget står til venstre. | designtavla 13.10, ikke i utdraget; Min liste i [`index.html`](../src/templates/index.html) (B13) | 8.2 |
+| U70 | 22.10 kl. 00:07, gruppen | Stripa og oversikten | Børsometeret mangler i appen. Det står i designforslaget, med en knapp i stripa, og er story 8.6, som er «Ekstra» og ikke bygget. | story 8.6 i [`epics.md`](../_bmad-output/planning-artifacts/epics.md); [`designutdrag-2026-10-13.md`](../_bmad-output/planning-artifacts/designutdrag-2026-10-13.md) §4 | 8.6, avgjort 22.10 kl. 00:09 |
 
 *Lagt til 2026-10-20 (story 3.3h, gjennomgangen VG6 og ECH10):* avgjørelsen kl. 10:14, 10:15, 10:18 og 10:19 og svaret kl. 16:19 står under story 3.3 i `epics.md` fra `49e9041`, og U7 bygges i [`spec-3-3h-readme-bak-piler-og-levende-hjelp.md`](../_bmad-output/implementation-artifacts/spec-3-3h-readme-bak-piler-og-levende-hjelp.md). Fra 3.3h har `docs/hjelp.md` ingen Rettet-linjer, så radene i del a som nevner en Rettet-linje i hjelpen, om AirPlay og om kl. 22, beskriver det som gjaldt før 3.3h. Svaret «Når kan jeg hente?» sier kl. 22 selv. README-en hadde 419 linjer etter `wc -l` og om lag 3 800 ord. Den blir ikke kortere i linjer, men kortere å lese, fordi mer står bak en pil.
 
@@ -564,3 +565,5 @@ Hvert funn er slått opp i koden 20.10 før det ble skrevet.
 *Lagt til 2026-10-22 kl. 00:15 (sammenligningen, del A):* dette i designforslaget mangler i demoen fordi det er planlagt og ikke bygget. I stripa: børsometeret (8.6), Innstillinger (8.10) og «Vis meg rundt» (8.9). På forsiden: periodevalget i kortet for hovedindeksen (8.17), endringen i NOK (8.5), endret signalstyrke siden forrige børsdag (8.12), flere lister (8.11), egne aksjer og å følge en aksje (2.12), KI-teksten om børsdagen (10.6) og lenken til perioden i børsometeret (8.6). På aksjesiden: høy og lav (8.5 og 2.10), NOK (8.5), «Se nærmere» med kortet for investorsiden (8.4), volumet og nøytralsonen i grafen (8.7) og U for utbyttedag (2.6). I Min liste: sammenligningen med en annen dag (8.17), og å komme i gang med en egen liste og følge flere aksjer (2.12).
 
 *Lagt til 2026-10-22 kl. 00:15 (sammenligningen, del C):* det demoen skal vise som den ekte, etter gruppen kl. 23:16: historikken som den ekte, med «ikke vurdert» før en startdag (avgjort kl. 23:09, U45), lenken til investorsiden i samme form som den ekte (U48), og utbytte i noen demoselskaper når U-merket bygges (U42).
+
+*Lagt til 2026-10-22 kl. 00:34:* U30 (2.12) kommer nå etter 8.6, børsometeret, etter svaret 22.10 kl. 00:09 under «Prioritering», story 8.6 og story 2.12 i `epics.md`. Rekkefølgen er 10.7, README-rettingen, 8.6 og så 2.12, og den endrer rekkefølgen kl. 22:51 som «Tas i» for U30 viser til.
