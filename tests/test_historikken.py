@@ -241,7 +241,7 @@ class TestTallene:
         """Ville feilet hvis uka talte 2 av 3 uten at siden sa at terskelen er
         2, som i oversikten (gjennomgangen, BH4)."""
         tekst = _tekst(_avsnittet(_side(klient, f"/aksje/{SYMBOL}")))
-        assert "En dag skilte seg ut når signalstyrken var 2 eller mer, som i oversikten" in tekst
+        assert "Tallene for uka og måneden teller dagene med signalstyrke 2 eller mer, som i oversikten" in tekst
 
     def test_terskelen_bestemmer_hva_som_skilte_seg_ut(self):
         """Ville feilet hvis tallene brukte 2 og ikke terskelen de får
