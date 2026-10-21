@@ -201,9 +201,9 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # Story 2.7b: historikken nederst paa aksjesiden.
         "historikken": Hjelpetekst(
             "Signalet dag for dag:",
-            "det appen skrev om aksjen hver børsdag i måneden, lest fra basen og aldri regnet på nytt. "
-            "Pilene viser måneden før og etter, så langt kursserien går. "
-            "Velg en dag for å se hele siden for den dagen, med målingene.",
+            "det appen skrev om aksjen hver dag i måneden, eller hvorfor det mangler, lest fra basen og "
+            "aldri regnet på nytt. Pilene viser måneden før og etter, så langt kursserien går. "
+            "Velg en dag med kurs for å se hele siden for den dagen, med målingene.",
             ((AKSJE_MAL, "Signalet dag for dag"), (HISTORIKK, "Signalet regnes aldri her")),
         ),
         # Svar 32 i 8.0d (rettet kl. 13:05): én tekst for oversikten og

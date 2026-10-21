@@ -253,14 +253,17 @@
       aldri (AD-7), og målingene står på siden for dagen (8.16b). 3 av 3
       merkes som i oversikten, 2 av 3 ikke (designregler.md §3). #}
   <section class="historikk" id="signalet-dag-for-dag" aria-labelledby="historikk-tittel">
-    <h2 id="historikk-tittel">Signalet dag for dag {{ hjelpeknapp("hjelp-historikk", "Hjelp: signalet dag for dag") }}</h2>
-    <p class="ingress">Det appen skrev om {{ detalj.aksje.navn }} hver børsdag, lest fra basen og aldri regnet på nytt. Velg en dag for å se hele siden for den dagen, med målingene.</p>
+    <h2><span id="historikk-tittel">Signalet dag for dag</span> {{ hjelpeknapp("hjelp-historikk", "Hjelp: signalet dag for dag") }}</h2>
+    <p class="ingress">Det appen skrev om {{ detalj.aksje.navn }} hver dag, eller hvorfor det mangler, lest fra basen og aldri regnet på nytt. Velg en dag med kurs for å se hele siden for den dagen, med målingene.</p>
     <nav class="maanedspiler" aria-label="Måned i historikken">
       {% if historikk.forrige %}<a class="pil" href="{{ pil(historikk.forrige) }}">‹ {{ historikk.forrige|maanedsnavn }}</a>{% endif %}
       <span class="maaned">{{ historikk.tittel|capitalize }}</span>
       {% if historikk.neste %}<a class="pil" href="{{ pil(historikk.neste) }}">{{ historikk.neste|maanedsnavn }} ›</a>{% endif %}
     </nav>
     {% if historikk.beskjed %}<p class="periodebeskjed" role="status">{{ historikk.beskjed }}</p>{% endif %}
+    {#- Gjennomgangen (ECH1, ECH2): dagene utenfor kursserien står tomme, og
+        siden sier hvor langt den går, så de ikke leses som et hull. #}
+    {% if historikk.har_tomme %}<p class="kursserien">Kursserien går fra {{ historikk.kurs_fra|dato }} til {{ historikk.kurs_til|dato }}, så dagene utenfor står tomme.</p>{% endif %}
     <ol class="uker">
       {% for uke in historikk.uker %}
         <li class="uke">
@@ -300,7 +303,7 @@
       Story 8.0d, PR 3: «data hentet» står i vinduet ved «Oppdatert». #}
   {% if hentet %}{{ hjelpevindu("hjelp-hentet", "Oppdatert", [("", ["data_hentet_aksje"])]) }}{% endif %}
   {#- U5 i docs/ux-logg.md (2.7b): hjelpen sier dagen siden viser. #}
-  {{ hjelpevindu("hjelp-kurs", "Sluttkurs", [("", ["sluttkurs_aksje", "utbyttejustert"])]) }}
+  {{ hjelpevindu("hjelp-kurs", "Sluttkurs", [("", ["sluttkurs_aksje", "utbyttejustert"])], vist=(detalj.dato|ukedag) ~ " " ~ (detalj.dato|dato)) }}
   {{ hjelpevindu("hjelp-endring", "Endring", [("", ["endring", "utbyttejustert"])]) }}
   {% if vis_grafhjelp %}
     {{ hjelpevindu("hjelp-graf", "Kursgrafen", [("", grafhjelp)]) }}

@@ -552,6 +552,7 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
                                         border: 1.5px solid var(--strek-2); }
 :where(.side-aksje) .historikk .pille.tre-av-tre { border: 2px solid var(--oransje); background: var(--fyll); color: var(--hvit); }
 :where(.side-aksje) .maanedssum { margin: 12px 0 0; }
+:where(.side-aksje) .kursserien { margin: 0 0 12px; color: var(--dempet); font-size: 13.5px; }
 @media (max-width: 760px) {
   :where(.side-aksje) li.uke { display: block; }
   :where(.side-aksje) li.uke ol.dager { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; margin: 6px 0; }

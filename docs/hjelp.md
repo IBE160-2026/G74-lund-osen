@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-21T17:14
+updated: 2026-10-21T17:31
 ---
 
 # Hjelp til «Kom i gang»
@@ -125,7 +125,7 @@ Har du laget demobasen utenfor Docker før 20.10, da Min liste kom, viser sidene
 
 ### Hva sa appen om en aksje tidligere?
 
-Nederst på aksjesiden står «Signalet dag for dag»: det appen skrev om aksjen hver børsdag, en måned om gangen, med retningen, T, B, I og styrken. Pilene viser måneden før og etter, så langt kursserien går. Klikk på en dag for å se hele siden for den dagen, med målingene. En dag uten vurdering står med «–» og grunnen, og dagene etter siste kurs står tomme. Det gjelder både demoen og den ekte versjonen.
+Nederst på aksjesiden står «Signalet dag for dag»: det appen skrev om aksjen hver børsdag, en måned om gangen, med retningen, T, B, I og styrken. Pilene viser måneden før og etter, så langt kursserien går. Klikk på en dag med kurs for å se hele siden for den dagen, med målingene. En dag uten vurdering står med «–» og grunnen, og dagene før første og etter siste kurs står tomme. Det gjelder både demoen og den ekte versjonen.
 
 ## Den ekte versjonen
 

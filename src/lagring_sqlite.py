@@ -414,6 +414,9 @@ class SqliteVurderingslager:
         # Story 2.7b: en spoerring for hele perioden, med samme kontroll som les.
         _kontroller_noekkel(symbol, fra, self._symboler)
         _kontroller_noekkel(symbol, til, self._symboler)
+        # Gjennomgangen, BH12: byttet om gir en feil, ikke en tom periode.
+        if fra > til:
+            raise ValueError(f"fra ({fra.isoformat()}) er etter til ({til.isoformat()})")
         return {
             date.fromisoformat(dato): _innhold(felt, grunn)
             for dato, *felt, grunn in self._tilkobling.execute(

@@ -43,8 +43,10 @@ class Dag:
     """En dag i historikken.
 
     tom er en dag etter siste kursrad uten rad i vurdering: raden er ikke
-    skrevet ennaa, og dagen skal ikke se ut som et hull. Da er tilstand og
-    tekst None. Ellers er de det les_tilstand gir. lenke er om dagen lenker
+    skrevet ennaa, og dagen skal ikke se ut som et hull. Det samme gjelder en
+    dag foer foerste kursrad, der aksjen ikke hadde kurs (gjennomgangen, BH2,
+    ECH2, VG10). Da er tilstand og tekst None, og siden sier hvor langt
+    kursserien gaar. Ellers er de det les_tilstand gir. lenke er om dagen lenker
     til siden for dagen: bare en dag med kurs, og ikke seriens foerste dag,
     som les_valg ikke godtar (8.16, BH3).
     """
@@ -96,9 +98,10 @@ class Uke:
 class Maaned:
     """Maaneden i historikken. foerste er den 1. i maaneden. utslag er
     (navnet paa sjekken, dager med +1 eller -1) i rekkefoelgen paa siden.
-    forrige og neste er den 1. i maaneden foer og etter, None naar
-    kursserien ikke har en rad der. beskjed er en kort tekst naar adressen
-    hadde en maaned som ikke kunne vises."""
+    forrige og neste er den 1. i naermeste maaned foer og etter med en
+    kursrad, None naar det ikke finnes en (gjennomgangen, VG9). kurs_fra og
+    kurs_til er foerste og siste kursrad. beskjed er en kort tekst naar
+    adressen hadde en maaned som ikke kunne vises."""
 
     foerste: date
     uker: tuple[Uke, ...]
@@ -107,7 +110,14 @@ class Maaned:
     utslag: tuple[tuple[str, int], ...]
     forrige: date | None
     neste: date | None
+    kurs_fra: date
+    kurs_til: date
     beskjed: str | None = None
+
+    @property
+    def har_tomme(self) -> bool:
+        """Maaneden har dager utenfor kursserien, som staar tomme."""
+        return any(dag is not None and dag.tom for uke in self.uker for dag in uke.dager)
 
     @property
     def navn(self) -> str:
@@ -126,14 +136,6 @@ def maanedsnavn(dag: date) -> str:
 def perioden(foerste: date) -> tuple[date, date]:
     """Foerste og siste dag i maaneden."""
     return foerste, foerste.replace(day=calendar.monthrange(foerste.year, foerste.month)[1])
-
-
-def _maaneden_foer(dag: date) -> date:
-    return (dag.replace(day=1) - timedelta(days=1)).replace(day=1)
-
-
-def _maaneden_etter(dag: date) -> date:
-    return perioden(dag.replace(day=1))[1] + timedelta(days=1)
 
 
 def les_maaned(verdi: str | None, dagen: date, foerste: date, siste: date) -> tuple[date, str | None]:
@@ -183,7 +185,7 @@ def _dag(
     terskel: int,
 ) -> Dag:
     innhold = rader.get(dato)
-    if dato > siste and innhold is None:
+    if (dato > siste or dato < foerste) and innhold is None:
         return Dag(dato, None, None, tom=True, lenke=False, skilte_seg_ut=False)
     tilstand_, tekst = les_tilstand(innhold, dato, idag)
     ut = isinstance(innhold, Vurdering) and innhold.styrke >= terskel
@@ -225,15 +227,18 @@ def bygg_maaned(
             )
         mandag += timedelta(days=7)
     vurderinger = [dag.vurdering for uke in uker for dag in uke.dager if dag is not None and dag.vurdering]
-    forrige = _maaneden_foer(maaned)
-    neste = _maaneden_etter(maaned)
+    maaneder = sorted({dag.replace(day=1) for dag in kursdatoer})
+    forrige = [m for m in maaneder if m < maaned]
+    neste = [m for m in maaneder if m > maaned]
     return Maaned(
         foerste=maaned,
         uker=tuple(uker),
         vurdert=len(vurderinger),
         skilte_seg_ut=sum(uke.skilte_seg_ut for uke in uker),
         utslag=tuple((felt, sum(getattr(v, felt) != 0 for v in vurderinger)) for _, felt in SJEKKBOKSTAVER),
-        forrige=forrige if forrige >= foerste.replace(day=1) else None,
-        neste=neste if neste <= siste.replace(day=1) else None,
+        forrige=forrige[-1] if forrige else None,
+        neste=neste[0] if neste else None,
+        kurs_fra=foerste,
+        kurs_til=siste,
         beskjed=beskjed,
     )

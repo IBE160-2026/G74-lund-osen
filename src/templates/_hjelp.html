@@ -10,7 +10,9 @@
 <button type="button" class="hjelpeknapp" popovertarget="{{ id }}" aria-label="{{ etikett }}">?</button>
 {%- endmacro %}
 
-{% macro hjelpevindu(id, tittel, grupper) -%}
+{#- Story 2.7b (U5, gjennomgangen VG2): vist er dagen siden viser, når
+    hjelpen gjelder den. #}
+{% macro hjelpevindu(id, tittel, grupper, vist=none) -%}
 <div id="{{ id }}" class="hjelpevindu" popover>
   <div class="hjelpetopp">
     <span class="hjelpemerke">Hjelp</span>
@@ -24,5 +26,6 @@
       <p>{% if tekst.tittel %}<strong>{{ tekst.tittel }}</strong> {% endif %}{{ tekst.tekst }}</p>
     {% endfor %}
   {% endfor %}
+  {% if vist %}<p class="vist"><strong>Siden viser</strong> {{ vist }}.</p>{% endif %}
 </div>
 {%- endmacro %}
