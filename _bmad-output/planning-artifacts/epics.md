@@ -581,6 +581,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-21 kl. 23:51 (gruppens svar):* «Bare egne resultater». I den nye promptversjonen får modellen bare våre egne resultater. I tillegg til det den får i dag, fortegnet for de tre sjekkene, styrken og retningen (`ki_grunnlag` i `src/ki_grunnlag.py`), er det hvor lenge signalet har vært slik, retningen på hovedindeksen og børsometeret (8.6) når det er bygget. Modellen får ingen kurser, volumer, prosenter eller forholdstall, heller ikke tallene som står på siden. Teksten kan vise til tallene på siden uten å gjenta dem, og hvert tall i teksten kontrolleres fortsatt mot grunnlaget. Delen av linja 2026-10-21 kl. 22:57 om «tallene som alt står på siden» gjelder ikke lenger, og det åpne punktet i den er lukket. Grunnlaget holder seg innenfor avgjørelsen 04.10 (fortegn, styrke, retning og antall), som står, og EODHD spørres ikke. Fra den nye versjonen får grunnlaget for én aksje et antall (dagene), ulikt linja 15.10 (svar 10 kl. 15:53), der grunnlaget for én aksje er uten antall.
 
+*Avgjort 2026-10-22 kl. 00:09 (gruppens svar):* rekkefølgen er 10.7 (egne nøkler), README-rettingen, 8.6 (børsometeret), så 2.12. Det endrer rekkefølgen 2026-10-21 kl. 22:51, der 2.12 kom rett etter README-rettingen. 8.6 er fortsatt «Ekstra, hvis tiden rekker» (svaret 19.10 kl. 15:43) og flettes bare ferdig og grønt (svaret 19.10 kl. 14:48). Flettes den før den nye promptversjonen, kan børsometeret komme med i grunnlaget fra den (avgjørelsene 2026-10-21 kl. 22:57 og 23:51). Story 8.6 sier at den avhenger av 8.17 for periodene; hvordan 8.6 bygges før 8.17, avgjøres i spesifikasjonen. Gruppen meldte kl. 00:07 at børsometeret mangler i appen (U70 i `docs/ux-logg.md`).
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -1896,6 +1898,8 @@ følger aksjene jeg bryr meg om.
 *Avgjort 2026-10-21 kl. 18:38 (gruppens svar):* de 20 kallene i døgnet hos EODHD er fordelt slik: 1 til hovedindeksen, 15 til de 15 aksjene, 3 holdt av til egne aksjer (story 2.12, taket på 18) og 1 i reserve, til et nytt forsøk hvis noe feiler eller til noe annet som trenger et kall. Brukes reserven til noe annet, er det ikke kall igjen til et nytt forsøk den kvelden. Til 2.12 er bygget, kan de 3 brukes til nye forsøk, som hentingen gjør i dag (`kall_til_nye_forsoek` i `src/fetch_prices.py`, som gir 4 med 15 aksjer og indeksen: de 3 og reserven). Taket på 18 står i linja kl. 16:47 over.
 
 *Avgjort 2026-10-21 kl. 22:51 (gruppens svar):* rekkefølgen er 10.7 (egne nøkler), så README-rettingen etter gjennomgangen av demoen 21.10, så 2.12. README-rettingen står ikke som egen story i repoet ennå.
+
+*Avgjort 2026-10-22 kl. 00:09 (gruppens svar):* rekkefølgen er 10.7 (egne nøkler), README-rettingen, 8.6 (børsometeret), så 2.12. Det endrer rekkefølgen 2026-10-21 kl. 22:51, der 2.12 kom rett etter README-rettingen. 8.6 er fortsatt «Ekstra, hvis tiden rekker» (svaret 19.10 kl. 15:43) og flettes bare ferdig og grønt (svaret 19.10 kl. 14:48). Flettes den før den nye promptversjonen, kan børsometeret komme med i grunnlaget fra den (avgjørelsene 2026-10-21 kl. 22:57 og 23:51). Story 8.6 sier at den avhenger av 8.17 for periodene; hvordan 8.6 bygges før 8.17, avgjøres i spesifikasjonen. Gruppen meldte kl. 00:07 at børsometeret mangler i appen (U70 i `docs/ux-logg.md`).
 
 ### Story 2.13: Kommandoen som måler omsetning
 
@@ -3354,6 +3358,8 @@ dagen gjaldt hele børsen eller noen bransjer.
 *Lagt til 2026-10-13, endringsforslaget 13.10 (N3, svar 24), godkjent av Marian kl. 12:46:*
 - Børsometeret bruker de 13 bransjene i `designregler.md` §4, med symbolene fra 8.0d. Det brukeren ser, heter «bransje», og koden sier `sektor`
 - **Ville feilet hvis:** siden sa «sektor», eller en bransje sto uten symbol
+
+*Avgjort 2026-10-22 kl. 00:09 (gruppens svar):* rekkefølgen er 10.7 (egne nøkler), README-rettingen, 8.6 (børsometeret), så 2.12. Det endrer rekkefølgen 2026-10-21 kl. 22:51, der 2.12 kom rett etter README-rettingen. 8.6 er fortsatt «Ekstra, hvis tiden rekker» (svaret 19.10 kl. 15:43) og flettes bare ferdig og grønt (svaret 19.10 kl. 14:48). Flettes den før den nye promptversjonen, kan børsometeret komme med i grunnlaget fra den (avgjørelsene 2026-10-21 kl. 22:57 og 23:51). Story 8.6 sier at den avhenger av 8.17 for periodene; hvordan 8.6 bygges før 8.17, avgjøres i spesifikasjonen. Gruppen meldte kl. 00:07 at børsometeret mangler i appen (U70 i `docs/ux-logg.md`).
 
 ### Story 8.7: Sjekk 2 og 3 i kursgrafen
 
