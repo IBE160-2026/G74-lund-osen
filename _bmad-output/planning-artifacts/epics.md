@@ -1861,6 +1861,8 @@ følger aksjene jeg bryr meg om.
 
 *Avgjort 2026-10-16, gruppens beslutning kl. 21:49:* demoen viser alle 10 fargekombinasjonene av de tre sjekkene på siste dag, fra 3 grønne til 3 grå, og en test krever dem. De to aksjene som viser en grunn i stedet for en vurdering (`NYLIG_NOTERT` og `UTEN_KURSER` i `src/demo.py`), blir stående. Det bygges lørdag 17.10 etter PR 1 og PR 2 for hovedindeksen, fordi PR 1 også endrer demobasen.
 
+*Avgjort 2026-10-21 kl. 16:47 (gruppens svar):* taket er 18 aksjer fordi 18 aksjer og hovedindeksen er 19 kall, og ett kall holdes igjen til et nytt forsøk samme kveld, til sammen de 20 i gratisnivået hos EODHD (docstringen i `src/fetch_prices.py`). Med ett kall igjen kan bare én aksje som feiler, prøves på nytt samme kveld; feiler flere, mangler de den dagen, og hullet tas av 2.4. Taket heves ikke uten en betalt konto eller en ny avgjørelse.
+
 ### Story 2.13: Kommandoen som måler omsetning
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
