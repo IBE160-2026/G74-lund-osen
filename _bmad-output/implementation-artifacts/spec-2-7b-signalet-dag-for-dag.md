@@ -4,7 +4,7 @@ type: 'feature'
 created: '2026-10-21'
 status: 'review'
 route: 'dispatch'
-review_loop_iteration: 0
+review_loop_iteration: 1
 baseline_commit: '7c55e44'
 context:
   - '{project-root}/CLAUDE.md'
@@ -46,6 +46,78 @@ context:
 
 ## Avgjort underveis
 
+- **`les_periode` står i porten og i `SqliteVurderingslager`**, og siden lager lageret med aksjen siden viser som lista. Da kan også demoselskapene leses, og kontrollen av nøkkelen er den samme som i `les` (`64ee382`). Med `fra` etter `til` reiser den `ValueError` (gjennomgangen, BH12).
+- **De to eldre testene for porten** i `tests/test_vurderingslager.py` krevde akkurat `skriv` og `les`. Nå krever de også `les_periode`, og fortsatt ingen slett og ingen endre.
+- **`tests/test_utseende.py`** godtar lenkene til siden for dagen og pilene med måneden. `tests/test_hjelpetekster.py` har de nye vinduene. `tests/test_docker.py` har historikken i «Ferdig», ett punkt under «Neste i v1» og `src/historikk.py` i avtrykket bak bildet av aksjesiden.
+- **Hjelpen ved Sluttkurs (U5)** har en egen tekst på aksjesiden, `sluttkurs_aksje`, og vinduet sier dagen siden viser, som «Siden viser fredag 09.10.» (gjennomgangen, VG2). Oversikten har teksten fra før.
+- **En uke uten en eneste dag i kursserien** har ingen tekst under seg, så den ikke ser ut som et hull.
+- **Dagene utenfor kursserien:** også dagene før første kursrad står tomme, og når måneden har slike dager, sier en linje «Kursserien går fra <første> til <siste>, så dagene utenfor står tomme.» (gjennomgangen, BH2, ECH1, ECH2, VG10). Dagene etter siste kursrad står tomme, som instruksjonen sier, og linja sier hvor serien slutter, så de ikke leses som et hull.
+- **Pilene** går til nærmeste måned med en kursrad, ikke bare til måneden før eller etter (gjennomgangen, VG9).
+- **Brikkene i en dag** brytes over to linjer i en smal rute, og går ikke ut av den (gjennomgangen, BH3, `c780d6c`).
+- **390 px**, målt i Edge uten vindu med siden i en iframe på 390 px: `scrollWidth` er 390 på `/aksje/KVST`, `?maaned=2026-09`, `?dag=2026-09-15`, `/aksje/BRFE?maaned=2026-08`, `/` og `/min-liste` i demoen. På 780 og 900 px er den lik bredden (gjennomgangen, VG1 og BH3).
+- **Bildene** ble tatt på nytt tre ganger, etter fremgangsmåten i 3.3b og 3.3f, og var hver gang byte for byte de samme. Avsnittet om investorsiden begynner ved 1980 px, under bildet, som slutter ved bunnen av grafen (1872 px), og historikken står under det. Bare avtrykkene er nye.
+
 ## Gjennomgangen
 
+Blind Hunter fant 14 funn, Edge Case Hunter 12 og Verification Gap 12, til sammen 38: 29 rettet, 4 avvist og 5 uten endring. Rettingene står i `4289d93` og `c780d6c`.
+
+| # | Funn | Dom | Utfall |
+|---|---|---|---|
+| BH1 | Testen for basefeil godtok 500 | medium | rettet: krever 503 og feiltypen |
+| BH2 | Dagene før første kursrad viste «– ikke vurdert» | medium | rettet: de står tomme |
+| BH3 | Innholdet i en dag kunne gå ut av ruta mellom 760 og 900 px | medium | rettet: brikkene brytes; målt på 780 og 900 px |
+| BH4 | Uka teller 2 av 3, men bare 3 av 3 merkes | lav–medium | avvist: «x av y dager skilte seg ut» er instruksjonens ord, og §3 merker 2 av 3 bare for siste børsdag |
+| BH5 | Ingressen sa «hver børsdag», og hjelpen «klikk på en dag» | lav | rettet: «hver dag, eller hvorfor det mangler» og «en dag med kurs» |
+| BH6 | Docstringen i fixturen sa 06.10 for DNB | lav | rettet: 07.10 |
+| BH7 | Importtesten ser bare på `historikk.py` | lav | uten endring: `test_siden_regner_aldri_signalet` stopper `vurder` i alle modulene i `src/` |
+| BH8 | Bare `vurder` stoppes | lav | uten endring: signalet regnes bare gjennom `vurder`, og testen for tilstandene viser de lagrede radene |
+| BH9 | Lenken på en dag beholder ikke perioden | lav | avvist: siden for dagen er «Velg dag», der perioden ikke gjelder, og den skal begynne øverst med målingene |
+| BH10 | `display: contents` på lista | lav | uten endring |
+| BH11 | Navnet på avsnittet tok med hjelpeknappen | lav | rettet: `aria-labelledby` peker på teksten alene |
+| BH12 | `les_periode` godtok `fra` etter `til` | lav | rettet: `ValueError` |
+| BH13 | Testen for porten står to steder | lav | uten endring: instruksjonen c ber om den her |
+| BH14 | «Under kursgrafen» i `docs/hjelp.md` | lav | avvist: avsnittet står etter grafen og to fotnoter, og en test holder rekkefølgen (VG5) |
+| ECH1 | Dagene etter siste kursrad skjuler et hull som er endelig | medium | rettet: linja sier hvor kursserien slutter; dagene står tomme, som instruksjonen sier |
+| ECH2 | Dagene før første kursrad | medium | rettet, som BH2 |
+| ECH3 | Formen på måneden var ikke testet | medium | rettet: `2026-1` og `2026x10` i testen |
+| ECH4 | Siste måned i adressen var ikke testet | medium | rettet |
+| ECH5 | Pilene i nest første og nest siste måned var ikke testet | medium | rettet |
+| ECH6 | En måned som begynner i helgen | lav–medium | rettet: august 2026 i testen |
+| ECH7 | Siste kursrad uten rad | lav | rettet: DNB 09.10 i testen |
+| ECH8 | Escapingen av beskjeden | lav | rettet |
+| ECH9 | Avkortingen av beskjeden | lav | rettet |
+| ECH10 | Terskelen var ikke testet med en annen verdi | lav | rettet: terskel 3 i testen |
+| ECH11 | 500 eller 503, som BH1 | lav | rettet |
+| ECH12 | Sjekket uten funn | info | uten endring |
+| VG1 | 390 px var ikke ført | medium | rettet: målt og ført over |
+| VG2 | Hjelpen ved Sluttkurs sa ikke datoen | medium | rettet: «Siden viser <dag>» i vinduet |
+| VG3 | Stilen for 3 av 3 var ikke testet | medium | rettet |
+| VG4 | Dager i en annen måned ble ikke prøvd | medium | rettet: en rad 30.09, i uke 40 |
+| VG5 | Rekkefølgen grafen, investorsiden og historikken var ikke testet | medium | rettet |
+| VG6 | Mutantene og triagen var ikke ført | medium | rettet: ført under |
+| VG7 | Seks tester manglet «Ville feilet hvis» | lav | rettet |
+| VG8 | Hjelpen var bredere enn koden | lav | rettet, som BH5 |
+| VG9 | En pil kunne gå til en måned uten kursrad | lav | rettet |
+| VG10 | Dagene før første kursrad | lav | rettet, som BH2 |
+| VG11 | Kontrollpunktet om fire uker står uten datert linje | lav | rettet etter flettingen: en datert linje under story 2.7 |
+| VG12 | Bildene viser ikke historikken | lav | avvist: bildet slutter ved grafen etter `HOEYDE_PAA_AKSJESIDEN`, og et nytt bilde er ikke bedt om |
+
 ## Mutantene
+
+Én om gangen med `-x` på `tests/test_historikken.py`, i en fersk klon med `core.autocrlf=false`, med kopi av fila før og sha256 lik HEAD etter hver, og `git status` tom. M1–M3 er fra instruksjonen, kjørt på `41f7594` og igjen på `4289d93`. N1–N10 er mutantene fra Edge Case Hunter som overlevde, og to til, kjørt på `4289d93`. Alle ble fanget.
+
+| # | Mutant | Fanget av |
+|---|---|---|
+| M1 | Historikken regnet med `vurder` | `test_hver_tilstand_ser_ulik_ut` |
+| M2 | En manglende rad vist som styrke 0 | `test_hver_tilstand_ser_ulik_ut` |
+| M3 | Dager etter siste kursrad vist som «– ikke vurdert» | `test_tallene_for_ukene` |
+| N1 | Formen på måneden ikke sjekket | `test_en_ugyldig_maaned_gir_maaneden_for_dagen_og_en_beskjed` |
+| N2 | Siste måned regnet som utenfor serien | `test_siste_maaned_i_adressen_gir_ingen_beskjed` |
+| N3 | Pila framover borte en måned for tidlig | `test_nest_siste_og_nest_foerste_maaned_har_begge_pilene` |
+| N4 | Pila bakover borte en måned for tidlig | `test_nest_siste_og_nest_foerste_maaned_har_begge_pilene` |
+| N5 | En uke uten dager i måneden tatt med | `test_en_maaned_som_begynner_i_helgen_har_ingen_tom_uke_foerst` |
+| N6 | Siste kursrad tom | `test_siste_kursrad_uten_rad_er_ikke_vurdert` |
+| N7 | Beskjeden uten escaping | `test_en_lang_eller_farlig_verdi_kortes_av_og_escapes` |
+| N8 | Beskjeden uten avkorting | `test_en_lang_eller_farlig_verdi_kortes_av_og_escapes` |
+| N9 | Terskelen 2 i koden | `test_terskelen_bestemmer_hva_som_skilte_seg_ut` |
+| N10 | Dagene før første kursrad ikke tomme | `test_dagene_foer_foerste_kursrad_er_tomme` |
