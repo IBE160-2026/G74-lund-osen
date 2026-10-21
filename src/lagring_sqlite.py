@@ -410,6 +410,19 @@ class SqliteVurderingslager:
         *felt, grunn = rad
         return _innhold(felt, grunn)
 
+    def les_periode(self, symbol: str, fra: date, til: date) -> dict[date, Vurdering | Grunn]:
+        # Story 2.7b: en spoerring for hele perioden, med samme kontroll som les.
+        _kontroller_noekkel(symbol, fra, self._symboler)
+        _kontroller_noekkel(symbol, til, self._symboler)
+        return {
+            date.fromisoformat(dato): _innhold(felt, grunn)
+            for dato, *felt, grunn in self._tilkobling.execute(
+                "SELECT dato, " + ", ".join(VURDERINGSKOLONNER) + ", grunn FROM vurdering "
+                "WHERE symbol = ? AND dato BETWEEN ? AND ? ORDER BY dato",
+                (symbol, fra.isoformat(), til.isoformat()),
+            )
+        }
+
 
 def _innhold(felt, grunn) -> Vurdering | Grunn:
     """Raden i vurdering som Vurdering eller Grunn, ett sted for begge

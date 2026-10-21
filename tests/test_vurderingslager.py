@@ -245,11 +245,13 @@ class TestProtokollen:
         # dir og ikke vars, saa en slett arvet fra en baseklasse ogsaa sees.
         return {navn for navn in dir(klasse) if not navn.startswith("_")}
 
+    # Story 2.7b: les_periode for historikken, og fortsatt ingen slett og
+    # ingen endre.
     def test_porten_har_bare_skriv_og_les(self):
-        assert self._offentlige(Vurderingslager) == {"skriv", "les"}
+        assert self._offentlige(Vurderingslager) == {"skriv", "les", "les_periode"}
 
     def test_adapteren_har_bare_skriv_og_les(self):
-        assert self._offentlige(SqliteVurderingslager) == {"skriv", "les"}
+        assert self._offentlige(SqliteVurderingslager) == {"skriv", "les", "les_periode"}
 
     def test_adapteren_oppfyller_porten(self, tilkobling):
         assert isinstance(lager(tilkobling), Vurderingslager)
