@@ -788,6 +788,10 @@ class TestReadme:
         hvorfor = tester.index("<details>\n<summary>Hvorfor hoppes noen over?</summary>")
         assert tester.index("uv run pytest") < tester.index("Alle testene skal bestå.") < hvorfor
         assert tester.rindex("</details>") < tester.index("\n- Ingen nettkall:")
+        # 21.10: en kort innledning foer punktene, saa de ikke ser ut som
+        # svaret i pila «Hvorfor hoppes noen over?». Ville feilet hvis
+        # punktene kom rett etter </details>.
+        assert "\n</details>\n\nSlik er testene satt opp:\n\n- Ingen nettkall:" in tester
         assert "Alle testene skal bestå. Noen hoppes over, og knappen under sier hvorfor.\n\n<details>" in tester
         assert not _blokkene(forklaring), forklaring
 
@@ -1802,8 +1806,9 @@ class TestReadmeForNybegynnere:
         assert "«The term 'uv' is not recognized» eller «command not found: uv»" in tester and funnet in tester
         assert "Første `uv sync` laster ned Python og pakkene" in tester
         # Gjennomgangen (BH1, VG2, ECH5): tidene som staar i dagsfila 18.10,
-        # 219-424 s, i hele minutter. 424 s er kjoeringen for 3.3e.
-        assert "Hele testsettet tok mellom 4 og 7 minutter på maskinen vår 18.10." in tester
+        # 219-424 s, i hele minutter. 424 s er kjoeringen for 3.3e. Fra 21.10
+        # tidene i Utført-linjene 20.10, 307,84-579,47 s.
+        assert "Hele testsettet tok mellom 5 og 10 minutter på maskinen vår 20.10." in tester
         uv = _detaljer(_seksjon("Mer for den som vil"))["Uten Docker, med uv"]
         assert "[«Tester»](#tester)" in uv
         assert UV_WINDOWS not in uv and UV_MAC not in uv and "install.ps1" not in uv and "install.sh" not in uv

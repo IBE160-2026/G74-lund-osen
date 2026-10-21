@@ -370,7 +370,7 @@ uv sync
 uv run pytest
 ```
 
-Første `uv sync` laster ned Python og pakkene. Hele testsettet tok mellom 4 og 7 minutter på maskinen vår 18.10.
+Første `uv sync` laster ned Python og pakkene. Hele testsettet tok mellom 5 og 10 minutter på maskinen vår 20.10.
 
 Alle testene skal bestå. Noen hoppes over, og knappen under sier hvorfor.
 
@@ -380,6 +380,8 @@ Alle testene skal bestå. Noen hoppes over, og knappen under sier hvorfor.
 Noen hoppes over, med grunnen i utskriften når du legger til `-rs`: på Windows testene som bytter tidssone, fordi `time.tzset` ikke finnes der (de kjøres i CI), og testen for Unix-sokler, som Python på Windows ikke har. På en maskin uten IPv6 (`::1`) hoppes testen for den over. I en mappe fra ZIP-fila, uten git, hoppes også testene som sjekker hva som er sporet i git, over.
 
 </details>
+
+Slik er testene satt opp:
 
 - Ingen nettkall: `tests/conftest.py` sperrer nettverket i hver test.
 - `data/` røres ikke: testene bruker en midlertidig mappe.
