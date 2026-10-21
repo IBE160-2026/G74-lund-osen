@@ -320,6 +320,16 @@ class TestRammen:
                     or re.fullmatch(r"/aksje/[A-Z0-9]+\?periode=(" + "|".join(map(re.escape, PERIODENE)) + ")", href)
                     # Story 2.7a: stilarket, med avtrykket av fila.
                     or re.fullmatch(r"/static/stil\.css\?v=[0-9a-f]{16}", href)
+                    # Story 2.7b: hver dag i historikken lenker til siden for
+                    # dagen (8.16b), og pilene har maaneden og dagen eller perioden.
+                    or re.fullmatch(r"/aksje/[A-Z0-9]+\?dag=[0-9]{4}-[0-9]{2}-[0-9]{2}", href)
+                    or re.fullmatch(
+                        r"/aksje/[A-Z0-9]+\?maaned=[0-9]{4}-[0-9]{2}"
+                        r"(&amp;dag=[0-9]{4}-[0-9]{2}-[0-9]{2}|&amp;periode=("
+                        + "|".join(map(re.escape, PERIODENE))
+                        + "))?#signalet-dag-for-dag",
+                        href,
+                    )
                 ), (navn, href)
 
     def test_tabelltall_i_tallcellene(self, sidene):

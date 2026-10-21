@@ -48,6 +48,7 @@ GRAF = "src/graf.py"
 AKSJE_MAL = "src/templates/aksje.html"
 PERIODER = "src/perioder.py"
 PERIODE_MAL = "src/templates/_perioder.html"
+HISTORIKK = "src/historikk.py"
 
 # FR-701: tre sjekker, ingen fjerde.
 ANTALL_SJEKKER = 3
@@ -188,6 +189,22 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "Sluttkurs:",
             "kursen ved børsens stengning siste børsdag i dataene, uten utbyttejustering.",
             ((PRD, "| Sluttkurs | `close` for siste børsdag |"), (INDEX_MAL, "Sluttkursen er den ujusterte kursen")),
+        ),
+        # U5 i docs/ux-logg.md (story 2.7b): paa aksjesiden er sluttkursen for
+        # dagen siden viser, ogsaa en dag valgt med «Velg dag» (8.16b).
+        "sluttkurs_aksje": Hjelpetekst(
+            "Sluttkurs:",
+            "kursen ved børsens stengning den dagen siden viser, uten utbyttejustering. "
+            "Dagen står under navnet øverst: siste børsdag i dataene, eller dagen som er valgt med «Velg dag».",
+            ((PRD, "| Sluttkurs | `close` for siste børsdag |"), (AKSJE_MAL, "{{ detalj.dato|dato }}")),
+        ),
+        # Story 2.7b: historikken nederst paa aksjesiden.
+        "historikken": Hjelpetekst(
+            "Signalet dag for dag:",
+            "det appen skrev om aksjen hver dag i måneden, eller hvorfor det mangler, lest fra basen og "
+            "aldri regnet på nytt. Pilene viser måneden før og etter, så langt kursserien går. "
+            "Velg en dag med kurs for å se hele siden for den dagen, med målingene.",
+            ((AKSJE_MAL, "Signalet dag for dag"), (HISTORIKK, "Signalet regnes aldri her")),
         ),
         # Svar 32 i 8.0d (rettet kl. 13:05): én tekst for oversikten og
         # aksjesiden, og datoene står bare ved endringen på aksjesiden.

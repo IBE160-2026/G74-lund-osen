@@ -410,7 +410,8 @@ class TestSidene:
                 # Story 8.0d, PR 3: «data hentet» står ved «Oppdatert» i stripa,
                 # og endringen er et eget nøkkeltall.
                 "hjelp-hentet": ["data_hentet_aksje"],
-                "hjelp-kurs": ["sluttkurs", "utbyttejustert"],
+                # U5 (story 2.7b): sluttkursen for dagen siden viser.
+                "hjelp-kurs": ["sluttkurs_aksje", "utbyttejustert"],
                 "hjelp-endring": ["endring", "utbyttejustert"],
                 # Story 2.9c: den stiplede linja, når basen har indeksen.
                 # Story 8.16: periodene i samme vindu som grafen.
@@ -426,6 +427,8 @@ class TestSidene:
                     "skjevhet",
                 ],
                 "hjelp-sjekkene": ["hvorfor_tre", "antall_dager"],
+                # Story 2.7b: historikken nederst på siden.
+                "hjelp-historikk": ["historikken"],
                 "hjelp-trend": ["trend"],
                 "hjelp-bevegelse": ["bevegelse"],
                 "hjelp-interesse": ["interesse"],

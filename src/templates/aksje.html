@@ -1,7 +1,7 @@
 {% extends "_ramme.html" %}
 {% from "_hjelp.html" import hjelpeknapp, hjelpevindu with context -%}
 {% from "_bransjer.html" import bransjesymbol -%}
-{% from "_brikker.html" import brikker -%}
+{% from "_brikker.html" import brikker, retningspille -%}
 {% from "_perioder.html" import periodevalg with context -%}
 {% block tittel %}{{ detalj.aksje.navn }} — OSE Signal{% endblock %}
 {#- Story 8.0d, PR 3: tidspunktet står bare i stripa, med «?» ved siden av
@@ -248,11 +248,62 @@
     <p class="fotnote investorside">Børsmeldingene står på NewsWeb og ofte også på selskapets investorside.</p>
   {% endif %}
 
+  {#- Story 2.7b (avgjørelsen 2026-10-21 under story 2.7): historikken, en
+      måned om gangen, med det som er lagret i vurdering. Signalet regnes
+      aldri (AD-7), og målingene står på siden for dagen (8.16b). 3 av 3
+      merkes som i oversikten, 2 av 3 ikke (designregler.md §3). #}
+  <section class="historikk" id="signalet-dag-for-dag" aria-labelledby="historikk-tittel">
+    <h2><span id="historikk-tittel">Signalet dag for dag</span> {{ hjelpeknapp("hjelp-historikk", "Hjelp: signalet dag for dag") }}</h2>
+    <p class="ingress">Det appen skrev om {{ detalj.aksje.navn }} hver dag, eller hvorfor det mangler, lest fra basen og aldri regnet på nytt. Velg en dag med kurs for å se hele siden for den dagen, med målingene. Tallene for uka og måneden teller dagene med signalstyrke {{ parametre.terskel }} eller mer, som i oversikten, og 3 av 3 er merket med strek og ring.</p>{#- Gjennomgangen, BH4: tallene for uka og måneden teller terskelen, som oversikten. #}
+    <nav class="maanedspiler" aria-label="Måned i historikken">
+      {% if historikk.forrige %}<a class="pil" href="{{ pil(historikk.forrige) }}">‹ {{ historikk.forrige|maanedsnavn }}</a>{% endif %}
+      <span class="maaned">{{ historikk.tittel|capitalize }}</span>
+      {% if historikk.neste %}<a class="pil" href="{{ pil(historikk.neste) }}">{{ historikk.neste|maanedsnavn }} ›</a>{% endif %}
+    </nav>
+    {% if historikk.beskjed %}<p class="periodebeskjed" role="status">{{ historikk.beskjed }}</p>{% endif %}
+    {#- Gjennomgangen (ECH1, ECH2): dagene utenfor kursserien står tomme, og
+        siden sier hvor langt den går, så de ikke leses som et hull. #}
+    {% if historikk.har_tomme %}<p class="kursserien">Kursserien går fra {{ historikk.kurs_fra|dato }} til {{ historikk.kurs_til|dato }}, så dagene utenfor står tomme.</p>{% endif %}
+    <ol class="uker">
+      {% for uke in historikk.uker %}
+        <li class="uke">
+          <p class="ukenummer">Uke {{ uke.nummer }}</p>
+          <ol class="dager">
+            {% for dag in uke.dager %}
+              {% if dag is none %}
+                <li class="dag utenfor" aria-hidden="true"></li>
+              {% else %}
+                <li class="dag{% if dag.tom %} tom{% elif dag.vurdering and dag.vurdering.styrke == antall_sjekker %} alle{% endif %}">
+                  {% if dag.lenke %}<a class="dato" href="/aksje/{{ detalj.aksje.symbol }}?dag={{ dag.dato.isoformat() }}">{{ dag.dato|ukedag }} {{ dag.dato|dato }}</a>{% else %}<span class="dato">{{ dag.dato|ukedag }} {{ dag.dato|dato }}</span>{% endif %}
+                  {% if dag.vurdering %}
+                    {{ retningspille(dag.retning) }}
+                    {{ brikker(dag.brikker) }}
+                    <span class="pille{% if dag.vurdering.styrke == antall_sjekker %} tre-av-tre{% endif %}">{{ dag.vurdering.styrke }} av {{ antall_sjekker }}</span>
+                  {% elif not dag.tom %}
+                    <span class="tilstand">– {{ dag.tekst }}</span>
+                  {% endif %}
+                </li>
+              {% endif %}
+            {% endfor %}
+          </ol>
+          {% if not uke.tom %}<p class="ukesum">{% if uke.vurdert %}{{ uke.skilte_seg_ut }} av {{ uke.vurdert }} {{ "dag" if uke.vurdert == 1 else "dager" }} skilte seg ut{% else %}Ingen dager med vurdering{% endif %}</p>{% endif %}
+        </li>
+      {% endfor %}
+    </ol>
+    {% if historikk.vurdert %}
+      <p class="maanedssum"><strong>{{ historikk.navn|capitalize }} samlet:</strong> {{ detalj.aksje.navn }} skilte seg ut {{ historikk.skilte_seg_ut }} av {{ historikk.vurdert }} {{ "børsdag" if historikk.vurdert == 1 else "børsdager" }}.
+        {% for navn, antall in historikk.utslag %}{% if loop.first %}{{ navn|capitalize }} slo ut {{ antall }} {{ "dag" if antall == 1 else "dager" }}{% elif loop.last %} og {{ navn }} {{ antall }}{% else %}, {{ navn }} {{ antall }}{% endif %}{% endfor %}.</p>
+    {% else %}
+      <p class="maanedssum"><strong>{{ historikk.navn|capitalize }} samlet:</strong> {{ detalj.aksje.navn }} har ingen dager med vurdering.</p>
+    {% endif %}
+  </section>
+
   {#- grafen bare med grafen og snittet, ga og maalt_mot bare med sjekkene
       (gjennomgangen av 8.0b): ellers forklarer hjelpen noe siden ikke viser.
       Story 8.0d, PR 3: «data hentet» står i vinduet ved «Oppdatert». #}
   {% if hentet %}{{ hjelpevindu("hjelp-hentet", "Oppdatert", [("", ["data_hentet_aksje"])]) }}{% endif %}
-  {{ hjelpevindu("hjelp-kurs", "Sluttkurs", [("", ["sluttkurs", "utbyttejustert"])]) }}
+  {#- U5 i docs/ux-logg.md (2.7b): hjelpen sier dagen siden viser. #}
+  {{ hjelpevindu("hjelp-kurs", "Sluttkurs", [("", ["sluttkurs_aksje", "utbyttejustert"])], vist=(detalj.dato|ukedag) ~ " " ~ (detalj.dato|dato)) }}
   {{ hjelpevindu("hjelp-endring", "Endring", [("", ["endring", "utbyttejustert"])]) }}
   {% if vis_grafhjelp %}
     {{ hjelpevindu("hjelp-graf", "Kursgrafen", [("", grafhjelp)]) }}
@@ -262,6 +313,7 @@
     ("", ["retning", "positiv", "negativ", "blandet", "ingen", "ukjent_aksje", "skjevhet"]),
   ]) }}
   {{ hjelpevindu("hjelp-sjekkene", "Sjekkene", [("", ["hvorfor_tre", "antall_dager"])]) }}
+  {{ hjelpevindu("hjelp-historikk", "Signalet dag for dag", [("", ["historikken"])]) }}
   {% if detalj.sjekker %}
     {% for sjekk in detalj.sjekker %}
       {{ hjelpevindu("hjelp-" ~ sjekk.navn|lower, sjekk.navn, [("", [sjekk.navn|lower])]) }}

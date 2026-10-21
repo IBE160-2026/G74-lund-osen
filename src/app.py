@@ -40,6 +40,7 @@ from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
 from boersdag import norsk_dato
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER
 from graf import bygg_graf
+from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
 from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster
 from hovedindeks import Hovedindeksvisning, bygg_hovedindeks
 from indeksdata import HOVEDINDEKS
@@ -53,6 +54,7 @@ from lagring_sqlite import (
     SqliteKurslager,
     SqliteMinlistelager,
     SqliteOversiktsleser,
+    SqliteVurderingslager,
     aapne_base,
     andre_aksjer_har_ki_rad,
     demo_sti,
@@ -145,6 +147,8 @@ app.jinja_env.filters["avrundet"] = avrundet
 # Story 8.0e: ukedagen i overskriften og navnene i linja om «3 av 3».
 app.jinja_env.filters["ukedag"] = ukedag
 app.jinja_env.filters["med_og"] = med_og
+# Story 2.7b: «oktober 2026» ved pilene i historikken.
+app.jinja_env.filters["maanedsnavn"] = maanedsnavn
 # Story 8.15: retningen et klikk på en kolonne gir.
 app.jinja_env.globals["neste_orden"] = neste_orden
 # Story 8.0d: «Oppdatert tirsdag 13.10 kl. 22.15» i stripa, i norsk tid.
@@ -601,6 +605,13 @@ def aksjedetalj(symbol: str):
     if valg.periode == VELG:
         tilbake += f"?dag={slutt.isoformat()}"
     indeks_symbol, indeks, indeks_feilet = _indeksen_for_grafen()
+    historikk = _historikken(post, rader, slutt, i_dag)
+    # Pilene beholder dagen, eller perioden naar adressen hadde en gyldig.
+    periode = valg.periode if request.args.get("periode") and not valg.beskjed and valg.periode != VELG else None
+    dag = slutt if valg.periode == VELG else None
+
+    def pil(maaned: date) -> str:
+        return adresse(post.aksje.symbol, maaned, dag=dag, periode=periode)
 
     svar = app.make_response(
         render_template(
@@ -637,11 +648,24 @@ def aksjedetalj(symbol: str):
             # Story 10.5: lenken til investorsiden for aksjen siden viser,
             # slaatt opp paa symbolet. Siden henter ingenting derfra (AD-2).
             investorside=investorside(post.aksje.symbol),
+            # Story 2.7b: maaneden for dagen siden viser, eller den i adressen.
+            historikk=historikk,
+            pil=pil,
         )
     )
     # Siden avhenger av bryteren (gjennomgangen av 10.3, BH10).
     svar.vary.add("Cookie")
     return svar
+
+
+def _historikken(post, rader, dagen: date, i_dag: date) -> Maaned:
+    """Story 2.7b: maaneden i historikken, lest gjennom Vurderingslager i en
+    spoerring (AD-3). Lista er aksjen siden viser, fra aksje i basen, saa
+    ogsaa demoselskapene kan leses. Signalet regnes aldri (AD-7)."""
+    maaned, beskjed = les_maaned(request.args.get(PARAMETER), dagen, rader[0].dato, rader[-1].dato)
+    lager = SqliteVurderingslager(g.tilkobling, naa, (post.aksje,))
+    radene = lager.les_periode(post.aksje.symbol, *perioden(maaned))
+    return bygg_maaned(maaned, [rad.dato for rad in rader], radene, i_dag, STANDARD.terskel, beskjed)
 
 
 def _ki_visning(post, detalj) -> KIVisning:

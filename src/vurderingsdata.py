@@ -159,7 +159,8 @@ class Vurdering:
 
 @runtime_checkable
 class Vurderingslager(Protocol):
-    """Porten for vurderingene - AD-3, AD-7. Bare skriv og les.
+    """Porten for vurderingene - AD-3, AD-7. Bare skriv og les, og fra story
+    2.7b les_periode for historikken.
 
     Det finnes med vilje ingen slett og ingen endre. Fravaeret er invarianten
     (AD-7), og testen ser paa protokollen, ikke paa en implementasjon.
@@ -177,3 +178,8 @@ class Vurderingslager(Protocol):
 
     def les(self, symbol: str, dato: date) -> "Vurdering | Grunn | None":
         """Raden for symbolet og datoen. None hvis den ikke finnes."""
+
+    def les_periode(self, symbol: str, fra: date, til: date) -> "dict[date, Vurdering | Grunn]":
+        """Radene for symbolet fra og med fra til og med til, etter dato.
+        En dag uten rad er ikke med - story 2.7b, historikken paa aksjesiden.
+        Bare lesing, som les (AD-7)."""
