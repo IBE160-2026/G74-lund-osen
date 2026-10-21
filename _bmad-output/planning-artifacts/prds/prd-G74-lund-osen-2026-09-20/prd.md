@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-20T15:54
+updated: 2026-10-21T18:38
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1681,6 +1681,8 @@ i 2.3 tar antallet fra lista som parameter.
 Bonuskvoten brukes bare til å fullføre kveldens henting, aldri til nye forsøk
 (2.3b), målingen av omsetning (FR-413) eller noe annet. Utenom det gjelder
 fortsatt aldri flere enn 20 kall i døgnet.
+
+*Lagt til 2026-10-21 kl. 18:38 (gruppens svar, under «Prioritering» og story 2.12 i `epics.md`):* de 20 kallene i døgnet hos EODHD er fordelt slik: 1 til hovedindeksen, 15 til de 15 aksjene, 3 holdt av til egne aksjer (story 2.12, taket på 18) og 1 i reserve, til et nytt forsøk hvis noe feiler eller til noe annet som trenger et kall. Brukes reserven til noe annet, er det ikke kall igjen til et nytt forsøk den kvelden. Til 2.12 er bygget, kan de 3 brukes til nye forsøk, som hentingen gjør i dag (`kall_til_nye_forsoek` i `src/fetch_prices.py`, som gir 4 med 15 aksjer og indeksen: de 3 og reserven).
 
 Ett bulk-kall er ikke et alternativ: bulk-endepunktet koster 100 kall flatt. Ett
 kall per symbol er eneste vei, og det er denne begrensningen som gir universet

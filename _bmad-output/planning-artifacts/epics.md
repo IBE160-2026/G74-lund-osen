@@ -567,6 +567,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-21 kl. 18:33 (gruppens svar):* README-prøven på en ren maskin er utsatt til v1 er ferdig bygget, fordi flere deler skal inn (historikken 2.7b, som ble flettet i `d4c2441` kl. 17:58 samme dag, og egne nøkler 10.7), og prøven skal gjelde den appen som leveres. Gruppen har kjørt oppskriften på egen maskin, og den virker. Den siste daterte gjennomgangen på egen maskin som står i repoet, er 16.10 kl. 20:40–21:11, under story 3.3 i `epics.md` (avgjørelsen 16.10 kl. 21:16), i tabellen i §13 i `docs/kvalitetssikring.md` og i `docs/reflection-log.md` 16.10. Den fant fire ting, som ble rettet i `fdaf403`, PR #66, 18.10. Prøven på en ren maskin er fortsatt funksjonsstoppen, senest én uke før innleveringen (svaret 19.10 kl. 14:48), og 3.4 står i review til den er tatt.
 
+*Avgjort 2026-10-21 kl. 18:38 (gruppens svar):* de 20 kallene i døgnet hos EODHD er fordelt slik: 1 til hovedindeksen, 15 til de 15 aksjene, 3 holdt av til egne aksjer (story 2.12, taket på 18) og 1 i reserve, til et nytt forsøk hvis noe feiler eller til noe annet som trenger et kall. Brukes reserven til noe annet, er det ikke kall igjen til et nytt forsøk den kvelden. Til 2.12 er bygget, kan de 3 brukes til nye forsøk, som hentingen gjør i dag (`kall_til_nye_forsoek` i `src/fetch_prices.py`, som gir 4 med 15 aksjer og indeksen: de 3 og reserven). Taket på 18 står i linja kl. 16:47 under story 2.12.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -1874,6 +1876,8 @@ følger aksjene jeg bryr meg om.
 *Avgjort 2026-10-16, gruppens beslutning kl. 21:49:* demoen viser alle 10 fargekombinasjonene av de tre sjekkene på siste dag, fra 3 grønne til 3 grå, og en test krever dem. De to aksjene som viser en grunn i stedet for en vurdering (`NYLIG_NOTERT` og `UTEN_KURSER` i `src/demo.py`), blir stående. Det bygges lørdag 17.10 etter PR 1 og PR 2 for hovedindeksen, fordi PR 1 også endrer demobasen.
 
 *Avgjort 2026-10-21 kl. 16:47 (gruppens svar):* taket er 18 aksjer fordi 18 aksjer og hovedindeksen er 19 kall, og ett kall holdes igjen til et nytt forsøk samme kveld, til sammen de 20 i gratisnivået hos EODHD (docstringen i `src/fetch_prices.py`). Med ett kall igjen kan bare én aksje som feiler, prøves på nytt samme kveld; feiler flere, mangler de den dagen, og hullet tas av 2.4. Taket heves ikke uten en betalt konto eller en ny avgjørelse.
+
+*Avgjort 2026-10-21 kl. 18:38 (gruppens svar):* de 20 kallene i døgnet hos EODHD er fordelt slik: 1 til hovedindeksen, 15 til de 15 aksjene, 3 holdt av til egne aksjer (story 2.12, taket på 18) og 1 i reserve, til et nytt forsøk hvis noe feiler eller til noe annet som trenger et kall. Brukes reserven til noe annet, er det ikke kall igjen til et nytt forsøk den kvelden. Til 2.12 er bygget, kan de 3 brukes til nye forsøk, som hentingen gjør i dag (`kall_til_nye_forsoek` i `src/fetch_prices.py`, som gir 4 med 15 aksjer og indeksen: de 3 og reserven). Taket på 18 står i linja kl. 16:47 over.
 
 ### Story 2.13: Kommandoen som måler omsetning
 
