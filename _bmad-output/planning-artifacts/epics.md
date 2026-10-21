@@ -1654,6 +1654,7 @@ Som **bruker**, vil jeg se hva løsningen sa om aksjen de siste ukene, så FR-40
 
 **Kontroll — hva testen ser etter:**
 - De siste fire ukene, dag for dag: styrke og retning, eller grunnen, «ikke vurdert» eller «ikke børsdag»
+  - *Lagt til 2026-10-21 kl. 17:59 (avgjørelsen 21.10 under, gjennomgangen av 2.7b, VG11):* historikken viser en måned om gangen, med piler så langt kursserien går, og ikke de siste fire ukene.
 - Målingene vises dag for dag, avrundet som i FR-706 (2.1c) *(lagt til 2026-09-29)*
   - *Lagt til 2026-10-21 (avgjørelsen 21.10 under):* målingene står ikke i historikken, men på siden for dagen (8.16b), som hver dag i historikken lenker til.
 - Hver dag går gjennom `tilstand`, så styrke 0, en grunn og en manglende rad aldri ser like ut
@@ -1671,6 +1672,8 @@ Som **bruker**, vil jeg se hva løsningen sa om aksjen de siste ukene, så FR-40
 *Lagt til 2026-10-19 kl. 14:28:* all stilen står i `src/static/stil.css`, lenket fra `_ramme.html` med et avtrykk av fila, og sidene ser ut som før, flettet i `dc521ff`, PR #76 (spesifikasjonen `spec-2-7a-stilen-i-en-css-fil.md`). Kontrollpunktet om én layout og én CSS-fil er oppfylt. Historikken er 2.7b.
 
 *Avgjort 2026-10-21 (gruppens svar):* historikken er månedsvisningen fra tavla, med piler så langt kursserien går tilbake. Målingene står på siden for dagen (8.16b), som hver dag lenker til, med en datert linje ved kontrollpunktet om målingene. Avgjørelsen 19.10 kl. 12:06 erstattet svaret kl. 11:54 om stilen; denne linja fører innholdet i historikken, så det ikke hviler på et svar som ikke står i repoet.
+
+*Lagt til 2026-10-21 kl. 17:59:* historikken, «Signalet dag for dag», er squash-flettet i `d4c2441`, PR #82 (spesifikasjonen `spec-2-7b-signalet-dag-for-dag.md`). Den står nederst på aksjesiden, en måned om gangen, lest med `Vurderingslager.les_periode`, og hver dag lenker til siden for dagen. Hjelpen ved Sluttkurs sier dagen siden viser (U5). Hele settet: 2843 bestått og 17 hoppet over. Alle 13 mutantene ble fanget. Spesifikasjonen er `done`.
 
 ### Story 2.8: Hovedindeksen hentes i samme kjøring
 

@@ -2,7 +2,7 @@
 title: 'Story 2.7 (2.7b): historikken, «Signalet dag for dag», på aksjesiden'
 type: 'feature'
 created: '2026-10-21'
-status: 'review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 1
 baseline_commit: '7c55e44'
