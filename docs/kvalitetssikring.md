@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-21T18:33
+updated: 2026-10-22T00:20
 ---
 
 # Kvalitetssikring
@@ -960,6 +960,7 @@ interesse, står i `malinger.md` §6, ved siden av EQNR 05.10 og GJF 02.10.
 | Navnene i demoen mot lista hos Euronext, for hånd | 10.10 kl. 12:25 | Kontrollert av en av oss, og av rådet med et søk på nettet samme dag. Resultatet per navn står ikke i kommentaren | kommentaren ved `DEMOUNIVERS` i `src/demo.py` |
 | `DEMIX` og «Demoindeksen» mot lista hos Euronext, for hånd | 17.10 kl. 00:25 | Verken symbolet eller navnet finnes der, og PR #56 ble flettet | `S/spec-2-8a-indeks-tabellen-og-porten.md` |
 | Vår egen gjennomgang av «Kom i gang», som en som aldri har gjort det | 16.10 kl. 20:40–21:11 | Fire ting som ingen test fant (§11, eksempel 12). De bygges i README-PR-en søndag 18.10 | under story 3.3 i `epics.md`; `docs/reflection-log.md`, 16.10 |
+| Gruppens gjennomgang av «Kom i gang» for demoen på egen PC | 21.10, steg 1–5 kl. 22:19–22:34 og steg 6–7 til kl. 23:44 | Demoen startet, sidene ble gått gjennom, og demoen ble stoppet, så steg 1–7 er gått gjennom. Steg 2–4 var vanskeligst: PowerShell sto i den ytre mappa, som hadde fått et nummer etter flere nedlastinger, og ga «no configuration file provided: not found». Det ble løst med `cd` i samme vindu kl. 22:34. Første gang åpnet ikke siden seg i nettleseren, og grunnen er ikke kjent. 49 funn fra gjennomgangen og 13 forskjeller mot designtavla står som U8–U69, og seks avgjørelser kom samme kveld | `docs/ux-logg.md`, «Åpne funn før brukertesten», U8–U69; avgjørelsene 21.10 kl. 22:47–23:51 under «Prioritering» i `epics.md` |
 | Prøvekjøringene av KI-teksten mot en kopi av basen | 16.10 kl. 22:26–22:27 og kl. 23:43–23:44 | 6 av 15 besto med prompten versjon 1, og 15 av 15 med versjon 2 | `malinger.md` §32 og §34 |
 | Grensen kl. 21:00: fire aksjer hentes på nytt og sammenlignes med kursfila | Planlagt mandag 19.10, etter kl. 22 | Ingen ennå | beslutningen 17.10 kl. 22:00 under story 2.3 i `epics.md` |
 | Brukertesten (story 8.1) | Ikke tatt | Ingen ennå. Den måler også suksesskriteriet «Brukerutfall» (§10) | `sprint-status.yaml`, 8-1 i backlog |
