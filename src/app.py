@@ -239,6 +239,12 @@ def _aapne_basen() -> None:
         try:
             g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False, skrivebeskyttet=request.endpoint != _SKRIVER)
             g.eksempeltall = True
+            # Story 3.4c (gjennomgangen, BH1): en demobase fra foer vises ikke
+            # her heller.
+            if gammel_demobase(g.tilkobling):
+                g.tilkobling.close()
+                g.tilkobling = None
+                g.demo_mangler = g.demo_gammel = True
         except BASEFEIL as feil:
             g.basefeil = _basefeil(feil)
         return

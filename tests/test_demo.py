@@ -973,3 +973,32 @@ class TestHistorikkenSomDenEkte:
         assert "Demobasen er laget av en eldre versjon av demoen. Lag den på nytt med" in html
         assert "Kvitstein Mineral" not in html
         assert klient.get("/aksje/KVST").status_code == 404
+        # Gjennomgangen (BH4, ECH4, VG5): Min liste sier det samme.
+        for adresse in ("/min-liste", "/min-liste?vis=alle"):
+            html = klient.get(adresse).data.decode("utf-8")
+            assert "Demobasen er laget av en eldre versjon av demoen." in html, adresse
+
+    def test_en_ny_demobase_sier_ikke_fra(self, klient, monkeypatch, demobase):
+        """Ville feilet hvis hver demobase ble regnet som gammel (BH4)."""
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        html = klient.get("/").data.decode("utf-8")
+        assert "eldre versjon" not in html and "Kvitstein Mineral" in html
+
+    def test_en_gammel_demobase_der_den_ekte_skal_ligge(self, klient, mal):
+        """En demobase fra foer der den ekte basen skal ligge, uten bryteren.
+        Ville feilet hvis den ble vist med den gamle historikken (BH1, ECH3,
+        VG2)."""
+        sti = Path(lagring_sqlite.BASE_STI)
+        sti.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(mal, sti)
+        c = aapne_base(sti, kjoer_migrasjoner=False)
+        try:
+            klokke = datetime(2026, 9, 18, 20, 30, tzinfo=timezone.utc)
+            SqliteVurderingslager(c, lambda: klokke, demo.DEMOUNIVERS).skriv(
+                "KVST", date(2026, 9, 18), Grunn.SYMBOL_FEILET
+            )
+        finally:
+            c.close()
+        html = klient.get("/").data.decode("utf-8")
+        assert "Demobasen er laget av en eldre versjon av demoen." in html
+        assert "Kvitstein Mineral" not in html

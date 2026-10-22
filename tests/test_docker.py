@@ -983,7 +983,9 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # høyde, fordi grafen slutter på samme sted.
 # Story 3.4c: vurderingene i demo.py fra STARTDAG, og meldingen om en demobase
 # fra før i app.py. Bildet ble tatt på nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "54e9b90bd6941a5a60b8b8315c4d541dd85ae972ffb209cbfed07fd8b1c9efcd"
+# Gjennomgangen av 3.4c (BH1): sjekken av en gammel demobase ogsaa der den ekte
+# skal ligge, i app.py. Bildet er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "846264bd95f2105dc3d95182b742336ce074ae68bd416e9d63baef1779db0414"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "
