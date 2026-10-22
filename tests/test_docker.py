@@ -604,17 +604,22 @@ class TestReadme:
     def test_demoen_paa_dagtid_og_helgen_i_steg_8(self):
         """3.3b, punkt d: på dagtid en børsdag er demoen veien for å se appen
         med en gang, og steg 8 og raden «Klar» nevner helgen, slik
-        docs/hjelp.md gjør. Ville feilet hvis helgen falt ut av steg 8."""
+        docs/hjelp.md gjør. Ville feilet hvis helgen falt ut av steg 8.
+
+        Story 2.3c (avgjørelsen 21.10 kl. 23:33, U53 og U54): første henting
+        går når som helst, og før kl. 22 en børsdag gir den forrige børsdag,
+        så demoen er ikke lenger eneste vei på dagtid. Ville feilet hvis
+        README-en sa at første henting på dagtid gir dagens kurs, eller at
+        man må vente til kvelden."""
         topp = _kom_i_gang().split("### Felles for begge", 1)[0]
-        assert (
-            "Første gang før kl. 22 på en børsdag, også på dagtid, er demoen veien for å se appen med en gang" in topp
-        )
+        assert "Første gang før kl. 22 henter den forrige børsdag, så du ser kursene og signalet med en gang." in topp
+        assert "er demoen veien for å se appen med en gang" not in topp
         klar = [l for l in topp.splitlines() if l.startswith("| Klar |")]
-        assert len(klar) == 1 and "helgen" in klar[0] and "etter kl. 22" in klar[0]
-        assert "andre dager børsen er stengt" in klar[0]
+        assert len(klar) == 1 and "når som helst" in klar[0] and "etter kl. 22" in klar[0]
+        assert "Før kl. 22 på en børsdag gir den forrige børsdag" in klar[0]
         steg8 = _steg("Den ekte versjonen", 8)
-        assert "Første gang går det også i helgen og andre dager børsen er stengt." in steg8
-        assert "Første gang kan du også hente i helgen" in _hjelp()
+        assert "Første gang går det når som helst; før kl. 22 en børsdag gir den forrige børsdag." in steg8
+        assert "når basen er tom, kan du også hente på dagtid og i helgen" in _hjelp()
 
     def test_demoen_foerst_og_zip_foer_kommandoene(self):
         """Story 3.3c: demoen står foerst, fordi faglaerer proever den (gruppen
@@ -2680,9 +2685,11 @@ LENKENE_FOER_3_3H = {
 # Gjennomgangen av 3.3i: demoen sier i steg 6 at demolinja har en lenke til
 # den ekte versjonen (VG8), og pila til den ekte versjonen at de 4 kallene som
 # er igjen, gaar til nye forsoek (BH5). Var b3f50242... og 36cc2505....
+# Story 2.3c: steg 8 sier at foerste henting gaar naar som helst, og at den
+# foer kl. 22 en boersdag gir forrige boersdag. Var 542c8991....
 AVTRYKK_I_PILENE = {
     "Demoen": "f124a92b1c64eeb0ea5e7141976ff85de68df49004a22d5874a4a257aaf89b55",
-    "Den ekte versjonen": "542c899135c674ed2526a41e8860b4e58f202616ba70f620da198d01e01884e2",
+    "Den ekte versjonen": "3bb398cd1be31a43abe09b7261456646b6dc03047e20f1aa57ab665a768cfd78",
     "Dokumentene": "d05514d3de77b3df67028b170b8c2b89c6c99f45ad716906b170b80f969a20b6",
     "Mappestruktur": "d157a1706be8d24e7235f8d89c39c464609032c63ce5443adf2c40d1916758cd",
 }

@@ -1175,6 +1175,16 @@ def kjoer(
     lag_ki_tekster(
         base_sti, dato, klokke, modell, skriv, lista, basen_har_kursene=alle_har_dagen, foerste_henting=foerste_henting
     )
+    if foerste_henting:
+        # Story 2.3c: hva foerste henting gir, og kallene samme kveld, slik
+        # vurder_kvote gjoer det.
+        skriv(
+            f"Foerste henting gjelder boersdagen {dato.isoformat()}. Signalet lagres fra den dagen og "
+            "regnes aldri bakover. Dagens kurser hentes etter kl. "
+            f"{_grensen()}. Den hentingen trenger {behov} kall: er det ikke nok igjen av dagens, "
+            "tas resten fra bonuskvoten hvis kontoen har en, ellers bruker den 0 kall, og dagens "
+            "kurser kommer neste kveld."
+        )
 
     # FR-402: svaret er ikke fra boersdagen for noen av aksjene. Kursene og
     # fila staar, og vurderingen har grunnen kurs_ikke_fra_dagen. Samme
