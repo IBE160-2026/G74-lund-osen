@@ -266,7 +266,9 @@ def lag_ki_tekster(
         # skrives ingen rader, og samme kommando kan kjoeres igjen.
         if mangler and skrivbar() != dato:
             raise IkkeInnevaerendeBoersdag(dato.isoformat())
-        if mangler and (grunn := _ikke_klar(modell)) and foerste_henting:
+        # Sjekken en gang, ogsaa ved foerste henting.
+        grunn = _ikke_klar(modell) if mangler else None
+        if grunn and foerste_henting:
             # Gjennomgangen av 2.3c, ECH1: etter foerste henting er dagen
             # ikke inneveerende boersdag, saa teksten kan ikke lages senere.
             skriv(
@@ -275,7 +277,7 @@ def lag_ki_tekster(
                 "inneveerende boersdag (AD-7). Kveldens henting lager tekstene for dagens boersdag."
             )
             return False
-        if mangler and (grunn := _ikke_klar(modell)):
+        if grunn:
             skriv(
                 f"Ingen KI-tekst for boersdagen {dato.isoformat()} ennaa: {grunn}. Ingen rader er "
                 f"skrevet i KI-loggen, og {len(mangler)} aksjer venter paa teksten"
