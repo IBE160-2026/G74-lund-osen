@@ -587,6 +587,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-22 kl. 17:42 (gruppens svar):* de to svarene om `cd` i steg 4 under «Står du fast?», «is not recognized as the name of a cmdlet» og «Cannot find path … because it does not exist», blir ett spørsmål med begge meldingene ordrett, så «Står du fast?» har fem spørsmål, som avgjort 16.10 kl. 21:53–21:58. Det erstatter grensen på 6 fra 3.3i (`a98146b`). Det bygges i spesifikasjonen 3.3j. Gruppen prøvde også steg 3 fra 3.3i samme minutt: PowerShell åpnet fra adressefeltet i Filutforsker i den innerste mappa, og `dir` viste `README.md` og `compose.yaml` (§13 i `docs/kvalitetssikring.md`).
 
+*Avgjort 2026-10-22 kl. 19:30 (gruppens svar):* unntaket fra AD-7 i 2.3c er godkjent. Første henting på dagtid i en tom base skriver vurderingene og KI-radene for børsdagen rett før inneværende, bare når basen ikke har rader for en annen dato, og hver rad skrives én gang og regnes aldri på nytt. Uten unntaket ville en ny bruker ikke sett signalet med en gang, som avgjørelsen 2026-10-21 kl. 23:33 sier.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -1566,6 +1568,8 @@ Oppgaveplanlegging beskrives i README (regel 19).
 *Lagt til 2026-10-21 kl. 23:30 (målingen etter gruppens svar 21.10 kl. 21:00, `malinger.md` §39):* EQNR, MOWI, GJF og VAR, de fire med volumforholdet nærmest 1,5 i vurderingene for 21.10, ble hentet på nytt kl. 23:30. Alle fire er like kursfila fra kl. 22 i alle sju feltene, så ingen vurdering måtte regnes på nytt. 4 kall av dagskvoten, de 3 som er holdt av til egne aksjer og reserven (fordelingen kl. 18:38), og bonuskvoten er ikke brukt. Svaret kl. 21:00 står i instruksjonen kl. 22:13 i dagsfila 21.10.
 
 *Avgjort 2026-10-21 kl. 23:33 (gruppens svar):* når basen er tom, henter første henting siste fullførte børsdag også på dagtid en hverdag, så en ny bruker ser kursene og signalet med en gang. Dagens rad skrives aldri før `TIDSGRENSE` (kl. 22:00 i `src/fetch_prices.py`), kallene er da brukt for dagen, og en base som ikke er tom, hentes som før. Bygges med README-rettingen, før 2.12 (rekkefølgen kl. 22:51). Det endrer tidskontrollen i 2.3, som i dag ikke henter noe på en børsdag før `TIDSGRENSE` uten `--uten-tidskontroll`, og må passe med FR-402 (kontroll mot forventet børsdag) og AD-7 (ingen slette- eller endremetode).
+
+*Avgjort 2026-10-22 kl. 19:30 (gruppens svar):* unntaket fra AD-7 i 2.3c er godkjent. Første henting på dagtid i en tom base skriver vurderingene og KI-radene for børsdagen rett før inneværende, bare når basen ikke har rader for en annen dato, og hver rad skrives én gang og regnes aldri på nytt. Uten unntaket ville en ny bruker ikke sett signalet med en gang, som avgjørelsen 2026-10-21 kl. 23:33 sier.
 
 ### Story 2.3b: Kallene som er igjen, brukes på nye forsøk
 
