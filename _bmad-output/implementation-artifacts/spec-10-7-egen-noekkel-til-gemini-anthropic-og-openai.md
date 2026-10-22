@@ -2,7 +2,7 @@
 title: 'Story 10.7: egen nøkkel til Gemini, Anthropic og OpenAI'
 type: 'feature'
 created: '2026-10-22'
-status: 'review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 1
 baseline_commit: '92ead71'

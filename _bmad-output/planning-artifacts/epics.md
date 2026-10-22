@@ -2836,6 +2836,8 @@ egne nøkler (regel 19). Punktet fra 3.3 om egne nøkler gjelder her.
 
 *Avgjort 2026-10-21 kl. 22:51 (gruppens svar):* rekkefølgen er 10.7 (egne nøkler), så README-rettingen etter gjennomgangen av demoen 21.10, så 2.12. README-rettingen står ikke som egen story i repoet ennå.
 
+*Lagt til 2026-10-22 kl. 10:44:* egne nøkler er squash-flettet i `6b39b80`, PR #83, låst til head-en `98d0853` (spesifikasjonen `spec-10-7-egen-noekkel-til-gemini-anthropic-og-openai.md`). `OSE_KI_TJENESTE` velger `gemini`, `anthropic` eller `openai`, og nøkkelen leses fra `OSE_KI_GEMINI_NOKKEL`, `OSE_KI_ANTHROPIC_NOKKEL` eller `OSE_KI_OPENAI_NOKKEL` og sendes bare i en header. Modellen til Gemini er Gemini 3.5 Flash-Lite, som avgjørelsen 04.10 sier, og modellene til Anthropic og OpenAI er valgt i spesifikasjonen og står som åpent punkt der. En nøkkel som mangler, eller en tjeneste som feiler, gir ingen tekst og en rad i loggen, uten overgang til en annen tjeneste. Hele settet: 3039 bestått og 17 hoppet over, og CI var grønn på head-en (39749617187). Alle elleve mutantene, M1–M3 og N1–N8, ble fanget.
+
 ### Story 10.8: ChatGPT med «Sign in with ChatGPT»
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
