@@ -123,16 +123,15 @@ def velg_modell(innstillinger: Mapping[str, str], skriv: Callable[[str], None] =
         klasse, variabel = MED_NOEKKEL[tjeneste]
         noekkel = (innstillinger.get(variabel) or "").strip()
         modell = klasse(noekkel)
+        # Bare det som er galt: om noe venter paa teksten, og om man kan
+        # hente igjen, vet foerst lag_ki_tekster (gjennomgangen av 10.7b, BH2, ECH3).
         if not noekkel:
             skriv(
-                f"OSE_KI_TJENESTE={tjeneste}, men {variabel} mangler i .env og i miljoeet. Ingen rader "
-                "skrives i KI-loggen, og du kan legge den inn og hente igjen samme kveld."
+                f"OSE_KI_TJENESTE={tjeneste}, men {variabel} mangler i .env og i miljoeet. "
+                "KI-teksten lages ikke foer den er lagt inn."
             )
         elif grunn := modell.sjekk():
-            skriv(
-                f"OSE_KI_TJENESTE={tjeneste}, men {grunn}. Ingen rader skrives i KI-loggen, og du kan "
-                "hente igjen samme kveld."
-            )
+            skriv(f"OSE_KI_TJENESTE={tjeneste}, men {grunn}. KI-teksten lages ikke foer den er rettet.")
         else:
             # Som for en adresse utenfor maskinen: utskriften sier at
             # grunnlaget sendes ut (gjennomgangen av 10.7, BH8).
@@ -199,7 +198,12 @@ def _ikke_klar(modell: Modell) -> str | None:
 def _hva_naa(grunn: str) -> str:
     """Det brukeren gjoer foer neste kjoering, etter grunnen (BH1, ECH)."""
     if grunn.startswith("OSE_KI_"):
-        return "Legg noekkelen inn i .env, se «Egen nøkkel til Gemini, Anthropic eller OpenAI» i README-en"
+        # Miljoeet gaar foran .env (ki_innstillinger), saa begge nevnes
+        # (gjennomgangen av 10.7b, BH1, ECH1, ECH2).
+        return (
+            "Legg noekkelen inn eller rett den i .env, eller i miljoeet, som gaar foran, "
+            "se «Egen nøkkel til Gemini, Anthropic eller OpenAI» i README-en"
+        )
     if "ikke hentet" in grunn:
         return "Hent modellen, se «Den lokale modellen» i README-en"
     return "Start Ollama, se «Den lokale modellen» i README-en"

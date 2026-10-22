@@ -500,7 +500,10 @@ class TestNoekkelen:
             if verdi:
                 assert f"KI-teksten lages av {tjeneste} ({modul.MODELL})" in linjer[0] and "sendes dit" in linjer[0]
             else:
+                # 10.7b: valget lover ingenting om radene (VG1, BH2, ECH3).
                 assert f"{modul.NOEKKEL_VARIABEL} mangler" in linjer[0]
+                assert "KI-teksten lages ikke foer den er lagt inn." in linjer[0]
+                assert "Raden i KI-loggen" not in linjer[0] and "rader" not in linjer[0]
 
 
 class TestValget:
@@ -587,6 +590,9 @@ class TestIngenOvergang:
         assert len(hent.kall) == (0 if feil == "noekkel" else 1)
         if feil != "noekkel":
             assert f"({tjeneste}, " in utskrift
+        else:
+            # Steget stoppet foer foerste kall (BH5), se TestNoekkelenFoerKallet.
+            assert "Ingen rader er skrevet i KI-loggen" in utskrift
 
     def test_valget_uten_noekkel_gir_den_valgte(self, tjeneste):
         """Ville feilet hvis en noekkel som mangler ga lokal, eller ingen modell."""
@@ -597,9 +603,11 @@ class TestIngenOvergang:
 
 
 def uten_noekkel(tjeneste, hva):
-    """En noekkel som mangler, eller som har et usynlig tegn fra kopieringen."""
+    """En noekkel som mangler, eller som har et usynlig tegn fra kopieringen,
+    et mellomrom eller en tabulator inne i seg (BH4)."""
     noekkel = noekkel_for(tjeneste)
-    return {"mangler": "", "tegn": noekkel[:10] + "​" + noekkel[10:]}[hva]
+    tegn = {"tegn": chr(0x200B), "mellomrom": " ", "tab": "\t"}
+    return "" if hva == "mangler" else noekkel[:10] + tegn[hva] + noekkel[10:]
 
 
 class TestNoekkelenFoerKallet:
@@ -608,7 +616,7 @@ class TestNoekkelenFoerKallet:
     den kan legges inn og hentingen kjoeres igjen samme kveld. En feil hos
     tjenesten etter kallet gir fortsatt en rad med grunnen."""
 
-    @pytest.mark.parametrize("hva", ["mangler", "tegn"])
+    @pytest.mark.parametrize("hva", ["mangler", "tegn", "mellomrom", "tab"])
     def test_sjekk_uten_kall(self, tjeneste, hva):
         """Ville feilet hvis sjekken kalte tjenesten, sa ja til en noekkel som
         ikke kan sendes, eller nei til en som kan."""
@@ -620,7 +628,7 @@ class TestNoekkelenFoerKallet:
         assert modell_for(tjeneste, hent).sjekk() is None
         assert hent.kall == []
 
-    @pytest.mark.parametrize("hva", ["mangler", "tegn"])
+    @pytest.mark.parametrize("hva", ["mangler", "tegn", "mellomrom", "tab"])
     def test_ingen_rader_og_ingen_kall(self, tjeneste, hva, stier, capsys):
         """Hele hentingen med en falsk EODHD. Ville feilet hvis rader ble
         skrevet naar noekkelen mangler (M1), tjenesten ble kalt uten noekkel
@@ -635,14 +643,14 @@ class TestNoekkelenFoerKallet:
         assert all(r is None for r in radene(base).values())
         assert f"ennaa: {modul.NOEKKEL_VARIABEL} " in utskrift
         assert "Ingen rader er skrevet i KI-loggen, og 15 aksjer venter paa teksten." in utskrift
-        assert "Legg noekkelen inn i .env" in utskrift
+        assert "Legg noekkelen inn eller rett den i .env, eller i miljoeet, som gaar foran" in utskrift
         assert "kjoer samme kommando igjen foer midnatt. Det gir 0 kall til EODHD." in utskrift
         fanget = capsys.readouterr()
         noekkel = noekkel_for(tjeneste)
         for tekst in (utskrift, fanget.out, fanget.err):
             assert noekkel[:10] not in tekst and noekkel[10:] not in tekst
 
-    @pytest.mark.parametrize("hva", ["mangler", "tegn"])
+    @pytest.mark.parametrize("hva", ["mangler", "tegn", "mellomrom", "tab"])
     def test_samme_kveld_med_noekkelen(self, tjeneste, hva, stier):
         """Foerst uten noekkel, saa med: samme kommando lager tekstene, med 0
         kall til EODHD. Ville feilet hvis den foerste hentingen hadde skrevet
@@ -684,7 +692,7 @@ class TestNoekkelenFoerKallet:
         )
         assert len(linjer) == 1
         assert f"{modul.NOEKKEL_VARIABEL} har tegn som ikke kan sendes" in linjer[0]
-        assert "Ingen rader skrives" in linjer[0] and "lages av" not in linjer[0]
+        assert "KI-teksten lages ikke foer den er rettet." in linjer[0] and "lages av" not in linjer[0]
         assert noekkel[:10] not in linjer[0] and noekkel[10:] not in linjer[0]
 
 
@@ -706,9 +714,20 @@ def test_readme_sier_det_instruksjonen_krever():
         "Nøkkelen skal aldri deles.",
         "Du må ikke ha sagt ja til at tjenesten trener på innholdet.",
         "resten av aksjene den kvelden",
+        "skrives ingen rader i KI-loggen",
+        "Legg den inn og kjør samme kommando igjen samme kveld, før midnatt",
         "kilder-og-rettigheter.md",
     ):
         assert krav in tekst, krav
+
+
+def test_hjelpen_sier_at_en_noekkel_som_mangler_ikke_gir_rader():
+    """10.7b i docs/hjelp.md. Ville feilet hvis hjelpen gikk tilbake til at
+    en noekkel som mangler, gir ingen tekst den dagen (VG2)."""
+    hjelp = (ROT / "docs" / "hjelp.md").read_text(encoding="utf-8")
+    svar = re.sub(r"\s+", " ", hjelp.split("Kan KI-teksten lages uten grafikkort?", 1)[1].split("###", 1)[0])
+    assert "skrives ingen rader" in svar
+    assert "legg den inn og hent igjen samme kveld, før midnatt" in svar
 
 
 def test_nettsperren_stopper_den_ekte_hentefunksjonen(tjeneste):
