@@ -585,6 +585,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-22 kl. 14:38 (gruppens svar):* to svar etter 10.7. a) Modellene til Anthropic og OpenAI er Claude Haiku 5.5 (`claude-haiku-5-5`) og GPT-6 Luna (`gpt-6-luna`), som spesifikasjonen 10.7 valgte. Det åpne punktet er lukket. b) Mangler nøkkelen, skrives ingen rader, som når Ollama ikke kjører: hentingen sier hvilken variabel som mangler, og man kan legge den inn og hente igjen samme kveld. En feil hos tjenesten etter kallet gir fortsatt en rad med grunnen. Det endrer kontrollpunktet i story 10.7 om at en nøkkel som mangler, gir en rad. Det bygges i spesifikasjonen 10.7b.
 
+*Avgjort 2026-10-22 kl. 17:42 (gruppens svar):* de to svarene om `cd` i steg 4 under «Står du fast?», «is not recognized as the name of a cmdlet» og «Cannot find path … because it does not exist», blir ett spørsmål med begge meldingene ordrett, så «Står du fast?» har fem spørsmål, som avgjort 16.10 kl. 21:53–21:58. Det erstatter grensen på 6 fra 3.3i (`a98146b`). Det bygges i spesifikasjonen 3.3j. Gruppen prøvde også steg 3 fra 3.3i samme minutt: PowerShell åpnet fra adressefeltet i Filutforsker i den innerste mappa, og `dir` viste `README.md` og `compose.yaml` (§13 i `docs/kvalitetssikring.md`).
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -2172,6 +2174,8 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 *Avgjort 2026-10-21 kl. 22:51 (gruppens svar):* rekkefølgen er 10.7 (egne nøkler), så README-rettingen etter gjennomgangen av demoen 21.10, så 2.12. README-rettingen står ikke som egen story i repoet ennå.
 
 *Lagt til 2026-10-22 kl. 17:14:* README-rettingen etter gruppens gjennomgang av demoen 21.10 er squash-flettet i `a98146b`, PR #85, låst til head-en `492873a` (spesifikasjonen `spec-3-3i-readme-rettingen-etter-demoen.md`). Den løser U8–U15, U51, U52 og U55 i `docs/ux-logg.md`: steg 1–4 i «Felles for begge» med Docker Desktop fra før og «Resource Saver mode», utpakkingen og tallet i mappenavnet, PowerShell fra adressefeltet i Filutforsker og kontrollen med `dir` eller `ls`, svaret på `ERR_CONNECTION_REFUSED` under «Står du fast?», hva gratiskontoen hos EODHD gir, invitasjonen til den ekte versjonen, og lenken til den fra demolinja. «Står du fast?» har nå høyst 6 spørsmål, ikke 5 som avgjørelsen 16.10 kl. 21:53–21:58 sa, fordi instruksjonen ba om det nye spørsmålet der. Første henting på dagtid (U53, U54) kommer i 2.3c. Hele settet: 3087 bestått og 17 hoppet over, og CI var grønn på head-en (39801801370). Alle tre mutantene, M1–M3, ble fanget.
+
+*Avgjort 2026-10-22 kl. 17:42 (gruppens svar):* de to svarene om `cd` i steg 4 under «Står du fast?», «is not recognized as the name of a cmdlet» og «Cannot find path … because it does not exist», blir ett spørsmål med begge meldingene ordrett, så «Står du fast?» har fem spørsmål, som avgjort 16.10 kl. 21:53–21:58. Det erstatter grensen på 6 fra 3.3i (`a98146b`). Det bygges i spesifikasjonen 3.3j. Gruppen prøvde også steg 3 fra 3.3i samme minutt: PowerShell åpnet fra adressefeltet i Filutforsker i den innerste mappa, og `dir` viste `README.md` og `compose.yaml` (§13 i `docs/kvalitetssikring.md`).
 
 ### Story 3.4: Demoversjonen
 
