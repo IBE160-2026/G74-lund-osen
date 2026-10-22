@@ -2,9 +2,9 @@
 title: 'Story 10.7: egen nøkkel til Gemini, Anthropic og OpenAI'
 type: 'feature'
 created: '2026-10-22'
-status: 'in-progress'
+status: 'review'
 route: 'dispatch'
-review_loop_iteration: 0
+review_loop_iteration: 1
 baseline_commit: '92ead71'
 context:
   - '{project-root}/CLAUDE.md'
@@ -102,9 +102,75 @@ Alt under er lest 22.10.2026, før grenen ble laget kl. 10:02.
 - M2: nøkkelen i adressen
 - M3: nøkkelen i grunnen
 
+## Avgjort underveis
+
+- **Det felles kallet står i `src/ki_sky.py`** (`761c970`): hentefunksjonen `http`, sjekken av nøkkelen, kallet med feilene, teksten og `modell_id` fra svaret. Hver adapter har fortsatt én injisert hentefunksjon, og standard er `ki_sky.http`, slått opp ved kallet, så en test kan bytte den (gjennomgangen, BH11, VG8). Det erstatter første punkt under «Avgjort i spesifikasjonen» om én `http` i hver fil.
+- **Ingen videresending:** `http` sender `allow_redirects=False`. En 30x gir «svarte HTTP 307», og `x-api-key` og `x-goog-api-key` følger ikke med til en annen vert (BH4, VG5).
+- **Nøkkelen sjekkes før kallet.** Mangler den, er grunnen «OSE_KI_GEMINI_NOKKEL mangler», uten «i .env», fordi den også kan komme fra miljøet (BH11). Har den et tegn som ikke er ASCII, ikke kan skrives ut, eller et mellomrom, er grunnen «… har tegn som ikke kan sendes, lim den inn paa nytt», og tjenesten kalles ikke. Før ga et slikt tegn `UnicodeEncodeError` fra `http.client`, som stoppet steget uten rader (ECH1, BH6, VG4). `UnicodeError` fra hentefunksjonen gir også en grunn.
+- **`ModellFeilet` reises utenfor `except`-blokken**, så feilen fra `requests` ikke henger ved den som `__context__` (BH5, ECH10). `from None` skjulte den bare.
+- **Bare `completed` gir tekst** hos Gemini og OpenAI. `incomplete` gir «svaret fra … ble kortet av», og alle andre statuser gir «… ga ingen ferdig tekst». Hos Anthropic gir `stop_reason` `max_tokens` «ble kortet av», og `refusal` «avslo». Hos OpenAI gir en del med type `refusal` «avslo». Det erstatter punktet om avslag under «Avgjort i spesifikasjonen» (VG1, ECH2–ECH4, BH2, BH8).
+- **Teksten** settes sammen bare når alle delene er strenger, og en tekst med tegn som ikke kan lagres i UTF-8, gir en grunn i stedet for en feil i basen (ECH6, ECH13). En tom tekst eller bare mellomrom går videre, og `lag_ki_rad` gir grunnen «tom tekst», som for Ollama (BH1).
+- **`modell_id`** er `model` fra svaret bare når den, uten mellomrom rundt, begynner med modellen som ble bedt om og er høyst 100 tegn. Ellers er den `None` (ECH5). Det erstatter setningen om `modell_id` under «Avgjort i spesifikasjonen».
+- **Utskriften** sier «KI-teksten lages av gemini (gemini-3.5-flash-lite) med noekkelen din. Grunnlaget sendes dit.» når nøkkelen finnes, på samme måte som hentingen sier fra når Ollama-adressen ikke er på maskinen (BH8).
+- **README-en og hjelpen** sier at én feil gir ingen tekst for resten av aksjene den kvelden, og at det ikke hjelper å legge inn nøkkelen og hente igjen samme kveld (`43abd75`, BH3, VG9). Modellnavnene står med koden, og en test binder dem til konstantene (VG6).
+- **Sitatene:** OpenAI-referansen deler setningen om `store` i to, og bare «Defaults to true when omitted.» er sitert ordrett herfra; resten er gjengitt. Sitatene under «Lagringen» hos Gemini er fra siden om Interactions, https://ai.google.dev/gemini-api/docs/interactions, ikke fra siden om nøkkelen. Referansen for `generateContent` hadde ingen dato for oppdateringen i den delen som ble lest (VG10).
+- **Testen i `tests/test_ki_tekst.py`** som krevde «ikke bygget ennaa» for gemini, har fått `ollama` som eksempel på en ukjent verdi. Det nye for gemini står i `tests/test_ki_tjenestene.py` (VG11).
+
+## Mutantene, kjørt
+
+I en fersk klon med `core.autocrlf=false`, slettet etterpå. M1–M3 er fra instruksjonen, kjørt på `c3be49c` og igjen på `43abd75`. N1–N8 dekker mutantene fra Edge Case Hunter som overlevde på `c3be49c`, og rettingene, kjørt på `43abd75`. Alle ble fanget, med sha256 lik HEAD og `git status` tom etter hver.
+
+| # | Mutant | Først i fila (`43abd75`) | Testen for den |
+|---|---|---|---|
+| M1 | Overgang til lokal i `lag_ki_rad` når den valgte feiler | `test_svar_uten_tekst[anthropic-tomt]`, via nettsperren | `test_en_valgt_tjeneste_som_feiler_gir_ingen_tekst_fra_en_annen[anthropic-noekkel]` |
+| M2 | Nøkkelen i adressen (Gemini) | `test_kallet_slik_dokumentasjonen_sier[gemini]` | den samme, og `test_noekkelen_bare_i_den_ene_headeren` |
+| M3 | Nøkkelen i grunnen, fra feilen (`ki_sky.py`) | `test_ingen_forbindelse[anthropic-feil2-InvalidHeader]` | `test_ikke_i_feilen_eller_grunnen_naar_feilen_har_den[anthropic-0]` |
+| N1 | Gemini sjekker ikke statusen | `test_bare_completed_gir_tekst[failed-gemini]` | den samme |
+| N2 | OpenAI sjekker ikke statusen | `test_bare_completed_gir_tekst[failed-openai]` | den samme |
+| N3 | Nøkkelen også i kroppen (Gemini) | `test_kallet_slik_dokumentasjonen_sier[gemini]` | den samme |
+| N4 | Videresending fulgt | `test_hentefunksjonen_foelger_ingen_videresending` | den samme |
+| N5 | `ModellFeilet` reist inne i `except` | `test_ikke_i_feilen_eller_grunnen_naar_feilen_har_den[anthropic-1]` | den samme |
+| N6 | `modell_id` uten sjekk | `test_modell_id_fra_svaret[anthropic-en-annen-modell-None]` | den samme |
+| N7 | Avkortet tekst godtatt (Anthropic) | `test_kortet_av_hos_anthropic` | den samme |
+| N8 | Nøkkelen ikke sjekket for tegn | `test_tegn_som_ikke_kan_sendes[anthropic-\u200b]` | den samme |
+
+## Gjennomgangen
+
+Gjennomgang 22.10 på diffen `92ead71..c3be49c`. Linsene var Blind Hunter (BH, 11 funn, bare diffen), Edge Case Hunter (ECH, 13 funn, med 16 mutanter i en fersk klon som ble slettet etterpå) og Verification Gap (VG, 11 funn). Ingen funn hadde dom høy.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| ECH1, BH6, VG4 | Et tegn i nøkkelen som ikke kan stå i en header, stoppet steget uten rader | medium | rettet: sjekken av nøkkelen, og `UnicodeError` gir en grunn |
+| VG1, ECH2, ECH3 | Statusene var ikke testet, og OpenAI godtok alt utenom `failed` | medium | rettet: bare `completed`, testet med tekst i svaret |
+| BH2, ECH4 | En avkortet tekst ble lagret som hel | medium | rettet: `incomplete` og `max_tokens` gir ingen tekst |
+| BH3 | README-en sa at aksjen får raden, men én feil stopper kallene for kvelden | medium | rettet i README-en og hjelpen |
+| BH1 | En tom tekst | medium | uten endring i koden: `lag_ki_rad` gir alt «tom tekst»; testet nå |
+| BH4, VG5 | Videresending sender nøkkelen videre | low | rettet: `allow_redirects=False` |
+| BH5, ECH10 | `from None` lot feilen henge ved som `__context__` | low | rettet: reist utenfor `except` |
+| BH7 | Testene av nøkkelen gikk via vaskingen i `_grunn` | low | rettet: feilen fra adapteren testes selv, med nøkler i ekte form |
+| BH8 | Avslag hos OpenAI, og ingen beskjed om at grunnlaget sendes ut | low | rettet |
+| BH9 | Ingen test av hva som ikke sendes | low | rettet: ingen symboler eller navn i kroppen |
+| ECH5 | Hva som helst fra `model` i `modell_id` | low | rettet |
+| ECH6 | Tekst som ikke er en streng | low | rettet |
+| ECH7 | Nøkkelen i kroppen eller en annen header | low | rettet |
+| ECH13 | Et ensomt surrogat stoppet steget i basen | low | rettet |
+| VG2, BH10, ECH8 | Grensen og tidsfristen ikke testet | low | rettet |
+| VG3 | Adressene testet mot seg selv | low | rettet: adressene står som tekst i testen |
+| VG6 | Ingenting bandt README-en til koden | low | rettet |
+| VG7 | Tester uten «Ville feilet hvis» | low | rettet |
+| VG9 | En nøkkel som mangler, bruker opp dagens rader | low | rettet i README-en og hjelpen; atferden står, som story 10.7 sier |
+| ECH11 | En `sjekk` for nøkkelen ville gitt «kjør igjen» som for Ollama | low | avvist: story 10.7 sier «ingen tekst og en rad i loggen». Ført under «Åpent» |
+| ECH12 | En tom variabel i miljøet slår en nøkkel i `.env`, og «Bearer » limt inn | low | avvist: samme regel som de to OSE_KI-variablene; en feil nøkkel gir HTTP 401 og en rad |
+| ECH9 | Mellomrom fjernes to steder | nit | uten endring: ufarlig |
+| VG8 | `andre_kalt` byttet en `http` som ikke ble brukt | nit | rettet: adapterne slår opp `ki_sky.http` ved kallet |
+| VG10 | Sitatene om `store` og kilden under «Lagringen» | nit | rettet under «Avgjort underveis» |
+| VG11 | Ordlyden om testen i `test_ki_tekst.py`, og avslag hos OpenAI | nit | rettet |
+| BH11 | Ordlyden «som har en gratis nøkkel», «mangler i .env», og `http` i tre filer | nit | rettet |
+
 ## Åpent
 
 - **Modellene til Anthropic og OpenAI** er valgt her, som de minste og raskeste, fordi avgjørelsen 04.10 bare navngir modellen til Gemini. Gruppen kan velge andre. Det er én konstant i hver fil.
+- **En nøkkel som mangler** gir rader for dagen, etter story 10.7. En `sjekk` før første kall, som for Ollama (svar c kl. 23:32), ville latt brukeren legge inn nøkkelen og kjøre igjen samme kveld (ECH11). Det er gruppens valg.
 - **Vilkårene** ble lest 04.10 og 05.10 (`docs/kilder-og-rettigheter.md`), og er ikke lest på nytt her.
 
 ## Det som ikke endres
