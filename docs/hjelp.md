@@ -89,13 +89,11 @@ Du har dratt inn ZIP-fila, ikke mappa. Dra mappa du pakket ut i steg 2, ikke ZIP
 
 PowerShell er trolig åpnet som administrator, og da sperrer Windows dra og slipp. Lukk vinduet og åpne PowerShell på vanlig måte (steg 3). Åpner du den fra adressefeltet i Filutforsker, står du alt i mappa og trenger ikke dra.
 
-### «is not recognized as the name of a cmdlet» etter cd.
+### «is not recognized as the name of a cmdlet» eller «Cannot find path … because it does not exist» etter cd.
 
-Det mangler mellomrom etter `cd`. Står `cd` klistret til stien i meldingen, for eksempel `'cdC:\...'`, skriver du `cd`, et mellomrom, og drar mappa inn i vinduet på nytt (steg 4). Står det `'docker'` i meldingen, er Docker Desktop ikke installert, eller vinduet ble åpnet før installasjonen: lukk det og åpne et nytt (steg 3). Står det `'uv'` i meldingen, er uv ikke installert, eller vinduet ble åpnet før installasjonen: se «Tester» i README-en.
+Kommer «is not recognized as the name of a cmdlet»: Det mangler mellomrom etter `cd`. Står `cd` klistret til stien i meldingen, for eksempel `'cdC:\...'`, skriver du `cd`, et mellomrom, og drar mappa inn i vinduet på nytt (steg 4). Står det `'docker'` i meldingen, er Docker Desktop ikke installert, eller vinduet ble åpnet før installasjonen: lukk det og åpne et nytt (steg 3). Står det `'uv'` i meldingen, er uv ikke installert, eller vinduet ble åpnet før installasjonen: se «Tester» i README-en.
 
-### «Cannot find path … because it does not exist».
-
-Mappa ligger ikke der stien sier, for eksempel fordi den er flyttet, eller fordi ZIP-fila ble dratt inn i stedet for mappa. Skriv `cd` og et mellomrom, og dra mappa inn i vinduet på nytt (steg 4). Står det `.zip` til slutt i stien i meldingen, var det ZIP-fila: se «Står det .zip til slutt i linja.» over.
+Kommer «Cannot find path … because it does not exist»: Mappa ligger ikke der stien sier, for eksempel fordi den er flyttet, eller fordi ZIP-fila ble dratt inn i stedet for mappa. Skriv `cd` og et mellomrom, og dra mappa inn i vinduet på nytt (steg 4). Står det `.zip` til slutt i stien i meldingen, var det ZIP-fila: se «Står det .zip til slutt i linja.» over.
 
 ### Stien har mellomrom og fikk ikke anførselstegn.
 

@@ -1462,11 +1462,15 @@ UTE_AV_README = {
 SAMMENSLAATT = (
     "«Engine running» kommer ikke, eller det står «Cannot connect to the Docker daemon» eller «error during connect»."
 )
+# Story 3.3j: ett spoersmaal for begge meldingene etter cd i steg 4.
+CD_SPOERSMAALET = (
+    "«is not recognized as the name of a cmdlet» eller «Cannot find path … because it does not exist» etter cd."
+)
 BEHOLDT_I_README = [
     SAMMENSLAATT,
     "ZIP-fila ser ut som en vanlig mappe.",
-    "«is not recognized as the name of a cmdlet» etter cd.",
-    "«Cannot find path … because it does not exist».",
+    # Story 3.3j (gruppens svar 22.10 kl. 17:42): de to svarene om cd er ett.
+    CD_SPOERSMAALET,
     # Story 3.3i (U13): lagt inn foran «no configuration file provided».
     "Nettleseren sier at 127.0.0.1 nektet å koble til.",
     "«no configuration file provided: not found».",
@@ -1557,10 +1561,13 @@ class TestReadmeForNybegynnere:
         feilen «The term 'cdC:\\...' is not recognized as the name of a
         cmdlet». Spoersmaalet staar under «Står du fast?» og i docs/hjelp.md
         under «Steg 4: mappa», med samme svar. Ville feilet hvis svaret om
-        mellomrommet falt bort."""
-        sporsmaal = "«is not recognized as the name of a cmdlet» etter cd."
-        svar = _detaljer(_faq())[sporsmaal]
-        assert svar.startswith("Det mangler mellomrom etter `cd`.")
+        mellomrommet falt bort.
+
+        Story 3.3j: svaret er foerste avsnitt i spoersmaalet for begge
+        meldingene etter cd."""
+        sporsmaal = CD_SPOERSMAALET
+        svar = _detaljer(_faq())[sporsmaal].strip().split("\n\n", 1)[0]
+        assert svar.startswith("Kommer «is not recognized as the name of a cmdlet»: Det mangler mellomrom etter `cd`.")
         assert "(steg 4)" in svar
         steg4 = _hjelp().split("\n## Steg 4: mappa\n", 1)[1].split("\n## ", 1)[0]
         assert re.search(rf"^### {re.escape(sporsmaal)}$", steg4, re.MULTILINE)
@@ -1577,14 +1584,19 @@ class TestReadmeForNybegynnere:
         """Story 3.3c, rettelse c: «Cannot find path» hadde ikke noe svar i
         gjennomgangen 16.10. Spoersmaalet staar under «Står du fast?» og i
         docs/hjelp.md under «Steg 4: mappa», med samme svar. Ville feilet
-        hvis svaret falt bort, eller ikke sa at mappa skal dras paa nytt."""
-        sporsmaal = "«Cannot find path … because it does not exist»."
-        svar = _detaljer(_faq())[sporsmaal]
-        assert svar.startswith("Mappa ligger ikke der stien sier,")
+        hvis svaret falt bort, eller ikke sa at mappa skal dras paa nytt.
+
+        Story 3.3j: svaret er andre avsnitt i spoersmaalet for begge
+        meldingene etter cd."""
+        sporsmaal = CD_SPOERSMAALET
+        svar = _detaljer(_faq())[sporsmaal].strip().split("\n\n", 1)[1]
+        assert svar.startswith(
+            "Kommer «Cannot find path … because it does not exist»: Mappa ligger ikke der stien sier,"
+        )
         assert "flyttet" in svar and "ZIP-fila ble dratt inn" in svar
         assert "dra mappa inn i vinduet på nytt (steg 4)" in svar
         steg4 = _hjelp().split("\n## Steg 4: mappa\n", 1)[1].split("\n## ", 1)[0]
-        i_hjelp = steg4.split(f"### {sporsmaal}\n\n", 1)[1].split("\n\n", 1)[0]
+        i_hjelp = steg4.split(f"### {sporsmaal}\n\n", 1)[1].split("\n\n")[1]
         assert i_hjelp.startswith(svar.strip())
 
     def test_kopieringen_forklares_en_gang_og_hvert_steg_sier_hvor(self):
