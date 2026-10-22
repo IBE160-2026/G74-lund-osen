@@ -1589,7 +1589,8 @@ class TestReadmeForNybegynnere:
         Story 3.3j: svaret er andre avsnitt i spoersmaalet for begge
         meldingene etter cd."""
         sporsmaal = CD_SPOERSMAALET
-        svar = _detaljer(_faq())[sporsmaal].strip().split("\n\n", 1)[1]
+        # Gjennomgangen av 3.3j (ECH3): andre avsnitt paa begge sider.
+        svar = _detaljer(_faq())[sporsmaal].strip().split("\n\n")[1]
         assert svar.startswith(
             "Kommer «Cannot find path … because it does not exist»: Mappa ligger ikke der stien sier,"
         )
@@ -2915,9 +2916,14 @@ class TestReadmeEtterDemoen:
 
 class TestFemSpoersmaal:
     """Story 3.3j (gruppens svar 22.10 kl. 17:42): de to svarene om cd i
-    steg 4 er ett spoersmaal, med begge meldingene ordrett."""
+    steg 4 er ett spoersmaal, med begge meldingene ordrett, saa «Står du
+    fast?» har fem spoersmaal. Grensen paa 5 staar i
+    test_staar_du_fast_har_hoeyst_5_spoersmaal (gjennomgangen, BH5)."""
 
     MELDINGENE = ("«is not recognized as the name of a cmdlet»", "«Cannot find path … because it does not exist»")
+    # Gjennomgangen (ECH2): uten anfoerselstegn, saa en gammel overskrift i
+    # en annen form ogsaa fanges. «The term 'uv' is not recognized» er sitt eget.
+    BARE_ORDENE = ("is not recognized as the name of a cmdlet", "Cannot find path")
 
     def test_begge_meldingene_i_samme_spoersmaal(self):
         """Ville feilet hvis en av meldingene falt ut av spoersmaalet (M2),
@@ -2931,9 +2937,13 @@ class TestFemSpoersmaal:
 
     def test_det_samme_spoersmaalet_i_hjelpen(self):
         """Ville feilet hvis docs/hjelp.md fortsatt hadde de to som hvert sitt
-        spoersmaal, eller det nye sto utenfor «Steg 4: mappa»."""
+        spoersmaal, ogsaa i en annen form, det nye sto utenfor «Steg 4:
+        mappa», eller et av svarene manglet under det (BH4, ECH2)."""
         steg4 = _hjelp().split("\n## Steg 4: mappa\n", 1)[1].split("\n## ", 1)[0]
         overskrifter = re.findall(r"^### (.+)$", _hjelp(), re.MULTILINE)
-        med = [o for o in overskrifter if any(m in o for m in self.MELDINGENE)]
+        med = [o for o in overskrifter if any(m in o for m in self.BARE_ORDENE)]
         assert med == [CD_SPOERSMAALET], med
         assert f"### {CD_SPOERSMAALET}\n" in steg4
+        under = steg4.split(f"### {CD_SPOERSMAALET}\n\n", 1)[1].split("\n### ", 1)[0]
+        for melding in self.MELDINGENE:
+            assert f"Kommer {melding}: " in under, melding
