@@ -914,7 +914,9 @@ HOEYDE_PAA_BILDET = 1630
 # Story 3.3i (U51): lenken til den ekte versjonen i demolinja i _ramme.html,
 # og fargen paa den i stil.css. Bildet ble tatt paa nytt, med samme hoeyde,
 # fordi linja fortsatt er én linje i 1280 px.
-AVTRYKK_BAK_BILDET = "416d90bb41a852fa41888178723b04d4bea6170703c062e1d61dd5a8c70316f3"
+# Story 2.3c: forrige_boersdag i boersdag.py. Bildet ble tatt paa nytt og
+# er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "7fd2458d338530fe2d8e4386ec15b3ec731773b28878a4196fadeac352f24462"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -979,7 +981,9 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # bildet ble byte for byte det samme da det ble tatt på nytt.
 # Story 3.3i (U51): lenken i demolinja. Bildet ble tatt på nytt, med samme
 # høyde, fordi grafen slutter på samme sted.
-AVTRYKK_BAK_AKSJESIDEN = "eae32b3812da70e937a0df12117877416762bf402cd8b46539a74e91377ef5ab"
+# Story 2.3c: forrige_boersdag i boersdag.py og foerste_dag i lagrene i
+# lagring_sqlite.py. Bildet ble tatt på nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "b06cc271a722e706408cdeb4110c8d53f293ad638406e9ef0c31acefb634c651"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "
