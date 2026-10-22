@@ -2,7 +2,7 @@
 title: 'Story 8.6: børsometeret'
 type: 'feature'
 created: '2026-10-23'
-status: 'ready-for-dev'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'c497677'
@@ -44,9 +44,35 @@ context:
 ## Avgjort i spesifikasjonen
 
 - **Størrelsen** har tre trinn: under 1 (mindre enn vanlig), fra 1 til under `volumfaktor` (vanlig), og fra `volumfaktor` (høy, som gir utslag på interesse). Uten vurdering eller volumforhold er ruta i midtre størrelse.
+  *Rettet 2026-10-23 (gjennomgangen, BH1):* høy er over `volumfaktor`, med «>» som interesse-sjekken, og vanlig er fra 1 til og med `volumfaktor`. Uten vurdering eller volumforhold er ruta i midtre størrelse.
 - **Rammen** følger styrken i vurderingen for dagen som vises: 3 gul, 2 mørk, ellers ingen. Uten vurdering ingen ramme.
+  *Rettet 2026-10-23 (gjennomgangen, VG1):* rammen følger siste børsdag. En annen dag har gult ved 3 av 3 på siste børsdag og ingen mørk ramme (designregler §3), og en dag uten vurdering har ingen ramme.
 - **Hovedindeksen** står for siste børsdag også når «Velg dag» viser en annen dag, med datoen ved verdien, som på oversikten.
 - **Bransjer uten aksjer** i lista vises ikke. En aksje med en bransje utenfor de 13 står sist, under bransjens navn.
+
+## Gjennomgangen 23.10
+
+Blind Hunter (BH1–BH10), Edge Case Hunter (ECH1–ECH7) og Verification Gap (VG1–VG11), kjørt samtidig, før hele settet. Rettet i `2d72dc2` og `d427910`, og før det i `35f555e`, der testene for 8.6 b fant at ruta for en aksje uten kurser lenket til en aksjeside som gir 404 (FR-204).
+
+| Funn | Dom | Utfall |
+|---|---|---|
+| VG1 rammen fulgte dagen som vises | høy | rettet: gult følger 3 av 3 på siste børsdag, 2 av 3 merkes bare siste børsdag (designregler §3) |
+| VG2 README-en | medium | rettet i `d427910` |
+| BH1 «høyt» ved `>=`, interesse ved `>` | medium | rettet |
+| BH2, ECH4 volumtallet ved grensen | medium | rettet med `desimaler_mot_grense` |
+| BH3, VG3, ECH1 dag før første kurs | medium | rettet, med egen melding |
+| BH4, ECH2 lenkene mistet dagen | medium | rettet: `?dag=` til aksjesiden |
+| VG4, VG5, VG6, VG8, VG9, VG11 tester | medium og lav | rettet: nye tester |
+| VG7 gul ramme i `#F2B53A` på lys bakgrunn | lav-medium | rettet: `--gul-symbol` |
+| VG10, BH6, BH7, BH8, BH10, ECH6 | lav | rettet |
+| BH5, ECH3 hovedindeksen for siste børsdag på en annen dag | lav | avgjort i spesifikasjonen; siden sier det nå med en linje |
+| BH9 fokus og mørk ramme i samme farge | lav | ikke rettet: fokus er blekk etter designregler §4 |
+| ECH5 seriene leses to ganger | lav | ikke rettet: 15 ms med demobasen |
+| ECH7 gjentatt `dag` i adressen | lav | ikke rettet: skjemaet sender én |
+
+**Åpent punkt for gruppen (regel 12):** designregler §3 sier at gult står også når siden viser en annen dag. Instruksjonen kl. 00:09 sier at en dag uten vurdering har ingen ramme. Koden gjør det begge sier for en dag med vurdering, og det instruksjonen sier for en dag uten: ingen ramme.
+
+**Avvik fra instruksjonen:** ruta for en aksje uten kurser er ikke en lenke, fordi aksjesiden gir 404 for den (FR-204). Hjelpen sier det.
 
 ## Mutantene
 
