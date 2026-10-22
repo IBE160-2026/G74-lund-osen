@@ -911,7 +911,10 @@ HOEYDE_PAA_BILDET = 1630
 # byte for byte det samme. Avtrykket er av kildefilene, ikke av PNG-en.
 # Story 2.7b: hjelpen til Sluttkurs og historikken i hjelpetekster.py. Bildet
 # ble tatt på nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "6568924cf169b0eea3b6844e92a838c1d598fec0659e5be4966c69132c33fa5b"
+# Story 3.3i (U51): lenken til den ekte versjonen i demolinja i _ramme.html,
+# og fargen paa den i stil.css. Bildet ble tatt paa nytt, med samme hoeyde,
+# fordi linja fortsatt er én linje i 1280 px.
+AVTRYKK_BAK_BILDET = "416d90bb41a852fa41888178723b04d4bea6170703c062e1d61dd5a8c70316f3"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -974,7 +977,9 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # kildefilene bak bildet, ikke av PNG-en, så det er nytt (gjennomgangen, BH11).
 # Story 2.7b: historikken står nederst, under avsnittet om investorsiden, og
 # bildet ble byte for byte det samme da det ble tatt på nytt.
-AVTRYKK_BAK_AKSJESIDEN = "4ef9ee6d29ac1b2f17a4dbdd39c754b57595dcb71344fa3e2173238e05f34ca2"
+# Story 3.3i (U51): lenken i demolinja. Bildet ble tatt på nytt, med samme
+# høyde, fordi grafen slutter på samme sted.
+AVTRYKK_BAK_AKSJESIDEN = "eae32b3812da70e937a0df12117877416762bf402cd8b46539a74e91377ef5ab"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "
@@ -1462,6 +1467,8 @@ BEHOLDT_I_README = [
     "ZIP-fila ser ut som en vanlig mappe.",
     "«is not recognized as the name of a cmdlet» etter cd.",
     "«Cannot find path … because it does not exist».",
+    # Story 3.3i (U13): lagt inn foran «no configuration file provided».
+    "Nettleseren sier at 127.0.0.1 nektet å koble til.",
     "«no configuration file provided: not found».",
 ]
 
@@ -1686,11 +1693,15 @@ class TestReadmeForNybegynnere:
         Story 3.3d (beslutningen 16.10 kl. 21:53-21:58, svarene 18.10 kl.
         15:37): hoeyst 5. Hvilke fem er raadets forslag, ikke avgjort 16.10.
         Het test_staar_du_fast_har_hoeyst_8_spoersmaal til 3.3c, og
-        test_staar_du_fast_har_hoeyst_10_spoersmaal til 3.3d. Ville feilet
-        med et sjette spoersmaal."""
+        test_staar_du_fast_har_hoeyst_10_spoersmaal til 3.3d.
+
+        Story 3.3i (instruksjonen 22.10 kl. 16:06, U13): hoeyst 6, for svaret
+        paa at 127.0.0.1 nektet aa koble til. Navnet staar, fordi
+        docs/vurderingsmatrise.md og vedlegget i docs/kvalitetssikring.md
+        nevner testen. Ville feilet med et sjuende spoersmaal."""
         faq = _faq()
         sporsmaal = _detaljer(faq)
-        assert 1 <= len(sporsmaal) <= 5
+        assert 1 <= len(sporsmaal) <= 6
         assert list(sporsmaal) == BEHOLDT_I_README, list(sporsmaal)
         assert faq.count("<details>") == faq.count("</details>") == faq.count("<summary>") == len(sporsmaal)
         rest = re.sub(r"<details>.*?</details>", "", faq, flags=re.DOTALL)
@@ -1745,7 +1756,12 @@ class TestReadmeForNybegynnere:
         assert sitert == app_modul.EKSEMPELTALL_MERKE
         # Story 8.0d: merket staar i rammen, som alle tre malene bruker.
         ramme = (ROT / "src" / "templates" / "_ramme.html").read_text(encoding="utf-8")
-        assert re.findall(r'<p class="eksempeltall">([^<]+)</p>', ramme) == ["Demoversjon. {{ eksempeltall_merke }}"]
+        # Story 3.3i (U51): lenken til den ekte versjonen i README-en staar
+        # etter merket, i samme avsnitt.
+        assert re.findall(r'<p class="eksempeltall">(.+?)</p>', ramme) == [
+            "Demoversjon. {{ eksempeltall_merke }} Ekte kurser trenger en gratis nøkkel fra EODHD: se "
+            '<a href="{{ ekte_versjonen_url }}">Den ekte versjonen</a>.'
+        ]
         for mal in ("index.html", "aksje.html", "basefeil.html"):
             tekst = (ROT / "src" / "templates" / mal).read_text(encoding="utf-8")
             assert tekst.startswith('{% extends "_ramme.html" %}'), mal
@@ -2360,7 +2376,13 @@ class TestReadmeForNybegynnere:
                 "demoen",
                 "Demoen",
             ),
-            ("Ekte kurser, med en gratis nøkkel fra EODHD", "den ekte versjonen", "Den ekte versjonen"),
+            # Story 3.3i (U52): en invitasjon til den ekte versjonen, etter
+            # demoen. Var «Ekte kurser, med en gratis nøkkel fra EODHD».
+            (
+                "Demoen viser så mye som mulig. Prøv gjerne også ekte kurser etterpå, med en gratis nøkkel fra EODHD",
+                "den ekte versjonen",
+                "Den ekte versjonen",
+            ),
             # Story 3.3e (gjennomgangen, VG7): uv installeres foerst.
             ("De automatiske testene, med to kommandoer etter at uv er installert", "Tester", "Tester"),
         ]
@@ -2629,9 +2651,15 @@ LENKENE_FOER_3_3H = {
 
 # Gjennomgangen av 3.3h (ECH2): sha256 av innholdet i hver pil, det samme
 # som delen under overskriften paa main foer grenen (013be41).
+# Story 3.3i (U55): den ekte versjonen fikk avsnittet om at appen er gratis,
+# og hva gratiskontoen og et betalt abonnement hos EODHD gir, foer steg 5.
+# Stegene staar uendret. Var fd359e96... (spesifikasjonen 3.3i).
+# Gjennomgangen av 3.3i: demoen sier i steg 6 at demolinja har en lenke til
+# den ekte versjonen (VG8), og pila til den ekte versjonen at de 4 kallene som
+# er igjen, gaar til nye forsoek (BH5). Var b3f50242... og 36cc2505....
 AVTRYKK_I_PILENE = {
-    "Demoen": "b3f50242ef2bd90baec498eb758acca58e04c420178958650b14f120a8186191",
-    "Den ekte versjonen": "fd359e967c67c89a01ef361e239380adfa094b0bb8a13856fc5120d0a5cf3af2",
+    "Demoen": "f124a92b1c64eeb0ea5e7141976ff85de68df49004a22d5874a4a257aaf89b55",
+    "Den ekte versjonen": "542c899135c674ed2526a41e8860b4e58f202616ba70f620da198d01e01884e2",
     "Dokumentene": "d05514d3de77b3df67028b170b8c2b89c6c99f45ad716906b170b80f969a20b6",
     "Mappestruktur": "d157a1706be8d24e7235f8d89c39c464609032c63ce5443adf2c40d1916758cd",
 }
@@ -2823,3 +2851,45 @@ class TestReadmeBakPiler:
             for linje in tekst.splitlines():
                 if "details>" in linje:
                     assert linje in ("<details>", "</details>"), (navn, linje)
+
+
+class TestReadmeEtterDemoen:
+    """Story 3.3i: README-rettingen etter gruppens gjennomgang av demoen
+    21.10 (U13 og U55 i docs/ux-logg.md)."""
+
+    SPOERSMAALET = "Nettleseren sier at 127.0.0.1 nektet å koble til."
+
+    def test_err_connection_refused_under_staar_du_fast(self):
+        """U13: meldingen fra nettleseren står ordrett, så den kan søkes opp.
+        Ville feilet hvis spørsmålet falt ut av «Står du fast?», eller
+        meldingen falt ut av svaret i README-en eller i docs/hjelp.md."""
+        svar = _detaljer(_faq())
+        assert self.SPOERSMAALET in svar, list(svar)
+        assert "`ERR_CONNECTION_REFUSED`" in svar[self.SPOERSMAALET]
+        assert "«Serving on»" in svar[self.SPOERSMAALET]
+        i_hjelp = _hjelp().split(f"### {self.SPOERSMAALET}\n\n", 1)[1].split("\n\n### ", 1)[0]
+        assert "`ERR_CONNECTION_REFUSED`" in i_hjelp
+
+    def test_tallene_20_og_16_stemmer_med_koden(self, tmp_path):
+        """U55: kallene i døgnet og kallene per henting, slik README-en sier
+        dem i pila til den ekte versjonen. 16 er kallene en henting gjør mot
+        en falsk EODHD, og 20 er tallet øverst i fetch_prices.py, som med 16
+        gir de kallene til nye forsøk som docs/hjelp.md sier. Ville feilet
+        hvis README-en sa 15 kall per henting, eller et annet tall enn koden."""
+        import fetch_prices as fp
+        from kursdata import AKSJEUNIVERS
+        from test_ki_tekst import kjoer
+
+        pila = re.sub(r"\s+", " ", _pil("Den ekte versjonen"))
+        treff = re.search(r"gir (\d+) kall i døgnet og kurser ett år tilbake, og en henting bruker (\d+):", pila)
+        assert treff, pila[:300]
+        i_doegnet, per_henting = int(treff.group(1)), int(treff.group(2))
+        assert f"appen bruker ikke flere enn {per_henting} per henting" in pila
+        _, kall, _ = kjoer(tmp_path / "raa", tmp_path / "db" / "ose.db", None)
+        assert per_henting == len(kall) == len(AKSJEUNIVERS) + 1
+        assert i_doegnet == int(re.search(r"Gratisnivaaet gir (\d+) kall i doegnet", fp.__doc__).group(1))
+        hjelp = re.sub(r"\s+", " ", _hjelp())
+        til_overs, aksjer = map(int, re.search(r"altså (\d+) med de (\d+)", hjelp).groups())
+        assert aksjer == len(AKSJEUNIVERS)
+        assert f"og de {til_overs} som er igjen, går til nye forsøk samme kveld" in pila
+        assert fp.kall_til_nye_forsoek(i_doegnet, i_doegnet, per_henting) == til_overs

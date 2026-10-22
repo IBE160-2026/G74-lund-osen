@@ -285,6 +285,10 @@ class TestRammen:
             for verdi in re.findall(r'(?:src|href)="([^"]*)"', html):
                 if verdi in INVESTORSIDER.values() and verdi in lenker:
                     continue
+                # Story 3.3i (U51): demolinja lenker til den ekte versjonen i
+                # README-en paa GitHub, bare i demoen, og laster ingenting.
+                if verdi == app_modul.EKTE_VERSJONEN_URL and verdi in lenker and 'class="eksempeltall"' in html:
+                    continue
                 assert not re.match(r"(https?:)?//", verdi), (navn, verdi)
             # Story 2.7a: skriftene står i stilarket, ikke i siden.
             for adresse in re.findall(r"""url\(\s*["']?([^"')]+)""", html + _stil(html)):
@@ -308,6 +312,8 @@ class TestRammen:
                     href in ("/", "/min-liste", "/min-liste?vis=alle")
                     # Story 10.5: lenken til investorsiden for aksjen.
                     or href in INVESTORSIDER.values()
+                    # Story 3.3i (U51): den ekte versjonen i README-en, bare i demoen.
+                    or (href == app_modul.EKTE_VERSJONEN_URL and 'class="eksempeltall"' in html)
                     or re.fullmatch(r"/aksje/[A-Z0-9]+", href)
                     or re.fullmatch(
                         r"/min-liste\?(vis=alle&amp;)?sorter=(selskap|kurs|endring|signal|retning)&amp;orden=(synkende|stigende)",
@@ -373,7 +379,8 @@ class TestRammen:
     def test_merket_staar_i_stripa_i_demoen(self, sidene):
         """FR-411 og svar 3: hele merket som egen rad i stripa, uten det gule
         banneret. Ville feilet hvis merket ble borte fra stripa."""
-        merket = f'<p class="eksempeltall">Demoversjon. {app_modul.EKSEMPELTALL_MERKE}</p>'
+        # Story 3.3i (U51): lenken til den ekte versjonen staar etter merket.
+        merket = f'<p class="eksempeltall">Demoversjon. {app_modul.EKSEMPELTALL_MERKE} Ekte kurser'
         # Feilsiden her har en demo.db som ikke kan leses, og ingen kan si at
         # den er en demobase. Feilsiden for en demobase har merket
         # (test_demo.py, test_feilsiden_har_eksempeltall_for_en_demobase).

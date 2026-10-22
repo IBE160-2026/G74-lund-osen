@@ -21,7 +21,7 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 
 Til faglærer:
 - Se appen med oppdiktede tall, uten konto og nøkkel, etter [steg 1–4](#felles-for-begge): [demoen](#demoen)
-- Ekte kurser, med en gratis nøkkel fra EODHD: [den ekte versjonen](#den-ekte-versjonen)
+- Demoen viser så mye som mulig. Prøv gjerne også ekte kurser etterpå, med en gratis nøkkel fra EODHD: [den ekte versjonen](#den-ekte-versjonen)
 - De automatiske testene, med to kommandoer etter at uv er installert: [Tester](#tester)
 - [Product Brief](_bmad-output/planning-artifacts/product-brief.md), arbeidskravet: versjon 8, laget etter [tilbakemeldingen 06.10](_bmad-output/planning-artifacts/tilbakemelding-product-brief.md) og låst i taggen `arbeidskrav-product-brief-v8`
 - Plan og krav: [PRD](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md), [arkitektur](_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md) og [epics og stories](_bmad-output/planning-artifacts/epics.md)
@@ -43,24 +43,24 @@ Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og v
 
 ### Felles for begge
 
-1. **Installer og start Docker Desktop** fra [docker.com](https://www.docker.com/products/docker-desktop/). Hopp over innloggingen. Det er klart når det står «Engine running» nederst i vinduet. La det være åpent.
+1. **Installer og start Docker Desktop** fra [docker.com](https://www.docker.com/products/docker-desktop/). Har du det fra før, starter du det bare. Hopp over innloggingen. Det er klart når det står «Engine running» nederst i vinduet. «Resource Saver mode», med en måne, er også klart: motoren hviler fordi ingen containere kjører, og starter selv når den trengs. La det være åpent.
 
 ![Docker Desktop med «Engine running» nederst i vinduet](docs/bilder/readme/engine-running.png)
 
 *Slik ser det ut nederst i Docker Desktop når det er klart. Står det «Engine starting», venter du litt til.*
 
-2. **Last ned koden.** Trykk den grønne knappen «Code» på [GitHub-siden](https://github.com/IBE160-2026/G74-lund-osen) og «Download ZIP» nederst i menyen. Windows: høyreklikk fila i Nedlastinger (Downloads) og velg «Pakk ut alle» (Extract All). Mac: dobbeltklikk fila. Det er klart når du har en mappe som heter `G74-lund-osen-main`. Har du fått koden som mappe eller ZIP-fil, pakker du den ut og går til steg 3.
+2. **Last ned koden.** Trykk knappen «Code» på [GitHub-siden](https://github.com/IBE160-2026/G74-lund-osen) og «Download ZIP». Windows: høyreklikk fila i Nedlastinger og velg «Pakk ut alle», der den ligger. Mac: dobbeltklikk fila. Det er klart når du har mappa `G74-lund-osen-main`. [Har den tall i navnet](docs/hjelp.md#det-er-to-mapper-med-samme-navn): bruk den nyeste. Har du fått koden som mappe eller ZIP-fil, pakker du den ut og går til steg 3.
 
 ![Menyen under «Code» på GitHub, med «Download ZIP» nederst](docs/bilder/readme/github-download-zip.png)
 
 *Menyen under den grønne knappen «Code». Trykk «Download ZIP» nederst. Adressen i boksen trenger du ikke.*
 
-3. **Åpne PowerShell** (Windows: trykk Start, skriv PowerShell og velg «Windows PowerShell», ikke ISE) **eller Terminal** (Mac: trykk Cmd+mellomrom og skriv Terminal). Det er klart når et vindu venter på at du skriver.
-4. **Skriv `cd` og et mellomrom**, dra mappa `G74-lund-osen-main` fra steg 2 (ikke ZIP-fila), der README og compose ligger (den innerste hvis det er to) fra Filutforsker eller Finder inn i vinduet, og trykk Enter. [Står det `.zip` til slutt?](docs/hjelp.md#står-det-zip-til-slutt-i-linja) Det er klart når mappenavnet står foran `>` eller `%`. Har mappa et annet navn, drar du den mappa der README og compose ligger.
+3. **Åpne PowerShell** i mappa. Windows: åpne den innerste `G74-lund-osen-main` i Filutforsker, skriv `powershell` i adressefeltet og trykk Enter. Da gjør du bare kontrollen i steg 4. Eller trykk Start og velg «Windows PowerShell», ikke ISE og ikke som administrator. Mac: åpne **Terminal** med Cmd+mellomrom. Det er klart når et vindu venter på at du skriver.
+4. **Skriv `cd` og et mellomrom**, dra mappa `G74-lund-osen-main` fra steg 2 (ikke ZIP-fila), der README og compose ligger, inn i vinduet, og trykk Enter. [Står det `.zip` til slutt?](docs/hjelp.md#står-det-zip-til-slutt-i-linja) **Kontroll:** det er klart når `dir` (Windows) eller `ls` (Mac) viser `README.md` og `compose.yaml`. Har mappa et annet navn, drar du den mappa der README og compose ligger.
 
 ![PowerShell med en linje som slutter med G74-lund-osen-main og >](docs/bilder/readme/powershell-mappa.png)
 
-*Slik ser det ut når steg 4 har gått bra. Stien blir en annen hos deg, men mappenavnet skal stå foran `>` (`%` på Mac).*
+*Slik ser det ut etter steg 4. Stien blir en annen hos deg, men mappenavnet skal stå foran `>` (`%` på Mac). Sjekk med `dir` eller `ls`.*
 
 **Slik limer du inn en kommando.** Kopier kommandoen med ikonet til høyre i den grå boksen. Ikonet, som stegene kaller knappen, synes først når musa er over boksen. Du kan også markere den og trykke Ctrl+C eller Cmd+C, eller skrive den inn. Lim den inn i PowerShell-vinduet fra steg 4 (Terminal på Mac) med Ctrl+V eller Cmd+V, og trykk Enter.
 
@@ -75,7 +75,7 @@ Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og v
 docker compose up --build demo
 ```
 
-6. **Åpne http://127.0.0.1:8000** i en ny fane. Øverst står «Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.» Klikk på et selskapsnavn for å se en aksje.
+6. **Åpne http://127.0.0.1:8000** i en ny fane. Øverst står «Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.», med en lenke til den ekte versjonen. Klikk på et selskapsnavn for å se en aksje.
 7. **Stopp** med Ctrl+C i terminalvinduet, også på Mac, og lim så inn denne i PowerShell-vinduet fra steg 4. Det er klart når det står at containerne er fjernet (Removed).
 
 ```
@@ -88,6 +88,8 @@ Vil du også prøve den ekte versjonen, går du videre til steg 5 i [den ekte ve
 
 <details>
 <summary><a name="den-ekte-versjonen"></a>Den ekte versjonen: kurser fra EODHD, med egen nøkkel</summary>
+
+Appen er gratis. Gratiskontoen hos EODHD gir 20 kall i døgnet og kurser ett år tilbake, og en henting bruker 16: ett per aksje og ett for hovedindeksen. Et betalt abonnement gir fra 100 000 kall i døgnet ([prisene hos EODHD](https://eodhd.com/pricing), lest 22.10.2026), men appen bruker ikke flere enn 16 per henting, og de 4 som er igjen, går til nye forsøk samme kveld. Gratiskontoen holder.
 
 5. **Hent en nøkkel.** Lag en gratis bruker hos [EODHD](https://eodhd.com/register), og kopier API-nøkkelen din. Det er klart når du har nøkkelen.
 6. **Legg inn nøkkelen, bare første gang.** Kopier kommandoene med knappen til høyre i boksen, lim dem inn i PowerShell-vinduet fra steg 4 én om gangen (Ctrl+V eller Cmd+V) og trykk Enter. Den første lager fila [`.env`](#mer-for-den-som-vil), og den neste åpner den (Windows eller Mac). Lim inn nøkkelen etter `EODHD_API_KEY=`, lagre og lukk. Det er klart når nøkkelen står etter `EODHD_API_KEY=`.
@@ -139,6 +141,8 @@ Klikk på spørsmålet som passer.
 
 Docker Desktop er ikke startet, eller motoren er ikke klar. Start Docker Desktop, vent til det står «Engine running» (steg 1), og prøv kommandoen igjen. Kommer det ikke etter noen minutter, avslutter du Docker Desktop helt: høyreklikk hvalen ved klokka (Windows) eller klikk den i menylinja øverst (Mac), og velg «Quit Docker Desktop». Åpne det igjen og vent. Hjelper ikke det, starter du maskinen på nytt.
 
+Står det «Resource Saver mode», med en måne, er alt i orden: Docker har stoppet motoren fordi ingen containere kjører, og starter den selv når den trengs, bare litt tregere. Da trenger du ikke vente på «Engine running».
+
 </details>
 
 <details>
@@ -159,6 +163,13 @@ Det mangler mellomrom etter `cd`. Står `cd` klistret til stien i meldingen, for
 <summary>«Cannot find path … because it does not exist».</summary>
 
 Mappa ligger ikke der stien sier, for eksempel fordi den er flyttet, eller fordi ZIP-fila ble dratt inn i stedet for mappa. Skriv `cd` og et mellomrom, og dra mappa inn i vinduet på nytt (steg 4).
+
+</details>
+
+<details>
+<summary>Nettleseren sier at 127.0.0.1 nektet å koble til.</summary>
+
+Nettleseren viser da `ERR_CONNECTION_REFUSED`. Andre nettlesere sier det med andre ord. Ingenting svarer på adressen ennå. Appen er ikke klar, eller den er stoppet. Se i terminalvinduet: vent til linja med «Serving on» har kommet, og sjekk at vinduet fortsatt er åpent og at Docker Desktop kjører. Last så siden på nytt. Adressen er http://127.0.0.1:8000, ikke 0.0.0.0.
 
 </details>
 

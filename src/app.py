@@ -255,6 +255,9 @@ def _aapne_basen() -> None:
 # Story 8.0c: merket staar ett sted, ikke kopiert i tre maler, og demoen
 # sier «Demoversjon.» foran det (tillegget 11.10).
 EKSEMPELTALL_MERKE = "Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs."
+# Story 3.3i (U51): demolinja lenker til stegene for den ekte versjonen i
+# README-en paa GitHub. Den staar bare i demoen, i samme blokk som merket.
+EKTE_VERSJONEN_URL = "https://github.com/IBE160-2026/G74-lund-osen#den-ekte-versjonen"
 
 # Story 8.0c (tillegget 11.10, svar 4): linja nederst paa alle sidene. Én
 # innstilling avgjoer den, og docs/innlevering.md §5 sier at den avgjoeres
@@ -284,6 +287,7 @@ def _eksempeltall():
     return {
         "eksempeltall": g.get("eksempeltall", False),
         "eksempeltall_merke": EKSEMPELTALL_MERKE,
+        "ekte_versjonen_url": EKTE_VERSJONEN_URL,
         "under_arbeid": UNDER_ARBEID_TEKST if UNDER_ARBEID else None,
     }
 
