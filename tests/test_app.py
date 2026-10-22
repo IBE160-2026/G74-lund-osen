@@ -1212,7 +1212,8 @@ class TestVurderingenPaaOversikten:
 
         assert rad[3] == "– ikke vurdert"
         assert "Ukjent" in rad[4]
-        assert "hentekommandoen har ikke skrevet en vurdering" in html
+        # Story 3.4d (gruppens svar 22.10 kl. 20:11): den ekte teksten.
+        assert "signalet lagres bare den kvelden kursene hentes" in html
         assert "--les-inn" in html
 
     def test_ingen_fotnote_naar_alle_er_vurdert(self, klient, monkeypatch):
@@ -1367,7 +1368,8 @@ class TestVurderingenIDetaljen:
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
 
         assert "ikke vurdert" in html
-        assert "hentekommandoen har ikke skrevet en vurdering" in html
+        # Story 3.4d (gruppens svar 22.10 kl. 20:11): den ekte teksten.
+        assert "signalet lagres bare den kvelden kursene hentes" in html
         # Tabellen, ikke hjelpeteksten om kolonnen (story 8.0b).
         assert "<th>Målt mot</th>" not in html
 

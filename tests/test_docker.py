@@ -916,7 +916,8 @@ HOEYDE_PAA_BILDET = 1630
 # fordi linja fortsatt er én linje i 1280 px.
 # Story 3.4c: vurderingene i demo.py fra STARTDAG, og meldingen om en demobase
 # fra foer i index.html. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "9700540f3082ba0537501202ec1089c4ed56c9c0a2b67b36dbe947480c45ccf8"
+# Story 3.4d: fotnoten for «ikke vurdert» i index.html. Bildet er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "eb260bbb98e65f6b9f9749f97c35126ab32e0abcb5624abc14965dd7aeb17e6a"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -985,7 +986,9 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # fra før i app.py. Bildet ble tatt på nytt og er byte for byte det samme.
 # Gjennomgangen av 3.4c (BH1): sjekken av en gammel demobase ogsaa der den ekte
 # skal ligge, i app.py. Bildet er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "846264bd95f2105dc3d95182b742336ce074ae68bd416e9d63baef1779db0414"
+# Story 3.4d: fotnoten i aksje.html og demo_startdag i app.py. Bildet er byte
+# for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "c3dd57f08e91c596147b13978570e411fca9e8b80c14c62d4b2dddbbb1578ee2"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "

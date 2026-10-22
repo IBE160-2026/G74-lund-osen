@@ -274,8 +274,12 @@
 
     {% if ikke_vurdert %}
       <p class="fotnote">
-        «Ikke vurdert»: hentekommandoen har ikke skrevet en vurdering for
-        dagen, for eksempel fordi kursene er lest inn med <code>--les-inn</code>.
+        {#- Story 3.4d (gruppens svar 22.10 kl. 20:11): egen tekst i demoen. #}
+        {% if eksempeltall %}«Ikke vurdert»: i demoen starter vurderingene
+        {{ demo_startdag }}, slik den ekte versjonen har signal fra første henting.
+        {%- else %}«Ikke vurdert»: signalet lagres bare den kvelden kursene hentes,
+        og regnes aldri ut bakover. Det gjelder dagene før første henting, og dager
+        der kursene er lest inn med <code>--les-inn</code>.{% endif %}
       </p>
     {% endif %}
 

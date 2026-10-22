@@ -38,7 +38,7 @@ from flask import Flask, abort, g, redirect, render_template, request
 import lagring_sqlite
 from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
 from boersdag import norsk_dato
-from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, gammel_demobase
+from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
 from graf import bygg_graf
 from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
 from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster
@@ -293,6 +293,16 @@ def _stilark():
     return {"stilark": f"/static/{STILARK.name}?v={avtrykk}"}
 
 
+# Story 3.4d: ukedagene i fotnoten for «ikke vurdert» i demoen.
+UKEDAGER = ("mandag", "tirsdag", "onsdag", "torsdag", "fredag", "lørdag", "søndag")
+
+
+def demo_startdag() -> str:
+    """Første dag med vurdering i demoen, som «mandag 21.09», regnet fra
+    STARTDAG i demo.py (gruppens svar 22.10 kl. 20:11)."""
+    return f"{UKEDAGER[STARTDAG.weekday()]} {STARTDAG:%d.%m}"
+
+
 @app.context_processor
 def _eksempeltall():
     """«Eksempeltall» paa hver side som viser en base med demomerket, og
@@ -300,6 +310,7 @@ def _eksempeltall():
     return {
         "eksempeltall": g.get("eksempeltall", False),
         "eksempeltall_merke": EKSEMPELTALL_MERKE,
+        "demo_startdag": demo_startdag(),
         "ekte_versjonen_url": EKTE_VERSJONEN_URL,
         "under_arbeid": UNDER_ARBEID_TEKST if UNDER_ARBEID else None,
     }
