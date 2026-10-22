@@ -2379,8 +2379,7 @@ class TestReadmeForNybegynnere:
             # Story 3.3i (U52): en invitasjon til den ekte versjonen, etter
             # demoen. Var «Ekte kurser, med en gratis nøkkel fra EODHD».
             (
-                "Prøv gjerne også ekte kurser når du har sett demoen, som viser så mye som mulig, "
-                "med en gratis nøkkel fra EODHD",
+                "Demoen viser så mye som mulig. Prøv gjerne også ekte kurser etterpå, med en gratis nøkkel fra EODHD",
                 "den ekte versjonen",
                 "Den ekte versjonen",
             ),
@@ -2655,9 +2654,12 @@ LENKENE_FOER_3_3H = {
 # Story 3.3i (U55): den ekte versjonen fikk avsnittet om at appen er gratis,
 # og hva gratiskontoen og et betalt abonnement hos EODHD gir, foer steg 5.
 # Stegene staar uendret. Var fd359e96... (spesifikasjonen 3.3i).
+# Gjennomgangen av 3.3i: demoen sier i steg 6 at demolinja har en lenke til
+# den ekte versjonen (VG8), og pila til den ekte versjonen at de 4 kallene som
+# er igjen, gaar til nye forsoek (BH5). Var b3f50242... og 36cc2505....
 AVTRYKK_I_PILENE = {
-    "Demoen": "b3f50242ef2bd90baec498eb758acca58e04c420178958650b14f120a8186191",
-    "Den ekte versjonen": "36cc2505cdc48f09161e22662f239a52fe7f496c4d2d05deb82fa964853f4dd6",
+    "Demoen": "f124a92b1c64eeb0ea5e7141976ff85de68df49004a22d5874a4a257aaf89b55",
+    "Den ekte versjonen": "542c899135c674ed2526a41e8860b4e58f202616ba70f620da198d01e01884e2",
     "Dokumentene": "d05514d3de77b3df67028b170b8c2b89c6c99f45ad716906b170b80f969a20b6",
     "Mappestruktur": "d157a1706be8d24e7235f8d89c39c464609032c63ce5443adf2c40d1916758cd",
 }
@@ -2887,5 +2889,7 @@ class TestReadmeEtterDemoen:
         assert per_henting == len(kall) == len(AKSJEUNIVERS) + 1
         assert i_doegnet == int(re.search(r"Gratisnivaaet gir (\d+) kall i doegnet", fp.__doc__).group(1))
         hjelp = re.sub(r"\s+", " ", _hjelp())
-        til_overs = int(re.search(r"altså (\d+) med de 15", hjelp).group(1))
+        til_overs, aksjer = map(int, re.search(r"altså (\d+) med de (\d+)", hjelp).groups())
+        assert aksjer == len(AKSJEUNIVERS)
+        assert f"og de {til_overs} som er igjen, går til nye forsøk samme kveld" in pila
         assert fp.kall_til_nye_forsoek(i_doegnet, i_doegnet, per_henting) == til_overs

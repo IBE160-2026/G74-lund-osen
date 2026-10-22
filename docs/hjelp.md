@@ -49,7 +49,7 @@ Du må pakke ut. Står det «Komprimert størrelse» (Compressed size) som kolon
 
 ### Det er to mapper med samme navn.
 
-Bruk den innerste `G74-lund-osen-main`, den der filene README og compose ligger. Windows viser dem ofte uten filendelsen (.md og .yaml). På Windows har også ZIP-fila samme navn: den har en glidelås på ikonet, og den skal du ikke bruke. Har du lastet ned flere ganger, kan mappene ha fått et tall i navnet, som `G74-lund-osen-main (4)`. Bruk den nyeste, eller slett de gamle (se «Mappa finnes fra før.»).
+Bruk den innerste `G74-lund-osen-main`, den der filene README og compose ligger. Windows viser dem ofte uten filendelsen (.md og .yaml). På Windows har også ZIP-fila samme navn: den har en glidelås på ikonet, og den skal du ikke bruke. Har du lastet ned flere ganger, kan ZIP-fila og den ytre mappa ha fått et tall i navnet, som `G74-lund-osen-main (4)`. Bruk den nyeste ytre mappa, og den innerste i den. Vil du slette de gamle, flytter du først ut en `.env` med nøkkelen din (se «Mappa finnes fra før.»).
 
 ### Jeg finner ikke ZIP-fila på Mac.
 
@@ -67,7 +67,7 @@ Vil du laste ned på nytt, og det ligger en `.env` med nøkkelen din i den gamle
 
 ### Hvilket vindu skal jeg åpne?
 
-Et terminalvindu, der du skriver kommandoer i stedet for å klikke. Windows: gå i Filutforsker inn i den innerste mappa `G74-lund-osen-main`, klikk i adressefeltet øverst, skriv `powershell` og trykk Enter. Da åpnes PowerShell i mappa, og du slipper steg 4. Du kan også trykke Start, skrive `PowerShell` og åpne «Windows PowerShell», men ikke «Kjør som administrator» (Run as administrator). Ikke velg «Windows PowerShell ISE», som også står i lista. Da står vinduet i en annen mappe, og du går til mappa med steg 4. Mac: trykk Cmd+mellomrom, skriv `Terminal` og trykk Enter. Når det har gått bra, ser du et vindu med en linje som venter på at du skriver. Kommandoene er de samme i PowerShell på Windows og i Terminal på Mac og Linux.
+Et terminalvindu, der du skriver kommandoer i stedet for å klikke. Windows: gå i Filutforsker inn i den innerste mappa `G74-lund-osen-main`, klikk i adressefeltet øverst, skriv `powershell` og trykk Enter. Da åpnes PowerShell i mappa, og du slipper `cd`, men gjør kontrollen i steg 4: `dir` skal vise `README.md` og `compose.yaml`. Du kan også trykke Start, skrive `PowerShell` og åpne «Windows PowerShell», men ikke «Kjør som administrator» (Run as administrator). Fra Start-menyen står vinduet i en annen mappe, og du går til mappa med steg 4. Ikke velg «Windows PowerShell ISE», som også står i lista. Mac: trykk Cmd+mellomrom, skriv `Terminal` og trykk Enter. Når det har gått bra, ser du et vindu med en linje som venter på at du skriver. Kommandoene er de samme i PowerShell på Windows og i Terminal på Mac og Linux.
 
 ### Ingenting skjer når jeg limer inn.
 
@@ -79,7 +79,7 @@ Kopier kommandoen med ikonet til høyre i den grå boksen i README-en. Ikonet sy
 
 ### Hva betyr cd, og hvordan ser jeg at det gikk?
 
-`cd` betyr «gå til mappe», og kommandoene etter steg 4 virker bare fra mappa med koden. Når det har gått bra, står `G74-lund-osen-main` rett før `>` (Windows) eller `%` (Mac) på linja som venter. Det gjør det også i den ytre mappa, så sjekk med `dir` (Windows) eller `ls` (Mac): lista skal vise `README.md` og `compose.yaml`.
+`cd` betyr «gå til mappe», og kommandoene etter steg 4 virker bare fra mappa med koden. Når det har gått bra, står `G74-lund-osen-main` rett før `>` (Windows) eller `%` (Mac) på linja som venter. Det gjør det også i den ytre mappa, så sjekk med `dir` (Windows) eller `ls` (Mac): lista skal vise `README.md` og `compose.yaml`. Viser den bare en mappe som heter `G74-lund-osen-main`, står du i den ytre: skriv `cd G74-lund-osen-main`, trykk Enter og sjekk igjen.
 
 ### Står det .zip til slutt i linja.
 
@@ -171,7 +171,7 @@ Vent til linja med «Serving on» har kommet, og sjekk at terminalvinduet fortsa
 
 ### Nettleseren sier at 127.0.0.1 nektet å koble til.
 
-Nettleseren viser da `ERR_CONNECTION_REFUSED`. Ingenting svarer på adressen ennå. Appen er ikke klar, eller den er stoppet. Se i terminalvinduet: vent til linja med «Serving on» har kommet, og sjekk at vinduet fortsatt er åpent og at Docker Desktop kjører. Last så siden på nytt. Adressen er http://127.0.0.1:8000, ikke 0.0.0.0.
+Nettleseren viser da `ERR_CONNECTION_REFUSED`. Andre nettlesere sier det med andre ord. Ingenting svarer på adressen ennå. Appen er ikke klar, eller den er stoppet. Se i terminalvinduet: vent til linja med «Serving on» har kommet, og sjekk at vinduet fortsatt er åpent og at Docker Desktop kjører. Last så siden på nytt. Adressen er http://127.0.0.1:8000, ikke 0.0.0.0.
 
 ### «The term 'uv' is not recognized» eller «command not found: uv».
 
