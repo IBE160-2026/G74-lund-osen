@@ -281,6 +281,9 @@ def ki_av(monkeypatch):
     variabelen selv eller gir kjoer en falsk modell."""
     monkeypatch.setenv("OSE_KI_TJENESTE", "av")
     monkeypatch.delenv("OSE_KI_OLLAMA_URL", raising=False)
+    # Story 10.7: en ekte noekkel i miljoeet naar aldri testene.
+    for navn in ("OSE_KI_GEMINI_NOKKEL", "OSE_KI_ANTHROPIC_NOKKEL", "OSE_KI_OPENAI_NOKKEL"):
+        monkeypatch.delenv(navn, raising=False)
 
 
 @pytest.fixture(autouse=True)
