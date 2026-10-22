@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-10-22T00:34
+updated: 2026-10-22T17:14
 ---
 
 # UX-loggen
@@ -567,3 +567,21 @@ Hvert funn er slått opp i koden 20.10 før det ble skrevet.
 *Lagt til 2026-10-22 kl. 00:15 (sammenligningen, del C):* det demoen skal vise som den ekte, etter gruppen kl. 23:16: historikken som den ekte, med «ikke vurdert» før en startdag (avgjort kl. 23:09, U45), lenken til investorsiden i samme form som den ekte (U48), og utbytte i noen demoselskaper når U-merket bygges (U42).
 
 *Lagt til 2026-10-22 kl. 00:34:* U30 (2.12) kommer nå etter 8.6, børsometeret, etter svaret 22.10 kl. 00:09 under «Prioritering», story 8.6 og story 2.12 i `epics.md`. Rekkefølgen er 10.7, README-rettingen, 8.6 og så 2.12, og den endrer rekkefølgen kl. 22:51 som «Tas i» for U30 viser til.
+
+*Lagt til 2026-10-22 kl. 17:14:* U8 er løst i `a98146b`, PR #85 (story 3.3i): steg 1 sier at man bare starter Docker Desktop når det finnes fra før.
+
+*Lagt til 2026-10-22 kl. 17:14:* U9 er løst i `a98146b`: «Resource Saver mode», med en måne, er også klart, i steg 1, i det første svaret under «Står du fast?» og i `docs/hjelp.md`, slik Docker beskriver modusen (sitert i spesifikasjonen 3.3i).
+
+*Lagt til 2026-10-22 kl. 17:14:* U10 og U12 er løst i `a98146b`: steg 3 åpner PowerShell i den innerste mappa fra adressefeltet i Filutforsker, med Start-menyen, ikke ISE og ikke som administrator, som den andre veien, og å dra mappa inn i steg 4 som veien på Mac og fra Start. Microsoft dokumenterer adressefeltet bare i et arkivert blogginnlegg fra 2013, så gruppen bør prøve steget på Windows 11.
+
+*Lagt til 2026-10-22 kl. 17:14:* U11 og U14 er løst i `a98146b`: steg 2 pakker ut i Nedlastinger, der fila ligger, og lenker til svaret i `docs/hjelp.md` om tallet i navnet, der man bruker den nyeste ytre mappa og den innerste i den.
+
+*Lagt til 2026-10-22 kl. 17:14:* U13 er løst i `a98146b`: «Nettleseren sier at 127.0.0.1 nektet å koble til.» står under «Står du fast?» og i `docs/hjelp.md`, med `ERR_CONNECTION_REFUSED` i svaret. Årsaken 21.10 er fortsatt ikke kjent.
+
+*Lagt til 2026-10-22 kl. 17:14:* U15 er løst i `a98146b`: kontrollen i steg 4 er at `dir` eller `ls` viser `README.md` og `compose.yaml`, og hjelpen sier hva man gjør fra den ytre mappa.
+
+*Lagt til 2026-10-22 kl. 17:14:* U51 er løst i `a98146b`: demolinja sier «Ekte kurser trenger en gratis nøkkel fra EODHD: se Den ekte versjonen.», med lenken til pila i README-en på GitHub. Den ekte versjonen har ingen slik lenke.
+
+*Lagt til 2026-10-22 kl. 17:14:* U52 er løst i `a98146b`: «Til faglærer» sier at demoen viser så mye som mulig, og inviterer til å prøve ekte kurser etterpå. «Vi anbefaler demoen» står.
+
+*Lagt til 2026-10-22 kl. 17:14:* U55 er løst i `a98146b`: pila til den ekte versjonen sier at appen er gratis, at gratiskontoen hos EODHD gir 20 kall i døgnet og kurser ett år tilbake, at en henting bruker 16 og de 4 som er igjen går til nye forsøk, og at et betalt abonnement gir fra 100 000 kall i døgnet, med lenke til prisene og datoen de ble lest. «Opptil 18 aksjer» står i `docs/hjelp.md` som før.
