@@ -79,6 +79,7 @@ context:
   - «Den ekte versjonen»: avsnittet om at appen er gratis, og hva gratiskontoen og et betalt abonnement hos EODHD gir, står foran steg 5 (U55, `16d9d63`), og fra rettingen at de 4 kallene som er igjen, går til nye forsøk (BH5, `1edd479`). Stegene står uendret. Var `fd359e96…`, så `36cc2505…`, og er `542c8991…`.
   - «Demoen»: steg 6 sier at demolinja har en lenke til den ekte versjonen (VG8, `1edd479`). Var `b3f50242…`, og er `f124a92b…`.
 - **Steg 3 har Start-menyen som den andre veien** på Windows, med «ikke ISE og ikke som administrator» der, fordi adressefeltet ikke er prøvd på Windows 11 av oss (BH2, VG5). Fra adressefeltet gjør man bare kontrollen i steg 4.
+- **`tests/test_utseende.py` godtar lenken til README-en på GitHub** som en `<a href>` på sidene med demomerket, ved siden av investorsidene. Den laster ingenting. Testene der er ikke med i testene for dokumentene, og hele settet fant det etter triagen: fem feil i tre tester.
 - **Tallet 20** kommer fra EODHD (`dailyRateLimit` i `/api/user`), ikke fra en konstant i koden. Testen binder det til docstringen i `fetch_prices.py` og til de 4 kallene i hjelpen, og «med de 15» i hjelpen til lista (ECH10).
 
 ## Mutantene, kjørt
