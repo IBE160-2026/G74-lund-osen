@@ -360,7 +360,7 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 
 **Neste i v1**
 
-- Rettingene i README-en etter gruppens gjennomgang av demoen 21.10
+- Første henting på dagtid: når basen er tom, hentes siste fullførte børsdag også før kl. 22
 
 **Ekstra, hvis tiden rekker**
 

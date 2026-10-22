@@ -2193,8 +2193,10 @@ class TestReadmeForNybegynnere:
         # Story 2.7b: historikken er flyttet til «Ferdig».
         # Story 10.7: egne nøkler er flyttet til «Ferdig», og README-rettingen
         # er neste (svarene 21.10 kl. 22:51 og 22.10 kl. 00:09).
+        # Story 3.3i: README-rettingen er flettet, og første henting på
+        # dagtid (2.3c, avgjørelsen 21.10 kl. 23:33) er neste.
         saker = (
-            "rettingene i readme-en",
+            "første henting på dagtid",
             "signaldagene i kursgrafen",
             "«vis ki-tekst»",
             # Story 8.16: periodene i kursgrafen er flyttet til «Ferdig».
@@ -2527,7 +2529,7 @@ class TestReadmeDemoenAnbefales:
                 assert sak in punkt, (sak, punkt)
         # Gjennomgangen (BH2, VG1): lenken går til selskapets investorside,
         # som i briefen v8 og story 10.5 etter 06.10.
-        for sak in ("rettingene i readme-en",):
+        for sak in ("første henting på dagtid",):
             assert sum(sak in p for p in v1) == 1, (sak, v1)
         assert not any("egen nøkkel" in p for p in v1), v1
         assert not any("min liste" in p or "investorside" in p or "historikk" in p for p in v1), v1
