@@ -2,7 +2,7 @@
 title: 'Story 10.7 (10.7b): en nøkkel som mangler, gir ingen rader'
 type: 'feature'
 created: '2026-10-22'
-status: 'review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '07770d8'
