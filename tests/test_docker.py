@@ -1710,10 +1710,14 @@ class TestReadmeForNybegynnere:
         Story 3.3i (instruksjonen 22.10 kl. 16:06, U13): hoeyst 6, for svaret
         paa at 127.0.0.1 nektet aa koble til. Navnet staar, fordi
         docs/vurderingsmatrise.md og vedlegget i docs/kvalitetssikring.md
-        nevner testen. Ville feilet med et sjuende spoersmaal."""
+        nevner testen.
+
+        Story 3.3j (gruppens svar 22.10 kl. 17:42): hoeyst 5 igjen, som
+        avgjort 16.10. De to svarene om cd i steg 4 er ett spoersmaal. Ville
+        feilet med et sjette spoersmaal (M1)."""
         faq = _faq()
         sporsmaal = _detaljer(faq)
-        assert 1 <= len(sporsmaal) <= 6
+        assert 1 <= len(sporsmaal) <= 5
         assert list(sporsmaal) == BEHOLDT_I_README, list(sporsmaal)
         assert faq.count("<details>") == faq.count("</details>") == faq.count("<summary>") == len(sporsmaal)
         rest = re.sub(r"<details>.*?</details>", "", faq, flags=re.DOTALL)
@@ -2907,3 +2911,29 @@ class TestReadmeEtterDemoen:
         assert aksjer == len(AKSJEUNIVERS)
         assert f"og de {til_overs} som er igjen, går til nye forsøk samme kveld" in pila
         assert fp.kall_til_nye_forsoek(i_doegnet, i_doegnet, per_henting) == til_overs
+
+
+class TestFemSpoersmaal:
+    """Story 3.3j (gruppens svar 22.10 kl. 17:42): de to svarene om cd i
+    steg 4 er ett spoersmaal, med begge meldingene ordrett."""
+
+    MELDINGENE = ("«is not recognized as the name of a cmdlet»", "«Cannot find path … because it does not exist»")
+
+    def test_begge_meldingene_i_samme_spoersmaal(self):
+        """Ville feilet hvis en av meldingene falt ut av spoersmaalet (M2),
+        sto i et eget spoersmaal, eller ikke hadde sitt svar under det."""
+        svar = _detaljer(_faq())
+        med = [s for s in svar if any(m in s for m in self.MELDINGENE)]
+        assert med == [CD_SPOERSMAALET], med
+        for melding in self.MELDINGENE:
+            assert melding in CD_SPOERSMAALET, melding
+            assert f"Kommer {melding}: " in svar[CD_SPOERSMAALET], melding
+
+    def test_det_samme_spoersmaalet_i_hjelpen(self):
+        """Ville feilet hvis docs/hjelp.md fortsatt hadde de to som hvert sitt
+        spoersmaal, eller det nye sto utenfor «Steg 4: mappa»."""
+        steg4 = _hjelp().split("\n## Steg 4: mappa\n", 1)[1].split("\n## ", 1)[0]
+        overskrifter = re.findall(r"^### (.+)$", _hjelp(), re.MULTILINE)
+        med = [o for o in overskrifter if any(m in o for m in self.MELDINGENE)]
+        assert med == [CD_SPOERSMAALET], med
+        assert f"### {CD_SPOERSMAALET}\n" in steg4
