@@ -584,29 +584,29 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) section.bransje h2 .snitt.ned { color: var(--ned); }
 :where(.side-oversikt) section.bransje h2 .antall { font-family: "IBM Plex Sans", sans-serif; font-size: 14px; font-weight: 400; color: var(--dempet); }
 :where(.side-oversikt) ul.ruter { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; }
-:where(.side-oversikt) a.rute { display: flex; flex-direction: column; justify-content: center; gap: 2px; box-sizing: border-box;
+:where(.side-oversikt) .rute { display: flex; flex-direction: column; justify-content: center; gap: 2px; box-sizing: border-box;
                                    padding: 8px 10px; border-radius: 10px; border: 3px solid transparent; text-decoration: none;
                                    color: var(--blekk); background: var(--ingen-bakgrunn); font-variant-numeric: tabular-nums; }
-:where(.side-oversikt) a.rute.opp { background: var(--opp-bakgrunn); }
-:where(.side-oversikt) a.rute.ned { background: var(--ned-bakgrunn); }
-:where(.side-oversikt) a.rute.opp .endring { color: var(--opp); }
-:where(.side-oversikt) a.rute.ned .endring { color: var(--ned); }
-:where(.side-oversikt) a.rute.stoerrelse-lav { width: 96px; min-height: 64px; }
-:where(.side-oversikt) a.rute.stoerrelse-vanlig { width: 120px; min-height: 80px; }
-:where(.side-oversikt) a.rute.stoerrelse-hoey { width: 150px; min-height: 100px; }
-:where(.side-oversikt) a.rute.ramme-moerk { border-color: var(--blekk); }
-:where(.side-oversikt) a.rute.ramme-gul { border-color: var(--oransje); box-shadow: 0 0 0 2px var(--hvit) inset; }
-:where(.side-oversikt) a.rute:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
-:where(.side-oversikt) a.rute .ticker { font-weight: 700; }
-:where(.side-oversikt) a.rute .merke { font-size: 12px; font-weight: 600; }
-:where(.side-oversikt) a.rute .tekst { font-size: 12px; color: var(--dempet); }
+:where(.side-oversikt) .rute.opp { background: var(--opp-bakgrunn); }
+:where(.side-oversikt) .rute.ned { background: var(--ned-bakgrunn); }
+:where(.side-oversikt) .rute.opp .endring { color: var(--opp); }
+:where(.side-oversikt) .rute.ned .endring { color: var(--ned); }
+:where(.side-oversikt) .rute.stoerrelse-lav { width: 96px; min-height: 64px; }
+:where(.side-oversikt) .rute.stoerrelse-vanlig { width: 120px; min-height: 80px; }
+:where(.side-oversikt) .rute.stoerrelse-hoey { width: 150px; min-height: 100px; }
+:where(.side-oversikt) .rute.ramme-moerk { border-color: var(--blekk); }
+:where(.side-oversikt) .rute.ramme-gul { border-color: var(--oransje); box-shadow: 0 0 0 2px var(--hvit) inset; }
+:where(.side-oversikt) .rute:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+:where(.side-oversikt) .rute .ticker { font-weight: 700; }
+:where(.side-oversikt) .rute .merke { font-size: 12px; font-weight: 600; }
+:where(.side-oversikt) .rute .tekst { font-size: 12px; color: var(--dempet); }
 :where(.side-oversikt) .tabellboks.boersometerboks { margin-top: 28px; }
 :where(.side-oversikt) table.boersometertabell { font-variant-numeric: tabular-nums; }
 :where(.side-oversikt) table.boersometertabell caption { text-align: left; font-weight: 600; padding: 12px 8px 8px; }
 :where(.side-oversikt) table.boersometertabell th,
 :where(.side-oversikt) table.boersometertabell td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--strek); }
 @media (max-width: 600px) {
-  :where(.side-oversikt) a.rute.stoerrelse-lav { width: 84px; }
-  :where(.side-oversikt) a.rute.stoerrelse-vanlig { width: 100px; }
-  :where(.side-oversikt) a.rute.stoerrelse-hoey { width: 124px; }
+  :where(.side-oversikt) .rute.stoerrelse-lav { width: 84px; }
+  :where(.side-oversikt) .rute.stoerrelse-vanlig { width: 100px; }
+  :where(.side-oversikt) .rute.stoerrelse-hoey { width: 124px; }
 }

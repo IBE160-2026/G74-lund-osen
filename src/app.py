@@ -550,6 +550,9 @@ def boersometer():
         "boersometer.html",
         bransjer=bransjer,
         antall_aksjer=len(ruter),
+        # Testene for 8.6 b: aksjesiden gir 404 for en aksje uten kursrader
+        # (FR-204), saa bare aksjene med kurser faar lenke.
+        med_side={symbol for symbol, serie in serier.items() if serie},
         dagen=dagen,
         siste=siste,
         foerste=datoer[0],

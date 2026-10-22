@@ -929,7 +929,9 @@ HOEYDE_PAA_BILDET = 1630
 # Story 8.6: knappen «Børsometer» i stripa, hovedindeksen flyttet til delmalen
 # _hovedindeks.html og hjelpen til børsometeret. Bildet ble tatt paa nytt med
 # samme hoeyde, og viser den nye knappen.
-AVTRYKK_BAK_BILDET = "541fd85ddc09af5003f97e107478de07a1f495699d1f1ddd0106111dc6d43597"
+# Testene for 8.6 b: en aksje uten kurser har ingen lenke i børsometeret,
+# i stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "096746a5253905d054d5b227c083525fd5144e8876f35445cf39373eba23dc9c"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1008,7 +1010,9 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # Story 8.6: knappen «Børsometer» i stripa, og ruta og hjelpen til
 # børsometeret i app.py og hjelpetekster.py. Bildet ble tatt på nytt med
 # samme høyde, og viser den nye knappen.
-AVTRYKK_BAK_AKSJESIDEN = "11bbb65d60b9c78720b0d8facd76c0910ee3028edc47b8ea7b794ac24a8fb522"
+# Testene for 8.6 b: en aksje uten kurser har ingen lenke i børsometeret,
+# i app.py. Bildet ble tatt på nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "73581a0c5d09f337213802764974d901a28bd66f246ef3670c4398597e932120"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "
