@@ -120,12 +120,17 @@ def velg_modell(innstillinger: Mapping[str, str], skriv: Callable[[str], None] =
     if tjeneste in MED_NOEKKEL:
         klasse, variabel = MED_NOEKKEL[tjeneste]
         noekkel = (innstillinger.get(variabel) or "").strip()
+        modell = klasse(noekkel)
         if not noekkel:
             skriv(
-                f"OSE_KI_TJENESTE={tjeneste}, men {variabel} mangler i .env. Raden i KI-loggen "
-                "sier det, og det blir ingen KI-tekst i kveld."
+                f"OSE_KI_TJENESTE={tjeneste}, men {variabel} mangler i .env og i miljoeet. Raden i "
+                "KI-loggen sier det, og det blir ingen KI-tekst i kveld."
             )
-        return klasse(noekkel)
+        else:
+            # Som for en adresse utenfor maskinen: utskriften sier at
+            # grunnlaget sendes ut (gjennomgangen av 10.7, BH8).
+            skriv(f"KI-teksten lages av {tjeneste} ({modell.modell}) med noekkelen din. Grunnlaget sendes dit.")
+        return modell
     skriv(
         "OSE_KI_TJENESTE har en ukjent eller tom verdi. Bruk lokal, gemini, anthropic, openai eller av. "
         "Ingen KI-tekst i kveld."
