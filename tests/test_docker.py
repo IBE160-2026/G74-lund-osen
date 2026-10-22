@@ -2152,6 +2152,8 @@ class TestReadmeForNybegynnere:
             "periodene i kursgrafen med «velg dag»",
             # Story 8.3: Min liste er flettet.
             "min liste, med stjernen foran hvert selskap",
+            # Story 10.7: egne nøkler er flettet.
+            "eller med egen nøkkel",
         ):
             assert sak in ferdig, sak
         # Story 3.3h: det rundt appen står i én setning under listene, ikke
@@ -2173,8 +2175,10 @@ class TestReadmeForNybegynnere:
         # Story 8.3: Min liste er flyttet til «Ferdig».
         # Story 10.5: lenken til investorsiden er flyttet til «Ferdig».
         # Story 2.7b: historikken er flyttet til «Ferdig».
+        # Story 10.7: egne nøkler er flyttet til «Ferdig», og README-rettingen
+        # er neste (svarene 21.10 kl. 22:51 og 22.10 kl. 00:09).
         saker = (
-            "egen nøkkel",
+            "rettingene i readme-en",
             "signaldagene i kursgrafen",
             "«vis ki-tekst»",
             # Story 8.16: periodene i kursgrafen er flyttet til «Ferdig».
@@ -2483,7 +2487,9 @@ class TestReadmeDemoenAnbefales:
         tilbake i punktet om lenkene. Story 8.3: Min liste er flyttet til
         «Ferdig», og «Neste i v1» har de tre som er igjen. Story 10.5: lenken
         til investorsiden er flyttet til «Ferdig», og to står igjen. Story
-        2.7b: historikken er flyttet til «Ferdig», og én står igjen."""
+        2.7b: historikken er flyttet til «Ferdig», og én står igjen. Story
+        10.7: egen nøkkel er flyttet til «Ferdig», og README-rettingen står
+        igjen (svarene 21.10 kl. 22:51 og 22.10 kl. 00:09)."""
         tekst = README.read_text(encoding="utf-8")
         status = tekst.split("\n## Status\n", 1)[1].split("\n## ", 1)[0]
         lister = _statuslister(status)
@@ -2499,8 +2505,9 @@ class TestReadmeDemoenAnbefales:
                 assert sak in punkt, (sak, punkt)
         # Gjennomgangen (BH2, VG1): lenken går til selskapets investorside,
         # som i briefen v8 og story 10.5 etter 06.10.
-        for sak in ("egen nøkkel til gemini",):
+        for sak in ("rettingene i readme-en",):
             assert sum(sak in p for p in v1) == 1, (sak, v1)
+        assert not any("egen nøkkel" in p for p in v1), v1
         assert not any("min liste" in p or "investorside" in p or "historikk" in p for p in v1), v1
         assert sum("lenken til investorsiden" in p.lower() for p in lister["Ferdig"]) == 1, lister["Ferdig"]
         assert len(v1) == 1, v1
