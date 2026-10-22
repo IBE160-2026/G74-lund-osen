@@ -34,6 +34,11 @@ Ingen kall til EODHD gaar herfra: steget leser bare basen.
 velg_modell leser OSE_KI_TJENESTE og OSE_KI_OLLAMA_URL (svar 5 og 8):
 «av» gir ingen modell, og uten variabelen gjelder «lokal» (FR-608). Det er
 én tjeneste per kjoering, uten stille overgang til en annen.
+
+Story 10.7: «gemini», «anthropic» og «openai» bruker brukerens egen noekkel,
+fra OSE_KI_GEMINI_NOKKEL, OSE_KI_ANTHROPIC_NOKKEL eller OSE_KI_OPENAI_NOKKEL.
+Mangler den, faar tjenesten modellen likevel, og raden sier at noekkelen
+mangler (FR-604). Noekkelen skrives aldri ut.
 """
 
 import sys
@@ -45,10 +50,16 @@ from urllib.parse import urlsplit
 
 from dotenv import dotenv_values
 
+import ki_anthropic
+import ki_gemini
+import ki_openai
 from boersdag import innevaerende_boersdag, norsk_dato
+from ki_anthropic import AnthropicModell
+from ki_gemini import GeminiModell
 from ki_grunnlag import ki_grunnlag
 from ki_lokal import STANDARD_URL, OllamaModell
 from ki_modell import Modell, lag_ki_rad
+from ki_openai import OpenAIModell
 from kilogg import Emne, IkkeInnevaerendeBoersdag, KIRad
 from kursdata import AKSJEUNIVERS, Aksje
 from lagring_sqlite import SqliteKILogg, SqliteVurderingslager, aapne_base
@@ -56,18 +67,29 @@ from vurderingsdata import Vurdering
 
 AV = "av"
 LOKAL = "lokal"
-# Tjenestene i FR-608 som kommer med egen noekkel i story 10.7.
-SENERE = ("gemini", "anthropic", "openai")
+# Tjenestene i FR-608 med egen noekkel (story 10.7): modellen og variabelen
+# med noekkelen.
+MED_NOEKKEL = {
+    "gemini": (GeminiModell, ki_gemini.NOEKKEL_VARIABEL),
+    "anthropic": (AnthropicModell, ki_anthropic.NOEKKEL_VARIABEL),
+    "openai": (OpenAIModell, ki_openai.NOEKKEL_VARIABEL),
+}
 # Adressene som er paa maskinen eller i compose. En annen adresse sender
 # prompten dit, og hentingen sier fra (gjennomgangen av PR F, BH13).
 LOKALE_VERTER = ("127.0.0.1", "localhost", "::1", "ollama")
 
-_NOEKLER = ("OSE_KI_TJENESTE", "OSE_KI_OLLAMA_URL")
+_NOEKLER = (
+    "OSE_KI_TJENESTE",
+    "OSE_KI_OLLAMA_URL",
+    "OSE_KI_GEMINI_NOKKEL",
+    "OSE_KI_ANTHROPIC_NOKKEL",
+    "OSE_KI_OPENAI_NOKKEL",
+)
 
 
 def ki_innstillinger(env_fil: Path, miljoe: Mapping[str, str]) -> dict[str, str]:
-    """OSE_KI_* per noekkel: miljoeet foerst, saa .env. Bare de to noeklene
-    tas med. Sier miljoeet «av», leses ikke fila, saa testene (conftest.py)
+    """OSE_KI_* per noekkel: miljoeet foerst, saa .env. Bare noeklene i
+    _NOEKLER tas med. Sier miljoeet «av», leses ikke fila, saa testene (conftest.py)
     aldri leser den."""
     innstillinger = {n: miljoe[n] for n in _NOEKLER if n in miljoe}
     if innstillinger.get("OSE_KI_TJENESTE", "").strip().lower() == AV:
@@ -95,10 +117,19 @@ def velg_modell(innstillinger: Mapping[str, str], skriv: Callable[[str], None] =
         if deler.hostname not in LOKALE_VERTER:
             skriv(f"OSE_KI_OLLAMA_URL peker til {deler.hostname}, ikke til maskinen. Prompten sendes dit.")
         return OllamaModell(url=url)
-    if tjeneste in SENERE:
-        skriv(f"OSE_KI_TJENESTE={tjeneste} er ikke bygget ennaa (story 10.7). Ingen KI-tekst i kveld.")
-    else:
-        skriv("OSE_KI_TJENESTE har en ukjent eller tom verdi. Bruk lokal eller av. Ingen KI-tekst i kveld.")
+    if tjeneste in MED_NOEKKEL:
+        klasse, variabel = MED_NOEKKEL[tjeneste]
+        noekkel = (innstillinger.get(variabel) or "").strip()
+        if not noekkel:
+            skriv(
+                f"OSE_KI_TJENESTE={tjeneste}, men {variabel} mangler i .env. Raden i KI-loggen "
+                "sier det, og det blir ingen KI-tekst i kveld."
+            )
+        return klasse(noekkel)
+    skriv(
+        "OSE_KI_TJENESTE har en ukjent eller tom verdi. Bruk lokal, gemini, anthropic, openai eller av. "
+        "Ingen KI-tekst i kveld."
+    )
     return None
 
 
@@ -145,8 +176,8 @@ def _rad_uten_kall(emne: Emne, vurdering: Vurdering, modell: Modell, foerste: st
 
 def _ikke_klar(modell: Modell) -> str | None:
     """Grunnen til at tjenesten ikke kan brukes i kveld, eller None. En modell
-    uten sjekk regnes som klar: de falske i testene, og tjenestene i 10.7 til
-    de faar sin egen. En sjekk som ikke gir en tekst, regnes ogsaa som klar."""
+    uten sjekk regnes som klar: de falske i testene, og tjenestene i 10.7, der
+    en noekkel som mangler eller en feil gir en rad (spesifikasjonen 10.7). En sjekk som ikke gir en tekst, regnes ogsaa som klar."""
     sjekk = getattr(modell, "sjekk", None)
     grunn = sjekk() if callable(sjekk) else None
     return grunn if isinstance(grunn, str) and grunn.strip() else None

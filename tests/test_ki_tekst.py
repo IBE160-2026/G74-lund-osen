@@ -218,7 +218,7 @@ class TestTjenesten:
     @pytest.mark.parametrize(
         "tjeneste, tekst",
         [
-            ("gemini", "ikke bygget ennaa"),
+            ("ollama", "ukjent eller tom verdi"),
             ("chatgpt", "ukjent eller tom verdi"),
             ("", "ukjent eller tom verdi"),
             ("   ", "ukjent eller tom verdi"),
