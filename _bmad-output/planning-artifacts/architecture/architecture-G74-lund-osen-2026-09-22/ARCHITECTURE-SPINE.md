@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-10-22T18:52'
+updated: '2026-10-22T23:45'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -221,6 +221,7 @@ tallene og ordene i hjelpen er de samme som i beregningen og tabellen.
 - **Konsekvensen er tilsiktet:** en dag ingen kjørte hentekommandoen, kan ikke etterfylles med en vurdering. `FR-403` fyller hull i kursserien fordi en kurs for 12.09 er den samme uansett når den hentes; en vurdering er det ikke. Dagen skal kunne skilles som manglende, ikke som tom, i lageret — `FR-409`. *Rettet 2026-09-24: her sto «vises». FR-409 er et lagerkrav.*
 - **Merknad 2026-10-03 (FR-411, demobasen, story 3.4):** AD-7 gjelder uendret for den ekte basen, og porten får ingen ny metode. Demokommandoen skriver én vurdering per aksje og dag gjennom `SqliteVurderingslager`, med lagerets klokke stilt på hver dag etter tur, så `skriv` brukes uendret og avviser fortsatt alle datoer utenom inneværende børsdag for den klokka. Demobasen er merket med `PRAGMA application_id`, med en fast verdi som bare demokommandoen setter. Det er trygt bare fordi demokommandoen nekter en base uten demomerket, og hentekommandoen nekter en demobase. Begge vaktene testes. Svikter en av dem, kan noen skrive historikk i ettertid i en ekte base. Hentekommandoen er fortsatt eneste skriver av kurser og vurderinger i den ekte basen (AD-3). Webserveren migrerer basen (story 2.2, AD-10), og Min liste får webserveren som skriver (føringen 2026-09-30 under AD-3).
 - **Merknad 2026-10-22 (story 2.3c, foreslått, ikke godkjent av gruppen):** første henting på dagtid i en tom base skriver vurderingene og KI-radene for forrige børsdag, som ikke er inneværende børsdag. `SqliteVurderingslager` og `SqliteKILogg` får derfor `foerste_dag`: en rad for den dagen godtas bare når den er børsdagen rett før inneværende, og verken tabellen eller `vurdering` har en rad for en annen dato. Uten `foerste_dag` er vernet som før. Det er et unntak fra skjerpingen over, ikke en ny metode, og ingen rad som finnes, kan skrives om på en ny måte. Unntaket må godkjennes av gruppen før 2.3c flettes (`spec-2-3c-foerste-henting-paa-dagtid.md`, «Åpent»).
+- *Godkjent 2026-10-22 kl. 19:30 (gruppens svar):* unntaket fra AD-7 er godkjent. Første henting på dagtid i en tom base skriver vurderingene og KI-radene for børsdagen rett før inneværende, bare når basen ikke har rader for en annen dato, og hver rad skrives én gang og regnes aldri på nytt (under «Prioritering» og story 2.3 i `epics.md`, flettet i `2a84142`).
 
 ### AD-8 — Nettverk er sperret i testkjøringen `[ADOPTED 2026-09-21]`
 
