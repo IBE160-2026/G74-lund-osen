@@ -2177,6 +2177,8 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 
 *Avgjort 2026-10-22 kl. 17:42 (gruppens svar):* de to svarene om `cd` i steg 4 under «Står du fast?», «is not recognized as the name of a cmdlet» og «Cannot find path … because it does not exist», blir ett spørsmål med begge meldingene ordrett, så «Står du fast?» har fem spørsmål, som avgjort 16.10 kl. 21:53–21:58. Det erstatter grensen på 6 fra 3.3i (`a98146b`). Det bygges i spesifikasjonen 3.3j. Gruppen prøvde også steg 3 fra 3.3i samme minutt: PowerShell åpnet fra adressefeltet i Filutforsker i den innerste mappa, og `dir` viste `README.md` og `compose.yaml` (§13 i `docs/kvalitetssikring.md`).
 
+*Lagt til 2026-10-22 kl. 18:08:* fem spørsmål i «Står du fast?» igjen er squash-flettet i `6d67db0`, PR #86, låst til head-en `70e4de5` (spesifikasjonen `spec-3-3j-fem-spoersmaal-i-staar-du-fast.md`). «is not recognized as the name of a cmdlet» og «Cannot find path … because it does not exist» står i ett spørsmål med begge svarene, i README-en og `docs/hjelp.md`, så linja over fra 3.3i om høyst 6 spørsmål gjelder ikke lenger. Hele settet: 3089 bestått og 17 hoppet over, og CI var grønn på head-en (39811006651). Begge mutantene, M1 og M2, ble fanget.
+
 ### Story 3.4: Demoversjonen
 
 *Lagt til 2026-10-03, Marians beslutning kl. 18:10.*

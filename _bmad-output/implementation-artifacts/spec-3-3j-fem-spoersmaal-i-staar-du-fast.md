@@ -2,7 +2,7 @@
 title: 'Story 3.3 (3.3j): fem spørsmål i «Står du fast?» igjen'
 type: 'feature'
 created: '2026-10-22'
-status: 'review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'b751e91'

@@ -84,6 +84,8 @@ context:
 - **`tests/test_utseende.py` godtar lenken til README-en på GitHub** som en `<a href>` på sidene med demomerket, ved siden av investorsidene. Den laster ingenting. Testene der er ikke med i testene for dokumentene, og hele settet fant det etter triagen: fem feil i tre tester.
 - **Tallet 20** kommer fra EODHD (`dailyRateLimit` i `/api/user`), ikke fra en konstant i koden. Testen binder det til docstringen i `fetch_prices.py` og til de 4 kallene i hjelpen, og «med de 15» i hjelpen til lista (ECH10).
 
+*Lagt til 2026-10-22 kl. 18:08:* punktet om høyst 6 spørsmål i «Står du fast?» over gjelder ikke lenger. Etter gruppens svar 22.10 kl. 17:42 er de to svarene om `cd` i steg 4 ett spørsmål, og «Står du fast?» har høyst 5 igjen, flettet i `6d67db0`, PR #86 (spesifikasjonen `spec-3-3j-fem-spoersmaal-i-staar-du-fast.md`).
+
 *Rettet 2026-10-22 kl. 17:24:* den første kjøringen av hele settet hadde 5 feil: 3 tester i `tests/test_utseende.py` og 2 i `tests/test_kvalitetssikring.py`, fordi testen av «Står du fast?» hadde fått nytt navn. Punktet over om `tests/test_utseende.py` sier «fem feil i tre tester».
 
 ## Mutantene, kjørt
