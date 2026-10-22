@@ -73,6 +73,18 @@ def innevaerende_boersdag(dag: date) -> date:
         oppslag -= timedelta(days=1)
 
 
+def forrige_boersdag(dag: date) -> date:
+    """Siste boersdag foer dag, ikke paa den - story 2.3c.
+
+    Foerste henting paa dagtid naar basen er tom, henter denne dagen: siste
+    fullfoerte boersdag foer TIDSGRENSE paa en boersdag. Samme liste og samme
+    feil som inneveerende_boersdag.
+    """
+    if not isinstance(dag, date) or isinstance(dag, datetime):
+        raise TypeError(f"dag maa vaere datetime.date, fikk {dag!r}")
+    return innevaerende_boersdag(dag - timedelta(days=1))
+
+
 def er_boersdag(dag: date) -> bool:
     """Om dag er en boersdag: mandag-fredag som ikke staar i STENGT.
 

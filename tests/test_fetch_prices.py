@@ -1792,6 +1792,16 @@ def kjoer_23(raa, base, oeyeblikk, hent=None, nokkel=NOEKKEL, les_kvote=nok_kvot
     return fil, kall, "\n".join(linjer)
 
 
+def ikke_tom(raa, base, kvelden_foer: datetime) -> str:
+    """Story 2.3c: en base som ikke er tom, fra kveldens henting dagen foer.
+    En tom base henter forrige boersdag foer kl. 22 (foerste henting), saa
+    testene av tidskontrollen trenger en base med kurser. Gir sha256 av
+    basen, saa testen kan se at ingenting ble skrevet."""
+    fil, kall, _ = kjoer_23(raa, base, kvelden_foer)
+    assert fil is not None and len(kall) == KALL
+    return sha(base)
+
+
 def kjoer_23_kode(raa, base, oeyeblikk, hent=None, nokkel=NOEKKEL, les_kvote=nok_kvote, **kw):
     """Som kjoer_23, for en kjoering som skal avslutte: (kode, kall, utskrift)."""
     linjer, kall = [], []
@@ -1819,18 +1829,22 @@ class TestTidskontrollen:
 
     def test_boersdag_kl_21_59_59_gir_0_kall_og_nevner_flagget(self, stier):
         """21:59:59 i Oslo er for tidlig. Ville feilet uten tidskontrollen (M1),
-        med noekkelen lest foerst (M5), eller med grensen paa 21:00 (G1)."""
+        med noekkelen lest foerst (M5), eller med grensen paa 21:00 (G1).
+        Story 2.3c: med en base som ikke er tom; en tom base henter forrige
+        boersdag (TestFoersteHenting)."""
         raa, base = stier
+        foer = ikke_tom(raa, base, _utc(2026, 9, 21, 20, 30))
         fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 19, 59, 59), ingen_kall, ingen_noekkel, ingen_kall)
         assert fil is None and kall == []
         assert "--uten-tidskontroll" in ut and "0 kall brukt" in ut
         assert "klokka er ikke 22:00 i Oslo" in ut and "Kjoer etter kl. 22:00" in ut
-        assert not raa.exists() and not base.exists()
+        assert not (raa / "kurser-raa-2026-09-22.json").exists() and sha(base) == foer
 
     def test_kl_21_59_gir_0_kall(self, stier):
         """Stoppet av tidskontrollen, ikke av noe annet (gjennomgangen 17.10,
         BH12)."""
         raa, base = stier
+        ikke_tom(raa, base, _utc(2026, 9, 21, 20, 30))
         fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 19, 59), ingen_kall, ingen_noekkel, ingen_kall)
         assert fil is None and kall == []
         assert "klokka er ikke 22:00 i Oslo" in ut and "--uten-tidskontroll" in ut
@@ -1840,11 +1854,12 @@ class TestTidskontrollen:
         feilet med grensen tilbake paa 21:00 (mutant G1), eller hvis noe ble
         skrevet foer tidskontrollen sa nei (gjennomgangen 20.10, BH8)."""
         raa, base = stier
+        foer = ikke_tom(raa, base, _utc(2026, 9, 21, 20, 30))
         fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 19, 30), ingen_kall, ingen_noekkel, ingen_kall)
         assert fil is None and kall == []
         assert "klokka er ikke 22:00 i Oslo" in ut
         assert "--uten-tidskontroll" in ut and "0 kall brukt" in ut
-        assert not raa.exists() and not base.exists()
+        assert not (raa / "kurser-raa-2026-09-22.json").exists() and sha(base) == foer
 
     def test_grensen_er_foer_stoppen_for_nye_forsoek(self):
         """Gjennomgangen 17.10, BH11: en endring av grensen kan ikke tomme
@@ -2218,6 +2233,8 @@ class TestVintertid:
         UTC+2 (V2), som gir 22:59 og henter, eller med grensen paa 21:00 (G1).
         19.10 var tidene 20:59 og 19:59."""
         raa, base = stier
+        # Story 2.3c: kveldens henting mandag 9.11, kl. 22:30 i Oslo.
+        ikke_tom(raa, base, _utc(2026, 11, 9, 21, 30))
         fil, kall, ut = kjoer_23(raa, base, _utc(2026, 11, 10, 20, 59), ingen_kall, ingen_noekkel, ingen_kall)
         assert fil is None and kall == []
         assert "--uten-tidskontroll" in ut and "0 kall brukt" in ut

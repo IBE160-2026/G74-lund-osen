@@ -26,7 +26,7 @@ from collections.abc import Callable
 from datetime import date, datetime
 from pathlib import Path
 
-from boersdag import innevaerende_boersdag, norsk_dato
+from boersdag import forrige_boersdag, innevaerende_boersdag, norsk_dato
 from indeksdata import HOVEDINDEKS, Indeks, kontroller_indeksskriving
 from kilogg import AKSJE, Emne, IkkeInnevaerendeBoersdag, KIRad
 from kursdata import AKSJEUNIVERS, Aksje, Kursrad, kontroller_skriving
@@ -331,6 +331,20 @@ _UPSERT = (
 )
 
 
+def _foerste_dag_godtas(
+    tilkobling: sqlite3.Connection, tabell: str, dato: date, dagens: date, foerste_dag: date | None
+) -> bool:
+    """Story 2.3c: en rad for foerste_dag godtas selv om den ikke er
+    inneveerende boersdag, bare naar den er boersdagen rett foer, og tabellen
+    ikke har en rad for en annen dato. Det er foerste henting i en tom base,
+    der ingen eldre rad finnes som kan skrives om (AD-7). Uten foerste_dag
+    er vernet som foer."""
+    if foerste_dag is None or dato != foerste_dag or dato != forrige_boersdag(dagens):
+        return False
+    annen = tilkobling.execute(f"SELECT 1 FROM {tabell} WHERE dato <> ? LIMIT 1", (dato.isoformat(),)).fetchone()
+    return annen is None
+
+
 def _kontroller_noekkel(symbol: str, dato: date, symboler: frozenset[str] = SYMBOLER) -> None:
     if not isinstance(dato, date) or isinstance(dato, datetime):
         raise TypeError(f"dato maa vaere datetime.date, fikk {dato!r}")
@@ -361,10 +375,13 @@ class SqliteVurderingslager:
         univers: tuple[Aksje, ...] = AKSJEUNIVERS,
         *,
         godta_en_versjon_bak: bool = False,
+        foerste_dag: date | None = None,
     ):
         _krev_siste_versjon(tilkobling, godta_en_versjon_bak=godta_en_versjon_bak)
         self._tilkobling = tilkobling
         self._klokke = klokke
+        # Story 2.3c: foerste henting paa dagtid i en tom base (_foerste_dag_godtas).
+        self._foerste_dag = foerste_dag
         # Story 3.4: lista som skrives, med AKSJEUNIVERS som standard.
         self._symboler = SYMBOLER if univers is AKSJEUNIVERS else frozenset(aksje.symbol for aksje in univers)
 
@@ -377,7 +394,7 @@ class SqliteVurderingslager:
         else:
             raise TypeError(f"innhold maa vaere Vurdering eller Grunn, fikk {type(innhold).__name__}")
         dagens = innevaerende_boersdag(norsk_dato(self._klokke()))
-        if dato != dagens:
+        if dato != dagens and not _foerste_dag_godtas(self._tilkobling, "vurdering", dato, dagens, self._foerste_dag):
             raise ValueError(
                 f"{dato.isoformat()} er ikke inneveerende boersdag "
                 f"({dagens.isoformat()}). En eldre rad skrives aldri om (AD-7)."
@@ -556,12 +573,16 @@ class SqliteKILogg:
     men aldri endres.
     """
 
-    def __init__(self, tilkobling: sqlite3.Connection, klokke: Callable[[], datetime]):
+    def __init__(
+        self, tilkobling: sqlite3.Connection, klokke: Callable[[], datetime], *, foerste_dag: date | None = None
+    ):
         if not callable(klokke):
             raise TypeError(f"klokke maa kunne kalles, fikk {klokke!r}")
         _krev_siste_versjon(tilkobling)
         self._tilkobling = tilkobling
         self._klokke = klokke
+        # Story 2.3c: foerste henting paa dagtid i en tom base (_foerste_dag_godtas).
+        self._foerste_dag = foerste_dag
 
     def skriv(self, rad: KIRad) -> bool:
         if not isinstance(rad, KIRad):
@@ -570,7 +591,9 @@ class SqliteKILogg:
         if not isinstance(naa, datetime) or naa.tzinfo is None:
             raise TypeError(f"klokka maa gi et tidspunkt med sone, ga {naa!r}")
         dagens = innevaerende_boersdag(norsk_dato(naa))
-        if rad.emne.dato != dagens:
+        if rad.emne.dato != dagens and not _foerste_dag_godtas(
+            self._tilkobling, "ki_logg", rad.emne.dato, dagens, self._foerste_dag
+        ):
             raise IkkeInnevaerendeBoersdag(
                 f"{rad.emne.dato.isoformat()} er ikke inneveerende boersdag "
                 f"({dagens.isoformat()}). En eldre rad kan ikke skrives (AD-7)."
