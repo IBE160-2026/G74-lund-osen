@@ -1579,6 +1579,8 @@ Oppgaveplanlegging beskrives i README (regel 19).
 
 *Avgjort 2026-10-22 kl. 19:30 (gruppens svar):* unntaket fra AD-7 i 2.3c er godkjent. Første henting på dagtid i en tom base skriver vurderingene og KI-radene for børsdagen rett før inneværende, bare når basen ikke har rader for en annen dato, og hver rad skrives én gang og regnes aldri på nytt. Uten unntaket ville en ny bruker ikke sett signalet med en gang, som avgjørelsen 2026-10-21 kl. 23:33 sier.
 
+*Lagt til 2026-10-22 kl. 23:45:* første henting på dagtid er squash-flettet i `2a84142`, PR #87, låst til head-en `be511ee`, etter at main ble flettet inn i grenen i `be511ee` (spesifikasjonen `spec-2-3c-foerste-henting-paa-dagtid.md`). Er basen tom på en børsdag før `TIDSGRENSE`, henter første henting forrige børsdag, med kurser til og med den dagen, og skriver vurderingene og KI-radene for den dagen gjennom unntaket fra AD-7, godkjent kl. 19:30. En base som ikke er tom, gir 0 kall før kl. 22 som før. Hele settet: 3124 bestått og 17 hoppet over, og CI var grønn på head-en (39859331489). Alle tre mutantene, M1–M3, ble fanget.
+
 ### Story 2.3b: Kallene som er igjen, brukes på nye forsøk
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 19:17.*

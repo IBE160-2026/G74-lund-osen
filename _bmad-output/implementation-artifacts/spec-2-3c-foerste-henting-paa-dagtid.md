@@ -2,7 +2,7 @@
 title: 'Story 2.3 (2.3c): første henting på dagtid når basen er tom'
 type: 'feature'
 created: '2026-10-22'
-status: 'review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'fb9bcac'
@@ -113,6 +113,8 @@ Gjennomgang 22.10 på diffen `fb9bcac..9ad2c60`. Linsene var Blind Hunter (BH, 8
 ## Åpent
 
 - **Unntaket i lagrene (AD-7)** må godkjennes av gruppen før flettingen. Alternativet er at første henting på dagtid bare lagrer kursene, uten vurdering og KI-tekst, og at signalet kommer fra kveldens henting. Det gir ikke «signalet med en gang» som avgjørelsen 23:33 sier.
+
+*Godkjent 2026-10-22 kl. 19:30 (gruppens svar):* unntaket fra AD-7 er godkjent. Første henting på dagtid i en tom base skriver vurderingene og KI-radene for børsdagen rett før inneværende, bare når basen ikke har rader for en annen dato, og hver rad skrives én gang og regnes aldri på nytt (under «Prioritering» og story 2.3 i `epics.md`).
 
 ## Det som ikke endres
 
