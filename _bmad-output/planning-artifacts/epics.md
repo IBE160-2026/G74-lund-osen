@@ -2274,6 +2274,8 @@ avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 
 *Avgjort 2026-10-22 kl. 18:20 (gruppens svar):* historikken i demoen som den ekte (avgjørelsen 2026-10-21 kl. 23:09, U45 i `docs/ux-logg.md`) bygges nå, før 8.6, i spesifikasjonen 3.4c.
 
+*Lagt til 2026-10-22 kl. 20:03:* historikken i demoen som den ekte er squash-flettet i `9359a70`, PR #88, låst til head-en `d58ba83` (spesifikasjonen `spec-3-4c-historikken-i-demoen.md`). Vurderingene i demoen skrives bare fra mandag 21.09, tre uker før siste demodag 09.10, og dagene før står som «ikke vurdert», slik den ekte versjonen viser dagene før første henting. Kursene, de 10 fargekombinasjonene og KI-tekstene på 09.10 er som før. En demobase fra før sier fra og viser kommandoen som lager den på nytt. Hele settet: 3097 bestått og 17 hoppet over, og CI var grønn på head-en (39827715260). Alle tre mutantene, M1–M3, ble fanget.
+
 ### Story 3.4b: KI-tekstene i demoen
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 16:53.*

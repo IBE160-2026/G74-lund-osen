@@ -2,7 +2,7 @@
 title: 'Story 3.4 (3.4c): historikken i demoen som den ekte'
 type: 'feature'
 created: '2026-10-22'
-status: 'review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '5ff304f'
