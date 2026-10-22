@@ -593,6 +593,10 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-22 kl. 19:30 (gruppens svar):* unntaket fra AD-7 i 2.3c er godkjent. Første henting på dagtid i en tom base skriver vurderingene og KI-radene for børsdagen rett før inneværende, bare når basen ikke har rader for en annen dato, og hver rad skrives én gang og regnes aldri på nytt. Uten unntaket ville en ny bruker ikke sett signalet med en gang, som avgjørelsen 2026-10-21 kl. 23:33 sier.
 
+*Avgjort 2026-10-22 kl. 23:14 (gruppens svar):* i 2.12 velger brukeren aksjer bare fra lista over aksjene på Oslo Børs (`malinger.md` §40). Hentekommandoen henter lista med 1 kall, sjelden og med reservekallet, og lagrer den i basen, og siden viser bare tickere som står i lista. Webserveren henter aldri (AD-10). Da kan en ticker som ikke finnes, aldri koste et kall, som den gjorde i §40. Kontrollpunktet om en ticker som ikke gir rader ved hentingen, står som vern.
+
+*Avgjort 2026-10-22 kl. 23:19 (gruppens svar):* børsometeret blir som tavla, én rute per aksje ordnet etter bransje, med farge for endringen, størrelse for volumet mot vanlig og ramme for signalet, og snittet per bransje i overskriften, som storyen krever. Først for siste børsdag og «Velg dag»; periodene kommer med 8.17.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -1922,6 +1926,8 @@ følger aksjene jeg bryr meg om.
 *Avgjort 2026-10-22 kl. 16:07 (gruppens svar):* de 4 kallene som er igjen av dagskvoten 22.10 i GMT, de 3 som er holdt av til egne aksjer og reserven (avgjort 21.10 kl. 18:38), går i kveld til oppslagene i `malinger.md` §40: lista over aksjene på Oslo Børs, en ticker som ikke finnes, og ett år for NEL og STB. Det erstatter svaret kl. 16:06 om NOD, NEL, SUBC og STB, fordi de fire alt er målt i §15, §16 og §28.
 
 *Lagt til 2026-10-22 kl. 22:53 (målingen etter gruppens svar 22.10 kl. 16:07, `malinger.md` §40):* lista over aksjene på Oslo Børs (`exchange-symbol-list/OL`) koster 1 kall og har 304 rader, 297 av dem «Common Stock», med alle de 15, men med navnene i juridisk form («Equinor ASA», «DnB ASA», «Var Energi ASA»). En ticker som ikke finnes, gir HTTP 404 og koster et kall. NEL og STB har 250 rader til 2026-10-22, med median omsetning de siste tre månedene på 3,9 og 96,6 MNOK. Bonuskvoten er ikke brukt.
+
+*Avgjort 2026-10-22 kl. 23:14 (gruppens svar):* i 2.12 velger brukeren aksjer bare fra lista over aksjene på Oslo Børs (`malinger.md` §40). Hentekommandoen henter lista med 1 kall, sjelden og med reservekallet, og lagrer den i basen, og siden viser bare tickere som står i lista. Webserveren henter aldri (AD-10). Da kan en ticker som ikke finnes, aldri koste et kall, som den gjorde i §40. Kontrollpunktet om en ticker som ikke gir rader ved hentingen, står som vern.
 
 ### Story 2.13: Kommandoen som måler omsetning
 
@@ -3400,6 +3406,8 @@ dagen gjaldt hele børsen eller noen bransjer.
 - **Ville feilet hvis:** siden sa «sektor», eller en bransje sto uten symbol
 
 *Avgjort 2026-10-22 kl. 00:09 (gruppens svar):* rekkefølgen er 10.7 (egne nøkler), README-rettingen, 8.6 (børsometeret), så 2.12. Det endrer rekkefølgen 2026-10-21 kl. 22:51, der 2.12 kom rett etter README-rettingen. 8.6 er fortsatt «Ekstra, hvis tiden rekker» (svaret 19.10 kl. 15:43) og flettes bare ferdig og grønt (svaret 19.10 kl. 14:48). Flettes den før den nye promptversjonen, kan børsometeret komme med i grunnlaget fra den (avgjørelsene 2026-10-21 kl. 22:57 og 23:51). Story 8.6 sier at den avhenger av 8.17 for periodene; hvordan 8.6 bygges før 8.17, avgjøres i spesifikasjonen. Gruppen meldte kl. 00:07 at børsometeret mangler i appen (U70 i `docs/ux-logg.md`).
+
+*Avgjort 2026-10-22 kl. 23:19 (gruppens svar):* børsometeret blir som tavla, én rute per aksje ordnet etter bransje, med farge for endringen, størrelse for volumet mot vanlig og ramme for signalet, og snittet per bransje i overskriften, som storyen krever. Først for siste børsdag og «Velg dag»; periodene kommer med 8.17.
 
 ### Story 8.7: Sjekk 2 og 3 i kursgrafen
 
