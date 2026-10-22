@@ -37,8 +37,10 @@ velg_modell leser OSE_KI_TJENESTE og OSE_KI_OLLAMA_URL (svar 5 og 8):
 
 Story 10.7: «gemini», «anthropic» og «openai» bruker brukerens egen noekkel,
 fra OSE_KI_GEMINI_NOKKEL, OSE_KI_ANTHROPIC_NOKKEL eller OSE_KI_OPENAI_NOKKEL.
-Mangler den, faar tjenesten modellen likevel, og raden sier at noekkelen
-mangler (FR-604). Noekkelen skrives aldri ut.
+Mangler den, faar tjenesten modellen likevel, og ingen annen. Sjekken foer
+foerste kall gjelder ogsaa dem (10.7b, gruppens svar 22.10 kl. 14:38): mangler
+noekkelen eller har tegn som ikke kan sendes, skrives ingen rader, og den kan
+legges inn og hentingen kjoeres igjen samme kveld. Noekkelen skrives aldri ut.
 """
 
 import sys
@@ -121,11 +123,15 @@ def velg_modell(innstillinger: Mapping[str, str], skriv: Callable[[str], None] =
         klasse, variabel = MED_NOEKKEL[tjeneste]
         noekkel = (innstillinger.get(variabel) or "").strip()
         modell = klasse(noekkel)
+        # Bare det som er galt: om noe venter paa teksten, og om man kan
+        # hente igjen, vet foerst lag_ki_tekster (gjennomgangen av 10.7b, BH2, ECH3).
         if not noekkel:
             skriv(
-                f"OSE_KI_TJENESTE={tjeneste}, men {variabel} mangler i .env og i miljoeet. Raden i "
-                "KI-loggen sier det, og det blir ingen KI-tekst i kveld."
+                f"OSE_KI_TJENESTE={tjeneste}, men {variabel} mangler i .env og i miljoeet. "
+                "KI-teksten lages ikke foer den er lagt inn."
             )
+        elif grunn := modell.sjekk():
+            skriv(f"OSE_KI_TJENESTE={tjeneste}, men {grunn}. KI-teksten lages ikke foer den er rettet.")
         else:
             # Som for en adresse utenfor maskinen: utskriften sier at
             # grunnlaget sendes ut (gjennomgangen av 10.7, BH8).
@@ -180,9 +186,10 @@ def _rad_uten_kall(emne: Emne, vurdering: Vurdering, modell: Modell, foerste: st
 
 
 def _ikke_klar(modell: Modell) -> str | None:
-    """Grunnen til at tjenesten ikke kan brukes i kveld, eller None. En modell
-    uten sjekk regnes som klar: de falske i testene, og tjenestene i 10.7, der
-    en noekkel som mangler eller en feil gir en rad (spesifikasjonen 10.7). En sjekk som ikke gir en tekst, regnes ogsaa som klar."""
+    """Grunnen til at tjenesten ikke kan brukes i kveld, eller None. Ollama
+    sjekker at den svarer og har modellen, og tjenestene i 10.7 at noekkelen
+    finnes og kan sendes (10.7b). En modell uten sjekk regnes som klar, som de
+    falske i testene. En sjekk som ikke gir en tekst, regnes ogsaa som klar."""
     sjekk = getattr(modell, "sjekk", None)
     grunn = sjekk() if callable(sjekk) else None
     return grunn if isinstance(grunn, str) and grunn.strip() else None
@@ -190,6 +197,13 @@ def _ikke_klar(modell: Modell) -> str | None:
 
 def _hva_naa(grunn: str) -> str:
     """Det brukeren gjoer foer neste kjoering, etter grunnen (BH1, ECH)."""
+    if grunn.startswith("OSE_KI_"):
+        # Miljoeet gaar foran .env (ki_innstillinger), saa begge nevnes
+        # (gjennomgangen av 10.7b, BH1, ECH1, ECH2).
+        return (
+            "Legg noekkelen inn eller rett den i .env, eller i miljoeet, som gaar foran, "
+            "se «Egen nøkkel til Gemini, Anthropic eller OpenAI» i README-en"
+        )
     if "ikke hentet" in grunn:
         return "Hent modellen, se «Den lokale modellen» i README-en"
     return "Start Ollama, se «Den lokale modellen» i README-en"

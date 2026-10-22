@@ -359,9 +359,10 @@ class TestSvaret:
 class TestFeil:
     @pytest.mark.parametrize("noekkel", ["", "   "])
     def test_noekkelen_mangler(self, tjeneste, noekkel):
-        """Story 10.7: ingen tekst og en rad med grunnen, og tjenesten
-        kalles ikke. Ville feilet hvis tjenesten ble kalt uten noekkel, eller
-        raden ikke sa hvilken variabel som mangler."""
+        """Adapteren alene, uten sjekken foer foerste kall: ingen tekst og en
+        rad med grunnen, og tjenesten kalles ikke. I hentingen stopper sjekken
+        steget foer dette, uten rader (10.7b). Ville feilet hvis tjenesten ble
+        kalt uten noekkel, eller raden ikke sa hvilken variabel som mangler."""
         modul = TJENESTENE[tjeneste][1]
         hent = FalskHent(TJENESTENE[tjeneste][2]())
         rad = rad_for(modell_for(tjeneste, hent, noekkel))
@@ -499,7 +500,10 @@ class TestNoekkelen:
             if verdi:
                 assert f"KI-teksten lages av {tjeneste} ({modul.MODELL})" in linjer[0] and "sendes dit" in linjer[0]
             else:
+                # 10.7b: valget lover ingenting om radene (VG1, BH2, ECH3).
                 assert f"{modul.NOEKKEL_VARIABEL} mangler" in linjer[0]
+                assert "KI-teksten lages ikke foer den er lagt inn." in linjer[0]
+                assert "Raden i KI-loggen" not in linjer[0] and "rader" not in linjer[0]
 
 
 class TestValget:
@@ -579,11 +583,16 @@ class TestIngenOvergang:
         kode, _, utskrift = kjoer(raa, base, modell)
         assert kode == 0
         rader = [r for r in radene(base).values() if r is not None]
-        assert len(rader) == 15
+        # 10.7b: en noekkel som mangler, gir ingen rader (gruppens svar 22.10 kl. 14:38).
+        assert len(rader) == (0 if feil == "noekkel" else 15)
         assert all(r.tekst is None and r.tjeneste == tjeneste for r in rader)
         assert kalt == []
         assert len(hent.kall) == (0 if feil == "noekkel" else 1)
-        assert f"({tjeneste}, " in utskrift
+        if feil != "noekkel":
+            assert f"({tjeneste}, " in utskrift
+        else:
+            # Steget stoppet foer foerste kall (BH5), se TestNoekkelenFoerKallet.
+            assert "Ingen rader er skrevet i KI-loggen" in utskrift
 
     def test_valget_uten_noekkel_gir_den_valgte(self, tjeneste):
         """Ville feilet hvis en noekkel som mangler ga lokal, eller ingen modell."""
@@ -591,6 +600,100 @@ class TestIngenOvergang:
         modell = velg_modell({"OSE_KI_TJENESTE": tjeneste}, linjer.append)
         assert type(modell) is TJENESTENE[tjeneste][0]
         assert TJENESTENE[tjeneste][1].NOEKKEL_VARIABEL in linjer[0]
+
+
+def uten_noekkel(tjeneste, hva):
+    """En noekkel som mangler, eller som har et usynlig tegn fra kopieringen,
+    et mellomrom eller en tabulator inne i seg (BH4)."""
+    noekkel = noekkel_for(tjeneste)
+    tegn = {"tegn": chr(0x200B), "mellomrom": " ", "tab": "\t"}
+    return "" if hva == "mangler" else noekkel[:10] + tegn[hva] + noekkel[10:]
+
+
+class TestNoekkelenFoerKallet:
+    """10.7b, gruppens svar 22.10 kl. 14:38: mangler noekkelen eller har tegn
+    som ikke kan sendes, skrives ingen rader, som naar Ollama ikke kjoerer, og
+    den kan legges inn og hentingen kjoeres igjen samme kveld. En feil hos
+    tjenesten etter kallet gir fortsatt en rad med grunnen."""
+
+    @pytest.mark.parametrize("hva", ["mangler", "tegn", "mellomrom", "tab"])
+    def test_sjekk_uten_kall(self, tjeneste, hva):
+        """Ville feilet hvis sjekken kalte tjenesten, sa ja til en noekkel som
+        ikke kan sendes, eller nei til en som kan."""
+        modul = TJENESTENE[tjeneste][1]
+        hent = FalskHent(TJENESTENE[tjeneste][2]())
+        grunn = modell_for(tjeneste, hent, uten_noekkel(tjeneste, hva)).sjekk()
+        forventet = "mangler" if hva == "mangler" else "har tegn som ikke kan sendes, lim den inn paa nytt"
+        assert grunn == f"{modul.NOEKKEL_VARIABEL} {forventet}"
+        assert modell_for(tjeneste, hent).sjekk() is None
+        assert hent.kall == []
+
+    @pytest.mark.parametrize("hva", ["mangler", "tegn", "mellomrom", "tab"])
+    def test_ingen_rader_og_ingen_kall(self, tjeneste, hva, stier, capsys):
+        """Hele hentingen med en falsk EODHD. Ville feilet hvis rader ble
+        skrevet naar noekkelen mangler (M1), tjenesten ble kalt uten noekkel
+        (M2), utskriften ikke sa variabelen og hva man gjoer, eller noekkelen
+        sto i utskriften."""
+        modul = TJENESTENE[tjeneste][1]
+        raa, base = stier
+        hent = FalskHent(TJENESTENE[tjeneste][2]())
+        kode, _, utskrift = kjoer(raa, base, modell_for(tjeneste, hent, uten_noekkel(tjeneste, hva)))
+        assert kode == 0
+        assert hent.kall == []
+        assert all(r is None for r in radene(base).values())
+        assert f"ennaa: {modul.NOEKKEL_VARIABEL} " in utskrift
+        assert "Ingen rader er skrevet i KI-loggen, og 15 aksjer venter paa teksten." in utskrift
+        assert "Legg noekkelen inn eller rett den i .env, eller i miljoeet, som gaar foran" in utskrift
+        assert "kjoer samme kommando igjen foer midnatt. Det gir 0 kall til EODHD." in utskrift
+        fanget = capsys.readouterr()
+        noekkel = noekkel_for(tjeneste)
+        for tekst in (utskrift, fanget.out, fanget.err):
+            assert noekkel[:10] not in tekst and noekkel[10:] not in tekst
+
+    @pytest.mark.parametrize("hva", ["mangler", "tegn", "mellomrom", "tab"])
+    def test_samme_kveld_med_noekkelen(self, tjeneste, hva, stier):
+        """Foerst uten noekkel, saa med: samme kommando lager tekstene, med 0
+        kall til EODHD. Ville feilet hvis den foerste hentingen hadde skrevet
+        rader, for da sto de, og ingen aksje fikk tekst den dagen (FR-604)."""
+        raa, base = stier
+        foerste = FalskHent(TJENESTENE[tjeneste][2]())
+        kjoer(raa, base, modell_for(tjeneste, foerste, uten_noekkel(tjeneste, hva)))
+        assert foerste.kall == []
+        hent = FalskHent(TJENESTENE[tjeneste][2]())
+        kode, kall, _ = kjoer(raa, base, modell_for(tjeneste, hent))
+        assert (kode, kall, len(hent.kall)) == (0, [], 15)
+        rader = list(radene(base).values())
+        assert len(rader) == 15
+        assert all(r is not None and r.tekst == TEKST and r.tjeneste == tjeneste for r in rader)
+        assert not any(r.modellen_feilet for r in rader)
+
+    def test_en_feil_hos_tjenesten_gir_fortsatt_en_rad(self, tjeneste, stier):
+        """En noekkel som kan sendes, men som tjenesten avviser. Ville feilet
+        hvis sjekken ogsaa stoppet dette uten rader, eller raden ikke sa
+        grunnen."""
+        modul = TJENESTENE[tjeneste][1]
+        raa, base = stier
+        hent = FalskHent({}, status=401)
+        kode, _, _ = kjoer(raa, base, modell_for(tjeneste, hent))
+        assert kode == 0 and len(hent.kall) == 1
+        rader = list(radene(base).values())
+        assert len(rader) == 15 and all(r is not None and r.tekst is None for r in rader)
+        assert sum(r.grunn == f"modellen feilet: {modul.NAVN} svarte HTTP 401" for r in rader) == 1
+        assert sum("ikke kalt" in r.grunn for r in rader) == 14
+
+    def test_utskriften_naar_noekkelen_ikke_kan_sendes(self, tjeneste):
+        """Ville feilet hvis valget sa at teksten lages med noekkelen, eller
+        skrev ut noekkelen."""
+        modul = TJENESTENE[tjeneste][1]
+        noekkel = noekkel_for(tjeneste)
+        linjer: list[str] = []
+        velg_modell(
+            {"OSE_KI_TJENESTE": tjeneste, modul.NOEKKEL_VARIABEL: uten_noekkel(tjeneste, "tegn")}, linjer.append
+        )
+        assert len(linjer) == 1
+        assert f"{modul.NOEKKEL_VARIABEL} har tegn som ikke kan sendes" in linjer[0]
+        assert "KI-teksten lages ikke foer den er rettet." in linjer[0] and "lages av" not in linjer[0]
+        assert noekkel[:10] not in linjer[0] and noekkel[10:] not in linjer[0]
 
 
 def _readme_avsnittet() -> str:
@@ -611,9 +714,20 @@ def test_readme_sier_det_instruksjonen_krever():
         "Nøkkelen skal aldri deles.",
         "Du må ikke ha sagt ja til at tjenesten trener på innholdet.",
         "resten av aksjene den kvelden",
+        "skrives ingen rader i KI-loggen",
+        "Legg den inn og kjør samme kommando igjen samme kveld, før midnatt",
         "kilder-og-rettigheter.md",
     ):
         assert krav in tekst, krav
+
+
+def test_hjelpen_sier_at_en_noekkel_som_mangler_ikke_gir_rader():
+    """10.7b i docs/hjelp.md. Ville feilet hvis hjelpen gikk tilbake til at
+    en noekkel som mangler, gir ingen tekst den dagen (VG2)."""
+    hjelp = (ROT / "docs" / "hjelp.md").read_text(encoding="utf-8")
+    svar = re.sub(r"\s+", " ", hjelp.split("Kan KI-teksten lages uten grafikkort?", 1)[1].split("###", 1)[0])
+    assert "skrives ingen rader" in svar
+    assert "legg den inn og hent igjen samme kveld, før midnatt" in svar
 
 
 def test_nettsperren_stopper_den_ekte_hentefunksjonen(tjeneste):

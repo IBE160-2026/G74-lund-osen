@@ -11,7 +11,9 @@ Noekkelen (gjennomgangen av 10.7):
 - sendes bare i headeren adapteren gir, og hentefunksjonen foelger ingen
   videresending, saa den ikke gaar videre til en annen vert (BH4, VG5)
 - sjekkes foer kallet: et tegn som ikke kan staa i en header, gir en grunn
-  i stedet for en feil som stopper steget (ECH1, BH6, VG4)
+  i stedet for en feil som stopper steget (ECH1, BH6, VG4). Fra 10.7b
+  sjekkes den foer foerste aksje, og mangler den eller har slike tegn,
+  skrives ingen rader (gruppens svar 22.10 kl. 14:38)
 - kommer aldri med i grunnen. Grunnen har bare tjenesten, HTTP-statusen,
   tidsavbruddet eller typen paa feilen, og ModellFeilet reises utenfor
   except-blokken, saa feilen fra requests ikke henger ved den (BH5, ECH10)
@@ -40,13 +42,22 @@ def http(url: str, headere: dict[str, str], json: dict, tidsfrist: float) -> tup
     return svar.status_code, innhold
 
 
-def sjekk_noekkel(noekkel: str, variabel: str) -> None:
-    """Reiser ModellFeilet naar noekkelen mangler eller har et tegn som ikke
-    kan sendes i en header. Grunnen nevner variabelen, aldri noekkelen."""
+def noekkel_feil(noekkel: str, variabel: str) -> str | None:
+    """Grunnen naar noekkelen mangler eller har et tegn som ikke kan sendes i
+    en header, ellers None. Grunnen nevner variabelen, aldri noekkelen. Ingen
+    kall: sjekk i adapterne bruker den foer foerste kall (spesifikasjonen 10.7b)."""
     if not noekkel:
-        raise ModellFeilet(f"{variabel} mangler")
+        return f"{variabel} mangler"
     if not (noekkel.isascii() and noekkel.isprintable()) or " " in noekkel:
-        raise ModellFeilet(f"{variabel} har tegn som ikke kan sendes, lim den inn paa nytt")
+        return f"{variabel} har tegn som ikke kan sendes, lim den inn paa nytt"
+    return None
+
+
+def sjekk_noekkel(noekkel: str, variabel: str) -> None:
+    """Reiser ModellFeilet med grunnen fra noekkel_feil, saa en adapter som
+    kalles uten sjekken, aldri sender uten noekkel."""
+    if grunn := noekkel_feil(noekkel, variabel):
+        raise ModellFeilet(grunn)
 
 
 def kall(navn: str, hent: Http, url: str, headere: dict[str, str], kropp: dict, tidsfrist: float) -> dict:
