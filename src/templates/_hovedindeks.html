@@ -68,7 +68,8 @@
           </figure>
         {% endif %}
       {% elif indeks_feilet %}
-        <p>Hovedindeksen kunne ikke leses. Tabellen under vises som vanlig.</p>
+        {#- Gjennomgangen av 8.6 (BH6): på børsometeret er det rutene som står under. #}
+        <p>Hovedindeksen kunne ikke leses. {{ "Rutene" if aktiv == "boersometer" else "Tabellen" }} under vises som vanlig.</p>
       {% else %}
         <p>Hovedindeksen er ikke hentet ennå.</p>
       {% endif %}

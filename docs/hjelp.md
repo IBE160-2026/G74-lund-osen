@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-23T00:24
+updated: 2026-10-23T00:45
 ---
 
 # Hjelp til «Kom i gang»
@@ -125,7 +125,7 @@ Har du laget demobasen utenfor Docker før 22.10, sier sidene «Demobasen er lag
 
 ### Hva viser børsometeret?
 
-Én rute per aksje, ordnet etter bransje. Grønn rute steg og rød falt fra børsdagen før, og tallet står i ruta. Ruta er større når volumet var minst 1,5 ganger vanlig, og mindre når det var under vanlig. Rammen er gul ved 3 av 3 og mørk ved 2 av 3. Ved hver bransje står snittet av endringen for aksjene i den, og «1 aksje» der det er én. Med «Velg dag» ser du en tidligere dag, og en dag uten vurdering står som «ikke vurdert», uten ramme. Klikk på en rute for å se aksjen. Under rutene står de samme tallene i en tabell. Det gjelder både demoen og den ekte versjonen.
+Én rute per aksje, ordnet etter bransje. Grønn rute steg og rød falt fra børsdagen før, og tallet står i ruta. Ruta er større når volumet var mer enn 1,5 ganger vanlig, og mindre når det var under vanlig. Rammen er gul ved 3 av 3 på siste børsdag og mørk ved 2 av 3. Ved hver bransje står snittet av endringen for aksjene i den som har kurs, og «1 aksje» der det er én. Med «Velg dag» ser du en tidligere dag. Gult står da fortsatt ved 3 av 3 på siste børsdag, og en dag uten vurdering står som «ikke vurdert», uten ramme. Klikk på en rute for å se aksjen den dagen. En aksje uten kurser har ingen aksjeside. Under rutene står de samme tallene i en tabell. Det gjelder både demoen og den ekte versjonen.
 
 ### Hva sa appen om en aksje tidligere?
 

@@ -3,14 +3,15 @@
 {% from "_bransjer.html" import bransjesymbol -%}
 {#- Story 8.6 (FR-106, avgjørelsen 22.10 kl. 23:19): børsometeret som på
     tavla. Én rute per aksje, ordnet etter bransje med symbolet. Fargen er
-    endringen slik den vises, størrelsen volumforholdet, og rammen styrken:
-    gul ved 3 av 3, mørk ved 2 av 3 (designregler §3). Teksten i hver rute
-    bærer det fargen og rammen sier, og tabellen under har de samme tallene
-    for skjermleser. Ingen råd (NFR-06). #}
+    endringen slik den vises, størrelsen volumforholdet, og rammen signalet:
+    gul ved 3 av 3 på siste børsdag, også når siden viser en annen dag, og
+    mørk ved 2 av 3 bare for siste børsdag (designregler §3). Teksten i hver
+    rute bærer det fargen, størrelsen og rammen sier, og tabellen under har de
+    samme tallene. Ingen råd (NFR-06). #}
 {% macro fortegn(verdi) %}{% if verdi is none %}null{% else %}{% set vist = verdi|avrundet('endring') %}{{ 'opp' if vist > 0 else 'ned' if vist < 0 else 'null' }}{% endif %}{% endmacro %}
-{% macro stoerrelsestekst(rute) -%}
-  {%- if rute.volumforhold is none %}ingen{% elif rute.stoerrelse == "hoey" %}høyt{% elif rute.stoerrelse == "lav" %}lavt{% else %}vanlig{% endif -%}
-{%- endmacro %}
+{% macro antall_ord(antall, en, flere) %}{{ antall }} {{ en if antall == 1 else flere }}{% endmacro %}
+{#- Gjennomgangen (BH4, ECH2): en annen dag følger med til aksjesiden. #}
+{% macro aksjeadresse(symbol) %}/aksje/{{ symbol }}{% if dagen != siste %}?dag={{ dagen.isoformat() }}{% endif %}{% endmacro %}
 {% block tittel %}Børsometer – OSE Signal{% endblock %}
 {#- Samme klasse som oversikten, så hovedindeksen får samme stil. Reglene
     for rutene har egne klassenavn. #}
@@ -18,7 +19,7 @@
 {% block innhold %}
   <h1 class="overskrift">Børsometer {{ hjelpeknapp("hjelp-boersometer", "Hjelp: børsometeret") }}</h1>
   {% if bransjer %}
-    <p class="meta">{{ "Demo Børs" if eksempeltall else "Oslo Børs" }} · {{ dagen|ukedag }} {{ dagen|dato }} · {{ antall_aksjer }} aksjer i {{ bransjer|length }} bransjer</p>
+    <p class="meta">{{ "Demo Børs" if eksempeltall else "Oslo Børs" }} · {{ dagen|ukedag }} {{ dagen|dato }} · {{ antall_ord(antall_aksjer, "aksje", "aksjer") }} i {{ antall_ord(bransjer|length, "bransje", "bransjer") }}</p>
     <form class="velg-dag-boersometer" method="get" action="/boersometer">
       <label for="dag">Velg dag</label>
       <input type="date" id="dag" name="dag" min="{{ foerste.isoformat() }}" max="{{ siste.isoformat() }}" value="{{ dagen.isoformat() }}" required>
@@ -26,7 +27,9 @@
       {% if dagen != siste %}<a href="/boersometer">Siste børsdag</a>{% endif %}
     </form>
     {% if ugyldig %}<p class="forklaring">Datoen kunne ikke leses, så siden viser siste børsdag.</p>{% endif %}
-    {% if valgt and valgt != dagen %}<p class="forklaring">{{ valgt|dato }} har ingen kurs, så siden viser børsdagen før, {{ dagen|dato }}.</p>{% endif %}
+    {% if foer_foerste %}<p class="forklaring">{{ valgt|dato }} er før første kurs, så siden viser første børsdag med kurs, {{ dagen|dato }}.</p>
+    {% elif valgt and valgt != dagen %}<p class="forklaring">{{ valgt|dato }} har ingen kurs, så siden viser børsdagen før, {{ dagen|dato }}.</p>{% endif %}
+    {% if dagen != siste %}<p class="forklaring">Gul ramme betyr 3 av 3 på siste børsdag, {{ siste|dato }}. Hovedindeksen og søylene gjelder også den dagen.</p>{% endif %}
 
     {% include "_hovedindeks.html" %}
 
@@ -34,18 +37,18 @@
       <section class="bransje" aria-labelledby="bransje-{{ loop.index }}">
         <h2 id="bransje-{{ loop.index }}">{{ bransjesymbol(bransje.navn) }}<span>{{ bransje.navn }}</span>
           {%- if bransje.snitt is not none %} <span class="snitt {{ fortegn(bransje.snitt) }}">{{ bransje.snitt|tall('endring') }}</span>{% endif %}
-          <span class="antall">{{ "1 aksje" if bransje.antall == 1 else bransje.antall ~ " aksjer" }}</span></h2>
+          <span class="antall">{{ antall_ord(bransje.antall, "aksje", "aksjer") }}</span></h2>
         <ul class="ruter">
           {%- for rute in bransje.ruter %}
           {#- En aksje uten kurser har ingen aksjeside (FR-204), så ruta er ikke
               en lenke. #}
           {%- set lenke = rute.aksje.symbol in med_side %}
-          <li><{{ "a" if lenke else "div" }} class="rute stoerrelse-{{ rute.stoerrelse }} {{ fortegn(rute.endring) }}{% if rute.ramme %} ramme-{{ rute.ramme }}{% endif %}{% if rute.uten_data %} uten-data{% endif %}"{% if lenke %} href="/aksje/{{ rute.aksje.symbol }}"{% endif %}>
+          <li><{{ "a" if lenke else "div" }} class="rute stoerrelse-{{ rute.stoerrelse }} {{ fortegn(rute.endring) }}{% if rute.ramme %} ramme-{{ rute.ramme }}{% endif %}{% if rute.uten_data %} uten-data{% endif %}"{% if lenke %} href="{{ aksjeadresse(rute.aksje.symbol) }}"{% endif %}>
             <span class="ticker">{{ rute.aksje.symbol }}</span>
             <span class="endring">{% if rute.endring is not none %}{{ rute.endring|tall('endring') }}{% elif rute.uten_data %}Uten data{% else %}–{% endif %}</span>
-            {% if rute.ramme == "gul" %}<span class="merke">{{ antall_sjekker }} av {{ antall_sjekker }}</span>{% elif rute.ramme == "moerk" %}<span class="merke">2 av {{ antall_sjekker }}</span>{% endif %}
+            {% if rute.ramme == "gul" %}<span class="merke">{{ antall_sjekker }} av {{ antall_sjekker }}{% if dagen != siste %} siste børsdag{% endif %}</span>{% elif rute.ramme == "moerk" %}<span class="merke">{{ antall_sjekker - 1 }} av {{ antall_sjekker }}</span>{% endif %}
             {% if rute.tekst and not rute.uten_data %}<span class="tekst">{{ rute.tekst }}</span>{% endif %}
-            <span class="skjult">, {{ rute.aksje.navn }}</span>
+            <span class="skjult">, {{ rute.aksje.navn }}{% if rute.volumord %}, volum {{ rute.volumord }}{% endif %}</span>
           </{{ "a" if lenke else "div" }}></li>
           {%- endfor %}
         </ul>
@@ -63,10 +66,10 @@
         {%- for bransje in bransjer %}
         {%- for rute in bransje.ruter %}
         <tr>
-          <td>{{ bransje.navn }}{% if loop.first %} ({{ "1 aksje" if bransje.antall == 1 else bransje.antall ~ " aksjer" }}{% if bransje.snitt is not none %}, snitt {{ bransje.snitt|tall('endring') }}{% endif %}){% endif %}</td>
-          <td>{% if rute.aksje.symbol in med_side %}<a href="/aksje/{{ rute.aksje.symbol }}">{{ rute.aksje.navn }}</a>{% else %}{{ rute.aksje.navn }}{% endif %}</td>
+          <td>{{ bransje.navn }}{% if loop.first %} ({{ antall_ord(bransje.antall, "aksje", "aksjer") }}{% if bransje.snitt is not none %}, snitt {{ bransje.snitt|tall('endring') }}{% endif %}){% endif %}</td>
+          <td>{% if rute.aksje.symbol in med_side %}<a href="{{ aksjeadresse(rute.aksje.symbol) }}">{{ rute.aksje.navn }}</a>{% else %}{{ rute.aksje.navn }}{% endif %}</td>
           <td>{% if rute.endring is not none %}{{ rute.endring|tall('endring') }}{% elif rute.uten_data %}Uten data{% else %}–{% endif %}</td>
-          <td>{% if rute.volumforhold is not none %}{{ rute.volumforhold|tall('forhold') }} ({{ stoerrelsestekst(rute) }}){% else %}–{% endif %}</td>
+          <td>{% if rute.volumforhold is not none %}{{ rute.volum_vist }} ({{ rute.volumord }}){% else %}–{% endif %}</td>
           <td>{% if rute.styrke is not none %}{{ rute.styrke }} av {{ antall_sjekker }}{% elif rute.uten_data %}Uten data{% else %}{{ rute.tekst or "–" }}{% endif %}</td>
         </tr>
         {%- endfor %}

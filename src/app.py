@@ -513,8 +513,16 @@ def boersometer():
     serier = {post.aksje.symbol: leser.serie(post.aksje.symbol) for post in poster}
     datoer = sorted({rad.dato for serie in serier.values() for rad in serie})
     if not datoer:
+        # Gjennomgangen (ECH6): som grenen uten kurser over, med demokommandoen
+        # naar bryteren er paa.
         return render_template(
-            "boersometer.html", bransjer=[], dato=None, hentet=None, hentekommando=hentekommando(), **felles
+            "boersometer.html",
+            bransjer=[],
+            dato=None,
+            hentet=None,
+            hentekommando=hentekommando(),
+            demokommando=demokommando() if demo_paa() else None,
+            **felles,
         )
     siste = datoer[-1]
     oenske = request.args.get("dag", "")
@@ -528,10 +536,18 @@ def boersometer():
         else:
             ugyldig = True
     dagen = siste
+    # Gjennomgangen (BH3, VG3, ECH1): en dag foer foerste kurs gir foerste
+    # boersdag med kurs, og siden sier at den kommer etter.
+    foer_foerste = False
     if valgt is not None:
         foer = [d for d in datoer if d <= valgt]
         dagen = foer[-1] if foer else datoer[0]
+        foer_foerste = not foer
     i_dag = idag()
+    rader = bygg_oversikt(poster, i_dag, STANDARD)
+    # Gjennomgangen (VG1): gult foelger 3 av 3 paa siste boersdag, ogsaa naar
+    # siden viser en annen dag (designregler §3).
+    siste_styrke = {rad.aksje.symbol: rad.styrke for rad in rader}
     ruter = [
         bygg_rute(
             post.aksje,
@@ -539,11 +555,12 @@ def boersometer():
             oversiktsleser.vurdering(post.aksje.symbol, dagen),
             dagen,
             i_dag,
+            siste_styrke=siste_styrke.get(post.aksje.symbol),
+            er_siste=dagen == siste,
         )
         for post in poster
     ]
     bransjer = bygg_boersometer(ruter)
-    rader = bygg_oversikt(poster, i_dag, STANDARD)
     tre_av_tre = frozenset(rad.aksje.symbol for rad in rader if rad.styrke == ANTALL_SJEKKER)
     hovedindeks, indeks_feilet = _hovedindeks(leser, poster, tre_av_tre)
     return render_template(
@@ -557,6 +574,7 @@ def boersometer():
         siste=siste,
         foerste=datoer[0],
         valgt=valgt,
+        foer_foerste=foer_foerste,
         ugyldig=ugyldig,
         # Delmalen for hovedindeksen setter datoen ved verdien naar indeksen
         # staar paa en annen dag enn siden, som paa oversikten.

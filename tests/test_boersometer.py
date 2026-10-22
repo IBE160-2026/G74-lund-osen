@@ -31,6 +31,7 @@ from boersometer import (
     ramme,
     snitt,
     stoerrelse,
+    vis_volumforhold,
 )
 from kursdata import Aksje, Kursrad
 from lagring_sqlite import SqliteOversiktsleser, demo_sti
@@ -118,6 +119,7 @@ class TestBransjene:
         assert [b.navn for b in bransjer] == ["Energi", "Romfart"]
 
     def test_aksjene_staar_i_lista_sin_rekkefoelge_i_bransjen(self):
+        """Ville feilet hvis rutene i en bransje ble sortert på nytt."""
         ruter = [_rute("B", "Energi", 1.0), _rute("A", "Energi", 2.0)]
         assert [r.aksje.symbol for r in bygg_boersometer(ruter)[0].ruter] == ["B", "A"]
 
@@ -129,22 +131,75 @@ class TestRammen:
         og 0."""
         assert ramme(styrke) == ventet
 
+    @pytest.mark.parametrize(
+        ("styrke", "siste", "ventet"),
+        [(3, 3, GUL), (1, 3, GUL), (3, 2, None), (2, 2, None), (None, 3, None), (0, None, None)],
+    )
+    def test_en_annen_dag_foelger_gult_siste_boersdag(self, styrke, siste, ventet):
+        """Designregler §3: gult betyr 3 av 3 på siste børsdag og står også en
+        annen dag, 2 av 3 merkes bare for siste børsdag, og en dag uten
+        vurdering har ingen ramme (gjennomgangen, VG1). Ville feilet med
+        rammen fra dagen som vises."""
+        rute = Rute(
+            aksje=_aksje("A", "Energi"),
+            endring=1.0,
+            volumforhold=None,
+            styrke=styrke,
+            tekst=None,
+            siste_styrke=siste,
+            er_siste=False,
+        )
+        assert rute.ramme == ventet
+
 
 class TestStoerrelsen:
     @pytest.mark.parametrize(
         ("forhold", "ventet"),
-        [(None, VANLIG), (0.5, LAV), (0.99, LAV), (1.0, VANLIG), (1.49, VANLIG), (1.5, HOEY), (4.0, HOEY)],
+        [
+            (None, VANLIG),
+            (0.5, LAV),
+            (0.99, LAV),
+            (1.0, VANLIG),
+            (1.49, VANLIG),
+            (1.5, VANLIG),
+            (1.5001, HOEY),
+            (4.0, HOEY),
+        ],
     )
     def test_stoerrelsen_foelger_volumforholdet(self, forhold, ventet):
-        """Grensen for høy er volumfaktoren (1,5), den samme som gir utslag på
-        interesse. Ville feilet med samme størrelse for alle, eller med en
-        annen grense."""
+        """Høy er over volumfaktoren (1,5), med «>» som interesse-sjekken i
+        signalberegning (gjennomgangen, BH1). Ville feilet med samme størrelse
+        for alle, med en annen grense, eller med «>=»."""
         assert STANDARD.volumfaktor == 1.5
         assert stoerrelse(forhold) == ventet
+
+    def test_samme_grense_som_interesse_sjekken(self):
+        """Ville feilet hvis en stor rute kunne stå ved en aksje der
+        interesse ikke slo ut på volumet, eller omvendt."""
+        from signalberegning import interesse
+
+        for forhold in (1.4999, 1.5, 1.5001):
+            volumer = [1000] * STANDARD.volum_vindu + [round(1000 * forhold * 10_000) / 10_000]
+            kurser = [100.0] * STANDARD.volum_vindu + [101.0]
+            slo_ut = interesse(kurser, volumer, STANDARD).verdi != 0
+            assert (stoerrelse(volumer[-1] / 1000) == HOEY) == slo_ut, forhold
+
+
+class TestVolumtallet:
+    @pytest.mark.parametrize(
+        ("forhold", "vist"),
+        [(1.4996, "1,4996"), (1.5004, "1,5004"), (1.5, "1,50"), (0.998, "0,998"), (2.0, "2,00")],
+    )
+    def test_tallet_skilles_fra_grensene(self, forhold, vist):
+        """Gjennomgangen (BH2, ECH4): ville feilet med «1,50 (vanlig)» og
+        «1,50 (høyt)» ved siden av hverandre, eller «1,00 (lavt)»."""
+        assert vis_volumforhold(forhold) == vist
 
 
 class TestRuta:
     def test_med_vurdering_har_ruta_styrken_og_volumforholdet(self):
+        """Ville feilet hvis styrken eller volumforholdet ikke kom fra
+        vurderingen for dagen."""
         rute = bygg_rute(_aksje("A", "Energi"), KURSER, _vurdering(3, 2.0), date(2026, 10, 9), IDAG)
         assert (rute.styrke, rute.ramme, rute.stoerrelse) == (3, GUL, HOEY)
         assert rute.endring == pytest.approx(1.0)
@@ -214,7 +269,11 @@ def _ruter(html: str) -> list[tuple[str, str]]:
 
 
 def _lenker(html: str) -> list[str]:
-    return re.findall(r'<a class="rute [^"]*" href="/aksje/([A-Z0-9]+)"', html)
+    return re.findall(r'<a class="rute [^"]*" href="/aksje/([A-Z0-9]+)(?:\?dag=[0-9-]+)?"', html)
+
+
+def _tall(tekst: str) -> float:
+    return float(tekst.replace(",", ".").replace("\u00a0%", "").replace("\u2212", "-"))
 
 
 class TestSiden:
@@ -268,11 +327,11 @@ class TestSiden:
         bransjer = {post.aksje.sektor for post in hele(SqliteOversiktsleser(sqlite3.connect(demo_sti())))[:4]}
         assert len(_ruter(html)) == 4
         assert len(_overskrifter(html)) == len(bransjer) < 8
-        assert f"4 aksjer i {len(bransjer)} bransjer" in html
+        assert f"4 aksjer i {len(bransjer)} {'bransje' if len(bransjer) == 1 else 'bransjer'}</p>" in html
 
     def test_gul_ramme_bare_ved_3_av_3(self, klient):
-        """Rammene på siden er de samme som styrken i tabellen under. Ville
-        feilet med gult ved 2 av 3 (mutant 2)."""
+        """Gul ramme ved de fire med 3 av 3 i demoen, de samme som linja om
+        3 av 3 på oversikten. Ville feilet med gult ved 2 av 3 (mutant 2)."""
         html = _side(klient)
         rammer = {symbol: re.search(r"ramme-(\w+)", klasser) for klasser, symbol in _ruter(html)}
         gule = {s for s, r in rammer.items() if r and r.group(1) == "gul"}
@@ -314,15 +373,43 @@ class TestSiden:
         assert "av 3</span>" not in html
 
     def test_en_dag_uten_kurs_gir_boersdagen_foer(self, klient):
+        """Ville feilet hvis en lørdag ga en feilside eller siste børsdag."""
         html = _side(klient, "/boersometer?dag=2026-09-19")
         assert "fredag 18.09" in html and "19.09 har ingen kurs" in html
 
+    def test_en_dag_foer_foerste_kurs_sier_at_siden_viser_en_senere_dag(self, klient):
+        """Gjennomgangen (BH3, VG3, ECH1): ville feilet med «børsdagen før»
+        om en dag som kommer etter."""
+        html = _side(klient, "/boersometer?dag=1990-01-01")
+        assert "er før første kurs, så siden viser første børsdag med kurs" in html
+        assert "har ingen kurs, så siden viser børsdagen før" not in html
+
+    def test_gult_en_annen_dag_er_3_av_3_paa_siste_boersdag(self, klient):
+        """08.10 har vurderinger. Gult står ved de fire med 3 av 3 på siste
+        børsdag, og ingen ruter har mørk ramme (designregler §3, VG1). Ville
+        feilet med rammen fra 08.10."""
+        html = _side(klient, "/boersometer?dag=2026-10-08")
+        rammer = {symbol: re.search(r"ramme-(\w+)", klasser) for klasser, symbol in _ruter(html)}
+        assert {s for s, r in rammer.items() if r and r.group(1) == "gul"} == {"BRFE", "KVST", "LKSV", "TRHF"}
+        assert not any(r and r.group(1) == "moerk" for r in rammer.values())
+        assert "3 av 3 siste børsdag" in html and "Gul ramme betyr 3 av 3 på siste børsdag, 09.10" in html
+
+    def test_lenkene_har_dagen_som_vises(self, klient):
+        """Gjennomgangen (BH4, ECH2): ville feilet hvis en rute for 08.10
+        lenket til aksjesiden for siste børsdag."""
+        html = _side(klient, "/boersometer?dag=2026-10-08")
+        assert 'href="/aksje/BRFE?dag=2026-10-08"' in html
+        assert 'href="/aksje/BRFE"' in _side(klient)
+        assert "08.10" in _side(klient, "/aksje/BRFE?dag=2026-10-08")
+
     @pytest.mark.parametrize("dag", ["tull", "2026-13-40", "2026-09-18x"])
     def test_en_ugyldig_dato_gir_siste_boersdag(self, klient, dag):
+        """Ville feilet med en feilside, eller uten meldingen."""
         html = _side(klient, f"/boersometer?dag={dag}")
         assert "fredag 09.10" in html and "Datoen kunne ikke leses" in html
 
     def test_aksjen_uten_kurser_staar_med_uten_data(self, klient):
+        """Ville feilet hvis MTFJ, uten kurser, sto uten merket."""
         html = _side(klient)
         rute = re.search(
             r'<div class="rute [^"]*uten-data[^"]*">\s*<span class="ticker">MTFJ</span>.*?</div>', html, re.S
@@ -343,15 +430,85 @@ class TestSiden:
         assert "VRDS" in _lenker(_side(klient, "/boersometer?dag=2026-08-03"))
 
     def test_hovedindeksen_staar_over_rutene(self, klient):
+        """Ville feilet hvis hovedindeksen manglet eller sto under rutene."""
         html = _side(klient)
         assert html.index('<section class="hovedindeks"') < html.index('<section class="bransje"')
         # En annen dag: indeksen står med datoen sin, som på oversikten.
         assert '<span class="indeksdato">09.10</span>' in _side(klient, "/boersometer?dag=2026-09-18")
 
-    def test_ingen_raad(self, klient):
-        """NFR-06. Ville feilet med kjøp eller selg på siden utenom hjelpen."""
-        tekst = re.sub(r"<[^>]+>", " ", _side(klient).split("<main", 1)[1]).lower()
+    def test_ingen_raad_og_ingen_ki(self, klient):
+        """NFR-06. Ville feilet med kjøp eller selg på siden utenom hjelpen,
+        eller med KI-tekst (gjennomgangen, VG11)."""
+        html = _side(klient)
+        tekst = re.sub(r"<[^>]+>", " ", html.split("<main", 1)[1]).lower()
         assert not re.search(r"\b(kjøp|selg|anbefal)", tekst)
+        assert 'class="ki' not in html and "KI-tekst" not in html
+
+    def test_ordet_er_bransje_og_hver_bransje_har_symbolet(self, klient):
+        """Linja 13.10 under story 8.6 (gjennomgangen, VG4): ville feilet hvis
+        siden sa «sektor», eller en bransje i §4 sto uten symbol."""
+        html = _side(klient)
+        assert "sektor" not in re.sub(r"<[^>]+>", " ", html.split("<main", 1)[1]).lower()
+        for h2 in re.findall(r'<section class="bransje".*?<h2[^>]*>(.*?)</h2>', html, re.S):
+            assert "<svg" in h2, h2[:80]
+
+    def test_tabellen_har_de_samme_tallene_som_rutene(self, klient):
+        """Gjennomgangen (VG5): ville feilet hvis endringen eller styrken i
+        tabellen var en annen enn i ruta."""
+        html = _side(klient)
+        tabell = html.split('<table class="boersometertabell">')[1]
+        rader = re.findall(
+            r"<tr>\s*<td>[^<]*</td>\s*<td>(?:<a [^>]*>)?([^<]+)(?:</a>)?</td>\s*<td>([^<]*)</td>\s*<td>[^<]*</td>\s*<td>([^<]*)</td>",
+            tabell,
+        )
+        assert len(rader) == 15
+        navn_til_symbol = {
+            f"{n}": s
+            for s, n in re.findall(
+                r'<span class="ticker">([A-Z0-9]+)</span>.*?<span class="skjult">, ([^,<]+)', html, re.S
+            )
+        }
+        endringer = dict(
+            re.findall(r'<span class="ticker">([A-Z0-9]+)</span>\s*<span class="endring">([^<]+)</span>', html)
+        )
+        merker = dict(
+            re.findall(
+                r'<span class="ticker">([A-Z0-9]+)</span>\s*<span class="endring">[^<]+</span>\s*<span class="merke">([^<]+)</span>',
+                html,
+            )
+        )
+        for navn, endring, styrke in rader:
+            symbol = navn_til_symbol[navn]
+            assert endringer[symbol] == endring, symbol
+            if styrke in ("3 av 3", "2 av 3"):
+                assert merker[symbol] == styrke, symbol
+            else:
+                assert symbol not in merker, symbol
+
+    def test_390_px_uten_vannrett_rulling_og_med_tastatur(self, klient):
+        """Gjennomgangen (VG6). Edge målte 390 px uten vannrett rulling 23.10;
+        denne testen holder det som gjorde det mulig. Ville feilet med en rute
+        bredere enn 390 px minus margene, rutene uten bryting, tabellen uten
+        rullboksen, eller rutene uten fokus, skjult navn og tabellen uten
+        caption og scope."""
+        stil = (SRC / "static" / "stil.css").read_text(encoding="utf-8")
+        assert re.search(r"ul\.ruter \{[^}]*flex-wrap: wrap", stil)
+        for bredde in re.findall(r"\.rute\.stoerrelse-\w+ \{ width: (\d+)px", stil):
+            assert int(bredde) <= 390 - 2 * 16, bredde
+        assert re.search(r"\.rute:focus-visible \{ outline", stil)
+        html = _side(klient)
+        assert (
+            '<div class="tabellboks boersometerboks" role="region" aria-label="Børsometeret som tabell" tabindex="0">'
+            in html
+        )
+        assert "<caption>Børsometeret 09.10 som tabell</caption>" in html and html.count('scope="col"') >= 5
+        assert '<span class="skjult">, Brattfjell Energi, volum høyt</span>' in html
+
+    def test_bøyningen_i_linja_over(self, klient, monkeypatch):
+        """Gjennomgangen (BH8): ville feilet med «1 aksjer i 1 bransjer»."""
+        hele = SqliteOversiktsleser.oversikt
+        monkeypatch.setattr(SqliteOversiktsleser, "oversikt", lambda self: hele(self)[:1])
+        assert "1 aksje i 1 bransje</p>" in _side(klient)
 
 
 class TestIngenKallOgIngenTabell:
@@ -365,7 +522,8 @@ class TestIngenKallOgIngenTabell:
         assert demo_sti().read_bytes() == innhold
 
     def test_migrasjonene_er_de_samme(self):
-        """Ingen ny tabell: ingen migrasjon er lagt til for børsometeret."""
+        """Ingen ny tabell. Ville feilet med en migrasjon for børsometeret,
+        eller en tabell laget i logikken."""
         migrasjoner = sorted(p.name for p in (SRC / "migrasjoner").glob("*.sql"))
         assert not any("boersometer" in navn for navn in migrasjoner)
         assert "CREATE TABLE" not in (SRC / "boersometer.py").read_text(encoding="utf-8")
@@ -400,6 +558,40 @@ def lagring_sqlite_skjema(sti: Path) -> set:
 
 
 def test_demomerket_er_paa_siden(klient):
-    """Demoen viser det samme med demoselskapene, merket «Eksempeltall»."""
+    """Demoen viser det samme med demoselskapene. Ville feilet uten merket
+    «Eksempeltall»."""
     assert lagring_sqlite.er_demobase(demo_sti())
     assert "Eksempeltall" in _side(klient)
+
+
+class TestDenEkteVersjonen:
+    """Gjennomgangen (VG9): uten demo, med en base uten demomerket."""
+
+    @pytest.fixture
+    def ekte(self, monkeypatch, basemal):
+        sti = Path(lagring_sqlite.BASE_STI)
+        sti.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(basemal, sti)
+        tilkobling = sqlite3.connect(sti)
+        try:
+            tilkobling.execute("PRAGMA application_id = 0")
+            tilkobling.commit()
+        finally:
+            tilkobling.close()
+        monkeypatch.delenv(app_modul.I_DEMO, raising=False)
+        monkeypatch.delenv(app_modul.I_DOCKER, raising=False)
+        app_modul.app.config["TESTING"] = True
+        return app_modul.app.test_client()
+
+    def test_den_ekte_viser_det_samme_uten_merket(self, ekte):
+        """Ville feilet hvis siden bare virket i demoen."""
+        html = _side(ekte)
+        assert "Eksempeltall" not in html and "Oslo Børs · fredag 09.10 · 15 aksjer i 8 bransjer" in html
+        assert len(_ruter(html)) == 15
+
+    def test_uten_base_viser_siden_hentekommandoen(self, monkeypatch):
+        """Ville feilet med en feilside før første henting."""
+        monkeypatch.delenv(app_modul.I_DEMO, raising=False)
+        monkeypatch.delenv(app_modul.I_DOCKER, raising=False)
+        html = _side(app_modul.app.test_client())
+        assert "Ingen kurser i basen ennå" in html and '<section class="bransje"' not in html

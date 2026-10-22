@@ -595,7 +595,9 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) .rute.stoerrelse-vanlig { width: 120px; min-height: 80px; }
 :where(.side-oversikt) .rute.stoerrelse-hoey { width: 150px; min-height: 100px; }
 :where(.side-oversikt) .rute.ramme-moerk { border-color: var(--blekk); }
-:where(.side-oversikt) .rute.ramme-gul { border-color: var(--oransje); box-shadow: 0 0 0 2px var(--hvit) inset; }
+/* Gjennomgangen (VG7): gult på lys bakgrunn i --gul-symbol, som symbolet over
+   søylene (designregler §3 og §4), med hvit kant innenfor. */
+:where(.side-oversikt) .rute.ramme-gul { border-color: var(--gul-symbol); box-shadow: 0 0 0 2px var(--hvit) inset; }
 :where(.side-oversikt) .rute:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
 :where(.side-oversikt) .rute .ticker { font-weight: 700; }
 :where(.side-oversikt) .rute .merke { font-size: 12px; font-weight: 600; }
