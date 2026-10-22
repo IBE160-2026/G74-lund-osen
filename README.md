@@ -43,20 +43,20 @@ Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og v
 
 ### Felles for begge
 
-1. **Installer og start Docker Desktop** fra [docker.com](https://www.docker.com/products/docker-desktop/). Hopp over innloggingen. Det er klart når det står «Engine running» nederst i vinduet. La det være åpent.
+1. **Installer og start Docker Desktop** fra [docker.com](https://www.docker.com/products/docker-desktop/). Har du det fra før, starter du det bare. Hopp over innloggingen. Det er klart når det står «Engine running» nederst i vinduet. «Resource Saver mode», med en måne, er også klart: motoren hviler fordi ingen containere kjører, og starter selv når den trengs. La det være åpent.
 
 ![Docker Desktop med «Engine running» nederst i vinduet](docs/bilder/readme/engine-running.png)
 
 *Slik ser det ut nederst i Docker Desktop når det er klart. Står det «Engine starting», venter du litt til.*
 
-2. **Last ned koden.** Trykk den grønne knappen «Code» på [GitHub-siden](https://github.com/IBE160-2026/G74-lund-osen) og «Download ZIP» nederst i menyen. Windows: høyreklikk fila i Nedlastinger (Downloads) og velg «Pakk ut alle» (Extract All). Mac: dobbeltklikk fila. Det er klart når du har en mappe som heter `G74-lund-osen-main`. Har du fått koden som mappe eller ZIP-fil, pakker du den ut og går til steg 3.
+2. **Last ned koden.** Trykk knappen «Code» på [GitHub-siden](https://github.com/IBE160-2026/G74-lund-osen) og «Download ZIP». Windows: høyreklikk fila i Nedlastinger og velg «Pakk ut alle», der den ligger. Mac: dobbeltklikk fila. Det er klart når du har mappa `G74-lund-osen-main`. [Har den tall i navnet](docs/hjelp.md#det-er-to-mapper-med-samme-navn): bruk den nyeste. Har du fått koden som mappe eller ZIP-fil, pakker du den ut og går til steg 3.
 
 ![Menyen under «Code» på GitHub, med «Download ZIP» nederst](docs/bilder/readme/github-download-zip.png)
 
 *Menyen under den grønne knappen «Code». Trykk «Download ZIP» nederst. Adressen i boksen trenger du ikke.*
 
-3. **Åpne PowerShell** (Windows: trykk Start, skriv PowerShell og velg «Windows PowerShell», ikke ISE) **eller Terminal** (Mac: trykk Cmd+mellomrom og skriv Terminal). Det er klart når et vindu venter på at du skriver.
-4. **Skriv `cd` og et mellomrom**, dra mappa `G74-lund-osen-main` fra steg 2 (ikke ZIP-fila), der README og compose ligger (den innerste hvis det er to) fra Filutforsker eller Finder inn i vinduet, og trykk Enter. [Står det `.zip` til slutt?](docs/hjelp.md#står-det-zip-til-slutt-i-linja) Det er klart når mappenavnet står foran `>` eller `%`. Har mappa et annet navn, drar du den mappa der README og compose ligger.
+3. **Åpne PowerShell** i mappa (Windows: åpne den innerste mappa `G74-lund-osen-main` i Filutforsker, klikk i adressefeltet øverst, skriv `powershell` og trykk Enter, ikke som administrator og ikke ISE) **eller Terminal** (Mac: trykk Cmd+mellomrom og skriv Terminal). Det er klart når et vindu venter på at du skriver. Fra adressefeltet står du alt i mappa: gå til kontrollen i steg 4.
+4. **Skriv `cd` og et mellomrom**, dra mappa `G74-lund-osen-main` fra steg 2 (ikke ZIP-fila), der README og compose ligger, inn i vinduet, og trykk Enter. [Står det `.zip` til slutt?](docs/hjelp.md#står-det-zip-til-slutt-i-linja) **Kontroll:** det er klart når `dir` (Windows) eller `ls` (Mac) viser `README.md` og `compose.yaml`. Har mappa et annet navn, drar du den mappa der README og compose ligger.
 
 ![PowerShell med en linje som slutter med G74-lund-osen-main og >](docs/bilder/readme/powershell-mappa.png)
 
@@ -139,6 +139,8 @@ Klikk på spørsmålet som passer.
 
 Docker Desktop er ikke startet, eller motoren er ikke klar. Start Docker Desktop, vent til det står «Engine running» (steg 1), og prøv kommandoen igjen. Kommer det ikke etter noen minutter, avslutter du Docker Desktop helt: høyreklikk hvalen ved klokka (Windows) eller klikk den i menylinja øverst (Mac), og velg «Quit Docker Desktop». Åpne det igjen og vent. Hjelper ikke det, starter du maskinen på nytt.
 
+Står det «Resource Saver mode», med en måne, er alt i orden: Docker har stoppet motoren fordi ingen containere kjører, og starter den selv når den trengs, bare litt tregere. Da trenger du ikke vente på «Engine running».
+
 </details>
 
 <details>
@@ -159,6 +161,13 @@ Det mangler mellomrom etter `cd`. Står `cd` klistret til stien i meldingen, for
 <summary>«Cannot find path … because it does not exist».</summary>
 
 Mappa ligger ikke der stien sier, for eksempel fordi den er flyttet, eller fordi ZIP-fila ble dratt inn i stedet for mappa. Skriv `cd` og et mellomrom, og dra mappa inn i vinduet på nytt (steg 4).
+
+</details>
+
+<details>
+<summary>Nettleseren sier at 127.0.0.1 nektet å koble til.</summary>
+
+Nettleseren viser da `ERR_CONNECTION_REFUSED`. Ingenting svarer på adressen ennå. Appen er ikke klar, eller den er stoppet. Se i terminalvinduet: vent til linja med «Serving on» har kommet, og sjekk at vinduet fortsatt er åpent og at Docker Desktop kjører. Last så siden på nytt. Adressen er http://127.0.0.1:8000, ikke 0.0.0.0.
 
 </details>
 

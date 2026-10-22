@@ -1462,6 +1462,8 @@ BEHOLDT_I_README = [
     "ZIP-fila ser ut som en vanlig mappe.",
     "«is not recognized as the name of a cmdlet» etter cd.",
     "«Cannot find path … because it does not exist».",
+    # Story 3.3i (U13): lagt inn foran «no configuration file provided».
+    "Nettleseren sier at 127.0.0.1 nektet å koble til.",
     "«no configuration file provided: not found».",
 ]
 
@@ -1676,7 +1678,7 @@ class TestReadmeForNybegynnere:
         etter_pila = tekst.split('<a name="den-ekte-versjonen"></a>', 1)[1].split("\n</details>\n\n", 1)[1]
         assert etter_pila.split("\n\n", 1)[0] == ADVARSELEN_MOT_DOWN_V
 
-    def test_staar_du_fast_har_hoeyst_5_spoersmaal(self):
+    def test_staar_du_fast_har_hoeyst_6_spoersmaal(self):
         """22:32: FAQ-en var for lang. Hoeyst 8 spoersmaal, hvert som
         <details> med <summary>, og en lenke til docs/hjelp.md.
 
@@ -1686,11 +1688,15 @@ class TestReadmeForNybegynnere:
         Story 3.3d (beslutningen 16.10 kl. 21:53-21:58, svarene 18.10 kl.
         15:37): hoeyst 5. Hvilke fem er raadets forslag, ikke avgjort 16.10.
         Het test_staar_du_fast_har_hoeyst_8_spoersmaal til 3.3c, og
-        test_staar_du_fast_har_hoeyst_10_spoersmaal til 3.3d. Ville feilet
-        med et sjette spoersmaal."""
+        test_staar_du_fast_har_hoeyst_10_spoersmaal til 3.3d.
+
+        Story 3.3i (instruksjonen 22.10 kl. 16:06, U13): hoeyst 6, for svaret
+        paa at 127.0.0.1 nektet aa koble til. Het
+        test_staar_du_fast_har_hoeyst_5_spoersmaal til 3.3i. Ville feilet
+        med et sjuende spoersmaal."""
         faq = _faq()
         sporsmaal = _detaljer(faq)
-        assert 1 <= len(sporsmaal) <= 5
+        assert 1 <= len(sporsmaal) <= 6
         assert list(sporsmaal) == BEHOLDT_I_README, list(sporsmaal)
         assert faq.count("<details>") == faq.count("</details>") == faq.count("<summary>") == len(sporsmaal)
         rest = re.sub(r"<details>.*?</details>", "", faq, flags=re.DOTALL)

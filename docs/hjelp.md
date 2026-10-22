@@ -39,6 +39,8 @@ Følg beskjeden, eller lim inn `wsl --update` i PowerShell og start Docker Deskt
 
 Avslutt Docker Desktop helt: høyreklikk hvalen ved klokka (Windows) eller klikk den i menylinja øverst (Mac), og velg «Quit Docker Desktop». Åpne det igjen og vent. Hjelper ikke det, starter du maskinen på nytt.
 
+Står det «Resource Saver mode», med en måne, er alt i orden: Docker har stoppet motoren fordi ingen containere kjører, og starter den selv når den trengs, bare litt tregere. Da trenger du ikke vente på «Engine running».
+
 ## Steg 2: koden
 
 ### ZIP-fila ser ut som en vanlig mappe.
@@ -47,7 +49,7 @@ Du må pakke ut. Står det «Komprimert størrelse» (Compressed size) som kolon
 
 ### Det er to mapper med samme navn.
 
-Bruk den innerste `G74-lund-osen-main`, den der filene README og compose ligger. Windows viser dem ofte uten filendelsen (.md og .yaml). På Windows har også ZIP-fila samme navn: den har en glidelås på ikonet, og den skal du ikke bruke.
+Bruk den innerste `G74-lund-osen-main`, den der filene README og compose ligger. Windows viser dem ofte uten filendelsen (.md og .yaml). På Windows har også ZIP-fila samme navn: den har en glidelås på ikonet, og den skal du ikke bruke. Har du lastet ned flere ganger, kan mappene ha fått et tall i navnet, som `G74-lund-osen-main (4)`. Bruk den nyeste, eller slett de gamle (se «Mappa finnes fra før.»).
 
 ### Jeg finner ikke ZIP-fila på Mac.
 
@@ -65,7 +67,7 @@ Vil du laste ned på nytt, og det ligger en `.env` med nøkkelen din i den gamle
 
 ### Hvilket vindu skal jeg åpne?
 
-Et terminalvindu, der du skriver kommandoer i stedet for å klikke. Windows: trykk Start, skriv `PowerShell` og åpne «Windows PowerShell». Ikke velg «Windows PowerShell ISE», som også står i lista. Mac: trykk Cmd+mellomrom, skriv `Terminal` og trykk Enter. Når det har gått bra, ser du et vindu med en linje som venter på at du skriver. Kommandoene er de samme i PowerShell på Windows og i Terminal på Mac og Linux.
+Et terminalvindu, der du skriver kommandoer i stedet for å klikke. Windows: gå i Filutforsker inn i den innerste mappa `G74-lund-osen-main`, klikk i adressefeltet øverst, skriv `powershell` og trykk Enter. Da åpnes PowerShell i mappa, og du slipper steg 4. Du kan også trykke Start, skrive `PowerShell` og åpne «Windows PowerShell», men ikke «Kjør som administrator» (Run as administrator). Ikke velg «Windows PowerShell ISE», som også står i lista. Da står vinduet i en annen mappe, og du går til mappa med steg 4. Mac: trykk Cmd+mellomrom, skriv `Terminal` og trykk Enter. Når det har gått bra, ser du et vindu med en linje som venter på at du skriver. Kommandoene er de samme i PowerShell på Windows og i Terminal på Mac og Linux.
 
 ### Ingenting skjer når jeg limer inn.
 
@@ -77,7 +79,7 @@ Kopier kommandoen med ikonet til høyre i den grå boksen i README-en. Ikonet sy
 
 ### Hva betyr cd, og hvordan ser jeg at det gikk?
 
-`cd` betyr «gå til mappe», og kommandoene etter steg 4 virker bare fra mappa med koden. Når det har gått bra, står `G74-lund-osen-main` rett før `>` (Windows) eller `%` (Mac) på linja som venter.
+`cd` betyr «gå til mappe», og kommandoene etter steg 4 virker bare fra mappa med koden. Når det har gått bra, står `G74-lund-osen-main` rett før `>` (Windows) eller `%` (Mac) på linja som venter. Det gjør det også i den ytre mappa, så sjekk med `dir` (Windows) eller `ls` (Mac): lista skal vise `README.md` og `compose.yaml`.
 
 ### Står det .zip til slutt i linja.
 
@@ -85,7 +87,7 @@ Du har dratt inn ZIP-fila, ikke mappa. Dra mappa du pakket ut i steg 2, ikke ZIP
 
 ### Mappa lar seg ikke dra inn i vinduet.
 
-PowerShell er trolig åpnet som administrator, og da sperrer Windows dra og slipp. Lukk vinduet og åpne PowerShell på vanlig måte (steg 3).
+PowerShell er trolig åpnet som administrator, og da sperrer Windows dra og slipp. Lukk vinduet og åpne PowerShell på vanlig måte (steg 3). Åpner du den fra adressefeltet i Filutforsker, står du alt i mappa og trenger ikke dra.
 
 ### «is not recognized as the name of a cmdlet» etter cd.
 
@@ -166,6 +168,10 @@ Ja, med din egen nøkkel til Gemini, Anthropic eller OpenAI. Sett `OSE_KI_TJENES
 ### Siden åpnes ikke.
 
 Vent til linja med «Serving on» har kommet, og sjekk at terminalvinduet fortsatt er åpent. Adressen er http://127.0.0.1:8000, ikke 0.0.0.0.
+
+### Nettleseren sier at 127.0.0.1 nektet å koble til.
+
+Nettleseren viser da `ERR_CONNECTION_REFUSED`. Ingenting svarer på adressen ennå. Appen er ikke klar, eller den er stoppet. Se i terminalvinduet: vent til linja med «Serving on» har kommet, og sjekk at vinduet fortsatt er åpent og at Docker Desktop kjører. Last så siden på nytt. Adressen er http://127.0.0.1:8000, ikke 0.0.0.0.
 
 ### «The term 'uv' is not recognized» eller «command not found: uv».
 
