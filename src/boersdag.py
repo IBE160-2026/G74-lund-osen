@@ -78,7 +78,8 @@ def forrige_boersdag(dag: date) -> date:
 
     Foerste henting paa dagtid naar basen er tom, henter denne dagen: siste
     fullfoerte boersdag foer TIDSGRENSE paa en boersdag. Samme liste og samme
-    feil som inneveerende_boersdag.
+    feil som inneveerende_boersdag. Ikke det samme som forrige_boersdag i
+    hovedindeks.py, som gir None utenfor kalenderen (gjennomgangen, VG11).
     """
     if not isinstance(dag, date) or isinstance(dag, datetime):
         raise TypeError(f"dag maa vaere datetime.date, fikk {dag!r}")

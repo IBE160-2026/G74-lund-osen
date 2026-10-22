@@ -341,8 +341,12 @@ def _foerste_dag_godtas(
     er vernet som foer."""
     if foerste_dag is None or dato != foerste_dag or dato != forrige_boersdag(dagens):
         return False
-    annen = tilkobling.execute(f"SELECT 1 FROM {tabell} WHERE dato <> ? LIMIT 1", (dato.isoformat(),)).fetchone()
-    return annen is None
+    # Gjennomgangen av 2.3c, BH4: ogsaa vurdering, saa en base med historikk
+    # og en tom ki_logg ikke kan faa KI-rader for en eldre dag.
+    for navn in dict.fromkeys((tabell, "vurdering")):
+        if tilkobling.execute(f"SELECT 1 FROM {navn} WHERE dato <> ? LIMIT 1", (dato.isoformat(),)).fetchone():
+            return False
+    return True
 
 
 def _kontroller_noekkel(symbol: str, dato: date, symboler: frozenset[str] = SYMBOLER) -> None:

@@ -228,8 +228,9 @@ def lag_ki_tekster(
 
     Story 2.3c: med foerste_henting er dato forrige boersdag, fra foerste
     henting paa dagtid i en tom base. Radene skrives for den dagen
-    (foerste_dag i SqliteKILogg), og steget stopper som foer hvis det er
-    blitt en ny dag.
+    (foerste_dag i SqliteKILogg). Steget stopper hvis forrige boersdag
+    regnet fra klokka ikke lenger er dato, og sier nei til tjenesten uten aa
+    love en ny kjoering (gjennomgangen, BH6, ECH1).
     """
 
     def skrivbar() -> date:
@@ -265,6 +266,15 @@ def lag_ki_tekster(
         # skrives ingen rader, og samme kommando kan kjoeres igjen.
         if mangler and skrivbar() != dato:
             raise IkkeInnevaerendeBoersdag(dato.isoformat())
+        if mangler and (grunn := _ikke_klar(modell)) and foerste_henting:
+            # Gjennomgangen av 2.3c, ECH1: etter foerste henting er dagen
+            # ikke inneveerende boersdag, saa teksten kan ikke lages senere.
+            skriv(
+                f"Ingen KI-tekst for boersdagen {dato.isoformat()}: {grunn}. Ingen rader er skrevet i "
+                "KI-loggen, og teksten for den dagen kan ikke lages senere, fordi den ikke er "
+                "inneveerende boersdag (AD-7). Kveldens henting lager tekstene for dagens boersdag."
+            )
+            return False
         if mangler and (grunn := _ikke_klar(modell)):
             skriv(
                 f"Ingen KI-tekst for boersdagen {dato.isoformat()} ennaa: {grunn}. Ingen rader er "

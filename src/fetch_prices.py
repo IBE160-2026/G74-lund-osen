@@ -484,15 +484,26 @@ IGJEN_SENERE = (
 )
 
 
-def _igjen_etter(foerste_henting: bool) -> str:
+def _kvelden(behov: int) -> str:
+    """Story 2.3c: kveldens henting etter foerste henting paa dagtid, slik
+    vurder_kvote gjoer det (gjennomgangen, BH1, ECH2, VG2, VG3)."""
+    return (
+        f"Kveldens henting etter kl. {_grensen()} trenger {behov} kall. Er det ikke nok igjen av "
+        "dagens, tas resten fra bonuskvoten hvis den dekker det. Ellers bruker den 0 kall, og "
+        "dagens boersdag faar aldri signal, fordi en vurdering bare kan skrives for "
+        "inneveerende boersdag (AD-7). Neste kveld hentes neste boersdag."
+    )
+
+
+def _igjen_etter(foerste_henting: bool, behov: int = len(AKSJEUNIVERS) + 1) -> str:
     """Det kommandoen sier naar en aksje mangler kursen for boersdagen.
     Story 2.3c: etter foerste henting er basen ikke tom lenger, saa en ny
-    kjoering paa dagtid gir 0 kall, og kveldens henting henter dagens kurser."""
+    kjoering paa dagtid gir 0 kall, og aksjen faar ikke kursen for den dagen."""
     if not foerste_henting:
         return IGJEN_SENERE
     return (
-        f"Basen er ikke tom lenger, saa en ny henting foer kl. {_grensen()} gir 0 kall. "
-        f"Kveldens henting etter kl. {_grensen()} henter dagens kurser for alle aksjene (story 2.3c)."
+        f"Basen er ikke tom lenger, saa en ny henting foer kl. {_grensen()} gir 0 kall, og "
+        f"aksjene som mangler, faar ikke kursen for den dagen (story 2.3c). {_kvelden(behov)}"
     )
 
 
@@ -946,18 +957,22 @@ def kjoer(
     # boersdag. En base som ikke er tom, faar 0 kall som foer.
     foerste_henting = False
     if er_boersdag(dag) and oeyeblikk.astimezone(OSLO).time() < TIDSGRENSE:
+        foerste_dato = None
         if not uten_tidskontroll and base_er_tom(base_sti):
+            # Gjennomgangen, ECH6: kan forrige boersdag ikke slaas opp, sier
+            # tidskontrollen nei som foer.
             try:
-                dato = forrige_boersdag(dag)
-            except UtenforKalenderen as feil:
-                skriv(f"{feil}. Foerste henting gjetter ikke paa boersdagen (NFR-08). 0 kall brukt.")
-                sys.exit(1)
+                foerste_dato = forrige_boersdag(dag)
+            except UtenforKalenderen:
+                foerste_dato = None
+        if foerste_dato is not None:
+            dato = foerste_dato
             foerste_henting = True
             skriv(
                 f"Basen er tom, saa dette er foerste henting. Klokka er ikke {_grensen()} i Oslo "
                 f"ennaa, saa den henter forrige boersdag, {dato.isoformat()}, med kurser til og med "
-                "den dagen. Dagens kurs hentes aldri foer kl. "
-                f"{_grensen()} (story 2.3c)."
+                "den dagen. Dagens kurs hentes ikke foer kl. "
+                f"{_grensen()} uten --uten-tidskontroll (story 2.3c)."
             )
         elif not uten_tidskontroll:
             skriv(
@@ -1028,8 +1043,9 @@ def kjoer(
         # Story 2.3c: et nytt forsoek (2.3b) gjelder ikke foerste henting.
         skriv(
             f"Oeyeblikksbildet for boersdagen {dato.isoformat()}, {fil.name}, finnes "
-            "allerede og skrives aldri om (AD-6), men basen er tom. Les fila inn med "
-            f"--les-inn {fil}, eller hent etter kl. {_grensen()}. 0 kall brukt."
+            "allerede og skrives aldri om (AD-6), men basen er tom. Hent etter kl. "
+            f"{_grensen()}. Med --les-inn {fil} kommer kursene inn, men den dagen faar aldri "
+            "signal, fordi innlesingen ikke skriver vurderinger (AD-7). 0 kall brukt."
         )
         sys.exit(1)
     if fil.exists():
@@ -1093,6 +1109,14 @@ def kjoer(
         skriv(f"Kvoten kunne ikke leses fra /api/user ({type(feil).__name__}). Henter likevel.")
     else:
         fra_bonus = vurder_kvote(igjen, bonus, behov)
+        if foerste_henting and fra_bonus != 0:
+            # Gjennomgangen av 2.3c, ECH3 og VG8: bonusen brukes bare til aa
+            # fullfoere kveldens henting (NFR-01, beslutningen 08.10 kl. 08:06).
+            skriv(
+                f"Kvoten: {igjen} kall igjen av dagens, og foerste henting trenger {behov}. Den "
+                f"bruker ikke bonuskvoten. Hent etter kl. {_grensen()}. 0 kall brukt."
+            )
+            sys.exit(1)
         if fra_bonus == 0:
             skriv(f"Kvoten: {igjen} kall igjen av dagens.")
         elif fra_bonus is not None:
@@ -1180,10 +1204,7 @@ def kjoer(
         # vurder_kvote gjoer det.
         skriv(
             f"Foerste henting gjelder boersdagen {dato.isoformat()}. Signalet lagres fra den dagen og "
-            "regnes aldri bakover. Dagens kurser hentes etter kl. "
-            f"{_grensen()}. Den hentingen trenger {behov} kall: er det ikke nok igjen av dagens, "
-            "tas resten fra bonuskvoten hvis kontoen har en, ellers bruker den 0 kall, og dagens "
-            "kurser kommer neste kveld."
+            f"regnes aldri bakover. {_kvelden(behov)}"
         )
 
     # FR-402: svaret er ikke fra boersdagen for noen av aksjene. Kursene og
@@ -1194,7 +1215,7 @@ def kjoer(
         skriv(
             f"Svaret har ikke kursen for boersdagen {dato.isoformat()} for "
             f"{len(uten_dagen)} aksjer: {', '.join(uten_dagen)} (FR-402). "
-            f"Kursene og fila staar. {_igjen_etter(foerste_henting)}"
+            f"Kursene og fila staar. {_igjen_etter(foerste_henting, behov)}"
         )
     # Svar 5 (ECH1): en aksje som feilet i hentingen, mangler ogsaa dagens
     # kurs, og gir kode 1 som et svar uten dagen.
@@ -1202,7 +1223,7 @@ def kjoer(
     if feilet:
         skriv(
             f"{len(feilet)} aksjer feilet i hentingen og mangler kursen for "
-            f"boersdagen {dato.isoformat()}: {', '.join(feilet)}. {_igjen_etter(foerste_henting)}"
+            f"boersdagen {dato.isoformat()}: {', '.join(feilet)}. {_igjen_etter(foerste_henting, behov)}"
         )
     if uten_dagen or feilet or skrevne != set(serier):
         sys.exit(1)
