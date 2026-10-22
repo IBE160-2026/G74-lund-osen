@@ -2,7 +2,7 @@
 title: 'Story 3.4 (3.4c): historikken i demoen som den ekte'
 type: 'feature'
 created: '2026-10-22'
-status: 'ready-for-dev'
+status: 'review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '5ff304f'
@@ -42,6 +42,45 @@ context:
 - **M1:** en vurdering før startdagen.
 - **M2:** en børsdag etter startdagen uten vurdering.
 - **M3:** startdagen flyttet.
+
+## Avgjort underveis
+
+- **«Signal hele året»** under «Intent» er unøyaktig (VG3): demoen hadde en rad i `vurdering` for hver børsdag fra 02.01, men U45 i `docs/ux-logg.md` sier at signalet startet 13.03, fordi MA50 trenger 51 dager. Begge sier at det var rader fra 02.01.
+- **En demobase fra før** gjenkjennes på dataene: en rad i `vurdering` før `STARTDAG` (`gammel_demobase` i `demo.py`). Webserveren sier at den er laget av en eldre versjon og viser kommandoen som lager den på nytt, både med demobryteren og når en demobase ligger der den ekte basen skal ligge (`c60be34`, BH1). Aksjesiden gir 404 som når demobasen mangler.
+- **Fingeravtrykket av vurderingene** før siste dag (`FINGERAVTRYKK_VURDERING_FOER_SISTE_DAG` i `tests/test_demo.py`) er nytt, fordi radene før 21.09 er borte. Fingeravtrykkene av kursene står. Avtrykkene bak bildene er nye, fordi `demo.py`, `app.py` og `index.html` er endret; bildene ble tatt på nytt og er byte for byte de samme.
+- **`test_hver_vurdering_er_det_vurder_gir`** sjekker dagene fra `STARTDAG`, med grunnen i docstringen.
+
+## Mutantene, kjørt
+
+I en fersk klon med `core.autocrlf=false`, slettet etterpå, én om gangen med `-x`, med kopi før og sha256 lik HEAD etter hver. Kjørt på `c137b66` og igjen på `c60be34`, med `tests/test_demo.py`, og en gang til med bare `TestHistorikkenSomDenEkte` (`-k`) (VG1).
+
+| # | Mutant | Først i fila (`c60be34`) | `TestHistorikkenSomDenEkte` alene |
+|---|---|---|---|
+| M1 | En vurdering før startdagen (fra 18.09) | `test_hver_vurdering_er_det_vurder_gir` | `test_ingen_vurdering_foer_startdagen` |
+| M2 | En børsdag etter startdagen uten vurdering (30.09) | `test_hver_vurdering_er_det_vurder_gir` | `test_en_rad_per_aksje_hver_boersdag_fra_startdagen` |
+| M3 | Startdagen flyttet til 28.09 | `test_froeet_og_de_andre_dagene_staar_som_foer` | `test_startdagen` |
+
+## Gjennomgangen
+
+Gjennomgang 22.10 på diffen `5ff304f..c137b66`. Linsene var Blind Hunter (BH, 6 funn, bare diffen), Edge Case Hunter (ECH, 5 funn, prøvd mot demobaser i midlertidige mapper) og Verification Gap (VG, 5 funn), hver for seg og uten å endre noe i repoet. 16 funn ble 11 rader. To hadde dom medium, og begge er rettet i `c60be34`.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH1, ECH3, VG2 | En demobase fra før der den ekte basen skal ligge, ble vist med den gamle historikken | medium | rettet: samme sjekk og melding der, og testet |
+| ECH1, BH6 | Hjelpen sa at en demobase fra før 20.10 gir `RuntimeError`, men nå kommer meldingen om en eldre versjon | medium | rettet i hjelpen |
+| BH4, ECH4, VG5 | Testen av en demobase fra før så ikke på Min liste, eller på en ny demobase | low | rettet |
+| VG1 | Mutantene var ikke ført | low | rettet: tabellen over |
+| VG3 | «Signal hele året» stemmer ikke med U45 | low | rettet under «Avgjort underveis» |
+| VG4 | «aksjene har signal fra 21.09» stemmer ikke for VRDS og MTFJ | nit | rettet: «vurderingene starter» |
+| BH3 | Ingen versjon av demoen i basen, bare dataene | low | avvist: `application_id` er demomerket og `user_version` er migrasjonene; dataene skiller en demobase fra før, og et eget merke vurderes ved neste endring av demoen |
+| ECH2 | Siden for en dag før 21.09 i demoen sier at hentekommandoen ikke har skrevet en vurdering, «for eksempel fordi kursene er lest inn med `--les-inn`» | low | uten endring: teksten er felles med den ekte versjonen og står i `aksje.html` bak bildet; føres under «Åpent» |
+| BH2 | `/aksje/<symbol>` gir 404 uten melding for en demobase fra før | low | uten endring: som når demobasen mangler, og forsiden og Min liste sier fra |
+| ECH5 | Stjernen på en åpen side med en demobase fra før gir 404 | nit | uten endring: som BH2 |
+| BH5 | Spørringen etter en gammel rad går ved hver forespørsel | nit | uten endring: 225 rader i en ny demobase |
+
+## Åpent
+
+- **Fotnoten på siden for en dag uten vurdering** i demoen viser til hentekommandoen og `--les-inn` (ECH2). En egen tekst for demoen kan komme i en liten PR.
 
 ## Det som ikke endres
 
