@@ -2272,6 +2272,8 @@ avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 
 *Avgjort 2026-10-21 kl. 23:09 (gruppens svar):* historikken i demoen («Signalet dag for dag», 2.7b) viser det samme bildet som den ekte: signal bare fra en startdag noen uker før siste demodag, og «ikke vurdert» før. Det må passe med de 10 fargekombinasjonene på siste demodag (avgjørelsen 16.10 kl. 21:49, 3.4) og KI-tekstene i demoen (3.4b).
 
+*Avgjort 2026-10-22 kl. 18:20 (gruppens svar):* historikken i demoen som den ekte (avgjørelsen 2026-10-21 kl. 23:09, U45 i `docs/ux-logg.md`) bygges nå, før 8.6, i spesifikasjonen 3.4c.
+
 ### Story 3.4b: KI-tekstene i demoen
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 16:53.*
