@@ -21,7 +21,7 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 
 Til faglærer:
 - Se appen med oppdiktede tall, uten konto og nøkkel, etter [steg 1–4](#felles-for-begge): [demoen](#demoen)
-- Ekte kurser, med en gratis nøkkel fra EODHD: [den ekte versjonen](#den-ekte-versjonen)
+- Prøv gjerne også ekte kurser når du har sett demoen, som viser så mye som mulig, med en gratis nøkkel fra EODHD: [den ekte versjonen](#den-ekte-versjonen)
 - De automatiske testene, med to kommandoer etter at uv er installert: [Tester](#tester)
 - [Product Brief](_bmad-output/planning-artifacts/product-brief.md), arbeidskravet: versjon 8, laget etter [tilbakemeldingen 06.10](_bmad-output/planning-artifacts/tilbakemelding-product-brief.md) og låst i taggen `arbeidskrav-product-brief-v8`
 - Plan og krav: [PRD](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md), [arkitektur](_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md) og [epics og stories](_bmad-output/planning-artifacts/epics.md)
@@ -88,6 +88,8 @@ Vil du også prøve den ekte versjonen, går du videre til steg 5 i [den ekte ve
 
 <details>
 <summary><a name="den-ekte-versjonen"></a>Den ekte versjonen: kurser fra EODHD, med egen nøkkel</summary>
+
+Appen er gratis. Gratiskontoen hos EODHD gir 20 kall i døgnet og kurser ett år tilbake, og en henting bruker 16: ett per aksje og ett for hovedindeksen. Et betalt abonnement gir fra 100 000 kall i døgnet ([prisene hos EODHD](https://eodhd.com/pricing), lest 22.10.2026), men appen bruker ikke flere enn 16 per henting, så gratiskontoen holder.
 
 5. **Hent en nøkkel.** Lag en gratis bruker hos [EODHD](https://eodhd.com/register), og kopier API-nøkkelen din. Det er klart når du har nøkkelen.
 6. **Legg inn nøkkelen, bare første gang.** Kopier kommandoene med knappen til høyre i boksen, lim dem inn i PowerShell-vinduet fra steg 4 én om gangen (Ctrl+V eller Cmd+V) og trykk Enter. Den første lager fila [`.env`](#mer-for-den-som-vil), og den neste åpner den (Windows eller Mac). Lim inn nøkkelen etter `EODHD_API_KEY=`, lagre og lukk. Det er klart når nøkkelen står etter `EODHD_API_KEY=`.

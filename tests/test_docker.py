@@ -911,7 +911,10 @@ HOEYDE_PAA_BILDET = 1630
 # byte for byte det samme. Avtrykket er av kildefilene, ikke av PNG-en.
 # Story 2.7b: hjelpen til Sluttkurs og historikken i hjelpetekster.py. Bildet
 # ble tatt på nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "6568924cf169b0eea3b6844e92a838c1d598fec0659e5be4966c69132c33fa5b"
+# Story 3.3i (U51): lenken til den ekte versjonen i demolinja i _ramme.html,
+# og fargen paa den i stil.css. Bildet ble tatt paa nytt, med samme hoeyde,
+# fordi linja fortsatt er én linje i 1280 px.
+AVTRYKK_BAK_BILDET = "416d90bb41a852fa41888178723b04d4bea6170703c062e1d61dd5a8c70316f3"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -974,7 +977,9 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # kildefilene bak bildet, ikke av PNG-en, så det er nytt (gjennomgangen, BH11).
 # Story 2.7b: historikken står nederst, under avsnittet om investorsiden, og
 # bildet ble byte for byte det samme da det ble tatt på nytt.
-AVTRYKK_BAK_AKSJESIDEN = "4ef9ee6d29ac1b2f17a4dbdd39c754b57595dcb71344fa3e2173238e05f34ca2"
+# Story 3.3i (U51): lenken i demolinja. Bildet ble tatt på nytt, med samme
+# høyde, fordi grafen slutter på samme sted.
+AVTRYKK_BAK_AKSJESIDEN = "eae32b3812da70e937a0df12117877416762bf402cd8b46539a74e91377ef5ab"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "
@@ -1751,7 +1756,12 @@ class TestReadmeForNybegynnere:
         assert sitert == app_modul.EKSEMPELTALL_MERKE
         # Story 8.0d: merket staar i rammen, som alle tre malene bruker.
         ramme = (ROT / "src" / "templates" / "_ramme.html").read_text(encoding="utf-8")
-        assert re.findall(r'<p class="eksempeltall">([^<]+)</p>', ramme) == ["Demoversjon. {{ eksempeltall_merke }}"]
+        # Story 3.3i (U51): lenken til den ekte versjonen i README-en staar
+        # etter merket, i samme avsnitt.
+        assert re.findall(r'<p class="eksempeltall">(.+?)</p>', ramme) == [
+            "Demoversjon. {{ eksempeltall_merke }} Ekte kurser trenger en gratis nøkkel fra EODHD: se "
+            '<a href="{{ ekte_versjonen_url }}">Den ekte versjonen</a>.'
+        ]
         for mal in ("index.html", "aksje.html", "basefeil.html"):
             tekst = (ROT / "src" / "templates" / mal).read_text(encoding="utf-8")
             assert tekst.startswith('{% extends "_ramme.html" %}'), mal
@@ -2366,7 +2376,14 @@ class TestReadmeForNybegynnere:
                 "demoen",
                 "Demoen",
             ),
-            ("Ekte kurser, med en gratis nøkkel fra EODHD", "den ekte versjonen", "Den ekte versjonen"),
+            # Story 3.3i (U52): en invitasjon til den ekte versjonen, etter
+            # demoen. Var «Ekte kurser, med en gratis nøkkel fra EODHD».
+            (
+                "Prøv gjerne også ekte kurser når du har sett demoen, som viser så mye som mulig, "
+                "med en gratis nøkkel fra EODHD",
+                "den ekte versjonen",
+                "Den ekte versjonen",
+            ),
             # Story 3.3e (gjennomgangen, VG7): uv installeres foerst.
             ("De automatiske testene, med to kommandoer etter at uv er installert", "Tester", "Tester"),
         ]
@@ -2635,9 +2652,12 @@ LENKENE_FOER_3_3H = {
 
 # Gjennomgangen av 3.3h (ECH2): sha256 av innholdet i hver pil, det samme
 # som delen under overskriften paa main foer grenen (013be41).
+# Story 3.3i (U55): den ekte versjonen fikk avsnittet om at appen er gratis,
+# og hva gratiskontoen og et betalt abonnement hos EODHD gir, foer steg 5.
+# Stegene staar uendret. Var fd359e96... (spesifikasjonen 3.3i).
 AVTRYKK_I_PILENE = {
     "Demoen": "b3f50242ef2bd90baec498eb758acca58e04c420178958650b14f120a8186191",
-    "Den ekte versjonen": "fd359e967c67c89a01ef361e239380adfa094b0bb8a13856fc5120d0a5cf3af2",
+    "Den ekte versjonen": "36cc2505cdc48f09161e22662f239a52fe7f496c4d2d05deb82fa964853f4dd6",
     "Dokumentene": "d05514d3de77b3df67028b170b8c2b89c6c99f45ad716906b170b80f969a20b6",
     "Mappestruktur": "d157a1706be8d24e7235f8d89c39c464609032c63ce5443adf2c40d1916758cd",
 }

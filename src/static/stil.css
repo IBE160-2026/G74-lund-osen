@@ -97,6 +97,9 @@ header.stripe .oppdatert svg { width: 16px; height: 16px; fill: none; stroke: va
 header.stripe .eksempeltall { margin: 0; padding: 0.5rem 0; font-size: 13.5px; font-weight: 600;
                               color: var(--stripe-tekst); }
 header.stripe .demo { border-top: 1px solid var(--stripe-strek); }
+/* Story 3.3i (U51): lenken til den ekte versjonen i demolinja, i fargen til
+   stripa og understreket, saa den synes paa den moerke stripa. */
+header.stripe .eksempeltall a { color: var(--hvit); text-decoration: underline; }
 /* Story 8.3: knapperaden med Markedsoversikt og Min liste. Knappen for
    siden man står på, er fylt (aria-current), og klikkflaten er 44 px høy.
    To knapper får plass på 390 px, og raden brytes heller enn å rulle. */
