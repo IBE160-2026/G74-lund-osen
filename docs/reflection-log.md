@@ -2,6 +2,8 @@
 
 Denne loggen føres kort underveis for å dokumentere arbeidsprosess, valg, KI-bruk, utfordringer og læring. Viktige KI-prompts lagres separat i `docs/ai-prompts/`.
 
+*Lagt til 2026-10-22 (gruppens svar kl. 20:25):* fra oppføringen for 22.10 har hver utfordring «Problem», «Løsning» og «KI sin rolle», slik refleksjonsmalen fra faglærer spør. Malen ligger ikke i repoet.
+
 ---
 
 ## 13.09.2026 – Marian
@@ -2744,6 +2746,44 @@ Før 2.7b ble bygget, førte vi utformingen som en avgjørelse under «Prioriter
 Kl. 18:33 utsatte vi README-prøven på en ren maskin til v1 er ferdig bygget, fordi prøven skal gjelde den appen som leveres (`3ec2ddc`). Den er fortsatt funksjonsstoppen, senest én uke før innleveringen. Den siste daterte gjennomgangen av oppskriften på egen maskin som står i repoet, er fra 16.10, og de fire tingene den fant, ble rettet 18.10 (`fdaf403`, PR #66). Kl. 18:38 fordelte vi de 20 kallene: 1 til hovedindeksen, 15 til aksjene, 3 til egne aksjer og 1 i reserve (`edc3f06`). Kveldens henting og målingen §39 i `malinger.md` er ikke kjørt når dette skrives, og de kommer i oppføringen for 22.10.
 
 Det vi lærte: en avgjørelse må stå i repoet før en instruksjon kan bygge på den, og et stopp av den grunn er vernet som virker. 2.7b ble bygget samme dag, på en linje vi hadde ført. En prøve skal gjelde den appen som leveres, men til den er tatt, er oppskriften ikke gått gjennom på nytt siden 16.10. Kallene er fordelt på forhånd, så vi vet hva som er igjen til nye forsøk før kvelden begynner.
+
+---
+
+## 22.10.2026 – Demoen på egen maskin, seks PR-er og et unntak fra AD-7
+
+*Joakim og Marian.*
+
+Kvelden 21.10 gikk hentingen med kode 0: 16 kall og 15 KI-tekster som besto kontrollen (`dd6fb6e`). Kl. 23:30 hentet vi EQNR, MOWI, GJF og VAR på nytt, og radene var like dem fra kl. 22 i alle sju feltene (§39 i `malinger.md`, `00a3dd8`).
+
+Mellom kl. 22:19 og 23:44 gikk vi gjennom «Kom i gang» for demoen på egen PC. Steg 2–4 var vanskeligst: PowerShell sto i den ytre mappa, som hadde fått et tall etter flere nedlastinger, og ga «no configuration file provided: not found». Med `cd` i samme vindu kjørte demoen kl. 22:34. Første gang åpnet ikke siden seg, og vi vet ikke hvorfor. Rådet i chatten førte notater, og funnene står som U8–U69 i `docs/ux-logg.md` (`ae847ce`), med U70, børsometeret som mangler, kl. 00:07 (`d544750`). Samme kveld avgjorde vi hjelpen i et fast felt, rekkefølgen, mer grunnlag til KI-teksten, historikken i demoen og første henting på dagtid, kl. 22:47–23:33 (`839f3cc`), og kl. 23:51 og 00:09 grunnlaget og rekkefølgen med børsometeret (`7cf1fd1`, `37b13b5`).
+
+22.10 ble seks PR-er flettet. Egne nøkler til Gemini, Anthropic og OpenAI kom i 10.7 (PR #83, `6b39b80`), og i 10.7b gir en nøkkel som mangler, ingen rader, så den kan legges inn og hentes igjen samme kveld (PR #84, `286caa8`). README-rettingen etter gjennomgangen ble 3.3i (PR #85, `a98146b`). Kl. 17:42 prøvde vi PowerShell fra adressefeltet i Filutforsker, og `dir` viste README.md og compose.yaml, og 3.3j ga «Står du fast?» fem spørsmål igjen (PR #86, `6d67db0`). Historikken i demoen viser nå «ikke vurdert» før 21.09, som den ekte før første henting (3.4c, PR #88, `9359a70`). 3.4d, fotnoten for «ikke vurdert», ble stoppet kl. 21:27 fordi klokka var over 21:20, og står på grenen `3-4d-fotnoten-ikke-vurdert` uten PR.
+
+Hentingen 22.10 gikk med kode 0 og 16 kall, og alle 15 KI-tekstene besto (`2cf1817`). Ollama startet først etter at containeren ble laget på nytt. De 4 kallene som var igjen, gikk til §40: lista over aksjene på Oslo Børs koster 1 kall og har alle de 15, en ticker som ikke finnes, koster et kall, og NEL og STB har et år med kurser (`52ee39f`). Kl. 23:14 avgjorde vi at 2.12 bare lar brukeren velge fra den lista, og kl. 23:19 at børsometeret blir som tavla (`335c56f`). Første henting på dagtid (2.3c, PR #87) ble flettet kl. 23:42 i `2a84142`.
+
+**Utfordringer**
+
+1. **Tallene på siden i KI-grunnlaget.**
+   *Problem:* svaret kl. 22:57 ga den nye promptversjonen «tallene som alt står på siden». Avgjørelsen 04.10 om ikke å spørre EODHD bygde på at modellen ikke får prosenter, forholdstall, kurser eller volumer.
+   *Løsning:* svaret ble ført med et åpent punkt, og kl. 23:51 valgte vi «Bare egne resultater»: modellen får fortegn, styrke, retning og antall dager, ikke tallene (`7cf1fd1`).
+   *KI sin rolle:* Claude Code så motsetningen da svaret ble ført, og skrev den som åpent punkt i stedet for å avgjøre den. Gruppen avgjorde.
+
+2. **En måling av aksjer som alt var målt.**
+   *Problem:* svaret kl. 16:06 ville bruke de 4 kallene på NOD, NEL, SUBC og STB, som alt står i §15, §16 og §28.
+   *Løsning:* svaret kl. 16:07 erstattet det med oppslagene i §40, og de 4 kallene ga noe nytt: prisen på lista og hva en ticker som ikke finnes, koster.
+   *KI sin rolle:* det står ikke i repoet hvem som så det. Claude Code slo opp at de fire står i målingene før kallene ble tatt. Gruppen avgjorde.
+
+3. **Seks spørsmål mot vedtaket om fem.**
+   *Problem:* 3.3i la svaret om `ERR_CONNECTION_REFUSED` under «Står du fast?», og grensen fra 16.10 var fem spørsmål.
+   *Løsning:* Claude Code hevet grensen til seks og sa det i PR-en og i rapporten. Kl. 17:42 valgte vi å slå sammen de to svarene om `cd` til ett spørsmål, og 3.3j ga fem igjen.
+   *KI sin rolle:* Claude Code endret et vedtak for å følge en instruksjon, men skrev det åpent. Gruppen avgjorde hvordan vedtaket skulle holdes.
+
+4. **Første henting krevde et unntak fra AD-7.**
+   *Problem:* lagrene godtar bare inneværende børsdag. For at en ny bruker skal se signalet med en gang, må første henting på dagtid skrive vurderingene for børsdagen før.
+   *Løsning:* et smalt unntak i lagrene: raden for den dagen godtas bare når basen ikke har rader for en annen dato. Det ble godkjent kl. 19:30, og 2.3c ble flettet først etter kveldens henting, så hentingen gikk på koden som var på main. Flettingen stoppet først på to konflikter med 3.4c, som ble løst etter en ny instruksjon.
+   *KI sin rolle:* Claude Code foreslo unntaket og skrev det som åpent punkt. Gjennomgangen fant at arkitekturen ikke sa noe om det, og at en dag uten nok bonuskvote aldri får signal. Gruppen godkjente unntaket.
+
+Det vi lærte: en ny bruker finner det testene ikke finner. 49 funn kom fra én gjennomgang på egen maskin, og ingen test hadde sett dem. Et forslag slås opp før det gis, også fra rådet. Svaret kl. 16:06 ville brukt kall på det vi alt visste. Det som går hver kveld, endres ikke samme dag: 2.3c ble flettet etter hentingen, ikke før.
 
 ---
 
