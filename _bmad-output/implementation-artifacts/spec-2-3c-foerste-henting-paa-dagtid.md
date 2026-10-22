@@ -2,7 +2,7 @@
 title: 'Story 2.3 (2.3c): første henting på dagtid når basen er tom'
 type: 'feature'
 created: '2026-10-22'
-status: 'ready-for-dev'
+status: 'review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'fb9bcac'
@@ -61,6 +61,54 @@ context:
 - **M1:** dagens rad skrevet før kl. 22 med tom base (`dato` ikke flyttet til forrige børsdag).
 - **M2:** en base som ikke er tom, hentet før kl. 22.
 - **M3:** kursene bedt om til og med i dag.
+
+## Avgjort underveis
+
+- **Første henting bruker aldri bonuskvoten** (ECH3, VG8). Mangler den kall av dagens, gir den 0 kall og kode 1. Bonusen brukes fortsatt bare til å fullføre kveldens henting (NFR-01, beslutningen 08.10 kl. 08:06).
+- **Kvelden etter første henting:** den trenger 16 kall, og det er normalt 4 igjen. Med minst 12 i bonuskvoten tas de derfra, og dagen får signal. Ellers bruker den 0 kall, og den dagen får aldri signal, fordi en vurdering bare kan skrives for inneværende børsdag (AD-7); neste kveld hentes neste børsdag. Det sier utskriften (`_kvelden`), hjelpen og raden «Klar» i README-en, og en datert rettelse står etter presiseringen i `epics.md` (BH1, ECH2, VG1–VG3). Det erstatter «dagens kurser kommer neste kveld» i presiseringen og i punktet «Kallene samme kveld» over.
+- **Unntaket i lagrene** krever også at `vurdering` ikke har en rad for en annen dato, så en base med historikk og en tom `ki_logg` ikke kan få KI-rader for en eldre dag (BH4).
+- **Når KI-tjenesten ikke er klar ved første henting,** sier utskriften at teksten for den dagen ikke kan lages senere, og lover ingen ny kjøring (ECH1).
+- **`--les-inn`** nevnes ikke lenger som vei når fila for forrige børsdag finnes og basen er tom: innlesingen gir kurser uten signal for den dagen (BH5, ECH4, VG6).
+- **En dag utenfor kalenderen** (`UtenforKalenderen` for forrige børsdag) gir den gamle avvisningen med 0 kall, ikke kode 1 (ECH6).
+- **AD-7 har fått en merknad** i `ARCHITECTURE-SPINE.md` om unntaket, merket «foreslått, ikke godkjent av gruppen» (VG4).
+- **Commit a (`0c85909`) var ikke grønn:** avtrykkene bak bildene i `tests/test_docker.py` følger `boersdag.py` og `lagring_sqlite.py`, og de testene var ikke med i kjøringen før commiten. Rettet i `10b6e4f` (VG9). Historikken skrives ikke om (regel 7).
+- **Sitatet under «Slik virker det i dag», «siste børsdag på eller før», er gjenskapt** (VG10). Docstringen i `boersdag.py` sier «Siste boersdag paa eller foer dag.», og PRD-en, punkt 3 i tabellen over åpne punkter: «Inneværende børsdag er siste børsdag på eller før dagens dato i Europe/Oslo.»
+- **Testen for dagtid i `tests/test_docker.py`** (`test_demoen_paa_dagtid_og_helgen_i_steg_8`) og avtrykket av pila til den ekte versjonen er endret i `70c8eb5`, fordi README-en ikke lenger sier at demoen er eneste vei på dagtid. Grunnen står i testen.
+
+## Mutantene, kjørt
+
+I en fersk klon med `core.autocrlf=false`, slettet etterpå, én om gangen med `-x`, med kopi før og sha256 lik HEAD etter hver. Kjørt på `9ad2c60` og igjen på `1431a6a`, med `tests/test_fetch_prices.py`, og en gang til med bare `TestFoersteHenting` (`-k`).
+
+| # | Mutant | Først i fila (`1431a6a`) | `TestFoersteHenting` alene |
+|---|---|---|---|
+| M1 | Dagens rad skrevet før kl. 22 med tom base (datoen ikke flyttet) | `test_tom_base_foer_22_henter_forrige_boersdag` | den samme |
+| M2 | En base som ikke er tom, hentet før kl. 22 | `test_boersdag_kl_21_59_59_gir_0_kall_og_nevner_flagget` | `test_base_som_ikke_er_tom_gir_0_kall_foer_22` |
+| M3 | Kursene bedt om til og med i dag | `test_tom_base_foer_22_henter_forrige_boersdag` | den samme |
+
+## Gjennomgangen
+
+Gjennomgang 22.10 på diffen `fb9bcac..9ad2c60`. Linsene var Blind Hunter (BH, 8 funn, bare diffen), Edge Case Hunter (ECH, 7 funn) og Verification Gap (VG, 11 funn), hver for seg og uten å endre noe i repoet. 26 funn ble 18 rader. Fire hadde dom medium. Tre er rettet i `1431a6a`. Den fjerde, VG4, kan bare gruppen lukke: unntaket fra AD-7 må godkjennes.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH1, ECH2, VG1, VG2, VG3 | Uten nok bonuskvote får dagen aldri signal, men tekstene sa at dagens kurser kommer neste kveld, og README-en sa ingenting | medium | rettet: samme ordlyd i utskriften, hjelpen og raden «Klar», og en datert rettelse etter presiseringen |
+| BH2 | `base_er_tom` var ikke testet for en base webserveren har laget | medium | rettet: testene for en migrert tom base og en base med én kursrad |
+| ECH1 | Når KI-tjenesten ikke var klar ved første henting, lovet utskriften en ny kjøring som ikke kan lage teksten | medium | rettet |
+| VG4 | Unntaket fra AD-7 er ikke godkjent, og spinen sa ingenting | medium | åpent: merknaden står i spinen, og godkjenningen er gruppens. Grenen flettes ikke før den finnes |
+| BH4 | Unntaket i KI-loggen så bare på `ki_logg` | low | rettet: også `vurdering` |
+| ECH3, VG8 | Første henting kunne ta kall fra bonuskvoten på dagtid | low | rettet: den bruker den aldri |
+| BH5, ECH4, VG6 | Meldingen anbefalte `--les-inn`, som gir kurser uten signal | low | rettet, og testet |
+| VG5 | Ingen test av en base som ikke kan leses, mandag morgen, kvoten om kvelden eller `forrige_boersdag` | low | rettet, utenom grenen utenfor kalenderen, som ikke kan nås i 2026 |
+| VG9 | Commit a var ikke grønn | low | uten endring: står over og i Utført-linja (regel 7) |
+| VG7 | «Neste i v1» har første henting på dagtid | low | uten endring: flyttes til «Ferdig» etter flettingen |
+| BH3 | En base som ikke kan leses, gir den gamle meldingen | low | uten endring: slik var det før 2.3c, og det blir 0 kall |
+| ECH5 | Meldingene når basen feiler eller kveldens henting overlapper første henting | low | uten endring: sjeldne, og ingen rad skrives feil |
+| ECH6 | Utenfor kalenderen ga kode 1 | nit | rettet: den gamle avvisningen |
+| BH6 | Docstringen om ny dag i KI-steget | nit | rettet |
+| BH7 | «Dagens kurs hentes aldri før kl. 22» stemmer ikke med flagget | nit | rettet |
+| BH8, ECH7 | «16 av dagens 20» gjelder ikke mellom midnatt og midnatt GMT | nit | rettet: «normalt» |
+| VG10 | Sitatet om inneværende børsdag var gjenskapt | nit | rettet under «Avgjort underveis», med kilden ordrett |
+| VG11 | To funksjoner heter `forrige_boersdag` | nit | rettet: docstringen viser til den andre |
 
 ## Åpent
 
