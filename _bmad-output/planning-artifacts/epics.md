@@ -2171,6 +2171,8 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 
 *Avgjort 2026-10-21 kl. 22:51 (gruppens svar):* rekkefølgen er 10.7 (egne nøkler), så README-rettingen etter gjennomgangen av demoen 21.10, så 2.12. README-rettingen står ikke som egen story i repoet ennå.
 
+*Lagt til 2026-10-22 kl. 17:14:* README-rettingen etter gruppens gjennomgang av demoen 21.10 er squash-flettet i `a98146b`, PR #85, låst til head-en `492873a` (spesifikasjonen `spec-3-3i-readme-rettingen-etter-demoen.md`). Den løser U8–U15, U51, U52 og U55 i `docs/ux-logg.md`: steg 1–4 i «Felles for begge» med Docker Desktop fra før og «Resource Saver mode», utpakkingen og tallet i mappenavnet, PowerShell fra adressefeltet i Filutforsker og kontrollen med `dir` eller `ls`, svaret på `ERR_CONNECTION_REFUSED` under «Står du fast?», hva gratiskontoen hos EODHD gir, invitasjonen til den ekte versjonen, og lenken til den fra demolinja. «Står du fast?» har nå høyst 6 spørsmål, ikke 5 som avgjørelsen 16.10 kl. 21:53–21:58 sa, fordi instruksjonen ba om det nye spørsmålet der. Første henting på dagtid (U53, U54) kommer i 2.3c. Hele settet: 3087 bestått og 17 hoppet over, og CI var grønn på head-en (39801801370). Alle tre mutantene, M1–M3, ble fanget.
+
 ### Story 3.4: Demoversjonen
 
 *Lagt til 2026-10-03, Marians beslutning kl. 18:10.*
