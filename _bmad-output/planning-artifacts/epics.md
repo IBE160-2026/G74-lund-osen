@@ -1907,6 +1907,8 @@ følger aksjene jeg bryr meg om.
 
 *Avgjort 2026-10-22 kl. 16:07 (gruppens svar):* de 4 kallene som er igjen av dagskvoten 22.10 i GMT, de 3 som er holdt av til egne aksjer og reserven (avgjort 21.10 kl. 18:38), går i kveld til oppslagene i `malinger.md` §40: lista over aksjene på Oslo Børs, en ticker som ikke finnes, og ett år for NEL og STB. Det erstatter svaret kl. 16:06 om NOD, NEL, SUBC og STB, fordi de fire alt er målt i §15, §16 og §28.
 
+*Lagt til 2026-10-22 kl. 22:53 (målingen etter gruppens svar 22.10 kl. 16:07, `malinger.md` §40):* lista over aksjene på Oslo Børs (`exchange-symbol-list/OL`) koster 1 kall og har 304 rader, 297 av dem «Common Stock», med alle de 15, men med navnene i juridisk form («Equinor ASA», «DnB ASA», «Var Energi ASA»). En ticker som ikke finnes, gir HTTP 404 og koster et kall. NEL og STB har 250 rader til 2026-10-22, med median omsetning de siste tre månedene på 3,9 og 96,6 MNOK. Bonuskvoten er ikke brukt.
+
 ### Story 2.13: Kommandoen som måler omsetning
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.

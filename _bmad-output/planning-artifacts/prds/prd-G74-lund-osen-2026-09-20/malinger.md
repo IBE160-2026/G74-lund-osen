@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-21T23:30
+updated: 2026-10-22T22:53
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -4227,3 +4227,64 @@ på nytt etter kl. 22 to kvelder, og ingen av dem var endret.
 **Kostnad.** 4 kall. Kvoten før: 16 brukt, 4 igjen, `apiRequestsDate` 2026-10-21 og
 `extraLimit` 463. Kvoten etter: 20 brukt, 0 igjen, `extraLimit` uendret 463.
 Bonuskvoten er ikke brukt.
+
+
+## 40. Oppslag til 2.12: lista over aksjene, en ticker som ikke finnes, og ett år for NEL og STB (2026-10-22)
+
+**Metode.** Fire kall av dagskvoten 22.10 i GMT, med `hent_api_nokkel`, `hent_kvote` og
+`hent_ett_symbol` importert fra `src/fetch_prices.py`. Skriptet lå utenfor repoet og
+leste kvoten før og etter hvert kall. Det skulle stoppe hvis `apiRequestsDate` ikke var
+2026-10-22 eller 20 kall var brukt, så verken bonuskvoten eller morgendagens kvote kunne
+brukes. `src/fetch_prices.py` ble ikke kjørt, og ingenting ble skrevet til basen (AD-7).
+Svarene ligger i `data/proever/`, som ikke spores (regel 10). Lista er lagret urørt,
+som teksten i svaret. De tre `/api/eod`-svarene er lagret slik `hent_ett_symbol` gir dem
+tilbake, som JSON, og svaret som feilet som `null`. Gruppens svar 22.10 kl. 16:07 ga
+kallene (under story 2.12 i `epics.md`).
+
+**Grunnen** er story 2.12, valget av egne aksjer: hva lista over aksjene på Oslo Børs
+koster og har, hva en ticker som ikke finnes gir, og om NEL og STB har et år med kurser.
+De 4 kallene er de 3 som er holdt av til egne aksjer og reserven (avgjort 21.10 kl.
+18:38).
+
+**Dokumentasjonen, lest 22.10.2026.** Fra
+https://eodhd.com/financial-apis/exchanges-api-list-of-tickers-and-trading-hours: lista
+hentes med `exchange-symbol-list` og børskoden i adressen, og «Each request consumes 1
+API call.» Siden fører den under «All plans». Fra https://eodhd.com/exchange/OL: «Oslo
+Stock Exchange - OL», «MIC Code XOSL». Fra https://eodhd.com/financial-apis/api-limits/:
+«A request for a ticker that does not exist returns HTTP 404 and still costs its normal
+price.» Ingen av sidene har en dato utenom «© Unicorn Data Services, 2017-2026».
+
+| Kall | Klokkeslett (`date`) | Resultat |
+|---|---|---|
+| a) `exchange-symbol-list/OL` | 22:52 | HTTP 200, 304 rader |
+| b) `/api/eod/FINNESIKKE.OL` | 22:52 | HTTP 404 Not Found, trukket fra kvoten |
+| c) `/api/eod/NEL.OL`, 2025-10-23–2026-10-22 | 22:52 | 250 rader |
+| d) `/api/eod/STB.OL`, 2025-10-23–2026-10-22 | 22:52 | 250 rader |
+
+**Resultat.**
+
+- **a) Lista.** 304 rader med feltene `Code`, `Country`, `Currency`, `Exchange`, `Isin`,
+  `Name` og `Type`: 297 «Common Stock», 4 «FUND», 2 «INDEX» og 1 «ETF». Alle de 15 i
+  `AKSJEUNIVERS` står der, under symbolet uten `.OL`, alle som «Common Stock». Navnene er
+  den juridiske formen, ikke navnene i `AKSJEUNIVERS`: «ASA» eller «Ltd» til slutt for
+  alle 15, og tre skrives også annerledes: «DnB ASA» (DNB Bank), «Var Energi ASA» (Vår
+  Energi) og «Dno ASA» (DNO). Navnene i lista kan altså ikke vises i appen uten å rettes.
+- **b) En ticker som ikke finnes** gir HTTP 404 Not Found, og `hent_ett_symbol` gir
+  feilen «HTTP 404 Not Found». Kallet ble trukket fra kvoten, som dokumentasjonen sier.
+  En skrivefeil i et symbol koster altså et kall.
+- **c) og d) Ett år for NEL og STB.** Begge har 250 rader fra 2025-10-23 til 2026-10-22,
+  som hver av de 15 i hentingen samme kveld, og ingen dager uten volum eller med 0.
+  Median omsetning de siste tre månedene, 2026-07-22–2026-10-22, regnet som i §15
+  (`volume × close` per handelsdag, medianen over perioden), over 67 handelsdager:
+
+| Symbol | Selskap | Handelsdager | Median omsetning | Over 32 MNOK | Over 25 MNOK | Før |
+|---|---|---:|---:|---|---|---|
+| NEL | Nel | 67 | 3,9 MNOK | Nei | Nei | 4,1 MNOK (§28, 2026-07-02–2026-10-02) |
+| STB | Storebrand | 67 | 96,6 MNOK | Ja | Ja | 87,8 MNOK (§15, 2026-07-02–2026-10-02) |
+
+Vinduet er et annet enn i §15 og §28, så tallene er ikke like, men begge ligger på samme
+side av 32 MNOK som før.
+
+**Kostnad.** 4 kall. Kvoten før: 16 brukt, 4 igjen, `apiRequestsDate` 2026-10-22 og
+`extraLimit` 463. Etter hvert kall gikk `apiRequests` opp med 1, også for b). Kvoten
+etter: 20 brukt, 0 igjen, `extraLimit` uendret 463. Bonuskvoten er ikke brukt.
