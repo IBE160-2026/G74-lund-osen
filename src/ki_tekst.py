@@ -55,7 +55,7 @@ from dotenv import dotenv_values
 import ki_anthropic
 import ki_gemini
 import ki_openai
-from boersdag import innevaerende_boersdag, norsk_dato
+from boersdag import forrige_boersdag, innevaerende_boersdag, norsk_dato
 from ki_anthropic import AnthropicModell
 from ki_gemini import GeminiModell
 from ki_grunnlag import ki_grunnlag
@@ -217,6 +217,7 @@ def lag_ki_tekster(
     skriv: Callable[[str], None] = print,
     lista: tuple[Aksje, ...] = AKSJEUNIVERS,
     basen_har_kursene: bool = True,
+    foerste_henting: bool = False,
 ) -> bool:
     """KI-raden for hver aksje som har en vurdering og mangler raden.
 
@@ -224,7 +225,18 @@ def lag_ki_tekster(
     aa sjekke paa nytt i samme kjoering. basen_har_kursene sier om en ny
     kjoering samme kveld gir 0 kall til EODHD: det gjoer den bare naar basen
     har dagens kurs for alle aksjene.
+
+    Story 2.3c: med foerste_henting er dato forrige boersdag, fra foerste
+    henting paa dagtid i en tom base. Radene skrives for den dagen
+    (foerste_dag i SqliteKILogg). Steget stopper hvis forrige boersdag
+    regnet fra klokka ikke lenger er dato, og sier nei til tjenesten uten aa
+    love en ny kjoering (gjennomgangen, BH6, ECH1).
     """
+
+    def skrivbar() -> date:
+        dagens = innevaerende_boersdag(norsk_dato(klokke()))
+        return forrige_boersdag(dagens) if foerste_henting else dagens
+
     if modell is None:
         return True
     besto = stoppet = feilet = sto = 0
@@ -240,7 +252,7 @@ def lag_ki_tekster(
         return True
     try:
         vurderinger = SqliteVurderingslager(tilkobling, klokke, lista)
-        logg = SqliteKILogg(tilkobling, klokke)
+        logg = SqliteKILogg(tilkobling, klokke, foerste_dag=dato if foerste_henting else None)
         mangler: list[tuple[Aksje, Vurdering]] = []
         for aksje in lista:
             vurdering = vurderinger.les(aksje.symbol, dato)
@@ -252,9 +264,20 @@ def lag_ki_tekster(
             mangler.append((aksje, vurdering))
         # Svar c kl. 23:32: svarer ikke tjenesten, eller mangler modellen,
         # skrives ingen rader, og samme kommando kan kjoeres igjen.
-        if mangler and innevaerende_boersdag(norsk_dato(klokke())) != dato:
+        if mangler and skrivbar() != dato:
             raise IkkeInnevaerendeBoersdag(dato.isoformat())
-        if mangler and (grunn := _ikke_klar(modell)):
+        # Sjekken en gang, ogsaa ved foerste henting.
+        grunn = _ikke_klar(modell) if mangler else None
+        if grunn and foerste_henting:
+            # Gjennomgangen av 2.3c, ECH1: etter foerste henting er dagen
+            # ikke inneveerende boersdag, saa teksten kan ikke lages senere.
+            skriv(
+                f"Ingen KI-tekst for boersdagen {dato.isoformat()}: {grunn}. Ingen rader er skrevet i "
+                "KI-loggen, og teksten for den dagen kan ikke lages senere, fordi den ikke er "
+                "inneveerende boersdag (AD-7). Kveldens henting lager tekstene for dagens boersdag."
+            )
+            return False
+        if grunn:
             skriv(
                 f"Ingen KI-tekst for boersdagen {dato.isoformat()} ennaa: {grunn}. Ingen rader er "
                 f"skrevet i KI-loggen, og {len(mangler)} aksjer venter paa teksten"
@@ -267,7 +290,7 @@ def lag_ki_tekster(
         feilet_for: str | None = None
         for aksje, vurdering in mangler:
             emne = Emne.aksje(aksje.symbol, dato)
-            if innevaerende_boersdag(norsk_dato(klokke())) != dato:
+            if skrivbar() != dato:
                 raise IkkeInnevaerendeBoersdag(dato.isoformat())
             if feilet_for is None:
                 rad = lag_ki_rad(emne, ki_grunnlag(vurdering, utenfor_maalingen=False), regeltekst(vurdering), modell)
