@@ -1462,11 +1462,15 @@ UTE_AV_README = {
 SAMMENSLAATT = (
     "«Engine running» kommer ikke, eller det står «Cannot connect to the Docker daemon» eller «error during connect»."
 )
+# Story 3.3j: ett spoersmaal for begge meldingene etter cd i steg 4.
+CD_SPOERSMAALET = (
+    "«is not recognized as the name of a cmdlet» eller «Cannot find path … because it does not exist» etter cd."
+)
 BEHOLDT_I_README = [
     SAMMENSLAATT,
     "ZIP-fila ser ut som en vanlig mappe.",
-    "«is not recognized as the name of a cmdlet» etter cd.",
-    "«Cannot find path … because it does not exist».",
+    # Story 3.3j (gruppens svar 22.10 kl. 17:42): de to svarene om cd er ett.
+    CD_SPOERSMAALET,
     # Story 3.3i (U13): lagt inn foran «no configuration file provided».
     "Nettleseren sier at 127.0.0.1 nektet å koble til.",
     "«no configuration file provided: not found».",
@@ -1557,10 +1561,13 @@ class TestReadmeForNybegynnere:
         feilen «The term 'cdC:\\...' is not recognized as the name of a
         cmdlet». Spoersmaalet staar under «Står du fast?» og i docs/hjelp.md
         under «Steg 4: mappa», med samme svar. Ville feilet hvis svaret om
-        mellomrommet falt bort."""
-        sporsmaal = "«is not recognized as the name of a cmdlet» etter cd."
-        svar = _detaljer(_faq())[sporsmaal]
-        assert svar.startswith("Det mangler mellomrom etter `cd`.")
+        mellomrommet falt bort.
+
+        Story 3.3j: svaret er foerste avsnitt i spoersmaalet for begge
+        meldingene etter cd."""
+        sporsmaal = CD_SPOERSMAALET
+        svar = _detaljer(_faq())[sporsmaal].strip().split("\n\n", 1)[0]
+        assert svar.startswith("Kommer «is not recognized as the name of a cmdlet»: Det mangler mellomrom etter `cd`.")
         assert "(steg 4)" in svar
         steg4 = _hjelp().split("\n## Steg 4: mappa\n", 1)[1].split("\n## ", 1)[0]
         assert re.search(rf"^### {re.escape(sporsmaal)}$", steg4, re.MULTILINE)
@@ -1577,14 +1584,20 @@ class TestReadmeForNybegynnere:
         """Story 3.3c, rettelse c: «Cannot find path» hadde ikke noe svar i
         gjennomgangen 16.10. Spoersmaalet staar under «Står du fast?» og i
         docs/hjelp.md under «Steg 4: mappa», med samme svar. Ville feilet
-        hvis svaret falt bort, eller ikke sa at mappa skal dras paa nytt."""
-        sporsmaal = "«Cannot find path … because it does not exist»."
-        svar = _detaljer(_faq())[sporsmaal]
-        assert svar.startswith("Mappa ligger ikke der stien sier,")
+        hvis svaret falt bort, eller ikke sa at mappa skal dras paa nytt.
+
+        Story 3.3j: svaret er andre avsnitt i spoersmaalet for begge
+        meldingene etter cd."""
+        sporsmaal = CD_SPOERSMAALET
+        # Gjennomgangen av 3.3j (ECH3): andre avsnitt paa begge sider.
+        svar = _detaljer(_faq())[sporsmaal].strip().split("\n\n")[1]
+        assert svar.startswith(
+            "Kommer «Cannot find path … because it does not exist»: Mappa ligger ikke der stien sier,"
+        )
         assert "flyttet" in svar and "ZIP-fila ble dratt inn" in svar
         assert "dra mappa inn i vinduet på nytt (steg 4)" in svar
         steg4 = _hjelp().split("\n## Steg 4: mappa\n", 1)[1].split("\n## ", 1)[0]
-        i_hjelp = steg4.split(f"### {sporsmaal}\n\n", 1)[1].split("\n\n", 1)[0]
+        i_hjelp = steg4.split(f"### {sporsmaal}\n\n", 1)[1].split("\n\n")[1]
         assert i_hjelp.startswith(svar.strip())
 
     def test_kopieringen_forklares_en_gang_og_hvert_steg_sier_hvor(self):
@@ -1698,10 +1711,14 @@ class TestReadmeForNybegynnere:
         Story 3.3i (instruksjonen 22.10 kl. 16:06, U13): hoeyst 6, for svaret
         paa at 127.0.0.1 nektet aa koble til. Navnet staar, fordi
         docs/vurderingsmatrise.md og vedlegget i docs/kvalitetssikring.md
-        nevner testen. Ville feilet med et sjuende spoersmaal."""
+        nevner testen.
+
+        Story 3.3j (gruppens svar 22.10 kl. 17:42): hoeyst 5 igjen, som
+        avgjort 16.10. De to svarene om cd i steg 4 er ett spoersmaal. Ville
+        feilet med et sjette spoersmaal (M1)."""
         faq = _faq()
         sporsmaal = _detaljer(faq)
-        assert 1 <= len(sporsmaal) <= 6
+        assert 1 <= len(sporsmaal) <= 5
         assert list(sporsmaal) == BEHOLDT_I_README, list(sporsmaal)
         assert faq.count("<details>") == faq.count("</details>") == faq.count("<summary>") == len(sporsmaal)
         rest = re.sub(r"<details>.*?</details>", "", faq, flags=re.DOTALL)
@@ -2895,3 +2912,38 @@ class TestReadmeEtterDemoen:
         assert aksjer == len(AKSJEUNIVERS)
         assert f"og de {til_overs} som er igjen, går til nye forsøk samme kveld" in pila
         assert fp.kall_til_nye_forsoek(i_doegnet, i_doegnet, per_henting) == til_overs
+
+
+class TestFemSpoersmaal:
+    """Story 3.3j (gruppens svar 22.10 kl. 17:42): de to svarene om cd i
+    steg 4 er ett spoersmaal, med begge meldingene ordrett, saa «Står du
+    fast?» har fem spoersmaal. Grensen paa 5 staar i
+    test_staar_du_fast_har_hoeyst_5_spoersmaal (gjennomgangen, BH5)."""
+
+    MELDINGENE = ("«is not recognized as the name of a cmdlet»", "«Cannot find path … because it does not exist»")
+    # Gjennomgangen (ECH2): uten anfoerselstegn, saa en gammel overskrift i
+    # en annen form ogsaa fanges. «The term 'uv' is not recognized» er sitt eget.
+    BARE_ORDENE = ("is not recognized as the name of a cmdlet", "Cannot find path")
+
+    def test_begge_meldingene_i_samme_spoersmaal(self):
+        """Ville feilet hvis en av meldingene falt ut av spoersmaalet (M2),
+        sto i et eget spoersmaal, eller ikke hadde sitt svar under det."""
+        svar = _detaljer(_faq())
+        med = [s for s in svar if any(m in s for m in self.MELDINGENE)]
+        assert med == [CD_SPOERSMAALET], med
+        for melding in self.MELDINGENE:
+            assert melding in CD_SPOERSMAALET, melding
+            assert f"Kommer {melding}: " in svar[CD_SPOERSMAALET], melding
+
+    def test_det_samme_spoersmaalet_i_hjelpen(self):
+        """Ville feilet hvis docs/hjelp.md fortsatt hadde de to som hvert sitt
+        spoersmaal, ogsaa i en annen form, det nye sto utenfor «Steg 4:
+        mappa», eller et av svarene manglet under det (BH4, ECH2)."""
+        steg4 = _hjelp().split("\n## Steg 4: mappa\n", 1)[1].split("\n## ", 1)[0]
+        overskrifter = re.findall(r"^### (.+)$", _hjelp(), re.MULTILINE)
+        med = [o for o in overskrifter if any(m in o for m in self.BARE_ORDENE)]
+        assert med == [CD_SPOERSMAALET], med
+        assert f"### {CD_SPOERSMAALET}\n" in steg4
+        under = steg4.split(f"### {CD_SPOERSMAALET}\n\n", 1)[1].split("\n### ", 1)[0]
+        for melding in self.MELDINGENE:
+            assert f"Kommer {melding}: " in under, melding
