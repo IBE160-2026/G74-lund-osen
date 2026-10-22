@@ -2226,6 +2226,8 @@ class TestReadmeForNybegynnere:
             "periodene i kursgrafen med «velg dag»",
             # Story 8.3: Min liste er flettet.
             "min liste, med stjernen foran hvert selskap",
+            # Story 8.6: børsometeret er flettet.
+            "og børsometeret",
             # Story 10.7: egne nøkler er flettet.
             "eller med egen nøkkel",
             # Story 2.3c: første henting på dagtid er flettet.
@@ -2483,7 +2485,8 @@ class TestReadmeForNybegynnere:
 EKSTRA = (
     ("signaldag",),
     ("«vis ki-tekst»",),
-    ("periodevalget", "børsometeret", "ki-teksten om dagen"),
+    # Story 8.6: børsometeret er flyttet til «Ferdig».
+    ("periodevalget", "ki-teksten om dagen"),
     ("velge og bytte aksjer",),
 )
 
