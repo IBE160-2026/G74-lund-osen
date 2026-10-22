@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-22T10:43
+updated: 2026-10-22T15:12
 ---
 
 # Kvalitetssikring
@@ -289,6 +289,7 @@ sist i dokumentet.
 | 10.5 Lenken til selskapets investorside | `bd19380` (#81) | 1 (6, M1–M3 og N1–N3) | – N1–N3 er mutantene fra Edge Case Hunter som overlevde, kjørt etter rettingen i `18a377c` | `S/spec-10-5-investorsiden.md` |
 | 2.7b Signalet dag for dag | `d4c2441` (#82) | 1 (13, M1–M3 og N1–N10) | – N1–N10 er mutantene fra Edge Case Hunter som overlevde, og to til, kjørt etter rettingen i `4289d93` | `S/spec-2-7b-signalet-dag-for-dag.md` |
 | 10.7 Egen nøkkel til Gemini, Anthropic og OpenAI | `6b39b80` (#83) | 1 (11, M1–M3 og N1–N8) | – N1–N8 dekker mutantene fra Edge Case Hunter som overlevde på `c3be49c`, og rettingene, kjørt etter rettingen i `761c970` | `S/spec-10-7-egen-noekkel-til-gemini-anthropic-og-openai.md` |
+| 10.7b En nøkkel som mangler, gir ingen rader | `286caa8` (#84) | 1 (2, M1 og M2) | – kjørt på `6d0981c` og igjen etter rettingen i `d7feed6` | `S/spec-10-7b-noekkel-som-mangler-gir-ingen-rader.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
 | 2.9b Søylene under hovedindeksen | `73098ed` (#63) | 1 (6, S1–S6) | – | `S/spec-2-9b-soeylene-under-hovedindeksen.md` |
@@ -502,6 +503,7 @@ funn. Antall rader i loggen:
 | 10.5 | 25 | 16 | 4 | – |
 | 2.7b | 38 | 30 | 3 | – |
 | 10.7 | 26 | 22 | 2 | – |
+| 10.7b | 13 | 8 | 3 | – |
 | 9.1, oppdatering 17.10 | 19 | 17 | 2 | – |
 | 9.7 | 19 | 13 | 6 | – |
 | 2.9b | 23 | 17 | 6 | – |
@@ -1234,6 +1236,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 10.5 | M1–M3 og N1–N3 | M1 `test_hver_av_de_15_har_adressen_fra_svarene`, M2 `test_ingen_mal_lenker_til_euronext`, M3 `test_demoen_viser_teksten_og_ingen_lenke`, N1 og N2 `test_lenken_paa_siden_gaar_til_aksjen_siden_viser`, N3 `test_en_ekte_aksje_uten_adresse_faar_setningen_uten_lenke` | `S/spec-10-5-…` |
 | 2.7b | M1–M3 og N1–N10 | M1 og M2 `test_hver_tilstand_ser_ulik_ut`, M3 `test_tallene_for_ukene`, N1–N10 i tabellen i spesifikasjonen | `S/spec-2-7b-…` |
 | 10.7 | M1–M3 og N1–N8 | M1 `test_en_valgt_tjeneste_som_feiler_gir_ingen_tekst_fra_en_annen`, M2 `test_kallet_slik_dokumentasjonen_sier`, M3 `test_ikke_i_feilen_eller_grunnen_naar_feilen_har_den`, N1–N8 i tabellen i spesifikasjonen | `S/spec-10-7-…` |
+| 10.7b | M1 og M2 | M1 `test_en_valgt_tjeneste_som_feiler_gir_ingen_tekst_fra_en_annen`, M2 `test_noekkelen_mangler`, begge også av `test_ingen_rader_og_ingen_kall` alene | `S/spec-10-7b-…` |
 | 9.1 | Q1–Q4 | Q1, Q3 og Q4 `test_hver_ferdige_spesifikasjon_har_en_rad`, Q2 `test_hver_test_dokumentene_nevner_finnes` | `S/spec-9-1-…` |
 | 9.7 | A1–A5 | A1 `test_ruff_check_finner_ingenting`, A2 og A3 `test_ruff_format_er_kjoert`, A4 `test_ci_kjoerer_ruff_foer_testene`, A5 `test_ingen_modul_i_src_bruker_meldinger` | `S/spec-9-7-…` |
 | 2.9b | S1–S6 | S1 `test_en_soeyle_per_aksje_med_kurs_fra_stoerst_fall`, S2 `test_antallet_telles_med_en_kortere_liste`, S3 `test_den_stiplede_linja_er_groenn_naar_indeksen_steg_og_roed_naar_den_falt`, S4 og S5 `test_ingen_aksje_med_rad_foer_dagen_navngis_uten_soeyler`, S6 `test_hoeyden_er_paa_endringen_slik_den_vises` | `S/spec-2-9b-…` |
