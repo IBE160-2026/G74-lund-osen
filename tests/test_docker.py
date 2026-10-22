@@ -919,9 +919,14 @@ HOEYDE_PAA_BILDET = 1630
 # Story 3.3i (U51): lenken til den ekte versjonen i demolinja i _ramme.html,
 # og fargen paa den i stil.css. Bildet ble tatt paa nytt, med samme hoeyde,
 # fordi linja fortsatt er én linje i 1280 px.
+# Story 3.4c: vurderingene i demo.py fra STARTDAG, og meldingen om en demobase
+# fra foer i index.html. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Story 2.3c: forrige_boersdag i boersdag.py. Bildet ble tatt paa nytt og
 # er byte for byte det samme. Ogsaa etter gjennomgangen av 2.3c (VG11).
-AVTRYKK_BAK_BILDET = "60c457b24f7f84e71c3ad97d9f8f17300ddf195a671f71a3e3ec12b4c0352ee4"
+# Flettingen av main inn i grenen for 2.3c (22.10 kl. 23:30): kildene fra 3.4c
+# og 2.3c sammen, saa avtrykket er regnet paa nytt (instruksjonen kl. 23:29).
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "423fc79c53d96c2435faf001ab47257969dae23aae4b3dae4c70452f2159499a"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -986,10 +991,17 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # bildet ble byte for byte det samme da det ble tatt på nytt.
 # Story 3.3i (U51): lenken i demolinja. Bildet ble tatt på nytt, med samme
 # høyde, fordi grafen slutter på samme sted.
+# Story 3.4c: vurderingene i demo.py fra STARTDAG, og meldingen om en demobase
+# fra før i app.py. Bildet ble tatt på nytt og er byte for byte det samme.
+# Gjennomgangen av 3.4c (BH1): sjekken av en gammel demobase ogsaa der den ekte
+# skal ligge, i app.py. Bildet er byte for byte det samme.
 # Story 2.3c: forrige_boersdag i boersdag.py og foerste_dag i lagrene i
 # lagring_sqlite.py. Bildet ble tatt på nytt og er byte for byte det samme.
 # Også etter gjennomgangen av 2.3c (BH4, VG11).
-AVTRYKK_BAK_AKSJESIDEN = "4afc230bd0dc9540a74a10565452e89816b406652ea99c7ce8c3e57e490606b4"
+# Flettingen av main inn i grenen for 2.3c (22.10 kl. 23:30): kildene fra 3.4c
+# og 2.3c sammen, saa avtrykket er regnet paa nytt (instruksjonen kl. 23:29).
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "fca26567a3a7237d6f8a2d143d14954d45fc9b5c91ffc1c4fe0cb1b1949035da"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "

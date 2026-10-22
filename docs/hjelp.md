@@ -121,11 +121,11 @@ Sidene sier «Eksempeltall»: 15 oppdiktede selskaper med kurser til fredag 9. o
 
 Øverst på sidene står knappene «Markedsoversikt» og «Min liste», og knappen for siden du står på, er fylt. Stjernen foran et selskap legger aksjen i Min liste, og et nytt trykk tar den ut. Demoen starter med fem merket, og siden demobasen lages på nytt hver gang demoen starter, er det de samme fem neste gang. I den ekte versjonen starter lista tom, og merkingen blir liggende til du tar den bort.
 
-Har du laget demobasen utenfor Docker før 20.10, da Min liste kom, viser sidene «Siden kan ikke vises» med `RuntimeError`. Lag den på nytt med `uv run python src/demo.py`. I Docker lages den på nytt hver gang demoen starter.
+Har du laget demobasen utenfor Docker før 22.10, sier sidene «Demobasen er laget av en eldre versjon av demoen». Lag den på nytt med `uv run python src/demo.py`. I Docker lages den på nytt hver gang demoen starter.
 
 ### Hva sa appen om en aksje tidligere?
 
-Nederst på aksjesiden står «Signalet dag for dag»: det appen skrev om aksjen hver børsdag, en måned om gangen, med retningen, T, B, I og styrken. Pilene viser måneden før og etter, så langt kursserien går. Klikk på en dag med kurs for å se hele siden for den dagen, med målingene. En dag uten vurdering står med «–» og grunnen, og dagene før første og etter siste kurs står tomme. Det gjelder både demoen og den ekte versjonen.
+Nederst på aksjesiden står «Signalet dag for dag»: det appen skrev om aksjen hver børsdag, en måned om gangen, med retningen, T, B, I og styrken. Pilene viser måneden før og etter, så langt kursserien går. Klikk på en dag med kurs for å se hele siden for den dagen, med målingene. En dag uten vurdering står med «–» og grunnen, og dagene før første og etter siste kurs står tomme. Det gjelder både demoen og den ekte versjonen. Den ekte versjonen har signal fra første henting, og dagene før står som «ikke vurdert». Demoen viser det samme: vurderingene starter mandag 21. september 2026, tre uker før siste demodag, og dagene før står som «ikke vurdert».
 
 ## Den ekte versjonen
 

@@ -591,6 +591,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-22 kl. 17:42 (gruppens svar):* de to svarene om `cd` i steg 4 under «Står du fast?», «is not recognized as the name of a cmdlet» og «Cannot find path … because it does not exist», blir ett spørsmål med begge meldingene ordrett, så «Står du fast?» har fem spørsmål, som avgjort 16.10 kl. 21:53–21:58. Det erstatter grensen på 6 fra 3.3i (`a98146b`). Det bygges i spesifikasjonen 3.3j. Gruppen prøvde også steg 3 fra 3.3i samme minutt: PowerShell åpnet fra adressefeltet i Filutforsker i den innerste mappa, og `dir` viste `README.md` og `compose.yaml` (§13 i `docs/kvalitetssikring.md`).
 
+*Avgjort 2026-10-22 kl. 19:30 (gruppens svar):* unntaket fra AD-7 i 2.3c er godkjent. Første henting på dagtid i en tom base skriver vurderingene og KI-radene for børsdagen rett før inneværende, bare når basen ikke har rader for en annen dato, og hver rad skrives én gang og regnes aldri på nytt. Uten unntaket ville en ny bruker ikke sett signalet med en gang, som avgjørelsen 2026-10-21 kl. 23:33 sier.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -1575,6 +1577,8 @@ Oppgaveplanlegging beskrives i README (regel 19).
 
 *Rettet 2026-10-22 kl. 18:51 (gjennomgangen av 2.3c, BH1, ECH2, VG1–VG3):* presiseringen over sier at dagens kurser kommer neste kveld, og at README-en sier det slik. Uten minst 12 i bonuskvoten får den dagen aldri signal: neste kveld hentes neste børsdag, og en vurdering kan bare skrives for inneværende børsdag (AD-7). Første henting bruker heller aldri bonuskvoten selv; mangler den kall, gir den 0 kall. README-en, `docs/hjelp.md` og utskriften sier det slik fra rettingen.
 
+*Avgjort 2026-10-22 kl. 19:30 (gruppens svar):* unntaket fra AD-7 i 2.3c er godkjent. Første henting på dagtid i en tom base skriver vurderingene og KI-radene for børsdagen rett før inneværende, bare når basen ikke har rader for en annen dato, og hver rad skrives én gang og regnes aldri på nytt. Uten unntaket ville en ny bruker ikke sett signalet med en gang, som avgjørelsen 2026-10-21 kl. 23:33 sier.
+
 ### Story 2.3b: Kallene som er igjen, brukes på nye forsøk
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 19:17.*
@@ -1912,6 +1916,10 @@ følger aksjene jeg bryr meg om.
 *Avgjort 2026-10-21 kl. 22:51 (gruppens svar):* rekkefølgen er 10.7 (egne nøkler), så README-rettingen etter gjennomgangen av demoen 21.10, så 2.12. README-rettingen står ikke som egen story i repoet ennå.
 
 *Avgjort 2026-10-22 kl. 00:09 (gruppens svar):* rekkefølgen er 10.7 (egne nøkler), README-rettingen, 8.6 (børsometeret), så 2.12. Det endrer rekkefølgen 2026-10-21 kl. 22:51, der 2.12 kom rett etter README-rettingen. 8.6 er fortsatt «Ekstra, hvis tiden rekker» (svaret 19.10 kl. 15:43) og flettes bare ferdig og grønt (svaret 19.10 kl. 14:48). Flettes den før den nye promptversjonen, kan børsometeret komme med i grunnlaget fra den (avgjørelsene 2026-10-21 kl. 22:57 og 23:51). Story 8.6 sier at den avhenger av 8.17 for periodene; hvordan 8.6 bygges før 8.17, avgjøres i spesifikasjonen. Gruppen meldte kl. 00:07 at børsometeret mangler i appen (U70 i `docs/ux-logg.md`).
+
+*Avgjort 2026-10-22 kl. 16:07 (gruppens svar):* de 4 kallene som er igjen av dagskvoten 22.10 i GMT, de 3 som er holdt av til egne aksjer og reserven (avgjort 21.10 kl. 18:38), går i kveld til oppslagene i `malinger.md` §40: lista over aksjene på Oslo Børs, en ticker som ikke finnes, og ett år for NEL og STB. Det erstatter svaret kl. 16:06 om NOD, NEL, SUBC og STB, fordi de fire alt er målt i §15, §16 og §28.
+
+*Lagt til 2026-10-22 kl. 22:53 (målingen etter gruppens svar 22.10 kl. 16:07, `malinger.md` §40):* lista over aksjene på Oslo Børs (`exchange-symbol-list/OL`) koster 1 kall og har 304 rader, 297 av dem «Common Stock», med alle de 15, men med navnene i juridisk form («Equinor ASA», «DnB ASA», «Var Energi ASA»). En ticker som ikke finnes, gir HTTP 404 og koster et kall. NEL og STB har 250 rader til 2026-10-22, med median omsetning de siste tre månedene på 3,9 og 96,6 MNOK. Bonuskvoten er ikke brukt.
 
 ### Story 2.13: Kommandoen som måler omsetning
 
@@ -2279,6 +2287,12 @@ avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 *Lagt til 2026-10-17 kl. 19:03:* demoen viser alle 10 fargekombinasjonene av de tre sjekkene på siste demodag (beslutningen 16.10 kl. 21:49 under story 2.12), flettet i `f21f927`, PR #58. Spesifikasjonen er `spec-3-4-alle-ti-kombinasjonene-paa-siste-demodag.md`. CI var grønn på head-en `33ca133` (kjøring 39051824634) og på main (39051953417).
 
 *Avgjort 2026-10-21 kl. 23:09 (gruppens svar):* historikken i demoen («Signalet dag for dag», 2.7b) viser det samme bildet som den ekte: signal bare fra en startdag noen uker før siste demodag, og «ikke vurdert» før. Det må passe med de 10 fargekombinasjonene på siste demodag (avgjørelsen 16.10 kl. 21:49, 3.4) og KI-tekstene i demoen (3.4b).
+
+*Avgjort 2026-10-22 kl. 18:20 (gruppens svar):* historikken i demoen som den ekte (avgjørelsen 2026-10-21 kl. 23:09, U45 i `docs/ux-logg.md`) bygges nå, før 8.6, i spesifikasjonen 3.4c.
+
+*Lagt til 2026-10-22 kl. 20:03:* historikken i demoen som den ekte er squash-flettet i `9359a70`, PR #88, låst til head-en `d58ba83` (spesifikasjonen `spec-3-4c-historikken-i-demoen.md`). Vurderingene i demoen skrives bare fra mandag 21.09, tre uker før siste demodag 09.10, og dagene før står som «ikke vurdert», slik den ekte versjonen viser dagene før første henting. Kursene, de 10 fargekombinasjonene og KI-tekstene på 09.10 er som før. En demobase fra før sier fra og viser kommandoen som lager den på nytt. Hele settet: 3097 bestått og 17 hoppet over, og CI var grønn på head-en (39827715260). Alle tre mutantene, M1–M3, ble fanget.
+
+*Avgjort 2026-10-22 kl. 20:11 (gruppens svar):* fotnoten for «ikke vurdert» (det åpne punktet ECH2 i spesifikasjonen 3.4c) får to tekster. Den ekte versjonen: «Ikke vurdert»: signalet lagres bare den kvelden kursene hentes, og regnes aldri ut bakover. Det gjelder dagene før første henting, og dager der kursene er lest inn med --les-inn. Demoen: «Ikke vurdert»: i demoen starter vurderingene mandag 21.09, slik den ekte versjonen har signal fra første henting. Datoen i demoteksten kommer fra `STARTDAG` i `src/demo.py`. Det bygges i spesifikasjonen 3.4d.
 
 ### Story 3.4b: KI-tekstene i demoen
 

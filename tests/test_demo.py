@@ -17,6 +17,7 @@ import pytest
 
 import app as app_modul
 import demo
+import demo_ki
 import fetch_prices
 import lagring_sqlite
 from aksjedetalj import bygg_detalj
@@ -46,7 +47,9 @@ FINGERAVTRYKK_KURS = "e92012b8df47f6b0e00b7cae9c0a833956da3c90d668f7ac58173410c4
 # gamle FINGERAVTRYKK_KURS) og etter 17.10: like, saa froeet og de andre dagene
 # staar som foer (gjennomgangen, BH5).
 FINGERAVTRYKK_KURS_UTEN_SISTE_DAG = "f3bb1e35ae082562dafb38e0aa5667fede6cf9d8dc296d6ac73d55b57a762e02"
-FINGERAVTRYKK_VURDERING_FOER_SISTE_DAG = "74aaaa152d4676b882e9149c4f726911fcb86a5d002bed3c777e26a84986def9"
+# Story 3.4c: vurderingene bare fra STARTDAG, 21.09, saa radene foer siste dag
+# er faerre. Var 74aaaa15....
+FINGERAVTRYKK_VURDERING_FOER_SISTE_DAG = "ee1488d3b8c771514ed2fb065c6126e4ccf4e1e30ab4ebab447a5361b1f5cf55"
 
 
 @pytest.fixture(autouse=True)
@@ -175,13 +178,15 @@ class TestDemokommandoen:
 
     def test_hver_vurdering_er_det_vurder_gir(self, mal):
         """AD-7: én rad per aksje og boersdag, lik vurder() for serien fram til
-        dagen. Ville feilet hvis en rad ble regnet paa en annen maate."""
+        dagen. Ville feilet hvis en rad ble regnet paa en annen maate.
+
+        Story 3.4c: bare fra STARTDAG, og ingen rad foer."""
         c = aapne_base(mal, kjoer_migrasjoner=False, skrivebeskyttet=True)
         try:
             kurslager = SqliteKurslager(c, demo.DEMOUNIVERS)
             lager = SqliteVurderingslager(c, lambda: datetime.now(timezone.utc), demo.DEMOUNIVERS)
             antall = c.execute("SELECT COUNT(*) FROM vurdering").fetchone()[0]
-            dager = demo.handelsdager()
+            dager = [d for d in demo.handelsdager() if d >= demo.STARTDAG]
             assert antall == len(dager) * len(demo.DEMOUNIVERS)
             for aksje in demo.DEMOUNIVERS:
                 serie = kurslager.serie(aksje.symbol)
@@ -891,3 +896,109 @@ class TestLenkenTilDenEkteVersjonen:
             html = klient.get(adresse).data.decode("utf-8")
             assert "Eksempeltall" not in html, adresse
             assert app_modul.EKTE_VERSJONEN_URL not in html and "Den ekte versjonen" not in html, adresse
+
+
+class TestHistorikkenSomDenEkte:
+    """Story 3.4c (avgjoerelsen 21.10 kl. 23:09, U45): vurderingene i demoen
+    bare fra STARTDAG, mandag 21.09, tre uker foer SLUTTDATO, slik den ekte
+    versjonen har signal bare fra foerste henting."""
+
+    def test_startdagen(self):
+        """Ville feilet hvis startdagen ble flyttet (M3)."""
+        assert demo.STARTDAG == date(2026, 9, 21) and demo.STARTDAG.weekday() == 0
+        assert (demo.SLUTTDATO - demo.STARTDAG).days == 18
+
+    def test_ingen_vurdering_foer_startdagen(self, mal):
+        """Ville feilet med en vurdering foer 21.09 (M1)."""
+        c = sqlite3.connect(mal)
+        try:
+            foer = c.execute("SELECT COUNT(*) FROM vurdering WHERE dato < ?", ("2026-09-21",)).fetchone()[0]
+            foerste = c.execute("SELECT MIN(dato) FROM vurdering").fetchone()[0]
+        finally:
+            c.close()
+        assert foer == 0 and foerste == "2026-09-21"
+
+    def test_en_rad_per_aksje_hver_boersdag_fra_startdagen(self, mal):
+        """Hver aksje har én rad hver boersdag fra 21.09 til 09.10, og hver
+        aksje med kurs den dagen har en vurdering eller en grunn. Ville feilet
+        med en boersdag etter startdagen uten vurdering (M2)."""
+        dager = [d.isoformat() for d in demo.handelsdager() if d >= date(2026, 9, 21)]
+        assert dager[0] == "2026-09-21" and dager[-1] == "2026-10-09" and len(dager) == 15
+        c = sqlite3.connect(mal)
+        try:
+            rader = c.execute("SELECT symbol, dato FROM vurdering").fetchall()
+            med_kurs = set(c.execute("SELECT symbol, dato FROM kurs WHERE dato >= ?", ("2026-09-21",)).fetchall())
+        finally:
+            c.close()
+        assert len(rader) == len(set(rader)) == len(dager) * len(demo.DEMOUNIVERS)
+        assert {(s, d) for s, d in rader} == {(a.symbol, d) for a in demo.DEMOUNIVERS for d in dager}
+        assert med_kurs <= set(rader)
+
+    def test_ikke_vurdert_i_historikken_foer_startdagen(self, klient, monkeypatch, demobase):
+        """Ville feilet hvis dagene foer 21.09 hadde signal, eller 21.09 ikke
+        hadde det."""
+        import re
+
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        html = klient.get("/aksje/KVST?maaned=2026-09").data.decode("utf-8")
+        delen = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html.split('id="signalet-dag-for-dag"', 1)[1]))
+        assert "fredag 18.09 – ikke vurdert" in delen
+        assert "mandag 21.09 – ikke vurdert" not in delen and "mandag 21.09" in delen
+
+    def test_kombinasjonene_og_ki_tekstene_paa_sluttdato_som_foer(self, mal):
+        """De 10 fargekombinasjonene og en KI-rad per aksje med vurdering paa
+        09.10, som foer 3.4c. Ville feilet hvis startdagen endret siste dag."""
+        TestAlleTiKombinasjonene().test_alle_ti_kombinasjonene_paa_sluttdato(mal)
+        c = sqlite3.connect(mal)
+        try:
+            ki = c.execute("SELECT DISTINCT dato FROM ki_logg").fetchall()
+            antall = c.execute("SELECT COUNT(*) FROM ki_logg WHERE dato = ?", ("2026-10-09",)).fetchone()[0]
+        finally:
+            c.close()
+        assert ki == [("2026-10-09",)] and antall == len(demo_ki.les_radene())
+
+    def test_en_demobase_fra_foer_sier_fra(self, klient, monkeypatch, demobase):
+        """En demobase med en vurdering foer 21.09, som foer 3.4c. Ville feilet
+        hvis den ble vist med den gamle historikken."""
+        c = aapne_base(demobase, kjoer_migrasjoner=False)
+        try:
+            klokke = datetime(2026, 9, 18, 20, 30, tzinfo=timezone.utc)
+            SqliteVurderingslager(c, lambda: klokke, demo.DEMOUNIVERS).skriv(
+                "KVST", date(2026, 9, 18), Grunn.SYMBOL_FEILET
+            )
+        finally:
+            c.close()
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        html = klient.get("/").data.decode("utf-8")
+        assert "Demobasen er laget av en eldre versjon av demoen. Lag den på nytt med" in html
+        assert "Kvitstein Mineral" not in html
+        assert klient.get("/aksje/KVST").status_code == 404
+        # Gjennomgangen (BH4, ECH4, VG5): Min liste sier det samme.
+        for adresse in ("/min-liste", "/min-liste?vis=alle"):
+            html = klient.get(adresse).data.decode("utf-8")
+            assert "Demobasen er laget av en eldre versjon av demoen." in html, adresse
+
+    def test_en_ny_demobase_sier_ikke_fra(self, klient, monkeypatch, demobase):
+        """Ville feilet hvis hver demobase ble regnet som gammel (BH4)."""
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        html = klient.get("/").data.decode("utf-8")
+        assert "eldre versjon" not in html and "Kvitstein Mineral" in html
+
+    def test_en_gammel_demobase_der_den_ekte_skal_ligge(self, klient, mal):
+        """En demobase fra foer der den ekte basen skal ligge, uten bryteren.
+        Ville feilet hvis den ble vist med den gamle historikken (BH1, ECH3,
+        VG2)."""
+        sti = Path(lagring_sqlite.BASE_STI)
+        sti.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(mal, sti)
+        c = aapne_base(sti, kjoer_migrasjoner=False)
+        try:
+            klokke = datetime(2026, 9, 18, 20, 30, tzinfo=timezone.utc)
+            SqliteVurderingslager(c, lambda: klokke, demo.DEMOUNIVERS).skriv(
+                "KVST", date(2026, 9, 18), Grunn.SYMBOL_FEILET
+            )
+        finally:
+            c.close()
+        html = klient.get("/").data.decode("utf-8")
+        assert "Demobasen er laget av en eldre versjon av demoen." in html
+        assert "Kvitstein Mineral" not in html

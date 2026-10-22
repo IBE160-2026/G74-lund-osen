@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-22T18:08
+updated: 2026-10-22T20:03
 ---
 
 # Kvalitetssikring
@@ -292,6 +292,7 @@ sist i dokumentet.
 | 10.7b En nøkkel som mangler, gir ingen rader | `286caa8` (#84) | 1 (2, M1 og M2) | – kjørt på `6d0981c` og igjen etter rettingen i `d7feed6` | `S/spec-10-7b-noekkel-som-mangler-gir-ingen-rader.md` |
 | 3.3i README-rettingen etter gjennomgangen av demoen | `a98146b` (#85) | 1 (3, M1–M3) | – kjørt på `b4a9ae2` og igjen etter rettingen i `1edd479` | `S/spec-3-3i-readme-rettingen-etter-demoen.md` |
 | 3.3j Fem spørsmål i «Står du fast?» igjen | `6d67db0` (#86) | 1 (2, M1 og M2) | – kjørt på `3252f5b` og igjen etter rettingen i `1c757b4` | `S/spec-3-3j-fem-spoersmaal-i-staar-du-fast.md` |
+| 3.4c Historikken i demoen som den ekte | `9359a70` (#88) | 1 (3, M1–M3) | – kjørt på `c137b66` og igjen etter rettingen i `c60be34` | `S/spec-3-4c-historikken-i-demoen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
 | 2.9b Søylene under hovedindeksen | `73098ed` (#63) | 1 (6, S1–S6) | – | `S/spec-2-9b-soeylene-under-hovedindeksen.md` |
@@ -508,6 +509,7 @@ funn. Antall rader i loggen:
 | 10.7b | 13 | 8 | 3 | – |
 | 3.3i | 20 | 15 | 1 | – |
 | 3.3j | 13 | 7 | 1 | – |
+| 3.4c | 11 | 6 | 1 | – |
 | 9.1, oppdatering 17.10 | 19 | 17 | 2 | – |
 | 9.7 | 19 | 13 | 6 | – |
 | 2.9b | 23 | 17 | 6 | – |
@@ -1244,6 +1246,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 10.7b | M1 og M2 | M1 `test_en_valgt_tjeneste_som_feiler_gir_ingen_tekst_fra_en_annen`, M2 `test_noekkelen_mangler`, begge også av `test_ingen_rader_og_ingen_kall` alene | `S/spec-10-7b-…` |
 | 3.3i | M1–M3 | M1 `test_ingen_lenke_i_den_ekte_versjonen`, M2 `test_err_connection_refused_under_staar_du_fast`, M3 `test_tallene_20_og_16_stemmer_med_koden`, de nye testene alene (`-k`) | `S/spec-3-3i-…` |
 | 3.3j | M1 og M2 | M1 `test_staar_du_fast_har_hoeyst_5_spoersmaal`, M2 `test_svaret_om_mellomrommet_etter_cd`, og `test_begge_meldingene_i_samme_spoersmaal` alene (`-k`) | `S/spec-3-3j-…` |
+| 3.4c | M1–M3 | M1 `test_ingen_vurdering_foer_startdagen`, M2 `test_en_rad_per_aksje_hver_boersdag_fra_startdagen`, M3 `test_startdagen`, de nye testene alene (`-k`) | `S/spec-3-4c-…` |
 | 9.1 | Q1–Q4 | Q1, Q3 og Q4 `test_hver_ferdige_spesifikasjon_har_en_rad`, Q2 `test_hver_test_dokumentene_nevner_finnes` | `S/spec-9-1-…` |
 | 9.7 | A1–A5 | A1 `test_ruff_check_finner_ingenting`, A2 og A3 `test_ruff_format_er_kjoert`, A4 `test_ci_kjoerer_ruff_foer_testene`, A5 `test_ingen_modul_i_src_bruker_meldinger` | `S/spec-9-7-…` |
 | 2.9b | S1–S6 | S1 `test_en_soeyle_per_aksje_med_kurs_fra_stoerst_fall`, S2 `test_antallet_telles_med_en_kortere_liste`, S3 `test_den_stiplede_linja_er_groenn_naar_indeksen_steg_og_roed_naar_den_falt`, S4 og S5 `test_ingen_aksje_med_rad_foer_dagen_navngis_uten_soeyler`, S6 `test_hoeyden_er_paa_endringen_slik_den_vises` | `S/spec-2-9b-…` |

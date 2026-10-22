@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-10-22T17:14
+updated: 2026-10-22T20:03
 ---
 
 # UX-loggen
@@ -585,3 +585,5 @@ Hvert funn er slått opp i koden 20.10 før det ble skrevet.
 *Lagt til 2026-10-22 kl. 17:14:* U52 er løst i `a98146b`: «Til faglærer» sier at demoen viser så mye som mulig, og inviterer til å prøve ekte kurser etterpå. «Vi anbefaler demoen» står.
 
 *Lagt til 2026-10-22 kl. 17:14:* U55 er løst i `a98146b`: pila til den ekte versjonen sier at appen er gratis, at gratiskontoen hos EODHD gir 20 kall i døgnet og kurser ett år tilbake, at en henting bruker 16 og de 4 som er igjen går til nye forsøk, og at et betalt abonnement gir fra 100 000 kall i døgnet, med lenke til prisene og datoen de ble lest. «Opptil 18 aksjer» står i `docs/hjelp.md` som før.
+
+*Lagt til 2026-10-22 kl. 20:03:* U45 er løst i `9359a70`, PR #88 (story 3.4c): vurderingene i demoen skrives bare fra mandag 21.09, tre uker før siste demodag 09.10, og «Signalet dag for dag» viser «ikke vurdert» før, slik den ekte versjonen viser dagene før første henting.
