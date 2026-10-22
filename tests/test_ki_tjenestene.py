@@ -359,9 +359,10 @@ class TestSvaret:
 class TestFeil:
     @pytest.mark.parametrize("noekkel", ["", "   "])
     def test_noekkelen_mangler(self, tjeneste, noekkel):
-        """Story 10.7: ingen tekst og en rad med grunnen, og tjenesten
-        kalles ikke. Ville feilet hvis tjenesten ble kalt uten noekkel, eller
-        raden ikke sa hvilken variabel som mangler."""
+        """Adapteren alene, uten sjekken foer foerste kall: ingen tekst og en
+        rad med grunnen, og tjenesten kalles ikke. I hentingen stopper sjekken
+        steget foer dette, uten rader (10.7b). Ville feilet hvis tjenesten ble
+        kalt uten noekkel, eller raden ikke sa hvilken variabel som mangler."""
         modul = TJENESTENE[tjeneste][1]
         hent = FalskHent(TJENESTENE[tjeneste][2]())
         rad = rad_for(modell_for(tjeneste, hent, noekkel))
@@ -579,11 +580,13 @@ class TestIngenOvergang:
         kode, _, utskrift = kjoer(raa, base, modell)
         assert kode == 0
         rader = [r for r in radene(base).values() if r is not None]
-        assert len(rader) == 15
+        # 10.7b: en noekkel som mangler, gir ingen rader (gruppens svar 22.10 kl. 14:38).
+        assert len(rader) == (0 if feil == "noekkel" else 15)
         assert all(r.tekst is None and r.tjeneste == tjeneste for r in rader)
         assert kalt == []
         assert len(hent.kall) == (0 if feil == "noekkel" else 1)
-        assert f"({tjeneste}, " in utskrift
+        if feil != "noekkel":
+            assert f"({tjeneste}, " in utskrift
 
     def test_valget_uten_noekkel_gir_den_valgte(self, tjeneste):
         """Ville feilet hvis en noekkel som mangler ga lokal, eller ingen modell."""

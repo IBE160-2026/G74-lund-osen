@@ -57,6 +57,12 @@ class OpenAIModell:
     def __repr__(self) -> str:
         return f"OpenAIModell(modell={self.modell!r})"
 
+    def sjekk(self) -> str | None:
+        """Grunnen naar noekkelen mangler eller ikke kan sendes, ellers None,
+        uten kall. lag_ki_tekster kaller den foer foerste tekst, som for
+        Ollama, og sier den nei, skrives ingen rader (spesifikasjonen 10.7b)."""
+        return ki_sky.noekkel_feil(self._noekkel, NOEKKEL_VARIABEL)
+
     def lag_tekst(self, prompt: str) -> Modellsvar:
         ki_sky.sjekk_noekkel(self._noekkel, NOEKKEL_VARIABEL)
         headere = {"Content-Type": "application/json", "Authorization": f"Bearer {self._noekkel}"}
