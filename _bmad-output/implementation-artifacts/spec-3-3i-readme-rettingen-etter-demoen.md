@@ -82,6 +82,8 @@ context:
 - **`tests/test_utseende.py` godtar lenken til README-en på GitHub** som en `<a href>` på sidene med demomerket, ved siden av investorsidene. Den laster ingenting. Testene der er ikke med i testene for dokumentene, og hele settet fant det etter triagen: fem feil i tre tester.
 - **Tallet 20** kommer fra EODHD (`dailyRateLimit` i `/api/user`), ikke fra en konstant i koden. Testen binder det til docstringen i `fetch_prices.py` og til de 4 kallene i hjelpen, og «med de 15» i hjelpen til lista (ECH10).
 
+*Rettet 2026-10-22 kl. 17:24:* den første kjøringen av hele settet hadde 5 feil: 3 tester i `tests/test_utseende.py` og 2 i `tests/test_kvalitetssikring.py`, fordi testen av «Står du fast?» hadde fått nytt navn. Punktet over om `tests/test_utseende.py` sier «fem feil i tre tester».
+
 ## Mutantene, kjørt
 
 I en fersk klon med `core.autocrlf=false`, slettet etterpå, én om gangen med `-x`, med kopi før og sha256 lik HEAD etter hver. Kjørt på `b4a9ae2` og igjen på `1edd479`, med `tests/test_docker.py` og `tests/test_demo.py`, og en gang til med bare de nye testene (`-k`) (VG7).
