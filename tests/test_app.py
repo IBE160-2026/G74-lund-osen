@@ -1214,6 +1214,8 @@ class TestVurderingenPaaOversikten:
         assert "Ukjent" in rad[4]
         # Story 3.4d (gruppens svar 22.10 kl. 20:11): den ekte teksten.
         assert "signalet lagres bare den kvelden kursene hentes" in html
+        # Ville feilet med demoteksten i den ekte versjonen (M2).
+        assert "i demoen starter vurderingene" not in html and "--les-inn" in html
         assert "--les-inn" in html
 
     def test_ingen_fotnote_naar_alle_er_vurdert(self, klient, monkeypatch):
@@ -1370,6 +1372,8 @@ class TestVurderingenIDetaljen:
         assert "ikke vurdert" in html
         # Story 3.4d (gruppens svar 22.10 kl. 20:11): den ekte teksten.
         assert "signalet lagres bare den kvelden kursene hentes" in html
+        # Ville feilet med demoteksten i den ekte versjonen (M2).
+        assert "i demoen starter vurderingene" not in html and "--les-inn" in html
         # Tabellen, ikke hjelpeteksten om kolonnen (story 8.0b).
         assert "<th>Målt mot</th>" not in html
 
