@@ -583,6 +583,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-22 kl. 00:09 (gruppens svar):* rekkefølgen er 10.7 (egne nøkler), README-rettingen, 8.6 (børsometeret), så 2.12. Det endrer rekkefølgen 2026-10-21 kl. 22:51, der 2.12 kom rett etter README-rettingen. 8.6 er fortsatt «Ekstra, hvis tiden rekker» (svaret 19.10 kl. 15:43) og flettes bare ferdig og grønt (svaret 19.10 kl. 14:48). Flettes den før den nye promptversjonen, kan børsometeret komme med i grunnlaget fra den (avgjørelsene 2026-10-21 kl. 22:57 og 23:51). Story 8.6 sier at den avhenger av 8.17 for periodene; hvordan 8.6 bygges før 8.17, avgjøres i spesifikasjonen. Gruppen meldte kl. 00:07 at børsometeret mangler i appen (U70 i `docs/ux-logg.md`).
 
+*Avgjort 2026-10-22 kl. 14:38 (gruppens svar):* to svar etter 10.7. a) Modellene til Anthropic og OpenAI er Claude Haiku 5.5 (`claude-haiku-5-5`) og GPT-6 Luna (`gpt-6-luna`), som spesifikasjonen 10.7 valgte. Det åpne punktet er lukket. b) Mangler nøkkelen, skrives ingen rader, som når Ollama ikke kjører: hentingen sier hvilken variabel som mangler, og man kan legge den inn og hente igjen samme kveld. En feil hos tjenesten etter kallet gir fortsatt en rad med grunnen. Det endrer kontrollpunktet i story 10.7 om at en nøkkel som mangler, gir en rad. Det bygges i spesifikasjonen 10.7b.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -2837,6 +2839,8 @@ egne nøkler (regel 19). Punktet fra 3.3 om egne nøkler gjelder her.
 *Avgjort 2026-10-21 kl. 22:51 (gruppens svar):* rekkefølgen er 10.7 (egne nøkler), så README-rettingen etter gjennomgangen av demoen 21.10, så 2.12. README-rettingen står ikke som egen story i repoet ennå.
 
 *Lagt til 2026-10-22 kl. 10:44:* egne nøkler er squash-flettet i `6b39b80`, PR #83, låst til head-en `98d0853` (spesifikasjonen `spec-10-7-egen-noekkel-til-gemini-anthropic-og-openai.md`). `OSE_KI_TJENESTE` velger `gemini`, `anthropic` eller `openai`, og nøkkelen leses fra `OSE_KI_GEMINI_NOKKEL`, `OSE_KI_ANTHROPIC_NOKKEL` eller `OSE_KI_OPENAI_NOKKEL` og sendes bare i en header. Modellen til Gemini er Gemini 3.5 Flash-Lite, som avgjørelsen 04.10 sier, og modellene til Anthropic og OpenAI er valgt i spesifikasjonen og står som åpent punkt der. En nøkkel som mangler, eller en tjeneste som feiler, gir ingen tekst og en rad i loggen, uten overgang til en annen tjeneste. Hele settet: 3039 bestått og 17 hoppet over, og CI var grønn på head-en (39749617187). Alle elleve mutantene, M1–M3 og N1–N8, ble fanget.
+
+*Avgjort 2026-10-22 kl. 14:38 (gruppens svar):* to svar etter 10.7. a) Modellene til Anthropic og OpenAI er Claude Haiku 5.5 (`claude-haiku-5-5`) og GPT-6 Luna (`gpt-6-luna`), som spesifikasjonen 10.7 valgte. Det åpne punktet er lukket. b) Mangler nøkkelen, skrives ingen rader, som når Ollama ikke kjører: hentingen sier hvilken variabel som mangler, og man kan legge den inn og hente igjen samme kveld. En feil hos tjenesten etter kallet gir fortsatt en rad med grunnen. Det endrer kontrollpunktet i story 10.7 om at en nøkkel som mangler, gir en rad. Det bygges i spesifikasjonen 10.7b.
 
 ### Story 10.8: ChatGPT med «Sign in with ChatGPT»
 

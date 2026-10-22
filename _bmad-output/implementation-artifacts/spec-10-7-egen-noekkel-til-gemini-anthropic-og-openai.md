@@ -173,6 +173,8 @@ Gjennomgang 22.10 på diffen `92ead71..c3be49c`. Linsene var Blind Hunter (BH, 1
 - **En nøkkel som mangler** gir rader for dagen, etter story 10.7. En `sjekk` før første kall, som for Ollama (svar c kl. 23:32), ville latt brukeren legge inn nøkkelen og kjøre igjen samme kveld (ECH11). Det er gruppens valg.
 - **Vilkårene** ble lest 04.10 og 05.10 (`docs/kilder-og-rettigheter.md`), og er ikke lest på nytt her.
 
+*Avgjort 2026-10-22 kl. 14:38 (gruppens svar):* de to første punktene over er avgjort. Modellene er Claude Haiku 5.5 (`claude-haiku-5-5`) og GPT-6 Luna (`gpt-6-luna`), som valgt her, og det åpne punktet er lukket. Mangler nøkkelen, skrives ingen rader, som når Ollama ikke kjører: hentingen sier hvilken variabel som mangler, og man kan legge den inn og hente igjen samme kveld. En feil hos tjenesten etter kallet gir fortsatt en rad med grunnen. Det snur avvisningen av ECH11 og bygges i spesifikasjonen 10.7b.
+
 ## Det som ikke endres
 
 - Ingen test går på nett, og ingen test kaller en ekte tjeneste (`AD-8`). Ingen API-kall utover kvotesjekken.
