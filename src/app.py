@@ -38,6 +38,7 @@ from flask import Flask, abort, g, redirect, render_template, request
 import lagring_sqlite
 from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
 from boersdag import norsk_dato
+from boersometer import bygg_boersometer, bygg_rute
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, gammel_demobase
 from graf import bygg_graf
 from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
@@ -185,7 +186,7 @@ def _migrer_en_gang(sti: Path) -> None:
 
 # Rutene som leser basen. Andre forespoersler (404, statiske filer) roerer den
 # ikke. Story 8.3: Min liste og merkingen, som er den eneste ruta som skriver.
-_RUTER_MED_BASE = {"markedsoversikt", "aksjedetalj", "min_liste", "merk"}
+_RUTER_MED_BASE = {"markedsoversikt", "aksjedetalj", "min_liste", "merk", "boersometer"}
 
 # Story 8.3: ruta som skriver merkingen. Bare den aapner en demobase for
 # skriving, og bare tabellen min_liste skrives (AD-3, AD-10).
@@ -470,6 +471,98 @@ def min_liste():
 # Story 8.3: siden man staar paa, som knapperaden i stripa fyller.
 OVERSIKT = "oversikt"
 MIN_LISTE_SIDE = "min_liste"
+# Story 8.6: børsometeret, mellom de to i stripa.
+BOERSOMETER = "boersometer"
+_DAG = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
+
+
+@app.route("/boersometer")
+def boersometer():
+    """Story 8.6, FR-106: én rute per aksje i lista, ordnet etter bransje,
+    for siste børsdag eller dagen fra «Velg dag» (?dag=ÅÅÅÅ-MM-DD). Kursene
+    og vurderingene leses gjennom portene som finnes, uten ny tabell, og
+    webserveren henter aldri (AD-10). En dag uten kurs gir den siste
+    børsdagen med kurs før den. Hovedindeksen står for siste børsdag, som på
+    oversikten."""
+    felles = {"aktiv": BOERSOMETER}
+    if g.get("basefeil"):
+        return _basen_kan_ikke_aapnes()
+    if g.get("demo_mangler"):
+        return render_template(
+            "boersometer.html",
+            bransjer=[],
+            dato=None,
+            hentet=None,
+            demokommando=demokommando(),
+            demo_gammel=g.get("demo_gammel", False),
+            **felles,
+        )
+    leser = _leser_eller_basefeil()
+    if leser is None:
+        return render_template(
+            "boersometer.html",
+            bransjer=[],
+            dato=None,
+            hentet=None,
+            hentekommando=hentekommando(),
+            demokommando=demokommando() if demo_paa() else None,
+            **felles,
+        )
+    oversiktsleser = _leser_eller_basefeil(hent_oversiktsleser)
+    poster = oversiktsleser.oversikt()
+    serier = {post.aksje.symbol: leser.serie(post.aksje.symbol) for post in poster}
+    datoer = sorted({rad.dato for serie in serier.values() for rad in serie})
+    if not datoer:
+        return render_template(
+            "boersometer.html", bransjer=[], dato=None, hentet=None, hentekommando=hentekommando(), **felles
+        )
+    siste = datoer[-1]
+    oenske = request.args.get("dag", "")
+    valgt, ugyldig = None, False
+    if oenske:
+        if _DAG.fullmatch(oenske):
+            try:
+                valgt = date.fromisoformat(oenske)
+            except ValueError:
+                ugyldig = True
+        else:
+            ugyldig = True
+    dagen = siste
+    if valgt is not None:
+        foer = [d for d in datoer if d <= valgt]
+        dagen = foer[-1] if foer else datoer[0]
+    i_dag = idag()
+    ruter = [
+        bygg_rute(
+            post.aksje,
+            [rad for rad in serier[post.aksje.symbol] if rad.dato <= dagen],
+            oversiktsleser.vurdering(post.aksje.symbol, dagen),
+            dagen,
+            i_dag,
+        )
+        for post in poster
+    ]
+    bransjer = bygg_boersometer(ruter)
+    rader = bygg_oversikt(poster, i_dag, STANDARD)
+    tre_av_tre = frozenset(rad.aksje.symbol for rad in rader if rad.styrke == ANTALL_SJEKKER)
+    hovedindeks, indeks_feilet = _hovedindeks(leser, poster, tre_av_tre)
+    return render_template(
+        "boersometer.html",
+        bransjer=bransjer,
+        antall_aksjer=len(ruter),
+        dagen=dagen,
+        siste=siste,
+        foerste=datoer[0],
+        valgt=valgt,
+        ugyldig=ugyldig,
+        # Delmalen for hovedindeksen setter datoen ved verdien naar indeksen
+        # staar paa en annen dag enn siden, som paa oversikten.
+        dato=dagen,
+        hentet=sidens_tidsstempel(rader),
+        hovedindeks=hovedindeks,
+        indeks_feilet=indeks_feilet,
+        **felles,
+    )
 
 
 def _tabellsiden(aktiv: str):

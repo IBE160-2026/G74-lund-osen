@@ -43,6 +43,10 @@ MARKEDSOVERSIKT = "src/markedsoversikt.py"
 AKSJEDETALJ = "src/aksjedetalj.py"
 APP = "src/app.py"
 INDEX_MAL = "src/templates/index.html"
+# Story 8.6: hovedindeksen og søylene står i en delmal, som oversikten og
+# børsometeret bruker.
+HOVEDINDEKS_MAL = "src/templates/_hovedindeks.html"
+BOERSOMETER = "src/boersometer.py"
 HOVEDINDEKS = "src/hovedindeks.py"
 GRAF = "src/graf.py"
 AKSJE_MAL = "src/templates/aksje.html"
@@ -157,6 +161,19 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (AKSJE_MAL, 'class="kurslinje"'),
             ),
         ),
+        # Story 8.6 (FR-106, avgjørelsen 22.10 kl. 23:19): børsometeret.
+        "boersometeret": Hjelpetekst(
+            "Børsometer:",
+            "én rute per aksje, ordnet etter bransje, med endringen fra børsdagen før som farge. "
+            f"Ruta er større når volumet var minst {faktor} ganger vanlig, mindre når det var under "
+            "vanlig, og rammen er gul ved 3 av 3 og mørk ved 2 av 3. Overskriften har snittet av "
+            "endringen for aksjene i bransjen, og «1 aksje» der det er én.",
+            (
+                (PRD, "#### FR-106 — Børsometeret"),
+                (BOERSOMETER, "def stoerrelse("),
+                (BOERSOMETER, "def snitt("),
+            ),
+        ),
         # Story 2.9 (FR-104): delen over tabellen.
         "hovedindeksen": Hjelpetekst(
             "Hovedindeksen:",
@@ -182,7 +199,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (PRD, "#### FR-105 — Søylene under hovedindeksen"),
                 (PRD, "Indeksens endring er en stiplet linje, grønn når indeksen steg og rød når den"),
                 (HOVEDINDEKS, "def bygg_soeyler("),
-                (INDEX_MAL, 'class="indekslinje'),
+                (HOVEDINDEKS_MAL, 'class="indekslinje'),
             ),
         ),
         "sluttkurs": Hjelpetekst(

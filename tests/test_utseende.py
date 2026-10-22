@@ -310,6 +310,8 @@ class TestRammen:
                 # Story 8.15: sorteringen er en parameter på /.
                 assert (
                     href in ("/", "/min-liste", "/min-liste?vis=alle")
+                    # Story 8.6: børsometeret, fra knappen i stripa.
+                    or href == "/boersometer"
                     # Story 10.5: lenken til investorsiden for aksjen.
                     or href in INVESTORSIDER.values()
                     # Story 3.3i (U51): den ekte versjonen i README-en, bare i demoen.
@@ -901,7 +903,8 @@ class TestStilarket:
             sider += 1
             treff = re.findall(r"\{% block side %\}(side-[a-z]+)\{% endblock %\}", tekst)
             assert len(treff) == 1 and treff[0] in brukt, (malfil.name, treff)
-        assert sider == 3
+        # Story 8.6: børsometeret er den fjerde siden.
+        assert sider == 4
 
     def test_fargene_staar_bare_i_root(self):
         """Ville feilet med en farge skrevet fast utenfor :root i stilarket,

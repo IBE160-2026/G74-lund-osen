@@ -926,7 +926,10 @@ HOEYDE_PAA_BILDET = 1630
 # Flettingen av main inn i grenen for 2.3c (22.10 kl. 23:30): kildene fra 3.4c
 # og 2.3c sammen, saa avtrykket er regnet paa nytt (instruksjonen kl. 23:29).
 # Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "423fc79c53d96c2435faf001ab47257969dae23aae4b3dae4c70452f2159499a"
+# Story 8.6: knappen «Børsometer» i stripa, hovedindeksen flyttet til delmalen
+# _hovedindeks.html og hjelpen til børsometeret. Bildet ble tatt paa nytt med
+# samme hoeyde, og viser den nye knappen.
+AVTRYKK_BAK_BILDET = "541fd85ddc09af5003f97e107478de07a1f495699d1f1ddd0106111dc6d43597"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -978,7 +981,8 @@ FILENE_BAK_AKSJESIDEN = (
 )
 # Moduler appen og demoen importerer, men som ikke lager noe aksjesiden viser:
 # lagring_sqlite henter DATA_KATALOG fra lagring_fil, som importerer eodhd.
-IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py"}
+# Story 8.6: boersometer.py bygger bare børsometeret.
+IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py", "src/boersometer.py"}
 # Bildet er saa hoeyt at grafen, som staar under KI-teksten, er med til bunnen.
 # Story 8.3: 1872 med knapperaden i stripa. Var 1816.
 HOEYDE_PAA_AKSJESIDEN = 1872
@@ -1001,7 +1005,10 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # Flettingen av main inn i grenen for 2.3c (22.10 kl. 23:30): kildene fra 3.4c
 # og 2.3c sammen, saa avtrykket er regnet paa nytt (instruksjonen kl. 23:29).
 # Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "fca26567a3a7237d6f8a2d143d14954d45fc9b5c91ffc1c4fe0cb1b1949035da"
+# Story 8.6: knappen «Børsometer» i stripa, og ruta og hjelpen til
+# børsometeret i app.py og hjelpetekster.py. Bildet ble tatt på nytt med
+# samme høyde, og viser den nye knappen.
+AVTRYKK_BAK_AKSJESIDEN = "11bbb65d60b9c78720b0d8facd76c0910ee3028edc47b8ea7b794ac24a8fb522"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "
