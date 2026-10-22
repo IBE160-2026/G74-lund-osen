@@ -2,7 +2,7 @@
 title: 'Story 3.3 (3.3i): README-rettingen etter gruppens gjennomgang av demoen 21.10'
 type: 'feature'
 created: '2026-10-22'
-status: 'ready-for-dev'
+status: 'review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '02a51bb'
@@ -67,6 +67,56 @@ context:
 - **M1:** lenken også i den ekte versjonen.
 - **M2:** ERR_CONNECTION_REFUSED borte fra «Står du fast?».
 - **M3:** 16 byttet med 15 i README-en.
+
+## Avgjort underveis
+
+- **«Står du fast?» har høyst 6 spørsmål, ikke 5** (VG1). Grensen på 5 er fra beslutningen 16.10 kl. 21:53–21:58 og svarene 18.10 kl. 15:37 (story 3.3d). Instruksjonen kl. 16:06 ber om et svar under «Står du fast?» på at 127.0.0.1 nektet å koble til (U13), og det passer ikke inn i noen av de fem: de gjelder Docker, ZIP-fila og mappa, ikke nettleseren. Testen heter nå `test_staar_du_fast_har_hoeyst_6_spoersmaal`, med grunnen i docstringen, og spørsmålet står i `BEHOLDT_I_README` foran «no configuration file provided» (`6fb1f32`). Gruppen kan velge å slå det sammen med et annet i stedet.
+- **`ERR_CONNECTION_REFUSED` står i svaret, ikke i spørsmålet.** Testen av pilene godtar ikke `_` i en `<summary>`, og meldingen står i kodeformat i svaret, så den kan søkes opp. Spørsmålet er «Nettleseren sier at 127.0.0.1 nektet å koble til.», det samme i `docs/hjelp.md`. Svaret sier også at andre nettlesere sier det med andre ord (BH4). Hva Firefox og Safari skriver, er ikke slått opp, så det siteres ikke (regel 11).
+- **«Resource Saver mode» står også i det første svaret under «Står du fast?»**, fordi testen av det svaret krever alt som står i svaret om «Engine running» i `docs/hjelp.md`.
+- **Demolinja** er «Ekte kurser trenger en gratis nøkkel fra EODHD: se Den ekte versjonen.», med lenken på «Den ekte versjonen». Med «i README-en» til slutt brøt linja over to linjer i 1280 px og flyttet sidene 18 px ned (målt 1648 og 1890 px mot 1630 og 1872), så bildene ville fått ny høyde. Uten de ordene er den én linje, og høydene står.
+- **Bildene** ble tatt på nytt, med samme høyde, fordi `_ramme.html` og `stil.css` er med i avtrykkene bak dem. `AVTRYKK_BAK_BILDET` og `AVTRYKK_BAK_AKSJESIDEN` er satt på nytt i `16d9d63`.
+- **Avtrykkene av pilene** (`AVTRYKK_I_PILENE` i `tests/test_docker.py`, VG2):
+  - «Den ekte versjonen»: avsnittet om at appen er gratis, og hva gratiskontoen og et betalt abonnement hos EODHD gir, står foran steg 5 (U55, `16d9d63`), og fra rettingen at de 4 kallene som er igjen, går til nye forsøk (BH5, `1edd479`). Stegene står uendret. Var `fd359e96…`, så `36cc2505…`, og er `542c8991…`.
+  - «Demoen»: steg 6 sier at demolinja har en lenke til den ekte versjonen (VG8, `1edd479`). Var `b3f50242…`, og er `f124a92b…`.
+- **Steg 3 har Start-menyen som den andre veien** på Windows, med «ikke ISE og ikke som administrator» der, fordi adressefeltet ikke er prøvd på Windows 11 av oss (BH2, VG5). Fra adressefeltet gjør man bare kontrollen i steg 4.
+- **Tallet 20** kommer fra EODHD (`dailyRateLimit` i `/api/user`), ikke fra en konstant i koden. Testen binder det til docstringen i `fetch_prices.py` og til de 4 kallene i hjelpen, og «med de 15» i hjelpen til lista (ECH10).
+
+## Mutantene, kjørt
+
+I en fersk klon med `core.autocrlf=false`, slettet etterpå, én om gangen med `-x`, med kopi før og sha256 lik HEAD etter hver. Kjørt på `b4a9ae2` og igjen på `1edd479`, med `tests/test_docker.py` og `tests/test_demo.py`, og en gang til med bare de nye testene (`-k`) (VG7).
+
+| # | Mutant | Først i fila (`1edd479`) | De nye testene alene |
+|---|---|---|---|
+| M1 | Lenken også i den ekte versjonen, utenfor blokken for demoen i `_ramme.html` | `test_bildet_tas_paa_nytt_naar_oversikten_endres` | `test_ingen_lenke_i_den_ekte_versjonen` |
+| M2 | `ERR_CONNECTION_REFUSED` borte fra svaret under «Står du fast?» | `test_like_spoersmaal_har_samme_svar` | `test_err_connection_refused_under_staar_du_fast` |
+| M3 | 16 byttet med 15 i pila til den ekte versjonen | `test_innholdet_i_pilene_er_det_samme_som_foer` | `test_tallene_20_og_16_stemmer_med_koden` |
+
+## Gjennomgangen
+
+Gjennomgang 22.10 på diffen `02a51bb..b4a9ae2`. Linsene var Blind Hunter (BH, 8 funn, bare diffen), Edge Case Hunter (ECH, 11 funn) og Verification Gap (VG, 9 funn), hver for seg og uten å endre noe i repoet. 28 funn ble 20 rader. Fem hadde dom medium, og alle er rettet, i `1edd479` og her.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH1, ECH1, VG4 | Hjelpen sa at man slipper steg 4 fra adressefeltet, og hoppet over kontrollen med `dir` | medium | rettet: man slipper `cd`, men gjør kontrollen |
+| BH2, VG5 | Steg 3 hadde bare adressefeltet, og advarslene om ISE og administrator sto ved feil vei | medium | rettet: Start-menyen som den andre veien, med advarslene |
+| VG3, ECH3 | Bildeteksten i steg 4 hadde bare det gamle tegnet, navnet foran `>` | medium | rettet: «Sjekk med `dir` eller `ls`.» (høyst 25 ord, og setningen om `>` er bundet av en test) |
+| VG1 | Grensen 5 ble 6 uten at spesifikasjonen sa det | medium | rettet under «Avgjort underveis» |
+| VG2 | Avtrykket av pila ble endret uten grunnen i spesifikasjonen | medium | rettet under «Avgjort underveis» |
+| BH3, ECH4 | «Da står vinduet i en annen mappe» kom etter setningen om ISE | low | rettet |
+| BH4 | Spørsmålet passer bare meldingen fra Chrome og Edge | low | rettet: «Andre nettlesere sier det med andre ord.» uten å sitere dem |
+| BH5, ECH11 | «ikke flere enn 16» sa ikke at resten går til nye forsøk | low | rettet |
+| ECH2 | Ingenting sa hva man gjør når `dir` ikke viser filene | low | rettet i hjelpen: `cd G74-lund-osen-main` fra den ytre |
+| ECH5 | Tallet står på den ytre mappa, og «slett de gamle» kunne slette `.env` | low | rettet i hjelpen |
+| ECH10 | 20 er bundet til en docstring, og «med de 15» ikke til lista | low | rettet: lista er bundet; 20 kommer fra EODHD, under «Avgjort underveis» |
+| VG7 | Det sto ikke hvilken test som fanget mutantene | low | rettet: tabellen over |
+| VG6 | Steg 2 og 4 mistet de engelske navnene og «den innerste hvis det er to» | low | avvist: stegene er på grensen på 65 ord; de engelske navnene står i hjelpen, og «den innerste» i steg 3 |
+| BH6, VG9, ECH8 | Testen av den ekte versjonen ser bare på `/` og `/min-liste` | low | uten endring: lenken står i én felles ramme for alle sidene |
+| ECH6 | PowerShell fra adressefeltet arver rettighetene til Filutforsker | low | uten endring: fra adressefeltet trengs ikke dra og slipp |
+| BH7 | Invitasjonen var tung å lese | nit | rettet |
+| BH8 | Spesifikasjonen sto i `ready-for-dev` | nit | rettet: `review` |
+| VG8 | Steg 6 i demoen nevnte ikke lenken i demolinja | nit | rettet |
+| ECH7 | Demolinja har lite å gå på i 1280 px, og fokus på lenken | nit | uten endring: linja kan bryte uten fast høyde, og fokusrammen finnes alt |
+| ECH9 | Ankeret åpner ikke pila på GitHub | nit | uten endring: README-en sier at man klikker på pila |
 
 ## Det som ikke endres
 
