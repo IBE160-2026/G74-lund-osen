@@ -125,7 +125,7 @@ Har du laget demobasen utenfor Docker før 20.10, da Min liste kom, viser sidene
 
 ### Hva sa appen om en aksje tidligere?
 
-Nederst på aksjesiden står «Signalet dag for dag»: det appen skrev om aksjen hver børsdag, en måned om gangen, med retningen, T, B, I og styrken. Pilene viser måneden før og etter, så langt kursserien går. Klikk på en dag med kurs for å se hele siden for den dagen, med målingene. En dag uten vurdering står med «–» og grunnen, og dagene før første og etter siste kurs står tomme. Det gjelder både demoen og den ekte versjonen.
+Nederst på aksjesiden står «Signalet dag for dag»: det appen skrev om aksjen hver børsdag, en måned om gangen, med retningen, T, B, I og styrken. Pilene viser måneden før og etter, så langt kursserien går. Klikk på en dag med kurs for å se hele siden for den dagen, med målingene. En dag uten vurdering står med «–» og grunnen, og dagene før første og etter siste kurs står tomme. Det gjelder både demoen og den ekte versjonen. Den ekte versjonen har signal fra første henting, og dagene før står som «ikke vurdert». Demoen viser det samme: aksjene har signal fra mandag 21. september 2026, tre uker før siste demodag, og «ikke vurdert» før.
 
 ## Den ekte versjonen
 

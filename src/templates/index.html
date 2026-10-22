@@ -295,7 +295,7 @@
   {% elif demokommando %}
     {% if aktiv != "min_liste" %}<h1 class="overskrift">Markedsoversikt</h1>{% endif %}
     <p>
-      Demobasen finnes ikke ennå. Lag den med <code>{{ demokommando }}</code>.
+      {% if demo_gammel %}Demobasen er laget av en eldre versjon av demoen. Lag den på nytt med <code>{{ demokommando }}</code>.{% else %}Demobasen finnes ikke ennå. Lag den med <code>{{ demokommando }}</code>.{% endif %}
     </p>
   {% else %}
     {% if aktiv != "min_liste" %}<h1 class="overskrift">Markedsoversikt</h1>{% endif %}

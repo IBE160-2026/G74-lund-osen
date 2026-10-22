@@ -46,7 +46,9 @@ FINGERAVTRYKK_KURS = "e92012b8df47f6b0e00b7cae9c0a833956da3c90d668f7ac58173410c4
 # gamle FINGERAVTRYKK_KURS) og etter 17.10: like, saa froeet og de andre dagene
 # staar som foer (gjennomgangen, BH5).
 FINGERAVTRYKK_KURS_UTEN_SISTE_DAG = "f3bb1e35ae082562dafb38e0aa5667fede6cf9d8dc296d6ac73d55b57a762e02"
-FINGERAVTRYKK_VURDERING_FOER_SISTE_DAG = "74aaaa152d4676b882e9149c4f726911fcb86a5d002bed3c777e26a84986def9"
+# Story 3.4c: vurderingene bare fra STARTDAG, 21.09, saa radene foer siste dag
+# er faerre. Var 74aaaa15....
+FINGERAVTRYKK_VURDERING_FOER_SISTE_DAG = "ee1488d3b8c771514ed2fb065c6126e4ccf4e1e30ab4ebab447a5361b1f5cf55"
 
 
 @pytest.fixture(autouse=True)
@@ -175,13 +177,15 @@ class TestDemokommandoen:
 
     def test_hver_vurdering_er_det_vurder_gir(self, mal):
         """AD-7: én rad per aksje og boersdag, lik vurder() for serien fram til
-        dagen. Ville feilet hvis en rad ble regnet paa en annen maate."""
+        dagen. Ville feilet hvis en rad ble regnet paa en annen maate.
+
+        Story 3.4c: bare fra STARTDAG, og ingen rad foer."""
         c = aapne_base(mal, kjoer_migrasjoner=False, skrivebeskyttet=True)
         try:
             kurslager = SqliteKurslager(c, demo.DEMOUNIVERS)
             lager = SqliteVurderingslager(c, lambda: datetime.now(timezone.utc), demo.DEMOUNIVERS)
             antall = c.execute("SELECT COUNT(*) FROM vurdering").fetchone()[0]
-            dager = demo.handelsdager()
+            dager = [d for d in demo.handelsdager() if d >= demo.STARTDAG]
             assert antall == len(dager) * len(demo.DEMOUNIVERS)
             for aksje in demo.DEMOUNIVERS:
                 serie = kurslager.serie(aksje.symbol)

@@ -38,7 +38,7 @@ from flask import Flask, abort, g, redirect, render_template, request
 import lagring_sqlite
 from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
 from boersdag import norsk_dato
-from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER
+from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, gammel_demobase
 from graf import bygg_graf
 from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
 from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster
@@ -208,6 +208,7 @@ def _aapne_basen() -> None:
     g.tilkobling = None
     g.basefeil = None
     g.demo_mangler = False
+    g.demo_gammel = False
     g.eksempeltall = False
     if request.endpoint not in _RUTER_MED_BASE:
         return
@@ -223,6 +224,12 @@ def _aapne_basen() -> None:
             # aapner demobasen for skriving, og den migreres fortsatt ikke.
             g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False, skrivebeskyttet=request.endpoint != _SKRIVER)
             g.eksempeltall = les_merket(g.tilkobling) == DEMOMERKE
+            # Story 3.4c: en demobase fra foer, med historikken fra 02.01,
+            # vises ikke. Siden ber om at den lages paa nytt.
+            if g.eksempeltall and gammel_demobase(g.tilkobling):
+                g.tilkobling.close()
+                g.tilkobling = None
+                g.demo_mangler = g.demo_gammel = True
         except BASEFEIL as feil:
             g.basefeil = _basefeil(feil)
         return
@@ -478,6 +485,7 @@ def _tabellsiden(aktiv: str):
             mangler=[],
             eget=set(),
             demokommando=demokommando(),
+            demo_gammel=g.get("demo_gammel", False),
             **felles,
         )
     leser = _leser_eller_basefeil()
