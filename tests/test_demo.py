@@ -858,3 +858,36 @@ class TestKlokkeslettetSomDenEkte:
         oeyeblikk = demo._klokke_for(demo.SLUTTDATO)()
         assert oeyeblikk == datetime(2026, 10, 9, 22, 30, tzinfo=demo.OSLO)
         assert oeyeblikk.timetz().replace(tzinfo=None) >= fetch_prices.TIDSGRENSE
+
+
+class TestLenkenTilDenEkteVersjonen:
+    """Story 3.3i (U51): demolinja øverst lenker til «Den ekte versjonen» i
+    README-en på GitHub. Den ekte versjonen har ingen slik lenke."""
+
+    LENKEN = f'<a href="{app_modul.EKTE_VERSJONEN_URL}">Den ekte versjonen</a>'
+
+    def test_lenken_staar_i_demoen(self, klient, monkeypatch, demobase):
+        """Ville feilet hvis lenken manglet på en av sidene i demoen, sto
+        utenfor stripa øverst, eller ikke sa at det trengs en nøkkel."""
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        for adresse in ("/", "/aksje/BRFE", "/min-liste"):
+            html = klient.get(adresse).data.decode("utf-8")
+            stripe = html.split('<header class="stripe">', 1)[1].split("</header>", 1)[0]
+            assert self.LENKEN in stripe, adresse
+            assert "gratis nøkkel fra EODHD" in stripe, adresse
+
+    def test_lenken_gaar_til_ankeret_i_readme(self):
+        """Ville feilet hvis adressen gikk til et annet repo enn README-en
+        lenker til, eller til et anker README-en ikke har."""
+        readme = (Path(__file__).resolve().parent.parent / "README.md").read_text(encoding="utf-8")
+        repo, anker = app_modul.EKTE_VERSJONEN_URL.split("#", 1)
+        assert f"]({repo})" in readme
+        assert f'<a name="{anker}"></a>' in readme
+
+    def test_ingen_lenke_i_den_ekte_versjonen(self, klient):
+        """Ville feilet hvis lenken sto også i den ekte versjonen (M1)."""
+        aapne_base(Path(lagring_sqlite.BASE_STI)).close()
+        for adresse in ("/", "/min-liste"):
+            html = klient.get(adresse).data.decode("utf-8")
+            assert "Eksempeltall" not in html, adresse
+            assert app_modul.EKTE_VERSJONEN_URL not in html and "Den ekte versjonen" not in html, adresse

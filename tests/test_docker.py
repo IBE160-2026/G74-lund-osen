@@ -2849,3 +2849,43 @@ class TestReadmeBakPiler:
             for linje in tekst.splitlines():
                 if "details>" in linje:
                     assert linje in ("<details>", "</details>"), (navn, linje)
+
+
+class TestReadmeEtterDemoen:
+    """Story 3.3i: README-rettingen etter gruppens gjennomgang av demoen
+    21.10 (U13 og U55 i docs/ux-logg.md)."""
+
+    SPOERSMAALET = "Nettleseren sier at 127.0.0.1 nektet å koble til."
+
+    def test_err_connection_refused_under_staar_du_fast(self):
+        """U13: meldingen fra nettleseren står ordrett, så den kan søkes opp.
+        Ville feilet hvis spørsmålet falt ut av «Står du fast?», eller
+        meldingen falt ut av svaret i README-en eller i docs/hjelp.md."""
+        svar = _detaljer(_faq())
+        assert self.SPOERSMAALET in svar, list(svar)
+        assert "`ERR_CONNECTION_REFUSED`" in svar[self.SPOERSMAALET]
+        assert "«Serving on»" in svar[self.SPOERSMAALET]
+        i_hjelp = _hjelp().split(f"### {self.SPOERSMAALET}\n\n", 1)[1].split("\n\n### ", 1)[0]
+        assert "`ERR_CONNECTION_REFUSED`" in i_hjelp
+
+    def test_tallene_20_og_16_stemmer_med_koden(self, tmp_path):
+        """U55: kallene i døgnet og kallene per henting, slik README-en sier
+        dem i pila til den ekte versjonen. 16 er kallene en henting gjør mot
+        en falsk EODHD, og 20 er tallet øverst i fetch_prices.py, som med 16
+        gir de kallene til nye forsøk som docs/hjelp.md sier. Ville feilet
+        hvis README-en sa 15 kall per henting, eller et annet tall enn koden."""
+        import fetch_prices as fp
+        from kursdata import AKSJEUNIVERS
+        from test_ki_tekst import kjoer
+
+        pila = re.sub(r"\s+", " ", _pil("Den ekte versjonen"))
+        treff = re.search(r"gir (\d+) kall i døgnet og kurser ett år tilbake, og en henting bruker (\d+):", pila)
+        assert treff, pila[:300]
+        i_doegnet, per_henting = int(treff.group(1)), int(treff.group(2))
+        assert f"appen bruker ikke flere enn {per_henting} per henting" in pila
+        _, kall, _ = kjoer(tmp_path / "raa", tmp_path / "db" / "ose.db", None)
+        assert per_henting == len(kall) == len(AKSJEUNIVERS) + 1
+        assert i_doegnet == int(re.search(r"Gratisnivaaet gir (\d+) kall i doegnet", fp.__doc__).group(1))
+        hjelp = re.sub(r"\s+", " ", _hjelp())
+        til_overs = int(re.search(r"altså (\d+) med de 15", hjelp).group(1))
+        assert fp.kall_til_nye_forsoek(i_doegnet, i_doegnet, per_henting) == til_overs
