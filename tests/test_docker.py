@@ -914,7 +914,9 @@ HOEYDE_PAA_BILDET = 1630
 # Story 3.3i (U51): lenken til den ekte versjonen i demolinja i _ramme.html,
 # og fargen paa den i stil.css. Bildet ble tatt paa nytt, med samme hoeyde,
 # fordi linja fortsatt er én linje i 1280 px.
-AVTRYKK_BAK_BILDET = "416d90bb41a852fa41888178723b04d4bea6170703c062e1d61dd5a8c70316f3"
+# Story 3.4c: vurderingene i demo.py fra STARTDAG, og meldingen om en demobase
+# fra foer i index.html. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "9700540f3082ba0537501202ec1089c4ed56c9c0a2b67b36dbe947480c45ccf8"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -979,7 +981,11 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # bildet ble byte for byte det samme da det ble tatt på nytt.
 # Story 3.3i (U51): lenken i demolinja. Bildet ble tatt på nytt, med samme
 # høyde, fordi grafen slutter på samme sted.
-AVTRYKK_BAK_AKSJESIDEN = "eae32b3812da70e937a0df12117877416762bf402cd8b46539a74e91377ef5ab"
+# Story 3.4c: vurderingene i demo.py fra STARTDAG, og meldingen om en demobase
+# fra før i app.py. Bildet ble tatt på nytt og er byte for byte det samme.
+# Gjennomgangen av 3.4c (BH1): sjekken av en gammel demobase ogsaa der den ekte
+# skal ligge, i app.py. Bildet er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "846264bd95f2105dc3d95182b742336ce074ae68bd416e9d63baef1779db0414"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "

@@ -1,7 +1,7 @@
 """Demoversjonen - story 3.4, FR-411.
 
 Lager demobasen data/db/demo.db med 15 oppdiktede selskaper, kurser etter
-regelen under, og en vurdering per aksje og boersdag. Kommandoen gjoer ingen
+regelen under, og en vurdering per aksje og boersdag fra STARTDAG. Kommandoen gjoer ingen
 nettkall, leser ingen noekkel og importerer verken requests, eodhd eller
 fetch_prices.
 
@@ -39,7 +39,13 @@ Regelen for kursene (spesifikasjonen til 3.4, Boundaries):
 
 Vurderingene: for hver boersdag og hver aksje er raden det vurder() gir for
 serien fram til dagen, skrevet med SqliteVurderingslager.skriv uendret og
-lagerets klokke stilt paa dagen (AD-7, merknaden 2026-10-03).
+lagerets klokke stilt paa dagen (AD-7, merknaden 2026-10-03). Story 3.4c
+(avgjoerelsen 21.10 kl. 23:09): bare fra STARTDAG, mandag 21.09, tre uker
+foer SLUTTDATO, slik den ekte versjonen har signal bare fra foerste henting.
+Dagene foer har kurser, men ingen rad, og historikken viser dem uten signal.
+Kursene, de 10 fargekombinasjonene og KI-tekstene paa SLUTTDATO er som foer.
+En demobase fra foer, med en vurdering foer STARTDAG, gjenkjennes med
+gammel_demobase, og webserveren ber om at den lages paa nytt.
 
 Hovedindeksen (story 2.8, PR 1): DEMOINDEKS, «Demoindeksen», er oppdiktet,
 som selskapene. Den starter paa INDEKS_START, og dagens endring er snittet av
@@ -100,6 +106,8 @@ DEMOKOMMANDO_DOCKER = "docker compose run --rm demo-lag"
 FROE = 20261009
 FOERSTE_DAG = date(2026, 1, 2)
 SLUTTDATO = date(2026, 10, 9)
+# Story 3.4c: foerste dag med vurdering, mandag tre uker foer SLUTTDATO.
+STARTDAG = date(2026, 9, 21)
 NYLIG_NOTERT_DAGER = 30
 
 # Navnene og tickerne er kontrollert for haand av en av oss mot lista over aksjer
@@ -293,6 +301,13 @@ def lag_demobase(sti: Path, skriv=print, med_ki: bool = True) -> None:
         skriv(f"KI-tekst for {len(radene)} aksjer paa siste dag, fra demo_ki_tekster.json. Ingen kall til modellen.")
 
 
+def gammel_demobase(tilkobling) -> bool:
+    """Story 3.4c: om demobasen er laget foer vurderingene startet paa
+    STARTDAG, altsaa har en vurdering foer den. Leser bare."""
+    rad = tilkobling.execute("SELECT 1 FROM vurdering WHERE dato < ? LIMIT 1", (STARTDAG.isoformat(),)).fetchone()
+    return rad is not None
+
+
 def _ki_radene(skriv) -> list:
     """KI-radene fra fila, sjekket mot demoen. Kan fila ikke leses, eller
     stemmer den ikke, lages demoen uten KI-tekst og sier hvorfor, som
@@ -342,7 +357,8 @@ def _bygg(sti: Path, radene: list | None = None) -> None:
             DEMOINDEKS.symbol, indeksserie(serier, dager), hentet
         )
 
-        for dag in dager:
+        # Story 3.4c: vurderingene bare fra STARTDAG, som den ekte fra foerste henting.
+        for dag in (d for d in dager if d >= STARTDAG):
             lager = SqliteVurderingslager(tilkobling, _klokke_for(dag), DEMOUNIVERS)
             for aksje in DEMOUNIVERS:
                 fram_til = [r for r in serier[aksje.symbol] if r.dato <= dag]
