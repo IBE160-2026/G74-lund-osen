@@ -1683,7 +1683,7 @@ class TestReadmeForNybegynnere:
         etter_pila = tekst.split('<a name="den-ekte-versjonen"></a>', 1)[1].split("\n</details>\n\n", 1)[1]
         assert etter_pila.split("\n\n", 1)[0] == ADVARSELEN_MOT_DOWN_V
 
-    def test_staar_du_fast_har_hoeyst_6_spoersmaal(self):
+    def test_staar_du_fast_har_hoeyst_5_spoersmaal(self):
         """22:32: FAQ-en var for lang. Hoeyst 8 spoersmaal, hvert som
         <details> med <summary>, og en lenke til docs/hjelp.md.
 
@@ -1696,9 +1696,9 @@ class TestReadmeForNybegynnere:
         test_staar_du_fast_har_hoeyst_10_spoersmaal til 3.3d.
 
         Story 3.3i (instruksjonen 22.10 kl. 16:06, U13): hoeyst 6, for svaret
-        paa at 127.0.0.1 nektet aa koble til. Het
-        test_staar_du_fast_har_hoeyst_5_spoersmaal til 3.3i. Ville feilet
-        med et sjuende spoersmaal."""
+        paa at 127.0.0.1 nektet aa koble til. Navnet staar, fordi
+        docs/vurderingsmatrise.md og vedlegget i docs/kvalitetssikring.md
+        nevner testen. Ville feilet med et sjuende spoersmaal."""
         faq = _faq()
         sporsmaal = _detaljer(faq)
         assert 1 <= len(sporsmaal) <= 6
