@@ -257,8 +257,11 @@ Basen, demobasen og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo`
 | Variabel | Hva den gjør | Standard | Når den trengs |
 |---|---|---|---|
 | `EODHD_API_KEY` | Nøkkelen til EODHD, som hentingen bruker til sluttkursene | Ingen | Til hentingen i den ekte versjonen. Webserveren og demoen trenger den ikke |
-| `OSE_KI_TJENESTE` | Om hentingen lager KI-tekst: `av` eller `lokal` (Gemma i Ollama) | `av` etter steg 6, fordi `.env.example` har `OSE_KI_TJENESTE=av`. Står variabelen ikke i `.env`, gjelder `lokal`, og en tom verdi gir ingen KI-tekst | Når du vil slå KI-teksten på |
+| `OSE_KI_TJENESTE` | Om hentingen lager KI-tekst, og med hva: `av`, `lokal` (Gemma i Ollama), eller `gemini`, `anthropic` eller `openai` med egen nøkkel | `av` etter steg 6, fordi `.env.example` har `OSE_KI_TJENESTE=av`. Står variabelen ikke i `.env`, gjelder `lokal`, og en tom verdi gir ingen KI-tekst | Når du vil slå KI-teksten på |
 | `OSE_KI_OLLAMA_URL` | Adressen til Ollama | `http://127.0.0.1:11434`, og `http://ollama:11434` i Docker | Bare med uv, når Ollama ikke svarer på standardadressen |
+| `OSE_KI_GEMINI_NOKKEL` | Din egen nøkkel til Gemini | Ingen | Bare med `OSE_KI_TJENESTE=gemini` |
+| `OSE_KI_ANTHROPIC_NOKKEL` | Din egen nøkkel til Anthropic API | Ingen | Bare med `OSE_KI_TJENESTE=anthropic` |
+| `OSE_KI_OPENAI_NOKKEL` | Din egen nøkkel til OpenAI API | Ingen | Bare med `OSE_KI_TJENESTE=openai` |
 
 `OSE_DEMO` og `OSE_I_DOCKER` settes av `compose.yaml` og `Dockerfile`, og skal ikke i `.env`. Med uv slås demoen på med `--demo`.
 
@@ -300,6 +303,32 @@ Hentingen sjekker først at Ollama svarer og har modellen. Gjør den ikke det, l
 Slå av KI-teksten: sett `OSE_KI_TJENESTE=av` i `.env`.
 
 Modellen ble prøvd på en maskin med 15,7 GB minne og et grafikkort med 8 GB, der Docker Desktop hadde 8,2 GB (`malinger.md` §19).
+
+</details>
+
+<details>
+<summary>Egen nøkkel til Gemini, Anthropic eller OpenAI (valgfri)</summary>
+
+I stedet for den lokale modellen kan hentingen la en tjeneste du selv har valgt, skrive KI-teksten, med din egen nøkkel og på dine egne vilkår. Det trengs verken grafikkort eller Ollama. Ingen nøkkel følger med appen eller repoet.
+
+| Tjeneste | `OSE_KI_TJENESTE` | Nøkkelen i `.env` | Modellen |
+|---|---|---|---|
+| Gemini | `gemini` | `OSE_KI_GEMINI_NOKKEL` | Gemini 3.5 Flash-Lite, som har en gratis nøkkel |
+| Anthropic API | `anthropic` | `OSE_KI_ANTHROPIC_NOKKEL` | Claude Haiku 5.5 |
+| OpenAI API | `openai` | `OSE_KI_OPENAI_NOKKEL` | GPT-6 Luna |
+
+Slå den på: sett for eksempel `OSE_KI_TJENESTE=gemini` i `.env`, og lim inn nøkkelen etter `OSE_KI_GEMINI_NOKKEL=`. Så hentes det som vanlig.
+
+Det du bør vite før du slår den på:
+
+- **Grunnlaget sendes til tjenesten du har valgt.** Det er reglene for teksten og bare våre egne resultater for hver aksje, uten navnet: fortegnet for de tre sjekkene, styrken og retningen. Ingen kurser, volumer eller tekster fra EODHD sendes. Med den lokale modellen sendes ingenting ut.
+- **Det kan koste hos dem.** Hver henting gir ett kall per aksje med vurdering, opptil 15. Prisen og grensene står hos tjenesten.
+- **Nøkkelen skal aldri deles.** Den står bare i `.env`, som aldri committes, og sendes bare til tjenesten den hører til, i en header. Appen skriver den aldri ut.
+- **Du må ikke ha sagt ja til at tjenesten trener på innholdet.** Vilkårene vi har lest, sier at det som sendes gjennom API-et, ikke brukes til trening uten samtykke. For Gemini gjelder det i EØS også gratisnøkkelen. Sitatene står i [`docs/kilder-og-rettigheter.md`](docs/kilder-og-rettigheter.md), «Betingelse 4 og KI-tjenestene (2026-10-04)».
+
+Det er én tjeneste per henting. Feiler den, eller mangler nøkkelen, får aksjen en rad i KI-loggen om det, og ingen tekst den dagen (FR-604). Hentingen går ikke over til en annen tjeneste, så grunnlaget sendes aldri til en tjeneste du ikke har valgt. Kursene hentes som før.
+
+Slå av KI-teksten: sett `OSE_KI_TJENESTE=av` i `.env`.
 
 </details>
 

@@ -309,6 +309,7 @@ def test_env_example_har_variablene_koden_leser_og_kallene_en_henting_bruker():
     variabler = ("EODHD_API_KEY", *_NOEKLER)
     for navn in variabler:
         assert re.search(rf"^#? ?{navn}=", tekst, re.MULTILINE), navn
-    tall = {3: "tre"}
+    # Story 10.7: tre noekler til KI-tjenestene kom til.
+    tall = {3: "tre", 6: "seks"}
     assert f"Det er {tall[len(variabler)]} variabler aa sette i .env" in tekst
     assert f"bruker {len(AKSJEUNIVERS) + 1} av de 20 kallene" in tekst

@@ -157,6 +157,10 @@ Nei. Porten er bare åpen på maskinen selv (127.0.0.1). Appen kan ikke nås fra
 
 Appen viser ikke børsmeldingene. De står på NewsWeb og ofte også på selskapets investorside. Under kursgrafen på aksjesiden står en lenke til investorsiden for aksjen siden viser. Appen henter ingenting derfra. I demoen er selskapene oppdiktet og har ingen investorside, så der står det i stedet at lenken står der i den ekte versjonen.
 
+### Kan KI-teksten lages uten grafikkort?
+
+Ja, med din egen nøkkel til Gemini, Anthropic eller OpenAI. Sett `OSE_KI_TJENESTE=gemini`, `anthropic` eller `openai` i `.env`, og lim inn nøkkelen etter `OSE_KI_GEMINI_NOKKEL=`, `OSE_KI_ANTHROPIC_NOKKEL=` eller `OSE_KI_OPENAI_NOKKEL=`. Da sendes grunnlaget for hver aksje til tjenesten du har valgt, og det kan koste hos dem. Del aldri nøkkelen, og bruk ikke en konto der du har sagt ja til at tjenesten trener på innholdet. Mangler nøkkelen, eller feiler tjenesten, blir det ingen KI-tekst den dagen, og hentingen går ikke over til en annen tjeneste. Mer står under «Egen nøkkel til Gemini, Anthropic eller OpenAI» i [README-en](../README.md).
+
 ## Når appen kjører, eller ikke
 
 ### Siden åpnes ikke.

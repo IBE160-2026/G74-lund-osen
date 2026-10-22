@@ -1884,6 +1884,8 @@ class TestReadmeForNybegynnere:
             "Uten Docker, med uv",
             "Variablene i .env",
             "Den lokale modellen for KI-teksten (valgfri)",
+            # Story 10.7: egen noekkel, ogsaa lukket.
+            "Egen nøkkel til Gemini, Anthropic eller OpenAI (valgfri)",
         }
 
     def test_uv_delen_er_to_nummererte_lister(self):
