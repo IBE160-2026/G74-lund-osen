@@ -313,9 +313,9 @@ I stedet for den lokale modellen kan hentingen la en tjeneste du selv har valgt,
 
 | Tjeneste | `OSE_KI_TJENESTE` | Nøkkelen i `.env` | Modellen |
 |---|---|---|---|
-| Gemini | `gemini` | `OSE_KI_GEMINI_NOKKEL` | Gemini 3.5 Flash-Lite, som har en gratis nøkkel |
-| Anthropic API | `anthropic` | `OSE_KI_ANTHROPIC_NOKKEL` | Claude Haiku 5.5 |
-| OpenAI API | `openai` | `OSE_KI_OPENAI_NOKKEL` | GPT-6 Luna |
+| Gemini | `gemini` | `OSE_KI_GEMINI_NOKKEL` | Gemini 3.5 Flash-Lite (`gemini-3.5-flash-lite`), som kan brukes med en gratis nøkkel |
+| Anthropic API | `anthropic` | `OSE_KI_ANTHROPIC_NOKKEL` | Claude Haiku 5.5 (`claude-haiku-5-5`) |
+| OpenAI API | `openai` | `OSE_KI_OPENAI_NOKKEL` | GPT-6 Luna (`gpt-6-luna`) |
 
 Slå den på: sett for eksempel `OSE_KI_TJENESTE=gemini` i `.env`, og lim inn nøkkelen etter `OSE_KI_GEMINI_NOKKEL=`. Så hentes det som vanlig.
 
@@ -326,7 +326,7 @@ Det du bør vite før du slår den på:
 - **Nøkkelen skal aldri deles.** Den står bare i `.env`, som aldri committes, og sendes bare til tjenesten den hører til, i en header. Appen skriver den aldri ut.
 - **Du må ikke ha sagt ja til at tjenesten trener på innholdet.** Vilkårene vi har lest, sier at det som sendes gjennom API-et, ikke brukes til trening uten samtykke. For Gemini gjelder det i EØS også gratisnøkkelen. Sitatene står i [`docs/kilder-og-rettigheter.md`](docs/kilder-og-rettigheter.md), «Betingelse 4 og KI-tjenestene (2026-10-04)».
 
-Det er én tjeneste per henting. Feiler den, eller mangler nøkkelen, får aksjen en rad i KI-loggen om det, og ingen tekst den dagen (FR-604). Hentingen går ikke over til en annen tjeneste, så grunnlaget sendes aldri til en tjeneste du ikke har valgt. Kursene hentes som før.
+Det er én tjeneste per henting. Feiler den for én aksje, kalles den ikke for resten av aksjene den kvelden, og alle får en rad i KI-loggen om det. Mangler nøkkelen, får alle aksjene en rad om det med en gang. Radene står, så ingen av dem får tekst den dagen, heller ikke om du legger inn nøkkelen og henter igjen samme kveld (FR-604). Hentingen går ikke over til en annen tjeneste, så grunnlaget sendes aldri til en tjeneste du ikke har valgt. Utskriften sier hvilken tjeneste teksten lages av. Kursene hentes som før.
 
 Slå av KI-teksten: sett `OSE_KI_TJENESTE=av` i `.env`.
 

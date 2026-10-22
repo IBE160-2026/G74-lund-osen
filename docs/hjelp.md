@@ -159,7 +159,7 @@ Appen viser ikke børsmeldingene. De står på NewsWeb og ofte også på selskap
 
 ### Kan KI-teksten lages uten grafikkort?
 
-Ja, med din egen nøkkel til Gemini, Anthropic eller OpenAI. Sett `OSE_KI_TJENESTE=gemini`, `anthropic` eller `openai` i `.env`, og lim inn nøkkelen etter `OSE_KI_GEMINI_NOKKEL=`, `OSE_KI_ANTHROPIC_NOKKEL=` eller `OSE_KI_OPENAI_NOKKEL=`. Da sendes grunnlaget for hver aksje til tjenesten du har valgt, og det kan koste hos dem. Del aldri nøkkelen, og bruk ikke en konto der du har sagt ja til at tjenesten trener på innholdet. Mangler nøkkelen, eller feiler tjenesten, blir det ingen KI-tekst den dagen, og hentingen går ikke over til en annen tjeneste. Mer står under «Egen nøkkel til Gemini, Anthropic eller OpenAI» i [README-en](../README.md).
+Ja, med din egen nøkkel til Gemini, Anthropic eller OpenAI. Sett `OSE_KI_TJENESTE=gemini`, `anthropic` eller `openai` i `.env`, og lim inn nøkkelen etter `OSE_KI_GEMINI_NOKKEL=`, `OSE_KI_ANTHROPIC_NOKKEL=` eller `OSE_KI_OPENAI_NOKKEL=`. Da sendes grunnlaget for hver aksje til tjenesten du har valgt, og det kan koste hos dem. Del aldri nøkkelen, og bruk ikke en konto der du har sagt ja til at tjenesten trener på innholdet. Mangler nøkkelen, eller feiler tjenesten, blir det ingen KI-tekst for noen av aksjene den dagen, heller ikke om du retter det og henter igjen samme kveld. Hentingen går ikke over til en annen tjeneste. Mer står under «Egen nøkkel til Gemini, Anthropic eller OpenAI» i [README-en](../README.md).
 
 ## Når appen kjører, eller ikke
 
