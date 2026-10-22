@@ -2199,7 +2199,10 @@ class TestReadmeForNybegynnere:
             "søylene",
             "stiplet linje i kursgrafen",
             # Gjennomgangen, VG1: resten av det som er flettet.
-            "fra kl. 22 på børsdager",
+            # Story 2.3c: første gang går hentingen også på dagtid, så punktet
+            # sier «fra kl. 22», og «på børsdager» er tatt ut for å holde
+            # punktet på høyst 20 ord. Var «fra kl. 22 på børsdager».
+            "fra kl. 22",
             # Story 3.4b: KI-teksten i demoen er flettet.
             # Rådets funn 20.10: demoen viser kombinasjonene av de tre sjekkene.
             "alle 10 fargekombinasjonene av de tre sjekkene og ki-tekst laget med gemma",
@@ -2209,6 +2212,8 @@ class TestReadmeForNybegynnere:
             "min liste, med stjernen foran hvert selskap",
             # Story 10.7: egne nøkler er flettet.
             "eller med egen nøkkel",
+            # Story 2.3c: første henting på dagtid er flettet.
+            "første gang på dagtid",
         ):
             assert sak in ferdig, sak
         # Story 3.3h: det rundt appen står i én setning under listene, ikke
@@ -2234,8 +2239,10 @@ class TestReadmeForNybegynnere:
         # er neste (svarene 21.10 kl. 22:51 og 22.10 kl. 00:09).
         # Story 3.3i: README-rettingen er flettet, og første henting på
         # dagtid (2.3c, avgjørelsen 21.10 kl. 23:33) er neste.
+        # Story 2.3c: første henting på dagtid er flyttet til «Ferdig», og
+        # prøven på en ren maskin er neste (avgjørelsen 21.10 kl. 18:33).
         saker = (
-            "første henting på dagtid",
+            "prøven av readme-en på en ren maskin",
             "signaldagene i kursgrafen",
             "«vis ki-tekst»",
             # Story 8.16: periodene i kursgrafen er flyttet til «Ferdig».
@@ -2568,7 +2575,7 @@ class TestReadmeDemoenAnbefales:
                 assert sak in punkt, (sak, punkt)
         # Gjennomgangen (BH2, VG1): lenken går til selskapets investorside,
         # som i briefen v8 og story 10.5 etter 06.10.
-        for sak in ("første henting på dagtid",):
+        for sak in ("prøven av readme-en på en ren maskin",):
             assert sum(sak in p for p in v1) == 1, (sak, v1)
         assert not any("egen nøkkel" in p for p in v1), v1
         assert not any("min liste" in p or "investorside" in p or "historikk" in p for p in v1), v1

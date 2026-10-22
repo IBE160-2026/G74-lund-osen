@@ -345,7 +345,7 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 **Ferdig**
 
 - De tre sjekkene, trend, bevegelse og interesse, og styrken for hver aksje hver børsdag, med regelforklaringen på aksjesiden
-- Hentingen av kursene og hovedindeksen fra kl. 22 på børsdager, med børsdagskontroll og nye forsøk med kallene som er igjen
+- Hentingen: kursene og hovedindeksen fra kl. 22, første gang på dagtid, med børsdagskontroll og forsøk med kallene som er igjen
 - Oversikten og utseendet fra designforslaget, med tydeligere merking, hjelp bak «?» og sortering ved klikk i kolonneraden
 - Hovedindeksen over tabellen på forsiden, med søylene under, og som stiplet linje i kursgrafen
 - På aksjesiden: periodene i kursgrafen med «Velg dag», datoene og månedsmerkene, lenken til investorsiden og signalet dag for dag
@@ -355,7 +355,7 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 
 **Neste i v1**
 
-- Første henting på dagtid: når basen er tom, hentes siste fullførte børsdag også før kl. 22
+- Prøven av README-en på en ren maskin, når alt i v1 er bygget
 
 **Ekstra, hvis tiden rekker**
 
