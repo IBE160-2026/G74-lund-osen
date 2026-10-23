@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-23T13:45
+updated: 2026-10-23T14:51
 ---
 
 # Kvalitetssikring
@@ -930,6 +930,8 @@ interesse, står i `malinger.md` §6, ved siden av EQNR 05.10 og GJF 02.10.
 
 *Lagt til 2026-10-16:* raden «KI-forklaringen» sier «KI-laget er ikke bygget». Det stemte 13.10, men nå finnes testene for kontrollen, loggen og visningen. Kontrollen i FR-603 (story 10.2a, PR #48, `77ebf31`): `tests/test_ki_modell.py`, med `TestKontrollen` og `TestRaden`. Loggen i FR-604 (story 4.2 og 4.3): `tests/test_kilogg.py`, der kontrakttestene kjøres mot både minnet og SQLite, og `tests/test_kilogg_sqlite.py`. Visningen (story 10.3, PR #50 og #51): `tests/test_ki_visning.py`, med `TestSiden::test_vakten_paa_siden` og `TestGrunnenPaaSiden`. Talt 16.10: 207 tester i `test_ki_modell.py`, 106 i `test_kilogg.py`, 49 i `test_kilogg_sqlite.py` og 67 i `test_ki_visning.py`. Teksten lages ennå ikke i hentingen (story 10.2b, PR #49, ikke flettet), så ingen KI-tekst er laget med ekte data. Én ukes logget drift begynner når PR #49 er flettet, og målingen av bidraget er story 10.4.
 
+*Lagt til 2026-10-23 kl. 14:51:* raden «Brukerutfall»: opplegget for brukertesten står i `spec-8-1-brukertesten.md`, og skjemaet er `docs/brukertest.md`. Testen tas neste uke, med story 10.4 rett etter, med samme person og samme aksje (gruppens svar 23.10 kl. 12:29). Kriteriet er ikke målt ennå.
+
 ## 11. Feil vi fant og rettet
 
 *Lagt til 2026-10-17.* Tolv eksempler fra repoet, med minst ett for hver måte en feil ble funnet. «Rettet i» er commiten på main. Ble PR-en squash-flettet, står grencommiten i parentes, og den finnes i PR-en på GitHub. En mutant som overlevde, viser et hull i testene, ikke nødvendigvis en feil i koden.
@@ -992,6 +994,8 @@ interesse, står i `malinger.md` §6, ved siden av EQNR 05.10 og GJF 02.10.
 *Avgjort 2026-10-21 kl. 18:33 (gruppens svar):* README-prøven på en ren maskin er utsatt til v1 er ferdig bygget, fordi flere deler skal inn (historikken 2.7b, som ble flettet i `d4c2441` kl. 17:58 samme dag, og egne nøkler 10.7), og prøven skal gjelde den appen som leveres. Gruppen har kjørt oppskriften på egen maskin, og den virker. Den siste daterte gjennomgangen på egen maskin som står i repoet, er 16.10 kl. 20:40–21:11, under story 3.3 i `epics.md` (avgjørelsen 16.10 kl. 21:16), i tabellen i §13 i `docs/kvalitetssikring.md` og i `docs/reflection-log.md` 16.10. Den fant fire ting, som ble rettet i `fdaf403`, PR #66, 18.10. Prøven på en ren maskin er fortsatt funksjonsstoppen, senest én uke før innleveringen (svaret 19.10 kl. 14:48), og 3.4 står i review til den er tatt.
 
 *Lagt til 2026-10-18 kl. 15:41 (story 3.3c, ECH16 i triagen):* README-en har nå tre skjermbilder i «Kom i gang», fra gruppens gjennomgang 16.10 kl. 20:40–21:11 (raden i tabellen over): «Engine running» i steg 1, menyen under «Code» med «Download ZIP» i steg 2, og PowerShell med mappenavnet foran `>` i steg 4. De ligger i `docs/bilder/readme/` og viser ikke appen. Demoen står før den ekte versjonen, og de fire tingene gjennomgangen fant, er rettet. Flettet i `fdaf403`, PR #66.
+
+*Lagt til 2026-10-23 kl. 14:51:* raden «Brukertesten (story 8.1)»: opplegget står i `spec-8-1-brukertesten.md`, med story 10.4 i samme økt (gruppens svar 23.10 kl. 12:29), og skjemaet er `docs/brukertest.md`. Testen er ikke tatt, og tas neste uke. 8-1 og 10-4 er ready-for-dev i `sprint-status.yaml`.
 
 ## Vedlegg: hver mutant
 
