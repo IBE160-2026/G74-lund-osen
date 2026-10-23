@@ -718,3 +718,66 @@ class TestSvaretKl0924:
         assert "også en dag uten vurdering" in hjelp
         assert "For en aksje uten kurser sier aksjesiden at det ikke finnes kurser ennå" in hjelp
         assert "har ingen aksjeside" not in hjelp and "uten ramme" not in hjelp
+
+
+# --- Gruppens svar 23.10 kl. 11:44 (b) -------------------------------------
+
+
+def _fotnoten(html: str) -> str | None:
+    """Fotnoten for «ikke vurdert», uten taggene og med ett mellomrom mellom
+    ordene, eller None når den ikke står."""
+    treff = re.search(r'<p class="fotnote">\s*«Ikke vurdert»(.*?)</p>', html, re.DOTALL)
+    if not treff:
+        return None
+    return "«Ikke vurdert»" + re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", treff.group(1))).rstrip()
+
+
+class TestFotnoten:
+    """Story 3.4d: fotnoten står også på børsometeret når en rute sier «ikke
+    vurdert», med samme tekster som på aksjesiden og oversikten."""
+
+    DEMOTEKST = (
+        "«Ikke vurdert»: i demoen starter vurderingene mandag 21.09, slik den ekte versjonen har signal fra "
+        "første henting."
+    )
+    EKTE_TEKST = (
+        "«Ikke vurdert»: signalet lagres bare den kvelden kursene hentes, og regnes aldri ut bakover. Det gjelder "
+        "dagene før første henting, kvelder uten henting, og dager der kursene er lest inn med --les-inn."
+    )
+
+    def test_demoen_foer_startdagen_har_fotnoten(self, klient):
+        """Ville feilet hvis fotnoten var borte fra børsometeret (M2 i 3.4d c)."""
+        html = _side(klient, "/boersometer?dag=2026-09-18")
+        assert f'<span class="tekst">{IKKE_VURDERT}</span>' in html
+        assert _fotnoten(html) == self.DEMOTEKST
+
+    def test_ingen_fotnote_uten_en_rute_som_sier_ikke_vurdert(self, klient):
+        """Siste demodag har vurdering for alle aksjene med kurs, og MTFJ sier
+        «Uten data». Ville feilet hvis fotnoten sto på hver side."""
+        html = _side(klient)
+        assert f'<span class="tekst">{IKKE_VURDERT}</span>' not in html
+        assert _fotnoten(html) is None
+
+    def test_den_ekte_versjonen_har_den_ekte_teksten(self, monkeypatch, basemal):
+        """Ville feilet med demoteksten i den ekte versjonen, eller uten
+        fotnoten på børsometeret."""
+        sti = Path(lagring_sqlite.BASE_STI)
+        sti.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(basemal, sti)
+        tilkobling = sqlite3.connect(sti)
+        try:
+            tilkobling.execute("PRAGMA application_id = 0")
+            tilkobling.commit()
+        finally:
+            tilkobling.close()
+        monkeypatch.delenv(app_modul.I_DEMO, raising=False)
+        monkeypatch.delenv(app_modul.I_DOCKER, raising=False)
+        html = _side(app_modul.app.test_client(), "/boersometer?dag=2026-09-18")
+        assert _fotnoten(html) == self.EKTE_TEKST
+
+    def test_datoen_i_fotnoten_kommer_fra_startdag(self, klient, monkeypatch):
+        """Gjennomgangen av 3.4d (VG1). Ville feilet med datoen skrevet fast i
+        malen i stedet for STARTDAG (M1 i 3.4d c)."""
+        monkeypatch.setattr(app_modul, "STARTDAG", date(2026, 9, 29))
+        html = _side(klient, "/boersometer?dag=2026-09-18")
+        assert "i demoen starter vurderingene tirsdag 29.09," in _fotnoten(html)

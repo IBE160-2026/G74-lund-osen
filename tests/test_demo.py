@@ -1041,6 +1041,19 @@ class TestFotnotenIDemoen:
         assert self._fotnoten(html) == "«Ikke vurdert»: " + self.DEMOTEKST
         assert "--les-inn" not in html
 
+    @pytest.mark.parametrize("adresse", ["/aksje/KVST?dag=2026-09-18", "/boersometer?dag=2026-09-18"])
+    def test_datoen_paa_sidene_kommer_fra_startdag(self, klient, monkeypatch, demobase, adresse):
+        """Gjennomgangen av 3.4d (VG1): sidene, ikke bare funksjonen. Ville
+        feilet med datoen skrevet fast i malen i stedet for STARTDAG (M1 i
+        3.4d c), fordi testene over sammenligner med «mandag 21.09»."""
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        monkeypatch.setattr(app_modul, "STARTDAG", date(2026, 9, 29))
+        html = klient.get(adresse).data.decode("utf-8")
+        assert self._fotnoten(html) == (
+            "«Ikke vurdert»: i demoen starter vurderingene tirsdag 29.09, slik den ekte versjonen har signal "
+            "fra første henting."
+        )
+
     def test_datoen_kommer_fra_startdag(self, monkeypatch):
         """Ville feilet med en fast dato i stedet for STARTDAG (M3)."""
         monkeypatch.setattr(app_modul, "STARTDAG", date(2026, 9, 29))
