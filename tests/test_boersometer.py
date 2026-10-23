@@ -809,16 +809,16 @@ class TestFotnotenEtterStartdagen:
             tilkobling.close()
 
     def test_demoen_etter_startdagen_har_den_ekte_teksten(self, klient):
-        """KVST uten vurdering 08.10, etter STARTDAG. Ville feilet med
-        demoteksten for alle dager i demoen (M1 i 3.4e c)."""
+        """KVST uten vurdering 08.10, etter STARTDAG. Ville feilet hvis
+        demoteksten sto for alle dager i demoen (M1 i 3.4e c)."""
         self._uten_vurdering(demo_sti(), "KVST", "2026-10-08")
         html = _side(klient, "/boersometer?dag=2026-10-08")
         assert _fotnoten(html) == TestFotnoten.EKTE_TEKST
 
     def test_setningen_om_i_dag(self, monkeypatch, basemal):
         """Den ekte versjonen, KVST uten vurdering 09.10, og klokka er 09.10
-        kl. 20 i Oslo. Ville feilet uten setningen om i dag, og med den en
-        annen dag (M2 i 3.4e c)."""
+        kl. 20 i Oslo. Ville feilet hvis setningen om i dag manglet, eller
+        sto en annen dag (M2 i 3.4e c)."""
         sti = Path(lagring_sqlite.BASE_STI)
         sti.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(basemal, sti)
