@@ -67,7 +67,6 @@ def test_startfilene_finnes_og_starter_riktig_skript(navn):
     skript, versjon = STARTFILENE[navn]
     tekst = (ROT / navn).read_text(encoding="utf-8")
     assert skript in tekst and versjon in tekst, navn
-    assert sum(1 for linje in _kode(ROT / navn) if "start" in linje.lower()) >= 1
 
 
 @pytest.mark.parametrize("navn", list(SKRIPTENE))
@@ -79,6 +78,21 @@ def test_skriptene_bruker_kommandoene_i_readme(navn):
     assert sorted(set(kommandoene)) == sorted(KOMMANDOENE), kommandoene
     for kommando in KOMMANDOENE:
         assert f"`{kommando}`" in del_, kommando
+
+
+@pytest.mark.parametrize("navn", list(SKRIPTENE))
+def test_rekkefoelgen_demo_eller_henting_foer_serveren(navn):
+    """Gjennomgangen (VG3). Ville feilet hvis hentingen kom etter at
+    serveren startet, kjoerte i demoen, eller demo.py kjoerte i den ekte
+    versjonen: demo.py, saa grenen for den ekte, saa hentingen, saa serveren."""
+    kode = "\n".join(_kode(SKRIPTENE[navn]))
+    sync = kode.index("uv sync")
+    demo = kode.index("uv run python src/demo.py")
+    ellers = kode.index("else", demo)
+    henting = kode.index("uv run python src/fetch_prices.py")
+    server = kode.index("waitress-serve")
+    assert sync < demo < ellers < henting < server
+    assert kode.count("src/demo.py") == 1 and kode.count("src/fetch_prices.py") == 1
 
 
 @pytest.mark.parametrize("navn", list(SKRIPTENE))
@@ -115,15 +129,26 @@ def test_noekkelen_og_miljoeet_skrives_aldri_ut(navn):
     noekkelen staar i det etter load_dotenv eller i CI. Noekkelen skrives bare
     til .env."""
     kode = _kode(SKRIPTENE[navn])
-    ut = re.compile(r"\b(echo|printf|Write-Host|Write-Output|Write-Information|Out-Host|Out-File)\b", re.I)
+    ut = re.compile(
+        r"\b(echo|printf|Write-Host|Write-Output|Write-Information|Out-Host|Out-File|Set-Content|Add-Content|tee|cat)\b"
+        r"|>",
+        re.I,
+    )
+    # Gjennomgangen (BH12, VG4): noekkelen faar ikke et nytt navn som kan
+    # skrives ut i stedet.
+    tekst = "\n".join(kode)
+    assert not re.search(r"\$\w+\s*=\s*\$noekkel\b|\b(?!EODHD_API_KEY=)\w+=\"?\$noekkel\b", tekst), "noekkelen kopieres"
+    assert not re.search(r"Write-\w+[^\n]*\$sikker|\$sikker[^\n]*\|", tekst)
     for linje in kode:
         if re.search(r"noekkel\b", linje, re.I) and ut.search(linje):
             assert ">> .env.ny" in linje or "WriteAllText" in linje, linje
         assert not re.search(r"(^|[;|&]\s*)(env|printenv|set)\s*($|[|>])", linje), linje
         assert not re.search(r"(Get-ChildItem|dir|ls|gci)\s+env:", linje, re.I), linje
+        assert "GetEnvironmentVariables" not in linje and "export -p" not in linje, linje
+        assert "declare -x" not in linje and "declare -p" not in linje, linje
         assert "set -x" not in linje and "Set-PSDebug" not in linje, linje
-        assert "EODHD_API_KEY" not in linje or ut.search(linje) is None or ">> .env.ny" in linje, linje
-    tekst = "\n".join(kode)
+        # Variabelen leses aldri i skriptet, bare av fetch_prices.py fra .env.
+        assert not re.search(r"\$(env:)?\{?EODHD_API_KEY", linje, re.I), linje
     assert "https://eodhd.com/register" in tekst
 
 
@@ -149,6 +174,15 @@ def test_spoer_foer_uv_installeres(navn):
     assert installasjon in readme
     assert tekst.index("Installere uv nå?") < tekst.index(installasjon)
     assert "OSE_START_SVAR_JA" in tekst
+    # Gjennomgangen (VG5): bare j, ja, y og yes er ja, og et nei stopper
+    # foer installasjonen.
+    ja = {
+        "start.ps1": "$svar -notmatch '^\\s*(j|ja|y|yes)\\s*$'",
+        "start.sh": "j|J|ja|Ja|JA|y|Y|yes) ;;",
+    }[navn]
+    assert ja in tekst
+    nei = tekst.index("stopp" if navn == "start.sh" else "Stopp", tekst.index(ja))
+    assert nei < tekst.index(installasjon)
 
 
 @pytest.mark.parametrize("navn", list(SKRIPTENE))
@@ -158,8 +192,61 @@ def test_vinduet_sier_hvordan_man_stopper_paa_norsk(navn):
     tekst = SKRIPTENE[navn].read_text(encoding="utf-8-sig")
     assert "Lukk dette vinduet, eller trykk Ctrl+C, for å stoppe den." in tekst
     assert "Se «Står du fast?» i README-en, eller docs/hjelp.md." in tekst
-    assert "æ" in tekst or "Første" in tekst
-    assert "ø" in tekst and "å" in tekst
+    # Gjennomgangen (BH11): i det vinduet sier, ikke i kommentarene.
+    meldinger = [
+        linje
+        for linje in _kode(SKRIPTENE[navn])
+        if re.search(r"\b(Write-Host|Read-Host|Stopp|echo|stopp|read -r)\b", linje)
+    ]
+    for bokstav in "æøå":
+        assert any(bokstav in linje for linje in meldinger), bokstav
+    assert any("Vinduet må være åpent mens appen kjører." in linje for linje in meldinger)
+
+
+@pytest.mark.parametrize("navn", list(SKRIPTENE))
+def test_nettleseren_aapnes_etter_at_siden_svarer(navn):
+    """Gjennomgangen (VG6). Ville feilet hvis nettleseren ble aapnet foer
+    siden svarte, eller registreringssiden ble aapnet uten at noekkelen
+    manglet."""
+    kode = "\n".join(_kode(SKRIPTENE[navn]))
+    klar = kode.index("Appen kjører på")
+    aapne = {"start.ps1": "Start-Process $Adresse", "start.sh": 'aapne "$ADRESSE"'}[navn]
+    assert kode.count(aapne) == 1 and kode.index(aapne) > klar
+    mangler = {
+        "start.ps1": "if (-not $harNoekkel) {",
+        "start.sh": "if ! grep -q '^EODHD_API_KEY=[^[:space:]]' .env; then",
+    }[navn]
+    lagret = kode.index("Nøkkelen er lagret i .env.")
+    assert kode.index(mangler) < kode.index("https://eodhd.com/register") < lagret
+
+
+@pytest.mark.parametrize("navn", list(SKRIPTENE))
+def test_den_ekte_versjonen_startes_bare_fra_main(navn):
+    """Regel 22 (gjennomgangen, VG1 og ECH9). Ville feilet hvis den ekte
+    versjonen kunne hente fra en gren i en klon med .git, slik at
+    data/db/ose.db ble skrevet fra grenen."""
+    kode = "\n".join(_kode(SKRIPTENE[navn]))
+    vern = kode.index("git rev-parse --abbrev-ref HEAD")
+    assert "main" in kode[vern : vern + 200] and "regel 22" in kode[vern : vern + 400]
+    assert vern < kode.index("uv run python src/fetch_prices.py")
+
+
+@pytest.mark.parametrize("navn", list(SKRIPTENE))
+def test_porten_sjekkes_for_alt_som_svarer_og_serveren_stoppes(navn):
+    """Gjennomgangen (BH16, ECH7, BH3, ECH2, BH2). Ville feilet hvis bare
+    200 talte som opptatt, serveren ble staaende etter en stopp, eller en
+    server som stoppet av seg selv, lukket vinduet uten beskjed."""
+    kode = "\n".join(_kode(SKRIPTENE[navn]))
+    if navn == "start.ps1":
+        assert "System.Net.Sockets.TcpClient" in kode and "if (Opptatt) {" in kode
+        assert "taskkill.exe /T /F /PID $script:server.Id" in kode
+        assert kode.index("function Stopp([string]$Melding) {\nStopp-Serveren") >= 0
+        assert "$null = $server.Handle" in kode and "if ($server.ExitCode -ne 0)" in kode
+    else:
+        assert "-w '%{http_code}'" in kode and "if opptatt; then" in kode
+        assert "trap 'kill \"$server\" 2>/dev/null' EXIT" in kode
+        assert "trap 'exit 130' INT TERM HUP" in kode
+        assert '[ "$kode" = 0 ] || stopp "appen stoppet med kode $kode.' in kode
 
 
 def test_start_ps1_har_bom():
