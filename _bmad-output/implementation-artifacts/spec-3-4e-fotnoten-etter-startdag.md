@@ -28,6 +28,7 @@ context:
 
 - a) Demoteksten står bare for en dag før `STARTDAG`. En dag fra `STARTDAG` og senere uten vurdering får den ekte teksten, også i demoen, slik en kveld uten henting gjør i den ekte versjonen. Testen som sletter en rad 09.10 i demoen, krever da den ekte teksten, med grunnen.
 - b) Er dagen som vises, i dag, står det i tillegg i fotnoten: «For i dag kan signalet fortsatt lagres hvis hentingen kjøres ferdig i kveld.» Ellers står den ekte teksten fra kl. 23:19 uendret.
+  *Rettet 2026-10-23 (gruppens svar 23.10 kl. 19:10, gjennomgangen 23.10 kveld, VG5):* setningen står når en av dagene er inneværende børsdag (`innevaerende_boersdag`), og lyder «Signalet for denne dagen kan fortsatt lagres hvis hentingen kjøres ferdig før neste børsdag.»
 - c) Testene, med «Ville feilet hvis», uten nett: i demoen demoteksten før `STARTDAG` og den ekte teksten etter, på aksjesiden, oversikten og børsometeret; setningen om i dag bare når dagen er i dag, med `idag` satt i testen.
 - Hjelpen og `docs/hjelp.md` følger med der de sier det samme (regel 19). Bildene tas på nytt bare hvis testene krever det.
 
@@ -35,6 +36,7 @@ context:
 
 1. a) `_fotnoten(datoer)` i `app.py` gir malen `fotnote_demo`: sant i demoen når alle datoene som er «ikke vurdert», er før `STARTDAG`. Har oversikten rader både før og etter, står den ekte teksten, fordi den dekker begge. Delmalen bruker `fotnote_demo` i stedet for `eksempeltall`.
 2. b) `_fotnoten` gir også `fotnote_i_dag`: sant når en av datoene er `idag()`. Setningen står etter den ekte teksten.
+   *Rettet 2026-10-23 (gruppens svar 23.10 kl. 19:10, gjennomgangen 23.10 kveld, VG5):* `fotnote_kan_lagres`, sant når `innevaerende_boersdag(idag())` er en av datoene, i `2fd2635`.
 3. c) Testene.
 
 ## Mutantene
@@ -81,6 +83,35 @@ Gjennomgang 23.10 etter hele settet, på diffen `651be64..622e25f` og `31feb13` 
   *Lukket 2026-10-23 (gruppens svar 23.10 kl. 19:10 under story 3.4 i `epics.md`):* setningen står når dagen som vises, er siste børsdag fram til i dag, med samme regel som lagringen (`innevaerende_boersdag`), og lyder «Signalet for denne dagen kan fortsatt lagres hvis hentingen kjøres ferdig før neste børsdag.» Rettet i `2fd2635` (a), testet i `TestFotnotenForInnevaerendeBoersdag` (b).
 - **Etter kveldens henting** (BH2): setningen om i dag står også etter at hentingen har gått, hvis raden fortsatt mangler. Siden vet ikke om hentingen har gått.
   *Lukket 2026-10-23 (gruppens svar 23.10 kl. 19:10 under story 3.4 i `epics.md`):* svaret erstatter vilkåret og setningen fra kl. 16:06, så punktet er avgjort. Setningen sier nå at signalet kan lagres hvis hentingen kjøres ferdig før neste børsdag.
+
+## Gjennomgangen 23.10 kveld
+
+Gjennomgang 23.10 etter hele settet, etter gruppens svar 23.10 kl. 19:10, på `21a7bfe` og `578d875` på main og diffen `cbdf7c6..5cacd5e` på grenen. Linsene var Blind Hunter (BH, 10 funn), Edge Case Hunter (ECH, 6 funn) og Verification Gap (VG, 7 funn), hver for seg og uten å endre noe i repoet. Numrene gjelder denne gjennomgangen, ikke den over. 23 funn ble 18 rader. Blind Hunter ga BH1 og BH2 dom medium; begge ble slått opp og holder ikke, så ingen funn med dom medium eller høyere står igjen. De små funnene er rettet med en gang (svaret kl. 15:53).
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH1 | Står `fotnote_i_dag` igjen et sted, forsvinner setningen der uten feil | medium etter linsen, avvist | uten endring: slått opp, `fotnote_i_dag` finnes ikke i `src/`, `tests/` eller `docs/hjelp.md` |
+| BH2 | «Samme regel som lagringen» holder bare hvis lagringen bruker samme dato | medium etter linsen, avvist | uten endring: slått opp, lagringen bruker `innevaerende_boersdag(norsk_dato(...))` (`src/lagring_sqlite.py`), og siden `idag()`, som er `norsk_dato(naa())` |
+| BH3, VG1 | Grenen for `UtenforKalenderen` i `_innevaerende` var ikke testet | low | rettet i `0fd807f` |
+| BH4, ECH1 | Med flere datoer på oversikten sier ikke «denne dagen» hvilken | low | uten endring: teksten er gruppens ordrett; føres under «Åpent» |
+| BH5 | Lukket-linja for BH2 er en avgjørelse, ikke en retting | low | uten endring: linja sier at svaret avgjør punktet |
+| BH6, VG2 | Helga var ikke testet på børsometeret | low | rettet i `0fd807f` |
+| BH7, VG4 | Konstanten `I_DAG` og `i_dag` holdt den nye setningen | nit | rettet i `0fd807f`: `SETNINGEN`; testnavnene står, fordi mutanttabellen over viser til dem |
+| BH8, ECH5 | `bool(datoer)` i vilkåret er overflødig | nit | uten endring: en tom liste gir da ikke noe oppslag i kalenderen |
+| BH9 | Ordlyden i `docs/hjelp.md` var tung | nit | rettet i `53223ca` |
+| BH10 | Testene forutsetter at `serie` bruker kalenderdager | low | uten endring: slått opp, `serie` i `tests/test_app.py` legger til én kalenderdag per rad fra 01.09, så 60 rader slutter 30.10 og 114 rader 23.12 |
+| ECH2 | Hentingen kan likevel ikke bli ferdig, når kvoten er brukt opp eller datoen skifter under kjøringen | low | uten endring: setningen er betinget («hvis hentingen kjøres ferdig») |
+| ECH3 | Midnatt i Oslo mot UTC var ikke testet | nit | rettet i `0fd807f` |
+| ECH4 | Lagringen godtar også forrige børsdag ved første henting i en tom base | nit | rettet i `0fd807f`: docstringen sier det, og at ingen rad da er «ikke vurdert» |
+| ECH6 | En side som står åpen over midnatt, viser setningen til den lastes på nytt | nit | uten endring: siden bygges på serveren |
+| VG3 | Ingen test av helga i demoen | low | rettet i `0fd807f` |
+| VG5 | Kontrollpunktene og planen beskrev fortsatt vilkåret fra kl. 16:06 | nit | rettet her: Rettet-linjer |
+| VG6 | Raden ECH1 i triagen over sier fortsatt «ikke rettet» | nit | rettet her: Lukket-linja under «Åpent» og denne tabellen; raden står som historikk |
+| VG7 | Spesifikasjonen står på `in-review`, og bildene kan ikke sjekkes fra diffen | nit | uten endring: `done` etter flettingen (steg 4); bildene ble tatt på nytt, og git viste ingen endring |
+
+Under «Åpent», etter gjennomgangen 23.10 kveld:
+
+- **Flere datoer på oversikten** (BH4, ECH1, low): er en aksje «ikke vurdert» torsdag og en annen fredag, står setningen, men «denne dagen» gjelder bare fredagen. Teksten er gruppens ordrett.
 
 ## Det som ikke endres
 
