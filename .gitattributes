@@ -1,0 +1,6 @@
+# Story 3.5a: skriptene for dobbeltklikk faar riktige linjeskift ogsaa i
+# «Download ZIP» paa GitHub: CRLF for Windows og LF for Mac.
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+*.command text eol=lf
+*.sh text eol=lf
