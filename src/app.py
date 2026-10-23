@@ -547,7 +547,10 @@ def boersometer():
     rader = bygg_oversikt(poster, i_dag, STANDARD)
     # Gjennomgangen (VG1): gult foelger 3 av 3 paa siste boersdag, ogsaa naar
     # siden viser en annen dag (designregler §3).
-    siste_styrke = {rad.aksje.symbol: rad.styrke for rad in rader}
+    # Gjennomgangen 23.10 (ECH1): bare en rad fra sidens siste boersdag,
+    # saa en aksje der hentingen feilet den dagen, ikke faar gult fra
+    # en eldre dag.
+    siste_styrke = {rad.aksje.symbol: rad.styrke for rad in rader if rad.dato == siste}
     ruter = [
         bygg_rute(
             post.aksje,
@@ -701,7 +704,11 @@ def aksjedetalj(symbol: str):
     if not rader:
         # Gruppens svar 23.10 kl. 09:24 (b): en aksje i lista uten kurser
         # svarer 200 med en beskjed, ikke 404, som FR-204 for en aksje uten
-        # gyldig signal.
+        # gyldig signal. Siste avsnitt i FR-204 forbeholder fortsatt 404 for
+        # en aksje uten en eneste kursrad (aapent punkt under story 8.6 i
+        # epics.md). Siden har ingen dag og ingen periode, saa ?dag= og
+        # ?periode= leses ikke (gjennomgangen 23.10, BH6, ECH3). En base uten
+        # en eneste kurs gir fortsatt 404 over, foer foerste henting.
         return render_template("aksje_uten_kurser.html", aksje=post.aksje, hentet=None)
     # Gjennomgangen, BH10: dagen leses én gang, saa alt i svaret gjelder samme dag.
     i_dag = idag()

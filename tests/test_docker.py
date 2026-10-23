@@ -936,8 +936,8 @@ HOEYDE_PAA_BILDET = 1630
 # ble tatt paa nytt og er byte for byte det samme.
 # Gruppens svar 23.10 kl. 09:24 (a): gult i børsometeret en dag uten
 # vurdering, i hjelpetekster.py. Bildet ble tatt på nytt og er byte for byte det samme.
-# Gruppens svar 23.10 kl. 09:24 (b): navnet uten kurser lenker til aksjesiden, i
-# index.html, app.py og hjelpetekster.py. Bildet ble tatt på nytt og er byte for byte det samme.
+# Gruppens svar 23.10 kl. 09:24 (b): aksjesiden for en aksje uten kurser, og
+# lenkene dit. Bildet ble tatt på nytt og er byte for byte det samme.
 AVTRYKK_BAK_BILDET = "e2fd44b1ab9266591331c0e49e9c982b916bcd31fd3cba82be5983e3c0dfb4a7"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
@@ -1023,9 +1023,11 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # hjelpetekster.py. Bildet ble tatt på nytt og er byte for byte det samme.
 # Gruppens svar 23.10 kl. 09:24 (a): gult i børsometeret en dag uten
 # vurdering, i hjelpetekster.py. Bildet ble tatt på nytt og er byte for byte det samme.
-# Gruppens svar 23.10 kl. 09:24 (b): navnet uten kurser lenker til aksjesiden, i
-# index.html, app.py og hjelpetekster.py. Bildet ble tatt på nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "7efcf1c4e3ac7e9d55e32a4d24a51a259fdac9ff3c8b606bbb6ff19096cd9c07"
+# Gruppens svar 23.10 kl. 09:24 (b): aksjesiden for en aksje uten kurser, og
+# lenkene dit. Bildet ble tatt på nytt og er byte for byte det samme.
+# Gjennomgangen 23.10: gult fra sidens siste børsdag (ECH1) og kommentarene om
+# aksjesiden uten kurser i app.py. Bildet ble tatt på nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "12d7ff9b4d6b0bb0833b01cff94c6b0899fd0def2f59ae69eb6acca148b01f99"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "

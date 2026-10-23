@@ -3,7 +3,9 @@
 {#- Gruppens svar 23.10 kl. 09:24 (b): en aksje i lista uten en eneste kurs
     har en aksjeside som svarer 200, med navnet, bransjen og en beskjed, og
     uten graf og sjekker, slik FR-204 sier for en aksje uten gyldig signal.
-    Toppen er som på aksjesiden. #}
+    Siste avsnitt i FR-204 forbeholder fortsatt 404 for en aksje uten en
+    eneste kursrad (åpent punkt under story 8.6 i epics.md). Toppen er som
+    på aksjesiden. #}
 {% block tittel %}{{ aksje.navn }} — OSE Signal{% endblock %}
 {% block side %}side-aksje{% endblock %}
 
@@ -17,7 +19,7 @@
   <h1 class="overskrift">{{ aksje.navn }}</h1>
   <p class="meta">{{ "Demo Børs" if eksempeltall else "Oslo Børs" }}</p>
 
-  <p class="ingen-kurser" role="status">
+  <p class="ingen-kurser">
     Det finnes ingen kurser for {{ aksje.navn }} ennå, så siden har ingen kursgraf og ingen sjekker.
     {% if eksempeltall %}I demoen mangler kursene med vilje.{% endif %}
   </p>

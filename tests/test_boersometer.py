@@ -600,6 +600,13 @@ class TestDenEkteVersjonen:
         assert "Eksempeltall" not in html and "Oslo Børs · fredag 09.10 · 15 aksjer i 8 bransjer" in html
         assert len(_ruter(html)) == 15
 
+    def test_aksjesiden_uten_kurser_sier_ikke_demo(self, ekte):
+        """Gjennomgangen 23.10 (VG8). Ville feilet med «Demo Børs» eller
+        setningen om demoen i den ekte versjonen."""
+        html = _side(ekte, "/aksje/MTFJ")
+        assert "Det finnes ingen kurser for Matfjord Merkevarer ennå" in html
+        assert "Oslo Børs" in html and "Demo Børs" not in html and "I demoen" not in html
+
     def test_uten_base_viser_siden_hentekommandoen(self, monkeypatch):
         """Ville feilet med en feilside før første henting."""
         monkeypatch.delenv(app_modul.I_DEMO, raising=False)
@@ -624,18 +631,24 @@ class TestSvaretKl0924:
         )
         assert rute.uten_data and rute.ramme == ventet
 
-    def test_siste_boersdag_uten_vurdering_har_ingen_ramme(self):
-        """a) Siste børsdag uten vurdering er ingen 3 av 3. Ville feilet hvis
-        gult fra en rad som ikke finnes, sto siste børsdag."""
-        rute = bygg_rute(_aksje("A", "Energi"), KURSER, None, date(2026, 10, 9), IDAG, siste_styrke=None)
+    @pytest.mark.parametrize("siste", [3, 2, None])
+    def test_siste_boersdag_uten_vurdering_har_ingen_ramme(self, siste):
+        """a) Siste børsdag følger rammen vurderingen for dagen, ikke
+        siste_styrke (gjennomgangen 23.10, BH2, VG4). Ville feilet hvis gult
+        fra siste_styrke sto siste børsdag uten vurdering."""
+        rute = bygg_rute(_aksje("A", "Energi"), KURSER, None, date(2026, 10, 9), IDAG, siste_styrke=siste)
         assert rute.ramme is None
 
     def test_gult_en_dag_uten_vurdering_ogsaa_i_merket(self, klient):
         """a) 18.09 har ingen vurderinger i demoen. Ville feilet hvis gult
-        forsvant den dagen (mutant N1), eller merket ikke sa «siste børsdag»."""
+        forsvant den dagen (mutant N1), eller merket i ruta ikke sa «siste
+        børsdag» (gjennomgangen 23.10, VG5)."""
         html = _side(klient, "/boersometer?dag=2026-09-18")
         gule = [symbol for klasser, symbol in _ruter(html) if "ramme-gul" in klasser]
         assert sorted(gule) == ["BRFE", "KVST", "LKSV", "TRHF"]
+        for symbol in gule:
+            rute = re.search(rf'<span class="ticker">{symbol}</span>.*?</a>', html, re.S).group(0)
+            assert '<span class="merke">3 av 3 siste børsdag</span>' in rute, symbol
         assert "Gul ramme betyr 3 av 3 på siste børsdag, 09.10" in html
 
     def test_aksjesiden_uten_kurser_svarer_200_med_beskjed(self, klient):
@@ -669,3 +682,39 @@ class TestSvaretKl0924:
         lenke = '<a href="/aksje/MTFJ">Matfjord Merkevarer</a>'
         assert lenke in _side(klient, "/")
         assert lenke in _side(klient, "/min-liste?vis=alle")
+
+    def test_gult_bare_fra_sidens_siste_boersdag(self, klient):
+        """Gjennomgangen 23.10 (ECH1): BRFE mangler kurs og vurdering 09.10,
+        sidens siste børsdag, som når hentingen feilet for den, og får 3 av 3
+        08.10 i kopien av demobasen. Ville feilet hvis gult kom fra aksjens
+        egen siste kursdag og sto 08.10 eller 18.09."""
+        tilkobling = sqlite3.connect(demo_sti())
+        try:
+            tilkobling.execute("DELETE FROM kurs WHERE symbol = 'BRFE' AND dato = '2026-10-09'")
+            tilkobling.execute("DELETE FROM vurdering WHERE symbol = 'BRFE' AND dato = '2026-10-09'")
+            tilkobling.execute(
+                "UPDATE vurdering SET styrke = 3, retning = 'Negativ', trend = -1, bevegelse = -1, interesse = -1"
+                " WHERE symbol = 'BRFE' AND dato = '2026-10-08'"
+            )
+            tilkobling.commit()
+        finally:
+            tilkobling.close()
+        for adresse in ("/boersometer", "/boersometer?dag=2026-10-08", "/boersometer?dag=2026-09-18"):
+            html = _side(klient, adresse)
+            assert "fredag 09.10" in html or "?dag=" in adresse
+            gule = {symbol for klasser, symbol in _ruter(html) if "ramme-gul" in klasser}
+            assert gule == {"KVST", "LKSV", "TRHF"}, adresse
+
+    def test_hjelpen_sier_det_samme(self):
+        """Gjennomgangen 23.10 (VG3): hjelpen i appen og docs/hjelp.md følger
+        svarene (regel 19). Ville feilet med den gamle teksten om ingen
+        aksjeside, eller om ingen ramme en dag uten vurdering."""
+        from hjelpetekster import hjelpetekster
+
+        tekster = hjelpetekster(STANDARD)
+        assert "også når du velger en annen dag" in tekster["boersometeret"].tekst
+        assert "med lenke til aksjesiden" in tekster["uten_data"].tekst
+        hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
+        assert "også en dag uten vurdering" in hjelp
+        assert "For en aksje uten kurser sier aksjesiden at det ikke finnes kurser ennå" in hjelp
+        assert "har ingen aksjeside" not in hjelp and "uten ramme" not in hjelp

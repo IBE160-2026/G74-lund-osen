@@ -405,6 +405,10 @@ class TestAksjedetalj:
         assert klient.get("/aksje/EQNR.OL").status_code == 404
 
     def test_kjent_symbol_uten_data_gir_404(self, klient, monkeypatch):
+        """Basen har ikke en eneste kurs, som før første henting, og ingen
+        side lenker til aksjen. Har basen andre kurser, svarer siden 200 med
+        en beskjed (gruppens svar 23.10 kl. 09:24, b; gjennomgangen 23.10,
+        VG1)."""
         monter(monkeypatch, snapshot({}))
         assert klient.get("/aksje/EQNR").status_code == 404
 
@@ -479,6 +483,11 @@ class TestAksjedetalj:
         assert "01.09 til 19.11" in html
 
     def test_uleselig_symbol_gir_404(self, klient, monkeypatch):
+        """Den eneste aksjen har en rad som ikke kan leses, så basen får
+        ingen kurser, og siden gir 404 som før første henting. Med andre
+        kurser i basen svarer den 200 med en beskjed (gruppens svar 23.10
+        kl. 09:24, b; test_uleselig_symbol_navngis_i_fotnoten; gjennomgangen
+        23.10, VG1)."""
         ugyldig = [eodhd(r) for r in serie([100.0] * 61)]
         ugyldig[10]["date"] = "2026-9-11"
         monter(monkeypatch, snapshot({"EQNR": ugyldig}))

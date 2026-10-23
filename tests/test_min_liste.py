@@ -371,6 +371,11 @@ class TestSidene:
         assert stripa.count('class="sideknapp"') == 3 and 'aria-current="page"' not in stripa
         # Aksjesiden beholder veien tilbake.
         assert '<a class="tilbake" href="/">Markedsoversikt</a>' in aksjesiden
+        # Gjennomgangen 23.10 (BH8): også siden for en aksje uten kurser.
+        uten = demo.get("/aksje/MTFJ").data.decode("utf-8")
+        stripa = uten.split("</header>", 1)[0]
+        assert stripa.count('class="sideknapp"') == 3 and 'aria-current="page"' not in stripa
+        assert '<a class="tilbake" href="/">Markedsoversikt</a>' in uten
 
     def test_knapperaden_ogsaa_paa_feilsiden(self, demo):
         """Ville feilet hvis knapperaden bare sto på sidene med tabell."""
