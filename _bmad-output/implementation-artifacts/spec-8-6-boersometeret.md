@@ -86,7 +86,7 @@ Blind Hunter (BH1–BH10), Edge Case Hunter (ECH1–ECH8) og Verification Gap (V
 | ECH1 gult fra aksjens egen siste kursdag, ikke sidens | medium | rettet: `siste_styrke` bare fra en rad fra sidens siste børsdag, med test som feiler uten rettingen |
 | VG1 to tester krever fortsatt 404 for et kjent symbol | medium | rettet: grunnen står i testene (basen uten en eneste kurs, som før første henting, og ingen side lenker dit) |
 | VG2 kvalitetssikringen sa at et uleselig symbol gir 404 | medium | rettet med en Rettet-linje i `38c84ca` |
-| BH1, ECH4 «ennå» når kursene ikke kan leses | medium og lav | ikke rettet: `monter` skriver ingen rader for et symbol som ikke kan leses, så basen har ingen kurser for aksjen, og teksten er den instruksjonen ba om |
+| BH1, ECH4 «ennå» når kursene ikke kan leses | lav (Blind Hunter foreslo medium, uten å ha lest utenfor diffen) | ikke en feil: `monter` skriver ingen rader for et symbol som ikke kan leses, så basen har ingen kurser for aksjen, og teksten er den instruksjonen ba om |
 | BH2, VG4 testen for siste børsdag uten vurdering fanget ikke det den sa | medium og lav | rettet: med `siste_styrke` 3, 2 og None |
 | BH3 `ramme(None)` | lav | ikke rettet: `ramme` tar `None` og gir `None` (`test_gult_bare_ved_3_av_3`) |
 | BH5 `eksempeltall` | lav | ikke rettet: kommer fra kontekstprosessoren `_eksempeltall` i `app.py` |
