@@ -945,7 +945,13 @@ HOEYDE_PAA_BILDET = 1630
 # Story 3.4d b: fotnoten for «ikke vurdert» i delmalen _fotnote_ikke_vurdert.html,
 # med den ekte teksten fra 22.10 kl. 23:19. Bildet ble tatt paa nytt og er byte
 # for byte det samme.
-AVTRYKK_BAK_BILDET = "f87cc97426824409a8c8440bbad2796f8b005bb7e5f4d288ffbd9b09be20d3de"
+# Story 3.4e a: demoteksten i fotnoten bare før STARTDAG, i app.py og
+# _fotnote_ikke_vurdert.html. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 3.4e b: setningen om i dag i fotnoten, i app.py og
+# _fotnote_ikke_vurdert.html. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 3.4e a etter svaret 23.10 kl. 19:10: setningen i fotnoten for inneværende
+# børsdag, i app.py og _fotnote_ikke_vurdert.html. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "8101e3231baa4250be618b705077407ba026c7b4710dadc799918ffababc8d8c"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1051,7 +1057,17 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # Gjennomgangen 23.10 (VG6): 3.4d b endret ogsaa aksje.html, som tar inn
 # delmalen, og ikke_vurdert for børsometeret i app.py. aksje_uten_kurser.html
 # fra 3.4d d er ikke bak bildet.
-AVTRYKK_BAK_AKSJESIDEN = "fae521807383713b53d70bfbdca636892d73cd8f3e0c82e7d28dfa4074fa6a88"
+# Story 3.4e a: demoteksten i fotnoten bare før STARTDAG, i app.py og
+# _fotnote_ikke_vurdert.html. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 3.4e b: setningen om i dag i fotnoten, i app.py og
+# _fotnote_ikke_vurdert.html. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gjennomgangen av 3.4e: _fotnoten i app.py med samme i_dag som siden, uten
+# setningen om i dag i demoen. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 3.4e a etter svaret 23.10 kl. 19:10: setningen i fotnoten for inneværende
+# børsdag, i app.py og _fotnote_ikke_vurdert.html. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gjennomgangen 23.10 kveld (ECH4): docstringen i _fotnoten i app.py.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "6a4a5ff17c749904bf10bd98262ac3fc8f864b4a86172da2eb4c865ac1bad143"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "

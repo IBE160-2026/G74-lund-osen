@@ -37,7 +37,7 @@ from flask import Flask, abort, g, redirect, render_template, request
 
 import lagring_sqlite
 from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
-from boersdag import norsk_dato
+from boersdag import UtenforKalenderen, innevaerende_boersdag, norsk_dato
 from boersometer import bygg_boersometer, bygg_rute
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
 from graf import bygg_graf
@@ -301,6 +301,38 @@ def demo_startdag() -> str:
     når det er et annet enn i år, som i de andre datoene på sidene
     (gjennomgangen 23.10, BH1 og ECH1)."""
     return f"{ukedag(STARTDAG)} {dato(STARTDAG, idag().year)}"
+
+
+def _fotnoten(datoer: list[date], i_dag: date) -> dict[str, bool]:
+    """Fotnoten for «ikke vurdert» etter datoene som er «ikke vurdert» på
+    siden (story 3.4e). Demoteksten står bare i demoen, og bare når alle
+    datoene er før STARTDAG. En dag fra STARTDAG uten vurdering får den
+    ekte teksten, også i demoen, som en kveld uten henting. Med datoer både
+    før og etter står den ekte teksten, fordi den dekker begge.
+    fotnote_kan_lagres: en av datoene er inneværende børsdag, siste børsdag
+    fram til i_dag, og fotnoten sier i tillegg at signalet fortsatt kan
+    lagres før neste børsdag. Samme regel som lagringen bruker, så fredagen
+    teller også lørdag, søndag og en helligdag (gruppens svar 23.10 kl.
+    19:10, ECH1). Lagringen godtar i tillegg forrige børsdag ved første
+    henting i en tom base (2.3c), men da finnes ingen rad «ikke vurdert»
+    på sidene (gjennomgangen 23.10 kveld, ECH4). Kan kalenderen ikke
+    avgjøre dagen, kan lagringen heller ikke skrive, og setningen står
+    ikke. Ikke i demoen, der ingen henting skriver (gjennomgangen, BH1 og
+    ECH3). i_dag er den samme dagen siden ellers er bygd med (ECH2)."""
+    demo = bool(g.get("eksempeltall", False))
+    return {
+        "fotnote_demo": demo and bool(datoer) and all(d < STARTDAG for d in datoer),
+        "fotnote_kan_lagres": not demo and bool(datoer) and _innevaerende(i_dag) in datoer,
+    }
+
+
+def _innevaerende(i_dag: date) -> date | None:
+    """Inneværende børsdag for i_dag, eller None når kalenderen ikke dekker
+    dagen (story 3.4e, svaret kl. 19:10)."""
+    try:
+        return innevaerende_boersdag(i_dag)
+    except UtenforKalenderen:
+        return None
 
 
 @app.context_processor
@@ -576,11 +608,13 @@ def boersometer():
     bransjer = bygg_boersometer(ruter)
     tre_av_tre = frozenset(rad.aksje.symbol for rad in rader if rad.styrke == ANTALL_SJEKKER)
     hovedindeks, indeks_feilet = _hovedindeks(leser, poster, tre_av_tre)
+    ikke_vurdert = any(rute.ikke_vurdert for rute in ruter)
     return render_template(
         "boersometer.html",
         bransjer=bransjer,
         antall_aksjer=len(ruter),
-        ikke_vurdert=any(rute.ikke_vurdert for rute in ruter),
+        ikke_vurdert=ikke_vurdert,
+        **_fotnoten([dagen] if ikke_vurdert else [], i_dag),
         dagen=dagen,
         siste=siste,
         foerste=datoer[0],
@@ -636,7 +670,8 @@ def _tabellsiden(aktiv: str):
         )
 
     poster = _leser_eller_basefeil(hent_oversiktsleser).oversikt()
-    rader = bygg_oversikt(poster, idag(), STANDARD)
+    i_dag = idag()
+    rader = bygg_oversikt(poster, i_dag, STANDARD)
     # Story 8.15: hver del sorteres for seg, så ingen rad flytter seg
     # mellom delene (tillegget 13.10). Linja om 3 av 3 og «N av M» bruker
     # rader, som står i FR-102 (svar 7).
@@ -654,6 +689,8 @@ def _tabellsiden(aktiv: str):
         oevrige = [rad for rad in oevrige if rad.aksje.symbol in merkede]
         mangler = uten_kurser([post for post in poster if post.aksje.symbol in merkede])
     hovedindeks, indeks_feilet = (None, False) if i_lista else _hovedindeks(leser, poster, tre_av_tre)
+    # Story 3.4e: datoene som er «ikke vurdert» i det siden viser, én gang.
+    ikke_vurdert = [rad.dato for rad in (*skilte_seg_ut, *oevrige) if rad.ikke_vurdert]
 
     return render_template(
         "index.html",
@@ -667,7 +704,8 @@ def _tabellsiden(aktiv: str):
         # Story 8.0d, PR 2b: M i «N av M aksjer» er alle aksjene i lista,
         # også de uten kurser (beslutningen 14.10).
         antall_aksjer=len(poster),
-        ikke_vurdert=any(rad.ikke_vurdert for rad in (*skilte_seg_ut, *oevrige)),
+        ikke_vurdert=bool(ikke_vurdert),
+        **_fotnoten(ikke_vurdert, i_dag),
         # Gjennomgangen (BH7, ECH1): «Alle» i Min liste er samme tabell som
         # oversikten, ogsaa naar ingen skilte seg ut.
         ingen_skilte_seg_ut=ingen_skilte_seg_ut(rader) and not (i_lista and not alle),
@@ -802,6 +840,7 @@ def aksjedetalj(symbol: str):
             # Story 2.7b: maaneden for dagen siden viser, eller den i adressen.
             historikk=historikk,
             pil=pil,
+            **_fotnoten([detalj.dato] if detalj.ikke_vurdert else [], i_dag),
         )
     )
     # Siden avhenger av bryteren (gjennomgangen av 10.3, BH10).

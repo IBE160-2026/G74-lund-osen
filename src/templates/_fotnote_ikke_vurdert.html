@@ -1,11 +1,16 @@
 {#- Story 3.4d: fotnoten for «ikke vurdert», felles for aksjesiden, oversikten
     og børsometeret. Siden som tar den inn, sier når den står. Egen tekst i
     demoen (gruppens svar 22.10 kl. 20:11), den ekte teksten fra svaret
-    22.10 kl. 23:19, og på børsometeret fra svaret 23.10 kl. 11:44 (b). #}
+    22.10 kl. 23:19, og på børsometeret fra svaret 23.10 kl. 11:44 (b).
+    Story 3.4e: demoteksten bare for en dag før STARTDAG (fotnote_demo fra
+    _fotnoten i app.py), og setningen om at signalet kan lagres når dagen er
+    inneværende børsdag (fotnote_kan_lagres, gruppens svar 23.10 kl. 19:10). #}
       <p class="fotnote">
-        {% if eksempeltall %}«Ikke vurdert»: i demoen starter vurderingene
+        {% if fotnote_demo %}«Ikke vurdert»: i demoen starter vurderingene
         {{ demo_startdag }}, slik den ekte versjonen har signal fra første henting.
         {%- else %}«Ikke vurdert»: signalet lagres bare den kvelden kursene hentes,
         og regnes aldri ut bakover. Det gjelder dagene før første henting, kvelder
-        uten henting, og dager der kursene er lest inn med <code>--les-inn</code>.{% endif %}
+        uten henting, og dager der kursene er lest inn med <code>--les-inn</code>.
+        {%- if fotnote_kan_lagres %} Signalet for denne dagen kan fortsatt lagres hvis
+        hentingen kjøres ferdig før neste børsdag.{% endif %}{% endif %}
       </p>

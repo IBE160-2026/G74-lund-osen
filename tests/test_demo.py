@@ -1009,6 +1009,12 @@ class TestFotnotenIDemoen:
     vurdert» har en egen tekst i demoen, med datoen fra STARTDAG."""
 
     DEMOTEKST = "i demoen starter vurderingene mandag 21.09, slik den ekte versjonen har signal fra første henting."
+    # Story 3.4e: den ekte teksten, ogsaa i demoen for en dag fra STARTDAG.
+    EKTE_TEKST = (
+        "«Ikke vurdert»: signalet lagres bare den kvelden kursene hentes, og regnes aldri ut bakover. "
+        "Det gjelder dagene før første henting, kvelder uten henting, og dager der kursene er lest inn med "
+        "<code>--les-inn</code>."
+    )
 
     @staticmethod
     def _fotnoten(html):
@@ -1030,7 +1036,9 @@ class TestFotnotenIDemoen:
 
     def test_oversikten_med_en_rad_som_mangler(self, klient, monkeypatch, demobase):
         """KVST uten rad paa 09.10, tatt bort direkte i en kopi av demobasen.
-        Ville feilet med den ekte teksten i demoen (M1)."""
+        Story 3.4e: 09.10 er etter STARTDAG, saa raden er som en kveld uten
+        henting i den ekte versjonen, og fotnoten har den ekte teksten, ogsaa
+        i demoen. Ville feilet hvis demoteksten sto for en dag etter STARTDAG."""
         c = sqlite3.connect(demobase)
         try:
             c.execute("DELETE FROM vurdering WHERE symbol = 'KVST' AND dato = '2026-10-09'")
@@ -1040,8 +1048,67 @@ class TestFotnotenIDemoen:
         monkeypatch.setenv(app_modul.I_DEMO, "1")
         html = klient.get("/").data.decode("utf-8")
         assert "ikke vurdert" in html
+        assert self._fotnoten(html) == self.EKTE_TEKST
+
+    def test_oversikten_med_en_rad_foer_startdagen(self, klient, monkeypatch, demobase):
+        """Story 3.4e: KVST uten kurser fra STARTDAG, saa raden er fra fredag
+        18.09 og «ikke vurdert». Ville feilet hvis demoteksten forsvant for
+        en dag foer STARTDAG paa oversikten."""
+        c = sqlite3.connect(demobase)
+        try:
+            c.execute("DELETE FROM kurs WHERE symbol = 'KVST' AND dato >= '2026-09-21'")
+            c.execute("DELETE FROM vurdering WHERE symbol = 'KVST' AND dato >= '2026-09-21'")
+            c.commit()
+        finally:
+            c.close()
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        html = klient.get("/").data.decode("utf-8")
+        assert "ikke vurdert" in html
         assert self._fotnoten(html) == "«Ikke vurdert»: " + self.DEMOTEKST
-        assert "--les-inn" not in html
+
+    @pytest.mark.parametrize("dag", ["2026-09-21", "2026-10-08"])
+    def test_aksjesiden_etter_startdagen_har_den_ekte_teksten(self, klient, monkeypatch, demobase, dag):
+        """Story 3.4e: KVST uten vurdering på STARTDAG 21.09 og 08.10. Ville
+        feilet hvis demoteksten sto for alle dager i demoen (M1 i 3.4e c),
+        eller også på STARTDAG (gjennomgangen, VG1)."""
+        c = sqlite3.connect(demobase)
+        try:
+            c.execute("DELETE FROM vurdering WHERE symbol = 'KVST' AND dato = ?", (dag,))
+            c.commit()
+        finally:
+            c.close()
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        html = klient.get(f"/aksje/KVST?dag={dag}").data.decode("utf-8")
+        assert self._fotnoten(html) == self.EKTE_TEKST
+
+    def test_ingen_setning_i_demoen_i_helga(self, klient, monkeypatch, demobase):
+        """Gjennomgangen 23.10 kveld (VG3): KVST uten vurdering fredag 09.10,
+        lest lørdag 10.10, da fredagen er inneværende børsdag. Ville feilet
+        hvis setningen om at signalet kan lagres sto i demoen, der ingen
+        henting skriver."""
+        c = sqlite3.connect(demobase)
+        try:
+            c.execute("DELETE FROM vurdering WHERE symbol = 'KVST' AND dato = '2026-10-09'")
+            c.commit()
+        finally:
+            c.close()
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 10, 12, 0, tzinfo=timezone.utc))
+        html = klient.get("/aksje/KVST?dag=2026-10-09").data.decode("utf-8")
+        assert self._fotnoten(html) == self.EKTE_TEKST
+
+    def test_oversikten_med_datoer_foer_og_etter_startdagen(self, klient, monkeypatch, demobase):
+        """Gjennomgangen (VG2): KVST «ikke vurdert» 18.09 og LKSV 09.10. Ville
+        feilet hvis demoteksten sto når én av datoene er før STARTDAG."""
+        c = sqlite3.connect(demobase)
+        try:
+            c.execute("DELETE FROM kurs WHERE symbol = 'KVST' AND dato >= '2026-09-21'")
+            c.execute("DELETE FROM vurdering WHERE symbol IN ('KVST', 'LKSV') AND dato >= '2026-09-21'")
+            c.commit()
+        finally:
+            c.close()
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        assert self._fotnoten(klient.get("/").data.decode("utf-8")) == self.EKTE_TEKST
 
     @pytest.mark.parametrize("adresse", ["/aksje/KVST?dag=2026-09-18", "/boersometer?dag=2026-09-18"])
     def test_datoen_paa_sidene_kommer_fra_startdag(self, klient, monkeypatch, demobase, adresse):

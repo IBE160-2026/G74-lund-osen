@@ -64,12 +64,14 @@ Spør personen om noe underveis, er svaret alltid:
   - Ser personen hovedindeksen og søylene?
   - Hvilke sider åpnes, i rekkefølge?
 - **Slår personen på KI-teksten selv** i del A («Vis KI-teksten»), noteres det med tidspunkt. Da har personen sett KI-teksten før del B, og 10.4 ville feilet (under). Hva som gjøres da, står under «Åpent».
+  *Rettet 2026-10-23 (gjennomgangen av 3.4e, VG5):* avgjort kl. 15:53 (b), se Lukket-linja under «Åpent»: forklaringen teller for 8.1 bare hvis den kom før, del B hoppes over, og 10.4 tas med neste person.
 
 ## Del B (story 10.4)
 
 Etter at tiden i del A er stoppet.
 
 - **Aksjen** er den personen forklarte i del A. Uten forklaring er det den første aksjesiden personen åpnet. Åpnet personen ingen aksjeside, er aksjen ikke avgjort (se «Åpent»).
+  *Rettet 2026-10-23 (gjennomgangen av 3.4e, VG5):* avgjort kl. 15:53 (a): aksjen er den øverste i tabellen.
 - **Ett fast spørsmål**, ordrett: «Hva sier siden om denne aksjen?»
   1. Først med KI av. Svaret noteres ordrett.
   2. Så slår én av oss KI-teksten på med «Vis KI-teksten», og spørsmålet stilles på nytt, ordrett. Svaret noteres ordrett.
