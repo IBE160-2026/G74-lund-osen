@@ -2366,6 +2366,39 @@ FR-604, FR-605, `AD-8`, `AD-9`
 
 ---
 
+### Story 3.5: Start med dobbeltklikk
+
+*Lagt til 2026-10-23, etter gruppens svar kl. 16:16 og 16:37 (avgjørelsene under «Prioritering» og story 3.3).*
+
+Som **faglærer, sensor eller en annen bruker uten Docker**, vil jeg starte
+demoen eller den ekte versjonen med et dobbeltklikk, så jeg slipper å skrive
+kommandoer.
+
+**Oppfyller:** svarene kl. 16:16 og 16:37 · **Begrenses av:** `AD-9`, `AD-10`,
+regel 10 og 22 i `CLAUDE.md`
+
+**Tre veier, hver på sin gren (svaret kl. 16:37):**
+- **3.5a:** dobbeltklikk med uv, uten Docker. Mangler uv, spør skriptet før det
+  installeres i brukermappa (svaret kl. 16:16).
+- **3.5b:** dobbeltklikk med Docker.
+- **3.5c:** et installasjonsprogram for Windows, ikke for Mac.
+
+Gruppen velger hovedveien i «Kom i gang» før README-prøven, med Docker som
+reserve. Til da endres ikke «Kom i gang».
+
+**Kontroll — hva testen ser etter:**
+- «Start demoen» og «Start den ekte versjonen» finnes for Windows og Mac
+- Webserveren binder bare 127.0.0.1, aldri med debug
+- Den ekte versjonen spør etter nøkkelen fra EODHD første gang, og nøkkelen
+  vises aldri og skrives bare til `.env`
+- CI prøver «Start demoen» på Windows og Mac (svaret kl. 16:16)
+- **Ville feilet hvis:** et skript startet serveren på alle adresser, eller
+  skrev ut nøkkelen
+
+**Avhenger av:** 3.3 og 3.4. **Én økt:** én per vei.
+
+---
+
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
 
 *Lagt til 2026-10-15 (gruppens svar på de ti spørsmålene i planen for KI-laget, instruksjonen kl. 15:53):* svarene er beslutninger. De som gjelder Epic 4:
