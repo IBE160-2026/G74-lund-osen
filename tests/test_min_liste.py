@@ -354,15 +354,21 @@ class TestSidene:
 
     def test_den_fylte_knappen_paa_hver_side(self, demo):
         """Ville feilet hvis knappen for siden man står på, ikke var fylt,
-        eller en knapp var fylt på aksjesiden."""
-        forventet = {"/": "Markedsoversikt", "/min-liste": "Min liste", "/min-liste?vis=alle": "Min liste"}
+        eller en knapp var fylt på aksjesiden. Story 8.6: tre knapper, med
+        «Børsometer» i midten."""
+        forventet = {
+            "/": "Markedsoversikt",
+            "/boersometer": "Børsometer",
+            "/min-liste": "Min liste",
+            "/min-liste?vis=alle": "Min liste",
+        }
         for adresse, fylt in forventet.items():
             stripa = demo.get(adresse).data.decode("utf-8").split("</header>", 1)[0]
             assert re.findall(r'class="sideknapp" href="[^"]*" aria-current="page">([^<]+)<', stripa) == [fylt]
-            assert stripa.count('class="sideknapp"') == 2
+            assert stripa.count('class="sideknapp"') == 3
         aksjesiden = demo.get("/aksje/KVST").data.decode("utf-8")
         stripa = aksjesiden.split("</header>", 1)[0]
-        assert stripa.count('class="sideknapp"') == 2 and 'aria-current="page"' not in stripa
+        assert stripa.count('class="sideknapp"') == 3 and 'aria-current="page"' not in stripa
         # Aksjesiden beholder veien tilbake.
         assert '<a class="tilbake" href="/">Markedsoversikt</a>' in aksjesiden
 
@@ -372,7 +378,7 @@ class TestSidene:
         svar = demo.get("/min-liste")
         assert svar.status_code == 503
         stripa = svar.data.decode("utf-8").split("</header>", 1)[0]
-        assert stripa.count('class="sideknapp"') == 2
+        assert stripa.count('class="sideknapp"') == 3
 
     def test_stjernen_er_en_knapp_med_aria_pressed_og_navnet(self, demo):
         """Ville feilet hvis stjernen bare var et tegn, eller skjermleseren
