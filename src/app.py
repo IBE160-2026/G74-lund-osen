@@ -303,17 +303,20 @@ def demo_startdag() -> str:
     return f"{ukedag(STARTDAG)} {dato(STARTDAG, idag().year)}"
 
 
-def _fotnoten(datoer: list[date]) -> dict[str, bool]:
+def _fotnoten(datoer: list[date], i_dag: date) -> dict[str, bool]:
     """Fotnoten for «ikke vurdert» etter datoene som er «ikke vurdert» på
     siden (story 3.4e). Demoteksten står bare i demoen, og bare når alle
     datoene er før STARTDAG. En dag fra STARTDAG uten vurdering får den
     ekte teksten, også i demoen, som en kveld uten henting. Med datoer både
     før og etter står den ekte teksten, fordi den dekker begge.
     fotnote_i_dag: en av datoene er i dag, og fotnoten sier i tillegg at
-    signalet fortsatt kan lagres i kveld (story 3.4e, b)."""
+    signalet fortsatt kan lagres i kveld (story 3.4e, b). Ikke i demoen,
+    der ingen henting skriver (gjennomgangen, BH1 og ECH3). i_dag er den
+    samme dagen siden ellers er bygd med (ECH2)."""
+    demo = bool(g.get("eksempeltall", False))
     return {
-        "fotnote_demo": bool(g.get("eksempeltall", False)) and bool(datoer) and all(d < STARTDAG for d in datoer),
-        "fotnote_i_dag": idag() in datoer,
+        "fotnote_demo": demo and bool(datoer) and all(d < STARTDAG for d in datoer),
+        "fotnote_i_dag": not demo and i_dag in datoer,
     }
 
 
@@ -590,12 +593,13 @@ def boersometer():
     bransjer = bygg_boersometer(ruter)
     tre_av_tre = frozenset(rad.aksje.symbol for rad in rader if rad.styrke == ANTALL_SJEKKER)
     hovedindeks, indeks_feilet = _hovedindeks(leser, poster, tre_av_tre)
+    ikke_vurdert = any(rute.ikke_vurdert for rute in ruter)
     return render_template(
         "boersometer.html",
         bransjer=bransjer,
         antall_aksjer=len(ruter),
-        ikke_vurdert=any(rute.ikke_vurdert for rute in ruter),
-        **_fotnoten([dagen] if any(rute.ikke_vurdert for rute in ruter) else []),
+        ikke_vurdert=ikke_vurdert,
+        **_fotnoten([dagen] if ikke_vurdert else [], i_dag),
         dagen=dagen,
         siste=siste,
         foerste=datoer[0],
@@ -651,7 +655,8 @@ def _tabellsiden(aktiv: str):
         )
 
     poster = _leser_eller_basefeil(hent_oversiktsleser).oversikt()
-    rader = bygg_oversikt(poster, idag(), STANDARD)
+    i_dag = idag()
+    rader = bygg_oversikt(poster, i_dag, STANDARD)
     # Story 8.15: hver del sorteres for seg, så ingen rad flytter seg
     # mellom delene (tillegget 13.10). Linja om 3 av 3 og «N av M» bruker
     # rader, som står i FR-102 (svar 7).
@@ -669,6 +674,8 @@ def _tabellsiden(aktiv: str):
         oevrige = [rad for rad in oevrige if rad.aksje.symbol in merkede]
         mangler = uten_kurser([post for post in poster if post.aksje.symbol in merkede])
     hovedindeks, indeks_feilet = (None, False) if i_lista else _hovedindeks(leser, poster, tre_av_tre)
+    # Story 3.4e: datoene som er «ikke vurdert» i det siden viser, én gang.
+    ikke_vurdert = [rad.dato for rad in (*skilte_seg_ut, *oevrige) if rad.ikke_vurdert]
 
     return render_template(
         "index.html",
@@ -682,8 +689,8 @@ def _tabellsiden(aktiv: str):
         # Story 8.0d, PR 2b: M i «N av M aksjer» er alle aksjene i lista,
         # også de uten kurser (beslutningen 14.10).
         antall_aksjer=len(poster),
-        ikke_vurdert=any(rad.ikke_vurdert for rad in (*skilte_seg_ut, *oevrige)),
-        **_fotnoten([rad.dato for rad in (*skilte_seg_ut, *oevrige) if rad.ikke_vurdert]),
+        ikke_vurdert=bool(ikke_vurdert),
+        **_fotnoten(ikke_vurdert, i_dag),
         # Gjennomgangen (BH7, ECH1): «Alle» i Min liste er samme tabell som
         # oversikten, ogsaa naar ingen skilte seg ut.
         ingen_skilte_seg_ut=ingen_skilte_seg_ut(rader) and not (i_lista and not alle),
@@ -818,7 +825,7 @@ def aksjedetalj(symbol: str):
             # Story 2.7b: maaneden for dagen siden viser, eller den i adressen.
             historikk=historikk,
             pil=pil,
-            **_fotnoten([detalj.dato]),
+            **_fotnoten([detalj.dato] if detalj.ikke_vurdert else [], i_dag),
         )
     )
     # Siden avhenger av bryteren (gjennomgangen av 10.3, BH10).

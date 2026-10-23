@@ -1059,7 +1059,9 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # _fotnote_ikke_vurdert.html. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Story 3.4e b: setningen om i dag i fotnoten, i app.py og
 # _fotnote_ikke_vurdert.html. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "18a1c8add73095bcc73b064af0647b7de26d7ad34d7181c2b1db9294530e0386"
+# Gjennomgangen av 3.4e: _fotnoten i app.py med samme i_dag som siden, uten
+# setningen om i dag i demoen. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "64b40f0128e281e546235a557dadcc7f863d2c2abae6bf81637d229e2d9e336c"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "
