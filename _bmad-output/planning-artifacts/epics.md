@@ -599,6 +599,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-23 kl. 11:56 (gruppens svar):* a) kallene som er igjen etter hentingen i kveld, går til de fire første «Common Stock» i lista fra §40 i `malinger.md`, i rekkefølgen der, som ikke står i rangeringen i §36 (§41). §41 finnes ikke ennå i `malinger.md` (slått opp kl. 14:44); den skrives med målingen. b) Etter 3.4d kommer opplegget for brukertesten 8.1, så 8.17. c) README-prøven på en ren maskin tas neste uke.
 
+*Avgjort 2026-10-23 kl. 15:53 (gruppens svar):* små funn fra en gjennomgang rettes med en gang, ikke senere, og først de to åpne punktene i spesifikasjonen 3.4d.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -2314,6 +2316,8 @@ avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 
 *Lagt til 2026-10-23 kl. 13:45:* fotnoten for «ikke vurdert» er squash-flettet i `544648f`, PR #90, låst til head-en `3b10267` (spesifikasjonen `spec-3-4d-fotnoten-ikke-vurdert.md`). Fotnoten står i én felles mal på aksjesiden, oversikten og børsometeret, med den ekte teksten fra kl. 23:19 og demoteksten fra kl. 20:11, og datoen i demoteksten kommer fra `STARTDAG` gjennom `tallformat.py`. Hele settet på `3b10267`: 3219 bestått og 17 hoppet over. CI var grønn på head-en (39948115771). Mutantene M1–M3 og c M1–c M2 ble fanget. Demoteksten for en rad som mangler etter 21.09 står som åpent punkt i spesifikasjonen.
 
+*Avgjort 2026-10-23 kl. 15:53 (gruppens svar):* små funn fra en gjennomgang rettes med en gang, ikke senere, og først de to åpne punktene i spesifikasjonen 3.4d.
+
 ### Story 3.4b: KI-tekstene i demoen
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 16:53.*
@@ -2763,6 +2767,8 @@ uten KI. 5B.4 måler KI-tillegget. Blandes de, vet ingen hva som ble målt.
 **Avhenger av:** 8.1 og 5B.3. **Én økt:** ja.
 
 *Avgjort 2026-10-23 kl. 12:29 (gruppens svar):* 10.4 tas rett etter 8.1, med samme person og samme aksje, først med KI av (8.1) og så på (10.4), som to tester med hvert sitt notat (avgjort 23.09). Brukertesten tas neste uke.
+
+*Avgjort 2026-10-23 kl. 15:53 (gruppen uten preferanse, rådets forslag):* de to åpne punktene i `spec-8-1-brukertesten.md`. a) Har personen verken forklart noe eller åpnet en aksjeside i del A, er aksjen i del B den øverste i tabellen. b) Slår personen på KI-teksten selv i del A, teller forklaringen for 8.1 bare hvis den kom før det, del B hoppes over, og 10.4 tas med neste person.
 
 ### Story 10.5: Lenke til selskapets side på NewsWeb
 
@@ -3283,6 +3289,8 @@ noteres det, med tidspunkt.
 **Én økt:** ja.
 
 *Avgjort 2026-10-23 kl. 12:29 (gruppens svar):* 10.4 tas rett etter 8.1, med samme person og samme aksje, først med KI av (8.1) og så på (10.4), som to tester med hvert sitt notat (avgjort 23.09). Brukertesten tas neste uke.
+
+*Avgjort 2026-10-23 kl. 15:53 (gruppen uten preferanse, rådets forslag):* de to åpne punktene i `spec-8-1-brukertesten.md`. a) Har personen verken forklart noe eller åpnet en aksjeside i del A, er aksjen i del B den øverste i tabellen. b) Slår personen på KI-teksten selv i del A, teller forklaringen for 8.1 bare hvis den kom før det, del B hoppes over, og 10.4 tas med neste person.
 
 ### Story 8.2: UX-gjennomgang av de to skjermbildene med `[CU] bmad-ux`
 

@@ -2,7 +2,7 @@
 title: "Brukertesten"
 status: aktiv
 created: 2026-10-23
-updated: 2026-10-23T14:51
+updated: 2026-10-23T16:11
 ---
 
 # Brukertesten
@@ -36,6 +36,7 @@ Ingen navn eller annet som kan kjenne personen igjen, står her. En kurs eller e
 | Så hovedindeksen og søylene, med tidspunkt | |
 | Sidene som ble åpnet, i rekkefølge | |
 | Slo på KI-teksten selv, med tidspunkt | |
+| Forklaringen kom før KI-teksten ble slått på (ja eller nei). Kom den etter, teller den ikke for 8.1 (svaret 23.10 kl. 15:53, b) | |
 | Spørsmål personen stilte, og svaret «Gjør det du ville gjort hvis du satt alene.» | |
 
 ## Del B (story 10.4): samme aksje, først KI av og så på
@@ -43,6 +44,8 @@ Ingen navn eller annet som kan kjenne personen igjen, står her. En kurs eller e
 | Felt | Notat |
 |---|---|
 | Aksjen, og om den kom fra forklaringen eller var den første aksjesiden personen åpnet | |
+| Den øverste i tabellen, fordi personen verken forklarte noe eller åpnet en aksjeside (ja eller nei, svaret 23.10 kl. 15:53, a) | |
+| Hoppet over, fordi personen slo på KI-teksten selv i del A. 10.4 tas da med neste person (ja eller nei, svaret 23.10 kl. 15:53, b) | |
 | Klokkeslett da del B startet | |
 | «Hva sier siden om denne aksjen?», KI av, svaret ordrett | |
 | «Hva sier siden om denne aksjen?», KI på, svaret ordrett | |

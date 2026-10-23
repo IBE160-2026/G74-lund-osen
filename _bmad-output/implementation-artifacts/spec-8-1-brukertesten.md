@@ -90,7 +90,9 @@ Etter at tiden i del A er stoppet.
 
 Ikke avgjort av gruppen, og ikke i instruksjonen kl. 14:38:
 - **Aksjen i del B når personen ikke åpnet en aksjeside** i del A og ikke ga en forklaring.
+  *Lukket 2026-10-23 (gruppen uten preferanse, rådets forslag kl. 15:53, a):* aksjen i del B er den øverste i tabellen.
 - **Når personen slår på KI-teksten selv i del A:** om del B tas likevel og merkes, eller om 10.4 tas med en annen person. Knappen «Vis KI-teksten» står på hver aksjeside med sjekker, så det kan skje.
+  *Lukket 2026-10-23 (gruppen uten preferanse, rådets forslag kl. 15:53, b):* forklaringen teller for 8.1 bare hvis den kom før det, del B hoppes over, og 10.4 tas med neste person.
 
 ## Det som ikke dekkes her
 
