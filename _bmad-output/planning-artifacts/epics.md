@@ -2304,6 +2304,8 @@ avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 
 *Avgjort 2026-10-22 kl. 23:19 (gruppens svar):* den ekte teksten i fotnoten blir «Ikke vurdert»: signalet lagres bare den kvelden kursene hentes, og regnes aldri ut bakover. Det gjelder dagene før første henting, kvelder uten henting, og dager der kursene er lest inn med --les-inn. Den erstatter den ekte teksten fra kl. 20:11, og demoteksten står.
 
+*Avgjort 2026-10-23 kl. 11:44 (gruppens svar, b):* fotnoten står også på børsometeret når en rute sier «ikke vurdert», med samme tekster.
+
 ### Story 3.4b: KI-tekstene i demoen
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 16:53.*
@@ -3417,7 +3419,11 @@ dagen gjaldt hele børsen eller noen bransjer.
 
 Åpent punkt: siste avsnitt i FR-204 i `prd.md` forbeholder 404 for et symbol som ikke er i aksjeuniverset og for en aksje kilden ikke har en eneste kursrad for. Svar b endrer det siste for en aksje i lista. `prd.md` er ikke rettet.
 
+*Lukket 2026-10-23 (gruppens svar kl. 11:44, a):* det åpne punktet om FR-204 er lukket med en Rettet-linje under siste avsnitt i FR-204 i `prd.md`.
+
 *Lagt til 2026-10-23 kl. 10:51:* børsometeret er squash-flettet i `7f1c1f0`, PR #89, låst til head-en `4f5290a` (spesifikasjonen `spec-8-6-boersometeret.md`), med svarene kl. 09:24: gult alle dagene for 3 av 3 på siste børsdag, og aksjesiden for en aksje uten kurser svarer 200 med en beskjed. Hele settet på `b4f3a81`: 3208 bestått og 17 hoppet over. CI var grønn på head-en (39927276079). Mutantene M1–M3, N1 og N2 ble fanget. Periodene i børsometeret kommer med 8.17.
+
+*Avgjort 2026-10-23 kl. 11:44 (gruppens svar, a):* en Rettet-linje under siste avsnitt i FR-204 i `prd.md`. 404 gjelder bare et symbol utenfor lista, og en base uten en eneste kurs før første henting, når ingen side lenker dit. En aksje i lista uten kurser svarer 200 med en beskjed (svaret kl. 09:24, b). Det åpne punktet om FR-204 over er dermed lukket.
 
 ### Story 8.7: Sjekk 2 og 3 i kursgrafen
 
