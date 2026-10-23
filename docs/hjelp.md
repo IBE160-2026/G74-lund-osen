@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-23T10:11
+updated: 2026-10-23T23:01
 ---
 
 # Hjelp til «Kom i gang»
@@ -212,6 +212,20 @@ Noe annet bruker port 8000. Kjører den andre versjonen, stopper du den først (
 ### Jeg lukket vinduet før jeg stoppet.
 
 Åpne et nytt terminalvindu, gjør steg 4 og lim inn stoppkommandoen for versjonen du kjørte: `docker compose down` for den ekte versjonen, eller `docker compose --profile demo down` for demoen.
+
+## Start med dobbeltklikk
+
+### Windows advarer mot fila.
+
+Første gang kan Windows advare mot `Start demoen.cmd` eller `Start den ekte versjonen.cmd`, fordi fila er lastet ned fra nettet. Velg å vise mer informasjon, og kjør den likevel. Spør Windows om du vil kjøre fila, svarer du ja. Mer står under «Start med dobbeltklikk, uten Docker» i [README-en](../README.md).
+
+### Mac sier at fila ikke kan åpnes.
+
+Første gang kan macOS stoppe `Start demoen.command` eller `Start den ekte versjonen.command`, fordi fila er lastet ned fra nettet. Høyreklikk fila, velg Åpne, og bekreft. Går det ikke, tillater du den under Personvern og sikkerhet i Systeminnstillinger, og dobbeltklikker på nytt.
+
+### Vinduet sier at noe svarer allerede på 127.0.0.1:8000.
+
+Demoen eller appen kjører allerede, kanskje i Docker. Lukk det andre vinduet, eller stopp Docker med `docker compose --profile demo down`, og dobbeltklikk på nytt.
 
 ## Neste gang
 
