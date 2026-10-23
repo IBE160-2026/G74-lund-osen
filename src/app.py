@@ -308,9 +308,12 @@ def _fotnoten(datoer: list[date]) -> dict[str, bool]:
     siden (story 3.4e). Demoteksten står bare i demoen, og bare når alle
     datoene er før STARTDAG. En dag fra STARTDAG uten vurdering får den
     ekte teksten, også i demoen, som en kveld uten henting. Med datoer både
-    før og etter står den ekte teksten, fordi den dekker begge."""
+    før og etter står den ekte teksten, fordi den dekker begge.
+    fotnote_i_dag: en av datoene er i dag, og fotnoten sier i tillegg at
+    signalet fortsatt kan lagres i kveld (story 3.4e, b)."""
     return {
         "fotnote_demo": bool(g.get("eksempeltall", False)) and bool(datoer) and all(d < STARTDAG for d in datoer),
+        "fotnote_i_dag": idag() in datoer,
     }
 
 

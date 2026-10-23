@@ -133,7 +133,7 @@ Nederst på aksjesiden står «Signalet dag for dag»: det appen skrev om aksjen
 
 ### Hvorfor står det «ikke vurdert»?
 
-Står «ikke vurdert» på oversikten, aksjesiden eller børsometeret, sier en fotnote hvorfor. I den ekte versjonen lagres signalet bare den kvelden kursene hentes, og regnes aldri ut bakover. Det gjelder dagene før første henting, kvelder uten henting, og dager der kursene er lest inn med `--les-inn`. I demoen sier fotnoten for en dag før 21.09 at vurderingene starter mandag 21.09, slik den ekte versjonen har signal fra første henting. En dag fra 21.09 uten vurdering får den ekte teksten, også i demoen.
+Står «ikke vurdert» på oversikten, aksjesiden eller børsometeret, sier en fotnote hvorfor. I den ekte versjonen lagres signalet bare den kvelden kursene hentes, og regnes aldri ut bakover. Det gjelder dagene før første henting, kvelder uten henting, og dager der kursene er lest inn med `--les-inn`. Gjelder det i dag, sier fotnoten også at signalet fortsatt kan lagres hvis hentingen kjøres ferdig i kveld. I demoen sier fotnoten for en dag før 21.09 at vurderingene starter mandag 21.09, slik den ekte versjonen har signal fra første henting. En dag fra 21.09 uten vurdering får den ekte teksten, også i demoen.
 
 ## Den ekte versjonen
 
