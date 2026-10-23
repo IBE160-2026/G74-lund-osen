@@ -77,12 +77,44 @@ Blind Hunter (BH1–BH10), Edge Case Hunter (ECH1–ECH7) og Verification Gap (V
 **Avvik fra instruksjonen:** ruta for en aksje uten kurser er ikke en lenke, fordi aksjesiden gir 404 for den (FR-204). Hjelpen sier det.
 *Lukket 2026-10-23 (gruppens svar kl. 09:24, b):* alle ruter lenker til aksjesiden. Aksjesiden for en aksje i lista uten kurser svarer 200 med navnet, bransjen og en beskjed, uten graf og sjekker (`aksje_uten_kurser.html`), og navnet under tabellen på oversikten og i Min liste lenker dit. Siste avsnitt i FR-204 forbeholder fortsatt 404 for en aksje uten en eneste kursrad, og `prd.md` er ikke rettet (åpent punkt under story 8.6 i `epics.md`).
 
+## Gjennomgangen 23.10 etter svarene kl. 09:24
+
+Blind Hunter (BH1–BH10), Edge Case Hunter (ECH1–ECH8) og Verification Gap (VG1–VG11) gikk gjennom `0baef45..a1f869f`, kjørt samtidig etter hele settet. Rettet i `2f839c8` og `38c84ca`.
+
+| Funn | Dom | Utfall |
+|---|---|---|
+| ECH1 gult fra aksjens egen siste kursdag, ikke sidens | medium | rettet: `siste_styrke` bare fra en rad fra sidens siste børsdag, med test som feiler uten rettingen |
+| VG1 to tester krever fortsatt 404 for et kjent symbol | medium | rettet: grunnen står i testene (basen uten en eneste kurs, som før første henting, og ingen side lenker dit) |
+| VG2 kvalitetssikringen sa at et uleselig symbol gir 404 | medium | rettet med en Rettet-linje i `38c84ca` |
+| BH1, ECH4 «ennå» når kursene ikke kan leses | medium og lav | ikke rettet: `monter` skriver ingen rader for et symbol som ikke kan leses, så basen har ingen kurser for aksjen, og teksten er den instruksjonen ba om |
+| BH2, VG4 testen for siste børsdag uten vurdering fanget ikke det den sa | medium og lav | rettet: med `siste_styrke` 3, 2 og None |
+| BH3 `ramme(None)` | lav | ikke rettet: `ramme` tar `None` og gir `None` (`test_gult_bare_ved_3_av_3`) |
+| BH5 `eksempeltall` | lav | ikke rettet: kommer fra kontekstprosessoren `_eksempeltall` i `app.py` |
+| BH6, ECH3 `?dag=` og `?periode=` leses ikke | lav | rettet: kommentaren sier det |
+| BH10 kommentarene og FR-204 | lav | rettet: kommentarene viser til det åpne punktet |
+| BH7, VG11 kommentarene om avtrykkene | lav | rettet |
+| BH8 stripa på siden uten kurser | lav | rettet: testet. Endringen av knappetallet i testene for Min liste er sin egen commit, `ab24b4e` |
+| BH9, ECH5 `role="status"` på fast tekst | lav | rettet: fjernet |
+| VG3 hjelpen uten test | lav-medium | rettet: `test_hjelpen_sier_det_samme` |
+| VG5 beskrivelsen påsto at merket ble sjekket | lav | rettet: merket i hver gul rute sjekkes |
+| VG6 N1 og N2 sto ikke i spesifikasjonen | lav | rettet under «Mutantene» |
+| VG8 den ekte versjonen av siden uten kurser | lav | rettet: `test_aksjesiden_uten_kurser_sier_ikke_demo` |
+| VG10 «Det som ikke endres» | lav | rettet med en Rettet-linje |
+| BH4, ECH7 to måter å lage adressen på, uten URL-koding | lav | ikke rettet: symbolene er store bokstaver, tall og bindestrek |
+| ECH2 tabellen viser ikke gult en annen dag | lav | ikke rettet: tabellen gjelder dagen som vises, og overskriften sier datoen |
+| ECH6 lenken i fotnoten uten egen fokusregel | lav | ikke rettet: nettleserens fokusomriss står, og en ny regel endrer bildene |
+| ECH8 gult en dag før aksjens første kurs | lav | ikke rettet: svar a sier «alle dagene» |
+| VG7 gult på en rute med «Uten data» bare i enhetstest | lav | ikke rettet: demoen har ingen slik aksje; `test_gult_bare_fra_sidens_siste_boersdag` dekker koblingen i `app.py` |
+| VG9 lenken i Min liste med MTFJ merket | lav | ikke rettet: samme mal og samme `uten_kurser` som «Alle», som er testet |
+
 ## Mutantene
 
 Én om gangen, med `-x`, med kopi før og sha256 mot HEAD etter: snittet av bare én aksje, gult ved 2 av 3, og et fast antall bransjer.
+*Lagt til 2026-10-23 (svarene kl. 09:24):* N1 gult borte en dag uten vurdering (vakten `if self.styrke is None: return None` tilbake i `Rute.ramme`), og N2 404 tilbake for en aksje uten kurser (`abort(404)` i stedet for `aksje_uten_kurser.html`). Begge fanget, på hele `tests/test_boersometer.py` og på `TestSvaretKl0924` alene, med sha256 lik HEAD etter.
 
 ## Det som ikke endres
 
 - Ingen nye kall og ingen ny tabell. Ingen API-kall utover kvotesjekken i regel 15, og `src/fetch_prices.py` kjøres ikke.
 - `data/db/ose.db` røres ikke, og demobaser lages bare i midlertidige mapper.
 - Oversikten, Min liste og aksjesiden viser det samme som før.
+  *Rettet 2026-10-23 (gruppens svar kl. 09:24, b; gjennomgangen VG10):* navnet under tabellen på oversikten og i Min liste lenker til aksjesiden, og aksjesiden for en aksje uten kurser er ny. Ellers viser de det samme som før.
