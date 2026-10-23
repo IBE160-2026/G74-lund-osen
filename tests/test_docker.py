@@ -1036,7 +1036,9 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # Flettingen av main inn i grenen for 3.4d (23.10): kildene fra 8.6 og 3.4d
 # sammen, saa avtrykket er regnet paa nytt. Bildet ble tatt paa nytt og er byte
 # for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "e123c0af1dde10268b1e324affd2f4676b0ac78b758d16d3ce5960ec15be1bc5"
+# Story 3.4d, VG2: demo_startdag i app.py med ukedag og dato fra tallformat.py.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "4ed820aa7e3b67480512a563144c05524c139840fe0c43803fd5ae3a4a5c6ea4"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "

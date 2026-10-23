@@ -294,14 +294,12 @@ def _stilark():
     return {"stilark": f"/static/{STILARK.name}?v={avtrykk}"}
 
 
-# Story 3.4d: ukedagene i fotnoten for «ikke vurdert» i demoen.
-UKEDAGER = ("mandag", "tirsdag", "onsdag", "torsdag", "fredag", "lørdag", "søndag")
-
-
 def demo_startdag() -> str:
     """Første dag med vurdering i demoen, som «mandag 21.09», regnet fra
-    STARTDAG i demo.py (gruppens svar 22.10 kl. 20:11)."""
-    return f"{UKEDAGER[STARTDAG.weekday()]} {STARTDAG:%d.%m}"
+    STARTDAG i demo.py (gruppens svar 22.10 kl. 20:11). Ukedagen og datoen
+    kommer fra tallformat.py (regel 21, gjennomgangen VG2), og året står
+    ikke, fordi demoen har ett år."""
+    return f"{ukedag(STARTDAG)} {dato(STARTDAG, STARTDAG.year)}"
 
 
 @app.context_processor
