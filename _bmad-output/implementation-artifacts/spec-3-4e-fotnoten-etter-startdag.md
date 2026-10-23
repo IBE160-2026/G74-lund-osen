@@ -2,7 +2,7 @@
 title: 'Story 3.4 (3.4e): fotnoten etter startdagen i demoen, og for i dag'
 type: 'bugfix'
 created: '2026-10-23'
-status: 'ready-for-dev'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '651be64'
@@ -40,6 +40,43 @@ context:
 ## Mutantene
 
 Én om gangen, med `-x`, med kopi før og sha256 mot HEAD etter: demoteksten for alle dager i demoen, og setningen om i dag for en annen dag.
+
+*Lagt til 2026-10-23:* kjørt på `622e25f` i en klon med `core.autocrlf=false`, slettet etterpå, med `tests/test_app.py`, `tests/test_demo.py` og `tests/test_boersometer.py`, og så med de nye testene alene (`-k`). Begge ble fanget, og sha256 for `src/app.py` var lik HEAD etter hver:
+
+| # | Mutant | Først i filene | Alene |
+|---|---|---|---|
+| M1 | Demoteksten for alle dager i demoen | `TestFotnotenIDemoen::test_oversikten_med_en_rad_som_mangler` | `test_aksjesiden_etter_startdagen_har_den_ekte_teksten`, `TestFotnotenEtterStartdagen::test_demoen_etter_startdagen_har_den_ekte_teksten` |
+| M2 | Setningen om i dag for en annen dag | `TestVurderingenPaaOversikten::test_ikke_vurdert_med_fotnoten` | `TestFotnotenForIDag::test_ingen_setning_en_annen_dag[/]`, `TestFotnotenEtterStartdagen::test_setningen_om_i_dag` |
+
+## Gjennomgangen 23.10
+
+Gjennomgang 23.10 etter hele settet, på diffen `651be64..622e25f` og `31feb13` og `651be64` på main. Linsene var Blind Hunter (BH, 8 funn), Edge Case Hunter (ECH, 6 funn) og Verification Gap (VG, 9 funn), hver for seg og uten å endre noe i repoet. 23 funn ble 18 rader. Ett hadde dom medium, ECH1, og det er ikke rettet, så flettingen venter på gruppen (steg 4).
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| ECH1 | På en lørdag, søndag eller helligdag kan fredagens signal fortsatt lagres, men setningen om i dag står bare når dagen er i dag | medium | **ikke rettet**: instruksjonen gir vilkåret («er dagen som vises, i dag») og setningen ordrett, og «For i dag» passer ikke for fredagen lest på lørdag. Gruppen avgjør; flettingen venter |
+| BH2 | Setningen om i dag står også etter at kveldens henting har gått, hvis raden fortsatt mangler | low | uten endring: siden vet ikke om hentingen har gått; føres under «Åpent» sammen med ECH1 |
+| BH1, ECH3 | I demoen kunne setningen om i dag stå, selv om ingen henting skriver til en demobase | low | rettet i `5ff7e1c` |
+| ECH2 | `_fotnoten` leste klokka en gang til | low | rettet i `5ff7e1c`: samme `i_dag` som siden |
+| BH3, ECH6 | Samme sjekk regnet to ganger på børsometeret og oversikten | nit | rettet i `5ff7e1c` |
+| ECH5 | Aksjesiden ga datoen også når dagen ikke er «ikke vurdert» | nit | rettet i `5ff7e1c` |
+| VG1 | STARTDAG selv var ikke testet | low | rettet i `1aac9f3` |
+| VG2, ECH4 | Datoer både før og etter STARTDAG på oversikten var ikke testet | low | rettet i `1aac9f3` |
+| VG3 | De nye testene sa «Ville feilet uten/med», ikke «hvis» | low | rettet i `1aac9f3` |
+| VG4 | Mutantene var ikke ført | low | rettet: tabellen over |
+| VG5 | Spesifikasjonen 8.1 viste fortsatt til «Åpent» for de to lukkede punktene | low | rettet her: Rettet-linjer |
+| VG6 | Innledningen i `docs/brukertest.md` sa ikke at 10.4 kan tas med neste person | nit | rettet her: en Rettet-linje |
+| VG8 | Spesifikasjonen sto på `ready-for-dev` | nit | rettet: `in-review` |
+| BH4, BH5 | Tekstene og oppsettet for den ekte versjonen står i flere testfiler | nit | uten endring: hver testfil sier hva siden skal vise |
+| BH6 | `"ikke vurdert" in html` i testen av oversikten før STARTDAG er svak alene | nit | uten endring: sammenligningen av hele fotnoten etter dekker det |
+| BH7, VG7 | To kommentarer per avtrykk sier at bildet ble tatt på nytt | nit | uten endring: bildene ble tatt på nytt etter hvert punkt og var like, som Utført-linja sier |
+| BH8 | `docs/hjelp.md` skriver 21.09 for hånd | nit | uten endring: som VG6 22.10 i 3.4d |
+| VG9 | Setningen om i dag er ikke testet på Min liste | nit | uten endring: samme `_fotnoten` og samme mal som oversikten |
+
+## Åpent
+
+- **Helg og helligdag** (ECH1, medium): lørdag, søndag og en helligdag er `innevaerende_boersdag` forrige børsdag, så hentingen kan fortsatt skrive den dagens vurdering (`skriv` i `src/lagring_sqlite.py`, og tidskontrollen i `src/fetch_prices.py` gjelder bare på en børsdag). Fotnoten sier da ikke at signalet kan lagres. Vilkåret og setningen står ordrett i instruksjonen, så gruppen avgjør om vilkåret blir «dagen er inneværende børsdag», og hvilken tekst som da står.
+- **Etter kveldens henting** (BH2): setningen om i dag står også etter at hentingen har gått, hvis raden fortsatt mangler. Siden vet ikke om hentingen har gått.
 
 ## Det som ikke endres
 
