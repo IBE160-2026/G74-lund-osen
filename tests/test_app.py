@@ -21,6 +21,7 @@ import pytest
 import app as app_modul
 import lagring_fil
 import lagring_sqlite
+from boersdag import UtenforKalenderen
 from kursdata import Kursleser, Kursrad
 from lagring_fil import SnapshotKilde, SnapshotLeser
 from lagring_sqlite import SqliteKurslager, aapne_base
@@ -3805,7 +3806,7 @@ class TestFotnotenForIDag:
     svaret 23.10 kl. 19:10 gjelder det inneværende børsdag, se klassen
     under."""
 
-    I_DAG = " Signalet for denne dagen kan fortsatt lagres hvis hentingen kjøres ferdig før neste børsdag."
+    SETNINGEN = " Signalet for denne dagen kan fortsatt lagres hvis hentingen kjøres ferdig før neste børsdag."
 
     @pytest.mark.parametrize("adresse", ["/", "/aksje/EQNR"])
     def test_setningen_naar_dagen_er_i_dag(self, klient, monkeypatch, adresse):
@@ -3814,7 +3815,7 @@ class TestFotnotenForIDag:
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 59 + [110.0])}), vurdert=False)
         monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 30, 18, 0, tzinfo=timezone.utc))
         html = klient.get(adresse).data.decode("utf-8")
-        assert fotnoten(html) == EKTE_FOTNOTE + self.I_DAG
+        assert fotnoten(html) == EKTE_FOTNOTE + self.SETNINGEN
 
     @pytest.mark.parametrize("adresse", ["/", "/aksje/EQNR"])
     def test_ingen_setning_en_annen_dag(self, klient, monkeypatch, adresse):
@@ -3832,7 +3833,7 @@ class TestFotnotenForInnevaerendeBoersdag:
     regel som lagringen (innevaerende_boersdag). Klokka settes i testen,
     uten nett."""
 
-    SETNINGEN = TestFotnotenForIDag.I_DAG
+    SETNINGEN = TestFotnotenForIDag.SETNINGEN
 
     @pytest.mark.parametrize("adresse", ["/", "/aksje/EQNR"])
     @pytest.mark.parametrize(
@@ -3841,8 +3842,9 @@ class TestFotnotenForInnevaerendeBoersdag:
             datetime(2026, 10, 30, 19, 0, tzinfo=timezone.utc),  # fredag kl. 20 i Oslo
             datetime(2026, 10, 31, 12, 0, tzinfo=timezone.utc),  # lørdag
             datetime(2026, 11, 1, 12, 0, tzinfo=timezone.utc),  # søndag
+            datetime(2026, 10, 30, 23, 30, tzinfo=timezone.utc),  # lørdag kl. 00:30 i Oslo
         ],
-        ids=["fredag-kveld", "loerdag", "soendag"],
+        ids=["fredag-kveld", "loerdag", "soendag", "loerdag-etter-midnatt"],
     )
     def test_fredagen_i_helga(self, klient, monkeypatch, adresse, klokka):
         """60 rader slutter fredag 30.10. Ville feilet hvis setningen bare
@@ -3853,12 +3855,22 @@ class TestFotnotenForInnevaerendeBoersdag:
         assert fotnoten(html) == EKTE_FOTNOTE + self.SETNINGEN
 
     @pytest.mark.parametrize("adresse", ["/", "/aksje/EQNR"])
-    def test_ikke_fredagen_mandag(self, klient, monkeypatch, adresse):
-        """Samme rader, og klokka er mandag 02.11 kl. 20 i Oslo, så
-        inneværende børsdag er mandag. Ville feilet hvis setningen sto for
-        en dag før siste børsdag."""
+    @pytest.mark.parametrize(
+        "klokka",
+        [
+            datetime(2026, 11, 2, 19, 0, tzinfo=timezone.utc),  # mandag kl. 20 i Oslo
+            datetime(2026, 11, 1, 23, 30, tzinfo=timezone.utc),  # mandag kl. 00:30 i Oslo
+        ],
+        ids=["mandag-kveld", "mandag-etter-midnatt"],
+    )
+    def test_ikke_fredagen_mandag(self, klient, monkeypatch, adresse, klokka):
+        """Samme rader, og klokka er mandag 02.11 kl. 20 i Oslo, eller
+        mandag kl. 00:30 i Oslo, som ennå er søndag i UTC (gjennomgangen 23.10
+        kveld, ECH3). Inneværende børsdag er da mandag. Ville feilet hvis
+        setningen sto for en dag før siste børsdag, eller dagen ble regnet
+        i UTC."""
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 59 + [110.0])}), vurdert=False)
-        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 11, 2, 19, 0, tzinfo=timezone.utc))
+        monkeypatch.setattr(app_modul, "naa", lambda: klokka)
         html = klient.get(adresse).data.decode("utf-8")
         assert fotnoten(html) == EKTE_FOTNOTE
 
@@ -3889,3 +3901,20 @@ class TestFotnotenForInnevaerendeBoersdag:
         monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 12, 24, 12, 0, tzinfo=timezone.utc))
         html = klient.get(adresse).data.decode("utf-8")
         assert fotnoten(html) == EKTE_FOTNOTE + self.SETNINGEN
+
+    @pytest.mark.parametrize("adresse", ["/", "/aksje/EQNR"])
+    def test_ingen_setning_naar_kalenderen_ikke_dekker_dagen(self, klient, monkeypatch, adresse):
+        """Fredagen lest lørdag, men kalenderen reiser UtenforKalenderen, som
+        for en dag i et år DEKKEDE_AAR ikke har. Da kan lagringen heller ikke
+        skrive. Ville feilet hvis siden ga feil, eller setningen sto likevel
+        (gjennomgangen 23.10 kveld, BH3 og VG1)."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 59 + [110.0])}), vurdert=False)
+        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 31, 12, 0, tzinfo=timezone.utc))
+
+        def utenfor(dag):
+            raise UtenforKalenderen(f"{dag} er utenfor kalenderen")
+
+        monkeypatch.setattr(app_modul, "innevaerende_boersdag", utenfor)
+        svar = klient.get(adresse)
+        assert svar.status_code == 200
+        assert fotnoten(svar.data.decode("utf-8")) == EKTE_FOTNOTE

@@ -313,10 +313,12 @@ def _fotnoten(datoer: list[date], i_dag: date) -> dict[str, bool]:
     fram til i_dag, og fotnoten sier i tillegg at signalet fortsatt kan
     lagres før neste børsdag. Samme regel som lagringen bruker, så fredagen
     teller også lørdag, søndag og en helligdag (gruppens svar 23.10 kl.
-    19:10, ECH1). Kan kalenderen ikke avgjøre dagen, kan lagringen heller
-    ikke skrive, og setningen står ikke. Ikke i demoen, der ingen henting
-    skriver (gjennomgangen, BH1 og ECH3). i_dag er den samme dagen siden
-    ellers er bygd med (ECH2)."""
+    19:10, ECH1). Lagringen godtar i tillegg forrige børsdag ved første
+    henting i en tom base (2.3c), men da finnes ingen rad «ikke vurdert»
+    på sidene (gjennomgangen 23.10 kveld, ECH4). Kan kalenderen ikke
+    avgjøre dagen, kan lagringen heller ikke skrive, og setningen står
+    ikke. Ikke i demoen, der ingen henting skriver (gjennomgangen, BH1 og
+    ECH3). i_dag er den samme dagen siden ellers er bygd med (ECH2)."""
     demo = bool(g.get("eksempeltall", False))
     return {
         "fotnote_demo": demo and bool(datoer) and all(d < STARTDAG for d in datoer),

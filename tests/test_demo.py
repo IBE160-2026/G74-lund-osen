@@ -1081,6 +1081,22 @@ class TestFotnotenIDemoen:
         html = klient.get(f"/aksje/KVST?dag={dag}").data.decode("utf-8")
         assert self._fotnoten(html) == self.EKTE_TEKST
 
+    def test_ingen_setning_i_demoen_i_helga(self, klient, monkeypatch, demobase):
+        """Gjennomgangen 23.10 kveld (VG3): KVST uten vurdering fredag 09.10,
+        lest lørdag 10.10, da fredagen er inneværende børsdag. Ville feilet
+        hvis setningen om at signalet kan lagres sto i demoen, der ingen
+        henting skriver."""
+        c = sqlite3.connect(demobase)
+        try:
+            c.execute("DELETE FROM vurdering WHERE symbol = 'KVST' AND dato = '2026-10-09'")
+            c.commit()
+        finally:
+            c.close()
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 10, 12, 0, tzinfo=timezone.utc))
+        html = klient.get("/aksje/KVST?dag=2026-10-09").data.decode("utf-8")
+        assert self._fotnoten(html) == self.EKTE_TEKST
+
     def test_oversikten_med_datoer_foer_og_etter_startdagen(self, klient, monkeypatch, demobase):
         """Gjennomgangen (VG2): KVST «ikke vurdert» 18.09 og LKSV 09.10. Ville
         feilet hvis demoteksten sto når én av datoene er før STARTDAG."""
