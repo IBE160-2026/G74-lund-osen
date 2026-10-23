@@ -579,7 +579,8 @@ class TestGjennomgangen:
     def test_fotnotene_i_min_liste_gjelder_bare_lista(self, demo):
         """ECH7, BH9. Ville feilet hvis Min liste viste fotnoten om en aksje
         uten kurser som ikke er merket, eller fotnoter under en tom liste."""
-        uten = "Uten data i denne kilden: Matfjord Merkevarer"
+        # Navnet lenker til aksjesiden (gruppens svar 23.10 kl. 09:24, b).
+        uten = 'Uten data i denne kilden: <a href="/aksje/MTFJ">Matfjord Merkevarer</a>'
         assert uten in demo.get("/").data.decode("utf-8")
         assert uten in demo.get("/min-liste?vis=alle").data.decode("utf-8")
         assert uten not in demo.get("/min-liste").data.decode("utf-8")

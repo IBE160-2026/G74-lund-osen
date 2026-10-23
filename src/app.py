@@ -567,9 +567,6 @@ def boersometer():
         "boersometer.html",
         bransjer=bransjer,
         antall_aksjer=len(ruter),
-        # Testene for 8.6 b: aksjesiden gir 404 for en aksje uten kursrader
-        # (FR-204), saa bare aksjene med kurser faar lenke.
-        med_side={symbol for symbol, serie in serier.items() if serie},
         dagen=dagen,
         siste=siste,
         foerste=datoer[0],
@@ -691,8 +688,7 @@ def aksjedetalj(symbol: str):
         abort(404)
 
     # Aksjen slaas opp i aksje i basen, ikke i lista i kursdata.py (story 2.2b,
-    # merknaden 03.10 under AD-21). 404 bare for et symbol som ikke staar der,
-    # og for en aksje uten kursrader (FR-204).
+    # merknaden 03.10 under AD-21). 404 bare for et symbol som ikke staar der.
     oversiktsleser = _leser_eller_basefeil(hent_oversiktsleser)
     post = oversiktsleser.post(normaliser_symbol(symbol))
     if post is None:
@@ -703,7 +699,10 @@ def aksjedetalj(symbol: str):
     # siste dag i grafen: dagen for «Velg dag», ellers siste rad.
     rader = leser.serie(post.aksje.symbol)
     if not rader:
-        abort(404)
+        # Gruppens svar 23.10 kl. 09:24 (b): en aksje i lista uten kurser
+        # svarer 200 med en beskjed, ikke 404, som FR-204 for en aksje uten
+        # gyldig signal.
+        return render_template("aksje_uten_kurser.html", aksje=post.aksje, hentet=None)
     # Gjennomgangen, BH10: dagen leses én gang, saa alt i svaret gjelder samme dag.
     i_dag = idag()
     valg = les_valg(request.args.get("periode"), request.args.get("dag"), rader[0].dato, i_dag, rader[-1].dato)

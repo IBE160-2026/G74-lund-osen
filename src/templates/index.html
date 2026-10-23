@@ -212,7 +212,8 @@
 
     {% if mangler %}
       <p class="fotnote">
-        Uten data i denne kilden: {{ mangler|join(", ") }}.
+        {#- Gruppens svar 23.10 kl. 09:24 (b): navnet lenker til aksjesiden. #}
+        Uten data i denne kilden: {% for aksje in mangler %}<a href="/aksje/{{ aksje.symbol }}">{{ aksje.navn }}</a>{{ ", " if not loop.last }}{% endfor %}.
       </p>
     {% endif %}
 

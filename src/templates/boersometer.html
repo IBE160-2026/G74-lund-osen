@@ -40,16 +40,15 @@
           <span class="antall">{{ antall_ord(bransje.antall, "aksje", "aksjer") }}</span></h2>
         <ul class="ruter">
           {%- for rute in bransje.ruter %}
-          {#- En aksje uten kurser har ingen aksjeside (FR-204), så ruta er ikke
-              en lenke. #}
-          {%- set lenke = rute.aksje.symbol in med_side %}
-          <li><{{ "a" if lenke else "div" }} class="rute stoerrelse-{{ rute.stoerrelse }} {{ fortegn(rute.endring) }}{% if rute.ramme %} ramme-{{ rute.ramme }}{% endif %}{% if rute.uten_data %} uten-data{% endif %}"{% if lenke %} href="{{ aksjeadresse(rute.aksje.symbol) }}"{% endif %}>
+          {#- Gruppens svar 23.10 kl. 09:24 (b): hver rute lenker til aksjesiden,
+              også for en aksje uten kurser. #}
+          <li><a class="rute stoerrelse-{{ rute.stoerrelse }} {{ fortegn(rute.endring) }}{% if rute.ramme %} ramme-{{ rute.ramme }}{% endif %}{% if rute.uten_data %} uten-data{% endif %}" href="{{ aksjeadresse(rute.aksje.symbol) }}">
             <span class="ticker">{{ rute.aksje.symbol }}</span>
             <span class="endring">{% if rute.endring is not none %}{{ rute.endring|tall('endring') }}{% elif rute.uten_data %}Uten data{% else %}–{% endif %}</span>
             {% if rute.ramme == "gul" %}<span class="merke">{{ antall_sjekker }} av {{ antall_sjekker }}{% if dagen != siste %} siste børsdag{% endif %}</span>{% elif rute.ramme == "moerk" %}<span class="merke">{{ antall_sjekker - 1 }} av {{ antall_sjekker }}</span>{% endif %}
             {% if rute.tekst and not rute.uten_data %}<span class="tekst">{{ rute.tekst }}</span>{% endif %}
             <span class="skjult">, {{ rute.aksje.navn }}{% if rute.volumord %}, volum {{ rute.volumord }}{% endif %}</span>
-          </{{ "a" if lenke else "div" }}></li>
+          </a></li>
           {%- endfor %}
         </ul>
       </section>
@@ -67,7 +66,7 @@
         {%- for rute in bransje.ruter %}
         <tr>
           <td>{{ bransje.navn }}{% if loop.first %} ({{ antall_ord(bransje.antall, "aksje", "aksjer") }}{% if bransje.snitt is not none %}, snitt {{ bransje.snitt|tall('endring') }}{% endif %}){% endif %}</td>
-          <td>{% if rute.aksje.symbol in med_side %}<a href="{{ aksjeadresse(rute.aksje.symbol) }}">{{ rute.aksje.navn }}</a>{% else %}{{ rute.aksje.navn }}{% endif %}</td>
+          <td><a href="{{ aksjeadresse(rute.aksje.symbol) }}">{{ rute.aksje.navn }}</a></td>
           <td>{% if rute.endring is not none %}{{ rute.endring|tall('endring') }}{% elif rute.uten_data %}Uten data{% else %}–{% endif %}</td>
           <td>{% if rute.volumforhold is not none %}{{ rute.volum_vist }} ({{ rute.volumord }}){% else %}–{% endif %}</td>
           <td>{% if rute.styrke is not none %}{{ rute.styrke }} av {{ antall_sjekker }}{% elif rute.uten_data %}Uten data{% else %}{{ rute.tekst or "–" }}{% endif %}</td>

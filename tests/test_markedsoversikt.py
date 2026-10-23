@@ -260,7 +260,9 @@ class TestByggOversikt:
         rader = bygg_oversikt(kilde, IDAG, KORT)
 
         assert [r.aksje.symbol for r in rader] == ["DNB"]
-        assert uten_kurser(kilde) == ["Equinor"]
+        # Aksjene, så siden kan lenke navnet til aksjesiden (gruppens svar
+        # 23.10 kl. 09:24, b).
+        assert [aksje.navn for aksje in uten_kurser(kilde)] == ["Equinor"]
 
     def test_tom_kilde_gir_tom_oversikt_uten_aa_kaste(self):
         assert bygg_oversikt([], IDAG, KORT) == []

@@ -268,7 +268,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         ),
         "uten_data": Hjelpetekst(
             "Uten data i denne kilden:",
-            "aksjer uten en eneste kurs. De står ikke i tabellen, men navnes under den.",
+            "aksjer uten en eneste kurs. De står ikke i tabellen, men navnes under den, med lenke til aksjesiden.",
             ((PRD, "Aksjer kilden ikke har en eneste kursrad for"), (MARKEDSOVERSIKT, "def uten_kurser(")),
         ),
         "signalstyrke": Hjelpetekst(

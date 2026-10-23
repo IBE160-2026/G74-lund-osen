@@ -351,7 +351,9 @@ class TestSiden:
         tabell = html.split('<table class="boersometertabell">')[1]
         ord_ = {"lavt": LAV, "vanlig": VANLIG, "høyt": HOEY}
         rader = re.findall(r'href="/aksje/([A-Z0-9]+)">.*?</td>\s*<td>[^<]*</td>\s*<td>([^<]*)</td>', tabell, re.S)
-        # MTFJ har ingen kurser og ingen lenke i tabellen.
+        # MTFJ har ingen kurser og ingen volumtall, men lenke (gruppens svar
+        # 23.10 kl. 09:24, b), så den hoppes over her.
+        rader = [(symbol, volum) for symbol, volum in rader if symbol != "MTFJ"]
         assert len(rader) == 14
         stoerrelser = {symbol: re.search(r"stoerrelse-(\w+)", klasser).group(1) for klasser, symbol in _ruter(html)}
         sett = set()
@@ -419,20 +421,22 @@ class TestSiden:
         """Ville feilet hvis MTFJ, uten kurser, sto uten merket."""
         html = _side(klient)
         rute = re.search(
-            r'<div class="rute [^"]*uten-data[^"]*">\s*<span class="ticker">MTFJ</span>.*?</div>', html, re.S
+            r'<a class="rute [^"]*uten-data[^"]*" href="/aksje/MTFJ">\s*<span class="ticker">MTFJ</span>.*?</a>',
+            html,
+            re.S,
         )
         assert rute and "Uten data" in rute.group(0)
 
     def test_hver_rute_lenker_til_aksjesiden(self, klient):
-        """Hver aksje med kurser lenker til aksjesiden. MTFJ har ingen kurser
-        og ingen aksjeside (FR-204), så ruta er ikke en lenke. Ville feilet
-        med en lenke som gir 404."""
+        """Hver rute lenker til aksjesiden, også MTFJ uten kurser, som svarer
+        200 (gruppens svar 23.10 kl. 09:24, b; før 404 etter FR-204). Ville
+        feilet med en rute uten lenke, eller en lenke som gir 404."""
         html = _side(klient)
         lenker = _lenker(html)
-        assert len(lenker) == 14 and "MTFJ" not in lenker
+        assert len(lenker) == 15 and "MTFJ" in lenker
         for symbol in lenker:
             assert klient.get(f"/aksje/{symbol}").status_code == 200
-        assert klient.get("/aksje/MTFJ").status_code == 404
+        assert '<a href="/aksje/MTFJ">Matfjord Merkevarer</a>' in html
         # Også en dag aksjen ikke hadde kurs, når den har kurser senere.
         assert "VRDS" in _lenker(_side(klient, "/boersometer?dag=2026-08-03"))
 

@@ -75,6 +75,7 @@ Blind Hunter (BH1–BH10), Edge Case Hunter (ECH1–ECH7) og Verification Gap (V
 *Lukket 2026-10-23 (gruppens svar kl. 09:24, a):* gult følger designregler §3 også en dag uten vurdering.
 
 **Avvik fra instruksjonen:** ruta for en aksje uten kurser er ikke en lenke, fordi aksjesiden gir 404 for den (FR-204). Hjelpen sier det.
+*Lukket 2026-10-23 (gruppens svar kl. 09:24, b):* alle ruter lenker til aksjesiden. Aksjesiden for en aksje i lista uten kurser svarer 200 med navnet, bransjen og en beskjed, uten graf og sjekker (`aksje_uten_kurser.html`), og navnet under tabellen på oversikten og i Min liste lenker dit. Siste avsnitt i FR-204 forbeholder fortsatt 404 for en aksje uten en eneste kursrad, og `prd.md` er ikke rettet (åpent punkt under story 8.6 i `epics.md`).
 
 ## Mutantene
 

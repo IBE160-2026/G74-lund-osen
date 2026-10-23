@@ -1,0 +1,24 @@
+{% extends "_ramme.html" %}
+{% from "_bransjer.html" import bransjesymbol -%}
+{#- Gruppens svar 23.10 kl. 09:24 (b): en aksje i lista uten en eneste kurs
+    har en aksjeside som svarer 200, med navnet, bransjen og en beskjed, og
+    uten graf og sjekker, slik FR-204 sier for en aksje uten gyldig signal.
+    Toppen er som på aksjesiden. #}
+{% block tittel %}{{ aksje.navn }} — OSE Signal{% endblock %}
+{% block side %}side-aksje{% endblock %}
+
+{% block innhold %}
+  <a class="tilbake" href="/">Markedsoversikt</a>
+
+  <div class="merkene">
+    <span class="merke">{{ aksje.symbol }}</span>
+    {% if aksje.sektor %}<span class="merke">{{ bransjesymbol(aksje.sektor) }}{{ aksje.sektor }}</span>{% endif %}
+  </div>
+  <h1 class="overskrift">{{ aksje.navn }}</h1>
+  <p class="meta">{{ "Demo Børs" if eksempeltall else "Oslo Børs" }}</p>
+
+  <p class="ingen-kurser" role="status">
+    Det finnes ingen kurser for {{ aksje.navn }} ennå, så siden har ingen kursgraf og ingen sjekker.
+    {% if eksempeltall %}I demoen mangler kursene med vilje.{% endif %}
+  </p>
+{% endblock %}

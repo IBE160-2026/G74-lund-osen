@@ -226,7 +226,9 @@ def test_aksje_uten_data_navngis_i_fotnoten(klient, monkeypatch):
 
 def test_uleselig_symbol_navngis_i_fotnoten(klient, monkeypatch):
     """Et symbol med en rad oversettelsen ikke godtar, er manglende (1.4a).
-    De andre vises som vanlig, og det manglende navngis."""
+    De andre vises som vanlig, og det manglende navngis, med lenke til en
+    aksjeside som svarer 200 med en beskjed (gruppens svar 23.10 kl. 09:24,
+    b; før uten lenke, fordi aksjesiden ga 404)."""
     ugyldig = [eodhd(r) for r in serie([100.0] * 61)]
     del ugyldig[30]["adjusted_close"]
     monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [101.0]), "DNB": ugyldig}))
@@ -236,7 +238,9 @@ def test_uleselig_symbol_navngis_i_fotnoten(klient, monkeypatch):
     assert "Equinor" in html
     assert "Uten data i denne kilden" in html
     assert "DNB Bank" in html
-    assert 'href="/aksje/DNB"' not in html
+    assert '<a href="/aksje/DNB">DNB Bank</a>' in html
+    side = klient.get("/aksje/DNB")
+    assert side.status_code == 200 and "Det finnes ingen kurser for DNB Bank ennå" in side.data.decode("utf-8")
 
 
 @pytest.mark.parametrize("hentet", [None, "2026-09-21T15:40:00"], ids=["mangler", "uten-tidssone"])
@@ -1287,7 +1291,8 @@ class TestVurderingenPaaOversikten:
             tilkobling.close()
 
         html = klient.get("/").data.decode("utf-8")
-        fotnote = html.split("Uten data i denne kilden:")[1].split("</p>")[0]
+        # Navnene lenker til aksjesiden (gruppens svar 23.10 kl. 09:24, b).
+        fotnote = re.sub(r"<[^>]+>", "", html.split("Uten data i denne kilden:")[1].split("</p>")[0])
         # Story 8.0d, PR 2b (VG1): M telles fra aksje, ikke fast 15 eller
         # AKSJEUNIVERS. Basen har 13 aksjer igjen.
         assert "<mark>0 av 13 aksjer</mark>" in html and " · 13 aksjer" in _synlig(html)
