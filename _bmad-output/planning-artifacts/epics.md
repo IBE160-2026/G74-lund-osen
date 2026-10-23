@@ -3415,6 +3415,8 @@ dagen gjaldt hele børsen eller noen bransjer.
 
 Åpent punkt: siste avsnitt i FR-204 i `prd.md` forbeholder 404 for et symbol som ikke er i aksjeuniverset og for en aksje kilden ikke har en eneste kursrad for. Svar b endrer det siste for en aksje i lista. `prd.md` er ikke rettet.
 
+*Lagt til 2026-10-23 kl. 10:51:* børsometeret er squash-flettet i `7f1c1f0`, PR #89, låst til head-en `4f5290a` (spesifikasjonen `spec-8-6-boersometeret.md`), med svarene kl. 09:24: gult alle dagene for 3 av 3 på siste børsdag, og aksjesiden for en aksje uten kurser svarer 200 med en beskjed. Hele settet på `b4f3a81`: 3208 bestått og 17 hoppet over. CI var grønn på head-en (39927276079). Mutantene M1–M3, N1 og N2 ble fanget. Periodene i børsometeret kommer med 8.17.
+
 ### Story 8.7: Sjekk 2 og 3 i kursgrafen
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.

@@ -2,7 +2,7 @@
 title: 'Story 8.6: børsometeret'
 type: 'feature'
 created: '2026-10-23'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'c497677'
