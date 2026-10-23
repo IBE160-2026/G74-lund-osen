@@ -38,6 +38,8 @@
     </div>
     <nav class="rad sider" aria-label="Sidene">
       <a class="sideknapp" href="/"{% if aktiv == "oversikt" %} aria-current="page"{% endif %}>Markedsoversikt</a>
+      {#- Story 8.6: børsometeret mellom de to, som på tavla. #}
+      <a class="sideknapp" href="/boersometer"{% if aktiv == "boersometer" %} aria-current="page"{% endif %}>Børsometer</a>
       <a class="sideknapp" href="/min-liste"{% if aktiv == "min_liste" %} aria-current="page"{% endif %}>Min liste</a>
     </nav>
     {% if hentet %}

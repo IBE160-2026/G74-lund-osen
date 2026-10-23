@@ -604,17 +604,22 @@ class TestReadme:
     def test_demoen_paa_dagtid_og_helgen_i_steg_8(self):
         """3.3b, punkt d: på dagtid en børsdag er demoen veien for å se appen
         med en gang, og steg 8 og raden «Klar» nevner helgen, slik
-        docs/hjelp.md gjør. Ville feilet hvis helgen falt ut av steg 8."""
+        docs/hjelp.md gjør. Ville feilet hvis helgen falt ut av steg 8.
+
+        Story 2.3c (avgjørelsen 21.10 kl. 23:33, U53 og U54): første henting
+        går når som helst, og før kl. 22 en børsdag gir den forrige børsdag,
+        så demoen er ikke lenger eneste vei på dagtid. Ville feilet hvis
+        README-en sa at første henting på dagtid gir dagens kurs, eller at
+        man må vente til kvelden."""
         topp = _kom_i_gang().split("### Felles for begge", 1)[0]
-        assert (
-            "Første gang før kl. 22 på en børsdag, også på dagtid, er demoen veien for å se appen med en gang" in topp
-        )
+        assert "Første gang før kl. 22 henter den forrige børsdag, så du ser kursene og signalet med en gang." in topp
+        assert "er demoen veien for å se appen med en gang" not in topp
         klar = [l for l in topp.splitlines() if l.startswith("| Klar |")]
-        assert len(klar) == 1 and "helgen" in klar[0] and "etter kl. 22" in klar[0]
-        assert "andre dager børsen er stengt" in klar[0]
+        assert len(klar) == 1 and "når som helst" in klar[0] and "etter kl. 22" in klar[0]
+        assert "Før kl. 22 på en børsdag gir den forrige børsdag" in klar[0]
         steg8 = _steg("Den ekte versjonen", 8)
-        assert "Første gang går det også i helgen og andre dager børsen er stengt." in steg8
-        assert "Første gang kan du også hente i helgen" in _hjelp()
+        assert "Første gang går det når som helst; før kl. 22 en børsdag gir den forrige børsdag." in steg8
+        assert "når basen er tom, kan du også hente på dagtid og i helgen" in _hjelp()
 
     def test_demoen_foerst_og_zip_foer_kommandoene(self):
         """Story 3.3c: demoen står foerst, fordi faglaerer proever den (gruppen
@@ -916,8 +921,28 @@ HOEYDE_PAA_BILDET = 1630
 # fordi linja fortsatt er én linje i 1280 px.
 # Story 3.4c: vurderingene i demo.py fra STARTDAG, og meldingen om en demobase
 # fra foer i index.html. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 2.3c: forrige_boersdag i boersdag.py. Bildet ble tatt paa nytt og
+# er byte for byte det samme. Ogsaa etter gjennomgangen av 2.3c (VG11).
+# Flettingen av main inn i grenen for 2.3c (22.10 kl. 23:30): kildene fra 3.4c
+# og 2.3c sammen, saa avtrykket er regnet paa nytt (instruksjonen kl. 23:29).
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 8.6: knappen «Børsometer» i stripa, hovedindeksen flyttet til delmalen
+# _hovedindeks.html og hjelpen til børsometeret. Bildet ble tatt paa nytt med
+# samme hoeyde, og viser den nye knappen.
+# Testene for 8.6 b: en aksje uten kurser har ingen lenke i børsometeret,
+# i stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gjennomgangen av 8.6: rammen, lenkene og hjelpen til børsometeret, og
+# teksten om en hovedindeks som ikke kan leses i _hovedindeks.html. Bildet
+# ble tatt paa nytt og er byte for byte det samme.
+# Gruppens svar 23.10 kl. 09:24 (a): gult i børsometeret en dag uten
+# vurdering, i hjelpetekster.py. Bildet ble tatt på nytt og er byte for byte det samme.
+# Gruppens svar 23.10 kl. 09:24 (b): aksjesiden for en aksje uten kurser, og
+# lenkene dit. Bildet ble tatt på nytt og er byte for byte det samme.
 # Story 3.4d: fotnoten for «ikke vurdert» i index.html. Bildet er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "eb260bbb98e65f6b9f9749f97c35126ab32e0abcb5624abc14965dd7aeb17e6a"
+# Flettingen av main inn i grenen for 3.4d (23.10): kildene fra 8.6 og 3.4d
+# sammen, saa avtrykket er regnet paa nytt. Bildet ble tatt paa nytt og er byte
+# for byte det samme.
+AVTRYKK_BAK_BILDET = "20fa514a500eba3d33209595cc96cb44e58f2d81c6a71d69c7a40a6a5fa70302"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -969,7 +994,8 @@ FILENE_BAK_AKSJESIDEN = (
 )
 # Moduler appen og demoen importerer, men som ikke lager noe aksjesiden viser:
 # lagring_sqlite henter DATA_KATALOG fra lagring_fil, som importerer eodhd.
-IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py"}
+# Story 8.6: boersometer.py bygger bare børsometeret.
+IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py", "src/boersometer.py"}
 # Bildet er saa hoeyt at grafen, som staar under KI-teksten, er med til bunnen.
 # Story 8.3: 1872 med knapperaden i stripa. Var 1816.
 HOEYDE_PAA_AKSJESIDEN = 1872
@@ -986,9 +1012,31 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # fra før i app.py. Bildet ble tatt på nytt og er byte for byte det samme.
 # Gjennomgangen av 3.4c (BH1): sjekken av en gammel demobase ogsaa der den ekte
 # skal ligge, i app.py. Bildet er byte for byte det samme.
+# Story 2.3c: forrige_boersdag i boersdag.py og foerste_dag i lagrene i
+# lagring_sqlite.py. Bildet ble tatt på nytt og er byte for byte det samme.
+# Også etter gjennomgangen av 2.3c (BH4, VG11).
+# Flettingen av main inn i grenen for 2.3c (22.10 kl. 23:30): kildene fra 3.4c
+# og 2.3c sammen, saa avtrykket er regnet paa nytt (instruksjonen kl. 23:29).
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 8.6: knappen «Børsometer» i stripa, og ruta og hjelpen til
+# børsometeret i app.py og hjelpetekster.py. Bildet ble tatt på nytt med
+# samme høyde, og viser den nye knappen.
+# Testene for 8.6 b: en aksje uten kurser har ingen lenke i børsometeret,
+# i app.py. Bildet ble tatt på nytt og er byte for byte det samme.
+# Gjennomgangen av 8.6: ruta for børsometeret i app.py og hjelpen i
+# hjelpetekster.py. Bildet ble tatt på nytt og er byte for byte det samme.
+# Gruppens svar 23.10 kl. 09:24 (a): gult i børsometeret en dag uten
+# vurdering, i hjelpetekster.py. Bildet ble tatt på nytt og er byte for byte det samme.
+# Gruppens svar 23.10 kl. 09:24 (b): aksjesiden for en aksje uten kurser, og
+# lenkene dit. Bildet ble tatt på nytt og er byte for byte det samme.
+# Gjennomgangen 23.10: gult fra sidens siste børsdag (ECH1) og kommentarene om
+# aksjesiden uten kurser i app.py. Bildet ble tatt på nytt og er byte for byte det samme.
 # Story 3.4d: fotnoten i aksje.html og demo_startdag i app.py. Bildet er byte
 # for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "c3dd57f08e91c596147b13978570e411fca9e8b80c14c62d4b2dddbbb1578ee2"
+# Flettingen av main inn i grenen for 3.4d (23.10): kildene fra 8.6 og 3.4d
+# sammen, saa avtrykket er regnet paa nytt. Bildet ble tatt paa nytt og er byte
+# for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "e123c0af1dde10268b1e324affd2f4676b0ac78b758d16d3ce5960ec15be1bc5"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "
@@ -2186,7 +2234,10 @@ class TestReadmeForNybegynnere:
             "søylene",
             "stiplet linje i kursgrafen",
             # Gjennomgangen, VG1: resten av det som er flettet.
-            "fra kl. 22 på børsdager",
+            # Story 2.3c: første gang går hentingen også på dagtid, så punktet
+            # sier «fra kl. 22», og «på børsdager» er tatt ut for å holde
+            # punktet på høyst 20 ord. Var «fra kl. 22 på børsdager».
+            "fra kl. 22",
             # Story 3.4b: KI-teksten i demoen er flettet.
             # Rådets funn 20.10: demoen viser kombinasjonene av de tre sjekkene.
             "alle 10 fargekombinasjonene av de tre sjekkene og ki-tekst laget med gemma",
@@ -2194,8 +2245,12 @@ class TestReadmeForNybegynnere:
             "periodene i kursgrafen med «velg dag»",
             # Story 8.3: Min liste er flettet.
             "min liste, med stjernen foran hvert selskap",
+            # Story 8.6: børsometeret er flettet.
+            "og børsometeret",
             # Story 10.7: egne nøkler er flettet.
             "eller med egen nøkkel",
+            # Story 2.3c: første henting på dagtid er flettet.
+            "første gang på dagtid",
         ):
             assert sak in ferdig, sak
         # Story 3.3h: det rundt appen står i én setning under listene, ikke
@@ -2221,8 +2276,10 @@ class TestReadmeForNybegynnere:
         # er neste (svarene 21.10 kl. 22:51 og 22.10 kl. 00:09).
         # Story 3.3i: README-rettingen er flettet, og første henting på
         # dagtid (2.3c, avgjørelsen 21.10 kl. 23:33) er neste.
+        # Story 2.3c: første henting på dagtid er flyttet til «Ferdig», og
+        # prøven på en ren maskin er neste (avgjørelsen 21.10 kl. 18:33).
         saker = (
-            "første henting på dagtid",
+            "prøven av readme-en på en ren maskin",
             "signaldagene i kursgrafen",
             "«vis ki-tekst»",
             # Story 8.16: periodene i kursgrafen er flyttet til «Ferdig».
@@ -2447,7 +2504,8 @@ class TestReadmeForNybegynnere:
 EKSTRA = (
     ("signaldag",),
     ("«vis ki-tekst»",),
-    ("periodevalget", "børsometeret", "ki-teksten om dagen"),
+    # Story 8.6: børsometeret er flyttet til «Ferdig».
+    ("periodevalget", "ki-teksten om dagen"),
     ("velge og bytte aksjer",),
 )
 
@@ -2555,7 +2613,7 @@ class TestReadmeDemoenAnbefales:
                 assert sak in punkt, (sak, punkt)
         # Gjennomgangen (BH2, VG1): lenken går til selskapets investorside,
         # som i briefen v8 og story 10.5 etter 06.10.
-        for sak in ("første henting på dagtid",):
+        for sak in ("prøven av readme-en på en ren maskin",):
             assert sum(sak in p for p in v1) == 1, (sak, v1)
         assert not any("egen nøkkel" in p for p in v1), v1
         assert not any("min liste" in p or "investorside" in p or "historikk" in p for p in v1), v1
@@ -2685,9 +2743,11 @@ LENKENE_FOER_3_3H = {
 # Gjennomgangen av 3.3i: demoen sier i steg 6 at demolinja har en lenke til
 # den ekte versjonen (VG8), og pila til den ekte versjonen at de 4 kallene som
 # er igjen, gaar til nye forsoek (BH5). Var b3f50242... og 36cc2505....
+# Story 2.3c: steg 8 sier at foerste henting gaar naar som helst, og at den
+# foer kl. 22 en boersdag gir forrige boersdag. Var 542c8991....
 AVTRYKK_I_PILENE = {
     "Demoen": "f124a92b1c64eeb0ea5e7141976ff85de68df49004a22d5874a4a257aaf89b55",
-    "Den ekte versjonen": "542c899135c674ed2526a41e8860b4e58f202616ba70f620da198d01e01884e2",
+    "Den ekte versjonen": "3bb398cd1be31a43abe09b7261456646b6dc03047e20f1aa57ab665a768cfd78",
     "Dokumentene": "d05514d3de77b3df67028b170b8c2b89c6c99f45ad716906b170b80f969a20b6",
     "Mappestruktur": "d157a1706be8d24e7235f8d89c39c464609032c63ce5443adf2c40d1916758cd",
 }

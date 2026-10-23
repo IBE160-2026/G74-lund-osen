@@ -227,9 +227,10 @@ def bygg_oversikt(poster: list[Oversiktspost], idag: date, p: Parametre = STANDA
     return sorted(rader, key=_sorteringsnokkel)
 
 
-def uten_kurser(poster: list[Oversiktspost]) -> list[str]:
-    """Navnene paa aksjene i aksje som ikke har en eneste kursrad (FR-101)."""
-    return [post.aksje.navn for post in poster if post.nyeste is None]
+def uten_kurser(poster: list[Oversiktspost]) -> list[Aksje]:
+    """Aksjene i aksje som ikke har en eneste kursrad (FR-101). Siden viser
+    navnet med lenke til aksjesiden (gruppens svar 23.10 kl. 09:24, b)."""
+    return [post.aksje for post in poster if post.nyeste is None]
 
 
 def sidens_tidsstempel(rader: list[Rad]) -> datetime | None:

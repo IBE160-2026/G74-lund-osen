@@ -38,6 +38,7 @@ from flask import Flask, abort, g, redirect, render_template, request
 import lagring_sqlite
 from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
 from boersdag import norsk_dato
+from boersometer import bygg_boersometer, bygg_rute
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
 from graf import bygg_graf
 from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
@@ -185,7 +186,7 @@ def _migrer_en_gang(sti: Path) -> None:
 
 # Rutene som leser basen. Andre forespoersler (404, statiske filer) roerer den
 # ikke. Story 8.3: Min liste og merkingen, som er den eneste ruta som skriver.
-_RUTER_MED_BASE = {"markedsoversikt", "aksjedetalj", "min_liste", "merk"}
+_RUTER_MED_BASE = {"markedsoversikt", "aksjedetalj", "min_liste", "merk", "boersometer"}
 
 # Story 8.3: ruta som skriver merkingen. Bare den aapner en demobase for
 # skriving, og bare tabellen min_liste skrives (AD-3, AD-10).
@@ -481,6 +482,119 @@ def min_liste():
 # Story 8.3: siden man staar paa, som knapperaden i stripa fyller.
 OVERSIKT = "oversikt"
 MIN_LISTE_SIDE = "min_liste"
+# Story 8.6: børsometeret, mellom de to i stripa.
+BOERSOMETER = "boersometer"
+_DAG = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
+
+
+@app.route("/boersometer")
+def boersometer():
+    """Story 8.6, FR-106: én rute per aksje i lista, ordnet etter bransje,
+    for siste børsdag eller dagen fra «Velg dag» (?dag=ÅÅÅÅ-MM-DD). Kursene
+    og vurderingene leses gjennom portene som finnes, uten ny tabell, og
+    webserveren henter aldri (AD-10). En dag uten kurs gir den siste
+    børsdagen med kurs før den. Hovedindeksen står for siste børsdag, som på
+    oversikten."""
+    felles = {"aktiv": BOERSOMETER}
+    if g.get("basefeil"):
+        return _basen_kan_ikke_aapnes()
+    if g.get("demo_mangler"):
+        return render_template(
+            "boersometer.html",
+            bransjer=[],
+            dato=None,
+            hentet=None,
+            demokommando=demokommando(),
+            demo_gammel=g.get("demo_gammel", False),
+            **felles,
+        )
+    leser = _leser_eller_basefeil()
+    if leser is None:
+        return render_template(
+            "boersometer.html",
+            bransjer=[],
+            dato=None,
+            hentet=None,
+            hentekommando=hentekommando(),
+            demokommando=demokommando() if demo_paa() else None,
+            **felles,
+        )
+    oversiktsleser = _leser_eller_basefeil(hent_oversiktsleser)
+    poster = oversiktsleser.oversikt()
+    serier = {post.aksje.symbol: leser.serie(post.aksje.symbol) for post in poster}
+    datoer = sorted({rad.dato for serie in serier.values() for rad in serie})
+    if not datoer:
+        # Gjennomgangen (ECH6): som grenen uten kurser over, med demokommandoen
+        # naar bryteren er paa.
+        return render_template(
+            "boersometer.html",
+            bransjer=[],
+            dato=None,
+            hentet=None,
+            hentekommando=hentekommando(),
+            demokommando=demokommando() if demo_paa() else None,
+            **felles,
+        )
+    siste = datoer[-1]
+    oenske = request.args.get("dag", "")
+    valgt, ugyldig = None, False
+    if oenske:
+        if _DAG.fullmatch(oenske):
+            try:
+                valgt = date.fromisoformat(oenske)
+            except ValueError:
+                ugyldig = True
+        else:
+            ugyldig = True
+    dagen = siste
+    # Gjennomgangen (BH3, VG3, ECH1): en dag foer foerste kurs gir foerste
+    # boersdag med kurs, og siden sier at den kommer etter.
+    foer_foerste = False
+    if valgt is not None:
+        foer = [d for d in datoer if d <= valgt]
+        dagen = foer[-1] if foer else datoer[0]
+        foer_foerste = not foer
+    i_dag = idag()
+    rader = bygg_oversikt(poster, i_dag, STANDARD)
+    # Gjennomgangen (VG1): gult foelger 3 av 3 paa siste boersdag, ogsaa naar
+    # siden viser en annen dag (designregler §3).
+    # Gjennomgangen 23.10 (ECH1): bare en rad fra sidens siste boersdag,
+    # saa en aksje der hentingen feilet den dagen, ikke faar gult fra
+    # en eldre dag.
+    siste_styrke = {rad.aksje.symbol: rad.styrke for rad in rader if rad.dato == siste}
+    ruter = [
+        bygg_rute(
+            post.aksje,
+            [rad for rad in serier[post.aksje.symbol] if rad.dato <= dagen],
+            oversiktsleser.vurdering(post.aksje.symbol, dagen),
+            dagen,
+            i_dag,
+            siste_styrke=siste_styrke.get(post.aksje.symbol),
+            er_siste=dagen == siste,
+        )
+        for post in poster
+    ]
+    bransjer = bygg_boersometer(ruter)
+    tre_av_tre = frozenset(rad.aksje.symbol for rad in rader if rad.styrke == ANTALL_SJEKKER)
+    hovedindeks, indeks_feilet = _hovedindeks(leser, poster, tre_av_tre)
+    return render_template(
+        "boersometer.html",
+        bransjer=bransjer,
+        antall_aksjer=len(ruter),
+        dagen=dagen,
+        siste=siste,
+        foerste=datoer[0],
+        valgt=valgt,
+        foer_foerste=foer_foerste,
+        ugyldig=ugyldig,
+        # Delmalen for hovedindeksen setter datoen ved verdien naar indeksen
+        # staar paa en annen dag enn siden, som paa oversikten.
+        dato=dagen,
+        hentet=sidens_tidsstempel(rader),
+        hovedindeks=hovedindeks,
+        indeks_feilet=indeks_feilet,
+        **felles,
+    )
 
 
 def _tabellsiden(aktiv: str):
@@ -588,8 +702,7 @@ def aksjedetalj(symbol: str):
         abort(404)
 
     # Aksjen slaas opp i aksje i basen, ikke i lista i kursdata.py (story 2.2b,
-    # merknaden 03.10 under AD-21). 404 bare for et symbol som ikke staar der,
-    # og for en aksje uten kursrader (FR-204).
+    # merknaden 03.10 under AD-21). 404 bare for et symbol som ikke staar der.
     oversiktsleser = _leser_eller_basefeil(hent_oversiktsleser)
     post = oversiktsleser.post(normaliser_symbol(symbol))
     if post is None:
@@ -600,7 +713,14 @@ def aksjedetalj(symbol: str):
     # siste dag i grafen: dagen for «Velg dag», ellers siste rad.
     rader = leser.serie(post.aksje.symbol)
     if not rader:
-        abort(404)
+        # Gruppens svar 23.10 kl. 09:24 (b): en aksje i lista uten kurser
+        # svarer 200 med en beskjed, ikke 404, som FR-204 for en aksje uten
+        # gyldig signal. Siste avsnitt i FR-204 forbeholder fortsatt 404 for
+        # en aksje uten en eneste kursrad (aapent punkt under story 8.6 i
+        # epics.md). Siden har ingen dag og ingen periode, saa ?dag= og
+        # ?periode= leses ikke (gjennomgangen 23.10, BH6, ECH3). En base uten
+        # en eneste kurs gir fortsatt 404 over, foer foerste henting.
+        return render_template("aksje_uten_kurser.html", aksje=post.aksje, hentet=None)
     # Gjennomgangen, BH10: dagen leses én gang, saa alt i svaret gjelder samme dag.
     i_dag = idag()
     valg = les_valg(request.args.get("periode"), request.args.get("dag"), rader[0].dato, i_dag, rader[-1].dato)

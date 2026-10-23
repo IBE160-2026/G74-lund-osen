@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-22T20:03
+updated: 2026-10-23T10:52
 ---
 
 # Kvalitetssikring
@@ -293,6 +293,8 @@ sist i dokumentet.
 | 3.3i README-rettingen etter gjennomgangen av demoen | `a98146b` (#85) | 1 (3, M1–M3) | – kjørt på `b4a9ae2` og igjen etter rettingen i `1edd479` | `S/spec-3-3i-readme-rettingen-etter-demoen.md` |
 | 3.3j Fem spørsmål i «Står du fast?» igjen | `6d67db0` (#86) | 1 (2, M1 og M2) | – kjørt på `3252f5b` og igjen etter rettingen i `1c757b4` | `S/spec-3-3j-fem-spoersmaal-i-staar-du-fast.md` |
 | 3.4c Historikken i demoen som den ekte | `9359a70` (#88) | 1 (3, M1–M3) | – kjørt på `c137b66` og igjen etter rettingen i `c60be34` | `S/spec-3-4c-historikken-i-demoen.md` |
+| 2.3c Første henting på dagtid når basen er tom | `2a84142` (#87) | 1 (3, M1–M3) | – kjørt på `9ad2c60` og igjen etter rettingen i `1431a6a` | `S/spec-2-3c-foerste-henting-paa-dagtid.md` |
+| 8.6 Børsometeret | `7f1c1f0` (#89) | 1 (5, M1–M3, N1 og N2) | – M1–M3 kjørt før og etter rettingen i `2d72dc2`, og igjen på `a1f869f`; N1 og N2 for svarene kl. 09:24 på `a1f869f` | `S/spec-8-6-boersometeret.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
 | 2.9b Søylene under hovedindeksen | `73098ed` (#63) | 1 (6, S1–S6) | – | `S/spec-2-9b-soeylene-under-hovedindeksen.md` |
@@ -510,6 +512,8 @@ funn. Antall rader i loggen:
 | 3.3i | 20 | 15 | 1 | – |
 | 3.3j | 13 | 7 | 1 | – |
 | 3.4c | 11 | 6 | 1 | – |
+| 2.3c | 18 | 13 | – | – |
+| 8.6, to gjennomganger 23.10 | 36 | 24 | 12 | – |
 | 9.1, oppdatering 17.10 | 19 | 17 | 2 | – |
 | 9.7 | 19 | 13 | 6 | – |
 | 2.9b | 23 | 17 | 6 | – |
@@ -955,6 +959,7 @@ interesse, står i `malinger.md` §6, ved siden av EQNR 05.10 og GJF 02.10.
 - **Sidene når basen mangler, er tom eller feiler.** En tom base gir en beskjed med kommandoen som henter, og en base som er nyere enn koden eller feiler under lesingen, gir 503 med grunnen og uten stier. En base som mangler, lages ikke av siden som leser: `tests/test_app.py::test_uten_kilde_viser_beskjed_i_stedet_for_aa_feile`, `tests/test_app.py::TestBasenIWebserveren::test_tom_base_gir_tom_tilstand_med_kommandoen`, `tests/test_app.py::TestBasenIWebserveren::test_basen_nyere_enn_koden_gir_503_med_grunnen`, `tests/test_app.py::TestBasenIWebserveren::test_feilsiden_viser_ingen_stier`, `tests/test_app.py::TestVurderingenIDetaljen::test_feil_i_spoerringen_gir_503_paa_begge_rutene` og `tests/test_lagring_sqlite.py::TestAapneBaseUtenMigrering::test_en_base_som_mangler_lages_ikke`.
 - **Sidene når indeksen mangler eller ikke kan leses.** Delen sier det, og tabellen vises (NFR-03): `tests/test_app.py::TestHovedindeksenPaaForsiden::test_uten_indeks_sier_siden_det_og_tabellen_vises`, `tests/test_app.py::TestHovedindeksenPaaForsiden::test_en_indeks_som_ikke_kan_leses_stopper_ikke_siden` og `tests/test_app.py::TestHovedindeksenPaaForsiden::test_en_rad_som_ikke_kan_tolkes_stopper_ikke_siden`.
 - **Validering av input.** En kursrad med et tall som ikke er endelig, avvises, og et svar med feil form gir en feil for den ene aksjen, mens de andre hentes (AD-15). En ukjent sortering i adressen gir standardrekkefølgen, og et ukjent eller uleselig symbol gir 404. Det gamle navnet på flagget avvises: `tests/test_kurslager.py::TestKursrad::test_ikke_endelige_tall_avvises`, `tests/test_fetch_prices.py::TestSvarMedFeilForm::test_feil_form_gir_feil_for_symbolet_og_de_andre_hentes`, `tests/test_fetch_prices.py::TestSvarMedFeilForm::test_ingen_aksje_forsvinner_uten_aa_staa_i_feil`, `tests/test_markedsoversikt.py::TestSorteringVedKlikk::test_ukjent_i_adressen_gir_ingen_sortering`, `tests/test_app.py::TestAksjedetalj::test_ukjent_symbol_gir_404`, `tests/test_app.py::TestAksjedetalj::test_uleselig_symbol_gir_404` og `tests/test_fetch_prices.py::TestTidskontrollen::test_det_gamle_flaggnavnet_godtas_ikke`.
+  *Rettet 2026-10-23 (story 8.6, gruppens svar kl. 09:24, b; gjennomgangen VG2):* et uleselig symbol gir 404 bare når basen ikke har en eneste kurs, som før første henting. En aksje i lista uten kurser i en base med andre kurser svarer 200 med en beskjed: `tests/test_app.py::test_uleselig_symbol_navngis_i_fotnoten` og `tests/test_boersometer.py::TestSvaretKl0924::test_aksjesiden_uten_kurser_svarer_200_med_beskjed`.
 - **Kvoten leses før kallene.** Nøkkelen og kvoten kommer før første kall, og en kvote som ikke holder, gir 0 kall: `tests/test_fetch_prices.py::TestRekkefoelgen::test_noekkelen_og_kvoten_kommer_foer_foerste_kall`, `tests/test_fetch_prices.py::TestKvoten::test_under_15_uten_nok_bonus_gir_0_kall_og_kode_1` og `tests/test_fetch_prices.py::TestKvoten::test_15_igjen_holder_ikke_for_16_uten_bonus`.
 - **Vaktene mot demobasen.** Hentingen nekter en demobase før alt annet, og demokommandoen nekter en ekte base og en tom fil: `tests/test_demo.py::TestVaktene::test_hentingen_nekter_en_demobase_foer_alt_annet`, `tests/test_demo.py::TestVaktene::test_demokommandoen_nekter_en_ekte_base` og `tests/test_demo.py::TestVaktene::test_demokommandoen_nekter_en_tom_fil`.
 
@@ -1247,6 +1252,8 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 3.3i | M1–M3 | M1 `test_ingen_lenke_i_den_ekte_versjonen`, M2 `test_err_connection_refused_under_staar_du_fast`, M3 `test_tallene_20_og_16_stemmer_med_koden`, de nye testene alene (`-k`) | `S/spec-3-3i-…` |
 | 3.3j | M1 og M2 | M1 `test_staar_du_fast_har_hoeyst_5_spoersmaal`, M2 `test_svaret_om_mellomrommet_etter_cd`, og `test_begge_meldingene_i_samme_spoersmaal` alene (`-k`) | `S/spec-3-3j-…` |
 | 3.4c | M1–M3 | M1 `test_ingen_vurdering_foer_startdagen`, M2 `test_en_rad_per_aksje_hver_boersdag_fra_startdagen`, M3 `test_startdagen`, de nye testene alene (`-k`) | `S/spec-3-4c-…` |
+| 2.3c | M1–M3 | M1 og M3 `test_tom_base_foer_22_henter_forrige_boersdag`, M2 `test_base_som_ikke_er_tom_gir_0_kall_foer_22`, `TestFoersteHenting` alene (`-k`) | `S/spec-2-3c-…` |
+| 8.6 | M1–M3, N1 og N2 | M1 `test_snittet_er_av_endringen_for_alle_aksjene_i_bransjen`, M2 `test_gult_bare_ved_3_av_3`, M3 `test_rekkefoelgen_er_den_i_designreglene`, N1 `test_en_annen_dag_foelger_gult_siste_boersdag` og `test_uten_kurs_en_annen_dag_har_gult_fra_siste_boersdag` alene (`-k`), N2 `test_hver_rute_lenker_til_aksjesiden` og `test_aksjesiden_uten_kurser_svarer_200_med_beskjed` alene (`-k`) | `S/spec-8-6-…` |
 | 9.1 | Q1–Q4 | Q1, Q3 og Q4 `test_hver_ferdige_spesifikasjon_har_en_rad`, Q2 `test_hver_test_dokumentene_nevner_finnes` | `S/spec-9-1-…` |
 | 9.7 | A1–A5 | A1 `test_ruff_check_finner_ingenting`, A2 og A3 `test_ruff_format_er_kjoert`, A4 `test_ci_kjoerer_ruff_foer_testene`, A5 `test_ingen_modul_i_src_bruker_meldinger` | `S/spec-9-7-…` |
 | 2.9b | S1–S6 | S1 `test_en_soeyle_per_aksje_med_kurs_fra_stoerst_fall`, S2 `test_antallet_telles_med_en_kortere_liste`, S3 `test_den_stiplede_linja_er_groenn_naar_indeksen_steg_og_roed_naar_den_falt`, S4 og S5 `test_ingen_aksje_med_rad_foer_dagen_navngis_uten_soeyler`, S6 `test_hoeyden_er_paa_endringen_slik_den_vises` | `S/spec-2-9b-…` |

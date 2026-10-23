@@ -1792,6 +1792,16 @@ def kjoer_23(raa, base, oeyeblikk, hent=None, nokkel=NOEKKEL, les_kvote=nok_kvot
     return fil, kall, "\n".join(linjer)
 
 
+def ikke_tom(raa, base, kvelden_foer: datetime) -> str:
+    """Story 2.3c: en base som ikke er tom, fra kveldens henting dagen foer.
+    En tom base henter forrige boersdag foer kl. 22 (foerste henting), saa
+    testene av tidskontrollen trenger en base med kurser. Gir sha256 av
+    basen, saa testen kan se at ingenting ble skrevet."""
+    fil, kall, _ = kjoer_23(raa, base, kvelden_foer)
+    assert fil is not None and len(kall) == KALL
+    return sha(base)
+
+
 def kjoer_23_kode(raa, base, oeyeblikk, hent=None, nokkel=NOEKKEL, les_kvote=nok_kvote, **kw):
     """Som kjoer_23, for en kjoering som skal avslutte: (kode, kall, utskrift)."""
     linjer, kall = [], []
@@ -1819,18 +1829,22 @@ class TestTidskontrollen:
 
     def test_boersdag_kl_21_59_59_gir_0_kall_og_nevner_flagget(self, stier):
         """21:59:59 i Oslo er for tidlig. Ville feilet uten tidskontrollen (M1),
-        med noekkelen lest foerst (M5), eller med grensen paa 21:00 (G1)."""
+        med noekkelen lest foerst (M5), eller med grensen paa 21:00 (G1).
+        Story 2.3c: med en base som ikke er tom; en tom base henter forrige
+        boersdag (TestFoersteHenting)."""
         raa, base = stier
+        foer = ikke_tom(raa, base, _utc(2026, 9, 21, 20, 30))
         fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 19, 59, 59), ingen_kall, ingen_noekkel, ingen_kall)
         assert fil is None and kall == []
         assert "--uten-tidskontroll" in ut and "0 kall brukt" in ut
         assert "klokka er ikke 22:00 i Oslo" in ut and "Kjoer etter kl. 22:00" in ut
-        assert not raa.exists() and not base.exists()
+        assert not (raa / "kurser-raa-2026-09-22.json").exists() and sha(base) == foer
 
     def test_kl_21_59_gir_0_kall(self, stier):
         """Stoppet av tidskontrollen, ikke av noe annet (gjennomgangen 17.10,
         BH12)."""
         raa, base = stier
+        ikke_tom(raa, base, _utc(2026, 9, 21, 20, 30))
         fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 19, 59), ingen_kall, ingen_noekkel, ingen_kall)
         assert fil is None and kall == []
         assert "klokka er ikke 22:00 i Oslo" in ut and "--uten-tidskontroll" in ut
@@ -1840,11 +1854,12 @@ class TestTidskontrollen:
         feilet med grensen tilbake paa 21:00 (mutant G1), eller hvis noe ble
         skrevet foer tidskontrollen sa nei (gjennomgangen 20.10, BH8)."""
         raa, base = stier
+        foer = ikke_tom(raa, base, _utc(2026, 9, 21, 20, 30))
         fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 19, 30), ingen_kall, ingen_noekkel, ingen_kall)
         assert fil is None and kall == []
         assert "klokka er ikke 22:00 i Oslo" in ut
         assert "--uten-tidskontroll" in ut and "0 kall brukt" in ut
-        assert not raa.exists() and not base.exists()
+        assert not (raa / "kurser-raa-2026-09-22.json").exists() and sha(base) == foer
 
     def test_grensen_er_foer_stoppen_for_nye_forsoek(self):
         """Gjennomgangen 17.10, BH11: en endring av grensen kan ikke tomme
@@ -2218,6 +2233,8 @@ class TestVintertid:
         UTC+2 (V2), som gir 22:59 og henter, eller med grensen paa 21:00 (G1).
         19.10 var tidene 20:59 og 19:59."""
         raa, base = stier
+        # Story 2.3c: kveldens henting mandag 9.11, kl. 22:30 i Oslo.
+        ikke_tom(raa, base, _utc(2026, 11, 9, 21, 30))
         fil, kall, ut = kjoer_23(raa, base, _utc(2026, 11, 10, 20, 59), ingen_kall, ingen_noekkel, ingen_kall)
         assert fil is None and kall == []
         assert "--uten-tidskontroll" in ut and "0 kall brukt" in ut
@@ -3659,3 +3676,318 @@ class TestKode3EtterGjennomgangen:
         assert kode == 3
         assert "Hovedindeksen OSEBX: basen kunne ikke aapnes (OperationalError)" in ut
         assert antall_rader(base, "vurdering") == len(AKSJEUNIVERS)
+
+
+# Story 2.3c (avgjoerelsen 21.10 kl. 23:33): tirsdag 22.09 kl. 10:00 i Oslo,
+# foer TIDSGRENSE paa en boersdag, og mandag 21.09, boersdagen foer.
+DAGTID_22_09 = datetime(2026, 9, 22, 8, 0, tzinfo=timezone.utc)
+MANDAG_21_09 = date(2026, 9, 21)
+
+
+def som_api_et(kall_til: list[str], i_dag: date = TIRSDAG_22_09):
+    """En falsk hentefunksjon som svarer som EODHD: en serie til og med i_dag,
+    kuttet ved til-datoen den blir bedt om. Husker til-datoene."""
+
+    def hent(_ticker, _noekkel, _fra, til):
+        kall_til.append(til)
+        return [rad for rad in serie_til(i_dag) if rad["date"] <= til]
+
+    return hent
+
+
+class TestFoersteHenting:
+    """Story 2.3c: er basen tom paa en boersdag foer kl. 22, henter foerste
+    henting forrige boersdag, med kurser til og med den dagen. En base som
+    ikke er tom, hentes som foer."""
+
+    def test_tom_base_foer_22_henter_forrige_boersdag(self, stier):
+        """Ville feilet hvis dagens rad ble skrevet (M1), kursene ble bedt om
+        til og med i dag (M3), eller fila, vurderingene eller kursene gjaldt
+        en annen dag enn forrige boersdag."""
+        raa, base = stier
+        til: list[str] = []
+        fil, kall, ut = kjoer_23(raa, base, DAGTID_22_09, som_api_et(til))
+        assert fil == raa / "kurser-raa-2026-09-21.json"
+        assert len(kall) == KALL and set(til) == {"2026-09-21"}
+        assert max(rad[1] for rad in alle_kursrader(base)) == "2026-09-21"
+        assert datoene_i_vurdering(base) == ["2026-09-21"]
+        rader = vurderingene(base, MANDAG_21_09)
+        assert all(isinstance(innhold, Vurdering) for innhold, _ in rader.values())
+        assert "foerste henting" in ut and "forrige boersdag, 2026-09-21" in ut
+        assert "Signalet lagres fra den dagen og regnes aldri bakover" in ut
+
+    def test_dagens_rad_kommer_aldri_med_selv_om_api_et_har_den(self, stier):
+        """Svaret kuttes ved til-datoen, saa dagens rad kommer bare med hvis
+        hentingen ber om den. Ville feilet med kursene bedt om til og med i
+        dag (M3): da har basen en rad for 22.09."""
+        raa, base = stier
+        kjoer_23(raa, base, DAGTID_22_09, som_api_et([]))
+        assert not any(rad[1] == "2026-09-22" for rad in alle_kursrader(base))
+
+    def test_base_som_ikke_er_tom_gir_0_kall_foer_22(self, stier):
+        """Som foer 2.3c. Ville feilet hvis en base som ikke er tom, ble
+        hentet foer kl. 22 (M2)."""
+        raa, base = stier
+        foer = ikke_tom(raa, base, _utc(2026, 9, 21, 20, 30))
+        fil, kall, ut = kjoer_23(raa, base, DAGTID_22_09, ingen_kall, ingen_noekkel, ingen_kall)
+        assert fil is None and kall == [] and sha(base) == foer
+        assert "klokka er ikke 22:00 i Oslo" in ut and "foerste henting" not in ut
+
+    def test_etter_22_som_foer(self, stier):
+        """Ville feilet hvis en tom base etter kl. 22 hentet forrige boersdag."""
+        raa, base = stier
+        til: list[str] = []
+        fil, kall, _ = kjoer_23(raa, base, _utc(2026, 9, 22, 20, 30), som_api_et(til))
+        assert fil == raa / "kurser-raa-2026-09-22.json"
+        assert len(kall) == KALL and set(til) == {"2026-09-22"}
+        assert datoene_i_vurdering(base) == ["2026-09-22"]
+
+    def test_i_helgen_som_foer(self, stier):
+        """Loerdag 26.09: fredagen hentes, og intervallet gaar til
+        kalenderdagen, som foer 2.3c. Ville feilet hvis helgen ble regnet
+        som foerste henting paa en boersdag."""
+        raa, base = stier
+        til: list[str] = []
+        fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 26, 10, 0), som_api_et(til, date(2026, 9, 25)))
+        assert fil == raa / "kurser-raa-2026-09-25.json"
+        assert len(kall) == KALL and set(til) == {"2026-09-26"}
+        assert "foerste henting" not in ut
+
+    def test_med_flagget_som_foer(self, stier):
+        """--uten-tidskontroll henter dagens dato, ogsaa med en tom base.
+        Ville feilet hvis flagget ga foerste henting."""
+        raa, base = stier
+        til: list[str] = []
+        fil, _, ut = kjoer_23(raa, base, DAGTID_22_09, som_api_et(til), uten_tidskontroll=True)
+        assert fil == raa / "kurser-raa-2026-09-22.json" and set(til) == {"2026-09-22"}
+        assert "foerste henting" not in ut
+
+    def test_fr_402_kontrollerer_mot_dagen_som_hentes(self, stier):
+        """Svaret for DNB slutter fredag 18.09. Ville feilet hvis FR-402
+        kontrollerte mot dagens dato i stedet for dagen som hentes."""
+        raa, base = stier
+
+        def hent(ticker, _noekkel, _fra, til):
+            siste = date(2026, 9, 18) if ticker == "DNB.OL" else date.fromisoformat(til)
+            return serie_til(siste)
+
+        kode, kall, ut = kjoer_23_kode(raa, base, DAGTID_22_09, hent)
+        assert kode == 1 and len(kall) == KALL
+        assert "Svaret har ikke kursen for boersdagen 2026-09-21 for 1 aksjer: DNB (FR-402)" in ut
+        assert "Basen er ikke tom lenger, saa en ny henting foer kl. 22:00 gir 0 kall" in ut
+        assert "senere i kveld" not in ut
+
+    def test_kveldens_henting_samme_dag_stoppes_ikke_av_filvakten(self, stier):
+        """Foerst paa dagtid, saa kl. 22:30: kveldens henting skriver fila for
+        dagen og vurderingene for den. Ville feilet hvis foerste henting
+        skrev fila under dagens dato, saa filvakten stoppet kvelden."""
+        raa, base = stier
+        kjoer_23(raa, base, DAGTID_22_09, som_api_et([]))
+        til: list[str] = []
+        fil, kall, _ = kjoer_23(raa, base, _utc(2026, 9, 22, 20, 30), som_api_et(til))
+        assert fil == raa / "kurser-raa-2026-09-22.json" and len(kall) == KALL and set(til) == {"2026-09-22"}
+        assert sorted(datoene_i_vurdering(base)) == ["2026-09-21", "2026-09-22"]
+        assert raa_filer(raa) == ["kurser-raa-2026-09-21.json", "kurser-raa-2026-09-22.json"]
+
+    def test_fila_for_forrige_boersdag_finnes_alt(self, stier):
+        """Basen er tom, men fila for 21.09 finnes. Ville feilet hvis den ble
+        skrevet om (AD-6) eller det ble brukt kall."""
+        raa, base = stier
+        raa.mkdir(parents=True)
+        (raa / "kurser-raa-2026-09-21.json").write_text("{}", encoding="utf-8")
+        kode, kall, ut = kjoer_23_kode(raa, base, DAGTID_22_09, ingen_kall, ingen_noekkel, ingen_kall)
+        assert kode == 1 and kall == [] and "0 kall brukt" in ut
+        assert (raa / "kurser-raa-2026-09-21.json").read_text(encoding="utf-8") == "{}"
+
+    def test_demobasen_nektes_som_foer(self, stier):
+        """En tom demobase paa dagtid. Ville feilet hvis foerste henting kom
+        foer demovakten."""
+        raa, base = stier
+        base.parent.mkdir(parents=True)
+        aapne_base(base).close()
+        tilkobling = sqlite3.connect(base)
+        tilkobling.execute(f"PRAGMA application_id = {lagring_sqlite.DEMOMERKE}")
+        tilkobling.commit()
+        tilkobling.close()
+        kode, kall, ut = kjoer_23_kode(raa, base, DAGTID_22_09, ingen_kall, ingen_noekkel, ingen_kall)
+        assert kode == 1 and kall == [] and "demobase" in ut
+        assert not raa.exists()
+
+    def test_ki_tekstene_gjelder_forrige_boersdag(self, stier):
+        """Ville feilet hvis KI-steget stoppet fordi datoen ikke er
+        inneveerende boersdag, eller skrev radene for en annen dag."""
+        from test_ki_tekst import FalskModell
+
+        raa, base = stier
+        modell = FalskModell()
+        kjoer_23(raa, base, DAGTID_22_09, som_api_et([]), modell=modell)
+        assert modell.kall == len(AKSJEUNIVERS)
+        tilkobling = aapne_base(base)
+        try:
+            datoene = {r[0] for r in tilkobling.execute("SELECT DISTINCT dato FROM ki_logg")}
+        finally:
+            tilkobling.close()
+        assert datoene == {"2026-09-21"}
+
+
+class TestFoersteDagILagrene:
+    """Story 2.3c, AD-7: lagrene godtar en rad for foerste_dag bare naar den
+    er boersdagen rett foer inneveerende, og tabellen ikke har en rad for en
+    annen dato. Uten foerste_dag er vernet som foer."""
+
+    @pytest.fixture
+    def tilkobling(self, tmp_path):
+        tilkobling = aapne_base(tmp_path / "ose.db")
+        yield tilkobling
+        tilkobling.close()
+
+    def test_vurdering_i_en_tom_tabell(self, tilkobling):
+        lager = SqliteVurderingslager(tilkobling, lambda: DAGTID_22_09, foerste_dag=MANDAG_21_09)
+        assert lager.skriv("DNB", MANDAG_21_09, Grunn.SYMBOL_FEILET)
+
+    def test_vurdering_uten_foerste_dag_som_foer(self, tilkobling):
+        """Ville feilet hvis vernet godtok forrige boersdag for alle."""
+        lager = SqliteVurderingslager(tilkobling, lambda: DAGTID_22_09)
+        with pytest.raises(ValueError, match="ikke inneveerende boersdag"):
+            lager.skriv("DNB", MANDAG_21_09, Grunn.SYMBOL_FEILET)
+
+    def test_vurdering_naar_tabellen_har_en_annen_dato(self, tilkobling):
+        """Ville feilet hvis foerste_dag kunne fylle inn en dag i en base med
+        historikk."""
+        SqliteVurderingslager(tilkobling, lambda: _utc(2026, 9, 18, 20, 30)).skriv(
+            "DNB", date(2026, 9, 18), Grunn.SYMBOL_FEILET
+        )
+        lager = SqliteVurderingslager(tilkobling, lambda: DAGTID_22_09, foerste_dag=MANDAG_21_09)
+        with pytest.raises(ValueError, match="ikke inneveerende boersdag"):
+            lager.skriv("EQNR", MANDAG_21_09, Grunn.SYMBOL_FEILET)
+
+    def test_vurdering_for_en_eldre_dag(self, tilkobling):
+        """foerste_dag maa vaere boersdagen rett foer. Ville feilet hvis en
+        eldre dag ble godtatt."""
+        lager = SqliteVurderingslager(tilkobling, lambda: DAGTID_22_09, foerste_dag=date(2026, 9, 18))
+        with pytest.raises(ValueError, match="ikke inneveerende boersdag"):
+            lager.skriv("DNB", date(2026, 9, 18), Grunn.SYMBOL_FEILET)
+
+    def test_ki_loggen_som_vurderingen(self, tilkobling):
+        from kilogg import Emne, IkkeInnevaerendeBoersdag, KIRad
+        from lagring_sqlite import SqliteKILogg
+
+        def rad(dato):
+            return KIRad(
+                emne=Emne.aksje("DNB", dato),
+                grunnlag={"trend": 1},
+                regelen="Trend +1.",
+                tekst=None,
+                besto=False,
+                grunn="modellen feilet: test",
+                promptversjon="2",
+                tjeneste="lokal",
+                modell="gemma4:e4b",
+            )
+
+        with pytest.raises(IkkeInnevaerendeBoersdag):
+            SqliteKILogg(tilkobling, lambda: DAGTID_22_09).skriv(rad(MANDAG_21_09))
+        assert SqliteKILogg(tilkobling, lambda: DAGTID_22_09, foerste_dag=MANDAG_21_09).skriv(rad(MANDAG_21_09))
+        with pytest.raises(IkkeInnevaerendeBoersdag):
+            SqliteKILogg(tilkobling, lambda: DAGTID_22_09, foerste_dag=date(2026, 9, 18)).skriv(rad(date(2026, 9, 18)))
+
+
+class TestFoersteHentingEtterGjennomgangen:
+    """Gjennomgangen av 2.3c: basen som webserveren har laget, en base som
+    ikke kan leses, mandag morgen, kvoten og meldingene."""
+
+    def test_migrert_tom_base_er_tom(self, stier):
+        """Webserveren lager og migrerer basen foer foerste henting. Ville
+        feilet hvis bare en base som ikke finnes, regnes som tom (BH2)."""
+        raa, base = stier
+        base.parent.mkdir(parents=True)
+        aapne_base(base).close()
+        fil, kall, ut = kjoer_23(raa, base, DAGTID_22_09, som_api_et([]))
+        assert fil == raa / "kurser-raa-2026-09-21.json" and len(kall) == KALL
+        assert "foerste henting" in ut
+
+    def test_en_kursrad_er_ikke_tom(self, stier):
+        """Ville feilet hvis en base med kurser regnes som tom (BH2)."""
+        raa, base = stier
+        base.parent.mkdir(parents=True)
+        tilkobling = aapne_base(base)
+        try:
+            SqliteKurslager(tilkobling).erstatt_serie(
+                "DNB", fp.serie_fra_eodhd(serie_til(MANDAG_21_09)), _utc(2026, 9, 21, 20, 30)
+            )
+        finally:
+            tilkobling.close()
+        fil, kall, ut = kjoer_23(raa, base, DAGTID_22_09, ingen_kall, ingen_noekkel, ingen_kall)
+        assert fil is None and kall == [] and "klokka er ikke 22:00 i Oslo" in ut
+
+    def test_en_base_som_ikke_kan_leses_er_ikke_tom(self, stier):
+        """Ville feilet hvis en base som ikke kan leses, ga foerste henting
+        (VG5)."""
+        raa, base = stier
+        base.parent.mkdir(parents=True)
+        base.write_bytes(b"ikke en sqlite-base")
+        assert not fp.base_er_tom(base)
+        fil, kall, _ = kjoer_23(raa, base, DAGTID_22_09, ingen_kall, ingen_noekkel, ingen_kall)
+        assert fil is None and kall == []
+
+    def test_mandag_morgen_henter_fredagen(self, stier):
+        """Mandag 28.09 kl. 10:00. Ville feilet hvis forrige boersdag ble
+        regnet som dagen foer, soendagen (VG5)."""
+        raa, base = stier
+        til: list[str] = []
+        fil, _, _ = kjoer_23(raa, base, _utc(2026, 9, 28, 8, 0), som_api_et(til, date(2026, 9, 28)))
+        assert fil == raa / "kurser-raa-2026-09-25.json" and set(til) == {"2026-09-25"}
+        assert datoene_i_vurdering(base) == ["2026-09-25"]
+
+    def test_foerste_henting_bruker_ikke_bonuskvoten(self, stier):
+        """10 kall brukt i dag og 463 i bonuskvoten. Ville feilet hvis
+        foerste henting tok kall fra bonuskvoten (ECH3, VG8)."""
+        raa, base = stier
+        kode, kall, ut = kjoer_23_kode(raa, base, DAGTID_22_09, ingen_kall, les_kvote=kvote(brukt=10, bonus=463))
+        assert kode == 1 and kall == [] and "bruker ikke bonuskvoten" in ut
+
+    @pytest.mark.parametrize("bonus, henter", [(0, False), (11, False), (12, True)])
+    def test_kvelden_etter_foerste_henting(self, stier, bonus, henter):
+        """16 kall brukt paa dagtid. Kvelden trenger 12 fra bonuskvoten; ellers
+        0 kall, og 22.09 faar aldri signal. Ville feilet hvis utskriften og
+        koden sa noe annet enn vurder_kvote gjoer (BH1, ECH2, VG3)."""
+        raa, base = stier
+        _, _, ut = kjoer_23(raa, base, DAGTID_22_09, som_api_et([]))
+        assert "dagens boersdag faar aldri signal" in ut and "regnes aldri bakover" in ut
+        kvelden = kvote(brukt=16, bonus=bonus)
+        if henter:
+            fil, kall, _ = kjoer_23(raa, base, _utc(2026, 9, 22, 20, 30), som_api_et([]), les_kvote=kvelden)
+            assert fil is not None and len(kall) == KALL
+            assert sorted(datoene_i_vurdering(base)) == ["2026-09-21", "2026-09-22"]
+        else:
+            kode, kall, _ = kjoer_23_kode(raa, base, _utc(2026, 9, 22, 20, 30), ingen_kall, les_kvote=kvelden)
+            assert kode == 1 and kall == [] and datoene_i_vurdering(base) == ["2026-09-21"]
+
+    def test_meldingen_om_les_inn(self, stier):
+        """Ville feilet hvis meldingen ikke sa at --les-inn gir kurser uten
+        signal for dagen (BH5, ECH4, VG6)."""
+        raa, base = stier
+        raa.mkdir(parents=True)
+        (raa / "kurser-raa-2026-09-21.json").write_text("{}", encoding="utf-8")
+        _, _, ut = kjoer_23_kode(raa, base, DAGTID_22_09, ingen_kall, ingen_noekkel, ingen_kall)
+        assert "Hent etter kl. 22:00" in ut and "den dagen faar aldri signal" in ut
+
+    def test_ki_tjenesten_ikke_klar_ved_foerste_henting(self, stier):
+        """Ville feilet hvis utskriften lovet en ny kjoering som ikke kan lage
+        teksten for forrige boersdag (ECH1)."""
+        from test_ki_tekst import SjekketModell
+
+        raa, base = stier
+        modell = SjekketModell("Ollama svarer ikke (kjoerer den?)")
+        _, _, ut = kjoer_23(raa, base, DAGTID_22_09, som_api_et([]), modell=modell)
+        assert modell.kall == 0 and "kan ikke lages senere" in ut
+        assert "kjoer samme kommando igjen" not in ut
+
+    def test_forrige_boersdag(self):
+        """Ville feilet hvis forrige boersdag var dagen selv, eller hoppet
+        over helgen eller en stengt dag feil (VG5)."""
+        from boersdag import forrige_boersdag
+
+        assert forrige_boersdag(TIRSDAG_22_09) == MANDAG_21_09
+        assert forrige_boersdag(date(2026, 9, 28)) == date(2026, 9, 25)
+        assert forrige_boersdag(date(2026, 9, 27)) == date(2026, 9, 25)

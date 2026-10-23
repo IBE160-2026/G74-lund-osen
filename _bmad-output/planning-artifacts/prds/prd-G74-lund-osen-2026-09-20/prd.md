@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-21T23:59
+updated: 2026-10-23T13:04
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -666,6 +666,11 @@ data for én aksje ikke skal stoppe hovedflyten.
 
 **404 er forbeholdt to tilfeller:** et symbol som ikke er i aksjeuniverset, og
 en aksje kilden ikke har en eneste kursrad for.
+
+*Rettet 2026-10-23, gruppens svar kl. 11:44 (story 8.6):* 404 gjelder bare et
+symbol utenfor lista, og en base uten en eneste kurs før første henting, når
+ingen side lenker dit. En aksje i lista uten kurser svarer 200 med en beskjed
+(svaret 23.10 kl. 09:24, b, under story 8.6 i `epics.md`).
 
 #### FR-205 — Se nærmere
 

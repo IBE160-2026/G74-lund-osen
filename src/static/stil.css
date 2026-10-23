@@ -568,3 +568,47 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 /* Feilsiden (basefeil.html). */
 /* Story 8.0d: meldingen i et kort, i rammen som de andre sidene. */
 :where(.side-feil) .kort { background: var(--kort); border: 1px solid var(--strek); border-radius: 16px; padding: 18px 22px; }
+
+/* Story 8.6 (FR-106, avgjørelsen 22.10 kl. 23:19): børsometeret. Rutene
+   brytes på smal skjerm, så siden ikke ruller vannrett. Fargen følger
+   endringen slik den vises, rammen styrken: gul (sterk oransje) ved 3 av 3
+   og mørk ved 2 av 3 (designregler §3). Teksten i ruta bærer det samme. */
+:where(.side-oversikt) .velg-dag-boersometer { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 12px 0 20px; }
+:where(.side-oversikt) .velg-dag-boersometer input,
+:where(.side-oversikt) .velg-dag-boersometer button { min-height: 44px; font: inherit; }
+:where(.side-oversikt) section.bransje { margin: 24px 0; }
+:where(.side-oversikt) section.bransje h2 { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 20px; }
+:where(.side-oversikt) section.bransje h2 .bransjesymbol { width: 22px; height: 22px; }
+:where(.side-oversikt) section.bransje h2 .snitt { font-family: "IBM Plex Sans", sans-serif; font-size: 16px; font-variant-numeric: tabular-nums; }
+:where(.side-oversikt) section.bransje h2 .snitt.opp { color: var(--opp); }
+:where(.side-oversikt) section.bransje h2 .snitt.ned { color: var(--ned); }
+:where(.side-oversikt) section.bransje h2 .antall { font-family: "IBM Plex Sans", sans-serif; font-size: 14px; font-weight: 400; color: var(--dempet); }
+:where(.side-oversikt) ul.ruter { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; }
+:where(.side-oversikt) .rute { display: flex; flex-direction: column; justify-content: center; gap: 2px; box-sizing: border-box;
+                                   padding: 8px 10px; border-radius: 10px; border: 3px solid transparent; text-decoration: none;
+                                   color: var(--blekk); background: var(--ingen-bakgrunn); font-variant-numeric: tabular-nums; }
+:where(.side-oversikt) .rute.opp { background: var(--opp-bakgrunn); }
+:where(.side-oversikt) .rute.ned { background: var(--ned-bakgrunn); }
+:where(.side-oversikt) .rute.opp .endring { color: var(--opp); }
+:where(.side-oversikt) .rute.ned .endring { color: var(--ned); }
+:where(.side-oversikt) .rute.stoerrelse-lav { width: 96px; min-height: 64px; }
+:where(.side-oversikt) .rute.stoerrelse-vanlig { width: 120px; min-height: 80px; }
+:where(.side-oversikt) .rute.stoerrelse-hoey { width: 150px; min-height: 100px; }
+:where(.side-oversikt) .rute.ramme-moerk { border-color: var(--blekk); }
+/* Gjennomgangen (VG7): gult på lys bakgrunn i --gul-symbol, som symbolet over
+   søylene (designregler §3 og §4), med hvit kant innenfor. */
+:where(.side-oversikt) .rute.ramme-gul { border-color: var(--gul-symbol); box-shadow: 0 0 0 2px var(--hvit) inset; }
+:where(.side-oversikt) .rute:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+:where(.side-oversikt) .rute .ticker { font-weight: 700; }
+:where(.side-oversikt) .rute .merke { font-size: 12px; font-weight: 600; }
+:where(.side-oversikt) .rute .tekst { font-size: 12px; color: var(--dempet); }
+:where(.side-oversikt) .tabellboks.boersometerboks { margin-top: 28px; }
+:where(.side-oversikt) table.boersometertabell { font-variant-numeric: tabular-nums; }
+:where(.side-oversikt) table.boersometertabell caption { text-align: left; font-weight: 600; padding: 12px 8px 8px; }
+:where(.side-oversikt) table.boersometertabell th,
+:where(.side-oversikt) table.boersometertabell td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--strek); }
+@media (max-width: 600px) {
+  :where(.side-oversikt) .rute.stoerrelse-lav { width: 84px; }
+  :where(.side-oversikt) .rute.stoerrelse-vanlig { width: 100px; }
+  :where(.side-oversikt) .rute.stoerrelse-hoey { width: 124px; }
+}

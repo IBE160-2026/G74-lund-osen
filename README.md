@@ -31,13 +31,13 @@ Til faglærer:
 
 ## Kom i gang
 
-Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og viser hovedfunksjonene med faste eksempeldata, også KI-teksten. Den ekte versjonen er for å prøve løsningen med kurser fra EODHD. Begge versjonene har samme kode. Første gang før kl. 22 på en børsdag, også på dagtid, er demoen veien for å se appen med en gang, fordi den ekte versjonen henter dagens kurser først etter kl. 22. Demoen står først i stegene under, fordi den er raskest.
+Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og viser hovedfunksjonene med faste eksempeldata, også KI-teksten. Den ekte versjonen er for å prøve løsningen med kurser fra EODHD. Begge versjonene har samme kode. Den ekte versjonen henter dagens kurser først etter kl. 22 på en børsdag. Første gang før kl. 22 henter den forrige børsdag, så du ser kursene og signalet med en gang. Demoen står først i stegene under, fordi den er raskest.
 
 | | Demoen | Den ekte versjonen |
 |---|---|---|
 | Kurser | Oppdiktede selskaper og kurser («Eksempeltall») | Ekte sluttkurser fra Oslo Børs, hentet fra EODHD hver børsdag. Dagens vurdering lagres per aksje |
 | Trenger | Bare Docker Desktop | Docker Desktop og en gratis nøkkel fra EODHD |
-| Klar | Med en gang | Viser kurser etter første henting, etter kl. 22 på en børsdag, eller i helgen og andre dager børsen er stengt |
+| Klar | Med en gang | Etter første henting, når som helst. Før kl. 22 på en børsdag gir den forrige børsdag. Hentingen etter kl. 22 samme dag trenger bonuskvote hos EODHD; uten den får den dagen aldri signal |
 
 **Du trenger** en Windows-maskin eller en Mac, lov til å installere programmer, nett og noen GB ledig plass, men verken git eller Docker-konto. Første gang tar det en stund. På Linux bruker du Docker Engine med Compose i stedet for Docker Desktop. Vi prøvde 10.10 med Docker Desktop 4.91.0 (motor 29.8.0, Compose v5.5.1) på Windows, og imaget bruker Python 3.13.15. Mac er ikke prøvd ennå. Uten Docker trenger du bare [uv](https://docs.astral.sh/uv/), som henter Python 3.13 eller nyere hvis maskinen ikke har den, se «Uten Docker, med uv» under «Mer for den som vil». Står du fast, se [«Står du fast?»](#står-du-fast) lenger ned.
 
@@ -116,7 +116,7 @@ open -e .env
 docker compose up --build
 ```
 
-8. **Hent kursene** etter kl. 22 og før midnatt på en børsdag. Første gang går det også i helgen og andre dager børsen er stengt. Åpne et nytt terminalvindu i samme mappe (steg 3 og 4), og lim inn denne i det nye PowerShell-vinduet. Det er klart når utskriften sier hvilken børsdag vurderingene gjelder. Last siden på nytt når hentingen er ferdig.
+8. **Hent kursene** etter kl. 22 og før midnatt på en børsdag. Første gang går det når som helst; før kl. 22 en børsdag gir den forrige børsdag. Åpne et nytt terminalvindu i samme mappe (steg 3 og 4), og lim inn denne i det nye PowerShell-vinduet. Det er klart når utskriften sier hvilken børsdag vurderingene gjelder. Last siden på nytt når hentingen er ferdig.
 
 ```
 docker compose run --rm hent
@@ -345,23 +345,23 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 **Ferdig**
 
 - De tre sjekkene, trend, bevegelse og interesse, og styrken for hver aksje hver børsdag, med regelforklaringen på aksjesiden
-- Hentingen av kursene og hovedindeksen fra kl. 22 på børsdager, med børsdagskontroll og nye forsøk med kallene som er igjen
+- Hentingen: kursene og hovedindeksen fra kl. 22, første gang på dagtid, med børsdagskontroll og forsøk med kallene som er igjen
 - Oversikten og utseendet fra designforslaget, med tydeligere merking, hjelp bak «?» og sortering ved klikk i kolonneraden
 - Hovedindeksen over tabellen på forsiden, med søylene under, og som stiplet linje i kursgrafen
 - På aksjesiden: periodene i kursgrafen med «Velg dag», datoene og månedsmerkene, lenken til investorsiden og signalet dag for dag
-- Min liste, med stjernen foran hvert selskap og knappene «Markedsoversikt» og «Min liste» øverst
+- Min liste, med stjernen foran hvert selskap, og børsometeret, med knappene «Markedsoversikt», «Børsometer» og «Min liste» øverst
 - KI-teksten fra en lokal modell på aksjesiden eller med egen nøkkel, med bryter, og bare tekster som besto kontrollen
 - Docker for begge versjonene, og demoen med alle 10 fargekombinasjonene av de tre sjekkene og KI-tekst laget med Gemma
 
 **Neste i v1**
 
-- Første henting på dagtid: når basen er tom, hentes siste fullførte børsdag også før kl. 22
+- Prøven av README-en på en ren maskin, når alt i v1 er bygget
 
 **Ekstra, hvis tiden rekker**
 
 - Signaldagene i kursgrafen
 - Innstillingene, med «Vis KI-tekst»
-- På forsiden periodevalget, børsometeret og KI-teksten om dagen
+- På forsiden periodevalget og KI-teksten om dagen
 - Til slutt å velge og bytte aksjer
 
 Det som står under «Ekstra», er ikke lovet i briefen og kommer bare med hvis det er ferdig og testet før README-prøven, senest én uke før innleveringen.

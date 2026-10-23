@@ -579,6 +579,10 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-21 kl. 23:33 (gruppens svar):* når basen er tom, henter første henting siste fullførte børsdag også på dagtid en hverdag, så en ny bruker ser kursene og signalet med en gang. Dagens rad skrives aldri før `TIDSGRENSE` (kl. 22:00 i `src/fetch_prices.py`), kallene er da brukt for dagen, og en base som ikke er tom, hentes som før. Bygges med README-rettingen, før 2.12 (rekkefølgen kl. 22:51). Det endrer tidskontrollen i 2.3, som i dag ikke henter noe på en børsdag før `TIDSGRENSE` uten `--uten-tidskontroll`, og må passe med FR-402 (kontroll mot forventet børsdag) og AD-7 (ingen slette- eller endremetode).
 
+*Presisert 2026-10-22 kl. 18:36 (spesifikasjonen 2.3c):* «kallene er da brukt for dagen» i linja 2026-10-21 kl. 23:33 stemmer ikke helt med koden. Første henting på dagtid bruker 16 av dagens 20 kall. Kveldens henting samme dag trenger 16 til, og `vurder_kvote` i `src/fetch_prices.py` tar de 12 som mangler, fra bonuskvoten hvis kontoen har en, som for enhver kveld der dagens kall ikke holder (NFR-01, beslutningen 08.10 kl. 08:06). Har kontoen ingen bonuskvote, bruker kveldens henting 0 kall, og dagens kurser kommer neste kveld. README-en, `docs/hjelp.md` og utskriften sier det slik.
+
+*Rettet 2026-10-22 kl. 18:51 (gjennomgangen av 2.3c, BH1, ECH2, VG1–VG3):* presiseringen over sier at dagens kurser kommer neste kveld, og at README-en sier det slik. Uten minst 12 i bonuskvoten får den dagen aldri signal: neste kveld hentes neste børsdag, og en vurdering kan bare skrives for inneværende børsdag (AD-7). Første henting bruker heller aldri bonuskvoten selv; mangler den kall, gir den 0 kall. README-en, `docs/hjelp.md` og utskriften sier det slik fra rettingen.
+
 *Avgjort 2026-10-21 kl. 23:51 (gruppens svar):* «Bare egne resultater». I den nye promptversjonen får modellen bare våre egne resultater. I tillegg til det den får i dag, fortegnet for de tre sjekkene, styrken og retningen (`ki_grunnlag` i `src/ki_grunnlag.py`), er det hvor lenge signalet har vært slik, retningen på hovedindeksen og børsometeret (8.6) når det er bygget. Modellen får ingen kurser, volumer, prosenter eller forholdstall, heller ikke tallene som står på siden. Teksten kan vise til tallene på siden uten å gjenta dem, og hvert tall i teksten kontrolleres fortsatt mot grunnlaget. Delen av linja 2026-10-21 kl. 22:57 om «tallene som alt står på siden» gjelder ikke lenger, og det åpne punktet i den er lukket. Grunnlaget holder seg innenfor avgjørelsen 04.10 (fortegn, styrke, retning og antall), som står, og EODHD spørres ikke. Fra den nye versjonen får grunnlaget for én aksje et antall (dagene), ulikt linja 15.10 (svar 10 kl. 15:53), der grunnlaget for én aksje er uten antall.
 
 *Avgjort 2026-10-22 kl. 00:09 (gruppens svar):* rekkefølgen er 10.7 (egne nøkler), README-rettingen, 8.6 (børsometeret), så 2.12. Det endrer rekkefølgen 2026-10-21 kl. 22:51, der 2.12 kom rett etter README-rettingen. 8.6 er fortsatt «Ekstra, hvis tiden rekker» (svaret 19.10 kl. 15:43) og flettes bare ferdig og grønt (svaret 19.10 kl. 14:48). Flettes den før den nye promptversjonen, kan børsometeret komme med i grunnlaget fra den (avgjørelsene 2026-10-21 kl. 22:57 og 23:51). Story 8.6 sier at den avhenger av 8.17 for periodene; hvordan 8.6 bygges før 8.17, avgjøres i spesifikasjonen. Gruppen meldte kl. 00:07 at børsometeret mangler i appen (U70 i `docs/ux-logg.md`).
@@ -586,6 +590,12 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 *Avgjort 2026-10-22 kl. 14:38 (gruppens svar):* to svar etter 10.7. a) Modellene til Anthropic og OpenAI er Claude Haiku 5.5 (`claude-haiku-5-5`) og GPT-6 Luna (`gpt-6-luna`), som spesifikasjonen 10.7 valgte. Det åpne punktet er lukket. b) Mangler nøkkelen, skrives ingen rader, som når Ollama ikke kjører: hentingen sier hvilken variabel som mangler, og man kan legge den inn og hente igjen samme kveld. En feil hos tjenesten etter kallet gir fortsatt en rad med grunnen. Det endrer kontrollpunktet i story 10.7 om at en nøkkel som mangler, gir en rad. Det bygges i spesifikasjonen 10.7b.
 
 *Avgjort 2026-10-22 kl. 17:42 (gruppens svar):* de to svarene om `cd` i steg 4 under «Står du fast?», «is not recognized as the name of a cmdlet» og «Cannot find path … because it does not exist», blir ett spørsmål med begge meldingene ordrett, så «Står du fast?» har fem spørsmål, som avgjort 16.10 kl. 21:53–21:58. Det erstatter grensen på 6 fra 3.3i (`a98146b`). Det bygges i spesifikasjonen 3.3j. Gruppen prøvde også steg 3 fra 3.3i samme minutt: PowerShell åpnet fra adressefeltet i Filutforsker i den innerste mappa, og `dir` viste `README.md` og `compose.yaml` (§13 i `docs/kvalitetssikring.md`).
+
+*Avgjort 2026-10-22 kl. 19:30 (gruppens svar):* unntaket fra AD-7 i 2.3c er godkjent. Første henting på dagtid i en tom base skriver vurderingene og KI-radene for børsdagen rett før inneværende, bare når basen ikke har rader for en annen dato, og hver rad skrives én gang og regnes aldri på nytt. Uten unntaket ville en ny bruker ikke sett signalet med en gang, som avgjørelsen 2026-10-21 kl. 23:33 sier.
+
+*Avgjort 2026-10-22 kl. 23:14 (gruppens svar):* i 2.12 velger brukeren aksjer bare fra lista over aksjene på Oslo Børs (`malinger.md` §40). Hentekommandoen henter lista med 1 kall, sjelden og med reservekallet, og lagrer den i basen, og siden viser bare tickere som står i lista. Webserveren henter aldri (AD-10). Da kan en ticker som ikke finnes, aldri koste et kall, som den gjorde i §40. Kontrollpunktet om en ticker som ikke gir rader ved hentingen, står som vern.
+
+*Avgjort 2026-10-22 kl. 23:19 (gruppens svar):* børsometeret blir som tavla, én rute per aksje ordnet etter bransje, med farge for endringen, størrelse for volumet mot vanlig og ramme for signalet, og snittet per bransje i overskriften, som storyen krever. Først for siste børsdag og «Velg dag»; periodene kommer med 8.17.
 
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
@@ -1567,6 +1577,14 @@ Oppgaveplanlegging beskrives i README (regel 19).
 
 *Avgjort 2026-10-21 kl. 23:33 (gruppens svar):* når basen er tom, henter første henting siste fullførte børsdag også på dagtid en hverdag, så en ny bruker ser kursene og signalet med en gang. Dagens rad skrives aldri før `TIDSGRENSE` (kl. 22:00 i `src/fetch_prices.py`), kallene er da brukt for dagen, og en base som ikke er tom, hentes som før. Bygges med README-rettingen, før 2.12 (rekkefølgen kl. 22:51). Det endrer tidskontrollen i 2.3, som i dag ikke henter noe på en børsdag før `TIDSGRENSE` uten `--uten-tidskontroll`, og må passe med FR-402 (kontroll mot forventet børsdag) og AD-7 (ingen slette- eller endremetode).
 
+*Presisert 2026-10-22 kl. 18:36 (spesifikasjonen 2.3c):* «kallene er da brukt for dagen» i linja 2026-10-21 kl. 23:33 stemmer ikke helt med koden. Første henting på dagtid bruker 16 av dagens 20 kall. Kveldens henting samme dag trenger 16 til, og `vurder_kvote` i `src/fetch_prices.py` tar de 12 som mangler, fra bonuskvoten hvis kontoen har en, som for enhver kveld der dagens kall ikke holder (NFR-01, beslutningen 08.10 kl. 08:06). Har kontoen ingen bonuskvote, bruker kveldens henting 0 kall, og dagens kurser kommer neste kveld. README-en, `docs/hjelp.md` og utskriften sier det slik.
+
+*Rettet 2026-10-22 kl. 18:51 (gjennomgangen av 2.3c, BH1, ECH2, VG1–VG3):* presiseringen over sier at dagens kurser kommer neste kveld, og at README-en sier det slik. Uten minst 12 i bonuskvoten får den dagen aldri signal: neste kveld hentes neste børsdag, og en vurdering kan bare skrives for inneværende børsdag (AD-7). Første henting bruker heller aldri bonuskvoten selv; mangler den kall, gir den 0 kall. README-en, `docs/hjelp.md` og utskriften sier det slik fra rettingen.
+
+*Avgjort 2026-10-22 kl. 19:30 (gruppens svar):* unntaket fra AD-7 i 2.3c er godkjent. Første henting på dagtid i en tom base skriver vurderingene og KI-radene for børsdagen rett før inneværende, bare når basen ikke har rader for en annen dato, og hver rad skrives én gang og regnes aldri på nytt. Uten unntaket ville en ny bruker ikke sett signalet med en gang, som avgjørelsen 2026-10-21 kl. 23:33 sier.
+
+*Lagt til 2026-10-22 kl. 23:45:* første henting på dagtid er squash-flettet i `2a84142`, PR #87, låst til head-en `be511ee`, etter at main ble flettet inn i grenen i `be511ee` (spesifikasjonen `spec-2-3c-foerste-henting-paa-dagtid.md`). Er basen tom på en børsdag før `TIDSGRENSE`, henter første henting forrige børsdag, med kurser til og med den dagen, og skriver vurderingene og KI-radene for den dagen gjennom unntaket fra AD-7, godkjent kl. 19:30. En base som ikke er tom, gir 0 kall før kl. 22 som før. Hele settet: 3124 bestått og 17 hoppet over, og CI var grønn på head-en (39859331489). Alle tre mutantene, M1–M3, ble fanget.
+
 ### Story 2.3b: Kallene som er igjen, brukes på nye forsøk
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 19:17.*
@@ -1904,6 +1922,12 @@ følger aksjene jeg bryr meg om.
 *Avgjort 2026-10-21 kl. 22:51 (gruppens svar):* rekkefølgen er 10.7 (egne nøkler), så README-rettingen etter gjennomgangen av demoen 21.10, så 2.12. README-rettingen står ikke som egen story i repoet ennå.
 
 *Avgjort 2026-10-22 kl. 00:09 (gruppens svar):* rekkefølgen er 10.7 (egne nøkler), README-rettingen, 8.6 (børsometeret), så 2.12. Det endrer rekkefølgen 2026-10-21 kl. 22:51, der 2.12 kom rett etter README-rettingen. 8.6 er fortsatt «Ekstra, hvis tiden rekker» (svaret 19.10 kl. 15:43) og flettes bare ferdig og grønt (svaret 19.10 kl. 14:48). Flettes den før den nye promptversjonen, kan børsometeret komme med i grunnlaget fra den (avgjørelsene 2026-10-21 kl. 22:57 og 23:51). Story 8.6 sier at den avhenger av 8.17 for periodene; hvordan 8.6 bygges før 8.17, avgjøres i spesifikasjonen. Gruppen meldte kl. 00:07 at børsometeret mangler i appen (U70 i `docs/ux-logg.md`).
+
+*Avgjort 2026-10-22 kl. 16:07 (gruppens svar):* de 4 kallene som er igjen av dagskvoten 22.10 i GMT, de 3 som er holdt av til egne aksjer og reserven (avgjort 21.10 kl. 18:38), går i kveld til oppslagene i `malinger.md` §40: lista over aksjene på Oslo Børs, en ticker som ikke finnes, og ett år for NEL og STB. Det erstatter svaret kl. 16:06 om NOD, NEL, SUBC og STB, fordi de fire alt er målt i §15, §16 og §28.
+
+*Lagt til 2026-10-22 kl. 22:53 (målingen etter gruppens svar 22.10 kl. 16:07, `malinger.md` §40):* lista over aksjene på Oslo Børs (`exchange-symbol-list/OL`) koster 1 kall og har 304 rader, 297 av dem «Common Stock», med alle de 15, men med navnene i juridisk form («Equinor ASA», «DnB ASA», «Var Energi ASA»). En ticker som ikke finnes, gir HTTP 404 og koster et kall. NEL og STB har 250 rader til 2026-10-22, med median omsetning de siste tre månedene på 3,9 og 96,6 MNOK. Bonuskvoten er ikke brukt.
+
+*Avgjort 2026-10-22 kl. 23:14 (gruppens svar):* i 2.12 velger brukeren aksjer bare fra lista over aksjene på Oslo Børs (`malinger.md` §40). Hentekommandoen henter lista med 1 kall, sjelden og med reservekallet, og lagrer den i basen, og siden viser bare tickere som står i lista. Webserveren henter aldri (AD-10). Da kan en ticker som ikke finnes, aldri koste et kall, som den gjorde i §40. Kontrollpunktet om en ticker som ikke gir rader ved hentingen, står som vern.
 
 ### Story 2.13: Kommandoen som måler omsetning
 
@@ -2277,6 +2301,10 @@ avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 *Lagt til 2026-10-22 kl. 20:03:* historikken i demoen som den ekte er squash-flettet i `9359a70`, PR #88, låst til head-en `d58ba83` (spesifikasjonen `spec-3-4c-historikken-i-demoen.md`). Vurderingene i demoen skrives bare fra mandag 21.09, tre uker før siste demodag 09.10, og dagene før står som «ikke vurdert», slik den ekte versjonen viser dagene før første henting. Kursene, de 10 fargekombinasjonene og KI-tekstene på 09.10 er som før. En demobase fra før sier fra og viser kommandoen som lager den på nytt. Hele settet: 3097 bestått og 17 hoppet over, og CI var grønn på head-en (39827715260). Alle tre mutantene, M1–M3, ble fanget.
 
 *Avgjort 2026-10-22 kl. 20:11 (gruppens svar):* fotnoten for «ikke vurdert» (det åpne punktet ECH2 i spesifikasjonen 3.4c) får to tekster. Den ekte versjonen: «Ikke vurdert»: signalet lagres bare den kvelden kursene hentes, og regnes aldri ut bakover. Det gjelder dagene før første henting, og dager der kursene er lest inn med --les-inn. Demoen: «Ikke vurdert»: i demoen starter vurderingene mandag 21.09, slik den ekte versjonen har signal fra første henting. Datoen i demoteksten kommer fra `STARTDAG` i `src/demo.py`. Det bygges i spesifikasjonen 3.4d.
+
+*Avgjort 2026-10-22 kl. 23:19 (gruppens svar):* den ekte teksten i fotnoten blir «Ikke vurdert»: signalet lagres bare den kvelden kursene hentes, og regnes aldri ut bakover. Det gjelder dagene før første henting, kvelder uten henting, og dager der kursene er lest inn med --les-inn. Den erstatter den ekte teksten fra kl. 20:11, og demoteksten står.
+
+*Avgjort 2026-10-23 kl. 11:44 (gruppens svar, b):* fotnoten står også på børsometeret når en rute sier «ikke vurdert», med samme tekster.
 
 ### Story 3.4b: KI-tekstene i demoen
 
@@ -3382,6 +3410,20 @@ dagen gjaldt hele børsen eller noen bransjer.
 - **Ville feilet hvis:** siden sa «sektor», eller en bransje sto uten symbol
 
 *Avgjort 2026-10-22 kl. 00:09 (gruppens svar):* rekkefølgen er 10.7 (egne nøkler), README-rettingen, 8.6 (børsometeret), så 2.12. Det endrer rekkefølgen 2026-10-21 kl. 22:51, der 2.12 kom rett etter README-rettingen. 8.6 er fortsatt «Ekstra, hvis tiden rekker» (svaret 19.10 kl. 15:43) og flettes bare ferdig og grønt (svaret 19.10 kl. 14:48). Flettes den før den nye promptversjonen, kan børsometeret komme med i grunnlaget fra den (avgjørelsene 2026-10-21 kl. 22:57 og 23:51). Story 8.6 sier at den avhenger av 8.17 for periodene; hvordan 8.6 bygges før 8.17, avgjøres i spesifikasjonen. Gruppen meldte kl. 00:07 at børsometeret mangler i appen (U70 i `docs/ux-logg.md`).
+
+*Avgjort 2026-10-22 kl. 23:19 (gruppens svar):* børsometeret blir som tavla, én rute per aksje ordnet etter bransje, med farge for endringen, størrelse for volumet mot vanlig og ramme for signalet, og snittet per bransje i overskriften, som storyen krever. Først for siste børsdag og «Velg dag»; periodene kommer med 8.17.
+
+*Avgjort 2026-10-23 kl. 09:24 (gruppens svar):* to svar på det åpne punktet og avviket i `spec-8-6-boersometeret.md`.
+- a) Gult følger designreglene §3 også en dag uten vurdering: en aksje med 3 av 3 på siste børsdag har gul ramme på alle dagene, og mørk ramme for 2 av 3 står bare for siste børsdag. Det retter instruksjonen 23.10 kl. 00:09, der en dag uten vurdering ikke hadde ramme.
+- b) Alle ruter lenker til aksjesiden. Aksjesiden for en aksje i lista uten kurser svarer 200 med en beskjed, ikke 404, slik FR-204 sier for en aksje uten gyldig signal.
+
+Åpent punkt: siste avsnitt i FR-204 i `prd.md` forbeholder 404 for et symbol som ikke er i aksjeuniverset og for en aksje kilden ikke har en eneste kursrad for. Svar b endrer det siste for en aksje i lista. `prd.md` er ikke rettet.
+
+*Lukket 2026-10-23 (gruppens svar kl. 11:44, a):* det åpne punktet om FR-204 er lukket med en Rettet-linje under siste avsnitt i FR-204 i `prd.md`.
+
+*Lagt til 2026-10-23 kl. 10:51:* børsometeret er squash-flettet i `7f1c1f0`, PR #89, låst til head-en `4f5290a` (spesifikasjonen `spec-8-6-boersometeret.md`), med svarene kl. 09:24: gult alle dagene for 3 av 3 på siste børsdag, og aksjesiden for en aksje uten kurser svarer 200 med en beskjed. Hele settet på `b4f3a81`: 3208 bestått og 17 hoppet over. CI var grønn på head-en (39927276079). Mutantene M1–M3, N1 og N2 ble fanget. Periodene i børsometeret kommer med 8.17.
+
+*Avgjort 2026-10-23 kl. 11:44 (gruppens svar, a):* en Rettet-linje under siste avsnitt i FR-204 i `prd.md`. 404 gjelder bare et symbol utenfor lista, og en base uten en eneste kurs før første henting, når ingen side lenker dit. En aksje i lista uten kurser svarer 200 med en beskjed (svaret kl. 09:24, b). Det åpne punktet om FR-204 over er dermed lukket.
 
 ### Story 8.7: Sjekk 2 og 3 i kursgrafen
 

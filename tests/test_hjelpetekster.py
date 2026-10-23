@@ -285,7 +285,8 @@ def base(basemal):
     return sti
 
 
-SIDENE = ("/", "/aksje/BRFE", "/aksje/VRDS")
+# Story 8.6: børsometeret har sin egen tekst.
+SIDENE = ("/", "/boersometer", "/aksje/BRFE", "/aksje/VRDS")
 
 
 def _side(klient, adresse: str) -> str:
