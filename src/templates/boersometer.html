@@ -76,6 +76,10 @@
       </tbody>
     </table>
     </div>
+    {#- Gruppens svar 23.10 kl. 11:44 (b): fotnoten når en rute sier «ikke vurdert». #}
+    {% if ikke_vurdert %}
+      {% include "_fotnote_ikke_vurdert.html" %}
+    {% endif %}
     {{ hjelpevindu("hjelp-hovedindeks", "Hovedindeksen", [("", ["hovedindeksen", "soeylene"] if hovedindeks and hovedindeks.har_soeyler else ["hovedindeksen"])]) }}
   {% elif demokommando %}
     <p>

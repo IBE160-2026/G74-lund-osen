@@ -579,6 +579,7 @@ def boersometer():
         "boersometer.html",
         bransjer=bransjer,
         antall_aksjer=len(ruter),
+        ikke_vurdert=any(rute.ikke_vurdert for rute in ruter),
         dagen=dagen,
         siste=siste,
         foerste=datoer[0],

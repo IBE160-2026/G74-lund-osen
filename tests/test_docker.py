@@ -942,7 +942,10 @@ HOEYDE_PAA_BILDET = 1630
 # Flettingen av main inn i grenen for 3.4d (23.10): kildene fra 8.6 og 3.4d
 # sammen, saa avtrykket er regnet paa nytt. Bildet ble tatt paa nytt og er byte
 # for byte det samme.
-AVTRYKK_BAK_BILDET = "20fa514a500eba3d33209595cc96cb44e58f2d81c6a71d69c7a40a6a5fa70302"
+# Story 3.4d b: fotnoten for «ikke vurdert» i delmalen _fotnote_ikke_vurdert.html,
+# med den ekte teksten fra 22.10 kl. 23:19. Bildet ble tatt paa nytt og er byte
+# for byte det samme.
+AVTRYKK_BAK_BILDET = "f87cc97426824409a8c8440bbad2796f8b005bb7e5f4d288ffbd9b09be20d3de"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1038,7 +1041,10 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # for byte det samme.
 # Story 3.4d, VG2: demo_startdag i app.py med ukedag og dato fra tallformat.py.
 # Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "4ed820aa7e3b67480512a563144c05524c139840fe0c43803fd5ae3a4a5c6ea4"
+# Story 3.4d b: fotnoten for «ikke vurdert» i delmalen _fotnote_ikke_vurdert.html,
+# med den ekte teksten fra 22.10 kl. 23:19. Bildet ble tatt paa nytt og er byte
+# for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "947e4126f5f951ab59c0ac23530215ca9796f8d03799f51d5682bd26e2f81aa6"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "

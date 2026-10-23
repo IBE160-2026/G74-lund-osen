@@ -24,7 +24,7 @@ from datetime import date
 
 from hjelpetekster import ANTALL_SJEKKER
 from kursdata import Aksje, Kursrad
-from markedsoversikt import endring_i_prosent, les_tilstand
+from markedsoversikt import IKKE_VURDERT, endring_i_prosent, les_tilstand
 from signalberegning import STANDARD, Parametre
 from tallformat import desimaler_mot_grense, tall
 from tilstand import Art
@@ -83,6 +83,13 @@ class Rute:
     @property
     def volum_vist(self) -> str | None:
         return None if self.volumforhold is None else vis_volumforhold(self.volumforhold)
+
+    @property
+    def ikke_vurdert(self) -> bool:
+        """Ruta sier «ikke vurdert», og siden får fotnoten (story 3.4d,
+        gruppens svar 23.10 kl. 11:44, b). En rute uten kurs sier «Uten
+        data»."""
+        return self.tekst == IKKE_VURDERT
 
     @property
     def ramme(self) -> str | None:

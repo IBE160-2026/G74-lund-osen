@@ -204,14 +204,7 @@
     {% if vist_tabell %}
 
     {% if ikke_vurdert %}
-      <p class="fotnote">
-        {#- Story 3.4d (gruppens svar 22.10 kl. 20:11): egen tekst i demoen. #}
-        {% if eksempeltall %}«Ikke vurdert»: i demoen starter vurderingene
-        {{ demo_startdag }}, slik den ekte versjonen har signal fra første henting.
-        {%- else %}«Ikke vurdert»: signalet lagres bare den kvelden kursene hentes,
-        og regnes aldri ut bakover. Det gjelder dagene før første henting, og dager
-        der kursene er lest inn med <code>--les-inn</code>.{% endif %}
-      </p>
+      {% include "_fotnote_ikke_vurdert.html" %}
     {% endif %}
 
     {% if mangler %}
