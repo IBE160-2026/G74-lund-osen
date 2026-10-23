@@ -94,7 +94,7 @@ else
         aapne "https://eodhd.com/register"
         read -r -s -p "Lim inn nøkkelen og trykk Enter (den vises ikke): " noekkel
         echo
-        noekkel="$(printf '%s' "$noekkel" | tr -d '[:space:]')"
+        noekkel="${noekkel//[[:space:]]/}"
         [ -n "$noekkel" ] || stopp "ingen nøkkel ble limt inn."
         grep -v '^EODHD_API_KEY=' .env > .env.ny
         printf 'EODHD_API_KEY=%s\n' "$noekkel" >> .env.ny
