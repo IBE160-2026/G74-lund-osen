@@ -3409,6 +3409,12 @@ dagen gjaldt hele børsen eller noen bransjer.
 
 *Avgjort 2026-10-22 kl. 23:19 (gruppens svar):* børsometeret blir som tavla, én rute per aksje ordnet etter bransje, med farge for endringen, størrelse for volumet mot vanlig og ramme for signalet, og snittet per bransje i overskriften, som storyen krever. Først for siste børsdag og «Velg dag»; periodene kommer med 8.17.
 
+*Avgjort 2026-10-23 kl. 09:24 (gruppens svar):* to svar på det åpne punktet og avviket i `spec-8-6-boersometeret.md`.
+- a) Gult følger designreglene §3 også en dag uten vurdering: en aksje med 3 av 3 på siste børsdag har gul ramme på alle dagene, og mørk ramme for 2 av 3 står bare for siste børsdag. Det retter instruksjonen 23.10 kl. 00:09, der en dag uten vurdering ikke hadde ramme.
+- b) Alle ruter lenker til aksjesiden. Aksjesiden for en aksje i lista uten kurser svarer 200 med en beskjed, ikke 404, slik FR-204 sier for en aksje uten gyldig signal.
+
+Åpent punkt: siste avsnitt i FR-204 i `prd.md` forbeholder 404 for et symbol som ikke er i aksjeuniverset og for en aksje kilden ikke har en eneste kursrad for. Svar b endrer det siste for en aksje i lista. `prd.md` er ikke rettet.
+
 ### Story 8.7: Sjekk 2 og 3 i kursgrafen
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
