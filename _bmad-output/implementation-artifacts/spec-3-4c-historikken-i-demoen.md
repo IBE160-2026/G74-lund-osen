@@ -81,6 +81,7 @@ Gjennomgang 22.10 på diffen `5ff304f..c137b66`. Linsene var Blind Hunter (BH, 6
 ## Åpent
 
 - **Fotnoten på siden for en dag uten vurdering** i demoen viser til hentekommandoen og `--les-inn` (ECH2). En egen tekst for demoen kan komme i en liten PR.
+  *Lukket 2026-10-23 kl. 13:45:* fotnoten har en egen tekst i demoen, flettet i `544648f`, PR #90 (spesifikasjonen 3.4d, gruppens svar 22.10 kl. 20:11 og 23:19).
 
 ## Det som ikke endres
 

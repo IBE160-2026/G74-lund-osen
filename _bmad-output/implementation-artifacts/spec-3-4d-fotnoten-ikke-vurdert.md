@@ -2,7 +2,7 @@
 title: 'Story 3.4 (3.4d): fotnoten for «ikke vurdert» i demoen og den ekte versjonen'
 type: 'feature'
 created: '2026-10-22'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'f4f0875'

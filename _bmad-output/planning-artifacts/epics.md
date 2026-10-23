@@ -2306,6 +2306,8 @@ avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 
 *Avgjort 2026-10-23 kl. 11:44 (gruppens svar, b):* fotnoten står også på børsometeret når en rute sier «ikke vurdert», med samme tekster.
 
+*Lagt til 2026-10-23 kl. 13:45:* fotnoten for «ikke vurdert» er squash-flettet i `544648f`, PR #90, låst til head-en `3b10267` (spesifikasjonen `spec-3-4d-fotnoten-ikke-vurdert.md`). Fotnoten står i én felles mal på aksjesiden, oversikten og børsometeret, med den ekte teksten fra kl. 23:19 og demoteksten fra kl. 20:11, og datoen i demoteksten kommer fra `STARTDAG` gjennom `tallformat.py`. Hele settet på `3b10267`: 3219 bestått og 17 hoppet over. CI var grønn på head-en (39948115771). Mutantene M1–M3 og c M1–c M2 ble fanget. Demoteksten for en rad som mangler etter 21.09 står som åpent punkt i spesifikasjonen.
+
 ### Story 3.4b: KI-tekstene i demoen
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 16:53.*
