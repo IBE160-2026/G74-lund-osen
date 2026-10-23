@@ -793,3 +793,47 @@ class TestFotnoten:
         monkeypatch.setattr(app_modul, "STARTDAG", date(2026, 9, 29))
         html = _side(klient, "/boersometer?dag=2026-09-18")
         assert "i demoen starter vurderingene tirsdag 29.09," in _fotnoten(html)
+
+
+class TestFotnotenEtterStartdagen:
+    """Story 3.4e: demoteksten bare for en dag før STARTDAG, og setningen om
+    i dag på børsometeret."""
+
+    @staticmethod
+    def _uten_vurdering(sti: Path, symbol: str, dato: str) -> None:
+        tilkobling = sqlite3.connect(sti)
+        try:
+            tilkobling.execute("DELETE FROM vurdering WHERE symbol = ? AND dato = ?", (symbol, dato))
+            tilkobling.commit()
+        finally:
+            tilkobling.close()
+
+    def test_demoen_etter_startdagen_har_den_ekte_teksten(self, klient):
+        """KVST uten vurdering 08.10, etter STARTDAG. Ville feilet med
+        demoteksten for alle dager i demoen (M1 i 3.4e c)."""
+        self._uten_vurdering(demo_sti(), "KVST", "2026-10-08")
+        html = _side(klient, "/boersometer?dag=2026-10-08")
+        assert _fotnoten(html) == TestFotnoten.EKTE_TEKST
+
+    def test_setningen_om_i_dag(self, monkeypatch, basemal):
+        """Den ekte versjonen, KVST uten vurdering 09.10, og klokka er 09.10
+        kl. 20 i Oslo. Ville feilet uten setningen om i dag, og med den en
+        annen dag (M2 i 3.4e c)."""
+        sti = Path(lagring_sqlite.BASE_STI)
+        sti.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(basemal, sti)
+        tilkobling = sqlite3.connect(sti)
+        try:
+            tilkobling.execute("PRAGMA application_id = 0")
+            tilkobling.commit()
+        finally:
+            tilkobling.close()
+        self._uten_vurdering(sti, "KVST", "2026-10-09")
+        monkeypatch.delenv(app_modul.I_DEMO, raising=False)
+        monkeypatch.delenv(app_modul.I_DOCKER, raising=False)
+        klient = app_modul.app.test_client()
+        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 9, 18, 0, tzinfo=timezone.utc))
+        i_dag = " For i dag kan signalet fortsatt lagres hvis hentingen kjøres ferdig i kveld."
+        assert _fotnoten(_side(klient)) == TestFotnoten.EKTE_TEKST + i_dag
+        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 12, 12, 0, tzinfo=timezone.utc))
+        assert _fotnoten(_side(klient)) == TestFotnoten.EKTE_TEKST

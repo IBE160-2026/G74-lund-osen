@@ -3797,3 +3797,28 @@ class TestStory815bSelskapOgMarkeringen:
                 assert "th[aria-sort]" in velger, velger
         # BH6, ECH3: en gjennomsiktig kant som synes med tvungne farger.
         assert "outline: 3px solid transparent" in regel
+
+
+class TestFotnotenForIDag:
+    """Story 3.4e (b): er dagen som er «ikke vurdert», i dag, sier fotnoten i
+    tillegg at signalet fortsatt kan lagres i kveld. idag settes i testen."""
+
+    I_DAG = " For i dag kan signalet fortsatt lagres hvis hentingen kjøres ferdig i kveld."
+
+    @pytest.mark.parametrize("adresse", ["/", "/aksje/EQNR"])
+    def test_setningen_naar_dagen_er_i_dag(self, klient, monkeypatch, adresse):
+        """60 rader slutter fredag 30.10, og klokka er 30.10 kl. 19 i Oslo.
+        Ville feilet uten setningen om i dag."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 59 + [110.0])}), vurdert=False)
+        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 30, 18, 0, tzinfo=timezone.utc))
+        html = klient.get(adresse).data.decode("utf-8")
+        assert fotnoten(html) == EKTE_FOTNOTE + self.I_DAG
+
+    @pytest.mark.parametrize("adresse", ["/", "/aksje/EQNR"])
+    def test_ingen_setning_en_annen_dag(self, klient, monkeypatch, adresse):
+        """Samme rader, og klokka er mandag 02.11. Ville feilet med setningen
+        om i dag for en annen dag (M2 i 3.4e c)."""
+        monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 59 + [110.0])}), vurdert=False)
+        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 11, 2, 12, 0, tzinfo=timezone.utc))
+        html = klient.get(adresse).data.decode("utf-8")
+        assert fotnoten(html) == EKTE_FOTNOTE
