@@ -2318,6 +2318,8 @@ avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 
 *Avgjort 2026-10-23 kl. 15:53 (gruppens svar):* små funn fra en gjennomgang rettes med en gang, ikke senere, og først de to åpne punktene i spesifikasjonen 3.4d.
 
+*Avgjort 2026-10-23 kl. 19:10 (gruppens svar):* setningen i fotnoten står når dagen som vises, er siste børsdag fram til i dag, med samme regel som lagringen bruker (`innevaerende_boersdag` i `src/boersdag.py`), og den lyder: «Signalet for denne dagen kan fortsatt lagres hvis hentingen kjøres ferdig før neste børsdag.» Den erstatter vilkåret og setningen fra instruksjonen kl. 16:06, så ECH1 og BH2 i spesifikasjonen 3.4e er avgjort.
+
 ### Story 3.4b: KI-tekstene i demoen
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 16:53.*
