@@ -269,7 +269,7 @@ Basen, demobasen og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo`
 
 **Godkjenningen på Mac.** Første gang kan macOS stoppe fila, fordi den er lastet ned fra nettet. Høyreklikk fila, velg Åpne, og bekreft. Går det ikke, tillater du den under Personvern og sikkerhet i Systeminnstillinger, og dobbeltklikker på nytt.
 
-**Den ekte versjonen** spør etter nøkkelen fra EODHD første gang. Registreringssiden https://eodhd.com/register åpnes, og du limer inn nøkkelen i vinduet. Den vises ikke, og lagres bare i `.env` i mappa. Så hentes kursene før appen starter. Er alt hentet, brukes ingen kall.
+**Den ekte versjonen** spør etter nøkkelen fra EODHD første gang. Registreringssiden https://eodhd.com/register åpnes, og du limer inn nøkkelen i vinduet. Den vises ikke, og lagres bare i `.env` i mappa. Var den feil, sletter du det som står etter `EODHD_API_KEY=` i `.env`, så spør vinduet på nytt. Så hentes kursene før appen starter. Er alt hentet, brukes ingen kall.
 
 Skriptene står i [`start/`](start/) og kjører de samme kommandoene som under «Uten Docker, med uv»: `uv sync`, så `uv run python src/demo.py` for demoen eller `uv run python src/fetch_prices.py` for den ekte versjonen. Webserveren startes med `uv run waitress-serve --listen=127.0.0.1:8000 app:app`, bare på 127.0.0.1 og uten debug, med `PYTHONPATH=src`, og `OSE_DEMO=1` i demoen. Den bruker port 8000, som Docker, så stopp demoen eller appen i Docker først.
 
