@@ -20,17 +20,43 @@ try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch { }
 
 $Adresse = 'http://127.0.0.1:8000'
 $SvarJa = $env:OSE_START_SVAR_JA -eq '1'
+$server = $null
 
 function Vent-PaaEnter {
     if (-not $SvarJa) { [void](Read-Host 'Trykk Enter for å lukke vinduet') }
 }
 
+function Stopp-Serveren {
+    # Gjennomgangen (BH3, ECH2): uv, python og waitress i samme tre.
+    if ($script:server -and -not $script:server.HasExited) {
+        try { & taskkill.exe /T /F /PID $script:server.Id | Out-Null } catch { }
+    }
+}
+
 function Stopp([string]$Melding) {
+    Stopp-Serveren
     Write-Host ''
     Write-Host "Noe gikk galt: $Melding"
     Write-Host 'Se «Står du fast?» i README-en, eller docs/hjelp.md. Du kan starte på nytt med et nytt dobbeltklikk.'
     Vent-PaaEnter
     exit 1
+}
+
+# Gjennomgangen (BH4, VG2): også en feil skriptet ikke har ventet, gir
+# beskjeden på norsk, og vinduet står til Enter.
+trap { Stopp "$($_.Exception.Message)" }
+
+function Opptatt {
+    # Svarer noe på porten, uansett hva (gjennomgangen, BH16 og ECH7).
+    $klient = New-Object System.Net.Sockets.TcpClient
+    try {
+        $klient.Connect('127.0.0.1', 8000)
+        return $true
+    } catch {
+        return $false
+    } finally {
+        $klient.Close()
+    }
 }
 
 function Svarer([string]$Url) {
@@ -50,12 +76,22 @@ if ($Versjon -eq 'demo') {
 } else {
     Write-Host 'OSE Signal: den ekte versjonen, med kurser fra EODHD.'
 }
-Write-Host 'Stopp appen ved å lukke dette vinduet, eller med Ctrl+C.'
+Write-Host 'Vinduet må være åpent mens appen kjører. Stopp appen ved å lukke vinduet, eller med Ctrl+C.'
 Write-Host ''
+
+# Regel 22: den ekte basen skrives bare fra main. I en ZIP-fil finnes ingen
+# .git, og da gjelder ikke sjekken (gjennomgangen, VG1 og ECH9).
+if ($Versjon -eq 'ekte' -and (Test-Path -LiteralPath '.git') -and (Get-Command git -ErrorAction SilentlyContinue)) {
+    $gren = ''
+    try { $gren = (& git rev-parse --abbrev-ref HEAD | Out-String).Trim() } catch { }
+    if ($gren -and $gren -ne 'main') {
+        Stopp "mappa står på grenen $gren. Den ekte versjonen startes bare fra main, så basen bare skrives derfra (regel 22 i CLAUDE.md)."
+    }
+}
 
 # uv: på PATH, i .local\bin i brukermappa, eller installert etter et ja.
 $uvMappe = Join-Path $env:USERPROFILE '.local\bin'
-if (-not (Get-Command uv -ErrorAction SilentlyContinue) -and (Test-Path (Join-Path $uvMappe 'uv.exe'))) {
+if (-not (Get-Command uv -ErrorAction SilentlyContinue) -and (Test-Path -LiteralPath (Join-Path $uvMappe 'uv.exe'))) {
     $env:Path = "$uvMappe;$env:Path"
 }
 if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
@@ -70,14 +106,15 @@ if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
         Stopp 'uv er ikke installert. Installer uv slik «Tester» i README-en sier, og start på nytt.'
     }
     powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+    if ($LASTEXITCODE -ne 0) { Stopp "installasjonen av uv feilet (kode $LASTEXITCODE)." }
     $env:Path = "$uvMappe;$env:Path"
     if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
         Stopp 'uv ble ikke funnet etter installasjonen. Lukk vinduet og start på nytt.'
     }
 }
 
-if (Svarer $Adresse) {
-    Stopp "noe svarer allerede på $Adresse. Stopp det først, for eksempel demoen i Docker med docker compose --profile demo down."
+if (Opptatt) {
+    Stopp "noe svarer allerede på $Adresse. Stopp det først: lukk det andre vinduet, eller stopp Docker med docker compose --profile demo down."
 }
 
 Write-Host 'Installerer pakkene (uv sync). Første gang tar det noen minutter.'
@@ -91,7 +128,7 @@ if ($Versjon -eq 'demo') {
     $env:OSE_DEMO = '1'
 } else {
     Remove-Item Env:OSE_DEMO -ErrorAction SilentlyContinue
-    if (-not (Test-Path '.env')) { Copy-Item '.env.example' '.env' }
+    if (-not (Test-Path -LiteralPath '.env')) { Copy-Item -LiteralPath '.env.example' -Destination '.env' }
     $linjer = @(Get-Content -LiteralPath '.env' -Encoding UTF8)
     $harNoekkel = @($linjer | Where-Object { $_ -match '^EODHD_API_KEY=\S' }).Count -gt 0
     if (-not $harNoekkel) {
@@ -101,7 +138,8 @@ if ($Versjon -eq 'demo') {
         $sikker = Read-Host 'Lim inn nøkkelen og trykk Enter (den vises ikke)' -AsSecureString
         $peker = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($sikker)
         try {
-            $noekkel = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($peker).Trim()
+            # Uten mellomrom og linjeskift, som i start.sh (gjennomgangen, BH7).
+            $noekkel = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($peker) -replace '\s', ''
         } finally {
             [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($peker)
         }
@@ -114,13 +152,16 @@ if ($Versjon -eq 'demo') {
     Write-Host 'Henter kurser. Er alt hentet, brukes ingen kall.'
     uv run python src/fetch_prices.py
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "Hentingen gikk ut med kode $LASTEXITCODE. Appen starter likevel, med det som er hentet før."
+        Write-Host "Hentingen gikk ut med kode $LASTEXITCODE. Grunnen står i linjene over. Appen starter likevel, med det som er hentet før."
+        Write-Host 'Er nøkkelen feil, sletter du det som står etter EODHD_API_KEY= i .env, så spør vinduet etter den på nytt neste gang.'
     }
 }
 
 Write-Host "Starter appen på $Adresse."
 $env:PYTHONPATH = 'src'
 $server = Start-Process -FilePath 'uv' -ArgumentList 'run', 'waitress-serve', '--listen=127.0.0.1:8000', 'app:app' -NoNewWindow -PassThru
+# Uten Handle gir Windows PowerShell 5.1 ingen ExitCode etterpå.
+$null = $server.Handle
 $klar = $false
 for ($i = 0; $i -lt 120; $i++) {
     if ($server.HasExited) { break }
@@ -134,3 +175,5 @@ Write-Host "Appen kjører på $Adresse."
 Write-Host 'Lukk dette vinduet, eller trykk Ctrl+C, for å stoppe den.'
 if ($env:OSE_START_UTEN_NETTLESER -ne '1') { Start-Process $Adresse }
 $server.WaitForExit()
+# Gjennomgangen (BH2, VG2): stopper appen av seg selv, står beskjeden.
+if ($server.ExitCode -ne 0) { Stopp "appen stoppet med kode $($server.ExitCode). Grunnen står i linjene over." }
