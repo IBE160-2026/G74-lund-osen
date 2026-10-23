@@ -47,6 +47,7 @@ context:
   *Rettet 2026-10-23 (gjennomgangen, BH1):* høy er over `volumfaktor`, med «>» som interesse-sjekken, og vanlig er fra 1 til og med `volumfaktor`. Uten vurdering eller volumforhold er ruta i midtre størrelse.
 - **Rammen** følger styrken i vurderingen for dagen som vises: 3 gul, 2 mørk, ellers ingen. Uten vurdering ingen ramme.
   *Rettet 2026-10-23 (gjennomgangen, VG1):* rammen følger siste børsdag. En annen dag har gult ved 3 av 3 på siste børsdag og ingen mørk ramme (designregler §3), og en dag uten vurdering har ingen ramme.
+  *Rettet 2026-10-23 (gruppens svar kl. 09:24, a):* gult følger designregler §3 også en dag uten vurdering og en dag uten kurs: en aksje med 3 av 3 på siste børsdag har gul ramme på alle dagene, og mørk ramme for 2 av 3 står bare for siste børsdag. Det retter instruksjonen kl. 00:09.
 - **Hovedindeksen** står for siste børsdag også når «Velg dag» viser en annen dag, med datoen ved verdien, som på oversikten.
 - **Bransjer uten aksjer** i lista vises ikke. En aksje med en bransje utenfor de 13 står sist, under bransjens navn.
 
@@ -71,6 +72,7 @@ Blind Hunter (BH1–BH10), Edge Case Hunter (ECH1–ECH7) og Verification Gap (V
 | ECH7 gjentatt `dag` i adressen | lav | ikke rettet: skjemaet sender én |
 
 **Åpent punkt for gruppen (regel 12):** designregler §3 sier at gult står også når siden viser en annen dag. Instruksjonen kl. 00:09 sier at en dag uten vurdering har ingen ramme. Koden gjør det begge sier for en dag med vurdering, og det instruksjonen sier for en dag uten: ingen ramme.
+*Lukket 2026-10-23 (gruppens svar kl. 09:24, a):* gult følger designregler §3 også en dag uten vurdering.
 
 **Avvik fra instruksjonen:** ruta for en aksje uten kurser er ikke en lenke, fordi aksjesiden gir 404 for den (FR-204). Hjelpen sier det.
 

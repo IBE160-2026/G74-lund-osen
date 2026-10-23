@@ -14,9 +14,9 @@ bransjen som har en endring, og en bransje med én aksje merkes «1 aksje»
 (føringen 30.09 under AD-21).
 
 Rammen (designregler §3, gjennomgangen VG1): gult betyr 3 av 3 på siste
-børsdag og står også når siden viser en annen dag. 2 av 3 merkes bare for
-siste børsdag. En dag uten vurdering har ingen ramme (instruksjonen 23.10 kl.
-00:09).
+børsdag og står også når siden viser en annen dag, også en dag uten vurdering
+eller uten kurs (gruppens svar 23.10 kl. 09:24, a). 2 av 3 merkes bare for
+siste børsdag.
 """
 
 from dataclasses import dataclass
@@ -86,10 +86,10 @@ class Rute:
 
     @property
     def ramme(self) -> str | None:
-        if self.styrke is None:
-            return None
         if self.er_siste:
             return ramme(self.styrke)
+        # Gruppens svar 23.10 kl. 09:24 (a): gult også en dag uten vurdering
+        # eller uten kurs.
         return GUL if self.siste_styrke == ANTALL_SJEKKER else None
 
 
@@ -159,9 +159,19 @@ def bygg_rute(
     er_siste: bool = True,
 ) -> Rute:
     """Ruta for én aksje på dato. kurser er kursradene til og med dato. En
-    aksje uten kurs på dato står med «Uten data» og uten ramme."""
+    aksje uten kurs på dato står med «Uten data», og med gult bare ved 3 av 3
+    på siste børsdag."""
     if not kurser or kurser[-1].dato != dato:
-        return Rute(aksje=aksje, endring=None, volumforhold=None, styrke=None, tekst=UTEN_DATA, uten_data=True)
+        return Rute(
+            aksje=aksje,
+            endring=None,
+            volumforhold=None,
+            styrke=None,
+            tekst=UTEN_DATA,
+            uten_data=True,
+            siste_styrke=siste_styrke,
+            er_siste=er_siste,
+        )
     utfall, tekst = les_tilstand(innhold, dato, idag)
     vurdering = utfall.innhold if utfall is not None and utfall.art is Art.SVAR else None
     return Rute(

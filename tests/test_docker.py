@@ -934,7 +934,9 @@ HOEYDE_PAA_BILDET = 1630
 # Gjennomgangen av 8.6: rammen, lenkene og hjelpen til børsometeret, og
 # teksten om en hovedindeks som ikke kan leses i _hovedindeks.html. Bildet
 # ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "2eda2a11a08581d3868ebf5cea7c1c3fc6731c1e36008bfbf8992f0df40b1864"
+# Gruppens svar 23.10 kl. 09:24 (a): gult i børsometeret en dag uten
+# vurdering, i hjelpetekster.py. Bildet ble tatt på nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "ecdb365e4b6cd5b5d72bd0dd66d6374247c865d01030c58d5dee825d817624ea"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1017,7 +1019,9 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # i app.py. Bildet ble tatt på nytt og er byte for byte det samme.
 # Gjennomgangen av 8.6: ruta for børsometeret i app.py og hjelpen i
 # hjelpetekster.py. Bildet ble tatt på nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "985e1864a95a662adc2d74a5d45cdd3fc875fff4c50bf53c4625632200dbd33c"
+# Gruppens svar 23.10 kl. 09:24 (a): gult i børsometeret en dag uten
+# vurdering, i hjelpetekster.py. Bildet ble tatt på nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "6ee6813bd4cf76f12b54105c0207bef8363a90d18b0a0569ba7a4af7b3cbbd9d"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "

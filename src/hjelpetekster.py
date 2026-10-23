@@ -166,7 +166,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "Børsometer:",
             "én rute per aksje, ordnet etter bransje, med endringen fra børsdagen før som farge. "
             f"Ruta er større når volumet var mer enn {faktor} ganger vanlig, mindre når det var under "
-            "vanlig, og rammen er gul ved 3 av 3 på siste børsdag og mørk ved 2 av 3. Overskriften har "
+            "vanlig, og rammen er gul ved 3 av 3 på siste børsdag, også når du velger en annen dag, og "
+            "mørk ved 2 av 3 bare på siste børsdag. Overskriften har "
             "snittet av endringen for aksjene i bransjen som har kurs, og «1 aksje» der det er én.",
             (
                 (PRD, "#### FR-106 — Børsometeret"),

@@ -133,13 +133,13 @@ class TestRammen:
 
     @pytest.mark.parametrize(
         ("styrke", "siste", "ventet"),
-        [(3, 3, GUL), (1, 3, GUL), (3, 2, None), (2, 2, None), (None, 3, None), (0, None, None)],
+        [(3, 3, GUL), (1, 3, GUL), (3, 2, None), (2, 2, None), (None, 3, GUL), (None, 2, None), (0, None, None)],
     )
     def test_en_annen_dag_foelger_gult_siste_boersdag(self, styrke, siste, ventet):
         """Designregler §3: gult betyr 3 av 3 på siste børsdag og står også en
-        annen dag, 2 av 3 merkes bare for siste børsdag, og en dag uten
-        vurdering har ingen ramme (gjennomgangen, VG1). Ville feilet med
-        rammen fra dagen som vises."""
+        annen dag, også en dag uten vurdering (gruppens svar 23.10 kl. 09:24,
+        a), og 2 av 3 merkes bare for siste børsdag (gjennomgangen, VG1).
+        Ville feilet med rammen fra dagen som vises."""
         rute = Rute(
             aksje=_aksje("A", "Energi"),
             endring=1.0,
@@ -362,15 +362,22 @@ class TestSiden:
             sett.add(ventet)
         assert sett == {LAV, VANLIG, HOEY}
 
-    def test_ingen_ramme_en_dag_uten_vurdering(self, klient):
-        """18.09 er før vurderingene i demoen starter (STARTDAG 21.09). Ville
-        feilet med ramme eller styrke den dagen."""
+    def test_gult_en_dag_uten_vurdering(self, klient):
+        """18.09 er før vurderingene i demoen starter (STARTDAG 21.09). Gult
+        står ved de fire med 3 av 3 på siste børsdag, uten mørk ramme og uten
+        styrke for dagen (gruppens svar 23.10 kl. 09:24, a). Ville feilet uten
+        gult den dagen, eller med styrke eller mørk ramme."""
         html = _side(klient, "/boersometer?dag=2026-09-18")
         assert "fredag 18.09" in html
         ruter = _ruter(html)
-        assert len(ruter) == 15 and not any("ramme-" in klasser for klasser, _ in ruter)
+        rammer = {symbol: re.search(r"ramme-(\w+)", klasser) for klasser, symbol in ruter}
+        assert len(ruter) == 15
+        assert {s for s, r in rammer.items() if r and r.group(1) == "gul"} == {"BRFE", "KVST", "LKSV", "TRHF"}
+        assert not any(r and r.group(1) == "moerk" for r in rammer.values())
         assert html.count(f'<span class="tekst">{IKKE_VURDERT}</span>') == 14
-        assert "av 3</span>" not in html
+        assert html.count("3 av 3 siste børsdag</span>") == 4 and "2 av 3</span>" not in html
+        tabell = html.split('<table class="boersometertabell">')[1]
+        assert "av 3</td>" not in tabell
 
     def test_en_dag_uten_kurs_gir_boersdagen_foer(self, klient):
         """Ville feilet hvis en lørdag ga en feilside eller siste børsdag."""
