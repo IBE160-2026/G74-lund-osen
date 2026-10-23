@@ -833,7 +833,7 @@ class TestFotnotenEtterStartdagen:
         monkeypatch.delenv(app_modul.I_DOCKER, raising=False)
         klient = app_modul.app.test_client()
         monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 9, 18, 0, tzinfo=timezone.utc))
-        i_dag = " For i dag kan signalet fortsatt lagres hvis hentingen kjøres ferdig i kveld."
+        i_dag = " Signalet for denne dagen kan fortsatt lagres hvis hentingen kjøres ferdig før neste børsdag."
         assert _fotnoten(_side(klient)) == TestFotnoten.EKTE_TEKST + i_dag
         monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 12, 12, 0, tzinfo=timezone.utc))
         assert _fotnoten(_side(klient)) == TestFotnoten.EKTE_TEKST

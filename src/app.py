@@ -37,7 +37,7 @@ from flask import Flask, abort, g, redirect, render_template, request
 
 import lagring_sqlite
 from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
-from boersdag import norsk_dato
+from boersdag import UtenforKalenderen, innevaerende_boersdag, norsk_dato
 from boersometer import bygg_boersometer, bygg_rute
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
 from graf import bygg_graf
@@ -309,15 +309,28 @@ def _fotnoten(datoer: list[date], i_dag: date) -> dict[str, bool]:
     datoene er før STARTDAG. En dag fra STARTDAG uten vurdering får den
     ekte teksten, også i demoen, som en kveld uten henting. Med datoer både
     før og etter står den ekte teksten, fordi den dekker begge.
-    fotnote_i_dag: en av datoene er i dag, og fotnoten sier i tillegg at
-    signalet fortsatt kan lagres i kveld (story 3.4e, b). Ikke i demoen,
-    der ingen henting skriver (gjennomgangen, BH1 og ECH3). i_dag er den
-    samme dagen siden ellers er bygd med (ECH2)."""
+    fotnote_kan_lagres: en av datoene er inneværende børsdag, siste børsdag
+    fram til i_dag, og fotnoten sier i tillegg at signalet fortsatt kan
+    lagres før neste børsdag. Samme regel som lagringen bruker, så fredagen
+    teller også lørdag, søndag og en helligdag (gruppens svar 23.10 kl.
+    19:10, ECH1). Kan kalenderen ikke avgjøre dagen, kan lagringen heller
+    ikke skrive, og setningen står ikke. Ikke i demoen, der ingen henting
+    skriver (gjennomgangen, BH1 og ECH3). i_dag er den samme dagen siden
+    ellers er bygd med (ECH2)."""
     demo = bool(g.get("eksempeltall", False))
     return {
         "fotnote_demo": demo and bool(datoer) and all(d < STARTDAG for d in datoer),
-        "fotnote_i_dag": not demo and i_dag in datoer,
+        "fotnote_kan_lagres": not demo and bool(datoer) and _innevaerende(i_dag) in datoer,
     }
+
+
+def _innevaerende(i_dag: date) -> date | None:
+    """Inneværende børsdag for i_dag, eller None når kalenderen ikke dekker
+    dagen (story 3.4e, svaret kl. 19:10)."""
+    try:
+        return innevaerende_boersdag(i_dag)
+    except UtenforKalenderen:
+        return None
 
 
 @app.context_processor

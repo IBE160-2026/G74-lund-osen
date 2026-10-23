@@ -949,7 +949,9 @@ HOEYDE_PAA_BILDET = 1630
 # _fotnote_ikke_vurdert.html. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Story 3.4e b: setningen om i dag i fotnoten, i app.py og
 # _fotnote_ikke_vurdert.html. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "660f2396173def1e9c857a511d6e72e4e88a330310827cde73afe91dcd60afab"
+# Story 3.4e a etter svaret 23.10 kl. 19:10: setningen i fotnoten for inneværende
+# børsdag, i app.py og _fotnote_ikke_vurdert.html. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "8101e3231baa4250be618b705077407ba026c7b4710dadc799918ffababc8d8c"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1061,7 +1063,9 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # _fotnote_ikke_vurdert.html. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Gjennomgangen av 3.4e: _fotnoten i app.py med samme i_dag som siden, uten
 # setningen om i dag i demoen. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "64b40f0128e281e546235a557dadcc7f863d2c2abae6bf81637d229e2d9e336c"
+# Story 3.4e a etter svaret 23.10 kl. 19:10: setningen i fotnoten for inneværende
+# børsdag, i app.py og _fotnote_ikke_vurdert.html. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "6a3f2899c8c7f549ca4fb47ac10706e0a37e0e0658e213e1fe72074df7615523"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "

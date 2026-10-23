@@ -3803,7 +3803,7 @@ class TestFotnotenForIDag:
     """Story 3.4e (b): er dagen som er «ikke vurdert», i dag, sier fotnoten i
     tillegg at signalet fortsatt kan lagres i kveld. idag settes i testen."""
 
-    I_DAG = " For i dag kan signalet fortsatt lagres hvis hentingen kjøres ferdig i kveld."
+    I_DAG = " Signalet for denne dagen kan fortsatt lagres hvis hentingen kjøres ferdig før neste børsdag."
 
     @pytest.mark.parametrize("adresse", ["/", "/aksje/EQNR"])
     def test_setningen_naar_dagen_er_i_dag(self, klient, monkeypatch, adresse):
