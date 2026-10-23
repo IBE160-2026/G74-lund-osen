@@ -601,6 +601,10 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-23 kl. 15:53 (gruppens svar):* små funn fra en gjennomgang rettes med en gang, ikke senere, og først de to åpne punktene i spesifikasjonen 3.4d.
 
+*Avgjort 2026-10-23 kl. 16:16 (gruppens svar):* appen skal kunne startes med dobbeltklikk uten Docker, med «Start demoen» og «Start den ekte versjonen». Mangler uv, spør skriptet før det installeres i brukermappa. Den ekte versjonen spør etter nøkkelen fra EODHD første gang. CI prøver skriptet på Windows og Mac, og Docker står igjen som et valg. Gruppen spurte kl. 16:07 om en fil man laster ned og installerer som et program.
+
+*Avgjort 2026-10-23 kl. 16:37 (gruppens svar):* tre veier prøves, hver på sin gren: dobbeltklikk med uv (3.5a), dobbeltklikk med Docker (3.5b) og et installasjonsprogram for Windows (3.5c), ikke for Mac. Gruppen velger hovedveien i «Kom i gang» før README-prøven, med Docker som reserve.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -2215,6 +2219,10 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 
 *Avgjort 2026-10-23 kl. 11:56 (gruppens svar, c):* README-prøven på en ren maskin tas neste uke (avgjørelsen under «Prioritering»).
 
+*Avgjort 2026-10-23 kl. 16:16 (gruppens svar):* appen skal kunne startes med dobbeltklikk uten Docker, med «Start demoen» og «Start den ekte versjonen». Mangler uv, spør skriptet før det installeres i brukermappa. Den ekte versjonen spør etter nøkkelen fra EODHD første gang. CI prøver skriptet på Windows og Mac, og Docker står igjen som et valg. Gruppen spurte kl. 16:07 om en fil man laster ned og installerer som et program.
+
+*Avgjort 2026-10-23 kl. 16:37 (gruppens svar):* tre veier prøves, hver på sin gren: dobbeltklikk med uv (3.5a), dobbeltklikk med Docker (3.5b) og et installasjonsprogram for Windows (3.5c), ikke for Mac. Gruppen velger hovedveien i «Kom i gang» før README-prøven, med Docker som reserve.
+
 ### Story 3.4: Demoversjonen
 
 *Lagt til 2026-10-03, Marians beslutning kl. 18:10.*
@@ -2325,6 +2333,8 @@ avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 *Avgjort 2026-10-23 kl. 19:10 (gruppens svar):* setningen i fotnoten står når dagen som vises, er siste børsdag fram til i dag, med samme regel som lagringen bruker (`innevaerende_boersdag` i `src/boersdag.py`), og den lyder: «Signalet for denne dagen kan fortsatt lagres hvis hentingen kjøres ferdig før neste børsdag.» Den erstatter vilkåret og setningen fra instruksjonen kl. 16:06, så ECH1 og BH2 i spesifikasjonen 3.4e er avgjort.
 
 *Lagt til 2026-10-23 kl. 19:44:* fotnoten etter startdagen i demoen og for inneværende børsdag er squash-flettet i `e772cc6`, PR #91, låst til head-en `a1ed96f` (spesifikasjonen `spec-3-4e-fotnoten-etter-startdag.md`). Demoteksten står bare for en dag før `STARTDAG`, og setningen om at signalet kan lagres står når en av dagene er inneværende børsdag, etter svarene kl. 15:53 og 19:10. Hele settet på `a1ed96f`: 3250 bestått og 17 hoppet over. CI var grønn på head-en (39996686215). Mutantene M1–M3 ble fanget. Flere datoer på oversikten (BH4, ECH1 fra gjennomgangen 23.10 kveld) står som åpent punkt i spesifikasjonen.
+
+*Avgjort 2026-10-23 kl. 20:27 (gruppens svar):* setningen i fotnoten sier datoen, for eksempel «Signalet for fredag 23.10 kan fortsatt lagres hvis hentingen kjøres ferdig før neste børsdag.», så den er klar når flere dager står «ikke vurdert» på oversikten (BH4 og ECH1 fra gjennomgangen 23.10 kveld). Den erstatter «denne dagen» fra svaret kl. 19:10, og bygges som 3.4f.
 
 ### Story 3.4b: KI-tekstene i demoen
 
