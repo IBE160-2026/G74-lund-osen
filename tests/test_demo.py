@@ -1009,6 +1009,12 @@ class TestFotnotenIDemoen:
     vurdert» har en egen tekst i demoen, med datoen fra STARTDAG."""
 
     DEMOTEKST = "i demoen starter vurderingene mandag 21.09, slik den ekte versjonen har signal fra første henting."
+    # Story 3.4e: den ekte teksten, ogsaa i demoen for en dag fra STARTDAG.
+    EKTE_TEKST = (
+        "«Ikke vurdert»: signalet lagres bare den kvelden kursene hentes, og regnes aldri ut bakover. "
+        "Det gjelder dagene før første henting, kvelder uten henting, og dager der kursene er lest inn med "
+        "<code>--les-inn</code>."
+    )
 
     @staticmethod
     def _fotnoten(html):
@@ -1030,7 +1036,9 @@ class TestFotnotenIDemoen:
 
     def test_oversikten_med_en_rad_som_mangler(self, klient, monkeypatch, demobase):
         """KVST uten rad paa 09.10, tatt bort direkte i en kopi av demobasen.
-        Ville feilet med den ekte teksten i demoen (M1)."""
+        Story 3.4e: 09.10 er etter STARTDAG, saa raden er som en kveld uten
+        henting i den ekte versjonen, og fotnoten har den ekte teksten, ogsaa
+        i demoen. Ville feilet med demoteksten for en dag etter STARTDAG."""
         c = sqlite3.connect(demobase)
         try:
             c.execute("DELETE FROM vurdering WHERE symbol = 'KVST' AND dato = '2026-10-09'")
@@ -1040,8 +1048,7 @@ class TestFotnotenIDemoen:
         monkeypatch.setenv(app_modul.I_DEMO, "1")
         html = klient.get("/").data.decode("utf-8")
         assert "ikke vurdert" in html
-        assert self._fotnoten(html) == "«Ikke vurdert»: " + self.DEMOTEKST
-        assert "--les-inn" not in html
+        assert self._fotnoten(html) == self.EKTE_TEKST
 
     @pytest.mark.parametrize("adresse", ["/aksje/KVST?dag=2026-09-18", "/boersometer?dag=2026-09-18"])
     def test_datoen_paa_sidene_kommer_fra_startdag(self, klient, monkeypatch, demobase, adresse):

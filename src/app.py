@@ -303,6 +303,17 @@ def demo_startdag() -> str:
     return f"{ukedag(STARTDAG)} {dato(STARTDAG, idag().year)}"
 
 
+def _fotnoten(datoer: list[date]) -> dict[str, bool]:
+    """Fotnoten for «ikke vurdert» etter datoene som er «ikke vurdert» på
+    siden (story 3.4e). Demoteksten står bare i demoen, og bare når alle
+    datoene er før STARTDAG. En dag fra STARTDAG uten vurdering får den
+    ekte teksten, også i demoen, som en kveld uten henting. Med datoer både
+    før og etter står den ekte teksten, fordi den dekker begge."""
+    return {
+        "fotnote_demo": bool(g.get("eksempeltall", False)) and bool(datoer) and all(d < STARTDAG for d in datoer),
+    }
+
+
 @app.context_processor
 def _eksempeltall():
     """«Eksempeltall» paa hver side som viser en base med demomerket, og
@@ -581,6 +592,7 @@ def boersometer():
         bransjer=bransjer,
         antall_aksjer=len(ruter),
         ikke_vurdert=any(rute.ikke_vurdert for rute in ruter),
+        **_fotnoten([dagen] if any(rute.ikke_vurdert for rute in ruter) else []),
         dagen=dagen,
         siste=siste,
         foerste=datoer[0],
@@ -668,6 +680,7 @@ def _tabellsiden(aktiv: str):
         # også de uten kurser (beslutningen 14.10).
         antall_aksjer=len(poster),
         ikke_vurdert=any(rad.ikke_vurdert for rad in (*skilte_seg_ut, *oevrige)),
+        **_fotnoten([rad.dato for rad in (*skilte_seg_ut, *oevrige) if rad.ikke_vurdert]),
         # Gjennomgangen (BH7, ECH1): «Alle» i Min liste er samme tabell som
         # oversikten, ogsaa naar ingen skilte seg ut.
         ingen_skilte_seg_ut=ingen_skilte_seg_ut(rader) and not (i_lista and not alle),
@@ -802,6 +815,7 @@ def aksjedetalj(symbol: str):
             # Story 2.7b: maaneden for dagen siden viser, eller den i adressen.
             historikk=historikk,
             pil=pil,
+            **_fotnoten([detalj.dato]),
         )
     )
     # Siden avhenger av bryteren (gjennomgangen av 10.3, BH10).
