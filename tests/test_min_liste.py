@@ -354,17 +354,28 @@ class TestSidene:
 
     def test_den_fylte_knappen_paa_hver_side(self, demo):
         """Ville feilet hvis knappen for siden man står på, ikke var fylt,
-        eller en knapp var fylt på aksjesiden."""
-        forventet = {"/": "Markedsoversikt", "/min-liste": "Min liste", "/min-liste?vis=alle": "Min liste"}
+        eller en knapp var fylt på aksjesiden. Story 8.6: tre knapper, med
+        «Børsometer» i midten."""
+        forventet = {
+            "/": "Markedsoversikt",
+            "/boersometer": "Børsometer",
+            "/min-liste": "Min liste",
+            "/min-liste?vis=alle": "Min liste",
+        }
         for adresse, fylt in forventet.items():
             stripa = demo.get(adresse).data.decode("utf-8").split("</header>", 1)[0]
             assert re.findall(r'class="sideknapp" href="[^"]*" aria-current="page">([^<]+)<', stripa) == [fylt]
-            assert stripa.count('class="sideknapp"') == 2
+            assert stripa.count('class="sideknapp"') == 3
         aksjesiden = demo.get("/aksje/KVST").data.decode("utf-8")
         stripa = aksjesiden.split("</header>", 1)[0]
-        assert stripa.count('class="sideknapp"') == 2 and 'aria-current="page"' not in stripa
+        assert stripa.count('class="sideknapp"') == 3 and 'aria-current="page"' not in stripa
         # Aksjesiden beholder veien tilbake.
         assert '<a class="tilbake" href="/">Markedsoversikt</a>' in aksjesiden
+        # Gjennomgangen 23.10 (BH8): også siden for en aksje uten kurser.
+        uten = demo.get("/aksje/MTFJ").data.decode("utf-8")
+        stripa = uten.split("</header>", 1)[0]
+        assert stripa.count('class="sideknapp"') == 3 and 'aria-current="page"' not in stripa
+        assert '<a class="tilbake" href="/">Markedsoversikt</a>' in uten
 
     def test_knapperaden_ogsaa_paa_feilsiden(self, demo):
         """Ville feilet hvis knapperaden bare sto på sidene med tabell."""
@@ -372,7 +383,7 @@ class TestSidene:
         svar = demo.get("/min-liste")
         assert svar.status_code == 503
         stripa = svar.data.decode("utf-8").split("</header>", 1)[0]
-        assert stripa.count('class="sideknapp"') == 2
+        assert stripa.count('class="sideknapp"') == 3
 
     def test_stjernen_er_en_knapp_med_aria_pressed_og_navnet(self, demo):
         """Ville feilet hvis stjernen bare var et tegn, eller skjermleseren
@@ -579,7 +590,8 @@ class TestGjennomgangen:
     def test_fotnotene_i_min_liste_gjelder_bare_lista(self, demo):
         """ECH7, BH9. Ville feilet hvis Min liste viste fotnoten om en aksje
         uten kurser som ikke er merket, eller fotnoter under en tom liste."""
-        uten = "Uten data i denne kilden: Matfjord Merkevarer"
+        # Navnet lenker til aksjesiden (gruppens svar 23.10 kl. 09:24, b).
+        uten = 'Uten data i denne kilden: <a href="/aksje/MTFJ">Matfjord Merkevarer</a>'
         assert uten in demo.get("/").data.decode("utf-8")
         assert uten in demo.get("/min-liste?vis=alle").data.decode("utf-8")
         assert uten not in demo.get("/min-liste").data.decode("utf-8")

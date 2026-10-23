@@ -926,7 +926,19 @@ HOEYDE_PAA_BILDET = 1630
 # Flettingen av main inn i grenen for 2.3c (22.10 kl. 23:30): kildene fra 3.4c
 # og 2.3c sammen, saa avtrykket er regnet paa nytt (instruksjonen kl. 23:29).
 # Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "423fc79c53d96c2435faf001ab47257969dae23aae4b3dae4c70452f2159499a"
+# Story 8.6: knappen «Børsometer» i stripa, hovedindeksen flyttet til delmalen
+# _hovedindeks.html og hjelpen til børsometeret. Bildet ble tatt paa nytt med
+# samme hoeyde, og viser den nye knappen.
+# Testene for 8.6 b: en aksje uten kurser har ingen lenke i børsometeret,
+# i stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gjennomgangen av 8.6: rammen, lenkene og hjelpen til børsometeret, og
+# teksten om en hovedindeks som ikke kan leses i _hovedindeks.html. Bildet
+# ble tatt paa nytt og er byte for byte det samme.
+# Gruppens svar 23.10 kl. 09:24 (a): gult i børsometeret en dag uten
+# vurdering, i hjelpetekster.py. Bildet ble tatt på nytt og er byte for byte det samme.
+# Gruppens svar 23.10 kl. 09:24 (b): aksjesiden for en aksje uten kurser, og
+# lenkene dit. Bildet ble tatt på nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "e2fd44b1ab9266591331c0e49e9c982b916bcd31fd3cba82be5983e3c0dfb4a7"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -978,7 +990,8 @@ FILENE_BAK_AKSJESIDEN = (
 )
 # Moduler appen og demoen importerer, men som ikke lager noe aksjesiden viser:
 # lagring_sqlite henter DATA_KATALOG fra lagring_fil, som importerer eodhd.
-IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py"}
+# Story 8.6: boersometer.py bygger bare børsometeret.
+IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py", "src/boersometer.py"}
 # Bildet er saa hoeyt at grafen, som staar under KI-teksten, er med til bunnen.
 # Story 8.3: 1872 med knapperaden i stripa. Var 1816.
 HOEYDE_PAA_AKSJESIDEN = 1872
@@ -1001,7 +1014,20 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # Flettingen av main inn i grenen for 2.3c (22.10 kl. 23:30): kildene fra 3.4c
 # og 2.3c sammen, saa avtrykket er regnet paa nytt (instruksjonen kl. 23:29).
 # Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "fca26567a3a7237d6f8a2d143d14954d45fc9b5c91ffc1c4fe0cb1b1949035da"
+# Story 8.6: knappen «Børsometer» i stripa, og ruta og hjelpen til
+# børsometeret i app.py og hjelpetekster.py. Bildet ble tatt på nytt med
+# samme høyde, og viser den nye knappen.
+# Testene for 8.6 b: en aksje uten kurser har ingen lenke i børsometeret,
+# i app.py. Bildet ble tatt på nytt og er byte for byte det samme.
+# Gjennomgangen av 8.6: ruta for børsometeret i app.py og hjelpen i
+# hjelpetekster.py. Bildet ble tatt på nytt og er byte for byte det samme.
+# Gruppens svar 23.10 kl. 09:24 (a): gult i børsometeret en dag uten
+# vurdering, i hjelpetekster.py. Bildet ble tatt på nytt og er byte for byte det samme.
+# Gruppens svar 23.10 kl. 09:24 (b): aksjesiden for en aksje uten kurser, og
+# lenkene dit. Bildet ble tatt på nytt og er byte for byte det samme.
+# Gjennomgangen 23.10: gult fra sidens siste børsdag (ECH1) og kommentarene om
+# aksjesiden uten kurser i app.py. Bildet ble tatt på nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "12d7ff9b4d6b0bb0833b01cff94c6b0899fd0def2f59ae69eb6acca148b01f99"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "
@@ -2210,6 +2236,8 @@ class TestReadmeForNybegynnere:
             "periodene i kursgrafen med «velg dag»",
             # Story 8.3: Min liste er flettet.
             "min liste, med stjernen foran hvert selskap",
+            # Story 8.6: børsometeret er flettet.
+            "og børsometeret",
             # Story 10.7: egne nøkler er flettet.
             "eller med egen nøkkel",
             # Story 2.3c: første henting på dagtid er flettet.
@@ -2467,7 +2495,8 @@ class TestReadmeForNybegynnere:
 EKSTRA = (
     ("signaldag",),
     ("«vis ki-tekst»",),
-    ("periodevalget", "børsometeret", "ki-teksten om dagen"),
+    # Story 8.6: børsometeret er flyttet til «Ferdig».
+    ("periodevalget", "ki-teksten om dagen"),
     ("velge og bytte aksjer",),
 )
 

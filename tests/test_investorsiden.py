@@ -28,7 +28,9 @@ from vurderingsdata import Vurdering
 ROT = Path(__file__).resolve().parent.parent
 EPICS = ROT / "_bmad-output" / "planning-artifacts" / "epics.md"
 EURONEXT = ("newsweb.oslobors.no", "oslobors.no", "live.euronext.com")
-# Demoselskapet uten kurser (U3 i docs/ux-logg.md), som gir 404.
+# Demoselskapet uten kurser (U3 i docs/ux-logg.md). Siden svarer 200 med en
+# beskjed og uten graf, og dermed uten avsnittet om investorsiden (gruppens
+# svar 23.10 kl. 09:24, b; før 404).
 DEMO_UTEN_KURSER = {"MTFJ"}
 # 61 kursdager, saa det er nok til en vurdering, og en dag midt i serien.
 RADENE = [
@@ -216,7 +218,8 @@ def test_demoen_viser_teksten_og_ingen_lenke(demoklient):
     for aksje in demo.DEMOUNIVERS:
         svar = demoklient.get(f"/aksje/{aksje.symbol}")
         if aksje.symbol in DEMO_UTEN_KURSER:
-            assert svar.status_code == 404
+            assert svar.status_code == 200
+            assert _les(svar.get_data(as_text=True)).lenker == []
             continue
         assert svar.status_code == 200, aksje.symbol
         html = svar.get_data(as_text=True)
@@ -281,11 +284,11 @@ def test_ingen_side_som_vises_lenker_til_euronext(klient):
 
 
 def test_ingen_demoside_lenker_til_euronext(demoklient):
-    """Som over, for demoen. MTFJ har ingen kurser og gir 404 (U3)."""
+    """Som over, for demoen. MTFJ har ingen kurser og svarer 200 med en
+    beskjed (U3, gruppens svar 23.10 kl. 09:24, b; før 404)."""
     for sti in ("/", "/min-liste", *(f"/aksje/{a.symbol}" for a in demo.DEMOUNIVERS)):
         svar = demoklient.get(sti)
-        venter = 404 if sti.rsplit("/", 1)[-1] in DEMO_UTEN_KURSER else 200
-        assert svar.status_code == venter, sti
+        assert svar.status_code == 200, sti
         html = svar.get_data(as_text=True)
         assert not _lenker_til_euronext(_les(html).alle), sti
         assert not any(d in html.lower() for d in EURONEXT), sti

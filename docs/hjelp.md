@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-22T18:01
+updated: 2026-10-23T10:11
 ---
 
 # Hjelp til «Kom i gang»
@@ -119,9 +119,13 @@ Under den kan det komme en linje med valg fra Docker. La terminalvinduet stå å
 
 Sidene sier «Eksempeltall»: 15 oppdiktede selskaper med kurser til fredag 9. oktober 2026, ikke data fra Oslo Børs. Under merket står en tabell med aksjer, og du klikker på et selskapsnavn for å se aksjen. Demoen trenger verken `.env` eller nøkkel, og gjør ingen kall. Aksjesiden viser KI-teksten for siste dag, laget én gang med Gemma og lagret i repoet, så demoen trenger ikke Ollama. Demobasen lages på nytt hver gang demoen starter, i sitt eget volum, `ose-demo`. Den ekte basen røres ikke. Mens demoen kjører, kan demobasen også lages på nytt med `docker compose run --rm demo-lag` i et nytt terminalvindu, fra samme mappe.
 
-Øverst på sidene står knappene «Markedsoversikt» og «Min liste», og knappen for siden du står på, er fylt. Stjernen foran et selskap legger aksjen i Min liste, og et nytt trykk tar den ut. Demoen starter med fem merket, og siden demobasen lages på nytt hver gang demoen starter, er det de samme fem neste gang. I den ekte versjonen starter lista tom, og merkingen blir liggende til du tar den bort.
+Øverst på sidene står knappene «Markedsoversikt», «Børsometer» og «Min liste», og knappen for siden du står på, er fylt. Stjernen foran et selskap legger aksjen i Min liste, og et nytt trykk tar den ut. Demoen starter med fem merket, og siden demobasen lages på nytt hver gang demoen starter, er det de samme fem neste gang. I den ekte versjonen starter lista tom, og merkingen blir liggende til du tar den bort.
 
 Har du laget demobasen utenfor Docker før 22.10, sier sidene «Demobasen er laget av en eldre versjon av demoen». Lag den på nytt med `uv run python src/demo.py`. I Docker lages den på nytt hver gang demoen starter.
+
+### Hva viser børsometeret?
+
+Én rute per aksje, ordnet etter bransje. Grønn rute steg og rød falt fra børsdagen før, og tallet står i ruta. Ruta er større når volumet var mer enn 1,5 ganger vanlig, og mindre når det var under vanlig. Rammen er gul ved 3 av 3 på siste børsdag og mørk ved 2 av 3 samme dag. Ved hver bransje står snittet av endringen for aksjene i den som har kurs, og «1 aksje» der det er én. Med «Velg dag» ser du en tidligere dag. Gult står da fortsatt ved 3 av 3 på siste børsdag, også en dag uten vurdering, og mørk ramme står bare for siste børsdag. En dag uten vurdering står som «ikke vurdert». Klikk på en rute for å se aksjen den dagen. For en aksje uten kurser sier aksjesiden at det ikke finnes kurser ennå. Under rutene står de samme tallene i en tabell. Det gjelder både demoen og den ekte versjonen.
 
 ### Hva sa appen om en aksje tidligere?
 
