@@ -2,12 +2,14 @@
 title: "Brukertesten"
 status: aktiv
 created: 2026-10-23
-updated: 2026-10-23T16:11
+updated: 2026-10-23T16:39
 ---
 
 # Brukertesten
 
 **Ikke tatt ennå.** Brukertesten tas neste uke (gruppens svar 23.10 kl. 12:29). Opplegget står i [spesifikasjonen 8.1](../_bmad-output/implementation-artifacts/spec-8-1-brukertesten.md): story 8.1 i del A, med KI av, og story 10.4 i del B, med samme person og samme aksje, først med KI av og så på. Del A og del B er to tester med hvert sitt notat.
+
+*Rettet 2026-10-23 (gjennomgangen av 3.4e, VG6):* slår personen på KI-teksten selv i del A, hoppes del B over, og 10.4 tas med neste person (svaret 23.10 kl. 15:53, b).
 
 Ingen navn eller annet som kan kjenne personen igjen, står her. En kurs eller et volum som personen sier høyt, står som [kurs] eller [volum] (regel 16). Originalnotatene ligger i `_privat/` (regel 10).
 
