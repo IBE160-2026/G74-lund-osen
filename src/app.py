@@ -297,9 +297,10 @@ def _stilark():
 def demo_startdag() -> str:
     """Første dag med vurdering i demoen, som «mandag 21.09», regnet fra
     STARTDAG i demo.py (gruppens svar 22.10 kl. 20:11). Ukedagen og datoen
-    kommer fra tallformat.py (regel 21, gjennomgangen VG2), og året står
-    ikke, fordi demoen har ett år."""
-    return f"{ukedag(STARTDAG)} {dato(STARTDAG, STARTDAG.year)}"
+    kommer fra tallformat.py (regel 21, gjennomgangen VG2). Året står bare
+    når det er et annet enn i år, som i de andre datoene på sidene
+    (gjennomgangen 23.10, BH1 og ECH1)."""
+    return f"{ukedag(STARTDAG)} {dato(STARTDAG, idag().year)}"
 
 
 @app.context_processor

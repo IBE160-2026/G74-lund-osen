@@ -1046,7 +1046,9 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # for byte det samme.
 # Story 3.4d d: kommentaren om FR-204 i app.py viser til Rettet-linja i prd.md.
 # Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "fef9d8e0e29abbc77eaa290fd2292c9d46e48c53c89e798c04e80d945336d186"
+# Gjennomgangen av 3.4d 23.10 (BH1, ECH1): aaret i demo_startdag i app.py fra
+# idag(). Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "fae521807383713b53d70bfbdca636892d73cd8f3e0c82e7d28dfa4074fa6a88"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "

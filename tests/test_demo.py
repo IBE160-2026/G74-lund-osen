@@ -1056,7 +1056,14 @@ class TestFotnotenIDemoen:
 
     def test_datoen_kommer_fra_startdag(self, monkeypatch):
         """Ville feilet med en fast dato i stedet for STARTDAG (M3)."""
+        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 13, 12, 0, tzinfo=timezone.utc))
         monkeypatch.setattr(app_modul, "STARTDAG", date(2026, 9, 29))
         assert app_modul.demo_startdag() == "tirsdag 29.09"
         monkeypatch.setattr(app_modul, "STARTDAG", demo.STARTDAG)
         assert app_modul.demo_startdag() == "mandag 21.09"
+
+    def test_aaret_staar_naar_det_er_et_annet_aar(self, monkeypatch):
+        """Gjennomgangen 23.10 (BH1, ECH1): som de andre datoene på sidene.
+        Ville feilet hvis året aldri sto, slik det var etter VG2."""
+        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2027, 1, 5, 12, 0, tzinfo=timezone.utc))
+        assert app_modul.demo_startdag() == "mandag 21.09.2026"
