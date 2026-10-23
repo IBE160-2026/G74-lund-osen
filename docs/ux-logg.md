@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-10-22T23:45
+updated: 2026-10-23T10:52
 ---
 
 # UX-loggen
@@ -591,3 +591,7 @@ Hvert funn er slått opp i koden 20.10 før det ble skrevet.
 *Lagt til 2026-10-22 kl. 23:45:* U53 er løst i `2a84142`, PR #87 (story 2.3c): er basen tom på en børsdag før kl. 22, henter første henting forrige børsdag, så en ny bruker ser kursene og signalet med en gang. Dagens rad hentes aldri før kl. 22.
 
 *Lagt til 2026-10-22 kl. 23:45:* U54 er løst i `2a84142`, PR #87 (story 2.3c): raden «Klar» i README-en, steg 8 og `docs/hjelp.md` sier hva første henting gir, at signalet lagres fra første henting og aldri regnes bakover, og hva som skjer med kallene samme kveld.
+
+*Lagt til 2026-10-23 kl. 10:52:* U70 er løst i `7f1c1f0`, PR #89 (story 8.6): børsometeret er en egen side, `/boersometer`, med knappen «Børsometer» i stripa mellom «Markedsoversikt» og «Min liste». Én rute per aksje, ordnet etter bransje, med farge for endringen, størrelse for volumet mot vanlig og ramme for signalet, og snittet per bransje.
+
+*Lagt til 2026-10-23 kl. 10:52:* U3 henger sammen med `7f1c1f0`, PR #89 (story 8.6, gruppens svar 23.10 kl. 09:24, b): demoselskapet `MTFJ` mangler fortsatt kurser med vilje, og «Alle» sier fortsatt 15. Navnet under tabellen lenker nå til aksjesiden, som svarer 200 med en beskjed om at det ikke finnes kurser ennå, i stedet for 404.
