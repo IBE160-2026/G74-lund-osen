@@ -66,6 +66,30 @@ Gjennomgang 22.10, ferdig kl. 21:27, på diffen `f4f0875..8dcde6d`. Linsene var 
 ## Åpent
 
 - **Demoteksten for en rad som mangler etter 21.09** (BH3, ECH1): fotnoten i demoen forklarer en rad «ikke vurdert» med startdagen, også når raden er fra etter 21.09. Demokommandoen lager ikke en slik base, men testen av oversikten sletter en rad 09.10 og låser teksten.
+- **Den ekte teksten på dagens børsdag** (ECH3 23.10): før kveldens henting har skrevet vurderingen, sier fotnoten at signalet aldri regnes ut bakover, selv om hentingen samme kveld kan skrive det.
+
+## Gjennomgangen 23.10
+
+Gjennomgang 23.10 etter hele settet, på diffen `b3ac62c..3bef6b9`, flettingen i `b3ac62c`, og `70d756e` og `8f7a9f3` på main. Linsene var Blind Hunter (BH, 7 funn), Edge Case Hunter (ECH, 3 funn, prøvd mot en demobase i en midlertidig mappe) og Verification Gap (VG, 8 funn), hver for seg og uten å endre noe i repoet. 18 funn ble 16 rader. Ingen hadde dom medium eller høyere.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH1, ECH1 | Fotnoten i demoen viste aldri året, mens de andre datoene på sidene viser det når året er et annet enn i år | low | rettet i `96a3318`: året fra `idag()`, og testet med 2027 |
+| BH2 | Hjelperne i testene tok den første fotnoten på siden, ikke den med «Ikke vurdert» | low | rettet i `a0e1938` |
+| BH3 | Testen uten fotnote så ikke at siden hadde tabellen | low | rettet i `a0e1938`: svar 200 og raden for Equinor |
+| VG2 | Ingen test holdt `docs/hjelp.md` lik fotnoten | low | rettet i `a0e1938` |
+| VG1 | Spesifikasjonen 8.6 sa fortsatt at `prd.md` ikke er rettet | low | rettet i `046f787`: en Lukket-linje |
+| VG3 | Datoen fra `STARTDAG` er testet på aksjesiden og børsometeret, ikke på oversikten | low | uten endring: de tre sidene tar inn samme delmal, og testen av oversikten med en rad som mangler ser hele demoteksten |
+| VG4 | Mutantene ble kjørt i kloner som er slettet, og kan ikke sjekkes i repoet | low | rettet i Utført-linja for instruksjonen 23.10 kl. 12:59, med klokkeslett og testene som fanget dem |
+| VG5 | Raden for BH4 22.10 hadde ingen commit | nit | rettet her: BH4 ble rettet i `3bef6b9` |
+| VG6 | Kommentarene ved avtrykket bak aksjesiden nevnte ikke alle filene | nit | rettet i `a0e1938` |
+| VG8 | Testen av aksjesiden sa ikke at den feiler med teksten fra kl. 20:11 | nit | rettet i `a0e1938` |
+| BH4, VG7 | Tekstene i fotnoten står i testene for hver side, og datotesten for børsometeret overlapper den i `test_demo.py` | nit | uten endring: hver testfil sier hva siden den tester, skal vise |
+| BH5 | `docs/hjelp.md` skriver startdagen for hånd | nit | uten endring: som VG6 22.10 |
+| BH6 | `_fotnote_ikke_vurdert.html` har LF i arbeidskopien, de andre malene CRLF | nit | uten endring: git lagrer LF, og avtrykket regnes med LF |
+| BH7 | `perioder.py` har sin egen `UKEDAGER` med store bokstaver | nit | uten endring: utenfor endringene, og ordene er navnet på en knapp der, med stor bokstav (designregler.md §2) |
+| ECH2 | Demoteksten for en rad som mangler etter 21.09 | nit | uten endring: det åpne punktet over |
+| ECH3 | Den ekte teksten sier «aldri» om dagens børsdag før kveldens henting har skrevet vurderingen | nit | uten endring: teksten er den samme som før 3.4d; føres under «Åpent» |
 
 ## Det som ikke endres
 
