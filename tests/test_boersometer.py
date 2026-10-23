@@ -606,3 +606,66 @@ class TestDenEkteVersjonen:
         monkeypatch.delenv(app_modul.I_DOCKER, raising=False)
         html = _side(app_modul.app.test_client())
         assert "Ingen kurser i basen ennå" in html and '<section class="bransje"' not in html
+
+
+# --- Gruppens svar 23.10 kl. 09:24 -----------------------------------------
+
+
+class TestSvaretKl0924:
+    """a) gult en dag uten vurdering, og b) aksjesiden for en aksje uten
+    kurser."""
+
+    @pytest.mark.parametrize(("siste", "ventet"), [(3, GUL), (2, None), (None, None)])
+    def test_uten_kurs_en_annen_dag_har_gult_fra_siste_boersdag(self, siste, ventet):
+        """a) Også en dag aksjen ikke hadde kurs. Ville feilet hvis en rute med
+        «Uten data» mistet gult, eller fikk mørk ramme en annen dag."""
+        rute = bygg_rute(
+            _aksje("A", "Energi"), KURSER[:1], None, date(2026, 10, 9), IDAG, siste_styrke=siste, er_siste=False
+        )
+        assert rute.uten_data and rute.ramme == ventet
+
+    def test_siste_boersdag_uten_vurdering_har_ingen_ramme(self):
+        """a) Siste børsdag uten vurdering er ingen 3 av 3. Ville feilet hvis
+        gult fra en rad som ikke finnes, sto siste børsdag."""
+        rute = bygg_rute(_aksje("A", "Energi"), KURSER, None, date(2026, 10, 9), IDAG, siste_styrke=None)
+        assert rute.ramme is None
+
+    def test_gult_en_dag_uten_vurdering_ogsaa_i_merket(self, klient):
+        """a) 18.09 har ingen vurderinger i demoen. Ville feilet hvis gult
+        forsvant den dagen (mutant N1), eller merket ikke sa «siste børsdag»."""
+        html = _side(klient, "/boersometer?dag=2026-09-18")
+        gule = [symbol for klasser, symbol in _ruter(html) if "ramme-gul" in klasser]
+        assert sorted(gule) == ["BRFE", "KVST", "LKSV", "TRHF"]
+        assert "Gul ramme betyr 3 av 3 på siste børsdag, 09.10" in html
+
+    def test_aksjesiden_uten_kurser_svarer_200_med_beskjed(self, klient):
+        """b) MTFJ har ingen kurser i demoen. Ville feilet med 404 (mutant
+        N2), uten navnet, bransjen eller beskjeden, eller med graf eller
+        sjekker."""
+        svar = klient.get("/aksje/MTFJ")
+        assert svar.status_code == 200
+        html = svar.data.decode("utf-8")
+        assert '<h1 class="overskrift">Matfjord Merkevarer</h1>' in html
+        assert '<span class="merke">MTFJ</span>' in html and "Konsum</span>" in html
+        assert "Det finnes ingen kurser for Matfjord Merkevarer ennå" in html
+        assert "I demoen mangler kursene med vilje." in html and "Eksempeltall" in html
+        assert '<svg class="graf"' not in html and "Kursutvikling" not in html
+        assert "sjekkort" not in html and "Signalet dag for dag" not in html
+
+    def test_aksjesiden_uten_kurser_med_dag_i_adressen(self, klient):
+        """b) Lenken fra børsometeret en annen dag har ?dag=. Ville feilet med
+        en feilside for den adressen."""
+        assert 'href="/aksje/MTFJ?dag=2026-10-08"' in _side(klient, "/boersometer?dag=2026-10-08")
+        assert "Det finnes ingen kurser for Matfjord Merkevarer ennå" in _side(klient, "/aksje/MTFJ?dag=2026-10-08")
+
+    def test_et_ukjent_symbol_gir_fortsatt_404(self, klient):
+        """b) 404 er fortsatt forbeholdt et symbol som ikke er i lista.
+        Ville feilet hvis alle symboler fikk siden uten kurser."""
+        assert klient.get("/aksje/FINNESIKKE").status_code == 404
+
+    def test_navnet_under_tabellen_lenker_til_aksjesiden(self, klient):
+        """b) Oversikten og «Alle» i Min liste. Ville feilet hvis navnet sto
+        uten lenke, eller lenket til en side som gir 404."""
+        lenke = '<a href="/aksje/MTFJ">Matfjord Merkevarer</a>'
+        assert lenke in _side(klient, "/")
+        assert lenke in _side(klient, "/min-liste?vis=alle")
