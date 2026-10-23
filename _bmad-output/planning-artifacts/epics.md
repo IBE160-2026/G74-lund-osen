@@ -1929,6 +1929,8 @@ følger aksjene jeg bryr meg om.
 
 *Avgjort 2026-10-22 kl. 16:07 (gruppens svar):* de 4 kallene som er igjen av dagskvoten 22.10 i GMT, de 3 som er holdt av til egne aksjer og reserven (avgjort 21.10 kl. 18:38), går i kveld til oppslagene i `malinger.md` §40: lista over aksjene på Oslo Børs, en ticker som ikke finnes, og ett år for NEL og STB. Det erstatter svaret kl. 16:06 om NOD, NEL, SUBC og STB, fordi de fire alt er målt i §15, §16 og §28.
 
+*Lagt til 2026-10-23 (gruppens opplysning i instruksjonen 23.10 kl. 22:23):* det var rådet i chatten som selv fant, kl. 16:07 og før kallene, at de fire aksjene i svaret kl. 16:06 alt var målt.
+
 *Lagt til 2026-10-22 kl. 22:53 (målingen etter gruppens svar 22.10 kl. 16:07, `malinger.md` §40):* lista over aksjene på Oslo Børs (`exchange-symbol-list/OL`) koster 1 kall og har 304 rader, 297 av dem «Common Stock», med alle de 15, men med navnene i juridisk form («Equinor ASA», «DnB ASA», «Var Energi ASA»). En ticker som ikke finnes, gir HTTP 404 og koster et kall. NEL og STB har 250 rader til 2026-10-22, med median omsetning de siste tre månedene på 3,9 og 96,6 MNOK. Bonuskvoten er ikke brukt.
 
 *Avgjort 2026-10-22 kl. 23:14 (gruppens svar):* i 2.12 velger brukeren aksjer bare fra lista over aksjene på Oslo Børs (`malinger.md` §40). Hentekommandoen henter lista med 1 kall, sjelden og med reservekallet, og lagrer den i basen, og siden viser bare tickere som står i lista. Webserveren henter aldri (AD-10). Da kan en ticker som ikke finnes, aldri koste et kall, som den gjorde i §40. Kontrollpunktet om en ticker som ikke gir rader ved hentingen, står som vern.

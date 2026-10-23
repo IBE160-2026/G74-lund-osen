@@ -2772,6 +2772,7 @@ Hentingen 22.10 gikk med kode 0 og 16 kall, og alle 15 KI-tekstene besto (`2cf18
    *Problem:* svaret kl. 16:06 ville bruke de 4 kallene på NOD, NEL, SUBC og STB, som alt står i §15, §16 og §28.
    *Løsning:* svaret kl. 16:07 erstattet det med oppslagene i §40, og de 4 kallene ga noe nytt: prisen på lista og hva en ticker som ikke finnes, koster.
    *KI sin rolle:* det står ikke i repoet hvem som så det. Claude Code slo opp at de fire står i målingene før kallene ble tatt. Gruppen avgjorde.
+   *Lagt til 2026-10-23 (gruppens opplysning i instruksjonen 23.10 kl. 22:23):* det var rådet i chatten som selv fant, kl. 16:07 og før kallene, at de fire aksjene i svaret kl. 16:06 alt var målt.
 
 3. **Seks spørsmål mot vedtaket om fem.**
    *Problem:* 3.3i la svaret om `ERR_CONNECTION_REFUSED` under «Står du fast?», og grensen fra 16.10 var fem spørsmål.
