@@ -2788,6 +2788,39 @@ Det vi lærte: en ny bruker finner det testene ikke finner. 49 funn kom fra én 
 
 ---
 
+## 23.10.2026 – Børsometeret, fotnoten som følger børsdagen, og en uke med KI-tekst
+
+*Joakim og Marian.*
+
+Børsometeret (8.6) ble bygget om natta. Kl. 00:55 ble hele settet startet, og det stoppet ved 8 % fordi maskinen hadde for lite minne. Ingen test feilet, men grenen ble ikke pushet. Kl. 09:24 svarte vi på to punkter fra gjennomgangen: gult følger designreglene §3 også en dag uten vurdering, og en aksje i lista uten kurser får en aksjeside med en beskjed, ikke 404 (`871dc1d`). Kl. 11:44 rettet vi FR-204 i `prd.md` så det stemmer med det (`8f7a9f3`). Hele settet gikk gjennom med 3208 bestått, og PR #89 ble flettet kl. 10:50 i `7f1c1f0`.
+
+Fotnoten for «ikke vurdert» står nå i én felles mal på aksjesiden, oversikten og børsometeret, med en egen tekst i demoen (3.4d, PR #90, `544648f`). Kl. 11:56, 12:29 og 12:35 avgjorde vi hva de siste kallene skal måle, at brukertesten 10.4 tas rett etter 8.1 med samme person, og hvordan en periode vises i oversikten og børsometeret (`069ecb1`). Opplegget for brukertesten 8.1 og 10.4 står i `_bmad-output/implementation-artifacts/spec-8-1-brukertesten.md` (`18e1dc5`), og skjemaet i `docs/brukertest.md` (`8d8212a`). Testen er ikke tatt ennå. Kl. 15:53 avgjorde vi at små funn fra en gjennomgang rettes med en gang (`651be64`).
+
+3.4e gir demoteksten bare for en dag før 21.09. Den føyer også til en setning om at signalet fortsatt kan lagres. Kl. 19:10 avgjorde vi at setningen følger samme regel som lagringen, inneværende børsdag (`578d875`), og PR #91 ble flettet i `e772cc6` kl. 19:43. Kl. 16:16 og 16:37 avgjorde vi at appen skal kunne startes med dobbeltklikk uten Docker, og at tre veier prøves på hver sin gren: uv (3.5a), Docker (3.5b) og et installasjonsprogram for Windows (3.5c). Kl. 20:27 avgjorde vi at setningen i fotnoten skal si datoen (3.4f). De tre avgjørelsene ble først ført kl. 22:32 (`386a509`), og ingen av dem er bygget ennå.
+
+Hentingen kl. 22:00 ga kode 0, med 16 kall og 15 KI-tekster som alle besto kontrollen (`098b794`). Det var den femte kvelden med KI-tekst, og `ki_logg` har nå 15 rader for hver børsdag fra mandag 19.10 til fredag 23.10. Dermed er uka med logget drift fullført. De 4 kallene som var igjen, gikk til §41 i `malinger.md`. Der målte vi de fire første aksjene i lista over Oslo Børs som ikke var rangert i §36: 2020, 5PG, AASB og ABS. Ingen av dem er over 25 MNOK (`c8a1574`).
+
+**Utfordringer**
+
+1. **Hele settet stoppet av for lite minne.**
+   *Problem:* hele settet for 8.6 stoppet ved 8 % kl. 00:55, uten en test som feilet. Grenen ble stående upushet over natta. Testene for Min liste hadde feilet på tre knapper siden 8.6 a, men det ble først sett da settet ble kjørt.
+   *Løsning:* instruksjonen kl. 09:42 sa hvor mye minne som var ledig (2,5 GB av 15,7 GB). Hele settet ble kjørt alene, uten agent eller annen pytest, og skulle kjøres fil for fil hvis det stoppet igjen. Det gikk gjennom, og knappene i testene ble rettet i `ab24b4e`.
+   *KI sin rolle:* Claude Code startet settet i bakgrunnen, og det stoppet da minnet tok slutt. Rådet i chatten skrev minnet og «alene» inn i instruksjonen kl. 09:42, og gruppen ga den.
+
+2. **Instruksjoner fra rådet som ikke stemte med det de startet fra.**
+   *Problem:* fire ganger stemte instruksjonen ikke med tilstanden. Instruksjonen kl. 09:42 kom mens grenen var sjekket ut, ikke main. Instruksjonen kl. 00:09 sa at en dag uten vurdering har ingen ramme, mot designreglene §3. Instruksjonen kl. 14:38 sa at bare dokumenter skulle endres, men lenken i README-en endret avtrykket i `tests/test_docker.py`. Instruksjonen kl. 22:23 ba om 3.4f og avgjørelser som ikke var ført.
+   *Løsning:* hver gang stoppet Claude Code og sa fra, og gruppen svarte. Kl. 09:52 byttet vi til main. Kl. 09:24 avgjorde vi gult. Kl. 15:52 satte vi avtrykket på nytt (`d7f9b09`). Etter stoppet kl. 22:29 (`b74a8bc`) førte vi avgjørelsene først.
+   *KI sin rolle:* rådet i chatten skrev instruksjonene, og feilen kl. 22:23 var rådets. Claude Code fant avvikene i steg 0, i gjennomgangen og i testene for dokumentene, og skrev dem som åpne punkter i stedet for å velge selv. Gruppen avgjorde.
+
+3. **«For i dag» var feil i helgene.**
+   *Problem:* instruksjonen kl. 16:06 ga setningen «For i dag kan signalet fortsatt lagres hvis hentingen kjøres ferdig i kveld.», og bare når dagen er i dag. Men lagringen godtar også fredagens signal lørdag, søndag og på en helligdag. Testene var skrevet etter samme tekst og gikk gjennom.
+   *Løsning:* flettingen ble stoppet kl. 16:51 med funnet som medium. Kl. 19:10 avgjorde vi at setningen følger inneværende børsdag. Nye tester (`TestFotnotenForInnevaerendeBoersdag` i `tests/test_app.py`) prøver fredagen lest lørdag og søndag, mandag, en dag før siste børsdag og julaften. Mutanten med vilkåret tilbake til i dag ble fanget. Gjennomgangen etterpå fant at «denne dagen» er uklar når flere dager står «ikke vurdert», og kl. 20:27 avgjorde vi at setningen skal si datoen (3.4f).
+   *KI sin rolle:* rådet i chatten skrev vilkåret og setningen. Edge Case Hunter i gjennomgangen til Claude Code fant feilen, og Claude Code stoppet før flettingen fordi instruksjonen ga teksten ordrett. Gruppen avgjorde begge rettingene.
+
+Det vi lærte: en instruksjon sjekkes mot tilstanden den starter fra: grenen, designreglene, avtrykkene og det som er ført. En gjennomgang finner feil i en tekst som testene ikke finner når de er skrevet etter samme tekst. Minnet sjekkes før hele settet, og settet kjøres alene. Små funn rettes med en gang (svaret kl. 15:53).
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
