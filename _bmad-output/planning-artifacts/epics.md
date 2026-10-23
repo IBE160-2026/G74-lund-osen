@@ -597,6 +597,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-22 kl. 23:19 (gruppens svar):* børsometeret blir som tavla, én rute per aksje ordnet etter bransje, med farge for endringen, størrelse for volumet mot vanlig og ramme for signalet, og snittet per bransje i overskriften, som storyen krever. Først for siste børsdag og «Velg dag»; periodene kommer med 8.17.
 
+*Avgjort 2026-10-23 kl. 11:56 (gruppens svar):* a) kallene som er igjen etter hentingen i kveld, går til de fire første «Common Stock» i lista fra §40 i `malinger.md`, i rekkefølgen der, som ikke står i rangeringen i §36 (§41). §41 finnes ikke ennå i `malinger.md` (slått opp kl. 14:44); den skrives med målingen. b) Etter 3.4d kommer opplegget for brukertesten 8.1, så 8.17. c) README-prøven på en ren maskin tas neste uke.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -1929,6 +1931,8 @@ følger aksjene jeg bryr meg om.
 
 *Avgjort 2026-10-22 kl. 23:14 (gruppens svar):* i 2.12 velger brukeren aksjer bare fra lista over aksjene på Oslo Børs (`malinger.md` §40). Hentekommandoen henter lista med 1 kall, sjelden og med reservekallet, og lagrer den i basen, og siden viser bare tickere som står i lista. Webserveren henter aldri (AD-10). Da kan en ticker som ikke finnes, aldri koste et kall, som den gjorde i §40. Kontrollpunktet om en ticker som ikke gir rader ved hentingen, står som vern.
 
+*Avgjort 2026-10-23 kl. 11:56 (gruppens svar):* a) kallene som er igjen etter hentingen i kveld, går til de fire første «Common Stock» i lista fra §40 i `malinger.md`, i rekkefølgen der, som ikke står i rangeringen i §36 (§41). §41 finnes ikke ennå i `malinger.md` (slått opp kl. 14:44); den skrives med målingen. Svaret er a) i avgjørelsen under «Prioritering».
+
 ### Story 2.13: Kommandoen som måler omsetning
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
@@ -2202,6 +2206,8 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
 *Avgjort 2026-10-22 kl. 17:42 (gruppens svar):* de to svarene om `cd` i steg 4 under «Står du fast?», «is not recognized as the name of a cmdlet» og «Cannot find path … because it does not exist», blir ett spørsmål med begge meldingene ordrett, så «Står du fast?» har fem spørsmål, som avgjort 16.10 kl. 21:53–21:58. Det erstatter grensen på 6 fra 3.3i (`a98146b`). Det bygges i spesifikasjonen 3.3j. Gruppen prøvde også steg 3 fra 3.3i samme minutt: PowerShell åpnet fra adressefeltet i Filutforsker i den innerste mappa, og `dir` viste `README.md` og `compose.yaml` (§13 i `docs/kvalitetssikring.md`).
 
 *Lagt til 2026-10-22 kl. 18:08:* fem spørsmål i «Står du fast?» igjen er squash-flettet i `6d67db0`, PR #86, låst til head-en `70e4de5` (spesifikasjonen `spec-3-3j-fem-spoersmaal-i-staar-du-fast.md`). «is not recognized as the name of a cmdlet» og «Cannot find path … because it does not exist» står i ett spørsmål med begge svarene, i README-en og `docs/hjelp.md`, så linja over fra 3.3i om høyst 6 spørsmål gjelder ikke lenger. Hele settet: 3089 bestått og 17 hoppet over, og CI var grønn på head-en (39811006651). Begge mutantene, M1 og M2, ble fanget.
+
+*Avgjort 2026-10-23 kl. 11:56 (gruppens svar, c):* README-prøven på en ren maskin tas neste uke (avgjørelsen under «Prioritering»).
 
 ### Story 3.4: Demoversjonen
 
@@ -2756,6 +2762,8 @@ uten KI. 5B.4 måler KI-tillegget. Blandes de, vet ingen hva som ble målt.
 
 **Avhenger av:** 8.1 og 5B.3. **Én økt:** ja.
 
+*Avgjort 2026-10-23 kl. 12:29 (gruppens svar):* 10.4 tas rett etter 8.1, med samme person og samme aksje, først med KI av (8.1) og så på (10.4), som to tester med hvert sitt notat (avgjort 23.09). Brukertesten tas neste uke.
+
 ### Story 10.5: Lenke til selskapets side på NewsWeb
 
 *Lagt til 2026-09-28, med plan B.*
@@ -3274,6 +3282,8 @@ noteres det, med tidspunkt.
 
 **Én økt:** ja.
 
+*Avgjort 2026-10-23 kl. 12:29 (gruppens svar):* 10.4 tas rett etter 8.1, med samme person og samme aksje, først med KI av (8.1) og så på (10.4), som to tester med hvert sitt notat (avgjort 23.09). Brukertesten tas neste uke.
+
 ### Story 8.2: UX-gjennomgang av de to skjermbildene med `[CU] bmad-ux`
 
 Som **gruppe**, vil vi at de to skjermbildene er vurdert som design, så
@@ -3734,6 +3744,8 @@ signalet for en dag jeg velger.
 
 **Avhenger av:** 8.16, 8.3 for Min liste og 8.6 for børsometeret. **Én økt:**
 avgjøres i planen.
+
+*Avgjort 2026-10-23 kl. 12:35 (gruppens svar):* a) En periode i oversikten: endringen gjelder perioden, og sluttkursen, signalet og «Skilte seg ut» gjelder siste børsdag, som kolonnen sier, og signalet regnes aldri for en periode (`AD-7`). b) En periode i børsometeret: like store ruter, fargen er endringen for perioden, og siden sier at størrelsen gjelder én dag. c) To PR-er: 8.17a, oversikten med søylene og indekslinja, og 8.17b, Min liste og børsometeret, i helga hvis tiden ikke rekker.
 
 ### Story 8.18: Kommende eks.dato i kursgrafen
 
