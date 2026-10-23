@@ -1044,7 +1044,9 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # Story 3.4d b: fotnoten for «ikke vurdert» i delmalen _fotnote_ikke_vurdert.html,
 # med den ekte teksten fra 22.10 kl. 23:19. Bildet ble tatt paa nytt og er byte
 # for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "947e4126f5f951ab59c0ac23530215ca9796f8d03799f51d5682bd26e2f81aa6"
+# Story 3.4d d: kommentaren om FR-204 i app.py viser til Rettet-linja i prd.md.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "fef9d8e0e29abbc77eaa290fd2292c9d46e48c53c89e798c04e80d945336d186"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "

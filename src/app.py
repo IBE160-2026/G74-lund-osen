@@ -714,11 +714,13 @@ def aksjedetalj(symbol: str):
     if not rader:
         # Gruppens svar 23.10 kl. 09:24 (b): en aksje i lista uten kurser
         # svarer 200 med en beskjed, ikke 404, som FR-204 for en aksje uten
-        # gyldig signal. Siste avsnitt i FR-204 forbeholder fortsatt 404 for
-        # en aksje uten en eneste kursrad (aapent punkt under story 8.6 i
-        # epics.md). Siden har ingen dag og ingen periode, saa ?dag= og
-        # ?periode= leses ikke (gjennomgangen 23.10, BH6, ECH3). En base uten
-        # en eneste kurs gir fortsatt 404 over, foer foerste henting.
+        # gyldig signal. Rettet-linja 23.10 under siste avsnitt i FR-204 i
+        # prd.md (gruppens svar kl. 11:44, a): 404 gjelder bare et symbol
+        # utenfor lista, og en base uten en eneste kurs foer foerste henting,
+        # naar ingen side lenker dit. Siden har ingen dag og ingen periode,
+        # saa ?dag= og ?periode= leses ikke (gjennomgangen 23.10, BH6,
+        # ECH3). En base uten en eneste kurs gir 404 over, foer foerste
+        # henting.
         return render_template("aksje_uten_kurser.html", aksje=post.aksje, hentet=None)
     # Gjennomgangen, BH10: dagen leses én gang, saa alt i svaret gjelder samme dag.
     i_dag = idag()
