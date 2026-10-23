@@ -1014,7 +1014,9 @@ class TestFotnotenIDemoen:
     def _fotnoten(html):
         import re
 
-        treff = re.search(r'<p class="fotnote">(.*?)</p>', html, re.DOTALL)
+        # Gjennomgangen 23.10 (BH2): fotnoten med «Ikke vurdert», ikke den
+        # første fotnoten på siden.
+        treff = re.search(r'<p class="fotnote">\s*(«Ikke vurdert».*?)</p>', html, re.DOTALL)
         assert treff, "ingen fotnote"
         return re.sub(r"\s+", " ", treff.group(1)).strip()
 

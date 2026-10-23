@@ -154,8 +154,10 @@ EKTE_FOTNOTE = (
 
 
 def fotnoten(html: str) -> str | None:
-    """Teksten i fotnoten, uten taggene og med ett mellomrom mellom ordene."""
-    treff = re.search(r'<p class="fotnote">(.*?)</p>', html, re.DOTALL)
+    """Teksten i fotnoten for «ikke vurdert», uten taggene og med ett
+    mellomrom mellom ordene. Gjennomgangen 23.10 (BH2): fotnoten med
+    «Ikke vurdert», ikke den første fotnoten på siden."""
+    treff = re.search(r'<p class="fotnote">\s*(«Ikke vurdert».*?)</p>', html, re.DOTALL)
     if not treff:
         return None
     return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", treff.group(1))).strip()
@@ -1249,7 +1251,12 @@ class TestVurderingenPaaOversikten:
         """Story 3.4d: testen så etter teksten fra før 3.4d, som aldri står
         lenger. Ville feilet hvis fotnoten sto uten en rad «ikke vurdert»."""
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [110.0])}))
-        assert "«Ikke vurdert»" not in klient.get("/").data.decode("utf-8")
+        svar = klient.get("/")
+        # Gjennomgangen 23.10 (BH3): siden med tabellen, ikke en feilside.
+        assert svar.status_code == 200
+        html = svar.data.decode("utf-8")
+        assert "Equinor" in _rader_per_selskap(html)
+        assert "«Ikke vurdert»" not in html
 
     @pytest.mark.parametrize(
         "grunn,tekst",
@@ -1401,7 +1408,8 @@ class TestVurderingenIDetaljen:
 
         assert "ikke vurdert" in html
         # Story 3.4d (gruppens svar 22.10 kl. 23:19): hele den ekte teksten.
-        # Ville feilet med demoteksten i den ekte versjonen (M2).
+        # Ville feilet med demoteksten i den ekte versjonen (M2), og med
+        # teksten fra kl. 20:11, uten kvelder uten henting.
         assert fotnoten(html) == EKTE_FOTNOTE
         # Tabellen, ikke hjelpeteksten om kolonnen (story 8.0b).
         assert "<th>Målt mot</th>" not in html

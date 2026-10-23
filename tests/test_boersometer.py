@@ -719,6 +719,18 @@ class TestSvaretKl0924:
         assert "For en aksje uten kurser sier aksjesiden at det ikke finnes kurser ennå" in hjelp
         assert "har ingen aksjeside" not in hjelp and "uten ramme" not in hjelp
 
+    def test_hjelpen_sier_det_fotnoten_sier(self):
+        """Gjennomgangen av 3.4d 23.10 (VG2): docs/hjelp.md følger fotnoten
+        (regel 19). Ville feilet uten kvelder uten henting, eller uten
+        børsometeret blant sidene med fotnoten."""
+        hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
+        assert (
+            "I den ekte versjonen lagres signalet bare den kvelden kursene hentes, og regnes aldri ut "
+            "bakover. Det gjelder dagene før første henting, kvelder uten henting, og dager der kursene "
+            "er lest inn med `--les-inn`."
+        ) in hjelp
+        assert "Står «ikke vurdert» på oversikten, aksjesiden eller børsometeret, sier en fotnote hvorfor" in hjelp
+
 
 # --- Gruppens svar 23.10 kl. 11:44 (b) -------------------------------------
 

@@ -1048,6 +1048,9 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # Bildet ble tatt paa nytt og er byte for byte det samme.
 # Gjennomgangen av 3.4d 23.10 (BH1, ECH1): aaret i demo_startdag i app.py fra
 # idag(). Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gjennomgangen 23.10 (VG6): 3.4d b endret ogsaa aksje.html, som tar inn
+# delmalen, og ikke_vurdert for børsometeret i app.py. aksje_uten_kurser.html
+# fra 3.4d d er ikke bak bildet.
 AVTRYKK_BAK_AKSJESIDEN = "fae521807383713b53d70bfbdca636892d73cd8f3e0c82e7d28dfa4074fa6a88"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
