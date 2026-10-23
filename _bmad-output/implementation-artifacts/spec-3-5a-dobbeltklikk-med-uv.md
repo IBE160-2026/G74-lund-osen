@@ -97,6 +97,8 @@ Gjennomgang 23.10 etter hele settet, på `b4b6316` på main og diffen `b4b6316..
 
 Mutantene etter rettingene, på `6287033`: M1 `test_skriptene_bruker_kommandoene_i_readme[start.ps1]`, M2 `test_noekkelen_og_miljoeet_skrives_aldri_ut[start.sh]`, M3 `test_aldri_debug_eller_down_v[start.ps1]`.
 
+*Lagt til 2026-10-23 (CI på PR #92):* på `d202cbe` var `dobbeltklikk (windows-latest)` rød i run 40027262304. Windows PowerShell 5.1 ble startet fra PowerShell 7 og arvet modulstiene derfra, og installasjonen av uv feilet på `Get-ExecutionPolicy`. `.cmd`-filene tømmer nå `PSModulePath` før PowerShell startes (`3af0882`). I run 40027845278 på `3af0882` var alle fire jobbene grønne, og loggen viser at skriptet installerte uv både på `windows-latest` og `macos-latest` («uv er ikke installert», så «everything's installed!»), så spørsmålet og installasjonen er prøvd i CI (BH10, ECH10, VG7).
+
 ## Åpent
 
 - **Godkjenningen på Mac** (BH15): teksten i README-en og hjelpen er ikke prøvd på en Mac. Prøven før flettingen viser om høyreklikk og Åpne er nok, eller om Personvern og sikkerhet må komme først.
