@@ -2,7 +2,7 @@
 title: 'Story 3.4 (3.4e): fotnoten etter startdagen i demoen, og for i dag'
 type: 'bugfix'
 created: '2026-10-23'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '651be64'

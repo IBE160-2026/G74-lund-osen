@@ -66,7 +66,9 @@ Gjennomgang 22.10, ferdig kl. 21:27, på diffen `f4f0875..8dcde6d`. Linsene var 
 ## Åpent
 
 - **Demoteksten for en rad som mangler etter 21.09** (BH3, ECH1): fotnoten i demoen forklarer en rad «ikke vurdert» med startdagen, også når raden er fra etter 21.09. Demokommandoen lager ikke en slik base, men testen av oversikten sletter en rad 09.10 og låser teksten.
+  *Lukket 2026-10-23 kl. 19:44:* demoteksten står bare for en dag før `STARTDAG`, og en dag fra 21.09 uten vurdering får den ekte teksten, flettet i `e772cc6`, PR #91 (spesifikasjonen 3.4e, gruppens svar 23.10 kl. 15:53).
 - **Den ekte teksten på dagens børsdag** (ECH3 23.10): før kveldens henting har skrevet vurderingen, sier fotnoten at signalet aldri regnes ut bakover, selv om hentingen samme kveld kan skrive det.
+  *Lukket 2026-10-23 kl. 19:44:* er dagen inneværende børsdag, sier fotnoten i tillegg «Signalet for denne dagen kan fortsatt lagres hvis hentingen kjøres ferdig før neste børsdag.», flettet i `e772cc6`, PR #91 (spesifikasjonen 3.4e, gruppens svar 23.10 kl. 15:53 og 19:10).
 
 ## Gjennomgangen 23.10
 

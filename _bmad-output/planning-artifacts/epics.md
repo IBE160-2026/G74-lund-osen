@@ -2320,6 +2320,8 @@ avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 
 *Avgjort 2026-10-23 kl. 19:10 (gruppens svar):* setningen i fotnoten står når dagen som vises, er siste børsdag fram til i dag, med samme regel som lagringen bruker (`innevaerende_boersdag` i `src/boersdag.py`), og den lyder: «Signalet for denne dagen kan fortsatt lagres hvis hentingen kjøres ferdig før neste børsdag.» Den erstatter vilkåret og setningen fra instruksjonen kl. 16:06, så ECH1 og BH2 i spesifikasjonen 3.4e er avgjort.
 
+*Lagt til 2026-10-23 kl. 19:44:* fotnoten etter startdagen i demoen og for inneværende børsdag er squash-flettet i `e772cc6`, PR #91, låst til head-en `a1ed96f` (spesifikasjonen `spec-3-4e-fotnoten-etter-startdag.md`). Demoteksten står bare for en dag før `STARTDAG`, og setningen om at signalet kan lagres står når en av dagene er inneværende børsdag, etter svarene kl. 15:53 og 19:10. Hele settet på `a1ed96f`: 3250 bestått og 17 hoppet over. CI var grønn på head-en (39996686215). Mutantene M1–M3 ble fanget. Flere datoer på oversikten (BH4, ECH1 fra gjennomgangen 23.10 kveld) står som åpent punkt i spesifikasjonen.
+
 ### Story 3.4b: KI-tekstene i demoen
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 16:53.*
