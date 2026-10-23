@@ -453,6 +453,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [Kvalitetssikring](docs/kvalitetssikring.md)
 - [Vurderingsmatrise for del 1](docs/vurderingsmatrise.md)
 - [UX-loggen](docs/ux-logg.md): hva vi har sett og gjort for brukeropplevelsen fra starten, og funnene som står åpne før brukertesten
+- [Brukertesten](docs/brukertest.md): skjemaet for story 8.1 og 10.4, ikke tatt ennå
 - [Kontrollrapport 22.09](docs/kontroll-2026-09-22.md), med [rettingsplanen](docs/kontroll-2026-09-22-plan.md)
 - [Kontrollrapport 26.09](docs/kontroll-2026-09-26.md)
 - [Refleksjonslogg](docs/reflection-log.md) og [lagrede KI-prompts](docs/ai-prompts/)

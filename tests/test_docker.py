@@ -2760,10 +2760,12 @@ LENKENE_FOER_3_3H = {
 # er igjen, gaar til nye forsoek (BH5). Var b3f50242... og 36cc2505....
 # Story 2.3c: steg 8 sier at foerste henting gaar naar som helst, og at den
 # foer kl. 22 en boersdag gir forrige boersdag. Var 542c8991....
+# Story 8.1 (instruksjonen 23.10 kl. 14:38, gruppens svar kl. 15:52): lenken
+# til skjemaet docs/brukertest.md i «Dokumentene» (regel 19). Var d05514d3....
 AVTRYKK_I_PILENE = {
     "Demoen": "f124a92b1c64eeb0ea5e7141976ff85de68df49004a22d5874a4a257aaf89b55",
     "Den ekte versjonen": "3bb398cd1be31a43abe09b7261456646b6dc03047e20f1aa57ab665a768cfd78",
-    "Dokumentene": "d05514d3de77b3df67028b170b8c2b89c6c99f45ad716906b170b80f969a20b6",
+    "Dokumentene": "409a3f8b38d4247df41e3eb5062ad439aa160e7fd1c0b49e0fd44f262eb2d77c",
     "Mappestruktur": "d157a1706be8d24e7235f8d89c39c464609032c63ce5443adf2c40d1916758cd",
 }
 
