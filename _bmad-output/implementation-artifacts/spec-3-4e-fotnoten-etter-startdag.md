@@ -48,6 +48,8 @@ context:
 | M1 | Demoteksten for alle dager i demoen | `TestFotnotenIDemoen::test_oversikten_med_en_rad_som_mangler` | `test_aksjesiden_etter_startdagen_har_den_ekte_teksten`, `TestFotnotenEtterStartdagen::test_demoen_etter_startdagen_har_den_ekte_teksten` |
 | M2 | Setningen om i dag for en annen dag | `TestVurderingenPaaOversikten::test_ikke_vurdert_med_fotnoten` | `TestFotnotenForIDag::test_ingen_setning_en_annen_dag[/]`, `TestFotnotenEtterStartdagen::test_setningen_om_i_dag` |
 
+*Lagt til 2026-10-23, etter gruppens svar 23.10 kl. 19:10 under story 3.4 i `epics.md`:* M3, vilkåret tilbake til i dag (`"fotnote_kan_lagres": not demo and i_dag in datoer`), kjørt én gang med `-x` på `2fd2635` med de nye testene i arbeidskopien, med kopi før og `tests/test_app.py`, `tests/test_boersometer.py` og `tests/test_demo.py`. Fanget av `TestFotnotenForInnevaerendeBoersdag::test_fredagen_i_helga[loerdag-/]`, etter 283 bestått. De nye testene alene (`-k Innevaerende`): 6 feilet og 8 bestått, alle for lørdag, søndag og julaften. Etter kopien tilbake var `git hash-object src/app.py` lik `HEAD:src/app.py`, og sha256 uten CR var lik HEAD; arbeidskopien har CRLF (`core.autocrlf=true`), så sha256 på selve fila er ikke den samme.
+
 ## Gjennomgangen 23.10
 
 Gjennomgang 23.10 etter hele settet, på diffen `651be64..622e25f` og `31feb13` og `651be64` på main. Linsene var Blind Hunter (BH, 8 funn), Edge Case Hunter (ECH, 6 funn) og Verification Gap (VG, 9 funn), hver for seg og uten å endre noe i repoet. 23 funn ble 18 rader. Ett hadde dom medium, ECH1, og det er ikke rettet, så flettingen venter på gruppen (steg 4).
@@ -76,7 +78,9 @@ Gjennomgang 23.10 etter hele settet, på diffen `651be64..622e25f` og `31feb13` 
 ## Åpent
 
 - **Helg og helligdag** (ECH1, medium): lørdag, søndag og en helligdag er `innevaerende_boersdag` forrige børsdag, så hentingen kan fortsatt skrive den dagens vurdering (`skriv` i `src/lagring_sqlite.py`, og tidskontrollen i `src/fetch_prices.py` gjelder bare på en børsdag). Fotnoten sier da ikke at signalet kan lagres. Vilkåret og setningen står ordrett i instruksjonen, så gruppen avgjør om vilkåret blir «dagen er inneværende børsdag», og hvilken tekst som da står.
+  *Lukket 2026-10-23 (gruppens svar 23.10 kl. 19:10 under story 3.4 i `epics.md`):* setningen står når dagen som vises, er siste børsdag fram til i dag, med samme regel som lagringen (`innevaerende_boersdag`), og lyder «Signalet for denne dagen kan fortsatt lagres hvis hentingen kjøres ferdig før neste børsdag.» Rettet i `2fd2635` (a), testet i `TestFotnotenForInnevaerendeBoersdag` (b).
 - **Etter kveldens henting** (BH2): setningen om i dag står også etter at hentingen har gått, hvis raden fortsatt mangler. Siden vet ikke om hentingen har gått.
+  *Lukket 2026-10-23 (gruppens svar 23.10 kl. 19:10 under story 3.4 i `epics.md`):* svaret erstatter vilkåret og setningen fra kl. 16:06, så punktet er avgjort. Setningen sier nå at signalet kan lagres hvis hentingen kjøres ferdig før neste børsdag.
 
 ## Det som ikke endres
 
