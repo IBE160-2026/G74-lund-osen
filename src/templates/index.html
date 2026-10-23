@@ -204,10 +204,7 @@
     {% if vist_tabell %}
 
     {% if ikke_vurdert %}
-      <p class="fotnote">
-        «Ikke vurdert»: hentekommandoen har ikke skrevet en vurdering for
-        dagen, for eksempel fordi kursene er lest inn med <code>--les-inn</code>.
-      </p>
+      {% include "_fotnote_ikke_vurdert.html" %}
     {% endif %}
 
     {% if mangler %}

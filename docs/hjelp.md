@@ -125,11 +125,15 @@ Har du laget demobasen utenfor Docker før 22.10, sier sidene «Demobasen er lag
 
 ### Hva viser børsometeret?
 
-Én rute per aksje, ordnet etter bransje. Grønn rute steg og rød falt fra børsdagen før, og tallet står i ruta. Ruta er større når volumet var mer enn 1,5 ganger vanlig, og mindre når det var under vanlig. Rammen er gul ved 3 av 3 på siste børsdag og mørk ved 2 av 3 samme dag. Ved hver bransje står snittet av endringen for aksjene i den som har kurs, og «1 aksje» der det er én. Med «Velg dag» ser du en tidligere dag. Gult står da fortsatt ved 3 av 3 på siste børsdag, også en dag uten vurdering, og mørk ramme står bare for siste børsdag. En dag uten vurdering står som «ikke vurdert». Klikk på en rute for å se aksjen den dagen. For en aksje uten kurser sier aksjesiden at det ikke finnes kurser ennå. Under rutene står de samme tallene i en tabell. Det gjelder både demoen og den ekte versjonen.
+Én rute per aksje, ordnet etter bransje. Grønn rute steg og rød falt fra børsdagen før, og tallet står i ruta. Ruta er større når volumet var mer enn 1,5 ganger vanlig, og mindre når det var under vanlig. Rammen er gul ved 3 av 3 på siste børsdag og mørk ved 2 av 3 samme dag. Ved hver bransje står snittet av endringen for aksjene i den som har kurs, og «1 aksje» der det er én. Med «Velg dag» ser du en tidligere dag. Gult står da fortsatt ved 3 av 3 på siste børsdag, også en dag uten vurdering, og mørk ramme står bare for siste børsdag. En dag uten vurdering står som «ikke vurdert», og da står fotnoten om «ikke vurdert» under tabellen. Klikk på en rute for å se aksjen den dagen. For en aksje uten kurser sier aksjesiden at det ikke finnes kurser ennå. Under rutene står de samme tallene i en tabell. Det gjelder både demoen og den ekte versjonen.
 
 ### Hva sa appen om en aksje tidligere?
 
 Nederst på aksjesiden står «Signalet dag for dag»: det appen skrev om aksjen hver børsdag, en måned om gangen, med retningen, T, B, I og styrken. Pilene viser måneden før og etter, så langt kursserien går. Klikk på en dag med kurs for å se hele siden for den dagen, med målingene. En dag uten vurdering står med «–» og grunnen, og dagene før første og etter siste kurs står tomme. Det gjelder både demoen og den ekte versjonen. Den ekte versjonen har signal fra første henting, og dagene før står som «ikke vurdert». Demoen viser det samme: vurderingene starter mandag 21. september 2026, tre uker før siste demodag, og dagene før står som «ikke vurdert».
+
+### Hvorfor står det «ikke vurdert»?
+
+Står «ikke vurdert» på oversikten, aksjesiden eller børsometeret, sier en fotnote hvorfor. I den ekte versjonen lagres signalet bare den kvelden kursene hentes, og regnes aldri ut bakover. Det gjelder dagene før første henting, kvelder uten henting, og dager der kursene er lest inn med `--les-inn`. I demoen sier fotnoten at vurderingene starter mandag 21.09, slik den ekte versjonen har signal fra første henting.
 
 ## Den ekte versjonen
 

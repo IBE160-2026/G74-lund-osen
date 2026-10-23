@@ -938,7 +938,14 @@ HOEYDE_PAA_BILDET = 1630
 # vurdering, i hjelpetekster.py. Bildet ble tatt på nytt og er byte for byte det samme.
 # Gruppens svar 23.10 kl. 09:24 (b): aksjesiden for en aksje uten kurser, og
 # lenkene dit. Bildet ble tatt på nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "e2fd44b1ab9266591331c0e49e9c982b916bcd31fd3cba82be5983e3c0dfb4a7"
+# Story 3.4d: fotnoten for «ikke vurdert» i index.html. Bildet er byte for byte det samme.
+# Flettingen av main inn i grenen for 3.4d (23.10): kildene fra 8.6 og 3.4d
+# sammen, saa avtrykket er regnet paa nytt. Bildet ble tatt paa nytt og er byte
+# for byte det samme.
+# Story 3.4d b: fotnoten for «ikke vurdert» i delmalen _fotnote_ikke_vurdert.html,
+# med den ekte teksten fra 22.10 kl. 23:19. Bildet ble tatt paa nytt og er byte
+# for byte det samme.
+AVTRYKK_BAK_BILDET = "f87cc97426824409a8c8440bbad2796f8b005bb7e5f4d288ffbd9b09be20d3de"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1027,7 +1034,24 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # lenkene dit. Bildet ble tatt på nytt og er byte for byte det samme.
 # Gjennomgangen 23.10: gult fra sidens siste børsdag (ECH1) og kommentarene om
 # aksjesiden uten kurser i app.py. Bildet ble tatt på nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "12d7ff9b4d6b0bb0833b01cff94c6b0899fd0def2f59ae69eb6acca148b01f99"
+# Story 3.4d: fotnoten i aksje.html og demo_startdag i app.py. Bildet er byte
+# for byte det samme.
+# Flettingen av main inn i grenen for 3.4d (23.10): kildene fra 8.6 og 3.4d
+# sammen, saa avtrykket er regnet paa nytt. Bildet ble tatt paa nytt og er byte
+# for byte det samme.
+# Story 3.4d, VG2: demo_startdag i app.py med ukedag og dato fra tallformat.py.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 3.4d b: fotnoten for «ikke vurdert» i delmalen _fotnote_ikke_vurdert.html,
+# med den ekte teksten fra 22.10 kl. 23:19. Bildet ble tatt paa nytt og er byte
+# for byte det samme.
+# Story 3.4d d: kommentaren om FR-204 i app.py viser til Rettet-linja i prd.md.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gjennomgangen av 3.4d 23.10 (BH1, ECH1): aaret i demo_startdag i app.py fra
+# idag(). Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gjennomgangen 23.10 (VG6): 3.4d b endret ogsaa aksje.html, som tar inn
+# delmalen, og ikke_vurdert for børsometeret i app.py. aksje_uten_kurser.html
+# fra 3.4d d er ikke bak bildet.
+AVTRYKK_BAK_AKSJESIDEN = "fae521807383713b53d70bfbdca636892d73cd8f3e0c82e7d28dfa4074fa6a88"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "

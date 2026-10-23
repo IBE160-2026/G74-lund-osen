@@ -39,7 +39,7 @@ import lagring_sqlite
 from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
 from boersdag import norsk_dato
 from boersometer import bygg_boersometer, bygg_rute
-from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, gammel_demobase
+from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
 from graf import bygg_graf
 from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
 from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster
@@ -294,6 +294,15 @@ def _stilark():
     return {"stilark": f"/static/{STILARK.name}?v={avtrykk}"}
 
 
+def demo_startdag() -> str:
+    """Første dag med vurdering i demoen, som «mandag 21.09», regnet fra
+    STARTDAG i demo.py (gruppens svar 22.10 kl. 20:11). Ukedagen og datoen
+    kommer fra tallformat.py (regel 21, gjennomgangen VG2). Året står bare
+    når det er et annet enn i år, som i de andre datoene på sidene
+    (gjennomgangen 23.10, BH1 og ECH1)."""
+    return f"{ukedag(STARTDAG)} {dato(STARTDAG, idag().year)}"
+
+
 @app.context_processor
 def _eksempeltall():
     """«Eksempeltall» paa hver side som viser en base med demomerket, og
@@ -301,6 +310,7 @@ def _eksempeltall():
     return {
         "eksempeltall": g.get("eksempeltall", False),
         "eksempeltall_merke": EKSEMPELTALL_MERKE,
+        "demo_startdag": demo_startdag(),
         "ekte_versjonen_url": EKTE_VERSJONEN_URL,
         "under_arbeid": UNDER_ARBEID_TEKST if UNDER_ARBEID else None,
     }
@@ -570,6 +580,7 @@ def boersometer():
         "boersometer.html",
         bransjer=bransjer,
         antall_aksjer=len(ruter),
+        ikke_vurdert=any(rute.ikke_vurdert for rute in ruter),
         dagen=dagen,
         siste=siste,
         foerste=datoer[0],
@@ -704,11 +715,13 @@ def aksjedetalj(symbol: str):
     if not rader:
         # Gruppens svar 23.10 kl. 09:24 (b): en aksje i lista uten kurser
         # svarer 200 med en beskjed, ikke 404, som FR-204 for en aksje uten
-        # gyldig signal. Siste avsnitt i FR-204 forbeholder fortsatt 404 for
-        # en aksje uten en eneste kursrad (aapent punkt under story 8.6 i
-        # epics.md). Siden har ingen dag og ingen periode, saa ?dag= og
-        # ?periode= leses ikke (gjennomgangen 23.10, BH6, ECH3). En base uten
-        # en eneste kurs gir fortsatt 404 over, foer foerste henting.
+        # gyldig signal. Rettet-linja 23.10 under siste avsnitt i FR-204 i
+        # prd.md (gruppens svar kl. 11:44, a): 404 gjelder bare et symbol
+        # utenfor lista, og en base uten en eneste kurs foer foerste henting,
+        # naar ingen side lenker dit. Siden har ingen dag og ingen periode,
+        # saa ?dag= og ?periode= leses ikke (gjennomgangen 23.10, BH6,
+        # ECH3). En base uten en eneste kurs gir 404 over, foer foerste
+        # henting.
         return render_template("aksje_uten_kurser.html", aksje=post.aksje, hentet=None)
     # Gjennomgangen, BH10: dagen leses én gang, saa alt i svaret gjelder samme dag.
     i_dag = idag()

@@ -117,10 +117,7 @@
       {% if detalj.sluttkurs is not none %}Kursen vises likevel.{% else %}Kursserien har ingen kurs for dagen.{% endif %}
     </p>
     {% if detalj.ikke_vurdert and detalj.sluttkurs is not none %}
-      <p class="fotnote">
-        «Ikke vurdert»: hentekommandoen har ikke skrevet en vurdering for
-        dagen, for eksempel fordi kursene er lest inn med <code>--les-inn</code>.
-      </p>
+      {% include "_fotnote_ikke_vurdert.html" %}
     {% endif %}
   {% endif %}
 

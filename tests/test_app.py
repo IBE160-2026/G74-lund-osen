@@ -144,6 +144,23 @@ def fyll_basen(serier: dict[str, list[Kursrad]], hentet: str = HENTET) -> None:
 
 
 TOM_TILSTAND = "Ingen kurser i basen ennå"
+# Story 3.4d (gruppens svar 22.10 kl. 23:19): den ekte teksten i fotnoten
+# for «ikke vurdert», uten taggene og med ett mellomrom mellom ordene.
+EKTE_FOTNOTE = (
+    "«Ikke vurdert»: signalet lagres bare den kvelden kursene hentes, og regnes aldri ut bakover. "
+    "Det gjelder dagene før første henting, kvelder uten henting, og dager der kursene er lest inn "
+    "med --les-inn."
+)
+
+
+def fotnoten(html: str) -> str | None:
+    """Teksten i fotnoten for «ikke vurdert», uten taggene og med ett
+    mellomrom mellom ordene. Gjennomgangen 23.10 (BH2): fotnoten med
+    «Ikke vurdert», ikke den første fotnoten på siden."""
+    treff = re.search(r'<p class="fotnote">\s*(«Ikke vurdert».*?)</p>', html, re.DOTALL)
+    if not treff:
+        return None
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", treff.group(1))).strip()
 
 
 def test_uten_kilde_viser_beskjed_i_stedet_for_aa_feile(klient, monkeypatch):
@@ -1225,12 +1242,21 @@ class TestVurderingenPaaOversikten:
 
         assert rad[3] == "– ikke vurdert"
         assert "Ukjent" in rad[4]
-        assert "hentekommandoen har ikke skrevet en vurdering" in html
-        assert "--les-inn" in html
+        # Story 3.4d (gruppens svar 22.10 kl. 23:19): hele den ekte teksten.
+        # Ville feilet med demoteksten i den ekte versjonen (M2), og med
+        # teksten fra kl. 20:11, uten kvelder uten henting.
+        assert fotnoten(html) == EKTE_FOTNOTE
 
     def test_ingen_fotnote_naar_alle_er_vurdert(self, klient, monkeypatch):
+        """Story 3.4d: testen så etter teksten fra før 3.4d, som aldri står
+        lenger. Ville feilet hvis fotnoten sto uten en rad «ikke vurdert»."""
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [110.0])}))
-        assert "hentekommandoen har ikke skrevet" not in klient.get("/").data.decode("utf-8")
+        svar = klient.get("/")
+        # Gjennomgangen 23.10 (BH3): siden med tabellen, ikke en feilside.
+        assert svar.status_code == 200
+        html = svar.data.decode("utf-8")
+        assert "Equinor" in _rader_per_selskap(html)
+        assert "«Ikke vurdert»" not in html
 
     @pytest.mark.parametrize(
         "grunn,tekst",
@@ -1381,7 +1407,10 @@ class TestVurderingenIDetaljen:
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
 
         assert "ikke vurdert" in html
-        assert "hentekommandoen har ikke skrevet en vurdering" in html
+        # Story 3.4d (gruppens svar 22.10 kl. 23:19): hele den ekte teksten.
+        # Ville feilet med demoteksten i den ekte versjonen (M2), og med
+        # teksten fra kl. 20:11, uten kvelder uten henting.
+        assert fotnoten(html) == EKTE_FOTNOTE
         # Tabellen, ikke hjelpeteksten om kolonnen (story 8.0b).
         assert "<th>Målt mot</th>" not in html
 

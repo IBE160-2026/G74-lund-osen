@@ -1002,3 +1002,70 @@ class TestHistorikkenSomDenEkte:
         html = klient.get("/").data.decode("utf-8")
         assert "Demobasen er laget av en eldre versjon av demoen." in html
         assert "Kvitstein Mineral" not in html
+
+
+class TestFotnotenIDemoen:
+    """Story 3.4d (gruppens svar 22.10 kl. 20:11): fotnoten for «ikke
+    vurdert» har en egen tekst i demoen, med datoen fra STARTDAG."""
+
+    DEMOTEKST = "i demoen starter vurderingene mandag 21.09, slik den ekte versjonen har signal fra første henting."
+
+    @staticmethod
+    def _fotnoten(html):
+        import re
+
+        # Gjennomgangen 23.10 (BH2): fotnoten med «Ikke vurdert», ikke den
+        # første fotnoten på siden.
+        treff = re.search(r'<p class="fotnote">\s*(«Ikke vurdert».*?)</p>', html, re.DOTALL)
+        assert treff, "ingen fotnote"
+        return re.sub(r"\s+", " ", treff.group(1)).strip()
+
+    def test_aksjesiden_for_en_dag_foer_startdagen(self, klient, monkeypatch, demobase):
+        """Ville feilet med den ekte teksten i demoen (M1)."""
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        html = klient.get("/aksje/KVST?dag=2026-09-18").data.decode("utf-8")
+        fotnoten = self._fotnoten(html)
+        assert fotnoten == "«Ikke vurdert»: " + self.DEMOTEKST
+        assert "--les-inn" not in html
+
+    def test_oversikten_med_en_rad_som_mangler(self, klient, monkeypatch, demobase):
+        """KVST uten rad paa 09.10, tatt bort direkte i en kopi av demobasen.
+        Ville feilet med den ekte teksten i demoen (M1)."""
+        c = sqlite3.connect(demobase)
+        try:
+            c.execute("DELETE FROM vurdering WHERE symbol = 'KVST' AND dato = '2026-10-09'")
+            c.commit()
+        finally:
+            c.close()
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        html = klient.get("/").data.decode("utf-8")
+        assert "ikke vurdert" in html
+        assert self._fotnoten(html) == "«Ikke vurdert»: " + self.DEMOTEKST
+        assert "--les-inn" not in html
+
+    @pytest.mark.parametrize("adresse", ["/aksje/KVST?dag=2026-09-18", "/boersometer?dag=2026-09-18"])
+    def test_datoen_paa_sidene_kommer_fra_startdag(self, klient, monkeypatch, demobase, adresse):
+        """Gjennomgangen av 3.4d (VG1): sidene, ikke bare funksjonen. Ville
+        feilet med datoen skrevet fast i malen i stedet for STARTDAG (M1 i
+        3.4d c), fordi testene over sammenligner med «mandag 21.09»."""
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        monkeypatch.setattr(app_modul, "STARTDAG", date(2026, 9, 29))
+        html = klient.get(adresse).data.decode("utf-8")
+        assert self._fotnoten(html) == (
+            "«Ikke vurdert»: i demoen starter vurderingene tirsdag 29.09, slik den ekte versjonen har signal "
+            "fra første henting."
+        )
+
+    def test_datoen_kommer_fra_startdag(self, monkeypatch):
+        """Ville feilet med en fast dato i stedet for STARTDAG (M3)."""
+        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 13, 12, 0, tzinfo=timezone.utc))
+        monkeypatch.setattr(app_modul, "STARTDAG", date(2026, 9, 29))
+        assert app_modul.demo_startdag() == "tirsdag 29.09"
+        monkeypatch.setattr(app_modul, "STARTDAG", demo.STARTDAG)
+        assert app_modul.demo_startdag() == "mandag 21.09"
+
+    def test_aaret_staar_naar_det_er_et_annet_aar(self, monkeypatch):
+        """Gjennomgangen 23.10 (BH1, ECH1): som de andre datoene på sidene.
+        Ville feilet hvis året aldri sto, slik det var etter VG2."""
+        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2027, 1, 5, 12, 0, tzinfo=timezone.utc))
+        assert app_modul.demo_startdag() == "mandag 21.09.2026"
