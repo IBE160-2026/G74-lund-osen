@@ -31,6 +31,12 @@ Versjon 3 rettet (gruppens svar 24.10 kl. 21:49, malinger.md §43): én sjekk
 omtales med navnet, «ingen sjekk» brukes bare naar styrken er 0, hver sjekk
 beskrives slik fortegnet er, og «minst» om dagene brukes bare med merket, og
 da alltid. Versjonen staar som 3, fordi versjon 3 ikke var flettet.
+
+Versjon 3, tredje forsoek (gruppens svar 24.10 kl. 23:23, malinger.md §44):
+modellen faar ferdig ordlyd for dagene, laget her av dagene og merket, og
+nevner dagene bare med den, ordrett. «Minst» staar bare i ordlyden, ikke i
+reglene. Kontrollen i FR-603 bruker den samme ordlyden (ordlyd_for_dagene),
+saa prompten og kontrollen ikke kan si ulikt. Ordlyden er med i avtrykket.
 """
 
 import json
@@ -49,7 +55,8 @@ Styrken er hvor mange av sjekkene som ga utslag. Retningen er Positiv, Negativ, 
 I opplysningene under står 1 for positivt utslag, -1 for negativt og 0 for ikke noe utslag.
 
 Opplysningene sier også hvordan dagen var:
-- dager: hvor mange børsdager på rad signalet har hatt samme retning og samme styrke, til og med i dag. Står dager_merke «minst», er det minst så mange børsdager, fordi dagene før ikke er lagret. Skriv da alltid «minst» foran antallet dager. Står ikke dager_merke i opplysningene, er antallet nøyaktig, og du skal ikke skrive «minst».
+- dager: hvor mange børsdager på rad signalet har hatt samme retning og samme styrke, til og med i dag. Nevn dagene bare med ordlyden for dagene, som står etter opplysningene, ordrett. Skriv aldri dagene med egne ord.
+- dager_merke: står når dagene før ikke er lagret. Ordlyden for dagene tar det med.
 - hovedindeksen: om hovedindeksen på Oslo Børs steg, falt eller var uendret i dag. Mangler feltet, skal du ikke si noe om hovedindeksen.
 - aksjer_steg og aksjer_falt: hvor mange av aksjene i lista som steg og som falt fra børsdagen før.
 - bransjen: om aksjene i samme bransje som denne steg, falt eller var uendret i snitt. Mangler feltet, skal du ikke si noe om bransjen.
@@ -68,9 +75,34 @@ Regler for teksten:
 UTENFOR = "\nAksjen er ikke blant aksjene grensene er målt på. Si at grensene ikke er målt på denne aksjen.\n"
 
 
+# Gruppens svar 24.10 kl. 23:23: ordlyden for dagene, laget av dagene og
+# merket. Med i avtrykket (ORDLYDEN), saa en endret ordlyd gir ny versjon.
+DAGENE_FOERSTE = "i dag for første gang"
+DAGENE_PAA_RAD = "i {dager} børsdager på rad"
+DAGENE_MINST_EN = "i minst 1 børsdag"
+DAGENE_MINST = "i minst {dager} børsdager"
+DAGENE_LINJE = "Ordlyden for dagene: {ordlyd}\n"
+ORDLYDEN = (DAGENE_FOERSTE, DAGENE_PAA_RAD, DAGENE_MINST_EN, DAGENE_MINST, DAGENE_LINJE)
+
+
+def ordlyd_for_dagene(grunnlag: Mapping[str, object]) -> str | None:
+    """Ordlyden for dagene i grunnlaget, eller None uten dagene (versjon 2)."""
+    dager = grunnlag.get("dager")
+    if type(dager) is not int or dager < 1:
+        return None
+    if grunnlag.get("dager_merke") == "minst":
+        return DAGENE_MINST_EN if dager == 1 else DAGENE_MINST.format(dager=dager)
+    return DAGENE_FOERSTE if dager == 1 else DAGENE_PAA_RAD.format(dager=dager)
+
+
 def lag_prompt(grunnlag: Mapping[str, object]) -> str:
-    """Reglene og grunnlaget som JSON. Ingenting annet kommer med."""
+    """Reglene og grunnlaget som JSON, og med dagene ordlyden for dem.
+    Ingenting annet kommer med."""
     prompt = REGLER
     if grunnlag.get("merke"):
         prompt += UTENFOR
-    return prompt + "\nOpplysningene:\n" + json.dumps(dict(grunnlag), ensure_ascii=False, sort_keys=True) + "\n"
+    prompt += "\nOpplysningene:\n" + json.dumps(dict(grunnlag), ensure_ascii=False, sort_keys=True) + "\n"
+    ordlyd = ordlyd_for_dagene(grunnlag)
+    if ordlyd is not None:
+        prompt += DAGENE_LINJE.format(ordlyd=ordlyd)
+    return prompt

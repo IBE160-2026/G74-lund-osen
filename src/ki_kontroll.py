@@ -57,6 +57,11 @@ stemme med fortegnet i grunnlaget. «Ingen sjekk ga utslag på» en sjekk er et
 utsagn om den sjekken, ikke om styrken. «Minst» om dagene er lov bare naar
 grunnlaget har dager_merke, og med merket stoppes et eksakt antall dager.
 
+Gruppens svar 24.10 kl. 23:23, under punkt 1: dagene er lov bare med
+ordlyden prompten gir (ordlyd_for_dagene i ki_prompt.py), ordrett. Dagene i
+annen form stoppes, ogsaa med riktig antall og med ordenstall som «det
+tredje på rad». Det erstatter sjekken av antallet og «minst» fra kl. 21:49.
+
 Kontrollen er grov: den fanger ord, ikke mening (FR-603). Teksten
 normaliseres (NFC, uten myk bindestrek og usynlige tegn) foer den leses, saa
 et ord ikke slipper gjennom fordi det er skrevet med andre tegn.
@@ -67,7 +72,8 @@ import unicodedata
 from collections.abc import Mapping
 from dataclasses import dataclass
 
-from ki_grunnlag import ANTALLENE, FALT, MINST, STEG, UENDRET
+from ki_grunnlag import ANTALLENE, FALT, STEG, UENDRET
+from ki_prompt import ordlyd_for_dagene
 from signalberegning import MA_VINDU, TERSKEL, VOLATILITET_VINDU, VOLUM_VINDU
 
 ANTALL_SJEKKER = 3
@@ -310,6 +316,22 @@ _MINST_OM_DAGENE = re.compile(
     r"(?<![\w-])minst(?:\s+[\w-]+){0,2}?\s+" + _DAGORD + r"|" + _DAGORD + r"(?:\s+[\w-]+){0,2}?\s+minst(?![\w-])",
     re.IGNORECASE,
 )
+# Gruppens svar 24.10 kl. 23:23: dagene i annen form enn ordlyden, ogsaa
+# uten et antall: «på rad», «etter hverandre», «i trekk», og ordenstall ved
+# «gang», «på rad» eller et ord om dagene, som «det tredje på rad», «for
+# andre gang» og «femte børsdag». Leses etter at ordlyden er tatt ut.
+# Ogsaa ordenstall ved «signalet», med inntil ett ord imellom: «det første
+# signalet med denne retningen» (demotekstene 25.10, NLYS, SLVP og KVST).
+_ORDENSTALL = (
+    r"(?:første|andre|annen|tredje|fjerde|femte|sjette|sjuende|syvende|åttende|niende|tiende|"
+    r"ellevte|tolvte|\d+\.)"
+)
+_DAGENE_I_ANNEN_FORM = re.compile(
+    r"(?<![\w-])(?:" + _ORDENSTALL + r"(?:\s+[\w-]+){0,2}?\s+(?:gang(?:en)?|på\s+rad|(?:børs)?dag(?:en|er|ene)?)"
+    r"|" + _ORDENSTALL + r"(?:\s+[\w-]+)?\s+signal(?:et|er|ene)?"
+    r"|på\s+rad|etter\s+hverandre|i\s+trekk)(?![\w-])",
+    re.IGNORECASE,
+)
 
 # Gruppens svar 24.10 kl. 21:49: utsagn om én sjekk, med navnet og utslaget,
 # skal stemme med fortegnet i grunnlaget. Ogsaa en liste: «bevegelse og
@@ -462,12 +484,20 @@ def _en_sjekk(tekst: str, grunnlag: Mapping[str, object]) -> list[str]:
 
 
 def _dagene(tekst: str, grunnlag: Mapping[str, object]) -> list[str]:
-    """Dagene og «minst» (gruppens svar 24.10 kl. 21:49): «minst» om dagene er
-    lov bare med merket, og med merket stoppes et eksakt antall dager."""
+    """Dagene (gruppens svar 24.10 kl. 23:23): dagene er lov bare med
+    ordlyden fra prompten, ordrett. Ordlyden tas ut av teksten, og det som da
+    staar igjen om dagene, er dagene i annen form og stoppes: et antall dager,
+    «minst» ved et ord om dagene, «på rad», og ordenstall som «det tredje på
+    rad» eller «for andre gang». Uten dagene i grunnlaget er det ingen ordlyd,
+    og alt om dagene stoppes, som foer."""
     grunner: list[str] = []
-    merket = grunnlag.get("dager_merke") == MINST
+    lest: list[tuple[int, int]] = []
+    ordlyd = ordlyd_for_dagene(grunnlag)
+    om = f"ordlyden er «{ordlyd}»" if ordlyd else "grunnlaget sier ingenting om dagene"
     # Gjennomgangen (ECH): «i  dag» med to mellomrom er fortsatt «i dag».
     tekst = re.sub(r"[ \t]+", " ", tekst)
+    if ordlyd:
+        tekst = re.sub(r"(?<![\w-])" + re.escape(ordlyd).replace(r"\ ", r"\s+") + r"(?![\w-])", " ", tekst, flags=re.I)
     for treff in _DAGER_UTSAGN.finditer(tekst):
         minst_foer, foran, minst_etter, ord_, etter = treff.groups()
         minst = minst_foer or minst_etter
@@ -479,14 +509,15 @@ def _dagene(tekst: str, grunnlag: Mapping[str, object]) -> list[str]:
             ord_.lower() in _TVETYDIGE or tall in _VINDUENE or _ETTER_SISTE.search(tekst[: treff.start()])
         ):
             continue
-        if tall != grunnlag.get("dager"):
-            grunner.append(f"1: dagene «{treff.group(0)}», grunnlaget sier {grunnlag.get('dager', 'ingenting')}")
-        elif merket and not minst:
-            grunner.append(f"1: dagene «{treff.group(0)}» uten «minst», grunnlaget sier minst {tall}")
-    if not merket:
-        for setning in _SETNING.finditer(tekst):
-            if _MINST_OM_DAGENE.search(setning.group(0)):
-                grunner.append(f"1: «minst» om dagene «{setning.group(0).strip()}», grunnlaget har ikke merket")
+        grunner.append(f"1: dagene «{treff.group(0).strip()}» i annen form, {om}")
+        lest.append(treff.span())
+    for treff in _DAGENE_I_ANNEN_FORM.finditer(tekst):
+        # «i to børsdager på rad» er alt stoppet over, med «på rad».
+        if not any(start <= treff.start() < slutt for start, slutt in lest):
+            grunner.append(f"1: dagene «{treff.group(0).strip()}» i annen form, {om}")
+    for setning in _SETNING.finditer(tekst):
+        if _MINST_OM_DAGENE.search(setning.group(0)):
+            grunner.append(f"1: «minst» om dagene «{setning.group(0).strip()}» utenfor ordlyden, {om}")
     return grunner
 
 

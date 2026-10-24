@@ -63,6 +63,17 @@ Versjon 3 rettes på grenen og prøvekjøres på nytt, og flettes bare hvis fær
 - Fordi teksten for KVST ble stoppet, viser bildet av aksjesiden nå feltet for KI-teksten med «Ingen KI-tekst for denne dagen». Grafen slutter ved 1827 px, målt i Edge uten vindu, og bildet ble tatt på nytt med den høyden (`HOEYDE_PAA_AKSJESIDEN`, var 1872). Bildeteksten i README-en sier at teksten ble stoppet (regel 19).
 - Prøvekjøringen står i §44 i `malinger.md`, mot kopien `data/db/ki-proeve-v3b.db`, laget med skallet på main kl. 21:52 før grenen. Tekstene står bare i kopien.
 
+## Tredje forsøk etter gruppens svar 24.10 kl. 23:23
+
+Ett forsøk til med versjon 3 søndag 25.10. Det flettes bare med 15 av 15 i prøvekjøringen og ingen tekst med feil (beslutningen 16.10 kl. 23:51, 2). Blir demoteksten for KVST stoppet igjen, viser bildet i README-en en demoaksje der teksten besto (under story 10.2 i `epics.md`).
+
+**a) Ordlyden for dagene** (`src/ki_prompt.py`, `src/ki_kontroll.py`):
+- `ordlyd_for_dagene` lager ordlyden av `dager` og `dager_merke`: «i dag for første gang» (1), «i N børsdager på rad» (2 eller flere), «i minst 1 børsdag» og «i minst N børsdager» (med merket). Grunnlaget er som før. Uten `dager` er det ingen ordlyd.
+- Prompten har ordlyden på en egen linje etter opplysningene, «Ordlyden for dagene: …», og reglene sier at dagene bare nevnes med den, ordrett, og aldri med egne ord. «Minst» står ikke i reglene, bare i ordlyden, og i grunnlaget som verdien til `dager_merke`. `PROMPTVERSJON` står som «3», og avtrykket er satt på nytt, nå med ordlyden (`ORDLYDEN`).
+- Kontrollen tar ordlyden ut av teksten og stopper det som står igjen om dagene: et antall dager, også riktig antall med egne ord, «minst» ved et ord om dagene, «på rad», «etter hverandre», «i trekk» og ordenstall ved «gang», «på rad» eller et ord om dagene, som «det tredje på rad». Det erstatter sjekken av antallet og «minst» fra kl. 21:49. Regelens vinduer og «en dag» som vanlig ord står som før.
+- Tester som godtok dagene med egne ord etter kl. 21:49, er snudd til å kreve stopp, og docstringene sier det. De fire formene som ble stoppet i §44 er med i `TestOrdlyden`.
+- Ordenstall ved «signalet», «det første signalet med denne retningen», stoppes også. Hullet ble funnet da demotekstene fra den første kjøringen 25.10 kl. 00:13 ble lest mot grunnlaget (NLYS, SLVP og KVST), før de ble committet. Tekstene ble lagt bort, og kommandoen ble kjørt på nytt med den rettede kontrollen (under b).
+
 ## Boundaries & Constraints
 
 - Ingen kall til EODHD utover kvotesjekken i regel 15. `src/fetch_prices.py` kjøres ikke, og `data/db/ose.db` røres ikke (regel 22).
