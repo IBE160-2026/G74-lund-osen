@@ -173,6 +173,38 @@ Gjennomgang 24.10, etter hele settet (ferdig 22:14:29) og før `4a1d088` (22:23)
 
 Med dom medium er BH13 og BH15 ikke rettet. De må avgjøres av gruppen, og grenen flettes uansett ikke, fordi fire tekster ble stoppet i §44.
 
+### Gjennomgangen 25.10
+
+Gjennomgang 25.10, etter hele settet (00:22:52–00:30:02), på diffen `cfceb42..d5a3476` på grenen (`0830edd`, `8627536` og `d5a3476`) og `6fc31fd` på main, med Blind Hunter (BH, 13 funn), Edge Case Hunter (ECH, 12) og Verification Gap (VG, 10), hver for seg og uten å endre noe i repoet. Rettingene står i `c6d0c85`. Med den rettede kontrollen er utfallet det samme: §34 15 bestått, §43 13 stoppet, §44 14 stoppet, §45 de samme 13 bestått og VAR og TEL stoppet, og demoradene får svaret som er lagret. Mutanten (dagene sluppet i annen form) ble kjørt på nytt på `c6d0c85` kl. 00:40:24 og fanget igjen av `test_dagene_byttet_med_styrken`.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| ECH1, BH3 | «andre … i dag» ble lest som dagene, også med grunnlaget fra versjon 2 | high | patch: «i dag» er ikke et ord om dagene i `_DAGENE_I_ANNEN_FORM` |
+| ECH5 | Et galt antall dager lik regelens vinduer, «holdt seg 20 børsdager», slapp gjennom | high | patch: vinduene godtas uten ledd bare når setningen nevner vinduet, snittet, medianen eller trenden. «De siste 20 dager» står: defer |
+| BH1, ECH7 | Ordlyden nektet, «ikke vært slik i dag for første gang», slapp gjennom | high | patch: «ikke» eller «aldri» inntil tre ord foran ordlyden stoppes |
+| BH2, ECH6 | Dagene uten tall: «flere ganger», «nok en gang», «i går», «siden mandag», «flere dager», «handelsdager», «det første med denne retningen» | medium | patch. «Fortsatt», «lenge», «uker» og «førstegangssignal» leses ikke: **må avgjøres av gruppen**, under «Åpent» |
+| ECH2, VG4 | «andre» og «annen» som «other», «andre dager», «en annen dag», «andre signaler», ble stoppet | medium | patch: ordenstall bare ved «gang» og «på rad» |
+| ECH3 | «styrke 1. Dagen …» ble lest som ordenstall | medium | patch: «1.» er ordenstall bare foran liten bokstav |
+| BH4 | Ordlyden godtas også i en annen setning, «Hovedindeksen steg i dag for første gang» | medium | **må avgjøres av gruppen**: kontrollen fanger ord, ikke mening (FR-603). Under «Åpent» |
+| VG1 | Ingen test for at prompten og kontrollen bruker samme ordlyd | medium | patch: `test_prompten_og_kontrollen_bruker_samme_ordlyd` |
+| VG2, BH7 | Avtrykket dekket malene, ikke koden som velger ordlyden | medium | patch: avtrykket dekker `ordlyd_for_dagene` og `lag_prompt`, og er satt på nytt |
+| BH6 | `ordlyd_for_dagene` hadde «minst» som tekst | medium | patch: `MINST` fra `ki_grunnlag` |
+| BH5 | Like grunner kan komme to ganger | medium | defer: gir bare en grunn til, ikke et annet svar |
+| VG3, BH12 | «etter hverandre» uten tall, ordenstall fra «femte», «4.», og «i minst fire børsdager på rad» hadde ingen test | medium | patch |
+| VG6 | Ordlyden i rette anførselstegn hadde ingen egen test | low | patch |
+| VG7 | Ingenting sjekket at aksjen på bildet besto | low | patch: `test_bildet_viser_en_aksje_der_teksten_besto` |
+| BH8, VG5 | Parameteret `symbol` gjorde ingenting | low | patch: én test |
+| BH10 | Setningen fra kl. 21:49 i docstringen sto som gjeldende | low | patch: merket som erstattet |
+| VG9 | `0830edd` ble endret med `--amend` før push, så forfattertiden (00:12) er før rettingen | low | Utført-linja bruker tiden commiten fikk (00:16) |
+| ECH9, VG4 | «på rad» og «etter hverandre» om noe annet stoppes | low | defer: gir et stopp, ikke en feil som slipper gjennom |
+| ECH8 | «første gang» ved siden av ordlyden stoppes | low | avvist: følger regelen |
+| ECH10 | Prompten nevner ordlyden også for grunnlaget fra versjon 2 | low | defer: hentingen gir alltid dagene |
+| ECH11 | Ugyldige dager gir ingen ordlyd | low | avvist: `ki_grunnlag` avviser dem |
+| ECH12 | Linja etter JSON bryter en enkel lesing av prompten | low | avvist: ingenting i `src/` leser den slik |
+| BH9, VG8 | Testen for §43 godtar også grunner om dagene | low | avvist: sjekken av interessen må fortsatt stoppe |
+| BH11 | Docstringen viser til §44 | low | avvist: §44 er grunnen |
+| BH13, VG10 | §45 og tidene | low | avvist: tallene stemmer, og prøvekjøringen kom etter rettingen |
+
 ## Åpent
 
 - `bransjen` for en bransje med bare aksjen selv sier det samme som aksjens egen endring. Børsometeret merker den «1 aksje». Grunnlaget har ikke det merket.
@@ -181,3 +213,5 @@ Med dom medium er BH13 og BH15 ikke rettet. De må avgjøres av gruppen, og gren
 - *Lagt til 2026-10-24 kl. 22:24:* versjon 3 rettet ble stoppet fire ganger i §44, og flettes ikke etter svaret kl. 21:49. Gruppen avgjør om prompten skal nevne «minst» bare med merket (BH13), og hva bildet av aksjesiden skal vise (BH15).
 - *Lagt til 2026-10-24:* utsagn om én sjekk i formene «ga et utslag som var negativt», «det gjorde også interessen» og en liste mellom komma før verbet leses ikke (gjennomgangen av rettingen, BH5, ECH6, ECH7).
 - *Lagt til 2026-10-25:* modellen setter ofte ordlyden i anførselstegn etter et ekstra «i», som «i "i dag for første gang"» (åtte av de ti demotekstene som besto). Ordlyden står ordrett, så kontrollen slipper den. Om prompten skal si hvordan ordlyden settes inn i setningen, avgjør gruppen.
+- *Lagt til 2026-10-25:* versjon 3 med ferdig ordlyd besto 13 av 15 i §45 (VAR og TEL på «det første signalet»), under kravet 15 av 15 i svaret kl. 23:23, og flettes ikke. Gruppen avgjør veien videre.
+- *Lagt til 2026-10-25:* ordlyden godtas der den står, også i en annen setning (BH4), og dagene med ord som «fortsatt», «lenge» og «uker» leses ikke (BH2, ECH6).
