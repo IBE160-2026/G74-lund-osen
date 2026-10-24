@@ -62,6 +62,57 @@ function Opptatt {
     }
 }
 
+# Forprøven 24.10 (funn 7, gruppens svar kl. 12:04): den andre versjonen av
+# OSE Signal kjennes på kommandolinja fra skriptene, med waitress-serve,
+# --listen=127.0.0.1:8000 og app:app. Alt annet stoppes aldri.
+function Er-OseSignal([string]$Kommandolinje) {
+    if (-not $Kommandolinje) { return $false }
+    return ($Kommandolinje -match '(^|[\\/\s"''])waitress-serve(\.exe)?["'']?(\s|$)') -and
+        ($Kommandolinje -match '(^|\s)--listen=127\.0\.0\.1:8000(\s|$)') -and
+        ($Kommandolinje -match '(^|\s)app:app(\s|$)')
+}
+
+function Lyttere {
+    # Prosessene som lytter på port 8000, med navn og kommandolinje.
+    $ider = @()
+    try {
+        $ider = @(Get-NetTCPConnection -LocalPort 8000 -State Listen -ErrorAction Stop | Select-Object -ExpandProperty OwningProcess -Unique)
+    } catch { }
+    foreach ($id in $ider) {
+        $prosess = $null
+        try { $prosess = Get-CimInstance Win32_Process -Filter "ProcessId=$id" -ErrorAction Stop } catch { }
+        if ($prosess) {
+            [pscustomobject]@{ Id = $id; Navn = $prosess.Name; Kommandolinje = $prosess.CommandLine }
+        } else {
+            [pscustomobject]@{ Id = $id; Navn = 'ukjent'; Kommandolinje = '' }
+        }
+    }
+}
+
+function Frigjoer-Porten {
+    if (-not (Opptatt)) { return }
+    $lyttere = @(Lyttere)
+    $fremmede = @($lyttere | Where-Object { -not (Er-OseSignal $_.Kommandolinje) })
+    if ($lyttere.Count -eq 0 -or $fremmede.Count -gt 0) {
+        if ($fremmede.Count -gt 0) {
+            $hvem = ($fremmede | ForEach-Object { "$($_.Navn) (prosess $($_.Id))" }) -join ', '
+        } else {
+            $hvem = 'et program skriptet ikke fant navnet på'
+        }
+        Stopp "et annet program svarer allerede på $Adresse, og det er ikke OSE Signal fra et av disse vinduene. Programmet er $hvem. Skriptet stopper aldri andre programmer. Er det demoen eller appen i Docker, stopper du den med docker compose --profile demo down i et terminalvindu i mappa med koden. Ellers lukker du programmet. Dobbeltklikk så på nytt."
+    }
+    foreach ($lytter in $lyttere) {
+        Write-Host "Den andre versjonen av OSE Signal kjører allerede på $Adresse (prosess $($lytter.Id)). Den stoppes nå, så denne kan starte."
+        # Lytteren selv, uten taskkill, som PowerShell ikke finner uten PATHEXT.
+        try { Stop-Process -Id $lytter.Id -Force -ErrorAction Stop } catch { }
+    }
+    for ($i = 0; $i -lt 30 -and (Opptatt); $i++) { Start-Sleep -Seconds 1 }
+    if (Opptatt) {
+        Stopp "porten $Adresse ble ikke ledig etter 30 sekunder. Lukk vinduet der den andre versjonen kjører, og dobbeltklikk på nytt."
+    }
+    Write-Host 'Den andre versjonen er stoppet, og porten er ledig.'
+}
+
 function Svarer([string]$Url) {
     try {
         $svar = Invoke-WebRequest -Uri $Url -UseBasicParsing -TimeoutSec 2
@@ -90,6 +141,9 @@ if ($Versjon -eq 'ekte' -and (Test-Path -LiteralPath '.git')) {
     Stopp 'mappa har .git (en klon av repoet eller et eget git-repo), og der starter ikke den ekte versjonen. Last ned en egen kopi med «Download ZIP» på GitHub, pakk den ut, og bruk din egen nøkkel fra EODHD. Demoen kan startes herfra.'
 }
 
+# Porten før uv og hentingen (forprøven 24.10, funn 7).
+Frigjoer-Porten
+
 # uv: på PATH, i .local\bin i brukermappa, eller installert etter et ja.
 $uvMappe = Join-Path $env:USERPROFILE '.local\bin'
 if (-not (Get-Command uv -ErrorAction SilentlyContinue) -and (Test-Path -LiteralPath (Join-Path $uvMappe 'uv.exe'))) {
@@ -112,10 +166,6 @@ if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
     if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
         Stopp 'uv ble ikke funnet etter installasjonen. Lukk vinduet og start på nytt.'
     }
-}
-
-if (Opptatt) {
-    Stopp "noe svarer allerede på $Adresse. Stopp det først: lukk det andre vinduet, eller stopp Docker med docker compose --profile demo down."
 }
 
 Write-Host 'Installerer pakkene (uv sync). Første gang tar det noen minutter.'

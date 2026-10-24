@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-24T16:33
+updated: 2026-10-24T16:55
 ---
 
 # Hjelp til «Kom i gang»
@@ -227,9 +227,13 @@ Første gang kan macOS stoppe `Start demoen.command` eller `Start den ekte versj
 
 `Start den ekte versjonen` starter ikke i en mappe med `.git`, en klon av repoet, heller ikke på main. Da stopper vinduet før noe installeres eller hentes, så et dobbeltklikk i en klon aldri henter med nøkkelen som ligger i den. Last ned en egen kopi med «Download ZIP» på GitHub, pakk den ut, og bruk din egen nøkkel fra EODHD. `Start demoen` starter også i en klon.
 
-### Vinduet sier at noe svarer allerede på 127.0.0.1:8000.
+### Vinduet sier at den andre versjonen av OSE Signal stoppes.
 
-Demoen eller appen kjører allerede, kanskje i Docker. Lukk det andre vinduet, eller stopp Docker med `docker compose --profile demo down`, som stopper både demoen og den ekte versjonen, og dobbeltklikk på nytt.
+Demoen eller den ekte versjonen kjørte allerede fra et annet dobbeltklikk, på samme port. Skriptet stopper den, venter til porten er ledig, og starter den du dobbeltklikket. Det andre vinduet sier da at appen stoppet, og kan lukkes.
+
+### Vinduet sier at et annet program svarer på 127.0.0.1:8000.
+
+Skriptet stopper aldri andre programmer, og vinduet sier hvilket program det er. Er det demoen eller appen i Docker, stopper du den med `docker compose --profile demo down` i et terminalvindu i mappa med koden. Den stopper både demoen og den ekte versjonen. Er det et annet program, lukker du det. Dobbeltklikk så på nytt.
 
 ### Hvor finner jeg nøkkelen, og hvordan limer jeg den inn?
 

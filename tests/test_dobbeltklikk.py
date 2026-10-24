@@ -9,6 +9,7 @@ i .github/workflows/tester.yml, paa Windows og Mac.
 import os
 import re
 import shutil
+import socket
 import subprocess
 import sys
 from pathlib import Path
@@ -94,7 +95,7 @@ def test_rekkefoelgen_demo_eller_henting_foer_serveren(navn):
     demo = kode.index("uv run python src/demo.py")
     ellers = kode.index("else", demo)
     henting = kode.index("uv run python src/fetch_prices.py")
-    server = kode.index("waitress-serve")
+    server = kode.index("uv run waitress-serve" if "uv run waitress-serve" in kode else "'run', 'waitress-serve'")
     assert sync < demo < ellers < henting < server
     assert kode.count("src/demo.py") == 1 and kode.count("src/fetch_prices.py") == 1
 
@@ -104,9 +105,12 @@ def test_webserveren_binder_bare_127_0_0_1(navn):
     """Ville feilet hvis serveren lyttet paa 0.0.0.0, paa en annen adresse
     eller med --host, som binder til alle adresser (M1)."""
     kode = "\n".join(_kode(SKRIPTENE[navn]))
-    adressene = re.findall(r"--listen=([^\s'\"]+)", kode)
+    # Spesifikasjonen 3.5d: bare linja som starter serveren, ikke sjekken av
+    # kommandolinja paa porten.
+    start = [l for l in kode.splitlines() if "uv run waitress-serve" in l or "-ArgumentList" in l]
+    adressene = re.findall(r"--listen=([^\s'\"]+)", "\n".join(start))
     assert adressene == ["127.0.0.1:8000"], adressene
-    assert "0.0.0.0" not in kode and "--host" not in kode and "--port" not in kode
+    assert len(start) == 1 and "0.0.0.0" not in kode and "--host" not in kode and "--port" not in kode
 
 
 def test_webserveren_har_8_traader_i_skriptene_readme_og_dockerfile():
@@ -305,10 +309,32 @@ def _mappe_med_skriptet(tmp_path, navn, git):
     return tmp_path
 
 
-def _kjoer(argumenter, miljoe):
+def _porten_er_ledig() -> bool:
+    """Om ingenting er bundet til port 8000 paa maskinen. Bind er ikke sperret
+    av conftest, og ingenting kobles til. Paa Windows med SO_EXCLUSIVEADDRUSE,
+    saa ogsaa en lytter paa 127.0.0.1 alene gjoer porten opptatt."""
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        if sys.platform == "win32":
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        s.bind(("0.0.0.0", 8000))
+        return True
+    except OSError:
+        return False
+    finally:
+        s.close()
+
+
+def _kjoer(argumenter, miljoe, sjekk_porten=True):
     """Kjoerer skriptet med «n» paa stdin, saa et spoersmaal om uv faar nei
     og ingenting installeres. Ingen uv paa PATH og en tom brukermappe, saa
-    heller ikke en mutant kommer til uv sync eller hentingen."""
+    heller ikke en mutant kommer til uv sync eller hentingen.
+
+    Spesifikasjonen 3.5d: skriptet stopper den andre versjonen av OSE Signal
+    paa port 8000. Er porten opptatt paa maskinen, for eksempel av appen fra
+    main, hoppes testen over, saa ingen test stopper den."""
+    if sjekk_porten and not _porten_er_ledig():
+        pytest.skip("port 8000 er i bruk paa maskinen")
     svar = subprocess.run(
         argumenter,
         input="n\nn\nn\n",
@@ -404,12 +430,13 @@ def test_porten_sjekkes_for_alt_som_svarer_og_serveren_stoppes(navn):
     server som stoppet av seg selv, lukket vinduet uten beskjed."""
     kode = "\n".join(_kode(SKRIPTENE[navn]))
     if navn == "start.ps1":
-        assert "System.Net.Sockets.TcpClient" in kode and "if (Opptatt) {" in kode
+        assert "System.Net.Sockets.TcpClient" in kode and "if (-not (Opptatt)) { return }" in kode
         assert "taskkill.exe /T /F /PID $script:server.Id" in kode
         assert kode.index("function Stopp([string]$Melding) {\nStopp-Serveren") >= 0
         assert "$null = $server.Handle" in kode and "if ($server.ExitCode -ne 0)" in kode
     else:
-        assert "-w '%{http_code}'" in kode and "if opptatt; then" in kode
+        # Spesifikasjonen 3.5d: /dev/tcp i bash, ikke curl.
+        assert "(exec 3<>/dev/tcp/127.0.0.1/8000) 2>/dev/null" in kode and "opptatt || return 0" in kode
         assert "trap 'kill \"$server\" 2>/dev/null' EXIT" in kode
         assert "trap 'exit 130' INT TERM HUP" in kode
         assert '[ "$kode" = 0 ] || stopp "appen stoppet med kode $kode.' in kode
@@ -547,3 +574,121 @@ def test_readme_og_hjelpen_har_advarselen_og_godkjenningen():
     kom_i_gang = tekst.split("\n## Kom i gang\n", 1)[1].split("\n### Mer for den som vil\n", 1)[0]
     assert ".cmd" not in kom_i_gang and ".command" not in kom_i_gang
     assert "Start med dobbeltklikk" not in kom_i_gang
+
+
+# Spesifikasjonen 3.5d (forproeven 24.10, funn 7, gruppens svar kl. 12:04):
+# en lytter paa 127.0.0.1:8000. «oss» har kommandolinja fra skriptene og skal
+# stoppes, «fremmed» har den ikke og skal kjoere videre. Lytteren er Python
+# uten venv-omdirigeringen paa Windows, saa prosessen som lytter, er den testen
+# startet.
+LYTTEREN = (
+    "import socket, sys, time\n"
+    "s = socket.socket()\n"
+    "s.bind(('127.0.0.1', 8000))\n"
+    "s.listen()\n"
+    "print('klar', flush=True)\n"
+    "time.sleep(300)\n"
+)
+SKRIPTENES_KOMMANDOLINJE = ["waitress-serve", "--listen=127.0.0.1:8000", "--threads=8", "app:app"]
+
+
+def _start_lytteren(hvem):
+    if not _porten_er_ledig():
+        pytest.skip("port 8000 er i bruk paa maskinen")
+    python = getattr(sys, "_base_executable", None) or sys.executable
+    argumenter = [python, "-c", LYTTEREN, *(SKRIPTENES_KOMMANDOLINJE if hvem == "oss" else [])]
+    lytter = subprocess.Popen(argumenter, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    assert lytter.stdout.readline().strip() == "klar"
+    return lytter
+
+
+def _stopp_lytteren(lytter):
+    if lytter.poll() is None:
+        lytter.kill()
+    lytter.wait(timeout=30)
+
+
+def _sjekk_porten(hvem, lytter, kode, utskrift):
+    assert kode == 1, utskrift
+    if hvem == "oss":
+        lytter.wait(timeout=30)
+        assert "Den andre versjonen av OSE Signal kjører allerede på http://127.0.0.1:8000" in utskrift, utskrift
+        assert f"(prosess {lytter.pid})" in utskrift, utskrift
+        assert "Den andre versjonen er stoppet, og porten er ledig." in utskrift, utskrift
+        # Videre til uv, som faar nei.
+        assert "Appen trenger uv" in utskrift, utskrift
+        assert _porten_er_ledig()
+    else:
+        assert lytter.poll() is None, "den fremmede lytteren ble stoppet"
+        assert "et annet program svarer allerede på http://127.0.0.1:8000" in utskrift, utskrift
+        assert "python" in utskrift.lower() and f"(prosess {lytter.pid})" in utskrift, utskrift
+        assert "Skriptet stopper aldri andre programmer." in utskrift, utskrift
+        assert "docker compose --profile demo down" in utskrift and "Dobbeltklikk så på nytt." in utskrift
+        assert "Den andre versjonen av OSE Signal" not in utskrift and "Appen trenger uv" not in utskrift
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="krever Windows PowerShell")
+@pytest.mark.parametrize("hvem", ["oss", "fremmed"])
+def test_start_ps1_stopper_bare_den_andre_versjonen_paa_porten(tmp_path, hvem):
+    """Gruppens svar 24.10 kl. 12:04. Ville feilet hvis start.ps1 stoppet et
+    annet program paa porten (mutanten: sjekken av kommandolinja borte), ikke
+    sa hvilket program og hva man gjoer, ikke stoppet den andre versjonen av
+    OSE Signal, eller ikke gikk videre naar porten var ledig."""
+    mappe = _mappe_med_skriptet(tmp_path, "start.ps1", "ingen")
+    systemrot = os.environ["SYSTEMROOT"]
+    powershell = Path(systemrot) / "System32" / "WindowsPowerShell" / "v1.0" / "powershell.exe"
+    stier = [str(Path(systemrot) / "System32"), str(Path(systemrot) / "System32" / "Wbem")]
+    _uten_uv(stier)
+    miljoe = {"PATH": os.pathsep.join(stier), "USERPROFILE": str(tmp_path / "hjem"), "SYSTEMROOT": systemrot}
+    miljoe["PSModulePath"] = ""
+    lytter = _start_lytteren(hvem)
+    try:
+        argumenter = [str(powershell), "-NoProfile", "-ExecutionPolicy", "Bypass", "-File"]
+        argumenter += [str(mappe / "start" / "start.ps1"), "-Versjon", "demo"]
+        kode, utskrift = _kjoer(argumenter, miljoe, sjekk_porten=False)
+        _sjekk_porten(hvem, lytter, kode, utskrift)
+    finally:
+        _stopp_lytteren(lytter)
+
+
+def _lsof():
+    return shutil.which("lsof") or ("/usr/sbin/lsof" if Path("/usr/sbin/lsof").exists() else None)
+
+
+@pytest.mark.skipif(sys.platform == "win32" or _bash() is None or _lsof() is None, reason="krever bash, lsof og ps")
+@pytest.mark.parametrize("hvem", ["oss", "fremmed"])
+def test_start_sh_stopper_bare_den_andre_versjonen_paa_porten(tmp_path, hvem):
+    """Gruppens svar 24.10 kl. 12:04. Ville feilet hvis start.sh stoppet et
+    annet program paa porten, ikke sa hvilket program og hva man gjoer, ikke
+    stoppet den andre versjonen av OSE Signal, eller ikke gikk videre naar
+    porten var ledig."""
+    mappe = _mappe_med_skriptet(tmp_path, "start.sh", "ingen")
+    stier = {str(Path(_bash()).parent)}
+    for program in ("dirname", "ps", "grep", "sort", "sleep", "lsof"):
+        if shutil.which(program):
+            stier.add(str(Path(shutil.which(program)).parent))
+    _uten_uv(stier)
+    miljoe = {"PATH": os.pathsep.join(sorted(stier)), "HOME": str(tmp_path / "hjem")}
+    lytter = _start_lytteren(hvem)
+    try:
+        kode, utskrift = _kjoer([_bash(), str(mappe / "start" / "start.sh"), "demo"], miljoe, sjekk_porten=False)
+        _sjekk_porten(hvem, lytter, kode, utskrift)
+    finally:
+        _stopp_lytteren(lytter)
+
+
+@pytest.mark.parametrize("navn", list(SKRIPTENE))
+def test_porten_sjekkes_foer_uv_og_bare_oss_stoppes(navn):
+    """Gruppens svar 24.10 kl. 12:04. Ville feilet hvis porten ble sjekket
+    etter uv eller hentingen, eller hvis skriptet stoppet lytterne uten aa
+    sjekke kommandolinja foerst."""
+    kode = "\n".join(_kode(SKRIPTENE[navn]))
+    kall, sjekk, stopp_ = {
+        "start.ps1": ("\nFrigjoer-Porten\n", "Er-OseSignal $_.Kommandolinje", "Stop-Process -Id $lytter.Id -Force"),
+        "start.sh": ("\nfrigjoer_porten\n", 'er_ose_signal "$(ps -p "$id" -o command=', 'kill "$id"'),
+    }[navn]
+    assert kode.index(kall) < kode.index("Appen trenger uv") < kode.index("uv sync")
+    assert kode.index(kall) < kode.index("uv run python src/fetch_prices.py")
+    assert kode.index(sjekk) < kode.index("Skriptet stopper aldri andre programmer.") < kode.index(stopp_)
+    for del_ in ("waitress-serve", "--listen=127", "app:app"):
+        assert del_ in kode.split(kall.strip() if navn == "start.ps1" else "er_ose_signal() {", 1)[1], del_
