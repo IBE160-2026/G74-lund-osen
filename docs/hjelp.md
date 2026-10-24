@@ -217,11 +217,15 @@ Noe annet bruker port 8000. Kjører den andre versjonen, stopper du den først (
 
 ### Windows advarer mot fila.
 
-Første gang kan Windows advare mot `Start demoen.cmd` eller `Start den ekte versjonen.cmd`, fordi fila er lastet ned fra nettet. Velg å vise mer informasjon, og kjør den likevel. Spør Windows om du vil kjøre fila, svarer du ja. Mer står under «Start med dobbeltklikk, uten Docker» i [README-en](../README.md).
+Første gang kan Windows advare mot `Start demoen.cmd` eller `Start den ekte versjonen.cmd`, fordi fila er lastet ned fra nettet. Advarselen heter «Windows beskyttet PC-en». Klikk «Mer informasjon», og så «Kjør likevel». Spør Windows om du vil kjøre fila, svarer du ja. Mer står under «Start med dobbeltklikk, uten Docker» i [README-en](../README.md).
 
 ### Mac sier at fila ikke kan åpnes.
 
-Første gang kan macOS stoppe `Start demoen.command` eller `Start den ekte versjonen.command`, fordi fila er lastet ned fra nettet. Høyreklikk fila, velg Åpne, og bekreft. Går det ikke, tillater du den under Personvern og sikkerhet i Systeminnstillinger, og dobbeltklikker på nytt.
+Første gang kan macOS stoppe `Start demoen.command` eller `Start den ekte versjonen.command`, fordi fila er lastet ned fra nettet. Fra macOS 15 holder det ikke å høyreklikke og velge Åpne. Velg Apple-menyen > Systeminnstillinger, og Personvern og sikkerhet i sidepanelet. Under Sikkerhet klikker du «Åpne likevel» og skriver inn passordet ditt. Knappen står der i omtrent en time etter at du prøvde å åpne fila. Dobbeltklikk så fila på nytt. På macOS 14 og eldre kan du også høyreklikke fila, velge Åpne og bekrefte.
+
+### Vinduet sier at mappa er en klon av repoet.
+
+`Start den ekte versjonen` starter ikke i en mappe med `.git`, en klon av repoet, heller ikke på main. Da stopper vinduet før noe installeres eller hentes, så et dobbeltklikk i en klon aldri henter med en annen sin nøkkel. Last ned en egen kopi med «Download ZIP» på GitHub, pakk den ut, og bruk din egen nøkkel fra EODHD. `Start demoen` starter også i en klon.
 
 ### Vinduet sier at noe svarer allerede på 127.0.0.1:8000.
 

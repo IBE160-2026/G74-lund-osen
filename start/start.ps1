@@ -79,14 +79,12 @@ if ($Versjon -eq 'demo') {
 Write-Host 'Vinduet må være åpent mens appen kjører. Stopp appen ved å lukke vinduet, eller med Ctrl+C.'
 Write-Host ''
 
-# Regel 22: den ekte basen skrives bare fra main. I en ZIP-fil finnes ingen
-# .git, og da gjelder ikke sjekken (gjennomgangen, VG1 og ECH9).
-if ($Versjon -eq 'ekte' -and (Test-Path -LiteralPath '.git') -and (Get-Command git -ErrorAction SilentlyContinue)) {
-    $gren = ''
-    try { $gren = (& git rev-parse --abbrev-ref HEAD | Out-String).Trim() } catch { }
-    if ($gren -and $gren -ne 'main') {
-        Stopp "mappa står på grenen $gren. Den ekte versjonen startes bare fra main, så basen bare skrives derfra (regel 22 i CLAUDE.md)."
-    }
+# Gruppens svar 23.10 kl. 23:31 (b): i en mappe med .git, en klon, stopper
+# den ekte versjonen før uv, .env og hentingen, også på main, så et
+# dobbeltklikk i en klon aldri henter med gruppens nøkkel. En ZIP-fil har
+# ingen .git. Erstatter vernet «bare fra main» (VG1 og ECH9).
+if ($Versjon -eq 'ekte' -and (Test-Path -LiteralPath '.git')) {
+    Stopp 'mappa er en klon av repoet (den har .git), og der starter ikke den ekte versjonen. Last ned en egen kopi med «Download ZIP» på GitHub, pakk den ut, og bruk din egen nøkkel fra EODHD. Demoen kan startes herfra.'
 }
 
 # uv: på PATH, i .local\bin i brukermappa, eller installert etter et ja.

@@ -59,13 +59,12 @@ fi
 echo "Vinduet må være åpent mens appen kjører. Stopp appen ved å lukke vinduet, eller med Ctrl+C."
 echo
 
-# Regel 22: den ekte basen skrives bare fra main. I en ZIP-fil finnes ingen
-# .git, og da gjelder ikke sjekken (gjennomgangen, VG1 og ECH9).
-if [ "$VERSJON" = "ekte" ] && [ -e .git ] && command -v git >/dev/null 2>&1; then
-    gren="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
-    if [ -n "$gren" ] && [ "$gren" != "main" ]; then
-        stopp "mappa står på grenen $gren. Den ekte versjonen startes bare fra main, så basen bare skrives derfra (regel 22 i CLAUDE.md)."
-    fi
+# Gruppens svar 23.10 kl. 23:31 (b): i en mappe med .git, en klon, stopper
+# den ekte versjonen før uv, .env og hentingen, også på main, så et
+# dobbeltklikk i en klon aldri henter med gruppens nøkkel. En ZIP-fil har
+# ingen .git. Erstatter vernet «bare fra main» (VG1 og ECH9).
+if [ "$VERSJON" = "ekte" ] && [ -e .git ]; then
+    stopp "mappa er en klon av repoet (den har .git), og der starter ikke den ekte versjonen. Last ned en egen kopi med «Download ZIP» på GitHub, pakk den ut, og bruk din egen nøkkel fra EODHD. Demoen kan startes herfra."
 fi
 
 # uv: på PATH, i .local/bin i brukermappa, eller installert etter et ja.
