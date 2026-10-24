@@ -1943,6 +1943,10 @@ følger aksjene jeg bryr meg om.
 
 *Lagt til 2026-10-23 kl. 22:07 (målingen etter gruppens svar 23.10 kl. 11:56, `malinger.md` §41):* de fire første «Common Stock» i lista fra §40 som ikke var rangert, 2020 Bulkers (2020), 5Th Planet Games (5PG), Aasen Sparebank (AASB) og Arctic Bioscience (ABS), har median omsetning på 0,9, 0,1, 0,0 og 0,0 MNOK og plass 130, 150, 165 og 164 av 166. Ingen er over 25 MNOK. Lista står alfabetisk, så de fire er de første i alfabetet. Kallene var de 4 som var igjen av dagskvoten 23.10 etter hentingen, og bonuskvoten er ikke brukt.
 
+*Avgjort 2026-10-24 kl. 10:00 (gruppens svar):* dagens 20 kall, hele dagskvoten 24.10 i GMT på en dag uten henting, går til `malinger.md` §42: de neste 20 med typen «Common Stock» i lista fra §40 som ikke er rangert, valgt som i §41, i rekkefølgen i svaret og uten de som står i rangeringen i §41. Bonuskvoten brukes ikke.
+
+*Lagt til 2026-10-24 kl. 10:16 (målingen etter gruppens svar 24.10 kl. 10:00, `malinger.md` §42):* de neste 20 «Common Stock» i lista fra §40 som ikke var rangert, plass 6–59 i lista, fra Aqua Bio Technology (ABTEC) til Cavendish Hydrogen (CAVEN), ga alle 67 rader. Den høyeste medianen er 1,1 MNOK (Arribatec Solutions, ARR, plass 128 av 186), 11 har 0,0 MNOK avrundet, og ingen er over 25 MNOK; 37 av 186 er fortsatt over 32 MNOK og 41 over 25 MNOK. Lista står alfabetisk, så de 20 er de neste i alfabetet. Kallene var alle de 20 i dagskvoten 24.10, og bonuskvoten er ikke brukt. De lokale råfilene gir rekkefølgen SNI, PLT, WWI på 8,3 MNOK, ikke den i §35–§41; det står som åpent punkt i §42.
+
 ### Story 2.13: Kommandoen som måler omsetning
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
@@ -2396,6 +2400,16 @@ reserve. Til da endres ikke «Kom i gang».
   skrev ut nøkkelen
 
 **Avhenger av:** 3.3 og 3.4. **Én økt:** én per vei.
+
+*Avgjort 2026-10-23 kl. 23:31 (gruppens svar):*
+- a) «Start den ekte versjonen» kjører hentingen før webserveren, og
+  dobbeltklikket er den bevisste handlingen. FR-401 og AD-10 får hver en
+  datert linje om at regelen står: webserveren henter aldri, og er det
+  ingenting nytt å hente, gir dobbeltklikket 0 kall (FR-402).
+- b) I en mappe med `.git` stopper den ekte versjonen og viser til «Download
+  ZIP» og egen nøkkel, så et dobbeltklikk i en klon aldri henter med gruppens
+  nøkkel. Det erstatter vernet «bare fra main» (VG1 og ECH9 i triagen i
+  `spec-3-5a-dobbeltklikk-med-uv.md`).
 
 ---
 
