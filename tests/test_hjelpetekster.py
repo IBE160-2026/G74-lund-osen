@@ -532,7 +532,11 @@ class TestSnittetIGrafen:
         assert "50-dagers" not in html
         # Hjelpen foelger samme parametre som navnet paa linja i grafen.
         assert "snittet av de siste 40 børsdagene" in html
-        assert "de siste 50 børsdagene" not in html
+        # Story 10.2e: KI-teksten i demoen er laget med regelens 50 og staar
+        # fast (demo_ki_tekster.json), saa den tas ut her. Testen gjelder malen
+        # og hjelpen.
+        uten_ki = re.sub(r'<section class="ki".*?</section>', "", html, flags=re.S)
+        assert "de siste 50 børsdagene" not in uten_ki
 
 
 # Story 8.0c: hoeyst 3 setninger per tekst, og ordene ordlista har valgt bort

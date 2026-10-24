@@ -140,6 +140,11 @@
         {% endif %}
       </section>
     {% endif %}
+    {#- Gruppens svar 25.10 kl. 00:51: appen skriver dagene, rett under
+        KI-teksten, også når KI er av eller teksten er stoppet. #}
+    {% if dagene %}
+      <p class="dagene">{{ dagene }}</p>
+    {% endif %}
     <form class="ki-bryter"{% if not ki_vises %} id="{{ ki_anker }}"{% endif %} method="post" action="/ki">
       <input type="hidden" name="til" value="{{ ki_til }}">
       <input type="hidden" name="tilbake" value="{{ ki_tilbake }}">

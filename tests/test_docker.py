@@ -1034,6 +1034,8 @@ FILENE_BAK_AKSJESIDEN = (
     "src/vurderingsdata.py",
     # Story 2.7b: historikken nederst paa aksjesiden.
     "src/historikk.py",
+    # Story 10.2e (svaret 25.10 kl. 00:51): setningen om dagene under KI-teksten.
+    "src/dagene.py",
     "src/templates/aksje.html",
     # Gjennomgangen (BH1, ECH1): lagringslaget som leser det siden viser, og
     # skjemaet demobasen lages med.
@@ -1054,7 +1056,9 @@ IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py", "src/boersometer.py
 # slutter da ved 1827, maalt i Edge uten vindu. Var 1872.
 # Story 10.2e, gruppens svar 24.10 kl. 23:23: bildet viser BRFE med KI-teksten,
 # og grafen slutter ved 1872, maalt i Edge uten vindu. Var 1827.
-HOEYDE_PAA_AKSJESIDEN = 1872
+# Story 10.2e, gruppens svar 25.10 kl. 00:51: setningen om dagene under
+# KI-teksten, og en lengre tekst for BRFE. Grafen slutter ved 1934. Var 1872.
+HOEYDE_PAA_AKSJESIDEN = 1934
 # Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
 # Story 10.5: lenken til investorsiden står under grafen, ved 1980 px målt i
 # Edge uten vindu, så bildet, som slutter ved bunnen av grafen (1872 px), ble
@@ -1136,7 +1140,10 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # bildet ble tatt paa nytt med hoeyden 1827.
 # Story 10.2e, gruppens svar 24.10 kl. 23:23: KI-tekstene laget paa nytt med
 # ferdig ordlyd for dagene. KVST ble stoppet igjen, og bildet viser BRFE.
-AVTRYKK_BAK_AKSJESIDEN = "0116e812158657a3689177a5cf8c5bdb8277246094d34b8220cf87c151aec0eb"
+# Story 10.2e, gruppens svar 25.10 kl. 00:51: modellen nevner ikke dagene, og
+# setningen om dagene staar under KI-teksten (src/dagene.py). Bildet viser
+# fortsatt BRFE, med hoeyden 1934.
+AVTRYKK_BAK_AKSJESIDEN = "a40ae6a13747d15f9bcdce7f28e99e30b2c471adaa1d18d15a2e146ff7b8d37c"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "

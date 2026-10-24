@@ -91,6 +91,13 @@ Gruppen ville prøve igjen (kl. 00:50). Modellen får ikke dagene og nevner dem 
 - Kontrollen stopper dagene i enhver form, uansett grunnlaget: et antall dager, «minst» ved et ord om dagene, «på rad», ordenstall og «for første gang», og ord som «fortsatt», «lenge», «uker» og «nytt signal». Rettingene fra gjennomgangen 25.10 for «andre», «i dag», «1. Dagen» og regelens vinduer står.
 - Testene som godtok ordlyden eller et antall dager, er snudd eller tatt bort, og formene fra §44 og §45, blant dem VAR og TEL, stoppes i `TestDageneStoppes`.
 
+**b) Setningen om dagene og demoen** (`src/dagene.py`, `src/app.py`, `src/templates/aksje.html`):
+- `tell_dagene` er flyttet fra `ki_grunnlag.py` til den nye modulen `src/dagene.py`, fordi webserveren ikke importerer noe fra `ki_*` (AD-10, `test_webserveren_importerer_ingen_modell_heller_ikke_under_en_forespoersel`). `setning_om_dagene` lager setningen: «Signalet er slik i dag for første gang.», «Signalet har vært slik i N børsdager på rad.», «Signalet har vært slik i minst 1 børsdag.» og «Signalet har vært slik i minst N børsdager.», med tallet etter regel 21.
+- For en tidligere dag valgt med «Velg dag» passer ikke «i dag», så setningen for 1 dag er da «Signalet ble slik denne dagen for første gang.» Den ordlyden er ikke gitt av gruppen og står under «Åpent».
+- Aksjesiden viser setningen rett under KI-feltet og over bryteren, også når KI er av, teksten er stoppet, modellen feilet eller det ikke er noen rad. Uten en vurdering for dagen står den ikke. Tellingen leser vurderingene for aksjen fra basen (AD-3, AD-10), i demoen og i den ekte versjonen.
+- KI-tekstene i demoen er laget på nytt, 01:09:25–01:09:44: 13 av 13 besto, og ingen nevner dagene. Hver er lest mot grunnlaget, og ingen sier feil om en sjekk. Bildet viser fortsatt BRFE, der teksten besto, nå med setningen, 1280 × 1934, målt i Edge uten vindu (var 1872). README-teksten under bildet, høyden, `src/dagene.py` i filene bak aksjesiden og avtrykket følger med.
+- `test_ma_vinduet_kommer_fra_parametre` tar KI-feltet ut før den ser etter «de siste 50 børsdagene», fordi den nye demoteksten for BRFE forklarer regelen med det faste tallet.
+
 ## Boundaries & Constraints
 
 - Ingen kall til EODHD utover kvotesjekken i regel 15. `src/fetch_prices.py` kjøres ikke, og `data/db/ose.db` røres ikke (regel 22).
@@ -225,3 +232,4 @@ Gjennomgang 25.10, etter hele settet (00:22:52–00:30:02), på diffen `cfceb42.
 - *Lagt til 2026-10-25:* modellen setter ofte ordlyden i anførselstegn etter et ekstra «i», som «i "i dag for første gang"» (åtte av de ti demotekstene som besto). Ordlyden står ordrett, så kontrollen slipper den. Om prompten skal si hvordan ordlyden settes inn i setningen, avgjør gruppen.
 - *Lagt til 2026-10-25:* versjon 3 med ferdig ordlyd besto 13 av 15 i §45 (VAR og TEL på «det første signalet»), under kravet 15 av 15 i svaret kl. 23:23, og flettes ikke. Gruppen avgjør veien videre.
 - *Lagt til 2026-10-25:* ordlyden godtas der den står, også i en annen setning (BH4), og dagene med ord som «fortsatt», «lenge» og «uker» leses ikke (BH2, ECH6).
+- *Lagt til 2026-10-25:* for en tidligere dag valgt med «Velg dag» skriver siden «Signalet ble slik denne dagen for første gang.» i stedet for «i dag». Gruppen avgjør ordlyden.

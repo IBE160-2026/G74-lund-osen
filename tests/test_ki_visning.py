@@ -554,3 +554,109 @@ class TestStory816bDenValgteDagen:
         etter stien, for eksempel en annen side eller et linjeskift."""
         svar = klient.post("/ki", data={"til": "paa", "tilbake": tilbake})
         assert svar.headers["Location"] in ("/", "http://localhost/")
+
+
+ANNEN = Vurdering(
+    styrke=1,
+    retning="Positiv",
+    trend=1,
+    bevegelse=0,
+    interesse=0,
+    slutt=100.0,
+    justert_slutt=100.0,
+    trend_avvik=0.031,
+    dagens_endring=0.001,
+    standardavvik=0.011,
+    volumforhold=1.0,
+)
+
+
+class TestSetningenOmDagene:
+    """Gruppens svar 25.10 kl. 00:51: appen skriver dagene i en setning rett
+    under KI-teksten, ogsaa naar KI er av eller teksten er stoppet, med
+    tellingen fra svaret 24.10 kl. 16:15 a)."""
+
+    @pytest.mark.parametrize(
+        "dager, minst, valgt, setning",
+        [
+            (1, False, False, "Signalet er slik i dag for første gang."),
+            (1, False, True, "Signalet ble slik denne dagen for første gang."),
+            (4, False, False, "Signalet har vært slik i 4 børsdager på rad."),
+            (4, False, True, "Signalet har vært slik i 4 børsdager på rad."),
+            (12, True, False, "Signalet har vært slik i minst 12 børsdager."),
+            (1, True, False, "Signalet har vært slik i minst 1 børsdag."),
+            (1234, False, False, "Signalet har vært slik i 1 234 børsdager på rad."),
+        ],
+    )
+    def test_setningen(self, dager, minst, valgt, setning):
+        """Ville feilet hvis setningen ikke fulgte gruppens ordlyd for 1 dag,
+        flere dager og minst, eller tallet ikke fulgte regel 21."""
+        from dagene import setning_om_dagene
+
+        assert setning_om_dagene(dager, minst, valgt_dag=valgt) == setning
+
+    @pytest.mark.parametrize("dager", [0, True, 2.0])
+    def test_ugyldige_dager_avvises(self, dager):
+        from dagene import setning_om_dagene
+
+        with pytest.raises(ValueError):
+            setning_om_dagene(dager, False)
+
+    def test_flere_dager_paa_siden_rett_under_ki_teksten(self, klient, aksje):
+        """Fire boersdager med samme retning og styrke, og en annen foer.
+        Ville feilet hvis setningen manglet, sto et annet sted enn rett
+        under KI-teksten, eller tellingen ikke leste basen."""
+        for dato in (date(2026, 10, 28), date(2026, 10, 29), date(2026, 10, 30)):
+            skriv_vurdering("EQNR", dato, VURDERING)
+        skriv_vurdering("EQNR", date(2026, 10, 27), ANNEN)
+        skriv_kirad(kirad(aksje))
+        html = side(klient)
+        setning = '<p class="dagene">Signalet har vært slik i 4 børsdager på rad.</p>'
+        assert setning in html
+        assert html.index("Med KI-ens ord") < html.index(TEKST) < html.index(setning) < html.index("ki-bryter")
+
+    def test_en_dag_paa_siden(self, klient, aksje):
+        """Ville feilet hvis en annen vurdering dagen foer ikke ga «i dag for
+        første gang»."""
+        skriv_vurdering("EQNR", date(2026, 10, 30), ANNEN)
+        assert '<p class="dagene">Signalet er slik i dag for første gang.</p>' in side(klient)
+
+    def test_minst_paa_siden(self, klient, aksje):
+        """Uten rad for boersdagen foer er antallet det minste det kan vaere.
+        Ville feilet hvis siden sa et eksakt antall."""
+        assert '<p class="dagene">Signalet har vært slik i minst 1 børsdag.</p>' in side(klient)
+
+    @pytest.mark.parametrize(
+        "kapsel, endret",
+        [
+            ("av", {}),
+            (None, dict(besto=False, grunn="1: dagene «i dag for første gang», modellen nevner ikke dagene")),
+            (None, dict(tekst=None, besto=False, grunn="modellen feilet")),
+            (None, None),
+        ],
+    )
+    def test_ogsaa_uten_ki_tekst(self, klient, aksje, kapsel, endret):
+        """KI av, teksten stoppet, modellen feilet, og ingen rad. Ville feilet
+        hvis setningen bare sto naar KI-teksten ble vist."""
+        skriv_vurdering("EQNR", date(2026, 10, 30), ANNEN)
+        if endret is not None:
+            skriv_kirad(kirad(aksje, **endret))
+        html = side(klient, kapsel)
+        assert TEKST not in html
+        assert '<p class="dagene">Signalet er slik i dag for første gang.</p>' in html
+
+    def test_ingen_setning_uten_vurdering(self, klient):
+        """En dag med en grunn har ikke noe signal. Ville feilet hvis siden
+        likevel skrev dagene."""
+        rader = serie([100.0] * 61)
+        skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET), vurdert=False)
+        skriv_vurdering("EQNR", rader[-1].dato, Grunn.KURS_IKKE_FRA_DAGEN)
+        assert 'class="dagene"' not in side(klient)
+
+    def test_en_valgt_dag(self, klient, aksje):
+        """«Velg dag» 30.10, med en annen vurdering 29.10. Ville feilet hvis
+        siden sa «i dag» om en tidligere dag."""
+        skriv_vurdering("EQNR", date(2026, 10, 30), VURDERING)
+        skriv_vurdering("EQNR", date(2026, 10, 29), ANNEN)
+        html = klient.get("/aksje/EQNR?dag=2026-10-30").get_data(as_text=True)
+        assert '<p class="dagene">Signalet ble slik denne dagen for første gang.</p>' in html

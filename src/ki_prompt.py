@@ -43,7 +43,7 @@ Versjon 3, fjerde forsoek (gruppens svar 25.10 kl. 00:50 og 00:51,
 malinger.md §45): modellen faar ikke dagene og nevner dem ikke. Ordlyden fra
 tredje forsoek er tatt ut, og reglene sier at teksten ikke sier hvor lenge
 signalet har vart. Appen skriver dagene selv, under KI-teksten paa
-aksjesiden (setning_om_dagene i aksjedetalj.py). Versjonen staar som 3, og
+aksjesiden (setning_om_dagene i dagene.py). Versjonen staar som 3, og
 avtrykket dekker reglene, merket og lag_prompt.
 """
 

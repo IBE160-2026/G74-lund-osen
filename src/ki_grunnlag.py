@@ -28,7 +28,7 @@ endringen slik den vises (tallformat.avrundet), som streken paa grafen og
 fargene i boersometeret, saa teksten og siden sier det samme.
 
 Fjerde forsoek (gruppens svar 25.10 kl. 00:51): modellen faar ikke dagene.
-Dagsbildet teller dem fortsatt (tell_dagene, svaret 24.10 kl. 16:15 a), men
+Dagsbildet teller dem fortsatt (tell_dagene, flyttet til dagene.py), men
 grunnlaget har ikke dager eller dager_merke. Appen skriver dagene selv, i en
 setning under KI-teksten paa aksjesiden.
 """
@@ -38,7 +38,7 @@ from dataclasses import dataclass
 from datetime import date
 from types import MappingProxyType
 
-from boersdag import UtenforKalenderen, forrige_boersdag
+from dagene import tell_dagene
 from hovedindeks import indeksendring
 from kursdata import Aksje, Kursrad
 from markedsoversikt import endring_i_prosent
@@ -83,30 +83,6 @@ def bevegelse(endring: float | None) -> str | None:
         return None
     vist = avrundet(endring, "endring")
     return STEG if vist > 0 else FALT if vist < 0 else UENDRET
-
-
-def tell_dagene(dag: date, vurdering: Vurdering, tidligere: Mapping[date, Vurdering | Grunn]) -> tuple[int, bool]:
-    """Boersdager paa rad til og med dag med samme retning og styrke, og om
-    rekka er «minst» (gruppens svar 24.10 kl. 16:15, a).
-
-    tidligere er de lagrede radene for aksjen foer dag. Rekka stopper ved en
-    annen retning eller styrke eller en grunn, og da er antallet kjent. En
-    boersdag uten rad, ogsaa foer foerste lagrede vurdering, eller en dag
-    utenfor kalenderen, gir «minst»: hvordan signalet var foer, er ukjent.
-    """
-    dager = 1
-    naa = dag
-    while True:
-        try:
-            naa = forrige_boersdag(naa)
-        except UtenforKalenderen:
-            return dager, True
-        rad = tidligere.get(naa)
-        if rad is None:
-            return dager, True
-        if not isinstance(rad, Vurdering) or (rad.retning, rad.styrke) != (vurdering.retning, vurdering.styrke):
-            return dager, False
-        dager += 1
 
 
 def _endringen(serie: list[Kursrad], dag: date) -> float | None:

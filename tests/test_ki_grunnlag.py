@@ -6,6 +6,7 @@ from datetime import date, timedelta
 
 import pytest
 
+from dagene import tell_dagene
 from ki_grunnlag import (
     FALT,
     RETNINGER,
@@ -17,7 +18,6 @@ from ki_grunnlag import (
     bevegelse,
     ki_grunnlag,
     lag_dagsbilde,
-    tell_dagene,
 )
 from kursdata import Aksje, Kursrad
 from signalberegning import Signal, Sjekk, beregn_signal, vurder

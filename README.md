@@ -12,8 +12,8 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 ![Oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/oversikten-demo.png)
 *Oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»).*
 
-![Aksjesiden for Brattfjell Energi (BRFE) i demoen, med KI-teksten og kursgrafen, med oppdiktede tall («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/aksjesiden-brfe-demo.png)
-*Aksjesiden for BRFE i demoen, med KI-teksten og grafen, med oppdiktede tall («Eksempeltall»).*
+![Aksjesiden for Brattfjell Energi (BRFE) i demoen, med KI-teksten, setningen om hvor lenge signalet har vært slik, og kursgrafen, med oppdiktede tall («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/aksjesiden-brfe-demo.png)
+*Aksjesiden for BRFE i demoen, med KI-teksten, setningen om dagene under den, og grafen, med oppdiktede tall («Eksempeltall»).*
 
 </details>
 
