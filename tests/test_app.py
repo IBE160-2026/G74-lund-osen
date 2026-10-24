@@ -3283,7 +3283,7 @@ def _dagen(html: str) -> str:
 def _toppen(html: str) -> str:
     """Story 8.16b: teksten fra merket og kortene til grafen, med sjekkene
     og KI-teksten."""
-    return _synlig(html.split('<a class="tilbake"', 1)[1].split("<h2>Kursutvikling", 1)[0])
+    return _synlig(html.split('<a class="tilbake"', 1)[1].split('<h2 id="kursgrafen">Kursutvikling', 1)[0])
 
 
 class TestPeriodeneIKursgrafen:
@@ -3311,7 +3311,9 @@ class TestPeriodeneIKursgrafen:
             "1 år",
             "Velg dag",
         ]
-        assert [href for href, _, _ in knappene] == [f"/aksje/EQNR?periode={p}" for p in PERIODENE[:-1]] + ["skjema"]
+        assert [href for href, _, _ in knappene] == [f"/aksje/EQNR?periode={p}#kursgrafen" for p in PERIODENE[:-1]] + [
+            "skjema"
+        ]
 
     def test_6_mnd_naar_siden_aapnes(self, klient):
         """FR-201. Ville feilet hvis grafen aapnet med en annen periode, eller
@@ -3319,7 +3321,7 @@ class TestPeriodeneIKursgrafen:
         self._aksjen()
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
         assert _valgt(html) == ["6 mnd"]
-        assert "<h2>Kursutvikling, 6 måneder " in html
+        assert '<h2 id="kursgrafen">Kursutvikling, 6 måneder ' in html
         assert _foerste_og_siste_dag(html) == "09.04 til 09.10"
 
     @pytest.mark.parametrize("periode", ["siste", "1-uke", "1-mnd", "3-mnd", "6-mnd", "i-aar", "1-aar"])
@@ -3372,7 +3374,7 @@ class TestPeriodeneIKursgrafen:
         assert "Oslo Børs · 01.10" in toppen and "Ingen vurdering for 01.10: ikke vurdert." in toppen
         assert '<p class="dagen">' not in html
         assert _valgt(html) == ["01.10"]
-        assert "<h2>Kursutvikling, 6 måneder fram til torsdag 01.10 " in html
+        assert '<h2 id="kursgrafen">Kursutvikling, 6 måneder fram til torsdag 01.10 ' in html
         assert 'class="dagstrek"' in html and 'class="dagpunkt"' in html
         assert _foerste_og_siste_dag(html) == "01.04 til 01.10"
 
@@ -3488,7 +3490,7 @@ class TestPeriodeneIKursgrafen:
         self._aksjen()
         html = klient.get("/aksje/EQNR?dag=2026-10-01").data.decode("utf-8")
         nav = html.split('<nav class="periodevalg"', 1)[1].split("</nav>", 1)[0]
-        assert '<form method="get" action="/aksje/EQNR">' in nav
+        assert '<form method="get" action="/aksje/EQNR#kursgrafen">' in nav
         assert (
             '<input type="date" id="velg-dag" name="dag" required value="2026-10-01" min="2026-01-05" max="2026-10-09">'
             in nav
@@ -3518,7 +3520,7 @@ class TestPeriodeneIKursgrafen:
         self._aksjen()
         for periode, tekst in (("1-uke", "1 uke"), ("1-mnd", "1 måned"), ("i-aar", "i år"), ("1-aar", "1 år")):
             html = klient.get(f"/aksje/EQNR?periode={periode}").data.decode("utf-8")
-            assert f"<h2>Kursutvikling, {tekst} " in html, periode
+            assert f'<h2 id="kursgrafen">Kursutvikling, {tekst} ' in html, periode
 
 
 class TestStory816bDagenPaaHeleSiden:

@@ -355,7 +355,7 @@ class TestSidene:
             ('<span class="etikett">Signalstyrke ', "hjelp-styrke"),
             ('<span class="etikett">Retning ', "hjelp-retning-aksje"),
             ('<span class="etikett">Endring ', "hjelp-endring"),
-            ("<h2>Kursutvikling, 6 måneder ", "hjelp-graf"),
+            ('<h2 id="kursgrafen">Kursutvikling, 6 måneder ', "hjelp-graf"),
             # Story 8.0d, PR 3 (svar 22): i sjekkortene.
             ('<span class="ga">Ga ', "hjelp-ga"),
             ('<p class="maalt">Målt mot ', "hjelp-maalt"),

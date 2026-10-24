@@ -820,6 +820,8 @@ def aksjedetalj(symbol: str):
             # står endringen og signalet i kortene.
             dagen_i_linja=valg.periode == SISTE,
             ki_tilbake=tilbake,
+            grafanker=GRAFANKER,
+            ki_anker=KI_ANKER,
             overskrift=OVERSKRIFT[valg.periode],
             knapper=knappene(rader[-1].dato, i_dag),
             # 1 aar og de andre periodene viser bare det serien har (FR-201).
@@ -886,6 +888,12 @@ def _ki_visning(post, detalj) -> KIVisning:
 # Story 8.16b: med en valgt dag ogsaa ?dag= og en dato. Datoen leses paa nytt
 # av les_valg, saa en dag som ikke kan vises, gir 6 mnd og en beskjed.
 _TILBAKE = re.compile(r"/aksje/[A-Za-z0-9.\-]{1,20}(\?dag=[0-9]{4}-[0-9]{2}-[0-9]{2})?")
+# Story 8.2a, a (U35, U36, gruppens svar 24.10 kl. 11:21): knappene som
+# endrer noe paa aksjesiden, holder plassen, som pilene i historikken.
+# Periodeknappene og «Velg dag» gaar til kursgrafen, og bryteren til
+# KI-teksten.
+GRAFANKER = "kursgrafen"
+KI_ANKER = "ki-teksten"
 
 
 @app.post("/ki")
@@ -899,7 +907,9 @@ def ki_bryter():
         abort(403)
     til = AV if request.form.get("til") == AV else PAA
     tilbake = request.form.get("tilbake", "/")
-    if not _TILBAKE.fullmatch(tilbake):
+    if _TILBAKE.fullmatch(tilbake):
+        tilbake += f"#{KI_ANKER}"
+    else:
         tilbake = "/"
     svar = redirect(tilbake, code=303)
     svar.set_cookie(KAPSEL, til, max_age=365 * 24 * 3600, samesite="Lax", httponly=True, secure=request.is_secure)

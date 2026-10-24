@@ -5,16 +5,19 @@
 
     knapper er (kode, navn) fra perioder.knappene(), valgt er koden som
     vises, adresse er siden lenkene går til, og dag er dagen for «Velg dag».
-    Den valgte knappen har aria-current, og fokus er synlig. -#}
+    Den valgte knappen har aria-current, og fokus er synlig.
 
-{% macro periodevalg(knapper, valgt, adresse, dag=None, minst=None, maks=None, etikett="Periode") -%}
+    Story 8.2a, a (U36): med anker går lenkene og skjemaet dit, så siden
+    holder plassen. Et skjema med GET beholder ankeret i action. -#}
+
+{% macro periodevalg(knapper, valgt, adresse, dag=None, minst=None, maks=None, etikett="Periode", anker=None) -%}
 <nav class="periodevalg" aria-label="{{ etikett }}">
   <ul>
     {%- for kode, navn in knapper %}
-    <li><a href="{{ adresse }}?periode={{ kode }}"{% if kode == valgt %} aria-current="true"{% endif %}>{{ navn }}</a></li>
+    <li><a href="{{ adresse }}?periode={{ kode }}{% if anker %}#{{ anker }}{% endif %}"{% if kode == valgt %} aria-current="true"{% endif %}>{{ navn }}</a></li>
     {%- endfor %}
     <li>
-      <form method="get" action="{{ adresse }}">
+      <form method="get" action="{{ adresse }}{% if anker %}#{{ anker }}{% endif %}">
         <input type="hidden" name="periode" value="velg">
         <label class="skjult" for="velg-dag">Velg dag</label>
         <input type="date" id="velg-dag" name="dag" required

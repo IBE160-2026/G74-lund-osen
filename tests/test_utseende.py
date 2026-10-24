@@ -325,7 +325,10 @@ class TestRammen:
                         r"/\?sorter=(selskap|kurs|endring|signal|retning)&amp;orden=(synkende|stigende)", href
                     )
                     # Story 8.16: periodene i kursgrafen er en parameter paa aksjesiden.
-                    or re.fullmatch(r"/aksje/[A-Z0-9]+\?periode=(" + "|".join(map(re.escape, PERIODENE)) + ")", href)
+                    # Story 8.2a, a (U36): med ankeret ved kursgrafen.
+                    or re.fullmatch(
+                        r"/aksje/[A-Z0-9]+\?periode=(" + "|".join(map(re.escape, PERIODENE)) + ")#kursgrafen", href
+                    )
                     # Story 2.7a: stilarket, med avtrykket av fila.
                     or re.fullmatch(r"/static/stil\.css\?v=[0-9a-f]{16}", href)
                     # Story 2.7b: hver dag i historikken lenker til siden for

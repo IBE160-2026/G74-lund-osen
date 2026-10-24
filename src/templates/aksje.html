@@ -125,9 +125,12 @@
       aldri i stedet for den (FR-602). Bryteren er synlig for brukeren
       (FR-601), og med KI av er siden lik den var før 10.3, bortsett fra
       bryteren. #}
+  {#- Story 8.2a, a (U35): bryteren sender tilbake til ankeret, på teksten
+      når den vises og ellers på bryteren. #}
   {% if detalj.sjekker %}
-    {% if ki_er_paa and ki %}
-      <section class="ki" aria-label="KI-tekst">
+    {% set ki_vises = ki_er_paa and ki %}
+    {% if ki_vises %}
+      <section class="ki" id="{{ ki_anker }}" aria-label="KI-tekst">
         <h2>Med KI-ens ord</h2>
         {% if ki.vist %}
           <p class="merke-ki">Laget av KI · {{ ki.modell }}. Regelforklaringen over er det signalet bygger på.</p>
@@ -137,7 +140,7 @@
         {% endif %}
       </section>
     {% endif %}
-    <form class="ki-bryter" method="post" action="/ki">
+    <form class="ki-bryter"{% if not ki_vises %} id="{{ ki_anker }}"{% endif %} method="post" action="/ki">
       <input type="hidden" name="til" value="{{ ki_til }}">
       <input type="hidden" name="tilbake" value="{{ ki_tilbake }}">
       <button type="submit" aria-pressed="{{ 'true' if ki_er_paa else 'false' }}">{{ 'Skjul KI-teksten' if ki_er_paa else 'Vis KI-teksten' }}</button>
@@ -149,8 +152,8 @@
   {%- set vis_grafhjelp = grafhjelp|length > 0 %}
   {#- Story 8.16: periodevalget i designregler.md §2, og overskriften etter
       perioden. Siste børsdag og «Velg dag» viser 6 mnd fram til dagen. #}
-  <h2>Kursutvikling, {{ overskrift }}{% if dagen %} {{ dagen.dato|ukedag }} {{ dagen.dato|dato }}{% endif %}{% if vis_grafhjelp %} {{ hjelpeknapp("hjelp-graf", "Hjelp: kursgrafen") }}{% endif %}</h2>
-  {{ periodevalg(knapper, valg.periode, "/aksje/" ~ detalj.aksje.symbol, valg.dag, foerste_valgbare, siste_i_serien, "Periode for kursgrafen") }}
+  <h2 id="{{ grafanker }}">Kursutvikling, {{ overskrift }}{% if dagen %} {{ dagen.dato|ukedag }} {{ dagen.dato|dato }}{% endif %}{% if vis_grafhjelp %} {{ hjelpeknapp("hjelp-graf", "Hjelp: kursgrafen") }}{% endif %}</h2>
+  {{ periodevalg(knapper, valg.periode, "/aksje/" ~ detalj.aksje.symbol, valg.dag, foerste_valgbare, siste_i_serien, "Periode for kursgrafen", grafanker) }}
   {% if valg.beskjed %}<p class="periodebeskjed" role="status">{{ valg.beskjed }}</p>{% endif %}
   {#- Story 8.16b: for en valgt dag står endringen og signalet i kortene. #}
   {% if dagen and dagen_i_linja %}
