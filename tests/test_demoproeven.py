@@ -193,3 +193,56 @@ def test_symbolene_over_soeylene_lenker_til_aksjesiden(klient, side):
     foer_etikettene = figur.split('<div class="etiketter">', 1)[0]
     assert 'aria-hidden="true"' not in foer_etikettene.split("</figcaption>", 1)[1]
     assert '<div class="felt" aria-hidden="true">' in figur
+
+
+# d) Grunnen der signalet ikke kunne regnes (kl. 11:29).
+
+
+def _tallene_paa_aksjesiden(html: str) -> tuple[str, str]:
+    """(fikk, trenger) fra «Trenger M dager for å regne signal, fikk N»."""
+    funnet = re.search(r"Trenger (\d+) dager\s+for å regne signal, fikk (\d+)\.", html)
+    assert funnet, "aksjesiden sier ikke hvor mange dager"
+    return funnet.group(2), funnet.group(1)
+
+
+@pytest.mark.parametrize("side", ["/", "/min-liste?vis=alle"])
+def test_raden_sier_hvorfor_med_samme_tall_som_aksjesiden(klient, side):
+    """Ville feilet hvis raden for Varde Systemer bare sa «signalet kunne
+    ikke regnes» (U71), eller tallene sprikte fra aksjesiden."""
+    fikk, trenger = _tallene_paa_aksjesiden(_html(klient, "/aksje/VRDS"))
+    rad = next(rad for rad in _radene(_html(klient, side)) if '<a href="/aksje/VRDS">' in rad)
+    celler = re.findall(r"<td[^>]*>(.*?)</td>", rad, re.S)
+    assert _synlig(celler[3]) == f"– for kort historikk: {fikk} av {trenger} dager"
+
+
+@pytest.mark.parametrize("dag", [None, "2026-09-30"])
+def test_ruta_i_boersometeret_sier_hvorfor_med_samme_tall(klient, dag):
+    """Ville feilet hvis ruta ikke sa hvorfor, eller tallene for en valgt dag
+    var de for siste børsdag, ikke de aksjesiden viser for dagen."""
+    aksjesiden = "/aksje/VRDS" + (f"?periode=velg&dag={dag}" if dag else "")
+    fikk, trenger = _tallene_paa_aksjesiden(_html(klient, aksjesiden))
+    html = _html(klient, "/boersometer" + (f"?dag={dag}" if dag else ""))
+    ruter = html.split("</figure>", 1)[-1]
+    rute = re.search(r'<span class="ticker">VRDS</span>.*?</a>', ruter, re.S).group(0)
+    assert f"for kort historikk: {fikk} av {trenger} dager" in _synlig(rute)
+    if dag:
+        assert int(fikk) < 30
+
+
+def test_andre_grunner_staar_som_foer():
+    """Ville feilet hvis en annen grunn, eller en serie som er lang nok, fikk
+    tallene (for_kort_serie på aksjesiden sier dem bare da)."""
+    from markedsoversikt import GRUNNTEKST, grunn_med_tall
+    from signalberegning import nodvendige_dager
+    from tilstand import Art, Tilstand
+    from vurderingsdata import Grunn
+
+    trenger = nodvendige_dager()
+    ikke_regnet = Tilstand(Art.GRUNN, Grunn.SIGNAL_IKKE_REGNET)
+    tekst = GRUNNTEKST[Grunn.SIGNAL_IKKE_REGNET]
+    assert grunn_med_tall(ikke_regnet, tekst, trenger - 1) == f"for kort historikk: {trenger - 1} av {trenger} dager"
+    assert grunn_med_tall(ikke_regnet, tekst, trenger) == tekst
+    assert grunn_med_tall(ikke_regnet, tekst, None) == tekst
+    feilet = Tilstand(Art.GRUNN, Grunn.SYMBOL_FEILET)
+    assert grunn_med_tall(feilet, GRUNNTEKST[Grunn.SYMBOL_FEILET], 3) == GRUNNTEKST[Grunn.SYMBOL_FEILET]
+    assert grunn_med_tall(None, "ikke vurdert", 3) == "ikke vurdert"

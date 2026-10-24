@@ -958,7 +958,10 @@ HOEYDE_PAA_BILDET = 1630
 # det samme, fordi raden staar under «Øvrige aksjer».
 # Story 8.2a c: symbolene over søylene er lenker, i _hovedindeks.html, stil.css
 # og hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "09ee7e04d31081abffd114c51645377539a4595009aeb0255a42f7336297f9e7"
+# Story 8.2a d: grunnen med tall i markedsoversikt.py og hjelpetekster.py.
+# Bildet ble tatt paa nytt med samme hoeyde. Det er ikke byte for byte det
+# samme, men viser de samme radene og tallene.
+AVTRYKK_BAK_BILDET = "053fb620fcdff8dc09643282ebf1d1e691e1f4556188393588faf0ba2ac24762"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1080,7 +1083,9 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Story 8.2a c: stil.css og hjelpetekster.py. Bildet ble tatt paa nytt og er
 # byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "67893eb9f2deb450781abc469879b56b03b08950a13057667d5ade59e4a99584"
+# Story 8.2a d: app.py, markedsoversikt.py og hjelpetekster.py. Bildet ble
+# tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "de4a520f45b5c39a40f71f79d20d2040d5f9e4b1faa585b40dd1a4dce6ff597c"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "

@@ -292,10 +292,14 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         "uten_styrke": Hjelpetekst(
             "",
             "Står det «–» med en tekst under i stedet for et tall, finnes det "
-            "ingen vurdering for dagen, og teksten sier hvorfor.",
+            "ingen vurdering for dagen, og teksten sier hvorfor. "
+            # Story 8.2a, d (gruppens svar 24.10 kl. 11:29): tallene ved en
+            # kort kursserie, som på aksjesiden.
+            "Er kursserien for kort, står hvor mange dager den har og hvor mange signalet trenger.",
             (
                 (PRD, "| Signalstyrke | Tom |"),
                 (MARKEDSOVERSIKT, "GRUNNTEKST"),
+                (MARKEDSOVERSIKT, "def grunn_med_tall("),
                 (MARKEDSOVERSIKT, 'IKKE_VURDERT = "ikke vurdert"'),
                 (MARKEDSOVERSIKT, 'IKKE_BOERSDAG = "ikke børsdag"'),
             ),

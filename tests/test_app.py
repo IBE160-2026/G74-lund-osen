@@ -1210,7 +1210,8 @@ class TestStory80:
 
         assert "for å regne signal" in klient.get("/aksje/EQNR").data.decode("utf-8")
         # Story 2.2b: oversikten viser grunnen fra raden i vurdering.
-        assert "signalet kunne ikke regnes" in klient.get("/").data.decode("utf-8")
+        # Story 8.2a, d: med tallene, fordi serien er for kort.
+        assert "for kort historikk: 3 av 51 dager" in klient.get("/").data.decode("utf-8")
 
 
 def _rader_per_selskap(html: str) -> dict[str, list[str]]:

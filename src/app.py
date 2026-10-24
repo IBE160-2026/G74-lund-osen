@@ -83,6 +83,7 @@ from oversiktsdata import Oversiktsleser
 from perioder import AKSEMERKER, MAANEDSNAVN, OVERSKRIFT, SISTE, VELG, knappene, les_valg, startdag
 from signalberegning import BLANDET, STANDARD
 from tallformat import avrundet, dato, med_og, tall, ukedag
+from vurderingsdata import Grunn
 
 # Kommandoen den tomme siden ber brukeren kjoere. Den staar ogsaa i README, og
 # en test krever at de to er like (story 3.3). Kommer kommandoen for Docker i
@@ -671,7 +672,15 @@ def _tabellsiden(aktiv: str):
 
     poster = _leser_eller_basefeil(hent_oversiktsleser).oversikt()
     i_dag = idag()
-    rader = bygg_oversikt(poster, i_dag, STANDARD)
+    # Story 8.2a, d (gruppens svar 24.10 kl. 11:29): dagene i kursserien for
+    # aksjene der signalet ikke kunne regnes, så raden sier hvorfor med samme
+    # tall som aksjesiden. Bare for dem, så siden ikke leser alle seriene.
+    dager = {
+        post.aksje.symbol: len(leser.serie(post.aksje.symbol))
+        for post in poster
+        if post.innhold is Grunn.SIGNAL_IKKE_REGNET
+    }
+    rader = bygg_oversikt(poster, i_dag, STANDARD, dager)
     # Story 8.15: hver del sorteres for seg, så ingen rad flytter seg
     # mellom delene (tillegget 13.10). Linja om 3 av 3 og «N av M» bruker
     # rader, som står i FR-102 (svar 7).

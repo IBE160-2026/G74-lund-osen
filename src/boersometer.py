@@ -24,7 +24,7 @@ from datetime import date
 
 from hjelpetekster import ANTALL_SJEKKER
 from kursdata import Aksje, Kursrad
-from markedsoversikt import IKKE_VURDERT, endring_i_prosent, les_tilstand
+from markedsoversikt import IKKE_VURDERT, endring_i_prosent, grunn_med_tall, les_tilstand
 from signalberegning import STANDARD, Parametre
 from tallformat import desimaler_mot_grense, tall
 from tilstand import Art
@@ -180,6 +180,9 @@ def bygg_rute(
             er_siste=er_siste,
         )
     utfall, tekst = les_tilstand(innhold, dato, idag)
+    # Story 8.2a, d (gruppens svar 24.10 kl. 11:29): ruta sier hvorfor, med
+    # samme tall som aksjesiden for dagen, regnet av kursene til og med dato.
+    tekst = grunn_med_tall(utfall, tekst, len(kurser))
     vurdering = utfall.innhold if utfall is not None and utfall.art is Art.SVAR else None
     return Rute(
         aksje=aksje,
