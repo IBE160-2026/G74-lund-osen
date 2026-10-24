@@ -12,8 +12,8 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 ![Oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/oversikten-demo.png)
 *Oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»).*
 
-![Aksjesiden for Kvitstein Mineral (KVST) i demoen, med kursgrafen og KI-teksten, med oppdiktede tall («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/aksjesiden-kvst-demo.png)
-*Aksjesiden for KVST i demoen, med grafen og KI-teksten, med oppdiktede tall («Eksempeltall»).*
+![Aksjesiden for Kvitstein Mineral (KVST) i demoen, med kursgrafen og feltet for KI-teksten, der teksten ble stoppet av kontrollen, med oppdiktede tall («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/aksjesiden-kvst-demo.png)
+*Aksjesiden for KVST i demoen, med grafen og feltet for KI-teksten, der teksten ble stoppet av kontrollen og ikke vises, med oppdiktede tall («Eksempeltall»).*
 
 </details>
 

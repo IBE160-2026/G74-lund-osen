@@ -58,6 +58,11 @@ Versjon 3 rettes på grenen og prøvekjøres på nytt, og flettes bare hvis fær
 - Testene fra 10.2d med de 13 demotekstene fra versjon 2 (`tests/demo_ki_tekster_versjon_2.json`) er kjørt mot den nye kontrollen: ingen ble stoppet. Én form i `test_formene_om_en_sjekk_stoppes_ikke`, «… og bevegelsen ga et positivt utslag», stoppes nå, fordi bevegelsen er 0 i grunnlaget. Den står med trenden i stedet, som er 1.
 - Mot tekstene fra §43 stopper den nye kontrollen 10 av 15: MOWI, ORK og SALM på interessen, DNB, FRO, VAR, TEL, GJF og DNO på «minst» uten merket, og MPCC på «Ingen sjekk ga et positivt utslag» (styrken). EQNR og AKRBP består nå.
 
+**c) Demoen og prøvekjøringen:**
+- KI-tekstene i demoen er laget på nytt (`uv run python src/demo_ki.py`, 22:01:46–22:02:09): 10 av 13 besto. KVST ble stoppet på «det tredje på rad» (punkt 2, dagene er 1), og LKSV og TROY på «minst» uten merket. De 10 som besto, er lest mot grunnlaget, og ingen sier feil om en sjekk eller om dagene. Ingen ny runde (FR-604).
+- Fordi teksten for KVST ble stoppet, viser bildet av aksjesiden nå feltet for KI-teksten med «Ingen KI-tekst for denne dagen». Grafen slutter ved 1827 px, målt i Edge uten vindu, og bildet ble tatt på nytt med den høyden (`HOEYDE_PAA_AKSJESIDEN`, var 1872). Bildeteksten i README-en sier at teksten ble stoppet (regel 19).
+- Prøvekjøringen står i §44 i `malinger.md`, mot kopien `data/db/ki-proeve-v3b.db`, laget med skallet på main kl. 21:52 før grenen. Tekstene står bare i kopien.
+
 ## Boundaries & Constraints
 
 - Ingen kall til EODHD utover kvotesjekken i regel 15. `src/fetch_prices.py` kjøres ikke, og `data/db/ose.db` røres ikke (regel 22).
