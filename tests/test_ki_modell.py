@@ -815,6 +815,31 @@ class TestKontrollenVersjon3:
         svar = kontroller(tekst, DAGEN)
         assert not svar.besto and any(g.startswith("1: antallet") for g in svar.grunner), svar.grunner
 
+    @pytest.mark.parametrize(
+        "tekst, grunn",
+        [
+            ("Hovedindeksen har steget.", "1: hovedindeksen"),
+            ("Børsen har gått opp i dag.", "1: hovedindeksen"),
+            ("Bransjen har sunket.", "1: bransjen"),
+            ("Alle aksjene i lista steg.", "1: antallet"),
+            ("Begge aksjene falt.", "1: antallet"),
+        ],
+    )
+    def test_formene_fra_gjennomgangen_stoppes(self, tekst, grunn):
+        """Gjennomgangen av 10.2e (BH3, BH4, ECH1, ECH3): ville feilet hvis
+        perfektum slapp gjennom med feil retning, eller «alle» og «begge» ble
+        lest som styrkens 3 og 2. Grunnlaget har ikke antallet i lista, saa
+        «alle aksjene» kan ikke sjekkes og stoppes."""
+        svar = kontroller(tekst, DAGEN)
+        assert not svar.besto and any(g.startswith(grunn) for g in svar.grunner), svar.grunner
+
+    @pytest.mark.parametrize("tekst", ["Aksjen på børsen steg.", "Hovedindeksen har sunket.", "Bransjen har økt."])
+    def test_formene_fra_gjennomgangen_bestaar(self, tekst):
+        """Gjennomgangen av 10.2e (BH5, VG3): «Aksjen på børsen steg» gjelder
+        aksjen, ikke hovedindeksen."""
+        svar = kontroller(tekst, DAGEN)
+        assert svar.besto, svar.grunner
+
     def test_dagene_byttet_med_styrken(self):
         """Grunnlaget sier styrke 2 og 4 dager. Ville feilet hvis «to børsdager
         på rad» besto."""

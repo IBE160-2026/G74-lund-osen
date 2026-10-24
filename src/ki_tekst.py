@@ -47,6 +47,7 @@ noekkelen eller har tegn som ikke kan sendes, skrives ingen rader, og den kan
 legges inn og hentingen kjoeres igjen samme kveld. Noekkelen skrives aldri ut.
 """
 
+import sqlite3
 import sys
 import traceback
 from collections.abc import Callable, Mapping
@@ -182,9 +183,15 @@ def _grunnlagene(
     antall kommer med (ki_grunnlag)."""
     kurser = SqliteKurslager(tilkobling, lista)
     serier = {aksje.symbol: kurser.serie(aksje.symbol) for aksje in lista}
-    indekser = SqliteIndekslager(tilkobling)
-    symboler = indekser.symboler()
-    indeksserie = indekser.serie(valgt_indeks(symboler)) if symboler else None
+    # Gjennomgangen av 10.2e (BH9, VG2): kan indeksen ikke leses, faar
+    # grunnlaget ikke hovedindeksen, og tekstene lages likevel, som paa
+    # forsiden (app._hovedindeks).
+    try:
+        indekser = SqliteIndekslager(tilkobling)
+        symboler = indekser.symboler()
+        indeksserie = indekser.serie(valgt_indeks(symboler)) if symboler else None
+    except (sqlite3.Error, ValueError):
+        indeksserie = None
     grunnlagene = {}
     for aksje, vurdering in mangler:
         tidligere = vurderinger.les_periode(aksje.symbol, date.min, dato)

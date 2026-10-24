@@ -129,6 +129,48 @@ class TestSteget:
         grunnlag = radene(base, onsdag)["EQNR"].grunnlag
         assert (grunnlag["dager"], grunnlag["dager_merke"]) == (2, "minst")
 
+    def test_hovedindeksen_er_osebx_ogsaa_med_en_annen_indeks(self, stier):
+        """Gjennomgangen av 10.2e (VG1): ville feilet hvis grunnlaget tok
+        indeksen basen sist hentet, i stedet for OSEBX som forsiden viser.
+        OBX hentes etter OSEBX og faller, mens OSEBX stiger."""
+        from indeksdata import HOVEDINDEKS, Indeks
+        from kursdata import Kursrad
+        from lagring_sqlite import SqliteIndekslager
+
+        raa, base = stier
+        kjoer(raa, base, None)
+        obx = Indeks("OBX", "OBX.OL", "OBX")
+        tilkobling = aapne_base(base)
+        try:
+            SqliteIndekslager(tilkobling, (HOVEDINDEKS, obx)).erstatt_serie(
+                "OBX",
+                [
+                    Kursrad(dato=date(2026, 9, 21), slutt=1500.0, justert_slutt=1500.0, volum=0),
+                    Kursrad(dato=TIRSDAG, slutt=1400.0, justert_slutt=1400.0, volum=0),
+                ],
+                ONSDAG_KL_22,
+            )
+            assert SqliteIndekslager(tilkobling).symboler()[0] == "OBX"
+        finally:
+            tilkobling.close()
+        lag_ki_tekster(base, TIRSDAG, lambda: OEYEBLIKK, FalskModell(), lambda _: None)
+        assert radene(base)["EQNR"].grunnlag["hovedindeksen"] == "steg"
+
+    def test_en_indeks_som_ikke_kan_leses_stopper_ikke_tekstene(self, stier, monkeypatch):
+        """Gjennomgangen av 10.2e (BH9, VG2): ville feilet hvis en feil ved
+        lesingen av indeksen stoppet KI-teksten for alle aksjene. Grunnlaget
+        faar da ikke hovedindeksen, som forsiden, der indeksen ikke vises."""
+        raa, base = stier
+
+        def feiler(self):
+            raise sqlite3.OperationalError("no such table: indeksserie")
+
+        monkeypatch.setattr(ki_tekst.SqliteIndekslager, "symboler", feiler)
+        kjoer(raa, base, FalskModell())
+        rader = radene(base)
+        assert all(r is not None and r.besto for r in rader.values())
+        assert all("hovedindeksen" not in r.grunnlag and r.grunnlag["dager"] == 1 for r in rader.values())
+
     def test_ingen_kall_til_eodhd_fra_steget(self, stier, tmp_path):
         """Ville feilet hvis KI-steget gjorde et kall til EODHD (F5)."""
         raa, base = stier

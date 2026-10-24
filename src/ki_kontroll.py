@@ -229,11 +229,17 @@ _BEVEGELSESVERB = {
     "økte": STEG,
     "øker": STEG,
     "gikk opp": STEG,
+    # Gjennomgangen av 10.2e (BH4, ECH3): perfektum, «har steget».
+    "steget": STEG,
+    "økt": STEG,
+    "gått opp": STEG,
     "falt": FALT,
     "faller": FALT,
     "sank": FALT,
     "synker": FALT,
     "gikk ned": FALT,
+    "sunket": FALT,
+    "gått ned": FALT,
     "var uendret": UENDRET,
     "er uendret": UENDRET,
     "sto stille": UENDRET,
@@ -241,8 +247,9 @@ _BEVEGELSESVERB = {
 }
 _VERB = "|".join(sorted((v.replace(" ", r"\s+") for v in _BEVEGELSESVERB), key=len, reverse=True))
 _FELTET = {
-    # «Aksjen på Oslo Børs steg» gjelder aksjen, ikke børsen.
-    "hovedindeksen": r"(?:hovedindeks(?:en)?|indeksen|osebx|(?<!på\s)oslo\s+børs|børsen)",
+    # «Aksjen på Oslo Børs steg» og «Aksjen på børsen steg» gjelder aksjen,
+    # ikke børsen (gjennomgangen av 10.2e, BH5, VG3).
+    "hovedindeksen": r"(?:hovedindeks(?:en)?|indeksen|osebx|(?<!på\s)oslo\s+børs|(?<!på\s)børsen)",
     "bransjen": r"(?:bransjen|sektoren|aksjene\s+i\s+(?:samme\s+)?bransje(?:n)?(?:\s+som\s+denne)?)",
 }
 # Inntil fire ord mellom feltet og verbet: «Hovedindeksen på Oslo Børs steg»,
@@ -269,6 +276,18 @@ _AKSJER_UTSAGN = re.compile(
     re.IGNORECASE,
 )
 _DAGER_UTSAGN = re.compile(r"(?<![\w-])(\w+)\s+(?:børs)?dag(?:er)?\s+på\s+rad", re.IGNORECASE)
+
+
+# Gjennomgangen av 10.2e (BH3, ECH1): antallet aksjer og dager leses uten
+# «alle» og «begge», som i STYRKEORD gjelder de tre sjekkene.
+ANTALLORD = {**TALLORD, "en": 1, "én": 1, "ett": 1, "ingen": 0}
+
+
+def _antall(ord_: str) -> int | None:
+    ord_ = ord_.lower()
+    if ord_.isdecimal() and len(ord_) <= _LENGSTE_TALL:
+        return int(ord_)
+    return ANTALLORD.get(ord_)
 
 
 def _bevegelsen(verb: str) -> str:
@@ -412,12 +431,17 @@ def kontroller(tekst: str, grunnlag: Mapping[str, object]) -> Kontrollsvar:
                 if fasit is None or (sagt == fasit) == ikke:
                     grunner.append(f"1: {felt} «{treff.group(0)}», grunnlaget sier {fasit or 'ingenting'}")
     for treff in _AKSJER_UTSAGN.finditer(tekst):
-        tall = _styrketall(treff.group(1))
+        # «alle» eller «begge» aksjene kan ikke sjekkes: grunnlaget har ikke
+        # hvor mange aksjer lista har, saa utsagnet stoppes.
+        if treff.group(1).lower() in ("alle", "begge"):
+            grunner.append(f"1: antallet «{treff.group(0)}», grunnlaget har ikke antallet i lista")
+            continue
+        tall = _antall(treff.group(1))
         felt = {STEG: "aksjer_steg", FALT: "aksjer_falt"}.get(_bevegelsen(treff.group(2)))
         if tall is not None and (felt is None or tall != grunnlag.get(felt)):
             grunner.append(f"1: antallet «{treff.group(0)}», grunnlaget sier {grunnlag.get(felt, 'ingenting')}")
     for treff in _DAGER_UTSAGN.finditer(tekst):
-        tall = _styrketall(treff.group(1))
+        tall = _antall(treff.group(1))
         if tall is not None and tall != grunnlag.get("dager"):
             grunner.append(f"1: dagene «{treff.group(0)}», grunnlaget sier {grunnlag.get('dager', 'ingenting')}")
 
