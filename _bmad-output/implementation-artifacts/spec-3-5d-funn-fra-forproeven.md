@@ -114,6 +114,8 @@ Gjennomgang 24.10 etter hele settet, av `01a5f8d..7b784f0` på main og `7b784f0.
 - **Kommandolinja på Mac** er ikke slått opp. Sjekken venter `<mappa>/.venv/bin/waitress-serve` med full sti, som på Windows. Står stien annerledes, regnes den andre versjonen som et annet program, og ingenting stoppes. Steget «Porten på Windows og Mac» i CI bruker testens egen lytter, ikke uv.
 - **BH5:** om den andre versjonen skal stoppes rett før webserveren i stedet for før uv, er gruppens valg.
 
+*Lagt til 2026-10-24:* gruppen så «API token» under «Dashboard» hos EODHD på skjermen 24.10 kl. 12:16, under forprøven. Bildet kommer senere på siden for den ekte versjonen.
+
 ## Det som ikke endres
 
 - «Kom i gang», til gruppen har valgt hovedvei (svaret 23.10 kl. 16:37).
