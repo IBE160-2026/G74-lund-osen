@@ -266,10 +266,17 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "når kursene for aksjen sist ble hentet, i norsk tid.",
             ((PRD, "##### Hvor gamle dataene er"), (APP, "hentet=post.hentet")),
         ),
+        # Story 8.2a, b (U23): en aksje uten kurser har en rad nederst i
+        # tabellen, ikke bare navnet under den.
         "uten_data": Hjelpetekst(
-            "Uten data i denne kilden:",
-            "aksjer uten en eneste kurs. De står ikke i tabellen, men navnes under den, med lenke til aksjesiden.",
-            ((PRD, "Aksjer kilden ikke har en eneste kursrad for"), (MARKEDSOVERSIKT, "def uten_kurser(")),
+            "Uten data:",
+            "en aksje uten en eneste kurs står nederst i tabellen, med «–» i hver kolonne og «uten data» og "
+            "med lenke til aksjesiden.",
+            (
+                (PRD, "Aksjer kilden ikke har en eneste kursrad for"),
+                (MARKEDSOVERSIKT, "def uten_kurser("),
+                (MARKEDSOVERSIKT, "class RadUtenData"),
+            ),
         ),
         "signalstyrke": Hjelpetekst(
             "Signalstyrke:",

@@ -233,6 +233,43 @@ def uten_kurser(poster: list[Oversiktspost]) -> list[Aksje]:
     return [post.aksje for post in poster if post.nyeste is None]
 
 
+# Story 8.2a, b (U23, gruppens svar 24.10 kl. 11:34 og 11:35): teksten under
+# «–» i raden for en aksje uten en eneste kurs.
+UTEN_DATA = "uten data"
+
+
+@dataclass(frozen=True)
+class RadUtenData:
+    """Raden for en aksje uten en eneste kurs - story 8.2a, b (U23).
+
+    Hver aksje i lista har en rad, så tallet i overskriften stemmer med
+    tabellen. Raden står nederst, som Varde Systemer i demoen: navnet som
+    lenke, «–» i hver kolonne og «uten data». Den har de feltene malen og
+    sorteringen leser, uten verdier, så den står sist i FR-102 og i hver
+    sortering på en kolonne med tall. Den har ingen dato og ingen tid, og
+    er derfor ikke med blant radene datoen og tidspunktet på siden regnes av.
+    """
+
+    aksje: Aksje
+    tekst: str = UTEN_DATA
+    sluttkurs: None = None
+    endring_prosent: None = None
+    tilstand: None = None
+    dato: None = None
+    sist_hentet: None = None
+    skiller_seg_ut: bool = False
+    vurdering: None = None
+    styrke: None = None
+    ikke_vurdert: bool = False
+    sjekker: tuple = ()
+    retning: Retningsvisning = UKJENT_RETNING
+
+
+def rader_uten_data(poster: list[Oversiktspost]) -> list[RadUtenData]:
+    """En RadUtenData per aksje uten kurser, i rekkefølgen i lista."""
+    return [RadUtenData(aksje) for aksje in uten_kurser(poster)]
+
+
 def sidens_tidsstempel(rader: list[Rad]) -> datetime | None:
     """Det eldste sist_hentet blant radene som vises (FR-101).
 

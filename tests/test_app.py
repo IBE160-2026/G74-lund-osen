@@ -233,13 +233,16 @@ def test_symbolet_er_skjult_for_skjermlesere(klient, monkeypatch):
 
 
 def test_aksje_uten_data_navngis_i_fotnoten(klient, monkeypatch):
-    """Brukeren skal faa vite at oversikten er ufullstendig, ikke bare se faerre rader."""
+    """Brukeren skal faa vite at oversikten er ufullstendig, ikke bare se faerre rader.
+    Story 8.2a, b (U23): aksjen uten data har en rad med «uten data», ikke
+    en fotnote. Navnet paa testen er det gamle, fordi dokumentene viser til
+    testene ved navn."""
     monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [101.0])}))
 
     html = klient.get("/").data.decode("utf-8")
 
-    assert "Uten data i denne kilden" in html
-    assert "DNB Bank" in html
+    assert "Uten data i denne kilden" not in html
+    assert ["DNB Bank", "–", "–", "– uten data", "– Ukjent"] in _tabell(html).uten_data
 
 
 def test_uleselig_symbol_navngis_i_fotnoten(klient, monkeypatch):
@@ -254,8 +257,9 @@ def test_uleselig_symbol_navngis_i_fotnoten(klient, monkeypatch):
     html = klient.get("/").data.decode("utf-8")
 
     assert "Equinor" in html
-    assert "Uten data i denne kilden" in html
-    assert "DNB Bank" in html
+    # Story 8.2a, b (U23): en rad med «uten data», ikke en fotnote.
+    assert "Uten data i denne kilden" not in html
+    assert ["DNB Bank", "–", "–", "– uten data", "– Ukjent"] in _tabell(html).uten_data
     assert '<a href="/aksje/DNB">DNB Bank</a>' in html
     side = klient.get("/aksje/DNB")
     assert side.status_code == 200 and "Det finnes ingen kurser for DNB Bank ennå" in side.data.decode("utf-8")
@@ -346,7 +350,9 @@ class TestTidsstempler:
 
         assert hode.count("</th>") == 5
         rader = re.findall(r'<tr(?! class="del)[^>]*>.*?</tr>', kropp, re.DOTALL)
-        assert len(rader) == 2
+        # Story 8.2a, b: og en rad uten data for hver av de andre aksjene i
+        # migrasjonen, også med fem kolonner.
+        assert len([rad for rad in rader if ">uten data<" not in rad]) == 2
         for rad in rader:
             assert rad.count("</td>") == 5
 
@@ -902,7 +908,12 @@ class _Tabell(HTMLParser):
     klassen som noekkel, og ikke i cellen. Cellen er det den var foer.
 
     Story 8.3: stjernen foran navnet (skjemaet med klassen stjerne) staar
-    ogsaa i ekstra, saa cellen fortsatt er navnet."""
+    ogsaa i ekstra, saa cellen fortsatt er navnet.
+
+    Story 8.2a, b (U23): hver aksje i lista har en rad, ogsaa de i
+    migrasjonen som testen ikke gir kurser. Radene «uten data» staar i
+    uten_data og ikke i rader, saa testene gjelder radene med kurs, som foer.
+    Raden uten data proeves i TestStory82aRadUtenData og test_demoproeven.py."""
 
     EKSTRA = ("linje", "antall", "bak", "under", "stjerne")
 
@@ -912,6 +923,7 @@ class _Tabell(HTMLParser):
         self.rader: list[list[str]] = []
         self.deler: list[str] = []
         self.del_av: list[str] = []
+        self.uten_data: list[list[str]] = []
         self.ekstra: dict[str, list[str]] = {k: [] for k in self.EKSTRA}
         self._i_kropp = False
         self._i_del = False
@@ -952,6 +964,11 @@ class _Tabell(HTMLParser):
             return
         if tag == "tbody":
             self._i_kropp = False
+        elif (
+            tag == "tr" and self._i_kropp and not self._i_del and self.rader and self.rader[-1][3:4] == ["– uten data"]
+        ):
+            self.uten_data.append(self.rader.pop())
+            self.del_av.pop()
         elif tag in ("td", "th") and self._celle is not None:
             # Bare vanlige blanktegn slaas sammen. str.split() ville ogsaa
             # tatt det harde mellomrommet, som testene ser etter.
@@ -1328,7 +1345,10 @@ class TestVurderingenPaaOversikten:
 
         html = klient.get("/").data.decode("utf-8")
         # Navnene lenker til aksjesiden (gruppens svar 23.10 kl. 09:24, b).
-        fotnote = re.sub(r"<[^>]+>", "", html.split("Uten data i denne kilden:")[1].split("</p>")[0])
+        # Story 8.2a, b (U23): navnene står i radene uten data, ikke i en
+        # fotnote, i rekkefølgen i aksje.
+        assert "Uten data i denne kilden" not in html
+        fotnote = ", ".join(rad[0] for rad in _tabell(html).uten_data) + "."
         # Story 8.0d, PR 2b (VG1): M telles fra aksje, ikke fast 15 eller
         # AKSJEUNIVERS. Basen har 13 aksjer igjen.
         assert "<mark>0 av 13 aksjer</mark>" in html and " · 13 aksjer" in _synlig(html)
@@ -1946,7 +1966,8 @@ class TestStory80e:
             "Øvrige aksjer": ["Equinor"],
         }
         # Story 8.0d, PR 2 (BH10): grensene i båndene følger terskelen.
-        assert _tabell(html).ekstra["bak"] == ["signalstyrke 3 eller mer", "signalstyrke 0 til 2"]
+        # Story 8.2a, b: de 13 aksjene uten kurser er uten signal.
+        assert _tabell(html).ekstra["bak"] == ["signalstyrke 3 eller mer", "signalstyrke 0 til 2 og 13 uten signal"]
 
     def test_setningene_fra_8_0c_der_skilte_seg_ut_ellers_staar(self, klient):
         """Svar 3. Ville feilet hvis «Skilte seg ut» stod sammen med
@@ -1992,7 +2013,9 @@ class TestStory80e:
         assert _tabell(html).deler[0] == (
             f"Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer. {m - 1} av {m} aksjer ble vurdert."
         )
-        assert f"Uten data i denne kilden: {mangler.navn}." in _synlig(html)
+        # Story 8.2a, b (U23): en rad uten data, ikke en fotnote.
+        assert [rad[0] for rad in _tabell(html).uten_data] == [mangler.navn]
+        assert "Uten data i denne kilden" not in html
 
     def test_oevrige_sier_hvor_mange_som_er_uten_signal(self, klient):
         """Story 8.0d, PR 3 (BH2 i PR 2, svar 7): «og 1 uten signal» også når
@@ -2000,20 +2023,44 @@ class TestStory80e:
         _lagret("KOG", 0.0, 1, 1, 0)
         _lagret("EQNR", 0.0, 1, 0, 0)
         _lagret("DNB", 0.0, 0, 0, 0, vurdert=False)
+        # Story 8.2a, b (U23): de 12 aksjene uten kurser har en rad i båndet,
+        # uten signal, og telles med.
         tabell = _tabell(klient.get("/").data.decode("utf-8"))
-        assert tabell.ekstra["bak"] == ["signalstyrke 2 eller mer", "signalstyrke 0 eller 1 og 1 uten signal"]
-        assert tabell.ekstra["antall"] == ["1", "2"]
+        assert tabell.ekstra["bak"] == ["signalstyrke 2 eller mer", "signalstyrke 0 eller 1 og 13 uten signal"]
+        assert tabell.ekstra["antall"] == ["1", "14"]
         _lagret("MOWI", 0.0, 0, 0, 0, vurdert=False)
         tabell = _tabell(klient.get("/").data.decode("utf-8"))
-        assert tabell.ekstra["bak"][1] == "signalstyrke 0 eller 1 og 2 uten signal"
-        assert tabell.ekstra["antall"] == ["1", "3"]
+        assert tabell.ekstra["bak"][1] == "signalstyrke 0 eller 1 og 13 uten signal"
+        assert tabell.ekstra["antall"] == ["1", "14"]
 
     def test_alle_over_terskelen_gir_bare_skilte_seg_ut(self, klient):
         _lagret("EQNR", 1.0, 1, 1, 0)
         _lagret("KOG", 1.0, 1, 1, 1)
+        # Story 8.2a, b (U23): bare de to står i lista, fordi en aksje uten
+        # kurser har en rad under «Øvrige aksjer».
+        tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+        try:
+            with tilkobling:
+                tilkobling.execute("DELETE FROM aksje WHERE symbol NOT IN ('EQNR', 'KOG')")
+        finally:
+            tilkobling.close()
         html = klient.get("/").data.decode("utf-8")
         assert _tabell(html).deler == ["Skilte seg ut"]
         assert "Øvrige aksjer" not in html
+
+    def test_bare_aksjer_uten_kurser_under_oevrige(self, klient):
+        """Story 8.2a, b (U23): er alle med kurser over terskelen, står
+        aksjene uten kurser under «Øvrige aksjer», med antallet. Ville feilet
+        hvis de forsvant fordi «Øvrige aksjer» ellers var tom."""
+        from kursdata import AKSJEUNIVERS
+
+        for aksje in AKSJEUNIVERS[:2]:
+            _lagret(aksje.symbol, 1.0, 1, 1, 0)
+        tabell = _tabell(klient.get("/").data.decode("utf-8"))
+        uten = len(AKSJEUNIVERS) - 2
+        assert tabell.deler == ["Skilte seg ut", "Øvrige aksjer"]
+        assert len(tabell.uten_data) == uten
+        assert tabell.ekstra["antall"] == ["2", str(uten)]
 
     def test_uten_en_eneste_vurdering_er_det_én_del_uten_overskrift(self, klient):
         _lagret("EQNR", 1.0, 0, 0, 0, vurdert=False)
@@ -2101,10 +2148,12 @@ class TestStory80eTekst:
         m = len(AKSJEUNIVERS)
         assert len(_tabell(html).rader) == m - 1
         assert f"<mark>{m - 2} av {m} aksjer</mark>" in html
-        # VG2: båndene teller radene sine som før.
-        assert _tabell(html).ekstra["antall"] == [str(m - 2), "1"]
+        # VG2: båndene teller radene sine som før. Story 8.2a, b (U23): den
+        # ene uten kurser har en rad i «Øvrige aksjer», og telles der.
+        assert _tabell(html).ekstra["antall"] == [str(m - 2), "2"]
         assert f"Oslo Børs · 31.10 · {m} aksjer" in tekst
-        assert f"Uten data i denne kilden: {mangler.navn}." in tekst
+        assert [rad[0] for rad in _tabell(html).uten_data] == [mangler.navn]
+        assert "Uten data i denne kilden" not in tekst
 
     def test_ukedagen_er_datoen_i_linja_over_tabellen(self, klient):
         """Svar 5: den eldste datoen, som linja over tabellen (story 8.0), og
@@ -2224,7 +2273,12 @@ def _deler_i_rekkefoelge(html: str) -> tuple[list[str], list[str]]:
     står - story 8.15."""
     tbody = html.split("</thead>", 1)[1].split("</table>", 1)[0]
     ut, oevrige = tbody.split("Øvrige aksjer", 1) if "Øvrige aksjer" in tbody else (tbody, "")
-    finn = lambda del_: re.findall(r'<span class="linje">([A-Z0-9]+)', del_)
+    # Story 8.2a, b: uten radene «uten data», som i _Tabell.
+    finn = lambda del_: [
+        re.search(r'<span class="linje">([A-Z0-9]+)', rad).group(1)
+        for rad in re.findall(r"<tr[ >].*?</tr>", del_, re.S)
+        if '<span class="linje">' in rad and '<span class="merke mangler">uten data</span>' not in rad
+    ]
     return finn(ut), finn(oevrige)
 
 

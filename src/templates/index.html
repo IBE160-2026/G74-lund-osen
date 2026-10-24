@@ -41,7 +41,8 @@
               <span class="linje">{{ rad.aksje.symbol }}{% if rad.aksje.sektor %} · {{ bransjesymbol(rad.aksje.sektor) }}{{ rad.aksje.sektor }}{% endif %}</span>
               {% if rad.aksje.symbol in eget %}<span class="hentet">hentet {{ rad.sist_hentet|norsk_tid }}</span>{% endif %}</td>
 
-            <td class="tall">{{ rad.sluttkurs|tall('kurs') }}</td>
+            {#- Story 8.2a, b (U23): raden for en aksje uten kurser har «–». #}
+            <td class="tall">{% if rad.sluttkurs is not none %}{{ rad.sluttkurs|tall('kurs') }}{% else %}–{% endif %}</td>
 
             {# Fargen foelger tallet slik det vises: 0,00 % har ingen farge (story 8.0). #}
             {% set vist_endring = rad.endring_prosent|round(2) if rad.endring_prosent is not none else none %}
@@ -83,7 +84,8 @@
       når det er noe å merke, og fotnotene bare når tabellen står. Valget i
       «Alle / Min liste» har aria-current="true", fordi knappen i stripa
       alt er siden (BH10). #}
-  {% set vist_tabell = rader and (skilte_seg_ut or oevrige or ingen_skilte_seg_ut) %}
+  {#- Story 8.2a, b (U23): en aksje uten kurser har en rad i tabellen. #}
+  {% set vist_tabell = rader and (skilte_seg_ut or oevrige or ingen_skilte_seg_ut or mangler) %}
   {% if aktiv == "min_liste" %}
     <h1 class="overskrift">Min liste</h1>
     {% if rader %}
@@ -191,10 +193,13 @@
         </td></tr>
       </tbody>
       {% endif %}
-      {% if oevrige %}
+      {#- Story 8.2a, b (U23): radene for aksjene uten kurser står nederst,
+          etter radene uten signal, og telles med i antallet. #}
+      {% if oevrige or mangler %}
       <tbody>
-        {% if foerste_del %}<tr class="del oevrige"><th colspan="5" scope="rowgroup">Øvrige aksjer <span class="antall">{{ oevrige|length }}</span> <span class="bak">signalstyrke 0{% if parametre.terskel == 2 %} eller 1{% elif parametre.terskel > 2 %} til {{ parametre.terskel - 1 }}{% endif %}{% set uten_signal = oevrige|selectattr("styrke", "none")|list|length %}{% if uten_signal %} og {{ uten_signal }} uten signal{% endif %}</span></th></tr>{% endif %}
+        {% if foerste_del %}<tr class="del oevrige"><th colspan="5" scope="rowgroup">Øvrige aksjer <span class="antall">{{ oevrige|length + mangler|length }}</span> <span class="bak">signalstyrke 0{% if parametre.terskel == 2 %} eller 1{% elif parametre.terskel > 2 %} til {{ parametre.terskel - 1 }}{% endif %}{% set uten_signal = (oevrige|selectattr("styrke", "none")|list|length) + mangler|length %}{% if uten_signal %} og {{ uten_signal }} uten signal{% endif %}</span></th></tr>{% endif %}
         {% for rad in oevrige %}{{ tabellrad(rad) }}{% endfor %}
+        {% for rad in mangler %}{{ tabellrad(rad) }}{% endfor %}
       </tbody>
       {% endif %}
     </table>
@@ -207,12 +212,8 @@
       {% include "_fotnote_ikke_vurdert.html" %}
     {% endif %}
 
-    {% if mangler %}
-      <p class="fotnote">
-        {#- Gruppens svar 23.10 kl. 09:24 (b): navnet lenker til aksjesiden. #}
-        Uten data i denne kilden: {% for aksje in mangler %}<a href="/aksje/{{ aksje.symbol }}">{{ aksje.navn }}</a>{{ ", " if not loop.last }}{% endfor %}.
-      </p>
-    {% endif %}
+    {#- Story 8.2a, b (U23): fotnoten «Uten data i denne kilden» er borte,
+        fordi aksjene uten kurser har en rad i tabellen. #}
 
     <p class="fotnote">
       Sluttkursen er den ujusterte kursen aksjen omsettes til. Endringen er

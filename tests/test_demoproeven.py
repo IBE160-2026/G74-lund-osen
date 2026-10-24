@@ -7,6 +7,7 @@ flytter BASE_STI. Ingen nett og ingen henting.
 
 import re
 import shutil
+import sqlite3
 from datetime import datetime, timezone
 
 import pytest
@@ -100,3 +101,72 @@ def test_ankeret_for_ki_teksten_finnes_med_bryteren_av_og_paa(klient):
     assert re.search(rf'<form class="ki-bryter" id="{app_modul.KI_ANKER}"', av)
     for html in (av, paa):
         assert html.count(f'id="{app_modul.KI_ANKER}"') == 1
+
+
+# b) Hver aksje i lista har en rad (U23, kl. 11:34 og 11:35).
+
+
+def _radene(html: str) -> list[str]:
+    """Radene i tabellen, uten radene med delenes overskrift."""
+    tabell = html.split("<table>", 1)[1].split("</table>", 1)[0]
+    return [rad for rad in re.findall(r"<tr[ >].*?</tr>", tabell, re.S) if '<td class="selskap">' in rad]
+
+
+def _synlig(html: str) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html)).strip()
+
+
+def test_aksjen_uten_kurser_har_en_rad_nederst_og_ingen_fotnote(klient):
+    """Ville feilet hvis Matfjord Merkevarer bare sto i fotnoten (U72), raden
+    manglet lenken, «–» eller «uten data», eller ikke sto nederst."""
+    html = _html(klient, "/")
+    radene = _radene(html)
+    assert "Uten data i denne kilden" not in html
+    siste = radene[-1]
+    assert '<a href="/aksje/MTFJ">Matfjord Merkevarer</a>' in siste
+    celler = re.findall(r"<td[^>]*>(.*?)</td>", siste, re.S)
+    assert len(celler) == 5
+    assert [_synlig(celle) for celle in celler[1:3]] == ["–", "–"]
+    assert _synlig(celler[3]) == "– uten data"
+    assert _synlig(celler[4]).startswith("–")
+    assert sum("Matfjord Merkevarer" in rad for rad in radene) == 1
+
+
+def test_tallet_i_overskriften_og_linja_under_er_antallet_rader(klient):
+    """Ville feilet hvis «7 av 15» talte en aksje som ikke hadde en rad, så
+    tabellen hadde 14 rader (U23)."""
+    html = _html(klient, "/")
+    antall = len(_radene(html))
+    assert antall == 15
+    assert f"av {antall} aksjer</mark> skilte seg ut" in html
+    assert f"· {antall} aksjer</p>" in html
+
+
+def test_tallet_foelger_lista_naar_en_aksje_legges_til(klient):
+    """Ville feilet hvis tallet var fast, så en aksje lagt til lista (2.12)
+    ikke fikk en rad eller ikke ble talt."""
+    tilkobling = sqlite3.connect(demo_sti())
+    try:
+        with tilkobling:
+            tilkobling.execute(
+                "INSERT INTO aksje (symbol, ticker, navn, sektor) VALUES ('NYTT', 'NYTT.OL', 'Nytt Selskap', 'Industri')"
+            )
+    finally:
+        tilkobling.close()
+    html = _html(klient, "/")
+    radene = _radene(html)
+    assert len(radene) == 16 and "av 16 aksjer</mark>" in html and "· 16 aksjer</p>" in html
+    assert '<a href="/aksje/NYTT">Nytt Selskap</a>' in "".join(radene[-2:])
+
+
+def test_aksjen_uten_kurser_har_en_rad_i_min_liste(klient):
+    """Ville feilet hvis en merket aksje uten kurser bare sto i en fotnote i
+    Min liste, eller ikke ble talt på knappen."""
+    foer = _html(klient, "/min-liste")
+    antall = int(re.search(r'Min liste <span class="antall">(\d+)</span>', foer).group(1))
+    svar = klient.post("/min-liste/merk", data={"symbol": "MTFJ", "til": "merk", "tilbake": "/min-liste"})
+    assert svar.status_code == 303
+    html = _html(klient, "/min-liste")
+    assert f'Min liste <span class="antall">{antall + 1}</span>' in html
+    assert '<a href="/aksje/MTFJ">Matfjord Merkevarer</a>' in _radene(html)[-1]
+    assert "Uten data i denne kilden" not in html

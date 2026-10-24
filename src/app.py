@@ -72,10 +72,10 @@ from markedsoversikt import (
     neste_orden,
     norsk_tid,
     oppdatert,
+    rader_uten_data,
     sidens_dato,
     sidens_tidsstempel,
     sorter,
-    uten_kurser,
 )
 from migrering import MigrasjonsFeil
 from minliste import UkjentAksje
@@ -680,14 +680,18 @@ def _tabellsiden(aktiv: str):
     tre_av_tre = frozenset(rad.aksje.symbol for rad in rader if rad.styrke == ANTALL_SJEKKER)
     # Story 8.3: merkingen leses fra sin egen port, bare lesing her.
     merkede = _leser_eller_basefeil(lambda: SqliteMinlistelager(g.tilkobling)).merkede()
-    mangler = uten_kurser(poster)
+    # Story 8.2a, b (U23): en aksje uten kurser har en rad nederst, ikke
+    # bare navnet i en fotnote.
+    alle_uten_data = rader_uten_data(poster)
+    mangler = alle_uten_data
     # Gjennomgangen (BH8, ECH2): antallet er de merkede som har en rad i
-    # tabellen, saa knappen og tabellen sier det samme.
-    antall_merket = sum(rad.aksje.symbol in merkede for rad in rader)
+    # tabellen, saa knappen og tabellen sier det samme. Story 8.2a, b: ogsaa
+    # en merket aksje uten kurser, som naa har en rad.
+    antall_merket = sum(rad.aksje.symbol in merkede for rad in (*rader, *alle_uten_data))
     if i_lista and not alle:
         skilte_seg_ut = [rad for rad in skilte_seg_ut if rad.aksje.symbol in merkede]
         oevrige = [rad for rad in oevrige if rad.aksje.symbol in merkede]
-        mangler = uten_kurser([post for post in poster if post.aksje.symbol in merkede])
+        mangler = [rad for rad in mangler if rad.aksje.symbol in merkede]
     hovedindeks, indeks_feilet = (None, False) if i_lista else _hovedindeks(leser, poster, tre_av_tre)
     # Story 3.4e: datoene som er «ikke vurdert» i det siden viser, én gang.
     ikke_vurdert = [rad.dato for rad in (*skilte_seg_ut, *oevrige) if rad.ikke_vurdert]
@@ -702,8 +706,10 @@ def _tabellsiden(aktiv: str):
         eget=eldre_enn_nyeste(rader),
         mangler=mangler,
         # Story 8.0d, PR 2b: M i «N av M aksjer» er alle aksjene i lista,
-        # også de uten kurser (beslutningen 14.10).
-        antall_aksjer=len(poster),
+        # også de uten kurser (beslutningen 14.10). Story 8.2a, b (U23): M er
+        # antallet rader i tabellen, med raden for hver aksje uten kurser, så
+        # «7 av 15» stemmer og følger lista når aksjer legges til (2.12).
+        antall_aksjer=len(rader) + len(alle_uten_data),
         ikke_vurdert=bool(ikke_vurdert),
         **_fotnoten(ikke_vurdert, i_dag),
         # Gjennomgangen (BH7, ECH1): «Alle» i Min liste er samme tabell som
