@@ -1943,6 +1943,8 @@ følger aksjene jeg bryr meg om.
 
 *Lagt til 2026-10-23 kl. 22:07 (målingen etter gruppens svar 23.10 kl. 11:56, `malinger.md` §41):* de fire første «Common Stock» i lista fra §40 som ikke var rangert, 2020 Bulkers (2020), 5Th Planet Games (5PG), Aasen Sparebank (AASB) og Arctic Bioscience (ABS), har median omsetning på 0,9, 0,1, 0,0 og 0,0 MNOK og plass 130, 150, 165 og 164 av 166. Ingen er over 25 MNOK. Lista står alfabetisk, så de fire er de første i alfabetet. Kallene var de 4 som var igjen av dagskvoten 23.10 etter hentingen, og bonuskvoten er ikke brukt.
 
+*Avgjort 2026-10-24 kl. 10:00 (gruppens svar):* dagens 20 kall, hele dagskvoten 24.10 i GMT på en dag uten henting, går til `malinger.md` §42: de neste 20 med typen «Common Stock» i lista fra §40 som ikke er rangert, valgt som i §41, i rekkefølgen i svaret og uten de som står i rangeringen i §41. Bonuskvoten brukes ikke.
+
 ### Story 2.13: Kommandoen som måler omsetning
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
