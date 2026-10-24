@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-25T00:21
+updated: 2026-10-25T01:15
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -4964,3 +4964,52 @@ kopien og er ikke ført her.
 13 av 15 er under kravet i gruppens svar kl. 23:23 (15 av 15), så versjon 3
 flettes ikke. Den består også færre enn versjon 2 på samme dag (15), etter
 beslutningen 16.10 kl. 23:51 (2).
+
+## 46. Prøvekjøringen av prompten versjon 3 uten dagene (2026-10-25)
+
+**Metode.** Som i §45, etter gruppens svar 25.10 kl. 00:50 og 00:51: et fjerde
+forsøk med versjon 3, der modellen ikke får dagene og ikke nevner dem. Appen
+skriver dagene selv i en setning rett under KI-teksten på aksjesiden. Den
+flettes bare med 15 av 15 og ingen tekst med feil. Grunnlaget har fortegnene,
+styrken, retningen, hovedindeksen, antallet aksjer som steg og falt, og
+bransjen, men ikke `dager` eller `dager_merke`. Prompten sier at teksten ikke
+sier hvor lenge signalet har vart, om det er nytt, eller om det er første gang.
+Kontrollen stopper dagene i enhver form (spesifikasjonen 10.2e, «Fjerde
+forsøk»). Basen ble kopiert med skallet på main til
+`data/db/ki-proeve-v3d.db` søndag 25.10 kl. 00:56:04, før grenen (regel 22),
+med samme sha256 som `ose.db`. Kopien hadde de 15 radene med versjon 2 fra
+kveldshentingen 23.10, alle bestått. De ble slettet i kopien, og bare der, med
+utløseren `ki_logg_slettes_ikke` tatt bort og satt inn igjen. Bare KI-steget
+ble kjørt mot kopien for børsdagen 23.10, med den ekte klokka, fra et skript
+utenfor repoet, og tiden per kall ble tatt med `time.monotonic()`. Ingen kall
+til EODHD: kvoten sto på 20 brukt kl. 00:55, og steget leser bare basen.
+sha256 for `data/db/ose.db` var den samme før og etter (`e3184c07…f4a4`).
+
+Hver av de 15 tekstene er lest mot grunnlaget: hver sjekk, og at dagene ikke
+nevnes. Med kontrollen fra 10.2e a) består fortsatt alle 15 tekstene fra §34.
+Av tekstene fra §43 består 2, fra §44 1 og fra §45 ingen, fordi de nevner
+dagene.
+
+| | §34, versjon 2, 16.10 | §43, versjon 3, 23.10 | §44, versjon 3 rettet, 23.10 | §45, versjon 3 med ordlyden, 23.10 | §46, versjon 3 uten dagene, 23.10 |
+|---|---:|---:|---:|---:|---:|
+| Kjørt | 23:43–23:44 | 20:31:25–20:31:36 | 22:05:12–22:05:22 | 00:20:45–00:20:56 | 01:15:01–01:15:17 |
+| Besto kontrollen | 15 | 12 | 11 | 13 | 15 |
+| Stoppet av kontrollen | 0 | 3 | 4 | 2 | 0 |
+| Modellen feilet | 0 | 0 | 0 | 0 | 0 |
+| Median tid per tekst | 0,77 s | 0,73 s | 0,65 s | 0,73 s | 0,43 s |
+| Lengste kall | 81,36 s (det første, med innlasting) | 1,01 s (modellen var lastet) | 0,85 s (modellen var lastet) | 0,96 s (modellen var lastet) | 9,27 s |
+| Tekster med feil som slapp gjennom | 0 | 9 | 0 | 0 | 0 |
+
+§46: `maskinvare` `gpu` for alle 15 og «100% GPU» i `ollama ps`,
+`gemma4:e4b` med `modell_id` `dc35e8d9c606`, og Ollama 0.35.1. Alle 15 radene
+har `promptversjon` 3. Hvilket kall som tok 9,27 s, ble ikke ført.
+
+**Resultat.** Kontrollen stoppet ingen av de 15. Ingen tekst sier feil om en
+sjekk, og ingen nevner dagene. To forklarer styrken («Styrken er tre, fordi
+alle tre sjekkene ga et utslag»), og VAR forklarer også regelen for hver
+sjekk, i samsvar med fortegnene. Ingen tekst nevner hovedindeksen, bransjen
+eller antallet aksjer, og ingen gir råd eller gjetter på en årsak. Tekstene
+står bare i kopien og er ikke ført her.
+
+15 av 15 er kravet i gruppens svar 25.10 kl. 00:51, og versjon 3 består like
+mange som versjon 2 på samme dag (15), etter beslutningen 16.10 kl. 23:51 (2).

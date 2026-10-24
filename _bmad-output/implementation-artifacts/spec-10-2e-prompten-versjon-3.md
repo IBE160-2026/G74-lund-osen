@@ -98,6 +98,8 @@ Gruppen ville prøve igjen (kl. 00:50). Modellen får ikke dagene og nevner dem 
 - KI-tekstene i demoen er laget på nytt, 01:09:25–01:09:44: 13 av 13 besto, og ingen nevner dagene. Hver er lest mot grunnlaget, og ingen sier feil om en sjekk. Bildet viser fortsatt BRFE, der teksten besto, nå med setningen, 1280 × 1934, målt i Edge uten vindu (var 1872). README-teksten under bildet, høyden, `src/dagene.py` i filene bak aksjesiden og avtrykket følger med.
 - `test_ma_vinduet_kommer_fra_parametre` tar KI-feltet ut før den ser etter «de siste 50 børsdagene», fordi den nye demoteksten for BRFE forklarer regelen med det faste tallet.
 
+**c) Prøvekjøringen** (§46 i `malinger.md`), mot kopien `data/db/ki-proeve-v3d.db`, laget med skallet på main kl. 00:56:04 før grenen, med samme sha256 som `ose.db`. Kjørt 01:15:01–01:15:17: 15 av 15 besto, 0 ble stoppet, og modellen feilet for 0. Hver tekst er lest mot grunnlaget. Ingen sier feil om en sjekk, og ingen nevner dagene. Med kontrollen fra a) består fortsatt alle 15 fra §34.
+
 ## Boundaries & Constraints
 
 - Ingen kall til EODHD utover kvotesjekken i regel 15. `src/fetch_prices.py` kjøres ikke, og `data/db/ose.db` røres ikke (regel 22).
