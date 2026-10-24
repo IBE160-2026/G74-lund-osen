@@ -45,6 +45,8 @@ Hvert punkt har tester med «Ville feilet hvis», uten nett. Hjelpetekstene og `
 - **Raden uten data** er en egen type, `RadUtenData` i `src/markedsoversikt.py`, med de samme feltene som malen og sorteringen leser. Den har ingen dato og ingen tid, så den er ikke med i `rader`, som datoen og tidspunktet på siden regnes av.
 - **Grunnen med tall** står bare når grunnen er «signalet kunne ikke regnes» og serien er kortere enn signalet trenger, som `for_kort_serie` på aksjesiden. Andre grunner står som før.
 
+*Lagt til 2026-10-24 (gjennomgangen, VG3 og BH6):* sortert er tabellen én liste uten delene, og da står heller ikke setningene fra 8.0c, «Ingen aksjer skilte seg ut» og «N av M aksjer ble vurdert», som står i stedet for «Skilte seg ut». Uten sortering står de som før. `test_sortert_uten_noen_som_skilte_seg_ut_er_en_liste_uten_setningene` holder det slik.
+
 ## Planen, én commit per punkt
 
 1. Spesifikasjonen.
@@ -58,6 +60,44 @@ Hvert punkt har tester med «Ville feilet hvis», uten nett. Hjelpetekstene og `
 ## Mutantene
 
 Én om gangen, med `-x`, med kopi før og sha256 mot HEAD etter: ankeret borte (a), raden uten data borte (b), lenken borte (c), grunnen borte (d) og sorteringen tilbake innenfor hver del (e).
+
+*Lagt til 2026-10-24:* kjørt 14:32:22–14:32:31 på `7ca19d9`, i arbeidskopien, mot `tests/test_demoproeven.py`. Hver fil ble kopiert før, og etter mutanten var sha256 lik kopien og `git hash-object` lik `HEAD:<sti>`. Alle ble fanget:
+
+| # | Mutant | Fanget av |
+|---|---|---|
+| M1 | Ankeret borte fra periodeknappene i `_perioder.html` | `test_periodeknappene_og_velg_dag_gaar_til_kursgrafen` |
+| M2 | Radene uten data borte fra `index.html` | `test_aksjen_uten_kurser_har_en_rad_nederst_og_ingen_fotnote` |
+| M3 | `href` borte fra symbolet over søyla i `_hovedindeks.html` | `test_symbolene_over_soeylene_lenker_til_aksjesiden[/]` |
+| M4 | `grunn_med_tall` gir teksten uten tall | `test_raden_sier_hvorfor_med_samme_tall_som_aksjesiden[/]` |
+| M5 | Sorteringen tilbake innenfor hver del i `app.py` | `test_sortert_er_hele_lista_en_liste_uten_delene[synkende]` |
+
+## Gjennomgangen 24.10
+
+Gjennomgang 24.10 etter hele settet (3316 bestått og 17 hoppet over), av endringene i dag for 8.2a: `0b98f42..3a4fb86` på main og `3a4fb86..7ca19d9` på grenen, uten bildene. Linsene var Blind Hunter (BH, 15 funn), Edge Case Hunter (ECH, 6 funn) og Verification Gap (VG, 5 funn), hver for seg og uten å endre noe i repoet. 26 funn ble 21 rader. Funnene er rettet med en gang (svaret 23.10 kl. 15:53), i `4be99ed` (dokumentene) og `c44e165` (koden og testene).
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH1 | PRD-en sa at en aksje uten kurser navngis under tabellen, og hjelpeteksten viste til den setningen | high | rettet i `4be99ed` og `c44e165`: en datert linje under avsnittet i `prd.md`, og hjelpen viser til den |
+| BH2 | `serie()` uten vern kunne gi en feilside for hele oversikten (NFR-03) | medium | rettet i `c44e165`: `_dager_i_serien` med vern, og `test_en_serie_som_ikke_kan_leses_gir_grunnen_uten_tall` |
+| BH3, VG1 | Testhjelperne i `test_app.py` legger radene uten data for seg, og klassen docstringen viste til, fantes ikke | medium | rettet i `c44e165`: `TestStory82aRadUtenData` prøver hvor radene står, også sortert |
+| BH4 | Båndet talte aksjene uten kurser som «uten signal» | medium | rettet i `c44e165`: «og N uten signal og M uten data» |
+| VG2 | Min liste med bare en aksje uten kurser var ikke prøvd | medium | rettet i `c44e165`: `test_min_liste_med_bare_aksjen_uten_kurser_har_tabellen` |
+| VG3, BH6 | Sortert uten noen som skilte seg ut var ikke prøvd, og setningene fra 8.0c står da ikke | low | rettet i `c44e165`: testen, og linja under «Valg» |
+| ECH1 | N talte hele serien, ikke radene til og med dagen grunnen gjelder | low | rettet i `c44e165` |
+| ECH2, BH10 | Ruta i børsometeret brukte standard Parametre, ikke dem oversikten får | nit og low | rettet i `c44e165`: `p` gjennom `bygg_rute` |
+| ECH3, BH7 | Raden uten data kunne komme foran en rad med kurs ved lik nøkkel, og hjelpen sa nederst også sortert | low | rettet i `c44e165`: sist blant radene uten verdi, og hjelpen sier «uten sortering». Sortert på Selskap står raden etter navnet |
+| ECH4, BH9 | Lenkene over søylene og lista for skjermleseren gir aksjene to ganger, og kommentaren sa at alt er skjult | low | rettet i `c44e165`: kommentaren. Lista står, fordi den har tallene. Fokus: `*:focus-visible` i `stil.css` gjelder også lenkene |
+| BH5 | `len(rader) + len(alle_uten_data)` er lik `len(poster)` | low | rettet i `c44e165`: kommentaren sier det, og definisjonen fra 14.10 står |
+| BH13 | To konstanter heter `UTEN_DATA`, med ulik stor bokstav | nit | rettet i `c44e165`: `UTEN_DATA_TEKST` i `markedsoversikt.py` |
+| BH14 | `deferred-work.md` og `epic-8-context.md` beskrev fotnoten og sorteringen innenfor hver del | nit | rettet i `4be99ed` med daterte linjer |
+| VG4 | Andre steg i testen av båndet kunne ikke feile alene | nit | rettet i `c44e165`: MOWI går fra uten data til uten signal |
+| VG5 | Navnet i `aria-label` var bare sjekket på slutten | nit | rettet i `c44e165`: lik navnet i tabellen |
+| BH8 | KI-bryteren beholder ikke en periode som 1 år | low | uten endring: som før 8.2a, bare `?dag=` er med (8.16b). Ikke i svaret |
+| ECH6 | Aksjene uten kurser navngis ikke når ingen aksje har kurser | low | uten endring: da gir `hent_leser` ingen leser, og siden sier at basen er tom |
+| BH11 | Eksemplet «32 av 50 dager» under story 8.2 stemmer ikke med demoen | nit | uten endring: eksemplet er gruppens. Demoen sier «30 av 51 dager» |
+| BH12 | Kommentaren ved bildet etter d) | nit | avvist: bildet slutter etter «Skilte seg ut», før raden til Varde Systemer |
+| BH15 | Raden uten data har «– Ukjent» i Retning | nit | uten endring: valgt som Varde Systemer under «Valg». Gruppen avgjør om det skal være bare «–» |
+| ECH5 | Ankeret for KI-teksten finnes ikke når siden ikke har sjekker | nit | uten endring: krever at dataene endres mellom visningen og klikket |
 
 ## Det som ikke endres
 
