@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300" role="img" aria-labelledby="lstf-t lstf-d">
+  <title id="lstf-t">Lastfjord Container</title>
+  <desc id="lstf-d">Et containerskip i en fjord. En kran senker den siste containeren ned i det eneste hullet, og det glitrer rundt.</desc>
+  <g stroke="#16181D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 232 L70 150 L120 198 L180 128 L250 208 L300 160 L412 232 Z" fill="#ECEAE4"/>
+    <path d="M8 230 Q58 222 108 230 T208 230 T308 230 T412 230 V272 H8 Z" fill="#E7EEFC"/>
+    <path d="M30 256 h30 M380 258 h20" fill="none" stroke="#1F4E8C" stroke-width="2.5"/>
+    <path d="M58 214 H348 L332 242 H74 Z" fill="#1F4E8C"/>
+    <rect x="80" y="190" width="50" height="24" fill="#B86E12"/>
+    <rect x="130" y="190" width="50" height="24" fill="#F2B53A"/>
+    <rect x="180" y="190" width="50" height="24" fill="#7FD1A1"/>
+    <rect x="230" y="190" width="50" height="24" fill="#D6D3CA"/>
+    <rect x="280" y="190" width="50" height="24" fill="#F8DE9C"/>
+    <rect x="80" y="166" width="50" height="24" fill="#D6D3CA"/>
+    <rect x="130" y="166" width="50" height="24" fill="#7FD1A1"/>
+    <rect x="180" y="166" width="50" height="24" fill="#B86E12"/>
+    <rect x="280" y="166" width="50" height="24" fill="#F2B53A"/>
+    <path d="M90 194 v16 M100 194 v16 M110 194 v16 M120 194 v16 M140 194 v16 M150 194 v16 M160 194 v16 M170 194 v16 M190 194 v16 M200 194 v16 M210 194 v16 M220 194 v16 M240 194 v16 M250 194 v16 M260 194 v16 M270 194 v16 M290 194 v16 M300 194 v16 M310 194 v16 M320 194 v16" fill="none" stroke-width="1.5"/>
+    <path d="M90 170 v16 M100 170 v16 M110 170 v16 M120 170 v16 M140 170 v16 M150 170 v16 M160 170 v16 M170 170 v16 M190 170 v16 M200 170 v16 M210 170 v16 M220 170 v16 M290 170 v16 M300 170 v16 M310 170 v16 M320 170 v16" fill="none" stroke-width="1.5"/>
+    <path d="M378 232 V48 M378 56 H246 M378 80 L350 56" fill="none" stroke-width="4.5"/>
+    <rect x="356" y="84" width="34" height="26" rx="3" fill="#F2B53A"/>
+    <rect x="362" y="90" width="22" height="12" fill="#FFFFFF" stroke-width="2"/>
+    <path d="M255 56 V128" fill="none" stroke-width="2"/>
+    <rect x="230" y="128" width="50" height="24" fill="#6A46A0"/>
+    <path d="M240 132 v16 M250 132 v16 M260 132 v16 M270 132 v16" fill="none" stroke="#F0EBF8" stroke-width="1.5"/>
+    <path d="M230 128 l25 -8 l25 8" fill="none" stroke-width="2"/>
+    <path d="M214 150 l3 -9 l3 9 l9 3 l-9 3 l-3 9 l-3 -9 l-9 -3 Z M296 146 l2 -6 l2 6 l6 2 l-6 2 l-2 6 l-2 -6 l-6 -2 Z" fill="#F2B53A" stroke-width="1.5"/>
+  </g>
+</svg>

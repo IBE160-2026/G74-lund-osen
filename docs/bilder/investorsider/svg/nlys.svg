@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300" role="img" aria-labelledby="nlys-t nlys-d">
+  <title id="nlys-t">Nordlysfeltet</title>
+  <desc id="nlys-d">Nordlys formet som sinuskurver over en oljeplattform i havet, der en liten figur peker opp mot himmelen.</desc>
+  <rect x="8" y="14" width="404" height="200" rx="16" fill="#16181D"/>
+  <g fill="#FFFFFF">
+    <circle cx="40" cy="40" r="1.8"/><circle cx="96" cy="30" r="1.4"/><circle cx="150" cy="48" r="1.8"/>
+    <circle cx="210" cy="28" r="1.4"/><circle cx="268" cy="44" r="1.8"/><circle cx="330" cy="30" r="1.4"/>
+    <circle cx="384" cy="52" r="1.8"/><circle cx="60" cy="176" r="1.4"/><circle cx="380" cy="184" r="1.4"/>
+  </g>
+  <path d="M30 170 H390" stroke="#5F646C" stroke-width="1.5" fill="none"/>
+  <path d="M90 166 v8 M150 166 v8 M210 166 v8 M270 166 v8 M330 166 v8" stroke="#5F646C" stroke-width="1.5" fill="none"/>
+  <path d="M30 104 C70 50 110 50 150 104 S230 158 270 104 S350 50 390 104" stroke="#13703C" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <path d="M30 104 C70 50 110 50 150 104 S230 158 270 104 S350 50 390 104" stroke="#7FD1A1" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M30 86 C70 32 110 32 150 86 S230 140 270 86 S350 32 390 86" stroke="#E4F4EA" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.8"/>
+  <text x="300" y="150" fill="#DADDE2" font-family="'DejaVu Sans Mono', Menlo, Consolas, monospace" font-size="14">y = sin(x)</text>
+  <g stroke="#16181D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="8" y="14" width="404" height="200" rx="16" fill="none"/>
+    <path d="M8 214 H412 V256 Q412 272 396 272 H24 Q8 272 8 256 Z" fill="#E7EEFC"/>
+    <path d="M40 238 h30 M120 250 h40 M220 240 h30" fill="none" stroke="#1F4E8C" stroke-width="2.5"/>
+    <path d="M296 214 L292 262 M356 214 L360 262 M296 232 L356 246 M356 232 L296 246" fill="none"/>
+    <rect x="284" y="200" width="84" height="14" fill="#D6D3CA"/>
+    <path d="M300 200 L316 150 L332 200 M305 184 H327 M310 168 H322" fill="none" stroke="#DADDE2"/>
+    <circle cx="352" cy="176" r="6" fill="#FFFFFF" stroke="#16181D" stroke-width="2.5"/>
+    <path d="M352 182 V192 M352 192 l-5 8 M352 192 l5 8 M352 185 l-6 6 M352 185 l8 -10" fill="none" stroke="#DADDE2" stroke-width="2.5"/>
+  </g>
+</svg>

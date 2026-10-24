@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300" role="img" aria-labelledby="slvp-t slvp-d">
+  <title id="slvp-t">Sølvbank Petroleum</title>
+  <desc id="slvp-d">En sparegris i sølv med gul hjelm står på en oljeplattform. Oljedråper faller ned i myntsprekken, merket 0, 1 og 2.</desc>
+  <g stroke="#16181D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 228 Q58 218 108 228 T208 228 T308 228 T412 228 V272 H8 Z" fill="#E7EEFC"/>
+    <path d="M60 246 h30 M300 252 h40" fill="none" stroke="#1F4E8C" stroke-width="2.5"/>
+    <path d="M112 220 L106 268 M290 220 L296 268 M110 236 L292 254 M292 236 L110 254" fill="none"/>
+    <rect x="90" y="206" width="222" height="16" fill="#E4E2DB"/>
+    <path d="M200 6 V34" fill="none" stroke-width="9"/>
+    <path d="M190 36 h20" fill="none"/>
+    <path d="M200 50 q-6 9 0 13 q6 -4 0 -13 Z M200 72 q-6 9 0 13 q6 -4 0 -13 Z M200 94 q-6 9 0 13 q6 -4 0 -13 Z" fill="#16181D" stroke-width="2"/>
+    <ellipse cx="200" cy="162" rx="64" ry="44" fill="#D9DDE3"/>
+    <path d="M160 140 q20 -18 52 -14" fill="none" stroke="#FFFFFF" stroke-width="4"/>
+    <path d="M168 198 v10 M186 200 v8 M220 200 v8 M238 198 v10" fill="none" stroke-width="7"/>
+    <ellipse cx="265" cy="166" rx="12" ry="10" fill="#D9DDE3"/>
+    <circle cx="262" cy="165" r="1.6" fill="#16181D" stroke="none"/>
+    <circle cx="269" cy="165" r="1.6" fill="#16181D" stroke="none"/>
+    <path d="M232 128 l12 -18 l8 22 Z" fill="#D9DDE3"/>
+    <path d="M222 124 A21 14 0 0 1 264 124 Z" fill="#F2B53A"/>
+    <path d="M218 124 h50" fill="none"/>
+    <circle cx="246" cy="146" r="3" fill="#16181D" stroke="none"/>
+    <path d="M137 158 c-15 -7 -15 11 -2 8" fill="none" stroke-width="2.5"/>
+    <path d="M186 119 h28" fill="none" stroke-width="4.5"/>
+  </g>
+  <g font-family="'DejaVu Sans Mono', Menlo, Consolas, monospace" font-size="15" fill="#16181D">
+    <text x="176" y="104">0</text><text x="176" y="82">1</text><text x="176" y="60">2</text>
+  </g>
+</svg>

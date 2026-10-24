@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300" role="img" aria-labelledby="vrds-t vrds-d">
+  <title id="vrds-t">Varde Systemer</title>
+  <desc id="vrds-d">En varde bygget av serverenheter med små lamper, med en lapp der det står NY. En figur legger den øverste enheten på plass.</desc>
+  <defs>
+    <g id="vrds-led" stroke="none">
+      <circle cx="0" cy="0" r="2.6" fill="#13703C"/>
+      <circle cx="9" cy="0" r="2.6" fill="#F2B53A"/>
+    </g>
+  </defs>
+  <g stroke="#16181D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 272 V248 Q140 232 260 240 T412 246 V272 Z" fill="#ECEAE4"/>
+    <rect x="160" y="214" width="124" height="26" rx="6" fill="#D6D3CA"/>
+    <rect x="170" y="188" width="108" height="26" rx="6" fill="#D6D3CA"/>
+    <rect x="166" y="162" width="100" height="26" rx="6" fill="#D6D3CA"/>
+    <rect x="178" y="138" width="80" height="24" rx="6" fill="#D6D3CA"/>
+    <path d="M172 227 h40 M182 201 h40 M178 175 h36 M190 150 h28" fill="none" stroke-width="2"/>
+    <g transform="rotate(-8 264 118)">
+      <rect x="236" y="106" width="58" height="24" rx="6" fill="#D6D3CA"/>
+      <path d="M246 118 h24" fill="none" stroke-width="2"/>
+    </g>
+    <path d="M154 150 q-6 6 0 12 M150 176 q-6 6 0 12 M276 146 q6 6 0 12" fill="none" stroke-width="2.5"/>
+    <path d="M166 170 L148 178" fill="none" stroke-width="2"/>
+    <path d="M110 172 h34 l8 8 l-8 8 h-34 Z" fill="#F8DE9C"/>
+    <circle cx="318" cy="150" r="10" fill="#FFFFFF"/>
+    <circle cx="314" cy="148" r="1.6" fill="#16181D" stroke="none"/>
+    <path d="M318 160 L322 204 M322 204 L312 244 M322 204 L336 244" fill="none"/>
+    <path d="M319 168 L294 132 M320 176 L298 142" fill="none"/>
+  </g>
+  <use href="#vrds-led" transform="translate(262 227)"/>
+  <use href="#vrds-led" transform="translate(256 201)"/>
+  <use href="#vrds-led" transform="translate(244 175)"/>
+  <use href="#vrds-led" transform="translate(234 150)"/>
+  <use href="#vrds-led" transform="translate(274 116) rotate(-8)"/>
+  <text x="117" y="185" font-family="'DejaVu Sans', Arial, sans-serif" font-weight="700" font-size="12" fill="#16181D">NY</text>
+</svg>

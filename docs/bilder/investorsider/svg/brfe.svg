@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300" role="img" aria-labelledby="brfe-t brfe-d">
+  <title id="brfe-t">Brattfjell Energi</title>
+  <desc id="brfe-d">En klatrer med gul hjelm og et batteri på ryggen er på vei opp et bratt fjell. Over toppen står et lyn, og på toppen et flagg med E = mgh, formelen for potensiell energi.</desc>
+  <g stroke="#16181D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 272H412" fill="none"/>
+    <path d="M26 272 L112 158 L140 176 L212 50 L246 98 L268 84 L394 272 Z" fill="#E4E2DB"/>
+    <path d="M212 50 L190 90 L206 82 L218 96 L232 80 L246 98 Z" fill="#FFFFFF"/>
+    <path d="M150 212 l18 -10 M96 238 l22 -8 M250 236 l16 8" fill="none" stroke-width="2.5"/>
+    <path d="M212 50 V6" fill="none"/>
+    <path d="M212 6 H276 L268 21 L276 36 H212 Z" fill="#F2B53A"/>
+    <path d="M316 6 L292 44 L308 44 L286 82 L330 36 L313 36 L334 6 Z" fill="#F2B53A"/>
+    <path d="M353 164 C378 192 360 222 390 258" fill="none" stroke-width="2.5" stroke-dasharray="7 7"/>
+    <g transform="rotate(-25 354 146)">
+      <rect x="346" y="134" width="16" height="24" rx="3" fill="#E4F4EA"/>
+      <path d="M351 131 h6" fill="none" stroke-width="3"/>
+      <path d="M354 141 v8 M350 145 h8" fill="none" stroke-width="2"/>
+    </g>
+    <path d="M353 164 L353 182 L337 187" fill="none"/>
+    <path d="M353 164 L335 158 L325 169" fill="none"/>
+    <path d="M353 164 L341 139" fill="none"/>
+    <path d="M341 139 L300 131 M341 139 L313 152" fill="none"/>
+    <path d="M300 131 L292 115" fill="none"/>
+    <path d="M285 121 L300 110" fill="none"/>
+    <circle cx="335" cy="127" r="10.5" fill="#FFFFFF"/>
+    <path d="M323.5 125 A11.5 11.5 0 0 1 346.5 125 Z" fill="#F2B53A"/>
+    <path d="M321 125 h28" fill="none" stroke-width="2.5"/>
+    <circle cx="330" cy="130" r="1.8" fill="#16181D" stroke="none"/>
+    <path d="M352 108 q5 7 0 10 q-5 -3 0 -10 Z M359 121 q4 6 0 8.5 q-4 -2.5 0 -8.5 Z" fill="#FFFFFF" stroke-width="2"/>
+  </g>
+  <text x="218" y="26" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="13" fill="#16181D">E = mgh</text>
+</svg>

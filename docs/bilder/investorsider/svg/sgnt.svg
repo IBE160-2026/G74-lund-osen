@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300" role="img" aria-labelledby="sgnt-t sgnt-d">
+  <title id="sgnt-t">Signalnett</title>
+  <desc id="sgnt-d">En mobilmast på en ås med en katt som ligger og slapper av på plattformen, med det ene øyet åpent. Ved siden av viser fem fulle streker at signalet er sterkt.</desc>
+  <g stroke="#16181D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 272 V240 Q140 220 260 232 T412 238 V272 Z" fill="#E4F4EA"/>
+    <path d="M168 236 L196 86 M232 236 L204 86" fill="none"/>
+    <path d="M174 206 L226 190 M178 180 L222 166 M183 154 L218 142 M188 128 L213 120" fill="none" stroke-width="2"/>
+    <path d="M174 206 L222 166 M178 180 L218 142 M183 154 L213 120" fill="none" stroke-width="2"/>
+    <path d="M200 86 V58" fill="none"/>
+    <circle cx="200" cy="54" r="5" fill="#F2B53A"/>
+    <path d="M186 42 a20 20 0 0 0 0 24 M214 42 a20 20 0 0 1 0 24 M176 34 a32 32 0 0 0 0 40 M224 34 a32 32 0 0 1 0 40" fill="none" stroke-width="2.5"/>
+    <path d="M170 118 H238" fill="none" stroke-width="5"/>
+    <path d="M178 116 C178 100 192 92 208 92 C222 92 230 100 230 116 Z" fill="#D6D3CA"/>
+    <circle cx="228" cy="102" r="11" fill="#D6D3CA"/>
+    <path d="M220 95 l1 -13 l9 9 Z M231 92 l6 -11 l3 13 Z" fill="#D6D3CA" stroke-width="2.5"/>
+    <path d="M221 104 q3 -2 6 0" fill="none" stroke-width="2"/>
+    <circle cx="233" cy="103" r="1.8" fill="#16181D" stroke="none"/>
+    <path d="M178 112 c-16 2 -18 -14 -8 -16" fill="none" stroke-width="2.5"/>
+    <rect x="292" y="182" width="12" height="18" fill="#13703C"/>
+    <rect x="310" y="170" width="12" height="30" fill="#13703C"/>
+    <rect x="328" y="156" width="12" height="44" fill="#13703C"/>
+    <rect x="346" y="140" width="12" height="60" fill="#13703C"/>
+    <rect x="364" y="122" width="12" height="78" fill="#13703C"/>
+  </g>
+  <g font-family="Georgia, 'Times New Roman', serif" font-style="italic" fill="#5F646C">
+    <text x="158" y="94" font-size="14">z</text>
+    <text x="146" y="80" font-size="18">z</text>
+    <text x="132" y="62" font-size="22">z</text>
+  </g>
+</svg>

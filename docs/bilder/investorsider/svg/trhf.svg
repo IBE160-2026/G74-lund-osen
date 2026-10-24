@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300" role="img" aria-labelledby="trhf-t trhf-d">
+  <title id="trhf-t">Trygghavn Forsikring</title>
+  <desc id="trhf-d">Et fyrtårn med gul hjelm på en holme, og ved siden av to mindre fyrtårn merket backup og backup².</desc>
+  <defs>
+    <g id="trhf-fyr" stroke="#16181D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M110 224 L118 110 L162 110 L170 224 Z" fill="#FFFFFF"/>
+      <path d="M115.9 140 H164.1 L165.5 160 H114.5 Z M112.7 185 H167.3 L168.7 205 H111.3 Z" fill="#1F4E8C"/>
+      <path d="M132 224 V206 a8 8 0 0 1 16 0 V224" fill="#D6D3CA"/>
+      <path d="M112 110 H168" fill="none" stroke-width="5"/>
+      <rect x="122" y="80" width="36" height="28" fill="#F8DE9C"/>
+      <path d="M134 80 V108 M146 80 V108" fill="none" stroke-width="2"/>
+      <path d="M118 80 A22 20 0 0 1 162 80 Z" fill="#F2B53A"/>
+      <path d="M112 80 H168" fill="none" stroke-width="4"/>
+      <circle cx="140" cy="58" r="3" fill="#16181D" stroke="none"/>
+    </g>
+  </defs>
+  <path d="M122 94 L36 70 L36 118 Z" fill="#FFF6DC"/>
+  <path d="M158 94 L236 74 L236 114 Z" fill="#FFF6DC"/>
+  <g stroke="#16181D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 236 Q58 226 108 236 T208 236 T308 236 T412 236 V272 H8 Z" fill="#E7EEFC"/>
+    <path d="M40 254 h30 M220 258 h36 M330 252 h30" fill="none" stroke="#1F4E8C" stroke-width="2.5"/>
+    <path d="M70 240 Q90 220 130 222 Q170 218 192 240 Z" fill="#D6D3CA"/>
+    <path d="M258 240 Q268 228 290 229 Q310 228 320 240 Z" fill="#D6D3CA"/>
+    <path d="M336 240 Q342 233 354 233 Q366 233 372 240 Z" fill="#D6D3CA"/>
+  </g>
+  <use href="#trhf-fyr"/>
+  <use href="#trhf-fyr" transform="translate(205 98) scale(0.6)"/>
+  <use href="#trhf-fyr" transform="translate(298 147) scale(0.4)"/>
+  <g font-family="'DejaVu Sans Mono', Menlo, Consolas, monospace" font-size="11" fill="#3C4048">
+    <text x="268" y="262">backup</text>
+    <text x="334" y="262">backup²</text>
+  </g>
+</svg>

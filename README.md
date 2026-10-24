@@ -490,6 +490,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [`src/`](src/) og [`tests/`](tests/) — applikasjonen og testene
 - [`docs/`](docs/) — arbeidsprosessen, og [`docs/hjelp.md`](docs/hjelp.md) med spørsmål og svar til «Kom i gang»
 - [`docs/bilder/readme/`](docs/bilder/readme/) — de tre skjermbildene i «Kom i gang»: [`engine-running.png`](docs/bilder/readme/engine-running.png), [`github-download-zip.png`](docs/bilder/readme/github-download-zip.png) og [`powershell-mappa.png`](docs/bilder/readme/powershell-mappa.png)
+- [`docs/bilder/investorsider/`](docs/bilder/investorsider/) — de 15 tegningene laget av KI til investorsidene i demoen, godkjent 24.10: SVG-ene, forhåndsvisningene, [`LESMEG.md`](docs/bilder/investorsider/LESMEG.md) og [`bobler.json`](docs/bilder/investorsider/bobler.json)
 - [`docs/appen/`](docs/appen/) — bilder og senere video av appen, bare av demoen: [`oversikten-demo.png`](docs/appen/oversikten-demo.png) og [`aksjesiden-kvst-demo.png`](docs/appen/aksjesiden-kvst-demo.png)
 - [`_bmad-output/`](_bmad-output/) — Product Brief, plan, krav og sprintstatus
 - [`.github/`](.github/) — testkjøringen og morgensjekken

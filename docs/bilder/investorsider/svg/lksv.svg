@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300" role="img" aria-labelledby="lksv-t lksv-d">
+  <title id="lksv-t">Laksevik Sjømat</title>
+  <desc id="lksv-d">En laks med briller hopper opp en foss mot strømmen, med en liten bærbar PC under finnen.</desc>
+  <g stroke="#16181D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 120 H166 L176 272 H8 Z" fill="#D6D3CA"/>
+    <path d="M8 110 Q58 102 108 110 T166 112 L166 122 L8 122 Z" fill="#E7EEFC"/>
+    <path d="M158 112 L178 112 Q188 170 184 240 L166 240 Q172 172 158 112 Z" fill="#E7EEFC"/>
+    <path d="M168 132 Q175 180 172 228 M176 128 Q183 178 179 226" fill="none" stroke="#1F4E8C" stroke-width="2"/>
+    <path d="M150 238 Q190 228 230 238 T310 238 T412 238 V272 H150 Z" fill="#E7EEFC"/>
+    <path d="M206 254 h30 M262 260 h36 M332 252 h30" fill="none" stroke="#1F4E8C" stroke-width="2.5"/>
+    <path d="M330 226 q-6 -10 0 -16 q6 6 0 16 Z M348 230 q-4 -8 0 -12 q4 4 0 12 Z M314 232 q-3 -6 0 -9 q3 3 0 9 Z" fill="#FFFFFF" stroke-width="2"/>
+    <path d="M344 168 q14 6 26 2 M350 184 q12 4 24 0 M338 154 q12 4 24 0" fill="none" stroke-width="2.5"/>
+    <g transform="translate(286 152) rotate(28)">
+      <path d="M56 -6 L88 -30 L80 -2 L90 26 Z" fill="#F2B53A"/>
+      <path d="M-10 -26 L6 -42 L20 -24" fill="#F2B53A"/>
+      <path d="M-70 0 C-40 -34 30 -34 58 -6 C30 26 -40 30 -70 0 Z" fill="#F8DE9C"/>
+      <path d="M-50 10 C-20 18 20 16 44 4" fill="none" stroke-width="2"/>
+      <circle cx="0" cy="-14" r="3" fill="#B86E12" stroke="none"/>
+      <circle cx="16" cy="-9" r="2.5" fill="#B86E12" stroke="none"/>
+      <circle cx="30" cy="-14" r="2" fill="#B86E12" stroke="none"/>
+      <circle cx="-50" cy="-7" r="8.5" fill="#FFFFFF"/>
+      <circle cx="-50" cy="-7" r="2.6" fill="#16181D" stroke="none"/>
+      <path d="M-41.5 -8 L-30 -10" fill="none" stroke-width="2.5"/>
+      <path d="M-70 0 l9 4" fill="none" stroke-width="2.5"/>
+      <rect x="-40" y="6" width="34" height="22" rx="2" fill="#FFFFFF"/>
+      <path d="M-28 13 l-4 4 l4 4 M-16 13 l4 4 l-4 4 M-21 12 l-2.5 10" fill="none" stroke="#1F4E8C" stroke-width="2"/>
+      <path d="M-44 30 h42" fill="none"/>
+      <path d="M-4 14 q10 10 -6 16" fill="#F2B53A"/>
+    </g>
+  </g>
+</svg>
