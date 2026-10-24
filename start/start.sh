@@ -64,7 +64,7 @@ echo
 # dobbeltklikk i en klon aldri henter med gruppens nøkkel. En ZIP-fil har
 # ingen .git. Erstatter vernet «bare fra main» (VG1 og ECH9).
 if [ "$VERSJON" = "ekte" ] && [ -e .git ]; then
-    stopp "mappa er en klon av repoet (den har .git), og der starter ikke den ekte versjonen. Last ned en egen kopi med «Download ZIP» på GitHub, pakk den ut, og bruk din egen nøkkel fra EODHD. Demoen kan startes herfra."
+    stopp "mappa har .git (en klon av repoet eller et eget git-repo), og der starter ikke den ekte versjonen. Last ned en egen kopi med «Download ZIP» på GitHub, pakk den ut, og bruk din egen nøkkel fra EODHD. Demoen kan startes herfra."
 fi
 
 # uv: på PATH, i .local/bin i brukermappa, eller installert etter et ja.

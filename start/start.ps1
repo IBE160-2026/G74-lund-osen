@@ -84,7 +84,7 @@ Write-Host ''
 # dobbeltklikk i en klon aldri henter med gruppens nøkkel. En ZIP-fil har
 # ingen .git. Erstatter vernet «bare fra main» (VG1 og ECH9).
 if ($Versjon -eq 'ekte' -and (Test-Path -LiteralPath '.git')) {
-    Stopp 'mappa er en klon av repoet (den har .git), og der starter ikke den ekte versjonen. Last ned en egen kopi med «Download ZIP» på GitHub, pakk den ut, og bruk din egen nøkkel fra EODHD. Demoen kan startes herfra.'
+    Stopp 'mappa har .git (en klon av repoet eller et eget git-repo), og der starter ikke den ekte versjonen. Last ned en egen kopi med «Download ZIP» på GitHub, pakk den ut, og bruk din egen nøkkel fra EODHD. Demoen kan startes herfra.'
 }
 
 # uv: på PATH, i .local\bin i brukermappa, eller installert etter et ja.
