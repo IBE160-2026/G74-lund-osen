@@ -149,8 +149,9 @@
 
   {% endif %}
   {% if vist_tabell %}
-    {#- Story 8.15, svar 5: linja står bare når en kolonne er valgt. #}
-    {% if sortering %}<p class="sortert">Sortert på {{ sortering.navn }}, {{ ordens_ord(sortering.kolonne, sortering.orden) }}, innenfor hver del. <a href="{{ sidesti }}{% if alle %}?vis=alle{% endif %}">Standard rekkefølge</a></p>{% endif %}
+    {#- Story 8.15, svar 5: linja står bare når en kolonne er valgt. Story
+        8.2a, e: tabellen er da én liste, ikke sortert innenfor hver del. #}
+    {% if sortering %}<p class="sortert">Sortert på {{ sortering.navn }}, {{ ordens_ord(sortering.kolonne, sortering.orden) }}, i én liste. <a href="{{ sidesti }}{% if alle %}?vis=alle{% endif %}">Standard rekkefølge</a></p>{% endif %}
     <div class="tabellboks" role="region" aria-label="Aksjene" tabindex="0">
     <table>
       <thead>
@@ -176,7 +177,15 @@
       {#- Story 8.3: i Min liste har «Øvrige aksjer» overskriften også når
           ingen av de merkede skilte seg ut. #}
       {% set foerste_del = skilte_seg_ut or ingen_skilte_seg_ut or (aktiv == "min_liste" and antall_vurdert) %}
-      {% if skilte_seg_ut %}
+      {#- Story 8.2a, e (gruppens svar 24.10 kl. 11:39): med en kolonne valgt
+          er tabellen én liste, uten delene og uten setningene fra 8.0c. De
+          som skilte seg ut, beholder kanten (klassen utslag i tabellrad). #}
+      {% set er_sortert = sortert is defined and sortert is not none %}
+      {% if er_sortert %}
+      <tbody>
+        {% for rad in sortert %}{{ tabellrad(rad) }}{% endfor %}
+      </tbody>
+      {% elif skilte_seg_ut %}
       <tbody>
         <tr class="del ut"><th colspan="5" scope="rowgroup">Skilte seg ut <span class="antall">{{ skilte_seg_ut|length }}</span> <span class="bak">signalstyrke {{ parametre.terskel }} eller mer</span></th></tr>
         {% for rad in skilte_seg_ut %}{{ tabellrad(rad) }}{% endfor %}
@@ -195,7 +204,7 @@
       {% endif %}
       {#- Story 8.2a, b (U23): radene for aksjene uten kurser står nederst,
           etter radene uten signal, og telles med i antallet. #}
-      {% if oevrige or mangler %}
+      {% if not er_sortert and (oevrige or mangler) %}
       <tbody>
         {% if foerste_del %}<tr class="del oevrige"><th colspan="5" scope="rowgroup">Øvrige aksjer <span class="antall">{{ oevrige|length + mangler|length }}</span> <span class="bak">signalstyrke 0{% if parametre.terskel == 2 %} eller 1{% elif parametre.terskel > 2 %} til {{ parametre.terskel - 1 }}{% endif %}{% set uten_signal = (oevrige|selectattr("styrke", "none")|list|length) + mangler|length %}{% if uten_signal %} og {{ uten_signal }} uten signal{% endif %}</span></th></tr>{% endif %}
         {% for rad in oevrige %}{{ tabellrad(rad) }}{% endfor %}

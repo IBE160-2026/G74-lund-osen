@@ -633,9 +633,9 @@ def boersometer():
 
 
 def _tabellsiden(aktiv: str):
-    """Oversikten eller Min liste. Min liste filtrerer radene etter at hver
-    del er sortert, og sorterer dem aldri paa nytt, saa rekkefoelgen er den
-    samme som i oversikten, ogsaa sortert (FR-102, story 8.15)."""
+    """Oversikten eller Min liste. Min liste filtrerer radene etter at de er
+    delt eller sortert, og sorterer dem aldri paa nytt, saa rekkefoelgen er
+    den samme som i oversikten, ogsaa sortert (FR-102, story 8.15)."""
     i_lista = aktiv == MIN_LISTE_SIDE
     alle = i_lista and request.args.get("vis") == ALLE
     sti = MIN_LISTE if i_lista else OVERSIKTEN
@@ -681,11 +681,13 @@ def _tabellsiden(aktiv: str):
         if post.innhold is Grunn.SIGNAL_IKKE_REGNET
     }
     rader = bygg_oversikt(poster, i_dag, STANDARD, dager)
-    # Story 8.15: hver del sorteres for seg, så ingen rad flytter seg
-    # mellom delene (tillegget 13.10). Linja om 3 av 3 og «N av M» bruker
-    # rader, som står i FR-102 (svar 7).
+    # Story 8.15: linja om 3 av 3 og «N av M» bruker rader, som står i
+    # FR-102 (svar 7). Story 8.2a, e (gruppens svar 24.10 kl. 11:39): uten
+    # en valgt kolonne er tabellen delt i to, hver i FR-102-rekkefølgen, som
+    # før. Med en kolonne valgt er den én liste, sortert under (sortert), og
+    # ikke sortert innenfor hver del, som tillegget 13.10 sa.
     sortering = Sortering.fra_adressen(request.args.get("sorter"), request.args.get("orden"))
-    skilte_seg_ut, oevrige = (sorter(del_, sortering) for del_ in del_i_to(rader))
+    skilte_seg_ut, oevrige = del_i_to(rader)
     tre_av_tre = frozenset(rad.aksje.symbol for rad in rader if rad.styrke == ANTALL_SJEKKER)
     # Story 8.3: merkingen leses fra sin egen port, bare lesing her.
     merkede = _leser_eller_basefeil(lambda: SqliteMinlistelager(g.tilkobling)).merkede()
@@ -697,10 +699,16 @@ def _tabellsiden(aktiv: str):
     # tabellen, saa knappen og tabellen sier det samme. Story 8.2a, b: ogsaa
     # en merket aksje uten kurser, som naa har en rad.
     antall_merket = sum(rad.aksje.symbol in merkede for rad in (*rader, *alle_uten_data))
+    # Story 8.2a, e: hele lista sortert på kolonnen, med radene uten data,
+    # som står sist når kolonnen ikke har en verdi for dem. None uten
+    # sortering. De som skilte seg ut, beholder kanten i malen.
+    sortert = sorter([*rader, *alle_uten_data], sortering) if sortering else None
     if i_lista and not alle:
         skilte_seg_ut = [rad for rad in skilte_seg_ut if rad.aksje.symbol in merkede]
         oevrige = [rad for rad in oevrige if rad.aksje.symbol in merkede]
         mangler = [rad for rad in mangler if rad.aksje.symbol in merkede]
+        if sortert is not None:
+            sortert = [rad for rad in sortert if rad.aksje.symbol in merkede]
     hovedindeks, indeks_feilet = (None, False) if i_lista else _hovedindeks(leser, poster, tre_av_tre)
     # Story 3.4e: datoene som er «ikke vurdert» i det siden viser, én gang.
     ikke_vurdert = [rad.dato for rad in (*skilte_seg_ut, *oevrige) if rad.ikke_vurdert]
@@ -727,6 +735,7 @@ def _tabellsiden(aktiv: str):
         antall_vurdert=antall_vurdert(rader),
         skilte_seg_ut=skilte_seg_ut,
         oevrige=oevrige,
+        sortert=sortert,
         sortering=sortering,
         tre_av_tre=[rad.aksje.navn for rad in rader if rad.styrke == ANTALL_SJEKKER],
         hentekommando=hentekommando(),

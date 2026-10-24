@@ -429,13 +429,14 @@ def _navn(rad: Rad) -> str:
 
 
 def sorter(rader: list[Rad], sortering: Sortering | None) -> list[Rad]:
-    """Én del av tabellen sortert på kolonnen - story 8.15.
+    """Radene sortert på kolonnen - story 8.15.
 
     Først FR-102 og så navnet, så lik verdi alltid står likt. Så kolonnen,
     der bare den snus. Rader uten verdi står sist i begge retninger. Uten
     sortering er rekkefølgen den samme som før, FR-102 fra bygg_oversikt.
-    Ruten kaller den for hver del etter del_i_to, så ingen rad flytter seg
-    mellom delene (tillegget 13.10)."""
+    Story 8.2a, e (gruppens svar 24.10 kl. 11:39): ruten kaller den for hele
+    lista, med radene uten data, så tabellen er én liste uten delene. Før
+    kalte den den for hver del etter del_i_to (tillegget 13.10)."""
     if sortering is None:
         return list(rader)
     grunn = sorted(rader, key=lambda rad: (_sorteringsnokkel(rad), _navn(rad)))

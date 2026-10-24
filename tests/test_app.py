@@ -2318,23 +2318,26 @@ class TestStory815Sortering:
             assert _deler_i_rekkefoelge(self._side(tabell, adresse)) == standard, adresse
 
     @pytest.mark.parametrize(
-        "adresse, ut, oevrige",
+        "adresse, liste",
         [
-            ("/?sorter=endring&orden=synkende", ["EQNR", "KOG", "DNB"], ["MOWI", "NHY"]),
-            ("/?sorter=endring&orden=stigende", ["DNB", "KOG", "EQNR"], ["NHY", "MOWI"]),
-            ("/?sorter=signal&orden=stigende", ["DNB", "EQNR", "KOG"], ["MOWI", "NHY"]),
-            ("/?sorter=retning&orden=stigende", ["EQNR", "DNB", "KOG"], ["MOWI", "NHY"]),
-            ("/?sorter=retning&orden=synkende", ["KOG", "DNB", "EQNR"], ["MOWI", "NHY"]),
-            # Story 8.15b: Selskap, A til Å og Å til A, innenfor hver del.
-            ("/?sorter=selskap&orden=stigende", ["DNB", "EQNR", "KOG"], ["MOWI", "NHY"]),
-            ("/?sorter=selskap&orden=synkende", ["KOG", "EQNR", "DNB"], ["NHY", "MOWI"]),
+            ("/?sorter=endring&orden=synkende", ["MOWI", "EQNR", "KOG", "NHY", "DNB"]),
+            ("/?sorter=endring&orden=stigende", ["DNB", "NHY", "KOG", "EQNR", "MOWI"]),
+            ("/?sorter=signal&orden=stigende", ["MOWI", "DNB", "EQNR", "KOG", "NHY"]),
+            ("/?sorter=retning&orden=stigende", ["EQNR", "DNB", "KOG", "MOWI", "NHY"]),
+            ("/?sorter=retning&orden=synkende", ["KOG", "MOWI", "DNB", "EQNR", "NHY"]),
+            # Story 8.15b: Selskap, A til Å og Å til A.
+            ("/?sorter=selskap&orden=stigende", ["DNB", "EQNR", "KOG", "MOWI", "NHY"]),
+            ("/?sorter=selskap&orden=synkende", ["NHY", "MOWI", "KOG", "EQNR", "DNB"]),
         ],
     )
-    def test_hver_del_sorteres_for_seg(self, tabell, adresse, ut, oevrige):
-        """Tillegget 13.10: ingen rad flytter seg mellom delene (S1). Rader
-        uten verdi står sist i begge retninger (S2), og endringen har
-        fortegn (S4)."""
-        assert _deler_i_rekkefoelge(self._side(tabell, adresse)) == (ut, oevrige)
+    def test_hver_del_sorteres_for_seg(self, tabell, adresse, liste):
+        """Rader uten verdi står sist i begge retninger (S2), og endringen har
+        fortegn (S4). Story 8.2a, e (gruppens svar 24.10 kl. 11:39): sortert
+        er tabellen én liste, uten delene, og ikke sortert innenfor hver del
+        som i tillegget 13.10 (S1). Navnet på testen er det gamle, fordi
+        dokumentene viser til testene ved navn. Ville feilet hvis MOWI, under
+        «Øvrige aksjer» uten sortering, ikke kom først på endring."""
+        assert _deler_i_rekkefoelge(self._side(tabell, adresse)) == (liste, [])
 
     def test_lenken_snur_og_aria_sort_staar_paa_kolonnen(self, tabell):
         """Første klikk synkende, A til Å for Retning, og et nytt klikk
@@ -2377,21 +2380,22 @@ class TestStory815Sortering:
         assert 'class="sortert"' not in self._side(tabell, "/")
         html = self._side(tabell, "/?sorter=signal&orden=stigende")
         assert (
-            '<p class="sortert">Sortert på signalstyrke, stigende, innenfor hver del. '
-            '<a href="/">Standard rekkefølge</a></p>'
+            '<p class="sortert">Sortert på signalstyrke, stigende, i én liste. <a href="/">Standard rekkefølge</a></p>'
         ) in html
         assert html.index('<p class="sortert">') < html.index('<div class="tabellboks"')
-        # Gjennomgangen (VG2): navnet for hver kolonne. Svar 9: «innenfor hver del».
+        # Gjennomgangen (VG2): navnet for hver kolonne. Svar 9 sa «innenfor
+        # hver del»; story 8.2a, e: «i én liste».
         for kolonne, navn in (("kurs", "sluttkurs"), ("endring", "endring")):
             html = self._side(tabell, f"/?sorter={kolonne}&orden=synkende")
-            assert f'<p class="sortert">Sortert på {navn}, synkende, innenfor hver del. ' in html, kolonne
+            assert f'<p class="sortert">Sortert på {navn}, synkende, i én liste. ' in html, kolonne
 
     def test_linja_og_skjermleseren_sier_det_samme(self, tabell):
         """Svar 8 (BH1, ECH1): for Retning sier linja over tabellen det
         samme som teksten for skjermleseren, i begge retninger."""
         for orden, ord in (("stigende", "stigende (A til Å)"), ("synkende", "synkende (Å til A)")):
             html = self._side(tabell, f"/?sorter=retning&orden={orden}")
-            assert f'<p class="sortert">Sortert på retning, {ord}, innenfor hver del. ' in html, orden
+            # Story 8.2a, e: «i én liste», ikke «innenfor hver del».
+            assert f'<p class="sortert">Sortert på retning, {ord}, i én liste. ' in html, orden
             assert f'Retning<span class="skjult">, sortert {ord}. ' in html, orden
 
     def test_vinkelen_peker_etter_retningen(self, tabell):
@@ -2410,7 +2414,8 @@ class TestStory815Sortering:
 
     def test_rad_uten_endring_sist_i_skilte_seg_ut(self, tabell, monkeypatch):
         """Gjennomgangen (BH14): en rad med vurdering, men bare én kursdag,
-        står sist i «Skilte seg ut» i begge retninger."""
+        står sist i «Skilte seg ut» i begge retninger. Story 8.2a, e: sist i
+        den ene lista, foran radene uten data."""
         rader = serie([100.0])
         skriv_serie("ORK", rader, datetime.fromisoformat(HENTET), vurdert=False)
         skriv_vurdering(
@@ -2431,8 +2436,8 @@ class TestStory815Sortering:
             ),
         )
         for orden in ("synkende", "stigende"):
-            ut, _ = _deler_i_rekkefoelge(self._side(tabell, f"/?sorter=endring&orden={orden}"))
-            assert ut[-1] == "ORK" and len(ut) == 4, (orden, ut)
+            liste, oevrige = _deler_i_rekkefoelge(self._side(tabell, f"/?sorter=endring&orden={orden}"))
+            assert liste[-1] == "ORK" and len(liste) == 6 and oevrige == [], (orden, liste)
 
     def test_tre_av_tre_og_antallet_foelger_fr_102(self, tabell):
         """Svar 7: linja om 3 av 3 og «N av M aksjer» endres ikke av et klikk."""
@@ -3795,14 +3800,16 @@ class TestStory815bSelskapOgMarkeringen:
         return klient
 
     @pytest.mark.parametrize(
-        "orden, ut, oevrige",
-        [("stigende", ["DNB", "KOG"], ["AKRBP", "MOWI"]), ("synkende", ["KOG", "DNB"], ["MOWI", "AKRBP"])],
+        "orden, liste",
+        [("stigende", ["AKRBP", "DNB", "KOG", "MOWI"]), ("synkende", ["MOWI", "KOG", "DNB", "AKRBP"])],
     )
-    def test_selskap_sorteres_innenfor_hver_del(self, tabell, orden, ut, oevrige):
-        """Tillegget 13.10. Ville feilet hvis Aker BP flyttet seg til «Skilte
-        seg ut» fordi den kommer først i alfabetet."""
+    def test_selskap_sorteres_innenfor_hver_del(self, tabell, orden, liste):
+        """Story 8.2a, e (gruppens svar 24.10 kl. 11:39): sortert er tabellen
+        én liste, så Aker BP, under «Øvrige aksjer» uten sortering, står
+        først i alfabetet. Før sto den sist (tillegget 13.10). Navnet på
+        testen er det gamle. Ville feilet hvis delene ble beholdt."""
         html = tabell.get(f"/?sorter=selskap&orden={orden}").data.decode("utf-8")
-        assert _deler_i_rekkefoelge(html) == (ut, oevrige)
+        assert _deler_i_rekkefoelge(html) == (liste, [])
 
     @staticmethod
     def _thead(klient, adresse):
@@ -3815,12 +3822,13 @@ class TestStory815bSelskapOgMarkeringen:
         html, thead = self._thead(tabell, "/?sorter=selskap&orden=stigende")
         assert 'href="/?sorter=selskap&amp;orden=synkende"' in thead
         assert ", sortert stigende (A til Å). Velg for synkende (Å til A)." in thead
-        assert "Sortert på selskap, stigende (A til Å), innenfor hver del." in html
+        # Story 8.2a, e: «i én liste».
+        assert "Sortert på selskap, stigende (A til Å), i én liste." in html
         _, thead = self._thead(tabell, "/")
         assert ", sorter stigende (A til Å)" in thead
         # Gjennomgangen (VG7): og synkende.
         html, thead = self._thead(tabell, "/?sorter=selskap&orden=synkende")
-        assert "Sortert på selskap, synkende (Å til A), innenfor hver del." in html
+        assert "Sortert på selskap, synkende (Å til A), i én liste." in html
         assert 'href="/?sorter=selskap&amp;orden=stigende"' in thead
 
     @pytest.mark.parametrize("orden, aria", [("stigende", "ascending"), ("synkende", "descending")])

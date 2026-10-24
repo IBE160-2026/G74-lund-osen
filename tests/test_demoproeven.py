@@ -246,3 +246,65 @@ def test_andre_grunner_staar_som_foer():
     feilet = Tilstand(Art.GRUNN, Grunn.SYMBOL_FEILET)
     assert grunn_med_tall(feilet, GRUNNTEKST[Grunn.SYMBOL_FEILET], 3) == GRUNNTEKST[Grunn.SYMBOL_FEILET]
     assert grunn_med_tall(None, "ikke vurdert", 3) == "ikke vurdert"
+
+
+# e) Én liste når man sorterer (kl. 11:39).
+
+
+def _symbolene(html: str) -> list[str]:
+    return [re.search(r'<span class="linje">([A-Z0-9]+)', rad).group(1) for rad in _radene(html)]
+
+
+@pytest.mark.parametrize("orden", ["synkende", "stigende"])
+def test_sortert_er_hele_lista_en_liste_uten_delene(klient, orden):
+    """Ville feilet hvis sorteringen gjaldt innenfor hver del (U73), så en
+    rad under «Øvrige aksjer» med større endring sto under en som skilte
+    seg ut, eller raden uten data ikke sto sist."""
+    html = _html(klient, f"/?sorter=endring&orden={orden}")
+    tabell = html.split("<table>", 1)[1].split("</table>", 1)[0]
+    assert "Skilte seg ut" not in tabell and "Øvrige aksjer" not in tabell
+    assert tabell.count("<tbody>") == 1
+    radene = _radene(html)
+    assert len(radene) == 15 and _symbolene(html)[-1] == "MTFJ"
+    endringer = [
+        float(_synlig(re.findall(r"<td[^>]*>(.*?)</td>", rad, re.S)[2]).replace("%", "").strip().replace(",", "."))
+        for rad in radene[:-1]
+    ]
+    assert endringer == sorted(endringer, reverse=orden == "synkende")
+    assert f"Sortert på endring, {orden}, i én liste." in html
+    assert "innenfor hver del" not in html
+
+
+def test_de_som_skilte_seg_ut_beholder_kanten(klient):
+    """Ville feilet hvis kanten fulgte delen, så den forsvant i én liste."""
+    standard = _html(klient, "/")
+    sortert = _html(klient, "/?sorter=kurs&orden=synkende")
+    med_kant = lambda html: {
+        re.search(r'<span class="linje">([A-Z0-9]+)', rad).group(1)
+        for rad in _radene(html)
+        if re.match(r'<tr class="utslag', rad)
+    }
+    assert len(med_kant(standard)) == 7
+    assert med_kant(sortert) == med_kant(standard)
+
+
+def test_standardrekkefoelgen_har_delene_som_foer(klient):
+    """Ville feilet hvis delene forsvant også uten en valgt kolonne."""
+    html = _html(klient, "/")
+    assert "Skilte seg ut" in html and "Øvrige aksjer" in html
+    assert '<p class="sortert">' not in html
+
+
+def test_min_liste_sortert_er_en_liste_med_bare_de_merkede(klient):
+    """Ville feilet hvis Min liste sorterte innenfor hver del, eller viste
+    aksjer som ikke er merket når lista er sortert."""
+    standard = _html(klient, "/min-liste")
+    merkede = set(_symbolene(standard))
+    html = _html(klient, "/min-liste?sorter=selskap&orden=stigende")
+    tabell = html.split("<table>", 1)[1].split("</table>", 1)[0]
+    assert "Skilte seg ut" not in tabell and "Øvrige aksjer" not in tabell
+    assert set(_symbolene(html)) == merkede
+    navn = [re.search(r'<a href="/aksje/[A-Z0-9]+">([^<]+)</a>', rad).group(1) for rad in _radene(html)]
+    assert navn == sorted(navn, key=lambda n: n.casefold().translate(str.maketrans({"æ": "{", "ø": "|", "å": "}"})))
+    alle = _html(klient, "/min-liste?vis=alle&sorter=endring&orden=synkende")
+    assert len(_radene(alle)) == 15 and _symbolene(alle)[-1] == "MTFJ"
