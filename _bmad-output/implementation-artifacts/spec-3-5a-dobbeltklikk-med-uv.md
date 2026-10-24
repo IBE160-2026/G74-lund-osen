@@ -107,6 +107,36 @@ Mutantene etter rettingene, på `6287033`: M1 `test_skriptene_bruker_kommandoene
 
 *Mutanten 2026-10-24:* vernet tilbake til «bare fra main» i begge skriptene, kjørt én gang med `-x` i arbeidskopien på `2a3dd7e`, med testene i denne commiten før de ble committet, og med kopi før og sha256 etter. Fanget av `test_den_ekte_versjonen_stopper_i_en_mappe_med_git[start.ps1]`. Etterpå var sha256 lik kopien, og `git hash-object` lik `HEAD:<sti>` for begge. Med `-x` stoppet kjøringen ved første feil, så om testene som kjører skriptene, også fanger den, er ikke prøvd med mutanten.
 
+*Rettet 2026-10-24 (gjennomgangen 24.10, BH12):* Apples utviklermelding fra 6. august 2024 er lest i ettertid, på developer.apple.com/news/?id=saqachfa. Den sier at høyreklikk ikke lenger overstyrer Gatekeeper i macOS Sequoia, og at brukeren må gå til System Settings > Privacy & Security.
+
+## Gjennomgangen 24.10
+
+Gjennomgang 24.10 etter hele settet (3287 bestått og 17 hoppet over), av endringene i dag: `a56aac3..8f89f9f` på main og `9006a78..fd7548c` på grenen. Linsene var Blind Hunter (BH, 16 funn), Edge Case Hunter (ECH, 9 funn) og Verification Gap (VG, 4 funn), hver for seg og uten å endre noe i repoet. 29 funn ble 21 rader. De små funnene er rettet med en gang (svaret 23.10 kl. 15:53), i `b857582` (skriptene, README-en og hjelpen) og `624bc2e` (testene og CI).
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| VG1 | CI-steget skilte ikke vernet fra «bare fra main» i en PR: med løsrevet HEAD ga også det gamle vernet kode 1 og ingen `.env` | medium | rettet i `624bc2e`: steget krever beskjeden fra vernet og at «Appen trenger uv» ikke står i utskriften |
+| BH1 | Vernet gjelder bare dobbeltklikket, men teksten kunne leses som om ingenting henter i en klon | medium | rettet i `b857582`: README-en sier at kommandoene under «Uten Docker, med uv» og Docker også henter i en klon |
+| BH5, BH6 | Kjøretestene var ikke vist å fange noe, og den strenge PATH kunne stoppe skriptet før vernet | medium | rettet i `624bc2e`: en kontroll uten `.git` må komme forbi vernet til spørsmålet om uv, og hele beskjeden kreves. Mutanten er ikke kjørt på nytt, fordi instruksjonen sier én gang |
+| BH2 | En ZIP av en gren kjører den ekte versjonen med grenens kode | medium etter linsen, low | uten endring: valgt i svaret b). En ZIP har sin egen `data/` og `.env`, og regel 22 gjelder basen på gruppens maskin |
+| VG2, BH10, ECH2 | Klonen i testene var en ufødt gren, så `rev-parse` ga `HEAD`, og `git init -b` krever git 2.28 | low og nit | rettet i `624bc2e`: `git init`, `symbolic-ref` og en tom commit, og testen sjekker at grenen er main |
+| VG3 | `.git` som fil, som i en worktree, var ikke prøvd | low | rettet i `624bc2e`: kjøretestene har også `.git` som fil |
+| VG4, ECH8 | Kommentaren over jobben sa at den ekte versjonen ikke kjøres i CI | nit og low | rettet i `624bc2e` |
+| BH7, ECH5 | Ingen tidsgrense på de nye stegene | low | rettet i `624bc2e`: 5 minutter per steg |
+| BH8 | Den statiske testen så ikke om vernet stoppet | low | rettet i `624bc2e`: linja etter vernet må være `Stopp` eller `stopp` |
+| BH9 | Testen av CI leste resten av fila, ikke bare jobben | low | rettet i `624bc2e` |
+| ECH1 | uv i samme mappe som bash eller git ga en rød test | low | rettet i `624bc2e`: testen hoppes over |
+| ECH4 | WSL-starteren i WindowsApps ble ikke holdt utenfor | nit | rettet i `624bc2e` |
+| ECH6 | Et eget git-repo i en ZIP-kopi fikk beskjeden «en klon av repoet» | low | rettet i `b857582`: «mappa har .git (en klon av repoet eller et eget git-repo)» |
+| BH4, ECH9 | README-en sa «en annen sin nøkkel», resten «gruppens nøkkel», og «aldri» er sterkere enn koden | low | rettet i `b857582`: «med nøkkelen som ligger i den». Linjene i FR-401, AD-10 og under story 3.5 står, fordi de gjelder et dobbeltklikk i en klon, som er det vernet sjekker |
+| BH3 | En `.git` høyere opp, og om mappa er riktig før vernet | low | uten endring: skriptene går til mappa de ligger i før vernet (`Set-Location` og `cd`), og en `.git` høyere opp sjekkes ikke |
+| BH11 | «Mer informasjon» og «Kjør likevel» har ingen kilde fra Microsoft | low | uten endring: navnene gruppen så på skjermen. Står under «Åpent» |
+| BH12 | At høyreklikk ikke virker fra macOS 15, var bare lest i omtaler | low | rettet: Apples melding er lest, se linja over |
+| BH13 | 0 kall i linja under FR-401 var ikke vist | low | uten endring: slått opp 24.10 i `src/fetch_prices.py`, der `kjoer()` sjekker basen før nøkkelen og kvoten. ECH fant det samme |
+| BH14 | Gruppens prøve var før commitene i dag | low | rettet i linja under «Prøven før flettingen»: CI-jobben `dobbeltklikk` prøver demoen på head-en |
+| BH15, BH16 | Utført-linja mangler, og BH15-punktet under «Åpent» ser åpent ut | nit | uten endring: Utført-linja skrives til slutt, og dokumentet legges bare til. Linja under punktet sier at det er lukket |
+| ECH3, ECH7 | git kreves i testene, og sjekken av git er tatt bort | nit | uten endring: klonen trenger git for commiten (VG2), og sjekken av git er tatt bort med vilje |
+
 ## Åpent
 
 - **Godkjenningen på Mac** (BH15): teksten i README-en og hjelpen er ikke prøvd på en Mac. Prøven før flettingen viser om høyreklikk og Åpne er nok, eller om Personvern og sikkerhet må komme først.
@@ -126,3 +156,5 @@ Mutantene etter rettingene, på `6287033`: M1 `test_skriptene_bruker_kommandoene
 Flettingen stopper alltid før gruppen har prøvd: «Download ZIP» av grenen på GitHub, pakk ut i en ny mappe, og dobbeltklikk «Start demoen». Den ekte versjonen prøves aldri med gruppens nøkkel i en kopi, men i README-prøven med testerens egen konto.
 
 *Gruppens prøve 24.10 (svarene kl. 11:22 og 11:28):* «Download ZIP» av grenen, pakket ut i Nedlastinger, og «Start demoen» etter advarselen «Windows beskyttet PC-en». Siden med «Eksempeltall» var oppe på under ett minutt. Prøven var før commitene 24.10 på grenen, og de endrer bare den ekte versjonen, tekstene og testene, ikke veien til demoen.
+
+*Lagt til 2026-10-24 (gjennomgangen 24.10, BH14):* at demoen starter fra head-en, viser CI-jobben `dobbeltklikk` på Windows og Mac. Kjøringen står i Utført-linja for instruksjonen 24.10 kl. 12:31.
