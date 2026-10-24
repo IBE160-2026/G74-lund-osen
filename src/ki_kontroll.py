@@ -50,6 +50,13 @@ steg, falt eller var uendret, skal det stemme med grunnlaget, og mangler
 feltet, stoppes utsagnet. Det samme gjelder antallet aksjer som steg eller
 falt («ni aksjer steg»), og dagene («tre børsdager på rad»).
 
+Gruppens svar 24.10 kl. 21:49, under punkt 1: et utsagn om én sjekk, med
+navnet og utslaget («interessen ga et positivt utslag», «bevegelse og
+interesse ga ikke noe utslag», «ingen sjekk ga utslag på interesse»), skal
+stemme med fortegnet i grunnlaget. «Ingen sjekk ga utslag på» en sjekk er et
+utsagn om den sjekken, ikke om styrken. «Minst» om dagene er lov bare naar
+grunnlaget har dager_merke, og med merket stoppes et eksakt antall dager.
+
 Kontrollen er grov: den fanger ord, ikke mening (FR-603). Teksten
 normaliseres (NFC, uten myk bindestrek og usynlige tegn) foer den leses, saa
 et ord ikke slipper gjennom fordi det er skrevet med andre tegn.
@@ -60,7 +67,7 @@ import unicodedata
 from collections.abc import Mapping
 from dataclasses import dataclass
 
-from ki_grunnlag import ANTALLENE, FALT, STEG, UENDRET
+from ki_grunnlag import ANTALLENE, FALT, MINST, STEG, UENDRET
 from signalberegning import MA_VINDU, TERSKEL, VOLATILITET_VINDU, VOLUM_VINDU
 
 ANTALL_SJEKKER = 3
@@ -275,7 +282,65 @@ _AKSJER_UTSAGN = re.compile(
     r"(?<![\w-])(\w+)\s+(?:av\s+(?:de\s+)?(?:\w+\s+)?)?aksje(?:r|ne)?(?:\s+i\s+lista)?\s+(" + _VERB + r")(?![\w-])",
     re.IGNORECASE,
 )
-_DAGER_UTSAGN = re.compile(r"(?<![\w-])(\w+)\s+(?:børs)?dag(?:er)?\s+på\s+rad", re.IGNORECASE)
+# Gruppens svar 24.10 kl. 21:49: dagene ogsaa i «i to børsdager», «har vært
+# minst én børsdag» og «tre børsdager med samme retning». Uten «i», «har
+# vaert», «minst» eller et ledd etter er «en dag» et vanlig ord, som i «stor
+# handel på en dag kursen steg». «De siste 20 dagene» er bestemt form og
+# leses ikke.
+_DAGER_UTSAGN = re.compile(
+    r"(?<![\w-])(?:(i|har\s+vært)\s+)?(minst\s+)?(\w+)\s+(?:børs)?dag(?:er)?(?![\w-])"
+    r"(\s+(?:på\s+rad|med\s+samme|etter\s+hverandre))?",
+    re.IGNORECASE,
+)
+# «Minst» og et ord om dagene i samme setning: «i minst to børsdager»,
+# «fordi feltet dager er minst». «I dag» og «dagens» gjelder ikke dagene.
+_SETNING = re.compile(r"[^.!?]+")
+_MINST = re.compile(r"(?<![\w-])minst(?![\w-])", re.IGNORECASE)
+_DAGORD = re.compile(r"(?<![\w-])(?<!\bi\s)(?:børs)?dag(?:er|ene)?(?![\w-])", re.IGNORECASE)
+
+# Gruppens svar 24.10 kl. 21:49: utsagn om én sjekk, med navnet og utslaget,
+# skal stemme med fortegnet i grunnlaget. Ogsaa en liste: «bevegelse og
+# interesse ga ikke noe utslag». Ikke over tankestrek, saa «ingen av de tre
+# sjekkene – trend, bevegelse og interesse – ga et utslag» leses som styrken.
+_SJEKKNAVN = r"(?:trend(?:en)?|bevegelse(?:n)?|interesse(?:n)?)(?:-?sjekken)?(?![\w-])"
+_SJEKKLISTE = (
+    r"(?<![\w-])(" + _SJEKKNAVN + r"(?:\s*,\s*" + _SJEKKNAVN + r")*(?:\s*,?\s+(?:og|samt)\s+" + _SJEKKNAVN + r")?)"
+)
+_FORTEGNSORD = r"(positiv|negativ)(?:t|e)?"
+_EN_SJEKK_UTSAGN = (
+    # «interessen ga et positivt utslag», «mens bevegelse og interesse ikke
+    # ga noe utslag», «trenden ga ikke utslag», «interessen slo ikke ut».
+    re.compile(
+        _SJEKKLISTE + r"\s+(?:(?:også|heller|begge|derimot|dermed)\s+)?(ikke\s+)?(?:ga|gav|gir|har\s+gitt|hadde)\s+"
+        r"(ikke\s+(?:noe\s+|et\s+)?|heller\s+ikke\s+(?:noe\s+|et\s+)?|intet\s+|ingen\s+|noe\s+|et\s+|også\s+et\s+)?"
+        r"(?:" + _FORTEGNSORD + r"\s+)?utslag(?:et)?(?![\w-])",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        _SJEKKLISTE + r"\s+(ikke\s+)?slo\s+(ikke\s+)?(?:" + _FORTEGNSORD + r"\s+)?ut(?![\w-])",
+        re.IGNORECASE,
+    ),
+    # «Trenden er positiv, mens interessen er negativ.»
+    re.compile(
+        _SJEKKLISTE + r"\s+(?:er|var|ble)\s+(ikke\s+)?()" + _FORTEGNSORD + r"(?![\w-])",
+        re.IGNORECASE,
+    ),
+)
+# «Ingen sjekk ga utslag på interesse», «ikke noe utslag på trenden», «et
+# positivt utslag på trenden».
+_UTSLAG_PAA = re.compile(
+    r"(?<![\w-])((?:ingen(?:\s+av\s+(?:de\s+)?(?:tre\s+|3\s+)?sjekkene|\s+sjekk(?:er)?)\s+"
+    r"(?:ga|gav|gir|slo|har\s+gitt)\s+|(?:ikke(?:\s+(?:noe|et))?|intet|ingen)\s+)(?:et\s+)?)?"
+    r"(?:" + _FORTEGNSORD + r"\s+)?utslag(?:et)?\s+(?:på|for|fra|i)\s+(?:sjekken\s+)?" + _SJEKKLISTE,
+    re.IGNORECASE,
+)
+# Etter «ingen sjekk ga» i punkt 1: «... utslag på interesse» gjelder den
+# sjekken, ikke styrken.
+_PAA_EN_SJEKK = re.compile(
+    r"\w*(?:\s+[\w-]+){0,3}?\s+utslag(?:et)?\s+(?:på|for|fra|i)\s+(?:sjekken\s+)?" + _SJEKKNAVN,
+    re.IGNORECASE,
+)
+_FORTEGNET = {"positiv": 1, "negativ": -1}
 
 
 # Gjennomgangen av 10.2e (BH3, ECH1): antallet aksjer og dager leses uten
@@ -292,6 +357,61 @@ def _antall(ord_: str) -> int | None:
 
 def _bevegelsen(verb: str) -> str:
     return _BEVEGELSESVERB[" ".join(verb.lower().split())]
+
+
+def _sjekkene(liste: str) -> list[str]:
+    """«bevegelse og interessen» -> ["bevegelse", "interesse"]."""
+    return [navn.lower() for navn in re.findall(r"trend|bevegelse|interesse", liste, re.IGNORECASE)]
+
+
+def _stemmer(verdi: object, nei: bool, fortegn: str | None) -> bool:
+    """Om utsagnet om én sjekk stemmer med fortegnet. Med fortegn: likt, eller
+    ulikt med «ikke». Uten: et utslag, eller ikke noe utslag med «ikke»."""
+    if fortegn:
+        return (verdi == _FORTEGNET[fortegn.lower()]) != nei
+    return (verdi != 0) != nei
+
+
+def _en_sjekk(tekst: str, grunnlag: Mapping[str, object]) -> list[str]:
+    """Utsagnene om én sjekk (gruppens svar 24.10 kl. 21:49)."""
+    grunner: list[str] = []
+    utsagn: list[tuple[re.Match[str], str, bool, str | None]] = []
+    for moenster in _EN_SJEKK_UTSAGN:
+        for treff in moenster.finditer(tekst):
+            liste, ikke_foer, ikke_etter, fortegn = treff.groups()
+            # «ga noe/et utslag» og «ga også et» er ikke nektet.
+            nei = bool(ikke_foer) or bool(ikke_etter and not re.fullmatch(r"(?:noe|et|også\s+et)\s+", ikke_etter))
+            utsagn.append((treff, liste, nei, fortegn))
+    for treff in _UTSLAG_PAA.finditer(tekst):
+        nei_ledd, fortegn, liste = treff.groups()
+        utsagn.append((treff, liste, bool(nei_ledd), fortegn))
+    for treff, liste, nei, fortegn in utsagn:
+        for navn in _sjekkene(liste):
+            verdi = grunnlag.get(navn)
+            if type(verdi) is int and not _stemmer(verdi, nei, fortegn):
+                grunner.append(f"1: sjekken {navn} «{treff.group(0).strip()}», grunnlaget sier {verdi}")
+    return grunner
+
+
+def _dagene(tekst: str, grunnlag: Mapping[str, object]) -> list[str]:
+    """Dagene og «minst» (gruppens svar 24.10 kl. 21:49): «minst» om dagene er
+    lov bare med merket, og med merket stoppes et eksakt antall dager."""
+    grunner: list[str] = []
+    merket = grunnlag.get("dager_merke") == MINST
+    for treff in _DAGER_UTSAGN.finditer(tekst):
+        foran, minst, ord_, etter = treff.groups()
+        tall = _antall(ord_)
+        if tall is None or not (foran or minst or etter):
+            continue
+        if tall != grunnlag.get("dager"):
+            grunner.append(f"1: dagene «{treff.group(0)}», grunnlaget sier {grunnlag.get('dager', 'ingenting')}")
+        elif merket and not minst:
+            grunner.append(f"1: dagene «{treff.group(0)}» uten «minst», grunnlaget sier minst {tall}")
+    if not merket:
+        for setning in _SETNING.finditer(tekst):
+            if _MINST.search(setning.group(0)) and _DAGORD.search(setning.group(0)):
+                grunner.append(f"1: «minst» om dagene «{setning.group(0).strip()}», grunnlaget har ikke merket")
+    return grunner
 
 
 RAAD = (
@@ -418,6 +538,10 @@ def kontroller(tekst: str, grunnlag: Mapping[str, object]) -> Kontrollsvar:
             if moenster.groups == 2 and _EN_SJEKK_FORAN.search(treff.group(1)):
                 continue
             tall = _styrketall(treff.group(moenster.groups))
+            # «Ingen sjekk ga utslag på interesse» gjelder den sjekken, ikke
+            # styrken (gruppens svar 24.10 kl. 21:49). Den sjekkes i _en_sjekk.
+            if tall == 0 and _PAA_EN_SJEKK.match(tekst, treff.end()):
+                continue
             if tall is not None and tall != styrke:
                 start = len(treff.group(1)) if moenster.groups == 2 else 0
                 grunner.append(f"1: styrken «{treff.group(0)[start:]}», regelen sier {styrke}")
@@ -440,10 +564,8 @@ def kontroller(tekst: str, grunnlag: Mapping[str, object]) -> Kontrollsvar:
         felt = {STEG: "aksjer_steg", FALT: "aksjer_falt"}.get(_bevegelsen(treff.group(2)))
         if tall is not None and (felt is None or tall != grunnlag.get(felt)):
             grunner.append(f"1: antallet «{treff.group(0)}», grunnlaget sier {grunnlag.get(felt, 'ingenting')}")
-    for treff in _DAGER_UTSAGN.finditer(tekst):
-        tall = _antall(treff.group(1))
-        if tall is not None and tall != grunnlag.get("dager"):
-            grunner.append(f"1: dagene «{treff.group(0)}», grunnlaget sier {grunnlag.get('dager', 'ingenting')}")
+    grunner += _dagene(tekst, grunnlag)
+    grunner += _en_sjekk(tekst, grunnlag)
 
     # 2. Tallene.
     lovlige = FASTE_TALL | {grunnlag[navn] for navn in ANTALLENE if type(grunnlag.get(navn)) is int}

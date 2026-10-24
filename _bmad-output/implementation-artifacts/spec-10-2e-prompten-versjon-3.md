@@ -51,6 +51,13 @@ Versjon 3 rettes på grenen og prøvekjøres på nytt, og flettes bare hvis fær
 
 **a) Prompten** (`src/ki_prompt.py`): én sjekk omtales med navnet, som «interessen ga ikke utslag», og «ingen sjekk» brukes bare når styrken er 0. Hver sjekk beskrives slik fortegnet i grunnlaget er. «Minst» om dagene brukes bare når grunnlaget har `dager_merke`, og da alltid. `PROMPTVERSJON` står som «3», fordi versjon 3 ikke er flettet, og avtrykket i `AVTRYKK` er satt på nytt. Den første teksten til versjon 3 står på `c848ea6`.
 
+**b) Kontrollen** (`src/ki_kontroll.py`, FR-603, under punkt 1):
+- Et utsagn om én sjekk, med navnet og utslaget, skal stemme med fortegnet i grunnlaget. Det leses i formene «interessen ga et positivt utslag», «ga ikke (noe) utslag», «slo (ikke) ut», «trenden er positiv», i en liste som «bevegelse og interesse ikke ga noe utslag», og som «(ingen sjekk ga / ikke noe / et positivt) utslag på interessen». En liste over tankestrek leses ikke, så «ingen av de tre sjekkene – trend, bevegelse og interesse – ga et utslag» er styrken.
+- «Ingen sjekk ga utslag på» en sjekk er et utsagn om den sjekken, ikke om styrken. «Ingen sjekk ga et positivt utslag», uten en sjekk etter, leses fortsatt som styrken.
+- «Minst» og et ord om dagene i samme setning er lov bare når grunnlaget har `dager_merke`. Med merket stoppes et antall dager uten «minst». Dagene leses også i «i to børsdager», «har vært minst én børsdag» og «to børsdager med samme retning». «En dag» uten «i», «har vært», «minst» eller et ledd etter er et vanlig ord.
+- Testene fra 10.2d med de 13 demotekstene fra versjon 2 (`tests/demo_ki_tekster_versjon_2.json`) er kjørt mot den nye kontrollen: ingen ble stoppet. Én form i `test_formene_om_en_sjekk_stoppes_ikke`, «… og bevegelsen ga et positivt utslag», stoppes nå, fordi bevegelsen er 0 i grunnlaget. Den står med trenden i stedet, som er 1.
+- Mot tekstene fra §43 stopper den nye kontrollen 10 av 15: MOWI, ORK og SALM på interessen, DNB, FRO, VAR, TEL, GJF og DNO på «minst» uten merket, og MPCC på «Ingen sjekk ga et positivt utslag» (styrken). EQNR og AKRBP består nå.
+
 ## Boundaries & Constraints
 
 - Ingen kall til EODHD utover kvotesjekken i regel 15. `src/fetch_prices.py` kjøres ikke, og `data/db/ose.db` røres ikke (regel 22).
