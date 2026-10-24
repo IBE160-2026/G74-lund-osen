@@ -2,7 +2,7 @@
 title: 'Story 3.5 (3.5d): funnene fra forprøven av den ekte versjonen 24.10'
 type: 'bugfix'
 created: '2026-10-24'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '7b784f0'

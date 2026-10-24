@@ -2437,6 +2437,8 @@ reserve. Til da endres ikke «Kom i gang».
 
 *Avgjort 2026-10-24 kl. 12:11 (gruppens svar):* forprøve av den ekte versjonen i en ZIP-kopi på gruppens PC med egen testkonto før README-prøven; nøkkelen bare i ZIP-mappa, som slettes etterpå.
 
+*Lagt til 2026-10-24 kl. 17:41:* 3.5d, funnene fra forprøven av den ekte versjonen 24.10, er squash-flettet i `5e01a4f`, PR #94, låst til head-en `a48c5de` (spesifikasjonen `spec-3-5d-funn-fra-forproeven.md`). Vinduet sier hvor nøkkelen står og hvordan den limes inn, meldingene har æ, ø og å, webserveren har 8 tråder, og kjører OSE Signal fra samme mappa på porten, stopper skriptet den før uv. Alt annet stoppes aldri. Om stoppen skal flyttes til rett før webserveren (BH5 i triagen), og kommandolinja på Mac, står åpent i spesifikasjonen.
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
