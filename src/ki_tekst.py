@@ -31,6 +31,10 @@ eller tall fra kildene (regel 16).
 
 Ingen kall til EODHD gaar herfra: steget leser bare basen.
 
+Story 10.2e: grunnlaget faar dagen (lag_dagsbilde i ki_grunnlag.py), med
+kursene, indeksen og de lagrede vurderingene fra basen. Bare fortegn og
+antall sendes.
+
 velg_modell leser OSE_KI_TJENESTE og OSE_KI_OLLAMA_URL (svar 5 og 8):
 «av» gir ingen modell, og uten variabelen gjelder «lokal» (FR-608). Det er
 én tjeneste per kjoering, uten stille overgang til en annen.
@@ -43,6 +47,7 @@ noekkelen eller har tegn som ikke kan sendes, skrives ingen rader, og den kan
 legges inn og hentingen kjoeres igjen samme kveld. Noekkelen skrives aldri ut.
 """
 
+import sqlite3
 import sys
 import traceback
 from collections.abc import Callable, Mapping
@@ -56,15 +61,16 @@ import ki_anthropic
 import ki_gemini
 import ki_openai
 from boersdag import forrige_boersdag, innevaerende_boersdag, norsk_dato
+from hovedindeks import valgt_indeks
 from ki_anthropic import AnthropicModell
 from ki_gemini import GeminiModell
-from ki_grunnlag import ki_grunnlag
+from ki_grunnlag import ki_grunnlag, lag_dagsbilde
 from ki_lokal import STANDARD_URL, OllamaModell
 from ki_modell import Modell, lag_ki_rad
 from ki_openai import OpenAIModell
 from kilogg import Emne, IkkeInnevaerendeBoersdag, KIRad
 from kursdata import AKSJEUNIVERS, Aksje
-from lagring_sqlite import SqliteKILogg, SqliteVurderingslager, aapne_base
+from lagring_sqlite import SqliteIndekslager, SqliteKILogg, SqliteKurslager, SqliteVurderingslager, aapne_base
 from vurderingsdata import Vurdering
 
 AV = "av"
@@ -169,12 +175,39 @@ def regeltekst(vurdering: Vurdering) -> str:
     )
 
 
-def _rad_uten_kall(emne: Emne, vurdering: Vurdering, modell: Modell, foerste: str) -> KIRad:
+def _grunnlagene(
+    tilkobling, vurderinger: SqliteVurderingslager, dato: date, lista: tuple[Aksje, ...], mangler
+) -> dict[str, Mapping[str, object]]:
+    """Grunnlaget med dagen for hver aksje som mangler raden - story 10.2e.
+    Kursene, indeksen og vurderingene leses fra basen, og bare fortegn og
+    antall kommer med (ki_grunnlag)."""
+    kurser = SqliteKurslager(tilkobling, lista)
+    serier = {aksje.symbol: kurser.serie(aksje.symbol) for aksje in lista}
+    # Gjennomgangen av 10.2e (BH9, VG2): kan indeksen ikke leses, faar
+    # grunnlaget ikke hovedindeksen, og tekstene lages likevel, som paa
+    # forsiden (app._hovedindeks).
+    try:
+        indekser = SqliteIndekslager(tilkobling)
+        symboler = indekser.symboler()
+        indeksserie = indekser.serie(valgt_indeks(symboler)) if symboler else None
+    except (sqlite3.Error, ValueError):
+        indeksserie = None
+    grunnlagene = {}
+    for aksje, vurdering in mangler:
+        tidligere = vurderinger.les_periode(aksje.symbol, date.min, dato)
+        dagen = lag_dagsbilde(aksje, dato, vurdering, tidligere, lista, serier, indeksserie)
+        grunnlagene[aksje.symbol] = ki_grunnlag(vurdering, utenfor_maalingen=False, dagen=dagen)
+    return grunnlagene
+
+
+def _rad_uten_kall(
+    emne: Emne, vurdering: Vurdering, grunnlag: Mapping[str, object], modell: Modell, foerste: str
+) -> KIRad:
     from ki_prompt import PROMPTVERSJON
 
     return KIRad(
         emne=emne,
-        grunnlag=ki_grunnlag(vurdering, utenfor_maalingen=False),
+        grunnlag=grunnlag,
         regelen=regeltekst(vurdering),
         tekst=None,
         besto=False,
@@ -288,16 +321,18 @@ def lag_ki_tekster(
             )
             return False
         feilet_for: str | None = None
+        grunnlagene = _grunnlagene(tilkobling, vurderinger, dato, lista, mangler)
         for aksje, vurdering in mangler:
             emne = Emne.aksje(aksje.symbol, dato)
             if skrivbar() != dato:
                 raise IkkeInnevaerendeBoersdag(dato.isoformat())
+            grunnlag = grunnlagene[aksje.symbol]
             if feilet_for is None:
-                rad = lag_ki_rad(emne, ki_grunnlag(vurdering, utenfor_maalingen=False), regeltekst(vurdering), modell)
+                rad = lag_ki_rad(emne, grunnlag, regeltekst(vurdering), modell)
                 if rad.modellen_feilet:
                     feilet_for = aksje.symbol
             else:
-                rad = _rad_uten_kall(emne, vurdering, modell, feilet_for)
+                rad = _rad_uten_kall(emne, vurdering, grunnlag, modell, feilet_for)
             if not logg.skriv(rad):
                 sto += 1
                 continue

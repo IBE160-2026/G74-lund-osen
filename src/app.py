@@ -43,8 +43,7 @@ from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
 from graf import bygg_graf
 from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
 from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster
-from hovedindeks import Hovedindeksvisning, bygg_hovedindeks
-from indeksdata import HOVEDINDEKS
+from hovedindeks import Hovedindeksvisning, bygg_hovedindeks, valgt_indeks
 from ki_visning import AV, KAPSEL, PAA, UKJENT, KIVisning, bygg_ki_visning, ki_paa
 from kilogg import Emne, UgyldigKIRad
 from kursdata import Kursleser, investorside
@@ -465,19 +464,13 @@ def _hovedindeks(
         symboler = lager.symboler()
         if not symboler:
             return None, False
-        symbol = _valgt_indeks(symboler)
+        symbol = valgt_indeks(symboler)
         serier = [(post.aksje, kurslager.serie(post.aksje.symbol)) for post in poster]
         aksjer = [(aksje.navn, serie) for aksje, serie in serier]
         grunnlag = [(aksje, serie, aksje.symbol in tre_av_tre) for aksje, serie in serier]
         return bygg_hovedindeks(symbol, lager.serie(symbol), aksjer, grunnlag), False
     except (*BASEFEIL, ValueError):
         return None, True
-
-
-def _valgt_indeks(symboler: tuple[str, ...]) -> str:
-    """HOVEDINDEKS (OSEBX) naar basen har den, ellers den basen sist hentet,
-    som DEMIX i demobasen. Forsiden og kursgrafen viser samme indeks."""
-    return HOVEDINDEKS.symbol if HOVEDINDEKS.symbol in symboler else symboler[0]
 
 
 def _indeksen_for_grafen() -> tuple[str | None, dict | None, bool]:
@@ -493,7 +486,7 @@ def _indeksen_for_grafen() -> tuple[str | None, dict | None, bool]:
         symboler = lager.symboler()
         if not symboler:
             return None, None, False
-        symbol = _valgt_indeks(symboler)
+        symbol = valgt_indeks(symboler)
         return symbol, {rad.dato: float(rad.justert_slutt) for rad in lager.serie(symbol)}, False
     except (*BASEFEIL, ValueError):
         return None, None, True

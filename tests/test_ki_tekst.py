@@ -92,6 +92,10 @@ class TestSteget:
         assert "15 besto kontrollen, 0 ble stoppet av kontrollen, og modellen feilet for 0." in ut
 
     def test_grunnlaget_og_regelen_er_vurderingens(self, stier):
+        """Story 10.2e: ville feilet hvis steget ikke ga grunnlaget dagen.
+        Foerste henting i en tom base har ingen vurdering foer dagen, saa
+        dagene er «minst» 1. Alle 15 seriene og indeksen stiger siste dag
+        (serie_med_utslag)."""
         raa, base = stier
         kjoer(raa, base, FalskModell())
         vurdering = vurderingene(base, TIRSDAG)["EQNR"][0]
@@ -102,8 +106,70 @@ class TestSteget:
             "interesse": vurdering.interesse,
             "styrke": vurdering.styrke,
             "retning": vurdering.retning,
+            "dager": 1,
+            "dager_merke": "minst",
+            "hovedindeksen": "steg",
+            "aksjer_steg": 15,
+            "aksjer_falt": 0,
+            "bransjen": "steg",
         }
         assert rad.regelen == regeltekst(vurdering)
+
+    def test_dagene_teller_kvelden_foer(self, stier):
+        """Story 10.2e: ville feilet hvis steget ikke leste vurderingene foer
+        dagen fra basen. Tirsdag og onsdag gir samme retning og styrke, saa
+        onsdag er «minst» 2."""
+        raa, base = stier
+        onsdag = date(2026, 9, 23)
+        kjoer(raa, base, FalskModell())
+        kjoer(raa, base, FalskModell(), hent=lambda *_: serie_med_utslag(onsdag), oeyeblikk=ONSDAG_KL_22)
+        tirsdag = vurderingene(base, TIRSDAG, ONSDAG_KL_22)["EQNR"][0]
+        vurdering = vurderingene(base, onsdag, ONSDAG_KL_22)["EQNR"][0]
+        assert (tirsdag.retning, tirsdag.styrke) == (vurdering.retning, vurdering.styrke)
+        grunnlag = radene(base, onsdag)["EQNR"].grunnlag
+        assert (grunnlag["dager"], grunnlag["dager_merke"]) == (2, "minst")
+
+    def test_hovedindeksen_er_osebx_ogsaa_med_en_annen_indeks(self, stier):
+        """Gjennomgangen av 10.2e (VG1): ville feilet hvis grunnlaget tok
+        indeksen basen sist hentet, i stedet for OSEBX som forsiden viser.
+        OBX hentes etter OSEBX og faller, mens OSEBX stiger."""
+        from indeksdata import HOVEDINDEKS, Indeks
+        from kursdata import Kursrad
+        from lagring_sqlite import SqliteIndekslager
+
+        raa, base = stier
+        kjoer(raa, base, None)
+        obx = Indeks("OBX", "OBX.OL", "OBX")
+        tilkobling = aapne_base(base)
+        try:
+            SqliteIndekslager(tilkobling, (HOVEDINDEKS, obx)).erstatt_serie(
+                "OBX",
+                [
+                    Kursrad(dato=date(2026, 9, 21), slutt=1500.0, justert_slutt=1500.0, volum=0),
+                    Kursrad(dato=TIRSDAG, slutt=1400.0, justert_slutt=1400.0, volum=0),
+                ],
+                ONSDAG_KL_22,
+            )
+            assert SqliteIndekslager(tilkobling).symboler()[0] == "OBX"
+        finally:
+            tilkobling.close()
+        lag_ki_tekster(base, TIRSDAG, lambda: OEYEBLIKK, FalskModell(), lambda _: None)
+        assert radene(base)["EQNR"].grunnlag["hovedindeksen"] == "steg"
+
+    def test_en_indeks_som_ikke_kan_leses_stopper_ikke_tekstene(self, stier, monkeypatch):
+        """Gjennomgangen av 10.2e (BH9, VG2): ville feilet hvis en feil ved
+        lesingen av indeksen stoppet KI-teksten for alle aksjene. Grunnlaget
+        faar da ikke hovedindeksen, som forsiden, der indeksen ikke vises."""
+        raa, base = stier
+
+        def feiler(self):
+            raise sqlite3.OperationalError("no such table: indeksserie")
+
+        monkeypatch.setattr(ki_tekst.SqliteIndekslager, "symboler", feiler)
+        kjoer(raa, base, FalskModell())
+        rader = radene(base)
+        assert all(r is not None and r.besto for r in rader.values())
+        assert all("hovedindeksen" not in r.grunnlag and r.grunnlag["dager"] == 1 for r in rader.values())
 
     def test_ingen_kall_til_eodhd_fra_steget(self, stier, tmp_path):
         """Ville feilet hvis KI-steget gjorde et kall til EODHD (F5)."""

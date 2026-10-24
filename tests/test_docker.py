@@ -989,7 +989,9 @@ HOEYDE_PAA_BILDET = 1630
 # byte det samme.
 # Story 3.5d b: æ, ø og å i meldingene fra demo.py. Bildet ble tatt paa nytt
 # og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "8adc35a02d4c69c7529e6c9ed6145ed5b7d093aad94fb2229953885901adefb2"
+# Story 10.2e: valgt_indeks flyttet fra app.py til hovedindeks.py. Bildet ble
+# tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "bc4126a7538d4bd76f82fcf0bf4c6c8867e11e4923a76035366655098296644a"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1045,7 +1047,10 @@ FILENE_BAK_AKSJESIDEN = (
 IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py", "src/boersometer.py"}
 # Bildet er saa hoeyt at grafen, som staar under KI-teksten, er med til bunnen.
 # Story 8.3: 1872 med knapperaden i stripa. Var 1816.
-HOEYDE_PAA_AKSJESIDEN = 1872
+# Story 10.2e, rettingen etter gruppens svar 24.10 kl. 21:49: teksten for KVST
+# ble stoppet av kontrollen, og feltet sier at den ikke ble vist. Grafen
+# slutter da ved 1827, maalt i Edge uten vindu. Var 1872.
+HOEYDE_PAA_AKSJESIDEN = 1827
 # Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
 # Story 10.5: lenken til investorsiden står under grafen, ved 1980 px målt i
 # Edge uten vindu, så bildet, som slutter ved bunnen av grafen (1872 px), ble
@@ -1119,7 +1124,13 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # Bildet ble tatt paa nytt og er byte for byte det samme.
 # Story 3.5d b: æ, ø og å i meldingene fra demo.py. Bildet ble tatt paa nytt
 # og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "30801cffdfdafa6630c73acffd776d98e723ea14930c23433400d689b704c918"
+# Story 10.2e: KI-tekstene i demoen laget paa nytt med prompten versjon 3, og
+# valgt_indeks flyttet fra app.py til hovedindeks.py. Bildet ble tatt paa nytt
+# med samme hoeyde og viser den nye teksten for KVST.
+# Story 10.2e, rettingen etter gruppens svar 24.10 kl. 21:49: KI-tekstene laget
+# paa nytt med prompten versjon 3 rettet. Teksten for KVST ble stoppet, og
+# bildet ble tatt paa nytt med hoeyden 1827.
+AVTRYKK_BAK_AKSJESIDEN = "f63b2e326a4d9b1ae959dd986cd169c58d9bb15810fd9d8aac1dbb6d30c9e32c"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "
