@@ -45,6 +45,12 @@ Fortsatt ingen kurser, volumer, prosenter eller forholdstall. Grunnlaget har bar
 - Kopien har radene med versjon 2 fra kveldshentingen 23.10. Utfallet av dem føres som sammenligning på samme dags data. Så slettes de i kopien, og bare i kopien, med utløseren `ki_logg_slettes_ikke` tatt bort og satt inn igjen, før KI-steget kjøres.
 - sha256 for `data/db/ose.db` er den samme før og etter.
 
+## Rettingen etter gruppens svar 24.10 kl. 21:49
+
+Versjon 3 rettes på grenen og prøvekjøres på nytt, og flettes bare hvis færre enn tre tekster stoppes og ingen tekst sier feil om en sjekk eller om dagene (under story 10.2 i `epics.md`).
+
+**a) Prompten** (`src/ki_prompt.py`): én sjekk omtales med navnet, som «interessen ga ikke utslag», og «ingen sjekk» brukes bare når styrken er 0. Hver sjekk beskrives slik fortegnet i grunnlaget er. «Minst» om dagene brukes bare når grunnlaget har `dager_merke`, og da alltid. `PROMPTVERSJON` står som «3», fordi versjon 3 ikke er flettet, og avtrykket i `AVTRYKK` er satt på nytt. Den første teksten til versjon 3 står på `c848ea6`.
+
 ## Boundaries & Constraints
 
 - Ingen kall til EODHD utover kvotesjekken i regel 15. `src/fetch_prices.py` kjøres ikke, og `data/db/ose.db` røres ikke (regel 22).

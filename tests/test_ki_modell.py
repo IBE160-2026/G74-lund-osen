@@ -35,7 +35,9 @@ AVTRYKK = {
     "1": "8fa4608965a356110f97963f65ba85bb44c79e913d47b5b911dc06b51af7be72",
     "2": "4c697052292bf7069ed7ba0cb7600a8c67574c969fd4fcd184f4b854876df660",
     # Story 10.2e. Teksten til versjon 2 staar i src/ki_prompt.py paa 153aba8.
-    "3": "90978789870ba20897939bdda02c161cf2053b75bff98a073590a14d3de4b8fd",
+    # Versjon 3 ble rettet foer den ble flettet (gruppens svar 24.10 kl. 21:49),
+    # og avtrykket ble satt paa nytt. Den foerste teksten staar paa c848ea6.
+    "3": "bedb41501fb4f853eb875497c593d48983fffb193c80d2760133852ba949052a",
 }
 
 
@@ -157,6 +159,24 @@ class TestPrompten:
         blokk = REGLER.split("Regler for teksten:", 1)[1].split("\n\n", 1)[0]
         assert any("vise til" in linje and "ikke gjenta tallene" in linje for linje in blokk.splitlines())
         assert any("antallene i opplysningene" in linje for linje in blokk.splitlines())
+
+    def test_en_sjekk_med_navnet_og_ingen_sjekk_bare_ved_styrke_0(self):
+        """Gruppens svar 24.10 kl. 21:49 (malinger.md §43): ville feilet hvis
+        reglene ikke ba om navnet paa sjekken, eller lot «ingen sjekk» staa om
+        én sjekk, eller ikke ba om aa beskrive hver sjekk slik fortegnet er."""
+        blokk = REGLER.split("Regler for teksten:", 1)[1].split("\n\n", 1)[0].splitlines()
+        assert any("én sjekk" in linje and "«interessen ga ikke utslag»" in linje for linje in blokk)
+        assert any("«ingen sjekk» bare når styrken er 0" in linje for linje in blokk)
+        assert any("Beskriv hver sjekk slik fortegnet står" in linje for linje in blokk)
+        assert "for eksempel at ingen sjekk ga utslag" not in REGLER
+
+    def test_minst_bare_med_merket_og_da_alltid(self):
+        """Gruppens svar 24.10 kl. 21:49: fem tekster i §43 sa «minst» uten
+        merket. Ville feilet hvis reglene ikke sa at «minst» skal staa med
+        merket, og bare da."""
+        linje = next(linje for linje in REGLER.splitlines() if linje.startswith("- dager:"))
+        assert "alltid «minst»" in linje
+        assert "du skal ikke skrive «minst»" in linje
 
     def test_ingen_raad_og_ingen_gjetning(self):
         prompt = lag_prompt(BLANDET)

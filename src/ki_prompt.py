@@ -26,6 +26,11 @@ fra boersometeret og bransjen, og reglene forklarer dem med ord. Teksten
 kan vise til tallene paa siden uten aa gjenta dem. Prompten nevner fortsatt
 bare regelens faste tall, saa en modell som gjentar den, ikke stoppes av
 punkt 2 i kontrollen.
+
+Versjon 3 rettet (gruppens svar 24.10 kl. 21:49, malinger.md §43): én sjekk
+omtales med navnet, «ingen sjekk» brukes bare naar styrken er 0, hver sjekk
+beskrives slik fortegnet er, og «minst» om dagene brukes bare med merket, og
+da alltid. Versjonen staar som 3, fordi versjon 3 ikke var flettet.
 """
 
 import json
@@ -44,17 +49,19 @@ Styrken er hvor mange av sjekkene som ga utslag. Retningen er Positiv, Negativ, 
 I opplysningene under står 1 for positivt utslag, -1 for negativt og 0 for ikke noe utslag.
 
 Opplysningene sier også hvordan dagen var:
-- dager: hvor mange børsdager på rad signalet har hatt samme retning og samme styrke, til og med i dag. Står dager_merke «minst», er det minst så mange børsdager, fordi dagene før ikke er lagret.
+- dager: hvor mange børsdager på rad signalet har hatt samme retning og samme styrke, til og med i dag. Står dager_merke «minst», er det minst så mange børsdager, fordi dagene før ikke er lagret. Skriv da alltid «minst» foran antallet dager. Står ikke dager_merke i opplysningene, er antallet nøyaktig, og du skal ikke skrive «minst».
 - hovedindeksen: om hovedindeksen på Oslo Børs steg, falt eller var uendret i dag. Mangler feltet, skal du ikke si noe om hovedindeksen.
 - aksjer_steg og aksjer_falt: hvor mange av aksjene i lista som steg og som falt fra børsdagen før.
 - bransjen: om aksjene i samme bransje som denne steg, falt eller var uendret i snitt. Mangler feltet, skal du ikke si noe om bransjen.
 
 Regler for teksten:
+- Beskriv hver sjekk slik fortegnet står i opplysningene: et positivt utslag, et negativt utslag eller ikke noe utslag. Ikke si at en sjekk ga utslag når den ikke ga det, eller at den ga et annet utslag enn det som står.
+- Når du sier noe om én sjekk, bruk navnet på sjekken, for eksempel «interessen ga ikke utslag». Skriv «ingen sjekk» bare når styrken er 0.
 - Bruk bare opplysningene under. Skriv utslagene med ord, ikke som tall. Ikke nevn kurser, prosenter eller andre tall enn antallene i opplysningene og regelens faste tall.
 - Siden viser kursen, endringen og målingene. Du kan vise til dem, for eksempel «se endringen i tabellen», men ikke gjenta tallene.
 - Hovedindeksen og bransjen er ikke en del av regelen. Ikke si at de forklarer signalet.
 - Ikke gi råd om å kjøpe, selge eller holde, og ikke si noe om hva som vil skje.
-- Ikke gjett på årsaker, som nyheter, resultater eller kontrakter. Du kan forklare regelen, for eksempel at ingen sjekk ga utslag.
+- Ikke gjett på årsaker, som nyheter, resultater eller kontrakter. Du kan forklare regelen, for eksempel at en sjekk ikke ga utslag.
 - Når du forklarer regelen, bruk «fordi». Ikke bruk «skyldes» eller «indikerer».
 """
 
