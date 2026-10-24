@@ -619,11 +619,11 @@ def skriv_indeksen_til_basen(
     finally:
         tilkobling.close()
     # Forprøven 24.10 (funn 5, U4): linja sier hvorfor dagene før 2026 ikke
-    # lagres.
+    # lagres. Gjennomgangen av 3.5d (BH11): de er ikke «ikke børsdager».
     skriv(
-        f"{indeks.navn} {indeks.symbol}: lagret {lagret} dager, tok bort "
-        f"{len(rader) - lagret} som ikke er børsdager i {aarene}. Børskalenderen "
-        f"i appen gjelder bare {aarene}, så andre dager lagres ikke."
+        f"{indeks.navn} {indeks.symbol}: lagret {lagret} dager og tok bort "
+        f"{len(rader) - lagret}, som er dager utenfor {aarene} eller dager børsen var "
+        f"stengt. Børskalenderen i appen gjelder bare {aarene}, så andre dager lagres ikke."
     )
     return True
 

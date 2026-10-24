@@ -3368,7 +3368,7 @@ class TestHovedindeksen:
         for tabell in ("aksje", "kurs", "kursserie", "vurdering"):
             assert "OSEBX" not in symbolene_i(base, tabell), tabell
         assert antall_rader(base, "vurdering") == len(AKSJEUNIVERS)
-        assert f"Hovedindeksen OSEBX: lagret {len(ventet)} dager, tok bort {60 - len(ventet)} " in ut
+        assert f"Hovedindeksen OSEBX: lagret {len(ventet)} dager og tok bort {60 - len(ventet)}, " in ut
 
     def test_utskriften_teller_dagene_som_tas_bort(self, stier):
         """BH2 i 2.8a: 300 dager bakover fra 22.09.2026 gir dager i 2025, helger
@@ -3384,7 +3384,10 @@ class TestHovedindeksen:
         assert any(d.year not in DEKKEDE_AAR for d in datoer)
         assert len(indeksen_i(base)[0]) == lagret
         aarene = ", ".join(str(aar) for aar in sorted(DEKKEDE_AAR))
-        assert f"lagret {lagret} dager, tok bort {300 - lagret} som ikke er børsdager i {aarene}." in ut
+        assert (
+            f"lagret {lagret} dager og tok bort {300 - lagret}, som er dager utenfor {aarene} eller dager børsen var stengt."
+            in ut
+        )
         # Forproeven 24.10 (funn 5, U4): linja sier hvorfor andre dager ikke lagres.
         assert f"Børskalenderen i appen gjelder bare {aarene}, så andre dager lagres ikke." in ut
 
