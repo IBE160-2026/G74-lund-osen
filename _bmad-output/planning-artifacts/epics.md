@@ -2340,6 +2340,26 @@ avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 
 *Avgjort 2026-10-23 kl. 20:27 (gruppens svar):* setningen i fotnoten sier datoen, for eksempel «Signalet for fredag 23.10 kan fortsatt lagres hvis hentingen kjøres ferdig før neste børsdag.», så den er klar når flere dager står «ikke vurdert» på oversikten (BH4 og ECH1 fra gjennomgangen 23.10 kveld). Den erstatter «denne dagen» fra svaret kl. 19:10, og bygges som 3.4f.
 
+*Avgjort 2026-10-24 kl. 11:48 (gruppens svar):* alle lenker ut av appen åpnes i en ny fane.
+
+*Avgjort 2026-10-24 kl. 11:58 (gruppens svar):* i demoen går knappen til investorsiden til en egen side i appen, med en logo med tekst i en sirkel og en tegning laget av KI, fordi selskapene er oppdiktet. I den ekte versjonen går den til selskapets egen side.
+
+*Avgjort 2026-10-24 kl. 12:01 (gruppens svar):* både logoen og tegningen, med litt nerdehumor om navnet eller bransjen, ikke grov.
+
+*Avgjort 2026-10-24 kl. 12:37 (gruppens svar):* bransjesymbolet fra appen står i logoen, og navnene har ulike skrifter.
+
+*Avgjort 2026-10-24 kl. 12:39 (gruppens svar):* tegneserieaktig strek, men ikke for mye.
+
+*Avgjort 2026-10-24 kl. 12:51 (gruppens svar):* ikke vannmerke.
+
+*Avgjort 2026-10-24 kl. 13:02 (gruppens svar):* «Illustrasjon laget av KI» rett under tegningen, snakkeboblen nær den som snakker, tegningen på samme sted på alle sidene, ingen tekst som overlapper, og en lenke tilbake til aksjesiden øverst.
+
+*Avgjort 2026-10-24 kl. 13:03 (gruppens svar):* navnene skrives aldri med små bokstaver.
+
+*Godkjent 2026-10-24 kl. 13:43 (gruppens svar):* de 15 tegningene i `docs/bilder/investorsider/`.
+
+*Avgjort 2026-10-24 kl. 15:21 (gruppens svar):* på aksjesiden er lenken til investorsiden et kort, «Mer om ‹navn›», med den samme logoen i 64 px og grå ring, fordi gul betyr «skilte seg ut». Logoen står ikke i lista på forsiden.
+
 ### Story 3.4b: KI-tekstene i demoen
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 16:53.*
