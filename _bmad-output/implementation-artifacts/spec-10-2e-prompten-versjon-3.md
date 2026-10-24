@@ -79,6 +79,8 @@ Ett forsøk til med versjon 3 søndag 25.10. Det flettes bare med 15 av 15 i pr�
 - De 10 som besto, er lest mot grunnlaget. Ingen sier feil om en sjekk eller om dagene. Åtte har ordlyden i anførselstegn etter «i», som «i "i dag for første gang"» (HVDO, FJSB, TRHF, JGRD, LSTF, SGNT, LKSV og TROY). Det er dårlig språk, men ordlyden står ordrett, og kontrollen sjekker ikke språket (under «Åpent»).
 - Teksten for KVST ble stoppet igjen, så bildet av aksjesiden i README-en viser nå BRFE (Brattfjell Energi), der teksten besto (svaret b): `docs/appen/aksjesiden-brfe-demo.png`, 1280 × 1872, målt i Edge uten vindu til bunnen av grafen. Målingen ga 1827 for KVST, som før, og 1872 for BRFE. Bildet av KVST er tatt bort. Bildeteksten, «Mappestruktur» (regel 19), stien, høyden og avtrykkene i `tests/test_docker.py` følger med.
 
+**c) Prøvekjøringen** (§45 i `malinger.md`), mot kopien `data/db/ki-proeve-v3c.db`, laget med skallet på main kl. 00:04:21 før grenen, med samme sha256 som `ose.db`. Kjørt 00:20:45–00:20:56: 13 av 15 besto, 2 ble stoppet, og modellen feilet for 0. VAR og TEL ble stoppet på «det første signalet», dagene med egne ord. Hver tekst er lest mot grunnlaget, og ingen av de 13 sier feil om en sjekk eller om dagene. Ti setter ordlyden klønete inn i setningen (under «Åpent»). 13 av 15 er under kravet (15 av 15) i svaret kl. 23:23, så grenen flettes ikke. Med kontrollen fra a) består fortsatt alle 15 fra §34.
+
 ## Boundaries & Constraints
 
 - Ingen kall til EODHD utover kvotesjekken i regel 15. `src/fetch_prices.py` kjøres ikke, og `data/db/ose.db` røres ikke (regel 22).

@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-25T00:04
+updated: 2026-10-25T00:21
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -4912,3 +4912,55 @@ på en årsak. Tekstene står bare i kopien og er ikke ført her.
 Fire stoppet er over grensen i gruppens svar kl. 21:49 (færre enn tre), så
 versjon 3 flettes ikke. Den består også færre enn versjon 2 på samme dag (15),
 etter beslutningen 16.10 kl. 23:51 (2).
+
+## 45. Prøvekjøringen av prompten versjon 3 med ferdig ordlyd for dagene (2026-10-25)
+
+**Metode.** Som i §44, etter gruppens svar 24.10 kl. 23:23: ett forsøk til med
+versjon 3, der modellen får ferdig ordlyd for dagene og aldri skriver dem med
+egne ord. Den flettes bare med 15 av 15 og ingen tekst med feil, etter
+beslutningen 16.10 kl. 23:51 (2). Ordlyden lages av dagene og merket: «i dag
+for første gang», «i N børsdager på rad», «i minst 1 børsdag» og «i minst N
+børsdager». Prompten har den på en egen linje etter opplysningene, og «minst»
+står ikke i reglene. Kontrollen tar ordlyden ut av teksten og stopper dagene i
+annen form, også ordenstall som «det tredje på rad» og «det første signalet»
+(spesifikasjonen 10.2e, «Tredje forsøk»). Basen ble kopiert med skallet på main
+til `data/db/ki-proeve-v3c.db` søndag 25.10 kl. 00:04:21, før grenen (regel
+22), med samme sha256 som `ose.db`. Kopien hadde de 15 radene med versjon 2 fra
+kveldshentingen 23.10, alle bestått. De ble slettet i kopien, og bare der, med
+utløseren `ki_logg_slettes_ikke` tatt bort og satt inn igjen. Bare KI-steget
+ble kjørt mot kopien for børsdagen 23.10, med den ekte klokka, fra et skript
+utenfor repoet, og tiden per kall ble tatt med `time.monotonic()`. Ingen kall
+til EODHD: kvoten sto på 20 brukt kl. 00:02, og steget leser bare basen.
+sha256 for `data/db/ose.db` var den samme før og etter (`e3184c07…f4a4`).
+
+Hver av de 15 tekstene er lest mot grunnlaget: hver sjekk og dagene. Med
+kontrollen fra 10.2e a) består fortsatt alle 15 tekstene fra §34. Av tekstene
+fra §43 stoppes 13 og fra §44 14, de fleste fordi de skrev dagene med egne ord,
+som «i to børsdager» og «i ett børsdag».
+
+| | §34, versjon 2, 16.10 | §43, versjon 3, 23.10 | §44, versjon 3 rettet, 23.10 | §45, versjon 3 med ordlyden, 23.10 |
+|---|---:|---:|---:|---:|
+| Kjørt | 23:43–23:44 | 20:31:25–20:31:36 | 22:05:12–22:05:22 | 00:20:45–00:20:56 |
+| Besto kontrollen | 15 | 12 | 11 | 13 |
+| Stoppet av kontrollen | 0 | 3 | 4 | 2 |
+| Modellen feilet | 0 | 0 | 0 | 0 |
+| Median tid per tekst | 0,77 s | 0,73 s | 0,65 s | 0,73 s |
+| Lengste kall | 81,36 s (det første, med innlasting) | 1,01 s (modellen var lastet) | 0,85 s (modellen var lastet) | 0,96 s (modellen var lastet) |
+| Tekster med feil som slapp gjennom | 0 | 9 | 0 | 0 |
+
+§45: `maskinvare` `gpu` for alle 15 og «100% GPU» i `ollama ps`,
+`gemma4:e4b` med `modell_id` `dc35e8d9c606`, og Ollama 0.35.1. Alle 15 radene
+har `promptversjon` 3.
+
+**Resultat.** Kontrollen stoppet 2 av 15, VAR og TEL, begge på «det første
+signalet» der dagene er 1: dagene med egne ord ved siden av ordlyden. Ingen av
+de 13 som besto, sier feil om en sjekk eller om dagene. Alle 13 nevner dagene
+med ordlyden, men ti setter den klønete inn i setningen: ni i anførselstegn
+etter et ekstra «i», som «i "i 2 børsdager på rad"», og én med «i i 2
+børsdager på rad». Ingen tekst nevner hovedindeksen, bransjen eller antallet
+aksjer, og ingen gir råd eller gjetter på en årsak. Tekstene står bare i
+kopien og er ikke ført her.
+
+13 av 15 er under kravet i gruppens svar kl. 23:23 (15 av 15), så versjon 3
+flettes ikke. Den består også færre enn versjon 2 på samme dag (15), etter
+beslutningen 16.10 kl. 23:51 (2).
