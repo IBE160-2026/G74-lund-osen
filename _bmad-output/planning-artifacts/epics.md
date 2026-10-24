@@ -3394,6 +3394,8 @@ passet inn.
 - d) Der signalet ikke kunne regnes, sier raden og ruta i børsometeret hvorfor, med samme tall som aksjesiden, for eksempel «for kort historikk: 32 av 50 dager» (kl. 11:29).
 - f) «Bare» tas bort fra setningen om dem med 3 av 3 (kl. 11:49), så teksten ikke vurderer (NFR-06).
 
+*Lagt til 2026-10-24 kl. 14:57:* 8.2a, seks funn fra prøven av demoen 24.10, er squash-flettet i `e4d1ba4`, PR #93, låst til head-en `775cd50` (spesifikasjonen `spec-8-2a-funn-fra-proeven-av-demoen.md`). Punkt e), én liste når man sorterer, er med, etter avgjørelsen under story 8.15.
+
 ### Story 8.3: Min liste: eget skjermbilde med stjerne og filter
 
 *Lagt til 2026-09-30, Marians beslutning.*

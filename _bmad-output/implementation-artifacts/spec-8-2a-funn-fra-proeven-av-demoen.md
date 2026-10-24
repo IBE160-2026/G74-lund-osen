@@ -2,7 +2,7 @@
 title: 'Story 8.2 (8.2a): seks funn fra prøven av demoen 24.10'
 type: 'bugfix'
 created: '2026-10-24'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '3a4fb86'
