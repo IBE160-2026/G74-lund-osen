@@ -2433,6 +2433,10 @@ reserve. Til da endres ikke «Kom i gang».
 
 *Lagt til 2026-10-24 kl. 13:06:* 3.5a, start med dobbeltklikk med uv, uten Docker, er squash-flettet i `afbc0af`, PR #92, låst til head-en `d902e22` (spesifikasjonen `spec-3-5a-dobbeltklikk-med-uv.md`). Etter svaret 23.10 kl. 23:31 stopper «Start den ekte versjonen» i en mappe med `.git`, også på main. Gruppens prøve 24.10 var «Download ZIP» av grenen og «Start demoen» på Windows. «Kom i gang» er uendret til gruppen har valgt hovedvei, og 3.5b og 3.5c står igjen.
 
+*Avgjort 2026-10-24 kl. 12:04 (gruppens svar):* kjører den andre versjonen av OSE Signal, stopper skriptet den og sier det; et annet program stoppes aldri, og vinduet sier hva man gjør.
+
+*Avgjort 2026-10-24 kl. 12:11 (gruppens svar):* forprøve av den ekte versjonen i en ZIP-kopi på gruppens PC med egen testkonto før README-prøven; nøkkelen bare i ZIP-mappa, som slettes etterpå.
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
