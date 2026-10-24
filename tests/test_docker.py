@@ -868,6 +868,25 @@ BILDEFILER = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"}
 # Story 3.3c: skjermbildene fra gruppens gjennomgang 16.10, per steg i
 # «Felles for begge».
 BILDENE = {1: "engine-running.png", 2: "github-download-zip.png", 4: "powershell-mappa.png"}
+# Story 3.4 (godkjent 24.10 kl. 13:43): én tegning og én forhåndsvisning per
+# oppdiktet selskap i docs/bilder/investorsider/.
+INVESTORSIDENE = (
+    "blgt",
+    "brfe",
+    "fjsb",
+    "hvdo",
+    "jgrd",
+    "kvst",
+    "lksv",
+    "lstf",
+    "mtfj",
+    "nlys",
+    "sgnt",
+    "slvp",
+    "trhf",
+    "troy",
+    "vrds",
+)
 
 # Story 3.3e (gruppens svar 18.10 kl. 00:20): bildet av oversikten i demoen,
 # tatt etter «Bildet» i spesifikasjonen 3.3b. Filene under bestemmer det
@@ -1350,6 +1369,10 @@ class TestBildeneIDocs:
         # Story 3.3e: og bildet av oversikten i demoen. Story 3.3f: det ligger
         # i docs/appen/.
         ventet = [f"docs/bilder/readme/{navn}" for navn in BILDENE.values()]
+        # Story 3.4 (godkjent 24.10 kl. 13:43): tegningene til investorsidene
+        # i demoen, oppdiktede selskaper uten kurser.
+        ventet += [f"docs/bilder/investorsider/svg/{navn}.svg" for navn in INVESTORSIDENE]
+        ventet += [f"docs/bilder/investorsider/forhandsvisning/{navn}.png" for navn in INVESTORSIDENE]
         assert filer == sorted(ventet), filer
 
 
@@ -2471,8 +2494,8 @@ class TestReadmeForNybegynnere:
         del_ = README.read_text(encoding="utf-8").split("\n## Mappestruktur\n", 1)[1].split("\n## ", 1)[0]
         punkter = [l for l in del_.splitlines() if l.startswith("- ")]
         # Story 3.3f: 8 med docs/appen/. Story 3.5a: 9 med start/ og
-        # .gitattributes.
-        assert len(punkter) == 9, punkter
+        # .gitattributes. Story 3.4 (24.10): 10 med docs/bilder/investorsider/.
+        assert len(punkter) == 10, punkter
         for punkt in punkter:
             # Hver sti i kodeformat i punktet er en lenke, ogsaa etter
             # tankestreken (gjennomgangen, BH3 og ECH4).
@@ -2482,7 +2505,9 @@ class TestReadmeForNybegynnere:
         # Story 3.3e: 16 med bildet av oversikten. Story 3.3f: 18 med docs/appen/
         # og bildet av aksjesiden.
         # Story 3.5a: 20 med start/ og .gitattributes.
-        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 20, lenker
+        # Story 3.4 (24.10): 23 med docs/bilder/investorsider/, LESMEG.md og
+        # bobler.json.
+        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 23, lenker
         sporet = _git_sporet()
         for tekst, maal in lenker:
             # Maalet er stien i teksten, relativ og uten «..» (BH4, ECH3).
@@ -2491,6 +2516,9 @@ class TestReadmeForNybegynnere:
             filnavn = {navn: f"docs/bilder/readme/{navn}" for navn in BILDENE.values()}
             filnavn[SKJERMBILDET.rsplit("/", 1)[1]] = SKJERMBILDET
             filnavn[AKSJESIDEBILDET.rsplit("/", 1)[1]] = AKSJESIDEBILDET
+            # Story 3.4: filene etter docs/bilder/investorsider/.
+            for navn in ("LESMEG.md", "bobler.json"):
+                filnavn[navn] = f"docs/bilder/investorsider/{navn}"
             assert maal == tekst or filnavn.get(tekst) == maal, (
                 tekst,
                 maal,
@@ -2814,11 +2842,13 @@ LENKENE_FOER_3_3H = {
 # til skjemaet docs/brukertest.md i «Dokumentene» (regel 19). Var d05514d3....
 # Story 3.5a: start/ og .gitattributes i «Mappestruktur» (regel 19). Var
 # d157a170....
+# Story 3.4 (godkjent 24.10 kl. 13:43): docs/bilder/investorsider/ i
+# «Mappestruktur» (regel 19). Var 0d1a51a6....
 AVTRYKK_I_PILENE = {
     "Demoen": "f124a92b1c64eeb0ea5e7141976ff85de68df49004a22d5874a4a257aaf89b55",
     "Den ekte versjonen": "3bb398cd1be31a43abe09b7261456646b6dc03047e20f1aa57ab665a768cfd78",
     "Dokumentene": "409a3f8b38d4247df41e3eb5062ad439aa160e7fd1c0b49e0fd44f262eb2d77c",
-    "Mappestruktur": "0d1a51a6b39865892cd144651cb2be3610cf8e7473bf2eb1f67fe5cede32cd52",
+    "Mappestruktur": "852cb13b127041b82184ad280e382f1fd081578a0bb1c50de1c1594ab5df516f",
 }
 
 # Svaret 20.10 kl. 20:20: advarselen staar rett under pila til den ekte
