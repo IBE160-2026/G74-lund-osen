@@ -74,6 +74,11 @@ Ett forsøk til med versjon 3 søndag 25.10. Det flettes bare med 15 av 15 i pr�
 - Tester som godtok dagene med egne ord etter kl. 21:49, er snudd til å kreve stopp, og docstringene sier det. De fire formene som ble stoppet i §44 er med i `TestOrdlyden`.
 - Ordenstall ved «signalet», «det første signalet med denne retningen», stoppes også. Hullet ble funnet da demotekstene fra den første kjøringen 25.10 kl. 00:13 ble lest mot grunnlaget (NLYS, SLVP og KVST), før de ble committet. Tekstene ble lagt bort, og kommandoen ble kjørt på nytt med den rettede kontrollen (under b).
 
+**b) Demoen:**
+- KI-tekstene i demoen er laget på nytt (`uv run python src/demo_ki.py`). Første kjøring, 00:13:04–00:13:31, ga 13 av 13 bestått med kontrollen før rettingen over, og ble ikke committet. Andre kjøring, 00:16:07–00:16:18, med den rettede kontrollen: 10 av 13 besto. NLYS, SLVP og KVST ble stoppet på «det første signalet» (dagene i annen form). Grunnlaget var likt i begge kjøringene, og 12 av 13 tekster var ordrett like. Bare BRFE skilte seg: anførselstegnene rundt ordlyden falt bort. Ingen ny runde for en bedre tekst (FR-604).
+- De 10 som besto, er lest mot grunnlaget. Ingen sier feil om en sjekk eller om dagene. Åtte har ordlyden i anførselstegn etter «i», som «i "i dag for første gang"» (HVDO, FJSB, TRHF, JGRD, LSTF, SGNT, LKSV og TROY). Det er dårlig språk, men ordlyden står ordrett, og kontrollen sjekker ikke språket (under «Åpent»).
+- Teksten for KVST ble stoppet igjen, så bildet av aksjesiden i README-en viser nå BRFE (Brattfjell Energi), der teksten besto (svaret b): `docs/appen/aksjesiden-brfe-demo.png`, 1280 × 1872, målt i Edge uten vindu til bunnen av grafen. Målingen ga 1827 for KVST, som før, og 1872 for BRFE. Bildet av KVST er tatt bort. Bildeteksten, «Mappestruktur» (regel 19), stien, høyden og avtrykkene i `tests/test_docker.py` følger med.
+
 ## Boundaries & Constraints
 
 - Ingen kall til EODHD utover kvotesjekken i regel 15. `src/fetch_prices.py` kjøres ikke, og `data/db/ose.db` røres ikke (regel 22).
@@ -173,3 +178,4 @@ Med dom medium er BH13 og BH15 ikke rettet. De må avgjøres av gruppen, og gren
 - *Lagt til 2026-10-24:* tall som står i grunnlaget, men om et annet felt, sjekkes bare der teksten har formene «N aksjer steg/falt» og «N (børs)dager på rad» (BH2, ECH8, ECH12).
 - *Lagt til 2026-10-24 kl. 22:24:* versjon 3 rettet ble stoppet fire ganger i §44, og flettes ikke etter svaret kl. 21:49. Gruppen avgjør om prompten skal nevne «minst» bare med merket (BH13), og hva bildet av aksjesiden skal vise (BH15).
 - *Lagt til 2026-10-24:* utsagn om én sjekk i formene «ga et utslag som var negativt», «det gjorde også interessen» og en liste mellom komma før verbet leses ikke (gjennomgangen av rettingen, BH5, ECH6, ECH7).
+- *Lagt til 2026-10-25:* modellen setter ofte ordlyden i anførselstegn etter et ekstra «i», som «i "i dag for første gang"» (åtte av de ti demotekstene som besto). Ordlyden står ordrett, så kontrollen slipper den. Om prompten skal si hvordan ordlyden settes inn i setningen, avgjør gruppen.

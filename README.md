@@ -12,8 +12,8 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 ![Oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/oversikten-demo.png)
 *Oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»).*
 
-![Aksjesiden for Kvitstein Mineral (KVST) i demoen, med kursgrafen og feltet for KI-teksten, der teksten ble stoppet av kontrollen, med oppdiktede tall («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/aksjesiden-kvst-demo.png)
-*Aksjesiden for KVST i demoen, med grafen og feltet for KI-teksten, der teksten ble stoppet av kontrollen og ikke vises, med oppdiktede tall («Eksempeltall»).*
+![Aksjesiden for Brattfjell Energi (BRFE) i demoen, med KI-teksten og kursgrafen, med oppdiktede tall («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/aksjesiden-brfe-demo.png)
+*Aksjesiden for BRFE i demoen, med KI-teksten og grafen, med oppdiktede tall («Eksempeltall»).*
 
 </details>
 
@@ -491,7 +491,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [`docs/`](docs/) — arbeidsprosessen, og [`docs/hjelp.md`](docs/hjelp.md) med spørsmål og svar til «Kom i gang»
 - [`docs/bilder/readme/`](docs/bilder/readme/) — de tre skjermbildene i «Kom i gang»: [`engine-running.png`](docs/bilder/readme/engine-running.png), [`github-download-zip.png`](docs/bilder/readme/github-download-zip.png) og [`powershell-mappa.png`](docs/bilder/readme/powershell-mappa.png)
 - [`docs/bilder/investorsider/`](docs/bilder/investorsider/) — de 15 tegningene laget av KI til investorsidene i demoen, godkjent 24.10: SVG-ene, forhåndsvisningene, [`LESMEG.md`](docs/bilder/investorsider/LESMEG.md) og [`bobler.json`](docs/bilder/investorsider/bobler.json)
-- [`docs/appen/`](docs/appen/) — bilder og senere video av appen, bare av demoen: [`oversikten-demo.png`](docs/appen/oversikten-demo.png) og [`aksjesiden-kvst-demo.png`](docs/appen/aksjesiden-kvst-demo.png)
+- [`docs/appen/`](docs/appen/) — bilder og senere video av appen, bare av demoen: [`oversikten-demo.png`](docs/appen/oversikten-demo.png) og [`aksjesiden-brfe-demo.png`](docs/appen/aksjesiden-brfe-demo.png)
 - [`_bmad-output/`](_bmad-output/) — Product Brief, plan, krav og sprintstatus
 - [`.github/`](.github/) — testkjøringen og morgensjekken
 - [`Dockerfile`](Dockerfile), [`compose.yaml`](compose.yaml) og [`.dockerignore`](.dockerignore) — imaget og tjenestene: webserveren, hentingen og demoen
