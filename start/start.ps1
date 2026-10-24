@@ -47,7 +47,8 @@ function Stopp([string]$Melding) {
 
 # Gjennomgangen (BH4, VG2): også en feil skriptet ikke har ventet, gir
 # beskjeden på norsk, og vinduet står til Enter.
-trap { Stopp "en feil skriptet ikke ventet: $($_.Exception.Message) Lukk vinduet og dobbeltklikk på nytt." }
+# Gjennomgangen av 3.5d (BH13): punktum etter meldingen, også når den mangler.
+trap { $m = "$($_.Exception.Message)".Trim().TrimEnd('.'); Stopp "en feil skriptet ikke ventet: $m. Lukk vinduet og dobbeltklikk på nytt." }
 
 function Opptatt {
     # Svarer noe på porten, uansett hva (gjennomgangen, BH16 og ECH7).
@@ -85,7 +86,11 @@ function Lyttere {
         $prosess = $null
         try { $prosess = Get-CimInstance Win32_Process -Filter "ProcessId=$id" -ErrorAction Stop } catch { }
         if ($prosess) {
-            [pscustomobject]@{ Id = $id; Navn = $prosess.Name; Kommandolinje = $prosess.CommandLine }
+            $navn = $prosess.Name
+            # Gjennomgangen av 3.5d (BH14, ECH3): en prosess startet som
+            # administrator eller av en annen bruker gir ingen kommandolinje.
+            if (-not $prosess.CommandLine) { $navn += ', som skriptet ikke kunne lese kommandolinja til (kanskje startet som administrator)' }
+            [pscustomobject]@{ Id = $id; Navn = $navn; Kommandolinje = $prosess.CommandLine }
         } else {
             [pscustomobject]@{ Id = $id; Navn = 'ukjent'; Kommandolinje = '' }
         }
@@ -95,6 +100,8 @@ function Lyttere {
 function Frigjoer-Porten {
     if (-not (Opptatt)) { return }
     $lyttere = @(Lyttere)
+    # Gjennomgangen av 3.5d (ECH4): lytteren stoppet av seg selv i mellomtiden.
+    if ($lyttere.Count -eq 0 -and -not (Opptatt)) { return }
     $fremmede = @($lyttere | Where-Object { -not (Er-OseSignal $_.Kommandolinje) })
     if ($lyttere.Count -eq 0 -or $fremmede.Count -gt 0) {
         if ($fremmede.Count -gt 0) {
@@ -106,7 +113,8 @@ function Frigjoer-Porten {
     }
     foreach ($lytter in $lyttere) {
         Write-Host "Den andre versjonen av OSE Signal kjører allerede på $Adresse (prosess $($lytter.Id)). Den stoppes nå, så denne kan starte."
-        # Lytteren selv, uten taskkill, som PowerShell ikke finner uten PATHEXT.
+        # Bare lytteren, python.exe; uv og waitress-serve.exe over den stopper
+        # når den stopper (gjennomgangen av 3.5d, BH8).
         try { Stop-Process -Id $lytter.Id -Force -ErrorAction Stop } catch { }
     }
     for ($i = 0; $i -lt 30 -and (Opptatt); $i++) { Start-Sleep -Seconds 1 }
@@ -233,4 +241,4 @@ Write-Host 'Lukk dette vinduet, eller trykk Ctrl+C, for å stoppe den.'
 if ($env:OSE_START_UTEN_NETTLESER -ne '1') { Start-Process $Adresse }
 $server.WaitForExit()
 # Gjennomgangen (BH2, VG2): stopper appen av seg selv, står beskjeden.
-if ($server.ExitCode -ne 0) { Stopp "appen stoppet med kode $($server.ExitCode). Grunnen står i linjene over. Lukk vinduet og dobbeltklikk på nytt." }
+if ($server.ExitCode -ne 0) { Stopp "appen stoppet med kode $($server.ExitCode). Startet du demoen eller den ekte versjonen i et annet vindu, er det den som kjører nå, og dette vinduet kan lukkes. Ellers står grunnen i linjene over: lukk vinduet og dobbeltklikk på nytt." }

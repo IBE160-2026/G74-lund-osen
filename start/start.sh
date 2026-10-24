@@ -71,10 +71,14 @@ lyttere() {
 frigjoer_porten() {
     opptatt || return 0
     ider="$(lyttere)"
+    # Gjennomgangen av 3.5d (ECH4): lytteren stoppet av seg selv i mellomtiden.
+    if [ -z "$ider" ] && ! opptatt; then return 0; fi
     fremmede=""
     for id in $ider; do
         if ! er_ose_signal "$(ps -p "$id" -o command= 2>/dev/null)"; then
             navn="$(ps -p "$id" -o comm= 2>/dev/null)"
+            # Gjennomgangen av 3.5d (BH7): prosessen er borte, eller er en annen brukers.
+            [ -n "$navn" ] || navn="et program skriptet ikke fant navnet på"
             fremmede="$fremmede, ${navn##*/} (prosess $id)"
         fi
     done
@@ -208,4 +212,4 @@ aapne "$ADRESSE"
 wait "$server"
 kode=$?
 # Gjennomgangen (BH2, VG2): stopper appen av seg selv, står beskjeden.
-[ "$kode" = 0 ] || stopp "appen stoppet med kode $kode. Grunnen står i linjene over. Lukk vinduet og dobbeltklikk på nytt."
+[ "$kode" = 0 ] || stopp "appen stoppet med kode $kode. Startet du demoen eller den ekte versjonen i et annet vindu, er det den som kjører nå, og dette vinduet kan lukkes. Ellers står grunnen i linjene over: lukk vinduet og dobbeltklikk på nytt."

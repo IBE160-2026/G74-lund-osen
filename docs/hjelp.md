@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-24T17:15
+updated: 2026-10-24T17:16
 ---
 
 # Hjelp til «Kom i gang»
@@ -229,7 +229,7 @@ Første gang kan macOS stoppe `Start demoen.command` eller `Start den ekte versj
 
 ### Vinduet sier at den andre versjonen av OSE Signal stoppes.
 
-Demoen eller den ekte versjonen kjørte allerede fra denne mappa, på samme port, fra et annet dobbeltklikk eller startet med `uv run waitress-serve`. Skriptet stopper den, venter til porten er ledig, og starter den du dobbeltklikket. Det andre vinduet sier da at appen stoppet, og kan lukkes.
+Demoen eller den ekte versjonen kjørte allerede fra denne mappa, på samme port, fra et annet dobbeltklikk eller startet med `uv run waitress-serve`. Skriptet stopper den, venter til porten er ledig, og starter den du dobbeltklikket. Det andre vinduet sier da at appen stoppet, og at det kan lukkes fordi den andre versjonen kjører.
 
 ### Vinduet sier at et annet program svarer på 127.0.0.1:8000.
 

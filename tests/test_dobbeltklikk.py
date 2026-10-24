@@ -844,3 +844,20 @@ def test_ingen_beskjed_viser_bare_til_readme(navn):
     meldinger = [l for l in _kode(SKRIPTENE[navn]) if re.search(r"\b(Write-Host|echo)\b", l)]
     assert not any("README" in l for l in meldinger), [l for l in meldinger if "README" in l]
     assert "skriv j og trykk Enter når vinduet spør om uv" in tekst
+
+
+@pytest.mark.parametrize("navn", list(SKRIPTENE))
+def test_vinduet_som_ble_stoppet_ber_ikke_om_et_nytt_dobbeltklikk_foerst(navn):
+    """Gjennomgangen av 3.5d (BH2). Ville feilet hvis vinduet der appen ble
+    stoppet av den andre versjonen, bare sa «dobbeltklikk på nytt», saa
+    brukeren stoppet den nye versjonen igjen. Og hvis et program uten navn
+    eller kommandolinje ga en tom plass i beskjeden (BH7, BH14)."""
+    tekst = SKRIPTENE[navn].read_text(encoding="utf-8-sig")
+    assert tekst.count("er det den som kjører nå, og dette vinduet kan lukkes.") == 1
+    assert "appen stoppet med kode" in tekst.split("er det den som kjører nå", 1)[0].rsplit("\n", 1)[-1]
+    if navn == "start.ps1":
+        assert "kanskje startet som administrator" in tekst
+        assert "if ($lyttere.Count -eq 0 -and -not (Opptatt)) { return }" in tekst
+    else:
+        assert '[ -n "$navn" ] || navn="et program skriptet ikke fant navnet på"' in tekst
+        assert 'if [ -z "$ider" ] && ! opptatt; then return 0; fi' in tekst
