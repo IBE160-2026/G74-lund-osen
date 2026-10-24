@@ -416,3 +416,14 @@ jobs:
             grep -qF "$t" "$RUNNER_TEMP/start-demoen.log" || { echo "Utskriften fra Start demoen mangler «$t»"; exit 1; }
           done
           echo "Start demoen svarte 200 med Eksempeltall etter $i s"
+
+      # Gjennomgangen av 3.5d (VG3): porten med en fremmed lytter, en med
+      # kommandolinja fra en annen mappe og en med kommandolinja fra skriptene,
+      # og sjekken av kommandolinja, på Windows og Mac. uv er installert av
+      # «Start demoen» over, og demoen er stoppet, så porten er ledig.
+      - name: Porten på Windows og Mac
+        shell: bash
+        timeout-minutes: 10
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          uv run pytest -q -p no:cacheprovider -rs tests/test_dobbeltklikk.py -k "porten or sjekken"

@@ -863,3 +863,16 @@ def test_vinduet_som_ble_stoppet_ber_ikke_om_et_nytt_dobbeltklikk_foerst(navn):
     else:
         assert '[ -n "$navn" ] || navn="et program skriptet ikke fant navnet på"' in tekst
         assert 'if [ -z "$ider" ] && ! opptatt; then return 0; fi' in tekst
+
+
+def test_ci_proever_porten_paa_windows_og_mac():
+    """Gjennomgangen av 3.5d (VG3). Ville feilet hvis porttestene og sjekken av
+    kommandolinja bare kjoerte paa Linux i jobben pytest, saa Get-NetTCPConnection,
+    Get-CimInstance, Stop-Process, lsof og ps aldri ble proevd paa Windows og
+    Mac i CI."""
+    jobb = CI.read_text(encoding="utf-8").split("\n  dobbeltklikk:\n", 1)[1]
+    steget = jobb.split("- name: Porten på Windows og Mac", 1)[1]
+    assert "os: [windows-latest, macos-latest]" in jobb
+    assert "if: runner.os" not in steget.split("\n      - name:", 1)[0]
+    assert 'uv run pytest -q -p no:cacheprovider -rs tests/test_dobbeltklikk.py -k "porten or sjekken"' in steget
+    assert jobb.index("Start demoen på Mac") < jobb.index("Porten på Windows og Mac")
