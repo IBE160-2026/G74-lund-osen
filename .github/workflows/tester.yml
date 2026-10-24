@@ -386,6 +386,12 @@ jobs:
           taskkill /T /F /PID $p.Id | Out-Null
           Get-Content $logg, "$logg.err" -ErrorAction SilentlyContinue
           if (-not $ok) { Write-Error 'Start demoen svarte ikke med Eksempeltall'; exit 1 }
+          # Forprøven 24.10 (funn 4): æ, ø og å fra demo.py og fra skriptet, gjennom
+          # Windows PowerShell 5.1 og til fila.
+          $ut = [string](Get-Content -Raw -Encoding utf8 $logg) + [string](Get-Content -Raw -Encoding utf8 "$logg.err" -ErrorAction SilentlyContinue)
+          foreach ($t in 'ikke data fra Oslo Børs', 'aksjer på siste dag', 'Vinduet må være åpent') {
+            if (-not $ut.Contains($t)) { Write-Error "Utskriften fra Start demoen mangler «$t»"; exit 1 }
+          }
           Write-Host "Start demoen svarte 200 med Eksempeltall etter $i s"
 
       - name: Start demoen på Mac
@@ -405,4 +411,8 @@ jobs:
           pkill -f "waitress-serve --listen=127.0.0.1:8000" || true
           cat "$RUNNER_TEMP/start-demoen.log"
           [ "$ok" = 1 ] || { echo "Start demoen svarte ikke med Eksempeltall"; exit 1; }
+          # Forprøven 24.10 (funn 4): æ, ø og å fra demo.py og fra skriptet.
+          for t in 'ikke data fra Oslo Børs' 'aksjer på siste dag' 'Vinduet må være åpent'; do
+            grep -qF "$t" "$RUNNER_TEMP/start-demoen.log" || { echo "Utskriften fra Start demoen mangler «$t»"; exit 1; }
+          done
           echo "Start demoen svarte 200 med Eksempeltall etter $i s"

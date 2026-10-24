@@ -17,6 +17,9 @@ ADRESSE="http://127.0.0.1:8000"
 VERSJON="${1:-demo}"
 SVAR_JA="${OSE_START_SVAR_JA:-}"
 UTEN_NETTLESER="${OSE_START_UTEN_NETTLESER:-}"
+# Forprøven 24.10 (funn 4): Python skriver æ, ø og å som UTF-8, også når
+# utskriften går til en fil.
+export PYTHONIOENCODING=utf-8
 
 vent_paa_enter() {
     if [ "$SVAR_JA" != "1" ]; then

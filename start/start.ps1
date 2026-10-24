@@ -17,6 +17,9 @@ param(
 
 $ErrorActionPreference = 'Stop'
 try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch { }
+# Forprøven 24.10 (funn 4): Python skriver æ, ø og å som UTF-8, også når
+# utskriften går til en fil, som i CI.
+$env:PYTHONIOENCODING = 'utf-8'
 
 $Adresse = 'http://127.0.0.1:8000'
 $SvarJa = $env:OSE_START_SVAR_JA -eq '1'

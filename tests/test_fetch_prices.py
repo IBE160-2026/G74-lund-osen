@@ -207,7 +207,7 @@ class TestSkriverIkkeOver:
         assert slutt.value.code == 1
         assert fil.read_text(encoding="utf-8") == '{"gammel": true}'
         assert any("finnes og skrives aldri om" in l for l in linjer)
-        assert any("0 til nye forsoek" in l and "0 kall brukt" in l for l in linjer)
+        assert any("0 til nye forsøk" in l and "0 kall brukt" in l for l in linjer)
 
     def test_fil_som_dukker_opp_under_kjoeringen_skrives_ikke_over(self, tmp_path):
         """Da er kallene brukt og ingenting lagret, og kjoeringen avslutter
@@ -1418,7 +1418,7 @@ class TestVurderingenISammeKjoering:
         assert antall_rader(base, "vurdering") == 15
         assert isinstance(dnb_foer, Vurdering)
         assert vurderingene(base, TIRSDAG_22_09, senere)["DNB"][0] == dnb_foer
-        assert any("sto fra foer" in l and "DNB" in l for l in linjer)
+        assert any("sto fra før" in l and "DNB" in l for l in linjer)
 
     @staticmethod
     def _klokke(*tider):
@@ -1565,7 +1565,7 @@ class TestVurderingenISammeKjoering:
         fil = raa / fp.filnavn(TIRSDAG_22_09)
 
         assert any(
-            "Skrev 15 rader i vurdering for boersdagen 2026-09-22" in l and "14 vurderinger og 1 med grunn" in l
+            "Skrev 15 rader i vurdering for børsdagen 2026-09-22" in l and "14 vurderinger og 1 med grunn" in l
             for l in linjer
         )
         assert any("Med grunn: DNB (symbol_feilet)" in l for l in linjer)
@@ -1684,7 +1684,7 @@ class TestVurderingenISammeKjoering:
         assert slutt.value.code == 1
         assert antall_rader(base, "vurdering") == 0
         assert antall_rader(base, "kursserie") == 15
-        assert any("kunne ikke aapnes for vurderingene" in l for l in linjer)
+        assert any("kunne ikke åpnes for vurderingene" in l for l in linjer)
 
     def test_stengt_dag_skriver_raden_for_inneveerende_boersdag(self, stier):
         """K11, svar 1: en kjoering loerdag 26.09 uten rad fra foer skriver
@@ -1699,7 +1699,7 @@ class TestVurderingenISammeKjoering:
         assert datoene_i_vurdering(base) == ["2026-09-25"]
         rader = vurderingene(base, fredag, loerdag)
         assert all(isinstance(v, Vurdering) for v, _ in rader.values())
-        assert any("boersdagen 2026-09-25 (boersen er stengt 2026-09-26)" in l for l in linjer)
+        assert any("børsdagen 2026-09-25 (børsen er stengt 2026-09-26)" in l for l in linjer)
 
     def test_stengt_dag_lar_raden_fra_foer_staa(self, stier, monkeypatch):
         """K12, svar 1: fredagens rad finnes fra fredag kveld. Loerdagens
@@ -1730,7 +1730,7 @@ class TestVurderingenISammeKjoering:
         assert {s: v for s, (v, _) in etter.items()} == {s: v for s, (v, _) in foer.items()}
         assert etter["EQNR"][1] == fp.serie_fra_eodhd(serie_med_utslag(fredag))
         assert any("Skrev 0 rader" in l for l in linjer)
-        assert any("sto fra foer" in l and "EQNR" in l for l in linjer)
+        assert any("sto fra før" in l and "EQNR" in l for l in linjer)
 
     def test_utenfor_kalenderen_stopper_foer_foerste_kall(self, stier):
         """K13, svar 2: 2027 er ikke foert inn. Kjoeringen stopper med 0 kall,
@@ -1837,7 +1837,7 @@ class TestTidskontrollen:
         fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 19, 59, 59), ingen_kall, ingen_noekkel, ingen_kall)
         assert fil is None and kall == []
         assert "--uten-tidskontroll" in ut and "0 kall brukt" in ut
-        assert "klokka er ikke 22:00 i Oslo" in ut and "Kjoer etter kl. 22:00" in ut
+        assert "klokka er ikke 22:00 i Oslo" in ut and "Kjør etter kl. 22:00" in ut
         assert not (raa / "kurser-raa-2026-09-22.json").exists() and sha(base) == foer
 
     def test_kl_21_59_gir_0_kall(self, stier):
@@ -1892,7 +1892,7 @@ class TestTidskontrollen:
         fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 22, 10, 0), uten_tidskontroll=True)
         assert fil == raa / "kurser-raa-2026-09-22.json"
         assert len(kall) == KALL
-        assert "Henter foer kl. 22:00 (--uten-tidskontroll)" in ut
+        assert "Henter før kl. 22:00 (--uten-tidskontroll)" in ut
 
     def test_dag_som_ikke_er_boersdag_har_ingen_tidskontroll(self, stier):
         """Loerdag kl. 12: basen avgjoer. Ville feilet hvis tidskontrollen
@@ -2286,7 +2286,7 @@ class TestSvaretIkkeFraBoersdagen:
         raa, base = stier
         fil, _, ut = kjoer_23(raa, base, OEYEBLIKK_22_09)
         assert fil is not None
-        assert "FR-402" not in ut.replace("Ingenting aa hente (FR-402)", "")
+        assert "FR-402" not in ut.replace("Ingenting å hente (FR-402)", "")
 
 
 class TestKvotenTarAntallet:
@@ -2658,7 +2658,7 @@ class TestNyttForsoek:
         assert bilde["hentet"] == ETTER_30_MIN.isoformat()
         rader = vurderingene(base, TIRSDAG_22_09, ETTER_30_MIN)
         assert all(isinstance(v, Vurdering) for v, _ in rader.values())
-        assert "eldste foerst: DNB, EQNR" in ut
+        assert "eldste først: DNB, EQNR" in ut
         assert "Bonuskvoten brukes ikke" in ut
         assert "Alle 15 aksjene har kursen" in ut
 
@@ -2734,7 +2734,7 @@ class TestNyttForsoekKvoten:
         assert kode == 1
         # Story 2.8: 20 - 16 = 4, selv med 5 igjen av dagens.
         assert kall == [f"{s}.OL" for s in seks[:4]]
-        assert "5 kall igjen av dagens, 4 til nye forsoek" in ut
+        assert "5 kall igjen av dagens, 4 til nye forsøk" in ut
         assert "2 aksjer: FRO, NHY" in [l for l in ut.splitlines() if "Mangler fortsatt" in l][0]
 
     def test_ingen_kall_igjen_gir_0_kall_selv_med_bonus(self, stier):
@@ -2743,7 +2743,7 @@ class TestNyttForsoekKvoten:
         les, _ = kvoter(svar(brukt=20, bonus=463))
         kode, kall, ut = kjoer_23_kode(raa, base, ETTER_30_MIN, les_kvote=les)
         assert kode == 1 and kall == []
-        assert "0 til nye forsoek" in ut and "Bonuskvoten brukes aldri" in ut
+        assert "0 til nye forsøk" in ut and "Bonuskvoten brukes aldri" in ut
         assert raa_filer(raa) == ["kurser-raa-2026-09-22.json"]
 
     def test_bare_marginen_selv_naar_hele_dagen_er_igjen(self, stier):
@@ -2755,7 +2755,7 @@ class TestNyttForsoekKvoten:
         les, _ = kvoter(svar(brukt=0))
         kode, kall, ut = kjoer_23_kode(raa, base, ETTER_30_MIN, les_kvote=les)
         assert kode == 1 and len(kall) == 4
-        assert "OSEBX.OL" not in kall and "20 kall igjen av dagens, 4 til nye forsoek" in ut
+        assert "OSEBX.OL" not in kall and "20 kall igjen av dagens, 4 til nye forsøk" in ut
 
     def test_stopper_naar_extralimit_synker(self, stier):
         raa, base = stier
@@ -2809,7 +2809,7 @@ class TestNyttForsoekKvoten:
         hovedhenting(stier, feiler=("DNB",))
         les, _ = kvoter(requests.HTTPError("HTTP 401 Unauthorized"))
         kode, kall, ut = kjoer_23_kode(raa, base, ETTER_30_MIN, les_kvote=les)
-        assert kode == 1 and kall == [] and "avviste noekkelen" in ut
+        assert kode == 1 and kall == [] and "avviste nøkkelen" in ut
 
     def test_liste_med_18_gir_1_kall_med_indeksen(self, stier):
         """18 aksjer og indeksen (2.8): 20 - 19 = 1. Ville feilet med 15
@@ -2819,7 +2819,7 @@ class TestNyttForsoekKvoten:
         hovedhenting(stier, feiler=("TSTA", "TSTB", "TSTC"), lista=ATTEN)
         kode, kall, ut = kjoer_23_kode(raa, base, ETTER_30_MIN, lista=ATTEN)
         assert kode == 1 and kall == ["TSTA.OL"]
-        assert "1 til nye forsoek" in ut
+        assert "1 til nye forsøk" in ut
         assert fp.kall_til_nye_forsoek(20, 20, 18 + 1) == 1
 
 
@@ -2883,7 +2883,7 @@ class TestNyttForsoekStengtDag:
         rader = vurderingene(base, FREDAG_25_09, LOERDAG_26_09_KL_12)
         assert rader["DNB"][0] == Grunn.SYMBOL_FEILET
         assert rader["DNB"][1][-1].dato == FREDAG_25_09
-        assert "sto fra foer" in ut and "DNB" in ut
+        assert "sto fra før" in ut and "DNB" in ut
 
 
 class TestNyttForsoekVaktene:
@@ -2906,7 +2906,7 @@ class TestNyttForsoekVaktene:
         base.write_bytes(b"ikke en base")
         kode, kall, ut = kjoer_23_kode(raa, base, ETTER_30_MIN, ingen_kall, ingen_noekkel, ingen_kall)
         assert kode == 1 and kall == []
-        assert "ikke noe nytt forsoek" in ut and "0 kall brukt" in ut
+        assert "ikke noe nytt forsøk" in ut and "0 kall brukt" in ut
 
     def test_utskriften_har_ingen_kurser_og_ingen_noekkel(self, stier):
         """Regel 16."""
@@ -3062,7 +3062,7 @@ class TestNyttForsoekEtterGjennomgangen:
         monkeypatch.setattr(fp, "skriv_til_basen", lambda *a: None)
         kode, kall, ut = kjoer_23_kode(raa, base, ETTER_30_MIN)
         assert kode == 1 and kall == ["DNB.OL"]
-        assert "Ingen vurdering er skrevet for 2026-09-22 i forsoeket" in ut
+        assert "Ingen vurdering er skrevet for 2026-09-22 i forsøket" in ut
         assert (raa / "forsoek2-raa-2026-09-22.json").exists()
 
     def test_basen_som_ikke_kan_leses_i_rekkefoelgen_gir_0_kall(self, stier, monkeypatch):
@@ -3098,7 +3098,7 @@ class TestNyttForsoekEtterGjennomgangen:
         hovedhenting(stier, feiler=("DNB",))
         les, _ = kvoter(requests.HTTPError("HTTP 403 Forbidden"))
         kode, kall, ut = kjoer_23_kode(raa, base, ETTER_30_MIN, les_kvote=les)
-        assert kode == 1 and kall == [] and "avviste noekkelen" in ut
+        assert kode == 1 and kall == [] and "avviste nøkkelen" in ut
 
     def test_0_kall_linjen_kommer_fra_forsoeket(self, stier):
         """ECH8 i gjennomgangen: linjen med 0 kall er kvotelinjen i forsoeket."""
@@ -3106,7 +3106,7 @@ class TestNyttForsoekEtterGjennomgangen:
         hovedhenting(stier, feiler=("DNB",))
         les, _ = kvoter(svar(brukt=20))
         _, _, ut = kjoer_23_kode(raa, base, ETTER_30_MIN, les_kvote=les)
-        assert any("0 til nye forsoek" in l and "0 kall brukt" in l for l in ut.splitlines())
+        assert any("0 til nye forsøk" in l and "0 kall brukt" in l for l in ut.splitlines())
 
 
 class TestVurderingeneSomManglerEtterGjennomgangen:
@@ -3272,7 +3272,7 @@ class TestSjekkenLeserEnBaseEnVersjonBak:
             raa, base, OEYEBLIKK_22_09 + timedelta(minutes=30), ingen_kall, ingen_noekkel, ingen_kall
         )
         assert fil is None and kall == []
-        assert "Basen har alt kursene for boersdagen 2026-09-22" in ut
+        assert "Basen har alt kursene for børsdagen 2026-09-22" in ut
         assert "kunne ikke leses" not in ut
         assert sha(base) == foer
 
@@ -3384,7 +3384,9 @@ class TestHovedindeksen:
         assert any(d.year not in DEKKEDE_AAR for d in datoer)
         assert len(indeksen_i(base)[0]) == lagret
         aarene = ", ".join(str(aar) for aar in sorted(DEKKEDE_AAR))
-        assert f"lagret {lagret} dager, tok bort {300 - lagret} som ikke er boersdager i {aarene}." in ut
+        assert f"lagret {lagret} dager, tok bort {300 - lagret} som ikke er børsdager i {aarene}." in ut
+        # Forproeven 24.10 (funn 5, U4): linja sier hvorfor andre dager ikke lagres.
+        assert f"Børskalenderen i appen gjelder bare {aarene}, så andre dager lagres ikke." in ut
 
     @pytest.mark.parametrize("svaret", ["feil", "tomt", "form"])
     def test_et_feilet_indekskall_stopper_ikke_aksjene(self, stier, svaret):
@@ -3446,7 +3448,7 @@ class TestHovedindeksen:
         les, _ = kvoter(svar(brukt=16))
         fil, kall, ut = kjoer_23(raa, base, ETTER_30_MIN, les_kvote=les)
         assert fil == raa / "forsoek2-raa-2026-09-22.json" and kall == ["DNB.OL"]
-        assert "4 kall igjen av dagens, 4 til nye forsoek" in ut
+        assert "4 kall igjen av dagens, 4 til nye forsøk" in ut
         assert "indeks" not in json.loads(fil.read_text(encoding="utf-8"))
         assert indeksen_i(base) == foer
 
@@ -3674,7 +3676,7 @@ class TestKode3EtterGjennomgangen:
         monkeypatch.setattr(fp, "aapne_base", aapne)
         kode, _, ut = kjoer_23_kode(raa, base, OEYEBLIKK_22_09)
         assert kode == 3
-        assert "Hovedindeksen OSEBX: basen kunne ikke aapnes (OperationalError)" in ut
+        assert "Hovedindeksen OSEBX: basen kunne ikke åpnes (OperationalError)" in ut
         assert antall_rader(base, "vurdering") == len(AKSJEUNIVERS)
 
 
@@ -3713,7 +3715,7 @@ class TestFoersteHenting:
         assert datoene_i_vurdering(base) == ["2026-09-21"]
         rader = vurderingene(base, MANDAG_21_09)
         assert all(isinstance(innhold, Vurdering) for innhold, _ in rader.values())
-        assert "foerste henting" in ut and "forrige boersdag, 2026-09-21" in ut
+        assert "første henting" in ut and "forrige børsdag, 2026-09-21" in ut
         assert "Signalet lagres fra den dagen og regnes aldri bakover" in ut
 
     def test_dagens_rad_kommer_aldri_med_selv_om_api_et_har_den(self, stier):
@@ -3731,7 +3733,7 @@ class TestFoersteHenting:
         foer = ikke_tom(raa, base, _utc(2026, 9, 21, 20, 30))
         fil, kall, ut = kjoer_23(raa, base, DAGTID_22_09, ingen_kall, ingen_noekkel, ingen_kall)
         assert fil is None and kall == [] and sha(base) == foer
-        assert "klokka er ikke 22:00 i Oslo" in ut and "foerste henting" not in ut
+        assert "klokka er ikke 22:00 i Oslo" in ut and "første henting" not in ut
 
     def test_etter_22_som_foer(self, stier):
         """Ville feilet hvis en tom base etter kl. 22 hentet forrige boersdag."""
@@ -3751,7 +3753,7 @@ class TestFoersteHenting:
         fil, kall, ut = kjoer_23(raa, base, _utc(2026, 9, 26, 10, 0), som_api_et(til, date(2026, 9, 25)))
         assert fil == raa / "kurser-raa-2026-09-25.json"
         assert len(kall) == KALL and set(til) == {"2026-09-26"}
-        assert "foerste henting" not in ut
+        assert "første henting" not in ut
 
     def test_med_flagget_som_foer(self, stier):
         """--uten-tidskontroll henter dagens dato, ogsaa med en tom base.
@@ -3760,7 +3762,7 @@ class TestFoersteHenting:
         til: list[str] = []
         fil, _, ut = kjoer_23(raa, base, DAGTID_22_09, som_api_et(til), uten_tidskontroll=True)
         assert fil == raa / "kurser-raa-2026-09-22.json" and set(til) == {"2026-09-22"}
-        assert "foerste henting" not in ut
+        assert "første henting" not in ut
 
     def test_fr_402_kontrollerer_mot_dagen_som_hentes(self, stier):
         """Svaret for DNB slutter fredag 18.09. Ville feilet hvis FR-402
@@ -3773,8 +3775,8 @@ class TestFoersteHenting:
 
         kode, kall, ut = kjoer_23_kode(raa, base, DAGTID_22_09, hent)
         assert kode == 1 and len(kall) == KALL
-        assert "Svaret har ikke kursen for boersdagen 2026-09-21 for 1 aksjer: DNB (FR-402)" in ut
-        assert "Basen er ikke tom lenger, saa en ny henting foer kl. 22:00 gir 0 kall" in ut
+        assert "Svaret har ikke kursen for børsdagen 2026-09-21 for 1 aksjer: DNB (FR-402)" in ut
+        assert "Basen er ikke tom lenger, så en ny henting før kl. 22:00 gir 0 kall" in ut
         assert "senere i kveld" not in ut
 
     def test_kveldens_henting_samme_dag_stoppes_ikke_av_filvakten(self, stier):
@@ -3904,7 +3906,7 @@ class TestFoersteHentingEtterGjennomgangen:
         aapne_base(base).close()
         fil, kall, ut = kjoer_23(raa, base, DAGTID_22_09, som_api_et([]))
         assert fil == raa / "kurser-raa-2026-09-21.json" and len(kall) == KALL
-        assert "foerste henting" in ut
+        assert "første henting" in ut
 
     def test_en_kursrad_er_ikke_tom(self, stier):
         """Ville feilet hvis en base med kurser regnes som tom (BH2)."""
@@ -3953,7 +3955,7 @@ class TestFoersteHentingEtterGjennomgangen:
         koden sa noe annet enn vurder_kvote gjoer (BH1, ECH2, VG3)."""
         raa, base = stier
         _, _, ut = kjoer_23(raa, base, DAGTID_22_09, som_api_et([]))
-        assert "dagens boersdag faar aldri signal" in ut and "regnes aldri bakover" in ut
+        assert "dagens børsdag får aldri signal" in ut and "regnes aldri bakover" in ut
         kvelden = kvote(brukt=16, bonus=bonus)
         if henter:
             fil, kall, _ = kjoer_23(raa, base, _utc(2026, 9, 22, 20, 30), som_api_et([]), les_kvote=kvelden)
@@ -3970,7 +3972,7 @@ class TestFoersteHentingEtterGjennomgangen:
         raa.mkdir(parents=True)
         (raa / "kurser-raa-2026-09-21.json").write_text("{}", encoding="utf-8")
         _, _, ut = kjoer_23_kode(raa, base, DAGTID_22_09, ingen_kall, ingen_noekkel, ingen_kall)
-        assert "Hent etter kl. 22:00" in ut and "den dagen faar aldri signal" in ut
+        assert "Hent etter kl. 22:00" in ut and "den dagen får aldri signal" in ut
 
     def test_ki_tjenesten_ikke_klar_ved_foerste_henting(self, stier):
         """Ville feilet hvis utskriften lovet en ny kjoering som ikke kan lage

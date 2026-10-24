@@ -403,6 +403,77 @@ def test_porten_sjekkes_for_alt_som_svarer_og_serveren_stoppes(navn):
         assert '[ "$kode" = 0 ] || stopp "appen stoppet med kode $kode.' in kode
 
 
+# Forproeven 24.10 (funn 4): ordene som sto med oe, aa og ae i det
+# fetch_prices.py og demo.py skrev ut, foer 3.5d.
+SKREVET_UTEN_AEOEAA = {
+    "aa", "aapen", "aapnes", "aaret", "boers", "boersdag", "boersdagen", "boersdager", "boersen", "ennaa",
+    "faa", "faar", "foer", "foerst", "foerste", "forsoek", "forsoeket", "inneveerende", "kjoer", "kjoeres",
+    "kjoeringen", "laaser", "laast", "naa", "noekkelen", "oeyeblikksbilde", "oeyeblikksbildet", "paa",
+    "paagikk", "proever", "proeves", "saa", "staar",
+}  # fmt: skip
+
+
+def _tekstene_brukeren_ser(sti) -> list[tuple[int, str]]:
+    """Strengene i fila, uten docstringene og filnavnene (-raa-, forsoek)."""
+    import ast
+
+    tre = ast.parse(sti.read_text(encoding="utf-8"))
+    docstringer = {
+        id(n.body[0].value)
+        for n in ast.walk(tre)
+        if isinstance(n, (ast.Module, ast.FunctionDef, ast.ClassDef))
+        and n.body
+        and isinstance(n.body[0], ast.Expr)
+        and isinstance(n.body[0].value, ast.Constant)
+    }
+    return [
+        (n.lineno, n.value)
+        for n in ast.walk(tre)
+        if isinstance(n, ast.Constant)
+        and isinstance(n.value, str)
+        and id(n) not in docstringer
+        and n.value != "forsoek"
+        and "-raa-" not in n.value
+    ]
+
+
+@pytest.mark.parametrize("fil", ["fetch_prices.py", "demo.py"])
+def test_det_brukeren_ser_har_ae_oe_og_aa(fil):
+    """Forproeven 24.10 (funn 4, spesifikasjonen 3.5d). Ville feilet hvis en
+    melding eller hjelpetekst fra hentingen eller demoen skrev «paa»,
+    «boersdagen» eller et annet ord med oe, aa eller ae i stedet for ø, å og
+    æ. Filnavn som boersdag.py og -raa- teller ikke."""
+    feil = []
+    for linje, tekst in _tekstene_brukeren_ser(ROT / "src" / fil):
+        for ord_ in re.findall(r"(?<![A-Za-z0-9_\-/.])[A-Za-z]+(?![A-Za-z0-9_\-/(]|\.py\b|\.json\b|\.db\b)", tekst):
+            if ord_.lower() in SKREVET_UTEN_AEOEAA:
+                feil.append((linje, ord_))
+    assert not feil, feil
+
+
+@pytest.mark.parametrize("navn", list(SKRIPTENE))
+def test_python_skriver_utf_8_ogsaa_til_en_fil(navn):
+    """Forproeven 24.10 (funn 4). Ville feilet hvis skriptet ikke ba Python
+    skrive UTF-8, saa æ, ø og å fra hentingen og demoen ble feil naar
+    utskriften gaar til en fil, som i CI, foer uv sync."""
+    kode = "\n".join(_kode(SKRIPTENE[navn]))
+    linja = {"start.ps1": "$env:PYTHONIOENCODING = 'utf-8'", "start.sh": "export PYTHONIOENCODING=utf-8"}[navn]
+    assert kode.index(linja) < kode.index("uv sync")
+
+
+def test_ci_krever_ae_oe_og_aa_i_utskriften_fra_start_demoen():
+    """Forproeven 24.10 (funn 4). Ville feilet hvis jobben dobbeltklikk ikke
+    krevde æ, ø og å i utskriften fra «Start demoen» paa Windows og Mac: ø fra
+    demo.py, å fra demo.py og æ fra skriptet."""
+    jobb = CI.read_text(encoding="utf-8").split("\n  dobbeltklikk:\n", 1)[1]
+    for tekst in ("ikke data fra Oslo Børs", "aksjer på siste dag", "Vinduet må være åpent"):
+        assert jobb.count(tekst) == 2, tekst
+    assert "Get-Content -Raw -Encoding utf8 $logg" in jobb
+    assert 'grep -qF "$t" "$RUNNER_TEMP/start-demoen.log"' in jobb
+    demo = (ROT / "src" / "demo.py").read_text(encoding="utf-8")
+    assert "ikke data fra Oslo Børs" in demo and "aksjer på siste dag" in demo
+
+
 def test_start_ps1_har_bom():
     """Windows PowerShell 5.1 leser en fil uten BOM med tegnsettet til
     maskinen. Ville feilet hvis BOM-en ble borte, saa æ, ø og å ble feil."""
