@@ -34,6 +34,8 @@ GOD_TEKST = (
 AVTRYKK = {
     "1": "8fa4608965a356110f97963f65ba85bb44c79e913d47b5b911dc06b51af7be72",
     "2": "4c697052292bf7069ed7ba0cb7600a8c67574c969fd4fcd184f4b854876df660",
+    # Story 10.2e. Teksten til versjon 2 staar i src/ki_prompt.py paa 153aba8.
+    "3": "90978789870ba20897939bdda02c161cf2053b75bff98a073590a14d3de4b8fd",
 }
 
 
@@ -108,6 +110,53 @@ class TestPrompten:
         av 10.2c, VG1)."""
         assert {"1", "2"} <= AVTRYKK.keys()
         assert AVTRYKK["1"] == "8fa4608965a356110f97963f65ba85bb44c79e913d47b5b911dc06b51af7be72"
+
+    def test_avtrykket_for_versjon_2_staar(self):
+        """Story 10.2e: radene fra uka med logget drift (19.-23.10) har
+        versjon 2. Ville feilet hvis avtrykket ble ryddet bort eller endret."""
+        assert AVTRYKK["2"] == "4c697052292bf7069ed7ba0cb7600a8c67574c969fd4fcd184f4b854876df660"
+
+    def test_versjon_3(self):
+        """Story 10.2e, gruppens svar 24.10 kl. 15:50."""
+        assert PROMPTVERSJON == "3"
+
+    def test_reglene_forklarer_hvert_felt_i_grunnlaget(self):
+        """Story 10.2e: ville feilet hvis grunnlaget hadde et felt reglene
+        ikke forklarer med ord, slik at modellen maatte gjette hva det er."""
+        from ki_grunnlag import Dagsbilde, ki_grunnlag
+        from vurderingsdata import Vurdering
+
+        vurdering = Vurdering(
+            styrke=2,
+            retning="Blandet",
+            trend=1,
+            bevegelse=0,
+            interesse=-1,
+            slutt=101.37,
+            justert_slutt=101.37,
+            trend_avvik=0.0123,
+            dagens_endring=-0.0217,
+            standardavvik=0.0071,
+            volumforhold=1.73,
+        )
+        dagen = Dagsbilde(
+            dager=3, dager_minst=True, hovedindeksen="falt", aksjer_steg=4, aksjer_falt=11, bransjen="steg"
+        )
+        grunnlag = ki_grunnlag(vurdering, utenfor_maalingen=True, dagen=dagen)
+        forklaringen = REGLER.split("Regler for teksten:")[0]
+        for felt in grunnlag:
+            if felt != "merke":
+                assert felt in forklaringen, felt
+        assert "«minst»" in forklaringen
+        assert UTENFOR in lag_prompt(grunnlag)
+
+    def test_teksten_kan_vise_til_tallene_paa_siden(self):
+        """Story 10.2e, svaret 21.10 kl. 23:51: teksten kan vise til tallene
+        paa siden uten aa gjenta dem. Ville feilet hvis regelen ble tatt ut,
+        eller kom utenfor reglene for teksten."""
+        blokk = REGLER.split("Regler for teksten:", 1)[1].split("\n\n", 1)[0]
+        assert any("vise til" in linje and "ikke gjenta tallene" in linje for linje in blokk.splitlines())
+        assert any("antallene i opplysningene" in linje for linje in blokk.splitlines())
 
     def test_ingen_raad_og_ingen_gjetning(self):
         prompt = lag_prompt(BLANDET)
