@@ -256,6 +256,28 @@ Basen, demobasen og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo`
 </details>
 
 <details>
+<summary>Start med dobbeltklikk, uten Docker</summary>
+
+Øverst i mappa, når den er pakket ut som i steg 2, ligger fire filer: `Start demoen` og `Start den ekte versjonen`, som `.cmd` for Windows og `.command` for Mac. Dobbeltklikk den du vil starte. Docker trengs ikke, og du skriver ingen kommandoer.
+
+- Mangler [uv](https://docs.astral.sh/uv/), spør vinduet om det skal installeres. Skriv `j` og trykk Enter. Det er den offisielle installasjonen fra astral.sh, og den legger uv i brukermappa di.
+- Første gang tar det noen minutter, fordi uv henter Python og pakkene appen bruker.
+- Nettleseren åpner http://127.0.0.1:8000 når appen svarer.
+- Stopp appen ved å lukke vinduet, eller med Ctrl+C.
+
+**Advarselen fra Windows.** Første gang kan Windows vise «Windows beskyttet PC-en», fordi fila er lastet ned fra nettet. Klikk «Mer informasjon», og så «Kjør likevel». Spør Windows om du vil kjøre fila, svarer du ja.
+
+**Godkjenningen på Mac.** Første gang kan macOS stoppe fila, fordi den er lastet ned fra nettet. Fra macOS 15 holder det ikke å høyreklikke og velge Åpne. Velg Apple-menyen > Systeminnstillinger, og Personvern og sikkerhet i sidepanelet. Under Sikkerhet klikker du «Åpne likevel» og skriver inn passordet ditt. Knappen står der i omtrent en time etter at du prøvde å åpne fila. Dobbeltklikk så fila på nytt. På macOS 14 og eldre kan du også høyreklikke fila, velge Åpne og bekrefte.
+
+**Den ekte versjonen** starter bare i en kopi fra «Download ZIP», ikke i en klon av repoet med `.git`. Der stopper vinduet før noe installeres eller hentes, så et dobbeltklikk i en klon aldri henter med nøkkelen som ligger i den. Last ned en egen kopi med «Download ZIP», og bruk din egen nøkkel. Demoen starter i begge. Vernet gjelder bare dobbeltklikket: kommandoene under «Uten Docker, med uv» og Docker henter også i en klon.
+
+Den ekte versjonen spør etter nøkkelen fra EODHD første gang. Registreringssiden https://eodhd.com/register åpnes, og du limer inn nøkkelen i vinduet. Den vises ikke, og lagres bare i `.env` i mappa. Var den feil, sletter du det som står etter `EODHD_API_KEY=` i `.env`, så spør vinduet på nytt. Så hentes kursene før appen starter. Er alt hentet, brukes ingen kall.
+
+Skriptene står i [`start/`](start/) og kjører de samme kommandoene som under «Uten Docker, med uv»: `uv sync`, så `uv run python src/demo.py` for demoen eller `uv run python src/fetch_prices.py` for den ekte versjonen. Webserveren startes med `uv run waitress-serve --listen=127.0.0.1:8000 app:app`, bare på 127.0.0.1 og uten debug, med `PYTHONPATH=src`, og `OSE_DEMO=1` i demoen. Den bruker port 8000, som Docker, så stopp demoen eller appen i Docker først.
+
+</details>
+
+<details>
 <summary>Variablene i .env</summary>
 
 `.env` lages fra `.env.example` i steg 6 i den ekte versjonen. Demoen trenger ingen av dem.
@@ -472,6 +494,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [`_bmad-output/`](_bmad-output/) — Product Brief, plan, krav og sprintstatus
 - [`.github/`](.github/) — testkjøringen og morgensjekken
 - [`Dockerfile`](Dockerfile), [`compose.yaml`](compose.yaml) og [`.dockerignore`](.dockerignore) — imaget og tjenestene: webserveren, hentingen og demoen
+- [`start/`](start/) og [`.gitattributes`](.gitattributes) — start med dobbeltklikk, uten Docker: skriptene bak de fire filene Start demoen og Start den ekte versjonen i rota, for Windows og Mac, og linjeskiftene de trenger
 - [`_bmad/`](_bmad/) og [`.claude/skills/`](.claude/skills/) — BMAD-rammeverket, ikke skrevet av oss
 
 Ikke i repoet: API-nøkkelen (`.env`), rådata, basen og demobasen (`data/`), lokale testskript (`local-tests/`) og den private arbeidsmappa (`_privat/`).

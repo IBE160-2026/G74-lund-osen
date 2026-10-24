@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-23T10:11
+updated: 2026-10-23T23:17
 ---
 
 # Hjelp til «Kom i gang»
@@ -212,6 +212,28 @@ Noe annet bruker port 8000. Kjører den andre versjonen, stopper du den først (
 ### Jeg lukket vinduet før jeg stoppet.
 
 Åpne et nytt terminalvindu, gjør steg 4 og lim inn stoppkommandoen for versjonen du kjørte: `docker compose down` for den ekte versjonen, eller `docker compose --profile demo down` for demoen.
+
+## Start med dobbeltklikk
+
+### Windows advarer mot fila.
+
+Første gang kan Windows advare mot `Start demoen.cmd` eller `Start den ekte versjonen.cmd`, fordi fila er lastet ned fra nettet. Advarselen heter «Windows beskyttet PC-en». Klikk «Mer informasjon», og så «Kjør likevel». Spør Windows om du vil kjøre fila, svarer du ja. Mer står under «Start med dobbeltklikk, uten Docker» i [README-en](../README.md).
+
+### Mac sier at fila ikke kan åpnes.
+
+Første gang kan macOS stoppe `Start demoen.command` eller `Start den ekte versjonen.command`, fordi fila er lastet ned fra nettet. Fra macOS 15 holder det ikke å høyreklikke og velge Åpne. Velg Apple-menyen > Systeminnstillinger, og Personvern og sikkerhet i sidepanelet. Under Sikkerhet klikker du «Åpne likevel» og skriver inn passordet ditt. Knappen står der i omtrent en time etter at du prøvde å åpne fila. Dobbeltklikk så fila på nytt. På macOS 14 og eldre kan du også høyreklikke fila, velge Åpne og bekrefte.
+
+### Vinduet sier at mappa har .git.
+
+`Start den ekte versjonen` starter ikke i en mappe med `.git`, en klon av repoet, heller ikke på main. Da stopper vinduet før noe installeres eller hentes, så et dobbeltklikk i en klon aldri henter med nøkkelen som ligger i den. Last ned en egen kopi med «Download ZIP» på GitHub, pakk den ut, og bruk din egen nøkkel fra EODHD. `Start demoen` starter også i en klon.
+
+### Vinduet sier at noe svarer allerede på 127.0.0.1:8000.
+
+Demoen eller appen kjører allerede, kanskje i Docker. Lukk det andre vinduet, eller stopp Docker med `docker compose --profile demo down`, som stopper både demoen og den ekte versjonen, og dobbeltklikk på nytt.
+
+### Nøkkelen var feil.
+
+Vinduet spør bare etter nøkkelen når den mangler i `.env`. Åpne `.env` i mappa, slett det som står etter `EODHD_API_KEY=`, og lagre. Neste dobbeltklikk på «Start den ekte versjonen» spør da på nytt.
 
 ## Neste gang
 

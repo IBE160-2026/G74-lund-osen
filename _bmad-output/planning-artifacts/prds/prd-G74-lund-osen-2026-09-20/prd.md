@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-23T13:04
+updated: 2026-10-24T12:38
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -776,6 +776,8 @@ helst, og etter 2.5 er en dag uten henting en vurdering som mangler for alltid
 *Lagt til 2026-10-17:* fra mandag 19.10 nekter tidskontrollen i hentingen bare før kl. 21:00 på en børsdag, ikke før kl. 22:00, så punkt 23 legger kjøringen til kl. 21:00–midnatt (beslutningen 16.10 kl. 21:09 under story 2.3, `malinger.md` §31). Når jobben i Oppgaveplanlegging skal kjøre, avgjøres i planen for den.
 
 *Lagt til 2026-10-20 kl. 15:12:* fra tirsdag 20.10 nekter tidskontrollen igjen før kl. 22:00 på en børsdag, så punkt 23 legger kjøringen til kl. 22:00–midnatt, som før 19.10. Det snur beslutningen 16.10 kl. 21:09, etter gruppens svar 19.10 kl. 22:19 under story 2.3: raden fra kl. 21 var ikke endelig for DNO (`malinger.md` §37), og en vurdering kan ikke skrives om (AD-7).
+
+*Lagt til 2026-10-24 (story 3.5a, gruppens svar 23.10 kl. 23:31):* regelen står. «Start den ekte versjonen» kjører hentekommandoen før webserveren, og dobbeltklikket er den bevisste handlingen. Webserveren henter aldri. Er det ingenting nytt å hente, gir dobbeltklikket 0 kall (FR-402): hentekommandoen stopper ved sjekken av basen, før første kall. I en mappe med `.git` starter ikke den ekte versjonen, så et dobbeltklikk i en klon aldri henter med gruppens nøkkel.
 
 #### FR-402 — Kontroll mot forventet børsdag, ikke mot klokkeslett
 

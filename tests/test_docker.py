@@ -2007,6 +2007,9 @@ class TestReadmeForNybegynnere:
             "Den lokale modellen for KI-teksten (valgfri)",
             # Story 10.7: egen noekkel, ogsaa lukket.
             "Egen nøkkel til Gemini, Anthropic eller OpenAI (valgfri)",
+            # Story 3.5a: start med dobbeltklikk, ogsaa lukket, og «Kom i
+            # gang» er uendret til gruppen har valgt hovedvei (svaret 16:37).
+            "Start med dobbeltklikk, uten Docker",
         }
 
     def test_uv_delen_er_to_nummererte_lister(self):
@@ -2438,8 +2441,9 @@ class TestReadmeForNybegynnere:
         gitignore = (ROT / ".gitignore").read_text(encoding="utf-8")
         del_ = README.read_text(encoding="utf-8").split("\n## Mappestruktur\n", 1)[1].split("\n## ", 1)[0]
         punkter = [l for l in del_.splitlines() if l.startswith("- ")]
-        # Story 3.3f: 8 med docs/appen/.
-        assert len(punkter) == 8, punkter
+        # Story 3.3f: 8 med docs/appen/. Story 3.5a: 9 med start/ og
+        # .gitattributes.
+        assert len(punkter) == 9, punkter
         for punkt in punkter:
             # Hver sti i kodeformat i punktet er en lenke, ogsaa etter
             # tankestreken (gjennomgangen, BH3 og ECH4).
@@ -2448,7 +2452,8 @@ class TestReadmeForNybegynnere:
         # Alle lenkene, ogsaa uten kodeformat, er de i kodeformat.
         # Story 3.3e: 16 med bildet av oversikten. Story 3.3f: 18 med docs/appen/
         # og bildet av aksjesiden.
-        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 18, lenker
+        # Story 3.5a: 20 med start/ og .gitattributes.
+        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 20, lenker
         sporet = _git_sporet()
         for tekst, maal in lenker:
             # Maalet er stien i teksten, relativ og uten «..» (BH4, ECH3).
@@ -2778,11 +2783,13 @@ LENKENE_FOER_3_3H = {
 # foer kl. 22 en boersdag gir forrige boersdag. Var 542c8991....
 # Story 8.1 (instruksjonen 23.10 kl. 14:38, gruppens svar kl. 15:52): lenken
 # til skjemaet docs/brukertest.md i «Dokumentene» (regel 19). Var d05514d3....
+# Story 3.5a: start/ og .gitattributes i «Mappestruktur» (regel 19). Var
+# d157a170....
 AVTRYKK_I_PILENE = {
     "Demoen": "f124a92b1c64eeb0ea5e7141976ff85de68df49004a22d5874a4a257aaf89b55",
     "Den ekte versjonen": "3bb398cd1be31a43abe09b7261456646b6dc03047e20f1aa57ab665a768cfd78",
     "Dokumentene": "409a3f8b38d4247df41e3eb5062ad439aa160e7fd1c0b49e0fd44f262eb2d77c",
-    "Mappestruktur": "d157a1706be8d24e7235f8d89c39c464609032c63ce5443adf2c40d1916758cd",
+    "Mappestruktur": "0d1a51a6b39865892cd144651cb2be3610cf8e7473bf2eb1f67fe5cede32cd52",
 }
 
 # Svaret 20.10 kl. 20:20: advarselen staar rett under pila til den ekte
