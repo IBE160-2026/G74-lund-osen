@@ -153,6 +153,7 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-8-0c-tydelig-merking-ord-ved-sjekkene-og-datoer-paa-grafen.md`
   summary: Teksten om «Uten data i denne kilden» står bare i vinduet ved «data hentet», og det vinduet finnes bare når `hentet` har en verdi. Fotnoten kan stå uten at teksten finnes på siden.
   evidence: BH5 og ECH8 i gjennomgangen av PR #35 (13.10). Delen 2 av hjelpen ble godkjent med teksten i det vinduet. Et eget «?» ved fotnoten er et valg for gruppen. Ikke rettet nå.
+  resolved: Bortfalt 2026-10-24 i story 8.2a (b, gruppens svar kl. 11:34 og 11:35): fotnoten «Uten data i denne kilden» er borte, og en aksje uten kurser har en rad nederst i tabellen med «uten data». Teksten i vinduet ved «Oppdatert» heter nå «Uten data:» (`spec-8-2a-funn-fra-proeven-av-demoen.md`, BH14 i gjennomgangen 24.10).
 - source_spec: `_bmad-output/implementation-artifacts/spec-8-0c-tydelig-merking-ord-ved-sjekkene-og-datoer-paa-grafen.md`
   summary: Ga sier «0 ingen utslag» en dag volumet var over 1,5 ganger medianen og kursen var uendret, mens hjelpen for interesse sier «Slår ut over 1,5 ganger medianen».
   evidence: ECH1 i gjennomgangen av PR #35 (13.10). Sjekken gir 0 og teller ikke i styrken (`signalberegning.py`, `interesse`), så «ingen utslag» stemmer med styrken. Hjelpen kan presiseres. Ikke rettet nå.

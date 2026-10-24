@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-24T12:38
+updated: 2026-10-24T14:44
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -294,6 +294,8 @@ Bare det andre er sant.
 
 Aksjer kilden ikke har en eneste kursrad for, faller ut av tabellen, men skal
 navngis under den, slik at brukeren vet at oversikten er ufullstendig.
+
+*Lagt til 2026-10-24 (story 8.2a, b, gruppens svar kl. 11:34 og 11:35, U23):* en aksje uten en eneste kursrad har en rad nederst i tabellen, med navnet som lenke, «–» i hver kolonne og «uten data». Fotnoten under tabellen er borte. Brukeren ser fortsatt at oversikten er ufullstendig, og tallet i overskriften stemmer med radene.
 
 ##### Hvor gamle dataene er
 

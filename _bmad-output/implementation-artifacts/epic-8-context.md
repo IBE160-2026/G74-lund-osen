@@ -53,6 +53,8 @@ i arbeid, resten er backlog.
   synlig vei tilbake.
 - **Sortering:** styrke fallende, så absolutt endring; aksjer uten gyldig signal
   sist. Klikksortering (8.15) gjelder innenfor hver del når tabellen er delt.
+  *Endret 2026-10-24 (story 8.2a, e, gruppens svar kl. 11:39):* med en kolonne
+  valgt er tabellen én liste, uten delene. Uten sortering er delene som før.
 - **Signalet regnes aldri på nytt.** Alt som viser en vurdering (T/B/I,
   signaldager, «Velg dag», endret styrke), leser den lagrede vurderingen. En
   børsdag uten rad er «ikke vurdert», en rad med grunn viser grunnen, og en dag
