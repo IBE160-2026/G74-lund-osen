@@ -2362,6 +2362,8 @@ avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 
 *Avgjort 2026-10-24 kl. 15:21 (gruppens svar):* på aksjesiden er lenken til investorsiden et kort, «Mer om ‹navn›», med den samme logoen i 64 px og grå ring, fordi gul betyr «skilte seg ut». Logoen står ikke i lista på forsiden.
 
+*Rettet 2026-10-24:* kanten for dem som skilte seg ut er oransje, ikke gul, som linja kl. 15:21 sier: sterk oransje (`--oransje`, #F2B53A) ved 3 av 3 og lys oransje (`--lys-oransje`, #F8DE9C) ved 2 av 3. Den grå ringen står: ringen i logoen har samme farge som kanten ved 3 av 3, og gult (`--gul-symbol`) betyr 3 av 3.
+
 ### Story 3.4b: KI-tekstene i demoen
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 16:53.*
@@ -3803,6 +3805,8 @@ jeg finner det jeg leter etter.
 
 *Avgjort 2026-10-24 kl. 11:39 (gruppens svar, 8.2a punkt e):* erstatter linja fra 13.10 om sorteringen innenfor hver del. Velges en kolonne, sorteres hele lista, uten delene «Skilte seg ut» og «Øvrige aksjer». Rader uten tall i kolonnen står sist, og de som skilte seg ut, beholder den gule kanten. Standardrekkefølgen etter signalstyrke har delene som nå. Teksten om sorteringen og designreglene §5 følger med. Gjelder oversikten og Min liste.
 - **Ville feilet hvis:** en sortert tabell fortsatt var delt i to, eller en rad som skilte seg ut, mistet kanten etter et klikk
+
+*Rettet 2026-10-24:* kanten for dem som skilte seg ut er oransje, ikke gul, som linja kl. 11:39 sier: sterk oransje (`--oransje`, #F2B53A) ved 3 av 3 og lys oransje (`--lys-oransje`, #F8DE9C) ved 2 av 3. Den grå ringen står: ringen i logoen har samme farge som kanten ved 3 av 3, og gult (`--gul-symbol`) betyr 3 av 3.
 
 ### Story 8.16: Regelen for startdagen, og periodene i kursgrafen
 
