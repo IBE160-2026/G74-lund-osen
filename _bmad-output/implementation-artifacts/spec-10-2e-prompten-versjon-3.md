@@ -58,6 +58,45 @@ Fortsatt ingen kurser, volumer, prosenter eller forholdstall. Grunnlaget har bar
 - M1: dagene telt bare på retningen.
 - M2: kontrollen slipper et tall utenfor grunnlaget.
 
+**Utfallet** (på `1795981`, kl. 20:33, med sha256 lik HEAD etter hver):
+- M1, `(rad.retning, rad.styrke) != …` byttet med `rad.retning != vurdering.retning`, ble fanget av `test_dagene_naar_styrken_byttes`.
+- M2, alle heltallene i grunnlaget og tallene 4–12 lagt til de lovlige, ble fanget av `test_2_tall_og_mengder_som_ikke_er_i_grunnlaget[Femdagssnittet ligger lavere.]`.
+
+## Prøvekjøringen
+
+§43 i `malinger.md`, kl. 20:31:25–20:31:36: 12 av 15 besto, og 3 ble stoppet, mot 15 av 15 med versjon 2 på samme dag. Alle tre ble stoppet på «Ingen sjekk ga …» om én sjekk, som styrkeregelen fra 10.2a leser som styrke 0, og utsagnet var riktig. Etter instruksjonen kl. 20:00 (steg 4, tre eller flere stoppet) og beslutningen 16.10 kl. 23:51 (2) flettes ikke grenen før gruppen har avgjort det. Med kontrollen etter gjennomgangen (`6f34ebd`) er utfallet det samme: 12 besto.
+
+KI-tekstene i demoen ble laget på nytt med versjon 3: 11 av 13 besto, mot 13 av 13 med versjon 2. NLYS ble stoppet på «skyldes» og TROY på «Ingen sjekk ga utslag på interesse».
+
+## Gjennomgangen
+
+Gjennomgang 24.10 på diffen `df137b3..1795981` (commitene `ed68979` og `153aba8` på main og grenen), med Blind Hunter (BH, 15 funn), Edge Case Hunter (ECH, 12) og Verification Gap (VG, 3). Rettingene står i `6f34ebd`.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH7 | Grenen gjør versjon 3 til standard og bytter demotekstene, men §43 sier at den ikke skal flettes | medium | **må avgjøres av gruppen:** grenen flettes ikke. Gruppen avgjør om versjon 3 rettes, eller legges bort |
+| BH6 | «Ingen sjekk ga utslag på interesse» om én sjekk leses som styrke 0. Det stoppet alle tre i §43 og TROY i demoen, og utsagnet var riktig | medium | **må avgjøres av gruppen:** det er styrkeregelen fra 10.2a, og en retting endrer kontrollen etter prøvekjøringen |
+| BH8 | Kontrollen sjekker ikke utsagn om én sjekk: tre tekster i §43 sier at interessen ga utslag der bare trenden ga det, og de besto | medium | **må avgjøres av gruppen**, og ført under «Åpent» |
+| BH1, ECH6 | «Minst» om dagene sjekkes ikke: fem tekster i §43 og seks i demoen sier «minst» uten merket, og en tekst med merket kan si et eksakt antall | medium | **må avgjøres av gruppen:** en sjekk ville stoppe flere tekster i §43 og i demoen |
+| BH9, VG2 | En feil ved lesingen av indeksen stoppet KI-teksten for alle aksjene | medium | patch: grunnlaget uten hovedindeksen, som forsiden, og `test_en_indeks_som_ikke_kan_leses_stopper_ikke_tekstene` |
+| VG1 | Ingen test for valget av OSEBX når basen har en annen indeks | medium | patch: `test_hovedindeksen_er_osebx_ogsaa_med_en_annen_indeks` |
+| BH3, ECH1 | «Alle aksjene» og «begge» ble lest som styrkens 3 og 2 | low | patch: egen ordliste for antallene, og «alle» og «begge» om aksjene stoppes |
+| BH4, ECH3 | Perfektum, «har steget», «har sunket», «har gått opp», ble ikke lest | low | patch |
+| BH5, VG3 | «Aksjen på børsen steg» ble lest som hovedindeksen | low | patch |
+| BH2, ECH8, ECH12 | Tallene er lov som én mengde, og bare «N aksjer steg/falt» og «N (børs)dager på rad» knyttes til feltet sitt. «I sju dager» eller «og fem falt» sjekkes bare mot mengden | low | defer: punkt c) sier at et tall er lov når det står i grunnlaget. Ført under «Åpent» |
+| ECH2 | Et antall uendrede aksjer stoppes alltid | low | defer: grunnlaget har ikke antallet |
+| ECH7 | Sammensatte tallord over 20, som «tjueen», leses ikke | low | defer |
+| ECH4, BH12 | Ord mellom feltet og verbet kan binde feltet til en annen setningsdel, som «Sammenlignet med bransjen falt aksjen» | low | defer: gir et stopp, ikke en feil som slipper gjennom |
+| ECH5 | To mellomrom foran «Oslo Børs» | low | defer |
+| ECH9 | Bransjen med bare aksjen selv | low | defer: står under «Åpent» fra før |
+| BH10, ECH10 | Aksjene bruker forrige rad og indeksen forrige børsdag | avvist | som børsometeret (`bygg_rute`) og forsiden (`indeksendring`), slik spesifikasjonen sier |
+| BH11 | Blandet med styrke 2 telles på rad selv om fortegnene bytter | avvist | gruppens svar kl. 16:15: samme retning og styrke |
+| BH13, ECH11 | Uten OSEBX velges en annen indeks og kalles hovedindeksen | avvist | som forsiden og kursgrafen (`valgt_indeks`). Basen har bare OSEBX, og demoen DEMIX |
+| BH14 | NLYS i demoen brukte «skyldes» igjen | low | ført i «Prøvekjøringen» over |
+| BH15 | Tester for hullene over | low | testene er lagt til for funnene som er rettet |
+
 ## Åpent
 
 - `bransjen` for en bransje med bare aksjen selv sier det samme som aksjens egen endring. Børsometeret merker den «1 aksje». Grunnlaget har ikke det merket.
+- *Lagt til 2026-10-24:* om versjon 3 skal rettes og prøvekjøres på nytt, eller legges bort: styrkeregelen og «Ingen sjekk ga» (BH6), utsagn om én sjekk (BH8) og «minst» (BH1, ECH6).
+- *Lagt til 2026-10-24:* tall som står i grunnlaget, men om et annet felt, sjekkes bare der teksten har formene «N aksjer steg/falt» og «N (børs)dager på rad» (BH2, ECH8, ECH12).
