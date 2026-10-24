@@ -333,6 +333,29 @@ jobs:
       - name: Hent koden
         uses: actions/checkout@v4
 
+      # Svaret 23.10 kl. 23:31 (b): klonen har .git, så den ekte versjonen
+      # stopper med kode 1 før uv, .env og hentingen, og ingen nøkkel trengs.
+      - name: Start den ekte versjonen i klonen på Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          & '.\Start den ekte versjonen.cmd'
+          $kode = $LASTEXITCODE
+          if ($kode -ne 1) { Write-Error "Start den ekte versjonen ga kode $kode, ikke 1"; exit 1 }
+          if (Test-Path -LiteralPath '.env') { Write-Error 'Start den ekte versjonen laget .env'; exit 1 }
+          Write-Host 'Start den ekte versjonen stoppet i klonen med kode 1 og uten .env'
+          exit 0
+
+      - name: Start den ekte versjonen i klonen på Mac
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          kode=0
+          ./"Start den ekte versjonen.command" || kode=$?
+          [ "$kode" = 1 ] || { echo "Start den ekte versjonen ga kode $kode, ikke 1"; exit 1; }
+          [ ! -e .env ] || { echo "Start den ekte versjonen laget .env"; exit 1; }
+          echo "Start den ekte versjonen stoppet i klonen med kode 1 og uten .env"
+
       - name: Start demoen på Windows
         if: runner.os == 'Windows'
         shell: pwsh

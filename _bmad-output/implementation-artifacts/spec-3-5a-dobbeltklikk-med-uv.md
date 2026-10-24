@@ -35,6 +35,8 @@ context:
 - c) CI: jobben `dobbeltklikk` kjører «Start demoen» på `windows-latest` og `macos-latest`, med `OSE_START_SVAR_JA=1`, som svarer ja, og `OSE_START_UTEN_NETTLESER=1`. Den venter til siden svarer 200 med «Eksempeltall», og stopper. Den ekte versjonen kjøres ikke i CI.
 - d) Testene, med «Ville feilet hvis», uten nett: skriptene finnes for begge, bruker de samme kommandoene som README-en, binder bare 127.0.0.1, har aldri debug eller `down -v`, og skriver aldri ut nøkkelen eller miljøet.
 
+*Lagt til 2026-10-24 (gruppens svar 23.10 kl. 23:31, b):* i en mappe med `.git` stopper den ekte versjonen før uv, `.env` og hentingen, også på main, og viser til «Download ZIP» og egen nøkkel. Det erstatter vernet «bare fra main» (VG1 og ECH9). Jobben `dobbeltklikk` kjører også «Start den ekte versjonen» i klonen, før demoen, og krever kode 1 og ingen `.env` på Windows og Mac. Klonen har `.git`, så skriptet stopper før uv, og ingen nøkkel trengs.
+
 ## Valg som er gjort her
 
 - **«De samme kommandoene som README-en»** er kommandoene i den nye delen «Start med dobbeltklikk, uten Docker»: `uv sync`, `uv run python src/demo.py`, `uv run python src/fetch_prices.py` og webserveren med `uv run waitress-serve --listen=127.0.0.1:8000 app:app`. De tre første er de samme som i «Uten Docker, med uv». Webserveren er ikke `uv run python src/app.py`, fordi den har debug. Testen krever at hver kommando i skriptene står i README-en.
@@ -99,9 +101,19 @@ Mutantene etter rettingene, på `6287033`: M1 `test_skriptene_bruker_kommandoene
 
 *Lagt til 2026-10-23 (CI på PR #92):* på `d202cbe` var `dobbeltklikk (windows-latest)` rød i run 40027262304. Windows PowerShell 5.1 ble startet fra PowerShell 7 og arvet modulstiene derfra, og installasjonen av uv feilet på `Get-ExecutionPolicy`. `.cmd`-filene tømmer nå `PSModulePath` før PowerShell startes (`3af0882`). I run 40027845278 på `3af0882` var alle fire jobbene grønne, og loggen viser at skriptet installerte uv både på `windows-latest` og `macos-latest` («uv er ikke installert», så «everything's installed!»), så spørsmålet og installasjonen er prøvd i CI (BH10, ECH10, VG7).
 
+*Lukket 2026-10-24 (gruppens svar 23.10 kl. 23:31):*
+- **Lukket VG1, ECH9:** vernet «bare fra main» er erstattet etter svaret b). I en mappe med `.git` stopper den ekte versjonen før uv, `.env` og hentingen, også på main, og viser til «Download ZIP» og egen nøkkel (`ebbb657`). Testene er `test_den_ekte_versjonen_stopper_i_en_mappe_med_git`, `test_start_sh_stopper_den_ekte_versjonen_i_en_klon_paa_main` og `test_start_ps1_stopper_den_ekte_versjonen_i_en_klon_paa_main`, som kjører skriptet i en midlertidig mappe med `git init -b main`, og CI-jobben `dobbeltklikk` på Windows og Mac.
+- **Lukket BH15:** slått opp 24.10. Apples hjelpeside på norsk (support.apple.com/no-no/guide/mac-help/mh40616/mac) gir Apple-menyen > Systeminnstillinger, Personvern og sikkerhet i sidepanelet, «Åpne likevel» under Sikkerhet og passordet, og knappen står i omtrent en time etter forsøket. At høyreklikk og Åpne ikke lenger overstyrer Gatekeeper fra macOS 15, står i Apples utviklermelding fra august 2024. Den er lest i omtaler (9to5mac og AppleInsider), ikke selv. README-en og hjelpen har Personvern og sikkerhet først, og høyreklikk bare for macOS 14 og eldre (`ebbb657`). Ikke prøvd på en Mac.
+
+*Mutanten 2026-10-24:* vernet tilbake til «bare fra main» i begge skriptene, kjørt én gang med `-x` i arbeidskopien på `2a3dd7e`, med testene i denne commiten før de ble committet, og med kopi før og sha256 etter. Fanget av `test_den_ekte_versjonen_stopper_i_en_mappe_med_git[start.ps1]`. Etterpå var sha256 lik kopien, og `git hash-object` lik `HEAD:<sti>` for begge. Med `-x` stoppet kjøringen ved første feil, så om testene som kjører skriptene, også fanger den, er ikke prøvd med mutanten.
+
 ## Åpent
 
 - **Godkjenningen på Mac** (BH15): teksten i README-en og hjelpen er ikke prøvd på en Mac. Prøven før flettingen viser om høyreklikk og Åpne er nok, eller om Personvern og sikkerhet må komme først.
+
+*Lagt til 2026-10-24:* BH15 er lukket etter oppslaget under «Gjennomgangen 23.10». Teksten er fortsatt ikke prøvd på en Mac.
+
+- **Navnene i advarselen fra Windows:** «Windows beskyttet PC-en» står i gruppens svar 24.10 kl. 11:22 og 11:28. «Mer informasjon» og «Kjør likevel» står slik instruksjonen 24.10 kl. 12:31 gir navnene på skjermen. Ingen side fra Microsoft med de to knappenavnene på norsk ble funnet 24.10.
 
 ## Det som ikke endres
 
@@ -112,3 +124,5 @@ Mutantene etter rettingene, på `6287033`: M1 `test_skriptene_bruker_kommandoene
 ## Prøven før flettingen
 
 Flettingen stopper alltid før gruppen har prøvd: «Download ZIP» av grenen på GitHub, pakk ut i en ny mappe, og dobbeltklikk «Start demoen». Den ekte versjonen prøves aldri med gruppens nøkkel i en kopi, men i README-prøven med testerens egen konto.
+
+*Gruppens prøve 24.10 (svarene kl. 11:22 og 11:28):* «Download ZIP» av grenen, pakket ut i Nedlastinger, og «Start demoen» etter advarselen «Windows beskyttet PC-en». Siden med «Eksempeltall» var oppe på under ett minutt. Prøven var før commitene 24.10 på grenen, og de endrer bare den ekte versjonen, tekstene og testene, ikke veien til demoen.
