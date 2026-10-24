@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-24T17:41
+updated: 2026-10-24T23:37
 ---
 
 # Kvalitetssikring
@@ -196,6 +196,8 @@ importerer adaptere, at `signalberegning.py` bare importerer `kursdata`,
 til basen (story 2.1b). `tests/test_tidssone.py` avviser `date.today(`,
 `datetime.now()` og `astimezone()` uten argument i hele `src/` (story 2.1).
 `tests/test_readme.py` sjekker at hver lenke i README peker på noe som finnes.
+
+*Lagt til 2026-10-24:* «testene for dokumentene», som instruksjonene og endringsforslagene viser til, er `tests/test_readme.py`, `tests/test_kvalitetssikring.py`, `tests/test_ryddighet.py`, `tests/test_suksesskriterier.py`, `tests/test_hjelpetekster.py` og `tests/test_docker.py`.
 
 ## 3. Mutantpraksisen
 

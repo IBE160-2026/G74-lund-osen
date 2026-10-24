@@ -1947,6 +1947,8 @@ følger aksjene jeg bryr meg om.
 
 *Lagt til 2026-10-24 kl. 10:16 (målingen etter gruppens svar 24.10 kl. 10:00, `malinger.md` §42):* de neste 20 «Common Stock» i lista fra §40 som ikke var rangert, plass 6–59 i lista, fra Aqua Bio Technology (ABTEC) til Cavendish Hydrogen (CAVEN), ga alle 67 rader. Den høyeste medianen er 1,1 MNOK (Arribatec Solutions, ARR, plass 128 av 186), 11 har 0,0 MNOK avrundet, og ingen er over 25 MNOK; 37 av 186 er fortsatt over 32 MNOK og 41 over 25 MNOK. Lista står alfabetisk, så de 20 er de neste i alfabetet. Kallene var alle de 20 i dagskvoten 24.10, og bonuskvoten er ikke brukt. De lokale råfilene gir rekkefølgen SNI, PLT, WWI på 8,3 MNOK, ikke den i §35–§41; det står som åpent punkt i §42.
 
+*Avgjort 2026-10-24 kl. 11:08 (gruppens svar):* PLT og WWI bytter plass i «Alle 186, rangert» i §42 i `malinger.md`, så plass 72–74 er SNI, PLT, WWI, rekkefølgen den uavrundede medianen gir regnet fra de lokale råfilene (det åpne punktet i §42). §35 og §42 har hver fått en Rettet-linje om at råfilene for SNI og WWI finnes.
+
 ### Story 2.13: Kommandoen som måler omsetning
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
@@ -2359,6 +2361,8 @@ avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 *Godkjent 2026-10-24 kl. 13:43 (gruppens svar):* de 15 tegningene i `docs/bilder/investorsider/`.
 
 *Avgjort 2026-10-24 kl. 15:21 (gruppens svar):* på aksjesiden er lenken til investorsiden et kort, «Mer om ‹navn›», med den samme logoen i 64 px og grå ring, fordi gul betyr «skilte seg ut». Logoen står ikke i lista på forsiden.
+
+*Rettet 2026-10-24:* kanten for dem som skilte seg ut er oransje, ikke gul, som linja kl. 15:21 sier: sterk oransje (`--oransje`, #F2B53A) ved 3 av 3 og lys oransje (`--lys-oransje`, #F8DE9C) ved 2 av 3. Den grå ringen står: ringen i logoen har samme farge som kanten ved 3 av 3, og gult (`--gul-symbol`) betyr 3 av 3.
 
 ### Story 3.4b: KI-tekstene i demoen
 
@@ -2795,6 +2799,8 @@ starter ikke av seg selv.
 *Avgjort 2026-10-24 kl. 16:15 (gruppens svar):* a) hvor lenge signalet har vært slik, er børsdager på rad med samme retning og styrke, til og med dagen; b) fra børsometeret: hvor mange aksjer i lista som steg og falt fra børsdagen før, og om bransjen til aksjen steg eller falt i snitt. Begge er fortegn og antall.
 
 *Avgjort 2026-10-24 kl. 21:49 (gruppens svar):* versjon 3 rettes og prøvekjøres på nytt, og flettes bare hvis prøvekjøringen består: færre enn tre tekster stoppet, og ingen tekst som sier feil om en sjekk eller om dagene.
+
+*Avgjort 2026-10-24 kl. 23:23 (gruppens svar):* a) ett forsøk til med versjon 3 søndag 25.10: modellen får ferdig ordlyd for dagene og skriver dem aldri med egne ord. Den flettes bare med 15 av 15 i prøvekjøringen og ingen tekst med feil, etter beslutningen 16.10 kl. 23:51 (2). b) Blir demoteksten for KVST stoppet igjen, viser bildet av aksjesiden i README-en en demoaksje der KI-teksten besto; modellen kjøres ikke på nytt for en bedre tekst (FR-604).
 
 ### Story 10.3: Visningen i aksjedetaljen
 
@@ -3801,6 +3807,8 @@ jeg finner det jeg leter etter.
 
 *Avgjort 2026-10-24 kl. 11:39 (gruppens svar, 8.2a punkt e):* erstatter linja fra 13.10 om sorteringen innenfor hver del. Velges en kolonne, sorteres hele lista, uten delene «Skilte seg ut» og «Øvrige aksjer». Rader uten tall i kolonnen står sist, og de som skilte seg ut, beholder den gule kanten. Standardrekkefølgen etter signalstyrke har delene som nå. Teksten om sorteringen og designreglene §5 følger med. Gjelder oversikten og Min liste.
 - **Ville feilet hvis:** en sortert tabell fortsatt var delt i to, eller en rad som skilte seg ut, mistet kanten etter et klikk
+
+*Rettet 2026-10-24:* kanten for dem som skilte seg ut er oransje, ikke gul, som linja kl. 11:39 sier: sterk oransje (`--oransje`, #F2B53A) ved 3 av 3 og lys oransje (`--lys-oransje`, #F8DE9C) ved 2 av 3. Den grå ringen står: ringen i logoen har samme farge som kanten ved 3 av 3, og gult (`--gul-symbol`) betyr 3 av 3.
 
 ### Story 8.16: Regelen for startdagen, og periodene i kursgrafen
 
