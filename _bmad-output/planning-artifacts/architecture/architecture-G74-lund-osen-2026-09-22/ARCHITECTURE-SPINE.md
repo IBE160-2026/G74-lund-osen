@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: '2026-10-22T23:45'
+updated: '2026-10-24T12:38'
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -252,6 +252,7 @@ tallene og ordene i hjelpen er de samme som i beregningen og tabellen.
 - **Merknad 2026-10-09 (story 3.3, gruppens svar kl. 23:13):** regelen står. `hent` har `entrypoint: ["python", "src/fetch_prices.py"]` og ingen `command`, så flagg legges til: `docker compose run --rm hent --les-inn FIL`. Dockerfile setter `OSE_I_DOCKER=1`, og da viser den tomme siden `HENTEKOMMANDO_DOCKER` («docker compose run --rm hent») i stedet for `HENTEKOMMANDO`. README-en har begge, og en test holder dem like.
 - **Merknad 2026-10-10 (story 3.4, PR 2, instruksjonen kl. 15:23):** regelen står. Webserveren lager aldri demobasen. `demo` er webserveren med `OSE_DEMO=1`, og den starter når `demo-lag` er ferdig (`depends_on` med `service_completed_successfully`). Begge ligger i profilen `demo`, uten nøkkel og uten `env_file`, så `docker compose up` starter ingen av dem. Mangler demobasen, viser siden i Docker `DEMOKOMMANDO_DOCKER` («docker compose run --rm demo-lag»), valgt med `OSE_I_DOCKER` som hentekommandoen. `demo` har samme port som `app`, så de to kjører ikke samtidig. `docker compose down` uten profilen stopper ikke demoen (Compose v5.5.1, prøvd 10.10), og README-en gir `docker compose --profile demo down`.
 - **Merknad 2026-10-19 (story 8.3):** regelen står. Webserveren skriver nå én tabell, `min_liste`, og bare fra `POST /min-liste/merk`. Den henter aldri, og koster ingen kall. Ruta åpner demobasen for skriving, og migrerer den fortsatt ikke; sidene åpner den bare for lesing. En test holder alle andre tabeller, skjemaet og demomerket like under en merking, og en annen at ingen side skriver.
+- **Merknad 2026-10-24 (story 3.5a, gruppens svar 23.10 kl. 23:31):** regelen står. «Start den ekte versjonen» kjører `uv run python src/fetch_prices.py` før webserveren, og dobbeltklikket er den bevisste handlingen. Webserveren startes etterpå med `uv run waitress-serve --listen=127.0.0.1:8000 app:app` og henter aldri. Er det ingenting nytt å hente, gir dobbeltklikket 0 kall (FR-402). I en mappe med `.git` stopper den ekte versjonen før uv, `.env` og hentingen, også på main, så et dobbeltklikk i en klon aldri henter med gruppens nøkkel. Det erstatter vernet «bare fra main».
 
 ### AD-11 — To volumer
 
