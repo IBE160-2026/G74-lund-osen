@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-23T23:17
+updated: 2026-10-24T17:16
 ---
 
 # Hjelp til «Kom i gang»
@@ -227,9 +227,17 @@ Første gang kan macOS stoppe `Start demoen.command` eller `Start den ekte versj
 
 `Start den ekte versjonen` starter ikke i en mappe med `.git`, en klon av repoet, heller ikke på main. Da stopper vinduet før noe installeres eller hentes, så et dobbeltklikk i en klon aldri henter med nøkkelen som ligger i den. Last ned en egen kopi med «Download ZIP» på GitHub, pakk den ut, og bruk din egen nøkkel fra EODHD. `Start demoen` starter også i en klon.
 
-### Vinduet sier at noe svarer allerede på 127.0.0.1:8000.
+### Vinduet sier at den andre versjonen av OSE Signal stoppes.
 
-Demoen eller appen kjører allerede, kanskje i Docker. Lukk det andre vinduet, eller stopp Docker med `docker compose --profile demo down`, som stopper både demoen og den ekte versjonen, og dobbeltklikk på nytt.
+Demoen eller den ekte versjonen kjørte allerede fra denne mappa, på samme port, fra et annet dobbeltklikk eller startet med `uv run waitress-serve`. Skriptet stopper den, venter til porten er ledig, og starter den du dobbeltklikket. Det andre vinduet sier da at appen stoppet, og at det kan lukkes fordi den andre versjonen kjører.
+
+### Vinduet sier at et annet program svarer på 127.0.0.1:8000.
+
+Skriptet stopper aldri andre programmer, heller ikke OSE Signal fra en annen mappe, og vinduet sier hvilket program det er. Er det demoen eller appen i Docker, stopper du den med `docker compose --profile demo down` i et terminalvindu i mappa med koden. Den stopper både demoen og den ekte versjonen. Er det et annet program, lukker du det. Dobbeltklikk så på nytt.
+
+### Hvor finner jeg nøkkelen, og hvordan limer jeg den inn?
+
+`Start den ekte versjonen` åpner registreringssiden hos EODHD første gang. Når du har laget kontoen, står nøkkelen som «API token» under «Dashboard», med kopiknappen til høyre. Lim den inn i vinduet med Ctrl+V eller et høyreklikk på Windows, og med Cmd+V på Mac, og trykk Enter. På Windows vises den som stjerner. På Mac vises ingenting mens du limer inn, men nøkkelen kommer med.
 
 ### Nøkkelen var feil.
 

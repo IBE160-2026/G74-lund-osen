@@ -73,3 +73,8 @@ newsweb-*.json
 # av andre. Repoet er offentlig, og aerlige vurderinger skrives daarligere
 # naar de leses av medstudenter mens de blir til.
 _privat/
+
+# Gjennomgangen av 3.5d (BH1, ECH1): cachen Windows PowerShell skriver i
+# mappa den står i, når miljøet mangler LOCALAPPDATA og SystemDrive.
+/%SystemDrive%/
+/Microsoft/

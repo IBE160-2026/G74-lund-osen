@@ -502,7 +502,7 @@ class TestNoekkelen:
             else:
                 # 10.7b: valget lover ingenting om radene (VG1, BH2, ECH3).
                 assert f"{modul.NOEKKEL_VARIABEL} mangler" in linjer[0]
-                assert "KI-teksten lages ikke foer den er lagt inn." in linjer[0]
+                assert "KI-teksten lages ikke før den er lagt inn." in linjer[0]
                 assert "Raden i KI-loggen" not in linjer[0] and "rader" not in linjer[0]
 
 
@@ -623,7 +623,7 @@ class TestNoekkelenFoerKallet:
         modul = TJENESTENE[tjeneste][1]
         hent = FalskHent(TJENESTENE[tjeneste][2]())
         grunn = modell_for(tjeneste, hent, uten_noekkel(tjeneste, hva)).sjekk()
-        forventet = "mangler" if hva == "mangler" else "har tegn som ikke kan sendes, lim den inn paa nytt"
+        forventet = "mangler" if hva == "mangler" else "har tegn som ikke kan sendes, lim den inn på nytt"
         assert grunn == f"{modul.NOEKKEL_VARIABEL} {forventet}"
         assert modell_for(tjeneste, hent).sjekk() is None
         assert hent.kall == []
@@ -641,10 +641,10 @@ class TestNoekkelenFoerKallet:
         assert kode == 0
         assert hent.kall == []
         assert all(r is None for r in radene(base).values())
-        assert f"ennaa: {modul.NOEKKEL_VARIABEL} " in utskrift
-        assert "Ingen rader er skrevet i KI-loggen, og 15 aksjer venter paa teksten." in utskrift
-        assert "Legg noekkelen inn eller rett den i .env, eller i miljoeet, som gaar foran" in utskrift
-        assert "kjoer samme kommando igjen foer midnatt. Det gir 0 kall til EODHD." in utskrift
+        assert f"ennå: {modul.NOEKKEL_VARIABEL} " in utskrift
+        assert "Ingen rader er skrevet i KI-loggen, og 15 aksjer venter på teksten." in utskrift
+        assert "Legg nøkkelen inn eller rett den i .env, eller i miljøet, som går foran" in utskrift
+        assert "kjør samme kommando igjen før midnatt. Det gir 0 kall til EODHD." in utskrift
         fanget = capsys.readouterr()
         noekkel = noekkel_for(tjeneste)
         for tekst in (utskrift, fanget.out, fanget.err):
@@ -692,7 +692,7 @@ class TestNoekkelenFoerKallet:
         )
         assert len(linjer) == 1
         assert f"{modul.NOEKKEL_VARIABEL} har tegn som ikke kan sendes" in linjer[0]
-        assert "KI-teksten lages ikke foer den er rettet." in linjer[0] and "lages av" not in linjer[0]
+        assert "KI-teksten lages ikke før den er rettet." in linjer[0] and "lages av" not in linjer[0]
         assert noekkel[:10] not in linjer[0] and noekkel[10:] not in linjer[0]
 
 

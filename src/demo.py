@@ -298,7 +298,7 @@ def lag_demobase(sti: Path, skriv=print, med_ki: bool = True) -> None:
         "ikke data fra Oslo Børs. Ingen nettkall."
     )
     if radene:
-        skriv(f"KI-tekst for {len(radene)} aksjer paa siste dag, fra demo_ki_tekster.json. Ingen kall til modellen.")
+        skriv(f"KI-tekst for {len(radene)} aksjer på siste dag, fra demo_ki_tekster.json. Ingen kall til modellen.")
 
 
 def gammel_demobase(tilkobling) -> bool:
@@ -391,7 +391,7 @@ def main(argv: list[str] | None = None) -> None:
         sys.exit(1)
     except OSError as feil:
         print(
-            f"{sti.name} kunne ikke lages: {type(feil).__name__}. Er den aapen i "
+            f"{sti.name} kunne ikke lages: {type(feil).__name__}. Er den åpen i "
             "et annet program, for eksempel webserveren?"
         )
         sys.exit(1)

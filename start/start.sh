@@ -17,6 +17,9 @@ ADRESSE="http://127.0.0.1:8000"
 VERSJON="${1:-demo}"
 SVAR_JA="${OSE_START_SVAR_JA:-}"
 UTEN_NETTLESER="${OSE_START_UTEN_NETTLESER:-}"
+# Forprøven 24.10 (funn 4): Python skriver æ, ø og å som UTF-8, også når
+# utskriften går til en fil.
+export PYTHONIOENCODING=utf-8
 
 vent_paa_enter() {
     if [ "$SVAR_JA" != "1" ]; then
@@ -27,7 +30,7 @@ vent_paa_enter() {
 stopp() {
     echo
     echo "Noe gikk galt: $1"
-    echo "Se «Står du fast?» i README-en, eller docs/hjelp.md. Du kan starte på nytt med et nytt dobbeltklikk."
+    echo "Står det fortsatt fast, er det mer hjelp under «Start med dobbeltklikk» i docs/hjelp.md i mappa."
     vent_paa_enter
     exit 1
 }
@@ -36,10 +39,67 @@ svarer() {
     curl -fsS --max-time 2 -o /dev/null "$ADRESSE/" 2>/dev/null
 }
 
-# Svarer noe på porten, uansett hva (gjennomgangen, BH16 og ECH7). curl gir
-# 000 når ingenting svarer.
+# Svarer noe på porten, uansett hva (gjennomgangen, BH16 og ECH7). Med
+# /dev/tcp i bash, så en manglende curl ikke ser ut som en opptatt port
+# (spesifikasjonen 3.5d).
 opptatt() {
-    [ "$(curl -s --max-time 2 -o /dev/null -w '%{http_code}' "$ADRESSE/" 2>/dev/null)" != "000" ]
+    (exec 3<>/dev/tcp/127.0.0.1/8000) 2>/dev/null
+}
+
+# Forprøven 24.10 (funn 7, gruppens svar kl. 12:04): den andre versjonen av
+# OSE Signal kjennes på kommandolinja fra skriptene, med waitress-serve,
+# --listen=127.0.0.1:8000 og app:app. Alt annet stoppes aldri.
+er_ose_signal() {
+    case " $1 " in *" --listen=127.0.0.1:8000 "*) ;; *) return 1 ;; esac
+    case " $1 " in *" app:app "*) ;; *) return 1 ;; esac
+    # Gjennomgangen av 3.5d (BH3, ECH2): bare waitress-serve fra .venv i denne
+    # mappa, så en annen app med app:app på porten aldri stoppes.
+    for mappe in "$(pwd -P)" "$PWD"; do
+        case " $1 " in *" $mappe/.venv/bin/waitress-serve "*) return 0 ;; esac
+    done
+    return 1
+}
+
+# Prosessene som lytter på port 8000. Uten lsof er de ukjente.
+lyttere() {
+    lsof_sti="$(command -v lsof 2>/dev/null)"
+    [ -n "$lsof_sti" ] || { [ -x /usr/sbin/lsof ] && lsof_sti=/usr/sbin/lsof; }
+    [ -n "$lsof_sti" ] || return 0
+    "$lsof_sti" -nP -iTCP:8000 -sTCP:LISTEN -t 2>/dev/null | sort -u
+}
+
+frigjoer_porten() {
+    opptatt || return 0
+    ider="$(lyttere)"
+    # Gjennomgangen av 3.5d (ECH4): lytteren stoppet av seg selv i mellomtiden.
+    if [ -z "$ider" ] && ! opptatt; then return 0; fi
+    fremmede=""
+    for id in $ider; do
+        if ! er_ose_signal "$(ps -p "$id" -o command= 2>/dev/null)"; then
+            navn="$(ps -p "$id" -o comm= 2>/dev/null)"
+            # Gjennomgangen av 3.5d (BH7): prosessen er borte, eller er en annen brukers.
+            [ -n "$navn" ] || navn="et program skriptet ikke fant navnet på"
+            fremmede="$fremmede, ${navn##*/} (prosess $id)"
+        fi
+    done
+    if [ -z "$ider" ] || [ -n "$fremmede" ]; then
+        hvem="${fremmede#, }"
+        [ -n "$hvem" ] || hvem="et program skriptet ikke fant navnet på"
+        stopp "et annet program svarer allerede på $ADRESSE, og det er ikke OSE Signal fra denne mappa. Programmet er $hvem. Skriptet stopper aldri andre programmer. Er det demoen eller appen i Docker, stopper du den med docker compose --profile demo down i et terminalvindu i mappa med koden. Ellers lukker du programmet. Dobbeltklikk så på nytt."
+    fi
+    for id in $ider; do
+        echo "Den andre versjonen av OSE Signal kjører allerede på $ADRESSE (prosess $id). Den stoppes nå, så denne kan starte."
+        kill "$id" 2>/dev/null
+    done
+    i=0
+    while opptatt && [ $i -lt 30 ]; do
+        sleep 1
+        i=$((i + 1))
+    done
+    if opptatt; then
+        stopp "porten $ADRESSE ble ikke ledig etter 30 sekunder. Lukk vinduet der den andre versjonen kjører, og dobbeltklikk på nytt."
+    fi
+    echo "Den andre versjonen er stoppet, og porten er ledig."
 }
 
 aapne() {
@@ -49,7 +109,7 @@ aapne() {
 }
 
 # Til mappa skriptet ligger i, uansett hvor det ble startet fra.
-cd "$(dirname "$0")/.." || stopp "fant ikke mappa til appen."
+cd "$(dirname "$0")/.." || stopp "fant ikke mappa til appen. Pakk ut ZIP-fila på nytt, og dobbeltklikk på nytt."
 
 if [ "$VERSJON" = "demo" ]; then
     echo "OSE Signal: demoen, med oppdiktede selskaper og kurser."
@@ -67,6 +127,9 @@ if [ "$VERSJON" = "ekte" ] && [ -e .git ]; then
     stopp "mappa har .git (en klon av repoet eller et eget git-repo), og der starter ikke den ekte versjonen. Last ned en egen kopi med «Download ZIP» på GitHub, pakk den ut, og bruk din egen nøkkel fra EODHD. Demoen kan startes herfra."
 fi
 
+# Porten før uv og hentingen (forprøven 24.10, funn 7).
+frigjoer_porten
+
 # uv: på PATH, i .local/bin i brukermappa, eller installert etter et ja.
 if ! command -v uv >/dev/null 2>&1 && [ -x "$HOME/.local/bin/uv" ]; then
     PATH="$HOME/.local/bin:$PATH"
@@ -81,35 +144,33 @@ if ! command -v uv >/dev/null 2>&1; then
     fi
     case "$svar" in
         j|J|ja|Ja|JA|y|Y|yes) ;;
-        *) stopp "uv er ikke installert. Installer uv slik «Tester» i README-en sier, og start på nytt." ;;
+        *) stopp "uv er ikke installert, og appen kan ikke starte uten. Dobbeltklikk på nytt, og skriv j og trykk Enter når vinduet spør om uv." ;;
     esac
-    curl -LsSf https://astral.sh/uv/install.sh | sh || stopp "installasjonen av uv feilet."
+    curl -LsSf https://astral.sh/uv/install.sh | sh || stopp "installasjonen av uv feilet. Sjekk at maskinen er koblet til nettet, og dobbeltklikk på nytt."
     PATH="$HOME/.local/bin:$PATH"
-    command -v uv >/dev/null 2>&1 || stopp "uv ble ikke funnet etter installasjonen. Lukk vinduet og start på nytt."
-fi
-
-if opptatt; then
-    stopp "noe svarer allerede på $ADRESSE. Stopp det først: lukk det andre vinduet, eller stopp Docker med docker compose --profile demo down."
+    command -v uv >/dev/null 2>&1 || stopp "uv ble ikke funnet etter installasjonen. Lukk vinduet og dobbeltklikk på nytt."
 fi
 
 echo "Installerer pakkene (uv sync). Første gang tar det noen minutter."
-uv sync || stopp "uv sync feilet. Sjekk at maskinen er koblet til nettet."
+uv sync || stopp "uv sync feilet. Sjekk at maskinen er koblet til nettet, og dobbeltklikk på nytt."
 
 if [ "$VERSJON" = "demo" ]; then
     echo "Lager demobasen."
-    uv run python src/demo.py || stopp "demobasen kunne ikke lages."
+    uv run python src/demo.py || stopp "demobasen kunne ikke lages. Grunnen står i linjene over. Lukk andre vinduer der demoen kjører, og dobbeltklikk på nytt."
     export OSE_DEMO=1
 else
     unset OSE_DEMO
     [ -f .env ] || cp .env.example .env
     if ! grep -q '^EODHD_API_KEY=[^[:space:]]' .env; then
         echo "Første gang trenger den ekte versjonen en nøkkel fra EODHD. Registreringssiden åpnes nå."
-        echo "Lag en gratis konto, kopier nøkkelen (API key), og lim den inn her."
+        # Forprøven 24.10 (funn 1–3): hvor nøkkelen står, og hvordan den limes inn.
+        echo "Lag en gratis konto. Nøkkelen står som «API token» under «Dashboard» hos EODHD, med kopiknappen til høyre."
+        echo "Lim den inn her med Cmd+V. Den vises ikke mens du limer inn, men den kommer med."
         aapne "https://eodhd.com/register"
-        read -r -s -p "Lim inn nøkkelen og trykk Enter (den vises ikke): " noekkel
+        read -r -s -p "Lim inn nøkkelen og trykk Enter: " noekkel
         echo
         noekkel="${noekkel//[[:space:]]/}"
-        [ -n "$noekkel" ] || stopp "ingen nøkkel ble limt inn."
+        [ -n "$noekkel" ] || stopp "ingen nøkkel ble limt inn. Dobbeltklikk på nytt, og lim inn nøkkelen når vinduet spør."
         # Bare eieren kan lese .env.ny, som blir .env (gjennomgangen, BH6).
         (umask 077 && grep -v '^EODHD_API_KEY=' .env > .env.ny)
         printf 'EODHD_API_KEY=%s\n' "$noekkel" >> .env.ny
@@ -127,7 +188,8 @@ else
 fi
 
 echo "Starter appen på $ADRESSE."
-PYTHONPATH=src uv run waitress-serve --listen=127.0.0.1:8000 app:app &
+# Forprøven 24.10 (funn 6): 8 tråder, så waitress ikke skriver «Task queue depth».
+PYTHONPATH=src uv run waitress-serve --listen=127.0.0.1:8000 --threads=8 app:app &
 server=$!
 trap 'kill "$server" 2>/dev/null' EXIT
 # Gjennomgangen (BH5, ECH8): Ctrl+C og et lukket vindu stopper også skriptet.
@@ -141,7 +203,7 @@ while [ $i -lt 120 ]; do
     sleep 1
     i=$((i + 1))
 done
-[ "$klar" = 1 ] || stopp "appen svarte ikke på 127.0.0.1:8000."
+[ "$klar" = 1 ] || stopp "appen svarte ikke på 127.0.0.1:8000 etter 2 minutter. Grunnen står i linjene over. Lukk vinduet og dobbeltklikk på nytt."
 
 echo
 echo "Appen kjører på $ADRESSE."
@@ -150,4 +212,4 @@ aapne "$ADRESSE"
 wait "$server"
 kode=$?
 # Gjennomgangen (BH2, VG2): stopper appen av seg selv, står beskjeden.
-[ "$kode" = 0 ] || stopp "appen stoppet med kode $kode. Grunnen står i linjene over."
+[ "$kode" = 0 ] || stopp "appen stoppet med kode $kode. Startet du demoen eller den ekte versjonen i et annet vindu, er det den som kjører nå, og dette vinduet kan lukkes. Ellers står grunnen i linjene over: lukk vinduet og dobbeltklikk på nytt."

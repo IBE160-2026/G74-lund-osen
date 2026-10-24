@@ -9,6 +9,7 @@ i .github/workflows/tester.yml, paa Windows og Mac.
 import os
 import re
 import shutil
+import socket
 import subprocess
 import sys
 from pathlib import Path
@@ -32,7 +33,7 @@ KOMMANDOENE = [
     "uv sync",
     "uv run python src/demo.py",
     "uv run python src/fetch_prices.py",
-    "uv run waitress-serve --listen=127.0.0.1:8000 app:app",
+    "uv run waitress-serve --listen=127.0.0.1:8000 --threads=8 app:app",
 ]
 
 
@@ -94,7 +95,7 @@ def test_rekkefoelgen_demo_eller_henting_foer_serveren(navn):
     demo = kode.index("uv run python src/demo.py")
     ellers = kode.index("else", demo)
     henting = kode.index("uv run python src/fetch_prices.py")
-    server = kode.index("waitress-serve")
+    server = kode.index("uv run waitress-serve" if "uv run waitress-serve" in kode else "'run', 'waitress-serve'")
     assert sync < demo < ellers < henting < server
     assert kode.count("src/demo.py") == 1 and kode.count("src/fetch_prices.py") == 1
 
@@ -104,9 +105,24 @@ def test_webserveren_binder_bare_127_0_0_1(navn):
     """Ville feilet hvis serveren lyttet paa 0.0.0.0, paa en annen adresse
     eller med --host, som binder til alle adresser (M1)."""
     kode = "\n".join(_kode(SKRIPTENE[navn]))
-    adressene = re.findall(r"--listen=([^\s'\"]+)", kode)
+    # Spesifikasjonen 3.5d: bare linja som starter serveren, ikke sjekken av
+    # kommandolinja paa porten.
+    start = [l for l in kode.splitlines() if "uv run waitress-serve" in l or "-ArgumentList" in l]
+    adressene = re.findall(r"--listen=([^\s'\"]+)", "\n".join(start))
     assert adressene == ["127.0.0.1:8000"], adressene
-    assert "0.0.0.0" not in kode and "--host" not in kode and "--port" not in kode
+    assert len(start) == 1 and "0.0.0.0" not in kode and "--host" not in kode and "--port" not in kode
+
+
+def test_webserveren_har_8_traader_i_skriptene_readme_og_dockerfile():
+    """Forproeven 24.10 (funn 6, spesifikasjonen 3.5d). Ville feilet hvis
+    webserveren startet med standarden paa 4 traader et sted, saa waitress
+    skrev «Task queue depth» i vinduet."""
+    for navn in SKRIPTENE:
+        kode = "\n".join(_kode(SKRIPTENE[navn]))
+        assert kode.count("--threads=8") == 1 and "--threads=" not in kode.replace("--threads=8", ""), navn
+    assert "`uv run waitress-serve --listen=127.0.0.1:8000 --threads=8 app:app`" in _delen_i_readme()
+    dockerfile = (ROT / "Dockerfile").read_text(encoding="utf-8")
+    assert 'CMD ["waitress-serve", "--listen=0.0.0.0:8000", "--threads=8", "app:app"]' in dockerfile
 
 
 @pytest.mark.parametrize("navn", [*SKRIPTENE, *STARTFILENE])
@@ -156,6 +172,27 @@ def test_noekkelen_og_miljoeet_skrives_aldri_ut(navn):
     assert "https://eodhd.com/register" in tekst
 
 
+@pytest.mark.parametrize("navn", list(SKRIPTENE))
+def test_vinduet_sier_hvor_noekkelen_staar_og_hvordan_den_limes_inn(navn):
+    """Forproeven 24.10 (funn 1–3, spesifikasjonen 3.5d). Ville feilet hvis
+    vinduet ikke sa at noekkelen staar som «API token» under «Dashboard» med
+    kopiknappen, ikke sa hvordan den limes inn paa systemet, eller sa at den
+    ikke vises paa Windows, der Read-Host viser stjerner. Det samme staar i
+    README-en og hjelpen."""
+    meldinger = "\n".join(l for l in _kode(SKRIPTENE[navn]) if re.search(r"\b(Write-Host|Read-Host|echo|read -r)\b", l))
+    assert "Nøkkelen står som «API token» under «Dashboard» hos EODHD, med kopiknappen til høyre." in meldinger
+    if navn == "start.ps1":
+        assert "Ctrl+V eller et høyreklikk" in meldinger and "Den vises som stjerner." in meldinger
+        assert "vises ikke" not in meldinger and "Cmd+V" not in meldinger
+    else:
+        assert "Cmd+V" in meldinger and "Den vises ikke mens du limer inn" in meldinger
+        assert "Ctrl+V" not in meldinger and "stjerner" not in meldinger
+    for tekst in (_delen_i_readme(), _hjelp()):
+        assert "«API token» under «Dashboard»" in tekst and "kopiknappen til høyre" in tekst
+        assert "Ctrl+V eller et høyreklikk på Windows, og med Cmd+V på Mac" in tekst
+        assert "På Windows vises den som stjerner" in tekst
+
+
 def test_noekkelen_skrives_bare_til_env():
     """Ville feilet hvis noekkelen ble skrevet til en annen fil enn .env."""
     ps1 = "\n".join(_kode(PS1))
@@ -195,7 +232,7 @@ def test_vinduet_sier_hvordan_man_stopper_paa_norsk(navn):
     hvis noe feiler, eller æ, ø og å var borte."""
     tekst = SKRIPTENE[navn].read_text(encoding="utf-8-sig")
     assert "Lukk dette vinduet, eller trykk Ctrl+C, for å stoppe den." in tekst
-    assert "Se «Står du fast?» i README-en, eller docs/hjelp.md." in tekst
+    assert "Står det fortsatt fast, er det mer hjelp under «Start med dobbeltklikk» i docs/hjelp.md i mappa." in tekst
     # Gjennomgangen (BH11): i det vinduet sier, ikke i kommentarene.
     meldinger = [
         linje
@@ -272,12 +309,47 @@ def _mappe_med_skriptet(tmp_path, navn, git):
     return tmp_path
 
 
-def _kjoer(argumenter, miljoe):
+def _porten_er_ledig() -> bool:
+    """Om ingenting er bundet til port 8000 paa maskinen. Bind er ikke sperret
+    av conftest, og ingenting kobles til. Paa Windows med SO_EXCLUSIVEADDRUSE,
+    saa ogsaa en lytter paa 127.0.0.1 alene gjoer porten opptatt."""
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        if sys.platform == "win32":
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        s.bind(("0.0.0.0", 8000))
+        return True
+    except OSError:
+        return False
+    finally:
+        s.close()
+
+
+def _kjoer(argumenter, miljoe, sjekk_porten=True):
     """Kjoerer skriptet med «n» paa stdin, saa et spoersmaal om uv faar nei
     og ingenting installeres. Ingen uv paa PATH og en tom brukermappe, saa
-    heller ikke en mutant kommer til uv sync eller hentingen."""
+    heller ikke en mutant kommer til uv sync eller hentingen.
+
+    Spesifikasjonen 3.5d: skriptet stopper den andre versjonen av OSE Signal
+    paa port 8000. Er porten opptatt paa maskinen, for eksempel av appen fra
+    main, hoppes testen over, saa ingen test stopper den."""
+    if sjekk_porten and not _porten_er_ledig():
+        pytest.skip("port 8000 er i bruk paa maskinen")
+    # Gjennomgangen av 3.5d (BH1, ECH1): uten LOCALAPPDATA, ProgramData og
+    # SystemDrive skrev Windows PowerShell cachen sin i mappa den sto i, og
+    # det var repoet. Mappene ligger i tmp_path, og skriptet kjoeres derfra.
+    hjem = Path(miljoe.get("USERPROFILE") or miljoe["HOME"])
+    if sys.platform == "win32":
+        miljoe = {
+            **miljoe,
+            "LOCALAPPDATA": str(hjem / "AppData" / "Local"),
+            "APPDATA": str(hjem / "AppData" / "Roaming"),
+            "ProgramData": str(hjem.parent / "ProgramData"),
+            "SystemDrive": os.environ.get("SystemDrive", "C:"),
+        }
     svar = subprocess.run(
         argumenter,
+        cwd=hjem.parent,
         input="n\nn\nn\n",
         capture_output=True,
         text=True,
@@ -371,15 +443,89 @@ def test_porten_sjekkes_for_alt_som_svarer_og_serveren_stoppes(navn):
     server som stoppet av seg selv, lukket vinduet uten beskjed."""
     kode = "\n".join(_kode(SKRIPTENE[navn]))
     if navn == "start.ps1":
-        assert "System.Net.Sockets.TcpClient" in kode and "if (Opptatt) {" in kode
+        assert "System.Net.Sockets.TcpClient" in kode and "if (-not (Opptatt)) { return }" in kode
         assert "taskkill.exe /T /F /PID $script:server.Id" in kode
         assert kode.index("function Stopp([string]$Melding) {\nStopp-Serveren") >= 0
         assert "$null = $server.Handle" in kode and "if ($server.ExitCode -ne 0)" in kode
     else:
-        assert "-w '%{http_code}'" in kode and "if opptatt; then" in kode
+        # Spesifikasjonen 3.5d: /dev/tcp i bash, ikke curl.
+        assert "(exec 3<>/dev/tcp/127.0.0.1/8000) 2>/dev/null" in kode and "opptatt || return 0" in kode
         assert "trap 'kill \"$server\" 2>/dev/null' EXIT" in kode
         assert "trap 'exit 130' INT TERM HUP" in kode
         assert '[ "$kode" = 0 ] || stopp "appen stoppet med kode $kode.' in kode
+
+
+# Forproeven 24.10 (funn 4): ordene som sto med oe, aa og ae i det
+# fetch_prices.py og demo.py skrev ut, foer 3.5d.
+SKREVET_UTEN_AEOEAA = {
+    "aa", "aapen", "aapnes", "aaret", "boers", "boersdag", "boersdagen", "boersdager", "boersen", "ennaa",
+    "faa", "faar", "foer", "foerst", "foerste", "forsoek", "forsoeket", "inneveerende", "kjoer", "kjoeres",
+    "kjoeringen", "laaser", "laast", "naa", "noekkelen", "oeyeblikksbilde", "oeyeblikksbildet", "paa",
+    "paagikk", "proever", "proeves", "saa", "staar", "miljoeet", "gaar", "kjoering", "kjoerer",
+}  # fmt: skip
+
+
+def _tekstene_brukeren_ser(sti) -> list[tuple[int, str]]:
+    """Strengene i fila, uten docstringene og filnavnene (-raa-, forsoek)."""
+    import ast
+
+    tre = ast.parse(sti.read_text(encoding="utf-8"))
+    docstringer = {
+        id(n.body[0].value)
+        for n in ast.walk(tre)
+        if isinstance(n, (ast.Module, ast.FunctionDef, ast.ClassDef))
+        and n.body
+        and isinstance(n.body[0], ast.Expr)
+        and isinstance(n.body[0].value, ast.Constant)
+    }
+    return [
+        (n.lineno, n.value)
+        for n in ast.walk(tre)
+        if isinstance(n, ast.Constant)
+        and isinstance(n.value, str)
+        and id(n) not in docstringer
+        and n.value != "forsoek"
+        and "-raa-" not in n.value
+    ]
+
+
+# Gjennomgangen av 3.5d (VG6): KI-tekstene hentingen skriver ut, med grunnen
+# fra den lokale modellen og tjenestene.
+@pytest.mark.parametrize("fil", ["fetch_prices.py", "demo.py", "ki_tekst.py", "ki_lokal.py", "ki_sky.py"])
+def test_det_brukeren_ser_har_ae_oe_og_aa(fil):
+    """Forproeven 24.10 (funn 4, spesifikasjonen 3.5d). Ville feilet hvis en
+    melding eller hjelpetekst fra hentingen eller demoen skrev «paa»,
+    «boersdagen» eller et annet ord med oe, aa eller ae i stedet for ø, å og
+    æ. Filnavn som boersdag.py og -raa- teller ikke."""
+    feil = []
+    for linje, tekst in _tekstene_brukeren_ser(ROT / "src" / fil):
+        for ord_ in re.findall(r"(?<![A-Za-z0-9_\-/.])[A-Za-z]+(?![A-Za-z0-9_\-/(]|\.py\b|\.json\b|\.db\b)", tekst):
+            if ord_.lower() in SKREVET_UTEN_AEOEAA:
+                feil.append((linje, ord_))
+    assert not feil, feil
+
+
+@pytest.mark.parametrize("navn", list(SKRIPTENE))
+def test_python_skriver_utf_8_ogsaa_til_en_fil(navn):
+    """Forproeven 24.10 (funn 4). Ville feilet hvis skriptet ikke ba Python
+    skrive UTF-8, saa æ, ø og å fra hentingen og demoen ble feil naar
+    utskriften gaar til en fil, som i CI, foer uv sync."""
+    kode = "\n".join(_kode(SKRIPTENE[navn]))
+    linja = {"start.ps1": "$env:PYTHONIOENCODING = 'utf-8'", "start.sh": "export PYTHONIOENCODING=utf-8"}[navn]
+    assert kode.index(linja) < kode.index("uv sync")
+
+
+def test_ci_krever_ae_oe_og_aa_i_utskriften_fra_start_demoen():
+    """Forproeven 24.10 (funn 4). Ville feilet hvis jobben dobbeltklikk ikke
+    krevde æ, ø og å i utskriften fra «Start demoen» paa Windows og Mac: ø fra
+    demo.py, å fra demo.py og æ fra skriptet."""
+    jobb = CI.read_text(encoding="utf-8").split("\n  dobbeltklikk:\n", 1)[1]
+    for tekst in ("ikke data fra Oslo Børs", "aksjer på siste dag", "Vinduet må være åpent"):
+        assert jobb.count(tekst) == 2, tekst
+    assert "Get-Content -Raw -Encoding utf8 $logg" in jobb
+    assert 'grep -qF "$t" "$RUNNER_TEMP/start-demoen.log"' in jobb
+    demo = (ROT / "src" / "demo.py").read_text(encoding="utf-8")
+    assert "ikke data fra Oslo Børs" in demo and "aksjer på siste dag" in demo
 
 
 def test_start_ps1_har_bom():
@@ -443,3 +589,290 @@ def test_readme_og_hjelpen_har_advarselen_og_godkjenningen():
     kom_i_gang = tekst.split("\n## Kom i gang\n", 1)[1].split("\n### Mer for den som vil\n", 1)[0]
     assert ".cmd" not in kom_i_gang and ".command" not in kom_i_gang
     assert "Start med dobbeltklikk" not in kom_i_gang
+
+
+# Spesifikasjonen 3.5d (forproeven 24.10, funn 7, gruppens svar kl. 12:04):
+# en lytter paa 127.0.0.1:8000. «oss» har kommandolinja fra skriptene og skal
+# stoppes, «fremmed» har den ikke og skal kjoere videre. Lytteren er Python
+# uten venv-omdirigeringen paa Windows, saa prosessen som lytter, er den testen
+# startet.
+LYTTEREN = (
+    "import socket, sys, time\n"
+    "s = socket.socket()\n"
+    "s.bind(('127.0.0.1', 8000))\n"
+    "s.listen()\n"
+    "print('klar', flush=True)\n"
+    "time.sleep(300)\n"
+)
+ARGUMENTENE = ["--listen=127.0.0.1:8000", "--threads=8", "app:app"]
+
+
+def _waitress_serve(mappe, windows):
+    """Stien til waitress-serve i .venv i mappa, slik uv starter den."""
+    if windows:
+        return str(mappe / ".venv" / "Scripts" / "waitress-serve.exe")
+    return str(mappe / ".venv" / "bin" / "waitress-serve")
+
+
+def _start_lytteren(hvem, mappe, windows):
+    """«oss»: kommandolinja fra skriptene, med waitress-serve fra .venv i
+    mappa. «annen_mappe»: den samme kommandolinja fra en annen mappe
+    (gjennomgangen av 3.5d, BH3 og ECH2). «fremmed»: ingen av delene."""
+    if not _porten_er_ledig():
+        pytest.skip("port 8000 er i bruk paa maskinen")
+    python = getattr(sys, "_base_executable", None) or sys.executable
+    tillegg = {
+        "oss": [_waitress_serve(mappe, windows), *ARGUMENTENE],
+        "annen_mappe": [_waitress_serve(mappe.parent / "annen", windows), *ARGUMENTENE],
+        "fremmed": [],
+    }[hvem]
+    lytter = subprocess.Popen(
+        [python, "-c", LYTTEREN, *tillegg], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+    )
+    linja = lytter.stdout.readline().strip()
+    if linja != "klar":
+        # Gjennomgangen av 3.5d (ECH8): porten ble tatt etter sjekken.
+        _stopp_lytteren(lytter)
+        pytest.skip(f"lytteren startet ikke: {linja}")
+    return lytter
+
+
+def _stopp_lytteren(lytter):
+    if lytter.poll() is None:
+        lytter.kill()
+    lytter.wait(timeout=30)
+
+
+def _sjekk_porten(hvem, lytter, kode, utskrift):
+    assert kode == 1, utskrift
+    if hvem == "oss":
+        lytter.wait(timeout=30)
+        assert "Den andre versjonen av OSE Signal kjører allerede på http://127.0.0.1:8000" in utskrift, utskrift
+        assert f"(prosess {lytter.pid})" in utskrift, utskrift
+        assert "Den andre versjonen er stoppet, og porten er ledig." in utskrift, utskrift
+        # Videre til uv, som faar nei.
+        assert "Appen trenger uv" in utskrift, utskrift
+        assert _porten_er_ledig()
+    else:
+        assert lytter.poll() is None, "den fremmede lytteren ble stoppet"
+        assert "et annet program svarer allerede på http://127.0.0.1:8000" in utskrift, utskrift
+        assert "python" in utskrift.lower() and f"(prosess {lytter.pid})" in utskrift, utskrift
+        assert "Skriptet stopper aldri andre programmer." in utskrift, utskrift
+        assert "docker compose --profile demo down" in utskrift and "Dobbeltklikk så på nytt." in utskrift
+        assert "Den andre versjonen av OSE Signal" not in utskrift and "Appen trenger uv" not in utskrift
+        assert "og det er ikke OSE Signal fra denne mappa." in utskrift, utskrift
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="krever Windows PowerShell")
+@pytest.mark.parametrize("hvem", ["oss", "annen_mappe", "fremmed"])
+def test_start_ps1_stopper_bare_den_andre_versjonen_paa_porten(tmp_path, hvem):
+    """Gruppens svar 24.10 kl. 12:04. Ville feilet hvis start.ps1 stoppet et
+    annet program paa porten (mutanten: sjekken av kommandolinja borte), ikke
+    sa hvilket program og hva man gjoer, ikke stoppet den andre versjonen av
+    OSE Signal, eller ikke gikk videre naar porten var ledig."""
+    mappe = _mappe_med_skriptet(tmp_path, "start.ps1", "ingen")
+    systemrot = os.environ["SYSTEMROOT"]
+    powershell = Path(systemrot) / "System32" / "WindowsPowerShell" / "v1.0" / "powershell.exe"
+    stier = [str(Path(systemrot) / "System32"), str(Path(systemrot) / "System32" / "Wbem")]
+    _uten_uv(stier)
+    miljoe = {"PATH": os.pathsep.join(stier), "USERPROFILE": str(tmp_path / "hjem"), "SYSTEMROOT": systemrot}
+    miljoe["PSModulePath"] = ""
+    lytter = _start_lytteren(hvem, mappe, windows=True)
+    try:
+        argumenter = [str(powershell), "-NoProfile", "-ExecutionPolicy", "Bypass", "-File"]
+        argumenter += [str(mappe / "start" / "start.ps1"), "-Versjon", "demo"]
+        kode, utskrift = _kjoer(argumenter, miljoe, sjekk_porten=False)
+        _sjekk_porten(hvem, lytter, kode, utskrift)
+    finally:
+        _stopp_lytteren(lytter)
+
+
+def _lsof():
+    return shutil.which("lsof") or ("/usr/sbin/lsof" if Path("/usr/sbin/lsof").exists() else None)
+
+
+@pytest.mark.skipif(sys.platform == "win32" or _bash() is None or _lsof() is None, reason="krever bash, lsof og ps")
+@pytest.mark.parametrize("hvem", ["oss", "annen_mappe", "fremmed"])
+def test_start_sh_stopper_bare_den_andre_versjonen_paa_porten(tmp_path, hvem):
+    """Gruppens svar 24.10 kl. 12:04. Ville feilet hvis start.sh stoppet et
+    annet program paa porten, ikke sa hvilket program og hva man gjoer, ikke
+    stoppet den andre versjonen av OSE Signal, eller ikke gikk videre naar
+    porten var ledig."""
+    mappe = _mappe_med_skriptet(tmp_path, "start.sh", "ingen")
+    stier = {str(Path(_bash()).parent)}
+    for program in ("dirname", "ps", "grep", "sort", "sleep", "lsof"):
+        if shutil.which(program):
+            stier.add(str(Path(shutil.which(program)).parent))
+    _uten_uv(stier)
+    miljoe = {"PATH": os.pathsep.join(sorted(stier)), "HOME": str(tmp_path / "hjem")}
+    lytter = _start_lytteren(hvem, mappe, windows=False)
+    try:
+        kode, utskrift = _kjoer([_bash(), str(mappe / "start" / "start.sh"), "demo"], miljoe, sjekk_porten=False)
+        _sjekk_porten(hvem, lytter, kode, utskrift)
+    finally:
+        _stopp_lytteren(lytter)
+
+
+@pytest.mark.parametrize("navn", list(SKRIPTENE))
+def test_porten_sjekkes_foer_uv_og_bare_oss_stoppes(navn):
+    """Gruppens svar 24.10 kl. 12:04. Ville feilet hvis porten ble sjekket
+    etter uv eller hentingen, eller hvis skriptet stoppet lytterne uten aa
+    sjekke kommandolinja foerst."""
+    kode = "\n".join(_kode(SKRIPTENE[navn]))
+    kall, sjekk, stopp_ = {
+        "start.ps1": ("\nFrigjoer-Porten\n", "Er-OseSignal $_.Kommandolinje", "Stop-Process -Id $lytter.Id -Force"),
+        "start.sh": ("\nfrigjoer_porten\n", 'er_ose_signal "$(ps -p "$id" -o command=', 'kill "$id"'),
+    }[navn]
+    assert kode.index(kall) < kode.index("Appen trenger uv") < kode.index("uv sync")
+    assert kode.index(kall) < kode.index("uv run python src/fetch_prices.py")
+    assert kode.index(sjekk) < kode.index("Skriptet stopper aldri andre programmer.") < kode.index(stopp_)
+    # Gjennomgangen av 3.5d (VG1): delene staar i selve sjekken, ikke bare i
+    # linja som starter serveren lenger ned.
+    for del_ in ("waitress-serve", "--listen=127", "app:app", ".venv"):
+        assert del_ in _sjekken(navn), del_
+
+
+def _sjekken(navn) -> str:
+    """Funksjonen som kjenner igjen kommandolinja, til foerste } paa egen linje."""
+    tekst = SKRIPTENE[navn].read_text(encoding="utf-8-sig").replace("\r\n", "\n")
+    start = tekst.index({"start.ps1": "function Er-OseSignal(", "start.sh": "er_ose_signal() {"}[navn])
+    return tekst[start : tekst.index("\n}\n", start) + 3]
+
+
+# Gjennomgangen av 3.5d (VG1, VG2): kommandolinjer og om de er OSE Signal fra
+# mappa. MAPPE byttes med mappa skriptet staar i. Den foerste paa Windows har
+# formen som ble slaatt opp 24.10 (spesifikasjonen 3.5d).
+KOMMANDOLINJENE = {
+    "start.ps1": [
+        (
+            r'"MAPPE\.venv\Scripts\python.exe" "MAPPE\.venv\Scripts\waitress-serve.exe" '
+            "--listen=127.0.0.1:8000 --threads=8 app:app",
+            True,
+        ),
+        (
+            r'"MAPPE\.venv\Scripts\python.exe" "MAPPE\.venv\Scripts\waitress-serve.exe" --listen=127.0.0.1:8000 app:app',
+            True,
+        ),
+        (r"MAPPE\.venv\Scripts\waitress-serve.exe --listen=127.0.0.1:8000 --threads=8 app:app", True),
+        (r"C:\annen\.venv\Scripts\waitress-serve.exe --listen=127.0.0.1:8000 app:app", False),
+        ("waitress-serve --listen=127.0.0.1:8000 app:app", False),
+        (r"MAPPE\.venv\Scripts\waitress-serve.exe --listen=127.0.0.1:8000 annen:app", False),
+        (r"MAPPE\.venv\Scripts\waitress-serve.exe --listen=0.0.0.0:8000 app:app", False),
+        (r"MAPPE\.venv\Scripts\waitress-serve.exe app:app", False),
+        (r"python MAPPE\src\app.py", False),
+        (r'"C:\Program Files\Docker\Docker\resources\com.docker.backend.exe"', False),
+        ("", False),
+    ],
+    "start.sh": [
+        ("MAPPE/.venv/bin/python3 MAPPE/.venv/bin/waitress-serve --listen=127.0.0.1:8000 --threads=8 app:app", True),
+        ("MAPPE/.venv/bin/python3 MAPPE/.venv/bin/waitress-serve --listen=127.0.0.1:8000 app:app", True),
+        ("/annen/.venv/bin/python3 /annen/.venv/bin/waitress-serve --listen=127.0.0.1:8000 app:app", False),
+        ("waitress-serve --listen=127.0.0.1:8000 app:app", False),
+        ("MAPPE/.venv/bin/waitress-serve --listen=127.0.0.1:8000 annen:app", False),
+        ("MAPPE/.venv/bin/waitress-serve --listen=0.0.0.0:8000 app:app", False),
+        ("MAPPE/.venv/bin/waitress-serve app:app", False),
+        ("python MAPPE/src/app.py", False),
+        ("/Applications/Docker.app/Contents/MacOS/com.docker.backend", False),
+        ("", False),
+    ],
+}
+
+SJEKK_PS1 = """
+$m = (Get-Location).ProviderPath
+foreach ($l in [IO.File]::ReadAllLines((Join-Path $m 'linjer.txt'))) {
+    if (Er-OseSignal ($l.Replace('MAPPE', $m))) { 'ja' } else { 'nei' }
+}
+"""
+
+SJEKK_SH = """
+m="$(pwd -P)"
+while IFS= read -r l; do
+    if er_ose_signal "${l//MAPPE/$m}"; then echo ja; else echo nei; fi
+done < linjer.txt
+"""
+
+
+def _svar_fra_sjekken(navn, tmp_path):
+    """Kjoerer sjekken alene, i en tom mappe, for hver kommandolinje."""
+    linjene = "\n".join(linje for linje, _ in KOMMANDOLINJENE[navn]) + "\n"
+    (tmp_path / "linjer.txt").write_bytes(linjene.encode("utf-8"))
+    if navn == "start.ps1":
+        (tmp_path / "sjekk.ps1").write_bytes(("\ufeff" + _sjekken(navn) + SJEKK_PS1).encode("utf-8"))
+        systemrot = os.environ["SYSTEMROOT"]
+        powershell = Path(systemrot) / "System32" / "WindowsPowerShell" / "v1.0" / "powershell.exe"
+        argumenter = [str(powershell), "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(tmp_path / "sjekk.ps1")]
+    else:
+        (tmp_path / "sjekk.sh").write_bytes((_sjekken(navn) + SJEKK_SH).encode("utf-8"))
+        argumenter = [_bash(), str(tmp_path / "sjekk.sh")]
+    svar = subprocess.run(argumenter, cwd=tmp_path, capture_output=True, text=True, timeout=120)
+    return svar.stdout.split(), svar.stderr
+
+
+@pytest.mark.parametrize("navn", list(SKRIPTENE))
+def test_sjekken_kjenner_bare_igjen_waitress_fra_mappa(navn, tmp_path):
+    """Gjennomgangen av 3.5d (VG1, VG2, BH3, ECH2). Ville feilet hvis sjekken
+    ikke kjente igjen den ekte kommandolinja paa Windows, med sti i
+    anfoerselstegn og .exe, eller kjente igjen en kommandolinje uten en av
+    delene, med waitress-serve fra en annen mappe, med en annen app eller
+    en annen adresse, slik at et annet program kunne blitt stoppet."""
+    if navn == "start.ps1" and sys.platform != "win32":
+        pytest.skip("krever Windows PowerShell")
+    if navn == "start.sh" and _bash() is None:
+        pytest.skip("krever bash")
+    ut, feil = _svar_fra_sjekken(navn, tmp_path)
+    forventet = ["ja" if ja else "nei" for _, ja in KOMMANDOLINJENE[navn]]
+    assert ut == forventet, (ut, feil)
+
+
+def _beskjedene(navn) -> list[str]:
+    """Teksten i hvert kall til Stopp eller stopp, og i trap."""
+    kode = "\n".join(_kode(SKRIPTENE[navn]))
+    return re.findall(r"\b[Ss]topp ('[^'\n]*'|\"[^\"\n]*\")", kode)
+
+
+@pytest.mark.parametrize("navn", list(SKRIPTENE))
+def test_ingen_beskjed_viser_bare_til_readme(navn):
+    """Forproeven 24.10 (funn 8, spesifikasjonen 3.5d). Ville feilet hvis en
+    beskjed i vinduet bare viste til README-en, for eksempel «Installer uv
+    slik «Tester» i README-en sier», i stedet for aa si hva man gjoer: hver
+    beskjed sier at man dobbeltklikker paa nytt, eller laster ned en egen
+    kopi."""
+    beskjedene = _beskjedene(navn)
+    assert len(beskjedene) >= 10, beskjedene
+    for beskjed in beskjedene:
+        assert "README" not in beskjed, beskjed
+        assert "obbeltklikk" in beskjed or "Last ned en egen kopi" in beskjed, beskjed
+    tekst = SKRIPTENE[navn].read_text(encoding="utf-8-sig")
+    meldinger = [l for l in _kode(SKRIPTENE[navn]) if re.search(r"\b(Write-Host|echo)\b", l)]
+    assert not any("README" in l for l in meldinger), [l for l in meldinger if "README" in l]
+    assert "skriv j og trykk Enter når vinduet spør om uv" in tekst
+
+
+@pytest.mark.parametrize("navn", list(SKRIPTENE))
+def test_vinduet_som_ble_stoppet_ber_ikke_om_et_nytt_dobbeltklikk_foerst(navn):
+    """Gjennomgangen av 3.5d (BH2). Ville feilet hvis vinduet der appen ble
+    stoppet av den andre versjonen, bare sa «dobbeltklikk på nytt», saa
+    brukeren stoppet den nye versjonen igjen. Og hvis et program uten navn
+    eller kommandolinje ga en tom plass i beskjeden (BH7, BH14)."""
+    tekst = SKRIPTENE[navn].read_text(encoding="utf-8-sig")
+    assert tekst.count("er det den som kjører nå, og dette vinduet kan lukkes.") == 1
+    assert "appen stoppet med kode" in tekst.split("er det den som kjører nå", 1)[0].rsplit("\n", 1)[-1]
+    if navn == "start.ps1":
+        assert "kanskje startet som administrator" in tekst
+        assert "if ($lyttere.Count -eq 0 -and -not (Opptatt)) { return }" in tekst
+    else:
+        assert '[ -n "$navn" ] || navn="et program skriptet ikke fant navnet på"' in tekst
+        assert 'if [ -z "$ider" ] && ! opptatt; then return 0; fi' in tekst
+
+
+def test_ci_proever_porten_paa_windows_og_mac():
+    """Gjennomgangen av 3.5d (VG3). Ville feilet hvis porttestene og sjekken av
+    kommandolinja bare kjoerte paa Linux i jobben pytest, saa Get-NetTCPConnection,
+    Get-CimInstance, Stop-Process, lsof og ps aldri ble proevd paa Windows og
+    Mac i CI."""
+    jobb = CI.read_text(encoding="utf-8").split("\n  dobbeltklikk:\n", 1)[1]
+    steget = jobb.split("- name: Porten på Windows og Mac", 1)[1]
+    assert "os: [windows-latest, macos-latest]" in jobb
+    assert "if: runner.os" not in steget.split("\n      - name:", 1)[0]
+    assert 'uv run pytest -q -p no:cacheprovider -rs tests/test_dobbeltklikk.py -k "porten or sjekken"' in steget
+    assert jobb.index("Start demoen på Mac") < jobb.index("Porten på Windows og Mac")

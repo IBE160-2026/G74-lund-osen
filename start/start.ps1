@@ -17,6 +17,9 @@ param(
 
 $ErrorActionPreference = 'Stop'
 try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch { }
+# Forprøven 24.10 (funn 4): Python skriver æ, ø og å som UTF-8, også når
+# utskriften går til en fil, som i CI.
+$env:PYTHONIOENCODING = 'utf-8'
 
 $Adresse = 'http://127.0.0.1:8000'
 $SvarJa = $env:OSE_START_SVAR_JA -eq '1'
@@ -37,14 +40,15 @@ function Stopp([string]$Melding) {
     Stopp-Serveren
     Write-Host ''
     Write-Host "Noe gikk galt: $Melding"
-    Write-Host 'Se «Står du fast?» i README-en, eller docs/hjelp.md. Du kan starte på nytt med et nytt dobbeltklikk.'
+    Write-Host 'Står det fortsatt fast, er det mer hjelp under «Start med dobbeltklikk» i docs/hjelp.md i mappa.'
     Vent-PaaEnter
     exit 1
 }
 
 # Gjennomgangen (BH4, VG2): også en feil skriptet ikke har ventet, gir
 # beskjeden på norsk, og vinduet står til Enter.
-trap { Stopp "$($_.Exception.Message)" }
+# Gjennomgangen av 3.5d (BH13): punktum etter meldingen, også når den mangler.
+trap { $m = "$($_.Exception.Message)".Trim().TrimEnd('.'); Stopp "en feil skriptet ikke ventet: $m. Lukk vinduet og dobbeltklikk på nytt." }
 
 function Opptatt {
     # Svarer noe på porten, uansett hva (gjennomgangen, BH16 og ECH7).
@@ -57,6 +61,67 @@ function Opptatt {
     } finally {
         $klient.Close()
     }
+}
+
+# Forprøven 24.10 (funn 7, gruppens svar kl. 12:04): den andre versjonen av
+# OSE Signal kjennes på kommandolinja fra skriptene, med waitress-serve,
+# --listen=127.0.0.1:8000 og app:app. Alt annet stoppes aldri.
+function Er-OseSignal([string]$Kommandolinje) {
+    if (-not $Kommandolinje) { return $false }
+    # Gjennomgangen av 3.5d (BH3, ECH2): bare waitress-serve fra .venv i denne
+    # mappa, så en annen app med app:app på porten aldri stoppes.
+    $venv = [regex]::Escape((Join-Path (Get-Location).ProviderPath '.venv\Scripts\waitress-serve'))
+    return ($Kommandolinje -match ('(^|[\s"''])' + $venv + '(\.exe)?["'']?(\s|$)')) -and
+        ($Kommandolinje -match '(^|\s)--listen=127\.0\.0\.1:8000(\s|$)') -and
+        ($Kommandolinje -match '(^|\s)app:app(\s|$)')
+}
+
+function Lyttere {
+    # Prosessene som lytter på port 8000, med navn og kommandolinje.
+    $ider = @()
+    try {
+        $ider = @(Get-NetTCPConnection -LocalPort 8000 -State Listen -ErrorAction Stop | Select-Object -ExpandProperty OwningProcess -Unique)
+    } catch { }
+    foreach ($id in $ider) {
+        $prosess = $null
+        try { $prosess = Get-CimInstance Win32_Process -Filter "ProcessId=$id" -ErrorAction Stop } catch { }
+        if ($prosess) {
+            $navn = $prosess.Name
+            # Gjennomgangen av 3.5d (BH14, ECH3): en prosess startet som
+            # administrator eller av en annen bruker gir ingen kommandolinje.
+            if (-not $prosess.CommandLine) { $navn += ', som skriptet ikke kunne lese kommandolinja til (kanskje startet som administrator)' }
+            [pscustomobject]@{ Id = $id; Navn = $navn; Kommandolinje = $prosess.CommandLine }
+        } else {
+            [pscustomobject]@{ Id = $id; Navn = 'ukjent'; Kommandolinje = '' }
+        }
+    }
+}
+
+function Frigjoer-Porten {
+    if (-not (Opptatt)) { return }
+    $lyttere = @(Lyttere)
+    # Gjennomgangen av 3.5d (ECH4): lytteren stoppet av seg selv i mellomtiden.
+    if ($lyttere.Count -eq 0 -and -not (Opptatt)) { return }
+    $fremmede = @($lyttere | Where-Object { -not (Er-OseSignal $_.Kommandolinje) })
+    if ($lyttere.Count -eq 0 -or $fremmede.Count -gt 0) {
+        if ($fremmede.Count -gt 0) {
+            $hvem = ($fremmede | ForEach-Object { "$($_.Navn) (prosess $($_.Id))" }) -join ', '
+        } else {
+            $hvem = 'et program skriptet ikke fant navnet på'
+        }
+        Stopp "et annet program svarer allerede på $Adresse, og det er ikke OSE Signal fra denne mappa. Programmet er $hvem. Skriptet stopper aldri andre programmer. Er det demoen eller appen i Docker, stopper du den med docker compose --profile demo down i et terminalvindu i mappa med koden. Ellers lukker du programmet. Dobbeltklikk så på nytt."
+    }
+    foreach ($lytter in $lyttere) {
+        Write-Host "Den andre versjonen av OSE Signal kjører allerede på $Adresse (prosess $($lytter.Id)). Den stoppes nå, så denne kan starte."
+        # Bare lytteren, python.exe; uv og waitress-serve.exe over den stopper
+        # når den stopper (gjennomgangen av 3.5d, BH8).
+        try { Stop-Process -Id $lytter.Id -Force -ErrorAction Stop } catch { }
+    }
+    for ($i = 0; $i -lt 30 -and (Opptatt); $i++) { Start-Sleep -Seconds 1 }
+    if (Opptatt) {
+        Stopp "porten $Adresse ble ikke ledig etter 30 sekunder. Lukk vinduet der den andre versjonen kjører, og dobbeltklikk på nytt."
+    }
+    Write-Host 'Den andre versjonen er stoppet, og porten er ledig.'
 }
 
 function Svarer([string]$Url) {
@@ -87,6 +152,9 @@ if ($Versjon -eq 'ekte' -and (Test-Path -LiteralPath '.git')) {
     Stopp 'mappa har .git (en klon av repoet eller et eget git-repo), og der starter ikke den ekte versjonen. Last ned en egen kopi med «Download ZIP» på GitHub, pakk den ut, og bruk din egen nøkkel fra EODHD. Demoen kan startes herfra.'
 }
 
+# Porten før uv og hentingen (forprøven 24.10, funn 7).
+Frigjoer-Porten
+
 # uv: på PATH, i .local\bin i brukermappa, eller installert etter et ja.
 $uvMappe = Join-Path $env:USERPROFILE '.local\bin'
 if (-not (Get-Command uv -ErrorAction SilentlyContinue) -and (Test-Path -LiteralPath (Join-Path $uvMappe 'uv.exe'))) {
@@ -101,28 +169,24 @@ if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
         $svar = Read-Host 'Installere uv nå? Skriv j og trykk Enter for ja'
     }
     if ($svar -notmatch '^\s*(j|ja|y|yes)\s*$') {
-        Stopp 'uv er ikke installert. Installer uv slik «Tester» i README-en sier, og start på nytt.'
+        Stopp 'uv er ikke installert, og appen kan ikke starte uten. Dobbeltklikk på nytt, og skriv j og trykk Enter når vinduet spør om uv.'
     }
     powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-    if ($LASTEXITCODE -ne 0) { Stopp "installasjonen av uv feilet (kode $LASTEXITCODE)." }
+    if ($LASTEXITCODE -ne 0) { Stopp "installasjonen av uv feilet (kode $LASTEXITCODE). Sjekk at maskinen er koblet til nettet, og dobbeltklikk på nytt." }
     $env:Path = "$uvMappe;$env:Path"
     if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
-        Stopp 'uv ble ikke funnet etter installasjonen. Lukk vinduet og start på nytt.'
+        Stopp 'uv ble ikke funnet etter installasjonen. Lukk vinduet og dobbeltklikk på nytt.'
     }
-}
-
-if (Opptatt) {
-    Stopp "noe svarer allerede på $Adresse. Stopp det først: lukk det andre vinduet, eller stopp Docker med docker compose --profile demo down."
 }
 
 Write-Host 'Installerer pakkene (uv sync). Første gang tar det noen minutter.'
 uv sync
-if ($LASTEXITCODE -ne 0) { Stopp "uv sync gikk ut med kode $LASTEXITCODE. Sjekk at maskinen er koblet til nettet." }
+if ($LASTEXITCODE -ne 0) { Stopp "uv sync gikk ut med kode $LASTEXITCODE. Sjekk at maskinen er koblet til nettet, og dobbeltklikk på nytt." }
 
 if ($Versjon -eq 'demo') {
     Write-Host 'Lager demobasen.'
     uv run python src/demo.py
-    if ($LASTEXITCODE -ne 0) { Stopp "demobasen kunne ikke lages (kode $LASTEXITCODE)." }
+    if ($LASTEXITCODE -ne 0) { Stopp "demobasen kunne ikke lages (kode $LASTEXITCODE). Grunnen står i linjene over. Lukk andre vinduer der demoen kjører, og dobbeltklikk på nytt." }
     $env:OSE_DEMO = '1'
 } else {
     Remove-Item Env:OSE_DEMO -ErrorAction SilentlyContinue
@@ -131,9 +195,11 @@ if ($Versjon -eq 'demo') {
     $harNoekkel = @($linjer | Where-Object { $_ -match '^EODHD_API_KEY=\S' }).Count -gt 0
     if (-not $harNoekkel) {
         Write-Host 'Første gang trenger den ekte versjonen en nøkkel fra EODHD. Registreringssiden åpnes nå.'
-        Write-Host 'Lag en gratis konto, kopier nøkkelen (API key), og lim den inn her.'
+        # Forprøven 24.10 (funn 1–3): hvor nøkkelen står, og hvordan den limes inn.
+        Write-Host 'Lag en gratis konto. Nøkkelen står som «API token» under «Dashboard» hos EODHD, med kopiknappen til høyre.'
+        Write-Host 'Lim den inn her med Ctrl+V eller et høyreklikk. Den vises som stjerner.'
         if ($env:OSE_START_UTEN_NETTLESER -ne '1') { Start-Process 'https://eodhd.com/register' }
-        $sikker = Read-Host 'Lim inn nøkkelen og trykk Enter (den vises ikke)' -AsSecureString
+        $sikker = Read-Host 'Lim inn nøkkelen og trykk Enter' -AsSecureString
         $peker = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($sikker)
         try {
             # Uten mellomrom og linjeskift, som i start.sh (gjennomgangen, BH7).
@@ -141,7 +207,7 @@ if ($Versjon -eq 'demo') {
         } finally {
             [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($peker)
         }
-        if (-not $noekkel) { Stopp 'ingen nøkkel ble limt inn.' }
+        if (-not $noekkel) { Stopp 'ingen nøkkel ble limt inn. Dobbeltklikk på nytt, og lim inn nøkkelen når vinduet spør.' }
         $nye = @($linjer | Where-Object { $_ -notmatch '^EODHD_API_KEY=' }) + "EODHD_API_KEY=$noekkel"
         [IO.File]::WriteAllText((Join-Path (Get-Location) '.env'), (($nye -join "`r`n") + "`r`n"), (New-Object System.Text.UTF8Encoding($false)))
         Remove-Variable noekkel, nye
@@ -157,7 +223,8 @@ if ($Versjon -eq 'demo') {
 
 Write-Host "Starter appen på $Adresse."
 $env:PYTHONPATH = 'src'
-$server = Start-Process -FilePath 'uv' -ArgumentList 'run', 'waitress-serve', '--listen=127.0.0.1:8000', 'app:app' -NoNewWindow -PassThru
+# Forprøven 24.10 (funn 6): 8 tråder, så waitress ikke skriver «Task queue depth».
+$server = Start-Process -FilePath 'uv' -ArgumentList 'run', 'waitress-serve', '--listen=127.0.0.1:8000', '--threads=8', 'app:app' -NoNewWindow -PassThru
 # Uten Handle gir Windows PowerShell 5.1 ingen ExitCode etterpå.
 $null = $server.Handle
 $klar = $false
@@ -166,7 +233,7 @@ for ($i = 0; $i -lt 120; $i++) {
     if (Svarer $Adresse) { $klar = $true; break }
     Start-Sleep -Seconds 1
 }
-if (-not $klar) { Stopp 'appen svarte ikke på 127.0.0.1:8000.' }
+if (-not $klar) { Stopp 'appen svarte ikke på 127.0.0.1:8000 etter 2 minutter. Grunnen står i linjene over. Lukk vinduet og dobbeltklikk på nytt.' }
 
 Write-Host ''
 Write-Host "Appen kjører på $Adresse."
@@ -174,4 +241,4 @@ Write-Host 'Lukk dette vinduet, eller trykk Ctrl+C, for å stoppe den.'
 if ($env:OSE_START_UTEN_NETTLESER -ne '1') { Start-Process $Adresse }
 $server.WaitForExit()
 # Gjennomgangen (BH2, VG2): stopper appen av seg selv, står beskjeden.
-if ($server.ExitCode -ne 0) { Stopp "appen stoppet med kode $($server.ExitCode). Grunnen står i linjene over." }
+if ($server.ExitCode -ne 0) { Stopp "appen stoppet med kode $($server.ExitCode). Startet du demoen eller den ekte versjonen i et annet vindu, er det den som kjører nå, og dette vinduet kan lukkes. Ellers står grunnen i linjene over: lukk vinduet og dobbeltklikk på nytt." }

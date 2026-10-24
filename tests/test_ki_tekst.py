@@ -88,7 +88,7 @@ class TestSteget:
         rader = radene(base)
         assert all(r is not None and r.besto for r in rader.values())
         assert modell.kall == 15
-        assert ut.index("Skrev 15 rader i vurdering") < ut.index("KI-tekst for boersdagen 2026-09-22")
+        assert ut.index("Skrev 15 rader i vurdering") < ut.index("KI-tekst for børsdagen 2026-09-22")
         assert "15 besto kontrollen, 0 ble stoppet av kontrollen, og modellen feilet for 0." in ut
 
     def test_grunnlaget_og_regelen_er_vurderingens(self, stier):
@@ -177,7 +177,7 @@ class TestSammeKveld:
         kode, kall, ut = kjoer(raa, base, modell)
         assert (kode, kall, modell.kall) == (0, [], 0)
         assert radene(base) == foer
-        assert "15 rader sto fra foer og er ikke laget paa nytt." in ut
+        assert "15 rader sto fra før og er ikke laget på nytt." in ut
 
     def test_radene_som_mangler_lages_med_null_kall_til_eodhd(self, stier):
         """Punktet fra 4.3: stoppet kjoeringen mellom vurderingen og KI-raden,
@@ -196,7 +196,7 @@ class TestSammeKveld:
         kjoer(raa, base, None)
         linjer = []
         lag_ki_tekster(base, TIRSDAG, lambda: ONSDAG_KL_22, FalskModell(), linjer.append)
-        assert linjer and linjer[0].startswith("KI-teksten stoppet: det er blitt en ny boersdag")
+        assert linjer and linjer[0].startswith("KI-teksten stoppet: det er blitt en ny børsdag")
         assert all(r is None for r in radene(base).values())
 
 
@@ -362,7 +362,7 @@ class TestEtterGjennomgangen:
         monkeypatch.setattr(ki_tekst, "aapne_base", feil)
         linjer = []
         lag_ki_tekster(base, TIRSDAG, lambda: OEYEBLIKK, FalskModell(), linjer.append)
-        assert linjer == ["KI-teksten: basen kunne ikke aapnes (OperationalError). Ingen KI-tekst i kveld."]
+        assert linjer == ["KI-teksten: basen kunne ikke åpnes (OperationalError). Ingen KI-tekst i kveld."]
 
     def test_modellen_kalles_ikke_etter_midnatt(self, stier):
         """ECH: ny boersdag sjekkes foer kallet, ikke foerst ved skriv."""
@@ -371,7 +371,7 @@ class TestEtterGjennomgangen:
         modell = FalskModell()
         linjer = []
         lag_ki_tekster(base, TIRSDAG, lambda: ONSDAG_KL_22, modell, linjer.append)
-        assert modell.kall == 0 and linjer[0].startswith("KI-teksten stoppet: det er blitt en ny boersdag")
+        assert modell.kall == 0 and linjer[0].startswith("KI-teksten stoppet: det er blitt en ny børsdag")
 
     def test_nettsperren_svelges_ikke(self, stier):
         """ECH: NettverkISTest fra en ekte modell i en test skal synes."""
@@ -402,7 +402,7 @@ class TestForhaandssjekken:
     @pytest.mark.parametrize(
         "grunn, hva",
         [
-            ("Ollama svarer ikke (kjoerer den?)", "Start Ollama"),
+            ("Ollama svarer ikke (kjører den?)", "Start Ollama"),
             ("modellen gemma4:e4b er ikke hentet (ollama pull gemma4:e4b)", "Hent modellen"),
         ],
     )
@@ -415,16 +415,16 @@ class TestForhaandssjekken:
         rader = radene(base)
         assert len(rader) == 15 and all(r is None for r in rader.values())
         assert (
-            f"Ingen KI-tekst for boersdagen 2026-09-22 ennaa: {grunn}. Ingen rader er skrevet i "
-            f"KI-loggen, og 15 aksjer venter paa teksten. {hva}, se «Den lokale modellen» i "
-            f"README-en, og kjoer samme kommando igjen foer midnatt. Det gir 0 kall til EODHD."
+            f"Ingen KI-tekst for børsdagen 2026-09-22 ennå: {grunn}. Ingen rader er skrevet i "
+            f"KI-loggen, og 15 aksjer venter på teksten. {hva}, se «Den lokale modellen» i "
+            f"README-en, og kjør samme kommando igjen før midnatt. Det gir 0 kall til EODHD."
         ) in ut
 
     def test_samme_kveld_etter_at_ollama_er_startet(self, stier):
         """Foerst svarer ikke Ollama, saa er den startet: samme kommando lager
         tekstene, med 0 kall til EODHD."""
         raa, base = stier
-        foerste = SjekketModell("Ollama svarer ikke (kjoerer den?)")
+        foerste = SjekketModell("Ollama svarer ikke (kjører den?)")
         kjoer(raa, base, foerste)
         assert foerste.sjekker == 1 and all(r is None for r in radene(base).values())
         modell = SjekketModell(None)
@@ -470,7 +470,7 @@ class TestSjekkenEtterGjennomgangen:
         linjer = []
         lag_ki_tekster(base, TIRSDAG, lambda: OEYEBLIKK, OllamaModell(hent=FalskOllama(tags=False)), linjer.append)
         assert all(r is None for r in radene(base).values())
-        assert "ennaa: modellen gemma4:e4b er ikke hentet" in linjer[0]
+        assert "ennå: modellen gemma4:e4b er ikke hentet" in linjer[0]
 
         def nede(*_a):
             import requests
@@ -479,7 +479,7 @@ class TestSjekkenEtterGjennomgangen:
 
         linjer = []
         lag_ki_tekster(base, TIRSDAG, lambda: OEYEBLIKK, OllamaModell(hent=nede), linjer.append)
-        assert "ennaa: Ollama svarer ikke (kjoerer den?)" in linjer[0]
+        assert "ennå: Ollama svarer ikke (kjører den?)" in linjer[0]
         assert all(r is None for r in radene(base).values())
 
     def test_ikke_0_kall_naar_kurser_mangler_og_bare_en_sjekk(self, stier):
@@ -491,20 +491,20 @@ class TestSjekkenEtterGjennomgangen:
             return serie_til(date(2026, 9, 21)) if ticker == "EQNR.OL" else serie_med_utslag(TIRSDAG)
 
         kjoer(raa, base, None, hent)
-        modell = SjekketModell("Ollama svarer ikke (kjoerer den?)")
+        modell = SjekketModell("Ollama svarer ikke (kjører den?)")
         _, kall, ut = kjoer(raa, base, modell, hent)
         assert kall == ["EQNR.OL"]
-        assert modell.sjekker == 1 and ut.count("Ingen KI-tekst for boersdagen") == 1
+        assert modell.sjekker == 1 and ut.count("Ingen KI-tekst for børsdagen") == 1
         assert "0 kall til EODHD" not in ut
 
     def test_datoen_sjekkes_foer_tjenesten(self, stier):
         """BH4, ECH: etter midnatt sjekkes ikke tjenesten, og beskjeden er om dagen."""
         raa, base = stier
         kjoer(raa, base, None)
-        modell = SjekketModell("Ollama svarer ikke (kjoerer den?)")
+        modell = SjekketModell("Ollama svarer ikke (kjører den?)")
         linjer = []
         lag_ki_tekster(base, TIRSDAG, lambda: ONSDAG_KL_22, modell, linjer.append)
-        assert modell.sjekker == 0 and linjer[0].startswith("KI-teksten stoppet: det er blitt en ny boersdag")
+        assert modell.sjekker == 0 and linjer[0].startswith("KI-teksten stoppet: det er blitt en ny børsdag")
 
     def test_bare_de_som_mangler_og_sjekken_en_gang(self, stier):
         """BH23: noen rader finnes fra foer."""
@@ -529,10 +529,10 @@ class TestSjekkenEtterGjennomgangen:
                 )
         finally:
             tilkobling.close()
-        nede = SjekketModell("Ollama svarer ikke (kjoerer den?)")
+        nede = SjekketModell("Ollama svarer ikke (kjører den?)")
         linjer = []
         lag_ki_tekster(base, TIRSDAG, lambda: OEYEBLIKK, nede, linjer.append)
-        assert nede.sjekker == 1 and "10 aksjer venter paa teksten (5 har den fra foer)" in linjer[0]
+        assert nede.sjekker == 1 and "10 aksjer venter på teksten (5 har den fra før)" in linjer[0]
         oppe = SjekketModell(None)
         lag_ki_tekster(base, TIRSDAG, lambda: OEYEBLIKK, oppe, lambda _: None)
         assert oppe.kall == 10 and all(r is not None for r in radene(base).values())

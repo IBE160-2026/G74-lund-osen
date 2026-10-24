@@ -140,7 +140,7 @@ class TestImaget:
         aldri debug. Ville feilet med flask run eller app.run."""
         cmd = [r for i, r in _instruksjoner() if i == "CMD"]
         assert len(cmd) == 1
-        assert cmd[0] == '["waitress-serve", "--listen=0.0.0.0:8000", "app:app"]'
+        assert cmd[0] == '["waitress-serve", "--listen=0.0.0.0:8000", "--threads=8", "app:app"]'
         hele = "\n".join(_linjer(DOCKERFILE)).lower()
         assert "flask run" not in hele and "debug" not in hele
 
@@ -987,7 +987,9 @@ HOEYDE_PAA_BILDET = 1630
 # Gjennomgangen av 8.2a 24.10: båndet, sorteringen, kommentaren i
 # _hovedindeks.html og hjelpeteksten. Bildet ble tatt paa nytt og er byte for
 # byte det samme.
-AVTRYKK_BAK_BILDET = "dc77e5953b4add3b1228d6c7fb7571c4d0a08de5c2e669459bed978730f556a5"
+# Story 3.5d b: æ, ø og å i meldingene fra demo.py. Bildet ble tatt paa nytt
+# og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "8adc35a02d4c69c7529e6c9ed6145ed5b7d093aad94fb2229953885901adefb2"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1115,7 +1117,9 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # byte for byte det samme.
 # Gjennomgangen av 8.2a 24.10: app.py, markedsoversikt.py og hjelpetekster.py.
 # Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "ee67b52f607d54c13459ab747820e6bc936795def4845b31097da59bc63ea78b"
+# Story 3.5d b: æ, ø og å i meldingene fra demo.py. Bildet ble tatt paa nytt
+# og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "30801cffdfdafa6630c73acffd776d98e723ea14930c23433400d689b704c918"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "
