@@ -2800,6 +2800,8 @@ starter ikke av seg selv.
 
 *Avgjort 2026-10-24 kl. 21:49 (gruppens svar):* versjon 3 rettes og prøvekjøres på nytt, og flettes bare hvis prøvekjøringen består: færre enn tre tekster stoppet, og ingen tekst som sier feil om en sjekk eller om dagene.
 
+*Avgjort 2026-10-24 kl. 23:23 (gruppens svar):* a) ett forsøk til med versjon 3 søndag 25.10: modellen får ferdig ordlyd for dagene og skriver dem aldri med egne ord. Den flettes bare med 15 av 15 i prøvekjøringen og ingen tekst med feil, etter beslutningen 16.10 kl. 23:51 (2). b) Blir demoteksten for KVST stoppet igjen, viser bildet av aksjesiden i README-en en demoaksje der KI-teksten besto; modellen kjøres ikke på nytt for en bedre tekst (FR-604).
+
 ### Story 10.3: Visningen i aksjedetaljen
 
 *Het Story 5B.3 til 28.09.*
