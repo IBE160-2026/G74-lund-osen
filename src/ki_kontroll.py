@@ -35,12 +35,20 @@ sikkerhetsscore fra modellen. Fire punkter:
    «femtifem». Et desimaltall, en prosent, et beloep eller en mengde som
    «dobbelt» er aldri lov, fordi grunnlaget ikke har dem. Fortegnene (+1, 0
    og -1) er ikke antall, og prompten ber modellen skrive dem med ord.
+   Story 10.2e: et tall er lov bare naar det er et av antallene i
+   grunnlaget (ANTALLENE i ki_grunnlag.py: styrken, dagene og hvor mange
+   aksjer som steg og falt) eller et av regelens faste tall.
 3. Raad. Ingen ord som gir raad (NFR-06), ogsaa «alternativ for investorer»,
    «investerings-» og «raadgiver» fra malinger.md §19, og raad om aa holde.
 4. Gjetning. Ingen ord som gjetter eller spaar, og ingen aarsak som ikke staar
    i grunnlaget, som nyheter eller kontrakter. En forklaring av regelen selv
    er lov, som «fordi ingen sjekk ga utslag» naar ingen ga det. «Resultat»
    staar ikke i lista (FR-603, 05.10), fordi det i §19 viste til sjekkene.
+
+Story 10.2e, under punkt 1: sier teksten at hovedindeksen eller bransjen
+steg, falt eller var uendret, skal det stemme med grunnlaget, og mangler
+feltet, stoppes utsagnet. Det samme gjelder antallet aksjer som steg eller
+falt («ni aksjer steg»), og dagene («tre børsdager på rad»).
 
 Kontrollen er grov: den fanger ord, ikke mening (FR-603). Teksten
 normaliseres (NFC, uten myk bindestrek og usynlige tegn) foer den leses, saa
@@ -52,6 +60,7 @@ import unicodedata
 from collections.abc import Mapping
 from dataclasses import dataclass
 
+from ki_grunnlag import ANTALLENE, FALT, STEG, UENDRET
 from signalberegning import MA_VINDU, TERSKEL, VOLATILITET_VINDU, VOLUM_VINDU
 
 ANTALL_SJEKKER = 3
@@ -213,6 +222,59 @@ _STYRKE_UTSAGN = (
     ),
 )
 
+# Story 10.2e: hovedindeksen og bransjen, og verbene for steg, falt og uendret.
+_BEVEGELSESVERB = {
+    "steg": STEG,
+    "stiger": STEG,
+    "økte": STEG,
+    "øker": STEG,
+    "gikk opp": STEG,
+    "falt": FALT,
+    "faller": FALT,
+    "sank": FALT,
+    "synker": FALT,
+    "gikk ned": FALT,
+    "var uendret": UENDRET,
+    "er uendret": UENDRET,
+    "sto stille": UENDRET,
+    "endret seg ikke": UENDRET,
+}
+_VERB = "|".join(sorted((v.replace(" ", r"\s+") for v in _BEVEGELSESVERB), key=len, reverse=True))
+_FELTET = {
+    # «Aksjen på Oslo Børs steg» gjelder aksjen, ikke børsen.
+    "hovedindeksen": r"(?:hovedindeks(?:en)?|indeksen|osebx|(?<!på\s)oslo\s+børs|børsen)",
+    "bransjen": r"(?:bransjen|sektoren|aksjene\s+i\s+(?:samme\s+)?bransje(?:n)?(?:\s+som\s+denne)?)",
+}
+# Inntil fire ord mellom feltet og verbet: «Hovedindeksen på Oslo Børs steg»,
+# «Bransjen i snitt falt». Ikke over et skilletegn.
+_MELLOM = r"(?:\s+[\w-]+){0,4}?"
+_BEVEGELSE_UTSAGN = {
+    felt: (
+        re.compile(
+            r"(?<![\w-])" + uttrykk + _MELLOM + r"\s+(ikke\s+)?(" + _VERB + r")(?![\w-])(\s+ikke(?![\w-]))?",
+            re.IGNORECASE,
+        ),
+        # Omvendt ordstilling: «I dag steg hovedindeksen», «falt også bransjen».
+        re.compile(
+            r"(?<![\w-])()(" + _VERB + r")\s+(?:(?:også|derimot|samtidig|i\s+dag)\s+)?" + uttrykk + r"(?![\w-])"
+            r"(\s+ikke(?![\w-]))?",
+            re.IGNORECASE,
+        ),
+    )
+    for felt, uttrykk in _FELTET.items()
+}
+# «ni aksjer steg», «9 av aksjene i lista falt», og «tre børsdager på rad».
+_AKSJER_UTSAGN = re.compile(
+    r"(?<![\w-])(\w+)\s+(?:av\s+(?:de\s+)?(?:\w+\s+)?)?aksje(?:r|ne)?(?:\s+i\s+lista)?\s+(" + _VERB + r")(?![\w-])",
+    re.IGNORECASE,
+)
+_DAGER_UTSAGN = re.compile(r"(?<![\w-])(\w+)\s+(?:børs)?dag(?:er)?\s+på\s+rad", re.IGNORECASE)
+
+
+def _bevegelsen(verb: str) -> str:
+    return _BEVEGELSESVERB[" ".join(verb.lower().split())]
+
+
 RAAD = (
     r"kjøp",
     r"selg",
@@ -341,8 +403,26 @@ def kontroller(tekst: str, grunnlag: Mapping[str, object]) -> Kontrollsvar:
                 start = len(treff.group(1)) if moenster.groups == 2 else 0
                 grunner.append(f"1: styrken «{treff.group(0)[start:]}», regelen sier {styrke}")
 
+    # Story 10.2e: hovedindeksen og bransjen, antallet aksjer og dagene.
+    for felt, moenstrene in _BEVEGELSE_UTSAGN.items():
+        for moenster in moenstrene:
+            for treff in moenster.finditer(tekst):
+                ikke, sagt = bool(treff.group(1) or treff.group(3)), _bevegelsen(treff.group(2))
+                fasit = grunnlag.get(felt)
+                if fasit is None or (sagt == fasit) == ikke:
+                    grunner.append(f"1: {felt} «{treff.group(0)}», grunnlaget sier {fasit or 'ingenting'}")
+    for treff in _AKSJER_UTSAGN.finditer(tekst):
+        tall = _styrketall(treff.group(1))
+        felt = {STEG: "aksjer_steg", FALT: "aksjer_falt"}.get(_bevegelsen(treff.group(2)))
+        if tall is not None and (felt is None or tall != grunnlag.get(felt)):
+            grunner.append(f"1: antallet «{treff.group(0)}», grunnlaget sier {grunnlag.get(felt, 'ingenting')}")
+    for treff in _DAGER_UTSAGN.finditer(tekst):
+        tall = _styrketall(treff.group(1))
+        if tall is not None and tall != grunnlag.get("dager"):
+            grunner.append(f"1: dagene «{treff.group(0)}», grunnlaget sier {grunnlag.get('dager', 'ingenting')}")
+
     # 2. Tallene.
-    lovlige = FASTE_TALL | {styrke}
+    lovlige = FASTE_TALL | {grunnlag[navn] for navn in ANTALLENE if type(grunnlag.get(navn)) is int}
     for treff in _SIFFER.finditer(tekst):
         tall = treff.group(0)
         if "," in tall or "." in tall or len(tall) > _LENGSTE_TALL or int(tall) not in lovlige:

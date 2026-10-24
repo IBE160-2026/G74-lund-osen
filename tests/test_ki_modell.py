@@ -717,3 +717,104 @@ class TestFormeneGemmaSkriver:
         """Gjennomgangen (ECH4, VG6): ville feilet hvis «Retningen på signalet
         er positiv» ga samme grunn to ganger."""
         assert len(kontroller("Retningen på signalet er positiv.", BLANDET).grunner) == 1
+
+
+# Story 10.2e: grunnlaget med dagen, som ki_grunnlag gir det for versjon 3.
+DAGEN = {
+    **BLANDET,
+    "dager": 4,
+    "dager_merke": "minst",
+    "hovedindeksen": "falt",
+    "aksjer_steg": 9,
+    "aksjer_falt": 5,
+    "bransjen": "steg",
+}
+
+
+class TestKontrollenVersjon3:
+    """Story 10.2e, punkt c: tallene i grunnlaget, og retningen paa
+    hovedindeksen og bransjen."""
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            "Signalet har vært slik i minst 4 børsdager.",
+            "Ni aksjer i lista steg, og fem falt.",
+            "9 av aksjene steg.",
+            "Hovedindeksen falt i dag, mens bransjen steg i snitt.",
+            "I dag falt hovedindeksen.",
+            "Hovedindeksen på Oslo Børs falt.",
+            "Aksjene i samme bransje steg i snitt.",
+            "Bransjen falt ikke.",
+            "Signalet har vært slik i minst fire børsdager på rad.",
+            "Se endringen i tabellen.",
+            "Aksjen på Oslo Børs steg.",
+            "Hovedindeksen er ikke en del av regelen.",
+        ],
+    )
+    def test_det_grunnlaget_sier_bestaar(self, tekst):
+        """Ville feilet hvis kontrollen stoppet et antall fra grunnlaget, eller
+        en riktig retning paa hovedindeksen eller bransjen."""
+        svar = kontroller(tekst, DAGEN)
+        assert svar.besto, svar.grunner
+
+    @pytest.mark.parametrize(
+        "tekst", ["Signalet har vært slik i 7 børsdager.", "Elleve aksjer.", "Det gjelder 6 aksjer."]
+    )
+    def test_et_tall_som_ikke_staar_i_grunnlaget(self, tekst):
+        """Ville feilet hvis kontrollen slapp et tall som ikke er et av
+        antallene i grunnlaget eller regelens faste tall."""
+        svar = kontroller(tekst, DAGEN)
+        assert not svar.besto and any(g.startswith("2:") for g in svar.grunner), svar.grunner
+
+    def test_tallene_fra_dagen_er_ikke_lov_uten_dagen(self):
+        """Ville feilet hvis antallene var lov ogsaa naar grunnlaget ikke har
+        dem: 9 er ikke et tall i grunnlaget fra versjon 2."""
+        assert kontroller("Ni aksjer.", DAGEN).besto
+        assert not kontroller("Ni aksjer.", BLANDET).besto
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            "Hovedindeksen steg i dag.",
+            "I dag steg hovedindeksen.",
+            "Hovedindeksen på Oslo Børs gikk opp.",
+            "Oslo Børs steg.",
+            "Hovedindeksen var uendret.",
+            "Hovedindeksen falt ikke.",
+            "OSEBX steg.",
+        ],
+    )
+    def test_feil_retning_paa_hovedindeksen(self, tekst):
+        """Grunnlaget sier at hovedindeksen falt. Ville feilet hvis en tekst
+        som sier noe annet, besto."""
+        svar = kontroller(tekst, DAGEN)
+        assert not svar.besto and any(g.startswith("1: hovedindeksen") for g in svar.grunner), svar.grunner
+
+    @pytest.mark.parametrize(
+        "tekst",
+        ["Bransjen falt i snitt.", "Aksjene i samme bransje falt.", "Sektoren var uendret.", "Bransjen steg ikke."],
+    )
+    def test_feil_retning_paa_bransjen(self, tekst):
+        svar = kontroller(tekst, DAGEN)
+        assert not svar.besto and any(g.startswith("1: bransjen") for g in svar.grunner), svar.grunner
+
+    def test_hovedindeksen_naar_feltet_mangler(self):
+        """Ville feilet hvis teksten kunne si noe om hovedindeksen eller
+        bransjen naar grunnlaget ikke har feltet."""
+        uten = {k: v for k, v in DAGEN.items() if k not in ("hovedindeksen", "bransjen")}
+        for tekst in ("Hovedindeksen falt.", "Bransjen steg."):
+            assert not kontroller(tekst, uten).besto, tekst
+
+    @pytest.mark.parametrize("tekst", ["Fem aksjer steg.", "9 aksjer falt.", "Ni av aksjene i lista falt."])
+    def test_antallene_byttet(self, tekst):
+        """Ville feilet hvis et antall fra grunnlaget kunne staa om det andre
+        antallet, som bare punkt 2 ikke fanger."""
+        svar = kontroller(tekst, DAGEN)
+        assert not svar.besto and any(g.startswith("1: antallet") for g in svar.grunner), svar.grunner
+
+    def test_dagene_byttet_med_styrken(self):
+        """Grunnlaget sier styrke 2 og 4 dager. Ville feilet hvis «to børsdager
+        på rad» besto."""
+        svar = kontroller("Signalet har vært slik i to børsdager på rad.", DAGEN)
+        assert not svar.besto and any(g.startswith("1: dagene") for g in svar.grunner), svar.grunner
