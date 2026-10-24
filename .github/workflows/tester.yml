@@ -317,7 +317,9 @@ jobs:
   # dobbeltklikk proeves paa Windows og Mac, uten Docker og uten setup-uv, saa
   # spoersmaalet om uv og den offisielle installasjonen ogsaa proeves.
   # OSE_START_SVAR_JA=1 svarer ja, og OSE_START_UTEN_NETTLESER=1 aapner ingen
-  # nettleser. Den ekte versjonen kjoeres ikke i CI: den trenger en noekkel.
+  # nettleser. Den ekte versjonen kjoeres bare til vernet i klonen (svaret
+  # 23.10 kl. 23:31, b): den stopper med kode 1 foer uv, og trenger ingen
+  # noekkel (gjennomgangen 24.10, VG4 og ECH8).
   dobbeltklikk:
     strategy:
       fail-fast: false
@@ -335,13 +337,19 @@ jobs:
 
       # Svaret 23.10 kl. 23:31 (b): klonen har .git, så den ekte versjonen
       # stopper med kode 1 før uv, .env og hentingen, og ingen nøkkel trengs.
+      # Beskjeden fra vernet kreves også, fordi en PR har løsrevet HEAD, så
+      # også vernet «bare fra main» ga kode 1 (gjennomgangen 24.10, VG1).
       - name: Start den ekte versjonen i klonen på Windows
         if: runner.os == 'Windows'
         shell: pwsh
+        timeout-minutes: 5
         run: |
-          & '.\Start den ekte versjonen.cmd'
+          $ut = & '.\Start den ekte versjonen.cmd' 2>&1 | Out-String
           $kode = $LASTEXITCODE
+          Write-Host $ut
           if ($kode -ne 1) { Write-Error "Start den ekte versjonen ga kode $kode, ikke 1"; exit 1 }
+          if ($ut -notmatch 'mappa har \.git' -or $ut -notmatch 'Download ZIP') { Write-Error 'Beskjeden fra vernet mangler'; exit 1 }
+          if ($ut -match 'Appen trenger uv') { Write-Error 'Start den ekte versjonen kom forbi vernet'; exit 1 }
           if (Test-Path -LiteralPath '.env') { Write-Error 'Start den ekte versjonen laget .env'; exit 1 }
           Write-Host 'Start den ekte versjonen stoppet i klonen med kode 1 og uten .env'
           exit 0
@@ -349,10 +357,14 @@ jobs:
       - name: Start den ekte versjonen i klonen på Mac
         if: runner.os == 'macOS'
         shell: bash
+        timeout-minutes: 5
         run: |
           kode=0
-          ./"Start den ekte versjonen.command" || kode=$?
+          ut="$(./"Start den ekte versjonen.command" 2>&1)" || kode=$?
+          echo "$ut"
           [ "$kode" = 1 ] || { echo "Start den ekte versjonen ga kode $kode, ikke 1"; exit 1; }
+          echo "$ut" | grep -q 'mappa har \.git' && echo "$ut" | grep -q 'Download ZIP' || { echo "Beskjeden fra vernet mangler"; exit 1; }
+          ! echo "$ut" | grep -q 'Appen trenger uv' || { echo "Start den ekte versjonen kom forbi vernet"; exit 1; }
           [ ! -e .env ] || { echo "Start den ekte versjonen laget .env"; exit 1; }
           echo "Start den ekte versjonen stoppet i klonen med kode 1 og uten .env"
 

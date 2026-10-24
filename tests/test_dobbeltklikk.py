@@ -228,35 +228,51 @@ VERNET = {
     "start.ps1": "if ($Versjon -eq 'ekte' -and (Test-Path -LiteralPath '.git')) {",
     "start.sh": 'if [ "$VERSJON" = "ekte" ] && [ -e .git ]; then',
 }
+# Beskjeden fra vernet, i begge skriptene (gjennomgangen 24.10, BH6).
+BESKJEDEN = "mappa har .git (en klon av repoet eller et eget git-repo)"
 
 
 @pytest.mark.parametrize("navn", list(SKRIPTENE))
 def test_den_ekte_versjonen_stopper_i_en_mappe_med_git(navn):
     """Gruppens svar 23.10 kl. 23:31 (b), som erstatter vernet «bare fra
     main» (VG1 og ECH9). Ville feilet hvis vernet sjekket grenen, saa den
-    ekte versjonen kunne hente fra main i en klon med gruppens noekkel, eller
-    kom etter uv, .env eller hentingen."""
+    ekte versjonen kunne hente fra main i en klon med gruppens noekkel, ikke
+    stoppet (gjennomgangen 24.10, BH8), eller kom etter uv, .env eller
+    hentingen."""
     kode = "\n".join(_kode(SKRIPTENE[navn]))
     vern = kode.index(VERNET[navn])
     blokken = kode[vern : kode.index("\n", kode.index("Download ZIP", vern))]
     assert "git rev-parse" not in kode and "main" not in blokken
-    assert "Download ZIP" in blokken and "egen nøkkel" in blokken
+    assert "Download ZIP" in blokken and "egen nøkkel" in blokken and BESKJEDEN in blokken
+    assert blokken.splitlines()[1].startswith("Stopp '" if navn == "start.ps1" else 'stopp "')
     for senere in ("uv sync", ".env.example", "uv run python src/fetch_prices.py"):
         assert vern < kode.index(senere), senere
     # Foer uv-sjekken, ogsaa.
     assert vern < kode.index("Appen trenger uv")
 
 
-def _klon_paa_main(tmp_path, navn):
-    """En mappe med .git paa main og bare skriptet, uten pyproject.toml og
-    .env.example. git init er lokalt og gjoer ingen nettkall."""
+def _mappe_med_skriptet(tmp_path, navn, git):
+    """En mappe med bare skriptet, uten pyproject.toml og .env.example.
+    git er "klon" (git init og en tom commit, saa HEAD er main, ikke en
+    ufoedt gren; gjennomgangen 24.10, VG2), "fil" (.git som fil, som i en
+    worktree; VG3) eller "ingen" (som en ZIP-fil). git er lokalt og gjoer
+    ingen nettkall."""
     (tmp_path / "start").mkdir()
     (tmp_path / "start" / navn).write_bytes(SKRIPTENE[navn].read_bytes())
-    subprocess.run(["git", "init", "-q", "-b", "main", str(tmp_path)], check=True, capture_output=True)
+    if git == "klon":
+        # Uten init -b, som krever git 2.28 (BH10, ECH2).
+        subprocess.run(["git", "init", "-q", str(tmp_path)], check=True, capture_output=True)
+        git_c = ["git", "-C", str(tmp_path), "-c", "user.name=t", "-c", "user.email=t@t"]
+        subprocess.run([*git_c, "symbolic-ref", "HEAD", "refs/heads/main"], check=True, capture_output=True)
+        subprocess.run([*git_c, "commit", "-q", "--allow-empty", "-m", "t"], check=True, capture_output=True)
+        gren = subprocess.run([*git_c, "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True)
+        assert gren.stdout.strip() == "main", gren
+    elif git == "fil":
+        (tmp_path / ".git").write_text("gitdir: ../annen/.git/worktrees/kopi\n", encoding="utf-8")
     return tmp_path
 
 
-def _kjoer_og_sjekk(argumenter, mappe, miljoe):
+def _kjoer(argumenter, miljoe):
     """Kjoerer skriptet med «n» paa stdin, saa et spoersmaal om uv faar nei
     og ingenting installeres. Ingen uv paa PATH og en tom brukermappe, saa
     heller ikke en mutant kommer til uv sync eller hentingen."""
@@ -270,58 +286,82 @@ def _kjoer_og_sjekk(argumenter, mappe, miljoe):
         env=miljoe,
         timeout=120,
     )
-    utskrift = svar.stdout + svar.stderr
-    assert svar.returncode == 1, utskrift
-    assert "Download ZIP" in utskrift and "egen nøkkel" in utskrift, utskrift
-    assert "Appen trenger uv" not in utskrift, utskrift
+    return svar.returncode, svar.stdout + svar.stderr
+
+
+def _sjekk(git, mappe, kode, utskrift):
+    """Med .git: stoppet av vernet, foer uv. Uten .git (kontrollen,
+    gjennomgangen 24.10, BH5 og BH6): forbi vernet til spoersmaalet om uv,
+    som faar nei, saa PATH og mappa ikke stopper skriptet foer vernet."""
+    assert kode == 1, utskrift
     assert not (mappe / ".env").exists()
+    if git == "ingen":
+        assert "Appen trenger uv" in utskrift and BESKJEDEN not in utskrift, utskrift
+    else:
+        assert BESKJEDEN in utskrift and "Download ZIP" in utskrift and "egen nøkkel" in utskrift, utskrift
+        assert "Appen trenger uv" not in utskrift, utskrift
 
 
 def _bash():
-    """bash, men ikke WSL-starteren i System32 paa Windows."""
+    """bash, men ikke WSL-starteren i System32 eller WindowsApps paa Windows
+    (gjennomgangen 24.10, ECH4)."""
     sti = shutil.which("bash")
-    if sti and sys.platform == "win32" and "system32" in sti.lower():
+    if sti and sys.platform == "win32" and ("system32" in sti.lower() or "windowsapps" in sti.lower()):
         return None
     return sti
 
 
+def _uten_uv(stier):
+    # Gjennomgangen 24.10 (ECH1): uv ved siden av bash eller git, for
+    # eksempel i Homebrew, er en grunn til aa hoppe over, ikke en feil.
+    if any((Path(s) / "uv").exists() or (Path(s) / "uv.exe").exists() for s in stier):
+        pytest.skip("uv ligger i samme mappe som bash eller git")
+
+
 @pytest.mark.skipif(_bash() is None or shutil.which("git") is None, reason="krever bash og git")
-def test_start_sh_stopper_den_ekte_versjonen_i_en_klon_paa_main(tmp_path):
+@pytest.mark.parametrize("git", ["klon", "fil", "ingen"])
+def test_start_sh_stopper_den_ekte_versjonen_i_en_mappe_med_git(tmp_path, git):
     """Svaret 23.10 kl. 23:31 (b). Ville feilet hvis start.sh gikk videre
-    fra en klon paa main, slik vernet «bare fra main» gjorde: da spoer den om
-    uv i stedet for aa vise til «Download ZIP», eller lager .env."""
-    mappe = _klon_paa_main(tmp_path, "start.sh")
+    fra en klon paa main, slik vernet «bare fra main» gjorde, eller fra en
+    mappe med .git som fil: da spoer den om uv i stedet for aa vise til
+    «Download ZIP», eller lager .env. Uten .git maa den komme forbi vernet."""
+    mappe = _mappe_med_skriptet(tmp_path, "start.sh", git)
     stier = {str(Path(_bash()).parent), str(Path(shutil.which("git")).parent)}
     if shutil.which("dirname"):
         stier.add(str(Path(shutil.which("dirname")).parent))
+    _uten_uv(stier)
     miljoe = {
         "PATH": os.pathsep.join(sorted(stier)),
         "HOME": str(tmp_path / "hjem"),
         "SYSTEMROOT": os.environ.get("SYSTEMROOT", ""),
     }
-    assert not any((Path(s) / "uv").exists() or (Path(s) / "uv.exe").exists() for s in stier)
-    _kjoer_og_sjekk([_bash(), str(mappe / "start" / "start.sh"), "ekte"], mappe, miljoe)
+    kode, utskrift = _kjoer([_bash(), str(mappe / "start" / "start.sh"), "ekte"], miljoe)
+    _sjekk(git, mappe, kode, utskrift)
 
 
 @pytest.mark.skipif(sys.platform != "win32" or shutil.which("git") is None, reason="krever Windows PowerShell og git")
-def test_start_ps1_stopper_den_ekte_versjonen_i_en_klon_paa_main(tmp_path):
+@pytest.mark.parametrize("git", ["klon", "fil", "ingen"])
+def test_start_ps1_stopper_den_ekte_versjonen_i_en_mappe_med_git(tmp_path, git):
     """Svaret 23.10 kl. 23:31 (b). Ville feilet hvis start.ps1 gikk videre
-    fra en klon paa main, slik vernet «bare fra main» gjorde: da spoer den om
-    uv i stedet for aa vise til «Download ZIP», eller lager .env. PATH har
-    ikke Windows PowerShell, saa installasjonen av uv ikke kan startes."""
-    mappe = _klon_paa_main(tmp_path, "start.ps1")
+    fra en klon paa main, slik vernet «bare fra main» gjorde, eller fra en
+    mappe med .git som fil: da spoer den om uv i stedet for aa vise til
+    «Download ZIP», eller lager .env. Uten .git maa den komme forbi vernet.
+    PATH har ikke Windows PowerShell, saa installasjonen av uv ikke kan
+    startes."""
+    mappe = _mappe_med_skriptet(tmp_path, "start.ps1", git)
     systemrot = os.environ["SYSTEMROOT"]
     powershell = Path(systemrot) / "System32" / "WindowsPowerShell" / "v1.0" / "powershell.exe"
     stier = [str(Path(shutil.which("git")).parent), str(Path(systemrot) / "System32")]
+    _uten_uv(stier)
     miljoe = {
         "PATH": os.pathsep.join(stier),
         "USERPROFILE": str(tmp_path / "hjem"),
         "SYSTEMROOT": systemrot,
         "PSModulePath": "",
     }
-    assert not any((Path(s) / "uv.exe").exists() for s in stier)
     argumenter = [str(powershell), "-NoProfile", "-ExecutionPolicy", "Bypass", "-File"]
-    _kjoer_og_sjekk([*argumenter, str(mappe / "start" / "start.ps1"), "-Versjon", "ekte"], mappe, miljoe)
+    kode, utskrift = _kjoer([*argumenter, str(mappe / "start" / "start.ps1"), "-Versjon", "ekte"], miljoe)
+    _sjekk(git, mappe, kode, utskrift)
 
 
 @pytest.mark.parametrize("navn", list(SKRIPTENE))
@@ -368,9 +408,15 @@ def test_command_filene_er_kjoerbare_i_git():
 def test_ci_proever_demoen_og_vernet_i_klonen_paa_windows_og_mac():
     """Ville feilet hvis jobben dobbeltklikk manglet et av systemene, ikke
     ventet paa «Eksempeltall», eller ikke krevde kode 1 og ingen .env av «Start
-    den ekte versjonen» i klonen (svaret 23.10 kl. 23:31, b), foer demoen."""
+    den ekte versjonen» i klonen (svaret 23.10 kl. 23:31, b), foer demoen,
+    eller ikke krevde beskjeden fra vernet, saa vernet «bare fra main» ogsaa
+    gikk gjennom med loesrevet HEAD i en PR (gjennomgangen 24.10, VG1)."""
     ci = CI.read_text(encoding="utf-8")
     jobb = ci.split("\n  dobbeltklikk:\n", 1)[1]
+    # Bare jobben, til neste jobb (gjennomgangen 24.10, BH9).
+    jobb = re.split(r"\n  [a-z0-9_-]+:\n", jobb, maxsplit=1)[0]
+    assert jobb.count("mappa har \\.git") == 2 and jobb.count("Download ZIP") == 2
+    assert jobb.count("Appen trenger uv") == 2 and jobb.count("timeout-minutes: 5") == 2
     assert "os: [windows-latest, macos-latest]" in jobb
     assert 'OSE_START_SVAR_JA: "1"' in jobb and 'OSE_START_UTEN_NETTLESER: "1"' in jobb
     assert "Start demoen.cmd" in jobb and "Start demoen.command" in jobb
