@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-24T14:44
+updated: 2026-10-24T20:10
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1280,6 +1280,8 @@ EODHD eller ikke?»). Story 10.2 er blokkert til det er avgjort.
 *Lagt til 2026-10-21 (gruppens svar kl. 22:57, under «Prioritering» og story 10.1 i `epics.md`):* fra en ny promptversjon etter uka med logget drift får KI-teksten også hvor lenge signalet har vært slik, tallene som alt står på siden, og retningen på hovedindeksen. Det endrer avgjørelsen 04.10 over fra den nye versjonen, og versjon 2 gjelder til da. Fortsatt ingen råd (NFR-06), hvert tall i teksten kontrolleres mot grunnlaget, og børsometeret (8.6) kommer med når det er bygget. Åpent punkt: avgjørelsen 04.10 om ikke å spørre EODHD bygde på at modellen bare får våre egne resultater, og ingen prosenter, forholdstall, kurser eller volumer («Betingelse 4 og KI-tjenestene (2026-10-04)» i `docs/kilder-og-rettigheter.md`). Om tallene som står på siden, kan sendes til Gemini, Anthropic eller OpenAI med egen nøkkel uten å spørre, er ikke avgjort.
 
 *Lagt til 2026-10-21 (gruppens svar kl. 23:51, under «Prioritering» og story 10.1 i `epics.md`):* «Bare egne resultater». I den nye promptversjonen får modellen bare våre egne resultater. I tillegg til det den får i dag, fortegnet for de tre sjekkene, styrken og retningen (`ki_grunnlag` i `src/ki_grunnlag.py`), er det hvor lenge signalet har vært slik, retningen på hovedindeksen og børsometeret (8.6) når det er bygget. Modellen får ingen kurser, volumer, prosenter eller forholdstall, heller ikke tallene som står på siden. Teksten kan vise til tallene på siden uten å gjenta dem, og hvert tall i teksten kontrolleres fortsatt mot grunnlaget. Delen av linja 2026-10-21 kl. 22:57 om «tallene som alt står på siden» gjelder ikke lenger, og det åpne punktet i den er lukket. Grunnlaget holder seg innenfor avgjørelsen 04.10 (fortegn, styrke, retning og antall), som står, og EODHD spørres ikke. Fra den nye versjonen får grunnlaget for én aksje et antall (dagene), ulikt linja 15.10 (svar 10 kl. 15:53), der grunnlaget for én aksje er uten antall.
+
+*Lagt til 2026-10-24 (gruppens svar kl. 15:50 og 16:15, under story 10.2 i `epics.md`):* fra prompten versjon 3 får grunnlaget for én aksje tre antall i tillegg til fortegnene, styrken og retningen: dagene, som er børsdager på rad med samme retning og styrke, til og med dagen, og fra børsometeret hvor mange aksjer i lista som steg og som falt fra børsdagen før. Det får også retningen på hovedindeksen og på bransjen til aksjen i snitt, som steg, falt eller uendret. Det er fortegn og antall, innenfor avgjørelsen over, og fortsatt ingen prosenter, forholdstall, kurser eller volumer.
 
 #### FR-601 — Av/på-bryteren er brukersynlig
 

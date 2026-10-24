@@ -2790,6 +2790,10 @@ starter ikke av seg selv.
 
 *Lagt til 2026-10-18 kl. 22:49:* kontrollen i FR-603 leser retningen og styrken også i formene Gemma skriver, flettet i `3c2bd51`, PR #71 (spesifikasjonen `spec-10-2d-kontrollen-leser-formene-gemma-skriver.md`), før byggestoppen mandag. Ingen av de 79 KI-tekstene i sporede filer fikk et annet svar, så tekstene i demoen står. Det åpne punktet i spesifikasjonen for 3.4b er dermed lukket.
 
+*Avgjort 2026-10-24 kl. 15:50 (gruppens svar):* prompten versjon 3 bygges og flettes i kveld, etter uka med logget drift med versjon 2 (19.–23.10).
+
+*Avgjort 2026-10-24 kl. 16:15 (gruppens svar):* a) hvor lenge signalet har vært slik, er børsdager på rad med samme retning og styrke, til og med dagen; b) fra børsometeret: hvor mange aksjer i lista som steg og falt fra børsdagen før, og om bransjen til aksjen steg eller falt i snitt. Begge er fortegn og antall.
+
 ### Story 10.3: Visningen i aksjedetaljen
 
 *Het Story 5B.3 til 28.09.*
