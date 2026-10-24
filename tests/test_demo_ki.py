@@ -130,11 +130,13 @@ class TestFila:
         bestaatt, eller hvis kontrollen ble strammet inn uten at tekstene ble
         laget paa nytt."""
         for rad in radene:
+            svar = kontroller(rad.tekst, rad.grunnlag)
             if rad.besto:
-                svar = kontroller(rad.tekst, rad.grunnlag)
                 assert svar.besto, (rad.emne.symbol, svar.grunner)
             else:
-                assert rad.grunn, rad.emne.symbol
+                # Gjennomgangen av 10.2e rettet (VG3): grunnen siden viser, er
+                # den kontrollen gir naa.
+                assert rad.grunn and not svar.besto and svar.grunn == rad.grunn, (rad.emne.symbol, svar.grunn)
 
     def test_hver_rad_har_tjenesten_modellen_og_hvordan_den_kjoerte(self, radene):
         """FR-604 og FR-605. Ville feilet med en rad uten tjenesten, modellen,
