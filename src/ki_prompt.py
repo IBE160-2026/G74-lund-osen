@@ -36,11 +36,14 @@ Versjon 3, tredje forsoek (gruppens svar 24.10 kl. 23:23, malinger.md §44):
 modellen faar ferdig ordlyd for dagene, laget her av dagene og merket, og
 nevner dagene bare med den, ordrett. «Minst» staar bare i ordlyden, ikke i
 reglene. Kontrollen i FR-603 bruker den samme ordlyden (ordlyd_for_dagene),
-saa prompten og kontrollen ikke kan si ulikt. Ordlyden er med i avtrykket.
+saa prompten og kontrollen ikke kan si ulikt. Ordlyden, og koden som velger
+den og setter prompten sammen, er med i avtrykket (gjennomgangen 25.10, VG2).
 """
 
 import json
 from collections.abc import Mapping
+
+from ki_grunnlag import MINST
 
 PROMPTVERSJON = "3"
 
@@ -90,7 +93,7 @@ def ordlyd_for_dagene(grunnlag: Mapping[str, object]) -> str | None:
     dager = grunnlag.get("dager")
     if type(dager) is not int or dager < 1:
         return None
-    if grunnlag.get("dager_merke") == "minst":
+    if grunnlag.get("dager_merke") == MINST:
         return DAGENE_MINST_EN if dager == 1 else DAGENE_MINST.format(dager=dager)
     return DAGENE_FOERSTE if dager == 1 else DAGENE_PAA_RAD.format(dager=dager)
 

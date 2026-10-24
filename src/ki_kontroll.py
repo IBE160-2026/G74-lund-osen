@@ -56,6 +56,7 @@ interesse ga ikke noe utslag», «ingen sjekk ga utslag på interesse»), skal
 stemme med fortegnet i grunnlaget. «Ingen sjekk ga utslag på» en sjekk er et
 utsagn om den sjekken, ikke om styrken. «Minst» om dagene er lov bare naar
 grunnlaget har dager_merke, og med merket stoppes et eksakt antall dager.
+(Erstattet av svaret kl. 23:23, under.)
 
 Gruppens svar 24.10 kl. 23:23, under punkt 1: dagene er lov bare med
 ordlyden prompten gir (ordlyd_for_dagene i ki_prompt.py), ordrett. Dagene i
@@ -322,16 +323,44 @@ _MINST_OM_DAGENE = re.compile(
 # andre gang» og «femte børsdag». Leses etter at ordlyden er tatt ut.
 # Ogsaa ordenstall ved «signalet», med inntil ett ord imellom: «det første
 # signalet med denne retningen» (demotekstene 25.10, NLYS, SLVP og KVST).
-_ORDENSTALL = (
-    r"(?:første|andre|annen|tredje|fjerde|femte|sjette|sjuende|syvende|åttende|niende|tiende|"
-    r"ellevte|tolvte|\d+\.)"
+# Gjennomgangen 25.10 (ECH1-ECH3, BH3, VG4): «andre» og «annen» er ogsaa
+# «other», saa de er ordenstall bare ved «gang» og «på rad», ikke ved et ord
+# om dagene eller «signalet» («de andre dagene», «andre signaler»). «I dag»
+# er ikke et ord om dagene, og «1.» er et ordenstall bare foran liten
+# bokstav, ikke foran «Dagen» i neste setning.
+_ORDENSTALL_UTEN_ANDRE = (
+    r"(?:første|tredje|fjerde|femte|sjette|sjuende|syvende|åttende|niende|tiende|"
+    r"ellevte|tolvte|\d+\.(?-i:(?=\s+[a-zæøå])))"
 )
+_ORDENSTALL = r"(?:andre|annen|" + _ORDENSTALL_UTEN_ANDRE[3:]
+_DAG_ETTER = r"(?<!\bi\s)(?:børs)?dag(?:en|er|ene)?"
+# Gjennomgangen 25.10 (BH2, ECH6): dagene uten tall eller ordenstall, som
+# «flere ganger», «nok en gang», «i går», «siden mandag», «flere dager»,
+# «i 3 handelsdager» og «det første med denne retningen».
+_UKEDAG = r"(?:mandag|tirsdag|onsdag|torsdag|fredag|forrige\s+\w+)"
 _DAGENE_I_ANNEN_FORM = re.compile(
-    r"(?<![\w-])(?:" + _ORDENSTALL + r"(?:\s+[\w-]+){0,2}?\s+(?:gang(?:en)?|på\s+rad|(?:børs)?dag(?:en|er|ene)?)"
-    r"|" + _ORDENSTALL + r"(?:\s+[\w-]+)?\s+signal(?:et|er|ene)?"
+    r"(?<![\w-])(?:" + _ORDENSTALL + r"(?:\s+[\w-]+){0,2}?\s+(?:gang(?:en)?|på\s+rad)"
+    r"|"
+    + _ORDENSTALL_UTEN_ANDRE
+    + r"(?:\s+[\w-]+){0,2}?\s+"
+    + _DAG_ETTER
+    + r"|"
+    + _ORDENSTALL_UTEN_ANDRE
+    + r"(?:\s+[\w-]+)?\s+signal(?:et|er|ene)?"
+    r"|første(?:\s+[\w-]+)?\s+med\s+(?:denne|samme)\s+retning(?:en)?"
+    r"|ganger|nok\s+en\s+gang|i\s+går|siden\s+"
+    + _UKEDAG
+    + r"|(?:flere|mange|noen|få)\s+(?:børs|handels)?dag(?:er|ene)?|handelsdag(?:en|er|ene)?"
     r"|på\s+rad|etter\s+hverandre|i\s+trekk)(?![\w-])",
     re.IGNORECASE,
 )
+# Gjennomgangen 25.10 (BH1, ECH7): ordlyden nektet, «ikke … i dag for
+# første gang», inntil tre ord foran.
+_NEKTET_FORAN = re.compile(r"(?<![\w-])(?:ikke|aldri)(?:\s+[\w-]+){0,3}\s*[«»\"']?\s*$", re.IGNORECASE)
+# Gjennomgangen 25.10 (ECH5): regelens vinduer uten ledd er vinduene bare
+# naar setningen sier det, «Vinduet er 20 dager», «snittet for 50 dager» og
+# «Femti dager er grunnlaget for trenden». «Holdt seg 20 børsdager» stoppes.
+_OM_VINDUET = re.compile(r"(?<![\w-])(?:vindu|snitt|median|trend|ma50)", re.IGNORECASE)
 
 # Gruppens svar 24.10 kl. 21:49: utsagn om én sjekk, med navnet og utslaget,
 # skal stemme med fortegnet i grunnlaget. Ogsaa en liste: «bevegelse og
@@ -483,6 +512,11 @@ def _en_sjekk(tekst: str, grunnlag: Mapping[str, object]) -> list[str]:
     return grunner
 
 
+def _setningen(tekst: str, i: int) -> str:
+    """Setningen i tekst som posisjon i staar i."""
+    return next((s.group(0) for s in _SETNING.finditer(tekst) if s.start() <= i < s.end()), "")
+
+
 def _dagene(tekst: str, grunnlag: Mapping[str, object]) -> list[str]:
     """Dagene (gruppens svar 24.10 kl. 23:23): dagene er lov bare med
     ordlyden fra prompten, ordrett. Ordlyden tas ut av teksten, og det som da
@@ -497,7 +531,11 @@ def _dagene(tekst: str, grunnlag: Mapping[str, object]) -> list[str]:
     # Gjennomgangen (ECH): «i  dag» med to mellomrom er fortsatt «i dag».
     tekst = re.sub(r"[ \t]+", " ", tekst)
     if ordlyd:
-        tekst = re.sub(r"(?<![\w-])" + re.escape(ordlyd).replace(r"\ ", r"\s+") + r"(?![\w-])", " ", tekst, flags=re.I)
+        moenster = re.compile(r"(?<![\w-])" + re.escape(ordlyd).replace(r"\ ", r"\s+") + r"(?![\w-])", re.IGNORECASE)
+        for treff in moenster.finditer(tekst):
+            if _NEKTET_FORAN.search(tekst[: treff.start()]):
+                grunner.append(f"1: dagene nektet foran ordlyden «{treff.group(0)}», {om}")
+        tekst = moenster.sub(" ", tekst)
     for treff in _DAGER_UTSAGN.finditer(tekst):
         minst_foer, foran, minst_etter, ord_, etter = treff.groups()
         minst = minst_foer or minst_etter
@@ -505,8 +543,11 @@ def _dagene(tekst: str, grunnlag: Mapping[str, object]) -> list[str]:
         if tall is None:
             continue
         uten_ledd = not (foran or minst or etter)
+        foer = tekst[: treff.start()]
         if uten_ledd and (
-            ord_.lower() in _TVETYDIGE or tall in _VINDUENE or _ETTER_SISTE.search(tekst[: treff.start()])
+            ord_.lower() in _TVETYDIGE
+            or (tall in _VINDUENE and _OM_VINDUET.search(_setningen(tekst, treff.start())))
+            or _ETTER_SISTE.search(foer)
         ):
             continue
         grunner.append(f"1: dagene «{treff.group(0).strip()}» i annen form, {om}")

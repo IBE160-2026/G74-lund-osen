@@ -5,6 +5,7 @@ i conftest.py stopper en som proever (story 4.0).
 """
 
 import hashlib
+import inspect
 import json
 import re
 from datetime import date
@@ -39,8 +40,16 @@ AVTRYKK = {
     # og avtrykket ble satt paa nytt. Den foerste teksten staar paa c848ea6.
     # Gruppens svar 24.10 kl. 23:23: ferdig ordlyd for dagene, og avtrykket er
     # satt paa nytt med ORDLYDEN. Teksten fra kl. 21:49 staar paa 3252ecd.
-    "3": "c777d5490119f23808432278271539e2512b4fc4745504f320bbb1fb5daa7915",
+    # Gjennomgangen 25.10 (VG2): avtrykket dekker ogsaa ordlyd_for_dagene og
+    # lag_prompt (_promptteksten). Var c777d549....
+    "3": "bc9abc8cf55198934eead877a130b958ae50b8ee831bb880ff1ffb86de740959",
 }
+
+
+def _promptteksten() -> str:
+    """Det avtrykket for versjon 3 dekker: reglene, merket, ordlyden og koden
+    i ordlyd_for_dagene og lag_prompt (inspect leser kildeteksten med LF)."""
+    return REGLER + UTENFOR + "".join(ORDLYDEN) + inspect.getsource(ordlyd_for_dagene) + inspect.getsource(lag_prompt)
 
 
 class FalskModell:
@@ -193,8 +202,10 @@ class TestPrompten:
 
     def test_versjonen_foelger_teksten(self):
         """Gjennomgangen (BH13): en endret prompt maa faa ny versjon (FR-605).
-        Gruppens svar 24.10 kl. 23:23: ordlyden for dagene er med."""
-        avtrykk = hashlib.sha256((REGLER + UTENFOR + "".join(ORDLYDEN)).encode("utf-8")).hexdigest()
+        Gruppens svar 24.10 kl. 23:23: ordlyden for dagene er med, og
+        gjennomgangen 25.10 (VG2, BH7): ogsaa koden som velger ordlyden og
+        setter prompten sammen, saa en endret logikk ogsaa gir ny versjon."""
+        avtrykk = hashlib.sha256(_promptteksten().encode("utf-8")).hexdigest()
         assert AVTRYKK.get(PROMPTVERSJON) == avtrykk, (
             "Promptteksten er endret. Sett ny PROMPTVERSJON og legg avtrykket i AVTRYKK."
         )
@@ -1249,16 +1260,13 @@ class TestOrdlyden:
         svar = kontroller(tekst, grunnlag)
         assert svar.besto, svar.grunner
 
-    @pytest.mark.parametrize("symbol", ["EQNR", "AKRBP", "FRO"])
-    def test_minst_en_boersdag_fra_44_stoppes(self, symbol):
-        """EQNR, AKRBP og FRO i §44: «i minst én børsdag» uten merket. Ville
-        feilet hvis formen slapp gjennom."""
+    def test_minst_en_boersdag_fra_44_stoppes(self):
+        """EQNR, AKRBP og FRO i §44 hadde samme setning og samme grunnlag:
+        «i minst én børsdag» uten merket. Én test, ikke tre (gjennomgangen
+        25.10, BH8, VG5). Ville feilet hvis formen slapp gjennom."""
         tekst = "Dette signalet har hatt samme retning og styrke i minst én børsdag."
         svar = kontroller(tekst, TO_POSITIVE_EN_DAG)
-        assert not svar.besto and any(g.startswith("1: «minst» om dagene") for g in svar.grunner), (
-            symbol,
-            svar.grunner,
-        )
+        assert not svar.besto and any(g.startswith("1: «minst» om dagene") for g in svar.grunner), svar.grunner
 
     def test_det_tredje_paa_rad_fra_44_stoppes_som_dagene(self):
         """VAR i §44: «det tredje på rad» med 1 dag. Foer ble den bare
@@ -1285,6 +1293,22 @@ class TestOrdlyden:
             ("Signalet har vært det samme dager i trekk.", {**DAGEN, "dager_merke": None}),
             ("Signalet har vært slik i 4 børsdager på rad.", DAGEN),
             ("Signalet har vært slik i 2 børsdager på rad.", BLANDET),
+            # Gjennomgangen 25.10 (BH12, VG3, ECH5, BH2, ECH6, BH1, ECH7).
+            ("Signalet har vært slik i minst fire børsdager på rad.", DAGEN),
+            ("Signalet har vært slik dager etter hverandre.", {**DAGEN, "dager_merke": None}),
+            ("Det er den femte børsdagen.", {**DAGEN, "dager_merke": None}),
+            ("Det er den 4. dagen.", {**DAGEN, "dager_merke": None}),
+            ("Signalet har holdt seg 20 børsdager.", {**DAGEN, "dager_merke": None}),
+            ("Signalet har vart 50 dager.", {**DAGEN, "dager_merke": None}),
+            ("Signalet har vært slik flere ganger.", {**DAGEN, "dager_merke": None}),
+            ("Nok en gang er signalet slik.", {**DAGEN, "dager_merke": None}),
+            ("Signalet er det samme som i går.", {**DAGEN, "dager_merke": None}),
+            ("Signalet har vært slik siden mandag.", {**DAGEN, "dager_merke": None}),
+            ("Signalet har vært slik i flere dager.", {**DAGEN, "dager_merke": None}),
+            ("Signalet har vært slik i 4 handelsdager.", {**DAGEN, "dager_merke": None}),
+            ("Signalet er det første med denne retningen.", TO_POSITIVE_EN_DAG),
+            ("Signalet har ikke vært slik i dag for første gang.", TO_POSITIVE_EN_DAG),
+            ("Det har ikke holdt i 4 børsdager på rad.", {**DAGEN, "dager_merke": None}),
         ],
     )
     def test_dagene_i_annen_form_stoppes(self, tekst, grunnlag):
@@ -1302,7 +1326,7 @@ class TestOrdlyden:
             "Dette er det første signalet i dag for første gang.",
             "Dette er det første signalet med denne retningen og styrken i dag for første gang.",
             "Dette er det første signalet med denne retningen og styrken, som vist i «i dag for første gang».",
-            "Det er det andre positive signalet.",
+            "Det er det tredje positive signalet.",
         ],
     )
     def test_ordenstall_ved_signalet_stoppes(self, tekst):
@@ -1324,3 +1348,60 @@ class TestOrdlyden:
         hvis den, eller «andre» som vanlig ord, ble stoppet."""
         svar = kontroller(tekst, TRE_POSITIVE_EN_DAG)
         assert svar.besto, svar.grunner
+
+
+class TestGjennomgangen25_10:
+    """Gjennomgangen 25.10 av ordlyden for dagene (BH, ECH, VG)."""
+
+    @pytest.mark.parametrize(
+        "tekst, grunnlag",
+        [
+            # ECH1, BH3: «andre … i dag» er ikke dagene.
+            ("Trenden og de andre sjekkene i dag ga dette.", DAGEN),
+            ("De andre aksjene i dag steg.", DAGEN),
+            ("Snittet for de andre dagene.", DAGEN),
+            # ECH2, VG4: «andre» og «annen» som «other».
+            ("Andre dager kan bli annerledes.", DAGEN),
+            ("Det ble handlet mye på en annen dag enn i dag.", DAGEN),
+            ("Ingen andre signaler er med.", DAGEN),
+            # ECH3: et tall som slutter en setning, foran «Dagen».
+            ("Signalet har styrke 2. Dagen var rolig for hovedindeksen, som falt.", DAGEN),
+            # ECH5: regelens vinduer med ordet foran.
+            ("Vinduet er 20 dager.", DAGEN),
+            ("Snittet for 50 dager.", DAGEN),
+            # BH1: «ikke» om noe annet foer ordlyden.
+            ("Bevegelsen ga ikke utslag, og signalet er slik i minst 4 børsdager.", DAGEN),
+            # VG6: ordlyden i rette anfoerselstegn, som i demotekstene.
+            ('Signalet har hatt samme retning og styrke i "i minst 4 børsdager".', DAGEN),
+            # Grunnlaget fra versjon 2 uten dagene.
+            ("Trenden og de andre sjekkene i dag ga dette.", BLANDET),
+        ],
+    )
+    def test_riktige_tekster_bestaar(self, tekst, grunnlag):
+        """Ville feilet hvis en riktig tekst ble stoppet som dagene i annen
+        form."""
+        svar = kontroller(tekst, grunnlag)
+        assert svar.besto, svar.grunner
+
+    def test_prompten_og_kontrollen_bruker_samme_ordlyd(self, monkeypatch):
+        """VG1: ville feilet hvis kontrollen hadde sin egen kopi av ordlyden i
+        stedet for ordlyd_for_dagene fra ki_prompt."""
+        import ki_prompt
+
+        monkeypatch.setattr(ki_prompt, "DAGENE_FOERSTE", "for aller første gang i dag")
+        grunnlag = {**TO_POSITIVE_EN_DAG}
+        assert "Ordlyden for dagene: for aller første gang i dag\n" in lag_prompt(grunnlag)
+        assert kontroller("Signalet er slik for aller første gang i dag.", grunnlag).besto
+        assert not kontroller("Signalet er slik i dag for første gang.", grunnlag).besto
+
+    def test_avtrykket_dekker_valget_av_ordlyd(self):
+        """VG2, BH7: ville feilet hvis avtrykket bare dekket malene, slik at en
+        endret logikk i ordlyd_for_dagene ga samme versjon."""
+        assert inspect.getsource(ordlyd_for_dagene) in _promptteksten()
+        assert inspect.getsource(lag_prompt) in _promptteksten()
+
+    def test_bildet_viser_en_aksje_der_teksten_besto(self):
+        """VG7, gruppens svar 24.10 kl. 23:23 (b): ville feilet hvis bildet av
+        aksjesiden viste en demoaksje der KI-teksten ble stoppet."""
+        radene = json.loads((Path(__file__).parents[1] / "src" / "demo_ki_tekster.json").read_text("utf-8"))["radene"]
+        assert next(r for r in radene if r["symbol"] == "BRFE")["besto"] is True
