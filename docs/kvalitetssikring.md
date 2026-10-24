@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-24T13:07
+updated: 2026-10-24T14:58
 ---
 
 # Kvalitetssikring
@@ -298,6 +298,7 @@ sist i dokumentet.
 | 3.4d Fotnoten for «ikke vurdert» | `544648f` (#90) | 1 (5, M1–M3, c M1 og c M2) | – M1–M3 kjørt på `8dcde6d` 22.10, c M1 og c M2 for svarene kl. 23:19 og 11:44 på `abdb110` | `S/spec-3-4d-fotnoten-ikke-vurdert.md` |
 | 3.4e Fotnoten etter startdagen i demoen, og for inneværende børsdag | `e772cc6` (#91) | 1 (3, M1–M3) | – M1 og M2 kjørt på `622e25f`, M3 for svaret kl. 19:10 på `2fd2635` | `S/spec-3-4e-fotnoten-etter-startdag.md` |
 | 3.5a Start med dobbeltklikk med uv, uten Docker | `afbc0af` (#92) | 2 (4, M1–M3 og vernet) | – M1–M3 kjørt på `1d46532` og igjen på `6287033` 23.10, vernet «bare fra main» én gang med `-x` på `2a3dd7e` 24.10 | `S/spec-3-5a-dobbeltklikk-med-uv.md` |
+| 8.2a Seks funn fra prøven av demoen 24.10 | `e4d1ba4` (#93) | 1 (5, M1–M5) | – kjørt på `7ca19d9` 24.10 | `S/spec-8-2a-funn-fra-proeven-av-demoen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
 | 2.9b Søylene under hovedindeksen | `73098ed` (#63) | 1 (6, S1–S6) | – | `S/spec-2-9b-soeylene-under-hovedindeksen.md` |
@@ -520,6 +521,7 @@ funn. Antall rader i loggen:
 | 3.4d, gjennomgangene 22.10 og 23.10 | 27 | 15 | 12 | – |
 | 3.4e, to gjennomganger 23.10 | 36 | 22 | 13 | 1 |
 | 3.5a, gjennomgangene 23.10 og 24.10 | 48 | 34 | 14 | – |
+| 8.2a | 21 | 15 | 6 | – |
 | 9.1, oppdatering 17.10 | 19 | 17 | 2 | – |
 | 9.7 | 19 | 13 | 6 | – |
 | 2.9b | 23 | 17 | 6 | – |
@@ -1268,6 +1270,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 3.4e | M1–M3 | M1 `TestFotnotenIDemoen::test_oversikten_med_en_rad_som_mangler`, M2 `TestVurderingenPaaOversikten::test_ikke_vurdert_med_fotnoten`, M3 `TestFotnotenForInnevaerendeBoersdag::test_fredagen_i_helga[loerdag-/]`, og hver av de nye testene alene (`-k`) | `S/spec-3-4e-…` |
 | 3.5a | M1–M3 | M1 `test_skriptene_bruker_kommandoene_i_readme[start.ps1]` og `test_webserveren_binder_bare_127_0_0_1`, M2 `test_noekkelen_og_miljoeet_skrives_aldri_ut[start.sh]`, M3 `test_aldri_debug_eller_down_v[start.ps1]` | `S/spec-3-5a-…` |
 | 3.5a | vernet tilbake til «bare fra main» i begge skriptene | `test_den_ekte_versjonen_stopper_i_en_mappe_med_git[start.ps1]`, med `-x` | `S/spec-3-5a-…` |
+| 8.2a | M1–M5 | M1 `test_periodeknappene_og_velg_dag_gaar_til_kursgrafen`, M2 `test_aksjen_uten_kurser_har_en_rad_nederst_og_ingen_fotnote`, M3 `test_symbolene_over_soeylene_lenker_til_aksjesiden[/]`, M4 `test_raden_sier_hvorfor_med_samme_tall_som_aksjesiden[/]`, M5 `test_sortert_er_hele_lista_en_liste_uten_delene[synkende]` | `S/spec-8-2a-…` |
 | 9.1 | Q1–Q4 | Q1, Q3 og Q4 `test_hver_ferdige_spesifikasjon_har_en_rad`, Q2 `test_hver_test_dokumentene_nevner_finnes` | `S/spec-9-1-…` |
 | 9.7 | A1–A5 | A1 `test_ruff_check_finner_ingenting`, A2 og A3 `test_ruff_format_er_kjoert`, A4 `test_ci_kjoerer_ruff_foer_testene`, A5 `test_ingen_modul_i_src_bruker_meldinger` | `S/spec-9-7-…` |
 | 2.9b | S1–S6 | S1 `test_en_soeyle_per_aksje_med_kurs_fra_stoerst_fall`, S2 `test_antallet_telles_med_en_kortere_liste`, S3 `test_den_stiplede_linja_er_groenn_naar_indeksen_steg_og_roed_naar_den_falt`, S4 og S5 `test_ingen_aksje_med_rad_foer_dagen_navngis_uten_soeyler`, S6 `test_hoeyden_er_paa_endringen_slik_den_vises` | `S/spec-2-9b-…` |
