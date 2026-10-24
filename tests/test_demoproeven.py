@@ -170,3 +170,26 @@ def test_aksjen_uten_kurser_har_en_rad_i_min_liste(klient):
     assert f'Min liste <span class="antall">{antall + 1}</span>' in html
     assert '<a href="/aksje/MTFJ">Matfjord Merkevarer</a>' in _radene(html)[-1]
     assert "Uten data i denne kilden" not in html
+
+
+# c) Symbolene over søylene lenker til aksjesiden (U20, kl. 11:23).
+
+
+@pytest.mark.parametrize("side", ["/", "/boersometer"])
+def test_symbolene_over_soeylene_lenker_til_aksjesiden(klient, side):
+    """Ville feilet hvis symbolet over en søyle ikke var en lenke, lenket et
+    annet sted enn til aksjen sin, eller lenkene lå i en del som er skjult
+    for skjermleseren."""
+    html = _html(klient, side)
+    figur = html.split('<figure class="soeyler">', 1)[1].split("</figure>", 1)[0]
+    etiketter = figur.split('<div class="etiketter">', 1)[1].split("</div>", 1)[0]
+    lenker = re.findall(r'<a class="etikett[^"]*" href="/aksje/([A-Z0-9]+)" aria-label="([^"]+)">', etiketter)
+    symboler = re.findall(r'<span class="ticker">([A-Z0-9]+)</span>', etiketter)
+    assert len(lenker) == len(symboler) == 14
+    assert [symbol for symbol, _ in lenker] == symboler
+    for symbol, navn in lenker:
+        assert navn.endswith(f"({symbol})")
+        assert klient.get(f"/aksje/{symbol}").status_code == 200
+    foer_etikettene = figur.split('<div class="etiketter">', 1)[0]
+    assert 'aria-hidden="true"' not in foer_etikettene.split("</figcaption>", 1)[1]
+    assert '<div class="felt" aria-hidden="true">' in figur

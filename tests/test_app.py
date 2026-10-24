@@ -2976,7 +2976,8 @@ class TestSoeylenePaaForsiden:
         self._tre_aksjer()
         _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, 1005.0)]))
         figur = _soeylene(klient.get("/").data.decode("utf-8"))
-        assert '<div aria-hidden="true">' in figur
+        # Story 8.2a, c (U20): søylene er skjult, symbolene over er lenker.
+        assert '<div class="felt" aria-hidden="true">' in figur
         liste = figur.split('<ol class="skjult">', 1)[1].split("</ol>", 1)[0]
         # Gjennomgangen (BH9): lista har én linje per aksje, og overskriften og
         # indeksen står utenfor.
@@ -2995,7 +2996,8 @@ class TestSoeylenePaaForsiden:
         self._tre_aksjer()
         _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, 1005.0)]))
         figur = _soeylene(klient.get("/").data.decode("utf-8"))
-        etiketter = re.findall(r'<span class="etikett[^"]*">(.*?)<span class="ticker">', figur, re.DOTALL)
+        # Story 8.2a, c (U20): etiketten er en lenke til aksjesiden.
+        etiketter = re.findall(r'<a class="etikett[^"]*"[^>]*>(.*?)<span class="ticker">', figur, re.DOTALL)
         assert len(etiketter) == 3
         assert all(e.startswith('<svg class="bransjesymbol"') for e in etiketter)
         assert "http" not in figur

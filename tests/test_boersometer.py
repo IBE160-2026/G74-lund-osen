@@ -647,7 +647,10 @@ class TestSvaretKl0924:
         gule = [symbol for klasser, symbol in _ruter(html) if "ramme-gul" in klasser]
         assert sorted(gule) == ["BRFE", "KVST", "LKSV", "TRHF"]
         for symbol in gule:
-            rute = re.search(rf'<span class="ticker">{symbol}</span>.*?</a>', html, re.S).group(0)
+            # Story 8.2a, c: symbolene over søylene er også lenker, så ruta
+            # letes etter under søylene.
+            ruter = html.split("</figure>", 1)[-1]
+            rute = re.search(rf'<span class="ticker">{symbol}</span>.*?</a>', ruter, re.S).group(0)
             assert '<span class="merke">3 av 3 siste børsdag</span>' in rute, symbol
         assert "Gul ramme betyr 3 av 3 på siste børsdag, 09.10" in html
 

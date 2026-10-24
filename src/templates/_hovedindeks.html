@@ -36,13 +36,17 @@
           <figure class="soeyler">
             <figcaption class="soeyletittel">{% if hovedindeks.dato != dato %}Endring per aksje {{ hovedindeks.dato|dato }}{% else %}Dagens endring per aksje{% endif %}{% if sy.linje is not none %}, med indeksen som stiplet linje{% endif %}</figcaption>
             {% if sy.soeyler %}
-            <div aria-hidden="true">
+            {#- Story 8.2a, c (U20, gruppens svar 24.10 kl. 11:23): symbolet over
+                hver søyle lenker til aksjesiden, på oversikten og i
+                børsometeret. Lenkene er ikke aria-hidden, og navnet står i
+                aria-label; bare søylene er skjult for skjermleseren. #}
+            <div>
               <div class="etiketter">
                 {%- for soeyle in sy.soeyler %}
-                <span class="etikett{{ ' tre-av-tre' if soeyle.tre_av_tre }}">{{ bransjesymbol(soeyle.bransje) }}<span class="ticker">{{ soeyle.symbol }}</span></span>
+                <a class="etikett{{ ' tre-av-tre' if soeyle.tre_av_tre }}" href="/aksje/{{ soeyle.symbol }}" aria-label="{{ soeyle.navn }} ({{ soeyle.symbol }})">{{ bransjesymbol(soeyle.bransje) }}<span class="ticker">{{ soeyle.symbol }}</span></a>
                 {%- endfor %}
               </div>
-              <div class="felt">
+              <div class="felt" aria-hidden="true">
                 {%- for soeyle in sy.soeyler %}
                 <span class="spor"><span class="stolpe {{ fortegn(soeyle.endring) }}" style="{{ 'bottom' if soeyle.endring|avrundet('endring') >= 0 else 'top' }}: 50%; height: {{ '%.2f'|format(soeyle.hoeyde) }}%;"></span></span>
                 {%- endfor %}

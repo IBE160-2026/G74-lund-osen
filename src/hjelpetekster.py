@@ -195,9 +195,12 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "før, fra størst fall til venstre til størst stigning til høyre, med null "
             "midt i feltet. Den stiplede linja er indeksens endring: grønn når den "
             "steg, rød når den falt, grå ved 0,00 % og borte når indeksen ikke har en "
-            "endring. Et gult bransjesymbol betyr at aksjen fikk 3 av 3 siste børsdag.",
+            # Story 8.2a, c (U20): symbolet over søyla er en lenke.
+            "endring. Et gult bransjesymbol betyr at aksjen fikk 3 av 3 siste børsdag, "
+            "og et klikk på symbolet viser aksjen.",
             (
                 (PRD, "#### FR-105 — Søylene under hovedindeksen"),
+                (HOVEDINDEKS_MAL, '<a class="etikett'),
                 (PRD, "Indeksens endring er en stiplet linje, grønn når indeksen steg og rød når den"),
                 (HOVEDINDEKS, "def bygg_soeyler("),
                 (HOVEDINDEKS_MAL, 'class="indekslinje'),

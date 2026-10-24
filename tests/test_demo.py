@@ -790,7 +790,8 @@ class TestSoeyleneIDemoen:
             if 'class="pille tre-av-tre"' in rad:
                 i_tabellen.add(re.search(r'href="/aksje/([^"]+)"', rad).group(1))
         gule = set(
-            re.findall(r'<span class="etikett tre-av-tre">.*?<span class="ticker">([^<]+)</span>', figur, re.DOTALL)
+            # Story 8.2a, c (U20): etiketten er en lenke.
+            re.findall(r'<a class="etikett tre-av-tre"[^>]*>.*?<span class="ticker">([^<]+)</span>', figur, re.DOTALL)
         )
         assert i_tabellen and gule == i_tabellen
         # Gjennomgangen (BH2): «3 av 3» står også i lista for skjermleser.
