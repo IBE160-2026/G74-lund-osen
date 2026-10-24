@@ -2,7 +2,7 @@
 title: 'Story 3.5 (3.5a): start med dobbeltklikk med uv, uten Docker'
 type: 'feature'
 created: '2026-10-23'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'b4b6316'

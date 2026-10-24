@@ -2411,6 +2411,8 @@ reserve. Til da endres ikke «Kom i gang».
   nøkkel. Det erstatter vernet «bare fra main» (VG1 og ECH9 i triagen i
   `spec-3-5a-dobbeltklikk-med-uv.md`).
 
+*Lagt til 2026-10-24 kl. 13:06:* 3.5a, start med dobbeltklikk med uv, uten Docker, er squash-flettet i `afbc0af`, PR #92, låst til head-en `d902e22` (spesifikasjonen `spec-3-5a-dobbeltklikk-med-uv.md`). Etter svaret 23.10 kl. 23:31 stopper «Start den ekte versjonen» i en mappe med `.git`, også på main. Gruppens prøve 24.10 var «Download ZIP» av grenen og «Start demoen» på Windows. «Kom i gang» er uendret til gruppen har valgt hovedvei, og 3.5b og 3.5c står igjen.
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
