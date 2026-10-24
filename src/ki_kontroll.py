@@ -62,6 +62,12 @@ Gruppens svar 24.10 kl. 23:23, under punkt 1: dagene er lov bare med
 ordlyden prompten gir (ordlyd_for_dagene i ki_prompt.py), ordrett. Dagene i
 annen form stoppes, ogsaa med riktig antall og med ordenstall som «det
 tredje på rad». Det erstatter sjekken av antallet og «minst» fra kl. 21:49.
+(Erstattet av svaret 25.10 kl. 00:51, under.)
+
+Gruppens svar 25.10 kl. 00:51, under punkt 1: modellen faar ikke dagene og
+nevner dem ikke. Appen skriver dem under KI-teksten. Kontrollen stopper
+dagene i enhver form, ogsaa ordenstall, «for første gang», «fortsatt» og
+«nytt signal», uansett hva grunnlaget har.
 
 Kontrollen er grov: den fanger ord, ikke mening (FR-603). Teksten
 normaliseres (NFC, uten myk bindestrek og usynlige tegn) foer den leses, saa
@@ -74,7 +80,6 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 from ki_grunnlag import ANTALLENE, FALT, STEG, UENDRET
-from ki_prompt import ordlyd_for_dagene
 from signalberegning import MA_VINDU, TERSKEL, VOLATILITET_VINDU, VOLUM_VINDU
 
 ANTALL_SJEKKER = 3
@@ -351,12 +356,11 @@ _DAGENE_I_ANNEN_FORM = re.compile(
     r"|ganger|nok\s+en\s+gang|i\s+går|siden\s+"
     + _UKEDAG
     + r"|(?:flere|mange|noen|få)\s+(?:børs|handels)?dag(?:er|ene)?|handelsdag(?:en|er|ene)?"
-    r"|på\s+rad|etter\s+hverandre|i\s+trekk)(?![\w-])",
+    r"|på\s+rad|etter\s+hverandre|i\s+trekk"
+    # Svaret 25.10 kl. 00:51: dagene i enhver form, ogsaa uten tall.
+    r"|fortsatt|fremdeles|lenge|uke[nr]?|nytt?\s+signal\w*|signalet\s+(?:er|var|ble)\s+(?:helt\s+)?nytt)(?![\w-])",
     re.IGNORECASE,
 )
-# Gjennomgangen 25.10 (BH1, ECH7): ordlyden nektet, «ikke … i dag for
-# første gang», inntil tre ord foran.
-_NEKTET_FORAN = re.compile(r"(?<![\w-])(?:ikke|aldri)(?:\s+[\w-]+){0,3}\s*[«»\"']?\s*$", re.IGNORECASE)
 # Gjennomgangen 25.10 (ECH5): regelens vinduer uten ledd er vinduene bare
 # naar setningen sier det, «Vinduet er 20 dager», «snittet for 50 dager» og
 # «Femti dager er grunnlaget for trenden». «Holdt seg 20 børsdager» stoppes.
@@ -517,25 +521,17 @@ def _setningen(tekst: str, i: int) -> str:
     return next((s.group(0) for s in _SETNING.finditer(tekst) if s.start() <= i < s.end()), "")
 
 
-def _dagene(tekst: str, grunnlag: Mapping[str, object]) -> list[str]:
-    """Dagene (gruppens svar 24.10 kl. 23:23): dagene er lov bare med
-    ordlyden fra prompten, ordrett. Ordlyden tas ut av teksten, og det som da
-    staar igjen om dagene, er dagene i annen form og stoppes: et antall dager,
-    «minst» ved et ord om dagene, «på rad», og ordenstall som «det tredje på
-    rad» eller «for andre gang». Uten dagene i grunnlaget er det ingen ordlyd,
-    og alt om dagene stoppes, som foer."""
+def _dagene(tekst: str) -> list[str]:
+    """Dagene (gruppens svar 25.10 kl. 00:51): modellen faar ikke dagene og
+    nevner dem ikke, saa alt om dagene stoppes: et antall dager, «minst» ved et
+    ord om dagene, «på rad», ordenstall som «det tredje på rad» og «for første
+    gang», og ord som «fortsatt» og «nytt signal». Regelens vinduer og «en
+    dag» som vanlig ord står som før."""
     grunner: list[str] = []
     lest: list[tuple[int, int]] = []
-    ordlyd = ordlyd_for_dagene(grunnlag)
-    om = f"ordlyden er «{ordlyd}»" if ordlyd else "grunnlaget sier ingenting om dagene"
+    om = "modellen nevner ikke dagene"
     # Gjennomgangen (ECH): «i  dag» med to mellomrom er fortsatt «i dag».
     tekst = re.sub(r"[ \t]+", " ", tekst)
-    if ordlyd:
-        moenster = re.compile(r"(?<![\w-])" + re.escape(ordlyd).replace(r"\ ", r"\s+") + r"(?![\w-])", re.IGNORECASE)
-        for treff in moenster.finditer(tekst):
-            if _NEKTET_FORAN.search(tekst[: treff.start()]):
-                grunner.append(f"1: dagene nektet foran ordlyden «{treff.group(0)}», {om}")
-        tekst = moenster.sub(" ", tekst)
     for treff in _DAGER_UTSAGN.finditer(tekst):
         minst_foer, foran, minst_etter, ord_, etter = treff.groups()
         minst = minst_foer or minst_etter
@@ -550,15 +546,15 @@ def _dagene(tekst: str, grunnlag: Mapping[str, object]) -> list[str]:
             or _ETTER_SISTE.search(foer)
         ):
             continue
-        grunner.append(f"1: dagene «{treff.group(0).strip()}» i annen form, {om}")
+        grunner.append(f"1: dagene «{treff.group(0).strip()}», {om}")
         lest.append(treff.span())
     for treff in _DAGENE_I_ANNEN_FORM.finditer(tekst):
         # «i to børsdager på rad» er alt stoppet over, med «på rad».
         if not any(start <= treff.start() < slutt for start, slutt in lest):
-            grunner.append(f"1: dagene «{treff.group(0).strip()}» i annen form, {om}")
+            grunner.append(f"1: dagene «{treff.group(0).strip()}», {om}")
     for setning in _SETNING.finditer(tekst):
         if _MINST_OM_DAGENE.search(setning.group(0)):
-            grunner.append(f"1: «minst» om dagene «{setning.group(0).strip()}» utenfor ordlyden, {om}")
+            grunner.append(f"1: «minst» om dagene «{setning.group(0).strip()}», {om}")
     return grunner
 
 
@@ -715,7 +711,7 @@ def kontroller(tekst: str, grunnlag: Mapping[str, object]) -> Kontrollsvar:
         felt = {STEG: "aksjer_steg", FALT: "aksjer_falt"}.get(_bevegelsen(treff.group(2)))
         if tall is not None and (felt is None or tall != grunnlag.get(felt)):
             grunner.append(f"1: antallet «{treff.group(0)}», grunnlaget sier {grunnlag.get(felt, 'ingenting')}")
-    grunner += _dagene(tekst, grunnlag)
+    grunner += _dagene(tekst)
     grunner += _en_sjekk(tekst, grunnlag)
 
     # 2. Tallene.

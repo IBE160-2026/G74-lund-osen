@@ -26,6 +26,11 @@ bransjen. Det er fortegn og antall, regnet her av kursene og vurderingene,
 og ingen kurs, prosent eller forholdstall sendes. Retningen er fortegnet paa
 endringen slik den vises (tallformat.avrundet), som streken paa grafen og
 fargene i boersometeret, saa teksten og siden sier det samme.
+
+Fjerde forsoek (gruppens svar 25.10 kl. 00:51): modellen faar ikke dagene.
+Dagsbildet teller dem fortsatt (tell_dagene, svaret 24.10 kl. 16:15 a), men
+grunnlaget har ikke dager eller dager_merke. Appen skriver dagene selv, i en
+setning under KI-teksten paa aksjesiden.
 """
 
 from collections.abc import Mapping
@@ -46,16 +51,17 @@ SJEKKENE = ("trend", "bevegelse", "interesse")
 UTENFOR_MAALINGEN = "Utenfor målingen"
 NOEKLENE = frozenset((*SJEKKENE, "styrke", "retning"))
 
-# Story 10.2e: retningen paa hovedindeksen og bransjen, og merket paa dagene.
+# Story 10.2e: retningen paa hovedindeksen og bransjen. Merket paa dagene
+# («minst») er tatt bort med dagene (svaret 25.10 kl. 00:51).
 STEG, FALT, UENDRET = "steg", "falt", "uendret"
 BEVEGELSER = (STEG, FALT, UENDRET)
-MINST = "minst"
-# Feltene med dagen. dager_merke, hovedindeksen og bransjen kan mangle.
-DAGNOEKLENE = frozenset(("dager", "aksjer_steg", "aksjer_falt"))
-VALGFRIE = frozenset(("merke", "dager_merke", "hovedindeksen", "bransjen"))
+# Feltene med dagen. hovedindeksen og bransjen kan mangle. Svaret 25.10 kl.
+# 00:51: dagene er ikke med, og et grunnlag med dager eller dager_merke avvises.
+DAGNOEKLENE = frozenset(("aksjer_steg", "aksjer_falt"))
+VALGFRIE = frozenset(("merke", "hovedindeksen", "bransjen"))
 # Antallene i grunnlaget. Kontrollen i FR-603 godtar bare disse og regelens
 # faste tall (punkt 2). Fortegnene er ikke antall.
-ANTALLENE = ("styrke", "dager", "aksjer_steg", "aksjer_falt")
+ANTALLENE = ("styrke", "aksjer_steg", "aksjer_falt")
 
 
 @dataclass(frozen=True)
@@ -176,9 +182,6 @@ def ki_grunnlag(
     if utenfor_maalingen:
         grunnlag["merke"] = UTENFOR_MAALINGEN
     if dagen is not None:
-        grunnlag["dager"] = dagen.dager
-        if dagen.dager_minst:
-            grunnlag["dager_merke"] = MINST
         if dagen.hovedindeksen is not None:
             grunnlag["hovedindeksen"] = dagen.hovedindeksen
         grunnlag["aksjer_steg"] = dagen.aksjer_steg
@@ -197,7 +200,7 @@ def _kontroller(grunnlag: dict[str, object]) -> None:
     if noekler not in (NOEKLENE, NOEKLENE | DAGNOEKLENE):
         raise ValueError("grunnlaget har andre noekler enn fortegnene, styrken, retningen og dagen")
     if noekler == NOEKLENE and set(grunnlag) & (VALGFRIE - {"merke"}):
-        raise ValueError("dager_merke, hovedindeksen og bransjen kommer bare med dagen")
+        raise ValueError("hovedindeksen og bransjen kommer bare med dagen")
     if grunnlag.get("merke", UTENFOR_MAALINGEN) != UTENFOR_MAALINGEN:
         raise ValueError("merke kan bare vaere «Utenfor målingen»")
     for navn in SJEKKENE:
@@ -207,14 +210,10 @@ def _kontroller(grunnlag: dict[str, object]) -> None:
         raise ValueError(f"styrke maa vaere et heltall fra 0 til 3, fikk {type(grunnlag['styrke']).__name__}")
     if type(grunnlag["retning"]) is not str or grunnlag["retning"] not in RETNINGER:
         raise ValueError(f"retning maa vaere en av {RETNINGER}")
-    if "dager" in grunnlag:
-        if not _heltall(grunnlag["dager"]) or grunnlag["dager"] < 1:
-            raise ValueError(f"dager maa vaere et heltall fra 1, fikk {type(grunnlag['dager']).__name__}")
+    if "aksjer_steg" in grunnlag:
         for navn in ("aksjer_steg", "aksjer_falt"):
             if not _heltall(grunnlag[navn]) or grunnlag[navn] < 0:
                 raise ValueError(f"{navn} maa vaere et heltall fra 0, fikk {type(grunnlag[navn]).__name__}")
-    if grunnlag.get("dager_merke", MINST) != MINST:
-        raise ValueError("dager_merke kan bare vaere «minst»")
     for navn in ("hovedindeksen", "bransjen"):
         if navn in grunnlag and (type(grunnlag[navn]) is not str or grunnlag[navn] not in BEVEGELSER):
             raise ValueError(f"{navn} maa vaere en av {BEVEGELSER}")

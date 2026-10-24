@@ -8,7 +8,6 @@ import pytest
 
 from ki_grunnlag import (
     FALT,
-    MINST,
     RETNINGER,
     SJEKKENE,
     STEG,
@@ -451,8 +450,6 @@ class TestGrunnlagetMedDagen:
             "interesse": 0,
             "styrke": 2,
             "retning": "Positiv",
-            "dager": 4,
-            "dager_merke": MINST,
             "hovedindeksen": STEG,
             "aksjer_steg": 9,
             "aksjer_falt": 5,
@@ -466,17 +463,19 @@ class TestGrunnlagetMedDagen:
         for verdi in _alle_tall(grunnlag):
             assert type(verdi) in (int, str), verdi
 
-    def test_uten_merket_naar_antallet_er_kjent(self):
-        bildet = Dagsbilde(dager=1, dager_minst=False, hovedindeksen=None, aksjer_steg=0, aksjer_falt=0, bransjen=None)
-        grunnlag = ki_grunnlag(_v("Ingen", 0), utenfor_maalingen=False, dagen=bildet)
-        assert set(grunnlag) == NOEKLENE | {"dager", "aksjer_steg", "aksjer_falt"}
+    def test_dagene_sendes_ikke(self):
+        """Gruppens svar 25.10 kl. 00:51: modellen faar ikke dagene, med eller
+        uten merket. Ville feilet hvis dager eller dager_merke kom med."""
+        for minst in (False, True):
+            bildet = Dagsbilde(
+                dager=1, dager_minst=minst, hovedindeksen=None, aksjer_steg=0, aksjer_falt=0, bransjen=None
+            )
+            grunnlag = ki_grunnlag(_v("Ingen", 0), utenfor_maalingen=False, dagen=bildet)
+            assert set(grunnlag) == NOEKLENE | {"aksjer_steg", "aksjer_falt"}
 
     @pytest.mark.parametrize(
         "felt, verdi",
         [
-            ("dager", 0),
-            ("dager", True),
-            ("dager", 2.0),
             ("aksjer_steg", -1),
             ("aksjer_falt", True),
             ("hovedindeksen", "opp"),

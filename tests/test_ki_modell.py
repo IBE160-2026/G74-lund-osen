@@ -15,7 +15,7 @@ import pytest
 
 from ki_kontroll import AARSAKER, GJETNING, RAAD, kontroller
 from ki_modell import Modell, ModellFeilet, Modellsvar, lag_ki_rad
-from ki_prompt import ORDLYDEN, PROMPTVERSJON, REGLER, UTENFOR, lag_prompt, ordlyd_for_dagene
+from ki_prompt import PROMPTVERSJON, REGLER, UTENFOR, lag_prompt
 from kilogg import Emne
 
 EMNE = Emne.aksje("EQNR", date(2026, 10, 15))
@@ -42,14 +42,17 @@ AVTRYKK = {
     # satt paa nytt med ORDLYDEN. Teksten fra kl. 21:49 staar paa 3252ecd.
     # Gjennomgangen 25.10 (VG2): avtrykket dekker ogsaa ordlyd_for_dagene og
     # lag_prompt (_promptteksten). Var c777d549....
-    "3": "bc9abc8cf55198934eead877a130b958ae50b8ee831bb880ff1ffb86de740959",
+    # Gruppens svar 25.10 kl. 00:51: dagene og ordlyden er tatt ut, og avtrykket
+    # dekker reglene, merket og lag_prompt. Var bc9abc8c....
+    "3": "7654300322c8ffb013107067a66ad15ab275e2d12131ffdea54146357ff62b70",
 }
 
 
 def _promptteksten() -> str:
-    """Det avtrykket for versjon 3 dekker: reglene, merket, ordlyden og koden
-    i ordlyd_for_dagene og lag_prompt (inspect leser kildeteksten med LF)."""
-    return REGLER + UTENFOR + "".join(ORDLYDEN) + inspect.getsource(ordlyd_for_dagene) + inspect.getsource(lag_prompt)
+    """Det avtrykket for versjon 3 dekker: reglene, merket og koden i
+    lag_prompt (inspect leser kildeteksten med LF). Svaret 25.10 kl. 00:51:
+    ordlyden for dagene er tatt ut av prompten, og dermed av avtrykket."""
+    return REGLER + UTENFOR + inspect.getsource(lag_prompt)
 
 
 class FalskModell:
@@ -159,9 +162,10 @@ class TestPrompten:
         forklaringen = REGLER.split("Regler for teksten:")[0]
         for felt in grunnlag:
             if felt != "merke":
-                assert felt in forklaringen, felt
-        # Gruppens svar 24.10 kl. 23:23: «minst» staar bare i ordlyden.
-        assert "Ordlyden for dagene: i minst 3 børsdager\n" in lag_prompt(grunnlag)
+                # «Styrken er …»: uten aa skille store og smaa bokstaver.
+                assert felt in forklaringen.lower(), felt
+        # Gruppens svar 25.10 kl. 00:51: dagene er ikke i grunnlaget.
+        assert "dager" not in grunnlag and "dager_merke" not in grunnlag
         assert UTENFOR in lag_prompt(grunnlag)
 
     def test_teksten_kan_vise_til_tallene_paa_siden(self):
@@ -182,15 +186,14 @@ class TestPrompten:
         assert any("Beskriv hver sjekk slik fortegnet står" in linje for linje in blokk)
         assert "for eksempel at ingen sjekk ga utslag" not in REGLER
 
-    def test_dagene_bare_med_ordlyden(self):
-        """Gruppens svar 24.10 kl. 23:23 (malinger.md §44): tre tekster sa
-        «minst» uten merket og én «det tredje på rad». Erstatter testen fra
-        kl. 21:49 om «minst» med merket. Ville feilet hvis reglene ikke ba om
-        ordlyden, ordrett, eller hvis «minst» sto i reglene."""
-        linje = next(linje for linje in REGLER.splitlines() if linje.startswith("- dager:"))
-        assert "bare med ordlyden for dagene" in linje and "ordrett" in linje
-        assert "aldri dagene med egne ord" in linje
+    def test_dagene_er_ikke_i_reglene(self):
+        """Gruppens svar 25.10 kl. 00:51 (malinger.md §45): modellen faar ikke
+        dagene. Erstatter testene fra 21:49 og 23:23 om «minst» og ordlyden.
+        Ville feilet hvis reglene forklarte dagene, hadde «minst», eller ikke
+        sa at teksten ikke nevner hvor lenge signalet har vart."""
+        assert not any(linje.startswith(("- dager", "- dager_merke")) for linje in REGLER.splitlines())
         assert "minst" not in (REGLER + UTENFOR).lower()
+        assert "Ikke si hvor lenge signalet har vart, om det er nytt, eller om det er første gang." in REGLER
 
     def test_ingen_raad_og_ingen_gjetning(self):
         prompt = lag_prompt(BLANDET)
@@ -783,7 +786,8 @@ class TestKontrollenVersjon3:
     @pytest.mark.parametrize(
         "tekst",
         [
-            "Signalet har vært slik i minst 4 børsdager.",
+            # «i minst 4 børsdager» stoppes fra svaret 25.10 kl. 00:51
+            # (TestDageneStoppes).
             "Ni aksjer i lista steg, og fem falt.",
             "9 av aksjene steg.",
             "Hovedindeksen falt i dag, mens bransjen steg i snitt.",
@@ -1011,8 +1015,9 @@ class TestEnSjekk:
 
 
 class TestMinst:
-    """Gruppens svar 24.10 kl. 21:49, punkt b: «minst» om dagene er lov bare
-    med merket, og et eksakt antall dager med merket stoppes."""
+    """Gruppens svar 24.10 kl. 21:49, punkt b, og 25.10 kl. 00:51: modellen
+    nevner ikke dagene, saa «minst» om dagene og ethvert antall dager stoppes,
+    med og uten merket. Testene fra 21:49 og 23:23 som godtok dagene, er snudd."""
 
     @pytest.mark.parametrize(
         "tekst",
@@ -1022,69 +1027,49 @@ class TestMinst:
             "Det har vært minst to børsdager med samme retning og styrke.",
             "Signalet har hatt samme retning og styrke i minst to børsdager på rad.",
             "Det har vært to bølger av samme retning og styrke, fordi feltet dager er minst.",
+            # Ordlyden fra 23:23 med merket, som bestod da.
+            "Signalet har hatt samme retning og styrke i minst 4 børsdager.",
         ],
     )
-    def test_minst_uten_merket_stoppes(self, tekst):
-        """Ville feilet hvis «minst» om dagene slapp gjennom uten merket, slik
-        seks tekster i §43 gjorde."""
+    def test_minst_om_dagene_stoppes(self, tekst):
+        """Ville feilet hvis «minst» om dagene slapp gjennom, slik seks
+        tekster i §43 gjorde."""
         svar = kontroller(tekst, BARE_TRENDEN)
         assert not svar.besto and any(g.startswith("1: «minst»") for g in svar.grunner), svar.grunner
 
     @pytest.mark.parametrize(
         "tekst",
         [
-            # Gruppens svar 24.10 kl. 23:23: ordlyden er «i 2 børsdager på rad».
-            "Signalet har hatt samme retning og styrke i 2 børsdager på rad.",
-            "Minst én sjekk ga utslag. Signalet har vært slik i 2 børsdager på rad.",
+            "Minst én sjekk ga utslag.",
             "Det ble handlet mye på en dag kursen steg, og i dag er signalet det samme.",
         ],
     )
-    def test_eksakt_uten_merket_bestaar(self, tekst):
-        """Ville feilet hvis kontrollen stoppet ordlyden uten merket, «minst»
-        i en annen setning, eller «en dag» som vanlig ord."""
+    def test_minst_om_sjekkene_og_en_dag_som_vanlig_ord_bestaar(self, tekst):
+        """Ville feilet hvis «minst» om sjekkene eller «en dag» som vanlig ord
+        ble stoppet."""
         svar = kontroller(tekst, BARE_TRENDEN)
         assert svar.besto, svar.grunner
 
     @pytest.mark.parametrize(
         "tekst",
         [
-            # Bestod foer svaret 24.10 kl. 23:23: riktig antall, med egne ord.
+            # Ordlyden fra 23:23, som bestod da.
+            "Signalet har hatt samme retning og styrke i 2 børsdager på rad.",
+            "Minst én sjekk ga utslag. Signalet har vært slik i 2 børsdager på rad.",
+            # Riktig antall med egne ord, som bestod foer 23:23.
             "Signalet har hatt samme retning og styrke i to børsdager.",
             "Signalet har hatt samme retning og styrke i to børsdager på rad.",
-            "Minst én sjekk ga utslag. Signalet har vært slik i to børsdager.",
-        ],
-    )
-    def test_riktig_antall_med_egne_ord_stoppes(self, tekst):
-        """Gruppens svar 24.10 kl. 23:23: dagene aldri med egne ord. Ville
-        feilet hvis et riktig antall dager i annen form enn ordlyden besto."""
-        svar = kontroller(tekst, BARE_TRENDEN)
-        assert not svar.besto and any("i annen form" in g for g in svar.grunner), svar.grunner
-
-    @pytest.mark.parametrize(
-        "tekst",
-        [
             "Signalet har hatt samme retning og styrke i fire børsdager.",
             "Signalet har vært slik i 4 børsdager på rad.",
             "Det har vært fire børsdager med samme retning og styrke.",
         ],
     )
-    def test_eksakt_med_merket_stoppes(self, tekst):
-        """Grunnlaget sier minst 4. Ville feilet hvis et eksakt antall dager
-        slapp gjennom med merket."""
-        svar = kontroller(tekst, DAGEN)
-        assert not svar.besto and any("i annen form" in g for g in svar.grunner), svar.grunner
-
-    def test_minst_med_merket_bestaar(self):
-        """Ville feilet hvis ordlyden med «minst» ble stoppet med merket.
-        Gruppens svar 24.10 kl. 23:23: ordlyden er «i minst 4 børsdager»."""
-        svar = kontroller("Signalet har hatt samme retning og styrke i minst 4 børsdager.", DAGEN)
-        assert svar.besto, svar.grunner
-
-    def test_minst_med_merket_og_egne_ord_stoppes(self):
-        """Bestod foer svaret 24.10 kl. 23:23. Ville feilet hvis «minst fire»
-        med ord, ikke ordlyden, besto med merket."""
-        svar = kontroller("Signalet har hatt samme retning og styrke i minst fire børsdager.", DAGEN)
-        assert not svar.besto and any("i annen form" in g for g in svar.grunner), svar.grunner
+    def test_ethvert_antall_dager_stoppes(self, tekst):
+        """Gruppens svar 25.10 kl. 00:51. Ville feilet hvis et antall dager,
+        ogsaa det riktige eller ordlyden fra 23:23, slapp gjennom."""
+        for grunnlag in (BARE_TRENDEN, DAGEN, EN_POSITIV):
+            svar = kontroller(tekst, grunnlag)
+            assert not svar.besto and any(g.startswith("1: dagene") for g in svar.grunner), svar.grunner
 
 
 class TestGjennomgangenAvRettingen:
@@ -1147,8 +1132,8 @@ class TestGjennomgangenAvRettingen:
     @pytest.mark.parametrize(
         "tekst",
         [
-            # Gruppens svar 24.10 kl. 23:23: med ordlyden, ikke «i to børsdager».
-            "Minst én sjekk ga utslag, og signalet har vært slik i 2 børsdager på rad.",
+            # Gruppens svar 25.10 kl. 00:51: uten dagene.
+            "Minst én sjekk ga utslag, og signalet er positivt.",
             "Minst én sjekk ga utslag sammenlignet med de siste 20 dagene.",
             "Minst én sjekk ga utslag i  dag.",
             "Snittet for de siste 50 børsdager.",
@@ -1190,218 +1175,151 @@ class TestGjennomgangenAvRettingen:
         """BH7, VG1: grunnlaget sier minst 4. Ville feilet hvis et eksakt
         antall dager uten «i» slapp gjennom med merket."""
         svar = kontroller(tekst, DAGEN)
-        assert not svar.besto and any("i annen form" in g for g in svar.grunner), svar.grunner
+        assert not svar.besto and any(g.startswith("1: dagene") for g in svar.grunner), svar.grunner
 
     def test_minst_foer_i_med_merket_stoppes(self):
-        """BH8: bestod etter rettingen kl. 21:49. Gruppens svar 24.10 kl.
-        23:23: «minst i fire børsdager» er ikke ordlyden «i minst 4
-        børsdager». Ville feilet hvis den besto."""
+        """BH8: bestod etter rettingen kl. 21:49. Gruppens svar 25.10 kl.
+        00:51: dagene stoppes i enhver form. Ville feilet hvis den besto."""
         svar = kontroller("Signalet har vært slik minst i fire børsdager.", DAGEN)
-        assert not svar.besto and any("i annen form" in g for g in svar.grunner), svar.grunner
+        assert not svar.besto and any(g.startswith("1: dagene") for g in svar.grunner), svar.grunner
 
 
-# Gruppens svar 24.10 kl. 23:23 (malinger.md §44): grunnlaget for EQNR, AKRBP
-# og FRO 23.10, der trenden og bevegelsen ga utslag, og for VAR, der alle tre
-# ga det. Alle fire hadde 1 dag uten merket. Antallene er vaare egne (regel 16).
-TO_POSITIVE_EN_DAG = {**TREND_OG_BEVEGELSE, "retning": "Positiv"}
-TRE_POSITIVE_EN_DAG = {**TRE_POSITIVE, "dager": 1}
+# Grunnlaget for EQNR, AKRBP og FRO 23.10 i §44 og §45, der trenden og
+# bevegelsen ga utslag, og for VAR og TEL. Svaret 25.10 kl. 00:51: grunnlaget
+# har ikke dagene. Antallene er vaare egne (regel 16).
+TO_POSITIVE = {k: v for k, v in TREND_OG_BEVEGELSE.items() if k != "dager"} | {"retning": "Positiv"}
+TRE_POSITIVE_DAGEN = {**TRE_POSITIVE, "hovedindeksen": "steg", "aksjer_steg": 8, "aksjer_falt": 7}
+INGEN_DAGEN = {**INGEN, "hovedindeksen": "steg", "aksjer_steg": 8, "aksjer_falt": 7}
+DAGEN_UTEN_DAGENE = {k: v for k, v in DAGEN.items() if k not in ("dager", "dager_merke")}
+# Aksjen paa bildet av aksjesiden i README-en (tests/test_docker.py).
+BILDEAKSJEN = "BRFE"
 
 
-class TestOrdlyden:
-    """Gruppens svar 24.10 kl. 23:23: modellen faar ferdig ordlyd for dagene
-    og skriver dem aldri med egne ord. Kontrollen stopper dagene i annen form."""
+class TestDageneStoppes:
+    """Gruppens svar 25.10 kl. 00:51: modellen faar ikke dagene og nevner dem
+    ikke. Kontrollen stopper dagene i enhver form."""
 
-    @pytest.mark.parametrize(
-        "dager, merke, ordlyd",
-        [
-            (1, None, "i dag for første gang"),
-            (4, None, "i 4 børsdager på rad"),
-            (12, "minst", "i minst 12 børsdager"),
-            (1, "minst", "i minst 1 børsdag"),
-        ],
-    )
-    def test_ordlyden_lages_av_dagene_og_merket(self, dager, merke, ordlyd):
-        """Ville feilet hvis ordlyden ikke fulgte dagene og merket, eller ikke
-        sto i prompten etter opplysningene."""
-        grunnlag = {**BLANDET, "dager": dager, **({"dager_merke": merke} if merke else {})}
-        assert ordlyd_for_dagene(grunnlag) == ordlyd
-        prompt = lag_prompt(grunnlag)
-        opplysningene, linja = prompt.split("Opplysningene:\n", 1)[1].split("\n", 1)
-        assert json.loads(opplysningene) == grunnlag
-        assert linja == f"Ordlyden for dagene: {ordlyd}\n"
+    def test_tekstene_fra_45_stoppes(self):
+        """VAR og TEL i §45, med «det første signalet» og ordlyden fra 23:23.
+        Ville feilet hvis en av dem slapp gjennom."""
+        var = (
+            "Signalet er Positivt fordi trenden ga et positivt utslag, bevegelsen ga et positivt utslag, og "
+            "interessen ga et positivt utslag. Dette er det første signalet med denne retningen og styrken, "
+            'som er "i dag for første gang".'
+        )
+        tel = (
+            "Signalet er Ingen fordi trenden ga ikke utslag, bevegelsen ga ikke utslag, og interessen ga ikke "
+            "utslag. Dette er det første signalet i dag for første gang."
+        )
+        for tekst, grunnlag in ((var, TRE_POSITIVE_DAGEN), (tel, INGEN_DAGEN)):
+            svar = kontroller(tekst, grunnlag)
+            assert not svar.besto and all(g.startswith("1: dagene") for g in svar.grunner), svar.grunner
 
-    def test_ingen_ordlyd_uten_dagene(self):
-        """Grunnlaget fra versjon 2 har ikke dagene. Ville feilet hvis
-        prompten fikk en ordlyd for dager grunnlaget ikke har."""
-        assert ordlyd_for_dagene(BLANDET) is None
-        assert "Ordlyden for dagene:" not in lag_prompt(BLANDET)
-
-    def test_minst_staar_ikke_i_prompten_uten_merket(self):
-        """BH13 i gjennomgangen av rettingen: prompten nevnte «minst» ogsaa
-        uten merket, og 3 av 4 stopp i §44 var «minst». Ville feilet hvis
-        «minst» sto i prompten for et grunnlag uten merket."""
-        for dager in (1, 2, 12):
-            assert "minst" not in lag_prompt({**BARE_TRENDEN, "dager": dager}).lower()
-
-    @pytest.mark.parametrize(
-        "tekst, grunnlag",
-        [
-            ("Signalet har i dag for første gang denne retningen og styrken.", TO_POSITIVE_EN_DAG),
-            ("I dag for første gang har signalet denne retningen og styrken.", TO_POSITIVE_EN_DAG),
-            ("Signalet har hatt samme retning og styrke i 2 børsdager på rad.", BARE_TRENDEN),
-            ("Signalet har hatt samme retning og styrke i minst 4 børsdager.", DAGEN),
-            ("Hovedindeksen falt i dag, og den andre sjekken ga ikke utslag.", DAGEN),
-        ],
-    )
-    def test_ordlyden_bestaar(self, tekst, grunnlag):
-        """Ville feilet hvis ordlyden ordrett, ogsaa med stor forbokstav
-        foerst i setningen, eller «i dag» og «andre» som vanlige ord, ble
-        stoppet."""
-        svar = kontroller(tekst, grunnlag)
-        assert svar.besto, svar.grunner
-
-    def test_minst_en_boersdag_fra_44_stoppes(self):
-        """EQNR, AKRBP og FRO i §44 hadde samme setning og samme grunnlag:
-        «i minst én børsdag» uten merket. Én test, ikke tre (gjennomgangen
-        25.10, BH8, VG5). Ville feilet hvis formen slapp gjennom."""
-        tekst = "Dette signalet har hatt samme retning og styrke i minst én børsdag."
-        svar = kontroller(tekst, TO_POSITIVE_EN_DAG)
+    def test_formene_fra_44_stoppes(self):
+        """EQNR, AKRBP og FRO («i minst én børsdag») og VAR («det tredje på
+        rad») i §44. Ville feilet hvis en av formene slapp gjennom som dagene."""
+        svar = kontroller("Dette signalet har hatt samme retning og styrke i minst én børsdag.", TO_POSITIVE)
         assert not svar.besto and any(g.startswith("1: «minst» om dagene") for g in svar.grunner), svar.grunner
-
-    def test_det_tredje_paa_rad_fra_44_stoppes_som_dagene(self):
-        """VAR i §44: «det tredje på rad» med 1 dag. Foer ble den bare
-        stoppet av punkt 2 («tredje»). Ville feilet hvis ordenstallet ikke
-        ogsaa ble stoppet som dagene i annen form."""
-        tekst = "Dette er det tredje på rad at signalet har hatt samme retning og styrke."
-        svar = kontroller(tekst, TRE_POSITIVE_EN_DAG)
+        svar = kontroller("Dette er det tredje på rad at signalet har hatt samme retning og styrke.", TRE_POSITIVE)
         assert not svar.besto and any(g.startswith("1: dagene «tredje på rad»") for g in svar.grunner), svar.grunner
 
     @pytest.mark.parametrize(
-        "tekst, grunnlag",
-        [
-            ("Signalet har denne retningen for første gang.", TO_POSITIVE_EN_DAG),
-            ("Signalet har denne retningen for andre gang.", TO_POSITIVE_EN_DAG),
-            ("Dette er det andre på rad.", TO_POSITIVE_EN_DAG),
-            ("Signalet har vært slik i 1 børsdag.", TO_POSITIVE_EN_DAG),
-            ("Signalet har vært slik i fire børsdager på rad.", {**DAGEN, "dager_merke": None}),
-            ("Signalet har vært slik i 4 børsdager.", {**DAGEN, "dager_merke": None}),
-            ("Signalet har vært slik 4 børsdager på rad.", {**DAGEN, "dager_merke": None}),
-            ("Signalet har vært slik i 4 dager på rad.", {**DAGEN, "dager_merke": None}),
-            ("Det er den fjerde børsdagen på rad.", {**DAGEN, "dager_merke": None}),
-            ("Signalet er i dag for første gang slik.", {**DAGEN, "dager_merke": None}),
-            ("Signalet har vært det samme flere dager på rad.", {**DAGEN, "dager_merke": None}),
-            ("Signalet har vært det samme dager i trekk.", {**DAGEN, "dager_merke": None}),
-            ("Signalet har vært slik i 4 børsdager på rad.", DAGEN),
-            ("Signalet har vært slik i 2 børsdager på rad.", BLANDET),
-            # Gjennomgangen 25.10 (BH12, VG3, ECH5, BH2, ECH6, BH1, ECH7).
-            ("Signalet har vært slik i minst fire børsdager på rad.", DAGEN),
-            ("Signalet har vært slik dager etter hverandre.", {**DAGEN, "dager_merke": None}),
-            ("Det er den femte børsdagen.", {**DAGEN, "dager_merke": None}),
-            ("Det er den 4. dagen.", {**DAGEN, "dager_merke": None}),
-            ("Signalet har holdt seg 20 børsdager.", {**DAGEN, "dager_merke": None}),
-            ("Signalet har vart 50 dager.", {**DAGEN, "dager_merke": None}),
-            ("Signalet har vært slik flere ganger.", {**DAGEN, "dager_merke": None}),
-            ("Nok en gang er signalet slik.", {**DAGEN, "dager_merke": None}),
-            ("Signalet er det samme som i går.", {**DAGEN, "dager_merke": None}),
-            ("Signalet har vært slik siden mandag.", {**DAGEN, "dager_merke": None}),
-            ("Signalet har vært slik i flere dager.", {**DAGEN, "dager_merke": None}),
-            ("Signalet har vært slik i 4 handelsdager.", {**DAGEN, "dager_merke": None}),
-            ("Signalet er det første med denne retningen.", TO_POSITIVE_EN_DAG),
-            ("Signalet har ikke vært slik i dag for første gang.", TO_POSITIVE_EN_DAG),
-            ("Det har ikke holdt i 4 børsdager på rad.", {**DAGEN, "dager_merke": None}),
-        ],
-    )
-    def test_dagene_i_annen_form_stoppes(self, tekst, grunnlag):
-        """Ville feilet hvis dagene slapp gjennom i annen form enn ordlyden:
-        ordenstall, tall med ord, uten «i» eller «på rad», «dager» for
-        «børsdager», ordlyden for et annet antall, eller dager grunnlaget
-        ikke har."""
-        svar = kontroller(tekst, grunnlag)
-        assert not svar.besto and any(g.startswith(("1: dagene", "1: «minst»")) for g in svar.grunner), svar.grunner
-
-    @pytest.mark.parametrize(
         "tekst",
         [
-            # Formene fra demotekstene 25.10 for NLYS, SLVP og KVST, med 1 dag.
-            "Dette er det første signalet i dag for første gang.",
-            "Dette er det første signalet med denne retningen og styrken i dag for første gang.",
-            "Dette er det første signalet med denne retningen og styrken, som vist i «i dag for første gang».",
+            # Ordlyden fra 23:23, i alle fire former, og i anfoerselstegn.
+            "Signalet har i dag for første gang denne retningen og styrken.",
+            "I dag for første gang har signalet denne retningen og styrken.",
+            "Signalet har hatt samme retning og styrke i 2 børsdager på rad.",
+            "Signalet har hatt samme retning og styrke i minst 4 børsdager.",
+            "Signalet har hatt samme retning og styrke i minst 1 børsdag.",
+            'Signalet har hatt samme retning og styrke i "i dag for første gang".',
+            # Ordenstall og «for første gang».
+            "Signalet har denne retningen for første gang.",
+            "Signalet har denne retningen for andre gang.",
+            "Dette er det andre på rad.",
+            "Det er den femte børsdagen.",
+            "Det er den 4. dagen.",
+            "Dette er det første signalet med denne retningen.",
+            "Signalet er det første med denne retningen.",
             "Det er det tredje positive signalet.",
+            # Antall, med og uten «i» eller «på rad».
+            "Signalet har vært slik i 1 børsdag.",
+            "Signalet har vært slik i fire børsdager på rad.",
+            "Signalet har vært slik 4 børsdager på rad.",
+            "Signalet har vært slik i 4 dager på rad.",
+            "Signalet har holdt seg 20 børsdager.",
+            "Signalet har vart 50 dager.",
+            "Signalet har vært slik i 4 handelsdager.",
+            # Uten tall.
+            "Signalet har vært det samme flere dager på rad.",
+            "Signalet har vært det samme dager i trekk.",
+            "Signalet har vært slik dager etter hverandre.",
+            "Signalet har vært slik flere ganger.",
+            "Nok en gang er signalet slik.",
+            "Signalet er det samme som i går.",
+            "Signalet har vært slik siden mandag.",
+            "Signalet har vært slik i flere dager.",
+            "Signalet er fortsatt positivt.",
+            "Signalet har vært slik lenge.",
+            "Signalet har vært slik i to uker.",
+            "Dette er et nytt signal.",
+            "Signalet er nytt.",
         ],
     )
-    def test_ordenstall_ved_signalet_stoppes(self, tekst):
-        """Ville feilet hvis «det første signalet med denne retningen», dagene
-        med egne ord, slapp gjennom ved siden av ordlyden."""
-        svar = kontroller(tekst, TRE_POSITIVE_EN_DAG)
-        assert not svar.besto and any(g.startswith("1: dagene") for g in svar.grunner), svar.grunner
-
-    @pytest.mark.parametrize(
-        "tekst",
-        [
-            "Signalet har hatt samme retning og styrke i «i dag for første gang».",
-            "Den andre sjekken ga ikke utslag.",
-            "Bevegelsen og de andre sjekkene ga et positivt utslag.",
-        ],
-    )
-    def test_ordlyden_i_anfoerselstegn_og_andre_som_vanlig_ord_bestaar(self, tekst):
-        """Demotekstene 25.10 hadde ordlyden i anfoerselstegn. Ville feilet
-        hvis den, eller «andre» som vanlig ord, ble stoppet."""
-        svar = kontroller(tekst, TRE_POSITIVE_EN_DAG)
-        assert svar.besto, svar.grunner
-
-
-class TestGjennomgangen25_10:
-    """Gjennomgangen 25.10 av ordlyden for dagene (BH, ECH, VG)."""
+    def test_dagene_i_enhver_form_stoppes(self, tekst):
+        """Ville feilet hvis dagene slapp gjennom i en av formene, med eller
+        uten tall, ogsaa ordlyden fra 23:23."""
+        for grunnlag in (TO_POSITIVE, DAGEN, BLANDET):
+            svar = kontroller(tekst, grunnlag)
+            assert not svar.besto and any(g.startswith(("1: dagene", "1: «minst»")) for g in svar.grunner), (
+                grunnlag,
+                svar.grunner,
+            )
 
     @pytest.mark.parametrize(
         "tekst, grunnlag",
         [
-            # ECH1, BH3: «andre … i dag» er ikke dagene.
-            ("Trenden og de andre sjekkene i dag ga dette.", DAGEN),
-            ("De andre aksjene i dag steg.", DAGEN),
-            ("Snittet for de andre dagene.", DAGEN),
+            # Gjennomgangen 25.10 (ECH1, BH3): «andre … i dag» er ikke dagene.
+            ("Trenden og de andre sjekkene i dag ga dette.", DAGEN_UTEN_DAGENE),
+            ("De andre aksjene i dag steg.", DAGEN_UTEN_DAGENE),
+            ("Snittet for de andre dagene.", DAGEN_UTEN_DAGENE),
             # ECH2, VG4: «andre» og «annen» som «other».
-            ("Andre dager kan bli annerledes.", DAGEN),
-            ("Det ble handlet mye på en annen dag enn i dag.", DAGEN),
-            ("Ingen andre signaler er med.", DAGEN),
+            ("Andre dager kan bli annerledes.", DAGEN_UTEN_DAGENE),
+            ("Det ble handlet mye på en annen dag enn i dag.", DAGEN_UTEN_DAGENE),
+            ("Ingen andre signaler er med.", DAGEN_UTEN_DAGENE),
+            ("Den andre sjekken ga ikke utslag.", TRE_POSITIVE),
+            ("Bevegelsen og de andre sjekkene ga et positivt utslag.", TRE_POSITIVE),
             # ECH3: et tall som slutter en setning, foran «Dagen».
-            ("Signalet har styrke 2. Dagen var rolig for hovedindeksen, som falt.", DAGEN),
-            # ECH5: regelens vinduer med ordet foran.
-            ("Vinduet er 20 dager.", DAGEN),
-            ("Snittet for 50 dager.", DAGEN),
-            # BH1: «ikke» om noe annet foer ordlyden.
-            ("Bevegelsen ga ikke utslag, og signalet er slik i minst 4 børsdager.", DAGEN),
-            # VG6: ordlyden i rette anfoerselstegn, som i demotekstene.
-            ('Signalet har hatt samme retning og styrke i "i minst 4 børsdager".', DAGEN),
-            # Grunnlaget fra versjon 2 uten dagene.
+            ("Signalet har styrke 2. Dagen var rolig for hovedindeksen, som falt.", DAGEN_UTEN_DAGENE),
+            # ECH5: regelens vinduer med ordet i setningen.
+            ("Vinduet er 20 dager.", DAGEN_UTEN_DAGENE),
+            ("Snittet for 50 dager.", DAGEN_UTEN_DAGENE),
+            ("Hovedindeksen falt i dag.", DAGEN_UTEN_DAGENE),
             ("Trenden og de andre sjekkene i dag ga dette.", BLANDET),
         ],
     )
     def test_riktige_tekster_bestaar(self, tekst, grunnlag):
-        """Ville feilet hvis en riktig tekst ble stoppet som dagene i annen
-        form."""
+        """Ville feilet hvis en riktig tekst ble stoppet som dagene."""
         svar = kontroller(tekst, grunnlag)
         assert svar.besto, svar.grunner
 
-    def test_prompten_og_kontrollen_bruker_samme_ordlyd(self, monkeypatch):
-        """VG1: ville feilet hvis kontrollen hadde sin egen kopi av ordlyden i
-        stedet for ordlyd_for_dagene fra ki_prompt."""
-        import ki_prompt
+    def test_prompten_har_ikke_dagene(self):
+        """Ville feilet hvis prompten forklarte dagene, hadde ordlyden fra
+        23:23 eller «minst», eller ikke sa at teksten ikke nevner dagene."""
+        for grunnlag in (BLANDET, DAGEN_UTEN_DAGENE):
+            prompt = lag_prompt(grunnlag)
+            assert "Ordlyden for dagene" not in prompt and "minst" not in prompt.lower()
+            assert "- dager" not in prompt and '"dager' not in prompt
+        blokk = REGLER.split("Regler for teksten:", 1)[1].split("\n\n", 1)[0].splitlines()
+        assert any(linje.startswith("- Ikke si hvor lenge signalet har vart") for linje in blokk)
 
-        monkeypatch.setattr(ki_prompt, "DAGENE_FOERSTE", "for aller første gang i dag")
-        grunnlag = {**TO_POSITIVE_EN_DAG}
-        assert "Ordlyden for dagene: for aller første gang i dag\n" in lag_prompt(grunnlag)
-        assert kontroller("Signalet er slik for aller første gang i dag.", grunnlag).besto
-        assert not kontroller("Signalet er slik i dag for første gang.", grunnlag).besto
-
-    def test_avtrykket_dekker_valget_av_ordlyd(self):
-        """VG2, BH7: ville feilet hvis avtrykket bare dekket malene, slik at en
-        endret logikk i ordlyd_for_dagene ga samme versjon."""
-        assert inspect.getsource(ordlyd_for_dagene) in _promptteksten()
+    def test_avtrykket_dekker_lag_prompt(self):
+        """VG2, BH7 i gjennomgangen 25.10: ville feilet hvis avtrykket bare
+        dekket reglene, slik at en endret lag_prompt ga samme versjon."""
         assert inspect.getsource(lag_prompt) in _promptteksten()
 
     def test_bildet_viser_en_aksje_der_teksten_besto(self):
         """VG7, gruppens svar 24.10 kl. 23:23 (b): ville feilet hvis bildet av
         aksjesiden viste en demoaksje der KI-teksten ble stoppet."""
         radene = json.loads((Path(__file__).parents[1] / "src" / "demo_ki_tekster.json").read_text("utf-8"))["radene"]
-        assert next(r for r in radene if r["symbol"] == "BRFE")["besto"] is True
+        assert next(r for r in radene if r["symbol"] == BILDEAKSJEN)["besto"] is True

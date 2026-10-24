@@ -81,6 +81,16 @@ Ett forsøk til med versjon 3 søndag 25.10. Det flettes bare med 15 av 15 i pr�
 
 **c) Prøvekjøringen** (§45 i `malinger.md`), mot kopien `data/db/ki-proeve-v3c.db`, laget med skallet på main kl. 00:04:21 før grenen, med samme sha256 som `ose.db`. Kjørt 00:20:45–00:20:56: 13 av 15 besto, 2 ble stoppet, og modellen feilet for 0. VAR og TEL ble stoppet på «det første signalet», dagene med egne ord. Hver tekst er lest mot grunnlaget, og ingen av de 13 sier feil om en sjekk eller om dagene. Ti setter ordlyden klønete inn i setningen (under «Åpent»). 13 av 15 er under kravet (15 av 15) i svaret kl. 23:23, så grenen flettes ikke. Med kontrollen fra a) består fortsatt alle 15 fra §34.
 
+## Fjerde forsøk etter gruppens svar 25.10 kl. 00:50 og 00:51
+
+Gruppen ville prøve igjen (kl. 00:50). Modellen får ikke dagene og nevner dem ikke, og appen skriver dagene selv i en setning rett under KI-teksten på aksjesiden. Det endrer hvem som skriver dagene i svarene 21.10 kl. 22:57 og 23:51, og tellingen i svaret 24.10 kl. 16:15 a) står. Flettes bare med 15 av 15 og ingen tekst med feil (under story 10.2 i `epics.md`).
+
+**a) Modellen** (`src/ki_grunnlag.py`, `src/ki_prompt.py`, `src/ki_kontroll.py`):
+- Grunnlaget har ikke `dager` eller `dager_merke`. `Dagsbilde` teller dem fortsatt (`tell_dagene`), men `ki_grunnlag` legger dem ikke inn, og et grunnlag med dem avvises. Resten av grunnlaget står: fortegnene, styrken, retningen, hovedindeksen, antallet aksjer som steg og falt, og bransjen.
+- Prompten forklarer ikke dagene, og ordlyden fra tredje forsøk er tatt bort (`ordlyd_for_dagene`, `ORDLYDEN`). Reglene sier: «Ikke si hvor lenge signalet har vart, om det er nytt, eller om det er første gang. Siden sier det under teksten.» `PROMPTVERSJON` står som «3». Avtrykket dekker reglene, merket og `lag_prompt` og er satt på nytt.
+- Kontrollen stopper dagene i enhver form, uansett grunnlaget: et antall dager, «minst» ved et ord om dagene, «på rad», ordenstall og «for første gang», og ord som «fortsatt», «lenge», «uker» og «nytt signal». Rettingene fra gjennomgangen 25.10 for «andre», «i dag», «1. Dagen» og regelens vinduer står.
+- Testene som godtok ordlyden eller et antall dager, er snudd eller tatt bort, og formene fra §44 og §45, blant dem VAR og TEL, stoppes i `TestDageneStoppes`.
+
 ## Boundaries & Constraints
 
 - Ingen kall til EODHD utover kvotesjekken i regel 15. `src/fetch_prices.py` kjøres ikke, og `data/db/ose.db` røres ikke (regel 22).

@@ -93,9 +93,8 @@ class TestSteget:
 
     def test_grunnlaget_og_regelen_er_vurderingens(self, stier):
         """Story 10.2e: ville feilet hvis steget ikke ga grunnlaget dagen.
-        Foerste henting i en tom base har ingen vurdering foer dagen, saa
-        dagene er «minst» 1. Alle 15 seriene og indeksen stiger siste dag
-        (serie_med_utslag)."""
+        Alle 15 seriene og indeksen stiger siste dag (serie_med_utslag).
+        Gruppens svar 25.10 kl. 00:51: dagene er ikke med."""
         raa, base = stier
         kjoer(raa, base, FalskModell())
         vurdering = vurderingene(base, TIRSDAG)["EQNR"][0]
@@ -106,8 +105,6 @@ class TestSteget:
             "interesse": vurdering.interesse,
             "styrke": vurdering.styrke,
             "retning": vurdering.retning,
-            "dager": 1,
-            "dager_merke": "minst",
             "hovedindeksen": "steg",
             "aksjer_steg": 15,
             "aksjer_falt": 0,
@@ -115,10 +112,11 @@ class TestSteget:
         }
         assert rad.regelen == regeltekst(vurdering)
 
-    def test_dagene_teller_kvelden_foer(self, stier):
-        """Story 10.2e: ville feilet hvis steget ikke leste vurderingene foer
-        dagen fra basen. Tirsdag og onsdag gir samme retning og styrke, saa
-        onsdag er «minst» 2."""
+    def test_dagene_sendes_ikke_ogsaa_med_kvelden_foer(self, stier):
+        """Gruppens svar 25.10 kl. 00:51: modellen faar ikke dagene. Tirsdag og
+        onsdag gir samme retning og styrke, saa dagene er 2, men grunnlaget
+        onsdag har dem ikke. Ville feilet hvis dagene kom med i grunnlaget.
+        Tellingen paa siden testes i test_aksjedetalj.py."""
         raa, base = stier
         onsdag = date(2026, 9, 23)
         kjoer(raa, base, FalskModell())
@@ -127,7 +125,8 @@ class TestSteget:
         vurdering = vurderingene(base, onsdag, ONSDAG_KL_22)["EQNR"][0]
         assert (tirsdag.retning, tirsdag.styrke) == (vurdering.retning, vurdering.styrke)
         grunnlag = radene(base, onsdag)["EQNR"].grunnlag
-        assert (grunnlag["dager"], grunnlag["dager_merke"]) == (2, "minst")
+        assert "dager" not in grunnlag and "dager_merke" not in grunnlag
+        assert grunnlag["aksjer_steg"] == 15
 
     def test_hovedindeksen_er_osebx_ogsaa_med_en_annen_indeks(self, stier):
         """Gjennomgangen av 10.2e (VG1): ville feilet hvis grunnlaget tok
@@ -169,7 +168,7 @@ class TestSteget:
         kjoer(raa, base, FalskModell())
         rader = radene(base)
         assert all(r is not None and r.besto for r in rader.values())
-        assert all("hovedindeksen" not in r.grunnlag and r.grunnlag["dager"] == 1 for r in rader.values())
+        assert all("hovedindeksen" not in r.grunnlag and "dager" not in r.grunnlag for r in rader.values())
 
     def test_ingen_kall_til_eodhd_fra_steget(self, stier, tmp_path):
         """Ville feilet hvis KI-steget gjorde et kall til EODHD (F5)."""

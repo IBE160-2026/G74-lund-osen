@@ -38,12 +38,17 @@ nevner dagene bare med den, ordrett. «Minst» staar bare i ordlyden, ikke i
 reglene. Kontrollen i FR-603 bruker den samme ordlyden (ordlyd_for_dagene),
 saa prompten og kontrollen ikke kan si ulikt. Ordlyden, og koden som velger
 den og setter prompten sammen, er med i avtrykket (gjennomgangen 25.10, VG2).
+
+Versjon 3, fjerde forsoek (gruppens svar 25.10 kl. 00:50 og 00:51,
+malinger.md §45): modellen faar ikke dagene og nevner dem ikke. Ordlyden fra
+tredje forsoek er tatt ut, og reglene sier at teksten ikke sier hvor lenge
+signalet har vart. Appen skriver dagene selv, under KI-teksten paa
+aksjesiden (setning_om_dagene i aksjedetalj.py). Versjonen staar som 3, og
+avtrykket dekker reglene, merket og lag_prompt.
 """
 
 import json
 from collections.abc import Mapping
-
-from ki_grunnlag import MINST
 
 PROMPTVERSJON = "3"
 
@@ -58,8 +63,6 @@ Styrken er hvor mange av sjekkene som ga utslag. Retningen er Positiv, Negativ, 
 I opplysningene under står 1 for positivt utslag, -1 for negativt og 0 for ikke noe utslag.
 
 Opplysningene sier også hvordan dagen var:
-- dager: hvor mange børsdager på rad signalet har hatt samme retning og samme styrke, til og med i dag. Nevn dagene bare med ordlyden for dagene, som står etter opplysningene, ordrett. Skriv aldri dagene med egne ord.
-- dager_merke: står når dagene før ikke er lagret. Ordlyden for dagene tar det med.
 - hovedindeksen: om hovedindeksen på Oslo Børs steg, falt eller var uendret i dag. Mangler feltet, skal du ikke si noe om hovedindeksen.
 - aksjer_steg og aksjer_falt: hvor mange av aksjene i lista som steg og som falt fra børsdagen før.
 - bransjen: om aksjene i samme bransje som denne steg, falt eller var uendret i snitt. Mangler feltet, skal du ikke si noe om bransjen.
@@ -70,6 +73,7 @@ Regler for teksten:
 - Bruk bare opplysningene under. Skriv utslagene med ord, ikke som tall. Ikke nevn kurser, prosenter eller andre tall enn antallene i opplysningene og regelens faste tall.
 - Siden viser kursen, endringen og målingene. Du kan vise til dem, for eksempel «se endringen i tabellen», men ikke gjenta tallene.
 - Hovedindeksen og bransjen er ikke en del av regelen. Ikke si at de forklarer signalet.
+- Ikke si hvor lenge signalet har vart, om det er nytt, eller om det er første gang. Siden sier det under teksten.
 - Ikke gi råd om å kjøpe, selge eller holde, og ikke si noe om hva som vil skje.
 - Ikke gjett på årsaker, som nyheter, resultater eller kontrakter. Du kan forklare regelen, for eksempel at en sjekk ikke ga utslag.
 - Når du forklarer regelen, bruk «fordi». Ikke bruk «skyldes» eller «indikerer».
@@ -78,34 +82,9 @@ Regler for teksten:
 UTENFOR = "\nAksjen er ikke blant aksjene grensene er målt på. Si at grensene ikke er målt på denne aksjen.\n"
 
 
-# Gruppens svar 24.10 kl. 23:23: ordlyden for dagene, laget av dagene og
-# merket. Med i avtrykket (ORDLYDEN), saa en endret ordlyd gir ny versjon.
-DAGENE_FOERSTE = "i dag for første gang"
-DAGENE_PAA_RAD = "i {dager} børsdager på rad"
-DAGENE_MINST_EN = "i minst 1 børsdag"
-DAGENE_MINST = "i minst {dager} børsdager"
-DAGENE_LINJE = "Ordlyden for dagene: {ordlyd}\n"
-ORDLYDEN = (DAGENE_FOERSTE, DAGENE_PAA_RAD, DAGENE_MINST_EN, DAGENE_MINST, DAGENE_LINJE)
-
-
-def ordlyd_for_dagene(grunnlag: Mapping[str, object]) -> str | None:
-    """Ordlyden for dagene i grunnlaget, eller None uten dagene (versjon 2)."""
-    dager = grunnlag.get("dager")
-    if type(dager) is not int or dager < 1:
-        return None
-    if grunnlag.get("dager_merke") == MINST:
-        return DAGENE_MINST_EN if dager == 1 else DAGENE_MINST.format(dager=dager)
-    return DAGENE_FOERSTE if dager == 1 else DAGENE_PAA_RAD.format(dager=dager)
-
-
 def lag_prompt(grunnlag: Mapping[str, object]) -> str:
-    """Reglene og grunnlaget som JSON, og med dagene ordlyden for dem.
-    Ingenting annet kommer med."""
+    """Reglene og grunnlaget som JSON. Ingenting annet kommer med."""
     prompt = REGLER
     if grunnlag.get("merke"):
         prompt += UTENFOR
-    prompt += "\nOpplysningene:\n" + json.dumps(dict(grunnlag), ensure_ascii=False, sort_keys=True) + "\n"
-    ordlyd = ordlyd_for_dagene(grunnlag)
-    if ordlyd is not None:
-        prompt += DAGENE_LINJE.format(ordlyd=ordlyd)
-    return prompt
+    return prompt + "\nOpplysningene:\n" + json.dumps(dict(grunnlag), ensure_ascii=False, sort_keys=True) + "\n"
