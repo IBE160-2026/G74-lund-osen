@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-24T10:10
+updated: 2026-10-24T23:36
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -3726,6 +3726,8 @@ med samme vindu, så den uavrundede medianen for dem kan ikke regnes på nytt.
 PLT står etter dem, slik at de 122 beholder rekkefølgen fra §33, og rekkefølgen
 mellom PLT og de to er et åpent punkt.
 
+*Rettet 2026-10-24:* SNI og WWI finnes i en lokal råfil med samme vindu: WWI i `data/raa/maaling-raa-2026-10-03.json` og SNI i `data/raa/maaling-raa-2026-10-04.json`, begge med 67 handelsdager i vinduet. Regnet fra de filene er rekkefølgen SNI, PLT, WWI, ikke SNI, WWI, PLT som i tabellen under. Tabellen står som den ble ført; rekkefølgen er rettet i §42 (avgjort 24.10 kl. 11:08, under story 2.12 i `epics.md`).
+
 | # | Symbol | Selskap | Median omsetning (MNOK) | Blant de 15 | I OBX | Fra |
 |---|---|---|---:|---|---|---|
 | 1 | EQNR | Equinor | 937,9 | Ja | Ja | §17 |
@@ -4621,6 +4623,8 @@ WWI, ikke SNI, WWI, PLT som i §35–§41. Ingen av de 20 har 8,3 MNOK, og de 16
 skal stå uendret, så tabellen under har rekkefølgen fra §41 (plass 72–74).
 Gruppen avgjør om WWI og PLT skal bytte plass.
 
+*Rettet 2026-10-24:* gruppen avgjorde 24.10 kl. 11:08 (under story 2.12 i `epics.md`) at PLT og WWI bytter plass, og tabellen under har nå rekkefølgen SNI, PLT, WWI på plass 72–74. Råfilene for SNI og WWI finnes: WWI i `data/raa/maaling-raa-2026-10-03.json` og SNI i `data/raa/maaling-raa-2026-10-04.json`. PLT står i `data/raa/maaling-raa-2026-10-17.json`. Alle tre har 67 handelsdager i vinduet, og den uavrundede medianen regnet fra de filene gir rekkefølgen SNI, PLT, WWI, uten to like. Det åpne punktet over er dermed avgjort. Bare plassene til PLT og WWI er endret; de andre 184 står som før.
+
 | # | Symbol | Selskap | Median omsetning (MNOK) | Blant de 15 | I OBX | Fra |
 |---|---|---|---:|---|---|---|
 | 1 | EQNR | Equinor | 937,9 | Ja | Ja | §17 |
@@ -4695,8 +4699,8 @@ Gruppen avgjør om WWI og PLT skal bytte plass.
 | 70 | BRG | Borregaard | 8,8 | Nei | Nei | §18 |
 | 71 | PEXIP | Pexip | 8,6 | Nei | Nei | §24 |
 | 72 | SNI | Stolt-Nielsen | 8,3 | Nei | Nei | §18 |
-| 73 | WWI | Wilh. Wilhelmsen Holding | 8,3 | Nei | Nei | §16 |
-| 74 | PLT | poLight | 8,3 | Nei | Nei | §35 |
+| 73 | PLT | poLight | 8,3 | Nei | Nei | §35 |
+| 74 | WWI | Wilh. Wilhelmsen Holding | 8,3 | Nei | Nei | §16 |
 | 75 | ELMRA | Elmera Group | 8,0 | Nei | Nei | §27 |
 | 76 | PLSV | Paratus Energy Services | 7,7 | Nei | Nei | §24 |
 | 77 | BRUT | Bruton | 7,5 | Nei | Nei | §33 |

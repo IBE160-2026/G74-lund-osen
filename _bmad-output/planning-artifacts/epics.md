@@ -1947,6 +1947,8 @@ følger aksjene jeg bryr meg om.
 
 *Lagt til 2026-10-24 kl. 10:16 (målingen etter gruppens svar 24.10 kl. 10:00, `malinger.md` §42):* de neste 20 «Common Stock» i lista fra §40 som ikke var rangert, plass 6–59 i lista, fra Aqua Bio Technology (ABTEC) til Cavendish Hydrogen (CAVEN), ga alle 67 rader. Den høyeste medianen er 1,1 MNOK (Arribatec Solutions, ARR, plass 128 av 186), 11 har 0,0 MNOK avrundet, og ingen er over 25 MNOK; 37 av 186 er fortsatt over 32 MNOK og 41 over 25 MNOK. Lista står alfabetisk, så de 20 er de neste i alfabetet. Kallene var alle de 20 i dagskvoten 24.10, og bonuskvoten er ikke brukt. De lokale råfilene gir rekkefølgen SNI, PLT, WWI på 8,3 MNOK, ikke den i §35–§41; det står som åpent punkt i §42.
 
+*Avgjort 2026-10-24 kl. 11:08 (gruppens svar):* PLT og WWI bytter plass i «Alle 186, rangert» i §42 i `malinger.md`, så plass 72–74 er SNI, PLT, WWI, rekkefølgen den uavrundede medianen gir regnet fra de lokale råfilene (det åpne punktet i §42). §35 og §42 har hver fått en Rettet-linje om at råfilene for SNI og WWI finnes.
+
 ### Story 2.13: Kommandoen som måler omsetning
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
