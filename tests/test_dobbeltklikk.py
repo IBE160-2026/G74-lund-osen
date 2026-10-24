@@ -335,8 +335,21 @@ def _kjoer(argumenter, miljoe, sjekk_porten=True):
     main, hoppes testen over, saa ingen test stopper den."""
     if sjekk_porten and not _porten_er_ledig():
         pytest.skip("port 8000 er i bruk paa maskinen")
+    # Gjennomgangen av 3.5d (BH1, ECH1): uten LOCALAPPDATA, ProgramData og
+    # SystemDrive skrev Windows PowerShell cachen sin i mappa den sto i, og
+    # det var repoet. Mappene ligger i tmp_path, og skriptet kjoeres derfra.
+    hjem = Path(miljoe.get("USERPROFILE") or miljoe["HOME"])
+    if sys.platform == "win32":
+        miljoe = {
+            **miljoe,
+            "LOCALAPPDATA": str(hjem / "AppData" / "Local"),
+            "APPDATA": str(hjem / "AppData" / "Roaming"),
+            "ProgramData": str(hjem.parent / "ProgramData"),
+            "SystemDrive": os.environ.get("SystemDrive", "C:"),
+        }
     svar = subprocess.run(
         argumenter,
+        cwd=hjem.parent,
         input="n\nn\nn\n",
         capture_output=True,
         text=True,
