@@ -132,7 +132,8 @@ else
 fi
 
 echo "Starter appen på $ADRESSE."
-PYTHONPATH=src uv run waitress-serve --listen=127.0.0.1:8000 app:app &
+# Forprøven 24.10 (funn 6): 8 tråder, så waitress ikke skriver «Task queue depth».
+PYTHONPATH=src uv run waitress-serve --listen=127.0.0.1:8000 --threads=8 app:app &
 server=$!
 trap 'kill "$server" 2>/dev/null' EXIT
 # Gjennomgangen (BH5, ECH8): Ctrl+C og et lukket vindu stopper også skriptet.

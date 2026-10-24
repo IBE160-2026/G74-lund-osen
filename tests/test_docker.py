@@ -140,7 +140,7 @@ class TestImaget:
         aldri debug. Ville feilet med flask run eller app.run."""
         cmd = [r for i, r in _instruksjoner() if i == "CMD"]
         assert len(cmd) == 1
-        assert cmd[0] == '["waitress-serve", "--listen=0.0.0.0:8000", "app:app"]'
+        assert cmd[0] == '["waitress-serve", "--listen=0.0.0.0:8000", "--threads=8", "app:app"]'
         hele = "\n".join(_linjer(DOCKERFILE)).lower()
         assert "flask run" not in hele and "debug" not in hele
 

@@ -32,7 +32,7 @@ KOMMANDOENE = [
     "uv sync",
     "uv run python src/demo.py",
     "uv run python src/fetch_prices.py",
-    "uv run waitress-serve --listen=127.0.0.1:8000 app:app",
+    "uv run waitress-serve --listen=127.0.0.1:8000 --threads=8 app:app",
 ]
 
 
@@ -107,6 +107,18 @@ def test_webserveren_binder_bare_127_0_0_1(navn):
     adressene = re.findall(r"--listen=([^\s'\"]+)", kode)
     assert adressene == ["127.0.0.1:8000"], adressene
     assert "0.0.0.0" not in kode and "--host" not in kode and "--port" not in kode
+
+
+def test_webserveren_har_8_traader_i_skriptene_readme_og_dockerfile():
+    """Forproeven 24.10 (funn 6, spesifikasjonen 3.5d). Ville feilet hvis
+    webserveren startet med standarden paa 4 traader et sted, saa waitress
+    skrev «Task queue depth» i vinduet."""
+    for navn in SKRIPTENE:
+        kode = "\n".join(_kode(SKRIPTENE[navn]))
+        assert kode.count("--threads=8") == 1 and "--threads=" not in kode.replace("--threads=8", ""), navn
+    assert "`uv run waitress-serve --listen=127.0.0.1:8000 --threads=8 app:app`" in _delen_i_readme()
+    dockerfile = (ROT / "Dockerfile").read_text(encoding="utf-8")
+    assert 'CMD ["waitress-serve", "--listen=0.0.0.0:8000", "--threads=8", "app:app"]' in dockerfile
 
 
 @pytest.mark.parametrize("navn", [*SKRIPTENE, *STARTFILENE])

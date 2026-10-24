@@ -162,7 +162,8 @@ if ($Versjon -eq 'demo') {
 
 Write-Host "Starter appen på $Adresse."
 $env:PYTHONPATH = 'src'
-$server = Start-Process -FilePath 'uv' -ArgumentList 'run', 'waitress-serve', '--listen=127.0.0.1:8000', 'app:app' -NoNewWindow -PassThru
+# Forprøven 24.10 (funn 6): 8 tråder, så waitress ikke skriver «Task queue depth».
+$server = Start-Process -FilePath 'uv' -ArgumentList 'run', 'waitress-serve', '--listen=127.0.0.1:8000', '--threads=8', 'app:app' -NoNewWindow -PassThru
 # Uten Handle gir Windows PowerShell 5.1 ingen ExitCode etterpå.
 $null = $server.Handle
 $klar = $false

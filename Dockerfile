@@ -53,4 +53,5 @@ EXPOSE 8000
 
 # waitress, aldri Flasks egen server og aldri debug. 0.0.0.0 gjelder inne i
 # containeren; compose.yaml binder porten bare til 127.0.0.1 paa maskinen.
-CMD ["waitress-serve", "--listen=0.0.0.0:8000", "app:app"]
+# 8 traader, saa waitress ikke skriver «Task queue depth» (story 3.5d, funn 6).
+CMD ["waitress-serve", "--listen=0.0.0.0:8000", "--threads=8", "app:app"]
