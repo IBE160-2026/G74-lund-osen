@@ -269,7 +269,9 @@ def uten_kurser(poster: list[Oversiktspost]) -> list[Aksje]:
 
 # Story 8.2a, b (U23, gruppens svar 24.10 kl. 11:34 og 11:35): teksten under
 # «–» i raden for en aksje uten en eneste kurs.
-UTEN_DATA = "uten data"
+# Gjennomgangen 24.10 (BH13): et annet navn enn UTEN_DATA i boersometer.py,
+# som har stor forbokstav.
+UTEN_DATA_TEKST = "uten data"
 
 
 @dataclass(frozen=True)
@@ -285,7 +287,7 @@ class RadUtenData:
     """
 
     aksje: Aksje
-    tekst: str = UTEN_DATA
+    tekst: str = UTEN_DATA_TEKST
     sluttkurs: None = None
     endring_prosent: None = None
     tilstand: None = None
@@ -441,7 +443,11 @@ def sorter(rader: list[Rad], sortering: Sortering | None) -> list[Rad]:
         return list(rader)
     grunn = sorted(rader, key=lambda rad: (_sorteringsnokkel(rad), _navn(rad)))
     med = [rad for rad in grunn if _verdi(rad, sortering.kolonne) is not None]
-    uten = [rad for rad in grunn if _verdi(rad, sortering.kolonne) is None]
+    # Gjennomgangen 24.10 (ECH3): radene uten data sist blant dem uten verdi,
+    # også når en rad med kurs har samme nøkkel i FR-102.
+    uten = sorted(
+        (rad for rad in grunn if _verdi(rad, sortering.kolonne) is None), key=lambda rad: isinstance(rad, RadUtenData)
+    )
     # Gjennomgangen (BH8): sort er stabil også med reverse=True, så lik
     # verdi beholder rekkefølgen fra grunn, FR-102 og navnet, i begge
     # retninger. Snus grunn eller nøkkelen i stedet, går det tapt.

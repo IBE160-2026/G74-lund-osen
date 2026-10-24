@@ -965,7 +965,10 @@ HOEYDE_PAA_BILDET = 1630
 # Bildet ble tatt paa nytt og er byte for byte det samme.
 # Story 8.2a f: linja om 3 av 3 uten «Bare» i index.html. Bildet ble tatt paa
 # nytt med samme hoeyde, og viser linja uten ordet.
-AVTRYKK_BAK_BILDET = "138cbf621f5ba9601a1676a18464ad07939d8c42a3f9c6d8ec0a058148cec942"
+# Gjennomgangen av 8.2a 24.10: båndet, sorteringen, kommentaren i
+# _hovedindeks.html og hjelpeteksten. Bildet ble tatt paa nytt og er byte for
+# byte det samme.
+AVTRYKK_BAK_BILDET = "dc77e5953b4add3b1228d6c7fb7571c4d0a08de5c2e669459bed978730f556a5"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1091,7 +1094,9 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # tatt paa nytt og er byte for byte det samme.
 # Story 8.2a e: app.py og markedsoversikt.py. Bildet ble tatt paa nytt og er
 # byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "91c10cced5718f25c93f8657e751cbf048c0262c059531dd784acc999cc2cab2"
+# Gjennomgangen av 8.2a 24.10: app.py, markedsoversikt.py og hjelpetekster.py.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "ee67b52f607d54c13459ab747820e6bc936795def4845b31097da59bc63ea78b"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "

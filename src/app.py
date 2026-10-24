@@ -601,6 +601,8 @@ def boersometer():
             oversiktsleser.vurdering(post.aksje.symbol, dagen),
             dagen,
             i_dag,
+            # Gjennomgangen 24.10 (ECH2, BH10): samme Parametre som oversikten.
+            p=STANDARD,
             siste_styrke=siste_styrke.get(post.aksje.symbol),
             er_siste=dagen == siste,
         )
@@ -630,6 +632,28 @@ def boersometer():
         indeks_feilet=indeks_feilet,
         **felles,
     )
+
+
+def _dager_i_serien(leser: Kursleser, poster: list) -> dict[str, int]:
+    """Story 8.2a, d (gruppens svar 24.10 kl. 11:29): dagene i kursserien,
+    til og med dagen raden gjelder, for aksjene der signalet ikke kunne
+    regnes, så raden sier hvorfor med samme tall som aksjesiden. Bare for
+    dem, så siden ikke leser alle seriene.
+
+    Gjennomgangen 24.10 (BH2): kan serien ikke leses, står aksjen uten tall,
+    og raden sier grunnen uten dem, så tabellen vises likevel (NFR-03), som
+    for hovedindeksen. (ECH1): bare radene til og med nyeste dato telles.
+    """
+    dager = {}
+    for post in poster:
+        if post.innhold is not Grunn.SIGNAL_IKKE_REGNET or post.nyeste is None:
+            continue
+        try:
+            serie = leser.serie(post.aksje.symbol)
+        except (*BASEFEIL, ValueError):
+            continue
+        dager[post.aksje.symbol] = sum(1 for rad in serie if rad.dato <= post.nyeste.dato)
+    return dager
 
 
 def _tabellsiden(aktiv: str):
@@ -672,15 +696,7 @@ def _tabellsiden(aktiv: str):
 
     poster = _leser_eller_basefeil(hent_oversiktsleser).oversikt()
     i_dag = idag()
-    # Story 8.2a, d (gruppens svar 24.10 kl. 11:29): dagene i kursserien for
-    # aksjene der signalet ikke kunne regnes, så raden sier hvorfor med samme
-    # tall som aksjesiden. Bare for dem, så siden ikke leser alle seriene.
-    dager = {
-        post.aksje.symbol: len(leser.serie(post.aksje.symbol))
-        for post in poster
-        if post.innhold is Grunn.SIGNAL_IKKE_REGNET
-    }
-    rader = bygg_oversikt(poster, i_dag, STANDARD, dager)
+    rader = bygg_oversikt(poster, i_dag, STANDARD, _dager_i_serien(leser, poster))
     # Story 8.15: linja om 3 av 3 og «N av M» bruker rader, som står i
     # FR-102 (svar 7). Story 8.2a, e (gruppens svar 24.10 kl. 11:39): uten
     # en valgt kolonne er tabellen delt i to, hver i FR-102-rekkefølgen, som
@@ -723,9 +739,10 @@ def _tabellsiden(aktiv: str):
         eget=eldre_enn_nyeste(rader),
         mangler=mangler,
         # Story 8.0d, PR 2b: M i «N av M aksjer» er alle aksjene i lista,
-        # også de uten kurser (beslutningen 14.10). Story 8.2a, b (U23): M er
-        # antallet rader i tabellen, med raden for hver aksje uten kurser, så
-        # «7 av 15» stemmer og følger lista når aksjer legges til (2.12).
+        # også de uten kurser (beslutningen 14.10). Story 8.2a, b (U23): det
+        # er også antallet rader i tabellen, fordi hver aksje uten kurser nå
+        # har en rad, så «7 av 15» stemmer med tabellen. Summen er lik
+        # len(poster), og definisjonen fra 14.10 står (gjennomgangen, BH5).
         antall_aksjer=len(rader) + len(alle_uten_data),
         ikke_vurdert=bool(ikke_vurdert),
         **_fotnoten(ikke_vurdert, i_dag),

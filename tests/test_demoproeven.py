@@ -187,8 +187,15 @@ def test_symbolene_over_soeylene_lenker_til_aksjesiden(klient, side):
     symboler = re.findall(r'<span class="ticker">([A-Z0-9]+)</span>', etiketter)
     assert len(lenker) == len(symboler) == 14
     assert [symbol for symbol, _ in lenker] == symboler
+    # Gjennomgangen 24.10 (VG5): navnet i aria-label er navnet i tabellen.
+    tabellnavn = {
+        re.search(r'<span class="linje">([A-Z0-9]+)', rad).group(1): re.search(
+            r'<a href="/aksje/[A-Z0-9]+">([^<]+)</a>', rad
+        ).group(1)
+        for rad in _radene(_html(klient, "/"))
+    }
     for symbol, navn in lenker:
-        assert navn.endswith(f"({symbol})")
+        assert navn == f"{tabellnavn[symbol]} ({symbol})"
         assert klient.get(f"/aksje/{symbol}").status_code == 200
     foer_etikettene = figur.split('<div class="etiketter">', 1)[0]
     assert 'aria-hidden="true"' not in foer_etikettene.split("</figcaption>", 1)[1]
@@ -322,3 +329,59 @@ def test_setningen_om_3_av_3_vurderer_ikke(klient):
         "fikk utslag på alle 3 sjekkene."
     )
     assert "Bare" not in linja
+
+
+# Gjennomgangen 24.10.
+
+
+def test_min_liste_med_bare_aksjen_uten_kurser_har_tabellen(klient):
+    """VG2. Ville feilet hvis Min liste med bare en aksje uten kurser viste
+    antallet 1 uten tabell, så knappen og tabellen sprikte (U23, BH8)."""
+    fra_foer = _symbolene(_html(klient, "/min-liste"))
+    for symbol in fra_foer:
+        assert (
+            klient.post("/min-liste/merk", data={"symbol": symbol, "til": "fjern", "tilbake": "/min-liste"}).status_code
+            == 303
+        )
+    assert (
+        klient.post("/min-liste/merk", data={"symbol": "MTFJ", "til": "merk", "tilbake": "/min-liste"}).status_code
+        == 303
+    )
+    for adresse in ("/min-liste", "/min-liste?sorter=endring&orden=synkende"):
+        html = _html(klient, adresse)
+        assert 'Min liste <span class="antall">1</span>' in html and "<table" in html
+        radene = _radene(html)
+        assert len(radene) == 1 and '<a href="/aksje/MTFJ">Matfjord Merkevarer</a>' in radene[0]
+        assert ">uten data<" in radene[0]
+
+
+def test_en_serie_som_ikke_kan_leses_gir_grunnen_uten_tall(klient, monkeypatch):
+    """BH2, NFR-03. Ville feilet hvis en serie som ikke kan leses, ga en
+    feilside for hele oversikten i stedet for grunnen uten tall."""
+    import lagring_sqlite
+
+    ekte = lagring_sqlite.SqliteKurslager.serie
+
+    def serie(self, symbol):
+        if symbol == "VRDS":
+            raise ValueError("en rad som ikke kan tolkes")
+        return ekte(self, symbol)
+
+    monkeypatch.setattr(lagring_sqlite.SqliteKurslager, "serie", serie)
+    html = _html(klient, "/")
+    rad = next(rad for rad in _radene(html) if '<a href="/aksje/VRDS">' in rad)
+    assert _synlig(re.findall(r"<td[^>]*>(.*?)</td>", rad, re.S)[3]) == "– signalet kunne ikke regnes"
+
+
+def test_raden_uten_data_staar_sist_ogsaa_ved_lik_noekkel():
+    """ECH3. Ville feilet hvis en rad uten data kom foran en rad med kurs
+    uten styrke og uten endring når lista sorteres på signalet."""
+    from datetime import date
+
+    from kursdata import Aksje
+    from markedsoversikt import Rad, RadUtenData, Sortering, sorter
+
+    med_kurs = Rad(Aksje("AAA", "AAA.OL", "Aaa", "Energi"), date(2026, 10, 9), 10.0, None, None, "ikke vurdert")
+    uten = RadUtenData(Aksje("AAB", "AAB.OL", "Aab", "Energi"))
+    for orden in ("synkende", "stigende"):
+        assert sorter([uten, med_kurs], Sortering("signal", orden)) == [med_kurs, uten]

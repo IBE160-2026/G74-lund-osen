@@ -654,8 +654,12 @@ class TestOversikten:
             html,
         )
         # Story 8.0d, PR 3: «og N uten signal» når rader uten signal står der.
-        uten = html.count('<span class="merke mangler">')
-        assert oevrige and oevrige.group(1) == "signalstyrke 0 eller 1" + (f" og {uten} uten signal" if uten else "")
+        # Story 8.2a, b (gjennomgangen 24.10, BH4): «og N uten data» for seg.
+        uten_data = html.count('<span class="merke mangler">uten data</span>')
+        uten = html.count('<span class="merke mangler">') - uten_data
+        assert oevrige and oevrige.group(1) == "signalstyrke 0 eller 1" + (
+            f" og {uten} uten signal" if uten else ""
+        ) + (f" og {uten_data} uten data" if uten_data else "")
         stil = _stil(html)
         assert "var(--brun)" in _regel(stil, "tr.del.ut .antall")
         skjult = _regel(stil, ".merke.skjult")

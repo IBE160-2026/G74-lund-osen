@@ -273,10 +273,13 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # tabellen, ikke bare navnet under den.
         "uten_data": Hjelpetekst(
             "Uten data:",
-            "en aksje uten en eneste kurs står nederst i tabellen, med «–» i hver kolonne og «uten data» og "
-            "med lenke til aksjesiden.",
+            # Gjennomgangen 24.10 (BH7): nederst uten sortering. Sortert på
+            # Selskap står den etter navnet.
+            "en aksje uten en eneste kurs står nederst i tabellen uten sortering, med «–» i hver kolonne og "
+            "«uten data» og med lenke til aksjesiden.",
             (
-                (PRD, "Aksjer kilden ikke har en eneste kursrad for"),
+                # Gjennomgangen 24.10 (BH1): den daterte linja fra 8.2a.
+                (PRD, "en aksje uten en eneste kursrad har en rad nederst i tabellen"),
                 (MARKEDSOVERSIKT, "def uten_kurser("),
                 (MARKEDSOVERSIKT, "class RadUtenData"),
             ),

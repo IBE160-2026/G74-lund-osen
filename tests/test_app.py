@@ -1967,8 +1967,8 @@ class TestStory80e:
             "Øvrige aksjer": ["Equinor"],
         }
         # Story 8.0d, PR 2 (BH10): grensene i båndene følger terskelen.
-        # Story 8.2a, b: de 13 aksjene uten kurser er uten signal.
-        assert _tabell(html).ekstra["bak"] == ["signalstyrke 3 eller mer", "signalstyrke 0 til 2 og 13 uten signal"]
+        # Story 8.2a, b: og de 13 aksjene uten kurser (gjennomgangen 24.10, BH4).
+        assert _tabell(html).ekstra["bak"] == ["signalstyrke 3 eller mer", "signalstyrke 0 til 2 og 13 uten data"]
 
     def test_setningene_fra_8_0c_der_skilte_seg_ut_ellers_staar(self, klient):
         """Svar 3. Ville feilet hvis «Skilte seg ut» stod sammen med
@@ -2024,15 +2024,19 @@ class TestStory80e:
         _lagret("KOG", 0.0, 1, 1, 0)
         _lagret("EQNR", 0.0, 1, 0, 0)
         _lagret("DNB", 0.0, 0, 0, 0, vurdert=False)
-        # Story 8.2a, b (U23): de 12 aksjene uten kurser har en rad i båndet,
-        # uten signal, og telles med.
+        # Story 8.2a, b (U23): de 12 aksjene uten kurser har en rad i båndet
+        # og telles med. Gjennomgangen 24.10 (BH4): «uten data» for seg.
         tabell = _tabell(klient.get("/").data.decode("utf-8"))
-        assert tabell.ekstra["bak"] == ["signalstyrke 2 eller mer", "signalstyrke 0 eller 1 og 13 uten signal"]
+        assert tabell.ekstra["bak"] == [
+            "signalstyrke 2 eller mer",
+            "signalstyrke 0 eller 1 og 1 uten signal og 12 uten data",
+        ]
         assert tabell.ekstra["antall"] == ["1", "14"]
         _lagret("MOWI", 0.0, 0, 0, 0, vurdert=False)
         tabell = _tabell(klient.get("/").data.decode("utf-8"))
-        assert tabell.ekstra["bak"][1] == "signalstyrke 0 eller 1 og 13 uten signal"
-        assert tabell.ekstra["antall"] == ["1", "14"]
+        # Gjennomgangen 24.10 (VG4): MOWI går fra uten data til uten signal.
+        assert tabell.ekstra["bak"][1] == "signalstyrke 0 eller 1 og 2 uten signal og 11 uten data"
+        assert tabell.ekstra["antall"] == ["1", "14"] and len(tabell.uten_data) == 11
 
     def test_alle_over_terskelen_gir_bare_skilte_seg_ut(self, klient):
         _lagret("EQNR", 1.0, 1, 1, 0)
@@ -2284,6 +2288,62 @@ def _deler_i_rekkefoelge(html: str) -> tuple[list[str], list[str]]:
         if '<span class="linje">' in rad and '<span class="merke mangler">uten data</span>' not in rad
     ]
     return finn(ut), finn(oevrige)
+
+
+class TestStory82aRadUtenData:
+    """Story 8.2a, b og e (gjennomgangen 24.10, BH3 og VG1): radene uten data,
+    som _Tabell legger for seg, står der de skal. Migrasjonen har 15
+    aksjer, og testene gir kurser til noen av dem."""
+
+    @staticmethod
+    def _rekkefoelge(html: str) -> list[tuple[str, bool]]:
+        """(symbol, uten data) for hver rad, i rekkefølgen de står."""
+        tabell = html.split("<table>", 1)[1].split("</table>", 1)[0]
+        return [
+            (re.search(r'<span class="linje">([A-Z0-9]+)', rad).group(1), ">uten data<" in rad)
+            for rad in re.findall(r"<tr[ >].*?</tr>", tabell, re.S)
+            if '<td class="selskap">' in rad
+        ]
+
+    def test_radene_uten_data_staar_nederst_under_oevrige(self, klient):
+        """Ville feilet hvis en rad uten data sto under «Skilte seg ut», midt
+        blant radene med kurs, eller to ganger."""
+        _lagret("KOG", 1.0, 1, 1, 1)
+        _lagret("DNB", -1.0, 0, 0, 0, vurdert=False)
+        html = klient.get("/").data.decode("utf-8")
+        rekkefoelge = self._rekkefoelge(html)
+        uten = [i for i, (_, mangler) in enumerate(rekkefoelge) if mangler]
+        assert len(uten) == 13 and uten == list(range(len(rekkefoelge) - 13, len(rekkefoelge)))
+        assert len({symbol for symbol, _ in rekkefoelge}) == len(rekkefoelge) == 15
+        oevrige = html.split("Øvrige aksjer", 1)[1]
+        assert all(f'<span class="linje">{symbol}' in oevrige for symbol, mangler in rekkefoelge if mangler)
+
+    @pytest.mark.parametrize("orden", ["synkende", "stigende"])
+    def test_radene_uten_data_staar_sist_sortert_paa_en_kolonne_med_tall(self, klient, orden):
+        """Ville feilet hvis en rad uten data kom foran en rad med kurs når
+        lista er sortert på endring, også bak en rad med kurs uten endring
+        (gjennomgangen 24.10, ECH3)."""
+        _lagret("KOG", 1.0, 1, 1, 1)
+        _lagret("DNB", -1.0, 0, 0, 0, vurdert=False)
+        rader = serie([100.0])
+        skriv_serie("ORK", rader, datetime.fromisoformat(HENTET), vurdert=False)
+        rekkefoelge = self._rekkefoelge(klient.get(f"/?sorter=endring&orden={orden}").data.decode("utf-8"))
+        assert [mangler for _, mangler in rekkefoelge] == [False] * 3 + [True] * 12
+        assert rekkefoelge[2][0] == "ORK"
+
+    def test_sortert_uten_noen_som_skilte_seg_ut_er_en_liste_uten_setningene(self, klient):
+        """Gjennomgangen 24.10 (VG3, BH6): ingen skilte seg ut, og lista er
+        sortert. Da er tabellen én liste med alle radene, uten setningene fra
+        8.0c, som står uten sortering. Ville feilet hvis rader forsvant."""
+        _lagret("KOG", 1.0, 0, 0, 0)
+        _lagret("DNB", -1.0, 1, 0, 0)
+        standard = klient.get("/").data.decode("utf-8")
+        assert "Ingen aksjer skilte seg ut" in standard
+        html = klient.get("/?sorter=endring&orden=synkende").data.decode("utf-8")
+        tabell = html.split("<table>", 1)[1].split("</table>", 1)[0]
+        assert "Ingen aksjer skilte seg ut" not in tabell and tabell.count("<tbody>") == 1
+        assert [symbol for symbol, _ in self._rekkefoelge(html)][:2] == ["KOG", "DNB"]
+        assert len(self._rekkefoelge(html)) == 15
 
 
 class TestStory815Sortering:

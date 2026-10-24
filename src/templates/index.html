@@ -205,10 +205,11 @@
       </tbody>
       {% endif %}
       {#- Story 8.2a, b (U23): radene for aksjene uten kurser står nederst,
-          etter radene uten signal, og telles med i antallet. #}
+          etter radene uten signal, og telles med i antallet. Gjennomgangen
+          24.10 (BH4): båndet sier «uten signal» og «uten data» hver for seg. #}
       {% if not er_sortert and (oevrige or mangler) %}
       <tbody>
-        {% if foerste_del %}<tr class="del oevrige"><th colspan="5" scope="rowgroup">Øvrige aksjer <span class="antall">{{ oevrige|length + mangler|length }}</span> <span class="bak">signalstyrke 0{% if parametre.terskel == 2 %} eller 1{% elif parametre.terskel > 2 %} til {{ parametre.terskel - 1 }}{% endif %}{% set uten_signal = (oevrige|selectattr("styrke", "none")|list|length) + mangler|length %}{% if uten_signal %} og {{ uten_signal }} uten signal{% endif %}</span></th></tr>{% endif %}
+        {% if foerste_del %}<tr class="del oevrige"><th colspan="5" scope="rowgroup">Øvrige aksjer <span class="antall">{{ oevrige|length + mangler|length }}</span> <span class="bak">signalstyrke 0{% if parametre.terskel == 2 %} eller 1{% elif parametre.terskel > 2 %} til {{ parametre.terskel - 1 }}{% endif %}{% set uten_signal = oevrige|selectattr("styrke", "none")|list|length %}{% if uten_signal %} og {{ uten_signal }} uten signal{% endif %}{% if mangler %} og {{ mangler|length }} uten data{% endif %}</span></th></tr>{% endif %}
         {% for rad in oevrige %}{{ tabellrad(rad) }}{% endfor %}
         {% for rad in mangler %}{{ tabellrad(rad) }}{% endfor %}
       </tbody>
