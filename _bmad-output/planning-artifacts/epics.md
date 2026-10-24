@@ -2401,6 +2401,16 @@ reserve. Til da endres ikke «Kom i gang».
 
 **Avhenger av:** 3.3 og 3.4. **Én økt:** én per vei.
 
+*Avgjort 2026-10-23 kl. 23:31 (gruppens svar):*
+- a) «Start den ekte versjonen» kjører hentingen før webserveren, og
+  dobbeltklikket er den bevisste handlingen. FR-401 og AD-10 får hver en
+  datert linje om at regelen står: webserveren henter aldri, og er det
+  ingenting nytt å hente, gir dobbeltklikket 0 kall (FR-402).
+- b) I en mappe med `.git` stopper den ekte versjonen og viser til «Download
+  ZIP» og egen nøkkel, så et dobbeltklikk i en klon aldri henter med gruppens
+  nøkkel. Det erstatter vernet «bare fra main» (VG1 og ECH9 i triagen i
+  `spec-3-5a-dobbeltklikk-med-uv.md`).
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
