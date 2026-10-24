@@ -80,11 +80,19 @@ Versjon 3 rettes på grenen og prøvekjøres på nytt, og flettes bare hvis fær
 - M1, `(rad.retning, rad.styrke) != …` byttet med `rad.retning != vurdering.retning`, ble fanget av `test_dagene_naar_styrken_byttes`.
 - M2, alle heltallene i grunnlaget og tallene 4–12 lagt til de lovlige, ble fanget av `test_2_tall_og_mengder_som_ikke_er_i_grunnlaget[Femdagssnittet ligger lavere.]`.
 
+**Rettingen etter svaret kl. 21:49**, én om gangen med `-x`, med kopi før og fila lik HEAD etter (`git hash-object` lik bloben på HEAD):
+- M1, `grunner += _en_sjekk(…)` tatt ut, kontrollen uten sjekken av én sjekk: på `f42c9d7` kl. 22:07:15 og på `4a1d088` kl. 22:23:22, fanget begge ganger av `test_de_tre_tekstene_i_43_som_sa_feil_om_interessen` (MOWI).
+- M2, `if not merket:` byttet med `if False:`, «minst» sluppet uten merket: på `f42c9d7` kl. 22:07:17 og på `4a1d088` kl. 22:23:25, fanget begge ganger av `test_minst_uten_merket_stoppes`.
+
 ## Prøvekjøringen
 
 §43 i `malinger.md`, kl. 20:31:25–20:31:36: 12 av 15 besto, og 3 ble stoppet, mot 15 av 15 med versjon 2 på samme dag. Alle tre ble stoppet på «Ingen sjekk ga …» om én sjekk, som styrkeregelen fra 10.2a leser som styrke 0, og utsagnet var riktig. Etter instruksjonen kl. 20:00 (steg 4, tre eller flere stoppet) og beslutningen 16.10 kl. 23:51 (2) flettes ikke grenen før gruppen har avgjort det. Med kontrollen etter gjennomgangen (`6f34ebd`) er utfallet det samme: 12 besto.
 
 KI-tekstene i demoen ble laget på nytt med versjon 3: 11 av 13 besto, mot 13 av 13 med versjon 2. NLYS ble stoppet på «skyldes» og TROY på «Ingen sjekk ga utslag på interesse».
+
+**§44** (rettingen etter svaret kl. 21:49), kl. 22:05:12–22:05:22 mot `ki-proeve-v3b.db`: 11 av 15 besto, 4 ble stoppet og modellen feilet for 0. EQNR, AKRBP og FRO ble stoppet på «minst én børsdag» uten merket, og VAR på «det tredje på rad» (punkt 2, dagene er 1). Ingen av de 11 som besto, sier feil om en sjekk eller om dagene. Fire stoppet er over grensen i svaret kl. 21:49 (færre enn tre), så grenen flettes ikke. Med kontrollen etter gjennomgangen av rettingen (`4a1d088`) er utfallet det samme: §34 0 stoppet, §43 de samme 10, §44 de samme 4 med samme grunner, og demoradene får grunnene som er lagret.
+
+MPCC i §43, «Ingen sjekk ga et positivt utslag», med styrke 2: utsagnet stemmer om fortegnene (ingen ga et positivt utslag), men bruker «ingen sjekk» der styrken ikke er 0, som prompten nå sier nei til. Det er ikke «utslag på» én sjekk, så kontrollen leser det fortsatt som styrken og stopper det (gjennomgangen av rettingen, BH12).
 
 ## Gjennomgangen
 
@@ -113,8 +121,44 @@ Gjennomgang 24.10 på diffen `df137b3..1795981` (commitene `ed68979` og `153aba8
 | BH14 | NLYS i demoen brukte «skyldes» igjen | low | ført i «Prøvekjøringen» over |
 | BH15 | Tester for hullene over | low | testene er lagt til for funnene som er rettet |
 
+### Gjennomgangen av rettingen
+
+Gjennomgang 24.10, etter hele settet (ferdig 22:14:29) og før `4a1d088` (22:23), på diffen `c848ea6..f42c9d7` (commitene `4467688` og `43e7717` fra main, flettet i `08dcb3c`, og `fb363cd`, `c3dcfce` og `f42c9d7`), med Blind Hunter (BH, 16 funn), Edge Case Hunter (ECH, 15) og Verification Gap (VG, 3). Rettingene står i `4a1d088`.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH1, ECH4, ECH14 | «Ingen sjekk ga dessverre noe utslag på interessen» og «… på trenden, bevegelsen eller interessen» slo av styrken og ble lest halvt | medium | patch: styrken hoppes over bare når hele utsagnet leses med «ingen», og «eller» i lista |
+| BH2 | «har ikke gitt utslag» ble ikke lest | medium | patch |
+| BH3, ECH6 | Genitiv, «Trendens utslag var negativt», og «slo ut negativt» ble ikke lest | medium | patch. «ga et utslag som var negativt» er ikke lest: defer, under «Åpent» |
+| ECH5 | Gradsord, «et sterkt positivt utslag», ble ikke lest | medium | patch |
+| VG2 | «Interessen ga et positivt signal» og «negativt på bevegelse» ble ikke lest, og en test holdt den siste som bestått | medium | patch: formen i testen står med interessen, og den gamle stoppes i `TestGjennomgangenAvRettingen` |
+| BH7, ECH2, ECH13 | Et antall dager uten «i» ble ikke lest, også med merket | medium | patch: bare «en», «én», «ett» og «ingen» og regelens vinduer trenger et ledd |
+| BH6, ECH8 | «Minst» om sjekkene i en setning om dagene ble stoppet | medium | patch: «minst» må stå inntil to ord fra et ord om dagene |
+| VG3 | Stoppede demorader ble ikke sjekket mot kontrollen | medium | patch |
+| BH13 | Prompten nevner «minst» også når merket mangler, og 3 av 4 stopp i §44 er «minst» | medium | **må avgjøres av gruppen:** en endret prompt må prøvekjøres på nytt |
+| BH15 | Bildet av aksjesiden i README-en viser feltet uten KI-tekst | medium | **må avgjøres av gruppen:** FR-604 gir ingen ny runde. Bildeteksten sier det. Grenen er ikke flettet, så main viser fortsatt bildet med teksten |
+| BH4, ECH3 | «Verken … eller» ble stoppet | low | patch |
+| BH5, ECH7 | «og interessen et negativt» ble ikke lest | low | patch. «det gjorde også interessen» og en liste mellom komma før verbet: defer |
+| BH8 | «minst i fire børsdager» ble lest som eksakt | low | patch. «mer enn fire» med merket stoppes som eksakt |
+| BH10 | Se BH1 | low | patch |
+| BH11 | «fem» og «seks» tekster med «minst» i §43 | low | patch: seks (fem med «minst N børsdager» og TEL), i testene |
+| BH12 | MPCC: «utsagnet var riktig» i §43, «styrken» nå | low | patch: forklart under «Prøvekjøringen» |
+| BH16, VG1 | Tester for formene over, «har vært» og «etter hverandre» | low | patch: `TestGjennomgangenAvRettingen` |
+| ECH1 | «i hele fire børsdager» | low | patch |
+| ECH9 | «i  dag» med to mellomrom | low | patch |
+| ECH12 | En sjekk som mangler i grunnlaget, ble ikke sjekket | low | patch: stoppes |
+| BH9 | «Kursen falt i tre dager» leses som dagene | low | defer: gir et stopp, ikke en feil som slipper gjennom. Står i kommentaren |
+| ECH10 | «fire børsdager på rad, minst» med merket stoppes | low | defer: gir et stopp |
+| BH14 | «i ett børsdag» og ordstillingen etter «fordi» i demotekstene | low | defer: kontrollen sjekker ikke språket. Gruppen avgjør sammen med BH13 |
+| ECH11 | Et grunnlag fra versjon 2 uten dagene stopper nå flere former om dagene | low | avvist: grunnlaget har ikke dagene, så et utsagn om dem er feil. De 13 demotekstene fra versjon 2 og de 15 fra §34 består |
+| ECH15 | Kriteriet «ingen tekst sier feil» hviler på lesingen av 15 tekster, ikke på kontrollen | low | avvist: instruksjonen ber om at hver tekst leses mot grunnlaget, og det står i §44 |
+
+Med dom medium er BH13 og BH15 ikke rettet. De må avgjøres av gruppen, og grenen flettes uansett ikke, fordi fire tekster ble stoppet i §44.
+
 ## Åpent
 
 - `bransjen` for en bransje med bare aksjen selv sier det samme som aksjens egen endring. Børsometeret merker den «1 aksje». Grunnlaget har ikke det merket.
 - *Lagt til 2026-10-24:* om versjon 3 skal rettes og prøvekjøres på nytt, eller legges bort: styrkeregelen og «Ingen sjekk ga» (BH6), utsagn om én sjekk (BH8) og «minst» (BH1, ECH6).
 - *Lagt til 2026-10-24:* tall som står i grunnlaget, men om et annet felt, sjekkes bare der teksten har formene «N aksjer steg/falt» og «N (børs)dager på rad» (BH2, ECH8, ECH12).
+- *Lagt til 2026-10-24 kl. 22:24:* versjon 3 rettet ble stoppet fire ganger i §44, og flettes ikke etter svaret kl. 21:49. Gruppen avgjør om prompten skal nevne «minst» bare med merket (BH13), og hva bildet av aksjesiden skal vise (BH15).
+- *Lagt til 2026-10-24:* utsagn om én sjekk i formene «ga et utslag som var negativt», «det gjorde også interessen» og en liste mellom komma før verbet leses ikke (gjennomgangen av rettingen, BH5, ECH6, ECH7).
