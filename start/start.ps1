@@ -131,9 +131,11 @@ if ($Versjon -eq 'demo') {
     $harNoekkel = @($linjer | Where-Object { $_ -match '^EODHD_API_KEY=\S' }).Count -gt 0
     if (-not $harNoekkel) {
         Write-Host 'Første gang trenger den ekte versjonen en nøkkel fra EODHD. Registreringssiden åpnes nå.'
-        Write-Host 'Lag en gratis konto, kopier nøkkelen (API key), og lim den inn her.'
+        # Forprøven 24.10 (funn 1–3): hvor nøkkelen står, og hvordan den limes inn.
+        Write-Host 'Lag en gratis konto. Nøkkelen står som «API token» under «Dashboard» hos EODHD, med kopiknappen til høyre.'
+        Write-Host 'Lim den inn her med Ctrl+V eller et høyreklikk. Den vises som stjerner.'
         if ($env:OSE_START_UTEN_NETTLESER -ne '1') { Start-Process 'https://eodhd.com/register' }
-        $sikker = Read-Host 'Lim inn nøkkelen og trykk Enter (den vises ikke)' -AsSecureString
+        $sikker = Read-Host 'Lim inn nøkkelen og trykk Enter' -AsSecureString
         $peker = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($sikker)
         try {
             # Uten mellomrom og linjeskift, som i start.sh (gjennomgangen, BH7).

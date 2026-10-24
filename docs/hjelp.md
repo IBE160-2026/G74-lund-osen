@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-23T23:17
+updated: 2026-10-24T16:33
 ---
 
 # Hjelp til «Kom i gang»
@@ -230,6 +230,10 @@ Første gang kan macOS stoppe `Start demoen.command` eller `Start den ekte versj
 ### Vinduet sier at noe svarer allerede på 127.0.0.1:8000.
 
 Demoen eller appen kjører allerede, kanskje i Docker. Lukk det andre vinduet, eller stopp Docker med `docker compose --profile demo down`, som stopper både demoen og den ekte versjonen, og dobbeltklikk på nytt.
+
+### Hvor finner jeg nøkkelen, og hvordan limer jeg den inn?
+
+`Start den ekte versjonen` åpner registreringssiden hos EODHD første gang. Når du har laget kontoen, står nøkkelen som «API token» under «Dashboard», med kopiknappen til høyre. Lim den inn i vinduet med Ctrl+V eller et høyreklikk på Windows, og med Cmd+V på Mac, og trykk Enter. På Windows vises den som stjerner. På Mac vises ingenting mens du limer inn, men nøkkelen kommer med.
 
 ### Nøkkelen var feil.
 

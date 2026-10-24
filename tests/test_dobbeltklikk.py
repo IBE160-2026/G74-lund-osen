@@ -156,6 +156,27 @@ def test_noekkelen_og_miljoeet_skrives_aldri_ut(navn):
     assert "https://eodhd.com/register" in tekst
 
 
+@pytest.mark.parametrize("navn", list(SKRIPTENE))
+def test_vinduet_sier_hvor_noekkelen_staar_og_hvordan_den_limes_inn(navn):
+    """Forproeven 24.10 (funn 1–3, spesifikasjonen 3.5d). Ville feilet hvis
+    vinduet ikke sa at noekkelen staar som «API token» under «Dashboard» med
+    kopiknappen, ikke sa hvordan den limes inn paa systemet, eller sa at den
+    ikke vises paa Windows, der Read-Host viser stjerner. Det samme staar i
+    README-en og hjelpen."""
+    meldinger = "\n".join(l for l in _kode(SKRIPTENE[navn]) if re.search(r"\b(Write-Host|Read-Host|echo|read -r)\b", l))
+    assert "Nøkkelen står som «API token» under «Dashboard» hos EODHD, med kopiknappen til høyre." in meldinger
+    if navn == "start.ps1":
+        assert "Ctrl+V eller et høyreklikk" in meldinger and "Den vises som stjerner." in meldinger
+        assert "vises ikke" not in meldinger and "Cmd+V" not in meldinger
+    else:
+        assert "Cmd+V" in meldinger and "Den vises ikke mens du limer inn" in meldinger
+        assert "Ctrl+V" not in meldinger and "stjerner" not in meldinger
+    for tekst in (_delen_i_readme(), _hjelp()):
+        assert "«API token» under «Dashboard»" in tekst and "kopiknappen til høyre" in tekst
+        assert "Ctrl+V eller et høyreklikk på Windows, og med Cmd+V på Mac" in tekst
+        assert "På Windows vises den som stjerner" in tekst
+
+
 def test_noekkelen_skrives_bare_til_env():
     """Ville feilet hvis noekkelen ble skrevet til en annen fil enn .env."""
     ps1 = "\n".join(_kode(PS1))
