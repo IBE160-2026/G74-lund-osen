@@ -40,14 +40,14 @@ function Stopp([string]$Melding) {
     Stopp-Serveren
     Write-Host ''
     Write-Host "Noe gikk galt: $Melding"
-    Write-Host 'Se «Står du fast?» i README-en, eller docs/hjelp.md. Du kan starte på nytt med et nytt dobbeltklikk.'
+    Write-Host 'Står det fortsatt fast, er det mer hjelp under «Start med dobbeltklikk» i docs/hjelp.md i mappa.'
     Vent-PaaEnter
     exit 1
 }
 
 # Gjennomgangen (BH4, VG2): også en feil skriptet ikke har ventet, gir
 # beskjeden på norsk, og vinduet står til Enter.
-trap { Stopp "$($_.Exception.Message)" }
+trap { Stopp "en feil skriptet ikke ventet: $($_.Exception.Message) Lukk vinduet og dobbeltklikk på nytt." }
 
 function Opptatt {
     # Svarer noe på porten, uansett hva (gjennomgangen, BH16 og ECH7).
@@ -158,24 +158,24 @@ if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
         $svar = Read-Host 'Installere uv nå? Skriv j og trykk Enter for ja'
     }
     if ($svar -notmatch '^\s*(j|ja|y|yes)\s*$') {
-        Stopp 'uv er ikke installert. Installer uv slik «Tester» i README-en sier, og start på nytt.'
+        Stopp 'uv er ikke installert, og appen kan ikke starte uten. Dobbeltklikk på nytt, og skriv j og trykk Enter når vinduet spør om uv.'
     }
     powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-    if ($LASTEXITCODE -ne 0) { Stopp "installasjonen av uv feilet (kode $LASTEXITCODE)." }
+    if ($LASTEXITCODE -ne 0) { Stopp "installasjonen av uv feilet (kode $LASTEXITCODE). Sjekk at maskinen er koblet til nettet, og dobbeltklikk på nytt." }
     $env:Path = "$uvMappe;$env:Path"
     if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
-        Stopp 'uv ble ikke funnet etter installasjonen. Lukk vinduet og start på nytt.'
+        Stopp 'uv ble ikke funnet etter installasjonen. Lukk vinduet og dobbeltklikk på nytt.'
     }
 }
 
 Write-Host 'Installerer pakkene (uv sync). Første gang tar det noen minutter.'
 uv sync
-if ($LASTEXITCODE -ne 0) { Stopp "uv sync gikk ut med kode $LASTEXITCODE. Sjekk at maskinen er koblet til nettet." }
+if ($LASTEXITCODE -ne 0) { Stopp "uv sync gikk ut med kode $LASTEXITCODE. Sjekk at maskinen er koblet til nettet, og dobbeltklikk på nytt." }
 
 if ($Versjon -eq 'demo') {
     Write-Host 'Lager demobasen.'
     uv run python src/demo.py
-    if ($LASTEXITCODE -ne 0) { Stopp "demobasen kunne ikke lages (kode $LASTEXITCODE)." }
+    if ($LASTEXITCODE -ne 0) { Stopp "demobasen kunne ikke lages (kode $LASTEXITCODE). Grunnen står i linjene over. Lukk andre vinduer der demoen kjører, og dobbeltklikk på nytt." }
     $env:OSE_DEMO = '1'
 } else {
     Remove-Item Env:OSE_DEMO -ErrorAction SilentlyContinue
@@ -196,7 +196,7 @@ if ($Versjon -eq 'demo') {
         } finally {
             [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($peker)
         }
-        if (-not $noekkel) { Stopp 'ingen nøkkel ble limt inn.' }
+        if (-not $noekkel) { Stopp 'ingen nøkkel ble limt inn. Dobbeltklikk på nytt, og lim inn nøkkelen når vinduet spør.' }
         $nye = @($linjer | Where-Object { $_ -notmatch '^EODHD_API_KEY=' }) + "EODHD_API_KEY=$noekkel"
         [IO.File]::WriteAllText((Join-Path (Get-Location) '.env'), (($nye -join "`r`n") + "`r`n"), (New-Object System.Text.UTF8Encoding($false)))
         Remove-Variable noekkel, nye
@@ -222,7 +222,7 @@ for ($i = 0; $i -lt 120; $i++) {
     if (Svarer $Adresse) { $klar = $true; break }
     Start-Sleep -Seconds 1
 }
-if (-not $klar) { Stopp 'appen svarte ikke på 127.0.0.1:8000.' }
+if (-not $klar) { Stopp 'appen svarte ikke på 127.0.0.1:8000 etter 2 minutter. Grunnen står i linjene over. Lukk vinduet og dobbeltklikk på nytt.' }
 
 Write-Host ''
 Write-Host "Appen kjører på $Adresse."
@@ -230,4 +230,4 @@ Write-Host 'Lukk dette vinduet, eller trykk Ctrl+C, for å stoppe den.'
 if ($env:OSE_START_UTEN_NETTLESER -ne '1') { Start-Process $Adresse }
 $server.WaitForExit()
 # Gjennomgangen (BH2, VG2): stopper appen av seg selv, står beskjeden.
-if ($server.ExitCode -ne 0) { Stopp "appen stoppet med kode $($server.ExitCode). Grunnen står i linjene over." }
+if ($server.ExitCode -ne 0) { Stopp "appen stoppet med kode $($server.ExitCode). Grunnen står i linjene over. Lukk vinduet og dobbeltklikk på nytt." }

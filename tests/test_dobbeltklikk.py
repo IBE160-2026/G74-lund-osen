@@ -232,7 +232,7 @@ def test_vinduet_sier_hvordan_man_stopper_paa_norsk(navn):
     hvis noe feiler, eller æ, ø og å var borte."""
     tekst = SKRIPTENE[navn].read_text(encoding="utf-8-sig")
     assert "Lukk dette vinduet, eller trykk Ctrl+C, for å stoppe den." in tekst
-    assert "Se «Står du fast?» i README-en, eller docs/hjelp.md." in tekst
+    assert "Står det fortsatt fast, er det mer hjelp under «Start med dobbeltklikk» i docs/hjelp.md i mappa." in tekst
     # Gjennomgangen (BH11): i det vinduet sier, ikke i kommentarene.
     meldinger = [
         linje
@@ -692,3 +692,27 @@ def test_porten_sjekkes_foer_uv_og_bare_oss_stoppes(navn):
     assert kode.index(sjekk) < kode.index("Skriptet stopper aldri andre programmer.") < kode.index(stopp_)
     for del_ in ("waitress-serve", "--listen=127", "app:app"):
         assert del_ in kode.split(kall.strip() if navn == "start.ps1" else "er_ose_signal() {", 1)[1], del_
+
+
+def _beskjedene(navn) -> list[str]:
+    """Teksten i hvert kall til Stopp eller stopp, og i trap."""
+    kode = "\n".join(_kode(SKRIPTENE[navn]))
+    return re.findall(r"\b[Ss]topp ('[^'\n]*'|\"[^\"\n]*\")", kode)
+
+
+@pytest.mark.parametrize("navn", list(SKRIPTENE))
+def test_ingen_beskjed_viser_bare_til_readme(navn):
+    """Forproeven 24.10 (funn 8, spesifikasjonen 3.5d). Ville feilet hvis en
+    beskjed i vinduet bare viste til README-en, for eksempel «Installer uv
+    slik «Tester» i README-en sier», i stedet for aa si hva man gjoer: hver
+    beskjed sier at man dobbeltklikker paa nytt, eller laster ned en egen
+    kopi."""
+    beskjedene = _beskjedene(navn)
+    assert len(beskjedene) >= 10, beskjedene
+    for beskjed in beskjedene:
+        assert "README" not in beskjed, beskjed
+        assert "obbeltklikk" in beskjed or "Last ned en egen kopi" in beskjed, beskjed
+    tekst = SKRIPTENE[navn].read_text(encoding="utf-8-sig")
+    meldinger = [l for l in _kode(SKRIPTENE[navn]) if re.search(r"\b(Write-Host|echo)\b", l)]
+    assert not any("README" in l for l in meldinger), [l for l in meldinger if "README" in l]
+    assert "skriv j og trykk Enter når vinduet spør om uv" in tekst

@@ -30,7 +30,7 @@ vent_paa_enter() {
 stopp() {
     echo
     echo "Noe gikk galt: $1"
-    echo "Se «Står du fast?» i README-en, eller docs/hjelp.md. Du kan starte på nytt med et nytt dobbeltklikk."
+    echo "Står det fortsatt fast, er det mer hjelp under «Start med dobbeltklikk» i docs/hjelp.md i mappa."
     vent_paa_enter
     exit 1
 }
@@ -100,7 +100,7 @@ aapne() {
 }
 
 # Til mappa skriptet ligger i, uansett hvor det ble startet fra.
-cd "$(dirname "$0")/.." || stopp "fant ikke mappa til appen."
+cd "$(dirname "$0")/.." || stopp "fant ikke mappa til appen. Pakk ut ZIP-fila på nytt, og dobbeltklikk på nytt."
 
 if [ "$VERSJON" = "demo" ]; then
     echo "OSE Signal: demoen, med oppdiktede selskaper og kurser."
@@ -135,19 +135,19 @@ if ! command -v uv >/dev/null 2>&1; then
     fi
     case "$svar" in
         j|J|ja|Ja|JA|y|Y|yes) ;;
-        *) stopp "uv er ikke installert. Installer uv slik «Tester» i README-en sier, og start på nytt." ;;
+        *) stopp "uv er ikke installert, og appen kan ikke starte uten. Dobbeltklikk på nytt, og skriv j og trykk Enter når vinduet spør om uv." ;;
     esac
-    curl -LsSf https://astral.sh/uv/install.sh | sh || stopp "installasjonen av uv feilet."
+    curl -LsSf https://astral.sh/uv/install.sh | sh || stopp "installasjonen av uv feilet. Sjekk at maskinen er koblet til nettet, og dobbeltklikk på nytt."
     PATH="$HOME/.local/bin:$PATH"
-    command -v uv >/dev/null 2>&1 || stopp "uv ble ikke funnet etter installasjonen. Lukk vinduet og start på nytt."
+    command -v uv >/dev/null 2>&1 || stopp "uv ble ikke funnet etter installasjonen. Lukk vinduet og dobbeltklikk på nytt."
 fi
 
 echo "Installerer pakkene (uv sync). Første gang tar det noen minutter."
-uv sync || stopp "uv sync feilet. Sjekk at maskinen er koblet til nettet."
+uv sync || stopp "uv sync feilet. Sjekk at maskinen er koblet til nettet, og dobbeltklikk på nytt."
 
 if [ "$VERSJON" = "demo" ]; then
     echo "Lager demobasen."
-    uv run python src/demo.py || stopp "demobasen kunne ikke lages."
+    uv run python src/demo.py || stopp "demobasen kunne ikke lages. Grunnen står i linjene over. Lukk andre vinduer der demoen kjører, og dobbeltklikk på nytt."
     export OSE_DEMO=1
 else
     unset OSE_DEMO
@@ -161,7 +161,7 @@ else
         read -r -s -p "Lim inn nøkkelen og trykk Enter: " noekkel
         echo
         noekkel="${noekkel//[[:space:]]/}"
-        [ -n "$noekkel" ] || stopp "ingen nøkkel ble limt inn."
+        [ -n "$noekkel" ] || stopp "ingen nøkkel ble limt inn. Dobbeltklikk på nytt, og lim inn nøkkelen når vinduet spør."
         # Bare eieren kan lese .env.ny, som blir .env (gjennomgangen, BH6).
         (umask 077 && grep -v '^EODHD_API_KEY=' .env > .env.ny)
         printf 'EODHD_API_KEY=%s\n' "$noekkel" >> .env.ny
@@ -194,7 +194,7 @@ while [ $i -lt 120 ]; do
     sleep 1
     i=$((i + 1))
 done
-[ "$klar" = 1 ] || stopp "appen svarte ikke på 127.0.0.1:8000."
+[ "$klar" = 1 ] || stopp "appen svarte ikke på 127.0.0.1:8000 etter 2 minutter. Grunnen står i linjene over. Lukk vinduet og dobbeltklikk på nytt."
 
 echo
 echo "Appen kjører på $ADRESSE."
@@ -203,4 +203,4 @@ aapne "$ADRESSE"
 wait "$server"
 kode=$?
 # Gjennomgangen (BH2, VG2): stopper appen av seg selv, står beskjeden.
-[ "$kode" = 0 ] || stopp "appen stoppet med kode $kode. Grunnen står i linjene over."
+[ "$kode" = 0 ] || stopp "appen stoppet med kode $kode. Grunnen står i linjene over. Lukk vinduet og dobbeltklikk på nytt."
