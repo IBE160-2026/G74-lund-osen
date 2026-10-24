@@ -2794,6 +2794,8 @@ starter ikke av seg selv.
 
 *Avgjort 2026-10-24 kl. 16:15 (gruppens svar):* a) hvor lenge signalet har vært slik, er børsdager på rad med samme retning og styrke, til og med dagen; b) fra børsometeret: hvor mange aksjer i lista som steg og falt fra børsdagen før, og om bransjen til aksjen steg eller falt i snitt. Begge er fortegn og antall.
 
+*Avgjort 2026-10-24 kl. 21:49 (gruppens svar):* versjon 3 rettes og prøvekjøres på nytt, og flettes bare hvis prøvekjøringen består: færre enn tre tekster stoppet, og ingen tekst som sier feil om en sjekk eller om dagene.
+
 ### Story 10.3: Visningen i aksjedetaljen
 
 *Het Story 5B.3 til 28.09.*
