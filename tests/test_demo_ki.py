@@ -10,7 +10,7 @@ import json
 import sqlite3
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -19,13 +19,14 @@ from markupsafe import escape
 import app as app_modul
 import demo
 import demo_ki
-from ki_grunnlag import ki_grunnlag
+from hovedindeks import valgt_indeks
+from ki_grunnlag import ki_grunnlag, lag_dagsbilde
 from ki_kontroll import kontroller
 from ki_modell import Modellsvar
 from ki_prompt import PROMPTVERSJON
 from ki_tekst import regeltekst
 from kilogg import AKSJE, LOKAL, MASKINVARE
-from lagring_sqlite import SqliteKILogg, SqliteVurderingslager, demo_sti
+from lagring_sqlite import SqliteIndekslager, SqliteKILogg, SqliteKurslager, SqliteVurderingslager, demo_sti
 from vurderingsdata import Vurdering
 
 SRC = Path(demo_ki.__file__).resolve().parent
@@ -61,6 +62,35 @@ def vurderingene(uten_ki):
         tilkobling.close()
 
 
+@pytest.fixture(scope="module")
+def dagene(uten_ki, vurderingene):
+    """Story 10.2e: dagsbildet for hver aksje med vurdering paa siste
+    demodag, regnet fra kursene, indeksen og vurderingene i demobasen."""
+    tilkobling = sqlite3.connect(uten_ki)
+    try:
+        lista = demo.DEMOUNIVERS
+        lager = SqliteVurderingslager(tilkobling, demo._klokke_for(demo.SLUTTDATO), lista)
+        kurser = SqliteKurslager(tilkobling, lista)
+        serier = {a.symbol: kurser.serie(a.symbol) for a in lista}
+        indekser = SqliteIndekslager(tilkobling)
+        indeks = indekser.serie(valgt_indeks(indekser.symboler()))
+        return {
+            a.symbol: lag_dagsbilde(
+                a,
+                demo.SLUTTDATO,
+                vurderingene[a.symbol],
+                lager.les_periode(a.symbol, date.min, demo.SLUTTDATO),
+                lista,
+                serier,
+                indeks,
+            )
+            for a in lista
+            if isinstance(vurderingene[a.symbol], Vurdering)
+        }
+    finally:
+        tilkobling.close()
+
+
 @pytest.fixture
 def klient(monkeypatch):
     monkeypatch.delenv(app_modul.I_DOCKER, raising=False)
@@ -69,17 +99,18 @@ def klient(monkeypatch):
 
 
 class TestFila:
-    def test_grunnlaget_stemmer_med_demodagen(self, radene, vurderingene):
+    def test_grunnlaget_stemmer_med_demodagen(self, radene, vurderingene, dagene):
         """FR-602: grunnlaget og regelen i hver rad er det demoen vurderer
         paa siste demodag. Ville feilet hvis demoen endret seg og tekstene ble
         staaende: da forklarer KI en annen dag enn siden viser, og testen er
-        roed til tekstene lages paa nytt (uv run python src/demo_ki.py)."""
+        roed til tekstene lages paa nytt (uv run python src/demo_ki.py).
+        Story 10.2e: ogsaa dagen fra versjon 3."""
         assert radene
         for rad in radene:
             assert rad.emne.slag == AKSJE and rad.emne.dato == demo.SLUTTDATO, rad.emne
             vurdering = vurderingene[rad.emne.symbol]
             assert isinstance(vurdering, Vurdering), rad.emne.symbol
-            ventet = ki_grunnlag(vurdering, utenfor_maalingen=False)
+            ventet = ki_grunnlag(vurdering, utenfor_maalingen=False, dagen=dagene[rad.emne.symbol])
             assert json.loads(rad.grunnlag_som_json()) == dict(ventet), rad.emne.symbol
             assert rad.regelen == regeltekst(vurdering), rad.emne.symbol
 

@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-24T10:10
+updated: 2026-10-24T20:32
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -4812,3 +4812,48 @@ Gruppen avgjør om WWI og PLT skal bytte plass.
 
 Målingen endrer ikke universet. Parametrene i signalet er låst og målt på de
 15 (AD-13).
+
+## 43. Prøvekjøringen av prompten versjon 3 (2026-10-24)
+
+**Metode.** Som i §34, med prompten versjon 3 fra grenen
+`10-2e-prompten-versjon-3` (story 10.2, gruppens svar kl. 15:50 og 16:15).
+Grunnlaget har i tillegg dagene, hovedindeksen, hvor mange aksjer som steg og
+falt, og bransjen, og kontrollen godtar bare tallene i grunnlaget og sjekker
+hovedindeksen, bransjen, antallene og dagene (spesifikasjonen 10.2e). Basen
+ble kopiert med skallet på main til `data/db/ki-proeve-v3.db` kl. 20:11, før
+grenen ble laget (regel 22). Kopien hadde de 15 radene med versjon 2 fra
+kveldshentingen 23.10, og utfallet av dem står i tabellen. De ble så slettet i
+kopien, og bare der, med utløseren `ki_logg_slettes_ikke` tatt bort og satt
+inn igjen. Bare KI-steget ble kjørt mot kopien for børsdagen 23.10, med den
+ekte klokka, fra et skript utenfor repoet. Tiden per kall ble tatt med
+`time.monotonic()`. Sjekken fra svar c gikk først og sa at tjenesten var klar.
+Ingen kall til EODHD: kvoten sto på 20 brukt kl. 20:06, og steget leser bare
+basen. sha256 for `data/db/ose.db` var den samme før og etter (`e3184c07…f4a4`).
+
+| | §34, versjon 2, 16.10 | Versjon 2, 23.10 (driften) | §43, versjon 3, 23.10 |
+|---|---:|---:|---:|
+| Kjørt | 23:43–23:44 | kveldshentingen | 20:31:25–20:31:36 |
+| Besto kontrollen | 15 | 15 | 12 |
+| Stoppet av kontrollen | 0 | 0 | 3 |
+| Modellen feilet | 0 | 0 | 0 |
+| Median tid per tekst | 0,77 s | ikke målt | 0,73 s |
+| Lengste kall | 81,36 s (det første, med innlasting) | ikke målt | 1,01 s (modellen var lastet) |
+
+§43: `maskinvare` `gpu` for alle 15 og «100% GPU» i `ollama ps`,
+`gemma4:e4b` med `modell_id` `dc35e8d9c606`, og Ollama 0.35.1. Alle 15 radene
+har `promptversjon` 3. Kontrollen i driften 23.10 var den fra versjon 2, uten
+punktene fra 10.2e.
+
+**Resultat.** Kontrollen stoppet 3 av 15 tekster, alle på regel 1 og
+utsagnet «Ingen sjekk ga …» om én sjekk, som styrkeregelen leser som styrke
+0. Utsagnet var riktig i alle tre. Av de 12 som besto, sier tre at både
+trenden og interessen ga utslag der bare trenden ga det, og kontrollen
+sjekker ikke utsagn om én sjekk. Fem sier «minst» om dagene uten at
+grunnlaget har merket, og én forklarer det med «fordi feltet dager er
+minst». Ingen tekst nevner hovedindeksen, bransjen eller antallet aksjer, og
+ingen gir råd eller gjetter på en årsak som nyheter. Tekstene står bare i
+kopien og er ikke ført her.
+
+Versjon 3 besto færre enn versjon 2 på samme dag, så den flettes ikke etter
+beslutningen 16.10 kl. 23:51 (2), og kontrollen stoppet tre, som er grensen i
+instruksjonen kl. 20:00.

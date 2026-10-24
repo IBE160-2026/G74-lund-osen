@@ -989,7 +989,9 @@ HOEYDE_PAA_BILDET = 1630
 # byte det samme.
 # Story 3.5d b: æ, ø og å i meldingene fra demo.py. Bildet ble tatt paa nytt
 # og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "8adc35a02d4c69c7529e6c9ed6145ed5b7d093aad94fb2229953885901adefb2"
+# Story 10.2e: valgt_indeks flyttet fra app.py til hovedindeks.py. Bildet ble
+# tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "bc4126a7538d4bd76f82fcf0bf4c6c8867e11e4923a76035366655098296644a"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1119,7 +1121,10 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # Bildet ble tatt paa nytt og er byte for byte det samme.
 # Story 3.5d b: æ, ø og å i meldingene fra demo.py. Bildet ble tatt paa nytt
 # og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "30801cffdfdafa6630c73acffd776d98e723ea14930c23433400d689b704c918"
+# Story 10.2e: KI-tekstene i demoen laget paa nytt med prompten versjon 3, og
+# valgt_indeks flyttet fra app.py til hovedindeks.py. Bildet ble tatt paa nytt
+# med samme hoeyde og viser den nye teksten for KVST.
+AVTRYKK_BAK_AKSJESIDEN = "f3a79e999ad4e25ba981b6b691dcefd9c0c6dbf61e11da4227d24f2e79e8506b"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "

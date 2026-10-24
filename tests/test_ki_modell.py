@@ -549,8 +549,10 @@ class TestRaden:
 
 
 # Story 10.2d: de 13 tekstene Gemma skrev til demoen (3.4b), og en feil
-# retning for hver retning.
-DEMOTEKSTENE = Path(__file__).resolve().parents[1] / "src" / "demo_ki_tekster.json"
+# retning for hver retning. Story 10.2e: tekstene i demoen er laget paa nytt
+# med versjon 3, og de 13 med versjon 2 ligger ved testene, uendret fra
+# src/demo_ki_tekster.json paa 153aba8, saa testene fra 10.2d staar.
+DEMOTEKSTENE = Path(__file__).resolve().parent / "demo_ki_tekster_versjon_2.json"
 FEIL_RETNING = {"Positiv": "Negativ", "Negativ": "Positiv", "Blandet": "Positiv", "Ingen": "Positiv"}
 
 
