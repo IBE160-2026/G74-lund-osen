@@ -52,7 +52,12 @@ opptatt() {
 er_ose_signal() {
     case " $1 " in *" --listen=127.0.0.1:8000 "*) ;; *) return 1 ;; esac
     case " $1 " in *" app:app "*) ;; *) return 1 ;; esac
-    printf '%s\n' "$1" | grep -Eq '(^|[/ ])waitress-serve( |$)'
+    # Gjennomgangen av 3.5d (BH3, ECH2): bare waitress-serve fra .venv i denne
+    # mappa, så en annen app med app:app på porten aldri stoppes.
+    for mappe in "$(pwd -P)" "$PWD"; do
+        case " $1 " in *" $mappe/.venv/bin/waitress-serve "*) return 0 ;; esac
+    done
+    return 1
 }
 
 # Prosessene som lytter på port 8000. Uten lsof er de ukjente.
@@ -76,7 +81,7 @@ frigjoer_porten() {
     if [ -z "$ider" ] || [ -n "$fremmede" ]; then
         hvem="${fremmede#, }"
         [ -n "$hvem" ] || hvem="et program skriptet ikke fant navnet på"
-        stopp "et annet program svarer allerede på $ADRESSE, og det er ikke OSE Signal fra et av disse vinduene. Programmet er $hvem. Skriptet stopper aldri andre programmer. Er det demoen eller appen i Docker, stopper du den med docker compose --profile demo down i et terminalvindu i mappa med koden. Ellers lukker du programmet. Dobbeltklikk så på nytt."
+        stopp "et annet program svarer allerede på $ADRESSE, og det er ikke OSE Signal fra denne mappa. Programmet er $hvem. Skriptet stopper aldri andre programmer. Er det demoen eller appen i Docker, stopper du den med docker compose --profile demo down i et terminalvindu i mappa med koden. Ellers lukker du programmet. Dobbeltklikk så på nytt."
     fi
     for id in $ider; do
         echo "Den andre versjonen av OSE Signal kjører allerede på $ADRESSE (prosess $id). Den stoppes nå, så denne kan starte."

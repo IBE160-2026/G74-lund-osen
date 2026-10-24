@@ -602,16 +602,36 @@ LYTTEREN = (
     "print('klar', flush=True)\n"
     "time.sleep(300)\n"
 )
-SKRIPTENES_KOMMANDOLINJE = ["waitress-serve", "--listen=127.0.0.1:8000", "--threads=8", "app:app"]
+ARGUMENTENE = ["--listen=127.0.0.1:8000", "--threads=8", "app:app"]
 
 
-def _start_lytteren(hvem):
+def _waitress_serve(mappe, windows):
+    """Stien til waitress-serve i .venv i mappa, slik uv starter den."""
+    if windows:
+        return str(mappe / ".venv" / "Scripts" / "waitress-serve.exe")
+    return str(mappe / ".venv" / "bin" / "waitress-serve")
+
+
+def _start_lytteren(hvem, mappe, windows):
+    """«oss»: kommandolinja fra skriptene, med waitress-serve fra .venv i
+    mappa. «annen_mappe»: den samme kommandolinja fra en annen mappe
+    (gjennomgangen av 3.5d, BH3 og ECH2). «fremmed»: ingen av delene."""
     if not _porten_er_ledig():
         pytest.skip("port 8000 er i bruk paa maskinen")
     python = getattr(sys, "_base_executable", None) or sys.executable
-    argumenter = [python, "-c", LYTTEREN, *(SKRIPTENES_KOMMANDOLINJE if hvem == "oss" else [])]
-    lytter = subprocess.Popen(argumenter, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-    assert lytter.stdout.readline().strip() == "klar"
+    tillegg = {
+        "oss": [_waitress_serve(mappe, windows), *ARGUMENTENE],
+        "annen_mappe": [_waitress_serve(mappe.parent / "annen", windows), *ARGUMENTENE],
+        "fremmed": [],
+    }[hvem]
+    lytter = subprocess.Popen(
+        [python, "-c", LYTTEREN, *tillegg], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+    )
+    linja = lytter.stdout.readline().strip()
+    if linja != "klar":
+        # Gjennomgangen av 3.5d (ECH8): porten ble tatt etter sjekken.
+        _stopp_lytteren(lytter)
+        pytest.skip(f"lytteren startet ikke: {linja}")
     return lytter
 
 
@@ -638,10 +658,11 @@ def _sjekk_porten(hvem, lytter, kode, utskrift):
         assert "Skriptet stopper aldri andre programmer." in utskrift, utskrift
         assert "docker compose --profile demo down" in utskrift and "Dobbeltklikk så på nytt." in utskrift
         assert "Den andre versjonen av OSE Signal" not in utskrift and "Appen trenger uv" not in utskrift
+        assert "og det er ikke OSE Signal fra denne mappa." in utskrift, utskrift
 
 
 @pytest.mark.skipif(sys.platform != "win32", reason="krever Windows PowerShell")
-@pytest.mark.parametrize("hvem", ["oss", "fremmed"])
+@pytest.mark.parametrize("hvem", ["oss", "annen_mappe", "fremmed"])
 def test_start_ps1_stopper_bare_den_andre_versjonen_paa_porten(tmp_path, hvem):
     """Gruppens svar 24.10 kl. 12:04. Ville feilet hvis start.ps1 stoppet et
     annet program paa porten (mutanten: sjekken av kommandolinja borte), ikke
@@ -654,7 +675,7 @@ def test_start_ps1_stopper_bare_den_andre_versjonen_paa_porten(tmp_path, hvem):
     _uten_uv(stier)
     miljoe = {"PATH": os.pathsep.join(stier), "USERPROFILE": str(tmp_path / "hjem"), "SYSTEMROOT": systemrot}
     miljoe["PSModulePath"] = ""
-    lytter = _start_lytteren(hvem)
+    lytter = _start_lytteren(hvem, mappe, windows=True)
     try:
         argumenter = [str(powershell), "-NoProfile", "-ExecutionPolicy", "Bypass", "-File"]
         argumenter += [str(mappe / "start" / "start.ps1"), "-Versjon", "demo"]
@@ -669,7 +690,7 @@ def _lsof():
 
 
 @pytest.mark.skipif(sys.platform == "win32" or _bash() is None or _lsof() is None, reason="krever bash, lsof og ps")
-@pytest.mark.parametrize("hvem", ["oss", "fremmed"])
+@pytest.mark.parametrize("hvem", ["oss", "annen_mappe", "fremmed"])
 def test_start_sh_stopper_bare_den_andre_versjonen_paa_porten(tmp_path, hvem):
     """Gruppens svar 24.10 kl. 12:04. Ville feilet hvis start.sh stoppet et
     annet program paa porten, ikke sa hvilket program og hva man gjoer, ikke
@@ -682,7 +703,7 @@ def test_start_sh_stopper_bare_den_andre_versjonen_paa_porten(tmp_path, hvem):
             stier.add(str(Path(shutil.which(program)).parent))
     _uten_uv(stier)
     miljoe = {"PATH": os.pathsep.join(sorted(stier)), "HOME": str(tmp_path / "hjem")}
-    lytter = _start_lytteren(hvem)
+    lytter = _start_lytteren(hvem, mappe, windows=False)
     try:
         kode, utskrift = _kjoer([_bash(), str(mappe / "start" / "start.sh"), "demo"], miljoe, sjekk_porten=False)
         _sjekk_porten(hvem, lytter, kode, utskrift)
@@ -703,8 +724,102 @@ def test_porten_sjekkes_foer_uv_og_bare_oss_stoppes(navn):
     assert kode.index(kall) < kode.index("Appen trenger uv") < kode.index("uv sync")
     assert kode.index(kall) < kode.index("uv run python src/fetch_prices.py")
     assert kode.index(sjekk) < kode.index("Skriptet stopper aldri andre programmer.") < kode.index(stopp_)
-    for del_ in ("waitress-serve", "--listen=127", "app:app"):
-        assert del_ in kode.split(kall.strip() if navn == "start.ps1" else "er_ose_signal() {", 1)[1], del_
+    # Gjennomgangen av 3.5d (VG1): delene staar i selve sjekken, ikke bare i
+    # linja som starter serveren lenger ned.
+    for del_ in ("waitress-serve", "--listen=127", "app:app", ".venv"):
+        assert del_ in _sjekken(navn), del_
+
+
+def _sjekken(navn) -> str:
+    """Funksjonen som kjenner igjen kommandolinja, til foerste } paa egen linje."""
+    tekst = SKRIPTENE[navn].read_text(encoding="utf-8-sig").replace("\r\n", "\n")
+    start = tekst.index({"start.ps1": "function Er-OseSignal(", "start.sh": "er_ose_signal() {"}[navn])
+    return tekst[start : tekst.index("\n}\n", start) + 3]
+
+
+# Gjennomgangen av 3.5d (VG1, VG2): kommandolinjer og om de er OSE Signal fra
+# mappa. MAPPE byttes med mappa skriptet staar i. Den foerste paa Windows har
+# formen som ble slaatt opp 24.10 (spesifikasjonen 3.5d).
+KOMMANDOLINJENE = {
+    "start.ps1": [
+        (
+            r'"MAPPE\.venv\Scripts\python.exe" "MAPPE\.venv\Scripts\waitress-serve.exe" '
+            "--listen=127.0.0.1:8000 --threads=8 app:app",
+            True,
+        ),
+        (
+            r'"MAPPE\.venv\Scripts\python.exe" "MAPPE\.venv\Scripts\waitress-serve.exe" --listen=127.0.0.1:8000 app:app',
+            True,
+        ),
+        (r"MAPPE\.venv\Scripts\waitress-serve.exe --listen=127.0.0.1:8000 --threads=8 app:app", True),
+        (r"C:\annen\.venv\Scripts\waitress-serve.exe --listen=127.0.0.1:8000 app:app", False),
+        ("waitress-serve --listen=127.0.0.1:8000 app:app", False),
+        (r"MAPPE\.venv\Scripts\waitress-serve.exe --listen=127.0.0.1:8000 annen:app", False),
+        (r"MAPPE\.venv\Scripts\waitress-serve.exe --listen=0.0.0.0:8000 app:app", False),
+        (r"MAPPE\.venv\Scripts\waitress-serve.exe app:app", False),
+        (r"python MAPPE\src\app.py", False),
+        (r'"C:\Program Files\Docker\Docker\resources\com.docker.backend.exe"', False),
+        ("", False),
+    ],
+    "start.sh": [
+        ("MAPPE/.venv/bin/python3 MAPPE/.venv/bin/waitress-serve --listen=127.0.0.1:8000 --threads=8 app:app", True),
+        ("MAPPE/.venv/bin/python3 MAPPE/.venv/bin/waitress-serve --listen=127.0.0.1:8000 app:app", True),
+        ("/annen/.venv/bin/python3 /annen/.venv/bin/waitress-serve --listen=127.0.0.1:8000 app:app", False),
+        ("waitress-serve --listen=127.0.0.1:8000 app:app", False),
+        ("MAPPE/.venv/bin/waitress-serve --listen=127.0.0.1:8000 annen:app", False),
+        ("MAPPE/.venv/bin/waitress-serve --listen=0.0.0.0:8000 app:app", False),
+        ("MAPPE/.venv/bin/waitress-serve app:app", False),
+        ("python MAPPE/src/app.py", False),
+        ("/Applications/Docker.app/Contents/MacOS/com.docker.backend", False),
+        ("", False),
+    ],
+}
+
+SJEKK_PS1 = """
+$m = (Get-Location).ProviderPath
+foreach ($l in [IO.File]::ReadAllLines((Join-Path $m 'linjer.txt'))) {
+    if (Er-OseSignal ($l.Replace('MAPPE', $m))) { 'ja' } else { 'nei' }
+}
+"""
+
+SJEKK_SH = """
+m="$(pwd -P)"
+while IFS= read -r l; do
+    if er_ose_signal "${l//MAPPE/$m}"; then echo ja; else echo nei; fi
+done < linjer.txt
+"""
+
+
+def _svar_fra_sjekken(navn, tmp_path):
+    """Kjoerer sjekken alene, i en tom mappe, for hver kommandolinje."""
+    linjene = "\n".join(linje for linje, _ in KOMMANDOLINJENE[navn]) + "\n"
+    (tmp_path / "linjer.txt").write_bytes(linjene.encode("utf-8"))
+    if navn == "start.ps1":
+        (tmp_path / "sjekk.ps1").write_bytes(("\ufeff" + _sjekken(navn) + SJEKK_PS1).encode("utf-8"))
+        systemrot = os.environ["SYSTEMROOT"]
+        powershell = Path(systemrot) / "System32" / "WindowsPowerShell" / "v1.0" / "powershell.exe"
+        argumenter = [str(powershell), "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(tmp_path / "sjekk.ps1")]
+    else:
+        (tmp_path / "sjekk.sh").write_bytes((_sjekken(navn) + SJEKK_SH).encode("utf-8"))
+        argumenter = [_bash(), str(tmp_path / "sjekk.sh")]
+    svar = subprocess.run(argumenter, cwd=tmp_path, capture_output=True, text=True, timeout=120)
+    return svar.stdout.split(), svar.stderr
+
+
+@pytest.mark.parametrize("navn", list(SKRIPTENE))
+def test_sjekken_kjenner_bare_igjen_waitress_fra_mappa(navn, tmp_path):
+    """Gjennomgangen av 3.5d (VG1, VG2, BH3, ECH2). Ville feilet hvis sjekken
+    ikke kjente igjen den ekte kommandolinja paa Windows, med sti i
+    anfoerselstegn og .exe, eller kjente igjen en kommandolinje uten en av
+    delene, med waitress-serve fra en annen mappe, med en annen app eller
+    en annen adresse, slik at et annet program kunne blitt stoppet."""
+    if navn == "start.ps1" and sys.platform != "win32":
+        pytest.skip("krever Windows PowerShell")
+    if navn == "start.sh" and _bash() is None:
+        pytest.skip("krever bash")
+    ut, feil = _svar_fra_sjekken(navn, tmp_path)
+    forventet = ["ja" if ja else "nei" for _, ja in KOMMANDOLINJENE[navn]]
+    assert ut == forventet, (ut, feil)
 
 
 def _beskjedene(navn) -> list[str]:

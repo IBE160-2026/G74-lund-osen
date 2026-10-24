@@ -67,7 +67,10 @@ function Opptatt {
 # --listen=127.0.0.1:8000 og app:app. Alt annet stoppes aldri.
 function Er-OseSignal([string]$Kommandolinje) {
     if (-not $Kommandolinje) { return $false }
-    return ($Kommandolinje -match '(^|[\\/\s"''])waitress-serve(\.exe)?["'']?(\s|$)') -and
+    # Gjennomgangen av 3.5d (BH3, ECH2): bare waitress-serve fra .venv i denne
+    # mappa, så en annen app med app:app på porten aldri stoppes.
+    $venv = [regex]::Escape((Join-Path (Get-Location).ProviderPath '.venv\Scripts\waitress-serve'))
+    return ($Kommandolinje -match ('(^|[\s"''])' + $venv + '(\.exe)?["'']?(\s|$)')) -and
         ($Kommandolinje -match '(^|\s)--listen=127\.0\.0\.1:8000(\s|$)') -and
         ($Kommandolinje -match '(^|\s)app:app(\s|$)')
 }
@@ -99,7 +102,7 @@ function Frigjoer-Porten {
         } else {
             $hvem = 'et program skriptet ikke fant navnet på'
         }
-        Stopp "et annet program svarer allerede på $Adresse, og det er ikke OSE Signal fra et av disse vinduene. Programmet er $hvem. Skriptet stopper aldri andre programmer. Er det demoen eller appen i Docker, stopper du den med docker compose --profile demo down i et terminalvindu i mappa med koden. Ellers lukker du programmet. Dobbeltklikk så på nytt."
+        Stopp "et annet program svarer allerede på $Adresse, og det er ikke OSE Signal fra denne mappa. Programmet er $hvem. Skriptet stopper aldri andre programmer. Er det demoen eller appen i Docker, stopper du den med docker compose --profile demo down i et terminalvindu i mappa med koden. Ellers lukker du programmet. Dobbeltklikk så på nytt."
     }
     foreach ($lytter in $lyttere) {
         Write-Host "Den andre versjonen av OSE Signal kjører allerede på $Adresse (prosess $($lytter.Id)). Den stoppes nå, så denne kan starte."

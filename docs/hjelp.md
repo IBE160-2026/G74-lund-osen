@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-24T16:55
+updated: 2026-10-24T17:15
 ---
 
 # Hjelp til «Kom i gang»
@@ -229,11 +229,11 @@ Første gang kan macOS stoppe `Start demoen.command` eller `Start den ekte versj
 
 ### Vinduet sier at den andre versjonen av OSE Signal stoppes.
 
-Demoen eller den ekte versjonen kjørte allerede fra et annet dobbeltklikk, på samme port. Skriptet stopper den, venter til porten er ledig, og starter den du dobbeltklikket. Det andre vinduet sier da at appen stoppet, og kan lukkes.
+Demoen eller den ekte versjonen kjørte allerede fra denne mappa, på samme port, fra et annet dobbeltklikk eller startet med `uv run waitress-serve`. Skriptet stopper den, venter til porten er ledig, og starter den du dobbeltklikket. Det andre vinduet sier da at appen stoppet, og kan lukkes.
 
 ### Vinduet sier at et annet program svarer på 127.0.0.1:8000.
 
-Skriptet stopper aldri andre programmer, og vinduet sier hvilket program det er. Er det demoen eller appen i Docker, stopper du den med `docker compose --profile demo down` i et terminalvindu i mappa med koden. Den stopper både demoen og den ekte versjonen. Er det et annet program, lukker du det. Dobbeltklikk så på nytt.
+Skriptet stopper aldri andre programmer, heller ikke OSE Signal fra en annen mappe, og vinduet sier hvilket program det er. Er det demoen eller appen i Docker, stopper du den med `docker compose --profile demo down` i et terminalvindu i mappa med koden. Den stopper både demoen og den ekte versjonen. Er det et annet program, lukker du det. Dobbeltklikk så på nytt.
 
 ### Hvor finner jeg nøkkelen, og hvordan limer jeg den inn?
 
