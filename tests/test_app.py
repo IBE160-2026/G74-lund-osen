@@ -2207,10 +2207,11 @@ class TestStory80eTekst:
         _lagret("KOG", 0.0, 1, 1, 1)
         _lagret("EQNR", 0.0, 1, 1, 0)
         tekst = _synlig(klient.get("/").data.decode("utf-8"))
-        assert "3 av 3 Bare Kongsberg Gruppen fikk utslag på alle 3 sjekkene." in tekst
+        # Story 8.2a, f (gruppens svar 24.10 kl. 11:49): uten «Bare» (NFR-06).
+        assert "3 av 3 Kongsberg Gruppen fikk utslag på alle 3 sjekkene." in tekst
         _lagret("DNB", 5.0, -1, -1, -1)
         tekst = _synlig(klient.get("/").data.decode("utf-8"))
-        assert "Bare DNB Bank og Kongsberg Gruppen fikk utslag på alle 3 sjekkene." in tekst
+        assert "3 av 3 DNB Bank og Kongsberg Gruppen fikk utslag på alle 3 sjekkene." in tekst
 
     def test_linja_om_3_av_3_ogsaa_naar_terskelen_er_over_3(self, klient, monkeypatch):
         """ECH3 i gjennomgangen: navnene tas fra alle radene, ikke bare fra
@@ -2219,7 +2220,9 @@ class TestStory80eTekst:
 
         monkeypatch.setattr(app_modul, "STANDARD", dataclasses.replace(app_modul.STANDARD, terskel=4))
         _lagret("KOG", 0.0, 1, 1, 1)
-        assert "Bare Kongsberg Gruppen fikk utslag på alle 3 sjekkene." in _synlig(klient.get("/").data.decode("utf-8"))
+        assert "3 av 3 Kongsberg Gruppen fikk utslag på alle 3 sjekkene." in _synlig(
+            klient.get("/").data.decode("utf-8")
+        )
 
     def test_ingen_linje_uten_3_av_3(self, klient):
         _lagret("KOG", 0.0, 1, 1, 0)

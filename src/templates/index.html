@@ -128,8 +128,10 @@
           {%- elif n > 1 %} Hos disse {{ n }} slo minst {{ parametre.terskel }} av {{ antall_sjekker }} ut.{% endif %}
           Det viser hvor du kan se nærmere, ikke hva du bør kjøpe eller selge.
         </p>
+        {#- Story 8.2a, f (gruppens svar 24.10 kl. 11:49): uten «Bare», så
+            teksten ikke vurderer (NFR-06). #}
         {% if tre_av_tre %}
-          <p class="alle-sjekkene"><span class="pille tre-av-tre">{{ antall_sjekker }} av {{ antall_sjekker }}</span> Bare {{ tre_av_tre|med_og }} fikk utslag på alle {{ antall_sjekker }} sjekkene.</p>
+          <p class="alle-sjekkene"><span class="pille tre-av-tre">{{ antall_sjekker }} av {{ antall_sjekker }}</span> {{ tre_av_tre|med_og }} fikk utslag på alle {{ antall_sjekker }} sjekkene.</p>
         {% endif %}
       </div>
 

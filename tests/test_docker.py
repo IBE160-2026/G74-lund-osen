@@ -963,7 +963,9 @@ HOEYDE_PAA_BILDET = 1630
 # samme, men viser de samme radene og tallene.
 # Story 8.2a e: én liste når man sorterer, i index.html og markedsoversikt.py.
 # Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "cb71dcd0874c7a366fe74917c85d243b383b269309b5df3e37cad34d82ef9fd4"
+# Story 8.2a f: linja om 3 av 3 uten «Bare» i index.html. Bildet ble tatt paa
+# nytt med samme hoeyde, og viser linja uten ordet.
+AVTRYKK_BAK_BILDET = "138cbf621f5ba9601a1676a18464ad07939d8c42a3f9c6d8ec0a058148cec942"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "

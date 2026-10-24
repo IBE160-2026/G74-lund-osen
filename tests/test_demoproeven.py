@@ -308,3 +308,17 @@ def test_min_liste_sortert_er_en_liste_med_bare_de_merkede(klient):
     assert navn == sorted(navn, key=lambda n: n.casefold().translate(str.maketrans({"æ": "{", "ø": "|", "å": "}"})))
     alle = _html(klient, "/min-liste?vis=alle&sorter=endring&orden=synkende")
     assert len(_radene(alle)) == 15 and _symbolene(alle)[-1] == "MTFJ"
+
+
+# f) «Bare» tas bort fra setningen om dem med 3 av 3 (kl. 11:49).
+
+
+def test_setningen_om_3_av_3_vurderer_ikke(klient):
+    """NFR-06. Ville feilet hvis setningen begynte med «Bare» (U74)."""
+    html = _html(klient, "/")
+    linja = _synlig(re.search(r'<p class="alle-sjekkene">(.*?)</p>', html, re.S).group(1))
+    assert linja == (
+        "3 av 3 Brattfjell Energi, Kvitstein Mineral, Laksevik Sjømat og Trygghavn Forsikring "
+        "fikk utslag på alle 3 sjekkene."
+    )
+    assert "Bare" not in linja

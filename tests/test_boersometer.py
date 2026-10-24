@@ -342,7 +342,9 @@ class TestSiden:
         oversikt = _side(klient, "/")
         for symbol in gule:
             navn = re.search(rf'href="/aksje/{symbol}">([^<]+)</a>', oversikt).group(1)
-            assert navn in re.search(r"Bare (.*?) fikk utslag på alle", oversikt).group(1)
+            # Story 8.2a, f: linja begynner ikke lenger med «Bare».
+            linja = re.search(r'<p class="alle-sjekkene">(.*?)</p>', oversikt, re.S).group(1)
+            assert navn in re.search(r"</span> (.*?) fikk utslag på alle", linja).group(1)
 
     def test_stoerrelsen_foelger_volumforholdet_i_tabellen(self, klient):
         """Ville feilet hvis ruta hadde en annen størrelse enn volumforholdet
