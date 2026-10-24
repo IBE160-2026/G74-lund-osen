@@ -185,14 +185,14 @@ class TestSjekken:
             raise requests.ConnectionError("http://127.0.0.1:11434 nede")
 
         grunn = OllamaModell(hent=hent).sjekk()
-        assert grunn == "Ollama svarer ikke (kjoerer den?)"
+        assert grunn == "Ollama svarer ikke (kjører den?)"
         assert "127.0.0.1" not in grunn
 
     def test_tidsavbrudd(self):
         def hent(*_a):
             raise requests.Timeout()
 
-        assert OllamaModell(hent=hent).sjekk() == "Ollama svarer ikke (kjoerer den?)"
+        assert OllamaModell(hent=hent).sjekk() == "Ollama svarer ikke (kjører den?)"
 
     def test_modellen_mangler(self):
         assert (
@@ -203,7 +203,7 @@ class TestSjekken:
     @pytest.mark.parametrize("svar", [(500, None), (500, {"models": [{"name": MODELL}]})])
     def test_status_som_ikke_er_200(self, svar):
         """VG4: ogsaa naar svaret har modellen."""
-        assert OllamaModell(hent=lambda *_a: svar).sjekk() == "Ollama svarte HTTP 500 paa listen over modeller"
+        assert OllamaModell(hent=lambda *_a: svar).sjekk() == "Ollama svarte HTTP 500 på listen over modeller"
 
     @pytest.mark.parametrize("svar", [(200, None), (200, {"models": 5}), (200, {})])
     def test_svar_som_ikke_kan_leses(self, svar):

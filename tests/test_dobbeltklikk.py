@@ -461,7 +461,7 @@ SKREVET_UTEN_AEOEAA = {
     "aa", "aapen", "aapnes", "aaret", "boers", "boersdag", "boersdagen", "boersdager", "boersen", "ennaa",
     "faa", "faar", "foer", "foerst", "foerste", "forsoek", "forsoeket", "inneveerende", "kjoer", "kjoeres",
     "kjoeringen", "laaser", "laast", "naa", "noekkelen", "oeyeblikksbilde", "oeyeblikksbildet", "paa",
-    "paagikk", "proever", "proeves", "saa", "staar",
+    "paagikk", "proever", "proeves", "saa", "staar", "miljoeet", "gaar", "kjoering", "kjoerer",
 }  # fmt: skip
 
 
@@ -489,7 +489,9 @@ def _tekstene_brukeren_ser(sti) -> list[tuple[int, str]]:
     ]
 
 
-@pytest.mark.parametrize("fil", ["fetch_prices.py", "demo.py"])
+# Gjennomgangen av 3.5d (VG6): KI-tekstene hentingen skriver ut, med grunnen
+# fra den lokale modellen og tjenestene.
+@pytest.mark.parametrize("fil", ["fetch_prices.py", "demo.py", "ki_tekst.py", "ki_lokal.py", "ki_sky.py"])
 def test_det_brukeren_ser_har_ae_oe_og_aa(fil):
     """Forproeven 24.10 (funn 4, spesifikasjonen 3.5d). Ville feilet hvis en
     melding eller hjelpetekst fra hentingen eller demoen skrev «paa»,

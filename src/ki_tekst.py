@@ -127,15 +127,15 @@ def velg_modell(innstillinger: Mapping[str, str], skriv: Callable[[str], None] =
         # hente igjen, vet foerst lag_ki_tekster (gjennomgangen av 10.7b, BH2, ECH3).
         if not noekkel:
             skriv(
-                f"OSE_KI_TJENESTE={tjeneste}, men {variabel} mangler i .env og i miljoeet. "
-                "KI-teksten lages ikke foer den er lagt inn."
+                f"OSE_KI_TJENESTE={tjeneste}, men {variabel} mangler i .env og i miljøet. "
+                "KI-teksten lages ikke før den er lagt inn."
             )
         elif grunn := modell.sjekk():
-            skriv(f"OSE_KI_TJENESTE={tjeneste}, men {grunn}. KI-teksten lages ikke foer den er rettet.")
+            skriv(f"OSE_KI_TJENESTE={tjeneste}, men {grunn}. KI-teksten lages ikke før den er rettet.")
         else:
             # Som for en adresse utenfor maskinen: utskriften sier at
             # grunnlaget sendes ut (gjennomgangen av 10.7, BH8).
-            skriv(f"KI-teksten lages av {tjeneste} ({modell.modell}) med noekkelen din. Grunnlaget sendes dit.")
+            skriv(f"KI-teksten lages av {tjeneste} ({modell.modell}) med nøkkelen din. Grunnlaget sendes dit.")
         return modell
     skriv(
         "OSE_KI_TJENESTE har en ukjent eller tom verdi. Bruk lokal, gemini, anthropic, openai eller av. "
@@ -178,7 +178,7 @@ def _rad_uten_kall(emne: Emne, vurdering: Vurdering, modell: Modell, foerste: st
         regelen=regeltekst(vurdering),
         tekst=None,
         besto=False,
-        grunn=f"modellen feilet: ikke kalt, fordi den feilet for {foerste} i samme kjoering",
+        grunn=f"modellen feilet: ikke kalt, fordi den feilet for {foerste} i samme kjøring",
         promptversjon=PROMPTVERSJON,
         tjeneste=modell.tjeneste,
         modell=modell.modell,
@@ -201,7 +201,7 @@ def _hva_naa(grunn: str) -> str:
         # Miljoeet gaar foran .env (ki_innstillinger), saa begge nevnes
         # (gjennomgangen av 10.7b, BH1, ECH1, ECH2).
         return (
-            "Legg noekkelen inn eller rett den i .env, eller i miljoeet, som gaar foran, "
+            "Legg nøkkelen inn eller rett den i .env, eller i miljøet, som går foran, "
             "se «Egen nøkkel til Gemini, Anthropic eller OpenAI» i README-en"
         )
     if "ikke hentet" in grunn:
@@ -243,12 +243,12 @@ def lag_ki_tekster(
 
     def antall() -> str:
         tekst = f"{besto + stoppet + feilet} rader ble skrevet"
-        return tekst + (f", og {sto} sto fra foer" if sto else "")
+        return tekst + (f", og {sto} sto fra før" if sto else "")
 
     try:
         tilkobling = aapne_base(base_sti)
     except Exception as feil:  # NFR-04: KI-laget stopper aldri hentingen.
-        skriv(f"KI-teksten: basen kunne ikke aapnes ({type(feil).__name__}). Ingen KI-tekst i kveld.")
+        skriv(f"KI-teksten: basen kunne ikke åpnes ({type(feil).__name__}). Ingen KI-tekst i kveld.")
         return True
     try:
         vurderinger = SqliteVurderingslager(tilkobling, klokke, lista)
@@ -272,18 +272,18 @@ def lag_ki_tekster(
             # Gjennomgangen av 2.3c, ECH1: etter foerste henting er dagen
             # ikke inneveerende boersdag, saa teksten kan ikke lages senere.
             skriv(
-                f"Ingen KI-tekst for boersdagen {dato.isoformat()}: {grunn}. Ingen rader er skrevet i "
+                f"Ingen KI-tekst for børsdagen {dato.isoformat()}: {grunn}. Ingen rader er skrevet i "
                 "KI-loggen, og teksten for den dagen kan ikke lages senere, fordi den ikke er "
-                "inneveerende boersdag (AD-7). Kveldens henting lager tekstene for dagens boersdag."
+                "inneværende børsdag (AD-7). Kveldens henting lager tekstene for dagens børsdag."
             )
             return False
         if grunn:
             skriv(
-                f"Ingen KI-tekst for boersdagen {dato.isoformat()} ennaa: {grunn}. Ingen rader er "
-                f"skrevet i KI-loggen, og {len(mangler)} aksjer venter paa teksten"
-                + (f" ({sto} har den fra foer)" if sto else "")
+                f"Ingen KI-tekst for børsdagen {dato.isoformat()} ennå: {grunn}. Ingen rader er "
+                f"skrevet i KI-loggen, og {len(mangler)} aksjer venter på teksten"
+                + (f" ({sto} har den fra før)" if sto else "")
                 + ". "
-                f"{_hva_naa(grunn)}, og kjoer samme kommando igjen foer midnatt"
+                f"{_hva_naa(grunn)}, og kjør samme kommando igjen før midnatt"
                 + (". Det gir 0 kall til EODHD." if basen_har_kursene else ".")
             )
             return False
@@ -309,7 +309,7 @@ def lag_ki_tekster(
                 stoppet += 1
     except IkkeInnevaerendeBoersdag:
         skriv(
-            f"KI-teksten stoppet: det er blitt en ny boersdag siden kjoeringen startet, og "
+            f"KI-teksten stoppet: det er blitt en ny børsdag siden kjøringen startet, og "
             f"radene for {dato.isoformat()} kan ikke skrives lenger (AD-7). {antall()}."
         )
         return True
@@ -323,8 +323,8 @@ def lag_ki_tekster(
     finally:
         tilkobling.close()
     skriv(
-        f"KI-tekst for boersdagen {dato.isoformat()} ({modell.tjeneste}, {modell.modell}): "
+        f"KI-tekst for børsdagen {dato.isoformat()} ({modell.tjeneste}, {modell.modell}): "
         f"{besto} besto kontrollen, {stoppet} ble stoppet av kontrollen, og modellen feilet "
-        f"for {feilet}." + (f" {sto} rader sto fra foer og er ikke laget paa nytt." if sto else "")
+        f"for {feilet}." + (f" {sto} rader sto fra før og er ikke laget på nytt." if sto else "")
     )
     return True

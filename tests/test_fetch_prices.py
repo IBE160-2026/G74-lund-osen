@@ -3980,7 +3980,7 @@ class TestFoersteHentingEtterGjennomgangen:
         from test_ki_tekst import SjekketModell
 
         raa, base = stier
-        modell = SjekketModell("Ollama svarer ikke (kjoerer den?)")
+        modell = SjekketModell("Ollama svarer ikke (kjører den?)")
         _, _, ut = kjoer_23(raa, base, DAGTID_22_09, som_api_et([]), modell=modell)
         assert modell.kall == 0 and "kan ikke lages senere" in ut
         assert "kjoer samme kommando igjen" not in ut

@@ -340,11 +340,11 @@ class TestLagTekstene:
         class Feiler(_Falsk):
             def lag_tekst(self, prompt):
                 self.kall += 1
-                raise ModellFeilet("Ollama svarer ikke (kjoerer den?)")
+                raise ModellFeilet("Ollama svarer ikke (kjører den?)")
 
         class IkkeKlar(_Falsk):
             def sjekk(self):
-                return "Ollama svarer ikke (kjoerer den?)"
+                return "Ollama svarer ikke (kjører den?)"
 
         fil = tmp_path / "radene.json"
         fil.write_text("den gamle", encoding="utf-8")

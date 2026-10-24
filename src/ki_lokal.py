@@ -84,7 +84,7 @@ class OllamaModell:
         except requests.Timeout as feil:
             raise ModellFeilet(f"tidsavbrudd etter {self._tidsfrist:g} s") from feil
         except requests.ConnectionError as feil:
-            raise ModellFeilet("Ollama svarer ikke (kjoerer den?)") from feil
+            raise ModellFeilet("Ollama svarer ikke (kjører den?)") from feil
         except requests.RequestException as feil:
             raise ModellFeilet(type(feil).__name__) from feil
         if status == 404:
@@ -110,9 +110,9 @@ class OllamaModell:
         try:
             status, svar = self._kall("GET", "/api/tags")
         except requests.RequestException:
-            return "Ollama svarer ikke (kjoerer den?)"
+            return "Ollama svarer ikke (kjører den?)"
         if status != 200:
-            return f"Ollama svarte HTTP {status} paa listen over modeller"
+            return f"Ollama svarte HTTP {status} på listen over modeller"
         modeller = svar.get("models") if isinstance(svar, dict) else None
         if not isinstance(modeller, list):
             return "Ollama ga en liste over modeller som ikke kunne leses"

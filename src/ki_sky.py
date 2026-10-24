@@ -49,7 +49,7 @@ def noekkel_feil(noekkel: str, variabel: str) -> str | None:
     if not noekkel:
         return f"{variabel} mangler"
     if not (noekkel.isascii() and noekkel.isprintable()) or " " in noekkel:
-        return f"{variabel} har tegn som ikke kan sendes, lim den inn paa nytt"
+        return f"{variabel} har tegn som ikke kan sendes, lim den inn på nytt"
     return None
 
 
