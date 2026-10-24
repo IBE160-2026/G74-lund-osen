@@ -355,7 +355,13 @@ class TestSidene:
         assert "Oslo Børs · " not in oversikt
         assert f"Demoversjon. {app_modul.EKSEMPELTALL_MERKE}" in oversikt
         assert f"Demoversjon. {app_modul.EKSEMPELTALL_MERKE}" in detalj
-        for tekst in ("Brattfjell Energi", "skiller seg ut", "signalet kunne ikke regnes", "Matfjord Merkevarer"):
+        # Story 8.2a, d: grunnen for Varde Systemer har tallene, som aksjesiden.
+        for tekst in (
+            "Brattfjell Energi",
+            "skiller seg ut",
+            "for kort historikk: 30 av 51 dager",
+            "Matfjord Merkevarer",
+        ):
             assert tekst in oversikt, tekst
         assert "Trenger 51 dager" in klient.get("/aksje/VRDS").data.decode("utf-8")
         assert not Path(lagring_sqlite.BASE_STI).exists()
@@ -790,7 +796,8 @@ class TestSoeyleneIDemoen:
             if 'class="pille tre-av-tre"' in rad:
                 i_tabellen.add(re.search(r'href="/aksje/([^"]+)"', rad).group(1))
         gule = set(
-            re.findall(r'<span class="etikett tre-av-tre">.*?<span class="ticker">([^<]+)</span>', figur, re.DOTALL)
+            # Story 8.2a, c (U20): etiketten er en lenke.
+            re.findall(r'<a class="etikett tre-av-tre"[^>]*>.*?<span class="ticker">([^<]+)</span>', figur, re.DOTALL)
         )
         assert i_tabellen and gule == i_tabellen
         # Gjennomgangen (BH2): «3 av 3» står også i lista for skjermleser.

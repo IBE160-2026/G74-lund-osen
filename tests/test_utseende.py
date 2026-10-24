@@ -325,7 +325,10 @@ class TestRammen:
                         r"/\?sorter=(selskap|kurs|endring|signal|retning)&amp;orden=(synkende|stigende)", href
                     )
                     # Story 8.16: periodene i kursgrafen er en parameter paa aksjesiden.
-                    or re.fullmatch(r"/aksje/[A-Z0-9]+\?periode=(" + "|".join(map(re.escape, PERIODENE)) + ")", href)
+                    # Story 8.2a, a (U36): med ankeret ved kursgrafen.
+                    or re.fullmatch(
+                        r"/aksje/[A-Z0-9]+\?periode=(" + "|".join(map(re.escape, PERIODENE)) + ")#kursgrafen", href
+                    )
                     # Story 2.7a: stilarket, med avtrykket av fila.
                     or re.fullmatch(r"/static/stil\.css\?v=[0-9a-f]{16}", href)
                     # Story 2.7b: hver dag i historikken lenker til siden for
@@ -651,8 +654,12 @@ class TestOversikten:
             html,
         )
         # Story 8.0d, PR 3: «og N uten signal» når rader uten signal står der.
-        uten = html.count('<span class="merke mangler">')
-        assert oevrige and oevrige.group(1) == "signalstyrke 0 eller 1" + (f" og {uten} uten signal" if uten else "")
+        # Story 8.2a, b (gjennomgangen 24.10, BH4): «og N uten data» for seg.
+        uten_data = html.count('<span class="merke mangler">uten data</span>')
+        uten = html.count('<span class="merke mangler">') - uten_data
+        assert oevrige and oevrige.group(1) == "signalstyrke 0 eller 1" + (
+            f" og {uten} uten signal" if uten else ""
+        ) + (f" og {uten_data} uten data" if uten_data else "")
         stil = _stil(html)
         assert "var(--brun)" in _regel(stil, "tr.del.ut .antall")
         skjult = _regel(stil, ".merke.skjult")
@@ -722,7 +729,8 @@ class TestSorteringen:
         """FR-411: samme rute og mal i demoen, med merket som før."""
         monkeypatch.setenv(app_modul.I_DEMO, "1")
         html = klient.get("/?sorter=endring&orden=stigende").data.decode("utf-8")
-        assert '<p class="sortert">Sortert på endring, stigende, innenfor hver del.' in html
+        # Story 8.2a, e: «i én liste».
+        assert '<p class="sortert">Sortert på endring, stigende, i én liste.' in html
         assert "Eksempeltall" in html
 
 

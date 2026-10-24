@@ -195,9 +195,12 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "før, fra størst fall til venstre til størst stigning til høyre, med null "
             "midt i feltet. Den stiplede linja er indeksens endring: grønn når den "
             "steg, rød når den falt, grå ved 0,00 % og borte når indeksen ikke har en "
-            "endring. Et gult bransjesymbol betyr at aksjen fikk 3 av 3 siste børsdag.",
+            # Story 8.2a, c (U20): symbolet over søyla er en lenke.
+            "endring. Et gult bransjesymbol betyr at aksjen fikk 3 av 3 siste børsdag, "
+            "og et klikk på symbolet viser aksjen.",
             (
                 (PRD, "#### FR-105 — Søylene under hovedindeksen"),
+                (HOVEDINDEKS_MAL, '<a class="etikett'),
                 (PRD, "Indeksens endring er en stiplet linje, grønn når indeksen steg og rød når den"),
                 (HOVEDINDEKS, "def bygg_soeyler("),
                 (HOVEDINDEKS_MAL, 'class="indekslinje'),
@@ -266,10 +269,20 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "når kursene for aksjen sist ble hentet, i norsk tid.",
             ((PRD, "##### Hvor gamle dataene er"), (APP, "hentet=post.hentet")),
         ),
+        # Story 8.2a, b (U23): en aksje uten kurser har en rad nederst i
+        # tabellen, ikke bare navnet under den.
         "uten_data": Hjelpetekst(
-            "Uten data i denne kilden:",
-            "aksjer uten en eneste kurs. De står ikke i tabellen, men navnes under den, med lenke til aksjesiden.",
-            ((PRD, "Aksjer kilden ikke har en eneste kursrad for"), (MARKEDSOVERSIKT, "def uten_kurser(")),
+            "Uten data:",
+            # Gjennomgangen 24.10 (BH7): nederst uten sortering. Sortert på
+            # Selskap står den etter navnet.
+            "en aksje uten en eneste kurs står nederst i tabellen uten sortering, med «–» i hver kolonne og "
+            "«uten data» og med lenke til aksjesiden.",
+            (
+                # Gjennomgangen 24.10 (BH1): den daterte linja fra 8.2a.
+                (PRD, "en aksje uten en eneste kursrad har en rad nederst i tabellen"),
+                (MARKEDSOVERSIKT, "def uten_kurser("),
+                (MARKEDSOVERSIKT, "class RadUtenData"),
+            ),
         ),
         "signalstyrke": Hjelpetekst(
             "Signalstyrke:",
@@ -282,10 +295,14 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         "uten_styrke": Hjelpetekst(
             "",
             "Står det «–» med en tekst under i stedet for et tall, finnes det "
-            "ingen vurdering for dagen, og teksten sier hvorfor.",
+            "ingen vurdering for dagen, og teksten sier hvorfor. "
+            # Story 8.2a, d (gruppens svar 24.10 kl. 11:29): tallene ved en
+            # kort kursserie, som på aksjesiden.
+            "Er kursserien for kort, står hvor mange dager den har og hvor mange signalet trenger.",
             (
                 (PRD, "| Signalstyrke | Tom |"),
                 (MARKEDSOVERSIKT, "GRUNNTEKST"),
+                (MARKEDSOVERSIKT, "def grunn_med_tall("),
                 (MARKEDSOVERSIKT, 'IKKE_VURDERT = "ikke vurdert"'),
                 (MARKEDSOVERSIKT, 'IKKE_BOERSDAG = "ikke børsdag"'),
             ),

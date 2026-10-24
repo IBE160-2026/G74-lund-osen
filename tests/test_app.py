@@ -233,13 +233,16 @@ def test_symbolet_er_skjult_for_skjermlesere(klient, monkeypatch):
 
 
 def test_aksje_uten_data_navngis_i_fotnoten(klient, monkeypatch):
-    """Brukeren skal faa vite at oversikten er ufullstendig, ikke bare se faerre rader."""
+    """Brukeren skal faa vite at oversikten er ufullstendig, ikke bare se faerre rader.
+    Story 8.2a, b (U23): aksjen uten data har en rad med «uten data», ikke
+    en fotnote. Navnet paa testen er det gamle, fordi dokumentene viser til
+    testene ved navn."""
     monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [101.0])}))
 
     html = klient.get("/").data.decode("utf-8")
 
-    assert "Uten data i denne kilden" in html
-    assert "DNB Bank" in html
+    assert "Uten data i denne kilden" not in html
+    assert ["DNB Bank", "–", "–", "– uten data", "– Ukjent"] in _tabell(html).uten_data
 
 
 def test_uleselig_symbol_navngis_i_fotnoten(klient, monkeypatch):
@@ -254,8 +257,9 @@ def test_uleselig_symbol_navngis_i_fotnoten(klient, monkeypatch):
     html = klient.get("/").data.decode("utf-8")
 
     assert "Equinor" in html
-    assert "Uten data i denne kilden" in html
-    assert "DNB Bank" in html
+    # Story 8.2a, b (U23): en rad med «uten data», ikke en fotnote.
+    assert "Uten data i denne kilden" not in html
+    assert ["DNB Bank", "–", "–", "– uten data", "– Ukjent"] in _tabell(html).uten_data
     assert '<a href="/aksje/DNB">DNB Bank</a>' in html
     side = klient.get("/aksje/DNB")
     assert side.status_code == 200 and "Det finnes ingen kurser for DNB Bank ennå" in side.data.decode("utf-8")
@@ -346,7 +350,9 @@ class TestTidsstempler:
 
         assert hode.count("</th>") == 5
         rader = re.findall(r'<tr(?! class="del)[^>]*>.*?</tr>', kropp, re.DOTALL)
-        assert len(rader) == 2
+        # Story 8.2a, b: og en rad uten data for hver av de andre aksjene i
+        # migrasjonen, også med fem kolonner.
+        assert len([rad for rad in rader if ">uten data<" not in rad]) == 2
         for rad in rader:
             assert rad.count("</td>") == 5
 
@@ -902,7 +908,12 @@ class _Tabell(HTMLParser):
     klassen som noekkel, og ikke i cellen. Cellen er det den var foer.
 
     Story 8.3: stjernen foran navnet (skjemaet med klassen stjerne) staar
-    ogsaa i ekstra, saa cellen fortsatt er navnet."""
+    ogsaa i ekstra, saa cellen fortsatt er navnet.
+
+    Story 8.2a, b (U23): hver aksje i lista har en rad, ogsaa de i
+    migrasjonen som testen ikke gir kurser. Radene «uten data» staar i
+    uten_data og ikke i rader, saa testene gjelder radene med kurs, som foer.
+    Raden uten data proeves i TestStory82aRadUtenData og test_demoproeven.py."""
 
     EKSTRA = ("linje", "antall", "bak", "under", "stjerne")
 
@@ -912,6 +923,7 @@ class _Tabell(HTMLParser):
         self.rader: list[list[str]] = []
         self.deler: list[str] = []
         self.del_av: list[str] = []
+        self.uten_data: list[list[str]] = []
         self.ekstra: dict[str, list[str]] = {k: [] for k in self.EKSTRA}
         self._i_kropp = False
         self._i_del = False
@@ -952,6 +964,11 @@ class _Tabell(HTMLParser):
             return
         if tag == "tbody":
             self._i_kropp = False
+        elif (
+            tag == "tr" and self._i_kropp and not self._i_del and self.rader and self.rader[-1][3:4] == ["– uten data"]
+        ):
+            self.uten_data.append(self.rader.pop())
+            self.del_av.pop()
         elif tag in ("td", "th") and self._celle is not None:
             # Bare vanlige blanktegn slaas sammen. str.split() ville ogsaa
             # tatt det harde mellomrommet, som testene ser etter.
@@ -1193,7 +1210,8 @@ class TestStory80:
 
         assert "for å regne signal" in klient.get("/aksje/EQNR").data.decode("utf-8")
         # Story 2.2b: oversikten viser grunnen fra raden i vurdering.
-        assert "signalet kunne ikke regnes" in klient.get("/").data.decode("utf-8")
+        # Story 8.2a, d: med tallene, fordi serien er for kort.
+        assert "for kort historikk: 3 av 51 dager" in klient.get("/").data.decode("utf-8")
 
 
 def _rader_per_selskap(html: str) -> dict[str, list[str]]:
@@ -1328,7 +1346,10 @@ class TestVurderingenPaaOversikten:
 
         html = klient.get("/").data.decode("utf-8")
         # Navnene lenker til aksjesiden (gruppens svar 23.10 kl. 09:24, b).
-        fotnote = re.sub(r"<[^>]+>", "", html.split("Uten data i denne kilden:")[1].split("</p>")[0])
+        # Story 8.2a, b (U23): navnene står i radene uten data, ikke i en
+        # fotnote, i rekkefølgen i aksje.
+        assert "Uten data i denne kilden" not in html
+        fotnote = ", ".join(rad[0] for rad in _tabell(html).uten_data) + "."
         # Story 8.0d, PR 2b (VG1): M telles fra aksje, ikke fast 15 eller
         # AKSJEUNIVERS. Basen har 13 aksjer igjen.
         assert "<mark>0 av 13 aksjer</mark>" in html and " · 13 aksjer" in _synlig(html)
@@ -1946,7 +1967,8 @@ class TestStory80e:
             "Øvrige aksjer": ["Equinor"],
         }
         # Story 8.0d, PR 2 (BH10): grensene i båndene følger terskelen.
-        assert _tabell(html).ekstra["bak"] == ["signalstyrke 3 eller mer", "signalstyrke 0 til 2"]
+        # Story 8.2a, b: og de 13 aksjene uten kurser (gjennomgangen 24.10, BH4).
+        assert _tabell(html).ekstra["bak"] == ["signalstyrke 3 eller mer", "signalstyrke 0 til 2 og 13 uten data"]
 
     def test_setningene_fra_8_0c_der_skilte_seg_ut_ellers_staar(self, klient):
         """Svar 3. Ville feilet hvis «Skilte seg ut» stod sammen med
@@ -1992,7 +2014,9 @@ class TestStory80e:
         assert _tabell(html).deler[0] == (
             f"Ingen aksjer skilte seg ut: ingen fikk 2 av 3 eller mer. {m - 1} av {m} aksjer ble vurdert."
         )
-        assert f"Uten data i denne kilden: {mangler.navn}." in _synlig(html)
+        # Story 8.2a, b (U23): en rad uten data, ikke en fotnote.
+        assert [rad[0] for rad in _tabell(html).uten_data] == [mangler.navn]
+        assert "Uten data i denne kilden" not in html
 
     def test_oevrige_sier_hvor_mange_som_er_uten_signal(self, klient):
         """Story 8.0d, PR 3 (BH2 i PR 2, svar 7): «og 1 uten signal» også når
@@ -2000,20 +2024,48 @@ class TestStory80e:
         _lagret("KOG", 0.0, 1, 1, 0)
         _lagret("EQNR", 0.0, 1, 0, 0)
         _lagret("DNB", 0.0, 0, 0, 0, vurdert=False)
+        # Story 8.2a, b (U23): de 12 aksjene uten kurser har en rad i båndet
+        # og telles med. Gjennomgangen 24.10 (BH4): «uten data» for seg.
         tabell = _tabell(klient.get("/").data.decode("utf-8"))
-        assert tabell.ekstra["bak"] == ["signalstyrke 2 eller mer", "signalstyrke 0 eller 1 og 1 uten signal"]
-        assert tabell.ekstra["antall"] == ["1", "2"]
+        assert tabell.ekstra["bak"] == [
+            "signalstyrke 2 eller mer",
+            "signalstyrke 0 eller 1 og 1 uten signal og 12 uten data",
+        ]
+        assert tabell.ekstra["antall"] == ["1", "14"]
         _lagret("MOWI", 0.0, 0, 0, 0, vurdert=False)
         tabell = _tabell(klient.get("/").data.decode("utf-8"))
-        assert tabell.ekstra["bak"][1] == "signalstyrke 0 eller 1 og 2 uten signal"
-        assert tabell.ekstra["antall"] == ["1", "3"]
+        # Gjennomgangen 24.10 (VG4): MOWI går fra uten data til uten signal.
+        assert tabell.ekstra["bak"][1] == "signalstyrke 0 eller 1 og 2 uten signal og 11 uten data"
+        assert tabell.ekstra["antall"] == ["1", "14"] and len(tabell.uten_data) == 11
 
     def test_alle_over_terskelen_gir_bare_skilte_seg_ut(self, klient):
         _lagret("EQNR", 1.0, 1, 1, 0)
         _lagret("KOG", 1.0, 1, 1, 1)
+        # Story 8.2a, b (U23): bare de to står i lista, fordi en aksje uten
+        # kurser har en rad under «Øvrige aksjer».
+        tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+        try:
+            with tilkobling:
+                tilkobling.execute("DELETE FROM aksje WHERE symbol NOT IN ('EQNR', 'KOG')")
+        finally:
+            tilkobling.close()
         html = klient.get("/").data.decode("utf-8")
         assert _tabell(html).deler == ["Skilte seg ut"]
         assert "Øvrige aksjer" not in html
+
+    def test_bare_aksjer_uten_kurser_under_oevrige(self, klient):
+        """Story 8.2a, b (U23): er alle med kurser over terskelen, står
+        aksjene uten kurser under «Øvrige aksjer», med antallet. Ville feilet
+        hvis de forsvant fordi «Øvrige aksjer» ellers var tom."""
+        from kursdata import AKSJEUNIVERS
+
+        for aksje in AKSJEUNIVERS[:2]:
+            _lagret(aksje.symbol, 1.0, 1, 1, 0)
+        tabell = _tabell(klient.get("/").data.decode("utf-8"))
+        uten = len(AKSJEUNIVERS) - 2
+        assert tabell.deler == ["Skilte seg ut", "Øvrige aksjer"]
+        assert len(tabell.uten_data) == uten
+        assert tabell.ekstra["antall"] == ["2", str(uten)]
 
     def test_uten_en_eneste_vurdering_er_det_én_del_uten_overskrift(self, klient):
         _lagret("EQNR", 1.0, 0, 0, 0, vurdert=False)
@@ -2101,10 +2153,12 @@ class TestStory80eTekst:
         m = len(AKSJEUNIVERS)
         assert len(_tabell(html).rader) == m - 1
         assert f"<mark>{m - 2} av {m} aksjer</mark>" in html
-        # VG2: båndene teller radene sine som før.
-        assert _tabell(html).ekstra["antall"] == [str(m - 2), "1"]
+        # VG2: båndene teller radene sine som før. Story 8.2a, b (U23): den
+        # ene uten kurser har en rad i «Øvrige aksjer», og telles der.
+        assert _tabell(html).ekstra["antall"] == [str(m - 2), "2"]
         assert f"Oslo Børs · 31.10 · {m} aksjer" in tekst
-        assert f"Uten data i denne kilden: {mangler.navn}." in tekst
+        assert [rad[0] for rad in _tabell(html).uten_data] == [mangler.navn]
+        assert "Uten data i denne kilden" not in tekst
 
     def test_ukedagen_er_datoen_i_linja_over_tabellen(self, klient):
         """Svar 5: den eldste datoen, som linja over tabellen (story 8.0), og
@@ -2157,10 +2211,11 @@ class TestStory80eTekst:
         _lagret("KOG", 0.0, 1, 1, 1)
         _lagret("EQNR", 0.0, 1, 1, 0)
         tekst = _synlig(klient.get("/").data.decode("utf-8"))
-        assert "3 av 3 Bare Kongsberg Gruppen fikk utslag på alle 3 sjekkene." in tekst
+        # Story 8.2a, f (gruppens svar 24.10 kl. 11:49): uten «Bare» (NFR-06).
+        assert "3 av 3 Kongsberg Gruppen fikk utslag på alle 3 sjekkene." in tekst
         _lagret("DNB", 5.0, -1, -1, -1)
         tekst = _synlig(klient.get("/").data.decode("utf-8"))
-        assert "Bare DNB Bank og Kongsberg Gruppen fikk utslag på alle 3 sjekkene." in tekst
+        assert "3 av 3 DNB Bank og Kongsberg Gruppen fikk utslag på alle 3 sjekkene." in tekst
 
     def test_linja_om_3_av_3_ogsaa_naar_terskelen_er_over_3(self, klient, monkeypatch):
         """ECH3 i gjennomgangen: navnene tas fra alle radene, ikke bare fra
@@ -2169,7 +2224,9 @@ class TestStory80eTekst:
 
         monkeypatch.setattr(app_modul, "STANDARD", dataclasses.replace(app_modul.STANDARD, terskel=4))
         _lagret("KOG", 0.0, 1, 1, 1)
-        assert "Bare Kongsberg Gruppen fikk utslag på alle 3 sjekkene." in _synlig(klient.get("/").data.decode("utf-8"))
+        assert "3 av 3 Kongsberg Gruppen fikk utslag på alle 3 sjekkene." in _synlig(
+            klient.get("/").data.decode("utf-8")
+        )
 
     def test_ingen_linje_uten_3_av_3(self, klient):
         _lagret("KOG", 0.0, 1, 1, 0)
@@ -2224,8 +2281,69 @@ def _deler_i_rekkefoelge(html: str) -> tuple[list[str], list[str]]:
     står - story 8.15."""
     tbody = html.split("</thead>", 1)[1].split("</table>", 1)[0]
     ut, oevrige = tbody.split("Øvrige aksjer", 1) if "Øvrige aksjer" in tbody else (tbody, "")
-    finn = lambda del_: re.findall(r'<span class="linje">([A-Z0-9]+)', del_)
+    # Story 8.2a, b: uten radene «uten data», som i _Tabell.
+    finn = lambda del_: [
+        re.search(r'<span class="linje">([A-Z0-9]+)', rad).group(1)
+        for rad in re.findall(r"<tr[ >].*?</tr>", del_, re.S)
+        if '<span class="linje">' in rad and '<span class="merke mangler">uten data</span>' not in rad
+    ]
     return finn(ut), finn(oevrige)
+
+
+class TestStory82aRadUtenData:
+    """Story 8.2a, b og e (gjennomgangen 24.10, BH3 og VG1): radene uten data,
+    som _Tabell legger for seg, står der de skal. Migrasjonen har 15
+    aksjer, og testene gir kurser til noen av dem."""
+
+    @staticmethod
+    def _rekkefoelge(html: str) -> list[tuple[str, bool]]:
+        """(symbol, uten data) for hver rad, i rekkefølgen de står."""
+        tabell = html.split("<table>", 1)[1].split("</table>", 1)[0]
+        return [
+            (re.search(r'<span class="linje">([A-Z0-9]+)', rad).group(1), ">uten data<" in rad)
+            for rad in re.findall(r"<tr[ >].*?</tr>", tabell, re.S)
+            if '<td class="selskap">' in rad
+        ]
+
+    def test_radene_uten_data_staar_nederst_under_oevrige(self, klient):
+        """Ville feilet hvis en rad uten data sto under «Skilte seg ut», midt
+        blant radene med kurs, eller to ganger."""
+        _lagret("KOG", 1.0, 1, 1, 1)
+        _lagret("DNB", -1.0, 0, 0, 0, vurdert=False)
+        html = klient.get("/").data.decode("utf-8")
+        rekkefoelge = self._rekkefoelge(html)
+        uten = [i for i, (_, mangler) in enumerate(rekkefoelge) if mangler]
+        assert len(uten) == 13 and uten == list(range(len(rekkefoelge) - 13, len(rekkefoelge)))
+        assert len({symbol for symbol, _ in rekkefoelge}) == len(rekkefoelge) == 15
+        oevrige = html.split("Øvrige aksjer", 1)[1]
+        assert all(f'<span class="linje">{symbol}' in oevrige for symbol, mangler in rekkefoelge if mangler)
+
+    @pytest.mark.parametrize("orden", ["synkende", "stigende"])
+    def test_radene_uten_data_staar_sist_sortert_paa_en_kolonne_med_tall(self, klient, orden):
+        """Ville feilet hvis en rad uten data kom foran en rad med kurs når
+        lista er sortert på endring, også bak en rad med kurs uten endring
+        (gjennomgangen 24.10, ECH3)."""
+        _lagret("KOG", 1.0, 1, 1, 1)
+        _lagret("DNB", -1.0, 0, 0, 0, vurdert=False)
+        rader = serie([100.0])
+        skriv_serie("ORK", rader, datetime.fromisoformat(HENTET), vurdert=False)
+        rekkefoelge = self._rekkefoelge(klient.get(f"/?sorter=endring&orden={orden}").data.decode("utf-8"))
+        assert [mangler for _, mangler in rekkefoelge] == [False] * 3 + [True] * 12
+        assert rekkefoelge[2][0] == "ORK"
+
+    def test_sortert_uten_noen_som_skilte_seg_ut_er_en_liste_uten_setningene(self, klient):
+        """Gjennomgangen 24.10 (VG3, BH6): ingen skilte seg ut, og lista er
+        sortert. Da er tabellen én liste med alle radene, uten setningene fra
+        8.0c, som står uten sortering. Ville feilet hvis rader forsvant."""
+        _lagret("KOG", 1.0, 0, 0, 0)
+        _lagret("DNB", -1.0, 1, 0, 0)
+        standard = klient.get("/").data.decode("utf-8")
+        assert "Ingen aksjer skilte seg ut" in standard
+        html = klient.get("/?sorter=endring&orden=synkende").data.decode("utf-8")
+        tabell = html.split("<table>", 1)[1].split("</table>", 1)[0]
+        assert "Ingen aksjer skilte seg ut" not in tabell and tabell.count("<tbody>") == 1
+        assert [symbol for symbol, _ in self._rekkefoelge(html)][:2] == ["KOG", "DNB"]
+        assert len(self._rekkefoelge(html)) == 15
 
 
 class TestStory815Sortering:
@@ -2263,23 +2381,26 @@ class TestStory815Sortering:
             assert _deler_i_rekkefoelge(self._side(tabell, adresse)) == standard, adresse
 
     @pytest.mark.parametrize(
-        "adresse, ut, oevrige",
+        "adresse, liste",
         [
-            ("/?sorter=endring&orden=synkende", ["EQNR", "KOG", "DNB"], ["MOWI", "NHY"]),
-            ("/?sorter=endring&orden=stigende", ["DNB", "KOG", "EQNR"], ["NHY", "MOWI"]),
-            ("/?sorter=signal&orden=stigende", ["DNB", "EQNR", "KOG"], ["MOWI", "NHY"]),
-            ("/?sorter=retning&orden=stigende", ["EQNR", "DNB", "KOG"], ["MOWI", "NHY"]),
-            ("/?sorter=retning&orden=synkende", ["KOG", "DNB", "EQNR"], ["MOWI", "NHY"]),
-            # Story 8.15b: Selskap, A til Å og Å til A, innenfor hver del.
-            ("/?sorter=selskap&orden=stigende", ["DNB", "EQNR", "KOG"], ["MOWI", "NHY"]),
-            ("/?sorter=selskap&orden=synkende", ["KOG", "EQNR", "DNB"], ["NHY", "MOWI"]),
+            ("/?sorter=endring&orden=synkende", ["MOWI", "EQNR", "KOG", "NHY", "DNB"]),
+            ("/?sorter=endring&orden=stigende", ["DNB", "NHY", "KOG", "EQNR", "MOWI"]),
+            ("/?sorter=signal&orden=stigende", ["MOWI", "DNB", "EQNR", "KOG", "NHY"]),
+            ("/?sorter=retning&orden=stigende", ["EQNR", "DNB", "KOG", "MOWI", "NHY"]),
+            ("/?sorter=retning&orden=synkende", ["KOG", "MOWI", "DNB", "EQNR", "NHY"]),
+            # Story 8.15b: Selskap, A til Å og Å til A.
+            ("/?sorter=selskap&orden=stigende", ["DNB", "EQNR", "KOG", "MOWI", "NHY"]),
+            ("/?sorter=selskap&orden=synkende", ["NHY", "MOWI", "KOG", "EQNR", "DNB"]),
         ],
     )
-    def test_hver_del_sorteres_for_seg(self, tabell, adresse, ut, oevrige):
-        """Tillegget 13.10: ingen rad flytter seg mellom delene (S1). Rader
-        uten verdi står sist i begge retninger (S2), og endringen har
-        fortegn (S4)."""
-        assert _deler_i_rekkefoelge(self._side(tabell, adresse)) == (ut, oevrige)
+    def test_hver_del_sorteres_for_seg(self, tabell, adresse, liste):
+        """Rader uten verdi står sist i begge retninger (S2), og endringen har
+        fortegn (S4). Story 8.2a, e (gruppens svar 24.10 kl. 11:39): sortert
+        er tabellen én liste, uten delene, og ikke sortert innenfor hver del
+        som i tillegget 13.10 (S1). Navnet på testen er det gamle, fordi
+        dokumentene viser til testene ved navn. Ville feilet hvis MOWI, under
+        «Øvrige aksjer» uten sortering, ikke kom først på endring."""
+        assert _deler_i_rekkefoelge(self._side(tabell, adresse)) == (liste, [])
 
     def test_lenken_snur_og_aria_sort_staar_paa_kolonnen(self, tabell):
         """Første klikk synkende, A til Å for Retning, og et nytt klikk
@@ -2322,21 +2443,22 @@ class TestStory815Sortering:
         assert 'class="sortert"' not in self._side(tabell, "/")
         html = self._side(tabell, "/?sorter=signal&orden=stigende")
         assert (
-            '<p class="sortert">Sortert på signalstyrke, stigende, innenfor hver del. '
-            '<a href="/">Standard rekkefølge</a></p>'
+            '<p class="sortert">Sortert på signalstyrke, stigende, i én liste. <a href="/">Standard rekkefølge</a></p>'
         ) in html
         assert html.index('<p class="sortert">') < html.index('<div class="tabellboks"')
-        # Gjennomgangen (VG2): navnet for hver kolonne. Svar 9: «innenfor hver del».
+        # Gjennomgangen (VG2): navnet for hver kolonne. Svar 9 sa «innenfor
+        # hver del»; story 8.2a, e: «i én liste».
         for kolonne, navn in (("kurs", "sluttkurs"), ("endring", "endring")):
             html = self._side(tabell, f"/?sorter={kolonne}&orden=synkende")
-            assert f'<p class="sortert">Sortert på {navn}, synkende, innenfor hver del. ' in html, kolonne
+            assert f'<p class="sortert">Sortert på {navn}, synkende, i én liste. ' in html, kolonne
 
     def test_linja_og_skjermleseren_sier_det_samme(self, tabell):
         """Svar 8 (BH1, ECH1): for Retning sier linja over tabellen det
         samme som teksten for skjermleseren, i begge retninger."""
         for orden, ord in (("stigende", "stigende (A til Å)"), ("synkende", "synkende (Å til A)")):
             html = self._side(tabell, f"/?sorter=retning&orden={orden}")
-            assert f'<p class="sortert">Sortert på retning, {ord}, innenfor hver del. ' in html, orden
+            # Story 8.2a, e: «i én liste», ikke «innenfor hver del».
+            assert f'<p class="sortert">Sortert på retning, {ord}, i én liste. ' in html, orden
             assert f'Retning<span class="skjult">, sortert {ord}. ' in html, orden
 
     def test_vinkelen_peker_etter_retningen(self, tabell):
@@ -2355,7 +2477,8 @@ class TestStory815Sortering:
 
     def test_rad_uten_endring_sist_i_skilte_seg_ut(self, tabell, monkeypatch):
         """Gjennomgangen (BH14): en rad med vurdering, men bare én kursdag,
-        står sist i «Skilte seg ut» i begge retninger."""
+        står sist i «Skilte seg ut» i begge retninger. Story 8.2a, e: sist i
+        den ene lista, foran radene uten data."""
         rader = serie([100.0])
         skriv_serie("ORK", rader, datetime.fromisoformat(HENTET), vurdert=False)
         skriv_vurdering(
@@ -2376,8 +2499,8 @@ class TestStory815Sortering:
             ),
         )
         for orden in ("synkende", "stigende"):
-            ut, _ = _deler_i_rekkefoelge(self._side(tabell, f"/?sorter=endring&orden={orden}"))
-            assert ut[-1] == "ORK" and len(ut) == 4, (orden, ut)
+            liste, oevrige = _deler_i_rekkefoelge(self._side(tabell, f"/?sorter=endring&orden={orden}"))
+            assert liste[-1] == "ORK" and len(liste) == 6 and oevrige == [], (orden, liste)
 
     def test_tre_av_tre_og_antallet_foelger_fr_102(self, tabell):
         """Svar 7: linja om 3 av 3 og «N av M aksjer» endres ikke av et klikk."""
@@ -2922,7 +3045,8 @@ class TestSoeylenePaaForsiden:
         self._tre_aksjer()
         _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, 1005.0)]))
         figur = _soeylene(klient.get("/").data.decode("utf-8"))
-        assert '<div aria-hidden="true">' in figur
+        # Story 8.2a, c (U20): søylene er skjult, symbolene over er lenker.
+        assert '<div class="felt" aria-hidden="true">' in figur
         liste = figur.split('<ol class="skjult">', 1)[1].split("</ol>", 1)[0]
         # Gjennomgangen (BH9): lista har én linje per aksje, og overskriften og
         # indeksen står utenfor.
@@ -2941,7 +3065,8 @@ class TestSoeylenePaaForsiden:
         self._tre_aksjer()
         _legg_inn_indeks(_indeks([(TORSDAG_08_10, 1000.0), (FREDAG_09_10, 1005.0)]))
         figur = _soeylene(klient.get("/").data.decode("utf-8"))
-        etiketter = re.findall(r'<span class="etikett[^"]*">(.*?)<span class="ticker">', figur, re.DOTALL)
+        # Story 8.2a, c (U20): etiketten er en lenke til aksjesiden.
+        etiketter = re.findall(r'<a class="etikett[^"]*"[^>]*>(.*?)<span class="ticker">', figur, re.DOTALL)
         assert len(etiketter) == 3
         assert all(e.startswith('<svg class="bransjesymbol"') for e in etiketter)
         assert "http" not in figur
@@ -3283,7 +3408,7 @@ def _dagen(html: str) -> str:
 def _toppen(html: str) -> str:
     """Story 8.16b: teksten fra merket og kortene til grafen, med sjekkene
     og KI-teksten."""
-    return _synlig(html.split('<a class="tilbake"', 1)[1].split("<h2>Kursutvikling", 1)[0])
+    return _synlig(html.split('<a class="tilbake"', 1)[1].split('<h2 id="kursgrafen">Kursutvikling', 1)[0])
 
 
 class TestPeriodeneIKursgrafen:
@@ -3311,7 +3436,9 @@ class TestPeriodeneIKursgrafen:
             "1 år",
             "Velg dag",
         ]
-        assert [href for href, _, _ in knappene] == [f"/aksje/EQNR?periode={p}" for p in PERIODENE[:-1]] + ["skjema"]
+        assert [href for href, _, _ in knappene] == [f"/aksje/EQNR?periode={p}#kursgrafen" for p in PERIODENE[:-1]] + [
+            "skjema"
+        ]
 
     def test_6_mnd_naar_siden_aapnes(self, klient):
         """FR-201. Ville feilet hvis grafen aapnet med en annen periode, eller
@@ -3319,7 +3446,7 @@ class TestPeriodeneIKursgrafen:
         self._aksjen()
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
         assert _valgt(html) == ["6 mnd"]
-        assert "<h2>Kursutvikling, 6 måneder " in html
+        assert '<h2 id="kursgrafen">Kursutvikling, 6 måneder ' in html
         assert _foerste_og_siste_dag(html) == "09.04 til 09.10"
 
     @pytest.mark.parametrize("periode", ["siste", "1-uke", "1-mnd", "3-mnd", "6-mnd", "i-aar", "1-aar"])
@@ -3372,7 +3499,7 @@ class TestPeriodeneIKursgrafen:
         assert "Oslo Børs · 01.10" in toppen and "Ingen vurdering for 01.10: ikke vurdert." in toppen
         assert '<p class="dagen">' not in html
         assert _valgt(html) == ["01.10"]
-        assert "<h2>Kursutvikling, 6 måneder fram til torsdag 01.10 " in html
+        assert '<h2 id="kursgrafen">Kursutvikling, 6 måneder fram til torsdag 01.10 ' in html
         assert 'class="dagstrek"' in html and 'class="dagpunkt"' in html
         assert _foerste_og_siste_dag(html) == "01.04 til 01.10"
 
@@ -3488,7 +3615,7 @@ class TestPeriodeneIKursgrafen:
         self._aksjen()
         html = klient.get("/aksje/EQNR?dag=2026-10-01").data.decode("utf-8")
         nav = html.split('<nav class="periodevalg"', 1)[1].split("</nav>", 1)[0]
-        assert '<form method="get" action="/aksje/EQNR">' in nav
+        assert '<form method="get" action="/aksje/EQNR#kursgrafen">' in nav
         assert (
             '<input type="date" id="velg-dag" name="dag" required value="2026-10-01" min="2026-01-05" max="2026-10-09">'
             in nav
@@ -3518,7 +3645,7 @@ class TestPeriodeneIKursgrafen:
         self._aksjen()
         for periode, tekst in (("1-uke", "1 uke"), ("1-mnd", "1 måned"), ("i-aar", "i år"), ("1-aar", "1 år")):
             html = klient.get(f"/aksje/EQNR?periode={periode}").data.decode("utf-8")
-            assert f"<h2>Kursutvikling, {tekst} " in html, periode
+            assert f'<h2 id="kursgrafen">Kursutvikling, {tekst} ' in html, periode
 
 
 class TestStory816bDagenPaaHeleSiden:
@@ -3736,14 +3863,16 @@ class TestStory815bSelskapOgMarkeringen:
         return klient
 
     @pytest.mark.parametrize(
-        "orden, ut, oevrige",
-        [("stigende", ["DNB", "KOG"], ["AKRBP", "MOWI"]), ("synkende", ["KOG", "DNB"], ["MOWI", "AKRBP"])],
+        "orden, liste",
+        [("stigende", ["AKRBP", "DNB", "KOG", "MOWI"]), ("synkende", ["MOWI", "KOG", "DNB", "AKRBP"])],
     )
-    def test_selskap_sorteres_innenfor_hver_del(self, tabell, orden, ut, oevrige):
-        """Tillegget 13.10. Ville feilet hvis Aker BP flyttet seg til «Skilte
-        seg ut» fordi den kommer først i alfabetet."""
+    def test_selskap_sorteres_innenfor_hver_del(self, tabell, orden, liste):
+        """Story 8.2a, e (gruppens svar 24.10 kl. 11:39): sortert er tabellen
+        én liste, så Aker BP, under «Øvrige aksjer» uten sortering, står
+        først i alfabetet. Før sto den sist (tillegget 13.10). Navnet på
+        testen er det gamle. Ville feilet hvis delene ble beholdt."""
         html = tabell.get(f"/?sorter=selskap&orden={orden}").data.decode("utf-8")
-        assert _deler_i_rekkefoelge(html) == (ut, oevrige)
+        assert _deler_i_rekkefoelge(html) == (liste, [])
 
     @staticmethod
     def _thead(klient, adresse):
@@ -3756,12 +3885,13 @@ class TestStory815bSelskapOgMarkeringen:
         html, thead = self._thead(tabell, "/?sorter=selskap&orden=stigende")
         assert 'href="/?sorter=selskap&amp;orden=synkende"' in thead
         assert ", sortert stigende (A til Å). Velg for synkende (Å til A)." in thead
-        assert "Sortert på selskap, stigende (A til Å), innenfor hver del." in html
+        # Story 8.2a, e: «i én liste».
+        assert "Sortert på selskap, stigende (A til Å), i én liste." in html
         _, thead = self._thead(tabell, "/")
         assert ", sorter stigende (A til Å)" in thead
         # Gjennomgangen (VG7): og synkende.
         html, thead = self._thead(tabell, "/?sorter=selskap&orden=synkende")
-        assert "Sortert på selskap, synkende (Å til A), innenfor hver del." in html
+        assert "Sortert på selskap, synkende (Å til A), i én liste." in html
         assert 'href="/?sorter=selskap&amp;orden=stigende"' in thead
 
     @pytest.mark.parametrize("orden, aria", [("stigende", "ascending"), ("synkende", "descending")])

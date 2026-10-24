@@ -19,8 +19,8 @@ from zoneinfo import ZoneInfo
 from boersdag import UtenforKalenderen
 from kursdata import Aksje, Kursrad
 from oversiktsdata import Oversiktspost
-from signalberegning import BLANDET, INGEN, NEGATIV, POSITIV, STANDARD, Parametre
-from tallformat import dato, fortegn, ukedag
+from signalberegning import BLANDET, INGEN, NEGATIV, POSITIV, STANDARD, Parametre, nodvendige_dager
+from tallformat import dato, fortegn, tall, ukedag
 from tilstand import Art, Tilstand, tilstand
 from vurderingsdata import Grunn, Vurdering
 
@@ -102,6 +102,30 @@ def les_tilstand(innhold: Vurdering | Grunn | None, dato: date, idag: date) -> t
     return utfall, IKKE_BOERSDAG
 
 
+def grunn_med_tall(
+    utfall: Tilstand | None, tekst: str | None, antall_dager: int | None, p: Parametre = STANDARD
+) -> str | None:
+    """Teksten under «–», med tallene når kursserien er for kort - story
+    8.2a, d (gruppens svar 24.10 kl. 11:29).
+
+    Raden og ruta i børsometeret sier hvorfor signalet ikke kunne regnes,
+    med samme tall som aksjesiden: dagene serien har til og med dagen, og
+    dagene signalet trenger (for_kort_serie i aksjedetalj.py). Bare når
+    grunnen er «signalet kunne ikke regnes» og serien er kortere; ellers
+    står teksten som før. Tallene formes av tall() i tallformat.py (regel 21).
+    """
+    trenger = nodvendige_dager(p)
+    if (
+        utfall is not None
+        and utfall.art is Art.GRUNN
+        and utfall.innhold is Grunn.SIGNAL_IKKE_REGNET
+        and antall_dager is not None
+        and antall_dager < trenger
+    ):
+        return f"for kort historikk: {tall(antall_dager, 'heltall')} av {tall(trenger, 'heltall')} dager"
+    return tekst
+
+
 # Bokstaven og feltet i Vurdering for hver sjekk, i samme rekkefoelge som
 # paa aksjesiden (story 8.0e). Feltnavnet er ogsaa navnet som vises.
 SJEKKBOKSTAVER = (("T", "trend"), ("B", "bevegelse"), ("I", "interesse"))
@@ -176,7 +200,7 @@ def endring_i_prosent(rader: list[Kursrad]) -> float | None:
     return (til - fra) / fra * 100
 
 
-def bygg_rad(post: Oversiktspost, idag: date, p: Parametre = STANDARD) -> Rad | None:
+def bygg_rad(post: Oversiktspost, idag: date, p: Parametre = STANDARD, antall_dager: int | None = None) -> Rad | None:
     """En rad for en aksje. None bare naar aksjen ikke har en eneste kursrad.
 
     En aksje uten vurdering gir en rad UTEN styrke, ikke ingen rad. Brukeren
@@ -184,12 +208,16 @@ def bygg_rad(post: Oversiktspost, idag: date, p: Parametre = STANDARD) -> Rad | 
     borte. Endringen regnes av de to siste kursene (FR-101). Signalet regnes
     ikke: styrken og retningen er radens, og «skiller seg ut» er den lagrede
     styrken mot terskelen (FR-705).
+
+    antall_dager er dagene i kursserien. Story 8.2a, d: med dem sier raden
+    hvorfor signalet ikke kunne regnes, som aksjesiden (grunn_med_tall).
     """
     siste = post.nyeste
     if siste is None:
         return None
 
     utfall, tekst = les_tilstand(post.innhold, siste.dato, idag)
+    tekst = grunn_med_tall(utfall, tekst, antall_dager, p)
     rader = [r for r in (post.forrige, siste) if r is not None]
     styrke = utfall.innhold.styrke if utfall is not None and utfall.art is Art.SVAR else None
     return Rad(
@@ -216,14 +244,20 @@ def _sorteringsnokkel(rad: Rad) -> tuple[int, float]:
     return (-styrke, -endring)
 
 
-def bygg_oversikt(poster: list[Oversiktspost], idag: date, p: Parametre = STANDARD) -> list[Rad]:
+def bygg_oversikt(
+    poster: list[Oversiktspost], idag: date, p: Parametre = STANDARD, antall_dager: dict[str, int] | None = None
+) -> list[Rad]:
     """Alle radene, sortert etter FR-102.
 
     Aksjer uten kurser faller ut, og navngis av uten_kurser. Hver rad faar
     symbolets egen sist_hentet (FR-101, AD-15). Antallet er det som staar i
-    aksje i basen, aldri et fast tall.
+    aksje i basen, aldri et fast tall. antall_dager er dagene i kursserien
+    per symbol, for grunnen med tall (story 8.2a, d).
     """
-    rader = [rad for rad in (bygg_rad(post, idag, p) for post in poster) if rad is not None]
+    dager = antall_dager or {}
+    rader = [
+        rad for rad in (bygg_rad(post, idag, p, dager.get(post.aksje.symbol)) for post in poster) if rad is not None
+    ]
     return sorted(rader, key=_sorteringsnokkel)
 
 
@@ -231,6 +265,45 @@ def uten_kurser(poster: list[Oversiktspost]) -> list[Aksje]:
     """Aksjene i aksje som ikke har en eneste kursrad (FR-101). Siden viser
     navnet med lenke til aksjesiden (gruppens svar 23.10 kl. 09:24, b)."""
     return [post.aksje for post in poster if post.nyeste is None]
+
+
+# Story 8.2a, b (U23, gruppens svar 24.10 kl. 11:34 og 11:35): teksten under
+# «–» i raden for en aksje uten en eneste kurs.
+# Gjennomgangen 24.10 (BH13): et annet navn enn UTEN_DATA i boersometer.py,
+# som har stor forbokstav.
+UTEN_DATA_TEKST = "uten data"
+
+
+@dataclass(frozen=True)
+class RadUtenData:
+    """Raden for en aksje uten en eneste kurs - story 8.2a, b (U23).
+
+    Hver aksje i lista har en rad, så tallet i overskriften stemmer med
+    tabellen. Raden står nederst, som Varde Systemer i demoen: navnet som
+    lenke, «–» i hver kolonne og «uten data». Den har de feltene malen og
+    sorteringen leser, uten verdier, så den står sist i FR-102 og i hver
+    sortering på en kolonne med tall. Den har ingen dato og ingen tid, og
+    er derfor ikke med blant radene datoen og tidspunktet på siden regnes av.
+    """
+
+    aksje: Aksje
+    tekst: str = UTEN_DATA_TEKST
+    sluttkurs: None = None
+    endring_prosent: None = None
+    tilstand: None = None
+    dato: None = None
+    sist_hentet: None = None
+    skiller_seg_ut: bool = False
+    vurdering: None = None
+    styrke: None = None
+    ikke_vurdert: bool = False
+    sjekker: tuple = ()
+    retning: Retningsvisning = UKJENT_RETNING
+
+
+def rader_uten_data(poster: list[Oversiktspost]) -> list[RadUtenData]:
+    """En RadUtenData per aksje uten kurser, i rekkefølgen i lista."""
+    return [RadUtenData(aksje) for aksje in uten_kurser(poster)]
 
 
 def sidens_tidsstempel(rader: list[Rad]) -> datetime | None:
@@ -358,18 +431,23 @@ def _navn(rad: Rad) -> str:
 
 
 def sorter(rader: list[Rad], sortering: Sortering | None) -> list[Rad]:
-    """Én del av tabellen sortert på kolonnen - story 8.15.
+    """Radene sortert på kolonnen - story 8.15.
 
     Først FR-102 og så navnet, så lik verdi alltid står likt. Så kolonnen,
     der bare den snus. Rader uten verdi står sist i begge retninger. Uten
     sortering er rekkefølgen den samme som før, FR-102 fra bygg_oversikt.
-    Ruten kaller den for hver del etter del_i_to, så ingen rad flytter seg
-    mellom delene (tillegget 13.10)."""
+    Story 8.2a, e (gruppens svar 24.10 kl. 11:39): ruten kaller den for hele
+    lista, med radene uten data, så tabellen er én liste uten delene. Før
+    kalte den den for hver del etter del_i_to (tillegget 13.10)."""
     if sortering is None:
         return list(rader)
     grunn = sorted(rader, key=lambda rad: (_sorteringsnokkel(rad), _navn(rad)))
     med = [rad for rad in grunn if _verdi(rad, sortering.kolonne) is not None]
-    uten = [rad for rad in grunn if _verdi(rad, sortering.kolonne) is None]
+    # Gjennomgangen 24.10 (ECH3): radene uten data sist blant dem uten verdi,
+    # også når en rad med kurs har samme nøkkel i FR-102.
+    uten = sorted(
+        (rad for rad in grunn if _verdi(rad, sortering.kolonne) is None), key=lambda rad: isinstance(rad, RadUtenData)
+    )
     # Gjennomgangen (BH8): sort er stabil også med reverse=True, så lik
     # verdi beholder rekkefølgen fra grunn, FR-102 og navnet, i begge
     # retninger. Snus grunn eller nøkkelen i stedet, går det tapt.

@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-10-21T23:41
+updated: 2026-10-24T14:24
 ---
 
 # Designregler
@@ -230,3 +230,5 @@ Ord kan endres rett i tavla. I appen samles hjelpetekstene i én fil (8.0b).
 *Lagt til 2026-10-15 (gruppens svar 8 og 9 på funnene i PR #43 for story 8.15, instruksjonen kl. 15:25):* linja over tabellen og teksten for skjermleseren i kolonneraden sier det samme. For Retning står «stigende (A til Å)» eller «synkende (Å til A)». Linja slutter med «innenfor hver del», for eksempel «Sortert på endring, synkende, innenfor hver del.»
 
 *Lagt til 2026-10-18 (story 8.15b, gruppens svar kl. 22:06):* Selskap sorteres også, med vinkel og «?» ved siden av som de andre. Første klikk gir A til Å, i norsk rekkefølge med Æ, Ø og Å etter Z og uten forskjell på store og små bokstaver, og et nytt klikk snur. Linja og teksten for skjermleseren sier «stigende (A til Å)» eller «synkende (Å til A)», som for Retning.
+
+*Lagt til 2026-10-24 (story 8.2a, e, gruppens svar kl. 11:39):* når en kolonne er valgt, er tabellen én liste, uten båndene «Skilte seg ut» og «Øvrige aksjer». Rader uten verdi i kolonnen står sist, og en rad som skilte seg ut, beholder streken til venstre. Linja over tabellen slutter med «i én liste», for eksempel «Sortert på endring, synkende, i én liste.», i stedet for «innenfor hver del». Uten en valgt kolonne er båndene som før. Gjelder oversikten og Min liste.

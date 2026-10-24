@@ -390,7 +390,8 @@ class TestSidene:
         ikke hørte hvilken aksje den gjelder og om den er merket."""
         html = demo.get("/").data.decode("utf-8")
         celler = re.findall(r'<td class="selskap">(.*?)</td>', html, re.S)
-        assert len(celler) == 14  # Matfjord Merkevarer har ingen kurser
+        # Story 8.2a, b (U23): Matfjord Merkevarer har ingen kurser, men en rad.
+        assert len(celler) == 15
         for celle in celler:
             navn = re.search(r'<a href="/aksje/[A-Z0-9]+">([^<]+)</a>', celle).group(1)
             assert celle.index("stjerneknapp") < celle.index('<a href="/aksje/')
@@ -409,7 +410,8 @@ class TestSidene:
             assert thead.count("<th") == 5
             assert '<span class="under">★ = Min liste</span></th>' in thead.split("</th>", 1)[0] + "</th>"
             rader = [r for r in re.findall(r"<tr[^>]*>(.*?)</tr>", html, re.S) if '<td class="selskap">' in r]
-            assert len(rader) == len(_rekkefoelge(html)) > 0
+            # Story 8.2a, b: _rekkefoelge teller ikke radene uten data.
+            assert len(rader) == len(_rekkefoelge(html)) + sum(">uten data<" in r for r in rader) > 0
             for rad in rader:
                 assert rad.count("<td") == 5
 
@@ -478,17 +480,18 @@ class TestGjennomgangen:
 
     def test_antallet_teller_bare_merkede_med_en_rad(self, demo):
         """BH8, ECH2. Ville feilet hvis knappen talte en merket aksje som
-        ikke har en rad i tabellen, så antallet og tabellen sprikte."""
+        ikke har en rad i tabellen, så antallet og tabellen sprikte.
+        Story 8.2a, b (U23): aksjen uten kurser har nå en rad, og telles."""
         assert _merk(demo, "MTFJ").status_code == 303  # uten kurser
         html = demo.get("/min-liste").data.decode("utf-8")
-        assert 'Min liste <span class="antall">5</span>' in html
+        assert 'Min liste <span class="antall">6</span>' in html
+        assert '<a href="/aksje/MTFJ">Matfjord Merkevarer</a>' in html
+        assert _merk(demo, "MTFJ", til="fjern").status_code == 303
         for symbol in MERKET_I_DEMOEN:
             assert _merk(demo, symbol, til="fjern").status_code == 303
         html = demo.get("/min-liste").data.decode("utf-8")
         assert 'Min liste <span class="antall">0</span>' in html
         assert "Ingen aksjer i Min liste ennå" in html and "<table" not in html
-        # Og den kan tas ut igjen.
-        assert _merk(demo, "MTFJ", til="fjern").status_code == 303
 
     def test_en_rad_for_en_aksje_som_er_tatt_ut_kan_fjernes(self, tmp_path):
         """ECH3, BH16. Ville feilet hvis fjern bare godtok symbolene i aksje:
@@ -591,7 +594,10 @@ class TestGjennomgangen:
         """ECH7, BH9. Ville feilet hvis Min liste viste fotnoten om en aksje
         uten kurser som ikke er merket, eller fotnoter under en tom liste."""
         # Navnet lenker til aksjesiden (gruppens svar 23.10 kl. 09:24, b).
-        uten = 'Uten data i denne kilden: <a href="/aksje/MTFJ">Matfjord Merkevarer</a>'
+        # Story 8.2a, b (U23): i en rad med «uten data», ikke i en fotnote.
+        uten = '<a href="/aksje/MTFJ">Matfjord Merkevarer</a>'
+        for adresse in ("/", "/min-liste?vis=alle", "/min-liste"):
+            assert "Uten data i denne kilden" not in demo.get(adresse).data.decode("utf-8")
         assert uten in demo.get("/").data.decode("utf-8")
         assert uten in demo.get("/min-liste?vis=alle").data.decode("utf-8")
         assert uten not in demo.get("/min-liste").data.decode("utf-8")

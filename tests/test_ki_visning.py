@@ -269,7 +269,8 @@ class TestSiden:
 class TestBryteren:
     def test_post_setter_kapselen_og_gaar_tilbake(self, klient):
         svar = klient.post("/ki", data={"til": "av", "tilbake": "/aksje/EQNR"})
-        assert svar.status_code == 303 and svar.headers["Location"].endswith("/aksje/EQNR")
+        # Story 8.2a, a (U35): tilbake til ankeret ved KI-teksten.
+        assert svar.status_code == 303 and svar.headers["Location"].endswith("/aksje/EQNR#ki-teksten")
         kapsel = svar.headers["Set-Cookie"]
         assert kapsel.startswith(f"{KAPSEL}=av") and "HttpOnly" in kapsel and "SameSite=Lax" in kapsel
 
@@ -532,7 +533,9 @@ class TestStory816bDenValgteDagen:
         html = klient.get(adresse).data.decode("utf-8")
         assert f'<input type="hidden" name="tilbake" value="{adresse}">' in html
         svar = klient.post("/ki", data={"til": "av", "tilbake": adresse})
-        assert svar.status_code == 303 and svar.headers["Location"] in (adresse, f"http://localhost{adresse}")
+        # Story 8.2a, a (U35): med ankeret ved KI-teksten.
+        maal = f"{adresse}#ki-teksten"
+        assert svar.status_code == 303 and svar.headers["Location"] in (maal, f"http://localhost{maal}")
         # Uten en valgt dag er adressen den samme som før.
         assert '<input type="hidden" name="tilbake" value="/aksje/EQNR">' in side(klient)
 

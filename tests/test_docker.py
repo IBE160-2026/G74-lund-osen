@@ -951,7 +951,24 @@ HOEYDE_PAA_BILDET = 1630
 # _fotnote_ikke_vurdert.html. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Story 3.4e a etter svaret 23.10 kl. 19:10: setningen i fotnoten for inneværende
 # børsdag, i app.py og _fotnote_ikke_vurdert.html. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "8101e3231baa4250be618b705077407ba026c7b4710dadc799918ffababc8d8c"
+# Story 8.2a a: ankeret ved kursgrafen i delmalen _perioder.html. Bildet ble
+# tatt paa nytt og er byte for byte det samme.
+# Story 8.2a b: raden uten data i index.html og markedsoversikt.py, og
+# hjelpeteksten i hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte
+# det samme, fordi raden staar under «Øvrige aksjer».
+# Story 8.2a c: symbolene over søylene er lenker, i _hovedindeks.html, stil.css
+# og hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 8.2a d: grunnen med tall i markedsoversikt.py og hjelpetekster.py.
+# Bildet ble tatt paa nytt med samme hoeyde. Det er ikke byte for byte det
+# samme, men viser de samme radene og tallene.
+# Story 8.2a e: én liste når man sorterer, i index.html og markedsoversikt.py.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 8.2a f: linja om 3 av 3 uten «Bare» i index.html. Bildet ble tatt paa
+# nytt med samme hoeyde, og viser linja uten ordet.
+# Gjennomgangen av 8.2a 24.10: båndet, sorteringen, kommentaren i
+# _hovedindeks.html og hjelpeteksten. Bildet ble tatt paa nytt og er byte for
+# byte det samme.
+AVTRYKK_BAK_BILDET = "dc77e5953b4add3b1228d6c7fb7571c4d0a08de5c2e669459bed978730f556a5"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1067,7 +1084,19 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # børsdag, i app.py og _fotnote_ikke_vurdert.html. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Gjennomgangen 23.10 kveld (ECH4): docstringen i _fotnoten i app.py.
 # Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "6a4a5ff17c749904bf10bd98262ac3fc8f864b4a86172da2eb4c865ac1bad143"
+# Story 8.2a a: ankerne ved kursgrafen og KI-teksten, i app.py, aksje.html og
+# _perioder.html. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 8.2a b: raden uten data i app.py, markedsoversikt.py og
+# hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 8.2a c: stil.css og hjelpetekster.py. Bildet ble tatt paa nytt og er
+# byte for byte det samme.
+# Story 8.2a d: app.py, markedsoversikt.py og hjelpetekster.py. Bildet ble
+# tatt paa nytt og er byte for byte det samme.
+# Story 8.2a e: app.py og markedsoversikt.py. Bildet ble tatt paa nytt og er
+# byte for byte det samme.
+# Gjennomgangen av 8.2a 24.10: app.py, markedsoversikt.py og hjelpetekster.py.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "ee67b52f607d54c13459ab747820e6bc936795def4845b31097da59bc63ea78b"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "

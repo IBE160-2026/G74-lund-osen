@@ -72,10 +72,10 @@ from markedsoversikt import (
     neste_orden,
     norsk_tid,
     oppdatert,
+    rader_uten_data,
     sidens_dato,
     sidens_tidsstempel,
     sorter,
-    uten_kurser,
 )
 from migrering import MigrasjonsFeil
 from minliste import UkjentAksje
@@ -83,6 +83,7 @@ from oversiktsdata import Oversiktsleser
 from perioder import AKSEMERKER, MAANEDSNAVN, OVERSKRIFT, SISTE, VELG, knappene, les_valg, startdag
 from signalberegning import BLANDET, STANDARD
 from tallformat import avrundet, dato, med_og, tall, ukedag
+from vurderingsdata import Grunn
 
 # Kommandoen den tomme siden ber brukeren kjoere. Den staar ogsaa i README, og
 # en test krever at de to er like (story 3.3). Kommer kommandoen for Docker i
@@ -600,6 +601,8 @@ def boersometer():
             oversiktsleser.vurdering(post.aksje.symbol, dagen),
             dagen,
             i_dag,
+            # Gjennomgangen 24.10 (ECH2, BH10): samme Parametre som oversikten.
+            p=STANDARD,
             siste_styrke=siste_styrke.get(post.aksje.symbol),
             er_siste=dagen == siste,
         )
@@ -631,10 +634,32 @@ def boersometer():
     )
 
 
+def _dager_i_serien(leser: Kursleser, poster: list) -> dict[str, int]:
+    """Story 8.2a, d (gruppens svar 24.10 kl. 11:29): dagene i kursserien,
+    til og med dagen raden gjelder, for aksjene der signalet ikke kunne
+    regnes, så raden sier hvorfor med samme tall som aksjesiden. Bare for
+    dem, så siden ikke leser alle seriene.
+
+    Gjennomgangen 24.10 (BH2): kan serien ikke leses, står aksjen uten tall,
+    og raden sier grunnen uten dem, så tabellen vises likevel (NFR-03), som
+    for hovedindeksen. (ECH1): bare radene til og med nyeste dato telles.
+    """
+    dager = {}
+    for post in poster:
+        if post.innhold is not Grunn.SIGNAL_IKKE_REGNET or post.nyeste is None:
+            continue
+        try:
+            serie = leser.serie(post.aksje.symbol)
+        except (*BASEFEIL, ValueError):
+            continue
+        dager[post.aksje.symbol] = sum(1 for rad in serie if rad.dato <= post.nyeste.dato)
+    return dager
+
+
 def _tabellsiden(aktiv: str):
-    """Oversikten eller Min liste. Min liste filtrerer radene etter at hver
-    del er sortert, og sorterer dem aldri paa nytt, saa rekkefoelgen er den
-    samme som i oversikten, ogsaa sortert (FR-102, story 8.15)."""
+    """Oversikten eller Min liste. Min liste filtrerer radene etter at de er
+    delt eller sortert, og sorterer dem aldri paa nytt, saa rekkefoelgen er
+    den samme som i oversikten, ogsaa sortert (FR-102, story 8.15)."""
     i_lista = aktiv == MIN_LISTE_SIDE
     alle = i_lista and request.args.get("vis") == ALLE
     sti = MIN_LISTE if i_lista else OVERSIKTEN
@@ -671,23 +696,35 @@ def _tabellsiden(aktiv: str):
 
     poster = _leser_eller_basefeil(hent_oversiktsleser).oversikt()
     i_dag = idag()
-    rader = bygg_oversikt(poster, i_dag, STANDARD)
-    # Story 8.15: hver del sorteres for seg, så ingen rad flytter seg
-    # mellom delene (tillegget 13.10). Linja om 3 av 3 og «N av M» bruker
-    # rader, som står i FR-102 (svar 7).
+    rader = bygg_oversikt(poster, i_dag, STANDARD, _dager_i_serien(leser, poster))
+    # Story 8.15: linja om 3 av 3 og «N av M» bruker rader, som står i
+    # FR-102 (svar 7). Story 8.2a, e (gruppens svar 24.10 kl. 11:39): uten
+    # en valgt kolonne er tabellen delt i to, hver i FR-102-rekkefølgen, som
+    # før. Med en kolonne valgt er den én liste, sortert under (sortert), og
+    # ikke sortert innenfor hver del, som tillegget 13.10 sa.
     sortering = Sortering.fra_adressen(request.args.get("sorter"), request.args.get("orden"))
-    skilte_seg_ut, oevrige = (sorter(del_, sortering) for del_ in del_i_to(rader))
+    skilte_seg_ut, oevrige = del_i_to(rader)
     tre_av_tre = frozenset(rad.aksje.symbol for rad in rader if rad.styrke == ANTALL_SJEKKER)
     # Story 8.3: merkingen leses fra sin egen port, bare lesing her.
     merkede = _leser_eller_basefeil(lambda: SqliteMinlistelager(g.tilkobling)).merkede()
-    mangler = uten_kurser(poster)
+    # Story 8.2a, b (U23): en aksje uten kurser har en rad nederst, ikke
+    # bare navnet i en fotnote.
+    alle_uten_data = rader_uten_data(poster)
+    mangler = alle_uten_data
     # Gjennomgangen (BH8, ECH2): antallet er de merkede som har en rad i
-    # tabellen, saa knappen og tabellen sier det samme.
-    antall_merket = sum(rad.aksje.symbol in merkede for rad in rader)
+    # tabellen, saa knappen og tabellen sier det samme. Story 8.2a, b: ogsaa
+    # en merket aksje uten kurser, som naa har en rad.
+    antall_merket = sum(rad.aksje.symbol in merkede for rad in (*rader, *alle_uten_data))
+    # Story 8.2a, e: hele lista sortert på kolonnen, med radene uten data,
+    # som står sist når kolonnen ikke har en verdi for dem. None uten
+    # sortering. De som skilte seg ut, beholder kanten i malen.
+    sortert = sorter([*rader, *alle_uten_data], sortering) if sortering else None
     if i_lista and not alle:
         skilte_seg_ut = [rad for rad in skilte_seg_ut if rad.aksje.symbol in merkede]
         oevrige = [rad for rad in oevrige if rad.aksje.symbol in merkede]
-        mangler = uten_kurser([post for post in poster if post.aksje.symbol in merkede])
+        mangler = [rad for rad in mangler if rad.aksje.symbol in merkede]
+        if sortert is not None:
+            sortert = [rad for rad in sortert if rad.aksje.symbol in merkede]
     hovedindeks, indeks_feilet = (None, False) if i_lista else _hovedindeks(leser, poster, tre_av_tre)
     # Story 3.4e: datoene som er «ikke vurdert» i det siden viser, én gang.
     ikke_vurdert = [rad.dato for rad in (*skilte_seg_ut, *oevrige) if rad.ikke_vurdert]
@@ -702,8 +739,11 @@ def _tabellsiden(aktiv: str):
         eget=eldre_enn_nyeste(rader),
         mangler=mangler,
         # Story 8.0d, PR 2b: M i «N av M aksjer» er alle aksjene i lista,
-        # også de uten kurser (beslutningen 14.10).
-        antall_aksjer=len(poster),
+        # også de uten kurser (beslutningen 14.10). Story 8.2a, b (U23): det
+        # er også antallet rader i tabellen, fordi hver aksje uten kurser nå
+        # har en rad, så «7 av 15» stemmer med tabellen. Summen er lik
+        # len(poster), og definisjonen fra 14.10 står (gjennomgangen, BH5).
+        antall_aksjer=len(rader) + len(alle_uten_data),
         ikke_vurdert=bool(ikke_vurdert),
         **_fotnoten(ikke_vurdert, i_dag),
         # Gjennomgangen (BH7, ECH1): «Alle» i Min liste er samme tabell som
@@ -712,6 +752,7 @@ def _tabellsiden(aktiv: str):
         antall_vurdert=antall_vurdert(rader),
         skilte_seg_ut=skilte_seg_ut,
         oevrige=oevrige,
+        sortert=sortert,
         sortering=sortering,
         tre_av_tre=[rad.aksje.navn for rad in rader if rad.styrke == ANTALL_SJEKKER],
         hentekommando=hentekommando(),
@@ -820,6 +861,8 @@ def aksjedetalj(symbol: str):
             # står endringen og signalet i kortene.
             dagen_i_linja=valg.periode == SISTE,
             ki_tilbake=tilbake,
+            grafanker=GRAFANKER,
+            ki_anker=KI_ANKER,
             overskrift=OVERSKRIFT[valg.periode],
             knapper=knappene(rader[-1].dato, i_dag),
             # 1 aar og de andre periodene viser bare det serien har (FR-201).
@@ -886,6 +929,12 @@ def _ki_visning(post, detalj) -> KIVisning:
 # Story 8.16b: med en valgt dag ogsaa ?dag= og en dato. Datoen leses paa nytt
 # av les_valg, saa en dag som ikke kan vises, gir 6 mnd og en beskjed.
 _TILBAKE = re.compile(r"/aksje/[A-Za-z0-9.\-]{1,20}(\?dag=[0-9]{4}-[0-9]{2}-[0-9]{2})?")
+# Story 8.2a, a (U35, U36, gruppens svar 24.10 kl. 11:21): knappene som
+# endrer noe paa aksjesiden, holder plassen, som pilene i historikken.
+# Periodeknappene og «Velg dag» gaar til kursgrafen, og bryteren til
+# KI-teksten.
+GRAFANKER = "kursgrafen"
+KI_ANKER = "ki-teksten"
 
 
 @app.post("/ki")
@@ -899,7 +948,9 @@ def ki_bryter():
         abort(403)
     til = AV if request.form.get("til") == AV else PAA
     tilbake = request.form.get("tilbake", "/")
-    if not _TILBAKE.fullmatch(tilbake):
+    if _TILBAKE.fullmatch(tilbake):
+        tilbake += f"#{KI_ANKER}"
+    else:
         tilbake = "/"
     svar = redirect(tilbake, code=303)
     svar.set_cookie(KAPSEL, til, max_age=365 * 24 * 3600, samesite="Lax", httponly=True, secure=request.is_secure)
