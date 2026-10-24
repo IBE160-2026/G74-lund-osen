@@ -3387,6 +3387,13 @@ passet inn.
 
 **Avhenger av:** 8.1. **Én økt:** ja.
 
+*Avgjort 2026-10-24 kl. 11:49 (gruppens svar):* funn fra gruppens prøve av demoen 24.10 rettes i 8.2a, etter svarene kl. 11:21–11:49. Punkt e), sorteringen, står under story 8.15.
+- a) Siden holder plassen (U36 og U35, kl. 11:21): periodeknappene og «Velg dag» på aksjesiden går til et anker ved kursgrafen, og KI-bryteren til KI-teksten.
+- b) Hver aksje i lista har en rad (U23, kl. 11:34 og 11:35): en aksje uten kurser står nederst som Varde Systemer, med navnet som lenke, «–» i hver kolonne og «uten data», og fotnoten blir borte. Tallet i overskriften og linja under teller radene, så «7 av 15» stemmer og følger lista når aksjer legges til (2.12).
+- c) Symbolene over søylene lenker til aksjesiden (U20, kl. 11:23), på oversikten og i børsometeret.
+- d) Der signalet ikke kunne regnes, sier raden og ruta i børsometeret hvorfor, med samme tall som aksjesiden, for eksempel «for kort historikk: 32 av 50 dager» (kl. 11:29).
+- f) «Bare» tas bort fra setningen om dem med 3 av 3 (kl. 11:49), så teksten ikke vurderer (NFR-06).
+
 ### Story 8.3: Min liste: eget skjermbilde med stjerne og filter
 
 *Lagt til 2026-09-30, Marians beslutning.*
@@ -3757,6 +3764,9 @@ jeg finner det jeg leter etter.
 *Avgjort 2026-10-18 kl. 22:06 (gruppens svar):* Selskap kan sorteres A til Å, og kolonnen tabellen er sortert på, får et lysere felt og en oransje strek under, som på designtavla, i en liten PR etter 8.16 i kveld (spesifikasjonen 8.15b). Grunnen: tavla har sorteringsmerket på Selskap, og i appen skiller bare fargen på vinkelen den sorterte kolonnen fra de andre.
 
 *Lagt til 2026-10-19 kl. 00:22:* Selskap kan sorteres, og den sorterte kolonnen har et lysere felt og en oransje strek under, flettet i `b6449ac`, PR #73 (spesifikasjonen `spec-8-15b-selskap-og-den-sorterte-kolonnen.md`).
+
+*Avgjort 2026-10-24 kl. 11:39 (gruppens svar, 8.2a punkt e):* erstatter linja fra 13.10 om sorteringen innenfor hver del. Velges en kolonne, sorteres hele lista, uten delene «Skilte seg ut» og «Øvrige aksjer». Rader uten tall i kolonnen står sist, og de som skilte seg ut, beholder den gule kanten. Standardrekkefølgen etter signalstyrke har delene som nå. Teksten om sorteringen og designreglene §5 følger med. Gjelder oversikten og Min liste.
+- **Ville feilet hvis:** en sortert tabell fortsatt var delt i to, eller en rad som skilte seg ut, mistet kanten etter et klikk
 
 ### Story 8.16: Regelen for startdagen, og periodene i kursgrafen
 

@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-10-23T10:52
+updated: 2026-10-24T13:46
 ---
 
 # UX-loggen
@@ -553,6 +553,10 @@ Hvert funn er slått opp i koden 20.10 før det ble skrevet.
 | U68 | 21.10 kl. 23:18, rådet (designtavla mot demoen) | Aksjesiden, «Signalet dag for dag» | Tavla har en kompakt tabell med man–fre og en kolonne for uka, månedsvelgeren som én knapp med piler, «Velg dag» øverst til høyre, en kort ingress og antallet per sjekk i sumlinja. Appen har store kort, summen under hver uke, tekstlenker som piler og en lang ingress. Se U16, U43 og U44. | designtavla 13.10, ikke i utdraget; utdraget §14 nevner bare at historikken ikke er i 8.0d (B12) | 8.2 |
 | U69 | 21.10 kl. 23:18, rådet (designtavla mot demoen) | Min liste | Tavla har en tittel om hvor mange i lista som skilte seg ut, og valget mellom Alle og Min liste øverst til høyre. Appen har tittelen «Min liste», og valget står til venstre. | designtavla 13.10, ikke i utdraget; Min liste i [`index.html`](../src/templates/index.html) (B13) | 8.2 |
 | U70 | 22.10 kl. 00:07, gruppen | Stripa og oversikten | Børsometeret mangler i appen. Det står i designforslaget, med en knapp i stripa, og er story 8.6, som er «Ekstra» og ikke bygget. | story 8.6 i [`epics.md`](../_bmad-output/planning-artifacts/epics.md); [`designutdrag-2026-10-13.md`](../_bmad-output/planning-artifacts/designutdrag-2026-10-13.md) §4 | 8.6, avgjort 22.10 kl. 00:09 |
+| U71 | 24.10 kl. 11:29, gruppens prøve av demoen | Oversikten, Min liste og børsometeret (demoen) | Der signalet ikke kunne regnes, sier raden og ruta bare «signalet kunne ikke regnes». Aksjesiden sier hvorfor, for Varde Systemer «Trenger 51 dager for å regne signal, fikk 30». | `GRUNNTEKST` i [`markedsoversikt.py`](../src/markedsoversikt.py); [`aksje.html`](../src/templates/aksje.html) | 8.2a |
+| U72 | 24.10 kl. 11:30, gruppens prøve av demoen | Oversikten (demoen), tabellen | Matfjord Merkevarer står bare i fotnoten «Uten data i denne kilden», ikke som en rad, så tabellen har 14 rader når overskriften sier 15 aksjer. Henger sammen med U23. | `mangler` i [`index.html`](../src/templates/index.html); `UTEN_KURSER` i [`demo.py`](../src/demo.py) | 8.2a |
+| U73 | 24.10 kl. 11:38, gruppens prøve av demoen | Oversikten og Min liste, sorteringen | Et klikk på en kolonne sorterer innenfor hver del, så en rad under «Øvrige aksjer» kan ha et høyere tall enn en under «Skilte seg ut». Gruppen vil ha én liste når man sorterer. | linja «Sortert på …, innenfor hver del» i [`index.html`](../src/templates/index.html); story 8.15 i [`epics.md`](../_bmad-output/planning-artifacts/epics.md) | 8.2a |
+| U74 | 24.10 kl. 11:49, gruppens prøve av demoen | Oversikten (demoen), linja om 3 av 3 | Setningen begynner med «Bare» foran dem som fikk utslag på alle 3 sjekkene. Ordet vurderer, og teksten skal ikke vurdere (NFR-06). | `alle-sjekkene` i [`index.html`](../src/templates/index.html) | 8.2a |
 
 *Lagt til 2026-10-20 (story 3.3h, gjennomgangen VG6 og ECH10):* avgjørelsen kl. 10:14, 10:15, 10:18 og 10:19 og svaret kl. 16:19 står under story 3.3 i `epics.md` fra `49e9041`, og U7 bygges i [`spec-3-3h-readme-bak-piler-og-levende-hjelp.md`](../_bmad-output/implementation-artifacts/spec-3-3h-readme-bak-piler-og-levende-hjelp.md). Fra 3.3h har `docs/hjelp.md` ingen Rettet-linjer, så radene i del a som nevner en Rettet-linje i hjelpen, om AirPlay og om kl. 22, beskriver det som gjaldt før 3.3h. Svaret «Når kan jeg hente?» sier kl. 22 selv. README-en hadde 419 linjer etter `wc -l` og om lag 3 800 ord. Den blir ikke kortere i linjer, men kortere å lese, fordi mer står bak en pil.
 
@@ -595,3 +599,11 @@ Hvert funn er slått opp i koden 20.10 før det ble skrevet.
 *Lagt til 2026-10-23 kl. 10:52:* U70 er løst i `7f1c1f0`, PR #89 (story 8.6): børsometeret er en egen side, `/boersometer`, med knappen «Børsometer» i stripa mellom «Markedsoversikt» og «Min liste». Én rute per aksje, ordnet etter bransje, med farge for endringen, størrelse for volumet mot vanlig og ramme for signalet, og snittet per bransje.
 
 *Lagt til 2026-10-23 kl. 10:52:* U3 henger sammen med `7f1c1f0`, PR #89 (story 8.6, gruppens svar 23.10 kl. 09:24, b): demoselskapet `MTFJ` mangler fortsatt kurser med vilje, og «Alle» sier fortsatt 15. Navnet under tabellen lenker nå til aksjesiden, som svarer 200 med en beskjed om at det ikke finnes kurser ennå, i stedet for 404.
+
+*Lagt til 2026-10-24:* U20 tas i 8.2a (gruppens svar 24.10 kl. 11:23, under story 8.2 i `epics.md`): symbolene over søylene lenker til aksjesiden, på oversikten og i børsometeret. Større skrift er ikke med.
+
+*Lagt til 2026-10-24:* U23 tas i 8.2a (gruppens svar 24.10 kl. 11:34 og 11:35): en aksje uten kurser får en rad nederst i tabellen, og tallene i overskriften og linja under teller radene. Linja om hovedindeksen, «7 av 14 gikk bedre enn indeksen», er ikke med i svaret.
+
+*Lagt til 2026-10-24:* U35 tas i 8.2a (gruppens svar 24.10 kl. 11:21): KI-bryteren sender tilbake til et anker ved KI-teksten.
+
+*Lagt til 2026-10-24:* U36 tas i 8.2a (gruppens svar 24.10 kl. 11:21): periodeknappene og «Velg dag» på aksjesiden går til et anker ved kursgrafen.
