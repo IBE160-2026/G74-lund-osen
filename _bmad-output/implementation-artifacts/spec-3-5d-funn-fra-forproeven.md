@@ -71,9 +71,48 @@ Den ekte versjonen i en ZIP-kopi på gruppens PC med egen testkonto (avgjort kl.
 
 Én, med `-x`, med kopi før og sha256 mot HEAD etter: sjekken av kommandolinja borte, så alt på porten stoppes.
 
+*Mutanten 2026-10-24:* sjekken av kommandolinja borte i `start.ps1` (`Er-OseSignal` svarer alltid ja), kjørt én gang med `-x` mot `tests/test_dobbeltklikk.py` kl. 16:58:13–16:58:41 på `50ab5a6`. Fanget av `test_start_ps1_stopper_bare_den_andre_versjonen_paa_porten[fremmed]`. Etterpå var sha256 lik kopien før, og `git hash-object` lik `HEAD:start/start.ps1`. Sjekken ble snevret inn etter gjennomgangen (`0ca3fcc`), og mutanten er ikke kjørt på nytt, fordi instruksjonen sier én.
+
+*Rettet 2026-10-24 (gjennomgangen, BH8, ECH9, VG7):* under «Valg som er gjort her» står at Windows stopper med `taskkill /T /F`. Koden stopper lytteren, `python.exe`, med `Stop-Process -Id … -Force`, og uv og `waitress-serve.exe` over den stopper når den stopper. `taskkill` brukes fortsatt av `Stopp-Serveren` for vinduets egen server. Grunnen til byttet var at testmiljøet uten `PATHEXT` ikke fant `taskkill.exe`.
+
+*Rettet 2026-10-24 (gjennomgangen, BH3, ECH2):* under «Valg som er gjort her» står at også en annen kopi av OSE Signal i en annen mappe stoppes. Etter gjennomgangen stoppes bare `waitress-serve` fra `.venv` i mappa skriptet ligger i, `<mappa>\.venv\Scripts\waitress-serve(.exe)` på Windows og `<mappa>/.venv/bin/waitress-serve` på Mac, med `--listen=127.0.0.1:8000` og `app:app`. OSE Signal fra en annen mappe regnes som et annet program.
+
+## Gjennomgangen 24.10
+
+Gjennomgang 24.10 etter hele settet, av `01a5f8d..7b784f0` på main og `7b784f0..50ab5a6` på grenen. Linsene var Blind Hunter (BH, 14 funn), Edge Case Hunter (ECH, 11 funn) og Verification Gap (VG, 7 funn), hver for seg og uten å endre noe i repoet. 32 funn ble 24 rader. Funnene er rettet med en gang (svaret 23.10 kl. 15:53), i `56eafe9`, `0ca3fcc`, `d000bdf`, `2bf788e`, `72dfe78` og `a5cdcb8`.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH1, ECH1, ECH11 | Fem binære cachefiler fra Windows PowerShell kom med i `20ddc7f`. Kjøretestene startet PowerShell uten `LOCALAPPDATA`, `ProgramData` og `SystemDrive`, i repoet | high | rettet i `56eafe9`: filene er tatt ut, kjøretestene får mappene i `tmp_path` og kjøres derfra, og `.gitignore` har de to mappene. De kommer ikke til main, fordi grenen squash-flettes |
+| BH3, ECH2 | Sjekken kjente igjen enhver `waitress-serve … app:app` på porten, også en annen app | medium | rettet i `0ca3fcc`: bare `waitress-serve` fra `.venv` i mappa |
+| BH4, ECH10 | README-en og hjelpen lovet at bare en versjon fra «et av disse vinduene» stoppes | medium og low | rettet i `0ca3fcc`: de sier denne mappa, også en webserver startet med `uv run waitress-serve`, og at OSE Signal fra en annen mappe ikke stoppes |
+| BH2 | Vinduet der appen ble stoppet, sa «Noe gikk galt … dobbeltklikk på nytt», så brukeren kunne stoppe den nye versjonen igjen | medium | rettet i `d000bdf`: vinduet sier at det kan lukkes hvis den andre versjonen ble startet, og hjelpen sier det samme |
+| BH5 | Den andre versjonen stoppes før uv, `uv sync`, nøkkelen og hentingen, så den er borte hvis noe av det feiler | medium etter linsen, low | uten endring: instruksjonen sier «før uv og hentingen» i punkt d). Gruppen avgjør om stoppen skal flyttes til rett før webserveren |
+| VG1 | Ingen test viste at hver av de tre delene trengs, og den statiske testen fant delene i linja som starter serveren | medium | rettet i `0ca3fcc`: `test_sjekken_kjenner_bare_igjen_waitress_fra_mappa` kjører sjekken alene med elleve kommandolinjer på Windows og ti i bash, og den statiske testen leser bare sjekken |
+| VG2 | Den ekte kommandolinja på Windows, med sti i anførselstegn og `.exe`, var ikke testet | medium | rettet i `0ca3fcc`: den står først i tabellen |
+| VG3 | Porttestene kjørte ikke på Windows og Mac i CI | medium | rettet i `a5cdcb8`: steget «Porten på Windows og Mac» i jobben `dobbeltklikk` |
+| VG6 | KI-tekstene hentingen skriver ut, fra `src/ki_tekst.py`, hadde fortsatt oe, aa og ae | medium | rettet i `2bf788e`, også grunnene fra `src/ki_lokal.py` og `src/ki_sky.py`, og testen gjelder de tre filene. Feilmeldingene til programmereren i `boersdag.py`, `ki_modell.py` og `ki_kontroll.py` er ikke endret |
+| BH11 | Linja om hovedindeksen kalte dagene utenfor 2026 «ikke børsdager» | low | rettet i `72dfe78`: «dager utenfor 2026 eller dager børsen var stengt» |
+| BH8, ECH9, VG7 | Spesifikasjonen sa `taskkill /T /F`, koden har `Stop-Process` | low og nit | rettet: Rettet-linja over, og kommentaren i `start.ps1` i `d000bdf` |
+| BH7 | Uten navn fra `ps` ble beskjeden «Programmet er  (prosess …)» | low | rettet i `d000bdf` |
+| BH13 | En feilmelding uten punktum gikk i ett med «Lukk vinduet» | nit | rettet i `d000bdf` |
+| BH14, ECH3 | En prosess startet som administrator gir ingen kommandolinje, og ble bare kalt et annet program | nit og low | rettet i `d000bdf`: beskjeden sier at kommandolinja ikke kunne leses |
+| ECH4 | Lytteren kunne stoppe mellom sjekken av porten og oppslaget | low | rettet i `d000bdf`: da går skriptet videre |
+| ECH8 | En lytter i testene som ikke fikk porten, ga en feil i stedet for å hoppes over | nit | rettet i `0ca3fcc` |
+| BH6 | En prosess-ID kan gjenbrukes mellom oppslaget og stoppen | low | uten endring: tiden mellom oppslaget og stoppen er kort, og er ikke målt |
+| BH9 | Testene bruker port 8000 på maskinen | low | uten endring: de hoppes over når porten er i bruk. En egen port for testene ville gitt skriptene en variabel for porten |
+| BH10 | Testen for æ, ø og å er en liste med ord | low | delvis: lista har ordene fra KI-modulene. Ellers uten endring |
+| BH12 | `svarer` bruker fortsatt curl | low | uten endring: curl følger med macOS, og installasjonen av uv bruker den også |
+| ECH5 | `/dev/tcp` har ingen tidsgrense | low | uten endring: på 127.0.0.1 svarer en lukket port med en gang |
+| ECH6 | Et annet program kan ta porten mens `uv sync` eller hentingen kjører | low | uten endring: løkka ser først om webserveren har stoppet |
+| ECH7 | En feil fra `Stop-Process` eller `kill` vises ikke | nit | uten endring: etter 30 sekunder sier vinduet hva man gjør |
+| VG4, VG5 | To lyttere samtidig, og grenen uten kjent lytter, er ikke testet | low | uten endring |
+
 ## Åpent
 
 - **«API token» under «Dashboard»** hos EODHD er ikke slått opp, fordi siden krever innlogging. Teksten står slik gruppen så den i forprøven.
+- **Kommandolinja på Mac** er ikke slått opp. Sjekken venter `<mappa>/.venv/bin/waitress-serve` med full sti, som på Windows. Står stien annerledes, regnes den andre versjonen som et annet program, og ingenting stoppes. Steget «Porten på Windows og Mac» i CI bruker testens egen lytter, ikke uv.
+- **BH5:** om den andre versjonen skal stoppes rett før webserveren i stedet for før uv, er gruppens valg.
 
 ## Det som ikke endres
 
