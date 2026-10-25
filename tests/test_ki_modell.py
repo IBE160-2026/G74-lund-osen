@@ -242,6 +242,10 @@ class TestPrompten:
         assert AVTRYKK.get(PROMPTVERSJON) == avtrykk, (
             "Promptteksten er endret. Sett ny PROMPTVERSJON og legg avtrykket i AVTRYKK."
         )
+        # Story 10.2g: demoradene har det samme avtrykket (demo_ki.py).
+        import demo_ki
+
+        assert demo_ki.promptavtrykk() == avtrykk
 
     def test_prompten_har_ingen_tall_kontrollen_stopper(self):
         """Gjennomgangen (BH1, BH2): gjentar modellen prompten, skal den ikke
