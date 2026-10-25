@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-25T20:37
+updated: 2026-10-25T21:19
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -4857,6 +4857,15 @@ grunnlaget har merket, og én forklarer det med «fordi feltet dager er
 minst». Ingen tekst nevner hovedindeksen, bransjen eller antallet aksjer, og
 ingen gir råd eller gjetter på en årsak som nyheter. Tekstene står bare i
 kopien og er ikke ført her.
+
+*Presisert 2026-10-25:* talt på nytt i `data/db/ki-proeve-v3.db`, åpnet bare
+for lesing og med samme sha256 før og etter. Ingen av de 15 grunnlagene har
+`dager_merke`, og seks tekster sier «minst» om dagene: DNB, FRO, VAR, GJF og
+DNO sier «minst» foran et antall børsdager, og TEL er en sjette, med «fordi
+feltet dager er minst». «Fem» over er de fem med «minst» foran et antall, og
+«én» er TEL. Alle seks besto kontrollen. De 9 med feil i tabellen i §44 er
+MOWI, ORK og SALM om interessen og disse seks, og ingen tekst er telt to
+ganger. Det er de samme seks som spesifikasjonen 10.2e nevner.
 
 Versjon 3 besto færre enn versjon 2 på samme dag, så den flettes ikke etter
 beslutningen 16.10 kl. 23:51 (2), og kontrollen stoppet tre, som er grensen i
