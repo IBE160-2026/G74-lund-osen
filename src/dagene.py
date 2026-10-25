@@ -1,4 +1,5 @@
-"""Hvor lenge signalet har vaert slik - story 10.2e, gruppens svar 25.10 kl. 00:51.
+"""Hvor lenge signalet har vaert slik - story 10.2e, gruppens svar 25.10 kl. 00:51,
+med ordlyden fra svarene kl. 12:12 og 12:19.
 
 Ren logikk. Tellingen er fra svaret 24.10 kl. 16:15 a): boersdager paa rad
 med samme retning og styrke, til og med dagen. Den laa i ki_grunnlag.py, men
@@ -14,14 +15,19 @@ from boersdag import UtenforKalenderen, forrige_boersdag
 from tallformat import tall
 from vurderingsdata import Grunn, Vurdering
 
-DAGENE_FOERSTE = "Signalet er slik i dag for første gang."
-# For en dag som ikke er i dag passer ikke «i dag»: en dag valgt med «Velg
-# dag», og siste boersdag i helga eller foer kveldshentingen. Datoen staar
-# oeverst paa siden (gruppens svar 25.10 kl. 11:04 b), gjennomgangen, BH1).
-DAGENE_FOERSTE_VALGT = "Signalet ble slik denne dagen for første gang."
+# Uten «for første gang», fordi tellingen gjelder dagene paa rad (gruppens
+# svar 25.10 kl. 12:12 a), gjennomgangen kl. 11, BH2, ECH7).
+DAGENE_EN = "Signalet ble slik i dag."
 DAGENE_PAA_RAD = "Signalet har vært slik i {dager} børsdager på rad."
 DAGENE_MINST_EN = "Signalet har vært slik i minst 1 børsdag."
 DAGENE_MINST = "Signalet har vært slik i minst {dager} børsdager."
+# For en dag som ikke er i dag passer ikke «i dag» eller «har vært»: en dag
+# valgt med «Velg dag», og siste boersdag i helga eller foer kveldshentingen
+# (svarene kl. 12:12 c) og 12:19 d), gjennomgangen kl. 11, BH1, BH5).
+DAGENE_EN_ANNEN = "Signalet ble slik denne dagen."
+DAGENE_PAA_RAD_ANNEN = "Denne dagen hadde signalet vært slik i {dager} børsdager på rad."
+DAGENE_MINST_EN_ANNEN = "Denne dagen hadde signalet vært slik i minst 1 børsdag."
+DAGENE_MINST_ANNEN = "Denne dagen hadde signalet vært slik i minst {dager} børsdager."
 
 
 def tell_dagene(dag: date, vurdering: Vurdering, tidligere: Mapping[date, Vurdering | Grunn]) -> tuple[int, bool]:
@@ -56,7 +62,7 @@ def setning_om_dagene(dager: int, minst: bool, annen_dag: bool = False) -> str:
     if type(dager) is not int or dager < 1:
         raise ValueError("dager maa vaere et heltall fra 1")
     if minst:
-        return DAGENE_MINST_EN if dager == 1 else DAGENE_MINST.format(dager=tall(dager, "heltall"))
-    if dager == 1:
-        return DAGENE_FOERSTE_VALGT if annen_dag else DAGENE_FOERSTE
-    return DAGENE_PAA_RAD.format(dager=tall(dager, "heltall"))
+        en, flere = (DAGENE_MINST_EN_ANNEN, DAGENE_MINST_ANNEN) if annen_dag else (DAGENE_MINST_EN, DAGENE_MINST)
+    else:
+        en, flere = (DAGENE_EN_ANNEN, DAGENE_PAA_RAD_ANNEN) if annen_dag else (DAGENE_EN, DAGENE_PAA_RAD)
+    return en if dager == 1 else flere.format(dager=tall(dager, "heltall"))

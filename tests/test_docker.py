@@ -1143,7 +1143,10 @@ HOEYDE_PAA_AKSJESIDEN = 1934
 # Story 10.2e, gruppens svar 25.10 kl. 00:51: modellen nevner ikke dagene, og
 # setningen om dagene staar under KI-teksten (src/dagene.py). Bildet viser
 # fortsatt BRFE, med hoeyden 1934.
-AVTRYKK_BAK_AKSJESIDEN = "d343d510a1f0ec77783bc4207e3c55e04a112898955a181ddba38a2d25e775c7"
+# Story 10.2e, gruppens svar 25.10 kl. 12:12 og 12:19: setningen uten «for
+# første gang», og «denne dagen» for en dag som ikke er i dag. Bildet viser
+# fortsatt BRFE, med hoeyden 1934.
+AVTRYKK_BAK_AKSJESIDEN = "67a9943b5d05e1dc8ce5055e3bc7231df47807711283c6f619bfedc8e4469479"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "

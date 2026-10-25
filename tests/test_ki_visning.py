@@ -574,8 +574,9 @@ ANNEN = Vurdering(
 class TestSetningenOmDagene:
     """Gruppens svar 25.10 kl. 00:51: appen skriver dagene i en setning rett
     under KI-teksten, ogsaa naar KI er av eller teksten er stoppet, med
-    tellingen fra svaret 24.10 kl. 16:15 a). Klokka staar paa 31.10, siste
-    dag i serien, saa dagen siden viser er i dag."""
+    tellingen fra svaret 24.10 kl. 16:15 a) og ordlyden fra svarene kl. 12:12
+    og 12:19. Klokka staar paa 31.10, siste dag i serien, saa dagen siden
+    viser er i dag."""
 
     @pytest.fixture(autouse=True)
     def klokka_paa_siste_dag(self, monkeypatch):
@@ -584,23 +585,45 @@ class TestSetningenOmDagene:
     @pytest.mark.parametrize(
         "dager, minst, annen, setning",
         [
-            (1, False, False, "Signalet er slik i dag for første gang."),
-            (1, False, True, "Signalet ble slik denne dagen for første gang."),
+            # I dag (svaret kl. 12:12 a).
+            (1, False, False, "Signalet ble slik i dag."),
             (4, False, False, "Signalet har vært slik i 4 børsdager på rad."),
-            (4, False, True, "Signalet har vært slik i 4 børsdager på rad."),
             (12, True, False, "Signalet har vært slik i minst 12 børsdager."),
             (1, True, False, "Signalet har vært slik i minst 1 børsdag."),
             (1234, False, False, "Signalet har vært slik i 1 234 børsdager på rad."),
             # Gjennomgangen, VG5: regel 21 ogsaa i «minst».
             (1234, True, False, "Signalet har vært slik i minst 1 234 børsdager."),
+            # En dag som ikke er i dag (svarene kl. 12:12 a) og c) og 12:19 d).
+            (1, False, True, "Signalet ble slik denne dagen."),
+            (4, False, True, "Denne dagen hadde signalet vært slik i 4 børsdager på rad."),
+            (12, True, True, "Denne dagen hadde signalet vært slik i minst 12 børsdager."),
+            (1, True, True, "Denne dagen hadde signalet vært slik i minst 1 børsdag."),
+            (1234, False, True, "Denne dagen hadde signalet vært slik i 1 234 børsdager på rad."),
+            (1234, True, True, "Denne dagen hadde signalet vært slik i minst 1 234 børsdager."),
         ],
     )
     def test_setningen(self, dager, minst, annen, setning):
         """Ville feilet hvis setningen ikke fulgte gruppens ordlyd for 1 dag,
-        flere dager og minst, eller tallet ikke fulgte regel 21."""
+        flere dager og minst, ogsaa entall, i dag og en annen dag, eller
+        tallet ikke fulgte regel 21."""
         from dagene import setning_om_dagene
 
         assert setning_om_dagene(dager, minst, annen_dag=annen) == setning
+
+    @pytest.mark.parametrize("annen", [False, True])
+    @pytest.mark.parametrize("minst", [False, True])
+    @pytest.mark.parametrize("dager", [1, 2, 4, 12, 1234])
+    def test_aldri_for_foerste_gang_og_aldri_har_vaert_en_annen_dag(self, dager, minst, annen):
+        """Svaret kl. 12:12 a): tellingen gjelder dagene paa rad, saa ingen
+        setning sier «for første gang». Svarene kl. 12:12 c) og 12:19 d): en
+        dag som ikke er i dag, faar «denne dagen» og aldri «Signalet har
+        vært». Ville feilet hvis en av setningene sa noe av det."""
+        from dagene import setning_om_dagene
+
+        setning = setning_om_dagene(dager, minst, annen_dag=annen)
+        assert "første gang" not in setning
+        if annen:
+            assert "Signalet har vært" not in setning and "denne dagen" in setning.lower()
 
     @pytest.mark.parametrize("dager", [0, True, 2.0])
     def test_ugyldige_dager_avvises(self, dager):
@@ -625,10 +648,10 @@ class TestSetningenOmDagene:
         assert html.index("Med KI-ens ord") < html.index(TEKST) < html.index(setning) < html.index("ki-bryter")
 
     def test_en_dag_paa_siden(self, klient, aksje):
-        """Ville feilet hvis en annen vurdering dagen foer ikke ga «i dag for
-        første gang»."""
+        """Ville feilet hvis en annen vurdering dagen foer ikke ga «Signalet
+        ble slik i dag.» (svaret kl. 12:12 a)."""
         skriv_vurdering("EQNR", date(2026, 10, 30), ANNEN)
-        assert '<p class="dagene">Signalet er slik i dag for første gang.</p>' in side(klient)
+        assert '<p class="dagene">Signalet ble slik i dag.</p>' in side(klient)
 
     def test_minst_paa_siden(self, klient, aksje):
         """Uten rad for boersdagen foer er antallet det minste det kan vaere.
@@ -652,7 +675,7 @@ class TestSetningenOmDagene:
             skriv_kirad(kirad(aksje, **endret))
         html = side(klient, kapsel)
         assert TEKST not in html
-        assert '<p class="dagene">Signalet er slik i dag for første gang.</p>' in html
+        assert '<p class="dagene">Signalet ble slik i dag.</p>' in html
 
     def test_ingen_setning_uten_vurdering(self, klient):
         """En dag med en grunn har ikke noe signal. Ville feilet hvis siden
@@ -668,20 +691,36 @@ class TestSetningenOmDagene:
         skriv_vurdering("EQNR", date(2026, 10, 30), VURDERING)
         skriv_vurdering("EQNR", date(2026, 10, 29), ANNEN)
         html = klient.get("/aksje/EQNR?dag=2026-10-30").get_data(as_text=True)
-        assert '<p class="dagene">Signalet ble slik denne dagen for første gang.</p>' in html
+        assert '<p class="dagene">Signalet ble slik denne dagen.</p>' in html
+
+    def test_en_valgt_dag_med_flere_dager(self, klient, aksje):
+        """Svaret kl. 12:19 d): «Velg dag» 30.10 med tre dager paa rad. Ville
+        feilet hvis siden sa «Signalet har vært» om en tidligere dag."""
+        for dato in (date(2026, 10, 28), date(2026, 10, 29), date(2026, 10, 30)):
+            skriv_vurdering("EQNR", dato, VURDERING)
+        skriv_vurdering("EQNR", date(2026, 10, 27), ANNEN)
+        html = klient.get("/aksje/EQNR?dag=2026-10-30").get_data(as_text=True)
+        assert '<p class="dagene">Denne dagen hadde signalet vært slik i 3 børsdager på rad.</p>' in html
 
     def test_siste_dag_som_ikke_er_i_dag(self, klient, aksje, monkeypatch):
         """Gjennomgangen, BH1, ECH6, VG1: i helga og foer kveldshentingen er
         siste boersdag ikke i dag. Ville feilet hvis siden sa «i dag» om den."""
         monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 11, 2, 12, 0).astimezone())
         skriv_vurdering("EQNR", date(2026, 10, 30), ANNEN)
-        assert '<p class="dagene">Signalet ble slik denne dagen for første gang.</p>' in side(klient)
+        assert '<p class="dagene">Signalet ble slik denne dagen.</p>' in side(klient)
+
+    def test_minst_paa_siste_dag_som_ikke_er_i_dag(self, klient, aksje, monkeypatch):
+        """Svarene kl. 12:12 c) og 12:19 d): ogsaa uten «Velg dag». Ville
+        feilet hvis siden sa «Signalet har vært slik i minst» om siste
+        boersdag foer kveldshentingen."""
+        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 11, 2, 12, 0).astimezone())
+        assert '<p class="dagene">Denne dagen hadde signalet vært slik i minst 1 børsdag.</p>' in side(klient)
 
     @pytest.mark.parametrize(
         "naa, setning",
         [
-            (datetime(2026, 10, 31, 12, 0), "Signalet er slik i dag for første gang."),
-            (datetime(2026, 12, 31, 12, 0), "Signalet ble slik denne dagen for første gang."),
+            (datetime(2026, 10, 31, 12, 0), "Signalet ble slik i dag."),
+            (datetime(2026, 12, 31, 12, 0), "Signalet ble slik denne dagen."),
         ],
     )
     def test_velg_dag_paa_siste_dag(self, klient, aksje, monkeypatch, naa, setning):

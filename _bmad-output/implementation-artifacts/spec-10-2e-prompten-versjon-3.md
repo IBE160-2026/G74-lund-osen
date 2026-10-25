@@ -107,6 +107,16 @@ Gruppens svar 25.10 kl. 11:04:
 - **a) Lesingen på aksjesiden.** Setningen om dagene leser vurderingene for aksjen med ett kall, fra første dato til dagen siden viser. `test_siden_leser_en_gang_per_maaned` godtar nøyaktig det ene kallet i tillegg til måneden i historikken, og feiler fortsatt hvis siden leser dag for dag eller gjør mer enn ett kall til.
 - **b) Ordlyden for en valgt dag.** Med «Velg dag» står ordlyden fra fjerde forsøk, som «Signalet ble slik denne dagen for første gang.», fordi datoen står øverst på siden. Punktet under «Åpent» er dermed avgjort.
 
+Gruppens svar 25.10 kl. 12:12 og 12:19, på funnene fra gjennomgangen kl. 11:
+
+- **a) Uten «for første gang».** Tellingen gjelder dagene på rad (BH2, ECH7), så setningen for 1 dag er «Signalet ble slik i dag.», og for en dag som ikke er i dag «Signalet ble slik denne dagen.». Tellingen fra svaret 24.10 kl. 16:15 a) står. Det endrer ordlyden fra svarene kl. 00:51 og 11:04 b).
+- **b) «Fortsatt», «lenge» og «uke»** stoppes som før, fordi modellen ikke vet hva som var før (ECH4, BH14). Kontrollen er ikke endret.
+- **c) «Denne dagen»** gjelder alle dager som ikke er i dag, også i helga og før kveldshentingen, ikke bare med «Velg dag». Siden gjorde det allerede etter rettingen av BH1 (`21cebff`), og testene sier det nå.
+- **d) Flere dager og «minst» en dag som ikke er i dag:** «Denne dagen hadde signalet vært slik i 4 børsdager på rad.» og «Denne dagen hadde signalet vært slik i minst 12 børsdager.» (BH5). Entall følger av det: «Denne dagen hadde signalet vært slik i minst 1 børsdag.»
+- **e) Retningen Ingen:** setningen står som den er, fordi «slik» viser til retningen rett over (ECH10).
+
+`src/dagene.py` har ordlyden fra a), c) og d). README-en, `docs/hjelp.md` og `src/hjelpetekster.py` siterer ikke setningen, så de er ikke endret. Bildet av BRFE er tatt på nytt, 1280 × 1934, og viser «Signalet ble slik denne dagen.».
+
 ## Boundaries & Constraints
 
 - Ingen kall til EODHD utover kvotesjekken i regel 15. `src/fetch_prices.py` kjøres ikke, og `data/db/ose.db` røres ikke (regel 22).
@@ -270,6 +280,8 @@ Gjennomgang 25.10, etter hele settet (11:09:48–11:17:23, fil for fil, 3560 bes
 
 Med dom medium er BH2, ECH7 og ECH4, BH14 ikke rettet. De må avgjøres av gruppen, og grenen flettes ikke før det.
 
+*Lagt til 2026-10-25 kl. 12:12 og 12:19 (gruppens svar):* BH2, ECH7: ordlyden uten «for første gang» (svaret a). ECH4, BH14: stoppes som før (svaret b), ingen endring. BH5: ordlyden fra svaret d). ECH10: setningen står som den er (svaret e). Se «Valg».
+
 ## Åpent
 
 - `bransjen` for en bransje med bare aksjen selv sier det samme som aksjens egen endring. Børsometeret merker den «1 aksje». Grunnlaget har ikke det merket.
@@ -286,3 +298,4 @@ Med dom medium er BH2, ECH7 og ECH4, BH14 ikke rettet. De må avgjøres av grupp
 - *Lagt til 2026-10-25 kl. 11:* «fortsatt», «lenge» og «uke» stopper også tekster om trenden, som «Kursen ligger fortsatt over snittet» (ECH4, BH14). Gruppen avgjør om ordene skal leses snevrere, eller om prompten skal nevne dem.
 - *Lagt til 2026-10-25 kl. 11:* kontrollen leser ord, ikke mening, så en form for dagene som ikke er i lista, slipper gjennom (VG3). «I enhver form» i svaret kl. 00:51 er derfor de kjente formene.
 - *Lagt til 2026-10-25 kl. 11:* ordlyden for flere dager og «minst» om en dag som ikke er i dag («har vært slik», BH5), og setningen når retningen er Ingen (ECH10).
+- *Lagt til 2026-10-25 kl. 12:12 og 12:19:* de fire punktene fra gjennomgangen kl. 11 over er avgjort av gruppen (under «Valg»): «for første gang» er tatt ut (BH2, ECH7), «fortsatt», «lenge» og «uke» stoppes som før (ECH4, BH14), en dag som ikke er i dag får «Denne dagen hadde signalet vært slik …» (BH5), og setningen med retningen Ingen står (ECH10).
