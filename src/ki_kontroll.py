@@ -375,7 +375,10 @@ _DAGENE_I_ANNEN_FORM = re.compile(
     r"|signalet\s+(?:er|var|ble)\s+(?:\w+\s+)?nytt"
     # Gjennomgangen 25.10 kl. 11 (ECH3, BH4, VG3): flere former uten tall.
     r"|igjen|ennå|stadig|på\s+nytt|fortsetter|vedvarer|nylig|en\s+stund|som\s+sist"
-    r"|forrige\s+(?:børs|handels)?dag(?:en)?|dagen\s+før|måned(?:en|er|ene)?)(?![\w-])",
+    r"|forrige\s+(?:børs|handels)?dag(?:en)?|dagen\s+før|måned(?:en|er|ene)?"
+    # Gjennomgangen 25.10 kl. 13 (ECH1): setningen appen skriver for 1 dag
+    # (svaret 25.10 kl. 12:12 a). Modellen kunne skrive den om en lengre rekke.
+    r"|ble\s+slik\s+(?:i\s+dag|denne\s+dagen))(?![\w-])",
     re.IGNORECASE,
 )
 # Gjennomgangen 25.10 (ECH5): regelens vinduer uten ledd er vinduene bare

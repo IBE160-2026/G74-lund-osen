@@ -1292,6 +1292,9 @@ class TestDageneStoppes:
             "Signalet har fremdeles denne retningen.",
             "Signalet har vært slik hele uken.",
             "Signalet har vært slik i en uke.",
+            # Gjennomgangen 25.10 kl. 13 (ECH1): appens setning for 1 dag.
+            "Signalet ble slik i dag.",
+            "Signalet ble slik denne dagen.",
         ],
     )
     def test_dagene_i_enhver_form_stoppes(self, tekst):
