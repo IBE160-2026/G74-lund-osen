@@ -114,9 +114,10 @@ class TestSteget:
 
     def test_dagene_sendes_ikke_ogsaa_med_kvelden_foer(self, stier):
         """Gruppens svar 25.10 kl. 00:51: modellen faar ikke dagene. Tirsdag og
-        onsdag gir samme retning og styrke, saa dagene er 2, men grunnlaget
+        onsdag gir samme retning og styrke, saa dagene ville vaert 2, men grunnlaget
         onsdag har dem ikke. Ville feilet hvis dagene kom med i grunnlaget.
-        Tellingen paa siden testes i test_aksjedetalj.py."""
+        Tellingen paa siden testes i test_ki_visning.py, og tell_dagene i
+        test_ki_grunnlag.py (gjennomgangen, VG8)."""
         raa, base = stier
         onsdag = date(2026, 9, 23)
         kjoer(raa, base, FalskModell())

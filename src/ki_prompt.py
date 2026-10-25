@@ -36,11 +36,11 @@ Versjon 3, tredje forsoek (gruppens svar 24.10 kl. 23:23, malinger.md §44):
 modellen faar ferdig ordlyd for dagene, laget her av dagene og merket, og
 nevner dagene bare med den, ordrett. «Minst» staar bare i ordlyden, ikke i
 reglene. Kontrollen i FR-603 bruker den samme ordlyden (ordlyd_for_dagene),
-saa prompten og kontrollen ikke kan si ulikt. Ordlyden, og koden som velger
+saa prompten og kontrollen ikke kan si ulikt (tatt ut i fjerde forsoek). Ordlyden, og koden som velger
 den og setter prompten sammen, er med i avtrykket (gjennomgangen 25.10, VG2).
 
 Versjon 3, fjerde forsoek (gruppens svar 25.10 kl. 00:50 og 00:51,
-malinger.md §45): modellen faar ikke dagene og nevner dem ikke. Ordlyden fra
+malinger.md §46): modellen faar ikke dagene og nevner dem ikke. Ordlyden fra
 tredje forsoek er tatt ut, og reglene sier at teksten ikke sier hvor lenge
 signalet har vart. Appen skriver dagene selv, under KI-teksten paa
 aksjesiden (setning_om_dagene i dagene.py). Versjonen staar som 3, og

@@ -473,6 +473,18 @@ class TestGrunnlagetMedDagen:
             grunnlag = ki_grunnlag(_v("Ingen", 0), utenfor_maalingen=False, dagen=bildet)
             assert set(grunnlag) == NOEKLENE | {"aksjer_steg", "aksjer_falt"}
 
+    @pytest.mark.parametrize("felt", ["dager", "dager_merke"])
+    def test_et_grunnlag_med_dagene_avvises(self, felt):
+        """Gjennomgangen 25.10 kl. 11 (VG12, BH8): ville feilet hvis et
+        grunnlag med dager eller dager_merke ble godtatt."""
+        from ki_grunnlag import _kontroller
+
+        bildet = Dagsbilde(dager=1, dager_minst=False, hovedindeksen=None, aksjer_steg=0, aksjer_falt=0, bransjen=None)
+        grunnlag = dict(ki_grunnlag(_v("Ingen", 0), utenfor_maalingen=False, dagen=bildet))
+        _kontroller(grunnlag)
+        with pytest.raises(ValueError, match="andre noekler"):
+            _kontroller({**grunnlag, felt: 1})
+
     @pytest.mark.parametrize(
         "felt, verdi",
         [
