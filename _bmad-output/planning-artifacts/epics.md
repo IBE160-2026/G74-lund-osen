@@ -2822,6 +2822,8 @@ starter ikke av seg selv.
 
 *Avgjort 2026-10-25 kl. 20:54 (gruppens svar):* a) kontrollen stopper ikke «Signalet er Ingen», fordi teksten er riktig, og regelen ga 0 i §48 (BH4). b) KI-loggen i basen får ikke promptens avtrykk (BH5). Fra hentingen mandag 26.10, når basen får tekster med versjon 3, gir enhver endring i prompten en ny versjon. c) Prompten får to linjer blant reglene, ordrett: «- Etter «fordi» står «ikke» foran verbet, for eksempel «fordi trenden ikke ga utslag».» og «- Når du nevner flere sjekker, ta dem i rekkefølgen trend, bevegelse og interesse.» (rådets ordlyd). d) `PROMPTVERSJON` står som «3» av samme grunn som svaret kl. 18:35 b).
 
+*Avgjort 2026-10-25 kl. 22:11 (gruppens svar):* 10.2h flettes i kveld. Linja om ordstillingen virket: «fordi» med «ikke» etter verbet i 2 tekster i §48 og 0 i §49. Linja om rekkefølgen står, men modellen følger den ikke når bare én sjekk utenom trenden ga utslag (DNO i §48 og §49, og FJSB, LSTF og SGNT i demoen). Tekstene er riktige, og avviket står under «Åpent» (BH7, ECH2). En ny ordlyd gir versjon 4.
+
 ### Story 10.3: Visningen i aksjedetaljen
 
 *Het Story 5B.3 til 28.09.*
