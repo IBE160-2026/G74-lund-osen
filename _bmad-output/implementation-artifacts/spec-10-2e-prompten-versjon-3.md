@@ -231,6 +231,45 @@ Gjennomgang 25.10, etter hele settet (00:22:52–00:30:02), på diffen `cfceb42.
 | BH11 | Docstringen viser til §44 | low | avvist: §44 er grunnen |
 | BH13, VG10 | §45 og tidene | low | avvist: tallene stemmer, og prøvekjøringen kom etter rettingen |
 
+### Gjennomgangen 25.10 kl. 11
+
+Gjennomgang 25.10, etter hele settet (11:09:48–11:17:23, fil for fil, 3560 bestått, 20 hoppet over, 0 feilet), på diffen `dce8d1e..dfa39fc` på grenen, uten dagsfilene, `epics.md` og bildet. Den dekker fjerde forsøk (`10123df`, `7b2eda8`, `9aa4219`) og testen og «Valg» fra i dag (`dfa39fc`). Blind Hunter (BH, 17 funn), Edge Case Hunter (ECH, 14) og Verification Gap (VG, 17) gikk gjennom hver for seg, uten å endre noe i repoet. Rettingene står i `21cebff` (siden), `fa6b9bc` (kontrollen) og `0cb83bb` (henvisningene og en test). Kontrollen ble endret, så §46 ble kjørt på nytt mot en ny kopi av basen (`a2d13b5`): 15 av 15 besto, og ingen tekst har feil.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH1, ECH6, VG1 | «I dag for første gang» om forrige børsdag i helga, før kveldshentingen og i demoen | high | patch: ordlyden fra svaret 11:04 b) når dagen siden viser, ikke er i dag. Bildet viser nå «Signalet ble slik denne dagen for første gang.» |
+| ECH1 | «De siste 3 børsdager», «de siste dagene» og «de siste ukene» slapp gjennom | high | patch: «siste» er vinduet bare med 20 eller 50 |
+| BH2, ECH7 | «For første gang» er usant når signalet var slik før, med en annen dag imellom. Tellingen er «på rad» | medium | **må avgjøres av gruppen**: ordlyden og tellingen er gruppens (svarene 24.10 kl. 16:15 a) og 25.10 kl. 00:51). Under «Åpent» |
+| ECH4, BH14 | «Fortsatt», «lenge» og «uke» stopper også riktige tekster, som «Kursen ligger fortsatt over snittet» | medium | **må avgjøres av gruppen**: et stopp, ikke en feil som slipper gjennom, og §46 på nytt hadde 0 stoppet. Om ordene skal leses snevrere, eller prompten nevne dem. Under «Åpent» |
+| ECH2 | Et vindu etter «har vært» eller «har ligget», «Trenden har vært positiv 50 dager», slapp gjennom | medium | patch: et verb om varighet foran i setningen gjør tallet til dagene |
+| ECH3, BH4, VG3 | Dagene uten tall: «igjen», «fortsetter», «forrige børsdag», «dagen før», «det nye signalet», «en stund», «ukene». «I enhver form» var en overpåstand | medium | patch: formene er lagt til, og docstringen sier «de kjente formene». Kontrollen leser ord, ikke mening: under «Åpent» |
+| ECH5 | Vinduene for bevegelsen og interessen, «Bevegelsen måles over 20 dager» og «20 handelsdager», ble stoppet | medium | patch |
+| VG2, BH16 | «Velg dag» på siste dag var ikke testet | medium | patch: `test_velg_dag_paa_siste_dag` |
+| VG4, BH7, ECH11 | Feilgrenen for dagene var utestet, og `RuntimeError` fra versjonssjekken ga 500 | medium | patch: fanges som i `_ki_visning`, og `test_uten_setning_naar_dagene_ikke_kan_leses` |
+| VG5 | Regel 21 i «minst» var utestet | low | patch |
+| VG7 | «Fremdeles», «uken», «et nytt positivt signal» og «ble helt nytt» var utestet | low | patch |
+| VG12, BH8 | Ingen test for at et grunnlag med `dager` eller `dager_merke` avvises | low | patch: `test_et_grunnlag_med_dagene_avvises` |
+| VG10, BH10, VG8 | Docstringene viste til §45, `ordlyd_for_dagene` og `test_aksjedetalj.py` | low | patch |
+| VG11 | Kommentaren i `aksje.html` sa at siden med KI av er lik den før 10.3 | low | patch i malen. Kontrollpunktet under 10.3 i `epics.md`: defer, gruppen fører det |
+| VG13 | `test_ugyldige_dager_avvises` manglet «Ville feilet hvis» | low | patch |
+| BH5 | «Har vært slik i 4 børsdager på rad» om en tidligere dag | low | **må avgjøres av gruppen**: ordlyden. Under «Åpent» |
+| ECH10 | «Signalet er slik» også med retningen Ingen | low | **må avgjøres av gruppen**: under «Åpent» |
+| BH3 | Demoteksten for BRFE sier 50 og 20, også om parametrene var andre | low | defer: KI-steget bruker standardparametrene, som siden |
+| BH6 | Siden leser hele historikken for aksjen | low | defer: ett kall per side (svaret 11:04 a) |
+| ECH12 | En låst base gir ingen setning, men 503 i historikken | low | defer: setningen er et tillegg |
+| ECH13 | «Vart én dag» slipper gjennom | low | defer: «en dag» er et vanlig ord (kjent avveining) |
+| ECH14, VG16 | Testen for lesingen dekker bare siste dag, og plasseringen er bare testet med KI på | low | defer |
+| VG6 | Setningen i demoen har ingen egen test | low | defer: bildet og avtrykket dekker den |
+| VG9, BH11 | Testgrunnlag i `test_ki_modell.py` har fortsatt `dager` | low | defer: kontrollen leser ikke nøklene, og at grunnlaget avvises, er nå testet |
+| VG14 | Tellingen for §34–§45 med den nye kontrollen har ingen test | low | defer: tekstene står bare i kopiene, og tellingen er ført i §46 |
+| VG15 | `Dagsbilde.dager` regnes i KI-steget, men brukes ikke | low | defer |
+| VG17, BH9 | Avtrykket dekker ikke feltene i grunnlaget, og versjon 3 har hatt flere prompter | low | avvist: versjon 3 er ikke flettet, og avtrykket skiller promptene |
+| ECH8, ECH9 | En grunn dagen før gir et kjent antall, og rekka ser bare på retning og styrke | low | avvist: følger svaret 24.10 kl. 16:15 a) |
+| BH12, BH13, BH15 | Svake påstander i to tester, regexen for KI-seksjonen, og formen på demotekstene | low | avvist: testene feiler fortsatt på det de skal, og demotekstene er modellens |
+| BH17 | Hjelpen nevner ikke setningen | low | avvist: hjelpen sier ikke hva KI-teksten tar med |
+
+Med dom medium er BH2, ECH7 og ECH4, BH14 ikke rettet. De må avgjøres av gruppen, og grenen flettes ikke før det.
+
 ## Åpent
 
 - `bransjen` for en bransje med bare aksjen selv sier det samme som aksjens egen endring. Børsometeret merker den «1 aksje». Grunnlaget har ikke det merket.
@@ -243,3 +282,7 @@ Gjennomgang 25.10, etter hele settet (00:22:52–00:30:02), på diffen `cfceb42.
 - *Lagt til 2026-10-25:* ordlyden godtas der den står, også i en annen setning (BH4), og dagene med ord som «fortsatt», «lenge» og «uker» leses ikke (BH2, ECH6).
 - *Lagt til 2026-10-25:* for en tidligere dag valgt med «Velg dag» skriver siden «Signalet ble slik denne dagen for første gang.» i stedet for «i dag». Gruppen avgjør ordlyden.
 - *Lagt til 2026-10-25 kl. 11:04:* ordlyden for en valgt dag er avgjort av gruppen (under «Valg», svaret b).
+- *Lagt til 2026-10-25 kl. 11:* «for første gang» sier noe om hele historikken, men tellingen gjelder rekka på rad. Positiv/1, Negativ/1, Positiv/1 gir «i dag for første gang» (BH2, ECH7). Gruppen avgjør ordlyden eller tellingen.
+- *Lagt til 2026-10-25 kl. 11:* «fortsatt», «lenge» og «uke» stopper også tekster om trenden, som «Kursen ligger fortsatt over snittet» (ECH4, BH14). Gruppen avgjør om ordene skal leses snevrere, eller om prompten skal nevne dem.
+- *Lagt til 2026-10-25 kl. 11:* kontrollen leser ord, ikke mening, så en form for dagene som ikke er i lista, slipper gjennom (VG3). «I enhver form» i svaret kl. 00:51 er derfor de kjente formene.
+- *Lagt til 2026-10-25 kl. 11:* ordlyden for flere dager og «minst» om en dag som ikke er i dag («har vært slik», BH5), og setningen når retningen er Ingen (ECH10).
