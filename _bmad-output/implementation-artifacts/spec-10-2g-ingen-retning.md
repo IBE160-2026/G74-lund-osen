@@ -2,7 +2,7 @@
 title: 'Story 10.2, 10.2g: regelen for retningen Ingen og promptens avtrykk i demotekstene'
 type: 'feature'
 created: '2026-10-25'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '78e1c8f'
