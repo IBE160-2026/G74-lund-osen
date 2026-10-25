@@ -2816,6 +2816,8 @@ starter ikke av seg selv.
 
 *Lagt til 2026-10-25 kl. 19:40:* prompten med den nye grunnen, «Siden sier under teksten hvor lenge signalet har vart.», er flettet i `a9c3bdd`, PR #96 (spesifikasjonen `spec-10-2f-grunnen-i-prompten.md`), og brukes fra hentingen mandag 26.10. `PROMPTVERSJON` står som «3». §47 i `malinger.md` ga 15 av 15, og CI var grønn på head-en `37b764c` (kjøring 40221717678).
 
+*Avgjort 2026-10-25 kl. 19:54 og 19:56 (gruppens svar):* a) begge punktene rettes i kveld. b) Prompten får regelen «- Når retningen er Ingen, skriv at signalet ikke har noen retning.», fordi modellen skrev «Signalet er Ingen, fordi …» (BH10). Rekkefølgen på sjekkene (BH11) står åpen. c) Hver rad i `src/demo_ki_tekster.json` får promptens avtrykk ved `promptversjon`, og en test feiler hvis en rad har et annet avtrykk enn prompten (VG1, ECH2, BH13, rådets forslag). d) `PROMPTVERSJON` står som «3» av samme grunn som svaret kl. 18:35 b): ingen tekst i `ose.db` er laget med versjon 3 ennå.
+
 ### Story 10.3: Visningen i aksjedetaljen
 
 *Het Story 5B.3 til 28.09.*
