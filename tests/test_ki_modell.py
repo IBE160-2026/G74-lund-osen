@@ -49,7 +49,9 @@ AVTRYKK = {
     # 76543003....
     # Story 10.2g, gruppens svar 25.10 kl. 19:54 og 19:56: regelen for
     # retningen Ingen, og versjonen staar som 3. Var 0a9e650c....
-    "3": "0d427725ad4f4faaf9156451164fc991a35da73eab5834d7f9b816e820110a27",
+    # Story 10.2h, gruppens svar 25.10 kl. 20:54: ordstillingen etter «fordi»
+    # og rekkefoelgen paa sjekkene, og versjonen staar som 3. Var 0d427725....
+    "3": "ec16642676123e3730c7e8dbd66c03f282a6f77b9ac8fa121b8dc023f97522d5",
 }
 
 
@@ -227,6 +229,23 @@ class TestPrompten:
         # Gjennomgangen (ECH5): regelen staar i prompten for alle retninger,
         # som de andre reglene.
         assert regelen in lag_prompt(BLANDET)
+
+    @pytest.mark.parametrize(
+        "linja",
+        [
+            "- Etter «fordi» står «ikke» foran verbet, for eksempel «fordi trenden ikke ga utslag».",
+            "- Når du nevner flere sjekker, ta dem i rekkefølgen trend, bevegelse og interesse.",
+        ],
+    )
+    def test_ordstillingen_og_rekkefoelgen_staar_i_reglene(self, linja):
+        """Story 10.2h, gruppens svar 25.10 kl. 20:54 c): modellen skrev
+        «fordi trenden ga ikke utslag» (BH10 i 10.2g) og tok ikke alltid
+        sjekkene i samme rekkefoelge (BH11 i 10.2f). Ville feilet hvis en av
+        de to linjene ble tatt ut av reglene, endret, eller ikke kom med i
+        prompten til modellen, med eller uten merket."""
+        assert REGLER.splitlines().count(linja) == 1
+        assert linja in lag_prompt(BLANDET)
+        assert linja in lag_prompt({**BLANDET, "merke": "Utenfor målingen"})
 
     def test_ingen_raad_og_ingen_gjetning(self):
         prompt = lag_prompt(BLANDET)
