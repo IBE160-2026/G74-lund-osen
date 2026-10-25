@@ -29,7 +29,13 @@ context:
 
 **b) Demoen:** hver rad i `src/demo_ki_tekster.json` får feltet `promptavtrykk` rett etter `promptversjon`, i `src/demo_ki.py`. Fila leses i `demo_ki.les_radene`, som `demo.py` bruker, og en rad med et annet avtrykk enn prompten avvises der, så demoen lages uten KI-tekst og sier hvorfor, som for en fil som ikke stemmer med demoen (NFR-04). KI-tekstene i demoen lages på nytt (`uv run python src/demo_ki.py`), og bildet av aksjesiden i README-en tas på nytt med avtrykkene, av en demoaksje der teksten besto.
 
+*Utfallet:* KI-tekstene i demoen ble laget på nytt 20:17:51–20:18:20: 13 av 13 besto, 0 ble stoppet, og modellen feilet for 0. Alle har `promptversjon` 3 og `promptavtrykk` `0d427725…0a27`, det samme som `AVTRYKK["3"]`. BRFE, NLYS, SLVP, TRHF og LKSV fikk en annen tekst enn før, og de åtte andre er like. SLVP, den eneste med retningen Ingen, sier nå «Signalet har ingen retning fordi …». Hver er lest mot grunnlaget: alle beskriver hver sjekk slik fortegnet er, og ingen nevner dagene, hovedindeksen, bransjen eller antallet aksjer. Bildet viser fortsatt BRFE, der teksten besto. Teksten er kortere, og bunnen av grafen ble målt i Edge uten vindu til 1894, så bildet er 1280 × 1894 (var 1934). `HOEYDE_PAA_AKSJESIDEN` og `AVTRYKK_BAK_AKSJESIDEN` er satt på nytt. README-teksten under bildet siterer ikke KI-teksten og er ikke endret.
+
+*Valg underveis:* webserveren importerer ikke `ki_prompt` (AD-10, `test_webserveren_importerer_ingen_modell`), og demoen leser fila når den lages. Derfor krever `les_radene` feltet `promptavtrykk` som en sha256, mens sammenligningen med prompten bare gjøres når kalleren gir avtrykket (`prompt=promptavtrykk()`). Testene leser fila slik, så en endret prompt gjør testene røde til tekstene lages på nytt. `promptavtrykk()` importerer `ki_prompt` inne i funksjonen.
+
 **c) Prøvekjøringen** (§48 i `malinger.md`), som i §47, mot `data/db/ki-proeve-v3h.db` for børsdagen 23.10, med hver tekst lest mot grunnlaget og telt for «Ingen» skrevet som et ord. Tabellen sammenligner §34 og §43–§48.
+
+*Utfallet:* kjørt 20:23:20–20:23:38 mot `ki-proeve-v3h.db`: 15 av 15 besto, 0 ble stoppet, og modellen feilet for 0, med median 0,46 s og lengste kall 11,44 s (kall nr. 1). Hver tekst er lest mot grunnlaget: ingen sier feil om en sjekk, og ingen nevner dagene. «Ingen» står som et ord i 0 av de 15, mot 2 i §47 (DNB og TEL, de to med retningen Ingen). Begge sier nå «Signalet har ingen retning fordi …». 7 er ordrett de samme som i §47. sha256 for `ose.db` var den samme før og etter.
 
 ## Boundaries & Constraints
 
