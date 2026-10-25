@@ -283,6 +283,26 @@ Med dom medium er BH2, ECH7 og ECH4, BH14 ikke rettet. De må avgjøres av grupp
 
 *Lagt til 2026-10-25 kl. 12:12 og 12:19 (gruppens svar):* BH2, ECH7: ordlyden uten «for første gang» (svaret a). ECH4, BH14: stoppes som før (svaret b), ingen endring. BH5: ordlyden fra svaret d). ECH10: setningen står som den er (svaret e). Se «Valg».
 
+### Gjennomgangen 25.10 kl. 13
+
+Gjennomgang 25.10, etter hele settet (12:45:29–12:53:48, fil for fil, 3624 bestått, 20 hoppet over, 0 feilet), på diffen `d24d9b5..7d61aaf` på grenen, uten bildet. Den dekker ordlyden etter gruppens svar kl. 12:12 og 12:19 (`7d61aaf`). Flettingen av main (`d24d9b5`) hadde bare dagsfila og `epics.md`. Blind Hunter (BH, 9 funn), Edge Case Hunter (ECH, 1) og Verification Gap (VG, ingen hull, ett funn utenfor diffen) gikk gjennom hver for seg, uten å endre noe i repoet. Rettingene står i `e150117` (kontrollen) og `c3cf84b` (testene og spesifikasjonen). Kontrollen ble endret, så §46 ble kjørt på nytt mot en ny kopi av basen (`ce36870`): 15 av 15 besto, og ingen tekst har feil.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| ECH1 | Kontrollen slapp appens nye setning for 1 dag fra modellen, «Signalet ble slik i dag.» og «Signalet ble slik denne dagen.», også om en lengre rekke | high | patch: stoppes som dagene, med en test i `test_dagene_i_enhver_form_stoppes` |
+| BH1 | Linja under «Åpent» sa «de fire punktene» og kunne leses som at VG3 var avgjort | low | patch |
+| BH2 | «Fjerde forsøk» viste fortsatt den gamle ordlyden uten henvisning til svarene | low | patch: en Rettet-linje. «Valg» har svarene rett under b), og triagen kl. 11 har en Lagt til-linje |
+| BH3 | Entall for en annen dag sto som gruppens svar | low | patch: merket som utledet av d) |
+| BH4 | Vakttesten sjekket bare setningene for en annen dag | low | patch: i dag får aldri «denne dagen» eller «hadde» |
+| BH6 | Premisset for «minst» i `test_minst_paa_siste_dag_som_ikke_er_i_dag` var ikke sagt | low | patch: docstringen |
+| BH5 | Ingen test for retningen Ingen (svaret e) | low | defer: `setning_om_dagene` tar ikke retningen inn, så setningen kan ikke variere med den |
+| BH7 | Ingen sidetest for «minst» med flere dager en annen dag | low | defer: enhetstesten dekker ordlyden, og siden sender `annen_dag` likt for alle |
+| BH8 | Kommentaren om avtrykket i `test_docker.py` er lagt oppå den forrige | low | avvist: lista over endringer bak avtrykket er historikk, som resten av lista |
+| BH9 | Docstringen i `dagene.py` sier ikke hva ordlyden er | low | avvist: konstantene står rett under, med kommentarer |
+| VG-utenfor | `ki_prompt.py`: «Siden sier det under teksten» gjelder ikke lenger «første gang» | low | under «Åpent»: koden er ikke endret i denne instruksjonen, og en endring i prompten avgjør gruppen |
+
+Ingen funn med dom medium eller høyere står urettet.
+
 ## Åpent
 
 - `bransjen` for en bransje med bare aksjen selv sier det samme som aksjens egen endring. Børsometeret merker den «1 aksje». Grunnlaget har ikke det merket.
@@ -300,3 +320,4 @@ Med dom medium er BH2, ECH7 og ECH4, BH14 ikke rettet. De må avgjøres av grupp
 - *Lagt til 2026-10-25 kl. 11:* kontrollen leser ord, ikke mening, så en form for dagene som ikke er i lista, slipper gjennom (VG3). «I enhver form» i svaret kl. 00:51 er derfor de kjente formene.
 - *Lagt til 2026-10-25 kl. 11:* ordlyden for flere dager og «minst» om en dag som ikke er i dag («har vært slik», BH5), og setningen når retningen er Ingen (ECH10).
 - *Lagt til 2026-10-25 kl. 12:12 og 12:19:* punktene om BH2, ECH7, ECH4, BH14, BH5 og ECH10 fra gjennomgangen kl. 11 over er avgjort av gruppen (under «Valg»): «for første gang» er tatt ut (BH2, ECH7), «fortsatt», «lenge» og «uke» stoppes som før (ECH4, BH14), en dag som ikke er i dag får «Denne dagen hadde signalet vært slik …» (BH5), og setningen med retningen Ingen står (ECH10). Punktet om VG3 står åpent.
+- *Lagt til 2026-10-25 kl. 13:* prompten sier om dagene, nyheten og «første gang» at «Siden sier det under teksten», men siden sier ikke lenger «for første gang» etter svaret kl. 12:12 a) (gjennomgangen kl. 13). Regelen for modellen står. Om begrunnelsen skal endres, avgjør gruppen, fordi prompten og avtrykket da endres.
