@@ -2814,6 +2814,8 @@ starter ikke av seg selv.
 
 *Avgjort 2026-10-25 kl. 18:34 og 18:35 (gruppens svar):* a) grunnen i prompten endres i kveld, fordi siden ikke lenger sier «for første gang» (svaret kl. 12:12 a). Linja blir: «Ikke si hvor lenge signalet har vart, om det er nytt, eller om det er første gang. Siden sier under teksten hvor lenge signalet har vart.» Regelen for modellen står. b) `PROMPTVERSJON` står som «3», fordi ingen tekst i `ose.db` er laget med versjon 3 ennå. Avtrykket settes på nytt, og demotekstene og prøvekjøringen lages på nytt, så alle tekster med versjon 3 er laget med samme prompt. Det er et unntak fra regelen om ny versjon i docstringen i `ki_prompt.py`, og docstringen sier det.
 
+*Lagt til 2026-10-25 kl. 19:40:* prompten med den nye grunnen, «Siden sier under teksten hvor lenge signalet har vart.», er flettet i `a9c3bdd`, PR #96 (spesifikasjonen `spec-10-2f-grunnen-i-prompten.md`), og brukes fra hentingen mandag 26.10. `PROMPTVERSJON` står som «3». §47 i `malinger.md` ga 15 av 15, og CI var grønn på head-en `37b764c` (kjøring 40221717678).
+
 ### Story 10.3: Visningen i aksjedetaljen
 
 *Het Story 5B.3 til 28.09.*
