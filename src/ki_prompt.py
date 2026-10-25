@@ -52,8 +52,10 @@ grunnen er «Siden sier under teksten hvor lenge signalet har vart.» Regelen
 for modellen staar. Versjonen staar som 3, og det er et unntak fra regelen
 om ny versjon oeverst: ingen tekst i ose.db var laget med versjon 3 ennaa.
 Avtrykket er satt paa nytt, og demotekstene og proevekjoeringen
-(malinger.md §47) er laget paa nytt, saa alle tekster med versjon 3 er laget
-med samme prompt.
+(malinger.md §47) er laget paa nytt, saa alle tekster med versjon 3 i ose.db
+og i demoen er laget med samme prompt. Tekstene med versjon 3 i
+proevekjoeringene foer §47 (§43-§46) og i historikken til
+demo_ki_tekster.json er laget med den gamle grunnen (gjennomgangen, BH1).
 """
 
 import json

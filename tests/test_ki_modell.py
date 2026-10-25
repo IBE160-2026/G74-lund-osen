@@ -209,6 +209,10 @@ class TestPrompten:
             "Siden sier under teksten hvor lenge signalet har vart."
         ]
         assert "Siden sier det under teksten" not in REGLER + UTENFOR
+        # Gjennomgangen (ECH3, ECH4, BH14): grunnen staar bare én gang, ogsaa
+        # i en omskrevet form, og den kommer med i prompten til modellen.
+        assert (REGLER + UTENFOR).count("Siden sier") == 1
+        assert "Siden sier under teksten hvor lenge signalet har vart." in lag_prompt(BLANDET)
 
     def test_ingen_raad_og_ingen_gjetning(self):
         prompt = lag_prompt(BLANDET)
