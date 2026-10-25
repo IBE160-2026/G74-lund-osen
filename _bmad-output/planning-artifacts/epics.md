@@ -2804,6 +2804,8 @@ starter ikke av seg selv.
 
 *Avgjort 2026-10-25 kl. 00:51 (gruppens svar):* et fjerde forsøk med versjon 3, fordi gruppen ville prøve igjen (kl. 00:50). Modellen får ikke dagene og nevner dem ikke. Appen skriver dagene selv i en setning rett under KI-teksten på aksjesiden: «Signalet er slik i dag for første gang.», «Signalet har vært slik i 4 børsdager på rad.» eller «Signalet har vært slik i minst 12 børsdager.». Det endrer hvem som skriver dagene i svarene 21.10 kl. 22:57 og 23:51; tellingen i svaret 24.10 kl. 16:15 a) står. Flettes bare med 15 av 15 og ingen tekst med feil.
 
+*Avgjort 2026-10-25 kl. 11:04 (gruppens svar):* a) testen for lesingen på aksjesiden godtar nøyaktig ett oppslag til, for dagene. Den passer fortsatt på at siden ikke leser dag for dag. b) Med «Velg dag» står ordlyden fra fjerde forsøk, som «Signalet ble slik denne dagen for første gang.», fordi datoen står øverst på siden.
+
 ### Story 10.3: Visningen i aksjedetaljen
 
 *Het Story 5B.3 til 28.09.*
