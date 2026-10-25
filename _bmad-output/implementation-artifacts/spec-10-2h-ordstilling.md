@@ -59,6 +59,7 @@ Gjennomgang 25.10 etter hele settet (49 filer, 3634 bestått, 20 hoppet over, 0 
 | # | Funn | Dom | Rute |
 |---|---|---|---|
 | BH7, ECH2 | Linja om rekkefølgen ble ikke fulgt der én sjekk som ikke er trenden, ga utslag: DNO i §48 og §49, og FJSB, LSTF og SGNT i demoen | medium | **under «Åpent»:** linja er gruppens ordrette ordlyd (svaret c), så en ny ordlyd må avgjøres av gruppen. Ikke rettet, så PR-en flettes ikke (steg 4) |
+| BH7, ECH2 | *Lagt til 2026-10-25 kl. 23:23:* som raden over | medium | **avgjort av gruppen kl. 22:11:** 10.2h flettes i kveld. Linja står, avviket står under «Åpent», og en ny ordlyd gir versjon 4 |
 | BH4, ECH1 | Avtrykket for versjon 3 var ikke låst, så det kunne skrives over etter 26.10 | medium | **rettet** i `5261ebf`: `test_avtrykket_for_versjon_3_staar` |
 | BH1 | §49 sier ikke hvilken prompt som ble brukt | medium | **rettet** i `bed17e7`: avtrykket og commiten i §49 |
 | BH3 | Tellingen i §49 dekker bare leddsetninger med «fordi» | medium | **rettet** i `bed17e7`: en rad for alle konjunksjoner, 2 i §48 og 0 i §49 |
@@ -77,6 +78,7 @@ Gjennomgang 25.10 etter hele settet (49 filer, 3634 bestått, 20 hoppet over, 0 
 ## Åpent
 
 - *Lagt til 2026-10-25 kl. 21:54 (BH7, ECH2):* linja om rekkefølgen ble ikke fulgt i DNO (§48 og §49) og i FJSB, LSTF og SGNT i demoen. Der ga en annen sjekk enn trenden utslag, og modellen nevner den først. Om linja skal få en ny ordlyd, for eksempel at rekkefølgen også gjelder når bare én sjekk ga utslag, avgjør gruppen. Dom medium, så PR #98 er ikke flettet.
+  - *Avgjort 2026-10-25 kl. 22:11 (gruppens svar):* 10.2h flettes i kveld. Linja om ordstillingen virket: «fordi» med «ikke» etter verbet i 2 tekster i §48 og 0 i §49. Linja om rekkefølgen står, men modellen følger den ikke når bare én sjekk utenom trenden ga utslag. Tekstene er riktige, og avviket står her. En ny ordlyd gir versjon 4.
 - *Lagt til 2026-10-25 kl. 21:54 (BH2):* linja om ordstillingen nevner bare «fordi». Om den skal gjelde alle leddsetninger, avgjør gruppen.
 - *Lagt til 2026-10-25 kl. 21:54 (BH6, ECH3):* eksempelet «interessen ga ikke utslag» i linja om navnet på sjekken har ordstillingen fra en hovedsetning, rett over linja om «fordi».
 - *Lagt til 2026-10-25 kl. 21:54 (BH10):* demotekstene skriver retningen på flere måter, og «Blandet» med stor forbokstav midt i setningen.
