@@ -67,6 +67,19 @@ proevekjoeringen (malinger.md §48) er laget paa nytt. Tekstene med versjon 3
 i §43-§47 er laget uten regelen. Fra 10.2g har hver rad i
 demo_ki_tekster.json ogsaa avtrykket av prompten (demo_ki.py), saa en
 demotekst fra en annen prompt med samme versjon avvises.
+
+Versjon 3, ordstillingen og rekkefoelgen (story 10.2h, gruppens svar 25.10
+kl. 20:54): modellen skrev «fordi trenden ga ikke utslag» (BH10 i 10.2g) og
+nevnte ikke alltid sjekkene i fast rekkefoelge (BH11 i 10.2f). Reglene har
+to linjer til, med raadets ordlyd: «ikke» foran verbet etter «fordi», og
+sjekkene i rekkefoelgen trend, bevegelse og interesse. Versjonen staar som 3
+av samme grunn som i 10.2f: ingen tekst i ose.db var laget med versjon 3
+ennaa. Avtrykket er satt paa nytt, og demotekstene og proevekjoeringen
+(malinger.md §49) er laget paa nytt. Tekstene med versjon 3 i §43-§48 er
+laget uten de to linjene. KI-loggen i basen faar ikke promptens avtrykk
+(svaret b, BH5 i 10.2g): fra hentingen mandag 26.10, naar ose.db faar
+tekster med versjon 3, gir enhver endring i prompten en ny versjon, og
+unntaket fra 10.2f-10.2h gjelder ikke lenger.
 """
 
 import json
@@ -92,6 +105,7 @@ Opplysningene sier også hvordan dagen var:
 Regler for teksten:
 - Beskriv hver sjekk slik fortegnet står i opplysningene: et positivt utslag, et negativt utslag eller ikke noe utslag. Ikke si at en sjekk ga utslag når den ikke ga det, eller at den ga et annet utslag enn det som står.
 - Når du sier noe om én sjekk, bruk navnet på sjekken, for eksempel «interessen ga ikke utslag». Skriv «ingen sjekk» bare når styrken er 0.
+- Når du nevner flere sjekker, ta dem i rekkefølgen trend, bevegelse og interesse.
 - Når retningen er Ingen, skriv at signalet ikke har noen retning.
 - Bruk bare opplysningene under. Skriv utslagene med ord, ikke som tall. Ikke nevn kurser, prosenter eller andre tall enn antallene i opplysningene og regelens faste tall.
 - Siden viser kursen, endringen og målingene. Du kan vise til dem, for eksempel «se endringen i tabellen», men ikke gjenta tallene.
@@ -100,6 +114,7 @@ Regler for teksten:
 - Ikke gi råd om å kjøpe, selge eller holde, og ikke si noe om hva som vil skje.
 - Ikke gjett på årsaker, som nyheter, resultater eller kontrakter. Du kan forklare regelen, for eksempel at en sjekk ikke ga utslag.
 - Når du forklarer regelen, bruk «fordi». Ikke bruk «skyldes» eller «indikerer».
+- Etter «fordi» står «ikke» foran verbet, for eksempel «fordi trenden ikke ga utslag».
 """
 
 UTENFOR = "\nAksjen er ikke blant aksjene grensene er målt på. Si at grensene ikke er målt på denne aksjen.\n"
