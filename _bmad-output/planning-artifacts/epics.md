@@ -2824,6 +2824,8 @@ starter ikke av seg selv.
 
 *Avgjort 2026-10-25 kl. 22:11 (gruppens svar):* 10.2h flettes i kveld. Linja om ordstillingen virket: «fordi» med «ikke» etter verbet i 2 tekster i §48 og 0 i §49. Linja om rekkefølgen står, men modellen følger den ikke når bare én sjekk utenom trenden ga utslag (DNO i §48 og §49, og FJSB, LSTF og SGNT i demoen). Tekstene er riktige, og avviket står under «Åpent» (BH7, ECH2). En ny ordlyd gir versjon 4.
 
+*Lagt til 2026-10-25 kl. 23:25:* linjene om ordstillingen etter «fordi» og rekkefølgen på sjekkene er flettet i `998dadd`, PR #98 (spesifikasjonen `spec-10-2h-ordstilling.md`), og reglene brukes fra hentingen mandag 26.10. `PROMPTVERSJON` står som «3», og avtrykket for versjon 3 er låst med en test. §49 i `malinger.md` ga 15 av 15, «fordi» med «ikke» etter verbet i 0 av 15, og sjekker i en annen rekkefølge i 1 (DNO). CI var grønn på head-en `a0a514f` (kjøring 40239989964). Avviket i rekkefølgen står under «Åpent» i spesifikasjonen.
+
 ### Story 10.3: Visningen i aksjedetaljen
 
 *Het Story 5B.3 til 28.09.*
