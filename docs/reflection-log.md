@@ -2866,6 +2866,46 @@ Det vi lærte: da prompten ba om navnet på sjekken, fikk modellen fortegnene ri
 
 ---
 
+## 25.10.2026 – Appen skriver dagene, fire PR-er med prompten, og hovedveien i README-en
+
+*Joakim og Marian.*
+
+Natta begynte med tredje forsøk med versjon 3, etter svaret 24.10 kl. 23:23 (`6fc31fd`). Modellen fikk ferdig ordlyd for dagene, laget av koden. Prøvekjøringen i §45 for børsdagen 23.10 ga 13 bestått og 2 stoppet, fordi VAR og TEL skrev «det første signalet». Av demotekstene ble 3 av 13 stoppet, blant dem KVST, så bildet i README-en viser nå BRFE. Arbeidet stoppet før flettingen kl. 00:42. Kl. 00:50 ville vi prøve igjen, og kl. 00:51 avgjorde vi at modellen ikke får dagene i det hele tatt (`c89e61c`). Appen skriver dem selv i en setning rett under KI-teksten, fra `src/dagene.py`. I §46 besto 15 av 15, og ingen tekst nevnte dagene. Men hele settet ga én feil, `tests/test_historikken.py::TestLesingen::test_siden_leser_en_gang_per_maaned`, fordi setningen gjorde ett oppslag til i basen. Arbeidet stoppet kl. 01:23.
+
+Kl. 11:04 avgjorde vi at testen godtar nøyaktig ett oppslag til, og at en annen dag enn i dag får sin egen ordlyd (`7b211b4`). Gjennomgangen kl. 11 fant 48 funn, og de med dom high ble rettet i `21cebff` og `fa6b9bc`. Kontrollen ble endret, så §46 ble kjørt på nytt, og den ga fortsatt 15 av 15. CI feilet i 6 tester, fordi klokka i de nye testene sto på 31.10 kl. 23, som er 1.11 i Oslo når CI kjører i UTC. Det ble rettet i `e57a41c`. To funn med dom medium gikk til oss. Kl. 12:12 tok vi «for første gang» ut av setningen, fordi tellingen gjelder dagene på rad, og «fortsatt», «lenge» og «uke» stoppes som før. Kl. 12:19 fikk en annen dag enn i dag sin egen ordlyd (`c474d60`). Neste gjennomgang fant ett funn med dom high: kontrollen slapp gjennom appens egen setning når modellen skrev den. Det ble rettet i `e150117`, og §46 ga 15 av 15 også da. PR #95 ble flettet kl. 13:11 i `0c25686`, og versjon 3 brukes fra hentingen mandag 26.10.
+
+Kl. 11:32 avgjorde vi hovedveien i «Kom i gang»: dobbeltklikket fra 3.5a først, Docker som den andre og uv i terminalen som den tredje. 3.5b og 3.5c bygges ikke, fordi demoen virket i vår prøve 24.10, og forprøvens funn er rettet i 3.5d. Kl. 11:49 avgjorde vi at dobbeltklikket bare bruker uv, også når Docker kjører. Svarene ble ført under story 3.5 26.10 (`dde8733`). README-en er ikke endret ennå. Det bygges i 3.5f.
+
+Om kvelden kom tre PR-er til med prompten. 10.2f (PR #96) endret grunnen i prompten, fordi siden ikke lenger sier «for første gang» (svarene kl. 18:34 og 18:35), og ble flettet kl. 19:40 i `a9c3bdd`. 10.2g (PR #97) ga prompten en regel for retningen Ingen, etter at modellen hadde skrevet «Signalet er Ingen, fordi …», og la promptens avtrykk i hver rad i `src/demo_ki_tekster.json` (svarene kl. 19:54 og 19:56). Den ble flettet kl. 20:45 i `2aa7745`. 10.2h (PR #98) la til ordstillingen etter «fordi» og rekkefølgen på sjekkene (svaret kl. 20:54). Den stoppet før flettingen kl. 22:03, fordi linja om rekkefølgen ikke ble fulgt i DNO. Kl. 22:11 avgjorde vi at tekstene er riktige, og at avviket står åpent. Instruksjonen kl. 23:16 stoppet i steg 0 fordi klokka var over 23:15, og vi overstyrte grensen kl. 23:23. PR #98 ble flettet kl. 23:25 i `998dadd`. Prøvekjøringene §47, §48 og §49 ga alle 15 av 15 uten feil. Alle tre ble flettet med `PROMPTVERSJON` «3», fordi ingen tekst i basen har versjon 3 ennå.
+
+Kl. 20:02 førte vi oppføringen for 24.10 (`17df1ce`), og kl. 21:20 talte vi «minst» i §43 på nytt (`17b6c34`). Det var seks tekster, og spriket mot §44 var to måter å telle på. Dagens 20 kall gikk til §50 kl. 23:36–23:37, etter svaret kl. 21:48 (`7127f3c`). Det var de 20 neste «Common Stock» i lista, fra CODE til GOD. Alle 20 ga rader, ELOO bare 14 handelsdager, og den beste kom på plass 122 av 206 (`e6acc0a`). Til slutt talte vi testene på nytt: 49 testfiler og 3656 tester på `d183856`, med 3649 bestått og 7 hoppet over i CI (`992996c`).
+
+**Utfordringer**
+
+1. **Modellen som skrev dagene selv.**
+   *Problem:* i §44 skrev modellen dagene med egne ord. I §45 fikk den ferdig ordlyd, men to tekster sa «det første signalet», og ti satte ordlyden klønete inn i setningen. Kontrollen måtte stoppe stadig nye former.
+   *Løsning:* kl. 00:51 avgjorde vi at appen skriver dagene, og at modellen ikke nevner dem. §46 ga 15 av 15. Kl. 12:12 tok vi bort «for første gang», fordi tellingen gjelder dagene på rad.
+   *KI sin rolle:* rådet i chatten skrev instruksjonene for forsøkene. Claude Code bygget dem, leste hver tekst mot grunnlaget og stoppet før flettingen. Blind Hunter og Edge Case Hunter fant at «for første gang» kunne være usant (BH2, ECH7). Gruppen ville prøve en fjerde gang kl. 00:50, og avgjorde kl. 00:51 at appen skriver dagene.
+
+2. **Instruksjoner som viste til svar som ikke var ført.**
+   *Problem:* instruksjonen for loggen 24.10 viste til «svaret kl. 20:00 om stoppen» i 3.5d, men det svaret fantes ikke i repoet. Svarene kl. 18:34 og 18:35, og kl. 19:54 og 19:56, sto bare i instruksjonene som brukte dem. Svarene kl. 11:32, 11:49 og 20:16 ble ikke ført 25.10.
+   *Løsning:* Claude Code spurte, og svaret kl. 20:00, at BH5 står åpent, ble ført i dagsfila (`c749cd4`). Svarene i instruksjonene ble ført under story 10.2 i første steg av hver instruksjon. De tre siste ble ført 26.10 (`dde8733`).
+   *KI sin rolle:* rådet i chatten skrev instruksjonene som viste til svarene. Claude Code fant at svaret kl. 20:00 manglet og spurte før den skrev, og skrev i Utført-linja at svarene kl. 19:54 og 19:56 bare sto i instruksjonen. Gruppen svarte.
+
+3. **Samme versjonsnummer for en endret prompt.**
+   *Problem:* prompten ble endret tre ganger etter flettingen av PR #95, i 10.2f, 10.2g og 10.2h, men `PROMPTVERSJON` sto som «3». Demoradene hadde ikke promptens avtrykk, så ingenting viste om en demotekst var laget med prompten slik den er nå (VG1, ECH2, BH13 i 10.2f).
+   *Løsning:* kl. 18:35 avgjorde vi at versjonen står, fordi ingen tekst i basen har versjon 3, og at demotekstene og prøvekjøringen lages på nytt ved hver endring. Fra 10.2g har hver demorad promptens avtrykk, og `test_en_rad_med_et_annet_promptavtrykk_avvises` i `tests/test_demo_ki.py` feiler hvis det ikke stemmer. Kl. 20:54 avgjorde vi at enhver endring i prompten gir en ny versjon fra hentingen mandag 26.10.
+   *KI sin rolle:* gjennomgangen til Claude Code fant at demoradene manglet avtrykket. Rådet i chatten foreslo avtrykket i hver demorad. Gruppen avgjorde unntaket og når det slutter.
+
+4. **Gjennomganger som fant nye feil med dom high i hver runde.**
+   *Problem:* hver runde med 10.2e fant nye feil med dom high. Kl. 00:40 ble ECH1, BH3, ECH5, BH1 og ECH7 rettet, kl. 11:32 BH1, ECH6 og VG1 (samme feil) og ECH1, og kl. 13:00 ECH1: kontrollen slapp gjennom appens egen setning om dagene. Hver retting i kontrollen krevde §46 på nytt.
+   *Løsning:* feilene ble rettet før flettingen, og §46 ble kjørt på nytt mot en ny kopi av basen hver gang. PR #95 ble flettet først da ingen funn med dom medium eller høyere sto urettet. I 10.2f, 10.2g og 10.2h fant gjennomgangen ingen med dom high.
+   *KI sin rolle:* Blind Hunter, Edge Case Hunter og Verification Gap i gjennomgangen til Claude Code fant feilene, og Claude Code rettet dem. Gruppen avgjorde funnene med dom medium som Claude Code ikke kunne rette selv, kl. 12:12 og 12:19.
+
+Det vi lærte: koden skriver tall og dager, og modellen bare ordene rundt dem. I tre forsøk fant modellen nye måter å skrive dagene på, og først da appen skrev dem, ga §46 15 av 15. En avgjørelse føres i repoet før en instruksjon viser til den, ellers må økten stoppe og spørre. En endret prompt betyr nye demotekster og en ny prøvekjøring, og avtrykket i demoradene viser at de hører sammen. Og et versjonsnummer kan bare stå mens ingen tekst i basen har det. Fra hentingen mandag 26.10 gir enhver endring en ny versjon.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
