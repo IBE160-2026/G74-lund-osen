@@ -27,6 +27,8 @@ context:
 
 **b) Demoen:** KI-tekstene i demoen lages på nytt (`uv run python src/demo_ki.py`), og bildet av aksjesiden i README-en tas på nytt med avtrykkene. Bildet viser en demoaksje der teksten besto (svaret 24.10 kl. 23:23 b).
 
+*Utfallet:* KI-tekstene i demoen ble laget på nytt 19:15:59–19:16:21: 13 av 13 besto, 0 ble stoppet, og modellen feilet for 0. Alle har `promptversjon` 3. BRFE, SLVP, TRHF og LKSV fikk en annen tekst enn før, og de ni andre er like. Hver er lest mot grunnlaget: alle beskriver hver sjekk slik fortegnet er, og ingen nevner dagene, hovedindeksen, bransjen eller antallet aksjer. Bildet viser fortsatt BRFE, der teksten besto, 1280 × 1934. Bunnen av grafen ble målt i Edge uten vindu og står fortsatt ved 1934. `AVTRYKK_BAK_AKSJESIDEN` er satt på nytt. README-teksten under bildet siterer ikke KI-teksten og er ikke endret.
+
 **c) Prøvekjøringen** (§47 i `malinger.md`), som i §46, mot `data/db/ki-proeve-v3g.db` for børsdagen 23.10, med hver tekst lest mot grunnlaget. Tabellen sammenligner §34 og §43–§47.
 
 ## Boundaries & Constraints
