@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-25T23:25
+updated: 2026-10-25T23:55
 ---
 
 # Kvalitetssikring
@@ -26,6 +26,7 @@ Forkortelser i kildene: `S/` er `_bmad-output/implementation-artifacts/`, og
 - 1074 tester i 22 testfiler. Lokalt på Windows består 1058, og 16 hoppes over.
   I CI på Linux består alle 1074 (kjøring 37072797767 på `74fc69b`, den siste
   på main da dette ble skrevet, med samme tester som `3803b4d`; `D/2026-10-03.md`).
+  *Oppdatert 2026-10-25, og det er tallene som gjelder nå:* 3656 tester i 49 testfiler, telt med `uv run pytest --collect-only -q` på `d183856`, med 40 moduler i `src/` og sju migrasjoner i `src/migrasjoner/`. I CI på Linux består 3649, og 7 hoppes over (kjøring 40242295656 på `d183856`). Lokalt på Windows besto 3636, og 20 ble hoppet over, i den siste hele kjøringen 25.10 (21:55:10–22:02:40, fil for fil, på `9b28e1e`; `git diff 9b28e1e d183856 -- src tests` er tom). Tabellen fra 25.10 står over den fra 17.10 i §2.
   *Oppdatert 2026-10-17:* 2383 tester i 38 testfiler, telt med `uv run pytest --collect-only -q` på `3699a16`. Lokalt på Windows består 2366, og 17 hoppes over (målt på `59976ee` etter gjennomgangene av PR #60, slik beskrivelsen av PR #60 sier; `git diff 59976ee 3699a16 -- src tests` er tom). I CI på Linux består alle 2383 (kjøring 39066471455 på `3699a16`). Tabellen fra 17.10 står over den fra 03.10 i §2.
   *Lagt til 2026-10-17:* story 9.1 legger til `tests/test_kvalitetssikring.py` med 10 tester, så etter flettingen har main 2393 tester i 39 testfiler. Tabellen i §2 er talt før den kom til.
   *Oppdatert 2026-10-05:* 1148 tester i 23 testfiler, telt med `uv run pytest --collect-only -q` på `3fac7cc`. Lokalt på Windows består 1132, og 16 hoppes over. I CI på Linux består alle 1148 (kjøring 37348017033 på `3fac7cc`). Siden 03.10 har story 2.2 (`1570ae9`, PR #19) og 2.2b (`ff58ecf`, PR #20) kommet til, med den nye testfila `test_oversiktsleser.py`. Tabellen under er fra 03.10.
@@ -35,6 +36,8 @@ Forkortelser i kildene: `S/` er `_bmad-output/implementation-artifacts/`, og
   en test skal feile. Vedlegget har 197 linjer, én per mutant eller per gruppe
   som kilden bare teller. 18 tilfeller overlevde en stund, og hvert av dem fikk
   en test eller en forklaring (§3).
+  *Oppdatert 2026-10-25:* vedlegget har nå 264 linjer: de 197 fra 03.10 og 67 i
+  «Fra 2.2 til 10.3, én linje per spesifikasjon», talt på `d183856`.
 - Fra story 1.4a fikk hver story med kode en gjennomgang med tre eller fire
   lenser før flettingen, og Epic 1 fikk en samlet gjennomgang etterpå (§5).
 - Koden er også kontrollert mot ekte data, og ikke bare mot testdata (§4).
@@ -43,6 +46,63 @@ Forkortelser i kildene: `S/` er `_bmad-output/implementation-artifacts/`, og
 ## 2. Testene
 
 ### Antall
+
+Talt med `uv run pytest --collect-only -q` 25.10.2026, på `d183856`, med CI-kjøringen 40242295656 for samme commit (3649 bestått og 7 hoppet over). Dette er tallene som gjelder nå:
+
+| Fil | Tester |
+|---|---:|
+| `test_ki_modell.py` | 481 |
+| `test_fetch_prices.py` | 332 |
+| `test_app.py` | 306 |
+| `test_ki_tjenestene.py` | 239 |
+| `test_vurderingslager.py` | 170 |
+| `test_snapshotleser.py` | 133 |
+| `test_docker.py` | 131 |
+| `test_ki_visning.py` | 127 |
+| `test_kurslager.py` | 113 |
+| `test_kilogg.py` | 106 |
+| `test_boersometer.py` | 91 |
+| `test_markedsoversikt.py` | 82 |
+| `test_demo.py` | 74 |
+| `test_dobbeltklikk.py` | 67 |
+| `test_ki_grunnlag.py` | 66 |
+| `test_min_liste.py` | 64 |
+| `test_aksje.py` | 59 |
+| `test_utseende.py` | 57 |
+| `test_ki_tekst.py` | 54 |
+| `test_signalberegning.py` | 52 |
+| `test_hjelpetekster.py` | 51 |
+| `test_boersdag.py` | 49 |
+| `test_kilogg_sqlite.py` | 49 |
+| `test_migrering.py` | 49 |
+| `test_hovedindeks.py` | 48 |
+| `test_historikken.py` | 46 |
+| `test_perioder.py` | 43 |
+| `test_konsumentene.py` | 40 |
+| `test_ki_lokal.py` | 39 |
+| `test_aksjedetalj.py` | 38 |
+| `test_indeks.py` | 38 |
+| `test_ryddighet.py` | 35 |
+| `test_ingen_nettverk.py` | 32 |
+| `test_graf.py` | 31 |
+| `test_meldinger.py` | 31 |
+| `test_tallformat.py` | 31 |
+| `test_tilstand.py` | 29 |
+| `test_demoproeven.py` | 27 |
+| `test_lagring_sqlite.py` | 26 |
+| `test_investorsiden.py` | 25 |
+| `test_demo_ki.py` | 21 |
+| `test_kursdata.py` | 19 |
+| `test_oversiktsleser.py` | 16 |
+| `test_lagring_fil.py` | 13 |
+| `test_kvalitetssikring.py` | 11 |
+| `test_ruff.py` | 6 |
+| `test_tidssone.py` | 5 |
+| `test_suksesskriterier.py` | 3 |
+| `test_readme.py` | 1 |
+| **Sum** | **3656** |
+
+Tabellen fra 17.10 står under, som den var.
 
 Talt med `uv run pytest --collect-only -q` 17.10.2026, på `3699a16`, med CI-kjøringen 39066471455 for samme commit (2383 bestått):
 

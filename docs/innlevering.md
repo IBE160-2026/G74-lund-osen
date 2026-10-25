@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-10-16T00:28
+updated: 2026-10-25T23:55
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -114,7 +114,7 @@ Merk at bare frasen
 | | |
 |---|---|
 | **Status** | **Delvis** |
-| **Ligger i** | `src/` (12 moduler og `migrasjoner/`), `tests/` (17 testfiler, 468 tester — telt 2026-09-26), `.github/workflows/`, `pyproject.toml`, `uv.lock`. *Rettet 2026-09-26:* her sto 10 moduler, 13 filer og 285 tester, telt 2026-09-24. *Rettet 2026-09-26, etter 1.5b (`ef1cca7`):* her sto 427 tester. *Rettet 2026-09-26, etter 2.0 (`4b65a3c`):* her sto 455 tester. *Telt 2026-10-05, på `3fac7cc`:* 17 moduler i `src/` og fire migrasjoner i `src/migrasjoner/`, 23 testfiler og 1148 tester |
+| **Ligger i** | `src/` (12 moduler og `migrasjoner/`), `tests/` (17 testfiler, 468 tester — telt 2026-09-26), `.github/workflows/`, `pyproject.toml`, `uv.lock`. *Rettet 2026-09-26:* her sto 10 moduler, 13 filer og 285 tester, telt 2026-09-24. *Rettet 2026-09-26, etter 1.5b (`ef1cca7`):* her sto 427 tester. *Rettet 2026-09-26, etter 2.0 (`4b65a3c`):* her sto 455 tester. *Telt 2026-10-05, på `3fac7cc`:* 17 moduler i `src/` og fire migrasjoner i `src/migrasjoner/`, 23 testfiler og 1148 tester. *Telt 2026-10-25, på `d183856`, og det er tallene som gjelder nå:* 40 moduler i `src/` og sju migrasjoner i `src/migrasjoner/`, 49 testfiler og 3656 tester (`uv run pytest --collect-only -q`). I CI på Linux består 3649, og 7 hoppes over (kjøring 40242295656 på `d183856`). Lokalt på Windows besto 3636, og 20 ble hoppet over, i den siste hele kjøringen 25.10 (21:55–22:02, på samme `src/` og `tests/`). Tabellen per fil står under «Antall» i §2 i [kvalitetssikringen](kvalitetssikring.md) |
 | **Gjenstår** | **Dockerfile finnes ikke.** Kontrollert 21.09 og igjen 22.09: ingen treff på `Dockerfile` eller `docker-compose` noe sted i repoet. Beslutningen var punkt 18 i `prd.md`, som ble lukket 22.09 (AD-9 til AD-12), og selve Dockerfilen er story 3.1. *Rettet 2026-09-26:* her sto «Ført som åpent punkt 18 i `prd.md`». |
 
 Arkitekturen for den er besluttet 22.09 og ligger i `ARCHITECTURE-SPINE.md`:
