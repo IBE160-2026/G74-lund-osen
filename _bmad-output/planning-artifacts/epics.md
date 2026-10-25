@@ -1949,6 +1949,8 @@ følger aksjene jeg bryr meg om.
 
 *Avgjort 2026-10-24 kl. 11:08 (gruppens svar):* PLT og WWI bytter plass i «Alle 186, rangert» i §42 i `malinger.md`, så plass 72–74 er SNI, PLT, WWI, rekkefølgen den uavrundede medianen gir regnet fra de lokale råfilene (det åpne punktet i §42). §35 og §42 har hver fått en Rettet-linje om at råfilene for SNI og WWI finnes.
 
+*Avgjort 2026-10-25 kl. 21:48 (gruppens svar):* dagens 20 kall, hele dagskvoten 25.10 i GMT på en dag uten henting, går til målingen: de neste 20 med typen «Common Stock» i lista fra §40 som ikke er rangert, valgt som i §42, etter CAVEN i rekkefølgen i svaret. Bonuskvoten brukes ikke.
+
 ### Story 2.13: Kommandoen som måler omsetning
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
