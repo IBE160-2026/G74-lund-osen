@@ -2806,6 +2806,10 @@ starter ikke av seg selv.
 
 *Avgjort 2026-10-25 kl. 11:04 (gruppens svar):* a) testen for lesingen på aksjesiden godtar nøyaktig ett oppslag til, for dagene. Den passer fortsatt på at siden ikke leser dag for dag. b) Med «Velg dag» står ordlyden fra fjerde forsøk, som «Signalet ble slik denne dagen for første gang.», fordi datoen står øverst på siden.
 
+*Avgjort 2026-10-25 kl. 12:12 (gruppens svar):* a) «for første gang» tas ut av setningen om dagene, fordi tellingen gjelder dagene på rad (BH2, ECH7): «Signalet ble slik i dag.», og for en dag som ikke er i dag «Signalet ble slik denne dagen.». Tellingen fra svaret 24.10 kl. 16:15 a) står. Det endrer ordlyden fra svarene kl. 00:51 og 11:04 b). b) «Fortsatt», «lenge» og «uke» stoppes som før, fordi modellen ikke vet hva som var før (ECH4, BH14). c) Ordlyden med «denne dagen» gjelder alle dager som ikke er i dag, også i helga og før kveldshentingen, ikke bare med «Velg dag».
+
+*Avgjort 2026-10-25 kl. 12:19 (gruppens svar):* d) for en dag som ikke er i dag: «Denne dagen hadde signalet vært slik i 4 børsdager på rad.» og «Denne dagen hadde signalet vært slik i minst 12 børsdager.» (BH5). e) Med retningen Ingen står setningen som den er, fordi «slik» viser til retningen rett over (ECH10).
+
 ### Story 10.3: Visningen i aksjedetaljen
 
 *Het Story 5B.3 til 28.09.*
