@@ -100,6 +100,13 @@ Gruppen ville prøve igjen (kl. 00:50). Modellen får ikke dagene og nevner dem 
 
 **c) Prøvekjøringen** (§46 i `malinger.md`), mot kopien `data/db/ki-proeve-v3d.db`, laget med skallet på main kl. 00:56:04 før grenen, med samme sha256 som `ose.db`. Kjørt 01:15:01–01:15:17: 15 av 15 besto, 0 ble stoppet, og modellen feilet for 0. Hver tekst er lest mot grunnlaget. Ingen sier feil om en sjekk, og ingen nevner dagene. Med kontrollen fra a) består fortsatt alle 15 fra §34.
 
+## Valg
+
+Gruppens svar 25.10 kl. 11:04:
+
+- **a) Lesingen på aksjesiden.** Setningen om dagene leser vurderingene for aksjen med ett kall, fra første dato til dagen siden viser. `test_siden_leser_en_gang_per_maaned` godtar nøyaktig det ene kallet i tillegg til måneden i historikken, og feiler fortsatt hvis siden leser dag for dag eller gjør mer enn ett kall til.
+- **b) Ordlyden for en valgt dag.** Med «Velg dag» står ordlyden fra fjerde forsøk, som «Signalet ble slik denne dagen for første gang.», fordi datoen står øverst på siden. Punktet under «Åpent» er dermed avgjort.
+
 ## Boundaries & Constraints
 
 - Ingen kall til EODHD utover kvotesjekken i regel 15. `src/fetch_prices.py` kjøres ikke, og `data/db/ose.db` røres ikke (regel 22).
@@ -235,3 +242,4 @@ Gjennomgang 25.10, etter hele settet (00:22:52–00:30:02), på diffen `cfceb42.
 - *Lagt til 2026-10-25:* versjon 3 med ferdig ordlyd besto 13 av 15 i §45 (VAR og TEL på «det første signalet»), under kravet 15 av 15 i svaret kl. 23:23, og flettes ikke. Gruppen avgjør veien videre.
 - *Lagt til 2026-10-25:* ordlyden godtas der den står, også i en annen setning (BH4), og dagene med ord som «fortsatt», «lenge» og «uker» leses ikke (BH2, ECH6).
 - *Lagt til 2026-10-25:* for en tidligere dag valgt med «Velg dag» skriver siden «Signalet ble slik denne dagen for første gang.» i stedet for «i dag». Gruppen avgjør ordlyden.
+- *Lagt til 2026-10-25 kl. 11:04:* ordlyden for en valgt dag er avgjort av gruppen (under «Valg», svaret b).
