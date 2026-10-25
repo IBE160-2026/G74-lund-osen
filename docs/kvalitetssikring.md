@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-25T23:55
+updated: 2026-10-26T00:30
 ---
 
 # Kvalitetssikring
@@ -258,6 +258,8 @@ til basen (story 2.1b). `tests/test_tidssone.py` avviser `date.today(`,
 `tests/test_readme.py` sjekker at hver lenke i README peker på noe som finnes.
 
 *Lagt til 2026-10-24:* «testene for dokumentene», som instruksjonene og endringsforslagene viser til, er `tests/test_readme.py`, `tests/test_kvalitetssikring.py`, `tests/test_ryddighet.py`, `tests/test_suksesskriterier.py`, `tests/test_hjelpetekster.py` og `tests/test_docker.py`.
+
+*Avgjort 2026-10-25 kl. 20:16 (gruppens svar):* ingen sperre før push. Regelen står i hver instruksjon, og CI fanger feil.
 
 ## 3. Mutantpraksisen
 

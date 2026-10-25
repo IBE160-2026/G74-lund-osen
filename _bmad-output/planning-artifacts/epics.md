@@ -2447,6 +2447,18 @@ reserve. Til da endres ikke «Kom i gang».
 
 *Lagt til 2026-10-24 kl. 17:41:* 3.5d, funnene fra forprøven av den ekte versjonen 24.10, er squash-flettet i `5e01a4f`, PR #94, låst til head-en `a48c5de` (spesifikasjonen `spec-3-5d-funn-fra-forproeven.md`). Vinduet sier hvor nøkkelen står og hvordan den limes inn, meldingene har æ, ø og å, webserveren har 8 tråder, og kjører OSE Signal fra samme mappa på porten, stopper skriptet den før uv. Alt annet stoppes aldri. Om stoppen skal flyttes til rett før webserveren (BH5 i triagen), og kommandolinja på Mac, står åpent i spesifikasjonen.
 
+*Avgjort 2026-10-25 kl. 11:32 (gruppens svar):*
+- a) Dobbeltklikket (3.5a) er den anbefalte hovedveien i «Kom i gang», Docker
+  den andre og uv i terminalen den tredje. Dockerfilen og `compose.yaml`
+  leveres som før.
+- b) 3.5b og 3.5c bygges ikke: demoen virket i gruppens prøve 24.10,
+  forprøvens funn er rettet i 3.5d, og Docker er reserven.
+
+*Innspill kl. 11:26:* tre veier etter behov, og dobbeltklikket som egen del.
+Resten ryddes etter alle testene.
+
+*Avgjort kl. 11:49:* dobbeltklikket bruker bare uv, også når Docker kjører.
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
