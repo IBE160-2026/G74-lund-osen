@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-25T19:31
+updated: 2026-10-25T20:37
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -5096,3 +5096,60 @@ mange som de 15 radene med versjon 2 fra kveldshentingen 23.10 i kopien, alle
 bestått, etter punkt 2 i beslutningen 16.10 kl. 23:51 (gjennomgangen, BH7).
 Utløseren `ki_logg_slettes_ikke` ble satt inn igjen med den samme definisjonen
 fra `sqlite_master`, og skriptet sjekket at den fantes etterpå.
+
+## 48. Prøvekjøringen av prompten versjon 3 med regelen for retningen Ingen (2026-10-25)
+
+**Metode.** Som i §47, etter gruppens svar 25.10 kl. 19:54 og 19:56
+(spesifikasjonen 10.2g): modellen skrev retningen Ingen som et ord i
+setningen, «Signalet er Ingen, fordi …», så prompten har nå regelen «- Når
+retningen er Ingen, skriv at signalet ikke har noen retning.» `PROMPTVERSJON`
+står som «3», fordi ingen tekst i `ose.db` var laget med versjon 3.
+Kontrollen er ikke endret. Basen ble kopiert med skallet på main til
+`data/db/ki-proeve-v3h.db` søndag 25.10 kl. 20:13:43, før grenen (regel 22),
+med samme sha256 som `ose.db`. Ingen KI-rad i kopien hadde `promptversjon` 3:
+alle 75 hadde 2. Kopien hadde de 15 radene med versjon 2 fra kveldshentingen
+23.10, alle bestått. De ble slettet i kopien, og bare der, med utløseren
+`ki_logg_slettes_ikke` tatt bort og satt inn igjen med den samme definisjonen
+fra `sqlite_master`, og skriptet sjekket at den fantes etterpå. Bare KI-steget
+ble kjørt mot kopien for børsdagen 23.10, med den ekte klokka, fra et skript
+utenfor repoet, og tiden per kall ble tatt med `time.monotonic()`. Ingen kall
+til EODHD: kvoten sto på 0 brukt i dag (GMT) kl. 20:11, og steget leser bare
+basen. sha256 for `data/db/ose.db` var den samme før og etter
+(`e3184c07…f4a4`).
+
+Hver av de 15 tekstene er lest mot grunnlaget: hver sjekk, at dagene ikke
+nevnes, og om «Ingen» står som et ord (med stor forbokstav, som retningen i
+opplysningene). 7 av de 15 er ordrett de samme som i §47
+(`ki-proeve-v3g.db`), og 8 er endret.
+
+| | §34, versjon 2, 16.10 | §43, versjon 3, 23.10 | §44, versjon 3 rettet, 23.10 | §45, versjon 3 med ordlyden, 23.10 | §46, versjon 3 uten dagene, 23.10 | §47, versjon 3 med den nye grunnen, 23.10 | §48, versjon 3 med regelen for Ingen, 23.10 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Kjørt | 23:43–23:44 | 20:31:25–20:31:36 | 22:05:12–22:05:22 | 00:20:45–00:20:56 | 01:15:01–01:15:17 | 19:19:04–19:19:12 | 20:23:20–20:23:38 |
+| Besto kontrollen | 15 | 12 | 11 | 13 | 15 | 15 | 15 |
+| Stoppet av kontrollen | 0 | 3 | 4 | 2 | 0 | 0 | 0 |
+| Modellen feilet | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Median tid per tekst | 0,77 s | 0,73 s | 0,65 s | 0,73 s | 0,43 s | 0,46 s | 0,46 s |
+| Lengste kall | 81,36 s (det første, med innlasting) | 1,01 s (modellen var lastet) | 0,85 s (modellen var lastet) | 0,96 s (modellen var lastet) | 9,27 s (hvilket kall, ble ikke ført) | 1,02 s (kall nr. 13, modellen var lastet) | 11,44 s (kall nr. 1) |
+| Tekster med feil som slapp gjennom | 0 | 9 | 0 | 0 | 0 | 0 | 0 |
+
+§48: `maskinvare` `gpu` for alle 15, `gemma4:e4b` med `modell_id`
+`dc35e8d9c606`, og Ollama 0.35.1. Alle 15 radene har `promptversjon` 3.
+Om modellen ble lastet inn ved kall nr. 1 i §48, ble ikke ført
+(gjennomgangen, BH11). Demotekstene var laget kl. 20:17:51–20:18:20, fem
+minutter før.
+
+**Resultat.** Kontrollen stoppet ingen av de 15. Ingen tekst sier feil om en
+sjekk, og ingen nevner dagene. To av de 15 har retningen Ingen (styrke 0), og
+begge sier at signalet ikke har noen retning, med «ingen retning». «Ingen»
+står som et ord i 0 av de 15, mot 2 av 15 i §47, de samme to aksjene. Ingen
+tekst nevner hovedindeksen, bransjen eller antallet aksjer, og ingen gir råd
+eller gjetter på en årsak. Tekstene står bare i kopien og er ikke ført her.
+
+15 av 15 er kravet i gruppens svar 25.10 kl. 00:51. Versjonen består like
+mange som de 15 radene med versjon 2 fra kveldshentingen 23.10 i kopien, alle
+bestått, etter punkt 2 i beslutningen 16.10 kl. 23:51.
+
+Regelen for retningen Ingen er prøvd på 2 av de 15, i én kjøring, og på 1
+demotekst (SLVP). Det viser at modellen fulgte regelen her, ikke at den
+gjør det hver gang. Kontrollen stopper ikke «Signalet er Ingen», fordi det
+er riktig retning (gjennomgangen, BH4, BH12 og ECH4).

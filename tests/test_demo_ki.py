@@ -19,6 +19,7 @@ from markupsafe import escape
 import app as app_modul
 import demo
 import demo_ki
+import ki_prompt
 from hovedindeks import valgt_indeks
 from ki_grunnlag import ki_grunnlag, lag_dagsbilde
 from ki_kontroll import kontroller
@@ -40,7 +41,9 @@ def fast_klokke(monkeypatch):
 
 @pytest.fixture(scope="module")
 def radene():
-    return demo_ki.les_radene()
+    # Story 10.2g: med promptens avtrykk, saa en endret prompt gjoer testene
+    # roede til tekstene lages paa nytt.
+    return demo_ki.les_radene(prompt=demo_ki.promptavtrykk())
 
 
 @pytest.fixture(scope="module")
@@ -160,6 +163,50 @@ class TestFila:
         with pytest.raises(demo_ki.UgyldigDemoKI, match="avtrykket"):
             demo_ki.les_radene(fil)
 
+    def test_hver_rad_har_promptens_avtrykk_ved_promptversjonen(self):
+        """Story 10.2g, gruppens svar 25.10 kl. 19:54 og 19:56 c). Ville
+        feilet hvis en rad i fila manglet promptens avtrykk, hadde et annet
+        avtrykk enn prompten slik den er naa, eller feltet sto et annet sted
+        enn rett etter promptversjonen."""
+        # utf-8-sig som i les_radene (gjennomgangen, BH8 og ECH3).
+        i_fila = json.loads(demo_ki.FIL.read_text(encoding="utf-8-sig"))["radene"]
+        assert i_fila
+        for verdi in i_fila:
+            assert verdi["promptavtrykk"] == demo_ki.promptavtrykk(), verdi["symbol"]
+            feltene = list(verdi)
+            assert feltene[feltene.index("promptversjon") + 1] == "promptavtrykk", verdi["symbol"]
+
+    def test_en_rad_med_et_annet_promptavtrykk_avvises(self, tmp_path):
+        """Story 10.2g (VG1, ECH2 og BH13 i 10.2f): to prompter med samme
+        versjon skilles bare av avtrykket. Ville feilet hvis en rad med et
+        annet avtrykk enn prompten, eller uten avtrykket, ble lest."""
+        innhold = json.loads(demo_ki.FIL.read_text(encoding="utf-8-sig"))
+        innhold["radene"][-1]["promptavtrykk"] = "0" * 64
+        fil = tmp_path / "annen-prompt.json"
+        fil.write_text(json.dumps(innhold, ensure_ascii=False), encoding="utf-8")
+        assert demo_ki.les_radene(fil)
+        with pytest.raises(demo_ki.UgyldigDemoKI, match="annen prompt"):
+            demo_ki.les_radene(fil, prompt=demo_ki.promptavtrykk())
+        innhold["radene"][-1]["promptavtrykk"] = "ikke et avtrykk"
+        fil.write_text(json.dumps(innhold, ensure_ascii=False), encoding="utf-8")
+        with pytest.raises(demo_ki.UgyldigDemoKI, match="ikke en sha256"):
+            demo_ki.les_radene(fil)
+        del innhold["radene"][-1]["promptavtrykk"]
+        fil.write_text(json.dumps(innhold, ensure_ascii=False), encoding="utf-8")
+        with pytest.raises(demo_ki.UgyldigDemoKI, match="promptavtrykk"):
+            demo_ki.les_radene(fil)
+
+    @pytest.mark.parametrize("navn", ["REGLER", "UTENFOR"])
+    def test_en_endret_prompt_avviser_tekstene(self, monkeypatch, navn):
+        """Story 10.2g: endres prompten uten at tekstene lages paa nytt,
+        ogsaa med samme versjon, avvises fila. Ville feilet hvis lesingen
+        bare saa paa versjonen, eller avtrykket ikke dekket reglene eller
+        merket (gjennomgangen, BH9)."""
+        monkeypatch.setattr(ki_prompt, navn, getattr(ki_prompt, navn) + "- En ny regel.\n")
+        assert ki_prompt.PROMPTVERSJON == PROMPTVERSJON
+        with pytest.raises(demo_ki.UgyldigDemoKI, match="annen prompt"):
+            demo_ki.les_radene(prompt=demo_ki.promptavtrykk())
+
 
 class TestDemokommandoen:
     def test_skriver_radene_uten_nett_og_uten_ollama(self, tmp_path, monkeypatch, radene):
@@ -228,6 +275,10 @@ class TestDemokommandoen:
         to_like = json.loads(json.dumps(innhold))
         to_like["radene"].append(to_like["radene"][0])
         tilfeller["to rader for en aksje"] = json.dumps(to_like)
+        # Story 10.2g: en rad uten promptens avtrykk.
+        uten_prompt = json.loads(json.dumps(innhold))
+        del uten_prompt["radene"][0]["promptavtrykk"]
+        tilfeller["uten promptavtrykk"] = json.dumps(uten_prompt)
         for navn, tekst in tilfeller.items():
             fil = tmp_path / f"{len(navn)}.json"
             if tekst is not None:
@@ -344,6 +395,12 @@ class TestLagTekstene:
         assert modell.kall == len(radene) == len(med_vurdering)
         assert all(not r.besto and r.tekst == modell.tekst for r in radene)
         assert [r.emne for r in demo_ki.les_radene(fil)] == [r.emne for r in radene]
+        # Gjennomgangen av 10.2g (VG1): fila kommandoen skriver, har promptens
+        # avtrykk rett etter promptversjonen.
+        for verdi in json.loads(fil.read_text(encoding="utf-8"))["radene"]:
+            feltene = list(verdi)
+            assert feltene[feltene.index("promptversjon") + 1] == "promptavtrykk"
+            assert verdi["promptavtrykk"] == demo_ki.promptavtrykk()
 
     def test_roerer_ikke_basene_i_data(self, tmp_path):
         """Regel 22: demobasen lages i en midlertidig mappe. Ville feilet hvis
@@ -362,7 +419,7 @@ class TestLagTekstene:
 
         assert set(demo_ki.FELTENE) == {f.name for f in fields(KIRad)} - {"emne", "grunnlag"}
         i_fila = json.loads(demo_ki.FIL.read_text(encoding="utf-8"))["radene"]
-        assert [demo_ki.til_json(r) for r in radene] == i_fila
+        assert [demo_ki.til_json(r, demo_ki.promptavtrykk()) for r in radene] == i_fila
 
     def test_en_kjoering_som_ikke_er_hel_skriver_ikke_fila(self, tmp_path):
         """Gjennomgangen, BH4, ECH1 og VG4: svarer ikke modellen, eller feiler
