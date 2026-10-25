@@ -45,6 +45,17 @@ tredje forsoek er tatt ut, og reglene sier at teksten ikke sier hvor lenge
 signalet har vart. Appen skriver dagene selv, under KI-teksten paa
 aksjesiden (setning_om_dagene i dagene.py). Versjonen staar som 3, og
 avtrykket dekker reglene, merket og lag_prompt.
+
+Versjon 3, grunnen i prompten (story 10.2f, gruppens svar 25.10 kl. 18:34
+og 18:35): siden sier ikke lenger «for første gang» (svaret kl. 12:12 a), saa
+grunnen er «Siden sier under teksten hvor lenge signalet har vart.» Regelen
+for modellen staar. Versjonen staar som 3, og det er et unntak fra regelen
+om ny versjon oeverst: ingen tekst i ose.db var laget med versjon 3 ennaa.
+Avtrykket er satt paa nytt, og demotekstene og proevekjoeringen
+(malinger.md §47) er laget paa nytt, saa alle tekster med versjon 3 i ose.db
+og i demoen er laget med samme prompt. Tekstene med versjon 3 i
+proevekjoeringene foer §47 (§43-§46) og i historikken til
+demo_ki_tekster.json er laget med den gamle grunnen (gjennomgangen, BH1).
 """
 
 import json
@@ -73,7 +84,7 @@ Regler for teksten:
 - Bruk bare opplysningene under. Skriv utslagene med ord, ikke som tall. Ikke nevn kurser, prosenter eller andre tall enn antallene i opplysningene og regelens faste tall.
 - Siden viser kursen, endringen og målingene. Du kan vise til dem, for eksempel «se endringen i tabellen», men ikke gjenta tallene.
 - Hovedindeksen og bransjen er ikke en del av regelen. Ikke si at de forklarer signalet.
-- Ikke si hvor lenge signalet har vart, om det er nytt, eller om det er første gang. Siden sier det under teksten.
+- Ikke si hvor lenge signalet har vart, om det er nytt, eller om det er første gang. Siden sier under teksten hvor lenge signalet har vart.
 - Ikke gi råd om å kjøpe, selge eller holde, og ikke si noe om hva som vil skje.
 - Ikke gjett på årsaker, som nyheter, resultater eller kontrakter. Du kan forklare regelen, for eksempel at en sjekk ikke ga utslag.
 - Når du forklarer regelen, bruk «fordi». Ikke bruk «skyldes» eller «indikerer».

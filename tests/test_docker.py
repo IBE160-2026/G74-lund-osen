@@ -1146,7 +1146,10 @@ HOEYDE_PAA_AKSJESIDEN = 1934
 # Story 10.2e, gruppens svar 25.10 kl. 12:12 og 12:19: setningen uten «for
 # første gang», og «denne dagen» for en dag som ikke er i dag. Bildet viser
 # fortsatt BRFE, med hoeyden 1934.
-AVTRYKK_BAK_AKSJESIDEN = "67a9943b5d05e1dc8ce5055e3bc7231df47807711283c6f619bfedc8e4469479"
+# Story 10.2f, gruppens svar 25.10 kl. 18:34 og 18:35: KI-tekstene laget paa
+# nytt med den nye grunnen i prompten. Bildet viser fortsatt BRFE, der teksten
+# besto, med hoeyden 1934.
+AVTRYKK_BAK_AKSJESIDEN = "39cc2458fd109ace7e1ccb21bc9086896df8642b5e53dde4110220af69e037e8"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
