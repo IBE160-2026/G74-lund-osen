@@ -2820,6 +2820,8 @@ starter ikke av seg selv.
 
 *Lagt til 2026-10-25 kl. 20:46:* regelen for retningen Ingen, «- Når retningen er Ingen, skriv at signalet ikke har noen retning.», og promptens avtrykk i hver rad i `src/demo_ki_tekster.json` er flettet i `2aa7745`, PR #97 (spesifikasjonen `spec-10-2g-ingen-retning.md`). Regelen brukes fra hentingen mandag 26.10. `PROMPTVERSJON` står som «3». §48 i `malinger.md` ga 15 av 15, og «Ingen» sto som et ord i 0 av 15. CI var grønn på head-en `7daf0a0` (kjøring 40227006629). Rekkefølgen på sjekkene står åpen.
 
+*Avgjort 2026-10-25 kl. 20:54 (gruppens svar):* a) kontrollen stopper ikke «Signalet er Ingen», fordi teksten er riktig, og regelen ga 0 i §48 (BH4). b) KI-loggen i basen får ikke promptens avtrykk (BH5). Fra hentingen mandag 26.10, når basen får tekster med versjon 3, gir enhver endring i prompten en ny versjon. c) Prompten får to linjer blant reglene, ordrett: «- Etter «fordi» står «ikke» foran verbet, for eksempel «fordi trenden ikke ga utslag».» og «- Når du nevner flere sjekker, ta dem i rekkefølgen trend, bevegelse og interesse.» (rådets ordlyd). d) `PROMPTVERSJON` står som «3» av samme grunn som svaret kl. 18:35 b).
+
 ### Story 10.3: Visningen i aksjedetaljen
 
 *Het Story 5B.3 til 28.09.*
