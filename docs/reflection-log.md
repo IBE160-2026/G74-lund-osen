@@ -2821,6 +2821,50 @@ Det vi lærte: en instruksjon sjekkes mot tilstanden den starter fra: grenen, de
 
 ---
 
+## 24.10.2026 – To prøver for hånd, tegningene til investorsidene, og versjon 3 som ikke besto
+
+*Joakim og Marian.*
+
+Dagens 20 kall gikk til §42 i `malinger.md`, etter svaret kl. 10:00 (`68a2804`). Det var de 20 neste «Common Stock» i lista over Oslo Børs som ikke var rangert, fra ABTEC til CAVEN. Kallene gikk kl. 10:06–10:07, og alle 20 ga 67 rader. Den beste kom på plass 128 av 186 (`011d922`, `62fc8bb`), og bonuskvoten ble ikke brukt. Underveis fant Claude Code at råfilene for SNI og WWI finnes, mot det §35 sier. Kl. 11:08 avgjorde vi at PLT og WWI bytter plass i rangeringen, og det ble ført om kvelden (`8bb33e6`).
+
+Om formiddagen prøvde vi demoen fra en ZIP-kopi av grenen til 3.5a: «Download ZIP», pakket ut i Nedlastinger, og «Start demoen» etter advarselen «Windows beskyttet PC-en». Siden var oppe på under ett minutt (svarene kl. 11:22 og 11:28). Etter svaret 23.10 kl. 23:31 (`8f89f9f`) stopper «Start den ekte versjonen» i en mappe med `.git`, også på main, så et dobbeltklikk i en klon aldri henter med vår nøkkel. PR #92 ble flettet kl. 13:05 i `afbc0af`.
+
+Prøven av demoen ga seks funn, og dem svarte vi på kl. 11:21–11:49 (`3a4fb86`). Siden holder nå plassen når man trykker på periodeknappene og «Velg dag». Hver aksje i lista har en rad, også uten kurser. Symbolene over søylene lenker til aksjesiden, og raden sier hvorfor signalet ikke kunne regnes. Velger man en kolonne, sorteres hele lista, og «Bare» er tatt bort fra setningen om dem med 3 av 3. 8.2a (PR #93) ble flettet kl. 14:57 i `e4d1ba4`. Gjennomgangen fant 26 funn, og de fem med dom medium eller høyere ble rettet før flettingen.
+
+Fra kl. 11:48 til 13:03 avgjorde vi hvordan investorsidene i demoen skal se ut. Hver blir en egen side i appen med en logo og en tegning laget av KI, fordi selskapene er oppdiktet. Kl. 13:43 godkjente vi de 15 tegningene, og kl. 15:21 kortet på aksjesiden (`408c15e`). Tegningene er laget av KI i chatten og ligger urørt i `docs/bilder/investorsider/`, 32 filer (`2b09ad4`). Selve siden er ikke bygget. Det skjer i 3.4h.
+
+Kl. 12:14–12:18 forprøvde vi den ekte versjonen i en ZIP-kopi med egen testkonto (avgjort kl. 12:11), fra nøkkelen til siden. Det ga åtte funn: tre om nøkkelen, to om æ, ø og å, ett om trådene i webserveren, ett om porten og ett om beskjeder som bare viste til README-en. Kl. 12:04 avgjorde vi at skriptet stopper en annen versjon av OSE Signal på porten, men aldri et annet program (`7b784f0`). 3.5d (PR #94) ble flettet kl. 17:40 i `5e01a4f`. Nå stoppes den andre versjonen før uv. Om den heller skal stoppes rett før webserveren (BH5), står åpent i spesifikasjonen.
+
+Kl. 15:50 og 16:15 avgjorde vi at prompten versjon 3 skulle bygges og flettes samme kveld (`153aba8`). Den skulle få med hvor lenge signalet har vart, og fra børsometeret hvor mange aksjer som steg og falt, og om bransjen steg eller falt. Prøvekjøringen i §43 for børsdagen 23.10 ga 12 bestått og 3 stoppet, mot 15 av 15 med versjon 2. Etter svaret kl. 21:49 (`43e7717`) ble prompten og kontrollen rettet, og §44 ga 11 bestått og 4 stoppet. Begge gangene ble arbeidet stoppet før flettingen, og PR #95 ble ikke flettet 24.10. Kl. 23:23 avgjorde vi ett forsøk til, der modellen får ferdig ordlyd for dagene. Det fortsetter 25.10.
+
+Om kvelden rettet vi fire ting i dokumentene, etter instruksjonen kl. 23:30. PLT og WWI byttet plass i §42 (`8bb33e6`), og lista over testene for dokumentene ble ført (`3a55d4e`). Spesifikasjonen 3.5d fikk en linje om at vi så «API token» under «Dashboard» kl. 12:16 (`61b9bb9`). Og under story 3.4 og 8.15 står det nå at kanten for dem som skilte seg ut, er oransje, ikke gul (`2025f2e`).
+
+**Utfordringer**
+
+1. **CI rød på main etter tegningene.**
+   *Problem:* CI-kjøringen på `2b09ad4` feilet med 3 feil. Testene for bildene og for «Mappestruktur» kjente ikke den nye mappa, og `AVTRYKK_I_PILENE` var ikke satt på nytt. Instruksjonene sa at testene for dokumentene skulle kjøres før push, men hvilke tester det var, sto ikke i repoet, og `tests/test_docker.py` var ikke blant dem som ble kjørt.
+   *Løsning:* rettet i `6a2ad5d` kl. 15:41, og CI ble grønn. Om kvelden førte vi lista i `docs/kvalitetssikring.md` (`3a55d4e`): seks filer, også `tests/test_docker.py`. Instruksjonene kl. 20:00 og 21:51 ba om den i tillegg før hver push.
+   *KI sin rolle:* Claude Code skrev i Utført-linjene kl. 10:23 og 13:07 at uttrykket ikke sto i repoet, og valgte selv fem testfiler. Rådet i chatten brukte uttrykket videre i instruksjonene uten å definere det. Claude Code fant feilen i CI og rettet den. Rådet skrev lista inn i instruksjonen kl. 23:30, og gruppen ga den.
+
+2. **Kontrollen som slapp gjennom feil, og modellen som skrev dagene selv.**
+   *Problem:* i §43 slapp kontrollen gjennom tre tekster som sa at både trenden og interessen ga utslag, der bare trenden ga det. Kontrollen sjekket ikke utsagn om én sjekk. Samtidig stoppet den tre tekster på «Ingen sjekk ga …», selv om utsagnet var riktig. Flere sa «minst» om dagene uten at grunnlaget hadde merket. §43 sier fem og opptellingen i §44 seks, og det spriket står åpent. I §44 ble de feilene stoppet, men modellen skrev dagene med egne ord. Tre tekster sa «minst én børsdag» uten merket, og én sa «det tredje på rad» der dagene var 1.
+   *Løsning:* etter svaret kl. 21:49 ble prompten og kontrollen rettet, og hver av de 15 tekstene i §44 ble lest mot grunnlaget. Ingen av dem som besto, sa noe feil, men fire ble stoppet, og det er over grensen. Kl. 23:23 avgjorde vi at modellen skal få ferdig ordlyd for dagene.
+   *KI sin rolle:* rådet i chatten skrev instruksjonene og grensene. Claude Code bygget versjon 3, leste tekstene som besto, mot grunnlaget, fant de tre om interessen og stoppet før flettingen begge gangene. Gruppen avgjorde rettingen kl. 21:49 og forsøket kl. 23:23.
+
+3. **Ord i instruksjonene som ikke stemte med repoet.**
+   *Problem:* tre ganger stemte et ord ikke med repoet. Svarene kl. 11:39 og 15:21 og instruksjonen kl. 13:42 kalte kanten for dem som skilte seg ut, gul. I `stil.css` er den oransje, og gult betyr 3 av 3. 3.5d sa at den andre versjonen skulle stoppes «før uv og hentingen», og gjennomgangen (BH5) spurte om den heller skal stoppes rett før webserveren. Instruksjonen kl. 23:30 sa at bildet av «API token» kommer «i 3.4f», men 3.4f er datoen i fotnoten.
+   *Løsning:* linjene om kanten fikk begge fargene, sterk og lys oransje, etter svaret kl. 23:54 (`2025f2e`). «I 3.4f» ble tatt bort etter svaret kl. 23:52 (`61b9bb9`). BH5 står åpent.
+   *KI sin rolle:* rådet i chatten skrev instruksjonene, og ordet «gul» sto også i våre egne svar. Claude Code fant da tegningene ble lagt inn, at «gul» ikke stemte med koden, og førte det som åpent punkt. Blind Hunter i gjennomgangen til Claude Code fant BH5. Kl. 23:30 stoppet den på kanten og på 3.4f, i stedet for å velge selv. Gruppen avgjorde.
+
+4. **Ollama svarte ikke.**
+   *Problem:* instruksjonen kl. 20:00 krevde at Ollama svarte på 127.0.0.1:11434, og steg 0 stoppet kl. 20:01. Beskjedene kl. 20:03 og 20:04 sa at Ollama var startet, men steg 0 stoppet igjen.
+   *Løsning:* Ollama er ikke installert på Windows. Den kjører i Docker i dette repoet, og Docker Desktop kjørte ikke. Beskjeden kl. 20:06 sa at Docker Desktop kjørte nå, og `docker compose up -d ollama` startet bare Ollama-tjenesten. Da stemte steg 0. Fra instruksjonen kl. 21:51 skal Ollama-containeren stå oppe til slutt.
+   *KI sin rolle:* Claude Code stoppet tre ganger i steg 0 og fant kl. 20:04 at Ollama kjører i Docker. Gruppen startet Docker Desktop og ga beskjeden kl. 20:06.
+
+Det vi lærte: da prompten ba om navnet på sjekken, fikk modellen fortegnene riktig i §44, men ikke dagene. Derfor bør koden skrive tallene, og modellen bare ordene rundt dem. Hver tekst leses mot grunnlaget, ikke bare mot svaret fra kontrollen: i §43 slapp tre feil gjennom en kontroll som sa bestått. Ord som går igjen i instruksjonene, som «testene for dokumentene», defineres i repoet, ellers velger hver økt sin egen betydning. Og vår egen prøve av demoen og den ekte versjonen fant fjorten funn som testene ikke hadde funnet.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
