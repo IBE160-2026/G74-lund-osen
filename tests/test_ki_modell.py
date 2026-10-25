@@ -44,7 +44,10 @@ AVTRYKK = {
     # lag_prompt (_promptteksten). Var c777d549....
     # Gruppens svar 25.10 kl. 00:51: dagene og ordlyden er tatt ut, og avtrykket
     # dekker reglene, merket og lag_prompt. Var bc9abc8c....
-    "3": "7654300322c8ffb013107067a66ad15ab275e2d12131ffdea54146357ff62b70",
+    # Story 10.2f, gruppens svar 25.10 kl. 18:34 og 18:35: ny grunn i reglene,
+    # og versjonen staar som 3 (unntaket i docstringen i ki_prompt.py). Var
+    # 76543003....
+    "3": "0a9e650c2744c05c199abe28e44935f55fb07d14faa57b99fa3af162aabab576",
 }
 
 
@@ -194,6 +197,18 @@ class TestPrompten:
         assert not any(linje.startswith(("- dager", "- dager_merke")) for linje in REGLER.splitlines())
         assert "minst" not in (REGLER + UTENFOR).lower()
         assert "Ikke si hvor lenge signalet har vart, om det er nytt, eller om det er første gang." in REGLER
+
+    def test_grunnen_er_at_siden_sier_hvor_lenge_signalet_har_vart(self):
+        """Story 10.2f, gruppens svar 25.10 kl. 18:34 a): siden sier ikke
+        lenger «for første gang», saa grunnen er hvor lenge signalet har vart.
+        Ville feilet hvis den gamle grunnen, «Siden sier det under teksten.»,
+        kom tilbake, eller den nye ikke sto i regelen for modellen."""
+        linjer = [linje for linje in REGLER.splitlines() if linje.startswith("- Ikke si hvor lenge signalet har vart")]
+        assert linjer == [
+            "- Ikke si hvor lenge signalet har vart, om det er nytt, eller om det er første gang. "
+            "Siden sier under teksten hvor lenge signalet har vart."
+        ]
+        assert "Siden sier det under teksten" not in REGLER + UTENFOR
 
     def test_ingen_raad_og_ingen_gjetning(self):
         prompt = lag_prompt(BLANDET)
