@@ -39,12 +39,12 @@ import lagring_sqlite
 from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
 from boersdag import UtenforKalenderen, innevaerende_boersdag, norsk_dato
 from boersometer import bygg_boersometer, bygg_rute
+from dagene import setning_om_dagene, tell_dagene
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
 from graf import bygg_graf
 from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
 from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster
-from hovedindeks import Hovedindeksvisning, bygg_hovedindeks
-from indeksdata import HOVEDINDEKS
+from hovedindeks import Hovedindeksvisning, bygg_hovedindeks, valgt_indeks
 from ki_visning import AV, KAPSEL, PAA, UKJENT, KIVisning, bygg_ki_visning, ki_paa
 from kilogg import Emne, UgyldigKIRad
 from kursdata import Kursleser, investorside
@@ -465,19 +465,13 @@ def _hovedindeks(
         symboler = lager.symboler()
         if not symboler:
             return None, False
-        symbol = _valgt_indeks(symboler)
+        symbol = valgt_indeks(symboler)
         serier = [(post.aksje, kurslager.serie(post.aksje.symbol)) for post in poster]
         aksjer = [(aksje.navn, serie) for aksje, serie in serier]
         grunnlag = [(aksje, serie, aksje.symbol in tre_av_tre) for aksje, serie in serier]
         return bygg_hovedindeks(symbol, lager.serie(symbol), aksjer, grunnlag), False
     except (*BASEFEIL, ValueError):
         return None, True
-
-
-def _valgt_indeks(symboler: tuple[str, ...]) -> str:
-    """HOVEDINDEKS (OSEBX) naar basen har den, ellers den basen sist hentet,
-    som DEMIX i demobasen. Forsiden og kursgrafen viser samme indeks."""
-    return HOVEDINDEKS.symbol if HOVEDINDEKS.symbol in symboler else symboler[0]
 
 
 def _indeksen_for_grafen() -> tuple[str | None, dict | None, bool]:
@@ -493,7 +487,7 @@ def _indeksen_for_grafen() -> tuple[str | None, dict | None, bool]:
         symboler = lager.symboler()
         if not symboler:
             return None, None, False
-        symbol = _valgt_indeks(symboler)
+        symbol = valgt_indeks(symboler)
         return symbol, {rad.dato: float(rad.justert_slutt) for rad in lager.serie(symbol)}, False
     except (*BASEFEIL, ValueError):
         return None, None, True
@@ -830,6 +824,10 @@ def aksjedetalj(symbol: str):
     # vurdering aa forklare og bryteren er paa (FR-601, FR-602).
     ki_er_paa = ki_paa(request.cookies.get(KAPSEL))
     ki = _ki_visning(post, detalj) if ki_er_paa and detalj.sjekker else None
+    # Gruppens svar 25.10 kl. 00:51: setningen om dagene under KI-teksten,
+    # ogsaa naar KI er av eller teksten er stoppet. «I dag» bare naar dagen
+    # siden viser, er i dag (gjennomgangen, BH1, ECH6, VG1).
+    dagene = _setningen_om_dagene(post, detalj, annen_dag=detalj.dato != i_dag)
     # Story 8.16b: bryteren tar deg tilbake til den samme dagen.
     tilbake = f"/aksje/{post.aksje.symbol}"
     if valg.periode == VELG:
@@ -876,6 +874,7 @@ def aksjedetalj(symbol: str):
             hentet=post.hentet,
             ki=ki,
             ki_er_paa=ki_er_paa,
+            dagene=dagene,
             ki_til=AV if ki_er_paa else PAA,
             # Story 10.5: lenken til investorsiden for aksjen siden viser,
             # slaatt opp paa symbolet. Siden henter ingenting derfra (AD-2).
@@ -899,6 +898,24 @@ def _historikken(post, rader, dagen: date, i_dag: date) -> Maaned:
     lager = SqliteVurderingslager(g.tilkobling, naa, (post.aksje,))
     radene = lager.les_periode(post.aksje.symbol, *perioden(maaned))
     return bygg_maaned(maaned, [rad.dato for rad in rader], radene, i_dag, STANDARD.terskel, beskjed)
+
+
+def _setningen_om_dagene(post, detalj, annen_dag: bool) -> str | None:
+    """Gruppens svar 25.10 kl. 00:51: hvor lenge signalet har vaert slik, med
+    tellingen fra svaret 24.10 kl. 16:15 a), lest fra vurdering (AD-3, AD-10).
+    None uten en vurdering for dagen, eller naar basen ikke kan leses, ogsaa
+    en base fra foer siste migrasjon, som i _ki_visning (gjennomgangen, BH7,
+    ECH11)."""
+    if not detalj.vurdering:
+        return None
+    try:
+        lager = SqliteVurderingslager(g.tilkobling, naa, (post.aksje,))
+        tidligere = lager.les_periode(post.aksje.symbol, date.min, detalj.dato)
+    except (sqlite3.Error, ValueError, RuntimeError) as feil:
+        app.logger.warning("Dagene kunne ikke leses: %s: %s", type(feil).__name__, feil)
+        return None
+    dager, minst = tell_dagene(detalj.dato, detalj.vurdering, tidligere)
+    return setning_om_dagene(dager, minst, annen_dag=annen_dag)
 
 
 def _ki_visning(post, detalj) -> KIVisning:

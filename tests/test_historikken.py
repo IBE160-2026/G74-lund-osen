@@ -449,7 +449,9 @@ class TestLesingen:
             tilkobling.close()
 
     def test_siden_leser_en_gang_per_maaned(self, klient, base, monkeypatch):
-        """Ville feilet hvis siden leste historikken dag for dag."""
+        """Ville feilet hvis siden leste historikken dag for dag, eller gjorde
+        mer enn ett kall til. Gruppens svar 25.10 kl. 11:04 a): setningen om
+        dagene leser én gang, fra første dato til dagen siden viser."""
         kall = []
         ekte = SqliteVurderingslager.les_periode
 
@@ -460,7 +462,8 @@ class TestLesingen:
         monkeypatch.setattr(SqliteVurderingslager, "les_periode", tell)
         monkeypatch.setattr(SqliteVurderingslager, "les", lambda *a: pytest.fail("les per dag"))
         _side(klient, f"/aksje/{SYMBOL}")
-        assert kall == [(SYMBOL, date(2026, 10, 1), date(2026, 10, 31))]
+        maaneden = (SYMBOL, date(2026, 10, 1), date(2026, 10, 31))
+        assert sorted(kall) == [(SYMBOL, date.min, date(2026, 10, 9)), maaneden], kall
 
 
 class TestVurderKallesIkke:

@@ -28,6 +28,7 @@ from dataclasses import dataclass
 from datetime import date, timedelta
 
 from boersdag import UtenforKalenderen, er_boersdag
+from indeksdata import HOVEDINDEKS
 from kursdata import Aksje, Kursrad
 from markedsoversikt import endring_i_prosent
 from tallformat import avrundet
@@ -88,6 +89,13 @@ class Hovedindeksvisning:
         """Om minst én aksje har soeyle. Malen bruker den baade for soeylene
         og for teksten om dem bak «?» (gjennomgangen, BH13)."""
         return self.soeyler is not None and bool(self.soeyler.soeyler)
+
+
+def valgt_indeks(symboler: tuple[str, ...]) -> str:
+    """HOVEDINDEKS (OSEBX) naar basen har den, ellers den basen sist hentet,
+    som DEMIX i demobasen. Forsiden, kursgrafen og KI-grunnlaget (story
+    10.2e) bruker samme indeks."""
+    return HOVEDINDEKS.symbol if HOVEDINDEKS.symbol in symboler else symboler[0]
 
 
 def forrige_boersdag(dag: date) -> date | None:

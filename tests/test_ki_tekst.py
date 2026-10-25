@@ -92,6 +92,9 @@ class TestSteget:
         assert "15 besto kontrollen, 0 ble stoppet av kontrollen, og modellen feilet for 0." in ut
 
     def test_grunnlaget_og_regelen_er_vurderingens(self, stier):
+        """Story 10.2e: ville feilet hvis steget ikke ga grunnlaget dagen.
+        Alle 15 seriene og indeksen stiger siste dag (serie_med_utslag).
+        Gruppens svar 25.10 kl. 00:51: dagene er ikke med."""
         raa, base = stier
         kjoer(raa, base, FalskModell())
         vurdering = vurderingene(base, TIRSDAG)["EQNR"][0]
@@ -102,8 +105,71 @@ class TestSteget:
             "interesse": vurdering.interesse,
             "styrke": vurdering.styrke,
             "retning": vurdering.retning,
+            "hovedindeksen": "steg",
+            "aksjer_steg": 15,
+            "aksjer_falt": 0,
+            "bransjen": "steg",
         }
         assert rad.regelen == regeltekst(vurdering)
+
+    def test_dagene_sendes_ikke_ogsaa_med_kvelden_foer(self, stier):
+        """Gruppens svar 25.10 kl. 00:51: modellen faar ikke dagene. Tirsdag og
+        onsdag gir samme retning og styrke, saa dagene ville vaert 2, men grunnlaget
+        onsdag har dem ikke. Ville feilet hvis dagene kom med i grunnlaget.
+        Tellingen paa siden testes i test_ki_visning.py, og tell_dagene i
+        test_ki_grunnlag.py (gjennomgangen, VG8)."""
+        raa, base = stier
+        onsdag = date(2026, 9, 23)
+        kjoer(raa, base, FalskModell())
+        kjoer(raa, base, FalskModell(), hent=lambda *_: serie_med_utslag(onsdag), oeyeblikk=ONSDAG_KL_22)
+        tirsdag = vurderingene(base, TIRSDAG, ONSDAG_KL_22)["EQNR"][0]
+        vurdering = vurderingene(base, onsdag, ONSDAG_KL_22)["EQNR"][0]
+        assert (tirsdag.retning, tirsdag.styrke) == (vurdering.retning, vurdering.styrke)
+        grunnlag = radene(base, onsdag)["EQNR"].grunnlag
+        assert "dager" not in grunnlag and "dager_merke" not in grunnlag
+        assert grunnlag["aksjer_steg"] == 15
+
+    def test_hovedindeksen_er_osebx_ogsaa_med_en_annen_indeks(self, stier):
+        """Gjennomgangen av 10.2e (VG1): ville feilet hvis grunnlaget tok
+        indeksen basen sist hentet, i stedet for OSEBX som forsiden viser.
+        OBX hentes etter OSEBX og faller, mens OSEBX stiger."""
+        from indeksdata import HOVEDINDEKS, Indeks
+        from kursdata import Kursrad
+        from lagring_sqlite import SqliteIndekslager
+
+        raa, base = stier
+        kjoer(raa, base, None)
+        obx = Indeks("OBX", "OBX.OL", "OBX")
+        tilkobling = aapne_base(base)
+        try:
+            SqliteIndekslager(tilkobling, (HOVEDINDEKS, obx)).erstatt_serie(
+                "OBX",
+                [
+                    Kursrad(dato=date(2026, 9, 21), slutt=1500.0, justert_slutt=1500.0, volum=0),
+                    Kursrad(dato=TIRSDAG, slutt=1400.0, justert_slutt=1400.0, volum=0),
+                ],
+                ONSDAG_KL_22,
+            )
+            assert SqliteIndekslager(tilkobling).symboler()[0] == "OBX"
+        finally:
+            tilkobling.close()
+        lag_ki_tekster(base, TIRSDAG, lambda: OEYEBLIKK, FalskModell(), lambda _: None)
+        assert radene(base)["EQNR"].grunnlag["hovedindeksen"] == "steg"
+
+    def test_en_indeks_som_ikke_kan_leses_stopper_ikke_tekstene(self, stier, monkeypatch):
+        """Gjennomgangen av 10.2e (BH9, VG2): ville feilet hvis en feil ved
+        lesingen av indeksen stoppet KI-teksten for alle aksjene. Grunnlaget
+        faar da ikke hovedindeksen, som forsiden, der indeksen ikke vises."""
+        raa, base = stier
+
+        def feiler(self):
+            raise sqlite3.OperationalError("no such table: indeksserie")
+
+        monkeypatch.setattr(ki_tekst.SqliteIndekslager, "symboler", feiler)
+        kjoer(raa, base, FalskModell())
+        rader = radene(base)
+        assert all(r is not None and r.besto for r in rader.values())
+        assert all("hovedindeksen" not in r.grunnlag and "dager" not in r.grunnlag for r in rader.values())
 
     def test_ingen_kall_til_eodhd_fra_steget(self, stier, tmp_path):
         """Ville feilet hvis KI-steget gjorde et kall til EODHD (F5)."""

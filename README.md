@@ -12,8 +12,8 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 ![Oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/oversikten-demo.png)
 *Oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»).*
 
-![Aksjesiden for Kvitstein Mineral (KVST) i demoen, med kursgrafen og KI-teksten, med oppdiktede tall («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/aksjesiden-kvst-demo.png)
-*Aksjesiden for KVST i demoen, med grafen og KI-teksten, med oppdiktede tall («Eksempeltall»).*
+![Aksjesiden for Brattfjell Energi (BRFE) i demoen, med KI-teksten, setningen om hvor lenge signalet har vært slik, og kursgrafen, med oppdiktede tall («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/aksjesiden-brfe-demo.png)
+*Aksjesiden for BRFE i demoen, med KI-teksten, setningen om dagene under den, og grafen, med oppdiktede tall («Eksempeltall»).*
 
 </details>
 
@@ -349,7 +349,7 @@ Slå den på: sett for eksempel `OSE_KI_TJENESTE=gemini` i `.env`, og lim inn n�
 
 Det du bør vite før du slår den på:
 
-- **Grunnlaget sendes til tjenesten du har valgt.** Det er reglene for teksten og bare våre egne resultater for hver aksje, uten navnet: fortegnet for de tre sjekkene, styrken og retningen. Ingen kurser, volumer eller tekster fra EODHD sendes. Med den lokale modellen sendes ingenting ut.
+- **Grunnlaget sendes til tjenesten du har valgt.** Det er reglene for teksten og bare våre egne resultater for hver aksje, uten navnet: fortegnet for de tre sjekkene, styrken og retningen. Fra prompten versjon 3 kommer også hvor mange børsdager på rad signalet har vært slik, om hovedindeksen og bransjen til aksjen steg eller falt, og hvor mange aksjer i lista som steg og falt. Ingen kurser, volumer, prosenter eller tekster fra EODHD sendes. Med den lokale modellen sendes ingenting ut.
 - **Det kan koste hos dem.** Hver henting gir ett kall per aksje med vurdering, opptil 15. Prisen og grensene står hos tjenesten.
 - **Nøkkelen skal aldri deles.** Den står bare i `.env`, som aldri committes, og sendes bare til tjenesten den hører til, i en header. Appen skriver den aldri ut.
 - **Du må ikke ha sagt ja til at tjenesten trener på innholdet.** Vilkårene vi har lest, sier at det som sendes gjennom API-et, ikke brukes til trening uten samtykke. For Gemini gjelder det i EØS også gratisnøkkelen. Sitatene står i [`docs/kilder-og-rettigheter.md`](docs/kilder-og-rettigheter.md), «Betingelse 4 og KI-tjenestene (2026-10-04)».
@@ -491,7 +491,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [`docs/`](docs/) — arbeidsprosessen, og [`docs/hjelp.md`](docs/hjelp.md) med spørsmål og svar til «Kom i gang»
 - [`docs/bilder/readme/`](docs/bilder/readme/) — de tre skjermbildene i «Kom i gang»: [`engine-running.png`](docs/bilder/readme/engine-running.png), [`github-download-zip.png`](docs/bilder/readme/github-download-zip.png) og [`powershell-mappa.png`](docs/bilder/readme/powershell-mappa.png)
 - [`docs/bilder/investorsider/`](docs/bilder/investorsider/) — de 15 tegningene laget av KI til investorsidene i demoen, godkjent 24.10: SVG-ene, forhåndsvisningene, [`LESMEG.md`](docs/bilder/investorsider/LESMEG.md) og [`bobler.json`](docs/bilder/investorsider/bobler.json)
-- [`docs/appen/`](docs/appen/) — bilder og senere video av appen, bare av demoen: [`oversikten-demo.png`](docs/appen/oversikten-demo.png) og [`aksjesiden-kvst-demo.png`](docs/appen/aksjesiden-kvst-demo.png)
+- [`docs/appen/`](docs/appen/) — bilder og senere video av appen, bare av demoen: [`oversikten-demo.png`](docs/appen/oversikten-demo.png) og [`aksjesiden-brfe-demo.png`](docs/appen/aksjesiden-brfe-demo.png)
 - [`_bmad-output/`](_bmad-output/) — Product Brief, plan, krav og sprintstatus
 - [`.github/`](.github/) — testkjøringen og morgensjekken
 - [`Dockerfile`](Dockerfile), [`compose.yaml`](compose.yaml) og [`.dockerignore`](.dockerignore) — imaget og tjenestene: webserveren, hentingen og demoen

@@ -989,7 +989,9 @@ HOEYDE_PAA_BILDET = 1630
 # byte det samme.
 # Story 3.5d b: æ, ø og å i meldingene fra demo.py. Bildet ble tatt paa nytt
 # og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "8adc35a02d4c69c7529e6c9ed6145ed5b7d093aad94fb2229953885901adefb2"
+# Story 10.2e: valgt_indeks flyttet fra app.py til hovedindeks.py. Bildet ble
+# tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "bc4126a7538d4bd76f82fcf0bf4c6c8867e11e4923a76035366655098296644a"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1006,7 +1008,9 @@ SLIK_TAS_BILDET = (
 # Filene under bestemmer det bildet viser: malen og delmalene, skriftene,
 # demodataene med KI-tekstene, og modulene som lager tallene, grafen og
 # tekstene. Hele app.py er med, fordi ruta bygger siden der.
-AKSJESIDEBILDET = "docs/appen/aksjesiden-kvst-demo.png"
+# Story 10.2e, gruppens svar 24.10 kl. 23:23 (b): teksten for KVST ble stoppet
+# igjen, saa bildet viser BRFE, en demoaksje der KI-teksten besto. Var KVST.
+AKSJESIDEBILDET = "docs/appen/aksjesiden-brfe-demo.png"
 FILENE_BAK_AKSJESIDEN = (
     "src/app.py",
     "src/aksjedetalj.py",
@@ -1030,6 +1034,8 @@ FILENE_BAK_AKSJESIDEN = (
     "src/vurderingsdata.py",
     # Story 2.7b: historikken nederst paa aksjesiden.
     "src/historikk.py",
+    # Story 10.2e (svaret 25.10 kl. 00:51): setningen om dagene under KI-teksten.
+    "src/dagene.py",
     "src/templates/aksje.html",
     # Gjennomgangen (BH1, ECH1): lagringslaget som leser det siden viser, og
     # skjemaet demobasen lages med.
@@ -1045,7 +1051,14 @@ FILENE_BAK_AKSJESIDEN = (
 IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py", "src/boersometer.py"}
 # Bildet er saa hoeyt at grafen, som staar under KI-teksten, er med til bunnen.
 # Story 8.3: 1872 med knapperaden i stripa. Var 1816.
-HOEYDE_PAA_AKSJESIDEN = 1872
+# Story 10.2e, rettingen etter gruppens svar 24.10 kl. 21:49: teksten for KVST
+# ble stoppet av kontrollen, og feltet sier at den ikke ble vist. Grafen
+# slutter da ved 1827, maalt i Edge uten vindu. Var 1872.
+# Story 10.2e, gruppens svar 24.10 kl. 23:23: bildet viser BRFE med KI-teksten,
+# og grafen slutter ved 1872, maalt i Edge uten vindu. Var 1827.
+# Story 10.2e, gruppens svar 25.10 kl. 00:51: setningen om dagene under
+# KI-teksten, og en lengre tekst for BRFE. Grafen slutter ved 1934. Var 1872.
+HOEYDE_PAA_AKSJESIDEN = 1934
 # Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
 # Story 10.5: lenken til investorsiden står under grafen, ved 1980 px målt i
 # Edge uten vindu, så bildet, som slutter ved bunnen av grafen (1872 px), ble
@@ -1119,10 +1132,24 @@ HOEYDE_PAA_AKSJESIDEN = 1872
 # Bildet ble tatt paa nytt og er byte for byte det samme.
 # Story 3.5d b: æ, ø og å i meldingene fra demo.py. Bildet ble tatt paa nytt
 # og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "30801cffdfdafa6630c73acffd776d98e723ea14930c23433400d689b704c918"
+# Story 10.2e: KI-tekstene i demoen laget paa nytt med prompten versjon 3, og
+# valgt_indeks flyttet fra app.py til hovedindeks.py. Bildet ble tatt paa nytt
+# med samme hoeyde og viser den nye teksten for KVST.
+# Story 10.2e, rettingen etter gruppens svar 24.10 kl. 21:49: KI-tekstene laget
+# paa nytt med prompten versjon 3 rettet. Teksten for KVST ble stoppet, og
+# bildet ble tatt paa nytt med hoeyden 1827.
+# Story 10.2e, gruppens svar 24.10 kl. 23:23: KI-tekstene laget paa nytt med
+# ferdig ordlyd for dagene. KVST ble stoppet igjen, og bildet viser BRFE.
+# Story 10.2e, gruppens svar 25.10 kl. 00:51: modellen nevner ikke dagene, og
+# setningen om dagene staar under KI-teksten (src/dagene.py). Bildet viser
+# fortsatt BRFE, med hoeyden 1934.
+# Story 10.2e, gruppens svar 25.10 kl. 12:12 og 12:19: setningen uten «for
+# første gang», og «denne dagen» for en dag som ikke er i dag. Bildet viser
+# fortsatt BRFE, med hoeyden 1934.
+AVTRYKK_BAK_AKSJESIDEN = "67a9943b5d05e1dc8ce5055e3bc7231df47807711283c6f619bfedc8e4469479"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
-    f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/KVST: "
+    f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
     "demobasen i en midlertidig mappe (lagring_sqlite.BASE_STI dit), OSE_DEMO=1, "
     "waitress på en ledig port, og msedge --headless --disable-gpu --hide-scrollbars "
     f"--window-size=1280,{HOEYDE_PAA_AKSJESIDEN} med egen --user-data-dir. Bildet skal slutte "
@@ -1218,7 +1245,8 @@ class TestSkjermbildet:
 
 
 class TestAksjesidebildet:
-    """Story 3.3f, punkt b: bildet av aksjesiden for KVST i demoen."""
+    """Story 3.3f, punkt b: bildet av aksjesiden i demoen, for BRFE fra 25.10
+    (gruppens svar 24.10 kl. 23:23, b). Var KVST."""
 
     def test_fila_er_1280_px_bred_og_like_hoey_som_maalt(self):
         """Ville feilet med et bilde i en annen bredde, eller en annen høyde
@@ -2769,7 +2797,8 @@ LENKENE_FOER_3_3H = {
     "https://github.com/IBE160-2026/G74-lund-osen/actions/workflows/tester.yml/badge.svg": 1,
     "https://github.com/IBE160-2026/G74-lund-osen/actions/workflows/tester.yml": 1,
     "docs/appen/oversikten-demo.png": 2,
-    "docs/appen/aksjesiden-kvst-demo.png": 2,
+    # Story 10.2e (svaret 24.10 kl. 23:23, b): bildet viser BRFE. Var KVST.
+    "docs/appen/aksjesiden-brfe-demo.png": 2,
     "#kom-i-gang": 1,
     "#status": 1,
     "#tester": 3,
@@ -2848,11 +2877,13 @@ LENKENE_FOER_3_3H = {
 # d157a170....
 # Story 3.4 (godkjent 24.10 kl. 13:43): docs/bilder/investorsider/ i
 # «Mappestruktur» (regel 19). Var 0d1a51a6....
+# Story 10.2e (gruppens svar 24.10 kl. 23:23, b): bildet av aksjesiden i
+# «Mappestruktur» er BRFE (regel 19). Var 852cb13b....
 AVTRYKK_I_PILENE = {
     "Demoen": "f124a92b1c64eeb0ea5e7141976ff85de68df49004a22d5874a4a257aaf89b55",
     "Den ekte versjonen": "3bb398cd1be31a43abe09b7261456646b6dc03047e20f1aa57ab665a768cfd78",
     "Dokumentene": "409a3f8b38d4247df41e3eb5062ad439aa160e7fd1c0b49e0fd44f262eb2d77c",
-    "Mappestruktur": "852cb13b127041b82184ad280e382f1fd081578a0bb1c50de1c1594ab5df516f",
+    "Mappestruktur": "7ed8bbe88d9ae1bda3a589a025499a9b9ef4b3cfc3086422de947d63e9495255",
 }
 
 # Svaret 20.10 kl. 20:20: advarselen staar rett under pila til den ekte

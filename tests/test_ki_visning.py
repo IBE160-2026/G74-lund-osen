@@ -554,3 +554,199 @@ class TestStory816bDenValgteDagen:
         etter stien, for eksempel en annen side eller et linjeskift."""
         svar = klient.post("/ki", data={"til": "paa", "tilbake": tilbake})
         assert svar.headers["Location"] in ("/", "http://localhost/")
+
+
+ANNEN = Vurdering(
+    styrke=1,
+    retning="Positiv",
+    trend=1,
+    bevegelse=0,
+    interesse=0,
+    slutt=100.0,
+    justert_slutt=100.0,
+    trend_avvik=0.031,
+    dagens_endring=0.001,
+    standardavvik=0.011,
+    volumforhold=1.0,
+)
+
+
+class TestSetningenOmDagene:
+    """Gruppens svar 25.10 kl. 00:51: appen skriver dagene i en setning rett
+    under KI-teksten, ogsaa naar KI er av eller teksten er stoppet, med
+    tellingen fra svaret 24.10 kl. 16:15 a) og ordlyden fra svarene kl. 12:12
+    og 12:19. Klokka staar paa 31.10, siste dag i serien, saa dagen siden
+    viser er i dag."""
+
+    @pytest.fixture(autouse=True)
+    def klokka_paa_siste_dag(self, monkeypatch):
+        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 31, 12, 0).astimezone())
+
+    @pytest.mark.parametrize(
+        "dager, minst, annen, setning",
+        [
+            # I dag (svaret kl. 12:12 a).
+            (1, False, False, "Signalet ble slik i dag."),
+            (4, False, False, "Signalet har vært slik i 4 børsdager på rad."),
+            (12, True, False, "Signalet har vært slik i minst 12 børsdager."),
+            (1, True, False, "Signalet har vært slik i minst 1 børsdag."),
+            (1234, False, False, "Signalet har vært slik i 1 234 børsdager på rad."),
+            # Gjennomgangen, VG5: regel 21 ogsaa i «minst».
+            (1234, True, False, "Signalet har vært slik i minst 1 234 børsdager."),
+            # En dag som ikke er i dag (svarene kl. 12:12 a) og c) og 12:19 d).
+            (1, False, True, "Signalet ble slik denne dagen."),
+            (4, False, True, "Denne dagen hadde signalet vært slik i 4 børsdager på rad."),
+            (12, True, True, "Denne dagen hadde signalet vært slik i minst 12 børsdager."),
+            (1, True, True, "Denne dagen hadde signalet vært slik i minst 1 børsdag."),
+            (1234, False, True, "Denne dagen hadde signalet vært slik i 1 234 børsdager på rad."),
+            (1234, True, True, "Denne dagen hadde signalet vært slik i minst 1 234 børsdager."),
+        ],
+    )
+    def test_setningen(self, dager, minst, annen, setning):
+        """Ville feilet hvis setningen ikke fulgte gruppens ordlyd for 1 dag,
+        flere dager og minst, ogsaa entall, i dag og en annen dag, eller
+        tallet ikke fulgte regel 21."""
+        from dagene import setning_om_dagene
+
+        assert setning_om_dagene(dager, minst, annen_dag=annen) == setning
+
+    @pytest.mark.parametrize("annen", [False, True])
+    @pytest.mark.parametrize("minst", [False, True])
+    @pytest.mark.parametrize("dager", [1, 2, 4, 12, 1234])
+    def test_aldri_for_foerste_gang_og_aldri_har_vaert_en_annen_dag(self, dager, minst, annen):
+        """Svaret kl. 12:12 a): tellingen gjelder dagene paa rad, saa ingen
+        setning sier «for første gang». Svarene kl. 12:12 c) og 12:19 d): en
+        dag som ikke er i dag, faar «denne dagen» og aldri «Signalet har
+        vært». Ville feilet hvis en av setningene sa noe av det."""
+        from dagene import setning_om_dagene
+
+        setning = setning_om_dagene(dager, minst, annen_dag=annen)
+        assert "første gang" not in setning
+        if annen:
+            assert "Signalet har vært" not in setning and "denne dagen" in setning.lower()
+        else:
+            assert "denne dagen" not in setning.lower() and "hadde" not in setning
+
+    @pytest.mark.parametrize("dager", [0, True, 2.0])
+    def test_ugyldige_dager_avvises(self, dager):
+        """Ville feilet hvis 0, en bool eller et flyttall ga en setning
+        (gjennomgangen, VG13)."""
+        from dagene import setning_om_dagene
+
+        with pytest.raises(ValueError):
+            setning_om_dagene(dager, False)
+
+    def test_flere_dager_paa_siden_rett_under_ki_teksten(self, klient, aksje):
+        """Fire boersdager med samme retning og styrke, og en annen foer.
+        Ville feilet hvis setningen manglet, sto et annet sted enn rett
+        under KI-teksten, eller tellingen ikke leste basen."""
+        for dato in (date(2026, 10, 28), date(2026, 10, 29), date(2026, 10, 30)):
+            skriv_vurdering("EQNR", dato, VURDERING)
+        skriv_vurdering("EQNR", date(2026, 10, 27), ANNEN)
+        skriv_kirad(kirad(aksje))
+        html = side(klient)
+        setning = '<p class="dagene">Signalet har vært slik i 4 børsdager på rad.</p>'
+        assert setning in html
+        assert html.index("Med KI-ens ord") < html.index(TEKST) < html.index(setning) < html.index("ki-bryter")
+
+    def test_en_dag_paa_siden(self, klient, aksje):
+        """Ville feilet hvis en annen vurdering dagen foer ikke ga «Signalet
+        ble slik i dag.» (svaret kl. 12:12 a)."""
+        skriv_vurdering("EQNR", date(2026, 10, 30), ANNEN)
+        assert '<p class="dagene">Signalet ble slik i dag.</p>' in side(klient)
+
+    def test_minst_paa_siden(self, klient, aksje):
+        """Uten rad for boersdagen foer er antallet det minste det kan vaere.
+        Ville feilet hvis siden sa et eksakt antall."""
+        assert '<p class="dagene">Signalet har vært slik i minst 1 børsdag.</p>' in side(klient)
+
+    @pytest.mark.parametrize(
+        "kapsel, endret",
+        [
+            ("av", {}),
+            (None, dict(besto=False, grunn="1: dagene «i dag for første gang», modellen nevner ikke dagene")),
+            (None, dict(tekst=None, besto=False, grunn="modellen feilet")),
+            (None, None),
+        ],
+    )
+    def test_ogsaa_uten_ki_tekst(self, klient, aksje, kapsel, endret):
+        """KI av, teksten stoppet, modellen feilet, og ingen rad. Ville feilet
+        hvis setningen bare sto naar KI-teksten ble vist."""
+        skriv_vurdering("EQNR", date(2026, 10, 30), ANNEN)
+        if endret is not None:
+            skriv_kirad(kirad(aksje, **endret))
+        html = side(klient, kapsel)
+        assert TEKST not in html
+        assert '<p class="dagene">Signalet ble slik i dag.</p>' in html
+
+    def test_ingen_setning_uten_vurdering(self, klient):
+        """En dag med en grunn har ikke noe signal. Ville feilet hvis siden
+        likevel skrev dagene."""
+        rader = serie([100.0] * 61)
+        skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET), vurdert=False)
+        skriv_vurdering("EQNR", rader[-1].dato, Grunn.KURS_IKKE_FRA_DAGEN)
+        assert 'class="dagene"' not in side(klient)
+
+    def test_en_valgt_dag(self, klient, aksje):
+        """«Velg dag» 30.10, med en annen vurdering 29.10. Ville feilet hvis
+        siden sa «i dag» om en tidligere dag."""
+        skriv_vurdering("EQNR", date(2026, 10, 30), VURDERING)
+        skriv_vurdering("EQNR", date(2026, 10, 29), ANNEN)
+        html = klient.get("/aksje/EQNR?dag=2026-10-30").get_data(as_text=True)
+        assert '<p class="dagene">Signalet ble slik denne dagen.</p>' in html
+
+    def test_en_valgt_dag_med_flere_dager(self, klient, aksje):
+        """Svaret kl. 12:19 d): «Velg dag» 30.10 med tre dager paa rad. Ville
+        feilet hvis siden sa «Signalet har vært» om en tidligere dag."""
+        for dato in (date(2026, 10, 28), date(2026, 10, 29), date(2026, 10, 30)):
+            skriv_vurdering("EQNR", dato, VURDERING)
+        skriv_vurdering("EQNR", date(2026, 10, 27), ANNEN)
+        html = klient.get("/aksje/EQNR?dag=2026-10-30").get_data(as_text=True)
+        assert '<p class="dagene">Denne dagen hadde signalet vært slik i 3 børsdager på rad.</p>' in html
+
+    def test_siste_dag_som_ikke_er_i_dag(self, klient, aksje, monkeypatch):
+        """Gjennomgangen, BH1, ECH6, VG1: i helga og foer kveldshentingen er
+        siste boersdag ikke i dag. Ville feilet hvis siden sa «i dag» om den."""
+        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 11, 2, 12, 0).astimezone())
+        skriv_vurdering("EQNR", date(2026, 10, 30), ANNEN)
+        assert '<p class="dagene">Signalet ble slik denne dagen.</p>' in side(klient)
+
+    def test_minst_paa_siste_dag_som_ikke_er_i_dag(self, klient, aksje, monkeypatch):
+        """Svarene kl. 12:12 c) og 12:19 d): ogsaa uten «Velg dag». aksje
+        skriver bare vurderingen for siste dag (31.10), saa boersdagen foer
+        mangler og gir «minst». Ville feilet hvis siden sa «Signalet har vært
+        slik i minst» om siste boersdag foer kveldshentingen (gjennomgangen
+        kl. 13, BH6)."""
+        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 11, 2, 12, 0).astimezone())
+        assert '<p class="dagene">Denne dagen hadde signalet vært slik i minst 1 børsdag.</p>' in side(klient)
+
+    @pytest.mark.parametrize(
+        "naa, setning",
+        [
+            (datetime(2026, 10, 31, 12, 0), "Signalet ble slik i dag."),
+            (datetime(2026, 12, 31, 12, 0), "Signalet ble slik denne dagen."),
+        ],
+    )
+    def test_velg_dag_paa_siste_dag(self, klient, aksje, monkeypatch, naa, setning):
+        """Gjennomgangen, VG2, BH16: «Velg dag» paa siste dag i serien. Ville
+        feilet hvis «i dag» fulgte valget av dag, og ikke datoen."""
+        monkeypatch.setattr(app_modul, "naa", lambda: naa.astimezone())
+        skriv_vurdering("EQNR", date(2026, 10, 30), ANNEN)
+        html = klient.get("/aksje/EQNR?dag=2026-10-31").get_data(as_text=True)
+        assert f'<p class="dagene">{setning}</p>' in html
+
+    @pytest.mark.parametrize("feil", [sqlite3.OperationalError("database is locked"), RuntimeError("versjonen")])
+    def test_uten_setning_naar_dagene_ikke_kan_leses(self, klient, aksje, monkeypatch, feil):
+        """Gjennomgangen, VG4, BH7, ECH11: ville feilet hvis siden feilet,
+        eller skrev en setning, naar lesingen av dagene feilet."""
+        ekte = lagring_sqlite.SqliteVurderingslager.les_periode
+
+        def les(self, symbol, fra, til):
+            if fra == date.min:
+                raise feil
+            return ekte(self, symbol, fra, til)
+
+        monkeypatch.setattr(lagring_sqlite.SqliteVurderingslager, "les_periode", les)
+        skriv_kirad(kirad(aksje))
+        html = side(klient)
+        assert 'class="dagene"' not in html and TEKST in html

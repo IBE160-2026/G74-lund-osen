@@ -5,6 +5,7 @@ i conftest.py stopper en som proever (story 4.0).
 """
 
 import hashlib
+import inspect
 import json
 import re
 from datetime import date
@@ -34,7 +35,24 @@ GOD_TEKST = (
 AVTRYKK = {
     "1": "8fa4608965a356110f97963f65ba85bb44c79e913d47b5b911dc06b51af7be72",
     "2": "4c697052292bf7069ed7ba0cb7600a8c67574c969fd4fcd184f4b854876df660",
+    # Story 10.2e. Teksten til versjon 2 staar i src/ki_prompt.py paa 153aba8.
+    # Versjon 3 ble rettet foer den ble flettet (gruppens svar 24.10 kl. 21:49),
+    # og avtrykket ble satt paa nytt. Den foerste teksten staar paa c848ea6.
+    # Gruppens svar 24.10 kl. 23:23: ferdig ordlyd for dagene, og avtrykket er
+    # satt paa nytt med ORDLYDEN. Teksten fra kl. 21:49 staar paa 3252ecd.
+    # Gjennomgangen 25.10 (VG2): avtrykket dekker ogsaa ordlyd_for_dagene og
+    # lag_prompt (_promptteksten). Var c777d549....
+    # Gruppens svar 25.10 kl. 00:51: dagene og ordlyden er tatt ut, og avtrykket
+    # dekker reglene, merket og lag_prompt. Var bc9abc8c....
+    "3": "7654300322c8ffb013107067a66ad15ab275e2d12131ffdea54146357ff62b70",
 }
+
+
+def _promptteksten() -> str:
+    """Det avtrykket for versjon 3 dekker: reglene, merket og koden i
+    lag_prompt (inspect leser kildeteksten med LF). Svaret 25.10 kl. 00:51:
+    ordlyden for dagene er tatt ut av prompten, og dermed av avtrykket."""
+    return REGLER + UTENFOR + inspect.getsource(lag_prompt)
 
 
 class FalskModell:
@@ -109,6 +127,74 @@ class TestPrompten:
         assert {"1", "2"} <= AVTRYKK.keys()
         assert AVTRYKK["1"] == "8fa4608965a356110f97963f65ba85bb44c79e913d47b5b911dc06b51af7be72"
 
+    def test_avtrykket_for_versjon_2_staar(self):
+        """Story 10.2e: radene fra uka med logget drift (19.-23.10) har
+        versjon 2. Ville feilet hvis avtrykket ble ryddet bort eller endret."""
+        assert AVTRYKK["2"] == "4c697052292bf7069ed7ba0cb7600a8c67574c969fd4fcd184f4b854876df660"
+
+    def test_versjon_3(self):
+        """Story 10.2e, gruppens svar 24.10 kl. 15:50."""
+        assert PROMPTVERSJON == "3"
+
+    def test_reglene_forklarer_hvert_felt_i_grunnlaget(self):
+        """Story 10.2e: ville feilet hvis grunnlaget hadde et felt reglene
+        ikke forklarer med ord, slik at modellen maatte gjette hva det er."""
+        from ki_grunnlag import Dagsbilde, ki_grunnlag
+        from vurderingsdata import Vurdering
+
+        vurdering = Vurdering(
+            styrke=2,
+            retning="Blandet",
+            trend=1,
+            bevegelse=0,
+            interesse=-1,
+            slutt=101.37,
+            justert_slutt=101.37,
+            trend_avvik=0.0123,
+            dagens_endring=-0.0217,
+            standardavvik=0.0071,
+            volumforhold=1.73,
+        )
+        dagen = Dagsbilde(
+            dager=3, dager_minst=True, hovedindeksen="falt", aksjer_steg=4, aksjer_falt=11, bransjen="steg"
+        )
+        grunnlag = ki_grunnlag(vurdering, utenfor_maalingen=True, dagen=dagen)
+        forklaringen = REGLER.split("Regler for teksten:")[0]
+        for felt in grunnlag:
+            if felt != "merke":
+                # «Styrken er …»: uten aa skille store og smaa bokstaver.
+                assert felt in forklaringen.lower(), felt
+        # Gruppens svar 25.10 kl. 00:51: dagene er ikke i grunnlaget.
+        assert "dager" not in grunnlag and "dager_merke" not in grunnlag
+        assert UTENFOR in lag_prompt(grunnlag)
+
+    def test_teksten_kan_vise_til_tallene_paa_siden(self):
+        """Story 10.2e, svaret 21.10 kl. 23:51: teksten kan vise til tallene
+        paa siden uten aa gjenta dem. Ville feilet hvis regelen ble tatt ut,
+        eller kom utenfor reglene for teksten."""
+        blokk = REGLER.split("Regler for teksten:", 1)[1].split("\n\n", 1)[0]
+        assert any("vise til" in linje and "ikke gjenta tallene" in linje for linje in blokk.splitlines())
+        assert any("antallene i opplysningene" in linje for linje in blokk.splitlines())
+
+    def test_en_sjekk_med_navnet_og_ingen_sjekk_bare_ved_styrke_0(self):
+        """Gruppens svar 24.10 kl. 21:49 (malinger.md §43): ville feilet hvis
+        reglene ikke ba om navnet paa sjekken, eller lot «ingen sjekk» staa om
+        én sjekk, eller ikke ba om aa beskrive hver sjekk slik fortegnet er."""
+        blokk = REGLER.split("Regler for teksten:", 1)[1].split("\n\n", 1)[0].splitlines()
+        assert any("én sjekk" in linje and "«interessen ga ikke utslag»" in linje for linje in blokk)
+        assert any("«ingen sjekk» bare når styrken er 0" in linje for linje in blokk)
+        assert any("Beskriv hver sjekk slik fortegnet står" in linje for linje in blokk)
+        assert "for eksempel at ingen sjekk ga utslag" not in REGLER
+
+    def test_dagene_er_ikke_i_reglene(self):
+        """Gruppens svar 25.10 kl. 00:51 (malinger.md §46): modellen faar ikke
+        dagene. Erstatter testene fra 21:49 og 23:23 om «minst» og ordlyden.
+        Ville feilet hvis reglene forklarte dagene, hadde «minst», eller ikke
+        sa at teksten ikke nevner hvor lenge signalet har vart."""
+        assert not any(linje.startswith(("- dager", "- dager_merke")) for linje in REGLER.splitlines())
+        assert "minst" not in (REGLER + UTENFOR).lower()
+        assert "Ikke si hvor lenge signalet har vart, om det er nytt, eller om det er første gang." in REGLER
+
     def test_ingen_raad_og_ingen_gjetning(self):
         prompt = lag_prompt(BLANDET)
         assert "Ikke gi råd" in prompt and "Ikke gjett" in prompt
@@ -118,8 +204,11 @@ class TestPrompten:
         assert UTENFOR not in lag_prompt(BLANDET)
 
     def test_versjonen_foelger_teksten(self):
-        """Gjennomgangen (BH13): en endret prompt maa faa ny versjon (FR-605)."""
-        avtrykk = hashlib.sha256((REGLER + UTENFOR).encode("utf-8")).hexdigest()
+        """Gjennomgangen (BH13): en endret prompt maa faa ny versjon (FR-605).
+        Gruppens svar 24.10 kl. 23:23: ordlyden for dagene er med, og
+        gjennomgangen 25.10 (VG2, BH7): ogsaa koden som velger ordlyden og
+        setter prompten sammen, saa en endret logikk ogsaa gir ny versjon."""
+        avtrykk = hashlib.sha256(_promptteksten().encode("utf-8")).hexdigest()
         assert AVTRYKK.get(PROMPTVERSJON) == avtrykk, (
             "Promptteksten er endret. Sett ny PROMPTVERSJON og legg avtrykket i AVTRYKK."
         )
@@ -500,8 +589,10 @@ class TestRaden:
 
 
 # Story 10.2d: de 13 tekstene Gemma skrev til demoen (3.4b), og en feil
-# retning for hver retning.
-DEMOTEKSTENE = Path(__file__).resolve().parents[1] / "src" / "demo_ki_tekster.json"
+# retning for hver retning. Story 10.2e: tekstene i demoen er laget paa nytt
+# med versjon 3, og de 13 med versjon 2 ligger ved testene, uendret fra
+# src/demo_ki_tekster.json paa 153aba8, saa testene fra 10.2d staar.
+DEMOTEKSTENE = Path(__file__).resolve().parent / "demo_ki_tekster_versjon_2.json"
 FEIL_RETNING = {"Positiv": "Negativ", "Negativ": "Positiv", "Blandet": "Positiv", "Ingen": "Positiv"}
 
 
@@ -631,7 +722,10 @@ class TestFormeneGemmaSkriver:
             "Trendens retning er positiv.",
             "Trenden ga et positivt utslag.",
             "Trenden ga et positivt signal.",
-            "Interessen ga et negativt signal, og bevegelsen ga et positivt utslag.",
+            # Gruppens svar 24.10 kl. 21:49: «bevegelsen ga et positivt utslag»
+            # er et utsagn om én sjekk og stoppes naa, fordi bevegelsen er 0.
+            # Formen staar med trenden, som er 1.
+            "Interessen ga et negativt signal, og trenden ga et positivt utslag.",
             "Trendsignalet er positivt.",
             "Signalet er ingen garanti.",
             # Gjennomgangen: «det er et positivt signal» om en sjekk (BH1,
@@ -644,7 +738,10 @@ class TestFormeneGemmaSkriver:
             "Trendens retning på signalet er positiv.",
             "Trend-signalet er negativt.",
             "Signalet er positivt for trenden, men negativt for interessen.",
-            "Signalet er positivt på trend, men negativt på bevegelse.",
+            # Gjennomgangen av rettingen (VG2): «negativt på bevegelse» er et
+            # feil utsagn om én sjekk naar bevegelsen er 0, og stoppes i
+            # TestEnSjekk. Formen staar med interessen, som er -1.
+            "Signalet er positivt på trend, men negativt på interesse.",
         ],
     )
     def test_formene_om_en_sjekk_stoppes_ikke(self, tekst):
@@ -668,3 +765,604 @@ class TestFormeneGemmaSkriver:
         """Gjennomgangen (ECH4, VG6): ville feilet hvis «Retningen på signalet
         er positiv» ga samme grunn to ganger."""
         assert len(kontroller("Retningen på signalet er positiv.", BLANDET).grunner) == 1
+
+
+# Story 10.2e: grunnlaget med dagen, som ki_grunnlag gir det for versjon 3.
+DAGEN = {
+    **BLANDET,
+    "dager": 4,
+    "dager_merke": "minst",
+    "hovedindeksen": "falt",
+    "aksjer_steg": 9,
+    "aksjer_falt": 5,
+    "bransjen": "steg",
+}
+
+
+class TestKontrollenVersjon3:
+    """Story 10.2e, punkt c: tallene i grunnlaget, og retningen paa
+    hovedindeksen og bransjen."""
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            # «i minst 4 børsdager» stoppes fra svaret 25.10 kl. 00:51
+            # (TestDageneStoppes).
+            "Ni aksjer i lista steg, og fem falt.",
+            "9 av aksjene steg.",
+            "Hovedindeksen falt i dag, mens bransjen steg i snitt.",
+            "I dag falt hovedindeksen.",
+            "Hovedindeksen på Oslo Børs falt.",
+            "Aksjene i samme bransje steg i snitt.",
+            "Bransjen falt ikke.",
+            "Se endringen i tabellen.",
+            "Aksjen på Oslo Børs steg.",
+            "Hovedindeksen er ikke en del av regelen.",
+        ],
+    )
+    def test_det_grunnlaget_sier_bestaar(self, tekst):
+        """Ville feilet hvis kontrollen stoppet et antall fra grunnlaget, eller
+        en riktig retning paa hovedindeksen eller bransjen."""
+        svar = kontroller(tekst, DAGEN)
+        assert svar.besto, svar.grunner
+
+    @pytest.mark.parametrize(
+        "tekst", ["Signalet har vært slik i 7 børsdager.", "Elleve aksjer.", "Det gjelder 6 aksjer."]
+    )
+    def test_et_tall_som_ikke_staar_i_grunnlaget(self, tekst):
+        """Ville feilet hvis kontrollen slapp et tall som ikke er et av
+        antallene i grunnlaget eller regelens faste tall."""
+        svar = kontroller(tekst, DAGEN)
+        assert not svar.besto and any(g.startswith("2:") for g in svar.grunner), svar.grunner
+
+    def test_tallene_fra_dagen_er_ikke_lov_uten_dagen(self):
+        """Ville feilet hvis antallene var lov ogsaa naar grunnlaget ikke har
+        dem: 9 er ikke et tall i grunnlaget fra versjon 2."""
+        assert kontroller("Ni aksjer.", DAGEN).besto
+        assert not kontroller("Ni aksjer.", BLANDET).besto
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            "Hovedindeksen steg i dag.",
+            "I dag steg hovedindeksen.",
+            "Hovedindeksen på Oslo Børs gikk opp.",
+            "Oslo Børs steg.",
+            "Hovedindeksen var uendret.",
+            "Hovedindeksen falt ikke.",
+            "OSEBX steg.",
+        ],
+    )
+    def test_feil_retning_paa_hovedindeksen(self, tekst):
+        """Grunnlaget sier at hovedindeksen falt. Ville feilet hvis en tekst
+        som sier noe annet, besto."""
+        svar = kontroller(tekst, DAGEN)
+        assert not svar.besto and any(g.startswith("1: hovedindeksen") for g in svar.grunner), svar.grunner
+
+    @pytest.mark.parametrize(
+        "tekst",
+        ["Bransjen falt i snitt.", "Aksjene i samme bransje falt.", "Sektoren var uendret.", "Bransjen steg ikke."],
+    )
+    def test_feil_retning_paa_bransjen(self, tekst):
+        svar = kontroller(tekst, DAGEN)
+        assert not svar.besto and any(g.startswith("1: bransjen") for g in svar.grunner), svar.grunner
+
+    def test_hovedindeksen_naar_feltet_mangler(self):
+        """Ville feilet hvis teksten kunne si noe om hovedindeksen eller
+        bransjen naar grunnlaget ikke har feltet."""
+        uten = {k: v for k, v in DAGEN.items() if k not in ("hovedindeksen", "bransjen")}
+        for tekst in ("Hovedindeksen falt.", "Bransjen steg."):
+            assert not kontroller(tekst, uten).besto, tekst
+
+    @pytest.mark.parametrize("tekst", ["Fem aksjer steg.", "9 aksjer falt.", "Ni av aksjene i lista falt."])
+    def test_antallene_byttet(self, tekst):
+        """Ville feilet hvis et antall fra grunnlaget kunne staa om det andre
+        antallet, som bare punkt 2 ikke fanger."""
+        svar = kontroller(tekst, DAGEN)
+        assert not svar.besto and any(g.startswith("1: antallet") for g in svar.grunner), svar.grunner
+
+    @pytest.mark.parametrize(
+        "tekst, grunn",
+        [
+            ("Hovedindeksen har steget.", "1: hovedindeksen"),
+            ("Børsen har gått opp i dag.", "1: hovedindeksen"),
+            ("Bransjen har sunket.", "1: bransjen"),
+            ("Alle aksjene i lista steg.", "1: antallet"),
+            ("Begge aksjene falt.", "1: antallet"),
+        ],
+    )
+    def test_formene_fra_gjennomgangen_stoppes(self, tekst, grunn):
+        """Gjennomgangen av 10.2e (BH3, BH4, ECH1, ECH3): ville feilet hvis
+        perfektum slapp gjennom med feil retning, eller «alle» og «begge» ble
+        lest som styrkens 3 og 2. Grunnlaget har ikke antallet i lista, saa
+        «alle aksjene» kan ikke sjekkes og stoppes."""
+        svar = kontroller(tekst, DAGEN)
+        assert not svar.besto and any(g.startswith(grunn) for g in svar.grunner), svar.grunner
+
+    @pytest.mark.parametrize("tekst", ["Aksjen på børsen steg.", "Hovedindeksen har sunket.", "Bransjen har økt."])
+    def test_formene_fra_gjennomgangen_bestaar(self, tekst):
+        """Gjennomgangen av 10.2e (BH5, VG3): «Aksjen på børsen steg» gjelder
+        aksjen, ikke hovedindeksen."""
+        svar = kontroller(tekst, DAGEN)
+        assert svar.besto, svar.grunner
+
+    def test_dagene_byttet_med_styrken(self):
+        """Grunnlaget sier styrke 2 og 4 dager. Ville feilet hvis «to børsdager
+        på rad» besto."""
+        svar = kontroller("Signalet har vært slik i to børsdager på rad.", DAGEN)
+        assert not svar.besto and any(g.startswith("1: dagene") for g in svar.grunner), svar.grunner
+
+
+# Gruppens svar 24.10 kl. 21:49 (malinger.md §43): grunnlaget for MOWI, ORK og
+# SALM 23.10, der bare trenden ga utslag, og for EQNR og AKRBP, der trenden og
+# bevegelsen ga det. Antallene er vaare egne (regel 16).
+BARE_TRENDEN = {
+    **EN_POSITIV,
+    "dager": 2,
+    "hovedindeksen": "steg",
+    "aksjer_steg": 8,
+    "aksjer_falt": 7,
+    "bransjen": "steg",
+}
+TREND_OG_BEVEGELSE = {**BARE_TRENDEN, "bevegelse": 1, "styrke": 2, "dager": 1}
+
+
+class TestEnSjekk:
+    """Gruppens svar 24.10 kl. 21:49, punkt b: et utsagn om én sjekk, med
+    navnet og utslaget, skal stemme med fortegnet i grunnlaget."""
+
+    @pytest.mark.parametrize(
+        "tekst, dager",
+        [
+            # De tre tekstene i §43 som sa feil om interessen (MOWI, ORK, SALM).
+            (
+                "Dette signalet er Positivt med styrke én, fordi trenden ga et positivt utslag og interessen ga et "
+                "positivt utslag. Signalet har hatt samme retning og styrke i to børsdager.",
+                2,
+            ),
+            (
+                "Dette signalet er Positivt med styrke én, fordi trenden ga et positivt utslag og interessen ga et "
+                "positivt utslag. Signalet har hatt samme retning og styrke i to børsdager på rad.",
+                2,
+            ),
+            (
+                "Dette signalet er Positivt med styrke én, fordi trenden ga et positivt utslag og interessen ga et "
+                "positivt utslag. Signalet har hatt samme retning og styrke i tre børsdager.",
+                3,
+            ),
+        ],
+    )
+    def test_de_tre_tekstene_i_43_som_sa_feil_om_interessen(self, tekst, dager):
+        """Ville feilet hvis kontrollen slapp en tekst som sier at interessen
+        ga utslag der grunnlaget sier 0, slik de tre gjorde i §43. Stoppet av
+        sjekken av interessen, og etter svaret 24.10 kl. 23:23 ogsaa av dagene
+        med egne ord, og ingenting annet."""
+        svar = kontroller(tekst, {**BARE_TRENDEN, "dager": dager})
+        assert not svar.besto and any(g.startswith("1: sjekken interesse") for g in svar.grunner), svar.grunner
+        assert all(g.startswith(("1: sjekken interesse", "1: dagene")) for g in svar.grunner), svar.grunner
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            "Interessen ga et utslag.",
+            "Bevegelsen ga et negativt utslag.",
+            "Trenden ga et negativt utslag.",
+            "Trenden ga ikke noe utslag.",
+            "Trenden og interessen ga positive utslag.",
+            "Trend, bevegelse og interesse ga et positivt utslag.",
+            "Interessen slo ut.",
+            "Trenden slo ikke ut.",
+            "Interessen er positiv.",
+            "Trenden ga ikke et positivt utslag.",
+            "Ingen sjekk ga utslag på trenden.",
+            "Det var et positivt utslag på interessen.",
+            "Trendsjekken ga et negativt utslag.",
+        ],
+    )
+    def test_feil_om_en_sjekk_stoppes(self, tekst):
+        """Grunnlaget sier at bare trenden ga et positivt utslag. Ville feilet
+        hvis en av formene sa noe annet om én sjekk og slapp gjennom."""
+        svar = kontroller(tekst, EN_POSITIV)
+        assert not svar.besto and any(g.startswith("1: sjekken") for g in svar.grunner), svar.grunner
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            "Trenden ga et positivt utslag.",
+            "Trenden ga utslag, mens bevegelse og interesse ikke ga noe utslag.",
+            "Interessen ga ikke utslag.",
+            "Interessen ga ikke et positivt utslag.",
+            "Bevegelsen og interessen slo ikke ut.",
+            "Trenden er positiv.",
+            "Det var ikke noe utslag på interessen.",
+            "Ingen sjekk ga utslag på interesse.",
+        ],
+    )
+    def test_riktig_om_en_sjekk_bestaar(self, tekst):
+        """Ville feilet hvis kontrollen stoppet et riktig utsagn om én sjekk."""
+        svar = kontroller(tekst, EN_POSITIV)
+        assert svar.besto, svar.grunner
+
+    def test_ingen_sjekk_ga_utslag_paa_en_sjekk_er_ikke_styrken(self):
+        """Teksten for EQNR og AKRBP i §43 ble stoppet fordi «Ingen sjekk ga»
+        ble lest som styrke 0. Ville feilet hvis «ingen sjekk ga utslag på»
+        en sjekk fortsatt ble lest som styrken, eller ikke ble sjekket mot
+        den sjekken."""
+        tekst = (
+            "Dette signalet er Positivt med styrke to, fordi trenden ga et positivt utslag og bevegelsen ga et "
+            "positivt utslag. Ingen sjekk ga utslag på interesse."
+        )
+        assert kontroller(tekst, TREND_OG_BEVEGELSE).besto, kontroller(tekst, TREND_OG_BEVEGELSE).grunner
+        svar = kontroller(tekst, {**TREND_OG_BEVEGELSE, "interesse": 1, "styrke": 3})
+        assert not svar.besto and any(g.startswith("1: sjekken interesse") for g in svar.grunner), svar.grunner
+        assert not any(g.startswith("1: styrken «Ingen") for g in svar.grunner), svar.grunner
+
+    def test_ingen_sjekk_uten_en_sjekk_er_fortsatt_styrken(self):
+        """MPCC i §43: «Ingen sjekk ga et positivt utslag» med styrke 2. Ville
+        feilet hvis det ikke lenger ble lest som styrken."""
+        svar = kontroller("Ingen sjekk ga et positivt utslag.", {**BLANDET, "retning": "Negativ"})
+        assert not svar.besto and any(g.startswith("1: styrken") for g in svar.grunner), svar.grunner
+
+    def test_listen_over_tankestrek_er_styrken(self):
+        """DNB i §43: ville feilet hvis «ingen av de tre sjekkene – trend,
+        bevegelse og interesse – ga et utslag» ble lest som at hver sjekk ga
+        utslag."""
+        tekst = (
+            "Dette signalet er av typen Ingen, fordi ingen av de tre sjekkene – trend, bevegelse og interesse – "
+            "ga et utslag."
+        )
+        assert kontroller(tekst, INGEN).besto, kontroller(tekst, INGEN).grunner
+
+
+class TestMinst:
+    """Gruppens svar 24.10 kl. 21:49, punkt b, og 25.10 kl. 00:51: modellen
+    nevner ikke dagene, saa «minst» om dagene og ethvert antall dager stoppes,
+    med og uten merket. Testene fra 21:49 og 23:23 som godtok dagene, er snudd."""
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            # Formene fra §43, der grunnlaget ikke hadde merket.
+            "Signalet har hatt samme retning og styrke i minst to børsdager.",
+            "Det har vært minst to børsdager med samme retning og styrke.",
+            "Signalet har hatt samme retning og styrke i minst to børsdager på rad.",
+            "Det har vært to bølger av samme retning og styrke, fordi feltet dager er minst.",
+            # Ordlyden fra 23:23 med merket, som bestod da.
+            "Signalet har hatt samme retning og styrke i minst 4 børsdager.",
+        ],
+    )
+    def test_minst_om_dagene_stoppes(self, tekst):
+        """Ville feilet hvis «minst» om dagene slapp gjennom, slik seks
+        tekster i §43 gjorde."""
+        svar = kontroller(tekst, BARE_TRENDEN)
+        assert not svar.besto and any(g.startswith("1: «minst»") for g in svar.grunner), svar.grunner
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            "Minst én sjekk ga utslag.",
+            "Det ble handlet mye på en dag kursen steg, og i dag er signalet det samme.",
+        ],
+    )
+    def test_minst_om_sjekkene_og_en_dag_som_vanlig_ord_bestaar(self, tekst):
+        """Ville feilet hvis «minst» om sjekkene eller «en dag» som vanlig ord
+        ble stoppet."""
+        svar = kontroller(tekst, BARE_TRENDEN)
+        assert svar.besto, svar.grunner
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            # Ordlyden fra 23:23, som bestod da.
+            "Signalet har hatt samme retning og styrke i 2 børsdager på rad.",
+            "Minst én sjekk ga utslag. Signalet har vært slik i 2 børsdager på rad.",
+            # Riktig antall med egne ord, som bestod foer 23:23.
+            "Signalet har hatt samme retning og styrke i to børsdager.",
+            "Signalet har hatt samme retning og styrke i to børsdager på rad.",
+            "Signalet har hatt samme retning og styrke i fire børsdager.",
+            "Signalet har vært slik i 4 børsdager på rad.",
+            "Det har vært fire børsdager med samme retning og styrke.",
+        ],
+    )
+    def test_ethvert_antall_dager_stoppes(self, tekst):
+        """Gruppens svar 25.10 kl. 00:51. Ville feilet hvis et antall dager,
+        ogsaa det riktige eller ordlyden fra 23:23, slapp gjennom."""
+        for grunnlag in (BARE_TRENDEN, DAGEN, EN_POSITIV):
+            svar = kontroller(tekst, grunnlag)
+            assert not svar.besto and any(g.startswith("1: dagene") for g in svar.grunner), svar.grunner
+
+
+class TestGjennomgangenAvRettingen:
+    """Gjennomgangen 24.10 av rettingen etter svaret kl. 21:49 (BH, ECH, VG)."""
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            # BH1: ord mellom «ga» og «utslag» etter «ingen sjekk».
+            "Ingen sjekk ga dessverre noe utslag på interessen.",
+            # BH2: «ikke» inne i perfektum.
+            "Trenden har ikke gitt utslag.",
+            # BH3, ECH6: genitiv og fortegnet etter «ut».
+            "Trendens utslag var negativt.",
+            "Trenden slo ut negativt.",
+            # BH5, ECH7: verbet underforstaatt etter «og».
+            "Trenden ga et positivt utslag, og interessen et negativt.",
+            # ECH5: et gradsord foran fortegnet.
+            "Interessen ga et sterkt positivt utslag.",
+            # BH10, ECH4: «eller» i lista etter «ingen sjekk ga utslag på».
+            "Ingen sjekk ga utslag på bevegelsen eller trenden.",
+            # VG2: «signal» og «negativt på» om én sjekk.
+            "Interessen ga et positivt signal.",
+            "Signalet er positivt på trend, men negativt på bevegelse.",
+            # «eller» uten «verken» sier ikke hvilken sjekk.
+            "Trenden eller interessen ga utslag.",
+        ],
+    )
+    def test_feil_om_en_sjekk_i_formene_fra_gjennomgangen_stoppes(self, tekst):
+        """Grunnlaget sier at bare trenden ga et positivt utslag. Ville feilet
+        hvis en av formene slapp gjennom."""
+        svar = kontroller(tekst, EN_POSITIV)
+        assert not svar.besto and any(g.startswith(("1: sjekk", "1: styrken")) for g in svar.grunner), svar.grunner
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            "Verken bevegelsen eller interessen ga utslag.",
+            "Hverken bevegelsen eller interessen slo ut.",
+            "Interessen har ikke gitt utslag.",
+            "Trendens utslag var positivt.",
+            "Trenden slo ut positivt.",
+            "Trenden ga et klart positivt utslag, og interessen ikke noe utslag.",
+            "Ingen sjekk ga utslag på bevegelse eller interesse.",
+            "Signalet er positivt for trenden.",
+        ],
+    )
+    def test_riktig_om_en_sjekk_i_formene_fra_gjennomgangen_bestaar(self, tekst):
+        """Ville feilet hvis en riktig form fra gjennomgangen ble stoppet."""
+        svar = kontroller(tekst, EN_POSITIV)
+        assert svar.besto, svar.grunner
+
+    def test_en_sjekk_som_mangler_i_grunnlaget_stoppes(self):
+        """ECH: ville feilet hvis et utsagn om en sjekk som mangler i
+        grunnlaget, slapp gjennom uten aa bli sjekket."""
+        grunnlag = {k: v for k, v in EN_POSITIV.items() if k != "interesse"}
+        svar = kontroller("Interessen ga ikke utslag.", grunnlag)
+        assert not svar.besto and any("grunnlaget sier ingenting" in g for g in svar.grunner), svar.grunner
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            # Gruppens svar 25.10 kl. 00:51: uten dagene.
+            "Minst én sjekk ga utslag, og signalet er positivt.",
+            "Minst én sjekk ga utslag sammenlignet med de siste 20 dagene.",
+            "Minst én sjekk ga utslag i  dag.",
+            "Snittet for de siste 50 børsdager.",
+            "Vinduet er 20 dager.",
+        ],
+    )
+    def test_minst_om_sjekkene_og_regelens_vinduer_bestaar(self, tekst):
+        """BH6, ECH8, ECH9: ville feilet hvis «minst» om sjekkene i en setning
+        om dagene, eller regelens vinduer, ble lest som dagene."""
+        svar = kontroller(tekst, BARE_TRENDEN)
+        assert svar.besto, svar.grunner
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            "Signalet har holdt seg åtte børsdager.",
+            "Signalet har vært slik i hele tre børsdager.",
+            "Signalet har hatt samme retning og styrke i tre børsdager.",
+            "Det har vært tre børsdager.",
+            "Signalet har vært slik tre børsdager etter hverandre.",
+        ],
+    )
+    def test_feil_antall_dager_uten_paa_rad_stoppes(self, tekst):
+        """BH7, ECH1, ECH2, VG1: grunnlaget sier 2 dager. Ville feilet hvis et
+        feil antall dager slapp gjennom fordi teksten ikke har «i» eller «på
+        rad» (8 er ogsaa aksjer_steg, saa punkt 2 fanger det ikke)."""
+        svar = kontroller(tekst, BARE_TRENDEN)
+        assert not svar.besto and any(g.startswith("1: dagene") for g in svar.grunner), svar.grunner
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            "Signalet har holdt seg fire børsdager.",
+            "Det har vært fire børsdager.",
+            "Signalet har vært slik fire børsdager etter hverandre.",
+        ],
+    )
+    def test_eksakt_med_merket_uten_i_stoppes(self, tekst):
+        """BH7, VG1: grunnlaget sier minst 4. Ville feilet hvis et eksakt
+        antall dager uten «i» slapp gjennom med merket."""
+        svar = kontroller(tekst, DAGEN)
+        assert not svar.besto and any(g.startswith("1: dagene") for g in svar.grunner), svar.grunner
+
+    def test_minst_foer_i_med_merket_stoppes(self):
+        """BH8: bestod etter rettingen kl. 21:49. Gruppens svar 25.10 kl.
+        00:51: dagene stoppes i enhver form. Ville feilet hvis den besto."""
+        svar = kontroller("Signalet har vært slik minst i fire børsdager.", DAGEN)
+        assert not svar.besto and any(g.startswith("1: dagene") for g in svar.grunner), svar.grunner
+
+
+# Grunnlaget for EQNR, AKRBP og FRO 23.10 i §44 og §45, der trenden og
+# bevegelsen ga utslag, og for VAR og TEL. Svaret 25.10 kl. 00:51: grunnlaget
+# har ikke dagene. Antallene er vaare egne (regel 16).
+TO_POSITIVE = {k: v for k, v in TREND_OG_BEVEGELSE.items() if k != "dager"} | {"retning": "Positiv"}
+TRE_POSITIVE_DAGEN = {**TRE_POSITIVE, "hovedindeksen": "steg", "aksjer_steg": 8, "aksjer_falt": 7}
+INGEN_DAGEN = {**INGEN, "hovedindeksen": "steg", "aksjer_steg": 8, "aksjer_falt": 7}
+DAGEN_UTEN_DAGENE = {k: v for k, v in DAGEN.items() if k not in ("dager", "dager_merke")}
+# Aksjen paa bildet av aksjesiden i README-en (tests/test_docker.py).
+BILDEAKSJEN = "BRFE"
+
+
+class TestDageneStoppes:
+    """Gruppens svar 25.10 kl. 00:51: modellen faar ikke dagene og nevner dem
+    ikke. Kontrollen stopper dagene i enhver form."""
+
+    def test_tekstene_fra_45_stoppes(self):
+        """VAR og TEL i §45, med «det første signalet» og ordlyden fra 23:23.
+        Ville feilet hvis en av dem slapp gjennom."""
+        var = (
+            "Signalet er Positivt fordi trenden ga et positivt utslag, bevegelsen ga et positivt utslag, og "
+            "interessen ga et positivt utslag. Dette er det første signalet med denne retningen og styrken, "
+            'som er "i dag for første gang".'
+        )
+        tel = (
+            "Signalet er Ingen fordi trenden ga ikke utslag, bevegelsen ga ikke utslag, og interessen ga ikke "
+            "utslag. Dette er det første signalet i dag for første gang."
+        )
+        for tekst, grunnlag in ((var, TRE_POSITIVE_DAGEN), (tel, INGEN_DAGEN)):
+            svar = kontroller(tekst, grunnlag)
+            assert not svar.besto and all(g.startswith("1: dagene") for g in svar.grunner), svar.grunner
+
+    def test_formene_fra_44_stoppes(self):
+        """EQNR, AKRBP og FRO («i minst én børsdag») og VAR («det tredje på
+        rad») i §44. Ville feilet hvis en av formene slapp gjennom som dagene."""
+        svar = kontroller("Dette signalet har hatt samme retning og styrke i minst én børsdag.", TO_POSITIVE)
+        assert not svar.besto and any(g.startswith("1: «minst» om dagene") for g in svar.grunner), svar.grunner
+        svar = kontroller("Dette er det tredje på rad at signalet har hatt samme retning og styrke.", TRE_POSITIVE)
+        assert not svar.besto and any(g.startswith("1: dagene «tredje på rad»") for g in svar.grunner), svar.grunner
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            # Ordlyden fra 23:23, i alle fire former, og i anfoerselstegn.
+            "Signalet har i dag for første gang denne retningen og styrken.",
+            "I dag for første gang har signalet denne retningen og styrken.",
+            "Signalet har hatt samme retning og styrke i 2 børsdager på rad.",
+            "Signalet har hatt samme retning og styrke i minst 4 børsdager.",
+            "Signalet har hatt samme retning og styrke i minst 1 børsdag.",
+            'Signalet har hatt samme retning og styrke i "i dag for første gang".',
+            # Ordenstall og «for første gang».
+            "Signalet har denne retningen for første gang.",
+            "Signalet har denne retningen for andre gang.",
+            "Dette er det andre på rad.",
+            "Det er den femte børsdagen.",
+            "Det er den 4. dagen.",
+            "Dette er det første signalet med denne retningen.",
+            "Signalet er det første med denne retningen.",
+            "Det er det tredje positive signalet.",
+            # Antall, med og uten «i» eller «på rad».
+            "Signalet har vært slik i 1 børsdag.",
+            "Signalet har vært slik i fire børsdager på rad.",
+            "Signalet har vært slik 4 børsdager på rad.",
+            "Signalet har vært slik i 4 dager på rad.",
+            "Signalet har holdt seg 20 børsdager.",
+            "Signalet har vart 50 dager.",
+            "Signalet har vært slik i 4 handelsdager.",
+            # Uten tall.
+            "Signalet har vært det samme flere dager på rad.",
+            "Signalet har vært det samme dager i trekk.",
+            "Signalet har vært slik dager etter hverandre.",
+            "Signalet har vært slik flere ganger.",
+            "Nok en gang er signalet slik.",
+            "Signalet er det samme som i går.",
+            "Signalet har vært slik siden mandag.",
+            "Signalet har vært slik i flere dager.",
+            "Signalet er fortsatt positivt.",
+            "Signalet har vært slik lenge.",
+            "Signalet har vært slik i to uker.",
+            "Dette er et nytt signal.",
+            "Signalet er nytt.",
+            # Gjennomgangen 25.10 kl. 11 (ECH1): «de siste» med et annet tall
+            # enn vinduene, i bestemt form, eller uten tall.
+            "Signalet har vært negativt de siste 3 børsdager.",
+            "Signalet har vært negativt de siste tre børsdager.",
+            "Signalet har vært negativt de siste 4 børsdagene.",
+            "Signalet har vært negativt de tre siste børsdagene.",
+            "Signalet har vært negativt de siste dagene.",
+            "Signalet har vært negativt de siste ukene.",
+            # ECH2: et vindu etter et verb om varighet.
+            "Kursen har ligget over snittet 50 dager.",
+            "Trenden har vært positiv 50 dager.",
+            "Signalet har vært positivt 20 dager, og interessen måles mot snittet.",
+            "Signalet har vært positivt femti dager med trenden over snittet.",
+            # ECH3, BH4, VG7: flere former uten tall.
+            "Signalet er negativt igjen.",
+            "Signalet fortsetter å være positivt.",
+            "Signalet var også negativt forrige børsdag.",
+            "Signalet er det samme som dagen før.",
+            "Det nye signalet er positivt.",
+            "Et nytt positivt signal.",
+            "Signalet ble helt nytt.",
+            "Signalet har vært slik en stund.",
+            "Signalet har vært slik i flere måneder.",
+            "Signalet er det samme som sist.",
+            "Signalet har holdt seg i ukene som har gått.",
+            "Signalet har fremdeles denne retningen.",
+            "Signalet har vært slik hele uken.",
+            "Signalet har vært slik i en uke.",
+            # Gjennomgangen 25.10 kl. 13 (ECH1): appens setning for 1 dag.
+            "Signalet ble slik i dag.",
+            "Signalet ble slik denne dagen.",
+        ],
+    )
+    def test_dagene_i_enhver_form_stoppes(self, tekst):
+        """Ville feilet hvis dagene slapp gjennom i en av formene, med eller
+        uten tall, ogsaa ordlyden fra 23:23."""
+        for grunnlag in (TO_POSITIVE, DAGEN, BLANDET):
+            svar = kontroller(tekst, grunnlag)
+            assert not svar.besto and any(g.startswith(("1: dagene", "1: «minst»")) for g in svar.grunner), (
+                grunnlag,
+                svar.grunner,
+            )
+
+    @pytest.mark.parametrize(
+        "tekst, grunnlag",
+        [
+            # Gjennomgangen 25.10 (ECH1, BH3): «andre … i dag» er ikke dagene.
+            ("Trenden og de andre sjekkene i dag ga dette.", DAGEN_UTEN_DAGENE),
+            ("De andre aksjene i dag steg.", DAGEN_UTEN_DAGENE),
+            ("Snittet for de andre dagene.", DAGEN_UTEN_DAGENE),
+            # ECH2, VG4: «andre» og «annen» som «other».
+            ("Andre dager kan bli annerledes.", DAGEN_UTEN_DAGENE),
+            ("Det ble handlet mye på en annen dag enn i dag.", DAGEN_UTEN_DAGENE),
+            ("Ingen andre signaler er med.", DAGEN_UTEN_DAGENE),
+            ("Den andre sjekken ga ikke utslag.", TRE_POSITIVE),
+            ("Bevegelsen og de andre sjekkene ga et positivt utslag.", TRE_POSITIVE),
+            # ECH3: et tall som slutter en setning, foran «Dagen».
+            ("Signalet har styrke 2. Dagen var rolig for hovedindeksen, som falt.", DAGEN_UTEN_DAGENE),
+            # ECH5: regelens vinduer med ordet i setningen.
+            ("Vinduet er 20 dager.", DAGEN_UTEN_DAGENE),
+            ("Snittet for 50 dager.", DAGEN_UTEN_DAGENE),
+            ("Hovedindeksen falt i dag.", DAGEN_UTEN_DAGENE),
+            ("Trenden og de andre sjekkene i dag ga dette.", BLANDET),
+            # Gjennomgangen 25.10 kl. 11 (ECH1, ECH5): regelens vinduer etter
+            # «siste», og vinduene for bevegelsen og interessen.
+            (
+                "Kursen ligger over snittet for de siste 50 børsdagene, og endringen var stor "
+                "sammenlignet med de siste 20 dagene.",
+                DAGEN_UTEN_DAGENE,
+            ),
+            ("Bevegelsen måles over 20 dager.", DAGEN_UTEN_DAGENE),
+            ("Interessen måler volumet mot 20 dager.", DAGEN_UTEN_DAGENE),
+            ("Volumet sammenlignes med 20 handelsdager.", DAGEN_UTEN_DAGENE),
+            ("Volumet er høyere enn snittet over de siste 20 handelsdagene.", DAGEN_UTEN_DAGENE),
+            ("Hovedindeksen var uendret.", {**DAGEN_UTEN_DAGENE, "hovedindeksen": "uendret"}),
+        ],
+    )
+    def test_riktige_tekster_bestaar(self, tekst, grunnlag):
+        """Ville feilet hvis en riktig tekst ble stoppet som dagene."""
+        svar = kontroller(tekst, grunnlag)
+        assert svar.besto, svar.grunner
+
+    def test_prompten_har_ikke_dagene(self):
+        """Ville feilet hvis prompten forklarte dagene, hadde ordlyden fra
+        23:23 eller «minst», eller ikke sa at teksten ikke nevner dagene."""
+        for grunnlag in (BLANDET, DAGEN_UTEN_DAGENE):
+            prompt = lag_prompt(grunnlag)
+            assert "Ordlyden for dagene" not in prompt and "minst" not in prompt.lower()
+            assert "- dager" not in prompt and '"dager' not in prompt
+        blokk = REGLER.split("Regler for teksten:", 1)[1].split("\n\n", 1)[0].splitlines()
+        assert any(linje.startswith("- Ikke si hvor lenge signalet har vart") for linje in blokk)
+
+    def test_avtrykket_dekker_lag_prompt(self):
+        """VG2, BH7 i gjennomgangen 25.10: ville feilet hvis avtrykket bare
+        dekket reglene, slik at en endret lag_prompt ga samme versjon."""
+        assert inspect.getsource(lag_prompt) in _promptteksten()
+
+    def test_bildet_viser_en_aksje_der_teksten_besto(self):
+        """VG7, gruppens svar 24.10 kl. 23:23 (b): ville feilet hvis bildet av
+        aksjesiden viste en demoaksje der KI-teksten ble stoppet."""
+        radene = json.loads((Path(__file__).parents[1] / "src" / "demo_ki_tekster.json").read_text("utf-8"))["radene"]
+        assert next(r for r in radene if r["symbol"] == BILDEAKSJEN)["besto"] is True
