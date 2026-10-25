@@ -139,6 +139,14 @@ class TestPrompten:
         versjon 2. Ville feilet hvis avtrykket ble ryddet bort eller endret."""
         assert AVTRYKK["2"] == "4c697052292bf7069ed7ba0cb7600a8c67574c969fd4fcd184f4b854876df660"
 
+    def test_avtrykket_for_versjon_3_staar(self):
+        """Story 10.2h, gruppens svar 25.10 kl. 20:54 b): fra hentingen mandag
+        26.10 har ose.db tekster med versjon 3, og KI-loggen har ikke promptens
+        avtrykk, saa enhver endring i prompten gir en ny versjon (gjennomgangen,
+        BH4, ECH1). Ville feilet hvis avtrykket for versjon 3 ble endret i
+        stedet for at prompten fikk en ny versjon."""
+        assert AVTRYKK["3"] == "ec16642676123e3730c7e8dbd66c03f282a6f77b9ac8fa121b8dc023f97522d5"
+
     def test_versjon_3(self):
         """Story 10.2e, gruppens svar 24.10 kl. 15:50."""
         assert PROMPTVERSJON == "3"
@@ -246,6 +254,22 @@ class TestPrompten:
         assert REGLER.splitlines().count(linja) == 1
         assert linja in lag_prompt(BLANDET)
         assert linja in lag_prompt({**BLANDET, "merke": "Utenfor målingen"})
+
+    def test_ordstillingen_og_rekkefoelgen_staar_der_spesifikasjonen_sier(self):
+        """Story 10.2h, gjennomgangen (VG1, BH8): linja om rekkefoelgen staar
+        rett etter linja om navnet paa sjekken, og linja om ordstillingen rett
+        etter linja om «fordi», begge under «Regler for teksten:». Ville feilet
+        hvis en av dem ble flyttet ut av reglene eller bort fra linja den
+        hoerer til."""
+        reglene = REGLER.split("Regler for teksten:\n", 1)[1].splitlines()
+        navnet = next(i for i, linje in enumerate(reglene) if linje.startswith("- Når du sier noe om én sjekk,"))
+        fordi = reglene.index("- Når du forklarer regelen, bruk «fordi». Ikke bruk «skyldes» eller «indikerer».")
+        assert reglene[navnet + 1] == (
+            "- Når du nevner flere sjekker, ta dem i rekkefølgen trend, bevegelse og interesse."
+        )
+        assert reglene[fordi + 1] == (
+            "- Etter «fordi» står «ikke» foran verbet, for eksempel «fordi trenden ikke ga utslag»."
+        )
 
     def test_ingen_raad_og_ingen_gjetning(self):
         prompt = lag_prompt(BLANDET)
