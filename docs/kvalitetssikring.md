@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-25T19:41
+updated: 2026-10-25T20:46
 ---
 
 # Kvalitetssikring
@@ -289,6 +289,7 @@ sist i dokumentet.
 | 10.2d Kontrollen leser formene Gemma skriver | `3c2bd51` (#71) | 1 (12, D1–D12) | Testen i punkt a var først xfail av feil grunn, fordi `\b` i mønsteret var skrevet som backspace. Rettet i `aae2eef` før D1–D4 ble kjørt | `S/spec-10-2d-kontrollen-leser-formene-gemma-skriver.md` |
 | 10.2e Prompten versjon 3 | `0c25686` (#95) | 2 (9 i seks runder) | – M1 og M2 kjørt på `1795981` 24.10, rettingen M1 og M2 på `f42c9d7` og `4a1d088`, tredje forsøk på `d5a3476` og `c6d0c85`, fjerde forsøk M1 og M2 på `9aa4219`, lesingen på `dfa39fc` og ordlyden på `7d61aaf` 25.10 | `S/spec-10-2e-prompten-versjon-3.md` og Utført-linjene i dagsfila for 25.10 |
 | 10.2f Grunnen i prompten | `a9c3bdd` (#96) | 1 | – kjørt på `6ea0aed` og `3751c95` 25.10 | `S/spec-10-2f-grunnen-i-prompten.md` |
+| 10.2g Regelen for retningen Ingen og promptens avtrykk i demotekstene | `2aa7745` (#97) | 1 (2, M1 og M2) | – kjørt på `2ded327` og `2e7883d`, og igjen på `a71a9e7` 25.10 | `S/spec-10-2g-ingen-retning.md` |
 | 10.3 Visningen i aksjedetaljen | `e728c37` (#50), `4a22199` (#51) | 1 (15) | – | `S/spec-10-3-visningen-i-aksjedetaljen.md` |
 | 10.5 Lenken til selskapets investorside | `bd19380` (#81) | 1 (6, M1–M3 og N1–N3) | – N1–N3 er mutantene fra Edge Case Hunter som overlevde, kjørt etter rettingen i `18a377c` | `S/spec-10-5-investorsiden.md` |
 | 2.7b Signalet dag for dag | `d4c2441` (#82) | 1 (13, M1–M3 og N1–N10) | – N1–N10 er mutantene fra Edge Case Hunter som overlevde, og to til, kjørt etter rettingen i `4289d93` | `S/spec-2-7b-signalet-dag-for-dag.md` |
@@ -518,6 +519,7 @@ funn. Antall rader i loggen:
 | 10.2e, 25.10 kl. 11 | 30 | 13 | 4 | 13 |
 | 10.2e, 25.10 kl. 13 | 11 | 6 | 2 | 3 |
 | 10.2f, 25.10 kl. 19:30 | 17 | 10 | 5 | 2 |
+| 10.2g, 25.10 kl. 20:37 | 15 | 9 | 3 | 3 |
 | 10.3, PR #50 | 21 | 13 | 8 | – |
 | 10.3, PR #51 | 13 | 9 | 2 | 2 |
 | 10.5 | 25 | 16 | 4 | – |
@@ -1271,6 +1273,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 10.2e | M1 og M2 24.10, og M1 og M2 i rettingen | M1 `test_dagene_naar_styrken_byttes`, M2 `test_2_tall_og_mengder_som_ikke_er_i_grunnlaget[Femdagssnittet ligger lavere.]`; i rettingen M1 `test_de_tre_tekstene_i_43_som_sa_feil_om_interessen`, M2 av testen for «minst» uten merket, som ble tatt bort i fjerde forsøk | `S/spec-10-2e-…` |
 | 10.2e | tredje forsøk, fjerde forsøk M1 og M2, lesingen og ordlyden 25.10 | tredje forsøk `test_dagene_byttet_med_styrken`; M1 `test_en_dag_paa_siden`, M2 `test_dagene_byttet_med_styrken`; lesingen `test_siden_leser_en_gang_per_maaned`; ordlyden `test_setningen[4-False-True-…]` | `S/spec-10-2e-…` og dagsfila 25.10 |
 | 10.2f | den gamle grunnen tilbake i prompten, på `6ea0aed` og `3751c95` | `test_grunnen_er_at_siden_sier_hvor_lenge_signalet_har_vart` begge gangene | `S/spec-10-2f-grunnen-i-prompten.md` |
+| 10.2g | M1 regelen tatt ut av prompten, M2 sammenligningen med prompten tatt ut av `fra_json`, på `2ded327`/`2e7883d` og `a71a9e7` | M1 `test_retningen_ingen_skrives_som_ingen_retning`, M2 `test_en_rad_med_et_annet_promptavtrykk_avvises`, begge gangene | `S/spec-10-2g-ingen-retning.md` |
 | 10.3 | V1–V4, VR1–VR4 og B1–B7 | testene står per mutant i tabellene i spesifikasjonen | `S/spec-10-3-…` |
 | 10.5 | M1–M3 og N1–N3 | M1 `test_hver_av_de_15_har_adressen_fra_svarene`, M2 `test_ingen_mal_lenker_til_euronext`, M3 `test_demoen_viser_teksten_og_ingen_lenke`, N1 og N2 `test_lenken_paa_siden_gaar_til_aksjen_siden_viser`, N3 `test_en_ekte_aksje_uten_adresse_faar_setningen_uten_lenke` | `S/spec-10-5-…` |
 | 2.7b | M1–M3 og N1–N10 | M1 og M2 `test_hver_tilstand_ser_ulik_ut`, M3 `test_tallene_for_ukene`, N1–N10 i tabellen i spesifikasjonen | `S/spec-2-7b-…` |
