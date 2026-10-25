@@ -1951,6 +1951,8 @@ følger aksjene jeg bryr meg om.
 
 *Avgjort 2026-10-25 kl. 21:48 (gruppens svar):* dagens 20 kall, hele dagskvoten 25.10 i GMT på en dag uten henting, går til målingen: de neste 20 med typen «Common Stock» i lista fra §40 som ikke er rangert, valgt som i §42, etter CAVEN i rekkefølgen i svaret. Bonuskvoten brukes ikke.
 
+*Lagt til 2026-10-25 kl. 23:40 (målingen etter gruppens svar 25.10 kl. 21:48, `malinger.md` §50):* de neste 20 «Common Stock» i lista fra §40 som ikke var rangert, plass 62–101 i lista, fra CodeLab Capital (CODE) til Goodtech (GOD), er målt med de 20 kallene i dagskvoten 25.10 i GMT. Alle 20 ga rader, og bonuskvoten er ikke brukt. Den høyeste medianen er 1,9 MNOK (DELIA, plass 122 av 206), og ingen er over 25 MNOK. ELOO har bare 14 handelsdager i vinduet, og hvorfor står åpent. Alle 206 er rangert i §50.
+
 ### Story 2.13: Kommandoen som måler omsetning
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
