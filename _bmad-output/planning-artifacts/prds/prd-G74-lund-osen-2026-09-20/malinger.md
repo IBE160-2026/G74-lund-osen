@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-25T19:19
+updated: 2026-10-25T19:31
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -5066,8 +5066,9 @@ kl. 19:11, og steget leser bare basen. sha256 for `data/db/ose.db` var den
 samme før og etter (`e3184c07…f4a4`).
 
 Hver av de 15 tekstene er lest mot grunnlaget: hver sjekk, og at dagene ikke
-nevnes. 9 av de 15 er ordrett de samme som i den siste kjøringen i §46, og 6
-er endret.
+nevnes. 9 av de 15 er ordrett de samme som i den siste kjøringen i §46
+(`ki-proeve-v3f.db`), og 6 er endret. Tabellen viser den første kjøringen
+i §46, så tallet 9 gjelder ikke den kolonnen (gjennomgangen, BH6).
 
 | | §34, versjon 2, 16.10 | §43, versjon 3, 23.10 | §44, versjon 3 rettet, 23.10 | §45, versjon 3 med ordlyden, 23.10 | §46, versjon 3 uten dagene, 23.10 | §47, versjon 3 med den nye grunnen, 23.10 |
 |---|---:|---:|---:|---:|---:|---:|
@@ -5076,7 +5077,7 @@ er endret.
 | Stoppet av kontrollen | 0 | 3 | 4 | 2 | 0 | 0 |
 | Modellen feilet | 0 | 0 | 0 | 0 | 0 | 0 |
 | Median tid per tekst | 0,77 s | 0,73 s | 0,65 s | 0,73 s | 0,43 s | 0,46 s |
-| Lengste kall | 81,36 s (det første, med innlasting) | 1,01 s (modellen var lastet) | 0,85 s (modellen var lastet) | 0,96 s (modellen var lastet) | 9,27 s | 1,02 s (kall nr. 13, modellen var lastet) |
+| Lengste kall | 81,36 s (det første, med innlasting) | 1,01 s (modellen var lastet) | 0,85 s (modellen var lastet) | 0,96 s (modellen var lastet) | 9,27 s (hvilket kall, ble ikke ført) | 1,02 s (kall nr. 13, modellen var lastet) |
 | Tekster med feil som slapp gjennom | 0 | 9 | 0 | 0 | 0 | 0 |
 
 §46-kolonnen er den første kjøringen. De to kjøringene på nytt i §46 ga også
@@ -5090,5 +5091,8 @@ samsvar med fortegnene. Ingen tekst nevner hovedindeksen, bransjen eller
 antallet aksjer, og ingen gir råd eller gjetter på en årsak. Tekstene står
 bare i kopien og er ikke ført her.
 
-15 av 15 er kravet i gruppens svar 25.10 kl. 00:51, og versjonen består like
-mange som versjon 2 på samme dag (15), etter beslutningen 16.10 kl. 23:51 (2).
+15 av 15 er kravet i gruppens svar 25.10 kl. 00:51. Versjonen består like
+mange som de 15 radene med versjon 2 fra kveldshentingen 23.10 i kopien, alle
+bestått, etter punkt 2 i beslutningen 16.10 kl. 23:51 (gjennomgangen, BH7).
+Utløseren `ki_logg_slettes_ikke` ble satt inn igjen med den samme definisjonen
+fra `sqlite_master`, og skriptet sjekket at den fantes etterpå.
