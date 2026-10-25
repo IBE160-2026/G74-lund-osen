@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-25T11:34
+updated: 2026-10-25T13:02
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -5029,3 +5029,20 @@ grunnlaget: ingen sier feil om en sjekk, og ingen nevner dagene. sha256 for
 `ose.db` var den samme før og etter. Med den nye kontrollen består fortsatt
 15 fra §34, 2 fra §43, 1 fra §44, 0 fra §45 og 15 fra den første kjøringen i
 §46, og de 13 demotekstene får samme utfall som før.
+
+**Kjørt på nytt etter gjennomgangen 25.10 kl. 13.** Gruppens svar kl. 12:12
+tok «for første gang» ut av setningen appen skriver, og gjennomgangen fant at
+kontrollen slapp appens nye setning for 1 dag fra modellen, «Signalet ble
+slik i dag.» og «Signalet ble slik denne dagen.» (ECH1 i spesifikasjonen
+10.2e). Kontrollen stopper dem nå, og prompten er ikke endret. Basen ble
+kopiert med skallet til `data/db/ki-proeve-v3f.db` søndag 25.10 kl. 12:59:44,
+med grenen sjekket ut, men uten kode fra den, og med samme sha256 som
+`ose.db`. Kjørt på samme måte som over, kl. 12:59:44–13:00:05: 15 besto, 0
+ble stoppet, og modellen feilet for 0. Median 0,47 s per tekst og lengste
+kall 13,41 s. Hvilket kall det var, ble ikke ført. Alle 15 radene har
+`promptversjon` 3, `maskinvare` `gpu`, `gemma4:e4b` med `modell_id`
+`dc35e8d9c606` og Ollama 0.35.1. Hver tekst er lest mot grunnlaget: ingen
+sier feil om en sjekk, og ingen nevner dagene. sha256 for `ose.db` var den
+samme før og etter. Med den nye kontrollen består fortsatt 15 fra §34, 2 fra
+§43, 1 fra §44, 0 fra §45, 15 fra hver av de to kjøringene i §46 over, og 13
+av de 13 demotekstene.
