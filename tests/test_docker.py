@@ -1156,7 +1156,11 @@ HOEYDE_PAA_AKSJESIDEN = 1894
 # (demo_ki.py). Bildet viser fortsatt BRFE, der teksten besto, med hoeyden 1894.
 # Gjennomgangen av 10.2g (BH1): til_json faar avtrykket fra lag_tekstene.
 # Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "5af7921ef2cf720dafcbfa0c4601f93d82baa4315267f8da293cb71364c47e7c"
+# Story 10.2h, gruppens svar 25.10 kl. 20:54: KI-tekstene laget paa nytt med
+# ordstillingen etter «fordi» og rekkefoelgen paa sjekkene i prompten. Teksten
+# for BRFE besto og er den samme, og bildet ble tatt paa nytt og er byte for
+# byte det samme, med hoeyden 1894.
+AVTRYKK_BAK_AKSJESIDEN = "48902f9aa89f293b0b3dbe4848fc52f64b8bbbd50a0d755d094814c0e064e369"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
