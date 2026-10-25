@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-25T21:42
+updated: 2026-10-25T21:53
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -5201,6 +5201,7 @@ er ordrett de samme som i §48, og 5 er endret.
 | Tekster med feil som slapp gjennom | 0 | 9 | 0 | 0 | 0 | 0 | 0 | 0 |
 | «fordi» med «ikke» etter verbet | | | | | | | 2 | 0 |
 | Sjekker i en annen rekkefølge | | | | | | | 1 | 1 |
+| Leddsetning med «ikke» etter verbet, alle konjunksjoner | | | | | | | 2 | 0 |
 
 §49: `maskinvare` `gpu` for alle 15, `gemma4:e4b` med `modell_id`
 `dc35e8d9c606`, og Ollama 0.35.1. Alle 15 radene har `promptversjon` 3.
@@ -5228,3 +5229,17 @@ kjøring, og på 1 demotekst (SLVP). Linja om rekkefølgen ble ikke fulgt i
 den ene teksten i §49 der den gjaldt (DNO). I demotekstene nevner FJSB, LSTF
 og SGNT bevegelsen, som ga utslag, før trenden og interessen, mot 4 av 13
 før (de tre og HVDO). Kontrollen håndhever ingen av de to linjene.
+
+*Rettet 2026-10-25 kl. 21:53 (gjennomgangen av 10.2h):* prompten i §49 hadde
+avtrykket `ec166426…22d5` (`AVTRYKK["3"]`, commit `34b42d2`). Avtrykkene for
+§43–§48 er ikke ført, og KI-loggen i kopiene har det ikke (BH1). Raden
+«Leddsetning med «ikke» etter verbet, alle konjunksjoner» teller også
+leddsetninger med «mens»: ingen tekst i §48 eller §49 har «mens … ga ikke»
+(BH3). Linja om ordstillingen gjaldt 5 av de 15 i §49, der «ikke» står i en
+leddsetning i setningen med «fordi» (DNB, TEL, MOWI, ORK og SALM), og alle
+fem har «ikke» foran verbet. I demotekstene gjaldt den 5 av 13 (SLVP, HVDO,
+FJSB, LSTF og SGNT), og alle fem har «ikke» foran verbet, mot 2 med «ikke»
+etter verbet før (SLVP og LSTF) (ECH5). Om modellen var lastet ved kall nr. 1
+i §49, ble ikke sjekket. Demokjøringen sluttet kl. 21:38:42 (BH11).
+Klokkeslettene i §49 er norsk tid, UTC+1 fra 25.10, så kvotesjekken kl.
+21:34 var 20:34 GMT (BH12).
