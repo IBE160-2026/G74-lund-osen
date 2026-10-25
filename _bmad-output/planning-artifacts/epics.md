@@ -2818,6 +2818,8 @@ starter ikke av seg selv.
 
 *Avgjort 2026-10-25 kl. 19:54 og 19:56 (gruppens svar):* a) begge punktene rettes i kveld. b) Prompten får regelen «- Når retningen er Ingen, skriv at signalet ikke har noen retning.», fordi modellen skrev «Signalet er Ingen, fordi …» (BH10). Rekkefølgen på sjekkene (BH11) står åpen. c) Hver rad i `src/demo_ki_tekster.json` får promptens avtrykk ved `promptversjon`, og en test feiler hvis en rad har et annet avtrykk enn prompten (VG1, ECH2, BH13, rådets forslag). d) `PROMPTVERSJON` står som «3» av samme grunn som svaret kl. 18:35 b): ingen tekst i `ose.db` er laget med versjon 3 ennå.
 
+*Lagt til 2026-10-25 kl. 20:46:* regelen for retningen Ingen, «- Når retningen er Ingen, skriv at signalet ikke har noen retning.», og promptens avtrykk i hver rad i `src/demo_ki_tekster.json` er flettet i `2aa7745`, PR #97 (spesifikasjonen `spec-10-2g-ingen-retning.md`). Regelen brukes fra hentingen mandag 26.10. `PROMPTVERSJON` står som «3». §48 i `malinger.md` ga 15 av 15, og «Ingen» sto som et ord i 0 av 15. CI var grønn på head-en `7daf0a0` (kjøring 40227006629). Rekkefølgen på sjekkene står åpen.
+
 ### Story 10.3: Visningen i aksjedetaljen
 
 *Het Story 5B.3 til 28.09.*
