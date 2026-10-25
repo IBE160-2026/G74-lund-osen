@@ -825,8 +825,9 @@ def aksjedetalj(symbol: str):
     ki_er_paa = ki_paa(request.cookies.get(KAPSEL))
     ki = _ki_visning(post, detalj) if ki_er_paa and detalj.sjekker else None
     # Gruppens svar 25.10 kl. 00:51: setningen om dagene under KI-teksten,
-    # ogsaa naar KI er av eller teksten er stoppet.
-    dagene = _setningen_om_dagene(post, detalj, valgt_dag=valg.periode == VELG and slutt != rader[-1].dato)
+    # ogsaa naar KI er av eller teksten er stoppet. «I dag» bare naar dagen
+    # siden viser, er i dag (gjennomgangen, BH1, ECH6, VG1).
+    dagene = _setningen_om_dagene(post, detalj, annen_dag=detalj.dato != i_dag)
     # Story 8.16b: bryteren tar deg tilbake til den samme dagen.
     tilbake = f"/aksje/{post.aksje.symbol}"
     if valg.periode == VELG:
@@ -899,20 +900,22 @@ def _historikken(post, rader, dagen: date, i_dag: date) -> Maaned:
     return bygg_maaned(maaned, [rad.dato for rad in rader], radene, i_dag, STANDARD.terskel, beskjed)
 
 
-def _setningen_om_dagene(post, detalj, valgt_dag: bool) -> str | None:
+def _setningen_om_dagene(post, detalj, annen_dag: bool) -> str | None:
     """Gruppens svar 25.10 kl. 00:51: hvor lenge signalet har vaert slik, med
     tellingen fra svaret 24.10 kl. 16:15 a), lest fra vurdering (AD-3, AD-10).
-    None uten en vurdering for dagen, eller naar basen ikke kan leses."""
+    None uten en vurdering for dagen, eller naar basen ikke kan leses, ogsaa
+    en base fra foer siste migrasjon, som i _ki_visning (gjennomgangen, BH7,
+    ECH11)."""
     if not detalj.vurdering:
         return None
     try:
         lager = SqliteVurderingslager(g.tilkobling, naa, (post.aksje,))
         tidligere = lager.les_periode(post.aksje.symbol, date.min, detalj.dato)
-    except (sqlite3.Error, ValueError) as feil:
+    except (sqlite3.Error, ValueError, RuntimeError) as feil:
         app.logger.warning("Dagene kunne ikke leses: %s: %s", type(feil).__name__, feil)
         return None
     dager, minst = tell_dagene(detalj.dato, detalj.vurdering, tidligere)
-    return setning_om_dagene(dager, minst, valgt_dag=valgt_dag)
+    return setning_om_dagene(dager, minst, annen_dag=annen_dag)
 
 
 def _ki_visning(post, detalj) -> KIVisning:

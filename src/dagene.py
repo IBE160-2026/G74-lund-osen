@@ -15,7 +15,9 @@ from tallformat import tall
 from vurderingsdata import Grunn, Vurdering
 
 DAGENE_FOERSTE = "Signalet er slik i dag for første gang."
-# For en tidligere dag valgt med «Velg dag» passer ikke «i dag».
+# For en dag som ikke er i dag passer ikke «i dag»: en dag valgt med «Velg
+# dag», og siste boersdag i helga eller foer kveldshentingen. Datoen staar
+# oeverst paa siden (gruppens svar 25.10 kl. 11:04 b), gjennomgangen, BH1).
 DAGENE_FOERSTE_VALGT = "Signalet ble slik denne dagen for første gang."
 DAGENE_PAA_RAD = "Signalet har vært slik i {dager} børsdager på rad."
 DAGENE_MINST_EN = "Signalet har vært slik i minst 1 børsdag."
@@ -46,14 +48,15 @@ def tell_dagene(dag: date, vurdering: Vurdering, tidligere: Mapping[date, Vurder
         dager += 1
 
 
-def setning_om_dagene(dager: int, minst: bool, valgt_dag: bool = False) -> str:
+def setning_om_dagene(dager: int, minst: bool, annen_dag: bool = False) -> str:
     """Setningen under KI-teksten. minst er True naar dagene foer ikke er
-    lagret, saa antallet er det minste det kan vaere. Tallet vises etter
-    regel 21 (tallformat.tall)."""
+    lagret, saa antallet er det minste det kan vaere. annen_dag er True naar
+    dagen siden viser, ikke er i dag. Tallet vises etter regel 21
+    (tallformat.tall)."""
     if type(dager) is not int or dager < 1:
         raise ValueError("dager maa vaere et heltall fra 1")
     if minst:
         return DAGENE_MINST_EN if dager == 1 else DAGENE_MINST.format(dager=tall(dager, "heltall"))
     if dager == 1:
-        return DAGENE_FOERSTE_VALGT if valgt_dag else DAGENE_FOERSTE
+        return DAGENE_FOERSTE_VALGT if annen_dag else DAGENE_FOERSTE
     return DAGENE_PAA_RAD.format(dager=tall(dager, "heltall"))

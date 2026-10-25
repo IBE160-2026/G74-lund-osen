@@ -574,10 +574,15 @@ ANNEN = Vurdering(
 class TestSetningenOmDagene:
     """Gruppens svar 25.10 kl. 00:51: appen skriver dagene i en setning rett
     under KI-teksten, ogsaa naar KI er av eller teksten er stoppet, med
-    tellingen fra svaret 24.10 kl. 16:15 a)."""
+    tellingen fra svaret 24.10 kl. 16:15 a). Klokka staar paa 31.10, siste
+    dag i serien, saa dagen siden viser er i dag."""
+
+    @pytest.fixture(autouse=True)
+    def klokka_paa_siste_dag(self, monkeypatch):
+        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 31, 23, 0).astimezone())
 
     @pytest.mark.parametrize(
-        "dager, minst, valgt, setning",
+        "dager, minst, annen, setning",
         [
             (1, False, False, "Signalet er slik i dag for første gang."),
             (1, False, True, "Signalet ble slik denne dagen for første gang."),
@@ -586,17 +591,21 @@ class TestSetningenOmDagene:
             (12, True, False, "Signalet har vært slik i minst 12 børsdager."),
             (1, True, False, "Signalet har vært slik i minst 1 børsdag."),
             (1234, False, False, "Signalet har vært slik i 1 234 børsdager på rad."),
+            # Gjennomgangen, VG5: regel 21 ogsaa i «minst».
+            (1234, True, False, "Signalet har vært slik i minst 1 234 børsdager."),
         ],
     )
-    def test_setningen(self, dager, minst, valgt, setning):
+    def test_setningen(self, dager, minst, annen, setning):
         """Ville feilet hvis setningen ikke fulgte gruppens ordlyd for 1 dag,
         flere dager og minst, eller tallet ikke fulgte regel 21."""
         from dagene import setning_om_dagene
 
-        assert setning_om_dagene(dager, minst, valgt_dag=valgt) == setning
+        assert setning_om_dagene(dager, minst, annen_dag=annen) == setning
 
     @pytest.mark.parametrize("dager", [0, True, 2.0])
     def test_ugyldige_dager_avvises(self, dager):
+        """Ville feilet hvis 0, en bool eller et flyttall ga en setning
+        (gjennomgangen, VG13)."""
         from dagene import setning_om_dagene
 
         with pytest.raises(ValueError):
@@ -660,3 +669,41 @@ class TestSetningenOmDagene:
         skriv_vurdering("EQNR", date(2026, 10, 29), ANNEN)
         html = klient.get("/aksje/EQNR?dag=2026-10-30").get_data(as_text=True)
         assert '<p class="dagene">Signalet ble slik denne dagen for første gang.</p>' in html
+
+    def test_siste_dag_som_ikke_er_i_dag(self, klient, aksje, monkeypatch):
+        """Gjennomgangen, BH1, ECH6, VG1: i helga og foer kveldshentingen er
+        siste boersdag ikke i dag. Ville feilet hvis siden sa «i dag» om den."""
+        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 11, 2, 12, 0).astimezone())
+        skriv_vurdering("EQNR", date(2026, 10, 30), ANNEN)
+        assert '<p class="dagene">Signalet ble slik denne dagen for første gang.</p>' in side(klient)
+
+    @pytest.mark.parametrize(
+        "naa, setning",
+        [
+            (datetime(2026, 10, 31, 23, 0), "Signalet er slik i dag for første gang."),
+            (datetime(2026, 12, 31, 12, 0), "Signalet ble slik denne dagen for første gang."),
+        ],
+    )
+    def test_velg_dag_paa_siste_dag(self, klient, aksje, monkeypatch, naa, setning):
+        """Gjennomgangen, VG2, BH16: «Velg dag» paa siste dag i serien. Ville
+        feilet hvis «i dag» fulgte valget av dag, og ikke datoen."""
+        monkeypatch.setattr(app_modul, "naa", lambda: naa.astimezone())
+        skriv_vurdering("EQNR", date(2026, 10, 30), ANNEN)
+        html = klient.get("/aksje/EQNR?dag=2026-10-31").get_data(as_text=True)
+        assert f'<p class="dagene">{setning}</p>' in html
+
+    @pytest.mark.parametrize("feil", [sqlite3.OperationalError("database is locked"), RuntimeError("versjonen")])
+    def test_uten_setning_naar_dagene_ikke_kan_leses(self, klient, aksje, monkeypatch, feil):
+        """Gjennomgangen, VG4, BH7, ECH11: ville feilet hvis siden feilet,
+        eller skrev en setning, naar lesingen av dagene feilet."""
+        ekte = lagring_sqlite.SqliteVurderingslager.les_periode
+
+        def les(self, symbol, fra, til):
+            if fra == date.min:
+                raise feil
+            return ekte(self, symbol, fra, til)
+
+        monkeypatch.setattr(lagring_sqlite.SqliteVurderingslager, "les_periode", les)
+        skriv_kirad(kirad(aksje))
+        html = side(klient)
+        assert 'class="dagene"' not in html and TEKST in html
