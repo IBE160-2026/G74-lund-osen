@@ -579,7 +579,7 @@ class TestSetningenOmDagene:
 
     @pytest.fixture(autouse=True)
     def klokka_paa_siste_dag(self, monkeypatch):
-        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 31, 23, 0).astimezone())
+        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 31, 12, 0).astimezone())
 
     @pytest.mark.parametrize(
         "dager, minst, annen, setning",
@@ -680,7 +680,7 @@ class TestSetningenOmDagene:
     @pytest.mark.parametrize(
         "naa, setning",
         [
-            (datetime(2026, 10, 31, 23, 0), "Signalet er slik i dag for første gang."),
+            (datetime(2026, 10, 31, 12, 0), "Signalet er slik i dag for første gang."),
             (datetime(2026, 12, 31, 12, 0), "Signalet ble slik denne dagen for første gang."),
         ],
     )
