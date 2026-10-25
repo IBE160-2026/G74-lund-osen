@@ -2810,6 +2810,8 @@ starter ikke av seg selv.
 
 *Avgjort 2026-10-25 kl. 12:19 (gruppens svar):* d) for en dag som ikke er i dag: «Denne dagen hadde signalet vært slik i 4 børsdager på rad.» og «Denne dagen hadde signalet vært slik i minst 12 børsdager.» (BH5). e) Med retningen Ingen står setningen som den er, fordi «slik» viser til retningen rett over (ECH10).
 
+*Lagt til 2026-10-25 kl. 13:13:* prompten versjon 3 er flettet i `0c25686`, PR #95 (spesifikasjonen `spec-10-2e-prompten-versjon-3.md`), og brukes fra hentingen mandag 26.10. Modellen får ikke dagene og nevner dem ikke, og appen skriver dem i en setning under KI-teksten. §46 i `malinger.md` ga 15 av 15, også etter at kontrollen ble strammet inn etter gjennomgangen kl. 13. CI var grønn på head-en `3ca1378` (kjøring 40191436271).
+
 ### Story 10.3: Visningen i aksjedetaljen
 
 *Het Story 5B.3 til 28.09.*
