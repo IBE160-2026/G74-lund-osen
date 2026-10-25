@@ -2,7 +2,7 @@
 title: 'Story 10.2, 10.2h: ordstillingen etter «fordi» og rekkefølgen på sjekkene i prompten'
 type: 'feature'
 created: '2026-10-25'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'd4b6d12'
