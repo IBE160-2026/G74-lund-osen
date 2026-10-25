@@ -168,7 +168,8 @@ class TestFila:
         feilet hvis en rad i fila manglet promptens avtrykk, hadde et annet
         avtrykk enn prompten slik den er naa, eller feltet sto et annet sted
         enn rett etter promptversjonen."""
-        i_fila = json.loads(demo_ki.FIL.read_text(encoding="utf-8"))["radene"]
+        # utf-8-sig som i les_radene (gjennomgangen, BH8 og ECH3).
+        i_fila = json.loads(demo_ki.FIL.read_text(encoding="utf-8-sig"))["radene"]
         assert i_fila
         for verdi in i_fila:
             assert verdi["promptavtrykk"] == demo_ki.promptavtrykk(), verdi["symbol"]
@@ -179,7 +180,7 @@ class TestFila:
         """Story 10.2g (VG1, ECH2 og BH13 i 10.2f): to prompter med samme
         versjon skilles bare av avtrykket. Ville feilet hvis en rad med et
         annet avtrykk enn prompten, eller uten avtrykket, ble lest."""
-        innhold = json.loads(demo_ki.FIL.read_text(encoding="utf-8"))
+        innhold = json.loads(demo_ki.FIL.read_text(encoding="utf-8-sig"))
         innhold["radene"][-1]["promptavtrykk"] = "0" * 64
         fil = tmp_path / "annen-prompt.json"
         fil.write_text(json.dumps(innhold, ensure_ascii=False), encoding="utf-8")
@@ -195,11 +196,13 @@ class TestFila:
         with pytest.raises(demo_ki.UgyldigDemoKI, match="promptavtrykk"):
             demo_ki.les_radene(fil)
 
-    def test_en_endret_prompt_avviser_tekstene(self, monkeypatch):
+    @pytest.mark.parametrize("navn", ["REGLER", "UTENFOR"])
+    def test_en_endret_prompt_avviser_tekstene(self, monkeypatch, navn):
         """Story 10.2g: endres prompten uten at tekstene lages paa nytt,
         ogsaa med samme versjon, avvises fila. Ville feilet hvis lesingen
-        bare saa paa versjonen, eller avtrykket ikke dekket reglene."""
-        monkeypatch.setattr(ki_prompt, "REGLER", ki_prompt.REGLER + "- En ny regel.\n")
+        bare saa paa versjonen, eller avtrykket ikke dekket reglene eller
+        merket (gjennomgangen, BH9)."""
+        monkeypatch.setattr(ki_prompt, navn, getattr(ki_prompt, navn) + "- En ny regel.\n")
         assert ki_prompt.PROMPTVERSJON == PROMPTVERSJON
         with pytest.raises(demo_ki.UgyldigDemoKI, match="annen prompt"):
             demo_ki.les_radene(prompt=demo_ki.promptavtrykk())
@@ -392,6 +395,12 @@ class TestLagTekstene:
         assert modell.kall == len(radene) == len(med_vurdering)
         assert all(not r.besto and r.tekst == modell.tekst for r in radene)
         assert [r.emne for r in demo_ki.les_radene(fil)] == [r.emne for r in radene]
+        # Gjennomgangen av 10.2g (VG1): fila kommandoen skriver, har promptens
+        # avtrykk rett etter promptversjonen.
+        for verdi in json.loads(fil.read_text(encoding="utf-8"))["radene"]:
+            feltene = list(verdi)
+            assert feltene[feltene.index("promptversjon") + 1] == "promptavtrykk"
+            assert verdi["promptavtrykk"] == demo_ki.promptavtrykk()
 
     def test_roerer_ikke_basene_i_data(self, tmp_path):
         """Regel 22: demobasen lages i en midlertidig mappe. Ville feilet hvis
@@ -410,7 +419,7 @@ class TestLagTekstene:
 
         assert set(demo_ki.FELTENE) == {f.name for f in fields(KIRad)} - {"emne", "grunnlag"}
         i_fila = json.loads(demo_ki.FIL.read_text(encoding="utf-8"))["radene"]
-        assert [demo_ki.til_json(r) for r in radene] == i_fila
+        assert [demo_ki.til_json(r, demo_ki.promptavtrykk()) for r in radene] == i_fila
 
     def test_en_kjoering_som_ikke_er_hel_skriver_ikke_fila(self, tmp_path):
         """Gjennomgangen, BH4, ECH1 og VG4: svarer ikke modellen, eller feiler

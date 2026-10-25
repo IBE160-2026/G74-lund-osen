@@ -224,6 +224,9 @@ class TestPrompten:
         regelen = "- Når retningen er Ingen, skriv at signalet ikke har noen retning."
         assert REGLER.splitlines().count(regelen) == 1
         assert regelen in lag_prompt({**BLANDET, "styrke": 0, "retning": "Ingen"})
+        # Gjennomgangen (ECH5): regelen staar i prompten for alle retninger,
+        # som de andre reglene.
+        assert regelen in lag_prompt(BLANDET)
 
     def test_ingen_raad_og_ingen_gjetning(self):
         prompt = lag_prompt(BLANDET)

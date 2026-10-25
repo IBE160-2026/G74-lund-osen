@@ -104,22 +104,23 @@ def promptavtrykk() -> str:
     return hashlib.sha256(tekst.encode("utf-8")).hexdigest()
 
 
-def til_json(rad: KIRad) -> dict:
-    """Raden slik fila har den, med promptens avtrykk slik prompten er naa.
-    Brukes bare naar tekstene nettopp er laget med den."""
+def til_json(rad: KIRad, prompt: str) -> dict:
+    """Raden slik fila har den. prompt er avtrykket av prompten teksten ble
+    laget med, og staar rett etter promptversjonen (gjennomgangen av 10.2g,
+    BH1, BH14 og ECH2)."""
     if rad.emne.slag != AKSJE:
         raise UgyldigDemoKI(f"bare rader for en aksje, fikk {rad.emne.slag!r}")
-    verdi = {
+    feltene = {felt: getattr(rad, felt) for felt in FELTENE}
+    etter = FELTENE.index("promptversjon") + 1
+    return {
         "dato": rad.emne.dato.isoformat(),
         "symbol": rad.emne.symbol,
         "grunnlag": json.loads(rad.grunnlag_som_json()),
         "avtrykk": avtrykk(rad),
+        **{felt: feltene[felt] for felt in FELTENE[:etter]},
+        "promptavtrykk": prompt,
+        **{felt: feltene[felt] for felt in FELTENE[etter:]},
     }
-    for felt in FELTENE:
-        verdi[felt] = getattr(rad, felt)
-        if felt == "promptversjon":
-            verdi["promptavtrykk"] = promptavtrykk()
-    return verdi
 
 
 def fra_json(verdi: dict, prompt: str | None = None) -> KIRad:
@@ -211,6 +212,9 @@ def lag_tekstene(modell, fil: Path = FIL, skriv: Callable[[str], None] = print) 
 
     dag = demo.SLUTTDATO
     klokke = demo._klokke_for(dag)
+    # Avtrykket av prompten foer det foerste kallet, og sjekket igjen etter
+    # det siste, saa raden faar prompten teksten ble laget med (BH1).
+    prompt = promptavtrykk()
     med_tid = _MedTid(modell)
     with tempfile.TemporaryDirectory() as mappe:
         base = Path(mappe) / "demo.db"
@@ -237,7 +241,9 @@ def lag_tekstene(modell, fil: Path = FIL, skriv: Callable[[str], None] = print) 
         if feilet:
             grunn += f", og modellen feilet for {', '.join(feilet)}"
         raise UgyldigDemoKI(f"{grunn}. {Path(fil).name} er ikke endret. {tider}".rstrip())
-    innhold = {"format": FORMAT, "radene": [til_json(rad) for rad in radene]}
+    if promptavtrykk() != prompt:
+        raise UgyldigDemoKI(f"prompten ble endret underveis. {Path(fil).name} er ikke endret.")
+    innhold = {"format": FORMAT, "radene": [til_json(rad, prompt) for rad in radene]}
     ny = Path(fil).with_name(Path(fil).name + ".ny")
     ny.write_text(json.dumps(innhold, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
     os.replace(ny, fil)
