@@ -187,7 +187,7 @@ class TestPrompten:
         assert "for eksempel at ingen sjekk ga utslag" not in REGLER
 
     def test_dagene_er_ikke_i_reglene(self):
-        """Gruppens svar 25.10 kl. 00:51 (malinger.md §45): modellen faar ikke
+        """Gruppens svar 25.10 kl. 00:51 (malinger.md §46): modellen faar ikke
         dagene. Erstatter testene fra 21:49 og 23:23 om «minst» og ordlyden.
         Ville feilet hvis reglene forklarte dagene, hadde «minst», eller ikke
         sa at teksten ikke nevner hvor lenge signalet har vart."""
@@ -1264,6 +1264,34 @@ class TestDageneStoppes:
             "Signalet har vært slik i to uker.",
             "Dette er et nytt signal.",
             "Signalet er nytt.",
+            # Gjennomgangen 25.10 kl. 11 (ECH1): «de siste» med et annet tall
+            # enn vinduene, i bestemt form, eller uten tall.
+            "Signalet har vært negativt de siste 3 børsdager.",
+            "Signalet har vært negativt de siste tre børsdager.",
+            "Signalet har vært negativt de siste 4 børsdagene.",
+            "Signalet har vært negativt de tre siste børsdagene.",
+            "Signalet har vært negativt de siste dagene.",
+            "Signalet har vært negativt de siste ukene.",
+            # ECH2: et vindu etter et verb om varighet.
+            "Kursen har ligget over snittet 50 dager.",
+            "Trenden har vært positiv 50 dager.",
+            "Signalet har vært positivt 20 dager, og interessen måles mot snittet.",
+            "Signalet har vært positivt femti dager med trenden over snittet.",
+            # ECH3, BH4, VG7: flere former uten tall.
+            "Signalet er negativt igjen.",
+            "Signalet fortsetter å være positivt.",
+            "Signalet var også negativt forrige børsdag.",
+            "Signalet er det samme som dagen før.",
+            "Det nye signalet er positivt.",
+            "Et nytt positivt signal.",
+            "Signalet ble helt nytt.",
+            "Signalet har vært slik en stund.",
+            "Signalet har vært slik i flere måneder.",
+            "Signalet er det samme som sist.",
+            "Signalet har holdt seg i ukene som har gått.",
+            "Signalet har fremdeles denne retningen.",
+            "Signalet har vært slik hele uken.",
+            "Signalet har vært slik i en uke.",
         ],
     )
     def test_dagene_i_enhver_form_stoppes(self, tekst):
@@ -1296,6 +1324,18 @@ class TestDageneStoppes:
             ("Snittet for 50 dager.", DAGEN_UTEN_DAGENE),
             ("Hovedindeksen falt i dag.", DAGEN_UTEN_DAGENE),
             ("Trenden og de andre sjekkene i dag ga dette.", BLANDET),
+            # Gjennomgangen 25.10 kl. 11 (ECH1, ECH5): regelens vinduer etter
+            # «siste», og vinduene for bevegelsen og interessen.
+            (
+                "Kursen ligger over snittet for de siste 50 børsdagene, og endringen var stor "
+                "sammenlignet med de siste 20 dagene.",
+                DAGEN_UTEN_DAGENE,
+            ),
+            ("Bevegelsen måles over 20 dager.", DAGEN_UTEN_DAGENE),
+            ("Interessen måler volumet mot 20 dager.", DAGEN_UTEN_DAGENE),
+            ("Volumet sammenlignes med 20 handelsdager.", DAGEN_UTEN_DAGENE),
+            ("Volumet er høyere enn snittet over de siste 20 handelsdagene.", DAGEN_UTEN_DAGENE),
+            ("Hovedindeksen var uendret.", {**DAGEN_UTEN_DAGENE, "hovedindeksen": "uendret"}),
         ],
     )
     def test_riktige_tekster_bestaar(self, tekst, grunnlag):

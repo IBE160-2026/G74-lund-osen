@@ -305,13 +305,26 @@ _AKSJER_UTSAGN = re.compile(
 # falt i tre dager» leses som dagene, og stoppes hvis tallet ikke stemmer.
 _DAGER_UTSAGN = re.compile(
     r"(?<![\w-])(?:(minst\s+)?(i|har\s+vært)\s+)?(?:(?:hele|totalt|nå)\s+)?(minst\s+)?(\w+)\s+"
-    r"(?:børs)?dag(?:er)?(?![\w-])(\s+(?:på\s+rad|med\s+samme|etter\s+hverandre))?",
+    r"(?:børs|handels)?dag(?:er)?(?![\w-])(\s+(?:på\s+rad|med\s+samme|etter\s+hverandre))?",
     re.IGNORECASE,
 )
 _TVETYDIGE = frozenset(("en", "én", "ett", "ingen"))
 # Regelens vinduer uten ledd, «Vinduet er 20 dager», er ikke dagene.
 _VINDUENE = frozenset((MA_VINDU, VOLATILITET_VINDU, VOLUM_VINDU))
 _ETTER_SISTE = re.compile(r"(?<![\w-])siste\s+$", re.IGNORECASE)
+# Gjennomgangen 25.10 kl. 11 (ECH1): «de siste» er regelens vindu bare med 20
+# eller 50. «De siste 3 børsdager», «de tre siste børsdagene», «de siste
+# dagene» og «de siste ukene» er dagene.
+_SISTE_DAGENE = re.compile(
+    r"(?<![\w-])(?:(\w+)\s+)?siste\s+(?:(\w+)\s+)?((?:børs|handels)?dag(?:er|ene)|uke(?:r|ne))(?![\w-])",
+    re.IGNORECASE,
+)
+# ECH2: et vindu etter et verb om varighet i samme setning, «har vært
+# positiv 50 dager», er dagene, ogsaa naar setningen nevner snittet.
+_VARIGHET = re.compile(
+    r"(?<![\w-])(?:(?:har|hadde)\s+(?:vært|ligget|holdt|vart|stått)|vart|varer|varte)(?![\w-])",
+    re.IGNORECASE,
+)
 # «Minst» ved et ord om dagene, inntil to ord imellom: «i minst to
 # børsdager», «fordi feltet dager er minst». Gjennomgangen (BH6, ECH8):
 # ikke «minst» om sjekkene i en setning som ogsaa nevner dagene. «I dag»,
@@ -355,16 +368,24 @@ _DAGENE_I_ANNEN_FORM = re.compile(
     r"|første(?:\s+[\w-]+)?\s+med\s+(?:denne|samme)\s+retning(?:en)?"
     r"|ganger|nok\s+en\s+gang|i\s+går|siden\s+"
     + _UKEDAG
-    + r"|(?:flere|mange|noen|få)\s+(?:børs|handels)?dag(?:er|ene)?|handelsdag(?:en|er|ene)?"
+    + r"|(?:flere|mange|noen|få)\s+(?:børs|handels)?dag(?:er|ene)?"
     r"|på\s+rad|etter\s+hverandre|i\s+trekk"
     # Svaret 25.10 kl. 00:51: dagene i enhver form, ogsaa uten tall.
-    r"|fortsatt|fremdeles|lenge|uke[nr]?|nytt?\s+signal\w*|signalet\s+(?:er|var|ble)\s+(?:helt\s+)?nytt)(?![\w-])",
+    r"|fortsatt|fremdeles|lenge|uke(?:n|r|ne|rs|s)?|ny(?:tt|e)?\s+(?:[\w-]+\s+)?signal\w*"
+    r"|signalet\s+(?:er|var|ble)\s+(?:\w+\s+)?nytt"
+    # Gjennomgangen 25.10 kl. 11 (ECH3, BH4, VG3): flere former uten tall.
+    r"|igjen|ennå|stadig|på\s+nytt|fortsetter|vedvarer|nylig|en\s+stund|som\s+sist"
+    r"|forrige\s+(?:børs|handels)?dag(?:en)?|dagen\s+før|måned(?:en|er|ene)?)(?![\w-])",
     re.IGNORECASE,
 )
 # Gjennomgangen 25.10 (ECH5): regelens vinduer uten ledd er vinduene bare
 # naar setningen sier det, «Vinduet er 20 dager», «snittet for 50 dager» og
 # «Femti dager er grunnlaget for trenden». «Holdt seg 20 børsdager» stoppes.
-_OM_VINDUET = re.compile(r"(?<![\w-])(?:vindu|snitt|median|trend|ma50)", re.IGNORECASE)
+# Gjennomgangen 25.10 kl. 11 (ECH5): ogsaa vinduene for bevegelsen og
+# interessen, «Bevegelsen måles over 20 dager».
+_OM_VINDUET = re.compile(
+    r"(?<![\w-])(?:vindu|snitt|median|trend|ma50|volum|volatilitet|svingning|bevegelse|interesse)", re.IGNORECASE
+)
 
 # Gruppens svar 24.10 kl. 21:49: utsagn om én sjekk, med navnet og utslaget,
 # skal stemme med fortegnet i grunnlaget. Ogsaa en liste: «bevegelse og
@@ -521,12 +542,26 @@ def _setningen(tekst: str, i: int) -> str:
     return next((s.group(0) for s in _SETNING.finditer(tekst) if s.start() <= i < s.end()), "")
 
 
+def _er_vinduet(tekst: str, i: int, tall: int, etter_siste: bool) -> bool:
+    """Tallet ved posisjon i er regelens vindu (20 eller 50) og ikke dagene:
+    etter «siste», eller i en setning om vinduet, og uten et verb om varighet
+    foran i samme setning (gjennomgangen 25.10 kl. 11, ECH1, ECH2)."""
+    if tall not in _VINDUENE:
+        return False
+    foer = next((tekst[s.start() : i] for s in _SETNING.finditer(tekst) if s.start() <= i < s.end()), "")
+    if _VARIGHET.search(foer):
+        return False
+    return etter_siste or bool(_OM_VINDUET.search(_setningen(tekst, i)))
+
+
 def _dagene(tekst: str) -> list[str]:
     """Dagene (gruppens svar 25.10 kl. 00:51): modellen faar ikke dagene og
-    nevner dem ikke, saa alt om dagene stoppes: et antall dager, «minst» ved et
-    ord om dagene, «på rad», ordenstall som «det tredje på rad» og «for første
-    gang», og ord som «fortsatt» og «nytt signal». Regelens vinduer og «en
-    dag» som vanlig ord står som før."""
+    nevner dem ikke, saa de kjente formene for dagene stoppes: et antall
+    dager, «minst» ved et ord om dagene, «på rad», «de siste dagene»,
+    ordenstall som «det tredje på rad» og «for første gang», og ord som
+    «fortsatt», «igjen» og «nytt signal». Kontrollen leser ord, ikke mening,
+    saa en form som ikke er i lista, slipper gjennom (gjennomgangen, VG3).
+    Regelens vinduer og «en dag» som vanlig ord står som før."""
     grunner: list[str] = []
     lest: list[tuple[int, int]] = []
     om = "modellen nevner ikke dagene"
@@ -539,12 +574,17 @@ def _dagene(tekst: str) -> list[str]:
         if tall is None:
             continue
         uten_ledd = not (foran or minst or etter)
-        foer = tekst[: treff.start()]
-        if uten_ledd and (
-            ord_.lower() in _TVETYDIGE
-            or (tall in _VINDUENE and _OM_VINDUET.search(_setningen(tekst, treff.start())))
-            or _ETTER_SISTE.search(foer)
-        ):
+        etter_siste = bool(_ETTER_SISTE.search(tekst[: treff.start()]))
+        if uten_ledd and (ord_.lower() in _TVETYDIGE or _er_vinduet(tekst, treff.start(), tall, etter_siste)):
+            continue
+        grunner.append(f"1: dagene «{treff.group(0).strip()}», {om}")
+        lest.append(treff.span())
+    for treff in _SISTE_DAGENE.finditer(tekst):
+        if any(treff.start() < slutt and start < treff.end() for start, slutt in lest):
+            continue
+        tallene = [t for t in (_antall(treff.group(1) or ""), _antall(treff.group(2) or "")) if t is not None]
+        om_dager = not treff.group(3).lower().startswith("uke")
+        if om_dager and tallene and _er_vinduet(tekst, treff.start(), tallene[0], etter_siste=True):
             continue
         grunner.append(f"1: dagene «{treff.group(0).strip()}», {om}")
         lest.append(treff.span())
