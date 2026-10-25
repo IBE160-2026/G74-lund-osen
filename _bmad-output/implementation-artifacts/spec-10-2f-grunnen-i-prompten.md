@@ -31,6 +31,8 @@ context:
 
 **c) Prøvekjøringen** (§47 i `malinger.md`), som i §46, mot `data/db/ki-proeve-v3g.db` for børsdagen 23.10, med hver tekst lest mot grunnlaget. Tabellen sammenligner §34 og §43–§47.
 
+*Utfallet:* kjørt 19:19:04–19:19:12 mot `ki-proeve-v3g.db`: 15 av 15 besto, 0 ble stoppet, og modellen feilet for 0, med median 0,46 s og lengste kall 1,02 s. Hver tekst er lest mot grunnlaget: ingen sier feil om en sjekk, og ingen nevner dagene. 9 er ordrett de samme som i den siste kjøringen i §46. sha256 for `ose.db` var den samme før og etter.
+
 ## Boundaries & Constraints
 
 - Ingen kall til EODHD utover kvotesjekken i regel 15. `src/fetch_prices.py` kjøres ikke, og `data/db/ose.db` røres ikke (regel 22). Demobaser lages bare i midlertidige mapper.
