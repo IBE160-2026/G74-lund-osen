@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-25T20:24
+updated: 2026-10-25T20:37
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -5134,6 +5134,9 @@ opplysningene). 7 av de 15 er ordrett de samme som i §47
 
 §48: `maskinvare` `gpu` for alle 15, `gemma4:e4b` med `modell_id`
 `dc35e8d9c606`, og Ollama 0.35.1. Alle 15 radene har `promptversjon` 3.
+Om modellen ble lastet inn ved kall nr. 1 i §48, ble ikke ført
+(gjennomgangen, BH11). Demotekstene var laget kl. 20:17:51–20:18:20, fem
+minutter før.
 
 **Resultat.** Kontrollen stoppet ingen av de 15. Ingen tekst sier feil om en
 sjekk, og ingen nevner dagene. To av de 15 har retningen Ingen (styrke 0), og
@@ -5145,3 +5148,8 @@ eller gjetter på en årsak. Tekstene står bare i kopien og er ikke ført her.
 15 av 15 er kravet i gruppens svar 25.10 kl. 00:51. Versjonen består like
 mange som de 15 radene med versjon 2 fra kveldshentingen 23.10 i kopien, alle
 bestått, etter punkt 2 i beslutningen 16.10 kl. 23:51.
+
+Regelen for retningen Ingen er prøvd på 2 av de 15, i én kjøring, og på 1
+demotekst (SLVP). Det viser at modellen fulgte regelen her, ikke at den
+gjør det hver gang. Kontrollen stopper ikke «Signalet er Ingen», fordi det
+er riktig retning (gjennomgangen, BH4, BH12 og ECH4).
