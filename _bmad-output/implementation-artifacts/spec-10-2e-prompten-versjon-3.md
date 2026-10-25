@@ -2,7 +2,7 @@
 title: 'Story 10.2, 10.2e: prompten versjon 3'
 type: 'feature'
 created: '2026-10-24'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '153aba8'
@@ -138,6 +138,8 @@ Gruppens svar 25.10 kl. 12:12 og 12:19, på funnene fra gjennomgangen kl. 11:
 **Rettingen etter svaret kl. 21:49**, én om gangen med `-x`, med kopi før og fila lik HEAD etter (`git hash-object` lik bloben på HEAD):
 - M1, `grunner += _en_sjekk(…)` tatt ut, kontrollen uten sjekken av én sjekk: på `f42c9d7` kl. 22:07:15 og på `4a1d088` kl. 22:23:22, fanget begge ganger av `test_de_tre_tekstene_i_43_som_sa_feil_om_interessen` (MOWI).
 - M2, `if not merket:` byttet med `if False:`, «minst» sluppet uten merket: på `f42c9d7` kl. 22:07:17 og på `4a1d088` kl. 22:23:25, fanget begge ganger av `test_minst_uten_merket_stoppes`.
+
+*Lagt til 2026-10-25 kl. 13 (flettet i `0c2568660e1e`):* ordlyden etter gruppens svar kl. 12:12 og 12:19, én mutant med `-x`, med kopi før og fila lik HEAD etter (samme blob): «Signalet har vært slik i N børsdager på rad.» for en dag som ikke er i dag, på `7d61aaf` kl. 12:45:00, fanget av `test_setningen[4-False-True-…]`. Mutantene i tredje og fjerde forsøk og for lesingen står i Utført-linjene i dagsfila for 25.10.
 
 ## Prøvekjøringen
 
