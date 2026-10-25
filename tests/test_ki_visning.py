@@ -624,6 +624,8 @@ class TestSetningenOmDagene:
         assert "første gang" not in setning
         if annen:
             assert "Signalet har vært" not in setning and "denne dagen" in setning.lower()
+        else:
+            assert "denne dagen" not in setning.lower() and "hadde" not in setning
 
     @pytest.mark.parametrize("dager", [0, True, 2.0])
     def test_ugyldige_dager_avvises(self, dager):
@@ -710,9 +712,11 @@ class TestSetningenOmDagene:
         assert '<p class="dagene">Signalet ble slik denne dagen.</p>' in side(klient)
 
     def test_minst_paa_siste_dag_som_ikke_er_i_dag(self, klient, aksje, monkeypatch):
-        """Svarene kl. 12:12 c) og 12:19 d): ogsaa uten «Velg dag». Ville
-        feilet hvis siden sa «Signalet har vært slik i minst» om siste
-        boersdag foer kveldshentingen."""
+        """Svarene kl. 12:12 c) og 12:19 d): ogsaa uten «Velg dag». aksje
+        skriver bare vurderingen for siste dag (31.10), saa boersdagen foer
+        mangler og gir «minst». Ville feilet hvis siden sa «Signalet har vært
+        slik i minst» om siste boersdag foer kveldshentingen (gjennomgangen
+        kl. 13, BH6)."""
         monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 11, 2, 12, 0).astimezone())
         assert '<p class="dagene">Denne dagen hadde signalet vært slik i minst 1 børsdag.</p>' in side(klient)
 
