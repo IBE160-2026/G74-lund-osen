@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-25T01:15
+updated: 2026-10-25T11:34
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -5013,3 +5013,19 @@ står bare i kopien og er ikke ført her.
 
 15 av 15 er kravet i gruppens svar 25.10 kl. 00:51, og versjon 3 består like
 mange som versjon 2 på samme dag (15), etter beslutningen 16.10 kl. 23:51 (2).
+
+**Kjørt på nytt etter gjennomgangen 25.10 kl. 11.** Gjennomgangen strammet
+inn kontrollen for dagene (spesifikasjonen 10.2e, «Gjennomgangen 25.10 kl.
+11»): «de siste N dager» med et annet tall enn 20 og 50, et vindu etter et
+verb om varighet, og flere former uten tall, som «igjen», «forrige børsdag»
+og «det nye signalet». Prompten er ikke endret. Basen ble kopiert med
+skallet på main til `data/db/ki-proeve-v3e.db` søndag 25.10 kl. 11:32:48,
+med samme sha256 som `ose.db`, og kjørt på samme måte som over, kl.
+11:32:56–11:33:22: 15 besto, 0 ble stoppet, og modellen feilet for 0. Median
+0,47 s per tekst og lengste kall 18,61 s. Hvilket kall det var, ble ikke
+ført. Alle 15 radene har `promptversjon` 3, `maskinvare` `gpu`, `gemma4:e4b`
+med `modell_id` `dc35e8d9c606` og Ollama 0.35.1. Hver tekst er lest mot
+grunnlaget: ingen sier feil om en sjekk, og ingen nevner dagene. sha256 for
+`ose.db` var den samme før og etter. Med den nye kontrollen består fortsatt
+15 fra §34, 2 fra §43, 1 fra §44, 0 fra §45 og 15 fra den første kjøringen i
+§46, og de 13 demotekstene får samme utfall som før.
