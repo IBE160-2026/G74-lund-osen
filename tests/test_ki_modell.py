@@ -47,7 +47,9 @@ AVTRYKK = {
     # Story 10.2f, gruppens svar 25.10 kl. 18:34 og 18:35: ny grunn i reglene,
     # og versjonen staar som 3 (unntaket i docstringen i ki_prompt.py). Var
     # 76543003....
-    "3": "0a9e650c2744c05c199abe28e44935f55fb07d14faa57b99fa3af162aabab576",
+    # Story 10.2g, gruppens svar 25.10 kl. 19:54 og 19:56: regelen for
+    # retningen Ingen, og versjonen staar som 3. Var 0a9e650c....
+    "3": "0d427725ad4f4faaf9156451164fc991a35da73eab5834d7f9b816e820110a27",
 }
 
 
@@ -213,6 +215,15 @@ class TestPrompten:
         # i en omskrevet form, og den kommer med i prompten til modellen.
         assert (REGLER + UTENFOR).count("Siden sier") == 1
         assert "Siden sier under teksten hvor lenge signalet har vart." in lag_prompt(BLANDET)
+
+    def test_retningen_ingen_skrives_som_ingen_retning(self):
+        """Story 10.2g, gruppens svar 25.10 kl. 19:54 og 19:56 b): modellen
+        skrev «Signalet er Ingen, fordi ...» (BH10). Ville feilet hvis regelen
+        for retningen Ingen ble tatt ut av reglene, eller ikke kom med i
+        prompten til modellen."""
+        regelen = "- Når retningen er Ingen, skriv at signalet ikke har noen retning."
+        assert REGLER.splitlines().count(regelen) == 1
+        assert regelen in lag_prompt({**BLANDET, "styrke": 0, "retning": "Ingen"})
 
     def test_ingen_raad_og_ingen_gjetning(self):
         prompt = lag_prompt(BLANDET)
