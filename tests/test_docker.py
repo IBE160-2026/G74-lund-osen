@@ -1019,6 +1019,8 @@ HOEYDE_PAA_BILDET = 1630
 # Story 8.6b, svaret 26.10 kl. 15:21 (f): tabellen bak «Se tallene som tabell»
 # i stil.css og hjelpen i hjelpetekster.py. Bildet ble tatt paa nytt og er byte
 # for byte det samme.
+# Gjennomgangen av 8.6b 26.10 (ECH4): datoen for børsdagen før i app.py. Bildet
+# ble tatt paa nytt og er byte for byte det samme.
 AVTRYKK_BAK_BILDET = "e8f5222ed62f26f7075cdbb31d496961de076999e26b8920925365d547577627"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
@@ -1204,7 +1206,9 @@ HOEYDE_PAA_AKSJESIDEN = 1894
 # Story 8.6b, svaret 26.10 kl. 15:21 (f): tabellen bak «Se tallene som tabell»
 # i stil.css og hjelpen i hjelpetekster.py. Bildet ble tatt paa nytt og er byte
 # for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "26f61037bdf5075301de375aca020988f4c4695392bdd5897fd2e0b74cb4c3a7"
+# Gjennomgangen av 8.6b 26.10 (ECH4): datoen for børsdagen før i app.py. Bildet
+# ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "61c895a148d71b8c7de7ff2b24359352a53ceabc05790cb42987ae4f9cdb9c41"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "

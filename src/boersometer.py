@@ -37,7 +37,7 @@ from hovedindeks import indeksendring
 from kursdata import Aksje, Kursrad
 from markedsoversikt import IKKE_VURDERT, endring_i_prosent, grunn_med_tall, les_tilstand
 from signalberegning import STANDARD, Parametre
-from tallformat import avrundet, desimaler_mot_grense, tall
+from tallformat import avrundet, dato, desimaler_mot_grense, tall, ukedag
 from tilstand import Art
 from vurderingsdata import Grunn, Vurdering
 
@@ -265,6 +265,22 @@ def dagen_foer(datoer: list[date], dag: date) -> date | None:
     rutene regnes fra (8.6b, b). None når dag er den første."""
     foer = [d for d in datoer if d < dag]
     return max(foer) if foer else None
+
+
+# Gjennomgangen 26.10 (ECH4): ukedagen sier hvilken dag bare når den er i
+# uka før dagen som vises. Er børsdagen før mer enn 6 dager før, står datoen.
+UKEDAG_INNTIL = 6
+
+
+def vis_dagen_foer(foer: date | None, dag: date, i_aar: int) -> str:
+    """Børsdagen før i linja «Mål mot børsen»: ukedagen når den er høyst
+    UKEDAG_INNTIL dager før dag, ellers datoen, og «børsdagen før» når dag
+    er den første (8.6b, b)."""
+    if foer is None:
+        return "børsdagen før"
+    if (dag - foer).days > UKEDAG_INNTIL:
+        return dato(foer, i_aar)
+    return ukedag(foer)
 
 
 def indeks_for_dagen(serie: list[Kursrad], dag: date) -> float | None:

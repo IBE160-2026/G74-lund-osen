@@ -41,7 +41,7 @@
     <section class="maal" aria-labelledby="maal-tittel">
       <h2 id="maal-tittel">Mål mot børsen</h2>
       <ul>
-        <li>Farge · endring fra {{ dagen_foer|ukedag if dagen_foer else "børsdagen før" }}</li>
+        <li>Farge · endring fra {{ dagen_foer }}</li>
         <li>Størrelse · volum mot medianen for de {{ volum_vindu }} børsdagene før</li>
         <li>Hovedindeksen · {% if indeksendring is not none %}<span class="indeksendring {{ fortegn(indeksendring) }}">{{ indeksendring|tall('endring') }}</span>{% else %}–{% endif %}</li>
       </ul>

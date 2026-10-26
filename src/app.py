@@ -38,7 +38,15 @@ from flask import Flask, abort, g, redirect, render_template, request
 import lagring_sqlite
 from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
 from boersdag import UtenforKalenderen, innevaerende_boersdag, norsk_dato
-from boersometer import bygg_boersometer, bygg_rute, dagen_foer, indeks_for_dagen, kart, trinnforklaringer
+from boersometer import (
+    bygg_boersometer,
+    bygg_rute,
+    dagen_foer,
+    indeks_for_dagen,
+    kart,
+    trinnforklaringer,
+    vis_dagen_foer,
+)
 from dagene import setning_om_dagene, tell_dagene
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
 from graf import bygg_graf
@@ -637,7 +645,8 @@ def boersometer():
         dagen=dagen,
         siste=siste,
         foerste=datoer[0],
-        dagen_foer=dagen_foer(datoer, dagen),
+        # Gjennomgangen 26.10 (ECH4): datoen når børsdagen før er mer enn 6 dager før.
+        dagen_foer=vis_dagen_foer(dagen_foer(datoer, dagen), dagen, i_dag.year),
         volum_vindu=STANDARD.volum_vindu,
         indeksendring=_indeksen_for_dagen(dagen),
         fargetrinn=trinnforklaringer(),

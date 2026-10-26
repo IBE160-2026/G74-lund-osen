@@ -107,12 +107,15 @@ Gjennomgang 26.10 etter hele settet (3721 bestått, 20 hoppet over, 0 feilet, 09
 
 *Rettet 2026-10-26 (instruksjonen kl. 15:24), BH7:* den lyse grensen i «Hva fargene betyr» formateres som `grense` med én desimal, som de andre grensene i prosent, så teksten er «fra 0,5 % til under 2 %» (`test_hvert_tall_i_forklaringen_er_prosent`).
 
+*Rettet 2026-10-26 (instruksjonen kl. 15:24), ECH4:* linja «Mål mot børsen» sier datoen i stedet for ukedagen når børsdagen før er mer enn 6 dager før dagen som vises (`vis_dagen_foer` og `UKEDAG_INNTIL` i `src/boersometer.py`, `test_datoen_naar_dagen_foer_er_mer_enn_6_dager_foer` og `test_datoen_i_linja_paa_siden`). ECH5 står fortsatt under «Åpent».
+
 ## Åpent
 
 - **BH2, rekkefølgen i kartet (medium, ikke rettet):** fokuset følger §4-rekkefølgen i HTML-en, mens `squarify` legger den største ruta først. Gruppen avgjør om rekkefølgen skal endres.
   *Lukket 2026-10-26 (gruppens svar kl. 13:00, a):* i HTML-en står feltene og rutene i den rekkefølgen `squarify` legger dem, den største først og ved lik vekt i rekkefølgen i §4 (`rekkefoelge` i `src/boersometer.py`), på begge flatene. Tabellen under har fortsatt rekkefølgen i §4. Hjelpen sier at Tab følger kartet.
 - **BH5:** høyden på den smale flaten mellom 390 og 760 px.
 - **ECH4 og ECH5:** linja «Mål mot børsen» når børsdagen før er mer enn 6 dager før, eller ikke er den samme i kursene og kalenderen.
+  *ECH4 lukket 2026-10-26:* rettet, se linja under triagen. ECH5 er fortsatt åpent.
 - **BH7:** typen `faktor` for den lyse grensen i «Hva fargene betyr».
   *Lukket 2026-10-26:* rettet, se linja under triagen.
 - **BH10:** grunnen til veksten 1,02.

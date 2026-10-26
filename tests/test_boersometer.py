@@ -1054,6 +1054,27 @@ class TestLinjaMotBoersen:
         assert dagen_foer(datoer, date(2026, 10, 5)) == date(2026, 10, 2)
         assert dagen_foer(datoer, date(2026, 10, 1)) is None
 
+    @pytest.mark.parametrize(
+        ("foer", "ventet"),
+        [
+            (date(2026, 10, 8), "torsdag"),
+            (date(2026, 10, 3), "lørdag"),
+            (date(2026, 10, 2), "02.10"),
+            (date(2025, 9, 26), "26.09.2025"),
+            (None, "børsdagen før"),
+        ],
+    )
+    def test_datoen_naar_dagen_foer_er_mer_enn_6_dager_foer(self, foer, ventet):
+        """Gjennomgangen 26.10 (ECH4): ville feilet hvis linja sa ukedagen for
+        en dag mer enn 6 dager før, som ville sett ut som dagen i samme uke."""
+        assert boersometer.vis_dagen_foer(foer, date(2026, 10, 9), 2026) == ventet
+
+    def test_datoen_i_linja_paa_siden(self, klient, monkeypatch):
+        """Gjennomgangen 26.10 (ECH4): ville feilet hvis siden skrev ukedagen
+        når børsdagen før er 10 dager før dagen som vises."""
+        monkeypatch.setattr(app_modul, "dagen_foer", lambda datoer, dag: date(2026, 9, 29))
+        assert _maal(_side(klient))[0] == "Farge · endring fra 29.09"
+
     def test_foerste_dag_uten_dag_foer(self, klient):
         """Ville feilet med en tom ukedag den første dagen med kurs."""
         assert _maal(_side(klient, "/boersometer?dag=1990-01-01"))[0] == "Farge · endring fra børsdagen før"
