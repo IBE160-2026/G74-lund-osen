@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-26T16:07
+updated: 2026-10-27T00:06
 ---
 
 # Hjelp til «Kom i gang»
@@ -25,7 +25,7 @@ Windows viser ofte `Start demoen.cmd` uten filendelsen og `Start demoen.command`
 
 ### Windows advarer mot fila.
 
-Første gang kan Windows advare mot `Start demoen.cmd` eller `Start den ekte versjonen.cmd`, fordi fila er lastet ned fra nettet. Advarselen heter «Windows beskyttet PC-en». Klikk «Mer informasjon», og så «Kjør likevel». Spør Windows om du vil kjøre fila, svarer du ja. Mer står under «Enklest: dobbeltklikk, uten Docker» i [README-en](../README.md#enklest-dobbeltklikk-uten-docker).
+Første gang kan Windows advare mot `Start demoen.cmd` eller `Start den ekte versjonen.cmd`, fordi fila er lastet ned fra nettet. Advarselen heter «Windows beskyttet PC-en». Klikk «Mer informasjon», og så «Kjør likevel». Spør Windows om du vil kjøre fila, svarer du ja. Mer står under «Slik virker dobbeltklikket» i [README-en](../README.md#enklest-dobbeltklikk-uten-docker).
 
 ### Mac sier at fila ikke kan åpnes.
 

@@ -20,7 +20,7 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 **Innhold:** [Kom i gang](#kom-i-gang) · [Status](#status) · [Tester](#tester) · [Dokumentene](#dokumentene) · [Mappestruktur](#mappestruktur) · [Medlemmer](#medlemmer)
 
 Til faglærer:
-- Se appen med oppdiktede tall, uten konto og nøkkel, med et dobbeltklikk på «Start demoen»: [Enklest: dobbeltklikk, uten Docker](#enklest-dobbeltklikk-uten-docker)
+- Se appen med oppdiktede tall, uten konto og nøkkel, med et dobbeltklikk på «Start demoen»: [Enklest: dobbeltklikk](#enklest-dobbeltklikk-uten-docker)
 - Eller med Docker Desktop, etter [steg 1–4](#med-docker-desktop): [demoen](#demoen)
 - Demoen viser så mye som mulig. Prøv gjerne også ekte kurser etterpå, med en gratis nøkkel fra EODHD: [den ekte versjonen](#den-ekte-versjonen)
 - De automatiske testene, med to kommandoer etter at uv er installert: [Tester](#tester)
@@ -34,7 +34,26 @@ Til faglærer:
 
 ## Kom i gang: nedlasting og installasjon
 
-Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og viser hovedfunksjonene med faste eksempeldata, også KI-teksten. Den ekte versjonen er for å prøve løsningen med kurser fra EODHD. Begge versjonene har samme kode. Den ekte versjonen henter dagens kurser først etter kl. 22 på en børsdag. Første gang før kl. 22 henter den forrige børsdag, så du ser kursene og signalet med en gang. Demoen står først i stegene under, fordi den er raskest.
+Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og viser hovedfunksjonene med faste eksempeldata, også KI-teksten.
+
+<a name="enklest-dobbeltklikk-uten-docker"></a>
+
+### Enklest: dobbeltklikk (anbefalt)
+
+1. **Last ned koden** med [den direkte lenken](https://github.com/IBE160-2026/G74-lund-osen/archive/refs/heads/main.zip).
+2. **Pakk ut.** Windows: høyreklikk fila i Nedlastinger og velg «Pakk ut alle». Mac: dobbeltklikk fila.
+3. **Åpne `G74-lund-osen-main` og dobbeltklikk «Start demoen».** Bruk den innerste mappa, der README ligger.
+4. **Svar `j`** og trykk Enter hvis vinduet spør om uv. Nettleseren åpner appen når den er klar, første gang etter noen minutter.
+5. **Lukk vinduet** for å stoppe appen.
+
+**Første gang** kan Windows og Mac stoppe fila, fordi den er lastet ned fra nettet. Slik går du videre: [Windows](docs/hjelp.md#windows-advarer-mot-fila) og [Mac](docs/hjelp.md#mac-sier-at-fila-ikke-kan-åpnes).
+
+**Ekte kurser:** dobbeltklikk «Start den ekte versjonen» i stedet for «Start demoen». Den spør etter en gratis nøkkel fra EODHD første gang.
+
+<details>
+<summary>Demoen og den ekte versjonen</summary>
+
+Den ekte versjonen er for å prøve løsningen med kurser fra EODHD. Begge versjonene har samme kode. Den ekte versjonen henter dagens kurser først etter kl. 22 på en børsdag. Første gang før kl. 22 henter den forrige børsdag, så du ser kursene og signalet med en gang. Demoen står først i stegene under, fordi den er raskest.
 
 | | Demoen | Den ekte versjonen |
 |---|---|---|
@@ -44,39 +63,21 @@ Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og v
 
 **Velg vei etter hva du har:**
 
-- [Enklest: dobbeltklikk, uten Docker](#enklest-dobbeltklikk-uten-docker) (anbefalt): last ned, pakk ut og dobbeltklikk. Du skriver ingen kommandoer.
+- [Enklest: dobbeltklikk](#enklest-dobbeltklikk-uten-docker) (anbefalt): last ned, pakk ut og dobbeltklikk. Du skriver ingen kommandoer.
 - [Med Docker Desktop](#med-docker-desktop): har du Docker Desktop, eller vil du kjøre appen i Docker.
-- [Uten Docker, med uv](#uten-docker-med-uv), under «Mer for den som vil»: kommandoene i et terminalvindu.
+- [Uten Docker, med uv](#uten-docker-med-uv): kommandoene i et terminalvindu.
+
+</details>
+
+<details>
+<summary>Du trenger</summary>
 
 **Du trenger** en Windows-maskin eller en Mac, lov til å installere programmer, nett og noen GB ledig plass, men verken git eller Docker, og demoen trenger ingen konto. Første gang tar det en stund. Dobbeltklikket og «Uten Docker, med uv» trenger bare [uv](https://docs.astral.sh/uv/), som henter Python 3.13 eller nyere hvis maskinen ikke har den. Dobbeltklikket spør før det installerer uv. Med Docker trenger du Docker Desktop, og på Linux Docker Engine med Compose i stedet. Vi prøvde 10.10 med Docker Desktop 4.91.0 (motor 29.8.0, Compose v5.5.1) på Windows, og imaget bruker Python 3.13.15. Mac er ikke prøvd ennå med Docker Desktop. Dobbeltklikket kjøres i CI på macOS. Står du fast, se [«Står du fast?»](#står-du-fast) lenger ned.
 
-### Enklest: dobbeltklikk, uten Docker
+</details>
 
-Docker trengs ikke, og du skriver ingen kommandoer.
-
-- **Last ned koden** med [den direkte lenken](https://github.com/IBE160-2026/G74-lund-osen/archive/refs/heads/main.zip), eller trykk «Code» på [GitHub-siden](https://github.com/IBE160-2026/G74-lund-osen) og «Download ZIP».
-- **Pakk ut.** Windows: høyreklikk fila i Nedlastinger og velg «Pakk ut alle», der den ligger. Mac: dobbeltklikk fila. Det er klart når du har mappa `G74-lund-osen-main`. Pakk ut først: inne i ZIP-fila finner ikke startfilene skriptene i `start/`. [Har mappa tall i navnet](docs/hjelp.md#det-er-to-mapper-med-samme-navn): bruk den nyeste.
-- **Finn de fire filene** øverst i den innerste `G74-lund-osen-main`, der README ligger: `Start demoen` og `Start den ekte versjonen`, som `.cmd` for Windows og `.command` for Mac. På Windows tar du den som bare heter «Start demoen», ikke «Start demoen.command».
-- **Dobbeltklikk «Start demoen».** Vil du prøve ekte kurser, dobbeltklikker du «Start den ekte versjonen».
-
-Når vinduet er åpent:
-
-- Mangler [uv](https://docs.astral.sh/uv/), spør vinduet om det skal installeres. Skriv `j` og trykk Enter. Det er den offisielle installasjonen fra astral.sh, og den legger uv i brukermappa di.
-- Første gang tar det noen minutter, fordi uv henter Python og pakkene appen bruker.
-- Nettleseren åpner http://127.0.0.1:8000 når appen svarer.
-- Stopp appen ved å lukke vinduet, eller med Ctrl+C.
-
-**Advarselen fra Windows.** Første gang kan Windows vise «Windows beskyttet PC-en», fordi fila er lastet ned fra nettet. Klikk «Mer informasjon», og så «Kjør likevel». Spør Windows om du vil kjøre fila, svarer du ja.
-
-**Godkjenningen på Mac.** Første gang kan macOS stoppe fila, fordi den er lastet ned fra nettet. Fra macOS 15 holder det ikke å høyreklikke og velge Åpne. Velg Apple-menyen > Systeminnstillinger, og Personvern og sikkerhet i sidepanelet. Under Sikkerhet klikker du «Åpne likevel» og skriver inn passordet ditt. Knappen står der i omtrent en time etter at du prøvde å åpne fila. Dobbeltklikk så fila på nytt. På macOS 14 og eldre kan du også høyreklikke fila, velge Åpne og bekrefte.
-
-**Den ekte versjonen** starter bare i en kopi fra «Download ZIP», ikke i en klon av repoet med `.git`. Der stopper vinduet før noe installeres eller hentes, så et dobbeltklikk i en klon aldri henter med nøkkelen som ligger i den. Last ned en egen kopi med «Download ZIP», og bruk din egen nøkkel. Demoen starter i begge. Vernet gjelder bare dobbeltklikket: kommandoene under «Uten Docker, med uv» og Docker henter også i en klon.
-
-Den ekte versjonen spør etter nøkkelen fra EODHD første gang. Registreringssiden https://eodhd.com/register åpnes. Når du har laget kontoen, står nøkkelen som «API token» under «Dashboard» hos EODHD, med kopiknappen til høyre. Lim den inn i vinduet med Ctrl+V eller et høyreklikk på Windows, og med Cmd+V på Mac, og trykk Enter. På Windows vises den som stjerner, og på Mac vises den ikke. Den lagres bare i `.env` i mappa. Var den feil, sletter du det som står etter `EODHD_API_KEY=` i `.env`, så spør vinduet på nytt. Så hentes kursene før appen starter. Er alt hentet, brukes ingen kall.
-
-Skriptene står i [`start/`](start/) og kjører de samme kommandoene som under «Uten Docker, med uv»: `uv sync`, så `uv run python src/demo.py` for demoen eller `uv run python src/fetch_prices.py` for den ekte versjonen. Webserveren startes med `uv run waitress-serve --listen=127.0.0.1:8000 --threads=8 app:app`, bare på 127.0.0.1 og uten debug, med 8 tråder, med `PYTHONPATH=src`, og `OSE_DEMO=1` i demoen. Den bruker port 8000, som Docker. Kjører OSE Signal allerede fra denne mappa, med webserveren fra `.venv` i mappa, sier skriptet fra og stopper den rett før webserveren starter, så den kjører videre hvis skriptet stopper før det, for eksempel fordi `uv sync` feiler. Feiler hentingen, starter appen likevel, og da stoppes den. Porten sjekkes igjen rett før webserveren, og et annet program som har tatt den i mellomtiden, stoppes ikke. Det gjelder også en webserver du har startet selv med kommandoen over. Et annet program på porten, også OSE Signal fra en annen mappe og demoen eller appen i Docker, stoppes aldri. Da sier vinduet hvilket program det er, og du stopper det selv, Docker med `docker compose --profile demo down`.
-
-### Med Docker Desktop
+<details>
+<summary><a name="med-docker-desktop"></a>Med Docker Desktop</summary>
 
 1. **Installer og start Docker Desktop** fra [docker.com](https://www.docker.com/products/docker-desktop/). Har du det fra før, starter du det bare. Hopp over innloggingen. Det er klart når det står «Engine running» nederst i vinduet. «Resource Saver mode», med en måne, er også klart: motoren hviler fordi ingen containere kjører, og starter selv når den trengs. La det være åpent.
 
@@ -100,6 +101,8 @@ Skriptene står i [`start/`](start/) og kjører de samme kommandoene som under �
 **Slik limer du inn en kommando.** Kopier kommandoen med ikonet til høyre i den grå boksen. Ikonet, som stegene kaller knappen, synes først når musa er over boksen. Du kan også markere den og trykke Ctrl+C eller Cmd+C, eller skrive den inn. Lim den inn i PowerShell-vinduet fra steg 4 (Terminal på Mac) med Ctrl+V eller Cmd+V, og trykk Enter.
 
 **Velg versjon.** Klikk på pila for den versjonen du vil prøve. Tabellen over viser forskjellen.
+
+</details>
 
 <details>
 <summary><a name="demoen"></a>Demoen: anbefalt for faglærer og sensor, uten nøkkel</summary>
@@ -167,80 +170,6 @@ docker compose down
 
 **Skriv aldri `docker compose down -v`.** Det sletter kursene og vurderingene, og vurderingene kan ikke lages på nytt.
 
-### Står du fast?
-
-Klikk på spørsmålet som passer.
-
-<details>
-<summary>«Engine running» kommer ikke, eller det står «Cannot connect to the Docker daemon» eller «error during connect».</summary>
-
-Docker Desktop er ikke startet, eller motoren er ikke klar. Start Docker Desktop, vent til det står «Engine running» (steg 1), og prøv kommandoen igjen. Kommer det ikke etter noen minutter, avslutter du Docker Desktop helt: høyreklikk hvalen ved klokka (Windows) eller klikk den i menylinja øverst (Mac), og velg «Quit Docker Desktop». Åpne det igjen og vent. Hjelper ikke det, starter du maskinen på nytt.
-
-Står det «Resource Saver mode», med en måne, er alt i orden: Docker har stoppet motoren fordi ingen containere kjører, og starter den selv når den trengs, bare litt tregere. Da trenger du ikke vente på «Engine running».
-
-</details>
-
-<details>
-<summary>ZIP-fila ser ut som en vanlig mappe.</summary>
-
-Du må pakke ut. Står det «Komprimert størrelse» (Compressed size) som kolonne og «Pakk ut alle» (Extract All) øverst i vinduet, er du inne i ZIP-fila, og den er ikke pakket ut. Trykk «Pakk ut alle», og bruk mappa som lages. På Windows finner du Nedlastinger (Downloads) i Filutforsker (File Explorer), og etter «Pakk ut alle» trykker du «Pakk ut» (Extract).
-
-</details>
-
-<details>
-<summary>«is not recognized as the name of a cmdlet» eller «Cannot find path … because it does not exist» etter cd.</summary>
-
-Kommer «is not recognized as the name of a cmdlet»: Det mangler mellomrom etter `cd`. Står `cd` klistret til stien i meldingen, for eksempel `'cdC:\...'`, skriver du `cd`, et mellomrom, og drar mappa inn i vinduet på nytt (steg 4). Står det `'docker'` i meldingen, er Docker Desktop ikke installert, eller vinduet ble åpnet før installasjonen: lukk det og åpne et nytt (steg 3). Står det `'uv'` i meldingen, er uv ikke installert, eller vinduet ble åpnet før installasjonen: se «Tester» i README-en.
-
-Kommer «Cannot find path … because it does not exist»: Mappa ligger ikke der stien sier, for eksempel fordi den er flyttet, eller fordi ZIP-fila ble dratt inn i stedet for mappa. Skriv `cd` og et mellomrom, og dra mappa inn i vinduet på nytt (steg 4).
-
-</details>
-
-<details>
-<summary>Nettleseren sier at 127.0.0.1 nektet å koble til.</summary>
-
-Nettleseren viser da `ERR_CONNECTION_REFUSED`. Andre nettlesere sier det med andre ord. Ingenting svarer på adressen ennå. Appen er ikke klar, eller den er stoppet. Se i terminalvinduet: vent til linja med «Serving on» har kommet, og sjekk at vinduet fortsatt er åpent og at Docker Desktop kjører. Last så siden på nytt. Adressen er http://127.0.0.1:8000, ikke 0.0.0.0.
-
-</details>
-
-<details>
-<summary>«no configuration file provided: not found».</summary>
-
-Terminalvinduet står i feil mappe. Gjør steg 4 på nytt, og dra den mappa der fila compose ligger. Windows viser den uten filendelsen, som compose og ikke compose.yaml.
-
-</details>
-
-Flere spørsmål og svar står i [docs/hjelp.md](docs/hjelp.md).
-
-### Mer for den som vil
-
-<details>
-<summary>Bytte mellom demoen og den ekte versjonen</summary>
-
-Begge bruker port 8000, så bare én kan kjøre om gangen. `docker compose down` stopper ikke demoen, fordi demoen ligger i en egen profil. `docker compose --profile demo down` stopper begge.
-
-Stopp demoen og den ekte versjonen:
-
-```
-docker compose --profile demo down
-```
-
-Start så den ekte versjonen:
-
-```
-docker compose up --build
-```
-
-eller demoen:
-
-```
-docker compose up --build demo
-```
-
-Volumene står når du bytter, også basen med vurderingene.
-
-</details>
-
 <details>
 <summary><a name="uten-docker-med-uv"></a>Uten Docker, med uv</summary>
 
@@ -287,6 +216,112 @@ uv run python src/app.py
 ```
 
 Basen, demobasen og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo` åpner webserveren den ekte basen.
+
+</details>
+
+<details>
+<summary>Slik virker dobbeltklikket</summary>
+
+Docker trengs ikke, og du skriver ingen kommandoer.
+
+- **Last ned koden** med [den direkte lenken](https://github.com/IBE160-2026/G74-lund-osen/archive/refs/heads/main.zip), eller trykk «Code» på [GitHub-siden](https://github.com/IBE160-2026/G74-lund-osen) og «Download ZIP».
+- **Pakk ut.** Windows: høyreklikk fila i Nedlastinger og velg «Pakk ut alle», der den ligger. Mac: dobbeltklikk fila. Det er klart når du har mappa `G74-lund-osen-main`. Pakk ut først: inne i ZIP-fila finner ikke startfilene skriptene i `start/`. [Har mappa tall i navnet](docs/hjelp.md#det-er-to-mapper-med-samme-navn): bruk den nyeste.
+- **Finn de fire filene** øverst i den innerste `G74-lund-osen-main`, der README ligger: `Start demoen` og `Start den ekte versjonen`, som `.cmd` for Windows og `.command` for Mac. På Windows tar du den som bare heter «Start demoen», ikke «Start demoen.command».
+- **Dobbeltklikk «Start demoen».** Vil du prøve ekte kurser, dobbeltklikker du «Start den ekte versjonen».
+
+Når vinduet er åpent:
+
+- Mangler [uv](https://docs.astral.sh/uv/), spør vinduet om det skal installeres. Skriv `j` og trykk Enter. Det er den offisielle installasjonen fra astral.sh, og den legger uv i brukermappa di.
+- Første gang tar det noen minutter, fordi uv henter Python og pakkene appen bruker.
+- Nettleseren åpner http://127.0.0.1:8000 når appen svarer.
+- Stopp appen ved å lukke vinduet, eller med Ctrl+C.
+
+**Advarselen fra Windows.** Første gang kan Windows vise «Windows beskyttet PC-en», fordi fila er lastet ned fra nettet. Klikk «Mer informasjon», og så «Kjør likevel». Spør Windows om du vil kjøre fila, svarer du ja.
+
+**Godkjenningen på Mac.** Første gang kan macOS stoppe fila, fordi den er lastet ned fra nettet. Fra macOS 15 holder det ikke å høyreklikke og velge Åpne. Velg Apple-menyen > Systeminnstillinger, og Personvern og sikkerhet i sidepanelet. Under Sikkerhet klikker du «Åpne likevel» og skriver inn passordet ditt. Knappen står der i omtrent en time etter at du prøvde å åpne fila. Dobbeltklikk så fila på nytt. På macOS 14 og eldre kan du også høyreklikke fila, velge Åpne og bekrefte.
+
+**Den ekte versjonen** starter bare i en kopi fra «Download ZIP», ikke i en klon av repoet med `.git`. Der stopper vinduet før noe installeres eller hentes, så et dobbeltklikk i en klon aldri henter med nøkkelen som ligger i den. Last ned en egen kopi med «Download ZIP», og bruk din egen nøkkel. Demoen starter i begge. Vernet gjelder bare dobbeltklikket: kommandoene under «Uten Docker, med uv» og Docker henter også i en klon.
+
+Den ekte versjonen spør etter nøkkelen fra EODHD første gang. Registreringssiden https://eodhd.com/register åpnes. Når du har laget kontoen, står nøkkelen som «API token» under «Dashboard» hos EODHD, med kopiknappen til høyre. Lim den inn i vinduet med Ctrl+V eller et høyreklikk på Windows, og med Cmd+V på Mac, og trykk Enter. På Windows vises den som stjerner, og på Mac vises den ikke. Den lagres bare i `.env` i mappa. Var den feil, sletter du det som står etter `EODHD_API_KEY=` i `.env`, så spør vinduet på nytt. Så hentes kursene før appen starter. Er alt hentet, brukes ingen kall.
+
+Skriptene står i [`start/`](start/) og kjører de samme kommandoene som under «Uten Docker, med uv»: `uv sync`, så `uv run python src/demo.py` for demoen eller `uv run python src/fetch_prices.py` for den ekte versjonen. Webserveren startes med `uv run waitress-serve --listen=127.0.0.1:8000 --threads=8 app:app`, bare på 127.0.0.1 og uten debug, med 8 tråder, med `PYTHONPATH=src`, og `OSE_DEMO=1` i demoen. Den bruker port 8000, som Docker. Kjører OSE Signal allerede fra denne mappa, med webserveren fra `.venv` i mappa, sier skriptet fra og stopper den rett før webserveren starter, så den kjører videre hvis skriptet stopper før det, for eksempel fordi `uv sync` feiler. Feiler hentingen, starter appen likevel, og da stoppes den. Porten sjekkes igjen rett før webserveren, og et annet program som har tatt den i mellomtiden, stoppes ikke. Det gjelder også en webserver du har startet selv med kommandoen over. Et annet program på porten, også OSE Signal fra en annen mappe og demoen eller appen i Docker, stoppes aldri. Da sier vinduet hvilket program det er, og du stopper det selv, Docker med `docker compose --profile demo down`.
+
+</details>
+
+<details>
+<summary><a name="står-du-fast"></a>Står du fast?</summary>
+
+Klikk på spørsmålet som passer.
+
+<details>
+<summary>«Engine running» kommer ikke, eller det står «Cannot connect to the Docker daemon» eller «error during connect».</summary>
+
+Docker Desktop er ikke startet, eller motoren er ikke klar. Start Docker Desktop, vent til det står «Engine running» (steg 1), og prøv kommandoen igjen. Kommer det ikke etter noen minutter, avslutter du Docker Desktop helt: høyreklikk hvalen ved klokka (Windows) eller klikk den i menylinja øverst (Mac), og velg «Quit Docker Desktop». Åpne det igjen og vent. Hjelper ikke det, starter du maskinen på nytt.
+
+Står det «Resource Saver mode», med en måne, er alt i orden: Docker har stoppet motoren fordi ingen containere kjører, og starter den selv når den trengs, bare litt tregere. Da trenger du ikke vente på «Engine running».
+
+</details>
+
+<details>
+<summary>ZIP-fila ser ut som en vanlig mappe.</summary>
+
+Du må pakke ut. Står det «Komprimert størrelse» (Compressed size) som kolonne og «Pakk ut alle» (Extract All) øverst i vinduet, er du inne i ZIP-fila, og den er ikke pakket ut. Trykk «Pakk ut alle», og bruk mappa som lages. På Windows finner du Nedlastinger (Downloads) i Filutforsker (File Explorer), og etter «Pakk ut alle» trykker du «Pakk ut» (Extract).
+
+</details>
+
+<details>
+<summary>«is not recognized as the name of a cmdlet» eller «Cannot find path … because it does not exist» etter cd.</summary>
+
+Kommer «is not recognized as the name of a cmdlet»: Det mangler mellomrom etter `cd`. Står `cd` klistret til stien i meldingen, for eksempel `'cdC:\...'`, skriver du `cd`, et mellomrom, og drar mappa inn i vinduet på nytt (steg 4). Står det `'docker'` i meldingen, er Docker Desktop ikke installert, eller vinduet ble åpnet før installasjonen: lukk det og åpne et nytt (steg 3). Står det `'uv'` i meldingen, er uv ikke installert, eller vinduet ble åpnet før installasjonen: se «Tester» i README-en.
+
+Kommer «Cannot find path … because it does not exist»: Mappa ligger ikke der stien sier, for eksempel fordi den er flyttet, eller fordi ZIP-fila ble dratt inn i stedet for mappa. Skriv `cd` og et mellomrom, og dra mappa inn i vinduet på nytt (steg 4).
+
+</details>
+
+<details>
+<summary>Nettleseren sier at 127.0.0.1 nektet å koble til.</summary>
+
+Nettleseren viser da `ERR_CONNECTION_REFUSED`. Andre nettlesere sier det med andre ord. Ingenting svarer på adressen ennå. Appen er ikke klar, eller den er stoppet. Se i terminalvinduet: vent til linja med «Serving on» har kommet, og sjekk at vinduet fortsatt er åpent og at Docker Desktop kjører. Last så siden på nytt. Adressen er http://127.0.0.1:8000, ikke 0.0.0.0.
+
+</details>
+
+<details>
+<summary>«no configuration file provided: not found».</summary>
+
+Terminalvinduet står i feil mappe. Gjør steg 4 på nytt, og dra den mappa der fila compose ligger. Windows viser den uten filendelsen, som compose og ikke compose.yaml.
+
+</details>
+
+Flere spørsmål og svar står i [docs/hjelp.md](docs/hjelp.md).
+
+</details>
+
+### Mer for den som vil
+
+<details>
+<summary>Bytte mellom demoen og den ekte versjonen</summary>
+
+Begge bruker port 8000, så bare én kan kjøre om gangen. `docker compose down` stopper ikke demoen, fordi demoen ligger i en egen profil. `docker compose --profile demo down` stopper begge.
+
+Stopp demoen og den ekte versjonen:
+
+```
+docker compose --profile demo down
+```
+
+Start så den ekte versjonen:
+
+```
+docker compose up --build
+```
+
+eller demoen:
+
+```
+docker compose up --build demo
+```
+
+Volumene står når du bytter, også basen med vurderingene.
 
 </details>
 

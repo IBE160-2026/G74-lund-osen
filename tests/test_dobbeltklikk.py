@@ -49,10 +49,14 @@ def _kode(sti) -> list[str]:
 
 def _delen_i_readme() -> str:
     """Fra 3.5f (gruppens svar 25.10 kl. 11:32) en egen del foerst i «Kom i
-    gang», ikke bak en pil under «Mer for den som vil»."""
+    gang», ikke bak en pil under «Mer for den som vil». Fra 3.5g (gruppens
+    svar 26.10 kl. 23:00) de fem stegene foerst, og resten i pila «Slik
+    virker dobbeltklikket», saa delen er begge."""
     tekst = README.read_text(encoding="utf-8")
-    start = tekst.index("\n### Enklest: dobbeltklikk, uten Docker\n")
-    return tekst[start : tekst.index("\n### ", start + 1)]
+    start = tekst.index("\n### Enklest: dobbeltklikk (anbefalt)\n")
+    stegene = tekst[start : tekst.index("\n<details>\n", start)]
+    pila = tekst.split("\n<summary>Slik virker dobbeltklikket</summary>\n\n", 1)[1].split("\n\n</details>\n", 1)[0]
+    return stegene + "\n\n" + pila
 
 
 def _kommandoene_i(navn: str) -> list[str]:
@@ -592,9 +596,14 @@ def test_readme_og_hjelpen_har_advarselen_og_godkjenningen():
     assert "### Windows advarer mot fila." in hjelp and "### Mac sier at fila ikke kan åpnes." in hjelp
     tekst = README.read_text(encoding="utf-8")
     kom_i_gang = tekst.split("\n## Kom i gang: nedlasting og installasjon\n", 1)[1].split("\n## ", 1)[0]
-    foer_docker = kom_i_gang.split("\n### Med Docker Desktop\n", 1)[0]
-    assert "`.cmd` for Windows og `.command` for Mac" in foer_docker
-    assert "Dobbeltklikk «Start demoen».**" in foer_docker
+    # Story 3.5g: stegene staar foer den foerste pila, og pila til Docker
+    # kommer etter. Filene for Windows og Mac forklares i «Slik virker
+    # dobbeltklikket».
+    foer_pilene = kom_i_gang.split("\n<details>\n", 1)[0]
+    assert "dobbeltklikk «Start demoen».**" in foer_pilene
+    assert foer_pilene in kom_i_gang.split('<summary><a name="med-docker-desktop"></a>', 1)[0]
+    assert "`.cmd` for Windows og `.command` for Mac" in del_
+    assert "Dobbeltklikk «Start demoen».**" in del_
     assert "<summary>Start med dobbeltklikk" not in tekst
 
 
