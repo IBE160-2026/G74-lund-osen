@@ -113,6 +113,7 @@ Gjennomgang 24.10 etter hele settet, av `01a5f8d..7b784f0` på main og `7b784f0.
 - **«API token» under «Dashboard»** hos EODHD er ikke slått opp, fordi siden krever innlogging. Teksten står slik gruppen så den i forprøven.
 - **Kommandolinja på Mac** er ikke slått opp. Sjekken venter `<mappa>/.venv/bin/waitress-serve` med full sti, som på Windows. Står stien annerledes, regnes den andre versjonen som et annet program, og ingenting stoppes. Steget «Porten på Windows og Mac» i CI bruker testens egen lytter, ikke uv.
 - **BH5:** om den andre versjonen skal stoppes rett før webserveren i stedet for før uv, er gruppens valg.
+  *Lukket 2026-10-26 kl. 10:34:* den andre versjonen stoppes rett før webserveren, flettet i `dbfa0b9`, PR #100 (spesifikasjonen 3.5e, gruppens svar 24.10 kl. 20:00).
 
 *Lagt til 2026-10-24:* gruppen så «API token» under «Dashboard» hos EODHD på skjermen 24.10 kl. 12:16, under forprøven. Bildet kommer senere på siden for den ekte versjonen.
 

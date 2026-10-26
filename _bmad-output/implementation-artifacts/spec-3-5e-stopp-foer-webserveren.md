@@ -2,7 +2,7 @@
 title: 'Story 3.5 (3.5e): den andre versjonen stoppes rett før webserveren'
 type: 'bugfix'
 created: '2026-10-26'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'fd04a78'

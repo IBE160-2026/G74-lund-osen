@@ -2461,6 +2461,8 @@ Resten ryddes etter alle testene.
 
 *Avgjort 2026-10-24 kl. 20:00 (gruppens svar, ført 26.10 fra instruksjonen kl. 09:57):* kjører den andre versjonen av OSE Signal fra samme mappe, stoppes den rett før webserveren startes, ikke før uv og hentingen, så den kjører videre hvis noe feiler før det. Et annet program på porten sjekkes fortsatt før uv og stoppes aldri. Det endrer «før uv og hentingen» i punkt d) i 3.5d. Svaret 25.10 kl. 20:00, «BH5 står åpent», gjaldt loggen for 24.10, fordi stoppen ikke var bygget.
 
+*Lagt til 2026-10-26 kl. 10:34:* 3.5e, den andre versjonen stoppes rett før webserveren, er squash-flettet i `dbfa0b9`, PR #100, låst til head-en `2e8f347` (spesifikasjonen `spec-3-5e-stopp-foer-webserveren.md`). Porten sjekkes før uv, og et annet program stopper skriptet der. Den andre versjonen fra samme mappe stoppes rett før webserveren, så den kjører videre hvis skriptet stopper før det. BH5 i triagen til 3.5d er lukket.
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
