@@ -991,7 +991,10 @@ HOEYDE_PAA_BILDET = 1630
 # og er byte for byte det samme.
 # Story 10.2e: valgt_indeks flyttet fra app.py til hovedindeks.py. Bildet ble
 # tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "bc4126a7538d4bd76f82fcf0bf4c6c8867e11e4923a76035366655098296644a"
+# Story 8.6b b: linja «Mål mot børsen» i stil.css og hjelpetekster.py, og
+# _hovedindeks.html bare paa oversikten. Bildet ble tatt paa nytt og er byte
+# for byte det samme.
+AVTRYKK_BAK_BILDET = "a6f932104d108b019b479bc78938bff92b2928d21eaa5abf29f00fa3317228b8"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1160,7 +1163,9 @@ HOEYDE_PAA_AKSJESIDEN = 1894
 # ordstillingen etter «fordi» og rekkefoelgen paa sjekkene i prompten. Teksten
 # for BRFE besto og er den samme, og bildet ble tatt paa nytt og er byte for
 # byte det samme, med hoeyden 1894.
-AVTRYKK_BAK_AKSJESIDEN = "48902f9aa89f293b0b3dbe4848fc52f64b8bbbd50a0d755d094814c0e064e369"
+# Story 8.6b b: linja «Mål mot børsen» i stil.css og hjelpetekster.py. Bildet
+# ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "2098774796c0645c411d60797c5f2c3929dbbdb20888d2d5060792e4ccd3407b"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "

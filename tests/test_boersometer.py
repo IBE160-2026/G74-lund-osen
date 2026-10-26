@@ -28,15 +28,18 @@ from boersometer import (
     Rute,
     bygg_boersometer,
     bygg_rute,
+    dagen_foer,
+    indeks_for_dagen,
     ramme,
     snitt,
     stoerrelse,
     vis_volumforhold,
 )
 from kursdata import Aksje, Kursrad
-from lagring_sqlite import SqliteOversiktsleser, demo_sti
+from lagring_sqlite import SqliteIndekslager, SqliteOversiktsleser, demo_sti
 from markedsoversikt import IKKE_VURDERT
 from signalberegning import INGEN, POSITIV, STANDARD
+from tallformat import avrundet, tall
 from vurderingsdata import Vurdering
 
 SRC = Path(boersometer.__file__).resolve().parent
@@ -442,12 +445,13 @@ class TestSiden:
         # Også en dag aksjen ikke hadde kurs, når den har kurser senere.
         assert "VRDS" in _lenker(_side(klient, "/boersometer?dag=2026-08-03"))
 
-    def test_hovedindeksen_staar_over_rutene(self, klient):
-        """Ville feilet hvis hovedindeksen manglet eller sto under rutene."""
+    def test_linja_mot_boersen_staar_over_rutene(self, klient):
+        """Story 8.6b, b erstatter testen for hovedindeksen over rutene:
+        hovedindeksen står som et tall i linja «Mål mot børsen» (avgjørelsen
+        24.10 kl. 11:54). Ville feilet hvis linja manglet eller sto under
+        rutene."""
         html = _side(klient)
-        assert html.index('<section class="hovedindeks"') < html.index('<section class="bransje"')
-        # En annen dag: indeksen står med datoen sin, som på oversikten.
-        assert '<span class="indeksdato">09.10</span>' in _side(klient, "/boersometer?dag=2026-09-18")
+        assert html.index('<section class="maal"') < html.index('<section class="bransje"')
 
     def test_ingen_raad_og_ingen_ki(self, klient):
         """NFR-06. Ville feilet med kjøp eller selg på siden utenom hjelpen,
@@ -871,3 +875,125 @@ class TestForklaringen:
         assert html.index(FORKLARINGEN) < html.index('<section class="bransje"')
         # Også en annen dag.
         assert FORKLARINGEN in _side(klient, "/boersometer?dag=2026-09-18")
+
+
+def _maal(html: str) -> list[str]:
+    """Punktene i linja «Mål mot børsen», uten taggene. Bare vanlige
+    mellomrom slås sammen, så det harde mellomrommet foran % står (regel 21)."""
+    linja = re.search(r'<section class="maal".*?</section>', html, re.S).group(0)
+    punkter = re.findall(r"<li>(.*?)</li>", linja, re.S)
+    return [re.sub(r"[ \t\r\n]+", " ", re.sub(r"<[^>]+>", "", li)).strip() for li in punkter]
+
+
+def _demoindeksen() -> list[Kursrad]:
+    tilkobling = sqlite3.connect(demo_sti())
+    try:
+        lager = SqliteIndekslager(tilkobling)
+        return lager.serie(lager.symboler()[0])
+    finally:
+        tilkobling.close()
+
+
+class TestLinjaMotBoersen:
+    """8.6b, b (avgjørelsen 24.10 kl. 11:54)."""
+
+    def test_de_tre_punktene(self, klient):
+        """09.10 er en fredag, og børsdagen før er torsdag. Ville feilet med
+        en annen ukedag, et annet vindu enn de 20 børsdagene før, eller uten
+        hovedindeksen."""
+        punkter = _maal(_side(klient))
+        assert STANDARD.volum_vindu == 20
+        assert punkter[:2] == ["Farge · endring fra torsdag", "Størrelse · volum mot medianen for de 20 børsdagene før"]
+        assert punkter[2].startswith("Hovedindeksen · ")
+        assert len(punkter) == 3
+        # Mandag 05.10: børsdagen før er fredag.
+        assert _maal(_side(klient, "/boersometer?dag=2026-10-05"))[0] == "Farge · endring fra fredag"
+
+    @pytest.mark.parametrize("dag", [None, "2026-10-08", "2026-09-18"])
+    def test_tallet_i_linja_er_endringen_den_dagen(self, klient, dag):
+        """Tallet med fortegn og farge for dagen som vises. Ville feilet med
+        endringen for siste børsdag på en annen dag, uten fortegn, eller med
+        feil farge."""
+        html = _side(klient, f"/boersometer?dag={dag}" if dag else "/boersometer")
+        dagen = date.fromisoformat(dag) if dag else date(2026, 10, 9)
+        endring = indeks_for_dagen(_demoindeksen(), dagen)
+        assert endring is not None
+        assert _maal(html)[2] == f"Hovedindeksen · {tall(endring, 'endring')}"
+        vist = avrundet(endring, "endring")
+        farge = "opp" if vist > 0 else "ned" if vist < 0 else "null"
+        assert f'<span class="indeksendring {farge}">{tall(endring, "endring")}</span>' in html
+        assert tall(endring, "endring")[0] in "+-" or vist == 0
+
+    def test_tallene_er_ulike_dag_for_dag(self, klient):
+        """Ville feilet hvis linja viste samme tall for hver dag, som når den
+        bare hadde siste børsdag."""
+        tallene = {_maal(_side(klient, f"/boersometer?dag=2026-10-0{d}"))[2] for d in (5, 6, 7, 8, 9)}
+        assert len(tallene) > 1
+
+    def test_strek_naar_indeksen_mangler_dagen(self, klient):
+        """Ville feilet med et tall fra en annen dag, eller en feilside, når
+        indeksen ikke har en rad for dagen."""
+        tilkobling = sqlite3.connect(demo_sti())
+        try:
+            tilkobling.execute("DELETE FROM indeks WHERE dato = '2026-10-08'")
+            tilkobling.commit()
+        finally:
+            tilkobling.close()
+        assert _maal(_side(klient, "/boersometer?dag=2026-10-08"))[2] == "Hovedindeksen · –"
+        # 09.10 mangler nå børsdagen før, og har heller ingen endring.
+        assert _maal(_side(klient))[2] == "Hovedindeksen · –"
+
+    def test_strek_uten_indeks_i_basen(self, klient):
+        """Ville feilet med en feilside når basen ikke har en indeks."""
+        tilkobling = sqlite3.connect(demo_sti())
+        try:
+            tilkobling.execute("DELETE FROM indeks")
+            tilkobling.execute("DELETE FROM indeksserie")
+            tilkobling.commit()
+        finally:
+            tilkobling.close()
+        assert _maal(_side(klient))[2] == "Hovedindeksen · –"
+
+    def test_strek_naar_indeksen_ikke_kan_leses(self, klient, monkeypatch):
+        """NFR-03: ville feilet med en feilside når indeksen ikke kan leses."""
+
+        def feil(*_a, **_k):
+            raise sqlite3.OperationalError("låst")
+
+        monkeypatch.setattr(SqliteIndekslager, "symboler", feil)
+        html = _side(klient)
+        assert _maal(html)[2] == "Hovedindeksen · –" and '<section class="bransje"' in html
+
+    def test_ingen_soeyler_paa_boersometeret(self, klient):
+        """Søylene og _hovedindeks.html er tatt ut av børsometeret, ikke av
+        oversikten. Ville feilet med søylene eller delen for hovedindeksen på
+        børsometeret, eller uten dem på oversikten."""
+        for adresse in ("/boersometer", "/boersometer?dag=2026-10-08"):
+            html = _side(klient, adresse)
+            assert '<figure class="soeyler"' not in html and '<section class="hovedindeks"' not in html, adresse
+            assert 'id="hjelp-hovedindeks"' not in html
+        oversikt = _side(klient, "/")
+        assert '<section class="hovedindeks"' in oversikt and '<figure class="soeyler"' in oversikt
+        mal = (SRC / "templates" / "boersometer.html").read_text(encoding="utf-8")
+        assert "_hovedindeks.html" not in mal
+
+    def test_dagen_foer(self):
+        """Ville feilet med dagen selv, en dag etter, eller en dag uten kurs."""
+        datoer = [date(2026, 10, 1), date(2026, 10, 2), date(2026, 10, 5)]
+        assert dagen_foer(datoer, date(2026, 10, 5)) == date(2026, 10, 2)
+        assert dagen_foer(datoer, date(2026, 10, 1)) is None
+
+    def test_foerste_dag_uten_dag_foer(self, klient):
+        """Ville feilet med en tom ukedag den første dagen med kurs."""
+        assert _maal(_side(klient, "/boersometer?dag=1990-01-01"))[0] == "Farge · endring fra børsdagen før"
+
+    def test_hjelpen_sier_det(self):
+        """Regel 19: ville feilet hvis hjelpen i appen eller docs/hjelp.md
+        ikke nevnte linja, eller sa at søylene sto på børsometeret."""
+        from hjelpetekster import hjelpetekster
+
+        tekst = hjelpetekster(STANDARD)["boersometeret"].tekst
+        assert "linja «Mål mot børsen» har endringen i hovedindeksen den dagen" in tekst
+        hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
+        avsnitt = hjelp.split("### Hva viser børsometeret?", 1)[1].split("###", 1)[0]
+        assert "Linja «Mål mot børsen»" in avsnitt and "Søylene står bare på oversikten." in avsnitt

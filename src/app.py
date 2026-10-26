@@ -38,7 +38,7 @@ from flask import Flask, abort, g, redirect, render_template, request
 import lagring_sqlite
 from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
 from boersdag import UtenforKalenderen, innevaerende_boersdag, norsk_dato
-from boersometer import bygg_boersometer, bygg_rute
+from boersometer import bygg_boersometer, bygg_rute, dagen_foer, indeks_for_dagen
 from dagene import setning_om_dagene, tell_dagene
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
 from graf import bygg_graf
@@ -493,6 +493,21 @@ def _indeksen_for_grafen() -> tuple[str | None, dict | None, bool]:
         return None, None, True
 
 
+def _indeksen_for_dagen(dag: date) -> float | None:
+    """Endringen i hovedindeksen for dag, til linja «Mål mot børsen» -
+    story 8.6b, b. None når basen ikke har en indeks, når indeksen ikke har
+    endringen for dagen, og når den ikke kan leses: da står «–», og rutene
+    vises som vanlig (NFR-03). Ingen nettkall (AD-10)."""
+    try:
+        lager = SqliteIndekslager(g.tilkobling)
+        symboler = lager.symboler()
+        if not symboler:
+            return None
+        return indeks_for_dagen(lager.serie(valgt_indeks(symboler)), dag)
+    except (*BASEFEIL, ValueError):
+        return None
+
+
 @app.route("/")
 def markedsoversikt():
     return _tabellsiden(OVERSIKT)
@@ -519,7 +534,8 @@ def boersometer():
     for siste børsdag eller dagen fra «Velg dag» (?dag=ÅÅÅÅ-MM-DD). Kursene
     og vurderingene leses gjennom portene som finnes, uten ny tabell, og
     webserveren henter aldri (AD-10). En dag uten kurs gir den siste
-    børsdagen med kurs før den. Hovedindeksen står for siste børsdag, som på
+    børsdagen med kurs før den. Story 8.6b, b: hovedindeksen står som et tall
+    i linja «Mål mot børsen», for dagen som vises, og søylene står bare på
     oversikten."""
     felles = {"aktiv": BOERSOMETER}
     if g.get("basefeil"):
@@ -603,8 +619,6 @@ def boersometer():
         for post in poster
     ]
     bransjer = bygg_boersometer(ruter)
-    tre_av_tre = frozenset(rad.aksje.symbol for rad in rader if rad.styrke == ANTALL_SJEKKER)
-    hovedindeks, indeks_feilet = _hovedindeks(leser, poster, tre_av_tre)
     ikke_vurdert = any(rute.ikke_vurdert for rute in ruter)
     return render_template(
         "boersometer.html",
@@ -615,15 +629,14 @@ def boersometer():
         dagen=dagen,
         siste=siste,
         foerste=datoer[0],
+        dagen_foer=dagen_foer(datoer, dagen),
+        volum_vindu=STANDARD.volum_vindu,
+        indeksendring=_indeksen_for_dagen(dagen),
         valgt=valgt,
         foer_foerste=foer_foerste,
         ugyldig=ugyldig,
-        # Delmalen for hovedindeksen setter datoen ved verdien naar indeksen
-        # staar paa en annen dag enn siden, som paa oversikten.
         dato=dagen,
         hentet=sidens_tidsstempel(rader),
-        hovedindeks=hovedindeks,
-        indeks_feilet=indeks_feilet,
         **felles,
     )
 

@@ -1,6 +1,7 @@
-{#- Story 8.6: hovedindeksen, flyttet hit fra index.html, så oversikten og
-    børsometeret viser den likt. Delmalen importerer makroene selv, fordi
-    en delmal ikke får makroene foreldermalen importerer. #}
+{#- Story 8.6: hovedindeksen, flyttet hit fra index.html. Story 8.6b, b:
+    bare oversikten bruker den; børsometeret har tallet i linja «Mål mot
+    børsen». Delmalen importerer makroene selv, fordi en delmal ikke får
+    makroene foreldermalen importerer. #}
 {% from "_hjelp.html" import hjelpeknapp with context -%}
 {% from "_bransjer.html" import bransjesymbol -%}
     {#- Story 2.9 (FR-104): hovedindeksen mellom innledningen og tabellen
@@ -38,8 +39,8 @@
             <figcaption class="soeyletittel">{% if hovedindeks.dato != dato %}Endring per aksje {{ hovedindeks.dato|dato }}{% else %}Dagens endring per aksje{% endif %}{% if sy.linje is not none %}, med indeksen som stiplet linje{% endif %}</figcaption>
             {% if sy.soeyler %}
             {#- Story 8.2a, c (U20, gruppens svar 24.10 kl. 11:23): symbolet over
-                hver søyle lenker til aksjesiden, på oversikten og i
-                børsometeret. Lenkene er ikke aria-hidden, og navnet står i
+                hver søyle lenker til aksjesiden, på oversikten (og i
+                børsometeret til 8.6b). Lenkene er ikke aria-hidden, og navnet står i
                 aria-label; bare søylene er skjult for skjermleseren. #}
             <div>
               <div class="etiketter">
@@ -73,8 +74,7 @@
           </figure>
         {% endif %}
       {% elif indeks_feilet %}
-        {#- Gjennomgangen av 8.6 (BH6): på børsometeret er det rutene som står under. #}
-        <p>Hovedindeksen kunne ikke leses. {{ "Rutene" if aktiv == "boersometer" else "Tabellen" }} under vises som vanlig.</p>
+        <p>Hovedindeksen kunne ikke leses. Tabellen under vises som vanlig.</p>
       {% else %}
         <p>Hovedindeksen er ikke hentet ennå.</p>
       {% endif %}

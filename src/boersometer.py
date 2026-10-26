@@ -17,12 +17,17 @@ Rammen (designregler §3, gjennomgangen VG1): gult betyr 3 av 3 på siste
 børsdag og står også når siden viser en annen dag, også en dag uten vurdering
 eller uten kurs (gruppens svar 23.10 kl. 09:24, a). 2 av 3 merkes bare for
 siste børsdag.
+
+Story 8.6b (avgjørelsen 24.10 kl. 11:54): søylene står bare på oversikten,
+og hovedindeksen står som et tall i linja «Mål mot børsen», med endringen
+for dagen som vises.
 """
 
 from dataclasses import dataclass
 from datetime import date
 
 from hjelpetekster import ANTALL_SJEKKER
+from hovedindeks import indeksendring
 from kursdata import Aksje, Kursrad
 from markedsoversikt import IKKE_VURDERT, endring_i_prosent, grunn_med_tall, les_tilstand
 from signalberegning import STANDARD, Parametre
@@ -205,3 +210,20 @@ def bygg_boersometer(ruter: list[Rute]) -> list[Bransje]:
         grupper.setdefault(rute.aksje.sektor, []).append(rute)
     rekkefoelge = sorted(grupper, key=lambda navn: (BRANSJER.index(navn) if navn in BRANSJER else len(BRANSJER), navn))
     return [Bransje(navn=navn, ruter=tuple(grupper[navn])) for navn in rekkefoelge]
+
+
+def dagen_foer(datoer: list[date], dag: date) -> date | None:
+    """Datoen før dag blant kursdatoene for aksjene i lista, den endringen i
+    rutene regnes fra (8.6b, b). None når dag er den første."""
+    foer = [d for d in datoer if d < dag]
+    return max(foer) if foer else None
+
+
+def indeks_for_dagen(serie: list[Kursrad], dag: date) -> float | None:
+    """Endringen i hovedindeksen for dag, mot børsdagen før etter kalenderen
+    (hovedindeks.indeksendring). None når indeksen ikke har en rad for dag,
+    eller ikke for børsdagen før (8.6b, b)."""
+    til = [rad for rad in serie if rad.dato <= dag]
+    if not til or til[-1].dato != dag:
+        return None
+    return indeksendring(til)

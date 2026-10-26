@@ -579,6 +579,13 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) .velg-dag-boersometer { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 12px 0 20px; }
 :where(.side-oversikt) .velg-dag-boersometer input,
 :where(.side-oversikt) .velg-dag-boersometer button { min-height: 44px; font: inherit; }
+/* Story 8.6b, b: linja «Mål mot børsen», med hovedindeksen som tall. */
+:where(.side-oversikt) section.maal { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 20px; margin: 16px 0; font-size: 14px; color: var(--tekst); }
+:where(.side-oversikt) section.maal h2 { font-size: 14px; font-weight: 600; margin: 0; color: var(--blekk); }
+:where(.side-oversikt) section.maal ul { display: flex; flex-wrap: wrap; gap: 4px 20px; list-style: none; margin: 0; padding: 0; }
+:where(.side-oversikt) section.maal .indeksendring { font-variant-numeric: tabular-nums; font-weight: 600; }
+:where(.side-oversikt) section.maal .indeksendring.opp { color: var(--opp); }
+:where(.side-oversikt) section.maal .indeksendring.ned { color: var(--ned); }
 :where(.side-oversikt) section.bransje { margin: 24px 0; }
 :where(.side-oversikt) section.bransje h2 { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 20px; }
 :where(.side-oversikt) section.bransje h2 .bransjesymbol { width: 22px; height: 22px; }
