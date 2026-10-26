@@ -80,6 +80,8 @@ context:
 
 *Utfallet 26.10 kl. 09:25 på `6f5815b`, etter rettelsene i kartet fra gjennomgangen:* begge ble fanget av de samme testene. Arealet uten vekten er `squarify([1.0 for r in bransje.ruter], …)` i `_legg_ut`. Fila var lik HEAD etterpå, med samme sha256 som `git show HEAD:src/boersometer.py` med CRLF.
 
+*Utfallet 26.10 kl. 16:08 på `38cbb3e`, etter punktene a–d og rettelsene fra gjennomgangen av endringene etter `00bd6e1`:* begge ble fanget, grensen av `test_hvert_trinn_ved_grensene[0.4951-lys-opp]` (16:08:06) og arealet av `test_arealet_foelger_volumforholdet_i_tabellen` (16:08:09). Fila var lik HEAD etterpå, med samme sha256 som `git show HEAD:src/boersometer.py` og samme `git hash-object`.
+
 ## Gjennomgangen
 
 Gjennomgang 26.10 etter hele settet (3721 bestått, 20 hoppet over, 0 feilet, 09:05:18–09:10:30 på `0deaf5f`), av hele PR-en, diffen `de1cd7d..0deaf5f`, med Blind Hunter (BH, 14 funn), Edge Case Hunter (ECH, 10) og Verification Gap (VG, 3). Rettet i `104b735`, `5cf4244`, `f9ae72c`, `40852ac`, `5eb6de0`, `6f5815b` og her.
@@ -113,11 +115,36 @@ Gjennomgang 26.10 etter hele settet (3721 bestått, 20 hoppet over, 0 feilet, 09
 
 *Rettet 2026-10-26 (instruksjonen kl. 15:24), BH10:* grunnen til veksten 1,02, målt 26.10 på `6d92bbd`, ferdig før kl. 15:48 (`date` rett etter målingen), med 200 tilfeldige dager for 15 aksjer i 8 bransjer, volumforholdet lognormalt fordelt med sigma 0,5 og 0,8 (100 dager hver), og høyden sammenlignet med en vekst på 1,002, som er nær den laveste høyden kartet får plass i. Med 1,05 ble kartet 1,5 % (bred) og 2,3 % (smal) høyere i median og 4,7 og 7,9 % ved 95-persentilen. Med 1,02 ble det 0,6 og 0,9 % i median og 1,9 % ved 95-persentilen, på 1,8 ms per kart. Med 1,01 ble det 0,2 og 0,4 % i median, men på 3,3 ms, og 1,002 tok 15 ms. Høyden kartet får plass i, er ikke alltid stigende med høyden, så enkelte dager ble opptil 28,5 % høyere med 1,02 og 53,9 % med 1,05 enn med 1,002. 1,02 er valgt fordi kartet blir under 2 % høyere enn nødvendig for 95 av 100 dager, på under 2 ms. Grunnen står også ved `VEKST` i `src/boersometer.py`. Ingen test, fordi det er et valg og ikke en regel.
 
+### Gjennomgangen av endringene etter `00bd6e1`
+
+Gjennomgang 26.10 etter hele settet (3760 bestått, 24 hoppet over, 0 feilet, 15:49:34–15:55:08 på `3d9381c`), av diffen `0195544..3d9381c`, det vil si alt etter `00bd6e1` uten det som kom fra main, med Blind Hunter (BH, 14 funn), Edge Case Hunter (ECH, 5) og Verification Gap (VG, 4). Numrene gjelder denne runden. Rettet i `2e8a178`, `22f4035`, `114d7b2`, `94cded1` og `38cbb3e`.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH1, ECH3 | Grensene i `@media` var hele px med hull mellom 359 og 360 og mellom 1079 og 1080, så ingen regel gjaldt ved zoom med desimaler | medium | **rettet** i `2e8a178`: `@container` på kartet med `width >=` og `width <`, uten hull |
+| ECH1 | Et vindu 360–376 px bredt med rullefelt har 311–327 px innhold, men teksten ble regnet ved 328 px | medium | **rettet** i `2e8a178`: `smal` gjelder når kartet er minst 328 px, som er et vindu fra 360 px uten rullefelt (svaret kl. 13:00, c) |
+| BH2 | Spesifikasjonen sa at overskriften er 24 px ved den minste bredden, men den er 24 px ved `Flate.bredde` og om lag 19,3 px ved 288 px | medium | **rettet** i `22f4035`: spesifikasjonen og kommentaren sier det, og `test_overskriften_har_plass_til_linja` |
+| BH4 | Testen for den åpne tabellen byttet ut `kart()`, så veien der kartet virkelig gir opp, var ikke prøvd | medium | **rettet** i `114d7b2`: `test_tabellen_er_aapen_naar_kartet_virkelig_gir_opp` med `MINSTE_RUTE` 1000 px |
+| BH3, ECH2, VG3 | 1008 px forutsetter at `main` er 65rem med 16 px på hver side og rotskriften 16 px | low | **rettet** i `2e8a178`: `@container` måler kartet, så nivået følger den bredden kartet faktisk har |
+| VG2 | Ingen test sjekket hele lista av elementer som skjules for hvert nivå | low | **rettet** i `2e8a178`: `test_tekstnivaaet_fra_360_og_1080_px` sjekker hver velger og grensene mot `Flate.tekst` |
+| BH9 | `docs/hjelp.md` hadde fortsatt «fra 0,5 til under 2 %» etter BH7 | low | **rettet** i `94cded1`, med test |
+| ECH4 | Den lyse grensen sto med én fast desimal, så 0,25 ville stått som 0,3 | low | **rettet** i `94cded1`: så mange desimaler som trengs, `test_grensen_staar_noeyaktig` |
+| BH7, BH8 | Kommentaren ved `VEKST` nevnte ikke feltbredden, og det var uklart om målingen var gjort med `MINSTE_FELT` | low | **rettet** i `38cbb3e`: målingen er gjort på `6d92bbd`, etter `MINSTE_FELT` i `a7f16fd`, og kommentaren sier det |
+| BH5, ECH5, VG4 | En bransje med flere aksjer der ingen har kurs, får bare navnet i overskriften, og ingen test viser den grenen | low | **under «Åpent»:** følger svaret kl. 13:00 (b), og tabellen har antallet |
+| BH6 | `dagen_foer` til malen er nå tekst, ikke dato | low | **avvist:** malen bruker den ett sted (`grep` i `src/templates/`) |
+| BH10 | Testen for rekkefølgen fanger bare første ord i bransjenavnet | low | **avvist:** alle de 13 navnene i `BRANSJER` er ett ord |
+| BH11 | `bred` og `smal` er både flatenavn og klassenavn | low | **avvist:** `plass` og `nivaa` er to ordbøker, og testene sjekker alle fire klassene |
+| BH12 | `id="bransje-N"` peker på en annen bransje fra dag til dag | low | **avvist:** id-en brukes bare av `aria-labelledby` på samme side |
+| BH13 | Linje to i overskriften skjules med en fast `row-gap` i px | low | **avvist:** zoom skalerer px likt, og høyden og avstanden følger med |
+| BH14 | Kommentarene om bildene sier «byte for byte det samme» uten bevis | low | **avvist:** bildene ble tatt på nytt og sammenlignet med `cmp` mot `docs/appen/` før hver commit, og `src/app.py` er blant `FILENE_BAK_AKSJESIDEN` |
+| VG1 | Ingen test sjekker rekkefølgen ved lik vekt | low | **avvist:** `squarify` og `kart` bruker samme funksjon, `rekkefoelge` |
+
 ## Åpent
 
 - **BH2, rekkefølgen i kartet (medium, ikke rettet):** fokuset følger §4-rekkefølgen i HTML-en, mens `squarify` legger den største ruta først. Gruppen avgjør om rekkefølgen skal endres.
   *Lukket 2026-10-26 (gruppens svar kl. 13:00, a):* i HTML-en står feltene og rutene i den rekkefølgen `squarify` legger dem, den største først og ved lik vekt i rekkefølgen i §4 (`rekkefoelge` i `src/boersometer.py`), på begge flatene. Tabellen under har fortsatt rekkefølgen i §4. Hjelpen sier at Tab følger kartet.
 - **BH5:** høyden på den smale flaten mellom 390 og 760 px.
+- **BH5, ECH5 og VG4 i gjennomgangen av endringene etter `00bd6e1`:** overskriften for en bransje med flere aksjer der ingen har kurs, har bare navnet (svaret kl. 13:00, b), og tabellen har antallet.
 - **ECH4 og ECH5:** linja «Mål mot børsen» når børsdagen før er mer enn 6 dager før, eller ikke er den samme i kursene og kalenderen.
   *ECH4 lukket 2026-10-26:* rettet, se linja under triagen. ECH5 er fortsatt åpent.
 - **BH7:** typen `faktor` for den lyse grensen i «Hva fargene betyr».
