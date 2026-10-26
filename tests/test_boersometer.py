@@ -1356,7 +1356,7 @@ class TestKartet:
         display: none, som også skjuler den for skjermleseren."""
         stil = (SRC / "static" / "stil.css").read_text(encoding="utf-8")
         for flate in ("bred", "smal"):
-            regel = re.search(rf"\.rute\.nivaa-{flate}-2 > :is\(\.merke, \.tekst\) \{{([^}}]*)\}}", stil).group(1)
+            regel = re.search(rf"\.rute\.nivaa-{flate}-2 > \.tekst \{{([^}}]*)\}}", stil).group(1)
             assert "clip: rect(0 0 0 0)" in regel and "display: none" not in regel
         assert "@media (max-width: 760px)" in stil
 

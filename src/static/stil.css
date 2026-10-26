@@ -614,9 +614,9 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 /* Navnet står på ruter som er store nok (tekstnivaa i boersometer.py). Det som
    ikke får plass, skjules bare for øyet, så skjermleseren leser alt. */
 @media (min-width: 761px) {
-  :where(.side-oversikt) .rute.nivaa-bred-0 > :is(.ticker, .endring, .merke, .tekst),
-  :where(.side-oversikt) .rute.nivaa-bred-1 > :is(.endring, .merke, .tekst),
-  :where(.side-oversikt) .rute.nivaa-bred-2 > :is(.merke, .tekst) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  :where(.side-oversikt) .rute.nivaa-bred-0 > .ticker, :where(.side-oversikt) .rute.nivaa-bred-0 > .endring, :where(.side-oversikt) .rute.nivaa-bred-0 > .merke, :where(.side-oversikt) .rute.nivaa-bred-0 > .tekst,
+  :where(.side-oversikt) .rute.nivaa-bred-1 > .endring, :where(.side-oversikt) .rute.nivaa-bred-1 > .merke, :where(.side-oversikt) .rute.nivaa-bred-1 > .tekst,
+  :where(.side-oversikt) .rute.nivaa-bred-2 > .merke, :where(.side-oversikt) .rute.nivaa-bred-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
 @media (max-width: 760px) {
   :where(.side-oversikt) .kart { aspect-ratio: var(--forhold-smal); }
@@ -624,9 +624,9 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
   :where(.side-oversikt) .kart section.bransje h2 { height: var(--topp-smal); }
   :where(.side-oversikt) .kart ul.ruter { top: var(--topp-smal); }
   :where(.side-oversikt) .kart ul.ruter > li { left: var(--x-smal); top: var(--y-smal); width: var(--b-smal); height: var(--h-smal); }
-  :where(.side-oversikt) .rute.nivaa-smal-0 > :is(.ticker, .endring, .merke, .tekst),
-  :where(.side-oversikt) .rute.nivaa-smal-1 > :is(.endring, .merke, .tekst),
-  :where(.side-oversikt) .rute.nivaa-smal-2 > :is(.merke, .tekst) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  :where(.side-oversikt) .rute.nivaa-smal-0 > .ticker, :where(.side-oversikt) .rute.nivaa-smal-0 > .endring, :where(.side-oversikt) .rute.nivaa-smal-0 > .merke, :where(.side-oversikt) .rute.nivaa-smal-0 > .tekst,
+  :where(.side-oversikt) .rute.nivaa-smal-1 > .endring, :where(.side-oversikt) .rute.nivaa-smal-1 > .merke, :where(.side-oversikt) .rute.nivaa-smal-1 > .tekst,
+  :where(.side-oversikt) .rute.nivaa-smal-2 > .merke, :where(.side-oversikt) .rute.nivaa-smal-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
 /* Story 8.6b, c: fem trinn etter endringen slik den vises. Uten endring er ruta
    hvit med grå kant, så den ikke ligner det nøytrale trinnet. Ikke stiplet:

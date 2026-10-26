@@ -175,7 +175,10 @@ def test_aksjen_uten_kurser_har_en_rad_i_min_liste(klient):
 # c) Symbolene over søylene lenker til aksjesiden (U20, kl. 11:23).
 
 
-@pytest.mark.parametrize("side", ["/", "/boersometer"])
+# Børsometeret er tatt ut: søylene står bare på oversikten etter avgjørelsen
+# 24.10 kl. 11:54 (story 8.6). På børsometeret lenker rutene i kartet til
+# aksjesiden.
+@pytest.mark.parametrize("side", ["/"])
 def test_symbolene_over_soeylene_lenker_til_aksjesiden(klient, side):
     """Ville feilet hvis symbolet over en søyle ikke var en lenke, lenket et
     annet sted enn til aksjen sin, eller lenkene lå i en del som er skjult
