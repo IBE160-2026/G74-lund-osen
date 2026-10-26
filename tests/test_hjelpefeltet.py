@@ -2,8 +2,10 @@
 
 Siden lages av Flasks testklient og skrives til en midlertidig mappe sammen
 med src/static/, og Edge eller Chrome uten hode åpner den med file:// og
---dump-dom. Et testskript nederst på siden trykker på knappene og skriver
-målingene som JSON i siden. Ingen server, ingen port og ingenting fra nettet
+--dump-dom. Siden står i en iframe så bred som bredden testen gjelder, fordi
+vinduet uten hode er minst 504 px og ikke akkurat så bredt som bedt om. Et
+testskript nederst på siden trykker på knappene og sender målingene som JSON
+til rammen, som skriver dem i sin side. Ingen server, ingen port og ingenting fra nettet
 (AD-8). Finnes ingen nettleser, hoppes testene over.
 """
 
@@ -78,10 +80,8 @@ function dekket(felt) {
     .map(([, t]) => t);
 }
 function ferdig(r) {
-  const pre = document.createElement("pre");
-  pre.id = "resultat";
-  pre.textContent = JSON.stringify(r);
-  document.body.append(pre);
+  r.bredde = document.documentElement.clientWidth;
+  parent.postMessage(JSON.stringify(r), "*");
 }
 """
 
@@ -98,6 +98,14 @@ def _kjoer(html: str, mappe: Path, bredde: int, skript: str, foer: str = "") -> 
     side = side.replace("</body>", test + "</body>", 1)
     fil = mappe / f"side-{bredde}.html"
     fil.write_text(side, encoding="utf-8")
+    ramme = mappe / f"ramme-{bredde}.html"
+    ramme.write_text(
+        "<!doctype html><body style='margin:0'>"
+        f"<iframe src='{fil.name}' style='border:0;width:{bredde}px;height:900px'></iframe>"
+        "<script>addEventListener('message', (e) => { const pre = document.createElement('pre');"
+        " pre.id = 'resultat'; pre.textContent = e.data; document.body.append(pre); });</script></body>",
+        encoding="utf-8",
+    )
     profil = mappe / f"profil-{bredde}"
     kommando = [
         NETTLESER,
@@ -111,19 +119,21 @@ def _kjoer(html: str, mappe: Path, bredde: int, skript: str, foer: str = "") -> 
         "--disable-sync",
         "--disable-extensions",
         f"--user-data-dir={profil}",
-        f"--window-size={bredde},900",
+        f"--window-size={bredde + 100},1000",
         "--virtual-time-budget=10000",
         "--dump-dom",
-        fil.as_uri(),
+        ramme.as_uri(),
     ]
     if sys.platform.startswith("linux"):
         kommando.insert(1, "--no-sandbox")
     ut = subprocess.run(kommando, capture_output=True, text=True, encoding="utf-8", timeout=120)
     treff = re.search(r'<pre id="resultat">(.*?)</pre>', ut.stdout, re.DOTALL)
     assert treff, ut.stderr[-2000:]
-    return json.loads(
+    svar = json.loads(
         treff.group(1).replace("&quot;", '"').replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">")
     )
+    assert svar.pop("bredde") == bredde, "siden ble ikke så bred som testen gjelder"
+    return svar
 
 
 @pytest.fixture
