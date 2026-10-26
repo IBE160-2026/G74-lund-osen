@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-26T00:30
+updated: 2026-10-26T13:32
 ---
 
 # Kvalitetssikring
@@ -367,6 +367,8 @@ sist i dokumentet.
 | 3.4e Fotnoten etter startdagen i demoen, og for inneværende børsdag | `e772cc6` (#91) | 1 (3, M1–M3) | – M1 og M2 kjørt på `622e25f`, M3 for svaret kl. 19:10 på `2fd2635` | `S/spec-3-4e-fotnoten-etter-startdag.md` |
 | 3.5a Start med dobbeltklikk med uv, uten Docker | `afbc0af` (#92) | 2 (4, M1–M3 og vernet) | – M1–M3 kjørt på `1d46532` og igjen på `6287033` 23.10, vernet «bare fra main» én gang med `-x` på `2a3dd7e` 24.10 | `S/spec-3-5a-dobbeltklikk-med-uv.md` |
 | 3.5d Funnene fra forprøven av den ekte versjonen 24.10 | `5e01a4f` (#94) | 1 (1, sjekken av kommandolinja) | – kjørt én gang med `-x` på `50ab5a6` 24.10, før sjekken ble snevret inn etter gjennomgangen | `S/spec-3-5d-funn-fra-forproeven.md` |
+| 3.5f Hovedveien i «Kom i gang» | `8cd20b3` (#101) | 1 (1, Docker-delen tatt ut av «Kom i gang») | – kjørt med `-x` på `b5e4faa` og igjen på `a052c74` 26.10 | `S/spec-3-5f-hovedveien.md` |
+| 3.5e Den andre versjonen stoppes rett før webserveren | `dbfa0b9` (#100) | 1 (1, stoppen tilbake før uv) | – kjørt med `-x` på `df6b0a0` og igjen på `fd19b7f` 26.10 | `S/spec-3-5e-stopp-foer-webserveren.md` |
 | 8.2a Seks funn fra prøven av demoen 24.10 | `e4d1ba4` (#93) | 1 (5, M1–M5) | – kjørt på `7ca19d9` 24.10 | `S/spec-8-2a-funn-fra-proeven-av-demoen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
@@ -599,6 +601,8 @@ funn. Antall rader i loggen:
 | 3.4e, to gjennomganger 23.10 | 36 | 22 | 13 | 1 |
 | 3.5a, gjennomgangene 23.10 og 24.10 | 48 | 34 | 14 | – |
 | 3.5d | 24 | 15 | 8 | 1 |
+| 3.5f | 23 | 13 | 9 | 1 |
+| 3.5e | 10 | 8 | – | 2 |
 | 8.2a | 21 | 15 | 6 | – |
 | 9.1, oppdatering 17.10 | 19 | 17 | 2 | – |
 | 9.7 | 19 | 13 | 6 | – |
@@ -879,6 +883,22 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
 - **Maskinen har aldri hatt repoet eller imaget:** ja / nei. Sjekket med
   `docker images` (ingen `ose-signal`) og at mappa `G74-lund-osen` ikke fantes.
 - **Commit som ble prøvd** (`git log -1 --oneline`):
+- **uv fra før** (`uv --version` før prøven, eller «ikke installert»), for hovedveien:
+
+*Lagt til 2026-10-26 (story 3.5f, gruppens svar 25.10 kl. 11:32 under story 3.5 i `epics.md`):* dobbeltklikket er hovedveien i «Kom i gang», og prøven begynner med det, i tabellen «Hovedveien» under. Docker Desktop trengs ikke for radene D1–D6. Tabellen med Docker og uv, rad 1–23, er reserven og tas etterpå. Ingen rad i den er endret.
+
+**Hovedveien: «Enklest: dobbeltklikk, uten Docker»**
+
+| # | Steg i README-en | Det som skjedde | Tid (min) |
+|---|---|---|---|
+| D1 | Last ned med den direkte lenken, eller «Code» → «Download ZIP», og pakk ut med «Pakk ut alle» (Windows) eller dobbeltklikk (Mac). Kom det en mappe `G74-lund-osen-main`, og lå de fire filene i den innerste? | | |
+| D2 | Finn de fire filene øverst i mappa. Viste Windows dem som «Start demoen» og «Start den ekte versjonen», uten filendelsen? | | |
+| D3 | Dobbeltklikk «Start demoen». Kom advarselen fra Windows eller godkjenningen på Mac, og holdt teksten i README-en? Spurte vinduet om uv skulle installeres? | | |
+| D4 | Åpnet nettleseren http://127.0.0.1:8000, og står «Eksempeltall» på siden? Hvor lang tid tok det fra dobbeltklikket? | | |
+| D5 | En aksje i demoen åpnes fra oversikten. Så lukkes vinduet: svarer http://127.0.0.1:8000 etterpå? | | |
+| D6 | Dobbeltklikk «Start den ekte versjonen» uten nøkkel. Åpnet registreringssiden hos EODHD seg, og spurte vinduet etter nøkkelen? Lukk vinduet uten å lime inn noe, og slett `.env` som vinduet laget, før reserven | | |
+
+**Reserven: Docker Desktop, og uv i terminalen**
 
 | # | Kommando eller steg i README-en | Det som skjedde | Tid (min) |
 |---|---|---|---|
@@ -1354,6 +1374,8 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 3.5a | M1–M3 | M1 `test_skriptene_bruker_kommandoene_i_readme[start.ps1]` og `test_webserveren_binder_bare_127_0_0_1`, M2 `test_noekkelen_og_miljoeet_skrives_aldri_ut[start.sh]`, M3 `test_aldri_debug_eller_down_v[start.ps1]` | `S/spec-3-5a-…` |
 | 3.5a | vernet tilbake til «bare fra main» i begge skriptene | `test_den_ekte_versjonen_stopper_i_en_mappe_med_git[start.ps1]`, med `-x` | `S/spec-3-5a-…` |
 | 3.5d | sjekken av kommandolinja borte i `start.ps1`, så alt på porten stoppes | `test_start_ps1_stopper_bare_den_andre_versjonen_paa_porten[fremmed]`, med `-x` | `S/spec-3-5d-…` |
+| 3.5f | Docker-delen, fra `### Med Docker Desktop` til `### Står du fast?`, tatt ut av `README.md` | `TestCompose::test_porten_er_den_samme_overalt_og_ikke_5000` med `-x` mot tre testfiler, og `TestHovedveien::test_dobbeltklikket_staar_foerst_og_ikke_bak_en_pil` med `-k TestHovedveien`, på `b5e4faa` og `a052c74` | `S/spec-3-5f-…` |
+| 3.5e | stoppen tilbake før uv i `start.ps1` (`Frigjoer-Porten $true` der porten sjekkes) | `test_start_ps1_stopper_bare_den_andre_versjonen_paa_porten[oss]`, med `-x` | `S/spec-3-5e-…` |
 | 8.2a | M1–M5 | M1 `test_periodeknappene_og_velg_dag_gaar_til_kursgrafen`, M2 `test_aksjen_uten_kurser_har_en_rad_nederst_og_ingen_fotnote`, M3 `test_symbolene_over_soeylene_lenker_til_aksjesiden[/]`, M4 `test_raden_sier_hvorfor_med_samme_tall_som_aksjesiden[/]`, M5 `test_sortert_er_hele_lista_en_liste_uten_delene[synkende]` | `S/spec-8-2a-…` |
 | 9.1 | Q1–Q4 | Q1, Q3 og Q4 `test_hver_ferdige_spesifikasjon_har_en_rad`, Q2 `test_hver_test_dokumentene_nevner_finnes` | `S/spec-9-1-…` |
 | 9.7 | A1–A5 | A1 `test_ruff_check_finner_ingenting`, A2 og A3 `test_ruff_format_er_kjoert`, A4 `test_ci_kjoerer_ruff_foer_testene`, A5 `test_ingen_modul_i_src_bruker_meldinger` | `S/spec-9-7-…` |

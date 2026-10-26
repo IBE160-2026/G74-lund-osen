@@ -2157,6 +2157,11 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
   egne nøkler gjelder 10.7. Punktet om at README-en endres når det den sier,
   stemmer, står
 
+*Rettet 2026-10-26, etter gruppens svar 25.10 kl. 11:32 under story 3.5:*
+Docker er ikke lenger hovedmåten i README-en. Dobbeltklikket (3.5a) er den
+anbefalte hovedveien i «Kom i gang», Docker den andre og uv i terminalen den
+tredje. Dockerfilen og `compose.yaml` leveres som før. Bygges i 3.5f.
+
 **Avhenger av:** 3.1. **Én økt:** ja.
 
 *Ferdig 2026-10-10:* flettet i `5816bc2`, PR #25.
@@ -2458,6 +2463,12 @@ reserve. Til da endres ikke «Kom i gang».
 Resten ryddes etter alle testene.
 
 *Avgjort kl. 11:49:* dobbeltklikket bruker bare uv, også når Docker kjører.
+
+*Avgjort 2026-10-24 kl. 20:00 (gruppens svar, ført 26.10 fra instruksjonen kl. 09:57):* kjører den andre versjonen av OSE Signal fra samme mappe, stoppes den rett før webserveren startes, ikke før uv og hentingen, så den kjører videre hvis noe feiler før det. Et annet program på porten sjekkes fortsatt før uv og stoppes aldri. Det endrer «før uv og hentingen» i punkt d) i 3.5d. Svaret 25.10 kl. 20:00, «BH5 står åpent», gjaldt loggen for 24.10, fordi stoppen ikke var bygget.
+
+*Lagt til 2026-10-26 kl. 10:34:* 3.5e, den andre versjonen stoppes rett før webserveren, er squash-flettet i `dbfa0b9`, PR #100, låst til head-en `2e8f347` (spesifikasjonen `spec-3-5e-stopp-foer-webserveren.md`). Porten sjekkes før uv, og et annet program stopper skriptet der. Den andre versjonen fra samme mappe stoppes rett før webserveren, så den kjører videre hvis skriptet stopper før det. BH5 i triagen til 3.5d er lukket.
+
+*Lagt til 2026-10-26 kl. 13:32:* 3.5f, hovedveien i «Kom i gang», er squash-flettet i `8cd20b3`, PR #101, låst til head-en `e5f65f5` (spesifikasjonen `spec-3-5f-hovedveien.md`). Etter svaret 25.10 kl. 11:32 og innspillet kl. 11:26 heter overskriften «Kom i gang: nedlasting og installasjon», med ankeret `kom-i-gang` beholdt. «Velg vei etter hva du har» lenker rett inn til dobbeltklikket (anbefalt), «Med Docker Desktop» og «Uten Docker, med uv». Dobbeltklikket er en egen del først, med den direkte ZIP-lenken, og «Mappestruktur» forklarer hver fil og mappe i rota. `docs/hjelp.md` og §9 i kvalitetssikringen følger, med Docker som reserve.
 
 ---
 
@@ -3604,6 +3615,12 @@ dagen gjaldt hele børsen eller noen bransjer.
 *Avgjort 2026-10-25 kl. 21:41 (gruppens svar):* 8.6b bygges i natt og stopper før flettingen med bilder, og gruppen avgjør flettingen mandag før kl. 21:20. Periodene er 8.17b.
 
 *Avgjort 2026-10-26 kl. 08:43 (gruppens svar):* valgene i spesifikasjonen 8.6b. a) Rammene måles mot det de grenser mot, den hvite linja innenfor og det hvite rundt ruta, og der har begge minst 3:1. b) Vekten holdes mellom 0,5 og 3 ganger vanlig volum, og hjelpen sier det. c) Ved 390 px er ingen rute under 44 × 44 px, og ved 320 px ingen under 24 × 24 px (WCAG 2.2, 2.5.8).
+
+*Avgjort 2026-10-26 kl. 13:00 (gruppens svar):* a) I HTML-en står bransjene og rutene i den rekkefølgen kartet legger dem, den største først, så Tab følger kartet; tabellen under beholder rekkefølgen fra designreglene (BH2). b) Overskriften i feltet er som på tavla: navnet og «snitt» med tallet, eller «1 aksje» ved én aksje; antallet står i tabellen. Er feltet for smalt, skjules snittet for øyet før navnet kuttes med «…». c) For vinduer fra 360 px regnes teksten i rutene ved 328 px; under 360 px ved 288 px som nå. d) Når alt er grønt, flettes PR #99 med bilder tatt først, og gruppen ser dem etterpå.
+
+*Avgjort 2026-10-26 kl. 13:07 (gruppens svar):* e) For vinduer fra 1080 px regnes teksten ved 1008 px, full bredde; mellom 761 og 1080 px ved 712 px som nå.
+
+*Avgjort 2026-10-26 kl. 15:21 (gruppens svar):* f) Tabellen under kartet er lukket som standard, bak «Se tallene som tabell»; skjermleseren finner den, og svarene om tabellen kl. 08:43 og 13:00 står.
 
 ### Story 8.7: Sjekk 2 og 3 i kursgrafen
 

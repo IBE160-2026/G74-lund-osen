@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-10-24T13:46
+updated: 2026-10-26T13:00
 ---
 
 # UX-loggen
@@ -472,6 +472,7 @@ Eldst først, 444 rader fra 2026-09-25. Radene kommer fra «Avgjort»-, «Rettet
 | 2026-10-21 | Historikken i demoen hadde signal fra 13.03 og viste ikke «ikke vurdert», som den ekte har mest av (U45). | gruppen | Historikken i demoen viser det samme bildet som den ekte: signal bare fra en startdag noen uker før siste demodag, og «ikke vurdert» før. Det må passe med de 10 fargekombinasjonene og KI-tekstene på siste demodag. | [`epics.md`](../_bmad-output/planning-artifacts/epics.md), «Prioritering» og story 3.4, «*Avgjort 2026-10-21 kl. 23:09*» |
 | 2026-10-21 | En ny bruker av den ekte versjonen ser ingen kurser på dagtid en børsdag før kvelden (U53). | gruppen | Når basen er tom, henter første henting siste fullførte børsdag også på dagtid en hverdag. Dagens rad skrives aldri før kl. 22, og en base som ikke er tom, hentes som før. Bygges med README-rettingen, før 2.12. | [`epics.md`](../_bmad-output/planning-artifacts/epics.md), «Prioritering» og story 2.3, «*Avgjort 2026-10-21 kl. 23:33*» |
 | 2026-10-21 | Linja kl. 22:57 tok med tallene som står på siden, og det bryter med grunnlaget for avgjørelsen 04.10 om ikke å spørre EODHD. | gruppen | Den nye promptversjonen gir modellen bare egne resultater, ingen kurser, volumer, prosenter eller forholdstall. Teksten kan vise til tallene på siden uten å gjenta dem. Det åpne punktet er lukket, og EODHD spørres ikke. | [`epics.md`](../_bmad-output/planning-artifacts/epics.md), «Prioritering» og story 10.1, «*Avgjort 2026-10-21 kl. 23:51*»; [`kilder-og-rettigheter.md`](kilder-og-rettigheter.md), «Betingelse 4 og KI-tjenestene (2026-10-04)» |
+| 2026-10-25 | «Kom i gang» hadde Docker Desktop som hovedmåten, og dobbeltklikket uten Docker (3.5a) sto bak en pil under «Mer for den som vil». | gruppen | Dobbeltklikket blir den anbefalte hovedveien i «Kom i gang», Docker den andre og uv i terminalen den tredje, med tre veier etter behov og dobbeltklikket som egen del (innspillet kl. 11:26). Dockerfilen og `compose.yaml` leveres som før. Bygges i 3.5f. | [`epics.md`](../_bmad-output/planning-artifacts/epics.md), story 3.5, «*Avgjort 2026-10-25 kl. 11:32*» og «*Innspill kl. 11:26*» |
 
 *Rettet 2026-10-21 kl. 18:33:* Raden 2026-10-13 «Testeren av README-en skulle se det nye utseendet.» over: delen om README-prøven i uke 43 (gruppens svar 18.10 kl. 00:03) gjelder ikke lenger. Prøven på en ren maskin er utsatt til v1 er ferdig bygget, etter avgjørelsen 2026-10-21 kl. 18:33 under «Prioritering» og story 3.3 i `epics.md`.
 

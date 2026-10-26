@@ -2,12 +2,54 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-24T17:16
+updated: 2026-10-26T13:26
 ---
 
 # Hjelp til «Kom i gang»
 
-Spørsmål og svar til «Kom i gang» i [README-en](../README.md), sortert etter steget de hører til. De vanligste står også i README-en, under «Står du fast?». Stegene 1–4 er felles for begge versjonene, og demoen står før den ekte versjonen, som i README-en.
+Spørsmål og svar til «Kom i gang» i [README-en](../README.md), sortert etter steget de hører til. De vanligste står også i README-en, under «Står du fast?». Dobbeltklikket står først, som i README-en. Stegene 1–4 hører til «Med Docker Desktop» og er felles for begge versjonene der, og demoen står før den ekte versjonen.
+
+## Start med dobbeltklikk
+
+### Jeg finner ikke de fire filene.
+
+Etter «Pakk ut alle» på Windows ligger en `G74-lund-osen-main` inne i en annen med samme navn. Åpne den innerste, der README ligger. De fire filene står øverst der: `Start demoen` og `Start den ekte versjonen`, som `.cmd` for Windows og `.command` for Mac. Står du inne i ZIP-fila, se «ZIP-fila ser ut som en vanlig mappe.» under steg 2.
+
+### Vinduet lukkes med en gang.
+
+Har du dobbeltklikket inne i ZIP-fila uten å pakke ut, finner ikke startfila skriptene i `start/`. Pakk ut først, og dobbeltklikk i den innerste `G74-lund-osen-main`.
+
+### Det er to filer som heter «Start demoen».
+
+Windows viser ofte `Start demoen.cmd` uten filendelsen og `Start demoen.command` med den. På Windows tar du den som bare heter «Start demoen». `.command` er for Mac, og på Windows spør den bare hvilket program som skal åpne den.
+
+### Windows advarer mot fila.
+
+Første gang kan Windows advare mot `Start demoen.cmd` eller `Start den ekte versjonen.cmd`, fordi fila er lastet ned fra nettet. Advarselen heter «Windows beskyttet PC-en». Klikk «Mer informasjon», og så «Kjør likevel». Spør Windows om du vil kjøre fila, svarer du ja. Mer står under «Enklest: dobbeltklikk, uten Docker» i [README-en](../README.md#enklest-dobbeltklikk-uten-docker).
+
+### Mac sier at fila ikke kan åpnes.
+
+Første gang kan macOS stoppe `Start demoen.command` eller `Start den ekte versjonen.command`, fordi fila er lastet ned fra nettet. Fra macOS 15 holder det ikke å høyreklikke og velge Åpne. Velg Apple-menyen > Systeminnstillinger, og Personvern og sikkerhet i sidepanelet. Under Sikkerhet klikker du «Åpne likevel» og skriver inn passordet ditt. Knappen står der i omtrent en time etter at du prøvde å åpne fila. Dobbeltklikk så fila på nytt. På macOS 14 og eldre kan du også høyreklikke fila, velge Åpne og bekrefte.
+
+### Vinduet sier at mappa har .git.
+
+`Start den ekte versjonen` starter ikke i en mappe med `.git`, en klon av repoet, heller ikke på main. Da stopper vinduet før noe installeres eller hentes, så et dobbeltklikk i en klon aldri henter med nøkkelen som ligger i den. Last ned en egen kopi med «Download ZIP» på GitHub, pakk den ut, og bruk din egen nøkkel fra EODHD. `Start demoen` starter også i en klon.
+
+### Vinduet sier at den andre versjonen av OSE Signal stoppes.
+
+Demoen eller den ekte versjonen kjørte allerede fra denne mappa, på samme port, fra et annet dobbeltklikk eller startet med `uv run waitress-serve`. Skriptet sier fra med en gang, men stopper den først rett før appen starter, så den kjører videre hvis skriptet stopper før det, for eksempel fordi `uv sync` feiler. Feiler hentingen, starter appen likevel med det som er hentet før, og da stoppes den andre versjonen. Så venter skriptet til porten er ledig, og starter den du dobbeltklikket. Det andre vinduet sier da at appen stoppet, og at det kan lukkes fordi den andre versjonen kjører.
+
+### Vinduet sier at et annet program svarer på 127.0.0.1:8000.
+
+Skriptet stopper aldri andre programmer, heller ikke OSE Signal fra en annen mappe, og vinduet sier hvilket program det er. Det sjekkes før uv, og igjen rett før appen starter, i tilfelle et annet program har tatt porten i mellomtiden. Er det demoen eller appen i Docker, stopper du den med `docker compose --profile demo down` i et terminalvindu i mappa med koden. Den stopper både demoen og den ekte versjonen. Er det et annet program, lukker du det. Dobbeltklikk så på nytt.
+
+### Hvor finner jeg nøkkelen, og hvordan limer jeg den inn?
+
+`Start den ekte versjonen` åpner registreringssiden hos EODHD første gang. Når du har laget kontoen, står nøkkelen som «API token» under «Dashboard», med kopiknappen til høyre. Lim den inn i vinduet med Ctrl+V eller et høyreklikk på Windows, og med Cmd+V på Mac, og trykk Enter. På Windows vises den som stjerner. På Mac vises ingenting mens du limer inn, men nøkkelen kommer med.
+
+### Nøkkelen var feil.
+
+Vinduet spør bare etter nøkkelen når den mangler i `.env`. Åpne `.env` i mappa, slett det som står etter `EODHD_API_KEY=`, og lagre. Neste dobbeltklikk på «Start den ekte versjonen» spør da på nytt.
 
 ## Steg 1: Docker Desktop
 
@@ -213,38 +255,10 @@ Noe annet bruker port 8000. Kjører den andre versjonen, stopper du den først (
 
 Åpne et nytt terminalvindu, gjør steg 4 og lim inn stoppkommandoen for versjonen du kjørte: `docker compose down` for den ekte versjonen, eller `docker compose --profile demo down` for demoen.
 
-## Start med dobbeltklikk
-
-### Windows advarer mot fila.
-
-Første gang kan Windows advare mot `Start demoen.cmd` eller `Start den ekte versjonen.cmd`, fordi fila er lastet ned fra nettet. Advarselen heter «Windows beskyttet PC-en». Klikk «Mer informasjon», og så «Kjør likevel». Spør Windows om du vil kjøre fila, svarer du ja. Mer står under «Start med dobbeltklikk, uten Docker» i [README-en](../README.md).
-
-### Mac sier at fila ikke kan åpnes.
-
-Første gang kan macOS stoppe `Start demoen.command` eller `Start den ekte versjonen.command`, fordi fila er lastet ned fra nettet. Fra macOS 15 holder det ikke å høyreklikke og velge Åpne. Velg Apple-menyen > Systeminnstillinger, og Personvern og sikkerhet i sidepanelet. Under Sikkerhet klikker du «Åpne likevel» og skriver inn passordet ditt. Knappen står der i omtrent en time etter at du prøvde å åpne fila. Dobbeltklikk så fila på nytt. På macOS 14 og eldre kan du også høyreklikke fila, velge Åpne og bekrefte.
-
-### Vinduet sier at mappa har .git.
-
-`Start den ekte versjonen` starter ikke i en mappe med `.git`, en klon av repoet, heller ikke på main. Da stopper vinduet før noe installeres eller hentes, så et dobbeltklikk i en klon aldri henter med nøkkelen som ligger i den. Last ned en egen kopi med «Download ZIP» på GitHub, pakk den ut, og bruk din egen nøkkel fra EODHD. `Start demoen` starter også i en klon.
-
-### Vinduet sier at den andre versjonen av OSE Signal stoppes.
-
-Demoen eller den ekte versjonen kjørte allerede fra denne mappa, på samme port, fra et annet dobbeltklikk eller startet med `uv run waitress-serve`. Skriptet stopper den, venter til porten er ledig, og starter den du dobbeltklikket. Det andre vinduet sier da at appen stoppet, og at det kan lukkes fordi den andre versjonen kjører.
-
-### Vinduet sier at et annet program svarer på 127.0.0.1:8000.
-
-Skriptet stopper aldri andre programmer, heller ikke OSE Signal fra en annen mappe, og vinduet sier hvilket program det er. Er det demoen eller appen i Docker, stopper du den med `docker compose --profile demo down` i et terminalvindu i mappa med koden. Den stopper både demoen og den ekte versjonen. Er det et annet program, lukker du det. Dobbeltklikk så på nytt.
-
-### Hvor finner jeg nøkkelen, og hvordan limer jeg den inn?
-
-`Start den ekte versjonen` åpner registreringssiden hos EODHD første gang. Når du har laget kontoen, står nøkkelen som «API token» under «Dashboard», med kopiknappen til høyre. Lim den inn i vinduet med Ctrl+V eller et høyreklikk på Windows, og med Cmd+V på Mac, og trykk Enter. På Windows vises den som stjerner. På Mac vises ingenting mens du limer inn, men nøkkelen kommer med.
-
-### Nøkkelen var feil.
-
-Vinduet spør bare etter nøkkelen når den mangler i `.env`. Åpne `.env` i mappa, slett det som står etter `EODHD_API_KEY=`, og lagre. Neste dobbeltklikk på «Start den ekte versjonen» spør da på nytt.
-
 ## Neste gang
 
 ### Hvordan starter jeg neste gang?
 
-Start Docker Desktop fra Start-menyen (Windows) eller Programmer (Mac), og vent til det står «Engine running». Gjør så steg 3 og 4, og hopp over steg 2. Start så appen med steg 7 i den ekte versjonen, og hent kursene med steg 8 om kvelden, eller start demoen med steg 5 i demoen. Det går raskere enn første gang. Etter «Stopp» kan du lukke terminalvinduet og Docker Desktop.
+Med dobbeltklikket: dobbeltklikk «Start demoen» eller «Start den ekte versjonen» i mappa igjen. Den ekte versjonen henter det som mangler før appen starter.
+
+Med Docker: start Docker Desktop fra Start-menyen (Windows) eller Programmer (Mac), og vent til det står «Engine running». Gjør så steg 3 og 4, og hopp over steg 2. Start så appen med steg 7 i den ekte versjonen, og hent kursene med steg 8 om kvelden, eller start demoen med steg 5 i demoen. Det går raskere enn første gang. Etter «Stopp» kan du lukke terminalvinduet og Docker Desktop.

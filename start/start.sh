@@ -17,6 +17,8 @@ ADRESSE="http://127.0.0.1:8000"
 VERSJON="${1:-demo}"
 SVAR_JA="${OSE_START_SVAR_JA:-}"
 UTEN_NETTLESER="${OSE_START_UTEN_NETTLESER:-}"
+# 3.5e: den andre versjonen fra mappa kjører fortsatt mens uv sync går.
+ANDRE_VERSJON=""
 # Forprøven 24.10 (funn 4): Python skriver æ, ø og å som UTF-8, også når
 # utskriften går til en fil.
 export PYTHONIOENCODING=utf-8
@@ -68,6 +70,10 @@ lyttere() {
     "$lsof_sti" -nP -iTCP:8000 -sTCP:LISTEN -t 2>/dev/null | sort -u
 }
 
+# Gruppens svar 24.10 kl. 20:00 (3.5e): før uv sjekkes porten, og et annet
+# program stopper skriptet der. Den andre versjonen fra mappa stoppes først
+# rett før webserveren, med stopp som argument, så den kjører videre hvis skriptet stopper før det, for eksempel fordi uv eller
+# uv sync feiler. Feiler hentingen, starter appen likevel, og da stoppes den.
 frigjoer_porten() {
     opptatt || return 0
     ider="$(lyttere)"
@@ -87,8 +93,14 @@ frigjoer_porten() {
         [ -n "$hvem" ] || hvem="et program skriptet ikke fant navnet på"
         stopp "et annet program svarer allerede på $ADRESSE, og det er ikke OSE Signal fra denne mappa. Programmet er $hvem. Skriptet stopper aldri andre programmer. Er det demoen eller appen i Docker, stopper du den med docker compose --profile demo down i et terminalvindu i mappa med koden. Ellers lukker du programmet. Dobbeltklikk så på nytt."
     fi
+    if [ "${1:-}" != "stopp" ]; then
+        prosesser="$(echo $ider)"
+        echo "Den andre versjonen av OSE Signal kjører allerede på $ADRESSE (prosess ${prosesser// /, }). Den stoppes rett før denne starter appen, så den kjører videre hvis skriptet stopper før det."
+        ANDRE_VERSJON=1
+        return 0
+    fi
     for id in $ider; do
-        echo "Den andre versjonen av OSE Signal kjører allerede på $ADRESSE (prosess $id). Den stoppes nå, så denne kan starte."
+        echo "Den andre versjonen av OSE Signal (prosess $id) stoppes nå, så denne kan starte."
         kill "$id" 2>/dev/null
     done
     i=0
@@ -127,8 +139,9 @@ if [ "$VERSJON" = "ekte" ] && [ -e .git ]; then
     stopp "mappa har .git (en klon av repoet eller et eget git-repo), og der starter ikke den ekte versjonen. Last ned en egen kopi med «Download ZIP» på GitHub, pakk den ut, og bruk din egen nøkkel fra EODHD. Demoen kan startes herfra."
 fi
 
-# Porten før uv og hentingen (forprøven 24.10, funn 7).
-frigjoer_porten
+# Porten før uv og hentingen (forprøven 24.10, funn 7): et annet program
+# stopper skriptet her. Den andre versjonen stoppes rett før webserveren (3.5e).
+frigjoer_porten sjekk
 
 # uv: på PATH, i .local/bin i brukermappa, eller installert etter et ja.
 if ! command -v uv >/dev/null 2>&1 && [ -x "$HOME/.local/bin/uv" ]; then
@@ -152,7 +165,13 @@ if ! command -v uv >/dev/null 2>&1; then
 fi
 
 echo "Installerer pakkene (uv sync). Første gang tar det noen minutter."
-uv sync || stopp "uv sync feilet. Sjekk at maskinen er koblet til nettet, og dobbeltklikk på nytt."
+uv sync
+if [ $? != 0 ]; then
+    # Gjennomgangen av 3.5e (BH, ECH): den andre versjonen kan holde filer i
+    # .venv åpne, og da er nettet feil grunn.
+    [ -z "$ANDRE_VERSJON" ] || stopp "uv sync feilet. Den andre versjonen av OSE Signal kjører fra denne mappa og kan holde filene i .venv åpne. Lukk vinduet der den kjører, og dobbeltklikk på nytt."
+    stopp "uv sync feilet. Sjekk at maskinen er koblet til nettet, og dobbeltklikk på nytt."
+fi
 
 if [ "$VERSJON" = "demo" ]; then
     echo "Lager demobasen."
@@ -186,6 +205,10 @@ else
         echo "Er nøkkelen feil, sletter du det som står etter EODHD_API_KEY= i .env, så spør vinduet etter den på nytt neste gang."
     fi
 fi
+
+# 3.5e: den andre versjonen stoppes først nå. Svarer et annet program på
+# porten nå, stoppes det ikke, og vinduet sier hva man gjør.
+frigjoer_porten stopp
 
 echo "Starter appen på $ADRESSE."
 # Forprøven 24.10 (funn 6): 8 tråder, så waitress ikke skriver «Task queue depth».
