@@ -2,7 +2,7 @@
 title: 'Story 8.6b: børsometeret som tavla'
 type: 'feature'
 created: '2026-10-26'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '9d64d4f'

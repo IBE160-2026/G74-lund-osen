@@ -3622,6 +3622,8 @@ dagen gjaldt hele børsen eller noen bransjer.
 
 *Avgjort 2026-10-26 kl. 15:21 (gruppens svar):* f) Tabellen under kartet er lukket som standard, bak «Se tallene som tabell»; skjermleseren finner den, og svarene om tabellen kl. 08:43 og 13:00 står.
 
+*Lagt til 2026-10-26 kl. 16:33:* 8.6b, børsometeret som tavla, er squash-flettet i `7f6d9e4`, PR #99, låst til head-en `dea0eae` (spesifikasjonen `spec-8-6b-som-tavla.md`), med svarene kl. 13:00, 13:07 og 15:21: Tab følger rekkefølgen kartet legges i, overskriften er navnet og «snitt» eller «1 aksje» og navnet forsvinner aldri helt, tekstnivået regnes ved 1008 og 328 px når kartet er så bredt, og tabellen står bak «Se tallene som tabell». BH7, ECH4 og BH10 er rettet. Hele settet på `dea0eae`: 3764 bestått og 24 hoppet over. CI var grønn på head-en (40347552446, macOS-jobben kjørt på nytt fordi den ikke fikk en runner). Begge mutantene ble fanget. Bildene er tatt, og gruppen ser dem etterpå (svaret kl. 13:00, d).
+
 ### Story 8.7: Sjekk 2 og 3 i kursgrafen
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
