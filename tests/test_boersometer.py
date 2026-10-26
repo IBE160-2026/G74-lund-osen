@@ -21,13 +21,19 @@ from boersometer import (
     BRANSJER,
     GUL,
     HOEY,
+    KANT,
     LAV,
     LYS_NED,
     LYS_OPP,
+    MINSTE_RUTE,
+    MINSTE_VEKT,
     MOERK,
     NOEYTRAL,
+    OVERSKRIFT,
+    SMAL,
     STERK_NED,
     STERK_OPP,
+    STOERSTE_VEKT,
     UTEN_DATA,
     VANLIG,
     Rute,
@@ -36,9 +42,13 @@ from boersometer import (
     dagen_foer,
     fargetrinn,
     indeks_for_dagen,
+    kart,
     ramme,
     snitt,
+    squarify,
     stoerrelse,
+    tekstnivaa,
+    vekt,
     vis_volumforhold,
 )
 from kursdata import Aksje, Kursrad
@@ -355,25 +365,30 @@ class TestSiden:
             linja = re.search(r'<p class="alle-sjekkene">(.*?)</p>', oversikt, re.S).group(1)
             assert navn in re.search(r"</span> (.*?) fikk utslag på alle", linja).group(1)
 
-    def test_stoerrelsen_foelger_volumforholdet_i_tabellen(self, klient):
-        """Ville feilet hvis ruta hadde en annen størrelse enn volumforholdet
-        i tabellen sier."""
+    def test_arealet_foelger_volumforholdet_i_tabellen(self, klient):
+        """Story 8.6b, d erstatter testen for de tre faste størrelsene: arealet
+        av ruta følger vekten, volumforholdet i tabellen mellom MINSTE_VEKT og
+        STOERSTE_VEKT. Ville feilet hvis arealet ikke fulgte volumforholdet i
+        tabellen (mutant 2, arealet uten vekten)."""
         html = _side(klient)
         tabell = html.split('<table class="boersometertabell">')[1]
-        ord_ = {"lavt": LAV, "vanlig": VANLIG, "høyt": HOEY}
         rader = re.findall(r'href="/aksje/([A-Z0-9]+)">.*?</td>\s*<td>[^<]*</td>\s*<td>([^<]*)</td>', tabell, re.S)
-        # MTFJ har ingen kurser og ingen volumtall, men lenke (gruppens svar
-        # 23.10 kl. 09:24, b), så den hoppes over her.
-        rader = [(symbol, volum) for symbol, volum in rader if symbol != "MTFJ"]
-        assert len(rader) == 14
-        stoerrelser = {symbol: re.search(r"stoerrelse-(\w+)", klasser).group(1) for klasser, symbol in _ruter(html)}
-        sett = set()
+        assert len(rader) == 15
+        vekter = {}
         for symbol, volum in rader:
-            treff = re.search(r"\((lavt|vanlig|høyt)\)", volum)
-            ventet = ord_[treff.group(1)] if treff else VANLIG
-            assert stoerrelser[symbol] == ventet, (symbol, volum)
-            sett.add(ventet)
-        assert sett == {LAV, VANLIG, HOEY}
+            treff = re.match(r"([0-9]+,[0-9]+)", volum)
+            forhold = float(treff.group(1).replace(",", ".")) if treff else 1.0
+            vekter[symbol] = min(max(forhold, MINSTE_VEKT), STOERSTE_VEKT)
+        assert len({round(v, 2) for v in vekter.values()}) > 5
+        for felt in _kartet(html)["felt"]:
+            if len(felt["ruter"]) < 2:
+                continue
+            for navn in ("bred", "smal"):
+                arealer = {sym: r[navn][2] * r[navn][3] for sym, r in felt["ruter"].items()}
+                sum_a, sum_v = sum(arealer.values()), sum(vekter[sym] for sym in arealer)
+                for sym, areal in arealer.items():
+                    # Tabellen viser volumforholdet med to desimaler, derfor 1 %.
+                    assert areal / sum_a == pytest.approx(vekter[sym] / sum_v, rel=1e-2), (navn, sym)
 
     def test_gult_en_dag_uten_vurdering(self, klient):
         """18.09 er før vurderingene i demoen starter (STARTDAG 21.09). Gult
@@ -512,16 +527,17 @@ class TestSiden:
                 assert symbol not in merker, symbol
 
     def test_390_px_uten_vannrett_rulling_og_med_tastatur(self, klient):
-        """Gjennomgangen (VG6). Edge målte 390 px uten vannrett rulling 23.10;
-        denne testen holder det som gjorde det mulig. Ville feilet med en rute
-        bredere enn 390 px minus margene, rutene uten bryting, tabellen uten
+        """Gjennomgangen (VG6), med kartet fra 8.6b, d: kartet er så bredt som
+        siden og har plassen i prosent, så det ruller ikke vannrett. Ville
+        feilet med en fast bredde i px på kartet eller rutene, tabellen uten
         rullboksen, eller rutene uten fokus, skjult navn og tabellen uten
         caption og scope."""
         stil = (SRC / "static" / "stil.css").read_text(encoding="utf-8")
-        assert re.search(r"ul\.ruter \{[^}]*flex-wrap: wrap", stil)
-        for bredde in re.findall(r"\.rute\.stoerrelse-\w+ \{ width: (\d+)px", stil):
-            assert int(bredde) <= 390 - 2 * 16, bredde
-        assert re.search(r"\.rute:focus-visible \{ outline", stil)
+        kartregel = re.search(r"\.kart \{([^}]*)\}", stil).group(1)
+        assert "aspect-ratio: var(--forhold-bred)" in kartregel and "width:" not in kartregel
+        # 1 px er teksten som skjules for øyet.
+        assert not re.search(r"\.rute[^{]*\{[^}]*width: (?!1px)\d+px", stil)
+        assert re.search(r"\.rute:focus-visible \{[^}]*outline", stil)
         html = _side(klient)
         assert (
             '<div class="tabellboks boersometerboks" role="region" aria-label="Børsometeret som tabell" tabindex="0">'
@@ -1151,3 +1167,209 @@ class TestFargetrinnene:
         avsnitt = hjelp.split("### Hva viser børsometeret?", 1)[1].split("###", 1)[0]
         assert "Fargen har fem trinn" in avsnitt and "Grønn rute steg og rød falt" not in avsnitt
         assert "Rammen er tykk med en hvit linje innenfor" in avsnitt
+
+
+_PLASS = r"--x-{n}: ([0-9.]+)%; --y-{n}: ([0-9.]+)%; --b-{n}: ([0-9.]+)%; --h-{n}: ([0-9.]+)%;"
+
+
+def _plass(stil: str) -> dict[str, tuple[float, ...]]:
+    return {n: tuple(map(float, re.search(_PLASS.format(n=n), stil).groups())) for n in ("bred", "smal")}
+
+
+def _kartet(html: str) -> dict:
+    """Kartet slik malen skriver det: forholdet, og for hvert felt plassen,
+    overskriften og rutene med plassen, alt i prosent."""
+    kartet = re.search(r'<div class="kart" style="([^"]*)">(.*?)\n    </div>', html, re.S)
+    forhold = {n: float(v) for n, v in re.findall(r"--forhold-(\w+): ([0-9.]+);", kartet.group(1))}
+    felt = []
+    for stil, innhold in re.findall(
+        r'<section class="bransje"[^>]*style="([^"]*)">(.*?)</section>', kartet.group(2), re.S
+    ):
+        ruter = {
+            symbol: _plass(rstil)
+            for rstil, symbol in re.findall(
+                r'<li style="([^"]*)"><a class="rute [^"]*"[^>]*>\s*<span class="ticker">([A-Z0-9]+)</span>', innhold
+            )
+        }
+        topp = {n: float(v) for n, v in re.findall(r"--topp-(\w+): ([0-9.]+)%;", stil)}
+        felt.append({"plass": _plass(stil), "topp": topp, "ruter": ruter})
+    return {"forhold": forhold, "felt": felt}
+
+
+def _dekker(rektangler: list[tuple[float, ...]], b: float, h: float, eps: float | None = None) -> None:
+    """Rektanglene ligger i (0, 0, b, h), overlapper ikke, og dekker alt.
+    eps er avrundingen som tåles, som tre desimaler i malen."""
+    eps = 1e-6 * max(b, h) if eps is None else eps
+    for x, y, rb, rh in rektangler:
+        assert x >= -eps and y >= -eps and x + rb <= b + eps and y + rh <= h + eps
+    for i, (x1, y1, b1, h1) in enumerate(rektangler):
+        for x2, y2, b2, h2 in rektangler[i + 1 :]:
+            bredde = min(x1 + b1, x2 + b2) - max(x1, x2)
+            hoeyde = min(y1 + h1, y2 + h2) - max(y1, y2)
+            assert bredde <= eps or hoeyde <= eps, ((x1, y1, b1, h1), (x2, y2, b2, h2))
+    assert sum(rb * rh for _, _, rb, rh in rektangler) == pytest.approx(b * h, rel=1e-9 if eps < 1e-3 else 1e-3)
+
+
+def _ruter_med(volumforhold: list[float | None], bransjer: list[str] | None = None) -> list[Rute]:
+    bransjer = bransjer or [BRANSJER[i % 5] for i in range(len(volumforhold))]
+    return [
+        Rute(aksje=_aksje(f"S{i}", b), endring=1.0, volumforhold=v, styrke=None, tekst=None)
+        for i, (v, b) in enumerate(zip(volumforhold, bransjer, strict=True))
+    ]
+
+
+class TestKartet:
+    """8.6b, d (avgjørelsen 24.10 kl. 11:54)."""
+
+    @pytest.mark.parametrize(
+        "vekter", [[1.0], [3.0, 1.0], [1.0] * 7, [3.0, 0.5, 0.5, 2.0, 1.2, 0.7, 0.5, 2.9, 1.0], [0.5] * 3 + [3.0] * 3]
+    )
+    @pytest.mark.parametrize(("b", "h"), [(729, 364.5), (358, 429.6), (100, 400)])
+    def test_squarify_dekker_feltet_uten_overlapp_med_areal_etter_vekten(self, vekter, b, h):
+        """Ville feilet med rektangler som overlappet, gikk utenfor feltet,
+        lot noe stå tomt, eller hadde et annet areal enn vekten sier."""
+        rektangler = squarify(vekter, 0, 0, b, h)
+        assert len(rektangler) == len(vekter)
+        _dekker(rektangler, b, h)
+        for (_, _, rb, rh), v in zip(rektangler, vekter, strict=True):
+            assert rb * rh / (b * h) == pytest.approx(v / sum(vekter), rel=1e-9)
+
+    def test_squarify_med_minstemaal(self):
+        """Også med minstemålet dekker rektanglene feltet med areal etter
+        vekten. Ville feilet hvis regelen for minstemålet ga hull eller
+        overlapp."""
+        vekter = [3.0, 1.0, 0.5, 0.5, 0.6, 2.0]
+        rektangler = squarify(vekter, 0, 0, 358, 300, 48)
+        _dekker(rektangler, 358, 300)
+        for (_, _, rb, rh), v in zip(rektangler, vekter, strict=True):
+            assert rb * rh / (358 * 300) == pytest.approx(v / sum(vekter), rel=1e-9)
+
+    @pytest.mark.parametrize(
+        ("forhold", "ventet"), [(None, 1.0), (0.0, 0.5), (0.49, 0.5), (0.5, 0.5), (1.7, 1.7), (3.0, 3.0), (8.4, 3.0)]
+    )
+    def test_vekten(self, forhold, ventet):
+        """Ville feilet uten gulvet og taket, eller uten vekten 1 for en
+        aksje uten volumforhold."""
+        assert vekt(_ruter_med([forhold])[0]) == ventet
+
+    def test_feltene_og_rutene_dekker_kartet_med_areal_etter_vekten(self):
+        """Begge nivåene og begge flatene. Ville feilet hvis et felt eller en
+        rute overlappet, kartet ikke var dekket, eller arealet ikke fulgte
+        summen av vektene og vekten (mutant 2, arealet uten vekten)."""
+        ruter = _ruter_med([0.6, 2.4, 1.0, None, 0.8, 1.9, 0.5, 3.0, 1.1, 1.4])
+        bransjer = bygg_boersometer(ruter)
+        k = kart(bransjer)
+        for navn in ("bred", "smal"):
+            felt = [f.plass[navn] for f in k.felt]
+            _dekker([(p.x, p.y, p.b, p.h) for p in felt], 100, 100)
+            totalt = sum(f.vekt for f in k.felt)
+            for f in k.felt:
+                assert f.plass[navn].b * f.plass[navn].h / 1e4 == pytest.approx(f.vekt / totalt, rel=1e-9)
+                assert f.vekt == pytest.approx(sum(vekt(r) for r in f.bransje.ruter))
+                _dekker([(p.x, p.y, p.b, p.h) for p in (kr.plass[navn] for kr in f.ruter)], 100, 100)
+                for kr in f.ruter:
+                    assert kr.plass[navn].b * kr.plass[navn].h / 1e4 == pytest.approx(kr.vekt / f.vekt, rel=1e-9)
+
+    def test_en_rute_per_aksje(self):
+        """Ville feilet hvis en aksje manglet eller sto to ganger i kartet."""
+        ruter = _ruter_med([1.0] * 11)
+        k = kart(bygg_boersometer(ruter))
+        symboler = [kr.rute.aksje.symbol for f in k.felt for kr in f.ruter]
+        assert sorted(symboler) == sorted(r.aksje.symbol for r in ruter)
+
+    def test_tomt_kart(self):
+        """Ville feilet med en feil når lista er tom."""
+        assert kart([]).felt == ()
+
+    @pytest.mark.parametrize(
+        "forhold",
+        [
+            [1.0] * 15,
+            [3.0] + [0.5] * 14,
+            [0.5, 3.0] * 7 + [1.0],
+            [None] * 15,
+            [0.6, 2.4, 1.0, 0.7, 0.8, 1.9, 0.5, 3.0, 1.1, 1.4, 0.9, 2.2, 0.55, 1.3, 2.7],
+        ],
+    )
+    def test_ingen_rute_under_44_px_i_390_px(self, forhold):
+        """Med 16 px på hver side er kartet 358 px bredt i et vindu 390 px
+        bredt. Ville feilet med en rute under 44 × 44 px der, uten de 2 px
+        hvitt på hver side."""
+        ruter = _ruter_med(forhold, [BRANSJER[i % 8] for i in range(len(forhold))])
+        k = kart(bygg_boersometer(ruter))
+        assert SMAL.bredde == 390 - 2 * 16
+        bredde = SMAL.bredde
+        hoeyde = bredde * k.forhold["smal"]
+        for f in k.felt:
+            fb, fh = f.plass["smal"].b / 100 * bredde, f.plass["smal"].h / 100 * hoeyde
+            kropp = fh - OVERSKRIFT
+            assert f.topp["smal"] / 100 * fh == pytest.approx(OVERSKRIFT)
+            for kr in f.ruter:
+                rb, rh = kr.plass["smal"].b / 100 * fb, kr.plass["smal"].h / 100 * kropp
+                assert rb - 2 * KANT >= MINSTE_RUTE - 1e-9 and rh - 2 * KANT >= MINSTE_RUTE - 1e-9, (rb, rh)
+
+    def test_ingen_rute_under_44_px_paa_siden(self, klient):
+        """Det malen skriver, for siste børsdag og 08.10 og 18.09. Ville
+        feilet hvis malen skrev en annen plass enn kartet regnet."""
+        for adresse in ("/boersometer", "/boersometer?dag=2026-10-08", "/boersometer?dag=2026-09-18"):
+            kartet = _kartet(_side(klient, adresse))
+            assert sum(len(f["ruter"]) for f in kartet["felt"]) == 15, adresse
+            bredde = 358
+            hoeyde = bredde / kartet["forhold"]["smal"]
+            for f in kartet["felt"]:
+                fb, fh = f["plass"]["smal"][2] / 100 * bredde, f["plass"]["smal"][3] / 100 * hoeyde
+                kropp = fh * (1 - f["topp"]["smal"] / 100)
+                for symbol, p in f["ruter"].items():
+                    rb, rh = p["smal"][2] / 100 * fb, p["smal"][3] / 100 * kropp
+                    assert min(rb, rh) - 2 * KANT >= MINSTE_RUTE - 0.01, (adresse, symbol, rb, rh)
+
+    def test_kartet_paa_siden_dekker_feltene(self, klient):
+        """Ville feilet hvis feltene eller rutene i malen overlappet eller lot
+        noe stå tomt."""
+        kartet = _kartet(_side(klient))
+        for navn in ("bred", "smal"):
+            _dekker([f["plass"][navn] for f in kartet["felt"]], 100, 100, eps=0.002)
+            for f in kartet["felt"]:
+                _dekker(list(p[navn] for p in f["ruter"].values()), 100, 100, eps=0.002)
+
+    @pytest.mark.parametrize(
+        ("b", "h", "symbol", "ventet"),
+        [
+            (40, 60, "BRFE", 0),
+            (46, 60, "BRFE", 1),
+            (100, 39, "BRFE", 0),
+            (73, 100, "BRFE", 1),
+            (74, 60, "BRFE", 2),
+            (95, 100, "BRFE", 2),
+            (96, 88, "BRFE", 3),
+            (54, 60, "NORSE", 0),
+            (55, 60, "NORSE", 1),
+        ],
+    )
+    def test_navnet_staar_paa_ruter_som_er_store_nok(self, b, h, symbol, ventet):
+        """Ville feilet hvis navnet sto på en rute det ikke får plass i, eller
+        manglet på en som er stor nok."""
+        assert tekstnivaa(b, h, symbol) == ventet
+
+    def test_det_som_ikke_faar_plass_leses_av_skjermleseren(self):
+        """Teksten som ikke får plass, skjules bare for øyet. Ville feilet med
+        display: none, som også skjuler den for skjermleseren."""
+        stil = (SRC / "static" / "stil.css").read_text(encoding="utf-8")
+        for flate in ("bred", "smal"):
+            regel = re.search(rf"\.rute\.nivaa-{flate}-2 > :is\(\.merke, \.tekst\) \{{([^}}]*)\}}", stil).group(1)
+            assert "clip: rect(0 0 0 0)" in regel and "display: none" not in regel
+        assert "@media (max-width: 760px)" in stil
+
+    def test_hjelpen_sier_det(self):
+        """Regel 19: ville feilet hvis hjelpen fortsatt sa at ruta er større
+        over 1,5 ganger vanlig, eller ikke sa at rutene er et fylt kart."""
+        from hjelpetekster import hjelpetekster
+
+        tekst = hjelpetekster(STANDARD)["boersometeret"].tekst
+        assert "Arealet av ruta følger volumet mot vanlig" in tekst and "ganger vanlig" not in tekst
+        hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
+        avsnitt = hjelp.split("### Hva viser børsometeret?", 1)[1].split("###", 1)[0]
+        assert "Rutene er et fylt kart" in avsnitt and "fra halvparten til tre ganger vanlig" in avsnitt
+        assert "Ruta er større når" not in avsnitt
+        readme = (Path(__file__).resolve().parents[1] / "README.md").read_text(encoding="utf-8")
+        assert "børsometeret som et fylt kart etter bransje" in readme

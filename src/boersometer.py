@@ -20,7 +20,9 @@ siste børsdag.
 
 Story 8.6b (avgjørelsen 24.10 kl. 11:54): søylene står bare på oversikten,
 og hovedindeksen står som et tall i linja «Mål mot børsen», med endringen
-for dagen som vises.
+for dagen som vises. Rutene er et fylt kart i to nivåer, som på tavla:
+bransjene som felt etter summen av vektene, og aksjene inne i feltet,
+squarified og i prosent (kart og squarify nederst).
 """
 
 from dataclasses import dataclass
@@ -268,3 +270,226 @@ def indeks_for_dagen(serie: list[Kursrad], dag: date) -> float | None:
     if not til or til[-1].dato != dag:
         return None
     return indeksendring(til)
+
+
+# --- Kartet (8.6b, d) --------------------------------------------------------
+
+# En aksje uten volumforhold får vekten 1, det vanlige. Vekten holdes mellom
+# MINSTE_VEKT og STOERSTE_VEKT, så hver aksje får en rute det går an å trykke
+# på, uten at kartet blir mange skjermer høyt (målt 26.10, spesifikasjonen).
+MINSTE_VEKT = 0.5
+STOERSTE_VEKT = 3.0
+# Ingen rute mindre enn 44 × 44 px, med 2 px hvitt på hver side.
+MINSTE_RUTE = 44
+KANT = 2
+# Overskriften i feltet, i px ved den minste bredden for flaten.
+OVERSKRIFT = 24
+# Høyden økes med 2 % til hver rute er stor nok.
+VEKST = 1.02
+MEST_VEKST = 600
+
+
+@dataclass(frozen=True)
+class Flate:
+    """Et oppsett av kartet. bredde er den minste bredden i px flaten brukes
+    på, og kartet regnes ved den; forhold er høyden mot bredden ved start."""
+
+    navn: str
+    bredde: float
+    forhold: float
+
+
+# Bred for vinduer bredere enn 760 px (innholdet minst 729 px), og smal for
+# 760 px og smalere, regnet ved 390 px (innholdet 358 px), som instruksjonen
+# sier. Stilen velger med @media, og hver rute har plassen i begge.
+BRED = Flate("bred", 729, 0.5)
+SMAL = Flate("smal", 358, 1.2)
+FLATENE = (BRED, SMAL)
+
+
+@dataclass(frozen=True)
+class Plass:
+    """Et rektangel i prosent av det som rommer det."""
+
+    x: float
+    y: float
+    b: float
+    h: float
+
+
+@dataclass(frozen=True)
+class Kartrute:
+    """En rute i kartet: plassen i prosent av feltet under overskriften, og
+    hvor mye tekst som står synlig, per flate (0 ingen, 1 symbolet, 2 også
+    endringen, 3 også merket og grunnen)."""
+
+    rute: Rute
+    vekt: float
+    plass: dict[str, Plass]
+    nivaa: dict[str, int]
+
+
+@dataclass(frozen=True)
+class Kartfelt:
+    """Feltet for en bransje: plassen i prosent av kartet, og høyden på
+    overskriften i prosent av feltet, per flate."""
+
+    bransje: Bransje
+    vekt: float
+    plass: dict[str, Plass]
+    topp: dict[str, float]
+    ruter: tuple[Kartrute, ...]
+
+
+@dataclass(frozen=True)
+class Kart:
+    """Feltene i rekkefølgen i designregler §4, og høyden mot bredden per
+    flate."""
+
+    felt: tuple[Kartfelt, ...]
+    forhold: dict[str, float]
+
+
+def vekt(rute: Rute) -> float:
+    """Volumforholdet, 1 uten, og mellom MINSTE_VEKT og STOERSTE_VEKT."""
+    forhold = 1.0 if rute.volumforhold is None else rute.volumforhold
+    return min(max(forhold, MINSTE_VEKT), STOERSTE_VEKT)
+
+
+def _verste(arealer: list[float], side: float) -> float:
+    """Det verste forholdet mellom sidene i en rad med arealene langs side."""
+    sum_ = sum(arealer)
+    return max(max(side * side * a / (sum_ * sum_), sum_ * sum_ / (side * side * a)) for a in arealer)
+
+
+def squarify(
+    vekter: list[float], x: float, y: float, b: float, h: float, minst: float = 0.0
+) -> list[tuple[float, float, float, float]]:
+    """Rektanglene for vektene i rektangelet (x, y, b, h), i samme rekkefølge
+    som vektene, med areal etter vekten og uten overlapp (Bruls, Huizing og
+    van Wijk, «Squarified Treemaps», 2000). Den største legges først, og en
+    rad fylles langs den korteste siden så lenge sidene blir likere.
+
+    Med minst tar raden også hensyn til minstemålet: en rad tynnere enn minst
+    får neste med, neste kommer ikke med når den ville gjort en rute i raden
+    kortere enn minst, og resten kommer med når det som er igjen etter raden,
+    ville blitt tynnere enn minst."""
+    if not vekter:
+        return []
+    totalt = sum(vekter)
+    rekkefoelge = sorted(range(len(vekter)), key=lambda i: -vekter[i])
+    rest = [(i, vekter[i] / totalt * b * h) for i in rekkefoelge]
+    ut: list[tuple[float, float, float, float]] = [(0.0, 0.0, 0.0, 0.0)] * len(vekter)
+    while rest:
+        side = min(b, h)
+        rad = [rest[0]]
+        while len(rad) < len(rest):
+            neste = rad + [rest[len(rad)]]
+            arealer = [a for _, a in neste]
+            # Blir det som er igjen etter raden tynnere enn minst, kommer
+            # resten med i raden, så det ikke blir en tynn stripe til slutt.
+            if minst and (b * h - sum(a for _, a in rad)) / side < minst:
+                rad = neste
+                continue
+            if minst and min(arealer) / sum(arealer) * side < minst:
+                break
+            tynn = minst and sum(a for _, a in rad) / side < minst
+            if not tynn and _verste(arealer, side) > _verste([a for _, a in rad], side):
+                break
+            rad = neste
+        sum_ = sum(a for _, a in rad)
+        if b >= h:
+            bredde = b if len(rad) == len(rest) else sum_ / h
+            yy = y
+            for i, a in rad:
+                ut[i] = (x, yy, bredde, a / sum_ * h)
+                yy += a / sum_ * h
+            x, b = x + bredde, b - bredde
+        else:
+            hoeyde = h if len(rad) == len(rest) else sum_ / b
+            xx = x
+            for i, a in rad:
+                ut[i] = (xx, y, a / sum_ * b, hoeyde)
+                xx += a / sum_ * b
+            y, h = y + hoeyde, h - hoeyde
+        rest = rest[len(rad) :]
+    return ut
+
+
+def tekstnivaa(b: float, h: float, symbol: str) -> int:
+    """Hvor mye tekst ruta har plass til, i px (spesifikasjonen 8.6b, «Navnet»)."""
+    if b < 9 * len(symbol) + 10 or h < 40:
+        return 0
+    if b < 74 or h < 60:
+        return 1
+    if b < 96 or h < 88:
+        return 2
+    return 3
+
+
+def _legg_ut(bransjer: list[Bransje], bredde: float, hoeyde: float) -> list | None:
+    """Feltene og rutene i px, eller None når en rute er mindre enn
+    MINSTE_RUTE med KANT på hver side, eller et felt ikke har plass under
+    overskriften."""
+    minst = MINSTE_RUTE + 2 * KANT
+    feltvekter = [sum(vekt(r) for r in bransje.ruter) for bransje in bransjer]
+    ut = []
+    for bransje, felt in zip(bransjer, squarify(feltvekter, 0, 0, bredde, hoeyde, minst), strict=True):
+        fx, fy, fb, fh = felt
+        if fh - OVERSKRIFT < minst or fb < minst:
+            return None
+        ruter = squarify([vekt(r) for r in bransje.ruter], fx, fy + OVERSKRIFT, fb, fh - OVERSKRIFT, minst)
+        if any(rb < minst or rh < minst for _, _, rb, rh in ruter):
+            return None
+        ut.append((felt, ruter))
+    return ut
+
+
+def kart(bransjer: list[Bransje], flatene: tuple[Flate, ...] = FLATENE) -> Kart:
+    """Kartet i to nivåer, regnet for hver flate ved den minste bredden, med
+    høyden økt til hver rute er stor nok, og gjort om til prosent."""
+    lagt: dict[str, list] = {}
+    forhold: dict[str, float] = {}
+    for flate in flatene:
+        hoeyde = flate.bredde * flate.forhold
+        for _ in range(MEST_VEKST):
+            utlagt = _legg_ut(bransjer, flate.bredde, hoeyde)
+            if utlagt is not None:
+                break
+            hoeyde *= VEKST
+        else:
+            raise ValueError(f"Kartet fikk ikke plass til rutene på flaten {flate.navn}")
+        lagt[flate.navn] = utlagt
+        forhold[flate.navn] = hoeyde / flate.bredde
+    felt = []
+    for n, bransje in enumerate(bransjer):
+        plass: dict[str, Plass] = {}
+        topp: dict[str, float] = {}
+        ruteplass: list[dict[str, Plass]] = [{} for _ in bransje.ruter]
+        nivaa: list[dict[str, int]] = [{} for _ in bransje.ruter]
+        for flate in flatene:
+            hoeyde = forhold[flate.navn] * flate.bredde
+            (fx, fy, fb, fh), ruter = lagt[flate.navn][n]
+            plass[flate.navn] = Plass(
+                fx / flate.bredde * 100, fy / hoeyde * 100, fb / flate.bredde * 100, fh / hoeyde * 100
+            )
+            topp[flate.navn] = OVERSKRIFT / fh * 100
+            kropp = fh - OVERSKRIFT
+            for i, (rx, ry, rb, rh) in enumerate(ruter):
+                ruteplass[i][flate.navn] = Plass(
+                    (rx - fx) / fb * 100, (ry - fy - OVERSKRIFT) / kropp * 100, rb / fb * 100, rh / kropp * 100
+                )
+                nivaa[i][flate.navn] = tekstnivaa(rb, rh, bransje.ruter[i].aksje.symbol)
+        felt.append(
+            Kartfelt(
+                bransje=bransje,
+                vekt=sum(vekt(r) for r in bransje.ruter),
+                plass=plass,
+                topp=topp,
+                ruter=tuple(
+                    Kartrute(rute=r, vekt=vekt(r), plass=ruteplass[i], nivaa=nivaa[i])
+                    for i, r in enumerate(bransje.ruter)
+                ),
+            )
+        )
+    return Kart(felt=tuple(felt), forhold=forhold)

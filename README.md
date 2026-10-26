@@ -371,7 +371,7 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 - Oversikten og utseendet fra designforslaget, med tydeligere merking, hjelp bak «?» og sortering ved klikk i kolonneraden
 - Hovedindeksen over tabellen på forsiden, med søylene under, og som stiplet linje i kursgrafen
 - På aksjesiden: periodene i kursgrafen med «Velg dag», datoene og månedsmerkene, lenken til investorsiden og signalet dag for dag
-- Min liste, med stjernen foran hvert selskap, og børsometeret, med knappene «Markedsoversikt», «Børsometer» og «Min liste» øverst
+- Min liste, med stjernen foran hvert selskap, og børsometeret som et fylt kart etter bransje, med knappene øverst
 - KI-teksten fra en lokal modell på aksjesiden eller med egen nøkkel, med bryter, og bare tekster som besto kontrollen
 - Docker for begge versjonene, og demoen med alle 10 fargekombinasjonene av de tre sjekkene og KI-tekst laget med Gemma
 

@@ -9,6 +9,8 @@
     rute bærer det fargen, størrelsen og rammen sier, og tabellen under har de
     samme tallene. Ingen råd (NFR-06). #}
 {% macro fortegn(verdi) %}{% if verdi is none %}null{% else %}{% set vist = verdi|avrundet('endring') %}{{ 'opp' if vist > 0 else 'ned' if vist < 0 else 'null' }}{% endif %}{% endmacro %}
+{#- Story 8.6b, d: plassen i prosent per flate, som egenskaper stilen leser. #}
+{% macro plass_stil(plass) %}{% for navn, p in plass.items() %}--x-{{ navn }}: {{ '%.3f'|format(p.x) }}%; --y-{{ navn }}: {{ '%.3f'|format(p.y) }}%; --b-{{ navn }}: {{ '%.3f'|format(p.b) }}%; --h-{{ navn }}: {{ '%.3f'|format(p.h) }}%;{% if not loop.last %} {% endif %}{% endfor %}{% endmacro %}
 {% macro antall_ord(antall, en, flere) %}{{ antall }} {{ en if antall == 1 else flere }}{% endmacro %}
 {#- Gjennomgangen (BH4, ECH2): en annen dag følger med til aksjesiden. #}
 {% macro aksjeadresse(symbol) %}/aksje/{{ symbol }}{% if dagen != siste %}?dag={{ dagen.isoformat() }}{% endif %}{% endmacro %}
@@ -45,16 +47,24 @@
       </ul>
     </section>
 
-    {% for bransje in bransjer %}
-      <section class="bransje" aria-labelledby="bransje-{{ loop.index }}">
+    {#- Story 8.6b, d: rutene som et fylt kart i to nivåer, regnet i
+        boersometer.kart: bransjene som felt etter summen av vektene, og
+        aksjene inne i feltet, med plassen i prosent for den brede og den
+        smale flaten. Bransjene står i rekkefølgen i designregler §4, så
+        skjermleseren og tastaturet går gjennom dem i den rekkefølgen. #}
+    <div class="kart" style="{% for navn, forhold in kart.forhold.items() %}--forhold-{{ navn }}: {{ '%.4f'|format(1 / forhold) }};{% if not loop.last %} {% endif %}{% endfor %}">
+    {%- for felt in kart.felt %}
+      {%- set bransje = felt.bransje %}
+      <section class="bransje" aria-labelledby="bransje-{{ loop.index }}" style="{{ plass_stil(felt.plass) }}{% for navn, topp in felt.topp.items() %} --topp-{{ navn }}: {{ '%.3f'|format(topp) }}%;{% endfor %}">
         <h2 id="bransje-{{ loop.index }}">{{ bransjesymbol(bransje.navn) }}<span>{{ bransje.navn }}</span>
           {%- if bransje.snitt is not none %} <span class="snitt {{ fortegn(bransje.snitt) }}">{{ bransje.snitt|tall('endring') }}</span>{% endif %}
           <span class="antall">{{ antall_ord(bransje.antall, "aksje", "aksjer") }}</span></h2>
         <ul class="ruter">
-          {%- for rute in bransje.ruter %}
+          {%- for kartrute in felt.ruter %}
+          {%- set rute = kartrute.rute %}
           {#- Gruppens svar 23.10 kl. 09:24 (b): hver rute lenker til aksjesiden,
               også for en aksje uten kurser. #}
-          <li><a class="rute stoerrelse-{{ rute.stoerrelse }} trinn-{{ rute.fargetrinn or 'ingen' }}{% if rute.ramme %} ramme-{{ rute.ramme }}{% endif %}{% if rute.uten_data %} uten-data{% endif %}" href="{{ aksjeadresse(rute.aksje.symbol) }}">
+          <li style="{{ plass_stil(kartrute.plass) }}"><a class="rute trinn-{{ rute.fargetrinn or 'ingen' }}{% for navn, nivaa in kartrute.nivaa.items() %} nivaa-{{ navn }}-{{ nivaa }}{% endfor %}{% if rute.ramme %} ramme-{{ rute.ramme }}{% endif %}{% if rute.uten_data %} uten-data{% endif %}" href="{{ aksjeadresse(rute.aksje.symbol) }}">
             <span class="ticker">{{ rute.aksje.symbol }}</span>
             <span class="endring">{% if rute.endring is not none %}{{ rute.endring|tall('endring') }}{% elif rute.uten_data %}Uten data{% else %}–{% endif %}</span>
             {% if rute.ramme == "gul" %}<span class="merke">{{ antall_sjekker }} av {{ antall_sjekker }}{% if dagen != siste %} siste børsdag{% endif %}</span>{% elif rute.ramme == "moerk" %}<span class="merke">{{ antall_sjekker - 1 }} av {{ antall_sjekker }}</span>{% endif %}
@@ -64,7 +74,8 @@
           {%- endfor %}
         </ul>
       </section>
-    {% endfor %}
+    {%- endfor %}
+    </div>
 
     {#- Story 8.6b, c: de fem trinnene og de to rammene under rutene. #}
     <section class="fargene" aria-labelledby="fargene-tittel">

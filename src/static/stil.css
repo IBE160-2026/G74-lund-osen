@@ -590,17 +590,44 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) section.maal .indeksendring { font-variant-numeric: tabular-nums; font-weight: 600; }
 :where(.side-oversikt) section.maal .indeksendring.opp { color: var(--opp); }
 :where(.side-oversikt) section.maal .indeksendring.ned { color: var(--ned); }
-:where(.side-oversikt) section.bransje { margin: 24px 0; }
-:where(.side-oversikt) section.bransje h2 { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 20px; }
-:where(.side-oversikt) section.bransje h2 .bransjesymbol { width: 22px; height: 22px; }
-:where(.side-oversikt) section.bransje h2 .snitt { font-family: "IBM Plex Sans", sans-serif; font-size: 16px; font-variant-numeric: tabular-nums; }
-:where(.side-oversikt) section.bransje h2 .snitt.opp { color: var(--opp); }
-:where(.side-oversikt) section.bransje h2 .snitt.ned { color: var(--ned); }
-:where(.side-oversikt) section.bransje h2 .antall { font-family: "IBM Plex Sans", sans-serif; font-size: 14px; font-weight: 400; color: var(--dempet); }
-:where(.side-oversikt) ul.ruter { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; }
-:where(.side-oversikt) .rute { display: flex; flex-direction: column; justify-content: center; gap: 2px; box-sizing: border-box;
-                                   padding: 8px 10px; border-radius: 10px; border: 3px solid transparent; text-decoration: none;
-                                   color: var(--blekk); background: var(--ingen-bakgrunn); font-variant-numeric: tabular-nums; }
+/* Story 8.6b, d: rutene som et fylt kart i to nivåer, regnet i boersometer.py.
+   Hver bransje og hver rute har plassen i prosent for den brede og den smale
+   flaten (--x-bred, --x-smal osv.), og @media velger. Bakgrunnen er hvit, så
+   rammene grenser mot hvitt. */
+:where(.side-oversikt) .kart { position: relative; aspect-ratio: var(--forhold-bred); margin: 8px 0 0; background: var(--kort); }
+:where(.side-oversikt) .kart section.bransje { position: absolute; margin: 0; box-sizing: border-box;
+                                               left: var(--x-bred); top: var(--y-bred); width: var(--b-bred); height: var(--h-bred); }
+:where(.side-oversikt) .kart section.bransje h2 { position: absolute; left: 2px; right: 2px; top: 0; height: var(--topp-bred); margin: 0;
+                                                  display: flex; align-items: center; gap: 4px; min-width: 0; overflow: hidden; white-space: nowrap;
+                                                  font-size: 13px; line-height: 1; }
+:where(.side-oversikt) .kart section.bransje h2 .bransjesymbol { flex: none; width: 14px; height: 14px; }
+:where(.side-oversikt) .kart section.bransje h2 .snitt { font-family: "IBM Plex Sans", sans-serif; font-variant-numeric: tabular-nums; }
+:where(.side-oversikt) .kart section.bransje h2 .snitt.opp { color: var(--opp); }
+:where(.side-oversikt) .kart section.bransje h2 .snitt.ned { color: var(--ned); }
+:where(.side-oversikt) .kart section.bransje h2 .antall { font-family: "IBM Plex Sans", sans-serif; font-weight: 400; color: var(--dempet); }
+:where(.side-oversikt) .kart ul.ruter { position: absolute; left: 0; right: 0; bottom: 0; top: var(--topp-bred); margin: 0; padding: 0; list-style: none; }
+:where(.side-oversikt) .kart ul.ruter > li { position: absolute; left: var(--x-bred); top: var(--y-bred); width: var(--b-bred); height: var(--h-bred); }
+/* KANT i boersometer.py: 2 px hvitt rundt hver rute. */
+:where(.side-oversikt) .rute { position: absolute; inset: 2px; display: flex; flex-direction: column; justify-content: flex-start; gap: 1px;
+                               box-sizing: border-box; overflow: hidden; padding: 4px 6px; border-radius: 4px; border: 0; text-decoration: none;
+                               color: var(--blekk); font-size: 13px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+/* Navnet står på ruter som er store nok (tekstnivaa i boersometer.py). Det som
+   ikke får plass, skjules bare for øyet, så skjermleseren leser alt. */
+@media (min-width: 761px) {
+  :where(.side-oversikt) .rute.nivaa-bred-0 > :is(.ticker, .endring, .merke, .tekst),
+  :where(.side-oversikt) .rute.nivaa-bred-1 > :is(.endring, .merke, .tekst),
+  :where(.side-oversikt) .rute.nivaa-bred-2 > :is(.merke, .tekst) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
+@media (max-width: 760px) {
+  :where(.side-oversikt) .kart { aspect-ratio: var(--forhold-smal); }
+  :where(.side-oversikt) .kart section.bransje { left: var(--x-smal); top: var(--y-smal); width: var(--b-smal); height: var(--h-smal); }
+  :where(.side-oversikt) .kart section.bransje h2 { height: var(--topp-smal); }
+  :where(.side-oversikt) .kart ul.ruter { top: var(--topp-smal); }
+  :where(.side-oversikt) .kart ul.ruter > li { left: var(--x-smal); top: var(--y-smal); width: var(--b-smal); height: var(--h-smal); }
+  :where(.side-oversikt) .rute.nivaa-smal-0 > :is(.ticker, .endring, .merke, .tekst),
+  :where(.side-oversikt) .rute.nivaa-smal-1 > :is(.endring, .merke, .tekst),
+  :where(.side-oversikt) .rute.nivaa-smal-2 > :is(.merke, .tekst) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
 /* Story 8.6b, c: fem trinn etter endringen slik den vises. Uten endring er ruta
    hvit med grå kant, så den ikke ligner det nøytrale trinnet. Ikke stiplet:
    stiplet er indekslinja (2.9b). */
@@ -610,9 +637,6 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) .trinn-opp { background: var(--opp); color: var(--hvit); }
 :where(.side-oversikt) .trinn-ned { background: var(--ned); color: var(--hvit); }
 :where(.side-oversikt) .rute.trinn-ingen { background: var(--kort); border: 2px solid var(--felt); }
-:where(.side-oversikt) .rute.stoerrelse-lav { width: 96px; min-height: 64px; }
-:where(.side-oversikt) .rute.stoerrelse-vanlig { width: 120px; min-height: 80px; }
-:where(.side-oversikt) .rute.stoerrelse-hoey { width: 150px; min-height: 100px; }
 /* Story 8.6b, c: rammene som på tavla, tykke med en hvit linje innenfor, i
    --blekk for 2 av 3 og --gul-symbol for 3 av 3 (VG7). Rammen grenser bare mot
    hvitt, den hvite linja innenfor og bakgrunnen utenfor, og har over 3:1 mot
@@ -620,7 +644,8 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) .rute.ramme-moerk, :where(.side-oversikt) .proeve.ramme-moerk,
 :where(.side-oversikt) .rute.ramme-gul, :where(.side-oversikt) .proeve.ramme-gul { border: 4px solid var(--blekk); box-shadow: inset 0 0 0 2px var(--hvit); }
 :where(.side-oversikt) .rute.ramme-gul, :where(.side-oversikt) .proeve.ramme-gul { border-color: var(--gul-symbol); }
-:where(.side-oversikt) .rute:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+/* Story 8.6b, d: fokus innenfor ruta og over naboene i kartet. */
+:where(.side-oversikt) .rute:focus-visible { z-index: 1; outline: 3px solid var(--blekk); outline-offset: 0; }
 :where(.side-oversikt) .rute .ticker { font-weight: 700; }
 :where(.side-oversikt) .rute .merke { font-size: 12px; font-weight: 600; }
 /* Story 8.6b, c: grunnen i samme farge som resten av ruta, fordi --dempet har
@@ -631,7 +656,7 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) section.fargene h2 { font-size: 14px; font-weight: 600; margin: 0 0 8px; color: var(--blekk); }
 :where(.side-oversikt) section.fargene ul { display: flex; flex-wrap: wrap; gap: 8px 18px; list-style: none; margin: 0; padding: 0; }
 :where(.side-oversikt) section.fargene li { display: flex; align-items: center; gap: 8px; }
-:where(.side-oversikt) section.fargene .proeve { display: inline-block; box-sizing: border-box; width: 28px; height: 20px; border-radius: 4px; background: var(--kort); }
+:where(.side-oversikt) section.fargene .proeve { display: inline-block; box-sizing: border-box; width: 28px; height: 20px; border-radius: 4px; }
 :where(.side-oversikt) section.fargene .proeve.ramme-moerk,
 :where(.side-oversikt) section.fargene .proeve.ramme-gul { background: var(--trinn-noeytral); }
 :where(.side-oversikt) .tabellboks.boersometerboks { margin-top: 28px; }
@@ -639,8 +664,3 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) table.boersometertabell caption { text-align: left; font-weight: 600; padding: 12px 8px 8px; }
 :where(.side-oversikt) table.boersometertabell th,
 :where(.side-oversikt) table.boersometertabell td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--strek); }
-@media (max-width: 600px) {
-  :where(.side-oversikt) .rute.stoerrelse-lav { width: 84px; }
-  :where(.side-oversikt) .rute.stoerrelse-vanlig { width: 100px; }
-  :where(.side-oversikt) .rute.stoerrelse-hoey { width: 124px; }
-}
