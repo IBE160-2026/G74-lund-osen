@@ -20,6 +20,8 @@
   <h1 class="overskrift">Børsometer {{ hjelpeknapp("hjelp-boersometer", "Hjelp: børsometeret") }}</h1>
   {% if bransjer %}
     <p class="meta">{{ "Demo Børs" if eksempeltall else "Oslo Børs" }} · {{ dagen|ukedag }} {{ dagen|dato }} · {{ antall_ord(antall_aksjer, "aksje", "aksjer") }} i {{ antall_ord(bransjer|length, "bransje", "bransjer") }}</p>
+    {#- Story 8.6b, a (avgjørelsen 24.10 kl. 11:54): forklaringen øverst, som på tavla. #}
+    <p class="innledning">Hver rute er en aksje, samlet etter bransje. Fargen viser endringen fra børsdagen før, og jo større ruta er, jo mer ble aksjen omsatt sammenlignet med vanlig. Klikk på en rute for å se aksjen. Bildet viser hva som skjedde, ikke hva du bør kjøpe eller selge.</p>
     <form class="velg-dag-boersometer" method="get" action="/boersometer">
       <label for="dag">Velg dag</label>
       <input type="date" id="dag" name="dag" min="{{ foerste.isoformat() }}" max="{{ siste.isoformat() }}" value="{{ dagen.isoformat() }}" required>

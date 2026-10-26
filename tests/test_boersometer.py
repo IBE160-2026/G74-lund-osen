@@ -453,6 +453,9 @@ class TestSiden:
         """NFR-06. Ville feilet med kjøp eller selg på siden utenom hjelpen,
         eller med KI-tekst (gjennomgangen, VG11)."""
         html = _side(klient)
+        # Story 8.6b, a: forklaringen sier at bildet ikke er et råd, med
+        # «kjøpe eller selge». Den setningen tas ut, og resten prøves.
+        html = html.replace(FORKLARINGEN, "")
         tekst = re.sub(r"<[^>]+>", " ", html.split("<main", 1)[1]).lower()
         assert not re.search(r"\b(kjøp|selg|anbefal)", tekst)
         assert 'class="ki' not in html and "KI-tekst" not in html
@@ -846,3 +849,25 @@ class TestFotnotenEtterStartdagen:
         assert _fotnoten(_side(klient)) == TestFotnoten.EKTE_TEKST + setningen
         monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 12, 12, 0, tzinfo=timezone.utc))
         assert _fotnoten(_side(klient)) == TestFotnoten.EKTE_TEKST
+
+
+# --- Story 8.6b: børsometeret som tavla ------------------------------------
+
+FORKLARINGEN = (
+    "Hver rute er en aksje, samlet etter bransje. Fargen viser endringen fra børsdagen før, og jo større ruta "
+    "er, jo mer ble aksjen omsatt sammenlignet med vanlig. Klikk på en rute for å se aksjen. Bildet viser hva "
+    "som skjedde, ikke hva du bør kjøpe eller selge."
+)
+
+
+class TestForklaringen:
+    """8.6b, a (avgjørelsen 24.10 kl. 11:54)."""
+
+    def test_forklaringen_staar_oeverst(self, klient):
+        """Ville feilet hvis forklaringen manglet, var endret, eller sto under
+        rutene."""
+        html = _side(klient)
+        assert f'<p class="innledning">{FORKLARINGEN}</p>' in html
+        assert html.index(FORKLARINGEN) < html.index('<section class="bransje"')
+        # Også en annen dag.
+        assert FORKLARINGEN in _side(klient, "/boersometer?dag=2026-09-18")
