@@ -1,0 +1,63 @@
+---
+title: 'Story 3.5 (3.5e): den andre versjonen stoppes rett før webserveren'
+type: 'bugfix'
+created: '2026-10-26'
+status: 'in-review'
+route: 'dispatch'
+review_loop_iteration: 0
+baseline_commit: 'fd04a78'
+context:
+  - '{project-root}/CLAUDE.md'
+  - '{project-root}/_bmad-output/planning-artifacts/epics.md'
+  - '{project-root}/_bmad-output/implementation-artifacts/spec-3-5d-funn-fra-forproeven.md'
+  - '{project-root}/README.md'
+  - '{project-root}/docs/hjelp.md'
+---
+
+## Intent
+
+**Problem:** kjører den andre versjonen av OSE Signal fra samme mappe, stopper skriptene den før uv, `uv sync`, nøkkelen og hentingen (3.5d, punkt d). Feiler noe av det, er den andre versjonen borte, og ingen av dem kjører (BH5 i triagen til 3.5d).
+
+**Løsningen:** porten sjekkes fortsatt før uv, og et annet program stopper skriptet der som før. Den andre versjonen fra samme mappe stoppes først rett før webserveren startes, så den kjører videre hvis noe feiler før det.
+
+**Grunnlaget:** avgjørelsen 24.10 kl. 20:00 under story 3.5 i `epics.md`, ført 26.10 fra instruksjonen kl. 09:57 i dagsfila.
+
+## Slik er det i dag (slått opp 26.10 på `fd04a78`)
+
+- **`start/start.ps1`:** `Frigjoer-Porten` kalles etter vernet mot `.git` og før uv. Svarer noe på porten, leses lytterne med `Get-NetTCPConnection` og `Get-CimInstance`. Er en av dem ikke `waitress-serve` fra `.venv` i mappa (`Er-OseSignal`), eller finnes ingen lytter, stopper skriptet med beskjeden «et annet program svarer allerede på http://127.0.0.1:8000, og det er ikke OSE Signal fra denne mappa. …». Ellers stoppes lytterne med `Stop-Process`, skriptet venter opptil 30 sekunder på ledig port, og sier «Den andre versjonen er stoppet, og porten er ledig.».
+- **`start/start.sh`:** det samme med `frigjoer_porten`, `lsof`, `ps` og `kill`.
+- **Etter porten:** uv (spør før den installeres), `uv sync`, så `uv run python src/demo.py` for demoen, eller nøkkelen og `uv run python src/fetch_prices.py` for den ekte versjonen. Feiler hentingen, starter appen likevel. Så `uv run waitress-serve --listen=127.0.0.1:8000 --threads=8 app:app`.
+- **`src/demo.py`:** bygger basen i `demo.db.ny` og bytter den inn med `os.replace`. Feiler det med `OSError`, sier den «Er den åpen i et annet program, for eksempel webserveren?».
+- **Appen** lukker tilkoblingen til basen etter hver forespørsel (`teardown_appcontext` i `src/app.py`).
+- **Testene fra 3.5d** i `tests/test_dobbeltklikk.py`: `test_start_ps1_stopper_bare_den_andre_versjonen_paa_porten` og `test_start_sh_…` (lyttere «oss», «annen_mappe» og «fremmed», uten uv), `test_porten_sjekkes_foer_uv_og_bare_oss_stoppes` (rekkefølgen i koden) og `test_sjekken_kjenner_bare_igjen_waitress_fra_mappa`. CI kjører `-k "porten or sjekken"` på Windows og Mac.
+- **README-en** («Start med dobbeltklikk, uten Docker») og **`docs/hjelp.md`** («Vinduet sier at den andre versjonen av OSE Signal stoppes.») sier at skriptet stopper den andre versjonen, men ikke når.
+
+## Kontrollpunktene
+
+- Porten sjekkes før uv. Et program som ikke er OSE Signal fra mappa, stopper skriptet der med beskjeden fra 3.5d og stoppes aldri.
+- Er det den andre versjonen fra mappa, sier vinduet det før uv, og at den stoppes rett før appen starter. Den stoppes ikke før da.
+- Rett før webserveren: den andre versjonen stoppes, skriptet venter på ledig port og sier det. Svarer et annet program da, stoppes det ikke, og vinduet sier hva man gjør.
+- Feiler uv, `uv sync` eller hentingen, kjører den andre versjonen fortsatt mens det skjer.
+- README-en og `docs/hjelp.md` sier når den andre versjonen stoppes (regel 19).
+
+## Valg som er gjort her
+
+- **Ett unntak for demoen trengs ikke.** Instruksjonen åpner for å stoppe demoen før demobasen lages på nytt, hvis Windows ikke lar `demo.db` byttes mens demoen kjører. Prøvd 26.10 på Windows 11 i en midlertidig mappe: demobasen laget, waitress i gang mot den, fire sider hentet (`/`, `/boersometer`, `/aksje/BRFE`, `/min-liste`), og så `lag_demobase` på nytt mens serveren kjørte. `os.replace` gikk gjennom, og siden svarte 200 etterpå. Grunnen er at appen lukker tilkoblingen etter hver forespørsel, så fila er bare åpen mens en side lastes. Skjer byttet akkurat da, feiler `src/demo.py` med beskjeden sin, skriptet stopper, og den andre versjonen kjører videre, som ved en annen feil før webserveren.
+- **Samme funksjon to ganger.** `Frigjoer-Porten` og `frigjoer_porten` får et argument: før uv sjekker de og sier fra, rett før webserveren stopper de. Beskjeden om et annet program er den samme begge steder, så vinduet sier hva man gjør også når et annet program har tatt porten underveis.
+
+## Planen, én commit per punkt
+
+1. Spesifikasjonen.
+2. a) Skriptene, README-en og `docs/hjelp.md`, med testene fra 3.5d som må følge med.
+3. b) Testene med en falsk uv uten nett, på Windows og Mac i CI.
+
+## Mutanten
+
+Én, med `-x`, med kopi før og sha256 mot HEAD etter: stoppen tilbake før uv.
+
+## Det som ikke endres
+
+- Ingen API-kall utover kvotesjekken i regel 15, og `src/fetch_prices.py` kjøres ikke mot EODHD. Testene bruker en falsk uv.
+- `data/db/ose.db` og `.env` i repoet røres ikke. Demobasen i prøven over ble laget i en midlertidig mappe.
+- Sjekken av kommandolinja (`Er-OseSignal`, `er_ose_signal`) og beskjedene fra 3.5d står som før.
+- PR #99 (8.6b) røres ikke.
