@@ -172,7 +172,7 @@ header.stripe button.hjelpeknapp:focus-visible, .tabellboks thead button.hjelpek
   border: 1px solid var(--strek-2); border-radius: 8px; background: var(--kort); color: var(--blekk);
 }
 /* Story 8.0f: med skriptet (hjelp.js, klassen hjelpefelt på <html>) er
-   hjelpen ett fast felt. Fra 1024 px står det i høyre kant, og <body> gir
+   hjelpen ett fast felt. Fra 1056 px står det i høyre kant, og <body> gir
    like mye plass, så feltet ikke dekker noe. Smalere står det over den tomme
    plassen skriptet setter inn rett under «?» (--topp). Uten skriptet gjelder
    reglene over, som i 8.0b. */
@@ -183,7 +183,7 @@ header.stripe button.hjelpeknapp:focus-visible, .tabellboks thead button.hjelpek
   font: inherit; font-size: 0.85rem; min-height: 44px; padding: 0 0.9rem; cursor: pointer; margin-left: auto;
   border: 1px solid var(--strek-2); border-radius: 8px; background: var(--kort); color: var(--blekk);
 }
-@media (min-width: 1024px) {
+@media (min-width: 1056px) {
   .hjelpefelt { --hjelpefelt: 432px; }
   .hjelpefelt .hjelpevindu {
     position: fixed; inset: 16px 16px 16px auto; margin: 0;
@@ -196,7 +196,7 @@ header.stripe button.hjelpeknapp:focus-visible, .tabellboks thead button.hjelpek
   .hjelpefelt.felt-venstre .hjelpevindu { inset: 16px auto 16px 16px; }
   .hjelpefelt.felt-venstre body:has(.hjelpevindu:popover-open) { padding-right: 0; padding-left: var(--hjelpefelt); }
 }
-@media (max-width: 1023.98px) {
+@media (max-width: 1055.98px) {
   .hjelpefelt .hjelpevindu {
     position: absolute; inset: var(--topp, 0) 16px auto 16px; margin: 0;
     width: auto; max-height: none; overflow: visible;

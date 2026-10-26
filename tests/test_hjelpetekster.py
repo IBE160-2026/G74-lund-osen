@@ -675,26 +675,48 @@ class TestHjelpefeltet:
         """Kontrollpunktet: uten JavaScript virker hjelpen som i dag. Ville
         feilet hvis vinduene var manual i HTML-en, saa Esc og et klikk utenfor
         ikke lukket uten skriptet, eller stilen for feltet gjaldt uten
-        klassen skriptet setter."""
+        klassen skriptet setter. Gjennomgangen (BH13, VG3): ogsaa hvis en ny
+        regel for vinduet uten klassen kom til, eller knappen «Flytt» viste
+        seg uten skriptet."""
         for adresse in SIDENE:
             html = _side(klient, adresse)
             assert 'popover="manual"' not in html and 'popovertargetaction="show"' not in html, adresse
-            assert 'class="hjelpefelt"' not in html, adresse
-        stil = STILARKET.read_text(encoding="utf-8")
-        flyttet = [
-            velger.strip()
-            for velger, kropp in re.findall(r"([^{};]*\.hjelpevindu[^{]*)\{([^}]*)\}", stil)
-            if re.search(r"\b(position|inset)\s*:", kropp)
-        ]
-        assert flyttet and all(re.match(r"\.hjelpefelt[ .]", v) for v in flyttet), flyttet
+            assert html.count('class="flytt"') == html.count('class="flytt" hidden>') > 0, adresse
+        stil = re.sub(r"/\*.*?\*/", "", STILARKET.read_text(encoding="utf-8"), flags=re.DOTALL)
+        reglene = [(v.strip(), k) for v, k in re.findall(r"([^{};]*\.hjelpevindu[^{]*)\{([^}]*)\}", stil)]
+        uten_klassen = {v for v, _ in reglene if not re.match(r"\.hjelpefelt[ .]", v)}
+        assert uten_klassen == {
+            ".hjelpevindu",
+            ".hjelpevindu .hjelpetopp",
+            ".hjelpevindu .hjelpemerke",
+            ".hjelpevindu h2",
+            ".hjelpevindu h3",
+            ".hjelpevindu p",
+            ".hjelpevindu button.lukk",
+            ".hjelpevindu button.flytt",
+        }, uten_klassen
+        assert all("display" not in k for v, k in reglene if v == ".hjelpevindu button.flytt")
         assert re.search(r"\.hjelpefelt body:has\(\.hjelpevindu:popover-open\)", stil)
         assert "margin: auto" in _regel_i(stil, ".hjelpevindu")
 
     def test_skriptet_henter_ingenting(self):
         """Ville feilet hvis skriptet hentet noe fra nettet eller lastet et
-        annet skript."""
+        annet skript (gjennomgangen, BH14: ogsaa de andre maatene)."""
         kode = HJELPESKRIPTET.read_text(encoding="utf-8")
-        for ord_ in ("http", "fetch(", "XMLHttpRequest", "import", "eval(", "innerHTML"):
+        for ord_ in (
+            "http",
+            "fetch(",
+            "XMLHttpRequest",
+            "import",
+            "eval(",
+            "innerHTML",
+            "WebSocket",
+            "sendBeacon",
+            "EventSource",
+            "new Image",
+            ".src",
+            'createElement("script',
+        ):
             assert ord_ not in kode, ord_
 
 

@@ -2,12 +2,14 @@
 // (avgjort 21.10 kl. 22:47 og 24.10 kl. 11:31 og 11:34). Uten skriptet er
 // vinduene popover (auto) midt på skjermen, som i 8.0b. Skriptet setter
 // klassen hjelpefelt på <html>, og bare da gjelder stilen for feltet.
-// Fra 1024 px står feltet fast i kanten, og stilen gir plass. Smalere står
+// Fra 1056 px står feltet fast i kanten, og stilen gir plass. Smalere står
 // det over en tom plass rett under «?», like høy som feltet.
 "use strict";
 
 (function () {
-  const BRED = window.matchMedia("(min-width: 1024px)");
+  // Gjennomgangen (ECH3): uten popover i nettleseren står hjelpen som før.
+  if (!("popover" in HTMLElement.prototype)) return;
+  const BRED = window.matchMedia("(min-width: 1056px)");
   const rot = document.documentElement;
   let knappen = null; // «?» som åpnet feltet, og som får fokus tilbake
   let plassen = null; // den tomme plassen under «?» på smal skjerm
@@ -31,30 +33,49 @@
   }
 
   // Setter inn plassen under «?» og legger feltet over den. Høyden settes
-  // når feltet vises (hoeyde), fordi det ikke kan måles før.
+  // når feltet vises (hoeyde), fordi det ikke kan måles før. En rad i en
+  // tabell får plassen som en ny rad når tabellen går over hele bredden
+  // (gjennomgangen, BH7).
   function lagPlassen(felt, knapp) {
     fjernPlassen();
     if (BRED.matches || !knapp) return;
     const rad = knapp.closest("tr");
-    if (rad) {
+    if (rad && hel(rad.closest("table"))) {
       plassen = document.createElement("tr");
       const celle = plassen.insertCell();
       celle.colSpan = Array.from(rad.cells).reduce((sum, c) => sum + c.colSpan, 0);
       rad.after(plassen);
     } else {
-      let blokk = knapp.parentElement;
-      while (blokk.parentElement !== document.body && !hel(blokk)) blokk = blokk.parentElement;
+      // Gjennomgangen (ECH4, BH8): aldri forbi et barn av <body>.
+      let blokk = (rad ? rad.closest("table") : knapp).parentElement;
+      while (blokk.parentElement && blokk.parentElement !== document.body && !hel(blokk)) blokk = blokk.parentElement;
       plassen = document.createElement("div");
       blokk.after(plassen);
     }
     plassen.className = "hjelpeplass";
     plassen.setAttribute("aria-hidden", "true");
-    felt.style.setProperty("--topp", plassen.getBoundingClientRect().top + window.scrollY + "px");
+    plasser(felt);
+  }
+
+  function plasser(felt) {
+    if (plassen) felt.style.setProperty("--topp", plassen.getBoundingClientRect().top + window.scrollY + "px");
   }
 
   function hoeyde(felt) {
     if (plassen) plassen.style.height = felt.offsetHeight + 16 + "px";
   }
+
+  // Gjennomgangen (BH4, ECH1): feltet og plassen følger med når siden eller
+  // feltet endrer størrelse, for eksempel når skriftene er lastet eller
+  // telefonen snus.
+  const observatoer = new ResizeObserver(() => {
+    const felt = aapent();
+    if (felt && plassen) {
+      hoeyde(felt);
+      plasser(felt);
+    }
+  });
+  observatoer.observe(document.body);
 
   document.addEventListener("click", (e) => {
     const knapp = e.target.closest("button.hjelpeknapp");
@@ -79,15 +100,22 @@
     if (!felt.classList || !felt.classList.contains("hjelpevindu")) return;
     if (e.newState === "open") {
       hoeyde(felt);
-      felt.focus();
-    } else if (!aapent() && knappen && knappen.isConnected) {
-      knappen.focus();
+      observatoer.observe(felt);
+      felt.focus({ preventScroll: BRED.matches });
+    } else {
+      observatoer.unobserve(felt);
+      // Gjennomgangen (BH1, ECH5): fokus tilbake uten å bla, så den som har
+      // bladd med feltet åpent, blir der, og bare til et «?» som vises.
+      if (!aapent() && knappen && knappen.isConnected && knappen.getClientRects().length) {
+        knappen.focus({ preventScroll: true });
+      }
     }
   }, true);
 
   document.addEventListener("keydown", (e) => {
     const felt = aapent();
-    if (e.key === "Escape" && felt) felt.hidePopover();
+    // Gjennomgangen (BH11, ECH6): ikke når en annen kontroll har brukt Esc.
+    if (e.key === "Escape" && felt && !e.defaultPrevented) felt.hidePopover();
   });
 
   // Valget huskes mens fanen er åpen. Er lagringen slått av, kaster
@@ -134,5 +162,10 @@
     knapp.popoverTargetAction = "show";
   }
   side(lagret() === "venstre");
+  // Gjennomgangen (ECH7): en side fra hurtigbufferen ved «Tilbake» leser
+  // valget på nytt.
+  window.addEventListener("pageshow", (e) => {
+    if (e.persisted) side(lagret() === "venstre");
+  });
   rot.classList.add("hjelpefelt");
 })();

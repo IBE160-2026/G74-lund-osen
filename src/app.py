@@ -297,7 +297,8 @@ def _stilark():
     av fila. Regnes ved hver side, saa en endret fil gir ny adresse uten
     omstart, og nettleseren aldri bruker en gammel utgave. Kan fila ikke
     leses, staar lenken uten avtrykk, saa siden og feilsiden likevel vises
-    (gjennomgangen, BH3)."""
+    (gjennomgangen, BH3). Story 8.0f: det samme for hjelpeskriptet, i
+    _med_avtrykk."""
     return {"stilark": _med_avtrykk(STILARK), "hjelpeskript": _med_avtrykk(HJELPESKRIPT)}
 
 
