@@ -69,6 +69,45 @@ context:
 
 Én om gangen, med `-x`, med kopi før og sha256 mot HEAD etter: grensen 0,5 flyttet til 1, og arealet uten vekten.
 
+*Utfallet 26.10 på `4af6efa`:* begge ble fanget, grensen av `test_hvert_trinn_ved_grensene[0.4951-lys-opp]` og arealet av `test_arealet_foelger_volumforholdet_i_tabellen`. Fila var lik HEAD etterpå.
+
+*Utfallet 26.10 kl. 09:25 på `6f5815b`, etter rettelsene i kartet fra gjennomgangen:* begge ble fanget av de samme testene. Arealet uten vekten er `squarify([1.0 for r in bransje.ruter], …)` i `_legg_ut`. Fila var lik HEAD etterpå, med samme sha256 som `git show HEAD:src/boersometer.py` med CRLF.
+
+## Gjennomgangen
+
+Gjennomgang 26.10 etter hele settet (3721 bestått, 20 hoppet over, 0 feilet, 09:05:18–09:10:30 på `0deaf5f`), av hele PR-en, diffen `de1cd7d..0deaf5f`, med Blind Hunter (BH, 14 funn), Edge Case Hunter (ECH, 10) og Verification Gap (VG, 3). Rettet i `104b735`, `5cf4244`, `f9ae72c`, `40852ac`, `5eb6de0`, `6f5815b` og her.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH9, ECH1 | `kart()` gir opp med `ValueError`, og ruten fanget den ikke, så siden ville gitt 500 | medium | **rettet** i `104b735`: tabellen står alene (NFR-03), `test_tabellen_staar_naar_rutene_ikke_faar_plass` |
+| ECH2, ECH10 | `@media` regner med rullefeltet, så et vindu 761 px bredt har 712 px innhold, og en rute kunne bli om lag 42,9 px | medium | **rettet** i `5cf4244`: den brede flaten regnes ved 712 px |
+| VG2, VG3, ECH3, ECH9, BH11 | Tekstnivået ble regnet ved 358 px og med kanten, men den smale flaten brukes ned til 288 px | medium | **rettet** i `f9ae72c`: `Flate.minste`, nivået for den synlige ruta ved 712 og 288 px |
+| VG1 | Ingen test leste klassene `nivaa-bred-N` og `nivaa-smal-N` på siden | medium | **rettet** i `f9ae72c`: `test_tekstnivaaet_paa_siden_er_det_kartet_regnet` |
+| BH1, ECH8 | Spesifikasjonen sier at overskriften kuttes med «…», men CSS-en hadde bare `overflow: hidden` | medium | **rettet** i `40852ac`: navnet er `.bransjenavn` med `text-overflow: ellipsis` |
+| BH4, ECH7 | Fokusringen med `outline-offset: 0` lå inntil den mørke rammen og så ut som en tykkere ramme | medium | **rettet** i `5eb6de0`: 2 px hvitt mellom ruta og ringen |
+| ECH6 | `ry - fy - OVERSKRIFT` kunne bli -2,6e-14, som malen skrev «-0.000%» | low | **rettet** i `6f5815b`: målt 109 slike plasser på 300 tilfeldige dager, `test_ingen_plass_er_negativ` |
+| BH6 | «Mutantene» hadde ikke utfallet | low | **rettet** her: Utfallet-linjene over |
+| BH2 | Tab-rekkefølgen er rekkefølgen i designregler §4, men `squarify` legger den største ruta først, så fokuset hopper i kartet (WCAG 2.4.3) | medium | **under «Åpent»:** rekkefølgen i HTML-en er den samme som i tabellen og overskriftene, og å endre den eller la `squarify` følge §4 er et valg for gruppen. Ikke rettet |
+| BH5 | Den smale flaten brukes opp til 760 px, og kartet blir da om lag dobbelt så høyt som den brede flaten ved samme bredde | low | **under «Åpent»:** bare målt ved 390 og 320 px |
+| ECH4 | Linja sier bare ukedagen for børsdagen før, også når den er mer enn 6 dager før | low | **under «Åpent»** |
+| ECH5 | «Børsdagen før» i linja er fra kursdatoene, men indeksen bruker kalenderen | low | **under «Åpent»:** de er like når kursene er komplette. Spesifikasjonen sier at indeksen står «–» når kalenderen ikke har en rad |
+| BH7 | Den lyse grensen formateres som `faktor`, så «Hva fargene betyr» får 0,5 uten % | low | **under «Åpent»:** formatet er valgt så «fra 0,5 til under 2 %» har % én gang, men det bruker en type for et annet tall (regel 21) |
+| BH10 | Veksten 1,02 har ingen måling i spesifikasjonen | low | **under «Åpent»:** valgt 26.10 i punkt d, og grunnen er ikke ført |
+| BH3 | Tabellen og den skjulte teksten sier lavt, vanlig og høyt etter `volumfaktor` 1,5, mens arealet følger vekten | low | **avvist:** ordet følger interesse-sjekken, som har den samme grensen, og tabellen har tallet. Det beskriver ikke størrelsen |
+| BH8 | Hjelpen har «3 ganger» og «halvparten» som tekst, ikke fra konstantene | low | **avvist:** `MINSTE_VEKT = 0.5` og `STOERSTE_VEKT = 3.0` er kilder til hjelpeteksten, så testen feiler når de endres |
+| BH11 | Overskriften er om lag 19,3 px høy ved 320 px | low | **avvist:** 24 × 288/358 ≈ 19,3 px rommer symbolet på 14 px og teksten på 13 px med `line-height: 1` |
+| BH12 | «(story 8.6)» i `test_demoproeven.py` om avgjørelsen 24.10 kl. 11:54 | low | **avvist:** avgjørelsen står under story 8.6 i `epics.md` |
+| BH13 | `--opp-bakgrunn`, `--ned-bakgrunn` og `--ingen-bakgrunn` brukes ikke lenger på børsometeret | low | **avvist:** de brukes fortsatt i `stil.css` for andre sider |
+| BH14 | Spesifikasjonen har ikke `updated` | low | **avvist:** ingen av de 83 spesifikasjonene i `implementation-artifacts` har feltet, og regel 4 gjelder `docs/` og `planning-artifacts` |
+
+## Åpent
+
+- **BH2, rekkefølgen i kartet (medium, ikke rettet):** fokuset følger §4-rekkefølgen i HTML-en, mens `squarify` legger den største ruta først. Gruppen avgjør om rekkefølgen skal endres.
+- **BH5:** høyden på den smale flaten mellom 390 og 760 px.
+- **ECH4 og ECH5:** linja «Mål mot børsen» når børsdagen før er mer enn 6 dager før, eller ikke er den samme i kursene og kalenderen.
+- **BH7:** typen `faktor` for den lyse grensen i «Hva fargene betyr».
+- **BH10:** grunnen til veksten 1,02.
+
 ## Det som ikke endres
 
 - Ingen nye kall og ingen ny tabell. Ingen API-kall utover kvotesjekken i regel 15, og `src/fetch_prices.py` kjøres ikke.
