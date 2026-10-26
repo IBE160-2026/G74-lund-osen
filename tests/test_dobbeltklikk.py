@@ -1032,11 +1032,16 @@ def _kjoer_35e(tmp_path, navn, tilfelle):
 def _sjekk_35e(tilfelle, kode, utskrift, linjene, levde, fremmed):
     assert kode == 1, utskrift
     stoppet = "Den andre versjonen er stoppet, og porten er ledig."
+    beskjeden = "Den stoppes rett før denne starter appen"
+    if tilfelle != "fremmed_underveis":
+        # Gjennomgangen av 3.5e (BH, ECH): beskjeden kommer foer uv sync.
+        assert utskrift.index(beskjeden) < utskrift.index("Installerer pakkene"), utskrift
     if tilfelle == "uv_sync_feiler":
         # Den andre versjonen kjoerte mens uv sync feilet, og kjoerer videre.
+        # Vinduet sier at den kan holde .venv, ikke bare at nettet er grunnen.
         assert linjene == ["sync 1"], (linjene, utskrift)
-        assert "Den stoppes rett før denne starter appen" in utskrift, utskrift
-        assert "uv sync gikk ut med kode 1" in utskrift or "uv sync feilet" in utskrift, utskrift
+        assert "kan holde filene i .venv åpne. Lukk vinduet der den kjører" in utskrift, utskrift
+        assert "Sjekk at maskinen er koblet til nettet" not in utskrift, utskrift
         assert levde and stoppet not in utskrift, utskrift
     elif tilfelle == "fremmed_underveis":
         # Porten var ledig foer uv, og et fremmed program tok den under uv

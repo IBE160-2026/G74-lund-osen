@@ -24,6 +24,8 @@ $env:PYTHONIOENCODING = 'utf-8'
 $Adresse = 'http://127.0.0.1:8000'
 $SvarJa = $env:OSE_START_SVAR_JA -eq '1'
 $server = $null
+# 3.5e: den andre versjonen fra mappa kjører fortsatt mens uv sync går.
+$AndreVersjon = $false
 
 function Vent-PaaEnter {
     if (-not $SvarJa) { [void](Read-Host 'Trykk Enter for å lukke vinduet') }
@@ -118,6 +120,7 @@ function Frigjoer-Porten([bool]$Stopp) {
     if (-not $Stopp) {
         $ider = ($lyttere | ForEach-Object { $_.Id }) -join ', '
         Write-Host "Den andre versjonen av OSE Signal kjører allerede på $Adresse (prosess $ider). Den stoppes rett før denne starter appen, så den kjører videre hvis skriptet stopper før det."
+        $script:AndreVersjon = $true
         return
     }
     foreach ($lytter in $lyttere) {
@@ -191,7 +194,13 @@ if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
 
 Write-Host 'Installerer pakkene (uv sync). Første gang tar det noen minutter.'
 uv sync
-if ($LASTEXITCODE -ne 0) { Stopp "uv sync gikk ut med kode $LASTEXITCODE. Sjekk at maskinen er koblet til nettet, og dobbeltklikk på nytt." }
+if ($LASTEXITCODE -ne 0) {
+    $kode = $LASTEXITCODE
+    # Gjennomgangen av 3.5e (BH, ECH): på Windows kan uv sync feile fordi
+    # den andre versjonen holder filer i .venv åpne, og da er nettet feil grunn.
+    if ($AndreVersjon) { Stopp "uv sync gikk ut med kode $kode. Den andre versjonen av OSE Signal kjører fra denne mappa og kan holde filene i .venv åpne. Lukk vinduet der den kjører, og dobbeltklikk på nytt." }
+    Stopp "uv sync gikk ut med kode $kode. Sjekk at maskinen er koblet til nettet, og dobbeltklikk på nytt."
+}
 
 if ($Versjon -eq 'demo') {
     Write-Host 'Lager demobasen.'

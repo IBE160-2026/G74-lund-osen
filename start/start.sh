@@ -17,6 +17,8 @@ ADRESSE="http://127.0.0.1:8000"
 VERSJON="${1:-demo}"
 SVAR_JA="${OSE_START_SVAR_JA:-}"
 UTEN_NETTLESER="${OSE_START_UTEN_NETTLESER:-}"
+# 3.5e: den andre versjonen fra mappa kjører fortsatt mens uv sync går.
+ANDRE_VERSJON=""
 # Forprøven 24.10 (funn 4): Python skriver æ, ø og å som UTF-8, også når
 # utskriften går til en fil.
 export PYTHONIOENCODING=utf-8
@@ -94,6 +96,7 @@ frigjoer_porten() {
     if [ "${1:-}" != "stopp" ]; then
         prosesser="$(echo $ider)"
         echo "Den andre versjonen av OSE Signal kjører allerede på $ADRESSE (prosess ${prosesser// /, }). Den stoppes rett før denne starter appen, så den kjører videre hvis skriptet stopper før det."
+        ANDRE_VERSJON=1
         return 0
     fi
     for id in $ider; do
@@ -162,7 +165,13 @@ if ! command -v uv >/dev/null 2>&1; then
 fi
 
 echo "Installerer pakkene (uv sync). Første gang tar det noen minutter."
-uv sync || stopp "uv sync feilet. Sjekk at maskinen er koblet til nettet, og dobbeltklikk på nytt."
+uv sync
+if [ $? != 0 ]; then
+    # Gjennomgangen av 3.5e (BH, ECH): den andre versjonen kan holde filer i
+    # .venv åpne, og da er nettet feil grunn.
+    [ -z "$ANDRE_VERSJON" ] || stopp "uv sync feilet. Den andre versjonen av OSE Signal kjører fra denne mappa og kan holde filene i .venv åpne. Lukk vinduet der den kjører, og dobbeltklikk på nytt."
+    stopp "uv sync feilet. Sjekk at maskinen er koblet til nettet, og dobbeltklikk på nytt."
+fi
 
 if [ "$VERSJON" = "demo" ]; then
     echo "Lager demobasen."
