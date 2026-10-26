@@ -67,6 +67,9 @@ context:
 - **Overskriften i feltet** er 24 px høy ved den minste bredden, med symbolet, navnet, snittet og antallet, og kuttes med «…» når feltet er smalt. Tabellen under har de samme tallene.
   *Avgjort 2026-10-26 kl. 13:00 (gruppens svar, b):* overskriften er som på tavla, navnet og «snitt» med tallet, eller «1 aksje» ved én aksje, og antallet står i tabellen. Tillegget står i samme flex-linje som navnet, og får det ikke plass, brytes det til linje to, som ligger under en `row-gap` høyere enn linja og skjules av `overflow` for øyet, men ikke for skjermleseren. Navnet står da alene og kuttes med «…». Navnet har `min-width: 24px` (`MINSTE_NAVN`), og hvert felt er minst `MINSTE_FELT` (46 px: 2 + 14 + 4 + 24 + 2) bredt ved den minste bredden flaten brukes på, så navnet forsvinner aldri helt. For den smale flaten er det 46 × 358/288 ≈ 57,2 px i kartet; for den brede gjelder 48 px fra rutene.
 
+- **Tabellen under kartet**
+  *Avgjort 2026-10-26 kl. 15:21 (gruppens svar, f):* tabellen er lukket som standard, i `<details class="tallene">` bak `<summary>Se tallene som tabell</summary>`. Skjermleseren og Tab finner knappen, og innholdet leses når den er åpnet. Svarene om tabellen kl. 08:43 (b, hjelpen sier at tabellen har tallet) og kl. 13:00 (a, rekkefølgen i §4) står. Fotnoten om «ikke vurdert» står under, utenfor den lukkede delen. Får rutene ikke plass og tabellen står alene (NFR-03), er den åpen.
+
 ## Mutantene
 
 Én om gangen, med `-x`, med kopi før og sha256 mot HEAD etter: grensen 0,5 flyttet til 1, og arealet uten vekten.

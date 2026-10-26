@@ -687,7 +687,12 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) section.fargene .proeve { display: inline-block; box-sizing: border-box; width: 28px; height: 20px; border-radius: 4px; }
 :where(.side-oversikt) section.fargene .proeve.ramme-moerk,
 :where(.side-oversikt) section.fargene .proeve.ramme-gul { background: var(--trinn-noeytral); }
-:where(.side-oversikt) .tabellboks.boersometerboks { margin-top: 28px; }
+:where(.side-oversikt) .tabellboks.boersometerboks { margin-top: 12px; }
+/* Gruppens svar 26.10 kl. 15:21 (f): tabellen bak «Se tallene som tabell»,
+   lukket som standard. summary er en knapp skjermleseren og Tab finner. */
+:where(.side-oversikt) details.tallene { margin-top: 28px; }
+:where(.side-oversikt) details.tallene > summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--blekk); }
+:where(.side-oversikt) details.tallene > summary:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
 :where(.side-oversikt) table.boersometertabell { font-variant-numeric: tabular-nums; }
 :where(.side-oversikt) table.boersometertabell caption { text-align: left; font-weight: 600; padding: 12px 8px 8px; }
 :where(.side-oversikt) table.boersometertabell th,

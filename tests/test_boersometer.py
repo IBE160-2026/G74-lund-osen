@@ -558,6 +558,43 @@ class TestSiden:
         assert "<caption>Børsometeret 09.10 som tabell</caption>" in html and html.count('scope="col"') >= 5
         assert '<span class="skjult">, Brattfjell Energi, volum høyt</span>' in html
 
+    def test_tabellen_er_lukket_bak_se_tallene_som_tabell(self, klient):
+        """Gruppens svar 26.10 kl. 15:21 (f): tabellen under kartet er lukket
+        som standard, bak «Se tallene som tabell», og skjermleseren finner
+        knappen. Ville feilet med tabellen åpen, uten summary, med tabellen
+        utenfor details, eller med fotnoten inne i den lukkede delen."""
+        for adresse in ("/boersometer", "/boersometer?dag=2026-10-08", "/boersometer?dag=2026-09-18"):
+            html = _side(klient, adresse)
+            details = re.findall(r"<details[^>]*>", html)
+            assert details == ['<details class="tallene">'], (adresse, details)
+            tallene = html.split('<details class="tallene">', 1)[1].split("</details>", 1)
+            assert tallene[0].lstrip().startswith("<summary>Se tallene som tabell</summary>")
+            assert '<table class="boersometertabell">' in tallene[0] and "</table>" in tallene[0]
+            assert html.count('<table class="boersometertabell">') == 1
+            assert "fotnote" not in tallene[0]
+            # Kartet og «Hva fargene betyr» står over, utenfor details.
+            assert html.index('<section class="fargene"') < html.index('<details class="tallene">')
+        fotnote = _side(klient, "/boersometer?dag=2026-09-18")
+        assert _fotnoten(fotnote) and fotnote.index("</details>") < fotnote.index('<p class="fotnote">')
+        stil = (SRC / "static" / "stil.css").read_text(encoding="utf-8")
+        assert re.search(r"details\.tallene > summary:focus-visible \{[^}]*outline", stil)
+        assert "display: none" not in re.search(r"details\.tallene > summary \{([^}]*)\}", stil).group(1)
+
+    def test_tabellen_er_aapen_naar_den_staar_alene(self, klient, monkeypatch):
+        """Gruppens svar 26.10 kl. 15:21 (f), med NFR-03: får rutene ikke
+        plass, står tabellen alene og er åpen. Ville feilet hvis siden da
+        bare viste en lukket knapp."""
+        monkeypatch.setattr(app_modul, "kart", lambda bransjer: boersometer.kart([]))
+        html = _side(klient)
+        assert '<details class="tallene" open>' in html
+
+    def test_hjelpen_sier_det_om_tabellen(self):
+        """Regel 19: ville feilet hvis docs/hjelp.md ikke sa at tabellen står
+        bak «Se tallene som tabell» og er lukket (svaret kl. 15:21, f)."""
+        hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
+        avsnitt = hjelp.split("### Hva viser børsometeret?", 1)[1].split("###", 1)[0]
+        assert "bak «Se tallene som tabell». Den er lukket til du åpner den" in avsnitt
+
     def test_bøyningen_i_linja_over(self, klient, monkeypatch):
         """Gjennomgangen (BH8): ville feilet med «1 aksjer i 1 bransjer»."""
         hele = SqliteOversiktsleser.oversikt
@@ -1679,7 +1716,7 @@ class TestKartet:
         tekst = hjelpetekster(STANDARD)["boersometeret"].tekst
         assert "Arealet av ruta følger volumet mot vanlig" in tekst and "1,5 ganger" not in tekst
         assert "ikke større over 3 ganger vanlig volum eller mindre under halvparten" in tekst
-        assert "tabellen under har tallet" in tekst
+        assert "tabellen bak «Se tallene som tabell» har tallet" in tekst
         hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
         avsnitt = hjelp.split("### Hva viser børsometeret?", 1)[1].split("###", 1)[0]
         assert "Rutene er et fylt kart" in avsnitt

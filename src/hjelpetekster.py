@@ -169,7 +169,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "trinn, som «Hva fargene betyr» under rutene viser. "
             # Story 8.6b, d: arealet i kartet.
             "Arealet av ruta følger volumet mot vanlig, men ruta blir ikke større over 3 ganger vanlig volum eller "
-            "mindre under halvparten, og tabellen under har tallet; "
+            # Gruppens svar 26.10 kl. 15:21 (f): tabellen bak «Se tallene som tabell».
+            "mindre under halvparten, og tabellen bak «Se tallene som tabell» har tallet; "
             # Gruppens svar 26.10 kl. 13:00 (a): Tab følger kartet.
             "med Tab går du fra det største feltet og den største ruta, slik kartet legger dem. "
             "Rammen er gul ved 3 av 3 på siste børsdag, også når du velger en annen dag, og "

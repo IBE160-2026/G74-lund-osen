@@ -94,6 +94,12 @@
       </ul>
     </section>
 
+    {#- Gruppens svar 26.10 kl. 15:21 (f): tabellen er lukket som standard, bak
+        «Se tallene som tabell». Skjermleseren finner knappen, og tabellen har
+        fortsatt rekkefølgen i designregler §4 (svaret kl. 13:00, a). Står
+        tabellen alene fordi rutene ikke fikk plass, er den åpen (NFR-03). #}
+    <details class="tallene"{% if not kart.felt %} open{% endif %}>
+    <summary>Se tallene som tabell</summary>
     {#- Rullboksen fra oversikten: tabellen ruller, ikke siden, også med tastaturet. #}
     <div class="tabellboks boersometerboks" role="region" aria-label="Børsometeret som tabell" tabindex="0">
     <table class="boersometertabell">
@@ -116,6 +122,7 @@
       </tbody>
     </table>
     </div>
+    </details>
     {#- Gruppens svar 23.10 kl. 11:44 (b): fotnoten når en rute sier «ikke vurdert». #}
     {% if ikke_vurdert %}
       {% include "_fotnote_ikke_vurdert.html" %}
