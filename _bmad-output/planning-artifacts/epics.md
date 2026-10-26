@@ -3616,6 +3616,12 @@ dagen gjaldt hele børsen eller noen bransjer.
 
 *Avgjort 2026-10-26 kl. 08:43 (gruppens svar):* valgene i spesifikasjonen 8.6b. a) Rammene måles mot det de grenser mot, den hvite linja innenfor og det hvite rundt ruta, og der har begge minst 3:1. b) Vekten holdes mellom 0,5 og 3 ganger vanlig volum, og hjelpen sier det. c) Ved 390 px er ingen rute under 44 × 44 px, og ved 320 px ingen under 24 × 24 px (WCAG 2.2, 2.5.8).
 
+*Avgjort 2026-10-26 kl. 13:00 (gruppens svar):* a) I HTML-en står bransjene og rutene i den rekkefølgen kartet legger dem, den største først, så Tab følger kartet; tabellen under beholder rekkefølgen fra designreglene (BH2). b) Overskriften i feltet er som på tavla: navnet og «snitt» med tallet, eller «1 aksje» ved én aksje; antallet står i tabellen. Er feltet for smalt, skjules snittet for øyet før navnet kuttes med «…». c) For vinduer fra 360 px regnes teksten i rutene ved 328 px; under 360 px ved 288 px som nå. d) Når alt er grønt, flettes PR #99 med bilder tatt først, og gruppen ser dem etterpå.
+
+*Avgjort 2026-10-26 kl. 13:07 (gruppens svar):* e) For vinduer fra 1080 px regnes teksten ved 1008 px, full bredde; mellom 761 og 1080 px ved 712 px som nå.
+
+*Avgjort 2026-10-26 kl. 15:21 (gruppens svar):* f) Tabellen under kartet er lukket som standard, bak «Se tallene som tabell»; skjermleseren finner den, og svarene om tabellen kl. 08:43 og 13:00 står.
+
 ### Story 8.7: Sjekk 2 og 3 i kursgrafen
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
