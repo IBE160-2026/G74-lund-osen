@@ -299,10 +299,11 @@ class Flate:
     forhold: float
 
 
-# Bred for vinduer bredere enn 760 px (innholdet minst 729 px), og smal for
+# Bred for vinduer bredere enn 760 px (innholdet minst 729 px, og 712 px med
+# et rullefelt på 17 px, gjennomgangen 26.10, ECH), og smal for
 # 760 px og smalere, regnet ved 390 px (innholdet 358 px), som instruksjonen
 # sier. Stilen velger med @media, og hver rute har plassen i begge.
-BRED = Flate("bred", 729, 0.5)
+BRED = Flate("bred", 712, 0.5)
 SMAL = Flate("smal", 358, 1.2)
 FLATENE = (BRED, SMAL)
 

@@ -1295,6 +1295,22 @@ class TestKartet:
         assert '<section class="bransje"' not in html
         assert html.count('<a href="/aksje/') >= 15
 
+    @pytest.mark.parametrize("forhold", [[1.0] * 15, [3.0] + [0.5] * 14, [0.5, 3.0] * 7 + [1.0]])
+    def test_ingen_rute_under_44_px_i_761_px_med_rullefelt(self, forhold):
+        """Gjennomgangen 26.10 (ECH): @media regner med rullefeltet, så et
+        vindu 761 px bredt med et rullefelt på 17 px har 712 px innhold. Ville
+        feilet hvis den brede flaten var regnet ved 729 px."""
+        ruter = _ruter_med(forhold, [BRANSJER[i % 8] for i in range(len(forhold))])
+        k = kart(bygg_boersometer(ruter))
+        bredde = 761 - 17 - 2 * 16
+        hoeyde = bredde * k.forhold["bred"]
+        for f in k.felt:
+            fb, fh = f.plass["bred"].b / 100 * bredde, f.plass["bred"].h / 100 * hoeyde
+            kropp = fh * (1 - f.topp["bred"] / 100)
+            for kr in f.ruter:
+                rb, rh = kr.plass["bred"].b / 100 * fb, kr.plass["bred"].h / 100 * kropp
+                assert rb - 2 * KANT >= MINSTE_RUTE - 1e-9 and rh - 2 * KANT >= MINSTE_RUTE - 1e-9, (rb, rh)
+
     @pytest.mark.parametrize(
         "forhold",
         [
