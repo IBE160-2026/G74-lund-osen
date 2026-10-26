@@ -171,6 +171,38 @@ header.stripe button.hjelpeknapp:focus-visible, .tabellboks thead button.hjelpek
   font: inherit; font-size: 0.85rem; min-height: 44px; padding: 0 0.9rem; cursor: pointer;
   border: 1px solid var(--strek-2); border-radius: 8px; background: var(--kort); color: var(--blekk);
 }
+/* Story 8.0f: med skriptet (hjelp.js, klassen hjelpefelt på <html>) er
+   hjelpen ett fast felt. Fra 1056 px står det i høyre kant, og <body> gir
+   like mye plass, så feltet ikke dekker noe. Smalere står det over den tomme
+   plassen skriptet setter inn rett under «?» (--topp). Uten skriptet gjelder
+   reglene over, som i 8.0b. */
+.hjelpefelt .hjelpevindu:focus { outline: none; }
+.hjelpefelt .hjelpevindu:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+.hjelpeplass td { padding: 0; border: 0; }
+.hjelpevindu button.flytt {
+  font: inherit; font-size: 0.85rem; min-height: 44px; padding: 0 0.9rem; cursor: pointer; margin-left: auto;
+  border: 1px solid var(--strek-2); border-radius: 8px; background: var(--kort); color: var(--blekk);
+}
+@media (min-width: 1056px) {
+  .hjelpefelt { --hjelpefelt: 432px; }
+  .hjelpefelt .hjelpevindu {
+    position: fixed; inset: 16px 16px 16px auto; margin: 0;
+    width: 400px; height: fit-content; max-height: calc(100dvh - 32px);
+  }
+  .hjelpefelt body:has(.hjelpevindu:popover-open) { padding-right: var(--hjelpefelt); }
+  /* Story 8.0f, b: knappen i feltet flytter det til venstre (felt-venstre
+     på <html>), og plassen følger med. Knappen står bare på bred skjerm. */
+  .hjelpefelt .hjelpevindu button.flytt { display: inline-block; }
+  .hjelpefelt.felt-venstre .hjelpevindu { inset: 16px auto 16px 16px; }
+  .hjelpefelt.felt-venstre body:has(.hjelpevindu:popover-open) { padding-right: 0; padding-left: var(--hjelpefelt); }
+}
+@media (max-width: 1055.98px) {
+  .hjelpefelt .hjelpevindu {
+    position: absolute; inset: var(--topp, 0) 16px auto 16px; margin: 0;
+    width: auto; max-height: none; overflow: visible;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  }
+}
 
 /* Story 8.0d, PR 3: brikkene og retningspillen (_brikker.html). */
 .sjekker { display: flex; gap: 3px; margin-top: 4px; font-weight: 700; white-space: nowrap; }

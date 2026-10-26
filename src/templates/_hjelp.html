@@ -16,6 +16,10 @@
 <div id="{{ id }}" class="hjelpevindu" popover>
   <div class="hjelpetopp">
     <span class="hjelpemerke">Hjelp</span>
+    {#- Story 8.0f, b: flytter feltet til venstre eller høyre. Stilen viser
+        den bare med skriptet (hjelp.js) og på bred skjerm, og skriptet
+        setter teksten etter siden feltet står på. #}
+    <button type="button" class="flytt" hidden>Flytt til venstre</button>
     <button type="button" class="lukk" popovertarget="{{ id }}" popovertargetaction="hide">Lukk</button>
   </div>
   <h2>{{ tittel }}</h2>

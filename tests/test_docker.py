@@ -935,7 +935,8 @@ MALENE_BAK_BILDET = (
     "src/kursdata.py",
     "src/templates/index.html",
 )
-SKRIFTFILER = {".woff", ".woff2", ".ttf", ".otf", ".css"}
+# Story 8.0f: ogsaa hjelpeskriptet (.js), som lastes paa begge sidene.
+SKRIFTFILER = {".woff", ".woff2", ".ttf", ".otf", ".css", ".js"}
 # Svaret 18.10 kl. 21:42: bildet er saa hoeyt at det slutter etter den siste
 # raden under «Skilte seg ut», foer «Øvrige aksjer», saa signalstyrken og
 # fargene per aksje er med.
@@ -1021,7 +1022,13 @@ HOEYDE_PAA_BILDET = 1630
 # for byte det samme.
 # Gjennomgangen av 8.6b 26.10 (BH, ECH): tekstnivået med @container i stil.css.
 # Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "e4e867edad0c4f33dfb2ea727c9ada9d34485638dca0c1c97c46f5904a73fb7c"
+# Story 8.0f: hjelpeskriptet, lenken i _ramme.html og feltet i stil.css.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 8.0f, b: knappen som flytter feltet. Bildet ble tatt paa nytt og er
+# byte for byte det samme.
+# Gjennomgangen av 8.0f: grensen 1056 px og rettelsene i hjelp.js. Bildet
+# ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "661c42525c0f38a92933edb7e847f93dc86f41518320fd3898f3d273e04d3b56"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1210,7 +1217,13 @@ HOEYDE_PAA_AKSJESIDEN = 1894
 # ble tatt paa nytt og er byte for byte det samme.
 # Gjennomgangen av 8.6b 26.10 (BH, ECH): tekstnivået med @container i stil.css.
 # Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "2bbb90388474332b1464ee2ef520295dc479daebcac1182b7b4efd8439236151"
+# Story 8.0f: hjelpeskriptet, lenken i _ramme.html og feltet i stil.css.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 8.0f, b: knappen som flytter feltet. Bildet ble tatt paa nytt og er
+# byte for byte det samme.
+# Gjennomgangen av 8.0f: grensen 1056 px og rettelsene i hjelp.js. Bildet
+# ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "22006ee8710d6b633f2b2988f46ea672cfdfc29fd89874adb69b619f789bade2"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "

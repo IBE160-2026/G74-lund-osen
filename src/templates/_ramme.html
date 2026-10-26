@@ -23,6 +23,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block tittel %}OSE Signal{% endblock %}</title>
   <link rel="stylesheet" href="{{ stilark }}">
+  {#- Story 8.0f: hjelpen ved «?» som ett fast felt. Uten skriptet virker
+      hjelpen som i 8.0b. #}
+  <script src="{{ hjelpeskript }}" defer></script>
 </head>
 <body class="{% block side %}{% endblock %}">
   <header class="stripe">
