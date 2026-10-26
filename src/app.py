@@ -146,6 +146,8 @@ BASEFEIL = (sqlite3.Error, OSError, MigrasjonsFeil, RuntimeError)
 app = Flask(__name__)
 # Story 2.7a: all stilen paa sidene, lenket fra _ramme.html.
 STILARK = Path(app.static_folder) / "stil.css"
+# Story 8.0f: skriptet som gjoer hjelpen ved «?» til ett fast felt.
+HJELPESKRIPT = Path(app.static_folder) / "hjelp.js"
 # Story 8.0c: datoene og tidspunktene med aar bare naar aaret er et annet
 # enn i dag. I dag kommer fra idag(), saa testene styrer det.
 app.jinja_env.filters["norsk_tid"] = lambda tid: norsk_tid(tid, idag().year)
@@ -296,11 +298,17 @@ def _stilark():
     omstart, og nettleseren aldri bruker en gammel utgave. Kan fila ikke
     leses, staar lenken uten avtrykk, saa siden og feilsiden likevel vises
     (gjennomgangen, BH3)."""
+    return {"stilark": _med_avtrykk(STILARK), "hjelpeskript": _med_avtrykk(HJELPESKRIPT)}
+
+
+def _med_avtrykk(fil: Path) -> str:
+    """Adressen til en fil i src/static/ med avtrykket. Story 8.0f: ogsaa
+    for hjelpeskriptet."""
     try:
-        avtrykk = hashlib.sha256(STILARK.read_bytes()).hexdigest()[:16]
+        avtrykk = hashlib.sha256(fil.read_bytes()).hexdigest()[:16]
     except OSError:
-        return {"stilark": f"/static/{STILARK.name}"}
-    return {"stilark": f"/static/{STILARK.name}?v={avtrykk}"}
+        return f"/static/{fil.name}"
+    return f"/static/{fil.name}?v={avtrykk}"
 
 
 def demo_startdag() -> str:

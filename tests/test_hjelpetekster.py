@@ -19,7 +19,7 @@ from markedsoversikt import RETNINGSVISNING
 from signalberegning import BLANDET, INGEN, NEGATIV, POSITIV, STANDARD, Parametre, interesse, trend
 from tallformat import HARDT_MELLOMROM as NB
 from tallformat import tall
-from test_app import _stil
+from test_app import _stil, _uten_hjelpeskriptet
 
 ROT = Path(__file__).resolve().parent.parent
 
@@ -461,10 +461,11 @@ class TestSidene:
 
     def test_ingen_skript_og_ingenting_fra_nettet(self, klient, base):
         """Kontrollpunktet: uten nettkall. Ville feilet hvis en side hentet
-        et skript, et stilark eller en skrift fra nettet."""
+        et skript, et stilark eller en skrift fra nettet. Story 8.0f: det
+        ene skriptet er hjelpen fra /static/."""
         for adresse in SIDENE:
             html = _side(klient, adresse)
-            assert "<script" not in html.lower(), adresse
+            assert "<script" not in _uten_hjelpeskriptet(html).lower(), adresse
             assert not re.search(r'(src|href)\s*=\s*"(https?:)?//', html), adresse
             # Story 8.0d: skriften ligger i appen, saa url( er lov bare til
             # /static/ (designregler §1).
@@ -649,3 +650,56 @@ class TestStory80c:
         ]
         signal = beregn_signal(rader)
         assert len(signal.sjekker) == ANTALL_SJEKKER
+
+
+# Story 8.0f: hjelpen ved «?» som ett fast felt, med src/static/hjelp.js.
+HJELPESKRIPTET = ROT / "src" / "static" / "hjelp.js"
+STILARKET = ROT / "src" / "static" / "stil.css"
+
+
+class TestHjelpefeltet:
+    def test_skriptet_er_lenket_med_avtrykket(self, klient, base):
+        """Ville feilet hvis en side manglet skriptet, lenket det to ganger,
+        eller lenket en gammel utgave, saa nettleseren brukte den."""
+        import hashlib
+
+        avtrykk = hashlib.sha256(HJELPESKRIPTET.read_bytes()).hexdigest()[:16]
+        lenke = f'<script src="/static/hjelp.js?v={avtrykk}" defer></script>'
+        for adresse in SIDENE:
+            assert _side(klient, adresse).count(lenke) == 1, adresse
+        svar = klient.get("/static/hjelp.js")
+        assert svar.status_code == 200
+        svar.close()
+
+    def test_uten_skriptet_er_hjelpen_som_foer(self, klient, base):
+        """Kontrollpunktet: uten JavaScript virker hjelpen som i dag. Ville
+        feilet hvis vinduene var manual i HTML-en, saa Esc og et klikk utenfor
+        ikke lukket uten skriptet, eller stilen for feltet gjaldt uten
+        klassen skriptet setter."""
+        for adresse in SIDENE:
+            html = _side(klient, adresse)
+            assert 'popover="manual"' not in html and 'popovertargetaction="show"' not in html, adresse
+            assert 'class="hjelpefelt"' not in html, adresse
+        stil = STILARKET.read_text(encoding="utf-8")
+        flyttet = [
+            velger.strip()
+            for velger, kropp in re.findall(r"([^{};]*\.hjelpevindu[^{]*)\{([^}]*)\}", stil)
+            if re.search(r"\b(position|inset)\s*:", kropp)
+        ]
+        assert flyttet and all(v.startswith(".hjelpefelt ") for v in flyttet), flyttet
+        assert re.search(r"\.hjelpefelt body:has\(\.hjelpevindu:popover-open\)", stil)
+        assert "margin: auto" in _regel_i(stil, ".hjelpevindu")
+
+    def test_skriptet_henter_ingenting(self):
+        """Ville feilet hvis skriptet hentet noe fra nettet eller lastet et
+        annet skript."""
+        kode = HJELPESKRIPTET.read_text(encoding="utf-8")
+        for ord_ in ("http", "fetch(", "XMLHttpRequest", "import", "eval(", "innerHTML"):
+            assert ord_ not in kode, ord_
+
+
+def _regel_i(stil: str, velger: str) -> str:
+    """Kroppen til den første regelen med akkurat denne velgeren."""
+    treff = re.search(r"(?m)^" + re.escape(velger) + r"\s*\{([^}]*)\}", stil)
+    assert treff, velger
+    return treff.group(1)

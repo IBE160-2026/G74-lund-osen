@@ -997,6 +997,15 @@ def _tabell(html: str) -> _Tabell:
 STATIC = Path(__file__).resolve().parent.parent / "src" / "static"
 # Story 2.7a: lenken til stilarket i _ramme.html, med avtrykket av fila.
 STILLENKE = re.compile(r'<link rel="stylesheet" href="/static/([a-z]+\.css)\?v=([0-9a-f]{16})">')
+# Story 8.0f: det ene skriptet paa sidene, hjelpen ved «?», fra appen selv.
+HJELPESKRIPT = re.compile(r'<script src="/static/hjelp\.js\?v=[0-9a-f]{16}" defer></script>')
+
+
+def _uten_hjelpeskriptet(html: str) -> str:
+    """Siden uten lenken til hjelpeskriptet. Story 8.0f: lenken staar én
+    gang, og alt annet skal fortsatt vaere uten skript."""
+    assert len(HJELPESKRIPT.findall(html)) == 1
+    return HJELPESKRIPT.sub("", html)
 
 
 def _uten_andre_sider(css: str, side: str) -> str:
@@ -3611,7 +3620,8 @@ class TestPeriodeneIKursgrafen:
         """«Velg dag» er et datofelt i et skjema, og siden har ingen skript.
         Feltet gaar fra andre dag i serien til siste (gjennomgangen, BH1 og
         BH3). Ville feilet med et skript, uten skjemaet, eller med i dag som
-        siste dag i feltet."""
+        siste dag i feltet. Story 8.0f: siden har ikke noe annet skript enn
+        hjelpen ved «?» (spesifikasjonen, «Avgjort»)."""
         self._aksjen()
         html = klient.get("/aksje/EQNR?dag=2026-10-01").data.decode("utf-8")
         nav = html.split('<nav class="periodevalg"', 1)[1].split("</nav>", 1)[0]
@@ -3620,7 +3630,7 @@ class TestPeriodeneIKursgrafen:
             '<input type="date" id="velg-dag" name="dag" required value="2026-10-01" min="2026-01-05" max="2026-10-09">'
             in nav
         )
-        assert "<script" not in html.lower()
+        assert "<script" not in _uten_hjelpeskriptet(html).lower()
 
     @pytest.mark.parametrize(
         "periode, ventet",

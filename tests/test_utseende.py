@@ -130,7 +130,7 @@ import re  # noqa: E402
 
 import app as app_modul  # noqa: E402
 from lagring_sqlite import demo_sti  # noqa: E402
-from test_app import _regel, _stil, monter, serie, snapshot  # noqa: E402
+from test_app import _regel, _stil, _uten_hjelpeskriptet, monter, serie, snapshot  # noqa: E402
 from test_demo import demobase, fast_klokke, klient, mal  # noqa: E402,F401
 
 # Fargene i designregler §5 som maa holde kontrasten: forgrunn, bakgrunn og
@@ -276,9 +276,10 @@ class TestRammen:
         og 19:49): bare en lenke (<a href>) til en av de 15 investorsidene
         går ut av appen. Den laster ingenting, så siden henter fortsatt
         ingenting fra nettet. Ville feilet med en annen adresse utenfor
-        appen, eller en investorside i src eller i et stilark."""
+        appen, eller en investorside i src eller i et stilark. Story 8.0f:
+        det ene skriptet er hjelpen fra /static/."""
         for navn, html in sidene.items():
-            assert "<script" not in html.lower(), navn
+            assert "<script" not in _uten_hjelpeskriptet(html).lower(), navn
             assert "@import" not in html, navn
             assert not re.search(r"https?:|//[a-z]", _stil(html)), navn
             lenker = re.findall(r'<a\s[^>]*?href="([^"]*)"', html)
