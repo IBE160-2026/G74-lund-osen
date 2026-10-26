@@ -1959,6 +1959,8 @@ følger aksjene jeg bryr meg om.
 
 *Avgjort 2026-10-26 kl. 22:22 (gruppens svar):* kallene som er igjen 26.10 i GMT etter kveldshentingen, går til målingen: de neste med typen «Common Stock» i lista fra §40 som ikke er rangert, valgt som i §50, etter GOD. Bonuskvoten brukes ikke.
 
+*Lagt til 2026-10-26 kl. 23:09 (målingen etter gruppens svar 26.10 kl. 22:22, `malinger.md` §51):* de 4 neste «Common Stock» i lista fra §40 som ikke var rangert, plass 102–108 i lista, GOLD ROAD INTL (GOLDR), Grong Sparebank (GRONG), Gyldendal (GYL) og HAV Group (HAV), er målt med de 4 kallene som var igjen i dagskvoten 26.10 i GMT etter kveldshentingen. Alle 4 ga rader, og bonuskvoten er ikke brukt. Den høyeste medianen er 0,8 MNOK (GOLDR, plass 136 av 210), og ingen er over 25 MNOK. Plassen hver av dem får i rangeringen fra §50, står i §51.
+
 ### Story 2.13: Kommandoen som måler omsetning
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.

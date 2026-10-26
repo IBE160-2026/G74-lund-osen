@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-25T23:39
+updated: 2026-10-26T23:09
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -5546,6 +5546,84 @@ andre likhetene står som i §42.
 | 204 | ADS | ADS Maritime Holding | 0,0 | Nei | Nei | §42 |
 | 205 | PYRUM | Pyrum Innovations | 0,0 | Nei | Nei | §36 |
 | 206 | BSP | Black Sea Property | 0,0 | Nei | Nei | §42 |
+
+Målingen endrer ikke universet. Parametrene i signalet er låst og målt på de
+15 (AD-13).
+
+## 51. Fire til fra lista over Oslo Børs med kallene som var igjen, og plassen deres blant 210 (2026-10-26)
+
+**Metode.** Som i §50: ett `/api/eod`-kall per symbol, med
+`from=2026-07-02` og `to=2026-10-02`, samme vindu. Omsetning regnes som
+`volume × close` per handelsdag, og medianen tas over perioden, som i §33.
+Kallene ble gjort med `hent_api_nokkel` og `hent_ett_symbol` importert fra
+`src/fetch_prices.py`, fra et skript utenfor repoet som leste kvoten
+(`hent_kvote`, gratis) før og etter hvert kall. Det skulle stoppe hvis
+`apiRequestsDate` ikke var 2026-10-26, hvis 20 kall var brukt 26.10 før et
+kall, eller hvis `extraLimit` endret seg, så verken bonuskvoten eller
+morgendagens kvote kunne brukes (NFR-01). `src/fetch_prices.py` ble ikke
+kjørt, og ingenting ble skrevet til basen (AD-7). Målingen ble kjørt mandag
+26.10 kl. 23:07:54–23:08:04 norsk tid (UTC+1), 22:07–22:08 GMT, etter
+kveldshentingen, med de 4 kallene som var igjen i dagskvoten 26.10 i GMT.
+Gruppens svar 26.10 kl. 22:22 ga kallene (under story 2.12 i `epics.md`).
+
+**Utvalget.** De 4 er de 4 neste med typen «Common Stock» i lista over
+aksjene på Oslo Børs fra §40 (`data/proever/symbolliste-OL-2026-10-22.json`),
+i rekkefølgen i svaret, som ikke står i rangeringen i §50, etter GOD (plass
+101). Lista ble lest lokalt, uten nytt kall. Ingen «Common Stock» før GOD var
+urangert. De 4 er plass 102–108 i lista, de neste i alfabetet etter `Code`,
+ikke et utvalg etter størrelse. GSF (104), HAFNI (106) og HAUTO (107) er
+«Common Stock» som alt er rangert, og ble hoppet over. Navnet står uten
+selskapsformen, som i §50; «GOLD ROAD INTL» står som i lista. Resten av lista
+er ikke ført her.
+
+**Grunnen** er som i §42 og §50: story 2.12, der brukeren velger egne aksjer
+bare fra lista (svaret 22.10 kl. 23:14), og 2.13, kommandoen som måler
+omsetning.
+
+**Kostnad.** 4 kall, tatt av dagskvoten 26.10. Før målingen sto
+`apiRequests` på 16 med `apiRequestsDate` 2026-10-26, de 16 kallene fra
+kveldshentingen, altså 4 igjen 26.10 i GMT, og `extraLimit` på 463. Etter
+hvert kall gikk `apiRequests` opp med 1, og datoen sto på 2026-10-26. Etter
+målingen er `apiRequests` 20 med datoen 2026-10-26, og `extraLimit` fortsatt
+463. Ingen kall feilet, og alle 4 ga rader. Ingen dagskall er igjen 26.10.
+
+**Rådata.** `data/raa/maaling-raa-2026-10-26.json`. Fila finnes **bare
+lokalt** og er ikke sporet i git. Bare tallene under er regnet ut og ført her.
+
+| Symbol | Selskap | Plass i lista | Handelsdager | Dager uten volum | Median omsetning | Over 32 MNOK | Over 25 MNOK | Plass av 210 |
+|---|---|---:|---:|---:|---:|---|---|---:|
+| GOLDR | GOLD ROAD INTL | 102 | 67 | 0 | 0,8 MNOK | Nei | Nei | 136 |
+| GRONG | Grong Sparebank | 103 | 67 | 0 | 0,0 MNOK | Nei | Nei | 195 |
+| GYL | Gyldendal | 105 | 67 | 16 | 0,0 MNOK | Nei | Nei | 209 |
+| HAV | HAV Group | 108 | 67 | 0 | 0,4 MNOK | Nei | Nei | 151 |
+
+Alle 4 har 67 handelsdager, fra 2026-07-02 til 2026-10-02. GYL har 16 dager
+med volum 0, og de dagene er tatt med i medianen med omsetning 0, som i §42.
+Ingen dag mangler volumfeltet. Den høyeste medianen av de 4 er 0,8 MNOK
+(GOLDR, plass 136), og 2 av dem har 0,0 MNOK avrundet. Ingen av de 4 er over
+25 MNOK. Med de 4 er 37 av de 210 over 32 MNOK, og 41 over 25 MNOK, som i
+§42 og §50.
+
+### Plassen blant 210
+
+Rangeringen i §50 skrives ikke på nytt. De 206 står i samme rekkefølge med de
+samme tallene; plassnummeret går opp med 1 for hver av de 4 som står foran.
+Der en av de 4 har samme avrundede median som en av de 206, er den
+uavrundede medianen for de 206 regnet på nytt fra de lokale råfilene, som i
+§42 og §50. Alle de 206 dette gjaldt, finnes i en lokal råfil med samme
+vindu, ingen av dem har samme uavrundede median som en av de 4, og
+rekkefølgen i §50 innenfor hver av de tre avrundede medianene er den samme
+som den uavrundede gir. Ingen av de 4 er blant de 15 eller i OBX.
+
+- **GOLDR**, 0,8 MNOK: foran JACK, den eneste andre på 0,8 MNOK. Plass 136,
+  og JACK går fra 136 til 137.
+- **HAV**, 0,4 MNOK: etter MAS, NOL og AZT og foran ALNG, AQUA og CAMBI, de
+  andre på 0,4 MNOK. Plass 151, etter de 149 første fra §50 og GOLDR.
+- **GRONG**, 0,0 MNOK: etter SNOR til CODE og foran EXTX, BIEN, GEM, AFISH,
+  AIX, ABS, AASB, ABTEC, ELOO, BALT, ENERG, ADS, PYRUM og BSP. Plass 195,
+  etter de 192 første fra §50, GOLDR og HAV.
+- **GYL**, 0,0 MNOK: etter PYRUM og foran BSP. Plass 209, og BSP står sist,
+  på plass 210.
 
 Målingen endrer ikke universet. Parametrene i signalet er låst og målt på de
 15 (AD-13).
