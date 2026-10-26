@@ -588,6 +588,20 @@ class TestSiden:
         html = _side(klient)
         assert '<details class="tallene" open>' in html
 
+    def test_tabellen_er_aapen_naar_kartet_virkelig_gir_opp(self, klient, monkeypatch):
+        """Gjennomgangen 26.10 (BH): uten å bytte ut kart() gir kartet opp når
+        ingen rute kan bli stor nok (MINSTE_RUTE 1000 px), app.py fanger ValueError, og
+        tabellen står alene og åpen. Ville feilet hvis den veien ga 500, et
+        kart med felt, eller en lukket tabell."""
+        monkeypatch.setattr(boersometer, "MINSTE_RUTE", 1000)
+        with pytest.raises(ValueError):
+            boersometer.kart(boersometer.bygg_boersometer(_ruter_med([1.0] * 15, [BRANSJER[i % 8] for i in range(15)])))
+        assert boersometer.kart([]).felt == ()
+        html = _side(klient)
+        assert '<section class="bransje"' not in html
+        assert '<details class="tallene" open>' in html
+        assert html.count('<a href="/aksje/') >= 15
+
     def test_hjelpen_sier_det_om_tabellen(self):
         """Regel 19: ville feilet hvis docs/hjelp.md ikke sa at tabellen står
         bak «Se tallene som tabell» og er lukket (svaret kl. 15:21, f)."""
