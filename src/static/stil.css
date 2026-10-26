@@ -601,6 +601,10 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
                                                   display: flex; align-items: center; gap: 4px; min-width: 0; overflow: hidden; white-space: nowrap;
                                                   font-size: 13px; line-height: 1; }
 :where(.side-oversikt) .kart section.bransje h2 .bransjesymbol { flex: none; width: 14px; height: 14px; }
+/* Gjennomgangen 26.10 (BH, ECH): navnet kuttes med «…» når feltet er smalt,
+   og snittet og antallet står helt så lenge det er plass. */
+:where(.side-oversikt) .kart section.bransje h2 .bransjenavn { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+:where(.side-oversikt) .kart section.bransje h2 .snitt, :where(.side-oversikt) .kart section.bransje h2 .antall { flex: none; }
 :where(.side-oversikt) .kart section.bransje h2 .snitt { font-family: "IBM Plex Sans", sans-serif; font-variant-numeric: tabular-nums; }
 :where(.side-oversikt) .kart section.bransje h2 .snitt.opp { color: var(--opp); }
 :where(.side-oversikt) .kart section.bransje h2 .snitt.ned { color: var(--ned); }

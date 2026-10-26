@@ -1455,6 +1455,15 @@ class TestKartet:
                     sett.add((n, ventet))
         assert len(sett) > 2, sett
 
+    def test_navnet_i_overskriften_kuttes_med_tre_prikker(self, klient):
+        """Gjennomgangen 26.10 (BH, ECH): spesifikasjonen sier at overskriften
+        kuttes med «…». Ville feilet uten text-overflow: ellipsis på navnet,
+        som er et eget element i en flex-boks."""
+        stil = (SRC / "static" / "stil.css").read_text(encoding="utf-8")
+        regel = re.search(r"\.kart section\.bransje h2 \.bransjenavn \{([^}]*)\}", stil).group(1)
+        assert "text-overflow: ellipsis" in regel and "overflow: hidden" in regel and "min-width: 0" in regel
+        assert _side(klient).count('<span class="bransjenavn">') == 8
+
     def test_det_som_ikke_faar_plass_leses_av_skjermleseren(self):
         """Teksten som ikke får plass, skjules bare for øyet. Ville feilet med
         display: none, som også skjuler den for skjermleseren."""
