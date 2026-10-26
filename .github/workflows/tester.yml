@@ -421,9 +421,28 @@ jobs:
       # kommandolinja fra en annen mappe og en med kommandolinja fra skriptene,
       # og sjekken av kommandolinja, på Windows og Mac. uv er installert av
       # «Start demoen» over, og demoen er stoppet, så porten er ledig.
+      # 3.5e: på Mac var porten fortsatt opptatt rett etter «Start demoen», og
+      # alle porttestene for start.sh ble hoppet over. Steget venter til porten
+      # er ledig, og feiler hvis en porttest likevel hoppes over av den grunnen.
       - name: Porten på Windows og Mac
         shell: bash
         timeout-minutes: 10
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          uv run pytest -q -p no:cacheprovider -rs tests/test_dobbeltklikk.py -k "porten or sjekken"
+          uv run python -c "import socket, sys, time
+          for i in range(120):
+              s = socket.socket()
+              if sys.platform == 'win32':
+                  s.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+              try:
+                  s.bind(('0.0.0.0', 8000))
+                  print(f'Porten 8000 er ledig etter {i} s')
+                  break
+              except OSError:
+                  time.sleep(1)
+              finally:
+                  s.close()
+          else:
+              sys.exit('Porten 8000 ble ikke ledig etter 120 s')"
+          uv run pytest -q -p no:cacheprovider -rs tests/test_dobbeltklikk.py -k "porten or sjekken" | tee "$RUNNER_TEMP/porten.log"
+          if grep -q "port 8000 er i bruk" "$RUNNER_TEMP/porten.log"; then echo "En porttest ble hoppet over fordi port 8000 var i bruk"; exit 1; fi

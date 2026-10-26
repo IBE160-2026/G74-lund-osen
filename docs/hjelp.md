@@ -229,11 +229,11 @@ Første gang kan macOS stoppe `Start demoen.command` eller `Start den ekte versj
 
 ### Vinduet sier at den andre versjonen av OSE Signal stoppes.
 
-Demoen eller den ekte versjonen kjørte allerede fra denne mappa, på samme port, fra et annet dobbeltklikk eller startet med `uv run waitress-serve`. Skriptet stopper den, venter til porten er ledig, og starter den du dobbeltklikket. Det andre vinduet sier da at appen stoppet, og at det kan lukkes fordi den andre versjonen kjører.
+Demoen eller den ekte versjonen kjørte allerede fra denne mappa, på samme port, fra et annet dobbeltklikk eller startet med `uv run waitress-serve`. Skriptet sier fra med en gang, men stopper den først rett før appen starter, så den kjører videre hvis skriptet stopper før det, for eksempel fordi `uv sync` feiler. Feiler hentingen, starter appen likevel med det som er hentet før, og da stoppes den andre versjonen. Så venter skriptet til porten er ledig, og starter den du dobbeltklikket. Det andre vinduet sier da at appen stoppet, og at det kan lukkes fordi den andre versjonen kjører.
 
 ### Vinduet sier at et annet program svarer på 127.0.0.1:8000.
 
-Skriptet stopper aldri andre programmer, heller ikke OSE Signal fra en annen mappe, og vinduet sier hvilket program det er. Er det demoen eller appen i Docker, stopper du den med `docker compose --profile demo down` i et terminalvindu i mappa med koden. Den stopper både demoen og den ekte versjonen. Er det et annet program, lukker du det. Dobbeltklikk så på nytt.
+Skriptet stopper aldri andre programmer, heller ikke OSE Signal fra en annen mappe, og vinduet sier hvilket program det er. Det sjekkes før uv, og igjen rett før appen starter, i tilfelle et annet program har tatt porten i mellomtiden. Er det demoen eller appen i Docker, stopper du den med `docker compose --profile demo down` i et terminalvindu i mappa med koden. Den stopper både demoen og den ekte versjonen. Er det et annet program, lukker du det. Dobbeltklikk så på nytt.
 
 ### Hvor finner jeg nøkkelen, og hvordan limer jeg den inn?
 
