@@ -169,7 +169,9 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "trinn, som «Hva fargene betyr» under rutene viser. "
             # Story 8.6b, d: arealet i kartet.
             "Arealet av ruta følger volumet mot vanlig, men ruta blir ikke større over 3 ganger vanlig volum eller "
-            "mindre under halvparten, og tabellen under har tallet. "
+            "mindre under halvparten, og tabellen under har tallet; "
+            # Gruppens svar 26.10 kl. 13:00 (a): Tab følger kartet.
+            "med Tab går du fra det største feltet og den største ruta, slik kartet legger dem. "
             "Rammen er gul ved 3 av 3 på siste børsdag, også når du velger en annen dag, og "
             "mørk ved 2 av 3 bare på siste børsdag; overskriften har "
             "snittet av endringen for aksjene i bransjen som har kurs, og «1 aksje» der det er én, "
@@ -178,6 +180,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             (
                 (PRD, "#### FR-106 — Børsometeret"),
                 (BOERSOMETER, "def vekt("),
+                (BOERSOMETER, "def rekkefoelge("),
                 (BOERSOMETER, "MINSTE_VEKT = 0.5"),
                 (BOERSOMETER, "STOERSTE_VEKT = 3.0"),
                 (BOERSOMETER, "def snitt("),

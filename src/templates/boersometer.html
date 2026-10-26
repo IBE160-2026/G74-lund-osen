@@ -50,8 +50,9 @@
     {#- Story 8.6b, d: rutene som et fylt kart i to nivåer, regnet i
         boersometer.kart: bransjene som felt etter summen av vektene, og
         aksjene inne i feltet, med plassen i prosent for den brede og den
-        smale flaten. Bransjene står i rekkefølgen i designregler §4, så
-        skjermleseren og tastaturet går gjennom dem i den rekkefølgen. #}
+        smale flaten. Gruppens svar 26.10 kl. 13:00 (a): bransjene og rutene
+        står i den rekkefølgen kartet legger dem, den største først, så Tab
+        følger kartet. Tabellen under har rekkefølgen i designregler §4. #}
     <div class="kart" style="{% for navn, forhold in kart.forhold.items() %}--forhold-{{ navn }}: {{ '%.4f'|format(1 / forhold) }};{% if not loop.last %} {% endif %}{% endfor %}">
     {%- for felt in kart.felt %}
       {%- set bransje = felt.bransje %}

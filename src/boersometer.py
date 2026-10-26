@@ -23,6 +23,10 @@ og hovedindeksen står som et tall i linja «Mål mot børsen», med endringen
 for dagen som vises. Rutene er et fylt kart i to nivåer, som på tavla:
 bransjene som felt etter summen av vektene, og aksjene inne i feltet,
 squarified og i prosent (kart og squarify nederst).
+
+Gruppens svar 26.10 kl. 13:00 (a): i kartet står bransjene og rutene i den
+rekkefølgen squarify legger dem, den største først, så Tab følger kartet.
+Tabellen under beholder rekkefølgen i designregler §4 (bygg_boersometer).
 """
 
 from dataclasses import dataclass
@@ -349,8 +353,9 @@ class Kartfelt:
 
 @dataclass(frozen=True)
 class Kart:
-    """Feltene i rekkefølgen i designregler §4, og høyden mot bredden per
-    flate."""
+    """Feltene, og rutene i hvert felt, i den rekkefølgen squarify legger
+    dem (rekkefoelge), og høyden mot bredden per flate. Rekkefølgen er den
+    samme på begge flatene, fordi den bare avhenger av vektene."""
 
     felt: tuple[Kartfelt, ...]
     forhold: dict[str, float]
@@ -368,6 +373,12 @@ def _verste(arealer: list[float], side: float) -> float:
     return max(max(side * side * a / (sum_ * sum_), sum_ * sum_ / (side * side * a)) for a in arealer)
 
 
+def rekkefoelge(vekter: list[float]) -> list[int]:
+    """Indeksene i den rekkefølgen squarify legger dem: den største først,
+    og ved lik vekt i rekkefølgen de kom (gruppens svar 26.10 kl. 13:00, a)."""
+    return sorted(range(len(vekter)), key=lambda i: -vekter[i])
+
+
 def squarify(
     vekter: list[float], x: float, y: float, b: float, h: float, minst: float = 0.0
 ) -> list[tuple[float, float, float, float]]:
@@ -383,8 +394,7 @@ def squarify(
     if not vekter:
         return []
     totalt = sum(vekter)
-    rekkefoelge = sorted(range(len(vekter)), key=lambda i: -vekter[i])
-    rest = [(i, vekter[i] / totalt * b * h) for i in rekkefoelge]
+    rest = [(i, vekter[i] / totalt * b * h) for i in rekkefoelge(vekter)]
     ut: list[tuple[float, float, float, float]] = [(0.0, 0.0, 0.0, 0.0)] * len(vekter)
     while rest:
         side = min(b, h)
@@ -497,16 +507,17 @@ def kart(bransjer: list[Bransje], flatene: tuple[Flate, ...] = FLATENE) -> Kart:
                     (rx - fx) / fb * 100, (ry - start) / kropp * 100, rb / fb * 100, rh / kropp * 100
                 )
                 nivaa[i][flate.navn] = _nivaa_paa_minste(flate, rb, rh, bransje.ruter[i].aksje.symbol)
+        kartruter = [
+            Kartrute(rute=r, vekt=vekt(r), plass=ruteplass[i], nivaa=nivaa[i]) for i, r in enumerate(bransje.ruter)
+        ]
         felt.append(
             Kartfelt(
                 bransje=bransje,
                 vekt=sum(vekt(r) for r in bransje.ruter),
                 plass=plass,
                 topp=topp,
-                ruter=tuple(
-                    Kartrute(rute=r, vekt=vekt(r), plass=ruteplass[i], nivaa=nivaa[i])
-                    for i, r in enumerate(bransje.ruter)
-                ),
+                ruter=tuple(kartruter[i] for i in rekkefoelge([kr.vekt for kr in kartruter])),
             )
         )
-    return Kart(felt=tuple(felt), forhold=forhold)
+    # Gruppens svar 26.10 kl. 13:00 (a): HTML-en følger kartet, så Tab gjør det.
+    return Kart(felt=tuple(felt[i] for i in rekkefoelge([f.vekt for f in felt])), forhold=forhold)

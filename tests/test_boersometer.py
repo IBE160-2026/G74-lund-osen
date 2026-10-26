@@ -46,6 +46,7 @@ from boersometer import (
     indeks_for_dagen,
     kart,
     ramme,
+    rekkefoelge,
     snitt,
     squarify,
     stoerrelse,
@@ -315,7 +316,10 @@ class TestSiden:
         """Energi har fire aksjer i demoen. Ville feilet med snittet av bare
         én av dem (mutant 1)."""
         html = _side(klient)
-        energi = re.search(r'<section class="bransje".*?</section>', html, re.S).group(0)
+        # Gruppens svar 26.10 kl. 13:00 (a): kartet står ikke lenger i §4-rekkefølgen.
+        energi = re.search(
+            r'<section class="bransje"(?:(?!</section>).)*?Energi</span>.*?</section>', html, re.S
+        ).group(0)
         endringer = [
             float(e.replace(",", ".").replace(" %", ""))
             for e in re.findall(r'<span class="endring">([^<]+)</span>', energi)
@@ -1281,6 +1285,60 @@ class TestKartet:
         k = kart(bygg_boersometer(ruter))
         symboler = [kr.rute.aksje.symbol for f in k.felt for kr in f.ruter]
         assert sorted(symboler) == sorted(r.aksje.symbol for r in ruter)
+
+    def test_tab_foelger_rekkefoelgen_kartet_legges_i(self):
+        """Gruppens svar 26.10 kl. 13:00 (a), gjennomgangen BH2: feltene og
+        rutene står i den rekkefølgen squarify legger dem, på begge flatene.
+        Ville feilet hvis kartet sto i rekkefølgen i designregler §4, eller
+        rutene i et felt i lista sin rekkefølge."""
+        rng = random.Random(3)
+        for _ in range(40):
+            forhold = [rng.lognormvariate(0, 0.8) for _ in range(15)]
+            bransjer = bygg_boersometer(_ruter_med(forhold, [BRANSJER[i % 8] for i in range(15)]))
+            k = kart(bransjer)
+            vekter = [sum(vekt(r) for r in b.ruter) for b in bransjer]
+            assert [f.bransje.navn for f in k.felt] == [bransjer[i].navn for i in rekkefoelge(vekter)]
+            for f in k.felt:
+                assert [kr.vekt for kr in f.ruter] == sorted((kr.vekt for kr in f.ruter), reverse=True)
+            for navn in ("bred", "smal"):
+                # Den første squarify legger, står øverst til venstre, i kartet og i feltet.
+                assert (k.felt[0].plass[navn].x, k.felt[0].plass[navn].y) == (0, 0)
+                for f in k.felt:
+                    assert (f.ruter[0].plass[navn].x, f.ruter[0].plass[navn].y) == pytest.approx((0, 0), abs=1e-9)
+
+    def test_tab_paa_siden_foelger_kartet_og_tabellen_designreglene(self, klient):
+        """Gruppens svar 26.10 kl. 13:00 (a): i HTML-en kommer det største
+        feltet og den største ruta først, og tabellen under har rekkefølgen
+        i designregler §4. Ville feilet hvis malen skrev kartet i
+        §4-rekkefølgen, eller tabellen fulgte kartet."""
+        for adresse in ("/boersometer", "/boersometer?dag=2026-10-08"):
+            html = _side(klient, adresse)
+            kartet = _kartet(html)
+            for navn in ("bred", "smal"):
+                arealer = [f["plass"][navn][2] * f["plass"][navn][3] for f in kartet["felt"]]
+                assert all(a >= b * 0.999 for a, b in zip(arealer, arealer[1:], strict=False)), (adresse, navn, arealer)
+                assert kartet["felt"][0]["plass"][navn][:2] == (0, 0)
+                for f in kartet["felt"]:
+                    ruter = [p[navn][2] * p[navn][3] for p in f["ruter"].values()]
+                    assert all(a >= b * 0.999 for a, b in zip(ruter, ruter[1:], strict=False)), (adresse, navn, ruter)
+            i_kartet = list(_overskrifter(html))
+            tabell = html.split('<table class="boersometertabell">', 1)[1]
+            i_tabellen = list(dict.fromkeys(re.findall(r"<tr>\s*<td>([A-ZÆØÅa-zæøå]+)", tabell)))
+            assert sorted(i_kartet) == sorted(i_tabellen)
+            assert i_tabellen == sorted(i_tabellen, key=BRANSJER.index)
+            assert i_kartet != i_tabellen, "demoen skal vise at kartet ikke følger §4"
+
+    def test_hjelpen_sier_rekkefoelgen(self):
+        """Regel 19: ville feilet hvis hjelpen ved «?» eller docs/hjelp.md
+        ikke sa at Tab følger kartet (gruppens svar 26.10 kl. 13:00, a)."""
+        from hjelpetekster import hjelpetekster
+
+        tekst = hjelpetekster(STANDARD)["boersometeret"].tekst
+        assert "med Tab går du fra det største feltet og den største ruta, slik kartet legger dem." in tekst
+        hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
+        avsnitt = hjelp.split("### Hva viser børsometeret?", 1)[1].split("###", 1)[0]
+        assert "Med Tab går du gjennom kartet fra det største feltet" in avsnitt
+        assert "tabellen har bransjene i fast rekkefølge" in avsnitt
 
     def test_ingen_plass_er_negativ(self):
         """Gjennomgangen 26.10 (ECH): ville feilet med y = -2,6e-14 for den
