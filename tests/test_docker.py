@@ -1014,7 +1014,9 @@ HOEYDE_PAA_BILDET = 1630
 # Story 8.6b, svaret 26.10 kl. 13:00 (b): overskriften i feltet i stil.css og
 # hjelpen i hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det
 # samme.
-AVTRYKK_BAK_BILDET = "1c937c0bc4970d38b03037a99e9a3f3e47c7c397b85b8890f19d43633c5cf10c"
+# Story 8.6b, svarene 26.10 kl. 13:00 (c) og 13:07 (e): tekstnivået i stil.css.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "01b4d8800f4aaf6d9c508f57fb4d1eff0d9ce2a43f8ee646456707d9a9d6a917"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1194,7 +1196,9 @@ HOEYDE_PAA_AKSJESIDEN = 1894
 # Story 8.6b, svaret 26.10 kl. 13:00 (b): overskriften i feltet i stil.css og
 # hjelpen i hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det
 # samme.
-AVTRYKK_BAK_AKSJESIDEN = "b535354973b13102c087af078092f8146c0b40982b44706141cc2b4f974e68d8"
+# Story 8.6b, svarene 26.10 kl. 13:00 (c) og 13:07 (e): tekstnivået i stil.css.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "9094b4ff137ef8d561486c0aacdf120ce91ab873cb7226b9db0baf532f26564c"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "

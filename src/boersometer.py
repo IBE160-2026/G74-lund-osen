@@ -305,24 +305,28 @@ MEST_VEKST = 600
 @dataclass(frozen=True)
 class Flate:
     """Et oppsett av kartet. Kartet regnes ved bredde i px; forhold er høyden
-    mot bredden ved start, og minste er den minste bredden flaten brukes på,
-    der tekstnivået regnes."""
+    mot bredden ved start, og minste er den minste bredden flaten brukes på.
+    tekst er klassen og bredden tekstnivået regnes ved, for hvert spenn av
+    vinduer flaten brukes på (gruppens svar 26.10 kl. 13:00, c, og 13:07, e)."""
 
     navn: str
     bredde: float
     forhold: float
     minste: float
+    tekst: tuple[tuple[str, float], ...]
 
 
 # Bred for vinduer bredere enn 760 px (innholdet minst 729 px, og 712 px med
 # et rullefelt på 17 px, gjennomgangen 26.10, ECH), og smal for
 # 760 px og smalere, regnet ved 390 px (innholdet 358 px), som instruksjonen
 # sier. Stilen velger med @media, og hver rute har plassen i begge.
-# Tekstnivået regnes ved den minste bredden, for den synlige ruta innenfor
-# KANT: 712 px og 288 px, et vindu 320 px bredt (gjennomgangen 26.10, VG,
-# ECH og BH).
-BRED = Flate("bred", 712, 0.5, 712)
-SMAL = Flate("smal", 358, 1.2, 288)
+# Tekstnivået regnes for den synlige ruta innenfor KANT (gjennomgangen 26.10,
+# VG, ECH og BH), ved den minste bredden i hvert spenn av vinduer, med 16 px
+# på hver side: 1008 px fra 1080 px, full bredde (svaret kl. 13:07, e), 712 px
+# fra 761 px, 328 px fra 360 px (svaret kl. 13:00, c), og 288 px under det,
+# et vindu 320 px bredt. Stilen velger klassen med @media.
+BRED = Flate("bred", 712, 0.5, 712, (("bred", 712), ("bredest", 1008)))
+SMAL = Flate("smal", 358, 1.2, 288, (("smal", 328), ("smalest", 288)))
 FLATENE = (BRED, SMAL)
 
 
@@ -338,9 +342,9 @@ class Plass:
 
 @dataclass(frozen=True)
 class Kartrute:
-    """En rute i kartet: plassen i prosent av feltet under overskriften, og
-    hvor mye tekst som står synlig, per flate (0 ingen, 1 symbolet, 2 også
-    endringen, 3 også merket og grunnen)."""
+    """En rute i kartet: plassen i prosent av feltet under overskriften per
+    flate, og hvor mye tekst som står synlig per klasse i Flate.tekst (0
+    ingen, 1 symbolet, 2 også endringen, 3 også merket og grunnen)."""
 
     rute: Rute
     vekt: float
@@ -441,10 +445,10 @@ def squarify(
     return ut
 
 
-def _nivaa_paa_minste(flate: Flate, rb: float, rh: float, symbol: str) -> int:
+def _nivaa_ved(flate: Flate, bredde: float, rb: float, rh: float, symbol: str) -> int:
     """Tekstnivået for plassen rb × rh ved flate.bredde, regnet for den
-    synlige ruta ved flate.minste."""
-    skala = flate.minste / flate.bredde
+    synlige ruta når kartet er bredde px bredt."""
+    skala = bredde / flate.bredde
     return tekstnivaa(rb * skala - 2 * KANT, rh * skala - 2 * KANT, symbol)
 
 
@@ -517,7 +521,8 @@ def kart(bransjer: list[Bransje], flatene: tuple[Flate, ...] = FLATENE) -> Kart:
                 ruteplass[i][flate.navn] = Plass(
                     (rx - fx) / fb * 100, (ry - start) / kropp * 100, rb / fb * 100, rh / kropp * 100
                 )
-                nivaa[i][flate.navn] = _nivaa_paa_minste(flate, rb, rh, bransje.ruter[i].aksje.symbol)
+                for klasse, bredde in flate.tekst:
+                    nivaa[i][klasse] = _nivaa_ved(flate, bredde, rb, rh, bransje.ruter[i].aksje.symbol)
         kartruter = [
             Kartrute(rute=r, vekt=vekt(r), plass=ruteplass[i], nivaa=nivaa[i]) for i, r in enumerate(bransje.ruter)
         ]

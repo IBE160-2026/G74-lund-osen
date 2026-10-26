@@ -1494,16 +1494,17 @@ class TestKartet:
         ruter = _ruter_med([0.6, 2.4, 1.0, 0.7, 0.8, 1.9, 0.5, 3.0, 1.1, 1.4, 0.9, 2.2, 0.55, 1.3, 2.7])
         k = kart(bygg_boersometer(ruter))
         assert (BRED.minste, SMAL.minste) == (761 - 17 - 2 * 16, 320 - 2 * 16)
+        # Gruppens svar 26.10 kl. 13:00 (c) og 13:07 (e): en klasse per spenn.
         for flate in (BRED, SMAL):
-            bredde = flate.minste
-            hoeyde = bredde * k.forhold[flate.navn]
-            for f in k.felt:
-                fb, fh = f.plass[flate.navn].b / 100 * bredde, f.plass[flate.navn].h / 100 * hoeyde
-                kropp = fh * (1 - f.topp[flate.navn] / 100)
-                for kr in f.ruter:
-                    rb, rh = kr.plass[flate.navn].b / 100 * fb, kr.plass[flate.navn].h / 100 * kropp
-                    ventet = tekstnivaa(rb - 2 * KANT, rh - 2 * KANT, kr.rute.aksje.symbol)
-                    assert kr.nivaa[flate.navn] == ventet, (flate.navn, kr.rute.aksje.symbol, rb, rh)
+            for klasse, bredde in flate.tekst:
+                hoeyde = bredde * k.forhold[flate.navn]
+                for f in k.felt:
+                    fb, fh = f.plass[flate.navn].b / 100 * bredde, f.plass[flate.navn].h / 100 * hoeyde
+                    kropp = fh * (1 - f.topp[flate.navn] / 100)
+                    for kr in f.ruter:
+                        rb, rh = kr.plass[flate.navn].b / 100 * fb, kr.plass[flate.navn].h / 100 * kropp
+                        ventet = tekstnivaa(rb - 2 * KANT, rh - 2 * KANT, kr.rute.aksje.symbol)
+                        assert kr.nivaa[klasse] == ventet, (klasse, kr.rute.aksje.symbol, rb, rh)
 
     def test_tekstnivaaet_paa_siden_er_det_kartet_regnet(self, klient):
         """Gjennomgangen 26.10 (VG): ville feilet hvis malen sluttet å skrive
@@ -1521,17 +1522,54 @@ class TestKartet:
         sett = set()
         for flate in (BRED, SMAL):
             n = flate.navn
-            bredde = flate.minste
-            hoeyde = bredde / kartet["forhold"][n]
-            for f in kartet["felt"]:
-                fb, fh = f["plass"][n][2] / 100 * bredde, f["plass"][n][3] / 100 * hoeyde
-                kropp = fh * (1 - f["topp"][n] / 100)
-                for symbol, p in f["ruter"].items():
-                    rb, rh = p[n][2] / 100 * fb, p[n][3] / 100 * kropp
-                    ventet = tekstnivaa(rb - 2 * KANT, rh - 2 * KANT, symbol)
-                    assert re.findall(rf"\bnivaa-{n}-(\d)\b", klasser[symbol]) == [str(ventet)], (n, symbol, rb, rh)
-                    sett.add((n, ventet))
-        assert len(sett) > 2, sett
+            for klasse, bredde in flate.tekst:
+                hoeyde = bredde / kartet["forhold"][n]
+                for f in kartet["felt"]:
+                    fb, fh = f["plass"][n][2] / 100 * bredde, f["plass"][n][3] / 100 * hoeyde
+                    kropp = fh * (1 - f["topp"][n] / 100)
+                    for symbol, p in f["ruter"].items():
+                        rb, rh = p[n][2] / 100 * fb, p[n][3] / 100 * kropp
+                        ventet = tekstnivaa(rb - 2 * KANT, rh - 2 * KANT, symbol)
+                        funnet = re.findall(rf"\bnivaa-{klasse}-(\d)\b", klasser[symbol])
+                        assert funnet == [str(ventet)], (klasse, symbol, rb, rh)
+                        sett.add((klasse, ventet))
+        assert len(sett) > 4, sett
+
+    def test_tekstnivaaet_fra_360_og_1080_px(self, klient):
+        """Gruppens svar 26.10 kl. 13:00 (c) og 13:07 (e): fra 1080 px regnes
+        teksten ved 1008 px, full bredde, mellom 761 og 1080 px ved 712 px,
+        fra 360 px ved 328 px og under 360 px ved 288 px, og stilen velger
+        klassen med @media. Ville feilet hvis teksten fortsatt ble regnet ved
+        712 px fra 1080 px eller ved 288 px fra 360 px, eller hvis @media
+        brukte en annen grense eller en annen klasse."""
+        side = 16
+        stil = (SRC / "static" / "stil.css").read_text(encoding="utf-8")
+        # main er høyst 65rem, 1040 px, med 16 px på hver side.
+        assert re.search(r"max-width: 65rem", stil)
+        assert dict(BRED.tekst) == {"bred": 761 - 17 - 2 * side, "bredest": 65 * 16 - 2 * side}
+        assert dict(SMAL.tekst) == {"smal": 360 - 2 * side, "smalest": 320 - 2 * side}
+        for media, klasse in (
+            ("(min-width: 1080px)", "bredest"),
+            ("(min-width: 761px) and (max-width: 1079px)", "bred"),
+            ("(min-width: 360px) and (max-width: 760px)", "smal"),
+            ("(max-width: 359px)", "smalest"),
+        ):
+            blokk = stil.split(f"@media {media} {{", 1)[1].split("\n}", 1)[0]
+            assert set(re.findall(r"nivaa-([a-z]+)-\d", blokk)) == {klasse}, media
+        # I demoen viser noen ruter mer ved 1008 og 328 px enn ved 712 og 288 px.
+        klasser = re.findall(r'<a class="rute ([^"]*)"', _side(klient))
+        nivaa = [{k: int(v) for k, v in re.findall(r"nivaa-([a-z]+)-(\d)", kl)} for kl in klasser]
+        assert len(nivaa) == 15 and all(len(n) == 4 for n in nivaa)
+        assert all(n["bredest"] >= n["bred"] and n["smal"] >= n["smalest"] for n in nivaa)
+        assert any(n["bredest"] > n["bred"] for n in nivaa) and any(n["smal"] > n["smalest"] for n in nivaa)
+
+    def test_hjelpen_sier_det_om_teksten_i_rutene(self):
+        """Regel 19: ville feilet hvis docs/hjelp.md ikke sa at et bredt
+        vindu gir tekst på flere ruter (gruppens svar 26.10 kl. 13:00, c, og
+        13:07, e)."""
+        hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
+        avsnitt = hjelp.split("### Hva viser børsometeret?", 1)[1].split("###", 1)[0]
+        assert "i et bredt vindu får flere ruter plass til teksten" in avsnitt
 
     def test_navnet_i_overskriften_kuttes_med_tre_prikker(self, klient):
         """Gjennomgangen 26.10 (BH, ECH): spesifikasjonen sier at overskriften
@@ -1627,7 +1665,7 @@ class TestKartet:
         """Teksten som ikke får plass, skjules bare for øyet. Ville feilet med
         display: none, som også skjuler den for skjermleseren."""
         stil = (SRC / "static" / "stil.css").read_text(encoding="utf-8")
-        for flate in ("bred", "smal"):
+        for flate in ("bredest", "bred", "smal", "smalest"):
             regel = re.search(rf"\.rute\.nivaa-{flate}-2 > \.tekst \{{([^}}]*)\}}", stil).group(1)
             assert "clip: rect(0 0 0 0)" in regel and "display: none" not in regel
         assert "@media (max-width: 760px)" in stil
