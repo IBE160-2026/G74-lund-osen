@@ -2157,6 +2157,11 @@ hjelpelæreren (`docs/innlevering.md`, «Svaret, 2026-10-05»):*
   egne nøkler gjelder 10.7. Punktet om at README-en endres når det den sier,
   stemmer, står
 
+*Rettet 2026-10-26, etter gruppens svar 25.10 kl. 11:32 under story 3.5:*
+Docker er ikke lenger hovedmåten i README-en. Dobbeltklikket (3.5a) er den
+anbefalte hovedveien i «Kom i gang», Docker den andre og uv i terminalen den
+tredje. Dockerfilen og `compose.yaml` leveres som før. Bygges i 3.5f.
+
 **Avhenger av:** 3.1. **Én økt:** ja.
 
 *Ferdig 2026-10-10:* flettet i `5816bc2`, PR #25.

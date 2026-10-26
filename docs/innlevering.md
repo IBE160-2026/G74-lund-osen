@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-10-25T23:55
+updated: 2026-10-26T13:00
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -432,6 +432,12 @@ ikke av seg selv, og blir et eget valg i story 10.2. 3.1 til 3.4 bygges uten
 KI-tekster rett etter 2.3, og KI-tekstene i demoen blir story 3.4b. Hentingen
 fortsetter hver børsdag. Ført i `prd.md` under FR-411, i `epics.md` og i spinen
 (AD-9).
+
+*Rettet 2026-10-26, etter gruppens svar 25.10 kl. 11:32 (under story 3.5 i
+`epics.md`):* Docker er ikke lenger hovedmåten i README-en. Dobbeltklikket uten
+Docker (3.5a) er den anbefalte hovedveien i «Kom i gang», Docker den andre og uv
+i terminalen den tredje. Dockerfilen og `compose.yaml` leveres som før.
+Bygges i 3.5f.
 
 ---
 
