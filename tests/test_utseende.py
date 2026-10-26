@@ -805,7 +805,8 @@ FARGENAVN = re.compile(
 def _reglene(css: str) -> list[tuple[str, str, str]]:
     """(@media, velger, kropp) for hver regel i stilarket, med blanktegnene
     slått sammen og uten kommentarene. @font-face er en regel med navnet som
-    velger."""
+    velger. Story 8.6b: en @container inne i en @media gir rammen
+    «@media … @container …»."""
     css = re.sub(r"/\*.*?\*/", "", css, flags=re.DOTALL)
     ut = []
 
@@ -814,12 +815,12 @@ def _reglene(css: str) -> list[tuple[str, str, str]]:
         while m := re.match(r"\s*([^{}]+)\{", tekst[i:]):
             velger = " ".join(m.group(1).split())
             j = i + m.end()
-            if velger.startswith("@media"):
+            if velger.startswith(("@media", "@container")):
                 dybde, k = 1, j
                 while dybde:
                     dybde += {"{": 1, "}": -1}.get(tekst[k], 0)
                     k += 1
-                gaa(tekst[j : k - 1], velger)
+                gaa(tekst[j : k - 1], f"{ramme} {velger}".strip())
                 i = k
                 continue
             k = tekst.index("}", j)

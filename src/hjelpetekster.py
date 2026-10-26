@@ -164,15 +164,31 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # Story 8.6 (FR-106, avgjørelsen 22.10 kl. 23:19): børsometeret.
         "boersometeret": Hjelpetekst(
             "Børsometer:",
-            "én rute per aksje, ordnet etter bransje, med endringen fra børsdagen før som farge. "
-            f"Ruta er større når volumet var mer enn {faktor} ganger vanlig, mindre når det var under "
-            "vanlig, og rammen er gul ved 3 av 3 på siste børsdag, også når du velger en annen dag, og "
-            "mørk ved 2 av 3 bare på siste børsdag. Overskriften har "
-            "snittet av endringen for aksjene i bransjen som har kurs, og «1 aksje» der det er én.",
+            # Story 8.6b, c: fem trinn.
+            "én rute per aksje, ordnet etter bransje, med endringen fra børsdagen før som farge i fem "
+            "trinn, som «Hva fargene betyr» under rutene viser. "
+            # Story 8.6b, d: arealet i kartet.
+            "Arealet av ruta følger volumet mot vanlig, men ruta blir ikke større over 3 ganger vanlig volum eller "
+            # Gruppens svar 26.10 kl. 15:21 (f): tabellen bak «Se tallene som tabell».
+            "mindre under halvparten, og tabellen bak «Se tallene som tabell» har tallet; "
+            # Gruppens svar 26.10 kl. 13:00 (a): Tab følger kartet.
+            "med Tab går du fra det største feltet og den største ruta, slik kartet legger dem. "
+            "Rammen er gul ved 3 av 3 på siste børsdag, også når du velger en annen dag, og "
+            "mørk ved 2 av 3 bare på siste børsdag; overskriften har "
+            "snittet av endringen for aksjene i bransjen som har kurs, og «1 aksje» der det er én, "
+            # Gruppens svar 26.10 kl. 13:00 (b): bare navnet når feltet er smalt.
+            "eller bare navnet når feltet er smalt, "
+            # Story 8.6b, b: linja «Mål mot børsen».
+            "og linja «Mål mot børsen» har endringen i hovedindeksen den dagen.",
             (
                 (PRD, "#### FR-106 — Børsometeret"),
-                (BOERSOMETER, "def stoerrelse("),
+                (BOERSOMETER, "def vekt("),
+                (BOERSOMETER, "def rekkefoelge("),
+                (BOERSOMETER, "MINSTE_VEKT = 0.5"),
+                (BOERSOMETER, "STOERSTE_VEKT = 3.0"),
                 (BOERSOMETER, "def snitt("),
+                (BOERSOMETER, "def indeks_for_dagen("),
+                (BOERSOMETER, "def fargetrinn("),
             ),
         ),
         # Story 2.9 (FR-104): delen over tabellen.

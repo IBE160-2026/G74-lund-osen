@@ -9,6 +9,8 @@
     rute bærer det fargen, størrelsen og rammen sier, og tabellen under har de
     samme tallene. Ingen råd (NFR-06). #}
 {% macro fortegn(verdi) %}{% if verdi is none %}null{% else %}{% set vist = verdi|avrundet('endring') %}{{ 'opp' if vist > 0 else 'ned' if vist < 0 else 'null' }}{% endif %}{% endmacro %}
+{#- Story 8.6b, d: plassen i prosent per flate, som egenskaper stilen leser. #}
+{% macro plass_stil(plass) %}{% for navn, p in plass.items() %}--x-{{ navn }}: {{ '%.3f'|format(p.x) }}%; --y-{{ navn }}: {{ '%.3f'|format(p.y) }}%; --b-{{ navn }}: {{ '%.3f'|format(p.b) }}%; --h-{{ navn }}: {{ '%.3f'|format(p.h) }}%;{% if not loop.last %} {% endif %}{% endfor %}{% endmacro %}
 {% macro antall_ord(antall, en, flere) %}{{ antall }} {{ en if antall == 1 else flere }}{% endmacro %}
 {#- Gjennomgangen (BH4, ECH2): en annen dag følger med til aksjesiden. #}
 {% macro aksjeadresse(symbol) %}/aksje/{{ symbol }}{% if dagen != siste %}?dag={{ dagen.isoformat() }}{% endif %}{% endmacro %}
@@ -20,6 +22,8 @@
   <h1 class="overskrift">Børsometer {{ hjelpeknapp("hjelp-boersometer", "Hjelp: børsometeret") }}</h1>
   {% if bransjer %}
     <p class="meta">{{ "Demo Børs" if eksempeltall else "Oslo Børs" }} · {{ dagen|ukedag }} {{ dagen|dato }} · {{ antall_ord(antall_aksjer, "aksje", "aksjer") }} i {{ antall_ord(bransjer|length, "bransje", "bransjer") }}</p>
+    {#- Story 8.6b, a (avgjørelsen 24.10 kl. 11:54): forklaringen øverst, som på tavla. #}
+    <p class="innledning">Hver rute er en aksje, samlet etter bransje. Fargen viser endringen fra børsdagen før, og jo større ruta er, jo mer ble aksjen omsatt sammenlignet med vanlig. Klikk på en rute for å se aksjen. Bildet viser hva som skjedde, ikke hva du bør kjøpe eller selge.</p>
     <form class="velg-dag-boersometer" method="get" action="/boersometer">
       <label for="dag">Velg dag</label>
       <input type="date" id="dag" name="dag" min="{{ foerste.isoformat() }}" max="{{ siste.isoformat() }}" value="{{ dagen.isoformat() }}" required>
@@ -29,20 +33,43 @@
     {% if ugyldig %}<p class="forklaring">Datoen kunne ikke leses, så siden viser siste børsdag.</p>{% endif %}
     {% if foer_foerste %}<p class="forklaring">{{ valgt|dato }} er før første kurs, så siden viser første børsdag med kurs, {{ dagen|dato }}.</p>
     {% elif valgt and valgt != dagen %}<p class="forklaring">{{ valgt|dato }} har ingen kurs, så siden viser børsdagen før, {{ dagen|dato }}.</p>{% endif %}
-    {% if dagen != siste %}<p class="forklaring">Gul ramme betyr 3 av 3 på siste børsdag, {{ siste|dato }}. Hovedindeksen og søylene gjelder også den dagen.</p>{% endif %}
+    {% if dagen != siste %}<p class="forklaring">Gul ramme betyr 3 av 3 på siste børsdag, {{ siste|dato }}.</p>{% endif %}
 
-    {% include "_hovedindeks.html" %}
+    {#- Story 8.6b, b (avgjørelsen 24.10 kl. 11:54): søylene står bare på
+        oversikten, og hovedindeksen står som et tall for dagen som vises,
+        med fortegn og farge etter tallet slik det vises, eller «–». #}
+    <section class="maal" aria-labelledby="maal-tittel">
+      <h2 id="maal-tittel">Mål mot børsen</h2>
+      <ul>
+        <li>Farge · endring fra {{ dagen_foer }}</li>
+        <li>Størrelse · volum mot medianen for de {{ volum_vindu }} børsdagene før</li>
+        <li>Hovedindeksen · {% if indeksendring is not none %}<span class="indeksendring {{ fortegn(indeksendring) }}">{{ indeksendring|tall('endring') }}</span>{% else %}–{% endif %}</li>
+      </ul>
+    </section>
 
-    {% for bransje in bransjer %}
-      <section class="bransje" aria-labelledby="bransje-{{ loop.index }}">
-        <h2 id="bransje-{{ loop.index }}">{{ bransjesymbol(bransje.navn) }}<span>{{ bransje.navn }}</span>
-          {%- if bransje.snitt is not none %} <span class="snitt {{ fortegn(bransje.snitt) }}">{{ bransje.snitt|tall('endring') }}</span>{% endif %}
-          <span class="antall">{{ antall_ord(bransje.antall, "aksje", "aksjer") }}</span></h2>
+    {#- Story 8.6b, d: rutene som et fylt kart i to nivåer, regnet i
+        boersometer.kart: bransjene som felt etter summen av vektene, og
+        aksjene inne i feltet, med plassen i prosent for den brede og den
+        smale flaten. Gruppens svar 26.10 kl. 13:00 (a): bransjene og rutene
+        står i den rekkefølgen kartet legger dem, den største først, så Tab
+        følger kartet. Tabellen under har rekkefølgen i designregler §4. #}
+    <div class="kart" style="{% for navn, forhold in kart.forhold.items() %}--forhold-{{ navn }}: {{ '%.4f'|format(1 / forhold) }};{% if not loop.last %} {% endif %}{% endfor %}">
+    {%- for felt in kart.felt %}
+      {%- set bransje = felt.bransje %}
+      <section class="bransje" aria-labelledby="bransje-{{ loop.index }}" style="{{ plass_stil(felt.plass) }}{% for navn, topp in felt.topp.items() %} --topp-{{ navn }}: {{ '%.3f'|format(topp) }}%;{% endfor %}">
+        {#- Gruppens svar 26.10 kl. 13:00 (b): som på tavla, navnet og «snitt»
+            med tallet, eller «1 aksje»; antallet står i tabellen. Er feltet for
+            smalt, brytes tillegget til en linje stilen skjuler for øyet, før
+            navnet kuttes med «…». #}
+        <h2 id="bransje-{{ loop.index }}"><span class="linje"><span class="navnet">{{ bransjesymbol(bransje.navn) }}<span class="bransjenavn">{{ bransje.navn }}</span></span>
+          {%- if bransje.antall == 1 %} <span class="tillegg">1 aksje</span>
+          {%- elif bransje.snitt is not none %} <span class="tillegg">snitt <span class="snitt {{ fortegn(bransje.snitt) }}">{{ bransje.snitt|tall('endring') }}</span></span>{% endif %}</span></h2>
         <ul class="ruter">
-          {%- for rute in bransje.ruter %}
+          {%- for kartrute in felt.ruter %}
+          {%- set rute = kartrute.rute %}
           {#- Gruppens svar 23.10 kl. 09:24 (b): hver rute lenker til aksjesiden,
               også for en aksje uten kurser. #}
-          <li><a class="rute stoerrelse-{{ rute.stoerrelse }} {{ fortegn(rute.endring) }}{% if rute.ramme %} ramme-{{ rute.ramme }}{% endif %}{% if rute.uten_data %} uten-data{% endif %}" href="{{ aksjeadresse(rute.aksje.symbol) }}">
+          <li style="{{ plass_stil(kartrute.plass) }}"><a class="rute trinn-{{ rute.fargetrinn or 'ingen' }}{% for navn, nivaa in kartrute.nivaa.items() %} nivaa-{{ navn }}-{{ nivaa }}{% endfor %}{% if rute.ramme %} ramme-{{ rute.ramme }}{% endif %}{% if rute.uten_data %} uten-data{% endif %}" href="{{ aksjeadresse(rute.aksje.symbol) }}">
             <span class="ticker">{{ rute.aksje.symbol }}</span>
             <span class="endring">{% if rute.endring is not none %}{{ rute.endring|tall('endring') }}{% elif rute.uten_data %}Uten data{% else %}–{% endif %}</span>
             {% if rute.ramme == "gul" %}<span class="merke">{{ antall_sjekker }} av {{ antall_sjekker }}{% if dagen != siste %} siste børsdag{% endif %}</span>{% elif rute.ramme == "moerk" %}<span class="merke">{{ antall_sjekker - 1 }} av {{ antall_sjekker }}</span>{% endif %}
@@ -52,8 +79,27 @@
           {%- endfor %}
         </ul>
       </section>
-    {% endfor %}
+    {%- endfor %}
+    </div>
 
+    {#- Story 8.6b, c: de fem trinnene og de to rammene under rutene. #}
+    <section class="fargene" aria-labelledby="fargene-tittel">
+      <h2 id="fargene-tittel">Hva fargene betyr</h2>
+      <ul>
+        {%- for trinn, tekst in fargetrinn %}
+        <li><span class="proeve trinn-{{ trinn }}" aria-hidden="true"></span>{{ tekst }}</li>
+        {%- endfor %}
+        <li><span class="proeve ramme-moerk" aria-hidden="true"></span>Mørk ramme: {{ antall_sjekker - 1 }} av {{ antall_sjekker }} på siste børsdag</li>
+        <li><span class="proeve ramme-gul" aria-hidden="true"></span>Gul ramme: {{ antall_sjekker }} av {{ antall_sjekker }} på siste børsdag</li>
+      </ul>
+    </section>
+
+    {#- Gruppens svar 26.10 kl. 15:21 (f): tabellen er lukket som standard, bak
+        «Se tallene som tabell». Skjermleseren finner knappen, og tabellen har
+        fortsatt rekkefølgen i designregler §4 (svaret kl. 13:00, a). Står
+        tabellen alene fordi rutene ikke fikk plass, er den åpen (NFR-03). #}
+    <details class="tallene"{% if not kart.felt %} open{% endif %}>
+    <summary>Se tallene som tabell</summary>
     {#- Rullboksen fra oversikten: tabellen ruller, ikke siden, også med tastaturet. #}
     <div class="tabellboks boersometerboks" role="region" aria-label="Børsometeret som tabell" tabindex="0">
     <table class="boersometertabell">
@@ -76,11 +122,11 @@
       </tbody>
     </table>
     </div>
+    </details>
     {#- Gruppens svar 23.10 kl. 11:44 (b): fotnoten når en rute sier «ikke vurdert». #}
     {% if ikke_vurdert %}
       {% include "_fotnote_ikke_vurdert.html" %}
     {% endif %}
-    {{ hjelpevindu("hjelp-hovedindeks", "Hovedindeksen", [("", ["hovedindeksen", "soeylene"] if hovedindeks and hovedindeks.har_soeyler else ["hovedindeksen"])]) }}
   {% elif demokommando %}
     <p>
       {% if demo_gammel %}Demobasen er laget av en eldre versjon av demoen. Lag den på nytt med <code>{{ demokommando }}</code>.{% else %}Demobasen finnes ikke ennå. Lag den med <code>{{ demokommando }}</code>.{% endif %}

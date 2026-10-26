@@ -1002,7 +1002,26 @@ HOEYDE_PAA_BILDET = 1630
 # og er byte for byte det samme.
 # Story 10.2e: valgt_indeks flyttet fra app.py til hovedindeks.py. Bildet ble
 # tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "bc4126a7538d4bd76f82fcf0bf4c6c8867e11e4923a76035366655098296644a"
+# Story 8.6b b: linja «Mål mot børsen» i stil.css og hjelpetekster.py, og
+# _hovedindeks.html bare paa oversikten. Bildet ble tatt paa nytt og er byte
+# for byte det samme.
+# Story 8.6b c: fargetrinnene og rammene i stil.css, og hjelpen i
+# hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 8.6b d: kartet i stil.css og hjelpen i hjelpetekster.py. Bildet ble
+# tatt paa nytt og er byte for byte det samme.
+# Story 8.6b, svaret 26.10 kl. 13:00 (a): rekkefoelgen i kartet og hjelpen i
+# hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 8.6b, svaret 26.10 kl. 13:00 (b): overskriften i feltet i stil.css og
+# hjelpen i hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det
+# samme.
+# Story 8.6b, svarene 26.10 kl. 13:00 (c) og 13:07 (e): tekstnivået i stil.css.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 8.6b, svaret 26.10 kl. 15:21 (f): tabellen bak «Se tallene som tabell»
+# i stil.css og hjelpen i hjelpetekster.py. Bildet ble tatt paa nytt og er byte
+# for byte det samme.
+# Gjennomgangen av 8.6b 26.10 (BH, ECH): tekstnivået med @container i stil.css.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "e4e867edad0c4f33dfb2ea727c9ada9d34485638dca0c1c97c46f5904a73fb7c"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1171,7 +1190,27 @@ HOEYDE_PAA_AKSJESIDEN = 1894
 # ordstillingen etter «fordi» og rekkefoelgen paa sjekkene i prompten. Teksten
 # for BRFE besto og er den samme, og bildet ble tatt paa nytt og er byte for
 # byte det samme, med hoeyden 1894.
-AVTRYKK_BAK_AKSJESIDEN = "48902f9aa89f293b0b3dbe4848fc52f64b8bbbd50a0d755d094814c0e064e369"
+# Story 8.6b b: linja «Mål mot børsen» i stil.css og hjelpetekster.py. Bildet
+# ble tatt paa nytt og er byte for byte det samme.
+# Story 8.6b c: fargetrinnene og rammene i stil.css, og hjelpen i
+# hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 8.6b d: kartet i stil.css og hjelpen i hjelpetekster.py. Bildet ble
+# tatt paa nytt og er byte for byte det samme.
+# Story 8.6b, svaret 26.10 kl. 13:00 (a): rekkefoelgen i kartet og hjelpen i
+# hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 8.6b, svaret 26.10 kl. 13:00 (b): overskriften i feltet i stil.css og
+# hjelpen i hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det
+# samme.
+# Story 8.6b, svarene 26.10 kl. 13:00 (c) og 13:07 (e): tekstnivået i stil.css.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 8.6b, svaret 26.10 kl. 15:21 (f): tabellen bak «Se tallene som tabell»
+# i stil.css og hjelpen i hjelpetekster.py. Bildet ble tatt paa nytt og er byte
+# for byte det samme.
+# Gjennomgangen av 8.6b 26.10 (ECH4): datoen for børsdagen før i app.py. Bildet
+# ble tatt paa nytt og er byte for byte det samme.
+# Gjennomgangen av 8.6b 26.10 (BH, ECH): tekstnivået med @container i stil.css.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "2bbb90388474332b1464ee2ef520295dc479daebcac1182b7b4efd8439236151"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
