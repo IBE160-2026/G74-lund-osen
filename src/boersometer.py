@@ -303,7 +303,9 @@ STOERSTE_VEKT = 3.0
 # Ingen rute mindre enn 44 × 44 px, med 2 px hvitt på hver side.
 MINSTE_RUTE = 44
 KANT = 2
-# Overskriften i feltet, i px ved den minste bredden for flaten.
+# Overskriften i feltet, i px ved bredden flaten regnes ved (Flate.bredde).
+# Den krymper med kartet: ved 288 px er den 24 × 288/358 ≈ 19,3 px, og linja
+# i den er 16 px (gjennomgangen 26.10, BH, og test_overskriften_har_plass_til_linja).
 OVERSKRIFT = 24
 # Gruppens svar 26.10 kl. 13:00 (b): navnet forsvinner aldri helt. Et felt er
 # minst så bredt, ved den minste bredden flaten brukes på, at overskriften har

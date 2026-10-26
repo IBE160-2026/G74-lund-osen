@@ -1707,6 +1707,17 @@ class TestKartet:
         assert "min-width: 0" in navnet and "max-width: 100%" in navnet
         assert "display: none" not in stil.split(".kart section.bransje h2", 1)[1].split("ul.ruter", 1)[0]
 
+    def test_overskriften_har_plass_til_linja(self):
+        """Gjennomgangen 26.10 (BH): OVERSKRIFT er 24 px ved bredden flaten
+        regnes ved og krymper med kartet. Ville feilet hvis linja med navnet
+        i stil.css ble høyere enn overskriften ved den minste bredden flaten
+        brukes på."""
+        stil = (SRC / "static" / "stil.css").read_text(encoding="utf-8")
+        linje = re.search(r"\.kart section\.bransje h2 \.linje \{([^}]*)\}", stil).group(1)
+        hoeyde = int(re.search(r"(?<![-\w])height: (\d+)px", linje).group(1))
+        for flate in (BRED, SMAL):
+            assert OVERSKRIFT * flate.minste / flate.bredde >= hoeyde, (flate.navn, hoeyde)
+
     def test_navnet_forsvinner_aldri_helt(self):
         """Gruppens svar 26.10 kl. 13:00 (b): hvert felt er så bredt, ved den
         minste bredden flaten brukes på, at overskriften har plass til
