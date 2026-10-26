@@ -1024,7 +1024,9 @@ HOEYDE_PAA_BILDET = 1630
 # Bildet ble tatt paa nytt og er byte for byte det samme.
 # Story 8.0f: hjelpeskriptet, lenken i _ramme.html og feltet i stil.css.
 # Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "3a6dfb307f7083c0249b886edb10529d5aab481f549ff7cc314add6f213bde96"
+# Story 8.0f, b: knappen som flytter feltet. Bildet ble tatt paa nytt og er
+# byte for byte det samme.
+AVTRYKK_BAK_BILDET = "461620d605f5466c9c8b3139ac383b7cd11cf2119fa442d5f43375dcded0c38e"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1215,7 +1217,9 @@ HOEYDE_PAA_AKSJESIDEN = 1894
 # Bildet ble tatt paa nytt og er byte for byte det samme.
 # Story 8.0f: hjelpeskriptet, lenken i _ramme.html og feltet i stil.css.
 # Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "2d8ec6fadade9b93c819a6096e27b60dac2ac69fadc57cbb7c962ad554489c97"
+# Story 8.0f, b: knappen som flytter feltet. Bildet ble tatt paa nytt og er
+# byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "de81dbedb16287a86a7d356bc0e91cc7384cfc2d0a5f701347947f1e29d0d9bc"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "

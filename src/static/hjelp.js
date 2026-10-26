@@ -11,6 +11,7 @@
   const rot = document.documentElement;
   let knappen = null; // «?» som åpnet feltet, og som får fokus tilbake
   let plassen = null; // den tomme plassen under «?» på smal skjerm
+  const SIDEN = "hjelpefelt-side"; // venstre eller hoeyre, i sessionStorage
 
   function aapent() {
     return document.querySelector(".hjelpevindu:popover-open");
@@ -89,6 +90,34 @@
     if (e.key === "Escape" && felt) felt.hidePopover();
   });
 
+  // Valget huskes mens fanen er åpen. Er lagringen slått av, kaster
+  // sessionStorage, og feltet flyttes likevel, men bare på denne siden.
+  function lagret() {
+    try {
+      return sessionStorage.getItem(SIDEN);
+    } catch {
+      return null;
+    }
+  }
+
+  function side(venstre) {
+    rot.classList.toggle("felt-venstre", venstre);
+    for (const k of document.querySelectorAll(".hjelpevindu button.flytt")) {
+      k.textContent = venstre ? "Flytt til høyre" : "Flytt til venstre";
+    }
+  }
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".hjelpevindu button.flytt")) return;
+    const venstre = !rot.classList.contains("felt-venstre");
+    side(venstre);
+    try {
+      sessionStorage.setItem(SIDEN, venstre ? "venstre" : "hoeyre");
+    } catch {
+      // Lagringen er slått av.
+    }
+  });
+
   BRED.addEventListener("change", () => {
     const felt = aapent();
     if (felt) {
@@ -104,5 +133,6 @@
   for (const knapp of document.querySelectorAll("button.hjelpeknapp")) {
     knapp.popoverTargetAction = "show";
   }
+  side(lagret() === "venstre");
   rot.classList.add("hjelpefelt");
 })();

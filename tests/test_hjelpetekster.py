@@ -686,7 +686,7 @@ class TestHjelpefeltet:
             for velger, kropp in re.findall(r"([^{};]*\.hjelpevindu[^{]*)\{([^}]*)\}", stil)
             if re.search(r"\b(position|inset)\s*:", kropp)
         ]
-        assert flyttet and all(v.startswith(".hjelpefelt ") for v in flyttet), flyttet
+        assert flyttet and all(re.match(r"\.hjelpefelt[ .]", v) for v in flyttet), flyttet
         assert re.search(r"\.hjelpefelt body:has\(\.hjelpevindu:popover-open\)", stil)
         assert "margin: auto" in _regel_i(stil, ".hjelpevindu")
 
