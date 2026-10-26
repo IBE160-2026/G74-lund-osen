@@ -594,7 +594,7 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
    Hver bransje og hver rute har plassen i prosent for den brede og den smale
    flaten (--x-bred, --x-smal osv.), og @media velger. Bakgrunnen er hvit, så
    rammene grenser mot hvitt. */
-:where(.side-oversikt) .kart { position: relative; aspect-ratio: var(--forhold-bred); margin: 8px 0 0; background: var(--kort); }
+:where(.side-oversikt) .kart { position: relative; aspect-ratio: var(--forhold-bred); margin: 8px 0 0; background: var(--kort); container-type: inline-size; }
 :where(.side-oversikt) .kart section.bransje { position: absolute; margin: 0; box-sizing: border-box;
                                                left: var(--x-bred); top: var(--y-bred); width: var(--b-bred); height: var(--h-bred); }
 :where(.side-oversikt) .kart section.bransje h2 { position: absolute; left: 2px; right: 2px; top: 0; height: var(--topp-bred); margin: 0;
@@ -624,17 +624,22 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
                                color: var(--blekk); font-size: 13px; line-height: 1.2; font-variant-numeric: tabular-nums; }
 /* Navnet står på ruter som er store nok (tekstnivaa i boersometer.py). Det som
    ikke får plass, skjules bare for øyet, så skjermleseren leser alt. */
-/* Gruppens svar 26.10 kl. 13:07 (e): fra 1080 px regnes teksten ved 1008 px,
-   full bredde, og fra 761 px ved 712 px (Flate.tekst i boersometer.py). */
-@media (min-width: 1080px) {
-  :where(.side-oversikt) .rute.nivaa-bredest-0 > .ticker, :where(.side-oversikt) .rute.nivaa-bredest-0 > .endring, :where(.side-oversikt) .rute.nivaa-bredest-0 > .merke, :where(.side-oversikt) .rute.nivaa-bredest-0 > .tekst,
-  :where(.side-oversikt) .rute.nivaa-bredest-1 > .endring, :where(.side-oversikt) .rute.nivaa-bredest-1 > .merke, :where(.side-oversikt) .rute.nivaa-bredest-1 > .tekst,
-  :where(.side-oversikt) .rute.nivaa-bredest-2 > .merke, :where(.side-oversikt) .rute.nivaa-bredest-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-}
-@media (min-width: 761px) and (max-width: 1079px) {
-  :where(.side-oversikt) .rute.nivaa-bred-0 > .ticker, :where(.side-oversikt) .rute.nivaa-bred-0 > .endring, :where(.side-oversikt) .rute.nivaa-bred-0 > .merke, :where(.side-oversikt) .rute.nivaa-bred-0 > .tekst,
-  :where(.side-oversikt) .rute.nivaa-bred-1 > .endring, :where(.side-oversikt) .rute.nivaa-bred-1 > .merke, :where(.side-oversikt) .rute.nivaa-bred-1 > .tekst,
-  :where(.side-oversikt) .rute.nivaa-bred-2 > .merke, :where(.side-oversikt) .rute.nivaa-bred-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* Gruppens svar 26.10 kl. 13:07 (e): teksten regnes ved 1008 px, full bredde,
+   og ellers ved 712 px (Flate.tekst i boersometer.py). Gjennomgangen 26.10
+   (BH, ECH, VG): @container måler kartet selv, så rullefeltet, rotskriften og
+   en bredde med desimaler ved zoom ikke gir et hull eller feil nivå. Kartet
+   er 1008 px fra et vindu 1080 px bredt, også med rullefelt. */
+@media (width > 760px) {
+  @container (width >= 1008px) {
+    :where(.side-oversikt) .rute.nivaa-bredest-0 > .ticker, :where(.side-oversikt) .rute.nivaa-bredest-0 > .endring, :where(.side-oversikt) .rute.nivaa-bredest-0 > .merke, :where(.side-oversikt) .rute.nivaa-bredest-0 > .tekst,
+    :where(.side-oversikt) .rute.nivaa-bredest-1 > .endring, :where(.side-oversikt) .rute.nivaa-bredest-1 > .merke, :where(.side-oversikt) .rute.nivaa-bredest-1 > .tekst,
+    :where(.side-oversikt) .rute.nivaa-bredest-2 > .merke, :where(.side-oversikt) .rute.nivaa-bredest-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
+  @container (width < 1008px) {
+    :where(.side-oversikt) .rute.nivaa-bred-0 > .ticker, :where(.side-oversikt) .rute.nivaa-bred-0 > .endring, :where(.side-oversikt) .rute.nivaa-bred-0 > .merke, :where(.side-oversikt) .rute.nivaa-bred-0 > .tekst,
+    :where(.side-oversikt) .rute.nivaa-bred-1 > .endring, :where(.side-oversikt) .rute.nivaa-bred-1 > .merke, :where(.side-oversikt) .rute.nivaa-bred-1 > .tekst,
+    :where(.side-oversikt) .rute.nivaa-bred-2 > .merke, :where(.side-oversikt) .rute.nivaa-bred-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
 }
 @media (max-width: 760px) {
   :where(.side-oversikt) .kart { aspect-ratio: var(--forhold-smal); }
@@ -643,17 +648,20 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
   :where(.side-oversikt) .kart ul.ruter { top: var(--topp-smal); }
   :where(.side-oversikt) .kart ul.ruter > li { left: var(--x-smal); top: var(--y-smal); width: var(--b-smal); height: var(--h-smal); }
 }
-/* Gruppens svar 26.10 kl. 13:00 (c): fra 360 px regnes teksten ved 328 px,
-   og under 360 px ved 288 px, et vindu 320 px bredt. */
-@media (min-width: 360px) and (max-width: 760px) {
-  :where(.side-oversikt) .rute.nivaa-smal-0 > .ticker, :where(.side-oversikt) .rute.nivaa-smal-0 > .endring, :where(.side-oversikt) .rute.nivaa-smal-0 > .merke, :where(.side-oversikt) .rute.nivaa-smal-0 > .tekst,
-  :where(.side-oversikt) .rute.nivaa-smal-1 > .endring, :where(.side-oversikt) .rute.nivaa-smal-1 > .merke, :where(.side-oversikt) .rute.nivaa-smal-1 > .tekst,
-  :where(.side-oversikt) .rute.nivaa-smal-2 > .merke, :where(.side-oversikt) .rute.nivaa-smal-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-}
-@media (max-width: 359px) {
-  :where(.side-oversikt) .rute.nivaa-smalest-0 > .ticker, :where(.side-oversikt) .rute.nivaa-smalest-0 > .endring, :where(.side-oversikt) .rute.nivaa-smalest-0 > .merke, :where(.side-oversikt) .rute.nivaa-smalest-0 > .tekst,
-  :where(.side-oversikt) .rute.nivaa-smalest-1 > .endring, :where(.side-oversikt) .rute.nivaa-smalest-1 > .merke, :where(.side-oversikt) .rute.nivaa-smalest-1 > .tekst,
-  :where(.side-oversikt) .rute.nivaa-smalest-2 > .merke, :where(.side-oversikt) .rute.nivaa-smalest-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* Gruppens svar 26.10 kl. 13:00 (c): teksten regnes ved 328 px når kartet er
+   så bredt, som i et vindu fra 360 px uten rullefelt, og ellers ved 288 px,
+   et vindu 320 px bredt. Med rullefelt gjelder 328 px fra kartet er 328 px. */
+@media (width <= 760px) {
+  @container (width >= 328px) {
+    :where(.side-oversikt) .rute.nivaa-smal-0 > .ticker, :where(.side-oversikt) .rute.nivaa-smal-0 > .endring, :where(.side-oversikt) .rute.nivaa-smal-0 > .merke, :where(.side-oversikt) .rute.nivaa-smal-0 > .tekst,
+    :where(.side-oversikt) .rute.nivaa-smal-1 > .endring, :where(.side-oversikt) .rute.nivaa-smal-1 > .merke, :where(.side-oversikt) .rute.nivaa-smal-1 > .tekst,
+    :where(.side-oversikt) .rute.nivaa-smal-2 > .merke, :where(.side-oversikt) .rute.nivaa-smal-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
+  @container (width < 328px) {
+    :where(.side-oversikt) .rute.nivaa-smalest-0 > .ticker, :where(.side-oversikt) .rute.nivaa-smalest-0 > .endring, :where(.side-oversikt) .rute.nivaa-smalest-0 > .merke, :where(.side-oversikt) .rute.nivaa-smalest-0 > .tekst,
+    :where(.side-oversikt) .rute.nivaa-smalest-1 > .endring, :where(.side-oversikt) .rute.nivaa-smalest-1 > .merke, :where(.side-oversikt) .rute.nivaa-smalest-1 > .tekst,
+    :where(.side-oversikt) .rute.nivaa-smalest-2 > .merke, :where(.side-oversikt) .rute.nivaa-smalest-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
 }
 /* Story 8.6b, c: fem trinn etter endringen slik den vises. Uten endring er ruta
    hvit med grå kant, så den ikke ligner det nøytrale trinnet. Ikke stiplet:

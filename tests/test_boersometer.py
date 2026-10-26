@@ -1605,23 +1605,38 @@ class TestKartet:
         """Gruppens svar 26.10 kl. 13:00 (c) og 13:07 (e): fra 1080 px regnes
         teksten ved 1008 px, full bredde, mellom 761 og 1080 px ved 712 px,
         fra 360 px ved 328 px og under 360 px ved 288 px, og stilen velger
-        klassen med @media. Ville feilet hvis teksten fortsatt ble regnet ved
-        712 px fra 1080 px eller ved 288 px fra 360 px, eller hvis @media
-        brukte en annen grense eller en annen klasse."""
+        klassen med @container etter bredden på kartet. Ville feilet hvis
+        teksten fortsatt ble regnet ved 712 px fra 1080 px eller ved 288 px
+        fra 360 px, hvis grensen ikke var bredden teksten er regnet ved, eller
+        hvis en regel for å skjule et element manglet."""
         side = 16
         stil = (SRC / "static" / "stil.css").read_text(encoding="utf-8")
         # main er høyst 65rem, 1040 px, med 16 px på hver side.
         assert re.search(r"max-width: 65rem", stil)
         assert dict(BRED.tekst) == {"bred": 761 - 17 - 2 * side, "bredest": 65 * 16 - 2 * side}
         assert dict(SMAL.tekst) == {"smal": 360 - 2 * side, "smalest": 320 - 2 * side}
-        for media, klasse in (
-            ("(min-width: 1080px)", "bredest"),
-            ("(min-width: 761px) and (max-width: 1079px)", "bred"),
-            ("(min-width: 360px) and (max-width: 760px)", "smal"),
-            ("(max-width: 359px)", "smalest"),
-        ):
-            blokk = stil.split(f"@media {media} {{", 1)[1].split("\n}", 1)[0]
-            assert set(re.findall(r"nivaa-([a-z]+)-\d", blokk)) == {klasse}, media
+        # Gjennomgangen 26.10 (BH, ECH, VG): @container på kartet, med grensen
+        # fra Flate.tekst, uten hull mellom spennene og med hele lista av
+        # elementer som skjules for hvert nivå.
+        kartregel = re.search(r"\.kart \{([^}]*)\}", stil).group(1)
+        assert "container-type: inline-size" in kartregel
+        skjult = {
+            0: [".ticker", ".endring", ".merke", ".tekst"],
+            1: [".endring", ".merke", ".tekst"],
+            2: [".merke", ".tekst"],
+        }
+        for media, flate in (("(width > 760px)", BRED), ("(width <= 760px)", SMAL)):
+            del_ = stil.split(f"@media {media} {{\n", 1)[1].split("\n}\n", 1)[0]
+            blokker = dict(re.findall(r"@container (\([^)]*\)) \{\n(.*?)\n  \}", del_, re.S))
+            (stor, stor_b), (liten, liten_b) = sorted(flate.tekst, key=lambda t: -t[1])
+            assert set(blokker) == {f"(width >= {stor_b}px)", f"(width < {stor_b}px)"}, blokker.keys()
+            for grense, klasse in ((f"(width >= {stor_b}px)", stor), (f"(width < {stor_b}px)", liten)):
+                velgere = re.findall(r"\.rute\.nivaa-([a-z]+)-(\d) > (\.[a-z]+)", blokker[grense])
+                assert sorted(velgere) == sorted((klasse, str(n), e) for n, el in skjult.items() for e in el), (
+                    grense,
+                    velgere,
+                )
+            assert liten_b < stor_b
         # I demoen viser noen ruter mer ved 1008 og 328 px enn ved 712 og 288 px.
         klasser = re.findall(r'<a class="rute ([^"]*)"', _side(klient))
         nivaa = [{k: int(v) for k, v in re.findall(r"nivaa-([a-z]+)-(\d)", kl)} for kl in klasser]
