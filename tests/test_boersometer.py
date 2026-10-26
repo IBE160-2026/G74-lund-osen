@@ -1323,6 +1323,32 @@ class TestKartet:
                     rb, rh = p["smal"][2] / 100 * fb, p["smal"][3] / 100 * kropp
                     assert min(rb, rh) - 2 * KANT >= MINSTE_RUTE - 0.01, (adresse, symbol, rb, rh)
 
+    @pytest.mark.parametrize(
+        "forhold",
+        [
+            [1.0] * 15,
+            [3.0] + [0.5] * 14,
+            [0.5, 3.0] * 7 + [1.0],
+            [0.05] + [12.0] * 14,
+            [0.6, 2.4, 1.0, 0.7, 0.8, 1.9, 0.5, 3.0, 1.1, 1.4, 0.9, 2.2, 0.55, 1.3, 2.7],
+        ],
+    )
+    def test_ingen_rute_under_24_px_i_320_px(self, forhold):
+        """Gruppens svar 26.10 kl. 08:43 (c), WCAG 2.2, 2.5.8: i et vindu 320
+        px bredt er kartet 288 px bredt, og prosentene krymper med det, men
+        ikke de 2 px hvitt rundt ruta. Ville feilet hvis en rute ble mindre
+        enn 24 × 24 px der."""
+        ruter = _ruter_med(forhold, [BRANSJER[i % 8] for i in range(len(forhold))])
+        k = kart(bygg_boersometer(ruter))
+        bredde = 320 - 2 * 16
+        hoeyde = bredde * k.forhold["smal"]
+        for f in k.felt:
+            fb, fh = f.plass["smal"].b / 100 * bredde, f.plass["smal"].h / 100 * hoeyde
+            kropp = fh * (1 - f.topp["smal"] / 100)
+            for kr in f.ruter:
+                rb, rh = kr.plass["smal"].b / 100 * fb, kr.plass["smal"].h / 100 * kropp
+                assert rb - 2 * KANT >= 24 and rh - 2 * KANT >= 24, (rb, rh)
+
     def test_kartet_paa_siden_dekker_feltene(self, klient):
         """Ville feilet hvis feltene eller rutene i malen overlappet eller lot
         noe stå tomt."""
@@ -1362,14 +1388,19 @@ class TestKartet:
 
     def test_hjelpen_sier_det(self):
         """Regel 19: ville feilet hvis hjelpen fortsatt sa at ruta er større
-        over 1,5 ganger vanlig, eller ikke sa at rutene er et fylt kart."""
+        over 1,5 ganger vanlig, ikke sa at rutene er et fylt kart, eller ikke
+        sa grensene for vekten (gruppens svar 26.10 kl. 08:43, b)."""
         from hjelpetekster import hjelpetekster
 
         tekst = hjelpetekster(STANDARD)["boersometeret"].tekst
-        assert "Arealet av ruta følger volumet mot vanlig" in tekst and "ganger vanlig" not in tekst
+        assert "Arealet av ruta følger volumet mot vanlig" in tekst and "1,5 ganger" not in tekst
+        assert "ikke større over 3 ganger vanlig volum eller mindre under halvparten" in tekst
+        assert "tabellen under har tallet" in tekst
         hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
         avsnitt = hjelp.split("### Hva viser børsometeret?", 1)[1].split("###", 1)[0]
-        assert "Rutene er et fylt kart" in avsnitt and "fra halvparten til tre ganger vanlig" in avsnitt
+        assert "Rutene er et fylt kart" in avsnitt
+        assert "ikke større over tre ganger vanlig volum eller mindre under halvparten" in avsnitt
+        assert "tabellen under har det faktiske tallet" in avsnitt
         assert "Ruta er større når" not in avsnitt
         readme = (Path(__file__).resolve().parents[1] / "README.md").read_text(encoding="utf-8")
         assert "børsometeret som et fylt kart etter bransje" in readme
