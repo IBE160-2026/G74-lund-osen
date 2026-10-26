@@ -73,6 +73,7 @@ Gjennomgang 26.10 etter hele settet (3640 bestått, 24 hoppet over, 0 feilet, 10
 | BH6 | Testen for uv sync godtok meldingen fra begge skriptene | low | **rettet** i `48e6da3`: meldingen er den samme i begge nå, og testen krever den |
 | BH4 | Vinduet sa «kjører allerede på …» både før uv og rett før webserveren | low | **rettet** i `fd19b7f`: den andre beskjeden sier bare at den stoppes nå |
 | BH1 | Testtekstene fra 3.5d sa at den andre versjonen stoppes før uv | low | **rettet** i `fd19b7f` |
+| CI | I den første kjøringen av grenen (40299393259) var port 8000 opptatt på Mac rett etter «Start demoen», så alle porttestene for `start.sh`, også de nye, ble hoppet over, og jobben var likevel grønn | medium | **rettet** i `fbcae5a`: steget venter opptil 120 s på ledig port og feiler hvis en porttest hoppes over fordi porten er i bruk. I kjøring 40299942312 var porten ledig etter 0 s, og 13 porttester besto på Mac. Funnet ved kontrollen av CI-loggen, ikke av linsene |
 | BH3 | Hentingen skriver til `data/db/ose.db` mens den andre ekte versjonen kjører fra samme mappe | low | **under «Åpent»:** webserveren skriver bare merkingen i Min liste, og tilkoblingen venter opptil `VENTETID_SEKUNDER` (5 sekunder) på en lås. Ikke prøvd |
 | BH8 | To vinduer startet nesten samtidig kommer begge forbi sjekken før uv, og den siste stopper den første rett før webserveren | low | **under «Åpent»:** det samme kunne skje før 3.5e, men tiden mellom sjekken og webserveren er lengre nå |
 
