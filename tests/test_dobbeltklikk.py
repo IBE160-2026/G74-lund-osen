@@ -646,13 +646,15 @@ def _stopp_lytteren(lytter):
 def _sjekk_porten(hvem, lytter, kode, utskrift):
     assert kode == 1, utskrift
     if hvem == "oss":
-        lytter.wait(timeout=30)
+        # 3.5e (svaret 24.10 kl. 20:00): skriptet sier fra foer uv, som faar
+        # nei, og den andre versjonen kjoerer videre, fordi den foerst stoppes
+        # rett foer webserveren.
         assert "Den andre versjonen av OSE Signal kjører allerede på http://127.0.0.1:8000" in utskrift, utskrift
         assert f"(prosess {lytter.pid})" in utskrift, utskrift
-        assert "Den andre versjonen er stoppet, og porten er ledig." in utskrift, utskrift
-        # Videre til uv, som faar nei.
+        assert "Den stoppes rett før denne starter appen" in utskrift, utskrift
         assert "Appen trenger uv" in utskrift, utskrift
-        assert _porten_er_ledig()
+        assert "Den andre versjonen er stoppet" not in utskrift, utskrift
+        assert lytter.poll() is None, "den andre versjonen ble stoppet foer uv"
     else:
         assert lytter.poll() is None, "den fremmede lytteren ble stoppet"
         assert "et annet program svarer allerede på http://127.0.0.1:8000" in utskrift, utskrift
@@ -715,16 +717,33 @@ def test_start_sh_stopper_bare_den_andre_versjonen_paa_porten(tmp_path, hvem):
 
 @pytest.mark.parametrize("navn", list(SKRIPTENE))
 def test_porten_sjekkes_foer_uv_og_bare_oss_stoppes(navn):
-    """Gruppens svar 24.10 kl. 12:04. Ville feilet hvis porten ble sjekket
-    etter uv eller hentingen, eller hvis skriptet stoppet lytterne uten aa
-    sjekke kommandolinja foerst."""
+    """Gruppens svar 24.10 kl. 12:04 og 20:00 (3.5e). Ville feilet hvis
+    porten ble sjekket etter uv eller hentingen, den andre versjonen ble
+    stoppet foer demobasen og hentingen i stedet for rett foer webserveren,
+    eller skriptet stoppet lytterne uten aa sjekke kommandolinja foerst."""
     kode = "\n".join(_kode(SKRIPTENE[navn]))
-    kall, sjekk, stopp_ = {
-        "start.ps1": ("\nFrigjoer-Porten\n", "Er-OseSignal $_.Kommandolinje", "Stop-Process -Id $lytter.Id -Force"),
-        "start.sh": ("\nfrigjoer_porten\n", 'er_ose_signal "$(ps -p "$id" -o command=', 'kill "$id"'),
+    kall, stoppen, sjekk, stopp_ = {
+        "start.ps1": (
+            "\nFrigjoer-Porten $false\n",
+            "\nFrigjoer-Porten $true\n",
+            "Er-OseSignal $_.Kommandolinje",
+            "Stop-Process -Id $lytter.Id -Force",
+        ),
+        "start.sh": (
+            "\nfrigjoer_porten sjekk\n",
+            "\nfrigjoer_porten stopp\n",
+            'er_ose_signal "$(ps -p "$id" -o command=',
+            'kill "$id"',
+        ),
     }[navn]
+    assert kode.count(kall) == kode.count(stoppen) == 1
     assert kode.index(kall) < kode.index("Appen trenger uv") < kode.index("uv sync")
-    assert kode.index(kall) < kode.index("uv run python src/fetch_prices.py")
+    assert kode.index(kall) < kode.index("uv run python src/fetch_prices.py") < kode.index(stoppen)
+    serveren = {
+        "start.ps1": "Start-Process -FilePath 'uv' -ArgumentList 'run', 'waitress-serve'",
+        "start.sh": "uv run waitress-serve --listen",
+    }[navn]
+    assert kode.index("uv run python src/demo.py") < kode.index(stoppen) < kode.index(serveren)
     assert kode.index(sjekk) < kode.index("Skriptet stopper aldri andre programmer.") < kode.index(stopp_)
     # Gjennomgangen av 3.5d (VG1): delene staar i selve sjekken, ikke bare i
     # linja som starter serveren lenger ned.

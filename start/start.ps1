@@ -97,7 +97,11 @@ function Lyttere {
     }
 }
 
-function Frigjoer-Porten {
+# Gruppens svar 24.10 kl. 20:00 (3.5e): før uv sjekkes porten, og et annet
+# program stopper skriptet der. Den andre versjonen fra mappa stoppes først
+# rett før webserveren, med -Stopp $true, så den kjører videre hvis uv,
+# uv sync eller hentingen feiler.
+function Frigjoer-Porten([bool]$Stopp) {
     if (-not (Opptatt)) { return }
     $lyttere = @(Lyttere)
     # Gjennomgangen av 3.5d (ECH4): lytteren stoppet av seg selv i mellomtiden.
@@ -110,6 +114,11 @@ function Frigjoer-Porten {
             $hvem = 'et program skriptet ikke fant navnet på'
         }
         Stopp "et annet program svarer allerede på $Adresse, og det er ikke OSE Signal fra denne mappa. Programmet er $hvem. Skriptet stopper aldri andre programmer. Er det demoen eller appen i Docker, stopper du den med docker compose --profile demo down i et terminalvindu i mappa med koden. Ellers lukker du programmet. Dobbeltklikk så på nytt."
+    }
+    if (-not $Stopp) {
+        $ider = ($lyttere | ForEach-Object { $_.Id }) -join ', '
+        Write-Host "Den andre versjonen av OSE Signal kjører allerede på $Adresse (prosess $ider). Den stoppes rett før denne starter appen, så den kjører videre hvis noe feiler før det."
+        return
     }
     foreach ($lytter in $lyttere) {
         Write-Host "Den andre versjonen av OSE Signal kjører allerede på $Adresse (prosess $($lytter.Id)). Den stoppes nå, så denne kan starte."
@@ -152,8 +161,9 @@ if ($Versjon -eq 'ekte' -and (Test-Path -LiteralPath '.git')) {
     Stopp 'mappa har .git (en klon av repoet eller et eget git-repo), og der starter ikke den ekte versjonen. Last ned en egen kopi med «Download ZIP» på GitHub, pakk den ut, og bruk din egen nøkkel fra EODHD. Demoen kan startes herfra.'
 }
 
-# Porten før uv og hentingen (forprøven 24.10, funn 7).
-Frigjoer-Porten
+# Porten før uv og hentingen (forprøven 24.10, funn 7): et annet program
+# stopper skriptet her. Den andre versjonen stoppes rett før webserveren (3.5e).
+Frigjoer-Porten $false
 
 # uv: på PATH, i .local\bin i brukermappa, eller installert etter et ja.
 $uvMappe = Join-Path $env:USERPROFILE '.local\bin'
@@ -220,6 +230,10 @@ if ($Versjon -eq 'demo') {
         Write-Host 'Er nøkkelen feil, sletter du det som står etter EODHD_API_KEY= i .env, så spør vinduet etter den på nytt neste gang.'
     }
 }
+
+# 3.5e: den andre versjonen stoppes først nå. Svarer et annet program på
+# porten nå, stoppes det ikke, og vinduet sier hva man gjør.
+Frigjoer-Porten $true
 
 Write-Host "Starter appen på $Adresse."
 $env:PYTHONPATH = 'src'
