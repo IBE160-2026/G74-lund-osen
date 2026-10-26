@@ -322,10 +322,11 @@ SYMBOL = 14
 MELLOMROM = 4
 MINSTE_NAVN = 24
 MINSTE_FELT = 2 * INNRYKK + SYMBOL + MELLOMROM + MINSTE_NAVN
-# Høyden økes med 2 % til hver rute er stor nok. Målt 26.10 (gjennomgangen,
-# BH10): 1,02 gir et kart om lag 1 % høyere enn å øke med 0,2 % i median,
-# 1,05 om lag 2 %, og 1,01 under halvparten av 1,02 på nesten dobbelt så lang tid
-# (spesifikasjonen 8.6b, linja om BH10 under triagen).
+# Høyden økes med 2 % til hver rute er stor nok og hvert felt minst
+# MINSTE_FELT bredt. Grunnen er målt 26.10 med MINSTE_FELT (gjennomgangen,
+# BH10): med 1,02 ble kartet under 2 % høyere enn nødvendig for 95 av 100
+# dager, på under 2 ms. Tallene står i spesifikasjonen 8.6b, i linja om BH10
+# under triagen.
 VEKST = 1.02
 MEST_VEKST = 600
 
