@@ -105,6 +105,8 @@ Gjennomgang 26.10 etter hele settet (3721 bestått, 20 hoppet over, 0 feilet, 09
 | BH13 | `--opp-bakgrunn`, `--ned-bakgrunn` og `--ingen-bakgrunn` brukes ikke lenger på børsometeret | low | **avvist:** de brukes fortsatt i `stil.css` for andre sider |
 | BH14 | Spesifikasjonen har ikke `updated` | low | **avvist:** ingen av de 83 spesifikasjonene i `implementation-artifacts` har feltet, og regel 4 gjelder `docs/` og `planning-artifacts` |
 
+*Rettet 2026-10-26 (instruksjonen kl. 15:24), BH7:* den lyse grensen i «Hva fargene betyr» formateres som `grense` med én desimal, som de andre grensene i prosent, så teksten er «fra 0,5 % til under 2 %» (`test_hvert_tall_i_forklaringen_er_prosent`).
+
 ## Åpent
 
 - **BH2, rekkefølgen i kartet (medium, ikke rettet):** fokuset følger §4-rekkefølgen i HTML-en, mens `squarify` legger den største ruta først. Gruppen avgjør om rekkefølgen skal endres.
@@ -112,6 +114,7 @@ Gjennomgang 26.10 etter hele settet (3721 bestått, 20 hoppet over, 0 feilet, 09
 - **BH5:** høyden på den smale flaten mellom 390 og 760 px.
 - **ECH4 og ECH5:** linja «Mål mot børsen» når børsdagen før er mer enn 6 dager før, eller ikke er den samme i kursene og kalenderen.
 - **BH7:** typen `faktor` for den lyse grensen i «Hva fargene betyr».
+  *Lukket 2026-10-26:* rettet, se linja under triagen.
 - **BH10:** grunnen til veksten 1,02.
 
 ## Det som ikke endres

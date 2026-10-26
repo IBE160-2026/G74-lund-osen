@@ -170,8 +170,9 @@ def fargetrinn(endring: float | None) -> str | None:
 
 def trinnforklaringer() -> list[tuple[str, str]]:
     """Trinnene til «Hva fargene betyr», fra størst fall til størst
-    stigning, med tallene fra grensene (regel 21)."""
-    lys, sterk = tall(GRENSE_LYS, "faktor"), tall(GRENSE_STERK, "grense")
+    stigning, med tallene fra grensene (regel 21). Begge grensene er
+    prosent, så begge formateres som «grense» (gjennomgangen 26.10, BH7)."""
+    lys, sterk = tall(GRENSE_LYS, "grense", desimaler=1), tall(GRENSE_STERK, "grense")
     return [
         (STERK_NED, f"Ned {sterk} eller mer"),
         (LYS_NED, f"Ned fra {lys} til under {sterk}"),

@@ -1186,6 +1186,14 @@ class TestFargetrinnene:
         stil = (SRC / "static" / "stil.css").read_text(encoding="utf-8")
         assert stil.index(".rute.trinn-ingen {") < stil.index(".rute.ramme-gul, ")
 
+    def test_hvert_tall_i_forklaringen_er_prosent(self):
+        """Gjennomgangen 26.10 (BH7), regel 21: begge grensene er prosent og
+        formateres med samme type. Ville feilet hvis den lyse grensen ble
+        formatert som «faktor», uten %."""
+        for _, tekst in boersometer.trinnforklaringer():
+            tallene = re.findall(r"\d+(?:,\d+)?(\S?)", tekst.replace("\u00a0%", "%"))
+            assert tallene and all(etter == "%" for etter in tallene), tekst
+
     def test_hva_fargene_betyr(self, klient):
         """Under rutene, med de fem trinnene fra fall til stigning og de to
         rammene. Ville feilet hvis forklaringen manglet, sto over rutene, eller
@@ -1196,9 +1204,9 @@ class TestFargetrinnene:
         punkter = re.findall(r'<li><span class="proeve ([a-z-]+)" aria-hidden="true"></span>([^<]+)</li>', del_)
         assert punkter == [
             ("trinn-ned", "Ned 2 % eller mer"),
-            ("trinn-lys-ned", "Ned fra 0,5 til under 2 %"),
+            ("trinn-lys-ned", "Ned fra 0,5 % til under 2 %"),
             ("trinn-noeytral", "Under ±0,5 %"),
-            ("trinn-lys-opp", "Opp fra 0,5 til under 2 %"),
+            ("trinn-lys-opp", "Opp fra 0,5 % til under 2 %"),
             ("trinn-opp", "Opp 2 % eller mer"),
             ("ramme-moerk", "Mørk ramme: 2 av 3 på siste børsdag"),
             ("ramme-gul", "Gul ramme: 3 av 3 på siste børsdag"),
