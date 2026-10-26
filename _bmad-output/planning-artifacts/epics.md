@@ -2478,6 +2478,8 @@ Resten ryddes etter alle testene.
 
 *Lagt til 2026-10-26 kl. 13:32:* 3.5f, hovedveien i «Kom i gang», er squash-flettet i `8cd20b3`, PR #101, låst til head-en `e5f65f5` (spesifikasjonen `spec-3-5f-hovedveien.md`). Etter svaret 25.10 kl. 11:32 og innspillet kl. 11:26 heter overskriften «Kom i gang: nedlasting og installasjon», med ankeret `kom-i-gang` beholdt. «Velg vei etter hva du har» lenker rett inn til dobbeltklikket (anbefalt), «Med Docker Desktop» og «Uten Docker, med uv». Dobbeltklikket er en egen del først, med den direkte ZIP-lenken, og «Mappestruktur» forklarer hver fil og mappe i rota. `docs/hjelp.md` og §9 i kvalitetssikringen følger, med Docker som reserve.
 
+*Avgjort 2026-10-26 kl. 23:00 (gruppens svar):* «Kom i gang» er for lang. Dobbeltklikket blir fem korte nummererte steg: last ned med den direkte lenken, pakk ut, åpne G74-lund-osen-main og dobbeltklikk «Start demoen», svar j når vinduet spør om uv, og nettleseren åpner appen, og lukk vinduet for å stoppe. Under stegene én linje om advarselen første gang på Windows og Mac, og én om den ekte versjonen. Alt annet står bak piler eller i `docs/hjelp.md`, og ingenting forsvinner. Det går foran innspillet 25.10 kl. 11:26 om at resten ryddes etter testene.
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
