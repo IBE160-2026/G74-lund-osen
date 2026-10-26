@@ -897,6 +897,14 @@ def test_ci_proever_porten_paa_windows_og_mac():
     assert "if: runner.os" not in steget.split("\n      - name:", 1)[0]
     assert 'uv run pytest -q -p no:cacheprovider -rs tests/test_dobbeltklikk.py -k "porten or sjekken"' in steget
     assert jobb.index("Start demoen på Mac") < jobb.index("Porten på Windows og Mac")
+    # 3.5e: ville feilet hvis steget ikke ventet paa ledig port etter «Start
+    # demoen», eller godtok at porttestene ble hoppet over fordi porten var
+    # i bruk, slik de for start.sh ble paa Mac i den foerste kjoeringen 26.10.
+    steget = steget.split("\n      - name:", 1)[0]
+    assert steget.index("s.bind(('0.0.0.0', 8000))") < steget.index("uv run pytest")
+    assert "Porten 8000 ble ikke ledig etter 120 s" in steget
+    assert 'tee "$RUNNER_TEMP/porten.log"' in steget
+    assert 'if grep -q "port 8000 er i bruk" "$RUNNER_TEMP/porten.log"; then' in steget and "exit 1" in steget
 
 
 # Story 3.5e (svaret 24.10 kl. 20:00): en falsk uv, uten nett. Den skriver
