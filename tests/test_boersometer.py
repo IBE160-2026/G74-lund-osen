@@ -1403,4 +1403,4 @@ class TestKartet:
         assert "tabellen under har det faktiske tallet" in avsnitt
         assert "Ruta er større når" not in avsnitt
         readme = (Path(__file__).resolve().parents[1] / "README.md").read_text(encoding="utf-8")
-        assert "børsometeret som et fylt kart etter bransje" in readme
+        assert "og børsometeret som et kart, med knappene" in readme
