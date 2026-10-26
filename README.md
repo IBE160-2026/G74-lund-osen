@@ -48,15 +48,15 @@ Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og v
 - [Med Docker Desktop](#med-docker-desktop): har du Docker Desktop, eller vil du kjøre appen i Docker.
 - [Uten Docker, med uv](#uten-docker-med-uv), under «Mer for den som vil»: kommandoene i et terminalvindu.
 
-**Du trenger** en Windows-maskin eller en Mac, lov til å installere programmer, nett og noen GB ledig plass, men verken git, Docker eller konto. Første gang tar det en stund. Dobbeltklikket og «Uten Docker, med uv» trenger bare [uv](https://docs.astral.sh/uv/), som henter Python 3.13 eller nyere hvis maskinen ikke har den. Dobbeltklikket spør før det installerer uv. Med Docker trenger du Docker Desktop, og på Linux Docker Engine med Compose i stedet. Vi prøvde 10.10 med Docker Desktop 4.91.0 (motor 29.8.0, Compose v5.5.1) på Windows, og imaget bruker Python 3.13.15. Mac er ikke prøvd ennå, bare i CI. Står du fast, se [«Står du fast?»](#står-du-fast) lenger ned.
+**Du trenger** en Windows-maskin eller en Mac, lov til å installere programmer, nett og noen GB ledig plass, men verken git eller Docker, og demoen trenger ingen konto. Første gang tar det en stund. Dobbeltklikket og «Uten Docker, med uv» trenger bare [uv](https://docs.astral.sh/uv/), som henter Python 3.13 eller nyere hvis maskinen ikke har den. Dobbeltklikket spør før det installerer uv. Med Docker trenger du Docker Desktop, og på Linux Docker Engine med Compose i stedet. Vi prøvde 10.10 med Docker Desktop 4.91.0 (motor 29.8.0, Compose v5.5.1) på Windows, og imaget bruker Python 3.13.15. Mac er ikke prøvd ennå med Docker Desktop. Dobbeltklikket kjøres i CI på macOS. Står du fast, se [«Står du fast?»](#står-du-fast) lenger ned.
 
 ### Enklest: dobbeltklikk, uten Docker
 
 Docker trengs ikke, og du skriver ingen kommandoer.
 
 - **Last ned koden** med [den direkte lenken](https://github.com/IBE160-2026/G74-lund-osen/archive/refs/heads/main.zip), eller trykk «Code» på [GitHub-siden](https://github.com/IBE160-2026/G74-lund-osen) og «Download ZIP».
-- **Pakk ut.** Windows: høyreklikk fila i Nedlastinger og velg «Pakk ut alle», der den ligger. Mac: dobbeltklikk fila. Det er klart når du har mappa `G74-lund-osen-main`.
-- **Finn de fire filene** øverst i mappa: `Start demoen` og `Start den ekte versjonen`, som `.cmd` for Windows og `.command` for Mac.
+- **Pakk ut.** Windows: høyreklikk fila i Nedlastinger og velg «Pakk ut alle», der den ligger. Mac: dobbeltklikk fila. Det er klart når du har mappa `G74-lund-osen-main`. Pakk ut først: inne i ZIP-fila finner ikke startfilene skriptene i `start/`. [Har mappa tall i navnet](docs/hjelp.md#det-er-to-mapper-med-samme-navn): bruk den nyeste.
+- **Finn de fire filene** øverst i den innerste `G74-lund-osen-main`, der README ligger: `Start demoen` og `Start den ekte versjonen`, som `.cmd` for Windows og `.command` for Mac. På Windows tar du den som bare heter «Start demoen», ikke «Start demoen.command».
 - **Dobbeltklikk «Start demoen».** Vil du prøve ekte kurser, dobbeltklikker du «Start den ekte versjonen».
 
 Når vinduet er åpent:

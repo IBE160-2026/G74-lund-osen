@@ -2554,6 +2554,7 @@ class TestReadmeForNybegynnere:
         # Story 3.5f: «Kom i gang: nedlasting og installasjon» staar som «Kom
         # i gang» i «Innhold», og ankeret kom-i-gang er beholdt paa linja over.
         hoved = hoved[hoved.index(KOM_I_GANG[3:]) : hoved.index("Medlemmer") + 1]
+        assert hoved[0] == KOM_I_GANG[3:] and lenker[0] == ("Kom i gang", "kom-i-gang"), lenker
         hoved[0] = "Kom i gang"
         assert [t for t, _ in lenker] == hoved, lenker
         # Gjennomgangen, ECH5: hvert anker finnes én gang, ellers gir GitHub
@@ -3262,7 +3263,10 @@ class TestHovedveien:
         ], stegene
         assert "«Code»" in stegene[0] and "«Download ZIP»" in stegene[0] and f"]({ZIP_LENKEN})" in stegene[0]
         assert "«Pakk ut alle»" in stegene[1] and "`G74-lund-osen-main`" in stegene[1]
-        assert "`Start demoen` og `Start den ekte versjonen`" in stegene[2] and "øverst i mappa" in stegene[2]
+        # Gjennomgangen (BH1, ECH1): den innerste mappa etter «Pakk ut alle».
+        assert "`Start demoen` og `Start den ekte versjonen`" in stegene[2]
+        assert "øverst i den innerste `G74-lund-osen-main`" in stegene[2]
+        assert "ikke «Start demoen.command»" in stegene[2] and "Pakk ut først" in stegene[1]
         # Ingen nummererte steg: «steg 1–4» betyr Docker-stegene.
         assert re.search(r"^\d+\. ", dobbeltklikk, re.MULTILINE) is None
         # Resten av teksten står: advarselen, godkjenningen, vernet mot .git
@@ -3347,7 +3351,9 @@ class TestHovedveien:
         trenger = [l for l in topp.splitlines() if l.startswith("| Trenger |")]
         assert trenger == ["| Trenger | Ingen konto og ingen nøkkel | En gratis nøkkel fra EODHD |"], trenger
         du_trenger = [a for a in topp.split("\n\n") if a.startswith("**Du trenger**")][0]
-        assert "men verken git, Docker eller konto" in du_trenger
+        # Gjennomgangen (BH3, ECH4): den ekte versjonen trenger en konto hos
+        # EODHD, saa bare demoen er uten konto.
+        assert "men verken git eller Docker, og demoen trenger ingen konto" in du_trenger
         assert "Bare Docker" not in du_trenger and "Med Docker trenger du Docker Desktop" in du_trenger
 
     def test_til_faglaerer_viser_foerst_til_dobbeltklikket_og_saa_til_docker(self):
@@ -3381,9 +3387,12 @@ class TestHovedveien:
             "Start den ekte versjonen.cmd",
             "Start den ekte versjonen.command",
         ]
+        # Gjennomgangen (BH14, VG3): startfilene forklares i punktet om start/.
+        start = [p for p in punkter if p.startswith("- [`start/`](start/)")]
+        assert len(start) == 1, punkter
         for navn in startfilene:
-            assert navn.rsplit(".", 1)[0] in del_, navn
-        assert "for Windows og Mac" in del_
+            assert navn.rsplit(".", 1)[0] in start[0], navn
+        assert "for Windows og Mac" in start[0]
         mangler = [f for f in rota if f not in startfilene and f not in lenket]
         assert not mangler, mangler
         for navn in ("CLAUDE.md", "pyproject.toml", "uv.lock"):
@@ -3396,6 +3405,14 @@ class TestHovedveien:
         hjelp = _hjelp()
         deler = re.findall(r"^## (.+)$", hjelp, re.MULTILINE)
         assert deler[:2] == ["Start med dobbeltklikk", "Steg 1: Docker Desktop"], deler
+        # Gjennomgangen (BH8, ECH3): svar for de vanligste feilene på hovedveien.
+        dobbeltklikk = hjelp.split("\n## Start med dobbeltklikk\n", 1)[1].split("\n## ", 1)[0]
+        for sporsmaal in (
+            "Jeg finner ikke de fire filene.",
+            "Vinduet lukkes med en gang.",
+            "Det er to filer som heter «Start demoen».",
+        ):
+            assert f"### {sporsmaal}\n" in dobbeltklikk, sporsmaal
         assert "Dobbeltklikket står først, som i README-en." in hjelp
         assert "«Start med dobbeltklikk, uten Docker»" not in hjelp
         assert f"«{DOBBELTKLIKKET}» i [README-en](../README.md#enklest-dobbeltklikk-uten-docker)" in hjelp

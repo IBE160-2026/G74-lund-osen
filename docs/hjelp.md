@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-26T13:05
+updated: 2026-10-26T13:26
 ---
 
 # Hjelp til «Kom i gang»
@@ -10,6 +10,18 @@ updated: 2026-10-26T13:05
 Spørsmål og svar til «Kom i gang» i [README-en](../README.md), sortert etter steget de hører til. De vanligste står også i README-en, under «Står du fast?». Dobbeltklikket står først, som i README-en. Stegene 1–4 hører til «Med Docker Desktop» og er felles for begge versjonene der, og demoen står før den ekte versjonen.
 
 ## Start med dobbeltklikk
+
+### Jeg finner ikke de fire filene.
+
+Etter «Pakk ut alle» på Windows ligger en `G74-lund-osen-main` inne i en annen med samme navn. Åpne den innerste, der README ligger. De fire filene står øverst der: `Start demoen` og `Start den ekte versjonen`, som `.cmd` for Windows og `.command` for Mac. Står du inne i ZIP-fila, se «ZIP-fila ser ut som en vanlig mappe.» under steg 2.
+
+### Vinduet lukkes med en gang.
+
+Har du dobbeltklikket inne i ZIP-fila uten å pakke ut, finner ikke startfila skriptene i `start/`. Pakk ut først, og dobbeltklikk i den innerste `G74-lund-osen-main`.
+
+### Det er to filer som heter «Start demoen».
+
+Windows viser ofte `Start demoen.cmd` uten filendelsen og `Start demoen.command` med den. På Windows tar du den som bare heter «Start demoen». `.command` er for Mac, og på Windows spør den bare hvilket program som skal åpne den.
 
 ### Windows advarer mot fila.
 
