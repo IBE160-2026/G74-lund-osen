@@ -2,7 +2,7 @@
 title: 'Story 3.5 (3.5f): hovedveien i «Kom i gang»'
 type: 'docs'
 created: '2026-10-26'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'ab85068'

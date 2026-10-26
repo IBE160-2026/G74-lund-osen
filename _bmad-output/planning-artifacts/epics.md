@@ -2468,6 +2468,8 @@ Resten ryddes etter alle testene.
 
 *Lagt til 2026-10-26 kl. 10:34:* 3.5e, den andre versjonen stoppes rett før webserveren, er squash-flettet i `dbfa0b9`, PR #100, låst til head-en `2e8f347` (spesifikasjonen `spec-3-5e-stopp-foer-webserveren.md`). Porten sjekkes før uv, og et annet program stopper skriptet der. Den andre versjonen fra samme mappe stoppes rett før webserveren, så den kjører videre hvis skriptet stopper før det. BH5 i triagen til 3.5d er lukket.
 
+*Lagt til 2026-10-26 kl. 13:32:* 3.5f, hovedveien i «Kom i gang», er squash-flettet i `8cd20b3`, PR #101, låst til head-en `e5f65f5` (spesifikasjonen `spec-3-5f-hovedveien.md`). Etter svaret 25.10 kl. 11:32 og innspillet kl. 11:26 heter overskriften «Kom i gang: nedlasting og installasjon», med ankeret `kom-i-gang` beholdt. «Velg vei etter hva du har» lenker rett inn til dobbeltklikket (anbefalt), «Med Docker Desktop» og «Uten Docker, med uv». Dobbeltklikket er en egen del først, med den direkte ZIP-lenken, og «Mappestruktur» forklarer hver fil og mappe i rota. `docs/hjelp.md` og §9 i kvalitetssikringen følger, med Docker som reserve.
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
