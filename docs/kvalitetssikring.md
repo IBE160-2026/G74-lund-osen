@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-26T13:32
+updated: 2026-10-26T16:32
 ---
 
 # Kvalitetssikring
@@ -363,6 +363,7 @@ sist i dokumentet.
 | 3.4c Historikken i demoen som den ekte | `9359a70` (#88) | 1 (3, M1–M3) | – kjørt på `c137b66` og igjen etter rettingen i `c60be34` | `S/spec-3-4c-historikken-i-demoen.md` |
 | 2.3c Første henting på dagtid når basen er tom | `2a84142` (#87) | 1 (3, M1–M3) | – kjørt på `9ad2c60` og igjen etter rettingen i `1431a6a` | `S/spec-2-3c-foerste-henting-paa-dagtid.md` |
 | 8.6 Børsometeret | `7f1c1f0` (#89) | 1 (5, M1–M3, N1 og N2) | – M1–M3 kjørt før og etter rettingen i `2d72dc2`, og igjen på `a1f869f`; N1 og N2 for svarene kl. 09:24 på `a1f869f` | `S/spec-8-6-boersometeret.md` |
+| 8.6b Børsometeret som tavla | `7f6d9e4` (#99) | 2 | – begge kjørt på `4af6efa` og `6f5815b`, og igjen på `38cbb3e` 26.10 etter punktene a–d og gjennomgangen | `S/spec-8-6b-som-tavla.md` |
 | 3.4d Fotnoten for «ikke vurdert» | `544648f` (#90) | 1 (5, M1–M3, c M1 og c M2) | – M1–M3 kjørt på `8dcde6d` 22.10, c M1 og c M2 for svarene kl. 23:19 og 11:44 på `abdb110` | `S/spec-3-4d-fotnoten-ikke-vurdert.md` |
 | 3.4e Fotnoten etter startdagen i demoen, og for inneværende børsdag | `e772cc6` (#91) | 1 (3, M1–M3) | – M1 og M2 kjørt på `622e25f`, M3 for svaret kl. 19:10 på `2fd2635` | `S/spec-3-4e-fotnoten-etter-startdag.md` |
 | 3.5a Start med dobbeltklikk med uv, uten Docker | `afbc0af` (#92) | 2 (4, M1–M3 og vernet) | – M1–M3 kjørt på `1d46532` og igjen på `6287033` 23.10, vernet «bare fra main» én gang med `-x` på `2a3dd7e` 24.10 | `S/spec-3-5a-dobbeltklikk-med-uv.md` |
@@ -603,6 +604,7 @@ funn. Antall rader i loggen:
 | 3.5d | 24 | 15 | 8 | 1 |
 | 3.5f | 23 | 13 | 9 | 1 |
 | 3.5e | 10 | 8 | – | 2 |
+| 8.6b, gjennomgangene 26.10 | 37 | 21 | 13 | 3 |
 | 8.2a | 21 | 15 | 6 | – |
 | 9.1, oppdatering 17.10 | 19 | 17 | 2 | – |
 | 9.7 | 19 | 13 | 6 | – |
@@ -1369,6 +1371,8 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 3.4c | M1–M3 | M1 `test_ingen_vurdering_foer_startdagen`, M2 `test_en_rad_per_aksje_hver_boersdag_fra_startdagen`, M3 `test_startdagen`, de nye testene alene (`-k`) | `S/spec-3-4c-…` |
 | 2.3c | M1–M3 | M1 og M3 `test_tom_base_foer_22_henter_forrige_boersdag`, M2 `test_base_som_ikke_er_tom_gir_0_kall_foer_22`, `TestFoersteHenting` alene (`-k`) | `S/spec-2-3c-…` |
 | 8.6 | M1–M3, N1 og N2 | M1 `test_snittet_er_av_endringen_for_alle_aksjene_i_bransjen`, M2 `test_gult_bare_ved_3_av_3`, M3 `test_rekkefoelgen_er_den_i_designreglene`, N1 `test_en_annen_dag_foelger_gult_siste_boersdag` og `test_uten_kurs_en_annen_dag_har_gult_fra_siste_boersdag` alene (`-k`), N2 `test_hver_rute_lenker_til_aksjesiden` og `test_aksjesiden_uten_kurser_svarer_200_med_beskjed` alene (`-k`) | `S/spec-8-6-…` |
+| 8.6b | grensen 0,5 flyttet til 1 (`GRENSE_LYS`) | `test_hvert_trinn_ved_grensene[0.4951-lys-opp]` på `4af6efa`, `6f5815b` og `38cbb3e` | `S/spec-8-6b-…` |
+| 8.6b | arealet uten vekten (`squarify([1.0 for r in bransje.ruter], …)` i `_legg_ut`) | `test_arealet_foelger_volumforholdet_i_tabellen` på `4af6efa`, `6f5815b` og `38cbb3e` | `S/spec-8-6b-…` |
 | 3.4d | M1–M3, c M1 og c M2 | M1–M3 fanget på `8dcde6d` 22.10 (Utført-linja kl. 21:30), c M1 `test_datoen_i_fotnoten_kommer_fra_startdag` og `test_datoen_paa_sidene_kommer_fra_startdag` alene (`-k`), c M2 `test_demoen_foer_startdagen_har_fotnoten` og `test_den_ekte_versjonen_har_den_ekte_teksten` alene (`-k`) | `S/spec-3-4d-…` |
 | 3.4e | M1–M3 | M1 `TestFotnotenIDemoen::test_oversikten_med_en_rad_som_mangler`, M2 `TestVurderingenPaaOversikten::test_ikke_vurdert_med_fotnoten`, M3 `TestFotnotenForInnevaerendeBoersdag::test_fredagen_i_helga[loerdag-/]`, og hver av de nye testene alene (`-k`) | `S/spec-3-4e-…` |
 | 3.5a | M1–M3 | M1 `test_skriptene_bruker_kommandoene_i_readme[start.ps1]` og `test_webserveren_binder_bare_127_0_0_1`, M2 `test_noekkelen_og_miljoeet_skrives_aldri_ut[start.sh]`, M3 `test_aldri_debug_eller_down_v[start.ps1]` | `S/spec-3-5a-…` |
