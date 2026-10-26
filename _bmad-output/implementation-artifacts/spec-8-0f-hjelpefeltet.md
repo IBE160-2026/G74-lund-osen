@@ -2,7 +2,7 @@
 title: 'Story 8.0f: hjelpen ved «?» i et fast felt som ikke dekker siden'
 type: 'feature'
 created: '2026-10-26'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'd0830bb'

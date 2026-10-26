@@ -3306,6 +3306,8 @@ sted. Min liste (8.3) bruker de samme.
 
 *Avgjort 2026-10-24 kl. 11:34 (gruppen uten preferanse, rådets forslag):* det er ett felt, et nytt «?» bytter innholdet, og feltet står åpent til «Lukk» eller Esc. Svarene står i repoet bare i instruksjonen 26.10 kl. 17:51 i `docs/ai-prompts/2026-10-26.md`.
 
+*Lagt til 2026-10-26 kl. 18:54:* 8.0f, hjelpen ved «?» i ett fast felt, er squash-flettet i `238ef18`, PR #102, låst til head-en `8621103` (spesifikasjonen `spec-8-0f-hjelpefeltet.md`): fra 1056 px står feltet fast i høyre kant og siden gir plass, smalere står det over en tom plass rett under «?», et nytt «?» bytter innholdet, «Lukk» og Esc lukker, og en knapp flytter feltet til venstre eller høyre. Uten JavaScript er hjelpen som før. U19 og U28 er løst.
+
 ### Story 8.0c: Tydelig merking, ord ved sjekkene og datoer på grafen
 
 *Lagt til 2026-10-05, fra rådets gjennomgang av sidene og Marians beslutning kl. 21:23.*
