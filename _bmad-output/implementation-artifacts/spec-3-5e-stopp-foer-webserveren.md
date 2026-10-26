@@ -56,6 +56,31 @@ context:
 
 Én, med `-x`, med kopi før og sha256 mot HEAD etter: stoppen tilbake før uv.
 
+*Utfallet 26.10 kl. 10:08:17–10:08:32 på `df6b0a0`:* `Frigjoer-Porten $false` byttet med `$true` i `start.ps1`, så den andre versjonen stoppes før uv, kjørt med `-x` mot `tests/test_dobbeltklikk.py`. Fanget av `test_start_ps1_stopper_bare_den_andre_versjonen_paa_porten[oss]`. Fila var lik HEAD etterpå: samme sha256 som kopien, og samme git-objekt som HEAD.
+
+*Utfallet 26.10 kl. 10:23:59–10:24:14 på `fd19b7f`, etter rettelsene fra gjennomgangen:* fanget av den samme testen, og fila var lik HEAD etterpå. Et forsøk kl. 10:23:05 satte ikke inn mutanten, fordi mønsteret krevde CRLF og fila har LF i arbeidskopien; testene kjørte da på uendret kode og telles ikke.
+
+## Gjennomgangen
+
+Gjennomgang 26.10 etter hele settet (3640 bestått, 24 hoppet over, 0 feilet, 10:08:49–10:14:38 på `df6b0a0`), av diffen `fd04a78..df6b0a0`, med Blind Hunter (BH, 8 funn), Edge Case Hunter (ECH, 4) og Verification Gap (VG, ingen hull). Rettet i `d8cd7b8`, `48e6da3` og `fd19b7f`.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| ECH1, ECH2 | «Kjører videre hvis uv, uv sync eller hentingen feiler» lovet for mye: feiler hentingen, starter appen likevel, og da stoppes den andre versjonen | medium | **rettet** i `d8cd7b8`: «hvis skriptet stopper før det», og README-en og `docs/hjelp.md` sier hva som skjer når hentingen feiler |
+| BH2, ECH3 | `uv sync` går nå mens den andre versjonen bruker `.venv`, og på Windows kan den feile på åpne filer, med en beskjed om nettet | medium | **rettet** i `48e6da3`: da sier vinduet at den andre versjonen kan holde filene i `.venv` åpne, og ber om å lukke vinduet dens. Ikke prøvd med en `uv sync` som må bytte filer |
+| BH7 | README-en sa ikke at porten sjekkes igjen rett før webserveren | low | **rettet** i `d8cd7b8` |
+| BH5, ECH4 | Ingen test sjekket at beskjeden om den andre versjonen kommer før uv sync | low | **rettet** i `48e6da3`: beskjeden står før «Installerer pakkene» i alle tilfellene med den andre versjonen |
+| BH6 | Testen for uv sync godtok meldingen fra begge skriptene | low | **rettet** i `48e6da3`: meldingen er den samme i begge nå, og testen krever den |
+| BH4 | Vinduet sa «kjører allerede på …» både før uv og rett før webserveren | low | **rettet** i `fd19b7f`: den andre beskjeden sier bare at den stoppes nå |
+| BH1 | Testtekstene fra 3.5d sa at den andre versjonen stoppes før uv | low | **rettet** i `fd19b7f` |
+| BH3 | Hentingen skriver til `data/db/ose.db` mens den andre ekte versjonen kjører fra samme mappe | low | **under «Åpent»:** webserveren skriver bare merkingen i Min liste, og tilkoblingen venter opptil `VENTETID_SEKUNDER` (5 sekunder) på en lås. Ikke prøvd |
+| BH8 | To vinduer startet nesten samtidig kommer begge forbi sjekken før uv, og den siste stopper den første rett før webserveren | low | **under «Åpent»:** det samme kunne skje før 3.5e, men tiden mellom sjekken og webserveren er lengre nå |
+
+## Åpent
+
+- **BH3:** hentingen mens den andre ekte versjonen kjører fra samme mappe, ikke prøvd.
+- **BH8:** to vinduer startet nesten samtidig.
+
 ## Det som ikke endres
 
 - Ingen API-kall utover kvotesjekken i regel 15, og `src/fetch_prices.py` kjøres ikke mot EODHD. Testene bruker en falsk uv.
