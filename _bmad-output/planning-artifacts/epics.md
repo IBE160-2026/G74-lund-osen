@@ -3599,6 +3599,10 @@ dagen gjaldt hele børsen eller noen bransjer.
 
 *Avgjort 2026-10-23 kl. 11:44 (gruppens svar, a):* en Rettet-linje under siste avsnitt i FR-204 i `prd.md`. 404 gjelder bare et symbol utenfor lista, og en base uten en eneste kurs før første henting, når ingen side lenker dit. En aksje i lista uten kurser svarer 200 med en beskjed (svaret kl. 09:24, b). Det åpne punktet om FR-204 over er dermed lukket.
 
+*Avgjort 2026-10-24 kl. 11:54 (gruppens svar):* børsometeret gjøres likt tavla i 8.6b, søylene tas ut av børsometeret og står bare på oversikten, og hovedindeksen står som et tall i linja «Mål mot børsen».
+
+*Avgjort 2026-10-25 kl. 21:41 (gruppens svar):* 8.6b bygges i natt og stopper før flettingen med bilder, og gruppen avgjør flettingen mandag før kl. 21:20. Periodene er 8.17b.
+
 ### Story 8.7: Sjekk 2 og 3 i kursgrafen
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
