@@ -19,6 +19,7 @@ import demo
 import lagring_sqlite
 from boersometer import (
     BRANSJER,
+    BRED,
     GUL,
     HOEY,
     KANT,
@@ -1406,6 +1407,53 @@ class TestKartet:
         """Ville feilet hvis navnet sto på en rute det ikke får plass i, eller
         manglet på en som er stor nok."""
         assert tekstnivaa(b, h, symbol) == ventet
+
+    def test_tekstnivaaet_er_regnet_for_den_synlige_ruta_ved_den_minste_bredden(self):
+        """Gjennomgangen 26.10 (VG, ECH, BH): den smale flaten brukes ned til
+        288 px, og ruta er 2 px mindre enn plassen på hver side. Ville feilet
+        hvis nivået ble regnet ved 358 px, for plassen med kanten, eller for
+        feltet i stedet for ruta."""
+        ruter = _ruter_med([0.6, 2.4, 1.0, 0.7, 0.8, 1.9, 0.5, 3.0, 1.1, 1.4, 0.9, 2.2, 0.55, 1.3, 2.7])
+        k = kart(bygg_boersometer(ruter))
+        assert (BRED.minste, SMAL.minste) == (761 - 17 - 2 * 16, 320 - 2 * 16)
+        for flate in (BRED, SMAL):
+            bredde = flate.minste
+            hoeyde = bredde * k.forhold[flate.navn]
+            for f in k.felt:
+                fb, fh = f.plass[flate.navn].b / 100 * bredde, f.plass[flate.navn].h / 100 * hoeyde
+                kropp = fh * (1 - f.topp[flate.navn] / 100)
+                for kr in f.ruter:
+                    rb, rh = kr.plass[flate.navn].b / 100 * fb, kr.plass[flate.navn].h / 100 * kropp
+                    ventet = tekstnivaa(rb - 2 * KANT, rh - 2 * KANT, kr.rute.aksje.symbol)
+                    assert kr.nivaa[flate.navn] == ventet, (flate.navn, kr.rute.aksje.symbol, rb, rh)
+
+    def test_tekstnivaaet_paa_siden_er_det_kartet_regnet(self, klient):
+        """Gjennomgangen 26.10 (VG): ville feilet hvis malen sluttet å skrive
+        nivaa-bred-N og nivaa-smal-N, skrev et annet nivå enn plassen gir,
+        eller alle rutene fikk samme nivå."""
+        html = _side(klient)
+        kartet = _kartet(html)
+        klasser = {
+            symbol: k
+            for k, symbol in re.findall(
+                r'<a class="rute ([^"]*)"[^>]*>\s*<span class="ticker">([A-Z0-9]+)</span>', html
+            )
+        }
+        assert len(klasser) == 15
+        sett = set()
+        for flate in (BRED, SMAL):
+            n = flate.navn
+            bredde = flate.minste
+            hoeyde = bredde / kartet["forhold"][n]
+            for f in kartet["felt"]:
+                fb, fh = f["plass"][n][2] / 100 * bredde, f["plass"][n][3] / 100 * hoeyde
+                kropp = fh * (1 - f["topp"][n] / 100)
+                for symbol, p in f["ruter"].items():
+                    rb, rh = p[n][2] / 100 * fb, p[n][3] / 100 * kropp
+                    ventet = tekstnivaa(rb - 2 * KANT, rh - 2 * KANT, symbol)
+                    assert re.findall(rf"\bnivaa-{n}-(\d)\b", klasser[symbol]) == [str(ventet)], (n, symbol, rb, rh)
+                    sett.add((n, ventet))
+        assert len(sett) > 2, sett
 
     def test_det_som_ikke_faar_plass_leses_av_skjermleseren(self):
         """Teksten som ikke får plass, skjules bare for øyet. Ville feilet med

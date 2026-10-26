@@ -291,20 +291,25 @@ MEST_VEKST = 600
 
 @dataclass(frozen=True)
 class Flate:
-    """Et oppsett av kartet. bredde er den minste bredden i px flaten brukes
-    på, og kartet regnes ved den; forhold er høyden mot bredden ved start."""
+    """Et oppsett av kartet. Kartet regnes ved bredde i px; forhold er høyden
+    mot bredden ved start, og minste er den minste bredden flaten brukes på,
+    der tekstnivået regnes."""
 
     navn: str
     bredde: float
     forhold: float
+    minste: float
 
 
 # Bred for vinduer bredere enn 760 px (innholdet minst 729 px, og 712 px med
 # et rullefelt på 17 px, gjennomgangen 26.10, ECH), og smal for
 # 760 px og smalere, regnet ved 390 px (innholdet 358 px), som instruksjonen
 # sier. Stilen velger med @media, og hver rute har plassen i begge.
-BRED = Flate("bred", 712, 0.5)
-SMAL = Flate("smal", 358, 1.2)
+# Tekstnivået regnes ved den minste bredden, for den synlige ruta innenfor
+# KANT: 712 px og 288 px, et vindu 320 px bredt (gjennomgangen 26.10, VG,
+# ECH og BH).
+BRED = Flate("bred", 712, 0.5, 712)
+SMAL = Flate("smal", 358, 1.2, 288)
 FLATENE = (BRED, SMAL)
 
 
@@ -417,6 +422,13 @@ def squarify(
     return ut
 
 
+def _nivaa_paa_minste(flate: Flate, rb: float, rh: float, symbol: str) -> int:
+    """Tekstnivået for plassen rb × rh ved flate.bredde, regnet for den
+    synlige ruta ved flate.minste."""
+    skala = flate.minste / flate.bredde
+    return tekstnivaa(rb * skala - 2 * KANT, rh * skala - 2 * KANT, symbol)
+
+
 def tekstnivaa(b: float, h: float, symbol: str) -> int:
     """Hvor mye tekst ruta har plass til, i px (spesifikasjonen 8.6b, «Navnet»)."""
     if b < 9 * len(symbol) + 10 or h < 40:
@@ -480,7 +492,7 @@ def kart(bransjer: list[Bransje], flatene: tuple[Flate, ...] = FLATENE) -> Kart:
                 ruteplass[i][flate.navn] = Plass(
                     (rx - fx) / fb * 100, (ry - fy - OVERSKRIFT) / kropp * 100, rb / fb * 100, rh / kropp * 100
                 )
-                nivaa[i][flate.navn] = tekstnivaa(rb, rh, bransje.ruter[i].aksje.symbol)
+                nivaa[i][flate.navn] = _nivaa_paa_minste(flate, rb, rh, bransje.ruter[i].aksje.symbol)
         felt.append(
             Kartfelt(
                 bransje=bransje,
