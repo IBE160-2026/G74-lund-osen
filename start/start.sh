@@ -100,7 +100,7 @@ frigjoer_porten() {
         return 0
     fi
     for id in $ider; do
-        echo "Den andre versjonen av OSE Signal kjører allerede på $ADRESSE (prosess $id). Den stoppes nå, så denne kan starte."
+        echo "Den andre versjonen av OSE Signal (prosess $id) stoppes nå, så denne kan starte."
         kill "$id" 2>/dev/null
     done
     i=0

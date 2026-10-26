@@ -124,7 +124,7 @@ function Frigjoer-Porten([bool]$Stopp) {
         return
     }
     foreach ($lytter in $lyttere) {
-        Write-Host "Den andre versjonen av OSE Signal kjører allerede på $Adresse (prosess $($lytter.Id)). Den stoppes nå, så denne kan starte."
+        Write-Host "Den andre versjonen av OSE Signal (prosess $($lytter.Id)) stoppes nå, så denne kan starte."
         # Bare lytteren, python.exe; uv og waitress-serve.exe over den stopper
         # når den stopper (gjennomgangen av 3.5d, BH8).
         try { Stop-Process -Id $lytter.Id -Force -ErrorAction Stop } catch { }

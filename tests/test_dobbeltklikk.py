@@ -332,7 +332,8 @@ def _kjoer(argumenter, miljoe, sjekk_porten=True):
 
     Spesifikasjonen 3.5d: skriptet stopper den andre versjonen av OSE Signal
     paa port 8000. Er porten opptatt paa maskinen, for eksempel av appen fra
-    main, hoppes testen over, saa ingen test stopper den."""
+    main, hoppes testen over, saa ingen test stopper den. Testene for 3.5e
+    legger en falsk uv foerst paa PATH; den gjoer ingen nettkall."""
     if sjekk_porten and not _porten_er_ledig():
         pytest.skip("port 8000 er i bruk paa maskinen")
     # Gjennomgangen av 3.5d (BH1, ECH1): uten LOCALAPPDATA, ProgramData og
@@ -668,10 +669,11 @@ def _sjekk_porten(hvem, lytter, kode, utskrift):
 @pytest.mark.skipif(sys.platform != "win32", reason="krever Windows PowerShell")
 @pytest.mark.parametrize("hvem", ["oss", "annen_mappe", "fremmed"])
 def test_start_ps1_stopper_bare_den_andre_versjonen_paa_porten(tmp_path, hvem):
-    """Gruppens svar 24.10 kl. 12:04. Ville feilet hvis start.ps1 stoppet et
-    annet program paa porten (mutanten: sjekken av kommandolinja borte), ikke
-    sa hvilket program og hva man gjoer, ikke stoppet den andre versjonen av
-    OSE Signal, eller ikke gikk videre naar porten var ledig."""
+    """Gruppens svar 24.10 kl. 12:04 og 20:00 (3.5e). Ville feilet hvis
+    start.ps1 stoppet et annet program paa porten (mutanten: sjekken av
+    kommandolinja borte), ikke sa hvilket program og hva man gjoer, eller
+    stoppet den andre versjonen av OSE Signal foer uv i stedet for aa si fra
+    og gaa videre (mutanten i 3.5e)."""
     mappe = _mappe_med_skriptet(tmp_path, "start.ps1", "ingen")
     systemrot = os.environ["SYSTEMROOT"]
     powershell = Path(systemrot) / "System32" / "WindowsPowerShell" / "v1.0" / "powershell.exe"
@@ -696,10 +698,10 @@ def _lsof():
 @pytest.mark.skipif(sys.platform == "win32" or _bash() is None or _lsof() is None, reason="krever bash, lsof og ps")
 @pytest.mark.parametrize("hvem", ["oss", "annen_mappe", "fremmed"])
 def test_start_sh_stopper_bare_den_andre_versjonen_paa_porten(tmp_path, hvem):
-    """Gruppens svar 24.10 kl. 12:04. Ville feilet hvis start.sh stoppet et
-    annet program paa porten, ikke sa hvilket program og hva man gjoer, ikke
-    stoppet den andre versjonen av OSE Signal, eller ikke gikk videre naar
-    porten var ledig."""
+    """Gruppens svar 24.10 kl. 12:04 og 20:00 (3.5e). Ville feilet hvis
+    start.sh stoppet et annet program paa porten, ikke sa hvilket program og
+    hva man gjoer, eller stoppet den andre versjonen av OSE Signal foer uv i
+    stedet for aa si fra og gaa videre."""
     mappe = _mappe_med_skriptet(tmp_path, "start.sh", "ingen")
     stier = {str(Path(_bash()).parent)}
     for program in ("dirname", "ps", "grep", "sort", "sleep", "lsof"):
@@ -1056,6 +1058,8 @@ def _sjekk_35e(tilfelle, kode, utskrift, linjene, levde, fremmed):
         midten = "demo" if tilfelle == "demoen" else "henting"
         assert linjene == ["sync 1", f"{midten} 1", "server 0"], (linjene, utskrift)
         assert not levde, utskrift
+        assert "Den andre versjonen av OSE Signal (prosess " in utskrift and ") stoppes nå" in utskrift, utskrift
+        assert utskrift.count("kjører allerede på http://127.0.0.1:8000") == 1, utskrift
         foer = "Lager demobasen." if tilfelle == "demoen" else "Hentingen gikk ut med kode 1"
         assert utskrift.index(foer) < utskrift.index(stoppet) < utskrift.index("Starter appen"), utskrift
 
