@@ -2459,6 +2459,8 @@ Resten ryddes etter alle testene.
 
 *Avgjort kl. 11:49:* dobbeltklikket bruker bare uv, også når Docker kjører.
 
+*Avgjort 2026-10-24 kl. 20:00 (gruppens svar, ført 26.10 fra instruksjonen kl. 09:57):* kjører den andre versjonen av OSE Signal fra samme mappe, stoppes den rett før webserveren startes, ikke før uv og hentingen, så den kjører videre hvis noe feiler før det. Et annet program på porten sjekkes fortsatt før uv og stoppes aldri. Det endrer «før uv og hentingen» i punkt d) i 3.5d. Svaret 25.10 kl. 20:00, «BH5 står åpent», gjaldt loggen for 24.10, fordi stoppen ikke var bygget.
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
