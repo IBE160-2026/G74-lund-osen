@@ -54,10 +54,43 @@ context:
 
 Én, med `-x`, med kopi før og sha256 mot HEAD etter: steg 3 tatt ut av dobbeltklikket.
 
+*Utfallet 27.10 kl. 00:13:48–00:13:50 på `e450ff9`:* linja `3. **Åpne `G74-lund-osen-main` og dobbeltklikk «Start demoen».** …` tatt ut av `README.md`, kjørt med `-x` mot `tests/test_docker.py`, `tests/test_dobbeltklikk.py` og `tests/test_readme.py`. Fanget av `TestReadmeBakPiler::test_hvert_steg_hver_kommando_og_hver_lenke_fra_foer_finnes`. Kjørt igjen kl. 00:13:57 med `-k TestHovedveien`: fanget av `test_dobbeltklikket_staar_foerst_og_ikke_bak_en_pil`. Fila var lik HEAD etter begge: samme sha256 som kopien, og samme git-objekt som `HEAD:README.md` (`e152934`).
+
+## Avtrykkene
+
+Avtrykkene i `AVTRYKK_I_KOM_I_GANG` er sha256 av innholdet i hver pil på grenen. Med et skript utenfor repoet ble de sammenlignet med sha256 av de samme delene i `git show 54d4714:README.md` (linje 51, 55–77, 81–102, 172–213 og 247–289). «Du trenger», «Med Docker Desktop», «Uten Docker, med uv», «Slik virker dobbeltklikket» og «Står du fast?» var like på `e450ff9`. Etter gjennomgangen er «Med Docker Desktop» skrevet om i én setning (BH2), og de fire andre er fortsatt like.
+
 ## Gjennomgangen
 
 Kommer etter hele settet.
 
+Gjennomgang 27.10 etter hele settet (3773 bestått, 37 hoppet over, 0 feilet, 00:14:12–00:21:50 på `e450ff9`), av diffen `54d4714..e450ff9`, med Blind Hunter (BH, 14 funn), Edge Case Hunter (ECH, 15) og Verification Gap (VG, 5, ingen hull i dekningen av kravene i c). Dommen i tabellen er vår. Små funn er rettet med en gang.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH7, ECH1, ECH15, VG2 | Lenken i «Windows advarer mot fila.» i hjelpen nevner «Slik virker dobbeltklikket», men går til de fem stegene | medium | **rettet:** pila har ankeret `slik-virker-dobbeltklikket`, og hjelpen lenker dit |
+| BH2, ECH6, VG4 | «Tabellen over viser forskjellen» i pila til Docker, men tabellen står i en annen pil | medium | **rettet:** «Tabellen i pila «Demoen og den ekte versjonen» viser forskjellen.», og avtrykket er satt på nytt |
+| BH1, ECH5, VG4 | «Demoen står først i stegene under» står over tabellen, ikke over stegene | low | **rettet:** «i stegene for Docker og uv», og avtrykket er satt på nytt |
+| ECH2, VG3 | Steg 3 sier ikke at Windows-brukere skal ta fila uten `.command` | medium | **rettet:** «På Windows: den uten `.command`.» (21 ord), med test |
+| BH14, ECH3 | Steg 2 sier ikke at man ikke skal starte inne i ZIP-fila | medium | **rettet:** «Ikke start fra inne i ZIP-fila.» (22 ord), med test |
+| BH5, ECH4 | Linja om den ekte versjonen sier ikke at den bare starter i en kopi fra ZIP-fila | medium | **rettet:** «og starter bare i en kopi fra ZIP-fila, ikke i en klon», med test |
+| BH8, ECH8, VG1 | En assert i `test_readme_og_hjelpen_har_advarselen_og_godkjenningen` kan ikke feile | low | **rettet:** den krever at pila til Docker finnes og står etter stegene |
+| BH9, ECH9 | `_utenfor_pilene` godtar en `</details>` uten par | low | **rettet:** `dybde` sjekkes i løkka og til slutt |
+| ECH10, ECH11, ECH12 | `_pilene` gir IndexError, to piler med samme navn leses stille, og `_delen_i_readme` gir IndexError | low | **rettet:** påstander med melding |
+| BH13, ECH14 | Avtrykkene er regnet på grenen, ikke vist mot `54d4714` | low | **rettet:** «Avtrykkene» over sier hvordan de ble sammenlignet |
+| ECH13 | Commit-meldingen sier «uendret» om pilene, men «Velg vei» er skrevet om | low | står: spesifikasjonen og kommentaren over avtrykkene sier hva som er skrevet om, og historikken skrives ikke om (regel 7) |
+| BH3 | Ingenting synlig viser til Docker eller uv, for eksempel for Linux | medium | **til gruppen:** avgjørelsen 26.10 kl. 23:00 sier én linje om advarselen og én om den ekte versjonen under stegene, og alt annet bak piler. «Du trenger» (Linux) og «Velg vei» står i pilene rett under |
+| ECH7 | «steg 4» i svarene under «Står du fast?» kan leses som steg 4 i dobbeltklikket | medium | **til gruppen:** står under «Åpent». Svarene er flyttet uendret |
+| BH4 | Den som har uv fra før, kan hoppe over steg 4 og ikke lese at første gang tar minutter | low | står: avgjørelsen gir fem steg i den rekkefølgen. Under «Åpent» |
+| BH6 | «steg 1–4» i «Til faglærer» lander på pila til Docker, ikke på stegene | low | står: pila heter «Med Docker Desktop» og er synlig der lenken lander |
+| BH11 | Bare én mutant, så grensen på 25 ord og ankeret er ikke mutert | low | står: instruksjonen sier én mutant. Grensen og ankeret sjekkes i `test_dobbeltklikket_staar_foerst_og_ikke_bak_en_pil` og `test_overskriftene_fra_foer_finnes` |
+| BH12 | To ankre på samme sted, og ingen test hindrer lenker til `enklest-dobbeltklikk-anbefalt` | low | står: «Valg som er gjort her» sier at `enklest-dobbeltklikk-uten-docker` er ankeret lenkene bruker, og testen krever at det finnes én gang |
+| BH10 | `<details open>` eller CRLF gjør at hjelperne ikke ser pila | low | avvist: `test_markdown_inne_i_pilene_vises_riktig_paa_github` krever `<details>` alene på linja og like mange `<details`, `</details>` og `<summary>`, og `read_text` leser CRLF som LF |
+| VG5 | Prøveprotokollen i §9 i `docs/kvalitetssikring.md` har overskriften og stegene fra før 3.5g | low | **til gruppen:** §9 er ikke med i instruksjonen. Rettes før README-prøven, med en Rettet-linje |
+
 ## Åpent
 
-- Om «steg 4» er uklart nå som dobbeltklikket også har nummererte steg (se «Valg som er gjort her»).
+- Om «steg 4» er uklart nå som dobbeltklikket også har nummererte steg (se «Valg som er gjort her», ECH7).
+- Om det skal stå en synlig linje til Docker og uv under stegene, for eksempel for Linux (BH3). Det ville vært en tredje linje under stegene, og avgjørelsen 26.10 kl. 23:00 sier to.
+- Om ventingen første gang skal stå i et eget steg (BH4).
+- §9 i `docs/kvalitetssikring.md` følger ikke de fem stegene ennå (VG5).

@@ -41,19 +41,19 @@ Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og v
 ### Enklest: dobbeltklikk (anbefalt)
 
 1. **Last ned koden** med [den direkte lenken](https://github.com/IBE160-2026/G74-lund-osen/archive/refs/heads/main.zip).
-2. **Pakk ut.** Windows: høyreklikk fila i Nedlastinger og velg «Pakk ut alle». Mac: dobbeltklikk fila.
-3. **Åpne `G74-lund-osen-main` og dobbeltklikk «Start demoen».** Bruk den innerste mappa, der README ligger.
+2. **Pakk ut.** Windows: høyreklikk fila i Nedlastinger og velg «Pakk ut alle». Mac: dobbeltklikk fila. Ikke start fra inne i ZIP-fila.
+3. **Åpne `G74-lund-osen-main` og dobbeltklikk «Start demoen».** Bruk den innerste mappa, der README ligger. På Windows: den uten `.command`.
 4. **Svar `j`** og trykk Enter hvis vinduet spør om uv. Nettleseren åpner appen når den er klar, første gang etter noen minutter.
 5. **Lukk vinduet** for å stoppe appen.
 
 **Første gang** kan Windows og Mac stoppe fila, fordi den er lastet ned fra nettet. Slik går du videre: [Windows](docs/hjelp.md#windows-advarer-mot-fila) og [Mac](docs/hjelp.md#mac-sier-at-fila-ikke-kan-åpnes).
 
-**Ekte kurser:** dobbeltklikk «Start den ekte versjonen» i stedet for «Start demoen». Den spør etter en gratis nøkkel fra EODHD første gang.
+**Ekte kurser:** dobbeltklikk «Start den ekte versjonen» i stedet for «Start demoen». Den spør etter en gratis nøkkel fra EODHD første gang, og starter bare i en kopi fra ZIP-fila, ikke i en klon.
 
 <details>
 <summary>Demoen og den ekte versjonen</summary>
 
-Den ekte versjonen er for å prøve løsningen med kurser fra EODHD. Begge versjonene har samme kode. Den ekte versjonen henter dagens kurser først etter kl. 22 på en børsdag. Første gang før kl. 22 henter den forrige børsdag, så du ser kursene og signalet med en gang. Demoen står først i stegene under, fordi den er raskest.
+Den ekte versjonen er for å prøve løsningen med kurser fra EODHD. Begge versjonene har samme kode. Den ekte versjonen henter dagens kurser først etter kl. 22 på en børsdag. Første gang før kl. 22 henter den forrige børsdag, så du ser kursene og signalet med en gang. Demoen står først i stegene for Docker og uv, fordi den er raskest.
 
 | | Demoen | Den ekte versjonen |
 |---|---|---|
@@ -100,7 +100,7 @@ Den ekte versjonen er for å prøve løsningen med kurser fra EODHD. Begge versj
 
 **Slik limer du inn en kommando.** Kopier kommandoen med ikonet til høyre i den grå boksen. Ikonet, som stegene kaller knappen, synes først når musa er over boksen. Du kan også markere den og trykke Ctrl+C eller Cmd+C, eller skrive den inn. Lim den inn i PowerShell-vinduet fra steg 4 (Terminal på Mac) med Ctrl+V eller Cmd+V, og trykk Enter.
 
-**Velg versjon.** Klikk på pila for den versjonen du vil prøve. Tabellen over viser forskjellen.
+**Velg versjon.** Klikk på pila for den versjonen du vil prøve. Tabellen i pila «Demoen og den ekte versjonen» viser forskjellen.
 
 </details>
 
@@ -220,7 +220,7 @@ Basen, demobasen og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo`
 </details>
 
 <details>
-<summary>Slik virker dobbeltklikket</summary>
+<summary><a name="slik-virker-dobbeltklikket"></a>Slik virker dobbeltklikket</summary>
 
 Docker trengs ikke, og du skriver ingen kommandoer.
 

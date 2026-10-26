@@ -658,7 +658,7 @@ class TestReadme:
         )
         topp = del_.split(docker, 1)[0]
         assert "Vi anbefaler demoen for faglærer og sensor" in topp
-        assert "Demoen står først i stegene under, fordi den er raskest." in topp
+        assert "Demoen står først i stegene for Docker og uv, fordi den er raskest." in topp
         assert "git clone" not in del_.split(staar, 1)[0]
         demo = _seksjon("Demoen")
         assert "docker compose up --build demo" in demo and "http://127.0.0.1:8000" in demo
@@ -1544,6 +1544,8 @@ def _pilene(tekst: str) -> list[tuple[str, str]]:
         if linje == "<details>":
             if dybde == 0:
                 start = i
+                # Gjennomgangen av 3.5g (ECH10): en melding, ikke IndexError.
+                assert i + 1 < len(linjer), "<details> er siste linje"
                 treff = re.fullmatch(r"<summary>(.+)</summary>", linjer[i + 1])
                 assert treff, linjer[i + 1]
                 summary = re.sub(ANKER_I_PIL, "", treff.group(1))
@@ -1556,6 +1558,10 @@ def _pilene(tekst: str) -> list[tuple[str, str]]:
                 assert innhold.startswith("\n") and innhold.endswith("\n"), summary
                 pilene.append((summary, innhold[1:-1]))
     assert dybde == 0
+    # Gjennomgangen av 3.5g (ECH11): to piler med samme navn ville gjort at
+    # _seksjon leste feil pil.
+    navnene = [s for s, _ in pilene]
+    assert len(navnene) == len(set(navnene)), navnene
     return pilene
 
 
@@ -3092,18 +3098,22 @@ AVTRYKK_I_PILENE = {
 }
 
 # Story 3.5g (gruppens svar 26.10 kl. 23:00): sha256 av innholdet i de nye
-# pilene i «Kom i gang». «Du trenger», «Med Docker Desktop», «Uten Docker,
-# med uv», «Slik virker dobbeltklikket» og «Står du fast?» er det samme som
-# delen under overskriften (eller avsnittet «Du trenger») på main foer grenen
-# (54d4714), byte for byte. «Demoen og den ekte versjonen» er resten av det
-# foerste avsnittet, tabellen og «Velg vei», der lenketeksten til
-# dobbeltklikket er «Enklest: dobbeltklikk» og uv ikke lenger staar «under
-# «Mer for den som vil»» (spesifikasjonen 3.5g). Pilene til demoen og den
-# ekte versjonen har sine avtrykk i AVTRYKK_I_PILENE, uendret.
+# pilene i «Kom i gang». «Du trenger», «Uten Docker, med uv», «Slik virker
+# dobbeltklikket» og «Står du fast?» er det samme som delen under
+# overskriften (eller avsnittet «Du trenger») på main foer grenen (54d4714),
+# byte for byte, regnet av `git show 54d4714:README.md` (spesifikasjonen
+# 3.5g). «Demoen og den ekte versjonen» er resten av det foerste avsnittet,
+# tabellen og «Velg vei», der lenketeksten til dobbeltklikket er «Enklest:
+# dobbeltklikk», uv ikke lenger staar «under «Mer for den som vil»», og
+# demoen staar først «i stegene for Docker og uv», ikke «i stegene under».
+# «Med Docker Desktop» var også lik til gjennomgangen av 3.5g (BH2, ECH6,
+# VG4): «Tabellen over» er «Tabellen i pila «Demoen og den ekte versjonen»».
+# Var 386c91b5... og dc27ef47.... Pilene til demoen og den ekte versjonen
+# har sine avtrykk i AVTRYKK_I_PILENE, uendret.
 AVTRYKK_I_KOM_I_GANG = {
-    "Demoen og den ekte versjonen": "386c91b5f033bc1008c9ef74a791cc3137cf9bd7e970ed77f96954ff75e06638",
+    "Demoen og den ekte versjonen": "d9bc06178554d5dc78c83dff1b57bb3d9039d05e80335346cec94f87303d47fe",
     "Du trenger": "edb9feeacf0f246bf416ab859f08e196d6ec92a0a44e8da9e371325c9680917b",
-    "Med Docker Desktop": "dc27ef473566b19792f332c7d2366bbf4e8bbead537503f045f977b22a1d6a4e",
+    "Med Docker Desktop": "44485fc5b1ea920e546d3e47180dabeec4b8f8da28f72cf1f54158161ab40b06",
     "Uten Docker, med uv": "2efeb5262b38f15a7fa04bc9715e149cbd053c7c45c193c9e0c048bab02dfc13",
     "Slik virker dobbeltklikket": "9066cc123fbc8efda0833fefdadec7f4f6fe039909f3bfaa498db2748b022d80",
     "Står du fast?": "261431676862760025951efa7db4ef3678ea7e309acd8ff489b365475796b22a",
@@ -3128,8 +3138,11 @@ def _utenfor_pilene(tekst: str) -> str:
             dybde += 1
         elif linje == "</details>":
             dybde -= 1
+            # Gjennomgangen av 3.5g (BH9, ECH9): en </details> uten par.
+            assert dybde >= 0, "</details> uten <details>"
         elif dybde == 0:
             synlig.append(linje)
+    assert dybde == 0, "<details> uten </details>"
     return "\n".join(synlig)
 
 
@@ -3164,7 +3177,11 @@ class TestReadmeBakPiler:
         assert "**Plan og krav**" not in synlig and "[`src/`](src/)" not in synlig
         # «Velg vei» står rett etter de felles stegene og sier hvor forskjellen står.
         # Story 3.5g: i pila til Docker, ikke synlig.
-        velg = f"{VELG_VEI} Klikk på pila for den versjonen du vil prøve. Tabellen over viser forskjellen."
+        # Gjennomgangen av 3.5g (BH2, ECH6, VG4): tabellen står i en annen pil.
+        velg = (
+            f"{VELG_VEI} Klikk på pila for den versjonen du vil prøve. Tabellen i pila «Demoen og den ekte "
+            "versjonen» viser forskjellen."
+        )
         assert velg in dict(_pilene(_kom_i_gang()))["Med Docker Desktop"] and velg not in synlig
 
     def test_innholdet_i_pilene_er_det_samme_som_foer(self):
@@ -3478,6 +3495,10 @@ class TestHovedveien:
         assert f"[den direkte lenken]({ZIP_LENKEN})" in steg[1]
         assert "«Pakk ut alle»" in steg[2] and "Mac: dobbeltklikk fila" in steg[2]
         assert "`G74-lund-osen-main`" in steg[3] and "«Start demoen»" in steg[3] and "innerste" in steg[3]
+        # Gjennomgangen av 3.5g (BH14, ECH2, ECH3, VG3): de vanligste feilene
+        # står synlig: å starte inne i ZIP-fila og å ta .command på Windows.
+        assert "Ikke start fra inne i ZIP-fila." in steg[2]
+        assert "På Windows: den uten `.command`." in steg[3]
         assert "`j`" in steg[4] and "uv" in steg[4] and "Nettleseren åpner appen" in steg[4]
         assert "**Lukk vinduet**" in steg[5] and "stoppe" in steg[5]
         # Linja om advarselen lenker til svarene for Windows og Mac.
@@ -3489,6 +3510,8 @@ class TestHovedveien:
             assert maal in hjelp, maal
         assert ekte.startswith("**Ekte kurser:**") and "«Start den ekte versjonen»" in ekte and "\n" not in ekte
         assert "nøkkel fra EODHD" in ekte
+        # Gjennomgangen av 3.5g (BH5, ECH4): vernet mot .git står synlig.
+        assert "bare i en kopi fra ZIP-fila, ikke i en klon" in ekte
         assert [s for s, _ in _pilene(del_)][: len(PILENE_I_KOM_I_GANG)] == list(PILENE_I_KOM_I_GANG)
         assert not any("dobbeltklikk" in s.lower() for s in _detaljer(_seksjon("Mer for den som vil")))
 
@@ -3547,6 +3570,7 @@ class TestHovedveien:
             "den-ekte-versjonen",
             "uten-docker-med-uv",
             "står-du-fast",
+            "slik-virker-dobbeltklikket",
             "mer-for-den-som-vil",
             "tester",
         ):
@@ -3699,7 +3723,11 @@ class TestHovedveien:
         assert "Dobbeltklikket står først, som i README-en." in hjelp
         assert "«Start med dobbeltklikk, uten Docker»" not in hjelp
         # Story 3.5g: avsnittet om advarselen står i pila «Slik virker
-        # dobbeltklikket», og lenken går til ankeret fra før.
-        assert f"«Slik virker dobbeltklikket» i [README-en](../README.md#{DOBBELTKLIKK_ANKER})" in hjelp
+        # dobbeltklikket». Gjennomgangen (BH7, ECH1, VG2): lenken går til
+        # ankeret i den pila, ikke til de fem stegene.
+        assert "«Slik virker dobbeltklikket» i [README-en](../README.md#slik-virker-dobbeltklikket)" in hjelp
+        assert '<summary><a name="slik-virker-dobbeltklikket"></a>Slik virker dobbeltklikket</summary>' in (
+            README.read_text(encoding="utf-8")
+        )
         neste = hjelp.split("### Hvordan starter jeg neste gang?\n\n", 1)[1]
         assert neste.startswith("Med dobbeltklikket: ") and "\n\nMed Docker: " in neste
