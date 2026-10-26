@@ -571,6 +571,10 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-21 kl. 22:47 (gruppens svar):* hjelpen ved «?» åpnes i et fast felt på siden, som blir stående åpent og ikke dekker det den forklarer. Hvordan feltet ser ut på smal skjerm, er ikke avgjort. I dag åpnes hjelpen som et vindu med attributtet `popover` (`src/templates/_hjelp.html`, story 8.0b). Datert linje også ved «Hjelp bak «?»» i `designregler.md` §4.
 
+*Avgjort 2026-10-24 kl. 11:31 (gruppens svar):* på bred skjerm står feltet fast i høyre kant, og siden gir plass, så feltet ikke dekker noe. På smal skjerm åpnes hjelpen rett under «?». En knapp i feltet flytter det til venstre eller høyre, og valget huskes mens man blar. Gruppen spurte kl. 11:21 om høyre side og kl. 11:28 om å kunne flytte feltet. Bygges i 8.0f.
+
+*Avgjort 2026-10-24 kl. 11:34 (gruppen uten preferanse, rådets forslag):* det er ett felt, et nytt «?» bytter innholdet, og feltet står åpent til «Lukk» eller Esc. Svarene står i repoet bare i instruksjonen 26.10 kl. 17:51 i `docs/ai-prompts/2026-10-26.md`.
+
 *Avgjort 2026-10-21 kl. 22:51 (gruppens svar):* rekkefølgen er 10.7 (egne nøkler), så README-rettingen etter gjennomgangen av demoen 21.10, så 2.12. README-rettingen står ikke som egen story i repoet ennå.
 
 *Avgjort 2026-10-21 kl. 22:57 (gruppens svar):* KI-teksten får mer å bygge på i en ny promptversjon etter uka med logget drift, som går med prompten versjon 2 (`PROMPTVERSJON` i `src/ki_prompt.py`, flettet 16.10 i `cafe067`, PR #55, og i drift fra 19.10): hvor lenge signalet har vært slik, tallene som alt står på siden, og retningen på hovedindeksen. Fortsatt ingen råd (NFR-06), og hvert tall i teksten kontrolleres mot grunnlaget. Børsometeret (8.6) kommer med når det er bygget. Det endrer grunnlaget fra 04.10 fra den nye versjonen, med en datert linje under «Avgjort 2026-10-04» i `prd.md`. Åpent punkt: avgjørelsen 04.10 om ikke å spørre EODHD bygde på at modellen bare får våre egne resultater, og ingen prosenter, forholdstall, kurser eller volumer («Betingelse 4 og KI-tjenestene (2026-10-04)» i `docs/kilder-og-rettigheter.md`). Om tallene som står på siden, kan sendes til Gemini, Anthropic eller OpenAI med egen nøkkel uten å spørre, er ikke avgjort.
@@ -3297,6 +3301,10 @@ sted. Min liste (8.3) bruker de samme.
 *Ferdig 2026-10-12:* flettet i `8d70762`, PR #29.
 
 *Avgjort 2026-10-21 kl. 22:47 (gruppens svar):* hjelpen ved «?» åpnes i et fast felt på siden, som blir stående åpent og ikke dekker det den forklarer. Hvordan feltet ser ut på smal skjerm, er ikke avgjort. I dag åpnes hjelpen som et vindu med attributtet `popover` (`src/templates/_hjelp.html`, story 8.0b). Datert linje også ved «Hjelp bak «?»» i `designregler.md` §4.
+
+*Avgjort 2026-10-24 kl. 11:31 (gruppens svar):* på bred skjerm står feltet fast i høyre kant, og siden gir plass, så feltet ikke dekker noe. På smal skjerm åpnes hjelpen rett under «?». En knapp i feltet flytter det til venstre eller høyre, og valget huskes mens man blar. Gruppen spurte kl. 11:21 om høyre side og kl. 11:28 om å kunne flytte feltet. Bygges i 8.0f.
+
+*Avgjort 2026-10-24 kl. 11:34 (gruppen uten preferanse, rådets forslag):* det er ett felt, et nytt «?» bytter innholdet, og feltet står åpent til «Lukk» eller Esc. Svarene står i repoet bare i instruksjonen 26.10 kl. 17:51 i `docs/ai-prompts/2026-10-26.md`.
 
 ### Story 8.0c: Tydelig merking, ord ved sjekkene og datoer på grafen
 

@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-10-26T13:00
+updated: 2026-10-26T17:52
 ---
 
 # UX-loggen
@@ -608,3 +608,7 @@ Hvert funn er slått opp i koden 20.10 før det ble skrevet.
 *Lagt til 2026-10-24:* U35 tas i 8.2a (gruppens svar 24.10 kl. 11:21): KI-bryteren sender tilbake til et anker ved KI-teksten.
 
 *Lagt til 2026-10-24:* U36 tas i 8.2a (gruppens svar 24.10 kl. 11:21): periodeknappene og «Velg dag» på aksjesiden går til et anker ved kursgrafen.
+
+*Lagt til 2026-10-26:* U19 tas i 8.0f (gruppens svar 24.10 kl. 11:31 og 11:34, under «Prioritering» og story 8.0b i `epics.md`): hjelpen står i ett fast felt i høyre kant på bred skjerm, og siden gir plass, så feltet ikke dekker det den forklarer. På smal skjerm åpnes den rett under «?». En knapp flytter feltet til venstre eller høyre, og feltet står åpent til «Lukk» eller Esc.
+
+*Lagt til 2026-10-26:* U28 tas i 8.0f (gruppens svar 24.10 kl. 11:31 og 11:34, under «Prioritering» og story 8.0b i `epics.md`): hjelpen står i ett fast felt i høyre kant på bred skjerm, og siden gir plass, så feltet ikke dekker det den forklarer. På smal skjerm åpnes den rett under «?». En knapp flytter feltet til venstre eller høyre, og feltet står åpent til «Lukk» eller Esc.
