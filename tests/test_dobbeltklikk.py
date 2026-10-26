@@ -895,3 +895,181 @@ def test_ci_proever_porten_paa_windows_og_mac():
     assert "if: runner.os" not in steget.split("\n      - name:", 1)[0]
     assert 'uv run pytest -q -p no:cacheprovider -rs tests/test_dobbeltklikk.py -k "porten or sjekken"' in steget
     assert jobb.index("Start demoen på Mac") < jobb.index("Porten på Windows og Mac")
+
+
+# Story 3.5e (svaret 24.10 kl. 20:00): en falsk uv, uten nett. Den skriver
+# hvert steg og om porten var opptatt da, til loggen, og gaar ut med koden
+# testen ber om. uv sync feiler med OSE_FALSK_UV_SYNC=1, hentingen feiler
+# alltid, og webserveren gaar ut med 3 med en gang, saa skriptet stopper
+# etter at porten er frigjort. Med OSE_FALSK_UV_FREMMED=1 starter uv sync et
+# fremmed program paa porten og skriver prosessen til fremmed.pid.
+FALSK_UV = (
+    "import os, socket, subprocess, sys\n"
+    "argumentene = sys.argv[1:]\n"
+    "def opptatt():\n"
+    "    s = socket.socket()\n"
+    "    s.settimeout(2)\n"
+    "    try:\n"
+    "        s.connect(('127.0.0.1', 8000))\n"
+    "        return 1\n"
+    "    except OSError:\n"
+    "        return 0\n"
+    "    finally:\n"
+    "        s.close()\n"
+    "if argumentene[:1] == ['sync']:\n"
+    "    steg = 'sync'\n"
+    "elif 'src/demo.py' in argumentene:\n"
+    "    steg = 'demo'\n"
+    "elif 'src/fetch_prices.py' in argumentene:\n"
+    "    steg = 'henting'\n"
+    "elif 'waitress-serve' in argumentene:\n"
+    "    steg = 'server'\n"
+    "else:\n"
+    "    steg = 'annet'\n"
+    "with open(os.environ['OSE_FALSK_UV_LOGG'], 'a', encoding='utf-8') as logg:\n"
+    "    logg.write(f'{steg} {opptatt()}\\n')\n"
+    "if steg == 'sync' and os.environ.get('OSE_FALSK_UV_FREMMED') == '1':\n"
+    "    ekstra = {'start_new_session': True} if os.name != 'nt' else {'creationflags': 0x00000200}\n"
+    "    lytter = subprocess.Popen([sys.executable, '-c', os.environ['OSE_FALSK_UV_LYTTER']],\n"
+    "        stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, **ekstra)\n"
+    "    lytter.stdout.readline()\n"
+    "    with open(os.environ['OSE_FALSK_UV_PID'], 'w', encoding='utf-8') as fil:\n"
+    "        fil.write(str(lytter.pid))\n"
+    "koder = {'sync': int(os.environ.get('OSE_FALSK_UV_SYNC', '0')), 'henting': 1, 'server': 3}\n"
+    "sys.exit(koder.get(steg, 0))\n"
+)
+
+
+def _falsk_uv(tmp_path, windows) -> Path:
+    """Mappa med den falske uv, som uv.cmd paa Windows og uv ellers."""
+    mappe = tmp_path / "falsk_uv"
+    mappe.mkdir()
+    (mappe / "falsk_uv.py").write_text(FALSK_UV, encoding="utf-8")
+    python = getattr(sys, "_base_executable", None) or sys.executable
+    if windows:
+        (mappe / "uv.cmd").write_text(
+            f'@"{python}" "{mappe / "falsk_uv.py"}" %*\r\n@exit /b %errorlevel%\r\n', encoding="utf-8"
+        )
+    else:
+        uv = mappe / "uv"
+        uv.write_text(f'#!/bin/sh\nexec "{python}" "{mappe / "falsk_uv.py"}" "$@"\n', encoding="utf-8")
+        uv.chmod(0o755)
+    return mappe
+
+
+# Tilfellene: versjonen, om den andre versjonen kjoerer paa porten foerst,
+# og miljoeet til den falske uv.
+TILFELLENE_35E = {
+    "uv_sync_feiler": ("demo", "oss", {"OSE_FALSK_UV_SYNC": "1"}),
+    "hentingen_feiler": ("ekte", "oss", {}),
+    "demoen": ("demo", "oss", {}),
+    "fremmed_underveis": ("demo", None, {"OSE_FALSK_UV_FREMMED": "1"}),
+}
+
+
+def _drep(pid):
+    try:
+        os.kill(pid, 9 if os.name != "nt" else 15)
+    except OSError:
+        pass
+
+
+def _kjoer_35e(tmp_path, navn, tilfelle):
+    """Kjoerer skriptet med den falske uv og gir koden, utskriften, loggen,
+    den andre versjonen og den fremmede prosessen, hvis noen."""
+    windows = navn == "start.ps1"
+    versjon, foerst, ekstra = TILFELLENE_35E[tilfelle]
+    if not _porten_er_ledig():
+        pytest.skip("port 8000 er i bruk paa maskinen")
+    mappe = _mappe_med_skriptet(tmp_path, navn, "ingen")
+    if versjon == "ekte":
+        # Bare i tmp_path, og den falske uv henter ingenting.
+        (mappe / ".env").write_text("EODHD_API_KEY=proeve\n", encoding="utf-8")
+    falsk = _falsk_uv(tmp_path, windows)
+    logg, pidfil = tmp_path / "uv.logg", tmp_path / "fremmed.pid"
+    miljoe_uv = {
+        "OSE_FALSK_UV_LOGG": str(logg),
+        "OSE_FALSK_UV_PID": str(pidfil),
+        "OSE_FALSK_UV_LYTTER": LYTTEREN,
+        # Uten OSE_START_SVAR_JA, saa spoersmaalet om uv faar nei fra _kjoer
+        # hvis den falske uv ikke blir funnet, og ingenting installeres.
+        "OSE_START_UTEN_NETTLESER": "1",
+        **ekstra,
+    }
+    if windows:
+        systemrot = os.environ["SYSTEMROOT"]
+        powershell = Path(systemrot) / "System32" / "WindowsPowerShell" / "v1.0" / "powershell.exe"
+        stier = [str(falsk), str(Path(systemrot) / "System32"), str(Path(systemrot) / "System32" / "Wbem")]
+        miljoe = {"PATH": os.pathsep.join(stier), "USERPROFILE": str(tmp_path / "hjem"), "SYSTEMROOT": systemrot}
+        # PATHEXT, saa Get-Command finner uv.cmd.
+        miljoe["PSModulePath"], miljoe["PATHEXT"] = "", ".COM;.EXE;.BAT;.CMD"
+        argumenter = [str(powershell), "-NoProfile", "-ExecutionPolicy", "Bypass", "-File"]
+        argumenter += [str(mappe / "start" / "start.ps1"), "-Versjon", versjon]
+    else:
+        stier = {str(Path(_bash()).parent)}
+        for program in ("dirname", "ps", "grep", "sort", "sleep", "lsof", "cp", "mv"):
+            if shutil.which(program):
+                stier.add(str(Path(shutil.which(program)).parent))
+        miljoe = {"PATH": os.pathsep.join([str(falsk), *sorted(stier)]), "HOME": str(tmp_path / "hjem")}
+        argumenter = [_bash(), str(mappe / "start" / "start.sh"), versjon]
+    (tmp_path / "hjem").mkdir(exist_ok=True)
+    lytter = _start_lytteren(foerst, mappe, windows) if foerst else None
+    fremmed = None
+    try:
+        kode, utskrift = _kjoer(argumenter, {**miljoe, **miljoe_uv}, sjekk_porten=False)
+        if pidfil.exists():
+            fremmed = int(pidfil.read_text(encoding="utf-8"))
+        linjene = logg.read_text(encoding="utf-8").split("\n")[:-1] if logg.exists() else []
+        levde = lytter is not None and lytter.poll() is None
+        return kode, utskrift, linjene, levde, fremmed
+    finally:
+        if lytter is not None:
+            _stopp_lytteren(lytter)
+        if pidfil.exists():
+            _drep(int(pidfil.read_text(encoding="utf-8")))
+
+
+def _sjekk_35e(tilfelle, kode, utskrift, linjene, levde, fremmed):
+    assert kode == 1, utskrift
+    stoppet = "Den andre versjonen er stoppet, og porten er ledig."
+    if tilfelle == "uv_sync_feiler":
+        # Den andre versjonen kjoerte mens uv sync feilet, og kjoerer videre.
+        assert linjene == ["sync 1"], (linjene, utskrift)
+        assert "Den stoppes rett før denne starter appen" in utskrift, utskrift
+        assert "uv sync gikk ut med kode 1" in utskrift or "uv sync feilet" in utskrift, utskrift
+        assert levde and stoppet not in utskrift, utskrift
+    elif tilfelle == "fremmed_underveis":
+        # Porten var ledig foer uv, og et fremmed program tok den under uv
+        # sync. Det stoppes ikke, og vinduet sier hva man gjoer.
+        assert fremmed is not None, utskrift
+        assert linjene == ["sync 0", "demo 1"], (linjene, utskrift)
+        assert "et annet program svarer allerede på http://127.0.0.1:8000" in utskrift, utskrift
+        assert f"(prosess {fremmed})" in utskrift and "Dobbeltklikk så på nytt." in utskrift, utskrift
+        assert "Starter appen" not in utskrift and stoppet not in utskrift, utskrift
+    else:
+        # Opptatt ved demobasen eller hentingen, ledig naar webserveren starter.
+        midten = "demo" if tilfelle == "demoen" else "henting"
+        assert linjene == ["sync 1", f"{midten} 1", "server 0"], (linjene, utskrift)
+        assert not levde, utskrift
+        foer = "Lager demobasen." if tilfelle == "demoen" else "Hentingen gikk ut med kode 1"
+        assert utskrift.index(foer) < utskrift.index(stoppet) < utskrift.index("Starter appen"), utskrift
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="krever Windows PowerShell")
+@pytest.mark.parametrize("tilfelle", list(TILFELLENE_35E))
+def test_start_ps1_frigjoer_porten_rett_foer_webserveren(tmp_path, tilfelle):
+    """Svaret 24.10 kl. 20:00 (3.5e). Ville feilet hvis start.ps1 stoppet den
+    andre versjonen foer uv sync, demobasen eller hentingen, slik at den var
+    borte naar uv sync feilet, ikke stoppet den rett foer webserveren, eller
+    stoppet et program som tok porten underveis."""
+    _sjekk_35e(tilfelle, *_kjoer_35e(tmp_path, "start.ps1", tilfelle))
+
+
+@pytest.mark.skipif(sys.platform == "win32" or _bash() is None or _lsof() is None, reason="krever bash, lsof og ps")
+@pytest.mark.parametrize("tilfelle", list(TILFELLENE_35E))
+def test_start_sh_frigjoer_porten_rett_foer_webserveren(tmp_path, tilfelle):
+    """Svaret 24.10 kl. 20:00 (3.5e). Ville feilet hvis start.sh stoppet den
+    andre versjonen foer uv sync, demobasen eller hentingen, slik at den var
+    borte naar uv sync feilet, ikke stoppet den rett foer webserveren, eller
+    stoppet et program som tok porten underveis."""
+    _sjekk_35e(tilfelle, *_kjoer_35e(tmp_path, "start.sh", tilfelle))
