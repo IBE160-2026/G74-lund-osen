@@ -20,7 +20,8 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 **Innhold:** [Kom i gang](#kom-i-gang) · [Status](#status) · [Tester](#tester) · [Dokumentene](#dokumentene) · [Mappestruktur](#mappestruktur) · [Medlemmer](#medlemmer)
 
 Til faglærer:
-- Se appen med oppdiktede tall, uten konto og nøkkel, etter [steg 1–4](#felles-for-begge): [demoen](#demoen)
+- Se appen med oppdiktede tall, uten konto og nøkkel, med et dobbeltklikk på «Start demoen»: [Enklest: dobbeltklikk, uten Docker](#enklest-dobbeltklikk-uten-docker)
+- Eller med Docker Desktop, etter [steg 1–4](#med-docker-desktop): [demoen](#demoen)
 - Demoen viser så mye som mulig. Prøv gjerne også ekte kurser etterpå, med en gratis nøkkel fra EODHD: [den ekte versjonen](#den-ekte-versjonen)
 - De automatiske testene, med to kommandoer etter at uv er installert: [Tester](#tester)
 - [Product Brief](_bmad-output/planning-artifacts/product-brief.md), arbeidskravet: versjon 8, laget etter [tilbakemeldingen 06.10](_bmad-output/planning-artifacts/tilbakemelding-product-brief.md) og låst i taggen `arbeidskrav-product-brief-v8`
@@ -29,19 +30,53 @@ Til faglærer:
 - Prosessen og KI-bruken: [kvalitetssikringen](docs/kvalitetssikring.md), [refleksjonsloggen](docs/reflection-log.md) og [de lagrede KI-promptene](docs/ai-prompts/)
 - [Vurderingsmatrisen for del 1](docs/vurderingsmatrise.md): status per kriterium, med bevis og neste tiltak
 
-## Kom i gang
+<a name="kom-i-gang"></a>
+
+## Kom i gang: nedlasting og installasjon
 
 Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og viser hovedfunksjonene med faste eksempeldata, også KI-teksten. Den ekte versjonen er for å prøve løsningen med kurser fra EODHD. Begge versjonene har samme kode. Den ekte versjonen henter dagens kurser først etter kl. 22 på en børsdag. Første gang før kl. 22 henter den forrige børsdag, så du ser kursene og signalet med en gang. Demoen står først i stegene under, fordi den er raskest.
 
 | | Demoen | Den ekte versjonen |
 |---|---|---|
 | Kurser | Oppdiktede selskaper og kurser («Eksempeltall») | Ekte sluttkurser fra Oslo Børs, hentet fra EODHD hver børsdag. Dagens vurdering lagres per aksje |
-| Trenger | Bare Docker Desktop | Docker Desktop og en gratis nøkkel fra EODHD |
+| Trenger | Ingen konto og ingen nøkkel | En gratis nøkkel fra EODHD |
 | Klar | Med en gang | Etter første henting, når som helst. Før kl. 22 på en børsdag gir den forrige børsdag. Hentingen etter kl. 22 samme dag trenger bonuskvote hos EODHD; uten den får den dagen aldri signal |
 
-**Du trenger** en Windows-maskin eller en Mac, lov til å installere programmer, nett og noen GB ledig plass, men verken git eller Docker-konto. Første gang tar det en stund. På Linux bruker du Docker Engine med Compose i stedet for Docker Desktop. Vi prøvde 10.10 med Docker Desktop 4.91.0 (motor 29.8.0, Compose v5.5.1) på Windows, og imaget bruker Python 3.13.15. Mac er ikke prøvd ennå. Uten Docker trenger du bare [uv](https://docs.astral.sh/uv/), som henter Python 3.13 eller nyere hvis maskinen ikke har den, se «Uten Docker, med uv» under «Mer for den som vil». Står du fast, se [«Står du fast?»](#står-du-fast) lenger ned.
+**Velg vei etter hva du har:**
 
-### Felles for begge
+- [Enklest: dobbeltklikk, uten Docker](#enklest-dobbeltklikk-uten-docker) (anbefalt): last ned, pakk ut og dobbeltklikk. Du skriver ingen kommandoer.
+- [Med Docker Desktop](#med-docker-desktop): har du Docker Desktop, eller vil du kjøre appen i Docker.
+- [Uten Docker, med uv](#uten-docker-med-uv), under «Mer for den som vil»: kommandoene i et terminalvindu.
+
+**Du trenger** en Windows-maskin eller en Mac, lov til å installere programmer, nett og noen GB ledig plass, men verken git eller Docker, og demoen trenger ingen konto. Første gang tar det en stund. Dobbeltklikket og «Uten Docker, med uv» trenger bare [uv](https://docs.astral.sh/uv/), som henter Python 3.13 eller nyere hvis maskinen ikke har den. Dobbeltklikket spør før det installerer uv. Med Docker trenger du Docker Desktop, og på Linux Docker Engine med Compose i stedet. Vi prøvde 10.10 med Docker Desktop 4.91.0 (motor 29.8.0, Compose v5.5.1) på Windows, og imaget bruker Python 3.13.15. Mac er ikke prøvd ennå med Docker Desktop. Dobbeltklikket kjøres i CI på macOS. Står du fast, se [«Står du fast?»](#står-du-fast) lenger ned.
+
+### Enklest: dobbeltklikk, uten Docker
+
+Docker trengs ikke, og du skriver ingen kommandoer.
+
+- **Last ned koden** med [den direkte lenken](https://github.com/IBE160-2026/G74-lund-osen/archive/refs/heads/main.zip), eller trykk «Code» på [GitHub-siden](https://github.com/IBE160-2026/G74-lund-osen) og «Download ZIP».
+- **Pakk ut.** Windows: høyreklikk fila i Nedlastinger og velg «Pakk ut alle», der den ligger. Mac: dobbeltklikk fila. Det er klart når du har mappa `G74-lund-osen-main`. Pakk ut først: inne i ZIP-fila finner ikke startfilene skriptene i `start/`. [Har mappa tall i navnet](docs/hjelp.md#det-er-to-mapper-med-samme-navn): bruk den nyeste.
+- **Finn de fire filene** øverst i den innerste `G74-lund-osen-main`, der README ligger: `Start demoen` og `Start den ekte versjonen`, som `.cmd` for Windows og `.command` for Mac. På Windows tar du den som bare heter «Start demoen», ikke «Start demoen.command».
+- **Dobbeltklikk «Start demoen».** Vil du prøve ekte kurser, dobbeltklikker du «Start den ekte versjonen».
+
+Når vinduet er åpent:
+
+- Mangler [uv](https://docs.astral.sh/uv/), spør vinduet om det skal installeres. Skriv `j` og trykk Enter. Det er den offisielle installasjonen fra astral.sh, og den legger uv i brukermappa di.
+- Første gang tar det noen minutter, fordi uv henter Python og pakkene appen bruker.
+- Nettleseren åpner http://127.0.0.1:8000 når appen svarer.
+- Stopp appen ved å lukke vinduet, eller med Ctrl+C.
+
+**Advarselen fra Windows.** Første gang kan Windows vise «Windows beskyttet PC-en», fordi fila er lastet ned fra nettet. Klikk «Mer informasjon», og så «Kjør likevel». Spør Windows om du vil kjøre fila, svarer du ja.
+
+**Godkjenningen på Mac.** Første gang kan macOS stoppe fila, fordi den er lastet ned fra nettet. Fra macOS 15 holder det ikke å høyreklikke og velge Åpne. Velg Apple-menyen > Systeminnstillinger, og Personvern og sikkerhet i sidepanelet. Under Sikkerhet klikker du «Åpne likevel» og skriver inn passordet ditt. Knappen står der i omtrent en time etter at du prøvde å åpne fila. Dobbeltklikk så fila på nytt. På macOS 14 og eldre kan du også høyreklikke fila, velge Åpne og bekrefte.
+
+**Den ekte versjonen** starter bare i en kopi fra «Download ZIP», ikke i en klon av repoet med `.git`. Der stopper vinduet før noe installeres eller hentes, så et dobbeltklikk i en klon aldri henter med nøkkelen som ligger i den. Last ned en egen kopi med «Download ZIP», og bruk din egen nøkkel. Demoen starter i begge. Vernet gjelder bare dobbeltklikket: kommandoene under «Uten Docker, med uv» og Docker henter også i en klon.
+
+Den ekte versjonen spør etter nøkkelen fra EODHD første gang. Registreringssiden https://eodhd.com/register åpnes. Når du har laget kontoen, står nøkkelen som «API token» under «Dashboard» hos EODHD, med kopiknappen til høyre. Lim den inn i vinduet med Ctrl+V eller et høyreklikk på Windows, og med Cmd+V på Mac, og trykk Enter. På Windows vises den som stjerner, og på Mac vises den ikke. Den lagres bare i `.env` i mappa. Var den feil, sletter du det som står etter `EODHD_API_KEY=` i `.env`, så spør vinduet på nytt. Så hentes kursene før appen starter. Er alt hentet, brukes ingen kall.
+
+Skriptene står i [`start/`](start/) og kjører de samme kommandoene som under «Uten Docker, med uv»: `uv sync`, så `uv run python src/demo.py` for demoen eller `uv run python src/fetch_prices.py` for den ekte versjonen. Webserveren startes med `uv run waitress-serve --listen=127.0.0.1:8000 --threads=8 app:app`, bare på 127.0.0.1 og uten debug, med 8 tråder, med `PYTHONPATH=src`, og `OSE_DEMO=1` i demoen. Den bruker port 8000, som Docker. Kjører OSE Signal allerede fra denne mappa, med webserveren fra `.venv` i mappa, sier skriptet fra og stopper den rett før webserveren starter, så den kjører videre hvis skriptet stopper før det, for eksempel fordi `uv sync` feiler. Feiler hentingen, starter appen likevel, og da stoppes den. Porten sjekkes igjen rett før webserveren, og et annet program som har tatt den i mellomtiden, stoppes ikke. Det gjelder også en webserver du har startet selv med kommandoen over. Et annet program på porten, også OSE Signal fra en annen mappe og demoen eller appen i Docker, stoppes aldri. Da sier vinduet hvilket program det er, og du stopper det selv, Docker med `docker compose --profile demo down`.
+
+### Med Docker Desktop
 
 1. **Installer og start Docker Desktop** fra [docker.com](https://www.docker.com/products/docker-desktop/). Har du det fra før, starter du det bare. Hopp over innloggingen. Det er klart når det står «Engine running» nederst i vinduet. «Resource Saver mode», med en måne, er også klart: motoren hviler fordi ingen containere kjører, og starter selv når den trengs. La det være åpent.
 
@@ -53,7 +88,7 @@ Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og v
 
 ![Menyen under «Code» på GitHub, med «Download ZIP» nederst](docs/bilder/readme/github-download-zip.png)
 
-*Menyen under den grønne knappen «Code». Trykk «Download ZIP» nederst. Adressen i boksen trenger du ikke.*
+*Menyen under den grønne knappen «Code». Trykk «Download ZIP» nederst, eller bruk [den direkte lenken](https://github.com/IBE160-2026/G74-lund-osen/archive/refs/heads/main.zip). Adressen i boksen trenger du ikke.*
 
 3. **Åpne PowerShell** i mappa. Windows: åpne den innerste `G74-lund-osen-main` i Filutforsker, skriv `powershell` i adressefeltet og trykk Enter. Da gjør du bare kontrollen i steg 4. Eller trykk Start og velg «Windows PowerShell», ikke ISE og ikke som administrator. Mac: åpne **Terminal** med Cmd+mellomrom. Det er klart når et vindu venter på at du skriver.
 4. **Skriv `cd` og et mellomrom**, dra mappa `G74-lund-osen-main` fra steg 2 (ikke ZIP-fila), der README og compose ligger, inn i vinduet, og trykk Enter. [Står det `.zip` til slutt?](docs/hjelp.md#står-det-zip-til-slutt-i-linja) **Kontroll:** det er klart når `dir` (Windows) eller `ls` (Mac) viser `README.md` og `compose.yaml`. Har mappa et annet navn, drar du den mappa der README og compose ligger.
@@ -64,7 +99,7 @@ Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og v
 
 **Slik limer du inn en kommando.** Kopier kommandoen med ikonet til høyre i den grå boksen. Ikonet, som stegene kaller knappen, synes først når musa er over boksen. Du kan også markere den og trykke Ctrl+C eller Cmd+C, eller skrive den inn. Lim den inn i PowerShell-vinduet fra steg 4 (Terminal på Mac) med Ctrl+V eller Cmd+V, og trykk Enter.
 
-**Velg vei.** Klikk på pila for den versjonen du vil prøve. Tabellen over viser forskjellen.
+**Velg versjon.** Klikk på pila for den versjonen du vil prøve. Tabellen over viser forskjellen.
 
 <details>
 <summary><a name="demoen"></a>Demoen: anbefalt for faglærer og sensor, uten nøkkel</summary>
@@ -207,7 +242,7 @@ Volumene står når du bytter, også basen med vurderingene.
 </details>
 
 <details>
-<summary>Uten Docker, med uv</summary>
+<summary><a name="uten-docker-med-uv"></a>Uten Docker, med uv</summary>
 
 Med Python 3.13 og [uv](https://docs.astral.sh/uv/). Installasjonen av uv står under [«Tester»](#tester). Først demoen.
 
@@ -252,28 +287,6 @@ uv run python src/app.py
 ```
 
 Basen, demobasen og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo` åpner webserveren den ekte basen.
-
-</details>
-
-<details>
-<summary>Start med dobbeltklikk, uten Docker</summary>
-
-Øverst i mappa, når den er pakket ut som i steg 2, ligger fire filer: `Start demoen` og `Start den ekte versjonen`, som `.cmd` for Windows og `.command` for Mac. Dobbeltklikk den du vil starte. Docker trengs ikke, og du skriver ingen kommandoer.
-
-- Mangler [uv](https://docs.astral.sh/uv/), spør vinduet om det skal installeres. Skriv `j` og trykk Enter. Det er den offisielle installasjonen fra astral.sh, og den legger uv i brukermappa di.
-- Første gang tar det noen minutter, fordi uv henter Python og pakkene appen bruker.
-- Nettleseren åpner http://127.0.0.1:8000 når appen svarer.
-- Stopp appen ved å lukke vinduet, eller med Ctrl+C.
-
-**Advarselen fra Windows.** Første gang kan Windows vise «Windows beskyttet PC-en», fordi fila er lastet ned fra nettet. Klikk «Mer informasjon», og så «Kjør likevel». Spør Windows om du vil kjøre fila, svarer du ja.
-
-**Godkjenningen på Mac.** Første gang kan macOS stoppe fila, fordi den er lastet ned fra nettet. Fra macOS 15 holder det ikke å høyreklikke og velge Åpne. Velg Apple-menyen > Systeminnstillinger, og Personvern og sikkerhet i sidepanelet. Under Sikkerhet klikker du «Åpne likevel» og skriver inn passordet ditt. Knappen står der i omtrent en time etter at du prøvde å åpne fila. Dobbeltklikk så fila på nytt. På macOS 14 og eldre kan du også høyreklikke fila, velge Åpne og bekrefte.
-
-**Den ekte versjonen** starter bare i en kopi fra «Download ZIP», ikke i en klon av repoet med `.git`. Der stopper vinduet før noe installeres eller hentes, så et dobbeltklikk i en klon aldri henter med nøkkelen som ligger i den. Last ned en egen kopi med «Download ZIP», og bruk din egen nøkkel. Demoen starter i begge. Vernet gjelder bare dobbeltklikket: kommandoene under «Uten Docker, med uv» og Docker henter også i en klon.
-
-Den ekte versjonen spør etter nøkkelen fra EODHD første gang. Registreringssiden https://eodhd.com/register åpnes. Når du har laget kontoen, står nøkkelen som «API token» under «Dashboard» hos EODHD, med kopiknappen til høyre. Lim den inn i vinduet med Ctrl+V eller et høyreklikk på Windows, og med Cmd+V på Mac, og trykk Enter. På Windows vises den som stjerner, og på Mac vises den ikke. Den lagres bare i `.env` i mappa. Var den feil, sletter du det som står etter `EODHD_API_KEY=` i `.env`, så spør vinduet på nytt. Så hentes kursene før appen starter. Er alt hentet, brukes ingen kall.
-
-Skriptene står i [`start/`](start/) og kjører de samme kommandoene som under «Uten Docker, med uv»: `uv sync`, så `uv run python src/demo.py` for demoen eller `uv run python src/fetch_prices.py` for den ekte versjonen. Webserveren startes med `uv run waitress-serve --listen=127.0.0.1:8000 --threads=8 app:app`, bare på 127.0.0.1 og uten debug, med 8 tråder, med `PYTHONPATH=src`, og `OSE_DEMO=1` i demoen. Den bruker port 8000, som Docker. Kjører OSE Signal allerede fra denne mappa, med webserveren fra `.venv` i mappa, sier skriptet fra og stopper den rett før webserveren starter, så den kjører videre hvis skriptet stopper før det, for eksempel fordi `uv sync` feiler. Feiler hentingen, starter appen likevel, og da stoppes den. Porten sjekkes igjen rett før webserveren, og et annet program som har tatt den i mellomtiden, stoppes ikke. Det gjelder også en webserver du har startet selv med kommandoen over. Et annet program på porten, også OSE Signal fra en annen mappe og demoen eller appen i Docker, stoppes aldri. Da sier vinduet hvilket program det er, og du stopper det selv, Docker med `docker compose --profile demo down`.
 
 </details>
 
@@ -497,6 +510,11 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [`Dockerfile`](Dockerfile), [`compose.yaml`](compose.yaml) og [`.dockerignore`](.dockerignore) — imaget og tjenestene: webserveren, hentingen og demoen
 - [`start/`](start/) og [`.gitattributes`](.gitattributes) — start med dobbeltklikk, uten Docker: skriptene bak de fire filene Start demoen og Start den ekte versjonen i rota, for Windows og Mac, og linjeskiftene de trenger
 - [`_bmad/`](_bmad/) og [`.claude/skills/`](.claude/skills/) — BMAD-rammeverket, ikke skrevet av oss
+- [`README.md`](README.md) — denne fila: hva appen er, hvordan den startes, status og testene
+- [`CLAUDE.md`](CLAUDE.md) — reglene for KI-øktene i repoet, som Claude Code leser når en økt starter
+- [`pyproject.toml`](pyproject.toml) og [`uv.lock`](uv.lock) — prosjektet for uv: Python-versjonen, avhengighetene og innstillingene for pytest og ruff, og de låste versjonene av avhengighetene, som uv sync og imaget installerer
+- [`.env.example`](.env.example) — malen for .env, uten nøkkel, som den ekte versjonen kopierer første gang
+- [`.gitignore`](.gitignore) og [`.mailmap`](.mailmap) — det git ikke skal spore, som nøklene, data/ og _privat/, og navnet og e-postadressen git log viser for hver av oss
 
 Ikke i repoet: API-nøkkelen (`.env`), rådata, basen og demobasen (`data/`), lokale testskript (`local-tests/`) og den private arbeidsmappa (`_privat/`).
 

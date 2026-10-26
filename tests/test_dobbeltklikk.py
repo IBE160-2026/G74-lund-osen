@@ -48,9 +48,11 @@ def _kode(sti) -> list[str]:
 
 
 def _delen_i_readme() -> str:
+    """Fra 3.5f (gruppens svar 25.10 kl. 11:32) en egen del foerst i «Kom i
+    gang», ikke bak en pil under «Mer for den som vil»."""
     tekst = README.read_text(encoding="utf-8")
-    start = tekst.index("<summary>Start med dobbeltklikk, uten Docker</summary>")
-    return tekst[start : tekst.index("</details>", start)]
+    start = tekst.index("\n### Enklest: dobbeltklikk, uten Docker\n")
+    return tekst[start : tekst.index("\n### ", start + 1)]
 
 
 def _kommandoene_i(navn: str) -> list[str]:
@@ -579,17 +581,21 @@ def test_ci_proever_demoen_og_vernet_i_klonen_paa_windows_og_mac():
 
 def test_readme_og_hjelpen_har_advarselen_og_godkjenningen():
     """Ville feilet hvis advarselen fra Windows eller godkjenningen paa Mac
-    manglet i README-en eller i docs/hjelp.md, eller «Kom i gang» nevnte
-    skriptene foer gruppen har valgt hovedvei (svaret kl. 16:37)."""
+    manglet i README-en eller i docs/hjelp.md. Fra 3.5f (gruppens svar 25.10
+    kl. 11:32): ville feilet hvis skriptene ikke sto foerst i «Kom i gang»,
+    foer Docker. Til 3.5f sto de bak en pil under «Mer for den som vil»
+    (svaret 23.10 kl. 16:37)."""
     del_ = _delen_i_readme()
     assert "**Advarselen fra Windows.**" in del_ and "**Godkjenningen på Mac.**" in del_
     assert "nøkkelen fra EODHD første gang" in del_
     hjelp = _hjelp()
     assert "### Windows advarer mot fila." in hjelp and "### Mac sier at fila ikke kan åpnes." in hjelp
     tekst = README.read_text(encoding="utf-8")
-    kom_i_gang = tekst.split("\n## Kom i gang\n", 1)[1].split("\n### Mer for den som vil\n", 1)[0]
-    assert ".cmd" not in kom_i_gang and ".command" not in kom_i_gang
-    assert "Start med dobbeltklikk" not in kom_i_gang
+    kom_i_gang = tekst.split("\n## Kom i gang: nedlasting og installasjon\n", 1)[1].split("\n## ", 1)[0]
+    foer_docker = kom_i_gang.split("\n### Med Docker Desktop\n", 1)[0]
+    assert "`.cmd` for Windows og `.command` for Mac" in foer_docker
+    assert "Dobbeltklikk «Start demoen».**" in foer_docker
+    assert "<summary>Start med dobbeltklikk" not in tekst
 
 
 # Spesifikasjonen 3.5d (forproeven 24.10, funn 7, gruppens svar kl. 12:04):
