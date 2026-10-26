@@ -22,13 +22,19 @@ from boersometer import (
     GUL,
     HOEY,
     LAV,
+    LYS_NED,
+    LYS_OPP,
     MOERK,
+    NOEYTRAL,
+    STERK_NED,
+    STERK_OPP,
     UTEN_DATA,
     VANLIG,
     Rute,
     bygg_boersometer,
     bygg_rute,
     dagen_foer,
+    fargetrinn,
     indeks_for_dagen,
     ramme,
     snitt,
@@ -997,3 +1003,151 @@ class TestLinjaMotBoersen:
         hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
         avsnitt = hjelp.split("### Hva viser børsometeret?", 1)[1].split("###", 1)[0]
         assert "Linja «Mål mot børsen»" in avsnitt and "Søylene står bare på oversikten." in avsnitt
+
+
+def _rot(stil: str) -> dict[str, str]:
+    """Navnene i :root i stil.css med verdien."""
+    rot = re.search(r":root\s*\{(.*?)\}", stil, re.S).group(1)
+    return {navn: verdi.strip() for navn, verdi in re.findall(r"(--[\w-]+):\s*([^;]+);", rot)}
+
+
+def _kontrast(a: str, b: str) -> float:
+    """Kontrasten mellom to farger etter WCAG 2.x."""
+
+    def lys(farge: str) -> float:
+        kanaler = [int(farge.lstrip("#")[i : i + 2], 16) / 255 for i in (0, 2, 4)]
+        kanaler = [k / 12.92 if k <= 0.03928 else ((k + 0.055) / 1.055) ** 2.4 for k in kanaler]
+        return 0.2126 * kanaler[0] + 0.7152 * kanaler[1] + 0.0722 * kanaler[2]
+
+    lyse, moerke = sorted((lys(a), lys(b)), reverse=True)
+    return (lyse + 0.05) / (moerke + 0.05)
+
+
+class TestFargetrinnene:
+    """8.6b, c (avgjørelsen 24.10 kl. 11:54)."""
+
+    @pytest.mark.parametrize(
+        ("endring", "ventet"),
+        [
+            (None, None),
+            (0.0, NOEYTRAL),
+            (-0.004, NOEYTRAL),
+            (0.4949, NOEYTRAL),
+            (-0.4949, NOEYTRAL),
+            (0.4951, LYS_OPP),
+            (0.5, LYS_OPP),
+            (-0.5, LYS_NED),
+            (-0.4951, LYS_NED),
+            (1.99, LYS_OPP),
+            (1.9949, LYS_OPP),
+            (-1.9949, LYS_NED),
+            (1.9951, STERK_OPP),
+            (2.0, STERK_OPP),
+            (-2.0, STERK_NED),
+            (-1.9951, STERK_NED),
+            (12.0, STERK_OPP),
+            (-12.0, STERK_NED),
+        ],
+    )
+    def test_hvert_trinn_ved_grensene(self, endring, ventet):
+        """Etter tallet slik det vises, med to desimaler: 0,4951 vises som
+        0,50 % og er lys, og 1,9951 vises som 2,00 % og er sterk. Ville
+        feilet med grensen 0,5 flyttet til 1 (mutant 1), med «>» i stedet for
+        «>=» ved grensene, eller med trinnet fra tallet før avrundingen."""
+        assert fargetrinn(endring) == ventet
+
+    def test_hver_rute_har_trinnet_for_tallet_den_viser(self, klient):
+        """Ville feilet hvis en rute hadde et annet trinn enn tallet i ruta,
+        eller hvis demoen ikke hadde minst tre av trinnene."""
+        sett = set()
+        for adresse in ("/boersometer", "/boersometer?dag=2026-10-08", "/boersometer?dag=2026-10-05"):
+            html = _side(klient, adresse)
+            ruter = re.findall(
+                r'<a class="rute [^"]*trinn-([a-z-]+)[^"]*"[^>]*>\s*<span class="ticker">([A-Z0-9]+)</span>\s*'
+                r'<span class="endring">([^<]+)</span>',
+                html,
+            )
+            assert len(ruter) == 15, adresse
+            for trinn, symbol, endring in ruter:
+                ventet = "ingen" if endring in ("Uten data", "–") else fargetrinn(_tall(endring))
+                assert trinn == ventet, (adresse, symbol, endring)
+                sett.add(trinn)
+        assert len(sett - {"ingen"}) >= 3, sett
+
+    def test_fargene_er_navn_i_root(self):
+        """Ville feilet hvis en av de fem fargene sto rett i en regel og ikke
+        som navn i :root, eller hadde en annen verdi."""
+        stil = (SRC / "static" / "stil.css").read_text(encoding="utf-8")
+        rot = _rot(stil)
+        assert rot["--trinn-noeytral"].upper() == "#E9E7E1"
+        assert rot["--trinn-lys-opp"].upper() == "#B4E2C4"
+        assert rot["--trinn-lys-ned"].upper() == "#F6C2BB"
+        for trinn, navn in (
+            ("noeytral", "--trinn-noeytral"),
+            ("lys-opp", "--trinn-lys-opp"),
+            ("lys-ned", "--trinn-lys-ned"),
+            ("opp", "--opp"),
+            ("ned", "--ned"),
+        ):
+            regel = re.search(rf"\.trinn-{trinn} \{{([^}}]*)\}}", stil).group(1)
+            assert f"background: var({navn})" in regel, trinn
+        for trinn in ("opp", "ned"):
+            assert "color: var(--hvit)" in re.search(rf"\.trinn-{trinn} \{{([^}}]*)\}}", stil).group(1)
+        for farge in ("#E9E7E1", "#B4E2C4", "#F6C2BB"):
+            assert stil.upper().count(farge) == 1, farge
+
+    def test_kontrasten(self):
+        """Hvit tekst på --opp og --ned og blekk på de lyse trinnene har
+        minst 4,5:1, og rammene har minst 3:1 mot hvitt, som er det de grenser
+        mot (spesifikasjonen, «Kontrasten mot ruta»). Ville feilet med en
+        farge som ikke leses, eller en ramme uten den hvite linja innenfor."""
+        stil = (SRC / "static" / "stil.css").read_text(encoding="utf-8")
+        rot = _rot(stil)
+        for navn in ("--opp", "--ned"):
+            assert _kontrast(rot["--hvit"], rot[navn]) >= 4.5, navn
+        for navn in ("--trinn-noeytral", "--trinn-lys-opp", "--trinn-lys-ned"):
+            assert _kontrast(rot["--blekk"], rot[navn]) >= 4.5, navn
+        for navn in ("--blekk", "--gul-symbol"):
+            assert _kontrast(rot[navn], rot["--hvit"]) >= 3, navn
+        regel = re.search(r"\.rute\.ramme-gul, [^{]*\{([^}]*)\}", stil).group(1)
+        assert "border: 4px solid" in regel and "box-shadow: inset 0 0 0 2px var(--hvit)" in regel
+        assert re.search(r"\.rute\.ramme-gul, [^{]*\{ border-color: var\(--gul-symbol\); \}", stil)
+
+    def test_rammen_staar_ogsaa_uten_data(self):
+        """Rammen kommer etter regelen for en rute uten endring og har like
+        høy spesifisitet, så gult står også på en rute med «Uten data»
+        (svarene 23.10 kl. 09:24). Ville feilet hvis den grå kanten
+        vant over rammen."""
+        stil = (SRC / "static" / "stil.css").read_text(encoding="utf-8")
+        assert stil.index(".rute.trinn-ingen {") < stil.index(".rute.ramme-gul, ")
+
+    def test_hva_fargene_betyr(self, klient):
+        """Under rutene, med de fem trinnene fra fall til stigning og de to
+        rammene. Ville feilet hvis forklaringen manglet, sto over rutene, eller
+        hadde et annet tall enn grensene."""
+        html = _side(klient)
+        del_ = re.search(r'<section class="fargene".*?</section>', html, re.S).group(0)
+        assert "<h2" in del_ and "Hva fargene betyr</h2>" in del_
+        punkter = re.findall(r'<li><span class="proeve ([a-z-]+)" aria-hidden="true"></span>([^<]+)</li>', del_)
+        assert punkter == [
+            ("trinn-ned", "Ned 2 % eller mer"),
+            ("trinn-lys-ned", "Ned fra 0,5 til under 2 %"),
+            ("trinn-noeytral", "Under ±0,5 %"),
+            ("trinn-lys-opp", "Opp fra 0,5 til under 2 %"),
+            ("trinn-opp", "Opp 2 % eller mer"),
+            ("ramme-moerk", "Mørk ramme: 2 av 3 på siste børsdag"),
+            ("ramme-gul", "Gul ramme: 3 av 3 på siste børsdag"),
+        ]
+        assert html.rindex('<section class="bransje"') < html.index('<section class="fargene"')
+        assert html.index('<section class="fargene"') < html.index('<table class="boersometertabell">')
+
+    def test_hjelpen_sier_det(self):
+        """Regel 19: ville feilet hvis hjelpen sa to farger, eller manglet
+        trinnene og rammen."""
+        from hjelpetekster import hjelpetekster
+
+        assert "som farge i fem trinn" in hjelpetekster(STANDARD)["boersometeret"].tekst
+        hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
+        avsnitt = hjelp.split("### Hva viser børsometeret?", 1)[1].split("###", 1)[0]
+        assert "Fargen har fem trinn" in avsnitt and "Grønn rute steg og rød falt" not in avsnitt
+        assert "Rammen er tykk med en hvit linje innenfor" in avsnitt

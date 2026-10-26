@@ -31,7 +31,7 @@ from hovedindeks import indeksendring
 from kursdata import Aksje, Kursrad
 from markedsoversikt import IKKE_VURDERT, endring_i_prosent, grunn_med_tall, les_tilstand
 from signalberegning import STANDARD, Parametre
-from tallformat import desimaler_mot_grense, tall
+from tallformat import avrundet, desimaler_mot_grense, tall
 from tilstand import Art
 from vurderingsdata import Grunn, Vurdering
 
@@ -60,6 +60,12 @@ VOLUMORD = {LAV: "lavt", VANLIG: "vanlig", HOEY: "høyt"}
 GUL, MOERK = "gul", "moerk"
 UTEN_DATA = "Uten data"
 
+# Story 8.6b, c: fem fargetrinn etter endringen slik den vises, med grensene i
+# prosent. Navnene er klassene i malen og fargene i :root i stil.css.
+GRENSE_LYS = 0.5
+GRENSE_STERK = 2.0
+NOEYTRAL, LYS_OPP, LYS_NED, STERK_OPP, STERK_NED = "noeytral", "lys-opp", "lys-ned", "opp", "ned"
+
 
 @dataclass(frozen=True)
 class Rute:
@@ -80,6 +86,10 @@ class Rute:
     @property
     def stoerrelse(self) -> str:
         return stoerrelse(self.volumforhold)
+
+    @property
+    def fargetrinn(self) -> str | None:
+        return fargetrinn(self.endring)
 
     @property
     def volumord(self) -> str | None:
@@ -132,6 +142,37 @@ def stoerrelse(volumforhold: float | None, p: Parametre = STANDARD) -> str:
     if volumforhold < 1:
         return LAV
     return VANLIG
+
+
+def fargetrinn(endring: float | None) -> str | None:
+    """Fem trinn etter endringen slik den vises, to desimaler (8.6b, c):
+    under GRENSE_LYS i tallverdi nøytral, fra GRENSE_LYS lys, og fra
+    GRENSE_STERK sterk. 0,50 % er lys, og 2,00 % er sterk. None uten endring."""
+    if endring is None:
+        return None
+    vist = avrundet(endring, "endring")
+    if vist >= GRENSE_STERK:
+        return STERK_OPP
+    if vist <= -GRENSE_STERK:
+        return STERK_NED
+    if vist >= GRENSE_LYS:
+        return LYS_OPP
+    if vist <= -GRENSE_LYS:
+        return LYS_NED
+    return NOEYTRAL
+
+
+def trinnforklaringer() -> list[tuple[str, str]]:
+    """Trinnene til «Hva fargene betyr», fra størst fall til størst
+    stigning, med tallene fra grensene (regel 21)."""
+    lys, sterk = tall(GRENSE_LYS, "faktor"), tall(GRENSE_STERK, "grense")
+    return [
+        (STERK_NED, f"Ned {sterk} eller mer"),
+        (LYS_NED, f"Ned fra {lys} til under {sterk}"),
+        (NOEYTRAL, f"Under ±{tall(GRENSE_LYS, 'grense', desimaler=1)}"),
+        (LYS_OPP, f"Opp fra {lys} til under {sterk}"),
+        (STERK_OPP, f"Opp {sterk} eller mer"),
+    ]
 
 
 def vis_volumforhold(volumforhold: float, p: Parametre = STANDARD) -> str:

@@ -38,7 +38,7 @@ from flask import Flask, abort, g, redirect, render_template, request
 import lagring_sqlite
 from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
 from boersdag import UtenforKalenderen, innevaerende_boersdag, norsk_dato
-from boersometer import bygg_boersometer, bygg_rute, dagen_foer, indeks_for_dagen
+from boersometer import bygg_boersometer, bygg_rute, dagen_foer, indeks_for_dagen, trinnforklaringer
 from dagene import setning_om_dagene, tell_dagene
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
 from graf import bygg_graf
@@ -632,6 +632,7 @@ def boersometer():
         dagen_foer=dagen_foer(datoer, dagen),
         volum_vindu=STANDARD.volum_vindu,
         indeksendring=_indeksen_for_dagen(dagen),
+        fargetrinn=trinnforklaringer(),
         valgt=valgt,
         foer_foerste=foer_foerste,
         ugyldig=ugyldig,

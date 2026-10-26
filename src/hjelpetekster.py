@@ -164,7 +164,9 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # Story 8.6 (FR-106, avgjørelsen 22.10 kl. 23:19): børsometeret.
         "boersometeret": Hjelpetekst(
             "Børsometer:",
-            "én rute per aksje, ordnet etter bransje, med endringen fra børsdagen før som farge. "
+            # Story 8.6b, c: fem trinn.
+            "én rute per aksje, ordnet etter bransje, med endringen fra børsdagen før som farge i fem "
+            "trinn, som «Hva fargene betyr» under rutene viser. "
             f"Ruta er større når volumet var mer enn {faktor} ganger vanlig, mindre når det var under "
             "vanlig, og rammen er gul ved 3 av 3 på siste børsdag, også når du velger en annen dag, og "
             "mørk ved 2 av 3 bare på siste børsdag. Overskriften har "
@@ -176,6 +178,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (BOERSOMETER, "def stoerrelse("),
                 (BOERSOMETER, "def snitt("),
                 (BOERSOMETER, "def indeks_for_dagen("),
+                (BOERSOMETER, "def fargetrinn("),
             ),
         ),
         # Story 2.9 (FR-104): delen over tabellen.

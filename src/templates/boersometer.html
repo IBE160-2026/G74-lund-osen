@@ -54,7 +54,7 @@
           {%- for rute in bransje.ruter %}
           {#- Gruppens svar 23.10 kl. 09:24 (b): hver rute lenker til aksjesiden,
               også for en aksje uten kurser. #}
-          <li><a class="rute stoerrelse-{{ rute.stoerrelse }} {{ fortegn(rute.endring) }}{% if rute.ramme %} ramme-{{ rute.ramme }}{% endif %}{% if rute.uten_data %} uten-data{% endif %}" href="{{ aksjeadresse(rute.aksje.symbol) }}">
+          <li><a class="rute stoerrelse-{{ rute.stoerrelse }} trinn-{{ rute.fargetrinn or 'ingen' }}{% if rute.ramme %} ramme-{{ rute.ramme }}{% endif %}{% if rute.uten_data %} uten-data{% endif %}" href="{{ aksjeadresse(rute.aksje.symbol) }}">
             <span class="ticker">{{ rute.aksje.symbol }}</span>
             <span class="endring">{% if rute.endring is not none %}{{ rute.endring|tall('endring') }}{% elif rute.uten_data %}Uten data{% else %}–{% endif %}</span>
             {% if rute.ramme == "gul" %}<span class="merke">{{ antall_sjekker }} av {{ antall_sjekker }}{% if dagen != siste %} siste børsdag{% endif %}</span>{% elif rute.ramme == "moerk" %}<span class="merke">{{ antall_sjekker - 1 }} av {{ antall_sjekker }}</span>{% endif %}
@@ -65,6 +65,18 @@
         </ul>
       </section>
     {% endfor %}
+
+    {#- Story 8.6b, c: de fem trinnene og de to rammene under rutene. #}
+    <section class="fargene" aria-labelledby="fargene-tittel">
+      <h2 id="fargene-tittel">Hva fargene betyr</h2>
+      <ul>
+        {%- for trinn, tekst in fargetrinn %}
+        <li><span class="proeve trinn-{{ trinn }}" aria-hidden="true"></span>{{ tekst }}</li>
+        {%- endfor %}
+        <li><span class="proeve ramme-moerk" aria-hidden="true"></span>Mørk ramme: {{ antall_sjekker - 1 }} av {{ antall_sjekker }} på siste børsdag</li>
+        <li><span class="proeve ramme-gul" aria-hidden="true"></span>Gul ramme: {{ antall_sjekker }} av {{ antall_sjekker }} på siste børsdag</li>
+      </ul>
+    </section>
 
     {#- Rullboksen fra oversikten: tabellen ruller, ikke siden, også med tastaturet. #}
     <div class="tabellboks boersometerboks" role="region" aria-label="Børsometeret som tabell" tabindex="0">

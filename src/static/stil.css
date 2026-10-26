@@ -48,6 +48,10 @@
   /* Story 2.9b: gult bransjesymbol ved 3 av 3 over søylene, 3,82:1 mot
      hvitt (designregler §3). */
   --gul-symbol: #a67c00;
+  /* Story 8.6b, c: de tre trinnene i børsometeret som ikke er --opp og --ned. */
+  --trinn-noeytral: #E9E7E1;
+  --trinn-lys-opp: #B4E2C4;
+  --trinn-lys-ned: #F6C2BB;
   --lys-oransje: #F8DE9C;
   --fyll: #16181D;
   --baand-ut: #FFF6DC;
@@ -597,21 +601,39 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) .rute { display: flex; flex-direction: column; justify-content: center; gap: 2px; box-sizing: border-box;
                                    padding: 8px 10px; border-radius: 10px; border: 3px solid transparent; text-decoration: none;
                                    color: var(--blekk); background: var(--ingen-bakgrunn); font-variant-numeric: tabular-nums; }
-:where(.side-oversikt) .rute.opp { background: var(--opp-bakgrunn); }
-:where(.side-oversikt) .rute.ned { background: var(--ned-bakgrunn); }
-:where(.side-oversikt) .rute.opp .endring { color: var(--opp); }
-:where(.side-oversikt) .rute.ned .endring { color: var(--ned); }
+/* Story 8.6b, c: fem trinn etter endringen slik den vises. Uten endring er ruta
+   hvit med grå kant, så den ikke ligner det nøytrale trinnet. Ikke stiplet:
+   stiplet er indekslinja (2.9b). */
+:where(.side-oversikt) .trinn-noeytral { background: var(--trinn-noeytral); }
+:where(.side-oversikt) .trinn-lys-opp { background: var(--trinn-lys-opp); }
+:where(.side-oversikt) .trinn-lys-ned { background: var(--trinn-lys-ned); }
+:where(.side-oversikt) .trinn-opp { background: var(--opp); color: var(--hvit); }
+:where(.side-oversikt) .trinn-ned { background: var(--ned); color: var(--hvit); }
+:where(.side-oversikt) .rute.trinn-ingen { background: var(--kort); border: 2px solid var(--felt); }
 :where(.side-oversikt) .rute.stoerrelse-lav { width: 96px; min-height: 64px; }
 :where(.side-oversikt) .rute.stoerrelse-vanlig { width: 120px; min-height: 80px; }
 :where(.side-oversikt) .rute.stoerrelse-hoey { width: 150px; min-height: 100px; }
-:where(.side-oversikt) .rute.ramme-moerk { border-color: var(--blekk); }
-/* Gjennomgangen (VG7): gult på lys bakgrunn i --gul-symbol, som symbolet over
-   søylene (designregler §3 og §4), med hvit kant innenfor. */
-:where(.side-oversikt) .rute.ramme-gul { border-color: var(--gul-symbol); box-shadow: 0 0 0 2px var(--hvit) inset; }
+/* Story 8.6b, c: rammene som på tavla, tykke med en hvit linje innenfor, i
+   --blekk for 2 av 3 og --gul-symbol for 3 av 3 (VG7). Rammen grenser bare mot
+   hvitt, den hvite linja innenfor og bakgrunnen utenfor, og har over 3:1 mot
+   det (spesifikasjonen 8.6b, «Kontrasten mot ruta»). */
+:where(.side-oversikt) .rute.ramme-moerk, :where(.side-oversikt) .proeve.ramme-moerk,
+:where(.side-oversikt) .rute.ramme-gul, :where(.side-oversikt) .proeve.ramme-gul { border: 4px solid var(--blekk); box-shadow: inset 0 0 0 2px var(--hvit); }
+:where(.side-oversikt) .rute.ramme-gul, :where(.side-oversikt) .proeve.ramme-gul { border-color: var(--gul-symbol); }
 :where(.side-oversikt) .rute:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
 :where(.side-oversikt) .rute .ticker { font-weight: 700; }
 :where(.side-oversikt) .rute .merke { font-size: 12px; font-weight: 600; }
-:where(.side-oversikt) .rute .tekst { font-size: 12px; color: var(--dempet); }
+/* Story 8.6b, c: grunnen i samme farge som resten av ruta, fordi --dempet har
+   under 4,5:1 mot de lyse trinnene. */
+:where(.side-oversikt) .rute .tekst { font-size: 12px; color: inherit; }
+/* Story 8.6b, c: «Hva fargene betyr» under rutene. */
+:where(.side-oversikt) section.fargene { margin: 20px 0 0; font-size: 14px; color: var(--tekst); }
+:where(.side-oversikt) section.fargene h2 { font-size: 14px; font-weight: 600; margin: 0 0 8px; color: var(--blekk); }
+:where(.side-oversikt) section.fargene ul { display: flex; flex-wrap: wrap; gap: 8px 18px; list-style: none; margin: 0; padding: 0; }
+:where(.side-oversikt) section.fargene li { display: flex; align-items: center; gap: 8px; }
+:where(.side-oversikt) section.fargene .proeve { display: inline-block; box-sizing: border-box; width: 28px; height: 20px; border-radius: 4px; background: var(--kort); }
+:where(.side-oversikt) section.fargene .proeve.ramme-moerk,
+:where(.side-oversikt) section.fargene .proeve.ramme-gul { background: var(--trinn-noeytral); }
 :where(.side-oversikt) .tabellboks.boersometerboks { margin-top: 28px; }
 :where(.side-oversikt) table.boersometertabell { font-variant-numeric: tabular-nums; }
 :where(.side-oversikt) table.boersometertabell caption { text-align: left; font-weight: 600; padding: 12px 8px 8px; }
