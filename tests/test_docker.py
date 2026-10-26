@@ -487,9 +487,14 @@ def _hjelp() -> str:
     return HJELP.read_text(encoding="utf-8")
 
 
+# Story 3.5f (gruppens svar 25.10 kl. 11:32): overskriften har fått
+# «nedlasting og installasjon», og ankeret kom-i-gang staar paa linja over.
+KOM_I_GANG = "## Kom i gang: nedlasting og installasjon"
+
+
 def _kom_i_gang() -> str:
     tekst = README.read_text(encoding="utf-8")
-    return tekst.split("## Kom i gang\n", 1)[1].split("\n## ", 1)[0]
+    return tekst.split(f"\n{KOM_I_GANG}\n", 1)[1].split("\n## ", 1)[0]
 
 
 def _blokkene(tekst: str) -> list[tuple[str, str]]:
@@ -599,7 +604,7 @@ class TestReadme:
         # uv henter Python, så de to avsnittene sier det samme (BH1, ECH).
         assert f"bare [uv](https://docs.astral.sh/uv/), som henter Python {_python_krav()} eller nyere" in trenger
         assert "«Uten Docker, med uv»" in trenger
-        assert "Uten Docker, med uv" in _detaljer(_seksjon("Mer for den som vil"))
+        assert UV_PIL in _detaljer(_seksjon("Mer for den som vil"))
 
     def test_demoen_paa_dagtid_og_helgen_i_steg_8(self):
         """3.3b, punkt d: på dagtid en børsdag er demoen veien for å se appen
@@ -611,7 +616,7 @@ class TestReadme:
         så demoen er ikke lenger eneste vei på dagtid. Ville feilet hvis
         README-en sa at første henting på dagtid gir dagens kurs, eller at
         man må vente til kvelden."""
-        topp = _kom_i_gang().split("### Felles for begge", 1)[0]
+        topp = _kom_i_gang().split("### Med Docker Desktop", 1)[0]
         assert "Første gang før kl. 22 henter den forrige børsdag, så du ser kursene og signalet med en gang." in topp
         assert "er demoen veien for å se appen med en gang" not in topp
         klar = [l for l in topp.splitlines() if l.startswith("| Klar |")]
@@ -635,15 +640,17 @@ class TestReadme:
         assert del_.index("«Download ZIP»") < del_.index("docker compose up --build demo")
         overskrifter = re.findall(r"^### (.+)$", del_, re.MULTILINE)
         # Story 3.3h: demoen og den ekte versjonen står bak hver sin pil
-        # mellom de felles stegene og «Står du fast?», demoen først.
-        assert overskrifter[:2] == ["Felles for begge", "Står du fast?"], overskrifter
+        # mellom de felles stegene og «Står du fast?», demoen først. Story
+        # 3.5f: dobbeltklikket står foran, og de felles stegene heter «Med
+        # Docker Desktop».
+        assert overskrifter[:3] == [DOBBELTKLIKKET, "Med Docker Desktop", "Står du fast?"], overskrifter
         assert (
-            del_.index("### Felles for begge")
+            del_.index("### Med Docker Desktop")
             < del_.index('<a name="demoen">')
             < del_.index('<a name="den-ekte-versjonen">')
             < del_.index("### Står du fast?")
         )
-        topp = del_.split("### Felles for begge", 1)[0]
+        topp = del_.split("### Med Docker Desktop", 1)[0]
         assert "Vi anbefaler demoen for faglærer og sensor" in topp
         assert "Demoen står først i stegene under, fordi den er raskest." in topp
         assert "git clone" not in del_.split("### Står du fast?", 1)[0]
@@ -831,7 +838,7 @@ class TestReadme:
             assert (ROT / sti).is_file(), sti
         # Hvert bilde i sitt steg i «Felles for begge».
         for nummer, navn in BILDENE.items():
-            assert f"](docs/bilder/readme/{navn})" in _steg("Felles for begge", nummer), navn
+            assert f"](docs/bilder/readme/{navn})" in _steg("Med Docker Desktop", nummer), navn
         # Ogsaa HTML-bilder og bilder med referanse (BH7).
         assert "<img" not in tekst.lower()
         assert not re.search(r"!\[[^\]]*\]\[", tekst)
@@ -840,13 +847,17 @@ class TestReadme:
         """Svar 2 kl. 14:48: teksten under et bilde telles for seg, høyst 25
         ord. Under bildet i steg 4 står at stien blir en annen, men at
         mappenavnet skal stå foran >. Ville feilet hvis et bilde sto uten
-        tekst under, eller teksten ble for lang."""
+        tekst under, eller teksten ble for lang.
+
+        Story 3.5f: ordene telles slik leseren ser dem, med lenketeksten og
+        uten adressen bak, som i stegene (svaret 13.10 kl. 23:50). Teksten
+        under bildet i steg 2 har den direkte lenken til ZIP-fila."""
         for nummer, navn in BILDENE.items():
-            under = _bildetekst(_steg("Felles for begge", nummer), navn)
+            under = _bildetekst(_steg("Med Docker Desktop", nummer), navn)
             assert under, navn
-            assert len(re.findall(r"\w+", under)) <= 25, (navn, under)
+            assert len(re.findall(r"\w+", re.sub(r"\]\([^)]*\)", "]", under))) <= 25, (navn, under)
         assert "Stien blir en annen hos deg, men mappenavnet skal stå foran `>` (`%` på Mac)." in _bildetekst(
-            _steg("Felles for begge", 4), BILDENE[4]
+            _steg("Med Docker Desktop", 4), BILDENE[4]
         )
 
     def test_mappestrukturen_nevner_bildene(self):
@@ -1436,7 +1447,14 @@ def _proevetabellen(proeve: str | None = None) -> str:
 # Story 3.3h (gruppens svar 20.10 kl. 10:14-10:19): etter de felles stegene
 # kommer linja «Velg vei», og demoen og den ekte versjonen staar bak hver sin
 # pil, med ankeret i pila.
-VELG_VEI = "**Velg vei.**"
+# Story 3.5f: «Velg vei» heter «Velg versjon», fordi «Velg vei etter hva du
+# har» staar under tabellen.
+VELG_VEI = "**Velg versjon.**"
+# Story 3.5f: dobbeltklikket er en egen del foerst i «Kom i gang», og pila
+# til uv har et anker, saa «Velg vei etter hva du har» kan lenke rett inn.
+DOBBELTKLIKKET = "Enklest: dobbeltklikk, uten Docker"
+UV_PIL = '<a name="uten-docker-med-uv"></a>Uten Docker, med uv'
+ZIP_LENKEN = "https://github.com/IBE160-2026/G74-lund-osen/archive/refs/heads/main.zip"
 PILENE = {"Demoen": "demoen", "Den ekte versjonen": "den-ekte-versjonen"}
 
 
@@ -1460,7 +1478,7 @@ def _seksjon(navn: str) -> str:
     return _kom_i_gang().split(f"### {navn}\n", 1)[1].split("\n### ", 1)[0].split(f"\n{VELG_VEI}", 1)[0]
 
 
-SEKSJONENE = {"Felles for begge": [1, 2, 3, 4], "Den ekte versjonen": [5, 6, 7, 8, 9], "Demoen": [5, 6, 7]}
+SEKSJONENE = {"Med Docker Desktop": [1, 2, 3, 4], "Den ekte versjonen": [5, 6, 7, 8, 9], "Demoen": [5, 6, 7]}
 
 
 # Story 3.3c (svar 2 18.10 kl. 14:48): avsnittet som forklarer hvordan en
@@ -1695,7 +1713,7 @@ class TestReadmeForNybegynnere:
         (svaret 19.10 kl. 14:46): vi anbefaler demoen, ikke den ekte, og
         tabellen merker ingen av dem. Ville feilet hvis tabellen manglet en
         versjon, eller anbefalte den ekte."""
-        topp = _kom_i_gang().split("### Felles for begge", 1)[0]
+        topp = _kom_i_gang().split("### Med Docker Desktop", 1)[0]
         hode = [l for l in topp.splitlines() if l.startswith("|")][0]
         assert "Den ekte versjonen" in hode and "| Demoen |" in hode
         # Story 3.3c: demoen i første kolonne, som i stegene.
@@ -1730,7 +1748,7 @@ class TestReadmeForNybegynnere:
         sier Esc (svar 2 kl. 14:48: detaljene i docs/hjelp.md når steget
         ellers blir over 65 ord). Ville feilet hvis .zip-sjekken falt bort
         fra steg 4."""
-        steg = _steg("Felles for begge", 4)
+        steg = _steg("Med Docker Desktop", 4)
         assert "dra mappa `G74-lund-osen-main` fra steg 2 (ikke ZIP-fila), der README og compose ligger" in steg
         sporsmaal = "Står det .zip til slutt i linja."
         assert f"[Står det `.zip` til slutt?](docs/hjelp.md#{_anker(sporsmaal)})" in steg
@@ -1848,11 +1866,11 @@ class TestReadmeForNybegynnere:
         assert "«Serving on http://0.0.0.0:8000» betyr bare at appen kjører." in vinduet
 
     def test_stegene_nevner_powershell_og_terminal(self):
-        steg = _steg("Felles for begge", 3)
+        steg = _steg("Med Docker Desktop", 3)
         assert "PowerShell" in steg and "Terminal" in steg and "ikke ISE" in steg
 
     def test_zip_fila_maa_pakkes_ut(self):
-        steg = _steg("Felles for begge", 2)
+        steg = _steg("Med Docker Desktop", 2)
         assert "«Download ZIP»" in steg and "«Pakk ut alle»" in steg
         # Story 8.0e PR 2: setningen fra «Jeg har fått koden fra før» i
         # docs/hjelp.md staar ordrett til slutt i steg 2.
@@ -1860,7 +1878,7 @@ class TestReadmeForNybegynnere:
         assert svar == "Har du fått koden som mappe eller ZIP-fil, pakker du den ut og går til steg 3."
         assert _uten_bilder(steg).strip().endswith(svar)
         assert (
-            _uten_bilder(_steg("Felles for begge", 4))
+            _uten_bilder(_steg("Med Docker Desktop", 4))
             .strip()
             .endswith("Har mappa et annet navn, drar du den mappa der README og compose ligger.")
         )
@@ -1996,9 +2014,19 @@ class TestReadmeForNybegynnere:
         for n in re.findall(r"steg (\d+) i den ekte versjonen", tekst):
             assert int(n) in SEKSJONENE["Den ekte versjonen"], n
         tabell = _proevetabellen("Prøve 1")
+        # Story 3.5f: hovedveien, dobbeltklikket, står først, i en egen tabell
+        # med radene D1-D6, og Docker og uv er reserven under.
+        linjer = tabell.splitlines()
+        assert linjer[0] == "| # | Steg i README-en | Det som skjedde | Tid (min) |", linjer[0]
+        assert re.findall(r"^\| (D\d+) \|", tabell, re.MULTILINE) == [f"D{n}" for n in range(1, 7)]
+        reserven = "| # | Kommando eller steg i README-en | Det som skjedde | Tid (min) |"
+        assert linjer.count(reserven) == 1
+        assert tabell.index("| D6 |") < tabell.index(reserven)
+        assert "«Download ZIP»" in tabell.split("| D2 |", 1)[0] and "«Start demoen»" in tabell.split("| D4 |", 1)[0]
+        tabell = tabell[tabell.index(reserven) :]
         # Story 3.3c: demoen foer den ekte versjonen, som i README-en, og en
         # kolonne for tiden hvert steg tok.
-        assert tabell.splitlines()[0] == "| # | Kommando eller steg i README-en | Det som skjedde | Tid (min) |"
+        assert tabell.splitlines()[0] == reserven
         # Gjennomgangen, BH7: byttet begynner med den ekte versjonen, som kjoerte sist.
         bytte = [l for l in tabell.splitlines() if "| Byttet" in l]
         assert len(bytte) == 1
@@ -2040,7 +2068,7 @@ class TestReadmeForNybegynnere:
         # 219-424 s, i hele minutter. 424 s er kjoeringen for 3.3e. Fra 21.10
         # tidene i Utført-linjene 20.10, 307,84-579,47 s.
         assert "Hele testsettet tok mellom 5 og 10 minutter på maskinen vår 20.10." in tester
-        uv = _detaljer(_seksjon("Mer for den som vil"))["Uten Docker, med uv"]
+        uv = _detaljer(_seksjon("Mer for den som vil"))[UV_PIL]
         assert "[«Tester»](#tester)" in uv
         assert UV_WINDOWS not in uv and UV_MAC not in uv and "install.ps1" not in uv and "install.sh" not in uv
         sporsmaal = "«The term 'uv' is not recognized» eller «command not found: uv»."
@@ -2100,14 +2128,15 @@ class TestReadmeForNybegynnere:
         # variablene i .env.
         assert set(_detaljer(mer)) == {
             "Bytte mellom demoen og den ekte versjonen",
-            "Uten Docker, med uv",
+            # Story 3.5f: med ankeret, saa «Velg vei» kan lenke rett inn.
+            UV_PIL,
             "Variablene i .env",
             "Den lokale modellen for KI-teksten (valgfri)",
             # Story 10.7: egen noekkel, ogsaa lukket.
             "Egen nøkkel til Gemini, Anthropic eller OpenAI (valgfri)",
-            # Story 3.5a: start med dobbeltklikk, ogsaa lukket, og «Kom i
-            # gang» er uendret til gruppen har valgt hovedvei (svaret 16:37).
-            "Start med dobbeltklikk, uten Docker",
+            # Story 3.5a: start med dobbeltklikk sto her, lukket, til gruppen
+            # valgte hovedvei. Fra 3.5f (svaret 25.10 kl. 11:32) er den en
+            # egen del foerst i «Kom i gang».
         }
 
     def test_uv_delen_er_to_nummererte_lister(self):
@@ -2116,7 +2145,7 @@ class TestReadmeForNybegynnere:
         linje før hver boks. Kommandoene er de samme som før 3.3d. Ville
         feilet hvis en liste manglet, et punkt fikk mer enn én linje, eller
         en kommando ble endret."""
-        uv = _detaljer(_seksjon("Mer for den som vil"))["Uten Docker, med uv"]
+        uv = _detaljer(_seksjon("Mer for den som vil"))[UV_PIL]
         forventet = {
             "Demoen": ["uv sync", "uv run python src/demo.py", "uv run python src/app.py --demo"],
             "Den ekte versjonen": [
@@ -2248,15 +2277,17 @@ class TestReadmeForNybegynnere:
         så «Status». Ville feilet hvis «Status» kom foerst igjen, eller noe
         kom mellom beskrivelsen og «Til faglærer»."""
         tekst = README.read_text(encoding="utf-8")
-        for del_ in ("Til faglærer:", "\n## Kom i gang\n", "\n## Status\n", "\n## Tester\n"):
+        # Story 3.5f: ankeret kom-i-gang staar paa linja over overskriften.
+        kom_i_gang = f'\n<a name="kom-i-gang"></a>\n\n{KOM_I_GANG}\n'
+        for del_ in ("Til faglærer:", kom_i_gang, "\n## Status\n", "\n## Tester\n"):
             assert del_ in tekst, del_
         assert (
             tekst.index("Til faglærer:")
-            < tekst.index("\n## Kom i gang\n")
+            < tekst.index(kom_i_gang)
             < tekst.index("\n## Status\n")
             < tekst.index("\n## Tester\n")
         )
-        topp = tekst.split("\n## Kom i gang\n", 1)[0]
+        topp = tekst.split(kom_i_gang, 1)[0]
         # Story 3.3f: knappen med bildene telles som ett avsnitt.
         topp = re.sub(r"<details>.*?</details>", "<details>", topp, flags=re.DOTALL)
         avsnitt = [a.strip() for a in topp.split("\n\n") if a.strip()]
@@ -2520,13 +2551,17 @@ class TestReadmeForNybegynnere:
         assert len(innhold) == 1
         lenker = re.findall(r"\[([^\]]+)\]\(#([^)]+)\)", innhold[0])
         hoved = re.findall(r"^## (.+)$", _uten_bokser(tekst), re.MULTILINE)
-        hoved = hoved[hoved.index("Kom i gang") : hoved.index("Medlemmer") + 1]
+        # Story 3.5f: «Kom i gang: nedlasting og installasjon» staar som «Kom
+        # i gang» i «Innhold», og ankeret kom-i-gang er beholdt paa linja over.
+        hoved = hoved[hoved.index(KOM_I_GANG[3:]) : hoved.index("Medlemmer") + 1]
+        hoved[0] = "Kom i gang"
         assert [t for t, _ in lenker] == hoved, lenker
         # Gjennomgangen, ECH5: hvert anker finnes én gang, ellers gir GitHub
         # den neste «-1», og lenken gaar til den foerste.
         alle = _alle_ankrene(tekst)
         for tittel, anker in lenker:
             assert anker == _anker(tittel) and alle.count(anker) == 1, anker
+        assert f'<a name="kom-i-gang"></a>\n\n{KOM_I_GANG}\n' in tekst
         assert innhold[0] == "**Innhold:** " + " · ".join(f"[{t}](#{a})" for t, a in lenker)
 
     def test_mappestrukturen_lenker_til_stier_i_repoet(self):
@@ -2541,7 +2576,8 @@ class TestReadmeForNybegynnere:
         punkter = [l for l in del_.splitlines() if l.startswith("- ")]
         # Story 3.3f: 8 med docs/appen/. Story 3.5a: 9 med start/ og
         # .gitattributes. Story 3.4 (24.10): 10 med docs/bilder/investorsider/.
-        assert len(punkter) == 10, punkter
+        # Story 3.5f: 15 med filene i rota.
+        assert len(punkter) == 15, punkter
         for punkt in punkter:
             # Hver sti i kodeformat i punktet er en lenke, ogsaa etter
             # tankestreken (gjennomgangen, BH3 og ECH4).
@@ -2553,7 +2589,9 @@ class TestReadmeForNybegynnere:
         # Story 3.5a: 20 med start/ og .gitattributes.
         # Story 3.4 (24.10): 23 med docs/bilder/investorsider/, LESMEG.md og
         # bobler.json.
-        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 23, lenker
+        # Story 3.5f: 30 med README.md, CLAUDE.md, pyproject.toml, uv.lock,
+        # .env.example, .gitignore og .mailmap.
+        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 30, lenker
         sporet = _git_sporet()
         for tekst, maal in lenker:
             # Maalet er stien i teksten, relativ og uten «..» (BH4, ECH3).
@@ -2594,9 +2632,15 @@ class TestReadmeForNybegynnere:
         tekst = README.read_text(encoding="utf-8")
         lista = tekst.split("Til faglærer:\n", 1)[1].split("\n\n", 1)[0].splitlines()
         forventet = [
+            # Story 3.5f: foerst dobbeltklikket, saa Docker.
+            (
+                "Se appen med oppdiktede tall, uten konto og nøkkel, med et dobbeltklikk på «Start demoen»",
+                DOBBELTKLIKKET,
+                DOBBELTKLIKKET,
+            ),
             # Gjennomgangen, BH2: demolenken sier ogsaa hvor steg 1-4 staar.
             (
-                "Se appen med oppdiktede tall, uten konto og nøkkel, etter [steg 1–4](#felles-for-begge)",
+                "Eller med Docker Desktop, etter [steg 1–4](#med-docker-desktop)",
                 "demoen",
                 "Demoen",
             ),
@@ -2611,7 +2655,7 @@ class TestReadmeForNybegynnere:
             ("De automatiske testene, med to kommandoer etter at uv er installert", "Tester", "Tester"),
         ]
         alle = _alle_ankrene(tekst)
-        for linje, (forklaring, lenketekst, overskrift) in zip(lista[:3], forventet, strict=True):
+        for linje, (forklaring, lenketekst, overskrift) in zip(lista[:4], forventet, strict=True):
             treff = re.fullmatch(r"- (.+): \[([^\]]+)\]\(#([^)]+)\)", linje)
             assert treff, linje
             assert treff.group(1) == forklaring and treff.group(2) == lenketekst, linje
@@ -2619,7 +2663,8 @@ class TestReadmeForNybegynnere:
             # Hvert anker finnes én gang (ECH5).
             for anker in [treff.group(3), *re.findall(r"\]\(#([^)]+)\)", treff.group(1))]:
                 assert alle.count(anker) == 1, (anker, linje)
-        assert _anker("Felles for begge") == "felles-for-begge"
+        assert _anker("Med Docker Desktop") == "med-docker-desktop"
+        assert _anker(DOBBELTKLIKKET) == "enklest-dobbeltklikk-uten-docker"
 
     def test_til_faglaerer_lenker_til_briefen_med_gjeldende_tag(self):
         """12.10 kl. 12:12: briefen var gjemt langt nede. Lista under
@@ -2677,10 +2722,12 @@ class TestReadmeDemoenAnbefales:
         ), foerste
         # «anbefal» står bare i den ene setningen, i hele README-en og i
         # hjelpen. Fra 3.3h også i pila til demoen, og hjelpen har ingen
-        # daterte linjer lenger (gjennomgangen av 3.3h, BH12).
-        assert re.findall(r"anbefal\w*", tekst, re.IGNORECASE) == ["anbefaler", "anbefalt"], re.findall(
+        # daterte linjer lenger (gjennomgangen av 3.3h, BH12). Story 3.5f:
+        # og ved dobbeltklikket i «Velg vei etter hva du har», som veien.
+        assert re.findall(r"anbefal\w*", tekst, re.IGNORECASE) == ["anbefaler", "anbefalt", "anbefalt"], re.findall(
             r"\w*anbefal\w*", tekst
         )
+        assert f"[{DOBBELTKLIKKET}](#{_anker(DOBBELTKLIKKET)}) (anbefalt):" in tekst
         assert '<a name="demoen"></a>Demoen: anbefalt for faglærer og sensor' in tekst
         assert re.search(r"anbefal", _uten_daterte_linjer(_hjelp()), re.IGNORECASE) is None
 
@@ -2689,7 +2736,10 @@ class TestReadmeDemoenAnbefales:
         overskriften eller tabellen, eller hvis en lenke gikk til det gamle
         ankeret."""
         tekst = README.read_text(encoding="utf-8")
-        assert "(anbefalt)" not in tekst
+        # Story 3.5f: «(anbefalt)» står bare ved dobbeltklikket, som er veien,
+        # ikke versjonen.
+        assert tekst.count("(anbefalt)") == 1
+        assert f"[{DOBBELTKLIKKET}](#{_anker(DOBBELTKLIKKET)}) (anbefalt):" in tekst
         # Story 3.3h: pila til den ekte versjonen, med ankeret.
         assert '<summary><a name="den-ekte-versjonen"></a>Den ekte versjonen: ' in tekst
         assert "](#den-ekte-versjonen)" in tekst
@@ -2819,7 +2869,8 @@ LENKENE_FOER_3_3H = {
     "#dokumentene": 1,
     "#mappestruktur": 1,
     "#medlemmer": 1,
-    "#felles-for-begge": 1,
+    # Story 3.5f: «Felles for begge» heter «Med Docker Desktop».
+    "#med-docker-desktop": 1,
     "#demoen": 1,
     "#den-ekte-versjonen": 1,
     "_bmad-output/planning-artifacts/product-brief.md": 2,
@@ -2893,11 +2944,13 @@ LENKENE_FOER_3_3H = {
 # «Mappestruktur» (regel 19). Var 0d1a51a6....
 # Story 10.2e (gruppens svar 24.10 kl. 23:23, b): bildet av aksjesiden i
 # «Mappestruktur» er BRFE (regel 19). Var 852cb13b....
+# Story 3.5f: hver fil og mappe i rota i «Mappestruktur» (regel 19). Var
+# 7ed8bbe8....
 AVTRYKK_I_PILENE = {
     "Demoen": "f124a92b1c64eeb0ea5e7141976ff85de68df49004a22d5874a4a257aaf89b55",
     "Den ekte versjonen": "3bb398cd1be31a43abe09b7261456646b6dc03047e20f1aa57ab665a768cfd78",
     "Dokumentene": "409a3f8b38d4247df41e3eb5062ad439aa160e7fd1c0b49e0fd44f262eb2d77c",
-    "Mappestruktur": "7ed8bbe88d9ae1bda3a589a025499a9b9ef4b3cfc3086422de947d63e9495255",
+    "Mappestruktur": "a363fbd74f9dbaf125876c7d3cefe2213b997a988bd0933da497e94e662512a9",
 }
 
 # Svaret 20.10 kl. 20:20: advarselen staar rett under pila til den ekte
@@ -2973,9 +3026,9 @@ class TestReadmeBakPiler:
         """Ville feilet hvis de felles stegene 1–4, bildene eller avsnittet
         om å lime inn sto bak en pil."""
         synlig = _utenfor_pilene(_kom_i_gang())
-        felles = _seksjon("Felles for begge")
+        felles = _seksjon("Med Docker Desktop")
         assert "<details>" not in felles
-        assert "### Felles for begge\n" in synlig
+        assert "### Med Docker Desktop\n" in synlig
         for steg in STEGENE_FOER_3_3H[:4]:
             assert f"\n{steg}" in synlig, steg
         for bilde in BILDENE.values():
@@ -3164,3 +3217,187 @@ class TestFemSpoersmaal:
         under = steg4.split(f"### {CD_SPOERSMAALET}\n\n", 1)[1].split("\n### ", 1)[0]
         for melding in self.MELDINGENE:
             assert f"Kommer {melding}: " in under, melding
+
+
+def _velg_vei() -> list[tuple[str, str, str]]:
+    """Punktene under «Velg vei etter hva du har» som (lenketekst, anker,
+    resten av linja)."""
+    del_ = _kom_i_gang().split("\n**Velg vei etter hva du har:**\n\n", 1)[1].split("\n\n", 1)[0]
+    punkter = []
+    for linje in del_.splitlines():
+        treff = re.fullmatch(r"- \[([^\]]+)\]\(#([^)]+)\)(.*)", linje)
+        assert treff, linje
+        punkter.append(treff.groups())
+    return punkter
+
+
+def _dobbeltklikket() -> str:
+    """Delen «Enklest: dobbeltklikk, uten Docker» i «Kom i gang»."""
+    return _seksjon(DOBBELTKLIKKET)
+
+
+class TestHovedveien:
+    """Story 3.5f (gruppens svar 25.10 kl. 11:32 og innspillet kl. 11:26):
+    dobbeltklikket er den anbefalte hovedveien og en egen del foerst i «Kom i
+    gang», Docker den andre og uv i terminalen den tredje."""
+
+    def test_dobbeltklikket_staar_foerst_og_ikke_bak_en_pil(self):
+        """Ville feilet hvis dobbeltklikket ikke sto foerst i «Kom i gang»,
+        sto bak en pil, eller sto igjen under «Mer for den som vil»."""
+        del_ = _kom_i_gang()
+        overskrifter = re.findall(r"^### (.+)$", del_, re.MULTILINE)
+        assert overskrifter == [DOBBELTKLIKKET, "Med Docker Desktop", "Står du fast?", "Mer for den som vil"]
+        dobbeltklikk = _dobbeltklikket()
+        assert "<details>" not in dobbeltklikk and dobbeltklikk in _utenfor_pilene(del_)
+        assert del_.index(f"### {DOBBELTKLIKKET}\n") < del_.index("### Med Docker Desktop\n")
+        assert not any("dobbeltklikk" in s.lower() for s in _detaljer(_seksjon("Mer for den som vil")))
+        # Stegene i instruksjonen, i rekkefølgen der: last ned, pakk ut, finn
+        # de fire filene og dobbeltklikk «Start demoen».
+        stegene = [l for l in dobbeltklikk.split("\n\n") if l.startswith("- **")][0].splitlines()
+        assert [re.match(r"- \*\*([^*]+)\*\*", l).group(1) for l in stegene] == [
+            "Last ned koden",
+            "Pakk ut.",
+            "Finn de fire filene",
+            "Dobbeltklikk «Start demoen».",
+        ], stegene
+        assert "«Code»" in stegene[0] and "«Download ZIP»" in stegene[0] and f"]({ZIP_LENKEN})" in stegene[0]
+        assert "«Pakk ut alle»" in stegene[1] and "`G74-lund-osen-main`" in stegene[1]
+        assert "`Start demoen` og `Start den ekte versjonen`" in stegene[2] and "øverst i mappa" in stegene[2]
+        # Ingen nummererte steg: «steg 1–4» betyr Docker-stegene.
+        assert re.search(r"^\d+\. ", dobbeltklikk, re.MULTILINE) is None
+        # Resten av teksten står: advarselen, godkjenningen, vernet mot .git
+        # og kommandoene skriptene kjører.
+        for setning in (
+            "**Advarselen fra Windows.**",
+            "**Godkjenningen på Mac.**",
+            "**Den ekte versjonen** starter bare i en kopi fra «Download ZIP»",
+            "Den ekte versjonen spør etter nøkkelen fra EODHD første gang.",
+            "Skriptene står i [`start/`](start/)",
+        ):
+            assert setning in dobbeltklikk, setning
+
+    def test_velg_vei_lenker_rett_inn_i_rekkefoelgen(self):
+        """Ville feilet hvis lista under tabellen manglet, en vei sto i en
+        annen rekkefølge, eller en lenke gikk til et anker som ikke finnes
+        eller finnes to ganger."""
+        topp = _kom_i_gang().split(f"### {DOBBELTKLIKKET}\n", 1)[0]
+        assert topp.index("| Klar |") < topp.index("**Velg vei etter hva du har:**") < topp.index("**Du trenger**")
+        punkter = _velg_vei()
+        assert [t for t, _, _ in punkter] == [DOBBELTKLIKKET, "Med Docker Desktop", "Uten Docker, med uv"]
+        assert [a for _, a, _ in punkter] == [
+            "enklest-dobbeltklikk-uten-docker",
+            "med-docker-desktop",
+            "uten-docker-med-uv",
+        ]
+        alle = _alle_ankrene(README.read_text(encoding="utf-8"))
+        for tekst, anker, _ in punkter:
+            assert alle.count(anker) == 1, anker
+            if anker != "uten-docker-med-uv":
+                assert anker == _anker(tekst), anker
+        assert punkter[0][2].startswith(" (anbefalt): ")
+        assert punkter[2][2].startswith(", under «Mer for den som vil»: ")
+        # Ankeret til uv står i pila under «Mer for den som vil».
+        assert UV_PIL in _detaljer(_seksjon("Mer for den som vil"))
+
+    def test_docker_veien_har_stegene_bildene_og_kommandoene(self):
+        """Ville feilet hvis Docker-veien eller en kommando manglet i «Kom i
+        gang», eller hvis «Velg vei» i Docker-delen ikke het «Velg versjon»."""
+        docker = _kom_i_gang().split("\n### Med Docker Desktop\n", 1)[1].split("\n### Står du fast?\n", 1)[0]
+        assert [int(n) for n in re.findall(r"^(\d+)\. ", docker, re.MULTILINE)] == [1, 2, 3, 4, 5, 6, 7, 5, 6, 7, 8, 9]
+        for bilde in BILDENE.values():
+            assert f"](docs/bilder/readme/{bilde})" in docker, bilde
+        assert KOPIERINGEN in docker and f"\n{VELG_VEI} Klikk på pila" in docker
+        assert "**Velg vei.**" not in README.read_text(encoding="utf-8")
+        assert '<a name="demoen"></a>' in docker and '<a name="den-ekte-versjonen"></a>' in docker
+        kommandoene = [l.strip() for spraak, b in _blokkene(docker) if not spraak for l in b.splitlines()]
+        assert kommandoene == [
+            "docker compose up --build demo",
+            "docker compose --profile demo down",
+            "cp .env.example .env",
+            "notepad .env",
+            "open -e .env",
+            "docker compose up --build",
+            "docker compose run --rm hent",
+            "docker compose down",
+        ], kommandoene
+        assert ADVARSELEN_MOT_DOWN_V in docker
+
+    def test_zip_lenken_gaar_til_main_i_dette_repoet(self):
+        """Ville feilet hvis den direkte lenken gikk til en annen gren eller
+        et annet repo enn GitHub-siden README-en lenker til, eller ikke sto
+        både i dobbeltklikket og i steg 2. Mappa GitHub pakker ut, heter
+        repoet og grenen, G74-lund-osen-main, som stegene sier."""
+        tekst = README.read_text(encoding="utf-8")
+        repoet = "https://github.com/IBE160-2026/G74-lund-osen"
+        assert f"[GitHub-siden]({repoet})" in tekst
+        assert f"{repoet}/actions/workflows/tester.yml" in tekst
+        zip_lenker = re.findall(r"\]\((https://[^)]*\.zip)\)", tekst)
+        assert zip_lenker == [ZIP_LENKEN, ZIP_LENKEN], zip_lenker
+        assert ZIP_LENKEN == f"{repoet}/archive/refs/heads/main.zip"
+        assert f"]({ZIP_LENKEN})" in _dobbeltklikket() and f"]({ZIP_LENKEN})" in _steg("Med Docker Desktop", 2)
+        mappa = f"{repoet.rsplit('/', 1)[1]}-{ZIP_LENKEN.rsplit('/', 1)[1].removesuffix('.zip')}"
+        assert mappa == "G74-lund-osen-main"
+        assert f"`{mappa}`" in _dobbeltklikket() and f"`{mappa}`" in _steg("Med Docker Desktop", 2)
+
+    def test_tabellen_og_du_trenger_sier_ikke_at_docker_trengs(self):
+        """Ville feilet hvis raden «Trenger» eller «Du trenger» sa at Docker
+        trengs, eller hvis «Du trenger» ikke sa at Docker trengs bare for
+        Docker-veien."""
+        topp = _kom_i_gang().split(f"### {DOBBELTKLIKKET}\n", 1)[0]
+        trenger = [l for l in topp.splitlines() if l.startswith("| Trenger |")]
+        assert trenger == ["| Trenger | Ingen konto og ingen nøkkel | En gratis nøkkel fra EODHD |"], trenger
+        du_trenger = [a for a in topp.split("\n\n") if a.startswith("**Du trenger**")][0]
+        assert "men verken git, Docker eller konto" in du_trenger
+        assert "Bare Docker" not in du_trenger and "Med Docker trenger du Docker Desktop" in du_trenger
+
+    def test_til_faglaerer_viser_foerst_til_dobbeltklikket_og_saa_til_docker(self):
+        """Ville feilet hvis «Til faglærer» viste til Docker foer
+        dobbeltklikket."""
+        lista = README.read_text(encoding="utf-8").split("Til faglærer:\n", 1)[1].split("\n\n", 1)[0]
+        assert lista.index("](#enklest-dobbeltklikk-uten-docker)") < lista.index("](#med-docker-desktop)")
+        assert lista.index("](#med-docker-desktop)") < lista.index("](#demoen)")
+
+    def test_mappestrukturen_forklarer_alt_i_rota(self):
+        """Ville feilet hvis en fil eller mappe i rota som git sporer, ikke
+        sto i «Mappestruktur» med en forklaring. De fire startfilene står med
+        navnet uten filendelsen, og .cmd og .command forklares. Uten git
+        (ZIP-fila) hoppes testen over, fordi rota der også har det som ikke
+        er sporet."""
+        import pytest
+
+        sporet = _git_sporet()
+        if sporet is None:
+            pytest.skip("ingen git her (for eksempel ZIP-fila som leveres)")
+        rota = sorted({f.split("/", 1)[0] for f in sporet})
+        del_ = README.read_text(encoding="utf-8").split("\n## Mappestruktur\n", 1)[1].split("\n## ", 1)[0]
+        punkter = [l for l in del_.splitlines() if l.startswith("- ")]
+        for punkt in punkter:
+            assert " — " in punkt and punkt.split(" — ", 1)[1].strip(), punkt
+        lenket = {maal.rstrip("/").split("/", 1)[0] for _, maal in re.findall(r"\[`([^`]+)`\]\(([^)]+)\)", del_)}
+        startfilene = [f for f in rota if f.startswith("Start ")]
+        assert sorted(startfilene) == [
+            "Start demoen.cmd",
+            "Start demoen.command",
+            "Start den ekte versjonen.cmd",
+            "Start den ekte versjonen.command",
+        ]
+        for navn in startfilene:
+            assert navn.rsplit(".", 1)[0] in del_, navn
+        assert "for Windows og Mac" in del_
+        mangler = [f for f in rota if f not in startfilene and f not in lenket]
+        assert not mangler, mangler
+        for navn in ("CLAUDE.md", "pyproject.toml", "uv.lock"):
+            assert f"[`{navn}`]({navn})" in del_, navn
+
+    def test_hjelpen_har_dobbeltklikket_foerst(self):
+        """Regel 19: docs/hjelp.md følger hovedveien. Ville feilet hvis
+        dobbeltklikket sto etter Docker-stegene, lenken gikk til den gamle
+        pila, eller «neste gang» bare nevnte Docker."""
+        hjelp = _hjelp()
+        deler = re.findall(r"^## (.+)$", hjelp, re.MULTILINE)
+        assert deler[:2] == ["Start med dobbeltklikk", "Steg 1: Docker Desktop"], deler
+        assert "Dobbeltklikket står først, som i README-en." in hjelp
+        assert "«Start med dobbeltklikk, uten Docker»" not in hjelp
+        assert f"«{DOBBELTKLIKKET}» i [README-en](../README.md#enklest-dobbeltklikk-uten-docker)" in hjelp
+        neste = hjelp.split("### Hvordan starter jeg neste gang?\n\n", 1)[1]
+        assert neste.startswith("Med dobbeltklikket: ") and "\n\nMed Docker: " in neste
