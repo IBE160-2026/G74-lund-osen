@@ -998,7 +998,7 @@ HOEYDE_PAA_BILDET = 1630
 # hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Story 8.6b d: kartet i stil.css og hjelpen i hjelpetekster.py. Bildet ble
 # tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "714a9803b72448d8ef7292f9965543928839142967efc7f9b394e1018fc4eb67"
+AVTRYKK_BAK_BILDET = "c9c0100fa282223b3e64e19ab3ae9674bfcfe0b504af07914971003e2cf950f1"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1173,7 +1173,7 @@ HOEYDE_PAA_AKSJESIDEN = 1894
 # hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Story 8.6b d: kartet i stil.css og hjelpen i hjelpetekster.py. Bildet ble
 # tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "2b5a56985566492b7ea46c61fe563b270200779d8c33bdedec53cc22ccfbe6af"
+AVTRYKK_BAK_AKSJESIDEN = "cb4bf803102cc4fb066887312d926aca8cb211acbbd0a1ff31db0b2dc8366e4d"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "

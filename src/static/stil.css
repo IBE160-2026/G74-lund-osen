@@ -648,8 +648,9 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) .rute.ramme-moerk, :where(.side-oversikt) .proeve.ramme-moerk,
 :where(.side-oversikt) .rute.ramme-gul, :where(.side-oversikt) .proeve.ramme-gul { border: 4px solid var(--blekk); box-shadow: inset 0 0 0 2px var(--hvit); }
 :where(.side-oversikt) .rute.ramme-gul, :where(.side-oversikt) .proeve.ramme-gul { border-color: var(--gul-symbol); }
-/* Story 8.6b, d: fokus innenfor ruta og over naboene i kartet. */
-:where(.side-oversikt) .rute:focus-visible { z-index: 1; outline: 3px solid var(--blekk); outline-offset: 0; }
+/* Story 8.6b, d: fokus over naboene i kartet. Gjennomgangen 26.10 (BH, ECH):
+   2 px hvitt mellom ringen og ruta, så ringen ikke ser ut som den mørke rammen. */
+:where(.side-oversikt) .rute:focus-visible { z-index: 1; outline: 3px solid var(--blekk); outline-offset: 2px; }
 :where(.side-oversikt) .rute .ticker { font-weight: 700; }
 :where(.side-oversikt) .rute .merke { font-size: 12px; font-weight: 600; }
 /* Story 8.6b, c: grunnen i samme farge som resten av ruta, fordi --dempet har

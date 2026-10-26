@@ -539,6 +539,9 @@ class TestSiden:
         # 1 px er teksten som skjules for øyet.
         assert not re.search(r"\.rute[^{]*\{[^}]*width: (?!1px)\d+px", stil)
         assert re.search(r"\.rute:focus-visible \{[^}]*outline", stil)
+        # Gjennomgangen 26.10 (BH, ECH): ville feilet med outline-offset: 0, der
+        # ringen ligger inntil den mørke rammen og bare ser ut som en tykkere ramme.
+        assert re.search(r"\.rute:focus-visible \{[^}]*outline-offset: 2px", stil)
         html = _side(klient)
         assert (
             '<div class="tabellboks boersometerboks" role="region" aria-label="Børsometeret som tabell" tabindex="0">'
