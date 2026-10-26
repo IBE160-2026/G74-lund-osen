@@ -158,3 +158,7 @@ et sitat som ikke fantes».
     CI kjører `ruff check` og `ruff format --check`, og `tests/test_ruff.py`
     gjør det samme, så `uv run pytest` feiler hvis det er glemt. Lagt til
     2026-10-17 med story 9.7, etter gruppens svar kl. 22:38–22:42.
+
+## Sesjonslogg
+
+Når en oppgave eller økt avsluttes, før sluttoppsummeringen, bruk `sesjonslogg`-skillen: dokumenter Oppgave + Plan + Resultat + åpne punkter i `.logs/<bruker>/`, og før åpne punkter i `.logs/<bruker>/issues.md`. Skillen committer loggfila lokalt; push gjør du selv. Gruppens egne regler for commit og språk gjelder foran dette.
