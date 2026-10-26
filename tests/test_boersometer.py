@@ -330,10 +330,13 @@ class TestSiden:
         assert abs(float(vist.replace(",", ".").replace(" %", "")) - sum(endringer) / 4) <= 0.006
 
     def test_1_aksje_der_bransjen_har_en(self, klient):
-        """Ville feilet med «1 aksjer», eller uten merket."""
-        overskrifter = _overskrifter(_side(klient))
+        """Ville feilet med «1 aksjer», eller uten merket. Gruppens svar
+        26.10 kl. 13:00 (b): antallet står i tabellen, ikke i overskriften."""
+        html = _side(klient)
+        overskrifter = _overskrifter(html)
         assert overskrifter["Industri"].endswith("1 aksje")
-        assert overskrifter["Energi"].endswith("4 aksjer")
+        assert "aksjer" not in overskrifter["Energi"]
+        assert "Energi (4 aksjer, snitt" in html
         assert not any(t.endswith("1 aksjer") for t in overskrifter.values())
 
     def test_antallet_telles_fra_lista(self, klient):
@@ -1536,8 +1539,89 @@ class TestKartet:
         som er et eget element i en flex-boks."""
         stil = (SRC / "static" / "stil.css").read_text(encoding="utf-8")
         regel = re.search(r"\.kart section\.bransje h2 \.bransjenavn \{([^}]*)\}", stil).group(1)
-        assert "text-overflow: ellipsis" in regel and "overflow: hidden" in regel and "min-width: 0" in regel
+        assert "text-overflow: ellipsis" in regel and "overflow: hidden" in regel
+        assert re.search(r"min-width: (\d+)px", regel)
         assert _side(klient).count('<span class="bransjenavn">') == 8
+
+    def test_overskriften_er_navnet_og_snittet_eller_1_aksje(self, klient):
+        """Gruppens svar 26.10 kl. 13:00 (b): som på tavla, navnet og
+        «snitt» med tallet, eller «1 aksje» ved én aksje. Ville feilet med
+        antallet i overskriften, uten «snitt», med snittet ved én aksje,
+        eller med tillegget foran navnet."""
+        for adresse in ("/boersometer", "/boersometer?dag=2026-10-08"):
+            html = _side(klient, adresse)
+            kartet = html.split('<div class="kart"', 1)[1].split('<section class="fargene"', 1)[0]
+            h2 = re.findall(r"<h2 id=\"bransje-\d+\">(.*?)</h2>", kartet, re.S)
+            assert len(h2) == 8
+            for innhold in h2:
+                linje = re.fullmatch(
+                    r'<span class="linje"><span class="navnet"><svg [^>]*>.*?</svg><span class="bransjenavn">([^<]+)</span></span>\s*(.*)</span>',
+                    innhold,
+                    re.S,
+                )
+                assert linje, innhold
+                navn, tillegg = linje.groups()
+                rader = re.findall(rf"<td>{navn} \((\d+) aksjer?", html)
+                assert len(rader) == 1, (navn, rader)
+                if rader[0] == "1":
+                    assert tillegg == '<span class="tillegg">1 aksje</span>', tillegg
+                else:
+                    assert re.fullmatch(
+                        r'<span class="tillegg">snitt <span class="snitt (opp|ned|null)">[^<]+</span></span>', tillegg
+                    ), tillegg
+
+    def test_tillegget_skjules_for_oeyet_foer_navnet_kuttes(self):
+        """Gruppens svar 26.10 kl. 13:00 (b): får ikke snittet eller «1 aksje»
+        plass, brytes det til en linje som skjules av overflow, under en
+        row-gap høyere enn linja. Navnet står først og kuttes med «…» først
+        når det står alene. Ville feilet uten flex-wrap, med display: none,
+        som skjuler tillegget for skjermleseren, eller med en row-gap som lot
+        linje to synes."""
+        stil = (SRC / "static" / "stil.css").read_text(encoding="utf-8")
+        linje = re.search(r"\.kart section\.bransje h2 \.linje \{([^}]*)\}", stil).group(1)
+        assert "flex-wrap: wrap" in linje and "overflow: hidden" in linje and "min-width: 0" in linje
+        hoeyde = int(re.search(r"(?<![-\w])height: (\d+)px", linje).group(1))
+        assert int(re.search(r"row-gap: (\d+)px", linje).group(1)) > hoeyde
+        tillegg = re.search(r"\.kart section\.bransje h2 \.tillegg \{([^}]*)\}", stil).group(1)
+        assert "display: none" not in tillegg and "flex: none" in tillegg
+        navnet = re.search(r"\.kart section\.bransje h2 \.navnet \{([^}]*)\}", stil).group(1)
+        assert "min-width: 0" in navnet and "max-width: 100%" in navnet
+        assert "display: none" not in stil.split(".kart section.bransje h2", 1)[1].split("ul.ruter", 1)[0]
+
+    def test_navnet_forsvinner_aldri_helt(self):
+        """Gruppens svar 26.10 kl. 13:00 (b): hvert felt er så bredt, ved den
+        minste bredden flaten brukes på, at overskriften har plass til
+        symbolet og min-width for navnet. Ville feilet hvis et felt kunne bli
+        så smalt at bare symbolet eller ingenting av navnet sto, eller hvis
+        tallene i boersometer.py ikke var de i stil.css."""
+        stil = (SRC / "static" / "stil.css").read_text(encoding="utf-8")
+        regel = lambda velger: re.search(velger + r" \{([^}]*)\}", stil).group(1)  # noqa: E731
+        assert f"min-width: {boersometer.MINSTE_NAVN}px" in regel(r"\.kart section\.bransje h2 \.bransjenavn")
+        assert f"gap: {boersometer.MELLOMROM}px" in regel(r"\.kart section\.bransje h2 \.navnet")
+        assert f"width: {boersometer.SYMBOL}px" in regel(r"\.kart section\.bransje h2 \.bransjesymbol")
+        h2 = regel(r"\.kart section\.bransje h2")
+        assert f"left: {boersometer.INNRYKK}px; right: {boersometer.INNRYKK}px" in h2
+        rng = random.Random(5)
+        dager = [[rng.lognormvariate(0, sigma) for _ in range(15)] for sigma in (0.5, 0.8, 1.2) for _ in range(30)]
+        dager += [[3.0] * 14 + [0.05], [0.5] * 14 + [12.0], [1.0] * 15]
+        for forhold in dager:
+            k = kart(bygg_boersometer(_ruter_med(forhold, [BRANSJER[i % 8] for i in range(15)])))
+            for flate in (BRED, SMAL):
+                for f in k.felt:
+                    synlig = f.plass[flate.navn].b / 100 * flate.minste
+                    assert synlig >= boersometer.MINSTE_FELT - 1e-9, (flate.navn, f.bransje.navn, synlig)
+
+    def test_hjelpen_sier_det_om_overskriften(self):
+        """Regel 19: ville feilet hvis hjelpen ved «?» eller docs/hjelp.md
+        ikke sa at bare navnet står når feltet er smalt, eller at antallet
+        står i tabellen (gruppens svar 26.10 kl. 13:00, b)."""
+        from hjelpetekster import hjelpetekster
+
+        assert "eller bare navnet når feltet er smalt" in hjelpetekster(STANDARD)["boersometeret"].tekst
+        hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
+        avsnitt = hjelp.split("### Hva viser børsometeret?", 1)[1].split("###", 1)[0]
+        assert "eller «1 aksje» der det er én; antallet står i tabellen" in avsnitt
+        assert "Er feltet for smalt, står bare navnet" in avsnitt
 
     def test_det_som_ikke_faar_plass_leses_av_skjermleseren(self):
         """Teksten som ikke får plass, skjules bare for øyet. Ville feilet med

@@ -601,14 +601,21 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
                                                   display: flex; align-items: center; gap: 4px; min-width: 0; overflow: hidden; white-space: nowrap;
                                                   font-size: 13px; line-height: 1; }
 :where(.side-oversikt) .kart section.bransje h2 .bransjesymbol { flex: none; width: 14px; height: 14px; }
-/* Gjennomgangen 26.10 (BH, ECH): navnet kuttes med «…» når feltet er smalt,
-   og snittet og antallet står helt så lenge det er plass. */
-:where(.side-oversikt) .kart section.bransje h2 .bransjenavn { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-:where(.side-oversikt) .kart section.bransje h2 .snitt, :where(.side-oversikt) .kart section.bransje h2 .antall { flex: none; }
-:where(.side-oversikt) .kart section.bransje h2 .snitt { font-family: "IBM Plex Sans", sans-serif; font-variant-numeric: tabular-nums; }
+/* Gruppens svar 26.10 kl. 13:00 (b): navnet først, og tillegget («snitt» med
+   tallet, eller «1 aksje») ved siden av så lenge det får plass. Får det ikke
+   plass, brytes det til linje to, som ligger under row-gap og skjules for øyet
+   av overflow, men leses av skjermleseren. Navnet står alene på linje én og
+   kuttes med «…», men blir aldri smalere enn min-width (MINSTE_NAVN i
+   boersometer.py, med MINSTE_FELT for feltet). */
+:where(.side-oversikt) .kart section.bransje h2 .linje { flex: 1 1 auto; min-width: 0; height: 16px; overflow: hidden;
+                                                         display: flex; flex-wrap: wrap; align-items: center; column-gap: 4px; row-gap: 40px; }
+:where(.side-oversikt) .kart section.bransje h2 .navnet { display: flex; align-items: center; gap: 4px; min-width: 0; max-width: 100%; height: 16px; }
+:where(.side-oversikt) .kart section.bransje h2 .bransjenavn { min-width: 24px; overflow: hidden; text-overflow: ellipsis; }
+:where(.side-oversikt) .kart section.bransje h2 .tillegg { flex: none; height: 16px; display: flex; align-items: center; gap: 0.25em;
+                                                           font-family: "IBM Plex Sans", sans-serif; font-weight: 400; color: var(--dempet); }
+:where(.side-oversikt) .kart section.bransje h2 .snitt { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--blekk); }
 :where(.side-oversikt) .kart section.bransje h2 .snitt.opp { color: var(--opp); }
 :where(.side-oversikt) .kart section.bransje h2 .snitt.ned { color: var(--ned); }
-:where(.side-oversikt) .kart section.bransje h2 .antall { font-family: "IBM Plex Sans", sans-serif; font-weight: 400; color: var(--dempet); }
 :where(.side-oversikt) .kart ul.ruter { position: absolute; left: 0; right: 0; bottom: 0; top: var(--topp-bred); margin: 0; padding: 0; list-style: none; }
 :where(.side-oversikt) .kart ul.ruter > li { position: absolute; left: var(--x-bred); top: var(--y-bred); width: var(--b-bred); height: var(--h-bred); }
 /* KANT i boersometer.py: 2 px hvitt rundt hver rute. */

@@ -57,9 +57,13 @@
     {%- for felt in kart.felt %}
       {%- set bransje = felt.bransje %}
       <section class="bransje" aria-labelledby="bransje-{{ loop.index }}" style="{{ plass_stil(felt.plass) }}{% for navn, topp in felt.topp.items() %} --topp-{{ navn }}: {{ '%.3f'|format(topp) }}%;{% endfor %}">
-        <h2 id="bransje-{{ loop.index }}">{{ bransjesymbol(bransje.navn) }}<span class="bransjenavn">{{ bransje.navn }}</span>
-          {%- if bransje.snitt is not none %} <span class="snitt {{ fortegn(bransje.snitt) }}">{{ bransje.snitt|tall('endring') }}</span>{% endif %}
-          <span class="antall">{{ antall_ord(bransje.antall, "aksje", "aksjer") }}</span></h2>
+        {#- Gruppens svar 26.10 kl. 13:00 (b): som på tavla, navnet og «snitt»
+            med tallet, eller «1 aksje»; antallet står i tabellen. Er feltet for
+            smalt, brytes tillegget til en linje stilen skjuler for øyet, før
+            navnet kuttes med «…». #}
+        <h2 id="bransje-{{ loop.index }}"><span class="linje"><span class="navnet">{{ bransjesymbol(bransje.navn) }}<span class="bransjenavn">{{ bransje.navn }}</span></span>
+          {%- if bransje.antall == 1 %} <span class="tillegg">1 aksje</span>
+          {%- elif bransje.snitt is not none %} <span class="tillegg">snitt <span class="snitt {{ fortegn(bransje.snitt) }}">{{ bransje.snitt|tall('endring') }}</span></span>{% endif %}</span></h2>
         <ul class="ruter">
           {%- for kartrute in felt.ruter %}
           {%- set rute = kartrute.rute %}

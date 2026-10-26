@@ -288,6 +288,15 @@ MINSTE_RUTE = 44
 KANT = 2
 # Overskriften i feltet, i px ved den minste bredden for flaten.
 OVERSKRIFT = 24
+# Gruppens svar 26.10 kl. 13:00 (b): navnet forsvinner aldri helt. Et felt er
+# minst så bredt, ved den minste bredden flaten brukes på, at overskriften har
+# plass til INNRYKK på hver side, symbolet, mellomrommet og MINSTE_NAVN, som er
+# min-width for navnet i stil.css: én bokstav og «…».
+INNRYKK = 2
+SYMBOL = 14
+MELLOMROM = 4
+MINSTE_NAVN = 24
+MINSTE_FELT = 2 * INNRYKK + SYMBOL + MELLOMROM + MINSTE_NAVN
 # Høyden økes med 2 % til hver rute er stor nok.
 VEKST = 1.02
 MEST_VEKST = 600
@@ -450,16 +459,17 @@ def tekstnivaa(b: float, h: float, symbol: str) -> int:
     return 3
 
 
-def _legg_ut(bransjer: list[Bransje], bredde: float, hoeyde: float) -> list | None:
+def _legg_ut(bransjer: list[Bransje], bredde: float, hoeyde: float, minste_felt: float = 0.0) -> list | None:
     """Feltene og rutene i px, eller None når en rute er mindre enn
-    MINSTE_RUTE med KANT på hver side, eller et felt ikke har plass under
-    overskriften."""
+    MINSTE_RUTE med KANT på hver side, et felt ikke har plass under
+    overskriften, eller et felt er smalere enn minste_felt."""
     minst = MINSTE_RUTE + 2 * KANT
+    feltbredde = max(minst, minste_felt)
     feltvekter = [sum(vekt(r) for r in bransje.ruter) for bransje in bransjer]
     ut = []
-    for bransje, felt in zip(bransjer, squarify(feltvekter, 0, 0, bredde, hoeyde, minst), strict=True):
+    for bransje, felt in zip(bransjer, squarify(feltvekter, 0, 0, bredde, hoeyde, feltbredde), strict=True):
         fx, fy, fb, fh = felt
-        if fh - OVERSKRIFT < minst or fb < minst:
+        if fh - OVERSKRIFT < minst or fb < feltbredde:
             return None
         ruter = squarify([vekt(r) for r in bransje.ruter], fx, fy + OVERSKRIFT, fb, fh - OVERSKRIFT, minst)
         if any(rb < minst or rh < minst for _, _, rb, rh in ruter):
@@ -476,7 +486,8 @@ def kart(bransjer: list[Bransje], flatene: tuple[Flate, ...] = FLATENE) -> Kart:
     for flate in flatene:
         hoeyde = flate.bredde * flate.forhold
         for _ in range(MEST_VEKST):
-            utlagt = _legg_ut(bransjer, flate.bredde, hoeyde)
+            # MINSTE_FELT gjelder ved den minste bredden flaten brukes på.
+            utlagt = _legg_ut(bransjer, flate.bredde, hoeyde, MINSTE_FELT * flate.bredde / flate.minste)
             if utlagt is not None:
                 break
             hoeyde *= VEKST
