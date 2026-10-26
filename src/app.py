@@ -620,11 +620,17 @@ def boersometer():
     ]
     bransjer = bygg_boersometer(ruter)
     ikke_vurdert = any(rute.ikke_vurdert for rute in ruter)
+    # Story 8.6b, d: kartet regnes av de samme bransjene som tabellen.
+    # Gjennomgangen 26.10 (BH, ECH): får rutene ikke plass, står tabellen
+    # alene, som indeksen i linja (NFR-03).
+    try:
+        kartet = kart(bransjer)
+    except ValueError:
+        kartet = kart([])
     return render_template(
         "boersometer.html",
         bransjer=bransjer,
-        # Story 8.6b, d: kartet regnes av de samme bransjene som tabellen.
-        kart=kart(bransjer),
+        kart=kartet,
         antall_aksjer=len(ruter),
         ikke_vurdert=ikke_vurdert,
         **_fotnoten([dagen] if ikke_vurdert else [], i_dag),

@@ -1281,6 +1281,20 @@ class TestKartet:
         """Ville feilet med en feil når lista er tom."""
         assert kart([]).felt == ()
 
+    def test_tabellen_staar_naar_rutene_ikke_faar_plass(self, klient, monkeypatch):
+        """Gjennomgangen 26.10 (BH, ECH): ville feilet med 500 hvis kart()
+        ga opp, i stedet for at tabellen sto alene."""
+
+        def gir_opp(bransjer):
+            if bransjer:
+                raise ValueError("ingen plass")
+            return kart(bransjer)
+
+        monkeypatch.setattr(app_modul, "kart", gir_opp)
+        html = _side(klient)
+        assert '<section class="bransje"' not in html
+        assert html.count('<a href="/aksje/') >= 15
+
     @pytest.mark.parametrize(
         "forhold",
         [

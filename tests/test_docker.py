@@ -1173,7 +1173,7 @@ HOEYDE_PAA_AKSJESIDEN = 1894
 # hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Story 8.6b d: kartet i stil.css og hjelpen i hjelpetekster.py. Bildet ble
 # tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "0b0baf99396f20e5ff62e488fa5396c48270cedc24cb69bce6ef3a7c6dcda912"
+AVTRYKK_BAK_AKSJESIDEN = "e0f82aff65bf788a951f4c7e750b9bc22711a6550b008d0cb34d1b24e3211799"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
