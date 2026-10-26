@@ -109,6 +109,8 @@ Gjennomgang 26.10 etter hele settet (3721 bestått, 20 hoppet over, 0 feilet, 09
 
 *Rettet 2026-10-26 (instruksjonen kl. 15:24), ECH4:* linja «Mål mot børsen» sier datoen i stedet for ukedagen når børsdagen før er mer enn 6 dager før dagen som vises (`vis_dagen_foer` og `UKEDAG_INNTIL` i `src/boersometer.py`, `test_datoen_naar_dagen_foer_er_mer_enn_6_dager_foer` og `test_datoen_i_linja_paa_siden`). ECH5 står fortsatt under «Åpent».
 
+*Rettet 2026-10-26 (instruksjonen kl. 15:24), BH10:* grunnen til veksten 1,02, målt 26.10 på `6d92bbd`, ferdig før kl. 15:48 (`date` rett etter målingen), med 200 tilfeldige dager for 15 aksjer i 8 bransjer, volumforholdet lognormalt fordelt med sigma 0,5 og 0,8 (100 dager hver), og høyden sammenlignet med en vekst på 1,002, som er nær den laveste høyden kartet får plass i. Med 1,05 ble kartet 1,5 % (bred) og 2,3 % (smal) høyere i median og 4,7 og 7,9 % ved 95-persentilen. Med 1,02 ble det 0,6 og 0,9 % i median og 1,9 % ved 95-persentilen, på 1,8 ms per kart. Med 1,01 ble det 0,2 og 0,4 % i median, men på 3,3 ms, og 1,002 tok 15 ms. Høyden kartet får plass i, er ikke alltid stigende med høyden, så enkelte dager ble opptil 28,5 % høyere med 1,02 og 53,9 % med 1,05 enn med 1,002. 1,02 er valgt fordi kartet blir under 2 % høyere enn nødvendig for 95 av 100 dager, på under 2 ms. Grunnen står også ved `VEKST` i `src/boersometer.py`. Ingen test, fordi det er et valg og ikke en regel.
+
 ## Åpent
 
 - **BH2, rekkefølgen i kartet (medium, ikke rettet):** fokuset følger §4-rekkefølgen i HTML-en, mens `squarify` legger den største ruta først. Gruppen avgjør om rekkefølgen skal endres.
@@ -119,6 +121,7 @@ Gjennomgang 26.10 etter hele settet (3721 bestått, 20 hoppet over, 0 feilet, 09
 - **BH7:** typen `faktor` for den lyse grensen i «Hva fargene betyr».
   *Lukket 2026-10-26:* rettet, se linja under triagen.
 - **BH10:** grunnen til veksten 1,02.
+  *Lukket 2026-10-26:* målt og ført, se linja under triagen.
 
 ## Det som ikke endres
 
