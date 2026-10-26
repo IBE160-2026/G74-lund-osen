@@ -5,6 +5,7 @@ Hvert kontrollpunkt er prøvd med en mutant (spesifikasjonen, Mutantene).
 """
 
 import ast
+import random
 import re
 import shutil
 import sqlite3
@@ -1280,6 +1281,19 @@ class TestKartet:
         k = kart(bygg_boersometer(ruter))
         symboler = [kr.rute.aksje.symbol for f in k.felt for kr in f.ruter]
         assert sorted(symboler) == sorted(r.aksje.symbol for r in ruter)
+
+    def test_ingen_plass_er_negativ(self):
+        """Gjennomgangen 26.10 (ECH): ville feilet med y = -2,6e-14 for den
+        første raden i et felt, som malen skrev som «-0.000%». Dagene er
+        faste, og med den gamle regningen hadde 109 plasser på 300 slike
+        dager et lite negativt tall."""
+        rng = random.Random(1)
+        for _ in range(60):
+            forhold = [rng.lognormvariate(0, 0.8) for _ in range(15)]
+            k = kart(bygg_boersometer(_ruter_med(forhold, [BRANSJER[i % 8] for i in range(15)])))
+            for f in k.felt:
+                for p in [*f.plass.values(), *(q for kr in f.ruter for q in kr.plass.values())]:
+                    assert p.x >= 0 and p.y >= 0, p
 
     def test_tomt_kart(self):
         """Ville feilet med en feil når lista er tom."""

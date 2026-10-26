@@ -488,9 +488,13 @@ def kart(bransjer: list[Bransje], flatene: tuple[Flate, ...] = FLATENE) -> Kart:
             )
             topp[flate.navn] = OVERSKRIFT / fh * 100
             kropp = fh - OVERSKRIFT
+            # Gjennomgangen 26.10 (ECH): rutene ble lagt fra fy + OVERSKRIFT,
+            # så den summen trekkes fra. ry - fy - OVERSKRIFT kunne bli -2e-14,
+            # og malen skrev da «-0.000%».
+            start = fy + OVERSKRIFT
             for i, (rx, ry, rb, rh) in enumerate(ruter):
                 ruteplass[i][flate.navn] = Plass(
-                    (rx - fx) / fb * 100, (ry - fy - OVERSKRIFT) / kropp * 100, rb / fb * 100, rh / kropp * 100
+                    (rx - fx) / fb * 100, (ry - start) / kropp * 100, rb / fb * 100, rh / kropp * 100
                 )
                 nivaa[i][flate.navn] = _nivaa_paa_minste(flate, rb, rh, bransje.ruter[i].aksje.symbol)
         felt.append(
