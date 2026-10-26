@@ -19,6 +19,7 @@ context:
 **Problem:** kjører den andre versjonen av OSE Signal fra samme mappe, stopper skriptene den før uv, `uv sync`, nøkkelen og hentingen (3.5d, punkt d). Feiler noe av det, er den andre versjonen borte, og ingen av dem kjører (BH5 i triagen til 3.5d).
 
 **Løsningen:** porten sjekkes fortsatt før uv, og et annet program stopper skriptet der som før. Den andre versjonen fra samme mappe stoppes først rett før webserveren startes, så den kjører videre hvis noe feiler før det.
+  *Rettet 2026-10-26 (gjennomgangen, ECH1 og ECH2):* «hvis noe feiler før det» gjelder det som stopper skriptet: uv, `uv sync`, nøkkelen og demobasen. Feiler hentingen, starter appen likevel med det som er hentet før (3.5a), og da stoppes den andre versjonen rett før webserveren. Den kjører altså mens hentingen går og feiler, men ikke etterpå.
 
 **Grunnlaget:** avgjørelsen 24.10 kl. 20:00 under story 3.5 i `epics.md`, ført 26.10 fra instruksjonen kl. 09:57 i dagsfila.
 

@@ -229,7 +229,7 @@ Første gang kan macOS stoppe `Start demoen.command` eller `Start den ekte versj
 
 ### Vinduet sier at den andre versjonen av OSE Signal stoppes.
 
-Demoen eller den ekte versjonen kjørte allerede fra denne mappa, på samme port, fra et annet dobbeltklikk eller startet med `uv run waitress-serve`. Skriptet sier fra med en gang, men stopper den først rett før appen starter, så den kjører videre hvis uv, `uv sync` eller hentingen feiler. Så venter skriptet til porten er ledig, og starter den du dobbeltklikket. Det andre vinduet sier da at appen stoppet, og at det kan lukkes fordi den andre versjonen kjører.
+Demoen eller den ekte versjonen kjørte allerede fra denne mappa, på samme port, fra et annet dobbeltklikk eller startet med `uv run waitress-serve`. Skriptet sier fra med en gang, men stopper den først rett før appen starter, så den kjører videre hvis skriptet stopper før det, for eksempel fordi `uv sync` feiler. Feiler hentingen, starter appen likevel med det som er hentet før, og da stoppes den andre versjonen. Så venter skriptet til porten er ledig, og starter den du dobbeltklikket. Det andre vinduet sier da at appen stoppet, og at det kan lukkes fordi den andre versjonen kjører.
 
 ### Vinduet sier at et annet program svarer på 127.0.0.1:8000.
 

@@ -99,8 +99,8 @@ function Lyttere {
 
 # Gruppens svar 24.10 kl. 20:00 (3.5e): før uv sjekkes porten, og et annet
 # program stopper skriptet der. Den andre versjonen fra mappa stoppes først
-# rett før webserveren, med -Stopp $true, så den kjører videre hvis uv,
-# uv sync eller hentingen feiler.
+# rett før webserveren, med -Stopp $true, så den kjører videre hvis skriptet stopper før det, for eksempel fordi uv eller
+# uv sync feiler. Feiler hentingen, starter appen likevel, og da stoppes den.
 function Frigjoer-Porten([bool]$Stopp) {
     if (-not (Opptatt)) { return }
     $lyttere = @(Lyttere)
@@ -117,7 +117,7 @@ function Frigjoer-Porten([bool]$Stopp) {
     }
     if (-not $Stopp) {
         $ider = ($lyttere | ForEach-Object { $_.Id }) -join ', '
-        Write-Host "Den andre versjonen av OSE Signal kjører allerede på $Adresse (prosess $ider). Den stoppes rett før denne starter appen, så den kjører videre hvis noe feiler før det."
+        Write-Host "Den andre versjonen av OSE Signal kjører allerede på $Adresse (prosess $ider). Den stoppes rett før denne starter appen, så den kjører videre hvis skriptet stopper før det."
         return
     }
     foreach ($lytter in $lyttere) {

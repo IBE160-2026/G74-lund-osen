@@ -70,8 +70,8 @@ lyttere() {
 
 # Gruppens svar 24.10 kl. 20:00 (3.5e): før uv sjekkes porten, og et annet
 # program stopper skriptet der. Den andre versjonen fra mappa stoppes først
-# rett før webserveren, med stopp som argument, så den kjører videre hvis uv,
-# uv sync eller hentingen feiler.
+# rett før webserveren, med stopp som argument, så den kjører videre hvis skriptet stopper før det, for eksempel fordi uv eller
+# uv sync feiler. Feiler hentingen, starter appen likevel, og da stoppes den.
 frigjoer_porten() {
     opptatt || return 0
     ider="$(lyttere)"
@@ -93,7 +93,7 @@ frigjoer_porten() {
     fi
     if [ "${1:-}" != "stopp" ]; then
         prosesser="$(echo $ider)"
-        echo "Den andre versjonen av OSE Signal kjører allerede på $ADRESSE (prosess ${prosesser// /, }). Den stoppes rett før denne starter appen, så den kjører videre hvis noe feiler før det."
+        echo "Den andre versjonen av OSE Signal kjører allerede på $ADRESSE (prosess ${prosesser// /, }). Den stoppes rett før denne starter appen, så den kjører videre hvis skriptet stopper før det."
         return 0
     fi
     for id in $ider; do
