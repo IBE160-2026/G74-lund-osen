@@ -168,11 +168,17 @@ def fargetrinn(endring: float | None) -> str | None:
     return NOEYTRAL
 
 
+def _noeyaktig(grense: float) -> int:
+    """Færrest desimaler, minst én, som viser grensen nøyaktig: 0,5 og 0,25."""
+    return next((n for n in range(1, 7) if round(grense, n) == grense), 6)
+
+
 def trinnforklaringer() -> list[tuple[str, str]]:
     """Trinnene til «Hva fargene betyr», fra størst fall til størst
     stigning, med tallene fra grensene (regel 21). Begge grensene er
-    prosent, så begge formateres som «grense» (gjennomgangen 26.10, BH7)."""
-    lys, sterk = tall(GRENSE_LYS, "grense", desimaler=1), tall(GRENSE_STERK, "grense")
+    prosent, så begge formateres som «grense» (gjennomgangen 26.10, BH7),
+    med så mange desimaler at grensen står nøyaktig (ECH)."""
+    lys, sterk = tall(GRENSE_LYS, "grense", desimaler=_noeyaktig(GRENSE_LYS)), tall(GRENSE_STERK, "grense")
     return [
         (STERK_NED, f"Ned {sterk} eller mer"),
         (LYS_NED, f"Ned fra {lys} til under {sterk}"),

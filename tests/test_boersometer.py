@@ -1229,6 +1229,19 @@ class TestFargetrinnene:
             tallene = re.findall(r"\d+(?:,\d+)?(\S?)", tekst.replace("\u00a0%", "%"))
             assert tallene and all(etter == "%" for etter in tallene), tekst
 
+    def test_grensen_staar_noeyaktig(self, monkeypatch):
+        """Gjennomgangen 26.10 (ECH): ville feilet hvis en lys grense på 0,25
+        sto som «0,3 %» i forklaringen, mens fargen skiller ved 0,25."""
+        monkeypatch.setattr(boersometer, "GRENSE_LYS", 0.25)
+        assert dict(boersometer.trinnforklaringer())[LYS_OPP] == "Opp fra 0,25\u00a0% til under 2\u00a0%"
+
+    def test_hjelpen_har_samme_grenser_som_forklaringen(self):
+        """Gjennomgangen 26.10 (BH): ville feilet hvis docs/hjelp.md skrev den
+        lyse grensen uten %, mens «Hva fargene betyr» har den med (BH7)."""
+        hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
+        avsnitt = hjelp.split("### Hva viser børsometeret?", 1)[1].split("###", 1)[0]
+        assert "fra 0,5 % til under 2 %" in avsnitt and "fra 0,5 til" not in avsnitt
+
     def test_hva_fargene_betyr(self, klient):
         """Under rutene, med de fem trinnene fra fall til stigning og de to
         rammene. Ville feilet hvis forklaringen manglet, sto over rutene, eller
