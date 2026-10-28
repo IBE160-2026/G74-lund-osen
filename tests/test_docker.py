@@ -1763,7 +1763,7 @@ UTE_AV_README = {
     ),
     "«Cannot connect to the Docker daemon», «error during connect» eller «dockerDesktopLinuxEngine».": (
         "Docker Desktop er ikke startet, eller motoren er ikke klar. Start Docker Desktop, vent til det "
-        "står «Engine running» (steg 1), og prøv kommandoen igjen."
+        "står «Engine running» (steg 1 med Docker), og prøv kommandoen igjen."
     ),
     # Story 3.2b: porten er 8000, som i docs/hjelp.md. Setningen om AirPlay,
     # som bruker 5000, er tatt ut (gruppens svar 18.10 kl. 18:58). Fra 3.3h
@@ -1892,7 +1892,7 @@ class TestReadmeForNybegynnere:
         sporsmaal = CD_SPOERSMAALET
         svar = _detaljer(_faq())[sporsmaal].strip().split("\n\n", 1)[0]
         assert svar.startswith("Kommer «is not recognized as the name of a cmdlet»: Det mangler mellomrom etter `cd`.")
-        assert "(steg 4)" in svar
+        assert "(steg 4 med Docker)" in svar
         steg4 = _hjelp().split("\n## Steg 4: mappa\n", 1)[1].split("\n## ", 1)[0]
         assert re.search(rf"^### {re.escape(sporsmaal)}$", steg4, re.MULTILINE)
         i_hjelp = steg4.split(f"### {sporsmaal}\n\n", 1)[1].split("\n\n", 1)[0]
@@ -1919,7 +1919,7 @@ class TestReadmeForNybegynnere:
             "Kommer «Cannot find path … because it does not exist»: Mappa ligger ikke der stien sier,"
         )
         assert "flyttet" in svar and "ZIP-fila ble dratt inn" in svar
-        assert "dra mappa inn i vinduet på nytt (steg 4)" in svar
+        assert "dra mappa inn i vinduet på nytt (steg 4 med Docker)" in svar
         steg4 = _hjelp().split("\n## Steg 4: mappa\n", 1)[1].split("\n## ", 1)[0]
         i_hjelp = steg4.split(f"### {sporsmaal}\n\n", 1)[1].split("\n\n")[1]
         assert i_hjelp.startswith(svar.strip())
@@ -3118,14 +3118,16 @@ AVTRYKK_I_PILENE = {
 # «Med Docker Desktop» var også lik til gjennomgangen av 3.5g (BH2, ECH6,
 # VG4): «Tabellen over» er «Tabellen i pila «Demoen og den ekte versjonen»».
 # Var 386c91b5... og dc27ef47.... Pilene til demoen og den ekte versjonen
-# har sine avtrykk i AVTRYKK_I_PILENE, uendret.
+# har sine avtrykk i AVTRYKK_I_PILENE, uendret. Gruppens svar 27.10 kl.
+# 06:09, b (ECH7): hver henvisning til et steg i «Står du fast?» sier at den
+# gjelder Docker, som «steg 4 med Docker». Var 26143167....
 AVTRYKK_I_KOM_I_GANG = {
     "Demoen og den ekte versjonen": "d9bc06178554d5dc78c83dff1b57bb3d9039d05e80335346cec94f87303d47fe",
     "Du trenger": "edb9feeacf0f246bf416ab859f08e196d6ec92a0a44e8da9e371325c9680917b",
     "Med Docker Desktop": "44485fc5b1ea920e546d3e47180dabeec4b8f8da28f72cf1f54158161ab40b06",
     "Uten Docker, med uv": "2efeb5262b38f15a7fa04bc9715e149cbd053c7c45c193c9e0c048bab02dfc13",
     "Slik virker dobbeltklikket": "9066cc123fbc8efda0833fefdadec7f4f6fe039909f3bfaa498db2748b022d80",
-    "Står du fast?": "261431676862760025951efa7db4ef3678ea7e309acd8ff489b365475796b22a",
+    "Står du fast?": "c75b3ea0c4d84655d313b1002cf5845f2321e140fd737a8ac9df20d0de68c2ea",
 }
 
 # Svaret 20.10 kl. 20:20: advarselen staar rett under pila til den ekte
@@ -3528,6 +3530,26 @@ class TestHovedveien:
         assert linux == LINUX_LINJA
         assert [s for s, _ in _pilene(del_)][: len(PILENE_I_KOM_I_GANG)] == list(PILENE_I_KOM_I_GANG)
         assert not any("dobbeltklikk" in s.lower() for s in _detaljer(_seksjon("Mer for den som vil")))
+
+    def test_hvert_steg_under_staar_du_fast_sier_hvilken_vei(self):
+        """Gruppens svar 27.10 kl. 06:09, b (ECH7 i triagen til 3.5g): hver
+        henvisning til et steg under «Står du fast?» sier hvilken vei den
+        gjelder, som «steg 4 med Docker», fordi dobbeltklikket også har
+        nummererte steg. De samme svarene i docs/hjelp.md sier det samme.
+        Ville feilet hvis et «steg» med tall under «Står du fast?», eller i
+        svarene i hjelpen som står der også, ikke ble fulgt av «med Docker»,
+        eller hvis det ikke var noen henvisninger å sjekke."""
+        faq = _faq()
+        henvisninger = re.findall(r"\bsteg (\d)\b( med Docker)?", faq)
+        assert len(henvisninger) == 5, henvisninger
+        assert all(med for _, med in henvisninger), henvisninger
+        i_hjelp = dict(re.findall(r"^### ([^\n]+)\n\n(.*?)(?=\n\n### |\n\n## |\Z)", _hjelp(), re.MULTILINE | re.DOTALL))
+        felles = [s for s in _detaljer(faq) if s in i_hjelp]
+        felles.append("«Cannot connect to the Docker daemon», «error during connect» eller «dockerDesktopLinuxEngine».")
+        felles.append("«docker» er ikke gjenkjent, eller «command not found: docker».")
+        for sporsmaal in felles:
+            for _, med in re.findall(r"\bsteg (\d)\b( med Docker)?", i_hjelp[sporsmaal]):
+                assert med, sporsmaal
 
     def test_linja_om_linux_lenker_til_docker_og_uv(self):
         """Gruppens svar 27.10 kl. 06:09, a (BH3 i triagen til 3.5g): en
