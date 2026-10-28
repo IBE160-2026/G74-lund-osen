@@ -78,6 +78,8 @@ context:
 
 *Utfallet 28.10 kl. 23:25:10–23:25:11 på `fda73fd`, etter rettingene fra gjennomgangen:* den samme mutanten ble fanget av den samme testen, og fila var lik `HEAD:src/omsetning.py` (`3697494`) etterpå, med samme sha256 som kopien.
 
+*Mutanten 28.10 kl. 23:19 (svaret d), grensen kl. 23:45 tatt ut, med `-x`, kopi før og sha256 mot HEAD etter:* betingelsen byttet til `True`, så målingen alltid venter når en kurs mangler. 28.10 kl. 23:50:14–23:50:19 på `e744f87`: fanget av `test_gaar_fra_23_45_naar_en_kurs_mangler`, og fila var lik `HEAD:src/omsetning.py` (`39e1ebc`) med samme sha256 som kopien. 29.10 kl. 00:12:25–00:12:37 på `0640378`, etter rettingene fra gjennomgangen: fanget av samme test, og fila var lik `HEAD:src/omsetning.py` (`091f9da`) med samme sha256 som kopien.
+
 ## Gjennomgangen
 
 Gjennomgang 28.10 etter hele settet (3849 bestått, 24 hoppet over, 0 feilet, 22:57:49–23:05:44 på `ab7b967`), av diffen `4e98564..ab7b967`, med Blind Hunter (BH, 13 funn), Edge Case Hunter (ECH, 13) og Verification Gap (VG, 12). Dommen i tabellen er vår. Rettet i `fda73fd`. Hele settet på `fda73fd` (kjørt før commiten, på samme kode): 3861 bestått, 24 hoppet over, 0 feilet, 23:16:23–23:24:49.
@@ -121,6 +123,29 @@ Gjennomgang 28.10 etter hele settet (3849 bestått, 24 hoppet over, 0 feilet, 22
 | VG11 | Ordlyden om OBX i spesifikasjonen | low | **rettet** her |
 | VG12 | Medianen var bare prøvd der `median`, `median_low` og `median_high` er like, og en kode to ganger i lista var ikke prøvd | low | **rettet** i `fda73fd`: `test_medianen_av_et_partall_rader_og_en_kode_to_ganger_i_lista` |
 
+## Gjennomgangen 29.10
+
+Gjennomgang 29.10 etter hele settet (3867 bestått, 24 hoppet over, 0 feilet, 23:50:30–23:59:07 på `e744f87`), av endringene etter `e6287bf` (diffen `cd1e64d..e744f87`, uten flettingen av main), med Blind Hunter (BH, 10 funn), Edge Case Hunter (ECH, 9) og Verification Gap (VG, 6). Ingen funn med dom high. Dommen i tabellen er vår. Rettet i `0640378`. Hele settet på samme kode før commiten: 3867 bestått, 24 hoppet over, 0 feilet, 29.10 kl. 00:04:10–00:12:08. BH-, ECH- og VG-numrene her er nye og gjelder bare denne gjennomgangen.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH2, VG2, ECH3, ECH2 | Fra 23:45 går målingen også når alle 15 mangler kursen, for eksempel når hentingen feilet hele kvelden, eller basen er laget av webserveren uten kurser. Svaret kl. 23:19 sier «mangler én av de 15» | medium | **ikke rettet**, spørsmål til gruppen («Åpent») |
+| ECH1, BH3 | Når målingen i kjøringen kl. 23:45 starter etter midnatt i Oslo, venter den, og ingen kjøring kommer etter | medium | **ikke rettet**, spørsmål til gruppen («Åpent»). Hentingen gjør ingen nye kall fra 23:50 (`KL_23_50`), så målingen starter normalt før midnatt |
+| VG1 | Vinduet fra børsdagen var bare prøvd på hverdager, så et vindu fra kalenderdagen ville overlevd | medium | **rettet** i `0640378`: lørdagen i `test_vinduet_staar_ved_hvert_tall` |
+| BH1, ECH5, VG3 | Grensen er klokka da målingen starter, ikke kjøringen kl. 23:45. En kjøring kl. 23:15 som når målingen etter 23:45, eller en måling for hånd, går også | low | **rettet** i ordlyden i README-en og hjelpen: «startes kl. 23:45 eller senere». Ingen lås og ingen kjøring for hånd mens jobben går (svaret kl. 23:19, c) |
+| ECH4 | En treg kjøring kl. 23:15 som fortsatt går kl. 23:45, gjør at kjøringen kl. 23:45 ikke starter (`IgnoreNew`) | low | **står**: gjelder også nye forsøk i hentingen, og er slik 2.3d er bygget |
+| BH4, ECH6 | Uten base sa utskriften at hentingen og nye forsøk får kallene først, og testen sjekket ikke grunnen | low | **rettet**: egen linje «Basen finnes ikke …», og testen sjekker den |
+| VG4, BH9 | Testen for 23:45 sjekket ikke symbolene eller at «venter» ikke står i utskriften, og docstringen nevnte bare EQNR | low | **rettet** |
+| BH10 | Kodene fra kjøringene i testen for vinduet ble ikke sjekket | low | **rettet** |
+| BH7 | Docstringen sa at den falske docker «svarer aldri». Den feiler med kode 1 | low | **rettet**: «feiler alltid» |
+| ECH7 | Med fristen på 1 s kan `docker.cmd` drepes før den skriver `docker.txt` på en treg runner | low | **står**: skriptet spør to ganger, ved start og etter 5 s, og CI var grønn |
+| ECH8 | Greinen «Fant ikke docker.» kjøres ikke lenger av noen test | low | **står** |
+| VG6 | «Fant ikke Docker Desktop.» avhenger av om Docker Desktop kjører på maskinen | low | **står**: ingen test sjekker linja |
+| BH5 | `exists()` kunne bli sann fordi `manglende_i_basen` lager basen | low | **avvist** etter oppslag: `manglende_i_basen` returnerer før basen åpnes når den mangler |
+| BH6 | «Starter Ollama.» og «Stopper Ollama.» kunne ha en annen ordlyd i skriptet | low | **avvist** etter oppslag: begge står slik i `start/kveldshenting.ps1` |
+| BH8, VG5 | At docker fantes på PATH på runneren, er sluttet fra loggen, ikke sett | low | **står** som i «Åpent»: loggen viser «Stopper Ollama.», som bare skjer når `docker info` svarte |
+| ECH9 | Et siste argument som er ett siffer, leses som omdirigering i `docker.cmd` | low | **avvist**: ingen kall slutter på et siffer |
+
 ## Åpent
 
 - **Datoen før første kall:** instruksjonen sier at valget stopper hvis `apiRequestsDate` ikke er dagens dato i GMT. På en dag uten henting, som en lørdag, står `apiRequestsDate` på gårsdagen til første kall (regel 15), så en streng stopp før første kall ville gitt 0 målinger på dager børsen er stengt, mot avgjørelsen kl. 22:17, b). Valget godtar derfor en tidligere dato før første kall og leser den som 0 brukt i dag, som `les_kvotetall` og regel 15. Etter hvert kall må datoen være dagens. En dato etter dagens i GMT stopper alltid. Gruppen avgjør før flettingen.
@@ -136,3 +161,5 @@ Gjennomgang 28.10 etter hele settet (3849 bestått, 24 hoppet over, 0 feilet, 22
 - **CI:** steget «Kveldshentingen på Windows» feilet på `ab7b967` (40777327364) fordi Docker svarte på runneren innen ett sekund, så skriptet startet og stoppet Ollama, mens `test_hele_jobben_uten_docker_henter_uten_ki_og_gir_koden_fra_hentingen` krever at det ikke skjer. Den delen av skriptet og påstanden er ikke endret i 2.13.
   *Rettet 2026-10-28 i `441b922`:* runneren har en docker på PATH (PATH i testen er den falske uv, mappa til git og System32). Feilen kom også på main på `1721d9f` (40770982416), som bare endret `epics.md` og `malinger.md`, så den kom ikke fra 2.13. Testene for jobben har nå en falsk docker først i PATH som aldri svarer og skriver kallene til `docker.txt`, og testen for hele jobben krever at den er spurt.
 - **Lista over Oslo Børs** er fila fra 22.10. Nye noteringer kommer ikke med før lista hentes på nytt (avgjørelsen 22.10 kl. 23:14 under 2.12).
+- *Lagt til 2026-10-29 (gjennomgangen, BH2, VG2, ECH3, ECH2, spørsmål til gruppen):* fra 23:45 går målingen også når alle 15 mangler kursen. Skal den vente når alle mangler, eller når basen ikke har noen kurs for børsdagen?
+- *Lagt til 2026-10-29 (gjennomgangen, ECH1, BH3, spørsmål til gruppen):* starter målingen i kjøringen kl. 23:45 etter midnatt i Oslo, venter den. Skal den gå også da, med børsdagen fra før midnatt?
