@@ -86,11 +86,11 @@ Gjennomgang 27.10 etter hele settet (3773 bestått, 37 hoppet over, 0 feilet, 00
 | BH11 | Bare én mutant, så grensen på 25 ord og ankeret er ikke mutert | low | står: instruksjonen sier én mutant. Grensen og ankeret sjekkes i `test_dobbeltklikket_staar_foerst_og_ikke_bak_en_pil` og `test_overskriftene_fra_foer_finnes` |
 | BH12 | To ankre på samme sted, og ingen test hindrer lenker til `enklest-dobbeltklikk-anbefalt` | low | står: «Valg som er gjort her» sier at `enklest-dobbeltklikk-uten-docker` er ankeret lenkene bruker, og testen krever at det finnes én gang |
 | BH10 | `<details open>` eller CRLF gjør at hjelperne ikke ser pila | low | avvist: `test_markdown_inne_i_pilene_vises_riktig_paa_github` krever `<details>` alene på linja og like mange `<details`, `</details>` og `<summary>`, og `read_text` leser CRLF som LF |
-| VG5 | Prøveprotokollen i §9 i `docs/kvalitetssikring.md` har overskriften og stegene fra før 3.5g | low | **til gruppen:** §9 er ikke med i instruksjonen. Rettes før README-prøven, med en Rettet-linje |
+| VG5 | Prøveprotokollen i §9 i `docs/kvalitetssikring.md` har overskriften og stegene fra før 3.5g | low | **til gruppen:** §9 er ikke med i instruksjonen. Rettes før README-prøven, med en Rettet-linje. **Avgjort av gruppen 27.10 kl. 06:09 (c):** radene D1–D6 følger de fem stegene og linjene under dem, hver med steget eller linja den gjelder, og en Rettet-linje over tabellen |
 
 ## Åpent
 
 - Om «steg 4» er uklart nå som dobbeltklikket også har nummererte steg (se «Valg som er gjort her», ECH7). Avgjort av gruppen 27.10 kl. 06:09: henvisningene sier hvilken vei, som «steg 4 med Docker».
 - Om det skal stå en synlig linje til Docker og uv under stegene, for eksempel for Linux (BH3). Det ville vært en tredje linje under stegene, og avgjørelsen 26.10 kl. 23:00 sier to. Avgjort av gruppen 27.10 kl. 06:09: en tredje kort linje, «Linux: bruk Docker eller uv, under.»
 - Om ventingen første gang skal stå i et eget steg (BH4).
-- §9 i `docs/kvalitetssikring.md` følger ikke de fem stegene ennå (VG5).
+- §9 i `docs/kvalitetssikring.md` følger ikke de fem stegene ennå (VG5). Avgjort av gruppen 27.10 kl. 06:09: radene D1–D6 følger de fem stegene og linjene under dem.

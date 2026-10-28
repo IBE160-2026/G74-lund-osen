@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-28T11:43
+updated: 2026-10-28T19:36
 ---
 
 # Kvalitetssikring
@@ -893,16 +893,18 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
 
 *Lagt til 2026-10-26 (story 3.5f, gruppens svar 25.10 kl. 11:32 under story 3.5 i `epics.md`):* dobbeltklikket er hovedveien i «Kom i gang», og prøven begynner med det, i tabellen «Hovedveien» under. Docker Desktop trengs ikke for radene D1–D6. Tabellen med Docker og uv, rad 1–23, er reserven og tas etterpå. Ingen rad i den er endret.
 
+*Rettet 2026-10-28 (story 3.5g, gruppens svar 27.10 kl. 06:09, c, under story 3.5 i `epics.md`):* radene D1–D6 følger de fem stegene under «Enklest: dobbeltklikk (anbefalt)» og linjene under dem, «Første gang», «Ekte kurser» og «Linux». Hver rad sier hvilket steg eller hvilken linje den gjelder, og spørsmålene fra før står i radene: «Dobbeltklikk «Start demoen»» er flyttet fra D3 til D2, fordi det er steg 3, og advarselen sjekkes mot svarene i `docs/hjelp.md` som linja «Første gang» lenker til, fordi avsnittet i README-en står bak pila «Slik virker dobbeltklikket». Overskriften over tabellen har navnet fra før 3.5g, som ankeret `enklest-dobbeltklikk-uten-docker` beholder. Ingen rad i reserven er endret.
+
 **Hovedveien: «Enklest: dobbeltklikk, uten Docker»**
 
 | # | Steg i README-en | Det som skjedde | Tid (min) |
 |---|---|---|---|
-| D1 | Last ned med den direkte lenken, eller «Code» → «Download ZIP», og pakk ut med «Pakk ut alle» (Windows) eller dobbeltklikk (Mac). Kom det en mappe `G74-lund-osen-main`, og lå de fire filene i den innerste? | | |
-| D2 | Finn de fire filene øverst i mappa. Viste Windows dem som «Start demoen» og «Start den ekte versjonen», uten filendelsen? | | |
-| D3 | Dobbeltklikk «Start demoen». Kom advarselen fra Windows eller godkjenningen på Mac, og holdt teksten i README-en? Spurte vinduet om uv skulle installeres? | | |
-| D4 | Åpnet nettleseren http://127.0.0.1:8000, og står «Eksempeltall» på siden? Hvor lang tid tok det fra dobbeltklikket? | | |
-| D5 | En aksje i demoen åpnes fra oversikten. Så lukkes vinduet: svarer http://127.0.0.1:8000 etterpå? | | |
-| D6 | Dobbeltklikk «Start den ekte versjonen» uten nøkkel. Åpnet registreringssiden hos EODHD seg, og spurte vinduet etter nøkkelen? Lukk vinduet uten å lime inn noe, og slett `.env` som vinduet laget, før reserven | | |
+| D1 | Steg 1 og 2: last ned med den direkte lenken, eller «Code» → «Download ZIP», og pakk ut med «Pakk ut alle» (Windows) eller dobbeltklikk (Mac), ikke fra inne i ZIP-fila. Kom det en mappe `G74-lund-osen-main`, og lå de fire filene i den innerste? | | |
+| D2 | Steg 3: åpne den innerste `G74-lund-osen-main`, finn de fire filene øverst i mappa, og dobbeltklikk «Start demoen», på Windows den uten `.command`. Viste Windows dem som «Start demoen» og «Start den ekte versjonen», uten filendelsen? | | |
+| D3 | Linja «Første gang»: kom advarselen fra Windows eller godkjenningen på Mac, og holdt svaret i `docs/hjelp.md` som lenken går til? Steg 4: spurte vinduet om uv skulle installeres, og gikk det videre etter `j` og Enter? | | |
+| D4 | Steg 4: åpnet nettleseren http://127.0.0.1:8000, og står «Eksempeltall» på siden? Hvor lang tid tok det fra dobbeltklikket? | | |
+| D5 | Steg 5: en aksje i demoen åpnes fra oversikten. Så lukkes vinduet: svarer http://127.0.0.1:8000 etterpå? | | |
+| D6 | Linja «Ekte kurser»: dobbeltklikk «Start den ekte versjonen» uten nøkkel. Åpnet registreringssiden hos EODHD seg, og spurte vinduet etter nøkkelen? Lukk vinduet uten å lime inn noe, og slett `.env` som vinduet laget, før reserven. Linja «Linux»: går lenkene til pilene «Med Docker Desktop» og «Uten Docker, med uv»? | | |
 
 **Reserven: Docker Desktop, og uv i terminalen**
 
