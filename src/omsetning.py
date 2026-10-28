@@ -15,6 +15,8 @@ er rangert i malinger.md (MAALT_I_MALINGER).
 Hentingen og nye forsoek faar kallene foerst (b): mangler en aksje i lista
 kursen for boersdagen, stopper valget med 0 kall, saa kallene staar til et
 nytt forsoek. Paa en boersdag foer hentingen er det dagens kurs som mangler.
+Fra kl. 23:45 i Oslo, jobbens siste kjoering, gaar maalingen likevel med
+kallene som er igjen etter de nye forsoekene (avgjoerelsen kl. 23:19, d).
 
 Kvoten leses med /api/user (gratis) foer og etter hvert kall, som i §51.
 Valget stopper hvis extraLimit endrer seg, hvis apiRequestsDate ikke er
@@ -33,12 +35,12 @@ import json
 import math
 import statistics
 from dataclasses import dataclass
-from datetime import date, datetime, timezone
+from datetime import date, datetime, time, timezone
 from pathlib import Path
 from typing import Callable
 
 import lagring_sqlite
-from boersdag import UtenforKalenderen, innevaerende_boersdag, norsk_dato
+from boersdag import OSLO, UtenforKalenderen, innevaerende_boersdag, norsk_dato
 from fetch_prices import BASEFEIL, UlesbarKvote, _uten_noekkel, les_kvotetall, manglende_i_basen, nekt_demobase
 from kursdata import AKSJEUNIVERS, Aksje
 from lagring_fil import PROSJEKTROT
@@ -50,6 +52,10 @@ AKSJETYPE = "Common Stock"
 
 PREFIKS = "omsetning"
 MAANEDER = 3
+
+# Jobbens siste kjoering. Fra da stopper ikke en manglende kurs maalingen
+# (avgjoerelsen 28.10 kl. 23:19, d).
+KL_23_45 = time(23, 45)
 
 # De 214 som er rangert i malinger.md: paragrafen, datoen i overskriften til
 # paragrafen og symbolene som ble maalt der («Maalt i» i «Alle 206, rangert»
@@ -506,12 +512,19 @@ def maal_omsetning(
     except BASEFEIL as feil:
         skriv(f"Basen kan ikke leses ({type(feil).__name__}). Målingen venter. 0 kall brukt.")
         return 1
-    if mangler:
+    # En base som ikke finnes, er ingen henting, og venter ogsaa etter 23:45.
+    if mangler and (start.astimezone(OSLO).time() < KL_23_45 or not base_sti.exists()):
         skriv(
             f"{', '.join(mangler)} mangler kursen for {boersdag.isoformat()}. Hentingen og nye forsøk får "
             "kallene først, så målingen venter. 0 kall brukt."
         )
         return 1
+    if mangler:
+        skriv(
+            f"{len(mangler)} av de {len(lista)} i lista mangler kursen for {boersdag.isoformat()} "
+            f"({', '.join(mangler)}). Klokka er 23:45 i Oslo eller senere, så målingen går med kallene "
+            "som er igjen etter nye forsøk."
+        )
     try:
         lista_over_boersen = les_lista(listefil)
     except (OSError, ValueError) as feil:

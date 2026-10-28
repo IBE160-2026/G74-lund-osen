@@ -267,6 +267,50 @@ class TestHentingenFoerst:
         assert not lagring_sqlite.BASE_STI.exists()
 
 
+class TestKl2345:
+    """Avgjoerelsen 28.10 kl. 23:19, d): mangler en av de 15 kursen, gaar
+    maalingen kl. 23:45 med kallene som er igjen etter nye forsoek."""
+
+    def test_venter_til_23_45_naar_en_kurs_mangler(self, tmp_path):
+        """Ville feilet hvis maalingen gikk foer 23:45 med en kurs som mangler:
+        kl. 23:44:59 i Oslo venter den som foer."""
+        _fyll(date(2026, 10, 28), uten=("EQNR",))
+        kvote = Kvote(brukt=16)
+        kode, ut = _kjoer(tmp_path, kvote, klokke=datetime(2026, 10, 28, 22, 44, 59, tzinfo=timezone.utc))
+        assert (kode, kvote.kall) == (1, []), ut
+        assert "EQNR mangler kursen for 2026-10-28" in ut and "0 kall brukt" in ut
+
+    def test_gaar_fra_23_45_naar_en_kurs_mangler(self, tmp_path):
+        """Ville feilet hvis maalingen ikke gikk fra 23:45: EQNR mangler, og
+        kl. 23:45:00 i Oslo brukes de 4 kallene som er igjen. Utskriften sier
+        hvor mange av de 15 som mangler."""
+        _fyll(date(2026, 10, 28), uten=("EQNR", "MOWI"))
+        kvote = Kvote(brukt=16)
+        kode, ut = _kjoer(tmp_path, kvote, klokke=datetime(2026, 10, 28, 22, 45, tzinfo=timezone.utc))
+        assert kode == 0, ut
+        assert kvote.kall == ["NYA.OL", "NYB.OL", "NYC.OL", "NYD.OL"]
+        assert (kvote.brukt, kvote.bonus) == (20, 463)
+        assert "2 av de 15 i lista mangler kursen for 2026-10-28" in ut
+        assert [rad[0] for rad in _radene()] == ["NYA", "NYB", "NYC", "NYD"]
+
+    def test_23_45_gjelder_ogsaa_i_sommertid(self, tmp_path):
+        """Grensen er klokka i Oslo, ikke i GMT: 23:45 i september er 21:45 GMT."""
+        _fyll(date(2026, 9, 30), uten=("EQNR",))
+        kvote = Kvote(brukt=19, dato=date(2026, 9, 30))
+        foer = datetime(2026, 9, 30, 21, 44, tzinfo=timezone.utc)
+        assert _kjoer(tmp_path, kvote, klokke=foer)[0] == 1 and kvote.kall == []
+        kode, ut = _kjoer(tmp_path, kvote, klokke=foer + timedelta(minutes=1))
+        assert (kode, kvote.kall) == (0, ["NYA.OL"]), ut
+
+    def test_uten_base_venter_ogsaa_etter_23_45(self, tmp_path):
+        """En base som ikke finnes, er ingen henting: ingen kall, og ingen base
+        lages."""
+        kvote = Kvote(brukt=0)
+        kode, ut = _kjoer(tmp_path, kvote, klokke=datetime(2026, 10, 28, 22, 50, tzinfo=timezone.utc))
+        assert (kode, kvote.kall) == (1, []), ut
+        assert not lagring_sqlite.BASE_STI.exists()
+
+
 class TestRekkefoelgen:
     def test_ingen_maales_to_ganger_foer_alle_er_maalt(self, tmp_path):
         """Ville feilet hvis en aksje ble maalt to ganger foer alle var maalt:
