@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-26T18:54
+updated: 2026-10-28T10:47
 ---
 
 # Kvalitetssikring
@@ -1008,6 +1008,25 @@ hentingen kan gi kurser, se «Når kan jeg hente?» i
 | 8 | Ollama startet og hentingen kjørt igjen samme kveld etter steg 6: ble KI-tekstene laget? Les `/api/user` før og etter: `apiRequests` skal være uendret | |
 | 9 | Modellen hentet og hentingen kjørt igjen etter steg 7: ble KI-tekstene laget? | |
 | 10 | `OSE_KI_TJENESTE=av` i `.env` til slutt | |
+
+- **Det som ikke stemte:**
+- **Rettet i** (commit eller story):
+
+### Prøve 4: hentingen hver kveld
+
+*Lagt til 2026-10-28 (story 2.3d):* «Hentingen hver kveld med Oppgaveplanlegging (Windows, valgfri)» under «Mer for den som vil» i README-en. Prøven tas på PC-en som skal hente, i mappa vi jobber i, etter at 2.3d er flettet, og før kl. 22:00, så hentingen gir 0 kall.
+
+- **Dato:**
+- **Commit som ble prøvd:**
+
+| # | Kommando eller steg i README-en | Det som skjedde |
+|---|---|---|
+| 1 | `git worktree add --detach ..\G74-lund-osen-jobb origin/main` | |
+| 2 | `cmd /c mklink /J ..\G74-lund-osen-jobb\data data`. Står det «Junction created»? | |
+| 3 | `New-Item -ItemType HardLink -Path ..\G74-lund-osen-jobb\.env -Target .env`. Viser `Get-Item ..\G74-lund-osen-jobb\.env` `LinkType` `HardLink`? | |
+| 4 | `powershell -NoProfile -ExecutionPolicy Bypass -File start\legg-inn-kveldshentingen.ps1 -Arbeidskopi ..\G74-lund-osen-jobb -FoersteDato 2026-10-29`. Viser Oppgaveplanlegging jobben med kl. 22:15 og hver halvtime? | |
+| 5 | Jobben kjørt for hånd før kl. 22:00 (`Start-ScheduledTask`). Sier loggen i `data/logg/` commiten fra midnatt, 0 kall og koden? Les `/api/user` før og etter: `apiRequests` skal være uendret | |
+| 6 | `powershell -NoProfile -ExecutionPolicy Bypass -File start\ta-bort-kveldshentingen.ps1`, bare hvis jobben skal av | |
 
 - **Det som ikke stemte:**
 - **Rettet i** (commit eller story):

@@ -2186,6 +2186,9 @@ class TestReadmeForNybegynnere:
             "Den lokale modellen for KI-teksten (valgfri)",
             # Story 10.7: egen noekkel, ogsaa lukket.
             "Egen nøkkel til Gemini, Anthropic eller OpenAI (valgfri)",
+            # Story 2.3d: hentingen hver kveld, ogsaa lukket, med ankeret
+            # docs/hjelp.md lenker til.
+            '<a name="hentingen-hver-kveld"></a>Hentingen hver kveld med Oppgaveplanlegging (Windows, valgfri)',
             # Story 3.5a: start med dobbeltklikk sto her, lukket, til gruppen
             # valgte hovedvei. Fra 3.5f (svaret 25.10 kl. 11:32) er den en
             # egen del foerst i «Kom i gang».
@@ -3003,11 +3006,13 @@ LENKENE_FOER_3_3H = {
 # 7ed8bbe8....
 # Gruppens svar 27.10 kl. 06:31: .logs/ og skillen sesjonslogg fra faglærer
 # i «Mappestruktur» (regel 19). Var a363fbd7....
+# Story 2.3d: jobben som henter hver kveld i punktet om start/ i
+# «Mappestruktur» (regel 19). Var 0fe44843....
 AVTRYKK_I_PILENE = {
     "Demoen": "f124a92b1c64eeb0ea5e7141976ff85de68df49004a22d5874a4a257aaf89b55",
     "Den ekte versjonen": "3bb398cd1be31a43abe09b7261456646b6dc03047e20f1aa57ab665a768cfd78",
     "Dokumentene": "409a3f8b38d4247df41e3eb5062ad439aa160e7fd1c0b49e0fd44f262eb2d77c",
-    "Mappestruktur": "0fe4484323794d4c3766e1f647dc44f24b8777392b5dadd2031afb54abd45cb2",
+    "Mappestruktur": "677fa094d2584edaa15eb9e156e7905b6679565e319717eb9cf19f4058ce53cd",
 }
 
 # Svaret 20.10 kl. 20:20: advarselen staar rett under pila til den ekte
