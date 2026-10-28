@@ -2021,6 +2021,8 @@ overs, så lista kan vise den før noen velger en aksje.
 
 **Avhenger av:** 2.3 og 2.8. **Én økt:** ja.
 
+*Avgjort 2026-10-28 kl. 22:17 (gruppens svar):* a) 2.13 bygges i natt, og 8.17a tas senere. b) Jobben fra 2.3d kjører målingen etter hentingen med alle kallene som er igjen den dagen i GMT, også på dager børsen er stengt. Hentingen og nye forsøk får kallene først, og bonuskvoten brukes aldri. c) Når hele lista er målt, måles de eldste målingene på nytt først. Det går foran «etter 3 måneder» og «lar 2 stå igjen» i FR-413.
+
 ### Story 2.14: Eks.datoer føres inn for hånd
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
@@ -3997,6 +3999,8 @@ signalet for en dag jeg velger.
 avgjøres i planen.
 
 *Avgjort 2026-10-23 kl. 12:35 (gruppens svar):* a) En periode i oversikten: endringen gjelder perioden, og sluttkursen, signalet og «Skilte seg ut» gjelder siste børsdag, som kolonnen sier, og signalet regnes aldri for en periode (`AD-7`). b) En periode i børsometeret: like store ruter, fargen er endringen for perioden, og siden sier at størrelsen gjelder én dag. c) To PR-er: 8.17a, oversikten med søylene og indekslinja, og 8.17b, Min liste og børsometeret, i helga hvis tiden ikke rekker.
+
+*Avgjort 2026-10-28 kl. 22:17 (gruppens svar):* a) 2.13 bygges i natt, og 8.17a tas senere. b) Jobben fra 2.3d kjører målingen etter hentingen med alle kallene som er igjen den dagen i GMT, også på dager børsen er stengt. Hentingen og nye forsøk får kallene først, og bonuskvoten brukes aldri. c) Når hele lista er målt, måles de eldste målingene på nytt først. Det går foran «etter 3 måneder» og «lar 2 stå igjen» i FR-413.
 
 ### Story 8.18: Kommende eks.dato i kursgrafen
 
