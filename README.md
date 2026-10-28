@@ -373,6 +373,45 @@ Slå av KI-teksten: sett `OSE_KI_TJENESTE=av` i `.env`.
 
 </details>
 
+<details>
+<summary><a name="hentingen-hver-kveld"></a>Hentingen hver kveld med Oppgaveplanlegging (Windows, valgfri)</summary>
+
+En jobb i Oppgaveplanlegging kan hente for deg hver kveld, med den samme kommandoen som du kjører selv, `uv run python src/fetch_prices.py`. Jobben går hver dag kl. 22:15, og igjen kl. 22:45, 23:15 og 23:45, så aksjer som mangler dagens kurs, prøves på nytt med kallene som er til overs. En ny kjøring starter ikke mens en går, og en kveld PC-en er av eller du ikke er logget inn, hentes ikke senere.
+
+Jobben kjører fra en egen arbeidskopi av main (`git worktree`), ikke fra mappa du jobber i. Før hver kjøring flyttes arbeidskopien til commiten main hadde ved midnatt, så det som flettes en dag, går først neste kveld. `data/` og `.env` i arbeidskopien er lenker til mappa du jobber i, så basen og nøkkelen er de samme, og nøkkelen kopieres ikke. Jobben starter Docker Desktop og Ollama hvis de ikke kjører. Svarer de ikke innen tre minutter til sammen, hentes det uten KI-tekst. Det jobben startet selv, stopper den etterpå.
+
+Alt jobben gjør, står i loggen `data/logg/kveldshenting-<dato>.log` i mappa du jobber i, én fil per kveld. Nøkkelen skrives aldri ut.
+
+Slå den på, i PowerShell i mappa du jobber i, med arbeidskopien ved siden av:
+
+```
+git worktree add --detach ..\G74-lund-osen-jobb origin/main
+```
+
+```
+cmd /c mklink /J ..\G74-lund-osen-jobb\data data
+```
+
+```
+New-Item -ItemType HardLink -Path ..\G74-lund-osen-jobb\.env -Target .env
+```
+
+```
+powershell -NoProfile -ExecutionPolicy Bypass -File start\legg-inn-kveldshentingen.ps1 -Arbeidskopi ..\G74-lund-osen-jobb -FoersteDato 2026-10-29
+```
+
+Uten `-FoersteDato` går den første gang i kveld, hvis den legges inn før kl. 22:15. Er commiten fra midnatt eldre enn jobben, stopper den og sier det i loggen, og går fra neste kveld. Lager du `.env` på nytt, må lenken også lages på nytt; ellers stopper jobben og sier det i loggen.
+
+Slå den av:
+
+```
+powershell -NoProfile -ExecutionPolicy Bypass -File start\ta-bort-kveldshentingen.ps1
+```
+
+Arbeidskopien, `data/` og loggene står etterpå.
+
+</details>
+
 ## Status
 
 Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, og hva som gjenstår.
@@ -509,7 +548,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [`.github/`](.github/) — testkjøringen og morgensjekken
 - [`.logs/`](.logs/) — loggene fra øktene med Claude Code, én mappe per bruker, og issues.md i hver mappe med det som gjenstår
 - [`Dockerfile`](Dockerfile), [`compose.yaml`](compose.yaml) og [`.dockerignore`](.dockerignore) — imaget og tjenestene: webserveren, hentingen og demoen
-- [`start/`](start/) og [`.gitattributes`](.gitattributes) — start med dobbeltklikk, uten Docker: skriptene bak de fire filene Start demoen og Start den ekte versjonen i rota, for Windows og Mac, og linjeskiftene de trenger
+- [`start/`](start/) og [`.gitattributes`](.gitattributes) — start med dobbeltklikk, uten Docker: skriptene bak de fire filene Start demoen og Start den ekte versjonen i rota, for Windows og Mac, og linjeskiftene de trenger. Der står også jobben som henter hver kveld i Oppgaveplanlegging på Windows, og skriptene som legger den inn og tar den bort
 - [`_bmad/`](_bmad/) og [`.claude/skills/`](.claude/skills/) — BMAD-rammeverket, ikke skrevet av oss, og skillen sesjonslogg, som kommer fra faglærer
 - [`README.md`](README.md) — denne fila: hva appen er, hvordan den startes, status og testene
 - [`CLAUDE.md`](CLAUDE.md) — reglene for KI-øktene i repoet, som Claude Code leser når en økt starter
