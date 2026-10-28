@@ -3862,3 +3862,49 @@ class TestHovedveien:
         )
         neste = hjelp.split("### Hvordan starter jeg neste gang?\n\n", 1)[1]
         assert neste.startswith("Med dobbeltklikket: ") and "\n\nMed Docker: " in neste
+
+
+# «Kort fortalt» øverst i PRD-en, etter gruppens svar 27.10 kl. 00:08 og
+# 28.10 kl. 11:30. Gjennomgangen kl. 20:44 (VG1, VG2, VG3).
+PRD = ROT / "_bmad-output" / "planning-artifacts" / "prds" / "prd-G74-lund-osen-2026-09-20" / "prd.md"
+
+
+def _kort_fortalt() -> str:
+    tekst = PRD.read_text(encoding="utf-8")
+    assert "\n## Kort fortalt\n" in tekst, "«Kort fortalt» mangler i PRD-en"
+    return tekst.split("\n## Kort fortalt\n", 1)[1].split("\n---\n", 1)[0]
+
+
+class TestKortFortalt:
+    def test_staar_foer_dette_dokumentet_fastsetter(self):
+        """Ville feilet hvis delen sto et annet sted enn rett etter linjene
+        om emne og gruppe."""
+        tekst = PRD.read_text(encoding="utf-8")
+        assert (
+            tekst.index("**Gruppe:**") < tekst.index("\n## Kort fortalt\n") < tekst.index("Dette dokumentet fastsetter")
+        )
+
+    def test_hoeyst_400_ord(self):
+        """Ville feilet med mer enn 400 ord, telt som leseren ser dem (_ord)."""
+        ord_ = _ord("Kort fortalt\n" + _kort_fortalt())
+        assert ord_ <= 400, ord_
+
+    def test_lenkene_peker_paa_overskrifter_som_finnes(self):
+        """Ville feilet hvis en FR- eller NFR-overskrift fikk ny tittel, eller
+        lenken til «Status» i README-en ble borte."""
+        del_ = _kort_fortalt()
+        egne = _ankrene(PRD.read_text(encoding="utf-8"))
+        ankre = re.findall(r"\]\(#([^)\s]+)\)", del_)
+        assert ankre, "ingen lenker til kravene"
+        for anker in ankre:
+            assert anker in egne, anker
+            assert anker.startswith(("fr-", "nfr-")), anker
+        assert "](../../../../README.md#status)" in del_
+        assert "status" in _ankrene(README.read_text(encoding="utf-8"))
+
+    def test_readme_lenker_til_kort_fortalt_under_til_faglaerer(self):
+        """Regel 19. Ville feilet hvis lenken falt ut da «Til faglærer» ble
+        kortet ned."""
+        lista = README.read_text(encoding="utf-8").split("Til faglærer:\n", 1)[1].split("\n\n", 1)[0]
+        assert sum("prd.md#kort-fortalt)" in linje for linje in lista.splitlines()) == 1
+        assert "kort-fortalt" in _ankrene(PRD.read_text(encoding="utf-8"))

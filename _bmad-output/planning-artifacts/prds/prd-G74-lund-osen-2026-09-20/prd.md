@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-28T11:41
+updated: 2026-10-28T20:57
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -41,6 +41,64 @@ updated: 2026-10-28T11:41
 **Emne:** IBE160 Programmering med KI, Høgskolen i Molde
 **Gruppe:** G74 — Joakim Lund, Marian Osen
 
+## Kort fortalt
+
+*Lagt til 2026-10-28 etter gruppens svar 27.10 kl. 00:08. Kravene under er ikke
+endret. Det som er bygget nå, står i [«Status» i README-en](../../../../README.md#status)
+(svaret 28.10 kl. 11:30).*
+
+**Problemet.** Den som følger 10–30 norske aksjer ved siden av jobb eller
+studier, har et sorteringsproblem: kursene finnes, men ligger på ulike steder,
+og det meste er irrelevant akkurat i dag (§1).
+
+**For hvem.** En vanlig sparer som vil se hva som beveget seg i går, og hvorfor
+(§1).
+
+**Hva v1 er.** En webapplikasjon for PC, på norsk, som kjører lokalt (§2), med
+15 likvide aksjer på Oslo Børs, antallet utledet av EODHD-kvoten på 20 kall i
+døgnet (§3). Endelig v1 er det briefen v8 lover: kjernen, KI-teksten med
+bryter, historikken, hovedindeksen, Min liste, lenken til investorsiden og egne
+nøkler til Gemini, Anthropic og OpenAI, og det som alt er flettet (§2). En lokal
+modell er standard og trenger ingen nøkkel (FR-608).
+
+**Hva v1 ikke er.** Ingen investeringsråd (NFR-06), kontoer, varsler, betaling
+eller mobiltilpasning (§2). Børsmeldingene og de kommende hendelsene er ute,
+fordi Euronext ikke ga tillatelse til automatisert henting innen 28.09 (plan B,
+punkt 1 i §8). «Ekstra, hvis tiden rekker» er ikke v1.
+
+**De viktigste kravene.**
+
+- Tre sjekker, trend, bevegelse og interesse, gir hver +1, 0 eller -1.
+  Signalstyrken er hvor mange som slo ut, og retningen leses av fortegnene.
+  Styrken er verken en sannsynlighet eller et råd om kjøp eller salg
+  ([FR-701](#fr-701--tre-navngitte-sjekker),
+  [FR-703](#fr-703--signalstyrke), [FR-704](#fr-704--retning)).
+- Aksjesiden viser målingen bak hver sjekk, så brukeren kan regne etter
+  ([FR-706](#fr-706--synlig-begrunnelse-i-aksjedetaljen)).
+- Oversikten har fem kolonner, sortert på signalstyrke
+  ([FR-101](#fr-101--fem-kolonner), [FR-102](#fr-102--standard-sortering)).
+- Webserveren henter aldri, og driften holder seg innenfor kvoten
+  ([FR-401](#fr-401--henting-utløses-eksplisitt-aldri-av-en-oppstart),
+  [NFR-01](#nfr-01--daglig-drift-skal-holde-seg-innenfor-api-kvoten)).
+- Dagens vurdering lagres og etterfylles ikke
+  ([FR-408](#fr-408--dagens-vurdering-lagres-per-aksje)).
+- Regler regner, og KI formulerer: KI-teksten står under regelforklaringen, kan
+  slås av, kontrolleres og logges
+  ([FR-601](#fr-601--avpå-bryteren-er-brukersynlig),
+  [FR-603](#fr-603--ki-teksten-sier-ikke-mer-enn-grunnlaget),
+  [FR-604](#fr-604--logging-av-ki-bidraget-fra-første-kjøring)).
+- Demoen har oppdiktede tall og trenger ingen nøkkel
+  ([FR-411](#fr-411--demoversjonen-har-oppdiktede-tall-i-en-egen-base)).
+
+**Bygget per 28.10**, etter «Status» i README-en: sjekkene og styrken hver
+børsdag, hentingen, oversikten med hjelp og sortering, hovedindeksen, periodene
+i kursgrafen, Min liste, børsometeret, KI-teksten med bryter, Docker og demoen.
+Fra 29.10 starter en jobb på en PC i gruppen hentingen hver kveld (tillegget
+28.10 under FR-401). Neste i v1 er
+prøven av README-en på en ren maskin.
+
+---
+
 Dette dokumentet fastsetter hva OSE Signal skal gjøre i v1. Det er et
 kravregister: hvert krav står med sin normative setning og én linje begrunnelse.
 Her står kravene og beslutningene som må være låst før arkitekturarbeidet
@@ -60,6 +118,10 @@ suksessmålene og de åpne punktene. Å komme under 11 sider krever at krav går
 ikke at teksten strammes. *Talt på nytt 2026-09-24: 130 datarader, uten
 overskrift- og skillelinjer. Her sto 115; da det ble skrevet, hadde fila 114
 tabellinjer medregnet overskrift- og skillelinjer.*
+*Rettet 2026-10-28 kl. 20:57:* målt da hadde fila `2066` linjer og `25605` ord, telt med
+`wc -l` og `wc -w`, frontmatteren og denne linja medregnet. Hvordan 11,7 sider
+ble målt, står ikke i `.memlog.md`, så sidetallet er ikke målt på nytt.
+«Kort fortalt» øverst er siden å lese først.
 
 ---
 
