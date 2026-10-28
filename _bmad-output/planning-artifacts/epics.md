@@ -2023,6 +2023,12 @@ overs, så lista kan vise den før noen velger en aksje.
 
 *Avgjort 2026-10-28 kl. 22:17 (gruppens svar):* a) 2.13 bygges i natt, og 8.17a tas senere. b) Jobben fra 2.3d kjører målingen etter hentingen med alle kallene som er igjen den dagen i GMT, også på dager børsen er stengt. Hentingen og nye forsøk får kallene først, og bonuskvoten brukes aldri. c) Når hele lista er målt, måles de eldste målingene på nytt først. Det går foran «etter 3 måneder» og «lar 2 stå igjen» i FR-413.
 
+*Avgjort 2026-10-28 kl. 23:19 (gruppens svar), om «Åpent» i spesifikasjonen:* a) Gårsdagens dato godtas før første kall og leses som 0 brukt i dag, som i hentingen (regel 15). Etter hvert kall må datoen være dagens. b) Vinduet er tre måneder bakover fra børsdagen (FR-413) og står ved hvert tall. c) Ingen lås, som for hentingen kl. 11:34: vi kjører ikke noe for hånd mens jobben går. d) Mangler én av de 15 kursen, går målingen kl. 23:45 med kallene som er igjen. Nye forsøk får fortsatt kallene først.
+
+*Avgjort 2026-10-28 kl. 23:22 (gruppens svar):* e) 2.13 flettes torsdag 29.10 kl. 23:50, etter jobbens siste kjøring og før midnatt, så jobben fredag kjører den nye koden. Rekker det ikke før 23:59, flettes det ikke den kvelden.
+
+*Avgjort 2026-10-28 kl. 23:36 (gruppens svar):* f) Kallene som er igjen torsdag, brukes av målingen for hånd rett etter flettingen, før midnatt. g) Målingene fra tabellen føres i `malinger.md` som en ny § hver søndag, med vinduet ved hvert tall, plassen i rangeringen og radene med feil, og rader med et annet vindu enn §50–§52 i egen tabell.
+
 ### Story 2.14: Eks.datoer føres inn for hånd
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.

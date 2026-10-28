@@ -26,3 +26,7 @@
 - [ ] 2026-10-28 [kort-fortalt-i-prd](996-2026-10-28-20-58-45-kort-fortalt-i-prd.md) — sidetallet 11,7 i «Om lengden» er ikke målt på nytt; metoden står ikke i `.memlog.md`
 - [x] 2026-10-28 [refleksjonsloggen-26-og-27-10](995-2026-10-28-21-20-48-refleksjonsloggen-26-og-27-10.md) — klokkeslettet for delen av svaret 27.10 kl. 20:58 om de 4 kallene, som var igjen først etter hentingen kl. 22:00 (løst 2026-10-28: svaret sa bare at kallene skulle gå til målingen, Rettet-linja i 102ecb0)
 - [x] 2026-10-28 [hentingen-28-10](994-2026-10-28-22-01-59-hentingen-28-10.md) — de 4 kallene som er igjen 28.10, går til målingen; den trenger en egen instruksjon før kl. 01:00 (løst 2026-10-28: målt i §52, 1721d9f)
+- [ ] 2026-10-28 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — PR #105 (2.13): gruppen avgjør datoen før første kall og vinduet før flettingen
+- [ ] 2026-10-28 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — PR #105: lås mot to kjøringer samtidig (BH1/ECH2) og ingen måling når én av de 15 mangler kursen (ECH4), spørsmål til gruppen
+- [ ] 2026-10-28 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — hvordan målingene i tabellen omsetning føres i malinger.md (forslag: en ny § én gang i uka)
+- [ ] 2026-10-28 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — testen for hele jobben på Windows feilet i CI når Docker svarte innen ett sekund (40777327364)
