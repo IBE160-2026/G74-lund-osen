@@ -85,9 +85,9 @@ def _rad_rett_i_basen(tilkobling, **endret):
 
 class TestMigrasjonen:
     def test_0005_lager_ki_logg(self, base):
-        """Tabellen lages av en nummerert migrasjon (AD-16). Basen staar paa 7
-        etter 0007 (story 8.3)."""
-        assert versjon(base) == 7
+        """Tabellen lages av en nummerert migrasjon (AD-16). Basen staar paa 8
+        etter 0008 (story 2.13)."""
+        assert versjon(base) == 8
         assert base.execute("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'ki_logg'").fetchone()
         assert (MIGRASJONSKATALOG / "0005_ki_logg.sql").is_file()
 
@@ -110,7 +110,7 @@ class TestMigrasjonen:
             assert migrer(tilkobling, til_0004) == 4
             with pytest.raises(RuntimeError):
                 SqliteKILogg(tilkobling, klokke)
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 7
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 8
             assert SqliteKILogg(tilkobling, klokke).les_alle() == []
         finally:
             tilkobling.close()

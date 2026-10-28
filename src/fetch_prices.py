@@ -66,6 +66,10 @@ SqliteIndekslager, aldri i kurs eller vurdering (AD-21). Feiler kallet,
 lagres og vurderes aksjene som vanlig, og indeksen faar ingen ny sjanse
 (AD-15). Nye forsoek henter bare aksjene. Feilet bare indeksen, gir
 kjoeringen kode 3 (KODE_BARE_INDEKSEN, beslutningen 17.10 kl. 11:58).
+
+Story 2.13: --maal-omsetning maaler omsetningen for de neste aksjene i lista
+over Oslo Boers med kallene som er igjen av dagens, og aldri bonuskvoten.
+Logikken staar i omsetning.py, og nettfunksjonene her gis inn til den.
 """
 
 import argparse
@@ -1544,6 +1548,8 @@ def main(argv: list[str] | None = None) -> None:
     Med --uten-tidskontroll: en henting paa en boersdag foer TIDSGRENSE, kl.
     22:00 (story 2.3). Det gamle navnet, --hent-foer-kl-22, godtas ikke
     lenger. Noekkelen gaar til kjoer som funksjon og leses etter filvakten.
+    Med --maal-omsetning: maalingen av omsetning (story 2.13, omsetning.py),
+    med koden derfra.
 
     Stiene slaas opp her, naar main kalles (story 2.1b), saa fixturen i
     tests/conftest.py flytter dem.
@@ -1564,7 +1570,33 @@ def main(argv: list[str] | None = None) -> None:
             "henting stopper ved filvakten"
         ),
     )
+    parser.add_argument(
+        "--maal-omsetning",
+        action="store_true",
+        help=(
+            "mål omsetningen for de neste aksjene i lista over Oslo Børs med kallene som er igjen "
+            "av dagens, etter hentingen (story 2.13). Bruker aldri bonuskvoten"
+        ),
+    )
     argumenter = parser.parse_args(argv)
+    if argumenter.maal_omsetning:
+        # Story 2.13: et eget valg. omsetning.py importerer fra denne fila og
+        # importeres derfor her. Nettfunksjonene gis inn herfra (AD-2).
+        if argumenter.les_inn is not None or argumenter.uten_tidskontroll:
+            parser.error("--maal-omsetning kan ikke kombineres med --les-inn eller --uten-tidskontroll")
+        import omsetning
+
+        sys.exit(
+            omsetning.maal_omsetning(
+                lagring_fil.RAA_KATALOG,
+                lagring_sqlite.BASE_STI,
+                omsetning.LISTEFIL,
+                hent_api_nokkel,
+                hent=hent_ett_symbol,
+                les_kvote=hent_kvote,
+                klokke=naa,
+            )
+        )
     if argumenter.les_inn is not None:
         les_inn(argumenter.les_inn, lagring_sqlite.BASE_STI)
         return

@@ -98,6 +98,20 @@ def test_jobben_henter_uten_flagg_og_bare_med_ki_som_svarer():
     assert "exit $kode" in kode.splitlines()[-1]
 
 
+def test_jobben_maaler_omsetningen_etter_hentingen_i_hver_kjoering():
+    """Ville feilet hvis jobben ikke kjoerte maalingen etter hentingen, bare
+    kjoerte den naar hentingen ga kode 0, eller lot koden fra maalingen bli
+    koden jobben avslutter med (story 2.13, avgjoerelsen 28.10 kl. 22:17)."""
+    kode = _kode(JOBBEN)
+    hentingen = kode.index("& $uvSti run python src/fetch_prices.py 2>&1")
+    maalingen = kode.index("& $uvSti run python src/fetch_prices.py --maal-omsetning 2>&1")
+    assert hentingen < kode.index("$kode = $LASTEXITCODE") < maalingen
+    assert kode.count("$kode = $LASTEXITCODE") == 1
+    mellom = kode[hentingen:maalingen]
+    assert "if (" not in mellom and "exit" not in mellom
+    assert 'Logg "Målingen avsluttet med kode $LASTEXITCODE."' in kode
+
+
 def test_modellen_er_den_samme_som_i_ki_lokal():
     """Ville feilet hvis jobben ventet paa en annen modell enn den hentingen
     bruker."""
@@ -183,6 +197,8 @@ def test_readme_og_hjelpen_sier_hva_jobben_gjoer_loggen_og_hvordan_den_slaas_av(
         assert "22:15" in tekst and "23:45" in tekst
     assert "legg-inn-kveldshentingen.ps1" in readme
     assert "commiten main hadde ved midnatt" in readme
+    for tekst in (readme, hjelp):
+        assert "--maal-omsetning" in tekst and "bonuskvoten" in tekst
 
 
 # Kjoeringen paa Windows, i en midlertidig mappe.
@@ -252,7 +268,8 @@ def _kjoer(tmp_path: Path, skript: Path, hoved: Path, *ekstra: str) -> tuple[int
     falsk = tmp_path / "falsk"
     falsk.mkdir(exist_ok=True)
     (falsk / "uv.cmd").write_text(
-        "@echo off\r\necho falsk henting %*\r\necho tjeneste=%OSE_KI_TJENESTE%\r\necho mappe=%CD%\r\nexit /b 3\r\n",
+        "@echo off\r\necho falsk henting %*\r\necho tjeneste=%OSE_KI_TJENESTE%\r\necho mappe=%CD%\r\n"
+        'if "%~4"=="--maal-omsetning" exit /b 5\r\nexit /b 3\r\n',
         encoding="ascii",
     )
     hjem = tmp_path / "hjem"
@@ -345,7 +362,8 @@ def test_hele_jobben_uten_docker_henter_uten_ki_og_gir_koden_fra_hentingen(tmp_p
     """Ville feilet hvis jobben skrev ut nøkkelen eller miljøet, hentet med
     KI-tekst uten Docker (NFR-04), kjoerte hentingen et annet sted enn i
     arbeidskopien, ikke skrev loggen i data/, eller ga en annen kode enn
-    hentingen (den falske uv gir 3)."""
+    hentingen (den falske uv gir 3). Story 2.13: maalingen kjoeres etter
+    hentingen, og koden fra den (5) blir ikke koden jobben gir."""
     oppsett = _oppsett(tmp_path, "nyeste")
     jobb = oppsett["jobb"]
     kode, utskrift = _kjoer(tmp_path, jobb / "start" / "kveldshenting.ps1", oppsett["hoved"])
@@ -355,6 +373,8 @@ def test_hele_jobben_uten_docker_henter_uten_ki_og_gir_koden_fra_hentingen(tmp_p
     assert "tjeneste=av" in loggen and f"mappe={jobb}" in loggen
     assert "Henter uten KI-tekst (NFR-04)" in loggen
     assert "Hentingen avsluttet med kode 3." in loggen
+    assert "falsk henting run python src/fetch_prices.py --maal-omsetning" in loggen
+    assert loggen.index("Hentingen avsluttet med kode 3.") < loggen.index("Målingen avsluttet med kode 5.")
     assert "Skriptet startet verken Docker Desktop eller Ollama." in loggen
     for tekst in (utskrift, loggen):
         assert NOEKKELEN not in tekst and MILJOEET not in tekst

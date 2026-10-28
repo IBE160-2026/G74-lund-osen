@@ -12,7 +12,8 @@
 # 3. Docker Desktop og Ollama startes, med én felles tidsgrense. Svarer de
 #    ikke innen den, hentes det uten KI-tekst (NFR-04).
 # 4. uv run python src/fetch_prices.py, uten flagg, med OSE_KI_TJENESTE=lokal
-#    og OSE_KI_OLLAMA_URL satt bare for kjøringen.
+#    og OSE_KI_OLLAMA_URL satt bare for kjøringen. Så målingen av omsetning,
+#    uv run python src/fetch_prices.py --maal-omsetning (story 2.13).
 # 5. Det skriptet selv startet, stoppes, også når noe feiler. Skriptet
 #    avslutter med koden fra hentingen.
 #
@@ -255,8 +256,14 @@ try {
         $ErrorActionPreference = 'Continue'
         & $uvSti run python src/fetch_prices.py 2>&1 | ForEach-Object { Logg "$_" }
         $kode = $LASTEXITCODE
-        $ErrorActionPreference = 'Stop'
         Logg "Hentingen avsluttet med kode $kode."
+        # Story 2.13 (avgjørelsen 28.10 kl. 22:17): målingen etter hentingen i
+        # hver kjøring. Den venter selv til hentingen har kursene, og koden
+        # fra den endrer ikke koden jobben avslutter med.
+        Logg 'uv run python src/fetch_prices.py --maal-omsetning'
+        & $uvSti run python src/fetch_prices.py --maal-omsetning 2>&1 | ForEach-Object { Logg "$_" }
+        Logg "Målingen avsluttet med kode $LASTEXITCODE."
+        $ErrorActionPreference = 'Stop'
     } else {
         Logg 'Fant ikke uv. Ingen henting.'
     }
