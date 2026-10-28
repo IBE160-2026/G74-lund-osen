@@ -3470,6 +3470,9 @@ def _ord(tekst: str) -> int:
     return len(re.findall(r"\w+", re.sub(r"\]\([^)]*\)", "]", tekst)))
 
 
+LINUX_LINJA = "**Linux:** bruk [Docker](#med-docker-desktop) eller [uv](#uten-docker-med-uv), under."
+
+
 class TestHovedveien:
     """Story 3.5f (gruppens svar 25.10 kl. 11:32 og innspillet kl. 11:26):
     dobbeltklikket er den anbefalte hovedveien og en egen del foerst i «Kom i
@@ -3479,8 +3482,9 @@ class TestHovedveien:
 
     def test_dobbeltklikket_staar_foerst_og_ikke_bak_en_pil(self):
         """Story 3.5g: «Kom i gang» er én setning, overskriften med ankeret
-        fra før, de fem stegene, linja om advarselen og linja om den ekte
-        versjonen, og så pilene i rekkefølgen i instruksjonen. Ville feilet
+        fra før, de fem stegene, linja om advarselen, linja om den ekte
+        versjonen og linja om Linux (gruppens svar 27.10 kl. 06:09, a), og så
+        pilene i rekkefølgen i instruksjonen. Ville feilet
         hvis stegene ikke sto først, et steg manglet, sto i en annen
         rekkefølge eller hadde mer enn 25 ord, noe annet sto synlig før
         pilene, en pil manglet eller sto i en annen rekkefølge, eller
@@ -3490,8 +3494,8 @@ class TestHovedveien:
         assert overskrifter == [DOBBELTKLIKKET, "Mer for den som vil"], overskrifter
         foer = del_.split("\n<details>\n", 1)[0].strip("\n")
         avsnitt = [a for a in foer.split("\n\n") if a.strip()]
-        assert len(avsnitt) == 6, avsnitt
-        anbefalingen, anker, overskrift, stegene, advarselen, ekte = avsnitt
+        assert len(avsnitt) == 7, avsnitt
+        anbefalingen, anker, overskrift, stegene, advarselen, ekte, linux = avsnitt
         assert anbefalingen.startswith("Vi anbefaler demoen for faglærer og sensor") and "\n" not in anbefalingen
         assert len(re.findall(r"[.!?](?:\s|$)", anbefalingen)) == 1, anbefalingen
         assert anker == f'<a name="{DOBBELTKLIKK_ANKER}"></a>' and overskrift == f"### {DOBBELTKLIKKET}"
@@ -3521,8 +3525,28 @@ class TestHovedveien:
         assert "nøkkel fra EODHD" in ekte
         # Gjennomgangen av 3.5g (BH5, ECH4): vernet mot .git står synlig.
         assert "bare i en kopi fra ZIP-fila, ikke i en klon" in ekte
+        assert linux == LINUX_LINJA
         assert [s for s, _ in _pilene(del_)][: len(PILENE_I_KOM_I_GANG)] == list(PILENE_I_KOM_I_GANG)
         assert not any("dobbeltklikk" in s.lower() for s in _detaljer(_seksjon("Mer for den som vil")))
+
+    def test_linja_om_linux_lenker_til_docker_og_uv(self):
+        """Gruppens svar 27.10 kl. 06:09, a (BH3 i triagen til 3.5g): en
+        tredje kort linje under stegene, «Linux: bruk Docker eller uv,
+        under.», med lenker til pilene for Docker og uv. Ville feilet hvis
+        linja manglet, sto et annet sted enn rett etter linja om den ekte
+        versjonen, sto bak en pil, eller lenket til et anker som ikke finnes."""
+        del_ = _kom_i_gang()
+        foer = del_.split("\n<details>\n", 1)[0]
+        assert foer.count(LINUX_LINJA) == 1
+        assert not any(LINUX_LINJA in innhold for _, innhold in _pilene(del_))
+        avsnitt = [a.strip() for a in foer.split("\n\n") if a.strip()]
+        assert avsnitt[-2].startswith("**Ekte kurser:**") and avsnitt[-1] == LINUX_LINJA
+        assert re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", LINUX_LINJA) == "**Linux:** bruk Docker eller uv, under."
+        lenkene = re.findall(r"\]\(#([^)]+)\)", LINUX_LINJA)
+        assert lenkene == ["med-docker-desktop", "uten-docker-med-uv"]
+        tekst = README.read_text(encoding="utf-8")
+        for maal in lenkene:
+            assert f'<a name="{maal}"></a>' in tekst, maal
 
     def test_resten_av_dobbeltklikket_staar_bak_pila(self):
         """Story 3.5g: teksten som sto under dobbeltklikket, står uendret i

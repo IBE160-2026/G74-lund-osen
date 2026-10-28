@@ -50,6 +50,8 @@ Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og v
 
 **Ekte kurser:** dobbeltklikk «Start den ekte versjonen» i stedet for «Start demoen». Den spør etter en gratis nøkkel fra EODHD første gang, og starter bare i en kopi fra ZIP-fila, ikke i en klon.
 
+**Linux:** bruk [Docker](#med-docker-desktop) eller [uv](#uten-docker-med-uv), under.
+
 <details>
 <summary>Demoen og den ekte versjonen</summary>
 

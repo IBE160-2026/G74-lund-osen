@@ -79,7 +79,7 @@ Gjennomgang 27.10 etter hele settet (3773 bestått, 37 hoppet over, 0 feilet, 00
 | ECH10, ECH11, ECH12 | `_pilene` gir IndexError, to piler med samme navn leses stille, og `_delen_i_readme` gir IndexError | low | **rettet:** påstander med melding |
 | BH13, ECH14 | Avtrykkene er regnet på grenen, ikke vist mot `54d4714` | low | **rettet:** «Avtrykkene» over sier hvordan de ble sammenlignet |
 | ECH13 | Commit-meldingen sier «uendret» om pilene, men «Velg vei» er skrevet om | low | står: spesifikasjonen og kommentaren over avtrykkene sier hva som er skrevet om, og historikken skrives ikke om (regel 7) |
-| BH3 | Ingenting synlig viser til Docker eller uv, for eksempel for Linux | medium | **til gruppen:** avgjørelsen 26.10 kl. 23:00 sier én linje om advarselen og én om den ekte versjonen under stegene, og alt annet bak piler. «Du trenger» (Linux) og «Velg vei» står i pilene rett under |
+| BH3 | Ingenting synlig viser til Docker eller uv, for eksempel for Linux | medium | **til gruppen:** avgjørelsen 26.10 kl. 23:00 sier én linje om advarselen og én om den ekte versjonen under stegene, og alt annet bak piler. «Du trenger» (Linux) og «Velg vei» står i pilene rett under. **Avgjort av gruppen 27.10 kl. 06:09 (a):** en tredje kort linje under stegene, «Linux: bruk Docker eller uv, under.», med lenker til pilene for Docker og uv og test (`test_linja_om_linux_lenker_til_docker_og_uv`) |
 | ECH7 | «steg 4» i svarene under «Står du fast?» kan leses som steg 4 i dobbeltklikket | medium | **til gruppen:** står under «Åpent». Svarene er flyttet uendret |
 | BH4 | Den som har uv fra før, kan hoppe over steg 4 og ikke lese at første gang tar minutter | low | står: avgjørelsen gir fem steg i den rekkefølgen. Under «Åpent» |
 | BH6 | «steg 1–4» i «Til faglærer» lander på pila til Docker, ikke på stegene | low | står: pila heter «Med Docker Desktop» og er synlig der lenken lander |
@@ -91,6 +91,6 @@ Gjennomgang 27.10 etter hele settet (3773 bestått, 37 hoppet over, 0 feilet, 00
 ## Åpent
 
 - Om «steg 4» er uklart nå som dobbeltklikket også har nummererte steg (se «Valg som er gjort her», ECH7).
-- Om det skal stå en synlig linje til Docker og uv under stegene, for eksempel for Linux (BH3). Det ville vært en tredje linje under stegene, og avgjørelsen 26.10 kl. 23:00 sier to.
+- Om det skal stå en synlig linje til Docker og uv under stegene, for eksempel for Linux (BH3). Det ville vært en tredje linje under stegene, og avgjørelsen 26.10 kl. 23:00 sier to. Avgjort av gruppen 27.10 kl. 06:09: en tredje kort linje, «Linux: bruk Docker eller uv, under.»
 - Om ventingen første gang skal stå i et eget steg (BH4).
 - §9 i `docs/kvalitetssikring.md` følger ikke de fem stegene ennå (VG5).
