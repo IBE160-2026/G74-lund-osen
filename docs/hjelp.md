@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-28T10:45
+updated: 2026-10-28T19:57
 ---
 
 # Hjelp til «Kom i gang»
@@ -25,7 +25,7 @@ Windows viser ofte `Start demoen.cmd` uten filendelsen og `Start demoen.command`
 
 ### Windows advarer mot fila.
 
-Første gang kan Windows advare mot `Start demoen.cmd` eller `Start den ekte versjonen.cmd`, fordi fila er lastet ned fra nettet. Advarselen heter «Windows beskyttet PC-en». Klikk «Mer informasjon», og så «Kjør likevel». Spør Windows om du vil kjøre fila, svarer du ja. Mer står under «Enklest: dobbeltklikk, uten Docker» i [README-en](../README.md#enklest-dobbeltklikk-uten-docker).
+Første gang kan Windows advare mot `Start demoen.cmd` eller `Start den ekte versjonen.cmd`, fordi fila er lastet ned fra nettet. Advarselen heter «Windows beskyttet PC-en». Klikk «Mer informasjon», og så «Kjør likevel». Spør Windows om du vil kjøre fila, svarer du ja. Mer står under «Slik virker dobbeltklikket» i [README-en](../README.md#slik-virker-dobbeltklikket).
 
 ### Mac sier at fila ikke kan åpnes.
 
@@ -129,13 +129,13 @@ Du har dratt inn ZIP-fila, ikke mappa. Dra mappa du pakket ut i steg 2, ikke ZIP
 
 ### Mappa lar seg ikke dra inn i vinduet.
 
-PowerShell er trolig åpnet som administrator, og da sperrer Windows dra og slipp. Lukk vinduet og åpne PowerShell på vanlig måte (steg 3). Åpner du den fra adressefeltet i Filutforsker, står du alt i mappa og trenger ikke dra.
+PowerShell er trolig åpnet som administrator, og da sperrer Windows dra og slipp. Lukk vinduet og åpne PowerShell på vanlig måte (steg 3 med Docker). Åpner du den fra adressefeltet i Filutforsker, står du alt i mappa og trenger ikke dra.
 
 ### «is not recognized as the name of a cmdlet» eller «Cannot find path … because it does not exist» etter cd.
 
-Kommer «is not recognized as the name of a cmdlet»: Det mangler mellomrom etter `cd`. Står `cd` klistret til stien i meldingen, for eksempel `'cdC:\...'`, skriver du `cd`, et mellomrom, og drar mappa inn i vinduet på nytt (steg 4). Står det `'docker'` i meldingen, er Docker Desktop ikke installert, eller vinduet ble åpnet før installasjonen: lukk det og åpne et nytt (steg 3). Står det `'uv'` i meldingen, er uv ikke installert, eller vinduet ble åpnet før installasjonen: se «Tester» i README-en.
+Kommer «is not recognized as the name of a cmdlet»: Det mangler mellomrom etter `cd`. Står `cd` klistret til stien i meldingen, for eksempel `'cdC:\...'`, skriver du `cd`, et mellomrom, og drar mappa inn i vinduet på nytt (steg 4 med Docker). Står det `'docker'` i meldingen, er Docker Desktop ikke installert, eller vinduet ble åpnet før installasjonen: lukk det og åpne et nytt (steg 3 med Docker). Står det `'uv'` i meldingen, er uv ikke installert, eller vinduet ble åpnet før installasjonen: se «Tester» i README-en.
 
-Kommer «Cannot find path … because it does not exist»: Mappa ligger ikke der stien sier, for eksempel fordi den er flyttet, eller fordi ZIP-fila ble dratt inn i stedet for mappa. Skriv `cd` og et mellomrom, og dra mappa inn i vinduet på nytt (steg 4). Står det `.zip` til slutt i stien i meldingen, var det ZIP-fila: se «Står det .zip til slutt i linja.» over.
+Kommer «Cannot find path … because it does not exist»: Mappa ligger ikke der stien sier, for eksempel fordi den er flyttet, eller fordi ZIP-fila ble dratt inn i stedet for mappa. Skriv `cd` og et mellomrom, og dra mappa inn i vinduet på nytt (steg 4 med Docker). Står det `.zip` til slutt i stien i meldingen, var det ZIP-fila: se «Står det .zip til slutt i linja.» over.
 
 ### Stien har mellomrom og fikk ikke anførselstegn.
 
@@ -227,15 +227,15 @@ Nettleseren viser da `ERR_CONNECTION_REFUSED`. Andre nettlesere sier det med and
 
 ### «The term 'uv' is not recognized» eller «command not found: uv».
 
-Blir `uv` ikke funnet etter installasjonen, lukker du vinduet, åpner et nytt og går til mappa, som i steg 4. Er uv ikke installert, står installasjonen for Windows og Mac under «Tester» i [README-en](../README.md#tester).
+Blir `uv` ikke funnet etter installasjonen, lukker du vinduet, åpner et nytt og går til mappa, som i steg 4 med Docker. Er uv ikke installert, står installasjonen for Windows og Mac under «Tester» i [README-en](../README.md#tester).
 
 ### «docker» er ikke gjenkjent, eller «command not found: docker».
 
-Docker Desktop er ikke installert, eller terminalvinduet ble åpnet før installasjonen. Lukk terminalvinduet og åpne et nytt (steg 3).
+Docker Desktop er ikke installert, eller terminalvinduet ble åpnet før installasjonen. Lukk terminalvinduet og åpne et nytt (steg 3 med Docker).
 
 ### «Cannot connect to the Docker daemon», «error during connect» eller «dockerDesktopLinuxEngine».
 
-Docker Desktop er ikke startet, eller motoren er ikke klar. Start Docker Desktop, vent til det står «Engine running» (steg 1), og prøv kommandoen igjen.
+Docker Desktop er ikke startet, eller motoren er ikke klar. Start Docker Desktop, vent til det står «Engine running» (steg 1 med Docker), og prøv kommandoen igjen.
 
 ### To kommandoer havnet på samme linje.
 
@@ -243,7 +243,7 @@ For eksempel med feilen «no such service». Lim inn én kommando om gangen, og 
 
 ### «no configuration file provided: not found».
 
-Terminalvinduet står i feil mappe. Gjør steg 4 på nytt, og dra den mappa der fila compose ligger. Windows viser den uten filendelsen, som compose og ikke compose.yaml.
+Terminalvinduet står i feil mappe. Gjør steg 4 med Docker på nytt, og dra den mappa der fila compose ligger. Windows viser den uten filendelsen, som compose og ikke compose.yaml.
 
 ### «toomanyrequests» fra Docker Hub.
 
@@ -257,7 +257,7 @@ Noe annet bruker port 8000. Kjører den andre versjonen, stopper du den først (
 
 ### Jeg lukket vinduet før jeg stoppet.
 
-Åpne et nytt terminalvindu, gjør steg 4 og lim inn stoppkommandoen for versjonen du kjørte: `docker compose down` for den ekte versjonen, eller `docker compose --profile demo down` for demoen.
+Åpne et nytt terminalvindu, gjør steg 4 med Docker og lim inn stoppkommandoen for versjonen du kjørte: `docker compose down` for den ekte versjonen, eller `docker compose --profile demo down` for demoen.
 
 ## Neste gang
 
