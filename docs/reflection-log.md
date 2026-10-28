@@ -2906,6 +2906,72 @@ Det vi lærte: koden skriver tall og dager, og modellen bare ordene rundt dem. I
 
 ---
 
+## 26.10.2026 – Fire PR-er flettet, hentingen som nesten ble glemt, og sesjonsloggen fra faglærer
+
+*Joakim og Marian.*
+
+Natta begynte med oppføringen for 25.10 (`da0dd8a`) og 8.6b, børsometeret som tavla, etter svarene 24.10 kl. 11:54 og 25.10 kl. 21:41 (`9d64d4f`). Arbeidet stoppet kl. 01:59, fordi to tester feilet, se utfordring 3. Om morgenen ble de rettet etter svaret kl. 08:43 (`de1cd7d`), og 8.6b stoppet før flettingen kl. 09:29, som instruksjonen sa. Funnene som gikk til oss, blant dem rekkefølgen i kartet, avgjorde vi kl. 13:00, 13:07 og 15:21 (`85d71c4`). PR #99 ble flettet kl. 16:32 i `7f6d9e4`. De to gjennomgangene fant 27 og 23 funn.
+
+Samme dag ble tre PR-er til flettet. 3.5e (PR #100) stopper den andre versjonen rett før webserveren, etter svaret 24.10 kl. 20:00, og ble flettet kl. 10:33 i `dbfa0b9`. 3.5f (PR #101) gjorde dobbeltklikket til hovedveien i «Kom i gang», etter svaret 25.10 kl. 11:32, og ble flettet kl. 13:31 i `8cd20b3`. 8.0f (PR #102) la hjelpen ved «?» i et fast felt som ikke dekker siden, etter svarene 21.10 kl. 22:47 og 24.10 kl. 11:31 og 11:34, og ble flettet kl. 18:53 i `238ef18`. Gjennomgangene fant 12, 32 og 33 funn, og ingen med dom medium eller høyere sto urettet ved flettingen.
+
+Kl. 18:10 og 19:37 la faglærer inn skillen `sesjonslogg` og delen «## Sesjonslogg» i `CLAUDE.md` (`499ab97` og `5ba12b9`). Kl. 19:14 svarte vi at skillen ventet til vi visste mer, og kl. 21:09 at den brukes fra nå. Instruksjonen kl. 21:10 stoppet i steg 0, se utfordring 2.
+
+Kl. 22:50 stoppet målingen med kallene som var igjen, i steg 0: kvoten sto på 2026-10-25, så hentingen for 26.10 var ikke gjort. Instruksjonen for hentingen kom kl. 22:54 (`6de5fef`), og hentingen gikk kl. 22:56–22:57 med kode 0 og 16 kall. Det var den første med prompten versjon 3. Alle 15 KI-tekstene besto kontrollen, og bare GJF ga utslag på interesse. Kl. 22:58 avgjorde vi at hentingen blir en jobb i Oppgaveplanlegging. Målingen kom på nytt kl. 23:05, og de 4 kallene gikk til §51 i `malinger.md` kl. 23:07–23:08 (`d7b964c`): GOLDR, GRONG, GYL og HAV, alle med 67 rader, på plass 136, 195, 209 og 151 av 210. Bonuskvoten ble ikke brukt.
+
+Kl. 23:00 avgjorde vi at «Kom i gang» får fem korte steg og resten bak piler (`54d4714`). 3.5g ble bygget natt til 27.10 i PR #103 og stoppet før flettingen kl. 00:30, som instruksjonen sa. Teksten fram til første pil gikk fra 1571 til 201 ord. Gjennomgangen fant 34 funn, og to med dom medium, BH3 og ECH7, gikk til oss fordi de gjaldt avgjørelsen kl. 23:00. PR #103 ble flettet 28.10 i `27ccf82`.
+
+**Utfordringer**
+
+1. **Hentingen som nesten ble glemt.**
+   *Problem:* hentingen går bare når noen gir instruksjonen for den, og 26.10 var den ikke gitt da målingen ble limt inn kl. 22:50. Målingen stoppet i steg 0, fordi kvoten sto på 2026-10-25 og `data/raa/` ikke hadde noen fil for 26.10. Instruksjonene for hentingen har grensen kl. 23:30, og en kveld uten henting blir en vurdering som mangler for alltid (AD-7).
+   *Løsning:* instruksjonen for hentingen kom kl. 22:54, og hentingen gikk kl. 22:56, 34 minutter før grensen. Målingen kom etterpå, kl. 23:05. Kl. 22:58 avgjorde vi at hentingen blir en jobb i Oppgaveplanlegging. 2.3d ble flettet 28.10 i `817b331` (PR #104), og jobben går første gang torsdag 29.10.
+   *KI sin rolle:* rådet i chatten hadde ikke skrevet instruksjonen for hentingen og trodde den gikk av seg selv. Det står i instruksjonen 28.10 kl. 21:15, ikke ellers i repoet. Claude Code fant i steg 0 at hentingen ikke var gjort, og stoppet uten å bruke kallene. Gruppen ga instruksjonen for hentingen og avgjorde jobben.
+
+2. **En instruksjon som ville stått mot teksten til faglærer.**
+   *Problem:* instruksjonen kl. 21:10 skulle føre svaret kl. 19:14 og gi `CLAUDE.md` en linje om at skillen `sesjonslogg` ikke kjøres. Men `git pull --ff-only` i steg 0 hentet `5ba12b9`, der faglærer etter svaret hadde skrevet skillen om og lagt «## Sesjonslogg» nederst i `CLAUDE.md`. Linjen ville stått mot den nye delen, og skillen nevnte ikke lenger `book`, som svaret bygget på.
+   *Løsning:* ingenting ble skrevet. Svarene kl. 19:14 og 21:09 ble ført 27.10 i `67e34dda`, og skillen brukes. De to instruksjonene som stoppet i steg 0, kl. 21:10 og 22:50, ble ikke lagret før de stoppet. De ble ført i ettertid kl. 23:03 etter svaret kl. 23:02 (`55b8560`).
+   *KI sin rolle:* rådet i chatten skrev instruksjonen ut fra svaret kl. 19:14, uten `5ba12b9`. Claude Code fant commiten i steg 0, så at punkt b ikke stemte lenger (regel 3), og stoppet. Den lagret ikke instruksjonene før den stoppet, mot regel 18. Gruppen avgjorde at skillen brukes.
+
+3. **Tester som sto mot en ny avgjørelse.**
+   *Problem:* kl. 01:59 feilet to tester i hele settet for 8.6b. Den ene krevde søylene på børsometeret, som avgjørelsen 24.10 kl. 11:54 tar ut. Den andre delte velgerne i `stil.css` på komma, så de nye reglene feilet. Om morgenen ga punkt c 9 punkter under «Ferdig», mot høyst 8 i testen fra 16.10.
+   *Løsning:* instruksjonen kl. 08:46 rettet testene (`706c6c5`), og svaret kl. 09:04 ga ett punkt med 20 ord (`7dd0ccb`). Hele settet ga 0 feilet før PR #99 ble flettet.
+   *KI sin rolle:* rådet i chatten skrev instruksjonene. Claude Code fant feilene i hele settet og stoppet, som instruksjonen sa, i stedet for å rette testene selv. Gruppen svarte kl. 08:43 og 09:04.
+
+Det vi lærte: det som skal skje hver kveld, bør ikke hvile på at noen husker det. Hentingen 26.10 gikk 34 minutter før grensen, og derfor ble 2.3d bygget. En instruksjon som bygger på et svar, kan være gammel når den limes inn. `git pull` i steg 0 fant `5ba12b9`, og regel 3 stoppet linjen. En instruksjon lagres før den stopper, også når den stopper i steg 0. Og en PR som stopper før flettingen, er ikke tapt tid: 8.6b stoppet to ganger og ble flettet samme dag etter svarene våre.
+
+---
+
+## 27.10.2026 – Sesjonsloggen som stoppet, hentingen kl. 22:00, og 4 kall som ikke ble brukt
+
+*Joakim og Marian.*
+
+Kl. 06:09 kom instruksjonen om å ta i bruk sesjonsloggen fra faglærer. Svarene 26.10 kl. 19:14 og 21:09 ble ført i dagsfila (`67e34dda`), men arbeidet stoppet i steg 2 kl. 06:13 (`fa9cea29`), fordi to tester sto mot rekkefølgen, se utfordring 1. Kl. 06:31 svarte vi at punktet om `.logs/` i README-en og de første loggfilene kommer i samme commit denne ene gangen. Kl. 06:09 svarte vi også på funnene i 3.5g: en kort linje for Linux under stegene, at hver henvisning til et steg under «Står du fast?» sier hvilken vei den gjelder, at radene D1–D6 i §9 i kvalitetssikringen følger stegene, og at 3.5g flettes når alt er grønt. Ingen av svarene ble ført 27.10, se utfordring 3. Mellom kl. 06:13 og 21:40 ble det ikke committet noe.
+
+Instruksjonen for hentingen kom kl. 21:28 og ventet til 21:40, som steg 0 sier (`afcf5020`). Hentingen gikk kl. 22:00:13–22:00:46 med kode 0 og 16 kall, den andre med prompten versjon 3. Alle 15 KI-tekstene besto kontrollen, og NHY, TEL, GJF og DNO ga utslag på interesse. En andre kjøring brukte 0 kall (`b17bda66`).
+
+Etter hentingen var det 4 kall igjen, og Utført-linja sa at de venter på en egen instruksjon. Den kom ikke, og kvotesjekken 28.10 kl. 07:24 viste 16 kall brukt 27.10. Føringen 28.10 sier at de skulle måle de 4 neste på lista etter HAV. Av svaret kl. 20:58: jobben for hentingen ble ikke bygget 27.10, som avgjort kl. 22:58 dagen før. Den bygges 28.10 og går første gang torsdag 29.10. Onsdag hentes det med instruksjonen som vanlig, fordi det som går hver kveld, ikke endres samme dag. Svarene ble ført 28.10 (`0d5e9228`), og 2.3d ble flettet 28.10 kl. 11:40 i `817b331` (PR #104).
+
+**Utfordringer**
+
+1. **To tester som sto mot rekkefølgen i instruksjonen.**
+   *Problem:* steg 2 skulle lenke `.logs/` i «Mappestruktur», og steg 3 skulle så committe bare loggfilene, som skillen sier. `test_mappestrukturen_lenker_til_stier_i_repoet` i `tests/test_docker.py` krever at hver sti i «Mappestruktur» er en lenke til noe som finnes og er sporet, så lenken feiler før mappa finnes. `test_mappestrukturen_forklarer_alt_i_rota` krever at hver sporet mappe i rota er lenket der, så loggcommiten feiler før `.logs/` er lenket. Én av commitene ville feilet uansett rekkefølge.
+   *Løsning:* Claude Code stoppet kl. 06:13, uten commit i steg 2 og uten loggfil. Svaret kl. 06:31: README-en og de første loggfilene i samme commit denne ene gangen, fordi teksten til faglærer i `CLAUDE.md` sier at gruppens regler for commit går foran skillen. Det ble gjort 28.10 i `bf2707c2`, og regel 24 kom i `ae5b3308`.
+   *KI sin rolle:* rådet i chatten skrev instruksjonen med rekkefølgen. Claude Code fant at testene sto mot den, og stoppet i stedet for å velge en rekkefølge selv. Gruppen avgjorde kl. 06:31.
+
+2. **Arbeid som venter på en instruksjon.**
+   *Problem:* 2.3d skulle bygges 27.10, etter svaret 26.10 kl. 22:58, men det ble ikke committet noe mellom kl. 06:13 og 21:40, og jobben ble ikke bygget. De 4 kallene som var igjen etter hentingen, ventet på en instruksjon som ikke kom. Ubrukte kall forsvinner ved midnatt GMT, kl. 01:00 hos oss (regel 15), så de gikk tapt.
+   *Løsning:* svaret kl. 20:58: jobben bygges 28.10 og går første gang torsdag 29.10, og onsdag hentes det med instruksjonen. 2.3d ble flettet 28.10 i `817b331`. Jobben gjelder hentingen, ikke målingene med kallene som er igjen, så de trenger fortsatt en instruksjon.
+   *KI sin rolle:* Claude Code bruker ingen kall og bygger ingenting uten avtale (regel 6 og 9), så både kallene og 2.3d ventet. Den skrev i Utført-linja kl. 22:01 at de 4 kallene venter på en egen instruksjon. Ingen instruksjon for dem ble skrevet 27.10. Gruppen avgjorde kl. 20:58 når jobben bygges.
+
+3. **Svar som ikke ble ført samme dag.**
+   *Problem:* svarene 26.10 kl. 22:58 og 27.10 kl. 06:09, 06:31 og 20:58 sto ikke i repoet 27.10, bare i chatten. Utført-linja 28.10 kl. 07:30 sier at svarene kl. 22:58, 06:31 og 20:58 ikke står i repoet utenom instruksjonen. Føringen 28.10 sier at det var svaret kl. 20:58 som sa at de 4 kallene ikke ble brukt. Men de 4 kallene var først igjen etter hentingen kl. 22:00–22:01, og dagskvoten gikk ut kl. 01:00. Hvilket klokkeslett den delen av svaret har, står åpent.
+   *Løsning:* svarene kl. 22:58, 06:31 og 20:58 ble ført 28.10 kl. 07:26 i `0d5e9228`, og svaret kl. 06:09 kl. 19:24 i `6537872`, i første steg av instruksjonene som brukte dem.
+   *KI sin rolle:* rådet i chatten skrev svarene inn i instruksjonene. Claude Code førte dem i første steg og skrev i Utført-linja at de bare sto i instruksjonen. Spriket i klokkeslettet fant Claude Code da denne oppføringen ble skrevet. Gruppen svarte.
+
+Det vi lærte: en instruksjon sjekkes mot testene før den sendes. To tester som alt fantes, stoppet rekkefølgen kl. 06:13, og 26.10 gjaldt det samme 8.6b. En avgjørelse føres i repoet før den siteres. Ellers blir både klokkeslettet og innholdet usikkert, som for svaret kl. 20:58. Og det som venter på en instruksjon, går tapt når instruksjonen ikke kommer. Kvoten nullstilles kl. 01:00, og 4 kall forsvant. Hentingen hver kveld har nå en jobb, men målingene med kallene som er igjen, har det ikke.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
