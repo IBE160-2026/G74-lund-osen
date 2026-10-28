@@ -1,5 +1,10 @@
 # Åpne punkter
 
+- [ ] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d BH6: en henting for hånd samtidig med jobben er ikke sperret (spørsmål til gruppen før flettingen)
+- [ ] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d ECH5: jobben overstyrer OSE_KI_TJENESTE i .env (spørsmål til gruppen før flettingen)
+- [ ] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d: FR-401 i prd.md er ikke endret etter beslutningen 29.09 (gruppen avgjør)
+- [ ] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d: arbeidskopien, lenkene og jobben på PC-en etter flettingen, med Prøve 4 før kl. 22 og 0 kall
+- [ ] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d VG4, BH7, BH9/ECH8, BH15/VG7 og BH16 (low) under «Åpent» i spesifikasjonen
 - [ ] 2026-10-28 [sesjonsloggen-tas-i-bruk](999-2026-10-28-07-29-09-sesjonsloggen-tas-i-bruk.md) — jobben i Oppgaveplanlegging bygges 28.10 og går første gang torsdag 29.10 (svaret 27.10 kl. 20:58)
 - [ ] 2026-10-27 [sesjonsloggen-tas-i-bruk](999-2026-10-28-07-29-09-sesjonsloggen-tas-i-bruk.md) — 3.5g (PR #103): BH3, en synlig linje til Docker og uv, og ECH7, «steg 4» i svarene under «Står du fast?», venter på gruppen; flettingen er ikke avgjort
 - [ ] 2026-10-26 [sesjonsloggen-tas-i-bruk](999-2026-10-28-07-29-09-sesjonsloggen-tas-i-bruk.md) — 3.5f BH15: prøven av hovedveien (D1) etter flettingen
