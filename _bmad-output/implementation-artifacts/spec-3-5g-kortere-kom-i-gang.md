@@ -60,6 +60,14 @@ context:
 
 Avtrykkene i `AVTRYKK_I_KOM_I_GANG` er sha256 av innholdet i hver pil på grenen. Med et skript utenfor repoet ble de sammenlignet med sha256 av de samme delene i `git show 54d4714:README.md` (linje 51, 55–77, 81–102, 172–213 og 247–289). «Du trenger», «Med Docker Desktop», «Uten Docker, med uv», «Slik virker dobbeltklikket» og «Står du fast?» var like på `e450ff9`. Etter gjennomgangen er «Med Docker Desktop» skrevet om i én setning (BH2), og de fire andre er fortsatt like.
 
+## Tabellen øverst (e)
+
+*Avgjort 2026-10-28 kl. 11:19 og 11:23 (gruppens svar, under story 3.5 i `epics.md`):* veiene står hver for seg, som i 3.5g, men tabellen «Demoen og den ekte versjonen» står uten pil under «Innhold», før «Til faglærer», så de to versjonene og hva som er laget, synes med en gang. Kl. 11:19 sto den etter stegene; svaret kl. 11:23 gjelder. «Til faglærer» kortes ned i en egen endring etter 3.5g (f), og er ikke rørt her.
+
+- **Det som er gjort:** tabellen er flyttet byte for byte ut av pila «Demoen og den ekte versjonen» og står mellom «Innhold» og «Til faglærer», med ankeret `demoen-og-den-ekte-versjonen` og linja «**Demoen og den ekte versjonen:**» over. Pila beholder navnet, avsnittet om de to versjonene og «Velg vei etter hva du har», så veiene står i pila som før. «Velg versjon» i pila til Docker lenker til tabellen øverst i stedet for å vise til pila. `docs/hjelp.md` nevner ikke tabellen, så den er ikke endret.
+- **Ord før «Kom i gang»,** telt med `\w+` som i kontrollene av briefen, fra toppen til ankeret `kom-i-gang`: 224 synlige før e (på `c8196b9`, og det samme på `cc7f587`) og 302 etter, uten innholdet i pila med bildene, adressene i lenkene og HTML-taggene. I kilden 423 før og 509 etter.
+- **Testene:** `test_tabellen_staar_uten_pil_foer_til_faglaerer` med «Ville feilet hvis», og testene som leste tabellen i pila, leser den øverst (`_tabellen`). Avtrykkene for «Demoen og den ekte versjonen» og «Med Docker Desktop» er satt på nytt.
+
 ## Gjennomgangen
 
 Kommer etter hele settet.

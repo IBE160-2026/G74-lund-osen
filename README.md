@@ -19,6 +19,16 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 
 **Innhold:** [Kom i gang](#kom-i-gang) · [Status](#status) · [Tester](#tester) · [Dokumentene](#dokumentene) · [Mappestruktur](#mappestruktur) · [Medlemmer](#medlemmer)
 
+<a name="demoen-og-den-ekte-versjonen"></a>
+
+**Demoen og den ekte versjonen:**
+
+| | Demoen | Den ekte versjonen |
+|---|---|---|
+| Kurser | Oppdiktede selskaper og kurser («Eksempeltall») | Ekte sluttkurser fra Oslo Børs, hentet fra EODHD hver børsdag. Dagens vurdering lagres per aksje |
+| Trenger | Ingen konto og ingen nøkkel | En gratis nøkkel fra EODHD |
+| Klar | Med en gang | Etter første henting, når som helst. Før kl. 22 på en børsdag gir den forrige børsdag. Hentingen etter kl. 22 samme dag trenger bonuskvote hos EODHD; uten den får den dagen aldri signal |
+
 Til faglærer:
 - Se appen med oppdiktede tall, uten konto og nøkkel, med et dobbeltklikk på «Start demoen»: [Enklest: dobbeltklikk](#enklest-dobbeltklikk-uten-docker)
 - Eller med Docker Desktop, etter [steg 1–4](#med-docker-desktop): [demoen](#demoen)
@@ -56,12 +66,6 @@ Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og v
 <summary>Demoen og den ekte versjonen</summary>
 
 Den ekte versjonen er for å prøve løsningen med kurser fra EODHD. Begge versjonene har samme kode. Den ekte versjonen henter dagens kurser først etter kl. 22 på en børsdag. Første gang før kl. 22 henter den forrige børsdag, så du ser kursene og signalet med en gang. Demoen står først i stegene for Docker og uv, fordi den er raskest.
-
-| | Demoen | Den ekte versjonen |
-|---|---|---|
-| Kurser | Oppdiktede selskaper og kurser («Eksempeltall») | Ekte sluttkurser fra Oslo Børs, hentet fra EODHD hver børsdag. Dagens vurdering lagres per aksje |
-| Trenger | Ingen konto og ingen nøkkel | En gratis nøkkel fra EODHD |
-| Klar | Med en gang | Etter første henting, når som helst. Før kl. 22 på en børsdag gir den forrige børsdag. Hentingen etter kl. 22 samme dag trenger bonuskvote hos EODHD; uten den får den dagen aldri signal |
 
 **Velg vei etter hva du har:**
 
@@ -102,7 +106,7 @@ Den ekte versjonen er for å prøve løsningen med kurser fra EODHD. Begge versj
 
 **Slik limer du inn en kommando.** Kopier kommandoen med ikonet til høyre i den grå boksen. Ikonet, som stegene kaller knappen, synes først når musa er over boksen. Du kan også markere den og trykke Ctrl+C eller Cmd+C, eller skrive den inn. Lim den inn i PowerShell-vinduet fra steg 4 (Terminal på Mac) med Ctrl+V eller Cmd+V, og trykk Enter.
 
-**Velg versjon.** Klikk på pila for den versjonen du vil prøve. Tabellen i pila «Demoen og den ekte versjonen» viser forskjellen.
+**Velg versjon.** Klikk på pila for den versjonen du vil prøve. [Tabellen «Demoen og den ekte versjonen»](#demoen-og-den-ekte-versjonen) øverst viser forskjellen.
 
 </details>
 

@@ -617,7 +617,9 @@ class TestReadme:
         README-en sa at første henting på dagtid gir dagens kurs, eller at
         man må vente til kvelden."""
         # Story 3.5g: tabellen staar i pila «Demoen og den ekte versjonen».
-        topp = _seksjon("Demoen og den ekte versjonen")
+        # Gruppens svar 28.10 kl. 11:19 og 11:23 (e): tabellen staar oeverst,
+        # og avsnittet i pila.
+        topp = _seksjon("Demoen og den ekte versjonen") + _tabellen()
         assert "Første gang før kl. 22 henter den forrige børsdag, så du ser kursene og signalet med en gang." in topp
         assert "er demoen veien for å se appen med en gang" not in topp
         klar = [l for l in topp.splitlines() if l.startswith("| Klar |")]
@@ -1582,6 +1584,19 @@ PILENE_I_KOM_I_GANG = (
 )
 
 
+# Gruppens svar 28.10 kl. 11:19 og 11:23 (e): tabellen «Demoen og den ekte
+# versjonen» staar uten pil under «Innhold», foer «Til faglærer».
+TABELLEN = '<a name="demoen-og-den-ekte-versjonen"></a>\n\n**Demoen og den ekte versjonen:**\n\n'
+
+
+def _tabellen() -> str:
+    """Tabellen «Demoen og den ekte versjonen» oeverst i README-en, med
+    ankeret og linja over, til «Til faglærer»."""
+    tekst = README.read_text(encoding="utf-8")
+    assert tekst.count(TABELLEN) == 1, "tabellen mangler eller staar to ganger"
+    return tekst.split(TABELLEN, 1)[1].split("\n\nTil faglærer:\n", 1)[0]
+
+
 def _seksjon(navn: str) -> str:
     """Delen under «### navn» i «Kom i gang», til neste ### eller «Velg vei».
     Fra 3.3h er demoen og den ekte versjonen innholdet i pila. Fra 3.5g er
@@ -1834,7 +1849,8 @@ class TestReadmeForNybegynnere:
         # Story 3.5g: tabellen staar i pila «Demoen og den ekte versjonen», og
         # anbefalingen er den foerste setningen i «Kom i gang».
         topp = _kom_i_gang().split('<summary><a name="med-docker-desktop"></a>', 1)[0]
-        hode = [l for l in _seksjon("Demoen og den ekte versjonen").splitlines() if l.startswith("|")][0]
+        # Svarene 28.10 kl. 11:19 og 11:23 (e): tabellen staar oeverst.
+        hode = [l for l in _tabellen().splitlines() if l.startswith("|")][0]
         assert "Den ekte versjonen" in hode and "| Demoen |" in hode
         # Story 3.3c: demoen i første kolonne, som i stegene.
         assert hode == "| | Demoen | Den ekte versjonen |", hode
@@ -2425,11 +2441,17 @@ class TestReadmeForNybegynnere:
         # beskrivelsen, og «Til faglærer» er igjen siste avsnitt.
         assert avsnitt[-1].startswith("Til faglærer:"), avsnitt[-1]
         assert SKJERMBILDET not in avsnitt[-1]
+        # Gruppens svar 28.10 kl. 11:19 og 11:23 (e): tabellen «Demoen og den
+        # ekte versjonen» står mellom «Innhold» og «Til faglærer», med
+        # ankeret og linja over.
+        assert avsnitt[-2].startswith("| | Demoen | Den ekte versjonen |"), avsnitt[-2]
+        assert avsnitt[-3] == "**Demoen og den ekte versjonen:**", avsnitt[-3]
+        assert avsnitt[-4] == '<a name="demoen-og-den-ekte-versjonen"></a>', avsnitt[-4]
         # Story 3.3d, punkt f: «Innhold» står rett under beskrivelsen, og fra
         # 3.3f rett under knappen.
-        assert avsnitt[-2].startswith("**Innhold:** "), avsnitt[-2]
-        assert avsnitt[-3] == "<details>", avsnitt[-3]
-        assert avsnitt[-4].startswith("OSE Signal viser"), avsnitt[-4]
+        assert avsnitt[-5].startswith("**Innhold:** "), avsnitt[-5]
+        assert avsnitt[-6] == "<details>", avsnitt[-6]
+        assert avsnitt[-7].startswith("OSE Signal viser"), avsnitt[-7]
         assert "\n## " not in topp
 
     def test_status_uten_storynumre_og_uten_kommando(self):
@@ -3120,11 +3142,14 @@ AVTRYKK_I_PILENE = {
 # Var 386c91b5... og dc27ef47.... Pilene til demoen og den ekte versjonen
 # har sine avtrykk i AVTRYKK_I_PILENE, uendret. Gruppens svar 27.10 kl.
 # 06:09, b (ECH7): hver henvisning til et steg i «Står du fast?» sier at den
-# gjelder Docker, som «steg 4 med Docker». Var 26143167....
+# gjelder Docker, som «steg 4 med Docker». Var 26143167.... Svarene 28.10
+# kl. 11:19 og 11:23 (e): tabellen er tatt ut av pila «Demoen og den ekte
+# versjonen» og står øverst, og pila til Docker lenker dit. Var d9bc0617...
+# og 44485fc5....
 AVTRYKK_I_KOM_I_GANG = {
-    "Demoen og den ekte versjonen": "d9bc06178554d5dc78c83dff1b57bb3d9039d05e80335346cec94f87303d47fe",
+    "Demoen og den ekte versjonen": "aa69940997c10246503b38bad1da10dc53afea965745fefbd33e75eaea4e23b4",
     "Du trenger": "edb9feeacf0f246bf416ab859f08e196d6ec92a0a44e8da9e371325c9680917b",
-    "Med Docker Desktop": "44485fc5b1ea920e546d3e47180dabeec4b8f8da28f72cf1f54158161ab40b06",
+    "Med Docker Desktop": "bed9f253f46f680c10ff969a60a0e2ce0508da9bcec668598c343994331c3453",
     "Uten Docker, med uv": "2efeb5262b38f15a7fa04bc9715e149cbd053c7c45c193c9e0c048bab02dfc13",
     "Slik virker dobbeltklikket": "9066cc123fbc8efda0833fefdadec7f4f6fe039909f3bfaa498db2748b022d80",
     "Står du fast?": "c75b3ea0c4d84655d313b1002cf5845f2321e140fd737a8ac9df20d0de68c2ea",
@@ -3189,9 +3214,10 @@ class TestReadmeBakPiler:
         # «Velg vei» står rett etter de felles stegene og sier hvor forskjellen står.
         # Story 3.5g: i pila til Docker, ikke synlig.
         # Gjennomgangen av 3.5g (BH2, ECH6, VG4): tabellen står i en annen pil.
+        # Svarene 28.10 kl. 11:19 og 11:23 (e): tabellen står øverst.
         velg = (
-            f"{VELG_VEI} Klikk på pila for den versjonen du vil prøve. Tabellen i pila «Demoen og den ekte "
-            "versjonen» viser forskjellen."
+            f"{VELG_VEI} Klikk på pila for den versjonen du vil prøve. [Tabellen «Demoen og den ekte "
+            "versjonen»](#demoen-og-den-ekte-versjonen) øverst viser forskjellen."
         )
         assert velg in dict(_pilene(_kom_i_gang()))["Med Docker Desktop"] and velg not in synlig
 
@@ -3531,6 +3557,29 @@ class TestHovedveien:
         assert [s for s, _ in _pilene(del_)][: len(PILENE_I_KOM_I_GANG)] == list(PILENE_I_KOM_I_GANG)
         assert not any("dobbeltklikk" in s.lower() for s in _detaljer(_seksjon("Mer for den som vil")))
 
+    def test_tabellen_staar_uten_pil_foer_til_faglaerer(self):
+        """Gruppens svar 28.10 kl. 11:19 og 11:23 (e): veiene står hver for
+        seg, som i 3.5g, men tabellen «Demoen og den ekte versjonen» står
+        uten pil under «Innhold», før «Til faglærer», så de to versjonene og
+        hva som er laget, synes med en gang. Svaret kl. 11:23 gjelder, ikke
+        «etter stegene» kl. 11:19. Ville feilet hvis tabellen sto bak en pil,
+        sto etter «Til faglærer» eller etter stegene, sto to ganger, manglet
+        en rad, eller hvis lenken fra pila til Docker ikke gikk til den."""
+        tekst = README.read_text(encoding="utf-8")
+        tabellen = _tabellen()
+        rader = [l.split(" | ", 1)[0] for l in tabellen.splitlines() if l.startswith("| ")]
+        assert rader == ["|", "| Kurser", "| Trenger", "| Klar"], rader
+        assert tabellen.splitlines()[0] == "| | Demoen | Den ekte versjonen |"
+        synlig = _utenfor_pilene(tekst)
+        assert TABELLEN + tabellen in synlig
+        i = tekst.index(TABELLEN)
+        assert tekst.index("**Innhold:**") < i < tekst.index("\nTil faglærer:\n") < tekst.index("\n## Kom i gang")
+        assert tekst.count("| | Demoen | Den ekte versjonen |") == 1
+        assert not any("| Klar |" in innhold for _, innhold in _pilene(_kom_i_gang()))
+        lenke = "](#demoen-og-den-ekte-versjonen)"
+        assert lenke in dict(_pilene(_kom_i_gang()))["Med Docker Desktop"]
+        assert tekst.count('<a name="demoen-og-den-ekte-versjonen"></a>') == 1
+
     def test_hvert_steg_under_staar_du_fast_sier_hvilken_vei(self):
         """Gruppens svar 27.10 kl. 06:09, b (ECH7 i triagen til 3.5g): hver
         henvisning til et steg under «Står du fast?» sier hvilken vei den
@@ -3636,9 +3685,11 @@ class TestHovedveien:
         annen rekkefølge, eller en lenke gikk til et anker som ikke finnes
         eller finnes to ganger."""
         # Story 3.5g: lista står under tabellen i pila «Demoen og den ekte
-        # versjonen», og «Du trenger» i pila etter.
+        # versjonen», og «Du trenger» i pila etter. Svarene 28.10 kl. 11:19
+        # og 11:23 (e): tabellen står øverst, og lista står i pila.
         topp = _seksjon("Demoen og den ekte versjonen")
-        assert topp.index("| Klar |") < topp.index("**Velg vei etter hva du har:**")
+        assert "| Klar |" not in topp and "**Velg vei etter hva du har:**" in topp
+        assert "| Klar |" in _tabellen()
         assert _seksjon("Du trenger").startswith("**Du trenger**")
         punkter = _velg_vei()
         assert [t for t, _, _ in punkter] == [DOBBELTKLIKK_LENKE, "Med Docker Desktop", "Uten Docker, med uv"]
@@ -3708,8 +3759,9 @@ class TestHovedveien:
         """Ville feilet hvis raden «Trenger» eller «Du trenger» sa at Docker
         trengs, eller hvis «Du trenger» ikke sa at Docker trengs bare for
         Docker-veien."""
-        # Story 3.5g: tabellen og «Du trenger» står i hver sin pil.
-        topp = _seksjon("Demoen og den ekte versjonen")
+        # Story 3.5g: tabellen og «Du trenger» står i hver sin pil. Svarene
+        # 28.10 kl. 11:19 og 11:23 (e): tabellen står øverst, uten pil.
+        topp = _tabellen()
         trenger = [l for l in topp.splitlines() if l.startswith("| Trenger |")]
         assert trenger == ["| Trenger | Ingen konto og ingen nøkkel | En gratis nøkkel fra EODHD |"], trenger
         du_trenger = [a for a in _seksjon("Du trenger").split("\n\n") if a.startswith("**Du trenger**")][0]
