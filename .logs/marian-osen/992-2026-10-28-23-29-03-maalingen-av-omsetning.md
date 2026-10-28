@@ -32,3 +32,37 @@ Instruksjonen kl. 22:38: bygge story 2.13 i natt etter gruppens svar kl. 22:17. 
 - Hvordan målingene fra tabellen føres i `malinger.md` (forslag: en ny § én gang i uka).
 - Flett ikke mens jobben går, kl. 22:15–23:45 (ECH5).
 - Testen for hele jobben på Windows kan feile i CI når Docker svarer innen ett sekund (40777327364).
+
+## 2026-10-29 kl. 00:16 — Marian Osen
+
+### Oppgave
+Instruksjonen 28.10 kl. 23:41: 2.13 videre etter gruppens svar 28.10 kl. 23:19, 23:22 og 23:36 om PR #105, og CI-feilen på Windows. Arbeidet stopper alltid før flettingen, og PR #105 står som utkast.
+
+### Plan
+- Steg 0–1: kvotesjekken, instruksjonen i dagsfila og de tre svarene under story 2.13 på main.
+- Steg 2: main flettet inn i grenen i en ny worktree, så én commit per punkt a–d, og mutanten for grensen kl. 23:45.
+- Steg 3: hele settet alene, gjennomgangen med tre lesere av endringene etter `e6287bf`, triagen, rettingene og CI.
+
+### Resultat
+- **Kvoten** kl. 23:41: 20 av 20 brukt 28.10 i GMT, `extraLimit` 463. Ingen andre kall.
+- **Main:** instruksjonen i `16c5d3ca`, og svarene kl. 23:19, 23:22 og 23:36 under 2.13 i `c2035716`.
+- **Grenen**, PR #105 (utkast), head `08abdaba`:
+  - Main flettet inn i `cd1e64d2`.
+  - a) `f58cf7b3`: fra kl. 23:45 i Oslo stopper ikke en manglende kurs målingen, og utskriften sier hvor mange av de 15 som mangler (`TestKl2345`).
+  - b) `441b922c`: en falsk docker først i PATH i testene for jobben. CI-feilen i 40777327364 og på main i 40770982416 (`1721d9f`, bare dokumenter) hadde samme årsak: runneren hadde en docker på PATH som svarte innen fristen på 1 s, så skriptet startet og stoppet Ollama.
+  - c) `8c336afe`: `TestSvarene2319` og daterte linjer i triagen og «Åpent».
+  - d) `e744f875`: README-en, hjelpen og en datert linje under FR-413.
+  - Rettingene etter gjennomgangen i `06403784`, og triagen og mutanten i spesifikasjonen i `08abdaba`.
+- **Minnet:** 4,2 GB ledig av 15,7 GB.
+- **Hele settet:** 3867 bestått, 24 hoppet over og 0 feilet (23:50:30–23:59:07). Etter rettingene: 3867 bestått, 24 hoppet over og 0 feilet (00:04:10–00:12:08).
+- **Mutanten** (grensen kl. 23:45 tatt ut) ble fanget begge gangene av `test_gaar_fra_23_45_naar_en_kurs_mangler`, og fila var lik HEAD etterpå.
+- **Gjennomgangen:** BH 10, ECH 9 og VG 6 funn, ingen med dom high. Rettet: VG1 (medium) og 7 med dom low. To med dom medium er ikke rettet og går til gruppen.
+- **CI:** grønn på `e744f87` (40784071691) og på head-en `08abdab` (40785774200).
+- Worktreen er fjernet. `data/db/ose.db` og `.env` er ikke rørt, utenom lesingen av nøkkelen til kvotesjekken.
+- Lukket i `issues.md`: de 4 punktene fra 28.10 om PR #105.
+
+### Åpne punkter
+- PR #105, spørsmål til gruppen: fra 23:45 går målingen også når alle 15 mangler kursen (BH2, VG2, ECH3, ECH2, dom medium).
+- PR #105, spørsmål til gruppen: starter målingen i kjøringen kl. 23:45 etter midnatt i Oslo, venter den (ECH1, BH3, dom medium).
+- 2.13 flettes torsdag 29.10 kl. 23:50, og ikke etter 23:59 (svaret kl. 23:22). Kallene som er igjen, brukes av målingen for hånd rett etter, før midnatt (svaret kl. 23:36).
+- Målingene fra tabellen føres i `malinger.md` som en ny § hver søndag, første gang søndag 01.11 (svaret kl. 23:36, g).
