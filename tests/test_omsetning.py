@@ -267,6 +267,45 @@ class TestHentingenFoerst:
         assert not lagring_sqlite.BASE_STI.exists()
 
 
+class TestSvarene2319:
+    """Avgjoerelsen 28.10 kl. 23:19, a) og b)."""
+
+    def test_gaarsdagens_dato_foer_foerste_kall_er_0_brukt_i_dag(self, tmp_path):
+        """Ville feilet hvis gaarsdagens dato foer foerste kall stoppet
+        maalingen, eller kallene fra i gaar ble trukket fra dagens: kvoten
+        staar paa 27.10 med 20 brukt til foerste kall, og alle 6 maales."""
+        _fyll(date(2026, 10, 28))
+        kvote = Kvote(brukt=20, dato=date(2026, 10, 27))
+        ekte_hent = kvote.hent
+
+        def hent(*argumenter):
+            if kvote.dato != date(2026, 10, 28):
+                kvote.dato, kvote.brukt = date(2026, 10, 28), 0
+            return ekte_hent(*argumenter)
+
+        kvote.hent = hent
+        kode, ut = _kjoer(tmp_path, kvote)
+        assert kode == 0, ut
+        assert kvote.kall == [f"{kode}.OL" for kode in NYE]
+        assert (kvote.brukt, kvote.bonus) == (6, 463)
+
+    def test_vinduet_staar_ved_hvert_tall(self, tmp_path):
+        """Ville feilet hvis vinduet ikke var tre maaneder bakover fra
+        boersdagen, eller ikke sto ved hvert tall: maalingen tirsdag og
+        onsdag gir hver sin fra og til i radene."""
+        _fyll(date(2026, 10, 27))
+        _kjoer(tmp_path, Kvote(brukt=18, dato=date(2026, 10, 27)), klokke=ONSDAG - timedelta(days=1))
+        _fyll(date(2026, 10, 28))
+        _kjoer(tmp_path, Kvote(brukt=18), klokke=ONSDAG)
+        radene = [(rad[0], rad[2], rad[3]) for rad in _radene()]
+        assert radene == [
+            ("NYA", "2026-07-27", "2026-10-27"),
+            ("NYB", "2026-07-27", "2026-10-27"),
+            ("NYC", "2026-07-28", "2026-10-28"),
+            ("NYD", "2026-07-28", "2026-10-28"),
+        ]
+
+
 class TestKl2345:
     """Avgjoerelsen 28.10 kl. 23:19, d): mangler en av de 15 kursen, gaar
     maalingen kl. 23:45 med kallene som er igjen etter nye forsoek."""
