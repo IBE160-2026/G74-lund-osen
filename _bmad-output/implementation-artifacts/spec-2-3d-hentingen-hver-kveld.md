@@ -2,7 +2,7 @@
 title: 'Story 2.3d: hentingen går av seg selv hver kveld'
 type: 'feature'
 created: '2026-10-28'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '85998f6'

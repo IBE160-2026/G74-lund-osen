@@ -1657,6 +1657,8 @@ Som **gruppe som henter for hånd hver kveld**, vil vi at hentingen går av seg 
 
 *Avgjort 2026-10-28 kl. 11:34 (gruppens svar):* BH6: ingen lås nå. Vi henter ikke for hånd mens jobben går, og fra 29.10 hentes det for hånd bare når loggen viser at jobben feilet. ECH5: jobben bruker alltid den lokale modellen, som instruksjonene for hentingen, så KI-tekstene i `ki_logg` kommer fra samme modell hver dag. FR-401 får en datert linje etter flettingen.
 
+*Ferdig 2026-10-28:* squash-flettet i `817b331`, PR #104, låst til head-en `ad8ec4a` (spesifikasjonen `spec-2-3d-hentingen-hver-kveld.md`). Hele settet på `c852bbd`: 3806 bestått og 24 hoppet over, og CI var grønn på head-en (40673689106), med testene for kveldshentingen på `windows-latest`. Mutanten, `origin/main` i stedet for commiten fra midnatt, ble fanget. Jobben legges inn på PC-en i samme instruksjon og går første gang torsdag 29.10.
+
 ### Story 2.4: Etterfylling av hull i kursserien
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.

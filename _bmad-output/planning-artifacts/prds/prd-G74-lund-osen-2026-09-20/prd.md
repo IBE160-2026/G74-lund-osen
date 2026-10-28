@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-24T20:10
+updated: 2026-10-28T11:41
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -780,6 +780,8 @@ helst, og etter 2.5 er en dag uten henting en vurdering som mangler for alltid
 *Lagt til 2026-10-20 kl. 15:12:* fra tirsdag 20.10 nekter tidskontrollen igjen før kl. 22:00 på en børsdag, så punkt 23 legger kjøringen til kl. 22:00–midnatt, som før 19.10. Det snur beslutningen 16.10 kl. 21:09, etter gruppens svar 19.10 kl. 22:19 under story 2.3: raden fra kl. 21 var ikke endelig for DNO (`malinger.md` §37), og en vurdering kan ikke skrives om (AD-7).
 
 *Lagt til 2026-10-24 (story 3.5a, gruppens svar 23.10 kl. 23:31):* regelen står. «Start den ekte versjonen» kjører hentekommandoen før webserveren, og dobbeltklikket er den bevisste handlingen. Webserveren henter aldri. Er det ingenting nytt å hente, gir dobbeltklikket 0 kall (FR-402): hentekommandoen stopper ved sjekken av basen, før første kall. I en mappe med `.git` starter ikke den ekte versjonen, så et dobbeltklikk i en klon aldri henter med gruppens nøkkel.
+
+*Lagt til 2026-10-28 (story 2.3d, flettet i `817b331`, gruppens svar kl. 11:34):* beslutningen 29.09 gjelder fra torsdag 29.10. Hentekommandoen startes av jobben «OSE Signal kveldshenting» i Oppgaveplanlegging på Marians PC, hver dag kl. 22:15 og igjen hver halvtime til 23:45, fra en egen arbeidskopi av main på commiten main hadde ved midnatt. Tapte kjøringer tas ikke igjen, og loggen er `data/logg/kveldshenting-<dato>.log`. Instruksjonen for hentingen brukes bare når loggen viser at jobben feilet. Webserveren henter fortsatt aldri. README-en, «Hentingen hver kveld», sier hvordan jobben legges inn og tas bort.
 
 #### FR-402 — Kontroll mot forventet børsdag, ikke mot klokkeslett
 
