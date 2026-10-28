@@ -1632,6 +1632,29 @@ Med 2.8 er det 4 kall igjen, ikke 5.
 
 *Ferdig 2026-10-12:* flettet i `c3d6660`, PR #28.
 
+### Story 2.3d: Hentingen går av seg selv hver kveld
+
+*Lagt til 2026-10-28, etter gruppens svar 26.10 kl. 22:58 og 27.10 kl. 20:58.*
+
+Som **gruppe som henter for hånd hver kveld**, vil vi at hentingen går av seg selv fra en jobb i Oppgaveplanlegging, så en kveld uten henting ikke blir en vurdering som mangler for alltid (AD-7).
+
+**Oppfyller:** FR-401 (beslutningen 29.09), FR-402, NFR-01, NFR-04 · **Begrenses av:** `AD-7`, `AD-10`, `AD-20`
+
+**Grunnlaget:**
+- Beslutningen 29.09 under FR-401 i `prd.md`: når 2.3 er bygget, kan hentekommandoen startes av en planlagt jobb i Oppgaveplanlegging på Marians PC. Tapte kjøringer tas ikke igjen, og utskriften går til en loggfil i `data/`.
+- Svar 2 og 3 under story 2.3 (05.10 kl. 19:17): jobben kjører hver dag kl. 22:15, ikke bare på hverdager, og fra en egen arbeidskopi av main som deler `data/` og `.env` med hovedkopien uten at nøkkelen kopieres.
+- Kontrollpunktet «Oppgaveplanlegging gjentar jobben hver halvtime fra 22:15 til 23:45», som ble flyttet ut av 2.3b til et eget steg. Det steget er denne storyen.
+- Avgjørelsene 26.10 kl. 22:58 og 27.10 kl. 20:58 i dagsfila 28.10 (`0d5e922`): jobben bygges 28.10 og går første gang torsdag 29.10.
+
+**Kontroll — hva testen ser etter:**
+- Jobben starter kl. 22:15 hver dag og igjen hver halvtime til 23:45. Ingen ny kjøring starter mens en går (ECH3), og tapte kjøringer tas ikke igjen
+- Jobben kjører fra en egen arbeidskopi av main, på commiten main hadde ved midnatt, så det som flettes en dag, ikke går samme kveld
+- Nøkkelen og miljøet skrives aldri ut, verken i loggen eller i utskriften
+- Svarer ikke Docker Desktop eller Ollama innen tidsgrensen, hentes det uten KI-tekst (NFR-04)
+- **Ville feilet hvis:** skriptene skrev ut nøkkelen eller miljøet, kjørte fra en gren eller fra hovedkopien, brukte en nyere commit enn den fra midnatt, eller hadde andre tider enn over
+
+**Avhenger av:** 2.3 og 2.3b. **Én økt:** ja. Bygges 28.10, og jobben legges inn på PC-en etter flettingen.
+
 ### Story 2.4: Etterfylling av hull i kursserien
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
