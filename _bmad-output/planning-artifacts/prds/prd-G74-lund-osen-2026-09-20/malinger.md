@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-26T23:09
+updated: 2026-10-28T22:18
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -5624,6 +5624,85 @@ som den uavrundede gir. Ingen av de 4 er blant de 15 eller i OBX.
   etter de 192 første fra §50, GOLDR og HAV.
 - **GYL**, 0,0 MNOK: etter PYRUM og foran BSP. Plass 209, og BSP står sist,
   på plass 210.
+
+Målingen endrer ikke universet. Parametrene i signalet er låst og målt på de
+15 (AD-13).
+
+## 52. Fire til fra lista over Oslo Børs med kallene som var igjen, og plassen deres blant 214 (2026-10-28)
+
+**Metode.** Som i §51: ett `/api/eod`-kall per symbol, med
+`from=2026-07-02` og `to=2026-10-02`, samme vindu. Omsetning regnes som
+`volume × close` per handelsdag, og medianen tas over perioden, som i §33.
+Kallene ble gjort med `hent_api_nokkel` og `hent_ett_symbol` importert fra
+`src/fetch_prices.py`, fra et skript utenfor repoet som leste kvoten
+(`hent_kvote`, gratis) før og etter hvert kall. Det skulle stoppe hvis
+`apiRequestsDate` ikke var 2026-10-28, hvis 20 kall var brukt 28.10 før et
+kall, eller hvis `extraLimit` endret seg, så verken bonuskvoten eller
+morgendagens kvote kunne brukes (NFR-01). `src/fetch_prices.py` ble ikke
+kjørt, og ingenting ble skrevet til basen (AD-7). Målingen ble kjørt onsdag
+28.10 kl. 22:17:26–22:17:36 norsk tid (UTC+1), 21:17 GMT, etter
+kveldshentingen, med de 4 kallene som var igjen i dagskvoten 28.10 i GMT.
+Gruppens svar 28.10 kl. 07:23 ga kallene (under story 2.12 i `epics.md`):
+hver børsdag går kallene som er igjen, til målingen, til lista er rangert.
+
+**Utvalget.** De 4 er de 4 neste med typen «Common Stock» i lista over
+aksjene på Oslo Børs fra §40 (`data/proever/symbolliste-OL-2026-10-22.json`),
+i rekkefølgen i svaret, som ikke står i rangeringen i §50 og §51, etter HAV
+(plass 108). Lista ble lest lokalt, uten nytt kall. Ingen «Common Stock» før
+HAV var urangert. De 4 er plass 109–113 i lista, de neste i alfabetet etter
+`Code`, ikke et utvalg etter størrelse. HELG (112) er «Common Stock» som alt
+er rangert, og ble hoppet over. Navnet står uten selskapsformen, som i §50.
+Etter de 4 er 83 «Common Stock» i lista ikke rangert. Resten av lista er ikke
+ført her.
+
+**Grunnen** er som i §42, §50 og §51: story 2.12, der brukeren velger egne
+aksjer bare fra lista (svaret 22.10 kl. 23:14), og 2.13, kommandoen som måler
+omsetning.
+
+**Kostnad.** 4 kall, tatt av dagskvoten 28.10. Før målingen sto
+`apiRequests` på 16 med `apiRequestsDate` 2026-10-28, de 16 kallene fra
+kveldshentingen, altså 4 igjen 28.10 i GMT, og `extraLimit` på 463. Etter
+hvert kall gikk `apiRequests` opp med 1, og datoen sto på 2026-10-28. Etter
+målingen er `apiRequests` 20 med datoen 2026-10-28, og `extraLimit` fortsatt
+463. Ingen kall feilet, og alle 4 ga rader. Ingen dagskall er igjen 28.10.
+
+**Rådata.** `data/raa/maaling-raa-2026-10-28.json`. Fila finnes **bare
+lokalt** og er ikke sporet i git. Bare tallene under er regnet ut og ført her.
+
+| Symbol | Selskap | Plass i lista | Handelsdager | Dager uten volum | Median omsetning | Over 32 MNOK | Over 25 MNOK | Plass av 214 |
+|---|---|---:|---:|---:|---:|---|---|---:|
+| HAVI | Havila Shipping | 109 | 67 | 0 | 0,1 MNOK | Nei | Nei | 173 |
+| HBC | Hofseth Biocare | 110 | 67 | 0 | 0,1 MNOK | Nei | Nei | 176 |
+| HDLY | Huddly | 111 | 67 | 1 | 0,1 MNOK | Nei | Nei | 172 |
+| HERMA | Hermana Holding | 113 | 67 | 1 | 0,0 MNOK | Nei | Nei | 199 |
+
+Alle 4 har 67 handelsdager, fra 2026-07-02 til 2026-10-02. HDLY og HERMA har
+1 dag med volum 0 hver, og de dagene er tatt med i medianen med omsetning 0,
+som i §42. Ingen dag mangler volumfeltet. Den høyeste medianen av de 4 er
+0,1 MNOK, og HERMA har 0,0 MNOK avrundet. Ingen av de 4 er over 25 MNOK. Med
+de 4 er 37 av de 214 over 32 MNOK, og 41 over 25 MNOK, som i §42, §50 og §51.
+
+### Plassen blant 214
+
+Rangeringen i §50 og §51 skrives ikke på nytt. De 210 står i samme rekkefølge
+med de samme tallene; plassnummeret går opp med 1 for hver av de 4 som står
+foran. Der en av de 4 har samme avrundede median som en av de 210, er den
+uavrundede medianen for de 210 regnet på nytt fra de lokale råfilene, som i
+§42, §50 og §51. Alle de 210 dette gjaldt, 18 på 0,1 MNOK og 27 på 0,0 MNOK,
+finnes i en lokal råfil med samme vindu, ingen av dem har samme uavrundede
+median som en av de 4, og rekkefølgen i §50 og §51 innenfor de to avrundede
+medianene er den samme som den uavrundede gir. Ingen av de 4 er blant de 15,
+og ingen er blant de 40 i §17, så ingen er i OBX (§17).
+
+- **HDLY**, 0,1 MNOK: etter GEOS, IWS, EQVA, 5PG, NOAP og SOAG og foran HAVI.
+  Plass 172, etter de 171 første av de 210.
+- **HAVI**, 0,1 MNOK: etter HDLY og foran NORDH. Plass 173.
+- **HBC**, 0,1 MNOK: etter NORDH og EIOF og foran JAREN, BMA, CAPSL, SKUE,
+  NOHAL, ZAL, CONTX, GENT, BINT og BOR. Plass 176.
+- **HERMA**, 0,0 MNOK: etter SNOR til CODE og GRONG, og foran EXTX, BIEN, GEM,
+  AFISH, AIX, ABS, AASB, ABTEC, ELOO, BALT, ENERG, ADS, PYRUM, GYL og BSP.
+  Plass 199, etter de 195 første av de 210 og HDLY, HAVI og HBC. BSP står
+  sist, på plass 214.
 
 Målingen endrer ikke universet. Parametrene i signalet er låst og målt på de
 15 (AD-13).
