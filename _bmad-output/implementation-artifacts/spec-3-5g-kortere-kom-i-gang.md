@@ -60,6 +60,16 @@ context:
 
 Avtrykkene i `AVTRYKK_I_KOM_I_GANG` er sha256 av innholdet i hver pil på grenen. Med et skript utenfor repoet ble de sammenlignet med sha256 av de samme delene i `git show 54d4714:README.md` (linje 51, 55–77, 81–102, 172–213 og 247–289). «Du trenger», «Med Docker Desktop», «Uten Docker, med uv», «Slik virker dobbeltklikket» og «Står du fast?» var like på `e450ff9`. Etter gjennomgangen er «Med Docker Desktop» skrevet om i én setning (BH2), og de fire andre er fortsatt like.
 
+*Lagt til 2026-10-28 (gjennomgangen etter `cc7f587`, BH1):* etter svarene 27.10 kl. 06:09 og 28.10 kl. 11:19 og 11:23 er tre avtrykk satt på nytt: «Står du fast?» i b (var `26143167…`), og «Demoen og den ekte versjonen» og «Med Docker Desktop» i e (var `d9bc0617…` og `44485fc5…`). «Du trenger», «Uten Docker, med uv» og «Slik virker dobbeltklikket» er fortsatt like delene på `54d4714`.
+
+## Svarene 27.10 kl. 06:09 (a–c)
+
+*Avgjort 2026-10-27 kl. 06:09 (gruppens svar, under story 3.5 i `epics.md`)* om BH3, ECH7 og VG5 i triagen under. d) 3.5g flettes når alt er grønt.
+
+- **a (BH3):** «**Linux:** bruk [Docker] eller [uv], under.» er den tredje linja under stegene, etter «Ekte kurser», med lenker til `#med-docker-desktop` og `#uten-docker-med-uv`. Test: `test_linja_om_linux_lenker_til_docker_og_uv`, og `test_dobbeltklikket_staar_foerst_og_ikke_bak_en_pil` teller sju avsnitt før pilene.
+- **b (ECH7):** de fem henvisningene til et steg under «Står du fast?» sier «med Docker» (steg 1, 3 og 4), og de samme svarene i `docs/hjelp.md` følger. Etter gjennomgangen også svarene i hjelpen om administrator, om uv som ikke blir funnet og om vinduet som ble lukket, og linja om uv under «Tester» i README-en. Test: `test_hvert_steg_under_staar_du_fast_sier_hvilken_vei`.
+- **c (VG5):** radene D1–D6 i §9 i `docs/kvalitetssikring.md` sier hvilket steg eller hvilken linje de gjelder, med en Rettet-linje over tabellen. Ingen test er krevd for c; `test_henvisningene_og_proevetabellen` sjekker fortsatt radene D1–D6.
+
 ## Tabellen øverst (e)
 
 *Avgjort 2026-10-28 kl. 11:19 og 11:23 (gruppens svar, under story 3.5 i `epics.md`):* veiene står hver for seg, som i 3.5g, men tabellen «Demoen og den ekte versjonen» står uten pil under «Innhold», før «Til faglærer», så de to versjonene og hva som er laget, synes med en gang. Kl. 11:19 sto den etter stegene; svaret kl. 11:23 gjelder. «Til faglærer» kortes ned i en egen endring etter 3.5g (f), og er ikke rørt her.
@@ -96,9 +106,33 @@ Gjennomgang 27.10 etter hele settet (3773 bestått, 37 hoppet over, 0 feilet, 00
 | BH10 | `<details open>` eller CRLF gjør at hjelperne ikke ser pila | low | avvist: `test_markdown_inne_i_pilene_vises_riktig_paa_github` krever `<details>` alene på linja og like mange `<details`, `</details>` og `<summary>`, og `read_text` leser CRLF som LF |
 | VG5 | Prøveprotokollen i §9 i `docs/kvalitetssikring.md` har overskriften og stegene fra før 3.5g | low | **til gruppen:** §9 er ikke med i instruksjonen. Rettes før README-prøven, med en Rettet-linje. **Avgjort av gruppen 27.10 kl. 06:09 (c):** radene D1–D6 følger de fem stegene og linjene under dem, hver med steget eller linja den gjelder, og en Rettet-linje over tabellen |
 
+Gjennomgang 28.10 etter hele settet (fil for fil, fordi 2,4 GB av 15,7 GB var ledig: 51 filer, 3812 bestått, 24 hoppet over, 0 feilet, 19:43:37–19:51:47 på `a90dd0b`), av diffen `6d8042f..a90dd0b`, det vil si endringene etter `cc7f587` uten det flettingen av main tok med, med Blind Hunter (BH, 10 funn), Edge Case Hunter (ECH, 9) og Verification Gap (VG, ingen hull, og ett funn utenfor). Dommen i tabellen er vår. Små funn er rettet med en gang.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH5, ECH6, VG | Svar i hjelpen og linja om uv under «Tester» sier fortsatt «steg 3» og «steg 4» uten vei | low | **rettet:** «med Docker» i svarene om administrator, uv og vinduet som ble lukket, og under «Tester». «Med Docker: … Gjør så steg 3 og 4» og svarene under «Steg N»-overskriftene står, fordi veien står der |
+| BH6, ECH3 | Mønsteret i testen for b ser ikke «Steg 4», to sifre eller «steg 3 og 4» | low | **rettet:** mønsteret tar dem med |
+| ECH4 | Et spørsmål som skilte seg litt fra hjelpen, ville blitt hoppet over stille | low | **rettet:** testen krever fire felles spørsmål, og hvert spørsmål som er lagt til for hånd, må finnes |
+| ECH1 | `_tabellen` leser resten av README-en hvis «Til faglærer» mangler | low | **rettet:** påstand med melding |
+| ECH2 | Testen for e ser ikke en tabell uten skillelinje eller med feil antall kolonner | low | **rettet:** skillelinja og fire `|` per linje |
+| ECH9 | Dokumentasjonsstrengen i `test_til_faglaerer_og_kom_i_gang_foer_status` sier at ingenting står mellom beskrivelsen og «Til faglærer» | low | **rettet** |
+| BH1 | «Avtrykkene» sier ikke at «Står du fast?» er satt på nytt | low | **rettet:** en Lagt til-linje under «Avtrykkene» |
+| BH3 | a, b og c har ingen egen del i spesifikasjonen | low | **rettet:** «Svarene 27.10 kl. 06:09 (a–c)» |
+| BH2 | Punktene under «Åpent» som er avgjort, står der fortsatt | low | står: hver har «Avgjort av gruppen 27.10 kl. 06:09» til slutt, og ingen linje fjernes |
+| BH4 | 224 synlige ord før «Kom i gang» ble 302 på en gren som skal korte ned | low | står: svarene kl. 11:19 og 11:23 flytter tabellen dit, og tallene står under «Tabellen øverst (e)». «Til faglærer» kortes ned i f |
+| BH7 | Pila «Demoen og den ekte versjonen» har samme navn som tabellen, men ikke tabellen | low | **til gruppen:** under «Åpent». Svaret kl. 11:23 sier at veiene står som i 3.5g |
+| BH8 | «Innhold» lenker ikke til tabellen | low | står: tabellen står rett under «Innhold» |
+| BH9 | §9 har ingen rad for tabellen øverst, Linux står i D6, og Rettet-linja har ikke klokkeslett | low | står: svaret c gjelder D1–D6. Om Linux skal være egen rad, står under «Åpent» |
+| BH10 | Overskriften over D1–D6 har navnet fra før 3.5g, og «steg 1–4» i «Til faglærer» sier ikke «med Docker» | low | står: Rettet-linja i §9 forklarer overskriften, og lenken i «Til faglærer» går til pila «Med Docker Desktop». «Til faglærer» er f |
+| ECH5 | To like overskrifter i hjelpen ville gitt én nøkkel | low | avvist: `test_like_spoersmaal_har_samme_svar` krever like mange nøkler som `###` |
+| ECH7 | D2 sier ikke hva som skjer hvis begge filene vises som «Start demoen» | low | står: D2 spør om Windows viste dem uten filendelsen |
+| ECH8 | D3 har ikke noe utfall når uv er installert fra før | low | står: «uv fra før» føres øverst i Prøve 1 |
+
 ## Åpent
 
 - Om «steg 4» er uklart nå som dobbeltklikket også har nummererte steg (se «Valg som er gjort her», ECH7). Avgjort av gruppen 27.10 kl. 06:09: henvisningene sier hvilken vei, som «steg 4 med Docker».
 - Om det skal stå en synlig linje til Docker og uv under stegene, for eksempel for Linux (BH3). Det ville vært en tredje linje under stegene, og avgjørelsen 26.10 kl. 23:00 sier to. Avgjort av gruppen 27.10 kl. 06:09: en tredje kort linje, «Linux: bruk Docker eller uv, under.»
 - Om ventingen første gang skal stå i et eget steg (BH4).
 - §9 i `docs/kvalitetssikring.md` følger ikke de fem stegene ennå (VG5). Avgjort av gruppen 27.10 kl. 06:09: radene D1–D6 følger de fem stegene og linjene under dem.
+- Om pila «Demoen og den ekte versjonen» skal få et annet navn nå som tabellen står øverst (BH7).
+- Om Linux skal være en egen rad i §9 (BH9).

@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-28T19:33
+updated: 2026-10-28T19:57
 ---
 
 # Hjelp til «Kom i gang»
@@ -129,7 +129,7 @@ Du har dratt inn ZIP-fila, ikke mappa. Dra mappa du pakket ut i steg 2, ikke ZIP
 
 ### Mappa lar seg ikke dra inn i vinduet.
 
-PowerShell er trolig åpnet som administrator, og da sperrer Windows dra og slipp. Lukk vinduet og åpne PowerShell på vanlig måte (steg 3). Åpner du den fra adressefeltet i Filutforsker, står du alt i mappa og trenger ikke dra.
+PowerShell er trolig åpnet som administrator, og da sperrer Windows dra og slipp. Lukk vinduet og åpne PowerShell på vanlig måte (steg 3 med Docker). Åpner du den fra adressefeltet i Filutforsker, står du alt i mappa og trenger ikke dra.
 
 ### «is not recognized as the name of a cmdlet» eller «Cannot find path … because it does not exist» etter cd.
 
@@ -227,7 +227,7 @@ Nettleseren viser da `ERR_CONNECTION_REFUSED`. Andre nettlesere sier det med and
 
 ### «The term 'uv' is not recognized» eller «command not found: uv».
 
-Blir `uv` ikke funnet etter installasjonen, lukker du vinduet, åpner et nytt og går til mappa, som i steg 4. Er uv ikke installert, står installasjonen for Windows og Mac under «Tester» i [README-en](../README.md#tester).
+Blir `uv` ikke funnet etter installasjonen, lukker du vinduet, åpner et nytt og går til mappa, som i steg 4 med Docker. Er uv ikke installert, står installasjonen for Windows og Mac under «Tester» i [README-en](../README.md#tester).
 
 ### «docker» er ikke gjenkjent, eller «command not found: docker».
 
@@ -257,7 +257,7 @@ Noe annet bruker port 8000. Kjører den andre versjonen, stopper du den først (
 
 ### Jeg lukket vinduet før jeg stoppet.
 
-Åpne et nytt terminalvindu, gjør steg 4 og lim inn stoppkommandoen for versjonen du kjørte: `docker compose down` for den ekte versjonen, eller `docker compose --profile demo down` for demoen.
+Åpne et nytt terminalvindu, gjør steg 4 med Docker og lim inn stoppkommandoen for versjonen du kjørte: `docker compose down` for den ekte versjonen, eller `docker compose --profile demo down` for demoen.
 
 ## Neste gang
 

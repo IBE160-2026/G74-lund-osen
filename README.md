@@ -504,7 +504,7 @@ Mac (Terminal):
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-Blir `uv` ikke funnet etterpå («The term 'uv' is not recognized» eller «command not found: uv»), lukker du vinduet, åpner et nytt og går til mappa, som i steg 4.
+Blir `uv` ikke funnet etterpå («The term 'uv' is not recognized» eller «command not found: uv»), lukker du vinduet, åpner et nytt og går til mappa, som i steg 4 med Docker.
 
 </details>
 

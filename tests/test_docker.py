@@ -1594,7 +1594,11 @@ def _tabellen() -> str:
     ankeret og linja over, til «Til faglærer»."""
     tekst = README.read_text(encoding="utf-8")
     assert tekst.count(TABELLEN) == 1, "tabellen mangler eller staar to ganger"
-    return tekst.split(TABELLEN, 1)[1].split("\n\nTil faglærer:\n", 1)[0]
+    resten = tekst.split(TABELLEN, 1)[1]
+    # Gjennomgangen etter cc7f587 (ECH1): uten «Til faglærer» etter tabellen
+    # ville resten av README-en blitt lest som tabellen.
+    assert "\n\nTil faglærer:\n" in resten, "«Til faglærer» mangler etter tabellen"
+    return resten.split("\n\nTil faglærer:\n", 1)[0]
 
 
 def _seksjon(navn: str) -> str:
@@ -1765,7 +1769,7 @@ TEMAENE = (
 UTE_AV_README = {
     "Mappa lar seg ikke dra inn i vinduet.": (
         "PowerShell er trolig åpnet som administrator, og da sperrer Windows dra og slipp. Lukk vinduet "
-        "og åpne PowerShell på vanlig måte (steg 3)."
+        "og åpne PowerShell på vanlig måte (steg 3 med Docker)."
     ),
     "Ingenting skjer når jeg limer inn.": (
         "Kommandoene skrives i PowerShell eller Terminal, ikke i Docker Desktop. Docker Desktop skal "
@@ -2417,7 +2421,9 @@ class TestReadmeForNybegynnere:
     def test_til_faglaerer_og_kom_i_gang_foer_status(self):
         """Kl. 23:41: beskrivelsen, så «Til faglærer», så «Kom i gang»,
         så «Status». Ville feilet hvis «Status» kom foerst igjen, eller noe
-        kom mellom beskrivelsen og «Til faglærer»."""
+        kom mellom beskrivelsen og «Til faglærer», utenom bildene, «Innhold»
+        og tabellen «Demoen og den ekte versjonen» (svarene 28.10 kl. 11:19
+        og 11:23, e)."""
         tekst = README.read_text(encoding="utf-8")
         # Story 3.5f: ankeret kom-i-gang staar paa linja over overskriften.
         kom_i_gang = f'\n<a name="kom-i-gang"></a>\n\n{KOM_I_GANG}\n'
@@ -3570,6 +3576,10 @@ class TestHovedveien:
         rader = [l.split(" | ", 1)[0] for l in tabellen.splitlines() if l.startswith("| ")]
         assert rader == ["|", "| Kurser", "| Trenger", "| Klar"], rader
         assert tabellen.splitlines()[0] == "| | Demoen | Den ekte versjonen |"
+        # Gjennomgangen etter cc7f587 (ECH2): uten skillelinja, eller med feil
+        # antall kolonner, viser GitHub ikke tabellen som tabell.
+        assert tabellen.splitlines()[1] == "|---|---|---|"
+        assert all(l.count("|") == 4 for l in tabellen.splitlines()), tabellen
         synlig = _utenfor_pilene(tekst)
         assert TABELLEN + tabellen in synlig
         i = tekst.index(TABELLEN)
@@ -3588,16 +3598,30 @@ class TestHovedveien:
         Ville feilet hvis et «steg» med tall under «Står du fast?», eller i
         svarene i hjelpen som står der også, ikke ble fulgt av «med Docker»,
         eller hvis det ikke var noen henvisninger å sjekke."""
+        # Gjennomgangen etter cc7f587 (BH6, ECH3): også «Steg 4», tall med to
+        # sifre og «steg 3 og 4» eller «steg 1–4».
+        mønster = r"\b[Ss]teg (\d+)(?:\s*(?:–|og)\s*\d+)?\b( med Docker)?"
         faq = _faq()
-        henvisninger = re.findall(r"\bsteg (\d)\b( med Docker)?", faq)
+        henvisninger = re.findall(mønster, faq)
         assert len(henvisninger) == 5, henvisninger
         assert all(med for _, med in henvisninger), henvisninger
         i_hjelp = dict(re.findall(r"^### ([^\n]+)\n\n(.*?)(?=\n\n### |\n\n## |\Z)", _hjelp(), re.MULTILINE | re.DOTALL))
         felles = [s for s in _detaljer(faq) if s in i_hjelp]
-        felles.append("«Cannot connect to the Docker daemon», «error during connect» eller «dockerDesktopLinuxEngine».")
-        felles.append("«docker» er ikke gjenkjent, eller «command not found: docker».")
+        # Gjennomgangen etter cc7f587 (ECH4): fire av de fem spørsmålene står
+        # likt i hjelpen; det femte er det sammenslåtte (SAMMENSLAATT).
+        assert len(felles) == 4, felles
+        # Og svarene i hjelpen med en henvisning til et steg i Docker-veien
+        # som ikke står under en overskrift «Steg N» (BH5, ECH6, VG).
+        felles += [
+            "«Cannot connect to the Docker daemon», «error during connect» eller «dockerDesktopLinuxEngine».",
+            "«docker» er ikke gjenkjent, eller «command not found: docker».",
+            "Mappa lar seg ikke dra inn i vinduet.",
+            "«The term 'uv' is not recognized» eller «command not found: uv».",
+            "Jeg lukket vinduet før jeg stoppet.",
+        ]
         for sporsmaal in felles:
-            for _, med in re.findall(r"\bsteg (\d)\b( med Docker)?", i_hjelp[sporsmaal]):
+            assert sporsmaal in i_hjelp, sporsmaal
+            for _, med in re.findall(mønster, i_hjelp[sporsmaal]):
                 assert med, sporsmaal
 
     def test_linja_om_linux_lenker_til_docker_og_uv(self):
