@@ -5,7 +5,8 @@ spec-2-3d-hentingen-hver-kveld.md).
 Testene leser skriptene i start/, og paa Windows kjoerer de
 start/kveldshenting.ps1 i en midlertidig mappe: et lokalt repo som origin, en
 hovedkopi og jobbens arbeidskopi med git worktree. Ingen nettkall, ingen
-Docker og ingen ekte uv: PATH har bare git, System32 og en falsk uv.
+Docker og ingen ekte uv: PATH har en falsk docker og en falsk uv foerst, saa
+git og System32.
 legg-inn-kveldshentingen.ps1 og ta-bort-kveldshentingen.ps1 kjoeres aldri,
 saa ingen jobb legges inn i Oppgaveplanlegging.
 """
@@ -265,8 +266,15 @@ def _oppsett(tmp_path: Path, start: str, etter: str = "") -> dict[str, Path | st
 
 
 def _kjoer(tmp_path: Path, skript: Path, hoved: Path, *ekstra: str) -> tuple[int, str]:
-    """Windows PowerShell 5.1 med git, System32 og den falske uv paa PATH.
-    ProgramFiles peker paa en tom mappe, saa Docker Desktop aldri startes."""
+    """Windows PowerShell 5.1 med den falske docker og den falske uv foerst
+    paa PATH, saa git og System32. ProgramFiles peker paa en tom mappe, saa
+    Docker Desktop aldri startes.
+
+    CI-feilen 28.10 (40770982416 paa main og 40777327364 paa 2.13): runneren
+    har en docker paa PATH som svarte innen fristen, saa skriptet startet og
+    stoppet Ollama. Den falske docker svarer aldri, saa svaret er det samme
+    med og uten Docker paa maskinen. Den skriver hvert kall til docker.txt.
+    """
     systemrot = os.environ["SYSTEMROOT"]
     powershell = Path(systemrot) / "System32" / "WindowsPowerShell" / "v1.0" / "powershell.exe"
     falsk = tmp_path / "falsk"
@@ -274,6 +282,10 @@ def _kjoer(tmp_path: Path, skript: Path, hoved: Path, *ekstra: str) -> tuple[int
     (falsk / "uv.cmd").write_text(
         "@echo off\r\necho falsk henting %*\r\necho tjeneste=%OSE_KI_TJENESTE%\r\necho mappe=%CD%\r\n"
         'if "%~4"=="--maal-omsetning" exit /b 5\r\nexit /b 3\r\n',
+        encoding="ascii",
+    )
+    (falsk / "docker.cmd").write_text(
+        '@echo off\r\necho falsk docker %*>>"%~dp0docker.txt"\r\nexit /b 1\r\n',
         encoding="ascii",
     )
     hjem = tmp_path / "hjem"
@@ -380,6 +392,11 @@ def test_hele_jobben_uten_docker_henter_uten_ki_og_gir_koden_fra_hentingen(tmp_p
     assert "falsk henting run python src/fetch_prices.py --maal-omsetning" in loggen
     assert loggen.index("Hentingen avsluttet med kode 3.") < loggen.index("Målingen avsluttet med kode 5.")
     assert "Skriptet startet verken Docker Desktop eller Ollama." in loggen
+    # Ville feilet hvis den ekte docker ble brukt: den falske er spurt, og
+    # svarte ikke (CI-feilen 28.10).
+    assert "falsk docker info" in (tmp_path / "falsk" / "docker.txt").read_text(encoding="ascii")
+    assert "Docker svarte ikke innen 1 s." in loggen
+    assert "Stopper Ollama." not in loggen and "Starter Ollama." not in loggen
     for tekst in (utskrift, loggen):
         assert NOEKKELEN not in tekst and MILJOEET not in tekst
 
