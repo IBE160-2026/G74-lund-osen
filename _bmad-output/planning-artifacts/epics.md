@@ -2507,6 +2507,16 @@ Resten ryddes etter alle testene.
 
 *Avgjort 2026-10-26 kl. 23:00 (gruppens svar):* «Kom i gang» er for lang. Dobbeltklikket blir fem korte nummererte steg: last ned med den direkte lenken, pakk ut, åpne G74-lund-osen-main og dobbeltklikk «Start demoen», svar j når vinduet spør om uv, og nettleseren åpner appen, og lukk vinduet for å stoppe. Under stegene én linje om advarselen første gang på Windows og Mac, og én om den ekte versjonen. Alt annet står bak piler eller i `docs/hjelp.md`, og ingenting forsvinner. Det går foran innspillet 25.10 kl. 11:26 om at resten ryddes etter testene.
 
+*Avgjort 2026-10-27 kl. 06:09 (gruppens svar)* om funnene i triagen til 3.5g (`spec-3-5g-kortere-kom-i-gang.md`):
+- a) En tredje kort linje under stegene: «Linux: bruk Docker eller uv, under.» (BH3)
+- b) Hver henvisning til et steg under «Står du fast?» sier hvilken vei den gjelder, som «steg 4 med Docker». (ECH7)
+- c) Radene D1–D6 i §9 i kvalitetssikringen følger de fem stegene og linjene under dem. (VG5)
+- d) 3.5g flettes når alt er grønt.
+
+*Avgjort 2026-10-28 kl. 11:19 og 11:23 (gruppens svar):*
+- e) Veiene står hver for seg, som i 3.5g, men tabellen «Demoen og den ekte versjonen» står uten pil under «Innhold», før «Til faglærer», så de to versjonene og hva som er laget, synes med en gang. Kl. 11:19 sto den etter stegene; svaret kl. 11:23 gjelder.
+- f) «Til faglærer» kortes ned i en egen endring etter 3.5g.
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
