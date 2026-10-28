@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-28T22:54
+updated: 2026-10-28T23:49
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1202,6 +1202,14 @@ den dagen i GMT, også på dager børsen er stengt. Hentingen og nye forsøk få
 kallene først, og bonuskvoten brukes aldri. Når hele lista er målt, måles de
 eldste målingene på nytt først. Det går foran «etter 3 måneder» og «lar 2 stå
 igjen» over.
+
+*Endret 2026-10-28 kl. 23:19 (gruppens svar, under story 2.13 i `epics.md`):*
+før første kall godtas gårsdagens dato i `/api/user` og leses som 0 brukt i dag,
+som i hentingen (regel 15), og etter hvert kall må datoen være dagens. Vinduet er
+tre måneder bakover fra børsdagen og står ved hvert tall. Det er ingen lås, som
+for hentingen: vi kjører ikke noe for hånd mens jobben går. Mangler én av de 15
+kursen, går målingen kl. 23:45 med kallene som er igjen, og nye forsøk får
+fortsatt kallene først.
 
 #### FR-414 — Eks.datoer ført for hånd
 
