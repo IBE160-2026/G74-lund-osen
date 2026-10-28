@@ -89,8 +89,8 @@ Gjennomgang 28.10 etter hele settet (3803 bestått, 24 hoppet over, 0 feilet, 10
 | VG1 | Testene som kjører skriptet, hoppes over i CI | medium | **rettet** i `c852bbd`: steget «Kveldshentingen på Windows» i `tester.yml`, som feiler hvis en test hoppes over |
 | VG2, ECH6 | Den nye versjonen etter utsjekken var ikke prøvd, og `powershell.exe` ble funnet på PATH | medium | **rettet** i `c852bbd`: testen `test_den_nye_versjonen_kjoeres_en_gang_etter_utsjekken`, og `$PSHOME` |
 | BH4 | Nøkkelen kunne havne i loggen gjennom en feil fra hentingen | medium | **avvist:** story 2.0 fjerner nøkkelen fra feilene i `src/fetch_prices.py` (`hent_ett_symbol`, `_uten_noekkel`); testen sjekker at skriptet selv ikke skriver den ut |
-| BH6 | En henting for hånd samtidig med jobben er ikke sperret | medium | **ikke rettet, spørsmål til gruppen:** jobbens egne kjøringer sperres av `IgnoreNew`, og hjelpen ber om at jobben slås av eller får gjøre seg ferdig først. En låsefil må også respekteres av hentingen for hånd, og det er en endring i `src/` |
-| ECH5 | Jobben setter `OSE_KI_TJENESTE`, som går foran `.env`, så `av` eller en tjeneste i skyen i `.env` overstyres | medium | **ikke rettet, spørsmål til gruppen:** instruksjonen sier `OSE_KI_TJENESTE=lokal` bare for kommandoen, som steg 4 i hentingsinstruksjonene |
+| BH6 | En henting for hånd samtidig med jobben er ikke sperret | medium | **ikke rettet, spørsmål til gruppen:** jobbens egne kjøringer sperres av `IgnoreNew`, og hjelpen ber om at jobben slås av eller får gjøre seg ferdig først. En låsefil må også respekteres av hentingen for hånd, og det er en endring i `src/`. **Avgjort av gruppen 28.10 kl. 11:34:** ingen lås nå; vi henter ikke for hånd mens jobben går, og fra 29.10 hentes det for hånd bare når loggen viser at jobben feilet |
+| ECH5 | Jobben setter `OSE_KI_TJENESTE`, som går foran `.env`, så `av` eller en tjeneste i skyen i `.env` overstyres | medium | **ikke rettet, spørsmål til gruppen:** instruksjonen sier `OSE_KI_TJENESTE=lokal` bare for kommandoen, som steg 4 i hentingsinstruksjonene. **Avgjort av gruppen 28.10 kl. 11:34:** jobben bruker alltid den lokale modellen, som instruksjonene for hentingen, så KI-tekstene i `ki_logg` kommer fra samme modell hver dag |
 | VG3 | Ingen test med endringer i arbeidskopien | low | **rettet** i `c852bbd`: `test_jobben_stopper_naar_arbeidskopien_har_endringer` |
 | VG5 | `ExecutionTimeLimit` og `LogonType` var ikke i testen | low | **rettet** i `c852bbd` |
 | VG6 | Den statiske testen for `.env` så ikke `$envHoved` og `$envJobb` | low | **rettet** i `c852bbd` |
@@ -112,8 +112,8 @@ Gjennomgang 28.10 etter hele settet (3803 bestått, 24 hoppet over, 0 feilet, 10
 
 ## Åpent
 
-- **BH6:** en henting for hånd samtidig med jobben er ikke sperret (spørsmål til gruppen).
-- **ECH5:** `OSE_KI_TJENESTE` i `.env` overstyres av jobben (spørsmål til gruppen).
+- **BH6:** en henting for hånd samtidig med jobben er ikke sperret (spørsmål til gruppen). Avgjort av gruppen 28.10 kl. 11:34: ingen lås nå.
+- **ECH5:** `OSE_KI_TJENESTE` i `.env` overstyres av jobben (spørsmål til gruppen). Avgjort av gruppen 28.10 kl. 11:34: alltid den lokale modellen.
 - **VG4:** stien med Docker og Ollama er bare lest, ikke kjørt i en test. Den prøves første gang i Prøve 4 og første kveld.
 - **BH7:** alle fire kjøringene starter Docker og Ollama, også når basen alt har dagens kurser.
 - **BH9, ECH8:** `.env` sjekkes som hard lenke med samme innhold, ikke med fil-ID.
