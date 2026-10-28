@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-28T11:41
+updated: 2026-10-28T11:43
 ---
 
 # Kvalitetssikring
@@ -1018,20 +1018,22 @@ hentingen kan gi kurser, se «Når kan jeg hente?» i
 
 *Lagt til 2026-10-28 (story 2.3d):* «Hentingen hver kveld med Oppgaveplanlegging (Windows, valgfri)» under «Mer for den som vil» i README-en. Prøven tas på PC-en som skal hente, i mappa vi jobber i, etter at 2.3d er flettet, og før kl. 22:00, så hentingen gir 0 kall.
 
-- **Dato:**
-- **Commit som ble prøvd:**
+- **Dato:** 2026-10-28, kl. 11:41–11:42
+- **Commit som ble prøvd:** `a6b4e41` på main, etter flettingen i `817b331`
 
 | # | Kommando eller steg i README-en | Det som skjedde |
 |---|---|---|
-| 1 | `git worktree add --detach ..\G74-lund-osen-jobb origin/main` | |
-| 2 | `cmd /c mklink /J ..\G74-lund-osen-jobb\data data`. Står det «Junction created»? | |
-| 3 | `New-Item -ItemType HardLink -Path ..\G74-lund-osen-jobb\.env -Target .env`. Viser `Get-Item ..\G74-lund-osen-jobb\.env` `LinkType` `HardLink`? | |
-| 4 | `powershell -NoProfile -ExecutionPolicy Bypass -File start\legg-inn-kveldshentingen.ps1 -Arbeidskopi ..\G74-lund-osen-jobb -FoersteDato 2026-10-29`. Viser Oppgaveplanlegging jobben med kl. 22:15 og hver halvtime? | |
-| 5 | Jobben kjørt for hånd før kl. 22:00 (`Start-ScheduledTask`). Sier loggen i `data/logg/` commiten fra midnatt, 0 kall og koden? Les `/api/user` før og etter: `apiRequests` skal være uendret | |
+| 1 | `git worktree add --detach ..\G74-lund-osen-jobb origin/main` | Kode 0, «HEAD is now at a6b4e413» |
+| 2 | `cmd /c mklink /J ..\G74-lund-osen-jobb\data data`. Står det «Junction created»? | Ja, kode 0. `LinkType` `Junction` til `data` i hovedkopien |
+| 3 | `New-Item -ItemType HardLink -Path ..\G74-lund-osen-jobb\.env -Target .env`. Viser `Get-Item ..\G74-lund-osen-jobb\.env` `LinkType` `HardLink`? | Ja. Innholdet er ikke skrevet ut |
+| 4 | `powershell -NoProfile -ExecutionPolicy Bypass -File start\legg-inn-kveldshentingen.ps1 -Arbeidskopi ..\G74-lund-osen-jobb -FoersteDato 2026-10-29`. Viser Oppgaveplanlegging jobben med kl. 22:15 og hver halvtime? | Ja: `StartBoundary` `2026-10-29T22:15:00` uten Z, daglig, gjentakelse `PT30M` i `PT1H35M` med `StopAtDurationEnd` av, `MultipleInstances` `IgnoreNew`, `StartWhenAvailable` av, `LogonType` `Interactive`, og neste kjøring 29.10 kl. 22:15 |
+| 5 | Jobben kjørt for hånd før kl. 22:00 (`Start-ScheduledTask`). Sier loggen i `data/logg/` commiten fra midnatt, 0 kall og koden? Les `/api/user` før og etter: `apiRequests` skal være uendret | 28.10 kl. 11:42:31, før commiten fra midnatt hadde jobben: loggen sier «STOPP: Commiten fra midnatt, b17bda66…, har ikke start/kveldshenting.ps1 ennå. Jobben går fra neste kveld.», siste resultat 1, 0 kall, og `apiRequests` 16 med `apiRequestsDate` 2026-10-27 både før og etter. Arbeidskopien ble ikke flyttet |
 | 6 | `powershell -NoProfile -ExecutionPolicy Bypass -File start\ta-bort-kveldshentingen.ps1`, bare hvis jobben skal av | |
 
-- **Det som ikke stemte:**
-- **Rettet i** (commit eller story):
+- **Det som ikke stemte:** ingenting.
+- **Rettet i** (commit eller story): –
+
+*Lagt til 2026-10-28 kl. 11:43:* rad 5 ble tatt samme dag som flettingen, så jobben stoppet før hentingen, som den skal. Prøven med 0 kall fra selve hentingen tas 29.10 før kl. 22:00, eller leses i loggen etter første kjøring 29.10 kl. 22:15.
 
 ## 10. Suksesskriteriene og testene
 
