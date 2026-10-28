@@ -1655,6 +1655,8 @@ Som **gruppe som henter for hånd hver kveld**, vil vi at hentingen går av seg 
 
 **Avhenger av:** 2.3 og 2.3b. **Én økt:** ja. Bygges 28.10, og jobben legges inn på PC-en etter flettingen.
 
+*Avgjort 2026-10-28 kl. 11:34 (gruppens svar):* BH6: ingen lås nå. Vi henter ikke for hånd mens jobben går, og fra 29.10 hentes det for hånd bare når loggen viser at jobben feilet. ECH5: jobben bruker alltid den lokale modellen, som instruksjonene for hentingen, så KI-tekstene i `ki_logg` kommer fra samme modell hver dag. FR-401 får en datert linje etter flettingen.
+
 ### Story 2.4: Etterfylling av hull i kursserien
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
