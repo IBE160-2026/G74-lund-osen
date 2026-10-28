@@ -292,17 +292,21 @@ class TestSvarene2319:
     def test_vinduet_staar_ved_hvert_tall(self, tmp_path):
         """Ville feilet hvis vinduet ikke var tre maaneder bakover fra
         boersdagen, eller ikke sto ved hvert tall: maalingen tirsdag og
-        onsdag gir hver sin fra og til i radene."""
+        onsdag gir hver sin fra og til i radene, og loerdag er vinduet fra
+        fredagen, ikke fra loerdagen (gjennomgangen 29.10, VG1)."""
         _fyll(date(2026, 10, 27))
-        _kjoer(tmp_path, Kvote(brukt=18, dato=date(2026, 10, 27)), klokke=ONSDAG - timedelta(days=1))
+        assert _kjoer(tmp_path, Kvote(brukt=18, dato=date(2026, 10, 27)), klokke=ONSDAG - timedelta(days=1))[0] == 0
         _fyll(date(2026, 10, 28))
-        _kjoer(tmp_path, Kvote(brukt=18), klokke=ONSDAG)
+        assert _kjoer(tmp_path, Kvote(brukt=18), klokke=ONSDAG)[0] == 0
+        _fyll(date(2026, 10, 30))
+        assert _kjoer(tmp_path, Kvote(brukt=19, dato=date(2026, 10, 31)), klokke=LOERDAG)[0] == 0
         radene = [(rad[0], rad[2], rad[3]) for rad in _radene()]
         assert radene == [
             ("NYA", "2026-07-27", "2026-10-27"),
             ("NYB", "2026-07-27", "2026-10-27"),
             ("NYC", "2026-07-28", "2026-10-28"),
             ("NYD", "2026-07-28", "2026-10-28"),
+            ("NYE", "2026-07-30", "2026-10-30"),
         ]
 
 
@@ -320,16 +324,17 @@ class TestKl2345:
         assert "EQNR mangler kursen for 2026-10-28" in ut and "0 kall brukt" in ut
 
     def test_gaar_fra_23_45_naar_en_kurs_mangler(self, tmp_path):
-        """Ville feilet hvis maalingen ikke gikk fra 23:45: EQNR mangler, og
-        kl. 23:45:00 i Oslo brukes de 4 kallene som er igjen. Utskriften sier
-        hvor mange av de 15 som mangler."""
+        """Ville feilet hvis maalingen ikke gikk fra 23:45: EQNR og MOWI
+        mangler, og kl. 23:45:00 i Oslo brukes de 4 kallene som er igjen.
+        Utskriften sier hvor mange av de 15 som mangler, og hvilke."""
         _fyll(date(2026, 10, 28), uten=("EQNR", "MOWI"))
         kvote = Kvote(brukt=16)
         kode, ut = _kjoer(tmp_path, kvote, klokke=datetime(2026, 10, 28, 22, 45, tzinfo=timezone.utc))
         assert kode == 0, ut
         assert kvote.kall == ["NYA.OL", "NYB.OL", "NYC.OL", "NYD.OL"]
         assert (kvote.brukt, kvote.bonus) == (20, 463)
-        assert "2 av de 15 i lista mangler kursen for 2026-10-28" in ut
+        assert "2 av de 15 i lista mangler kursen for 2026-10-28 (EQNR, MOWI)" in ut
+        assert "målingen venter" not in ut
         assert [rad[0] for rad in _radene()] == ["NYA", "NYB", "NYC", "NYD"]
 
     def test_23_45_gjelder_ogsaa_i_sommertid(self, tmp_path):
@@ -348,6 +353,7 @@ class TestKl2345:
         kode, ut = _kjoer(tmp_path, kvote, klokke=datetime(2026, 10, 28, 22, 50, tzinfo=timezone.utc))
         assert (kode, kvote.kall) == (1, []), ut
         assert not lagring_sqlite.BASE_STI.exists()
+        assert "Basen finnes ikke" in ut and "Målingen venter. 0 kall brukt." in ut
 
 
 class TestRekkefoelgen:

@@ -272,7 +272,7 @@ def _kjoer(tmp_path: Path, skript: Path, hoved: Path, *ekstra: str) -> tuple[int
 
     CI-feilen 28.10 (40770982416 paa main og 40777327364 paa 2.13): runneren
     har en docker paa PATH som svarte innen fristen, saa skriptet startet og
-    stoppet Ollama. Den falske docker svarer aldri, saa svaret er det samme
+    stoppet Ollama. Den falske docker feiler alltid, saa svaret er det samme
     med og uten Docker paa maskinen. Den skriver hvert kall til docker.txt.
     """
     systemrot = os.environ["SYSTEMROOT"]

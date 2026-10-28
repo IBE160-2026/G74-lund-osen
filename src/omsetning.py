@@ -512,8 +512,14 @@ def maal_omsetning(
     except BASEFEIL as feil:
         skriv(f"Basen kan ikke leses ({type(feil).__name__}). Målingen venter. 0 kall brukt.")
         return 1
-    # En base som ikke finnes, er ingen henting, og venter ogsaa etter 23:45.
-    if mangler and (start.astimezone(OSLO).time() < KL_23_45 or not base_sti.exists()):
+    # En base som ikke finnes, er ingen henting, og venter ogsaa etter 23:45
+    # (gjennomgangen 29.10, BH4 og ECH6: med egen grunn i utskriften).
+    if mangler and not base_sti.exists():
+        skriv(
+            f"Basen finnes ikke, så ingen henting er gjort for {boersdag.isoformat()}. Målingen venter. 0 kall brukt."
+        )
+        return 1
+    if mangler and start.astimezone(OSLO).time() < KL_23_45:
         skriv(
             f"{', '.join(mangler)} mangler kursen for {boersdag.isoformat()}. Hentingen og nye forsøk får "
             "kallene først, så målingen venter. 0 kall brukt."
