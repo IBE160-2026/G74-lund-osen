@@ -258,6 +258,7 @@ class TestHentingenFoerst:
         kvote = Kvote(brukt=0)
         kode, ut = _kjoer(tmp_path, kvote, klokke=ONSDAG.replace(hour=10))
         assert (kode, kvote.kall) == (1, []), ut
+        assert "mangler kursen for 2026-10-28" in ut
 
     def test_maaler_ikke_uten_base(self, tmp_path):
         kvote = Kvote(brukt=0)
@@ -359,7 +360,7 @@ class TestLagringen:
         for tall in (str(KURS), "123,45", str(VOLUM), "98 765", f"{VOLUM * KURS:.0f}", "HEMMELIG"):
             assert tall not in ut
         # En kjoering til samme dag skriver en ny fil, aldri over den gamle.
-        _kjoer(tmp_path, Kvote(brukt=19))
+        _kjoer(tmp_path, Kvote(brukt=19), klokke=ONSDAG + timedelta(minutes=1))
         assert (lagring_fil.RAA_KATALOG / "omsetning2-raa-2026-10-28.json").is_file()
         assert json.loads(fil.read_text(encoding="utf-8")) == bilde
 
@@ -491,3 +492,170 @@ def test_basen_staar_paa_versjon_8(tmp_path):
         assert versjon(tilkobling) == 8
     finally:
         tilkobling.close()
+
+
+class TestGjennomgangen:
+    """Funnene fra gjennomgangen 28.10 (BH, ECH, VG i spesifikasjonen)."""
+
+    def test_ingen_kall_naar_kvoten_naar_20_underveis(self, tmp_path):
+        """Ville feilet hvis et kall gikk fra bonuskvoten fordi noe annet
+        brukte kallene mens maalingen gikk (VG1): kontrollen foer hvert kall."""
+        _fyll(date(2026, 10, 28))
+        kvote = Kvote(brukt=16)
+        ekte_hent = kvote.hent
+
+        def hent(*argumenter):
+            svar = ekte_hent(*argumenter)
+            kvote.brukt = 20
+            return svar
+
+        kvote.hent = hent
+        kode, ut = _kjoer(tmp_path, kvote)
+        assert kode == 1
+        assert kvote.kall == ["NYA.OL"] and kvote.bonus == 463
+        assert "går fra bonuskvoten" in ut
+
+    def test_utskriften_sier_kallene_foer_foerste_kall_og_kvoten_etter(self, tmp_path):
+        """VG4, VG5, BH7: hvor mange kall, foer det foerste, og kvoten etter."""
+        _fyll(date(2026, 10, 28))
+        kode, ut = _kjoer(tmp_path, Kvote(brukt=16))
+        assert kode == 0
+        start = "Måler omsetningen for 4 aksjer med 4 av de 4 kallene som er igjen av dagens"
+        assert start in ut and ut.index(start) < ut.index("NYA:")
+        assert "Ingen kall blir igjen i dag." in ut
+        assert "Kvoten etter: 20 av 20 brukt 2026-10-28 i GMT, extraLimit 463." in ut
+        _, ut = _kjoer(tmp_path, Kvote(brukt=0), klokke=ONSDAG + timedelta(minutes=1), koder=["NYX", "NYY"])
+        assert "med 2 av de 20 kallene" in ut and "18 kall blir igjen i dag." in ut
+
+    def test_ingen_tall_fra_kildene_eller_medianen_i_utskriften(self, tmp_path):
+        """VG3: ingen tall i utskriften utenom datoer, tellinger under 100 og
+        extraLimit."""
+        _fyll(date(2026, 10, 28))
+        _, ut = _kjoer(tmp_path, Kvote(brukt=16))
+        uten_datoer = re.sub(r"\d{4}-\d{2}-\d{2}", "", ut)
+        assert [int(t) for t in re.findall(r"\d+", uten_datoer) if int(t) >= 100] == [463]
+
+    def test_stopper_naar_kvoten_staar_paa_gaarsdagen_etter_et_kall(self, tmp_path):
+        """Ville feilet hvis et kall ble gjort med en annen dato i GMT (VG7):
+        en loerdag staar apiRequestsDate fortsatt paa fredag etter kallet."""
+        _fyll(date(2026, 10, 30))
+        kvote = Kvote(brukt=16, dato=date(2026, 10, 30))
+        kode, ut = _kjoer(tmp_path, kvote, klokke=LOERDAG, koder=["N01", "N02"])
+        assert (kode, kvote.kall) == (1, ["N01.OL"]), ut
+        assert "etter kallet" in ut
+
+    def test_ingen_rader_naar_raadataene_ikke_kan_skrives(self, tmp_path, monkeypatch):
+        """VG8, AD-6: raadataene foerst. Kan fila ikke skrives, skrives ingen rader."""
+        _fyll(date(2026, 10, 28))
+        (tmp_path / "en-fil").write_text("", encoding="utf-8")
+        monkeypatch.setattr(lagring_fil, "RAA_KATALOG", tmp_path / "en-fil")
+        kode, ut = _kjoer(tmp_path, Kvote(brukt=18))
+        assert kode == 1 and "Ingen rader i basen" in ut and "API-kall brukt: 2." in ut
+        assert _radene() == []
+
+    def test_det_som_er_maalt_lagres_naar_kvoten_ikke_kan_leses(self, tmp_path):
+        """VG9: kvoten kan ikke leses etter foerste kall."""
+        _fyll(date(2026, 10, 28))
+        kvote = Kvote(brukt=16)
+        lest = []
+
+        def les(nokkel):
+            lest.append(1)
+            return {} if len(lest) == 3 else Kvote.les(kvote, nokkel)
+
+        kvote.les = les
+        kode, ut = _kjoer(tmp_path, kvote)
+        assert (kode, kvote.kall) == (1, ["NYA.OL"]), ut
+        assert [rad[0] for rad in _radene()] == ["NYA"]
+
+    def test_det_som_er_maalt_lagres_naar_kjoeringen_avbrytes(self, tmp_path):
+        """ECH3: en feil som ikke er en stopp, etter foerste kall."""
+        _fyll(date(2026, 10, 28))
+        kvote = Kvote(brukt=16)
+        ekte_hent = kvote.hent
+
+        def hent(ticker, *resten):
+            if ticker == "NYB.OL":
+                raise KeyboardInterrupt
+            return ekte_hent(ticker, *resten)
+
+        kvote.hent = hent
+        with pytest.raises(KeyboardInterrupt):
+            _kjoer(tmp_path, kvote)
+        assert [rad[0] for rad in _radene()] == ["NYA"]
+        assert (lagring_fil.RAA_KATALOG / "omsetning1-raa-2026-10-28.json").is_file()
+
+    def test_en_feil_som_gaar_over_gir_ingen_rad(self, tmp_path):
+        """BH3, ECH1: et tidsavbrudd gir ingen rad, saa aksjen maales foerst
+        neste gang. En ticker som ikke finnes (404), lagres som maalt."""
+        _fyll(date(2026, 10, 28))
+        kvote = Kvote(brukt=18)
+        ekte_hent = kvote.hent
+
+        def hent(ticker, *resten):
+            ekte_hent(ticker, *resten)
+            raise RuntimeError("Timeout" if ticker == "NYA.OL" else "HTTP 404 Not Found")
+
+        kvote.hent = hent
+        kode, ut = _kjoer(tmp_path, kvote)
+        assert kode == 0, ut
+        assert [(rad[0], rad[8]) for rad in _radene()] == [("NYB", "HTTP 404 Not Found")]
+        fil = lagring_fil.RAA_KATALOG / "omsetning1-raa-2026-10-28.json"
+        assert json.loads(fil.read_text(encoding="utf-8"))["feil"] == {"NYA": "Timeout", "NYB": "HTTP 404 Not Found"}
+        kvote = Kvote(brukt=19)
+        _kjoer(tmp_path, kvote, klokke=ONSDAG + timedelta(minutes=1))
+        assert kvote.kall == ["NYA.OL"]
+
+    def test_et_navn_som_dukker_opp_skrives_ikke_over(self, tmp_path, monkeypatch):
+        """ECH8: fila med navnet raafil ga, finnes naar den aapnes."""
+        _fyll(date(2026, 10, 28))
+        ekte = omsetning.raafil
+        katalog = lagring_fil.RAA_KATALOG
+        katalog.mkdir(parents=True, exist_ok=True)
+
+        def raafil(k, dag):
+            sti = ekte(k, dag)
+            if sti.name == "omsetning1-raa-2026-10-28.json":
+                sti.write_text("en annen", encoding="utf-8")
+            return sti
+
+        monkeypatch.setattr(omsetning, "raafil", raafil)
+        kode, _ = _kjoer(tmp_path, Kvote(brukt=19))
+        assert kode == 0
+        assert (katalog / "omsetning1-raa-2026-10-28.json").read_text(encoding="utf-8") == "en annen"
+        assert (katalog / "omsetning2-raa-2026-10-28.json").is_file()
+
+    def test_medianen_av_et_partall_rader_og_en_kode_to_ganger_i_lista(self, tmp_path):
+        """VG12: medianen av 10, 20, 30 og 40 er 25, og en kode som staar to
+        ganger i lista, maales en gang."""
+        rader = [{"date": f"2026-10-0{i}", "close": 1.0, "volume": v} for i, v in enumerate((10, 20, 30, 40), 1)]
+        assert regn_ut("X", rader, date(2026, 7, 1), date(2026, 10, 6)).median == 25.0
+        _fyll(date(2026, 10, 28))
+        kvote = Kvote(brukt=17)
+        _kjoer(tmp_path, kvote, koder=["NYA", "NYA", "NYB"])
+        assert kvote.kall == ["NYA.OL", "NYB.OL"]
+
+    def test_kurs_null_er_ikke_en_dag_uten_volum_og_store_tall_stopper_ikke(self):
+        """BH9, ECH3: kurs 0 med volum er ikke en dag uten volum, og et
+        heltall for stort for float er en rad uten tall."""
+        rader = [
+            {"date": "2026-10-01", "close": 0.0, "volume": 5},
+            {"date": "2026-10-02", "close": 1.0, "volume": 10**400},
+        ]
+        maaling = regn_ut("X", rader, date(2026, 7, 1), date(2026, 10, 6))
+        assert (maaling.handelsdager, maaling.dager_uten_volum, maaling.rader_uten_tall) == (1, 0, 1)
+
+    def test_valget_virker_naar_fetch_prices_kjoeres_som_skript(self, monkeypatch):
+        """BH4: jobben kjoerer src/fetch_prices.py som __main__, og omsetning
+        importerer fetch_prices en gang til. Uten base stopper den med 0 kall
+        foer noekkelen og kvoten leses."""
+        import runpy
+        import sys
+
+        monkeypatch.setattr(sys, "argv", ["fetch_prices.py", "--maal-omsetning"])
+        monkeypatch.delitem(sys.modules, "omsetning")
+        monkeypatch.delitem(sys.modules, "fetch_prices")
+        with pytest.raises(SystemExit) as utgang:
+            runpy.run_path(str(ROT / "src" / "fetch_prices.py"), run_name="__main__")
+        assert utgang.value.code == 1
+        assert not lagring_sqlite.BASE_STI.exists()

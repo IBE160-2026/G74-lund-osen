@@ -55,16 +55,7 @@ MAANEDER = 3
 # paragrafen og symbolene som ble maalt der («Maalt i» i «Alle 206, rangert»
 # i §50, og tabellene i §51 og §52). tests/test_omsetning.py holder dem like.
 MAALT_I_MALINGER: dict[int, tuple[date, tuple[str, ...]]] = {
-    15: (
-        date(2026, 10, 2),
-        (
-            "AKER",
-            "BWLPG",
-            "KMAR",
-            "STB",
-            "SUBC",
-        ),
-    ),
+    15: (date(2026, 10, 2), ("AKER", "BWLPG", "KMAR", "STB", "SUBC")),
     16: (
         date(2026, 10, 3),
         (
@@ -92,23 +83,7 @@ MAALT_I_MALINGER: dict[int, tuple[date, tuple[str, ...]]] = {
     ),
     17: (
         date(2026, 10, 3),
-        (
-            "AKRBP",
-            "DNB",
-            "DNO",
-            "EQNR",
-            "FRO",
-            "GJF",
-            "KOG",
-            "MOWI",
-            "MPCC",
-            "NHY",
-            "ORK",
-            "SALM",
-            "TEL",
-            "VAR",
-            "YAR",
-        ),
+        ("AKRBP", "DNB", "DNO", "EQNR", "FRO", "GJF", "KOG", "MOWI", "MPCC", "NHY", "ORK", "SALM", "TEL", "VAR", "YAR"),
     ),
     18: (
         date(2026, 10, 4),
@@ -135,56 +110,11 @@ MAALT_I_MALINGER: dict[int, tuple[date, tuple[str, ...]]] = {
             "SWON",
         ),
     ),
-    20: (
-        date(2026, 10, 5),
-        (
-            "AUSS",
-            "BAKKA",
-            "GSF",
-            "LSG",
-            "SALME",
-        ),
-    ),
-    21: (
-        date(2026, 10, 6),
-        (
-            "AFK",
-            "AKBM",
-            "BONHR",
-            "NORBT",
-            "ODF",
-        ),
-    ),
-    23: (
-        date(2026, 10, 7),
-        (
-            "B2I",
-            "ELO",
-            "HSHP",
-            "SATS",
-            "SNTIA",
-        ),
-    ),
-    24: (
-        date(2026, 10, 8),
-        (
-            "BWO",
-            "LINK",
-            "PEXIP",
-            "PLSV",
-            "RING",
-        ),
-    ),
-    26: (
-        date(2026, 10, 9),
-        (
-            "ENH",
-            "KCC",
-            "MORG",
-            "SOAG",
-            "SOFF",
-        ),
-    ),
+    20: (date(2026, 10, 5), ("AUSS", "BAKKA", "GSF", "LSG", "SALME")),
+    21: (date(2026, 10, 6), ("AFK", "AKBM", "BONHR", "NORBT", "ODF")),
+    23: (date(2026, 10, 7), ("B2I", "ELO", "HSHP", "SATS", "SNTIA")),
+    24: (date(2026, 10, 8), ("BWO", "LINK", "PEXIP", "PLSV", "RING")),
+    26: (date(2026, 10, 9), ("ENH", "KCC", "MORG", "SOAG", "SOFF")),
     27: (
         date(2026, 10, 10),
         (
@@ -209,44 +139,10 @@ MAALT_I_MALINGER: dict[int, tuple[date, tuple[str, ...]]] = {
             "ZAP",
         ),
     ),
-    28: (
-        date(2026, 10, 12),
-        (
-            "CLOUD",
-            "MULTI",
-            "NEL",
-            "OKEA",
-            "SNM",
-        ),
-    ),
-    29: (
-        date(2026, 10, 14),
-        (
-            "ABG",
-            "ACR",
-            "BOHUS",
-            "CAMBI",
-            "VTURA",
-        ),
-    ),
-    30: (
-        date(2026, 10, 15),
-        (
-            "AKAST",
-            "ANDF",
-            "CRNA",
-            "GENO",
-            "ROGS",
-        ),
-    ),
-    33: (
-        date(2026, 10, 16),
-        (
-            "BRUT",
-            "POL",
-            "SBO",
-        ),
-    ),
+    28: (date(2026, 10, 12), ("CLOUD", "MULTI", "NEL", "OKEA", "SNM")),
+    29: (date(2026, 10, 14), ("ABG", "ACR", "BOHUS", "CAMBI", "VTURA")),
+    30: (date(2026, 10, 15), ("AKAST", "ANDF", "CRNA", "GENO", "ROGS")),
+    33: (date(2026, 10, 16), ("BRUT", "POL", "SBO")),
     35: (
         date(2026, 10, 17),
         (
@@ -297,15 +193,7 @@ MAALT_I_MALINGER: dict[int, tuple[date, tuple[str, ...]]] = {
             "TEKNA",
         ),
     ),
-    41: (
-        date(2026, 10, 23),
-        (
-            "2020",
-            "5PG",
-            "AASB",
-            "ABS",
-        ),
-    ),
+    41: (date(2026, 10, 23), ("2020", "5PG", "AASB", "ABS")),
     42: (
         date(2026, 10, 24),
         (
@@ -356,24 +244,8 @@ MAALT_I_MALINGER: dict[int, tuple[date, tuple[str, ...]]] = {
             "GOD",
         ),
     ),
-    51: (
-        date(2026, 10, 26),
-        (
-            "GOLDR",
-            "GRONG",
-            "GYL",
-            "HAV",
-        ),
-    ),
-    52: (
-        date(2026, 10, 28),
-        (
-            "HAVI",
-            "HBC",
-            "HDLY",
-            "HERMA",
-        ),
-    ),
+    51: (date(2026, 10, 26), ("GOLDR", "GRONG", "GYL", "HAV")),
+    52: (date(2026, 10, 28), ("HAVI", "HBC", "HDLY", "HERMA")),
 }
 
 
@@ -406,18 +278,25 @@ def vindu(boersdag: date) -> tuple[date, date]:
 
 
 def _tall(verdi: object) -> bool:
-    return isinstance(verdi, (int, float)) and not isinstance(verdi, bool) and math.isfinite(verdi) and verdi >= 0
+    """Et endelig tall som ikke er negativt. Gjennomgangen (ECH3): et heltall
+    for stort for float gir OverflowError i isfinite, og er ikke et tall her."""
+    if isinstance(verdi, bool) or not isinstance(verdi, (int, float)):
+        return False
+    try:
+        return math.isfinite(verdi) and verdi >= 0
+    except OverflowError:
+        return False
 
 
 def regn_ut(symbol: str, rader: object, fra: date, til: date) -> Maaling:
     """Median av volume x close per rad i vinduet, som i §3 og §42.
 
-    En rad med volum 0 er med, med omsetning 0. En rad uten tall for close
-    eller volume er ikke med, men telles.
+    En rad med volum 0 er med, med omsetning 0, og telles i dager_uten_volum.
+    En rad uten tall for close eller volume er ikke med, men telles.
     """
     if not isinstance(rader, list):
         return Maaling(symbol, 0, 0, 0, None, "svaret er ikke en liste med rader")
-    omsetning, uten_tall = [], 0
+    omsetning, uten_volum, uten_tall = [], 0, 0
     for rad in rader:
         try:
             dag = date.fromisoformat(rad["date"])
@@ -429,11 +308,16 @@ def regn_ut(symbol: str, rader: object, fra: date, til: date) -> Maaling:
         if not (_tall(rad.get("close")) and _tall(rad.get("volume"))):
             uten_tall += 1
             continue
-        omsetning.append(rad["volume"] * rad["close"])
+        # Gjennomgangen (BH9): volum 0, ikke omsetning 0, saa en kurs paa 0
+        # ikke telles som en dag uten volum.
+        uten_volum += rad["volume"] == 0
+        omsetning.append(float(rad["volume"]) * float(rad["close"]))
     if not omsetning:
         return Maaling(symbol, 0, 0, uten_tall, None, "ingen rader med tall i vinduet")
-    uten_volum = sum(1 for verdi in omsetning if verdi == 0)
-    return Maaling(symbol, len(omsetning), uten_volum, uten_tall, float(statistics.median(omsetning)), None)
+    median = float(statistics.median(omsetning))
+    if not math.isfinite(median):
+        return Maaling(symbol, 0, 0, uten_tall, None, "medianen er ikke et endelig tall")
+    return Maaling(symbol, len(omsetning), uten_volum, uten_tall, median, None)
 
 
 def les_lista(sti: Path) -> list[str]:
@@ -545,6 +429,50 @@ def _les(les_kvote: Callable[[str], object], nokkel: str) -> tuple[int, int, int
         raise Stopp(f"Kvoten kan ikke leses: {_uten_noekkel(str(feil), nokkel)}") from None
 
 
+# Gjennomgangen (BH3, ECH1): bare et svar som sier at tickeren ikke finnes,
+# er en varig feil som lagres som maalt. En annen feil (tidsavbrudd, 5xx,
+# 429) gir ingen rad, saa aksjen staar foerst ogsaa neste gang.
+VARIG_FEIL = "HTTP 404"
+
+
+def _lagre(
+    data_katalog: Path,
+    base_sti: Path,
+    bilde: dict,
+    boersdag: date,
+    maalt: str,
+    fra: date,
+    til: date,
+    maalinger: list[Maaling],
+    skriv: Callable[[str], None],
+) -> int:
+    """Raadataene foerst (AD-6), saa radene. 0 naar alt er lagret, ellers 1.
+
+    Gjennomgangen (ECH8): finnes navnet naar fila aapnes, proeves neste n.
+    """
+    try:
+        data_katalog.mkdir(parents=True, exist_ok=True)
+        while True:
+            fil = raafil(data_katalog, boersdag)
+            try:
+                with fil.open("x", encoding="utf-8") as ut:
+                    json.dump(bilde, ut, ensure_ascii=False)
+                break
+            except FileExistsError:
+                continue
+    except OSError as feil:
+        skriv(f"Rådataene kunne ikke skrives ({type(feil).__name__}). Ingen rader i basen.")
+        return 1
+    if maalinger:
+        try:
+            skriv_radene(base_sti, maalt, fra, til, maalinger)
+        except BASEFEIL as feil:
+            skriv(f"Basen feilet ({type(feil).__name__}). Rådataene står i {fil.name}.")
+            return 1
+    skriv(f"Rådataene står i {fil.name}, og {len(maalinger)} rader er lagt til i omsetning.")
+    return 0
+
+
 def maal_omsetning(
     data_katalog: Path,
     base_sti: Path,
@@ -558,11 +486,12 @@ def maal_omsetning(
     lista: tuple[Aksje, ...] = AKSJEUNIVERS,
 ) -> int:
     """Maalingen. Gir 0 naar den er ferdig eller ingen kall er igjen, og 1
-    naar den stoppet. Stopper den etter et kall, lagres det som er maalt.
+    naar den stoppet. Stopper den etter et kall, eller avbrytes den, lagres
+    det som er maalt (gjennomgangen, ECH3).
 
     hent, les_kvote og klokke har ingen standardverdi, saa en test som
     glemmer dem, feiler i stedet for aa gaa mot nettet (AD-8). Klokka leses
-    foer og etter hvert kall.
+    rett foer hvert kall (gjennomgangen, ECH6).
     """
     nekt_demobase(base_sti, skriv)
     start = klokke().astimezone(timezone.utc)
@@ -587,12 +516,13 @@ def maal_omsetning(
         lista_over_boersen = les_lista(listefil)
     except (OSError, ValueError) as feil:
         skriv(
-            f"Lista over aksjene på Oslo Børs, {Path(listefil).name}, kan ikke leses ({type(feil).__name__}). 0 kall brukt."
+            f"Lista over aksjene på Oslo Børs, {Path(listefil).name}, kan ikke leses "
+            f"({type(feil).__name__}). 0 kall brukt."
         )
         return 1
     try:
         plan = rekkefoelge(lista_over_boersen, sist_maalt_i_basen(base_sti), lista)
-    except BASEFEIL as feil:
+    except (*BASEFEIL, ValueError) as feil:
         skriv(f"Basen kan ikke leses ({type(feil).__name__}). 0 kall brukt.")
         return 1
 
@@ -614,9 +544,11 @@ def maal_omsetning(
         return 0
 
     fra, til = vindu(boersdag)
+    rest = igjen - len(plan)
     skriv(
         f"Måler omsetningen for {len(plan)} aksjer med {len(plan)} av de {igjen} kallene som er igjen av dagens, "
-        f"fra {fra.isoformat()} til {til.isoformat()}. Bonuskvoten brukes aldri, og ingen kall blir igjen i dag."
+        f"fra {fra.isoformat()} til {til.isoformat()}. Bonuskvoten brukes aldri. "
+        + ("Ingen kall blir igjen i dag." if rest == 0 else f"{rest} kall blir igjen i dag.")
     )
 
     serier: dict[str, object] = {}
@@ -624,46 +556,59 @@ def maal_omsetning(
     maalinger: list[Maaling] = []
     kall = 0
     kode = 0
+    etter: tuple[int, int, int, date] | None = None
+    avbrutt: BaseException | None = None
     try:
         for symbol in plan:
-            if klokke().astimezone(timezone.utc).date() != i_dag_gmt:
-                raise Stopp(f"Datoen i GMT er ikke lenger {i_dag_gmt.isoformat()}.")
-            brukt, _, bonus_naa, dato = _les(les_kvote, nokkel)
+            brukt, grense_naa, bonus_naa, dato = _les(les_kvote, nokkel)
             if bonus_naa != bonus:
                 raise Stopp(f"extraLimit er endret fra {bonus} til {bonus_naa}, så bonuskvoten kan være brukt.")
             if dato > i_dag_gmt or (kall and dato != i_dag_gmt):
                 raise Stopp(f"Kvoten står på {dato.isoformat()}, ikke {i_dag_gmt.isoformat()} i GMT.")
+            # Gjennomgangen (BH10, ECH10): den laveste grensen som er lest.
+            grense = min(grense, grense_naa)
             if dato == i_dag_gmt and brukt >= grense:
                 raise Stopp(f"Alle de {grense} kallene i dag er brukt. Kall nummer {grense + 1} går fra bonuskvoten.")
+            if klokke().astimezone(timezone.utc).date() != i_dag_gmt:
+                raise Stopp(f"Datoen i GMT er ikke lenger {i_dag_gmt.isoformat()}.")
             try:
                 svar = hent(f"{symbol}.OL", nokkel, fra.isoformat(), til.isoformat())
             except Exception as feil:
                 svar = None
                 feil_ved[symbol] = _uten_noekkel(str(feil) or type(feil).__name__, nokkel)
             kall += 1
-            if symbol in feil_ved:
+            if symbol not in feil_ved:
+                serier[symbol] = svar
+                try:
+                    maaling = regn_ut(symbol, svar, fra, til)
+                except (ArithmeticError, TypeError, ValueError) as feil:
+                    maaling = Maaling(symbol, 0, 0, 0, None, f"radene kunne ikke regnes ut ({type(feil).__name__})")
+            elif feil_ved[symbol].startswith(VARIG_FEIL):
                 maaling = Maaling(symbol, 0, 0, 0, None, feil_ved[symbol])
             else:
-                serier[symbol] = svar
-                maaling = regn_ut(symbol, svar, fra, til)
-            maalinger.append(maaling)
-            if maaling.feil:
-                skriv(f"{symbol}: ingen måling ({maaling.feil}).")
-            else:
-                skriv(f"{symbol}: {maaling.handelsdager} handelsdager, {maaling.dager_uten_volum} uten volum.")
-            brukt, _, bonus_naa, dato = _les(les_kvote, nokkel)
+                maaling = None
+                skriv(f"{symbol}: kallet feilet ({feil_ved[symbol]}). Ingen rad, så den måles først neste gang.")
+            if maaling is not None:
+                maalinger.append(maaling)
+                if maaling.feil:
+                    skriv(f"{symbol}: ingen måling ({maaling.feil}).")
+                else:
+                    skriv(f"{symbol}: {maaling.handelsdager} handelsdager, {maaling.dager_uten_volum} uten volum.")
+            etter = brukt, grense_naa, bonus_naa, dato = _les(les_kvote, nokkel)
             if dato != i_dag_gmt:
                 raise Stopp(f"Kvoten står på {dato.isoformat()} etter kallet, ikke {i_dag_gmt.isoformat()} i GMT.")
             if bonus_naa != bonus:
                 raise Stopp(f"extraLimit er endret fra {bonus} til {bonus_naa}, så bonuskvoten kan være brukt.")
-            if brukt > grense:
-                raise Stopp(f"apiRequests er {brukt}, over dagens {grense}.")
+            if brukt > min(grense, grense_naa):
+                raise Stopp(f"apiRequests er {brukt}, over dagens {min(grense, grense_naa)}.")
     except Stopp as stopp:
         skriv(f"STOPP: {stopp}")
         kode = 1
+    except BaseException as feil:
+        avbrutt = feil
+        kode = 1
 
-    if maalinger:
-        fil = raafil(data_katalog, boersdag)
+    if serier or feil_ved:
         bilde = {
             "hentet": start.isoformat(),
             "boersdag": boersdag.isoformat(),
@@ -672,18 +617,10 @@ def maal_omsetning(
             "serier": serier,
             "feil": feil_ved,
         }
-        try:
-            fil.parent.mkdir(parents=True, exist_ok=True)
-            with fil.open("x", encoding="utf-8") as ut:
-                json.dump(bilde, ut, ensure_ascii=False)
-        except OSError as feil:
-            skriv(f"Rådataene kunne ikke skrives ({type(feil).__name__}). Ingen rader i basen.")
-            return 1
-        try:
-            skriv_radene(base_sti, start.isoformat(), fra, til, maalinger)
-        except BASEFEIL as feil:
-            skriv(f"Basen feilet ({type(feil).__name__}). Rådataene står i {fil.name}.")
-            return 1
-        skriv(f"Rådataene står i {fil.name}, og {len(maalinger)} rader er lagt til i omsetning.")
+        kode = _lagre(data_katalog, base_sti, bilde, boersdag, start.isoformat(), fra, til, maalinger, skriv) or kode
     skriv(f"API-kall brukt: {kall}.")
+    if etter is not None:
+        skriv(f"Kvoten etter: {etter[0]} av {etter[1]} brukt {etter[3].isoformat()} i GMT, extraLimit {etter[2]}.")
+    if avbrutt is not None:
+        raise avbrutt
     return kode

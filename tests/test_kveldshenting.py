@@ -109,6 +109,10 @@ def test_jobben_maaler_omsetningen_etter_hentingen_i_hver_kjoering():
     assert kode.count("$kode = $LASTEXITCODE") == 1
     mellom = kode[hentingen:maalingen]
     assert "if (" not in mellom and "exit" not in mellom
+    # Gjennomgangen (VG10): $kode settes ikke igjen etter maalingen, utenom i
+    # catch for en uventet feil.
+    assert "$kode" not in kode[maalingen : kode.index("} catch {", maalingen)]
+    assert re.search(r"\bif\s*\(", mellom) is None
     assert 'Logg "Målingen avsluttet med kode $LASTEXITCODE."' in kode
 
 
