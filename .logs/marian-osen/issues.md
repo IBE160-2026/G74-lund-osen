@@ -1,11 +1,12 @@
 # Åpne punkter
 
-- [ ] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d BH6: en henting for hånd samtidig med jobben er ikke sperret (spørsmål til gruppen før flettingen)
-- [ ] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d ECH5: jobben overstyrer OSE_KI_TJENESTE i .env (spørsmål til gruppen før flettingen)
-- [ ] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d: FR-401 i prd.md er ikke endret etter beslutningen 29.09 (gruppen avgjør)
-- [ ] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d: arbeidskopien, lenkene og jobben på PC-en etter flettingen, med Prøve 4 før kl. 22 og 0 kall
+- [ ] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d: prøven med 0 kall fra hentingen 29.10 før kl. 22:00, eller i loggen etter første kjøring 29.10 kl. 22:15
+- [x] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d BH6: en henting for hånd samtidig med jobben er ikke sperret (spørsmål til gruppen før flettingen) (løst 2026-10-28, gruppens svar kl. 11:34: ingen lås nå)
+- [x] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d ECH5: jobben overstyrer OSE_KI_TJENESTE i .env (spørsmål til gruppen før flettingen) (løst 2026-10-28, gruppens svar kl. 11:34: alltid den lokale modellen)
+- [x] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d: FR-401 i prd.md er ikke endret etter beslutningen 29.09 (gruppen avgjør) (løst 2026-10-28, datert linje under FR-401 i a6b4e41)
+- [x] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d: arbeidskopien, lenkene og jobben på PC-en etter flettingen, med Prøve 4 før kl. 22 og 0 kall (løst 2026-10-28, jobben lagt inn og Prøve 4 rad 5 tatt i dag; prøven med 0 kall fra hentingen står som eget punkt)
 - [ ] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d VG4, BH7, BH9/ECH8, BH15/VG7 og BH16 (low) under «Åpent» i spesifikasjonen
-- [ ] 2026-10-28 [sesjonsloggen-tas-i-bruk](999-2026-10-28-07-29-09-sesjonsloggen-tas-i-bruk.md) — jobben i Oppgaveplanlegging bygges 28.10 og går første gang torsdag 29.10 (svaret 27.10 kl. 20:58)
+- [x] 2026-10-28 [sesjonsloggen-tas-i-bruk](999-2026-10-28-07-29-09-sesjonsloggen-tas-i-bruk.md) — jobben i Oppgaveplanlegging bygges 28.10 og går første gang torsdag 29.10 (svaret 27.10 kl. 20:58) (løst 2026-10-28, flettet i 817b331 og lagt inn med første kjøring 29.10 kl. 22:15)
 - [ ] 2026-10-27 [sesjonsloggen-tas-i-bruk](999-2026-10-28-07-29-09-sesjonsloggen-tas-i-bruk.md) — 3.5g (PR #103): BH3, en synlig linje til Docker og uv, og ECH7, «steg 4» i svarene under «Står du fast?», venter på gruppen; flettingen er ikke avgjort
 - [ ] 2026-10-26 [sesjonsloggen-tas-i-bruk](999-2026-10-28-07-29-09-sesjonsloggen-tas-i-bruk.md) — 3.5f BH15: prøven av hovedveien (D1) etter flettingen
 - [ ] 2026-10-26 [sesjonsloggen-tas-i-bruk](999-2026-10-28-07-29-09-sesjonsloggen-tas-i-bruk.md) — 3.5f BH8: hjelpen har ikke eget svar når installasjonen av uv feiler
