@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-10-27T00:06
+updated: 2026-10-28T19:24
 ---
 
 # Hjelp til «Kom i gang»
@@ -190,6 +190,10 @@ Kursene kommer fra EODHD, og den gratis nøkkelen gir 20 kall i døgnet. Hver ak
 ### Når kan jeg hente?
 
 Hent etter kl. 22 og før midnatt på en børsdag. Første gang, når basen er tom, kan du også hente på dagtid og i helgen: da henter den siste fullførte børsdag, før kl. 22 en børsdag altså forrige børsdag, og aldri dagens kurs. Signalet lagres fra første henting og regnes aldri bakover, så «Signalet dag for dag» fylles én børsdag om gangen. Første henting på dagtid bruker normalt 16 av dagens 20 kall, så det er ingen kall igjen til nye forsøk samme kveld, og den bruker aldri bonuskvoten. Kveldens henting samme dag trenger 16 til: har kontoen minst 12 i bonuskvoten, tas de derfra, og dagen får signal. Ellers bruker den 0 kall, og den dagen får aldri signal, fordi en vurdering bare kan skrives for inneværende børsdag. Neste kveld hentes neste børsdag. Før kl. 22 en børsdag stopper hentingen med 0 kall og sier hvorfor når basen ikke er tom: dagens sluttkurs er ikke klar ennå, og en vurdering kan ikke fylles inn senere. Har basen alt kursene for børsdagen, bruker den også 0 kall. På en dag børsen er stengt henter den bare hvis basen mangler forrige børsdag. Mangler noen aksjer dagens kurs etter hentingen, sier den hvilke. Kjør samme kommando igjen senere samme kveld, så prøver den bare dem, med kallene som er til overs etter hentingen (20 minus ett per aksje og ett for hovedindeksen, altså 4 med de 15), aldri bonuskvoten og ikke etter kl. 23:50. Hovedindeksen prøves ikke på nytt samme kveld. Før kallene leser den kvoten med `/api/user`, som er gratis.
+
+### Kan hentingen gå av seg selv hver kveld?
+
+Ja, på Windows, med en jobb i Oppgaveplanlegging. Den går hver dag kl. 22:15, og igjen kl. 22:45, 23:15 og 23:45, fra en egen arbeidskopi på commiten main hadde ved midnatt, og henter uten KI-tekst hvis Docker Desktop eller Ollama ikke svarer. Loggen står i `data/logg/kveldshenting-<dato>.log`. Slik slås den på og av, med `start\legg-inn-kveldshentingen.ps1` og `start\ta-bort-kveldshentingen.ps1`: [Hentingen hver kveld](../README.md#hentingen-hver-kveld) i README-en. Slå den av før du henter for hånd samme kveld, eller vent til den er ferdig, så to hentinger ikke går samtidig.
 
 ### Oversikten er tom.
 

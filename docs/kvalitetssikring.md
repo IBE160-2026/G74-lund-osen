@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-26T18:54
+updated: 2026-10-28T11:43
 ---
 
 # Kvalitetssikring
@@ -371,6 +371,7 @@ sist i dokumentet.
 | 3.5d Funnene fra forprøven av den ekte versjonen 24.10 | `5e01a4f` (#94) | 1 (1, sjekken av kommandolinja) | – kjørt én gang med `-x` på `50ab5a6` 24.10, før sjekken ble snevret inn etter gjennomgangen | `S/spec-3-5d-funn-fra-forproeven.md` |
 | 3.5f Hovedveien i «Kom i gang» | `8cd20b3` (#101) | 1 (1, Docker-delen tatt ut av «Kom i gang») | – kjørt med `-x` på `b5e4faa` og igjen på `a052c74` 26.10 | `S/spec-3-5f-hovedveien.md` |
 | 3.5e Den andre versjonen stoppes rett før webserveren | `dbfa0b9` (#100) | 1 (1, stoppen tilbake før uv) | – kjørt med `-x` på `df6b0a0` og igjen på `fd19b7f` 26.10 | `S/spec-3-5e-stopp-foer-webserveren.md` |
+| 2.3d Hentingen går av seg selv hver kveld | `817b331` (#104) | 1 (1, `origin/main` i stedet for commiten fra midnatt) | – kjørt med `-x` på `5b5b737` og igjen på `c852bbd` 28.10 | `S/spec-2-3d-hentingen-hver-kveld.md` |
 | 8.2a Seks funn fra prøven av demoen 24.10 | `e4d1ba4` (#93) | 1 (5, M1–M5) | – kjørt på `7ca19d9` 24.10 | `S/spec-8-2a-funn-fra-proeven-av-demoen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
@@ -605,6 +606,7 @@ funn. Antall rader i loggen:
 | 3.5d | 24 | 15 | 8 | 1 |
 | 3.5f | 23 | 13 | 9 | 1 |
 | 3.5e | 10 | 8 | – | 2 |
+| 2.3d | 30 | 16 | 9 | 5 |
 | 8.6b, gjennomgangene 26.10 | 37 | 21 | 13 | 3 |
 | 8.0f, gjennomgangen 26.10 | 25 | 22 | 3 | – |
 | 8.2a | 21 | 15 | 6 | – |
@@ -1012,6 +1014,27 @@ hentingen kan gi kurser, se «Når kan jeg hente?» i
 - **Det som ikke stemte:**
 - **Rettet i** (commit eller story):
 
+### Prøve 4: hentingen hver kveld
+
+*Lagt til 2026-10-28 (story 2.3d):* «Hentingen hver kveld med Oppgaveplanlegging (Windows, valgfri)» under «Mer for den som vil» i README-en. Prøven tas på PC-en som skal hente, i mappa vi jobber i, etter at 2.3d er flettet, og før kl. 22:00, så hentingen gir 0 kall.
+
+- **Dato:** 2026-10-28, kl. 11:41–11:42
+- **Commit som ble prøvd:** `a6b4e41` på main, etter flettingen i `817b331`
+
+| # | Kommando eller steg i README-en | Det som skjedde |
+|---|---|---|
+| 1 | `git worktree add --detach ..\G74-lund-osen-jobb origin/main` | Kode 0, «HEAD is now at a6b4e413» |
+| 2 | `cmd /c mklink /J ..\G74-lund-osen-jobb\data data`. Står det «Junction created»? | Ja, kode 0. `LinkType` `Junction` til `data` i hovedkopien |
+| 3 | `New-Item -ItemType HardLink -Path ..\G74-lund-osen-jobb\.env -Target .env`. Viser `Get-Item ..\G74-lund-osen-jobb\.env` `LinkType` `HardLink`? | Ja. Innholdet er ikke skrevet ut |
+| 4 | `powershell -NoProfile -ExecutionPolicy Bypass -File start\legg-inn-kveldshentingen.ps1 -Arbeidskopi ..\G74-lund-osen-jobb -FoersteDato 2026-10-29`. Viser Oppgaveplanlegging jobben med kl. 22:15 og hver halvtime? | Ja: `StartBoundary` `2026-10-29T22:15:00` uten Z, daglig, gjentakelse `PT30M` i `PT1H35M` med `StopAtDurationEnd` av, `MultipleInstances` `IgnoreNew`, `StartWhenAvailable` av, `LogonType` `Interactive`, og neste kjøring 29.10 kl. 22:15 |
+| 5 | Jobben kjørt for hånd før kl. 22:00 (`Start-ScheduledTask`). Sier loggen i `data/logg/` commiten fra midnatt, 0 kall og koden? Les `/api/user` før og etter: `apiRequests` skal være uendret | 28.10 kl. 11:42:31, før commiten fra midnatt hadde jobben: loggen sier «STOPP: Commiten fra midnatt, b17bda66…, har ikke start/kveldshenting.ps1 ennå. Jobben går fra neste kveld.», siste resultat 1, 0 kall, og `apiRequests` 16 med `apiRequestsDate` 2026-10-27 både før og etter. Arbeidskopien ble ikke flyttet |
+| 6 | `powershell -NoProfile -ExecutionPolicy Bypass -File start\ta-bort-kveldshentingen.ps1`, bare hvis jobben skal av | |
+
+- **Det som ikke stemte:** ingenting.
+- **Rettet i** (commit eller story): –
+
+*Lagt til 2026-10-28 kl. 11:43:* rad 5 ble tatt samme dag som flettingen, så jobben stoppet før hentingen, som den skal. Prøven med 0 kall fra selve hentingen tas 29.10 før kl. 22:00, eller leses i loggen etter første kjøring 29.10 kl. 22:15.
+
 ## 10. Suksesskriteriene og testene
 
 *Lagt til 2026-10-13, etter faglærers tilbakemelding 06.10
@@ -1384,6 +1407,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 3.5d | sjekken av kommandolinja borte i `start.ps1`, så alt på porten stoppes | `test_start_ps1_stopper_bare_den_andre_versjonen_paa_porten[fremmed]`, med `-x` | `S/spec-3-5d-…` |
 | 3.5f | Docker-delen, fra `### Med Docker Desktop` til `### Står du fast?`, tatt ut av `README.md` | `TestCompose::test_porten_er_den_samme_overalt_og_ikke_5000` med `-x` mot tre testfiler, og `TestHovedveien::test_dobbeltklikket_staar_foerst_og_ikke_bak_en_pil` med `-k TestHovedveien`, på `b5e4faa` og `a052c74` | `S/spec-3-5f-…` |
 | 3.5e | stoppen tilbake før uv i `start.ps1` (`Frigjoer-Porten $true` der porten sjekkes) | `test_start_ps1_stopper_bare_den_andre_versjonen_paa_porten[oss]`, med `-x` | `S/spec-3-5e-…` |
+| 2.3d | `rev-list -1 --first-parent --before=$midnatt origin/main` byttet til `rev-parse origin/main` i `start/kveldshenting.ps1` | `test_jobben_bruker_commiten_fra_midnatt_paa_origin_main` med `-x`, og `test_arbeidskopien_flyttes_til_commiten_fra_midnatt[gren]` med `-k arbeidskopien_flyttes`, på `5b5b737` og `c852bbd` | `S/spec-2-3d-…` |
 | 8.2a | M1–M5 | M1 `test_periodeknappene_og_velg_dag_gaar_til_kursgrafen`, M2 `test_aksjen_uten_kurser_har_en_rad_nederst_og_ingen_fotnote`, M3 `test_symbolene_over_soeylene_lenker_til_aksjesiden[/]`, M4 `test_raden_sier_hvorfor_med_samme_tall_som_aksjesiden[/]`, M5 `test_sortert_er_hele_lista_en_liste_uten_delene[synkende]` | `S/spec-8-2a-…` |
 | 9.1 | Q1–Q4 | Q1, Q3 og Q4 `test_hver_ferdige_spesifikasjon_har_en_rad`, Q2 `test_hver_test_dokumentene_nevner_finnes` | `S/spec-9-1-…` |
 | 9.7 | A1–A5 | A1 `test_ruff_check_finner_ingenting`, A2 og A3 `test_ruff_format_er_kjoert`, A4 `test_ci_kjoerer_ruff_foer_testene`, A5 `test_ingen_modul_i_src_bruker_meldinger` | `S/spec-9-7-…` |

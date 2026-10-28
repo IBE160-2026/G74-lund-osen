@@ -158,6 +158,12 @@ et sitat som ikke fantes».
     CI kjører `ruff check` og `ruff format --check`, og `tests/test_ruff.py`
     gjør det samme, så `uv run pytest` feiler hvis det er glemt. Lagt til
     2026-10-17 med story 9.7, etter gruppens svar kl. 22:38–22:42.
+24. **Sesjonsloggen.** Loggen skrives på slutten av hver instruksjon, før
+    Utført-linja, i `.logs/<bruker>/` med `issues.md` og på norsk. Den har ingen
+    kurser, volumer, nøkler eller navn på testpersoner (regel 16).
+    Loggcommiten har Co-authored-by (regel 20) og pushes med Utført-linja, så
+    main er i takt med origin/main til slutt. Lagt til 2026-10-27, etter
+    gruppens svar 26.10 kl. 21:09.
 
 ## Sesjonslogg
 

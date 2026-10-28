@@ -1632,6 +1632,33 @@ Med 2.8 er det 4 kall igjen, ikke 5.
 
 *Ferdig 2026-10-12:* flettet i `c3d6660`, PR #28.
 
+### Story 2.3d: Hentingen går av seg selv hver kveld
+
+*Lagt til 2026-10-28, etter gruppens svar 26.10 kl. 22:58 og 27.10 kl. 20:58.*
+
+Som **gruppe som henter for hånd hver kveld**, vil vi at hentingen går av seg selv fra en jobb i Oppgaveplanlegging, så en kveld uten henting ikke blir en vurdering som mangler for alltid (AD-7).
+
+**Oppfyller:** FR-401 (beslutningen 29.09), FR-402, NFR-01, NFR-04 · **Begrenses av:** `AD-7`, `AD-10`, `AD-20`
+
+**Grunnlaget:**
+- Beslutningen 29.09 under FR-401 i `prd.md`: når 2.3 er bygget, kan hentekommandoen startes av en planlagt jobb i Oppgaveplanlegging på Marians PC. Tapte kjøringer tas ikke igjen, og utskriften går til en loggfil i `data/`.
+- Svar 2 og 3 under story 2.3 (05.10 kl. 19:17): jobben kjører hver dag kl. 22:15, ikke bare på hverdager, og fra en egen arbeidskopi av main som deler `data/` og `.env` med hovedkopien uten at nøkkelen kopieres.
+- Kontrollpunktet «Oppgaveplanlegging gjentar jobben hver halvtime fra 22:15 til 23:45», som ble flyttet ut av 2.3b til et eget steg. Det steget er denne storyen.
+- Avgjørelsene 26.10 kl. 22:58 og 27.10 kl. 20:58 i dagsfila 28.10 (`0d5e922`): jobben bygges 28.10 og går første gang torsdag 29.10.
+
+**Kontroll — hva testen ser etter:**
+- Jobben starter kl. 22:15 hver dag og igjen hver halvtime til 23:45. Ingen ny kjøring starter mens en går (ECH3), og tapte kjøringer tas ikke igjen
+- Jobben kjører fra en egen arbeidskopi av main, på commiten main hadde ved midnatt, så det som flettes en dag, ikke går samme kveld
+- Nøkkelen og miljøet skrives aldri ut, verken i loggen eller i utskriften
+- Svarer ikke Docker Desktop eller Ollama innen tidsgrensen, hentes det uten KI-tekst (NFR-04)
+- **Ville feilet hvis:** skriptene skrev ut nøkkelen eller miljøet, kjørte fra en gren eller fra hovedkopien, brukte en nyere commit enn den fra midnatt, eller hadde andre tider enn over
+
+**Avhenger av:** 2.3 og 2.3b. **Én økt:** ja. Bygges 28.10, og jobben legges inn på PC-en etter flettingen.
+
+*Avgjort 2026-10-28 kl. 11:34 (gruppens svar):* BH6: ingen lås nå. Vi henter ikke for hånd mens jobben går, og fra 29.10 hentes det for hånd bare når loggen viser at jobben feilet. ECH5: jobben bruker alltid den lokale modellen, som instruksjonene for hentingen, så KI-tekstene i `ki_logg` kommer fra samme modell hver dag. FR-401 får en datert linje etter flettingen.
+
+*Ferdig 2026-10-28:* squash-flettet i `817b331`, PR #104, låst til head-en `ad8ec4a` (spesifikasjonen `spec-2-3d-hentingen-hver-kveld.md`). Hele settet på `c852bbd`: 3806 bestått og 24 hoppet over, og CI var grønn på head-en (40673689106), med testene for kveldshentingen på `windows-latest`. Mutanten, `origin/main` i stedet for commiten fra midnatt, ble fanget. Jobben legges inn på PC-en i samme instruksjon og går første gang torsdag 29.10.
+
 ### Story 2.4: Etterfylling av hull i kursserien
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
@@ -2479,6 +2506,16 @@ Resten ryddes etter alle testene.
 *Lagt til 2026-10-26 kl. 13:32:* 3.5f, hovedveien i «Kom i gang», er squash-flettet i `8cd20b3`, PR #101, låst til head-en `e5f65f5` (spesifikasjonen `spec-3-5f-hovedveien.md`). Etter svaret 25.10 kl. 11:32 og innspillet kl. 11:26 heter overskriften «Kom i gang: nedlasting og installasjon», med ankeret `kom-i-gang` beholdt. «Velg vei etter hva du har» lenker rett inn til dobbeltklikket (anbefalt), «Med Docker Desktop» og «Uten Docker, med uv». Dobbeltklikket er en egen del først, med den direkte ZIP-lenken, og «Mappestruktur» forklarer hver fil og mappe i rota. `docs/hjelp.md` og §9 i kvalitetssikringen følger, med Docker som reserve.
 
 *Avgjort 2026-10-26 kl. 23:00 (gruppens svar):* «Kom i gang» er for lang. Dobbeltklikket blir fem korte nummererte steg: last ned med den direkte lenken, pakk ut, åpne G74-lund-osen-main og dobbeltklikk «Start demoen», svar j når vinduet spør om uv, og nettleseren åpner appen, og lukk vinduet for å stoppe. Under stegene én linje om advarselen første gang på Windows og Mac, og én om den ekte versjonen. Alt annet står bak piler eller i `docs/hjelp.md`, og ingenting forsvinner. Det går foran innspillet 25.10 kl. 11:26 om at resten ryddes etter testene.
+
+*Avgjort 2026-10-27 kl. 06:09 (gruppens svar)* om funnene i triagen til 3.5g (`spec-3-5g-kortere-kom-i-gang.md`):
+- a) En tredje kort linje under stegene: «Linux: bruk Docker eller uv, under.» (BH3)
+- b) Hver henvisning til et steg under «Står du fast?» sier hvilken vei den gjelder, som «steg 4 med Docker». (ECH7)
+- c) Radene D1–D6 i §9 i kvalitetssikringen følger de fem stegene og linjene under dem. (VG5)
+- d) 3.5g flettes når alt er grønt.
+
+*Avgjort 2026-10-28 kl. 11:19 og 11:23 (gruppens svar):*
+- e) Veiene står hver for seg, som i 3.5g, men tabellen «Demoen og den ekte versjonen» står uten pil under «Innhold», før «Til faglærer», så de to versjonene og hva som er laget, synes med en gang. Kl. 11:19 sto den etter stegene; svaret kl. 11:23 gjelder.
+- f) «Til faglærer» kortes ned i en egen endring etter 3.5g.
 
 ---
 
