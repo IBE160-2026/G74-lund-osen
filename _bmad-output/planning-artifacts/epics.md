@@ -2517,6 +2517,8 @@ Resten ryddes etter alle testene.
 - e) Veiene står hver for seg, som i 3.5g, men tabellen «Demoen og den ekte versjonen» står uten pil under «Innhold», før «Til faglærer», så de to versjonene og hva som er laget, synes med en gang. Kl. 11:19 sto den etter stegene; svaret kl. 11:23 gjelder.
 - f) «Til faglærer» kortes ned i en egen endring etter 3.5g.
 
+*Lagt til 2026-10-28 kl. 20:01:* 3.5g, «Kom i gang» med fem steg og resten bak piler, er squash-flettet i `27ccf82`, PR #103, låst til head-en `0f91a8f` (spesifikasjonen `spec-3-5g-kortere-kom-i-gang.md`), med a, b, c og e over. Tabellen «Demoen og den ekte versjonen» står uten pil før «Til faglærer», og f står igjen.
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen

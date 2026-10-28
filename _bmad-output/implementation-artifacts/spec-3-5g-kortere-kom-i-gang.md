@@ -2,7 +2,7 @@
 title: 'Story 3.5 (3.5g): «Kom i gang» med fem steg og resten bak piler'
 type: 'docs'
 created: '2026-10-27'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '54d4714'
