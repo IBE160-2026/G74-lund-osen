@@ -47,6 +47,12 @@ $handling = New-ScheduledTaskAction -Execute 'powershell.exe' -WorkingDirectory 
 $utloeser = New-ScheduledTaskTrigger -Daily -At $dato.Date.AddHours(22).AddMinutes(15)
 $utloeser.Repetition = (New-ScheduledTaskTrigger -Once -At $dato.Date.AddHours(22).AddMinutes(15) `
         -RepetitionInterval (New-TimeSpan -Minutes 30) -RepetitionDuration (New-TimeSpan -Hours 1 -Minutes 35)).Repetition
+# Gjennomgangen (ECH2): cmdleten lagrer starten i UTC (21:15:00Z om vinteren),
+# som ville gitt 23:15 om sommeren. Uten Z er det lokal tid hele året.
+$utloeser.StartBoundary = $dato.Date.AddHours(22).AddMinutes(15).ToString('yyyy-MM-ddTHH:mm:ss')
+# Gjennomgangen (ECH3): ellers stopper Oppgaveplanlegging en kjøring som går
+# når gjentakelsen er over, kl. 23:50.
+$utloeser.Repetition.StopAtDurationEnd = $false
 $innstillinger = New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -ExecutionTimeLimit (New-TimeSpan -Hours 1) `
     -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
 $innstillinger.StartWhenAvailable = $false

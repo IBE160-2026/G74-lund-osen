@@ -378,7 +378,7 @@ Slå av KI-teksten: sett `OSE_KI_TJENESTE=av` i `.env`.
 
 En jobb i Oppgaveplanlegging kan hente for deg hver kveld, med den samme kommandoen som du kjører selv, `uv run python src/fetch_prices.py`. Jobben går hver dag kl. 22:15, og igjen kl. 22:45, 23:15 og 23:45, så aksjer som mangler dagens kurs, prøves på nytt med kallene som er til overs. En ny kjøring starter ikke mens en går, og en kveld PC-en er av eller du ikke er logget inn, hentes ikke senere.
 
-Jobben kjører fra en egen arbeidskopi av main (`git worktree`), ikke fra mappa du jobber i. Før hver kjøring flyttes arbeidskopien til commiten main hadde ved midnatt, så det som flettes en dag, går først neste kveld. `data/` og `.env` i arbeidskopien er lenker til mappa du jobber i, så basen og nøkkelen er de samme, og nøkkelen kopieres ikke. Jobben starter Docker Desktop og Ollama hvis de ikke kjører. Svarer de ikke innen tidsgrensen på fire minutter, hentes det uten KI-tekst. Det jobben startet selv, stopper den etterpå.
+Jobben kjører fra en egen arbeidskopi av main (`git worktree`), ikke fra mappa du jobber i. Før hver kjøring flyttes arbeidskopien til commiten main hadde ved midnatt, så det som flettes en dag, går først neste kveld. `data/` og `.env` i arbeidskopien er lenker til mappa du jobber i, så basen og nøkkelen er de samme, og nøkkelen kopieres ikke. Jobben starter Docker Desktop og Ollama hvis de ikke kjører. Svarer de ikke innen tre minutter til sammen, hentes det uten KI-tekst. Det jobben startet selv, stopper den etterpå.
 
 Alt jobben gjør, står i loggen `data/logg/kveldshenting-<dato>.log` i mappa du jobber i, én fil per kveld. Nøkkelen skrives aldri ut.
 
@@ -400,7 +400,7 @@ New-Item -ItemType HardLink -Path ..\G74-lund-osen-jobb\.env -Target .env
 powershell -NoProfile -ExecutionPolicy Bypass -File start\legg-inn-kveldshentingen.ps1 -Arbeidskopi ..\G74-lund-osen-jobb -FoersteDato 2026-10-29
 ```
 
-Uten `-FoersteDato` går den første gang i kveld. Lager du `.env` på nytt, må lenken også lages på nytt; ellers stopper jobben og sier det i loggen.
+Uten `-FoersteDato` går den første gang i kveld, hvis den legges inn før kl. 22:15. Er commiten fra midnatt eldre enn jobben, stopper den og sier det i loggen, og går fra neste kveld. Lager du `.env` på nytt, må lenken også lages på nytt; ellers stopper jobben og sier det i loggen.
 
 Slå den av:
 

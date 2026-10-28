@@ -65,7 +65,8 @@ def test_skriptene_skriver_ikke_ut_noekkelen_eller_miljoeet(sti):
     ):
         assert not re.search(moenster, kode, re.MULTILINE), moenster
     for linje in kode.splitlines():
-        if ".env" in linje:
+        # Gjennomgangen (VG6): .env leses gjennom $envHoved og $envJobb.
+        if ".env" in linje or "$envHoved" in linje or "$envJobb" in linje:
             assert not re.search(r"(?i)Get-Content|\bcat\b|\btype\b|ReadAllText|Select-String", linje), linje
 
 
@@ -73,7 +74,7 @@ def test_jobben_bruker_commiten_fra_midnatt_paa_origin_main():
     """Ville feilet hvis jobben brukte en nyere commit enn den main hadde ved
     midnatt (origin/main, HEAD eller en gren), eller sto paa en gren."""
     kode = _kode(JOBBEN)
-    assert "$midnatt = (Get-Date).Date.ToString('yyyy-MM-ddTHH:mm:sszzz')" in kode
+    assert "$midnatt = ([DateTimeOffset]::new((Get-Date).Date)).ToString('yyyy-MM-ddTHH:mm:sszzz')" in kode
     assert "rev-list -1 --first-parent --before=$midnatt origin/main" in kode
     assert "checkout --quiet --detach $commit" in kode
     assert "symbolic-ref -q HEAD" in kode
@@ -109,7 +110,7 @@ def test_bare_det_skriptet_startet_stoppes():
     kjoerte fra foer, eller fjernet containeren og volumet."""
     kode = _kode(JOBBEN)
     assert (
-        "if ($startetOllama) {\nLogg 'Stopper Ollama.'\n$null = Kjoer-Med-Grense $docker.Source 'compose --profile ki stop ollama' 120"
+        "if ($startetOllama) {\nLogg 'Stopper Ollama.'\n$null = Kjoer-Med-Grense $docker.Source @('compose', '--profile', 'ki', 'stop', 'ollama') 120"
         in kode
     )
     assert "if ($startetDocker) {\nLogg 'Stopper Docker Desktop.'" in kode
@@ -123,7 +124,7 @@ def _tidene() -> list[str]:
     """Klokkeslettene jobben starter, regnet ut fra legg-inn-skriptet."""
     kode = _kode(LEGG_INN)
     start = re.findall(r"\$dato\.Date\.AddHours\((\d+)\)\.AddMinutes\((\d+)\)", kode)
-    assert len(start) == 2 and start[0] == start[1], start
+    assert len(start) == 3 and len(set(start)) == 1, start
     intervall = re.search(r"-RepetitionInterval \(New-TimeSpan -Minutes (\d+)\)", kode)
     varighet = re.search(r"-RepetitionDuration \(New-TimeSpan -Hours (\d+) -Minutes (\d+)\)", kode)
     foerste = int(start[0][0]) * 60 + int(start[0][1])
@@ -143,6 +144,12 @@ def test_jobben_gaar_hver_dag_fra_22_15_hver_halvtime_til_23_45():
     assert "-MultipleInstances IgnoreNew" in kode
     assert "$innstillinger.StartWhenAvailable = $false" in kode and "-StartWhenAvailable" not in kode
     assert "-WakeToRun" not in kode
+    # Gjennomgangen (ECH2, ECH3, VG5): lokal tid uten Z, ingen stopp ved
+    # slutten av gjentakelsen, og jobben bare med brukeren logget inn.
+    assert "$utloeser.StartBoundary = $dato.Date.AddHours(22).AddMinutes(15).ToString('yyyy-MM-ddTHH:mm:ss')" in kode
+    assert "$utloeser.Repetition.StopAtDurationEnd = $false" in kode
+    assert "-ExecutionTimeLimit (New-TimeSpan -Hours 1)" in kode
+    assert "-LogonType Interactive -RunLevel Limited" in kode
     assert "[string]$FoersteDato = (Get-Date).ToString('yyyy-MM-dd')" in kode
     assert "TryParseExact($FoersteDato, 'yyyy-MM-dd'" in kode
 
@@ -191,42 +198,50 @@ def _git(mappe: Path, *argumenter: str, dato: str | None = None) -> str:
     return svar.stdout.strip()
 
 
-def _oppsett(tmp_path: Path, start: str, skript: Path = JOBBEN) -> dict[str, Path | str]:
+def _oppsett(tmp_path: Path, start: str, etter: str = "") -> dict[str, Path | str]:
     """origin (bart repo), hovedkopien og jobbens arbeidskopi. Commiten fra
     i gaar kl. 12 er siste foer midnatt; commiten fra naa kom etter. start er
     "gren" (arbeidskopien paa en egen gren med en nyere commit) eller
-    "nyeste" (løsrevet paa commiten fra naa)."""
+    "nyeste" (løsrevet paa commiten fra naa). etter er "skriptet endret"
+    (commiten fra naa har en annen kveldshenting.ps1) eller "jobben ny"
+    (commiten fra i gaar har ingen kveldshenting.ps1)."""
     origin, hoved, jobb = tmp_path / "origin.git", tmp_path / "hoved", tmp_path / "jobb"
     subprocess.run(["git", "init", "-q", "--bare", str(origin)], check=True, capture_output=True)
     _git(origin, "symbolic-ref", "HEAD", "refs/heads/main")
     subprocess.run(["git", "clone", "-q", str(origin), str(hoved)], check=True, capture_output=True)
     _git(hoved, "symbolic-ref", "HEAD", "refs/heads/main")
     (hoved / "start").mkdir()
-    (hoved / "start" / "kveldshenting.ps1").write_bytes(skript.read_bytes())
+    skriptet = hoved / "start" / "kveldshenting.ps1"
+    if etter != "jobben ny":
+        skriptet.write_bytes(JOBBEN.read_bytes())
     (hoved / ".gitignore").write_text("data/\n.env\n", encoding="utf-8")
     _git(hoved, "add", ".")
     i_gaar = (datetime.now().astimezone() - timedelta(days=1)).replace(hour=12, minute=0, second=0, microsecond=0)
     _git(hoved, "commit", "-q", "-m", "foer midnatt", dato=i_gaar.isoformat())
     foer = _git(hoved, "rev-parse", "HEAD")
     (hoved / "etter-midnatt.txt").write_text("flettet i dag\n", encoding="utf-8")
+    if etter == "skriptet endret":
+        skriptet.write_bytes(JOBBEN.read_bytes() + b"# flettet i dag\r\n")
+    elif etter == "jobben ny":
+        skriptet.write_bytes(JOBBEN.read_bytes())
     _git(hoved, "add", ".")
     _git(hoved, "commit", "-q", "-m", "etter midnatt")
-    etter = _git(hoved, "rev-parse", "HEAD")
+    nyeste = _git(hoved, "rev-parse", "HEAD")
     _git(hoved, "push", "-q", "origin", "main")
     if start == "gren":
-        _git(hoved, "worktree", "add", "-q", "-b", "gren", str(jobb), etter)
+        _git(hoved, "worktree", "add", "-q", "-b", "gren", str(jobb), nyeste)
         (jobb / "paa-grenen.txt").write_text("gren\n", encoding="utf-8")
         _git(jobb, "add", ".")
         _git(jobb, "commit", "-q", "-m", "paa grenen")
     else:
-        _git(hoved, "worktree", "add", "-q", "--detach", str(jobb), etter)
+        _git(hoved, "worktree", "add", "-q", "--detach", str(jobb), nyeste)
     (hoved / "data").mkdir()
     subprocess.run(
         ["cmd.exe", "/c", "mklink", "/J", str(jobb / "data"), str(hoved / "data")], check=True, capture_output=True
     )
     (hoved / ".env").write_text(f"EODHD_API_KEY={NOEKKELEN}\n", encoding="utf-8")
     os.link(hoved / ".env", jobb / ".env")
-    return {"hoved": hoved, "jobb": jobb, "foer": foer, "etter": etter}
+    return {"hoved": hoved, "jobb": jobb, "foer": foer, "etter": nyeste}
 
 
 def _kjoer(tmp_path: Path, skript: Path, hoved: Path, *ekstra: str) -> tuple[int, str]:
@@ -343,3 +358,49 @@ def test_hele_jobben_uten_docker_henter_uten_ki_og_gir_koden_fra_hentingen(tmp_p
     assert "Skriptet startet verken Docker Desktop eller Ollama." in loggen
     for tekst in (utskrift, loggen):
         assert NOEKKELEN not in tekst and MILJOEET not in tekst
+
+
+@paa_windows
+def test_den_nye_versjonen_kjoeres_en_gang_etter_utsjekken(tmp_path):
+    """Gjennomgangen (VG2, ECH6). Ville feilet hvis jobben kjoerte skriptet
+    fra en nyere commit enn den fra midnatt i kveld, mistet argumentene i den
+    nye kjoeringen eller startet den mer enn én gang."""
+    oppsett = _oppsett(tmp_path, "nyeste", "skriptet endret")
+    jobb = oppsett["jobb"]
+    kode, utskrift = _kjoer(tmp_path, jobb / "start" / "kveldshenting.ps1", oppsett["hoved"], "-BareUtsjekk")
+    loggen = _loggen(oppsett["hoved"])
+    assert kode == 0, utskrift
+    assert loggen.count("Skriptet ble endret av utsjekken.") == 1, loggen
+    assert loggen.count("Bare utsjekken: ingen henting.") == 1, loggen
+    assert _git(jobb, "rev-parse", "HEAD") == oppsett["foer"]
+    assert _uten_cr(jobb / "start" / "kveldshenting.ps1") == _uten_cr(JOBBEN)
+
+
+@paa_windows
+def test_jobben_stopper_naar_commiten_fra_midnatt_ikke_har_den(tmp_path):
+    """Gjennomgangen (ECH1). Ville feilet hvis jobben sjekket ut en commit
+    uten kveldshenting.ps1, dagen 2.3d flettes, og tok bort skriptet som
+    kjoerer."""
+    oppsett = _oppsett(tmp_path, "nyeste", "jobben ny")
+    jobb = oppsett["jobb"]
+    kode, utskrift = _kjoer(tmp_path, jobb / "start" / "kveldshenting.ps1", oppsett["hoved"], "-BareUtsjekk")
+    assert kode == 1 and "har ikke start/kveldshenting.ps1 ennå" in utskrift, utskrift
+    assert _git(jobb, "rev-parse", "HEAD") == oppsett["etter"]
+    assert (jobb / "start" / "kveldshenting.ps1").is_file()
+
+
+@paa_windows
+def test_jobben_stopper_naar_arbeidskopien_har_endringer(tmp_path):
+    """Gjennomgangen (VG3). Ville feilet hvis jobben tok med endringer i
+    arbeidskopien til commiten fra midnatt."""
+    oppsett = _oppsett(tmp_path, "nyeste")
+    jobb = oppsett["jobb"]
+    (jobb / "etter-midnatt.txt").write_text("endret for hånd\n", encoding="utf-8")
+    kode, utskrift = _kjoer(tmp_path, jobb / "start" / "kveldshenting.ps1", oppsett["hoved"], "-BareUtsjekk")
+    assert kode == 1 and "Arbeidskopien har endringer" in utskrift, utskrift
+    assert _git(jobb, "rev-parse", "HEAD") == oppsett["etter"]
+
+
+def _uten_cr(sti: Path) -> bytes:
+    """Fila med LF, fordi git i den midlertidige mappa kan sjekke ut med CRLF."""
+    return sti.read_bytes().replace(b"\r\n", b"\n")
