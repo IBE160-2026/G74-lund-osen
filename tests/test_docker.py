@@ -2629,8 +2629,9 @@ class TestReadmeForNybegynnere:
         punkter = [l for l in del_.splitlines() if l.startswith("- ")]
         # Story 3.3f: 8 med docs/appen/. Story 3.5a: 9 med start/ og
         # .gitattributes. Story 3.4 (24.10): 10 med docs/bilder/investorsider/.
-        # Story 3.5f: 15 med filene i rota.
-        assert len(punkter) == 15, punkter
+        # Story 3.5f: 15 med filene i rota. Gruppens svar 27.10 kl. 06:31:
+        # 16 med .logs/.
+        assert len(punkter) == 16, punkter
         for punkt in punkter:
             # Hver sti i kodeformat i punktet er en lenke, ogsaa etter
             # tankestreken (gjennomgangen, BH3 og ECH4).
@@ -2643,8 +2644,9 @@ class TestReadmeForNybegynnere:
         # Story 3.4 (24.10): 23 med docs/bilder/investorsider/, LESMEG.md og
         # bobler.json.
         # Story 3.5f: 30 med README.md, CLAUDE.md, pyproject.toml, uv.lock,
-        # .env.example, .gitignore og .mailmap.
-        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 30, lenker
+        # .env.example, .gitignore og .mailmap. Gruppens svar 27.10 kl. 06:31:
+        # 31 med .logs/.
+        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 31, lenker
         sporet = _git_sporet()
         for tekst, maal in lenker:
             # Maalet er stien i teksten, relativ og uten «..» (BH4, ECH3).
@@ -2999,11 +3001,13 @@ LENKENE_FOER_3_3H = {
 # «Mappestruktur» er BRFE (regel 19). Var 852cb13b....
 # Story 3.5f: hver fil og mappe i rota i «Mappestruktur» (regel 19). Var
 # 7ed8bbe8....
+# Gruppens svar 27.10 kl. 06:31: .logs/ og skillen sesjonslogg fra faglærer
+# i «Mappestruktur» (regel 19). Var a363fbd7....
 AVTRYKK_I_PILENE = {
     "Demoen": "f124a92b1c64eeb0ea5e7141976ff85de68df49004a22d5874a4a257aaf89b55",
     "Den ekte versjonen": "3bb398cd1be31a43abe09b7261456646b6dc03047e20f1aa57ab665a768cfd78",
     "Dokumentene": "409a3f8b38d4247df41e3eb5062ad439aa160e7fd1c0b49e0fd44f262eb2d77c",
-    "Mappestruktur": "a363fbd74f9dbaf125876c7d3cefe2213b997a988bd0933da497e94e662512a9",
+    "Mappestruktur": "0fe4484323794d4c3766e1f647dc44f24b8777392b5dadd2031afb54abd45cb2",
 }
 
 # Svaret 20.10 kl. 20:20: advarselen staar rett under pila til den ekte
