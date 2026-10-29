@@ -30,7 +30,8 @@
 - [x] 2026-10-28 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — PR #105: lås mot to kjøringer samtidig (BH1/ECH2) og ingen måling når én av de 15 mangler kursen (ECH4), spørsmål til gruppen (løst 2026-10-29)
 - [x] 2026-10-28 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — hvordan målingene i tabellen omsetning føres i malinger.md (forslag: en ny § én gang i uka) (løst 2026-10-29)
 - [x] 2026-10-28 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — testen for hele jobben på Windows feilet i CI når Docker svarte innen ett sekund (40777327364) (løst 2026-10-29)
-- [ ] 2026-10-29 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — PR #105: fra 23:45 går målingen også når alle 15 mangler kursen (BH2/VG2/ECH3/ECH2), spørsmål til gruppen
-- [ ] 2026-10-29 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — PR #105: målingen i kjøringen kl. 23:45 venter hvis den starter etter midnatt (ECH1/BH3), spørsmål til gruppen
+- [x] 2026-10-29 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — PR #105: fra 23:45 går målingen også når alle 15 mangler kursen (BH2/VG2/ECH3/ECH2), spørsmål til gruppen (løst 2026-10-29: svaret kl. 09:20)
+- [x] 2026-10-29 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — PR #105: målingen i kjøringen kl. 23:45 venter hvis den starter etter midnatt (ECH1/BH3), spørsmål til gruppen (løst 2026-10-29: svaret kl. 09:20)
 - [ ] 2026-10-29 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — flett 2.13 torsdag 29.10 kl. 23:50 (ikke etter 23:59), og bruk kallene som er igjen til målingen for hånd før midnatt
 - [ ] 2026-10-29 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — ny § i malinger.md med målingene fra tabellen hver søndag, første gang 01.11
+- [ ] 2026-10-29 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — PR #105: ingen test prøver at målingen går fra 23:45 når alle 15 mangler kursen (svaret 29.10 kl. 09:20, a)
