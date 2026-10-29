@@ -2031,6 +2031,8 @@ overs, så lista kan vise den før noen velger en aksje.
 
 *Avgjort 2026-10-29 kl. 09:20 (gruppens svar):* a) Fra kl. 23:45 går målingen uansett hvor mange av de 15 som mangler kursen, også når alle mangler. Nye forsøk i samme kjøring får fortsatt kallene først, og i helga går målingen selv om fredagen feilet. b) Starter målingen etter midnatt i Oslo, venter den som nå. Hentingen gjør ingen nye kall fra 23:50, så det skjer sjelden, og i verste fall går noen kall tapt den kvelden.
 
+*Lagt til 2026-10-29 (flettingen):* 2.13 er flettet i `676fbc8` (#105) kl. 23:50:38, etter jobbens siste kjøring kl. 23:45:00 (Ready med resultat 0 kl. 23:50:15), med CI 40966838852 grønn på `0f746e2`. Basen ble kopiert til `data/db/ose-foer-2-13-2026-10-29.db` først. Målingen for hånd (svaret kl. 23:36, f) gikk kl. 23:50:50–23:51:03 med 4 kall, for HGSB, HKY, HPUR og HSPG, og la 4 rader i `omsetning`. Basen har nå versjon 8, kvoten gikk fra 16 til 20 brukt 29.10 i GMT, og `extraLimit` er 463 før og etter.
+
 ### Story 2.14: Eks.datoer føres inn for hånd
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
