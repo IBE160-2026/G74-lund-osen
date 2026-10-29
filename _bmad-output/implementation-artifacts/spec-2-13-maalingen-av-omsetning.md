@@ -109,6 +109,7 @@ Gjennomgang 28.10 etter hele settet (3849 bestått, 24 hoppet over, 0 feilet, 22
 | BH12 | Testen for børsdagen før hentingen sjekket ikke grunnen, og andre kjøring hadde samme `maalt` | low | **rettet** i `fda73fd` |
 | ECH5 | Flettes grenen mens jobben går, migrerer webserveren basen til 8, og kjøringene etter står på 7 | low | **står**: hentingen gir da 0 kall (slått opp av ECH5). Flett etter kl. 23:45 eller om dagen |
 | ECH5 | *Svart 2026-10-28 kl. 23:22 (gruppens svar, e):* 2.13 flettes torsdag 29.10 kl. 23:50, etter jobbens siste kjøring, og ikke etter 23:59 | low | **avgjort** |
+| ECH5 | *Rettet 2026-10-29:* «eller om dagen» holder ikke, fordi webserveren fra hovedkopien kan migrere basen samme dag, mens jobben kjører commiten fra midnatt og nekter en nyere base (svaret 28.10 kl. 23:22) | low | **avgjort** |
 | ECH6 | Klokka ble lest før kvoten, ikke rett før kallet | low | **rettet** i `fda73fd` |
 | ECH7 | Feiler radene etter at fila er skrevet, er de tapt, og aksjene måles på nytt | low | **utsatt**: rådataene står, og en innlesing fra fila er ikke en del av 2.13 |
 | ECH8 | To kjøringer kan få samme filnavn | low | **rettet** i `fda73fd`: neste `n` ved `FileExistsError`, `test_et_navn_som_dukker_opp_skrives_ikke_over` |
