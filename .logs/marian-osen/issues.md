@@ -35,3 +35,4 @@
 - [ ] 2026-10-29 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — flett 2.13 torsdag 29.10 kl. 23:50 (ikke etter 23:59), og bruk kallene som er igjen til målingen for hånd før midnatt
 - [ ] 2026-10-29 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — ny § i malinger.md med målingene fra tabellen hver søndag, første gang 01.11
 - [ ] 2026-10-29 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — PR #105: ingen test prøver at målingen går fra 23:45 når alle 15 mangler kursen (svaret 29.10 kl. 09:20, a)
+- [ ] 2026-10-29 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — `tests/test_dobbeltklikk.py` feiler lokalt (4–7 av 7 for start.ps1 og porten) fordi `Get-NetTCPConnection -State Listen` ikke ser lytteren etter Windows-oppdateringen 29.10; også på main

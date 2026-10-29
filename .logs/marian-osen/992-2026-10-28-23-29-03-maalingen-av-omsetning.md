@@ -87,3 +87,26 @@ Instruksjonen 29.10 kl. 10:25: 2.13 klar til flettingen i kveld, med gruppens sv
 ### Åpne punkter
 - 2.13 flettes torsdag 29.10 kl. 23:50, og ikke etter 23:59, i en egen instruksjon. Kallene som er igjen, brukes av målingen for hånd rett etter, før midnatt (står fra før i `issues.md`).
 - Ingen test prøver at målingen går fra 23:45 når alle 15 mangler kursen (svaret 29.10 kl. 09:20, a). Instruksjonen hadde ingen kodeendring.
+
+## 2026-10-29 kl. 19:42 — Marian Osen
+
+### Oppgave
+Fortsette testblokka fra kl. 11:35 for 2.13, som stoppet kl. 11:48 med 7 feil i `tests/test_dobbeltklikk.py` i hele settet. Først finne ut om feilen kommer fra 2.13, og så committe testen og triageraden hvis settet er grønt.
+
+### Plan
+- Instruksjonen i dagsfila 29.10 (`4f85a46b`).
+- `tests/test_dobbeltklikk.py` alene i worktreen og så på main, og se hva som lytter på port 8000.
+- Hele settet, commit og CI bare hvis fila består. Ellers stoppe før commit.
+
+### Resultat
+- Kvoten kl. 19:36 (18:36 GMT): `apiRequestsDate` 2026-10-28, så 0 brukt og 20 igjen 29.10, og `extraLimit` 463. Ingen andre kall.
+- `tests/test_dobbeltklikk.py` alene i worktreen, to ganger: 4 feil (19:37–19:38) og 5 feil, hver gang i `test_start_ps1_stopper_bare_den_andre_versjonen_paa_porten` og `test_start_ps1_frigjoer_porten_rett_foer_webserveren`, men med ulike parametre. Første linje av feilen: utskriften sier «et annet program svarer allerede på http://127.0.0.1:8000 … Programmet er et program skriptet ikke fant navnet på», så `assert 'Den andre versjonen av OSE Signal kjører allerede …' in …` ([oss]), `assert 'python' in …` ([annen_mappe], [fremmed]) og `ValueError: substring not found` (frigjør-testene) feiler.
+- På main, alene (19:40–19:41): 7 feil, de samme to testene med alle 7 parametrene. Feilen kommer altså ikke fra 2.13.
+- Port 8000: ingenting lytter utenom testene.
+- Årsaken, slik den ser ut: `Lyttere` i `start/start.ps1` spør `Get-NetTCPConnection -LocalPort 8000 -State Listen`. Med en Python-lytter på 127.0.0.1:8000 fant den ingenting, både i testmiljøet og i vanlig PowerShell, i og utenfor sandkassen. `netstat -ano` viste lytteren med tilstanden `FIN_WAIT_1` i stedet for `LISTENING`, og bare 4 porter totalt som `LISTENING`. Windows-oppdateringen KB5127936 ble installert 29.10, og maskinen startet på nytt kl. 02:31. Hele settet var sist grønt lokalt 28.10 kl. 23:50–00:12. At oppdateringen er årsaken, er ikke bevist, men det er det eneste som er endret.
+- `tests/test_omsetning.py` alene i worktreen: 51 bestått. Den nye testen og triageraden er fortsatt ikke committet i `..\G74-lund-osen-2-13`. Raden sier at mutanten der målingen venter når alle mangler, feilet i testen. Kjøringen av mutanten kl. 11:35 er ikke sett i denne økten.
+- Hele settet er ikke kjørt, og ingen commit, push eller CI er gjort på grenen. Ledig minne: 5 241 MB av 16 124 MB. Worktreen er ikke fjernet, fordi testen og raden bare finnes der.
+
+### Åpne punkter
+- `tests/test_dobbeltklikk.py` feiler lokalt i 4–7 av de 7 tilfellene for start.ps1 og porten, fordi `Get-NetTCPConnection -State Listen` ikke ser lytteren etter Windows-oppdateringen 29.10. Gruppen avgjør om maskinen skal startes på nytt og testen kjøres igjen, eller om testene for start.ps1 skal hoppes over lokalt og bare kjøres i CI.
+- Testen og triageraden for 2.13 (og Rettet-linja ved ECH5) ligger ukommittert i `..\G74-lund-osen-2-13` til settet er grønt.
