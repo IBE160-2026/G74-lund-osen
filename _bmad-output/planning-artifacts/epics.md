@@ -2029,6 +2029,8 @@ overs, så lista kan vise den før noen velger en aksje.
 
 *Avgjort 2026-10-28 kl. 23:36 (gruppens svar):* f) Kallene som er igjen torsdag, brukes av målingen for hånd rett etter flettingen, før midnatt. g) Målingene fra tabellen føres i `malinger.md` som en ny § hver søndag, med vinduet ved hvert tall, plassen i rangeringen og radene med feil, og rader med et annet vindu enn §50–§52 i egen tabell.
 
+*Avgjort 2026-10-29 kl. 09:20 (gruppens svar):* a) Fra kl. 23:45 går målingen uansett hvor mange av de 15 som mangler kursen, også når alle mangler. Nye forsøk i samme kjøring får fortsatt kallene først, og i helga går målingen selv om fredagen feilet. b) Starter målingen etter midnatt i Oslo, venter den som nå. Hentingen gjør ingen nye kall fra 23:50, så det skjer sjelden, og i verste fall går noen kall tapt den kvelden.
+
 ### Story 2.14: Eks.datoer føres inn for hånd
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
