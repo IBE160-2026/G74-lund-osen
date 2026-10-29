@@ -1231,7 +1231,9 @@ HOEYDE_PAA_AKSJESIDEN = 1894
 # byte for byte det samme.
 # Gjennomgangen av 8.0f: grensen 1056 px og rettelsene i hjelp.js. Bildet
 # ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "22006ee8710d6b633f2b2988f46ea672cfdfc29fd89874adb69b619f789bade2"
+# Story 2.13: migrasjonen 0008_omsetning.sql. Bildet ble tatt paa nytt og er
+# byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "b6986ea5e33a22c3efdcac02734f0aa91211d85512b5f71a822fb574919b12f2"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "

@@ -83,7 +83,7 @@ development_status:
   2-10-høy-og-lav-lagres-med-kursene: backlog
   2-11-lista-leses-fra-basen: backlog
   2-12-velge-og-bytte-aksjer: backlog
-  2-13-kommandoen-som-måler-omsetning: backlog
+  2-13-kommandoen-som-måler-omsetning: review
   2-14-eksdatoer-føres-inn-for-hånd: backlog
   epic-2-retrospective: optional
 
