@@ -155,3 +155,29 @@ Committe den nye testen for 2.13 etter gruppens svar 29.10 kl. 21:02: de 7 teste
 ### Åpne punkter
 - 2.13 flettes etter jobbens siste kjøring i kveld, i en egen instruksjon (står fra før i `issues.md`).
 - `tests/test_dobbeltklikk.py` undersøkes mandag (står fra før i `issues.md`, oppdatert).
+
+## 2026-10-29 kl. 23:52 — Marian Osen
+
+### Oppgave
+Flette 2.13 (PR #105) etter jobbens siste kjøring i kveld, og bruke kallene som var igjen, til målingen for hånd før midnatt. Gruppens svar kl. 23:12: steg 0 gjelder uten kontrollblokka for hentingen 29.10.
+
+### Plan
+- Instruksjonen og svaret i dagsfila 29.10 (`f746c9d1`).
+- Main flettet inn i grenen i en egen worktree, testene for dokumentene og `tests/test_omsetning.py`, push og CI.
+- Vente til kl. 23:50 og til jobben ikke kjører, kopiere basen, squash-flette låst til head-en og så måle.
+- Spesifikasjonen done, raden i epics og radene i kvalitetssikringen.
+
+### Resultat
+- Steg 0 kl. 23:10: dagsfila hadde ingen kontrollblokk for hentingen 29.10, så jeg stoppet. Resten stemte: kursene, vurderingene og KI-tekstene for 29.10 for alle 15, kvoten 16 brukt med `apiRequestsDate` 2026-10-29 og `extraLimit` 463, og jobben var Ready med resultat 0 kl. 22:45. Kjøringen kl. 23:15 ga resultat 0 og ingen nye kall (kvoten var fortsatt 16 kl. 23:34).
+- Grenen: `0f746e25` flettet main inn. 304 bestått i testene for dokumentene og `tests/test_omsetning.py`. CI 40966838852 var grønn kl. 23:35:58. Worktreen er fjernet.
+- Ventingen: klar kl. 23:50:15, med jobben Ready, siste kjøring kl. 23:45:00 og resultat 0.
+- Kopien `data/db/ose-foer-2-13-2026-10-29.db` har samme sha256 som basen (`174210f6…`).
+- Flettingen: `676fbc8b` (23:50:38), med grenen slettet på GitHub.
+- Målingen kl. 23:50:50–23:51:03: 4 kall, for HGSB, HKY, HPUR og HSPG, og 4 rader i `omsetning`. Kvoten gikk fra 16 til 20, og `extraLimit` var 463 før og etter. Basen har nå versjon 8 (`0008_omsetning.sql`).
+- På main: `1cfc86f9`, spesifikasjonen done med radene i §3, §5 og vedlegget, og `0941bea1`, den daterte linja under story 2.13. Testene for dokumentene ga 253 bestått før push.
+- Lukket i `issues.md`: flettingen og målingen for hånd.
+
+### Åpne punkter
+- Resten av kontrollen av hentingen 29.10 (loggen, powercfg og Windows Update) tas fredag morgen.
+- Ny § i `malinger.md` med målingene hver søndag, første gang 01.11 (står fra før).
+- `tests/test_dobbeltklikk.py` undersøkes mandag (står fra før).
