@@ -30,13 +30,16 @@
             slik den vises, og den stiplede linja er indeksen. Søylene er
             aria-hidden, og lista under har alle tallene for skjermleser.
             Story 8.2a, c: symbolene over søylene er lenker og ikke skjult. #}
+        {#- Story 8.17a: søylene og linja følger periodevalget, og
+            overskriften sier perioden eller dagen. Linja og teksten for
+            skjermleser bruker indeksens endring for den samme perioden. #}
         {% set sy = hovedindeks.soeyler %}
         {#- Gjennomgangen (BH3): figuren står også når ingen aksje fikk søyle,
             så aksjene uten kurs dagen før navngis. #}
         {% if sy %}
           {%- macro fortegn(verdi) %}{% set vist = verdi|avrundet('endring') %}{{ 'opp' if vist > 0 else 'ned' if vist < 0 else 'null' }}{% endmacro %}
           <figure class="soeyler">
-            <figcaption class="soeyletittel">{% if hovedindeks.dato != dato %}Endring per aksje {{ hovedindeks.dato|dato }}{% else %}Dagens endring per aksje{% endif %}{% if sy.linje is not none %}, med indeksen som stiplet linje{% endif %}</figcaption>
+            <figcaption class="soeyletittel">{% if sy.start %}Endring per aksje {{ periodenavn }}, fra {{ sy.start|dato }} til {{ sy.dag|dato }}{% elif sy.dag != hovedindeks.dato %}Endring per aksje {{ sy.dag|dato }}{% elif hovedindeks.dato != dato %}Endring per aksje {{ hovedindeks.dato|dato }}{% else %}Dagens endring per aksje{% endif %}{% if sy.linje is not none %}, med indeksen som stiplet linje{% endif %}</figcaption>
             {% if sy.soeyler %}
             {#- Story 8.2a, c (U20, gruppens svar 24.10 kl. 11:23): symbolet over
                 hver søyle lenker til aksjesiden, på oversikten (og i
@@ -53,25 +56,28 @@
                 <span class="spor"><span class="stolpe {{ fortegn(soeyle.endring) }}" style="{{ 'bottom' if soeyle.endring|avrundet('endring') >= 0 else 'top' }}: 50%; height: {{ '%.2f'|format(soeyle.hoeyde) }}%;"></span></span>
                 {%- endfor %}
                 {%- if sy.linje is not none %}
-                <span class="indekslinje {{ fortegn(hovedindeks.endring) }}" style="top: {{ '%.2f'|format(sy.linje) }}%;"></span>
+                <span class="indekslinje {{ fortegn(sy.indeks) }}" style="top: {{ '%.2f'|format(sy.linje) }}%;"></span>
                 {%- endif %}
               </div>
             </div>
             {#- Gjennomgangen (BH9): overskriften og indeksen står utenfor lista,
                 så lista har én linje per aksje. #}
-            <p class="skjult">Søyler for {{ sy.soeyler|length }} aksjer {{ hovedindeks.dato|dato }}, fra størst fall til størst stigning.</p>
+            <p class="skjult">Søyler for {{ sy.soeyler|length }} aksjer {% if sy.start %}{{ periodenavn }}, fra {{ sy.start|dato }} til {{ sy.dag|dato }}{% else %}{{ sy.dag|dato }}{% endif %}, fra størst fall til størst stigning.</p>
             <ol class="skjult">
               {%- for soeyle in sy.soeyler %}
               <li>{{ soeyle.navn }} ({{ soeyle.symbol }}{% if soeyle.bransje %}, {{ soeyle.bransje }}{% endif %}): {{ soeyle.endring|tall('endring') }}{% if soeyle.tre_av_tre %}, {{ antall_sjekker }} av {{ antall_sjekker }}{% endif %}.</li>
               {%- endfor %}
             </ol>
             {%- if sy.linje is not none %}
-            <p class="skjult">Indeksen, den stiplede linja: {{ hovedindeks.endring|tall('endring') }}.</p>
+            <p class="skjult">Indeksen, den stiplede linja: {{ sy.indeks|tall('endring') }}.</p>
             {%- endif %}
-            {% if sy.linje is none %}<p class="forklaring">Ingen stiplet linje: indeksen har ingen endring for dagen.</p>{% endif %}
+            {% if sy.linje is none %}<p class="forklaring">Ingen stiplet linje: indeksen har ingen endring for {{ 'perioden' if sy.start else 'dagen' }}.</p>{% endif %}
+            {% if sy.kortere %}<p class="uten-endring">Regnet fra første dag serien har, fordi den ikke går tilbake til {{ sy.start|dato }}: {{ sy.kortere|med_og }}.</p>{% endif %}
             {% endif %}
-            {% if sy.uten_endring %}<p class="uten-endring">Uten søyle, mangler kursen dagen før: {{ sy.uten_endring|med_og }}.</p>{% endif %}
+            {% if sy.uten_endring %}<p class="uten-endring">Uten søyle, mangler {% if sy.start %}kursene for perioden{% else %}kursen dagen før{% endif %}: {{ sy.uten_endring|med_og }}.</p>{% endif %}
           </figure>
+        {% elif valg and valg.periode == "velg" %}
+          <p class="uten-endring">Ingen søyler: ingen aksje har kurs {{ valg.dag|dato }}.</p>
         {% endif %}
       {% elif indeks_feilet %}
         <p>Hovedindeksen kunne ikke leses. Tabellen under vises som vanlig.</p>

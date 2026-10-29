@@ -164,7 +164,7 @@
         siste børsdag valgt når siden åpnes (designregler §2). Linja under
         sier hva tallene gjelder (gruppens svar 23.10 kl. 12:35, a). #}
     {% if valg %}
-      {{ periodevalg(knapper, valg.periode, sidesti, valg.dag, foerste_valgbare, siste_dag, "Periode for oversikten") }}
+      <div class="periodehode">{{ periodevalg(knapper, valg.periode, sidesti, valg.dag, foerste_valgbare, siste_dag, "Periode for oversikten") }} {{ hjelpeknapp("hjelp-perioden", "Hjelp: periodene") }}</div>
       {% if valg.beskjed %}<p class="periodebeskjed" role="status">{{ valg.beskjed }}</p>{% endif %}
       {% if valg.periode == "velg" %}
         <p class="periodelinje">Tabellen viser {{ valg.dag|ukedag }} {{ valg.dag|dato }}: sluttkursen, endringen den dagen og signalet som er lagret for dagen. En oransje strek og «{{ antall_sjekker }} av {{ antall_sjekker }} siste børsdag» viser aksjene som fikk {{ antall_sjekker }} av {{ antall_sjekker }} siste børsdag.</p>
@@ -279,6 +279,8 @@
     {% if aktiv != "min_liste" %}
     {{ hjelpevindu("hjelp-hovedindeks", "Hovedindeksen", [("", ["hovedindeksen", "soeylene"] if hovedindeks and hovedindeks.har_soeyler else ["hovedindeksen"])]) }}
     {% endif %}
+    {#- Story 8.17a: periodevalget over søylene og tabellen. #}
+    {% if valg %}{{ hjelpevindu("hjelp-perioden", "Periodene", [("", ["perioden_oversikten"])]) }}{% endif %}
     {{ hjelpevindu("hjelp-selskap", "Selskap", [("", ["selskap"])]) }}
     {{ hjelpevindu("hjelp-sluttkurs", "Sluttkurs", [("", ["sluttkurs"])]) }}
     {{ hjelpevindu("hjelp-endring", "Endring", [("", ["endring", "utbyttejustert"])]) }}

@@ -477,7 +477,11 @@ def _basen_feilet_under_lesingen(feil):
 
 
 def _hovedindeks(
-    kurslager: Kursleser, poster: list, tre_av_tre: frozenset[str]
+    kurslager: Kursleser,
+    poster: list,
+    tre_av_tre: frozenset[str],
+    valg: Valg | None = None,
+    serier: dict[str, list] | None = None,
 ) -> tuple[Hovedindeksvisning | None, bool]:
     """Hovedindeksen over tabellen - story 2.9, FR-104.
 
@@ -492,6 +496,9 @@ def _hovedindeks(
 
     Story 2.9b: soeylene faar de samme seriene, og tre_av_tre er symbolene
     med 3 av 3 paa siste boersdag, fra radene i tabellen.
+
+    Story 8.17a: soeylene og linja foelger perioden og dagen i valg, og
+    seriene som alt er lest for tabellen, brukes paa nytt.
     """
     try:
         lager = SqliteIndekslager(g.tilkobling)
@@ -499,10 +506,16 @@ def _hovedindeks(
         if not symboler:
             return None, False
         symbol = valgt_indeks(symboler)
-        serier = [(post.aksje, kurslager.serie(post.aksje.symbol)) for post in poster]
-        aksjer = [(aksje.navn, serie) for aksje, serie in serier]
-        grunnlag = [(aksje, serie, aksje.symbol in tre_av_tre) for aksje, serie in serier]
-        return bygg_hovedindeks(symbol, lager.serie(symbol), aksjer, grunnlag), False
+        lest = serier or {}
+        par = [
+            (post.aksje, lest[post.aksje.symbol] if post.aksje.symbol in lest else kurslager.serie(post.aksje.symbol))
+            for post in poster
+        ]
+        aksjer = [(aksje.navn, serie) for aksje, serie in par]
+        grunnlag = [(aksje, serie, aksje.symbol in tre_av_tre) for aksje, serie in par]
+        periode = valg.periode if valg is not None else SISTE
+        dag = valg.dag if valg is not None else None
+        return bygg_hovedindeks(symbol, lager.serie(symbol), aksjer, grunnlag, periode, dag), False
     except (*BASEFEIL, ValueError):
         return None, True
 
@@ -805,7 +818,7 @@ def _tabellsiden(aktiv: str):
         mangler = [rad for rad in mangler if rad.aksje.symbol in merkede]
         if sortert is not None:
             sortert = [rad for rad in sortert if rad.aksje.symbol in merkede]
-    hovedindeks, indeks_feilet = (None, False) if i_lista else _hovedindeks(leser, poster, tre_av_tre)
+    hovedindeks, indeks_feilet = (None, False) if i_lista else _hovedindeks(leser, poster, tre_av_tre, valg, serier)
     # Story 3.4e: datoene som er «ikke vurdert» i det siden viser, én gang.
     ikke_vurdert = [rad.dato for rad in (vist if annen_dag else (*skilte_seg_ut, *oevrige)) if rad.ikke_vurdert]
     ledd = periodeledd(valg)

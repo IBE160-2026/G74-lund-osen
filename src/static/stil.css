@@ -372,6 +372,8 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) .merke.gul-siste { display: block; font-size: 12px; font-weight: 400; }
 :where(.side-oversikt) td .fra { display: block; font-size: 12px; font-weight: 400; color: var(--dempet); }
 :where(.side-oversikt) .periodelinje { margin: 0 0 12px; }
+:where(.side-oversikt) .periodehode { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px; }
+:where(.side-oversikt) .periodehode nav.periodevalg { margin-bottom: 12px; }
 :where(.side-oversikt) td.selskap { font-weight: 600; }
 /* Story 8.0: navnet ser ut som en lenke, og fokus synes. */
 :where(.side-oversikt) td.selskap a { color: inherit; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }

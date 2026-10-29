@@ -1043,7 +1043,10 @@ HOEYDE_PAA_BILDET = 1690
 # Story 8.17a: periodevalget i oversikten i app.py, markedsoversikt.py,
 # perioder.py, index.html og stil.css. Bildet ble tatt paa nytt med hoeyden
 # 1690 og viser knappene over hovedindeksen.
-AVTRYKK_BAK_BILDET = "377e1ef309ce0cec7c121b493b1c08d95404a65c85cfeef624bd9afb4cc2c668"
+# Story 8.17a b): soeylene og linja foelger perioden i hovedindeks.py og
+# _hovedindeks.html, og hjelpen ved «?» over tabellen. Bildet ble tatt paa
+# nytt med samme hoeyde og viser «?» ved knappene.
+AVTRYKK_BAK_BILDET = "da6c3e38bf8cd824aeeb0d17f9613f1f092cfd7636de8436b095d267fa775cd2"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1242,7 +1245,9 @@ HOEYDE_PAA_AKSJESIDEN = 1894
 # byte for byte det samme.
 # Story 8.17a: les_valg for oversikten i perioder.py, og app.py og stil.css.
 # Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "f33185ef0ef062960a904e7d75be14fd1e983b551459c425415878e149eae055"
+# Story 8.17a b): hovedindeks.py, hjelpetekster.py og app.py. Bildet ble
+# tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "d2d0d59e170605be887a419ed8a821769b90c1fbfb10e37415fbb44740b09524"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -2611,7 +2616,9 @@ class TestReadmeForNybegynnere:
             "signaldagene i kursgrafen",
             "«vis ki-tekst»",
             # Story 8.16: periodene i kursgrafen er flyttet til «Ferdig».
-            "på forsiden periodevalget",
+            # Story 8.17a: periodevalget i oversikten er flyttet til «Ferdig»,
+            # og Min liste og børsometeret (8.17b) står igjen.
+            "periodevalget i min liste og børsometeret",
             "velge og bytte aksjer",
         )
         assert len(neste_punkter) == len(saker), neste_punkter

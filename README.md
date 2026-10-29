@@ -464,7 +464,7 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 - De tre sjekkene, trend, bevegelse og interesse, og styrken for hver aksje hver børsdag, med regelforklaringen på aksjesiden
 - Hentingen: kursene og hovedindeksen fra kl. 22, første gang på dagtid, med børsdagskontroll og forsøk med kallene som er igjen
 - Oversikten og utseendet fra designforslaget, med tydeligere merking, hjelp bak «?» og sortering ved klikk i kolonneraden
-- Hovedindeksen over tabellen på forsiden, med søylene under, og som stiplet linje i kursgrafen
+- Hovedindeksen over tabellen på forsiden, med søylene under og periodevalget, og som stiplet linje i kursgrafen
 - På aksjesiden: periodene i kursgrafen med «Velg dag», datoene og månedsmerkene, lenken til investorsiden og signalet dag for dag
 - Min liste, med stjernen foran hvert selskap, og børsometeret som et kart, med knappene «Markedsoversikt», «Børsometer» og «Min liste» øverst
 - KI-teksten fra en lokal modell på aksjesiden eller med egen nøkkel, med bryter, og bare tekster som besto kontrollen
@@ -478,7 +478,7 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 
 - Signaldagene i kursgrafen
 - Innstillingene, med «Vis KI-tekst»
-- På forsiden periodevalget og KI-teksten om dagen
+- Periodevalget i Min liste og børsometeret, og KI-teksten om dagen på forsiden
 - Til slutt å velge og bytte aksjer
 
 Det som står under «Ekstra», er ikke lovet i briefen og kommer bare med hvis det er ferdig og testet før README-prøven, senest én uke før innleveringen.
