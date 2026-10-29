@@ -61,6 +61,16 @@ Oversikten får periodevalget fra 8.16 over tabellen, og søylene under hovedind
 
 Tre, én om gangen med `-x`, med kopi før og sha256 mot HEAD etter: endringen fra dagen før i stedet for startdagen, søylene for siste børsdag ved en periode, og gult fra dagen som vises.
 
+*Utfallet 30.10 kl. 00:52:19–00:52:25 på `635205e`, mot `tests/test_periodevalget_oversikten.py`:*
+
+| Mutant | Endringen | Fanget av |
+|---|---|---|
+| M1 | `periodeendring` i `src/markedsoversikt.py` tar raden før slutt, ikke raden på startdagen | `test_1_uke_og_1_mnd_mot_den_haandregnede_serien` |
+| M2 | `soeylene_for` i `src/hovedindeks.py` gir søylene for siste børsdag også ved en periode (`if True:`) | `test_soeylene_og_linja_foelger_perioden` |
+| M3 | `bygg_rad_for_dag` i `src/markedsoversikt.py` gir gult fra 3 av 3 den dagen som vises | `test_dagen_viser_det_som_er_lagret` |
+
+Etter hver mutant var fila lik kopien (samme sha256) og lik `HEAD`.
+
 ## Gjennomgangen
 
 ## Åpent
