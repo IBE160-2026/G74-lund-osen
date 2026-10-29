@@ -2,6 +2,7 @@
 {% from "_hjelp.html" import hjelpeknapp, hjelpevindu with context -%}
 {% from "_bransjer.html" import bransjesymbol -%}
 {% from "_brikker.html" import brikker, retningspille -%}
+{% from "_perioder.html" import periodevalg with context -%}
 {#- Story 8.15: navnet i kolonneraden er en lenke som sorterer, med en vinkel
     som SVG (pilene er bare for retning, designregler §4). Vinkelen viser
     retningen et klikk gir, eller den som gjelder når kolonnen er valgt.
@@ -17,11 +18,12 @@
 {%- endmacro %}
 {#- Story 8.3: lenken sorterer på siden man står på, og «Alle» i Min liste
     står. #}
+{#- Story 8.17a: lenken beholder perioden og dagen (periodeledd). #}
 {% macro sorterlenke(kolonne, tekst) -%}
   {%- set valgt = sortering and sortering.kolonne == kolonne -%}
   {%- set neste = neste_orden(kolonne, sortering) -%}
   {%- set vist = sortering.orden if valgt else neste -%}
-  <a class="sorter{% if valgt %} valgt{% endif %}" href="{{ sidesti }}?{% if alle %}vis=alle&amp;{% endif %}sorter={{ kolonne }}&amp;orden={{ neste }}">{{ tekst }}<span class="skjult">
+  <a class="sorter{% if valgt %} valgt{% endif %}" href="{{ sidesti }}?{% if alle %}vis=alle&amp;{% endif %}{% for ledd in periodeledd %}{{ ledd }}&amp;{% endfor %}sorter={{ kolonne }}&amp;orden={{ neste }}">{{ tekst }}<span class="skjult">
   {%- if valgt %}, sortert {{ ordens_ord(kolonne, sortering.orden) }}. Velg for {{ ordens_ord(kolonne, neste) }}.{% else %}, sorter {{ ordens_ord(kolonne, neste) }}{% endif -%}
   </span><svg class="vinkel" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false"><path d="{{ 'M2.5 4.5 6 8l3.5-3.5' if vist == 'synkende' else 'M2.5 7.5 6 4l3.5 3.5' }}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
 {%- endmacro %}
@@ -34,8 +36,15 @@
               Knappen sender skjemaet, og aria-pressed og navnet sier hva den
               gjør for skjermleseren. Gjennomgangen (BH5): id-en på skjemaet er
               ankeret merkingen sender tilbake til. #}
+          {#- Story 8.17a: for en dag valgt med «Velg dag» kommer gult fra 3
+              av 3 siste børsdag, med streken og en tekst, og 2 av 3 merkes
+              ikke (designregler §3). #}
           {%- set merket = rad.aksje.symbol in merkede %}
+          {%- if rad.annen_dag %}
+          <tr{% if rad.tre_av_tre_siste %} class="gul"{% endif %}>
+          {%- else %}
           <tr {% if rad.skiller_seg_ut %}class="utslag{% if rad.styrke == antall_sjekker %} alle{% endif %}"{% endif %}>
+          {%- endif %}
             <td class="selskap"><form id="rad-{{ rad.aksje.symbol }}" class="stjerne" method="post" action="/min-liste/merk"><input type="hidden" name="symbol" value="{{ rad.aksje.symbol }}"><input type="hidden" name="til" value="{{ 'fjern' if merket else 'merk' }}"><input type="hidden" name="tilbake" value="{{ tilbake }}"><button type="submit" class="stjerneknapp{% if merket %} merket{% endif %}" aria-pressed="{{ 'true' if merket else 'false' }}"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><span class="skjult">Min liste: {{ rad.aksje.navn }}</span></button></form><a href="/aksje/{{ rad.aksje.symbol }}">{{ rad.aksje.navn }}</a>
               {#- Avvik 11: ticker og bransje med symbol under navnet. #}
               <span class="linje">{{ rad.aksje.symbol }}{% if rad.aksje.sektor %} · {{ bransjesymbol(rad.aksje.sektor) }}{{ rad.aksje.sektor }}{% endif %}</span>
@@ -49,6 +58,8 @@
             <td class="tall {% if vist_endring is not none %}{{ 'opp' if vist_endring > 0 else 'ned' if vist_endring < 0 else '' }}{% endif %}">
               {% if rad.endring_prosent is not none %}
                 {{ rad.endring_prosent|tall('endring') }}
+                {#- Story 8.17a: serien har ikke startdagen for perioden. #}
+                {% if rad.fra %}<span class="fra">fra {{ rad.fra|dato }}</span>{% endif %}
               {% else %}
                 –
               {% endif %}
@@ -58,7 +69,8 @@
               {% if rad.styrke is not none %}
                 {#- Story 8.0d, PR 3: hvit pille ved 2 av 3 (gruppen 14.10 kl.
                     19:59), og tekst uten pille ved 1 og 0 (utdraget §6). #}
-                {% if rad.styrke == antall_sjekker %}<span class="pille tre-av-tre">{{ rad.styrke }} av {{ antall_sjekker }}</span>
+                {% if rad.annen_dag %}<span class="styrketall">{{ rad.styrke }} av {{ antall_sjekker }}</span>
+                {%- elif rad.styrke == antall_sjekker %}<span class="pille tre-av-tre">{{ rad.styrke }} av {{ antall_sjekker }}</span>
                 {%- elif rad.skiller_seg_ut %}<span class="pille to-av-tre">{{ rad.styrke }} av {{ antall_sjekker }}</span>
                 {%- else %}<span class="styrketall">{{ rad.styrke }} av {{ antall_sjekker }}</span>{% endif %}
                 {{ brikker(rad.sjekker) }}
@@ -68,6 +80,7 @@
               {% else %}
                 – <span class="merke mangler">{{ rad.tekst }}</span>
               {% endif %}
+              {% if rad.annen_dag and rad.tre_av_tre_siste %}<span class="merke gul-siste">{{ antall_sjekker }} av {{ antall_sjekker }} siste børsdag</span>{% endif %}
             </td>
 
             <td class="retning">{{ retningspille(rad.retning) }}</td>
@@ -147,13 +160,26 @@
       </section>
     </div>
 
+    {#- Story 8.17a: periodevalget fra 8.16 over søylene og tabellen, med
+        siste børsdag valgt når siden åpnes (designregler §2). Linja under
+        sier hva tallene gjelder (gruppens svar 23.10 kl. 12:35, a). #}
+    {% if valg %}
+      {{ periodevalg(knapper, valg.periode, sidesti, valg.dag, foerste_valgbare, siste_dag, "Periode for oversikten") }}
+      {% if valg.beskjed %}<p class="periodebeskjed" role="status">{{ valg.beskjed }}</p>{% endif %}
+      {% if valg.periode == "velg" %}
+        <p class="periodelinje">Tabellen viser {{ valg.dag|ukedag }} {{ valg.dag|dato }}: sluttkursen, endringen den dagen og signalet som er lagret for dagen. En oransje strek og «{{ antall_sjekker }} av {{ antall_sjekker }} siste børsdag» viser aksjene som fikk {{ antall_sjekker }} av {{ antall_sjekker }} siste børsdag.</p>
+      {% elif periodestart %}
+        <p class="periodelinje">Endringen gjelder {{ periodenavn }}, fra {{ periodestart|dato }} til {{ siste_dag|dato }}. Sluttkursen og signalet gjelder siste børsdag.</p>
+      {% endif %}
+    {% endif %}
+
     {% include "_hovedindeks.html" %}
 
   {% endif %}
   {% if vist_tabell %}
     {#- Story 8.15, svar 5: linja står bare når en kolonne er valgt. Story
         8.2a, e: tabellen er da én liste, ikke sortert innenfor hver del. #}
-    {% if sortering %}<p class="sortert">Sortert på {{ sortering.navn }}, {{ ordens_ord(sortering.kolonne, sortering.orden) }}, i én liste. <a href="{{ sidesti }}{% if alle %}?vis=alle{% endif %}">Standard rekkefølge</a></p>{% endif %}
+    {% if sortering %}<p class="sortert">Sortert på {{ sortering.navn }}, {{ ordens_ord(sortering.kolonne, sortering.orden) }}, i én liste. <a href="{{ standard_adresse }}">Standard rekkefølge</a></p>{% endif %}
     <div class="tabellboks" role="region" aria-label="Aksjene" tabindex="0">
     <table>
       <thead>
@@ -163,7 +189,7 @@
           {#- Svar 2: bare «NOK» under et kolonnenavn. Story 8.15: «?» står
               ved siden av lenken, ikke inne i den. #}
           <th class="tall"{{ ariasort("kurs") }}>{{ sorterlenke("kurs", "Sluttkurs") }} {{ hjelpeknapp("hjelp-sluttkurs", "Hjelp: sluttkurs") }}<span class="under">NOK</span></th>
-          <th class="tall"{{ ariasort("endring") }}>{{ sorterlenke("endring", "Endring") }} {{ hjelpeknapp("hjelp-endring", "Hjelp: endring") }}</th>
+          <th class="tall"{{ ariasort("endring") }}>{{ sorterlenke("endring", "Endring") }} {{ hjelpeknapp("hjelp-endring", "Hjelp: endring") }}{% if valg and valg.periode == "velg" %}<span class="under">{{ valg.dag|dato }}</span>{% elif periodestart %}<span class="under">{{ periodenavn }}</span>{% endif %}</th>
           <th class="tall"{{ ariasort("signal") }}>{{ sorterlenke("signal", "Signalstyrke") }} {{ hjelpeknapp("hjelp-signalstyrke", "Hjelp: signalstyrken") }}</th>
           <th{{ ariasort("retning") }}>{{ sorterlenke("retning", "Retning") }} {{ hjelpeknapp("hjelp-retning", "Hjelp: retning") }}</th>
         </tr>

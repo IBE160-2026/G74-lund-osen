@@ -12,7 +12,7 @@ signalstyrke og retning. Hvor gamle dataene er, staar over tabellen og, for en
 rad som er eldre enn de andre, under selskapsnavnet (story 1.4c).
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
@@ -148,12 +148,19 @@ class Rad:
 
     aksje: Aksje
     dato: date
-    sluttkurs: float
+    sluttkurs: float | None
     endring_prosent: float | None
     tilstand: Tilstand | None
     tekst: str | None
     skiller_seg_ut: bool = False
     sist_hentet: datetime | None = None
+    # Story 8.17a: fra er dagen endringen for en periode er regnet fra, naar
+    # serien ikke har startdagen. annen_dag er en dag valgt med «Velg dag»,
+    # og tre_av_tre_siste er 3 av 3 paa siste boersdag, som gir gult ogsaa
+    # da (designregler.md §3).
+    fra: date | None = None
+    annen_dag: bool = False
+    tre_av_tre_siste: bool = False
 
     @property
     def vurdering(self) -> Vurdering | None:
@@ -200,6 +207,67 @@ def endring_i_prosent(rader: list[Kursrad]) -> float | None:
     return (til - fra) / fra * 100
 
 
+def periodeendring(serie: list[Kursrad], start: date, slutt: date) -> tuple[float, date] | None:
+    """Endringen i prosent fra startdagen til slutt, paa justert kurs som
+    endringen for én dag (FR-101) - story 8.17a.
+
+    Grunnlaget er raden paa startdagen. Har serien den ikke, er det foerste
+    rad etter startdagen og foer slutt, og dagen gis tilbake, saa raden kan
+    si det. None naar serien ikke har slutt, eller ingen rad mellom."""
+    paa_slutt = next((rad for rad in serie if rad.dato == slutt), None)
+    fra = next((rad for rad in serie if start <= rad.dato < slutt), None)
+    if paa_slutt is None or fra is None:
+        return None
+    return endring_i_prosent([fra, paa_slutt]), fra.dato
+
+
+def med_perioden(rader: list[Rad], serier: dict[str, list[Kursrad]], start_for) -> list[Rad]:
+    """Radene med endringen for perioden, sortert etter FR-102 paa nytt -
+    story 8.17a. start_for gir startdagen for radens siste boersdag
+    (perioder.startdag). Sluttkursen, signalet og «skiller seg ut» gjelder
+    fortsatt siste boersdag (gruppens svar 23.10 kl. 12:35, a)."""
+    nye = []
+    for rad in rader:
+        start = start_for(rad.dato)
+        utfall = periodeendring(serier.get(rad.aksje.symbol, []), start, rad.dato)
+        endring, fra = utfall if utfall is not None else (None, None)
+        nye.append(replace(rad, endring_prosent=endring, fra=fra if fra != start else None))
+    return sorted(nye, key=_sorteringsnokkel)
+
+
+def bygg_rad_for_dag(
+    post: Oversiktspost,
+    serie: list[Kursrad],
+    dag: date,
+    innhold: Vurdering | Grunn | None,
+    idag: date,
+    tre_av_tre_siste: bool,
+    p: Parametre = STANDARD,
+) -> Rad:
+    """Raden for en dag valgt med «Velg dag» - story 8.17a.
+
+    Sluttkursen og endringen er dagens, fra kursserien, og vurderingen er
+    raden i vurdering for dagen, eller teksten for hvorfor den mangler.
+    Signalet regnes aldri (AD-7). 2 av 3 merkes ikke for en annen dag enn
+    siste boersdag, saa skiller_seg_ut er usann, og gult kommer fra siste
+    boersdag (designregler.md §3)."""
+    foer = [rad for rad in serie if rad.dato <= dag]
+    paa_dagen = foer[-1] if foer and foer[-1].dato == dag else None
+    utfall, tekst = les_tilstand(innhold, dag, idag)
+    tekst = grunn_med_tall(utfall, tekst, len(foer), p)
+    return Rad(
+        aksje=post.aksje,
+        dato=dag,
+        sluttkurs=float(paa_dagen.slutt) if paa_dagen else None,
+        endring_prosent=endring_i_prosent(foer[-2:]) if paa_dagen else None,
+        tilstand=utfall,
+        tekst=tekst,
+        sist_hentet=post.hentet,
+        annen_dag=True,
+        tre_av_tre_siste=tre_av_tre_siste,
+    )
+
+
 def bygg_rad(post: Oversiktspost, idag: date, p: Parametre = STANDARD, antall_dager: int | None = None) -> Rad | None:
     """En rad for en aksje. None bare naar aksjen ikke har en eneste kursrad.
 
@@ -242,6 +310,12 @@ def _sorteringsnokkel(rad: Rad) -> tuple[int, float]:
     styrke = rad.styrke if rad.styrke is not None else -1
     endring = abs(rad.endring_prosent) if rad.endring_prosent is not None else -1.0
     return (-styrke, -endring)
+
+
+def sorter_fr102(rader: list[Rad]) -> list[Rad]:
+    """Radene i FR-102-rekkefoelgen, som bygg_oversikt - story 8.17a, for
+    radene for en dag valgt med «Velg dag»."""
+    return sorted(rader, key=_sorteringsnokkel)
 
 
 def bygg_oversikt(

@@ -330,6 +330,14 @@ class TestRammen:
                     or re.fullmatch(
                         r"/aksje/[A-Z0-9]+\?periode=(" + "|".join(map(re.escape, PERIODENE)) + ")#kursgrafen", href
                     )
+                    # Story 8.17a: periodene i oversikten, med dagen for «Velg
+                    # dag» og sorteringen.
+                    or re.fullmatch(
+                        r"/\?periode=(" + "|".join(map(re.escape, PERIODENE)) + r")"
+                        r"(&amp;dag=[0-9]{4}-[0-9]{2}-[0-9]{2})?"
+                        r"(&amp;sorter=(selskap|kurs|endring|signal|retning)&amp;orden=(synkende|stigende))?",
+                        href,
+                    )
                     # Story 2.7a: stilarket, med avtrykket av fila.
                     or re.fullmatch(r"/static/stil\.css\?v=[0-9a-f]{16}", href)
                     # Story 2.7b: hver dag i historikken lenker til siden for
@@ -559,7 +567,10 @@ class TestOversikten:
         stil = _stil(sidene["oversikten i demoen"])
         assert "inset 4px 0 0 var(--oransje)" in _regel(stil, "tr.utslag.alle td:first-child")
         assert "inset 4px 0 0 var(--lys-oransje)" in _regel(stil, "tr.utslag td:first-child")
-        assert len(re.findall(r"inset 4px", stil)) == 2
+        # Story 8.17a: streken for 3 av 3 siste børsdag ved «Velg dag», også
+        # i sterk oransje.
+        assert "inset 4px 0 0 var(--oransje)" in _regel(stil, "tr.gul td:first-child")
+        assert len(re.findall(r"inset 4px", stil)) == 3
         # Gjennomgangen: radene uten strek skrives «<tr >».
         sett = set()
         for rad in re.findall(

@@ -148,8 +148,24 @@ def _gjentatt(verdi: str) -> str:
     return verdi if len(verdi) <= _LENGSTE_I_BESKJED else verdi[:_LENGSTE_I_BESKJED] + "…"
 
 
-def les_valg(periode: str | None, dag: str | None, foerste: date, idag: date, siste: date | None = None) -> Valg:
-    """Perioden og dagen fra adressen, eller 6 mnd med en kort beskjed.
+# Story 8.17a: siden som leser adressen. Kursgrafen aapner med 6 mnd, og
+# oversikten med siste boersdag (designregler.md §2). Tekstene sier hva siden
+# viser naar adressen hadde en feil, og naar «Velg dag» mangler dagen.
+GRAFEN = "grafen"
+OVERSIKTEN = "oversikten"
+_STANDARD = {GRAFEN: SEKS_MND, OVERSIKTEN: SISTE}
+_VISER = {GRAFEN: "grafen viser 6 mnd", OVERSIKTEN: "oversikten viser siste børsdag"}
+_VELG_TEKST = {
+    GRAFEN: "Velg en dag i feltet, så viser grafen 6 mnd fram til den.",
+    OVERSIKTEN: "Velg en dag i feltet, så viser oversikten den dagen.",
+}
+
+
+def les_valg(
+    periode: str | None, dag: str | None, foerste: date, idag: date, siste: date | None = None, side: str = GRAFEN
+) -> Valg:
+    """Perioden og dagen fra adressen, eller standardperioden med en kort
+    beskjed: 6 mnd for grafen og siste boersdag for oversikten (8.17a).
 
     foerste og siste er foerste og siste dag i kursserien. En dag i adressen
     gir «Velg dag», ogsaa uten periode. En feil gir aldri en feilside: ukjent
@@ -158,27 +174,28 @@ def les_valg(periode: str | None, dag: str | None, foerste: date, idag: date, si
     beskjed. Seriens foerste dag ville gitt en graf med ett punkt
     (gjennomgangen, BH3), og en dag etter siste dag en graf som slutter foer
     dagen (BH1). Datoen i beskjeden er paa formen 09.10.2026."""
+    standard, viser = _STANDARD[side], _VISER[side]
     if dag:
         try:
             if not _DATO.fullmatch(dag):
                 raise ValueError(dag)
             valgt = date.fromisoformat(dag)
         except ValueError:
-            return Valg(SEKS_MND, beskjed=f"Datoen «{_gjentatt(dag)}» kunne ikke leses, så grafen viser 6 mnd.")
+            return Valg(standard, beskjed=f"Datoen «{_gjentatt(dag)}» kunne ikke leses, så {viser}.")
         if valgt > idag:
-            return Valg(SEKS_MND, beskjed=f"{valgt:%d.%m.%Y} er fram i tid, så grafen viser 6 mnd.")
+            return Valg(standard, beskjed=f"{valgt:%d.%m.%Y} er fram i tid, så {viser}.")
         if valgt <= foerste:
             return Valg(
-                SEKS_MND,
-                beskjed=f"Kursserien begynner {foerste:%d.%m.%Y}, så grafen viser 6 mnd.",
+                standard,
+                beskjed=f"Kursserien begynner {foerste:%d.%m.%Y}, så {viser}.",
             )
         if siste is not None and valgt > siste:
-            return Valg(SEKS_MND, beskjed=f"Kursserien slutter {siste:%d.%m.%Y}, så grafen viser 6 mnd.")
+            return Valg(standard, beskjed=f"Kursserien slutter {siste:%d.%m.%Y}, så {viser}.")
         return Valg(VELG, dag=valgt)
     if not periode:
-        return Valg(SEKS_MND)
+        return Valg(standard)
     if periode == VELG:
-        return Valg(SEKS_MND, beskjed="Velg en dag i feltet, så viser grafen 6 mnd fram til den.")
+        return Valg(standard, beskjed=_VELG_TEKST[side])
     if periode in PERIODENE:
         return Valg(periode)
-    return Valg(SEKS_MND, beskjed=f"Perioden «{_gjentatt(periode)}» finnes ikke, så grafen viser 6 mnd.")
+    return Valg(standard, beskjed=f"Perioden «{_gjentatt(periode)}» finnes ikke, så {viser}.")
