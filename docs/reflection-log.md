@@ -2973,6 +2973,46 @@ Det vi lærte: en instruksjon sjekkes mot testene før den sendes. To tester som
 
 ---
 
+## 28.10.2026 – Hentingen som jobb, to PR-er flettet, og 2.13 bygget i natt
+
+*Joakim og Marian.*
+
+Kl. 07:24 kom instruksjonen om sesjonsloggen videre. Svarene 26.10 kl. 22:58 og 27.10 kl. 06:31 og 20:58 ble ført i dagsfila (`0d5e9228`), regel 24 kom i `CLAUDE.md` (`ae5b3308`), og den første loggfila kom sammen med `.logs/` i «Mappestruktur» i `bf2707c2` kl. 07:30, som avgjort kl. 06:31. Etter det fikk hver instruksjon en sesjonslogg, åtte loggfiler i alt 28.10.
+
+2.3d, hentingen som jobb i Oppgaveplanlegging, ble bygget fra kl. 10:34 i PR #104 og stoppet før flettingen kl. 11:23. Kl. 11:34 avgjorde vi BH6 og ECH5: ingen lås, og alltid den lokale modellen (`ee82976e`). PR #104 ble flettet kl. 11:40 i `817b331a`, med 30 funn i triagen. Jobben ble lagt inn med første kjøring 29.10 kl. 22:15. Kjørt for hånd kl. 11:42 stoppet den før hentingen med 0 kall, fordi commiten fra midnatt ikke hadde skriptet ennå (Prøve 4 i `docs/kvalitetssikring.md`, `b9c06097`).
+
+Kl. 19:21 kom 3.5g videre, med svarene 27.10 kl. 06:09 og 28.10 kl. 11:19 og 11:23 (`6537872`). PR #103 ble flettet kl. 20:01 i `27ccf82`, med 36 funn og ingen med dom medium eller høyere, se utfordring 4. Kl. 20:58 fikk PRD-en «Kort fortalt» øverst, 396 ord, etter svarene 27.10 kl. 00:08 og 28.10 kl. 11:30 (`f0f67959` og `c4142edf`). Oppføringene for 26.10 og 27.10 kom her kl. 21:20 (`7881105a`).
+
+Instruksjonen for hentingen kom kl. 21:56 (`02b768c0`), den siste for hånd før jobben. Hentingen gikk kl. 22:00:01–22:00:49 med kode 0 og 16 kall, alle 15 KI-tekstene besto kontrollen, og NHY og TEL ga utslag på interesse. Etter svaret kl. 07:23 (`102ecb0c`) gikk de 4 kallene som var igjen, til §52 i `malinger.md` kl. 22:17 (`1721d9f2`): HAVI, HBC, HDLY og HERMA, på plass 173, 176, 172 og 199 av 214. Bonuskvoten ble ikke brukt.
+
+Kl. 22:17 avgjorde vi at 2.13, målingen jobben kjører hver kveld med kallene som er igjen, bygges i natt (`4e985641`). Den ble bygget fra kl. 22:38 til 00:16 i PR #105, i to instruksjoner, med svarene kl. 23:19, 23:22 og 23:36 imellom (`c2035716`). De to gjennomgangene fant 38 og 25 funn. PR #105 stoppet før flettingen, som begge instruksjonene sa. 29.10 kl. 09:20 svarte vi på de to spørsmålene som sto igjen (`5b05db38`), og PR-en flettes torsdag kl. 23:50.
+
+**Utfordringer**
+
+1. **En test som var avhengig av maskinen.**
+   *Problem:* CI feilet i steget «Kveldshentingen på Windows» to ganger: på main på `1721d9f` (40770982416), som bare endret `epics.md` og `malinger.md`, og på grenen for 2.13 på `ab7b967` (40777327364). Testen for hele jobben, `test_hele_jobben_uten_docker_henter_uten_ki_og_gir_koden_fra_hentingen` i `tests/test_kveldshenting.py`, gikk ut fra at Docker ikke svarte. På runneren svarte en docker innen fristen på 1 s, så skriptet stoppet Ollama, og loggen fikk en annen linje enn testen ventet.
+   *Løsning:* i `441b922c` i PR #105 står en falsk `docker.cmd` først i PATH i testene for jobben. Den feiler alltid og skriver kallene ned, og testen krever at den er spurt. CI ble grønn på grenen (40784071691 og 40785774200). Fra instruksjonen kl. 23:41 godtar steg 0 at siste CI-kjøring på main har feilet bare i dette steget.
+   *KI sin rolle:* testen kom fra 2.3d og ble skrevet av Claude Code. CI fant feilen. Instruksjonen kl. 23:41 foreslo den falske docker, og Claude Code bygget den og fant at feilen på main hadde samme årsak, ikke 2.13. Gruppen ga instruksjonen.
+
+2. **En ny migrasjon mens jobben kjører hver kveld.**
+   *Problem:* jobben kjører koden fra commiten ved midnatt på `origin/main` (`test_jobben_bruker_commiten_fra_midnatt_paa_origin_main`), og 2.13 har en ny migrasjon. Når PR #105 flettes, avgjør hvilken kode jobben kjører kvelden etter.
+   *Løsning:* svaret 28.10 kl. 23:22: 2.13 flettes torsdag 29.10 kl. 23:50, etter jobbens siste kjøring og før midnatt, så jobben fredag kjører den nye koden. Rekker det ikke før 23:59, flettes det ikke den kvelden. Svaret står under story 2.13 i `epics.md`.
+   *KI sin rolle:* Claude Code stoppet før flettingen, som instruksjonene sa, og la de to spørsmålene om funnene fram for gruppen. Gruppen avgjorde tidspunktet.
+
+3. **En linje som sa mer enn svaret.**
+   *Problem:* instruksjonen kl. 07:24 førte svaret 27.10 kl. 20:58 med en linje om at de 4 kallene ikke ble brukt. Den linjen kom fra rådet i chatten, ikke fra svaret, og de 4 kallene var først igjen etter hentingen kl. 22:00–22:01.
+   *Løsning:* en Rettet-linje i dagsfila 28.10 og en Avklart-linje i oppføringen 27.10 over, begge i `102ecb0c` kl. 22:16. Svaret sa bare at kallene skulle gå til målingen.
+   *KI sin rolle:* rådet i chatten skrev linjen inn i instruksjonen. Claude Code fant spriket da oppføringen 27.10 ble skrevet kl. 21:20 og førte det som åpent punkt (regel 12). Gruppen avgjorde i instruksjonen kl. 22:15 hva svaret sa.
+
+4. **Et råd om tid uten å se på klokka.**
+   *Problem:* rådet i chatten sa at 3.5g ikke rakk å bli flettet samme kveld, uten å sjekke klokka. Det står ikke i repoet utenom instruksjonen 29.10 kl. 11:02.
+   *Løsning:* gruppen sa fra. Instruksjonen kl. 19:21 sjekker klokka i steg 0, før 20:00, og stopper før flettingen hvis den er over 21:20. PR #103 ble flettet kl. 20:01.
+   *KI sin rolle:* rådet i chatten tok feil om tiden. Claude Code sjekket klokka i steg 0, kl. 19:21. Gruppen fant feilen.
+
+Det vi lærte: en test skal styre det den er avhengig av. Testen for jobben var grønn på én maskin og rød på en annen, til den falske docker tok bort valget. Det som går hver kveld, avgjør når noe kan flettes: med jobben er midnatt grensen for hvilken kode som kjører dagen etter. En avgjørelse føres med gruppens ord, ikke med det rådet i chatten la til, ellers må den rettes etterpå, som i `102ecb0c`. Og en KI kan ta feil om tid. Den må sjekke klokka før den sier hva som rekker, slik steg 0 gjør.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.

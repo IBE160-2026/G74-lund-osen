@@ -66,3 +66,24 @@ Instruksjonen 28.10 kl. 23:41: 2.13 videre etter gruppens svar 28.10 kl. 23:19, 
 - PR #105, spørsmål til gruppen: starter målingen i kjøringen kl. 23:45 etter midnatt i Oslo, venter den (ECH1, BH3, dom medium).
 - 2.13 flettes torsdag 29.10 kl. 23:50, og ikke etter 23:59 (svaret kl. 23:22). Kallene som er igjen, brukes av målingen for hånd rett etter, før midnatt (svaret kl. 23:36).
 - Målingene fra tabellen føres i `malinger.md` som en ny § hver søndag, første gang søndag 01.11 (svaret kl. 23:36, g).
+
+## 2026-10-29 kl. 10:32 — Marian Osen
+
+### Oppgave
+Instruksjonen 29.10 kl. 10:25: 2.13 klar til flettingen i kveld, med gruppens svar 29.10 kl. 09:20 på de to spørsmålene fra gjennomgangen 29.10 i PR #105. Ingen kodeendring, og stopp før flettingen.
+
+### Plan
+- Steg 0–1: kvotesjekken, instruksjonen i dagsfila og svaret under story 2.13 på main.
+- Steg 2: main flettet inn i grenen i en ny worktree, svaret i triagen og under «Åpent» i spesifikasjonen, testene for dokumentene og CI.
+
+### Resultat
+- **Kvoten** kl. 10:25 (09:25 GMT): `apiRequests` 20 med `apiRequestsDate` 2026-10-28, så 0 brukt og 20 igjen 29.10 i GMT, `extraLimit` 463. Ingen andre kall.
+- **Main:** instruksjonen i `bc08a18a`, og svaret kl. 09:20 under story 2.13 i `epics.md` i `5b05db38`. CI grønn på begge (40849867055 og 40849927390).
+- **Grenen**, PR #105 (fortsatt utkast): main flettet inn i `97ab8287`, og svaret i `2d0ea174`, med en «Svart»-rad ved BH2/VG2/ECH3/ECH2 og ECH1/BH3 i triagen, en «Avgjort»-linje under hvert spørsmål i «Åpent», og en linje om at ingenting står igjen for gruppen før flettingen. CI grønn på head-en `2d0ea174` (40850130502): pytest, docker og dobbeltklikk på Windows og macOS.
+- **Slått opp:** fra 23:45 har `src/omsetning.py` ingen grense på hvor mange som mangler, så svaret a) er slik koden var. Bare en base som ikke finnes, venter fortsatt. `TestKl2345` prøver 2 av 15 som mangler, ingen test prøver alle 15, og det står i triagen. `KL_23_50` i `src/fetch_prices.py` bekrefter b).
+- Testene for dokumentene (de seks i `docs/kvalitetssikring.md`) ga 253 bestått før hver push. Worktreen er fjernet. `data/db/ose.db` og `.env` er ikke rørt, utenom lesingen av nøkkelen til kvotesjekken.
+- Lukket i `issues.md`: de 2 spørsmålene til gruppen om PR #105.
+
+### Åpne punkter
+- 2.13 flettes torsdag 29.10 kl. 23:50, og ikke etter 23:59, i en egen instruksjon. Kallene som er igjen, brukes av målingen for hånd rett etter, før midnatt (står fra før i `issues.md`).
+- Ingen test prøver at målingen går fra 23:45 når alle 15 mangler kursen (svaret 29.10 kl. 09:20, a). Instruksjonen hadde ingen kodeendring.
