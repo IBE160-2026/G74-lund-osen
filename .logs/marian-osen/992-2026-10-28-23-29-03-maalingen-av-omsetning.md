@@ -132,3 +132,26 @@ Kjøre testblokkene fra kl. 11:35 og 19:36 for 2.13 videre etter at maskinen ble
 ### Åpne punkter
 - `tests/test_dobbeltklikk.py` feiler lokalt også etter omstarten (punktet står fra før i `issues.md`). Gruppen avgjør neste steg, for eksempel å hoppe over testene for start.ps1 lokalt og bare kjøre dem i CI, eller å la CI avgjøre for denne grenen.
 - Testen og triageraden for 2.13 ligger fortsatt ukommittert i `..\G74-lund-osen-2-13` (står fra før).
+
+## 2026-10-29 kl. 21:19 — Marian Osen
+
+### Oppgave
+Committe den nye testen for 2.13 etter gruppens svar 29.10 kl. 21:02: de 7 testene for porten i start.ps1 avgjøres av CI til feilen er rettet. Fullføre steg 3 fra instruksjonene kl. 11:35, 19:36 og 20:02.
+
+### Plan
+- Instruksjonen i dagsfila 29.10 (`421f65a6`), og avgjørelsen i `docs/kvalitetssikring.md` (`db5127e1`).
+- Hele settet alene i worktreen, stoppe hvis noe annet enn de 7 feiler.
+- Ruff, commit, push, CI. Så `issues.md` og Avklart-linja i refleksjonsloggen på main.
+
+### Resultat
+- Kvoten kl. 21:03 (20:03 GMT): `apiRequestsDate` 2026-10-28, så 0 brukt og 20 igjen 29.10, og `extraLimit` 463. Ingen andre kall.
+- Ledig minne før hele settet: 4 761 MB av 16 124 MB. Hele settet alene i worktreen (21:05:26–21:15:10): 7 feilet, 3 861 bestått og 24 hoppet over på 582 s. De 7 som feilet, er de 3 tilfellene av `test_start_ps1_stopper_bare_den_andre_versjonen_paa_porten` og de 4 av `test_start_ps1_frigjoer_porten_rett_foer_webserveren`, og ingen andre.
+- Ruff: «All checks passed!», 95 filer uendret.
+- På grenen: `7c743d30` (testen `test_gaar_fra_23_45_ogsaa_naar_alle_15_mangler` og raden i triagen) og `63707d37` (Rettet-linja ved ECH5), pushet sammen med `9fc20a2c`. CI 40947549000 grønn på `63707d37`. PR #105 står som utkast på `63707d37`.
+- På main: `2eb10f19`, Avklart-linja ved utfordring 2 i oppføringen 28.10. At rådet i chatten fant faren om dagen, står ikke i repoet utenom instruksjonen.
+- Lukket i `issues.md`: punktet om den manglende testen. Punktet om `tests/test_dobbeltklikk.py` er oppdatert med avgjørelsen og står åpent til feilen er undersøkt mandag.
+- Testene for dokumentene (de seks i `docs/kvalitetssikring.md`) ga 253 bestått før hver push. Worktreen `..\G74-lund-osen-2-13` er fjernet.
+
+### Åpne punkter
+- 2.13 flettes etter jobbens siste kjøring i kveld, i en egen instruksjon (står fra før i `issues.md`).
+- `tests/test_dobbeltklikk.py` undersøkes mandag (står fra før i `issues.md`, oppdatert).
