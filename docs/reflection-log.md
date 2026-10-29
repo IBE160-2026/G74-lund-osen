@@ -2998,6 +2998,7 @@ Kl. 22:17 avgjorde vi at 2.13, målingen jobben kjører hver kveld med kallene s
    *Problem:* jobben kjører koden fra commiten ved midnatt på `origin/main` (`test_jobben_bruker_commiten_fra_midnatt_paa_origin_main`), og 2.13 har en ny migrasjon. Når PR #105 flettes, avgjør hvilken kode jobben kjører kvelden etter.
    *Løsning:* svaret 28.10 kl. 23:22: 2.13 flettes torsdag 29.10 kl. 23:50, etter jobbens siste kjøring og før midnatt, så jobben fredag kjører den nye koden. Rekker det ikke før 23:59, flettes det ikke den kvelden. Svaret står under story 2.13 i `epics.md`.
    *KI sin rolle:* Claude Code stoppet før flettingen, som instruksjonene sa, og la de to spørsmålene om funnene fram for gruppen. Gruppen avgjorde tidspunktet.
+   *Avklart 2026-10-29 (instruksjonen kl. 21:03):* faren var at jobben stopper når basen er nyere enn koden. Edge Case Hunter fant den mens jobben går (ECH5), rådet i chatten fant den om dagen, og gruppen valgte tidspunktet.
 
 3. **En linje som sa mer enn svaret.**
    *Problem:* instruksjonen kl. 07:24 førte svaret 27.10 kl. 20:58 med en linje om at de 4 kallene ikke ble brukt. Den linjen kom fra rådet i chatten, ikke fra svaret, og de 4 kallene var først igjen etter hentingen kl. 22:00–22:01.

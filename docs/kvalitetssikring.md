@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-10-28T20:02
+updated: 2026-10-29T21:04
 ---
 
 # Kvalitetssikring
@@ -258,6 +258,8 @@ til basen (story 2.1b). `tests/test_tidssone.py` avviser `date.today(`,
 `tests/test_readme.py` sjekker at hver lenke i README peker på noe som finnes.
 
 *Lagt til 2026-10-24:* «testene for dokumentene», som instruksjonene og endringsforslagene viser til, er `tests/test_readme.py`, `tests/test_kvalitetssikring.py`, `tests/test_ryddighet.py`, `tests/test_suksesskriterier.py`, `tests/test_hjelpetekster.py` og `tests/test_docker.py`.
+
+*Avgjort 2026-10-29 kl. 21:02 (gruppens svar):* etter Windows-oppdateringen 29.10 feiler de 7 tilfellene av `test_start_ps1_stopper_bare_den_andre_versjonen_paa_porten` og `test_start_ps1_frigjoer_porten_rett_foer_webserveren` i `tests/test_dobbeltklikk.py` lokalt, også på main og etter omstart, fordi `Get-NetTCPConnection` ikke ser en lytter på 127.0.0.1:8000 som `Listen`. Til feilen er rettet, avgjør CI dem: hele settet lokalt regnes som grønt når bare disse 7 feiler, og CI må være grønn på head-en. Feilen undersøkes mandag.
 
 *Avgjort 2026-10-25 kl. 20:16 (gruppens svar):* ingen sperre før push. Regelen står i hver instruksjon, og CI fanger feil.
 

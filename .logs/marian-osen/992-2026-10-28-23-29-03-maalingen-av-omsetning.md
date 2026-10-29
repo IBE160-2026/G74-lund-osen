@@ -87,3 +87,71 @@ Instruksjonen 29.10 kl. 10:25: 2.13 klar til flettingen i kveld, med gruppens sv
 ### Åpne punkter
 - 2.13 flettes torsdag 29.10 kl. 23:50, og ikke etter 23:59, i en egen instruksjon. Kallene som er igjen, brukes av målingen for hånd rett etter, før midnatt (står fra før i `issues.md`).
 - Ingen test prøver at målingen går fra 23:45 når alle 15 mangler kursen (svaret 29.10 kl. 09:20, a). Instruksjonen hadde ingen kodeendring.
+
+## 2026-10-29 kl. 19:42 — Marian Osen
+
+### Oppgave
+Fortsette testblokka fra kl. 11:35 for 2.13, som stoppet kl. 11:48 med 7 feil i `tests/test_dobbeltklikk.py` i hele settet. Først finne ut om feilen kommer fra 2.13, og så committe testen og triageraden hvis settet er grønt.
+
+### Plan
+- Instruksjonen i dagsfila 29.10 (`4f85a46b`).
+- `tests/test_dobbeltklikk.py` alene i worktreen og så på main, og se hva som lytter på port 8000.
+- Hele settet, commit og CI bare hvis fila består. Ellers stoppe før commit.
+
+### Resultat
+- Kvoten kl. 19:36 (18:36 GMT): `apiRequestsDate` 2026-10-28, så 0 brukt og 20 igjen 29.10, og `extraLimit` 463. Ingen andre kall.
+- `tests/test_dobbeltklikk.py` alene i worktreen, to ganger: 4 feil (19:37–19:38) og 5 feil, hver gang i `test_start_ps1_stopper_bare_den_andre_versjonen_paa_porten` og `test_start_ps1_frigjoer_porten_rett_foer_webserveren`, men med ulike parametre. Første linje av feilen: utskriften sier «et annet program svarer allerede på http://127.0.0.1:8000 … Programmet er et program skriptet ikke fant navnet på», så `assert 'Den andre versjonen av OSE Signal kjører allerede …' in …` ([oss]), `assert 'python' in …` ([annen_mappe], [fremmed]) og `ValueError: substring not found` (frigjør-testene) feiler.
+- På main, alene (19:40–19:41): 7 feil, de samme to testene med alle 7 parametrene. Feilen kommer altså ikke fra 2.13.
+- Port 8000: ingenting lytter utenom testene.
+- Årsaken, slik den ser ut: `Lyttere` i `start/start.ps1` spør `Get-NetTCPConnection -LocalPort 8000 -State Listen`. Med en Python-lytter på 127.0.0.1:8000 fant den ingenting, både i testmiljøet og i vanlig PowerShell, i og utenfor sandkassen. `netstat -ano` viste lytteren med tilstanden `FIN_WAIT_1` i stedet for `LISTENING`, og bare 4 porter totalt som `LISTENING`. Windows-oppdateringen KB5127936 ble installert 29.10, og maskinen startet på nytt kl. 02:31. Hele settet var sist grønt lokalt 28.10 kl. 23:50–00:12. At oppdateringen er årsaken, er ikke bevist, men det er det eneste som er endret.
+- `tests/test_omsetning.py` alene i worktreen: 51 bestått. Den nye testen og triageraden er fortsatt ikke committet i `..\G74-lund-osen-2-13`. Raden sier at mutanten der målingen venter når alle mangler, feilet i testen. Kjøringen av mutanten kl. 11:35 er ikke sett i denne økten.
+- Hele settet er ikke kjørt, og ingen commit, push eller CI er gjort på grenen. Ledig minne: 5 241 MB av 16 124 MB. Worktreen er ikke fjernet, fordi testen og raden bare finnes der.
+
+### Åpne punkter
+- `tests/test_dobbeltklikk.py` feiler lokalt i 4–7 av de 7 tilfellene for start.ps1 og porten, fordi `Get-NetTCPConnection -State Listen` ikke ser lytteren etter Windows-oppdateringen 29.10. Gruppen avgjør om maskinen skal startes på nytt og testen kjøres igjen, eller om testene for start.ps1 skal hoppes over lokalt og bare kjøres i CI.
+- Testen og triageraden for 2.13 (og Rettet-linja ved ECH5) ligger ukommittert i `..\G74-lund-osen-2-13` til settet er grønt.
+
+## 2026-10-29 kl. 20:06 — Marian Osen
+
+### Oppgave
+Kjøre testblokkene fra kl. 11:35 og 19:36 for 2.13 videre etter at maskinen ble startet på nytt (gruppens svar 29.10 kl. 19:49), fordi `tests/test_dobbeltklikk.py` feilet lokalt, også på main.
+
+### Plan
+- Instruksjonen i dagsfila 29.10 (`62fc181e`).
+- `tests/test_dobbeltklikk.py` alene i worktreen, og se om `Get-NetTCPConnection` nå ser en lytter på 127.0.0.1:8000 som `Listen`.
+- Hele settet, commit og CI bare hvis fila består. Ellers stoppe før commit.
+
+### Resultat
+- Omstarten: `LastBootUpTime` er 29.10 kl. 19:59:48.
+- Kvoten kl. 20:02 (19:02 GMT): `apiRequestsDate` 2026-10-28, så 0 brukt og 20 igjen 29.10 i GMT, og `extraLimit` 463. Ingen andre kall.
+- `tests/test_dobbeltklikk.py` alene i worktreen: 5 feil, 59 bestått og 11 hoppet over (20:03:59–20:04:42), og så 7 feil i en ny kjøring, i de samme to testene som kl. 19:36.
+- En lytter jeg startet selv (Python, `socket.listen()` på 127.0.0.1:8000) får fortsatt tilstanden `FinWait1` i `Get-NetTCPConnection` og `FIN_WAIT_1` i `netstat -ano`, ikke `Listen`/`LISTENING`. Omstarten rettet altså ikke feilen. Lytteren er stoppet, og ingenting lytter på port 8000.
+- Ledig minne: 6 186 MB av 16 124 MB.
+- Steg 3 er ikke gjort: hele settet, ruff, commiten, Rettet-linja ved ECH5, pushen, CI, punktene i `issues.md` og Avklart-linja i refleksjonsloggen står igjen. Worktreen står med `9fc20a2c` ikke pushet og testen og raden ukommittert.
+
+### Åpne punkter
+- `tests/test_dobbeltklikk.py` feiler lokalt også etter omstarten (punktet står fra før i `issues.md`). Gruppen avgjør neste steg, for eksempel å hoppe over testene for start.ps1 lokalt og bare kjøre dem i CI, eller å la CI avgjøre for denne grenen.
+- Testen og triageraden for 2.13 ligger fortsatt ukommittert i `..\G74-lund-osen-2-13` (står fra før).
+
+## 2026-10-29 kl. 21:19 — Marian Osen
+
+### Oppgave
+Committe den nye testen for 2.13 etter gruppens svar 29.10 kl. 21:02: de 7 testene for porten i start.ps1 avgjøres av CI til feilen er rettet. Fullføre steg 3 fra instruksjonene kl. 11:35, 19:36 og 20:02.
+
+### Plan
+- Instruksjonen i dagsfila 29.10 (`421f65a6`), og avgjørelsen i `docs/kvalitetssikring.md` (`db5127e1`).
+- Hele settet alene i worktreen, stoppe hvis noe annet enn de 7 feiler.
+- Ruff, commit, push, CI. Så `issues.md` og Avklart-linja i refleksjonsloggen på main.
+
+### Resultat
+- Kvoten kl. 21:03 (20:03 GMT): `apiRequestsDate` 2026-10-28, så 0 brukt og 20 igjen 29.10, og `extraLimit` 463. Ingen andre kall.
+- Ledig minne før hele settet: 4 761 MB av 16 124 MB. Hele settet alene i worktreen (21:05:26–21:15:10): 7 feilet, 3 861 bestått og 24 hoppet over på 582 s. De 7 som feilet, er de 3 tilfellene av `test_start_ps1_stopper_bare_den_andre_versjonen_paa_porten` og de 4 av `test_start_ps1_frigjoer_porten_rett_foer_webserveren`, og ingen andre.
+- Ruff: «All checks passed!», 95 filer uendret.
+- På grenen: `7c743d30` (testen `test_gaar_fra_23_45_ogsaa_naar_alle_15_mangler` og raden i triagen) og `63707d37` (Rettet-linja ved ECH5), pushet sammen med `9fc20a2c`. CI 40947549000 grønn på `63707d37`. PR #105 står som utkast på `63707d37`.
+- På main: `2eb10f19`, Avklart-linja ved utfordring 2 i oppføringen 28.10. At rådet i chatten fant faren om dagen, står ikke i repoet utenom instruksjonen.
+- Lukket i `issues.md`: punktet om den manglende testen. Punktet om `tests/test_dobbeltklikk.py` er oppdatert med avgjørelsen og står åpent til feilen er undersøkt mandag.
+- Testene for dokumentene (de seks i `docs/kvalitetssikring.md`) ga 253 bestått før hver push. Worktreen `..\G74-lund-osen-2-13` er fjernet.
+
+### Åpne punkter
+- 2.13 flettes etter jobbens siste kjøring i kveld, i en egen instruksjon (står fra før i `issues.md`).
+- `tests/test_dobbeltklikk.py` undersøkes mandag (står fra før i `issues.md`, oppdatert).
