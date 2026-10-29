@@ -4012,6 +4012,10 @@ avgjøres i planen.
 
 *Avgjort 2026-10-28 kl. 22:17 (gruppens svar):* a) 2.13 bygges i natt, og 8.17a tas senere. b) Jobben fra 2.3d kjører målingen etter hentingen med alle kallene som er igjen den dagen i GMT, også på dager børsen er stengt. Hentingen og nye forsøk får kallene først, og bonuskvoten brukes aldri. c) Når hele lista er målt, måles de eldste målingene på nytt først. Det går foran «etter 3 måneder» og «lar 2 stå igjen» i FR-413.
 
+*Avgjort 2026-10-29 kl. 09:20 (gruppens svar):* 8.17a bygges på egen gren etter refleksjonen for 28.10, stopper før flettingen og flettes tidligst fredag, etter 2.13. Ført 30.10 i instruksjonen kl. 00:10, som svaret sa.
+
+*Lagt til 2026-10-30:* 8.17a startet ikke torsdag, fordi testblokkene for 2.13 tok dagen. Byggingen startet fredag 30.10 etter midnatt, med frist kl. 21:00 samme dag.
+
 ### Story 8.18: Kommende eks.dato i kursgrafen
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
