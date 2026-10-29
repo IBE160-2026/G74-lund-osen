@@ -110,3 +110,25 @@ Fortsette testblokka fra kl. 11:35 for 2.13, som stoppet kl. 11:48 med 7 feil i 
 ### Åpne punkter
 - `tests/test_dobbeltklikk.py` feiler lokalt i 4–7 av de 7 tilfellene for start.ps1 og porten, fordi `Get-NetTCPConnection -State Listen` ikke ser lytteren etter Windows-oppdateringen 29.10. Gruppen avgjør om maskinen skal startes på nytt og testen kjøres igjen, eller om testene for start.ps1 skal hoppes over lokalt og bare kjøres i CI.
 - Testen og triageraden for 2.13 (og Rettet-linja ved ECH5) ligger ukommittert i `..\G74-lund-osen-2-13` til settet er grønt.
+
+## 2026-10-29 kl. 20:06 — Marian Osen
+
+### Oppgave
+Kjøre testblokkene fra kl. 11:35 og 19:36 for 2.13 videre etter at maskinen ble startet på nytt (gruppens svar 29.10 kl. 19:49), fordi `tests/test_dobbeltklikk.py` feilet lokalt, også på main.
+
+### Plan
+- Instruksjonen i dagsfila 29.10 (`62fc181e`).
+- `tests/test_dobbeltklikk.py` alene i worktreen, og se om `Get-NetTCPConnection` nå ser en lytter på 127.0.0.1:8000 som `Listen`.
+- Hele settet, commit og CI bare hvis fila består. Ellers stoppe før commit.
+
+### Resultat
+- Omstarten: `LastBootUpTime` er 29.10 kl. 19:59:48.
+- Kvoten kl. 20:02 (19:02 GMT): `apiRequestsDate` 2026-10-28, så 0 brukt og 20 igjen 29.10 i GMT, og `extraLimit` 463. Ingen andre kall.
+- `tests/test_dobbeltklikk.py` alene i worktreen: 5 feil, 59 bestått og 11 hoppet over (20:03:59–20:04:42), og så 7 feil i en ny kjøring, i de samme to testene som kl. 19:36.
+- En lytter jeg startet selv (Python, `socket.listen()` på 127.0.0.1:8000) får fortsatt tilstanden `FinWait1` i `Get-NetTCPConnection` og `FIN_WAIT_1` i `netstat -ano`, ikke `Listen`/`LISTENING`. Omstarten rettet altså ikke feilen. Lytteren er stoppet, og ingenting lytter på port 8000.
+- Ledig minne: 6 186 MB av 16 124 MB.
+- Steg 3 er ikke gjort: hele settet, ruff, commiten, Rettet-linja ved ECH5, pushen, CI, punktene i `issues.md` og Avklart-linja i refleksjonsloggen står igjen. Worktreen står med `9fc20a2c` ikke pushet og testen og raden ukommittert.
+
+### Åpne punkter
+- `tests/test_dobbeltklikk.py` feiler lokalt også etter omstarten (punktet står fra før i `issues.md`). Gruppen avgjør neste steg, for eksempel å hoppe over testene for start.ps1 lokalt og bare kjøre dem i CI, eller å la CI avgjøre for denne grenen.
+- Testen og triageraden for 2.13 ligger fortsatt ukommittert i `..\G74-lund-osen-2-13` (står fra før).
