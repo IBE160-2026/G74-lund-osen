@@ -337,6 +337,24 @@ class TestKl2345:
         assert "målingen venter" not in ut
         assert [rad[0] for rad in _radene()] == ["NYA", "NYB", "NYC", "NYD"]
 
+    def test_gaar_fra_23_45_ogsaa_naar_alle_15_mangler(self, tmp_path):
+        """Svaret 29.10 kl. 09:20, a): fra 23:45 er det ingen grense paa hvor
+        mange som mangler. Basen har bare kursene for 27.10, saa alle 15
+        mangler 28.10. Ville feilet hvis maalingen ventet fra 23:45 naar alle
+        mangler, eller gikk foer 23:45."""
+        _fyll(date(2026, 10, 27))
+        kvote = Kvote(brukt=16)
+        kode, ut = _kjoer(tmp_path, kvote, klokke=datetime(2026, 10, 28, 22, 44, 59, tzinfo=timezone.utc))
+        assert (kode, kvote.kall) == (1, []), ut
+        assert "0 kall brukt" in ut
+        kode, ut = _kjoer(tmp_path, kvote, klokke=datetime(2026, 10, 28, 22, 45, tzinfo=timezone.utc))
+        assert kode == 0, ut
+        assert kvote.kall == ["NYA.OL", "NYB.OL", "NYC.OL", "NYD.OL"]
+        assert (kvote.brukt, kvote.bonus) == (20, 463)
+        assert "15 av de 15 i lista mangler kursen for 2026-10-28" in ut
+        assert "målingen venter" not in ut
+        assert [rad[0] for rad in _radene()] == ["NYA", "NYB", "NYC", "NYD"]
+
     def test_23_45_gjelder_ogsaa_i_sommertid(self, tmp_path):
         """Grensen er klokka i Oslo, ikke i GMT: 23:45 i september er 21:45 GMT."""
         _fyll(date(2026, 9, 30), uten=("EQNR",))
