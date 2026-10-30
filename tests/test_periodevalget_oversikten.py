@@ -7,7 +7,7 @@ lages der den også. Tallene er regnet for hånd fra seriene under.
 
 import re
 import shutil
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -17,7 +17,7 @@ import demo
 import lagring_sqlite
 from kursdata import Kursrad
 from markedsoversikt import periodeendring
-from perioder import EN_MND, EN_UKE, I_AAR, startdag
+from perioder import EN_MND, EN_UKE, I_AAR, TRE_MND, startdag
 from test_app import (
     FREDAG_09_10,
     HENTET,
@@ -227,6 +227,89 @@ class TestEndringenForPerioden:
         assert "120,00" in tekst and "3 av 3" in tekst
         assert klasse == "utslag alle"
         assert "Sluttkursen og signalet gjelder siste børsdag." in _synlig(html)
+
+
+# Gruppens svar 30.10 kl. 10:45 (ECH1): linja over tabellen, søylene og
+# kursgrafen sier dagen den første kursen i perioden er fra. 3 mnd fra
+# torsdag 26.03.2026 starter etter regelen fredag 26.12.2025, som er en
+# hverdag utenfor børskalenderen, men stengt. Seriene har hverdagene fra
+# 01.12.2025 uten de stengte dagene i jula, og 2026 etter kalenderen.
+TORSDAG_26_03 = date(2026, 3, 26)
+STENGT_2025 = {date(2025, 12, 24), date(2025, 12, 25), date(2025, 12, 26), date(2025, 12, 31)}
+MANDAG_29_12 = date(2025, 12, 29)
+
+
+def _hverdager(fra: date, til: date) -> list[date]:
+    from boersdag import UtenforKalenderen, er_boersdag
+
+    dager, dag = [], fra
+    while dag <= til:
+        try:
+            aapen = er_boersdag(dag)
+        except UtenforKalenderen:
+            aapen = dag.weekday() < 5 and dag not in STENGT_2025
+        if aapen:
+            dager.append(dag)
+        dag += timedelta(days=1)
+    return dager
+
+
+def _serie_fra(fra: date, grunnlag: date, verdi: float = 50.0) -> list[Kursrad]:
+    """Kurs 100 alle dager, og verdi på grunnlag, så endringen til siste dag
+    er (100 - verdi) / verdi."""
+    return [
+        Kursrad(
+            dato=d, slutt=verdi if d == grunnlag else 100.0, justert_slutt=verdi if d == grunnlag else 100.0, volum=1
+        )
+        for d in _hverdager(fra, TORSDAG_26_03)
+    ]
+
+
+class TestFoersteKursen:
+    def test_en_periode_som_begynner_paa_en_stengt_dag(self, klient):
+        """Ville feilet hvis linja over tabellen eller søylene nevnte
+        26.12.2025, som er stengt, eller radene fikk «fra» fordi ingen serie
+        har den dagen. Endringen er fra 29.12.2025 (50) til 26.03 (100)."""
+        assert startdag(TRE_MND, TORSDAG_26_03) == date(2025, 12, 26)
+        hentet = datetime.fromisoformat(HENTET)
+        skriv_serie("EQNR", _serie_fra(date(2025, 12, 1), MANDAG_29_12), hentet, vurdert=False)
+        skriv_serie("DNB", _serie_fra(date(2025, 12, 1), MANDAG_29_12), hentet, vurdert=False)
+        # Indekslageret tar bort dager utenfor kalenderen, så indeksen begynner
+        # 02.01.2026, og søylene står uten linje (BH4, ECH4).
+        _legg_inn_indeks(_indeks([(d, 1000.0) for d in _hverdager(date(2026, 1, 2), TORSDAG_26_03)]))
+        html = klient.get("/?periode=3-mnd").data.decode("utf-8")
+        assert "26.12.2025" not in html
+        assert "Endringen gjelder 3 måneder, fra 29.12.2025 til 26.03." in _synlig(html)
+        assert "+100,00 %" in _rad(html, "EQNR")[1]
+        assert 'class="fra"' not in html
+        lista = _soeylelista(html)
+        assert "Endring per aksje 3 måneder, fra 29.12.2025 til 26.03" in lista
+        assert "Regnet fra første dag" not in lista
+        assert "Ingen stiplet linje: indeksen har ingen endring for perioden." in lista
+
+    def test_en_periode_som_begynner_foer_kursene(self, klient):
+        """1 år fra 26.03.2026 starter 26.03.2025, men kursene begynner
+        mandag 02.03.2026. Ville feilet hvis linja sa 26.03.2025, eller
+        alle radene fikk «fra» i stedet for bare AKRBP, som begynner 16.03."""
+        hentet = datetime.fromisoformat(HENTET)
+        mars = date(2026, 3, 2)
+        skriv_serie("EQNR", _serie_fra(mars, mars), hentet, vurdert=False)
+        skriv_serie("AKRBP", _serie_fra(date(2026, 3, 16), date(2026, 3, 16), 80.0), hentet, vurdert=False)
+        html = klient.get("/?periode=1-aar").data.decode("utf-8")
+        assert "26.03.2025" not in html
+        assert "Endringen gjelder 1 år, fra 02.03 til 26.03." in _synlig(html)
+        assert 'class="fra"' not in _rad_html(html, "EQNR")
+        akrbp = _rad(html, "AKRBP")[1]
+        assert "+25,00 %" in akrbp and "fra 16.03" in akrbp
+
+    def test_kursgrafen_sier_foerste_kurs_ved_en_stengt_startdag(self, klient):
+        """Linja i kursgrafen fra 8.16. Ville feilet hvis grafen nevnte
+        26.12.2025, eller sa at serien er kortere enn perioden."""
+        skriv_serie("EQNR", _serie_fra(date(2025, 12, 1), MANDAG_29_12), datetime.fromisoformat(HENTET), vurdert=False)
+        html = klient.get("/aksje/EQNR?periode=3-mnd").data.decode("utf-8")
+        assert "26.12.2025" not in html
+        assert "29.12.2025 til 26.03." in _synlig(html)
+        assert "Kursserien begynner" not in html
 
 
 class TestVelgDag:

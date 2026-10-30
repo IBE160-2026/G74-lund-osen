@@ -432,13 +432,14 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # Story 8.17a: periodevalget i oversikten, med søylene og linja.
         "perioden_oversikten": Hjelpetekst(
             "Periodene:",
-            "knappene viser siste børsdag, endringen fra periodens første børsdag til siste "
+            "knappene viser siste børsdag, endringen fra den første kursen i perioden til siste "
             "børsdag, eller en dag du velger, med signalet som er lagret for den. Ved en periode "
             "gjelder sluttkursen og signalet siste børsdag, og «fra» med en dato står under "
             "endringen når kursserien begynner senere. Søylene og den stiplede linja følger samme "
             "periode eller dag, og oransje strek viser 3 av 3 siste børsdag.",
             (
                 (PERIODER, "def startdag("),
+                (PERIODER, "def foerste_kursdag("),
                 (MARKEDSOVERSIKT, "def periodeendring("),
                 (MARKEDSOVERSIKT, "def bygg_rad_for_dag("),
                 (HOVEDINDEKS, "def soeylene_for("),

@@ -87,6 +87,16 @@ def startdag(periode: str, siste: date) -> date:
     raise ValueError(f"ukjent periode: {periode!r}")
 
 
+def foerste_kursdag(serier, start: date, slutt: date) -> date | None:
+    """Dagen den foerste kursen i perioden er fra: den tidligste datoen fra
+    og med start til og med slutt i seriene (rader med .dato), eller None.
+
+    Story 8.17a (gruppens svar 30.10 kl. 10:45, ECH1): linja over tabellen
+    og soeylene sier denne dagen, ikke startdagen, saa ingen stengt dag
+    utenfor boerskalenderen nevnes. Kalenderen faar ikke 2025."""
+    return min((rad.dato for serie in serier for rad in serie if start <= rad.dato <= slutt), default=None)
+
+
 # Overskriften over grafen for hver periode (FR-201). Siste boersdag og
 # «Velg dag» faar dagen etter seg i malen: «6 måneder fram til fredag 09.10».
 OVERSKRIFT = {

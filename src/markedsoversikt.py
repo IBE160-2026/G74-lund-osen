@@ -231,9 +231,10 @@ def periodeendring(serie: list[Kursrad], start: date, slutt: date) -> tuple[floa
 
 def med_perioden(rader: list[Rad], serier: dict[str, list[Kursrad]], start: date) -> list[Rad]:
     """Radene med endringen for perioden, sortert etter FR-102 paa nytt -
-    story 8.17a. start er startdagen fra perioder.startdag, regnet fra
-    sidens siste boersdag, den samme for alle radene og linja over tabellen
-    (gjennomgangen, BH3 og ECH5). Endringen gaar til radens siste boersdag.
+    story 8.17a. start er dagen den foerste kursen i perioden er fra
+    (perioder.foerste_kursdag fra startdagen, gruppens svar 30.10 kl. 10:45,
+    ECH1), regnet fra sidens siste boersdag, den samme for alle radene og
+    linja over tabellen (gjennomgangen, BH3 og ECH5). Endringen gaar til radens siste boersdag.
     Sluttkursen, signalet og «skiller seg ut» gjelder fortsatt siste
     boersdag (gruppens svar 23.10 kl. 12:35, a)."""
     nye = []

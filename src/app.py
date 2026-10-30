@@ -99,6 +99,7 @@ from perioder import (
     SISTE,
     VELG,
     Valg,
+    foerste_kursdag,
     knappene,
     les_valg,
     startdag,
@@ -774,6 +775,9 @@ def _tabellsiden(aktiv: str):
     serier = {} if i_lista else _seriene(leser, poster)
     valg = None if i_lista else _valget(rader, serier, i_dag)
     vist = rader
+    # Gruppens svar 30.10 kl. 10:45 (ECH1): én dag for linja, radene og
+    # søylene, den første kursen i perioden.
+    periodestart = _periodestart(valg, rader, serier)
     if valg is not None and valg.periode == VELG:
         vist = sorter_fr102(
             [
@@ -789,8 +793,8 @@ def _tabellsiden(aktiv: str):
                 if post.nyeste is not None
             ]
         )
-    elif valg is not None and valg.periode != SISTE:
-        vist = med_perioden(rader, serier, startdag(valg.periode, sidens_siste(rader)))
+    elif periodestart is not None:
+        vist = med_perioden(rader, serier, periodestart)
     annen_dag = valg is not None and valg.periode == VELG
     skilte_seg_ut, oevrige = del_i_to(rader if annen_dag else vist)
     # Story 8.3: merkingen leses fra sin egen port, bare lesing her.
@@ -857,7 +861,7 @@ def _tabellsiden(aktiv: str):
         knapper=knappene(sidens_siste(rader), i_dag) if valg else (),
         # Gjennomgangen (ECH9): navnet midt i en setning, «i år» med liten i.
         periodenavn=OVERSKRIFT.get(valg.periode) if valg and valg.periode not in (SISTE, VELG) else None,
-        periodestart=_periodestart(valg, rader),
+        periodestart=periodestart,
         foerste_valgbare=_foerste_valgbare(serier),
         siste_dag=sidens_siste(rader),
         periodeledd=ledd,
@@ -910,13 +914,17 @@ def _valget(rader: list, serier: dict[str, list], i_dag: date) -> Valg | None:
     return valg
 
 
-def _periodestart(valg: Valg | None, rader: list) -> date | None:
-    """Startdagen for perioden, regnet fra siste børsdag, til linja over
-    tabellen. None for siste børsdag og «Velg dag»."""
+def _periodestart(valg: Valg | None, rader: list, serier: dict[str, list]) -> date | None:
+    """Dagen den første kursen i perioden er fra, regnet fra siste børsdag,
+    til linja over tabellen, radene og søylene. None for siste børsdag og
+    «Velg dag». Gruppens svar 30.10 kl. 10:45 (ECH1): ikke startdagen fra
+    perioder.startdag, som utenfor børskalenderen kan være en stengt dag.
+    Uten en kurs i perioden er det startdagen."""
     siste = sidens_siste(rader)
     if valg is None or siste is None or valg.periode in (SISTE, VELG):
         return None
-    return startdag(valg.periode, siste)
+    start = startdag(valg.periode, siste)
+    return foerste_kursdag(serier.values(), start, siste) or start
 
 
 def periodeledd(valg: Valg | None) -> tuple[str, ...]:

@@ -36,7 +36,7 @@ from boersdag import UtenforKalenderen, er_boersdag
 from indeksdata import HOVEDINDEKS
 from kursdata import Aksje, Kursrad
 from markedsoversikt import endring_i_prosent, periodeendring
-from perioder import SISTE, VELG, startdag
+from perioder import SISTE, VELG, foerste_kursdag, startdag
 from tallformat import avrundet
 
 # Hoeyst saa mange dager tilbake leter forrige_boersdag. Den lengste stengte
@@ -255,7 +255,10 @@ def soeylene_for(
         return bygg_soeyler(dag, indeks, grunnlag)
     if periode in (SISTE, VELG):
         return bygg_soeyler(siste, indeksendring(serie), grunnlag)
-    start = startdag(periode, siste)
+    # Gruppens svar 30.10 kl. 10:45 (ECH1): dagen den foerste kursen i
+    # perioden er fra, som linja over tabellen, ikke en stengt startdag.
+    beregnet = startdag(periode, siste)
+    start = foerste_kursdag((s for _, s, _ in grunnlag), beregnet, siste) or beregnet
     utfall = periodeendring(serie, start, siste)
     # Gjennomgangen (BH4, ECH4): begynner indeksen etter startdagen, er det
     # ingen linje, saa linja aldri gjelder en kortere tid enn soeylene.
