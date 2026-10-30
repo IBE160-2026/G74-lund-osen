@@ -1518,6 +1518,26 @@ DOBBELTKLIKKET = "Enklest: dobbeltklikk (anbefalt)"
 # Story 3.5g: overskriften het «Enklest: dobbeltklikk, uten Docker» til 3.5g.
 # Ankeret staar paa linja over, saa lenkene til det virker som foer.
 DOBBELTKLIKK_ANKER = "enklest-dobbeltklikk-uten-docker"
+# Story 3.5h (gruppens svar 29.10 kl. 19:36, a): de 16 lenkene i «Til
+# faglærer» foer den ble kortet ned, saa ingen forsvinner.
+TIL_FAGLAERER_LENKENE = (
+    "#enklest-dobbeltklikk-uten-docker",
+    "#med-docker-desktop",
+    "#demoen",
+    "#den-ekte-versjonen",
+    "#tester",
+    "_bmad-output/planning-artifacts/product-brief.md",
+    "_bmad-output/planning-artifacts/tilbakemelding-product-brief.md",
+    "_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md",
+    "_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md#kort-fortalt",
+    "_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md",
+    "_bmad-output/planning-artifacts/epics.md",
+    "docs/innlevering.md",
+    "docs/vurderingsmatrise.md",
+    "docs/kvalitetssikring.md",
+    "docs/reflection-log.md",
+    "docs/ai-prompts/",
+)
 # Lenketeksten i «Til faglærer» og «Velg vei».
 DOBBELTKLIKK_LENKE = "Enklest: dobbeltklikk"
 UV_PIL = '<a name="uten-docker-med-uv"></a>Uten Docker, med uv'
@@ -2785,47 +2805,66 @@ class TestReadmeForNybegynnere:
     def test_til_faglaerer_begynner_med_demoen_den_ekte_versjonen_og_testene(self):
         """Story 3.3d, punkt e (beslutningen 16.10 kl. 21:16, med svarene kl.
         21:25 og 21:57, og svaret 18.10 kl. 15:37): først under «Til
-        faglærer» kommer tre lenker, hver med en kort forklaring foran, til
-        demoen, den ekte versjonen og «Tester». Ville feilet med en lenke til
-        en overskrift som ikke finnes."""
+        faglærer» kommer lenkene til demoen, den ekte versjonen og «Tester»,
+        hver med en kort forklaring foran. Story 3.5h (gruppens svar 29.10
+        kl. 19:36, a): de står i de to første av fire punkter, «Prøv appen»
+        og «Testene». Ville feilet med en lenke til en overskrift som ikke
+        finnes, eller med lenkene i en annen rekkefølge."""
         tekst = README.read_text(encoding="utf-8")
         lista = tekst.split("Til faglærer:\n", 1)[1].split("\n\n", 1)[0].splitlines()
         forventet = [
-            # Story 3.5f: foerst dobbeltklikket, saa Docker.
-            (
-                "Se appen med oppdiktede tall, uten konto og nøkkel, med et dobbeltklikk på «Start demoen»",
-                # Story 3.5g: lenketeksten uten «(anbefalt)», og ankeret fra
-                # foer, paa linja over overskriften.
-                DOBBELTKLIKK_LENKE,
-                DOBBELTKLIKK_ANKER,
-            ),
+            # Story 3.5f: foerst dobbeltklikket, saa Docker. Story 3.5g:
+            # lenketeksten uten «(anbefalt)», og ankeret fra foer.
+            ("med et dobbeltklikk på «Start demoen»", DOBBELTKLIKK_LENKE, DOBBELTKLIKK_ANKER),
             # Gjennomgangen, BH2: demolenken sier ogsaa hvor steg 1-4 staar.
-            (
-                "Eller med Docker Desktop, etter [steg 1–4](#med-docker-desktop)",
-                "demoen",
-                _anker("Demoen"),
-            ),
-            # Story 3.3i (U52): en invitasjon til den ekte versjonen, etter
-            # demoen. Var «Ekte kurser, med en gratis nøkkel fra EODHD».
-            (
-                "Demoen viser så mye som mulig. Prøv gjerne også ekte kurser etterpå, med en gratis nøkkel fra EODHD",
-                "den ekte versjonen",
-                _anker("Den ekte versjonen"),
-            ),
+            ("eller med Docker Desktop etter", "steg 1–4", "med-docker-desktop"),
+            ("", "demoen", _anker("Demoen")),
+            # Story 3.3i (U52): en invitasjon til den ekte versjonen, etter demoen.
+            ("Ekte kurser etterpå, med en gratis nøkkel fra EODHD", "den ekte versjonen", _anker("Den ekte versjonen")),
             # Story 3.3e (gjennomgangen, VG7): uv installeres foerst.
-            ("De automatiske testene, med to kommandoer etter at uv er installert", "Tester", _anker("Tester")),
+            ("med to kommandoer etter at uv er installert", "Tester", _anker("Tester")),
         ]
+        assert lista[0].startswith("- Prøv appen: demoen med oppdiktede tall, uten konto og nøkkel"), lista[0]
+        assert lista[1].startswith("- Testene: "), lista[1]
+        to_foerste = "\n".join(lista[:2])
+        funnet = re.findall(r"\[([^\]]+)\]\(#([^)]+)\)", to_foerste)
+        assert funnet == [(t, a) for _, t, a in forventet], funnet
         alle = _alle_ankrene(tekst)
-        for linje, (forklaring, lenketekst, anker_) in zip(lista[:4], forventet, strict=True):
-            treff = re.fullmatch(r"- (.+): \[([^\]]+)\]\(#([^)]+)\)", linje)
-            assert treff, linje
-            assert treff.group(1) == forklaring and treff.group(2) == lenketekst, linje
-            assert treff.group(3) == anker_, linje
+        forrige = 0
+        for forklaring, lenketekst, anker_ in forventet:
+            i = to_foerste.index(f"[{lenketekst}](#{anker_})")
+            assert forklaring in to_foerste[forrige:i], (forklaring, lenketekst)
+            forrige = i
             # Hvert anker finnes én gang (ECH5).
-            for anker in [treff.group(3), *re.findall(r"\]\(#([^)]+)\)", treff.group(1))]:
-                assert alle.count(anker) == 1, (anker, linje)
+            assert alle.count(anker_) == 1, anker_
         assert _anker("Med Docker Desktop") == "med-docker-desktop"
         assert f'<a name="{DOBBELTKLIKK_ANKER}"></a>\n\n### {DOBBELTKLIKKET}\n' in tekst
+
+    def test_til_faglaerer_er_fire_punkter_med_alle_lenkene(self):
+        """Story 3.5h (gruppens svar 29.10 kl. 19:36, a): fire korte punkter,
+        prøv appen, testene, dokumentene og prosessen, med alle lenkene fra
+        før. Ville feilet hvis en lenke fra «Til faglærer» forsvant, det ble
+        flere enn fire punkter, eller en lenke til et anker eller en fil
+        brøt."""
+        tekst = README.read_text(encoding="utf-8")
+        lista = tekst.split("Til faglærer:\n", 1)[1].split("\n\n", 1)[0].splitlines()
+        assert [linje.split(":", 1)[0] for linje in lista] == [
+            "- Prøv appen",
+            "- Testene",
+            "- Dokumentene",
+            "- Prosessen og KI-bruken",
+        ], lista
+        lenkene = re.findall(r"\]\(([^)]+)\)", "\n".join(lista))
+        assert sorted(lenkene) == sorted(TIL_FAGLAERER_LENKENE), lenkene
+        alle = _alle_ankrene(tekst)
+        for lenke in lenkene:
+            sti, _, anker_ = lenke.partition("#")
+            if not sti:
+                assert alle.count(anker_) == 1, lenke
+                continue
+            assert (ROT / sti).exists(), lenke
+            if anker_:
+                assert anker_ in _ankrene((ROT / sti).read_text(encoding="utf-8")), lenke
 
     def test_til_faglaerer_lenker_til_briefen_med_gjeldende_tag(self):
         """12.10 kl. 12:12: briefen var gjemt langt nede. Lista under
