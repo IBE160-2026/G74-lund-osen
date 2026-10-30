@@ -2033,6 +2033,8 @@ overs, så lista kan vise den før noen velger en aksje.
 
 *Lagt til 2026-10-29 (flettingen):* 2.13 er flettet i `676fbc8` (#105) kl. 23:50:38, etter jobbens siste kjøring kl. 23:45:00 (Ready med resultat 0 kl. 23:50:15), med CI 40966838852 grønn på `0f746e2`. Basen ble kopiert til `data/db/ose-foer-2-13-2026-10-29.db` først. Målingen for hånd (svaret kl. 23:36, f) gikk kl. 23:50:50–23:51:03 med 4 kall, for HGSB, HKY, HPUR og HSPG, og la 4 rader i `omsetning`. Basen har nå versjon 8, kvoten gikk fra 16 til 20 brukt 29.10 i GMT, og `extraLimit` er 463 før og etter.
 
+*Avgjort 2026-10-30 kl. 10:45 (gruppens svar):* d) Tellingen i §5 i `docs/kvalitetssikring.md` står som ført: 56 rader, 29 rettet, 9 avvist og 8 utsatt, og de 10 radene som ikke står i noen kolonne, er forklart i linja fra 29.10 under tabellen.
+
 ### Story 2.14: Eks.datoer føres inn for hånd
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
@@ -4015,6 +4017,8 @@ avgjøres i planen.
 *Avgjort 2026-10-29 kl. 09:20 (gruppens svar):* 8.17a bygges på egen gren etter refleksjonen for 28.10, stopper før flettingen og flettes tidligst fredag, etter 2.13. Ført 30.10 i instruksjonen kl. 00:10, som svaret sa.
 
 *Lagt til 2026-10-30:* 8.17a startet ikke torsdag, fordi testblokkene for 2.13 tok dagen. Byggingen startet fredag 30.10 etter midnatt, med frist kl. 21:00 samme dag.
+
+*Avgjort 2026-10-30 kl. 10:45 (gruppens svar):* a) ECH1: linja over tabellen, og linja i kursgrafen fra 8.16, sier dagen den første kursen i perioden er fra, ikke en beregnet startdag, så ingen stengt dag nevnes. Børskalenderen får ikke 2025. b) VG5: søylene og indekslinja følger tabellens dag. Mangler indeksen kurs den dagen, står det over søylene. c) VG1: en automatisk test for 390 px.
 
 ### Story 8.18: Kommende eks.dato i kursgrafen
 
