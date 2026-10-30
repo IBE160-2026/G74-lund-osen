@@ -119,6 +119,7 @@ Gjennomgang 30.10 etter hele settet (3897 bestått, 24 hoppet over, 7 feilet, al
 | # | Funn | Dom | Rute |
 |---|---|---|---|
 | BH1, ECH2 | Indekstallet og endringen over søylene gjelder indeksens siste dato, mens linja gjelder tabellens dag, så to ulike endringer kan stå i samme del | medium | **står**: «Overskriften og indekstallet over tabellen gjelder fortsatt siste børsdag» (valg i spesifikasjonen), og svaret VG5 gjelder søylene og linja. Indeksens dato står ved tallet når den er en annen enn tabellens (`indeksdato`). Spørsmål til gruppen («Åpent») |
+| BH1, ECH2, svaret | *Avgjort 2026-10-30 kl. 12:21 (gruppens svar, e):* hele delen med hovedindeksen følger tabellens dag, også tallet over søylene. Mangler indeksen kurs den dagen, står det der tallet ellers står | – | **rettet** i `a086857`: `bygg_hovedindeks` regner verdien, endringen og «x av N» for tabellens dag eller dagen fra «Velg dag», og `TestTalletOverSoeylene` prøver indeksen én dag foran og bak og en valgt dag. `test_en_indeks_en_dag_bak_tabellen_har_datoen_ved_verdien` fra 2.9 er skrevet om til `test_en_indeks_en_dag_bak_tabellen_sier_at_kursen_mangler` |
 | BH2 | Linja kunne tegnes ved en periode når indeksen mangler tabellens dag | medium | **avvist** etter oppslag: `periodeendring` gir None når serien ikke har slutt (`paa_slutt is None`), så det er ingen linje |
 | BH3, ECH1 | Siden og søylene regnet første kursdag hver for seg, fra ulike serier | medium | **rettet**: dagen fra `_periodestart` sendes til `soeylene_for` (`start`) |
 | BH4 | Mangler alle aksjene kurs på en åpen startdag, begynner perioden senere uten at radene sier det | low | **avvist**: svaret a sier dagen den første kursen er fra, og linja over tabellen sier datoen |
@@ -131,6 +132,7 @@ Gjennomgang 30.10 etter hele settet (3897 bestått, 24 hoppet over, 7 feilet, al
 | BH11 | Modulteksten i `hovedindeks.py` sa startdagen | low | **rettet** |
 | BH12 | Hjelpen ved «?» for søylene sa ikke at indeksen kan mangle kurs | low | **rettet**: «borte når indeksen ikke har en kurs eller endring den dagen», innenfor tre setninger (`test_hjelpetekster.py`) |
 | BH13 | FR-105 i `prd.md` sier indeksens dato | low | **står**: spørsmål til gruppen («Åpent», VG5) |
+| BH13, svaret | *Avgjort 2026-10-30 kl. 12:21 (gruppens svar, f):* «forstår ikke hva blir best i forhold til alle sidene, må være samkjørt», ført som én dag per side, der alt på siden, også indeksen, gjelder den dagen | – | **rettet** i `37b7ed6`: Rettet-linja under FR-105 i `prd.md`, med `test_fr_105_har_rettet_linja_om_en_dag_per_side`. Gruppen ser over tolkningen før flettingen |
 | BH14, VG1 | «Velg dag» på en dag indeksen ikke har, var ikke prøvd | medium | **rettet**: `test_en_valgt_dag_indeksen_ikke_har`. En periode der indeksen begynner etter starten og slutter før tabellens dag, er ikke prøvd for seg |
 | ECH3 | Overskriften over søylene sa datoen når indeksen var én dag bak, og indeksens dato når den var én dag foran | medium | **rettet**: overskriften sammenligner med tabellens dag (`dato`), og `test_soeylene_er_for_tabellens_dag` og `test_indeksen_en_dag_foran_tabellen` sier «Dagens endring per aksje» |
 | ECH4 | Indeksen med et hull på startdagen gir en linje fra en senere dag | low | **avvist**: et hull i en lengre serie er ikke en kortere serie (ECH3 i første runde), som i tabellen |
@@ -139,13 +141,19 @@ Bildene av oversikten og aksjesiden er tatt på nytt med høydene 1690 og 1894, 
 
 Hele settet etter rettingene, på samme kode før commiten: 3898 bestått, 24 hoppet over og 7 feilet, alle sju i porttestene for `start.ps1`, 11:49:31–11:58:43.
 
+*Lagt til 2026-10-30 (svaret kl. 12:21, e):* M5, tallet ved indeksens siste dag (`vist = serie[-1].dato` i `bygg_hovedindeks` i `src/hovedindeks.py`), kjørt med `-x` på `a086857` kl. 13:25:44–13:25:51 mot `tests/test_periodevalget_oversikten.py` og `tests/test_app.py`: fanget av `test_indeksen_en_dag_foran_tabellen` i `TestTalletOverSoeylene`. Fila var lik kopien etterpå (sha256 `836b5ab6…`) og lik `HEAD`.
+
+*Lagt til 2026-10-30 (svaret kl. 12:21, f), slått opp uten endring:* børsometeret har én dag for hele siden, siste børsdag eller dagen fra «Velg dag», og indekstallet i «Mål mot børsen» er for samme dag (`_indeksen_for_dagen(dagen)`). Min liste har ingen hovedindeks og ikke periodevalget ennå (8.17b). Avvik fra regelen: i oversikten og Min liste viser en rad med eldre data enn de andre sin egen siste dag (story 1.4c), og ved en periode regnes endringen til radens egen siste børsdag (`med_perioden`). Aksjesiden følger aksjens egen siste dag eller dagen fra «Velg dag», som kan være en annen enn siste børsdag i oversikten, og den stiplede indekslinja i grafen kan slutte før grafen («Indeksen går bare til …»). Grafen og «Signalet dag for dag» viser flere dager med vilje.
+
 ## Åpent
 
 - **ECH1 (spørsmål til gruppen):** utenfor børskalenderen (`DEKKEDE_AAR`, bare 2026) er startdagen første hverdag, så 1 år eller 3 mnd tidlig i 2026 kan starte på en stengt dag i 2025, som 26.12.2025. Endringen regnes riktig fra første kurs etter den, men linja over tabellen nevner den stengte dagen. Det gjelder også kursgrafen (8.16). Skal kalenderen dekke 2025?
   - *Avgjort 2026-10-30 kl. 10:45 (gruppens svar):* linja over tabellen og i kursgrafen sier dagen den første kursen i perioden er fra, og kalenderen får ikke 2025. Rettet i `16c68b1`.
 - **VG5 (spørsmål til gruppen):** søylene og linja bruker indeksens siste dato, som i 2.9b, og tabellen sidens siste børsdag. Er indeksen en dag foran eller bak, gjelder de ulike dager, og overskriften over søylene sier fra og til. Skal søylene følge tabellens dag ved en periode?
   - *Avgjort 2026-10-30 kl. 10:45 (gruppens svar):* søylene og linja følger tabellens dag, og mangler indeksen kurs den dagen, står det over søylene. Rettet i `3aa2d80`. FR-105 i `prd.md` sier fortsatt «En aksje uten kurs for indeksens dato får ingen søyle». PRD-en er ikke endret, fordi instruksjonen 30.10 kl. 10:55 bare førte svaret i `epics.md`. Spørsmål til gruppen: skal FR-105 få en Rettet-linje?
+  - *Avgjort 2026-10-30 kl. 12:21 (gruppens svar, f):* FR-105 har fått en Rettet-linje om én dag per side (`37b7ed6`). Gruppen ser over tolkningen før flettingen.
 - **VG1:** 390 px er prøvd for hånd i Edge, ikke i en test.
   - *Avgjort 2026-10-30 kl. 10:45 (gruppens svar):* en automatisk test. `TestSmalSkjerm` i `9c8bda2`.
 - BH7, BH9 og BH11 står.
 - **BH1 og ECH2 i runden 30.10 (spørsmål til gruppen):** indekstallet og endringen over søylene gjelder indeksens siste dato, og linja tabellens dag. Skal tallet også følge tabellens dag?
+  - *Avgjort 2026-10-30 kl. 12:21 (gruppens svar, e):* hele delen følger tabellens dag, også tallet. Rettet i `a086857`.
