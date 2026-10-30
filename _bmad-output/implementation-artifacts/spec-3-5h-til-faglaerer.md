@@ -2,7 +2,7 @@
 title: 'Story 3.5 (3.5h): «Til faglærer» kortere, og BH4, BH7 og BH9 fra 3.5g'
 type: 'docs'
 created: '2026-10-30'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'acc5b0e'

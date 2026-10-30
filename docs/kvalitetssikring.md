@@ -375,6 +375,7 @@ sist i dokumentet.
 | 3.5e Den andre versjonen stoppes rett før webserveren | `dbfa0b9` (#100) | 1 (1, stoppen tilbake før uv) | – kjørt med `-x` på `df6b0a0` og igjen på `fd19b7f` 26.10 | `S/spec-3-5e-stopp-foer-webserveren.md` |
 | 2.3d Hentingen går av seg selv hver kveld | `817b331` (#104) | 1 (1, `origin/main` i stedet for commiten fra midnatt) | – kjørt med `-x` på `5b5b737` og igjen på `c852bbd` 28.10 | `S/spec-2-3d-hentingen-hver-kveld.md` |
 | 3.5g «Kom i gang» med fem steg og resten bak piler | `27ccf82` (#103) | 1 (1, steg 3 tatt ut av dobbeltklikket) | – kjørt med `-x` på `e450ff9` 27.10 | `S/spec-3-5g-kortere-kom-i-gang.md` |
+| 3.5h «Til faglærer» med fire punkter, og BH4, BH7 og BH9 fra 3.5g | `a3e6057` (#107) | 0 | – bare dokumenter og testene for dem, og instruksjonen ba ikke om mutant | `S/spec-3-5h-til-faglaerer.md` |
 | 2.13 Målingen av omsetning som jobben kjører hver kveld | `676fbc8` (#105) | 3 (3: stoppen ved endret `extraLimit`, grensen kl. 23:45 og ventingen når alle 15 mangler) | – de to første kjørt med `-x` på `ab7b967` og `fda73fd` 28.10 og på `e744f87` 28.10 og `0640378` 29.10, den tredje 29.10 uten at commiten er ført | `S/spec-2-13-maalingen-av-omsetning.md` |
 | 8.2a Seks funn fra prøven av demoen 24.10 | `e4d1ba4` (#93) | 1 (5, M1–M5) | – kjørt på `7ca19d9` 24.10 | `S/spec-8-2a-funn-fra-proeven-av-demoen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
@@ -612,6 +613,7 @@ funn. Antall rader i loggen:
 | 3.5e | 10 | 8 | – | 2 |
 | 2.3d | 30 | 16 | 9 | 5 |
 | 3.5g, to gjennomganger 27.10 og 28.10 | 36 | 18 | 14 | 4 |
+| 3.5h, gjennomgangen 30.10 | 15 | 10 | 2 | 3 |
 | 2.13, to gjennomganger 28.10 og 29.10 | 56 | 29 | 9 | 8 |
 | 8.6b, gjennomgangene 26.10 | 37 | 21 | 13 | 3 |
 | 8.0f, gjennomgangen 26.10 | 25 | 22 | 3 | – |
