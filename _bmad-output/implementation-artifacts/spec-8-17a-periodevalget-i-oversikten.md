@@ -90,12 +90,15 @@ Gjennomgang 30.10 etter hele settet (3885 bestått, 24 hoppet over, 3 feilet, al
 | BH11 | Overskriften over søylene sier ikke «valgt dag» | low | **står**: datoen står, og linja over tabellen sier dagen |
 | BH12, ECH3 | «fra» sto ved et hull i en lengre serie | low | **rettet**: «fra» bare når serien begynner etter startdagen |
 | ECH1 | Utenfor børskalenderen (før 2026) kan startdagen være en stengt dag, og alle radene fikk «fra» | medium | **delvis rettet**: «fra» står ikke lenger. Startdagen følger regelen fra 8.16 (første hverdag utenfor kalenderen), også i kursgrafen, så linja over tabellen kan nevne en stengt dag. Spørsmål til gruppen («Åpent») |
+| ECH1, svaret | *Avgjort 2026-10-30 kl. 10:45 (gruppens svar, a):* linja over tabellen, og linja i kursgrafen fra 8.16, sier dagen den første kursen i perioden er fra, ikke en beregnet startdag, så ingen stengt dag nevnes. Børskalenderen får ikke 2025 | – | **rettet** i `16c68b1`: `perioder.foerste_kursdag` gir dagen for linja, «fra» i radene og søylene. Kursgrafen viste allerede første kurs (`graf.forste_dato`), og en test låser det. `TestFoersteKursen` |
 | ECH2 | I år på årets første børsdag ga «–» | medium | **rettet**: 0,00 %, `test_hull_i_en_lengre_serie_og_i_aar_paa_aarets_foerste_dag` |
 | ECH9 | «I år» med stor I midt i en setning | low | **rettet**: navnet fra `OVERSKRIFT` («i år», «1 måned») |
 | VG1 | 390 px var bare prøvd som tekst i stilarket | high | **prøvd for hånd**: oversikten i en iframe på 390 px i Edge uten vindu, siste børsdag, 1 uke, «Velg dag» og I år sortert: `scrollWidth` 390, og bare tabellen er bredere, i sin egen boks som før. Ingen test i settet åpner en nettleser. Står i «Åpent» |
+| VG1, svaret | *Avgjort 2026-10-30 kl. 10:45 (gruppens svar, c):* en automatisk test for 390 px | – | **rettet** i `9c8bda2`: `TestSmalSkjerm` åpner oversikten i Edge eller Chrome uten vindu på 390 px, med hjelperen fra `test_hjelpefeltet.py`, og hopper over uten nettleser, men ikke i CI |
 | VG2 | Skjermleseren: beskjeden, setningen for søylene og perioden i kolonneraden var ikke prøvd | medium | **rettet** i testene |
 | VG3 | Rekkefølgen for en valgt dag var ikke prøvd | medium | **rettet**: `test_dagen_er_en_liste_i_fr_102_rekkefoelgen` |
 | VG5 | Søylene bruker indeksens siste dato, tabellen sidens | medium | **står**: som 2.9b, og overskriften over søylene sier fra og til. Spørsmål til gruppen («Åpent») |
+| VG5, svaret | *Avgjort 2026-10-30 kl. 10:45 (gruppens svar, b):* søylene og indekslinja følger tabellens dag. Mangler indeksen kurs den dagen, står det over søylene | – | **rettet** i `3aa2d80`: `soeylene_for` får tabellens dag (`slutt`), og `TestTabellensDag` prøver en indeks én dag foran og én dag bak. `test_soeylene_er_for_indeksens_dato` fra 2.9b er skrevet om til `test_soeylene_er_for_tabellens_dag` |
 | VG6 | Sluttkursen for en valgt dag var ikke prøvd mot den justerte | low | **rettet**: 105 mot 100 onsdag 07.10 |
 | VG7 | Fargen på linja ved en periode var ikke prøvd | low | **rettet** |
 | VG8 | Fotnoten for en valgt dag var ikke prøvd | low | **rettet** |
@@ -107,9 +110,14 @@ Hele settet etter rettingene, på samme kode før commiten: 3888 bestått, 24 ho
 
 Mutantene etter rettingene, 30.10 kl. 01:10:03–01:10:13: M1, M2 og M3 ble fanget av de samme testene, og hver fil var lik kopien etterpå.
 
+*Lagt til 2026-10-30 (svaret kl. 10:45, VG5):* M4, søylene ved indeksens dag (`siste = serie[-1].dato` i `soeylene_for` i `src/hovedindeks.py`, ikke tabellens dag), kjørt med `-x` på `3aa2d80` kl. 11:17:35–11:17:42 mot `tests/test_periodevalget_oversikten.py` og `tests/test_app.py`: fanget av `test_indeksen_en_dag_foran_tabellen`. Fila var lik kopien etterpå (sha256 `d80c1371…`) og lik `HEAD` (`git diff --quiet`).
+
 ## Åpent
 
 - **ECH1 (spørsmål til gruppen):** utenfor børskalenderen (`DEKKEDE_AAR`, bare 2026) er startdagen første hverdag, så 1 år eller 3 mnd tidlig i 2026 kan starte på en stengt dag i 2025, som 26.12.2025. Endringen regnes riktig fra første kurs etter den, men linja over tabellen nevner den stengte dagen. Det gjelder også kursgrafen (8.16). Skal kalenderen dekke 2025?
+  - *Avgjort 2026-10-30 kl. 10:45 (gruppens svar):* linja over tabellen og i kursgrafen sier dagen den første kursen i perioden er fra, og kalenderen får ikke 2025. Rettet i `16c68b1`.
 - **VG5 (spørsmål til gruppen):** søylene og linja bruker indeksens siste dato, som i 2.9b, og tabellen sidens siste børsdag. Er indeksen en dag foran eller bak, gjelder de ulike dager, og overskriften over søylene sier fra og til. Skal søylene følge tabellens dag ved en periode?
+  - *Avgjort 2026-10-30 kl. 10:45 (gruppens svar):* søylene og linja følger tabellens dag, og mangler indeksen kurs den dagen, står det over søylene. Rettet i `3aa2d80`. FR-105 i `prd.md` sier fortsatt «En aksje uten kurs for indeksens dato får ingen søyle». PRD-en er ikke endret, fordi instruksjonen 30.10 kl. 10:55 bare førte svaret i `epics.md`. Spørsmål til gruppen: skal FR-105 få en Rettet-linje?
 - **VG1:** 390 px er prøvd for hånd i Edge, ikke i en test.
+  - *Avgjort 2026-10-30 kl. 10:45 (gruppens svar):* en automatisk test. `TestSmalSkjerm` i `9c8bda2`.
 - BH7, BH9 og BH11 står.
