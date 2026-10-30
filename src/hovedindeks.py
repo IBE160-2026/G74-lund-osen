@@ -309,11 +309,11 @@ def bygg_hovedindeks(
     vist = dag if periode == VELG and dag is not None else (slutt or serie[-1].dato)
     foer = [rad for rad in serie if rad.dato <= vist]
     paa_dagen = foer[-1] if foer and foer[-1].dato == vist else None
-    endring = indeksendring(foer) if paa_dagen else None
+    endring = indeksendring(foer) if paa_dagen is not None else None
     return Hovedindeksvisning(
         symbol=symbol,
         dato=vist,
-        verdi=float(paa_dagen.slutt) if paa_dagen else None,
+        verdi=float(paa_dagen.slutt) if paa_dagen is not None else None,
         endring=endring,
         sammenligning=sammenlign(vist, endring, aksjer),
         soeyler=soeylene_for(serie, soeylegrunnlag, periode, dag, slutt, start) if soeylegrunnlag is not None else None,

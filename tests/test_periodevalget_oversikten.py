@@ -536,11 +536,16 @@ class TestTabellensDag:
         assert 'class="indekslinje' not in html
         assert "Indeksen har ingen kurs 07.10, så det er ingen stiplet linje." in lista
         assert "Ingen stiplet linje" not in lista
+        # Gjennomgangen (VG2): også tallet over søylene, og ingen «x av N».
+        assert _indekstallet(html) == "Indeksen har ingen kurs 07.10."
+        assert "gikk bedre enn indeksen" not in _synlig(html)
 
 
 def _indekstallet(html: str) -> str:
     """Den synlige teksten i linja med tallet over søylene."""
-    return _synlig(re.search(r'<p class="indekstall">(.*?)</p>', html, re.DOTALL).group(1))
+    treff = re.search(r'<p class="indekstall">(.*?)</p>', html, re.DOTALL)
+    assert treff, "linja med tallet over søylene mangler"
+    return _synlig(treff.group(1))
 
 
 class TestTalletOverSoeylene:
@@ -563,15 +568,18 @@ class TestTalletOverSoeylene:
         assert 'class="indeksdato"' not in html
         assert "0 av 2 gikk bedre enn indeksen." in _synlig(html)
 
-    def test_indeksen_en_dag_bak_tabellen(self, klient):
+    @pytest.mark.parametrize("adresse", ["/", "/?periode=1-uke"])
+    def test_indeksen_en_dag_bak_tabellen(self, klient, adresse):
         """Aksjene slutter fredag 09.10, indeksen torsdag 08.10. Ville
         feilet hvis tallet var torsdagens, eller siden ikke sa at indeksen
-        mangler kurs fredag der tallet ellers står."""
+        mangler kurs fredag der tallet ellers står og over søylene."""
         _basen()
         _legg_inn_indeks(_indeks([(ONSDAG_07_10, 1050.0), (TORSDAG_08_10, 1100.0)]))
-        html = klient.get("/?periode=1-uke").data.decode("utf-8")
+        html = klient.get(adresse).data.decode("utf-8")
         assert _indekstallet(html) == "Indeksen har ingen kurs 09.10."
         assert "gikk bedre enn indeksen" not in _synlig(html)
+        assert "Indeksen har ingen kurs 09.10, så det er ingen stiplet linje." in _soeylelista(html)
+        assert 'class="indekslinje' not in html
 
     def test_en_valgt_dag_gir_tallet_den_dagen(self, klient):
         """«Velg dag» onsdag 07.10: 1 050,00 og +5,00 % mot tirsdag (1000),
@@ -580,6 +588,10 @@ class TestTalletOverSoeylene:
         _basen(med_indeks=True)
         html = klient.get("/?periode=velg&dag=2026-10-07").data.decode("utf-8")
         assert _indekstallet(html) == "1 050,00 07.10 +5,00 %", _indekstallet(html)
+        # Gjennomgangen (VG1): «x av N» for 07.10, der alle tre har 0,00 %
+        # mot indeksens +5,00 %. 09.10 ville gitt 3 av 3.
+        assert "0 av 3 gikk bedre enn indeksen." in _synlig(html)
+        assert "3 av 3 gikk bedre" not in _synlig(html)
 
 
 class TestAdressen:
@@ -722,3 +734,15 @@ def test_fr_105_har_rettet_linja_om_en_dag_per_side():
     assert "tabellens dag" in linja and "ikke indeksens dato" in linja
     # Linja står etter kravet den retter, ikke før.
     assert fr105.index("En aksje uten kurs for") < fr105.index("*Rettet 2026-10-30, gruppens svar kl. 12:21 (f):*")
+
+
+def test_fr_104_har_rettet_linja_om_tabellens_dag():
+    """Gjennomgangen 30.10 (BH4): verdien, endringen og «x av N» står i
+    FR-104, som sa indeksens siste børsdag. Ville feilet hvis FR-104 ikke
+    fikk en Rettet-linje om at de gjelder tabellens dag."""
+    tekst = PRD.read_text(encoding="utf-8")
+    fr104 = tekst.split("#### FR-104 — Hovedindeksen i markedsoversikten", 1)[1].split("\n#### ", 1)[0]
+    merke = "*Rettet 2026-10-30, gruppens svar kl. 12:21 (e og f):*"
+    linja = " ".join(fr104.split(merke, 1)[1].split("\n\n", 1)[0].split())
+    assert "tabellens dag" in linja and "ikke indeksens siste børsdag" in linja, linja
+    assert fr104.index("indeksens siste børsdag") < fr104.index(merke)

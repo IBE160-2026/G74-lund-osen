@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-30T13:26
+updated: 2026-10-30T13:39
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -473,6 +473,14 @@ med fem.
 - Har ingen aksje kurs for indeksens dato, vises ikke sammenligningen. Mangler
   indeksen, står siste lagrede verdi med datoen sin, eller at indeksen mangler
   (NFR-03). Hentingen står i FR-410.
+
+*Rettet 2026-10-30, gruppens svar kl. 12:21 (e og f):* alle sidene følger samme regel,
+én dag per side, og alt på siden, også indeksen, gjelder den dagen (Rettet-linja
+under FR-105). Verdien, endringen og «x av N» gjelder derfor tabellens dag, siste
+børsdag i oversikten eller dagen fra «Velg dag», ikke indeksens siste børsdag, og N
+er aksjene med kurs den dagen. Mangler indeksen kurs den dagen, står det der tallet
+ellers står, i stedet for siste lagrede verdi. Gruppen ser over tolkningen før
+flettingen av 8.17a (gjennomgangen 30.10, BH4).
 
 #### FR-105 — Søylene under hovedindeksen
 

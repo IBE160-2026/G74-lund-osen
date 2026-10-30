@@ -145,6 +145,33 @@ Hele settet etter rettingene, på samme kode før commiten: 3898 bestått, 24 ho
 
 *Lagt til 2026-10-30 (svaret kl. 12:21, f), slått opp uten endring:* børsometeret har én dag for hele siden, siste børsdag eller dagen fra «Velg dag», og indekstallet i «Mål mot børsen» er for samme dag (`_indeksen_for_dagen(dagen)`). Min liste har ingen hovedindeks og ikke periodevalget ennå (8.17b). Avvik fra regelen: i oversikten og Min liste viser en rad med eldre data enn de andre sin egen siste dag (story 1.4c), og ved en periode regnes endringen til radens egen siste børsdag (`med_perioden`). Aksjesiden følger aksjens egen siste dag eller dagen fra «Velg dag», som kan være en annen enn siste børsdag i oversikten, og den stiplede indekslinja i grafen kan slutte før grafen («Indeksen går bare til …»). Grafen og «Signalet dag for dag» viser flere dager med vilje.
 
+## Gjennomgangen 30.10 etter svaret kl. 12:21
+
+Gjennomgang 30.10 av diffen `4cc2b98..e88d449` (etter flettingen av main med 3.5h), med Blind Hunter (BH, 15 funn), Edge Case Hunter (ECH, 7) og Verification Gap (VG, 3). Hele settet før: 3904 bestått, 24 hoppet over, 7 feilet, alle i porttestene, 13:26:45–13:35:31 på samme kode som `37b7ed6`. Numrene gjelder denne runden. Dommen er vår. Rettet i commiten etter `e88d449`.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| ECH1, ECH2 | `dato` i malen er den eldste dagen blant radene (`sidens_dato`), så med en rad med eldre data sto datoen ved tallet og over søylene på siste børsdag | medium | **rettet**: malen sammenligner med `siste_dag` |
+| BH4 | FR-104 sa fortsatt indeksens siste børsdag for verdien og «x av N» | medium | **rettet**: Rettet-linje under FR-104, som under FR-105, med `test_fr_104_har_rettet_linja_om_tabellens_dag`. Gruppen ser over tolkningen |
+| BH1, VG1 | «x av N» ved «Velg dag» var ikke prøvd | medium | **rettet** i testen: «0 av 3» for 07.10, ikke «3 av 3» for 09.10. `sammenlign` bruker dagen (`aksjeendring(serie, dag)`), slått opp |
+| VG2 | Tallet over søylene for en valgt dag indeksen ikke har, var ikke prøvd | low | **rettet** i `test_en_valgt_dag_indeksen_ikke_har` |
+| VG3 | Enhetstesten i `test_hovedindeks.py` sier indeksens egen dato | low | **rettet**: ny enhetstest med `slutt`. Den gamle gjelder bare uten `slutt`, som appen ikke bruker |
+| BH6 | `if paa_dagen` i stedet for `is not None` | low | **rettet** |
+| BH11 | Testen for indeksen én dag bak gjaldt bare 1 uke | low | **rettet**: også `/`, og beskjeden over søylene |
+| BH12, ECH5 | `_indekstallet` ga `AttributeError` uten linja | low | **rettet** |
+| BH14, ECH6 | Hjelpen kunne leses som at tallet følger perioden | low | **rettet** i `docs/hjelp.md`: tallet er alltid endringen den dagen |
+| ECH7 | Kommentaren i malen sa indeksens dato | low | **rettet** |
+| BH2, ECH3 | «Velg dag» på en lørdag sier «Indeksen har ingen kurs», mens tabellen sier «ikke børsdag» | low | **står**: det er sant, og søylene sier «ingen aksje har kurs» |
+| BH3 | `verdi` kan være None hos andre som leser den | low | **avvist** etter oppslag: bare `_hovedindeks.html` bruker den |
+| BH5 | Endringen kan gå over et hull | low | **avvist**: `indeksendring` krever forrige børsdag etter kalenderen |
+| BH7 | Datoen ved tallet står bare ved «Velg dag» | low | **står**: den sier dagen tabellen viser |
+| BH8 | Beskjeden står to ganger når indeksen mangler kurs | low | **står**: svaret e sier der tallet står, og søylene sier hvorfor linja mangler |
+| BH9 | Uten `slutt` gjelder indeksens dato | low | **avvist**: bare oversikten kaller `bygg_hovedindeks`, med `slutt` |
+| BH10 | Nyere indekstall skjules når indeksen er foran | low | **står**: én dag per side (f) |
+| BH13 | Testen låser ordlyden i tolkningen gruppen skal se over | low | **står**: rettes sammen med linja hvis gruppen vil |
+| BH15 | Ingenting viser at bildene er de samme | low | **avvist**: `git status` var ren etter at bildene ble tatt på nytt, med høydene målt til 1690 og 1894 |
+| ECH4 | En usortert serie | low | **avvist**: lageret gir seriene sortert på dato |
+
 ## Åpent
 
 - **ECH1 (spørsmål til gruppen):** utenfor børskalenderen (`DEKKEDE_AAR`, bare 2026) er startdagen første hverdag, så 1 år eller 3 mnd tidlig i 2026 kan starte på en stengt dag i 2025, som 26.12.2025. Endringen regnes riktig fra første kurs etter den, men linja over tabellen nevner den stengte dagen. Det gjelder også kursgrafen (8.16). Skal kalenderen dekke 2025?

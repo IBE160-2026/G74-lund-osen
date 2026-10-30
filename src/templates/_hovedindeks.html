@@ -20,7 +20,9 @@
         <p class="indekstall"><span class="mangler-kurs">Indeksen har ingen kurs {{ hovedindeks.dato|dato }}.</span></p>
         {% else %}
         <p class="indekstall"><span class="indeksverdi">{{ hovedindeks.verdi|tall('kurs') }}</span>
-          {%- if hovedindeks.dato != dato %} <span class="indeksdato">{{ hovedindeks.dato|dato }}</span>{% endif %}
+          {#- Gjennomgangen 30.10 (ECH1): dato er den eldste dagen blant radene, så
+              tabellens dag er siste_dag. #}
+          {%- if hovedindeks.dato != (siste_dag or dato) %} <span class="indeksdato">{{ hovedindeks.dato|dato }}</span>{% endif %}
           {%- if hovedindeks.endring is not none %}
             {%- set vist = hovedindeks.endring|avrundet('endring') %}
             <span class="indeksendring{{ ' opp' if vist > 0 else ' ned' if vist < 0 else '' }}">{{ hovedindeks.endring|tall('endring') }}</span>
@@ -31,8 +33,8 @@
           <p class="bedre"><strong>{{ s.bedre }} av {{ s.med }}</strong> gikk bedre enn indeksen.</p>
           {% if s.uten %}<p class="uten">Ikke med, uten kurs {{ hovedindeks.dato|dato }}: {{ s.uten|med_og }}.</p>{% endif %}
         {% endif %}
-        {#- Story 2.9b (FR-105): én søyle per aksje med kurs for indeksens
-            dato, fra størst fall til størst stigning. Fargen følger endringen
+        {#- Story 2.9b (FR-105): én søyle per aksje med kurs for tabellens
+            dag (fra 8.17a, før indeksens dato), fra størst fall til størst stigning. Fargen følger endringen
             slik den vises, og den stiplede linja er indeksen. Søylene er
             aria-hidden, og lista under har alle tallene for skjermleser.
             Story 8.2a, c: symbolene over søylene er lenker og ikke skjult. #}
@@ -45,7 +47,7 @@
         {% if sy %}
           {%- macro fortegn(verdi) %}{% set vist = verdi|avrundet('endring') %}{{ 'opp' if vist > 0 else 'ned' if vist < 0 else 'null' }}{% endmacro %}
           <figure class="soeyler">
-            <figcaption class="soeyletittel">{% if sy.start %}Endring per aksje {{ periodenavn }}, fra {{ sy.start|dato }} til {{ sy.dag|dato }}{% elif sy.dag != dato %}Endring per aksje {{ sy.dag|dato }}{% else %}Dagens endring per aksje{% endif %}{% if sy.linje is not none %}, med indeksen som stiplet linje{% endif %}</figcaption>
+            <figcaption class="soeyletittel">{% if sy.start %}Endring per aksje {{ periodenavn }}, fra {{ sy.start|dato }} til {{ sy.dag|dato }}{% elif sy.dag != (siste_dag or dato) %}Endring per aksje {{ sy.dag|dato }}{% else %}Dagens endring per aksje{% endif %}{% if sy.linje is not none %}, med indeksen som stiplet linje{% endif %}</figcaption>
             {#- Gruppens svar 30.10 kl. 10:45 (VG5): søylene og linja følger
                 tabellens dag, og mangler indeksen kurs den dagen, står det her. #}
             {% if sy.indeks_mangler %}<p class="forklaring">Indeksen har ingen kurs {{ sy.dag|dato }}, så det er ingen stiplet linje.</p>{% endif %}
