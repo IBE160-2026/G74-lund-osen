@@ -2543,6 +2543,8 @@ Resten ryddes etter alle testene.
 - c) Ventingen første gang står i steg 4 som nå, ikke i et eget steg (BH4).
 - d) Linja «Linux» får en egen rad D7 i §9 i kvalitetssikringen, som sjekker at lenkene til Docker og uv virker (BH9).
 
+*Lagt til 2026-10-30 kl. 12:55:* 3.5h, «Til faglærer» med fire punkter og BH4, BH7 og BH9 fra 3.5g, er squash-flettet i `a3e6057`, PR #107, låst til head-en `83c9bbf` (spesifikasjonen `spec-3-5h-til-faglaerer.md`), med CI 41051154071 grønn. a, b og d er gjort, og c står som før.
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
