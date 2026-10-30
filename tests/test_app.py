@@ -2853,17 +2853,18 @@ class TestHovedindeksenPaaForsiden:
         thead = html.split("<thead>", 1)[1].split("</thead>", 1)[0]
         assert thead.count("<th") == 5
 
-    def test_en_indeks_en_dag_bak_tabellen_har_datoen_ved_verdien(self, klient):
-        """Ville feilet uten datoen, eller med indeksen sammenlignet paa
-        tabellens dag."""
+    def test_en_indeks_en_dag_bak_tabellen_sier_at_kursen_mangler(self, klient):
+        """Fram til 8.17a viste delen indeksen paa sin egen dato, torsdag, med
+        datoen ved verdien. Gruppens svar 30.10 kl. 12:21 (e): hele delen
+        foelger tabellens dag, fredag, og mangler indeksen kurs den dagen,
+        staar det der tallet ellers staar. Ville feilet hvis verdien,
+        endringen eller \u00abx av N\u00bb var for torsdag."""
         self._to_aksjer()
         _legg_inn_indeks(_indeks([(date(2026, 10, 7), 1000.0), (TORSDAG_08_10, 990.0)]))
         delen = _delen(klient.get("/").data.decode("utf-8"))
-        assert '<span class="indeksdato">08.10</span>' in delen
-        assert '<span class="indeksendring ned">-1,00\u00a0%</span>' in delen
-        # Aksjene har kurs 100 torsdag og onsdag, altsaa 0,00 %, og indeksen
-        # falt 1 %: begge gikk bedre.
-        assert "2 av 2 gikk bedre enn indeksen." in _synlig(delen)
+        assert '<p class="indekstall"><span class="mangler-kurs">Indeksen har ingen kurs 09.10.</span></p>' in delen
+        assert 'class="indeksverdi"' not in delen and 'class="indeksendring' not in delen
+        assert "gikk bedre enn indeksen" not in _synlig(delen)
 
     def test_et_hull_foer_indeksens_dato_gir_ingen_endring(self, klient):
         """Torsdag mangler i indeksen. Ville feilet med endringen mot forrige rad."""
@@ -3089,20 +3090,21 @@ class TestSoeylenePaaForsiden:
         assert "YAR" not in _tickerne(figur)
         assert re.search(r"Uten søyle, mangler kursen dagen før: Yara[^.]*\.", _synlig(figur)), _synlig(figur)
 
-    def test_soeylene_er_for_indeksens_dato(self, klient):
+    def test_soeylene_er_for_tabellens_dag(self, klient):
         """Indeksen står på torsdag med en endring, og aksjene har kurs
-        fredag også. Søylene er for torsdag: 100 torsdag og onsdag gir
-        0,00 % for alle tre."""
+        fredag også. Fram til 8.17a var søylene for indeksens dato, torsdag.
+        Gruppens svar 30.10 kl. 10:45 (VG5): søylene følger tabellens dag,
+        fredag, med DNB ned, NHY 0,00 % og EQNR opp, og over søylene står
+        det at indeksen ikke har kurs fredag, så det er ingen linje."""
         self._tre_aksjer()
         _legg_inn_indeks(_indeks([(date(2026, 10, 7), 1000.0), (TORSDAG_08_10, 990.0)]))
         figur = _soeylene(klient.get("/").data.decode("utf-8"))
-        assert [k for k, _ in _stolpene(figur)] == ["null", "null", "null"]
-        # Gjennomgangen (ECH8): datoen står i overskriften, fordi tabellen er
-        # for fredag.
-        assert (
-            '<figcaption class="soeyletittel">Endring per aksje 08.10, med indeksen som stiplet linje</figcaption>'
-            in figur
-        )
+        assert [k for k, _ in _stolpene(figur)] == ["ned", "null", "opp"]
+        # Gjennomgangen 30.10 (ECH3): søylene gjelder tabellens dag, så
+        # overskriften har ingen egen dato. Indeksens dato står ved indeksen.
+        assert '<figcaption class="soeyletittel">Dagens endring per aksje</figcaption>' in figur
+        assert "Indeksen har ingen kurs 09.10, så det er ingen stiplet linje." in figur
+        assert 'class="indekslinje' not in figur
 
     def test_ved_390_px_deler_soeylene_bredden_uten_fast_bredde(self, klient):
         """Ved 390 px ruller ikke siden sideveis. Søylene og etikettene deler
