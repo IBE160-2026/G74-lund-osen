@@ -2537,6 +2537,14 @@ Resten ryddes etter alle testene.
 
 *Lagt til 2026-10-28 kl. 20:01:* 3.5g, «Kom i gang» med fem steg og resten bak piler, er squash-flettet i `27ccf82`, PR #103, låst til head-en `0f91a8f` (spesifikasjonen `spec-3-5g-kortere-kom-i-gang.md`), med a, b, c og e over. Tabellen «Demoen og den ekte versjonen» står uten pil før «Til faglærer», og f står igjen.
 
+*Avgjort 2026-10-29 kl. 19:36 (gruppens svar):*
+- a) «Til faglærer» blir fire korte punkter med alle lenkene: prøv appen, testene, dokumentene og prosessen. Ingen lenke forsvinner.
+- b) Pila «Demoen og den ekte versjonen» under stegene heter «Velg vei: dobbeltklikk, Docker eller uv», og tabellen øverst beholder navnet (BH7).
+- c) Ventingen første gang står i steg 4 som nå, ikke i et eget steg (BH4).
+- d) Linja «Linux» får en egen rad D7 i §9 i kvalitetssikringen, som sjekker at lenkene til Docker og uv virker (BH9).
+
+*Lagt til 2026-10-30 kl. 12:55:* 3.5h, «Til faglærer» med fire punkter og BH4, BH7 og BH9 fra 3.5g, er squash-flettet i `a3e6057`, PR #107, låst til head-en `83c9bbf` (spesifikasjonen `spec-3-5h-til-faglaerer.md`), med CI 41051154071 grønn. a, b og d er gjort, og c står som før.
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
@@ -4019,6 +4027,8 @@ avgjøres i planen.
 *Lagt til 2026-10-30:* 8.17a startet ikke torsdag, fordi testblokkene for 2.13 tok dagen. Byggingen startet fredag 30.10 etter midnatt, med frist kl. 21:00 samme dag.
 
 *Avgjort 2026-10-30 kl. 10:45 (gruppens svar):* a) ECH1: linja over tabellen, og linja i kursgrafen fra 8.16, sier dagen den første kursen i perioden er fra, ikke en beregnet startdag, så ingen stengt dag nevnes. Børskalenderen får ikke 2025. b) VG5: søylene og indekslinja følger tabellens dag. Mangler indeksen kurs den dagen, står det over søylene. c) VG1: en automatisk test for 390 px.
+
+*Avgjort 2026-10-30 kl. 12:21 (gruppens svar):* e) Hele delen med hovedindeksen følger tabellens dag, også tallet over søylene. Mangler indeksen kurs den dagen, står det der tallet ellers står. f) Om FR-105 svarte gruppen: «forstår ikke hva blir best i forhold til alle sidene, må være samkjørt». Det føres slik: alle sidene følger samme regel, én dag per side, og alt på siden, også indeksen, gjelder den dagen. FR-105 får en Rettet-linje om dette. Gruppen ser over tolkningen før flettingen.
 
 ### Story 8.18: Kommende eks.dato i kursgrafen
 

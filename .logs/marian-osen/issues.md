@@ -1,9 +1,9 @@
 # Åpne punkter
 
-- [ ] 2026-10-28 [3-5g-videre](997-2026-10-28-20-02-58-3-5g-videre.md) — 3.5g f: «Til faglærer» kortes ned i en egen endring
-- [ ] 2026-10-28 [3-5g-videre](997-2026-10-28-20-02-58-3-5g-videre.md) — 3.5g BH4: om ventingen første gang skal stå i et eget steg
-- [ ] 2026-10-28 [3-5g-videre](997-2026-10-28-20-02-58-3-5g-videre.md) — 3.5g BH7: om pila «Demoen og den ekte versjonen» skal få et annet navn nå som tabellen står øverst
-- [ ] 2026-10-28 [3-5g-videre](997-2026-10-28-20-02-58-3-5g-videre.md) — 3.5g BH9: om Linux skal ha en egen rad i §9
+- [x] 2026-10-28 [3-5g-videre](997-2026-10-28-20-02-58-3-5g-videre.md) — 3.5g f: «Til faglærer» kortes ned i en egen endring (løst 2026-10-30: a3e6057)
+- [x] 2026-10-28 [3-5g-videre](997-2026-10-28-20-02-58-3-5g-videre.md) — 3.5g BH4: om ventingen første gang skal stå i et eget steg (løst 2026-10-30: svaret 29.10 kl. 19:36 c, ingen endring)
+- [x] 2026-10-28 [3-5g-videre](997-2026-10-28-20-02-58-3-5g-videre.md) — 3.5g BH7: om pila «Demoen og den ekte versjonen» skal få et annet navn nå som tabellen står øverst (løst 2026-10-30: fe21d95, i a3e6057)
+- [x] 2026-10-28 [3-5g-videre](997-2026-10-28-20-02-58-3-5g-videre.md) — 3.5g BH9: om Linux skal ha en egen rad i §9 (løst 2026-10-30: D7 i 05cc7f0, i a3e6057)
 - [ ] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d: prøven med 0 kall fra hentingen 29.10 før kl. 22:00, eller i loggen etter første kjøring 29.10 kl. 22:15
 - [x] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d BH6: en henting for hånd samtidig med jobben er ikke sperret (spørsmål til gruppen før flettingen) (løst 2026-10-28, gruppens svar kl. 11:34: ingen lås nå)
 - [x] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d ECH5: jobben overstyrer OSE_KI_TJENESTE i .env (spørsmål til gruppen før flettingen) (løst 2026-10-28, gruppens svar kl. 11:34: alltid den lokale modellen)
@@ -36,8 +36,11 @@
 - [ ] 2026-10-29 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — ny § i malinger.md med målingene fra tabellen hver søndag, første gang 01.11
 - [x] 2026-10-29 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — PR #105: ingen test prøver at målingen går fra 23:45 når alle 15 mangler kursen (svaret 29.10 kl. 09:20, a) (løst 2026-10-29: `test_gaar_fra_23_45_ogsaa_naar_alle_15_mangler` i `7c743d30`)
 - [ ] 2026-10-29 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — `tests/test_dobbeltklikk.py` feiler lokalt (4–7 av 7 for start.ps1 og porten) fordi `Get-NetTCPConnection -State Listen` ikke ser lytteren etter Windows-oppdateringen 29.10; også på main (oppdatert 2026-10-29: feiler også etter omstarten kl. 19:59; til feilen er rettet, avgjør CI de 7, og hele settet lokalt regnes som grønt når bare de feiler, avgjort kl. 21:02 i `db5127e1`; undersøkes mandag)
-- [ ] 2026-10-29 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — resten av kontrollen av hentingen 29.10 (loggen, powercfg og Windows Update) fredag morgen (gruppens svar 29.10 kl. 23:12)
-- [ ] 2026-10-30 [periodevalget-i-oversikten](990-2026-10-30-01-20-08-periodevalget-i-oversikten.md) — 8.17a ECH1: utenfor børskalenderen kan startdagen være en stengt dag, og linja over tabellen nevner den; skal kalenderen dekke 2025? (spørsmål til gruppen før flettingen)
-- [ ] 2026-10-30 [periodevalget-i-oversikten](990-2026-10-30-01-20-08-periodevalget-i-oversikten.md) — 8.17a VG5: søylene bruker indeksens siste dato og tabellen sidens; skal søylene følge tabellens dag ved en periode? (spørsmål til gruppen før flettingen)
-- [ ] 2026-10-30 [periodevalget-i-oversikten](990-2026-10-30-01-20-08-periodevalget-i-oversikten.md) — 8.17a VG1: 390 px er prøvd for hånd i Edge, ikke i en test
+- [x] 2026-10-29 [maalingen-av-omsetning](992-2026-10-28-23-29-03-maalingen-av-omsetning.md) — resten av kontrollen av hentingen 29.10 (loggen, powercfg og Windows Update) fredag morgen (gruppens svar 29.10 kl. 23:12) (løst 2026-10-30: lest i instruksjonen kl. 10:55, steg 2)
+- [x] 2026-10-30 [periodevalget-i-oversikten](990-2026-10-30-01-20-08-periodevalget-i-oversikten.md) — 8.17a ECH1: utenfor børskalenderen kan startdagen være en stengt dag, og linja over tabellen nevner den; skal kalenderen dekke 2025? (spørsmål til gruppen før flettingen) (løst 2026-10-30: svaret kl. 10:45, rettet i 16c68b1)
+- [x] 2026-10-30 [periodevalget-i-oversikten](990-2026-10-30-01-20-08-periodevalget-i-oversikten.md) — 8.17a VG5: søylene bruker indeksens siste dato og tabellen sidens; skal søylene følge tabellens dag ved en periode? (spørsmål til gruppen før flettingen) (løst 2026-10-30: svaret kl. 10:45, rettet i 3aa2d80)
+- [x] 2026-10-30 [periodevalget-i-oversikten](990-2026-10-30-01-20-08-periodevalget-i-oversikten.md) — 8.17a VG1: 390 px er prøvd for hånd i Edge, ikke i en test (løst 2026-10-30: TestSmalSkjerm i 9c8bda2)
 - [ ] 2026-10-30 [periodevalget-i-oversikten](990-2026-10-30-01-20-08-periodevalget-i-oversikten.md) — 8.17a PR #106 stopper før flettingen; spesifikasjonen settes til done ved flettingen
+- [ ] 2026-10-30 [periodevalget-i-oversikten](990-2026-10-30-01-20-08-periodevalget-i-oversikten.md) — 8.17a BH1/ECH2: indekstallet over søylene gjelder indeksens siste dato og linja tabellens dag; spørsmål til gruppen
+- [ ] 2026-10-30 [periodevalget-i-oversikten](990-2026-10-30-01-20-08-periodevalget-i-oversikten.md) — 8.17a VG5: FR-105 i prd.md sier fortsatt indeksens dato; skal den få en Rettet-linje?
+- [ ] 2026-10-30 [periodevalget-i-oversikten](990-2026-10-30-01-20-08-periodevalget-i-oversikten.md) — CI windows-latest: «Start demoen på Windows» feilet i opprydningen på c4cc3cd (41042643003), og porttester fikk timeout på 61b3164 (40971615322); gikk igjen uten endring

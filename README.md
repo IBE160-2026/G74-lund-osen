@@ -30,15 +30,10 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 | Klar | Med en gang | Etter første henting, når som helst. Før kl. 22 på en børsdag gir den forrige børsdag. Hentingen etter kl. 22 samme dag trenger bonuskvote hos EODHD; uten den får den dagen aldri signal |
 
 Til faglærer:
-- Se appen med oppdiktede tall, uten konto og nøkkel, med et dobbeltklikk på «Start demoen»: [Enklest: dobbeltklikk](#enklest-dobbeltklikk-uten-docker)
-- Eller med Docker Desktop, etter [steg 1–4](#med-docker-desktop): [demoen](#demoen)
-- Demoen viser så mye som mulig. Prøv gjerne også ekte kurser etterpå, med en gratis nøkkel fra EODHD: [den ekte versjonen](#den-ekte-versjonen)
-- De automatiske testene, med to kommandoer etter at uv er installert: [Tester](#tester)
-- [Product Brief](_bmad-output/planning-artifacts/product-brief.md), arbeidskravet: versjon 8, laget etter [tilbakemeldingen 06.10](_bmad-output/planning-artifacts/tilbakemelding-product-brief.md) og låst i taggen `arbeidskrav-product-brief-v8`
-- Plan og krav: [PRD](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md), med [«Kort fortalt»](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md#kort-fortalt) å lese først, [arkitektur](_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md) og [epics og stories](_bmad-output/planning-artifacts/epics.md)
-- [Leveranselista](docs/innlevering.md): kravene i emnet, og hvor hvert av dem står
+- Prøv appen: demoen med oppdiktede tall, uten konto og nøkkel, med et dobbeltklikk på «Start demoen» ([Enklest: dobbeltklikk](#enklest-dobbeltklikk-uten-docker)) eller med Docker Desktop etter [steg 1–4](#med-docker-desktop) ([demoen](#demoen)). Prøv gjerne ekte kurser etterpå, med en gratis nøkkel fra EODHD: [den ekte versjonen](#den-ekte-versjonen)
+- Testene: de automatiske, med to kommandoer etter at uv er installert: [Tester](#tester)
+- Dokumentene: [Product Brief](_bmad-output/planning-artifacts/product-brief.md), arbeidskravet, versjon 8 etter [tilbakemeldingen 06.10](_bmad-output/planning-artifacts/tilbakemelding-product-brief.md), låst i taggen `arbeidskrav-product-brief-v8`; plan og krav: [PRD](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md) med [«Kort fortalt»](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md#kort-fortalt) først, [arkitektur](_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md), [epics og stories](_bmad-output/planning-artifacts/epics.md); [leveranselista](docs/innlevering.md) med kravene i emnet og hvor de står, og [vurderingsmatrisen for del 1](docs/vurderingsmatrise.md) med status per kriterium
 - Prosessen og KI-bruken: [kvalitetssikringen](docs/kvalitetssikring.md), [refleksjonsloggen](docs/reflection-log.md) og [de lagrede KI-promptene](docs/ai-prompts/)
-- [Vurderingsmatrisen for del 1](docs/vurderingsmatrise.md): status per kriterium, med bevis og neste tiltak
 
 <a name="kom-i-gang"></a>
 
@@ -63,7 +58,7 @@ Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og v
 **Linux:** bruk [Docker](#med-docker-desktop) eller [uv](#uten-docker-med-uv), under.
 
 <details>
-<summary>Demoen og den ekte versjonen</summary>
+<summary>Velg vei: dobbeltklikk, Docker eller uv</summary>
 
 Den ekte versjonen er for å prøve løsningen med kurser fra EODHD. Begge versjonene har samme kode. Den ekte versjonen henter dagens kurser først etter kl. 22 på en børsdag. Første gang før kl. 22 henter den forrige børsdag, så du ser kursene og signalet med en gang. Demoen står først i stegene for Docker og uv, fordi den er raskest.
 

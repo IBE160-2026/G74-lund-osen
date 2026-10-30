@@ -24,3 +24,31 @@ Bygge 8.17a, periodevalget i oversikten med søylene og indekslinja, på egen gr
 - 8.17a VG5: søylene bruker indeksens siste dato, tabellen sidens. Skal søylene følge tabellens dag ved en periode?
 - 8.17a VG1: 390 px er prøvd for hånd, ikke i en test.
 - PR #106 flettes tidligst fredag, etter svarene over. Spesifikasjonen står som `in-progress` og settes til `done` ved flettingen.
+
+## 2026-10-30 kl. 12:03 — Marian Osen
+
+### Oppgave
+Kontroll av jobben og CI, og så 8.17a videre etter gruppens svar 30.10 kl. 10:45 (ECH1, VG5, VG1, og tellingen i §5 for 2.13), før gruppen er borte fra kl. 12:00 til mandag kveld. Stopp før flettingen (instruksjonen 30.10 kl. 10:55).
+
+### Plan
+- Instruksjonen i dagsfila og svaret under story 8.17 og 2.13 i `epics.md` på main.
+- Lesing av oppgaven, loggen 29.10, kvoten, powercfg, Windows Update og CI-feilen på `2eb10f1`.
+- På grenen i worktreen `..\G74-lund-osen-8-17a`: flett main inn, a, b og c med tester, mutanten M4, linjene i spesifikasjonen.
+- Hele settet alene, gjennomgang med Blind Hunter, Edge Case Hunter og Verification Gap, triagen, CI.
+
+### Resultat
+- Kvoten kl. 10:54 (09:54 GMT): `apiRequestsDate` 29.10, så 0 brukt og 20 igjen, `extraLimit` 463. Ingen andre kall.
+- Main: `16861d2b` (instruksjonen), `0d7f3ec9` (svaret kl. 10:45 under 8.17 og 2.13). CI grønn på begge (41037014034, 41037153786).
+- Steg 2: jobben Ready, siste kjøring 29.10 kl. 23:45:00 med resultat 0, neste 30.10 kl. 22:15. Loggen 29.10 har fire kjøringer (22:15–22:16, 22:45, 23:15, 23:45), Docker Desktop og Ollama startet og stoppet hver gang, KI-tekstene fra den lokale modellen, ingen feillinjer. Hvilemodus i strøm: aldri. Windows Update: ikke på pause. CI-feilen på `2eb10f1` (#1563): testen uten Docker på windows-latest fant runnerens docker, fordi den falske docker (`441b922c`) bare lå på grenen for 2.13 til `676fbc8`.
+- Grenen: `524adcf1` (main inn), `16c68b1d` (a), `3aa2d80d` (b), `9c8bda28` (c), `07378532` (spesifikasjonen og M4), `c4cc3cd6` (avtrykkene bak bildene), `f583503a` (rettingene fra gjennomgangen og triagen).
+- Commitene a og b ble laget mens tre tester i `tests/test_docker.py` feilet (avtrykkene bak README-bildene), fordi den fila ikke ble kjørt før de commitene. Funnet i hele settet etter c, rettet i `c4cc3cd6`. Bildene er byte for byte de samme.
+- Hele settet: 11:19:41–11:29:11 (10 feilet: de 7 porttestene og de 3 for avtrykkene), 11:31:26–11:40:22 (3897 bestått, 24 hoppet over, 7 feilet) og 11:49:31–11:58:43 (3898 bestått, 24 hoppet over, 7 feilet). Bare porttestene for `start.ps1`.
+- M4 (søylene ved indeksens dag) fanget av `test_indeksen_en_dag_foran_tabellen` 11:17:35–11:17:42 og 11:59:05–11:59:14, fila lik kopien og HEAD.
+- Gjennomgangen: BH 14, ECH 6, VG 1. Rettet BH3/ECH1, BH7, BH11, BH12, BH14/VG1 og ECH3. Triagen i spesifikasjonen og i PR #106.
+- CI: 41042643003 feilet på `c4cc3cd6` i «Start demoen på Windows» etter at demoen svarte 200 (prosessen kunne ikke avsluttes). 41044941912 grønn på `f583503a`.
+
+### Åpne punkter
+- 8.17a BH1/ECH2: indekstallet over søylene gjelder indeksens siste dato, linja tabellens dag. Spørsmål til gruppen.
+- 8.17a VG5: FR-105 i `prd.md` sier indeksens dato. Skal den få en Rettet-linje?
+- CI på windows-latest: «Start demoen på Windows» feilet i opprydningen på `c4cc3cd6` (41042643003), og to porttester fikk timeout på `61b3164` (40971615322). Begge gikk igjen uten endring.
+- PR #106 flettes mandag kveld. Spesifikasjonen settes til `done` da.
