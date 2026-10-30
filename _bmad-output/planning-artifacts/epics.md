@@ -4028,6 +4028,8 @@ avgjøres i planen.
 
 *Avgjort 2026-10-30 kl. 10:45 (gruppens svar):* a) ECH1: linja over tabellen, og linja i kursgrafen fra 8.16, sier dagen den første kursen i perioden er fra, ikke en beregnet startdag, så ingen stengt dag nevnes. Børskalenderen får ikke 2025. b) VG5: søylene og indekslinja følger tabellens dag. Mangler indeksen kurs den dagen, står det over søylene. c) VG1: en automatisk test for 390 px.
 
+*Avgjort 2026-10-30 kl. 12:21 (gruppens svar):* e) Hele delen med hovedindeksen følger tabellens dag, også tallet over søylene. Mangler indeksen kurs den dagen, står det der tallet ellers står. f) Om FR-105 svarte gruppen: «forstår ikke hva blir best i forhold til alle sidene, må være samkjørt». Det føres slik: alle sidene følger samme regel, én dag per side, og alt på siden, også indeksen, gjelder den dagen. FR-105 får en Rettet-linje om dette. Gruppen ser over tolkningen før flettingen.
+
 ### Story 8.18: Kommende eks.dato i kursgrafen
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
