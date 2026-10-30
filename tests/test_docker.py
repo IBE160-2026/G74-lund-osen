@@ -2183,13 +2183,18 @@ class TestReadmeForNybegynnere:
             assert int(n) in SEKSJONENE["Den ekte versjonen"], n
         tabell = _proevetabellen("Prøve 1")
         # Story 3.5f: hovedveien, dobbeltklikket, står først, i en egen tabell
-        # med radene D1-D6, og Docker og uv er reserven under.
+        # med radene D1-D6, og Docker og uv er reserven under. Story 3.5h
+        # (gruppens svar 29.10 kl. 19:36, d, BH9): D7 er linja «Linux», med
+        # lenkene til Docker og uv.
         linjer = tabell.splitlines()
         assert linjer[0] == "| # | Steg i README-en | Det som skjedde | Tid (min) |", linjer[0]
-        assert re.findall(r"^\| (D\d+) \|", tabell, re.MULTILINE) == [f"D{n}" for n in range(1, 7)]
+        assert re.findall(r"^\| (D\d+) \|", tabell, re.MULTILINE) == [f"D{n}" for n in range(1, 8)]
         reserven = "| # | Kommando eller steg i README-en | Det som skjedde | Tid (min) |"
         assert linjer.count(reserven) == 1
-        assert tabell.index("| D6 |") < tabell.index(reserven)
+        assert tabell.index("| D6 |") < tabell.index("| D7 |") < tabell.index(reserven)
+        d7 = tabell.split("| D7 |", 1)[1].split("\n", 1)[0]
+        assert "Linja «Linux»" in d7 and "«Med Docker Desktop»" in d7 and "«Uten Docker, med uv»" in d7, d7
+        assert "**Linux:** bruk [Docker](#med-docker-desktop) eller [uv](#uten-docker-med-uv)" in _kom_i_gang()
         assert "«Download ZIP»" in tabell.split("| D2 |", 1)[0] and "«Start demoen»" in tabell.split("| D4 |", 1)[0]
         tabell = tabell[tabell.index(reserven) :]
         # Story 3.3c: demoen foer den ekte versjonen, som i README-en, og en
