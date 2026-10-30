@@ -5,6 +5,7 @@ Ingen nettverk (AD-8): basen ligger i tmp_path (conftest.py), og demobasen
 lages der den også. Tallene er regnet for hånd fra seriene under.
 """
 
+import os
 import re
 import shutil
 from datetime import date, datetime, timedelta, timezone
@@ -29,6 +30,7 @@ from test_app import (
     skriv_serie,
     skriv_vurdering,
 )
+from test_hjelpefeltet import NETTLESER, _kjoer
 from vurderingsdata import Vurdering
 
 ONSDAG_09_09 = date(2026, 9, 9)
@@ -594,3 +596,40 @@ class TestTilgjengelig:
         assert '<label class="skjult" for="velg-dag">Velg dag</label>' in html
         assert "Tabellen viser onsdag 07.10" in _synlig(html)
         assert 'aria-current="true">07.10</button>' in html
+
+
+# Gruppens svar 30.10 kl. 10:45 (VG1): 390 px prøvd i en nettleser uten
+# vindu, som bildene i 3.3b og feltet i 8.0f (test_hjelpefeltet.py). Siden
+# står i en iframe på 390 px, og skriptet måler bredden. Finnes ingen Edge
+# eller Chrome, hoppes testen over, men ikke i CI, der pytest-jobben på
+# ubuntu-latest har Chrome.
+BREDDEN = """
+  const b = document.documentElement.clientWidth;
+  const brede = [];
+  for (const el of document.querySelectorAll("body *")) {
+    // Tabellen ruller i sin egen boks (story 8.2a), og hjelpefeltet er lukket.
+    if (el.parentElement && el.parentElement.closest(".tabellboks")) continue;
+    if (el.closest(".hjelpevindu, script")) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width > 0 && (r.right > b + 0.5 || r.left < -0.5)) brede.push(el.tagName.toLowerCase() + "." + el.className);
+  }
+  ferdig({rull: document.documentElement.scrollWidth, brede: brede.slice(0, 10)});
+"""
+
+
+@pytest.mark.skipif(NETTLESER is None and not os.environ.get("CI"), reason="ingen Edge eller Chrome å prøve 390 px i")
+class TestSmalSkjerm:
+    @pytest.mark.parametrize(
+        "adresse",
+        ["/", "/?periode=1-uke", "/?periode=velg&dag=2026-10-07", "/?periode=i-aar&sorter=endring&orden=synkende"],
+    )
+    def test_ingen_vannrett_rulling_paa_390_px(self, klient, tmp_path, adresse):
+        """Ville feilet hvis oversikten fikk vannrett rulling på 390 px:
+        siden blir ikke bredere enn 390, og ingenting utenfor tabellens egen
+        boks går ut over kanten, med periodevalget, linja, søylene og
+        tabellen."""
+        _basen(med_indeks=True)
+        html = klient.get(adresse).data.decode("utf-8")
+        assert 'class="periodehode"' in html and '<figure class="soeyler">' in html
+        r = _kjoer(html, tmp_path, 390, BREDDEN)
+        assert r == {"rull": 390, "brede": []}, r
