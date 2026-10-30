@@ -1049,7 +1049,11 @@ HOEYDE_PAA_BILDET = 1690
 # Gjennomgangen av 8.17a: rettingene i app.py, markedsoversikt.py,
 # hovedindeks.py og _hovedindeks.html. Bildet ble tatt paa nytt og er byte
 # for byte det samme.
-AVTRYKK_BAK_BILDET = "6166dae9d76a152e92061aed6d98fd2300f8d3be782730916f66b15c41917ad9"
+# Svaret 30.10 kl. 10:45 (ECH1, VG5): foerste_kursdag i perioder.py, og
+# app.py, hovedindeks.py, markedsoversikt.py, hjelpetekster.py og
+# _hovedindeks.html. Bildet ble tatt paa nytt med samme hoeyde og er byte
+# for byte det samme.
+AVTRYKK_BAK_BILDET = "580bc6e8ef9c718702061458dfb1dbbf45bf3826e333863a0bbac679064f067a"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1252,7 +1256,10 @@ HOEYDE_PAA_AKSJESIDEN = 1894
 # tatt paa nytt og er byte for byte det samme.
 # Gjennomgangen av 8.17a: rettingene i app.py, markedsoversikt.py og
 # hovedindeks.py. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "2ff9522cfd2c5c3ed76bd63c02ffa0c7ecc5429a761c6c5e77b848c457816acd"
+# Svaret 30.10 kl. 10:45 (ECH1, VG5): perioder.py, app.py, hovedindeks.py,
+# markedsoversikt.py og hjelpetekster.py. Bildet ble tatt paa nytt og er
+# byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "4a7b427a42b729aa13e4c1f608dad88b76f6b7dbcddc25ff3c2563d43889f9e5"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
