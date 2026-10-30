@@ -136,6 +136,6 @@ Gjennomgang 28.10 etter hele settet (fil for fil, fordi 2,4 GB av 15,7 GB var le
   - *Avgjort 2026-10-29 kl. 19:36 (gruppens svar, c):* ventingen første gang står i steg 4 som nå, ikke i et eget steg. Ingen endring (3.5h).
 - §9 i `docs/kvalitetssikring.md` følger ikke de fem stegene ennå (VG5). Avgjort av gruppen 27.10 kl. 06:09: radene D1–D6 følger de fem stegene og linjene under dem.
 - Om pila «Demoen og den ekte versjonen» skal få et annet navn nå som tabellen står øverst (BH7).
-  - *Avgjort 2026-10-29 kl. 19:36 (gruppens svar, b):* pila heter «Velg vei: dobbeltklikk, Docker eller uv», og tabellen øverst beholder navnet. Rettet i 3.5h.
+  - *Avgjort 2026-10-29 kl. 19:36 (gruppens svar, b):* pila heter «Velg vei: dobbeltklikk, Docker eller uv», og tabellen øverst beholder navnet. Rettet i `fe21d95` på grenen for 3.5h.
 - Om Linux skal være en egen rad i §9 (BH9).
-  - *Avgjort 2026-10-29 kl. 19:36 (gruppens svar, d):* linja «Linux» får raden D7 i §9, som sjekker at lenkene til Docker og uv virker. Rettet i 3.5h.
+  - *Avgjort 2026-10-29 kl. 19:36 (gruppens svar, d):* linja «Linux» får raden D7 i §9, som sjekker at lenkene til Docker og uv virker. Rettet i `05cc7f0` på grenen for 3.5h.

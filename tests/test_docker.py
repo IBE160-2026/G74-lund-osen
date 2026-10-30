@@ -2828,9 +2828,14 @@ class TestReadmeForNybegynnere:
             ("med et dobbeltklikk på «Start demoen»", DOBBELTKLIKK_LENKE, DOBBELTKLIKK_ANKER),
             # Gjennomgangen, BH2: demolenken sier ogsaa hvor steg 1-4 staar.
             ("eller med Docker Desktop etter", "steg 1–4", "med-docker-desktop"),
-            ("", "demoen", _anker("Demoen")),
+            # Gjennomgangen av 3.5h (BH11): demoen står i parentes rett etter steg 1-4.
+            ("](#med-docker-desktop) (", "demoen", _anker("Demoen")),
             # Story 3.3i (U52): en invitasjon til den ekte versjonen, etter demoen.
-            ("Ekte kurser etterpå, med en gratis nøkkel fra EODHD", "den ekte versjonen", _anker("Den ekte versjonen")),
+            (
+                "Prøv gjerne ekte kurser etterpå, med en gratis nøkkel fra EODHD",
+                "den ekte versjonen",
+                _anker("Den ekte versjonen"),
+            ),
             # Story 3.3e (gjennomgangen, VG7): uv installeres foerst.
             ("med to kommandoer etter at uv er installert", "Tester", _anker("Tester")),
         ]
@@ -3652,8 +3657,11 @@ class TestHovedveien:
         assert tekst.count("<summary>Demoen og den ekte versjonen</summary>") == 0
         assert tekst.count("**Demoen og den ekte versjonen:**") == 1
         assert _alle_ankrene(tekst).count("demoen-og-den-ekte-versjonen") == 1
-        # Pila begynner rett etter de fem stegene og de tre linjene under.
-        assert "**Linux:**" in tekst.split(f"<summary>{VELG_VEI_PIL}</summary>", 1)[0].split("### Enklest", 1)[1]
+        # Pila begynner rett etter de fem stegene og de tre linjene under
+        # (gjennomgangen av 3.5h, BH13).
+        linux = "**Linux:** bruk [Docker](#med-docker-desktop) eller [uv](#uten-docker-med-uv), under."
+        mellom = tekst.split(linux, 1)[1].split(f"<summary>{VELG_VEI_PIL}</summary>", 1)[0]
+        assert mellom.split() == ["<details>"], mellom
 
     def test_hvert_steg_under_staar_du_fast_sier_hvilken_vei(self):
         """Gruppens svar 27.10 kl. 06:09, b (ECH7 i triagen til 3.5g): hver
