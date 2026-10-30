@@ -212,26 +212,35 @@ def periodeendring(serie: list[Kursrad], start: date, slutt: date) -> tuple[floa
     endringen for én dag (FR-101) - story 8.17a.
 
     Grunnlaget er raden paa startdagen. Har serien den ikke, er det foerste
-    rad etter startdagen og foer slutt, og dagen gis tilbake, saa raden kan
-    si det. None naar serien ikke har slutt, eller ingen rad mellom."""
+    rad etter startdagen og foer slutt. Den andre verdien er dagen serien
+    begynner, naar den begynner etter startdagen, saa raden kan si det, og
+    ellers None: et hull i en lengre serie er ikke en kortere serie
+    (gjennomgangen, ECH1 og ECH3). Er startdagen slutt, som I aar paa aarets
+    foerste boersdag, er endringen 0 (ECH2). None naar serien ikke har
+    slutt, eller ingen rad mellom."""
     paa_slutt = next((rad for rad in serie if rad.dato == slutt), None)
-    fra = next((rad for rad in serie if start <= rad.dato < slutt), None)
-    if paa_slutt is None or fra is None:
+    if paa_slutt is None:
         return None
-    return endring_i_prosent([fra, paa_slutt]), fra.dato
+    if start == slutt:
+        return 0.0, None
+    fra = next((rad for rad in serie if start <= rad.dato < slutt), None)
+    if fra is None:
+        return None
+    return endring_i_prosent([fra, paa_slutt]), (fra.dato if serie[0].dato > start else None)
 
 
-def med_perioden(rader: list[Rad], serier: dict[str, list[Kursrad]], start_for) -> list[Rad]:
+def med_perioden(rader: list[Rad], serier: dict[str, list[Kursrad]], start: date) -> list[Rad]:
     """Radene med endringen for perioden, sortert etter FR-102 paa nytt -
-    story 8.17a. start_for gir startdagen for radens siste boersdag
-    (perioder.startdag). Sluttkursen, signalet og «skiller seg ut» gjelder
-    fortsatt siste boersdag (gruppens svar 23.10 kl. 12:35, a)."""
+    story 8.17a. start er startdagen fra perioder.startdag, regnet fra
+    sidens siste boersdag, den samme for alle radene og linja over tabellen
+    (gjennomgangen, BH3 og ECH5). Endringen gaar til radens siste boersdag.
+    Sluttkursen, signalet og «skiller seg ut» gjelder fortsatt siste
+    boersdag (gruppens svar 23.10 kl. 12:35, a)."""
     nye = []
     for rad in rader:
-        start = start_for(rad.dato)
         utfall = periodeendring(serier.get(rad.aksje.symbol, []), start, rad.dato)
         endring, fra = utfall if utfall is not None else (None, None)
-        nye.append(replace(rad, endring_prosent=endring, fra=fra if fra != start else None))
+        nye.append(replace(rad, endring_prosent=endring, fra=fra))
     return sorted(nye, key=_sorteringsnokkel)
 
 
@@ -255,6 +264,10 @@ def bygg_rad_for_dag(
     paa_dagen = foer[-1] if foer and foer[-1].dato == dag else None
     utfall, tekst = les_tilstand(innhold, dag, idag)
     tekst = grunn_med_tall(utfall, tekst, len(foer), p)
+    # Gjennomgangen (ECH7, BH2): en boersdag uten kurs for aksjen, for
+    # eksempel foer serien begynner, er ikke «ikke vurdert», men uten kurs.
+    if paa_dagen is None and utfall is not None and utfall.art is Art.IKKE_KJOERT:
+        tekst = GRUNNTEKST[Grunn.KURS_IKKE_FRA_DAGEN]
     return Rad(
         aksje=post.aksje,
         dato=dag,

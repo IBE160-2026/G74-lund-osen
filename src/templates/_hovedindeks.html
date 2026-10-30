@@ -78,6 +78,9 @@
           </figure>
         {% elif valg and valg.periode == "velg" %}
           <p class="uten-endring">Ingen søyler: ingen aksje har kurs {{ valg.dag|dato }}.</p>
+        {#- Gjennomgangen (BH10): også ved en periode sier siden hvorfor. #}
+        {% elif valg and valg.periode != "siste" %}
+          <p class="uten-endring">Ingen søyler: ingen aksje har kurs {{ hovedindeks.dato|dato }}.</p>
         {% endif %}
       {% elif indeks_feilet %}
         <p>Hovedindeksen kunne ikke leses. Tabellen under vises som vanlig.</p>

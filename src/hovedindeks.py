@@ -192,7 +192,7 @@ def bygg_soeyler_perioden(
     for aksje, serie, tre in med_kurs:
         utfall = periodeendring(serie, start, slutt)
         endringer.append((aksje, utfall[0] if utfall else None, tre))
-        if utfall and utfall[1] != start:
+        if utfall and utfall[1] is not None:
             kortere.append(aksje.navn)
     return _soeyler(endringer, indeks, slutt, start, tuple(kortere))
 
@@ -257,7 +257,10 @@ def soeylene_for(
         return bygg_soeyler(siste, indeksendring(serie), grunnlag)
     start = startdag(periode, siste)
     utfall = periodeendring(serie, start, siste)
-    return bygg_soeyler_perioden(start, siste, utfall[0] if utfall else None, grunnlag)
+    # Gjennomgangen (BH4, ECH4): begynner indeksen etter startdagen, er det
+    # ingen linje, saa linja aldri gjelder en kortere tid enn soeylene.
+    indeks = utfall[0] if utfall and utfall[1] is None else None
+    return bygg_soeyler_perioden(start, siste, indeks, grunnlag)
 
 
 def bygg_hovedindeks(

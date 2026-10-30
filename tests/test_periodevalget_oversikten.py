@@ -17,7 +17,7 @@ import demo
 import lagring_sqlite
 from kursdata import Kursrad
 from markedsoversikt import periodeendring
-from perioder import EN_MND, EN_UKE, startdag
+from perioder import EN_MND, EN_UKE, I_AAR, startdag
 from test_app import (
     FREDAG_09_10,
     HENTET,
@@ -25,6 +25,7 @@ from test_app import (
     _indeks,
     _legg_inn_indeks,
     _synlig,
+    fotnoten,
     skriv_serie,
     skriv_vurdering,
 )
@@ -39,7 +40,10 @@ TORSDAG_08_10 = date(2026, 10, 8)
 # Den justerte kursen de dagene som teller. Alle andre dager er 100.
 # Siste børsdag 09.10: 110 mot 99 dagen før gir +11,11 %. 1 uke starter
 # fredag 02.10 (80), så +37,50 %. 1 mnd starter onsdag 09.09 (50), så
-# +120,00 %. Sluttkursen 09.10 er 120, ikke 110, så den ujusterte vises.
+# +120,00 %. Sluttkursen 09.10 er 120, ikke 110, så den ujusterte vises.
+# Gjennomgangen (VG6): sluttkursen 07.10 er 105 og den justerte 100, så
+# «Velg dag» viser at den ujusterte er sluttkursen også en annen dag.
+SLUTT = {FREDAG_09_10: 120.0, ONSDAG_07_10: 105.0}
 JUSTERT = {ONSDAG_09_09: 50.0, FREDAG_02_10: 80.0, ONSDAG_07_10: 100.0, TORSDAG_08_10: 99.0, FREDAG_09_10: 110.0}
 
 
@@ -64,7 +68,7 @@ def _eqnr() -> list[Kursrad]:
     return [
         Kursrad(
             dato=d,
-            slutt=120.0 if d == FREDAG_09_10 else JUSTERT.get(d, 100.0),
+            slutt=SLUTT.get(d, JUSTERT.get(d, 100.0)),
             justert_slutt=JUSTERT.get(d, 100.0),
             volum=1000,
         )
@@ -173,8 +177,21 @@ class TestEndringenForPerioden:
         serie = _eqnr()
         uke, fra_uke = periodeendring(serie, FREDAG_02_10, FREDAG_09_10)
         mnd, fra_mnd = periodeendring(serie, ONSDAG_09_09, FREDAG_09_10)
-        assert uke == pytest.approx(37.5) and fra_uke == FREDAG_02_10
-        assert mnd == pytest.approx(120.0) and fra_mnd == ONSDAG_09_09
+        assert uke == pytest.approx(37.5) and fra_uke is None
+        assert mnd == pytest.approx(120.0) and fra_mnd is None
+
+    def test_hull_i_en_lengre_serie_og_i_aar_paa_aarets_foerste_dag(self):
+        """Gjennomgangen (ECH3, ECH2). Mangler serien startdagen, men har
+        dager før, er den ikke kortere, og «fra» står ikke. På årets første
+        børsdag er I år 0,00 %. Ville feilet med «fra» ved et hull, eller «–»
+        for I år 02.01."""
+        uten_startdagen = [rad for rad in _eqnr() if rad.dato != FREDAG_02_10]
+        endring, fra = periodeendring(uten_startdagen, FREDAG_02_10, FREDAG_09_10)
+        assert fra is None and endring == pytest.approx((110 - 100) / 100 * 100)
+        foerste = date(2026, 1, 2)
+        rader = [Kursrad(dato=foerste, slutt=10.0, justert_slutt=10.0, volum=1)]
+        assert startdag(I_AAR, foerste) == foerste
+        assert periodeendring(rader, foerste, foerste) == (0.0, None)
 
     def test_1_uke_og_1_mnd_paa_siden(self, klient):
         """Ville feilet hvis tabellen viste endringen fra dagen før ved en
@@ -187,7 +204,9 @@ class TestEndringenForPerioden:
         assert "+37,50 %" in _rad(uke_html, "EQNR")[1]
         assert "+120,00 %" in _rad(mnd_html, "EQNR")[1]
         assert "Endringen gjelder 1 uke, fra 02.10 til 09.10." in _synlig(uke_html)
-        assert "Endringen gjelder 1 mnd, fra 09.09 til 09.10." in _synlig(mnd_html)
+        assert "Endringen gjelder 1 måned, fra 09.09 til 09.10." in _synlig(mnd_html)
+        # Gjennomgangen (VG2): kolonneraden sier perioden.
+        assert re.search(r'Hjelp: endring.*?<span class="under">1 uke</span></th>', uke_html, re.DOTALL)
 
     def test_en_kortere_serie_regnes_fra_foerste_dag_og_sier_det(self, klient):
         """AKRBP begynner 05.10: 210 mot 200 er +5,00 %, og raden sier «fra
@@ -217,8 +236,36 @@ class TestVelgDag:
         siste børsdag."""
         _basen()
         tekst = _rad(klient.get("/?periode=velg&dag=2026-10-07").data.decode("utf-8"), "EQNR")[1]
-        assert "2 av 3" in tekst and "0,00 %" in tekst and "100,00" in tekst
+        assert "2 av 3" in tekst and "0,00 %" in tekst and "105,00" in tekst
         assert "3 av 3 siste børsdag" in tekst
+
+    def test_dagen_er_en_liste_i_fr_102_rekkefoelgen(self, klient):
+        """Gjennomgangen (VG3, VG11): 07.10 har DNB 3 av 3 og EQNR 2 av 3,
+        og AKRBP har ingen rad. Ville feilet med rekkefølgen fra lista eller
+        fra siste børsdag, eller med delen «Skilte seg ut» for dagen."""
+        _basen()
+        html = klient.get("/?periode=velg&dag=2026-10-07").data.decode("utf-8")
+        rekkefoelge = re.findall(r'<td class="selskap">.*?<a href="/aksje/([A-Z]+)">', html, re.DOTALL)
+        assert rekkefoelge.index("DNB") < rekkefoelge.index("EQNR") < rekkefoelge.index("AKRBP")
+        assert 'class="del ut"' not in html and 'class="del oevrige"' not in html
+
+    def test_siste_boersdag_valgt_som_dag_er_siste_boersdag(self, klient):
+        """Gjennomgangen (BH5, VG9): «Velg dag» 09.10 gir siste børsdag med
+        delene og 2 av 3. Ville feilet hvis samme dag ble merket på to måter."""
+        _basen()
+        html = klient.get("/?periode=velg&dag=2026-10-09").data.decode("utf-8")
+        assert re.findall(r'<a href="/\?periode=([a-z0-9-]+)" aria-current="true">', html) == ["siste"]
+        assert _rad(html, "DNB")[0] == "utslag" and 'class="del ut"' in html
+
+    def test_en_boersdag_foer_serien_begynner_og_sortering_paa_kurs(self, klient):
+        """Gjennomgangen (ECH7, BH1, BH2): AKRBP begynner 05.10, så 02.10
+        har den ingen kurs, og raden sier det. Sortering på sluttkurs tåler
+        raden uten kurs. Ville feilet med «ikke vurdert» eller en feilside."""
+        _basen()
+        svar = klient.get("/?periode=velg&dag=2026-10-02&sorter=kurs&orden=stigende")
+        assert svar.status_code == 200
+        tekst = _rad(svar.data.decode("utf-8"), "AKRBP")[1]
+        assert "– ingen kurs fra dagen" in tekst and "ikke vurdert" not in tekst
 
     def test_en_dag_uten_rad_og_en_dag_som_ikke_er_boersdag(self, klient):
         """Tirsdag 06.10 har ingen rad i vurdering, og lørdag 03.10 er ikke
@@ -246,6 +293,8 @@ class TestVelgDag:
             assert "av 3" not in tekst, tekst
             assert "ikke vurdert" in tekst or "uten data" in tekst, tekst
         assert "Tabellen viser tirsdag 15.09" in _synlig(html)
+        # Gjennomgangen (VG8): fotnoten om «ikke vurdert» står for dagen.
+        assert fotnoten(html)
 
 
 class TestGultOgToAvTre:
@@ -284,7 +333,21 @@ class TestSoeyleneOgLinja:
         assert eqnr.startswith("+37,50 %"), lista
         assert "Indeksen, den stiplede linja: +10,00 %." in lista
         assert "Endring per aksje 1 uke, fra 02.10 til 09.10" in lista
-        assert "Regnet fra første dag serien har, fordi den ikke går tilbake til 02.10:" in lista
+        assert "Regnet fra første dag serien har, fordi den ikke går tilbake til 02.10: Aker BP." in lista
+        # Gjennomgangen (VG7, VG2): linja er grønn for indeksen som steg, og
+        # skjermleseren hører perioden.
+        assert '<span class="indekslinje opp"' in html
+        assert "Søyler for 3 aksjer 1 uke, fra 02.10 til 09.10" in lista
+
+    def test_indeksen_som_begynner_etter_startdagen_gir_ingen_linje(self, klient):
+        """Gjennomgangen (BH4, ECH4): indeksen begynner 05.10, og 1 uke
+        starter 02.10. Ville feilet hvis linja gjaldt en kortere tid enn
+        søylene uten at siden sa det."""
+        _basen()
+        _legg_inn_indeks(_indeks([(MANDAG_05_10, 1000.0), (TORSDAG_08_10, 1050.0), (FREDAG_09_10, 1100.0)]))
+        html = klient.get("/?periode=1-uke").data.decode("utf-8")
+        assert 'class="indekslinje' not in html
+        assert "Ingen stiplet linje: indeksen har ingen endring for perioden." in html
 
     def test_soeylene_paa_siste_boersdag_og_en_valgt_dag(self, klient):
         """Siste børsdag: EQNR +11,11 % og indeksen 0,00 %. Onsdag 07.10:
@@ -341,12 +404,24 @@ class TestAdressen:
         assert app_modul.tilbake_etter_merking("/?periode=velg&dag=2026-10-07") == "/?periode=velg&dag=2026-10-07"
         assert app_modul.tilbake_etter_merking("/?periode=tull") == "/"
         assert app_modul.tilbake_etter_merking("/min-liste?periode=1-uke") == "/min-liste"
+        # Gjennomgangen (VG10): en dag som ikke er en dato, tas ikke med.
+        assert app_modul.tilbake_etter_merking("/?periode=velg&dag=2026-1-07") == "/"
+
+    def test_en_dag_uten_kurser_sier_hvorfor_det_ikke_er_soeyler(self, klient):
+        """Gjennomgangen (VG10): lørdag 03.10. Ville feilet hvis søylene
+        bare forsvant."""
+        _basen(med_indeks=True)
+        html = klient.get("/?periode=velg&dag=2026-10-03").data.decode("utf-8")
+        assert "Ingen søyler: ingen aksje har kurs 03.10." in html
 
     def test_en_feil_i_adressen_gir_siste_boersdag_med_en_beskjed(self, klient):
         """Ville feilet med en feilside, eller med 6 mnd som i kursgrafen."""
         _basen()
         html = klient.get("/?periode=tull").data.decode("utf-8")
-        assert "Perioden «tull» finnes ikke, så oversikten viser siste børsdag." in html
+        assert (
+            '<p class="periodebeskjed" role="status">Perioden «tull» finnes ikke, så oversikten viser siste børsdag.</p>'
+            in html
+        )
         assert "+11,11 %" in _rad(html, "EQNR")[1]
 
     def test_min_liste_har_ikke_periodevalget(self, klient):

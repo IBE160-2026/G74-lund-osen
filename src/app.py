@@ -29,7 +29,7 @@ import sqlite3
 import sys
 import threading
 from collections.abc import Callable
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
@@ -94,7 +94,6 @@ from oversiktsdata import Oversiktsleser
 from perioder import (
     AKSEMERKER,
     MAANEDSNAVN,
-    NAVN,
     OVERSKRIFT,
     PERIODENE,
     SISTE,
@@ -791,7 +790,7 @@ def _tabellsiden(aktiv: str):
             ]
         )
     elif valg is not None and valg.periode != SISTE:
-        vist = med_perioden(rader, serier, lambda siste: startdag(valg.periode, siste))
+        vist = med_perioden(rader, serier, startdag(valg.periode, sidens_siste(rader)))
     annen_dag = valg is not None and valg.periode == VELG
     skilte_seg_ut, oevrige = del_i_to(rader if annen_dag else vist)
     # Story 8.3: merkingen leses fra sin egen port, bare lesing her.
@@ -856,7 +855,8 @@ def _tabellsiden(aktiv: str):
         # Story 8.17a: periodevalget, og perioden og dagen i lenkene.
         valg=valg,
         knapper=knappene(sidens_siste(rader), i_dag) if valg else (),
-        periodenavn=NAVN.get(valg.periode) if valg else None,
+        # Gjennomgangen (ECH9): navnet midt i en setning, «i år» med liten i.
+        periodenavn=OVERSKRIFT.get(valg.periode) if valg and valg.periode not in (SISTE, VELG) else None,
         periodestart=_periodestart(valg, rader),
         foerste_valgbare=_foerste_valgbare(serier),
         siste_dag=sidens_siste(rader),
@@ -888,9 +888,10 @@ def _seriene(leser: Kursleser, poster: list) -> dict[str, list]:
 
 def _foerste_valgbare(serier: dict[str, list]) -> date | None:
     """Første dag «Velg dag» godtar: dagen etter den første dagen i
-    seriene, fordi les_valg avviser seriens første dag (8.16, BH3)."""
-    datoer = sorted({rad.dato for serie in serier.values() for rad in serie[:2]})
-    return datoer[1] if len(datoer) > 1 else (datoer[0] if datoer else None)
+    seriene, fordi les_valg avviser seriens første dag (8.16, BH3), og
+    godtar alle dager etter den (gjennomgangen, ECH6 og BH8)."""
+    foerste = min((serie[0].dato for serie in serier.values() if serie), default=None)
+    return foerste + timedelta(days=1) if foerste else None
 
 
 def _valget(rader: list, serier: dict[str, list], i_dag: date) -> Valg | None:
@@ -901,7 +902,12 @@ def _valget(rader: list, serier: dict[str, list], i_dag: date) -> Valg | None:
     if siste is None:
         return None
     foerste = min((serie[0].dato for serie in serier.values() if serie), default=siste)
-    return les_valg(request.args.get("periode"), request.args.get("dag"), foerste, i_dag, siste, OVERSIKTEN_VALG)
+    valg = les_valg(request.args.get("periode"), request.args.get("dag"), foerste, i_dag, siste, OVERSIKTEN_VALG)
+    # Gjennomgangen (BH5, VG9): «Velg dag» på siste børsdag er siste børsdag,
+    # med delene og 2 av 3, så samme dag aldri merkes på to måter.
+    if valg.periode == VELG and valg.dag == siste:
+        return Valg(SISTE)
+    return valg
 
 
 def _periodestart(valg: Valg | None, rader: list) -> date | None:

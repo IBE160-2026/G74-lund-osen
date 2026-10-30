@@ -333,8 +333,8 @@ class TestRammen:
                     # Story 8.17a: periodene i oversikten, med dagen for «Velg
                     # dag» og sorteringen.
                     or re.fullmatch(
-                        r"/\?periode=(" + "|".join(map(re.escape, PERIODENE)) + r")"
-                        r"(&amp;dag=[0-9]{4}-[0-9]{2}-[0-9]{2})?"
+                        r"/\?(periode=(" + "|".join(map(re.escape, PERIODENE)) + r")"
+                        r"|periode=velg&amp;dag=[0-9]{4}-[0-9]{2}-[0-9]{2})"
                         r"(&amp;sorter=(selskap|kurs|endring|signal|retning)&amp;orden=(synkende|stigende))?",
                         href,
                     )
