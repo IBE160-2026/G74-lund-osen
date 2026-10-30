@@ -1,9 +1,9 @@
 # Åpne punkter
 
-- [ ] 2026-10-28 [3-5g-videre](997-2026-10-28-20-02-58-3-5g-videre.md) — 3.5g f: «Til faglærer» kortes ned i en egen endring
-- [ ] 2026-10-28 [3-5g-videre](997-2026-10-28-20-02-58-3-5g-videre.md) — 3.5g BH4: om ventingen første gang skal stå i et eget steg
-- [ ] 2026-10-28 [3-5g-videre](997-2026-10-28-20-02-58-3-5g-videre.md) — 3.5g BH7: om pila «Demoen og den ekte versjonen» skal få et annet navn nå som tabellen står øverst
-- [ ] 2026-10-28 [3-5g-videre](997-2026-10-28-20-02-58-3-5g-videre.md) — 3.5g BH9: om Linux skal ha en egen rad i §9
+- [x] 2026-10-28 [3-5g-videre](997-2026-10-28-20-02-58-3-5g-videre.md) — 3.5g f: «Til faglærer» kortes ned i en egen endring (løst 2026-10-30: a3e6057)
+- [x] 2026-10-28 [3-5g-videre](997-2026-10-28-20-02-58-3-5g-videre.md) — 3.5g BH4: om ventingen første gang skal stå i et eget steg (løst 2026-10-30: svaret 29.10 kl. 19:36 c, ingen endring)
+- [x] 2026-10-28 [3-5g-videre](997-2026-10-28-20-02-58-3-5g-videre.md) — 3.5g BH7: om pila «Demoen og den ekte versjonen» skal få et annet navn nå som tabellen står øverst (løst 2026-10-30: fe21d95, i a3e6057)
+- [x] 2026-10-28 [3-5g-videre](997-2026-10-28-20-02-58-3-5g-videre.md) — 3.5g BH9: om Linux skal ha en egen rad i §9 (løst 2026-10-30: D7 i 05cc7f0, i a3e6057)
 - [ ] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d: prøven med 0 kall fra hentingen 29.10 før kl. 22:00, eller i loggen etter første kjøring 29.10 kl. 22:15
 - [x] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d BH6: en henting for hånd samtidig med jobben er ikke sperret (spørsmål til gruppen før flettingen) (løst 2026-10-28, gruppens svar kl. 11:34: ingen lås nå)
 - [x] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d ECH5: jobben overstyrer OSE_KI_TJENESTE i .env (spørsmål til gruppen før flettingen) (løst 2026-10-28, gruppens svar kl. 11:34: alltid den lokale modellen)
