@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-28T23:49
+updated: 2026-10-30T13:26
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -494,6 +494,14 @@ falt.
   tabellen (FR-101, tillegget 08.10), og indekslinja følger samme periode.
   Endringen regnes som i FR-101, av kursserien på `adjusted_close`.
   Bransjesymbolet er gult som før (`designregler.md` §3). Story 8.17.
+  *Rettet 2026-10-30, gruppens svar kl. 12:21 (f):* alle sidene følger samme
+  regel, én dag per side, og alt på siden, også indeksen, gjelder den dagen.
+  Søylene, den stiplede linja, tallet for indeksen og «x av N» gjelder derfor
+  tabellens dag, siste børsdag i oversikten eller dagen fra «Velg dag», ikke
+  indeksens dato. «En aksje uten kurs for indeksens dato får ingen søyle»
+  gjelder tabellens dag. Mangler indeksen kurs den dagen, sier siden det der
+  tallet ellers står og over søylene (svaret kl. 10:45 b og kl. 12:21 e).
+  Gruppen ser over tolkningen før flettingen av 8.17a.
 
 *Lagt til 2026-10-01:* bransjesymbolet er gult når aksjen har 3 av 3 på siste børsdag (designregler.md §3).
 

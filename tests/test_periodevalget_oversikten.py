@@ -696,3 +696,29 @@ class TestSmalSkjerm:
         assert 'class="periodehode"' in html and '<figure class="soeyler">' in html
         r = _kjoer(html, tmp_path, 390, BREDDEN)
         assert r == {"rull": 390, "brede": []}, r
+
+
+PRD = (
+    Path(__file__).resolve().parent.parent
+    / "_bmad-output"
+    / "planning-artifacts"
+    / "prds"
+    / "prd-G74-lund-osen-2026-09-20"
+    / "prd.md"
+)
+
+
+def test_fr_105_har_rettet_linja_om_en_dag_per_side():
+    """Gruppens svar 30.10 kl. 12:21 (f): FR-105 får en Rettet-linje om at
+    alle sidene følger samme regel, én dag per side, og at alt på siden,
+    også indeksen, gjelder den dagen. Ville feilet hvis linja manglet, sto
+    under et annet krav, eller ikke sa at indeksen følger tabellens dag."""
+    tekst = PRD.read_text(encoding="utf-8")
+    fr105 = tekst.split("#### FR-105 — Søylene under hovedindeksen", 1)[1].split("\n#### ", 1)[0]
+    linja = " ".join(fr105.split("*Rettet 2026-10-30, gruppens svar kl. 12:21 (f):*", 1)[1].split("\n\n", 1)[0].split())
+    assert linja.startswith(
+        "alle sidene følger samme regel, én dag per side, og alt på siden, også indeksen, gjelder den dagen."
+    )
+    assert "tabellens dag" in linja and "ikke indeksens dato" in linja
+    # Linja står etter kravet den retter, ikke før.
+    assert fr105.index("En aksje uten kurs for") < fr105.index("*Rettet 2026-10-30, gruppens svar kl. 12:21 (f):*")
