@@ -2537,6 +2537,12 @@ Resten ryddes etter alle testene.
 
 *Lagt til 2026-10-28 kl. 20:01:* 3.5g, «Kom i gang» med fem steg og resten bak piler, er squash-flettet i `27ccf82`, PR #103, låst til head-en `0f91a8f` (spesifikasjonen `spec-3-5g-kortere-kom-i-gang.md`), med a, b, c og e over. Tabellen «Demoen og den ekte versjonen» står uten pil før «Til faglærer», og f står igjen.
 
+*Avgjort 2026-10-29 kl. 19:36 (gruppens svar):*
+- a) «Til faglærer» blir fire korte punkter med alle lenkene: prøv appen, testene, dokumentene og prosessen. Ingen lenke forsvinner.
+- b) Pila «Demoen og den ekte versjonen» under stegene heter «Velg vei: dobbeltklikk, Docker eller uv», og tabellen øverst beholder navnet (BH7).
+- c) Ventingen første gang står i steg 4 som nå, ikke i et eget steg (BH4).
+- d) Linja «Linux» får en egen rad D7 i §9 i kvalitetssikringen, som sjekker at lenkene til Docker og uv virker (BH9).
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
