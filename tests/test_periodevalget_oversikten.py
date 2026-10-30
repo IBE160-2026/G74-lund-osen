@@ -454,6 +454,69 @@ class TestSoeyleneOgLinja:
         assert etiketter["EQNR"] == " tre-av-tre" and etiketter["DNB"] == ""
 
 
+class TestTabellensDag:
+    """Gruppens svar 30.10 kl. 10:45 (VG5): søylene og indekslinja følger
+    tabellens dag, ikke indeksens siste dato."""
+
+    def test_indeksen_en_dag_foran_tabellen(self, klient):
+        """Aksjene slutter torsdag 08.10, indeksen fredag 09.10. Indeksen
+        08.10 mot 07.10 er 1100 mot 1050, +4,76 %, og 1 uke fra 01.10 (1000)
+        er +10,00 %. Fra indeksens dato ville det vært +10,00 % og +21,00 %,
+        og EQNR -1,00 % (99 mot 100) ville vært uten søyle. Ville feilet hvis
+        søylene eller linja fulgte indeksens dato."""
+        hentet = datetime.fromisoformat(HENTET)
+        skriv_serie("EQNR", _eqnr()[:-1], hentet, vurdert=False)
+        skriv_serie("DNB", _eqnr()[:-1], hentet, vurdert=False)
+        _legg_inn_indeks(
+            _indeks(
+                [
+                    (date(2026, 10, 1), 1000.0),
+                    (FREDAG_02_10, 1000.0),
+                    (date(2026, 10, 6), 1000.0),
+                    (ONSDAG_07_10, 1050.0),
+                    (TORSDAG_08_10, 1100.0),
+                    (FREDAG_09_10, 1210.0),
+                ]
+            )
+        )
+        siste = _soeylelista(klient.get("/").data.decode("utf-8"))
+        uke = _soeylelista(klient.get("/?periode=1-uke").data.decode("utf-8"))
+        assert "Endring per aksje 08.10" in siste
+        assert "Equinor (EQNR, Energi): -1,00 %." in siste
+        assert "Indeksen, den stiplede linja: +4,76 %." in siste
+        assert "Endring per aksje 1 uke, fra 01.10 til 08.10" in uke
+        assert "Indeksen, den stiplede linja: +10,00 %." in uke
+        assert "Indeksen har ingen kurs" not in siste + uke
+
+    @pytest.mark.parametrize("adresse", ["/", "/?periode=1-uke"])
+    def test_indeksen_en_dag_bak_tabellen(self, klient, adresse):
+        """Aksjene slutter fredag 09.10, indeksen torsdag 08.10. Søylene
+        gjelder 09.10, uten linje, og over søylene står det at indeksen
+        mangler kurs. Ville feilet hvis søylene fulgte indeksens dato (EQNR
+        -1,00 % 08.10), eller linja sto uten at siden sa hvorfor."""
+        _basen()
+        _legg_inn_indeks(
+            _indeks(
+                [
+                    (FREDAG_02_10, 1000.0),
+                    (date(2026, 10, 6), 1000.0),
+                    (ONSDAG_07_10, 1050.0),
+                    (TORSDAG_08_10, 1100.0),
+                ]
+            )
+        )
+        html = klient.get(adresse).data.decode("utf-8")
+        lista = _soeylelista(html)
+        eqnr = re.search(r"\(EQNR[^)]*\): ([^.]*)", lista).group(1)
+        assert eqnr.startswith("+37,50" if "uke" in adresse else "+11,11"), lista
+        assert 'class="indekslinje' not in html
+        figur = html.split('<figure class="soeyler">', 1)[1]
+        assert figur.index("Indeksen har ingen kurs 09.10, så søylene står uten stiplet linje.") < figur.index(
+            'class="felt"'
+        )
+        assert "Ingen stiplet linje" not in lista
+
+
 class TestAdressen:
     def test_siste_boersdag_er_valgt_naar_siden_aapnes(self, klient):
         """Designregler §2. Ville feilet hvis oversikten åpnet med 6 mnd som

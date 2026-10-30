@@ -24,12 +24,12 @@ til indekslinja regnes her, i prosent av feltet, med null midt i det og den
 stoerste endringen av soeylene og indeksen paa halve hoeyden.
 
 Story 8.17a: soeylene og linja foelger periodevalget i oversikten. For en
-periode er endringen fra startdagen (perioder.startdag) til indeksens dato,
+periode er endringen fra startdagen (perioder.startdag) til tabellens dag,
 regnet med periodeendring som tabellen, og for «Velg dag» endringen for
 dagen. Gult bransjesymbol er fortsatt 3 av 3 paa siste boersdag.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date, timedelta
 
 from boersdag import UtenforKalenderen, er_boersdag
@@ -83,6 +83,9 @@ class Soeyler:
     dag: date | None = None
     start: date | None = None
     kortere: tuple[str, ...] = ()
+    # Gruppens svar 30.10 kl. 10:45 (VG5): indeksen har ingen kurs dagen
+    # soeylene gjelder, saa siden sier det over soeylene.
+    indeks_mangler: bool = False
 
 
 @dataclass(frozen=True)
@@ -243,27 +246,35 @@ def soeylene_for(
     grunnlag: list[tuple[Aksje, list[Kursrad], bool]],
     periode: str = SISTE,
     dag: date | None = None,
+    slutt: date | None = None,
 ) -> Soeyler | None:
     """Soeylene for perioden eller dagen i oversikten - story 8.17a. serie
-    er indeksen. Siste boersdag gir soeylene for indeksens dato, som foer;
-    en periode gir endringen fra startdagen, regnet fra indeksens dato; og
-    «Velg dag» endringen den dagen, med indeksens endring for dagen."""
-    siste = serie[-1].dato
-    if periode == VELG and dag is not None:
-        foer = [rad for rad in serie if rad.dato <= dag]
-        indeks = indeksendring(foer) if foer and foer[-1].dato == dag else None
-        return bygg_soeyler(dag, indeks, grunnlag)
+    er indeksen, og slutt er tabellens dag, siste boersdag i oversikten.
+    Siste boersdag gir soeylene for slutt, en periode endringen fra
+    startdagen til slutt, og «Velg dag» endringen den dagen. Linja er
+    indeksens endring for samme dag eller periode.
+
+    Gruppens svar 30.10 kl. 10:45 (VG5): soeylene og linja foelger tabellens
+    dag, ikke indeksens siste dato. Mangler indeksen kurs den dagen, er det
+    ingen linje, og indeks_mangler sier det. Uten slutt er det indeksens
+    siste dato."""
+    siste = slutt or serie[-1].dato
+    paa = dag if periode == VELG and dag is not None else siste
+    har_dagen = any(rad.dato == paa for rad in serie)
     if periode in (SISTE, VELG):
-        return bygg_soeyler(siste, indeksendring(serie), grunnlag)
-    # Gruppens svar 30.10 kl. 10:45 (ECH1): dagen den foerste kursen i
-    # perioden er fra, som linja over tabellen, ikke en stengt startdag.
-    beregnet = startdag(periode, siste)
-    start = foerste_kursdag((s for _, s, _ in grunnlag), beregnet, siste) or beregnet
-    utfall = periodeendring(serie, start, siste)
-    # Gjennomgangen (BH4, ECH4): begynner indeksen etter startdagen, er det
-    # ingen linje, saa linja aldri gjelder en kortere tid enn soeylene.
-    indeks = utfall[0] if utfall and utfall[1] is None else None
-    return bygg_soeyler_perioden(start, siste, indeks, grunnlag)
+        foer = [rad for rad in serie if rad.dato <= paa]
+        soeyler = bygg_soeyler(paa, indeksendring(foer) if har_dagen else None, grunnlag)
+    else:
+        # Gruppens svar 30.10 kl. 10:45 (ECH1): dagen den foerste kursen i
+        # perioden er fra, som linja over tabellen, ikke en stengt startdag.
+        beregnet = startdag(periode, siste)
+        start = foerste_kursdag((s for _, s, _ in grunnlag), beregnet, siste) or beregnet
+        utfall = periodeendring(serie, start, siste)
+        # Gjennomgangen (BH4, ECH4): begynner indeksen etter startdagen, er
+        # det ingen linje, saa linja aldri gjelder en kortere tid enn soeylene.
+        indeks = utfall[0] if utfall and utfall[1] is None else None
+        soeyler = bygg_soeyler_perioden(start, siste, indeks, grunnlag)
+    return replace(soeyler, indeks_mangler=not har_dagen) if soeyler else None
 
 
 def bygg_hovedindeks(
@@ -273,11 +284,13 @@ def bygg_hovedindeks(
     soeylegrunnlag: list[tuple[Aksje, list[Kursrad], bool]] | None = None,
     periode: str = SISTE,
     dag: date | None = None,
+    slutt: date | None = None,
 ) -> Hovedindeksvisning | None:
     """Det forsiden viser, eller None naar indeksen ikke har en eneste rad.
     soeylegrunnlag er (aksje, serie, 3 av 3) for soeylene (story 2.9b), og
     uten det er det ingen soeyler. Story 8.17a: periode og dag fra
-    periodevalget gjelder soeylene og linja, ikke verdien og «x av N»."""
+    periodevalget gjelder soeylene og linja, ikke verdien og «x av N», og
+    slutt er tabellens dag (gruppens svar 30.10 kl. 10:45, VG5)."""
     if not serie:
         return None
     siste = serie[-1]
@@ -288,5 +301,5 @@ def bygg_hovedindeks(
         verdi=float(siste.slutt),
         endring=endring,
         sammenligning=sammenlign(siste.dato, endring, aksjer),
-        soeyler=soeylene_for(serie, soeylegrunnlag, periode, dag) if soeylegrunnlag is not None else None,
+        soeyler=soeylene_for(serie, soeylegrunnlag, periode, dag, slutt) if soeylegrunnlag is not None else None,
     )

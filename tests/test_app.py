@@ -3089,20 +3089,21 @@ class TestSoeylenePaaForsiden:
         assert "YAR" not in _tickerne(figur)
         assert re.search(r"Uten søyle, mangler kursen dagen før: Yara[^.]*\.", _synlig(figur)), _synlig(figur)
 
-    def test_soeylene_er_for_indeksens_dato(self, klient):
+    def test_soeylene_er_for_tabellens_dag(self, klient):
         """Indeksen står på torsdag med en endring, og aksjene har kurs
-        fredag også. Søylene er for torsdag: 100 torsdag og onsdag gir
-        0,00 % for alle tre."""
+        fredag også. Fram til 8.17a var søylene for indeksens dato, torsdag.
+        Gruppens svar 30.10 kl. 10:45 (VG5): søylene følger tabellens dag,
+        fredag, med DNB ned, NHY 0,00 % og EQNR opp, og over søylene står
+        det at indeksen ikke har kurs fredag, så det er ingen linje."""
         self._tre_aksjer()
         _legg_inn_indeks(_indeks([(date(2026, 10, 7), 1000.0), (TORSDAG_08_10, 990.0)]))
         figur = _soeylene(klient.get("/").data.decode("utf-8"))
-        assert [k for k, _ in _stolpene(figur)] == ["null", "null", "null"]
-        # Gjennomgangen (ECH8): datoen står i overskriften, fordi tabellen er
-        # for fredag.
-        assert (
-            '<figcaption class="soeyletittel">Endring per aksje 08.10, med indeksen som stiplet linje</figcaption>'
-            in figur
-        )
+        assert [k for k, _ in _stolpene(figur)] == ["ned", "null", "opp"]
+        # Gjennomgangen (ECH8): datoen står i overskriften, fordi indeksen er
+        # for torsdag.
+        assert '<figcaption class="soeyletittel">Endring per aksje 09.10</figcaption>' in figur
+        assert "Indeksen har ingen kurs 09.10, så søylene står uten stiplet linje." in figur
+        assert 'class="indekslinje' not in figur
 
     def test_ved_390_px_deler_soeylene_bredden_uten_fast_bredde(self, klient):
         """Ved 390 px ruller ikke siden sideveis. Søylene og etikettene deler

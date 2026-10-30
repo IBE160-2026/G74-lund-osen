@@ -207,12 +207,12 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # Story 2.9b (FR-105): søylene under indeksen, i samme vindu.
         "soeylene": Hjelpetekst(
             "Søylene:",
-            "dagens endring for hver aksje med kurs samme dag som indeksen og dagen "
+            "dagens endring for hver aksje med kurs siste børsdag i tabellen og dagen "
             "før, fra størst fall til venstre til størst stigning til høyre, med null "
             "midt i feltet. Den stiplede linja er indeksens endring: grønn når den "
             "steg, rød når den falt, grå ved 0,00 % og borte når indeksen ikke har en "
             # Story 8.2a, c (U20): symbolet over søyla er en lenke.
-            "endring. Et gult bransjesymbol betyr at aksjen fikk 3 av 3 siste børsdag, "
+            "endring den dagen. Et gult bransjesymbol betyr at aksjen fikk 3 av 3 siste børsdag, "
             "og et klikk på symbolet viser aksjen.",
             (
                 (PRD, "#### FR-105 — Søylene under hovedindeksen"),
