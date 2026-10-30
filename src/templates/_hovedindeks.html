@@ -39,10 +39,10 @@
         {% if sy %}
           {%- macro fortegn(verdi) %}{% set vist = verdi|avrundet('endring') %}{{ 'opp' if vist > 0 else 'ned' if vist < 0 else 'null' }}{% endmacro %}
           <figure class="soeyler">
-            <figcaption class="soeyletittel">{% if sy.start %}Endring per aksje {{ periodenavn }}, fra {{ sy.start|dato }} til {{ sy.dag|dato }}{% elif sy.dag != hovedindeks.dato %}Endring per aksje {{ sy.dag|dato }}{% elif hovedindeks.dato != dato %}Endring per aksje {{ hovedindeks.dato|dato }}{% else %}Dagens endring per aksje{% endif %}{% if sy.linje is not none %}, med indeksen som stiplet linje{% endif %}</figcaption>
+            <figcaption class="soeyletittel">{% if sy.start %}Endring per aksje {{ periodenavn }}, fra {{ sy.start|dato }} til {{ sy.dag|dato }}{% elif sy.dag != dato %}Endring per aksje {{ sy.dag|dato }}{% else %}Dagens endring per aksje{% endif %}{% if sy.linje is not none %}, med indeksen som stiplet linje{% endif %}</figcaption>
             {#- Gruppens svar 30.10 kl. 10:45 (VG5): søylene og linja følger
                 tabellens dag, og mangler indeksen kurs den dagen, står det her. #}
-            {% if sy.indeks_mangler %}<p class="forklaring">Indeksen har ingen kurs {{ sy.dag|dato }}, så søylene står uten stiplet linje.</p>{% endif %}
+            {% if sy.indeks_mangler %}<p class="forklaring">Indeksen har ingen kurs {{ sy.dag|dato }}, så det er ingen stiplet linje.</p>{% endif %}
             {% if sy.soeyler %}
             {#- Story 8.2a, c (U20, gruppens svar 24.10 kl. 11:23): symbolet over
                 hver søyle lenker til aksjesiden, på oversikten (og i

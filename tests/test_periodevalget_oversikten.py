@@ -483,7 +483,9 @@ class TestTabellensDag:
         )
         siste = _soeylelista(klient.get("/").data.decode("utf-8"))
         uke = _soeylelista(klient.get("/?periode=1-uke").data.decode("utf-8"))
-        assert "Endring per aksje 08.10" in siste
+        # Gjennomgangen 30.10 (ECH3): søylene gjelder tabellens dag, så
+        # overskriften har ingen egen dato, og indeksens dato står ved indeksen.
+        assert "Dagens endring per aksje" in siste
         assert "Equinor (EQNR, Energi): -1,00 %." in siste
         assert "Indeksen, den stiplede linja: +4,76 %." in siste
         assert "Endring per aksje 1 uke, fra 01.10 til 08.10" in uke
@@ -513,9 +515,26 @@ class TestTabellensDag:
         assert eqnr.startswith("+37,50" if "uke" in adresse else "+11,11"), lista
         assert 'class="indekslinje' not in html
         figur = html.split('<figure class="soeyler">', 1)[1]
-        assert figur.index("Indeksen har ingen kurs 09.10, så søylene står uten stiplet linje.") < figur.index(
+        assert figur.index("Indeksen har ingen kurs 09.10, så det er ingen stiplet linje.") < figur.index(
             'class="felt"'
         )
+        assert "Ingen stiplet linje" not in lista
+
+    def test_en_valgt_dag_indeksen_ikke_har(self, klient):
+        """Gjennomgangen 30.10 (VG1, BH14): indeksen mangler onsdag 07.10.
+        Ville feilet hvis linja var indeksens endring dagen før, eller siden
+        ikke sa at indeksen mangler kurs den dagen."""
+        _basen()
+        _legg_inn_indeks(
+            _indeks(
+                [(FREDAG_02_10, 1000.0), (date(2026, 10, 6), 1000.0), (TORSDAG_08_10, 1100.0), (FREDAG_09_10, 1100.0)]
+            )
+        )
+        html = klient.get("/?periode=velg&dag=2026-10-07").data.decode("utf-8")
+        lista = _soeylelista(html)
+        assert "Endring per aksje 07.10" in lista
+        assert 'class="indekslinje' not in html
+        assert "Indeksen har ingen kurs 07.10, så det er ingen stiplet linje." in lista
         assert "Ingen stiplet linje" not in lista
 
 

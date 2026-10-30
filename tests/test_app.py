@@ -3099,10 +3099,10 @@ class TestSoeylenePaaForsiden:
         _legg_inn_indeks(_indeks([(date(2026, 10, 7), 1000.0), (TORSDAG_08_10, 990.0)]))
         figur = _soeylene(klient.get("/").data.decode("utf-8"))
         assert [k for k, _ in _stolpene(figur)] == ["ned", "null", "opp"]
-        # Gjennomgangen (ECH8): datoen står i overskriften, fordi indeksen er
-        # for torsdag.
-        assert '<figcaption class="soeyletittel">Endring per aksje 09.10</figcaption>' in figur
-        assert "Indeksen har ingen kurs 09.10, så søylene står uten stiplet linje." in figur
+        # Gjennomgangen 30.10 (ECH3): søylene gjelder tabellens dag, så
+        # overskriften har ingen egen dato. Indeksens dato står ved indeksen.
+        assert '<figcaption class="soeyletittel">Dagens endring per aksje</figcaption>' in figur
+        assert "Indeksen har ingen kurs 09.10, så det er ingen stiplet linje." in figur
         assert 'class="indekslinje' not in figur
 
     def test_ved_390_px_deler_soeylene_bredden_uten_fast_bredde(self, klient):

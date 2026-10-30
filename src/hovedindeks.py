@@ -24,7 +24,8 @@ til indekslinja regnes her, i prosent av feltet, med null midt i det og den
 stoerste endringen av soeylene og indeksen paa halve hoeyden.
 
 Story 8.17a: soeylene og linja foelger periodevalget i oversikten. For en
-periode er endringen fra startdagen (perioder.startdag) til tabellens dag,
+periode er endringen fra den foerste kursen i perioden (perioder.foerste_kursdag
+fra startdagen) til tabellens dag,
 regnet med periodeendring som tabellen, og for «Velg dag» endringen for
 dagen. Gult bransjesymbol er fortsatt 3 av 3 paa siste boersdag.
 """
@@ -247,6 +248,7 @@ def soeylene_for(
     periode: str = SISTE,
     dag: date | None = None,
     slutt: date | None = None,
+    start: date | None = None,
 ) -> Soeyler | None:
     """Soeylene for perioden eller dagen i oversikten - story 8.17a. serie
     er indeksen, og slutt er tabellens dag, siste boersdag i oversikten.
@@ -257,7 +259,9 @@ def soeylene_for(
     Gruppens svar 30.10 kl. 10:45 (VG5): soeylene og linja foelger tabellens
     dag, ikke indeksens siste dato. Mangler indeksen kurs den dagen, er det
     ingen linje, og indeks_mangler sier det. Uten slutt er det indeksens
-    siste dato."""
+    siste dato. start er dagen den foerste kursen i perioden er fra, regnet
+    av siden for linja over tabellen, saa soeylene sier den samme dagen
+    (gjennomgangen 30.10, BH3 og ECH1). Uten start regnes den her."""
     siste = slutt or serie[-1].dato
     paa = dag if periode == VELG and dag is not None else siste
     har_dagen = any(rad.dato == paa for rad in serie)
@@ -267,8 +271,9 @@ def soeylene_for(
     else:
         # Gruppens svar 30.10 kl. 10:45 (ECH1): dagen den foerste kursen i
         # perioden er fra, som linja over tabellen, ikke en stengt startdag.
-        beregnet = startdag(periode, siste)
-        start = foerste_kursdag((s for _, s, _ in grunnlag), beregnet, siste) or beregnet
+        if start is None:
+            beregnet = startdag(periode, siste)
+            start = foerste_kursdag((s for _, s, _ in grunnlag), beregnet, siste) or beregnet
         utfall = periodeendring(serie, start, siste)
         # Gjennomgangen (BH4, ECH4): begynner indeksen etter startdagen, er
         # det ingen linje, saa linja aldri gjelder en kortere tid enn soeylene.
@@ -285,6 +290,7 @@ def bygg_hovedindeks(
     periode: str = SISTE,
     dag: date | None = None,
     slutt: date | None = None,
+    start: date | None = None,
 ) -> Hovedindeksvisning | None:
     """Det forsiden viser, eller None naar indeksen ikke har en eneste rad.
     soeylegrunnlag er (aksje, serie, 3 av 3) for soeylene (story 2.9b), og
@@ -301,5 +307,5 @@ def bygg_hovedindeks(
         verdi=float(siste.slutt),
         endring=endring,
         sammenligning=sammenlign(siste.dato, endring, aksjer),
-        soeyler=soeylene_for(serie, soeylegrunnlag, periode, dag, slutt) if soeylegrunnlag is not None else None,
+        soeyler=soeylene_for(serie, soeylegrunnlag, periode, dag, slutt, start) if soeylegrunnlag is not None else None,
     )

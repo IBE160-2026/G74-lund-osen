@@ -212,7 +212,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "midt i feltet. Den stiplede linja er indeksens endring: grønn når den "
             "steg, rød når den falt, grå ved 0,00 % og borte når indeksen ikke har en "
             # Story 8.2a, c (U20): symbolet over søyla er en lenke.
-            "endring den dagen. Et gult bransjesymbol betyr at aksjen fikk 3 av 3 siste børsdag, "
+            "kurs eller endring den dagen. Et gult bransjesymbol betyr at aksjen fikk 3 av 3 siste børsdag, "
             "og et klikk på symbolet viser aksjen.",
             (
                 (PRD, "#### FR-105 — Søylene under hovedindeksen"),

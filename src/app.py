@@ -483,6 +483,7 @@ def _hovedindeks(
     valg: Valg | None = None,
     serier: dict[str, list] | None = None,
     slutt: date | None = None,
+    start: date | None = None,
 ) -> tuple[Hovedindeksvisning | None, bool]:
     """Hovedindeksen over tabellen - story 2.9, FR-104.
 
@@ -501,7 +502,8 @@ def _hovedindeks(
     Story 8.17a: soeylene og linja foelger perioden og dagen i valg, og
     seriene som alt er lest for tabellen, brukes paa nytt. slutt er
     tabellens dag, som soeylene og linja foelger (gruppens svar 30.10 kl.
-    10:45, VG5).
+    10:45, VG5), og start dagen den første kursen i perioden er fra, den
+    samme som i linja over tabellen (gjennomgangen 30.10, BH3 og ECH1).
     """
     try:
         lager = SqliteIndekslager(g.tilkobling)
@@ -518,7 +520,7 @@ def _hovedindeks(
         grunnlag = [(aksje, serie, aksje.symbol in tre_av_tre) for aksje, serie in par]
         periode = valg.periode if valg is not None else SISTE
         dag = valg.dag if valg is not None else None
-        return bygg_hovedindeks(symbol, lager.serie(symbol), aksjer, grunnlag, periode, dag, slutt), False
+        return bygg_hovedindeks(symbol, lager.serie(symbol), aksjer, grunnlag, periode, dag, slutt, start), False
     except (*BASEFEIL, ValueError):
         return None, True
 
@@ -825,7 +827,9 @@ def _tabellsiden(aktiv: str):
         if sortert is not None:
             sortert = [rad for rad in sortert if rad.aksje.symbol in merkede]
     hovedindeks, indeks_feilet = (
-        (None, False) if i_lista else _hovedindeks(leser, poster, tre_av_tre, valg, serier, sidens_siste(rader))
+        (None, False)
+        if i_lista
+        else _hovedindeks(leser, poster, tre_av_tre, valg, serier, sidens_siste(rader), periodestart)
     )
     # Story 3.4e: datoene som er «ikke vurdert» i det siden viser, én gang.
     ikke_vurdert = [rad.dato for rad in (vist if annen_dag else (*skilte_seg_ut, *oevrige)) if rad.ikke_vurdert]
