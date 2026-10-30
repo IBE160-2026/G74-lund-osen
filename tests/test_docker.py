@@ -619,7 +619,7 @@ class TestReadme:
         # Story 3.5g: tabellen staar i pila «Demoen og den ekte versjonen».
         # Gruppens svar 28.10 kl. 11:19 og 11:23 (e): tabellen staar oeverst,
         # og avsnittet i pila.
-        topp = _seksjon("Demoen og den ekte versjonen") + _tabellen()
+        topp = _seksjon(VELG_VEI_PIL) + _tabellen()
         assert "Første gang før kl. 22 henter den forrige børsdag, så du ser kursene og signalet med en gang." in topp
         assert "er demoen veien for å se appen med en gang" not in topp
         klar = [l for l in topp.splitlines() if l.startswith("| Klar |")]
@@ -1589,13 +1589,18 @@ def _pilene(tekst: str) -> list[tuple[str, str]]:
     return pilene
 
 
+# Story 3.5h (gruppens svar 29.10 kl. 19:36, b, BH7): pila under stegene het
+# «Demoen og den ekte versjonen», som tabellen oeverst. Tabellen beholder
+# navnet. Innholdet i pila er uendret, saa avtrykket under er det samme.
+VELG_VEI_PIL = "Velg vei: dobbeltklikk, Docker eller uv"
+
 # Story 3.5g (gruppens svar 26.10 kl. 23:00): alt i «Kom i gang» utenom de fem
 # stegene og de to linjene under staar bak disse pilene, i denne rekkefoelgen.
 # Pilene til demoen og den ekte versjonen staar rett etter Docker, med
 # advarselen mot down -v under, og ikke inni pila til Docker, saa ankrene i
 # <summary> synes (spesifikasjonen 3.5g).
 PILENE_I_KOM_I_GANG = (
-    "Demoen og den ekte versjonen",
+    VELG_VEI_PIL,
     "Du trenger",
     "Med Docker Desktop",
     "Demoen: anbefalt for faglærer og sensor, uten nøkkel",
@@ -2921,9 +2926,7 @@ class TestReadmeDemoenAnbefales:
         # én setning, anbefalingen, og resten av avsnittet staar først i pila
         # «Demoen og den ekte versjonen».
         assert foerste == anbefalingen, foerste
-        assert _seksjon("Demoen og den ekte versjonen").startswith(
-            "Den ekte versjonen er for å prøve løsningen med kurser fra EODHD."
-        )
+        assert _seksjon(VELG_VEI_PIL).startswith("Den ekte versjonen er for å prøve løsningen med kurser fra EODHD.")
         # «anbefal» står bare i den ene setningen, i hele README-en og i
         # hjelpen. Fra 3.3h også i pila til demoen, og hjelpen har ingen
         # daterte linjer lenger (gjennomgangen av 3.3h, BH12). Story 3.5f:
@@ -3194,7 +3197,7 @@ AVTRYKK_I_PILENE = {
 # versjonen» og står øverst, og pila til Docker lenker dit. Var d9bc0617...
 # og 44485fc5....
 AVTRYKK_I_KOM_I_GANG = {
-    "Demoen og den ekte versjonen": "aa69940997c10246503b38bad1da10dc53afea965745fefbd33e75eaea4e23b4",
+    VELG_VEI_PIL: "aa69940997c10246503b38bad1da10dc53afea965745fefbd33e75eaea4e23b4",
     "Du trenger": "edb9feeacf0f246bf416ab859f08e196d6ec92a0a44e8da9e371325c9680917b",
     "Med Docker Desktop": "bed9f253f46f680c10ff969a60a0e2ce0508da9bcec668598c343994331c3453",
     "Uten Docker, med uv": "2efeb5262b38f15a7fa04bc9715e149cbd053c7c45c193c9e0c048bab02dfc13",
@@ -3631,6 +3634,22 @@ class TestHovedveien:
         assert lenke in dict(_pilene(_kom_i_gang()))["Med Docker Desktop"]
         assert tekst.count('<a name="demoen-og-den-ekte-versjonen"></a>') == 1
 
+    def test_pila_og_tabellen_har_hvert_sitt_navn(self):
+        """Story 3.5h (gruppens svar 29.10 kl. 19:36, b, BH7): pila under
+        stegene heter «Velg vei: dobbeltklikk, Docker eller uv», og tabellen
+        øverst beholder «Demoen og den ekte versjonen». Ville feilet hvis pila
+        og tabellen fikk samme navn, pila het noe annet, eller lenken til
+        tabellen brøt."""
+        tekst = README.read_text(encoding="utf-8")
+        navnene = [navn for navn, _ in _pilene(_kom_i_gang())]
+        assert navnene[0] == VELG_VEI_PIL == "Velg vei: dobbeltklikk, Docker eller uv", navnene
+        assert "Demoen og den ekte versjonen" not in navnene
+        assert tekst.count("<summary>Demoen og den ekte versjonen</summary>") == 0
+        assert tekst.count("**Demoen og den ekte versjonen:**") == 1
+        assert _alle_ankrene(tekst).count("demoen-og-den-ekte-versjonen") == 1
+        # Pila begynner rett etter de fem stegene og de tre linjene under.
+        assert "**Linux:**" in tekst.split(f"<summary>{VELG_VEI_PIL}</summary>", 1)[0].split("### Enklest", 1)[1]
+
     def test_hvert_steg_under_staar_du_fast_sier_hvilken_vei(self):
         """Gruppens svar 27.10 kl. 06:09, b (ECH7 i triagen til 3.5g): hver
         henvisning til et steg under «Står du fast?» sier hvilken vei den
@@ -3752,7 +3771,7 @@ class TestHovedveien:
         # Story 3.5g: lista står under tabellen i pila «Demoen og den ekte
         # versjonen», og «Du trenger» i pila etter. Svarene 28.10 kl. 11:19
         # og 11:23 (e): tabellen står øverst, og lista står i pila.
-        topp = _seksjon("Demoen og den ekte versjonen")
+        topp = _seksjon(VELG_VEI_PIL)
         assert "| Klar |" not in topp and "**Velg vei etter hva du har:**" in topp
         assert "| Klar |" in _tabellen()
         assert _seksjon("Du trenger").startswith("**Du trenger**")

@@ -58,7 +58,7 @@ Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og v
 **Linux:** bruk [Docker](#med-docker-desktop) eller [uv](#uten-docker-med-uv), under.
 
 <details>
-<summary>Demoen og den ekte versjonen</summary>
+<summary>Velg vei: dobbeltklikk, Docker eller uv</summary>
 
 Den ekte versjonen er for å prøve løsningen med kurser fra EODHD. Begge versjonene har samme kode. Den ekte versjonen henter dagens kurser først etter kl. 22 på en børsdag. Første gang før kl. 22 henter den forrige børsdag, så du ser kursene og signalet med en gang. Demoen står først i stegene for Docker og uv, fordi den er raskest.
 
