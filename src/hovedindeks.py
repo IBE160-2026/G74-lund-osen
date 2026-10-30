@@ -92,11 +92,13 @@ class Soeyler:
 @dataclass(frozen=True)
 class Hovedindeksvisning:
     """Det forsiden viser om indeksen. endring er i prosent, uavrundet, og
-    None naar den ikke kan regnes. sammenligning er None naar den ikke vises."""
+    None naar den ikke kan regnes. sammenligning er None naar den ikke vises.
+    Story 8.17a (gruppens svar 30.10 kl. 12:21, e): dato er tabellens dag, og
+    verdi er None naar indeksen ikke har kurs den dagen."""
 
     symbol: str
     dato: date
-    verdi: float
+    verdi: float | None
     endring: float | None
     sammenligning: Sammenligning | None
     soeyler: Soeyler | None = None
@@ -295,17 +297,24 @@ def bygg_hovedindeks(
     """Det forsiden viser, eller None naar indeksen ikke har en eneste rad.
     soeylegrunnlag er (aksje, serie, 3 av 3) for soeylene (story 2.9b), og
     uten det er det ingen soeyler. Story 8.17a: periode og dag fra
-    periodevalget gjelder soeylene og linja, ikke verdien og «x av N», og
-    slutt er tabellens dag (gruppens svar 30.10 kl. 10:45, VG5)."""
+    periodevalget gjelder soeylene og linja, og slutt er tabellens dag
+    (gruppens svar 30.10 kl. 10:45, VG5).
+
+    Gruppens svar 30.10 kl. 12:21 (e): hele delen foelger tabellens dag,
+    ogsaa verdien, endringen og «x av N»: slutt, eller dagen for «Velg dag».
+    Uten slutt er det indeksens siste dato. Mangler indeksen kurs den dagen,
+    er verdien None, og siden sier det der tallet ellers staar."""
     if not serie:
         return None
-    siste = serie[-1]
-    endring = indeksendring(serie)
+    vist = dag if periode == VELG and dag is not None else (slutt or serie[-1].dato)
+    foer = [rad for rad in serie if rad.dato <= vist]
+    paa_dagen = foer[-1] if foer and foer[-1].dato == vist else None
+    endring = indeksendring(foer) if paa_dagen else None
     return Hovedindeksvisning(
         symbol=symbol,
-        dato=siste.dato,
-        verdi=float(siste.slutt),
+        dato=vist,
+        verdi=float(paa_dagen.slutt) if paa_dagen else None,
         endring=endring,
-        sammenligning=sammenlign(siste.dato, endring, aksjer),
+        sammenligning=sammenlign(vist, endring, aksjer),
         soeyler=soeylene_for(serie, soeylegrunnlag, periode, dag, slutt, start) if soeylegrunnlag is not None else None,
     )

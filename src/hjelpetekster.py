@@ -194,10 +194,11 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # Story 2.9 (FR-104): delen over tabellen.
         "hovedindeksen": Hjelpetekst(
             "Hovedindeksen:",
-            "verdien siste børsdag indeksen har, og endringen i prosent fra "
+            # Story 8.17a (gruppens svar 30.10 kl. 12:21, e): tabellens dag.
+            "verdien den dagen tabellen viser, og endringen i prosent fra "
             "børsdagen før. «Gikk bedre» teller aksjene med kurs samme dag "
             "som hadde større endring enn indeksen, slik tallene vises, og "
-            "lik teller ikke.",
+            "lik teller ikke. Mangler indeksen kurs den dagen, står det i stedet for tallet.",
             (
                 (PRD, "#### FR-104 — Hovedindeksen i markedsoversikten"),
                 (PRD, "«Bedre» avgjøres på endringen slik den vises, og lik er ikke bedre."),

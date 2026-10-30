@@ -538,6 +538,50 @@ class TestTabellensDag:
         assert "Ingen stiplet linje" not in lista
 
 
+def _indekstallet(html: str) -> str:
+    """Den synlige teksten i linja med tallet over søylene."""
+    return _synlig(re.search(r'<p class="indekstall">(.*?)</p>', html, re.DOTALL).group(1))
+
+
+class TestTalletOverSoeylene:
+    """Gruppens svar 30.10 kl. 12:21 (e): hele delen med hovedindeksen
+    følger tabellens dag, også tallet over søylene."""
+
+    def test_indeksen_en_dag_foran_tabellen(self, klient):
+        """Aksjene slutter torsdag 08.10, indeksen fredag 09.10 (1210). Tallet
+        er 1 100,00 for 08.10, med +4,76 % mot 07.10 (1050), og «x av N» for
+        08.10, der begge aksjene gikk 99 mot 100, -1,00 %, dårligere enn
+        indeksen. Ville feilet hvis tallet, endringen eller «x av N» fulgte
+        indeksens siste dag: 1 210,00, +10,00 % og 09.10."""
+        hentet = datetime.fromisoformat(HENTET)
+        skriv_serie("EQNR", _eqnr()[:-1], hentet, vurdert=False)
+        skriv_serie("DNB", _eqnr()[:-1], hentet, vurdert=False)
+        _legg_inn_indeks(_indeks([(ONSDAG_07_10, 1050.0), (TORSDAG_08_10, 1100.0), (FREDAG_09_10, 1210.0)]))
+        html = klient.get("/").data.decode("utf-8")
+        tallet = _indekstallet(html)
+        assert tallet == "1 100,00 +4,76 %", tallet
+        assert 'class="indeksdato"' not in html
+        assert "0 av 2 gikk bedre enn indeksen." in _synlig(html)
+
+    def test_indeksen_en_dag_bak_tabellen(self, klient):
+        """Aksjene slutter fredag 09.10, indeksen torsdag 08.10. Ville
+        feilet hvis tallet var torsdagens, eller siden ikke sa at indeksen
+        mangler kurs fredag der tallet ellers står."""
+        _basen()
+        _legg_inn_indeks(_indeks([(ONSDAG_07_10, 1050.0), (TORSDAG_08_10, 1100.0)]))
+        html = klient.get("/?periode=1-uke").data.decode("utf-8")
+        assert _indekstallet(html) == "Indeksen har ingen kurs 09.10."
+        assert "gikk bedre enn indeksen" not in _synlig(html)
+
+    def test_en_valgt_dag_gir_tallet_den_dagen(self, klient):
+        """«Velg dag» onsdag 07.10: 1 050,00 og +5,00 % mot tirsdag (1000),
+        med datoen ved tallet. Ville feilet hvis tallet var for siste
+        børsdag (1 100,00 og 0,00 %)."""
+        _basen(med_indeks=True)
+        html = klient.get("/?periode=velg&dag=2026-10-07").data.decode("utf-8")
+        assert _indekstallet(html) == "1 050,00 07.10 +5,00 %", _indekstallet(html)
+
+
 class TestAdressen:
     def test_siste_boersdag_er_valgt_naar_siden_aapnes(self, klient):
         """Designregler §2. Ville feilet hvis oversikten åpnet med 6 mnd som

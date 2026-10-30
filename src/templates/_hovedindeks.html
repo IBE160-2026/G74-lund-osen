@@ -14,12 +14,18 @@
     <section class="hovedindeks" aria-labelledby="hovedindeks-tittel">
       <h2><span id="hovedindeks-tittel">Hovedindeksen</span>{% if hovedindeks %} <span class="indekssymbol">{{ hovedindeks.symbol }}</span>{% endif %} {{ hjelpeknapp("hjelp-hovedindeks", "Hjelp: hovedindeksen") }}</h2>
       {% if hovedindeks %}
+        {#- Story 8.17a (gruppens svar 30.10 kl. 12:21, e): hele delen følger
+            tabellens dag. Mangler indeksen kurs den dagen, står det her. #}
+        {% if hovedindeks.verdi is none %}
+        <p class="indekstall"><span class="mangler-kurs">Indeksen har ingen kurs {{ hovedindeks.dato|dato }}.</span></p>
+        {% else %}
         <p class="indekstall"><span class="indeksverdi">{{ hovedindeks.verdi|tall('kurs') }}</span>
           {%- if hovedindeks.dato != dato %} <span class="indeksdato">{{ hovedindeks.dato|dato }}</span>{% endif %}
           {%- if hovedindeks.endring is not none %}
             {%- set vist = hovedindeks.endring|avrundet('endring') %}
             <span class="indeksendring{{ ' opp' if vist > 0 else ' ned' if vist < 0 else '' }}">{{ hovedindeks.endring|tall('endring') }}</span>
           {%- else %} <span class="mangler-endring">Endringen vises ikke: indeksen mangler børsdagen før.</span>{% endif %}</p>
+        {% endif %}
         {% set s = hovedindeks.sammenligning %}
         {% if s %}
           <p class="bedre"><strong>{{ s.bedre }} av {{ s.med }}</strong> gikk bedre enn indeksen.</p>
