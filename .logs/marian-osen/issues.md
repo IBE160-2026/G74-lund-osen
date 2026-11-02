@@ -48,3 +48,5 @@
 - [ ] 2026-10-30 [periodevalget-i-oversikten](990-2026-10-30-01-20-08-periodevalget-i-oversikten.md) — 8.17a f: avvik fra én dag per side (rader med eldre data, endringen ved en periode til radens egen dag, aksjesidens egen dag og indekslinja i grafen), slått opp uten endring
 - [ ] 2026-11-02 [kontroll-av-kveldskjoeringene](988-2026-11-02-17-43-40-kontroll-av-kveldskjoeringene.md) — Windows Update står på pause fra 30.10 kl. 12:23 til 06.11 kl. 12:22; etter det kan oppdateringer starte PC-en på nytt
 - [ ] 2026-11-02 [kontroll-av-kveldskjoeringene](988-2026-11-02-17-43-40-kontroll-av-kveldskjoeringene.md) — Docker Desktop har kjørt siden 30.10 kl. 13:59, så jobbens start og stopp av Docker Desktop er ikke prøvd etter 29.10
+- [ ] 2026-11-02 [gjennomgang-av-prd-en-foer-fristen](986-2026-11-02-21-52-13-gjennomgang-av-prd-en-foer-fristen.md) — rettingen av prd.md onsdag 4.11 etter svarene på de 11 spørsmålene i gjennomgangen
+- [ ] 2026-11-02 [gjennomgang-av-prd-en-foer-fristen](986-2026-11-02-21-52-13-gjennomgang-av-prd-en-foer-fristen.md) — sprint-status.yaml henger etter: 2.13 review (flettet), 9.5 backlog (utgår), 2.3c, 2.3d og 3.5a–h mangler
