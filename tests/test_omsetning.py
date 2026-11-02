@@ -567,6 +567,14 @@ def _skjema_og_rader(tilkobling: sqlite3.Connection) -> dict[str, object]:
     return ut
 
 
+def _paragraf(tekst: str, nummer: int) -> str:
+    """§nummer i malinger.md, fram til neste «## » eller slutten av fila, saa
+    en ny § etter ikke telles med (svaret 03.11 kl. 00:40)."""
+    start = tekst.index(f"\n## {nummer}.")
+    slutt = tekst.find("\n## ", start + 1)
+    return tekst[start : slutt if slutt != -1 else None]
+
+
 def test_de_214_er_de_samme_som_i_malinger():
     """MAALT_I_MALINGER er «Maalt i» i «Alle 206, rangert» i §50 og tabellene i
     §51 og §52, med datoen i overskriften til paragrafen."""
@@ -575,13 +583,14 @@ def test_de_214_er_de_samme_som_i_malinger():
         int(m.group(1)): date.fromisoformat(m.group(2))
         for m in re.finditer(r"^## (\d+)\. .*\((\d{4}-\d{2}-\d{2})\)\s*$", tekst, re.M)
     }
-    rangert = tekst[tekst.index("### Alle 206, rangert") : tekst.index("\n## 51.")]
+    del50 = _paragraf(tekst, 50)
+    rangert = del50[del50.index("### Alle 206, rangert") :]
     fra_tekst = {
         m.group(1): int(m.group(2))
         for m in re.finditer(r"^\| \d+ \| ([A-Z0-9]+) \| [^|]+\| [^|]+\| [^|]+\| [^|]+\| §(\d+) \|", rangert, re.M)
     }
-    for paragraf, slutt in ((51, "\n## 52."), (52, None)):
-        del_ = tekst[tekst.index(f"\n## {paragraf}.") : tekst.index(slutt) if slutt else None]
+    for paragraf in (51, 52):
+        del_ = _paragraf(tekst, paragraf)
         fra_tekst |= {m.group(1): paragraf for m in re.finditer(r"^\| ([A-Z0-9]+) \| [^|]+\| \d+ \|", del_, re.M)}
     assert len(fra_tekst) == 214
     assert {s: (p, datoer[p]) for s, p in fra_tekst.items()} == {
