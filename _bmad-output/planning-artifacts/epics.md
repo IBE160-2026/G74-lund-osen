@@ -2035,6 +2035,8 @@ overs, så lista kan vise den før noen velger en aksje.
 
 *Avgjort 2026-10-30 kl. 10:45 (gruppens svar):* d) Tellingen i §5 i `docs/kvalitetssikring.md` står som ført: 56 rader, 29 rettet, 9 avvist og 8 utsatt, og de 10 radene som ikke står i noen kolonne, er forklart i linja fra 29.10 under tabellen.
 
+*Lagt til 2026-11-03:* den første ukas § er skrevet: §53 i `malinger.md`, med de 48 radene i `omsetning` fra 29.10 til 01.11 (svaret 28.10 kl. 23:36, g), i `2abc02c4`. Alle 48 har et annet vindu enn §50–§52, og 0 har feil. `tests/test_omsetning.py` leser nå hver § fram til neste «## », så en ny § ikke telles med (`58382ffb`, svaret 03.11 kl. 00:40). De 4 radene fra 02.11 hører til neste §.
+
 ### Story 2.14: Eks.datoer føres inn for hånd
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
