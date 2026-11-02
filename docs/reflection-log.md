@@ -3059,7 +3059,11 @@ Kl. 12:21 svarte vi på det som sto igjen. Instruksjonen for 8.17a videre stoppe
 
 Så kom 8.17a videre på grenen, fra kl. 13:10 til 13:55: svaret kl. 12:21 i `e51b229f`, main med 3.5h flettet inn i `4cc2b986`, e) tallet over søylene i `a0868573`, f) Rettet-linja under FR-105 i `37b7ed66`, og rettingene etter gjennomgangen i `9537f188`, med CI grønn (41058583275). Hele settet ble kjørt før hver commit som endret `src/` eller `tests/`, og bare de 7 porttestene feilet. PR #106 står som utkast. Før flettingen må gruppen se over tolkningen av FR-104 og FR-105 og avgjøre avvikene Claude Code fant i oversikten, Min liste og aksjesiden.
 
+*Rettet 2026-11-02:* instruksjonen kl. 12:21 heter «8.17a siste rettinger», ikke «8.17a videre». «8.17a videre» var instruksjonen kl. 10:55. Det gjelder begge avsnittene over.
+
 Fra kl. 12:00 fredag til mandag kveld var gruppen borte, og PC-en sto på uten oppsyn. Kontrollen 02.11 kl. 17:40 fant 12 kjøringer av jobben 30.10–01.11, alle med kode 0 og ingen linjer med FEIL eller STOPP. Hentingen fredag kl. 22:16 ga 15 vurderinger og 15 KI-tekster som besto kontrollen, og målingen la 4, 20 og 20 rader i `omsetning` for 30.10, 31.10 og 01.11.
+
+*Rettet 2026-11-02:* kl. 12:00 var planen i instruksjonen kl. 10:55. Gruppen svarte kl. 12:21 og 13:09, og den siste commiten fredag er `95673e07` kl. 13:56, så PC-en sto uten oppsyn først fra fredag ettermiddag.
 
 **Utfordringer**
 
