@@ -3014,6 +3014,79 @@ Det vi lærte: en test skal styre det den er avhengig av. Testen for jobben var 
 
 ---
 
+## 29.10.2026 – Porttester som feilet lokalt, jobben av seg selv, og 2.13 flettet kl. 23:50
+
+*Joakim og Marian.*
+
+Kl. 09:20 svarte vi på de to spørsmålene om 2.13 fra gjennomgangen: fra kl. 23:45 går målingen uansett hvor mange av de 15 som mangler kursen, og starter den etter midnatt, venter den som nå. Svaret ble ført under story 2.13 i `5b05db38` kl. 10:28 og i spesifikasjonen på grenen i `2d0ea174`. Samme svar sa at 8.17a bygges etter refleksjonen for 28.10, men den delen ble ikke ført før 30.10, se oppføringen under. Oppføringen for 28.10 kom kl. 11:06 (`879ea7b9`). Kl. 19:36 svarte vi om «Til faglærer» i README-en og de tre åpne punktene fra 3.5g. Det svaret ble ført 30.10 kl. 12:25 i `acc5b0e8`, i første steg av 3.5h.
+
+Resten av dagen gikk til testblokkene for 2.13. Instruksjonen kl. 11:35 skulle legge til testen for at målingen går fra kl. 23:45 også når alle 15 mangler, men stoppet kl. 11:48 fordi hele settet ga 7 feil i `tests/test_dobbeltklikk.py`. Blokka kl. 19:36 fant de samme feilene på main, og etter svaret kl. 19:49 startet vi PC-en på nytt kl. 19:59:48. Feilen sto fortsatt i blokka kl. 20:02. Kl. 21:02 avgjorde vi at CI avgjør de 7 porttestene til feilen er rettet (`db5127e1`), se utfordring 1. Da ga hele settet bare de 7 feilene, og testen `test_gaar_fra_23_45_ogsaa_naar_alle_15_mangler` kom på grenen i `7c743d30` kl. 21:16, med Rettet-linja ved ECH5 i `63707d37`. CI var grønn på head-en (40947549000).
+
+Kl. 22:15 kjørte jobben for første gang av seg selv. Loggen har fire kjøringer, kl. 22:15:01–22:16:26, 22:45, 23:15 og 23:45, alle uten linjer med feil, og KI-tekstene kom fra den lokale modellen. Hentingen brukte 16 kall, så 4 var igjen.
+
+Kl. 23:50:38 ble 2.13 squash-flettet i `676fbc8b` (PR #105), etter jobbens siste kjøring kl. 23:45 og før midnatt, som avgjort 28.10 kl. 23:22. Rett før ble basen kopiert til `data/db/ose-foer-2-13-2026-10-29.db`, med samme sha256 som basen. Målingen for hånd gikk kl. 23:50:50–23:51:03 med kode 0 og de 4 kallene som var igjen, for HGSB, HKY, HPUR og HSPG. Basen fikk versjon 8. Spesifikasjonen ble done i `1cfc86f9`, og linja under story 2.13 kom i `0941bea1`, begge kl. 23:52.
+
+**Utfordringer**
+
+1. **Porttester som feilet lokalt av en grunn utenfor koden.**
+   *Problem:* `test_start_ps1_stopper_bare_den_andre_versjonen_paa_porten` og `test_start_ps1_frigjoer_porten_rett_foer_webserveren` i `tests/test_dobbeltklikk.py` feilet lokalt i 7 tilfeller, også på main og etter omstarten. `Get-NetTCPConnection -State Listen` så ikke en Python-lytter på 127.0.0.1:8000, og `netstat -ano` viste den som `FIN_WAIT_1`. Windows-oppdateringen KB5127936 ble installert 29.10, og hele settet var grønt lokalt 28.10 kl. 23:50–00:12. At oppdateringen er årsaken, er ikke bevist. Regelen «ingen commit mens en test feiler» stoppet tre blokker på rad.
+   *Løsning:* svaret kl. 21:02, ført rett under avsnittet om testene for dokumentene i `docs/kvalitetssikring.md` (`db5127e1`): til feilen er rettet, regnes hele settet lokalt som grønt når bare disse 7 feiler, og CI må være grønn på head-en. Feilen skulle undersøkes mandag, og punktet står fortsatt åpent i `.logs/marian-osen/issues.md`.
+   *KI sin rolle:* Claude Code stoppet kl. 11:48, 19:43 og 20:06 i stedet for å committe, og fant at feilen også var på main, så den kom ikke fra 2.13. Gruppen avgjorde omstarten kl. 19:49 og regelen kl. 21:02.
+
+2. **En migrasjon som ikke kan flettes mens jobben kjører gammel kode.**
+   *Problem:* jobben kjører commiten fra midnatt og nekter en base som er nyere enn koden. 2.13 har migrasjonen `0008_omsetning.sql`. Flettes den om dagen, kan webserveren fra hovedkopien migrere basen samme dag, og jobben stopper samme kveld.
+   *Løsning:* flettingen kl. 23:50, etter jobbens siste kjøring (svaret 28.10 kl. 23:22), med kopien av basen før og grenen i en egen worktree (regel 22). «Eller om dagen» i triagen fikk en Rettet-linje ved ECH5 i `63707d37`, og oppføringen 28.10 en Avklart-linje i `2eb10f19`.
+   *KI sin rolle:* Edge Case Hunter fant faren mens jobben går (ECH5). At rådet i chatten fant den om dagen, står bare i instruksjonene kl. 19:36, 20:02 og 21:03. Gruppen valgte tidspunktet.
+
+3. **En kontrollblokk som manglet.**
+   *Problem:* steg 0 i instruksjonen kl. 23:10 krevde en Utført-linje for kontrollblokka for hentingen 29.10, men den blokka var aldri skrevet.
+   *Løsning:* Claude Code stoppet kl. 23:10. Svaret kl. 23:12: steg 0 gjelder uten blokka, fordi kursene, vurderingene, KI-tekstene, kvoten og jobben alt var sjekket, og resten av kontrollen tas fredag morgen. Den ble gjort 30.10 i steg 2 kl. 10:55.
+   *KI sin rolle:* rådet i chatten skrev en forutsetning som ikke fantes. Claude Code fant det i steg 0. Gruppen avgjorde.
+
+Det vi lærte: en test som feiler av en grunn utenfor koden, avgjøres med en regel som er ført, ikke ved å se bort fra den. Regelen kl. 21:02 sier hvilke 7 tilfeller det gjelder, og at CI må være grønn. Det som går hver kveld, avgjør når en migrasjon kan flettes, og en kopi av basen tas før. Og steg 0 fanger forutsetninger som ikke stemmer, også når det er en blokk som aldri ble skrevet.
+
+---
+
+## 30.10.2026 – 8.17a natt til fredag, 3.5h flettet, og PC-en uten oppsyn
+
+*Joakim og Marian.*
+
+Kl. 00:10 kom instruksjonen for 8.17a, periodevalget i oversikten. Den stoppet før steg 1 fordi svaret 29.10 kl. 09:20 om 8.17a ikke fantes i repoet, se utfordring 1. Etter bekreftelsen kl. 00:12 ble svaret ført i `afd08c5f`, og 8.17a ble bygget fra kl. 00:16 til 01:20 i PR #106: spesifikasjonen i `a46f0187`, a, b og c i `8bd801fe`, `635205ec` og `4e40a33e`, og rettingene etter gjennomgangen i `d355ceec`. De tre mutantene ble fanget, og CI var grønn (40978782787). PR-en stoppet før flettingen, med ECH1 og VG5 som spørsmål til gruppen.
+
+Kl. 10:45 svarte vi på dem, ført i `0d7f3ec9`: linja over tabellen sier dagen den første kursen er fra, søylene og indekslinja følger tabellens dag, og 390 px får en automatisk test. Blokka kl. 10:55 kontrollerte også jobben: fire kjøringer 29.10, alle med kode 0, og Windows Update sto ikke på pause. Punktene a, b og c kom på grenen i `16c68b1d`, `3aa2d80d` og `9c8bda28`, og rettingene etter gjennomgangen i `f583503a`, med CI grønn (41044941912).
+
+Kl. 12:21 svarte vi på det som sto igjen. Instruksjonen for 8.17a videre stoppet kl. 12:23 fordi 3.5h ikke var kjørt, se utfordring 3, og 3.5h ble kjørt først. 3.5h gjorde «Til faglærer» i README-en til fire punkter med alle de 16 lenkene, etter svaret 29.10 kl. 19:36, og ble squash-flettet kl. 12:55:58 i `a3e60577` (PR #107).
+
+Så kom 8.17a videre på grenen, fra kl. 13:10 til 13:55: svaret kl. 12:21 i `e51b229f`, main med 3.5h flettet inn i `4cc2b986`, e) tallet over søylene i `a0868573`, f) Rettet-linja under FR-105 i `37b7ed66`, og rettingene etter gjennomgangen i `9537f188`, med CI grønn (41058583275). Hele settet ble kjørt før hver commit som endret `src/` eller `tests/`, og bare de 7 porttestene feilet. PR #106 står som utkast. Før flettingen må gruppen se over tolkningen av FR-104 og FR-105 og avgjøre avvikene Claude Code fant i oversikten, Min liste og aksjesiden.
+
+Fra kl. 12:00 fredag til mandag kveld var gruppen borte, og PC-en sto på uten oppsyn. Kontrollen 02.11 kl. 17:40 fant 12 kjøringer av jobben 30.10–01.11, alle med kode 0 og ingen linjer med FEIL eller STOPP. Hentingen fredag kl. 22:16 ga 15 vurderinger og 15 KI-tekster som besto kontrollen, og målingen la 4, 20 og 20 rader i `omsetning` for 30.10, 31.10 og 01.11.
+
+**Utfordringer**
+
+1. **En instruksjon som siterte et svar før det var ført.**
+   *Problem:* instruksjonen kl. 00:10 skulle føre «Avgjort 2026-10-29 kl. 09:20» om 8.17a under story 8.17, men svaret fantes ikke i repoet. Svaret 09:20 som ble ført 29.10 (`5b05db38`), gjaldt bare 2.13.
+   *Løsning:* Claude Code stoppet før steg 1. Bekreftelsen kl. 00:12 sa hva gruppen svarte kl. 09:20, og at svaret skulle føres i denne instruksjonen. Det ble ført med en linje om at byggingen startet 30.10 etter midnatt (`afd08c5f`).
+   *KI sin rolle:* rådet i chatten skrev svaret inn i instruksjonen uten å føre det først. Claude Code fant at det manglet (regel 3). Gruppen bekreftet ordlyden.
+
+2. **Commits laget mens tre tester feilet.**
+   *Problem:* i blokka kl. 10:55 ble a og b committet uten at `tests/test_docker.py` var kjørt. Hele settet kl. 11:19–11:29 ga 10 feil: de 7 porttestene og 3 i `tests/test_docker.py`, fordi avtrykkene bak README-bildene ikke var oppdatert. Det var i strid med steg 5.
+   *Løsning:* rettet i `c4cc3cd6` kl. 11:31, med bildene tatt på nytt. Den første CI-kjøringen på grenen etter `d355ceec` er på `c4cc3cd6` (41042643003), så commitene ble ikke pushet før rettingen. Instruksjonen kl. 12:21 la til at hele settet kjøres før hver commit som endrer `src/` eller `tests/`, og det ble gjort tre ganger.
+   *KI sin rolle:* Claude Code laget commitene og fant feilen selv i hele settet, og skrev bruddet i Utført-linja. Instruksjonen kl. 12:21 fra gruppen skjerpet regelen.
+
+3. **To blokker limt inn i feil rekkefølge.**
+   *Problem:* instruksjonen kl. 12:21 for 8.17a krevde at 3.5h hadde Utført-linje, men 3.5h var ikke kjørt. At rådet i chatten sendte de to på en gang, står bare i instruksjonen 02.11 kl. 21:22. Mens 3.5h ble kjørt og flettet, svarte gruppen kl. 12:24 at 3.5h tas mandag, et svar som ikke lenger kunne følges.
+   *Løsning:* steg 0 stoppet kl. 12:23 uten endringer. Etter flettingen ble tre valg lagt fram, og kl. 13:09 valgte gruppen å fortsette med main som den var, så 3.5h kom med i flettingen inn i grenen.
+   *KI sin rolle:* rådet i chatten sendte begge blokkene. Claude Code stoppet i steg 0, og fant etterpå at svaret kl. 12:24 kom for sent. Gruppen avgjorde kl. 13:09.
+
+4. **PC-en uten oppsyn.**
+   *Problem:* jobben skal gå hver kveld mens ingen ser på. Kontrollen 02.11 fant at Windows Update står på pause fra 30.10 kl. 12:23 til 06.11 kl. 12:22, men ikke ved kontrollen 30.10 kl. 10:54, og at Docker Desktop har kjørt siden 30.10 kl. 13:59:50. Jobbens start og stopp av Docker Desktop er derfor ikke prøvd etter 29.10. Hvem som satte pausen, er ikke slått opp.
+   *Løsning:* alle 12 kjøringene gikk med kode 0, og to punkter står åpne i `.logs/marian-osen/issues.md`.
+   *KI sin rolle:* Claude Code leste av oppgaven, loggene, basen og Windows Update kl. 17:40 02.11 uten å endre noe. Gruppen må avgjøre punktene.
+
+Det vi lærte: en avgjørelse føres i repoet før den siteres. Svaret kl. 09:20 fantes bare i chatten, og blokka stoppet midt på natta. Hele settet kjøres før hver commit som endrer kode eller tester, ikke bare filene vi tror er berørt. Én blokk sendes om gangen, fordi steg 0 i den neste regner med at den forrige er ført. Og en PC uten oppsyn må kontrolleres etterpå: det som er endret på den, som pausen i Windows Update, ser vi bare når vi slår det opp.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
