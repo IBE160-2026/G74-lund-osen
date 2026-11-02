@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-11-02T21:43
+updated: 2026-11-02T21:51
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -495,6 +495,8 @@ allerede i repoet. *Skrevet 22.09, bevart:* spørsmålet ble stilt i loggen 20.0
 og stilt på nytt i Teams 22.09.
 
 *Lagt til 2026-11-02:* faglærer skriver på emnesiden 2.11: «Det er fint om alle prøver å bli ferdige med PRD-filen innen torsdag 5. november 2026.» Kilden er emnesiden, gjengitt av Marian 2.11 kl. 21:16. Gruppens svar kl. 21:18: PRD-en leses først og rettes onsdag 4.11.
+
+*Lagt til 2026-11-02:* gjennomgangen før rettingen står i [gjennomganger/gjennomgang-2026-11-02-foer-fristen.md](../_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/gjennomganger/gjennomgang-2026-11-02-foer-fristen.md): de 14 åpne punktene i §8, 37 rader for resten og 11 spørsmål til gruppen.
 
 ### F. Formkrav til refleksjonsrapporten
 
