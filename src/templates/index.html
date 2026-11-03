@@ -141,7 +141,7 @@
       {% endif %}
     {% endif %}
     {% if not vist_tabell %}
-      <p class="tom-liste">Ingen aksjer i Min liste ennå. Trykk på stjernen ☆ foran et selskap, under «Alle» her eller i markedsoversikten, for å legge det i lista.</p>
+      <p class="tom-liste" id="aksjene">Ingen aksjer i Min liste ennå. Trykk på stjernen ☆ foran et selskap, under «Alle» her eller i markedsoversikten, for å legge det i lista.</p>
     {% endif %}
     {% endif %}
   {% endif %}
@@ -186,9 +186,9 @@
       <section class="slik-leser" aria-labelledby="slik-leser">
         <h2 id="slik-leser">Slik leser du tabellen</h2>
         <ul>
-          <li><span class="symbolfelt" aria-hidden="true"><span class="utslagsfelt"><span class="pluss">+1</span><span class="minus">-1</span></span></span><span><strong>Signalstyrke 0–{{ antall_sjekker }}</strong> T, B og I er trend, bevegelse og interesse, og hver gir +1, 0 eller -1. Både +1 og -1 teller som utslag. Øverst i cellen står hvor mange som slo ut, fra 0 av {{ antall_sjekker }} til {{ antall_sjekker }} av {{ antall_sjekker }}.</span></li>
-          <li><span class="symbolfelt" aria-hidden="true"><span class="pil opp">↑</span><span class="pil blandet">↔</span><span class="pil ned">↓</span></span><span><strong>Retning</strong> Om sjekkene som slo ut, ga +1 eller -1. Ga noen +1 og noen -1, står det {{ blandet }}. Ikke et råd om å kjøpe eller selge.</span></li>
-          <li><span class="symbolfelt" aria-hidden="true"><svg class="peker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" focusable="false"><path d="M6 3.5v15.5l4.2-4.1 2.9 6.4 2.6-1.2-2.9-6.3h5.9z"/></svg></span><span><strong>Selskapsnavnet</strong> Klikk for å se sjekkene, tallene bak og kursgrafen.</span></li>
+          <li><span class="symbolfelt" aria-hidden="true"><span class="utslagsfelt"><span class="pluss">+1</span><span class="minus">-1</span></span></span><span><strong>Signalstyrke 0–{{ antall_sjekker }}</strong> <span class="setning">T, B og I er trend, bevegelse og interesse, og hver gir +1, 0 eller -1.</span> <span class="setning">Både +1 og -1 teller som utslag.</span> <span class="setning">Øverst i cellen står hvor mange som slo ut, fra 0 av {{ antall_sjekker }} til {{ antall_sjekker }} av {{ antall_sjekker }}.</span></span></li>
+          <li><span class="symbolfelt" aria-hidden="true"><span class="pil opp">↑</span><span class="pil blandet">↔</span><span class="pil ned">↓</span></span><span><strong>Retning</strong> <span class="setning">Om sjekkene som slo ut, ga +1 eller -1.</span> <span class="setning">Ga noen +1 og noen -1, står det {{ blandet }}.</span> <span class="setning">Ikke et råd om å kjøpe eller selge.</span></span></li>
+          <li><span class="symbolfelt" aria-hidden="true"><svg class="peker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" focusable="false"><path d="M6 3.5v15.5l4.2-4.1 2.9 6.4 2.6-1.2-2.9-6.3h5.9z"/></svg></span><span><strong>Selskapsnavnet</strong> <span class="setning">Klikk for å se sjekkene, tallene bak og kursgrafen.</span></span></li>
         </ul>
       </section>
     </div>
@@ -213,7 +213,8 @@
     {#- Story 8.15, svar 5: linja står bare når en kolonne er valgt. Story
         8.2a, e: tabellen er da én liste, ikke sortert innenfor hver del. #}
     {% if sortering %}<p class="sortert">Sortert på {{ sortering.navn }}, {{ ordens_ord(sortering.kolonne, sortering.orden) }}, i én liste. <a href="{{ standard_adresse }}">Standard rekkefølge</a></p>{% endif %}
-    <div class="tabellboks" role="region" aria-label="Aksjene" tabindex="0">
+    {#- Story 8.2b, a (U29): ankeret stjernen sender tilbake til når raden er borte. #}
+    <div class="tabellboks" id="aksjene" role="region" aria-label="Aksjene" tabindex="0">
     <table>
       <thead>
         <tr>
@@ -310,7 +311,9 @@
   {% if rader %}
     {#- Story 2.9b: teksten om søylene står bare når søylene vises. #}
     {% if aktiv != "min_liste" %}
-    {{ hjelpevindu("hjelp-hovedindeks", "Hovedindeksen", [("", ["hovedindeksen", "soeylene"] if hovedindeks and hovedindeks.har_soeyler else ["hovedindeksen"])]) }}
+    {#- Story 8.2b, a (U26): hovedindeksen og søylene har hvert sitt vindu. #}
+    {{ hjelpevindu("hjelp-hovedindeks", "Hovedindeksen", [("", ["hovedindeksen"])]) }}
+    {% if hovedindeks and hovedindeks.har_soeyler %}{{ hjelpevindu("hjelp-soeylene", "Søylene", [("", ["soeylene"])]) }}{% endif %}
     {% endif %}
     {#- Story 8.17a: periodevalget over søylene og tabellen. #}
     {% if valg and aktiv != "min_liste" %}{{ hjelpevindu("hjelp-perioden", "Periodene", [("", ["perioden_oversikten"])]) }}{% endif %}

@@ -56,6 +56,7 @@ Funnene og statusen i `docs/ux-logg.md`, designutdraget (`designutdrag-2026-10-1
 - U25: symbolene i kortet er større: +1 og -1 12 px, pilene 16 px og musepekeren 22 px, i det samme feltet på 36 × 36 px.
 - U26: hjelpen for hovedindeksen og for søylene er to vinduer, med hvert sitt «?»: ved «Hovedindeksen» og ved overskriften over søylene. Hver tekst er kortere.
 - U29: tas aksjen ut av Min liste (uten «Alle»), sender stjernen tilbake til tabellen (`#aksjene`), fordi raden er borte. Ellers til raden som før.
+- *Rettet 04.11 kl. 00:15:* tickeren står vannrett fra 900 px, ikke fra 760 px. Ved 761 px er det 44 px per søyle til en ticker på fem tegn i 13 px, og det er for trangt. Ved 900 px er det 53 px. Når tickeren står vannrett i appen (U57), står den fortsatt over søylene (spørsmål 1).
 
 **b) Aksjesiden, småting**
 

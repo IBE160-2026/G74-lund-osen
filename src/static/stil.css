@@ -285,17 +285,20 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
                         font-size: 13.5px; line-height: 1.45; color: var(--dempet); }
 :where(.side-oversikt) section.slik-leser li + li { margin-top: 14px; }
 :where(.side-oversikt) section.slik-leser strong { display: block; font-size: 15px; font-weight: 600; color: var(--blekk); }
+/* Story 8.2b, a (U24): hver setning på egen linje, med samme linjeavstand. */
+:where(.side-oversikt) section.slik-leser .setning { display: block; }
 :where(.side-oversikt) .symbolfelt { width: 36px; height: 36px; border-radius: 10px; background: var(--bakgrunn);
               display: flex; align-items: center; justify-content: center; gap: 1px; color: var(--tekst); }
 /* Svaret kl. 12:15 (15.10, BH20): en grønn +1 over en rød -1, med en egen
    klasse, så regelen for .brikke i rammen ikke virker inn. */
 :where(.side-oversikt) .utslagsfelt { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-:where(.side-oversikt) .utslagsfelt span { font-size: 10px; font-weight: 700; line-height: 1; padding: 2px 4px; border-radius: 4px;
+/* Story 8.2b, a (U25): symbolene er større, i det samme feltet på 36 × 36 px. */
+:where(.side-oversikt) .utslagsfelt span { font-size: 12px; font-weight: 700; line-height: 1; padding: 2px 4px; border-radius: 4px;
                     color: var(--hvit); white-space: nowrap; font-variant-numeric: tabular-nums; }
 :where(.side-oversikt) .utslagsfelt .pluss { background: var(--opp); }
 :where(.side-oversikt) .utslagsfelt .minus { background: var(--ned); }
-:where(.side-oversikt) .symbolfelt .pil { font-size: 12px; font-weight: 700; }
-:where(.side-oversikt) .symbolfelt svg { width: 18px; height: 18px; }
+:where(.side-oversikt) .symbolfelt .pil { font-size: 16px; font-weight: 700; line-height: 1; }
+:where(.side-oversikt) .symbolfelt svg { width: 22px; height: 22px; }
 
 /* Story 2.9: hovedindeksen i et kort mellom innledningen og tabellen
    (utdraget §11). Linjene brytes på smal skjerm. */
@@ -330,19 +333,35 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) .soeyler a.etikett { text-decoration: none; border-radius: 4px; }
 :where(.side-oversikt) .soeyler a.etikett:hover .ticker { text-decoration: underline; }
 :where(.side-oversikt) .soeyler .etikett.tre-av-tre .bransjesymbol { color: var(--gul-symbol); stroke-width: 2.4; }
-:where(.side-oversikt) .soeyler .ticker { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 11px; font-weight: 600;
-                   letter-spacing: 0.02em; color: var(--tekst); }
-:where(.side-oversikt) .soeyler .felt { position: relative; height: 140px; margin-top: 4px;
+/* Story 8.2b, a (U20, U57): tickeren er større, og står vannrett når
+   vinduet er bredt nok til det. På smal skjerm står den på høykant, så 15
+   søyler får plass ved 390 px. */
+:where(.side-oversikt) .soeyler .ticker { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 13px; font-weight: 600;
+                   line-height: 1.2; letter-spacing: 0.02em; color: var(--tekst); }
+@media (min-width: 900px) {
+  :where(.side-oversikt) .soeyler .ticker { writing-mode: horizontal-tb; transform: none; letter-spacing: 0; }
+}
+/* Story 8.2b, a (U21): feltet er høyere. */
+:where(.side-oversikt) .soeyler .felt { position: relative; height: 200px; margin-top: 4px;
                  background: linear-gradient(var(--strek-2), var(--strek-2)) 0 50% / 100% 1px no-repeat; }
 :where(.side-oversikt) .soeyler .spor { flex: 1 1 0; min-width: 0; position: relative; }
 :where(.side-oversikt) .soeyler .stolpe { position: absolute; left: 15%; right: 15%; border-radius: 2px; background: var(--dempet); }
 :where(.side-oversikt) .soeyler .stolpe.opp { background: var(--opp); }
 :where(.side-oversikt) .soeyler .stolpe.ned { background: var(--ned); }
 :where(.side-oversikt) .soeyler .indekslinje { position: absolute; left: 0; right: 0; margin-top: -1px;
-                        border-top: 2px dashed var(--dempet); }
+                        border-top: 3px dashed var(--dempet); }
 :where(.side-oversikt) .soeyler .indekslinje.opp { border-top-color: var(--opp); }
 :where(.side-oversikt) .soeyler .indekslinje.ned { border-top-color: var(--ned); }
 :where(.side-oversikt) .soeyler .forklaring, :where(.side-oversikt) .soeyler .uten-endring { font-size: 14px; color: var(--dempet); margin: 0.4rem 0 0; }
+/* Story 8.2b, a (U22, U57): forklaringen av den stiplede linja under
+   søylene, med en bit av linja i samme farge. */
+:where(.side-oversikt) .soeyler .linjeforklaring { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem;
+                            font-size: 14px; color: var(--dempet); margin: 0.5rem 0 0; }
+:where(.side-oversikt) .soeyler .linjeprove { display: inline-block; width: 28px; border-top: 3px dashed var(--dempet); }
+:where(.side-oversikt) .soeyler .linjeprove.opp { border-top-color: var(--opp); }
+:where(.side-oversikt) .soeyler .linjeprove.ned { border-top-color: var(--ned); }
+:where(.side-oversikt) .soeyler .linjeforklaring .opp { color: var(--opp); font-weight: 600; }
+:where(.side-oversikt) .soeyler .linjeforklaring .ned { color: var(--ned); font-weight: 600; }
 
 /* Tabellen i et kort med svart topp. Boksen ruller sidelengs på smal
    skjerm, så siden ikke gjør det (avvik 8). position: relative holder

@@ -399,8 +399,10 @@ class TestSidene:
         forventet = {
             "/": {
                 # Story 2.9: delen over tabellen.
-                # Story 2.9b: søylene i samme vindu.
-                "hjelp-hovedindeks": ["hovedindeksen", "soeylene"],
+                # Story 2.9b: søylene i samme vindu. Story 8.2b, a (U26):
+                # hvert sitt vindu.
+                "hjelp-hovedindeks": ["hovedindeksen"],
+                "hjelp-soeylene": ["soeylene"],
                 "hjelp-selskap": ["selskap"],
                 "hjelp-sluttkurs": ["sluttkurs"],
                 "hjelp-endring": ["endring", "utbyttejustert"],

@@ -1332,7 +1332,12 @@ def merk():
         return _basen_kan_ikke_aapnes()
     # Gjennomgangen (BH5): tilbake til raden, ikke til toppen av siden.
     # Symbolet er godtatt av porten, saa ankeret har bare kjente tegn.
-    return redirect(tilbake_etter_merking(request.form.get("tilbake")) + f"#rad-{symbol}", code=303)
+    adresse = tilbake_etter_merking(request.form.get("tilbake"))
+    # Story 8.2b, a (U29): tas aksjen ut av Min liste uten «Alle», er raden
+    # borte, saa siden sender tilbake til tabellen.
+    deler = urlsplit(adresse)
+    borte = til == FJERN and deler.path == MIN_LISTE and _ett(parse_qs(deler.query), "vis") != ALLE
+    return redirect(adresse + ("#aksjene" if borte else f"#rad-{symbol}"), code=303)
 
 
 if __name__ == "__main__":

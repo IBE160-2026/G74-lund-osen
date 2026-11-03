@@ -195,26 +195,25 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         "hovedindeksen": Hjelpetekst(
             "Hovedindeksen:",
             # Story 8.17a (gruppens svar 30.10 kl. 12:21, e): tabellens dag.
+            # Story 8.2b, a (U26): kortere, og søylene i et eget vindu.
             "verdien den dagen tabellen viser, og endringen i prosent fra "
-            "børsdagen før. «Gikk bedre» teller aksjene med kurs samme dag "
-            "som hadde større endring enn indeksen, slik tallene vises, og "
-            "lik teller ikke. Mangler indeksen kurs den dagen, står det i stedet for tallet.",
+            "børsdagen før. «Gikk bedre» teller aksjene med større endring "
+            "enn indeksen, slik tallene vises, og lik teller ikke.",
             (
                 (PRD, "#### FR-104 — Hovedindeksen i markedsoversikten"),
                 (PRD, "«Bedre» avgjøres på endringen slik den vises, og lik er ikke bedre."),
                 (HOVEDINDEKS, "def er_bedre("),
             ),
         ),
-        # Story 2.9b (FR-105): søylene under indeksen, i samme vindu.
+        # Story 2.9b (FR-105): søylene under indeksen. Story 8.2b, a (U26):
+        # i et eget vindu, og kortere, fordi forklaringen under søylene
+        # viser linja.
         "soeylene": Hjelpetekst(
             "Søylene:",
-            "dagens endring for hver aksje med kurs siste børsdag i tabellen og dagen "
-            "før, fra størst fall til venstre til størst stigning til høyre, med null "
-            "midt i feltet. Den stiplede linja er indeksens endring: grønn når den "
-            "steg, rød når den falt, grå ved 0,00 % og borte når indeksen ikke har en "
+            "endringen for hver aksje, fra størst fall til venstre til størst stigning "
+            "til høyre. Den stiplede linja er indeksen, grønn når den steg og rød når den falt. "
             # Story 8.2a, c (U20): symbolet over søyla er en lenke.
-            "kurs eller endring den dagen. Et gult bransjesymbol betyr at aksjen fikk 3 av 3 siste børsdag, "
-            "og et klikk på symbolet viser aksjen.",
+            "Et gult bransjesymbol betyr 3 av 3 siste børsdag, og et klikk på symbolet viser aksjen.",
             (
                 (PRD, "#### FR-105 — Søylene under hovedindeksen"),
                 (HOVEDINDEKS_MAL, '<a class="etikett'),

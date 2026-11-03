@@ -2252,9 +2252,11 @@ class TestStory80eTekst:
         html = klient.get("/").data.decode("utf-8")
         del_ = html.split('<section class="slik-leser"', 1)[1].split("</section>", 1)[0]
         # Story 8.0d, PR 2: symbolene er aria-hidden og ikke en del av teksten.
+        # Story 8.2b, a (U24): setningene står i hver sin span, så feltet med
+        # musepekeren tas bort først.
         del_ = re.sub(
-            r'<span class="symbolfelt" aria-hidden="true">.*?</span></span>|'
-            r'<span class="symbolfelt" aria-hidden="true">.*?</svg></span>',
+            r'<span class="symbolfelt" aria-hidden="true"><svg.*?</svg></span>|'
+            r'<span class="symbolfelt" aria-hidden="true">.*?</span></span>',
             "",
             del_,
             flags=re.DOTALL,
@@ -2996,8 +2998,9 @@ class TestSoeylenePaaForsiden:
         assert _tickerne(figur) == ["DNB", "NHY", "EQNR"]
         assert "Søyler for 3 aksjer 09.10, fra størst fall til størst stigning." in _synlig(figur)
         assert (
-            '<figcaption class="soeyletittel">Dagens endring per aksje, med indeksen som stiplet linje</figcaption>'
-            in figur
+            # Story 8.2b, a (U26): søylene har sitt eget «?» i overskriften.
+            '<figcaption class="soeyletittel">Dagens endring per aksje, med indeksen som stiplet linje '
+            '<button type="button" class="hjelpeknapp" popovertarget="hjelp-soeylene"' in figur
         )
 
     def test_fargen_foelger_endringen_slik_den_vises(self, klient):
@@ -3104,7 +3107,10 @@ class TestSoeylenePaaForsiden:
         assert [k for k, _ in _stolpene(figur)] == ["ned", "null", "opp"]
         # Gjennomgangen 30.10 (ECH3): søylene gjelder tabellens dag, så
         # overskriften har ingen egen dato. Indeksens dato står ved indeksen.
-        assert '<figcaption class="soeyletittel">Dagens endring per aksje</figcaption>' in figur
+        assert (
+            '<figcaption class="soeyletittel">Dagens endring per aksje '
+            '<button type="button" class="hjelpeknapp" popovertarget="hjelp-soeylene"' in figur
+        )
         assert "Indeksen har ingen kurs 09.10, så det er ingen stiplet linje." in figur
         assert 'class="indekslinje' not in figur
 
@@ -3127,6 +3133,10 @@ class TestSoeylenePaaForsiden:
             bredder = re.findall(r"(?:^|[;\s])(?:min-|max-)?width\s*:\s*([^;]+)", innhold)
             if "bransjesymbol" in velger:
                 assert [b.strip() for b in bredder] in ([], ["14px", "100%"]), velger
+            elif "linjeprove" in velger:
+                # Story 8.2b, a (U57): biten av linja i forklaringen under
+                # søylene, som brytes for seg.
+                assert [b.strip() for b in bredder] in ([], ["28px"]), velger
             else:
                 assert all(b.strip() == "0" for b in bredder), (velger, bredder)
             assert "nowrap" not in innhold, velger
@@ -3375,7 +3385,8 @@ class TestStipletBareForIndeksenPaaForsiden:
             for v, innhold in re.findall(r"([^{}]+)\{([^}]*)\}", re.sub(r"/\*.*?\*/", "", stil, flags=re.DOTALL))
             if "dasharray" in innhold or "dashed" in innhold
         ]
-        assert stiplet == [".soeyler .indekslinje"], stiplet
+        # Story 8.2b, a (U57): forklaringen under søylene har en bit av linja.
+        assert stiplet == [".soeyler .indekslinje", ".soeyler .linjeprove"], stiplet
 
 
 # Story 8.16: periodene i kursgrafen. Regelen for startdagen er testet i

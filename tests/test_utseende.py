@@ -567,7 +567,10 @@ class TestOversikten:
             # en posisjonert boks rundt gjorde den siden 409 px bred ved 390.
             assert "position: relative" in boksen, navn
             # BH7: tabellen står inne i boksen.
-            boks = _innhold(html, '<div class="tabellboks" role="region" aria-label="Aksjene" tabindex="0">')
+            # Story 8.2b, a (U29): boksen har ankeret stjernen sender til.
+            boks = _innhold(
+                html, '<div class="tabellboks" id="aksjene" role="region" aria-label="Aksjene" tabindex="0">'
+            )
             assert "<table>" in boks and "</table>" in boks, navn
 
     def test_strekene_og_ringen_i_oransje_bare_ved_2_og_3_av_3(self, sidene):
