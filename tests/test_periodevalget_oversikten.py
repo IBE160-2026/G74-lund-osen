@@ -746,3 +746,28 @@ def test_fr_104_har_rettet_linja_om_tabellens_dag():
     linja = " ".join(fr104.split(merke, 1)[1].split("\n\n", 1)[0].split())
     assert "tabellens dag" in linja and "ikke indeksens siste børsdag" in linja, linja
     assert fr104.index("indeksens siste børsdag") < fr104.index(merke)
+
+
+def test_fr_104_og_fr_105_har_unntaket_fra_en_dag_per_side():
+    """Gruppens svar 02.11 kl. 17:40: tolkningen av f står, og avvikene
+    beholdes som et felles unntak, slik koden er. Ville feilet hvis linja
+    manglet under FR-104 eller FR-105, sto før Rettet-linja fra f, eller
+    ikke sa at raden og aksjesiden viser aksjens egen siste dag og at
+    indekslinja i kursgrafen slutter ved indeksens siste kurs."""
+    tekst = PRD.read_text(encoding="utf-8")
+    merke = "*Lagt til 2026-11-03, gruppens svar 02.11 kl. 17:40:*"
+    krav = (
+        ("#### FR-104 — Hovedindeksen i markedsoversikten", "*Rettet 2026-10-30, gruppens svar kl. 12:21 (e og f):*"),
+        ("#### FR-105 — Søylene under hovedindeksen", "*Rettet 2026-10-30, gruppens svar kl. 12:21 (f):*"),
+    )
+    for overskrift, f in krav:
+        avsnitt = tekst.split(overskrift, 1)[1].split("\n#### ", 1)[0]
+        assert merke in avsnitt, overskrift
+        # Linja står etter regelen fra f, ikke før.
+        assert avsnitt.index(f) < avsnitt.index(merke), overskrift
+        linja = " ".join(avsnitt.split(merke, 1)[1].split("\n\n", 1)[0].split())
+        assert "unntak" in linja and "egen siste dag" in linja, linja
+        assert "indekslinja" in linja and "indeksens siste kurs" in linja, linja
+    fr104 = tekst.split(krav[0][0], 1)[1].split("\n#### ", 1)[0]
+    linja = " ".join(fr104.split(merke, 1)[1].split("\n\n", 1)[0].split())
+    assert "Min liste" in linja and "Aksjesiden" in linja and "Raden sier ikke hvilken dag" in linja, linja

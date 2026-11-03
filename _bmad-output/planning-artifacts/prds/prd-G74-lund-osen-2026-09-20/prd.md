@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-10-30T13:39
+updated: 2026-11-03T01:15
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -482,6 +482,21 @@ er aksjene med kurs den dagen. Mangler indeksen kurs den dagen, står det der ta
 ellers står, i stedet for siste lagrede verdi. Gruppen ser over tolkningen før
 flettingen av 8.17a (gjennomgangen 30.10, BH4).
 
+*Lagt til 2026-11-03, gruppens svar 02.11 kl. 17:40:* tolkningen av f står, og avvikene fra
+én dag per side beholdes som et felles unntak, slik koden er. Mangler en aksje kurs for
+dagen siden viser, viser raden i oversikten og i Min liste aksjens egen siste dag:
+sluttkursen, endringen og vurderingen for den dagen, og ved en periode endringen fra den
+første kursen i perioden til den dagen (`med_perioden`). Raden sier ikke hvilken dag den
+gjelder. Under navnet står «hentet» med tidspunktet bare når aksjens kurser ble hentet
+tidligere enn de nyeste (`eldre_enn_nyeste`, story 1.4c). Ukedagen i overskriften og datoen i
+linja under den er den eldste blant radene (`sidens_dato`), mens hovedindeksen, søylene og linja
+over tabellen gjelder den nyeste (`sidens_siste`). Aksjesiden viser aksjens egen siste
+dag, med datoen i linja under overskriften, og sier ikke at dagen er en annen enn
+siste børsdag i oversikten: «Siden viser …, ikke siste børsdag» står bare for en tidligere
+dag valgt med «Velg dag». Den stiplede indekslinja i kursgrafen slutter ved indeksens siste
+kurs, og da står «Indeksen går bare til» med datoen ved grafen. «Velg dag» i oversikten har
+ikke unntaket: der har en aksje uten kurs den dagen «–». Unntaket står også under FR-105.
+
 #### FR-105 — Søylene under hovedindeksen
 
 *Lagt til 2026-10-01, Marians beslutning.*
@@ -510,6 +525,12 @@ falt.
   gjelder tabellens dag. Mangler indeksen kurs den dagen, sier siden det der
   tallet ellers står og over søylene (svaret kl. 10:45 b og kl. 12:21 e).
   Gruppen ser over tolkningen før flettingen av 8.17a.
+
+  *Lagt til 2026-11-03, gruppens svar 02.11 kl. 17:40:* unntaket fra én dag per side under
+  FR-104 gjelder også her. En aksje uten kurs for tabellens dag står i tabellen med sin egen
+  siste dag, men får ingen søyle, fordi søylene bare har aksjene med kurs for tabellens dag
+  (`bygg_soeyler` og `bygg_soeyler_perioden`). I kursgrafen på aksjesiden slutter den
+  stiplede indekslinja ved indeksens siste kurs, med «Indeksen går bare til» og datoen.
 
 *Lagt til 2026-10-01:* bransjesymbolet er gult når aksjen har 3 av 3 på siste børsdag (designregler.md §3).
 
