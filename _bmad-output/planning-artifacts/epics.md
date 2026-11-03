@@ -4044,6 +4044,8 @@ avgjøres i planen.
 
 *Avgjort 2026-11-03 kl. 14:28 (gruppens svar):* en rad med eldre dag enn sidens viser datoen sin, i oversikten og i Min liste. Overskriften står som nå (FR-101).
 
+*Avgjort 2026-11-03 kl. 19:25 (gruppens svar):* 1) Tolkningen av f i Min liste er riktig: siste børsdag er sidens dag, og linja under er sammenligningen. 2) Ved «Velg dag» i Min liste viser linja under endringen fra dagen til siste børsdag, som bygget. 3) Fargetrinnene i børsometeret er de samme ved en periode (BH8). 4) 8.17b flettes i kveld. Ingen ny kode.
+
 ### Story 8.18: Kommende eks.dato i kursgrafen
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.

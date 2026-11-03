@@ -96,3 +96,28 @@ Flette 8.17a 03.11 før kl. 21:20, etter gruppens svar 02.11 kl. 17:40: tolkning
 ### Åpne punkter
 - 8.17b: Min liste og børsometeret med periodevalget.
 - Raden i oversikten sier ikke hvilken dag den gjelder når aksjen mangler kurs for siden sin dag, og overskriften tar da den eldste datoen. Det er unntaket gruppen valgte. Forslag, ikke avgjort: se på det igjen i 8.17b.
+
+## 2026-11-03 kl. 18:44 — Marian Osen
+
+### Oppgave
+Bygge 8.17b: periodevalget i Min liste («Sammenlign med») og i børsometeret, etter story 8.17, designreglene §2–3, beslutningen 08.10 kl. 21:48 og svaret 23.10 kl. 12:35 b og c. Egen gren med PR, og stopp før flettingen (instruksjonen kl. 17:42 i dagsfila 03.11).
+
+### Plan
+- Instruksjonen i dagsfila og avgjørelsene 03.11 kl. 01:06 og 14:28 under story 8.17, på main.
+- Gren i worktreen `../G74-lund-osen-8-17b`, spesifikasjonen `spec-8-17b-periodevalget-i-min-liste-og-boersometeret.md`, PR #108 og én commit per punkt a, b og c.
+- Fire mutanter, hele settet alene, gjennomgang med tre linser, triage, CI og bilder av demoen.
+
+### Resultat
+- Kvoten kl. 17:42 (16:42 GMT): 0 brukt 03.11 i GMT, 20 igjen og `extraLimit` 463. Ingen andre kall. `data/db/ose.db` er ikke rørt.
+- Main: `0e36796e` dagsfila og `dc8a5b08` avgjørelsene under story 8.17.
+- Grenen `8-17b-periodevalget-min-liste-boersometer`: `322dd46b` spesifikasjonen, `5d2a9a82` a (Min liste, datoen i en rad med eldre dag, Rettet-linja under FR-104), `7caab471` b (børsometeret, hjelpen, `docs/hjelp.md`, README-en), `7844af63` c (25 tester etter rettingene; testen for adressen fant `&amp;` skrevet to ganger, rettet der), `3c8fd278` rettingene etter gjennomgangen, `496e619c` mutantene og triagen.
+- Ledig minne 5 843 MB. Hele settet alene på `7844af6` kl. 18:12:56–18:19:59: 3929 bestått, 24 hoppet over, 6 feilet (porttestene for `start.ps1`). På `496e619` kl. 18:27:07–18:33:50: 3934 bestått, 24 hoppet over, 6 feilet (de samme).
+- Mutantene M1–M4 fanget på `7844af6` og på `3c8fd27`, og hver fil var lik kopien og HEAD etterpå.
+- Gjennomgangen: BH 17, ECH 7 og VG 4. Rettet: ECH1, BH11/VG1, ECH2/VG2 (børsometeret), VG3, VG4, BH10, BH13, BH16, og kolonneraden i Min liste (funnet i bildene). Avvist: BH1, BH2, BH4, BH5, BH7. Resten står, med BH15 og BH8 som spørsmål til gruppen.
+- CI 41684364131 grønn på `496e619c`: macOS-jobben ble avbrutt etter 15 min uten et steg som feilet, og besto ved ny kjøring. Bildene av demoen ligger på `pr-8-17b-bilder` (`8a0ed85d`) og i en kommentar i PR #108. Bildene til README-en er byte for byte de samme, og avtrykkene er oppdatert. Worktreen `../G74-lund-osen-8-17b` står til flettingen.
+
+### Åpne punkter
+- 8.17b, spørsmål til gruppen før flettingen: er tolkningen av f riktig (siste børsdag er sidens dag, og linja under er sammenligningen)?
+- 8.17b, spørsmål til gruppen: skal endringen i linja under ved «Velg dag» i Min liste være fra dagen til siste børsdag (bygget), eller endringen den dagen?
+- 8.17b BH8, spørsmål til gruppen: skal fargetrinnene i børsometeret (±0,5 % og 2 %) være de samme for en periode?
+- PR #108 flettes etter svarene; worktreen `../G74-lund-osen-8-17b` fjernes da.
