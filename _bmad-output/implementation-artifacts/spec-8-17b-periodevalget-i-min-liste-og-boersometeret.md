@@ -61,6 +61,51 @@ Min liste får periodevalget som «Sammenlign med», og børsometeret får samme
 
 Fire, én om gangen med `-x`, med kopi før og sha256 mot HEAD etter: linja under fra dagen før startdagen, signalet regnet på nytt for sammenligningsdagen, ulike ruter ved en periode, og sidens dato i stedet for radens.
 
+## Utfallet av mutantene
+
+*03.11 kl. 18:12:28–18:12:36 på `7844af6`, mot `tests/test_periodevalget_min_liste_boersometer.py`, én om gangen med `-x`:*
+
+| Mutant | Endringen | Fanget av |
+|---|---|---|
+| M1 | `bygg_sammenligning` i `src/markedsoversikt.py` tar raden før startdagen som grunnlag | `test_1_uke_og_1_mnd_mot_den_haandregnede_serien` |
+| M2 | `bygg_sammenligning` regner signalet for dagen med `signalberegning.vurder` i stedet for å lese det | `test_1_uke_og_1_mnd_mot_den_haandregnede_serien` («1 av 3» i stedet for «– ikke vurdert») |
+| M3 | `vekt` i `src/boersometer.py` bryr seg ikke om `lik_stoerrelse` (`if False:`) | `test_like_store_ruter_ved_en_periode` |
+| M4 | `egne_dager` i `src/markedsoversikt.py` gir sidens siste børsdag i stedet for radens dag | `test_raden_viser_datoen_sin_i_oversikten_og_min_liste` |
+
+Etter hver mutant var fila lik kopien (sha256 `02aa7a6c…` for `markedsoversikt.py`, `0cb72f68…` for `boersometer.py`) og lik `HEAD` (`git diff --quiet`). Kjørt på nytt på `3c8fd27` etter rettingene kl. 18:26:11–18:26:21, med samme utfall.
+
+## Gjennomgangen
+
+Hele settet før gjennomgangen, alene, 03.11 kl. 18:12:56–18:19:59 på `7844af6`: 3929 bestått, 24 hoppet over og 6 feilet, alle seks blant porttestene for `start.ps1` som CI avgjør (svaret 29.10 kl. 21:02). Gjennomgang av diffen `dc8a5b0..7844af6` med Blind Hunter (BH, 17 funn), Edge Case Hunter (ECH, 7) og Verification Gap (VG, 4). Dommen er vår, etter oppslag i koden. Rettet i `3c8fd27`.
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| ECH1 | Indeksen for perioden i «Mål mot børsen» gjaldt en kortere tid når indeksen begynner etter starten | medium | **rettet**: «–», som indekslinja i oversikten (`utfall[1] is None`), `test_hovedindeksen_for_perioden_i_boersometeret` |
+| BH11, VG1 | Indeksen for perioden var ikke prøvd | medium | **rettet**: +10,00 % for 1 uke mot 0,00 % for dagen, og «–» for 1 mnd |
+| – | Funnet i bildene til PR-en: kolonneraden i Min liste sa «1 uke» eller dagen under «Endring», men øverste linje er siste børsdag | medium | **rettet**, `test_kolonneraden_i_min_liste_er_siste_boersdag` |
+| ECH2, VG2 | Linja under og ruta for en kortere serie: «fra» var ikke prøvd i børsometeret, og linja under har ikke ordet «fra» | medium | **rettet** for børsometeret (`test_en_kortere_serie_i_boersometeret`). I Min liste **står** det: linja under viser datoen den gjelder, 05.10 for AKRBP, så ordet «fra» trengs ikke. Valget i spesifikasjonen sa «med «fra» som i 8.17a»; det er datoen, ikke ordet |
+| VG3, BH6, ECH4 | Linja under for en rad med eldre dag var ikke prøvd. Er radens dag før startdagen, står «–» og en dato etter øverste linje | low | **rettet** for testen (`test_linja_under_for_en_rad_med_eldre_dag`, 0,00 % til 08.10). En aksje uten kurs i hele perioden **står**: «–» og «ingen kurs fra dagen» er sant |
+| VG4 | Fargen i linja under var ikke prøvd | low | **rettet**: `test_fargen_i_linja_under` |
+| BH16 | Datoen i linja under var fet | low | **rettet**: `font-weight: 400` |
+| BH13 | Løkkevariabelen `navn` i `_perioder.html` skygget navnet på knappen | low | **rettet**: `felt` |
+| BH10 | `docs/hjelp.md` sa indeksen «den dagen» også ved en periode | low | **rettet**. Linja under overskriften sier dagen siden gjelder, siste børsdag, og **står** |
+| BH1 | `serier[...]` kunne gi KeyError i børsometeret | – | **avvist** etter oppslag: børsometeret leser en serie for hver post (`serier = {post.aksje.symbol: leser.serie(...) for post in poster}`) |
+| BH2 | `egne_dager` kunne få en rad uten dato | – | **avvist**: radene fra `bygg_oversikt` har alltid dato; radene uten data er en egen liste |
+| BH3 | Linja under har retningspillen | low | **står**: retningen vises i tre kanaler (FR-103); «uten pille» gjelder pillen for signalstyrken |
+| BH4 | Samme dato kan stå flere ganger i lista for fotnoten | low | **avvist**: `_fotnoten` bruker bare `all` og `in`, så antallet betyr ingenting |
+| BH5 | «ingen kurs fra dagen» kunne gi fotnoten «ikke vurdert» | – | **avvist**: `ikke_vurdert` leser teksten, som er byttet |
+| BH7 | Lesingen av vurderingen per rad uten feilhåndtering | low | **avvist**: `sqlite3.Error` gir siden for basefeil, som «Velg dag» i oversikten (8.17a) |
+| BH8 | Fargetrinnene er laget for én dag og brukes for en periode | low | **står**: svaret 23.10 kl. 12:35 (b) sier at fargen er endringen for perioden. Spørsmål til gruppen («Åpent») |
+| BH9 | Snittet per bransje blander kortere serier inn | low | **står**: som tabellen i 8.17a, og «fra» står i tabellen |
+| BH12, ECH5 | Med både `dag` og en periode i adressen gjelder dagen | low | **står**: `les_valg` gjør det samme i oversikten |
+| BH14 | Fargen i linja under regnes med `round(2)` i malen | low | **står**: samme mønster som raden over (story 8.0) |
+| BH15 | Tolkningen av «Velg dag» i Min liste er åpen, men bygget og skrevet i hjelpen | medium | **står**: spørsmål til gruppen før flettingen («Åpent»). Svarer gruppen annerledes, rettes `bygg_sammenligning`, hjelpen og testene |
+| BH17 | Første valgbare dag i børsometeret er seriens første dag, i oversikten dagen etter | low | **står**: børsometeret beholder regelen fra 8.6, der en dag før første kurs gir første børsdag |
+| ECH3 | «til siste børsdag» for skjermleseren når raden har en eldre dag | low | **står**: raden sier «siste kurs» og datoen |
+| ECH6 | En serie som ikke kan leses, gir «ingen kurs fra dagen» i linja under | low | **står**: som «Velg dag» i oversikten |
+| ECH7 | Datofeltet i børsometeret er ikke fylt ut med siste børsdag lenger | low | **står**: makroen er lik på alle sidene (§2) |
+
 ## Åpent
 
 - **Tolkningen av f i Min liste (spørsmål til gruppen):** siste børsdag er sidens dag, og linja under er sammenligningen, så Min liste viser to dager med vilje. Er det riktig? Og skal endringen i linja under for «Velg dag» være fra dagen til siste børsdag (valgt her), eller endringen den dagen, som «Velg dag» i oversikten?
+- **BH8 (spørsmål til gruppen):** fargetrinnene i børsometeret (±0,5 % og 2 %) er laget for én dag. Ved 3 mnd og lenger blir de fleste rutene sterke. Skal trinnene være de samme for en periode, som nå?
