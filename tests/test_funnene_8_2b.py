@@ -56,9 +56,17 @@ def _regel(velger: str, stil: str = STIL) -> str:
 
 
 def _media(betingelse: str) -> str:
-    treff = re.search(r"@media \(" + re.escape(betingelse) + r"\) \{(.*?)\n\}", STIL, flags=re.DOTALL)
-    assert treff, betingelse
-    return treff.group(1)
+    """Innholdet i alle @media-blokkene med betingelsen, med klammene talt,
+    så en blokk på én linje ikke tar med resten av fila."""
+    blokker = []
+    for treff in re.finditer(r"@media \(" + re.escape(betingelse) + r"\) \{", STIL):
+        dybde, i = 1, treff.end()
+        while dybde:
+            dybde += {"{": 1, "}": -1}.get(STIL[i], 0)
+            i += 1
+        blokker.append(STIL[treff.end() : i - 1])
+    assert blokker, betingelse
+    return "\n".join(blokker)
 
 
 def _synlig(html: str) -> str:
@@ -291,8 +299,110 @@ def test_grafen_har_felt_til_tallene_datoene_og_navnene(klient):
 
 
 def test_maanedspilene_er_knapper_med_kant(klient):
-    """U44. Ville feilet med understreket tekst, eller under 44 px."""
+    """U44 og U68 (c). Ville feilet med understreket tekst, under 44 px, eller
+    uten kanten rundt månedsvelgeren, som er én knapp med pilene på hver side."""
     regel = _regel(".maanedspiler a.pil")
-    assert "text-decoration: none" in regel and "min-height: 44px" in regel and "border: 1px solid" in regel
+    assert "text-decoration: none" in regel and "min-height: 44px" in regel
     assert "underline" not in regel
+    assert "border: 1px solid" in _regel(".maanedspiler")
     assert re.search(r'<a class="pil" href="[^"]*">‹ ', _html(klient, "/aksje/BRFE"))
+
+
+# c) Aksjesiden som på designtavla.
+
+
+def test_ki_teksten_staar_etter_grafen_foer_historikken(klient):
+    """U66. Ville feilet med KI-teksten før grafen, eller etter historikken."""
+    html = _html(klient, "/aksje/BRFE")
+    assert html.index("Hvorfor signalet ble") < html.index('<svg class="graf"') < html.index('<section class="ki"')
+    assert html.index('<section class="ki"') < html.index('<section class="historikk"')
+    assert html.index('class="fotnote investorside"') < html.index('<section class="ki"')
+
+
+def test_bryteren_staar_i_rammen_som_en_bryter(klient):
+    """U33, U46 og U67 (delvis). Ville feilet med knappen under rammen, uten
+    role="switch", uten «På» og «Av», eller med gult i bryteren."""
+    html = _html(klient, "/aksje/BRFE")
+    ki = html.split('<section class="ki"', 1)[1].split("</section>", 1)[0]
+    topp = ki.split('<div class="ki-topp">', 1)[1].split("</form>", 1)[0]
+    assert "<h2>Med KI-ens ord</h2>" in topp and 'role="switch" aria-checked="true"' in topp
+    assert '<span class="navn">KI-tekst</span>' in topp and '<span class="verdi" aria-hidden="true">På</span>' in topp
+    assert html.count('class="ki-bryter"') == 1
+    for velger in (".ki-bryter button", ".ki-bryter .spor", '.ki-bryter [aria-checked="true"] .spor'):
+        assert "gul" not in _regel(velger), velger
+    assert "var(--blekk)" in _regel('.ki-bryter [aria-checked="true"] .spor')
+    assert "border-radius: 16px" in _regel(".ki") and "font-size: 17px" in _regel(".ki p.ki-tekst")
+
+
+def test_med_ki_av_staar_bare_bryteren(klient):
+    """U33 og svaret 25.10 kl. 00:51 (VG11): med KI av er siden lik den var
+    før 10.3, bortsett fra bryteren og setningen om dagene. Ville feilet
+    hvis rammen eller tittelen sto med KI av."""
+    klient.set_cookie(app_modul.KAPSEL, "av")
+    html = _html(klient, "/aksje/BRFE")
+    assert '<section class="ki"' not in html and "Med KI-ens ord" not in html
+    assert re.search(rf'<form class="ki-bryter" id="{app_modul.KI_ANKER}"[^>]*>', html)
+    assert 'role="switch" aria-checked="false"' in html and '<span class="verdi" aria-hidden="true">Av</span>' in html
+
+
+def test_tallene_i_ki_teksten_har_prikket_strek():
+    """U67 (delvis, designregler §4). Ville feilet hvis et tall ikke var
+    markert, hvis et tegn i teksten ble endret, eller hvis & ble en del av
+    et tall."""
+    from ki_visning import prikkede_tall
+
+    tekst = "Kursen falt 5,53 % fra 08.10, og R&D ga +1 & 2."
+    ut = str(prikkede_tall(tekst))
+    assert re.findall(r'<span class="tall">([^<]*)</span>', ut) == ["5,53 %", "08.10", "+1", "2"]
+    assert re.sub(r"<[^>]+>", "", ut) == tekst.replace("&", "&amp;")
+    assert "&#" not in ut
+    assert str(prikkede_tall("<b>3</b>")) == '&lt;b&gt;<span class="tall">3</span>&lt;/b&gt;'
+    assert "underline dotted currentColor" in _regel(".ki .tall")
+
+
+def test_innledningen_under_tittelen(klient):
+    """U62. Ville feilet uten innledning, med den et annet sted, eller med
+    en som sa sjekkene på en side uten sjekker."""
+    html = _html(klient, "/aksje/BRFE")
+    assert '<p class="innledning">Siden viser sjekkene for Brattfjell Energi med tallene bak' in html
+    assert html.index('<p class="meta">') < html.index('<p class="innledning">') < html.index('class="sammendrag"')
+    assert '<p class="innledning">Siden viser kursgrafen for Varde Systemer' in _html(klient, "/aksje/VRDS")
+
+
+def test_kortet_retning_sier_hva_sjekkene_ga(klient):
+    """U63. BRFE fikk -1 på alle tre, og LKSV -1 på trend og +1 på de andre.
+    Ville feilet uten forklaringen, eller med sjekkene gruppert feil."""
+    retning = _html(klient, "/aksje/BRFE").split("Hjelp: retning", 1)[1].split("</div>", 1)[0]
+    assert '<span class="forklaring">Trend, bevegelse og interesse ga -1. </span>' in retning
+    blandet = _html(klient, "/aksje/LKSV").split("Hjelp: retning", 1)[1].split("</div>", 1)[0]
+    forklaring = re.search(r'<span class="forklaring">([^<]*)</span>', blandet).group(1).strip()
+    assert forklaring == "Bevegelse og interesse ga +1. Trend ga -1.", forklaring
+
+
+def test_summen_under_sjekkene(klient):
+    """U64. Ville feilet uten raden, eller med en annen styrke eller retning
+    enn kortene over."""
+    html = _html(klient, "/aksje/BRFE")
+    rad = re.search(r'<p class="sumrad">(.*?)</p>', html, flags=re.DOTALL).group(1)
+    assert _synlig(rad) == "Sum T -1 B -1 I -1 3 av 3 ↓Negativ", _synlig(rad)
+    assert 'class="pille tre-av-tre"' in rad
+    assert html.index('class="sjekkort-rad"') < html.index('class="sumrad"') < html.index("Signalstyrken er hvor mange")
+
+
+def test_historikken_er_en_kompakt_tabell(klient):
+    """U68. Ville feilet uten kolonnenavnene, med summen under uka i stedet
+    for i en egen kolonne, uten «Velg dag» øverst, eller med ukedagen
+    borte for skjermleseren."""
+    html = _html(klient, "/aksje/BRFE")
+    del_ = html.split('<section class="historikk"', 1)[1].split("</section>", 1)[0]
+    hode = re.search(r'<div class="ukehode" aria-hidden="true">(.*?)</div>', del_).group(1)
+    assert re.findall(r"<span>([^<]*)</span>", hode) == ["Uke", "Man", "Tir", "Ons", "Tor", "Fre", "Uka"]
+    assert "grid-column: 7" in _regel(".ukesum")
+    topp = del_.split('<div class="historikktopp">', 1)[1].split("</form>", 1)[0]
+    assert "Signalet dag for dag" in topp and '<form class="dagvalg" method="get" action="/aksje/BRFE">' in topp
+    assert 'name="dag"' in topp and ">Velg dag</button>" in topp
+    assert re.search(
+        r'<a class="dato" href="/aksje/BRFE\?dag=2026-10-09"><span class="ukedag">fredag</span> 09\.10</a>', del_
+    )
+    assert "clip: rect(0 0 0 0)" in _regel("li.dag .ukedag")
+    assert "display: none" in _regel(".ukehode", _media("max-width: 760px"))

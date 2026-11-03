@@ -26,6 +26,7 @@ from ki_visning import (
     VIST,
     bygg_ki_visning,
     ki_paa,
+    prikkede_tall,
 )
 from kilogg import Emne, KIRad, UgyldigKIRad
 from lagring_sqlite import aapne_base
@@ -187,10 +188,12 @@ class TestVisningen:
 
 class TestSiden:
     def test_ki_teksten_under_regelforklaringen(self, klient, aksje):
-        """Ville feilet hvis KI-teksten sto foer regelforklaringen (V1)."""
+        """Ville feilet hvis KI-teksten sto foer regelforklaringen (V1).
+        Story 8.2b, c (U66): etter grafen og foer historikken."""
         skriv_kirad(kirad(aksje))
         html = side(klient)
-        assert html.index("Hvorfor signalet ble") < html.index("Med KI-ens ord") < html.index("Kursutvikling")
+        assert html.index("Hvorfor signalet ble") < html.index("Kursutvikling") < html.index("Med KI-ens ord")
+        assert html.index("Med KI-ens ord") < html.index("Signalet dag for dag")
         assert TEKST in html
         assert "Laget av KI · gemma4:e4b, lokal." in html
 
@@ -237,9 +240,10 @@ class TestSiden:
         skriv_kirad(kirad(aksje))
         av = side(klient, "av")
         assert "Med KI-ens ord" not in av and TEKST not in av
-        assert ">Vis KI-teksten</button>" in av
+        # Story 8.2b, c (U33): en bryter med «KI-tekst» og «Av» eller «På».
+        assert 'role="switch" aria-checked="false"' in av and '<span class="verdi" aria-hidden="true">Av</span>' in av
         paa = side(klient, "paa")
-        assert ">Skjul KI-teksten</button>" in paa
+        assert 'role="switch" aria-checked="true"' in paa and '<span class="verdi" aria-hidden="true">På</span>' in paa
 
     def test_med_ki_av_er_siden_lik_med_og_uten_rad(self, klient, aksje):
         """FR-601: med KI av sier siden ingenting om KI-raden. Ville feilet
@@ -321,9 +325,10 @@ class TestEtterGjennomgangen:
         skriv_kirad(kirad(aksje))
         paa = side(klient, "paa")
         assert 'name="til" value="av"' in paa and 'name="tilbake" value="/aksje/EQNR"' in paa
-        assert 'aria-pressed="true"' in paa
+        # Story 8.2b, c (U33): en bryter, med aria-checked.
+        assert 'aria-checked="true"' in paa
         av = side(klient, "av")
-        assert 'name="til" value="paa"' in av and 'aria-pressed="false"' in av
+        assert 'name="til" value="paa"' in av and 'aria-checked="false"' in av
 
     def test_en_runde_med_bryteren(self, klient, aksje):
         """VG2: av og paa igjen gjennom skjemaet, slik nettleseren gjoer."""
@@ -503,7 +508,8 @@ class TestStory816bDenValgteDagen:
         valgt dag."""
         skriv_kirad(kirad(dag, tekst=self.DAGEN_TEKST))
         html = klient.get(f"/aksje/EQNR?dag={dag.isoformat()}").data.decode("utf-8")
-        assert self.DAGEN_TEKST in html and TEKST not in html
+        # Story 8.2b, c (U67): tallene i teksten har prikket strek.
+        assert prikkede_tall(self.DAGEN_TEKST) in html and TEKST not in html
         assert TEKST in side(klient)
 
     def test_en_dag_uten_ki_rad(self, klient, dag):
@@ -524,7 +530,7 @@ class TestStory816bDenValgteDagen:
         grunnlag = {"trend": 0, "bevegelse": 0, "interesse": -1, "styrke": 1, "retning": "Negativ"}
         skriv_kirad(kirad(dag, grunnlag=grunnlag, tekst=self.DAGEN_TEKST))
         html = klient.get(f"/aksje/EQNR?dag={dag.isoformat()}").data.decode("utf-8")
-        assert self.DAGEN_TEKST in html
+        assert prikkede_tall(self.DAGEN_TEKST) in html
 
     def test_knappen_beholder_dagen(self, klient, dag):
         """Ville feilet hvis bryteren sendte deg til siste børsdag fra en
@@ -647,7 +653,8 @@ class TestSetningenOmDagene:
         html = side(klient)
         setning = '<p class="dagene">Signalet har vært slik i 4 børsdager på rad.</p>'
         assert setning in html
-        assert html.index("Med KI-ens ord") < html.index(TEKST) < html.index(setning) < html.index("ki-bryter")
+        # Story 8.2b, c (U46): bryteren står øverst i rammen.
+        assert html.index("Med KI-ens ord") < html.index("ki-bryter") < html.index(TEKST) < html.index(setning)
 
     def test_en_dag_paa_siden(self, klient, aksje):
         """Ville feilet hvis en annen vurdering dagen foer ikke ga «Signalet

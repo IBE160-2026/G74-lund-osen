@@ -58,7 +58,18 @@ from graf import bygg_graf
 from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
 from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster
 from hovedindeks import Hovedindeksvisning, bygg_hovedindeks, valgt_indeks
-from ki_visning import AV, INGEN_I_DEMOEN, INGEN_RAD, KAPSEL, PAA, UKJENT, KIVisning, bygg_ki_visning, ki_paa
+from ki_visning import (
+    AV,
+    INGEN_I_DEMOEN,
+    INGEN_RAD,
+    KAPSEL,
+    PAA,
+    UKJENT,
+    KIVisning,
+    bygg_ki_visning,
+    ki_paa,
+    prikkede_tall,
+)
 from kilogg import Emne, UgyldigKIRad
 from kursdata import Kursleser, investorside
 from lagring_sqlite import (
@@ -185,6 +196,8 @@ app.jinja_env.filters["avrundet"] = avrundet
 # Story 8.0e: ukedagen i overskriften og navnene i linja om «3 av 3».
 app.jinja_env.filters["ukedag"] = ukedag
 app.jinja_env.filters["med_og"] = med_og
+# Story 8.2b, c (U67): tallene i en KI-tekst som vises, med prikket strek.
+app.jinja_env.filters["prikkede_tall"] = prikkede_tall
 # Story 2.7b: «oktober 2026» ved pilene i historikken.
 app.jinja_env.filters["maanedsnavn"] = maanedsnavn
 # Story 8.15: retningen et klikk på en kolonne gir.

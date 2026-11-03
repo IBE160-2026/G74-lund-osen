@@ -79,6 +79,8 @@ Funnene og statusen i `docs/ux-logg.md`, designutdraget (`designutdrag-2026-10-1
 - U64: en rad for summen under de tre sjekkene, med styrken, T, B og I og retningen.
 - U66: KI-teksten står etter kursgrafen, før historikken.
 - U68: historikken er en kompakt tabell med en rad per uke: uka, mandag til fredag og summen. Månedsvelgeren er én knapp med piler på hver side, «Velg dag» står øverst til høyre i delen, ingressen er kort, og sumlinja har antallet per sjekk (finnes alt).
+- *Rettet 04.11 kl. 00:48:* med KI av står bare bryteren, ikke rammen, tittelen og en linje om at teksten er skjult. Kommentaren i `aksje.html` fører svaret 25.10 kl. 00:51 og gjennomgangen 25.10 kl. 11 (VG11): med KI av er siden lik den var før 10.3, bortsett fra bryteren og setningen om dagene. Punktet over strider mot det, og regelen i instruksjonen sier at det da ikke bygges.
+- *Rettet 04.11 kl. 00:48:* bildet av aksjesiden i `docs/appen/` slutter nå ved setningen om dagene under KI-teksten, ikke ved grafen, så det fortsatt har både grafen og KI-teksten (README-en). Månedsvelgeren har kanten rundt hele valget, og pilene inne i den er 44 px høye (U44).
 
 **d) Forsiden og Min liste som på tavla**
 

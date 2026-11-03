@@ -3759,7 +3759,9 @@ class TestStory816bDagenPaaHeleSiden:
         siste børsdag."""
         self._aksjen()
         toppen = _toppen(klient.get("/aksje/EQNR?dag=2026-10-03").data.decode("utf-8"))
-        assert "Oslo Børs · 03.10 Sluttkurs ? – Endring ? – Signalstyrke ? –" in toppen
+        # Story 8.2b, c (U62): innledningen står mellom datoen og kortene.
+        assert "Oslo Børs · 03.10 Siden viser " in toppen
+        assert "aksjen hver børsdag. Sluttkurs ? – Endring ? – Signalstyrke ? –" in toppen
         assert "NOK" not in toppen
 
     def test_merket_og_lenken_tilbake(self, klient):

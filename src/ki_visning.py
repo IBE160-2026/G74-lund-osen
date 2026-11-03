@@ -27,6 +27,8 @@ import unicodedata
 from collections.abc import Mapping
 from dataclasses import dataclass
 
+from markupsafe import Markup, escape
+
 from kilogg import KIRad
 from vurderingsdata import Vurdering
 
@@ -115,6 +117,25 @@ def bygg_ki_visning(rad: KIRad | None, vurdering: object, *, andre_har_rader: bo
     if _VAKT.search(tekst):
         return KIVisning(STOPPET_AV_VAKTEN)
     return KIVisning(VIST, tekst=rad.tekst, modell=f"{rad.modell}, {rad.tjeneste}")
+
+
+# Story 8.2b, c (U67): et tall i teksten, med fortegn, desimaler og prosent.
+_TALL = re.compile(r"[+\-\u2212]?\d+(?:[.,]\d+)*(?:[\u00a0 ]?%)?")
+
+
+def prikkede_tall(tekst: str) -> Markup:
+    """Teksten med hvert tall i <span class="tall">, som siden gir prikket
+    strek i tekstfargen (designregler §4). Teksten er alt proevd mot
+    grunnlaget (FR-603), og ingenting i den endres: delene escapes hver for
+    seg, saa et tegn som & aldri blir en del av et tall."""
+    deler = []
+    forrige = 0
+    for treff in _TALL.finditer(tekst):
+        deler.append(escape(tekst[forrige : treff.start()]))
+        deler.append(Markup('<span class="tall">') + escape(treff.group()) + Markup("</span>"))
+        forrige = treff.end()
+    deler.append(escape(tekst[forrige:]))
+    return Markup("").join(deler)
 
 
 def ki_paa(kapsel: str | None) -> bool:

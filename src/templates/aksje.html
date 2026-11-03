@@ -33,6 +33,9 @@
   {% endif %}
   {#- Svar 18: børsen og datoen, «Demo Børs» i demoen. #}
   <p class="meta">{{ "Demo Børs" if eksempeltall else "Oslo Børs" }} · {{ detalj.dato|dato }}</p>
+  {#- Story 8.2b, c (U62, 8.0d beslutning 7): innledningen fra tavla sier hva
+      siden viser. #}
+  <p class="innledning">{% if detalj.sjekker %}Siden viser sjekkene for {{ detalj.aksje.navn }} med tallene bak, kursgrafen og det appen skrev om aksjen hver børsdag.{% else %}Siden viser kursgrafen for {{ detalj.aksje.navn }} og det appen skrev om aksjen hver børsdag.{% endif %}</p>
 
   <div class="sammendrag">
     <div class="noekkeltall">
@@ -64,6 +67,9 @@
       <span class="verdi {{ detalj.retning.klasse }}">
         <span aria-hidden="true">{{ detalj.retning.symbol }}</span> {{ detalj.retning.tekst }}
       </span>
+      {#- Story 8.2b, c (U63): sjekkene med navn, som «Trend ga +1.
+          Bevegelse og interesse ga 0.» (designregler §4). #}
+      {% if detalj.sjekker %}<span class="forklaring">{% for verdi in ["+1", "-1", "0"] %}{% set navnene = detalj.sjekker|selectattr("fortegn", "equalto", verdi)|map(attribute="navn")|list %}{% if navnene %}{{ ([navnene[0]] + navnene[1:]|map("lower")|list)|med_og }} ga {{ verdi }}. {% endif %}{% endfor %}</span>{% endif %}
     </div>
   </div>
 
@@ -100,6 +106,9 @@
       {% endfor %}
     </div>
 
+    {#- Story 8.2b, c (U64): summen under sjekkene, med T, B og I, styrken og
+        retningen, som på tavla. #}
+    <p class="sumrad"><span class="sumnavn">Sum</span> {{ brikker(detalj.sjekkbrikker) }} <span class="pille{% if detalj.styrke == antall_sjekker %} tre-av-tre{% endif %}">{{ detalj.styrke }} av {{ antall_sjekker }}</span> {{ retningspille(detalj.retning) }}</p>
     <p class="fotnote">
       Signalstyrken er hvor mange sjekker som slo ut: {{ detalj.bidragsytere|length }} av {{ antall_sjekker }} ga utslag.
       Ga noen +1 og noen -1, er retningen {{ blandet }}.
@@ -120,38 +129,6 @@
     {% if detalj.ikke_vurdert and detalj.sluttkurs is not none %}
       {% include "_fotnote_ikke_vurdert.html" %}
     {% endif %}
-  {% endif %}
-
-  {#- Story 10.3: KI-teksten står under regelforklaringen, aldri før og
-      aldri i stedet for den (FR-602). Bryteren er synlig for brukeren
-      (FR-601), og med KI av er siden lik den var før 10.3, bortsett fra
-      bryteren og setningen om dagene (svaret 25.10 kl. 00:51, gjennomgangen
-      25.10 kl. 11, VG11). #}
-  {#- Story 8.2a, a (U35): bryteren sender tilbake til ankeret, på teksten
-      når den vises og ellers på bryteren. #}
-  {% if detalj.sjekker %}
-    {% set ki_vises = ki_er_paa and ki %}
-    {% if ki_vises %}
-      <section class="ki" id="{{ ki_anker }}" aria-label="KI-tekst">
-        <h2>Med KI-ens ord</h2>
-        {% if ki.vist %}
-          <p class="merke-ki">Laget av KI · {{ ki.modell }}. Regelforklaringen over er det signalet bygger på.</p>
-          <p class="ki-tekst">{{ ki.tekst }}</p>
-        {% else %}
-          <p class="uten">{{ ki.grunn }}</p>
-        {% endif %}
-      </section>
-    {% endif %}
-    {#- Gruppens svar 25.10 kl. 00:51: appen skriver dagene, rett under
-        KI-teksten, også når KI er av eller teksten er stoppet. #}
-    {% if dagene %}
-      <p class="dagene">{{ dagene }}</p>
-    {% endif %}
-    <form class="ki-bryter"{% if not ki_vises %} id="{{ ki_anker }}"{% endif %} method="post" action="/ki">
-      <input type="hidden" name="til" value="{{ ki_til }}">
-      <input type="hidden" name="tilbake" value="{{ ki_tilbake }}">
-      <button type="submit" aria-pressed="{{ 'true' if ki_er_paa else 'false' }}">{{ 'Skjul KI-teksten' if ki_er_paa else 'Vis KI-teksten' }}</button>
-    </form>
   {% endif %}
 
   {#- Story 2.9c: hjelpen forklarer også den stiplede linja når den vises. #}
@@ -264,12 +241,66 @@
     <p class="fotnote investorside">Børsmeldingene står på NewsWeb og ofte også på selskapets investorside.</p>
   {% endif %}
 
+  {#- Story 10.3: KI-teksten står under regelforklaringen, aldri før og
+      aldri i stedet for den (FR-602). Bryteren er synlig for brukeren
+      (FR-601), og med KI av er siden lik den var før 10.3, bortsett fra
+      bryteren og setningen om dagene (svaret 25.10 kl. 00:51, gjennomgangen
+      25.10 kl. 11, VG11). #}
+  {#- Story 8.2a, a (U35): bryteren sender tilbake til ankeret, på teksten
+      når den vises og ellers på bryteren. #}
+  {#- Story 8.2b, c (U66): KI-teksten står etter grafen og lenken til
+      investorsiden, før historikken (utdraget §11, designregler §5), og
+      fortsatt under regelforklaringen (FR-602). U33, U46 og U67: bryteren
+      står inne i rammen øverst til høyre, som en bryter med «På» og «Av»,
+      i blekk, ikke gul (spørsmål 5 i spesifikasjonen). Rammen er et kort
+      som de andre, og tallene i teksten har prikket strek (designregler §4).
+      Med KI av står bare bryteren, som før. #}
+  {% if detalj.sjekker %}
+    {% set ki_vises = ki_er_paa and ki %}
+    {%- macro ki_bryter() %}
+    <form class="ki-bryter"{% if not ki_vises %} id="{{ ki_anker }}"{% endif %} method="post" action="/ki">
+      <input type="hidden" name="til" value="{{ ki_til }}">
+      <input type="hidden" name="tilbake" value="{{ ki_tilbake }}">
+      <button type="submit" role="switch" aria-checked="{{ 'true' if ki_er_paa else 'false' }}"><span class="spor" aria-hidden="true"></span><span class="navn">KI-tekst</span> <span class="verdi" aria-hidden="true">{{ 'På' if ki_er_paa else 'Av' }}</span></button>
+    </form>
+    {%- endmacro %}
+    {% if ki_vises %}
+      <section class="ki" id="{{ ki_anker }}" aria-label="KI-tekst">
+        <div class="ki-topp">
+          <h2>Med KI-ens ord</h2>
+          {{ ki_bryter() }}
+        </div>
+        {% if ki.vist %}
+          <p class="merke-ki">Laget av KI · {{ ki.modell }}. Regelforklaringen over er det signalet bygger på.</p>
+          <p class="ki-tekst">{{ ki.tekst|prikkede_tall }}</p>
+        {% else %}
+          <p class="uten">{{ ki.grunn }}</p>
+        {% endif %}
+      </section>
+    {% endif %}
+    {#- Gruppens svar 25.10 kl. 00:51: appen skriver dagene, rett under
+        KI-teksten, også når KI er av eller teksten er stoppet. #}
+    {% if dagene %}
+      <p class="dagene">{{ dagene }}</p>
+    {% endif %}
+    {% if not ki_vises %}{{ ki_bryter() }}{% endif %}
+  {% endif %}
+
   {#- Story 2.7b (avgjørelsen 2026-10-21 under story 2.7): historikken, en
       måned om gangen, med det som er lagret i vurdering. Signalet regnes
       aldri (AD-7), og målingene står på siden for dagen (8.16b). 3 av 3
       merkes som i oversikten, 2 av 3 ikke (designregler.md §3). #}
   <section class="historikk" id="signalet-dag-for-dag" aria-labelledby="historikk-tittel">
-    <h2><span id="historikk-tittel">Signalet dag for dag</span> {{ hjelpeknapp("hjelp-historikk", "Hjelp: signalet dag for dag") }}</h2>
+    {#- Story 8.2b, c (U68): «Velg dag» øverst til høyre i delen, til siden
+        for dagen, som en dag i tabellen. #}
+    <div class="historikktopp">
+      <h2><span id="historikk-tittel">Signalet dag for dag</span> {{ hjelpeknapp("hjelp-historikk", "Hjelp: signalet dag for dag") }}</h2>
+      <form class="dagvalg" method="get" action="/aksje/{{ detalj.aksje.symbol }}">
+        <label class="skjult" for="velg-dag-historikk">Velg dag i historikken</label>
+        <input type="date" id="velg-dag-historikk" name="dag" required min="{{ serien_begynner.isoformat() }}" max="{{ siste_i_serien.isoformat() }}">
+        <button type="submit">Velg dag</button>
+      </form>
+    </div>
     {#- Story 8.2b, b (U16): ingressen er kort, og resten står i hjelpen ved
         «?» (gjennomgangen, BH4: tallene teller terskelen, som oversikten). #}
     <p class="ingress">Det appen skrev om {{ detalj.aksje.navn }} hver børsdag, eller hvorfor det mangler. Velg en dag for å se hele siden for den dagen.</p>
@@ -282,6 +313,9 @@
     {#- Gjennomgangen (ECH1, ECH2): dagene utenfor kursserien står tomme, og
         siden sier hvor langt den går, så de ikke leses som et hull. #}
     {% if historikk.har_tomme %}<p class="kursserien">Kursserien går fra {{ historikk.kurs_fra|dato }} til {{ historikk.kurs_til|dato }}, så dagene utenfor står tomme.</p>{% endif %}
+    {#- Story 8.2b, c (U68): kolonnenavnene over tabellen, på bred skjerm.
+        Ukedagen og datoen står i hver dag, så skjermleseren trenger dem ikke. #}
+    <div class="ukehode" aria-hidden="true"><span>Uke</span><span>Man</span><span>Tir</span><span>Ons</span><span>Tor</span><span>Fre</span><span>Uka</span></div>
     <ol class="uker">
       {% for uke in historikk.uker %}
         <li class="uke">
@@ -292,7 +326,7 @@
                 <li class="dag utenfor" aria-hidden="true"></li>
               {% else %}
                 <li class="dag{% if dag.tom %} tom{% elif dag.vurdering and dag.vurdering.styrke == antall_sjekker %} alle{% endif %}">
-                  {% if dag.lenke %}<a class="dato" href="/aksje/{{ detalj.aksje.symbol }}?dag={{ dag.dato.isoformat() }}">{{ dag.dato|ukedag }} {{ dag.dato|dato }}</a>{% else %}<span class="dato">{{ dag.dato|ukedag }} {{ dag.dato|dato }}</span>{% endif %}
+                  {% if dag.lenke %}<a class="dato" href="/aksje/{{ detalj.aksje.symbol }}?dag={{ dag.dato.isoformat() }}"><span class="ukedag">{{ dag.dato|ukedag }}</span> {{ dag.dato|dato }}</a>{% else %}<span class="dato"><span class="ukedag">{{ dag.dato|ukedag }}</span> {{ dag.dato|dato }}</span>{% endif %}
                   {% if dag.vurdering %}
                     {{ retningspille(dag.retning) }}
                     {{ brikker(dag.brikker) }}

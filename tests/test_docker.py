@@ -1081,7 +1081,9 @@ HOEYDE_PAA_BILDET = 1772
 # hoeyden.
 # Story 8.2b, b: periodeknappene og hjelpen, i hjelpetekster.py, _ramme.html
 # og stil.css. Bildet ble tatt paa nytt med den nye hoeyden.
-AVTRYKK_BAK_BILDET = "2fc0cc7b484a7412d7b60a42b16a37727e98ed824f3e945963add856a8c8e31b"
+# Story 8.2b, c: stil.css. Bildet ble tatt paa nytt og er byte for byte det
+# samme.
+AVTRYKK_BAK_BILDET = "42858e6ff05c6e9fbbee4ca873816de39602b695eb70573df279de65ec6e9b40"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1152,7 +1154,10 @@ IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py", "src/boersometer.py
 # BRFE. Grafen slutter ved 1894, maalt i Edge uten vindu. Var 1934.
 # Story 8.2b, b: grafen (figure) slutter ved 1882, fordi periodeknappene er
 # 36 px (U37). Maalt i Edge uten vindu. Var 1894.
-HOEYDE_PAA_AKSJESIDEN = 1882
+# Story 8.2b, c (U66): KI-teksten står etter grafen, saa bildet slutter ved
+# bunnen av setningen om dagene (p.dagene) under KI-teksten, og har baade
+# grafen og teksten. Maalt i Edge uten vindu. Var 1882.
+HOEYDE_PAA_AKSJESIDEN = 2192
 # Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
 # Story 10.5: lenken til investorsiden står under grafen, ved 1980 px målt i
 # Edge uten vindu, så bildet, som slutter ved bunnen av grafen (1872 px), ble
@@ -1310,14 +1315,17 @@ HOEYDE_PAA_AKSJESIDEN = 1882
 # periodeknappene og historikken, i app.py, graf.py, ki_visning.py,
 # hjelpetekster.py, _ramme.html, aksje.html og stil.css. Bildet ble tatt paa
 # nytt med den nye hoeyden.
-AVTRYKK_BAK_AKSJESIDEN = "f8638488f313b9528f3bb259710470ac8c75be0a247edff9ad73243f7b2067de"
+# Story 8.2b, c: KI-delen etter grafen, bryteren i rammen, innledningen,
+# summen, kortet Retning og historikken, i app.py, ki_visning.py, aksje.html
+# og stil.css. Bildet ble tatt paa nytt med den nye hoeyden.
+AVTRYKK_BAK_AKSJESIDEN = "019dfa79cf7c75363c5f12424cc2e1b77d534f85ab24d8b596c19122529f7f81"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
     "demobasen i en midlertidig mappe (lagring_sqlite.BASE_STI dit), OSE_DEMO=1, "
     "waitress på en ledig port, og msedge --headless --disable-gpu --hide-scrollbars "
     f"--window-size=1280,{HOEYDE_PAA_AKSJESIDEN} med egen --user-data-dir. Bildet skal slutte "
-    "ved bunnen av grafen (figure), under KI-teksten: mål den og endre "
+    "ved bunnen av setningen om dagene (p.dagene), under KI-teksten etter grafen: mål den og endre "
     "HOEYDE_PAA_AKSJESIDEN hvis den har flyttet seg. Oppdater så "
     "AVTRYKK_BAK_AKSJESIDEN til {avtrykk} i samme commit."
 )

@@ -575,16 +575,33 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-aksje) .rute { stroke: var(--rutenett); stroke-width: 1; }
 :where(.side-aksje) .rutetekst { fill: var(--dempet); font-size: 12px; }
 /* Story 10.3: KI-teksten under regelforklaringen, som et tillegg. */
-:where(.side-aksje) .ki { margin: 18px 0 8px; padding: 14px 16px; border: 1px solid var(--strek-2); border-radius: 8px; }
-:where(.side-aksje) .ki h2 { margin: 0 0 6px; font-size: 16px; }
-:where(.side-aksje) .ki .merke-ki { color: var(--dempet); font-size: 13px; margin: 0 0 8px; }
-:where(.side-aksje) .ki p.ki-tekst { margin: 0; }
+:where(.side-aksje) .ki-bryter button:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+/* Story 8.2b, c (U33, U46, U67): KI-delen er et kort som de andre, med
+   bryteren øverst til høyre og teksten i 17 px. Bryteren er i blekk, ikke
+   gul, fordi gult ved en aksje betyr 3 av 3 (designregler §3). */
+:where(.side-aksje) .ki { margin: 60px 0 8px; padding: 20px 22px; background: var(--kort); border: 1px solid var(--strek);
+                          border-radius: 16px; }
+:where(.side-aksje) .ki .ki-topp { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+                                   gap: 8px 16px; margin: 0 0 10px; }
+:where(.side-aksje) .ki h2 { margin: 0; font-size: 28px; }
+:where(.side-aksje) .ki .merke-ki { color: var(--dempet); font-size: 13.5px; margin: 0 0 10px; }
+:where(.side-aksje) .ki p.ki-tekst { margin: 0; font-size: 17px; line-height: 1.55; color: var(--tekst); }
+:where(.side-aksje) .ki .tall { text-decoration: underline dotted currentColor; text-decoration-thickness: 1.5px;
+                                text-underline-offset: 3px; }
 :where(.side-aksje) .ki .uten { color: var(--dempet); margin: 0; }
 :where(.side-aksje) .ki-bryter { margin: 10px 0 0; }
-:where(.side-aksje) .ki-bryter button { font: inherit; font-size: 13.5px; padding: 6px 10px; min-height: 36px;
-                    border: 1px solid var(--strek-2); border-radius: 6px; background: transparent;
-                    color: var(--tekst); cursor: pointer; }
-:where(.side-aksje) .ki-bryter button:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+:where(.side-aksje) .ki .ki-bryter { margin: 0; }
+:where(.side-aksje) .ki-bryter button { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px 0 8px;
+                                        box-sizing: border-box; font: inherit; font-size: 14px; font-weight: 600;
+                                        border: 1px solid var(--strek-2); border-radius: 999px; background: var(--kort);
+                                        color: var(--blekk); cursor: pointer; }
+:where(.side-aksje) .ki-bryter .spor { position: relative; width: 36px; height: 20px; border-radius: 999px;
+                                       background: var(--strek-2); flex: none; }
+:where(.side-aksje) .ki-bryter .spor::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
+                                              border-radius: 50%; background: var(--hvit); }
+:where(.side-aksje) .ki-bryter [aria-checked="true"] .spor { background: var(--blekk); }
+:where(.side-aksje) .ki-bryter [aria-checked="true"] .spor::after { left: 18px; }
+:where(.side-aksje) .ki-bryter .verdi { color: var(--dempet); font-weight: 400; }
 :where(.side-aksje) .maanedsstrek { stroke: var(--strek-2); stroke-width: 1; }
 :where(.side-aksje) .maanedstekst { fill: var(--dempet); font-size: 12px; }
 :where(.side-aksje) .kurslinje { fill: none; stroke: var(--kurs); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
@@ -611,22 +628,43 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
    pillen og streken fra oversikten (designregler §3), 2 av 3 merkes ikke.
    På smal skjerm står dagene under hverandre. */
 :where(.side-aksje) .historikk .ingress { margin: 0 0 12px; }
-:where(.side-aksje) .maanedspiler { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 12px; }
-:where(.side-aksje) .maanedspiler .maaned { font-weight: 700; }
-/* Story 8.2b, b (U44): pilene er knapper med kant, 44 px høye. */
+/* Story 8.2b, c (U68): «Velg dag» øverst til høyre, og under på smal skjerm. */
+:where(.side-aksje) .historikktopp { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+                                     gap: 8px 16px; margin: 60px 0 16px; }
+:where(.side-aksje) .historikktopp h2 { margin: 0; }
+:where(.side-aksje) .dagvalg { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; }
+:where(.side-aksje) .dagvalg input[type="date"], :where(.side-aksje) .dagvalg button {
+  font: inherit; font-size: 14px; min-height: 36px; box-sizing: border-box; padding: 0 10px; max-width: 100%;
+  border: 1px solid var(--strek); border-radius: 999px; background: var(--kort); color: var(--blekk); }
+:where(.side-aksje) .dagvalg input[type="date"] { border-radius: 8px; }
+:where(.side-aksje) .dagvalg button { cursor: pointer; }
+:where(.side-aksje) .dagvalg .skjult { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+:where(.side-aksje) .dagvalg :focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+/* Story 8.2b, b og c (U44, U68): månedsvelgeren er én knapp med kant, med
+   pilene på hver side, 44 px høye. */
+:where(.side-aksje) .maanedspiler { display: inline-flex; align-items: center; flex-wrap: wrap; max-width: 100%; box-sizing: border-box;
+                                    margin: 0 0 12px; border: 1px solid var(--strek-2); border-radius: 999px; background: var(--kort); }
+:where(.side-aksje) .maanedspiler .maaned { font-weight: 700; padding: 0 12px; }
 :where(.side-aksje) .maanedspiler a.pil { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px;
-                         box-sizing: border-box; border: 1px solid var(--strek-2); border-radius: 999px;
-                         background: var(--kort); color: var(--blekk); font-weight: 600; text-decoration: none; }
-:where(.side-aksje) .maanedspiler a.pil:hover { border-color: var(--blekk); }
+                         box-sizing: border-box; border: 0; border-radius: 999px;
+                         color: var(--blekk); font-weight: 600; text-decoration: none; }
+:where(.side-aksje) .maanedspiler a.pil:hover { background: var(--bakgrunn); }
 :where(.side-aksje) .historikk a:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
 :where(.side-aksje) ol.uker, :where(.side-aksje) ol.dager { list-style: none; margin: 0; padding: 0; }
-:where(.side-aksje) li.uke { display: grid; grid-template-columns: 4.5rem repeat(5, minmax(0, 1fr)); gap: 8px;
-                             padding: 10px 0; border-top: 1px solid var(--strek); }
+/* Story 8.2b, c (U68): en kompakt tabell, én rad per uke med uka, mandag
+   til fredag og summen for uka i siste kolonne. Ukedagen står i kolonnenavnet
+   på bred skjerm, og er bare for skjermleseren i dagen. */
+:where(.side-aksje) .ukehode, :where(.side-aksje) li.uke { display: grid; grid-template-columns: 3.5rem repeat(5, minmax(0, 1fr)) 6.5rem;
+                                                           gap: 6px; }
+:where(.side-aksje) .ukehode { padding: 0 0 6px; font-size: 12.5px; font-weight: 700; text-transform: uppercase;
+                               letter-spacing: 0.05em; color: var(--dempet); }
+:where(.side-aksje) li.uke { padding: 6px 0; border-top: 1px solid var(--strek); align-items: stretch; }
 :where(.side-aksje) li.uke ol.dager { display: contents; }
-:where(.side-aksje) .ukenummer { margin: 0; font-weight: 700; font-size: 13.5px; color: var(--dempet); }
-:where(.side-aksje) .ukesum { grid-column: 2 / -1; margin: 0; font-size: 13px; color: var(--dempet); }
-:where(.side-aksje) li.dag { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0;
-                             padding: 8px; border: 1px solid var(--strek); border-radius: 8px; background: var(--kort);
+:where(.side-aksje) .ukenummer { margin: 0; align-self: center; font-weight: 700; font-size: 13.5px; color: var(--dempet); }
+:where(.side-aksje) .ukesum { grid-column: 7; grid-row: 1; align-self: center; margin: 0; font-size: 13px; color: var(--dempet); }
+:where(.side-aksje) li.dag .ukedag { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+:where(.side-aksje) li.dag { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0;
+                             padding: 6px; border: 1px solid var(--strek); border-radius: 8px; background: var(--kort);
                              font-size: 13px; }
 :where(.side-aksje) li.dag.alle { box-shadow: inset 4px 0 0 var(--oransje); }
 :where(.side-aksje) li.dag.tom, :where(.side-aksje) li.dag.utenfor { background: transparent; border-color: transparent; }
@@ -641,9 +679,21 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
                                         border: 1.5px solid var(--strek-2); }
 :where(.side-aksje) .historikk .pille.tre-av-tre { border: 2px solid var(--oransje); background: var(--fyll); color: var(--hvit); }
 :where(.side-aksje) .maanedssum { margin: 12px 0 0; }
+/* Story 8.2b, c (U64): summen under sjekkene. */
+:where(.side-aksje) p.sumrad { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 16px 0 0; padding: 14px 22px;
+                               background: var(--kort); border: 1px solid var(--strek); border-radius: 16px; }
+:where(.side-aksje) .sumrad .sumnavn { font-weight: 700; color: var(--blekk); }
+:where(.side-aksje) .sumrad .pille { white-space: nowrap; padding: 0.05rem 0.5rem; border-radius: 999px; font-weight: 700;
+                                     border: 1.5px solid var(--strek-2); }
+:where(.side-aksje) .sumrad .pille.tre-av-tre { border: 2px solid var(--oransje); background: var(--fyll); color: var(--hvit); }
+/* Story 8.2b, c (U62, U63): innledningen og forklaringen i kortet Retning. */
+:where(.side-aksje) p.innledning { max-width: 640px; font-size: 17px; line-height: 1.55; color: var(--tekst); margin: 0.4rem 0 24px; }
 :where(.side-aksje) .kursserien { margin: 0 0 12px; color: var(--dempet); font-size: 13.5px; }
 @media (max-width: 760px) {
   :where(.side-aksje) li.uke { display: block; }
+  /* Story 8.2b, c (U68): uten kolonnenavn, og med ukedagen i dagen. */
+  :where(.side-aksje) .ukehode { display: none; }
+  :where(.side-aksje) li.dag .ukedag { position: static; width: auto; height: auto; overflow: visible; clip: auto; }
   :where(.side-aksje) li.uke ol.dager { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; margin: 6px 0; }
   :where(.side-aksje) li.dag { flex-direction: row; flex-wrap: wrap; align-items: center; }
   :where(.side-aksje) li.dag.utenfor { display: none; }

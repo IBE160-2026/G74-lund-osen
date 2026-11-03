@@ -350,11 +350,12 @@ class TestAksjesiden:
         adresse = f"/aksje/{rad.emne.symbol}"
         tekst = f'<p class="ki-tekst">{escape(rad.tekst)}</p>'
         paa = klient.get(adresse).data.decode("utf-8")
-        assert tekst in paa and ">Skjul KI-teksten</button>" in paa
+        # Story 8.2b, c (U33): bryteren, med «På» og «Av».
+        assert tekst in paa and 'role="switch" aria-checked="true"' in paa
         svar = klient.post("/ki", data={"til": "av", "tilbake": adresse})
         assert svar.status_code == 303
         av = klient.get(adresse).data.decode("utf-8")
-        assert tekst not in av and ">Vis KI-teksten</button>" in av
+        assert tekst not in av and 'role="switch" aria-checked="false"' in av
         klient.post("/ki", data={"til": "paa", "tilbake": adresse})
         assert tekst in klient.get(adresse).data.decode("utf-8")
 
