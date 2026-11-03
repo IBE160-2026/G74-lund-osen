@@ -3091,6 +3091,72 @@ Det vi lærte: en avgjørelse føres i repoet før den siteres. Svaret kl. 09:20
 
 ---
 
+## 02.11.2026 – Kontrollen etter helga, PRD-fristen 5.11, og §53 som stoppet på en test
+
+*Joakim og Marian.*
+
+Kl. 17:40 kontrollerte Claude Code jobbens kjøringer fra fredag til søndag, bare med lesing (`84792a30`, utført i `7b65f514`). Hva kontrollen fant, står i oppføringen 30.10. Samme dag svarte vi kl. 17:40 på spørsmålene om 8.17a: tolkningen av f står, og avvikene fra én dag per side beholdes som et felles unntak, bare som tekst. Flettingen var satt til 2.11, men blokka ble ikke limt inn i tide, så den ble flyttet til 3.11 (`ee58786b`), se utfordring 1.
+
+Kl. 21:22 skrev vi refleksjonen for 29.10 og 30.10 (`f4caefac`). Kl. 21:16 gjenga vi beskjeden fra faglærer på emnesiden om at PRD-filen helst skal være ferdig torsdag 5.11. Vi svarte kl. 21:18 at PRD-en leses først og rettes onsdag, og det ble ført i `docs/innlevering.md` (`88827911`).
+
+Gjennomgangen av PRD-en kom kl. 21:42 og står i `_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/gjennomganger/gjennomgang-2026-11-02-foer-fristen.md` (`95edc9e9`): 51 funn, 14 av dem de åpne punktene i §8, og 11 spørsmål til oss. `prd.md` ble ikke endret den kvelden. Vi svarte kl. 22:15 med A–D: forslagene til spørsmål 1–4, 6 og 9–11 godtas, punkt 13 og 21 står åpne, brukertesten tas senere uten dato, og en brukslogg starter 4.11.
+
+Kl. 22:20 skulle §53 i `malinger.md` få ukas målinger fra tabellen `omsetning`. Den stoppet i steg 3 kl. 22:31, fordi `test_de_214_er_de_samme_som_i_malinger` i `tests/test_omsetning.py` feilet med §53 i fila, se utfordring 2. Etter svaret 03.11 kl. 00:40 leser testen hver § fram til neste overskrift (`58382ffb`), og §53 kom i `2abc02c4` med 48 rader og 0 med feil.
+
+**Utfordringer**
+
+1. **En blokk som ikke kom fram til oss.**
+   *Problem:* blokka som skulle flette 8.17a 2.11, ble aldri limt inn. At rådet i chatten skrev den, men at den ikke var synlig for gruppen, står bare i instruksjonen 03.11 kl. 20:03. Repoet viser bare at flettingen ble flyttet til 3.11 fordi blokka ikke ble limt inn (`ee58786b`).
+   *Løsning:* flettingen kom i en ny blokk natt til 3.11, kl. 01:09.
+   *KI sin rolle:* rådet i chatten skrev blokka. Claude Code kan bare kjøre det som limes inn. Gruppen så ikke blokka, og avgjorde å flytte flettingen.
+
+2. **En ny § som brøt en test for de gamle.**
+   *Problem:* testen for §52 leste til slutten av `malinger.md`, så radene i §53 ble talt med (`assert 262 == 214`).
+   *Løsning:* Claude Code stoppet kl. 22:31 uten å committe §53, og la fram tre valg. Gruppen valgte kl. 00:40 å la testen lese hver § fram til neste «## », og at den skulle prøves både med og uten §53. Den besto begge veier, og hele settet ble kjørt alene før §53 ble committet.
+   *KI sin rolle:* Claude Code fant feilen og stoppet. Gruppen valgte rettingen.
+
+Det vi lærte: en blokk regnes som kjørt først når den står i dagsfila. Det som bare finnes i chatten, er verken gjort eller avgjort. Og en test som leser et dokument, må lese det avsnittet den gjelder, ikke resten av fila, ellers stopper den neste gang dokumentet vokser.
+
+---
+
+## 03.11.2026 – 8.17a flettet, PRD-en rettet før fristen, og 8.17b bygget og flettet samme kveld
+
+*Joakim og Marian.*
+
+Kl. 01:09 kom blokka som flettet 8.17a. Svaret 2.11 kl. 17:40 ble ført under story 8.17, og unntaket fra én dag per side ble skrevet under FR-104 og FR-105 i `prd.md` med en test (`047f1f7b`). Hele settet ga 3908 bestått og bare de 7 porttestene feilet, og CI var grønn (41552952105). PR #106 ble squash-flettet kl. 01:30 i `b2e8b2c3`.
+
+Rettingen av PRD-en kom kl. 14:41 og var ferdig kl. 16:28: §8 i `c075b54e`, kravene R1–R33 i fem commits fra `a79bd455` til `b33c1ae5`, en ny `docs/brukslogg.md` i `7d36abef`, sprint-status i `fb6d1051` og README-ens «Status» i `7f67d336`. R35 stoppet kl. 15:05, se utfordring 3. Etter svaret kl. 16:25 står linja like under «Kort fortalt» (`d8524821`). Rettingen var tenkt natt til 3.11, se utfordring 2.
+
+8.17b ble bygget fra kl. 17:42 til 18:45 i PR #108: Min liste fikk «Sammenlign med» med en linje under hver rad for dagen man sammenligner med, en rad med eldre dag viser datoen sin (svaret kl. 14:28), og børsometeret fikk periodevalget. Spesifikasjonen i `322dd46b`, a, b og c i `5d2a9a82`, `7caab471` og `7844af63`, og rettingene etter gjennomgangen i `3c8fd278`. Hele settet ga 3934 bestått, de fire mutantene ble fanget, og gjennomgangen ga 28 funn. Bildene av demoen til PR-en viste at kolonneraden i Min liste sa «1 uke», og det ble rettet. PR-en stoppet før flettingen med tre spørsmål.
+
+Kl. 19:25 svarte vi på dem: tolkningen står, «Velg dag» viser endringen fra dagen til siste børsdag, og fargetrinnene er de samme ved en periode (`a6df8f16`). PR #108 ble squash-flettet kl. 19:36 i `978bd1ab`, og story 8.17 er done (`23c16ad9`).
+
+**Utfordringer**
+
+1. **En blokk som var avkortet da den ble limt inn.**
+   *Problem:* natt til 3.11 ble en blokk limt inn uten slutten. At det skjedde, og at Claude Code ikke kjørte den, står bare i instruksjonen kl. 20:03. Repoet viser ingenting av den.
+   *Løsning:* steg-vakta og sluttlinja virket: en instruksjon sier hvor mange steg den har, og slutter med «SLUTT PAA INSTRUKSJONEN». Mangler noe, gjøres ingenting (regel 1).
+   *KI sin rolle:* Claude Code stoppet uten å gjøre noe. Hvilken blokk det var, står ikke i repoet.
+
+2. **Rettingen av PRD-en kom på dagtid i stedet for natta.**
+   *Problem:* rettingen var tenkt natt til 3.11, men ble limt inn først kl. 14:41. 8.17b, som var avgjort å bygges «i natt» etter rettingen (svaret kl. 01:06), måtte vente.
+   *Løsning:* 8.17b ble bygget kl. 17:42–18:45, og en datert linje under story 8.17 sier at rettingen ikke var limt inn natt til 3.11 (`dc8a5b08`).
+   *KI sin rolle:* gruppen bestemte rekkefølgen. Claude Code sjekket i steg 0 at rettingen hadde Utført-linje før 8.17b startet.
+
+3. **En instruksjon som ba om noe en test ikke tillot.**
+   *Problem:* R35 skulle legge to linjer i «Kort fortalt» i `prd.md`, men `test_hoeyst_400_ord` i `tests/test_docker.py` tillater høyst 400 ord der, og avsnittet hadde 396. Med linjene ble det 533.
+   *Løsning:* Claude Code stoppet kl. 15:05 og la fram fire valg, blant dem å heve grensen i testen. Gruppen svarte kl. 16:25: «Like under «Kort fortalt»». Testen står uendret.
+   *KI sin rolle:* rådet i chatten skrev instruksjonen uten å vite om grensen. Claude Code fant den og stoppet. Gruppen avgjorde.
+
+4. **Jobber i CI som ble avbrutt uten at et steg feilet.**
+   *Problem:* macOS-jobben ble avbrutt etter 15 minutter uten et steg som feilet, tre ganger 3.11: på `d8524821` (41663954267), på grenen for 8.17b på `496e619c` (41684364131) og på flettecommiten `978bd1ab` (41695429612). På `8b0988be` (41664214196) feilet Windows-jobben i «Start demoen på Windows» med kode 1, rett etter at demoen svarte med Eksempeltall, uten en melding om hvorfor. Kjøringene på main etter de to commitene var grønne.
+   *Løsning:* på grenen og på flettecommiten ble macOS-jobben kjørt én gang til og besto, og det står i Utført-linjene. De to røde kjøringene på main under rettingen av PRD-en ble ikke sett før kvelden, fordi Utført-linja kl. 16:28 ble skrevet før CI var ferdig. Grunnen til avbruddene er ikke slått opp.
+   *KI sin rolle:* Claude Code fant avbruddene, kjørte jobben på nytt der instruksjonen tillot det, og fant de to røde kjøringene på main da denne oppføringen ble skrevet. Gruppen må avgjøre om grunnen skal finnes.
+
+Det vi lærte: steg-vakta og sluttlinja stopper en avkortet blokk før den gjør skade. En instruksjon som strider mot en test, stoppes og avgjøres av gruppen, i stedet for at testen endres. En jobb i CI som avbrytes uten at et steg feiler, kan kjøres én gang til og føres, men grunnen må finnes. Og Utført-linja bør si om CI er ferdig, ellers blir en rød kjøring på main ikke sett.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
