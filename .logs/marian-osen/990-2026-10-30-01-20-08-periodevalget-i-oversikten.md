@@ -74,3 +74,25 @@ Kontroll av jobben og CI, og så 8.17a videre etter gruppens svar 30.10 kl. 10:4
 ### Åpne punkter
 - 8.17a: gruppen ser over tolkningen av f i Rettet-linjene under FR-104 og FR-105 før flettingen mandag.
 - 8.17a f: avvik fra én dag per side, slått opp uten endring. Rader med eldre data viser sin egen dag, og ved en periode regnes endringen til radens egen siste børsdag (oversikten og Min liste). Aksjesiden følger aksjens egen siste dag, og indekslinja i grafen kan slutte før grafen.
+
+## 2026-11-03 kl. 01:32 — Marian Osen
+
+### Oppgave
+Flette 8.17a 03.11 før kl. 21:20, etter gruppens svar 02.11 kl. 17:40: tolkningen av f står, og avvikene fra én dag per side beholdes som et felles unntak, bare som tekst (instruksjonen kl. 01:09 i dagsfila 03.11).
+
+### Plan
+- Instruksjonen i dagsfila, avgjørelsen under story 8.17 og de to spørsmålene i `issues.md` krysset av, på main.
+- På grenen i en worktree utenfor repo-mappa: main flettet inn, unntaket under FR-104 og FR-105 og i spesifikasjonen, slått opp i koden, med en test. Hele settet, ruff, CI.
+- Squash-fletting låst til head-en, og etterpå status, sprint-status og kvalitetssikringen på main.
+
+### Resultat
+- Kvoten kl. 01:09 (00:09 GMT): 0 brukt 03.11 i GMT og 20 igjen, med `extraLimit` 463. Ingen andre kall.
+- `4868723b` (01:10) dagsfila, og `ee58786b` (01:11) avgjørelsen og flyttingen til 3.11 under story 8.17, med de to punktene i `issues.md` krysset av.
+- Grenen: main flettet inn i `aaa3c284` (01:12). Unntaket står i `047f1f7b` (01:27): datert linje under FR-104 og FR-105 i `prd.md` og i «Åpent» ved f i spesifikasjonen, med `test_fr_104_og_fr_105_har_unntaket_fra_en_dag_per_side`, som feilet med `prd.md` fra HEAD og besto med linja. Slått opp i koden: raden viser aksjens egen siste dag (`bygg_rad`, `med_perioden`) og sier ikke hvilken dag den gjelder, utenom «hentet» under navnet (`eldre_enn_nyeste`). Ukedagen i overskriften og datoen under den er den eldste blant radene (`sidens_dato`), mens indeksen og søylene bruker den nyeste (`sidens_siste`). Aksjesiden har dagen i linja under overskriften. Indekslinja slutter med «Indeksen går bare til». Søylene har bare aksjer med kurs for tabellens dag. Hjelpen og `docs/hjelp.md` er ikke endret, fordi de ikke sier noe som går imot unntaket.
+- Ledig minne 6 054 MB. Hele settet alene kl. 01:16:28–01:26:44 (614 s): 3908 bestått, 24 hoppet over og 7 feilet, de 7 porttestene for `start.ps1`. Ruff: ingen funn.
+- CI 41552952105 grønn på `047f1f7b`. Worktreen er fjernet. PR #106 ble squash-flettet i `b2e8b2c3` (01:30), låst til head-en, og grenen er slettet på GitHub. `pr-8-17a-bilder` står. CI 41553322199 er grønn på `b2e8b2c3`.
+- `de362fac` (01:32): spesifikasjonen done, linja under story 8.17, 8-17 in-progress i sprint-status, og radene i §3, §5 (66 rader: 39 rettet, 13 avvist, 10 utsatt) og vedlegget i kvalitetssikringen.
+
+### Åpne punkter
+- 8.17b: Min liste og børsometeret med periodevalget.
+- Raden i oversikten sier ikke hvilken dag den gjelder når aksjen mangler kurs for siden sin dag, og overskriften tar da den eldste datoen. Det er unntaket gruppen valgte. Forslag, ikke avgjort: se på det igjen i 8.17b.
