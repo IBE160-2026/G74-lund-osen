@@ -4032,6 +4032,10 @@ avgjøres i planen.
 
 *Avgjort 2026-10-30 kl. 12:21 (gruppens svar):* e) Hele delen med hovedindeksen følger tabellens dag, også tallet over søylene. Mangler indeksen kurs den dagen, står det der tallet ellers står. f) Om FR-105 svarte gruppen: «forstår ikke hva blir best i forhold til alle sidene, må være samkjørt». Det føres slik: alle sidene følger samme regel, én dag per side, og alt på siden, også indeksen, gjelder den dagen. FR-105 får en Rettet-linje om dette. Gruppen ser over tolkningen før flettingen.
 
+*Avgjort 2026-11-02 kl. 17:40 (gruppens svar):* 1) Tolkningen av f er riktig, og Rettet-linjene under FR-104 og FR-105 står. 2) Avvikene beholdes og skrives inn som et felles unntak, slik koden er i dag: mangler en aksje kurs for dagen siden viser, viser raden i oversikten og i Min liste, og aksjesiden, aksjens egen siste dag, og indekslinja i kursgrafen slutter ved indeksens siste kurs. Bare tekst, ingen ny kode, og 8.17a flettes 2.11.
+
+*Lagt til 2026-11-03:* flettingen ble flyttet til 3.11, fordi blokka ikke ble limt inn 2.11 (instruksjonen kl. 01:09 i dagsfila 03.11).
+
 ### Story 8.18: Kommende eks.dato i kursgrafen
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
