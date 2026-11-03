@@ -2,7 +2,7 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-24T15:33
+updated: 2026-11-03T14:45
 ---
 
 # Kilder og rettigheter
@@ -1334,6 +1334,8 @@ lenger uimotsagt» over.
       avgjøre om EODHDs klarering holder, og skrive ned hvorfor.
       **Eier: Marian.** Frist: før del 2 av relevanseksperimentet
 - [ ] Kontrollere Alpha Vantage sine vilkår for ikke-kommersiell bruk
+      *Lagt til 2026-11-03 (gruppens svar 02.11 kl. 22:15):* Alpha Vantage brukes ikke i v1,
+      og vilkårene er ikke kontrollert. Punkt 9 i §8 i `prd.md` er lukket av det.
 - [x] ~~Lese EODHDs fullstendige ToS, ikke bare prissiden~~ — gjort 2026-09-20,
       se seksjonen «EODHD: hva de fullstendige vilkårene sier». Svaret er uklart
 - [x] ~~Spørre `support@eodhistoricaldata.com` skriftlig om språkmodellbruk~~ —
