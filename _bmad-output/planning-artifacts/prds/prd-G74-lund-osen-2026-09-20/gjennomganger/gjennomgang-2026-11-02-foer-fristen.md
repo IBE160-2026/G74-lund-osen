@@ -2,7 +2,7 @@
 title: "Gjennomgang av PRD-en før fristen 5.11"
 status: aktiv
 created: 2026-11-02
-updated: 2026-11-03T14:42
+updated: 2026-11-03T16:27
 ---
 
 # Gjennomgang av PRD-en før fristen 5.11
@@ -153,3 +153,5 @@ og 9–11 er godtatt. B) Punkt 13 og 21 står åpne som nå (spørsmål 5). C) B
 (spørsmål 7). D) En brukslogg starter 4.11, med én linje for hver dag gruppen bruker
 appen, og §7 sier at bruken ikke ble logget før (spørsmål 8). Ført 03.11 i
 instruksjonen kl. 14:41.
+
+*Lagt til 2026-11-03:* PRD-en er rettet før fristen 5.11, 03.11, etter gruppens svar 02.11 kl. 22:15. I `prd.md`: §8 i `c075b54e` (5b og 9 lukket, tabellen «Utenfor v1», R34), R1–R7 i `a79bd455`, R8–R13 i `b0cfa6b2`, R14–R25 i `3c74eff1`, R28 med brukslogga i `7d36abef`, R26, R27 og R29–R33 i `b33c1ae5`, og R35 like under «Kort fortalt» i `d8524821` (svaret 03.11 kl. 16:25, fordi «Kort fortalt» har høyst 400 ord). 126 linjer er lagt til i `prd.md`, og de 11 som er fjernet, er de ti flyttede radene i §8 og `updated`. Utenfor `prd.md`: Alpha Vantage i `docs/kilder-og-rettigheter.md` i `8a006032`, «Status» i README-en i `7f67d336`, `sprint-status.yaml` i `fb6d1051` og `docs/brukertest.md` i `ef5f627a`. `status` i `prd.md` står som final.
