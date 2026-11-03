@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-11-03T14:57
+updated: 2026-11-03T16:26
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -98,6 +98,10 @@ Fra 29.10 starter en jobb på en PC i gruppen hentingen hver kveld (tillegget
 prøven av README-en på en ren maskin.
 
 ---
+
+*Rettet 2026-11-03 (gjennomgangen 02.11, R35, svaret 03.11 kl. 16:25):* «Bygget per 28.10» i «Kort fortalt» gjelder til 28.10. Bygget per 3.11, etter «Status» i README-en: i tillegg måler jobben fra 29.10 omsetningen etter hentingen med kallene som er igjen (FR-413, story 2.13, `676fbc8b`), og fra 3.11 har oversikten periodevalget, med søylene og indekslinja (story 8.17a, `b2e8b2c`). Min liste, «Signalet dag for dag» og børsometeret som egen side har ikke eget FR (spørsmål 10 i gjennomgangen); de står i `epics.md` og i README-en. Linja står her og ikke i «Kort fortalt», fordi den delen har høyst 400 ord.
+
+*Lagt til 2026-11-03:* PRD-en er gått gjennom før fristen 5.11 i [gjennomgangen 02.11](gjennomganger/gjennomgang-2026-11-02-foer-fristen.md), og rettet 03.11 etter gruppens svar 02.11 kl. 22:15. Hver retting står som en datert linje ved kravet, merket med raden i gjennomgangen (R1–R35), og §8 har fått tabellen «Utenfor v1».
 
 Dette dokumentet fastsetter hva OSE Signal skal gjøre i v1. Det er et
 kravregister: hvert krav står med sin normative setning og én linje begrunnelse.
