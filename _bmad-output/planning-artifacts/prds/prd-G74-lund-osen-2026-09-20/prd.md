@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-11-03T14:51
+updated: 2026-11-03T14:52
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -820,6 +820,8 @@ feil. I demoen er datoene oppdiktet og merket «Eksempeltall» (FR-411).
 
 ### 4.3 Kommende finansielle hendelser
 
+*Utenfor v1 (plan B, 28.09). Lagt til 2026-11-03 (gjennomgangen 02.11, R8):* kommende hendelser er ute av v1 (§2, punkt 1 i §8), og Epic 7 står i backlog. FR-301–FR-303 står som plan for en senere versjon.
+
 #### FR-301 — Kilde og kobling til selskap
 
 Kommende finansielle hendelser hentes fra Euronexts finanskalender. Kilden
@@ -920,6 +922,8 @@ uansett hvor langt intervallet er**. Etterfylling av 15 symboler koster derfor
 
 #### FR-404 — Etterfylling av børsmeldinger
 
+*Utenfor v1 (plan B, 28.09). Lagt til 2026-11-03 (gjennomgangen 02.11, R9):* det hentes ikke fra NewsWeb i v1 (punkt 1 i §8), og story 6.2 står i backlog.
+
 Meldinger etterfylles på samme måte som kurser og koster ingen EODHD-kvote.
 NewsWeb støtter `fromDate` og `toDate` som et ekte intervall.
 
@@ -927,6 +931,8 @@ Meldinger følger kalenderdøgn, ikke børsdager. Etterfylling skal derfor dekke
 alle kalenderdager i hullet, ikke bare børsdagene.
 
 #### FR-405 — Avkorting ved lange meldingsintervaller
+
+*Utenfor v1 (plan B, 28.09). Lagt til 2026-11-03 (gjennomgangen 02.11, R9):* som FR-404, og story 6.2 står i backlog.
 
 NewsWeb har et resultattak på mellom 557 og 601 meldinger per forespørsel. Er
 intervallet for langt, returneres de **nyeste** meldingene og resten forkastes —
@@ -1027,6 +1033,8 @@ var:
 | Relevante meldinger | Hvilke meldinger som ble vist for aksjen den dagen |
 | Kurs | `close` og `adjusted_close` |
 | Grunn | Bare når vurderingen mangler: hvorfor (punkt 24 i §8) |
+
+*Utenfor v1 (plan B, 28.09). Lagt til 2026-11-03 (gjennomgangen 02.11, R11):* raden «Relevante meldinger» er ikke en kolonne i `vurdering`. `src/migrasjoner/0002_vurdering.sql` sier at den kommer senere, og meldingene er ute av v1.
 
 *Lagt til 2026-09-29, avgjort av gruppen 28.09.* Målingene lagres fordi en
 vurdering skal kunne etterprøves og sjekkes. Et fortegn uten måling kan ikke det
@@ -1286,6 +1294,8 @@ ingen lenker til Euronexts nettsteder).
 
 ### 4.5 Meldingsfilter og deduplisering
 
+*Utenfor v1 (plan B, 28.09). Lagt til 2026-11-03 (gjennomgangen 02.11, R10):* hele delen gjelder meldingene, som er ute av v1 (punkt 1 i §8): FR-501, FR-502, FR-503 og «Resultat av filteret». Epic 6 står i backlog.
+
 Grunnlaget er en måling over 2026-08-22 til 2026-09-18, **28 kalenderdager**.
 For de 15 selskapene ga det **121 meldinger, 4,3 per kalenderdag**. Mengden er
 ikke problemet; sorteringen er. Fordelingen i sin helhet: `malinger.md`,
@@ -1367,6 +1377,8 @@ eks.dato som forteller hvilke dager differansen mellom to viste sluttkurser ikke
 vil stemme med den viste prosenten.
 
 Kategorien føres derfor til utbyttemerkingen, ikke til meldingsvisningen.
+
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R10):* FR-407 bygger nå på kursserien, ikke på meldinger i `EKS.DATO` (FR-407, punkt 4 i §8).
 
 #### Resultat av filteret
 
@@ -1755,6 +1767,8 @@ Terskelen styrer **visningen og sorteringen**, ikke hentingen.
 aksjen kommer over terskelen. KI-kostnaden er omtrent 1,25 forklaringer og 0,5
 relevansvurderinger per henting.
 
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R12):* de to setningene over gjelder plan A. I v1 hentes ingen meldinger (plan B, 28.09), og KI-teksten lages for hver aksje med en vurdering (`src/fetch_prices.py`, story 10.2).
+
 Hvorfor terskel 2 og ikke 3: se `begrunnelser.md`.
 
 *Endret 2026-09-22.* Setningen sa «hver dag» og «i døgnet». Det var en
@@ -1867,6 +1881,8 @@ henger sammen med av/på-bryteren i FR-601, som gjør KI-bidraget etterprøvbart
 
 Grensesnittet er på norsk, og KI-forklaringene gis på norsk. Dette er også
 begrunnelsen for språkvalget i dedupliseringen (FR-501).
+
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R13):* dedupliseringen i FR-501 er plan A og ute av v1, så den delen av begrunnelsen gjelder ikke v1. Kravet om norsk står.
 
 ### NFR-06 — Løsningen gir ikke investeringsråd
 
