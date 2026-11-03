@@ -222,7 +222,7 @@
           {#- Svar 2: bare «NOK» under et kolonnenavn. Story 8.15: «?» står
               ved siden av lenken, ikke inne i den. #}
           <th class="tall"{{ ariasort("kurs") }}>{{ sorterlenke("kurs", "Sluttkurs") }} {{ hjelpeknapp("hjelp-sluttkurs", "Hjelp: sluttkurs") }}<span class="under">NOK</span></th>
-          <th class="tall"{{ ariasort("endring") }}>{{ sorterlenke("endring", "Endring") }} {{ hjelpeknapp("hjelp-endring", "Hjelp: endring") }}{% if valg and valg.periode == "velg" %}<span class="under">{{ valg.dag|dato }}</span>{% elif periodestart %}<span class="under">{{ periodenavn }}</span>{% endif %}</th>
+          <th class="tall"{{ ariasort("endring") }}>{{ sorterlenke("endring", "Endring") }} {{ hjelpeknapp("hjelp-endring", "Hjelp: endring") }}{#- Story 8.17b: i Min liste er øverste linje siste børsdag. #}{% if aktiv == "min_liste" %}{% elif valg and valg.periode == "velg" %}<span class="under">{{ valg.dag|dato }}</span>{% elif periodestart %}<span class="under">{{ periodenavn }}</span>{% endif %}</th>
           <th class="tall"{{ ariasort("signal") }}>{{ sorterlenke("signal", "Signalstyrke") }} {{ hjelpeknapp("hjelp-signalstyrke", "Hjelp: signalstyrken") }}</th>
           <th{{ ariasort("retning") }}>{{ sorterlenke("retning", "Retning") }} {{ hjelpeknapp("hjelp-retning", "Hjelp: retning") }}</th>
         </tr>

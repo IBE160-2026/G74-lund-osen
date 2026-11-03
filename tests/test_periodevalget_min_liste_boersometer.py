@@ -303,3 +303,59 @@ class TestTilgjengelig:
         assert 'class="periodehode"' in html
         r = _kjoer(html, tmp_path, 390, BREDDEN)
         assert r == {"rull": 390, "brede": []}, r
+
+
+class TestGjennomgangen:
+    """Gjennomgangen 03.11 av dc8a5b0..7844af6 (spesifikasjonen, «Gjennomgangen»)."""
+
+    def test_hovedindeksen_for_perioden_i_boersometeret(self, klient):
+        """VG1, BH11: «Mål mot børsen» har indeksens endring for perioden,
+        1000 fredag 02.10 mot 1100 siste børsdag, +10,00 %, ikke dagens
+        0,00 %. ECH1: begynner indeksen etter starten, står «–», som
+        indekslinja i oversikten. Ville feilet med dagens endring, eller
+        med endringen over en kortere tid."""
+        _basen(med_indeks=True)
+
+        def maal(adresse):
+            seksjon = _side(klient, adresse).split('class="maal"')[1].split("</section>")[0]
+            return [
+                re.sub(r"[ \t\r\n]+", " ", _synlig(li)).strip() for li in re.findall(r"<li>(.*?)</li>", seksjon, re.S)
+            ]
+
+        assert maal("/boersometer?periode=1-uke")[2] == "Hovedindeksen · +10,00 %"
+        assert maal("/boersometer")[2] == "Hovedindeksen · 0,00 %"
+        assert maal("/boersometer?periode=1-mnd")[2] == "Hovedindeksen · –"
+
+    def test_en_kortere_serie_i_boersometeret(self, klient):
+        """VG2: AKRBP begynner mandag 05.10, så ruta har +5,00 %, og tabellen
+        sier «fra 05.10». Ville feilet uten «fra», eller med «–»."""
+        _basen()
+        html = _side(klient, "/boersometer?periode=1-uke")
+        tabell = html.split('<table class="boersometertabell">')[1]
+        rad = next(r for r in tabell.split("<tr>") if "Aker BP" in r)
+        assert "+5,00 % fra 05.10" in _synlig(rad)
+
+    def test_linja_under_for_en_rad_med_eldre_dag(self, klient):
+        """VG3: linja under går til radens egen siste dag, 08.10 for KOG,
+        med 50 begge dagene, så 0,00 %. Ville feilet med «–» hvis sidens
+        dag ble brukt som slutt."""
+        TestEgenDag._basen_med_en_eldre_dag()
+        tekst, _ = _under(_side(klient, "/min-liste?vis=alle&periode=1-uke"), "KOG")
+        assert "fredag 02.10 50,00 0,00 %" in tekst, tekst
+
+    def test_fargen_i_linja_under(self, klient):
+        """VG4: endringen i linja under har fargen etter tallet. Ville
+        feilet uten klassen opp."""
+        _basen()
+        _, linja = _under(_side(klient, "/min-liste?vis=alle&periode=1-uke"), "EQNR")
+        assert '<td class="tall opp">' in linja
+
+    def test_kolonneraden_i_min_liste_er_siste_boersdag(self, klient):
+        """Funnet i bildene: øverste linje i Min liste er siste børsdag, så
+        kolonneraden sier ikke perioden eller dagen under «Endring». Ville
+        feilet med «1 uke» eller «07.10» under kolonnenavnet."""
+        _basen()
+        for adresse in ("/min-liste?vis=alle&periode=1-uke", "/min-liste?vis=alle&periode=velg&dag=2026-10-07"):
+            hode = _side(klient, adresse).split("<thead>")[1].split("</thead>")[0]
+            assert "1 uke" not in hode and "07.10" not in hode, adresse
+        assert '<span class="under">1 uke</span>' in _side(klient, "/?periode=1-uke")

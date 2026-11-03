@@ -17,12 +17,12 @@
 <nav class="periodevalg" aria-label="{{ etikett }}">
   <ul>
     {%- for kode, navn in knapper %}
-    <li><a href="{{ adresse }}?{% for navn, verdi in ekstra %}{{ navn }}={{ verdi }}&amp;{% endfor %}periode={{ kode }}{% if anker %}#{{ anker }}{% endif %}"{% if kode == valgt %} aria-current="true"{% endif %}>{{ navn }}</a></li>
+    <li><a href="{{ adresse }}?{% for felt, verdi in ekstra %}{{ felt }}={{ verdi }}&amp;{% endfor %}periode={{ kode }}{% if anker %}#{{ anker }}{% endif %}"{% if kode == valgt %} aria-current="true"{% endif %}>{{ navn }}</a></li>
     {%- endfor %}
     <li>
       <form method="get" action="{{ adresse }}{% if anker %}#{{ anker }}{% endif %}">
-        {%- for navn, verdi in ekstra %}
-        <input type="hidden" name="{{ navn }}" value="{{ verdi }}">
+        {%- for felt, verdi in ekstra %}
+        <input type="hidden" name="{{ felt }}" value="{{ verdi }}">
         {%- endfor %}
         <input type="hidden" name="periode" value="velg">
         <label class="skjult" for="velg-dag">Velg dag</label>

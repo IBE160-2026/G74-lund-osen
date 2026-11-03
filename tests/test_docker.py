@@ -1069,7 +1069,9 @@ HOEYDE_PAA_BILDET = 1690
 # er byte for byte det samme.
 # Story 8.17b, c: lenkene «Alle / Min liste» i index.html, der &amp; ble
 # skrevet to ganger. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "cff0c06b539c7987f52e6ebf8cb06a6ac06800f3859ed763a1275acda93925c2"
+# Gjennomgangen av 8.17b 03.11: rettingene i app.py, index.html, _perioder.html
+# og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "34d22f9be30b77a192a80cb1c001a0fa4484fe3e1fcfb3e4550637af6aad4837"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1288,7 +1290,9 @@ HOEYDE_PAA_AKSJESIDEN = 1894
 # Story 8.17b, b: periodevalget i børsometeret, i app.py, boersometer.py,
 # hjelpetekster.py, boersometer.html og stil.css. Bildet ble tatt paa nytt og
 # er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "e533fbaccd3945181db61d9413e34ce050d965cb54b3e0e49611ee199e9f27af"
+# Gjennomgangen av 8.17b 03.11: rettingene i app.py, index.html, _perioder.html
+# og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "e63a2847ea8144bf13ec53a6b7bdc9d94712fc023810fe27dafccd5baea27d27"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "

@@ -557,14 +557,15 @@ def _indeksen_for_grafen() -> tuple[str | None, dict | None, bool]:
 def _indeksen_for_perioden(start: date, siste: date) -> float | None:
     """Endringen i hovedindeksen fra start til siste børsdag, til linja «Mål
     mot børsen» ved en periode - story 8.17b, regnet som indekslinja i
-    oversikten (periodeendring). None som _indeksen_for_dagen."""
+    oversikten (periodeendring). None som _indeksen_for_dagen, og når
+    indeksen begynner etter start, som indekslinja (gjennomgangen, ECH1)."""
     try:
         lager = SqliteIndekslager(g.tilkobling)
         symboler = lager.symboler()
         if not symboler:
             return None
         utfall = periodeendring(lager.serie(valgt_indeks(symboler)), start, siste)
-        return utfall[0] if utfall is not None else None
+        return utfall[0] if utfall is not None and utfall[1] is None else None
     except (*BASEFEIL, ValueError):
         return None
 
