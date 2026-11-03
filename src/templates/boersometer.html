@@ -1,6 +1,7 @@
 {% extends "_ramme.html" %}
 {% from "_hjelp.html" import hjelpeknapp, hjelpevindu with context -%}
 {% from "_bransjer.html" import bransjesymbol -%}
+{% from "_perioder.html" import periodevalg with context -%}
 {#- Story 8.6 (FR-106, avgjørelsen 22.10 kl. 23:19): børsometeret som på
     tavla. Én rute per aksje, ordnet etter bransje med symbolet. Fargen er
     endringen slik den vises, størrelsen volumforholdet, og rammen signalet:
@@ -23,13 +24,19 @@
   {% if bransjer %}
     <p class="meta">{{ "Demo Børs" if eksempeltall else "Oslo Børs" }} · {{ dagen|ukedag }} {{ dagen|dato }} · {{ antall_ord(antall_aksjer, "aksje", "aksjer") }} i {{ antall_ord(bransjer|length, "bransje", "bransjer") }}</p>
     {#- Story 8.6b, a (avgjørelsen 24.10 kl. 11:54): forklaringen øverst, som på tavla. #}
+    {#- Story 8.17b (gruppens svar 23.10 kl. 12:35, b): ved en periode er
+        fargen endringen for perioden, og rutene er like store, fordi volumet
+        mot vanlig gjelder én dag. Siden sier det. #}
+    {% if periodestart %}
+    <p class="innledning">Hver rute er en aksje, samlet etter bransje. Fargen viser endringen for {{ periodenavn }}, fra {{ periodestart|dato }} til {{ siste|dato }}, og rutene er like store, fordi volumet mot vanlig gjelder én dag. Rammen er signalet siste børsdag. Klikk på en rute for å se aksjen. Bildet viser hva som skjedde, ikke hva du bør kjøpe eller selge.</p>
+    {% else %}
     <p class="innledning">Hver rute er en aksje, samlet etter bransje. Fargen viser endringen fra børsdagen før, og jo større ruta er, jo mer ble aksjen omsatt sammenlignet med vanlig. Klikk på en rute for å se aksjen. Bildet viser hva som skjedde, ikke hva du bør kjøpe eller selge.</p>
-    <form class="velg-dag-boersometer" method="get" action="/boersometer">
-      <label for="dag">Velg dag</label>
-      <input type="date" id="dag" name="dag" min="{{ foerste.isoformat() }}" max="{{ siste.isoformat() }}" value="{{ dagen.isoformat() }}" required>
-      <button type="submit">Vis dagen</button>
-      {% if dagen != siste %}<a href="/boersometer">Siste børsdag</a>{% endif %}
-    </form>
+    {% endif %}
+    {#- Story 8.17b: periodevalget fra 8.16, som i oversikten og Min liste
+        (designregler §2), i stedet for skjemaet for «Velg dag» fra 8.6. En
+        dag uten kurs gir fortsatt børsdagen før. #}
+    <div class="periodehode">{{ periodevalg(knapper, valg.periode, "/boersometer", valg.dag, foerste, siste, "Periode for børsometeret") }} {{ hjelpeknapp("hjelp-perioden", "Hjelp: periodene") }}</div>
+    {% if valg.beskjed %}<p class="periodebeskjed" role="status">{{ valg.beskjed }}</p>{% endif %}
     {% if ugyldig %}<p class="forklaring">Datoen kunne ikke leses, så siden viser siste børsdag.</p>{% endif %}
     {% if foer_foerste %}<p class="forklaring">{{ valgt|dato }} er før første kurs, så siden viser første børsdag med kurs, {{ dagen|dato }}.</p>
     {% elif valgt and valgt != dagen %}<p class="forklaring">{{ valgt|dato }} har ingen kurs, så siden viser børsdagen før, {{ dagen|dato }}.</p>{% endif %}
@@ -41,8 +48,13 @@
     <section class="maal" aria-labelledby="maal-tittel">
       <h2 id="maal-tittel">Mål mot børsen</h2>
       <ul>
+        {% if periodestart %}
+        <li>Farge · endring for {{ periodenavn }}, fra {{ periodestart|dato }}</li>
+        <li>Størrelse · like store ruter: volumet mot vanlig gjelder én dag</li>
+        {% else %}
         <li>Farge · endring fra {{ dagen_foer }}</li>
         <li>Størrelse · volum mot medianen for de {{ volum_vindu }} børsdagene før</li>
+        {% endif %}
         <li>Hovedindeksen · {% if indeksendring is not none %}<span class="indeksendring {{ fortegn(indeksendring) }}">{{ indeksendring|tall('endring') }}</span>{% else %}–{% endif %}</li>
       </ul>
     </section>
@@ -74,7 +86,7 @@
             <span class="endring">{% if rute.endring is not none %}{{ rute.endring|tall('endring') }}{% elif rute.uten_data %}Uten data{% else %}–{% endif %}</span>
             {% if rute.ramme == "gul" %}<span class="merke">{{ antall_sjekker }} av {{ antall_sjekker }}{% if dagen != siste %} siste børsdag{% endif %}</span>{% elif rute.ramme == "moerk" %}<span class="merke">{{ antall_sjekker - 1 }} av {{ antall_sjekker }}</span>{% endif %}
             {% if rute.tekst and not rute.uten_data %}<span class="tekst">{{ rute.tekst }}</span>{% endif %}
-            <span class="skjult">, {{ rute.aksje.navn }}{% if rute.volumord %}, volum {{ rute.volumord }}{% endif %}</span>
+            <span class="skjult">, {{ rute.aksje.navn }}{% if rute.fra %}, fra {{ rute.fra|dato }}{% endif %}{% if rute.volumord and not rute.lik_stoerrelse %}, volum {{ rute.volumord }}{% endif %}</span>
           </a></li>
           {%- endfor %}
         </ul>
@@ -103,9 +115,9 @@
     {#- Rullboksen fra oversikten: tabellen ruller, ikke siden, også med tastaturet. #}
     <div class="tabellboks boersometerboks" role="region" aria-label="Børsometeret som tabell" tabindex="0">
     <table class="boersometertabell">
-      <caption>Børsometeret {{ dagen|dato }} som tabell</caption>
+      <caption>Børsometeret {% if periodestart %}for {{ periodenavn }}, fra {{ periodestart|dato }} til {{ siste|dato }},{% else %}{{ dagen|dato }}{% endif %} som tabell</caption>
       <thead>
-        <tr><th scope="col">Bransje</th><th scope="col">Selskap</th><th scope="col">Endring</th><th scope="col">Volum mot vanlig</th><th scope="col">Signalstyrke</th></tr>
+        <tr><th scope="col">Bransje</th><th scope="col">Selskap</th><th scope="col">Endring{% if periodestart %}, {{ periodenavn }}{% endif %}</th><th scope="col">Volum mot vanlig{% if periodestart %}, {{ siste|dato }}{% endif %}</th><th scope="col">Signalstyrke{% if periodestart %}, {{ siste|dato }}{% endif %}</th></tr>
       </thead>
       <tbody>
         {%- for bransje in bransjer %}
@@ -113,7 +125,7 @@
         <tr>
           <td>{{ bransje.navn }}{% if loop.first %} ({{ antall_ord(bransje.antall, "aksje", "aksjer") }}{% if bransje.snitt is not none %}, snitt {{ bransje.snitt|tall('endring') }}{% endif %}){% endif %}</td>
           <td><a href="{{ aksjeadresse(rute.aksje.symbol) }}">{{ rute.aksje.navn }}</a></td>
-          <td>{% if rute.endring is not none %}{{ rute.endring|tall('endring') }}{% elif rute.uten_data %}Uten data{% else %}–{% endif %}</td>
+          <td>{% if rute.endring is not none %}{{ rute.endring|tall('endring') }}{% if rute.fra %} fra {{ rute.fra|dato }}{% endif %}{% elif rute.uten_data %}Uten data{% else %}–{% endif %}</td>
           <td>{% if rute.volumforhold is not none %}{{ rute.volum_vist }} ({{ rute.volumord }}){% else %}–{% endif %}</td>
           <td>{% if rute.styrke is not none %}{{ rute.styrke }} av {{ antall_sjekker }}{% elif rute.uten_data %}Uten data{% else %}{{ rute.tekst or "–" }}{% endif %}</td>
         </tr>
@@ -137,4 +149,6 @@
     </p>
   {% endif %}
   {{ hjelpevindu("hjelp-boersometer", "Børsometer", [("", ["boersometeret"])]) }}
+  {#- Story 8.17b: periodevalget. #}
+  {% if bransjer %}{{ hjelpevindu("hjelp-perioden", "Periodene", [("", ["perioden_boersometeret"])]) }}{% endif %}
 {% endblock %}

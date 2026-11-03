@@ -49,6 +49,9 @@ from boersometer import (
     trinnforklaringer,
     vis_dagen_foer,
 )
+from boersometer import (
+    med_perioden as rute_med_perioden,
+)
 from dagene import setning_om_dagene, tell_dagene
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
 from graf import bygg_graf
@@ -86,6 +89,7 @@ from markedsoversikt import (
     neste_orden,
     norsk_tid,
     oppdatert,
+    periodeendring,
     rader_uten_data,
     sidens_dato,
     sidens_tidsstempel,
@@ -108,6 +112,7 @@ from perioder import (
     les_valg,
     startdag,
 )
+from perioder import BOERSOMETERET as BOERSOMETER_VALG
 from perioder import MIN_LISTE as MIN_LISTE_VALG
 from perioder import OVERSIKTEN as OVERSIKTEN_VALG
 from signalberegning import BLANDET, STANDARD
@@ -549,6 +554,21 @@ def _indeksen_for_grafen() -> tuple[str | None, dict | None, bool]:
         return None, None, True
 
 
+def _indeksen_for_perioden(start: date, siste: date) -> float | None:
+    """Endringen i hovedindeksen fra start til siste børsdag, til linja «Mål
+    mot børsen» ved en periode - story 8.17b, regnet som indekslinja i
+    oversikten (periodeendring). None som _indeksen_for_dagen."""
+    try:
+        lager = SqliteIndekslager(g.tilkobling)
+        symboler = lager.symboler()
+        if not symboler:
+            return None
+        utfall = periodeendring(lager.serie(valgt_indeks(symboler)), start, siste)
+        return utfall[0] if utfall is not None else None
+    except (*BASEFEIL, ValueError):
+        return None
+
+
 def _indeksen_for_dagen(dag: date) -> float | None:
     """Endringen i hovedindeksen for dag, til linja «Mål mot børsen» -
     story 8.6b, b. None når basen ikke har en indeks, når indeksen ikke har
@@ -653,6 +673,22 @@ def boersometer():
         dagen = foer[-1] if foer else datoer[0]
         foer_foerste = not foer
     i_dag = idag()
+    # Story 8.17b: periodevalget fra 8.16. Dagen leses som før (?dag=), og
+    # perioden med les_valg uten dag. Ved en periode er dagen siste børsdag,
+    # og periodestart dagen den første kursen i perioden er fra, som i
+    # oversikten (gruppens svar 30.10 kl. 10:45, a).
+    # En dag som ikke kan leses, har sin egen beskjed (ugyldig), og siste
+    # børsdag valgt som dag er siste børsdag, som i oversikten (8.17a, BH5).
+    if ugyldig or (oenske and dagen == siste):
+        valg = Valg(SISTE)
+    elif oenske:
+        valg = Valg(VELG, dag=dagen)
+    else:
+        valg = les_valg(request.args.get("periode"), None, datoer[0], i_dag, siste, BOERSOMETER_VALG)
+    periodestart = None
+    if valg.periode not in (SISTE, VELG):
+        start = startdag(valg.periode, siste)
+        periodestart = foerste_kursdag(serier.values(), start, siste) or start
     rader = bygg_oversikt(poster, i_dag, STANDARD)
     # Gjennomgangen (VG1): gult foelger 3 av 3 paa siste boersdag, ogsaa naar
     # siden viser en annen dag (designregler §3).
@@ -674,6 +710,8 @@ def boersometer():
         )
         for post in poster
     ]
+    if periodestart is not None:
+        ruter = [rute_med_perioden(rute, serier[rute.aksje.symbol], periodestart, siste) for rute in ruter]
     bransjer = bygg_boersometer(ruter)
     ikke_vurdert = any(rute.ikke_vurdert for rute in ruter)
     # Story 8.6b, d: kartet regnes av de samme bransjene som tabellen.
@@ -696,8 +734,15 @@ def boersometer():
         # Gjennomgangen 26.10 (ECH4): datoen når børsdagen før er mer enn 6 dager før.
         dagen_foer=vis_dagen_foer(dagen_foer(datoer, dagen), dagen, i_dag.year),
         volum_vindu=STANDARD.volum_vindu,
-        indeksendring=_indeksen_for_dagen(dagen),
+        indeksendring=_indeksen_for_dagen(dagen)
+        if periodestart is None
+        else _indeksen_for_perioden(periodestart, siste),
         fargetrinn=trinnforklaringer(),
+        # Story 8.17b: periodevalget, og perioden i adressen.
+        valg=valg,
+        knapper=knappene(siste, i_dag),
+        periodestart=periodestart,
+        periodenavn=OVERSKRIFT.get(valg.periode) if periodestart is not None else None,
         valgt=valgt,
         foer_foerste=foer_foerste,
         ugyldig=ugyldig,

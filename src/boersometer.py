@@ -29,13 +29,13 @@ rekkefølgen squarify legger dem, den største først, så Tab følger kartet.
 Tabellen under beholder rekkefølgen i designregler §4 (bygg_boersometer).
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date
 
 from hjelpetekster import ANTALL_SJEKKER
 from hovedindeks import indeksendring
 from kursdata import Aksje, Kursrad
-from markedsoversikt import IKKE_VURDERT, endring_i_prosent, grunn_med_tall, les_tilstand
+from markedsoversikt import IKKE_VURDERT, endring_i_prosent, grunn_med_tall, les_tilstand, periodeendring
 from signalberegning import STANDARD, Parametre
 from tallformat import avrundet, dato, desimaler_mot_grense, tall, ukedag
 from tilstand import Art
@@ -88,6 +88,12 @@ class Rute:
     uten_data: bool = False
     siste_styrke: int | None = None
     er_siste: bool = True
+    # Story 8.17b (gruppens svar 23.10 kl. 12:35, b): ved en periode er
+    # endringen for perioden, og rutene er like store, fordi volumet mot
+    # vanlig gjelder én dag. fra er dagen serien begynner, når den begynner
+    # etter den første kursen i perioden.
+    lik_stoerrelse: bool = False
+    fra: date | None = None
 
     @property
     def stoerrelse(self) -> str:
@@ -255,6 +261,19 @@ def bygg_rute(
     )
 
 
+def med_perioden(rute: Rute, serie: list[Kursrad], start: date, siste: date) -> Rute:
+    """Ruta ved en periode - story 8.17b (gruppens svar 23.10 kl. 12:35, b).
+    Endringen er fra start, dagen den første kursen i perioden er fra, til
+    siste børsdag, regnet som i oversikten (periodeendring), og ruta er like
+    stor som de andre. Signalet og rammen er siste børsdag, som før. En rute
+    uten kurs siste børsdag står med «Uten data»."""
+    if rute.uten_data:
+        return replace(rute, lik_stoerrelse=True)
+    utfall = periodeendring(serie, start, siste)
+    endring, fra = utfall if utfall is not None else (None, None)
+    return replace(rute, endring=endring, fra=fra, lik_stoerrelse=True)
+
+
 def bygg_boersometer(ruter: list[Rute]) -> list[Bransje]:
     """Rutene gruppert etter bransje, i rekkefølgen i designregler.md §4, og
     i lista sin rekkefølge inne i hver bransje. Bare bransjene som har en
@@ -404,7 +423,10 @@ class Kart:
 
 
 def vekt(rute: Rute) -> float:
-    """Volumforholdet, 1 uten, og mellom MINSTE_VEKT og STOERSTE_VEKT."""
+    """Volumforholdet, 1 uten, og mellom MINSTE_VEKT og STOERSTE_VEKT.
+    Story 8.17b: 1 for alle ved en periode (lik_stoerrelse)."""
+    if rute.lik_stoerrelse:
+        return 1.0
     forhold = 1.0 if rute.volumforhold is None else rute.volumforhold
     return min(max(forhold, MINSTE_VEKT), STOERSTE_VEKT)
 

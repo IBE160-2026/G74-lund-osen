@@ -1064,7 +1064,10 @@ HOEYDE_PAA_BILDET = 1690
 # app.py, markedsoversikt.py, perioder.py, hjelpetekster.py, index.html,
 # _perioder.html og stil.css. Bildet ble tatt paa nytt og er byte for byte
 # det samme.
-AVTRYKK_BAK_BILDET = "691df79acf0ae7b16d41adc37ddbd7dcaff29c7df2c171335a2cab74c15fe41b"
+# Story 8.17b, b: periodevalget i børsometeret, i app.py, boersometer.py,
+# hjelpetekster.py, boersometer.html og stil.css. Bildet ble tatt paa nytt og
+# er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "b6778a6126c642d461941a5525d79ae0fd9345f5dee1c3bc4b1ce0faa1ded3c9"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1280,7 +1283,10 @@ HOEYDE_PAA_AKSJESIDEN = 1894
 # app.py, markedsoversikt.py, perioder.py, hjelpetekster.py, index.html,
 # _perioder.html og stil.css. Bildet ble tatt paa nytt og er byte for byte
 # det samme.
-AVTRYKK_BAK_AKSJESIDEN = "d62fbb3f62991b1b5e9be629d4725ba291613b04029d01a4632a5e02c5e388f7"
+# Story 8.17b, b: periodevalget i børsometeret, i app.py, boersometer.py,
+# hjelpetekster.py, boersometer.html og stil.css. Bildet ble tatt paa nytt og
+# er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "e533fbaccd3945181db61d9413e34ce050d965cb54b3e0e49611ee199e9f27af"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -2681,7 +2687,9 @@ class TestReadmeForNybegynnere:
             # Story 8.16: periodene i kursgrafen er flyttet til «Ferdig».
             # Story 8.17a: periodevalget i oversikten er flyttet til «Ferdig»,
             # og Min liste og børsometeret (8.17b) står igjen.
-            "periodevalget i min liste og børsometeret",
+            # Story 8.17b: Min liste og børsometeret er flyttet til «Ferdig», og
+            # KI-teksten om dagen står igjen.
+            "ki-teksten om dagen på forsiden",
             "velge og bytte aksjer",
         )
         assert len(neste_punkter) == len(saker), neste_punkter
@@ -2953,7 +2961,9 @@ EKSTRA = (
     ("signaldag",),
     ("«vis ki-tekst»",),
     # Story 8.6: børsometeret er flyttet til «Ferdig».
-    ("periodevalget", "ki-teksten om dagen"),
+    # Story 8.17b: periodevalget i Min liste og børsometeret er flyttet til
+    # «Ferdig» («Periodevalget på alle sidene»).
+    ("ki-teksten om dagen",),
     ("velge og bytte aksjer",),
 )
 

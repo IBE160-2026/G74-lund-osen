@@ -627,9 +627,6 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
    brytes på smal skjerm, så siden ikke ruller vannrett. Fargen følger
    endringen slik den vises, rammen styrken: gul (sterk oransje) ved 3 av 3
    og mørk ved 2 av 3 (designregler §3). Teksten i ruta bærer det samme. */
-:where(.side-oversikt) .velg-dag-boersometer { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 12px 0 20px; }
-:where(.side-oversikt) .velg-dag-boersometer input,
-:where(.side-oversikt) .velg-dag-boersometer button { min-height: 44px; font: inherit; }
 /* Story 8.6b, b: linja «Mål mot børsen», med hovedindeksen som tall. */
 :where(.side-oversikt) section.maal { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 20px; margin: 16px 0; font-size: 14px; color: var(--tekst); }
 :where(.side-oversikt) section.maal h2 { font-size: 14px; font-weight: 600; margin: 0; color: var(--blekk); }
