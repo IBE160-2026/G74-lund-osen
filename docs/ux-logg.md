@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-10-26T17:52
+updated: 2026-11-03T21:54
 ---
 
 # UX-loggen
@@ -612,3 +612,57 @@ Hvert funn er slått opp i koden 20.10 før det ble skrevet.
 *Lagt til 2026-10-26:* U19 tas i 8.0f (gruppens svar 24.10 kl. 11:31 og 11:34, under «Prioritering» og story 8.0b i `epics.md`): hjelpen står i ett fast felt i høyre kant på bred skjerm, og siden gir plass, så feltet ikke dekker det den forklarer. På smal skjerm åpnes den rett under «?». En knapp flytter feltet til venstre eller høyre, og feltet står åpent til «Lukk» eller Esc.
 
 *Lagt til 2026-10-26:* U28 tas i 8.0f (gruppens svar 24.10 kl. 11:31 og 11:34, under «Prioritering» og story 8.0b i `epics.md`): hjelpen står i ett fast felt i høyre kant på bred skjerm, og siden gir plass, så feltet ikke dekker det den forklarer. På smal skjerm åpnes den rett under «?». En knapp flytter feltet til venstre eller høyre, og feltet står åpent til «Lukk» eller Esc.
+
+## Status for funnene til 8.2, sjekket 03.11
+
+De 45 funnene over der «Tas i» begynner med «8.2» (8.2, 8.2a og «8.2, og 8.19»), slått opp 03.11 mot main på `37390b4d`: malene, `stil.css`, koden, `docs/hjelp.md`, `epics.md`, de daterte linjene over og git log fra funnets dato. Ingenting er rettet, og ingen demo er startet. «Står» betyr at koden bak funnet er som da funnet ble gjort, eller at det funnet sier mangler, fortsatt mangler. Story 8.2 står som `backlog` i `sprint-status.yaml`, og 8.2a er flettet i `e4d1ba46` (PR #93).
+
+| # | Status | Bevis | Står igjen |
+|---|---|---|---|
+| U1 | delvis | Fra 3.4c (`9359a70d`, PR #88) viser oversikten, Min liste og børsometeret «Demobasen er laget av en eldre versjon av demoen» med kommandoen, og aksjesiden svarer 404, når `gammel_demobase` i `demo.py` finner en vurdering før `STARTDAG`. Det gjelder demobaser fra før 22.10, altså også dem fra før 0007. | En demobase laget etter 3.4c, men før `0008_omsetning.sql` (lagt til 29.10), har ingen vurdering før `STARTDAG` og står på versjon 7. `_krev_siste_versjon` i `lagring_sqlite.py` gir da `RuntimeError`, og `basefeil.html` viser «Feilen:» med typen. |
+| U2 | står | `_ramme.html`: knappen er fylt bare når `aktiv` er `oversikt`, `boersometer` eller `min_liste`, og aksjesiden sender ingen `aktiv`. | Ingen knapp i stripa er fylt på aksjesiden. |
+| U3 | løst | 8.2a b (`e4d1ba46`): `MTFJ` har en rad nederst i tabellen, og `antall_aksjer` er `len(rader) + len(alle_uten_data)` i `app.py`, så «Alle» og tabellen teller det samme. | – |
+| U4 | står | `DEKKEDE_AAR = frozenset({2026})` i `boersdag.py`. 3.5d (`5e01a4f5`) la til i linja fra hentingen at børskalenderen bare gjelder 2026, så andre dager ikke lagres. | Grafen for «1 år» har fortsatt ingen indekslinje før 02.01.2026. |
+| U6 | står | `INGEN_RAD` i `ki_visning.py` har samme tekst, og `demo_ki_tekster.json` har KI-rader bare for 2026-10-09. | Grunnen stemmer ikke for en tidligere dag i demoen. |
+| U16 | står | `ingress` i «Signalet dag for dag» i `aksje.html` har tre setninger, med «lest fra basen og aldri regnet på nytt» og «signalstyrke {{ parametre.terskel }} eller mer». | Ingressen er som i funnet. |
+| U17 | står | `nav class="rad sider"` i `_ramme.html` har tre knapper fra 8.6 (`7f1c1f09`): Markedsoversikt, Børsometer og Min liste. Aksjesiden nås fortsatt fra et selskapsnavn. | Spørsmålet er ikke besvart i `epics.md` eller under tabellen. |
+| U20 | delvis | 8.2a c (`e4d1ba46`): symbolene over søylene er lenker (`a class="etikett"` i `_hovedindeks.html`). | `.soeyler .ticker` i `stil.css` er fortsatt 11 px med `writing-mode: vertical-rl`. Større skrift var ikke med i svaret 24.10 kl. 11:23. |
+| U21 | står | `.soeyler .felt` i `stil.css` er fortsatt 140 px høyt. | Søylene er like store. |
+| U22 | står | `.soeyler .indekslinje` i `stil.css` er fortsatt `border-top: 2px dashed`. | Linja er som i funnet. |
+| U23 | delvis | 8.2a b (`e4d1ba46`): overskriften og tabellen teller samme rader, 15 i demoen. | Linja om indeksen, «N av M gikk bedre enn indeksen» i `_hovedindeks.html`, har fortsatt nevneren med kurs den dagen, med «Ikke med, uten kurs» under (fra 2.9, før funnet). Den var ikke med i svaret 24.10. |
+| U24 | står | «Slik leser du tabellen» i `index.html` er uendret siden 21.10: setningene i hvert punkt står etter hverandre i samme `span`. | Hver setning står ikke på egen linje. |
+| U25 | står | `.utslagsfelt span` er 10 px, `.symbolfelt .pil` 12 px og `.symbolfelt svg` 18 px i `stil.css`, som før. | Symbolene i forklaringen er like små. |
+| U26 | står | `"hovedindeksen"` og `"soeylene"` i `hjelpetekster.py` står i samme vindu. 8.2a la til en setning om lenken i `"soeylene"`, og 8.17a endret ordlyden om dagen. | Hjelpen er ikke gjort kortere eller delt. |
+| U29 | står | `merk` i `app.py` svarer 303 med `#rad-{symbol}`. | Tas aksjen ut av Min liste, finnes ikke ankeret, og siden står øverst. |
+| U31 | står | `endring_med_datoer` i `aksjedetalj.py` er sann bare med en børsdag mellom de to radene, og `aksje.html` viser bare ukedagene ellers. | Kortet viser ukedager uten dato. |
+| U33 | står | `ki-bryter` i `aksje.html` er et skjema med knappen «Skjul KI-teksten» eller «Vis KI-teksten» under teksten, 13,5 px i `stil.css`. | Ingen gul bryter. |
+| U35 | løst | 8.2a a (`e4d1ba46`): bryteren sender tilbake til `KI_ANKER`, på KI-teksten når den vises og ellers på bryteren (`aksje.html`). | – |
+| U36 | løst | 8.2a a (`e4d1ba46`): periodeknappene og skjemaet for «Velg dag» i `_perioder.html` har ankeret `grafanker` når det er gitt, og aksjesiden gir det. | – |
+| U37 | står | `nav.periodevalg a, nav.periodevalg button` i `stil.css` er uendret siden 2.7a (`dc521ff0`, 19.10), og periodene er fortsatt lenker og «Velg dag» en knapp i et skjema. | Ingen endring i stilen etter funnet. |
+| U38 | står | `input type="date"` med bare `min` og `max` i `_perioder.html`. | Datofeltet skiller ikke dagene. |
+| U39 | står | Overskriften i `aksje.html` er «Kursutvikling, {{ overskrift }}» med dagen. Teksten under grafen sier «Kursserien begynner …» (`kort_serie`, fra 8.16 18.10, før funnet). | Overskriften sier fortsatt 6 måneder for en dag tidlig i serien. |
+| U40 | står | Linja med signalet (`p class="dagen"`) står bare for en valgt dag, og 8.8 (signaldager i grafen) er `backlog` i `sprint-status.yaml`. | For en periode står ingenting om dagene. |
+| U41 | står | `linjenavn` står ved enden av linjene i `aksje.html`, med hvit kant (`paint-order: stroke`, fra 2.7a, før funnet), og `rutetekst` og `maanedstekst` står inne i grafen. | Ingen endring i plasseringen etter funnet. |
+| U43 | må ses på siden | Pilene har fortsatt ankeret `#signalet-dag-for-dag`, og grunnen var ikke funnet 21.10. | Om siden flytter seg, kan bare prøves i nettleseren. |
+| U44 | står | `.maanedspiler a.pil` i `stil.css` har `text-decoration: underline`. | Pilene er understreket tekst. |
+| U46 | står | `form class="ki-bryter"` står etter `section class="ki"` i `aksje.html`. | Bryteren står under rammen, ikke i den. |
+| U47 | står | Grafen har `linjenavn` bare for kurslinja og snittet, og den stiplede linja forklares i `indeksforklaring` under grafen. | Den stiplede linja har ikke navn i grafen. |
+| U57 | står | Symbolene står over søylene på høykant (`.etiketter` før `.felt` i `_hovedindeks.html`, `writing-mode: vertical-rl`), og `.stolpe` har én farge for opp og én for ned. | Som i funnet. Figurteksten «med indeksen som stiplet linje» fantes fra 2.9b. |
+| U58 | står | `thead` i `index.html`: «★ = Min liste» under Selskap og «NOK» under Sluttkurs. Fra 8.17a står perioden eller dagen under Endring når en periode er valgt. | Ingen «i går» eller «hva sjekkene peker mot», ingen vinkel ved navnene, og «3 av 3» står foran T, B og I, ikke til høyre for dem. |
+| U59 | står | Oversikten i `index.html` har ingen overskrift «Aksjene» og ingen «Alle / Min liste». `nav class="visvalg"` står bare i Min liste. | Som i funnet. |
+| U60 | står | `_ramme.html` viser «Oppdatert …» uten neste henting, og 8.19 er `backlog`. | Neste henting står ikke. |
+| U61 | står | `a class="tilbake"` med teksten «Markedsoversikt» i `aksje.html`. | Som i funnet. |
+| U62 | står | `p class="meta"` i `aksje.html` har bare børsen og datoen. | Ingen innledning. |
+| U63 | står | Kortet Retning i `aksje.html` viser symbolet og teksten for retningen. | Kortet sier ikke hvilke sjekker som ga hva. |
+| U64 | står | Under sjekkortene står en fotnote, «Signalstyrken er hvor mange sjekker som slo ut …», ingen rad for summen. | Ingen rad for summen. |
+| U65 | står | Som U41 og U47. | Som U41 og U47. |
+| U66 | står | I `aksje.html` står `section class="ki"` før `h2 id="{{ grafanker }}"`. | KI-teksten står før grafen. |
+| U67 | står | KI-delen har tittelen «Med KI-ens ord», bryteren under rammen og ingen markering av tall i teksten. | Som U33 og U46. |
+| U68 | står | `ol class="uker"` med `li class="dag"` som kort, `ukesum` under hver uke, `a class="pil"` og ingressen i `aksje.html`. | Som i funnet. |
+| U69 | står | Min liste i `index.html` har `h1` «Min liste», og `nav.visvalg` står under innledningen med `display: inline-flex` i `stil.css`. | Som i funnet. |
+| U71 | løst | 8.2a d (`e4d1ba46`): `grunn_med_tall` i `markedsoversikt.py` gir «for kort historikk: N av M dager», og `boersometer.py` bruker den samme. | – |
+| U72 | løst | 8.2a b (`e4d1ba46`): radene i `mangler` står nederst i tabellen i `index.html`, og fotnoten «Uten data i denne kilden» er borte. | – |
+| U73 | løst | 8.2a e (`e4d1ba46`): med en kolonne valgt er tabellen én liste (`sortert` i `index.html`), og linja sier «i én liste». | – |
+| U74 | løst | 8.2a f (`e4d1ba46`): `alle-sjekkene` i `index.html` begynner med pillen, uten «Bare». | – |
+
+Talt: løst 7, delvis 3, står 34, må ses på siden 1, i alt 45.
