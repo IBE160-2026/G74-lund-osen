@@ -3222,10 +3222,12 @@ LENKENE_FOER_3_3H = {
 # i «Mappestruktur» (regel 19). Var a363fbd7....
 # Story 2.3d: jobben som henter hver kveld i punktet om start/ i
 # «Mappestruktur» (regel 19). Var 0fe44843....
+# Gruppens svar 02.11 kl. 22:15 (D): lenken til docs/brukslogg.md i
+# «Dokumentene» (regel 19). Var 409a3f8b....
 AVTRYKK_I_PILENE = {
     "Demoen": "f124a92b1c64eeb0ea5e7141976ff85de68df49004a22d5874a4a257aaf89b55",
     "Den ekte versjonen": "3bb398cd1be31a43abe09b7261456646b6dc03047e20f1aa57ab665a768cfd78",
-    "Dokumentene": "409a3f8b38d4247df41e3eb5062ad439aa160e7fd1c0b49e0fd44f262eb2d77c",
+    "Dokumentene": "7ba6eada43af3ebdfe55e420dd4dcf05be7b034275d53aa1ff6af5ddffbaafa2",
     "Mappestruktur": "677fa094d2584edaa15eb9e156e7905b6679565e319717eb9cf19f4058ce53cd",
 }
 

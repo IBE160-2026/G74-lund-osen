@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-11-03T14:53
+updated: 2026-11-03T14:54
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1994,6 +1994,8 @@ på vilkår, og andre norske finansmedier publiserer ikke lenger åpen RSS. Se
 | Riktige beregninger *(lagt til 2026-10-06, brief v8)* | Håndlagde kursserier gir forhåndsberegnet styrke og retning | Testene består. Kontrollert for hånd for EQNR 05.10 og GJF 02.10: regnearket og appen stemmer (`malinger.md` §6) | Ved hver testkjøring |
 | KI-forklaringen *(lagt til 2026-10-06, brief v8)* | Hver KI-tekst som vises, har bestått kontrollen mot grunnlaget (FR-603), og hver tekst er logget (FR-604) | Testene viser at feil stoppes. Én ukes drift er logget | Før demonstrasjonen |
 | Kjørbar for andre *(lagt til 2026-10-06, brief v8)* | README-oppskriften fullføres gratis på en ren maskin, uten gruppens nøkler: demoen uten konto, og den ekte versjonen med egen gratiskonto hos EODHD | README-prøven fra en ren maskin i story 3.4 | Før prosjektinnlevering |
+
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R28, gruppens svar 02.11 kl. 22:15, D):* «Adopsjon» og «Fortsatt bruk» krever bruk som er loggført. Bruken ble ikke logget før 4.11. Fra 4.11 føres én linje for hver dag gruppen bruker appen, i [brukslogga](../../../../docs/brukslogg.md), med dato, hvem, hva vi gjorde i appen og feil vi så. Jobbens logger regnes ikke som bruk.
 
 **Hovedflyten** er definert som: åpne markedsoversikten, se hvilke aksjer som
 skiller seg ut, åpne én av dem, og lese hvorfor — de tre sjekkene med verdiene
