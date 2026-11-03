@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-11-03T14:54
+updated: 2026-11-03T14:57
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1995,7 +1995,15 @@ på vilkår, og andre norske finansmedier publiserer ikke lenger åpen RSS. Se
 | KI-forklaringen *(lagt til 2026-10-06, brief v8)* | Hver KI-tekst som vises, har bestått kontrollen mot grunnlaget (FR-603), og hver tekst er logget (FR-604) | Testene viser at feil stoppes. Én ukes drift er logget | Før demonstrasjonen |
 | Kjørbar for andre *(lagt til 2026-10-06, brief v8)* | README-oppskriften fullføres gratis på en ren maskin, uten gruppens nøkler: demoen uten konto, og den ekte versjonen med egen gratiskonto hos EODHD | README-prøven fra en ren maskin i story 3.4 | Før prosjektinnlevering |
 
+*Rettet 2026-11-03 (gjennomgangen 02.11, R26, gruppens svar 02.11 kl. 22:15, B):* «est. uke 45» i raden «KI-bidrag i drift» gjelder ikke lenger. Uke 45 er 2.–8.11, og datoen for demonstrasjonen er fortsatt ukjent (punkt 13 i §8, som står åpent).
+
+*Rettet 2026-11-03 (gjennomgangen 02.11, R27, gruppens svar 02.11 kl. 22:15, C):* «Brukerutfall» står som mål for v1. Brukertesten (story 8.1 og 10.4) er ikke tatt, og den tas senere, uten dato ennå (`docs/brukertest.md`). «Neste uke» i svaret 23.10 kl. 12:29 gjelder ikke lenger.
+
 *Lagt til 2026-11-03 (gjennomgangen 02.11, R28, gruppens svar 02.11 kl. 22:15, D):* «Adopsjon» og «Fortsatt bruk» krever bruk som er loggført. Bruken ble ikke logget før 4.11. Fra 4.11 føres én linje for hver dag gruppen bruker appen, i [brukslogga](../../../../docs/brukslogg.md), med dato, hvem, hva vi gjorde i appen og feil vi så. Jobbens logger regnes ikke som bruk.
+
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R29):* hvilken uke som teller for «Én ukes drift er logget» i «KI-forklaringen», og antallet rader i `ki_logg` for den, er ikke regnet ut per 3.11, og basen er ikke åpnet i rettingen. Linja føres når det er regnet ut.
+
+*Rettet 2026-11-03 (gjennomgangen 02.11, R30):* README-prøven fra en ren maskin i «Kjørbar for andre» er utsatt til v1 er ferdig bygget (gruppens svar 2026-10-21 kl. 18:33 i `epics.md`), og den tas senest én uke før innleveringen (gruppens svar 2026-10-14 kl. 22:19 og 22:25 i `epics.md`).
 
 **Hovedflyten** er definert som: åpne markedsoversikten, se hvilke aksjer som
 skiller seg ut, åpne én av dem, og lese hvorfor — de tre sjekkene med verdiene
@@ -2016,6 +2024,8 @@ av dem er bundet til datoer som ikke er fastsatt: «Brukerutfall», «Fortsatt
 bruk», «Grensesnitt og stabilitet», «KI-forklaringen» og «Kjørbar for andre».
 «Riktige beregninger» gjelder ved hver testkjøring.
 
+*Rettet 2026-11-03 (gjennomgangen 02.11, R31):* FR-407 er ekstra fra 19.10 og ikke v1 (story 2.6), så den er ikke lenger bundet til en dato i v1.
+
 *Endret 2026-09-22.* Terskelen sa «Ingen manuelle steg». Den målte **to**
 egenskaper, og FR-401 har skilt dem fra hverandre:
 
@@ -2034,6 +2044,8 @@ kommando. Arkitekturspinen fører «Hvem kjører migrasjonene, og når» som uts
 `AD-16` sier at de finnes, ikke hvem som anvender dem. Et svar som deler dem ut
 i `docker run … migrer` ville sett ut som ryddig ansvarsdeling og brutt målet.
 **Det skal leses når Dockerfilen skrives.**
+
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R32):* det er lest. Dockerfilen er skrevet (story 3.1, `a2ecee8a`), og migrasjonene kjøres når basen åpnes (`kjoer_migrasjoner=True` som standard i `aapne_base`, `src/lagring_sqlite.py`), ikke som et eget steg. Terskelen for «Drift» holder.
 
 ### Motmål
 
@@ -2118,6 +2130,8 @@ uten det kan ingen se at de var åpne, eller hva som måtte til.
 | 9 | **Kontrollere Alpha Vantages vilkår** for ikke-kommersiell bruk | Alpha Vantage brukes ikke i v1: den er forkastet som hovedkilde (`docs/kilder-og-rettigheter.md`, «Kilder»), og den finnes ikke i `src/`, `tests/` eller README-en (`git grep` 03.11). Avkrysningen i `docs/kilder-og-rettigheter.md` står åpen, med en linje om dette. Gruppens svar 02.11 kl. 22:15 (spørsmål 3) | 02.11 |
 
 *Lagt til 2026-11-03 (gruppens svar 02.11 kl. 22:15, spørsmål 3):* 5b og 9 er flyttet hit fra «Må følges opp», med teksten ordrett.
+
+*Rettet 2026-11-03 (gjennomgangen 02.11, R33):* punkt 18: «Merk at selve filen ikke er skrevet» gjelder ikke lenger. `Dockerfile` og `compose.yaml` er skrevet i story 3.1 (`a2ecee8a`).
 
 *Lagt til 2026-10-20 kl. 15:54:* punkt 23: beslutningen 16.10 kl. 21:09 i raden er snudd. Fra tirsdag 20.10 går hentingen på børsdager fra kl. 22:00 igjen, etter gruppens svar 19.10 kl. 22:19 under story 2.3: raden fra kl. 21 var ikke endelig for DNO (`malinger.md` §37), og en vurdering kan ikke skrives om (AD-7). Byggestoppen er kl. 21:40.
 
