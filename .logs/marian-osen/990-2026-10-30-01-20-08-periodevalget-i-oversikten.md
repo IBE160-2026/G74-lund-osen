@@ -121,3 +121,24 @@ Bygge 8.17b: periodevalget i Min liste («Sammenlign med») og i børsometeret, 
 - 8.17b, spørsmål til gruppen: skal endringen i linja under ved «Velg dag» i Min liste være fra dagen til siste børsdag (bygget), eller endringen den dagen?
 - 8.17b BH8, spørsmål til gruppen: skal fargetrinnene i børsometeret (±0,5 % og 2 %) være de samme for en periode?
 - PR #108 flettes etter svarene; worktreen `../G74-lund-osen-8-17b` fjernes da.
+
+## 2026-11-03 kl. 19:53 — Marian Osen
+
+### Oppgave
+Flette 8.17b 03.11 før kl. 21:20, etter gruppens svar kl. 19:25 på de tre spørsmålene i PR #108 (instruksjonen kl. 19:29 i dagsfila 03.11).
+
+### Plan
+- Instruksjonen og svaret under story 8.17 på main, med spørsmålene i `issues.md` merket som besvart.
+- På grenen: main flettet inn, svarene i spesifikasjonen og PR-en, CI grønn på head-en.
+- Squash-fletting låst til head-en, og etterpå status, sprint-status, kvalitetssikringen og `prd.md` på main.
+
+### Resultat
+- Kvoten kl. 19:29 (18:29 GMT): 0 brukt 03.11 i GMT, 20 igjen og `extraLimit` 463. Ingen andre kall.
+- Main: `c58b0ce7` (19:29) dagsfila, `a6df8f16` (19:30) svaret kl. 19:25 under story 8.17 og spørsmålene besvart.
+- Grenen: main flettet inn i `f01a07da` (19:30), svarene i spesifikasjonen i `b6978b2f` (19:30), PR-en oppdatert. CI 41694504920 grønn på `b6978b2f`.
+- PR #108 squash-flettet i `978bd1ab` kl. 19:36, låst til head-en. Grenen er slettet på GitHub, worktreen er fjernet, og `pr-8-17b-bilder` står.
+- `23c16ad9` (19:37): spesifikasjonen done, linja under story 8.17, 8-17 done i sprint-status, og radene i §3, §5 (26 rader: 9 rettet, 5 avvist, 10 utsatt) og vedlegget i kvalitetssikringen. `045ddeb1` (19:37): datert linje om flettingen ved R14 og under Rettet-linja i FR-104 i `prd.md`.
+- CI 41695429612 på `978bd1ab`: macOS-jobben ble avbrutt etter 15 min uten et steg som feilet, og besto ved ny kjøring (grønn 19:52). CI 41695568637 og 41695671845 grønne på `23c16ad9` og `045ddeb1`.
+
+### Åpne punkter
+Ingen.
