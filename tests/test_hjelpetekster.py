@@ -286,7 +286,8 @@ def base(basemal):
 
 
 # Story 8.6: børsometeret har sin egen tekst.
-SIDENE = ("/", "/boersometer", "/aksje/BRFE", "/aksje/VRDS")
+# Story 8.17b: Min liste med en periode, for «Sammenlign med».
+SIDENE = ("/", "/boersometer", "/aksje/BRFE", "/aksje/VRDS", "/min-liste?vis=alle&periode=1-uke")
 
 
 def _side(klient, adresse: str) -> str:

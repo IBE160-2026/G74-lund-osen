@@ -338,6 +338,16 @@ class TestRammen:
                         r"(&amp;sorter=(selskap|kurs|endring|signal|retning)&amp;orden=(synkende|stigende))?",
                         href,
                     )
+                    # Story 8.17b: periodene i Min liste («Sammenlign med»), med
+                    # «Alle» og sorteringen, og i børsometeret.
+                    or re.fullmatch(
+                        r"/(min-liste|boersometer)\?(vis=alle&amp;)?(periode=("
+                        + "|".join(map(re.escape, PERIODENE))
+                        + r")"
+                        r"|periode=velg&amp;dag=[0-9]{4}-[0-9]{2}-[0-9]{2})"
+                        r"(&amp;sorter=(selskap|kurs|endring|signal|retning)&amp;orden=(synkende|stigende))?",
+                        href,
+                    )
                     # Story 2.7a: stilarket, med avtrykket av fila.
                     or re.fullmatch(r"/static/stil\.css\?v=[0-9a-f]{16}", href)
                     # Story 2.7b: hver dag i historikken lenker til siden for

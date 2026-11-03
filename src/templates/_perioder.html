@@ -8,16 +8,22 @@
     Den valgte knappen har aria-current, og fokus er synlig.
 
     Story 8.2a, a (U36): med anker går lenkene og skjemaet dit, så siden
-    holder plassen. Et skjema med GET beholder ankeret i action. -#}
+    holder plassen. Et skjema med GET beholder ankeret i action.
 
-{% macro periodevalg(knapper, valgt, adresse, dag=None, minst=None, maks=None, etikett="Periode", anker=None) -%}
+    Story 8.17b: ekstra er (navn, verdi) som følger med i lenkene og
+    skjemaet, som vis=alle i Min liste. -#}
+
+{% macro periodevalg(knapper, valgt, adresse, dag=None, minst=None, maks=None, etikett="Periode", anker=None, ekstra=()) -%}
 <nav class="periodevalg" aria-label="{{ etikett }}">
   <ul>
     {%- for kode, navn in knapper %}
-    <li><a href="{{ adresse }}?periode={{ kode }}{% if anker %}#{{ anker }}{% endif %}"{% if kode == valgt %} aria-current="true"{% endif %}>{{ navn }}</a></li>
+    <li><a href="{{ adresse }}?{% for felt, verdi in ekstra %}{{ felt }}={{ verdi }}&amp;{% endfor %}periode={{ kode }}{% if anker %}#{{ anker }}{% endif %}"{% if kode == valgt %} aria-current="true"{% endif %}>{{ navn }}</a></li>
     {%- endfor %}
     <li>
       <form method="get" action="{{ adresse }}{% if anker %}#{{ anker }}{% endif %}">
+        {%- for felt, verdi in ekstra %}
+        <input type="hidden" name="{{ felt }}" value="{{ verdi }}">
+        {%- endfor %}
         <input type="hidden" name="periode" value="velg">
         <label class="skjult" for="velg-dag">Velg dag</label>
         <input type="date" id="velg-dag" name="dag" required

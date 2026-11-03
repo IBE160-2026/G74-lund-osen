@@ -12,6 +12,7 @@ signalstyrke og retning. Hvor gamle dataene er, staar over tabellen og, for en
 rad som er eldre enn de andre, under selskapsnavnet (story 1.4c).
 """
 
+from collections.abc import Callable
 from dataclasses import dataclass, replace
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
@@ -161,6 +162,9 @@ class Rad:
     fra: date | None = None
     annen_dag: bool = False
     tre_av_tre_siste: bool = False
+    # Story 8.17b: linja under i Min liste, dagen man sammenligner med
+    # («Sammenlign med», beslutningen 08.10 kl. 21:48). None uten.
+    under: "Rad | None" = None
 
     @property
     def vurdering(self) -> Vurdering | None:
@@ -280,6 +284,62 @@ def bygg_rad_for_dag(
         annen_dag=True,
         tre_av_tre_siste=tre_av_tre_siste,
     )
+
+
+def bygg_sammenligning(
+    post: Oversiktspost,
+    serie: list[Kursrad],
+    dag: date,
+    slutt: date,
+    les_vurdering: Callable[[date], Vurdering | Grunn | None],
+    idag: date,
+    periode: bool,
+    p: Parametre = STANDARD,
+) -> Rad:
+    """Linja under raden i Min liste: dagen man sammenligner med - story
+    8.17b, «Sammenlign med» (beslutningen 08.10 kl. 21:48).
+
+    slutt er radens siste boersdag, som oeverste linje viser. Ved en periode
+    er dag dagen den foerste kursen i perioden er fra (_periodestart), og
+    grunnlaget er raden paa dagen, eller foerste rad etter den og foer slutt,
+    som periodeendring i 8.17a. Ved «Velg dag» er grunnlaget raden paa dagen,
+    og uten den staar «–» og grunnen, som i oversikten.
+
+    Sluttkursen er grunnlagets, og endringen er fra grunnlaget til slutt, paa
+    justert kurs (FR-101). Vurderingen er den som er lagret for grunnlagets
+    dag, lest med les_vurdering, og signalet regnes aldri (AD-7)."""
+    paa_slutt = next((rad for rad in serie if rad.dato == slutt), None)
+    if periode:
+        grunnlag = paa_slutt if dag == slutt else next((rad for rad in serie if dag <= rad.dato < slutt), None)
+    else:
+        grunnlag = next((rad for rad in serie if rad.dato == dag), None)
+    vist = grunnlag.dato if grunnlag is not None else dag
+    utfall, tekst = les_tilstand(les_vurdering(vist), vist, idag)
+    tekst = grunn_med_tall(utfall, tekst, sum(1 for rad in serie if rad.dato <= vist), p)
+    if grunnlag is None and utfall is not None and utfall.art is Art.IKKE_KJOERT:
+        tekst = GRUNNTEKST[Grunn.KURS_IKKE_FRA_DAGEN]
+    endring = None
+    if grunnlag is not None and paa_slutt is not None and grunnlag.dato <= slutt:
+        endring = endring_i_prosent([grunnlag, paa_slutt])
+    return Rad(
+        aksje=post.aksje,
+        dato=vist,
+        sluttkurs=float(grunnlag.slutt) if grunnlag is not None else None,
+        endring_prosent=endring,
+        tilstand=utfall,
+        tekst=tekst,
+        sist_hentet=post.hentet,
+        annen_dag=True,
+    )
+
+
+def egne_dager(rader: list[Rad], siste: date | None) -> dict[str, date]:
+    """Symbolene med en eldre dag enn sidens siste boersdag, med dagen raden
+    viser - story 8.17b (gruppens svar 03.11 kl. 14:28). Raden viser
+    datoen sin, i oversikten og i Min liste."""
+    if siste is None:
+        return {}
+    return {rad.aksje.symbol: rad.dato for rad in rader if rad.dato < siste}
 
 
 def bygg_rad(post: Oversiktspost, idag: date, p: Parametre = STANDARD, antall_dager: int | None = None) -> Rad | None:

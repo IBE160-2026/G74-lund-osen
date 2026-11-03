@@ -447,6 +447,33 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (INDEX_MAL, "Periode for oversikten"),
             ),
         ),
+        # Story 8.17b: «Sammenlign med» i Min liste (beslutningen 08.10 kl. 21:48).
+        "sammenlign_med": Hjelpetekst(
+            "Sammenlign med:",
+            "knappene er de samme som i oversikten, og øverst i hver rad står alltid siste børsdag. "
+            "Med en periode eller en dag du velger, står en linje under hver rad med sluttkursen den "
+            "første dagen i perioden eller dagen du valgte, endringen derfra til siste børsdag og "
+            "signalet som er lagret for dagen, som aldri regnes på nytt. Oransje strek og «3 av 3» "
+            "gjelder siste børsdag.",
+            (
+                (MARKEDSOVERSIKT, "def bygg_sammenligning("),
+                (APP, "def _periodestart("),
+                (INDEX_MAL, '"Sammenlign med"'),
+            ),
+        ),
+        # Story 8.17b: periodevalget i børsometeret (gruppens svar 23.10 kl. 12:35, b).
+        "perioden_boersometeret": Hjelpetekst(
+            "Periodene:",
+            "knappene viser siste børsdag, endringen fra den første kursen i perioden til siste "
+            "børsdag, eller en dag du velger. Ved en periode er rutene like store, fordi volumet mot "
+            "vanlig gjelder én dag, og fargen og snittet er endringen for perioden. Rammen er signalet "
+            "siste børsdag.",
+            (
+                (BOERSOMETER, "def vekt("),
+                (MARKEDSOVERSIKT, "def periodeendring("),
+                (APP, "def _periodestart("),
+            ),
+        ),
         # Story 8.16: periodene i kursgrafen og regelen for startdagen.
         "perioden": Hjelpetekst(
             "Periodene:",

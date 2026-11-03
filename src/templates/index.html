@@ -48,7 +48,11 @@
             <td class="selskap"><form id="rad-{{ rad.aksje.symbol }}" class="stjerne" method="post" action="/min-liste/merk"><input type="hidden" name="symbol" value="{{ rad.aksje.symbol }}"><input type="hidden" name="til" value="{{ 'fjern' if merket else 'merk' }}"><input type="hidden" name="tilbake" value="{{ tilbake }}"><button type="submit" class="stjerneknapp{% if merket %} merket{% endif %}" aria-pressed="{{ 'true' if merket else 'false' }}"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><span class="skjult">Min liste: {{ rad.aksje.navn }}</span></button></form><a href="/aksje/{{ rad.aksje.symbol }}">{{ rad.aksje.navn }}</a>
               {#- Avvik 11: ticker og bransje med symbol under navnet. #}
               <span class="linje">{{ rad.aksje.symbol }}{% if rad.aksje.sektor %} · {{ bransjesymbol(rad.aksje.sektor) }}{{ rad.aksje.sektor }}{% endif %}</span>
-              {% if rad.aksje.symbol in eget %}<span class="hentet">hentet {{ rad.sist_hentet|norsk_tid }}</span>{% endif %}</td>
+              {% if rad.aksje.symbol in eget %}<span class="hentet">hentet {{ rad.sist_hentet|norsk_tid }}</span>{% endif %}
+              {#- Gruppens svar 03.11 kl. 14:28 (story 8.17b): en rad med eldre
+                  dag enn sidens viser datoen sin. Ikke for «Velg dag», der
+                  hver rad er dagen. #}
+              {% if not rad.annen_dag and egne_dager is defined and rad.aksje.symbol in egne_dager %}<span class="egen-dag">siste kurs {{ egne_dager[rad.aksje.symbol]|ukedag }} {{ egne_dager[rad.aksje.symbol]|dato }}</span>{% endif %}</td>
 
             {#- Story 8.2a, b (U23): raden for en aksje uten kurser har «–». #}
             <td class="tall">{% if rad.sluttkurs is not none %}{{ rad.sluttkurs|tall('kurs') }}{% else %}–{% endif %}</td>
@@ -85,6 +89,20 @@
 
             <td class="retning">{{ retningspille(rad.retning) }}</td>
           </tr>
+          {#- Story 8.17b: «Sammenlign med» i Min liste. Linja under er dagen
+              man sammenligner med: sluttkursen den dagen, endringen derfra
+              til siste børsdag og signalet som er lagret for dagen, uten
+              pille og uten 2 av 3 (designregler §3). #}
+          {%- if rad.under %}{% set under = rad.under %}
+          <tr class="sammenligning">
+            <td class="selskap"><span class="skjult">{{ rad.aksje.navn }}, sammenlignet med </span>{{ under.dato|ukedag }} {{ under.dato|dato }}</td>
+            <td class="tall">{% if under.sluttkurs is not none %}{{ under.sluttkurs|tall('kurs') }}{% else %}–{% endif %}</td>
+            {% set vist_under = under.endring_prosent|round(2) if under.endring_prosent is not none else none %}
+            <td class="tall {% if vist_under is not none %}{{ 'opp' if vist_under > 0 else 'ned' if vist_under < 0 else '' }}{% endif %}">{% if under.endring_prosent is not none %}{{ under.endring_prosent|tall('endring') }}<span class="skjult"> til siste børsdag</span>{% else %}–{% endif %}</td>
+            <td class="tall styrke">{% if under.styrke is not none %}<span class="styrketall">{{ under.styrke }} av {{ antall_sjekker }}</span> {{ brikker(under.sjekker) }}{% else %}– <span class="merke mangler">{{ under.tekst }}</span>{% endif %}</td>
+            <td class="retning">{% if under.styrke is not none %}{{ retningspille(under.retning) }}{% endif %}</td>
+          </tr>
+          {%- endif %}
 {% endmacro -%}
 {% block oppdatert_hjelp %}{% if rader and hentet %} {{ hjelpeknapp("hjelp-hentet", "Hjelp: oppdatert") }}{% endif %}{% endblock %}
 {% block tittel %}{% if aktiv == "min_liste" %}Min liste — OSE Signal{% else %}OSE Signal{% endif %}{% endblock %}
@@ -104,9 +122,24 @@
     {% if rader %}
     <p class="innledning">Stjernen foran et selskap legger aksjen i lista, og et nytt trykk tar den ut. Lista lagres på denne maskinen og koster ingen API-kall.</p>
     <nav class="visvalg" aria-label="Vis">
-      <a class="visknapp" href="{{ sidesti }}?vis=alle{% if sortering %}&amp;sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}"{% if alle %} aria-current="true"{% endif %}>Alle <span class="antall">{{ antall_aksjer }}</span></a>
-      <a class="visknapp" href="{{ sidesti }}{% if sortering %}?sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}"{% if not alle %} aria-current="true"{% endif %}>Min liste <span class="antall">{{ antall_merket }}</span></a>
+      {#- Story 8.17b: valget beholder perioden og dagen. #}
+      <a class="visknapp" href="{{ sidesti }}?vis=alle{% for ledd in periodeledd %}&amp;{{ ledd }}{% endfor %}{% if sortering %}&amp;sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}"{% if alle %} aria-current="true"{% endif %}>Alle <span class="antall">{{ antall_aksjer }}</span></a>
+      <a class="visknapp" href="{{ sidesti }}{% for ledd in periodeledd %}{% if loop.first %}?{% else %}&amp;{% endif %}{{ ledd }}{% endfor %}{% if sortering %}{% if periodeledd %}&amp;{% else %}?{% endif %}sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}"{% if not alle %} aria-current="true"{% endif %}>Min liste <span class="antall">{{ antall_merket }}</span></a>
     </nav>
+    {#- Story 8.17b: «Sammenlign med» er periodevalget i Min liste
+        (beslutningen 08.10 kl. 21:48), med siste børsdag valgt når siden
+        åpnes (designregler §2). Radene er siste børsdag, og linja under
+        hver rad er dagen man sammenligner med. #}
+    {% if valg and vist_tabell %}
+      <h2 class="sammenlign-tittel" id="sammenlign-med">Sammenlign med</h2>
+      <div class="periodehode">{{ periodevalg(knapper, valg.periode, sidesti, valg.dag, foerste_valgbare, siste_dag, "Sammenlign med", ekstra=[("vis", "alle")] if alle else []) }} {{ hjelpeknapp("hjelp-sammenlign", "Hjelp: sammenlign med") }}</div>
+      {% if valg.beskjed %}<p class="periodebeskjed" role="status">{{ valg.beskjed }}</p>{% endif %}
+      {% if valg.periode == "velg" %}
+        <p class="periodelinje">Øverst i hver rad står siste børsdag, {{ siste_dag|ukedag }} {{ siste_dag|dato }}. Linja under er {{ valg.dag|ukedag }} {{ valg.dag|dato }}: sluttkursen den dagen, endringen derfra til siste børsdag og signalet som er lagret for dagen.</p>
+      {% elif periodestart %}
+        <p class="periodelinje">Øverst i hver rad står siste børsdag, {{ siste_dag|ukedag }} {{ siste_dag|dato }}. Linja under er {{ periodestart|ukedag }} {{ periodestart|dato }}, den første kursen for {{ periodenavn }}: sluttkursen den dagen, endringen derfra til siste børsdag og signalet som er lagret for dagen.</p>
+      {% endif %}
+    {% endif %}
     {% if not vist_tabell %}
       <p class="tom-liste">Ingen aksjer i Min liste ennå. Trykk på stjernen ☆ foran et selskap, under «Alle» her eller i markedsoversikten, for å legge det i lista.</p>
     {% endif %}
@@ -189,7 +222,7 @@
           {#- Svar 2: bare «NOK» under et kolonnenavn. Story 8.15: «?» står
               ved siden av lenken, ikke inne i den. #}
           <th class="tall"{{ ariasort("kurs") }}>{{ sorterlenke("kurs", "Sluttkurs") }} {{ hjelpeknapp("hjelp-sluttkurs", "Hjelp: sluttkurs") }}<span class="under">NOK</span></th>
-          <th class="tall"{{ ariasort("endring") }}>{{ sorterlenke("endring", "Endring") }} {{ hjelpeknapp("hjelp-endring", "Hjelp: endring") }}{% if valg and valg.periode == "velg" %}<span class="under">{{ valg.dag|dato }}</span>{% elif periodestart %}<span class="under">{{ periodenavn }}</span>{% endif %}</th>
+          <th class="tall"{{ ariasort("endring") }}>{{ sorterlenke("endring", "Endring") }} {{ hjelpeknapp("hjelp-endring", "Hjelp: endring") }}{#- Story 8.17b: i Min liste er øverste linje siste børsdag. #}{% if aktiv == "min_liste" %}{% elif valg and valg.periode == "velg" %}<span class="under">{{ valg.dag|dato }}</span>{% elif periodestart %}<span class="under">{{ periodenavn }}</span>{% endif %}</th>
           <th class="tall"{{ ariasort("signal") }}>{{ sorterlenke("signal", "Signalstyrke") }} {{ hjelpeknapp("hjelp-signalstyrke", "Hjelp: signalstyrken") }}</th>
           <th{{ ariasort("retning") }}>{{ sorterlenke("retning", "Retning") }} {{ hjelpeknapp("hjelp-retning", "Hjelp: retning") }}</th>
         </tr>
@@ -280,7 +313,9 @@
     {{ hjelpevindu("hjelp-hovedindeks", "Hovedindeksen", [("", ["hovedindeksen", "soeylene"] if hovedindeks and hovedindeks.har_soeyler else ["hovedindeksen"])]) }}
     {% endif %}
     {#- Story 8.17a: periodevalget over søylene og tabellen. #}
-    {% if valg %}{{ hjelpevindu("hjelp-perioden", "Periodene", [("", ["perioden_oversikten"])]) }}{% endif %}
+    {% if valg and aktiv != "min_liste" %}{{ hjelpevindu("hjelp-perioden", "Periodene", [("", ["perioden_oversikten"])]) }}{% endif %}
+    {#- Story 8.17b: «Sammenlign med» i Min liste. #}
+    {% if valg and aktiv == "min_liste" %}{{ hjelpevindu("hjelp-sammenlign", "Sammenlign med", [("", ["sammenlign_med"])]) }}{% endif %}
     {{ hjelpevindu("hjelp-selskap", "Selskap", [("", ["selskap"])]) }}
     {{ hjelpevindu("hjelp-sluttkurs", "Sluttkurs", [("", ["sluttkurs"])]) }}
     {{ hjelpevindu("hjelp-endring", "Endring", [("", ["endring", "utbyttejustert"])]) }}
