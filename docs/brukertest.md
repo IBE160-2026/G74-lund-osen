@@ -2,7 +2,7 @@
 title: "Brukertesten"
 status: aktiv
 created: 2026-10-23
-updated: 2026-10-23T16:39
+updated: 2026-11-03T15:05
 ---
 
 # Brukertesten
@@ -10,6 +10,8 @@ updated: 2026-10-23T16:39
 **Ikke tatt ennå.** Brukertesten tas neste uke (gruppens svar 23.10 kl. 12:29). Opplegget står i [spesifikasjonen 8.1](../_bmad-output/implementation-artifacts/spec-8-1-brukertesten.md): story 8.1 i del A, med KI av, og story 10.4 i del B, med samme person og samme aksje, først med KI av og så på. Del A og del B er to tester med hvert sitt notat.
 
 *Rettet 2026-10-23 (gjennomgangen av 3.4e, VG6):* slår personen på KI-teksten selv i del A, hoppes del B over, og 10.4 tas med neste person (svaret 23.10 kl. 15:53, b).
+
+*Rettet 2026-11-03 (gruppens svar 02.11 kl. 22:15, C):* «neste uke» i svaret 23.10 kl. 12:29 gjelder ikke lenger. Brukertesten, story 8.1 og 10.4, tas senere, uten dato ennå, og «Brukerutfall» står som mål for v1 i §7 i PRD-en.
 
 Ingen navn eller annet som kan kjenne personen igjen, står her. En kurs eller et volum som personen sier høyt, står som [kurs] eller [volum] (regel 16). Originalnotatene ligger i `_privat/` (regel 10).
 
