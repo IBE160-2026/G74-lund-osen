@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-11-03T14:44
+updated: 2026-11-03T14:51
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -428,6 +428,8 @@ rangering fra godt til dårlig (NFR-06).
 for Retning sier teksten for skjermleseren «stigende (A til Å)» eller «synkende
 (Å til A)», ikke «alfabetisk», og linja over tabellen sier det samme.
 
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R6):* Selskap sorteres også ved klikk, A til Å først, i norsk rekkefølge (story 8.15b, gruppens svar 2026-10-18 kl. 22:06, `src/markedsoversikt.py`).
+
 #### FR-103 — Retning vises i tre redundante kanaler
 
 Retningen vises som tekst, symbol og farge samtidig.
@@ -497,6 +499,8 @@ dag valgt med «Velg dag». Den stiplede indekslinja i kursgrafen slutter ved in
 kurs, og da står «Indeksen går bare til» med datoen ved grafen. «Velg dag» i oversikten har
 ikke unntaket: der har en aksje uten kurs den dagen «–». Unntaket står også under FR-105.
 
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R5):* hovedindeksen står også som stiplet linje i kursgrafen på aksjesiden (FR-202, story 2.9c, `24849dd9`).
+
 #### FR-105 — Søylene under hovedindeksen
 
 *Lagt til 2026-10-01, Marians beslutning.*
@@ -545,6 +549,8 @@ merkes «1 aksje». En aksje med 3 av 3 på siste børsdag har gul ramme med hvi
 kant og merket «3 av 3» (`designregler.md` §3). Antallet sektorer og aksjer
 telles fra lista (føringen 30.09 under `AD-21`). Ingen nye kall og ingen ny
 tabell. Sektoren står i `aksje`.
+
+*Rettet 2026-11-03 (gjennomgangen 02.11, R4):* børsometeret er bygget som en egen side, `/boersometer`, ikke i markedsoversikten: et kart med én rute per aksje ordnet etter bransje, med farge for endringen, størrelse for volumet mot vanlig, ramme for signalet og snittet per bransje ved navnet (story 8.6, `7f1c1f09`, og 8.6b, `7f6d9e4c`, avgjørelsen 2026-10-22 kl. 23:19 i `epics.md`).
 
 #### FR-107 — Endret signalstyrke siden forrige børsdag
 
@@ -667,6 +673,8 @@ Grafen tegner 50-dagers glidende snitt som en linje oppå kursen. Det gjør
 **sjekk 1, trend**, direkte synlig.
 
 **Begge linjene tegnes på samme serie: `adjusted_close`.**
+
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R5):* fra story 2.9c (`24849dd9`, PR #64) tegnes også hovedindeksen, som en tredje, stiplet linje, regnet om så den starter på aksjens kurs.
 
 Begrunnelsen er at aksjedetaljen finnes for å forklare signalet. MA50 regnes på
 utbyttejustert kurs etter FR-701. Tegner grafen en annen serie enn den signalet
@@ -856,6 +864,8 @@ børsslutt (FR-402). Er de ikke det, hentes ingenting og ingen kvote brukes.
 Skal det hentes, skjer det i denne rekkefølgen: kurser, deretter meldinger, og
 til slutt dagens vurdering per aksje (FR-408).
 
+*Rettet 2026-11-03 (gjennomgangen 02.11, R7):* rekkefølgen som er bygget, er kursene for aksjene, hovedindeksen (FR-410), vurderingene og KI-teksten (`src/fetch_prices.py`). Målingen av omsetning (FR-413) er et eget valg som jobben kjører etter hentingen. Meldinger hentes ikke i v1 (plan B, 28.09).
+
 **Hvor langt tilbake hver henting går, er fastsatt i FR-406.**
 
 *Endret 2026-09-22.* Kravet sa opprinnelig at henting utløses når applikasjonen
@@ -894,6 +904,8 @@ Applikasjonen skal aldri presentere gårsdagens tall som dagens.
 Kontrollen eies av hentekommandoen alene — webserveren henter ikke, og kan
 derfor ikke handle på utfallet. «Forventet børsdag» regnes i norsk
 kalenderdato; se arkitekturspinen AD-20. Hva en børsdag er, står i punkt 3 i §8, lukket 2026-09-27.
+
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R1):* når basen er tom, henter første henting siste fullførte børsdag, også på dagtid en hverdag (story 2.3c, avgjørelsen 2026-10-21 kl. 23:33 i `epics.md`). Unntaket fra `AD-7` står ved FR-408.
 
 EODHD dokumenterer ingen publiseringstid for Oslo Børs; se `begrunnelser.md`.
 
@@ -1051,6 +1063,8 @@ ingenting. Da skal det stå at den ikke sa noe.
 Håndhevet av arkitekturspinen `AD-7`: `Vurderingslager.skriv` avviser enhver
 dato som ikke er inneværende børsdag. En eldre rad er utilgjengelig gjennom
 porten, også for skriving. Hva en børsdag er, står i punkt 3 i §8, lukket 2026-09-27. Hvordan spørsmålet stilles i appen, står i punkt 20 i §8, lukket 2026-09-27.
+
+*Rettet 2026-11-03 (gjennomgangen 02.11, R1):* det er ett unntak. Første henting på dagtid i en tom base skriver vurderingene og KI-radene for børsdagen rett før inneværende, bare når basen ikke har rader for en annen dato, og hver rad skrives én gang og regnes aldri på nytt (story 2.3c, `2a84142d`, PR #87, unntaket fra `AD-7` godkjent 2026-10-22 kl. 19:30 i `epics.md`).
 
 *Presisert 2026-09-22.* Kravet sa «for hver aksje, hver dag» og «lagringen skjer
 automatisk». Begge deler kunne leses som at systemet skriver av seg selv hver
@@ -1247,6 +1261,8 @@ tre måneder bakover fra børsdagen og står ved hvert tall. Det er ingen lås, 
 for hentingen: vi kjører ikke noe for hånd mens jobben går. Mangler én av de 15
 kursen, går målingen kl. 23:45 med kallene som er igjen, og nye forsøk får
 fortsatt kallene først.
+
+*Endret 2026-11-03 (gjennomgangen 02.11, R3):* rekkefølgen er bygget slik: først de som aldri er målt, i rekkefølgen i lista over Oslo Børs fra `malinger.md` §40, uten aksjene i appens liste, og når alle er målt, den eldste målingen først (`spec-2-13-maalingen-av-omsetning.md`). Det går foran «aksjene i OBX som ikke er i lista, først» over. Fra kl. 23:45 går målingen uansett hvor mange av de 15 som mangler kursen, også når alle mangler (gruppens svar 2026-10-29 kl. 09:20, a).
 
 #### FR-414 — Eks.datoer ført for hånd
 
@@ -1795,6 +1811,8 @@ samme kjøring (FR-410), så daglig henting koster 16 kall og gir **fire kalls
 margin**. Avsnittet over gjelder til story 2.8 er bygget.
 
 *Lagt til 2026-10-02:* idéen «Måling av omsetning med kall til overs» i §8 bruker marginen bare etter at kveldens henting har gått bra, og lar 2 kall stå igjen. Alle kallene brukes bare når brukeren selv kjører målingen etter at dagen er ferdig.
+
+*Rettet 2026-11-03 (gjennomgangen 02.11, R2):* fra story 2.13 (`676fbc8b`, 29.10) kjører jobben målingen hver kveld etter hentingen med alle kallene som er igjen den dagen i GMT, og aldri bonuskvoten. Det går foran «lar 2 kall stå igjen» og «bare når brukeren selv kjører målingen» over (FR-413, gruppens svar 2026-10-28 kl. 22:17).
 
 *Lagt til 2026-10-02:* lista har opptil 18 aksjer (§8, «Egne aksjer»), så minst 1 kall er igjen hver dag.
 
