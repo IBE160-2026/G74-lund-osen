@@ -1067,7 +1067,9 @@ HOEYDE_PAA_BILDET = 1690
 # Story 8.17b, b: periodevalget i børsometeret, i app.py, boersometer.py,
 # hjelpetekster.py, boersometer.html og stil.css. Bildet ble tatt paa nytt og
 # er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "b6778a6126c642d461941a5525d79ae0fd9345f5dee1c3bc4b1ce0faa1ded3c9"
+# Story 8.17b, c: lenkene «Alle / Min liste» i index.html, der &amp; ble
+# skrevet to ganger. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "cff0c06b539c7987f52e6ebf8cb06a6ac06800f3859ed763a1275acda93925c2"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "

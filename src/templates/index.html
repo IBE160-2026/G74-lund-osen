@@ -124,7 +124,7 @@
     <nav class="visvalg" aria-label="Vis">
       {#- Story 8.17b: valget beholder perioden og dagen. #}
       <a class="visknapp" href="{{ sidesti }}?vis=alle{% for ledd in periodeledd %}&amp;{{ ledd }}{% endfor %}{% if sortering %}&amp;sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}"{% if alle %} aria-current="true"{% endif %}>Alle <span class="antall">{{ antall_aksjer }}</span></a>
-      <a class="visknapp" href="{{ sidesti }}{% for ledd in periodeledd %}{{ '?' if loop.first else '&amp;' }}{{ ledd }}{% endfor %}{% if sortering %}{{ '&amp;' if periodeledd else '?' }}sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}"{% if not alle %} aria-current="true"{% endif %}>Min liste <span class="antall">{{ antall_merket }}</span></a>
+      <a class="visknapp" href="{{ sidesti }}{% for ledd in periodeledd %}{% if loop.first %}?{% else %}&amp;{% endif %}{{ ledd }}{% endfor %}{% if sortering %}{% if periodeledd %}&amp;{% else %}?{% endif %}sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}"{% if not alle %} aria-current="true"{% endif %}>Min liste <span class="antall">{{ antall_merket }}</span></a>
     </nav>
     {#- Story 8.17b: «Sammenlign med» er periodevalget i Min liste
         (beslutningen 08.10 kl. 21:48), med siste børsdag valgt når siden
