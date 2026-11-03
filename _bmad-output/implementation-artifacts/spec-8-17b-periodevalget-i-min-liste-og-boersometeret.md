@@ -96,10 +96,12 @@ Hele settet før gjennomgangen, alene, 03.11 kl. 18:12:56–18:19:59 på `7844af
 | BH5 | «ingen kurs fra dagen» kunne gi fotnoten «ikke vurdert» | – | **avvist**: `ikke_vurdert` leser teksten, som er byttet |
 | BH7 | Lesingen av vurderingen per rad uten feilhåndtering | low | **avvist**: `sqlite3.Error` gir siden for basefeil, som «Velg dag» i oversikten (8.17a) |
 | BH8 | Fargetrinnene er laget for én dag og brukes for en periode | low | **står**: svaret 23.10 kl. 12:35 (b) sier at fargen er endringen for perioden. Spørsmål til gruppen («Åpent») |
+| BH8, svaret | *Avgjort 2026-11-03 kl. 19:25 (gruppens svar, 3):* fargetrinnene er de samme ved en periode | – | **avgjort**: står som bygget, ingen ny kode |
 | BH9 | Snittet per bransje blander kortere serier inn | low | **står**: som tabellen i 8.17a, og «fra» står i tabellen |
 | BH12, ECH5 | Med både `dag` og en periode i adressen gjelder dagen | low | **står**: `les_valg` gjør det samme i oversikten |
 | BH14 | Fargen i linja under regnes med `round(2)` i malen | low | **står**: samme mønster som raden over (story 8.0) |
 | BH15 | Tolkningen av «Velg dag» i Min liste er åpen, men bygget og skrevet i hjelpen | medium | **står**: spørsmål til gruppen før flettingen («Åpent»). Svarer gruppen annerledes, rettes `bygg_sammenligning`, hjelpen og testene |
+| BH15, svaret | *Avgjort 2026-11-03 kl. 19:25 (gruppens svar, 1 og 2):* tolkningen av f er riktig, og «Velg dag» i Min liste viser endringen fra dagen til siste børsdag | – | **avgjort**: som bygget, så hjelpen, testene og README-en står |
 | BH17 | Første valgbare dag i børsometeret er seriens første dag, i oversikten dagen etter | low | **står**: børsometeret beholder regelen fra 8.6, der en dag før første kurs gir første børsdag |
 | ECH3 | «til siste børsdag» for skjermleseren når raden har en eldre dag | low | **står**: raden sier «siste kurs» og datoen |
 | ECH6 | En serie som ikke kan leses, gir «ingen kurs fra dagen» i linja under | low | **står**: som «Velg dag» i oversikten |
@@ -108,4 +110,6 @@ Hele settet før gjennomgangen, alene, 03.11 kl. 18:12:56–18:19:59 på `7844af
 ## Åpent
 
 - **Tolkningen av f i Min liste (spørsmål til gruppen):** siste børsdag er sidens dag, og linja under er sammenligningen, så Min liste viser to dager med vilje. Er det riktig? Og skal endringen i linja under for «Velg dag» være fra dagen til siste børsdag (valgt her), eller endringen den dagen, som «Velg dag» i oversikten?
+  - *Avgjort 2026-11-03 kl. 19:25 (gruppens svar, 1 og 2):* tolkningen er riktig: siste børsdag er sidens dag, og linja under er sammenligningen. Ved «Velg dag» viser linja under endringen fra dagen til siste børsdag, som bygget. Ingen ny kode.
 - **BH8 (spørsmål til gruppen):** fargetrinnene i børsometeret (±0,5 % og 2 %) er laget for én dag. Ved 3 mnd og lenger blir de fleste rutene sterke. Skal trinnene være de samme for en periode, som nå?
+  - *Avgjort 2026-11-03 kl. 19:25 (gruppens svar, 3):* fargetrinnene er de samme ved en periode. Ingen ny kode.
