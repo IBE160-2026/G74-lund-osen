@@ -2,7 +2,7 @@
 title: 'Story 8.17a: periodevalget i oversikten, med søylene og indekslinja'
 type: 'feature'
 created: '2026-10-30'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'afd08c5'

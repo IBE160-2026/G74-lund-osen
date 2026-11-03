@@ -4036,6 +4036,8 @@ avgjøres i planen.
 
 *Lagt til 2026-11-03:* flettingen ble flyttet til 3.11, fordi blokka ikke ble limt inn 2.11 (instruksjonen kl. 01:09 i dagsfila 03.11).
 
+*Lagt til 2026-11-03:* 8.17a er squash-flettet i `b2e8b2c` kl. 01:30, PR #106, låst til head-en `047f1f7` (spesifikasjonen `spec-8-17a-periodevalget-i-oversikten.md`). Unntaket fra én dag per side står under FR-104 og FR-105 i `prd.md`, med `test_fr_104_og_fr_105_har_unntaket_fra_en_dag_per_side`. Hele settet på `047f1f7`: 3908 bestått, 24 hoppet over og 7 feilet, alle blant porttestene for `start.ps1` som CI avgjør (svaret 29.10 kl. 21:02). CI var grønn på head-en (41552952105). Mutantene M1–M3 ble fanget. Min liste og børsometeret er 8.17b, så 8.17 står som in-progress.
+
 ### Story 8.18: Kommende eks.dato i kursgrafen
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
