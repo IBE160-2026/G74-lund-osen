@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-11-03T21:54
+updated: 2026-11-03T22:49
 ---
 
 # UX-loggen
@@ -666,3 +666,5 @@ De 45 funnene over der «Tas i» begynner med «8.2» (8.2, 8.2a og «8.2, og 8.
 | U74 | løst | 8.2a f (`e4d1ba46`): `alle-sjekkene` i `index.html` begynner med pillen, uten «Bare». | – |
 
 Talt: løst 7, delvis 3, står 34, må ses på siden 1, i alt 45.
+
+*Lagt til 2026-11-03 (gruppens svar kl. 22:01, instruksjonen kl. 22:44):* 29 av de 38 som ikke er løst, tas i 8.2b (under story 8.2 i `epics.md`). Disse står, med grunnen: U4 (kalenderen dekker bare 2026), U23 (nevnerne er ulike med vilje), U38 (datofeltet er nettleserens), U40 og U60 (egne stories, 8.8 og 8.19), U61 (8.0d valgte tekstlenke), U17 (aksjesiden nås fra navnet), U1 (bare demobaser fra 22.10–29.10) og U43 (må ses i appen).

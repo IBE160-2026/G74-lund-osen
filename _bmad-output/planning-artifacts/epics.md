@@ -3568,6 +3568,12 @@ passet inn.
 
 *Lagt til 2026-10-24 kl. 14:57:* 8.2a, seks funn fra prøven av demoen 24.10, er squash-flettet i `e4d1ba4`, PR #93, låst til head-en `775cd50` (spesifikasjonen `spec-8-2a-funn-fra-proeven-av-demoen.md`). Punkt e), én liste når man sorterer, er med, etter avgjørelsen under story 8.15.
 
+*Avgjort 2026-11-03 kl. 22:01 (gruppens svar):* disse funnene fra `docs/ux-logg.md` tas i 8.2b. Bygges i natt, flettes etter bildene.
+- a) Oversikten: U20–U22, U24–U26, U29 og U57.
+- b) Aksjesiden, småting: U2, U6, U16, U31, U37, U39, U41, U44, U47 og U65.
+- c) Aksjesiden som på designtavla: U33, U46, U62–U64 og U66–U68.
+- d) Forsiden og Min liste som på tavla: U58, U59 og U69.
+
 ### Story 8.3: Min liste: eget skjermbilde med stjerne og filter
 
 *Lagt til 2026-09-30, Marians beslutning.*
