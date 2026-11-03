@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-11-03T17:58
+updated: 2026-11-03T19:37
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -343,6 +343,8 @@ tidligere dag (`AD-7`). Det er fortsatt fem kolonner.
 
 *Lagt til 2026-11-03 (gjennomgangen 02.11, R14):* periodevalget i oversikten er bygget i story 8.17a (`b2e8b2c`, PR #106), med søylene og indekslinja (FR-105). I Min liste og børsometeret: ikke bygget per 3.11, story 8.17b, ekstra fra 19.10. At oversikten viser lista som er aktiv: ikke bygget per 3.11, story 2.11, ekstra fra 19.10.
 
+*Lagt til 2026-11-03:* periodevalget i Min liste («Sammenlign med») og i børsometeret er flettet 3.11 i story 8.17b (`978bd1a`, PR #108).
+
 **Aksjer uten gyldig signal vises likevel.** Signalet krever 51 handelsdager
 fordi MA50 spiser 50 av dem. En nynotert aksje, eller en serie med hull, gir
 derfor ingen signalverdi. Raden skal da vises med:
@@ -511,6 +513,8 @@ ikke unntaket: der har en aksje uten kurs den dagen «–». Unntaket står ogs�
 gjelder» gjelder ikke lenger. En rad med eldre dag enn sidens viser datoen sin, «siste kurs» med
 ukedagen og datoen under navnet, i oversikten og i Min liste, også ved en periode (`egne_dager`).
 Overskriften står som nå (FR-101). Bygget på grenen for 8.17b, ikke flettet per 3.11.
+
+*Lagt til 2026-11-03:* flettet 3.11 i story 8.17b (`978bd1a`, PR #108).
 
 *Lagt til 2026-11-03 (gjennomgangen 02.11, R5):* hovedindeksen står også som stiplet linje i kursgrafen på aksjesiden (FR-202, story 2.9c, `24849dd9`).
 
