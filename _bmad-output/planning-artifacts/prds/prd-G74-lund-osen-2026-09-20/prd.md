@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-11-03T14:52
+updated: 2026-11-03T14:53
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -325,6 +325,8 @@ viser også endringen i NOK, på en mindre linje under prosenten. Den regnes av
 samme vei. Det er fortsatt fem kolonner, og sorteringen er fortsatt på prosent
 (FR-102). En utbyttedag merkes etter FR-407.
 
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R16):* ikke bygget per 3.11, story 8.5, ekstra fra 19.10.
+
 *Lagt til 2026-10-08, Marians beslutning (story 2.11 og 8.17):* oversikten viser
 aksjene i lista som er aktiv (FR-412), ikke et fast antall på 15. Periodevalget i
 `designregler.md` §2 gjelder oversikten: siste børsdag («I går», «I dag» eller
@@ -334,6 +336,8 @@ over en periode regnes av kursserien, på `adjusted_close`, som endringen for é
 dag. Signalet for en dag vises bare der vurderingen er lagret, ellers «– ikke
 vurdert», grunnen eller «– ikke børsdag». Det regnes aldri et signal for en
 tidligere dag (`AD-7`). Det er fortsatt fem kolonner.
+
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R14):* periodevalget i oversikten er bygget i story 8.17a (`b2e8b2c`, PR #106), med søylene og indekslinja (FR-105). I Min liste og børsometeret: ikke bygget per 3.11, story 8.17b, ekstra fra 19.10. At oversikten viser lista som er aktiv: ikke bygget per 3.11, story 2.11, ekstra fra 19.10.
 
 **Aksjer uten gyldig signal vises likevel.** Signalet krever 51 handelsdager
 fordi MA50 spiser 50 av dem. En nynotert aksje, eller en serie med hull, gir
@@ -536,6 +540,8 @@ falt.
   (`bygg_soeyler` og `bygg_soeyler_perioden`). I kursgrafen på aksjesiden slutter den
   stiplede indekslinja ved indeksens siste kurs, med «Indeksen går bare til» og datoen.
 
+  *Lagt til 2026-11-03 (gjennomgangen 02.11, R14):* søylene og indekslinja følger periodevalget i oversikten, bygget i story 8.17a (`b2e8b2c`, PR #106).
+
 *Lagt til 2026-10-01:* bransjesymbolet er gult når aksjen har 3 av 3 på siste børsdag (designregler.md §3).
 
 #### FR-106 — Børsometeret
@@ -574,6 +580,8 @@ periodevalget i Min liste i designforslaget. Hver rad viser tallene for siste
 børsdag øverst og dagen man sammenligner med under. Det beskrives og bygges i
 8.17, som kommer før 8.12.
 
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R20):* ikke bygget per 3.11, story 8.12, ekstra fra 19.10.
+
 #### FR-108 — Filter på signalet
 
 *Lagt til 2026-10-08, Marians beslutning (story 8.11).*
@@ -583,6 +591,8 @@ retning, innenfor lista som er aktiv. Rekkefølgen er fortsatt FR-102. Filteret
 heter ikke «topp», fordi styrken verken er et råd eller en sannsynlighet
 (NFR-06, FR-703). Hele børsen er ute: det krever kurser for alle aksjene hver dag,
 og bulk koster 100 kall (NFR-01). Ingen kall.
+
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R20):* ikke bygget per 3.11, story 8.11, ekstra fra 19.10.
 
 #### FR-109 — Hjelpen på sidene
 
@@ -602,6 +612,8 @@ krever det.
   tips velges ut fra datoen, eller ut fra dagens tall når et tips passer, etter
   en regel i koden. Et tips skal ikke kunne leses som et råd (NFR-06).
 
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R21):* delvis bygget per 3.11. Hjelpen bak spørsmålstegnet er bygget (story 8.0b, og 8.0f, `238ef186`, PR #102). Omvisningen og «Lær noe nytt»: ikke bygget per 3.11, story 8.9 og 8.13, ekstra fra 19.10.
+
 #### FR-110 — Innstillinger
 
 *Lagt til 2026-10-08, Marians beslutning (story 8.10).*
@@ -611,6 +623,8 @@ KI-tekst». Valgene gjelder alle sidene og lagres i basen, slik merkingen i Min
 liste (8.3) gjør, så de overlever en omstart. Ingen innlogging: valgene gjelder
 maskinen. FR-601 står: bryteren ved hver KI-tekst blir der, og begge styrer samme
 valg, så de viser aldri hver sin verdi.
+
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R21):* ikke bygget per 3.11, story 8.10 og 8.10b, ekstra fra 19.10.
 
 #### FR-407 — Merking av utbyttedager
 
@@ -629,6 +643,8 @@ som en feil.
 
 Utbyttedager skal derfor merkes i grensesnittet, slik at avviket er forklart i
 stedet for å se ut som en feil. Kravet må være oppfylt før demonstrasjonen.
+
+*Rettet 2026-11-03 (gjennomgangen 02.11, R15):* ikke bygget per 3.11, story 2.6 og 8.14, ekstra fra 19.10. «Kravet må være oppfylt før demonstrasjonen» gjelder derfor ikke lenger.
 
 *Lagt til 2026-10-08, Marians beslutning (story 8.14):* kursgrafen markerer
 justeringsdagene det siste året, og aksjedetaljen viser hvor mange det var og
@@ -720,6 +736,8 @@ et bånd rundt forrige dags `adjusted_close` med standardavviket fra sjekk 2
 volumet, eller er medianen 0, tegnes ikke streken, og grafen sier det (NFR-08).
 Samme prinsipp som over: grafen skal forklare regelen som ble brukt.
 
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R17):* ikke bygget per 3.11, story 8.7, ekstra fra 19.10.
+
 #### FR-203 — Øvrig innhold
 
 Aksjedetaljen viser i tillegg:
@@ -742,6 +760,8 @@ Aksjedetaljen viser i tillegg:
 aksjedetaljen viser høy og lav for siste børsdag ved sluttkursen, og endringen i
 NOK ved prosenten. Høy og lav vises bare når begge finnes og lav ≤ sluttkurs ≤
 høy, ellers «–» (regelen i NFR-08). De tegnes ikke i grafen.
+
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R16):* ikke bygget per 3.11, story 2.10 og 8.5, ekstra fra 19.10.
 
 *Ute av v1 fra 2026-09-28 (plan B).* *Lagt til 2026-09-25:* over meldingene står en teller for hvor mange som ble
 funnet og hvor mange som vises, med grunnen til at resten er skjult: filtrert
@@ -794,6 +814,8 @@ Aksjedetaljen har delen «Se nærmere», rett under kursgrafen, med tre spørsm�
 
 Mangler et tall, står grunnen, ikke et gjettet svar (NFR-03).
 
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R18):* ikke bygget per 3.11, story 8.4, ekstra fra 19.10.
+
 #### FR-206 — Signaldager i kursgrafen
 
 *Lagt til 2026-10-08, Marians beslutning (story 8.8).*
@@ -804,6 +826,8 @@ aldri på nytt (`AD-7`). Det finnes vurderinger fra 02.10, så grafen sier fra
 hvilken dato markeringene finnes. En dag med grunn, en dag uten rad og en dag som
 ikke er børsdag markeres ikke som signal og ser aldri ut som styrke 0. Skillet i
 FR-409 bevares.
+
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R18):* ikke bygget per 3.11, story 8.8, ekstra fra 19.10.
 
 #### FR-207 — Kommende eks.dato i kursgrafen
 
@@ -817,6 +841,8 @@ den er sjekket (NFR-08). Uten dato står det ingenting, og det ser ikke ut som e
 feil. I demoen er datoene oppdiktet og merket «Eksempeltall» (FR-411).
 
 ---
+
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R19):* ikke bygget per 3.11, story 8.18, ekstra fra 19.10.
 
 ### 4.3 Kommende finansielle hendelser
 
@@ -919,6 +945,8 @@ skal fylles ved neste henting uten ekstra kostnad i kvote.
 `/api/eod` tar `from` og `to`, begge inklusive, og **ett kall koster det samme
 uansett hvor langt intervallet er**. Etterfylling av 15 symboler koster derfor
 15 kall enten hullet er én dag eller fire måneder.
+
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R25):* FR-403 oppfylles gjennom FR-406: hver henting erstatter symbolets serie i sin helhet, så et hull fylles uansett. Kontrollen story 2.4 skal skrive: ikke bygget per 3.11, story 2.4, ekstra fra 19.10.
 
 #### FR-404 — Etterfylling av børsmeldinger
 
@@ -1128,6 +1156,8 @@ historikken: signaldagene (FR-206), merket for endret signalstyrke (FR-107) og
 vurderingshistorikk i v1» gjelder derfor ikke lenger, og bindingen over gjelder
 dem alle.
 
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R22):* «ikke i lista» er ikke bygget per 3.11 (`src/tilstand.py` har den ikke), story 2.11, ekstra fra 19.10.
+
 #### FR-410 — Hovedindeksen hentes i samme kjøring
 
 *Lagt til 2026-10-01, Marians beslutning.*
@@ -1196,6 +1226,8 @@ Demobasen har i tillegg minst én aksje som er tatt ut av lista, én merket
 nok til at signaldagene, merket for endret signalstyrke og «Velg dag» har noe å
 vise. Lista i demoen kan byttes, men det hentes aldri (story 3.4).
 
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R23):* tillegget 08.10 er ikke bygget per 3.11: demobasen har ingen aksje tatt ut av lista, ingen merket «Utenfor målingen», ingen målte omsetninger og ingen eks.datoer (`src/demo.py`). Det venter på story 2.11 og 2.14, ekstra fra 19.10. Målingen av omsetning (2.13) er bygget, men demoen har ingen målinger.
+
 *Lagt til 2026-10-13, Marians ja kl. 13:44, etter faglærers tilbakemelding 06.10 (`tilbakemelding-product-brief.md`):* alt brukeren ser i v1, vises også i demoen, også KI-laget av og på (story 3.4b). Faglærer skrev: «sørg for at alle funksjoner i v1, også KI-laget i av-modus, kan vises der.»
 
 *Lagt til 2026-10-16 (gruppens beslutning kl. 11:46, instruksjonen kl. 15:59):* demoen skal være mest mulig lik den ekte versjonen. Der demoen ikke kan gjøre det samme, fordi den ikke henter (FR-411), forklarer en boks hvordan det er i den ekte versjonen, gjerne med et bilde som blir stort ved klikk, trykk eller tastatur, ikke bare når musa holdes over. Bildet kan vise hele siden, for eksempel «Min liste» i den ekte versjonen, men lages fra testdata, aldri med ekte kurser (regelen 25.09 under story 3.3 i `epics.md`). For 2.12 betyr det noen ekstra oppdiktede selskaper i demobasen som kan velges, og at valget, «x av 18» og «Dine egne aksjer» virker likt i begge versjonene. Detaljene avgjøres i planen for 2.12.
@@ -1230,6 +1262,8 @@ avvises med en forklaring.
 og én liste per sektor, som gruppen lager og måler (FR-413). En liste vi ikke har
 målt, står ikke som ferdig liste, og ingen har mer enn 18 aksjer. «De 15 mest
 omsatte» har ikke kravet om minst åtte sektorer i §3.
+
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R22):* ikke bygget per 3.11, story 2.11 og 2.12, ekstra fra 19.10. Oversikten viser de faste 15.
 
 #### FR-413 — Måling av omsetning
 
@@ -1291,6 +1325,8 @@ gratisnivået (`docs/kilder-og-rettigheter.md`), og Euronext er ute (plan B, og
 ingen lenker til Euronexts nettsteder).
 
 ---
+
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R19):* ikke bygget per 3.11, story 2.14, ekstra fra 19.10.
 
 ### 4.5 Meldingsfilter og deduplisering
 
@@ -1435,6 +1471,8 @@ demonstrasjonen mens noen ser på.
 
 I v1 slår bryteren av og på KI-teksten i aksjedetaljen (FR-602). *Lagt til 2026-10-02:* Bryteren gjelder også KI-teksten om dagen på forsiden (FR-607). Én bryter styrer begge.
 
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R24):* KI-teksten om dagen på forsiden (FR-607) er ikke bygget per 3.11, story 10.6, ekstra fra 19.10.
+
 *Lagt til 2026-10-05:* Bryteren slår av KI-teksten uansett hvilken tjeneste som er valgt (FR-608). Er tjenesten ikke tilgjengelig, også når Ollama ikke kjører, er KI av, og siden sier hvorfor.
 
 *Lagt til 2026-10-15 (gruppens svar kl. 23:57 på spørsmålet i Utført-linja kl. 23:51, instruksjonen kl. 23:58):* siden sier hvorfor med det loggen kan vise. Har dagen ingen rader i `ki_logg` i det hele tatt, står det «Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.» Har andre aksjer rader for dagen, men ikke denne, sier siden at teksten for denne aksjen ikke ble laget i hentingen. Den nøyaktige grunnen står i utskriften fra hentingen og i Utført-linja for den kvelden. Med dette regnes kontrollpunktet fra 05.10 om at siden sier hvorfor (FR-601), som oppfylt.
@@ -1570,6 +1608,8 @@ brukes på meldinger i applikasjonen, står i FR-606A.
 Under tabellen i markedsoversikten står noen setninger om hele børsdagen, skrevet av KI. Grunnlaget er bare utledede tall regnet av kursene: hvor mange som skilte seg ut, hvor mange som gikk bedre enn hovedindeksen (FR-104), indeksens endring, og snittendringen per bransje, for dagen og for uka. Teksten lages én gang i hentekommandoen, med ett kall til modellen per børsdag (NFR-02), og logges som i FR-604 og FR-605. Den er merket som laget av KI, med modellnavnet (FR-602). Kontrollen i FR-603 gjelder med alle 4 punktene, og teksten vises bare når grunnlaget stemmer med det siden viser. Ellers står det at dagen er uten KI-tekst. Teksten gir ikke råd og spår ikke (NFR-06).
 
 *Rettet 2026-10-05:* grunnlaget er bare antall og retninger: hvor mange som skilte seg ut, antall per retning, hvor mange som gikk bedre enn hovedindeksen (FR-104), retningen for hovedindeksen, og antall opp per bransje. Ingen prosenter. Her sto «Grunnlaget er bare utledede tall regnet av kursene: hvor mange som skilte seg ut, hvor mange som gikk bedre enn hovedindeksen (FR-104), indeksens endring, og snittendringen per bransje, for dagen og for uka.» Indeksens endring og snittendringen per bransje er prosenter, og sendes ikke (§4.6, avgjort 2026-10-04). Uka er ikke med i det nye grunnlaget; om den skal med som antall, avgjøres i story 10.6.
+
+*Lagt til 2026-11-03 (gjennomgangen 02.11, R24):* ikke bygget per 3.11, story 10.6, ekstra fra 19.10.
 
 #### FR-608 — Valg av tjeneste
 
