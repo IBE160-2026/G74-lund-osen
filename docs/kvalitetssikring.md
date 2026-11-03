@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-03T01:31
+updated: 2026-11-03T19:37
 ---
 
 # Kvalitetssikring
@@ -378,6 +378,7 @@ sist i dokumentet.
 | 3.5h «Til faglærer» med fire punkter, og BH4, BH7 og BH9 fra 3.5g | `a3e6057` (#107) | 0 | – bare dokumenter og testene for dem, og instruksjonen ba ikke om mutant | `S/spec-3-5h-til-faglaerer.md` |
 | 2.13 Målingen av omsetning som jobben kjører hver kveld | `676fbc8` (#105) | 3 (3: stoppen ved endret `extraLimit`, grensen kl. 23:45 og ventingen når alle 15 mangler) | – de to første kjørt med `-x` på `ab7b967` og `fda73fd` 28.10 og på `e744f87` 28.10 og `0640378` 29.10, den tredje 29.10 uten at commiten er ført | `S/spec-2-13-maalingen-av-omsetning.md` |
 | 8.17a Periodevalget i oversikten, med søylene og indekslinja | `b2e8b2c` (#106) | 1 (3, M1–M3) | – kjørt med `-x` på `635205e` 30.10 | `S/spec-8-17a-periodevalget-i-oversikten.md` |
+| 8.17b Periodevalget i Min liste («Sammenlign med») og i børsometeret | `978bd1a` (#108) | 1 (4, M1–M4) | – kjørt med `-x` på `7844af6` og igjen på `3c8fd27` 03.11 | `S/spec-8-17b-periodevalget-i-min-liste-og-boersometeret.md` |
 | 8.2a Seks funn fra prøven av demoen 24.10 | `e4d1ba4` (#93) | 1 (5, M1–M5) | – kjørt på `7ca19d9` 24.10 | `S/spec-8-2a-funn-fra-proeven-av-demoen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
@@ -617,6 +618,7 @@ funn. Antall rader i loggen:
 | 3.5h, gjennomgangen 30.10 | 15 | 10 | 2 | 3 |
 | 2.13, to gjennomganger 28.10 og 29.10 | 56 | 29 | 9 | 8 |
 | 8.17a, tre gjennomganger 30.10 | 66 | 39 | 13 | 10 |
+| 8.17b, gjennomgangen 03.11 | 26 | 9 | 5 | 10 |
 | 8.6b, gjennomgangene 26.10 | 37 | 21 | 13 | 3 |
 | 8.0f, gjennomgangen 26.10 | 25 | 22 | 3 | – |
 | 8.2a | 21 | 15 | 6 | – |
@@ -639,6 +641,8 @@ tabellen 03.10.
 *Lagt til 2026-10-29 (story 2.13):* 10 av de 56 radene står ikke i noen kolonne: 5 spørsmål til gruppen og 5 avgjort av gruppen uten endring. Rader med «står» og «utsatt» er talt som utsatt, og raden «prøvd» med den nye testen som rettet.
 
 *Lagt til 2026-11-03 (story 8.17a):* 4 av de 66 radene står ikke i noen kolonne: 3 spørsmål til gruppen (VG5, BH1 og ECH2, og BH13) og VG1, som ble prøvd for hånd før svaret kl. 10:45 ga testen `TestSmalSkjerm`. To rader med «delvis rettet» er talt som rettet, og rader med «står» som utsatt. Svarene fra gruppen med en retting er talt som rettet.
+
+*Lagt til 2026-11-03 (story 8.17b):* 2 av de 26 radene står ikke i noen kolonne: svarene fra gruppen 03.11 kl. 19:25 på BH8 og BH15, avgjort uten endring. ECH2/VG2 og VG3 er rettet for testene og talt som rettet, og rader med «står» er talt som utsatt.
 
 *Lagt til 2026-10-17:* fra story 9.1 (17.10) får hver PR triagen fra spesifikasjonen som kommentar, med lenke til spesifikasjonen. PR #56–#60 fikk den i ettertid 17.10, satt sammen fra triagen i spesifikasjonene.
 
@@ -1432,6 +1436,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 2.13 | grensen kl. 23:45 tatt ut: betingelsen byttet til `True`, så målingen alltid venter når en kurs mangler | `test_gaar_fra_23_45_naar_en_kurs_mangler`, med `-x`, på `e744f87` 28.10 og `0640378` 29.10 | `S/spec-2-13-…` |
 | 2.13 | målingen venter når alle mangler (`len(mangler) == len(lista)` i betingelsen) | `test_gaar_fra_23_45_ogsaa_naar_alle_15_mangler`, 29.10 | `S/spec-2-13-…` |
 | 8.17a | M1–M3 | M1 `test_1_uke_og_1_mnd_mot_den_haandregnede_serien`, M2 `test_soeylene_og_linja_foelger_perioden`, M3 `test_dagen_viser_det_som_er_lagret`, med `-x`, på `635205e` 30.10 | `S/spec-8-17a-…` |
+| 8.17b | M1–M4 | M1 og M2 `test_1_uke_og_1_mnd_mot_den_haandregnede_serien`, M3 `test_like_store_ruter_ved_en_periode`, M4 `test_raden_viser_datoen_sin_i_oversikten_og_min_liste`, med `-x`, på `7844af6` og `3c8fd27` 03.11 | `S/spec-8-17b-…` |
 | 8.2a | M1–M5 | M1 `test_periodeknappene_og_velg_dag_gaar_til_kursgrafen`, M2 `test_aksjen_uten_kurser_har_en_rad_nederst_og_ingen_fotnote`, M3 `test_symbolene_over_soeylene_lenker_til_aksjesiden[/]`, M4 `test_raden_sier_hvorfor_med_samme_tall_som_aksjesiden[/]`, M5 `test_sortert_er_hele_lista_en_liste_uten_delene[synkende]` | `S/spec-8-2a-…` |
 | 9.1 | Q1–Q4 | Q1, Q3 og Q4 `test_hver_ferdige_spesifikasjon_har_en_rad`, Q2 `test_hver_test_dokumentene_nevner_finnes` | `S/spec-9-1-…` |
 | 9.7 | A1–A5 | A1 `test_ruff_check_finner_ingenting`, A2 og A3 `test_ruff_format_er_kjoert`, A4 `test_ci_kjoerer_ruff_foer_testene`, A5 `test_ingen_modul_i_src_bruker_meldinger` | `S/spec-9-7-…` |

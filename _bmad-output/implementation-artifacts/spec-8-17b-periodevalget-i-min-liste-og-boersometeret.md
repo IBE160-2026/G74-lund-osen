@@ -2,7 +2,7 @@
 title: 'Story 8.17b: periodevalget i Min liste («Sammenlign med») og i børsometeret'
 type: 'feature'
 created: '2026-11-03'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'dc8a5b0'
