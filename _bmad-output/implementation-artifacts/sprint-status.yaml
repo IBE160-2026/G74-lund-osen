@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-24-2026 19:26
-last_updated: 11-03-2026 01:31
+last_updated: 11-03-2026 15:04
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -70,6 +70,9 @@ development_status:
   2-2b-sidene-leser-dagens-vurdering: done
   2-3-børsdagskontroll-før-kvoten-brukes: done
   2-3b-kallene-som-er-igjen-brukes-på-nye-forsøk: done
+  # Lagt til 2026-11-03 (gjennomgangen av PRD-en 02.11, spørsmål 11): 2-3c flettet i 2a84142d (PR #87), 2-3d i 817b331a (PR #104).
+  2-3c-foerste-henting-paa-dagtid: done
+  2-3d-hentingen-hver-kveld: done
   # Ekstra, hvis tiden rekker, fra 2026-10-19 (endringsforslaget 2026-10-19, gruppens svar kl. 15:43): 2-4, 2-6 og 2-10
   # til 2-14. Briefen v8 lover dem ikke. 2-7 er v1. Statusen staar.
   2-4-etterfylling-av-hull-i-kursserien: backlog
@@ -83,7 +86,7 @@ development_status:
   2-10-høy-og-lav-lagres-med-kursene: backlog
   2-11-lista-leses-fra-basen: backlog
   2-12-velge-og-bytte-aksjer: backlog
-  2-13-kommandoen-som-måler-omsetning: review
+  2-13-kommandoen-som-måler-omsetning: done
   2-14-eksdatoer-føres-inn-for-hånd: backlog
   epic-2-retrospective: optional
 
@@ -98,6 +101,18 @@ development_status:
   3-3e-bildet-uv-og-variablene: done
   3-4-demoversjonen: review
   3-4b-ki-tekstene-i-demoen: done
+  # Lagt til 2026-11-03 (gjennomgangen av PRD-en 02.11, spørsmål 11): status fra epics.md og git log.
+  # 3-5a afbc0af9 (#92), 3-5d 5e01a4f5 (#94), 3-5e dbfa0b97 (#100), 3-5f 8cd20b3d (#101),
+  # 3-5g 27ccf827 (#103) og 3-5h a3e60577 (#107) er flettet.
+  3-5a-dobbeltklikk-med-uv: done
+  # 3-5b og 3-5c bygges ikke (gruppens svar 2026-10-25 kl. 11:32, b, under story 3.5 i epics.md). Statusen staar.
+  3-5b-dobbeltklikk-med-docker: backlog
+  3-5c-installasjonsprogram-for-windows: backlog
+  3-5d-funn-fra-forproeven: done
+  3-5e-stopp-foer-webserveren: done
+  3-5f-hovedveien: done
+  3-5g-kortere-kom-i-gang: done
+  3-5h-til-faglaerer: done
   epic-3-retrospective: optional
 
   epic-4: in-progress
