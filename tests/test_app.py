@@ -2585,8 +2585,8 @@ class TestStory80dAksjesiden:
         endring = html.split('<div class="noekkeltall endring">', 1)[1].split("</div>", 1)[0]
         assert f'<span class="verdi opp">+2,00{NB}%</span>' in endring
         # Gjennomgangen (VG6): serien ender lørdag 31.10, og dagen før er
-        # fredag. En nedgang er rød.
-        assert "fra fredag til lørdag" in endring
+        # fredag. En nedgang er rød. Story 8.2b, b (U31): med datoene.
+        assert "fra fredag 30.10 til lørdag 31.10" in endring
         _lagret("DNB", -2.0, 1, 0, 0)
         ned = klient.get("/aksje/DNB").data.decode("utf-8")
         assert f'<span class="verdi ned">-2,00{NB}%</span>' in ned
@@ -2595,7 +2595,10 @@ class TestStory80dAksjesiden:
         """Svar 29 (15.10, BH6 og ECH2): datoene ved ukedagene når det ligger
         en børsdag mellom de to kursradene. Fredag til mandag og en uke med
         bare stengte dager har ingen. Ville feilet med alltid ukedager,
-        alltid datoer, eller kalenderdager i stedet for børsdager."""
+        alltid datoer, eller kalenderdager i stedet for børsdager.
+
+        Story 8.2b, b (U31, gruppens svar 03.11 kl. 22:01): kortet har nå
+        alltid datoene, så de tre har dem."""
         monter(
             monkeypatch,
             snapshot(
@@ -2607,8 +2610,8 @@ class TestStory80dAksjesiden:
             ),
         )
         assert _endringsforklaring(klient, "EQNR") == "fra fredag 02.10 til fredag 09.10"
-        assert _endringsforklaring(klient, "DNB") == "fra fredag til mandag"
-        assert _endringsforklaring(klient, "KOG") == "fra onsdag til tirsdag"
+        assert _endringsforklaring(klient, "DNB") == "fra fredag 02.10 til mandag 05.10"
+        assert _endringsforklaring(klient, "KOG") == "fra onsdag 01.04 til tirsdag 07.04"
 
     def test_endringen_med_datoene_naar_kalenderen_ikke_dekker_dagene(self, klient, monkeypatch):
         """Svar 29: kan boersdag.py ikke avgjøre det (UtenforKalenderen),
@@ -2693,8 +2696,9 @@ class TestStory80dAksjesiden:
         assert "stroke-width: 1.75" in _regel(stil, ".ma50linje")
         assert "stroke-width: 2.5" in _regel(stil, ".kurslinje")
         assert "tegnforklaring" not in html
-        assert '<text class="linjenavn kurs" text-anchor="end"' in html
-        assert '<text class="linjenavn snitt" text-anchor="end"' in html
+        # Story 8.2b, b (U41): navnene begynner i feltet til høyre for enden.
+        assert '<text class="linjenavn kurs" x=' in html
+        assert '<text class="linjenavn snitt" x=' in html
         assert "var(--snitt)" in _regel(stil, ".linjenavn.snitt")
         assert "stipl" not in _synlig(html).lower()
         # Gjennomgangen 15.10 (VG4): prikken ved enden av kurslinja.
@@ -3666,11 +3670,16 @@ class TestPeriodeneIKursgrafen:
         assert re.findall(r'class="maanedstekst"[^>]*>([^<]*)<', html) == ventet
 
     def test_overskriften_passer_perioden(self, klient):
-        """Ville feilet hvis overskriften sto paa 6 måneder for en annen periode."""
+        """Ville feilet hvis overskriften sto paa 6 måneder for en annen periode.
+        Story 8.2b, b (U39): serien begynner etter starten av 1 år, så
+        overskriften sier dagene grafen har."""
         self._aksjen()
-        for periode, tekst in (("1-uke", "1 uke"), ("1-mnd", "1 måned"), ("i-aar", "i år"), ("1-aar", "1 år")):
+        for periode, tekst in (("1-uke", "1 uke"), ("1-mnd", "1 måned"), ("i-aar", "i år")):
             html = klient.get(f"/aksje/EQNR?periode={periode}").data.decode("utf-8")
             assert f'<h2 id="kursgrafen">Kursutvikling, {tekst} ' in html, periode
+        html = klient.get("/aksje/EQNR?periode=1-aar").data.decode("utf-8")
+        assert re.search(r'<h2 id="kursgrafen">Kursutvikling fra \d\d\.\d\d til \d\d\.\d\d ', html)
+        assert "Kursutvikling, 1 år" not in html
 
 
 class TestStory816bDagenPaaHeleSiden:
@@ -3717,7 +3726,8 @@ class TestStory816bDagenPaaHeleSiden:
         assert "Equinor skilte seg ut torsdag Oslo Børs · 01.10" in toppen
         assert f"Sluttkurs ? {tall(rad.slutt, 'kurs')} NOK" in toppen
         assert tall(siste.slutt, "kurs") not in toppen
-        assert "fra onsdag til torsdag" in toppen
+        # Story 8.2b, b (U31): med datoene.
+        assert "fra onsdag 30.09 til torsdag 01.10" in toppen
         assert "Signalstyrke ? 3 av 3 T +1 B -1 I +1" in toppen and "Retning ? ↔ Blandet" in toppen
         assert "Hvorfor signalet ble 3" in toppen
         assert "Sjekk 2 Ga -1 negativ" in toppen and "+12,3 % mot MA50" in toppen
@@ -3806,7 +3816,8 @@ class TestStory816bDagenPaaHeleSiden:
         forrige, dagen = (r for r in rader if r.dato in (date(2026, 9, 30), date(2026, 10, 1)))
         ventet = tall((dagen.justert_slutt - forrige.justert_slutt) / forrige.justert_slutt * 100, "endring")
         toppen = _toppen(klient.get("/aksje/EQNR?dag=2026-10-01").data.decode("utf-8"))
-        assert f"Endring ? {ventet} fra onsdag til torsdag" in toppen
+        # Story 8.2b, b (U31): med datoene.
+        assert f"Endring ? {ventet} fra onsdag 30.09 til torsdag 01.10" in toppen
         assert ventet.startswith("+5,")
 
     def test_en_boersdag_uten_kurs_i_serien(self, klient):

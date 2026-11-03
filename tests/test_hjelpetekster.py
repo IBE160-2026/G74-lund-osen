@@ -152,12 +152,13 @@ class TestTekstenSierDetKodenGjoer:
     def test_endringen_sier_hvor_datoene_staar(self):
         """Svar 32 i 8.0d (rettet kl. 13:05): én tekst for oversikten og
         aksjesiden, som sier det samme som endringskortet etter svar 29.
-        Ville feilet med «fra børsdagen før»."""
+        Ville feilet med «fra børsdagen før». Story 8.2b, b (U31): kortet har
+        alltid datoene."""
         tekst = hjelpetekster()["endring"]
         assert (tekst.tittel, tekst.tekst) == (
             "Endring:",
             "endringen i prosent fra forrige dag med kurs, regnet på utbyttejustert kurs. "
-            "Mangler kilden kurser for noen børsdager, står datoene ved endringen på aksjesiden.",
+            "På aksjesiden står de to dagene ved endringen, med ukedag og dato.",
         )
 
 

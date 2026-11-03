@@ -14,6 +14,11 @@ hver dag indeksen har, faar kurs(start) x indeks(dag) / indeks(start). Saa
 starter linja paa aksjens kurs, og aksjens linje over den betyr at aksjen
 gikk bedre enn indeksen i perioden. Dager indeksen ikke har, faar ikke noe
 punkt. Kursen, snittet og indeksen deler skala.
+
+Story 8.2b, b (U41, U47): tegneflaten har et felt til venstre for tallene,
+et nederst for datoene og et til hoeyre for navnene paa linjene, saa ingen
+linje krysser en tekst. Navnene staar ved enden av linjene, i linjefargen
+(utdraget §8), ogsaa «Hovedindeksen» ved den stiplede.
 """
 
 from dataclasses import dataclass
@@ -25,8 +30,16 @@ from perioder import ANNENHVER_MAANED, DAGER, MAANEDSNAVN, UKER
 
 BREDDE = 720
 HOYDE = 260
-MARG_X = 8
 MARG_Y = 12
+# Story 8.2b, b (U41, U47): feltene rundt tegneflaten. VENSTRE har plass til
+# tallene ved rutenettet («2 000» i 12 px), HOEYRE til det lengste navnet,
+# «50-dagers snitt (sjekk 1)», og BUNN til datoene og maanedsnavnene. MARG_X
+# paa 8 px til begge sider er borte.
+VENSTRE = 44
+HOEYRE = 170
+BUNN = 22
+# Avstanden fra enden av linja til navnet.
+NAVNEMARG = 8
 
 # Litt luft over og under, saa kurven ikke klistrer seg til kanten.
 LUFT = 0.04
@@ -57,6 +70,10 @@ MAANEDER = (
 
 # Plassen et maanedsnavn trenger med 10px skrift. Naermere hoeyre kant enn
 # dette staar teksten til venstre for streken, saa den ikke kuttes (ECH1).
+# Story 8.2b, b: tegneflaten slutter HOEYRE foer kanten, saa navnet ved det
+# siste merket faar plass i feltet nederst til hoeyre, under navnene paa
+# linjene. Det staar da til hoeyre for streken, ogsaa ved enden av flaten,
+# og kommer ikke borti navnet ved merket foer.
 NAVNEBREDDE = 60
 
 # Story 8.16 (gjennomgangen, BH4): flere maanedsnavn enn dette faar ikke
@@ -104,6 +121,26 @@ class Graf:
     # Story 8.16: punktet for dagen som er merket (siste boersdag og «Velg
     # dag»), None naar ingen dag er merket eller grafen ikke har den.
     merket: Navn | None = None
+    # Story 8.2b, b (U47): navnet ved enden av den stiplede linja.
+    indeksnavn: Navn | None = None
+
+    # Story 8.2b, b (U41): kantene paa tegneflaten, som malen tegner
+    # rutenettet og merkene etter.
+    @property
+    def venstre(self) -> float:
+        return VENSTRE
+
+    @property
+    def hoeyre(self) -> float:
+        return self.bredde - HOEYRE
+
+    @property
+    def topp(self) -> float:
+        return MARG_Y
+
+    @property
+    def bunn(self) -> float:
+        return self.hoyde - BUNN
 
     @property
     def har_ma50(self) -> bool:
@@ -147,23 +184,27 @@ def _spenn(punkter: tuple[Punkt, ...], ekstra: tuple[float, ...] = ()) -> tuple[
     return lav - luft, hoy + luft
 
 
+def _x(i: int, antall: int, bredde: int) -> float:
+    """x for punkt nummer i av antall, innenfor tegneflaten (8.2b, b)."""
+    return VENSTRE + (bredde - VENSTRE - HOEYRE) * i / (antall - 1)
+
+
+def _y(verdi: float, lav: float, hoy: float, hoyde: int) -> float:
+    """y for verdien, innenfor tegneflaten, over feltet nederst (8.2b, b)."""
+    return MARG_Y + (hoyde - MARG_Y - BUNN) * (1 - (verdi - lav) / (hoy - lav))
+
+
 def _koordinater(punkter, hent, lav, hoy, bredde, hoyde) -> str:
     """Punktstreng til SVG. Hopper over punkter der verdien mangler."""
     if len(punkter) < 2:
         return ""
-
-    tegne_bredde = bredde - 2 * MARG_X
-    tegne_hoyde = hoyde - 2 * MARG_Y
-    skala = hoy - lav
 
     deler = []
     for i, punkt in enumerate(punkter):
         verdi = hent(punkt)
         if verdi is None:
             continue
-        x = MARG_X + tegne_bredde * i / (len(punkter) - 1)
-        y = MARG_Y + tegne_hoyde * (1 - (verdi - lav) / skala)
-        deler.append(f"{x:.1f},{y:.1f}")
+        deler.append(f"{_x(i, len(punkter), bredde):.1f},{_y(verdi, lav, hoy, hoyde):.1f}")
 
     return " ".join(deler) if len(deler) >= 2 else ""
 
@@ -187,7 +228,6 @@ def _maanedsmerker(punkter: tuple[Punkt, ...], bredde: int) -> tuple[Maanedsmerk
     i serien, faar maaneden ikke merke."""
     if len(punkter) < 2:
         return ()
-    tegne_bredde = bredde - 2 * MARG_X
     indeks = {p.dato: i for i, p in enumerate(punkter)}
     merker = []
     sett = set()
@@ -199,7 +239,7 @@ def _maanedsmerker(punkter: tuple[Punkt, ...], bredde: int) -> tuple[Maanedsmerk
         foerste = _foerste_boersdag(*maaned)
         if foerste is None or foerste not in indeks:
             continue
-        x = MARG_X + tegne_bredde * indeks[foerste] / (len(punkter) - 1)
+        x = _x(indeks[foerste], len(punkter), bredde)
         merker.append(Maanedsmerke(x=x, navn=MAANEDER[foerste.month - 1], til_venstre=x > bredde - NAVNEBREDDE))
     return tuple(merker)
 
@@ -210,7 +250,6 @@ def _dagmerker(punkter: tuple[Punkt, ...], bredde: int, hvilke: str) -> tuple[Ma
     Navnet er datoen, som «02.10» (designregler §4)."""
     if len(punkter) < 2:
         return ()
-    tegne_bredde = bredde - 2 * MARG_X
     merker = []
     forrige_uke = None
     for i, p in enumerate(punkter):
@@ -218,7 +257,7 @@ def _dagmerker(punkter: tuple[Punkt, ...], bredde: int, hvilke: str) -> tuple[Ma
         if hvilke == UKER and uke == forrige_uke:
             continue
         forrige_uke = uke
-        x = MARG_X + tegne_bredde * i / (len(punkter) - 1)
+        x = _x(i, len(punkter), bredde)
         merker.append(
             Maanedsmerke(x=x, navn=f"{p.dato.day:02d}.{p.dato.month:02d}", til_venstre=x > bredde - NAVNEBREDDE)
         )
@@ -246,41 +285,37 @@ def _siste(punkter: str) -> tuple[float, float] | None:
     return float(x), float(y)
 
 
-def _navnene(kurs: str, snitt: str, hoyde: int) -> tuple[Navn | None, Navn | None]:
-    """Hvor navnene paa kurslinja og snittet staar: ved enden av linja, over
-    den hoeyeste og under den laveste, innenfor tegneflaten."""
-    k, s = _siste(kurs), _siste(snitt)
-    if k is None:
-        return None, None
-    x = k[0]
-    if s is None:
-        return Navn(x, max(MARG_Y, k[1] - 8)), None
-    kurs_over = k[1] <= s[1]
-    oeverst, nederst = (k[1], s[1]) if kurs_over else (s[1], k[1])
-    over = oeverst - 8
-    under = max(nederst + 16, over + NAVNEAVSTAND)
-    if over < MARG_Y:
-        over, under = MARG_Y, max(under, MARG_Y + NAVNEAVSTAND)
-    # Gjennomgangen (BH2, ECH1): over maanedsnavnene nederst, og innenfor
-    # tegneflaten oeverst etter at det nederste er flyttet opp.
-    bunn = hoyde - NAVNEAVSTAND
-    if under > bunn:
-        under = bunn
-        over = max(MARG_Y, min(over, under - NAVNEAVSTAND))
-    return (Navn(x, over), Navn(x, under)) if kurs_over else (Navn(x, under), Navn(x, over))
+def _navnene(linjer: tuple[str, ...], bredde: int, hoyde: int) -> tuple[Navn | None, ...]:
+    """Hvor navnene paa linjene staar, i samme rekkefoelge som linjene: i
+    feltet til hoeyre, ved hoeyden linja ender paa, og minst NAVNEAVSTAND
+    fra hverandre, saa de ikke ligger oppaa hverandre. Den hoeyeste linja
+    har det oeverste navnet. Story 8.2b, b (U41, U47): ved siden av enden,
+    ikke over eller under den, saa ingen linje krysser et navn. y er
+    grunnlinja, 4 under enden, saa teksten i 12 px staar midt paa linja."""
+    ender = sorted((ende[1], i) for i, ende in enumerate(map(_siste, linjer)) if ende is not None)
+    if not ender:
+        return tuple(None for _ in linjer)
+    # Gjennomgangen av 8.0d (BH2, ECH1): innenfor tegneflaten, over datoene.
+    oeverst, nederst = MARG_Y + 4, hoyde - BUNN
+    plass = [max(oeverst, y + 4) for y, _ in ender]
+    for j in range(1, len(plass)):
+        plass[j] = max(plass[j], plass[j - 1] + NAVNEAVSTAND)
+    if plass[-1] > nederst:
+        plass[-1] = nederst
+        for j in range(len(plass) - 2, -1, -1):
+            plass[j] = min(plass[j], plass[j + 1] - NAVNEAVSTAND)
+    x = bredde - HOEYRE + NAVNEMARG
+    ut: list[Navn | None] = [None] * len(linjer)
+    for (_, i), y in zip(ender, plass, strict=True):
+        ut[i] = Navn(x, y)
+    return tuple(ut)
 
 
 def _rutenett(lav: float, hoy: float, hoyde: int, linjer: int = 3) -> tuple[Rutelinje, ...]:
-    tegne_hoyde = hoyde - 2 * MARG_Y
     ut = []
     for i in range(linjer):
-        andel = i / (linjer - 1)
-        ut.append(
-            Rutelinje(
-                y=MARG_Y + tegne_hoyde * (1 - andel),
-                verdi=lav + (hoy - lav) * andel,
-            )
-        )
+        verdi = lav + (hoy - lav) * i / (linjer - 1)
+        ut.append(Rutelinje(y=_y(verdi, lav, hoy, hoyde), verdi=verdi))
     return tuple(ut)
 
 
@@ -305,7 +340,7 @@ def bygg_graf(
     kurslinje = _koordinater(punkter, lambda p: p.kurs, lav, hoy, bredde, hoyde)
     ma50linje = _koordinater(punkter, lambda p: p.ma50, lav, hoy, bredde, hoyde)
     indekslinje = _koordinater(punkter, lambda p: omregnet.get(p.dato), lav, hoy, bredde, hoyde)
-    kursnavn, snittnavn = _navnene(kurslinje, ma50linje, hoyde)
+    kursnavn, snittnavn, indeksnavn = _navnene((kurslinje, ma50linje, indekslinje), bredde, hoyde)
     siste = _siste(kurslinje)
     # Story 8.16: punktet for dagen, regnet fra indeksen som de andre
     # punktene (gjennomgangen, BH11).
@@ -313,10 +348,7 @@ def bygg_graf(
     datoene = [p.dato for p in punkter]
     if merket in datoene:
         i = datoene.index(merket)
-        punktet = Navn(
-            MARG_X + (bredde - 2 * MARG_X) * i / (len(punkter) - 1),
-            MARG_Y + (hoyde - 2 * MARG_Y) * (1 - (punkter[i].kurs - lav) / (hoy - lav)),
-        )
+        punktet = Navn(_x(i, len(punkter), bredde), _y(punkter[i].kurs, lav, hoy, hoyde))
 
     return Graf(
         bredde=bredde,
@@ -336,4 +368,5 @@ def bygg_graf(
         indeksstart=min(omregnet) if omregnet else None,
         indeksslutt=max(omregnet) if omregnet else None,
         merket=punktet,
+        indeksnavn=indeksnavn,
     )

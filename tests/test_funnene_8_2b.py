@@ -142,7 +142,7 @@ def test_hovedindeksen_og_soeylene_har_hvert_sitt_vindu(klient):
     tittel = re.search(r'<figcaption class="soeyletittel">(.*?)</figcaption>', _figur(html), flags=re.DOTALL).group(1)
     assert 'popovertarget="hjelp-soeylene"' in tittel
     assert html.count('popovertarget="hjelp-soeylene" aria-label') == 1
-    # Tekstene var 45 og 68 ord før 8.2b.
+    # Tekstene var 44 og 78 ord før 8.2b (talt på a6d59bb).
     assert len(tekster["hovedindeksen"].tekst.split()) < 30
     assert len(tekster["soeylene"].tekst.split()) < 50
     assert "i stedet for tallet" not in tekster["hovedindeksen"].tekst
@@ -186,3 +186,113 @@ def test_stjernen_sender_til_teksten_naar_lista_blir_tom(klient):
     assert svar.headers["Location"] == "/min-liste#aksjene"
     html = _html(klient, "/min-liste")
     assert '<p class="tom-liste" id="aksjene">' in html and 'class="tabellboks"' not in html
+
+
+# b) Aksjesiden, småting.
+
+
+def _stripa(html: str) -> str:
+    return html.split('<header class="stripe">', 1)[1].split("</header>", 1)[0]
+
+
+def test_aksjesiden_hoerer_til_markedsoversikt_i_stripa(klient):
+    """U2. Ville feilet hvis ingen knapp i stripa var merket på aksjesiden,
+    hvis den var fylt som siden man står på, eller hvis oversikten ikke
+    lenger hadde aria-current="page"."""
+    for sti in ("/aksje/BRFE", "/aksje/MTFJ"):
+        stripa = _stripa(_html(klient, sti))
+        assert '<a class="sideknapp" href="/" aria-current="true">Markedsoversikt</a>' in stripa, sti
+        assert 'aria-current="page"' not in stripa and stripa.count("aria-current") == 1, sti
+    assert '<a class="sideknapp" href="/" aria-current="page">Markedsoversikt</a>' in _stripa(_html(klient, "/"))
+    kant = _regel('header.stripe a.sideknapp[aria-current="true"]')
+    assert "border: 2px solid" in kant and "background" not in kant
+
+
+def test_demoen_sier_at_ki_teksten_bare_er_for_siste_boersdag(klient):
+    """U6. Ville feilet hvis demoen ga grunnen fra den ekte versjonen («KI
+    var slått av …») for en tidligere dag, eller sa det for siste børsdag.
+    Den ekte versjonen står i test_ki_visning.py."""
+    tidligere = _html(klient, "/aksje/KVST?periode=velg&dag=2026-10-08")
+    assert (
+        '<p class="uten">Ingen KI-tekst for denne dagen: demoen har KI-tekst bare for siste børsdag.</p>' in tidligere
+    )
+    assert "KI var slått av" not in tidligere
+    assert "demoen har KI-tekst bare" not in _html(klient, "/aksje/BRFE")
+
+
+def test_ingressen_i_historikken_er_kort(klient):
+    """U16. Ville feilet med «lest fra basen og aldri regnet på nytt» eller
+    «signalstyrke 2 eller mer» i ingressen, eller hvis det sto i verken
+    ingressen eller hjelpen."""
+    html = _html(klient, "/aksje/BRFE")
+    ingress = re.search(r'<p class="ingress">(.*?)</p>', html, flags=re.DOTALL).group(1)
+    assert "lest fra basen" not in ingress and "eller mer" not in ingress
+    # Ingressen var 60 ord før 8.2b, med navnet for BRFE.
+    assert len(ingress.split()) <= 25, ingress
+    vinduet = _vindu(html, "hjelp-historikk")
+    assert "lest fra basen og aldri regnet på nytt" in vinduet and "signalstyrke 2 eller mer" in vinduet
+
+
+def test_endringen_har_alltid_ukedagen_og_datoen(klient):
+    """U31. Ville feilet hvis kortet bare hadde ukedagene når ingen børsdag
+    ligger mellom de to dagene."""
+    endring = _html(klient, "/aksje/BRFE").split('<div class="noekkeltall endring">', 1)[1].split("</div>", 1)[0]
+    assert re.search(r'<span class="forklaring">fra torsdag 08\.10 til fredag 09\.10</span>', endring), endring
+
+
+def test_periodeknappene_og_velg_dag_er_like_hoeye():
+    """U37. Ville feilet hvis lenkene og knappen hadde ulik høyde, eller
+    teksten ikke sto midt i dem."""
+    regel = _regel("nav.periodevalg a, nav.periodevalg button")
+    for del_ in ("display: inline-flex", "align-items: center", "box-sizing: border-box", "min-height: 36px"):
+        assert del_ in regel, del_
+    assert "padding: 0 12px" in regel
+    assert "min-height: 36px" in _regel('nav.periodevalg input[type="date"]')
+    assert "align-items: center" in _regel("nav.periodevalg ul")
+
+
+def test_overskriften_sier_dagene_naar_serien_er_kortere(klient):
+    """U39. Varde Systemer er nylig notert. Ville feilet hvis overskriften
+    sa «6 måneder fram til» en dag serien ikke går tilbake til."""
+    html = _html(klient, "/aksje/VRDS")
+    tittel = re.search(rf'<h2 id="{app_modul.GRAFANKER}">(.*?)<button', html, flags=re.DOTALL).group(1).strip()
+    assert re.fullmatch(r"Kursutvikling fra \d\d\.\d\d til 09\.10", tittel), tittel
+    assert "6 måneder" not in tittel
+    lang = re.search(rf'<h2 id="{app_modul.GRAFANKER}">(.*?)<button', _html(klient, "/aksje/BRFE"), flags=re.DOTALL)
+    assert lang.group(1).startswith("Kursutvikling, 6 måneder")
+
+
+def _svg(html: str) -> str:
+    return html.split('<svg class="graf"', 1)[1].split("</svg>", 1)[0]
+
+
+def test_grafen_har_felt_til_tallene_datoene_og_navnene(klient):
+    """U41 og U47. Ville feilet hvis en linje gikk inn der navnene står, hvis
+    tallene eller datoene sto inne i tegneflaten, eller hvis den stiplede
+    linja ikke hadde navnet «Hovedindeksen» i Dempet."""
+    svg = _svg(_html(klient, "/aksje/BRFE"))
+    xer = [
+        float(par.split(",")[0])
+        for linje in re.findall(r'<polyline class="[a-z0-9]+" points="([^"]*)"', svg)
+        for par in linje.split()
+    ]
+    navn = dict(re.findall(r'<text class="linjenavn (\w+)" x="([\d.]+)"', svg))
+    assert set(navn) == {"kurs", "snitt", "indeks"}
+    assert min(float(x) for x in navn.values()) > max(xer)
+    assert re.search(r'<text class="linjenavn indeks" [^>]*>Hovedindeksen</text>', svg)
+    assert "var(--dempet)" in _regel(".linjenavn.indeks")
+    venstre = min(xer)
+    for x in re.findall(r'<text class="rutetekst" text-anchor="end" x="([\d.]+)"', svg):
+        assert float(x) < venstre
+    assert len(re.findall(r'class="rutetekst"', svg)) == 3
+    bunn = max(float(y) for y in re.findall(r'<line class="maanedsstrek"[^>]*y2="([\d.]+)"', svg))
+    for y in re.findall(r'<text class="maanedstekst"[^>]*y="([\d.]+)"', svg):
+        assert float(y) > bunn
+
+
+def test_maanedspilene_er_knapper_med_kant(klient):
+    """U44. Ville feilet med understreket tekst, eller under 44 px."""
+    regel = _regel(".maanedspiler a.pil")
+    assert "text-decoration: none" in regel and "min-height: 44px" in regel and "border: 1px solid" in regel
+    assert "underline" not in regel
+    assert re.search(r'<a class="pil" href="[^"]*">‹ ', _html(klient, "/aksje/BRFE"))

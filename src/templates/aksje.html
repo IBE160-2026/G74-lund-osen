@@ -46,12 +46,13 @@
       {% endif %}
     </div>
     {#- Plan 8 og svar 21: endringen i prosent, med ukedagene. Svar 29: med
-        datoene også når det ligger en børsdag mellom de to kursradene. #}
+        datoene også når det ligger en børsdag mellom de to kursradene.
+        Story 8.2b, b (U31): alltid med ukedagen og datoen. #}
     {% set vist_endring = detalj.endring|round(2) if detalj.endring is not none else none %}
     <div class="noekkeltall endring">
       <span class="etikett">Endring {{ hjelpeknapp("hjelp-endring", "Hjelp: endring") }}</span>
       <span class="verdi {% if vist_endring is not none %}{{ 'opp' if vist_endring > 0 else 'ned' if vist_endring < 0 else '' }}{% endif %}">{% if detalj.endring is not none %}{{ detalj.endring|tall('endring') }}{% else %}–{% endif %}</span>
-      {% if detalj.forrige_dato %}<span class="forklaring">{% if detalj.endring_med_datoer %}fra {{ detalj.forrige_dato|ukedag }} {{ detalj.forrige_dato|dato }} til {{ detalj.dato|ukedag }} {{ detalj.dato|dato }}{% else %}fra {{ detalj.forrige_dato|ukedag }} til {{ detalj.dato|ukedag }}{% endif %}</span>{% endif %}
+      {% if detalj.forrige_dato %}<span class="forklaring">fra {{ detalj.forrige_dato|ukedag }} {{ detalj.forrige_dato|dato }} til {{ detalj.dato|ukedag }} {{ detalj.dato|dato }}</span>{% endif %}
     </div>
     <div class="noekkeltall">
       <span class="etikett">Signalstyrke {{ hjelpeknapp("hjelp-styrke", "Hjelp: signalstyrken") }}</span>
@@ -158,7 +159,9 @@
   {%- set vis_grafhjelp = grafhjelp|length > 0 %}
   {#- Story 8.16: periodevalget i designregler.md §2, og overskriften etter
       perioden. Siste børsdag og «Velg dag» viser 6 mnd fram til dagen. #}
-  <h2 id="{{ grafanker }}">Kursutvikling, {{ overskrift }}{% if dagen %} {{ dagen.dato|ukedag }} {{ dagen.dato|dato }}{% endif %}{% if vis_grafhjelp %} {{ hjelpeknapp("hjelp-graf", "Hjelp: kursgrafen") }}{% endif %}</h2>
+  {#- Story 8.2b, b (U39): begynner kursserien etter startdagen, sier
+      overskriften dagene grafen har, ikke perioden. #}
+  <h2 id="{{ grafanker }}">{% if kort_serie and graf %}Kursutvikling fra {{ graf.forste_dato|dato }} til {{ graf.siste_dato|dato }}{% else %}Kursutvikling, {{ overskrift }}{% if dagen %} {{ dagen.dato|ukedag }} {{ dagen.dato|dato }}{% endif %}{% endif %}{% if vis_grafhjelp %} {{ hjelpeknapp("hjelp-graf", "Hjelp: kursgrafen") }}{% endif %}</h2>
   {{ periodevalg(knapper, valg.periode, "/aksje/" ~ detalj.aksje.symbol, valg.dag, foerste_valgbare, siste_i_serien, "Periode for kursgrafen", grafanker) }}
   {% if valg.beskjed %}<p class="periodebeskjed" role="status">{{ valg.beskjed }}</p>{% endif %}
   {#- Story 8.16b: for en valgt dag står endringen og signalet i kortene. #}
@@ -175,21 +178,25 @@
       <svg class="graf" viewBox="0 0 {{ graf.bredde }} {{ graf.hoyde }}" role="img"
            aria-label="Kursutvikling for {{ detalj.aksje.navn }}: den tykke linja er utbyttejustert kurs{% if graf.har_ma50 %}, og den tynne er {{ parametre.ma_vindu }}-dagers snitt (sjekk 1){% endif %}{% if graf.har_indeks %}. Den stiplede er hovedindeksen {{ indeks_symbol }}, regnet om så den starter på aksjens kurs {{ graf.indeksstart|dato }}{% elif indeks_feilet %}. Hovedindeksen kunne ikke leses{% else %}. Hovedindeksen mangler for perioden{% endif %}">
         {% for linje in graf.rutenett %}
-          <line class="rute" x1="0" y1="{{ "%.1f"|format(linje.y) }}"
-                x2="{{ graf.bredde }}" y2="{{ "%.1f"|format(linje.y) }}"></line>
-          <text class="rutetekst" x="2" y="{{ "%.1f"|format(linje.y - 3) }}">
+          {#- Story 8.2b, b (U41): tallene står i feltet til venstre, ikke
+              inne i grafen. #}
+          <line class="rute" x1="{{ graf.venstre }}" y1="{{ "%.1f"|format(linje.y) }}"
+                x2="{{ graf.hoeyre }}" y2="{{ "%.1f"|format(linje.y) }}"></line>
+          <text class="rutetekst" text-anchor="end" x="{{ graf.venstre - 6 }}" y="{{ "%.1f"|format(linje.y + 4) }}">
             {{ linje.verdi|tall('akse') }}
           </text>
         {% endfor %}
         {#- Story 8.0c: et merke ved foerste boersdag i hver maaned, tegnet foer
             linjene saa streken ligger under kurslinja. #}
         {% for merke in graf.maanedsmerker %}
-          <line class="maanedsstrek" x1="{{ "%.1f"|format(merke.x) }}" y1="0"
-                x2="{{ "%.1f"|format(merke.x) }}" y2="{{ graf.hoyde }}"></line>
+          {#- Story 8.2b, b (U41): datoene står i feltet nederst, under
+              tegneflaten. #}
+          <line class="maanedsstrek" x1="{{ "%.1f"|format(merke.x) }}" y1="{{ graf.topp }}"
+                x2="{{ "%.1f"|format(merke.x) }}" y2="{{ graf.bunn }}"></line>
           {% if merke.til_venstre %}
-            <text class="maanedstekst" text-anchor="end" x="{{ "%.1f"|format(merke.x - 3) }}" y="{{ graf.hoyde - 3 }}">{{ merke.navn }}</text>
+            <text class="maanedstekst" text-anchor="end" x="{{ "%.1f"|format(merke.x - 3) }}" y="{{ graf.hoyde - 6 }}">{{ merke.navn }}</text>
           {% else %}
-            <text class="maanedstekst" x="{{ "%.1f"|format(merke.x + 3) }}" y="{{ graf.hoyde - 3 }}">{{ merke.navn }}</text>
+            <text class="maanedstekst" x="{{ "%.1f"|format(merke.x + 3) }}" y="{{ graf.hoyde - 6 }}">{{ merke.navn }}</text>
           {% endif %}
         {% endfor %}
         {#- Story 2.9c: indeksen under kurslinja og snittet. #}
@@ -200,11 +207,14 @@
           <polyline class="ma50linje" points="{{ graf.ma50linje }}"></polyline>
         {% endif %}
         <polyline class="kurslinje" points="{{ graf.kurslinje }}"></polyline>
-        {% if graf.merket %}<line class="dagstrek" x1="{{ "%.1f"|format(graf.merket.x) }}" y1="0" x2="{{ "%.1f"|format(graf.merket.x) }}" y2="{{ graf.hoyde }}"></line>{% endif %}
+        {% if graf.merket %}<line class="dagstrek" x1="{{ "%.1f"|format(graf.merket.x) }}" y1="{{ graf.topp }}" x2="{{ "%.1f"|format(graf.merket.x) }}" y2="{{ graf.bunn }}"></line>{% endif %}
         {% if graf.siste %}<circle class="sistepunkt" cx="{{ "%.1f"|format(graf.siste.x) }}" cy="{{ "%.1f"|format(graf.siste.y) }}" r="4.5"></circle>{% endif %}
         {% if graf.merket %}<circle class="dagpunkt" cx="{{ "%.1f"|format(graf.merket.x) }}" cy="{{ "%.1f"|format(graf.merket.y) }}" r="5.5"></circle>{% endif %}
-        {% if graf.kursnavn %}<text class="linjenavn kurs" text-anchor="end" x="{{ "%.1f"|format(graf.kursnavn.x) }}" y="{{ "%.1f"|format(graf.kursnavn.y) }}">Utbyttejustert kurs</text>{% endif %}
-        {% if graf.snittnavn %}<text class="linjenavn snitt" text-anchor="end" x="{{ "%.1f"|format(graf.snittnavn.x) }}" y="{{ "%.1f"|format(graf.snittnavn.y) }}">{{ parametre.ma_vindu }}-dagers snitt (sjekk 1)</text>{% endif %}
+        {#- Story 8.2b, b (U41, U47): navnene står i feltet til høyre, ved
+            enden av linjene, og den stiplede linja har også navn. #}
+        {% if graf.kursnavn %}<text class="linjenavn kurs" x="{{ "%.1f"|format(graf.kursnavn.x) }}" y="{{ "%.1f"|format(graf.kursnavn.y) }}">Utbyttejustert kurs</text>{% endif %}
+        {% if graf.snittnavn %}<text class="linjenavn snitt" x="{{ "%.1f"|format(graf.snittnavn.x) }}" y="{{ "%.1f"|format(graf.snittnavn.y) }}">{{ parametre.ma_vindu }}-dagers snitt (sjekk 1)</text>{% endif %}
+        {% if graf.indeksnavn %}<text class="linjenavn indeks" x="{{ "%.1f"|format(graf.indeksnavn.x) }}" y="{{ "%.1f"|format(graf.indeksnavn.y) }}">Hovedindeksen</text>{% endif %}
       </svg>
 
       <figcaption>
@@ -260,7 +270,9 @@
       merkes som i oversikten, 2 av 3 ikke (designregler.md §3). #}
   <section class="historikk" id="signalet-dag-for-dag" aria-labelledby="historikk-tittel">
     <h2><span id="historikk-tittel">Signalet dag for dag</span> {{ hjelpeknapp("hjelp-historikk", "Hjelp: signalet dag for dag") }}</h2>
-    <p class="ingress">Det appen skrev om {{ detalj.aksje.navn }} hver dag, eller hvorfor det mangler, lest fra basen og aldri regnet på nytt. Velg en dag med kurs for å se hele siden for den dagen, med målingene. Tallene for uka og måneden teller dagene med signalstyrke {{ parametre.terskel }} eller mer, som i oversikten, og 3 av 3 er merket med strek og ring.</p>{#- Gjennomgangen, BH4: tallene for uka og måneden teller terskelen, som oversikten. #}
+    {#- Story 8.2b, b (U16): ingressen er kort, og resten står i hjelpen ved
+        «?» (gjennomgangen, BH4: tallene teller terskelen, som oversikten). #}
+    <p class="ingress">Det appen skrev om {{ detalj.aksje.navn }} hver børsdag, eller hvorfor det mangler. Velg en dag for å se hele siden for den dagen.</p>
     <nav class="maanedspiler" aria-label="Måned i historikken">
       {% if historikk.forrige %}<a class="pil" href="{{ pil(historikk.forrige) }}">‹ {{ historikk.forrige|maanedsnavn }}</a>{% endif %}
       <span class="maaned">{{ historikk.tittel|capitalize }}</span>

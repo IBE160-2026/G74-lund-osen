@@ -112,6 +112,8 @@ header.stripe a.sideknapp { display: inline-flex; align-items: center; min-heigh
                             border: 1px solid var(--stripe-kant); border-radius: 999px; color: var(--stripe-tekst);
                             font-size: 15px; font-weight: 600; text-decoration: none; }
 header.stripe a.sideknapp[aria-current="page"] { background: var(--hvit); border-color: var(--hvit); color: var(--blekk); }
+/* Story 8.2b, b (U2): delen aksjesiden hører til, med kant og uten fyll. */
+header.stripe a.sideknapp[aria-current="true"] { border: 2px solid var(--hvit); color: var(--hvit); }
 
 footer.bunnlinje { max-width: 65rem; margin: 2rem auto 0; padding: 0 16px 2rem; box-sizing: border-box; }
 footer.bunnlinje p { border-top: 1px solid var(--strek); padding-top: 1rem; margin: 0;
@@ -229,11 +231,14 @@ header.stripe button.hjelpeknapp:focus-visible, .tabellboks thead button.hjelpek
 /* Story 8.16: knappene bryter linja på smale skjermer (390 px), så
    siden ikke ruller sidelengs. */
 nav.periodevalg { margin: 0 0 12px; }
-nav.periodevalg ul { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0; padding: 0; }
+nav.periodevalg ul { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; list-style: none; margin: 0; padding: 0; }
 nav.periodevalg li { margin: 0; }
+/* Story 8.2b, b (U37): lenkene og knappen er like høye, med teksten
+   midtstilt. */
 nav.periodevalg a, nav.periodevalg button {
-  display: inline-block; font: inherit; font-size: 14px; line-height: 1.2;
-  padding: 7px 12px; min-height: 32px; border: 1px solid var(--strek); border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;
+  font: inherit; font-size: 14px; line-height: 1.2;
+  padding: 0 12px; min-height: 36px; border: 1px solid var(--strek); border-radius: 999px;
   color: var(--blekk); background: var(--kort); text-decoration: none; cursor: pointer;
 }
 nav.periodevalg [aria-current] { color: var(--hvit); background: var(--blekk); border-color: var(--blekk); font-weight: 600; }
@@ -242,7 +247,7 @@ nav.periodevalg a:focus-visible, nav.periodevalg button:focus-visible, nav.perio
 }
 nav.periodevalg form { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; }
 nav.periodevalg input[type="date"] {
-  font: inherit; font-size: 14px; padding: 5px 8px; min-height: 32px; max-width: 100%;
+  font: inherit; font-size: 14px; padding: 0 8px; min-height: 36px; box-sizing: border-box; max-width: 100%;
   border: 1px solid var(--strek); border-radius: 8px; background: var(--kort); color: var(--blekk);
 }
 .periodebeskjed { margin: 0 0 12px; color: var(--tekst); }
@@ -592,6 +597,8 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-aksje) .linjenavn { font-size: 12px; font-weight: 600; paint-order: stroke; stroke: var(--hvit); stroke-width: 4px; stroke-linejoin: round; }
 :where(.side-aksje) .linjenavn.kurs { fill: var(--kurs); }
 :where(.side-aksje) .linjenavn.snitt { fill: var(--snitt); }
+/* Story 8.2b, b (U47): navnet ved den stiplede linja, i Dempet som linja. */
+:where(.side-aksje) .linjenavn.indeks { fill: var(--dempet); }
 :where(.side-aksje) figcaption { color: var(--dempet); font-size: 0.85rem; margin-top: 0.6rem; }
 
 :where(.side-aksje) .mangler { color: var(--dempet); font-style: italic; }
@@ -606,7 +613,11 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-aksje) .historikk .ingress { margin: 0 0 12px; }
 :where(.side-aksje) .maanedspiler { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 12px; }
 :where(.side-aksje) .maanedspiler .maaned { font-weight: 700; }
-:where(.side-aksje) .maanedspiler a.pil { color: inherit; text-decoration: underline; }
+/* Story 8.2b, b (U44): pilene er knapper med kant, 44 px høye. */
+:where(.side-aksje) .maanedspiler a.pil { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px;
+                         box-sizing: border-box; border: 1px solid var(--strek-2); border-radius: 999px;
+                         background: var(--kort); color: var(--blekk); font-weight: 600; text-decoration: none; }
+:where(.side-aksje) .maanedspiler a.pil:hover { border-color: var(--blekk); }
 :where(.side-aksje) .historikk a:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
 :where(.side-aksje) ol.uker, :where(.side-aksje) ol.dager { list-style: none; margin: 0; padding: 0; }
 :where(.side-aksje) li.uke { display: grid; grid-template-columns: 4.5rem repeat(5, minmax(0, 1fr)); gap: 8px;

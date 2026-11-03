@@ -955,7 +955,9 @@ SKRIFTFILER = {".woff", ".woff2", ".ttf", ".otf", ".css", ".js"}
 # ned. Bunnen av raden er maalt i Edge uten vindu. Var 1630.
 # Story 8.2b, a: 1784, fordi søylefeltet er høyere og forklaringen av den
 # stiplede linja står under søylene. Maalt paa samme maate. Var 1690.
-HOEYDE_PAA_BILDET = 1784
+# Story 8.2b, b: 1772, fordi periodeknappene er 36 px og midtstilt (U37). Var
+# 1784.
+HOEYDE_PAA_BILDET = 1772
 # Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
 # Story 10.5: investorsidene i kursdata.py. Bildet ble tatt på nytt og er
 # byte for byte det samme. Avtrykket er av kildefilene, ikke av PNG-en.
@@ -1073,10 +1075,13 @@ HOEYDE_PAA_BILDET = 1784
 # skrevet to ganger. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Gjennomgangen av 8.17b 03.11: rettingene i app.py, index.html, _perioder.html
 # og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
-# Story 8.2b, a: søylene, «Slik leser du tabellen», hjelpen og stjernen, i
-# app.py, hjelpetekster.py, index.html, _hovedindeks.html og stil.css.
-# Bildet ble tatt paa nytt med den nye hoeyden.
-AVTRYKK_BAK_BILDET = "501884dc1cc5b3014b7872e2e21309735e2dd2db5d88949c5a3b4be193d8388b"
+# Story 8.2b, a: søylene, «Slik leser du tabellen» og hjelpen, i
+# hjelpetekster.py, index.html, _hovedindeks.html og stil.css (rettet i 8.2b,
+# b: app.py er ikke blant filene). Bildet ble tatt paa nytt med den nye
+# hoeyden.
+# Story 8.2b, b: periodeknappene og hjelpen, i hjelpetekster.py, _ramme.html
+# og stil.css. Bildet ble tatt paa nytt med den nye hoeyden.
+AVTRYKK_BAK_BILDET = "2fc0cc7b484a7412d7b60a42b16a37727e98ed824f3e945963add856a8c8e31b"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1145,7 +1150,9 @@ IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py", "src/boersometer.py
 # KI-teksten, og en lengre tekst for BRFE. Grafen slutter ved 1934. Var 1872.
 # Story 10.2g, gruppens svar 25.10 kl. 19:54 og 19:56: en kortere tekst for
 # BRFE. Grafen slutter ved 1894, maalt i Edge uten vindu. Var 1934.
-HOEYDE_PAA_AKSJESIDEN = 1894
+# Story 8.2b, b: grafen (figure) slutter ved 1882, fordi periodeknappene er
+# 36 px (U37). Maalt i Edge uten vindu. Var 1894.
+HOEYDE_PAA_AKSJESIDEN = 1882
 # Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
 # Story 10.5: lenken til investorsiden står under grafen, ved 1980 px målt i
 # Edge uten vindu, så bildet, som slutter ved bunnen av grafen (1872 px), ble
@@ -1299,7 +1306,11 @@ HOEYDE_PAA_AKSJESIDEN = 1894
 # og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Story 8.2b, a: app.py, hjelpetekster.py og stil.css. Bildet ble tatt paa
 # nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "f8c97a81f7581edbabe2e4a94567be37922f8e008d50d58adee31d52d1a9f019"
+# Story 8.2b, b: stripa, kortet Endring, grafen med feltene og navnene,
+# periodeknappene og historikken, i app.py, graf.py, ki_visning.py,
+# hjelpetekster.py, _ramme.html, aksje.html og stil.css. Bildet ble tatt paa
+# nytt med den nye hoeyden.
+AVTRYKK_BAK_AKSJESIDEN = "f8638488f313b9528f3bb259710470ac8c75be0a247edff9ad73243f7b2067de"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1352,11 +1363,11 @@ class TestSkjermbildet:
         annen hoeyde enn HOEYDE_PAA_BILDET. Story 8.3: hoeyden er 1630 med
         knapperaden, og navnet paa testen staar, fordi kvalitetssikringen
         viser til det. Story 8.17a: 1690 med periodevalget. Story 8.2b, a:
-        1784 med de høyere søylene."""
+        1784 med de høyere søylene, og 1772 med periodeknappene fra 8.2b, b."""
         data = (ROT / SKJERMBILDET).read_bytes()
         assert data[:8] == b"\x89PNG\r\n\x1a\n"
         assert int.from_bytes(data[16:20], "big") == 1280
-        assert int.from_bytes(data[20:24], "big") == HOEYDE_PAA_BILDET == 1784
+        assert int.from_bytes(data[20:24], "big") == HOEYDE_PAA_BILDET == 1772
 
     def test_bildet_har_ingen_tekstfelt(self):
         """Regel 16 (gjennomgangen av 3.3e, BH8 og ECH10): ingen sti eller

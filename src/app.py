@@ -58,7 +58,7 @@ from graf import bygg_graf
 from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
 from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster
 from hovedindeks import Hovedindeksvisning, bygg_hovedindeks, valgt_indeks
-from ki_visning import AV, KAPSEL, PAA, UKJENT, KIVisning, bygg_ki_visning, ki_paa
+from ki_visning import AV, INGEN_I_DEMOEN, INGEN_RAD, KAPSEL, PAA, UKJENT, KIVisning, bygg_ki_visning, ki_paa
 from kilogg import Emne, UgyldigKIRad
 from kursdata import Kursleser, investorside
 from lagring_sqlite import (
@@ -1063,7 +1063,7 @@ def aksjedetalj(symbol: str):
         # saa ?dag= og ?periode= leses ikke (gjennomgangen 23.10, BH6,
         # ECH3). En base uten en eneste kurs gir 404 over, foer foerste
         # henting.
-        return render_template("aksje_uten_kurser.html", aksje=post.aksje, hentet=None)
+        return render_template("aksje_uten_kurser.html", aksje=post.aksje, hentet=None, aktiv="aksje")
     # Gjennomgangen, BH10: dagen leses én gang, saa alt i svaret gjelder samme dag.
     i_dag = idag()
     valg = les_valg(request.args.get("periode"), request.args.get("dag"), rader[0].dato, i_dag, rader[-1].dato)
@@ -1112,6 +1112,8 @@ def aksjedetalj(symbol: str):
     svar = app.make_response(
         render_template(
             "aksje.html",
+            # Story 8.2b, b (U2): siden hører til Markedsoversikt i stripa.
+            aktiv="aksje",
             detalj=detalj,
             graf=bygg_graf(
                 detalj.punkter,
@@ -1205,7 +1207,12 @@ def _ki_visning(post, detalj) -> KIVisning:
         app.logger.warning("KI-loggen kunne ikke leses: %s: %s", type(feil).__name__, feil)
         return KIVisning(UKJENT)
     # Proevd mot vurderingen som vises, ikke den for siste boersdag (8.16b).
-    return bygg_ki_visning(rad, detalj.vurdering, andre_har_rader=andre_har_rader)
+    visning = bygg_ki_visning(rad, detalj.vurdering, andre_har_rader=andre_har_rader)
+    # Story 8.2b, b (U6): i demoen er grunnen at demoen bare har KI-tekst for
+    # siste boersdag. Den ekte versjonen har teksten som foer.
+    if visning.tilstand == INGEN_RAD and g.get("eksempeltall"):
+        return KIVisning(INGEN_I_DEMOEN)
+    return visning
 
 
 # Bare aksjesiden kan vaere maalet for bryteren. Alt annet gaar til /, ogsaa

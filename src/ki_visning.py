@@ -52,6 +52,9 @@ MODELLEN_FEILET = "modellen_feilet"
 BESTO_IKKE = "besto_ikke"
 STEMMER_IKKE = "stemmer_ikke"
 STOPPET_AV_VAKTEN = "stoppet_av_vakten"
+# Story 8.2b, b (U6): demoen har KI-tekst bare for siste boersdag, saa grunnen
+# i INGEN_RAD stemmer ikke der.
+INGEN_I_DEMOEN = "ingen_i_demoen"
 
 GRUNNER = {
     # Svar kl. 23:57 15.10: siden sier hvorfor med det loggen kan vise. Den
@@ -63,6 +66,7 @@ GRUNNER = {
     BESTO_IKKE: "Ingen KI-tekst for denne dagen: teksten sa mer enn regelen, og ble ikke vist.",
     STEMMER_IKKE: "Ingen KI-tekst for denne dagen: vurderingen er skrevet på nytt etter at teksten ble laget.",
     STOPPET_AV_VAKTEN: "Ingen KI-tekst for denne dagen: teksten ble stoppet, fordi den kunne leses som et råd.",
+    INGEN_I_DEMOEN: "Ingen KI-tekst for denne dagen: demoen har KI-tekst bare for siste børsdag.",
 }
 
 

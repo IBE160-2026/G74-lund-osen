@@ -5,7 +5,10 @@ from datetime import date, timedelta
 import pytest
 
 from aksjedetalj import Punkt
-from graf import BREDDE, HOYDE, MARG_X, MARG_Y, bygg_graf, indeksverdier
+
+# Story 8.2b, b (U41, U47): tegneflaten har felt til venstre, nederst og til
+# hoeyre, saa grensene er VENSTRE, BREDDE - HOEYRE og HOYDE - BUNN.
+from graf import BREDDE, BUNN, HOEYRE, HOYDE, MARG_Y, NAVNEMARG, VENSTRE, bygg_graf, indeksverdier
 
 
 def punkter(kurser, ma50=None):
@@ -39,15 +42,15 @@ class TestSkalering:
         graf = bygg_graf(punkter([50.0, 300.0, 120.0, 90.0]))
 
         for x, y in koordinater(graf.kurslinje):
-            assert MARG_X <= x <= BREDDE - MARG_X
-            assert MARG_Y <= y <= HOYDE - MARG_Y
+            assert VENSTRE <= x <= BREDDE - HOEYRE
+            assert MARG_Y <= y <= HOYDE - BUNN
 
     def test_foerste_og_siste_punkt_ligger_i_hver_sin_ende(self):
         graf = bygg_graf(punkter([100.0, 110.0, 120.0]))
         punkt = koordinater(graf.kurslinje)
 
-        assert punkt[0][0] == pytest.approx(MARG_X)
-        assert punkt[-1][0] == pytest.approx(BREDDE - MARG_X)
+        assert punkt[0][0] == pytest.approx(VENSTRE)
+        assert punkt[-1][0] == pytest.approx(BREDDE - HOEYRE)
 
     def test_flat_serie_deler_ikke_paa_null(self):
         graf = bygg_graf(punkter([100.0, 100.0, 100.0]))
@@ -55,7 +58,7 @@ class TestSkalering:
         assert graf is not None
         assert graf.lav < graf.hoy
         for _, y in koordinater(graf.kurslinje):
-            assert MARG_Y <= y <= HOYDE - MARG_Y
+            assert MARG_Y <= y <= HOYDE - BUNN
 
 
 class TestMa50:
@@ -77,7 +80,7 @@ class TestMa50:
         graf = bygg_graf(punkter([100.0, 101.0], [40.0, 41.0]))
 
         for _, y in koordinater(graf.ma50linje):
-            assert MARG_Y <= y <= HOYDE - MARG_Y
+            assert MARG_Y <= y <= HOYDE - BUNN
         assert graf.lav < 40.0
 
     def test_hull_i_snittet_hoppes_over(self):
@@ -157,12 +160,19 @@ class TestMaanedsmerkerEtterGjennomgangen:
         assert [m.navn for m in graf.maanedsmerker] == ["mai"]
         assert graf.maanedsmerker[0].x == pytest.approx(x_per_dato[date(2026, 5, 4)], abs=0.06)
 
-    def test_merket_ved_hoeyre_kant_staar_til_venstre(self):
+    def test_merket_ved_hoeyre_kant_kuttes_ikke(self):
         """ECH1: navnet kuttes ikke naar maaneden starter paa et av de siste
-        punktene."""
+        punktene. Story 8.2b, b: tegneflaten slutter HOEYRE foer kanten, saa
+        navnet faar plass til hoeyre for streken, i feltet nederst, og kommer
+        ikke borti navnet ved merket foer (som «september» og «oktober» i
+        demoen)."""
+        from graf import NAVNEBREDDE
+
         ps = boersdagspunkter(date(2026, 9, 1), date(2026, 10, 1))
-        merke = bygg_graf(ps).maanedsmerker[-1]
-        assert merke.navn == "oktober" and merke.til_venstre
+        merker = bygg_graf(ps).maanedsmerker
+        assert merker[-1].navn == "oktober" and not merker[-1].til_venstre
+        assert merker[-1].x + 3 + NAVNEBREDDE <= BREDDE
+        assert merker[-1].x - merker[-2].x >= NAVNEBREDDE
 
     def test_merket_langt_fra_kanten_staar_til_hoeyre(self):
         ps = boersdagspunkter(date(2026, 9, 15), date(2026, 11, 10))
@@ -183,7 +193,7 @@ class TestNavneneVedEnden:
 
     def test_navnene_staar_ved_enden_og_kursen_over_naar_den_er_hoeyest(self):
         graf = bygg_graf(self._punkter([100, 110, 120], [100, 100, 100]))
-        assert graf.kursnavn.x == graf.snittnavn.x == BREDDE - MARG_X
+        assert graf.kursnavn.x == graf.snittnavn.x == BREDDE - HOEYRE + NAVNEMARG
         assert graf.kursnavn.y < graf.snittnavn.y
 
     def test_prikken_staar_paa_det_siste_kurspunktet(self):
@@ -192,7 +202,7 @@ class TestNavneneVedEnden:
         graf = bygg_graf(self._punkter([100, 110, 120], [100, 100, 100]))
         x, y = graf.kurslinje.split()[-1].split(",")
         assert (graf.siste.x, graf.siste.y) == (float(x), float(y))
-        assert graf.siste.x == BREDDE - MARG_X
+        assert graf.siste.x == BREDDE - HOEYRE
         assert graf.siste.y != float(graf.ma50linje.split()[-1].split(",")[1])
 
     def test_snittet_over_naar_kursen_er_lavest(self):
@@ -206,7 +216,7 @@ class TestNavneneVedEnden:
 
         graf = bygg_graf(self._punkter([120, 119, 50], [120, 119.5, 119]))
         for navn in (graf.kursnavn, graf.snittnavn):
-            assert MARG_Y <= navn.y <= HOYDE - NAVNEAVSTAND
+            assert MARG_Y <= navn.y <= HOYDE - BUNN
         assert abs(graf.kursnavn.y - graf.snittnavn.y) >= NAVNEAVSTAND
 
     def test_uten_snitt_bare_kursnavnet(self):
@@ -264,7 +274,7 @@ class TestIndekslinja:
         indeks = {p.dato: v for p, v in zip(ps, (1000.0, 1500.0, 2000.0))}
         graf = bygg_graf(ps, indeks=indeks)
         assert graf.hoy >= 100.0
-        assert all(MARG_Y - 0.05 <= y <= graf.hoyde - MARG_Y + 0.05 for _, y in koordinater(graf.indekslinje))
+        assert all(MARG_Y - 0.05 <= y <= graf.hoyde - BUNN + 0.05 for _, y in koordinater(graf.indekslinje))
 
     def test_uten_grafens_foerste_dag_starter_linja_paa_den_neste(self):
         """Gjennomgangen (VG1): indeksen har bare dag 2 og 3. Startdagen er
@@ -275,3 +285,47 @@ class TestIndekslinja:
         graf = bygg_graf(ps, indeks=indeks)
         assert graf.indeksstart == ps[1].dato and graf.indeksslutt == ps[2].dato
         assert koordinater(graf.indekslinje)[0] == koordinater(graf.kurslinje)[1]
+
+
+class TestFeltetTilHoeyre:
+    """Story 8.2b, b (U41, U47): navnene står i feltet til høyre, ved enden
+    av linjene, og den stiplede linja har navn."""
+
+    @staticmethod
+    def _graf(kurser, snitt, indeks):
+        start = date(2026, 1, 5)
+        ps = tuple(Punkt(dato=start + timedelta(days=i), kurs=k, ma50=s) for i, (k, s) in enumerate(zip(kurser, snitt)))
+        return bygg_graf(ps, indeks={p.dato: v for p, v in zip(ps, indeks)})
+
+    def test_ingen_linje_naar_inn_i_feltet_med_navnene(self):
+        """Ville feilet hvis en linje gikk forbi kanten der navnene begynner,
+        så den krysset et navn, eller navnene sto inne i tegneflaten."""
+        graf = self._graf([100, 110, 120], [100, 105, 110], [1000, 1050, 1080])
+        kant = max(x for linje in (graf.kurslinje, graf.ma50linje, graf.indekslinje) for x, _ in koordinater(linje))
+        assert kant == pytest.approx(graf.hoeyre) == BREDDE - HOEYRE
+        for navn in (graf.kursnavn, graf.snittnavn, graf.indeksnavn):
+            assert navn.x > kant
+
+    def test_tre_navn_i_rekkefoelgen_linjene_ender(self):
+        """Ville feilet uten navn på den stiplede linja (U47), eller hvis to
+        navn lå oppå hverandre."""
+        from graf import NAVNEAVSTAND
+
+        graf = self._graf([100, 110, 120], [100, 104, 108], [1000, 1110, 1150])
+        ender = {
+            navn: koordinater(linje)[-1][1]
+            for navn, linje in (("kurs", graf.kurslinje), ("snitt", graf.ma50linje), ("indeks", graf.indekslinje))
+        }
+        navn = {"kurs": graf.kursnavn.y, "snitt": graf.snittnavn.y, "indeks": graf.indeksnavn.y}
+        assert sorted(ender, key=ender.get) == sorted(navn, key=navn.get)
+        ys = sorted(navn.values())
+        assert all(b - a >= NAVNEAVSTAND for a, b in zip(ys, ys[1:]))
+        assert all(MARG_Y <= y <= HOYDE - BUNN for y in ys)
+
+    def test_tallene_og_datoene_har_egne_felt(self):
+        """Ville feilet hvis rutenettet eller merkene sto der tallene og
+        datoene står, så linjene krysset dem."""
+        graf = self._graf([100, 110, 120], [100, 104, 108], [1000, 1110, 1150])
+        assert graf.venstre == VENSTRE and graf.bunn == HOYDE - BUNN and graf.topp == MARG_Y
+        assert all(MARG_Y <= r.y <= HOYDE - BUNN for r in graf.rutenett)
+        assert all(VENSTRE <= m.x <= BREDDE - HOEYRE for m in graf.maanedsmerker)

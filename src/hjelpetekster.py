@@ -238,23 +238,30 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # Story 2.7b: historikken nederst paa aksjesiden.
         "historikken": Hjelpetekst(
             "Signalet dag for dag:",
+            # Story 8.2b, b (U16): det som er tatt ut av ingressen.
             "det appen skrev om aksjen hver dag i måneden, eller hvorfor det mangler, lest fra basen og "
-            "aldri regnet på nytt. Pilene viser måneden før og etter, så langt kursserien går. "
-            "Velg en dag med kurs for å se hele siden for den dagen, med målingene.",
-            ((AKSJE_MAL, "Signalet dag for dag"), (HISTORIKK, "Signalet regnes aldri her")),
+            "aldri regnet på nytt. Tallene for uka og måneden teller dagene med signalstyrke "
+            f"{terskel} eller mer, som i oversikten, og 3 av 3 er merket med strek og ring. "
+            "Pilene viser måneden før og etter, så langt kursserien går, og en dag med kurs viser "
+            "hele siden for den dagen, med målingene.",
+            (
+                (AKSJE_MAL, "Signalet dag for dag"),
+                (HISTORIKK, "Signalet regnes aldri her"),
+                (AKSJE_MAL, "{% if uke.vurdert %}{{ uke.skilte_seg_ut }} av {{ uke.vurdert }}"),
+            ),
         ),
         # Svar 32 i 8.0d (rettet kl. 13:05): én tekst for oversikten og
         # aksjesiden, og datoene står bare ved endringen på aksjesiden.
         "endring": Hjelpetekst(
             "Endring:",
+            # Story 8.2b, b (U31): datoene står alltid på aksjesiden.
             "endringen i prosent fra forrige dag med kurs, regnet på "
-            "utbyttejustert kurs. Mangler kilden kurser for noen børsdager, "
-            "står datoene ved endringen på aksjesiden.",
+            "utbyttejustert kurs. På aksjesiden står de to dagene ved "
+            "endringen, med ukedag og dato.",
             (
                 (PRD, "| Endring | Endring i prosent, regnet på "),
                 (MARKEDSOVERSIKT, "def endring_i_prosent("),
-                (AKSJEDETALJ, "def boersdag_mellom("),
-                (AKSJE_MAL, "{% if detalj.endring_med_datoer %}"),
+                (AKSJE_MAL, "fra {{ detalj.forrige_dato|ukedag }} {{ detalj.forrige_dato|dato }} til"),
             ),
         ),
         "utbyttejustert": Hjelpetekst(
@@ -426,7 +433,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "Kursgrafen:",
             f"den tykke linja er utbyttejustert kurs, og den tynne er "
             f"snittet av de siste {ma} børsdagene, som trendsjekken måler mot. "
-            f"Navnet står ved enden av kurslinja og snittet. Sjekk 2 og 3 står i kortene over.",
+            # Story 8.2b, b (U41, U47): navnene står i feltet til høyre.
+            f"Navnene står til høyre, ved enden av linjene. Sjekk 2 og 3 står i kortene over.",
             ((AKSJE_MAL, "Sjekk 2 og 3 tegnes ikke"), (AKSJEDETALJ, "glidende_snitt(kurser, p.ma_vindu)")),
         ),
         # Story 8.17a: periodevalget i oversikten, med søylene og linja.
