@@ -942,6 +942,8 @@ MALENE_BAK_BILDET = (
     "src/indeksdata.py",
     "src/kursdata.py",
     "src/templates/index.html",
+    # Story 8.17a: periodevalget over søylene og tabellen.
+    "src/perioder.py",
 )
 # Story 8.0f: ogsaa hjelpeskriptet (.js), som lastes paa begge sidene.
 SKRIFTFILER = {".woff", ".woff2", ".ttf", ".otf", ".css", ".js"}
@@ -949,7 +951,9 @@ SKRIFTFILER = {".woff", ".woff2", ".ttf", ".otf", ".css", ".js"}
 # raden under «Skilte seg ut», foer «Øvrige aksjer», saa signalstyrken og
 # fargene per aksje er med.
 # Story 8.3: 1630, fordi knapperaden i stripa skyver tabellen ned. Var 1573.
-HOEYDE_PAA_BILDET = 1630
+# Story 8.17a: 1690, fordi periodevalget over hovedindeksen skyver tabellen
+# ned. Bunnen av raden er maalt i Edge uten vindu. Var 1630.
+HOEYDE_PAA_BILDET = 1690
 # Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
 # Story 10.5: investorsidene i kursdata.py. Bildet ble tatt på nytt og er
 # byte for byte det samme. Avtrykket er av kildefilene, ikke av PNG-en.
@@ -1036,7 +1040,27 @@ HOEYDE_PAA_BILDET = 1630
 # byte for byte det samme.
 # Gjennomgangen av 8.0f: grensen 1056 px og rettelsene i hjelp.js. Bildet
 # ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "661c42525c0f38a92933edb7e847f93dc86f41518320fd3898f3d273e04d3b56"
+# Story 8.17a: periodevalget i oversikten i app.py, markedsoversikt.py,
+# perioder.py, index.html og stil.css. Bildet ble tatt paa nytt med hoeyden
+# 1690 og viser knappene over hovedindeksen.
+# Story 8.17a b): soeylene og linja foelger perioden i hovedindeks.py og
+# _hovedindeks.html, og hjelpen ved «?» over tabellen. Bildet ble tatt paa
+# nytt med samme hoeyde og viser «?» ved knappene.
+# Gjennomgangen av 8.17a: rettingene i app.py, markedsoversikt.py,
+# hovedindeks.py og _hovedindeks.html. Bildet ble tatt paa nytt og er byte
+# for byte det samme.
+# Svaret 30.10 kl. 10:45 (ECH1, VG5): foerste_kursdag i perioder.py, og
+# app.py, hovedindeks.py, markedsoversikt.py, hjelpetekster.py og
+# _hovedindeks.html. Bildet ble tatt paa nytt med samme hoeyde og er byte
+# for byte det samme.
+# Gjennomgangen 30.10: rettingene i app.py, hovedindeks.py, hjelpetekster.py
+# og _hovedindeks.html. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Svaret 30.10 kl. 12:21 (e): hele delen med indeksen foelger tabellens dag, i
+# hovedindeks.py, hjelpetekster.py og _hovedindeks.html. Bildet ble tatt paa
+# nytt og er byte for byte det samme.
+# Gjennomgangen etter svaret kl. 12:21: rettingene i hovedindeks.py og
+# _hovedindeks.html. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "0706feed532697abeef7b0c180b349b165bb6a60bb586d73ca08f1a7ceff1c60"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1233,7 +1257,22 @@ HOEYDE_PAA_AKSJESIDEN = 1894
 # ble tatt paa nytt og er byte for byte det samme.
 # Story 2.13: migrasjonen 0008_omsetning.sql. Bildet ble tatt paa nytt og er
 # byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "b6986ea5e33a22c3efdcac02734f0aa91211d85512b5f71a822fb574919b12f2"
+# Story 8.17a: les_valg for oversikten i perioder.py, og app.py og stil.css.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 8.17a b): hovedindeks.py, hjelpetekster.py og app.py. Bildet ble
+# tatt paa nytt og er byte for byte det samme.
+# Gjennomgangen av 8.17a: rettingene i app.py, markedsoversikt.py og
+# hovedindeks.py. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Svaret 30.10 kl. 10:45 (ECH1, VG5): perioder.py, app.py, hovedindeks.py,
+# markedsoversikt.py og hjelpetekster.py. Bildet ble tatt paa nytt og er
+# byte for byte det samme.
+# Gjennomgangen 30.10: rettingene i app.py, hovedindeks.py og
+# hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Svaret 30.10 kl. 12:21 (e): hovedindeks.py og hjelpetekster.py. Bildet ble
+# tatt paa nytt og er byte for byte det samme.
+# Gjennomgangen etter svaret kl. 12:21: rettingene i hovedindeks.py. Bildet
+# ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "8300ad3e619b62927794d92cd3f42c8281e479cd11ab698be18d592d5a6eb286"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1285,11 +1324,11 @@ class TestSkjermbildet:
         Ville feilet med bildet fra 3.3b (1280 x 1000), eller et bilde i en
         annen hoeyde enn HOEYDE_PAA_BILDET. Story 8.3: hoeyden er 1630 med
         knapperaden, og navnet paa testen staar, fordi kvalitetssikringen
-        viser til det."""
+        viser til det. Story 8.17a: 1690 med periodevalget."""
         data = (ROT / SKJERMBILDET).read_bytes()
         assert data[:8] == b"\x89PNG\r\n\x1a\n"
         assert int.from_bytes(data[16:20], "big") == 1280
-        assert int.from_bytes(data[20:24], "big") == HOEYDE_PAA_BILDET == 1630
+        assert int.from_bytes(data[20:24], "big") == HOEYDE_PAA_BILDET == 1690
 
     def test_bildet_har_ingen_tekstfelt(self):
         """Regel 16 (gjennomgangen av 3.3e, BH8 og ECH10): ingen sti eller
@@ -2632,7 +2671,9 @@ class TestReadmeForNybegynnere:
             "signaldagene i kursgrafen",
             "«vis ki-tekst»",
             # Story 8.16: periodene i kursgrafen er flyttet til «Ferdig».
-            "på forsiden periodevalget",
+            # Story 8.17a: periodevalget i oversikten er flyttet til «Ferdig»,
+            # og Min liste og børsometeret (8.17b) står igjen.
+            "periodevalget i min liste og børsometeret",
             "velge og bytte aksjer",
         )
         assert len(neste_punkter) == len(saker), neste_punkter

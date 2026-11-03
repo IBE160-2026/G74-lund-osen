@@ -194,10 +194,11 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # Story 2.9 (FR-104): delen over tabellen.
         "hovedindeksen": Hjelpetekst(
             "Hovedindeksen:",
-            "verdien siste børsdag indeksen har, og endringen i prosent fra "
+            # Story 8.17a (gruppens svar 30.10 kl. 12:21, e): tabellens dag.
+            "verdien den dagen tabellen viser, og endringen i prosent fra "
             "børsdagen før. «Gikk bedre» teller aksjene med kurs samme dag "
             "som hadde større endring enn indeksen, slik tallene vises, og "
-            "lik teller ikke.",
+            "lik teller ikke. Mangler indeksen kurs den dagen, står det i stedet for tallet.",
             (
                 (PRD, "#### FR-104 — Hovedindeksen i markedsoversikten"),
                 (PRD, "«Bedre» avgjøres på endringen slik den vises, og lik er ikke bedre."),
@@ -207,12 +208,12 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # Story 2.9b (FR-105): søylene under indeksen, i samme vindu.
         "soeylene": Hjelpetekst(
             "Søylene:",
-            "dagens endring for hver aksje med kurs samme dag som indeksen og dagen "
+            "dagens endring for hver aksje med kurs siste børsdag i tabellen og dagen "
             "før, fra størst fall til venstre til størst stigning til høyre, med null "
             "midt i feltet. Den stiplede linja er indeksens endring: grønn når den "
             "steg, rød når den falt, grå ved 0,00 % og borte når indeksen ikke har en "
             # Story 8.2a, c (U20): symbolet over søyla er en lenke.
-            "endring. Et gult bransjesymbol betyr at aksjen fikk 3 av 3 siste børsdag, "
+            "kurs eller endring den dagen. Et gult bransjesymbol betyr at aksjen fikk 3 av 3 siste børsdag, "
             "og et klikk på symbolet viser aksjen.",
             (
                 (PRD, "#### FR-105 — Søylene under hovedindeksen"),
@@ -428,6 +429,23 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             f"snittet av de siste {ma} børsdagene, som trendsjekken måler mot. "
             f"Navnet står ved enden av kurslinja og snittet. Sjekk 2 og 3 står i kortene over.",
             ((AKSJE_MAL, "Sjekk 2 og 3 tegnes ikke"), (AKSJEDETALJ, "glidende_snitt(kurser, p.ma_vindu)")),
+        ),
+        # Story 8.17a: periodevalget i oversikten, med søylene og linja.
+        "perioden_oversikten": Hjelpetekst(
+            "Periodene:",
+            "knappene viser siste børsdag, endringen fra den første kursen i perioden til siste "
+            "børsdag, eller en dag du velger, med signalet som er lagret for den. Ved en periode "
+            "gjelder sluttkursen og signalet siste børsdag, og «fra» med en dato står under "
+            "endringen når kursserien begynner senere. Søylene og den stiplede linja følger samme "
+            "periode eller dag, og oransje strek viser 3 av 3 siste børsdag.",
+            (
+                (PERIODER, "def startdag("),
+                (PERIODER, "def foerste_kursdag("),
+                (MARKEDSOVERSIKT, "def periodeendring("),
+                (MARKEDSOVERSIKT, "def bygg_rad_for_dag("),
+                (HOVEDINDEKS, "def soeylene_for("),
+                (INDEX_MAL, "Periode for oversikten"),
+            ),
         ),
         # Story 8.16: periodene i kursgrafen og regelen for startdagen.
         "perioden": Hjelpetekst(

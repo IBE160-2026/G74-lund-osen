@@ -406,6 +406,8 @@ class TestSidene:
                 "hjelp-signalstyrke": ["signalstyrke", "uten_styrke", "ikke_raad"],
                 "hjelp-retning": ["retning", "positiv", "negativ", "blandet", "ingen", "ukjent"],
                 "hjelp-hentet": ["data_hentet", "uten_data"],
+                # Story 8.17a: periodevalget over søylene og tabellen.
+                "hjelp-perioden": ["perioden_oversikten"],
             },
             "/aksje/BRFE": {
                 # Story 8.0d, PR 3: «data hentet» står ved «Oppdatert» i stripa,

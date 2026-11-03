@@ -121,6 +121,19 @@ class TestEnDagBak:
         assert visning.endring == pytest.approx(1.0)
         assert visning.sammenligning.bedre == 1 and visning.sammenligning.med == 1
 
+    def test_med_tabellens_dag_gjelder_hele_delen_den_dagen(self):
+        """Gruppens svar 30.10 kl. 12:21 (e): med tabellens dag (slutt)
+        gjelder verdien, endringen og «x av N» den dagen, og testen over
+        gjelder bare uten slutt. Indeksen mangler fredag, så verdien er None.
+        Ville feilet hvis delen falt tilbake til indeksens torsdag
+        (gjennomgangen, VG3)."""
+        aksje = [rad(ONSDAG, 100.0), rad(TORSDAG, 102.0), rad(FREDAG, 90.0)]
+        visning = bygg_hovedindeks(
+            "OSEBX", [rad(ONSDAG, 1000.0), rad(TORSDAG, 1010.0)], [("Alfa", aksje)], slutt=FREDAG
+        )
+        assert visning.dato == FREDAG
+        assert visning.verdi is None and visning.endring is None and visning.sammenligning is None
+
 
 class TestPorten:
     @pytest.fixture(params=["minne", "sqlite"])
