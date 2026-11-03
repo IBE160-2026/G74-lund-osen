@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-28T22:18
+updated: 2026-11-02T22:26
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -5703,6 +5703,162 @@ og ingen er blant de 40 i §17, så ingen er i OBX (§17).
   AFISH, AIX, ABS, AASB, ABTEC, ELOO, BALT, ENERG, ADS, PYRUM, GYL og BSP.
   Plass 199, etter de 195 første av de 210 og HDLY, HAVI og HBC. BSP står
   sist, på plass 214.
+
+Målingen endrer ikke universet. Parametrene i signalet er låst og målt på de
+15 (AD-13).
+
+## 53. Ukas målinger fra tabellen omsetning, 29.10–01.11, og plassen deres blant 262 (2026-11-01)
+
+**Metode.** Målingen fra story 2.13 (`src/omsetning.py`, valget
+`--maal-omsetning` i `src/fetch_prices.py`): ett `/api/eod`-kall per symbol,
+og omsetning regnet som `volume × close` per handelsdag, med medianen over
+vinduet, som i §33 og §42. En dag med volum 0 er med, med omsetning 0. Vinduet
+er tre måneder bakover fra børsdagen (svaret 28.10 kl. 23:19, b), så det er et
+annet enn i §50–§52, og det står ved hvert tall under. De 4 første ble målt for
+hånd torsdag 29.10 kl. 23:50:50–23:51:03 norsk tid (UTC+1), 22:50–22:51 GMT,
+rett etter flettingen av 2.13 i `676fbc8` (svaret 28.10 kl. 23:36, f), med
+børsdagen 29.10. Resten kom fra jobben i 2.3d, som kjører målingen etter
+hentingen (svaret 28.10 kl. 22:17, b): fredag 30.10 kl. 22:16:20–22:16:34 med
+børsdagen 30.10, og lørdag 31.10 kl. 22:15:25–22:16:24 og søndag 01.11 kl.
+22:15:29–22:16:27, begge med børsdagen 30.10, fordi børsen var stengt. Tidene
+er fra `data/logg/kveldshenting-<dato>.log` og flettelinja 29.10 under story
+2.13 i `epics.md`. Jobben 29.10 gikk før flettingen og målte ikke. De senere
+kjøringene 30.10–01.11, kl. 22:45, 23:15 og 23:45, fant ingen kall igjen og
+brukte 0. Radene står i tabellen `omsetning` i basen, og medianen er lagret
+uavrundet i NOK (regel 21). Denne § er skrevet fra basen, lest med `mode=ro`,
+og ingen ny måling er kjørt.
+
+**Utvalget.** Som i `rekkefoelge` i `src/omsetning.py`: de neste med typen
+«Common Stock» i lista over aksjene på Oslo Børs fra §40
+(`data/proever/symbolliste-OL-2026-10-22.json`), i rekkefølgen i lista, som
+ikke er rangert i §15–§52 og ikke er blant de 15, etter HERMA (plass 113).
+De 48 er plass 115–227 i lista, de neste i alfabetet etter `Code`, ikke et
+utvalg etter størrelse. 59 «Common Stock» mellom plass 114 og 227 er alt
+rangert eller blant de 15 og ble hoppet over, og 7 i det spennet har en annen
+type. Navnet står uten selskapsformen (AS, ASA, A/S og AB), som i §50, og det
+harde mellomrommet i seks av navnene er tatt bort; «Nv», «NV» og «Limited»
+står som i lista. Etter de 48 er 35 av de 297 «Common Stock» i lista ikke
+målt. Jobben målte 4 til 02.11, og de hører til neste §; etter dem er 31 ikke
+målt.
+
+**Grunnen** er svaret 28.10 kl. 23:36, g: målingene fra tabellen føres her
+som en ny § hver søndag, med vinduet ved hvert tall, plassen i rangeringen og
+radene med feil. Første uke er skrevet mandag 02.11.
+
+**Kostnad per dag i GMT.** Alt er tatt av dagskvoten, og bonuskvoten er ikke
+brukt (NFR-01, beslutningen 08.10 kl. 08:06).
+
+| Dag (GMT) | Hentingen | Målingen | Brukt i alt | `extraLimit` etter | Rader |
+|---|---:|---:|---:|---:|---:|
+| 2026-10-29 | 16 | 4, for hånd | 20 av 20 | 463 | 4 |
+| 2026-10-30 | 16 | 4 | 20 av 20 | 463 | 4 |
+| 2026-10-31 | 0 | 20 | 20 av 20 | 463 | 20 |
+| 2026-11-01 | 0 | 20 | 20 av 20 | 463 | 20 |
+
+48 kall til målingen, ett per rad. Lørdag og søndag hadde hentingen kursene
+for børsdagen 30.10 fra før og brukte 0 kall. Ingen dagskall var igjen etter
+målingen noen av dagene. `extraLimit` er fra «Kvoten etter» i loggene og,
+for 29.10, fra flettelinja, som også gir 463 før målingen.
+
+**Rådata.** `data/raa/omsetning1-raa-2026-10-29.json` (4 serier),
+`data/raa/omsetning1-raa-2026-10-30.json` (4),
+`data/raa/omsetning2-raa-2026-10-30.json` (20, målt 31.10) og
+`data/raa/omsetning3-raa-2026-10-30.json` (20, målt 01.11). Navnet har
+børsdagen, ikke dagen målingen gikk. Filene finnes **bare lokalt** og er ikke
+sporet i git. Bare tallene under er regnet ut og ført her.
+
+**Radene med feil.** 0 av de 48. Feltet `feil` er tomt i alle radene, og
+`feil` i alle fire råfilene er tomt. Ingen rad mangler tall for close eller
+volume (`rader_uten_tall` er 0 i alle).
+
+**Kontroll mot basen.** Hvert tall i tabellen er lest fra `omsetning` med
+`mode=ro` og regnet på nytt fra råfila for samme vindu: medianen og antallet
+handelsdager er de samme for alle 48.
+
+### Rader med et annet vindu enn §50–§52
+
+Ingen av de 48 har vinduet fra §50–§52, 2026-07-02–2026-10-02, så alle står
+her, og det finnes ingen tabell med samme vindu denne uka. Vinduene er
+forskjellige: de 214 i §50–§52 er målt over 2026-07-02–2026-10-02, de 4 fra
+29.10 over 2026-07-29–2026-10-29 og de 44 andre over 2026-07-30–2026-10-30,
+så plassen viser bare hvor medianen havner blant tall fra en periode fire
+uker tidligere, ikke en måling i samme vindu.
+
+| Symbol | Selskap | Plass i lista | Målt (GMT) | Vindu | Handelsdager | Dager uten volum | Median omsetning | Over 32 MNOK | Over 25 MNOK | Plass av 262 |
+|---|---|---:|---|---|---:|---:|---:|---|---|---:|
+| HGSB | Haugesund Sparebank | 115 | 2026-10-29 | 2026-07-29–2026-10-29 | 67 | 0 | 0,0 MNOK | Nei | Nei | 236 |
+| HKY | Havila Kystruten | 116 | 2026-10-29 | 2026-07-29–2026-10-29 | 67 | 1 | 0,1 MNOK | Nei | Nei | 215 |
+| HPUR | Hexagon Purus | 117 | 2026-10-29 | 2026-07-29–2026-10-29 | 67 | 0 | 0,3 MNOK | Nei | Nei | 174 |
+| HSPG | Holand og Setskog Sparebank | 119 | 2026-10-29 | 2026-07-29–2026-10-29 | 67 | 8 | 0,0 MNOK | Nei | Nei | 239 |
+| HUDL | Huddlestock Fintech | 120 | 2026-10-30 | 2026-07-30–2026-10-30 | 67 | 0 | 0,1 MNOK | Nei | Nei | 191 |
+| HYN | Hynion | 122 | 2026-10-30 | 2026-07-30–2026-10-30 | 64 | 64 | 0,0 MNOK | Nei | Nei | 262 |
+| HYPRO | HydrogenPro | 123 | 2026-10-30 | 2026-07-30–2026-10-30 | 67 | 0 | 0,2 MNOK | Nei | Nei | 177 |
+| IDEX | Idex | 124 | 2026-10-30 | 2026-07-30–2026-10-30 | 67 | 0 | 0,5 MNOK | Nei | Nei | 156 |
+| INDCT | Induct | 126 | 2026-10-31 | 2026-07-30–2026-10-30 | 67 | 0 | 0,1 MNOK | Nei | Nei | 218 |
+| INIFY | INIFY Laboratories | 127 | 2026-10-31 | 2026-07-30–2026-10-30 | 67 | 1 | 0,0 MNOK | Nei | Nei | 254 |
+| ININ | Inin Group | 128 | 2026-10-31 | 2026-07-30–2026-10-30 | 67 | 0 | 0,0 MNOK | Nei | Nei | 244 |
+| IOX | Interoil Exploration and Production | 130 | 2026-10-31 | 2026-07-30–2026-10-30 | 67 | 0 | 0,4 MNOK | Nei | Nei | 162 |
+| ITERA | Itera | 132 | 2026-10-31 | 2026-07-30–2026-10-30 | 67 | 0 | 0,1 MNOK | Nei | Nei | 205 |
+| JIN | Jinhui Shipping and Transportation Limited | 136 | 2026-10-31 | 2026-07-30–2026-10-30 | 67 | 0 | 0,2 MNOK | Nei | Nei | 178 |
+| KING | Kingfish Company Nv | 139 | 2026-10-31 | 2026-07-30–2026-10-30 | 67 | 0 | 0,0 MNOK | Nei | Nei | 229 |
+| KLDVK | Kaldvik | 141 | 2026-10-31 | 2026-07-30–2026-10-30 | 67 | 0 | 0,1 MNOK | Nei | Nei | 208 |
+| KOMPL | Komplett | 145 | 2026-10-31 | 2026-07-30–2026-10-30 | 67 | 0 | 0,4 MNOK | Nei | Nei | 167 |
+| KRAB | Kraft Bank | 146 | 2026-10-31 | 2026-07-30–2026-10-30 | 67 | 0 | 0,1 MNOK | Nei | Nei | 199 |
+| LIFE | Lifecare | 147 | 2026-10-31 | 2026-07-30–2026-10-30 | 67 | 0 | 0,8 MNOK | Nei | Nei | 145 |
+| LOKO | Lokotech Group | 149 | 2026-10-31 | 2026-07-30–2026-10-30 | 67 | 0 | 1,5 MNOK | Nei | Nei | 132 |
+| LUMI | Lumi Gruppen | 151 | 2026-10-31 | 2026-07-30–2026-10-30 | 67 | 1 | 0,0 MNOK | Nei | Nei | 234 |
+| LYTIX | Lytix Biopharma | 152 | 2026-10-31 | 2026-07-30–2026-10-30 | 67 | 0 | 0,1 MNOK | Nei | Nei | 192 |
+| MELG | Melhus Sparebank | 156 | 2026-10-31 | 2026-07-30–2026-10-30 | 67 | 0 | 0,0 MNOK | Nei | Nei | 243 |
+| MPCES | MPC Energy Solutions NV | 163 | 2026-10-31 | 2026-07-30–2026-10-30 | 67 | 0 | 0,1 MNOK | Nei | Nei | 188 |
+| MVW | M Vest Water | 165 | 2026-10-31 | 2026-07-30–2026-10-30 | 67 | 0 | 0,0 MNOK | Nei | Nei | 235 |
+| NAVA | Navamedic | 168 | 2026-10-31 | 2026-07-30–2026-10-30 | 67 | 0 | 0,3 MNOK | Nei | Nei | 175 |
+| NBX | Norwegian Block Exchange | 169 | 2026-10-31 | 2026-07-30–2026-10-30 | 67 | 0 | 0,6 MNOK | Nei | Nei | 151 |
+| NCOD | Norcod | 170 | 2026-10-31 | 2026-07-30–2026-10-30 | 67 | 0 | 0,2 MNOK | Nei | Nei | 182 |
+| NEXT | Next Biometrics Group | 172 | 2026-11-01 | 2026-07-30–2026-10-30 | 61 | 9 | 0,1 MNOK | Nei | Nei | 195 |
+| NISB | Nidaros Sparebank | 174 | 2026-11-01 | 2026-07-30–2026-10-30 | 67 | 12 | 0,0 MNOK | Nei | Nei | 255 |
+| NOFIN | Nordic Financials | 181 | 2026-11-01 | 2026-07-30–2026-10-30 | 67 | 0 | 0,0 MNOK | Nei | Nei | 222 |
+| NOM | Nordic Mining | 184 | 2026-11-01 | 2026-07-30–2026-10-30 | 67 | 0 | 1,5 MNOK | Nei | Nei | 131 |
+| NORSE | Norse Atlantic | 190 | 2026-11-01 | 2026-07-30–2026-10-30 | 67 | 0 | 2,0 MNOK | Nei | Nei | 122 |
+| NORTH | North Energy | 191 | 2026-11-01 | 2026-07-30–2026-10-30 | 67 | 0 | 0,1 MNOK | Nei | Nei | 196 |
+| NOSN | NOS NOVA | 192 | 2026-11-01 | 2026-07-30–2026-10-30 | 67 | 0 | 0,0 MNOK | Nei | Nei | 245 |
+| NTG | Nordic Technology Group | 195 | 2026-11-01 | 2026-07-30–2026-10-30 | 67 | 0 | 0,0 MNOK | Nei | Nei | 225 |
+| NYKD | Nykode Therapeutics | 197 | 2026-11-01 | 2026-07-30–2026-10-30 | 67 | 0 | 3,6 MNOK | Nei | Nei | 101 |
+| OBSRV | Observe Medical | 198 | 2026-11-01 | 2026-07-30–2026-10-30 | 67 | 0 | 0,3 MNOK | Nei | Nei | 172 |
+| OCEAN | Ocean GeoLoop | 201 | 2026-11-01 | 2026-07-30–2026-10-30 | 67 | 0 | 0,1 MNOK | Nei | Nei | 190 |
+| ODFB | Odfjell B | 203 | 2026-11-01 | 2026-07-30–2026-10-30 | 67 | 0 | 1,8 MNOK | Nei | Nei | 126 |
+| OMDA | Omda | 208 | 2026-11-01 | 2026-07-30–2026-10-30 | 67 | 0 | 0,4 MNOK | Nei | Nei | 165 |
+| ONCIN | Oncoinvent | 209 | 2026-11-01 | 2026-07-30–2026-10-30 | 67 | 0 | 1,2 MNOK | Nei | Nei | 137 |
+| OSUN | Ocean Sun | 212 | 2026-11-01 | 2026-07-30–2026-10-30 | 67 | 1 | 0,0 MNOK | Nei | Nei | 230 |
+| OTOVO | Otovo | 215 | 2026-11-01 | 2026-07-30–2026-10-30 | 67 | 0 | 0,3 MNOK | Nei | Nei | 176 |
+| OUTLT | OUTLET GROUP HOLDING | 216 | 2026-11-01 | 2026-07-30–2026-10-30 | 27 | 0 | 9,2 MNOK | Nei | Nei | 70 |
+| PLCAN | PELICAN AQUA HLDNG | 221 | 2026-11-01 | 2026-07-30–2026-10-30 | 67 | 0 | 0,1 MNOK | Nei | Nei | 201 |
+| PLGC | PELAGIC CREDIT | 222 | 2026-11-01 | 2026-07-30–2026-10-30 | 67 | 2 | 0,1 MNOK | Nei | Nei | 193 |
+| POLAR | POLAR RESOURCES | 227 | 2026-11-01 | 2026-07-30–2026-10-30 | 67 | 0 | 0,0 MNOK | Nei | Nei | 231 |
+
+Plassen er regnet fra uavrundede medianer for alle 262: de 48 fra basen, de
+199 av de 214 som ikke er blant de 15, regnet på nytt fra de lokale råfilene
+med vinduet 2026-07-02–2026-10-02 (`data/raa/maaling-obx-raa-2026-10-02.json`
+og `data/raa/maaling-raa-<dato>.json` fra 03.10 til 28.10), og de 15 med
+tallene i §50, som alle er over 25 MNOK. Den høyeste av de 48 er 9,2 MNOK, så
+ingen av de 48 står nær de 15. De 214 får samme rekkefølge som i §50–§52 når
+de uavrundede medianene sorteres, og ingen to av de 262 har samme uavrundede
+median.
+
+45 av de 48 har 67 handelsdager i vinduet. NEXT har 61, med siste dag
+2026-10-22; HYN har 64, med siste dag 2026-10-27, og volum 0 alle 64 dagene,
+så medianen er 0 og HYN står sist, på plass 262; OUTLT har 27, med første dag
+2026-09-24, og medianen for OUTLT er tatt over de 27. Hvorfor de tre har færre
+dager, er ikke slått opp, og det er et åpent punkt, som ELOO i §50. Ni har
+dager med volum 0: HYN 64, NISB 12, NEXT 9, HSPG 8, PLGC 2, og HKY, INIFY, LUMI
+og OSUN 1. De dagene er tatt med i medianen med omsetning 0, som i §42. Den
+høyeste medianen av de 48 er 9,2 MNOK (OUTLT, plass 70), og 15 av dem har
+0,0 MNOK avrundet. Ingen av de 48 er over 25 MNOK. Med de 48 er 37 av de 262
+over 32 MNOK, og 41 over 25 MNOK, som i §42 og §50–§52. Ingen av de 48 er
+blant de 15, og ingen er blant de 40 i §17, så ingen er i OBX (§17).
+
+Rangeringen i §50–§52 skrives ikke på nytt. De 214 står i samme rekkefølge
+med de samme tallene; plassnummeret går opp med 1 for hver av de 48 som står
+foran.
 
 Målingen endrer ikke universet. Parametrene i signalet er låst og målt på de
 15 (AD-13).

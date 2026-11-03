@@ -52,3 +52,25 @@ Kontroll av jobben og CI, og så 8.17a videre etter gruppens svar 30.10 kl. 10:4
 - 8.17a VG5: FR-105 i `prd.md` sier indeksens dato. Skal den få en Rettet-linje?
 - CI på windows-latest: «Start demoen på Windows» feilet i opprydningen på `c4cc3cd6` (41042643003), og to porttester fikk timeout på `61b3164` (40971615322). Begge gikk igjen uten endring.
 - PR #106 flettes mandag kveld. Spesifikasjonen settes til `done` da.
+
+## 2026-10-30 kl. 13:55 — Marian Osen
+
+### Oppgave
+8.17a siste rettinger etter gruppens svar 30.10 kl. 12:21 (e: hele delen med hovedindeksen følger tabellens dag, f: én dag per side og en Rettet-linje under FR-105), på grenen, og stopp før flettingen mandag (instruksjonen kl. 12:21, kjørt etter svaret kl. 13:09).
+
+### Plan
+- Instruksjonen og svarene kl. 12:24 og 13:09 i dagsfila, og svaret kl. 12:21 under story 8.17 på main.
+- Flett main inn (med 3.5h), e og f med tester, oppslaget for f, mutanten M5 og linjene i spesifikasjonen.
+- Hele settet før hver commit som endrer src/ eller tests/, gjennomgang med Blind Hunter, Edge Case Hunter og Verification Gap, triagen og CI.
+
+### Resultat
+- Main: `1c603d29` og `7f1430b5` (instruksjonen og svarene), `e51b229f` (svaret kl. 12:21 under 8.17).
+- Grenen: `4cc2b986` (main inn, uten konflikter), `a0868573` (e), `37b7ed66` (f), `e88d449c` (spesifikasjonen, M5 og oppslaget), `9537f188` (rettingene, Rettet-linje også under FR-104, og triagen).
+- Hele settet: 13:16:10–13:25:19 (3903 bestått), 13:26:45–13:35:31 (3904) og 13:42:05–13:51:02 (3907), hver gang 24 hoppet over og bare de 7 porttestene feilet.
+- M5 (tallet ved indeksens siste dag) fanget på `a0868573` og `9537f188`, og fila var lik HEAD etterpå.
+- Gjennomgangen: BH 15, ECH 7 og VG 3 funn i 20 rader: 10 rettet, 5 avvist og 5 står. De tre med dom medium er rettet.
+- CI 41058583275 grønn på `9537f188`. PR #106 er utkast og ikke flettet. Bildene er byte for byte de samme, og avtrykkene er oppdatert.
+
+### Åpne punkter
+- 8.17a: gruppen ser over tolkningen av f i Rettet-linjene under FR-104 og FR-105 før flettingen mandag.
+- 8.17a f: avvik fra én dag per side, slått opp uten endring. Rader med eldre data viser sin egen dag, og ved en periode regnes endringen til radens egen siste børsdag (oversikten og Min liste). Aksjesiden følger aksjens egen siste dag, og indekslinja i grafen kan slutte før grafen.
