@@ -372,6 +372,13 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) .merke.gul-siste { display: block; font-size: 12px; font-weight: 400; }
 :where(.side-oversikt) td .fra { display: block; font-size: 12px; font-weight: 400; color: var(--dempet); }
 :where(.side-oversikt) .periodelinje { margin: 0 0 12px; }
+/* Story 8.17b: «Sammenlign med» i Min liste. Linja under raden er dempet og
+   mindre, uten strek, og datoen står i cellen for selskap. */
+:where(.side-oversikt) .sammenlign-tittel { margin: 16px 0 8px; font-size: 15px; }
+:where(.side-oversikt) tr.sammenligning td { padding-top: 0; font-size: 13px; color: var(--dempet); }
+:where(.side-oversikt) tr.sammenligning td.opp { color: var(--opp); }
+:where(.side-oversikt) tr.sammenligning td.ned { color: var(--ned); }
+:where(.side-oversikt) td.selskap .egen-dag { display: block; font-weight: normal; color: var(--dempet); font-size: 0.8rem; }
 :where(.side-oversikt) .periodehode { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px; }
 :where(.side-oversikt) .periodehode nav.periodevalg { margin-bottom: 12px; }
 :where(.side-oversikt) td.selskap { font-weight: 600; }

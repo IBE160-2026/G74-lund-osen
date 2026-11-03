@@ -163,11 +163,22 @@ def _gjentatt(verdi: str) -> str:
 # viser naar adressen hadde en feil, og naar «Velg dag» mangler dagen.
 GRAFEN = "grafen"
 OVERSIKTEN = "oversikten"
-_STANDARD = {GRAFEN: SEKS_MND, OVERSIKTEN: SISTE}
-_VISER = {GRAFEN: "grafen viser 6 mnd", OVERSIKTEN: "oversikten viser siste børsdag"}
+# Story 8.17b: Min liste («Sammenlign med») og boersometeret aapner ogsaa med
+# siste boersdag.
+MIN_LISTE = "min-liste"
+BOERSOMETERET = "boersometeret"
+_STANDARD = {GRAFEN: SEKS_MND, OVERSIKTEN: SISTE, MIN_LISTE: SISTE, BOERSOMETERET: SISTE}
+_VISER = {
+    GRAFEN: "grafen viser 6 mnd",
+    OVERSIKTEN: "oversikten viser siste børsdag",
+    MIN_LISTE: "Min liste viser siste børsdag",
+    BOERSOMETERET: "børsometeret viser siste børsdag",
+}
 _VELG_TEKST = {
     GRAFEN: "Velg en dag i feltet, så viser grafen 6 mnd fram til den.",
     OVERSIKTEN: "Velg en dag i feltet, så viser oversikten den dagen.",
+    MIN_LISTE: "Velg en dag i feltet, så sammenligner Min liste med den dagen.",
+    BOERSOMETERET: "Velg en dag i feltet, så viser børsometeret den dagen.",
 }
 
 

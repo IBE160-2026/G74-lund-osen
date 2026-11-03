@@ -1060,7 +1060,11 @@ HOEYDE_PAA_BILDET = 1690
 # nytt og er byte for byte det samme.
 # Gjennomgangen etter svaret kl. 12:21: rettingene i hovedindeks.py og
 # _hovedindeks.html. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "0706feed532697abeef7b0c180b349b165bb6a60bb586d73ca08f1a7ceff1c60"
+# Story 8.17b, a: Min liste («Sammenlign med») og datoen i raden, i
+# app.py, markedsoversikt.py, perioder.py, hjelpetekster.py, index.html,
+# _perioder.html og stil.css. Bildet ble tatt paa nytt og er byte for byte
+# det samme.
+AVTRYKK_BAK_BILDET = "691df79acf0ae7b16d41adc37ddbd7dcaff29c7df2c171335a2cab74c15fe41b"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1272,7 +1276,11 @@ HOEYDE_PAA_AKSJESIDEN = 1894
 # tatt paa nytt og er byte for byte det samme.
 # Gjennomgangen etter svaret kl. 12:21: rettingene i hovedindeks.py. Bildet
 # ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "8300ad3e619b62927794d92cd3f42c8281e479cd11ab698be18d592d5a6eb286"
+# Story 8.17b, a: Min liste («Sammenlign med») og datoen i raden, i
+# app.py, markedsoversikt.py, perioder.py, hjelpetekster.py, index.html,
+# _perioder.html og stil.css. Bildet ble tatt paa nytt og er byte for byte
+# det samme.
+AVTRYKK_BAK_AKSJESIDEN = "d62fbb3f62991b1b5e9be629d4725ba291613b04029d01a4632a5e02c5e388f7"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "

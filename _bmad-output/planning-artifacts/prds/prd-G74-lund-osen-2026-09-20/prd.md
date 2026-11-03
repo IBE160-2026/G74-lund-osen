@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-11-03T16:26
+updated: 2026-11-03T17:58
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -506,6 +506,11 @@ siste børsdag i oversikten: «Siden viser …, ikke siste børsdag» står bare
 dag valgt med «Velg dag». Den stiplede indekslinja i kursgrafen slutter ved indeksens siste
 kurs, og da står «Indeksen går bare til» med datoen ved grafen. «Velg dag» i oversikten har
 ikke unntaket: der har en aksje uten kurs den dagen «–». Unntaket står også under FR-105.
+
+*Rettet 2026-11-03, gruppens svar kl. 14:28 (story 8.17b):* «Raden sier ikke hvilken dag den
+gjelder» gjelder ikke lenger. En rad med eldre dag enn sidens viser datoen sin, «siste kurs» med
+ukedagen og datoen under navnet, i oversikten og i Min liste, også ved en periode (`egne_dager`).
+Overskriften står som nå (FR-101). Bygget på grenen for 8.17b, ikke flettet per 3.11.
 
 *Lagt til 2026-11-03 (gjennomgangen 02.11, R5):* hovedindeksen står også som stiplet linje i kursgrafen på aksjesiden (FR-202, story 2.9c, `24849dd9`).
 

@@ -626,7 +626,9 @@ class TestAdressen:
         )
         assert app_modul.tilbake_etter_merking("/?periode=velg&dag=2026-10-07") == "/?periode=velg&dag=2026-10-07"
         assert app_modul.tilbake_etter_merking("/?periode=tull") == "/"
-        assert app_modul.tilbake_etter_merking("/min-liste?periode=1-uke") == "/min-liste"
+        # Story 8.17b: Min liste har periodevalget («Sammenlign med»), så
+        # perioden følger med dit også.
+        assert app_modul.tilbake_etter_merking("/min-liste?periode=1-uke") == "/min-liste?periode=1-uke"
         # Gjennomgangen (VG10): en dag som ikke er en dato, tas ikke med.
         assert app_modul.tilbake_etter_merking("/?periode=velg&dag=2026-1-07") == "/"
 
@@ -647,11 +649,14 @@ class TestAdressen:
         )
         assert "+11,11 %" in _rad(html, "EQNR")[1]
 
-    def test_min_liste_har_ikke_periodevalget(self, klient):
-        """8.17b tar Min liste. Ville feilet hvis Min liste fikk knappene nå."""
+    def test_min_liste_har_periodevalget_som_sammenlign_med(self, klient):
+        """Story 8.17b: Min liste har knappene, som «Sammenlign med», og
+        tabellen er siste børsdag. Ville feilet hvis Min liste ikke fikk
+        knappene, eller viste endringen for perioden øverst."""
         _basen()
         html = klient.get("/min-liste?vis=alle&periode=1-uke").data.decode("utf-8")
-        assert 'class="periodevalg"' not in html
+        assert '<nav class="periodevalg" aria-label="Sammenlign med">' in html
+        assert "+11,11 %" in _rad(html, "EQNR")[1]
 
 
 class TestTilgjengelig:

@@ -1208,7 +1208,9 @@ class TestStory80:
         )
 
         tabell = _tabell(klient.get("/").data.decode("utf-8"))
-        styrke = {rad[0]: rad[3] for rad in tabell.rader}
+        # Story 8.17b (gruppens svar 03.11 kl. 14:28): DNB har en eldre dag
+        # enn siden og viser datoen sin under navnet.
+        styrke = {rad[0].split(" siste kurs ")[0]: rad[3] for rad in tabell.rader}
 
         assert "skiller seg ut" in styrke["Equinor"]
         assert "skiller seg ut" not in styrke["DNB Bank"]

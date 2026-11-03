@@ -29,7 +29,9 @@ import sqlite3
 import sys
 import threading
 from collections.abc import Callable
+from dataclasses import replace
 from datetime import date, datetime, timedelta, timezone
+from functools import partial
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
@@ -75,7 +77,9 @@ from markedsoversikt import (
     antall_vurdert,
     bygg_oversikt,
     bygg_rad_for_dag,
+    bygg_sammenligning,
     del_i_to,
+    egne_dager,
     eldre_enn_nyeste,
     ingen_skilte_seg_ut,
     med_perioden,
@@ -104,6 +108,7 @@ from perioder import (
     les_valg,
     startdag,
 )
+from perioder import MIN_LISTE as MIN_LISTE_VALG
 from perioder import OVERSIKTEN as OVERSIKTEN_VALG
 from signalberegning import BLANDET, STANDARD
 from tallformat import avrundet, dato, med_og, tall, ukedag
@@ -773,17 +778,39 @@ def _tabellsiden(aktiv: str):
     # ikke sortert innenfor hver del, som tillegget 13.10 sa.
     sortering = Sortering.fra_adressen(request.args.get("sorter"), request.args.get("orden"))
     tre_av_tre = frozenset(rad.aksje.symbol for rad in rader if rad.styrke == ANTALL_SJEKKER)
-    # Story 8.17a: periodevalget i oversikten, ikke i Min liste (8.17b).
-    # Overskriften, linja om 3 av 3 og tidspunktet gjelder siste børsdag,
-    # og vist er radene tabellen viser: en periode gir endringen for
-    # perioden, og «Velg dag» radene for dagen, lest og aldri regnet (AD-7).
-    serier = {} if i_lista else _seriene(leser, poster)
-    valg = None if i_lista else _valget(rader, serier, i_dag)
+    # Story 8.17a: periodevalget i oversikten. Overskriften, linja om 3 av
+    # 3 og tidspunktet gjelder siste børsdag, og vist er radene tabellen
+    # viser: en periode gir endringen for perioden, og «Velg dag» radene for
+    # dagen, lest og aldri regnet (AD-7).
+    # Story 8.17b: i Min liste er periodevalget «Sammenlign med». Radene er
+    # siste børsdag, og hver rad får linja under for dagen man sammenligner
+    # med (beslutningen 08.10 kl. 21:48).
+    serier = _seriene(leser, poster)
+    valg = _valget(rader, serier, i_dag, MIN_LISTE_VALG if i_lista else OVERSIKTEN_VALG)
     vist = rader
     # Gruppens svar 30.10 kl. 10:45 (ECH1): én dag for linja, radene og
     # søylene, den første kursen i perioden.
     periodestart = _periodestart(valg, rader, serier)
-    if valg is not None and valg.periode == VELG:
+    sammenligner = i_lista and valg is not None and valg.periode != SISTE and (valg.dag or periodestart)
+    if sammenligner:
+        dag = valg.dag if valg.periode == VELG else periodestart
+        etter_symbol = {post.aksje.symbol: post for post in poster}
+        vist = [
+            replace(
+                rad,
+                under=bygg_sammenligning(
+                    etter_symbol[rad.aksje.symbol],
+                    serier.get(rad.aksje.symbol, []),
+                    dag,
+                    rad.dato,
+                    partial(oversiktsleser.vurdering, rad.aksje.symbol),
+                    i_dag,
+                    valg.periode != VELG,
+                ),
+            )
+            for rad in rader
+        ]
+    elif valg is not None and valg.periode == VELG:
         vist = sorter_fr102(
             [
                 bygg_rad_for_dag(
@@ -798,9 +825,9 @@ def _tabellsiden(aktiv: str):
                 if post.nyeste is not None
             ]
         )
-    elif periodestart is not None:
+    elif periodestart is not None and not i_lista:
         vist = med_perioden(rader, serier, periodestart)
-    annen_dag = valg is not None and valg.periode == VELG
+    annen_dag = not i_lista and valg is not None and valg.periode == VELG
     skilte_seg_ut, oevrige = del_i_to(rader if annen_dag else vist)
     # Story 8.3: merkingen leses fra sin egen port, bare lesing her.
     merkede = _leser_eller_basefeil(lambda: SqliteMinlistelager(g.tilkobling)).merkede()
@@ -833,6 +860,10 @@ def _tabellsiden(aktiv: str):
     )
     # Story 3.4e: datoene som er «ikke vurdert» i det siden viser, én gang.
     ikke_vurdert = [rad.dato for rad in (vist if annen_dag else (*skilte_seg_ut, *oevrige)) if rad.ikke_vurdert]
+    # Story 8.17b: også dagen i linja under i Min liste.
+    ikke_vurdert += [
+        rad.under.dato for rad in (*skilte_seg_ut, *oevrige) if rad.under is not None and rad.under.ikke_vurdert
+    ]
     ledd = periodeledd(valg)
 
     return render_template(
@@ -843,6 +874,8 @@ def _tabellsiden(aktiv: str):
         dato=sidens_dato(rader),
         hentet=sidens_tidsstempel(rader),
         eget=eldre_enn_nyeste(rader),
+        # Gruppens svar 03.11 kl. 14:28: en rad med eldre dag viser datoen sin.
+        egne_dager=egne_dager(rader, sidens_siste(rader)),
         mangler=mangler,
         # Story 8.0d, PR 2b: M i «N av M aksjer» er alle aksjene i lista,
         # også de uten kurser (beslutningen 14.10). Story 8.2a, b (U23): det
@@ -907,15 +940,15 @@ def _foerste_valgbare(serier: dict[str, list]) -> date | None:
     return foerste + timedelta(days=1) if foerste else None
 
 
-def _valget(rader: list, serier: dict[str, list], i_dag: date) -> Valg | None:
-    """Perioden og dagen fra adressen til oversikten - story 8.17a. Siste
-    børsdag uten noe i adressen og ved en feil, med beskjeden. None uten
-    rader, for da er det ingen tabell å velge for."""
+def _valget(rader: list, serier: dict[str, list], i_dag: date, side: str = OVERSIKTEN_VALG) -> Valg | None:
+    """Perioden og dagen fra adressen til oversikten - story 8.17a - eller
+    Min liste (8.17b). Siste børsdag uten noe i adressen og ved en feil, med
+    beskjeden. None uten rader, for da er det ingen tabell å velge for."""
     siste = sidens_siste(rader)
     if siste is None:
         return None
     foerste = min((serie[0].dato for serie in serier.values() if serie), default=siste)
-    valg = les_valg(request.args.get("periode"), request.args.get("dag"), foerste, i_dag, siste, OVERSIKTEN_VALG)
+    valg = les_valg(request.args.get("periode"), request.args.get("dag"), foerste, i_dag, siste, side)
     # Gjennomgangen (BH5, VG9): «Velg dag» på siste børsdag er siste børsdag,
     # med delene og 2 av 3, så samme dag aldri merkes på to måter.
     if valg.periode == VELG and valg.dag == siste:
@@ -1197,9 +1230,9 @@ _DAG_I_ADRESSEN = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
 
 
 def _periodeledd_fra(sti: str, periode: str | None, dag: str | None) -> tuple[str, ...]:
-    """Story 8.17a: perioden og dagen merkingen sender tilbake til, bare for
-    oversikten og bare kjente koder. Oversikten leser dem på nytt."""
-    if sti != OVERSIKTEN or periode not in PERIODENE or periode == SISTE:
+    """Story 8.17a: perioden og dagen merkingen sender tilbake til, bare
+    kjente koder. Siden leser dem på nytt. Story 8.17b: også Min liste."""
+    if sti not in (OVERSIKTEN, MIN_LISTE) or periode not in PERIODENE or periode == SISTE:
         return ()
     if periode == VELG:
         return (f"periode={VELG}", f"dag={dag}") if dag and _DAG_I_ADRESSEN.fullmatch(dag) else ()
