@@ -2,7 +2,7 @@
 title: "Gjennomgang av PRD-en før fristen 5.11"
 status: aktiv
 created: 2026-11-02
-updated: 2026-11-02T21:51
+updated: 2026-11-03T14:42
 ---
 
 # Gjennomgang av PRD-en før fristen 5.11
@@ -146,3 +146,10 @@ i alle visningene.
 11. **Skal `sprint-status.yaml` rettes samme dag (2.13, 9.5, 2.3c, 2.3d og
     3.5a–h)?** Forslag: ja, i en egen commit, fordi «Kort fortalt» og README-en
     viser til den.
+
+*Avgjort 2026-11-02 kl. 22:15 (gruppens svar):* A) forslagene til spørsmål 1–4, 6
+og 9–11 er godtatt. B) Punkt 13 og 21 står åpne som nå (spørsmål 5). C) Brukertesten
+8.1 og 10.4 tas senere, uten dato ennå, og «Brukerutfall» står som mål for v1
+(spørsmål 7). D) En brukslogg starter 4.11, med én linje for hver dag gruppen bruker
+appen, og §7 sier at bruken ikke ble logget før (spørsmål 8). Ført 03.11 i
+instruksjonen kl. 14:41.
