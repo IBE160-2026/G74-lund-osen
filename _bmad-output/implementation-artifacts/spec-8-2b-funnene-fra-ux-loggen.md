@@ -2,7 +2,7 @@
 title: 'Story 8.2 (8.2b): 29 funn fra UX-loggen'
 type: 'bugfix'
 created: '2026-11-03'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 1
 baseline_commit: 'a6d59bb'
