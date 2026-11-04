@@ -74,3 +74,9 @@
 - [x] 2026-11-04 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — ECH1: en annen dag kan en rute på nivå 2 vise gul ramme uten merket «3 av 3 siste børsdag» (merket står på nivå 3 etter svaret kl. 19:21); gruppen avgjør om merket får egen grense (besvart 2026-11-04: svaret kl. 20:53 og 20:56, 1: styrken står en annen dag bare når merket også får plass, ført under story 8.2 i epics.md)
 - [ ] 2026-11-04 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — bygges 5.11 (svaret kl. 20:53 og 20:56): 1) gul ramme en annen dag viser styrken bare når merket også får plass; 2) ruter uten styrke viser «ikke vurdert» på styrkelinja og hele grunnen der den får plass
 - [ ] 2026-11-04 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — periodevalget er ikke målt ved zoom 200 % og 320 px (BH6, ECH7)
+- [x] 2026-11-04 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — brukslogga 04.11: liten tekst i rutene og under kartet i børsometeret (løst 2026-11-04 i PR #109)
+- [x] 2026-11-04 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — brukslogga 04.11: ingen ramme rundt bransjene i børsometeret (løst 2026-11-04 i PR #109)
+- [x] 2026-11-04 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — brukslogga 04.11: styrken uten ring i børsometeret (løst 2026-11-04 i PR #109)
+- [x] 2026-11-04 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — brukslogga 04.11: styrken bare i noen ruter i børsometeret (løst 2026-11-04 i PR #110)
+- [x] 2026-11-04 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — brukslogga 04.11: «?» for periodene etter knappene (løst 2026-11-04 i PR #109)
+- [x] 2026-11-04 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — brukslogga 04.11: «?» ved «Ga» og «Målt mot» bare i det første sjekkortet (løst 2026-11-04 i PR #109)
