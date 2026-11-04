@@ -69,5 +69,5 @@
 - [ ] 2026-11-03 [utfoert-linja-for-ux-statusen](980-2026-11-03-22-39-10-utfoert-linja-for-ux-statusen.md) — macOS-jobben fikk ikke maskin på `dc027575` (41721045399, avbrutt etter 901 s med 0 steg)
 - [x] 2026-11-04 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — gruppen svarer på spørsmål 1–8 i spesifikasjonen 8.2b, så flettes PR #109 (løst 2026-11-04, flettet i `6f62f564`)
 - [ ] 2026-11-04 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — avgjørelse 1 fra 03.11 kl. 20:48 (`exit 0` i «Start demoen på Windows» i `tester.yml`) er ført, men ikke bygget
-- [ ] 2026-11-04 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — aksjesiden har ingen «?» for periodene; gruppen kan be om en (svaret kl. 10:04)
+- [x] 2026-11-04 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — aksjesiden har ingen «?» for periodene; gruppen kan be om en (svaret kl. 10:04) (besvart 2026-11-04: svaret kl. 19:21, 3: ingen egen «?», fordi «?» ved «Kursutvikling» forklarer både grafen og periodene, ført under story 8.2 i epics.md)
 - [ ] 2026-11-04 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — 8-2 står som in-progress til funnene fra brukertesten i 8.1 er brukt

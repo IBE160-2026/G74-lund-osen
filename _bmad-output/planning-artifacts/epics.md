@@ -3594,6 +3594,11 @@ Tidligere avgjørelser som sier noe annet, har fått en datert linje: `designreg
 
 *Lagt til 2026-11-04 kl. 11:34:* 8.2b er squash-flettet i `6f62f564`, PR #109, låst til head-en `04a8cef` (spesifikasjonen `spec-8-2b-funnene-fra-ux-loggen.md`), med svarene kl. 09:48, 09:58, 10:01 og 10:04. Av de 29 funnene er 23 bygget, U33, U46, U57 og U67 delvis, og U58 og U65 står (svaret kl. 09:58). Hele settet på `8ea018f`, siste commit med kode: 3993 bestått, 24 hoppet over og 5 porttester for `start.ps1` som feilet (svaret 29.10 kl. 21:02). CI var grønn på head-en (41814535296) og på flettecommiten (41814827401). 13 mutanter ble fanget; Md1 først etter at testen fikk med «Alle». Gjennomgangene 04.11 kl. 01:16 og 11:15 ga ingen funn på høy, og alle på middels er rettet. Kontrollpunktet «Funnene fra 8.1 er brukt som grunnlag» er ikke oppfylt, fordi brukertesten i 8.1 ikke er gjort, så 8.2 står som `in-progress` i sprint-status.
 
+*Avgjort 2026-11-04 kl. 19:21 (gruppens svar):*
+- I børsometeret får styrken sin egen, lavere grense, så den står i alle ruter med plass til én linje til under symbolet og endringen. Merket for en annen dag og teksten står som før, på nivå 3.
+- «?» foran periodeknappene står midt på høyden av knappene, på oversikten, i Min liste og i børsometeret.
+- Aksjesiden får ingen egen «?» for periodene, fordi «?» ved «Kursutvikling» forklarer både grafen og periodene.
+
 ### Story 8.2c: Kursgrafen på smal skjerm
 
 *Lagt til 2026-11-04 (gruppens svar kl. 09:48, spørsmål 8 i `spec-8-2b-funnene-fra-ux-loggen.md`):* «Ekstra, hvis tiden rekker», som 8.4–8.19 (svaret 19.10 kl. 15:43). Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt.
