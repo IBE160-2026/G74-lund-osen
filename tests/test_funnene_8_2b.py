@@ -151,10 +151,11 @@ def test_hovedindeksen_og_soeylene_har_hvert_sitt_vindu(klient):
     assert 'popovertarget="hjelp-soeylene"' in tittel
     assert html.count('popovertarget="hjelp-soeylene" aria-label') == 1
     # Tekstene var 44 og 78 ord før 8.2b (talt på a6d59bb).
-    assert len(tekster["hovedindeksen"].tekst.split()) < 30
-    assert len(tekster["soeylene"].tekst.split()) < 50
-    assert "i stedet for tallet" not in tekster["hovedindeksen"].tekst
-    assert "grå ved" not in tekster["soeylene"].tekst
+    # Gjennomgangen (VG2): bare lengden, så fakta kan stå (regel 13).
+    assert len(tekster["hovedindeksen"].tekst.split()) < 44
+    assert len(tekster["soeylene"].tekst.split()) < 78
+    assert "med kurs samme dag" in tekster["hovedindeksen"].tekst
+    assert "grå ved 0,00" in tekster["soeylene"].tekst
 
 
 def _merk(klient, symbol, til, tilbake):
@@ -328,8 +329,12 @@ def test_bryteren_staar_i_rammen_som_en_bryter(klient):
     assert "<h2>Med KI-ens ord</h2>" in topp and 'role="switch" aria-checked="true"' in topp
     assert '<span class="navn">KI-tekst</span>' in topp and '<span class="verdi" aria-hidden="true">På</span>' in topp
     assert html.count('class="ki-bryter"') == 1
-    for velger in (".ki-bryter button", ".ki-bryter .spor", '.ki-bryter [aria-checked="true"] .spor'):
-        assert "gul" not in _regel(velger), velger
+    # Gjennomgangen (VG1): gult heter også oransje og baand-ut i stilen.
+    regler = re.findall(r"\.ki-bryter[^{]*\{([^}]*)\}", STIL)
+    assert len(regler) >= 5
+    for regel in regler:
+        for farge in ("gul", "oransje", "baand-ut", "hjelp-bakgrunn"):
+            assert farge not in regel, (farge, regel)
     assert "var(--blekk)" in _regel('.ki-bryter [aria-checked="true"] .spor')
     assert "border-radius: 16px" in _regel(".ki") and "font-size: 17px" in _regel(".ki p.ki-tekst")
 
@@ -347,13 +352,17 @@ def test_med_ki_av_staar_bare_bryteren(klient):
 
 def test_tallene_i_ki_teksten_har_prikket_strek():
     """U67 (delvis, designregler §4). Ville feilet hvis et tall ikke var
-    markert, hvis et tegn i teksten ble endret, eller hvis & ble en del av
-    et tall."""
+    markert, hvis tallene ble delt på en annen måte enn kontrollen deler dem
+    (gjennomgangen, VG5), hvis et tegn i teksten ble endret, eller hvis &
+    ble en del av et tall."""
+    from ki_kontroll import _SIFFER
     from ki_visning import prikkede_tall
 
-    tekst = "Kursen falt 5,53 % fra 08.10, og R&D ga +1 & 2."
+    tekst = "Trend ga +1 og 3 av 3 slo ut 2 dager, 1 234 og MA50 08.10, og R&D & 2."
     ut = str(prikkede_tall(tekst))
-    assert re.findall(r'<span class="tall">([^<]*)</span>', ut) == ["5,53 %", "08.10", "+1", "2"]
+    markert = re.findall(r'<span class="tall">([^<]*)</span>', ut)
+    assert markert == [treff.group(0) for treff in _SIFFER.finditer(tekst)]
+    assert markert == ["1", "3", "3", "2", "1", "234", "50", "08.10", "2"]
     assert re.sub(r"<[^>]+>", "", ut) == tekst.replace("&", "&amp;")
     assert "&#" not in ut
     assert str(prikkede_tall("<b>3</b>")) == '&lt;b&gt;<span class="tall">3</span>&lt;/b&gt;'
@@ -399,7 +408,8 @@ def test_historikken_er_en_kompakt_tabell(klient):
     assert re.findall(r"<span>([^<]*)</span>", hode) == ["Uke", "Man", "Tir", "Ons", "Tor", "Fre", "Uka"]
     assert "grid-column: 7" in _regel(".ukesum")
     topp = del_.split('<div class="historikktopp">', 1)[1].split("</form>", 1)[0]
-    assert "Signalet dag for dag" in topp and '<form class="dagvalg" method="get" action="/aksje/BRFE">' in topp
+    assert "Signalet dag for dag" in topp
+    assert '<form class="dagvalg" method="get" action="/aksje/BRFE#signalet-dag-for-dag">' in topp
     assert 'name="dag"' in topp and ">Velg dag</button>" in topp
     assert re.search(
         r'<a class="dato" href="/aksje/BRFE\?dag=2026-10-09"><span class="ukedag">fredag</span> 09\.10</a>', del_
@@ -438,9 +448,79 @@ def test_min_liste_har_tittelen_med_antallet(klient):
     assert '<h1 class="overskrift"><mark>3 av 5 i Min liste</mark> skilte seg ut fredag</h1>' in topp
     assert topp.index("<h1") < topp.index('<nav class="visvalg"')
     assert "justify-content: space-between" in _regel(".listetopp, :where(.side-oversikt) .aksjetopp")
-    # Ville feilet hvis tittelen talte en aksje som ikke er merket.
+    # Ville feilet hvis tittelen talte en aksje som ikke er merket: under
+    # «Alle» står alle sju som skilte seg ut (mutanten Md1).
+    assert "<mark>3 av 5 i Min liste</mark>" in _html(klient, "/min-liste?vis=alle")
     _merk(klient, "BRFE", "fjern", "/min-liste")
     assert "<mark>2 av 4 i Min liste</mark>" in _html(klient, "/min-liste")
     for symbol in demo.MERKET_I_DEMOEN:
         _merk(klient, symbol, "fjern", "/min-liste")
     assert '<h1 class="overskrift">Min liste</h1>' in _html(klient, "/min-liste")
+
+
+# Gjennomgangen av 8.2b.
+
+
+def test_velg_dag_i_historikken_godtar_bare_dager_siden_viser(klient):
+    """BH1, ECH2. Ville feilet hvis feltet godtok seriens første dag, som
+    siden avviser, eller sendte til toppen av siden."""
+    html = _html(klient, "/aksje/VRDS")
+    skjema = html.split('<form class="dagvalg"', 1)[1].split("</form>", 1)[0]
+    velg = re.search(r'<input type="date" id="velg-dag"[^>]*min="([^"]+)"', html).group(1)
+    assert f'min="{velg}"' in skjema
+    assert 'action="/aksje/VRDS#signalet-dag-for-dag"' in skjema
+
+
+def test_demogrunnen_ikke_for_siste_dag(klient, monkeypatch):
+    """BH3, ECH3. En demobase uten KI-tekst for siste dag, som når
+    demo_ki_tekster.json ikke kan leses. Ki_logg kan ikke slettes fra (AD-7),
+    så loggen svarer at raden mangler. Ville feilet hvis siden sa at demoen
+    har KI-tekst bare for siste børsdag, på den dagen."""
+    from ki_visning import INGEN_RAD, KIVisning
+
+    monkeypatch.setattr(app_modul, "bygg_ki_visning", lambda *a, **k: KIVisning(INGEN_RAD))
+    html = _html(klient, "/aksje/BRFE")
+    assert "demoen har KI-tekst bare" not in html
+    assert "Ingen KI-tekst for denne dagen" in html
+
+
+def test_tittelen_i_min_liste_bare_med_en_vurdert_merket(klient):
+    """BH2, ECH8, VG6. Bare Matfjord, uten kurser, er merket. Ville feilet
+    med «0 av 1 i Min liste skilte seg ut»."""
+    for symbol in demo.MERKET_I_DEMOEN:
+        _merk(klient, symbol, "fjern", "/min-liste")
+    _merk(klient, "MTFJ", "merk", "/min-liste")
+    html = _html(klient, "/min-liste")
+    assert '<h1 class="overskrift">Min liste</h1>' in html and "i Min liste</mark>" not in html
+
+
+def test_valget_paa_oversikten_beholder_sorteringen(klient):
+    """BH7, ECH7. Ville feilet hvis «Alle» eller «Min liste» mistet
+    sorteringen."""
+    topp = _html(klient, "/?sorter=kurs&orden=stigende").split('<div class="aksjetopp">', 1)[1].split("</nav>", 1)[0]
+    assert 'href="/?sorter=kurs&amp;orden=stigende" aria-current="true">Alle' in topp
+    assert 'href="/min-liste?sorter=kurs&amp;orden=stigende">Min liste' in topp
+
+
+def test_de_nye_radene_brytes_paa_smal_skjerm():
+    """VG3: 390 px uten vannrett rulling. Hver ny rad med flere deler
+    brytes heller enn å gå ut av siden. Sjekket også i Edge med en ramme på
+    390 px (spesifikasjonen)."""
+    for velger in (
+        ".listetopp, :where(.side-oversikt) .aksjetopp",
+        "p.sumrad",
+        ".maanedspiler",
+        ".historikktopp",
+        ".dagvalg",
+        ".ki .ki-topp",
+        ".soeyler .linjeforklaring",
+    ):
+        assert "flex-wrap: wrap" in _regel(velger), velger
+    assert "min-width: 0" in _regel(".listetopp h1")
+    assert "max-width: 100%" in _regel(".maanedspiler")
+
+
+def test_bryteren_har_kant_med_hoey_kontrast():
+    """ECH9. Ville feilet hvis sporet bare var bakgrunn, som forsvinner med
+    høy kontrast."""
+    assert "border: 1px solid CanvasText" in _regel(".ki-bryter .spor", _media("forced-colors: active"))

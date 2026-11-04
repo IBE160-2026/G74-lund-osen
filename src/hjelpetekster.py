@@ -196,9 +196,10 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "Hovedindeksen:",
             # Story 8.17a (gruppens svar 30.10 kl. 12:21, e): tabellens dag.
             # Story 8.2b, a (U26): kortere, og søylene i et eget vindu.
+            # Gjennomgangen av 8.2b (VG2): «med kurs samme dag» står igjen.
             "verdien den dagen tabellen viser, og endringen i prosent fra "
-            "børsdagen før. «Gikk bedre» teller aksjene med større endring "
-            "enn indeksen, slik tallene vises, og lik teller ikke.",
+            "børsdagen før. «Gikk bedre» teller aksjene med kurs samme dag og "
+            "større endring enn indeksen, slik tallene vises, og lik teller ikke.",
             (
                 (PRD, "#### FR-104 — Hovedindeksen i markedsoversikten"),
                 (PRD, "«Bedre» avgjøres på endringen slik den vises, og lik er ikke bedre."),
@@ -211,7 +212,9 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         "soeylene": Hjelpetekst(
             "Søylene:",
             "endringen for hver aksje, fra størst fall til venstre til størst stigning "
-            "til høyre. Den stiplede linja er indeksen, grønn når den steg og rød når den falt. "
+            # Gjennomgangen av 8.2b (VG2): grå ved 0,00 % står igjen.
+            "til høyre. Den stiplede linja er indeksen, grønn når den steg, rød når den falt "
+            "og grå ved 0,00 %. "
             # Story 8.2a, c (U20): symbolet over søyla er en lenke.
             "Et gult bransjesymbol betyr 3 av 3 siste børsdag, og et klikk på symbolet viser aksjen.",
             (
@@ -241,7 +244,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             # Story 8.2b, b (U16): det som er tatt ut av ingressen.
             "det appen skrev om aksjen hver dag i måneden, eller hvorfor det mangler, lest fra basen og "
             "aldri regnet på nytt. Tallene for uka og måneden teller dagene med signalstyrke "
-            f"{terskel} eller mer, som i oversikten, og 3 av 3 er merket med strek og ring. "
+            f"{terskel} eller mer, som i oversikten, og {ANTALL_SJEKKER} av {ANTALL_SJEKKER} "
+            "er merket med strek og ring. "
             "Pilene viser måneden før og etter, så langt kursserien går, og en dag med kurs viser "
             "hele siden for den dagen, med målingene.",
             (

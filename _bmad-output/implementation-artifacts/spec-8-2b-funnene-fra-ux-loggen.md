@@ -4,7 +4,7 @@ type: 'bugfix'
 created: '2026-11-03'
 status: 'in-progress'
 route: 'dispatch'
-review_loop_iteration: 0
+review_loop_iteration: 1
 baseline_commit: 'a6d59bb'
 context:
   - '{project-root}/CLAUDE.md'
@@ -111,3 +111,32 @@ Hver commit med tester («Ville feilet hvis», uten nett), hjelpen, `docs/hjelp.
 4. **U65:** notatet sier at tavla har navnene i en forklaring over grafen, med tallene ved enden utenfor feltet, mens utdraget §8 sier at navnene står ved enden av linjene. Bygget er det utdraget sier (U41 og U47). Skal grafen ha forklaringen over i stedet?
 5. **U33 og U67, fargen:** tavla har en gul bryter. Gult ved en aksje betyr bare 3 av 3 (`designregler.md` §3). Bryteren er bygget i blekk. Skal den være gul likevel?
 6. **U46, stripa:** tavla har bryteren også i stripa øverst. Valget gjelder hele appen, og stripa har ingen knapper før sidene finnes (`designregler.md` §5), som Innstillinger (8.10). Skal bryteren stå i stripa nå?
+7. **U64, rekkefølgen i summen** (fra gjennomgangen 04.11, VG): raden for summen under sjekkene på aksjesiden har T, B og I og så «3 av 3» til høyre, som tavla. Det er samme rekkefølge som spørsmål 3 holder igjen for tabellen, der 8.0e har T, B og I under «N av 3». Skal summen ha styrken først?
+8. **Grafen ved 390 px** (fra gjennomgangen 04.11, ECH6): feltet til høyre for navnene er 170 av 720 i grafen, og hele grafen skaleres ned på smal skjerm, så teksten i den blir om lag 5 px. Teksten var like liten før 8.2b, men tegneflaten er nå smalere. Skal grafen ha egne mål på smal skjerm (en egen story)?
+
+## Gjennomgangen 04.11 kl. 01:16
+
+Etter hele settet på `f116c30`, med tre gjennomganger etter hverandre uten pytest eller demo samtidig: Blind Hunter (bare diffen), Edge Case Hunter og Verification Gap (med spesifikasjonen). Ingen funn på høy. Ingen funn sier at et spørsmål under «Åpent» er bygget.
+
+**Rettet:**
+- BH1, ECH2 (middels): «Velg dag» i historikken godtok seriens første dag, som `les_valg` avviser. Feltet begynner nå på andre dag, som periodevalget, og skjemaet sender tilbake til delen.
+- BH2, ECH8, VG6 (middels): tittelen i Min liste talte vurderingene for hele markedet. Nå står tallet bare når minst én merket aksje er vurdert.
+- ECH1 (middels): datoene på aksen for 1 mnd kom borti hverandre på den smalere tegneflaten. Et merke nærmere det forrige enn 36 får streken, ikke datoen.
+- VG1 (middels): testen for «ikke gul» så bare etter ordet «gul». Den ser nå etter alle de gule fargene i stilen.
+- VG2 (middels, regel 13): hjelpen mistet «med kurs samme dag» og «grå ved 0,00 %». Begge står igjen, og testen sjekker bare lengden.
+- BH3, ECH3 (lav): demogrunnen sto også for siste dag i en demobase uten KI-tekstene. Nå bare for en dag før siste dag.
+- BH4, ECH4, VG5 (lav): tallene i KI-teksten deles nå som kontrollen deler dem (`_SIFFER` i `ki_kontroll.py`), så tallet som er markert, er det som er prøvd.
+- BH7, ECH7 (lav): valget «Alle / Min liste» på oversikten beholder sorteringen.
+- ECH9 (lav): bryteren har kant og systemfarger med høy kontrast.
+- BH9 (lav): «3 av 3» i hjelpen for historikken kommer fra antallet sjekker.
+- VG3 (middels): en test for at hver ny rad brytes på smal skjerm. 390 px er også sjekket i Edge med en ramme på 390 px for oversikten, Min liste, børsometeret og aksjesidene.
+- VG7, VG8 (lav): `docs/hjelp.md` sier at bryteren står alene med KI av, og ingressen sier «en dag med kurs».
+
+**Står, med grunnen:**
+- BH5 (lav): `til_venstre` slår ikke lenger til, fordi tegneflaten slutter 170 før kanten. Den står som vern hvis feltet til høyre blir mindre.
+- BH6, ECH5 (lav): navnene kan stå et stykke fra enden når tre linjer ender likt, eller når indeksen slutter før siste dag. Fargen viser hvilken linje navnet hører til, og navnene ligger aldri oppå hverandre.
+- BH8 (lav): «?» i overskriften over søylene leses med i figurteksten. Det er gyldig HTML, og knappen har sitt eget navn.
+- ECH6 (lav): grafen på 390 px, spørsmål 8.
+- VG4 (lav): commit b sier «knapper med kant» om pilene. Fra c har hele månedsvelgeren kanten (rettet 04.11 over), og meldingen skrives ikke om (regel 7).
+- VG8 (lav): `endring_med_datoer` og `boersdag_mellom` i `aksjedetalj.py` brukes ikke lenger av malen, bare av testene. De står, så det er lett å gå tilbake hvis gruppen vil.
+- VG, U58: summen på aksjesiden har «3 av 3» til høyre for T, B og I, spørsmål 7.

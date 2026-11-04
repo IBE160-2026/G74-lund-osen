@@ -1087,7 +1087,10 @@ HOEYDE_PAA_BILDET = 1838
 # samme.
 # Story 8.2b, d: «Aksjene» og valget over tabellen, og tittelen i Min liste, i
 # index.html og stil.css. Bildet ble tatt paa nytt med den nye hoeyden.
-AVTRYKK_BAK_BILDET = "3b284724b6ec90ed34f5c79c67c1dafd39ba17fbf71b8e966360ba2a6f21d72e"
+# Gjennomgangen av 8.2b 04.11: rettingene i hjelpetekster.py, index.html,
+# aksje.html og stil.css. Bildet ble tatt paa nytt og er byte for byte det
+# samme.
+AVTRYKK_BAK_BILDET = "ae4e3dd76139cff1fa6badd0fbc9b0a78ef2c09b58ffce972f863f7afab37ffb"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1324,7 +1327,10 @@ HOEYDE_PAA_AKSJESIDEN = 2192
 # og stil.css. Bildet ble tatt paa nytt med den nye hoeyden.
 # Story 8.2b, d: stil.css. Bildet ble tatt paa nytt og er byte for byte det
 # samme.
-AVTRYKK_BAK_AKSJESIDEN = "a829e2368ac1f096d767f1e0b79de4a4f6f9f0e36b5ac9c6181dc0f0fbee91cb"
+# Gjennomgangen av 8.2b 04.11: rettingene i app.py, graf.py, ki_visning.py,
+# hjelpetekster.py, aksje.html, index.html og stil.css. Bildet ble tatt paa
+# nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "19bae65b3da9e7857af9ec3731dc6aa12c9ce321838b62a7ca40e95458d4a976"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "

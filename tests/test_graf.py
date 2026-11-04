@@ -329,3 +329,21 @@ class TestFeltetTilHoeyre:
         assert graf.venstre == VENSTRE and graf.bunn == HOYDE - BUNN and graf.topp == MARG_Y
         assert all(MARG_Y <= r.y <= HOYDE - BUNN for r in graf.rutenett)
         assert all(VENSTRE <= m.x <= BREDDE - HOEYRE for m in graf.maanedsmerker)
+
+
+class TestDatoeneEtterGjennomgangen:
+    """Gjennomgangen av 8.2b (ECH1): på den smalere tegneflaten kom datoene
+    for 1 mnd borti hverandre."""
+
+    def test_to_datoer_staar_aldri_naermere_enn_datobredden(self):
+        """Serien begynner fredag 02.10, så den korte første uka har et merke
+        rett før mandagen. Ville feilet med «02.10» og «05.10» oppå hverandre."""
+        from graf import DATOBREDDE
+        from perioder import UKER
+
+        ps = boersdagspunkter(date(2026, 10, 2), date(2026, 10, 30))
+        merker = bygg_graf(ps, merker=UKER).maanedsmerker
+        navngitt = [m.x for m in merker if m.navn]
+        assert len(navngitt) >= 4
+        assert all(b - a >= DATOBREDDE for a, b in zip(navngitt, navngitt[1:]))
+        assert len(merker) > len(navngitt)

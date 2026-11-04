@@ -614,6 +614,13 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-aksje) .ki-bryter [aria-checked="true"] .spor { background: var(--blekk); }
 :where(.side-aksje) .ki-bryter [aria-checked="true"] .spor::after { left: 18px; }
 :where(.side-aksje) .ki-bryter .verdi { color: var(--dempet); font-weight: 400; }
+/* Gjennomgangen av 8.2b (ECH9): med høy kontrast forsvinner bakgrunnen, så
+   sporet og knotten får kant og systemfarger. */
+@media (forced-colors: active) {
+  :where(.side-aksje) .ki-bryter .spor { border: 1px solid CanvasText; }
+  :where(.side-aksje) .ki-bryter .spor::after { background: CanvasText; }
+  :where(.side-aksje) .ki-bryter [aria-checked="true"] .spor { background: Highlight; }
+}
 :where(.side-aksje) .maanedsstrek { stroke: var(--strek-2); stroke-width: 1; }
 :where(.side-aksje) .maanedstekst { fill: var(--dempet); font-size: 12px; }
 :where(.side-aksje) .kurslinje { fill: none; stroke: var(--kurs); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }

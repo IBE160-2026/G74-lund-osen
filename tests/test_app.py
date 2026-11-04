@@ -2519,7 +2519,10 @@ class TestStory815Sortering:
         """Svar 7: linja om 3 av 3 og «N av M aksjer» endres ikke av et klikk."""
 
         def topp(html):
-            return html.split('<div class="tabellboks"', 1)[0].split("<main>", 1)[1]
+            # Story 8.2b (gjennomgangen, BH7): valget «Alle / Min liste» over
+            # tabellen beholder sorteringen, så det sammenlignes ikke.
+            del_ = html.split('<div class="tabellboks"', 1)[0].split("<main>", 1)[1]
+            return re.sub(r'<div class="aksjetopp">.*?</nav>\s*</div>', "", del_, flags=re.DOTALL)
 
         standard = topp(self._side(tabell, "/"))
         valgt = topp(self._side(tabell, "/?sorter=signal&orden=stigende"))

@@ -898,6 +898,9 @@ def _tabellsiden(aktiv: str):
     # tabellen, saa knappen og tabellen sier det samme. Story 8.2a, b: ogsaa
     # en merket aksje uten kurser, som naa har en rad.
     antall_merket = sum(rad.aksje.symbol in merkede for rad in (*rader, *alle_uten_data))
+    # Gjennomgangen av 8.2b (BH2, ECH8, VG6): tittelen i Min liste står med
+    # tall bare når minst én merket aksje er vurdert.
+    vurdert_i_lista = sum(1 for rad in rader if rad.aksje.symbol in merkede and rad.styrke is not None)
     # Story 8.2a, e: hele lista sortert på kolonnen, med radene uten data,
     # som står sist når kolonnen ikke har en verdi for dem. None uten
     # sortering. De som skilte seg ut, beholder kanten i malen.
@@ -956,6 +959,7 @@ def _tabellsiden(aktiv: str):
         hentekommando=hentekommando(),
         merkede=merkede,
         antall_merket=antall_merket,
+        vurdert_i_lista=vurdert_i_lista,
         tilbake=side_adresse(sti, sortering, alle, ledd),
         # Story 8.17a: periodevalget, og perioden og dagen i lenkene.
         valg=valg,
@@ -1104,7 +1108,7 @@ def aksjedetalj(symbol: str):
     # Story 10.3: KI-teksten under regelforklaringen, bare naar det er en
     # vurdering aa forklare og bryteren er paa (FR-601, FR-602).
     ki_er_paa = ki_paa(request.cookies.get(KAPSEL))
-    ki = _ki_visning(post, detalj) if ki_er_paa and detalj.sjekker else None
+    ki = _ki_visning(post, detalj, rader[-1].dato) if ki_er_paa and detalj.sjekker else None
     # Gruppens svar 25.10 kl. 00:51: setningen om dagene under KI-teksten,
     # ogsaa naar KI er av eller teksten er stoppet. «I dag» bare naar dagen
     # siden viser, er i dag (gjennomgangen, BH1, ECH6, VG1).
@@ -1201,7 +1205,7 @@ def _setningen_om_dagene(post, detalj, annen_dag: bool) -> str | None:
     return setning_om_dagene(dager, minst, annen_dag=annen_dag)
 
 
-def _ki_visning(post, detalj) -> KIVisning:
+def _ki_visning(post, detalj, siste: date) -> KIVisning:
     """Raden i KILogg for aksjen og dagen, mot vurderingen som vises.
 
     Webserveren leser bare (AD-10). Kan loggen ikke leses, for eksempel i en
@@ -1222,8 +1226,10 @@ def _ki_visning(post, detalj) -> KIVisning:
     # Proevd mot vurderingen som vises, ikke den for siste boersdag (8.16b).
     visning = bygg_ki_visning(rad, detalj.vurdering, andre_har_rader=andre_har_rader)
     # Story 8.2b, b (U6): i demoen er grunnen at demoen bare har KI-tekst for
-    # siste boersdag. Den ekte versjonen har teksten som foer.
-    if visning.tilstand == INGEN_RAD and g.get("eksempeltall"):
+    # siste boersdag. Den ekte versjonen har teksten som foer. Gjennomgangen
+    # av 8.2b (BH3, ECH3): bare for en dag foer siste dag i serien, saa en
+    # demobase uten KI-tekstene ikke sier det om siste dag.
+    if visning.tilstand == INGEN_RAD and g.get("eksempeltall") and detalj.dato < siste:
         return KIVisning(INGEN_I_DEMOEN)
     return visning
 

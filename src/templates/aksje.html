@@ -295,15 +295,17 @@
         for dagen, som en dag i tabellen. #}
     <div class="historikktopp">
       <h2><span id="historikk-tittel">Signalet dag for dag</span> {{ hjelpeknapp("hjelp-historikk", "Hjelp: signalet dag for dag") }}</h2>
-      <form class="dagvalg" method="get" action="/aksje/{{ detalj.aksje.symbol }}">
+      {#- Gjennomgangen av 8.2b (BH1, ECH2): fra andre dag i serien, som
+          periodevalget, og tilbake til delen. #}
+      <form class="dagvalg" method="get" action="/aksje/{{ detalj.aksje.symbol }}#signalet-dag-for-dag">
         <label class="skjult" for="velg-dag-historikk">Velg dag i historikken</label>
-        <input type="date" id="velg-dag-historikk" name="dag" required min="{{ serien_begynner.isoformat() }}" max="{{ siste_i_serien.isoformat() }}">
+        <input type="date" id="velg-dag-historikk" name="dag" required min="{{ foerste_valgbare.isoformat() }}" max="{{ siste_i_serien.isoformat() }}">
         <button type="submit">Velg dag</button>
       </form>
     </div>
     {#- Story 8.2b, b (U16): ingressen er kort, og resten står i hjelpen ved
         «?» (gjennomgangen, BH4: tallene teller terskelen, som oversikten). #}
-    <p class="ingress">Det appen skrev om {{ detalj.aksje.navn }} hver børsdag, eller hvorfor det mangler. Velg en dag for å se hele siden for den dagen.</p>
+    <p class="ingress">Det appen skrev om {{ detalj.aksje.navn }} hver børsdag, eller hvorfor det mangler. Velg en dag med kurs for å se hele siden for den dagen.</p>
     <nav class="maanedspiler" aria-label="Måned i historikken">
       {% if historikk.forrige %}<a class="pil" href="{{ pil(historikk.forrige) }}">‹ {{ historikk.forrige|maanedsnavn }}</a>{% endif %}
       <span class="maaned">{{ historikk.tittel|capitalize }}</span>

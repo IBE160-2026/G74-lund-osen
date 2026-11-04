@@ -119,8 +119,12 @@ def bygg_ki_visning(rad: KIRad | None, vurdering: object, *, andre_har_rader: bo
     return KIVisning(VIST, tekst=rad.tekst, modell=f"{rad.modell}, {rad.tjeneste}")
 
 
-# Story 8.2b, c (U67): et tall i teksten, med fortegn, desimaler og prosent.
-_TALL = re.compile(r"[+\-\u2212]?\d+(?:[.,]\d+)*(?:[\u00a0 ]?%)?")
+# Story 8.2b, c (U67): et tall i teksten, delt som kontrollen deler det
+# (_SIFFER i ki_kontroll.py), saa tallet som er markert, er det som er proevd
+# mot grunnlaget (designregler §4). En tekst som vises, har bare hele tall fra
+# grunnlaget, uten prosent (FR-603, punkt 2). Gjennomgangen av 8.2b (BH4,
+# ECH4, VG5): ikke fortegn, prosent eller tusenskille, som kontrollen.
+_TALL = re.compile(r"\d+(?:[.,]\d+)?")
 
 
 def prikkede_tall(tekst: str) -> Markup:
@@ -128,6 +132,7 @@ def prikkede_tall(tekst: str) -> Markup:
     strek i tekstfargen (designregler §4). Teksten er alt proevd mot
     grunnlaget (FR-603), og ingenting i den endres: delene escapes hver for
     seg, saa et tegn som & aldri blir en del av et tall."""
+    # Gjennomgangen av 8.2b (VG5): samme deling som kontrollen.
     deler = []
     forrige = 0
     for treff in _TALL.finditer(tekst):

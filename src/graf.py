@@ -76,6 +76,11 @@ MAANEDER = (
 # og kommer ikke borti navnet ved merket foer.
 NAVNEBREDDE = 60
 
+# Gjennomgangen av 8.2b (ECH1): plassen en dato som «02.10» trenger. Et merke
+# naermere det forrige enn dette faar streken, men ikke navnet, saa datoene
+# ikke kommer borti hverandre paa den smalere tegneflaten.
+DATOBREDDE = 36
+
 # Story 8.16 (gjennomgangen, BH4): flere maanedsnavn enn dette faar ikke
 # plass, saa da faar annenhver maaned navn.
 MAKS_MAANEDSNAVN = 8
@@ -252,15 +257,19 @@ def _dagmerker(punkter: tuple[Punkt, ...], bredde: int, hvilke: str) -> tuple[Ma
         return ()
     merker = []
     forrige_uke = None
+    forrige_navn = None
     for i, p in enumerate(punkter):
         uke = p.dato.isocalendar()[:2]
         if hvilke == UKER and uke == forrige_uke:
             continue
         forrige_uke = uke
         x = _x(i, len(punkter), bredde)
-        merker.append(
-            Maanedsmerke(x=x, navn=f"{p.dato.day:02d}.{p.dato.month:02d}", til_venstre=x > bredde - NAVNEBREDDE)
-        )
+        navn = f"{p.dato.day:02d}.{p.dato.month:02d}"
+        if forrige_navn is not None and x - forrige_navn < DATOBREDDE:
+            navn = ""
+        else:
+            forrige_navn = x
+        merker.append(Maanedsmerke(x=x, navn=navn, til_venstre=x > bredde - NAVNEBREDDE))
     return tuple(merker)
 
 
