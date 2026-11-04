@@ -118,14 +118,28 @@
   {#- Story 8.2a, b (U23): en aksje uten kurser har en rad i tabellen. #}
   {% set vist_tabell = rader and (skilte_seg_ut or oevrige or ingen_skilte_seg_ut or mangler) %}
   {% if aktiv == "min_liste" %}
-    <h1 class="overskrift">Min liste</h1>
+    {#- Story 8.2b, d (U69): tittelen sier hvor mange i lista som skilte seg ut
+        siste børsdag, med markeringen fra oversikten (designregler §4), når
+        noe er merket og vurdert. N er de merkede blant «Skilte seg ut», og M
+        alle de merkede med en rad. Valget «Alle / Min liste» står til høyre
+        for tittelen på bred skjerm, og under på smal. #}
+    {% set i_lista = skilte_seg_ut|map(attribute="aksje.symbol")|select("in", merkede)|list|length %}
+    <div class="listetopp">
+    {% if antall_merket and antall_vurdert %}
+      <h1 class="overskrift"><mark>{{ i_lista }} av {{ antall_merket }} i Min liste</mark> skilte seg ut {{ dato|ukedag }}</h1>
+    {% else %}
+      <h1 class="overskrift">Min liste</h1>
+    {% endif %}
     {% if rader %}
-    <p class="innledning">Stjernen foran et selskap legger aksjen i lista, og et nytt trykk tar den ut. Lista lagres på denne maskinen og koster ingen API-kall.</p>
     <nav class="visvalg" aria-label="Vis">
       {#- Story 8.17b: valget beholder perioden og dagen. #}
       <a class="visknapp" href="{{ sidesti }}?vis=alle{% for ledd in periodeledd %}&amp;{{ ledd }}{% endfor %}{% if sortering %}&amp;sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}"{% if alle %} aria-current="true"{% endif %}>Alle <span class="antall">{{ antall_aksjer }}</span></a>
       <a class="visknapp" href="{{ sidesti }}{% for ledd in periodeledd %}{% if loop.first %}?{% else %}&amp;{% endif %}{{ ledd }}{% endfor %}{% if sortering %}{% if periodeledd %}&amp;{% else %}?{% endif %}sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}"{% if not alle %} aria-current="true"{% endif %}>Min liste <span class="antall">{{ antall_merket }}</span></a>
     </nav>
+    {% endif %}
+    </div>
+    {% if rader %}
+    <p class="innledning">Stjernen foran et selskap legger aksjen i lista, og et nytt trykk tar den ut. Lista lagres på denne maskinen og koster ingen API-kall.</p>
     {#- Story 8.17b: «Sammenlign med» er periodevalget i Min liste
         (beslutningen 08.10 kl. 21:48), med siste børsdag valgt når siden
         åpnes (designregler §2). Radene er siste børsdag, og linja under
@@ -207,6 +221,17 @@
     {% endif %}
 
     {% include "_hovedindeks.html" %}
+
+    {#- Story 8.2b, d (U59, utdraget §11 punkt 4): overskriften «Aksjene» med
+        antallet, og valget «Alle / Min liste» over tabellen, som i Min liste.
+        «Alle» er siden man står på, og «Min liste» beholder perioden. #}
+    <div class="aksjetopp">
+      <h2 class="aksjetittel">Aksjene <span class="antall">{{ antall_aksjer }}</span></h2>
+      <nav class="visvalg" aria-label="Vis">
+        <a class="visknapp" href="{{ sidesti }}{% for ledd in periodeledd %}{% if loop.first %}?{% else %}&amp;{% endif %}{{ ledd }}{% endfor %}" aria-current="true">Alle <span class="antall">{{ antall_aksjer }}</span></a>
+        <a class="visknapp" href="/min-liste{% for ledd in periodeledd %}{% if loop.first %}?{% else %}&amp;{% endif %}{{ ledd }}{% endfor %}">Min liste <span class="antall">{{ antall_merket }}</span></a>
+      </nav>
+    </div>
 
   {% endif %}
   {% if vist_tabell %}

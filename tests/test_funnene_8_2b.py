@@ -406,3 +406,41 @@ def test_historikken_er_en_kompakt_tabell(klient):
     )
     assert "clip: rect(0 0 0 0)" in _regel("li.dag .ukedag")
     assert "display: none" in _regel(".ukehode", _media("max-width: 760px"))
+
+
+# d) Forsiden og Min liste.
+
+
+def test_oversikten_har_aksjene_med_antallet_og_valget(klient):
+    """U59. Ville feilet uten overskriften «Aksjene» med antallet over
+    tabellen, eller uten valget «Alle / Min liste», med «Alle» valgt og
+    perioden med i lenken til Min liste."""
+    html = _html(klient, "/?periode=1-uke")
+    topp = html.split('<div class="aksjetopp">', 1)[1].split("</nav>", 1)[0]
+    assert re.search(r'<h2 class="aksjetittel">Aksjene <span class="antall">15</span></h2>', topp)
+    assert re.search(
+        r'<a class="visknapp" href="/\?periode=1-uke" aria-current="true">Alle <span class="antall">15</span></a>', topp
+    )
+    assert re.search(
+        r'<a class="visknapp" href="/min-liste\?periode=1-uke">Min liste <span class="antall">5</span></a>', topp
+    )
+    assert html.index('<div class="aksjetopp">') < html.index('class="tabellboks"')
+    assert html.index('<section class="hovedindeks"') < html.index('<div class="aksjetopp">')
+    assert '<div class="aksjetopp">' not in _html(klient, "/min-liste")
+
+
+def test_min_liste_har_tittelen_med_antallet(klient):
+    """U69. Demoen har fem merket, og tre av dem skilte seg ut. Ville feilet
+    med tittelen «Min liste» når noe er merket og vurdert, med et annet
+    antall, eller med valget før tittelen."""
+    html = _html(klient, "/min-liste")
+    topp = html.split('<div class="listetopp">', 1)[1].split("</nav>", 1)[0]
+    assert '<h1 class="overskrift"><mark>3 av 5 i Min liste</mark> skilte seg ut fredag</h1>' in topp
+    assert topp.index("<h1") < topp.index('<nav class="visvalg"')
+    assert "justify-content: space-between" in _regel(".listetopp, :where(.side-oversikt) .aksjetopp")
+    # Ville feilet hvis tittelen talte en aksje som ikke er merket.
+    _merk(klient, "BRFE", "fjern", "/min-liste")
+    assert "<mark>2 av 4 i Min liste</mark>" in _html(klient, "/min-liste")
+    for symbol in demo.MERKET_I_DEMOEN:
+        _merk(klient, symbol, "fjern", "/min-liste")
+    assert '<h1 class="overskrift">Min liste</h1>' in _html(klient, "/min-liste")

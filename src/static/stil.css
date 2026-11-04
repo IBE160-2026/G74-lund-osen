@@ -447,6 +447,18 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
                        box-sizing: border-box; color: var(--blekk); font-size: 15px; font-weight: 600; text-decoration: none; }
 :where(.side-oversikt) a.visknapp[aria-current="true"] { background: var(--fyll); color: var(--hvit); }
 :where(.side-oversikt) a.visknapp:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+/* Story 8.2b, d (U59, U69): tittelen og valget på samme linje, valget til
+   høyre, og under hverandre når det ikke er plass. */
+:where(.side-oversikt) .listetopp, :where(.side-oversikt) .aksjetopp { display: flex; flex-wrap: wrap; align-items: center;
+                                    justify-content: space-between; gap: 8px 24px; }
+:where(.side-oversikt) .listetopp h1 { flex: 1 1 20rem; min-width: 0; margin: 0 0 0.5rem; }
+:where(.side-oversikt) .listetopp nav.visvalg { flex: none; }
+:where(.side-oversikt) .listetopp nav.visvalg, :where(.side-oversikt) .aksjetopp nav.visvalg { margin: 0 0 1rem; }
+:where(.side-oversikt) .aksjetopp { margin: 0 0 4px; }
+:where(.side-oversikt) h2.aksjetittel { font-family: "Newsreader", Georgia, serif; font-size: 28px; font-weight: 600; color: var(--blekk);
+                         margin: 0 0 1rem; display: flex; align-items: center; gap: 10px; }
+:where(.side-oversikt) h2.aksjetittel .antall { font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 14px; font-weight: 700;
+                                 color: var(--tekst); border: 1px solid var(--strek-2); border-radius: 999px; padding: 2px 10px; }
 :where(.side-oversikt) p.tom-liste { margin: 0 0 1rem; padding: 1rem 1.25rem; border: 1px solid var(--strek); border-radius: 12px;
                         background: var(--kort); color: var(--tekst); }
 /* Svar 5: linja over tabellen når en kolonne er valgt. */
