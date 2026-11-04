@@ -959,7 +959,9 @@ SKRIFTFILER = {".woff", ".woff2", ".ttf", ".otf", ".css", ".js"}
 # 1784.
 # Story 8.2b, d: 1838, fordi «Aksjene» og valget «Alle / Min liste» står over
 # tabellen (U59). Var 1772.
-HOEYDE_PAA_BILDET = 1838
+# Gruppens svar 04.11 kl. 09:58: 1864, fordi forklaringen av lys og mørk søyle
+# står under søylene. Maalt paa samme maate. Var 1838.
+HOEYDE_PAA_BILDET = 1864
 # Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
 # Story 10.5: investorsidene i kursdata.py. Bildet ble tatt på nytt og er
 # byte for byte det samme. Avtrykket er av kildefilene, ikke av PNG-en.
@@ -1090,7 +1092,9 @@ HOEYDE_PAA_BILDET = 1838
 # Gjennomgangen av 8.2b 04.11: rettingene i hjelpetekster.py, index.html,
 # aksje.html og stil.css. Bildet ble tatt paa nytt og er byte for byte det
 # samme.
-AVTRYKK_BAK_BILDET = "ae4e3dd76139cff1fa6badd0fbc9b0a78ef2c09b58ffce972f863f7afab37ffb"
+# Gruppens svar 04.11 kl. 09:58: lys og mørk søyle, i app.py, hjelpetekster.py,
+# _hovedindeks.html og stil.css. Bildet ble tatt paa nytt med den nye hoeyden.
+AVTRYKK_BAK_BILDET = "ae9fc7139441ad473386320e8b1faa959a54cdbd3a05c28e29fa16972fd174e3"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1332,7 +1336,9 @@ HOEYDE_PAA_AKSJESIDEN = 2192
 # nytt og er byte for byte det samme.
 # Gruppens svar 04.11 kl. 09:48: summen med styrken først, i aksje.html.
 # Bildet ble tatt paa nytt med samme hoeyde.
-AVTRYKK_BAK_AKSJESIDEN = "cd41a1f726382f4bc768f969b646784c8b9f637f73a236cd7ff21beb7b34560e"
+# Gruppens svar 04.11 kl. 09:58: lys og mørk søyle, i app.py, hjelpetekster.py
+# og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "88e6eaac9ddb2a421fbeef71c8f71478fa45c3f876fd944375c084be95589685"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1385,11 +1391,12 @@ class TestSkjermbildet:
         annen hoeyde enn HOEYDE_PAA_BILDET. Story 8.3: hoeyden er 1630 med
         knapperaden, og navnet paa testen staar, fordi kvalitetssikringen
         viser til det. Story 8.17a: 1690 med periodevalget. Story 8.2b, a:
-        1784 med de høyere søylene, 1772 med periodeknappene fra 8.2b, b, og 1838 med «Aksjene» fra 8.2b, d."""
+        1784 med de høyere søylene, 1772 med periodeknappene fra 8.2b, b, 1838 med «Aksjene» fra 8.2b, d, og
+        1864 med forklaringen av lys og mørk søyle (svaret 04.11 kl. 09:58)."""
         data = (ROT / SKJERMBILDET).read_bytes()
         assert data[:8] == b"\x89PNG\r\n\x1a\n"
         assert int.from_bytes(data[16:20], "big") == 1280
-        assert int.from_bytes(data[20:24], "big") == HOEYDE_PAA_BILDET == 1838
+        assert int.from_bytes(data[20:24], "big") == HOEYDE_PAA_BILDET == 1864
 
     def test_bildet_har_ingen_tekstfelt(self):
         """Regel 16 (gjennomgangen av 3.3e, BH8 og ECH10): ingen sti eller

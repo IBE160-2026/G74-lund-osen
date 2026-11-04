@@ -525,3 +525,59 @@ def test_bryteren_har_kant_med_hoey_kontrast():
     """ECH9. Ville feilet hvis sporet bare var bakgrunn, som forsvinner med
     høy kontrast."""
     assert "border: 1px solid CanvasText" in _regel(".ki-bryter .spor", _media("forced-colors: active"))
+
+
+# Gruppens svar 04.11 kl. 09:48, 09:58, 10:01 og 10:04.
+
+
+def _kontrast(a: str, b: str) -> float:
+    def lys(farge: str) -> float:
+        kanaler = [int(farge.lstrip("#")[i : i + 2], 16) / 255 for i in (0, 2, 4)]
+        kanaler = [k / 12.92 if k <= 0.03928 else ((k + 0.055) / 1.055) ** 2.4 for k in kanaler]
+        return 0.2126 * kanaler[0] + 0.7152 * kanaler[1] + 0.0722 * kanaler[2]
+
+    hoey, lav = sorted((lys(a), lys(b)), reverse=True)
+    return (hoey + 0.05) / (lav + 0.05)
+
+
+def test_soeylene_er_lyse_og_moerke(klient):
+    """Svaret kl. 09:58. Ville feilet hvis en søyle fra 2 % opp eller ned
+    ikke var mørk, en under var mørk, grensen ikke var den fra børsometeret,
+    eller forklaringen under søylene manglet."""
+    from boersometer import GRENSE_STERK
+    from tallformat import avrundet
+
+    figur = _figur(_html(klient, "/"))
+    klasser = re.findall(r'<span class="stolpe (opp|ned|null) (lys|sterk)" style=', figur)
+    endringer = re.findall(r"<li>[^<]*\): ([^<]+?%)[,.]", figur)
+    assert len(klasser) == len(endringer) >= 10
+    tall_ = [float(e.replace(" ", "").replace("%", "").replace(",", ".")) for e in endringer]
+    assert [k[1] for k in klasser] == ["sterk" if abs(avrundet(t, "endring")) >= GRENSE_STERK else "lys" for t in tall_]
+    assert {k[1] for k in klasser} == {"lys", "sterk"}
+    forklaring = re.search(r'<p class="soeylefarger" aria-hidden="true">(.*?)</p>', figur, flags=re.DOTALL).group(1)
+    ventet = "Lys søyle: under 2 % Mørk søyle: 2 % eller mer, opp eller ned"
+    assert _synlig(forklaring) == ventet, _synlig(forklaring)
+    assert figur.index('class="felt"') < figur.index('class="soeylefarger"')
+    assert "Lys søyle" not in re.sub(r'<p class="soeylefarger".*?</p>', "", figur, flags=re.DOTALL)
+
+
+@pytest.mark.parametrize(("endring", "ventet"), [(1.994, "lys"), (1.995, "sterk"), (-2.0, "sterk"), (-1.99, "lys")])
+def test_grensen_for_moerk_soeyle_er_tallet_slik_det_vises(endring, ventet):
+    """Svaret kl. 09:58, som fargetrinn i børsometeret. Ville feilet hvis
+    1,995 %, som vises som 2,00 %, var lys."""
+    assert app_modul.soeylestyrke(endring) == ventet
+
+
+def test_de_lyse_soeylene_kan_ses():
+    """Svaret kl. 09:58 og designregler §5 (kontrast). Søylene har ingen
+    tekst, så også de lyse har minst 3:1 mot kortet og bakgrunnen. Ville
+    feilet med de lyse trinnene fra børsometeret, som er om lag 1,4:1, eller
+    med lys lik mørk."""
+    rot = dict(re.findall(r"--([a-z0-9-]+):\s*(#[0-9a-fA-F]{6})", _regel(":root")))
+    for lys, moerk in (("soeyle-lys-opp", "opp"), ("soeyle-lys-ned", "ned")):
+        for bak in ("kort", "bakgrunn"):
+            assert _kontrast(rot[lys], rot[bak]) >= 3.0, (lys, bak)
+        assert _kontrast(rot[lys], rot["kort"]) < _kontrast(rot[moerk], rot["kort"]) - 1
+    assert "var(--soeyle-lys-opp)" in _regel(".soeyler .stolpe.opp")
+    assert "var(--opp)" in _regel(".soeyler .stolpe.opp.sterk")
+    assert "var(--ned)" in _regel(".soeyler .stolpe.ned.sterk")

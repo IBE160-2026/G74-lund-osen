@@ -41,6 +41,7 @@ import lagring_sqlite
 from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
 from boersdag import UtenforKalenderen, innevaerende_boersdag, norsk_dato
 from boersometer import (
+    GRENSE_STERK,
     bygg_boersometer,
     bygg_rute,
     dagen_foer,
@@ -202,6 +203,18 @@ app.jinja_env.filters["prikkede_tall"] = prikkede_tall
 app.jinja_env.filters["maanedsnavn"] = maanedsnavn
 # Story 8.15: retningen et klikk på en kolonne gir.
 app.jinja_env.globals["neste_orden"] = neste_orden
+
+
+def soeylestyrke(endring: float) -> str:
+    """«sterk» fra GRENSE_STERK opp eller ned, slik endringen vises, ellers
+    «lys». Gruppens svar 04.11 kl. 09:58: søylene under hovedindeksen er
+    mørke fra samme grense som børsometeret (designregler §5, rettet
+    04.11)."""
+    return "sterk" if abs(avrundet(endring, "endring")) >= GRENSE_STERK else "lys"
+
+
+app.jinja_env.filters["soeylestyrke"] = soeylestyrke
+app.jinja_env.globals["soeylegrense"] = tall(GRENSE_STERK, "grense")
 # Story 8.0d: «Oppdatert tirsdag 13.10 kl. 22.15» i stripa, i norsk tid.
 app.jinja_env.filters["oppdatert"] = lambda tid: oppdatert(tid, idag().year)
 

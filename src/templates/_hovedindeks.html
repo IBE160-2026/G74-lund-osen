@@ -65,7 +65,7 @@
               </div>
               <div class="felt" aria-hidden="true">
                 {%- for soeyle in sy.soeyler %}
-                <span class="spor"><span class="stolpe {{ fortegn(soeyle.endring) }}" style="{{ 'bottom' if soeyle.endring|avrundet('endring') >= 0 else 'top' }}: 50%; height: {{ '%.2f'|format(soeyle.hoeyde) }}%;"></span></span>
+                <span class="spor"><span class="stolpe {{ fortegn(soeyle.endring) }} {{ soeyle.endring|soeylestyrke }}" style="{{ 'bottom' if soeyle.endring|avrundet('endring') >= 0 else 'top' }}: 50%; height: {{ '%.2f'|format(soeyle.hoeyde) }}%;"></span></span>
                 {%- endfor %}
                 {%- if sy.linje is not none %}
                 <span class="indekslinje {{ fortegn(sy.indeks) }}" style="top: {{ '%.2f'|format(sy.linje) }}%;"></span>
@@ -80,6 +80,10 @@
               <li>{{ soeyle.navn }} ({{ soeyle.symbol }}{% if soeyle.bransje %}, {{ soeyle.bransje }}{% endif %}): {{ soeyle.endring|tall('endring') }}{% if soeyle.tre_av_tre %}, {{ antall_sjekker }} av {{ antall_sjekker }}{% endif %}.</li>
               {%- endfor %}
             </ol>
+            {#- Gruppens svar 04.11 kl. 09:58: lys og mørk søyle, mørk fra
+                samme grense som børsometeret. Skjult for skjermleseren, som
+                har tallene i lista over. #}
+            <p class="soeylefarger" aria-hidden="true"><span class="fargeprove opp lys"></span><span class="fargeprove ned lys"></span><span>Lys søyle: under {{ soeylegrense }}</span> <span class="fargeprove opp sterk"></span><span class="fargeprove ned sterk"></span><span>Mørk søyle: {{ soeylegrense }} eller mer, opp eller ned</span></p>
             {%- if sy.linje is not none %}
             <p class="skjult">Indeksen, den stiplede linja: {{ sy.indeks|tall('endring') }}.</p>
             {#- Story 8.2b, a (U22, U57): forklaringen står under søylene. Den

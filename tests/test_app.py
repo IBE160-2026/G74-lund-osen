@@ -2977,8 +2977,10 @@ def _soeylene(html: str) -> str:
 
 
 def _stolpene(figur: str) -> list[tuple[str, str]]:
-    """(fargeklassen, stilen) for hver stolpe, fra venstre."""
-    return re.findall(r'<span class="stolpe (\w+)" style="([^"]*)">', figur)
+    """(fargeklassen, stilen) for hver stolpe, fra venstre. Gruppens svar
+    04.11 kl. 09:58: stolpen har også «lys» eller «sterk», som
+    test_soeylene_er_lyse_og_moerke i test_funnene_8_2b.py prøver."""
+    return re.findall(r'<span class="stolpe (\w+) (?:lys|sterk)" style="([^"]*)">', figur)
 
 
 def _tickerne(figur: str) -> list[str]:
@@ -3043,8 +3045,11 @@ class TestSoeylenePaaForsiden:
         assert "margin-top: -1px" in _regel(stil, ".soeyler .indekslinje")
         # Gjennomgangen (VG3): fargene på søylene.
         assert "var(--dempet)" in _regel(stil, ".soeyler .stolpe")
-        assert "var(--opp)" in _regel(stil, ".soeyler .stolpe.opp")
-        assert "var(--ned)" in _regel(stil, ".soeyler .stolpe.ned")
+        # Gruppens svar 04.11 kl. 09:58: lys under 2 %, mørk fra 2 %.
+        assert "var(--soeyle-lys-opp)" in _regel(stil, ".soeyler .stolpe.opp")
+        assert "var(--soeyle-lys-ned)" in _regel(stil, ".soeyler .stolpe.ned")
+        assert "var(--opp)" in _regel(stil, ".soeyler .stolpe.opp.sterk")
+        assert "var(--ned)" in _regel(stil, ".soeyler .stolpe.ned.sterk")
         assert "var(--opp)" in _regel(stil, ".soeyler .indekslinje.opp")
         assert "var(--ned)" in _regel(stil, ".soeyler .indekslinje.ned")
 
@@ -3144,6 +3149,10 @@ class TestSoeylenePaaForsiden:
                 # Story 8.2b, a (U57): biten av linja i forklaringen under
                 # søylene, som brytes for seg.
                 assert [b.strip() for b in bredder] in ([], ["28px"]), velger
+            elif "fargeprove" in velger:
+                # Gruppens svar 04.11 kl. 09:58: biten av en lys og en mørk
+                # søyle i forklaringen, som brytes for seg som linjeprove.
+                assert [b.strip() for b in bredder] in ([], ["10px"]), velger
             else:
                 assert all(b.strip() == "0" for b in bredder), (velger, bredder)
             assert "nowrap" not in innhold, velger

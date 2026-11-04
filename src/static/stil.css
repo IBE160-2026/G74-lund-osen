@@ -52,6 +52,11 @@
   --trinn-noeytral: #E9E7E1;
   --trinn-lys-opp: #B4E2C4;
   --trinn-lys-ned: #F6C2BB;
+  /* Gruppens svar 04.11 kl. 09:58: de lyse søylene under hovedindeksen.
+     Lysere enn --opp og --ned, med minst 3:1 mot kortet og bakgrunnen
+     (designregler §5, kontrast), fordi søylene ikke har tekst. */
+  --soeyle-lys-opp: #4E946D;
+  --soeyle-lys-ned: #CE7069;
   --lys-oransje: #F8DE9C;
   --fyll: #16181D;
   --baand-ut: #FFF6DC;
@@ -351,8 +356,11 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
                  background: linear-gradient(var(--strek-2), var(--strek-2)) 0 50% / 100% 1px no-repeat; }
 :where(.side-oversikt) .soeyler .spor { flex: 1 1 0; min-width: 0; position: relative; }
 :where(.side-oversikt) .soeyler .stolpe { position: absolute; left: 15%; right: 15%; border-radius: 2px; background: var(--dempet); }
-:where(.side-oversikt) .soeyler .stolpe.opp { background: var(--opp); }
-:where(.side-oversikt) .soeyler .stolpe.ned { background: var(--ned); }
+/* Gruppens svar 04.11 kl. 09:58: lys under grensen, mørk fra den. */
+:where(.side-oversikt) .soeyler .stolpe.opp { background: var(--soeyle-lys-opp); }
+:where(.side-oversikt) .soeyler .stolpe.ned { background: var(--soeyle-lys-ned); }
+:where(.side-oversikt) .soeyler .stolpe.opp.sterk { background: var(--opp); }
+:where(.side-oversikt) .soeyler .stolpe.ned.sterk { background: var(--ned); }
 :where(.side-oversikt) .soeyler .indekslinje { position: absolute; left: 0; right: 0; margin-top: -1px;
                         border-top: 3px dashed var(--dempet); }
 :where(.side-oversikt) .soeyler .indekslinje.opp { border-top-color: var(--opp); }
@@ -367,6 +375,14 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) .soeyler .linjeprove.ned { border-top-color: var(--ned); }
 :where(.side-oversikt) .soeyler .linjeforklaring .opp { color: var(--opp); font-weight: 600; }
 :where(.side-oversikt) .soeyler .linjeforklaring .ned { color: var(--ned); font-weight: 600; }
+:where(.side-oversikt) .soeyler .soeylefarger { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem;
+                         font-size: 14px; color: var(--dempet); margin: 0.5rem 0 0; }
+:where(.side-oversikt) .soeyler .fargeprove { display: inline-block; width: 10px; height: 14px; border-radius: 2px; }
+:where(.side-oversikt) .soeyler .fargeprove.opp { background: var(--soeyle-lys-opp); }
+:where(.side-oversikt) .soeyler .fargeprove.ned { background: var(--soeyle-lys-ned); }
+:where(.side-oversikt) .soeyler .fargeprove.opp.sterk { background: var(--opp); }
+:where(.side-oversikt) .soeyler .fargeprove.ned.sterk { background: var(--ned); }
+:where(.side-oversikt) .soeyler .fargeprove.ned + span { margin-right: 0.5rem; }
 
 /* Tabellen i et kort med svart topp. Boksen ruller sidelengs på smal
    skjerm, så siden ikke gjør det (avvik 8). position: relative holder

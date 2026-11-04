@@ -137,6 +137,11 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
     """Alle hjelpetekstene, med tallene fra p. Teksten om maalingen bruker
     MAALTE_GRENSER, fordi den sier hva som ble maalt."""
     sone = _vis(p.noytralsone * 100, "grense")
+    # Gruppens svar 04.11 kl. 09:58. Her, fordi boersometer.py importerer
+    # denne modulen.
+    from boersometer import GRENSE_STERK
+
+    soeylegrense = _vis(GRENSE_STERK, "grense")
     faktor = _vis(p.volumfaktor, "faktor")
     ma = _vis(p.ma_vindu, "heltall")
     volatilitet = _vis(p.volatilitet_vindu, "heltall")
@@ -212,8 +217,10 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         "soeylene": Hjelpetekst(
             "Søylene:",
             "endringen for hver aksje, fra størst fall til venstre til størst stigning "
+            # Gruppens svar 04.11 kl. 09:58: lys og mørk, som i børsometeret.
+            f"til høyre, mørk fra {soeylegrense} opp eller ned, som i børsometeret, og lys under. "
             # Gjennomgangen av 8.2b (VG2): grå ved 0,00 % står igjen.
-            "til høyre. Den stiplede linja er indeksen, grønn når den steg, rød når den falt "
+            "Den stiplede linja er indeksen, grønn når den steg, rød når den falt "
             "og grå ved 0,00 %. "
             # Story 8.2a, c (U20): symbolet over søyla er en lenke.
             "Et gult bransjesymbol betyr 3 av 3 siste børsdag, og et klikk på symbolet viser aksjen.",
@@ -223,6 +230,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (PRD, "Indeksens endring er en stiplet linje, grønn når indeksen steg og rød når den"),
                 (HOVEDINDEKS, "def bygg_soeyler("),
                 (HOVEDINDEKS_MAL, 'class="indekslinje'),
+                (APP, "def soeylestyrke("),
+                (BOERSOMETER, "GRENSE_STERK = "),
             ),
         ),
         "sluttkurs": Hjelpetekst(
