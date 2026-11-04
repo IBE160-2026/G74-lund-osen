@@ -3157,6 +3157,39 @@ Det vi lærte: steg-vakta og sluttlinja stopper en avkortet blokk før den gjør
 
 ---
 
+## 04.11.2026 – 8.2b bygget i natt og flettet, styrken rettet i kveld, og brukslogga startet
+
+*Joakim og Marian.*
+
+8.2b ble bygget natt til 4.11 etter instruksjonen 03.11 kl. 22:44, i PR #109 som utkast, fra spesifikasjonen i `135b02a` til rettingene etter gjennomgangen i `c77764e`. Av de 29 funnene fra UX-loggen ble 23 bygget, og PR-en stoppet før flettingen med 8 spørsmål: 6 fra byggingen og 2 fra gjennomgangen. Utført-linja kom kl. 01:34.
+
+Om morgenen så vi på demoen selv, og tok skjermbilder kl. 10:00 av børsometeret og sjekkortene på en aksjeside. Vi svarte kl. 09:48, 09:58, 10:01 og 10:04, og svarene ble ført under story 8.2 i `epics.md` (`29d310fc`). Det vi så kl. 10:00, er grunnlaget for svarene kl. 10:01 og 10:04 om skriften, rammen rundt bransjene, styrken i rutene og «?» foran periodeknappene. PR #109 ble squash-flettet kl. 11:32 i `6f62f564`.
+
+Bildet av børsometeret etter flettingen viste at styrken bare sto i 7 av de 13 rutene med styrke ved 1280 px, se utfordring 2. Vi svarte kl. 19:21 (`e4d050d9`): styrken får sin egen, lavere grense, «?» står midt på periodeknappene, og aksjesiden får ingen egen «?» for periodene. Rettingen ble bygget i PR #110 med `STYRKE = (81, 75)` i `src/boersometer.py` og squash-flettet kl. 20:28 i `e45d04a9`. CI var grønn på head-en (41896308524) og på flettecommiten (41897285705). Kl. 20:53 og 20:56 svarte vi på ECH1, som var flettet åpent, og på ruter uten styrke. Begge bygges 5.11 (`61e74ed4`), se utfordring 3.
+
+Brukslogga startet i dag, slik vi avgjorde 02.11 kl. 22:15. Den første linja i `docs/brukslogg.md` er bruken kl. 10:00, med seks feil som alle ble rettet samme dag i PR #109 og #110 (`835fb4eb`).
+
+**Utfordringer**
+
+1. **Natt-blokka sa stopp, men to tester feilet av egne, uferdige endringer.**
+   *Problem:* instruksjonen 03.11 kl. 22:44 sa at feiler noe annet enn de 7 porttestene for `start.ps1`, skal alt stoppe. Natt til 4.11 feilet `tests/test_utseende.py` før a (`574d638`), og `tests/test_boersometer.py` før `c77764e`. Begge feilet fordi Claude Codes egne endringer ikke var ferdige.
+   *Løsning:* Claude Code rettet testene, kjørte hele settet på nytt og stoppet ikke, og skrev det i Utført-linja. Kl. 09:48 gjorde vi det til regel: feiler en test fordi endringene ikke er ferdige, rettes den, og hele settet kjøres på nytt før commit. Feiler noe annet, stopper alt.
+   *KI sin rolle:* Claude Code tolket blokka og fortsatte uten at den sa det. Det var gruppen som avgjorde at tolkningen skulle bli regel.
+
+2. **«Der ruta har plass» ble bygget som plass til alt.**
+   *Problem:* svaret kl. 10:01 og 10:04 sa at styrken står i alle rutene «der ruta har plass». Det ble bygget som nivå 3, som har plass til styrken, merket og grunnen, så styrken manglet i omtrent halvparten av rutene. Testene og gjennomgangen sjekket det som var bygget, og fant det ikke. At formuleringen kom fra rådet i chatten, og at rådet så feilen i bildet etter flettingen, står bare i instruksjonen kl. 20:58.
+   *Løsning:* svaret kl. 19:21 sa hva plass er: én linje til under symbolet og endringen. Grensen er regnet for 14 px med ringen og rammen, og målt i Edge ved ti bredder.
+   *KI sin rolle:* rådet foreslo formuleringen. Claude Code bygget den som plass til alt. Rådet så feilen i bildet, og gruppen avgjorde rettingen.
+
+3. **PR #110 ble flettet med ECH1 åpent.**
+   *Problem:* instruksjonen kl. 19:39 sa «ingen åpne funn på medium eller over». Edge Case Hunter fant ECH1, på middels: en annen dag kan en rute på nivå 2 vise gul ramme og styrken for dagen uten merket «3 av 3 siste børsdag». Claude Code regnet det som en følge av svaret kl. 19:21, som sa at merket står som før på nivå 3. Funnet ble ført som spørsmål og flettet åpent.
+   *Løsning:* vi svarte kl. 20:53 og 20:56: en annen dag står styrken i en rute med gul ramme bare når merket også får plass, og ruter uten styrke viser «ikke vurdert» og grunnen. Begge bygges 5.11.
+   *KI sin rolle:* rådet foreslo svaret kl. 19:21 uten å se følgen. Claude Code fant følgen i gjennomgangen, men avgjorde selv at den ikke var et åpent funn. Det burde vært et stopp. Gruppen avgjorde svaret.
+
+Det vi lærte: å se på appen selv fant det testene og gjennomgangene ikke fant. En avgjørelse som sier «der det er plass», må si hva plass er. Og regelen kl. 09:48 sparte to stopp i dag: én under byggingen 4.11, da en test i `tests/test_app.py` feilet før `d0f03d35`, og én i rettingen, da tre tester i `tests/test_docker.py` feilet før `3f02b59c`.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
