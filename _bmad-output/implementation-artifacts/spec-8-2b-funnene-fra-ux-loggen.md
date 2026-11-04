@@ -181,3 +181,46 @@ Etter hele settet på `f212cfd3`, med Blind Hunter, Edge Case Hunter og Verifica
 - BH5, ECH4, VG2 (lav): lys og mørk søyle har om lag 1,7:1 og 1,9:1 mellom seg. Lengden viser størrelsen, tallene står i lista for skjermleseren, og forklaringen under søylene har ordene. Svaret kl. 09:58 bestemmer bare at de er lyse og mørke.
 - VG3 (lav): rammen rundt bransjen er pynt, over.
 - VG4 (lav): aksjesiden har ingen «?» for periodene, over.
+
+## Rettet 04.11 kl. 19:21
+
+Gruppens svar 04.11 kl. 19:21, ført under story 8.2 i `epics.md` (`e4d050d9`), bygget på grenen `8-2b-retting-styrken-og-sporsmaal`.
+
+**1) Styrken i flere ruter (`3f02b59c`).** `STYRKE = (81, 75)` i `boersometer.py`: plass til én linje til under symbolet og endringen. På nivå 2 får ruta klassen `styrke-N` når den har plass, og `stil.css` skjuler styrken på nivå 2 bare uten den klassen. Merket for en annen dag og teksten står fortsatt bare på nivå 3. Grensen er regnet for 14 px med ringen og den gule rammen: høyden 2 × 4 + 2 × 4 + 2 × 16,8 + 22,4 (ringen) + 2 × 1 = 74,0, og bredden 2 × 4 + 2 × 6 + 2 × 2 + 2 × 7,2 + teksten. I Edge er «3 av 3» 38,78 px (0,46 em per tegn) og ringen 57,16 × 22,39 px; testen regner teksten med 0,5 em per tegn, og det gir 80,4. TROY i demoen er 86 × 191 px ved 1280 px og viser nå «2 av 3».
+
+**2) «?» midt på periodeknappene (`3918f77d`).** `margin-top: -4px` på «?» i `.periodehode`, så midten av sirkelen er 18 px ned, midt på en knapp på 36 px. Periodevalget har `flex: 1 1 0; min-width: 0`, så det krymper og bryter knappene inne i seg og står ved siden av «?» også ved 390 px. Før sto «?» 7 px for høyt, og ved 390 px brøt hele periodevalget til linja under «?».
+
+**3)** Aksjesiden er ikke endret. En test sjekker at den ikke har noen egen «?» for periodene, og at «?» står ved «Kursutvikling».
+
+**Målt i Edge.** Headless Edge låser vinduet til minst 504 px innvendig og trekker 30 px for rammen. Den første målerunden var derfor ved feil bredder og telles ikke. Målingene som gjelder, er gjort i en iframe med nøyaktig bredde, mot demobasen i en midlertidig mappe:
+- Børsometeret ved 1280, 1100, 1079, 900, 761, 760, 600, 390, 360 og 320 px, for siste børsdag, en annen dag (01.10) og 1 uke: ingen synlig tekst utenfor ruta og ingen vannrett rulling i noen av de 30.
+- «?» på oversikten, i Min liste og i børsometeret ved de samme ti breddene: midten av «?» og midten av den første knappen er like (avvik 0,0 px), og det er ingen vannrett rulling.
+
+**Bildene.** `docs/appen/oversikten-demo.png` er tatt på nytt, fordi «?» synes i det. «Øvrige aksjer» begynner på 1863,9 px før og etter, så høyden 1864 står. Bildet av aksjesiden er byte for byte det samme, og bare avtrykkene er endret. Hjelpen (`docs/hjelp.md` og `hjelpetekster.py`) sier allerede «styrken står i rutene som har plass», så den er ikke endret.
+
+**Mutantene**, én om gangen med `-x`, med kopi før og sha256 mot HEAD etter (med LF, som i blobben):
+- S1: `styrkeplass` gir alltid False. Fanget av `test_styrkeplass`.
+- S2: `margin-top: 0px` på «?». Fanget av `test_spoersmaalstegnet_staar_midt_paa_den_foerste_knappen`.
+
+### Gjennomgangen av rettingen 04.11
+
+Blind Hunter, Edge Case Hunter og Verification Gap på `main..3918f77d`. Ingen funn på høy.
+
+**Rettet i commiten etter gjennomgangen:**
+- VG1 (middels): testen for nivåene på siden sjekker også `styrke-N` for alle fire klassene.
+- VG2 (middels): ingen annen regel for `.periodehode`, heller ikke i en `@media`-blokk.
+- VG3 (middels): en test for svar 3, aksjesiden.
+- VG4 (middels): testen for grensen krever at styrken har samme skrift som ruta.
+- ECH5 (lav): `styrke-N` settes bare på ruter med styrke, med en test.
+
+**Står, med grunnen:**
+- ECH1 (middels): en annen dag kan en rute på nivå 2 vise gul ramme og styrken for dagen, uten merket «3 av 3 siste børsdag». Det er svaret kl. 19:21: merket står som før, på nivå 3. «Hva fargene betyr» forklarer den gule rammen. Står som åpent punkt for gruppen.
+- BH1, VG7 (middels og lav): testen for `styrke-N` i kartet bruker `styrkeplass`. Grensen selv er låst av `test_styrkeplass` (S1 ble fanget der) og av TROY.
+- BH2 (middels): bredden for symbolet og endringen er dekket av nivå 2 (minst 80 px), som er et vilkår for `styrke-N`.
+- BH3, ECH2, ECH3, VG8 (lav): grensen har 1 px og 0,6 px å gå på mot utregningen, og om lag 4 px i bredden mot målingen i Edge. Målt uten noe utenfor ruta ved alle ti breddene.
+- BH4, ECH6, VG5 (lav): «?» forutsetter at den første knappen er 36 px. Målt i Edge på de tre sidene.
+- BH5 (lav): klikkflaten på 44 px går 4 px opp. Den lå allerede 11 px utenfor (8.0d).
+- BH6, ECH7 (lav): periodevalget fyller resten av raden. Målt ved 320 px uten vannrett rulling; zoom 200 % er ikke målt.
+- BH7, BH9, VG6, VG9 (lav): testene leser velgerne slik de står; to av dem er strammet inn over (VG1, VG2).
+- BH8 (lav): TROY-testen bygger på demoen, som instruksjonen ber om.
+- ECH4 (lav): en overskrift på to linjer gjaldt før også; overskriften har én linje (`test_overskriften_har_plass_til_linja`).
