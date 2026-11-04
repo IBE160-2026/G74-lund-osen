@@ -71,3 +71,5 @@
 - [ ] 2026-11-04 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — avgjørelse 1 fra 03.11 kl. 20:48 (`exit 0` i «Start demoen på Windows» i `tester.yml`) er ført, men ikke bygget
 - [x] 2026-11-04 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — aksjesiden har ingen «?» for periodene; gruppen kan be om en (svaret kl. 10:04) (besvart 2026-11-04: svaret kl. 19:21, 3: ingen egen «?», fordi «?» ved «Kursutvikling» forklarer både grafen og periodene, ført under story 8.2 i epics.md)
 - [ ] 2026-11-04 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — 8-2 står som in-progress til funnene fra brukertesten i 8.1 er brukt
+- [ ] 2026-11-04 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — ECH1: en annen dag kan en rute på nivå 2 vise gul ramme uten merket «3 av 3 siste børsdag» (merket står på nivå 3 etter svaret kl. 19:21); gruppen avgjør om merket får egen grense
+- [ ] 2026-11-04 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — periodevalget er ikke målt ved zoom 200 % og 320 px (BH6, ECH7)
