@@ -35,7 +35,8 @@
     {#- Story 8.17b: periodevalget fra 8.16, som i oversikten og Min liste
         (designregler §2), i stedet for skjemaet for «Velg dag» fra 8.6. En
         dag uten kurs gir fortsatt børsdagen før. #}
-    <div class="periodehode">{{ periodevalg(knapper, valg.periode, "/boersometer", valg.dag, foerste, siste, "Periode for børsometeret") }} {{ hjelpeknapp("hjelp-perioden", "Hjelp: periodene") }}</div>
+    {#- Gruppens svar 04.11 kl. 10:04: «?» for periodene står først i raden, foran knappene. #}
+    <div class="periodehode">{{ hjelpeknapp("hjelp-perioden", "Hjelp: periodene") }} {{ periodevalg(knapper, valg.periode, "/boersometer", valg.dag, foerste, siste, "Periode for børsometeret") }}</div>
     {% if valg.beskjed %}<p class="periodebeskjed" role="status">{{ valg.beskjed }}</p>{% endif %}
     {% if ugyldig %}<p class="forklaring">Datoen kunne ikke leses, så siden viser siste børsdag.</p>{% endif %}
     {% if foer_foerste %}<p class="forklaring">{{ valgt|dato }} er før første kurs, så siden viser første børsdag med kurs, {{ dagen|dato }}.</p>

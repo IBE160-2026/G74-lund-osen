@@ -147,7 +147,8 @@
         hver rad er dagen man sammenligner med. #}
     {% if valg and vist_tabell %}
       <h2 class="sammenlign-tittel" id="sammenlign-med">Sammenlign med</h2>
-      <div class="periodehode">{{ periodevalg(knapper, valg.periode, sidesti, valg.dag, foerste_valgbare, siste_dag, "Sammenlign med", ekstra=[("vis", "alle")] if alle else []) }} {{ hjelpeknapp("hjelp-sammenlign", "Hjelp: sammenlign med") }}</div>
+      {#- Gruppens svar 04.11 kl. 10:04: «?» for periodene står først i raden, foran knappene. #}
+      <div class="periodehode">{{ hjelpeknapp("hjelp-sammenlign", "Hjelp: sammenlign med") }} {{ periodevalg(knapper, valg.periode, sidesti, valg.dag, foerste_valgbare, siste_dag, "Sammenlign med", ekstra=[("vis", "alle")] if alle else []) }}</div>
       {% if valg.beskjed %}<p class="periodebeskjed" role="status">{{ valg.beskjed }}</p>{% endif %}
       {% if valg.periode == "velg" %}
         <p class="periodelinje">Øverst i hver rad står siste børsdag, {{ siste_dag|ukedag }} {{ siste_dag|dato }}. Linja under er {{ valg.dag|ukedag }} {{ valg.dag|dato }}: sluttkursen den dagen, endringen derfra til siste børsdag og signalet som er lagret for dagen.</p>
@@ -212,7 +213,8 @@
         siste børsdag valgt når siden åpnes (designregler §2). Linja under
         sier hva tallene gjelder (gruppens svar 23.10 kl. 12:35, a). #}
     {% if valg %}
-      <div class="periodehode">{{ periodevalg(knapper, valg.periode, sidesti, valg.dag, foerste_valgbare, siste_dag, "Periode for oversikten") }} {{ hjelpeknapp("hjelp-perioden", "Hjelp: periodene") }}</div>
+      {#- Gruppens svar 04.11 kl. 10:04: «?» for periodene står først i raden, foran knappene. #}
+      <div class="periodehode">{{ hjelpeknapp("hjelp-perioden", "Hjelp: periodene") }} {{ periodevalg(knapper, valg.periode, sidesti, valg.dag, foerste_valgbare, siste_dag, "Periode for oversikten") }}</div>
       {% if valg.beskjed %}<p class="periodebeskjed" role="status">{{ valg.beskjed }}</p>{% endif %}
       {% if valg.periode == "velg" %}
         <p class="periodelinje">Tabellen viser {{ valg.dag|ukedag }} {{ valg.dag|dato }}: sluttkursen, endringen den dagen og signalet som er lagret for dagen. En oransje strek og «{{ antall_sjekker }} av {{ antall_sjekker }} siste børsdag» viser aksjene som fikk {{ antall_sjekker }} av {{ antall_sjekker }} siste børsdag.</p>

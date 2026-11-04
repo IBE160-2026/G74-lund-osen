@@ -638,3 +638,15 @@ def test_skriften_og_rammen_i_boersometeret():
     assert "box-shadow: inset 0 0 0 1px var(--strek-2)" in re.search(
         r"\.kart section\.bransje \{([^}]*)\}", STIL
     ).group(1)
+
+
+@pytest.mark.parametrize(
+    ("sti", "vindu"),
+    [("/", "hjelp-perioden"), ("/min-liste", "hjelp-sammenlign"), ("/boersometer", "hjelp-perioden")],
+)
+def test_spoersmaalstegnet_for_periodene_staar_foerst(klient, sti, vindu):
+    """Svaret kl. 10:04. Ville feilet med «?» etter knappene, som før, eller
+    uten «?» i raden."""
+    rad = _html(klient, sti).split('<div class="periodehode">', 1)[1].split("</nav>", 1)[0]
+    assert rad.lstrip().startswith(f'<button type="button" class="hjelpeknapp" popovertarget="{vindu}"'), rad[:120]
+    assert rad.index(f'popovertarget="{vindu}"') < rad.index("<nav")

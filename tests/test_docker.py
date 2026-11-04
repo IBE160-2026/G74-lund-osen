@@ -1096,7 +1096,9 @@ HOEYDE_PAA_BILDET = 1864
 # _hovedindeks.html og stil.css. Bildet ble tatt paa nytt med den nye hoeyden.
 # Gruppens svar 04.11 kl. 10:01 og 10:04: børsometeret, i hjelpetekster.py og
 # stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "376bcefef86e9aa90626465beafce6ad1baae69a6c49692bbf9fd84cfabfb3bb"
+# Gruppens svar 04.11 kl. 10:04: «?» først i periodevalget, i index.html.
+# Bildet ble tatt paa nytt med samme hoeyde.
+AVTRYKK_BAK_BILDET = "48706969fff0e27f4304f233ceae5f88ff43568e366cf3602f0e6d6e0aa0d70e"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
