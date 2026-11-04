@@ -8,6 +8,10 @@
     aria-current. aktiv kommer fra ruta, og aksjesiden og feilsiden har
     ingen, så ingen knapp er fylt der.
 
+    Story 8.2b, b (U2): på aksjesiden (aktiv er "aksje") har
+    «Markedsoversikt» kant, ikke fyll, og aria-current="true", fordi siden
+    hører til den delen uten å være den.
+
     Story 2.7a: all stilen står i src/static/stil.css, med fargene som navn
     der og ingen andre steder. Adressen har et avtrykk av fila (stilark fra
     app.py), så nettleseren aldri bruker en gammel utgave.
@@ -40,7 +44,7 @@
       </p>
     </div>
     <nav class="rad sider" aria-label="Sidene">
-      <a class="sideknapp" href="/"{% if aktiv == "oversikt" %} aria-current="page"{% endif %}>Markedsoversikt</a>
+      <a class="sideknapp" href="/"{% if aktiv == "oversikt" %} aria-current="page"{% elif aktiv == "aksje" %} aria-current="true"{% endif %}>Markedsoversikt</a>
       {#- Story 8.6: børsometeret mellom de to, som på tavla. #}
       <a class="sideknapp" href="/boersometer"{% if aktiv == "boersometer" %} aria-current="page"{% endif %}>Børsometer</a>
       <a class="sideknapp" href="/min-liste"{% if aktiv == "min_liste" %} aria-current="page"{% endif %}>Min liste</a>

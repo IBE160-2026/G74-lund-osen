@@ -27,6 +27,8 @@ import unicodedata
 from collections.abc import Mapping
 from dataclasses import dataclass
 
+from markupsafe import Markup, escape
+
 from kilogg import KIRad
 from vurderingsdata import Vurdering
 
@@ -52,6 +54,9 @@ MODELLEN_FEILET = "modellen_feilet"
 BESTO_IKKE = "besto_ikke"
 STEMMER_IKKE = "stemmer_ikke"
 STOPPET_AV_VAKTEN = "stoppet_av_vakten"
+# Story 8.2b, b (U6): demoen har KI-tekst bare for siste boersdag, saa grunnen
+# i INGEN_RAD stemmer ikke der.
+INGEN_I_DEMOEN = "ingen_i_demoen"
 
 GRUNNER = {
     # Svar kl. 23:57 15.10: siden sier hvorfor med det loggen kan vise. Den
@@ -63,6 +68,7 @@ GRUNNER = {
     BESTO_IKKE: "Ingen KI-tekst for denne dagen: teksten sa mer enn regelen, og ble ikke vist.",
     STEMMER_IKKE: "Ingen KI-tekst for denne dagen: vurderingen er skrevet på nytt etter at teksten ble laget.",
     STOPPET_AV_VAKTEN: "Ingen KI-tekst for denne dagen: teksten ble stoppet, fordi den kunne leses som et råd.",
+    INGEN_I_DEMOEN: "Ingen KI-tekst for denne dagen: demoen har KI-tekst bare for siste børsdag.",
 }
 
 
@@ -111,6 +117,30 @@ def bygg_ki_visning(rad: KIRad | None, vurdering: object, *, andre_har_rader: bo
     if _VAKT.search(tekst):
         return KIVisning(STOPPET_AV_VAKTEN)
     return KIVisning(VIST, tekst=rad.tekst, modell=f"{rad.modell}, {rad.tjeneste}")
+
+
+# Story 8.2b, c (U67): et tall i teksten, delt som kontrollen deler det
+# (_SIFFER i ki_kontroll.py), saa tallet som er markert, er det som er proevd
+# mot grunnlaget (designregler §4). En tekst som vises, har bare hele tall fra
+# grunnlaget, uten prosent (FR-603, punkt 2). Gjennomgangen av 8.2b (BH4,
+# ECH4, VG5): ikke fortegn, prosent eller tusenskille, som kontrollen.
+_TALL = re.compile(r"\d+(?:[.,]\d+)?")
+
+
+def prikkede_tall(tekst: str) -> Markup:
+    """Teksten med hvert tall i <span class="tall">, som siden gir prikket
+    strek i tekstfargen (designregler §4). Teksten er alt proevd mot
+    grunnlaget (FR-603), og ingenting i den endres: delene escapes hver for
+    seg, saa et tegn som & aldri blir en del av et tall."""
+    # Gjennomgangen av 8.2b (VG5): samme deling som kontrollen.
+    deler = []
+    forrige = 0
+    for treff in _TALL.finditer(tekst):
+        deler.append(escape(tekst[forrige : treff.start()]))
+        deler.append(Markup('<span class="tall">') + escape(treff.group()) + Markup("</span>"))
+        forrige = treff.end()
+    deler.append(escape(tekst[forrige:]))
+    return Markup("").join(deler)
 
 
 def ki_paa(kapsel: str | None) -> bool:

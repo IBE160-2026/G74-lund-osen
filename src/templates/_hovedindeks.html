@@ -47,7 +47,8 @@
         {% if sy %}
           {%- macro fortegn(verdi) %}{% set vist = verdi|avrundet('endring') %}{{ 'opp' if vist > 0 else 'ned' if vist < 0 else 'null' }}{% endmacro %}
           <figure class="soeyler">
-            <figcaption class="soeyletittel">{% if sy.start %}Endring per aksje {{ periodenavn }}, fra {{ sy.start|dato }} til {{ sy.dag|dato }}{% elif sy.dag != (siste_dag or dato) %}Endring per aksje {{ sy.dag|dato }}{% else %}Dagens endring per aksje{% endif %}{% if sy.linje is not none %}, med indeksen som stiplet linje{% endif %}</figcaption>
+            {#- Story 8.2b, a (U26): søylene har sitt eget «?», ved overskriften. #}
+            <figcaption class="soeyletittel">{% if sy.start %}Endring per aksje {{ periodenavn }}, fra {{ sy.start|dato }} til {{ sy.dag|dato }}{% elif sy.dag != (siste_dag or dato) %}Endring per aksje {{ sy.dag|dato }}{% else %}Dagens endring per aksje{% endif %}{% if sy.linje is not none %}, med indeksen som stiplet linje{% endif %}{% if sy.soeyler %} {{ hjelpeknapp("hjelp-soeylene", "Hjelp: søylene") }}{% endif %}</figcaption>
             {#- Gruppens svar 30.10 kl. 10:45 (VG5): søylene og linja følger
                 tabellens dag, og mangler indeksen kurs den dagen, står det her. #}
             {% if sy.indeks_mangler %}<p class="forklaring">Indeksen har ingen kurs {{ sy.dag|dato }}, så det er ingen stiplet linje.</p>{% endif %}
@@ -64,7 +65,7 @@
               </div>
               <div class="felt" aria-hidden="true">
                 {%- for soeyle in sy.soeyler %}
-                <span class="spor"><span class="stolpe {{ fortegn(soeyle.endring) }}" style="{{ 'bottom' if soeyle.endring|avrundet('endring') >= 0 else 'top' }}: 50%; height: {{ '%.2f'|format(soeyle.hoeyde) }}%;"></span></span>
+                <span class="spor"><span class="stolpe {{ fortegn(soeyle.endring) }} {{ soeyle.endring|soeylestyrke }}" style="{{ 'bottom' if soeyle.endring|avrundet('endring') >= 0 else 'top' }}: 50%; height: {{ '%.2f'|format(soeyle.hoeyde) }}%;"></span></span>
                 {%- endfor %}
                 {%- if sy.linje is not none %}
                 <span class="indekslinje {{ fortegn(sy.indeks) }}" style="top: {{ '%.2f'|format(sy.linje) }}%;"></span>
@@ -79,8 +80,15 @@
               <li>{{ soeyle.navn }} ({{ soeyle.symbol }}{% if soeyle.bransje %}, {{ soeyle.bransje }}{% endif %}): {{ soeyle.endring|tall('endring') }}{% if soeyle.tre_av_tre %}, {{ antall_sjekker }} av {{ antall_sjekker }}{% endif %}.</li>
               {%- endfor %}
             </ol>
+            {#- Gruppens svar 04.11 kl. 09:58: lys og mørk søyle, mørk fra
+                samme grense som børsometeret. Skjult for skjermleseren, som
+                har tallene i lista over. #}
+            <p class="soeylefarger" aria-hidden="true"><span class="fargeprove opp lys"></span><span class="fargeprove ned lys"></span><span>Lys søyle: under {{ soeylegrense }}, opp eller ned</span> <span class="fargeprove opp sterk"></span><span class="fargeprove ned sterk"></span><span>Mørk søyle: {{ soeylegrense }} eller mer, opp eller ned</span></p>
             {%- if sy.linje is not none %}
             <p class="skjult">Indeksen, den stiplede linja: {{ sy.indeks|tall('endring') }}.</p>
+            {#- Story 8.2b, a (U22, U57): forklaringen står under søylene. Den
+                er skjult for skjermleseren, som har linja over. #}
+            <p class="linjeforklaring" aria-hidden="true"><span class="linjeprove {{ fortegn(sy.indeks) }}"></span><span>Stiplet linje: hovedindeksen</span> <span class="{{ fortegn(sy.indeks) }}">{{ sy.indeks|tall('endring') }}</span></p>
             {%- endif %}
             {% if sy.linje is none and not sy.indeks_mangler %}<p class="forklaring">Ingen stiplet linje: indeksen har ingen endring for {{ 'perioden' if sy.start else 'dagen' }}.</p>{% endif %}
             {% if sy.kortere %}<p class="uten-endring">Regnet fra første dag serien har, fordi den ikke går tilbake til {{ sy.start|dato }}: {{ sy.kortere|med_og }}.</p>{% endif %}

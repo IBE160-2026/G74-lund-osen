@@ -152,12 +152,13 @@ class TestTekstenSierDetKodenGjoer:
     def test_endringen_sier_hvor_datoene_staar(self):
         """Svar 32 i 8.0d (rettet kl. 13:05): én tekst for oversikten og
         aksjesiden, som sier det samme som endringskortet etter svar 29.
-        Ville feilet med «fra børsdagen før»."""
+        Ville feilet med «fra børsdagen før». Story 8.2b, b (U31): kortet har
+        alltid datoene."""
         tekst = hjelpetekster()["endring"]
         assert (tekst.tittel, tekst.tekst) == (
             "Endring:",
             "endringen i prosent fra forrige dag med kurs, regnet på utbyttejustert kurs. "
-            "Mangler kilden kurser for noen børsdager, står datoene ved endringen på aksjesiden.",
+            "På aksjesiden står de to dagene ved endringen, med ukedag og dato.",
         )
 
 
@@ -368,11 +369,18 @@ class TestSidene:
         assert re.search(r"<h2>Hvorfor signalet ble [^<]* " + knapp.format("hjelp-sjekkene"), detalj)
         assert "Tallene og signalet" not in oversikt + detalj
         # Story 8.0d, PR 3: «?» ved «Oppdatert» i stripa også på aksjesiden,
-        # og hvert vindu har én knapp.
+        # og hvert vindu har én knapp. Rettet 04.11 (gruppens svar kl. 09:58):
+        # vinduene for Ga og Målt mot har én knapp i hvert sjekkort, under.
         stripa = detalj.split('<header class="stripe">', 1)[1].split("</header>", 1)[0]
         assert re.search(r"Oppdatert [^<]+</span>\s*" + knapp.format("hjelp-hentet"), stripa)
+        # Gruppens svar 04.11 kl. 09:58: «?» ved «Ga» og «Målt mot» i alle
+        # tre sjekkortene, som punkt 22 i 8.0d. Her sto én knapp per vindu,
+        # i det første kortet. Ville feilet med knappen bare i det første.
+        kortene = re.findall(r'<section class="sjekkort[^"]*"[^>]*>(.*?)</section>', detalj, flags=re.DOTALL)
+        assert len(kortene) == 3
         for vindu in ("hjelp-ga", "hjelp-maalt"):
-            assert detalj.count(f'class="hjelpeknapp" popovertarget="{vindu}"') == 1, vindu
+            assert detalj.count(f'class="hjelpeknapp" popovertarget="{vindu}"') == 3, vindu
+            assert all(f'popovertarget="{vindu}"' in kort for kort in kortene), vindu
 
     def test_hvert_vindu_har_bare_sine_tekster(self, klient, base):
         """Den nye delen 2: vinduene og tekstene i dem, i rekkefoelge. «Ikke et
@@ -399,8 +407,10 @@ class TestSidene:
         forventet = {
             "/": {
                 # Story 2.9: delen over tabellen.
-                # Story 2.9b: søylene i samme vindu.
-                "hjelp-hovedindeks": ["hovedindeksen", "soeylene"],
+                # Story 2.9b: søylene i samme vindu. Story 8.2b, a (U26):
+                # hvert sitt vindu.
+                "hjelp-hovedindeks": ["hovedindeksen"],
+                "hjelp-soeylene": ["soeylene"],
                 "hjelp-selskap": ["selskap"],
                 "hjelp-sluttkurs": ["sluttkurs"],
                 "hjelp-endring": ["endring", "utbyttejustert"],

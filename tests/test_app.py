@@ -2252,9 +2252,11 @@ class TestStory80eTekst:
         html = klient.get("/").data.decode("utf-8")
         del_ = html.split('<section class="slik-leser"', 1)[1].split("</section>", 1)[0]
         # Story 8.0d, PR 2: symbolene er aria-hidden og ikke en del av teksten.
+        # Story 8.2b, a (U24): setningene står i hver sin span, så feltet med
+        # musepekeren tas bort først.
         del_ = re.sub(
-            r'<span class="symbolfelt" aria-hidden="true">.*?</span></span>|'
-            r'<span class="symbolfelt" aria-hidden="true">.*?</svg></span>',
+            r'<span class="symbolfelt" aria-hidden="true"><svg.*?</svg></span>|'
+            r'<span class="symbolfelt" aria-hidden="true">.*?</span></span>',
             "",
             del_,
             flags=re.DOTALL,
@@ -2517,7 +2519,10 @@ class TestStory815Sortering:
         """Svar 7: linja om 3 av 3 og «N av M aksjer» endres ikke av et klikk."""
 
         def topp(html):
-            return html.split('<div class="tabellboks"', 1)[0].split("<main>", 1)[1]
+            # Story 8.2b (gjennomgangen, BH7): valget «Alle / Min liste» over
+            # tabellen beholder sorteringen, så det sammenlignes ikke.
+            del_ = html.split('<div class="tabellboks"', 1)[0].split("<main>", 1)[1]
+            return re.sub(r'<div class="aksjetopp">.*?</nav>\s*</div>', "", del_, flags=re.DOTALL)
 
         standard = topp(self._side(tabell, "/"))
         valgt = topp(self._side(tabell, "/?sorter=signal&orden=stigende"))
@@ -2583,8 +2588,8 @@ class TestStory80dAksjesiden:
         endring = html.split('<div class="noekkeltall endring">', 1)[1].split("</div>", 1)[0]
         assert f'<span class="verdi opp">+2,00{NB}%</span>' in endring
         # Gjennomgangen (VG6): serien ender lørdag 31.10, og dagen før er
-        # fredag. En nedgang er rød.
-        assert "fra fredag til lørdag" in endring
+        # fredag. En nedgang er rød. Story 8.2b, b (U31): med datoene.
+        assert "fra fredag 30.10 til lørdag 31.10" in endring
         _lagret("DNB", -2.0, 1, 0, 0)
         ned = klient.get("/aksje/DNB").data.decode("utf-8")
         assert f'<span class="verdi ned">-2,00{NB}%</span>' in ned
@@ -2593,7 +2598,10 @@ class TestStory80dAksjesiden:
         """Svar 29 (15.10, BH6 og ECH2): datoene ved ukedagene når det ligger
         en børsdag mellom de to kursradene. Fredag til mandag og en uke med
         bare stengte dager har ingen. Ville feilet med alltid ukedager,
-        alltid datoer, eller kalenderdager i stedet for børsdager."""
+        alltid datoer, eller kalenderdager i stedet for børsdager.
+
+        Story 8.2b, b (U31, gruppens svar 03.11 kl. 22:01): kortet har nå
+        alltid datoene, så de tre har dem."""
         monter(
             monkeypatch,
             snapshot(
@@ -2605,8 +2613,8 @@ class TestStory80dAksjesiden:
             ),
         )
         assert _endringsforklaring(klient, "EQNR") == "fra fredag 02.10 til fredag 09.10"
-        assert _endringsforklaring(klient, "DNB") == "fra fredag til mandag"
-        assert _endringsforklaring(klient, "KOG") == "fra onsdag til tirsdag"
+        assert _endringsforklaring(klient, "DNB") == "fra fredag 02.10 til mandag 05.10"
+        assert _endringsforklaring(klient, "KOG") == "fra onsdag 01.04 til tirsdag 07.04"
 
     def test_endringen_med_datoene_naar_kalenderen_ikke_dekker_dagene(self, klient, monkeypatch):
         """Svar 29: kan boersdag.py ikke avgjøre det (UtenforKalenderen),
@@ -2691,8 +2699,9 @@ class TestStory80dAksjesiden:
         assert "stroke-width: 1.75" in _regel(stil, ".ma50linje")
         assert "stroke-width: 2.5" in _regel(stil, ".kurslinje")
         assert "tegnforklaring" not in html
-        assert '<text class="linjenavn kurs" text-anchor="end"' in html
-        assert '<text class="linjenavn snitt" text-anchor="end"' in html
+        # Story 8.2b, b (U41): navnene begynner i feltet til høyre for enden.
+        assert '<text class="linjenavn kurs" x=' in html
+        assert '<text class="linjenavn snitt" x=' in html
         assert "var(--snitt)" in _regel(stil, ".linjenavn.snitt")
         assert "stipl" not in _synlig(html).lower()
         # Gjennomgangen 15.10 (VG4): prikken ved enden av kurslinja.
@@ -2968,8 +2977,10 @@ def _soeylene(html: str) -> str:
 
 
 def _stolpene(figur: str) -> list[tuple[str, str]]:
-    """(fargeklassen, stilen) for hver stolpe, fra venstre."""
-    return re.findall(r'<span class="stolpe (\w+)" style="([^"]*)">', figur)
+    """(fargeklassen, stilen) for hver stolpe, fra venstre. Gruppens svar
+    04.11 kl. 09:58: stolpen har også «lys» eller «sterk», som
+    test_soeylene_er_lyse_og_moerke i test_funnene_8_2b.py prøver."""
+    return re.findall(r'<span class="stolpe (\w+) (?:lys|sterk)" style="([^"]*)">', figur)
 
 
 def _tickerne(figur: str) -> list[str]:
@@ -2996,8 +3007,9 @@ class TestSoeylenePaaForsiden:
         assert _tickerne(figur) == ["DNB", "NHY", "EQNR"]
         assert "Søyler for 3 aksjer 09.10, fra størst fall til størst stigning." in _synlig(figur)
         assert (
-            '<figcaption class="soeyletittel">Dagens endring per aksje, med indeksen som stiplet linje</figcaption>'
-            in figur
+            # Story 8.2b, a (U26): søylene har sitt eget «?» i overskriften.
+            '<figcaption class="soeyletittel">Dagens endring per aksje, med indeksen som stiplet linje '
+            '<button type="button" class="hjelpeknapp" popovertarget="hjelp-soeylene"' in figur
         )
 
     def test_fargen_foelger_endringen_slik_den_vises(self, klient):
@@ -3033,8 +3045,11 @@ class TestSoeylenePaaForsiden:
         assert "margin-top: -1px" in _regel(stil, ".soeyler .indekslinje")
         # Gjennomgangen (VG3): fargene på søylene.
         assert "var(--dempet)" in _regel(stil, ".soeyler .stolpe")
-        assert "var(--opp)" in _regel(stil, ".soeyler .stolpe.opp")
-        assert "var(--ned)" in _regel(stil, ".soeyler .stolpe.ned")
+        # Gruppens svar 04.11 kl. 09:58: lys under 2 %, mørk fra 2 %.
+        assert "var(--soeyle-lys-opp)" in _regel(stil, ".soeyler .stolpe.opp")
+        assert "var(--soeyle-lys-ned)" in _regel(stil, ".soeyler .stolpe.ned")
+        assert "var(--opp)" in _regel(stil, ".soeyler .stolpe.opp.sterk")
+        assert "var(--ned)" in _regel(stil, ".soeyler .stolpe.ned.sterk")
         assert "var(--opp)" in _regel(stil, ".soeyler .indekslinje.opp")
         assert "var(--ned)" in _regel(stil, ".soeyler .indekslinje.ned")
 
@@ -3104,7 +3119,10 @@ class TestSoeylenePaaForsiden:
         assert [k for k, _ in _stolpene(figur)] == ["ned", "null", "opp"]
         # Gjennomgangen 30.10 (ECH3): søylene gjelder tabellens dag, så
         # overskriften har ingen egen dato. Indeksens dato står ved indeksen.
-        assert '<figcaption class="soeyletittel">Dagens endring per aksje</figcaption>' in figur
+        assert (
+            '<figcaption class="soeyletittel">Dagens endring per aksje '
+            '<button type="button" class="hjelpeknapp" popovertarget="hjelp-soeylene"' in figur
+        )
         assert "Indeksen har ingen kurs 09.10, så det er ingen stiplet linje." in figur
         assert 'class="indekslinje' not in figur
 
@@ -3127,6 +3145,14 @@ class TestSoeylenePaaForsiden:
             bredder = re.findall(r"(?:^|[;\s])(?:min-|max-)?width\s*:\s*([^;]+)", innhold)
             if "bransjesymbol" in velger:
                 assert [b.strip() for b in bredder] in ([], ["14px", "100%"]), velger
+            elif "linjeprove" in velger:
+                # Story 8.2b, a (U57): biten av linja i forklaringen under
+                # søylene, som brytes for seg.
+                assert [b.strip() for b in bredder] in ([], ["28px"]), velger
+            elif "fargeprove" in velger:
+                # Gruppens svar 04.11 kl. 09:58: biten av en lys og en mørk
+                # søyle i forklaringen, som brytes for seg som linjeprove.
+                assert [b.strip() for b in bredder] in ([], ["10px"]), velger
             else:
                 assert all(b.strip() == "0" for b in bredder), (velger, bredder)
             assert "nowrap" not in innhold, velger
@@ -3375,7 +3401,8 @@ class TestStipletBareForIndeksenPaaForsiden:
             for v, innhold in re.findall(r"([^{}]+)\{([^}]*)\}", re.sub(r"/\*.*?\*/", "", stil, flags=re.DOTALL))
             if "dasharray" in innhold or "dashed" in innhold
         ]
-        assert stiplet == [".soeyler .indekslinje"], stiplet
+        # Story 8.2b, a (U57): forklaringen under søylene har en bit av linja.
+        assert stiplet == [".soeyler .indekslinje", ".soeyler .linjeprove"], stiplet
 
 
 # Story 8.16: periodene i kursgrafen. Regelen for startdagen er testet i
@@ -3655,11 +3682,16 @@ class TestPeriodeneIKursgrafen:
         assert re.findall(r'class="maanedstekst"[^>]*>([^<]*)<', html) == ventet
 
     def test_overskriften_passer_perioden(self, klient):
-        """Ville feilet hvis overskriften sto paa 6 måneder for en annen periode."""
+        """Ville feilet hvis overskriften sto paa 6 måneder for en annen periode.
+        Story 8.2b, b (U39): serien begynner etter starten av 1 år, så
+        overskriften sier dagene grafen har."""
         self._aksjen()
-        for periode, tekst in (("1-uke", "1 uke"), ("1-mnd", "1 måned"), ("i-aar", "i år"), ("1-aar", "1 år")):
+        for periode, tekst in (("1-uke", "1 uke"), ("1-mnd", "1 måned"), ("i-aar", "i år")):
             html = klient.get(f"/aksje/EQNR?periode={periode}").data.decode("utf-8")
             assert f'<h2 id="kursgrafen">Kursutvikling, {tekst} ' in html, periode
+        html = klient.get("/aksje/EQNR?periode=1-aar").data.decode("utf-8")
+        assert re.search(r'<h2 id="kursgrafen">Kursutvikling fra \d\d\.\d\d til \d\d\.\d\d ', html)
+        assert "Kursutvikling, 1 år" not in html
 
 
 class TestStory816bDagenPaaHeleSiden:
@@ -3706,10 +3738,12 @@ class TestStory816bDagenPaaHeleSiden:
         assert "Equinor skilte seg ut torsdag Oslo Børs · 01.10" in toppen
         assert f"Sluttkurs ? {tall(rad.slutt, 'kurs')} NOK" in toppen
         assert tall(siste.slutt, "kurs") not in toppen
-        assert "fra onsdag til torsdag" in toppen
+        # Story 8.2b, b (U31): med datoene.
+        assert "fra onsdag 30.09 til torsdag 01.10" in toppen
         assert "Signalstyrke ? 3 av 3 T +1 B -1 I +1" in toppen and "Retning ? ↔ Blandet" in toppen
         assert "Hvorfor signalet ble 3" in toppen
-        assert "Sjekk 2 Ga -1 negativ" in toppen and "+12,3 % mot MA50" in toppen
+        # Gruppens svar 04.11 kl. 09:58: «?» ved «Ga» i alle tre kortene.
+        assert "Sjekk 2 Ga ? -1 negativ" in toppen and "+12,3 % mot MA50" in toppen
         assert "volum 7,00 × medianen" in toppen
         assert "skilte seg ut fredag" not in toppen and "Positiv" not in toppen
 
@@ -3738,7 +3772,9 @@ class TestStory816bDagenPaaHeleSiden:
         siste børsdag."""
         self._aksjen()
         toppen = _toppen(klient.get("/aksje/EQNR?dag=2026-10-03").data.decode("utf-8"))
-        assert "Oslo Børs · 03.10 Sluttkurs ? – Endring ? – Signalstyrke ? –" in toppen
+        # Story 8.2b, c (U62): innledningen står mellom datoen og kortene.
+        assert "Oslo Børs · 03.10 Siden viser " in toppen
+        assert "aksjen hver børsdag. Sluttkurs ? – Endring ? – Signalstyrke ? –" in toppen
         assert "NOK" not in toppen
 
     def test_merket_og_lenken_tilbake(self, klient):
@@ -3795,7 +3831,8 @@ class TestStory816bDagenPaaHeleSiden:
         forrige, dagen = (r for r in rader if r.dato in (date(2026, 9, 30), date(2026, 10, 1)))
         ventet = tall((dagen.justert_slutt - forrige.justert_slutt) / forrige.justert_slutt * 100, "endring")
         toppen = _toppen(klient.get("/aksje/EQNR?dag=2026-10-01").data.decode("utf-8"))
-        assert f"Endring ? {ventet} fra onsdag til torsdag" in toppen
+        # Story 8.2b, b (U31): med datoene.
+        assert f"Endring ? {ventet} fra onsdag 30.09 til torsdag 01.10" in toppen
         assert ventet.startswith("+5,")
 
     def test_en_boersdag_uten_kurs_i_serien(self, klient):

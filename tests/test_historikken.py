@@ -239,9 +239,13 @@ class TestTallene:
 
     def test_siden_sier_hva_som_skilte_seg_ut(self, klient, base):
         """Ville feilet hvis uka talte 2 av 3 uten at siden sa at terskelen er
-        2, som i oversikten (gjennomgangen, BH4)."""
-        tekst = _tekst(_avsnittet(_side(klient, f"/aksje/{SYMBOL}")))
-        assert "Tallene for uka og måneden teller dagene med signalstyrke 2 eller mer, som i oversikten" in tekst
+        2, som i oversikten (gjennomgangen, BH4). Story 8.2b, b (U16): det
+        står i hjelpen ved «?», ikke i ingressen."""
+        html = _side(klient, f"/aksje/{SYMBOL}")
+        setning = "Tallene for uka og måneden teller dagene med signalstyrke 2 eller mer, som i oversikten"
+        assert setning not in _tekst(_avsnittet(html))
+        vinduet = html.split('<div id="hjelp-historikk"', 1)[1].split('<div id="hjelp-', 1)[0]
+        assert setning in _tekst(vinduet)
 
     def test_terskelen_bestemmer_hva_som_skilte_seg_ut(self):
         """Ville feilet hvis tallene brukte 2 og ikke terskelen de får

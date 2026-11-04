@@ -385,3 +385,36 @@ class TestKnappenFlytter:
         """,
         )
         assert r["synlig"] == 0, r
+
+
+class TestSammeVinduFraFlereKnapper:
+    @pytest.mark.parametrize("bredde", [1280, 390])
+    def test_feltet_flytter_til_knappen_i_et_annet_kort(self, sidene, tmp_path, bredde):
+        """Gjennomgangen av 8.2b (BH1): «?» ved «Ga» står i alle tre
+        sjekkortene (gruppens svar 04.11 kl. 09:58). Ville feilet hvis feltet
+        ble stående under det første kortet når «?» i det tredje ble trykket
+        mens vinduet var åpent, eller hvis fokus gikk tilbake til feil «?»."""
+        r = _kjoer(
+            sidene["/aksje/BRFE"],
+            tmp_path,
+            bredde,
+            """
+          const knapper = document.querySelectorAll('button.hjelpeknapp[popovertarget="hjelp-ga"]');
+          const [en, , tre] = knapper;
+          en.click(); await vent();
+          tre.click(); await vent();
+          const felt = document.getElementById("hjelp-ga");
+          const plass = document.querySelector(".hjelpeplass");
+          const under = plass ? plass.getBoundingClientRect().top >= tre.getBoundingClientRect().bottom - 0.5 : null;
+          const plasser = document.querySelectorAll(".hjelpeplass").length;
+          const aapent = aapne().map((f) => f.id);
+          felt.querySelector("button.lukk").click(); await vent();
+          ferdig({knapper: knapper.length, aapent, plasser, under, fokus: document.activeElement === tre});
+        """,
+        )
+        assert r["knapper"] == 3 and r["aapent"] == ["hjelp-ga"], r
+        assert r["fokus"] is True, r
+        if bredde == 390:
+            assert r["plasser"] == 1 and r["under"] is True, r
+        else:
+            assert r["plasser"] == 0, r

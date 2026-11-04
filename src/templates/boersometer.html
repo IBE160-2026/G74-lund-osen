@@ -35,7 +35,8 @@
     {#- Story 8.17b: periodevalget fra 8.16, som i oversikten og Min liste
         (designregler §2), i stedet for skjemaet for «Velg dag» fra 8.6. En
         dag uten kurs gir fortsatt børsdagen før. #}
-    <div class="periodehode">{{ periodevalg(knapper, valg.periode, "/boersometer", valg.dag, foerste, siste, "Periode for børsometeret") }} {{ hjelpeknapp("hjelp-perioden", "Hjelp: periodene") }}</div>
+    {#- Gruppens svar 04.11 kl. 10:04: «?» for periodene står først i raden, foran knappene. #}
+    <div class="periodehode">{{ hjelpeknapp("hjelp-perioden", "Hjelp: periodene") }} {{ periodevalg(knapper, valg.periode, "/boersometer", valg.dag, foerste, siste, "Periode for børsometeret") }}</div>
     {% if valg.beskjed %}<p class="periodebeskjed" role="status">{{ valg.beskjed }}</p>{% endif %}
     {% if ugyldig %}<p class="forklaring">Datoen kunne ikke leses, så siden viser siste børsdag.</p>{% endif %}
     {% if foer_foerste %}<p class="forklaring">{{ valgt|dato }} er før første kurs, så siden viser første børsdag med kurs, {{ dagen|dato }}.</p>
@@ -84,7 +85,13 @@
           <li style="{{ plass_stil(kartrute.plass) }}"><a class="rute trinn-{{ rute.fargetrinn or 'ingen' }}{% for navn, nivaa in kartrute.nivaa.items() %} nivaa-{{ navn }}-{{ nivaa }}{% endfor %}{% if rute.ramme %} ramme-{{ rute.ramme }}{% endif %}{% if rute.uten_data %} uten-data{% endif %}" href="{{ aksjeadresse(rute.aksje.symbol) }}">
             <span class="ticker">{{ rute.aksje.symbol }}</span>
             <span class="endring">{% if rute.endring is not none %}{{ rute.endring|tall('endring') }}{% elif rute.uten_data %}Uten data{% else %}–{% endif %}</span>
-            {% if rute.ramme == "gul" %}<span class="merke">{{ antall_sjekker }} av {{ antall_sjekker }}{% if dagen != siste %} siste børsdag{% endif %}</span>{% elif rute.ramme == "moerk" %}<span class="merke">{{ antall_sjekker - 1 }} av {{ antall_sjekker }}</span>{% endif %}
+            {#- Gruppens svar 04.11 kl. 10:01 og 10:04: styrken står i alle
+                rutene som i tabellen, der ruta har plass: «3 av 3» og «2 av 3»
+                i ringen fra tabellen for siste børsdag, ellers som tekst. En
+                annen dag sier merket i tillegg at gul ramme er 3 av 3 siste
+                børsdag. #}
+            {% if rute.styrke is not none %}<span class="skjult">, </span><span class="styrke{% if dagen == siste and rute.ramme == 'gul' %} pille tre-av-tre{% elif rute.ramme == 'moerk' %} pille to-av-tre{% endif %}">{{ rute.styrke }} av {{ antall_sjekker }}</span>{% endif %}
+            {% if rute.ramme == "gul" and dagen != siste %}<span class="merke"><span class="skjult">, </span>{{ antall_sjekker }} av {{ antall_sjekker }} siste børsdag</span>{% endif %}
             {% if rute.tekst and not rute.uten_data %}<span class="tekst">{{ rute.tekst }}</span>{% endif %}
             <span class="skjult">, {{ rute.aksje.navn }}{% if rute.fra %}, fra {{ rute.fra|dato }}{% endif %}{% if rute.volumord and not rute.lik_stoerrelse %}, volum {{ rute.volumord }}{% endif %}</span>
           </a></li>

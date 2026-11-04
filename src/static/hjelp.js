@@ -79,7 +79,19 @@
 
   document.addEventListener("click", (e) => {
     const knapp = e.target.closest("button.hjelpeknapp");
-    if (knapp) knappen = knapp;
+    if (!knapp) return;
+    const forrige = knappen;
+    knappen = knapp;
+    // Gjennomgangen av 8.2b (BH1): vinduene for «Ga» og «Målt mot» har en
+    // knapp i hvert sjekkort (gruppens svar 04.11 kl. 09:58). Er vinduet
+    // alt åpent fra en annen knapp, gir «show» ingen toggle, så feltet
+    // flyttes hit her.
+    const felt = knapp.popoverTargetElement;
+    if (felt && felt.matches(":popover-open") && forrige !== knapp) {
+      lagPlassen(felt, knapp);
+      hoeyde(felt);
+      felt.focus({ preventScroll: BRED.matches });
+    }
   }, true);
 
   // beforetoggle og toggle bobler ikke, så de fanges på vei ned.

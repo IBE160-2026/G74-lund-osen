@@ -118,21 +118,37 @@
   {#- Story 8.2a, b (U23): en aksje uten kurser har en rad i tabellen. #}
   {% set vist_tabell = rader and (skilte_seg_ut or oevrige or ingen_skilte_seg_ut or mangler) %}
   {% if aktiv == "min_liste" %}
-    <h1 class="overskrift">Min liste</h1>
+    {#- Story 8.2b, d (U69): tittelen sier hvor mange i lista som skilte seg ut
+        siste børsdag, med markeringen fra oversikten (designregler §4), når
+        noe er merket og vurdert. N er de merkede blant «Skilte seg ut», og M
+        alle de merkede med en rad. Gjennomgangen (BH2): bare når minst én
+        merket aksje er vurdert. Valget «Alle / Min liste» står til høyre
+        for tittelen på bred skjerm, og under på smal. #}
+    {% set i_lista = skilte_seg_ut|map(attribute="aksje.symbol")|select("in", merkede)|list|length %}
+    <div class="listetopp">
+    {% if vurdert_i_lista %}
+      <h1 class="overskrift"><mark>{{ i_lista }} av {{ antall_merket }} i Min liste</mark> skilte seg ut {{ dato|ukedag }}</h1>
+    {% else %}
+      <h1 class="overskrift">Min liste</h1>
+    {% endif %}
     {% if rader %}
-    <p class="innledning">Stjernen foran et selskap legger aksjen i lista, og et nytt trykk tar den ut. Lista lagres på denne maskinen og koster ingen API-kall.</p>
     <nav class="visvalg" aria-label="Vis">
       {#- Story 8.17b: valget beholder perioden og dagen. #}
       <a class="visknapp" href="{{ sidesti }}?vis=alle{% for ledd in periodeledd %}&amp;{{ ledd }}{% endfor %}{% if sortering %}&amp;sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}"{% if alle %} aria-current="true"{% endif %}>Alle <span class="antall">{{ antall_aksjer }}</span></a>
       <a class="visknapp" href="{{ sidesti }}{% for ledd in periodeledd %}{% if loop.first %}?{% else %}&amp;{% endif %}{{ ledd }}{% endfor %}{% if sortering %}{% if periodeledd %}&amp;{% else %}?{% endif %}sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}"{% if not alle %} aria-current="true"{% endif %}>Min liste <span class="antall">{{ antall_merket }}</span></a>
     </nav>
+    {% endif %}
+    </div>
+    {% if rader %}
+    <p class="innledning">Stjernen foran et selskap legger aksjen i lista, og et nytt trykk tar den ut. Lista lagres på denne maskinen og koster ingen API-kall.</p>
     {#- Story 8.17b: «Sammenlign med» er periodevalget i Min liste
         (beslutningen 08.10 kl. 21:48), med siste børsdag valgt når siden
         åpnes (designregler §2). Radene er siste børsdag, og linja under
         hver rad er dagen man sammenligner med. #}
     {% if valg and vist_tabell %}
       <h2 class="sammenlign-tittel" id="sammenlign-med">Sammenlign med</h2>
-      <div class="periodehode">{{ periodevalg(knapper, valg.periode, sidesti, valg.dag, foerste_valgbare, siste_dag, "Sammenlign med", ekstra=[("vis", "alle")] if alle else []) }} {{ hjelpeknapp("hjelp-sammenlign", "Hjelp: sammenlign med") }}</div>
+      {#- Gruppens svar 04.11 kl. 10:04: «?» for periodene står først i raden, foran knappene. #}
+      <div class="periodehode">{{ hjelpeknapp("hjelp-sammenlign", "Hjelp: sammenlign med") }} {{ periodevalg(knapper, valg.periode, sidesti, valg.dag, foerste_valgbare, siste_dag, "Sammenlign med", ekstra=[("vis", "alle")] if alle else []) }}</div>
       {% if valg.beskjed %}<p class="periodebeskjed" role="status">{{ valg.beskjed }}</p>{% endif %}
       {% if valg.periode == "velg" %}
         <p class="periodelinje">Øverst i hver rad står siste børsdag, {{ siste_dag|ukedag }} {{ siste_dag|dato }}. Linja under er {{ valg.dag|ukedag }} {{ valg.dag|dato }}: sluttkursen den dagen, endringen derfra til siste børsdag og signalet som er lagret for dagen.</p>
@@ -141,7 +157,7 @@
       {% endif %}
     {% endif %}
     {% if not vist_tabell %}
-      <p class="tom-liste">Ingen aksjer i Min liste ennå. Trykk på stjernen ☆ foran et selskap, under «Alle» her eller i markedsoversikten, for å legge det i lista.</p>
+      <p class="tom-liste" id="aksjene">Ingen aksjer i Min liste ennå. Trykk på stjernen ☆ foran et selskap, under «Alle» her eller i markedsoversikten, for å legge det i lista.</p>
     {% endif %}
     {% endif %}
   {% endif %}
@@ -186,9 +202,9 @@
       <section class="slik-leser" aria-labelledby="slik-leser">
         <h2 id="slik-leser">Slik leser du tabellen</h2>
         <ul>
-          <li><span class="symbolfelt" aria-hidden="true"><span class="utslagsfelt"><span class="pluss">+1</span><span class="minus">-1</span></span></span><span><strong>Signalstyrke 0–{{ antall_sjekker }}</strong> T, B og I er trend, bevegelse og interesse, og hver gir +1, 0 eller -1. Både +1 og -1 teller som utslag. Øverst i cellen står hvor mange som slo ut, fra 0 av {{ antall_sjekker }} til {{ antall_sjekker }} av {{ antall_sjekker }}.</span></li>
-          <li><span class="symbolfelt" aria-hidden="true"><span class="pil opp">↑</span><span class="pil blandet">↔</span><span class="pil ned">↓</span></span><span><strong>Retning</strong> Om sjekkene som slo ut, ga +1 eller -1. Ga noen +1 og noen -1, står det {{ blandet }}. Ikke et råd om å kjøpe eller selge.</span></li>
-          <li><span class="symbolfelt" aria-hidden="true"><svg class="peker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" focusable="false"><path d="M6 3.5v15.5l4.2-4.1 2.9 6.4 2.6-1.2-2.9-6.3h5.9z"/></svg></span><span><strong>Selskapsnavnet</strong> Klikk for å se sjekkene, tallene bak og kursgrafen.</span></li>
+          <li><span class="symbolfelt" aria-hidden="true"><span class="utslagsfelt"><span class="pluss">+1</span><span class="minus">-1</span></span></span><span><strong>Signalstyrke 0–{{ antall_sjekker }}</strong> <span class="setning">T, B og I er trend, bevegelse og interesse, og hver gir +1, 0 eller -1.</span> <span class="setning">Både +1 og -1 teller som utslag.</span> <span class="setning">Øverst i cellen står hvor mange som slo ut, fra 0 av {{ antall_sjekker }} til {{ antall_sjekker }} av {{ antall_sjekker }}.</span></span></li>
+          <li><span class="symbolfelt" aria-hidden="true"><span class="pil opp">↑</span><span class="pil blandet">↔</span><span class="pil ned">↓</span></span><span><strong>Retning</strong> <span class="setning">Om sjekkene som slo ut, ga +1 eller -1.</span> <span class="setning">Ga noen +1 og noen -1, står det {{ blandet }}.</span> <span class="setning">Ikke et råd om å kjøpe eller selge.</span></span></li>
+          <li><span class="symbolfelt" aria-hidden="true"><svg class="peker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" focusable="false"><path d="M6 3.5v15.5l4.2-4.1 2.9 6.4 2.6-1.2-2.9-6.3h5.9z"/></svg></span><span><strong>Selskapsnavnet</strong> <span class="setning">Klikk for å se sjekkene, tallene bak og kursgrafen.</span></span></li>
         </ul>
       </section>
     </div>
@@ -197,7 +213,8 @@
         siste børsdag valgt når siden åpnes (designregler §2). Linja under
         sier hva tallene gjelder (gruppens svar 23.10 kl. 12:35, a). #}
     {% if valg %}
-      <div class="periodehode">{{ periodevalg(knapper, valg.periode, sidesti, valg.dag, foerste_valgbare, siste_dag, "Periode for oversikten") }} {{ hjelpeknapp("hjelp-perioden", "Hjelp: periodene") }}</div>
+      {#- Gruppens svar 04.11 kl. 10:04: «?» for periodene står først i raden, foran knappene. #}
+      <div class="periodehode">{{ hjelpeknapp("hjelp-perioden", "Hjelp: periodene") }} {{ periodevalg(knapper, valg.periode, sidesti, valg.dag, foerste_valgbare, siste_dag, "Periode for oversikten") }}</div>
       {% if valg.beskjed %}<p class="periodebeskjed" role="status">{{ valg.beskjed }}</p>{% endif %}
       {% if valg.periode == "velg" %}
         <p class="periodelinje">Tabellen viser {{ valg.dag|ukedag }} {{ valg.dag|dato }}: sluttkursen, endringen den dagen og signalet som er lagret for dagen. En oransje strek og «{{ antall_sjekker }} av {{ antall_sjekker }} siste børsdag» viser aksjene som fikk {{ antall_sjekker }} av {{ antall_sjekker }} siste børsdag.</p>
@@ -208,12 +225,25 @@
 
     {% include "_hovedindeks.html" %}
 
+    {#- Story 8.2b, d (U59, utdraget §11 punkt 4): overskriften «Aksjene» med
+        antallet, og valget «Alle / Min liste» over tabellen, som i Min liste.
+        «Alle» er siden man står på, og «Min liste» beholder perioden. #}
+    <div class="aksjetopp">
+      <h2 class="aksjetittel">Aksjene <span class="antall">{{ antall_aksjer }}</span></h2>
+      <nav class="visvalg" aria-label="Vis">
+        {#- Gjennomgangen (BH7, ECH7): med sorteringen, som i Min liste. #}
+        <a class="visknapp" href="{{ sidesti }}{% for ledd in periodeledd %}{% if loop.first %}?{% else %}&amp;{% endif %}{{ ledd }}{% endfor %}{% if sortering %}{% if periodeledd %}&amp;{% else %}?{% endif %}sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}" aria-current="true">Alle <span class="antall">{{ antall_aksjer }}</span></a>
+        <a class="visknapp" href="/min-liste{% for ledd in periodeledd %}{% if loop.first %}?{% else %}&amp;{% endif %}{{ ledd }}{% endfor %}{% if sortering %}{% if periodeledd %}&amp;{% else %}?{% endif %}sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}">Min liste <span class="antall">{{ antall_merket }}</span></a>
+      </nav>
+    </div>
+
   {% endif %}
   {% if vist_tabell %}
     {#- Story 8.15, svar 5: linja står bare når en kolonne er valgt. Story
         8.2a, e: tabellen er da én liste, ikke sortert innenfor hver del. #}
     {% if sortering %}<p class="sortert">Sortert på {{ sortering.navn }}, {{ ordens_ord(sortering.kolonne, sortering.orden) }}, i én liste. <a href="{{ standard_adresse }}">Standard rekkefølge</a></p>{% endif %}
-    <div class="tabellboks" role="region" aria-label="Aksjene" tabindex="0">
+    {#- Story 8.2b, a (U29): ankeret stjernen sender tilbake til når raden er borte. #}
+    <div class="tabellboks" id="aksjene" role="region" aria-label="Aksjene" tabindex="0">
     <table>
       <thead>
         <tr>
@@ -310,7 +340,9 @@
   {% if rader %}
     {#- Story 2.9b: teksten om søylene står bare når søylene vises. #}
     {% if aktiv != "min_liste" %}
-    {{ hjelpevindu("hjelp-hovedindeks", "Hovedindeksen", [("", ["hovedindeksen", "soeylene"] if hovedindeks and hovedindeks.har_soeyler else ["hovedindeksen"])]) }}
+    {#- Story 8.2b, a (U26): hovedindeksen og søylene har hvert sitt vindu. #}
+    {{ hjelpevindu("hjelp-hovedindeks", "Hovedindeksen", [("", ["hovedindeksen"])]) }}
+    {% if hovedindeks and hovedindeks.har_soeyler %}{{ hjelpevindu("hjelp-soeylene", "Søylene", [("", ["soeylene"])]) }}{% endif %}
     {% endif %}
     {#- Story 8.17a: periodevalget over søylene og tabellen. #}
     {% if valg and aktiv != "min_liste" %}{{ hjelpevindu("hjelp-perioden", "Periodene", [("", ["perioden_oversikten"])]) }}{% endif %}

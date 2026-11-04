@@ -419,7 +419,9 @@ class TestSidene:
         """Ville feilet uten overskriften, teksten om at det er uten kall,
         eller antallet i «Alle / Min liste»."""
         html = demo.get("/min-liste").data.decode("utf-8")
-        assert '<h1 class="overskrift">Min liste</h1>' in html
+        # Story 8.2b, d (U69): tittelen sier hvor mange i lista som skilte
+        # seg ut, når noe er merket og vurdert. Demoen har fem merket.
+        assert '<h1 class="overskrift"><mark>3 av 5 i Min liste</mark> skilte seg ut fredag</h1>' in html
         assert html.count("<h1") == 1
         assert "Stjernen foran et selskap legger aksjen i lista" in html
         assert "koster ingen API-kall" in html

@@ -137,6 +137,11 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
     """Alle hjelpetekstene, med tallene fra p. Teksten om maalingen bruker
     MAALTE_GRENSER, fordi den sier hva som ble maalt."""
     sone = _vis(p.noytralsone * 100, "grense")
+    # Gruppens svar 04.11 kl. 09:58. Her, fordi boersometer.py importerer
+    # denne modulen.
+    from boersometer import GRENSE_STERK
+
+    soeylegrense = _vis(GRENSE_STERK, "grense")
     faktor = _vis(p.volumfaktor, "faktor")
     ma = _vis(p.ma_vindu, "heltall")
     volatilitet = _vis(p.volatilitet_vindu, "heltall")
@@ -174,7 +179,9 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             # Gruppens svar 26.10 kl. 13:00 (a): Tab følger kartet.
             "med Tab går du fra det største feltet og den største ruta, slik kartet legger dem. "
             "Rammen er gul ved 3 av 3 på siste børsdag, også når du velger en annen dag, og "
-            "mørk ved 2 av 3 bare på siste børsdag; overskriften har "
+            "mørk ved 2 av 3 bare på siste børsdag, "
+            # Gruppens svar 04.11 kl. 10:01 og 10:04: styrken i rutene.
+            "og styrken står i rutene som har plass, som i tabellen; overskriften har "
             "snittet av endringen for aksjene i bransjen som har kurs, og «1 aksje» der det er én, "
             # Gruppens svar 26.10 kl. 13:00 (b): bare navnet når feltet er smalt.
             "eller bare navnet når feltet er smalt, "
@@ -195,32 +202,38 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         "hovedindeksen": Hjelpetekst(
             "Hovedindeksen:",
             # Story 8.17a (gruppens svar 30.10 kl. 12:21, e): tabellens dag.
+            # Story 8.2b, a (U26): kortere, og søylene i et eget vindu.
+            # Gjennomgangen av 8.2b (VG2): «med kurs samme dag» står igjen.
             "verdien den dagen tabellen viser, og endringen i prosent fra "
-            "børsdagen før. «Gikk bedre» teller aksjene med kurs samme dag "
-            "som hadde større endring enn indeksen, slik tallene vises, og "
-            "lik teller ikke. Mangler indeksen kurs den dagen, står det i stedet for tallet.",
+            "børsdagen før. «Gikk bedre» teller aksjene med kurs samme dag og "
+            "større endring enn indeksen, slik tallene vises, og lik teller ikke.",
             (
                 (PRD, "#### FR-104 — Hovedindeksen i markedsoversikten"),
                 (PRD, "«Bedre» avgjøres på endringen slik den vises, og lik er ikke bedre."),
                 (HOVEDINDEKS, "def er_bedre("),
             ),
         ),
-        # Story 2.9b (FR-105): søylene under indeksen, i samme vindu.
+        # Story 2.9b (FR-105): søylene under indeksen. Story 8.2b, a (U26):
+        # i et eget vindu, og kortere, fordi forklaringen under søylene
+        # viser linja.
         "soeylene": Hjelpetekst(
             "Søylene:",
-            "dagens endring for hver aksje med kurs siste børsdag i tabellen og dagen "
-            "før, fra størst fall til venstre til størst stigning til høyre, med null "
-            "midt i feltet. Den stiplede linja er indeksens endring: grønn når den "
-            "steg, rød når den falt, grå ved 0,00 % og borte når indeksen ikke har en "
+            "endringen for hver aksje, fra størst fall til venstre til størst stigning "
+            # Gruppens svar 04.11 kl. 09:58: lys og mørk, som i børsometeret.
+            f"til høyre, mørk fra {soeylegrense} opp eller ned, som i børsometeret, og lys under. "
+            # Gjennomgangen av 8.2b (VG2): grå ved 0,00 % står igjen.
+            "Den stiplede linja er indeksen, grønn når den steg, rød når den falt "
+            "og grå ved 0,00 %. "
             # Story 8.2a, c (U20): symbolet over søyla er en lenke.
-            "kurs eller endring den dagen. Et gult bransjesymbol betyr at aksjen fikk 3 av 3 siste børsdag, "
-            "og et klikk på symbolet viser aksjen.",
+            "Et gult bransjesymbol betyr 3 av 3 siste børsdag, og et klikk på symbolet viser aksjen.",
             (
                 (PRD, "#### FR-105 — Søylene under hovedindeksen"),
                 (HOVEDINDEKS_MAL, '<a class="etikett'),
                 (PRD, "Indeksens endring er en stiplet linje, grønn når indeksen steg og rød når den"),
                 (HOVEDINDEKS, "def bygg_soeyler("),
                 (HOVEDINDEKS_MAL, 'class="indekslinje'),
+                (APP, "def soeylestyrke("),
+                (BOERSOMETER, "GRENSE_STERK = "),
             ),
         ),
         "sluttkurs": Hjelpetekst(
@@ -239,23 +252,31 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # Story 2.7b: historikken nederst paa aksjesiden.
         "historikken": Hjelpetekst(
             "Signalet dag for dag:",
+            # Story 8.2b, b (U16): det som er tatt ut av ingressen.
             "det appen skrev om aksjen hver dag i måneden, eller hvorfor det mangler, lest fra basen og "
-            "aldri regnet på nytt. Pilene viser måneden før og etter, så langt kursserien går. "
-            "Velg en dag med kurs for å se hele siden for den dagen, med målingene.",
-            ((AKSJE_MAL, "Signalet dag for dag"), (HISTORIKK, "Signalet regnes aldri her")),
+            "aldri regnet på nytt. Tallene for uka og måneden teller dagene med signalstyrke "
+            f"{terskel} eller mer, som i oversikten, og {ANTALL_SJEKKER} av {ANTALL_SJEKKER} "
+            "er merket med strek og ring. "
+            "Pilene viser måneden før og etter, så langt kursserien går, og en dag med kurs viser "
+            "hele siden for den dagen, med målingene.",
+            (
+                (AKSJE_MAL, "Signalet dag for dag"),
+                (HISTORIKK, "Signalet regnes aldri her"),
+                (AKSJE_MAL, "{% if uke.vurdert %}{{ uke.skilte_seg_ut }} av {{ uke.vurdert }}"),
+            ),
         ),
         # Svar 32 i 8.0d (rettet kl. 13:05): én tekst for oversikten og
         # aksjesiden, og datoene står bare ved endringen på aksjesiden.
         "endring": Hjelpetekst(
             "Endring:",
+            # Story 8.2b, b (U31): datoene står alltid på aksjesiden.
             "endringen i prosent fra forrige dag med kurs, regnet på "
-            "utbyttejustert kurs. Mangler kilden kurser for noen børsdager, "
-            "står datoene ved endringen på aksjesiden.",
+            "utbyttejustert kurs. På aksjesiden står de to dagene ved "
+            "endringen, med ukedag og dato.",
             (
                 (PRD, "| Endring | Endring i prosent, regnet på "),
                 (MARKEDSOVERSIKT, "def endring_i_prosent("),
-                (AKSJEDETALJ, "def boersdag_mellom("),
-                (AKSJE_MAL, "{% if detalj.endring_med_datoer %}"),
+                (AKSJE_MAL, "fra {{ detalj.forrige_dato|ukedag }} {{ detalj.forrige_dato|dato }} til"),
             ),
         ),
         "utbyttejustert": Hjelpetekst(
@@ -427,7 +448,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "Kursgrafen:",
             f"den tykke linja er utbyttejustert kurs, og den tynne er "
             f"snittet av de siste {ma} børsdagene, som trendsjekken måler mot. "
-            f"Navnet står ved enden av kurslinja og snittet. Sjekk 2 og 3 står i kortene over.",
+            # Story 8.2b, b (U41, U47): navnene står i feltet til høyre.
+            f"Navnene står til høyre, ved enden av linjene. Sjekk 2 og 3 står i kortene over.",
             ((AKSJE_MAL, "Sjekk 2 og 3 tegnes ikke"), (AKSJEDETALJ, "glidende_snitt(kurser, p.ma_vindu)")),
         ),
         # Story 8.17a: periodevalget i oversikten, med søylene og linja.

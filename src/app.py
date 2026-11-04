@@ -41,6 +41,7 @@ import lagring_sqlite
 from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
 from boersdag import UtenforKalenderen, innevaerende_boersdag, norsk_dato
 from boersometer import (
+    GRENSE_STERK,
     bygg_boersometer,
     bygg_rute,
     dagen_foer,
@@ -58,7 +59,18 @@ from graf import bygg_graf
 from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
 from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster
 from hovedindeks import Hovedindeksvisning, bygg_hovedindeks, valgt_indeks
-from ki_visning import AV, KAPSEL, PAA, UKJENT, KIVisning, bygg_ki_visning, ki_paa
+from ki_visning import (
+    AV,
+    INGEN_I_DEMOEN,
+    INGEN_RAD,
+    KAPSEL,
+    PAA,
+    UKJENT,
+    KIVisning,
+    bygg_ki_visning,
+    ki_paa,
+    prikkede_tall,
+)
 from kilogg import Emne, UgyldigKIRad
 from kursdata import Kursleser, investorside
 from lagring_sqlite import (
@@ -185,10 +197,24 @@ app.jinja_env.filters["avrundet"] = avrundet
 # Story 8.0e: ukedagen i overskriften og navnene i linja om «3 av 3».
 app.jinja_env.filters["ukedag"] = ukedag
 app.jinja_env.filters["med_og"] = med_og
+# Story 8.2b, c (U67): tallene i en KI-tekst som vises, med prikket strek.
+app.jinja_env.filters["prikkede_tall"] = prikkede_tall
 # Story 2.7b: «oktober 2026» ved pilene i historikken.
 app.jinja_env.filters["maanedsnavn"] = maanedsnavn
 # Story 8.15: retningen et klikk på en kolonne gir.
 app.jinja_env.globals["neste_orden"] = neste_orden
+
+
+def soeylestyrke(endring: float) -> str:
+    """«sterk» fra GRENSE_STERK opp eller ned, slik endringen vises, ellers
+    «lys». Gruppens svar 04.11 kl. 09:58: søylene under hovedindeksen er
+    mørke fra samme grense som børsometeret (designregler §5, rettet
+    04.11)."""
+    return "sterk" if abs(avrundet(endring, "endring")) >= GRENSE_STERK else "lys"
+
+
+app.jinja_env.filters["soeylestyrke"] = soeylestyrke
+app.jinja_env.globals["soeylegrense"] = tall(GRENSE_STERK, "grense")
 # Story 8.0d: «Oppdatert tirsdag 13.10 kl. 22.15» i stripa, i norsk tid.
 app.jinja_env.filters["oppdatert"] = lambda tid: oppdatert(tid, idag().year)
 
@@ -885,6 +911,9 @@ def _tabellsiden(aktiv: str):
     # tabellen, saa knappen og tabellen sier det samme. Story 8.2a, b: ogsaa
     # en merket aksje uten kurser, som naa har en rad.
     antall_merket = sum(rad.aksje.symbol in merkede for rad in (*rader, *alle_uten_data))
+    # Gjennomgangen av 8.2b (BH2, ECH8, VG6): tittelen i Min liste står med
+    # tall bare når minst én merket aksje er vurdert.
+    vurdert_i_lista = sum(1 for rad in rader if rad.aksje.symbol in merkede and rad.styrke is not None)
     # Story 8.2a, e: hele lista sortert på kolonnen, med radene uten data,
     # som står sist når kolonnen ikke har en verdi for dem. None uten
     # sortering. De som skilte seg ut, beholder kanten i malen.
@@ -943,6 +972,7 @@ def _tabellsiden(aktiv: str):
         hentekommando=hentekommando(),
         merkede=merkede,
         antall_merket=antall_merket,
+        vurdert_i_lista=vurdert_i_lista,
         tilbake=side_adresse(sti, sortering, alle, ledd),
         # Story 8.17a: periodevalget, og perioden og dagen i lenkene.
         valg=valg,
@@ -1063,7 +1093,7 @@ def aksjedetalj(symbol: str):
         # saa ?dag= og ?periode= leses ikke (gjennomgangen 23.10, BH6,
         # ECH3). En base uten en eneste kurs gir 404 over, foer foerste
         # henting.
-        return render_template("aksje_uten_kurser.html", aksje=post.aksje, hentet=None)
+        return render_template("aksje_uten_kurser.html", aksje=post.aksje, hentet=None, aktiv="aksje")
     # Gjennomgangen, BH10: dagen leses én gang, saa alt i svaret gjelder samme dag.
     i_dag = idag()
     valg = les_valg(request.args.get("periode"), request.args.get("dag"), rader[0].dato, i_dag, rader[-1].dato)
@@ -1091,7 +1121,7 @@ def aksjedetalj(symbol: str):
     # Story 10.3: KI-teksten under regelforklaringen, bare naar det er en
     # vurdering aa forklare og bryteren er paa (FR-601, FR-602).
     ki_er_paa = ki_paa(request.cookies.get(KAPSEL))
-    ki = _ki_visning(post, detalj) if ki_er_paa and detalj.sjekker else None
+    ki = _ki_visning(post, detalj, rader[-1].dato) if ki_er_paa and detalj.sjekker else None
     # Gruppens svar 25.10 kl. 00:51: setningen om dagene under KI-teksten,
     # ogsaa naar KI er av eller teksten er stoppet. «I dag» bare naar dagen
     # siden viser, er i dag (gjennomgangen, BH1, ECH6, VG1).
@@ -1112,6 +1142,8 @@ def aksjedetalj(symbol: str):
     svar = app.make_response(
         render_template(
             "aksje.html",
+            # Story 8.2b, b (U2): siden hører til Markedsoversikt i stripa.
+            aktiv="aksje",
             detalj=detalj,
             graf=bygg_graf(
                 detalj.punkter,
@@ -1186,7 +1218,7 @@ def _setningen_om_dagene(post, detalj, annen_dag: bool) -> str | None:
     return setning_om_dagene(dager, minst, annen_dag=annen_dag)
 
 
-def _ki_visning(post, detalj) -> KIVisning:
+def _ki_visning(post, detalj, siste: date) -> KIVisning:
     """Raden i KILogg for aksjen og dagen, mot vurderingen som vises.
 
     Webserveren leser bare (AD-10). Kan loggen ikke leses, for eksempel i en
@@ -1205,7 +1237,14 @@ def _ki_visning(post, detalj) -> KIVisning:
         app.logger.warning("KI-loggen kunne ikke leses: %s: %s", type(feil).__name__, feil)
         return KIVisning(UKJENT)
     # Proevd mot vurderingen som vises, ikke den for siste boersdag (8.16b).
-    return bygg_ki_visning(rad, detalj.vurdering, andre_har_rader=andre_har_rader)
+    visning = bygg_ki_visning(rad, detalj.vurdering, andre_har_rader=andre_har_rader)
+    # Story 8.2b, b (U6): i demoen er grunnen at demoen bare har KI-tekst for
+    # siste boersdag. Den ekte versjonen har teksten som foer. Gjennomgangen
+    # av 8.2b (BH3, ECH3): bare for en dag foer siste dag i serien, saa en
+    # demobase uten KI-tekstene ikke sier det om siste dag.
+    if visning.tilstand == INGEN_RAD and g.get("eksempeltall") and detalj.dato < siste:
+        return KIVisning(INGEN_I_DEMOEN)
+    return visning
 
 
 # Bare aksjesiden kan vaere maalet for bryteren. Alt annet gaar til /, ogsaa
@@ -1332,7 +1371,12 @@ def merk():
         return _basen_kan_ikke_aapnes()
     # Gjennomgangen (BH5): tilbake til raden, ikke til toppen av siden.
     # Symbolet er godtatt av porten, saa ankeret har bare kjente tegn.
-    return redirect(tilbake_etter_merking(request.form.get("tilbake")) + f"#rad-{symbol}", code=303)
+    adresse = tilbake_etter_merking(request.form.get("tilbake"))
+    # Story 8.2b, a (U29): tas aksjen ut av Min liste uten «Alle», er raden
+    # borte, saa siden sender tilbake til tabellen.
+    deler = urlsplit(adresse)
+    borte = til == FJERN and deler.path == MIN_LISTE and _ett(parse_qs(deler.query), "vis") != ALLE
+    return redirect(adresse + ("#aksjene" if borte else f"#rad-{symbol}"), code=303)
 
 
 if __name__ == "__main__":

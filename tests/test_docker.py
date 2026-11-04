@@ -953,7 +953,15 @@ SKRIFTFILER = {".woff", ".woff2", ".ttf", ".otf", ".css", ".js"}
 # Story 8.3: 1630, fordi knapperaden i stripa skyver tabellen ned. Var 1573.
 # Story 8.17a: 1690, fordi periodevalget over hovedindeksen skyver tabellen
 # ned. Bunnen av raden er maalt i Edge uten vindu. Var 1630.
-HOEYDE_PAA_BILDET = 1690
+# Story 8.2b, a: 1784, fordi søylefeltet er høyere og forklaringen av den
+# stiplede linja står under søylene. Maalt paa samme maate. Var 1690.
+# Story 8.2b, b: 1772, fordi periodeknappene er 36 px og midtstilt (U37). Var
+# 1784.
+# Story 8.2b, d: 1838, fordi «Aksjene» og valget «Alle / Min liste» står over
+# tabellen (U59). Var 1772.
+# Gruppens svar 04.11 kl. 09:58: 1864, fordi forklaringen av lys og mørk søyle
+# står under søylene. Maalt paa samme maate. Var 1838.
+HOEYDE_PAA_BILDET = 1864
 # Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
 # Story 10.5: investorsidene i kursdata.py. Bildet ble tatt på nytt og er
 # byte for byte det samme. Avtrykket er av kildefilene, ikke av PNG-en.
@@ -1071,7 +1079,28 @@ HOEYDE_PAA_BILDET = 1690
 # skrevet to ganger. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Gjennomgangen av 8.17b 03.11: rettingene i app.py, index.html, _perioder.html
 # og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "34d22f9be30b77a192a80cb1c001a0fa4484fe3e1fcfb3e4550637af6aad4837"
+# Story 8.2b, a: søylene, «Slik leser du tabellen» og hjelpen, i
+# hjelpetekster.py, index.html, _hovedindeks.html og stil.css (rettet i 8.2b,
+# b: app.py er ikke blant filene). Bildet ble tatt paa nytt med den nye
+# hoeyden.
+# Story 8.2b, b: periodeknappene og hjelpen, i hjelpetekster.py, _ramme.html
+# og stil.css. Bildet ble tatt paa nytt med den nye hoeyden.
+# Story 8.2b, c: stil.css. Bildet ble tatt paa nytt og er byte for byte det
+# samme.
+# Story 8.2b, d: «Aksjene» og valget over tabellen, og tittelen i Min liste, i
+# index.html og stil.css. Bildet ble tatt paa nytt med den nye hoeyden.
+# Gjennomgangen av 8.2b 04.11: rettingene i hjelpetekster.py, index.html,
+# aksje.html og stil.css. Bildet ble tatt paa nytt og er byte for byte det
+# samme.
+# Gruppens svar 04.11 kl. 09:58: lys og mørk søyle, i app.py, hjelpetekster.py,
+# _hovedindeks.html og stil.css. Bildet ble tatt paa nytt med den nye hoeyden.
+# Gruppens svar 04.11 kl. 10:01 og 10:04: børsometeret, i hjelpetekster.py og
+# stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gruppens svar 04.11 kl. 10:04: «?» først i periodevalget, i index.html.
+# Bildet ble tatt paa nytt med samme hoeyde.
+# Gjennomgangen av 8.2b 04.11: rettingene i _hovedindeks.html, hjelp.js og
+# stil.css. Bildet ble tatt paa nytt med samme hoeyde.
+AVTRYKK_BAK_BILDET = "3c507617956ed5f24e9705362fa972eb06a71ba772375b8f2ec194deb526f7d8"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1140,7 +1169,14 @@ IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py", "src/boersometer.py
 # KI-teksten, og en lengre tekst for BRFE. Grafen slutter ved 1934. Var 1872.
 # Story 10.2g, gruppens svar 25.10 kl. 19:54 og 19:56: en kortere tekst for
 # BRFE. Grafen slutter ved 1894, maalt i Edge uten vindu. Var 1934.
-HOEYDE_PAA_AKSJESIDEN = 1894
+# Story 8.2b, b: grafen (figure) slutter ved 1882, fordi periodeknappene er
+# 36 px (U37). Maalt i Edge uten vindu. Var 1894.
+# Story 8.2b, c (U66): KI-teksten står etter grafen, saa bildet slutter ved
+# bunnen av setningen om dagene (p.dagene) under KI-teksten, og har baade
+# grafen og teksten. Maalt i Edge uten vindu. Var 1882.
+# Gruppens svar 04.11 kl. 09:58: 2198, fordi «?» ved «Ga» og «Målt mot» står i
+# alle tre sjekkortene. Maalt paa samme maate. Var 2192.
+HOEYDE_PAA_AKSJESIDEN = 2198
 # Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
 # Story 10.5: lenken til investorsiden står under grafen, ved 1980 px målt i
 # Edge uten vindu, så bildet, som slutter ved bunnen av grafen (1872 px), ble
@@ -1292,14 +1328,38 @@ HOEYDE_PAA_AKSJESIDEN = 1894
 # er byte for byte det samme.
 # Gjennomgangen av 8.17b 03.11: rettingene i app.py, index.html, _perioder.html
 # og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "e63a2847ea8144bf13ec53a6b7bdc9d94712fc023810fe27dafccd5baea27d27"
+# Story 8.2b, a: app.py, hjelpetekster.py og stil.css. Bildet ble tatt paa
+# nytt og er byte for byte det samme.
+# Story 8.2b, b: stripa, kortet Endring, grafen med feltene og navnene,
+# periodeknappene og historikken, i app.py, graf.py, ki_visning.py,
+# hjelpetekster.py, _ramme.html, aksje.html og stil.css. Bildet ble tatt paa
+# nytt med den nye hoeyden.
+# Story 8.2b, c: KI-delen etter grafen, bryteren i rammen, innledningen,
+# summen, kortet Retning og historikken, i app.py, ki_visning.py, aksje.html
+# og stil.css. Bildet ble tatt paa nytt med den nye hoeyden.
+# Story 8.2b, d: stil.css. Bildet ble tatt paa nytt og er byte for byte det
+# samme.
+# Gjennomgangen av 8.2b 04.11: rettingene i app.py, graf.py, ki_visning.py,
+# hjelpetekster.py, aksje.html, index.html og stil.css. Bildet ble tatt paa
+# nytt og er byte for byte det samme.
+# Gruppens svar 04.11 kl. 09:48: summen med styrken først, i aksje.html.
+# Bildet ble tatt paa nytt med samme hoeyde.
+# Gruppens svar 04.11 kl. 09:58: lys og mørk søyle, i app.py, hjelpetekster.py
+# og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gruppens svar 04.11 kl. 09:58: «?» i alle tre sjekkortene, i aksje.html.
+# Bildet ble tatt paa nytt med den nye hoeyden.
+# Gruppens svar 04.11 kl. 10:01 og 10:04: børsometeret, i hjelpetekster.py og
+# stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gjennomgangen av 8.2b 04.11: rettingene i hjelp.js og stil.css. Bildet ble
+# tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "47b249366eefcbffa8d18d6ad4da1f9dac89304271a0ef571ccf82943a179623"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
     "demobasen i en midlertidig mappe (lagring_sqlite.BASE_STI dit), OSE_DEMO=1, "
     "waitress på en ledig port, og msedge --headless --disable-gpu --hide-scrollbars "
     f"--window-size=1280,{HOEYDE_PAA_AKSJESIDEN} med egen --user-data-dir. Bildet skal slutte "
-    "ved bunnen av grafen (figure), under KI-teksten: mål den og endre "
+    "ved bunnen av setningen om dagene (p.dagene), under KI-teksten etter grafen: mål den og endre "
     "HOEYDE_PAA_AKSJESIDEN hvis den har flyttet seg. Oppdater så "
     "AVTRYKK_BAK_AKSJESIDEN til {avtrykk} i samme commit."
 )
@@ -1344,11 +1404,13 @@ class TestSkjermbildet:
         Ville feilet med bildet fra 3.3b (1280 x 1000), eller et bilde i en
         annen hoeyde enn HOEYDE_PAA_BILDET. Story 8.3: hoeyden er 1630 med
         knapperaden, og navnet paa testen staar, fordi kvalitetssikringen
-        viser til det. Story 8.17a: 1690 med periodevalget."""
+        viser til det. Story 8.17a: 1690 med periodevalget. Story 8.2b, a:
+        1784 med de høyere søylene, 1772 med periodeknappene fra 8.2b, b, 1838 med «Aksjene» fra 8.2b, d, og
+        1864 med forklaringen av lys og mørk søyle (svaret 04.11 kl. 09:58)."""
         data = (ROT / SKJERMBILDET).read_bytes()
         assert data[:8] == b"\x89PNG\r\n\x1a\n"
         assert int.from_bytes(data[16:20], "big") == 1280
-        assert int.from_bytes(data[20:24], "big") == HOEYDE_PAA_BILDET == 1690
+        assert int.from_bytes(data[20:24], "big") == HOEYDE_PAA_BILDET == 1864
 
     def test_bildet_har_ingen_tekstfelt(self):
         """Regel 16 (gjennomgangen av 3.3e, BH8 og ECH10): ingen sti eller

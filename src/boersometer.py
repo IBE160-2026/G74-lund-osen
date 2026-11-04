@@ -503,13 +503,23 @@ def _nivaa_ved(flate: Flate, bredde: float, rb: float, rh: float, symbol: str) -
     return tekstnivaa(rb * skala - 2 * KANT, rh * skala - 2 * KANT, symbol)
 
 
+# Bredden og høyden ruta må ha for nivå 3, med teksten på 14 px.
+NIVAA_3 = (126, 106)
+
+
 def tekstnivaa(b: float, h: float, symbol: str) -> int:
-    """Hvor mye tekst ruta har plass til, i px (spesifikasjonen 8.6b, «Navnet»)."""
-    if b < 9 * len(symbol) + 10 or h < 40:
+    """Hvor mye tekst ruta har plass til, i px (spesifikasjonen 8.6b, «Navnet»).
+    Gruppens svar 04.11 kl. 10:01 og 10:04: teksten er 14 px, ikke 13 og 12,
+    og nivå 3 har styrken og merket for siste børsdag. Grensene er skalert
+    med det og målt i Edge ved 1280, 1079, 900, 761, 760, 390, 360 og 320 px
+    (spesifikasjonen 8.2b). Gjennomgangen av 8.2b (BH2, ECH2, VG1): nivå 3
+    har plass til det lengste, en gul ramme en annen dag med navnet,
+    endringen, styrken og merket på to linjer (test_nivaa_3_har_plass_til_det_lengste)."""
+    if b < 10 * len(symbol) + 10 or h < 40:
         return 0
-    if b < 74 or h < 60:
+    if b < 80 or h < 65:
         return 1
-    if b < 96 or h < 88:
+    if b < NIVAA_3[0] or h < NIVAA_3[1]:
         return 2
     return 3
 
