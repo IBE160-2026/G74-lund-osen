@@ -3599,6 +3599,8 @@ Tidligere avgjørelser som sier noe annet, har fått en datert linje: `designreg
 - «?» foran periodeknappene står midt på høyden av knappene, på oversikten, i Min liste og i børsometeret.
 - Aksjesiden får ingen egen «?» for periodene, fordi «?» ved «Kursutvikling» forklarer både grafen og periodene.
 
+*Lagt til 2026-11-04 kl. 20:29:* rettingen etter svaret kl. 19:21 er squash-flettet i `e45d04a9`, PR #110, låst til head-en `9cdfe020`. Styrken har sin egen grense i børsometeret, `STYRKE = (81, 75)`, og «?» står midt på periodeknappene på oversikten, i Min liste og i børsometeret, også ved 390 px. Aksjesiden er ikke endret (svar 3). Hele settet på `fcb55a44`, siste commit med kode: 4003 bestått, 24 hoppet over og 5 porttester for `start.ps1` som feilet (svaret 29.10 kl. 21:02). CI var grønn på head-en (41896308524). Mutantene S1–S3 ble fanget. Gjennomgangen ga ingen funn på høy; VG1–VG4 er rettet, og ECH1, merket en annen dag på nivå 2, står etter svaret og er ført som spørsmål i spesifikasjonen 8.2b.
+
 ### Story 8.2c: Kursgrafen på smal skjerm
 
 *Lagt til 2026-11-04 (gruppens svar kl. 09:48, spørsmål 8 i `spec-8-2b-funnene-fra-ux-loggen.md`):* «Ekstra, hvis tiden rekker», som 8.4–8.19 (svaret 19.10 kl. 15:43). Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt.

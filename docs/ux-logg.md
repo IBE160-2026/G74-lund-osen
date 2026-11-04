@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-11-04T11:34
+updated: 2026-11-04T20:29
 ---
 
 # UX-loggen
@@ -670,3 +670,5 @@ Talt: løst 7, delvis 3, står 34, må ses på siden 1, i alt 45.
 *Lagt til 2026-11-03 (gruppens svar kl. 22:01, instruksjonen kl. 22:44):* 29 av de 38 som ikke er løst, tas i 8.2b (under story 8.2 i `epics.md`). Disse står, med grunnen: U4 (kalenderen dekker bare 2026), U23 (nevnerne er ulike med vilje), U38 (datofeltet er nettleserens), U40 og U60 (egne stories, 8.8 og 8.19), U61 (8.0d valgte tekstlenke), U17 (aksjesiden nås fra navnet), U1 (bare demobaser fra 22.10–29.10) og U43 (må ses i appen).
 
 *Lagt til 2026-11-04 kl. 11:34 (8.2b flettet i `6f62f564`, PR #109, etter svarene kl. 09:48–10:04 under story 8.2 i `epics.md`):* bygget er U2, U6, U16, U20–U22, U24–U26, U29, U31, U37, U39, U41, U44, U47, U59, U62–U64, U66, U68 og U69, og U57 med forklaringen under søylene, tickeren vannrett på bred skjerm og lyse og mørke søyler. U33, U46 og U67 er delvis bygget: bryteren står i rammen, i blekk og ikke i stripa, og tallene i KI-teksten har prikket strek. U58 og U65 står, etter svaret kl. 09:58. Summen på aksjesiden har styrken først (09:48), og grafen ved 390 px er story 8.2c. «?» ved «Ga» og «Målt mot» står nå i alle tre sjekkortene, så avvisningen 15.10 i tabellen over gjelder ikke lenger (09:58). De ni som sto 03.11, står fortsatt, med grunnen over.
+
+*Lagt til 2026-11-04 kl. 20:29 (rettingen av 8.2b flettet i `e45d04a9`, PR #110, etter svaret kl. 19:21 under story 8.2 i `epics.md`):* styrken står nå i alle rutene i børsometeret med plass til én linje til under symbolet og endringen, og «?» står midt på periodeknappene på oversikten, i Min liste og i børsometeret, også ved 390 px. Aksjesiden får ingen egen «?» for periodene.
