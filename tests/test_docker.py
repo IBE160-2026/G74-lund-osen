@@ -1330,7 +1330,9 @@ HOEYDE_PAA_AKSJESIDEN = 2192
 # Gjennomgangen av 8.2b 04.11: rettingene i app.py, graf.py, ki_visning.py,
 # hjelpetekster.py, aksje.html, index.html og stil.css. Bildet ble tatt paa
 # nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "19bae65b3da9e7857af9ec3731dc6aa12c9ce321838b62a7ca40e95458d4a976"
+# Gruppens svar 04.11 kl. 09:48: summen med styrken først, i aksje.html.
+# Bildet ble tatt paa nytt med samme hoeyde.
+AVTRYKK_BAK_AKSJESIDEN = "cd41a1f726382f4bc768f969b646784c8b9f637f73a236cd7ff21beb7b34560e"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "

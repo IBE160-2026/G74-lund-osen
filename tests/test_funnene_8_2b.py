@@ -389,11 +389,12 @@ def test_kortet_retning_sier_hva_sjekkene_ga(klient):
 
 
 def test_summen_under_sjekkene(klient):
-    """U64. Ville feilet uten raden, eller med en annen styrke eller retning
-    enn kortene over."""
+    """U64 og gruppens svar 04.11 kl. 09:48. Ville feilet uten raden, med en
+    annen styrke eller retning enn kortene over, eller med T, B og I foran
+    styrken, der tabellen har styrken først (8.0e)."""
     html = _html(klient, "/aksje/BRFE")
     rad = re.search(r'<p class="sumrad">(.*?)</p>', html, flags=re.DOTALL).group(1)
-    assert _synlig(rad) == "Sum T -1 B -1 I -1 3 av 3 ↓Negativ", _synlig(rad)
+    assert _synlig(rad) == "Sum 3 av 3 T -1 B -1 I -1 ↓Negativ", _synlig(rad)
     assert 'class="pille tre-av-tre"' in rad
     assert html.index('class="sjekkort-rad"') < html.index('class="sumrad"') < html.index("Signalstyrken er hvor mange")
 

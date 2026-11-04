@@ -106,9 +106,10 @@
       {% endfor %}
     </div>
 
-    {#- Story 8.2b, c (U64): summen under sjekkene, med T, B og I, styrken og
-        retningen, som på tavla. #}
-    <p class="sumrad"><span class="sumnavn">Sum</span> {{ brikker(detalj.sjekkbrikker) }} <span class="pille{% if detalj.styrke == antall_sjekker %} tre-av-tre{% endif %}">{{ detalj.styrke }} av {{ antall_sjekker }}</span> {{ retningspille(detalj.retning) }}</p>
+    {#- Story 8.2b, c (U64): summen under sjekkene, med styrken, T, B og I og
+        retningen. Gruppens svar 04.11 kl. 09:48: styrken først, som tabellen
+        (8.0e). #}
+    <p class="sumrad"><span class="sumnavn">Sum</span> <span class="pille{% if detalj.styrke == antall_sjekker %} tre-av-tre{% endif %}">{{ detalj.styrke }} av {{ antall_sjekker }}</span> {{ brikker(detalj.sjekkbrikker) }} {{ retningspille(detalj.retning) }}</p>
     <p class="fotnote">
       Signalstyrken er hvor mange sjekker som slo ut: {{ detalj.bidragsytere|length }} av {{ antall_sjekker }} ga utslag.
       Ga noen +1 og noen -1, er retningen {{ blandet }}.
