@@ -90,8 +90,8 @@
                 i ringen fra tabellen for siste børsdag, ellers som tekst. En
                 annen dag sier merket i tillegg at gul ramme er 3 av 3 siste
                 børsdag. #}
-            {% if rute.styrke is not none %}<span class="styrke{% if dagen == siste and rute.ramme == 'gul' %} pille tre-av-tre{% elif rute.ramme == 'moerk' %} pille to-av-tre{% endif %}">{{ rute.styrke }} av {{ antall_sjekker }}</span>{% endif %}
-            {% if rute.ramme == "gul" and dagen != siste %}<span class="merke">{{ antall_sjekker }} av {{ antall_sjekker }} siste børsdag</span>{% endif %}
+            {% if rute.styrke is not none %}<span class="skjult">, </span><span class="styrke{% if dagen == siste and rute.ramme == 'gul' %} pille tre-av-tre{% elif rute.ramme == 'moerk' %} pille to-av-tre{% endif %}">{{ rute.styrke }} av {{ antall_sjekker }}</span>{% endif %}
+            {% if rute.ramme == "gul" and dagen != siste %}<span class="merke"><span class="skjult">, </span>{{ antall_sjekker }} av {{ antall_sjekker }} siste børsdag</span>{% endif %}
             {% if rute.tekst and not rute.uten_data %}<span class="tekst">{{ rute.tekst }}</span>{% endif %}
             <span class="skjult">, {{ rute.aksje.navn }}{% if rute.fra %}, fra {{ rute.fra|dato }}{% endif %}{% if rute.volumord and not rute.lik_stoerrelse %}, volum {{ rute.volumord }}{% endif %}</span>
           </a></li>

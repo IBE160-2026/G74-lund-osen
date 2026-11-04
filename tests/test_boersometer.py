@@ -525,7 +525,7 @@ class TestSiden:
         # som i tabellen, ikke bare ved 3 av 3 og 2 av 3 som merket før.
         styrker = dict(
             re.findall(
-                r'<span class="ticker">([A-Z0-9]+)</span>\s*<span class="endring">[^<]+</span>\s*<span class="styrke[^"]*">([^<]+)</span>',
+                r'<span class="ticker">([A-Z0-9]+)</span>\s*<span class="endring">[^<]+</span>\s*<span class="skjult">, </span><span class="styrke[^"]*">([^<]+)</span>',
                 html,
             )
         )
@@ -748,7 +748,8 @@ class TestSvaretKl0924:
             # letes etter under søylene.
             ruter = html.split("</figure>", 1)[-1]
             rute = re.search(rf'<span class="ticker">{symbol}</span>.*?</a>', ruter, re.S).group(0)
-            assert '<span class="merke">3 av 3 siste børsdag</span>' in rute, symbol
+            # Gjennomgangen av 8.2b (ECH3): med skilletegn for skjermleseren.
+            assert '<span class="merke"><span class="skjult">, </span>3 av 3 siste børsdag</span>' in rute, symbol
         assert "Gul ramme betyr 3 av 3 på siste børsdag, 09.10" in html
 
     def test_aksjesiden_uten_kurser_svarer_200_med_beskjed(self, klient):
@@ -1575,9 +1576,10 @@ class TestKartet:
             (79, 110, "BRFE", 1),
             (80, 64, "BRFE", 1),
             (80, 65, "BRFE", 2),
-            (111, 110, "BRFE", 2),
-            (112, 102, "BRFE", 2),
-            (112, 103, "BRFE", 3),
+            # Gjennomgangen av 8.2b (BH2, ECH2, VG1): nivå 3 er NIVAA_3, 126 × 106.
+            (125, 110, "BRFE", 2),
+            (126, 105, "BRFE", 2),
+            (126, 106, "BRFE", 3),
             (59, 65, "NORSE", 0),
             (60, 65, "NORSE", 1),
         ],

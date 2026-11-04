@@ -369,7 +369,8 @@ class TestSidene:
         assert re.search(r"<h2>Hvorfor signalet ble [^<]* " + knapp.format("hjelp-sjekkene"), detalj)
         assert "Tallene og signalet" not in oversikt + detalj
         # Story 8.0d, PR 3: «?» ved «Oppdatert» i stripa også på aksjesiden,
-        # og hvert vindu har én knapp.
+        # og hvert vindu har én knapp. Rettet 04.11 (gruppens svar kl. 09:58):
+        # vinduene for Ga og Målt mot har én knapp i hvert sjekkort, under.
         stripa = detalj.split('<header class="stripe">', 1)[1].split("</header>", 1)[0]
         assert re.search(r"Oppdatert [^<]+</span>\s*" + knapp.format("hjelp-hentet"), stripa)
         # Gruppens svar 04.11 kl. 09:58: «?» ved «Ga» og «Målt mot» i alle

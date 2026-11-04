@@ -83,7 +83,7 @@
             {#- Gruppens svar 04.11 kl. 09:58: lys og mørk søyle, mørk fra
                 samme grense som børsometeret. Skjult for skjermleseren, som
                 har tallene i lista over. #}
-            <p class="soeylefarger" aria-hidden="true"><span class="fargeprove opp lys"></span><span class="fargeprove ned lys"></span><span>Lys søyle: under {{ soeylegrense }}</span> <span class="fargeprove opp sterk"></span><span class="fargeprove ned sterk"></span><span>Mørk søyle: {{ soeylegrense }} eller mer, opp eller ned</span></p>
+            <p class="soeylefarger" aria-hidden="true"><span class="fargeprove opp lys"></span><span class="fargeprove ned lys"></span><span>Lys søyle: under {{ soeylegrense }}, opp eller ned</span> <span class="fargeprove opp sterk"></span><span class="fargeprove ned sterk"></span><span>Mørk søyle: {{ soeylegrense }} eller mer, opp eller ned</span></p>
             {%- if sy.linje is not none %}
             <p class="skjult">Indeksen, den stiplede linja: {{ sy.indeks|tall('endring') }}.</p>
             {#- Story 8.2b, a (U22, U57): forklaringen står under søylene. Den

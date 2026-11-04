@@ -383,6 +383,12 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) .soeyler .fargeprove.opp.sterk { background: var(--opp); }
 :where(.side-oversikt) .soeyler .fargeprove.ned.sterk { background: var(--ned); }
 :where(.side-oversikt) .soeyler .fargeprove.ned + span { margin-right: 0.5rem; }
+/* Gjennomgangen av 8.2b (ECH5): med høy kontrast står prøvene i forklaringen
+   og rammen rundt bransjen fortsatt. */
+@media (forced-colors: active) {
+  :where(.side-oversikt) .soeyler .fargeprove { forced-color-adjust: none; }
+  :where(.side-oversikt) .kart section.bransje { outline: 1px solid CanvasText; outline-offset: -1px; }
+}
 
 /* Tabellen i et kort med svart topp. Boksen ruller sidelengs på smal
    skjerm, så siden ikke gjør det (avvik 8). position: relative holder

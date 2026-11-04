@@ -555,7 +555,7 @@ def test_soeylene_er_lyse_og_moerke(klient):
     assert [k[1] for k in klasser] == ["sterk" if abs(avrundet(t, "endring")) >= GRENSE_STERK else "lys" for t in tall_]
     assert {k[1] for k in klasser} == {"lys", "sterk"}
     forklaring = re.search(r'<p class="soeylefarger" aria-hidden="true">(.*?)</p>', figur, flags=re.DOTALL).group(1)
-    ventet = "Lys søyle: under 2 % Mørk søyle: 2 % eller mer, opp eller ned"
+    ventet = "Lys søyle: under 2 %, opp eller ned Mørk søyle: 2 % eller mer, opp eller ned"
     assert _synlig(forklaring) == ventet, _synlig(forklaring)
     assert figur.index('class="felt"') < figur.index('class="soeylefarger"')
     assert "Lys søyle" not in re.sub(r'<p class="soeylefarger".*?</p>', "", figur, flags=re.DOTALL)
@@ -621,8 +621,12 @@ def test_en_annen_dag_er_styrken_tekst_og_merket_star(klient):
     feilet med ringen en annen dag, eller uten merket."""
     ruter = _ruter(_html(klient, "/boersometer?periode=velg&dag=2026-10-01"))
     gule = [r for r in ruter.values() if "ramme-gul" in r]
-    assert gule and all('<span class="merke">3 av 3 siste børsdag</span>' in r for r in gule)
+    assert gule and all(
+        '<span class="merke"><span class="skjult">, </span>3 av 3 siste børsdag</span>' in r for r in gule
+    )
     assert "pille" not in "".join(ruter.values())
+    # Gjennomgangen (BH3): styrken for dagen står også, som tekst.
+    assert all(re.search(r'<span class="styrke">\d av 3</span>', r) for r in gule)
 
 
 def test_skriften_og_rammen_i_boersometeret():
@@ -635,9 +639,10 @@ def test_skriften_og_rammen_i_boersometeret():
     assert "font-size: 14px" in re.search(r"\.kart section\.bransje h2 \{([^}]*)\}", STIL).group(1)
     for velger in ("section.maal", "section.maal h2", "section.fargene", "section.fargene h2"):
         assert "font-size: 16px" in _regel(velger), velger
-    assert "box-shadow: inset 0 0 0 1px var(--strek-2)" in re.search(
-        r"\.kart section\.bransje \{([^}]*)\}", STIL
-    ).group(1)
+    assert any(
+        "box-shadow: inset 0 0 0 1px var(--strek-2)" in r
+        for r in re.findall(r"\.kart section\.bransje \{([^}]*)\}", STIL)
+    )
 
 
 @pytest.mark.parametrize(
@@ -650,3 +655,36 @@ def test_spoersmaalstegnet_for_periodene_staar_foerst(klient, sti, vindu):
     rad = _html(klient, sti).split('<div class="periodehode">', 1)[1].split("</nav>", 1)[0]
     assert rad.lstrip().startswith(f'<button type="button" class="hjelpeknapp" popovertarget="{vindu}"'), rad[:120]
     assert rad.index(f'popovertarget="{vindu}"') < rad.index("<nav")
+
+
+def test_nivaa_3_har_plass_til_det_lengste():
+    """Gjennomgangen av 8.2b (BH2, ECH2, VG1). Det lengste på nivå 3 er en gul
+    ramme en annen dag: navnet, endringen, styrken og merket «3 av 3 siste
+    børsdag» på to linjer, regnet med tallene i stil.css. Ville feilet med
+    grensen 112 × 103, der merket kunne kuttes."""
+    from boersometer import NIVAA_3
+
+    rute = re.search(r"side-oversikt\) \.rute \{([^}]*)\}", STIL).group(1)
+    skrift = int(re.search(r"font-size: (\d+)px", rute).group(1))
+    linje = skrift * float(re.search(r"line-height: ([\d.]+)", rute).group(1))
+    gap = int(re.search(r"gap: (\d+)px", rute).group(1))
+    luft = [int(v) for v in re.search(r"padding: (\d+)px (\d+)px", rute).groups()]
+    ramme = int(
+        re.search(r"border: (\d+)px solid", _regel(".rute.ramme-gul, :where(.side-oversikt) .proeve.ramme-gul")).group(
+            1
+        )
+    )
+    hoeyde = 2 * ramme + 2 * luft[0] + 5 * linje + 3 * gap
+    bredde = 2 * ramme + 2 * luft[1] + 0.62 * skrift * len("3 av 3 siste")
+    assert NIVAA_3[1] >= hoeyde and NIVAA_3[0] >= bredde, (NIVAA_3, hoeyde, bredde)
+
+
+def test_hjelpen_i_docs_sier_samme_grense_som_koden():
+    """Gjennomgangen av 8.2b (VG5): docs/hjelp.md skriver grensen for mørk
+    søyle som tekst. Ville feilet hvis GRENSE_STERK ble endret uten hjelpen."""
+    from boersometer import GRENSE_STERK
+    from tallformat import tall
+
+    hjelp = (Path(__file__).resolve().parent.parent / "docs" / "hjelp.md").read_text(encoding="utf-8")
+    grense = tall(GRENSE_STERK, "grense").replace(" ", " ")
+    assert f"En søyle er mørk fra {grense} opp eller ned" in hjelp
