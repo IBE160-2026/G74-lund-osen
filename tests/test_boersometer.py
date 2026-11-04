@@ -50,6 +50,7 @@ from boersometer import (
     snitt,
     squarify,
     stoerrelse,
+    styrkeplass,
     tekstnivaa,
     vekt,
     vis_volumforhold,
@@ -1608,6 +1609,10 @@ class TestKartet:
                         rb, rh = kr.plass[flate.navn].b / 100 * fb, kr.plass[flate.navn].h / 100 * kropp
                         ventet = tekstnivaa(rb - 2 * KANT, rh - 2 * KANT, kr.rute.aksje.symbol)
                         assert kr.nivaa[klasse] == ventet, (klasse, kr.rute.aksje.symbol, rb, rh)
+                        # Gruppens svar 04.11 kl. 19:21: styrken på nivå 2,
+                        # regnet for den samme synlige ruta.
+                        med_styrke = ventet == 2 and styrkeplass(rb - 2 * KANT, rh - 2 * KANT)
+                        assert (klasse in kr.styrke) == med_styrke, (klasse, kr.rute.aksje.symbol, rb, rh)
 
     def test_tekstnivaaet_paa_siden_er_det_kartet_regnet(self, klient):
         """Gjennomgangen 26.10 (VG): ville feilet hvis malen sluttet å skrive
@@ -1622,6 +1627,13 @@ class TestKartet:
             )
         }
         assert len(klasser) == 15
+        med_styrke = set(
+            re.findall(
+                r'<span class="ticker">([A-Z0-9]+)</span>\s*<span class="endring">[^<]*</span>\s*'
+                r'<span class="skjult">, </span><span class="styrke',
+                html,
+            )
+        )
         sett = set()
         for flate in (BRED, SMAL):
             n = flate.navn
@@ -1636,7 +1648,14 @@ class TestKartet:
                         funnet = re.findall(rf"\bnivaa-{klasse}-(\d)\b", klasser[symbol])
                         assert funnet == [str(ventet)], (klasse, symbol, rb, rh)
                         sett.add((klasse, ventet))
+                        # Gjennomgangen av rettingen 04.11 (VG1): styrke-N står
+                        # på siden der ruta har styrke og plass på nivå 2.
+                        med = ventet == 2 and styrkeplass(rb - 2 * KANT, rh - 2 * KANT) and symbol in med_styrke
+                        assert (f"styrke-{klasse}" in klasser[symbol].split()) == med, (klasse, symbol, rb, rh)
+                        if med:
+                            sett.add((klasse, "styrke"))
         assert len(sett) > 4, sett
+        assert {(k, "styrke") for k in ("bredest", "bred", "smal", "smalest")} <= sett, sett
 
     def test_tekstnivaaet_fra_360_og_1080_px(self, klient):
         """Gruppens svar 26.10 kl. 13:00 (c) og 13:07 (e): fra 1080 px regnes
@@ -1658,11 +1677,12 @@ class TestKartet:
         kartregel = re.search(r"\.kart \{([^}]*)\}", stil).group(1)
         assert "container-type: inline-size" in kartregel
         # Gruppens svar 04.11 kl. 10:01 og 10:04: styrken står på nivå 3, som
-        # merket.
+        # merket. Svaret kl. 19:21: på nivå 2 skjules styrken bare uten
+        # klassen styrke-N, og det står i en egen velger under.
         skjult = {
             0: [".ticker", ".endring", ".merke", ".styrke", ".tekst"],
             1: [".endring", ".merke", ".styrke", ".tekst"],
-            2: [".merke", ".styrke", ".tekst"],
+            2: [".merke", ".tekst"],
         }
         for media, flate in (("(width > 760px)", BRED), ("(width <= 760px)", SMAL)):
             del_ = stil.split(f"@media {media} {{\n", 1)[1].split("\n}\n", 1)[0]
@@ -1675,6 +1695,9 @@ class TestKartet:
                     grense,
                     velgere,
                 )
+                assert re.findall(r"\.rute\.nivaa-([a-z]+)-2:not\(\.styrke-([a-z]+)\) > \.styrke", blokker[grense]) == [
+                    (klasse, klasse)
+                ], grense
             assert liten_b < stor_b
         # I demoen viser noen ruter mer ved 1008 og 328 px enn ved 712 og 288 px.
         klasser = re.findall(r'<a class="rute ([^"]*)"', _side(klient))

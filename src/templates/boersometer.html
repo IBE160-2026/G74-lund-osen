@@ -82,7 +82,7 @@
           {%- set rute = kartrute.rute %}
           {#- Gruppens svar 23.10 kl. 09:24 (b): hver rute lenker til aksjesiden,
               også for en aksje uten kurser. #}
-          <li style="{{ plass_stil(kartrute.plass) }}"><a class="rute trinn-{{ rute.fargetrinn or 'ingen' }}{% for navn, nivaa in kartrute.nivaa.items() %} nivaa-{{ navn }}-{{ nivaa }}{% endfor %}{% if rute.ramme %} ramme-{{ rute.ramme }}{% endif %}{% if rute.uten_data %} uten-data{% endif %}" href="{{ aksjeadresse(rute.aksje.symbol) }}">
+          <li style="{{ plass_stil(kartrute.plass) }}"><a class="rute trinn-{{ rute.fargetrinn or 'ingen' }}{% for navn, nivaa in kartrute.nivaa.items() %} nivaa-{{ navn }}-{{ nivaa }}{% endfor %}{% if rute.styrke is not none %}{% for navn in kartrute.styrke|sort %} styrke-{{ navn }}{% endfor %}{% endif %}{% if rute.ramme %} ramme-{{ rute.ramme }}{% endif %}{% if rute.uten_data %} uten-data{% endif %}" href="{{ aksjeadresse(rute.aksje.symbol) }}">
             <span class="ticker">{{ rute.aksje.symbol }}</span>
             <span class="endring">{% if rute.endring is not none %}{{ rute.endring|tall('endring') }}{% elif rute.uten_data %}Uten data{% else %}–{% endif %}</span>
             {#- Gruppens svar 04.11 kl. 10:01 og 10:04: styrken står i alle

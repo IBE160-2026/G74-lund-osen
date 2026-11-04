@@ -688,3 +688,120 @@ def test_hjelpen_i_docs_sier_samme_grense_som_koden():
     hjelp = (Path(__file__).resolve().parent.parent / "docs" / "hjelp.md").read_text(encoding="utf-8")
     grense = tall(GRENSE_STERK, "grense").replace(" ", " ")
     assert f"En søyle er mørk fra {grense} opp eller ned" in hjelp
+
+
+# --- Rettet 04.11 kl. 19:21 (gruppens svar) -----------------------------------
+
+
+def test_styrkens_grense_er_regnet_fra_stilen():
+    """Svaret kl. 19:21, 1: styrken har sin egen, lavere grense, regnet for
+    14 px med ringen og rammen: den gule rammen, luften, symbolet, endringen
+    og «3 av 3» i pillen med kanten, med tallene i stil.css. Teksten er regnet
+    med 0,5 em per tegn; i Edge er «3 av 3» 38,78 px, 0,46 em per tegn
+    (spesifikasjonen 8.2b, «Rettet 04.11 kl. 19:21»). Ville feilet med en
+    grense der ringen kunne kuttes, eller med en grense som ikke er lavere
+    enn nivå 3."""
+    from boersometer import NIVAA_3, STYRKE
+
+    rute = re.search(r"side-oversikt\) \.rute \{([^}]*)\}", STIL).group(1)
+    skrift = int(re.search(r"font-size: (\d+)px", rute).group(1))
+    linje = skrift * float(re.search(r"line-height: ([\d.]+)", rute).group(1))
+    gap = int(re.search(r"gap: (\d+)px", rute).group(1))
+    luft = [int(v) for v in re.search(r"padding: (\d+)px (\d+)px", rute).groups()]
+    ramme = int(
+        re.search(r"border: (\d+)px solid", _regel(".rute.ramme-gul, :where(.side-oversikt) .proeve.ramme-gul")).group(
+            1
+        )
+    )
+    # Gjennomgangen av rettingen (VG4): styrken har sin egen skriftstørrelse.
+    styrke = int(re.search(r"font-size: (\d+)px", _regel(".rute .styrke")).group(1))
+    assert styrke == skrift, (styrke, skrift)
+    pille = _regel(".pille")
+    pluft = [float(v) * 16 for v in re.search(r"padding: ([\d.]+)rem ([\d.]+)rem", pille).groups()]
+    pkant = float(re.search(r"border: ([\d.]+)px solid", _regel(".pille.tre-av-tre")).group(1))
+    ring = linje + 2 * pluft[0] + 2 * pkant
+    hoeyde = 2 * ramme + 2 * luft[0] + 2 * linje + ring + 2 * gap
+    bredde = 2 * ramme + 2 * luft[1] + 2 * pkant + 2 * pluft[1] + 0.5 * skrift * len("3 av 3")
+    assert STYRKE[1] >= hoeyde and STYRKE[0] >= bredde, (STYRKE, hoeyde, bredde)
+    assert STYRKE[0] < NIVAA_3[0] and STYRKE[1] < NIVAA_3[1]
+
+
+@pytest.mark.parametrize(
+    ("b", "h", "ventet"),
+    [(81, 75, True), (80, 75, False), (81, 74, False), (125, 105, True)],
+)
+def test_styrkeplass(b, h, ventet):
+    """Svaret kl. 19:21, 1. Ville feilet hvis grensen ikke var STYRKE,
+    (81, 75)."""
+    from boersometer import styrkeplass
+
+    assert styrkeplass(b, h) is ventet
+
+
+def test_troy_viser_2_av_3_ved_1280_px(klient):
+    """Svaret kl. 19:21, 1: i demoen er TROY 86 × 191 px ved 1280 px, målt
+    i Edge, på nivå 2 i kartet på 1008 px. Ville feilet med den gamle
+    grensen, der styrken bare sto på nivå 3, eller uten velgeren som lar
+    styrken stå på nivå 2."""
+    html = _html(klient, "/boersometer")
+    klasser, rute = re.search(
+        r'<a class="rute ([^"]*)"[^>]*>\s*<span class="ticker">TROY</span>(.*?)</a>', html, re.S
+    ).groups()
+    assert "nivaa-bredest-2" in klasser.split() and "styrke-bredest" in klasser.split(), klasser
+    assert '<span class="styrke pille to-av-tre">2 av 3</span>' in rute
+    blokk = _media("width > 760px").split("@container (width >= 1008px) {", 1)[1].split("}", 1)[0]
+    assert ".rute.nivaa-bredest-2:not(.styrke-bredest) > .styrke" in blokk
+    assert ".rute.nivaa-bredest-2 > .styrke" not in blokk
+
+
+def test_merket_og_teksten_staar_fortsatt_paa_nivaa_3():
+    """Svaret kl. 19:21, 1: merket for en annen dag og teksten står som før.
+    Ville feilet hvis klassen styrke-N også viste merket eller teksten på
+    nivå 2."""
+    for klasse in ("bredest", "bred", "smal", "smalest"):
+        for element in (".merke", ".tekst"):
+            assert f".rute.nivaa-{klasse}-2 > {element}" in STIL, (klasse, element)
+        assert f"styrke-{klasse}) > .merke" not in STIL and f"styrke-{klasse}) > .tekst" not in STIL
+
+
+def test_spoersmaalstegnet_staar_midt_paa_den_foerste_knappen():
+    """Svaret kl. 19:21, 2: «?» foran periodeknappene står midt på høyden av
+    knappene, på oversikten, i Min liste og i børsometeret, også ved 390 px,
+    målt i Edge (spesifikasjonen 8.2b). Regnet med tallene i stil.css:
+    midten av sirkelen, margin-top og halve klikkflaten, er midten av den
+    første knappen. Ville feilet med «?» øverst i raden, som før (7 px for
+    høyt), eller hvis periodevalget brøt til linja under «?» på smal skjerm."""
+    knapp = _regel("nav.periodevalg a, nav.periodevalg button")
+    knapphoeyde = int(re.search(r"min-height: (\d+)px", knapp).group(1))
+    hjelp = _regel("button.hjelpeknapp")
+    flate = int(re.search(r"(?<![-\w])height: (\d+)px", hjelp).group(1))
+    hode = _regel(".periodehode > button.hjelpeknapp")
+    topp = int(re.search(r"margin-top: (-?\d+)px", hode).group(1))
+    assert topp + flate / 2 == knapphoeyde / 2, (topp, flate, knapphoeyde)
+    assert "align-items: flex-start" in _regel(".periodehode")
+    nav = _regel(".periodehode > nav.periodevalg")
+    assert "flex: 1 1 0" in nav and "min-width: 0" in nav, nav
+    # Gjennomgangen av rettingen (VG2): ingen annen regel, heller ikke i en
+    # @media-blokk, gir raden en annen oppstilling.
+    assert STIL.count(".periodehode") == 4
+
+
+def test_aksjesiden_har_ingen_egen_spoersmaalstegn_for_periodene(klient):
+    """Svaret kl. 19:21, 3 (gjennomgangen, VG3): «?» ved «Kursutvikling»
+    forklarer både grafen og periodene. Ville feilet med en egen «?» for
+    periodene på aksjesiden, eller uten «?» ved overskriften."""
+    html = _html(klient, "/aksje/BRFE")
+    assert 'class="periodehode"' not in html and 'popovertarget="hjelp-perioden"' not in html
+    overskrift = re.search(r"<h2 id=\"[^\"]*\">Kursutvikling.*?</h2>", html, re.S).group(0)
+    assert 'popovertarget="hjelp-graf"' in overskrift, overskrift
+
+
+def test_klassen_for_styrken_bare_paa_ruter_med_styrke(klient):
+    """Gjennomgangen av rettingen 04.11 (ECH5): ville feilet hvis en rute uten
+    styrke, «Uten data» eller ikke vurdert, fikk klassen styrke-N."""
+    for adresse in ("/boersometer", "/boersometer?periode=velg&dag=2026-10-01"):
+        ruter = _ruter(_html(klient, adresse))
+        for symbol, rute in ruter.items():
+            if not re.search(r'<span class="styrke[^"]*">\d av 3</span>', rute):
+                assert "styrke-" not in rute, (adresse, symbol)
+        assert any("styrke-" in r for r in ruter.values())
