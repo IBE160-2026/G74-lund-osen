@@ -104,6 +104,7 @@ Gjennomgang av PR 2b (diffen `main...4fc313e`), med Blind Hunter (BH, 6 funn), E
 20. Bevegelse får tre ganger grensen på hver side, som trend, og prikken står ved enden når målingen er utenfor skalaen.
 21. Endringskortet sier ukedagene, som på tavla, for eksempel «fra tirsdag til onsdag». Datoen står i linja under h1.
 22. I sjekkortene står «?» ved navnet på sjekken, ved «Ga»-pillen og ved «Målt mot».
+    *Rettet 2026-11-04 (gruppens svar kl. 09:58, story 8.2b):* «?» ved «Ga» og «Målt mot» står i alle tre kortene, ikke bare i det første (BH13 i triagen under).
 23. «Ukjent» retning står som tekst uten pille, i Dempet.
 24. «Øvrige aksjer» får «og N uten signal» etter grensen når rader uten signal står der, også «og 1 uten signal». Pillen teller alle radene i båndet.
 25. Setningen «… av M aksjer ble vurdert.» står bare når ingen skilte seg ut, nå når færre enn alle aksjene i lista ble vurdert. «Uten data i denne kilden» dekker resten.

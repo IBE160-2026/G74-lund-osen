@@ -3574,6 +3574,40 @@ passet inn.
 - c) Aksjesiden som på designtavla: U33, U46, U62–U64 og U66–U68.
 - d) Forsiden og Min liste som på tavla: U58, U59 og U69.
 
+*Avgjort 2026-11-04 kl. 09:48 (gruppens svar):* på spørsmål 7 og 8 i `spec-8-2b-funnene-fra-ux-loggen.md`, og om tester som feiler.
+- Summen under sjekkene på aksjesiden får styrken først, som tabellen (8.0e): «N av 3» og så T, B og I.
+- Grafen ved 390 px blir egen story, 8.2c, ekstra.
+- Feiler en test fordi endringene ikke er ferdige, rettes den, og hele settet kjøres på nytt før commit. Feiler noe annet, stopper alt.
+
+*Avgjort 2026-11-04 kl. 09:58 (gruppens svar):* på spørsmål 1–6 i spesifikasjonen 8.2b.
+- Spørsmål 1, 3, 4, 5 og 6 står som bygget: symbolet og tickeren over søylene (FR-105), U58 og U65 ikke bygget, bryteren i blekk og ikke i stripa.
+- Søylene under hovedindeksen får lys og mørk farge, mørk fra 2 % opp eller ned som i børsometeret (grensen etter rådet). `designregler.md` §5 får en Rettet-linje.
+- «?» ved «Ga» og «Målt mot» står i alle tre sjekkortene, som punkt 22 i 8.0d.
+
+*Avgjort 2026-11-04 kl. 10:01 og 10:04 (gruppens svar):*
+- I børsometeret er teksten i rutene og ved bransjenavnene 14 px, og «Mål mot børsen» og «Hva fargene betyr» 16 px.
+- Hver bransje får en tynn ramme.
+- Styrken står i alle rutene som i tabellen, der ruta har plass: «3 av 3» og «2 av 3» i samme ring, «1 av 3» og «0 av 3» som tekst.
+- «?» for periodene står først i raden, foran knappene, på alle sidene.
+
+Tidligere avgjørelser som sier noe annet, har fått en datert linje: `designregler.md` §5 (søylene, 2.9b), punkt 22 i `spec-8-0d-utseendet-fra-designforslaget.md` («?» i det første kortet) og tekstnivåene i `spec-8-6b-som-tavla.md` (teksten på 13 px, merket bare for 2 av 3 og 3 av 3).
+
+### Story 8.2c: Kursgrafen på smal skjerm
+
+*Lagt til 2026-11-04 (gruppens svar kl. 09:48, spørsmål 8 i `spec-8-2b-funnene-fra-ux-loggen.md`):* «Ekstra, hvis tiden rekker», som 8.4–8.19 (svaret 19.10 kl. 15:43). Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt.
+
+Som **bruker**, vil jeg kunne lese teksten i kursgrafen på mobilen, så grafen
+ikke bare er en strek der.
+
+**Oppfyller:** — *(oppfølging av gjennomgangen av 8.2b, ECH6)* · **Begrenses av:** FR-201, NFR-05
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- Kursgrafen har egne mål på smal skjerm, så teksten i den ikke skaleres ned til om lag 5 px ved 390 px, som etter 8.2b
+- 390 px uten vannrett rulling, som de andre sidene
+- **Ville feilet hvis:** teksten i grafen var mindre ved 390 px enn i resten av siden
+
+**Avhenger av:** 8.2b. **Én økt:** ja.
+
 ### Story 8.3: Min liste: eget skjermbilde med stjerne og filter
 
 *Lagt til 2026-09-30, Marians beslutning.*
