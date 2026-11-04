@@ -581,3 +581,60 @@ def test_de_lyse_soeylene_kan_ses():
     assert "var(--soeyle-lys-opp)" in _regel(".soeyler .stolpe.opp")
     assert "var(--opp)" in _regel(".soeyler .stolpe.opp.sterk")
     assert "var(--ned)" in _regel(".soeyler .stolpe.ned.sterk")
+
+
+def _ruter(html: str) -> dict[str, str]:
+    """Ruta i børsometeret per ticker, uten den skjulte teksten."""
+    return {
+        m.group(1): m.group(0)
+        for m in re.finditer(
+            r'<a class="rute [^"]*"[^>]*>\s*<span class="ticker">([A-Z0-9]+)</span>.*?</a>', html, re.S
+        )
+    }
+
+
+def test_styrken_staar_i_rutene_som_i_tabellen(klient):
+    """Svarene kl. 10:01 og 10:04. Ville feilet hvis 3 av 3 og 2 av 3 ikke
+    hadde ringen fra tabellen siste børsdag, hvis 1 av 3 og 0 av 3 hadde
+    ring, eller hvis en rute med styrke manglet den."""
+    ruter = _ruter(_html(klient, "/boersometer"))
+    assert len(ruter) == 15
+    sett = set()
+    for symbol, rute in ruter.items():
+        styrke = re.search(r'<span class="(styrke[^"]*)">(\d) av 3</span>', rute)
+        if "ramme-gul" in rute:
+            assert styrke.groups() == ("styrke pille tre-av-tre", "3"), symbol
+        elif "ramme-moerk" in rute:
+            assert styrke.groups() == ("styrke pille to-av-tre", "2"), symbol
+        elif styrke:
+            assert styrke.group(1) == "styrke" and styrke.group(2) in "01", symbol
+        else:
+            assert 'class="tekst"' in rute or "Uten data" in rute, symbol
+        sett.add(styrke.group(2) if styrke else None)
+    assert {"3", "2"} <= sett and sett & {"1", "0"}, sett
+    assert 'class="merke"' not in "".join(ruter.values())
+
+
+def test_en_annen_dag_er_styrken_tekst_og_merket_star(klient):
+    """Svarene kl. 10:01 og 10:04, med designregler §3: ringen står bare for
+    siste børsdag, og gul ramme sier fortsatt 3 av 3 siste børsdag. Ville
+    feilet med ringen en annen dag, eller uten merket."""
+    ruter = _ruter(_html(klient, "/boersometer?periode=velg&dag=2026-10-01"))
+    gule = [r for r in ruter.values() if "ramme-gul" in r]
+    assert gule and all('<span class="merke">3 av 3 siste børsdag</span>' in r for r in gule)
+    assert "pille" not in "".join(ruter.values())
+
+
+def test_skriften_og_rammen_i_boersometeret():
+    """Svarene kl. 10:01 og 10:04. Ville feilet med teksten i rutene eller ved
+    bransjenavnene under 14 px, «Mål mot børsen» eller «Hva fargene betyr»
+    under 16 px, eller uten rammen rundt bransjen."""
+    assert "font-size: 14px" in re.search(r"side-oversikt\) \.rute \{([^}]*)\}", STIL).group(1)
+    for velger in (".rute .merke", ".rute .styrke", ".rute .tekst"):
+        assert "font-size: 14px" in _regel(velger), velger
+    assert "font-size: 14px" in re.search(r"\.kart section\.bransje h2 \{([^}]*)\}", STIL).group(1)
+    for velger in ("section.maal", "section.maal h2", "section.fargene", "section.fargene h2"):
+        assert "font-size: 16px" in _regel(velger), velger
+    assert "box-shadow: inset 0 0 0 1px var(--strek-2)" in re.search(
+        r"\.kart section\.bransje \{([^}]*)\}", STIL
+    ).group(1)

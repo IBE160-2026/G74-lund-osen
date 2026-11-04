@@ -521,19 +521,22 @@ class TestSiden:
         endringer = dict(
             re.findall(r'<span class="ticker">([A-Z0-9]+)</span>\s*<span class="endring">([^<]+)</span>', html)
         )
-        merker = dict(
+        # Gruppens svar 04.11 kl. 10:01 og 10:04: styrken står i alle rutene
+        # som i tabellen, ikke bare ved 3 av 3 og 2 av 3 som merket før.
+        styrker = dict(
             re.findall(
-                r'<span class="ticker">([A-Z0-9]+)</span>\s*<span class="endring">[^<]+</span>\s*<span class="merke">([^<]+)</span>',
+                r'<span class="ticker">([A-Z0-9]+)</span>\s*<span class="endring">[^<]+</span>\s*<span class="styrke[^"]*">([^<]+)</span>',
                 html,
             )
         )
+        assert 'class="merke"' not in html
         for navn, endring, styrke in rader:
             symbol = navn_til_symbol[navn]
             assert endringer[symbol] == endring, symbol
-            if styrke in ("3 av 3", "2 av 3"):
-                assert merker[symbol] == styrke, symbol
+            if re.fullmatch(r"\d av 3", styrke):
+                assert styrker[symbol] == styrke, symbol
             else:
-                assert symbol not in merker, symbol
+                assert symbol not in styrker, symbol
 
     def test_390_px_uten_vannrett_rulling_og_med_tastatur(self, klient):
         """Gjennomgangen (VG6), med kartet fra 8.6b, d: kartet er så bredt som
@@ -1560,18 +1563,23 @@ class TestKartet:
             for f in kartet["felt"]:
                 _dekker(list(p[navn] for p in f["ruter"].values()), 100, 100, eps=0.002)
 
+    # Gruppens svar 04.11 kl. 10:01 og 10:04: teksten er 14 px, så grensene er
+    # skalert og målt i Edge (spesifikasjonen 8.2b). Var 9 px per tegn + 10,
+    # 74 × 60 og 96 × 88.
     @pytest.mark.parametrize(
         ("b", "h", "symbol", "ventet"),
         [
-            (40, 60, "BRFE", 0),
-            (46, 60, "BRFE", 1),
+            (49, 65, "BRFE", 0),
+            (50, 65, "BRFE", 1),
             (100, 39, "BRFE", 0),
-            (73, 100, "BRFE", 1),
-            (74, 60, "BRFE", 2),
-            (95, 100, "BRFE", 2),
-            (96, 88, "BRFE", 3),
-            (54, 60, "NORSE", 0),
-            (55, 60, "NORSE", 1),
+            (79, 110, "BRFE", 1),
+            (80, 64, "BRFE", 1),
+            (80, 65, "BRFE", 2),
+            (111, 110, "BRFE", 2),
+            (112, 102, "BRFE", 2),
+            (112, 103, "BRFE", 3),
+            (59, 65, "NORSE", 0),
+            (60, 65, "NORSE", 1),
         ],
     )
     def test_navnet_staar_paa_ruter_som_er_store_nok(self, b, h, symbol, ventet):
@@ -1647,10 +1655,12 @@ class TestKartet:
         # elementer som skjules for hvert nivå.
         kartregel = re.search(r"\.kart \{([^}]*)\}", stil).group(1)
         assert "container-type: inline-size" in kartregel
+        # Gruppens svar 04.11 kl. 10:01 og 10:04: styrken står på nivå 3, som
+        # merket.
         skjult = {
-            0: [".ticker", ".endring", ".merke", ".tekst"],
-            1: [".endring", ".merke", ".tekst"],
-            2: [".merke", ".tekst"],
+            0: [".ticker", ".endring", ".merke", ".styrke", ".tekst"],
+            1: [".endring", ".merke", ".styrke", ".tekst"],
+            2: [".merke", ".styrke", ".tekst"],
         }
         for media, flate in (("(width > 760px)", BRED), ("(width <= 760px)", SMAL)):
             del_ = stil.split(f"@media {media} {{\n", 1)[1].split("\n}\n", 1)[0]
