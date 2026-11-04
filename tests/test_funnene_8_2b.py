@@ -759,3 +759,22 @@ def test_merket_og_teksten_staar_fortsatt_paa_nivaa_3():
         for element in (".merke", ".tekst"):
             assert f".rute.nivaa-{klasse}-2 > {element}" in STIL, (klasse, element)
         assert f"styrke-{klasse}) > .merke" not in STIL and f"styrke-{klasse}) > .tekst" not in STIL
+
+
+def test_spoersmaalstegnet_staar_midt_paa_den_foerste_knappen():
+    """Svaret kl. 19:21, 2: «?» foran periodeknappene står midt på høyden av
+    knappene, på oversikten, i Min liste og i børsometeret, også ved 390 px,
+    målt i Edge (spesifikasjonen 8.2b). Regnet med tallene i stil.css:
+    midten av sirkelen, margin-top og halve klikkflaten, er midten av den
+    første knappen. Ville feilet med «?» øverst i raden, som før (7 px for
+    høyt), eller hvis periodevalget brøt til linja under «?» på smal skjerm."""
+    knapp = _regel("nav.periodevalg a, nav.periodevalg button")
+    knapphoeyde = int(re.search(r"min-height: (\d+)px", knapp).group(1))
+    hjelp = _regel("button.hjelpeknapp")
+    flate = int(re.search(r"(?<![-\w])height: (\d+)px", hjelp).group(1))
+    hode = _regel(".periodehode > button.hjelpeknapp")
+    topp = int(re.search(r"margin-top: (-?\d+)px", hode).group(1))
+    assert topp + flate / 2 == knapphoeyde / 2, (topp, flate, knapphoeyde)
+    assert "align-items: flex-start" in _regel(".periodehode")
+    nav = _regel(".periodehode > nav.periodevalg")
+    assert "flex: 1 1 0" in nav and "min-width: 0" in nav, nav

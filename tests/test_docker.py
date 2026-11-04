@@ -1102,7 +1102,9 @@ HOEYDE_PAA_BILDET = 1864
 # stil.css. Bildet ble tatt paa nytt med samme hoeyde.
 # Gruppens svar 04.11 kl. 19:21: styrken i boersometeret, i stil.css. Bildet
 # ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "1f9a4b90eb3bc47a726f75e88ca3cd94b4cfde36f9f8cc51410cd4a5de0f0829"
+# Gruppens svar 04.11 kl. 19:21, 2: «?» midt paa periodeknappene, i stil.css.
+# Bildet ble tatt paa nytt med samme hoeyde.
+AVTRYKK_BAK_BILDET = "310129dd819b613121b9f442095c1ecc48b2d582e16f8f1acc69159bca406480"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1356,7 +1358,9 @@ HOEYDE_PAA_AKSJESIDEN = 2198
 # tatt paa nytt og er byte for byte det samme.
 # Gruppens svar 04.11 kl. 19:21: styrken i boersometeret, i stil.css. Bildet
 # ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "ab3cb4927e6a5dfd4e1e5f06487a2c00fe7e18f377dd23ce141335ef1774e19d"
+# Gruppens svar 04.11 kl. 19:21, 2: «?» midt paa periodeknappene, i stil.css.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "90be97e6636f9cda61ba79ecbe54ec47c8bc4ee3a2859228ed373e5a1888d021"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "

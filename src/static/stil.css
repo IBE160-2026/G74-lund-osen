@@ -427,6 +427,13 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) td.selskap .egen-dag { display: block; font-weight: normal; color: var(--dempet); font-size: 0.8rem; }
 :where(.side-oversikt) .periodehode { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px; }
 :where(.side-oversikt) .periodehode nav.periodevalg { margin-bottom: 12px; }
+/* Gruppens svar 04.11 kl. 19:21, 2: «?» står midt på høyden av den første
+   knappen. Knappene er minst 36 px høye, med midten 18 px ned, og klikkflaten
+   er 44 px, med sirkelen i midten: -4 + 44 / 2 = 18. Periodevalget krymper
+   og bryter knappene inne i seg, så det står ved siden av «?» også ved
+   390 px, og ikke på linja under. */
+:where(.side-oversikt) .periodehode > button.hjelpeknapp { margin-top: -4px; }
+:where(.side-oversikt) .periodehode > nav.periodevalg { flex: 1 1 0; min-width: 0; }
 :where(.side-oversikt) td.selskap { font-weight: 600; }
 /* Story 8.0: navnet ser ut som en lenke, og fokus synes. */
 :where(.side-oversikt) td.selskap a { color: inherit; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
