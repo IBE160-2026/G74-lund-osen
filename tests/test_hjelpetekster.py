@@ -372,8 +372,14 @@ class TestSidene:
         # og hvert vindu har én knapp.
         stripa = detalj.split('<header class="stripe">', 1)[1].split("</header>", 1)[0]
         assert re.search(r"Oppdatert [^<]+</span>\s*" + knapp.format("hjelp-hentet"), stripa)
+        # Gruppens svar 04.11 kl. 09:58: «?» ved «Ga» og «Målt mot» i alle
+        # tre sjekkortene, som punkt 22 i 8.0d. Her sto én knapp per vindu,
+        # i det første kortet. Ville feilet med knappen bare i det første.
+        kortene = re.findall(r'<section class="sjekkort[^"]*"[^>]*>(.*?)</section>', detalj, flags=re.DOTALL)
+        assert len(kortene) == 3
         for vindu in ("hjelp-ga", "hjelp-maalt"):
-            assert detalj.count(f'class="hjelpeknapp" popovertarget="{vindu}"') == 1, vindu
+            assert detalj.count(f'class="hjelpeknapp" popovertarget="{vindu}"') == 3, vindu
+            assert all(f'popovertarget="{vindu}"' in kort for kort in kortene), vindu
 
     def test_hvert_vindu_har_bare_sine_tekster(self, klient, base):
         """Den nye delen 2: vinduene og tekstene i dem, i rekkefoelge. «Ikke et

@@ -77,19 +77,20 @@
   <h2>Hvorfor signalet ble {% if detalj.styrke is not none %}{{ detalj.styrke }}{% else %}ukjent{% endif %} {{ hjelpeknapp("hjelp-sjekkene", "Hjelp: sjekkene") }}</h2>
 
   {% if detalj.sjekker %}
-    {#- Svar 22: «?» ved navnet, ved «Ga»-pillen og ved «Målt mot», i det
-        første kortet for Ga og Målt mot, så hvert vindu har én knapp. #}
+    {#- Svar 22: «?» ved navnet, ved «Ga»-pillen og ved «Målt mot». Gruppens
+        svar 04.11 kl. 09:58: i alle tre kortene, ikke bare i det første, så
+        vinduene for Ga og Målt mot har tre knapper hver. #}
     <div class="sjekkort-rad">
       {% for sjekk in detalj.sjekker %}
         <section class="sjekkort{% if sjekk.bidro %} bidro{% endif %}" aria-label="Sjekk {{ sjekk.nummer }}: {{ sjekk.navn }}">
           <div class="topp">
             <span>Sjekk {{ sjekk.nummer }}</span>
-            <span class="ga">Ga{% if loop.first %} {{ hjelpeknapp("hjelp-ga", "Hjelp: ga") }}{% endif %}
+            <span class="ga">Ga {{ hjelpeknapp("hjelp-ga", "Hjelp: ga") }}
               <span class="resultat fortegn {{ sjekk.klasse }}">{{ sjekk.fortegn }} <span class="ord">{{ sjekk.ord }}</span></span></span>
           </div>
           <h3>{{ sjekk.navn }} {{ hjelpeknapp("hjelp-" ~ sjekk.navn|lower, "Hjelp: " ~ sjekk.navn|lower) }}</h3>
           <p class="maaler">{{ sjekk.maaler }}</p>
-          <p class="maalt">Målt mot{% if loop.first %} {{ hjelpeknapp("hjelp-maalt", "Hjelp: målt mot") }}{% endif %}</p>
+          <p class="maalt">Målt mot {{ hjelpeknapp("hjelp-maalt", "Hjelp: målt mot") }}</p>
           <p class="regnestykke">{{ sjekk.maaling }}</p>
           {% if sjekk.skala %}
             <div class="skala" aria-hidden="true">

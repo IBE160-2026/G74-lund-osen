@@ -3742,7 +3742,8 @@ class TestStory816bDagenPaaHeleSiden:
         assert "fra onsdag 30.09 til torsdag 01.10" in toppen
         assert "Signalstyrke ? 3 av 3 T +1 B -1 I +1" in toppen and "Retning ? ↔ Blandet" in toppen
         assert "Hvorfor signalet ble 3" in toppen
-        assert "Sjekk 2 Ga -1 negativ" in toppen and "+12,3 % mot MA50" in toppen
+        # Gruppens svar 04.11 kl. 09:58: «?» ved «Ga» i alle tre kortene.
+        assert "Sjekk 2 Ga ? -1 negativ" in toppen and "+12,3 % mot MA50" in toppen
         assert "volum 7,00 × medianen" in toppen
         assert "skilte seg ut fredag" not in toppen and "Positiv" not in toppen
 

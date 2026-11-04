@@ -1168,7 +1168,9 @@ IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py", "src/boersometer.py
 # Story 8.2b, c (U66): KI-teksten står etter grafen, saa bildet slutter ved
 # bunnen av setningen om dagene (p.dagene) under KI-teksten, og har baade
 # grafen og teksten. Maalt i Edge uten vindu. Var 1882.
-HOEYDE_PAA_AKSJESIDEN = 2192
+# Gruppens svar 04.11 kl. 09:58: 2198, fordi «?» ved «Ga» og «Målt mot» står i
+# alle tre sjekkortene. Maalt paa samme maate. Var 2192.
+HOEYDE_PAA_AKSJESIDEN = 2198
 # Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
 # Story 10.5: lenken til investorsiden står under grafen, ved 1980 px målt i
 # Edge uten vindu, så bildet, som slutter ved bunnen av grafen (1872 px), ble
@@ -1338,7 +1340,9 @@ HOEYDE_PAA_AKSJESIDEN = 2192
 # Bildet ble tatt paa nytt med samme hoeyde.
 # Gruppens svar 04.11 kl. 09:58: lys og mørk søyle, i app.py, hjelpetekster.py
 # og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "88e6eaac9ddb2a421fbeef71c8f71478fa45c3f876fd944375c084be95589685"
+# Gruppens svar 04.11 kl. 09:58: «?» i alle tre sjekkortene, i aksje.html.
+# Bildet ble tatt paa nytt med den nye hoeyden.
+AVTRYKK_BAK_AKSJESIDEN = "0d330a2c1bfb1ae5d193c73afb78f9ccb464288eb034de5b940a9984eb80bfe0"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
