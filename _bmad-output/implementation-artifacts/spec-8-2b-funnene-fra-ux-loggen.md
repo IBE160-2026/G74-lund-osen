@@ -106,13 +106,21 @@ Hver commit med tester («Ville feilet hvis», uten nett), hjelpen, `docs/hjelp.
 ## Åpent: spørsmål til gruppen
 
 1. **U57, plasseringen:** tavla har symbolet og tickeren under søylene, og FR-105 sier «Over hver søyle står bransjesymbolet, over tickeren». Skal FR-105 endres, så de står under?
+   *Svar 04.11 kl. 09:58:* står som bygget, over søylene (FR-105).
 2. **U57, fargen:** tavla har lys og mørk farge etter størrelsen. `designregler.md` §5 (2.9b) sier at fortegnet er de eneste fargegrensene, og at lengden viser størrelsen. Skal regelen endres?
+   *Svar 04.11 kl. 09:58:* lys og mørk, mørk fra 2 % opp eller ned som i børsometeret. `designregler.md` §5 har fått en Rettet-linje. Bygget i `1fb126ec`.
 3. **U58:** vinkelen ved navnet strider mot 8.0d (avvik 7, pilene bare for retning), «i går» og «hva sjekkene peker mot» i kolonneraden mot `designregler.md` §5 (bare «NOK», 14.10), og «3 av 3» til høyre for T, B og I mot 8.0e (T, B og I under). Skal noe av det endres?
+   *Svar 04.11 kl. 09:58:* står som bygget, U58 er ikke bygget.
 4. **U65:** notatet sier at tavla har navnene i en forklaring over grafen, med tallene ved enden utenfor feltet, mens utdraget §8 sier at navnene står ved enden av linjene. Bygget er det utdraget sier (U41 og U47). Skal grafen ha forklaringen over i stedet?
+   *Svar 04.11 kl. 09:58:* står som bygget, navnene ved enden av linjene.
 5. **U33 og U67, fargen:** tavla har en gul bryter. Gult ved en aksje betyr bare 3 av 3 (`designregler.md` §3). Bryteren er bygget i blekk. Skal den være gul likevel?
+   *Svar 04.11 kl. 09:58:* står som bygget, i blekk.
 6. **U46, stripa:** tavla har bryteren også i stripa øverst. Valget gjelder hele appen, og stripa har ingen knapper før sidene finnes (`designregler.md` §5), som Innstillinger (8.10). Skal bryteren stå i stripa nå?
+   *Svar 04.11 kl. 09:58:* står som bygget, bryteren står ikke i stripa.
 7. **U64, rekkefølgen i summen** (fra gjennomgangen 04.11, VG): raden for summen under sjekkene på aksjesiden har T, B og I og så «3 av 3» til høyre, som tavla. Det er samme rekkefølge som spørsmål 3 holder igjen for tabellen, der 8.0e har T, B og I under «N av 3». Skal summen ha styrken først?
+   *Svar 04.11 kl. 09:48:* styrken først, som tabellen. Bygget i `26f488e4`.
 8. **Grafen ved 390 px** (fra gjennomgangen 04.11, ECH6): feltet til høyre for navnene er 170 av 720 i grafen, og hele grafen skaleres ned på smal skjerm, så teksten i den blir om lag 5 px. Teksten var like liten før 8.2b, men tegneflaten er nå smalere. Skal grafen ha egne mål på smal skjerm (en egen story)?
+   *Svar 04.11 kl. 09:48:* egen story, 8.2c, ekstra, ført i `epics.md` og sprint-status som backlog.
 
 ## Gjennomgangen 04.11 kl. 01:16
 
@@ -140,3 +148,36 @@ Etter hele settet på `f116c30`, med tre gjennomganger etter hverandre uten pyte
 - VG4 (lav): commit b sier «knapper med kant» om pilene. Fra c har hele månedsvelgeren kanten (rettet 04.11 over), og meldingen skrives ikke om (regel 7).
 - VG8 (lav): `endring_med_datoer` og `boersdag_mellom` i `aksjedetalj.py` brukes ikke lenger av malen, bare av testene. De står, så det er lett å gå tilbake hvis gruppen vil.
 - VG, U58: summen på aksjesiden har «3 av 3» til høyre for T, B og I, spørsmål 7.
+
+## Svarene 04.11 kl. 09:48–10:04, bygget samme dag
+
+Svarene står under story 8.2 i `epics.md` (`29d310fc` på main). Main er flettet inn i `49b66d5e`. Én commit per endring:
+- `26f488e4`: summen på aksjesiden har styrken først, «Sum 3 av 3 T -1 B -1 I -1 ↓Negativ».
+- `1fb126ec`: søylene under hovedindeksen er lyse under 2 % opp eller ned og mørke fra 2 %, med `GRENSE_STERK` fra `boersometer.py` og endringen slik den vises. 0,00 % er grå som før. De lyse fargene fra børsometeret har om lag 1,4:1 mot hvitt, og søylene har ingen tekst, så søylene har egne lyse farger, `--soeyle-lys-opp` `#4E946D` og `--soeyle-lys-ned` `#CE7069`, med minst 3:1 mot kortet og bakgrunnen (designregler §5, kontrast). Forklaringen står under søylene, i hjelpen ved «?» og i `docs/hjelp.md`. FR-105 sier ingenting om fargen på søylene, bare om den stiplede linja, og er ikke endret.
+- `d0f03d35`: «?» ved «Ga» og «Målt mot» i alle tre sjekkortene. Testen som krevde én knapp per vindu, har en datert kommentar.
+- `75980cca`: børsometeret. Teksten i rutene og ved bransjenavnene er 14 px, og «Mål mot børsen» og «Hva fargene betyr» 16 px. Hver bransje har en tynn ramme i Strek 2, som er pynt: navnet over feltet sier hvilken bransje det er, så rammen trenger ikke 3:1. Styrken står i rutene som har plass: «3 av 3» og «2 av 3» i ringen fra tabellen for siste børsdag, ellers som tekst, som tabellen en annen dag. En gul ramme en annen dag har fortsatt merket «3 av 3 siste børsdag».
+- `f212cfd3`: «?» for periodene står først i raden på oversikten, i Min liste og i børsometeret. Aksjesiden har ingen «?» for periodene. Hjelpen for grafen, også periodene, står ved overskriften over knappene, og den er ikke flyttet. Gruppen kan be om en egen «?» der.
+
+**Tekstnivået i børsometeret.** Grensene i `tekstnivaa` var regnet for 13 og 12 px. Med 14 px er de 10 px per tegn pluss 10, 80 × 65 og, etter gjennomgangen, 126 × 106 (`NIVAA_3`). Målt i Edge med en ramme så bred som vinduet, ved 1280, 1100, 1079, 900, 761, 760, 600, 390, 360 og 320 px, for siste børsdag, 01.10, 18.09 og 1 uke: ingen synlig tekst utenfor ruta, og ingen vannrett rulling. 390 px er også sjekket for oversikten, Min liste, børsometeret og aksjesiden BRFE.
+
+**Mutantene,** én om gangen med `-x`, kopi før og sha256 mot HEAD etter (lik hver gang): Me1 T, B og I foran styrken, Me2 `>` i stedet for `>=` ved 2 %, Me3 «?» ved «Ga» bare i det første kortet, Me4 «2 av 3» uten ring, Me5 «?» etter knappene i børsometeret og Mg1 hjelpefeltet flyttes ikke til et annet kort. Alle ble fanget.
+
+## Gjennomgangen 04.11 kl. 11:15
+
+Etter hele settet på `f212cfd3`, med Blind Hunter, Edge Case Hunter og Verification Gap på `49b66d5e..f212cfd3`, uten pytest eller demo fra hovedøkta samtidig. Ingen funn på høy.
+
+**Rettet i `8ea018f9`:**
+- BH1, ECH1 (middels): med tre «?» for samme vindu ble hjelpefeltet stående under det første kortet når «?» i et annet kort ble trykket mens vinduet var åpent, og fokus gikk tilbake til et annet «?». Klikket flytter nå feltet (`hjelp.js`), med en test i nettleseren ved 1280 og 390 px.
+- BH2, ECH2, VG1 (middels): det lengste på nivå 3, en gul ramme en annen dag, kunne kuttes ved 112 × 103. Nivå 3 er nå 126 × 106, og en test regner høyden og bredden av tallene i `stil.css`.
+- ECH3 (lav): skilletegn for skjermleseren før styrken og merket i ruta.
+- ECH5 (lav): med høy kontrast står prøvene under søylene og rammen rundt bransjen.
+- ECH6 (lav): «Lys søyle: under 2 %, opp eller ned».
+- BH3 (lav): testen for en annen dag krever også styrken.
+- BH6 (lav): kommentaren om én knapp per vindu i `test_hjelpetekster.py` har fått en datert linje.
+- VG5 (lav): en test for at `docs/hjelp.md` sier samme grense som `GRENSE_STERK`.
+
+**Står, med grunnen:**
+- BH4 (lav): skjermleseren hører «1 av 3» og «3 av 3 siste børsdag» uten ordet «styrke». Merket sier dagen, og tabellen har kolonnenavnene.
+- BH5, ECH4, VG2 (lav): lys og mørk søyle har om lag 1,7:1 og 1,9:1 mellom seg. Lengden viser størrelsen, tallene står i lista for skjermleseren, og forklaringen under søylene har ordene. Svaret kl. 09:58 bestemmer bare at de er lyse og mørke.
+- VG3 (lav): rammen rundt bransjen er pynt, over.
+- VG4 (lav): aksjesiden har ingen «?» for periodene, over.
