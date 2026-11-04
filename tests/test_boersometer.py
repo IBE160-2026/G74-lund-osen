@@ -1627,6 +1627,13 @@ class TestKartet:
             )
         }
         assert len(klasser) == 15
+        med_styrke = set(
+            re.findall(
+                r'<span class="ticker">([A-Z0-9]+)</span>\s*<span class="endring">[^<]*</span>\s*'
+                r'<span class="skjult">, </span><span class="styrke',
+                html,
+            )
+        )
         sett = set()
         for flate in (BRED, SMAL):
             n = flate.navn
@@ -1641,7 +1648,14 @@ class TestKartet:
                         funnet = re.findall(rf"\bnivaa-{klasse}-(\d)\b", klasser[symbol])
                         assert funnet == [str(ventet)], (klasse, symbol, rb, rh)
                         sett.add((klasse, ventet))
+                        # Gjennomgangen av rettingen 04.11 (VG1): styrke-N står
+                        # på siden der ruta har styrke og plass på nivå 2.
+                        med = ventet == 2 and styrkeplass(rb - 2 * KANT, rh - 2 * KANT) and symbol in med_styrke
+                        assert (f"styrke-{klasse}" in klasser[symbol].split()) == med, (klasse, symbol, rb, rh)
+                        if med:
+                            sett.add((klasse, "styrke"))
         assert len(sett) > 4, sett
+        assert {(k, "styrke") for k in ("bredest", "bred", "smal", "smalest")} <= sett, sett
 
     def test_tekstnivaaet_fra_360_og_1080_px(self, klient):
         """Gruppens svar 26.10 kl. 13:00 (c) og 13:07 (e): fra 1080 px regnes

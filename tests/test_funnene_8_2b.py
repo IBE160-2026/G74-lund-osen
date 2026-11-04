@@ -713,6 +713,9 @@ def test_styrkens_grense_er_regnet_fra_stilen():
             1
         )
     )
+    # Gjennomgangen av rettingen (VG4): styrken har sin egen skriftstørrelse.
+    styrke = int(re.search(r"font-size: (\d+)px", _regel(".rute .styrke")).group(1))
+    assert styrke == skrift, (styrke, skrift)
     pille = _regel(".pille")
     pluft = [float(v) * 16 for v in re.search(r"padding: ([\d.]+)rem ([\d.]+)rem", pille).groups()]
     pkant = float(re.search(r"border: ([\d.]+)px solid", _regel(".pille.tre-av-tre")).group(1))
@@ -778,3 +781,27 @@ def test_spoersmaalstegnet_staar_midt_paa_den_foerste_knappen():
     assert "align-items: flex-start" in _regel(".periodehode")
     nav = _regel(".periodehode > nav.periodevalg")
     assert "flex: 1 1 0" in nav and "min-width: 0" in nav, nav
+    # Gjennomgangen av rettingen (VG2): ingen annen regel, heller ikke i en
+    # @media-blokk, gir raden en annen oppstilling.
+    assert STIL.count(".periodehode") == 4
+
+
+def test_aksjesiden_har_ingen_egen_spoersmaalstegn_for_periodene(klient):
+    """Svaret kl. 19:21, 3 (gjennomgangen, VG3): «?» ved «Kursutvikling»
+    forklarer både grafen og periodene. Ville feilet med en egen «?» for
+    periodene på aksjesiden, eller uten «?» ved overskriften."""
+    html = _html(klient, "/aksje/BRFE")
+    assert 'class="periodehode"' not in html and 'popovertarget="hjelp-perioden"' not in html
+    overskrift = re.search(r"<h2 id=\"[^\"]*\">Kursutvikling.*?</h2>", html, re.S).group(0)
+    assert 'popovertarget="hjelp-graf"' in overskrift, overskrift
+
+
+def test_klassen_for_styrken_bare_paa_ruter_med_styrke(klient):
+    """Gjennomgangen av rettingen 04.11 (ECH5): ville feilet hvis en rute uten
+    styrke, «Uten data» eller ikke vurdert, fikk klassen styrke-N."""
+    for adresse in ("/boersometer", "/boersometer?periode=velg&dag=2026-10-01"):
+        ruter = _ruter(_html(klient, adresse))
+        for symbol, rute in ruter.items():
+            if not re.search(r'<span class="styrke[^"]*">\d av 3</span>', rute):
+                assert "styrke-" not in rute, (adresse, symbol)
+        assert any("styrke-" in r for r in ruter.values())
