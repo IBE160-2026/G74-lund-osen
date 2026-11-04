@@ -392,12 +392,15 @@ class Plass:
 class Kartrute:
     """En rute i kartet: plassen i prosent av feltet under overskriften per
     flate, og hvor mye tekst som står synlig per klasse i Flate.tekst (0
-    ingen, 1 symbolet, 2 også endringen, 3 også merket og grunnen)."""
+    ingen, 1 symbolet, 2 også endringen, 3 også merket og grunnen). styrke
+    er klassene der ruta står på nivå 2 og har plass til styrken under
+    endringen (gruppens svar 04.11 kl. 19:21)."""
 
     rute: Rute
     vekt: float
     plass: dict[str, Plass]
     nivaa: dict[str, int]
+    styrke: frozenset[str] = frozenset()
 
 
 @dataclass(frozen=True)
@@ -496,15 +499,22 @@ def squarify(
     return ut
 
 
-def _nivaa_ved(flate: Flate, bredde: float, rb: float, rh: float, symbol: str) -> int:
+def _nivaa_ved(flate: Flate, bredde: float, rb: float, rh: float, symbol: str) -> tuple[int, bool]:
     """Tekstnivået for plassen rb × rh ved flate.bredde, regnet for den
-    synlige ruta når kartet er bredde px bredt."""
+    synlige ruta når kartet er bredde px bredt, og om styrken står på nivå 2."""
     skala = bredde / flate.bredde
-    return tekstnivaa(rb * skala - 2 * KANT, rh * skala - 2 * KANT, symbol)
+    b, h = rb * skala - 2 * KANT, rh * skala - 2 * KANT
+    nivaa = tekstnivaa(b, h, symbol)
+    return nivaa, nivaa == 2 and styrkeplass(b, h)
 
 
 # Bredden og høyden ruta må ha for nivå 3, med teksten på 14 px.
 NIVAA_3 = (126, 106)
+# Gruppens svar 04.11 kl. 19:21: styrken har sin egen, lavere grense, plass
+# til én linje til under symbolet og endringen. Regnet for 14 px med ringen
+# («3 av 3» i pillen) og den gule rammen, og målt i Edge (spesifikasjonen
+# 8.2b, «Rettet 04.11 kl. 19:21», og test_styrkens_grense_er_regnet_fra_stilen).
+STYRKE = (81, 75)
 
 
 def tekstnivaa(b: float, h: float, symbol: str) -> int:
@@ -522,6 +532,13 @@ def tekstnivaa(b: float, h: float, symbol: str) -> int:
     if b < NIVAA_3[0] or h < NIVAA_3[1]:
         return 2
     return 3
+
+
+def styrkeplass(b: float, h: float) -> bool:
+    """Om ruta har plass til styrken under symbolet og endringen, med ringen
+    og rammen (gruppens svar 04.11 kl. 19:21). Merket for en annen dag og
+    teksten står fortsatt bare på nivå 3."""
+    return b >= STYRKE[0] and h >= STYRKE[1]
 
 
 def _legg_ut(bransjer: list[Bransje], bredde: float, hoeyde: float, minste_felt: float = 0.0) -> list | None:
@@ -566,6 +583,7 @@ def kart(bransjer: list[Bransje], flatene: tuple[Flate, ...] = FLATENE) -> Kart:
         topp: dict[str, float] = {}
         ruteplass: list[dict[str, Plass]] = [{} for _ in bransje.ruter]
         nivaa: list[dict[str, int]] = [{} for _ in bransje.ruter]
+        styrke: list[set[str]] = [set() for _ in bransje.ruter]
         for flate in flatene:
             hoeyde = forhold[flate.navn] * flate.bredde
             (fx, fy, fb, fh), ruter = lagt[flate.navn][n]
@@ -583,9 +601,12 @@ def kart(bransjer: list[Bransje], flatene: tuple[Flate, ...] = FLATENE) -> Kart:
                     (rx - fx) / fb * 100, (ry - start) / kropp * 100, rb / fb * 100, rh / kropp * 100
                 )
                 for klasse, bredde in flate.tekst:
-                    nivaa[i][klasse] = _nivaa_ved(flate, bredde, rb, rh, bransje.ruter[i].aksje.symbol)
+                    nivaa[i][klasse], med_styrke = _nivaa_ved(flate, bredde, rb, rh, bransje.ruter[i].aksje.symbol)
+                    if med_styrke:
+                        styrke[i].add(klasse)
         kartruter = [
-            Kartrute(rute=r, vekt=vekt(r), plass=ruteplass[i], nivaa=nivaa[i]) for i, r in enumerate(bransje.ruter)
+            Kartrute(rute=r, vekt=vekt(r), plass=ruteplass[i], nivaa=nivaa[i], styrke=frozenset(styrke[i]))
+            for i, r in enumerate(bransje.ruter)
         ]
         felt.append(
             Kartfelt(

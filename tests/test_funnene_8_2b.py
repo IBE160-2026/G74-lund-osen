@@ -688,3 +688,74 @@ def test_hjelpen_i_docs_sier_samme_grense_som_koden():
     hjelp = (Path(__file__).resolve().parent.parent / "docs" / "hjelp.md").read_text(encoding="utf-8")
     grense = tall(GRENSE_STERK, "grense").replace(" ", " ")
     assert f"En søyle er mørk fra {grense} opp eller ned" in hjelp
+
+
+# --- Rettet 04.11 kl. 19:21 (gruppens svar) -----------------------------------
+
+
+def test_styrkens_grense_er_regnet_fra_stilen():
+    """Svaret kl. 19:21, 1: styrken har sin egen, lavere grense, regnet for
+    14 px med ringen og rammen: den gule rammen, luften, symbolet, endringen
+    og «3 av 3» i pillen med kanten, med tallene i stil.css. Teksten er regnet
+    med 0,5 em per tegn; i Edge er «3 av 3» 38,78 px, 0,46 em per tegn
+    (spesifikasjonen 8.2b, «Rettet 04.11 kl. 19:21»). Ville feilet med en
+    grense der ringen kunne kuttes, eller med en grense som ikke er lavere
+    enn nivå 3."""
+    from boersometer import NIVAA_3, STYRKE
+
+    rute = re.search(r"side-oversikt\) \.rute \{([^}]*)\}", STIL).group(1)
+    skrift = int(re.search(r"font-size: (\d+)px", rute).group(1))
+    linje = skrift * float(re.search(r"line-height: ([\d.]+)", rute).group(1))
+    gap = int(re.search(r"gap: (\d+)px", rute).group(1))
+    luft = [int(v) for v in re.search(r"padding: (\d+)px (\d+)px", rute).groups()]
+    ramme = int(
+        re.search(r"border: (\d+)px solid", _regel(".rute.ramme-gul, :where(.side-oversikt) .proeve.ramme-gul")).group(
+            1
+        )
+    )
+    pille = _regel(".pille")
+    pluft = [float(v) * 16 for v in re.search(r"padding: ([\d.]+)rem ([\d.]+)rem", pille).groups()]
+    pkant = float(re.search(r"border: ([\d.]+)px solid", _regel(".pille.tre-av-tre")).group(1))
+    ring = linje + 2 * pluft[0] + 2 * pkant
+    hoeyde = 2 * ramme + 2 * luft[0] + 2 * linje + ring + 2 * gap
+    bredde = 2 * ramme + 2 * luft[1] + 2 * pkant + 2 * pluft[1] + 0.5 * skrift * len("3 av 3")
+    assert STYRKE[1] >= hoeyde and STYRKE[0] >= bredde, (STYRKE, hoeyde, bredde)
+    assert STYRKE[0] < NIVAA_3[0] and STYRKE[1] < NIVAA_3[1]
+
+
+@pytest.mark.parametrize(
+    ("b", "h", "ventet"),
+    [(81, 75, True), (80, 75, False), (81, 74, False), (125, 105, True)],
+)
+def test_styrkeplass(b, h, ventet):
+    """Svaret kl. 19:21, 1. Ville feilet hvis grensen ikke var STYRKE,
+    (81, 75)."""
+    from boersometer import styrkeplass
+
+    assert styrkeplass(b, h) is ventet
+
+
+def test_troy_viser_2_av_3_ved_1280_px(klient):
+    """Svaret kl. 19:21, 1: i demoen er TROY 86 × 191 px ved 1280 px, målt
+    i Edge, på nivå 2 i kartet på 1008 px. Ville feilet med den gamle
+    grensen, der styrken bare sto på nivå 3, eller uten velgeren som lar
+    styrken stå på nivå 2."""
+    html = _html(klient, "/boersometer")
+    klasser, rute = re.search(
+        r'<a class="rute ([^"]*)"[^>]*>\s*<span class="ticker">TROY</span>(.*?)</a>', html, re.S
+    ).groups()
+    assert "nivaa-bredest-2" in klasser.split() and "styrke-bredest" in klasser.split(), klasser
+    assert '<span class="styrke pille to-av-tre">2 av 3</span>' in rute
+    blokk = _media("width > 760px").split("@container (width >= 1008px) {", 1)[1].split("}", 1)[0]
+    assert ".rute.nivaa-bredest-2:not(.styrke-bredest) > .styrke" in blokk
+    assert ".rute.nivaa-bredest-2 > .styrke" not in blokk
+
+
+def test_merket_og_teksten_staar_fortsatt_paa_nivaa_3():
+    """Svaret kl. 19:21, 1: merket for en annen dag og teksten står som før.
+    Ville feilet hvis klassen styrke-N også viste merket eller teksten på
+    nivå 2."""
+    for klasse in ("bredest", "bred", "smal", "smalest"):
+        for element in (".merke", ".tekst"):
+            assert f".rute.nivaa-{klasse}-2 > {element}" in STIL, (klasse, element)
+        assert f"styrke-{klasse}) > .merke" not in STIL and f"styrke-{klasse}) > .tekst" not in STIL

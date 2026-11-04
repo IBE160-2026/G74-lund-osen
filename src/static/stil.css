@@ -792,6 +792,8 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
                                color: var(--blekk); font-size: 14px; line-height: 1.2; font-variant-numeric: tabular-nums; }
 /* Navnet står på ruter som er store nok (tekstnivaa i boersometer.py). Det som
    ikke får plass, skjules bare for øyet, så skjermleseren leser alt. */
+/* Gruppens svar 04.11 kl. 19:21: på nivå 2 står styrken når ruta har
+   klassen styrke-N, plass til én linje til (STYRKE i boersometer.py). */
 /* Gruppens svar 26.10 kl. 13:07 (e): teksten regnes ved 1008 px, full bredde,
    og ellers ved 712 px (Flate.tekst i boersometer.py). Gjennomgangen 26.10
    (BH, ECH, VG): @container måler kartet selv, så rullefeltet, rotskriften og
@@ -801,12 +803,12 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
   @container (width >= 1008px) {
     :where(.side-oversikt) .rute.nivaa-bredest-0 > .ticker, :where(.side-oversikt) .rute.nivaa-bredest-0 > .endring, :where(.side-oversikt) .rute.nivaa-bredest-0 > .merke, :where(.side-oversikt) .rute.nivaa-bredest-0 > .styrke, :where(.side-oversikt) .rute.nivaa-bredest-0 > .tekst,
     :where(.side-oversikt) .rute.nivaa-bredest-1 > .endring, :where(.side-oversikt) .rute.nivaa-bredest-1 > .merke, :where(.side-oversikt) .rute.nivaa-bredest-1 > .styrke, :where(.side-oversikt) .rute.nivaa-bredest-1 > .tekst,
-    :where(.side-oversikt) .rute.nivaa-bredest-2 > .merke, :where(.side-oversikt) .rute.nivaa-bredest-2 > .styrke, :where(.side-oversikt) .rute.nivaa-bredest-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    :where(.side-oversikt) .rute.nivaa-bredest-2 > .merke, :where(.side-oversikt) .rute.nivaa-bredest-2:not(.styrke-bredest) > .styrke, :where(.side-oversikt) .rute.nivaa-bredest-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   }
   @container (width < 1008px) {
     :where(.side-oversikt) .rute.nivaa-bred-0 > .ticker, :where(.side-oversikt) .rute.nivaa-bred-0 > .endring, :where(.side-oversikt) .rute.nivaa-bred-0 > .merke, :where(.side-oversikt) .rute.nivaa-bred-0 > .styrke, :where(.side-oversikt) .rute.nivaa-bred-0 > .tekst,
     :where(.side-oversikt) .rute.nivaa-bred-1 > .endring, :where(.side-oversikt) .rute.nivaa-bred-1 > .merke, :where(.side-oversikt) .rute.nivaa-bred-1 > .styrke, :where(.side-oversikt) .rute.nivaa-bred-1 > .tekst,
-    :where(.side-oversikt) .rute.nivaa-bred-2 > .merke, :where(.side-oversikt) .rute.nivaa-bred-2 > .styrke, :where(.side-oversikt) .rute.nivaa-bred-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    :where(.side-oversikt) .rute.nivaa-bred-2 > .merke, :where(.side-oversikt) .rute.nivaa-bred-2:not(.styrke-bred) > .styrke, :where(.side-oversikt) .rute.nivaa-bred-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   }
 }
 @media (max-width: 760px) {
@@ -823,12 +825,12 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
   @container (width >= 328px) {
     :where(.side-oversikt) .rute.nivaa-smal-0 > .ticker, :where(.side-oversikt) .rute.nivaa-smal-0 > .endring, :where(.side-oversikt) .rute.nivaa-smal-0 > .merke, :where(.side-oversikt) .rute.nivaa-smal-0 > .styrke, :where(.side-oversikt) .rute.nivaa-smal-0 > .tekst,
     :where(.side-oversikt) .rute.nivaa-smal-1 > .endring, :where(.side-oversikt) .rute.nivaa-smal-1 > .merke, :where(.side-oversikt) .rute.nivaa-smal-1 > .styrke, :where(.side-oversikt) .rute.nivaa-smal-1 > .tekst,
-    :where(.side-oversikt) .rute.nivaa-smal-2 > .merke, :where(.side-oversikt) .rute.nivaa-smal-2 > .styrke, :where(.side-oversikt) .rute.nivaa-smal-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    :where(.side-oversikt) .rute.nivaa-smal-2 > .merke, :where(.side-oversikt) .rute.nivaa-smal-2:not(.styrke-smal) > .styrke, :where(.side-oversikt) .rute.nivaa-smal-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   }
   @container (width < 328px) {
     :where(.side-oversikt) .rute.nivaa-smalest-0 > .ticker, :where(.side-oversikt) .rute.nivaa-smalest-0 > .endring, :where(.side-oversikt) .rute.nivaa-smalest-0 > .merke, :where(.side-oversikt) .rute.nivaa-smalest-0 > .styrke, :where(.side-oversikt) .rute.nivaa-smalest-0 > .tekst,
     :where(.side-oversikt) .rute.nivaa-smalest-1 > .endring, :where(.side-oversikt) .rute.nivaa-smalest-1 > .merke, :where(.side-oversikt) .rute.nivaa-smalest-1 > .styrke, :where(.side-oversikt) .rute.nivaa-smalest-1 > .tekst,
-    :where(.side-oversikt) .rute.nivaa-smalest-2 > .merke, :where(.side-oversikt) .rute.nivaa-smalest-2 > .styrke, :where(.side-oversikt) .rute.nivaa-smalest-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    :where(.side-oversikt) .rute.nivaa-smalest-2 > .merke, :where(.side-oversikt) .rute.nivaa-smalest-2:not(.styrke-smalest) > .styrke, :where(.side-oversikt) .rute.nivaa-smalest-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   }
 }
 /* Story 8.6b, c: fem trinn etter endringen slik den vises. Uten endring er ruta
