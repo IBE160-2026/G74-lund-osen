@@ -293,7 +293,7 @@ def _kjoer(tmp_path: Path, skript: Path, hoved: Path, *ekstra: str, sjekk: str =
     falsk = tmp_path / "falsk"
     falsk.mkdir(exist_ok=True)
     (falsk / "uv.cmd").write_text(
-        '@echo off\r\nif "%~3"=="src/dagen_ferdig.py" goto sjekk\r\n'
+        '@echo off\r\nif "%~4"=="src/dagen_ferdig.py" goto sjekk\r\n'
         "echo falsk henting %*\r\necho tjeneste=%OSE_KI_TJENESTE%\r\necho mappe=%CD%\r\n"
         'if "%~4"=="--maal-omsetning" exit /b 5\r\nexit /b 3\r\n'
         f':sjekk\r\necho falsk sjekk %*>>"%~dp0sjekk.txt"\r\n{svar_fra_sjekken}\r\n',
@@ -429,7 +429,7 @@ def test_en_ferdig_dag_spoer_ikke_docker_men_henter_og_maaler(tmp_path):
     assert kode == 3, utskrift
     assert not (tmp_path / "falsk" / "docker.txt").exists(), loggen
     assert loggen.count("Dagen er ferdig (FERDIG 2026-09-22") == 1, loggen
-    assert "falsk sjekk run python src/dagen_ferdig.py" in (tmp_path / "falsk" / "sjekk.txt").read_text(
+    assert "falsk sjekk run --no-sync python src/dagen_ferdig.py" in (tmp_path / "falsk" / "sjekk.txt").read_text(
         encoding="ascii"
     )
     assert "tjeneste=av" in loggen and "tjeneste=lokal" not in loggen
@@ -460,7 +460,9 @@ def test_alt_annet_enn_ferdig_gir_kjoeringen_som_foer(tmp_path, sjekk):
     assert "Henter uten KI-tekst (NFR-04)" in loggen
     assert "Hentingen avsluttet med kode 3." in loggen and "Målingen avsluttet med kode 5." in loggen
     if sjekk == "henger":
-        assert "Sjekken av dagen svarte ikke innen 2 s." in loggen, loggen
+        # Gjennomgangen (BH1): grensen er den minste av -Sjekkgrense og
+        # fristen for steg 3 (-Tidsgrense 1 i testene).
+        assert "Sjekken av dagen svarte ikke innen 1 s." in loggen, loggen
     else:
         assert f"Sjekken av dagen ga kode {2 if sjekk == 'feil' else 1}." in loggen, loggen
 

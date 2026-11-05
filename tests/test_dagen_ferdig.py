@@ -149,3 +149,35 @@ def test_sjekken_leser_ikke_env_og_kaller_ikke(stier, capsys, monkeypatch):
     monkeypatch.setattr(fetch_prices, "hent_kvote", forbudt)
     monkeypatch.setattr(fetch_prices, "load_dotenv", forbudt)
     assert _sjekk(base, capsys)[0] == 0
+
+
+def test_basen_er_lik_foer_og_etter_ogsaa_for_en_ferdig_dag(stier, capsys):
+    """Gjennomgangen (VG2). Ville feilet hvis banen for en ferdig dag, den
+    eneste der jobben hopper over noe, skrev til basen."""
+    raa, base = stier
+    kjoer(raa, base, FalskModell())
+    foer = _sha(base)
+    assert _sjekk(base, capsys)[0] == 0
+    assert _sha(base) == foer
+
+
+def test_utskriften_passer_regexen_i_skriptet(stier, capsys):
+    """Gjennomgangen (BH9, VG9). Ville feilet hvis utskriften fra sjekken og
+    regexen i start/kveldshenting.ps1 ikke passet sammen: en ferdig dag gir
+    noeyaktig én linje som passer (-cmatch, store bokstaver), og en dag som
+    mangler noe, gir ingen."""
+    import re
+
+    from test_kveldshenting import JOBBEN
+
+    skriptet = JOBBEN.read_text(encoding="utf-8-sig")
+    funnet = re.search(r"-cmatch '([^']+)'", skriptet)
+    assert funnet, "fant ikke -cmatch i skriptet"
+    regex = re.compile(funnet.group(1))
+    raa, base = stier
+    kjoer(raa, base, FalskModell())
+    kode, ut = _sjekk(base, capsys)
+    assert kode == 0 and len([linje for linje in ut.splitlines() if regex.match(linje)]) == 1, ut
+    kjoer(raa, base.with_name("annen.db"), None)
+    kode, ut = _sjekk(base.with_name("annen.db"), capsys)
+    assert kode == 1 and not any(regex.match(linje) for linje in ut.splitlines()), ut
