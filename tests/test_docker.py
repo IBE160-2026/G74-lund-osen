@@ -1111,7 +1111,9 @@ HOEYDE_PAA_BILDET = 1864
 # Gjennomgangen av svarene 04.11 kl. 20:53 og 20:56: grunnen paa nivaa 3 og
 # hjelpen, i hjelpetekster.py og stil.css. Bildet ble tatt paa nytt og er byte
 # for byte det samme; avtrykket er regnet av kildene, ikke av bildet.
-AVTRYKK_BAK_BILDET = "7211a5d6af73d511ea52646c0b070b80668583060c6682687a001b7a7457ad1c"
+# Gruppens svar 05.11 kl. 09:34, 1: fotnoten for en annen grunn, i
+# hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "9dca17e1e5d61e8d979c7a15a20f8a07d1fc05078e72cd11496ed55878ff5798"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1374,7 +1376,9 @@ HOEYDE_PAA_AKSJESIDEN = 2198
 # Gjennomgangen av svarene 04.11 kl. 20:53 og 20:56: grunnen paa nivaa 3 og
 # hjelpen, i hjelpetekster.py og stil.css. Bildet ble tatt paa nytt og er byte
 # for byte det samme; avtrykket er regnet av kildene, ikke av bildet.
-AVTRYKK_BAK_AKSJESIDEN = "a4cc23d7aaa89d01f911e61509455021ef5436f390aad7333c96f375a5df1d14"
+# Gruppens svar 05.11 kl. 09:34, 1: fotnoten for en annen grunn, i app.py og
+# hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "b3a53ad38844b0d366790d28042d91edfa3fac23f329e8ae727097d2b1ae49d5"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "

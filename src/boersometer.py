@@ -134,6 +134,14 @@ class Rute:
         return self.tekst
 
     @property
+    def annen_grunn(self) -> bool:
+        """Ruta sier «ikke vurdert» av en annen grunn enn at signalet ikke
+        er lagret, som for kort historikk, og siden får fotnoten om at
+        grunnen står i tabellen og på aksjesiden (gruppens svar 05.11 kl.
+        09:34, 1)."""
+        return self.uten_styrke is not None and bool(self.grunn)
+
+    @property
     def ramme(self) -> str | None:
         if self.er_siste:
             return ramme(self.styrke)

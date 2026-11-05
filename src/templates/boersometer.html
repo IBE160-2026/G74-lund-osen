@@ -148,6 +148,11 @@
     {% if ikke_vurdert %}
       {% include "_fotnote_ikke_vurdert.html" %}
     {% endif %}
+    {#- Gruppens svar 05.11 kl. 09:34, 1: når en rute sier «ikke vurdert» av
+        en annen grunn, ved siden av den gamle når begge finnes. #}
+    {% if annen_grunn %}
+      <p class="fotnote">«Ikke vurdert» kan også ha en annen grunn, som for kort kurshistorikk. Grunnen står i tabellen og på aksjesiden.</p>
+    {% endif %}
   {% elif demokommando %}
     <p>
       {% if demo_gammel %}Demobasen er laget av en eldre versjon av demoen. Lag den på nytt med <code>{{ demokommando }}</code>.{% else %}Demobasen finnes ikke ennå. Lag den med <code>{{ demokommando }}</code>.{% endif %}

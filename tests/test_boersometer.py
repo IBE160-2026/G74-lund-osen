@@ -845,8 +845,10 @@ class TestSvaretKl0924:
 
 def _fotnoten(html: str) -> str | None:
     """Fotnoten for «ikke vurdert», uten taggene og med ett mellomrom mellom
-    ordene, eller None når den ikke står."""
-    treff = re.search(r'<p class="fotnote">\s*«Ikke vurdert»(.*?)</p>', html, re.DOTALL)
+    ordene, eller None når den ikke står. Gruppens svar 05.11 kl. 09:34, 1:
+    bare fotnoten som begynner med «Ikke vurdert»: og kolon, ikke den for en
+    annen grunn, som står i test_funnene_8_2b.py."""
+    treff = re.search(r'<p class="fotnote">\s*«Ikke vurdert»(?=:)(.*?)</p>', html, re.DOTALL)
     if not treff:
         return None
     return "«Ikke vurdert»" + re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", treff.group(1))).rstrip()

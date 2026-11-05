@@ -741,6 +741,9 @@ def boersometer():
         ruter = [rute_med_perioden(rute, serier[rute.aksje.symbol], periodestart, siste) for rute in ruter]
     bransjer = bygg_boersometer(ruter)
     ikke_vurdert = any(rute.ikke_vurdert for rute in ruter)
+    # Gruppens svar 05.11 kl. 09:34, 1: en egen fotnote når en rute sier
+    # «ikke vurdert» av en annen grunn, ved siden av den gamle.
+    annen_grunn = any(rute.annen_grunn for rute in ruter)
     # Story 8.6b, d: kartet regnes av de samme bransjene som tabellen.
     # Gjennomgangen 26.10 (BH, ECH): får rutene ikke plass, står tabellen
     # alene, som indeksen i linja (NFR-03).
@@ -754,6 +757,7 @@ def boersometer():
         kart=kartet,
         antall_aksjer=len(ruter),
         ikke_vurdert=ikke_vurdert,
+        annen_grunn=annen_grunn,
         **_fotnoten([dagen] if ikke_vurdert else [], i_dag),
         dagen=dagen,
         siste=siste,

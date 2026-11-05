@@ -1030,3 +1030,70 @@ def test_grunnen_staar_paa_nivaa_3_bare_med_plass(klient):
         _html(klient, "/boersometer?periode=velg&dag=2026-10-01"),
     ).group(1)
     assert "nivaa-bredest-3" in klasser.split() and "grunn-bredest" in klasser.split(), klasser
+
+
+# --- Gruppens svar 05.11 kl. 09:34 --------------------------------------------
+
+ANNEN_GRUNN = "«Ikke vurdert» kan også ha en annen grunn, som for kort kurshistorikk."
+GAMMEL_FOTNOTE = "«Ikke vurdert»: "
+
+
+def _fotnoter(html: str) -> list[str]:
+    return [re.sub(r"\s+", " ", f).strip() for f in re.findall(r'<p class="fotnote">(.*?)</p>', html, re.S)]
+
+
+def test_annen_grunn_bare_for_en_rute_med_kurs_og_en_annen_grunn():
+    """Svar 1: fotnoten står når en rute sier «ikke vurdert» av en annen
+    grunn enn at signalet ikke er lagret. Ville feilet hvis en rute med
+    styrke, en rute med «ikke vurdert» som grunn eller en rute uten data
+    ga fotnoten, eller hvis en rute med for kort historikk ikke ga den."""
+    from boersometer import Rute
+    from kursdata import Aksje
+
+    aksje = Aksje("VRDS", "VRDS.OL", "Varde", "Industri")
+    assert Rute(aksje, 1.0, None, None, "for kort historikk: 24 av 51 dager").annen_grunn
+    assert Rute(aksje, 1.0, None, None, "hentingen feilet", siste_styrke=3, er_siste=False).annen_grunn
+    assert not Rute(aksje, 1.0, None, None, "ikke vurdert").annen_grunn
+    assert not Rute(aksje, None, None, None, "Uten data", uten_data=True).annen_grunn
+    assert not Rute(aksje, 1.0, 1.0, 2, None).annen_grunn
+    assert not Rute(aksje, 1.0, None, None, None).annen_grunn
+
+
+def test_fotnoten_for_en_annen_grunn_staar_med_vrds_i_demoen(klient):
+    """Svar 1: siste demodag har VRDS for kort historikk og ingen dag uten
+    lagret signal. Ville feilet uten den nye fotnoten, hvis den gamle sto
+    alene for VRDS, eller hvis fotnoten sto over kartet."""
+    html = _html(klient, "/boersometer")
+    assert '<span class="ticker">VRDS</span>' in html
+    fotnoter = _fotnoter(html)
+    assert any(f.startswith(ANNEN_GRUNN) and "Grunnen står i tabellen og på aksjesiden." in f for f in fotnoter), (
+        fotnoter
+    )
+    assert not any(f.startswith(GAMMEL_FOTNOTE) for f in fotnoter), fotnoter
+    assert html.index(ANNEN_GRUNN) > html.index('<span class="ticker">VRDS</span>')
+
+
+def test_begge_fotnotene_naar_begge_grunnene_finnes(klient, monkeypatch):
+    """Svar 1: ingen dag i demoen har begge grunnene (skannet 05.11, 97
+    dager), så VRDS 18.09, før vurderingene starter, får en annen grunn her.
+    Ville feilet hvis den nye fotnoten tok plassen til den gamle, eller ikke
+    sto ved siden av den."""
+    import boersometer
+
+    monkeypatch.setattr(boersometer.Rute, "annen_grunn", property(lambda rute: rute.aksje.symbol == "VRDS"))
+    fotnoter = _fotnoter(_html(klient, "/boersometer?periode=velg&dag=2026-09-18"))
+    assert any(f.startswith(GAMMEL_FOTNOTE) for f in fotnoter), fotnoter
+    assert any(f.startswith(ANNEN_GRUNN) for f in fotnoter), fotnoter
+
+
+def test_hjelpen_og_hjelp_md_sier_det_samme_om_fotnoten():
+    """Svar 1: hjelpen ved «?» i børsometeret og docs/hjelp.md sier at
+    «ikke vurdert» kan ha en annen grunn, og at grunnen står i tabellen og
+    på aksjesiden. Ville feilet hvis en av dem manglet setningen."""
+    tekst = hjelpetekster()["boersometeret"].tekst
+    assert "som for kort kurshistorikk" in tekst and "tabellen og på aksjesiden" in tekst, tekst
+    hjelp = (Path(__file__).resolve().parent.parent / "docs" / "hjelp.md").read_text(encoding="utf-8")
+    avsnitt = hjelp.split("### Hvorfor står det «ikke vurdert»?")[1].split("\n#")[0]
+    assert "som for kort kurshistorikk" in avsnitt and "tabellen og på aksjesiden" in avsnitt
+    boersometer = hjelp.split("### Hva viser børsometeret?")[1].split("\n#")[0]
+    assert "som for kort kurshistorikk" in boersometer and "tabellen og på aksjesiden" in boersometer
