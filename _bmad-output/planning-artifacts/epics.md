@@ -3586,6 +3586,7 @@ passet inn.
 
 *Avgjort 2026-11-04 kl. 10:01 og 10:04 (gruppens svar):*
 - I børsometeret er teksten i rutene og ved bransjenavnene 14 px, og «Mål mot børsen» og «Hva fargene betyr» 16 px.
+  *Rettet 2026-11-05 (gruppens svar 04.11 kl. 22:23, svar 1):* store ruter får egne størrelser, symbolet 22 px, navnet 12,5 px og endringen 28 px. Små ruter beholder 14 px.
 - Hver bransje får en tynn ramme.
 - Styrken står i alle rutene som i tabellen, der ruta har plass: «3 av 3» og «2 av 3» i samme ring, «1 av 3» og «0 av 3» som tekst.
 - «?» for periodene står først i raden, foran knappene, på alle sidene.
@@ -3605,6 +3606,16 @@ Tidligere avgjørelser som sier noe annet, har fått en datert linje: `designreg
 - En annen dag viser en rute med gul ramme styrken bare når merket «3 av 3 siste børsdag» også får plass (ECH1 i `spec-8-2b-funnene-fra-ux-loggen.md`).
 - Ruter uten styrke viser «ikke vurdert» på linja der styrken ellers står, og hele grunnen der den får plass, som VRDS i demoen.
 - Begge bygges 5.11.
+
+*Avgjort 2026-11-04 kl. 22:23 (gruppens svar):* mot designforslaget. Størrelsene er gruppens; designtavla ligger i Claude, ikke i repoet (`designregler.md` §1), så de er ikke slått opp mot den. Bygges i en egen instruksjon.
+- Store ruter i børsometeret får teksten som i originalen, med en egen grense: symbolet 22 px, selskapsnavnet under i 12,5 px, endringen i 28 px nederst og «3 av 3» øverst til høyre. Små ruter beholder 14 px.
+- Under søylene på oversikten står lenken «Se perioden i Børsometer ›», som åpner børsometeret med samme periode.
+- KI-delen på aksjesiden heter «<selskapet> kort fortalt» og har «?». «Laget av KI» står som før. I dag heter den «Med KI-ens ord» (`aksje.html`).
+- Menyknappene øverst får ikonene fra originalen: rutenett, måler og stjerne.
+
+*Avgjort 2026-11-05 kl. 09:34 (gruppens svar):* på spørsmål 1 og 2 i PR #111.
+- Sier en rute i børsometeret «ikke vurdert» av en annen grunn enn at signalet ikke er lagret, står en kort fotnote under kartet om at grunnen står i tabellen og på aksjesiden (BH3 og ECH2 i `spec-8-2b-funnene-fra-ux-loggen.md`).
+- «ikke vurdert» i en gul rute en annen dag står bare med merket, på nivå 3, som bygget (VG3 og ECH4).
 
 ### Story 8.2c: Kursgrafen på smal skjerm
 
