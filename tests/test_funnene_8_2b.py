@@ -798,11 +798,13 @@ def test_aksjesiden_har_ingen_egen_spoersmaalstegn_for_periodene(klient):
 
 def test_klassen_for_styrken_bare_paa_ruter_med_styrke(klient):
     """Gjennomgangen av rettingen 04.11 (ECH5): ville feilet hvis en rute uten
-    styrke, «Uten data» eller ikke vurdert, fikk klassen styrke-N."""
+    styrke, «Uten data» eller ikke vurdert, fikk klassen styrke-N.
+    Rettet 05.11 (gruppens svar 04.11 kl. 20:53 og 20:56, 2): en rute med
+    kurs, men uten styrke, har «ikke vurdert» på linja og kan få klassen."""
     for adresse in ("/boersometer", "/boersometer?periode=velg&dag=2026-10-01"):
         ruter = _ruter(_html(klient, adresse))
         for symbol, rute in ruter.items():
-            if not re.search(r'<span class="styrke[^"]*">\d av 3</span>', rute):
+            if not re.search(r'<span class="styrke[^"]*">(\d av 3|ikke vurdert)</span>', rute):
                 assert "styrke-" not in rute, (adresse, symbol)
         assert any("styrke-" in r for r in ruter.values())
 
@@ -847,3 +849,96 @@ def test_gul_rute_en_annen_dag_uten_plass_til_merket_viser_ikke_styrken(klient):
     klasser = re.search(r'<a class="rute ([^"]*)"', ruter["KVST"]).group(1).split()
     assert "ramme-gul" in klasser and "nivaa-bredest-2" in klasser, klasser
     assert paa_nivaa_2 >= 4, paa_nivaa_2
+
+
+def test_vrds_viser_ikke_vurdert_ved_1280_px(klient):
+    """Svar 2: VRDS i demoen har kurs, men ingen styrke, og er 105 × 166 px
+    ved 1280 px, målt i Edge, på nivå 2 i kartet på 1008 px. Ville feilet
+    uten «ikke vurdert» på linja der styrken ellers står, eller uten klassen
+    som lar linja stå på nivå 2."""
+    html = _html(klient, "/boersometer")
+    klasser, rute = re.search(
+        r'<a class="rute ([^"]*)"[^>]*>\s*<span class="ticker">VRDS</span>(.*?)</a>', html, re.S
+    ).groups()
+    assert "nivaa-bredest-2" in klasser.split() and "styrke-bredest" in klasser.split(), klasser
+    assert re.search(
+        r'<span class="endring">[^<]*</span>\s*<span class="skjult">, </span>'
+        r'<span class="styrke ikke-vurdert">ikke vurdert</span>',
+        rute,
+    ), rute
+    # Grunnen står under, som før, og vises på nivå 3.
+    assert '<span class="tekst">for kort historikk:' in rute
+
+
+def test_grensen_for_ikke_vurdert_er_regnet_fra_stilen():
+    """Svar 2: grensen for «ikke vurdert» er regnet for 14 px som STYRKE: den
+    gule rammen, luften, symbolet, endringen og teksten, uten ring, med
+    0,5 em per tegn. I Edge er «ikke vurdert» 74,83 px, 0,45 em per tegn
+    (spesifikasjonen 8.2b). Ville feilet med en grense der teksten kunne
+    kuttes, med en annen skrift enn ruta, eller med en grense som ikke er
+    lavere enn nivå 3."""
+    from boersometer import IKKE_VURDERT_PLASS, NIVAA_3
+    from markedsoversikt import IKKE_VURDERT
+
+    rute = re.search(r"side-oversikt\) \.rute \{([^}]*)\}", STIL).group(1)
+    skrift = int(re.search(r"font-size: (\d+)px", rute).group(1))
+    linje = skrift * float(re.search(r"line-height: ([\d.]+)", rute).group(1))
+    gap = int(re.search(r"gap: (\d+)px", rute).group(1))
+    luft = [int(v) for v in re.search(r"padding: (\d+)px (\d+)px", rute).groups()]
+    ramme = int(
+        re.search(r"border: (\d+)px solid", _regel(".rute.ramme-gul, :where(.side-oversikt) .proeve.ramme-gul")).group(
+            1
+        )
+    )
+    assert int(re.search(r"font-size: (\d+)px", _regel(".rute .styrke")).group(1)) == skrift
+    linja = _regel(".rute .styrke.ikke-vurdert")
+    assert "font-size" not in linja and "padding" not in linja and "border" not in linja, linja
+    hoeyde = 2 * ramme + 2 * luft[0] + 3 * linje + 2 * gap
+    bredde = 2 * ramme + 2 * luft[1] + 0.5 * skrift * len(IKKE_VURDERT)
+    assert IKKE_VURDERT_PLASS[1] >= hoeyde and IKKE_VURDERT_PLASS[0] >= bredde, (IKKE_VURDERT_PLASS, hoeyde, bredde)
+    assert IKKE_VURDERT_PLASS[0] < NIVAA_3[0] and IKKE_VURDERT_PLASS[1] < NIVAA_3[1]
+
+
+@pytest.mark.parametrize(
+    ("b", "h", "ventet"),
+    [(104, 69, True), (103, 69, False), (104, 68, False), (125, 105, True)],
+)
+def test_ikke_vurdert_plass(b, h, ventet):
+    """Svar 2. Ville feilet hvis grensen ikke var IKKE_VURDERT_PLASS, (104, 69)."""
+    from boersometer import ikke_vurdert_plass
+
+    assert ikke_vurdert_plass(b, h) is ventet
+
+
+@pytest.mark.parametrize(
+    "adresse",
+    [
+        "/boersometer",
+        "/boersometer?periode=velg&dag=2026-10-01",
+        "/boersometer?periode=velg&dag=2026-09-18",
+        "/boersometer?periode=1-uke",
+    ],
+)
+def test_ikke_vurdert_staar_en_gang_og_uten_data_er_som_foer(klient, adresse):
+    """Svar 2: en rute med kurs, men uten styrke, har «ikke vurdert» på linja
+    for styrken én gang, også en dag der grunnen er «ikke vurdert» (18.09,
+    før vurderingene starter). En rute uten data er som før. Ville feilet med
+    «ikke vurdert» to ganger i ruta, uten linja, eller med linja eller
+    styrke-N i en rute uten data."""
+    ruter = _ruter(_html(klient, adresse))
+    assert len(ruter) == 15
+    uten_styrke = 0
+    for symbol, rute in ruter.items():
+        if "uten-data" in re.search(r'<a class="rute ([^"]*)"', rute).group(1).split():
+            assert "ikke vurdert" not in rute and "styrke" not in rute, (adresse, symbol)
+            assert '<span class="endring">Uten data</span>' in rute
+            continue
+        if re.search(r'<span class="styrke[^"]*">\d av 3</span>', rute):
+            assert "ikke vurdert" not in rute, (adresse, symbol)
+            continue
+        uten_styrke += 1
+        assert rute.count("ikke vurdert") == 1, (adresse, symbol)
+        assert '<span class="styrke ikke-vurdert">ikke vurdert</span>' in rute, (adresse, symbol)
+    assert uten_styrke >= 1
+    if adresse.endswith("2026-09-18"):
+        assert uten_styrke == 14

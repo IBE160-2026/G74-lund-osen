@@ -1106,7 +1106,9 @@ HOEYDE_PAA_BILDET = 1864
 # Bildet ble tatt paa nytt med samme hoeyde.
 # Gruppens svar 04.11 kl. 20:53 og 20:56, 1: styrken en annen dag, i
 # hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "66ca420af414a515e98cdf24a5210d0856f4789d99dcd0f9731917120eba9336"
+# Gruppens svar 04.11 kl. 20:53 og 20:56, 2: «ikke vurdert» i boersometeret, i
+# hjelpetekster.py og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "fc1f5ef9fde815dcd969d22ced675e154ec27be41a3d4f8fbbb7b11c141f1bc3"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1364,7 +1366,9 @@ HOEYDE_PAA_AKSJESIDEN = 2198
 # Bildet ble tatt paa nytt og er byte for byte det samme.
 # Gruppens svar 04.11 kl. 20:53 og 20:56, 1: styrken en annen dag, i
 # hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "75123545c322eec22e34864483f1e9aa96d4a0157fc0e7c8bd562e5807f31907"
+# Gruppens svar 04.11 kl. 20:53 og 20:56, 2: «ikke vurdert» i boersometeret, i
+# hjelpetekster.py og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "a25d6032d6127aaa35e11c8ccd4549dfab261991b3fb1cd980cba1945f6dc747"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "

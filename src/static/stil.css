@@ -862,6 +862,9 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) .rute .ticker { font-weight: 700; }
 :where(.side-oversikt) .rute .merke { font-size: 14px; font-weight: 600; }
 :where(.side-oversikt) .rute .styrke { align-self: flex-start; font-size: 14px; font-weight: 700; white-space: nowrap; }
+/* Gruppens svar 04.11 kl. 20:53 og 20:56, 2: «ikke vurdert» der styrken ellers
+   står, i vanlig skrift som grunnen (IKKE_VURDERT_PLASS i boersometer.py). */
+:where(.side-oversikt) .rute .styrke.ikke-vurdert { font-weight: 400; }
 /* Story 8.6b, c: grunnen i samme farge som resten av ruta, fordi --dempet har
    under 4,5:1 mot de lyse trinnene. */
 :where(.side-oversikt) .rute .tekst { font-size: 14px; color: inherit; }

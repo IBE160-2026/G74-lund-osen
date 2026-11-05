@@ -119,6 +119,21 @@ class Rute:
         return self.tekst == IKKE_VURDERT
 
     @property
+    def uten_styrke(self) -> str | None:
+        """«ikke vurdert» for en rute med kurs, men uten styrke, ellers None.
+        Gruppens svar 04.11 kl. 20:53 og 20:56, 2: det står på linja der
+        styrken ellers står. Ruter uten data er som før."""
+        return IKKE_VURDERT if self.styrke is None and not self.uten_data else None
+
+    @property
+    def grunn(self) -> str | None:
+        """Teksten under linja for styrken. Svar 2: «ikke vurdert» står bare
+        én gang i ruta, så teksten står ikke når den er det samme."""
+        if self.uten_data or self.tekst == IKKE_VURDERT:
+            return None
+        return self.tekst
+
+    @property
     def ramme(self) -> str | None:
         if self.er_siste:
             return ramme(self.styrke)
@@ -395,7 +410,8 @@ class Kartrute:
     ingen, 1 symbolet, 2 også endringen, 3 også merket og grunnen). styrke
     er klassene der ruta står på nivå 2 og har plass til styrken under
     endringen (gruppens svar 04.11 kl. 19:21), og en annen dag ikke har gul
-    ramme (svaret kl. 20:53 og 20:56, 1)."""
+    ramme (svaret kl. 20:53 og 20:56, 1). For en rute uten styrke er det
+    klassene der «ikke vurdert» har plass (svar 2)."""
 
     rute: Rute
     vekt: float
@@ -516,6 +532,11 @@ NIVAA_3 = (126, 106)
 # («3 av 3» i pillen) og den gule rammen, og målt i Edge (spesifikasjonen
 # 8.2b, «Rettet 04.11 kl. 19:21», og test_styrkens_grense_er_regnet_fra_stilen).
 STYRKE = (81, 75)
+# Gruppens svar 04.11 kl. 20:53 og 20:56, 2: «ikke vurdert» på linja der
+# styrken ellers står, med en grense regnet for 14 px som STYRKE: den gule
+# rammen, luften, symbolet, endringen og teksten uten ring
+# (test_grensen_for_ikke_vurdert_er_regnet_fra_stilen).
+IKKE_VURDERT_PLASS = (104, 69)
 
 
 def tekstnivaa(b: float, h: float, symbol: str) -> int:
@@ -542,13 +563,23 @@ def styrkeplass(b: float, h: float) -> bool:
     return b >= STYRKE[0] and h >= STYRKE[1]
 
 
+def ikke_vurdert_plass(b: float, h: float) -> bool:
+    """Om ruta har plass til «ikke vurdert» under symbolet og endringen
+    (gruppens svar 04.11 kl. 20:53 og 20:56, 2)."""
+    return b >= IKKE_VURDERT_PLASS[0] and h >= IKKE_VURDERT_PLASS[1]
+
+
 def styrkelinje(rute: Rute, b: float, h: float) -> bool:
     """Om styrken står på nivå 2 i ruta, som er b × h px. Gruppens svar
     04.11 kl. 20:53 og 20:56, 1 (ECH1 i spesifikasjonen 8.2b): en annen dag
     står styrken i en rute med gul ramme bare når merket «3 av 3 siste
-    børsdag» også får plass, og merket står bare på nivå 3."""
-    if rute.ramme == GUL and not rute.er_siste:
+    børsdag» også får plass, og merket står bare på nivå 3. Svar 2: en rute
+    uten styrke har «ikke vurdert» på den linja, med sin egen grense, og en
+    rute uten data har ingen linje."""
+    if rute.uten_data or (rute.ramme == GUL and not rute.er_siste):
         return False
+    if rute.uten_styrke:
+        return ikke_vurdert_plass(b, h)
     return styrkeplass(b, h)
 
 
