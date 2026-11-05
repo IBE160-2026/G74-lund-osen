@@ -93,3 +93,6 @@
 - [x] 2026-11-05 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — spørsmål 3 i PR #112: lenken sier «Se perioden i Børsometer» også når oversikten viser én dag; skal den si «dagen» da? (løst 2026-11-05: svar 3 kl. 14:29, «Se dagen» ved én dag, `931b1ccc`)
 - [ ] 2026-11-05 [r29-og-loggdelen-av-10-4](977-2026-11-05-15-49-43-r29-og-loggdelen-av-10-4.md) — funnet fra loggdelen av 10.4 (75 av 75 KI-tekster i uka 29.10–04.11 gjentar regelforklaringen) skal inn i refleksjonsrapporten
 - [ ] 2026-11-05 [r29-og-loggdelen-av-10-4](977-2026-11-05-15-49-43-r29-og-loggdelen-av-10-4.md) — delen av 10.4 med en person venter på brukertesten, og 10-4 står som in-progress til den er tatt
+- [ ] 2026-11-05 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — svar 2 og 4 kl. 14:29 er tolket sammen: store ruter bare i klassen `bredest`; gruppen kan se over tolkningen
+- [ ] 2026-11-05 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — stilen for nivå 4 i `bred`, `smal` og `smalest` brukes ikke (BH7 i PR #112)
+- [ ] 2026-11-05 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — avtrykket for bildene av oversikten har ikke `app.py` (VG9 i PR #112, arvet fra 3.3e)
