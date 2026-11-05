@@ -3009,6 +3009,8 @@ uten KI. 5B.4 måler KI-tillegget. Blandes de, vet ingen hva som ble målt.
 
 *Lagt til 2026-11-05 (loggdelen, svarene kl. 12:23 og 12:24):* loggdelen er talt for uka 29.10–04.11 i `spec-10-4-loggdelen.md`. Av 75 KI-tekster som besto kontrollen, gjentar alle 75 regelforklaringen, 0 sier mer og 0 er usikre. Det er et funn til refleksjonsrapporten, ikke en feil. Delen med en person venter på brukertesten, så 10-4 står som `in-progress`.
 
+*Avgjort 2026-11-05 kl. 16:05 (gruppens svar):* alle 75 KI-tekstene i uka 29.10–04.11 gjentar regelforklaringen, så en ny promptversjon lages før brukertesten, der modellen bes bruke bransjen, hovedindeksen og antallene med ord, innenfor kontrollen, og tellingen gjentas etter noen dager med den.
+
 ### Story 10.5: Lenke til selskapets side på NewsWeb
 
 *Lagt til 2026-09-28, med plan B.*
