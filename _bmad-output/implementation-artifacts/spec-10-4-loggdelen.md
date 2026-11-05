@@ -21,6 +21,8 @@ Ingenting i `src/` eller `tests/` er endret. `data/db/ose.db` ble åpnet skriveb
 
 Radene i `ki_logg` med `dato` fra 2026-10-29 til 2026-11-04. Alle 105 er av slaget `aksje`. Det finnes ingen rader av slagene `melding` eller `dag` i basen. Alle 105 besto kontrollen (FR-603), og 0 ble stoppet. Hver rad ville også blitt vist etter reglene i `bygg_ki_visning` i `src/ki_visning.py`: grunnlaget stemmer med vurderingen (FR-602), og vakta finner ingen av ordene (NFR-06). Modellen er `gemma4:e4b`, lokal, med `modell_id` `dc35e8d9c606`, og promptversjonen er `3` alle dagene. Hver av de fem børsdagene har 15 tekster, én for hver aksje. 31.10 og 01.11 er helg, uten kurser og uten rader. Tallene per dag står i en linje under R29 i §7 i `prd.md`.
 
+*Rettet 2026-11-05 (instruksjonen kl. 16:09):* «Alle 105» i avsnittet over skal være «alle 75». `ki_logg` har 75 rader for 29.10–04.11, 15 for hver av de fem børsdagene, og ingen for helgen 31.10 og 01.11. 105 er 7 × 15, de sju dagene i uka ganget med 15. Tabellen under og klassifiseringen gjelder de 75 og er ikke endret. Rettelsen står også under R29 i §7 i `prd.md`.
+
 ## Regelen
 
 Regelforklaringen på aksjesiden er det `regelen` i raden sier: hvilke sjekker som ga +1, 0 eller -1, styrken og retningen. Hver KI-tekst for en aksje i uka som besto kontrollen, får én klasse:
