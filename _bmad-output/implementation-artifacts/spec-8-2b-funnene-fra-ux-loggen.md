@@ -215,6 +215,7 @@ Blind Hunter, Edge Case Hunter og Verification Gap på `main..3918f77d`. Ingen f
 
 **Står, med grunnen:**
 - ECH1 (middels): en annen dag kan en rute på nivå 2 vise gul ramme og styrken for dagen, uten merket «3 av 3 siste børsdag». Det er svaret kl. 19:21: merket står som før, på nivå 3. «Hva fargene betyr» forklarer den gule rammen. Står som åpent punkt for gruppen.
+  *Svar 04.11 kl. 20:53:* en annen dag viser en rute med gul ramme styrken bare når merket også får plass. Bygget 05.11 i `8c1b5b69`, se under.
 - BH1, VG7 (middels og lav): testen for `styrke-N` i kartet bruker `styrkeplass`. Grensen selv er låst av `test_styrkeplass` (S1 ble fanget der) og av TROY.
 - BH2 (middels): bredden for symbolet og endringen er dekket av nivå 2 (minst 80 px), som er et vilkår for `styrke-N`.
 - BH3, ECH2, ECH3, VG8 (lav): grensen har 1 px og 0,6 px å gå på mot utregningen, og om lag 4 px i bredden mot målingen i Edge. Målt uten noe utenfor ruta ved alle ti breddene.
@@ -224,3 +225,91 @@ Blind Hunter, Edge Case Hunter og Verification Gap på `main..3918f77d`. Ingen f
 - BH7, BH9, VG6, VG9 (lav): testene leser velgerne slik de står; to av dem er strammet inn over (VG1, VG2).
 - BH8 (lav): TROY-testen bygger på demoen, som instruksjonen ber om.
 - ECH4 (lav): en overskrift på to linjer gjaldt før også; overskriften har én linje (`test_overskriften_har_plass_til_linja`).
+
+## Svarene 04.11 kl. 20:53 og 20:56, bygget 05.11
+
+Gruppens svar 04.11 kl. 20:53 og 20:56, ført under story 8.2 i `epics.md` (`61e74ed4`), bygget natt til 05.11 etter instruksjonen kl. 21:35 i `docs/ai-prompts/2026-11-04.md`, på grenen `8-2b-styrken-en-annen-dag-og-ikke-vurdert`, i en egen worktree.
+
+**1) Styrken en annen dag (`8c1b5b69`).** `styrkelinje(rute, b, h)` i `boersometer.py` gir ingen `styrke-N` på nivå 2 for en rute med gul ramme en annen dag, så styrken står der bare på nivå 3, der merket «3 av 3 siste børsdag» også står. I demoen 21.09 hadde KVST gul ramme og `styrke-bredest` på nivå 2 ved 1280 px før svaret; nå ikke.
+
+**2) «ikke vurdert» (`84e4ff1b`).** En rute med kurs, men uten styrke, har `<span class="styrke ikke-vurdert">ikke vurdert</span>` der styrken ellers står, i vanlig skrift. Grensen `IKKE_VURDERT_PLASS = (104, 69)` er regnet for 14 px som `STYRKE`, med den gule rammen og uten ring: høyden 2 × 4 + 2 × 4 + 3 × 16,8 + 2 × 1 = 68,4, og bredden 2 × 4 + 2 × 6 + 0,5 em × 14 × 12 tegn = 104. I Edge er «ikke vurdert» 74,83 px, 0,45 em per tegn. VRDS i demoen er 105 × 166 px ved 1280 px og viser det. «ikke vurdert» står én gang i ruta (`Rute.grunn`), også 18.09, der grunnen er «ikke vurdert». Ruter uten data er som før. Tre eldre tester som ventet «ikke vurdert» som grunnen, har fått en datert linje.
+
+**Rettingene etter gjennomgangen (`3dd9afce`).** Grunnen står på nivå 3 bare der hele grunnen får plass (`grunnplass`, klassen `grunn-N`), regnet ord for ord med 0,5 em per tegn og med merket på to linjer en annen dag. Se triagen under.
+
+**Målt i Edge,** i en iframe med nøyaktig bredde, mot demobasen i en midlertidig mappe, ved 1280, 1100, 1079, 900, 761, 760, 600, 390, 360 og 320 px, for siste børsdag, en annen dag (01.10), 1 uke og 18.09: ingen synlig tekst utenfor ruta og ingen vannrett rulling i noen av de 40, både etter `84e4ff1b` og etter `3dd9afce`. Før endringene var de 30 første også uten funn. VRDS har hele grunnen 01.10 ved 1280 px (132 × 199 px, nivå 3).
+
+**Bildene** i `docs/appen/` er tatt på nytt etter hver commit og er byte for byte de samme; bare avtrykkene i `tests/test_docker.py` er endret, fordi de regnes av kildene.
+
+**Hele settet** alene før hver commit med kode: 4004, 4013 og 4021 bestått, 24 hoppet over, og 6, 7 og 6 porttester for `start.ps1` som feilet (svaret 29.10 kl. 21:02). Før `8c1b5b69` feilet også tre tester i `test_docker.py` fordi avtrykkene ikke var oppdatert; de ble rettet og settet kjørt på nytt (svaret 4.11 kl. 09:48).
+
+**Mutantene**, én om gangen med `-x`, med kopi før og sha256 mot HEAD etter (lik hver gang):
+- N1: `styrkelinje` uten vilkåret for gul ramme en annen dag. Fanget av `test_styrkelinje_en_annen_dag_med_gul_ramme`.
+- N2: `Rute.uten_styrke` gir alltid None. Fanget av `test_klassen_for_styrken_bare_paa_ruter_med_styrke`.
+- N3: `grunnplass` regner ikke med merket. Fanget av `test_grunnplass`.
+
+**Jobben** (`fetch_prices.py`) importerer verken `boersometer` eller `hjelpetekster` (lest med `ast` 05.11), så ingenting jobben importerer, er endret. Ingen ny tabell, og KI-grunnlaget er ikke endret.
+
+### Gjennomgangen 05.11
+
+Blind Hunter (bare diffen), Edge Case Hunter og Verification Gap på `main..84e4ff1b`, uten pytest eller demo samtidig. Ingen funn på høy.
+
+**Rettet i `3dd9afce`:**
+- ECH1 (middels): en gul rute en annen dag uten styrke og med en grunn har symbolet, endringen, «ikke vurdert», merket på to linjer og grunnen: 6 linjer, 121,8 px mot 106 for nivå 3, så grunnen kunne kuttes. Nå står grunnen bare der hele grunnen får plass.
+- BH1 (middels): docstringen i `test_klassen_for_styrken_bare_paa_ruter_med_styrke` motsa seg selv.
+- VG2 (middels): VRDS er bred nok for begge grensene. En test viser at 90 × 80 er nok for «3 av 3», men ikke for «ikke vurdert».
+- ECH5 (lav): skilletegn for skjermleseren også foran grunnen.
+- BH6 (lav): `Rute.grunn` bruker `ikke_vurdert`.
+- BH8, BH9, VG6, VG7 (lav): hjelpen ved «?» og `docs/hjelp.md` sier begge «med grunnen under når hele grunnen får plass», og kildene for hjelpen har `styrkelinje` og `grunnplass`.
+- VG4 (lav): grenene for uten data og uten styrke i `styrkelinje` har tester.
+- VG5 (lav): testen for klassene på siden gjelder siste børsdag; det står i en kommentar.
+- VG1 (middels): målingen i Edge og denne seksjonen står nå i spesifikasjonen.
+
+**Står, med grunnen:**
+- BH2 (middels): kartberegningstesten med kunstige ruter har bare ruter uten styrke. Grensen `STYRKE` er dekket av testen for klassene på siden og av `test_styrkeplass`.
+- BH7 (lav): VRDS har 1 px å gå på ved 1280 px. Testen skal feile hvis det endres.
+- BH10, VG8 (lav): «byte for byte det samme» gjelder bildet; avtrykket regnes av kildene, og det står i kommentaren.
+- ECH3 (lav): «ikke børsdag», «utenfor børskalenderen» og «datoen er etter i dag» gir «ikke vurdert» og grunnen. En dag uten børs har ingen kurs, og ruta står da med «Uten data» (`bygg_rute`); de to andre skjer bare med feil klokke eller en dato utenfor kalenderen.
+
+**Spørsmål til gruppen:**
+1. **Fotnoten** (BH3, ECH2, middels): ruta sier nå «ikke vurdert» også når grunnen er en annen, som VRDS med «for kort historikk» (svar 2). Fotnoten om «ikke vurdert» står fortsatt bare når grunnen er at signalet ikke er lagret, og forklarer bare det. Skal fotnoten også stå for de andre grunnene, med en annen tekst, eller står det som bygget?
+2. **«ikke vurdert» i en gul rute en annen dag** (VG3, ECH4, BH4, lav): svar 1 er brukt også for «ikke vurdert», så linja står der bare på nivå 3, med merket. Skal «ikke vurdert» stå på nivå 2 i en gul rute en annen dag, uten merket?
+
+*Besvart 2026-11-05 kl. 09:34 (gruppens svar, under story 8.2 i `epics.md`):* spørsmål 1: fotnoten står under kartet når en rute sier «ikke vurdert» av en annen grunn. Spørsmål 2: «ikke vurdert» i en gul rute en annen dag står bare med merket, som bygget.
+
+## Svar 1 kl. 09:34, bygget 05.11
+
+- Main flettet inn i grenen i `2f777ff6`.
+- `74134ae6`: `Rute.annen_grunn` er sann for en rute med kurs, men uten styrke, med en annen grunn enn at signalet ikke er lagret. Børsometeret får en egen fotnote under kartet, med teksten `«Ikke vurdert» kan også ha en annen grunn, som for kort kurshistorikk. Grunnen står i tabellen og på aksjesiden.` Den står rett etter den gamle når begge finnes. Hjelpen ved «?» og `docs/hjelp.md` sier det samme. Hjelperen `_fotnoten` i `test_boersometer.py` finner nå bare den gamle fotnoten, som begynner med «Ikke vurdert»: og kolon.
+- `26330bb5`: rettingene etter gjennomgangen (under).
+- `2de6679f`: test for klassene til fotnoten, etter mutanten N5.
+
+Ingen dag i demoen har begge grunnene; 97 dager ble skannet. Testen for begge fotnotene gir derfor VRDS 18.09 en annen grunn med monkeypatch.
+
+**Målt i Edge** i en iframe ved 320, 390, 760, 761, 1080 og 1280 px, for siste børsdag og 01.10: fotnoten står for øyet ved 1080 og 1280 px, der VRDS viser «ikke vurdert», og er skjult for øyet ved de fire andre breddene, der VRDS bare viser symbolet eller endringen. Beholderen er like bred som kartet ved alle seks, og ingen side ruller vannrett. Bildet ved 1280 px er på `pr-8-2b-bilder` (`fe068e8c`), bare fra demoen. Bildene i `docs/appen/` ble tatt på nytt og er byte for byte de samme; bare avtrykkene er endret.
+
+**Mutanter**, med kopi før og fila lik HEAD etter (git-bloben og sha256 av innholdet):
+- N4: `annen_grunn` uten `and bool(self.grunn)`. Fanget av `test_annen_grunn_bare_for_en_rute_med_kurs_og_en_annen_grunn`.
+- N5: `nivaa >= 2` i `annen_grunn_i_kartet`. Overlevde først, fordi VRDS står på nivå 2 med plass til linja. Fanget etter `2de6679f`.
+
+**Hele settet** alene før hver commit med kode: 4024 (`74134ae6`), 4026 (`26330bb5`) og 4027 (`2de6679f`) bestått, 24 hoppet over, og bare de 7 porttestene for `start.ps1` som feilet (svaret 29.10 kl. 21:02). Før `74134ae6` feilet også `test_ingen_fotnote_uten_en_rute_som_sier_ikke_vurdert`, fordi hjelperen fant den nye fotnoten. Den ble rettet, og settet ble kjørt på nytt (svaret 4.11 kl. 09:48).
+
+### Gjennomgangen 05.11 av svar 1
+
+Blind Hunter (bare diffen), Edge Case Hunter og Verification Gap på `2f777ff6..74134ae6`, uten pytest eller demo samtidig. Ingen funn på høy.
+
+**Rettet i `26330bb5` og `2de6679f`:**
+- ECH1 og BH7 (middels): fotnoten sto også når ingen rute viste «ikke vurdert» for øyet, for eksempel VRDS ved 390 px, og når kartet ikke kunne regnes. Nå regnes den av rutene i kartet (`annen_grunn_i_kartet`). Den får klassene `vis-N` der en slik rute viser «ikke vurdert», og stilen skjuler den bare for øyet i de andre klassene, med de samme `@container`-grensene som rutene. Skjermleseren leser både ruta og fotnoten. Et tomt kart gir ingen fotnote.
+- VG1 (middels): en test viser at den nye fotnoten mangler 18.09, der grunnen er at signalet ikke er lagret.
+- VG2 (middels): hjelpetesten sjekker «fotnote under kartet» i alle tre tekstene, og «står begge fotnotene» i `docs/hjelp.md`.
+- VG3 (lav): en rute med styrke og en tekst gir ingen fotnote.
+- BH3 (lav): fotnoten står etter tabellen.
+- BH4, VG4 og ECH4 (lav): den nye fotnoten står rett etter den gamle, og testen går nå gjennom `annen_grunn_i_kartet`.
+
+**Står, med grunnen:**
+- BH1 (middels, avvist): «hentingen feilet» er en lagret grunn (`Art.GRUNN`), og den står i tabellen. «Ikke lagret» er `Art.IKKE_KJOERT` (`markedsoversikt.les_tilstand`).
+- BH2 (lav): fotnoten står under både kartet og den lukkede tabellen, som den gamle. «Under kartet» er ordet i svaret.
+- BH5 (lav): den ekte og demoteksten i den gamle fotnoten begynner begge med «Ikke vurdert»: og kolon, og `test_den_ekte_versjonen_har_den_ekte_teksten` sjekker hele teksten.
+- BH6 (lav): «også» står i svaret.
+- BH8 (lav): avtrykket for oversikten dekker `hjelpetekster.py` og `stil.css`, men ikke `app.py`. Kommentarene nevner filene hvert avtrykk dekker.
+- ECH2 (lav): hjelperne i `test_app.py` og `test_demo.py` brukes ikke på børsometeret.
+- ECH3 (lav): som ECH3 over. En rute har alltid kurs den dagen, så «ikke børsdag» skjer ikke.

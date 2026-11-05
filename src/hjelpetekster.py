@@ -181,7 +181,15 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "Rammen er gul ved 3 av 3 på siste børsdag, også når du velger en annen dag, og "
             "mørk ved 2 av 3 bare på siste børsdag, "
             # Gruppens svar 04.11 kl. 10:01 og 10:04: styrken i rutene.
-            "og styrken står i rutene som har plass, som i tabellen; overskriften har "
+            "og styrken står i rutene som har plass, som i tabellen, "
+            # Gruppens svar 04.11 kl. 20:53 og 20:56, 1.
+            "en annen dag i en rute med gul ramme bare der merket «3 av 3 siste børsdag» også får plass, "
+            # Gruppens svar 04.11 kl. 20:53 og 20:56, 2.
+            "mens en rute med kurs, men uten styrke, sier «ikke vurdert» der, "
+            "med grunnen under når hele grunnen får plass, "
+            # Gruppens svar 05.11 kl. 09:34, 1: fotnoten for en annen grunn.
+            "og er grunnen en annen enn at signalet ikke er lagret, som for kort kurshistorikk, "
+            "sier en fotnote under kartet at grunnen står i tabellen og på aksjesiden; overskriften har "
             "snittet av endringen for aksjene i bransjen som har kurs, og «1 aksje» der det er én, "
             # Gruppens svar 26.10 kl. 13:00 (b): bare navnet når feltet er smalt.
             "eller bare navnet når feltet er smalt, "
@@ -196,6 +204,10 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (BOERSOMETER, "def snitt("),
                 (BOERSOMETER, "def indeks_for_dagen("),
                 (BOERSOMETER, "def fargetrinn("),
+                (BOERSOMETER, "def styrkelinje("),
+                (BOERSOMETER, "def ikke_vurdert_plass("),
+                (BOERSOMETER, "def grunnplass("),
+                (BOERSOMETER, "def annen_grunn("),
             ),
         ),
         # Story 2.9 (FR-104): delen over tabellen.

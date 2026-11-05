@@ -42,6 +42,7 @@ from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
 from boersdag import UtenforKalenderen, innevaerende_boersdag, norsk_dato
 from boersometer import (
     GRENSE_STERK,
+    annen_grunn_i_kartet,
     bygg_boersometer,
     bygg_rute,
     dagen_foer,
@@ -748,12 +749,17 @@ def boersometer():
         kartet = kart(bransjer)
     except ValueError:
         kartet = kart([])
+    # Gruppens svar 05.11 kl. 09:34, 1: en egen fotnote når en rute sier
+    # «ikke vurdert» av en annen grunn, ved siden av den gamle, regnet av
+    # rutene i kartet (gjennomgangen, ECH1).
+    annen_grunn = annen_grunn_i_kartet(kartet)
     return render_template(
         "boersometer.html",
         bransjer=bransjer,
         kart=kartet,
         antall_aksjer=len(ruter),
         ikke_vurdert=ikke_vurdert,
+        annen_grunn=annen_grunn,
         **_fotnoten([dagen] if ikke_vurdert else [], i_dag),
         dagen=dagen,
         siste=siste,

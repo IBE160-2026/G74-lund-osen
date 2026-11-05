@@ -801,6 +801,9 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
    ikke får plass, skjules bare for øyet, så skjermleseren leser alt. */
 /* Gruppens svar 04.11 kl. 19:21: på nivå 2 står styrken når ruta har
    klassen styrke-N, plass til én linje til (STYRKE i boersometer.py). */
+/* Gjennomgangen av svarene 04.11 kl. 20:53 og 20:56 (ECH1): på nivå 3 står
+   grunnen bare når ruta har klassen grunn-N, plass til hele grunnen
+   (grunnplass i boersometer.py). */
 /* Gruppens svar 26.10 kl. 13:07 (e): teksten regnes ved 1008 px, full bredde,
    og ellers ved 712 px (Flate.tekst i boersometer.py). Gjennomgangen 26.10
    (BH, ECH, VG): @container måler kartet selv, så rullefeltet, rotskriften og
@@ -811,11 +814,13 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
     :where(.side-oversikt) .rute.nivaa-bredest-0 > .ticker, :where(.side-oversikt) .rute.nivaa-bredest-0 > .endring, :where(.side-oversikt) .rute.nivaa-bredest-0 > .merke, :where(.side-oversikt) .rute.nivaa-bredest-0 > .styrke, :where(.side-oversikt) .rute.nivaa-bredest-0 > .tekst,
     :where(.side-oversikt) .rute.nivaa-bredest-1 > .endring, :where(.side-oversikt) .rute.nivaa-bredest-1 > .merke, :where(.side-oversikt) .rute.nivaa-bredest-1 > .styrke, :where(.side-oversikt) .rute.nivaa-bredest-1 > .tekst,
     :where(.side-oversikt) .rute.nivaa-bredest-2 > .merke, :where(.side-oversikt) .rute.nivaa-bredest-2:not(.styrke-bredest) > .styrke, :where(.side-oversikt) .rute.nivaa-bredest-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    :where(.side-oversikt) .rute.nivaa-bredest-3:not(.grunn-bredest) > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   }
   @container (width < 1008px) {
     :where(.side-oversikt) .rute.nivaa-bred-0 > .ticker, :where(.side-oversikt) .rute.nivaa-bred-0 > .endring, :where(.side-oversikt) .rute.nivaa-bred-0 > .merke, :where(.side-oversikt) .rute.nivaa-bred-0 > .styrke, :where(.side-oversikt) .rute.nivaa-bred-0 > .tekst,
     :where(.side-oversikt) .rute.nivaa-bred-1 > .endring, :where(.side-oversikt) .rute.nivaa-bred-1 > .merke, :where(.side-oversikt) .rute.nivaa-bred-1 > .styrke, :where(.side-oversikt) .rute.nivaa-bred-1 > .tekst,
     :where(.side-oversikt) .rute.nivaa-bred-2 > .merke, :where(.side-oversikt) .rute.nivaa-bred-2:not(.styrke-bred) > .styrke, :where(.side-oversikt) .rute.nivaa-bred-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    :where(.side-oversikt) .rute.nivaa-bred-3:not(.grunn-bred) > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   }
 }
 @media (max-width: 760px) {
@@ -833,11 +838,34 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
     :where(.side-oversikt) .rute.nivaa-smal-0 > .ticker, :where(.side-oversikt) .rute.nivaa-smal-0 > .endring, :where(.side-oversikt) .rute.nivaa-smal-0 > .merke, :where(.side-oversikt) .rute.nivaa-smal-0 > .styrke, :where(.side-oversikt) .rute.nivaa-smal-0 > .tekst,
     :where(.side-oversikt) .rute.nivaa-smal-1 > .endring, :where(.side-oversikt) .rute.nivaa-smal-1 > .merke, :where(.side-oversikt) .rute.nivaa-smal-1 > .styrke, :where(.side-oversikt) .rute.nivaa-smal-1 > .tekst,
     :where(.side-oversikt) .rute.nivaa-smal-2 > .merke, :where(.side-oversikt) .rute.nivaa-smal-2:not(.styrke-smal) > .styrke, :where(.side-oversikt) .rute.nivaa-smal-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    :where(.side-oversikt) .rute.nivaa-smal-3:not(.grunn-smal) > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   }
   @container (width < 328px) {
     :where(.side-oversikt) .rute.nivaa-smalest-0 > .ticker, :where(.side-oversikt) .rute.nivaa-smalest-0 > .endring, :where(.side-oversikt) .rute.nivaa-smalest-0 > .merke, :where(.side-oversikt) .rute.nivaa-smalest-0 > .styrke, :where(.side-oversikt) .rute.nivaa-smalest-0 > .tekst,
     :where(.side-oversikt) .rute.nivaa-smalest-1 > .endring, :where(.side-oversikt) .rute.nivaa-smalest-1 > .merke, :where(.side-oversikt) .rute.nivaa-smalest-1 > .styrke, :where(.side-oversikt) .rute.nivaa-smalest-1 > .tekst,
     :where(.side-oversikt) .rute.nivaa-smalest-2 > .merke, :where(.side-oversikt) .rute.nivaa-smalest-2:not(.styrke-smalest) > .styrke, :where(.side-oversikt) .rute.nivaa-smalest-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    :where(.side-oversikt) .rute.nivaa-smalest-3:not(.grunn-smalest) > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
+}
+/* Gruppens svar 05.11 kl. 09:34, 1, og gjennomgangen (ECH1): fotnoten for en
+   annen grunn står for øyet bare i klassen der en slik rute viser «ikke
+   vurdert» (vis-N, annen_grunn_i_kartet i boersometer.py). Beholderen er like
+   bred som kartet, så grensene er de samme som for rutene over. */
+:where(.side-oversikt) .annen-grunn { container-type: inline-size; }
+@media (width > 760px) {
+  @container (width >= 1008px) {
+    :where(.side-oversikt) .annen-grunn:not(.vis-bredest) > .fotnote { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
+  @container (width < 1008px) {
+    :where(.side-oversikt) .annen-grunn:not(.vis-bred) > .fotnote { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
+}
+@media (width <= 760px) {
+  @container (width >= 328px) {
+    :where(.side-oversikt) .annen-grunn:not(.vis-smal) > .fotnote { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
+  @container (width < 328px) {
+    :where(.side-oversikt) .annen-grunn:not(.vis-smalest) > .fotnote { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   }
 }
 /* Story 8.6b, c: fem trinn etter endringen slik den vises. Uten endring er ruta
@@ -862,6 +890,9 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) .rute .ticker { font-weight: 700; }
 :where(.side-oversikt) .rute .merke { font-size: 14px; font-weight: 600; }
 :where(.side-oversikt) .rute .styrke { align-self: flex-start; font-size: 14px; font-weight: 700; white-space: nowrap; }
+/* Gruppens svar 04.11 kl. 20:53 og 20:56, 2: «ikke vurdert» der styrken ellers
+   står, i vanlig skrift som grunnen (IKKE_VURDERT_PLASS i boersometer.py). */
+:where(.side-oversikt) .rute .styrke.ikke-vurdert { font-weight: 400; }
 /* Story 8.6b, c: grunnen i samme farge som resten av ruta, fordi --dempet har
    under 4,5:1 mot de lyse trinnene. */
 :where(.side-oversikt) .rute .tekst { font-size: 14px; color: inherit; }

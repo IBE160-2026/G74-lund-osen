@@ -1104,7 +1104,18 @@ HOEYDE_PAA_BILDET = 1864
 # ble tatt paa nytt og er byte for byte det samme.
 # Gruppens svar 04.11 kl. 19:21, 2: «?» midt paa periodeknappene, i stil.css.
 # Bildet ble tatt paa nytt med samme hoeyde.
-AVTRYKK_BAK_BILDET = "310129dd819b613121b9f442095c1ecc48b2d582e16f8f1acc69159bca406480"
+# Gruppens svar 04.11 kl. 20:53 og 20:56, 1: styrken en annen dag, i
+# hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gruppens svar 04.11 kl. 20:53 og 20:56, 2: «ikke vurdert» i boersometeret, i
+# hjelpetekster.py og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gjennomgangen av svarene 04.11 kl. 20:53 og 20:56: grunnen paa nivaa 3 og
+# hjelpen, i hjelpetekster.py og stil.css. Bildet ble tatt paa nytt og er byte
+# for byte det samme; avtrykket er regnet av kildene, ikke av bildet.
+# Gruppens svar 05.11 kl. 09:34, 1: fotnoten for en annen grunn, i
+# hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gjennomgangen av svar 1 kl. 09:34 (ECH1): fotnoten foelger ruta, i stil.css.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "56ffa2fd488b20d39899060180916d559243bdbd15b5821810a003133790e48e"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1360,7 +1371,18 @@ HOEYDE_PAA_AKSJESIDEN = 2198
 # ble tatt paa nytt og er byte for byte det samme.
 # Gruppens svar 04.11 kl. 19:21, 2: «?» midt paa periodeknappene, i stil.css.
 # Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "90be97e6636f9cda61ba79ecbe54ec47c8bc4ee3a2859228ed373e5a1888d021"
+# Gruppens svar 04.11 kl. 20:53 og 20:56, 1: styrken en annen dag, i
+# hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gruppens svar 04.11 kl. 20:53 og 20:56, 2: «ikke vurdert» i boersometeret, i
+# hjelpetekster.py og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gjennomgangen av svarene 04.11 kl. 20:53 og 20:56: grunnen paa nivaa 3 og
+# hjelpen, i hjelpetekster.py og stil.css. Bildet ble tatt paa nytt og er byte
+# for byte det samme; avtrykket er regnet av kildene, ikke av bildet.
+# Gruppens svar 05.11 kl. 09:34, 1: fotnoten for en annen grunn, i app.py og
+# hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gjennomgangen av svar 1 kl. 09:34 (ECH1): fotnoten foelger ruta, i app.py og
+# stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "3146bf308ec7a2e4cbeb97d7debf20680eaf885e795df54899f4c83e44fdde0f"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "

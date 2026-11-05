@@ -43,6 +43,7 @@ from boersometer import (
     bygg_rute,
     dagen_foer,
     fargetrinn,
+    ikke_vurdert_plass,
     indeks_for_dagen,
     kart,
     ramme,
@@ -412,7 +413,10 @@ class TestSiden:
         assert len(ruter) == 15
         assert {s for s, r in rammer.items() if r and r.group(1) == "gul"} == {"BRFE", "KVST", "LKSV", "TRHF"}
         assert not any(r and r.group(1) == "moerk" for r in rammer.values())
-        assert html.count(f'<span class="tekst">{IKKE_VURDERT}</span>') == 14
+        # Rettet 05.11 (gruppens svar 04.11 kl. 20:53 og 20:56, 2): «ikke
+        # vurdert» står på linja for styrken, og ikke en gang til som grunn.
+        assert html.count(f'<span class="styrke ikke-vurdert">{IKKE_VURDERT}</span>') == 14
+        assert f'<span class="tekst">{IKKE_VURDERT}</span>' not in html
         assert html.count("3 av 3 siste børsdag</span>") == 4 and "2 av 3</span>" not in html
         tabell = html.split('<table class="boersometertabell">')[1]
         assert "av 3</td>" not in tabell
@@ -537,7 +541,9 @@ class TestSiden:
             if re.fullmatch(r"\d av 3", styrke):
                 assert styrker[symbol] == styrke, symbol
             else:
-                assert symbol not in styrker, symbol
+                # Rettet 05.11 (svar 2 kl. 20:53 og 20:56): en rute med kurs,
+                # men uten styrke, sier «ikke vurdert» på linja for styrken.
+                assert styrker.get(symbol) in (None, IKKE_VURDERT), symbol
 
     def test_390_px_uten_vannrett_rulling_og_med_tastatur(self, klient):
         """Gjennomgangen (VG6), med kartet fra 8.6b, d: kartet er så bredt som
@@ -839,8 +845,10 @@ class TestSvaretKl0924:
 
 def _fotnoten(html: str) -> str | None:
     """Fotnoten for «ikke vurdert», uten taggene og med ett mellomrom mellom
-    ordene, eller None når den ikke står."""
-    treff = re.search(r'<p class="fotnote">\s*«Ikke vurdert»(.*?)</p>', html, re.DOTALL)
+    ordene, eller None når den ikke står. Gruppens svar 05.11 kl. 09:34, 1:
+    bare fotnoten som begynner med «Ikke vurdert»: og kolon, ikke den for en
+    annen grunn, som står i test_funnene_8_2b.py."""
+    treff = re.search(r'<p class="fotnote">\s*«Ikke vurdert»(?=:)(.*?)</p>', html, re.DOTALL)
     if not treff:
         return None
     return "«Ikke vurdert»" + re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", treff.group(1))).rstrip()
@@ -862,7 +870,8 @@ class TestFotnoten:
     def test_demoen_foer_startdagen_har_fotnoten(self, klient):
         """Ville feilet hvis fotnoten var borte fra børsometeret (M2 i 3.4d c)."""
         html = _side(klient, "/boersometer?dag=2026-09-18")
-        assert f'<span class="tekst">{IKKE_VURDERT}</span>' in html
+        # Rettet 05.11 (svar 2 kl. 20:53 og 20:56): på linja for styrken.
+        assert f'<span class="styrke ikke-vurdert">{IKKE_VURDERT}</span>' in html
         assert _fotnoten(html) == self.DEMOTEKST
 
     def test_ingen_fotnote_uten_en_rute_som_sier_ikke_vurdert(self, klient):
@@ -1611,7 +1620,11 @@ class TestKartet:
                         assert kr.nivaa[klasse] == ventet, (klasse, kr.rute.aksje.symbol, rb, rh)
                         # Gruppens svar 04.11 kl. 19:21: styrken på nivå 2,
                         # regnet for den samme synlige ruta.
-                        med_styrke = ventet == 2 and styrkeplass(rb - 2 * KANT, rh - 2 * KANT)
+                        # Svarene 04.11 kl. 20:53 og 20:56, 2: rutene her har
+                        # ingen styrke, så linja er «ikke vurdert», med sin
+                        # egen grense.
+                        assert kr.rute.uten_styrke
+                        med_styrke = ventet == 2 and ikke_vurdert_plass(rb - 2 * KANT, rh - 2 * KANT)
                         assert (klasse in kr.styrke) == med_styrke, (klasse, kr.rute.aksje.symbol, rb, rh)
 
     def test_tekstnivaaet_paa_siden_er_det_kartet_regnet(self, klient):
@@ -1634,6 +1647,16 @@ class TestKartet:
                 html,
             )
         )
+        # Svarene 04.11 kl. 20:53 og 20:56, 2: en rute uten styrke har
+        # «ikke vurdert» på linja, med sin egen grense.
+        uten_styrke = set(
+            re.findall(
+                r'<span class="ticker">([A-Z0-9]+)</span>\s*<span class="endring">[^<]*</span>\s*'
+                r'<span class="skjult">, </span><span class="styrke ikke-vurdert">',
+                html,
+            )
+        )
+        assert uten_styrke and uten_styrke < med_styrke, (uten_styrke, med_styrke)
         sett = set()
         for flate in (BRED, SMAL):
             n = flate.navn
@@ -1650,7 +1673,10 @@ class TestKartet:
                         sett.add((klasse, ventet))
                         # Gjennomgangen av rettingen 04.11 (VG1): styrke-N står
                         # på siden der ruta har styrke og plass på nivå 2.
-                        med = ventet == 2 and styrkeplass(rb - 2 * KANT, rh - 2 * KANT) and symbol in med_styrke
+                        # Gjennomgangen av svar 2 (VG5): siden er siste
+                        # børsdag, så svar 1 om en annen dag gjelder ikke her.
+                        plass = ikke_vurdert_plass if symbol in uten_styrke else styrkeplass
+                        med = ventet == 2 and plass(rb - 2 * KANT, rh - 2 * KANT) and symbol in med_styrke
                         assert (f"styrke-{klasse}" in klasser[symbol].split()) == med, (klasse, symbol, rb, rh)
                         if med:
                             sett.add((klasse, "styrke"))
