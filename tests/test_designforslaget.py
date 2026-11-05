@@ -321,20 +321,26 @@ def _soeylefot(html: str) -> str:
 
 
 @pytest.mark.parametrize(
-    ("oversikt", "boersometer"),
+    ("oversikt", "boersometer", "ord_"),
     [
-        ("/", "/boersometer?periode=siste"),
-        ("/?periode=1-mnd", "/boersometer?periode=1-mnd"),
-        ("/?periode=velg&dag=2026-10-05", "/boersometer?periode=velg&amp;dag=2026-10-05"),
+        ("/", "/boersometer?periode=siste", "dagen"),
+        ("/?periode=siste", "/boersometer?periode=siste", "dagen"),
+        ("/?periode=1-mnd", "/boersometer?periode=1-mnd", "perioden"),
+        ("/?periode=1-uke", "/boersometer?periode=1-uke", "perioden"),
+        ("/?periode=velg&dag=2026-10-05", "/boersometer?periode=velg&amp;dag=2026-10-05", "dagen"),
     ],
 )
-def test_lenken_til_boersometeret_har_samme_periode(klient, oversikt, boersometer):
+def test_lenken_til_boersometeret_har_samme_periode(klient, oversikt, boersometer, ord_):
     """Svar 2: under søylene, til høyre for «Stiplet linje: hovedindeksen»,
-    står «Se perioden i Børsometer ›» med samme periode eller dag. Ville
-    feilet uten lenken, med lenken foran forklaringen, eller med en annen
-    periode eller dag i adressen."""
+    står lenken med samme periode eller dag. Gruppens svar 05.11 kl. 14:29,
+    3: «Se dagen i Børsometer ›» ved én dag og «Se perioden i Børsometer ›»
+    ved en periode. Ville feilet uten lenken, med lenken foran forklaringen,
+    med en annen periode eller dag i adressen, eller med «perioden» ved én
+    dag eller «dagen» ved en periode."""
     fot = _soeylefot(_html(klient, oversikt))
-    lenke = f'<a class="til-boersometer" href="{boersometer}">Se perioden i Børsometer <span aria-hidden="true">›</span></a>'
+    lenke = (
+        f'<a class="til-boersometer" href="{boersometer}">Se {ord_} i Børsometer <span aria-hidden="true">›</span></a>'
+    )
     assert lenke in fot, fot
     assert fot.index("Stiplet linje: hovedindeksen") < fot.index(lenke)
 

@@ -249,7 +249,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             # Story 8.2a, c (U20): symbolet over søyla er en lenke.
             "Et gult bransjesymbol betyr 3 av 3 siste børsdag, et klikk på symbolet viser aksjen, "
             # Gruppens svar 04.11 kl. 22:23, 2: lenken til børsometeret.
-            "og «Se perioden i Børsometer» under søylene åpner børsometeret med samme periode eller dag.",
+            # Gruppens svar 05.11 kl. 14:29, 3: «Se dagen» ved én dag.
+            "og «Se dagen» eller «Se perioden» under søylene åpner børsometeret med samme dag eller periode.",
             (
                 (PRD, "#### FR-105 — Søylene under hovedindeksen"),
                 (HOVEDINDEKS_MAL, 'class="til-boersometer"'),

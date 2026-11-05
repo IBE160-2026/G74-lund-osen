@@ -1128,7 +1128,10 @@ HOEYDE_PAA_BILDET = 1864
 # hjelpetekster.py og _hovedindeks.html. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Gruppens svar 05.11 kl. 14:29, 1: merket i stedet for navnet i en stor gul
 # rute, i hjelpetekster.py og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "4771bf0b8c644a77142a0a3662cadcb94fadd7994c87452108cc2aa6faa56eb9"
+# Gruppens svar 05.11 kl. 14:29, 3: «Se dagen i Boersometer» ved én dag, i
+# _hovedindeks.html og hjelpetekster.py. Bildet ble tatt paa nytt med «Se dagen»;
+# bunnen av raden er fortsatt 1864 px, maalt i Edge.
+AVTRYKK_BAK_BILDET = "3e8cd9a0ac1c770c9f4275b758647f2c50fd7ca8df0ce0d9097bbebeb7f77ca1"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1408,7 +1411,9 @@ HOEYDE_PAA_AKSJESIDEN = 2198
 # hjelpetekster.py og aksje.html. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Gruppens svar 05.11 kl. 14:29, 1: merket i stedet for navnet i en stor gul
 # rute, i hjelpetekster.py og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "bb82839ba33f7c75bab8e5dc1aa1880eb36b8ce3c8ddc02251abc6fad198dfe7"
+# Gruppens svar 05.11 kl. 14:29, 3: «Se dagen i Boersometer», i hjelpetekster.py.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "b30f32af3f8928258aafb2309680642fb9a8acbb83fda5238f303554dbf3210a"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
