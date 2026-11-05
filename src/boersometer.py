@@ -605,7 +605,7 @@ RUTESKRIFT, RUTELINJE, RUTEGAP, RUTELUFT, RUTERAMME, EM_PER_TEGN = 14, 1.2, 1, (
 # høyden og den største bredden en rute med en endring på høyst ni tegn
 # kan trenge.
 STORSYMBOL, STORNAVN, STORENDRING, STORLUFT, STORGAP, STORMELLOM = 22, 12.5, 28, (10, 12), 2, 8
-STOR = (193, 107)
+STOR = (207, 107)
 # Gruppens svar 05.11 kl. 14:29, 2: store ruter bare fra 1079 px, som bygget,
 # altså bare i klassen bredest i Flate.tekst.
 STORE_KLASSER = frozenset({"bredest"})
@@ -614,6 +614,12 @@ STORE_KLASSER = frozenset({"bredest"})
 PILLELUFT, PILLEKANT = 0.45 * 16, 2
 # Bredden per tegn i halvfet skrift, i em, som i grensen over.
 HALVFET_EM = 0.62
+# Gjennomgangen av svar 4 (ECH1): symbolet i 22 px halvfett er bredere enn
+# HALVFET_EM, fordi det bare har store bokstaver. Målt i Edge 05.11 med en
+# Range: opptil 0,721 em per tegn (MOWI) for de 15 aksjene og demoen, så
+# grensen per rute regnes med 0,75 em. STOR[0] er regnet med det (AKRBP med
+# «ikke vurdert»: 206,5 px).
+STORSYMBOL_EM = 0.75
 # Merket for en annen dag i en gul rute, som i boersometer.html.
 MERKET = f"{ANTALL_SJEKKER} av {ANTALL_SJEKKER} siste børsdag"
 
@@ -626,7 +632,7 @@ def stor_bredde(symbol: str, styrke: str | None, pille: bool, endring: str) -> f
     svarene 04.11 kl. 22:23 (BH3, ECH3): endringen kan ha flere tegn enn
     «Uten data»."""
     luft = 2 * RUTERAMME + 2 * STORLUFT[1]
-    topp = luft + HALVFET_EM * STORSYMBOL * len(symbol)
+    topp = luft + STORSYMBOL_EM * STORSYMBOL * len(symbol)
     if styrke is not None:
         topp += STORMELLOM + EM_PER_TEGN * RUTESKRIFT * len(styrke)
         if pille:

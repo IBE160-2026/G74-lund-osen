@@ -76,6 +76,18 @@ def _nivaaet(b: float, h: float, symbol: str, klasse: str, bredde: float) -> int
     return 4 if nivaa == 3 and stor else nivaa
 
 
+def _bredden(symbol: str, styrke: str | None, pille: bool, endring: str) -> float:
+    """Bredden en stor rute trenger, regnet her med tallene fra stil.css og
+    målingen i Edge, ikke med boersometer.stor_bredde (gjennomgangen av svar
+    4, BH1): rammen 2 × 4 og luften 2 × 12, symbolet 22 px med 0,75 em per
+    tegn, 8 px og styrken i 14 px med 0,5 em per tegn og ringen 2 × 2 +
+    2 × 7,2, og endringen i 28 px med 0,62 em per tegn."""
+    topp = 32 + 0.75 * 22 * len(symbol)
+    if styrke is not None:
+        topp += 8 + 0.5 * 14 * len(styrke) + (2 * 2 + 2 * 7.2 if pille else 0)
+    return max(topp, 32 + 0.62 * 28 * len(endring))
+
+
 IDAG = date(2026, 10, 13)
 
 
@@ -1635,7 +1647,7 @@ class TestKartet:
                             rh - 2 * KANT,
                             kr.rute.aksje.symbol,
                             klasse,
-                            boersometer._stor_bredde(kr.rute),
+                            _bredden(kr.rute.aksje.symbol, "ikke vurdert", False, tall(kr.rute.endring, "endring")),
                         )
                         assert kr.nivaa[klasse] == ventet, (klasse, kr.rute.aksje.symbol, rb, rh)
                         # Gruppens svar 04.11 kl. 19:21: styrken på nivå 2,
@@ -1689,9 +1701,7 @@ class TestKartet:
             tekst = re.search(
                 rf'<span class="ticker">{symbol}</span>.*?<span class="{re.escape(styrke)}">([^<]*)</span>', html, re.S
             )
-            bredder[symbol] = boersometer.stor_bredde(
-                symbol, tekst.group(1) if styrke else None, "pille" in styrke, endring
-            )
+            bredder[symbol] = _bredden(symbol, tekst.group(1) if styrke else None, "pille" in styrke, endring)
         assert len(bredder) == 15
         sett = set()
         for flate in (BRED, SMAL):

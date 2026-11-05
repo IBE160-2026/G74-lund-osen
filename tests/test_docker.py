@@ -1137,7 +1137,9 @@ HOEYDE_PAA_BILDET = 1864
 # Gruppens svar 05.11 kl. 14:29, 3: «Se dagen i Boersometer» ved én dag, i
 # _hovedindeks.html og hjelpetekster.py. Bildet ble tatt paa nytt med «Se dagen»;
 # bunnen av raden er fortsatt 1864 px, maalt i Edge.
-AVTRYKK_BAK_BILDET = "3e8cd9a0ac1c770c9f4275b758647f2c50fd7ca8df0ce0d9097bbebeb7f77ca1"
+# Gjennomgangen av svarene 05.11 kl. 14:29: kommentaren om grensen i stil.css og
+# hjelpen om 1079 px i hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "ef7f45bcc548ce44c5497a2d25d01bf53109d5eb36f0ec80e34b19c381a82cda"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1419,7 +1421,9 @@ HOEYDE_PAA_AKSJESIDEN = 2198
 # rute, i hjelpetekster.py og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Gruppens svar 05.11 kl. 14:29, 3: «Se dagen i Boersometer», i hjelpetekster.py.
 # Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "b30f32af3f8928258aafb2309680642fb9a8acbb83fda5238f303554dbf3210a"
+# Gjennomgangen av svarene 05.11 kl. 14:29: kommentaren om grensen i stil.css og
+# hjelpen om 1079 px i hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "695e3666c5936d79a0ceadb88cfe1b6f0b5a203810fb987661910183134c7dcb"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1450,17 +1454,21 @@ DE_NYE_BILDENE = {
     "docs/appen/oversikten-390-demo.png": ("/", 390, 3524, MALENE_BAK_BILDET),
     "docs/appen/boersometeret-390-demo.png": ("/boersometer", 390, 1687, FILENE_BAK_BOERSOMETERET),
 }
+# Gjennomgangen av svarene 05.11 kl. 14:29: stil.css, hjelpetekster.py og
+# boersometer.py (STORSYMBOL_EM). Bildene ble tatt paa nytt og er byte for byte de samme.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "3e8cd9a0ac1c770c9f4275b758647f2c50fd7ca8df0ce0d9097bbebeb7f77ca1",
-    "docs/appen/boersometeret-demo.png": "9907603520d03952b5e496303412c34a8648fd788c1d34ec7abc274352bede2d",
-    "docs/appen/min-liste-demo.png": "b88663ee482c0ad053811765d0cd0c9ba7c0a56eda7f23634a2ec1663c9049e4",
-    "docs/appen/oversikten-390-demo.png": "3e8cd9a0ac1c770c9f4275b758647f2c50fd7ca8df0ce0d9097bbebeb7f77ca1",
-    "docs/appen/boersometeret-390-demo.png": "9907603520d03952b5e496303412c34a8648fd788c1d34ec7abc274352bede2d",
+    TOPPEN_AV_OVERSIKTEN: "ef7f45bcc548ce44c5497a2d25d01bf53109d5eb36f0ec80e34b19c381a82cda",
+    "docs/appen/boersometeret-demo.png": "2a42a1a94cbe36e66f47d6288c1b34d0ab88c6ef6c393fb07b21998121428f6f",
+    "docs/appen/min-liste-demo.png": "95a66e9c1a24d016a5bfd154f13af9ae0e62b6ed92e4a9e918a3f025d785ade8",
+    "docs/appen/oversikten-390-demo.png": "ef7f45bcc548ce44c5497a2d25d01bf53109d5eb36f0ec80e34b19c381a82cda",
+    "docs/appen/boersometeret-390-demo.png": "2a42a1a94cbe36e66f47d6288c1b34d0ab88c6ef6c393fb07b21998121428f6f",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
-    "oversikten (SLIK_TAS_BILDET), mot {adresse} med --window-size={bredde},{hoeyde}; ved 390 px i "
-    "en iframe som er 390 px bred. Mål bunnen av siden og endre høyden i DE_NYE_BILDENE hvis den "
+    "oversikten (SLIK_TAS_BILDET), mot {adresse} med --window-size={bredde},{hoeyde}. Ved 390 px blir "
+    "vinduet bredere enn 390 px og bildet kuttes, så ta det av en side på samme port med en iframe som "
+    "er 390 px bred og {hoeyde} px høy, src={adresse}, og --virtual-time-budget=8000, så iframen er lastet "
+    "(gjennomgangen, BH11). Mål bunnen av siden og endre høyden i DE_NYE_BILDENE hvis den "
     "har flyttet seg. Oppdater så AVTRYKK_BAK_DE_NYE_BILDENE[{bildet!r}] til {avtrykk} i samme commit."
 )
 

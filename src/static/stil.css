@@ -859,7 +859,7 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
   }
 }
 /* Gruppens svar 04.11 kl. 22:23, 1: store ruter som i designforslaget, nivå 4
-   (STOR i boersometer.py). Symbolet 22 px halvfett øverst til venstre og
+   (storplass i boersometer.py, regnet for hver rute etter svar 4 kl. 14:29). Symbolet 22 px halvfett øverst til venstre og
    styrken øverst til høyre, navnet under i 12,5 px og kuttet med «…», merket
    og grunnen under navnet der de får plass (klassene merke-N og grunn-N), og
    endringen 28 px halvfett nederst, med luft 10 og 12 px. Små ruter er som før.

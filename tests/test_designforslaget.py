@@ -69,7 +69,12 @@ def test_grensen_for_store_ruter_er_regnet_fra_stilen():
     rammen, luften 10 og 12 px, symbolet 22 px, navnet 12,5 px og endringen
     28 px, og i bredden AKRBP med «ikke vurdert» ved siden av og «Uten data» i
     28 px. Ville feilet med en grense der symbolet, styrken eller endringen
-    kunne gå utenfor ruta, eller hvis stilen fikk andre tall enn koden."""
+    kunne gå utenfor ruta, eller hvis stilen fikk andre tall enn koden.
+    Gjennomgangen av svar 4 (ECH1): symbolet regnes med STORSYMBOL_EM, 0,75 em,
+    målt i Edge til opptil 0,721 em (MOWI). Gjennomgangen (VG2): ringen i
+    stor_bredde, PILLELUFT og PILLEKANT, er den i stil.css, og styrken står i
+    14 px. Ville også feilet hvis ringen fikk mer luft eller tykkere kant i
+    stilen uten at koden fulgte med."""
     import boersometer as b
 
     for klasse in KLASSENE:
@@ -90,26 +95,33 @@ def test_grensen_for_store_ruter_er_regnet_fra_stilen():
     luft_h, luft_b = b.STORLUFT
     hoeyde = 2 * ramme + 2 * luft_h + (b.STORSYMBOL + b.STORNAVN + b.STORENDRING) * linje + b.STORGAP
     halvfet = 0.62
-    topp = 2 * ramme + 2 * luft_b + halvfet * b.STORSYMBOL * len("AKRBP") + b.STORMELLOM
+    assert b.HALVFET_EM == halvfet and b.STORSYMBOL_EM >= 0.721
+    topp = 2 * ramme + 2 * luft_b + b.STORSYMBOL_EM * b.STORSYMBOL * len("AKRBP") + b.STORMELLOM
     topp += b.EM_PER_TEGN * b.RUTESKRIFT * len("ikke vurdert")
     bunn = 2 * ramme + 2 * luft_b + halvfet * b.STORENDRING * len("Uten data")
     assert b.STOR[1] >= hoeyde and b.STOR[0] >= max(topp, bunn), (b.STOR, hoeyde, topp, bunn)
     assert b.STOR[0] > b.NIVAA_3[0] and b.STOR[1] >= b.NIVAA_3[1]
+    pille = _regel(".pille")
+    assert float(re.search(r"padding: [\d.]+rem ([\d.]+)rem", pille).group(1)) * 16 == b.PILLELUFT
+    kanter = [float(k) for k in re.findall(r"\.pille\.(?:tre|to)-av-tre \{ border: ([\d.]+)px", STIL)]
+    assert kanter and max(kanter) == b.PILLEKANT, kanter
+    assert _px(_regel(".rute .styrke"), "font-size") == b.RUTESKRIFT
 
 
-@pytest.mark.parametrize(("b", "h", "ventet"), [(155, 107, True), (154.9, 107, False), (155, 106.9, False)])
+@pytest.mark.parametrize(("b", "h", "ventet"), [(166.4, 107, True), (166.3, 107, False), (166.4, 106.9, False)])
 def test_storplass_regnes_for_hver_rute(b, h, ventet):
     """Gruppens svar 05.11 kl. 14:29, 4: grensen regnes for hver rute. HVDO
-    i demoen, 2 av 3 i ringen og -1,67 %: øverst 32 + 0,62 × 22 × 4 + 8 +
-    0,5 × 14 × 6 + ringen 2 × 2 + 2 × 7,2 = 154,96 px, og nederst 32 +
-    0,62 × 28 × 7 = 153,52 px, så HVDO er stor fra 155 px, ikke fra 193 px.
+    i demoen, 2 av 3 i ringen og -1,67 %: øverst 32 + 0,75 × 22 × 4 + 8 +
+    0,5 × 14 × 6 + ringen 2 × 2 + 2 × 7,2 = 166,4 px, og nederst 32 +
+    0,62 × 28 × 7 = 153,52 px, så HVDO (175 px ved 1280 px) er stor fra
+    166,4 px, ikke fra den faste grensen.
     Ville feilet med den faste grensen STOR, eller uten ringen eller
     endringen i bredden."""
     from boersometer import MOERK, _stor_bredde, storplass
 
     hvdo = _rute(aksje=_aksje("HVDO", "Havdyp Olje"), styrke=2, siste_styrke=2, endring=-1.67, er_siste=True)
     assert hvdo.ramme == MOERK
-    assert _stor_bredde(hvdo) == pytest.approx(154.96)
+    assert _stor_bredde(hvdo) == pytest.approx(166.4)
     assert storplass(hvdo, b, h) is ventet
 
 
@@ -120,7 +132,10 @@ def test_stor_den_bredeste_er_stor_bredde():
     regnet ulikt."""
     from boersometer import STOR, stor_bredde
 
-    bredest = stor_bredde("AKRBP", "ikke vurdert", False, "Uten data")
+    # Gjennomgangen (BH5): en rute uten data har ingen styrke, så den bredeste
+    # er AKRBP med «ikke vurdert» og en endring på ni tegn.
+    bredest = stor_bredde("AKRBP", "ikke vurdert", False, "+12,34 %")
+    assert bredest > stor_bredde("AKRBP", None, False, "Uten data")
     assert bredest <= STOR[0] < bredest + 1
     assert stor_bredde("AKRBP", "3 av 3", True, "-12,34 %") < bredest
 
@@ -158,26 +173,28 @@ def test_merket_og_grunnen_der_de_faar_plass():
     flate = Flate("prove", 100, 1, 100, (("prove", 100),))
     linje = bm.RUTESKRIFT * bm.RUTELINJE
     navnet = bm.STORNAVN * bm.RUTELINJE + bm.STORGAP
-    # Ved 193 px er merket to linjer i halvfet skrift.
-    assert bm._linjer(bm.MERKET, STOR[0] - 2 * bm.RUTERAMME - 2 * bm.STORLUFT[1], bm.HALVFET_EM) == 2
+    # Ved 193 px er merket to linjer i halvfet skrift. Bredden er fast, så
+    # testen ikke følger STOR[0], som ble 207 etter gjennomgangen (ECH1).
+    bredde = 193
+    assert bm._linjer(bm.MERKET, bredde - 2 * bm.RUTERAMME - 2 * bm.STORLUFT[1], bm.HALVFET_EM) == 2
     merke = 2 * linje + bm.STORGAP
     # 0,001 px for avrundingen i flyttallene ved grensen.
-    b, h = STOR[0] + 2 * KANT, STOR[1] + 2 * KANT + 0.001
+    b, h = bredde + 2 * KANT, STOR[1] + 2 * KANT + 0.001
     gul = _rute(styrke=1, siste_styrke=3, er_siste=False)
     # Ikke plass til merket, heller ikke i stedet for navnet: ruta er ikke stor.
     assert _nivaa_ved(flate, 100, b, h, gul) == (3, False, False, False, False)
     assert _nivaa_ved(flate, 100, b, h + merke - navnet - 0.01, gul)[0] == 3
     # Plass i stedet for navnet: merket og styrken, uten navnet.
     assert _nivaa_ved(flate, 100, b, h + merke - navnet, gul) == (4, True, False, True, False)
-    # Plass under navnet: alt.
     assert _nivaa_ved(flate, 100, b, h + merke - 0.01, gul) == (4, True, False, True, False)
+    # Plass under navnet: alt (gjennomgangen, BH8: kommentaren sto over feil linje).
     assert _nivaa_ved(flate, 100, b, h + merke, gul) == (4, True, False, True, True)
     # Siste børsdag trenger ikke merket.
     siste = _rute(styrke=3, siste_styrke=3)
     assert _nivaa_ved(flate, 100, b, h, siste) == (4, True, False, False, True)
     # Grunnen, «for kort historikk: 24 av 51 dager», er tre linjer ved 161 px.
     grunn = "for kort historikk: 24 av 51 dager"
-    linjer = bm._linjer(grunn, STOR[0] - 2 * bm.RUTERAMME - 2 * bm.STORLUFT[1])
+    linjer = bm._linjer(grunn, bredde - 2 * bm.RUTERAMME - 2 * bm.STORLUFT[1])
     trengs = linjer * linje + bm.STORGAP
     uten = _rute(tekst=grunn)
     assert uten.grunn and uten.uten_styrke
@@ -201,6 +218,18 @@ def test_merket_i_stedet_for_navnet_som_lksv_18_09():
     assert bm._linjer(bm.MERKET, 231 - 2 * bm.RUTERAMME - 2 * bm.STORLUFT[1], bm.HALVFET_EM) == 1
     gul = _rute(siste_styrke=3, er_siste=False)
     assert _nivaa_ved(flate, 100, 231 + 2 * KANT, 123 + 2 * KANT, gul) == (4, True, False, True, False)
+
+
+def test_merket_er_det_malen_skriver():
+    """Gjennomgangen (VG3): høyden for merket regnes med MERKET, så teksten
+    må være den malen skriver. Ville feilet hvis malen fikk en annen tekst."""
+    import boersometer as bm
+
+    mal = (Path(__file__).resolve().parent.parent / "src" / "templates" / "boersometer.html").read_text(
+        encoding="utf-8"
+    )
+    assert "{{ antall_sjekker }} av {{ antall_sjekker }} siste børsdag</span>" in mal
+    assert bm.MERKET == f"{bm.ANTALL_SJEKKER} av {bm.ANTALL_SJEKKER} siste børsdag"
 
 
 def test_navnet_staar_bare_med_navn_klassen():
@@ -319,6 +348,8 @@ def test_hoeye_smale_ruter_er_store_i_demoen(klient):
     )
     for symbol in ("HVDO", "BRFE", "KVST"):
         assert "nivaa-bredest-4" in klasser[symbol], (symbol, klasser[symbol])
+        # Gjennomgangen (VG1): navnet står i de store rutene på siste børsdag.
+        assert "navn-bredest" in klasser[symbol], (symbol, klasser[symbol])
     assert not [s for s, k in klasser.items() if {f"nivaa-{n}-4" for n in ("bred", "smal", "smalest")} & set(k)]
 
 
@@ -372,6 +403,11 @@ def _soeylefot(html: str) -> str:
         ("/?periode=siste", "/boersometer?periode=siste", "dagen"),
         ("/?periode=1-mnd", "/boersometer?periode=1-mnd", "perioden"),
         ("/?periode=1-uke", "/boersometer?periode=1-uke", "perioden"),
+        # Gjennomgangen (VG4): alle periodene.
+        ("/?periode=3-mnd", "/boersometer?periode=3-mnd", "perioden"),
+        ("/?periode=6-mnd", "/boersometer?periode=6-mnd", "perioden"),
+        ("/?periode=i-aar", "/boersometer?periode=i-aar", "perioden"),
+        ("/?periode=1-aar", "/boersometer?periode=1-aar", "perioden"),
         ("/?periode=velg&dag=2026-10-05", "/boersometer?periode=velg&amp;dag=2026-10-05", "dagen"),
     ],
 )

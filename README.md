@@ -42,7 +42,7 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 |---|---|---|
 | Kurser | Oppdiktede selskaper og kurser («Eksempeltall») | Ekte sluttkurser fra Oslo Børs, hentet fra EODHD hver børsdag. Dagens vurdering lagres per aksje |
 | Trenger | Ingen konto og ingen nøkkel | En gratis nøkkel fra EODHD |
-| Klar | Med en gang | Etter første henting, når som helst. Før kl. 22 på en børsdag gir den forrige børsdag, og samme dag etter kl. 22 trengs bonuskvote hos EODHD |
+| Klar | Med en gang | Etter første henting, når som helst. Før kl. 22 på en børsdag gir den forrige børsdag, og samme dag etter kl. 22 trengs bonuskvote hos EODHD, ellers får dagen aldri signal |
 
 Til faglærer:
 - Prøv appen: demoen med oppdiktede tall, uten konto og nøkkel, med et dobbeltklikk på «Start demoen» ([Enklest: dobbeltklikk](#enklest-dobbeltklikk-uten-docker)) eller med Docker Desktop etter [steg 1–4](#med-docker-desktop) ([demoen](#demoen)). Prøv gjerne ekte kurser etterpå, med en gratis nøkkel fra EODHD: [den ekte versjonen](#den-ekte-versjonen)

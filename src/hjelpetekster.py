@@ -185,7 +185,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "Rammen er gul ved 3 av 3 på siste børsdag, også når du velger en annen dag, og "
             "mørk ved 2 av 3 bare på siste børsdag, "
             # Gruppens svar 04.11 kl. 22:23, 1: store ruter som i designforslaget.
-            "de største rutene har symbolet og styrken øverst, selskapsnavnet under, kuttet med «…» når "
+            # Gjennomgangen av svarene 05.11 kl. 14:29 (ECH2): bare fra 1079 px.
+            "i et vindu fra 1079 px har de største rutene symbolet og styrken øverst, selskapsnavnet under, kuttet med «…» når "
             "det er for langt, og endringen i stor skrift nederst, med merket og grunnen mellom der de får plass, "
             # Gruppens svar 05.11 kl. 14:29, 1.
             "og merket i stedet for navnet når det ikke får plass under navnet, "
