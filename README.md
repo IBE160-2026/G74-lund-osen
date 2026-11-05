@@ -6,6 +6,9 @@ Gruppe G74 (Ai Ai Ai) i IBE160 Programmering med KI, Høgskolen i Molde, høsten
 
 OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversikt. Tre enkle sjekker – trend, bevegelse og interesse (handelsvolum) – gir hver aksje en signalstyrke fra 0 til 3, så en vanlig sparer kan se hva som har endret seg, og hvorfor. Beregningene gjøres med vanlig programkode, og KI skal forklare signalet med ord. Appen gir ikke råd om å kjøpe eller selge. Den er under utvikling og ikke ferdig.
 
+![Toppen av oversikten i demoen, med overskriften, ingressen og «Slik leser du tabellen», med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/oversikten-topp-demo.png)
+*Toppen av oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»).*
+
 <details>
 <summary>Bilder av appen (demoen)</summary>
 
@@ -14,6 +17,18 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 
 ![Aksjesiden for Brattfjell Energi (BRFE) i demoen, med kursgrafen, KI-teksten og setningen om hvor lenge signalet har vært slik, med oppdiktede tall («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/aksjesiden-brfe-demo.png)
 *Aksjesiden for BRFE i demoen, med grafen, KI-teksten og setningen om dagene under den, med oppdiktede tall («Eksempeltall»).*
+
+![Børsometeret i demoen, et kart med én rute per aksje etter bransje, farget etter endringen, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/boersometeret-demo.png)
+*Børsometeret i demoen, der de største rutene har navnet og endringen i stor skrift, med oppdiktede tall («Eksempeltall»).*
+
+![Min liste i demoen, med de fem aksjene som har stjerne, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/min-liste-demo.png)
+*Min liste i demoen, med aksjene som har stjerne, med oppdiktede tall («Eksempeltall»).*
+
+![Oversikten i demoen på en mobil, 390 px bred, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/oversikten-390-demo.png)
+*Oversikten i demoen ved 390 px, som på en mobil, med oppdiktede tall («Eksempeltall»).*
+
+![Børsometeret i demoen på en mobil, 390 px bred, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/boersometeret-390-demo.png)
+*Børsometeret i demoen ved 390 px, som på en mobil, med oppdiktede tall («Eksempeltall»).*
 
 </details>
 
@@ -27,12 +42,17 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 |---|---|---|
 | Kurser | Oppdiktede selskaper og kurser («Eksempeltall») | Ekte sluttkurser fra Oslo Børs, hentet fra EODHD hver børsdag. Dagens vurdering lagres per aksje |
 | Trenger | Ingen konto og ingen nøkkel | En gratis nøkkel fra EODHD |
-| Klar | Med en gang | Etter første henting, når som helst. Før kl. 22 på en børsdag gir den forrige børsdag. Hentingen etter kl. 22 samme dag trenger bonuskvote hos EODHD; uten den får den dagen aldri signal |
+| Klar | Med en gang | Etter første henting, når som helst. Før kl. 22 på en børsdag gir den forrige børsdag, og samme dag etter kl. 22 trengs bonuskvote hos EODHD |
 
 Til faglærer:
 - Prøv appen: demoen med oppdiktede tall, uten konto og nøkkel, med et dobbeltklikk på «Start demoen» ([Enklest: dobbeltklikk](#enklest-dobbeltklikk-uten-docker)) eller med Docker Desktop etter [steg 1–4](#med-docker-desktop) ([demoen](#demoen)). Prøv gjerne ekte kurser etterpå, med en gratis nøkkel fra EODHD: [den ekte versjonen](#den-ekte-versjonen)
 - Testene: de automatiske, med to kommandoer etter at uv er installert: [Tester](#tester)
-- Dokumentene: [Product Brief](_bmad-output/planning-artifacts/product-brief.md), arbeidskravet, versjon 8 etter [tilbakemeldingen 06.10](_bmad-output/planning-artifacts/tilbakemelding-product-brief.md), låst i taggen `arbeidskrav-product-brief-v8`; plan og krav: [PRD](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md) (ferdig 3.11, låst i taggen `prd-ferdig-2026-11-03`) med [«Kort fortalt»](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md#kort-fortalt) først, [arkitektur](_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md), [epics og stories](_bmad-output/planning-artifacts/epics.md); [leveranselista](docs/innlevering.md) med kravene i emnet og hvor de står, og [vurderingsmatrisen for del 1](docs/vurderingsmatrise.md) med status per kriterium
+- Dokumentene:
+  - [Product Brief](_bmad-output/planning-artifacts/product-brief.md), arbeidskravet: versjon 8 etter [tilbakemeldingen 06.10](_bmad-output/planning-artifacts/tilbakemelding-product-brief.md), låst i taggen `arbeidskrav-product-brief-v8`
+  - Plan og krav: [PRD](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md) (ferdig 3.11, låst i taggen `prd-ferdig-2026-11-03`), med [«Kort fortalt»](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md#kort-fortalt) først
+  - [Arkitektur](_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md) og [epics og stories](_bmad-output/planning-artifacts/epics.md)
+  - [Leveranselista](docs/innlevering.md): kravene i emnet og hvor de står
+  - [Vurderingsmatrisen for del 1](docs/vurderingsmatrise.md): status per kriterium
 - Prosessen og KI-bruken: [kvalitetssikringen](docs/kvalitetssikring.md), [refleksjonsloggen](docs/reflection-log.md) og [de lagrede KI-promptene](docs/ai-prompts/)
 
 <a name="kom-i-gang"></a>
@@ -467,6 +487,7 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 
 **Neste i v1**
 
+- Brukertesten med én person, først med KI av
 - Prøven av README-en på en ren maskin, når alt i v1 er bygget
 
 **Ekstra, hvis tiden rekker**
@@ -582,7 +603,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [`docs/`](docs/) — arbeidsprosessen, og [`docs/hjelp.md`](docs/hjelp.md) med spørsmål og svar til «Kom i gang»
 - [`docs/bilder/readme/`](docs/bilder/readme/) — de tre skjermbildene i «Kom i gang»: [`engine-running.png`](docs/bilder/readme/engine-running.png), [`github-download-zip.png`](docs/bilder/readme/github-download-zip.png) og [`powershell-mappa.png`](docs/bilder/readme/powershell-mappa.png)
 - [`docs/bilder/investorsider/`](docs/bilder/investorsider/) — de 15 tegningene laget av KI til investorsidene i demoen, godkjent 24.10: SVG-ene, forhåndsvisningene, [`LESMEG.md`](docs/bilder/investorsider/LESMEG.md) og [`bobler.json`](docs/bilder/investorsider/bobler.json)
-- [`docs/appen/`](docs/appen/) — bilder og senere video av appen, bare av demoen: [`oversikten-demo.png`](docs/appen/oversikten-demo.png) og [`aksjesiden-brfe-demo.png`](docs/appen/aksjesiden-brfe-demo.png)
+- [`docs/appen/`](docs/appen/) — bilder og senere video av appen, bare av demoen: [`oversikten-topp-demo.png`](docs/appen/oversikten-topp-demo.png), [`oversikten-demo.png`](docs/appen/oversikten-demo.png), [`aksjesiden-brfe-demo.png`](docs/appen/aksjesiden-brfe-demo.png), [`boersometeret-demo.png`](docs/appen/boersometeret-demo.png), [`min-liste-demo.png`](docs/appen/min-liste-demo.png), [`oversikten-390-demo.png`](docs/appen/oversikten-390-demo.png) og [`boersometeret-390-demo.png`](docs/appen/boersometeret-390-demo.png)
 - [`_bmad-output/`](_bmad-output/) — Product Brief, plan, krav og sprintstatus
 - [`.github/`](.github/) — testkjøringen og morgensjekken
 - [`.logs/`](.logs/) — loggene fra øktene med Claude Code, én mappe per bruker, og issues.md i hver mappe med det som gjenstår
