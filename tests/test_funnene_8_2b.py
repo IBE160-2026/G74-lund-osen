@@ -1057,12 +1057,15 @@ def test_annen_grunn_bare_for_en_rute_med_kurs_og_en_annen_grunn():
     assert not Rute(aksje, None, None, None, "Uten data", uten_data=True).annen_grunn
     assert not Rute(aksje, 1.0, 1.0, 2, None).annen_grunn
     assert not Rute(aksje, 1.0, None, None, None).annen_grunn
+    # Gjennomgangen (VG3): en rute med styrke gir den ikke, heller ikke med en tekst.
+    assert not Rute(aksje, 1.0, 1.0, 2, "for kort historikk: 24 av 51 dager").annen_grunn
 
 
 def test_fotnoten_for_en_annen_grunn_staar_med_vrds_i_demoen(klient):
     """Svar 1: siste demodag har VRDS for kort historikk og ingen dag uten
     lagret signal. Ville feilet uten den nye fotnoten, hvis den gamle sto
-    alene for VRDS, eller hvis fotnoten sto over kartet."""
+    alene for VRDS, eller hvis fotnoten sto over kartet eller over tabellen
+    (gjennomgangen, BH3)."""
     html = _html(klient, "/boersometer")
     assert '<span class="ticker">VRDS</span>' in html
     fotnoter = _fotnoter(html)
@@ -1071,29 +1074,66 @@ def test_fotnoten_for_en_annen_grunn_staar_med_vrds_i_demoen(klient):
     )
     assert not any(f.startswith(GAMMEL_FOTNOTE) for f in fotnoter), fotnoter
     assert html.index(ANNEN_GRUNN) > html.index('<span class="ticker">VRDS</span>')
+    assert html.index(ANNEN_GRUNN) > html.index("</details>")
+
+
+def test_fotnoten_for_en_annen_grunn_foelger_ruta_som_viser_det(klient):
+    """Gjennomgangen (ECH1): VRDS viser «ikke vurdert» for øyet bare i den
+    bredeste klassen (nivå 2 med styrke-bredest), så fotnoten har bare
+    vis-bredest, og stilen skjuler den for øyet i de andre klassene, med de
+    samme grensene som rutene. Ville feilet hvis fotnoten sto for øyet ved
+    390 px, der VRDS bare viser symbolet, eller uten reglene i stil.css."""
+    html = _html(klient, "/boersometer")
+    klasser = re.search(r'<div class="annen-grunn([^"]*)">', html).group(1).split()
+    assert klasser == ["vis-bredest"], klasser
+    assert ":where(.side-oversikt) .annen-grunn { container-type: inline-size; }" in STIL
+    for klasse in ("bredest", "bred", "smal", "smalest"):
+        assert f":where(.side-oversikt) .annen-grunn:not(.vis-{klasse}) > .fotnote {{ position: absolute;" in STIL
+
+
+def test_ingen_fotnote_for_en_annen_grunn_uten_en_slik_rute_i_kartet(klient):
+    """Gjennomgangen (VG1, ECH1): 18.09 sier VRDS «ikke vurdert» fordi
+    signalet ikke er lagret, så bare den gamle fotnoten står, og et tomt kart
+    gir ingen fotnote. Ville feilet hvis den nye fotnoten sto på hver side,
+    eller sto når kartet ikke kunne regnes."""
+    from boersometer import Rute, annen_grunn_i_kartet, bygg_boersometer, kart
+    from kursdata import Aksje
+
+    html = _html(klient, "/boersometer?periode=velg&dag=2026-09-18")
+    assert ANNEN_GRUNN not in html and 'class="annen-grunn' not in html
+    assert any(f.startswith(GAMMEL_FOTNOTE) for f in _fotnoter(html))
+    assert annen_grunn_i_kartet(kart([])) is None
+    aksje = Aksje("VRDS", "VRDS.OL", "Varde", "Industri")
+    med_grunn = kart(bygg_boersometer([Rute(aksje, 1.0, 1.0, None, "for kort historikk: 24 av 51 dager")]))
+    assert annen_grunn_i_kartet(med_grunn) is not None
 
 
 def test_begge_fotnotene_naar_begge_grunnene_finnes(klient, monkeypatch):
     """Svar 1: ingen dag i demoen har begge grunnene (skannet 05.11, 97
     dager), så VRDS 18.09, før vurderingene starter, får en annen grunn her.
     Ville feilet hvis den nye fotnoten tok plassen til den gamle, eller ikke
-    sto ved siden av den."""
+    sto rett etter den (gjennomgangen, BH4 og VG4)."""
     import boersometer
 
     monkeypatch.setattr(boersometer.Rute, "annen_grunn", property(lambda rute: rute.aksje.symbol == "VRDS"))
-    fotnoter = _fotnoter(_html(klient, "/boersometer?periode=velg&dag=2026-09-18"))
-    assert any(f.startswith(GAMMEL_FOTNOTE) for f in fotnoter), fotnoter
-    assert any(f.startswith(ANNEN_GRUNN) for f in fotnoter), fotnoter
+    html = _html(klient, "/boersometer?periode=velg&dag=2026-09-18")
+    fotnoter = _fotnoter(html)
+    assert [f[:16] for f in fotnoter] == [GAMMEL_FOTNOTE[:16], ANNEN_GRUNN[:16]], fotnoter
+    mellom = html[html.index(GAMMEL_FOTNOTE) : html.index(ANNEN_GRUNN)]
+    assert re.fullmatch(r'[^<]*</p>\s*<div class="annen-grunn[^"]*">\s*<p class="fotnote">', mellom), mellom
 
 
 def test_hjelpen_og_hjelp_md_sier_det_samme_om_fotnoten():
     """Svar 1: hjelpen ved «?» i børsometeret og docs/hjelp.md sier at
-    «ikke vurdert» kan ha en annen grunn, og at grunnen står i tabellen og
-    på aksjesiden. Ville feilet hvis en av dem manglet setningen."""
+    «ikke vurdert» kan ha en annen grunn, at en fotnote under kartet sier
+    det, og at grunnen står i tabellen og på aksjesiden; hjelp.md også at
+    begge fotnotene kan stå. Ville feilet hvis en av dem manglet en av
+    delene (gjennomgangen, VG2)."""
+    deler = ("som for kort kurshistorikk", "fotnote under kartet", "tabellen og på aksjesiden")
     tekst = hjelpetekster()["boersometeret"].tekst
-    assert "som for kort kurshistorikk" in tekst and "tabellen og på aksjesiden" in tekst, tekst
+    assert all(del_ in tekst for del_ in deler), tekst
     hjelp = (Path(__file__).resolve().parent.parent / "docs" / "hjelp.md").read_text(encoding="utf-8")
     avsnitt = hjelp.split("### Hvorfor står det «ikke vurdert»?")[1].split("\n#")[0]
-    assert "som for kort kurshistorikk" in avsnitt and "tabellen og på aksjesiden" in avsnitt
+    assert all(del_ in avsnitt for del_ in deler) and "står begge fotnotene" in avsnitt
     boersometer = hjelp.split("### Hva viser børsometeret?")[1].split("\n#")[0]
-    assert "som for kort kurshistorikk" in boersometer and "tabellen og på aksjesiden" in boersometer
+    assert all(del_ in boersometer for del_ in deler)

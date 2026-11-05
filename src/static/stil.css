@@ -847,6 +847,27 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
     :where(.side-oversikt) .rute.nivaa-smalest-3:not(.grunn-smalest) > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   }
 }
+/* Gruppens svar 05.11 kl. 09:34, 1, og gjennomgangen (ECH1): fotnoten for en
+   annen grunn står for øyet bare i klassen der en slik rute viser «ikke
+   vurdert» (vis-N, annen_grunn_i_kartet i boersometer.py). Beholderen er like
+   bred som kartet, så grensene er de samme som for rutene over. */
+:where(.side-oversikt) .annen-grunn { container-type: inline-size; }
+@media (width > 760px) {
+  @container (width >= 1008px) {
+    :where(.side-oversikt) .annen-grunn:not(.vis-bredest) > .fotnote { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
+  @container (width < 1008px) {
+    :where(.side-oversikt) .annen-grunn:not(.vis-bred) > .fotnote { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
+}
+@media (width <= 760px) {
+  @container (width >= 328px) {
+    :where(.side-oversikt) .annen-grunn:not(.vis-smal) > .fotnote { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
+  @container (width < 328px) {
+    :where(.side-oversikt) .annen-grunn:not(.vis-smalest) > .fotnote { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
+}
 /* Story 8.6b, c: fem trinn etter endringen slik den vises. Uten endring er ruta
    hvit med grå kant, så den ikke ligner det nøytrale trinnet. Ikke stiplet:
    stiplet er indekslinja (2.9b). */

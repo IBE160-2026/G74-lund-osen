@@ -453,6 +453,21 @@ class Kart:
     forhold: dict[str, float]
 
 
+def annen_grunn_i_kartet(kartet: Kart) -> frozenset[str] | None:
+    """Fotnoten for en annen grunn (gruppens svar 05.11 kl. 09:34, 1): None
+    når ingen rute i kartet sier «ikke vurdert» av en annen grunn, også når
+    kartet er tomt, og ellers klassene i Flate.tekst der minst én av dem
+    viser det for øyet, på nivå 3 eller på nivå 2 med plass til linja.
+    Gjennomgangen (ECH1): stilen skjuler fotnoten for øyet i de andre
+    klassene, som teksten i en rute, så skjermleseren leser begge."""
+    ruter = [r for felt in kartet.felt for r in felt.ruter if r.rute.annen_grunn]
+    if not ruter:
+        return None
+    return frozenset(
+        klasse for r in ruter for klasse, nivaa in r.nivaa.items() if nivaa == 3 or (nivaa == 2 and klasse in r.styrke)
+    )
+
+
 def vekt(rute: Rute) -> float:
     """Volumforholdet, 1 uten, og mellom MINSTE_VEKT og STOERSTE_VEKT.
     Story 8.17b: 1 for alle ved en periode (lik_stoerrelse)."""

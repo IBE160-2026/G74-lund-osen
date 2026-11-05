@@ -149,9 +149,13 @@
       {% include "_fotnote_ikke_vurdert.html" %}
     {% endif %}
     {#- Gruppens svar 05.11 kl. 09:34, 1: når en rute sier «ikke vurdert» av
-        en annen grunn, ved siden av den gamle når begge finnes. #}
-    {% if annen_grunn %}
-      <p class="fotnote">«Ikke vurdert» kan også ha en annen grunn, som for kort kurshistorikk. Grunnen står i tabellen og på aksjesiden.</p>
+        en annen grunn, ved siden av den gamle når begge finnes. Gjennomgangen
+        (ECH1): klassene vis-N er der en slik rute viser det for øyet, og
+        stilen skjuler fotnoten for øyet ellers, som teksten i ruta. #}
+    {% if annen_grunn is defined and annen_grunn is not none %}
+      <div class="annen-grunn{% for klasse in annen_grunn|sort %} vis-{{ klasse }}{% endfor %}">
+        <p class="fotnote">«Ikke vurdert» kan også ha en annen grunn, som for kort kurshistorikk. Grunnen står i tabellen og på aksjesiden.</p>
+      </div>
     {% endif %}
   {% elif demokommando %}
     <p>
