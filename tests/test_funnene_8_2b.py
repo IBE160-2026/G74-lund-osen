@@ -1091,6 +1091,21 @@ def test_fotnoten_for_en_annen_grunn_foelger_ruta_som_viser_det(klient):
         assert f":where(.side-oversikt) .annen-grunn:not(.vis-{klasse}) > .fotnote {{ position: absolute;" in STIL
 
 
+def test_klassene_for_fotnoten_er_der_ruta_viser_ikke_vurdert():
+    """Gjennomgangen (ECH1), mutanten N5: en rute med en annen grunn viser
+    «ikke vurdert» for øyet på nivå 3, og på nivå 2 bare med plass til
+    linja (styrke). Ville feilet hvis nivå 2 uten plass, eller nivå 0 og 1,
+    ga klassen, eller hvis nivå 3 ikke ga den."""
+    from boersometer import Bransje, Kart, Kartfelt, Kartrute, Rute, annen_grunn_i_kartet
+    from kursdata import Aksje
+
+    rute = Rute(Aksje("VRDS", "VRDS.OL", "Varde", "Industri"), 1.0, 1.0, None, "for kort historikk: 24 av 51 dager")
+    nivaa = {"bredest": 3, "bred": 2, "smal": 2, "smalest": 1}
+    kartrute = Kartrute(rute, 1.0, {}, nivaa, styrke=frozenset({"smal"}))
+    felt = Kartfelt(Bransje("Industri", (rute,)), 1.0, {}, {}, (kartrute,))
+    assert annen_grunn_i_kartet(Kart((felt,), {})) == frozenset({"bredest", "smal"})
+
+
 def test_ingen_fotnote_for_en_annen_grunn_uten_en_slik_rute_i_kartet(klient):
     """Gjennomgangen (VG1, ECH1): 18.09 sier VRDS «ikke vurdert» fordi
     signalet ikke er lagret, så bare den gamle fotnoten står, og et tomt kart
