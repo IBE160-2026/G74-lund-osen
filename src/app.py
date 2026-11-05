@@ -54,7 +54,7 @@ from boersometer import (
 from boersometer import (
     med_perioden as rute_med_perioden,
 )
-from dagene import setning_om_dagene, tell_dagene
+from dagene import lag_dagsbilde, setning_om_dagene, setning_om_samme_dag
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
 from graf import bygg_graf
 from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
@@ -1131,7 +1131,9 @@ def aksjedetalj(symbol: str):
     # Gruppens svar 25.10 kl. 00:51: setningen om dagene under KI-teksten,
     # ogsaa naar KI er av eller teksten er stoppet. «I dag» bare naar dagen
     # siden viser, er i dag (gjennomgangen, BH1, ECH6, VG1).
-    dagene = _setningen_om_dagene(post, detalj, annen_dag=detalj.dato != i_dag)
+    # Gruppens svar 5.11 kl. 19:13 og 23:36: setningen om samme dag rett under
+    # setningen om dagene, av det samme dagsbildet som grunnlaget til modellen.
+    dagene, samme_dag = _setningene_om_dagen(post, detalj, leser, oversiktsleser, annen_dag=detalj.dato != i_dag)
     # Story 8.16b: bryteren tar deg tilbake til den samme dagen.
     tilbake = f"/aksje/{post.aksje.symbol}"
     if valg.periode == VELG:
@@ -1181,6 +1183,7 @@ def aksjedetalj(symbol: str):
             ki=ki,
             ki_er_paa=ki_er_paa,
             dagene=dagene,
+            samme_dag=samme_dag,
             ki_til=AV if ki_er_paa else PAA,
             # Story 10.5: lenken til investorsiden for aksjen siden viser,
             # slaatt opp paa symbolet. Siden henter ingenting derfra (AD-2).
@@ -1206,22 +1209,46 @@ def _historikken(post, rader, dagen: date, i_dag: date) -> Maaned:
     return bygg_maaned(maaned, [rad.dato for rad in rader], radene, i_dag, STANDARD.terskel, beskjed)
 
 
-def _setningen_om_dagene(post, detalj, annen_dag: bool) -> str | None:
+def _setningene_om_dagen(post, detalj, leser, oversiktsleser, annen_dag: bool) -> tuple[str | None, str | None]:
     """Gruppens svar 25.10 kl. 00:51: hvor lenge signalet har vaert slik, med
     tellingen fra svaret 24.10 kl. 16:15 a), lest fra vurdering (AD-3, AD-10).
     None uten en vurdering for dagen, eller naar basen ikke kan leses, ogsaa
     en base fra foer siste migrasjon, som i _ki_visning (gjennomgangen, BH7,
-    ECH11)."""
+    ECH11).
+
+    Story 10.2i, gruppens svar 5.11 kl. 19:13 og 23:36: ogsaa setningen om
+    hva hovedindeksen, bransjen og antallene gjorde samme dag, regnet av
+    lag_dagsbilde i dagene.py med lista, kursene og indeksen fra basen, som
+    grunnlaget i ki_tekst.py. Kan indeksen ikke leses, staar setningen uten
+    den, som i grunnlaget. Gir (dagene, samme_dag)."""
     if not detalj.vurdering:
-        return None
+        return None, None
     try:
         lager = SqliteVurderingslager(g.tilkobling, naa, (post.aksje,))
         tidligere = lager.les_periode(post.aksje.symbol, date.min, detalj.dato)
     except (sqlite3.Error, ValueError, RuntimeError) as feil:
         app.logger.warning("Dagene kunne ikke leses: %s: %s", type(feil).__name__, feil)
-        return None
-    dager, minst = tell_dagene(detalj.dato, detalj.vurdering, tidligere)
-    return setning_om_dagene(dager, minst, annen_dag=annen_dag)
+        return None, None
+    try:
+        indekser = SqliteIndekslager(g.tilkobling)
+        symboler = indekser.symboler()
+        indeksserie = indekser.serie(valgt_indeks(symboler)) if symboler else None
+    except (sqlite3.Error, ValueError):
+        indeksserie = None
+    try:
+        lista = tuple(p.aksje for p in oversiktsleser.oversikt())
+        serier = {aksje.symbol: leser.serie(aksje.symbol) for aksje in lista}
+    except (sqlite3.Error, ValueError, RuntimeError) as feil:
+        app.logger.warning("Dagen kunne ikke leses: %s: %s", type(feil).__name__, feil)
+        lista, serier = None, None
+    if lista is None:
+        bildet = lag_dagsbilde(post.aksje, detalj.dato, detalj.vurdering, tidligere, (), {}, None)
+        return setning_om_dagene(bildet.dager, bildet.dager_minst, annen_dag=annen_dag), None
+    bildet = lag_dagsbilde(post.aksje, detalj.dato, detalj.vurdering, tidligere, lista, serier, indeksserie)
+    return (
+        setning_om_dagene(bildet.dager, bildet.dager_minst, annen_dag=annen_dag),
+        setning_om_samme_dag(bildet),
+    )
 
 
 def _ki_visning(post, detalj, siste: date) -> KIVisning:

@@ -1218,7 +1218,10 @@ IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py", "src/boersometer.py
 # Story 10.2i, promptversjon 4: KI-teksten for BRFE har en setning til om
 # dagen, og bunnen av p.dagene er 2224,5 px, maalt i Edge uten vindu og
 # rundet opp. Var 2198.
-HOEYDE_PAA_AKSJESIDEN = 2225
+# Story 10.2i, gruppens svar 5.11 kl. 19:13 og 23:36: setningen om samme dag
+# (p.samme-dag) staar under setningen om dagene, saa bildet slutter ved bunnen
+# av den, 2260,5 px maalt i Edge uten vindu og rundet opp. Var 2225.
+HOEYDE_PAA_AKSJESIDEN = 2261
 # Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
 # Story 10.5: lenken til investorsiden står under grafen, ved 1980 px målt i
 # Edge uten vindu, så bildet, som slutter ved bunnen av grafen (1872 px), ble
@@ -1430,14 +1433,17 @@ HOEYDE_PAA_AKSJESIDEN = 2225
 # tatt paa nytt med den nye teksten for BRFE og er 2225 px hoeyt. Gjennomgangen av
 # 10.2i (ECH1): demotekstene laget paa nytt; teksten for BRFE er den samme, og
 # bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "e468d4b3dabdf82b50c330a3ad0a41977bb670e67ee55609df2ef4c22f40cbd6"
+# Story 10.2i, svarene 5.11 kl. 19:13 og 23:36: setningen om samme dag i
+# dagene.py, app.py og aksje.html. Bildet ble tatt paa nytt og er 2261 px hoeyt.
+AVTRYKK_BAK_AKSJESIDEN = "6e8b85b359321cc2554293e0f4236e59a2059e25b2e64418a771a5d11bc6087f"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
     "demobasen i en midlertidig mappe (lagring_sqlite.BASE_STI dit), OSE_DEMO=1, "
     "waitress på en ledig port, og msedge --headless --disable-gpu --hide-scrollbars "
     f"--window-size=1280,{HOEYDE_PAA_AKSJESIDEN} med egen --user-data-dir. Bildet skal slutte "
-    "ved bunnen av setningen om dagene (p.dagene), under KI-teksten etter grafen: mål den og endre "
+    "ved bunnen av setningen om samme dag (p.samme-dag), under setningen om dagene og KI-teksten "
+    "etter grafen: mål den og endre "
     "HOEYDE_PAA_AKSJESIDEN hvis den har flyttet seg. Oppdater så "
     "AVTRYKK_BAK_AKSJESIDEN til {avtrykk} i samme commit."
 )
@@ -1467,12 +1473,14 @@ DE_NYE_BILDENE = {
 # paa nytt: ved 1280 px byte for byte de samme, og ved 390 px piksel for piksel.
 # Gjennomgangen av 10.2i (ECH1): demotekstene laget paa nytt. Bildene ved 1280 px
 # ble tatt paa nytt og er byte for byte de samme; 390 px er samme side og ikke tatt paa nytt.
+# Story 10.2i, svarene 5.11 kl. 19:13 og 23:36: dagene.py og app.py. Alle bildene
+# ble tatt paa nytt og er byte for byte de samme.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
     TOPPEN_AV_OVERSIKTEN: "ef7f45bcc548ce44c5497a2d25d01bf53109d5eb36f0ec80e34b19c381a82cda",
-    "docs/appen/boersometeret-demo.png": "90159c861b506821cb27a0e7bcf97b6503e4335cb01dec39f577c64952226ad0",
-    "docs/appen/min-liste-demo.png": "db171182ff0296fd61dc13c309ff8eb8ddf3e57f8b012494d5e27d1e1406a5da",
+    "docs/appen/boersometeret-demo.png": "a9d352b1d6cf5b8fb09a6eaf4208075110ea6495e92d60812545fb60e17b06ee",
+    "docs/appen/min-liste-demo.png": "d8cbf34162daf60f965e8fe7fc23e6d679bbbfcf9ac1b7e82bd37e7338289cc4",
     "docs/appen/oversikten-390-demo.png": "ef7f45bcc548ce44c5497a2d25d01bf53109d5eb36f0ec80e34b19c381a82cda",
-    "docs/appen/boersometeret-390-demo.png": "90159c861b506821cb27a0e7bcf97b6503e4335cb01dec39f577c64952226ad0",
+    "docs/appen/boersometeret-390-demo.png": "a9d352b1d6cf5b8fb09a6eaf4208075110ea6495e92d60812545fb60e17b06ee",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "

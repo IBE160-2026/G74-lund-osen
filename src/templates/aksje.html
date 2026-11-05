@@ -288,6 +288,12 @@
     {% if dagene %}
       <p class="dagene">{{ dagene }}</p>
     {% endif %}
+    {#- Gruppens svar 5.11 kl. 19:13 og 23:36: appen skriver hva hovedindeksen,
+        bransjen og antallene gjorde samme dag, for seg selv under teksten som
+        setningen om dagene, og modellen skriver ikke om dagen. #}
+    {% if samme_dag %}
+      <p class="samme-dag">{{ samme_dag }}</p>
+    {% endif %}
     {% if not ki_vises %}{{ ki_bryter() }}{% endif %}
   {% endif %}
 

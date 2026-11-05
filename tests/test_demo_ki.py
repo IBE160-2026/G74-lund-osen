@@ -359,6 +359,22 @@ class TestAksjesiden:
         klient.post("/ki", data={"til": "paa", "tilbake": adresse})
         assert tekst in klient.get(adresse).data.decode("utf-8")
 
+    def test_setningen_om_samme_dag_er_regnet_som_grunnlaget(self, klient, radene, dagene):
+        """Story 10.2i, gruppens svar 5.11 kl. 19:13: setningen om samme dag
+        paa siden og grunnlaget til modellen er regnet av det samme
+        dagsbildet (lag_dagsbilde i dagene.py). Ville feilet hvis siden leste
+        en annen liste, andre kurser eller en annen indeks enn hentingen, saa
+        setningen og grunnlaget kunne si ulikt om hovedindeksen."""
+        from dagene import setning_om_samme_dag
+
+        demo.lag_demobase(demo_sti(), skriv=lambda _: None)
+        assert radene
+        for rad in radene:
+            bildet = dagene[rad.emne.symbol]
+            side = klient.get(f"/aksje/{rad.emne.symbol}").data.decode("utf-8")
+            assert f'<p class="samme-dag">{escape(setning_om_samme_dag(bildet))}</p>' in side, rad.emne.symbol
+            assert rad.grunnlag.get("hovedindeksen") == bildet.hovedindeksen, rad.emne.symbol
+
 
 class _Falsk:
     tjeneste = LOKAL

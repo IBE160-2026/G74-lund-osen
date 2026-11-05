@@ -31,30 +31,34 @@ Fjerde forsoek (gruppens svar 25.10 kl. 00:51): modellen faar ikke dagene.
 Dagsbildet teller dem fortsatt (tell_dagene, flyttet til dagene.py), men
 grunnlaget har ikke dager eller dager_merke. Appen skriver dagene selv, i en
 setning under KI-teksten paa aksjesiden.
+
+Story 10.2i (gruppens svar 5.11 kl. 19:13): Dagsbilde, lag_dagsbilde og
+bevegelse ligger i dagene.py, saa appen skriver setningen om samme dag av de
+samme verdiene som grunnlaget. De importeres her, saa ingenting annet endres.
 """
 
-from collections.abc import Mapping
-from dataclasses import dataclass
-from datetime import date
 from types import MappingProxyType
 
-from dagene import tell_dagene
-from hovedindeks import indeksendring
-from kursdata import Aksje, Kursrad
-from markedsoversikt import endring_i_prosent
+from dagene import BEVEGELSER, FALT, STEG, UENDRET, Dagsbilde, bevegelse, lag_dagsbilde
 from signalberegning import BLANDET, INGEN, NEGATIV, POSITIV, Signal, finn_retning, finn_styrke
-from tallformat import avrundet
-from vurderingsdata import Grunn, Vurdering
+from vurderingsdata import Vurdering
+
+__all__ = [
+    "BEVEGELSER",
+    "FALT",
+    "STEG",
+    "UENDRET",
+    "Dagsbilde",
+    "bevegelse",
+    "ki_grunnlag",
+    "lag_dagsbilde",
+]
 
 RETNINGER = (POSITIV, NEGATIV, BLANDET, INGEN)
 SJEKKENE = ("trend", "bevegelse", "interesse")
 UTENFOR_MAALINGEN = "Utenfor målingen"
 NOEKLENE = frozenset((*SJEKKENE, "styrke", "retning"))
 
-# Story 10.2e: retningen paa hovedindeksen og bransjen. Merket paa dagene
-# («minst») er tatt bort med dagene (svaret 25.10 kl. 00:51).
-STEG, FALT, UENDRET = "steg", "falt", "uendret"
-BEVEGELSER = (STEG, FALT, UENDRET)
 # Feltene med dagen. hovedindeksen og bransjen kan mangle. Svaret 25.10 kl.
 # 00:51: dagene er ikke med, og et grunnlag med dager eller dager_merke avvises.
 DAGNOEKLENE = frozenset(("aksjer_steg", "aksjer_falt"))
@@ -62,66 +66,6 @@ VALGFRIE = frozenset(("merke", "hovedindeksen", "bransjen"))
 # Antallene i grunnlaget. Kontrollen i FR-603 godtar bare disse og regelens
 # faste tall (punkt 2). Fortegnene er ikke antall.
 ANTALLENE = ("styrke", "aksjer_steg", "aksjer_falt")
-
-
-@dataclass(frozen=True)
-class Dagsbilde:
-    """Det grunnlaget faar om dagen i versjon 3. hovedindeksen og bransjen
-    er None naar de ikke kan regnes, og da faar grunnlaget ikke feltet."""
-
-    dager: int
-    dager_minst: bool
-    hovedindeksen: str | None
-    aksjer_steg: int
-    aksjer_falt: int
-    bransjen: str | None
-
-
-def bevegelse(endring: float | None) -> str | None:
-    """steg, falt eller uendret etter endringen slik den vises, eller None."""
-    if endring is None:
-        return None
-    vist = avrundet(endring, "endring")
-    return STEG if vist > 0 else FALT if vist < 0 else UENDRET
-
-
-def _endringen(serie: list[Kursrad], dag: date) -> float | None:
-    """Endringen for dag som i boersometeret (bygg_rute): de to siste
-    radene til og med dag, og None uten kurs paa dag."""
-    til = [rad for rad in serie if rad.dato <= dag]
-    if not til or til[-1].dato != dag:
-        return None
-    return endring_i_prosent(til[-2:])
-
-
-def lag_dagsbilde(
-    aksje: Aksje,
-    dag: date,
-    vurdering: Vurdering,
-    tidligere: Mapping[date, Vurdering | Grunn],
-    lista: tuple[Aksje, ...],
-    serier: Mapping[str, list[Kursrad]],
-    indeksserie: list[Kursrad] | None,
-) -> Dagsbilde:
-    """Dagsbildet for aksjen paa dag. serier er kursene for aksjene i lista,
-    og indeksserie hovedindeksen, eller None naar basen ikke har en."""
-    dager, minst = tell_dagene(dag, vurdering, tidligere)
-    endringer = {a.symbol: _endringen(serier.get(a.symbol, []), dag) for a in lista}
-    retninger = [bevegelse(e) for e in endringer.values()]
-    i_bransjen = [endringer[a.symbol] for a in lista if a.sektor == aksje.sektor and endringer[a.symbol] is not None]
-    indeks = None
-    if indeksserie:
-        til = [rad for rad in indeksserie if rad.dato <= dag]
-        if til and til[-1].dato == dag:
-            indeks = bevegelse(indeksendring(til))
-    return Dagsbilde(
-        dager=dager,
-        dager_minst=minst,
-        hovedindeksen=indeks,
-        aksjer_steg=retninger.count(STEG),
-        aksjer_falt=retninger.count(FALT),
-        bransjen=bevegelse(sum(i_bransjen) / len(i_bransjen)) if i_bransjen else None,
-    )
 
 
 def _heltall(verdi) -> bool:
