@@ -101,3 +101,4 @@
 - [ ] 2026-11-05 [promptversjon-4](976-2026-11-05-18-46-09-promptversjon-4.md) — spørsmål 3 i PR #113: «Dagen var preget av …» etter forklaringen, eller en nøytral innledning (BH7)?
 - [ ] 2026-11-05 [promptversjon-4](976-2026-11-05-18-46-09-promptversjon-4.md) — PR #113 venter på svarene og flettingen, og tellingen gjentas etter noen dager med versjon 4 i driften
 - [ ] 2026-11-05 [promptversjon-4](976-2026-11-05-18-46-09-promptversjon-4.md) — README-en, «Grunnlaget sendes …», sier at modellen får dagene fra versjon 3; de ble tatt ut 25.10
+- [ ] 2026-11-05 [ci-rettingen-og-tidlig-stopp](975-2026-11-05-19-18-32-ci-rettingen-og-tidlig-stopp.md) — hva er «målingen ferdig» for det tidlige stoppet i kveldsjobben (svaret 12:33)? Kvoten står bare i `/api/user`, ikke i basen; forslag a) hopp over Docker og Ollama, men kjør `--maal-omsetning` som før, b) en rad i `omsetning` målt i dag, c) les `/api/user`
