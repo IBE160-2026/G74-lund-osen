@@ -558,7 +558,7 @@ def _nivaa_ved(flate: Flate, bredde: float, rb: float, rh: float, rute: Rute) ->
     skala = bredde / flate.bredde
     b, h = rb * skala - 2 * KANT, rh * skala - 2 * KANT
     nivaa = tekstnivaa(b, h, rute.aksje.symbol)
-    if nivaa == 3 and storplass(b, h):
+    if nivaa == 3 and storplass(b, h) and _stor_endring_plass(rute, b):
         merke, grunn = _stor_linjer(rute, b, h)
         styrke = not rute.uten_data and (merke or not (rute.ramme == GUL and not rute.er_siste))
         return 4, styrke, grunn, merke
@@ -591,6 +591,8 @@ RUTESKRIFT, RUTELINJE, RUTEGAP, RUTELUFT, RUTERAMME, EM_PER_TEGN = 14, 1.2, 1, (
 # (test_grensen_for_store_ruter_er_regnet_fra_stilen).
 STORSYMBOL, STORNAVN, STORENDRING, STORLUFT, STORGAP, STORMELLOM = 22, 12.5, 28, (10, 12), 2, 8
 STOR = (193, 107)
+# Bredden per tegn i halvfet skrift, i em, som i grensen over.
+HALVFET_EM = 0.62
 
 
 def storplass(b: float, h: float) -> bool:
@@ -599,16 +601,29 @@ def storplass(b: float, h: float) -> bool:
     return b >= STOR[0] and h >= STOR[1]
 
 
+def _stor_endring_plass(rute: Rute, b: float) -> bool:
+    """Om endringen slik den vises får plass i 28 px halvfett i ruta, som er
+    b px bred. Gjennomgangen (BH3, ECH3): STOR er regnet for «Uten data», ni
+    tegn, og en endring over en periode kan ha flere, som «+1 234,56 %»."""
+    if rute.endring is not None:
+        tekst = tall(rute.endring, "endring")
+    else:
+        tekst = UTEN_DATA if rute.uten_data else "–"
+    return 2 * RUTERAMME + 2 * STORLUFT[1] + HALVFET_EM * STORENDRING * len(tekst) <= b
+
+
 def _stor_linjer(rute: Rute, b: float, h: float) -> tuple[bool, bool]:
     """Om merket og grunnen får plass mellom navnet og endringen i en stor
     rute, som er b × h px (svaret kl. 22:23, 1: «der de får plass»). Merket
-    kommer først, og grunnen bare under det når merket står."""
+    kommer først, og grunnen bare under det når merket står. Gjennomgangen
+    (ECH1): merket står i halvfet skrift, så det regnes alltid som to
+    linjer, som i grunnplass."""
     bredde = b - 2 * RUTERAMME - 2 * STORLUFT[1]
     rest = h - STOR[1]
     linje = RUTESKRIFT * RUTELINJE
     merke = False
     if rute.ramme == GUL and not rute.er_siste:
-        trengs = _linjer("3 av 3 siste børsdag", bredde) * linje + STORGAP
+        trengs = 2 * linje + STORGAP
         if trengs > rest:
             return False, False
         merke, rest = True, rest - trengs

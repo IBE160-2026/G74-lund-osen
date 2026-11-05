@@ -572,15 +572,17 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "Kort fortalt:",
             "en kort tekst om signalet for aksjen den dagen, skrevet av en språkmodell og merket "
             "«Laget av KI» med navnet på modellen. Modellen fikk bare det appen har regnet ut: om hver "
-            "av sjekkene ga utslag, styrken og retningen, hvor mange aksjer i lista som steg og "
-            "falt, og om hovedindeksen og bransjen steg eller falt når det kan regnes, men ingen kurser, "
-            "prosenter eller volumer. Tallene med prikket strek er sjekket mot det før teksten vises, "
+            "av sjekkene ga +1, 0 eller -1, styrken og retningen, hvor mange aksjer i lista som steg og "
+            "falt, om hovedindeksen og bransjen steg eller falt når det kan regnes, og et merke når aksjen "
+            "er utenfor de 15 grensene er målt på, men ingen kurser, prosenter eller volumer. Tallene med prikket strek er sjekket mot det før teksten vises, "
             "og teksten gir ikke råd.",
             (
                 (KI_GRUNNLAG, "def ki_grunnlag("),
                 (KI_GRUNNLAG, "kurser, volumer, prosenter eller forholdstall, og ingen maalinger"),
                 (KI_GRUNNLAG, 'ANTALLENE = ("styrke", "aksjer_steg", "aksjer_falt")'),
                 (KI_GRUNNLAG, 'VALGFRIE = frozenset(("merke", "hovedindeksen", "bransjen"))'),
+                (KI_GRUNNLAG, 'UTENFOR_MAALINGEN = "Utenfor målingen"'),
+                (KI_GRUNNLAG, "fortegnet for hver av de"),
                 (KI_VISNING, "def prikkede_tall("),
                 (KI_KONTROLL, "3. Raad."),
                 (AKSJE_MAL, "Laget av KI ·"),

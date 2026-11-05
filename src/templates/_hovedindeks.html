@@ -96,7 +96,7 @@
                 er skjult for skjermleseren, som har linja over. #}
             <p class="linjeforklaring" aria-hidden="true"><span class="linjeprove {{ fortegn(sy.indeks) }}"></span><span>Stiplet linje: hovedindeksen</span> <span class="{{ fortegn(sy.indeks) }}">{{ sy.indeks|tall('endring') }}</span></p>
             {%- endif %}
-            <a class="til-boersometer" href="/boersometer{% if valg and valg.periode == 'velg' and valg.dag %}?periode=velg&amp;dag={{ valg.dag.isoformat() }}{% elif valg %}?periode={{ valg.periode }}{% endif %}">Se perioden i Børsometer <span aria-hidden="true">›</span></a>
+            <a class="til-boersometer" href="/boersometer{% if valg and valg.periode == 'velg' and valg.dag %}?periode=velg&amp;dag={{ valg.dag.isoformat() }}{% elif valg and valg.periode != 'velg' %}?periode={{ valg.periode }}{% endif %}">Se perioden i Børsometer <span aria-hidden="true">›</span></a>
             </div>
             {% if sy.linje is none and not sy.indeks_mangler %}<p class="forklaring">Ingen stiplet linje: indeksen har ingen endring for {{ 'perioden' if sy.start else 'dagen' }}.</p>{% endif %}
             {% if sy.kortere %}<p class="uten-endring">Regnet fra første dag serien har, fordi den ikke går tilbake til {{ sy.start|dato }}: {{ sy.kortere|med_og }}.</p>{% endif %}

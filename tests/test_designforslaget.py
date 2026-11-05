@@ -116,20 +116,119 @@ def _rute(**kw):
 
 def test_merket_og_grunnen_der_de_faar_plass():
     """Svar 1: merket og grunnen står mellom navnet og endringen der de får
-    plass, merket først. En annen dag står styrken i en gul rute bare med
-    merket (svaret 04.11 kl. 20:53 og 20:56, 1). Ville feilet hvis merket
-    eller grunnen sto i en rute uten plass, eller styrken uten merket."""
-    from boersometer import STOR, Flate, _nivaa_ved
+    plass, merket først og alltid på to linjer (gjennomgangen, ECH1). En
+    annen dag står styrken i en gul rute bare med merket (svaret 04.11 kl.
+    20:53 og 20:56, 1). Gjennomgangen (VG1, BH13): grunnen med og uten
+    merket, og høydene regnet fra konstantene. Ville feilet hvis merket
+    eller grunnen sto i en rute uten plass, styrken sto uten merket, merket
+    ble regnet som én linje, eller grunnen sto under et merke som ikke fikk
+    plass."""
+    import boersometer as bm
+    from boersometer import KANT, STOR, Flate, _nivaa_ved
 
     flate = Flate("prove", 100, 1, 100, (("prove", 100),))
+    linje = bm.RUTESKRIFT * bm.RUTELINJE
+    merke = 2 * linje + bm.STORGAP
+    # 0,001 px for avrundingen i flyttallene ved grensen.
+    b, h = STOR[0] + 2 * KANT, STOR[1] + 2 * KANT + 0.001
     gul = _rute(styrke=1, siste_styrke=3, er_siste=False)
     # Bare plass til grunnoppsettet: verken merket eller styrken.
-    assert _nivaa_ved(flate, 100, STOR[0] + 4, STOR[1] + 4, gul) == (4, False, False, False)
-    # Plass til merket på to linjer (16,8 px hver og 2 px over).
-    assert _nivaa_ved(flate, 100, STOR[0] + 4, STOR[1] + 4 + 36, gul) == (4, True, False, True)
+    assert _nivaa_ved(flate, 100, b, h, gul) == (4, False, False, False)
+    # Én linje for merket er ikke nok (ECH1), to er det.
+    assert _nivaa_ved(flate, 100, b, h + linje + bm.STORGAP, gul) == (4, False, False, False)
+    assert _nivaa_ved(flate, 100, b, h + merke, gul) == (4, True, False, True)
     # Siste børsdag trenger ikke merket.
     siste = _rute(styrke=3, siste_styrke=3)
-    assert _nivaa_ved(flate, 100, STOR[0] + 4, STOR[1] + 4, siste) == (4, True, False, False)
+    assert _nivaa_ved(flate, 100, b, h, siste) == (4, True, False, False)
+    # Grunnen, «for kort historikk: 24 av 51 dager», er tre linjer ved 161 px.
+    grunn = "for kort historikk: 24 av 51 dager"
+    linjer = bm._linjer(grunn, STOR[0] - 2 * bm.RUTERAMME - 2 * bm.STORLUFT[1])
+    trengs = linjer * linje + bm.STORGAP
+    uten = _rute(tekst=grunn)
+    assert uten.grunn and uten.uten_styrke
+    assert _nivaa_ved(flate, 100, b, h + trengs - 1, uten) == (4, True, False, False)
+    assert _nivaa_ved(flate, 100, b, h + trengs, uten) == (4, True, True, False)
+    # En gul rute en annen dag: grunnen bare under merket.
+    gul_grunn = _rute(tekst=grunn, siste_styrke=3, er_siste=False)
+    assert _nivaa_ved(flate, 100, b, h + trengs, gul_grunn)[2] is False
+    assert _nivaa_ved(flate, 100, b, h + merke + trengs, gul_grunn) == (4, True, True, True)
+
+
+@pytest.mark.parametrize(("endring", "stor"), [(-2.26, True), (1234.56, False)])
+def test_endringen_maa_faa_plass_i_28_px(endring, stor):
+    """Gjennomgangen (BH3, ECH3): STOR er regnet for ni tegn, og en endring
+    over en periode kan ha flere, som «+1 234,56 %». Da blir ruta ikke stor.
+    Ville feilet hvis en endring bredere enn ruta sto i 28 px."""
+    from boersometer import KANT, STOR, Flate, _nivaa_ved
+
+    flate = Flate("prove", 100, 1, 100, (("prove", 100),))
+    nivaa = _nivaa_ved(flate, 100, STOR[0] + 2 * KANT, STOR[1] + 2 * KANT, _rute(styrke=3, endring=endring))[0]
+    assert (nivaa == 4) is stor
+
+
+def test_kartet_og_siden_har_merket_i_en_stor_rute():
+    """Gjennomgangen (VG3): kart() fyller Kartrute.merke, og malen skriver
+    merke-N. En gul rute en annen dag alene i kartet er stor og har plass til
+    merket. Ville feilet hvis kart() eller malen mistet merket, så stilen
+    skjulte det mens styrken sto."""
+    from boersometer import bygg_boersometer, kart
+
+    k = kart(bygg_boersometer([_rute(styrke=1, siste_styrke=3, er_siste=False)]))
+    rute = k.felt[0].ruter[0]
+    assert rute.nivaa["bredest"] == 4 and "bredest" in rute.merke and "bredest" in rute.styrke
+    mal = (Path(__file__).resolve().parent.parent / "src" / "templates" / "boersometer.html").read_text(
+        encoding="utf-8"
+    )
+    assert "{% for navn in kartrute.merke|sort %} merke-{{ navn }}{% endfor %}" in mal
+
+
+def test_fotnoten_for_en_annen_grunn_paa_nivaa_4():
+    """Gjennomgangen (VG2): en stor rute med en annen grunn viser «ikke
+    vurdert» øverst når den har styrke-N, og da står fotnoten for øyet i den
+    klassen. Ville feilet hvis annen_grunn_i_kartet bare regnet nivå 2 og 3."""
+    from boersometer import Bransje, Kart, Kartfelt, Kartrute, annen_grunn_i_kartet
+
+    rute = _rute(tekst="for kort historikk: 24 av 51 dager")
+    nivaa = {"bredest": 4, "bred": 4, "smal": 2, "smalest": 1}
+    kartrute = Kartrute(rute, 1.0, {}, nivaa, styrke=frozenset({"bredest"}))
+    felt = Kartfelt(Bransje("Sjømat", (rute,)), 1.0, {}, {}, (kartrute,))
+    assert annen_grunn_i_kartet(Kart((felt,), {})) == frozenset({"bredest"})
+
+
+def _container_blokker() -> list[tuple[str, str, str]]:
+    """(media, container, innhold) for hver @container i stil.css, med
+    klammene talt."""
+    ut = []
+    for m in re.finditer(r"@media \(([^)]*)\) \{", STIL):
+        dybde, i = 1, m.end()
+        while dybde:
+            dybde += {"{": 1, "}": -1}.get(STIL[i], 0)
+            i += 1
+        media = STIL[m.end() : i - 1]
+        for c in re.finditer(r"@container \(([^)]*)\) \{", media):
+            d, k = 1, c.end()
+            while d:
+                d += {"{": 1, "}": -1}.get(media[k], 0)
+                k += 1
+            ut.append((m.group(1), c.group(1), media[c.end() : k - 1]))
+    return ut
+
+
+def test_nivaa_4_staar_i_grensen_klassen_er_regnet_for():
+    """Gjennomgangen (VG4, BH9): reglene for nivå 4 i hver klasse står bare i
+    den @container-grensen klassen er regnet for (Flate.tekst), som for nivå
+    0–3. Ville feilet hvis to klasser byttet blokk."""
+    from boersometer import BRED, SMAL
+
+    grenser = {
+        "bredest": ("width > 760px", f"width >= {BRED.tekst[1][1]:.0f}px"),
+        "bred": ("width > 760px", f"width < {BRED.tekst[1][1]:.0f}px"),
+        "smal": ("width <= 760px", f"width >= {SMAL.tekst[0][1]:.0f}px"),
+        "smalest": ("width <= 760px", f"width < {SMAL.tekst[0][1]:.0f}px"),
+    }
+    for klasse, (media, container) in grenser.items():
+        der = [(m, c) for m, c, innhold in _container_blokker() if f".rute.nivaa-{klasse}-4" in innhold]
+        assert der == [(media, container)], (klasse, der)
 
 
 def test_en_stor_rute_i_demoen(klient):

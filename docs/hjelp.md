@@ -179,7 +179,7 @@ Nederst på aksjesiden står «Signalet dag for dag»: det appen skrev om aksjen
 
 ### Hva er «kort fortalt» på aksjesiden?
 
-Under grafen står «<navnet> kort fortalt», for eksempel «Brattfjell Energi kort fortalt», når KI-teksten er på. Det er en kort tekst om signalet for aksjen den dagen, skrevet av en språkmodell og merket «Laget av KI» med navnet på modellen. Modellen fikk bare det appen har regnet ut: om hver av sjekkene ga utslag, styrken og retningen, hvor mange aksjer i lista som steg og falt, og om hovedindeksen og bransjen steg eller falt når det kan regnes, men ingen kurser, prosenter eller volumer. Tallene med prikket strek er sjekket mot det før teksten vises, og teksten gir ikke råd. «?» ved overskriften sier det samme. Det gjelder både demoen og den ekte versjonen.
+Under grafen står «<navnet> kort fortalt», for eksempel «Brattfjell Energi kort fortalt», når KI-teksten er på. Det er en kort tekst om signalet for aksjen den dagen, skrevet av en språkmodell og merket «Laget av KI» med navnet på modellen. Modellen fikk bare det appen har regnet ut: om hver av sjekkene ga +1, 0 eller -1, styrken og retningen, hvor mange aksjer i lista som steg og falt, om hovedindeksen og bransjen steg eller falt når det kan regnes, og et merke når aksjen er utenfor de 15 grensene er målt på, men ingen kurser, prosenter eller volumer. Tallene med prikket strek er sjekket mot det før teksten vises, og teksten gir ikke råd. «?» ved overskriften sier det samme. Det gjelder både demoen og den ekte versjonen.
 
 ### Hvorfor står det «ikke vurdert»?
 

@@ -97,7 +97,7 @@
             {% if rute.grunn %}<span class="skjult">, </span><span class="tekst">{{ rute.grunn }}</span>{% endif %}
             {#- Gruppens svar 04.11 kl. 22:23, 1: navnet står for øyet i store ruter,
                 nivå 4. Skjermleseren leser det i linja under, og stilen setter det under symbolet, så det står bare én gang. #}
-            <span class="navn" aria-hidden="true">{{ rute.aksje.navn }}</span>
+            {% if 4 in kartrute.nivaa.values() %}<span class="navn" aria-hidden="true">{{ rute.aksje.navn }}</span>{% endif %}
             <span class="skjult">, {{ rute.aksje.navn }}{% if rute.fra %}, fra {{ rute.fra|dato }}{% endif %}{% if rute.volumord and not rute.lik_stoerrelse %}, volum {{ rute.volumord }}{% endif %}</span>
           </a></li>
           {%- endfor %}

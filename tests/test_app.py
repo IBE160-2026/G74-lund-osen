@@ -3060,6 +3060,8 @@ class TestSoeylenePaaForsiden:
         figur = _soeylene(klient.get("/").data.decode("utf-8"))
         assert "indekslinje" not in figur and len(_stolpene(figur)) == 3
         assert "Ingen stiplet linje: indeksen har ingen endring for dagen." in _synlig(figur)
+        # Gruppens svar 04.11 kl. 22:23, 2 (VG5): lenken står også uten linja.
+        assert 'class="til-boersometer" href="/boersometer?periode=siste"' in figur and "Stiplet linje" not in figur
         # Gjennomgangen (BH17): delen over søylene har ingen prosent, og
         # ingenting står etter søylene.
         html = klient.get("/").data.decode("utf-8")
