@@ -96,3 +96,8 @@
 - [ ] 2026-11-05 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — svar 2 og 4 kl. 14:29 er tolket sammen: store ruter bare i klassen `bredest`; gruppen kan se over tolkningen
 - [ ] 2026-11-05 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — stilen for nivå 4 i `bred`, `smal` og `smalest` brukes ikke (BH7 i PR #112)
 - [ ] 2026-11-05 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — avtrykket for bildene av oversikten har ikke `app.py` (VG9 i PR #112, arvet fra 3.3e)
+- [ ] 2026-11-05 [promptversjon-4](976-2026-11-05-18-46-09-promptversjon-4.md) — spørsmål 1 i PR #113: skal kontrollen lese antallene i formene modellen bruker («N aksjer som steg», «steg 8 og falt 7») og flere former for retningen på hovedindeksen og bransjen (BH1, VG1, ECH2, ECH3)?
+- [ ] 2026-11-05 [promptversjon-4](976-2026-11-05-18-46-09-promptversjon-4.md) — spørsmål 2 i PR #113: skal setningen om dagen lages av koden i stedet for av modellen (BH6)?
+- [ ] 2026-11-05 [promptversjon-4](976-2026-11-05-18-46-09-promptversjon-4.md) — spørsmål 3 i PR #113: «Dagen var preget av …» etter forklaringen, eller en nøytral innledning (BH7)?
+- [ ] 2026-11-05 [promptversjon-4](976-2026-11-05-18-46-09-promptversjon-4.md) — PR #113 venter på svarene og flettingen, og tellingen gjentas etter noen dager med versjon 4 i driften
+- [ ] 2026-11-05 [promptversjon-4](976-2026-11-05-18-46-09-promptversjon-4.md) — README-en, «Grunnlaget sendes …», sier at modellen får dagene fra versjon 3; de ble tatt ut 25.10
