@@ -52,6 +52,9 @@ AVTRYKK = {
     # Story 10.2h, gruppens svar 25.10 kl. 20:54: ordstillingen etter «fordi»
     # og rekkefoelgen paa sjekkene, og versjonen staar som 3. Var 0d427725....
     "3": "ec16642676123e3730c7e8dbd66c03f282a6f77b9ac8fa121b8dc023f97522d5",
+    # Story 10.2i, gruppens svar 5.11 kl. 16:05: linja om hvordan dagen var
+    # rundt aksjen. Teksten til versjon 3 staar i src/ki_prompt.py paa 72250544.
+    "4": "e03067628b2aa494910a82a7672efb0d1ac6f83e3521ea4e25ed9a989e8fd3f7",
 }
 
 
@@ -147,9 +150,31 @@ class TestPrompten:
         stedet for at prompten fikk en ny versjon."""
         assert AVTRYKK["3"] == "ec16642676123e3730c7e8dbd66c03f282a6f77b9ac8fa121b8dc023f97522d5"
 
-    def test_versjon_3(self):
-        """Story 10.2e, gruppens svar 24.10 kl. 15:50."""
-        assert PROMPTVERSJON == "3"
+    def test_versjon_4(self):
+        """Story 10.2i, gruppens svar 5.11 kl. 16:05 (var versjon 3 fra
+        10.2e). Ville feilet hvis prompten ble endret uten ny versjon, eller
+        avtrykket for versjon 3 ble satt paa nytt i stedet."""
+        assert PROMPTVERSJON == "4"
+        assert AVTRYKK["4"] == "e03067628b2aa494910a82a7672efb0d1ac6f83e3521ea4e25ed9a989e8fd3f7"
+        assert AVTRYKK["4"] != AVTRYKK["3"]
+
+    def test_teksten_sier_hvordan_dagen_var_rundt_aksjen(self):
+        """Story 10.2i, gruppens svar 5.11 kl. 16:05: alle 75 tekstene i uka
+        29.10-04.11 gjentok regelforklaringen (spec-10-4-loggdelen.md).
+        Ville feilet hvis linja ble tatt ut av reglene, ikke kom med i
+        prompten, med eller uten merket, eller kom etter linja om at
+        hovedindeksen og bransjen ikke forklarer signalet, som skal staa."""
+        linja = (
+            "- I tillegg til sjekkene skal teksten si med ord hvordan dagen var rundt aksjen: om hovedindeksen "
+            "og bransjen steg, falt eller var uendret, og hvor mange av aksjene i lista som steg og som falt."
+        )
+        ikke_forklarer = "- Hovedindeksen og bransjen er ikke en del av regelen. Ikke si at de forklarer signalet."
+        reglene = REGLER.split("Regler for teksten:\n", 1)[1].splitlines()
+        assert reglene.count(linja) == 1
+        assert reglene.count(ikke_forklarer) == 1
+        assert reglene.index(linja) + 1 == reglene.index(ikke_forklarer)
+        assert linja in lag_prompt(BLANDET)
+        assert linja in lag_prompt({**BLANDET, "merke": "Utenfor målingen"})
 
     def test_reglene_forklarer_hvert_felt_i_grunnlaget(self):
         """Story 10.2e: ville feilet hvis grunnlaget hadde et felt reglene

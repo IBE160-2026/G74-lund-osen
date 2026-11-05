@@ -1215,7 +1215,10 @@ IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py", "src/boersometer.py
 # grafen og teksten. Maalt i Edge uten vindu. Var 1882.
 # Gruppens svar 04.11 kl. 09:58: 2198, fordi «?» ved «Ga» og «Målt mot» står i
 # alle tre sjekkortene. Maalt paa samme maate. Var 2192.
-HOEYDE_PAA_AKSJESIDEN = 2198
+# Story 10.2i, promptversjon 4: KI-teksten for BRFE har en setning til om
+# dagen, og bunnen av p.dagene er 2224,5 px, maalt i Edge uten vindu og
+# rundet opp. Var 2198.
+HOEYDE_PAA_AKSJESIDEN = 2225
 # Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
 # Story 10.5: lenken til investorsiden står under grafen, ved 1980 px målt i
 # Edge uten vindu, så bildet, som slutter ved bunnen av grafen (1872 px), ble
@@ -1423,7 +1426,9 @@ HOEYDE_PAA_AKSJESIDEN = 2198
 # Bildet ble tatt paa nytt og er byte for byte det samme.
 # Gjennomgangen av svarene 05.11 kl. 14:29: kommentaren om grensen i stil.css og
 # hjelpen om 1079 px i hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "695e3666c5936d79a0ceadb88cfe1b6f0b5a203810fb987661910183134c7dcb"
+# Story 10.2i: demotekstene med promptversjon 4, i demo_ki_tekster.json. Bildet ble
+# tatt paa nytt med den nye teksten for BRFE og er 2225 px hoeyt.
+AVTRYKK_BAK_AKSJESIDEN = "4a069d7965f4b8f3a03fb0cf8257cfda106e108f91b74db404ef088451ddfed3"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1456,12 +1461,14 @@ DE_NYE_BILDENE = {
 }
 # Gjennomgangen av svarene 05.11 kl. 14:29: stil.css, hjelpetekster.py og
 # boersometer.py (STORSYMBOL_EM). Bildene ble tatt paa nytt og er byte for byte de samme.
+# Story 10.2i: demotekstene med promptversjon 4, i demo_ki_tekster.json. Bildene ble tatt
+# paa nytt: ved 1280 px byte for byte de samme, og ved 390 px piksel for piksel.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
     TOPPEN_AV_OVERSIKTEN: "ef7f45bcc548ce44c5497a2d25d01bf53109d5eb36f0ec80e34b19c381a82cda",
-    "docs/appen/boersometeret-demo.png": "2a42a1a94cbe36e66f47d6288c1b34d0ab88c6ef6c393fb07b21998121428f6f",
-    "docs/appen/min-liste-demo.png": "95a66e9c1a24d016a5bfd154f13af9ae0e62b6ed92e4a9e918a3f025d785ade8",
+    "docs/appen/boersometeret-demo.png": "ad9106e8d9ba23abbced1381ead375ce5d6ac930ec254d608746d31e94880229",
+    "docs/appen/min-liste-demo.png": "f266482a969d3d78458dce9237c66639159a705166576b48a9c8114e0a55af05",
     "docs/appen/oversikten-390-demo.png": "ef7f45bcc548ce44c5497a2d25d01bf53109d5eb36f0ec80e34b19c381a82cda",
-    "docs/appen/boersometeret-390-demo.png": "2a42a1a94cbe36e66f47d6288c1b34d0ab88c6ef6c393fb07b21998121428f6f",
+    "docs/appen/boersometeret-390-demo.png": "ad9106e8d9ba23abbced1381ead375ce5d6ac930ec254d608746d31e94880229",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
