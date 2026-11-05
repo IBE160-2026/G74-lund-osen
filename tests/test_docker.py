@@ -839,7 +839,13 @@ class TestReadme:
         andre = [(alt, b) for alt, b in bilder if b not in merket]
         # Story 3.3e: og bildet av oversikten under «Til faglærer».
         assert sorted(b for _, b in andre) == sorted(
-            [*(f"docs/bilder/readme/{navn}" for navn in BILDENE.values()), SKJERMBILDET, AKSJESIDEBILDET]
+            # Gruppens svar 05.11 kl. 12:14 og 12:20: toppen av oversikten og de nye bildene.
+            [
+                *(f"docs/bilder/readme/{navn}" for navn in BILDENE.values()),
+                SKJERMBILDET,
+                AKSJESIDEBILDET,
+                *DE_NYE_BILDENE,
+            ]
         )
         for alt, sti in andre:
             assert alt.strip(), sti
@@ -1115,7 +1121,25 @@ HOEYDE_PAA_BILDET = 1864
 # hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Gjennomgangen av svar 1 kl. 09:34 (ECH1): fotnoten foelger ruta, i stil.css.
 # Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "56ffa2fd488b20d39899060180916d559243bdbd15b5821810a003133790e48e"
+# Gruppens svar 04.11 kl. 22:23, 1: store ruter i boersometeret, i
+# hjelpetekster.py og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gruppens svar 04.11 kl. 22:23, 2: lenken til boersometeret under soeylene, i
+# _hovedindeks.html, hjelpetekster.py og stil.css. Bildet ble tatt paa nytt
+# med lenken; bunnen av raden er fortsatt 1864 px, maalt i Edge.
+# Gruppens svar 04.11 kl. 22:23, 3: hjelpen ved KI-delen, i hjelpetekster.py.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gruppens svar 04.11 kl. 22:23, 4: ikonene i menyknappene, i _ramme.html og
+# stil.css. Bildet ble tatt paa nytt med ikonene; bunnen av raden er fortsatt 1864 px.
+# Gjennomgangen av svarene kl. 22:23: hjelpen og lenken uten dag, i
+# hjelpetekster.py og _hovedindeks.html. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gruppens svar 05.11 kl. 14:29, 1: merket i stedet for navnet i en stor gul
+# rute, i hjelpetekster.py og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gruppens svar 05.11 kl. 14:29, 3: «Se dagen i Boersometer» ved én dag, i
+# _hovedindeks.html og hjelpetekster.py. Bildet ble tatt paa nytt med «Se dagen»;
+# bunnen av raden er fortsatt 1864 px, maalt i Edge.
+# Gjennomgangen av svarene 05.11 kl. 14:29: kommentaren om grensen i stil.css og
+# hjelpen om 1079 px i hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "ef7f45bcc548ce44c5497a2d25d01bf53109d5eb36f0ec80e34b19c381a82cda"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1382,7 +1406,24 @@ HOEYDE_PAA_AKSJESIDEN = 2198
 # hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Gjennomgangen av svar 1 kl. 09:34 (ECH1): fotnoten foelger ruta, i app.py og
 # stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "3146bf308ec7a2e4cbeb97d7debf20680eaf885e795df54899f4c83e44fdde0f"
+# Gruppens svar 04.11 kl. 22:23, 1: store ruter i boersometeret, i
+# hjelpetekster.py og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gruppens svar 04.11 kl. 22:23, 2: lenken under soeylene, i hjelpetekster.py
+# og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gruppens svar 04.11 kl. 22:23, 3: «<navnet> kort fortalt» med «?», i aksje.html
+# og hjelpetekster.py. Bildet ble tatt paa nytt med den nye overskriften;
+# bunnen av p.dagene er fortsatt 2198 px, maalt i Edge.
+# Gruppens svar 04.11 kl. 22:23, 4: ikonene i menyknappene, i _ramme.html og
+# stil.css. Bildet ble tatt paa nytt med ikonene; bunnen av p.dagene er fortsatt 2198 px.
+# Gjennomgangen av svarene kl. 22:23: hjelpen og etiketten på «?», i
+# hjelpetekster.py og aksje.html. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gruppens svar 05.11 kl. 14:29, 1: merket i stedet for navnet i en stor gul
+# rute, i hjelpetekster.py og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gruppens svar 05.11 kl. 14:29, 3: «Se dagen i Boersometer», i hjelpetekster.py.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gjennomgangen av svarene 05.11 kl. 14:29: kommentaren om grensen i stil.css og
+# hjelpen om 1079 px i hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "695e3666c5936d79a0ceadb88cfe1b6f0b5a203810fb987661910183134c7dcb"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1392,6 +1433,43 @@ SLIK_TAS_AKSJESIDEN = (
     "ved bunnen av setningen om dagene (p.dagene), under KI-teksten etter grafen: mål den og endre "
     "HOEYDE_PAA_AKSJESIDEN hvis den har flyttet seg. Oppdater så "
     "AVTRYKK_BAK_AKSJESIDEN til {avtrykk} i samme commit."
+)
+
+
+# Gruppens svar 05.11 kl. 12:14 og 12:20: toppen av oversikten står synlig
+# under beskrivelsen, og bak knappen står også hele bilder av børsometeret og
+# Min liste ved 1280 px og av oversikten og børsometeret ved 390 px. Bare
+# demoen. Hvert bilde har adressen, bredden og høyden det er tatt med, filene
+# bak det og sitt avtrykk. Bildene ved 390 px er tatt i en iframe som er 390 px
+# bred, fordi Edge uten vindu ikke ble 390 px bredt (bildet ble kuttet til
+# høyre, 05.11). Høydene er målt i Edge til bunnen av siden, og toppen slutter
+# over periodeknappene, som står 632 px ned.
+FILENE_BAK_BOERSOMETERET = (*FILENE_BAK_AKSJESIDEN, "src/boersometer.py", "src/templates/boersometer.html")
+FILENE_BAK_MIN_LISTE = (*FILENE_BAK_AKSJESIDEN, "src/templates/index.html")
+TOPPEN_AV_OVERSIKTEN = "docs/appen/oversikten-topp-demo.png"
+DE_NYE_BILDENE = {
+    TOPPEN_AV_OVERSIKTEN: ("/", 1280, 615, MALENE_BAK_BILDET),
+    "docs/appen/boersometeret-demo.png": ("/boersometer", 1280, 1329, FILENE_BAK_BOERSOMETERET),
+    "docs/appen/min-liste-demo.png": ("/min-liste", 1280, 1155, FILENE_BAK_MIN_LISTE),
+    "docs/appen/oversikten-390-demo.png": ("/", 390, 3524, MALENE_BAK_BILDET),
+    "docs/appen/boersometeret-390-demo.png": ("/boersometer", 390, 1687, FILENE_BAK_BOERSOMETERET),
+}
+# Gjennomgangen av svarene 05.11 kl. 14:29: stil.css, hjelpetekster.py og
+# boersometer.py (STORSYMBOL_EM). Bildene ble tatt paa nytt og er byte for byte de samme.
+AVTRYKK_BAK_DE_NYE_BILDENE = {
+    TOPPEN_AV_OVERSIKTEN: "ef7f45bcc548ce44c5497a2d25d01bf53109d5eb36f0ec80e34b19c381a82cda",
+    "docs/appen/boersometeret-demo.png": "2a42a1a94cbe36e66f47d6288c1b34d0ab88c6ef6c393fb07b21998121428f6f",
+    "docs/appen/min-liste-demo.png": "95a66e9c1a24d016a5bfd154f13af9ae0e62b6ed92e4a9e918a3f025d785ade8",
+    "docs/appen/oversikten-390-demo.png": "ef7f45bcc548ce44c5497a2d25d01bf53109d5eb36f0ec80e34b19c381a82cda",
+    "docs/appen/boersometeret-390-demo.png": "2a42a1a94cbe36e66f47d6288c1b34d0ab88c6ef6c393fb07b21998121428f6f",
+}
+SLIK_TAS_DE_NYE_BILDENE = (
+    "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
+    "oversikten (SLIK_TAS_BILDET), mot {adresse} med --window-size={bredde},{hoeyde}. Ved 390 px blir "
+    "vinduet bredere enn 390 px og bildet kuttes, så ta det av en side på samme port med en iframe som "
+    "er 390 px bred og {hoeyde} px høy, src={adresse}, og --virtual-time-budget=8000, så iframen er lastet "
+    "(gjennomgangen, BH11). Mål bunnen av siden og endre høyden i DE_NYE_BILDENE hvis den "
+    "har flyttet seg. Oppdater så AVTRYKK_BAK_DE_NYE_BILDENE[{bildet!r}] til {avtrykk} i samme commit."
 )
 
 
@@ -1534,10 +1612,18 @@ class TestBildeneAvAppen:
 
     def test_knappen_staar_rett_under_beskrivelsen_og_er_lukket(self):
         """Ville feilet hvis knappen sto et annet sted, hadde et annet navn,
-        eller var åpen som standard (<details open>)."""
+        eller var åpen som standard (<details open>). Gruppens svar 05.11 kl.
+        12:14 og 12:20: toppen av oversikten står synlig mellom beskrivelsen
+        og knappen. Ville også feilet uten det bildet, med et annet bilde der,
+        eller uten alt-teksten og teksten under."""
         tekst = README.read_text(encoding="utf-8")
         beskrivelse = next(a for a in tekst.split("\n\n") if a.startswith("OSE Signal viser"))
         etter = tekst.split(beskrivelse + "\n\n", 1)[1]
+        toppen, etter = etter.split("\n\n", 1)
+        alt, sti, under = re.fullmatch(r"!\[([^\]]*)\]\(([^)]+)\)\n(.*)", toppen).groups()
+        assert sti == TOPPEN_AV_OVERSIKTEN and (ROT / sti).is_file(), sti
+        assert "i demoen" in alt and "«Eksempeltall»" in alt and "ikke data fra Oslo Børs" in alt, alt
+        assert under.startswith("*Toppen av oversikten i demoen") and "«Eksempeltall»" in under, under
         assert etter.startswith("<details>\n<summary>Bilder av appen (demoen)</summary>\n\n"), etter[:80]
         assert etter.split("</details>\n\n", 1)[1].startswith("**Innhold:** ")
         # Lukket som de andre knappene: ingen <details> i README-en er åpen.
@@ -1549,7 +1635,10 @@ class TestBildeneAvAppen:
         oppdiktede tall."""
         knappen = _knappen_med_bildene()
         bilder = re.findall(r"^!\[([^\]]*)\]\(([^)]+)\)\n(.*)$", knappen, re.MULTILINE)
-        assert [sti for _, sti, _ in bilder] == [SKJERMBILDET, AKSJESIDEBILDET]
+        # Gruppens svar 05.11 kl. 12:14 og 12:20: alle de hele bildene, også de
+        # nye av børsometeret og Min liste og ved 390 px. Toppen står over.
+        hele = [sti for sti in DE_NYE_BILDENE if sti != TOPPEN_AV_OVERSIKTEN]
+        assert [sti for _, sti, _ in bilder] == [SKJERMBILDET, AKSJESIDEBILDET, *hele]
         for alt, sti, under in bilder:
             assert sti.startswith("docs/appen/") and (ROT / sti).is_file(), sti
             assert "i demoen" in alt and "«Eksempeltall»" in alt and "ikke data fra Oslo Børs" in alt, alt
@@ -1563,6 +1652,8 @@ class TestBildeneAvAppen:
         """Ville feilet med et bilde fra docs/appen/ et annet sted i
         README-en, for eksempel under «Til faglærer» som før."""
         tekst = README.read_text(encoding="utf-8")
+        # Gruppens svar 05.11 kl. 12:14: toppen av oversikten står over knappen.
+        tekst = tekst.replace(f"]({TOPPEN_AV_OVERSIKTEN})", "", 1)
         uten_knappen = tekst.replace(_knappen_med_bildene(), "")
         assert "docs/appen/" in uten_knappen.split("\n## Mappestruktur\n", 1)[1]
         assert "](docs/appen/" not in uten_knappen.split("\n## Mappestruktur\n", 1)[0]
@@ -1576,7 +1667,26 @@ class TestBildeneAvAppen:
         assert all(p.is_file() and p.parent == mappe for p in filer), filer
         assert all(p.suffix.lower() in (BILDEFILER | VIDEOFILER) - {".svg"} for p in filer), filer
         bildene = sorted(p.relative_to(ROT).as_posix() for p in filer if p.suffix.lower() in BILDEFILER)
-        assert bildene == sorted([SKJERMBILDET, AKSJESIDEBILDET]), bildene
+        assert bildene == sorted([SKJERMBILDET, AKSJESIDEBILDET, *DE_NYE_BILDENE]), bildene
+
+    def test_de_nye_bildene_tas_paa_nytt_naar_siden_endres(self):
+        """Gruppens svar 05.11 kl. 12:14 og 12:20. Ville feilet hvis en fil bak
+        et av de nye bildene ble endret uten at bildet ble tatt på nytt.
+        Feilmeldingen sier hvordan."""
+        assert set(AVTRYKK_BAK_DE_NYE_BILDENE) == set(DE_NYE_BILDENE)
+        for bildet, (adresse, bredde, hoeyde, filene) in DE_NYE_BILDENE.items():
+            avtrykk = _avtrykk_bak_bildet(filene)
+            assert avtrykk == AVTRYKK_BAK_DE_NYE_BILDENE[bildet], SLIK_TAS_DE_NYE_BILDENE.format(
+                bildet=bildet, adresse=adresse, bredde=bredde, hoeyde=hoeyde, avtrykk=avtrykk
+            )
+
+    def test_de_nye_bildene_har_bredden_og_hoeyden_de_er_tatt_med(self):
+        """Ville feilet hvis et bilde ved 390 px var tatt i et bredere vindu
+        og kuttet, eller høyden ikke var den i DE_NYE_BILDENE."""
+        for bildet, (_, bredde, hoeyde, _) in DE_NYE_BILDENE.items():
+            data = (ROT / bildet).read_bytes()
+            assert data[:8] == bytes.fromhex("89504e470d0a1a0a"), bildet
+            assert (int.from_bytes(data[16:20], "big"), int.from_bytes(data[20:24], "big")) == (bredde, hoeyde), bildet
 
     def test_avtrykket_dekker_modulene_appen_og_demoen_importerer(self):
         """Gjennomgangen (BH1, ECH1): lista over filene bak aksjesiden er ført
@@ -2640,7 +2750,10 @@ class TestReadmeForNybegynnere:
         # 3.3f rett under knappen.
         assert avsnitt[-5].startswith("**Innhold:** "), avsnitt[-5]
         assert avsnitt[-6] == "<details>", avsnitt[-6]
-        assert avsnitt[-7].startswith("OSE Signal viser"), avsnitt[-7]
+        # Gruppens svar 05.11 kl. 12:14: toppen av oversikten mellom
+        # beskrivelsen og knappen.
+        assert avsnitt[-7].startswith("![Toppen av oversikten i demoen"), avsnitt[-7]
+        assert avsnitt[-8].startswith("OSE Signal viser"), avsnitt[-8]
         assert "\n## " not in topp
 
     def test_status_uten_storynumre_og_uten_kommando(self):
@@ -2779,6 +2892,8 @@ class TestReadmeForNybegynnere:
         # Story 2.3c: første henting på dagtid er flyttet til «Ferdig», og
         # prøven på en ren maskin er neste (avgjørelsen 21.10 kl. 18:33).
         saker = (
+            # Gruppens svar 05.11 kl. 12:20: brukertesten står under «Neste i v1».
+            "brukertesten med én person",
             "prøven av readme-en på en ren maskin",
             "signaldagene i kursgrafen",
             "«vis ki-tekst»",
@@ -2934,8 +3049,9 @@ class TestReadmeForNybegynnere:
         # bobler.json.
         # Story 3.5f: 30 med README.md, CLAUDE.md, pyproject.toml, uv.lock,
         # .env.example, .gitignore og .mailmap. Gruppens svar 27.10 kl. 06:31:
-        # 31 med .logs/.
-        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 31, lenker
+        # 31 med .logs/. Gruppens svar 05.11 kl. 12:14 og 12:20: 36 med de fem
+        # nye bildene i docs/appen/.
+        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 36, lenker
         sporet = _git_sporet()
         for tekst, maal in lenker:
             # Maalet er stien i teksten, relativ og uten «..» (BH4, ECH3).
@@ -2944,6 +3060,9 @@ class TestReadmeForNybegynnere:
             filnavn = {navn: f"docs/bilder/readme/{navn}" for navn in BILDENE.values()}
             filnavn[SKJERMBILDET.rsplit("/", 1)[1]] = SKJERMBILDET
             filnavn[AKSJESIDEBILDET.rsplit("/", 1)[1]] = AKSJESIDEBILDET
+            # Gruppens svar 05.11 kl. 12:14 og 12:20: de nye bildene etter docs/appen/.
+            for bildet in DE_NYE_BILDENE:
+                filnavn[bildet.rsplit("/", 1)[1]] = bildet
             # Story 3.4: filene etter docs/bilder/investorsider/.
             for navn in ("LESMEG.md", "bobler.json"):
                 filnavn[navn] = f"docs/bilder/investorsider/{navn}"
@@ -3018,7 +3137,9 @@ class TestReadmeForNybegynnere:
         brøt."""
         tekst = README.read_text(encoding="utf-8")
         lista = tekst.split("Til faglærer:\n", 1)[1].split("\n\n", 1)[0].splitlines()
-        assert [linje.split(":", 1)[0] for linje in lista] == [
+        # Gruppens svar 05.11 kl. 12:20: «Dokumentene» er delt i korte punkter
+        # under, så de fire er punktene på øverste nivå.
+        assert [linje.split(":", 1)[0] for linje in lista if linje.startswith("- ")] == [
             "- Prøv appen",
             "- Testene",
             "- Dokumentene",
@@ -3045,7 +3166,7 @@ class TestReadmeForNybegynnere:
         # Regel 17 kan bryte linja mellom «er nå» og taggen.
         gjeldende = re.findall(r"[Gg]jeldende tag er(?:\s+nå)?\s+`([^`]+)`", claude)[-1]
         lista = tekst.split("Til faglærer:\n", 1)[1].split("\n\n", 1)[0]
-        assert all(l.startswith("- ") for l in lista.splitlines()), lista
+        assert all(l.startswith(("- ", "  - ")) for l in lista.splitlines()), lista
         brief = [l for l in lista.splitlines() if "](_bmad-output/planning-artifacts/product-brief.md)" in l]
         assert len(brief) == 1, lista
         assert re.findall(r"arbeidskrav-product-brief-v\d+", brief[0]) == [gjeldende], brief[0]
@@ -3181,12 +3302,14 @@ class TestReadmeDemoenAnbefales:
                 assert sak in punkt, (sak, punkt)
         # Gjennomgangen (BH2, VG1): lenken går til selskapets investorside,
         # som i briefen v8 og story 10.5 etter 06.10.
-        for sak in ("prøven av readme-en på en ren maskin",):
+        # Gruppens svar 05.11 kl. 12:20: brukertesten (8.1) står under «Neste i
+        # v1», uten storynummeret, som resten av «Status».
+        for sak in ("brukertesten med én person", "prøven av readme-en på en ren maskin"):
             assert sum(sak in p for p in v1) == 1, (sak, v1)
         assert not any("egen nøkkel" in p for p in v1), v1
         assert not any("min liste" in p or "investorside" in p or "historikk" in p for p in v1), v1
         assert sum("lenken til investorsiden" in p.lower() for p in lister["Ferdig"]) == 1, lister["Ferdig"]
-        assert len(v1) == 1, v1
+        assert len(v1) == 2, v1
         assert "newsweb" not in "\n".join(v1 + ekstra)
         assert REGELEN_FOR_EKSTRA in status
 
@@ -3340,11 +3463,13 @@ LENKENE_FOER_3_3H = {
 # «Mappestruktur» (regel 19). Var 0fe44843....
 # Gruppens svar 02.11 kl. 22:15 (D): lenken til docs/brukslogg.md i
 # «Dokumentene» (regel 19). Var 409a3f8b....
+# Gruppens svar 05.11 kl. 12:14 og 12:20: de fem nye bildene i docs/appen/ i
+# «Mappestruktur» (regel 19). Var 677fa094....
 AVTRYKK_I_PILENE = {
     "Demoen": "f124a92b1c64eeb0ea5e7141976ff85de68df49004a22d5874a4a257aaf89b55",
     "Den ekte versjonen": "3bb398cd1be31a43abe09b7261456646b6dc03047e20f1aa57ab665a768cfd78",
     "Dokumentene": "7ba6eada43af3ebdfe55e420dd4dcf05be7b034275d53aa1ff6af5ddffbaafa2",
-    "Mappestruktur": "677fa094d2584edaa15eb9e156e7905b6679565e319717eb9cf19f4058ce53cd",
+    "Mappestruktur": "6e34d0b23d63e0cc73e13881c7b19ea037bb3b95e434f671a251c7838eddb31d",
 }
 
 # Story 3.5g (gruppens svar 26.10 kl. 23:00): sha256 av innholdet i de nye

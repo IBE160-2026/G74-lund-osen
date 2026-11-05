@@ -267,9 +267,12 @@
     </form>
     {%- endmacro %}
     {% if ki_vises %}
-      <section class="ki" id="{{ ki_anker }}" aria-label="KI-tekst">
+      {#- Gruppens svar 04.11 kl. 22:23, 3: delen heter «<navnet> kort
+          fortalt», i Newsreader som de andre overskriftene, med «?» som sier
+          hva teksten er og hva modellen fikk. «Laget av KI» står som før. #}
+      <section class="ki" id="{{ ki_anker }}" aria-labelledby="ki-tittel">
         <div class="ki-topp">
-          <h2>Med KI-ens ord</h2>
+          <h2><span id="ki-tittel">{{ detalj.aksje.navn }} kort fortalt</span> {{ hjelpeknapp("hjelp-ki", "Hjelp: kort fortalt") }}</h2>
           {{ ki_bryter() }}
         </div>
         {% if ki.vist %}
@@ -370,6 +373,8 @@
   ]) }}
   {{ hjelpevindu("hjelp-sjekkene", "Sjekkene", [("", ["hvorfor_tre", "antall_dager"])]) }}
   {{ hjelpevindu("hjelp-historikk", "Signalet dag for dag", [("", ["historikken"])]) }}
+  {#- Gruppens svar 04.11 kl. 22:23, 3: «?» ved KI-delen, bare når den vises. #}
+  {% if detalj.sjekker and ki_er_paa and ki %}{{ hjelpevindu("hjelp-ki", "Kort fortalt", [("", ["ki_kort_fortalt"])]) }}{% endif %}
   {% if detalj.sjekker %}
     {% for sjekk in detalj.sjekker %}
       {{ hjelpevindu("hjelp-" ~ sjekk.navn|lower, sjekk.navn, [("", [sjekk.navn|lower])]) }}

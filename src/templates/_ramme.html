@@ -44,10 +44,13 @@
       </p>
     </div>
     <nav class="rad sider" aria-label="Sidene">
-      <a class="sideknapp" href="/"{% if aktiv == "oversikt" %} aria-current="page"{% elif aktiv == "aksje" %} aria-current="true"{% endif %}>Markedsoversikt</a>
+      {#- Gruppens svar 04.11 kl. 22:23, 4: ikonene fra designforslaget, en
+          tabell, en måler og en stjerne, 16 px med strek 2 i tekstfargen.
+          Navnet på knappen er teksten, så ikonene er skjult for skjermleseren. #}
+      <a class="sideknapp" href="/"{% if aktiv == "oversikt" %} aria-current="page"{% elif aktiv == "aksje" %} aria-current="true"{% endif %}><svg class="ikon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="2" y="2.5" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M2 10h12M6.5 6.5v7"/></svg>Markedsoversikt</a>
       {#- Story 8.6: børsometeret mellom de to, som på tavla. #}
-      <a class="sideknapp" href="/boersometer"{% if aktiv == "boersometer" %} aria-current="page"{% endif %}>Børsometer</a>
-      <a class="sideknapp" href="/min-liste"{% if aktiv == "min_liste" %} aria-current="page"{% endif %}>Min liste</a>
+      <a class="sideknapp" href="/boersometer"{% if aktiv == "boersometer" %} aria-current="page"{% endif %}><svg class="ikon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M2 12a6 6 0 0 1 12 0"/><path d="M8 12l3-4"/></svg>Børsometer</a>
+      <a class="sideknapp" href="/min-liste"{% if aktiv == "min_liste" %} aria-current="page"{% endif %}><svg class="ikon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 1.8l1.9 4 4.3.5-3.2 2.9.9 4.3L8 11.3l-3.9 2.2.9-4.3-3.2-2.9 4.3-.5z"/></svg>Min liste</a>
     </nav>
     {% if hentet %}
     <div class="rad oppdatert">

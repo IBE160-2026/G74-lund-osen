@@ -53,6 +53,10 @@ AKSJE_MAL = "src/templates/aksje.html"
 PERIODER = "src/perioder.py"
 PERIODE_MAL = "src/templates/_perioder.html"
 HISTORIKK = "src/historikk.py"
+# Gruppens svar 04.11 kl. 22:23, 3: hjelpen ved KI-delen, slått opp her.
+KI_GRUNNLAG = "src/ki_grunnlag.py"
+KI_KONTROLL = "src/ki_kontroll.py"
+KI_VISNING = "src/ki_visning.py"
 
 # FR-701: tre sjekker, ingen fjerde.
 ANTALL_SJEKKER = 3
@@ -180,6 +184,12 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "med Tab går du fra det største feltet og den største ruta, slik kartet legger dem. "
             "Rammen er gul ved 3 av 3 på siste børsdag, også når du velger en annen dag, og "
             "mørk ved 2 av 3 bare på siste børsdag, "
+            # Gruppens svar 04.11 kl. 22:23, 1: store ruter som i designforslaget.
+            # Gjennomgangen av svarene 05.11 kl. 14:29 (ECH2): bare fra 1079 px.
+            "i et vindu fra 1079 px har de største rutene symbolet og styrken øverst, selskapsnavnet under, kuttet med «…» når "
+            "det er for langt, og endringen i stor skrift nederst, med merket og grunnen mellom der de får plass, "
+            # Gruppens svar 05.11 kl. 14:29, 1.
+            "og merket i stedet for navnet når det ikke får plass under navnet, "
             # Gruppens svar 04.11 kl. 10:01 og 10:04: styrken i rutene.
             "og styrken står i rutene som har plass, som i tabellen, "
             # Gruppens svar 04.11 kl. 20:53 og 20:56, 1.
@@ -205,6 +215,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (BOERSOMETER, "def indeks_for_dagen("),
                 (BOERSOMETER, "def fargetrinn("),
                 (BOERSOMETER, "def styrkelinje("),
+                (BOERSOMETER, "def storplass("),
                 (BOERSOMETER, "def ikke_vurdert_plass("),
                 (BOERSOMETER, "def grunnplass("),
                 (BOERSOMETER, "def annen_grunn("),
@@ -237,9 +248,13 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "Den stiplede linja er indeksen, grønn når den steg, rød når den falt "
             "og grå ved 0,00 %. "
             # Story 8.2a, c (U20): symbolet over søyla er en lenke.
-            "Et gult bransjesymbol betyr 3 av 3 siste børsdag, og et klikk på symbolet viser aksjen.",
+            "Et gult bransjesymbol betyr 3 av 3 siste børsdag, et klikk på symbolet viser aksjen, "
+            # Gruppens svar 04.11 kl. 22:23, 2: lenken til børsometeret.
+            # Gruppens svar 05.11 kl. 14:29, 3: «Se dagen» ved én dag.
+            "og «Se dagen» eller «Se perioden» under søylene åpner børsometeret med samme dag eller periode.",
             (
                 (PRD, "#### FR-105 — Søylene under hovedindeksen"),
+                (HOVEDINDEKS_MAL, 'class="til-boersometer"'),
                 (HOVEDINDEKS_MAL, '<a class="etikett'),
                 (PRD, "Indeksens endring er en stiplet linje, grønn når indeksen steg og rød når den"),
                 (HOVEDINDEKS, "def bygg_soeyler("),
@@ -552,6 +567,29 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (AKSJE_MAL, '<p class="maalt">Målt mot'),
                 (AKSJE_MAL, '<div class="skala" aria-hidden="true">'),
                 (AKSJEDETALJ, "def bygg_skala("),
+            ),
+        ),
+        # Gruppens svar 04.11 kl. 22:23, 3: hva teksten er, hva modellen fikk
+        # (ki_grunnlag.py), at tallene med prikket strek er sjekket, og at
+        # den ikke gir råd.
+        "ki_kort_fortalt": Hjelpetekst(
+            "Kort fortalt:",
+            "en kort tekst om signalet for aksjen den dagen, skrevet av en språkmodell og merket "
+            "«Laget av KI» med navnet på modellen. Modellen fikk bare det appen har regnet ut: om hver "
+            "av sjekkene ga +1, 0 eller -1, styrken og retningen, hvor mange aksjer i lista som steg og "
+            "falt, om hovedindeksen og bransjen steg eller falt når det kan regnes, og et merke når aksjen "
+            "er utenfor de 15 grensene er målt på, men ingen kurser, prosenter eller volumer. Tallene med prikket strek er sjekket mot det før teksten vises, "
+            "og teksten gir ikke råd.",
+            (
+                (KI_GRUNNLAG, "def ki_grunnlag("),
+                (KI_GRUNNLAG, "kurser, volumer, prosenter eller forholdstall, og ingen maalinger"),
+                (KI_GRUNNLAG, 'ANTALLENE = ("styrke", "aksjer_steg", "aksjer_falt")'),
+                (KI_GRUNNLAG, 'VALGFRIE = frozenset(("merke", "hovedindeksen", "bransjen"))'),
+                (KI_GRUNNLAG, 'UTENFOR_MAALINGEN = "Utenfor målingen"'),
+                (KI_GRUNNLAG, "fortegnet for hver av de"),
+                (KI_VISNING, "def prikkede_tall("),
+                (KI_KONTROLL, "3. Raad."),
+                (AKSJE_MAL, "Laget av KI ·"),
             ),
         ),
         "ikke_raad": Hjelpetekst(

@@ -31,6 +31,8 @@ EGEN_MERKELAPP = {
     "spec-2-3-hentingen-fra-kl-21": "2.3, kl. 21",
     "spec-2-3-hentingen-fra-kl-22": "2.3, kl. 22",
     "spec-3-4-alle-ti-kombinasjonene-paa-siste-demodag": "3.4, alle 10",
+    # Gruppens svar 04.11 kl. 22:23, ved siden av spesifikasjonen for funnene i 8.2b.
+    "spec-8-2b-som-designforslaget": "8.2b, designforslaget",
 }
 
 # Tester som har fått nytt navn etter at et dokument nevnte dem, med det nye

@@ -113,9 +113,14 @@ header.stripe .eksempeltall a { color: var(--hvit); text-decoration: underline; 
    siden man står på, er fylt (aria-current), og klikkflaten er 44 px høy.
    To knapper får plass på 390 px, og raden brytes heller enn å rulle. */
 header.stripe .sider { flex-wrap: wrap; gap: 8px; padding-bottom: 12px; }
-header.stripe a.sideknapp { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; box-sizing: border-box;
+header.stripe a.sideknapp { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; box-sizing: border-box;
                             border: 1px solid var(--stripe-kant); border-radius: 999px; color: var(--stripe-tekst);
                             font-size: 15px; font-weight: 600; text-decoration: none; }
+/* Gruppens svar 04.11 kl. 22:23, 4: ikonene foran navnet, 16 px med strek 2
+   i tekstfargen (currentColor), så de følger knappen som er valgt, og 8 px
+   fra navnet (gap i regelen for a.sideknapp over). */
+header.stripe a.sideknapp .ikon { flex: none; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2;
+                                  stroke-linecap: round; stroke-linejoin: round; }
 header.stripe a.sideknapp[aria-current="page"] { background: var(--hvit); border-color: var(--hvit); color: var(--blekk); }
 /* Story 8.2b, b (U2): delen aksjesiden hører til, med kant og uten fyll. */
 header.stripe a.sideknapp[aria-current="true"] { border: 2px solid var(--hvit); color: var(--hvit); }
@@ -375,6 +380,12 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) .soeyler .linjeprove.ned { border-top-color: var(--ned); }
 :where(.side-oversikt) .soeyler .linjeforklaring .opp { color: var(--opp); font-weight: 600; }
 :where(.side-oversikt) .soeyler .linjeforklaring .ned { color: var(--ned); font-weight: 600; }
+/* Gruppens svar 04.11 kl. 22:23, 2: «Se perioden i Børsometer ›» til høyre
+   for forklaringen av den stiplede linja, i halvfet skrift. Er det ikke
+   plass, går lenken ned på neste linje. */
+:where(.side-oversikt) .soeyler .soeylefot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.25rem 1rem; }
+:where(.side-oversikt) .soeyler .soeylefot .til-boersometer { margin: 0.5rem 0 0 auto; font-size: 14px; font-weight: 600; color: var(--blekk); }
+:where(.side-oversikt) .soeyler .soeylefot .til-boersometer:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
 :where(.side-oversikt) .soeyler .soeylefarger { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem;
                          font-size: 14px; color: var(--dempet); margin: 0.5rem 0 0; }
 :where(.side-oversikt) .soeyler .fargeprove { display: inline-block; width: 10px; height: 14px; border-radius: 2px; }
@@ -845,6 +856,56 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
     :where(.side-oversikt) .rute.nivaa-smalest-1 > .endring, :where(.side-oversikt) .rute.nivaa-smalest-1 > .merke, :where(.side-oversikt) .rute.nivaa-smalest-1 > .styrke, :where(.side-oversikt) .rute.nivaa-smalest-1 > .tekst,
     :where(.side-oversikt) .rute.nivaa-smalest-2 > .merke, :where(.side-oversikt) .rute.nivaa-smalest-2:not(.styrke-smalest) > .styrke, :where(.side-oversikt) .rute.nivaa-smalest-2 > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
     :where(.side-oversikt) .rute.nivaa-smalest-3:not(.grunn-smalest) > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
+}
+/* Gruppens svar 04.11 kl. 22:23, 1: store ruter som i designforslaget, nivå 4
+   (storplass i boersometer.py, regnet for hver rute etter svar 4 kl. 14:29). Symbolet 22 px halvfett øverst til venstre og
+   styrken øverst til høyre, navnet under i 12,5 px og kuttet med «…», merket
+   og grunnen under navnet der de får plass (klassene merke-N og grunn-N), og
+   endringen 28 px halvfett nederst, med luft 10 og 12 px. Små ruter er som før.
+   Gruppens svar 05.11 kl. 14:29, 1: navnet står bare med navn-N, og en gul
+   rute en annen dag uten plass til merket under navnet viser merket i stedet. */
+:where(.side-oversikt) .rute .navn { display: none; grid-area: navn; margin-top: 2px; font-size: 12.5px; font-weight: 400;
+                                     white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+:where(.side-oversikt) .rute > .ticker { grid-area: ticker; }
+:where(.side-oversikt) .rute > .styrke { grid-area: styrke; }
+:where(.side-oversikt) .rute > .merke { grid-area: merke; }
+:where(.side-oversikt) .rute > .tekst { grid-area: tekst; }
+:where(.side-oversikt) .rute > .endring { grid-area: endring; }
+@media (width > 760px) {
+  @container (width >= 1008px) {
+    :where(.side-oversikt) .rute.nivaa-bredest-4 { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto auto minmax(0, 1fr);
+      grid-template-areas: "ticker styrke" "navn navn" "merke merke" "tekst tekst" "endring endring"; gap: 0 8px; padding: 10px 12px; }
+    :where(.side-oversikt) .rute.nivaa-bredest-4.navn-bredest > .navn { display: block; }
+    :where(.side-oversikt) .rute.nivaa-bredest-4 > .ticker { font-size: 22px; font-weight: 600; }
+    :where(.side-oversikt) .rute.nivaa-bredest-4 > .endring { align-self: end; font-size: 28px; font-weight: 600; }
+    :where(.side-oversikt) .rute.nivaa-bredest-4:not(.styrke-bredest) > .styrke, :where(.side-oversikt) .rute.nivaa-bredest-4:not(.merke-bredest) > .merke, :where(.side-oversikt) .rute.nivaa-bredest-4:not(.grunn-bredest) > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
+  @container (width < 1008px) {
+    :where(.side-oversikt) .rute.nivaa-bred-4 { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto auto minmax(0, 1fr);
+      grid-template-areas: "ticker styrke" "navn navn" "merke merke" "tekst tekst" "endring endring"; gap: 0 8px; padding: 10px 12px; }
+    :where(.side-oversikt) .rute.nivaa-bred-4.navn-bred > .navn { display: block; }
+    :where(.side-oversikt) .rute.nivaa-bred-4 > .ticker { font-size: 22px; font-weight: 600; }
+    :where(.side-oversikt) .rute.nivaa-bred-4 > .endring { align-self: end; font-size: 28px; font-weight: 600; }
+    :where(.side-oversikt) .rute.nivaa-bred-4:not(.styrke-bred) > .styrke, :where(.side-oversikt) .rute.nivaa-bred-4:not(.merke-bred) > .merke, :where(.side-oversikt) .rute.nivaa-bred-4:not(.grunn-bred) > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
+}
+@media (width <= 760px) {
+  @container (width >= 328px) {
+    :where(.side-oversikt) .rute.nivaa-smal-4 { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto auto minmax(0, 1fr);
+      grid-template-areas: "ticker styrke" "navn navn" "merke merke" "tekst tekst" "endring endring"; gap: 0 8px; padding: 10px 12px; }
+    :where(.side-oversikt) .rute.nivaa-smal-4.navn-smal > .navn { display: block; }
+    :where(.side-oversikt) .rute.nivaa-smal-4 > .ticker { font-size: 22px; font-weight: 600; }
+    :where(.side-oversikt) .rute.nivaa-smal-4 > .endring { align-self: end; font-size: 28px; font-weight: 600; }
+    :where(.side-oversikt) .rute.nivaa-smal-4:not(.styrke-smal) > .styrke, :where(.side-oversikt) .rute.nivaa-smal-4:not(.merke-smal) > .merke, :where(.side-oversikt) .rute.nivaa-smal-4:not(.grunn-smal) > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
+  @container (width < 328px) {
+    :where(.side-oversikt) .rute.nivaa-smalest-4 { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto auto minmax(0, 1fr);
+      grid-template-areas: "ticker styrke" "navn navn" "merke merke" "tekst tekst" "endring endring"; gap: 0 8px; padding: 10px 12px; }
+    :where(.side-oversikt) .rute.nivaa-smalest-4.navn-smalest > .navn { display: block; }
+    :where(.side-oversikt) .rute.nivaa-smalest-4 > .ticker { font-size: 22px; font-weight: 600; }
+    :where(.side-oversikt) .rute.nivaa-smalest-4 > .endring { align-self: end; font-size: 28px; font-weight: 600; }
+    :where(.side-oversikt) .rute.nivaa-smalest-4:not(.styrke-smalest) > .styrke, :where(.side-oversikt) .rute.nivaa-smalest-4:not(.merke-smalest) > .merke, :where(.side-oversikt) .rute.nivaa-smalest-4:not(.grunn-smalest) > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   }
 }
 /* Gruppens svar 05.11 kl. 09:34, 1, og gjennomgangen (ECH1): fotnoten for en

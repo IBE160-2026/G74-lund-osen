@@ -3060,6 +3060,8 @@ class TestSoeylenePaaForsiden:
         figur = _soeylene(klient.get("/").data.decode("utf-8"))
         assert "indekslinje" not in figur and len(_stolpene(figur)) == 3
         assert "Ingen stiplet linje: indeksen har ingen endring for dagen." in _synlig(figur)
+        # Gruppens svar 04.11 kl. 22:23, 2 (VG5): lenken står også uten linja.
+        assert 'class="til-boersometer" href="/boersometer?periode=siste"' in figur and "Stiplet linje" not in figur
         # Gjennomgangen (BH17): delen over søylene har ingen prosent, og
         # ingenting står etter søylene.
         html = klient.get("/").data.decode("utf-8")
@@ -3765,7 +3767,7 @@ class TestStory816bDagenPaaHeleSiden:
         assert ventet in toppen
         assert "Signalstyrke ? – Retning ? – Ukjent" in toppen
         assert "Hvorfor signalet ble ukjent" in toppen and "Sjekk 1" not in toppen
-        assert "Med KI-ens ord" not in toppen
+        assert "kort fortalt" not in toppen
 
     def test_en_loerdag_har_ingen_sluttkurs_og_ingen_endring(self, klient):
         """Ville feilet hvis lørdagen viste kursen fra fredagen før eller fra

@@ -421,7 +421,11 @@ class Kartrute:
     ramme (svaret kl. 20:53 og 20:56, 1). For en rute uten styrke er det
     klassene der «ikke vurdert» har plass (svar 2). grunn er klassene der
     ruta står på nivå 3 og har plass til hele grunnen (gjennomgangen av
-    svar 2, ECH1)."""
+    svar 2, ECH1). Nivå 4 er en stor rute som i designforslaget (gruppens
+    svar 04.11 kl. 22:23, 1): der står styrken, grunnen og merket i
+    klassene i styrke, grunn og merke, og navnet i klassene i navn. En gul
+    rute en annen dag viser merket i stedet for navnet når merket ikke får
+    plass under det (gruppens svar 05.11 kl. 14:29, 1)."""
 
     rute: Rute
     vekt: float
@@ -429,6 +433,8 @@ class Kartrute:
     nivaa: dict[str, int]
     styrke: frozenset[str] = frozenset()
     grunn: frozenset[str] = frozenset()
+    merke: frozenset[str] = frozenset()
+    navn: frozenset[str] = frozenset()
 
 
 @dataclass(frozen=True)
@@ -464,7 +470,10 @@ def annen_grunn_i_kartet(kartet: Kart) -> frozenset[str] | None:
     if not ruter:
         return None
     return frozenset(
-        klasse for r in ruter for klasse, nivaa in r.nivaa.items() if nivaa == 3 or (nivaa == 2 and klasse in r.styrke)
+        klasse
+        for r in ruter
+        for klasse, nivaa in r.nivaa.items()
+        if nivaa == 3 or (nivaa in (2, 4) and klasse in r.styrke)
     )
 
 
@@ -542,14 +551,29 @@ def squarify(
     return ut
 
 
-def _nivaa_ved(flate: Flate, bredde: float, rb: float, rh: float, rute: Rute) -> tuple[int, bool, bool]:
+def _nivaa_ved(
+    flate: Flate, bredde: float, rb: float, rh: float, rute: Rute, stor: bool = True
+) -> tuple[int, bool, bool, bool, bool]:
     """Tekstnivået for plassen rb × rh ved flate.bredde, regnet for den
-    synlige ruta når kartet er bredde px bredt, om styrken står på nivå 2,
-    og om hele grunnen står på nivå 3."""
+    synlige ruta når kartet er bredde px bredt, om styrken står på nivå 2
+    eller 4, om hele grunnen står på nivå 3 eller 4, om merket står på
+    nivå 4, og om navnet står på nivå 4. Nivå 4 er en stor rute (gruppens
+    svar 04.11 kl. 22:23, 1). Der står styrken en annen dag i en gul rute
+    bare med merket, som på nivå 2 (svaret 04.11 kl. 20:53 og 20:56, 1), og
+    merket står i stedet for navnet når det ikke får plass under det
+    (gruppens svar 05.11 kl. 14:29, 1). Får merket ikke plass der heller,
+    er ruta ikke stor. Med stor=False er ingen rute stor (svar 2 kl. 14:29:
+    store ruter bare fra 1079 px, STORE_KLASSER)."""
     skala = bredde / flate.bredde
     b, h = rb * skala - 2 * KANT, rh * skala - 2 * KANT
     nivaa = tekstnivaa(b, h, rute.aksje.symbol)
-    return nivaa, nivaa == 2 and styrkelinje(rute, b, h), nivaa == 3 and grunnplass(rute, b, h)
+    if stor and nivaa == 3 and storplass(rute, b, h):
+        linjene = _stor_linjer(rute, b, h)
+        if linjene is not None:
+            navn, merke, grunn = linjene
+            styrke = not rute.uten_data and (merke or not (rute.ramme == GUL and not rute.er_siste))
+            return 4, styrke, grunn, merke, navn
+    return nivaa, nivaa == 2 and styrkelinje(rute, b, h), nivaa == 3 and grunnplass(rute, b, h), False, False
 
 
 # Bredden og høyden ruta må ha for nivå 3, med teksten på 14 px.
@@ -568,6 +592,94 @@ IKKE_VURDERT_PLASS = (104, 69)
 # med: skriften i px, linjehøyden, mellomrommet, luften over og til siden,
 # rammen og bredden per tegn i em (test_grunnplass_er_regnet_fra_stilen).
 RUTESKRIFT, RUTELINJE, RUTEGAP, RUTELUFT, RUTERAMME, EM_PER_TEGN = 14, 1.2, 1, (4, 6), 4, 0.5
+# Gruppens svar 04.11 kl. 22:23, 1: store ruter som i designforslaget, nivå 4.
+# Symbolet 22 px halvfett og styrken øverst, navnet 12,5 px under, og
+# endringen 28 px halvfett nederst, med luft 10 og 12 px og STORGAP mellom
+# linjene og STORMELLOM mellom symbolet og styrken (stil.css). Grensen er
+# regnet som NIVAA_3 og STYRKE for det bredeste: AKRBP, fem tegn, med
+# «ikke vurdert» ved siden av, og «Uten data» i 28 px, med 0,62 em per tegn i
+# halvfet skrift og EM_PER_TEGN ellers, og for høyden uten merket og grunnen
+# (test_grensen_for_store_ruter_er_regnet_fra_stilen).
+# Gruppens svar 05.11 kl. 14:29, 4: grensen regnes for hver rute (storplass),
+# så høye, smale ruter blir store når alt deres får plass. STOR er nå
+# høyden og den største bredden en rute med en endring på høyst ni tegn
+# kan trenge.
+STORSYMBOL, STORNAVN, STORENDRING, STORLUFT, STORGAP, STORMELLOM = 22, 12.5, 28, (10, 12), 2, 8
+STOR = (207, 107)
+# Gruppens svar 05.11 kl. 14:29, 2: store ruter bare fra 1079 px, som bygget,
+# altså bare i klassen bredest i Flate.tekst.
+STORE_KLASSER = frozenset({"bredest"})
+# Ringen rundt «3 av 3» og «2 av 3»: luften til siden i px (0,45 rem) og den
+# tykkeste kanten, som i test_styrkens_grense_er_regnet_fra_stilen.
+PILLELUFT, PILLEKANT = 0.45 * 16, 2
+# Bredden per tegn i halvfet skrift, i em, som i grensen over.
+HALVFET_EM = 0.62
+# Gjennomgangen av svar 4 (ECH1): symbolet i 22 px halvfett er bredere enn
+# HALVFET_EM, fordi det bare har store bokstaver. Målt i Edge 05.11 med en
+# Range: opptil 0,721 em per tegn (MOWI) for de 15 aksjene og demoen, så
+# grensen per rute regnes med 0,75 em. STOR[0] er regnet med det (AKRBP med
+# «ikke vurdert»: 206,5 px).
+STORSYMBOL_EM = 0.75
+# Merket for en annen dag i en gul rute, som i boersometer.html.
+MERKET = f"{ANTALL_SJEKKER} av {ANTALL_SJEKKER} siste børsdag"
+
+
+def stor_bredde(symbol: str, styrke: str | None, pille: bool, endring: str) -> float:
+    """Bredden en stor rute trenger (gruppens svar 05.11 kl. 14:29, 4):
+    øverst symbolet i 22 px halvfett og styrken ved siden av, med ringen
+    når pille, og nederst endringen i 28 px halvfett, som den vises.
+    Navnet kuttes med «…», så det trenger ingen bredde. Gjennomgangen av
+    svarene 04.11 kl. 22:23 (BH3, ECH3): endringen kan ha flere tegn enn
+    «Uten data»."""
+    luft = 2 * RUTERAMME + 2 * STORLUFT[1]
+    topp = luft + STORSYMBOL_EM * STORSYMBOL * len(symbol)
+    if styrke is not None:
+        topp += STORMELLOM + EM_PER_TEGN * RUTESKRIFT * len(styrke)
+        if pille:
+            topp += 2 * PILLEKANT + 2 * PILLELUFT
+    return max(topp, luft + HALVFET_EM * STORENDRING * len(endring))
+
+
+def _stor_bredde(rute: Rute) -> float:
+    """stor_bredde for ruta, med teksten og ringen som i boersometer.html."""
+    if rute.endring is not None:
+        endring = tall(rute.endring, "endring")
+    else:
+        endring = UTEN_DATA if rute.uten_data else "–"
+    styrke = None if rute.uten_data else rute.uten_styrke or f"{rute.styrke} av {ANTALL_SJEKKER}"
+    pille = rute.ramme == MOERK or (rute.ramme == GUL and rute.er_siste)
+    return stor_bredde(rute.aksje.symbol, styrke, pille, endring)
+
+
+def storplass(rute: Rute, b: float, h: float) -> bool:
+    """Om ruta, som er b × h px, har plass til teksten som i designforslaget
+    (gruppens svar 04.11 kl. 22:23, 1), med bredden regnet for ruta selv
+    (svar 4 kl. 14:29)."""
+    return b >= _stor_bredde(rute) and h >= STOR[1]
+
+
+def _stor_linjer(rute: Rute, b: float, h: float) -> tuple[bool, bool, bool] | None:
+    """Om navnet, merket og grunnen står i en stor rute, som er b × h px
+    (svaret kl. 22:23, 1: «der de får plass»). Merket kommer først, og
+    grunnen bare under det når merket står. Gruppens svar 05.11 kl. 14:29,
+    1: en gul rute en annen dag uten plass til merket under navnet viser
+    merket og styrken i stedet for navnet. Får merket ikke plass der
+    heller, er svaret None, og ruta er ikke stor. Merket står i halvfet
+    skrift (gjennomgangen, ECH1), så linjene regnes med HALVFET_EM."""
+    bredde = b - 2 * RUTERAMME - 2 * STORLUFT[1]
+    rest = h - STOR[1]
+    linje = RUTESKRIFT * RUTELINJE
+    navn, merke = True, False
+    if rute.ramme == GUL and not rute.er_siste:
+        trengs = _linjer(MERKET, bredde, HALVFET_EM) * linje + STORGAP
+        if trengs > rest:
+            rest += STORNAVN * RUTELINJE + STORGAP
+            if trengs > rest:
+                return None
+            navn = False
+        merke, rest = True, rest - trengs
+    grunn = bool(rute.grunn) and _linjer(rute.grunn, bredde) * linje + STORGAP <= rest
+    return navn, merke, grunn
 
 
 def tekstnivaa(b: float, h: float, symbol: str) -> int:
@@ -600,10 +712,11 @@ def ikke_vurdert_plass(b: float, h: float) -> bool:
     return b >= IKKE_VURDERT_PLASS[0] and h >= IKKE_VURDERT_PLASS[1]
 
 
-def _linjer(tekst: str, bredde: float) -> int:
+def _linjer(tekst: str, bredde: float, em: float = EM_PER_TEGN) -> int:
     """Hvor mange linjer teksten brytes til i bredde px, ord for ord, med
-    EM_PER_TEGN per tegn. Et ord som er bredere enn linja, får en linje."""
-    per_linje = max(1, int(bredde // (EM_PER_TEGN * RUTESKRIFT)))
+    em per tegn, EM_PER_TEGN eller HALVFET_EM. Et ord som er bredere enn
+    linja, får en linje."""
+    per_linje = max(1, int(bredde // (em * RUTESKRIFT)))
     linjer, brukt = 1, 0
     for ord_ in tekst.split():
         if brukt and brukt + 1 + len(ord_) > per_linje:
@@ -684,6 +797,8 @@ def kart(bransjer: list[Bransje], flatene: tuple[Flate, ...] = FLATENE) -> Kart:
         nivaa: list[dict[str, int]] = [{} for _ in bransje.ruter]
         styrke: list[set[str]] = [set() for _ in bransje.ruter]
         grunn: list[set[str]] = [set() for _ in bransje.ruter]
+        merke: list[set[str]] = [set() for _ in bransje.ruter]
+        navn: list[set[str]] = [set() for _ in bransje.ruter]
         for flate in flatene:
             hoeyde = forhold[flate.navn] * flate.bredde
             (fx, fy, fb, fh), ruter = lagt[flate.navn][n]
@@ -701,11 +816,17 @@ def kart(bransjer: list[Bransje], flatene: tuple[Flate, ...] = FLATENE) -> Kart:
                     (rx - fx) / fb * 100, (ry - start) / kropp * 100, rb / fb * 100, rh / kropp * 100
                 )
                 for klasse, bredde in flate.tekst:
-                    nivaa[i][klasse], med_styrke, med_grunn = _nivaa_ved(flate, bredde, rb, rh, bransje.ruter[i])
+                    nivaa[i][klasse], med_styrke, med_grunn, med_merke, med_navn = _nivaa_ved(
+                        flate, bredde, rb, rh, bransje.ruter[i], klasse in STORE_KLASSER
+                    )
                     if med_styrke:
                         styrke[i].add(klasse)
                     if med_grunn:
                         grunn[i].add(klasse)
+                    if med_merke:
+                        merke[i].add(klasse)
+                    if med_navn:
+                        navn[i].add(klasse)
         kartruter = [
             Kartrute(
                 rute=r,
@@ -714,6 +835,8 @@ def kart(bransjer: list[Bransje], flatene: tuple[Flate, ...] = FLATENE) -> Kart:
                 nivaa=nivaa[i],
                 styrke=frozenset(styrke[i]),
                 grunn=frozenset(grunn[i]),
+                merke=frozenset(merke[i]),
+                navn=frozenset(navn[i]),
             )
             for i, r in enumerate(bransje.ruter)
         ]

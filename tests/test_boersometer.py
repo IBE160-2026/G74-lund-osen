@@ -64,6 +64,30 @@ from tallformat import avrundet, tall
 from vurderingsdata import Vurdering
 
 SRC = Path(boersometer.__file__).resolve().parent
+
+
+def _nivaaet(b: float, h: float, symbol: str, klasse: str, bredde: float) -> int:
+    """Tekstnivået, med nivå 4 for en stor rute (gruppens svar 04.11 kl. 22:23, 1).
+    Gruppens svar 05.11 kl. 14:29: bredde er den ruta selv trenger (4), og
+    store ruter finnes bare i STORE_KLASSER (2). Rutene her er ikke gule en
+    annen dag, så merket avgjør ikke nivået."""
+    nivaa = tekstnivaa(b, h, symbol)
+    stor = klasse in boersometer.STORE_KLASSER and b >= bredde and h >= boersometer.STOR[1]
+    return 4 if nivaa == 3 and stor else nivaa
+
+
+def _bredden(symbol: str, styrke: str | None, pille: bool, endring: str) -> float:
+    """Bredden en stor rute trenger, regnet her med tallene fra stil.css og
+    målingen i Edge, ikke med boersometer.stor_bredde (gjennomgangen av svar
+    4, BH1): rammen 2 × 4 og luften 2 × 12, symbolet 22 px med 0,75 em per
+    tegn, 8 px og styrken i 14 px med 0,5 em per tegn og ringen 2 × 2 +
+    2 × 7,2, og endringen i 28 px med 0,62 em per tegn."""
+    topp = 32 + 0.75 * 22 * len(symbol)
+    if styrke is not None:
+        topp += 8 + 0.5 * 14 * len(styrke) + (2 * 2 + 2 * 7.2 if pille else 0)
+    return max(topp, 32 + 0.62 * 28 * len(endring))
+
+
 IDAG = date(2026, 10, 13)
 
 
@@ -304,7 +328,8 @@ class TestSiden:
     def test_knappen_i_stripa_er_fylt_paa_siden(self, klient):
         """Ville feilet hvis knappen manglet, sto et annet sted enn mellom
         «Markedsoversikt» og «Min liste», eller ikke var fylt."""
-        html = _side(klient)
+        # Gruppens svar 04.11 kl. 22:23, 4: ikonene står foran navnet.
+        html = re.sub(r'<svg class="ikon".*?</svg>', "", _side(klient), flags=re.S)
         knapper = re.findall(r'<a class="sideknapp" href="([^"]+)"( aria-current="page")?>([^<]+)</a>', html)
         assert [(href, tekst) for href, _, tekst in knapper] == [
             ("/", "Markedsoversikt"),
@@ -312,7 +337,8 @@ class TestSiden:
             ("/min-liste", "Min liste"),
         ]
         assert [tekst for _, fylt, tekst in knapper if fylt] == ["Børsometer"]
-        assert 'href="/boersometer">Børsometer</a>' in _side(klient, "/")
+        oversikten = re.sub(r'<svg class="ikon".*?</svg>', "", _side(klient, "/"), flags=re.S)
+        assert 'href="/boersometer">Børsometer</a>' in oversikten
 
     def test_snittet_i_overskriften_er_snittet_av_rutene(self, klient):
         """Energi har fire aksjer i demoen. Ville feilet med snittet av bare
@@ -1616,7 +1642,13 @@ class TestKartet:
                     kropp = fh * (1 - f.topp[flate.navn] / 100)
                     for kr in f.ruter:
                         rb, rh = kr.plass[flate.navn].b / 100 * fb, kr.plass[flate.navn].h / 100 * kropp
-                        ventet = tekstnivaa(rb - 2 * KANT, rh - 2 * KANT, kr.rute.aksje.symbol)
+                        ventet = _nivaaet(
+                            rb - 2 * KANT,
+                            rh - 2 * KANT,
+                            kr.rute.aksje.symbol,
+                            klasse,
+                            _bredden(kr.rute.aksje.symbol, "ikke vurdert", False, tall(kr.rute.endring, "endring")),
+                        )
                         assert kr.nivaa[klasse] == ventet, (klasse, kr.rute.aksje.symbol, rb, rh)
                         # Gruppens svar 04.11 kl. 19:21: styrken på nivå 2,
                         # regnet for den samme synlige ruta.
@@ -1624,7 +1656,8 @@ class TestKartet:
                         # ingen styrke, så linja er «ikke vurdert», med sin
                         # egen grense.
                         assert kr.rute.uten_styrke
-                        med_styrke = ventet == 2 and ikke_vurdert_plass(rb - 2 * KANT, rh - 2 * KANT)
+                        # Gruppens svar 04.11 kl. 22:23, 1: en stor rute har styrken øverst.
+                        med_styrke = ventet == 4 or (ventet == 2 and ikke_vurdert_plass(rb - 2 * KANT, rh - 2 * KANT))
                         assert (klasse in kr.styrke) == med_styrke, (klasse, kr.rute.aksje.symbol, rb, rh)
 
     def test_tekstnivaaet_paa_siden_er_det_kartet_regnet(self, klient):
@@ -1657,6 +1690,19 @@ class TestKartet:
             )
         )
         assert uten_styrke and uten_styrke < med_styrke, (uten_styrke, med_styrke)
+        # Gruppens svar 05.11 kl. 14:29, 4: bredden for en stor rute, regnet
+        # av teksten og ringen slik de står på siden.
+        bredder = {}
+        for symbol, endring, styrke in re.findall(
+            r'<span class="ticker">([A-Z0-9]+)</span>\s*<span class="endring">([^<]*)</span>\s*'
+            r'(?:<span class="skjult">, </span><span class="(styrke[^"]*)">[^<]*</span>)?',
+            html,
+        ):
+            tekst = re.search(
+                rf'<span class="ticker">{symbol}</span>.*?<span class="{re.escape(styrke)}">([^<]*)</span>', html, re.S
+            )
+            bredder[symbol] = _bredden(symbol, tekst.group(1) if styrke else None, "pille" in styrke, endring)
+        assert len(bredder) == 15
         sett = set()
         for flate in (BRED, SMAL):
             n = flate.navn
@@ -1667,7 +1713,7 @@ class TestKartet:
                     kropp = fh * (1 - f["topp"][n] / 100)
                     for symbol, p in f["ruter"].items():
                         rb, rh = p[n][2] / 100 * fb, p[n][3] / 100 * kropp
-                        ventet = tekstnivaa(rb - 2 * KANT, rh - 2 * KANT, symbol)
+                        ventet = _nivaaet(rb - 2 * KANT, rh - 2 * KANT, symbol, klasse, bredder[symbol])
                         funnet = re.findall(rf"\bnivaa-{klasse}-(\d)\b", klasser[symbol])
                         assert funnet == [str(ventet)], (klasse, symbol, rb, rh)
                         sett.add((klasse, ventet))
@@ -1676,7 +1722,9 @@ class TestKartet:
                         # Gjennomgangen av svar 2 (VG5): siden er siste
                         # børsdag, så svar 1 om en annen dag gjelder ikke her.
                         plass = ikke_vurdert_plass if symbol in uten_styrke else styrkeplass
-                        med = ventet == 2 and plass(rb - 2 * KANT, rh - 2 * KANT) and symbol in med_styrke
+                        med = symbol in med_styrke and (
+                            ventet == 4 or (ventet == 2 and plass(rb - 2 * KANT, rh - 2 * KANT))
+                        )
                         assert (f"styrke-{klasse}" in klasser[symbol].split()) == med, (klasse, symbol, rb, rh)
                         if med:
                             sett.add((klasse, "styrke"))

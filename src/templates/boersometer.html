@@ -82,7 +82,7 @@
           {%- set rute = kartrute.rute %}
           {#- Gruppens svar 23.10 kl. 09:24 (b): hver rute lenker til aksjesiden,
               også for en aksje uten kurser. #}
-          <li style="{{ plass_stil(kartrute.plass) }}"><a class="rute trinn-{{ rute.fargetrinn or 'ingen' }}{% for navn, nivaa in kartrute.nivaa.items() %} nivaa-{{ navn }}-{{ nivaa }}{% endfor %}{% for navn in kartrute.styrke|sort %} styrke-{{ navn }}{% endfor %}{% for navn in kartrute.grunn|sort %} grunn-{{ navn }}{% endfor %}{% if rute.ramme %} ramme-{{ rute.ramme }}{% endif %}{% if rute.uten_data %} uten-data{% endif %}" href="{{ aksjeadresse(rute.aksje.symbol) }}">
+          <li style="{{ plass_stil(kartrute.plass) }}"><a class="rute trinn-{{ rute.fargetrinn or 'ingen' }}{% for navn, nivaa in kartrute.nivaa.items() %} nivaa-{{ navn }}-{{ nivaa }}{% endfor %}{% for navn in kartrute.styrke|sort %} styrke-{{ navn }}{% endfor %}{% for navn in kartrute.grunn|sort %} grunn-{{ navn }}{% endfor %}{% for navn in kartrute.merke|sort %} merke-{{ navn }}{% endfor %}{% for navn in kartrute.navn|sort %} navn-{{ navn }}{% endfor %}{% if rute.ramme %} ramme-{{ rute.ramme }}{% endif %}{% if rute.uten_data %} uten-data{% endif %}" href="{{ aksjeadresse(rute.aksje.symbol) }}">
             <span class="ticker">{{ rute.aksje.symbol }}</span>
             <span class="endring">{% if rute.endring is not none %}{{ rute.endring|tall('endring') }}{% elif rute.uten_data %}Uten data{% else %}–{% endif %}</span>
             {#- Gruppens svar 04.11 kl. 10:01 og 10:04: styrken står i alle
@@ -95,6 +95,9 @@
             {% if rute.styrke is not none %}<span class="skjult">, </span><span class="styrke{% if dagen == siste and rute.ramme == 'gul' %} pille tre-av-tre{% elif rute.ramme == 'moerk' %} pille to-av-tre{% endif %}">{{ rute.styrke }} av {{ antall_sjekker }}</span>{% elif rute.uten_styrke %}<span class="skjult">, </span><span class="styrke ikke-vurdert">{{ rute.uten_styrke }}</span>{% endif %}
             {% if rute.ramme == "gul" and dagen != siste %}<span class="merke"><span class="skjult">, </span>{{ antall_sjekker }} av {{ antall_sjekker }} siste børsdag</span>{% endif %}
             {% if rute.grunn %}<span class="skjult">, </span><span class="tekst">{{ rute.grunn }}</span>{% endif %}
+            {#- Gruppens svar 04.11 kl. 22:23, 1: navnet står for øyet i store ruter,
+                nivå 4. Skjermleseren leser det i linja under, og stilen setter det under symbolet, så det står bare én gang. #}
+            {% if 4 in kartrute.nivaa.values() %}<span class="navn" aria-hidden="true">{{ rute.aksje.navn }}</span>{% endif %}
             <span class="skjult">, {{ rute.aksje.navn }}{% if rute.fra %}, fra {{ rute.fra|dato }}{% endif %}{% if rute.volumord and not rute.lik_stoerrelse %}, volum {{ rute.volumord }}{% endif %}</span>
           </a></li>
           {%- endfor %}
