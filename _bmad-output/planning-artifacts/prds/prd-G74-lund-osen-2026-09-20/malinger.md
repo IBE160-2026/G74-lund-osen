@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-02T22:26
+updated: 2026-11-05T18:24
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -5862,3 +5862,72 @@ foran.
 
 Målingen endrer ikke universet. Parametrene i signalet er låst og målt på de
 15 (AD-13).
+
+## 54. Prøvekjøringen av prompten versjon 4, for 04.11 (2026-11-05)
+
+**Metode.** Etter gruppens svar 5.11 kl. 16:05 (story 10.4 i `epics.md`, og
+spesifikasjonen 10.2i): alle 75 KI-tekstene i uka 29.10–04.11 gjentok
+regelforklaringen (`spec-10-4-loggdelen.md`), så versjon 4 har én linje til
+blant reglene: «- I tillegg til sjekkene skal teksten si med ord hvordan dagen
+var rundt aksjen: om hovedindeksen og bransjen steg, falt eller var uendret,
+og hvor mange av aksjene i lista som steg og som falt.» Den står foran linja om
+at hovedindeksen og bransjen ikke forklarer signalet, som står. Grunnlaget,
+kontrollen (FR-603) og vakta (NFR-06) er ikke endret. Prompten hadde avtrykket
+`e0306762…d3f7` (`AVTRYKK["4"]`, commit `37fb7c9c`).
+
+Ulikt §43–§49 ble basen ikke kopiert, og ingenting ble skrevet. `data/db/ose.db`
+ble åpnet med `mode=ro`, og de 15 radene i `ki_logg` for 04.11 ga grunnlaget og
+regelforklaringen for hver aksje, de samme som versjon 3 fikk i
+kveldshentingen. Hvert grunnlag gikk gjennom `lag_ki_rad` med Gemma i Ollama
+(modellen, prompten og kontrollen), og så gjennom `bygg_ki_visning` med
+vurderingen fra basen (samsvaret i FR-602 og vakta), fra et skript utenfor
+repoet. Tekstene står bare i scratchpad. Tiden per kall ble tatt med
+`time.monotonic()`. Ingen kall til EODHD: kvoten sto på 0 brukt i dag (GMT) kl.
+18:01. sha256 for `data/db/ose.db` var den samme før og etter
+(`58b893eb…c1be`).
+
+Versjon 3 i uka er de 75 radene fra driften 29.10–04.11, talt og klassifisert
+i `spec-10-4-loggdelen.md`. Klassene i versjon 4 er satt etter regelen der, av
+Claude, ved å lese hver tekst ved siden av regelforklaringen og grunnlaget.
+Klassifiseringen er ikke gjort av en person.
+
+| | Versjon 3, uka 29.10–04.11 (driften) | Versjon 3, 04.11 (driften) | §54, versjon 4, 04.11 |
+|---|---:|---:|---:|
+| Kjørt | kveldshentingene | kveldshentingen | 18:06:36–18:07:08 |
+| Tekster | 75 | 15 | 15 |
+| Besto kontrollen | 75 | 15 | 15 |
+| Stoppet av kontrollen | 0 | 0 | 0 |
+| Modellen feilet | 0 | 0 | 0 |
+| Ville blitt vist (samsvar og vakta) | 75 | 15 | 15 |
+| gjentar | 75 | 15 | 0 |
+| sier mer | 0 | 0 | 15 |
+| usikker | 0 | 0 | 0 |
+| Median tid per tekst | ikke målt | ikke målt | 0,91 s |
+| Lengste kall | ikke målt | ikke målt | 19,07 s (kall nr. 1, det første etter at Ollama ble startet kl. 18:05:45) |
+
+§54: `maskinvare` `gpu` for alle 15, `gemma4:e4b` med `modell_id`
+`dc35e8d9c606`, og Ollama 0.35.1. Alle 15 radene har `promptversjon` 4.
+
+**Resultat.** Kontrollen stoppet ingen av de 15, så det er ingen grunner å
+føre, og alle 15 ville blitt vist. Alle 15 sier mer enn regelforklaringen: de
+forklarer sjekkene først, som versjon 3, og har så en setning om
+dagen, som sier at hovedindeksen falt, om bransjen steg eller falt, og hvor
+mange aksjer i lista som steg og falt. Hver tekst er lest mot grunnlaget:
+hovedindeksen, bransjen og antallene stemmer i alle 15, hver sjekk er
+beskrevet slik fortegnet er, ingen nevner dagene, og ingen sier at
+hovedindeksen eller bransjen forklarer signalet. Åtte skriver antallene med
+sifre og sju med ord. Ingen gir råd eller gjetter på en årsak. 14 av de 15
+bruker den samme formen for setningen om dagen, så teksten er nesten lik for
+aksjene med samme bransje og samme sjekker.
+
+Kontrollen leser «N aksjer steg», men ikke formene modellen brukte, «N aksjer
+som steg» og «falt åtte og steg syv». Der sjekkes bare at tallet er et av
+antallene i grunnlaget (punkt 2), ikke at det står ved riktig felt. Prøvd med
+`kontroller` på grenen: «Det var 8 aksjer som steg og 7 som falt.» besto med
+7 som steg og 8 som falt i grunnlaget, mens «Åtte aksjer steg og syv falt.»
+ble stoppet. Antallene i de 15 tekstene er riktige, lest for hånd. Om
+kontrollen skal lese de formene, avgjør gruppen, fordi kontrollen ikke skulle
+endres i denne instruksjonen.
+
+Det er én kjøring, for én dag, der hovedindeksen falt for alle 15. Tellingen
+gjentas etter noen dager med versjon 4 i driften (svaret 5.11 kl. 16:05).
