@@ -2,7 +2,7 @@
 title: 'Story 8.2 (8.2b): fire ting som i designforslaget (svarene 04.11 kl. 22:23)'
 type: 'feature'
 created: '2026-11-05'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 1
 baseline_commit: '7d2a7321'

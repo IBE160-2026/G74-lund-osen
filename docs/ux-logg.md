@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-11-05T15:46
+updated: 2026-11-05T17:45
 ---
 
 # UX-loggen
@@ -676,3 +676,5 @@ Talt: løst 7, delvis 3, står 34, må ses på siden 1, i alt 45.
 *Lagt til 2026-11-05 kl. 10:49 (PR #111 flettet i `ab18d375`, etter svarene 04.11 kl. 20:53 og 20:56 og 05.11 kl. 09:34 under story 8.2 i `epics.md`):* en gul rute en annen dag viser styrken bare med merket, en rute uten styrke sier «ikke vurdert» der styrken ellers står, og en fotnote under kartet sier at «ikke vurdert» også kan ha en annen grunn, som for kort kurshistorikk, og at grunnen står i tabellen og på aksjesiden.
 
 *Lagt til 2026-11-05 (story 10.4, loggdelen, svarene kl. 12:23 og 12:24 under story 10.4 i `epics.md`):* de 75 KI-tekstene som besto kontrollen i uka 29.10–04.11, er klassifisert etter regelen i `spec-10-4-loggdelen.md`: 75 gjentar regelforklaringen, 0 sier mer og 0 er usikre. KI-teksten la altså ingenting til med ord i den uka. Det er et funn til refleksjonsrapporten, ikke en feil.
+
+*Lagt til 2026-11-05 (PR #112 flettet i `eb492502`, etter svarene 04.11 kl. 22:23 og 05.11 kl. 14:29 under story 8.2 og svarene 05.11 kl. 12:14 og 12:20 ved 3.3f i `epics.md`):* store ruter i børsometeret har symbolet og styrken øverst, navnet under og endringen i stor skrift, med grensen regnet for hver rute og bare fra 1079 px, og en stor gul rute en annen dag viser merket og styrken i stedet for navnet. Under søylene står «Se dagen i Børsometer ›» ved én dag og «Se perioden i Børsometer ›» ved en periode, KI-delen heter «<navnet> kort fortalt», og menyknappene har ikoner. README-en viser toppen av oversikten og har alle bildene av demoen bak knappen. Funnet fra brukertesten venter (8.1).

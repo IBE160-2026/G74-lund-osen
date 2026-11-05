@@ -3631,6 +3631,8 @@ Tidligere avgjørelser som sier noe annet, har fått en datert linje: `designreg
 3. Lenken sier «Se dagen i Børsometer» ved én dag og «Se perioden i Børsometer» ved en periode.
 4. Grensen for store ruter regnes for hver rute, så høye, smale ruter som HVDO og BRFE blir store når alt deres får plass.
 
+*Lagt til 2026-11-05 kl. 17:44:* PR #112 er squash-flettet i `eb492502`, låst til head-en `f9ae2c05` (spesifikasjonen `spec-8-2b-som-designforslaget.md`), med svarene 04.11 kl. 22:23 og 05.11 kl. 14:29, og README-bildene etter svarene 05.11 kl. 12:14 og 12:20. Store ruter har grensen regnet for hver rute og står bare fra 1079 px, en stor gul rute en annen dag viser merket og styrken i stedet for navnet, og lenken sier «Se dagen» eller «Se perioden i Børsometer». Hele settet på `1be0676a`, siste commit med kode: 4072 bestått, 24 hoppet over og 2 porttester for `start.ps1` som feilet. CI var grønn på head-en (42066861195) og på flettecommiten (42067488900), med pytest, docker og dobbeltklikk på macOS og Windows.
+
 ### Story 8.2c: Kursgrafen på smal skjerm
 
 *Lagt til 2026-11-04 (gruppens svar kl. 09:48, spørsmål 8 i `spec-8-2b-funnene-fra-ux-loggen.md`):* «Ekstra, hvis tiden rekker», som 8.4–8.19 (svaret 19.10 kl. 15:43). Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt.
