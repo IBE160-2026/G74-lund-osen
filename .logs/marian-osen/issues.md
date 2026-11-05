@@ -90,3 +90,5 @@
 - [ ] 2026-11-05 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — spørsmål 1 i PR #112 (BH4): en gul rute en annen dag som er stor, men uten plass til merket, viser verken merket eller styrken (LKSV 18.09 ved 1280 px); merket foran navnet, eller ruta liten?
 - [ ] 2026-11-05 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — spørsmål 2 i PR #112: store ruter finnes i demoen bare fra 1079 px; er det som gruppen så for seg?
 - [ ] 2026-11-05 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — spørsmål 3 i PR #112: lenken sier «Se perioden i Børsometer» også når oversikten viser én dag; skal den si «dagen» da?
+- [ ] 2026-11-05 [r29-og-loggdelen-av-10-4](977-2026-11-05-15-49-43-r29-og-loggdelen-av-10-4.md) — funnet fra loggdelen av 10.4 (75 av 75 KI-tekster i uka 29.10–04.11 gjentar regelforklaringen) skal inn i refleksjonsrapporten
+- [ ] 2026-11-05 [r29-og-loggdelen-av-10-4](977-2026-11-05-15-49-43-r29-og-loggdelen-av-10-4.md) — delen av 10.4 med en person venter på brukertesten, og 10-4 står som in-progress til den er tatt
