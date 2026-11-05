@@ -1427,8 +1427,10 @@ HOEYDE_PAA_AKSJESIDEN = 2225
 # Gjennomgangen av svarene 05.11 kl. 14:29: kommentaren om grensen i stil.css og
 # hjelpen om 1079 px i hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Story 10.2i: demotekstene med promptversjon 4, i demo_ki_tekster.json. Bildet ble
-# tatt paa nytt med den nye teksten for BRFE og er 2225 px hoeyt.
-AVTRYKK_BAK_AKSJESIDEN = "4a069d7965f4b8f3a03fb0cf8257cfda106e108f91b74db404ef088451ddfed3"
+# tatt paa nytt med den nye teksten for BRFE og er 2225 px hoeyt. Gjennomgangen av
+# 10.2i (ECH1): demotekstene laget paa nytt; teksten for BRFE er den samme, og
+# bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "e468d4b3dabdf82b50c330a3ad0a41977bb670e67ee55609df2ef4c22f40cbd6"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1463,12 +1465,14 @@ DE_NYE_BILDENE = {
 # boersometer.py (STORSYMBOL_EM). Bildene ble tatt paa nytt og er byte for byte de samme.
 # Story 10.2i: demotekstene med promptversjon 4, i demo_ki_tekster.json. Bildene ble tatt
 # paa nytt: ved 1280 px byte for byte de samme, og ved 390 px piksel for piksel.
+# Gjennomgangen av 10.2i (ECH1): demotekstene laget paa nytt. Bildene ved 1280 px
+# ble tatt paa nytt og er byte for byte de samme; 390 px er samme side og ikke tatt paa nytt.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
     TOPPEN_AV_OVERSIKTEN: "ef7f45bcc548ce44c5497a2d25d01bf53109d5eb36f0ec80e34b19c381a82cda",
-    "docs/appen/boersometeret-demo.png": "ad9106e8d9ba23abbced1381ead375ce5d6ac930ec254d608746d31e94880229",
-    "docs/appen/min-liste-demo.png": "f266482a969d3d78458dce9237c66639159a705166576b48a9c8114e0a55af05",
+    "docs/appen/boersometeret-demo.png": "90159c861b506821cb27a0e7bcf97b6503e4335cb01dec39f577c64952226ad0",
+    "docs/appen/min-liste-demo.png": "db171182ff0296fd61dc13c309ff8eb8ddf3e57f8b012494d5e27d1e1406a5da",
     "docs/appen/oversikten-390-demo.png": "ef7f45bcc548ce44c5497a2d25d01bf53109d5eb36f0ec80e34b19c381a82cda",
-    "docs/appen/boersometeret-390-demo.png": "ad9106e8d9ba23abbced1381ead375ce5d6ac930ec254d608746d31e94880229",
+    "docs/appen/boersometeret-390-demo.png": "90159c861b506821cb27a0e7bcf97b6503e4335cb01dec39f577c64952226ad0",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "

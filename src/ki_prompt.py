@@ -90,6 +90,13 @@ dagen var rundt aksjen, ut fra hovedindeksen, bransjen og antallene som steg
 og falt. Alle andre regler staar, og grunnlaget, kontrollen (FR-603) og
 vakta (NFR-06) er ikke endret. Versjonen er 4, fordi ose.db har tekster med
 versjon 3 (svaret 25.10 kl. 20:54 b).
+
+Versjon 4 rettet (gjennomgangen av 10.2i, ECH1 og BH3): linja krevde
+hovedindeksen og bransjen ogsaa naar feltet mangler, mot linjene over om at
+teksten ikke sier noe om et felt som mangler. Linja sier naa «når feltet står
+i opplysningene». Versjonen staar som 4, fordi ingen tekst i ose.db er laget
+med versjon 4 ennaa, og avtrykket, demotekstene og proevekjoeringen
+(malinger.md §54) er laget paa nytt.
 """
 
 import json
@@ -119,7 +126,7 @@ Regler for teksten:
 - Når retningen er Ingen, skriv at signalet ikke har noen retning.
 - Bruk bare opplysningene under. Skriv utslagene med ord, ikke som tall. Ikke nevn kurser, prosenter eller andre tall enn antallene i opplysningene og regelens faste tall.
 - Siden viser kursen, endringen og målingene. Du kan vise til dem, for eksempel «se endringen i tabellen», men ikke gjenta tallene.
-- I tillegg til sjekkene skal teksten si med ord hvordan dagen var rundt aksjen: om hovedindeksen og bransjen steg, falt eller var uendret, og hvor mange av aksjene i lista som steg og som falt.
+- I tillegg til sjekkene skal teksten si med ord hvordan dagen var rundt aksjen: om hovedindeksen og bransjen steg, falt eller var uendret, når feltet står i opplysningene, og hvor mange av aksjene i lista som steg og som falt.
 - Hovedindeksen og bransjen er ikke en del av regelen. Ikke si at de forklarer signalet.
 - Ikke si hvor lenge signalet har vart, om det er nytt, eller om det er første gang. Siden sier under teksten hvor lenge signalet har vart.
 - Ikke gi råd om å kjøpe, selge eller holde, og ikke si noe om hva som vil skje.

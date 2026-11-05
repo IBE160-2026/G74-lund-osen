@@ -54,7 +54,9 @@ AVTRYKK = {
     "3": "ec16642676123e3730c7e8dbd66c03f282a6f77b9ac8fa121b8dc023f97522d5",
     # Story 10.2i, gruppens svar 5.11 kl. 16:05: linja om hvordan dagen var
     # rundt aksjen. Teksten til versjon 3 staar i src/ki_prompt.py paa 72250544.
-    "4": "e03067628b2aa494910a82a7672efb0d1ac6f83e3521ea4e25ed9a989e8fd3f7",
+    # Gjennomgangen av 10.2i (ECH1, BH3): «når feltet står i opplysningene», og
+    # versjonen staar som 4 (ingen tekst i ose.db med versjon 4). Var e0306762....
+    "4": "0df61d8fa2b5a6f8764756f3e338c575bf9682ebaac6e2bc0450a7860adcc825",
 }
 
 
@@ -152,10 +154,12 @@ class TestPrompten:
 
     def test_versjon_4(self):
         """Story 10.2i, gruppens svar 5.11 kl. 16:05 (var versjon 3 fra
-        10.2e). Ville feilet hvis prompten ble endret uten ny versjon, eller
-        avtrykket for versjon 3 ble satt paa nytt i stedet."""
+        10.2e). Ville feilet hvis versjonen ikke var 4, eller avtrykket for
+        versjon 4 var det samme som for versjon 3. At en endret prompt faar ny
+        versjon, fanger test_versjonen_foelger_teksten (gjennomgangen, BH12,
+        ECH7)."""
         assert PROMPTVERSJON == "4"
-        assert AVTRYKK["4"] == "e03067628b2aa494910a82a7672efb0d1ac6f83e3521ea4e25ed9a989e8fd3f7"
+        assert AVTRYKK["4"] == "0df61d8fa2b5a6f8764756f3e338c575bf9682ebaac6e2bc0450a7860adcc825"
         assert AVTRYKK["4"] != AVTRYKK["3"]
 
     def test_teksten_sier_hvordan_dagen_var_rundt_aksjen(self):
@@ -163,10 +167,13 @@ class TestPrompten:
         29.10-04.11 gjentok regelforklaringen (spec-10-4-loggdelen.md).
         Ville feilet hvis linja ble tatt ut av reglene, ikke kom med i
         prompten, med eller uten merket, eller kom etter linja om at
-        hovedindeksen og bransjen ikke forklarer signalet, som skal staa."""
+        hovedindeksen og bransjen ikke forklarer signalet, som skal staa.
+        Gjennomgangen (ECH1, BH3): ville ogsaa feilet hvis linja krevde
+        hovedindeksen og bransjen uten forbeholdet om at feltet kan mangle."""
         linja = (
             "- I tillegg til sjekkene skal teksten si med ord hvordan dagen var rundt aksjen: om hovedindeksen "
-            "og bransjen steg, falt eller var uendret, og hvor mange av aksjene i lista som steg og som falt."
+            "og bransjen steg, falt eller var uendret, når feltet står i opplysningene, og hvor mange av aksjene "
+            "i lista som steg og som falt."
         )
         ikke_forklarer = "- Hovedindeksen og bransjen er ikke en del av regelen. Ikke si at de forklarer signalet."
         reglene = REGLER.split("Regler for teksten:\n", 1)[1].splitlines()
