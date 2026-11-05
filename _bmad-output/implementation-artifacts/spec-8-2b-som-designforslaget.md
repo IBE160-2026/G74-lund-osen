@@ -61,6 +61,8 @@ Instruksjonen sier «tabellikon», og svaret i `epics.md` sier «rutenett». Iko
 
 **Merket og grunnen** står der de får plass (`_stor_linjer`): merket først, med `_linjer` på 14 px, og grunnen under det bare når merket står eller ikke trengs. En annen dag står styrken i en gul rute bare med merket, som på nivå 2 (svaret 04.11 kl. 20:53 og 20:56, 1). Rutene får klassen `merke-N` i tillegg.
 
+*Rettet 05.11 etter gjennomgangen (ECH1, BH3, ECH3), i `36c53166`:* merket står i halvfet skrift og regnes nå alltid som to linjer, som i `grunnplass`, ikke med `_linjer` på 0,5 em. En rute er stor bare når også endringen slik den vises får plass i 28 px halvfett (`_stor_endring_plass`), fordi en endring over en periode kan ha flere tegn enn «Uten data».
+
 **Hjelpen og `docs/hjelp.md`** sier at de største rutene har symbolet og styrken øverst, navnet under og endringen i stor skrift nederst.
 
 **I demoen** er rutene store bare i klassen `bredest`, fra 1079 px: siste børsdag SLVP, KVST, LKSV og TRHF; ved en periode og 18.09 og 01.09 BLGT, LSTF, LKSV og TROY. I `bred`, `smal` og `smalest` er ingen rute 193 px bred.
@@ -110,3 +112,30 @@ Første kjøring før svar 1 og før svar 4 feilet også fordi endringene ikke v
 1. **En gul rute en annen dag uten plass til merket** (følger av svar 1 og svaret 04.11 kl. 20:53 og 20:56, 1). LKSV 18.09 er stor ved 1280 px, men merket «3 av 3 siste børsdag» får ikke plass mellom navnet og endringen. Da står verken merket eller styrken («ikke vurdert»), bare symbolet, navnet og endringen. Skal det være slik, eller skal merket gå foran navnet, eller ruta bli liten (nivå 3) når merket ikke får plass?
 2. **Store ruter bare fra 1079 px.** Med grensen 193 × 107 er ingen rute stor under 1079 px i demoen, og på 390 px er alle små. Er det som gruppen så for seg?
 3. **Teksten på lenken** er «Se perioden i Børsometer ›» også når oversikten viser siste børsdag eller en valgt dag, som svaret sier. Skal den si «dagen» da?
+
+## Gjennomgangen 05.11 kl. 13:30
+
+På diffen `7d2a7321..3cc34200`, etter hele settet, med Blind Hunter (BH, 15 funn), Edge Case Hunter (ECH, 4) og Verification Gap (VG, 5), hver for seg. Rettingene står i `36c53166`. Hele settet før den: 4054 bestått, 24 hoppet over og 6 porttester for `start.ps1` som feilet. De 100 målingene i Edge ble gjort på nytt kl. 13:35, uten tekst utenfor ruta og uten vannrett rulling, og bildene i `docs/appen/` er byte for byte de samme.
+
+| Funn | Alvorlighet | Hva | Avgjort |
+|---|---|---|---|
+| BH1 | høy | «?» kunne peke på et vindu som ikke finnes | Avvist: `ki_vises` settes inne i `{% if detalj.sjekker %}`, så vilkåret for knappen og vinduet er det samme. Ingen funn står på høy. |
+| BH2 | middels | Hjelpen nevnte ikke merket for en aksje utenfor de 15, og sa «ga utslag» om fortegnet | Rettet: «ga +1, 0 eller -1» og merket, med kilden `UTENFOR_MAALINGEN` |
+| BH3, ECH3 | middels, lav | En lang endring over en periode får ikke plass i 28 px | Rettet: `_stor_endring_plass`, test med «+1 234,56 %» |
+| BH4 | middels | En gul rute en annen dag uten plass til merket viser verken merket eller styrken | Åpent, spørsmål 1 til gruppen. Følger av svar 1 og svaret 04.11 kl. 20:53 og 20:56, 1. |
+| BH5 | middels | `velg` uten dag ga `/boersometer?periode=velg` uten dag | Rettet: da får lenken ingen periode, og børsometeret viser siste børsdag |
+| BH6, VG5 | lav | Ingen test av lenken uten stiplet linje | Rettet: test i `test_app.py` |
+| BH7 | middels | `_nivaaet` i testene bruker `storplass` | Avvist: grensen selv er testet med faste tall i `test_storplass` (193 og 192, 107 og 106), og M1 ble fanget |
+| BH8 | lav | Ringen i den øverste raden | Avvist: ringen er 22,4 px høy og lavere enn symbolet, 26,4 px, og «3 av 3» i ring (60,4 px) er smalere enn «ikke vurdert» (84 px), som grensen er regnet for |
+| BH9, VG4 | lav, middels | Ingen test av at hver klasse står i riktig `@container` for nivå 4 | Rettet: `test_nivaa_4_staar_i_grensen_klassen_er_regnet_for` |
+| BH10 | lav | De skjulte spennene i rutenettet | Avvist: `.skjult` og de skjulte elementene har `position: absolute`, og ruta har `position: absolute`, så de står ikke i rutenettet |
+| BH11 | lav | Etiketten «Hjelp: KI-teksten» | Rettet: «Hjelp: kort fortalt». Knappen står i overskriften som ved «Hvorfor signalet ble» og «Kursutvikling». |
+| BH12 | lav | Navnet i alle ruter | Rettet: bare i ruter som er store i minst én klasse |
+| BH13, ECH4, VG1 | lav, lav, middels | Faste tall i testen, ingen test av grunnen på nivå 4 | Rettet: høydene regnes fra konstantene, med grunnen med og uten merket |
+| BH14 | lav | Samme regex for ikonene i tre testfiler | Står: tre linjer, ingen felles hjelper i conftest.py for dette |
+| BH15 | lav | Hjelpen sier ikke at store ruter bare finnes i et bredt vindu | Avvist: om ruta er stor, avgjøres av størrelsen, ikke av vinduet. At det i demoen bare skjer fra 1079 px, er spørsmål 2. |
+| ECH1 | middels | Merket regnet med 0,5 em, men står i halvfet skrift | Rettet, se Rettet-linja under svar 1 |
+| ECH2 | lav | Ingen lenke når ingen aksje har søyle | Står: da står ingen søyler og ingen forklaring, og lenken hører til søylene |
+| VG2 | middels | `annen_grunn_i_kartet` med nivå 4 uten test | Rettet: `test_fotnoten_for_en_annen_grunn_paa_nivaa_4` |
+| VG3 | middels | Ingen test av at `kart()` fyller `merke` | Rettet: `test_kartet_og_siden_har_merket_i_en_stor_rute` |
+
