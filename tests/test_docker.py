@@ -1120,7 +1120,9 @@ HOEYDE_PAA_BILDET = 1864
 # Gruppens svar 04.11 kl. 22:23, 2: lenken til boersometeret under soeylene, i
 # _hovedindeks.html, hjelpetekster.py og stil.css. Bildet ble tatt paa nytt
 # med lenken; bunnen av raden er fortsatt 1864 px, maalt i Edge.
-AVTRYKK_BAK_BILDET = "53500c0ef42d5affd67712490316f059d16af0d455885560d71be0cc9afa82b2"
+# Gruppens svar 04.11 kl. 22:23, 3: hjelpen ved KI-delen, i hjelpetekster.py.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "0e30d7fbd73afec73ecd4d1d2ebbe079b646feafc5d482e058599f35272e0fc0"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1391,7 +1393,10 @@ HOEYDE_PAA_AKSJESIDEN = 2198
 # hjelpetekster.py og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Gruppens svar 04.11 kl. 22:23, 2: lenken under soeylene, i hjelpetekster.py
 # og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "fe688fb48f3c8cb3c304ad035eebdd8e4da42bbf6bd237c15dcc938b9989b55e"
+# Gruppens svar 04.11 kl. 22:23, 3: «<navnet> kort fortalt» med «?», i aksje.html
+# og hjelpetekster.py. Bildet ble tatt paa nytt med den nye overskriften;
+# bunnen av p.dagene er fortsatt 2198 px, maalt i Edge.
+AVTRYKK_BAK_AKSJESIDEN = "2a30ef18059ea097ef8e0eb6051f909c48ed4f7d55f0e996b695b5189a39c322"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "

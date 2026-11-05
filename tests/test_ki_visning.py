@@ -192,8 +192,8 @@ class TestSiden:
         Story 8.2b, c (U66): etter grafen og foer historikken."""
         skriv_kirad(kirad(aksje))
         html = side(klient)
-        assert html.index("Hvorfor signalet ble") < html.index("Kursutvikling") < html.index("Med KI-ens ord")
-        assert html.index("Med KI-ens ord") < html.index("Signalet dag for dag")
+        assert html.index("Hvorfor signalet ble") < html.index("Kursutvikling") < html.index("kort fortalt")
+        assert html.index("kort fortalt") < html.index("Signalet dag for dag")
         assert TEKST in html
         assert "Laget av KI · gemma4:e4b, lokal." in html
 
@@ -239,7 +239,7 @@ class TestSiden:
         """FR-601: av og paa kan sammenlignes, og bryteren er synlig."""
         skriv_kirad(kirad(aksje))
         av = side(klient, "av")
-        assert "Med KI-ens ord" not in av and TEKST not in av
+        assert "kort fortalt" not in av and TEKST not in av
         # Story 8.2b, c (U33): en bryter med «KI-tekst» og «Av» eller «På».
         assert 'role="switch" aria-checked="false"' in av and '<span class="verdi" aria-hidden="true">Av</span>' in av
         paa = side(klient, "paa")
@@ -257,7 +257,7 @@ class TestSiden:
         skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET), vurdert=False)
         skriv_vurdering("EQNR", rader[-1].dato, Grunn.KURS_IKKE_FRA_DAGEN)
         html = side(klient)
-        assert "Med KI-ens ord" not in html and "ki-bryter" not in html.split("</head>", 1)[1]
+        assert "kort fortalt" not in html and "ki-bryter" not in html.split("</head>", 1)[1]
 
     def test_en_logg_som_ikke_kan_leses_gir_en_dag_uten_tekst(self, klient, aksje, monkeypatch):
         """NFR-04: for eksempel en base fra foer 0005."""
@@ -433,7 +433,7 @@ class TestGrunnenPaaSiden:
     def test_bryteren_av_viser_ingen_grunn(self, klient, aksje):
         skriv_kirad(kirad(aksje, emne=Emne.aksje("DNB", aksje)))
         html = side(klient, "av")
-        assert DAGEN not in html and AKSJEN not in html and "Med KI-ens ord" not in html
+        assert DAGEN not in html and AKSJEN not in html and "kort fortalt" not in html
 
     def test_siden_leser_bare(self, klient, aksje):
         """AD-10: aksjesiden skriver ingenting i KI-loggen."""
@@ -654,7 +654,7 @@ class TestSetningenOmDagene:
         setning = '<p class="dagene">Signalet har vært slik i 4 børsdager på rad.</p>'
         assert setning in html
         # Story 8.2b, c (U46): bryteren står øverst i rammen.
-        assert html.index("Med KI-ens ord") < html.index("ki-bryter") < html.index(TEKST) < html.index(setning)
+        assert html.index("kort fortalt") < html.index("ki-bryter") < html.index(TEKST) < html.index(setning)
 
     def test_en_dag_paa_siden(self, klient, aksje):
         """Ville feilet hvis en annen vurdering dagen foer ikke ga «Signalet

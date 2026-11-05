@@ -53,6 +53,10 @@ AKSJE_MAL = "src/templates/aksje.html"
 PERIODER = "src/perioder.py"
 PERIODE_MAL = "src/templates/_perioder.html"
 HISTORIKK = "src/historikk.py"
+# Gruppens svar 04.11 kl. 22:23, 3: hjelpen ved KI-delen, slått opp her.
+KI_GRUNNLAG = "src/ki_grunnlag.py"
+KI_KONTROLL = "src/ki_kontroll.py"
+KI_VISNING = "src/ki_visning.py"
 
 # FR-701: tre sjekker, ingen fjerde.
 ANTALL_SJEKKER = 3
@@ -559,6 +563,27 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (AKSJE_MAL, '<p class="maalt">Målt mot'),
                 (AKSJE_MAL, '<div class="skala" aria-hidden="true">'),
                 (AKSJEDETALJ, "def bygg_skala("),
+            ),
+        ),
+        # Gruppens svar 04.11 kl. 22:23, 3: hva teksten er, hva modellen fikk
+        # (ki_grunnlag.py), at tallene med prikket strek er sjekket, og at
+        # den ikke gir råd.
+        "ki_kort_fortalt": Hjelpetekst(
+            "Kort fortalt:",
+            "en kort tekst om signalet for aksjen den dagen, skrevet av en språkmodell og merket "
+            "«Laget av KI» med navnet på modellen. Modellen fikk bare det appen har regnet ut: om hver "
+            "av sjekkene ga utslag, styrken og retningen, hvor mange aksjer i lista som steg og "
+            "falt, og om hovedindeksen og bransjen steg eller falt når det kan regnes, men ingen kurser, "
+            "prosenter eller volumer. Tallene med prikket strek er sjekket mot det før teksten vises, "
+            "og teksten gir ikke råd.",
+            (
+                (KI_GRUNNLAG, "def ki_grunnlag("),
+                (KI_GRUNNLAG, "kurser, volumer, prosenter eller forholdstall, og ingen maalinger"),
+                (KI_GRUNNLAG, 'ANTALLENE = ("styrke", "aksjer_steg", "aksjer_falt")'),
+                (KI_GRUNNLAG, 'VALGFRIE = frozenset(("merke", "hovedindeksen", "bransjen"))'),
+                (KI_VISNING, "def prikkede_tall("),
+                (KI_KONTROLL, "3. Raad."),
+                (AKSJE_MAL, "Laget av KI ·"),
             ),
         ),
         "ikke_raad": Hjelpetekst(

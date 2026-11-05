@@ -214,3 +214,45 @@ def test_lenken_er_halvfet():
     regel = _regel(".soeyler .soeylefot .til-boersometer")
     assert "font-weight: 600" in regel and "auto" in regel
     assert "justify-content: space-between" in _regel(".soeyler .soeylefot")
+
+
+# --- Svar 3: «<navnet> kort fortalt» på aksjesiden ----------------------------
+
+
+def test_ki_delen_heter_navnet_kort_fortalt(klient):
+    """Svar 3: overskriften er «<navnet> kort fortalt» med «?», og «Laget av
+    KI» står som før. Ville feilet med «Med KI-ens ord», uten navnet, uten
+    «?» eller uten merket."""
+    html = _html(klient, "/aksje/BRFE")
+    ki = html.split('<section class="ki"', 1)[1].split("</section>", 1)[0]
+    assert 'aria-labelledby="ki-tittel"' in ki.split(">", 1)[0]
+    tittel = ki.split("<h2>", 1)[1].split("</h2>", 1)[0]
+    assert tittel.startswith('<span id="ki-tittel">Brattfjell Energi kort fortalt</span> ')
+    assert 'popovertarget="hjelp-ki"' in tittel
+    assert '<p class="merke-ki">Laget av KI · ' in ki
+    assert "Med KI-ens ord" not in html
+    assert 'id="hjelp-ki"' in html
+
+
+def test_overskriften_er_i_newsreader():
+    """Svar 3: overskriften står i Newsreader, som de andre. Ville feilet
+    hvis KI-delen fikk en annen skrift."""
+    assert re.search(r'(?:^|\n)h1, h2 \{ font-family: "Newsreader"', STIL)
+    assert "font-family" not in _regel(".ki h2")
+
+
+def test_hjelpen_ved_ki_delen():
+    """Svar 3: hjelpen sier hva teksten er, hva modellen fikk, slått opp i
+    ki_grunnlag.py, at tallene med prikket strek er sjekket, og at den ikke
+    gir råd. Ville feilet hvis en av de fire delene manglet, eller hjelpen
+    sa at modellen fikk kurser."""
+    from hjelpetekster import KI_GRUNNLAG, hjelpetekster
+
+    tekst = hjelpetekster()["ki_kort_fortalt"]
+    for del_ in ("skrevet av en språkmodell", "«Laget av KI»", "Modellen fikk bare", "prikket strek er sjekket"):
+        assert del_ in tekst.tekst, del_
+    assert "gir ikke råd" in tekst.tekst and "ingen kurser, prosenter eller volumer" in tekst.tekst
+    assert any(fil == KI_GRUNNLAG for fil, _ in tekst.kilder)
+    hjelp = (Path(__file__).resolve().parent.parent / "docs" / "hjelp.md").read_text(encoding="utf-8")
+    avsnitt = hjelp.split("### Hva er «kort fortalt» på aksjesiden?")[1].split("\n#")[0]
+    assert "prikket strek er sjekket" in avsnitt and "gir ikke råd" in avsnitt

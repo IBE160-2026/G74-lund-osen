@@ -3765,7 +3765,7 @@ class TestStory816bDagenPaaHeleSiden:
         assert ventet in toppen
         assert "Signalstyrke ? – Retning ? – Ukjent" in toppen
         assert "Hvorfor signalet ble ukjent" in toppen and "Sjekk 1" not in toppen
-        assert "Med KI-ens ord" not in toppen
+        assert "kort fortalt" not in toppen
 
     def test_en_loerdag_har_ingen_sluttkurs_og_ingen_endring(self, klient):
         """Ville feilet hvis lørdagen viste kursen fra fredagen før eller fra

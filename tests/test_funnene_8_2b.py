@@ -326,7 +326,7 @@ def test_bryteren_staar_i_rammen_som_en_bryter(klient):
     html = _html(klient, "/aksje/BRFE")
     ki = html.split('<section class="ki"', 1)[1].split("</section>", 1)[0]
     topp = ki.split('<div class="ki-topp">', 1)[1].split("</form>", 1)[0]
-    assert "<h2>Med KI-ens ord</h2>" in topp and 'role="switch" aria-checked="true"' in topp
+    assert "kort fortalt</span>" in topp and 'role="switch" aria-checked="true"' in topp
     assert '<span class="navn">KI-tekst</span>' in topp and '<span class="verdi" aria-hidden="true">På</span>' in topp
     assert html.count('class="ki-bryter"') == 1
     # Gjennomgangen (VG1): gult heter også oransje og baand-ut i stilen.
@@ -345,7 +345,7 @@ def test_med_ki_av_staar_bare_bryteren(klient):
     hvis rammen eller tittelen sto med KI av."""
     klient.set_cookie(app_modul.KAPSEL, "av")
     html = _html(klient, "/aksje/BRFE")
-    assert '<section class="ki"' not in html and "Med KI-ens ord" not in html
+    assert '<section class="ki"' not in html and "kort fortalt" not in html
     assert re.search(rf'<form class="ki-bryter" id="{app_modul.KI_ANKER}"[^>]*>', html)
     assert 'role="switch" aria-checked="false"' in html and '<span class="verdi" aria-hidden="true">Av</span>' in html
 
