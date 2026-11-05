@@ -3005,6 +3005,8 @@ uten KI. 5B.4 måler KI-tillegget. Blandes de, vet ingen hva som ble målt.
 
 *Avgjort 2026-11-05 kl. 12:23 og 12:24 (gruppens svar):* uka som teller for «Én ukes drift er logget», er 29.10–04.11, de sju første dagene jobben gikk av seg selv. Den og loggdelen av 10.4 telles før brukertesten. Delen med en person venter på brukertesten.
 
+*Lagt til 2026-11-05 (loggdelen, svarene kl. 12:23 og 12:24):* loggdelen er talt for uka 29.10–04.11 i `spec-10-4-loggdelen.md`. Av 75 KI-tekster som besto kontrollen, gjentar alle 75 regelforklaringen, 0 sier mer og 0 er usikre. Det er et funn til refleksjonsrapporten, ikke en feil. Delen med en person venter på brukertesten, så 10-4 står som `in-progress`.
+
 ### Story 10.5: Lenke til selskapets side på NewsWeb
 
 *Lagt til 2026-09-28, med plan B.*

@@ -202,7 +202,9 @@ development_status:
   10-3-visningen-i-aksjedetaljen: done
   # Fra 2026-10-19 (endringsforslaget 2026-10-19, gruppens svar kl. 15:43): 10-4, 10-5 og 10-7 er v1.
   # Ekstra, hvis tiden rekker: 10-6 og 10-8. Briefen v8 lover dem ikke.
-  10-4-måle-bidraget-egen-brukertest-etter-8-1: ready-for-dev
+  # 2026-11-05 (svarene kl. 12:23 og 12:24): loggdelen er talt for uka 29.10-04.11 (spec-10-4-loggdelen.md),
+  # og delen med en person venter paa brukertesten. Derfor in-progress.
+  10-4-måle-bidraget-egen-brukertest-etter-8-1: in-progress
   # 10-5 er lenken til selskapets investorside, ikke NewsWeb (2026-10-06). Navnet staar.
   10-5-lenke-til-selskapets-side-på-newsweb: done
   10-6-ki-teksten-om-dagen-på-forsiden: backlog
