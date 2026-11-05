@@ -375,6 +375,12 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) .soeyler .linjeprove.ned { border-top-color: var(--ned); }
 :where(.side-oversikt) .soeyler .linjeforklaring .opp { color: var(--opp); font-weight: 600; }
 :where(.side-oversikt) .soeyler .linjeforklaring .ned { color: var(--ned); font-weight: 600; }
+/* Gruppens svar 04.11 kl. 22:23, 2: «Se perioden i Børsometer ›» til høyre
+   for forklaringen av den stiplede linja, i halvfet skrift. Er det ikke
+   plass, går lenken ned på neste linje. */
+:where(.side-oversikt) .soeyler .soeylefot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.25rem 1rem; }
+:where(.side-oversikt) .soeyler .soeylefot .til-boersometer { margin: 0.5rem 0 0 auto; font-size: 14px; font-weight: 600; color: var(--blekk); }
+:where(.side-oversikt) .soeyler .soeylefot .til-boersometer:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
 :where(.side-oversikt) .soeyler .soeylefarger { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem;
                          font-size: 14px; color: var(--dempet); margin: 0.5rem 0 0; }
 :where(.side-oversikt) .soeyler .fargeprove { display: inline-block; width: 10px; height: 14px; border-radius: 2px; }

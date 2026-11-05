@@ -1117,7 +1117,10 @@ HOEYDE_PAA_BILDET = 1864
 # Bildet ble tatt paa nytt og er byte for byte det samme.
 # Gruppens svar 04.11 kl. 22:23, 1: store ruter i boersometeret, i
 # hjelpetekster.py og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "3e0d2510376f9fd4836d67f573d052404151145e1d0e672c7b57871f8f2fd760"
+# Gruppens svar 04.11 kl. 22:23, 2: lenken til boersometeret under soeylene, i
+# _hovedindeks.html, hjelpetekster.py og stil.css. Bildet ble tatt paa nytt
+# med lenken; bunnen av raden er fortsatt 1864 px, maalt i Edge.
+AVTRYKK_BAK_BILDET = "53500c0ef42d5affd67712490316f059d16af0d455885560d71be0cc9afa82b2"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1386,7 +1389,9 @@ HOEYDE_PAA_AKSJESIDEN = 2198
 # stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Gruppens svar 04.11 kl. 22:23, 1: store ruter i boersometeret, i
 # hjelpetekster.py og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "18ba5ed1c7d6d9e709a6c8a2432f17d4e24724d8ff7803233b3de41d745ab724"
+# Gruppens svar 04.11 kl. 22:23, 2: lenken under soeylene, i hjelpetekster.py
+# og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "fe688fb48f3c8cb3c304ad035eebdd8e4da42bbf6bd237c15dcc938b9989b55e"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "

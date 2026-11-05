@@ -166,3 +166,51 @@ def test_store_ruter_i_stilen():
         assert skjul and "clip: rect(0 0 0 0)" in skjul.group(1)
         assert f".rute.nivaa-{klasse}-4:not(.merke-{klasse}) > .merke" in STIL
         assert f".rute.nivaa-{klasse}-4:not(.grunn-{klasse}) > .tekst" in STIL
+
+
+# --- Svar 2: lenken til børsometeret under søylene ----------------------------
+
+
+def _soeylefot(html: str) -> str:
+    return html.split('<div class="soeylefot">', 1)[1].split("</div>", 1)[0]
+
+
+@pytest.mark.parametrize(
+    ("oversikt", "boersometer"),
+    [
+        ("/", "/boersometer?periode=siste"),
+        ("/?periode=1-mnd", "/boersometer?periode=1-mnd"),
+        ("/?periode=velg&dag=2026-10-05", "/boersometer?periode=velg&amp;dag=2026-10-05"),
+    ],
+)
+def test_lenken_til_boersometeret_har_samme_periode(klient, oversikt, boersometer):
+    """Svar 2: under søylene, til høyre for «Stiplet linje: hovedindeksen»,
+    står «Se perioden i Børsometer ›» med samme periode eller dag. Ville
+    feilet uten lenken, med lenken foran forklaringen, eller med en annen
+    periode eller dag i adressen."""
+    fot = _soeylefot(_html(klient, oversikt))
+    lenke = f'<a class="til-boersometer" href="{boersometer}">Se perioden i Børsometer <span aria-hidden="true">›</span></a>'
+    assert lenke in fot, fot
+    assert fot.index("Stiplet linje: hovedindeksen") < fot.index(lenke)
+
+
+@pytest.mark.parametrize(
+    ("oversikt", "ventet"),
+    [
+        ("/?periode=1-mnd", 'href="/boersometer?periode=1-mnd" aria-current="true"'),
+        ("/?periode=velg&dag=2026-10-05", "mandag 05.10"),
+    ],
+)
+def test_lenken_aapner_boersometeret_med_samme_periode(klient, oversikt, ventet):
+    """Svar 2: lenken åpner børsometeret med perioden eller dagen fra
+    oversikten. Ville feilet hvis børsometeret viste siste børsdag i stedet."""
+    adresse = re.search(r'class="til-boersometer" href="([^"]+)"', _html(klient, oversikt)).group(1)
+    assert ventet in _html(klient, adresse.replace("&amp;", "&"))
+
+
+def test_lenken_er_halvfet():
+    """Svar 2: lenken står i halvfet skrift, til høyre. Ville feilet med
+    vanlig skrift eller uten margin-left: auto."""
+    regel = _regel(".soeyler .soeylefot .til-boersometer")
+    assert "font-weight: 600" in regel and "auto" in regel
+    assert "justify-content: space-between" in _regel(".soeyler .soeylefot")

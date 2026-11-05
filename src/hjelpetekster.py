@@ -241,9 +241,12 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "Den stiplede linja er indeksen, grønn når den steg, rød når den falt "
             "og grå ved 0,00 %. "
             # Story 8.2a, c (U20): symbolet over søyla er en lenke.
-            "Et gult bransjesymbol betyr 3 av 3 siste børsdag, og et klikk på symbolet viser aksjen.",
+            "Et gult bransjesymbol betyr 3 av 3 siste børsdag, et klikk på symbolet viser aksjen, "
+            # Gruppens svar 04.11 kl. 22:23, 2: lenken til børsometeret.
+            "og «Se perioden i Børsometer» under søylene åpner børsometeret med samme periode eller dag.",
             (
                 (PRD, "#### FR-105 — Søylene under hovedindeksen"),
+                (HOVEDINDEKS_MAL, 'class="til-boersometer"'),
                 (HOVEDINDEKS_MAL, '<a class="etikett'),
                 (PRD, "Indeksens endring er en stiplet linje, grønn når indeksen steg og rød når den"),
                 (HOVEDINDEKS, "def bygg_soeyler("),
