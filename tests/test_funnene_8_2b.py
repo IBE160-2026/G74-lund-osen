@@ -805,3 +805,45 @@ def test_klassen_for_styrken_bare_paa_ruter_med_styrke(klient):
             if not re.search(r'<span class="styrke[^"]*">\d av 3</span>', rute):
                 assert "styrke-" not in rute, (adresse, symbol)
         assert any("styrke-" in r for r in ruter.values())
+
+
+# --- Gruppens svar 04.11 kl. 20:53 og 20:56 -----------------------------------
+
+
+def test_styrkelinje_en_annen_dag_med_gul_ramme():
+    """Svar 1: en annen dag viser en rute med gul ramme styrken bare når
+    merket «3 av 3 siste børsdag» også får plass, og merket står bare på
+    nivå 3. Ville feilet hvis en gul rute en annen dag fikk styrken på nivå 2,
+    eller hvis siste børsdag og ruter uten gul ramme mistet den."""
+    from boersometer import Rute, styrkelinje
+    from kursdata import Aksje
+
+    aksje = Aksje("KVST", "KVST.OL", "Kvist", "Industri")
+    annen_dag = Rute(aksje, 1.0, 1.0, 1, None, siste_styrke=3, er_siste=False)
+    assert annen_dag.ramme == "gul"
+    assert not styrkelinje(annen_dag, 125, 105)
+    assert styrkelinje(Rute(aksje, 1.0, 1.0, 3, None, siste_styrke=3), 125, 105)
+    assert styrkelinje(Rute(aksje, 1.0, 1.0, 1, None, siste_styrke=2, er_siste=False), 125, 105)
+    assert not styrkelinje(Rute(aksje, 1.0, 1.0, 3, None, siste_styrke=3), 80, 105)
+
+
+def test_gul_rute_en_annen_dag_uten_plass_til_merket_viser_ikke_styrken(klient):
+    """Svar 1, i demoen 21.09: KVST har gul ramme og står på nivå 2 ved
+    1280 px. Før svaret fikk den styrke-bredest, så styrken sto uten merket.
+    Ville feilet hvis en gul rute en annen dag fikk styrke-N der den står på
+    nivå 2, eller hvis styrken og merket ikke sto i ruta for skjermleseren."""
+    ruter = _ruter(_html(klient, "/boersometer?periode=velg&dag=2026-09-21"))
+    paa_nivaa_2 = 0
+    for symbol, rute in ruter.items():
+        klasser = re.search(r'<a class="rute ([^"]*)"', rute).group(1).split()
+        if "ramme-gul" not in klasser:
+            continue
+        assert re.search(r'<span class="styrke">\d av 3</span>', rute), symbol
+        assert "3 av 3 siste børsdag" in rute, symbol
+        for klasse in ("bredest", "bred", "smal", "smalest"):
+            if f"nivaa-{klasse}-2" in klasser:
+                paa_nivaa_2 += 1
+                assert f"styrke-{klasse}" not in klasser, (symbol, klasse)
+    klasser = re.search(r'<a class="rute ([^"]*)"', ruter["KVST"]).group(1).split()
+    assert "ramme-gul" in klasser and "nivaa-bredest-2" in klasser, klasser
+    assert paa_nivaa_2 >= 4, paa_nivaa_2

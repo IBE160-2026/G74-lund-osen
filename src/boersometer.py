@@ -394,7 +394,8 @@ class Kartrute:
     flate, og hvor mye tekst som står synlig per klasse i Flate.tekst (0
     ingen, 1 symbolet, 2 også endringen, 3 også merket og grunnen). styrke
     er klassene der ruta står på nivå 2 og har plass til styrken under
-    endringen (gruppens svar 04.11 kl. 19:21)."""
+    endringen (gruppens svar 04.11 kl. 19:21), og en annen dag ikke har gul
+    ramme (svaret kl. 20:53 og 20:56, 1)."""
 
     rute: Rute
     vekt: float
@@ -499,13 +500,13 @@ def squarify(
     return ut
 
 
-def _nivaa_ved(flate: Flate, bredde: float, rb: float, rh: float, symbol: str) -> tuple[int, bool]:
+def _nivaa_ved(flate: Flate, bredde: float, rb: float, rh: float, rute: Rute) -> tuple[int, bool]:
     """Tekstnivået for plassen rb × rh ved flate.bredde, regnet for den
     synlige ruta når kartet er bredde px bredt, og om styrken står på nivå 2."""
     skala = bredde / flate.bredde
     b, h = rb * skala - 2 * KANT, rh * skala - 2 * KANT
-    nivaa = tekstnivaa(b, h, symbol)
-    return nivaa, nivaa == 2 and styrkeplass(b, h)
+    nivaa = tekstnivaa(b, h, rute.aksje.symbol)
+    return nivaa, nivaa == 2 and styrkelinje(rute, b, h)
 
 
 # Bredden og høyden ruta må ha for nivå 3, med teksten på 14 px.
@@ -539,6 +540,16 @@ def styrkeplass(b: float, h: float) -> bool:
     og rammen (gruppens svar 04.11 kl. 19:21). Merket for en annen dag og
     teksten står fortsatt bare på nivå 3."""
     return b >= STYRKE[0] and h >= STYRKE[1]
+
+
+def styrkelinje(rute: Rute, b: float, h: float) -> bool:
+    """Om styrken står på nivå 2 i ruta, som er b × h px. Gruppens svar
+    04.11 kl. 20:53 og 20:56, 1 (ECH1 i spesifikasjonen 8.2b): en annen dag
+    står styrken i en rute med gul ramme bare når merket «3 av 3 siste
+    børsdag» også får plass, og merket står bare på nivå 3."""
+    if rute.ramme == GUL and not rute.er_siste:
+        return False
+    return styrkeplass(b, h)
 
 
 def _legg_ut(bransjer: list[Bransje], bredde: float, hoeyde: float, minste_felt: float = 0.0) -> list | None:
@@ -601,7 +612,7 @@ def kart(bransjer: list[Bransje], flatene: tuple[Flate, ...] = FLATENE) -> Kart:
                     (rx - fx) / fb * 100, (ry - start) / kropp * 100, rb / fb * 100, rh / kropp * 100
                 )
                 for klasse, bredde in flate.tekst:
-                    nivaa[i][klasse], med_styrke = _nivaa_ved(flate, bredde, rb, rh, bransje.ruter[i].aksje.symbol)
+                    nivaa[i][klasse], med_styrke = _nivaa_ved(flate, bredde, rb, rh, bransje.ruter[i])
                     if med_styrke:
                         styrke[i].add(klasse)
         kartruter = [
