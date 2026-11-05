@@ -256,3 +256,35 @@ def test_hjelpen_ved_ki_delen():
     hjelp = (Path(__file__).resolve().parent.parent / "docs" / "hjelp.md").read_text(encoding="utf-8")
     avsnitt = hjelp.split("### Hva er «kort fortalt» på aksjesiden?")[1].split("\n#")[0]
     assert "prikket strek er sjekket" in avsnitt and "gir ikke råd" in avsnitt
+
+
+# --- Svar 4: ikonene i menyknappene -------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("sti", "navn", "del_"),
+    [
+        ("/", "Markedsoversikt", '<rect x="2" y="2.5" width="12" height="11" rx="1.5"/>'),
+        ("/", "Børsometer", '<path d="M2 12a6 6 0 0 1 12 0"/><path d="M8 12l3-4"/>'),
+        ("/", "Min liste", '<path d="M8 1.8l1.9 4'),
+        ("/boersometer", "Børsometer", '<path d="M2 12a6 6 0 0 1 12 0"/>'),
+    ],
+)
+def test_hver_menyknapp_har_sitt_ikon(klient, sti, navn, del_):
+    """Svar 4: en tabell, en måler (halvsirkel med viser) og en stjerne, foran
+    navnet og skjult for skjermleseren, på alle sidene. Ville feilet uten
+    ikonet, med ikonet i feil knapp eller med ikonet synlig for skjermleseren."""
+    meny = _html(klient, sti).split('<nav class="rad sider"', 1)[1].split("</nav>", 1)[0]
+    knapp = re.search(r'<a class="sideknapp"[^>]*>(<svg class="ikon"[^>]*>.*?</svg>)' + navn + "</a>", meny)
+    assert knapp, navn
+    assert 'aria-hidden="true" focusable="false"' in knapp.group(1) and del_ in knapp.group(1)
+    assert len(re.findall(r'<svg class="ikon"', meny)) == 3
+
+
+def test_ikonene_er_16_px_med_strek_2_i_tekstfargen():
+    """Svar 4: 16 px med strek 2 i tekstfargen. Ville feilet med en annen
+    størrelse, en annen strek eller en fast farge, som ikke følger knappen
+    som er valgt."""
+    regel = _regel("header.stripe a.sideknapp .ikon")
+    for del_ in ("width: 16px", "height: 16px", "stroke: currentColor", "stroke-width: 2", "fill: none"):
+        assert del_ in regel, del_

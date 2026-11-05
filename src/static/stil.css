@@ -113,9 +113,14 @@ header.stripe .eksempeltall a { color: var(--hvit); text-decoration: underline; 
    siden man står på, er fylt (aria-current), og klikkflaten er 44 px høy.
    To knapper får plass på 390 px, og raden brytes heller enn å rulle. */
 header.stripe .sider { flex-wrap: wrap; gap: 8px; padding-bottom: 12px; }
-header.stripe a.sideknapp { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; box-sizing: border-box;
+header.stripe a.sideknapp { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; box-sizing: border-box;
                             border: 1px solid var(--stripe-kant); border-radius: 999px; color: var(--stripe-tekst);
                             font-size: 15px; font-weight: 600; text-decoration: none; }
+/* Gruppens svar 04.11 kl. 22:23, 4: ikonene foran navnet, 16 px med strek 2
+   i tekstfargen (currentColor), så de følger knappen som er valgt, og 8 px
+   fra navnet (gap i regelen for a.sideknapp over). */
+header.stripe a.sideknapp .ikon { flex: none; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2;
+                                  stroke-linecap: round; stroke-linejoin: round; }
 header.stripe a.sideknapp[aria-current="page"] { background: var(--hvit); border-color: var(--hvit); color: var(--blekk); }
 /* Story 8.2b, b (U2): delen aksjesiden hører til, med kant og uten fyll. */
 header.stripe a.sideknapp[aria-current="true"] { border: 2px solid var(--hvit); color: var(--hvit); }

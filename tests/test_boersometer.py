@@ -312,7 +312,8 @@ class TestSiden:
     def test_knappen_i_stripa_er_fylt_paa_siden(self, klient):
         """Ville feilet hvis knappen manglet, sto et annet sted enn mellom
         «Markedsoversikt» og «Min liste», eller ikke var fylt."""
-        html = _side(klient)
+        # Gruppens svar 04.11 kl. 22:23, 4: ikonene står foran navnet.
+        html = re.sub(r'<svg class="ikon".*?</svg>', "", _side(klient), flags=re.S)
         knapper = re.findall(r'<a class="sideknapp" href="([^"]+)"( aria-current="page")?>([^<]+)</a>', html)
         assert [(href, tekst) for href, _, tekst in knapper] == [
             ("/", "Markedsoversikt"),
@@ -320,7 +321,8 @@ class TestSiden:
             ("/min-liste", "Min liste"),
         ]
         assert [tekst for _, fylt, tekst in knapper if fylt] == ["Børsometer"]
-        assert 'href="/boersometer">Børsometer</a>' in _side(klient, "/")
+        oversikten = re.sub(r'<svg class="ikon".*?</svg>', "", _side(klient, "/"), flags=re.S)
+        assert 'href="/boersometer">Børsometer</a>' in oversikten
 
     def test_snittet_i_overskriften_er_snittet_av_rutene(self, klient):
         """Energi har fire aksjer i demoen. Ville feilet med snittet av bare

@@ -364,6 +364,8 @@ class TestSidene:
         }
         for adresse, fylt in forventet.items():
             stripa = demo.get(adresse).data.decode("utf-8").split("</header>", 1)[0]
+            # Gruppens svar 04.11 kl. 22:23, 4: ikonene står foran navnet.
+            stripa = re.sub(r'<svg class="ikon".*?</svg>', "", stripa, flags=re.S)
             assert re.findall(r'class="sideknapp" href="[^"]*" aria-current="page">([^<]+)<', stripa) == [fylt]
             assert stripa.count('class="sideknapp"') == 3
         aksjesiden = demo.get("/aksje/KVST").data.decode("utf-8")
