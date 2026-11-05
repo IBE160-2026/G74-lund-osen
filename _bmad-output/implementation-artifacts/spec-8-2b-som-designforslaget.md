@@ -174,3 +174,35 @@ Første kjøring før svar 1 feilet også i tre avtrykkstester i `test_docker.py
 **Edge i en iframe**, 05.11 kl. 16:58, med demobasen i en midlertidig mappe, på svar 1, 3 og 4: 10 visninger × 10 bredder (1280, 1100, 1079, 900, 761, 760, 600, 390, 360 og 320 px), de samme som før. Ingen synlig tekst utenfor ruta, ingen synlig tekst utenfor vinduet og ingen vannrett rulling i noen av de 100. Måleren regner ikke tekst i en boks som ruller selv (tabellene på smal skjerm), og regner tekst som en boks med `overflow: hidden` kutter, som kuttet («Industri» og «Konsum» ved 320 px). Bunnen av siste rad under «Skilte seg ut» er fortsatt 1864 px, og bunnen av `p.dagene` 2198 px.
 
 **Bildene** før (`2e48eb0f`) og etter (`42088949`) står på `pr-8-2b-bilder` i `77a0c0fa`, med navn som begynner på `svar-1429-`: børsometeret ved 1280 px siste børsdag og 18.09, børsometeret ved 390 px (likt før og etter, svar 2), og oversikten ved 1280 og 390 px. Bare demoen, ingen ekte kurser.
+
+## Gjennomgangen av svarene 05.11 kl. 14:29
+
+På diffen `665b3642..952e44dc`, etter hele settet, med Blind Hunter (BH, 12 funn), Edge Case Hunter (ECH, 2) og Verification Gap (VG, 9), hver for seg. Ingen funn står på høy. Rettingene står i `1be0676a`. Hele settet før den: 4072 bestått, 24 hoppet over og 2 porttester for `start.ps1` som feilet. Mutanten P6 (symbolet med `HALVFET_EM` i `stor_bredde`) ble fanget av 4 tester, og fila var lik HEAD etter. De 100 målingene i Edge ble gjort på nytt kl. 17:31 uten avvik, og de sju bildene i `docs/appen/` er byte for byte de samme.
+
+| Funn | Alvorlighet | Hva | Avgjort |
+|---|---|---|---|
+| ECH1 | middels | Symbolet ble regnet med 0,62 em, men store bokstaver i 22 px halvfett er bredere | Rettet: målt i Edge med en Range til opptil 0,721 em (MOWI) for de 15 aksjene og demoen, og regnet med `STORSYMBOL_EM` = 0,75. `STOR` er (207, 107). HVDO og BRFE trenger 166,4 px og er fortsatt store. Styrken målt til 0,462 em, under de 0,5 som regnes. |
+| BH1, VG7 | middels, lav | Testen for nivået regnet fasiten med `_stor_bredde` | Rettet: `_bredden` i `test_boersometer.py` med tallene skrevet ut |
+| BH2 | middels | Raden «Klar» mistet at dagen aldri får signal uten bonuskvote | Rettet: «ellers får dagen aldri signal». `docs/hjelp.md` sier det samme. |
+| VG1 | middels | Ingen test krevde `navn-bredest` på en stor rute | Rettet: HVDO, BRFE og KVST |
+| VG2 | middels | Ringen og skriften i `stor_bredde` var ikke testet mot stilen | Rettet: `PILLELUFT`, `PILLEKANT`, `HALVFET_EM` og skriften for styrken mot `stil.css` |
+| BH3 | lav | `stor=True` som standard i `_nivaa_ved` | Avvist: bare `kart()` regner klassene, og testene kaller `_nivaa_ved` for én rute uten klasse |
+| BH4 | lav | «None av 3» | Avvist: `uten_styrke` er «ikke vurdert» når styrken mangler og ruta har data |
+| BH5 | lav | Testen for den bredeste brukte «Uten data» med «ikke vurdert» | Rettet |
+| BH6 | lav | Kommentaren i `stil.css` sa `STOR` | Rettet |
+| BH7, ECH2 (stilen) | lav | Stilen for nivå 4 i `bred`, `smal` og `smalest` brukes ikke | Står: den er lik for alle klassene og testet, så den virker hvis `STORE_KLASSER` utvides |
+| ECH2 (hjelpen) | lav | Hjelpen sa ikke at store ruter bare finnes fra 1079 px | Rettet i hjelpen og `docs/hjelp.md` |
+| BH8 | lav | Kommentaren sto over feil linje | Rettet |
+| BH9 | lav | `velg` uten dag | Avvist: `les_valg` gir `siste` da (ECH), og lenken sier «dagen» |
+| BH10 | lav | Min liste kunne bruke en annen mal | Avvist: `/min-liste` bruker `index.html` (malene i `app.py` er `index.html`, `boersometer.html` og `basefeil.html`) |
+| BH11 | lav | Feilmeldingen for bildene ved 390 px ga fremgangsmåten som kuttet bildet | Rettet: iframen og `--virtual-time-budget` |
+| BH12 | lav | `Kartrute.navn` er tom som standard | Står: bare `kart()` lager ruter til siden, og uten klassen står ruta uten navn, ikke med tekst oppå hverandre |
+| VG3 | lav | `MERKET` ikke bundet til malen | Rettet: `test_merket_er_det_malen_skriver` |
+| VG4 | lav | Ikke alle periodene i testen for lenken | Rettet |
+| VG5 | lav | Hjelpen testes ikke mot oppførselen | Står, som for de andre svarene: hjelpen har kildene sine i `hjelpetekster.py` |
+| VG6 | lav | `STOR[0]` brukes ikke i koden | Står: den er testet som øvre grense i `test_stor_den_bredeste_er_stor_bredde` |
+| VG8 | lav | Antallet underpunkter og lengden på «Klar» testes ikke | Står: strukturen og lenkene er testet, og innholdet er gruppens |
+| VG9 | lav | Avtrykket for oversikten har ikke `app.py` | Står: arvet fra `SKJERMBILDET` (3.3e), ikke en del av svarene |
+
+Ingen funn på middels eller over står åpne, og ingen følger av et svar.
+
