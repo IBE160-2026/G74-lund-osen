@@ -3003,6 +3003,8 @@ uten KI. 5B.4 måler KI-tillegget. Blandes de, vet ingen hva som ble målt.
 
 *Avgjort 2026-10-23 kl. 15:53 (gruppen uten preferanse, rådets forslag):* de to åpne punktene i `spec-8-1-brukertesten.md`. a) Har personen verken forklart noe eller åpnet en aksjeside i del A, er aksjen i del B den øverste i tabellen. b) Slår personen på KI-teksten selv i del A, teller forklaringen for 8.1 bare hvis den kom før det, del B hoppes over, og 10.4 tas med neste person.
 
+*Avgjort 2026-11-05 kl. 12:23 og 12:24 (gruppens svar):* uka som teller for «Én ukes drift er logget», er 29.10–04.11, de sju første dagene jobben gikk av seg selv. Den og loggdelen av 10.4 telles før brukertesten. Delen med en person venter på brukertesten.
+
 ### Story 10.5: Lenke til selskapets side på NewsWeb
 
 *Lagt til 2026-09-28, med plan B.*
