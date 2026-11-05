@@ -1661,6 +1661,8 @@ Som **gruppe som henter for hånd hver kveld**, vil vi at hentingen går av seg 
 
 *Avgjort 2026-11-05 kl. 12:33 (gruppens svar):* kjøringene kl. 22:45, 23:15 og 23:45 stopper med en gang, før Docker og Ollama startes, når dagen alt er ferdig hentet, og feiler kjøringen kl. 22:15, prøver de senere som før.
 
+*Avgjort 2026-11-05 kl. 19:33 (gruppens svar):* på spørsmålet i Utført-linja kl. 19:15, forslag a): når kursene og vurderingene for de 15, hovedindeksen og KI-tekstene for dagen er der, starter kjøringen verken Docker eller Ollama, men kjører `--maal-omsetning` som før, med reglene for kvoten og kl. 23:45 der. Det presiserer svaret kl. 12:33.
+
 ### Story 2.4: Etterfylling av hull i kursserien
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
