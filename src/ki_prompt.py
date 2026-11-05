@@ -97,6 +97,15 @@ teksten ikke sier noe om et felt som mangler. Linja sier naa «når feltet står
 i opplysningene». Versjonen staar som 4, fordi ingen tekst i ose.db er laget
 med versjon 4 ennaa, og avtrykket, demotekstene og proevekjoeringen
 (malinger.md §54) er laget paa nytt.
+
+Versjon 4, appen skriver dagen (gruppens svar 5.11 kl. 19:13 og 23:36, BH6
+og BH7 i PR #113): grunnlaget har ikke lenger bransjen og antallene, men
+retningen paa aksjen selv (ki_grunnlag.py), og linja om hvordan dagen var
+rundt aksjen er tatt ut. Appen skriver hovedindeksen, bransjen og antallene
+selv under teksten (setning_om_samme_dag i dagene.py). Versjonen staar som 4,
+fordi versjon 4 ikke er flettet og ingen tekst i ose.db har versjon 4, som
+unntaket i 10.2f-10.2h foer versjon 3 var i bruk. Avtrykket og demotekstene
+er laget paa nytt.
 """
 
 import json
@@ -116,8 +125,7 @@ I opplysningene under står 1 for positivt utslag, -1 for negativt og 0 for ikke
 
 Opplysningene sier også hvordan dagen var:
 - hovedindeksen: om hovedindeksen på Oslo Børs steg, falt eller var uendret i dag. Mangler feltet, skal du ikke si noe om hovedindeksen.
-- aksjer_steg og aksjer_falt: hvor mange av aksjene i lista som steg og som falt fra børsdagen før.
-- bransjen: om aksjene i samme bransje som denne steg, falt eller var uendret i snitt. Mangler feltet, skal du ikke si noe om bransjen.
+- aksjen: om aksjen selv steg, falt eller var uendret i dag.
 
 Regler for teksten:
 - Beskriv hver sjekk slik fortegnet står i opplysningene: et positivt utslag, et negativt utslag eller ikke noe utslag. Ikke si at en sjekk ga utslag når den ikke ga det, eller at den ga et annet utslag enn det som står.
@@ -126,7 +134,6 @@ Regler for teksten:
 - Når retningen er Ingen, skriv at signalet ikke har noen retning.
 - Bruk bare opplysningene under. Skriv utslagene med ord, ikke som tall. Ikke nevn kurser, prosenter eller andre tall enn antallene i opplysningene og regelens faste tall.
 - Siden viser kursen, endringen og målingene. Du kan vise til dem, for eksempel «se endringen i tabellen», men ikke gjenta tallene.
-- I tillegg til sjekkene skal teksten si med ord hvordan dagen var rundt aksjen: om hovedindeksen og bransjen steg, falt eller var uendret, når feltet står i opplysningene, og hvor mange av aksjene i lista som steg og som falt.
 - Hovedindeksen og bransjen er ikke en del av regelen. Ikke si at de forklarer signalet.
 - Ikke si hvor lenge signalet har vart, om det er nytt, eller om det er første gang. Siden sier under teksten hvor lenge signalet har vart.
 - Ikke gi råd om å kjøpe, selge eller holde, og ikke si noe om hva som vil skje.

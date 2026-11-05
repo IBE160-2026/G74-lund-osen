@@ -35,6 +35,12 @@ setning under KI-teksten paa aksjesiden.
 Story 10.2i (gruppens svar 5.11 kl. 19:13): Dagsbilde, lag_dagsbilde og
 bevegelse ligger i dagene.py, saa appen skriver setningen om samme dag av de
 samme verdiene som grunnlaget. De importeres her, saa ingenting annet endres.
+
+Story 10.2i, gruppens svar 5.11 kl. 19:13 og 23:36: modellen skriver ikke om
+dagen. Grunnlaget faar retningen paa aksjen selv den dagen (aksjen), regnet
+som for hovedindeksen, og mister bransjen og antallene, som appen skriver selv
+under teksten (setning_om_samme_dag i dagene.py). Hovedindeksen staar, saa
+prompten kan gi ferdig ordlyd om aksjen gikk samme vei som den.
 """
 
 from types import MappingProxyType
@@ -59,13 +65,14 @@ SJEKKENE = ("trend", "bevegelse", "interesse")
 UTENFOR_MAALINGEN = "Utenfor målingen"
 NOEKLENE = frozenset((*SJEKKENE, "styrke", "retning"))
 
-# Feltene med dagen. hovedindeksen og bransjen kan mangle. Svaret 25.10 kl.
-# 00:51: dagene er ikke med, og et grunnlag med dager eller dager_merke avvises.
-DAGNOEKLENE = frozenset(("aksjer_steg", "aksjer_falt"))
-VALGFRIE = frozenset(("merke", "hovedindeksen", "bransjen"))
+# Feltene med dagen, som begge kan mangle. Svaret 25.10 kl. 00:51: dagene er
+# ikke med, og et grunnlag med dager eller dager_merke avvises. Story 10.2i:
+# bransjen, aksjer_steg og aksjer_falt er tatt ut, og aksjen er med.
+DAGFELTENE = ("hovedindeksen", "aksjen")
+VALGFRIE = frozenset(("merke", *DAGFELTENE))
 # Antallene i grunnlaget. Kontrollen i FR-603 godtar bare disse og regelens
-# faste tall (punkt 2). Fortegnene er ikke antall.
-ANTALLENE = ("styrke", "aksjer_steg", "aksjer_falt")
+# faste tall (punkt 2). Fortegnene er ikke antall. Story 10.2i: bare styrken.
+ANTALLENE = ("styrke",)
 
 
 def _heltall(verdi) -> bool:
@@ -75,7 +82,7 @@ def _heltall(verdi) -> bool:
 def ki_grunnlag(
     kilde: Signal | Vurdering, *, utenfor_maalingen: bool, dagen: Dagsbilde | None = None
 ) -> MappingProxyType:
-    """Fortegnene, styrken og retningen, og med dagen feltene fra versjon 3.
+    """Fortegnene, styrken og retningen, og med dagen hovedindeksen og aksjen.
 
     kilde er signalet fra signalberegning eller vurderingen fra basen. Begge
     har de samme tre fortegnene, styrken og retningen. Et Signal kontrolleres
@@ -102,12 +109,9 @@ def ki_grunnlag(
     if utenfor_maalingen:
         grunnlag["merke"] = UTENFOR_MAALINGEN
     if dagen is not None:
-        if dagen.hovedindeksen is not None:
-            grunnlag["hovedindeksen"] = dagen.hovedindeksen
-        grunnlag["aksjer_steg"] = dagen.aksjer_steg
-        grunnlag["aksjer_falt"] = dagen.aksjer_falt
-        if dagen.bransjen is not None:
-            grunnlag["bransjen"] = dagen.bransjen
+        for felt in DAGFELTENE:
+            if getattr(dagen, felt) is not None:
+                grunnlag[felt] = getattr(dagen, felt)
     _kontroller(grunnlag)
     if isinstance(kilde, Signal):
         _samsvar(kilde)
@@ -116,11 +120,8 @@ def ki_grunnlag(
 
 def _kontroller(grunnlag: dict[str, object]) -> None:
     """Siste vakt: noeklene, og bare heltall og tekst fra de lukkede listene."""
-    noekler = set(grunnlag) - VALGFRIE
-    if noekler not in (NOEKLENE, NOEKLENE | DAGNOEKLENE):
+    if set(grunnlag) - VALGFRIE != NOEKLENE:
         raise ValueError("grunnlaget har andre noekler enn fortegnene, styrken, retningen og dagen")
-    if noekler == NOEKLENE and set(grunnlag) & (VALGFRIE - {"merke"}):
-        raise ValueError("hovedindeksen og bransjen kommer bare med dagen")
     if grunnlag.get("merke", UTENFOR_MAALINGEN) != UTENFOR_MAALINGEN:
         raise ValueError("merke kan bare vaere «Utenfor målingen»")
     for navn in SJEKKENE:
@@ -130,11 +131,7 @@ def _kontroller(grunnlag: dict[str, object]) -> None:
         raise ValueError(f"styrke maa vaere et heltall fra 0 til 3, fikk {type(grunnlag['styrke']).__name__}")
     if type(grunnlag["retning"]) is not str or grunnlag["retning"] not in RETNINGER:
         raise ValueError(f"retning maa vaere en av {RETNINGER}")
-    if "aksjer_steg" in grunnlag:
-        for navn in ("aksjer_steg", "aksjer_falt"):
-            if not _heltall(grunnlag[navn]) or grunnlag[navn] < 0:
-                raise ValueError(f"{navn} maa vaere et heltall fra 0, fikk {type(grunnlag[navn]).__name__}")
-    for navn in ("hovedindeksen", "bransjen"):
+    for navn in DAGFELTENE:
         if navn in grunnlag and (type(grunnlag[navn]) is not str or grunnlag[navn] not in BEVEGELSER):
             raise ValueError(f"{navn} maa vaere en av {BEVEGELSER}")
 

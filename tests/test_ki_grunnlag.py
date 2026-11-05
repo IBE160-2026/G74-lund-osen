@@ -433,6 +433,20 @@ class TestDagsbildet:
         indeks = [Kursrad(dato=d, slutt=k, justert_slutt=k, volum=0) for d, k in ((UKA[-3], 1500.0), (FREDAG, 1510.0))]
         assert self._bildet({}, indeks).hovedindeksen is None
 
+    def test_aksjen_regnes_som_hovedindeksen(self):
+        """Story 10.2i: retningen paa aksjen selv den dagen, med den samme
+        funksjonen som hovedindeksen. Ville feilet hvis aksjen fikk en annen
+        retning enn indeksen faar av den samme serien, eller fikk retningen
+        uten rad paa forrige boersdag, som indeksen ikke faar."""
+        for kurser in (_kurser(100.0, 101.0), _kurser(100.0, 99.0), _kurser(100.0, 100.001)):
+            bildet = self._bildet({"EQNR": kurser}, kurser)
+            assert bildet.aksjen == bildet.hovedindeksen
+        assert self._bildet({"EQNR": _kurser(100.0, 101.0)}).aksjen == STEG
+        assert self._bildet({"EQNR": _kurser(100.0, 99.0)}).aksjen == FALT
+        hull = [Kursrad(dato=d, slutt=k, justert_slutt=k, volum=0) for d, k in ((UKA[-3], 100.0), (FREDAG, 101.0))]
+        assert self._bildet({"EQNR": hull}).aksjen is None
+        assert self._bildet({"EQNR": _kurser(100.0, 101.0, siste=UKA[-2])}).aksjen is None
+
     def test_ingen_bransje_uten_endring(self):
         bildet = self._bildet({"NY": _kurser(10.0)}, aksje=4)
         assert bildet.bransjen is None
@@ -440,9 +454,14 @@ class TestDagsbildet:
 
 
 class TestGrunnlagetMedDagen:
-    BILDET = Dagsbilde(dager=4, dager_minst=True, hovedindeksen=STEG, aksjer_steg=9, aksjer_falt=5, bransjen=FALT)
+    BILDET = Dagsbilde(
+        dager=4, dager_minst=True, hovedindeksen=STEG, aksjer_steg=9, aksjer_falt=5, bransjen=FALT, aksjen=FALT
+    )
 
     def test_feltene(self):
+        """Story 10.2i (svarene 5.11 kl. 19:13 og 23:36): hovedindeksen og
+        aksjen selv, ikke bransjen og antallene, som appen skriver. Ville
+        feilet hvis bransjen eller antallene kom med, eller aksjen manglet."""
         grunnlag = ki_grunnlag(_v("Positiv", 2), utenfor_maalingen=False, dagen=self.BILDET)
         assert dict(grunnlag) == {
             "trend": 1,
@@ -451,10 +470,16 @@ class TestGrunnlagetMedDagen:
             "styrke": 2,
             "retning": "Positiv",
             "hovedindeksen": STEG,
-            "aksjer_steg": 9,
-            "aksjer_falt": 5,
-            "bransjen": FALT,
+            "aksjen": FALT,
         }
+
+    def test_uten_aksjen_naar_den_ikke_kan_regnes(self):
+        """Ville feilet hvis grunnlaget fikk aksjen naar dagsbildet ikke har
+        den, som for hovedindeksen."""
+        import dataclasses
+
+        bildet = dataclasses.replace(self.BILDET, aksjen=None, hovedindeksen=None)
+        assert set(ki_grunnlag(_v("Positiv", 2), utenfor_maalingen=False, dagen=bildet)) == NOEKLENE
 
     def test_ingen_desimaltall_med_dagen(self):
         """Ville feilet hvis dagen sendte en prosent, et snitt eller en kurs
@@ -471,12 +496,13 @@ class TestGrunnlagetMedDagen:
                 dager=1, dager_minst=minst, hovedindeksen=None, aksjer_steg=0, aksjer_falt=0, bransjen=None
             )
             grunnlag = ki_grunnlag(_v("Ingen", 0), utenfor_maalingen=False, dagen=bildet)
-            assert set(grunnlag) == NOEKLENE | {"aksjer_steg", "aksjer_falt"}
+            assert set(grunnlag) == NOEKLENE
 
-    @pytest.mark.parametrize("felt", ["dager", "dager_merke"])
+    @pytest.mark.parametrize("felt", ["dager", "dager_merke", "bransjen", "aksjer_steg", "aksjer_falt"])
     def test_et_grunnlag_med_dagene_avvises(self, felt):
         """Gjennomgangen 25.10 kl. 11 (VG12, BH8): ville feilet hvis et
-        grunnlag med dager eller dager_merke ble godtatt."""
+        grunnlag med dager eller dager_merke ble godtatt. Story 10.2i: heller
+        ikke bransjen eller antallene, som appen skriver selv."""
         from ki_grunnlag import _kontroller
 
         bildet = Dagsbilde(dager=1, dager_minst=False, hovedindeksen=None, aksjer_steg=0, aksjer_falt=0, bransjen=None)
@@ -488,10 +514,9 @@ class TestGrunnlagetMedDagen:
     @pytest.mark.parametrize(
         "felt, verdi",
         [
-            ("aksjer_steg", -1),
-            ("aksjer_falt", True),
             ("hovedindeksen", "opp"),
-            ("bransjen", "Positiv"),
+            ("aksjen", "Positiv"),
+            ("aksjen", 1),
         ],
     )
     def test_ugyldige_verdier_avvises(self, felt, verdi):

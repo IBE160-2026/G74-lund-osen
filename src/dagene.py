@@ -95,6 +95,9 @@ class Dagsbilde:
     aksjer_steg: int
     aksjer_falt: int
     bransjen: str | None
+    # Story 10.2i (svarene 5.11 kl. 19:13 og 23:36): retningen paa aksjen selv
+    # den dagen, regnet som for hovedindeksen (_retningen_paa_dagen).
+    aksjen: str | None = None
 
 
 def bevegelse(endring: float | None) -> str | None:
@@ -114,6 +117,16 @@ def _endringen(serie: list[Kursrad], dag: date) -> float | None:
     return endring_i_prosent(til[-2:])
 
 
+def _retningen_paa_dagen(serie: list[Kursrad], dag: date) -> str | None:
+    """steg, falt eller uendret for dag, regnet som for hovedindeksen:
+    indeksendring paa radene til og med dag, mot forrige boersdag. None uten
+    rad paa dag eller paa forrige boersdag."""
+    til = [rad for rad in serie if rad.dato <= dag]
+    if not til or til[-1].dato != dag:
+        return None
+    return bevegelse(indeksendring(til))
+
+
 def lag_dagsbilde(
     aksje: Aksje,
     dag: date,
@@ -129,11 +142,8 @@ def lag_dagsbilde(
     endringer = {a.symbol: _endringen(serier.get(a.symbol, []), dag) for a in lista}
     retninger = [bevegelse(e) for e in endringer.values()]
     i_bransjen = [endringer[a.symbol] for a in lista if a.sektor == aksje.sektor and endringer[a.symbol] is not None]
-    indeks = None
-    if indeksserie:
-        til = [rad for rad in indeksserie if rad.dato <= dag]
-        if til and til[-1].dato == dag:
-            indeks = bevegelse(indeksendring(til))
+    # Story 10.2i: aksjen selv regnes med den samme funksjonen som indeksen.
+    indeks = _retningen_paa_dagen(indeksserie or [], dag)
     return Dagsbilde(
         dager=dager,
         dager_minst=minst,
@@ -141,6 +151,7 @@ def lag_dagsbilde(
         aksjer_steg=retninger.count(STEG),
         aksjer_falt=retninger.count(FALT),
         bransjen=bevegelse(sum(i_bransjen) / len(i_bransjen)) if i_bransjen else None,
+        aksjen=_retningen_paa_dagen(serier.get(aksje.symbol, []), dag),
     )
 
 

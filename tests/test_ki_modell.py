@@ -56,7 +56,10 @@ AVTRYKK = {
     # rundt aksjen. Teksten til versjon 3 staar i src/ki_prompt.py paa 72250544.
     # Gjennomgangen av 10.2i (ECH1, BH3): «når feltet står i opplysningene», og
     # versjonen staar som 4 (ingen tekst i ose.db med versjon 4). Var e0306762....
-    "4": "0df61d8fa2b5a6f8764756f3e338c575bf9682ebaac6e2bc0450a7860adcc825",
+    # Story 10.2i, svarene 5.11 kl. 19:13 og 23:36 (b): aksjen i opplysningene,
+    # og linja om dagen rundt aksjen er tatt ut. Versjonen staar som 4, fordi
+    # versjon 4 ikke er flettet. Var 0df61d8f....
+    "4": "50a0ec0ed786cbad6be47ad45469dec818276c3d3dd5b1f0bd4d6e8bedd7df31",
 }
 
 
@@ -159,29 +162,23 @@ class TestPrompten:
         versjon, fanger test_versjonen_foelger_teksten (gjennomgangen, BH12,
         ECH7)."""
         assert PROMPTVERSJON == "4"
-        assert AVTRYKK["4"] == "0df61d8fa2b5a6f8764756f3e338c575bf9682ebaac6e2bc0450a7860adcc825"
+        assert AVTRYKK["4"] == "50a0ec0ed786cbad6be47ad45469dec818276c3d3dd5b1f0bd4d6e8bedd7df31"
         assert AVTRYKK["4"] != AVTRYKK["3"]
 
-    def test_teksten_sier_hvordan_dagen_var_rundt_aksjen(self):
-        """Story 10.2i, gruppens svar 5.11 kl. 16:05: alle 75 tekstene i uka
-        29.10-04.11 gjentok regelforklaringen (spec-10-4-loggdelen.md).
-        Ville feilet hvis linja ble tatt ut av reglene, ikke kom med i
-        prompten, med eller uten merket, eller kom etter linja om at
-        hovedindeksen og bransjen ikke forklarer signalet, som skal staa.
-        Gjennomgangen (ECH1, BH3): ville ogsaa feilet hvis linja krevde
-        hovedindeksen og bransjen uten forbeholdet om at feltet kan mangle."""
-        linja = (
-            "- I tillegg til sjekkene skal teksten si med ord hvordan dagen var rundt aksjen: om hovedindeksen "
-            "og bransjen steg, falt eller var uendret, når feltet står i opplysningene, og hvor mange av aksjene "
-            "i lista som steg og som falt."
-        )
+    def test_modellen_skriver_ikke_om_dagen(self):
+        """Story 10.2i, gruppens svar 5.11 kl. 19:13 og 23:36 (BH6, BH7):
+        appen skriver hovedindeksen, bransjen og antallene, saa linja fra
+        svaret kl. 16:05 om hvordan dagen var rundt aksjen er tatt ut, og
+        reglene forklarer ikke bransjen og antallene. Ville feilet hvis linja
+        sto igjen, eller reglene forklarte aksjer_steg, aksjer_falt eller
+        bransjen. Linja om at hovedindeksen og bransjen ikke forklarer
+        signalet, staar."""
+        assert "I tillegg til sjekkene skal teksten si med ord hvordan dagen var" not in REGLER
+        assert not any(linje.startswith(("- aksjer_steg", "- bransjen")) for linje in REGLER.splitlines())
+        assert "- aksjen: om aksjen selv steg, falt eller var uendret i dag." in REGLER.splitlines()
         ikke_forklarer = "- Hovedindeksen og bransjen er ikke en del av regelen. Ikke si at de forklarer signalet."
-        reglene = REGLER.split("Regler for teksten:\n", 1)[1].splitlines()
-        assert reglene.count(linja) == 1
+        reglene = REGLER.split("Regler for teksten:", 1)[1].splitlines()
         assert reglene.count(ikke_forklarer) == 1
-        assert reglene.index(linja) + 1 == reglene.index(ikke_forklarer)
-        assert linja in lag_prompt(BLANDET)
-        assert linja in lag_prompt({**BLANDET, "merke": "Utenfor målingen"})
 
     def test_reglene_forklarer_hvert_felt_i_grunnlaget(self):
         """Story 10.2e: ville feilet hvis grunnlaget hadde et felt reglene
@@ -203,7 +200,13 @@ class TestPrompten:
             volumforhold=1.73,
         )
         dagen = Dagsbilde(
-            dager=3, dager_minst=True, hovedindeksen="falt", aksjer_steg=4, aksjer_falt=11, bransjen="steg"
+            dager=3,
+            dager_minst=True,
+            hovedindeksen="falt",
+            aksjer_steg=4,
+            aksjer_falt=11,
+            bransjen="steg",
+            aksjen="steg",
         )
         grunnlag = ki_grunnlag(vurdering, utenfor_maalingen=True, dagen=dagen)
         forklaringen = REGLER.split("Regler for teksten:")[0]
@@ -213,6 +216,8 @@ class TestPrompten:
                 assert felt in forklaringen.lower(), felt
         # Gruppens svar 25.10 kl. 00:51: dagene er ikke i grunnlaget.
         assert "dager" not in grunnlag and "dager_merke" not in grunnlag
+        # Story 10.2i: aksjen er med, og ogsaa den er forklart over.
+        assert "aksjen" in grunnlag
         assert UTENFOR in lag_prompt(grunnlag)
 
     def test_teksten_kan_vise_til_tallene_paa_siden(self):
@@ -899,9 +904,8 @@ class TestKontrollenVersjon3:
         "tekst",
         [
             # «i minst 4 børsdager» stoppes fra svaret 25.10 kl. 00:51
-            # (TestDageneStoppes).
-            "Ni aksjer i lista steg, og fem falt.",
-            "9 av aksjene steg.",
+            # (TestDageneStoppes). Story 10.2i: antallene er tatt ut av
+            # grunnlaget (test_tallene_fra_dagen_er_ikke_lov).
             "Hovedindeksen falt i dag, mens bransjen steg i snitt.",
             "I dag falt hovedindeksen.",
             "Hovedindeksen på Oslo Børs falt.",
@@ -927,11 +931,14 @@ class TestKontrollenVersjon3:
         svar = kontroller(tekst, DAGEN)
         assert not svar.besto and any(g.startswith("2:") for g in svar.grunner), svar.grunner
 
-    def test_tallene_fra_dagen_er_ikke_lov_uten_dagen(self):
-        """Ville feilet hvis antallene var lov ogsaa naar grunnlaget ikke har
-        dem: 9 er ikke et tall i grunnlaget fra versjon 2."""
-        assert kontroller("Ni aksjer.", DAGEN).besto
-        assert not kontroller("Ni aksjer.", BLANDET).besto
+    @pytest.mark.parametrize("tekst", ["Ni aksjer.", "Ni aksjer i lista steg, og fem falt.", "9 av aksjene steg."])
+    def test_tallene_fra_dagen_er_ikke_lov(self, tekst):
+        """Story 10.2i (svarene 5.11 kl. 19:13 og 23:36): antallene er ikke
+        lenger i ANTALLENE, fordi appen skriver dem. Ville feilet hvis et
+        antall aksjer var lov, ogsaa i et grunnlag fra foer 10.2i som har dem
+        (var lov fra 10.2e)."""
+        assert not kontroller(tekst, DAGEN).besto
+        assert not kontroller(tekst, BLANDET).besto
 
     @pytest.mark.parametrize(
         "tekst",

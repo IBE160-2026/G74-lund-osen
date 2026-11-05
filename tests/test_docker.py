@@ -1139,7 +1139,9 @@ HOEYDE_PAA_BILDET = 1864
 # bunnen av raden er fortsatt 1864 px, maalt i Edge.
 # Gjennomgangen av svarene 05.11 kl. 14:29: kommentaren om grensen i stil.css og
 # hjelpen om 1079 px i hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "ef7f45bcc548ce44c5497a2d25d01bf53109d5eb36f0ec80e34b19c381a82cda"
+# Story 10.2i b: hjelpen «Kort fortalt» i hjelpetekster.py sier hva modellen faar.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "8d4c88620ea6dfede5d6cc31d898859efd1dc0e2ec70b1ce0ebdd37cd911e340"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1221,7 +1223,10 @@ IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py", "src/boersometer.py
 # Story 10.2i, gruppens svar 5.11 kl. 19:13 og 23:36: setningen om samme dag
 # (p.samme-dag) staar under setningen om dagene, saa bildet slutter ved bunnen
 # av den, 2260,5 px maalt i Edge uten vindu og rundet opp. Var 2225.
-HOEYDE_PAA_AKSJESIDEN = 2261
+# Story 10.2i b: demotekstene laget paa nytt uten setningen om dagen, saa
+# teksten for BRFE er én linje kortere. Bunnen av p.samme-dag er 2234,2 px,
+# maalt paa samme maate. Var 2261.
+HOEYDE_PAA_AKSJESIDEN = 2235
 # Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
 # Story 10.5: lenken til investorsiden står under grafen, ved 1980 px målt i
 # Edge uten vindu, så bildet, som slutter ved bunnen av grafen (1872 px), ble
@@ -1435,7 +1440,9 @@ HOEYDE_PAA_AKSJESIDEN = 2261
 # bildet ble tatt paa nytt og er byte for byte det samme.
 # Story 10.2i, svarene 5.11 kl. 19:13 og 23:36: setningen om samme dag i
 # dagene.py, app.py og aksje.html. Bildet ble tatt paa nytt og er 2261 px hoeyt.
-AVTRYKK_BAK_AKSJESIDEN = "6e8b85b359321cc2554293e0f4236e59a2059e25b2e64418a771a5d11bc6087f"
+# Story 10.2i b: aksjen i dagene.py, hjelpen i hjelpetekster.py og demotekstene.
+# Bildet ble tatt paa nytt og er 2235 px hoeyt.
+AVTRYKK_BAK_AKSJESIDEN = "7e811bf24295c95039a717034308f7e3d62fddbf19e8f5bf2e462500b1fe6ac0"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1475,12 +1482,14 @@ DE_NYE_BILDENE = {
 # ble tatt paa nytt og er byte for byte de samme; 390 px er samme side og ikke tatt paa nytt.
 # Story 10.2i, svarene 5.11 kl. 19:13 og 23:36: dagene.py og app.py. Alle bildene
 # ble tatt paa nytt og er byte for byte de samme.
+# Story 10.2i b: dagene.py, hjelpetekster.py og demotekstene. Alle bildene ble tatt
+# paa nytt og er byte for byte de samme.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "ef7f45bcc548ce44c5497a2d25d01bf53109d5eb36f0ec80e34b19c381a82cda",
-    "docs/appen/boersometeret-demo.png": "a9d352b1d6cf5b8fb09a6eaf4208075110ea6495e92d60812545fb60e17b06ee",
-    "docs/appen/min-liste-demo.png": "d8cbf34162daf60f965e8fe7fc23e6d679bbbfcf9ac1b7e82bd37e7338289cc4",
-    "docs/appen/oversikten-390-demo.png": "ef7f45bcc548ce44c5497a2d25d01bf53109d5eb36f0ec80e34b19c381a82cda",
-    "docs/appen/boersometeret-390-demo.png": "a9d352b1d6cf5b8fb09a6eaf4208075110ea6495e92d60812545fb60e17b06ee",
+    TOPPEN_AV_OVERSIKTEN: "8d4c88620ea6dfede5d6cc31d898859efd1dc0e2ec70b1ce0ebdd37cd911e340",
+    "docs/appen/boersometeret-demo.png": "26880e63fabde099672e1135a3b693d56ff684da1d99be59c2f09f027145e6dd",
+    "docs/appen/min-liste-demo.png": "750a89faea02327a092ed23d4b17d047812380d57c697825b96babd519d15cea",
+    "docs/appen/oversikten-390-demo.png": "8d4c88620ea6dfede5d6cc31d898859efd1dc0e2ec70b1ce0ebdd37cd911e340",
+    "docs/appen/boersometeret-390-demo.png": "26880e63fabde099672e1135a3b693d56ff684da1d99be59c2f09f027145e6dd",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "

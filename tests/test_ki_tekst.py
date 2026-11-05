@@ -94,7 +94,9 @@ class TestSteget:
     def test_grunnlaget_og_regelen_er_vurderingens(self, stier):
         """Story 10.2e: ville feilet hvis steget ikke ga grunnlaget dagen.
         Alle 15 seriene og indeksen stiger siste dag (serie_med_utslag).
-        Gruppens svar 25.10 kl. 00:51: dagene er ikke med."""
+        Gruppens svar 25.10 kl. 00:51: dagene er ikke med. Story 10.2i
+        (svarene 5.11 kl. 19:13 og 23:36): aksjen selv, og ikke bransjen og
+        antallene. Ville ogsaa feilet hvis de kom med."""
         raa, base = stier
         kjoer(raa, base, FalskModell())
         vurdering = vurderingene(base, TIRSDAG)["EQNR"][0]
@@ -106,9 +108,7 @@ class TestSteget:
             "styrke": vurdering.styrke,
             "retning": vurdering.retning,
             "hovedindeksen": "steg",
-            "aksjer_steg": 15,
-            "aksjer_falt": 0,
-            "bransjen": "steg",
+            "aksjen": "steg",
         }
         assert rad.regelen == regeltekst(vurdering)
 
@@ -127,7 +127,7 @@ class TestSteget:
         assert (tirsdag.retning, tirsdag.styrke) == (vurdering.retning, vurdering.styrke)
         grunnlag = radene(base, onsdag)["EQNR"].grunnlag
         assert "dager" not in grunnlag and "dager_merke" not in grunnlag
-        assert grunnlag["aksjer_steg"] == 15
+        assert grunnlag["aksjen"] == "steg" and "aksjer_steg" not in grunnlag
 
     def test_hovedindeksen_er_osebx_ogsaa_med_en_annen_indeks(self, stier):
         """Gjennomgangen av 10.2e (VG1): ville feilet hvis grunnlaget tok
