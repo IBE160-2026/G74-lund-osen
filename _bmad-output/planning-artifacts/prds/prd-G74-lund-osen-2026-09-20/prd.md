@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-11-03T19:37
+updated: 2026-11-05T15:46
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -2015,6 +2015,8 @@ på vilkår, og andre norske finansmedier publiserer ikke lenger åpen RSS. Se
 *Lagt til 2026-11-03 (gjennomgangen 02.11, R28, gruppens svar 02.11 kl. 22:15, D):* «Adopsjon» og «Fortsatt bruk» krever bruk som er loggført. Bruken ble ikke logget før 4.11. Fra 4.11 føres én linje for hver dag gruppen bruker appen, i [brukslogga](../../../../docs/brukslogg.md), med dato, hvem, hva vi gjorde i appen og feil vi så. Jobbens logger regnes ikke som bruk.
 
 *Lagt til 2026-11-03 (gjennomgangen 02.11, R29):* hvilken uke som teller for «Én ukes drift er logget» i «KI-forklaringen», og antallet rader i `ki_logg` for den, er ikke regnet ut per 3.11, og basen er ikke åpnet i rettingen. Linja føres når det er regnet ut.
+
+*Lagt til 2026-11-05 (R29, gruppens svar 5.11 kl. 12:23 og 12:24):* uka som teller for «Én ukes drift er logget», er 29.10–04.11. `data/db/ose.db` er lest skrivebeskyttet. `ki_logg` har 15 rader av slaget `aksje` for hver av børsdagene 29.10, 30.10, 02.11, 03.11 og 04.11, og ingen av slagene `melding` eller `dag`. Hver dag besto alle 15 kontrollen (FR-603) og ville blitt vist, og 0 ble stoppet. Modellen er `gemma4:e4b` (lokal) og promptversjonen `3` alle dagene. 31.10 og 01.11 er helg, uten kurser og uten rader. Uka er logget: 105 rader, alle børsdager har tekster. Loggdelen av story 10.4 står i `spec-10-4-loggdelen.md`.
 
 *Rettet 2026-11-03 (gjennomgangen 02.11, R30):* README-prøven fra en ren maskin i «Kjørbar for andre» er utsatt til v1 er ferdig bygget (gruppens svar 2026-10-21 kl. 18:33 i `epics.md`), og den tas senest én uke før innleveringen (gruppens svar 2026-10-14 kl. 22:19 og 22:25 i `epics.md`).
 
