@@ -2,7 +2,7 @@
 title: 'Story 2.3d (2.3e): kveldsjobben starter ikke Docker og Ollama for en ferdig dag, og CI-rettingen'
 type: 'feature'
 created: '2026-11-05'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '9706d1b8'

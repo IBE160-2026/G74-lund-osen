@@ -1663,6 +1663,8 @@ Som **gruppe som henter for hånd hver kveld**, vil vi at hentingen går av seg 
 
 *Avgjort 2026-11-05 kl. 19:33 (gruppens svar):* på spørsmålet i Utført-linja kl. 19:15, forslag a): når kursene og vurderingene for de 15, hovedindeksen og KI-tekstene for dagen er der, starter kjøringen verken Docker eller Ollama, men kjører `--maal-omsetning` som før, med reglene for kvoten og kl. 23:45 der. Det presiserer svaret kl. 12:33.
 
+*Ferdig 2026-11-05:* squash-flettet i `0955f796`, PR #114, låst til head-en `fcc676e5` (spesifikasjonen `spec-2-3d-tidlig-stopp-og-ci.md`). Før steg 3 sjekker kveldsjobben med `src/dagen_ferdig.py`, med basen bare for lesing, om børsdagen er ferdig, og er den det, startes verken Docker eller Ollama, mens hentingen og målingen går som før. «Start demoen på Windows» i `tester.yml` slutter med `exit 0` (svaret 03.11 kl. 20:48, 1). Gjelder fra kjøringen fredag 06.11, når commiten fra midnatt har den. ECH1 står som spørsmål til gruppen: en indeks som feilet en dag der de 15 har kursene, hentes ikke på nytt, så den dagen går kjøringene som før.
+
 ### Story 2.4: Etterfylling av hull i kursserien
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
