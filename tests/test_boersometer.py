@@ -64,6 +64,14 @@ from tallformat import avrundet, tall
 from vurderingsdata import Vurdering
 
 SRC = Path(boersometer.__file__).resolve().parent
+
+
+def _nivaaet(b: float, h: float, symbol: str) -> int:
+    """Tekstnivået, med nivå 4 for en stor rute (gruppens svar 04.11 kl. 22:23, 1)."""
+    nivaa = tekstnivaa(b, h, symbol)
+    return 4 if nivaa == 3 and boersometer.storplass(b, h) else nivaa
+
+
 IDAG = date(2026, 10, 13)
 
 
@@ -1616,7 +1624,7 @@ class TestKartet:
                     kropp = fh * (1 - f.topp[flate.navn] / 100)
                     for kr in f.ruter:
                         rb, rh = kr.plass[flate.navn].b / 100 * fb, kr.plass[flate.navn].h / 100 * kropp
-                        ventet = tekstnivaa(rb - 2 * KANT, rh - 2 * KANT, kr.rute.aksje.symbol)
+                        ventet = _nivaaet(rb - 2 * KANT, rh - 2 * KANT, kr.rute.aksje.symbol)
                         assert kr.nivaa[klasse] == ventet, (klasse, kr.rute.aksje.symbol, rb, rh)
                         # Gruppens svar 04.11 kl. 19:21: styrken på nivå 2,
                         # regnet for den samme synlige ruta.
@@ -1624,7 +1632,8 @@ class TestKartet:
                         # ingen styrke, så linja er «ikke vurdert», med sin
                         # egen grense.
                         assert kr.rute.uten_styrke
-                        med_styrke = ventet == 2 and ikke_vurdert_plass(rb - 2 * KANT, rh - 2 * KANT)
+                        # Gruppens svar 04.11 kl. 22:23, 1: en stor rute har styrken øverst.
+                        med_styrke = ventet == 4 or (ventet == 2 and ikke_vurdert_plass(rb - 2 * KANT, rh - 2 * KANT))
                         assert (klasse in kr.styrke) == med_styrke, (klasse, kr.rute.aksje.symbol, rb, rh)
 
     def test_tekstnivaaet_paa_siden_er_det_kartet_regnet(self, klient):
@@ -1667,7 +1676,7 @@ class TestKartet:
                     kropp = fh * (1 - f["topp"][n] / 100)
                     for symbol, p in f["ruter"].items():
                         rb, rh = p[n][2] / 100 * fb, p[n][3] / 100 * kropp
-                        ventet = tekstnivaa(rb - 2 * KANT, rh - 2 * KANT, symbol)
+                        ventet = _nivaaet(rb - 2 * KANT, rh - 2 * KANT, symbol)
                         funnet = re.findall(rf"\bnivaa-{klasse}-(\d)\b", klasser[symbol])
                         assert funnet == [str(ventet)], (klasse, symbol, rb, rh)
                         sett.add((klasse, ventet))
@@ -1676,7 +1685,9 @@ class TestKartet:
                         # Gjennomgangen av svar 2 (VG5): siden er siste
                         # børsdag, så svar 1 om en annen dag gjelder ikke her.
                         plass = ikke_vurdert_plass if symbol in uten_styrke else styrkeplass
-                        med = ventet == 2 and plass(rb - 2 * KANT, rh - 2 * KANT) and symbol in med_styrke
+                        med = symbol in med_styrke and (
+                            ventet == 4 or (ventet == 2 and plass(rb - 2 * KANT, rh - 2 * KANT))
+                        )
                         assert (f"styrke-{klasse}" in klasser[symbol].split()) == med, (klasse, symbol, rb, rh)
                         if med:
                             sett.add((klasse, "styrke"))

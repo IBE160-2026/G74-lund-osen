@@ -180,6 +180,9 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "med Tab går du fra det største feltet og den største ruta, slik kartet legger dem. "
             "Rammen er gul ved 3 av 3 på siste børsdag, også når du velger en annen dag, og "
             "mørk ved 2 av 3 bare på siste børsdag, "
+            # Gruppens svar 04.11 kl. 22:23, 1: store ruter som i designforslaget.
+            "de største rutene har symbolet og styrken øverst, selskapsnavnet under, kuttet med «…» når "
+            "det er for langt, og endringen i stor skrift nederst, med merket og grunnen mellom der de får plass, "
             # Gruppens svar 04.11 kl. 10:01 og 10:04: styrken i rutene.
             "og styrken står i rutene som har plass, som i tabellen, "
             # Gruppens svar 04.11 kl. 20:53 og 20:56, 1.
@@ -205,6 +208,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (BOERSOMETER, "def indeks_for_dagen("),
                 (BOERSOMETER, "def fargetrinn("),
                 (BOERSOMETER, "def styrkelinje("),
+                (BOERSOMETER, "def storplass("),
                 (BOERSOMETER, "def ikke_vurdert_plass("),
                 (BOERSOMETER, "def grunnplass("),
                 (BOERSOMETER, "def annen_grunn("),

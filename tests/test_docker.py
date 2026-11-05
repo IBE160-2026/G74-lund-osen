@@ -1115,7 +1115,9 @@ HOEYDE_PAA_BILDET = 1864
 # hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Gjennomgangen av svar 1 kl. 09:34 (ECH1): fotnoten foelger ruta, i stil.css.
 # Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "56ffa2fd488b20d39899060180916d559243bdbd15b5821810a003133790e48e"
+# Gruppens svar 04.11 kl. 22:23, 1: store ruter i boersometeret, i
+# hjelpetekster.py og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "3e0d2510376f9fd4836d67f573d052404151145e1d0e672c7b57871f8f2fd760"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1382,7 +1384,9 @@ HOEYDE_PAA_AKSJESIDEN = 2198
 # hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Gjennomgangen av svar 1 kl. 09:34 (ECH1): fotnoten foelger ruta, i app.py og
 # stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "3146bf308ec7a2e4cbeb97d7debf20680eaf885e795df54899f4c83e44fdde0f"
+# Gruppens svar 04.11 kl. 22:23, 1: store ruter i boersometeret, i
+# hjelpetekster.py og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "18ba5ed1c7d6d9e709a6c8a2432f17d4e24724d8ff7803233b3de41d745ab724"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "

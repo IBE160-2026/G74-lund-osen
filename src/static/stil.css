@@ -847,6 +847,54 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
     :where(.side-oversikt) .rute.nivaa-smalest-3:not(.grunn-smalest) > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   }
 }
+/* Gruppens svar 04.11 kl. 22:23, 1: store ruter som i designforslaget, nivå 4
+   (STOR i boersometer.py). Symbolet 22 px halvfett øverst til venstre og
+   styrken øverst til høyre, navnet under i 12,5 px og kuttet med «…», merket
+   og grunnen under navnet der de får plass (klassene merke-N og grunn-N), og
+   endringen 28 px halvfett nederst, med luft 10 og 12 px. Små ruter er som før. */
+:where(.side-oversikt) .rute .navn { display: none; grid-area: navn; margin-top: 2px; font-size: 12.5px; font-weight: 400;
+                                     white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+:where(.side-oversikt) .rute > .ticker { grid-area: ticker; }
+:where(.side-oversikt) .rute > .styrke { grid-area: styrke; }
+:where(.side-oversikt) .rute > .merke { grid-area: merke; }
+:where(.side-oversikt) .rute > .tekst { grid-area: tekst; }
+:where(.side-oversikt) .rute > .endring { grid-area: endring; }
+@media (width > 760px) {
+  @container (width >= 1008px) {
+    :where(.side-oversikt) .rute.nivaa-bredest-4 { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto auto minmax(0, 1fr);
+      grid-template-areas: "ticker styrke" "navn navn" "merke merke" "tekst tekst" "endring endring"; gap: 0 8px; padding: 10px 12px; }
+    :where(.side-oversikt) .rute.nivaa-bredest-4 > .navn { display: block; }
+    :where(.side-oversikt) .rute.nivaa-bredest-4 > .ticker { font-size: 22px; font-weight: 600; }
+    :where(.side-oversikt) .rute.nivaa-bredest-4 > .endring { align-self: end; font-size: 28px; font-weight: 600; }
+    :where(.side-oversikt) .rute.nivaa-bredest-4:not(.styrke-bredest) > .styrke, :where(.side-oversikt) .rute.nivaa-bredest-4:not(.merke-bredest) > .merke, :where(.side-oversikt) .rute.nivaa-bredest-4:not(.grunn-bredest) > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
+  @container (width < 1008px) {
+    :where(.side-oversikt) .rute.nivaa-bred-4 { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto auto minmax(0, 1fr);
+      grid-template-areas: "ticker styrke" "navn navn" "merke merke" "tekst tekst" "endring endring"; gap: 0 8px; padding: 10px 12px; }
+    :where(.side-oversikt) .rute.nivaa-bred-4 > .navn { display: block; }
+    :where(.side-oversikt) .rute.nivaa-bred-4 > .ticker { font-size: 22px; font-weight: 600; }
+    :where(.side-oversikt) .rute.nivaa-bred-4 > .endring { align-self: end; font-size: 28px; font-weight: 600; }
+    :where(.side-oversikt) .rute.nivaa-bred-4:not(.styrke-bred) > .styrke, :where(.side-oversikt) .rute.nivaa-bred-4:not(.merke-bred) > .merke, :where(.side-oversikt) .rute.nivaa-bred-4:not(.grunn-bred) > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
+}
+@media (width <= 760px) {
+  @container (width >= 328px) {
+    :where(.side-oversikt) .rute.nivaa-smal-4 { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto auto minmax(0, 1fr);
+      grid-template-areas: "ticker styrke" "navn navn" "merke merke" "tekst tekst" "endring endring"; gap: 0 8px; padding: 10px 12px; }
+    :where(.side-oversikt) .rute.nivaa-smal-4 > .navn { display: block; }
+    :where(.side-oversikt) .rute.nivaa-smal-4 > .ticker { font-size: 22px; font-weight: 600; }
+    :where(.side-oversikt) .rute.nivaa-smal-4 > .endring { align-self: end; font-size: 28px; font-weight: 600; }
+    :where(.side-oversikt) .rute.nivaa-smal-4:not(.styrke-smal) > .styrke, :where(.side-oversikt) .rute.nivaa-smal-4:not(.merke-smal) > .merke, :where(.side-oversikt) .rute.nivaa-smal-4:not(.grunn-smal) > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
+  @container (width < 328px) {
+    :where(.side-oversikt) .rute.nivaa-smalest-4 { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto auto minmax(0, 1fr);
+      grid-template-areas: "ticker styrke" "navn navn" "merke merke" "tekst tekst" "endring endring"; gap: 0 8px; padding: 10px 12px; }
+    :where(.side-oversikt) .rute.nivaa-smalest-4 > .navn { display: block; }
+    :where(.side-oversikt) .rute.nivaa-smalest-4 > .ticker { font-size: 22px; font-weight: 600; }
+    :where(.side-oversikt) .rute.nivaa-smalest-4 > .endring { align-self: end; font-size: 28px; font-weight: 600; }
+    :where(.side-oversikt) .rute.nivaa-smalest-4:not(.styrke-smalest) > .styrke, :where(.side-oversikt) .rute.nivaa-smalest-4:not(.merke-smalest) > .merke, :where(.side-oversikt) .rute.nivaa-smalest-4:not(.grunn-smalest) > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
+}
 /* Gruppens svar 05.11 kl. 09:34, 1, og gjennomgangen (ECH1): fotnoten for en
    annen grunn står for øyet bare i klassen der en slik rute viser «ikke
    vurdert» (vis-N, annen_grunn_i_kartet i boersometer.py). Beholderen er like
