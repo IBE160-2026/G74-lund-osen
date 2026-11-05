@@ -585,6 +585,19 @@ def test_ci_proever_demoen_og_vernet_i_klonen_paa_windows_og_mac():
     assert "setup-uv" not in jobb
 
 
+def test_start_demoen_paa_windows_slutter_med_exit_0_etter_siste_kontroll():
+    """Svaret 03.11 kl. 20:48 (1). Ville feilet hvis steget «Start demoen paa
+    Windows» ikke sluttet med exit 0 etter siste kontroll, som steget for den
+    ekte versjonen, saa en kode fra taskkill igjen kunne gi steget kode 1
+    (41664214196)."""
+    ci = CI.read_text(encoding="utf-8")
+    for navn in ("Start demoen på Windows", "Start den ekte versjonen i klonen på Windows"):
+        steg = ci.split(f"- name: {navn}\n", 1)[1].split("\n      - name:", 1)[0]
+        linjer = [linje.strip() for linje in steg.splitlines() if linje.strip() and not linje.strip().startswith("#")]
+        assert linjer[-1] == "exit 0", (navn, linjer[-3:])
+        assert linjer[-2].startswith("Write-Host"), (navn, linjer[-3:])
+
+
 def test_readme_og_hjelpen_har_advarselen_og_godkjenningen():
     """Ville feilet hvis advarselen fra Windows eller godkjenningen paa Mac
     manglet i README-en eller i docs/hjelp.md. Fra 3.5f (gruppens svar 25.10
