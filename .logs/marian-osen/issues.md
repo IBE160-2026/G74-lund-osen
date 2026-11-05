@@ -80,6 +80,7 @@
 - [x] 2026-11-04 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — brukslogga 04.11: styrken bare i noen ruter i børsometeret (løst 2026-11-04 i PR #110)
 - [x] 2026-11-04 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — brukslogga 04.11: «?» for periodene etter knappene (løst 2026-11-04 i PR #109)
 - [x] 2026-11-04 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — brukslogga 04.11: «?» ved «Ga» og «Målt mot» bare i det første sjekkortet (løst 2026-11-04 i PR #109)
-- [x] 2026-11-05 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — PR #111 (svarene kl. 20:53 og 20:56) venter på gruppen og flettingen
-- [x] 2026-11-05 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — spørsmål 1 i PR #111: skal fotnoten om «ikke vurdert» også stå for ruter med en annen grunn (BH3, ECH2)?
-- [x] 2026-11-05 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — spørsmål 2 i PR #111: skal «ikke vurdert» stå på nivå 2 i en gul rute en annen dag (VG3, ECH4)?
+- [x] 2026-11-05 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — PR #111 (svarene kl. 20:53 og 20:56) venter på gruppen og flettingen (løst 2026-11-05)
+- [x] 2026-11-05 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — spørsmål 1 i PR #111: skal fotnoten om «ikke vurdert» også stå for ruter med en annen grunn (BH3, ECH2)? (løst 2026-11-05)
+- [x] 2026-11-05 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — spørsmål 2 i PR #111: skal «ikke vurdert» stå på nivå 2 i en gul rute en annen dag (VG3, ECH4)? (løst 2026-11-05)
+- [ ] 2026-11-05 [story-8-2b](979-2026-11-04-01-34-25-story-8-2b.md) — svarene 04.11 kl. 22:23 bygges i en egen instruksjon: tekststørrelsene i store ruter i børsometeret, lenken «Se perioden i Børsometer ›», «<selskapet> kort fortalt» med «?», og ikonene i menyknappene
