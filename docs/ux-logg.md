@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-11-05T10:49
+updated: 2026-11-05T15:46
 ---
 
 # UX-loggen
@@ -674,3 +674,5 @@ Talt: løst 7, delvis 3, står 34, må ses på siden 1, i alt 45.
 *Lagt til 2026-11-04 kl. 20:29 (rettingen av 8.2b flettet i `e45d04a9`, PR #110, etter svaret kl. 19:21 under story 8.2 i `epics.md`):* styrken står nå i alle rutene i børsometeret med plass til én linje til under symbolet og endringen, og «?» står midt på periodeknappene på oversikten, i Min liste og i børsometeret, også ved 390 px. Aksjesiden får ingen egen «?» for periodene.
 
 *Lagt til 2026-11-05 kl. 10:49 (PR #111 flettet i `ab18d375`, etter svarene 04.11 kl. 20:53 og 20:56 og 05.11 kl. 09:34 under story 8.2 i `epics.md`):* en gul rute en annen dag viser styrken bare med merket, en rute uten styrke sier «ikke vurdert» der styrken ellers står, og en fotnote under kartet sier at «ikke vurdert» også kan ha en annen grunn, som for kort kurshistorikk, og at grunnen står i tabellen og på aksjesiden.
+
+*Lagt til 2026-11-05 (story 10.4, loggdelen, svarene kl. 12:23 og 12:24 under story 10.4 i `epics.md`):* de 75 KI-tekstene som besto kontrollen i uka 29.10–04.11, er klassifisert etter regelen i `spec-10-4-loggdelen.md`: 75 gjentar regelforklaringen, 0 sier mer og 0 er usikre. KI-teksten la altså ingenting til med ord i den uka. Det er et funn til refleksjonsrapporten, ikke en feil.

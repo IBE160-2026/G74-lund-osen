@@ -2263,6 +2263,8 @@ tredje. Dockerfilen og `compose.yaml` leveres som før. Bygges i 3.5f.
 
 *Lagt til 2026-10-19 kl. 12:19:* bildene av appen står bak knappen «Bilder av appen (demoen)» rett under beskrivelsen, i `docs/appen/`, med bildet av oversikten og et nytt bilde av aksjesiden for KVST, flettet i `208d086`, PR #75 (spesifikasjonen `spec-3-3f-bildene-av-appen-bak-en-knapp.md`).
 
+*Avgjort 2026-11-05 kl. 12:14 og 12:20 (gruppens svar):* toppen av oversikten står synlig under beskrivelsen i README-en, og alle hele bildene, også de nye av børsometeret og Min liste og av oversikten og børsometeret ved 390 px, står bak knappen «Bilder av appen (demoen)». «Dokumentene» under «Til faglærer» deles i korte punkter, raden «Klar» kortes ned, og brukertesten (8.1) står under «Neste i v1».
+
 *Avgjort 2026-10-19 kl. 16:46 (gruppens svar):* ja til flettingen av PR #77, etter at README-en før og etter er sett.
 
 *Lagt til 2026-10-19 kl. 16:55:* README-en anbefaler demoen for faglærer og sensor, den lokale modellen er merket valgfri, og «Status» har «Neste i v1» og «Ekstra, hvis tiden rekker», flettet i `855ba75`, PR #77 (spesifikasjonen `spec-3-3g-readme-demoen-anbefales.md`).
@@ -3003,6 +3005,10 @@ uten KI. 5B.4 måler KI-tillegget. Blandes de, vet ingen hva som ble målt.
 
 *Avgjort 2026-10-23 kl. 15:53 (gruppen uten preferanse, rådets forslag):* de to åpne punktene i `spec-8-1-brukertesten.md`. a) Har personen verken forklart noe eller åpnet en aksjeside i del A, er aksjen i del B den øverste i tabellen. b) Slår personen på KI-teksten selv i del A, teller forklaringen for 8.1 bare hvis den kom før det, del B hoppes over, og 10.4 tas med neste person.
 
+*Avgjort 2026-11-05 kl. 12:23 og 12:24 (gruppens svar):* uka som teller for «Én ukes drift er logget», er 29.10–04.11, de sju første dagene jobben gikk av seg selv. Den og loggdelen av 10.4 telles før brukertesten. Delen med en person venter på brukertesten.
+
+*Lagt til 2026-11-05 (loggdelen, svarene kl. 12:23 og 12:24):* loggdelen er talt for uka 29.10–04.11 i `spec-10-4-loggdelen.md`. Av 75 KI-tekster som besto kontrollen, gjentar alle 75 regelforklaringen, 0 sier mer og 0 er usikre. Det er et funn til refleksjonsrapporten, ikke en feil. Delen med en person venter på brukertesten, så 10-4 står som `in-progress`.
+
 ### Story 10.5: Lenke til selskapets side på NewsWeb
 
 *Lagt til 2026-09-28, med plan B.*
@@ -3618,6 +3624,12 @@ Tidligere avgjørelser som sier noe annet, har fått en datert linje: `designreg
 - «ikke vurdert» i en gul rute en annen dag står bare med merket, på nivå 3, som bygget (VG3 og ECH4).
 
 *Lagt til 2026-11-05 kl. 10:49:* PR #111 er squash-flettet i `ab18d375`, låst til head-en `cac5e721`, med svarene 04.11 kl. 20:53 og 20:56 og 05.11 kl. 09:34 (spesifikasjonen `spec-8-2b-funnene-fra-ux-loggen.md`). En gul rute en annen dag viser styrken bare med merket, en rute uten styrke sier «ikke vurdert» der styrken ellers står, og børsometeret har en egen fotnote under kartet når en rute sier «ikke vurdert» av en annen grunn. Fotnoten står for øyet bare der en slik rute viser det. Hele settet på `2de6679f`, siste commit med kode: 4027 bestått, 24 hoppet over og 7 porttester for `start.ps1` som feilet (svaret 29.10 kl. 21:02). CI var grønn på head-en (42004977696). Mutantene N1–N5 ble fanget; N5 først etter `2de6679f`. Gjennomgangene 05.11 ga ingen funn på høy, og alle på middels er rettet eller avvist med grunnen. CI på flettecommiten står i Utført-linja i dagsfila 05.11.
+
+*Avgjort 2026-11-05 kl. 14:29 (gruppens svar):* på spørsmålene i PR #112.
+1. En stor gul rute en annen dag uten plass til merket viser merket og styrken i stedet for navnet.
+2. Store ruter bare fra 1079 px: som bygget.
+3. Lenken sier «Se dagen i Børsometer» ved én dag og «Se perioden i Børsometer» ved en periode.
+4. Grensen for store ruter regnes for hver rute, så høye, smale ruter som HVDO og BRFE blir store når alt deres får plass.
 
 ### Story 8.2c: Kursgrafen på smal skjerm
 
