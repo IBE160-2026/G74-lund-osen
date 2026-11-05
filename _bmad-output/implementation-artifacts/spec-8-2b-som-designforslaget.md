@@ -113,6 +113,8 @@ Første kjøring før svar 1 og før svar 4 feilet også fordi endringene ikke v
 2. **Store ruter bare fra 1079 px.** Med grensen 193 × 107 er ingen rute stor under 1079 px i demoen, og på 390 px er alle små. Er det som gruppen så for seg?
 3. **Teksten på lenken** er «Se perioden i Børsometer ›» også når oversikten viser siste børsdag eller en valgt dag, som svaret sier. Skal den si «dagen» da?
 
+*Besvart 05.11 kl. 14:29 (gruppens svar, under story 8.2 i `epics.md`):* 1) merket og styrken står i stedet for navnet; 2) store ruter bare fra 1079 px, som bygget; 3) «Se dagen i Børsometer» ved én dag og «Se perioden i Børsometer» ved en periode; 4) grensen regnes for hver rute, så høye, smale ruter som HVDO og BRFE blir store når alt deres får plass. Bygget etter instruksjonen 05.11 kl. 16:09, se «Svarene 05.11 kl. 14:29» nederst.
+
 ## Gjennomgangen 05.11 kl. 13:30
 
 På diffen `7d2a7321..3cc34200`, etter hele settet, med Blind Hunter (BH, 15 funn), Edge Case Hunter (ECH, 4) og Verification Gap (VG, 5), hver for seg. Rettingene står i `36c53166`. Hele settet før den: 4054 bestått, 24 hoppet over og 6 porttester for `start.ps1` som feilet. De 100 målingene i Edge ble gjort på nytt kl. 13:35, uten tekst utenfor ruta og uten vannrett rulling, og bildene i `docs/appen/` er byte for byte de samme.
@@ -139,3 +141,36 @@ På diffen `7d2a7321..3cc34200`, etter hele settet, med Blind Hunter (BH, 15 fun
 | VG2 | middels | `annen_grunn_i_kartet` med nivå 4 uten test | Rettet: `test_fotnoten_for_en_annen_grunn_paa_nivaa_4` |
 | VG3 | middels | Ingen test av at `kart()` fyller `merke` | Rettet: `test_kartet_og_siden_har_merket_i_en_stor_rute` |
 
+## Svarene 05.11 kl. 14:29 og README-en (svarene kl. 12:14 og 12:20)
+
+Instruksjonen 05.11 kl. 16:09 i `docs/ai-prompts/2026-11-05.md`. Main er flettet inn i `665b3642`. Én commit per endring:
+
+- **Svar 1, `92d87579`:** en stor gul rute en annen dag uten plass til merket under navnet viser merket og styrken i stedet for navnet. Navnet står bare med klassen `navn-N` (`Kartrute.navn`). Får merket ikke plass der heller, er ruta ikke stor (`_stor_linjer` gir `None`). Merket regnes i linjer med `HALVFET_EM`, ikke alltid som to linjer, så LKSV 18.09 (231 × 123 px ved 1280 px) har merket på én linje i stedet for navnet. Hjelpen og `docs/hjelp.md` sier det.
+- **Svar 3, `931b1ccc`:** lenken sier «Se dagen i Børsometer ›» når oversikten viser siste børsdag eller en valgt dag, og «Se perioden i Børsometer ›» ved 1 uke til 1 år, etter det samme som adressen i lenken. Hjelpen for søylene måtte kortes inn til «og «Se dagen» eller «Se perioden» under søylene …», fordi den ellers ble 79 ord, over grensen på 77 i `test_hovedindeksen_og_soeylene_har_hvert_sitt_vindu`.
+- **Svar 4, `469b02b2`:** `storplass(rute, b, h)` regner bredden ruta selv trenger (`stor_bredde`): øverst symbolet i 22 px halvfett, 8 px og styrken, med ringen der den står (2 × 2 + 2 × 7,2 px), og nederst endringen i 28 px halvfett. Høyden er som før, `STOR[1]` = 107. HVDO og BRFE (175 og 173 px brede ved 1280 px, siste børsdag) trenger 154,96 px og er store. `STOR[0]` = 193 er nå den største bredden en rute med en endring på høyst ni tegn kan trenge. `_stor_endring_plass` er med i `stor_bredde`. **Tolkning av svar 2 sammen med svar 4:** med grensen per rute ville KVST og LKSV (160 px) blitt store også i klassen `bred`, 761–1078 px. Svar 2 sier «store ruter bare fra 1079 px: som bygget», så nivå 4 står bare i klassen `bredest` (`STORE_KLASSER`). Stilen for nivå 4 i de andre klassene står som før og brukes ikke.
+- **README-en, `42088949`:** toppen av oversikten (1280 × 615 px, over periodeknappene) står synlig under beskrivelsen, og bak knappen står oversikten og aksjesiden som før, og børsometeret og Min liste ved 1280 px og oversikten og børsometeret ved 390 px, med alt-tekst og en kort tekst under hvert. Bare demoen. Bildene ved 390 px er tatt i en iframe som er 390 px bred, fordi Edge uten vindu ikke ble 390 px bredt (det første bildet ble kuttet til høyre). Hvert nytt bilde har adresse, størrelse, filene bak og avtrykk i `DE_NYE_BILDENE` og `AVTRYKK_BAK_DE_NYE_BILDENE` i `test_docker.py`, med to nye tester. «Dokumentene» under «Til faglærer» er delt i fem korte punkter, raden «Klar» er kortere (bonuskvoten står fortsatt, og mer i `docs/hjelp.md`), og «Brukertesten med én person, først med KI av» står under «Neste i v1», uten storynummer, fordi «Status» ikke har storynumre (`test_status_uten_storynumre_og_uten_kommando`). «Mappestruktur» har de nye bildene (regel 19).
+
+**Hele settet** alene før hver commit med kode eller tester, grense 15 minutter, ledig minne 4,2–4,5 GB:
+
+| Før | Bestått | Hoppet over | Feilet |
+|---|---|---|---|
+| `92d87579` | 4057 | 24 | 6 porttester for `start.ps1` |
+| `931b1ccc` | 4058 | 24 | 7 porttester |
+| `469b02b2` | 4062 | 24 | 5 porttester |
+| `42088949` | 4066 | 24 | 3 porttester |
+
+Første kjøring før svar 1 feilet også i tre avtrykkstester i `test_docker.py`, og første kjøring før svar 3 i lengden på hjelpen for søylene, fordi endringene ikke var ferdige. De ble rettet, og settet ble kjørt på nytt (svaret 4.11 kl. 09:48). En kjøring før svar 1 ble stoppet etter første feil med `-x` ved en feil, og ble kjørt på nytt uten.
+
+**Mutantene**, på den committede fila, med kopi før og git-bloben og sha256 av innholdet uten CR lik HEAD etter:
+
+| | Mutanten | Fanget av |
+|---|---|---|
+| P1 | `navn = False` tatt ut i `_stor_linjer` | 3 tester i `test_designforslaget.py` |
+| P2 | lenken sier alltid «Se perioden» | 3 tester |
+| P3 | `storplass` med den faste bredden `STOR[0]` | 5 tester |
+| P4 | store ruter i alle klassene, ikke bare `bredest` | 3 tester |
+| P5 | toppbildet i README-en uten «Toppen av oversikten» i alt-teksten | 1 test |
+
+**Edge i en iframe**, 05.11 kl. 16:58, med demobasen i en midlertidig mappe, på svar 1, 3 og 4: 10 visninger × 10 bredder (1280, 1100, 1079, 900, 761, 760, 600, 390, 360 og 320 px), de samme som før. Ingen synlig tekst utenfor ruta, ingen synlig tekst utenfor vinduet og ingen vannrett rulling i noen av de 100. Måleren regner ikke tekst i en boks som ruller selv (tabellene på smal skjerm), og regner tekst som en boks med `overflow: hidden` kutter, som kuttet («Industri» og «Konsum» ved 320 px). Bunnen av siste rad under «Skilte seg ut» er fortsatt 1864 px, og bunnen av `p.dagene` 2198 px.
+
+**Bildene** før (`2e48eb0f`) og etter (`42088949`) står på `pr-8-2b-bilder` i `77a0c0fa`, med navn som begynner på `svar-1429-`: børsometeret ved 1280 px siste børsdag og 18.09, børsometeret ved 390 px (likt før og etter, svar 2), og oversikten ved 1280 og 390 px. Bare demoen, ingen ekte kurser.
