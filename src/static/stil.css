@@ -862,7 +862,9 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
    (STOR i boersometer.py). Symbolet 22 px halvfett øverst til venstre og
    styrken øverst til høyre, navnet under i 12,5 px og kuttet med «…», merket
    og grunnen under navnet der de får plass (klassene merke-N og grunn-N), og
-   endringen 28 px halvfett nederst, med luft 10 og 12 px. Små ruter er som før. */
+   endringen 28 px halvfett nederst, med luft 10 og 12 px. Små ruter er som før.
+   Gruppens svar 05.11 kl. 14:29, 1: navnet står bare med navn-N, og en gul
+   rute en annen dag uten plass til merket under navnet viser merket i stedet. */
 :where(.side-oversikt) .rute .navn { display: none; grid-area: navn; margin-top: 2px; font-size: 12.5px; font-weight: 400;
                                      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 :where(.side-oversikt) .rute > .ticker { grid-area: ticker; }
@@ -874,7 +876,7 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
   @container (width >= 1008px) {
     :where(.side-oversikt) .rute.nivaa-bredest-4 { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto auto minmax(0, 1fr);
       grid-template-areas: "ticker styrke" "navn navn" "merke merke" "tekst tekst" "endring endring"; gap: 0 8px; padding: 10px 12px; }
-    :where(.side-oversikt) .rute.nivaa-bredest-4 > .navn { display: block; }
+    :where(.side-oversikt) .rute.nivaa-bredest-4.navn-bredest > .navn { display: block; }
     :where(.side-oversikt) .rute.nivaa-bredest-4 > .ticker { font-size: 22px; font-weight: 600; }
     :where(.side-oversikt) .rute.nivaa-bredest-4 > .endring { align-self: end; font-size: 28px; font-weight: 600; }
     :where(.side-oversikt) .rute.nivaa-bredest-4:not(.styrke-bredest) > .styrke, :where(.side-oversikt) .rute.nivaa-bredest-4:not(.merke-bredest) > .merke, :where(.side-oversikt) .rute.nivaa-bredest-4:not(.grunn-bredest) > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -882,7 +884,7 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
   @container (width < 1008px) {
     :where(.side-oversikt) .rute.nivaa-bred-4 { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto auto minmax(0, 1fr);
       grid-template-areas: "ticker styrke" "navn navn" "merke merke" "tekst tekst" "endring endring"; gap: 0 8px; padding: 10px 12px; }
-    :where(.side-oversikt) .rute.nivaa-bred-4 > .navn { display: block; }
+    :where(.side-oversikt) .rute.nivaa-bred-4.navn-bred > .navn { display: block; }
     :where(.side-oversikt) .rute.nivaa-bred-4 > .ticker { font-size: 22px; font-weight: 600; }
     :where(.side-oversikt) .rute.nivaa-bred-4 > .endring { align-self: end; font-size: 28px; font-weight: 600; }
     :where(.side-oversikt) .rute.nivaa-bred-4:not(.styrke-bred) > .styrke, :where(.side-oversikt) .rute.nivaa-bred-4:not(.merke-bred) > .merke, :where(.side-oversikt) .rute.nivaa-bred-4:not(.grunn-bred) > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -892,7 +894,7 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
   @container (width >= 328px) {
     :where(.side-oversikt) .rute.nivaa-smal-4 { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto auto minmax(0, 1fr);
       grid-template-areas: "ticker styrke" "navn navn" "merke merke" "tekst tekst" "endring endring"; gap: 0 8px; padding: 10px 12px; }
-    :where(.side-oversikt) .rute.nivaa-smal-4 > .navn { display: block; }
+    :where(.side-oversikt) .rute.nivaa-smal-4.navn-smal > .navn { display: block; }
     :where(.side-oversikt) .rute.nivaa-smal-4 > .ticker { font-size: 22px; font-weight: 600; }
     :where(.side-oversikt) .rute.nivaa-smal-4 > .endring { align-self: end; font-size: 28px; font-weight: 600; }
     :where(.side-oversikt) .rute.nivaa-smal-4:not(.styrke-smal) > .styrke, :where(.side-oversikt) .rute.nivaa-smal-4:not(.merke-smal) > .merke, :where(.side-oversikt) .rute.nivaa-smal-4:not(.grunn-smal) > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -900,7 +902,7 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
   @container (width < 328px) {
     :where(.side-oversikt) .rute.nivaa-smalest-4 { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto auto minmax(0, 1fr);
       grid-template-areas: "ticker styrke" "navn navn" "merke merke" "tekst tekst" "endring endring"; gap: 0 8px; padding: 10px 12px; }
-    :where(.side-oversikt) .rute.nivaa-smalest-4 > .navn { display: block; }
+    :where(.side-oversikt) .rute.nivaa-smalest-4.navn-smalest > .navn { display: block; }
     :where(.side-oversikt) .rute.nivaa-smalest-4 > .ticker { font-size: 22px; font-weight: 600; }
     :where(.side-oversikt) .rute.nivaa-smalest-4 > .endring { align-self: end; font-size: 28px; font-weight: 600; }
     :where(.side-oversikt) .rute.nivaa-smalest-4:not(.styrke-smalest) > .styrke, :where(.side-oversikt) .rute.nivaa-smalest-4:not(.merke-smalest) > .merke, :where(.side-oversikt) .rute.nivaa-smalest-4:not(.grunn-smalest) > .tekst { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

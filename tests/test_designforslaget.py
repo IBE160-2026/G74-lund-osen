@@ -116,42 +116,88 @@ def _rute(**kw):
 
 def test_merket_og_grunnen_der_de_faar_plass():
     """Svar 1: merket og grunnen står mellom navnet og endringen der de får
-    plass, merket først og alltid på to linjer (gjennomgangen, ECH1). En
-    annen dag står styrken i en gul rute bare med merket (svaret 04.11 kl.
-    20:53 og 20:56, 1). Gjennomgangen (VG1, BH13): grunnen med og uten
-    merket, og høydene regnet fra konstantene. Ville feilet hvis merket
-    eller grunnen sto i en rute uten plass, styrken sto uten merket, merket
-    ble regnet som én linje, eller grunnen sto under et merke som ikke fikk
-    plass."""
+    plass, merket først (gjennomgangen, ECH1). En annen dag står styrken i
+    en gul rute bare med merket (svaret 04.11 kl. 20:53 og 20:56, 1).
+    Gruppens svar 05.11 kl. 14:29, 1: uten plass til merket under navnet
+    står merket og styrken i stedet for navnet, og uten plass der heller er
+    ruta ikke stor. Gjennomgangen (VG1, BH13): grunnen med og uten merket,
+    og høydene regnet fra konstantene. Ville feilet hvis merket eller
+    grunnen sto i en rute uten plass, styrken sto uten merket, en stor gul
+    rute en annen dag sto uten merket, navnet sto sammen med et merke som
+    ikke fikk plass under det, eller grunnen sto under et merke som ikke
+    fikk plass."""
     import boersometer as bm
     from boersometer import KANT, STOR, Flate, _nivaa_ved
 
     flate = Flate("prove", 100, 1, 100, (("prove", 100),))
     linje = bm.RUTESKRIFT * bm.RUTELINJE
+    navnet = bm.STORNAVN * bm.RUTELINJE + bm.STORGAP
+    # Ved 193 px er merket to linjer i halvfet skrift.
+    assert bm._linjer(bm.MERKET, STOR[0] - 2 * bm.RUTERAMME - 2 * bm.STORLUFT[1], bm.HALVFET_EM) == 2
     merke = 2 * linje + bm.STORGAP
     # 0,001 px for avrundingen i flyttallene ved grensen.
     b, h = STOR[0] + 2 * KANT, STOR[1] + 2 * KANT + 0.001
     gul = _rute(styrke=1, siste_styrke=3, er_siste=False)
-    # Bare plass til grunnoppsettet: verken merket eller styrken.
-    assert _nivaa_ved(flate, 100, b, h, gul) == (4, False, False, False)
-    # Én linje for merket er ikke nok (ECH1), to er det.
-    assert _nivaa_ved(flate, 100, b, h + linje + bm.STORGAP, gul) == (4, False, False, False)
-    assert _nivaa_ved(flate, 100, b, h + merke, gul) == (4, True, False, True)
+    # Ikke plass til merket, heller ikke i stedet for navnet: ruta er ikke stor.
+    assert _nivaa_ved(flate, 100, b, h, gul) == (3, False, False, False, False)
+    assert _nivaa_ved(flate, 100, b, h + merke - navnet - 0.01, gul)[0] == 3
+    # Plass i stedet for navnet: merket og styrken, uten navnet.
+    assert _nivaa_ved(flate, 100, b, h + merke - navnet, gul) == (4, True, False, True, False)
+    # Plass under navnet: alt.
+    assert _nivaa_ved(flate, 100, b, h + merke - 0.01, gul) == (4, True, False, True, False)
+    assert _nivaa_ved(flate, 100, b, h + merke, gul) == (4, True, False, True, True)
     # Siste børsdag trenger ikke merket.
     siste = _rute(styrke=3, siste_styrke=3)
-    assert _nivaa_ved(flate, 100, b, h, siste) == (4, True, False, False)
+    assert _nivaa_ved(flate, 100, b, h, siste) == (4, True, False, False, True)
     # Grunnen, «for kort historikk: 24 av 51 dager», er tre linjer ved 161 px.
     grunn = "for kort historikk: 24 av 51 dager"
     linjer = bm._linjer(grunn, STOR[0] - 2 * bm.RUTERAMME - 2 * bm.STORLUFT[1])
     trengs = linjer * linje + bm.STORGAP
     uten = _rute(tekst=grunn)
     assert uten.grunn and uten.uten_styrke
-    assert _nivaa_ved(flate, 100, b, h + trengs - 1, uten) == (4, True, False, False)
-    assert _nivaa_ved(flate, 100, b, h + trengs, uten) == (4, True, True, False)
+    assert _nivaa_ved(flate, 100, b, h + trengs - 1, uten) == (4, True, False, False, True)
+    assert _nivaa_ved(flate, 100, b, h + trengs, uten) == (4, True, True, False, True)
     # En gul rute en annen dag: grunnen bare under merket.
     gul_grunn = _rute(tekst=grunn, siste_styrke=3, er_siste=False)
     assert _nivaa_ved(flate, 100, b, h + trengs, gul_grunn)[2] is False
-    assert _nivaa_ved(flate, 100, b, h + merke + trengs, gul_grunn) == (4, True, True, True)
+    assert _nivaa_ved(flate, 100, b, h + merke + trengs, gul_grunn) == (4, True, True, True, True)
+
+
+def test_merket_i_stedet_for_navnet_som_lksv_18_09():
+    """Gruppens svar 05.11 kl. 14:29, 1: LKSV 18.09 er 231 × 123 px ved
+    1280 px i demoen. Der er merket én linje i halvfet skrift, og det får
+    plass i stedet for navnet, men ikke under det. Ville feilet hvis ruta
+    viste navnet uten merket og styrken, som før svaret."""
+    import boersometer as bm
+    from boersometer import KANT, Flate, _nivaa_ved
+
+    flate = Flate("prove", 100, 1, 100, (("prove", 100),))
+    assert bm._linjer(bm.MERKET, 231 - 2 * bm.RUTERAMME - 2 * bm.STORLUFT[1], bm.HALVFET_EM) == 1
+    gul = _rute(siste_styrke=3, er_siste=False)
+    assert _nivaa_ved(flate, 100, 231 + 2 * KANT, 123 + 2 * KANT, gul) == (4, True, False, True, False)
+
+
+def test_navnet_staar_bare_med_navn_klassen():
+    """Gruppens svar 05.11 kl. 14:29, 1: navnet står bare i klassene i
+    Kartrute.navn, og malen skriver navn-N. Ville feilet hvis navnet sto i
+    en stor rute der merket står i stedet, eller malen mistet klassen."""
+    mal = (Path(__file__).resolve().parent.parent / "src" / "templates" / "boersometer.html").read_text(
+        encoding="utf-8"
+    )
+    assert "{% for navn in kartrute.navn|sort %} navn-{{ navn }}{% endfor %}" in mal
+    for klasse in KLASSENE:
+        assert "display: block" in _regel(f".rute.nivaa-{klasse}-4.navn-{klasse} > .navn")
+        assert f".rute.nivaa-{klasse}-4 > .navn {{" not in STIL
+
+
+def test_lksv_18_09_viser_merket_i_stedet_for_navnet(klient):
+    """Gruppens svar 05.11 kl. 14:29, 1, i demoen ved 1280 px: LKSV 18.09 er
+    stor, med merket og styrken, men uten navn-bredest. Ville feilet hvis
+    ruta var stor uten merket, eller hadde både navnet og merket."""
+    html = _html(klient, "/boersometer?periode=velg&dag=2026-09-18")
+    klasser = re.search(r'<a class="rute ([^"]*)"[^>]*>\s*<span class="ticker">LKSV</span>', html).group(1).split()
+    assert {"nivaa-bredest-4", "merke-bredest", "styrke-bredest"} <= set(klasser), klasser
+    assert "navn-bredest" not in klasser, klasser
 
 
 @pytest.mark.parametrize(("endring", "stor"), [(-2.26, True), (1234.56, False)])

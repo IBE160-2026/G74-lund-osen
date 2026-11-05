@@ -187,6 +187,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             # Gruppens svar 04.11 kl. 22:23, 1: store ruter som i designforslaget.
             "de største rutene har symbolet og styrken øverst, selskapsnavnet under, kuttet med «…» når "
             "det er for langt, og endringen i stor skrift nederst, med merket og grunnen mellom der de får plass, "
+            # Gruppens svar 05.11 kl. 14:29, 1.
+            "og merket i stedet for navnet når det ikke får plass under navnet, "
             # Gruppens svar 04.11 kl. 10:01 og 10:04: styrken i rutene.
             "og styrken står i rutene som har plass, som i tabellen, "
             # Gruppens svar 04.11 kl. 20:53 og 20:56, 1.

@@ -1126,7 +1126,9 @@ HOEYDE_PAA_BILDET = 1864
 # stil.css. Bildet ble tatt paa nytt med ikonene; bunnen av raden er fortsatt 1864 px.
 # Gjennomgangen av svarene kl. 22:23: hjelpen og lenken uten dag, i
 # hjelpetekster.py og _hovedindeks.html. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "4c5130505549c61a2ffa038d9694013c4e168b8ee0be4f0eda0a28fc57305d7e"
+# Gruppens svar 05.11 kl. 14:29, 1: merket i stedet for navnet i en stor gul
+# rute, i hjelpetekster.py og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "4771bf0b8c644a77142a0a3662cadcb94fadd7994c87452108cc2aa6faa56eb9"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1404,7 +1406,9 @@ HOEYDE_PAA_AKSJESIDEN = 2198
 # stil.css. Bildet ble tatt paa nytt med ikonene; bunnen av p.dagene er fortsatt 2198 px.
 # Gjennomgangen av svarene kl. 22:23: hjelpen og etiketten på «?», i
 # hjelpetekster.py og aksje.html. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "4612341effc240ddcf00b0aa64ecccf67b446dffd7f0fe736d75adb11ec02ef7"
+# Gruppens svar 05.11 kl. 14:29, 1: merket i stedet for navnet i en stor gul
+# rute, i hjelpetekster.py og stil.css. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "bb82839ba33f7c75bab8e5dc1aa1880eb36b8ce3c8ddc02251abc6fad198dfe7"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
