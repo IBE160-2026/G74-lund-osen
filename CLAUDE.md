@@ -164,6 +164,11 @@ et sitat som ikke fantes».
     Loggcommiten har Co-authored-by (regel 20) og pushes med Utført-linja, så
     main er i takt med origin/main til slutt. Lagt til 2026-10-27, etter
     gruppens svar 26.10 kl. 21:09.
+25. **Funn som følger av et svar.** Et funn på middels eller over som følger
+    av et svar, står åpent til gruppen har svart, og graden settes aldri ned
+    for å kunne flette. Lagt til 2026-11-05, etter gruppens svar kl. 21:01:
+    ECH1 i PR #114 ble satt ned fra middels til lav i triagen, og PR-en ble
+    flettet med funnet åpent.
 
 ## Sesjonslogg
 

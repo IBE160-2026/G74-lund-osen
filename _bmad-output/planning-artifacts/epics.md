@@ -1659,6 +1659,14 @@ Som **gruppe som henter for hånd hver kveld**, vil vi at hentingen går av seg 
 
 *Ferdig 2026-10-28:* squash-flettet i `817b331`, PR #104, låst til head-en `ad8ec4a` (spesifikasjonen `spec-2-3d-hentingen-hver-kveld.md`). Hele settet på `c852bbd`: 3806 bestått og 24 hoppet over, og CI var grønn på head-en (40673689106), med testene for kveldshentingen på `windows-latest`. Mutanten, `origin/main` i stedet for commiten fra midnatt, ble fanget. Jobben legges inn på PC-en i samme instruksjon og går første gang torsdag 29.10.
 
+*Avgjort 2026-11-05 kl. 12:33 (gruppens svar):* kjøringene kl. 22:45, 23:15 og 23:45 stopper med en gang, før Docker og Ollama startes, når dagen alt er ferdig hentet, og feiler kjøringen kl. 22:15, prøver de senere som før.
+
+*Avgjort 2026-11-05 kl. 19:33 (gruppens svar):* på spørsmålet i Utført-linja kl. 19:15, forslag a): når kursene og vurderingene for de 15, hovedindeksen og KI-tekstene for dagen er der, starter kjøringen verken Docker eller Ollama, men kjører `--maal-omsetning` som før, med reglene for kvoten og kl. 23:45 der. Det presiserer svaret kl. 12:33.
+
+*Ferdig 2026-11-05:* squash-flettet i `0955f796`, PR #114, låst til head-en `fcc676e5` (spesifikasjonen `spec-2-3d-tidlig-stopp-og-ci.md`). Før steg 3 sjekker kveldsjobben med `src/dagen_ferdig.py`, med basen bare for lesing, om børsdagen er ferdig, og er den det, startes verken Docker eller Ollama, mens hentingen og målingen går som før. «Start demoen på Windows» i `tester.yml` slutter med `exit 0` (svaret 03.11 kl. 20:48, 1). Gjelder fra kjøringen fredag 06.11, når commiten fra midnatt har den. ECH1 står som spørsmål til gruppen: en indeks som feilet en dag der de 15 har kursene, hentes ikke på nytt, så den dagen går kjøringene som før.
+
+*Avgjort 2026-11-05 kl. 21:01 (gruppens svar):* 1) ECH1 i PR #114 er middels, ikke lav, for graden skal ikke settes ned. Funnet godtas: hovedindeksen blir i «ferdig», og en kveld der den feiler, går kjøringene som i dag. PR #114 ble flettet med ECH1 åpent, mot steg 4 i instruksjonen kl. 19:41, og flettingen står. 2) Ny regel 25 i `CLAUDE.md`, «Funn som følger av et svar»: et funn på middels eller over som følger av et svar, står åpent til gruppen har svart, og graden settes aldri ned for å kunne flette.
+
 ### Story 2.4: Etterfylling av hull i kursserien
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
@@ -3010,6 +3018,10 @@ uten KI. 5B.4 måler KI-tillegget. Blandes de, vet ingen hva som ble målt.
 *Lagt til 2026-11-05 (loggdelen, svarene kl. 12:23 og 12:24):* loggdelen er talt for uka 29.10–04.11 i `spec-10-4-loggdelen.md`. Av 75 KI-tekster som besto kontrollen, gjentar alle 75 regelforklaringen, 0 sier mer og 0 er usikre. Det er et funn til refleksjonsrapporten, ikke en feil. Delen med en person venter på brukertesten, så 10-4 står som `in-progress`.
 
 *Avgjort 2026-11-05 kl. 16:05 (gruppens svar):* alle 75 KI-tekstene i uka 29.10–04.11 gjentar regelforklaringen, så en ny promptversjon lages før brukertesten, der modellen bes bruke bransjen, hovedindeksen og antallene med ord, innenfor kontrollen, og tellingen gjentas etter noen dager med den.
+
+*Avgjort 2026-11-05 kl. 19:13 (gruppens svar):* på spørsmål 1 i PR #113: appen skriver setningen om hovedindeksen, bransjen og antallene, alltid riktig, som setningen om dagene, og modellen sier bare med faste ord om aksjen gikk samme vei som børsen, og det sjekker kontrollen. Det bygges 6.11, og 10.6 bygges etter det med samme løsning.
+
+*Avgjort 2026-11-05 kl. 23:36 (gruppens svar):* spørsmål 2 og 3 i PR #113 er besvart av svaret kl. 19:13: appen lager setningen om dagen (BH6), og modellen skriver ikke om dagen; appens setning står for seg selv under teksten, som setningen om dagene, og sier aldri at dagen forklarer signalet (BH7).
 
 ### Story 10.5: Lenke til selskapets side på NewsWeb
 

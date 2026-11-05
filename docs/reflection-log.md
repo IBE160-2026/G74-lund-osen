@@ -3190,6 +3190,39 @@ Det vi lærte: å se på appen selv fant det testene og gjennomgangene ikke fant
 
 ---
 
+## 05.11.2026 – To PR-er flettet med designet, PRD-en låst, «ferdig» for kveldsjobben, og regel 25
+
+*Joakim og Marian.*
+
+Svaret kl. 10:01 førte størrelsene fra originalen (`c33e8032`), og PR #111, med fotnoten og «ikke vurdert» i børsometeret, ble squash-flettet kl. 10:47 i `ab18d375`. PR #112, fire ting som i designforslaget, ble squash-flettet kl. 17:44 i `eb492502`: store ruter i børsometeret, lenken «Se perioden i Børsometer» under søylene, «<navnet> kort fortalt» og ikonene i menyen. Etter svarene kl. 12:14 og 12:20 står toppen av oversikten synlig i README-en, og de hele bildene står bak knappen «Bilder av appen (demoen)» (`42088949`).
+
+*Rettet 2026-11-05:* størrelsene fra originalen kom fra svarene 04.11 kl. 22:23 og 05.11 kl. 09:34, ført i `c33e8032`. Svaret kl. 10:01 er fra 04.11, og `c33e8032` la bare til en datert linje ved 14 px i det, og én i spesifikasjonen 8.6b.
+
+PRD-en er låst i taggen `prd-ferdig-2026-11-03`, som står på `045ddeb1` og ble pushet før `prd.md` ble endret igjen. Samme ettermiddag talte vi uka 29.10–04.11 for R29. Kl. 15:50 sto det 105 rader i `prd.md` (`6c45588a`), men `ki_logg` har 15 rader på hver av de fem børsdagene, til sammen 75. 105 er 7 × 15, de sju dagene i uka. Det ble rettet samme dag i `398b29f4`.
+
+Promptversjon 4 ble bygget i PR #113, som stoppet før flettingen, se utfordring 1. Vi svarte kl. 19:13 på spørsmål 1 der, og kl. 19:33 på hva «ferdig» er for kveldsjobben, se utfordring 2. PR #114, med `exit 0` i CI og sjekken før Docker og Ollama i kveldsjobben, ble squash-flettet kl. 20:40 i `0955f796`, og CI var grønn på flettecommiten. Kl. 21:01 svarte vi på hvordan PR #114 ble flettet, se utfordring 3.
+
+**Utfordringer**
+
+1. **KI-tekstene gjentok regelen, og kontrollen sjekker ikke hva et tall gjelder.**
+   *Problem:* alle 75 KI-tekstene i uka 29.10–04.11, med versjon 3, gjentok regelforklaringen (`spec-10-4-loggdelen.md`). Versjon 4 for 04.11 sa mer i alle 15 (§54 i `malinger.md` på grenen til PR #113). Men gjennomgangen av PR #113 fant at kontrollen i FR-603 bare godtar tall som finnes i grunnlaget (`ANTALLENE` i `src/ki_grunnlag.py`), ikke hva tallet gjelder, så et byttet antall aksjer som steg og falt kan bestå.
+   *Løsning:* kl. 19:13 valgte vi at appen skriver setningen om hovedindeksen, bransjen og antallene selv, alltid riktig, som setningen om dagene. Modellen sier bare med faste ord om aksjen gikk samme vei som børsen, og det sjekker kontrollen. Det bygges 6.11.
+   *KI sin rolle:* Claude Code bygget versjon 4 og klassifiserte tekstene. Linsene i gjennomgangen fant hullet i kontrollen. Gruppen avgjorde løsningen.
+
+2. **«Ferdig» for kveldsjobben var ikke definert.**
+   *Problem:* instruksjonen kl. 19:15, med ordlyd fra rådet, sa at kjøringen stopper når dagen er ferdig, også målingen. Målingen bruker alle kallene som er igjen av dagens, og det står bare i `/api/user`, ikke i basen.
+   *Løsning:* Claude Code stoppet kl. 19:18 uten gren eller kode, med tre forslag. Vi valgte forslag a) kl. 19:33: når kursene, vurderingene, hovedindeksen og KI-tekstene er der, starter kjøringen verken Docker eller Ollama, men måler som før. Det ble bygget i PR #114.
+   *KI sin rolle:* rådet skrev ordet uten å si hva det betyr. Claude Code så at det ikke kunne leses i basen, stoppet og foreslo. Gruppen valgte.
+
+3. **Graden på ECH1 i PR #114 ble satt ned for å kunne flette.**
+   *Problem:* instruksjonen kl. 19:41 sa at PR-en bare flettes uten åpne funn på middels eller over, og at et funn som følger av et svar, også er åpent. Edge Case Hunter satte ECH1 til middels: en kveld hovedindeksen feiler, blir dagen aldri «ferdig». Claude Code satte selv graden ned til lav i triagen og flettet. Dagen før ble ECH1 i PR #110 også flettet åpent, da som en følge av et svar.
+   *Løsning:* kl. 21:01 sa vi nei: ECH1 er middels. Funnet godtas, og flettingen står. Regel 25 i `CLAUDE.md` sier at et funn på middels eller over som følger av et svar, står åpent til gruppen har svart, og at graden aldri settes ned for å kunne flette.
+   *KI sin rolle:* linsen Edge Case Hunter fant funnet. Claude Code satte graden ned med en grunn og sa det i sluttoppsummeringen, men flettet før vi hadde svart. Gruppen avgjorde at det ikke var greit, og laget regelen.
+
+Det vi lærte: en kontroll må sjekke hva et tall gjelder, ikke bare at det finnes. Et ord som «ferdig» må sies ut fra det som kan leses. Og en regel som bare står i blokkene, blir bøyd når tiden er knapp, så den står nå i `CLAUDE.md`.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.

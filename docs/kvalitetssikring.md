@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-05T17:45
+updated: 2026-11-05T20:41
 ---
 
 # Kvalitetssikring
@@ -383,6 +383,7 @@ sist i dokumentet.
 | 8.2b, rettingen 04.11 kl. 19:21: styrken og «?» | `e45d04a` (#110) | 1 (3, S1–S3) | – kjørt med `-x` 04.11 | `S/spec-8-2b-funnene-fra-ux-loggen.md` |
 | 8.2b, svarene 04.11 kl. 20:53 og 20:56 og 05.11 kl. 09:34: styrken en annen dag, «ikke vurdert» og fotnoten | `ab18d37` (#111) | 1 (5, N1–N5) | N5 overlevde først, fanget etter `2de6679f` | `S/spec-8-2b-funnene-fra-ux-loggen.md` |
 | 8.2b, designforslaget: svarene 04.11 kl. 22:23 og 05.11 kl. 14:29, store ruter, lenken, «kort fortalt» og ikonene | `eb49250` (#112) | 1 (10, M1–M4 og P1–P6) | – | `S/spec-8-2b-som-designforslaget.md` |
+| 2.3d, tidlig stopp: svarene 03.11 kl. 20:48 (1), 05.11 kl. 12:33 og 19:33, `exit 0` i CI og sjekken før steg 3 i kveldsjobben | `0955f79` (#114) | 1 (2, A og B) | – | `S/spec-2-3d-tidlig-stopp-og-ci.md` |
 | 8.2a Seks funn fra prøven av demoen 24.10 | `e4d1ba4` (#93) | 1 (5, M1–M5) | – kjørt på `7ca19d9` 24.10 | `S/spec-8-2a-funn-fra-proeven-av-demoen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
@@ -631,6 +632,7 @@ funn. Antall rader i loggen:
 | 8.2b, gjennomgangen 05.11 av svar 1 kl. 09:34 | 16 | 9 | 7 | – |
 | 8.2b, designforslaget: gjennomgangen 05.11 kl. 13:30 av svarene 04.11 kl. 22:23 | 19 | 11 | 5 | 3 |
 | 8.2b, designforslaget: gjennomgangen 05.11 av svarene kl. 14:29 | 22 | 12 | 4 | 6 |
+| 2.3d, tidlig stopp: gjennomgangen 05.11 kl. 20:11 | 19 | 8 | 1 | 10 |
 | 8.2a | 21 | 15 | 6 | – |
 | 9.1, oppdatering 17.10 | 19 | 17 | 2 | – |
 | 9.7 | 19 | 13 | 6 | – |
@@ -1450,6 +1452,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 8.2b, rettingen 04.11 kl. 19:21 | S1–S3 | S1 `test_styrkeplass`, S2 `test_spoersmaalstegnet_staar_midt_paa_den_foerste_knappen`, S3 `test_klassen_for_styrken_bare_paa_ruter_med_styrke`, alle med `-x` | `S/spec-8-2b-funnene-fra-ux-loggen.md` |
 | 8.2b, svarene 04.11 kl. 20:53 og 20:56 og 05.11 kl. 09:34 | N1–N5 | N1 `test_styrkelinje_en_annen_dag_med_gul_ramme`, N2 `test_klassen_for_styrken_bare_paa_ruter_med_styrke`, N3 `test_grunnplass`, N4 `test_annen_grunn_bare_for_en_rute_med_kurs_og_en_annen_grunn`, N5 `test_klassene_for_fotnoten_er_der_ruta_viser_ikke_vurdert` (lagt til etter at N5 overlevde) | `S/spec-8-2b-funnene-fra-ux-loggen.md` |
 | 8.2b, designforslaget: svarene 04.11 kl. 22:23 og 05.11 kl. 14:29 | M1–M4, P1–P6 | M1 4 tester, 2 i test_designforslaget.py og 2 i test_boersometer.py; M2 3 tester for lenken; M3 `test_ki_delen_heter_navnet_kort_fortalt`; M4 4 tester for ikonene; P1 `test_merket_og_grunnen_der_de_faar_plass`, `test_merket_i_stedet_for_navnet_som_lksv_18_09` og `test_lksv_18_09_viser_merket_i_stedet_for_navnet`; P2 `test_lenken_til_boersometeret_har_samme_periode` (3 av periodene); P3 `test_storplass_regnes_for_hver_rute`, `test_endringen_maa_faa_plass_i_28_px`, `test_hoeye_smale_ruter_er_store_i_demoen` og 2 i `TestKartet`; P4 `test_hoeye_smale_ruter_er_store_i_demoen` og 2 i `TestKartet`; P5 `test_til_faglaerer_og_kom_i_gang_foer_status`; P6 `test_storplass_regnes_for_hver_rute` (3) og `test_stor_den_bredeste_er_stor_bredde`. Fila var lik HEAD etter hver | `S/spec-8-2b-som-designforslaget.md` |
+| 2.3d, tidlig stopp: svarene 03.11 kl. 20:48 (1), 05.11 kl. 12:33 og 19:33 | A, B | A (`exit 0` tatt ut av «Start demoen på Windows») `test_start_demoen_paa_windows_slutter_med_exit_0_etter_siste_kontroll`; B (`$sjekk.Kode -eq 0 -and` tatt ut av `start/kveldshenting.ps1`) `test_alt_annet_enn_ferdig_gir_kjoeringen_som_foer[ferdig-kode-1]`. Fila var lik HEAD etter begge (git-bloben og sha256 uten CR) | `S/spec-2-3d-tidlig-stopp-og-ci.md` |
 | 8.2b | Ma1–Md1, Me1–Me5, Mg1 | Ma1 `test_stjernen_sender_til_tabellen_naar_raden_er_borte`, Ma2 `test_hovedindeksen_og_soeylene_har_hvert_sitt_vindu`, Mb1 `test_grafen_har_felt_til_tallene_datoene_og_navnene`, Mb2 `test_demoen_sier_at_ki_teksten_bare_er_for_siste_boersdag`, Mc1 `test_tallene_i_ki_teksten_har_prikket_strek`, Mc2 `test_kortet_retning_sier_hva_sjekkene_ga`, Md1 `test_min_liste_har_tittelen_med_antallet` (etter at testen fikk med «Alle»), Me1 `test_summen_under_sjekkene`, Me2 `test_grensen_for_moerk_soeyle_er_tallet_slik_det_vises`, Me3 `test_hvert_spoersmaalstegn_staar_ved_det_det_forklarer`, Me4 `test_styrken_staar_i_rutene_som_i_tabellen`, Me5 `test_spoersmaalstegnet_for_periodene_staar_foerst`, Mg1 `test_feltet_flytter_til_knappen_i_et_annet_kort`, med `-x` 03.11–04.11 | `S/spec-8-2b-…` |
 | 8.2a | M1–M5 | M1 `test_periodeknappene_og_velg_dag_gaar_til_kursgrafen`, M2 `test_aksjen_uten_kurser_har_en_rad_nederst_og_ingen_fotnote`, M3 `test_symbolene_over_soeylene_lenker_til_aksjesiden[/]`, M4 `test_raden_sier_hvorfor_med_samme_tall_som_aksjesiden[/]`, M5 `test_sortert_er_hele_lista_en_liste_uten_delene[synkende]` | `S/spec-8-2a-…` |
 | 9.1 | Q1–Q4 | Q1, Q3 og Q4 `test_hver_ferdige_spesifikasjon_har_en_rad`, Q2 `test_hver_test_dokumentene_nevner_finnes` | `S/spec-9-1-…` |
