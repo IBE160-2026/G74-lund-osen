@@ -66,10 +66,14 @@ from vurderingsdata import Vurdering
 SRC = Path(boersometer.__file__).resolve().parent
 
 
-def _nivaaet(b: float, h: float, symbol: str) -> int:
-    """Tekstnivået, med nivå 4 for en stor rute (gruppens svar 04.11 kl. 22:23, 1)."""
+def _nivaaet(b: float, h: float, symbol: str, klasse: str, bredde: float) -> int:
+    """Tekstnivået, med nivå 4 for en stor rute (gruppens svar 04.11 kl. 22:23, 1).
+    Gruppens svar 05.11 kl. 14:29: bredde er den ruta selv trenger (4), og
+    store ruter finnes bare i STORE_KLASSER (2). Rutene her er ikke gule en
+    annen dag, så merket avgjør ikke nivået."""
     nivaa = tekstnivaa(b, h, symbol)
-    return 4 if nivaa == 3 and boersometer.storplass(b, h) else nivaa
+    stor = klasse in boersometer.STORE_KLASSER and b >= bredde and h >= boersometer.STOR[1]
+    return 4 if nivaa == 3 and stor else nivaa
 
 
 IDAG = date(2026, 10, 13)
@@ -1626,7 +1630,13 @@ class TestKartet:
                     kropp = fh * (1 - f.topp[flate.navn] / 100)
                     for kr in f.ruter:
                         rb, rh = kr.plass[flate.navn].b / 100 * fb, kr.plass[flate.navn].h / 100 * kropp
-                        ventet = _nivaaet(rb - 2 * KANT, rh - 2 * KANT, kr.rute.aksje.symbol)
+                        ventet = _nivaaet(
+                            rb - 2 * KANT,
+                            rh - 2 * KANT,
+                            kr.rute.aksje.symbol,
+                            klasse,
+                            boersometer._stor_bredde(kr.rute),
+                        )
                         assert kr.nivaa[klasse] == ventet, (klasse, kr.rute.aksje.symbol, rb, rh)
                         # Gruppens svar 04.11 kl. 19:21: styrken på nivå 2,
                         # regnet for den samme synlige ruta.
@@ -1668,6 +1678,21 @@ class TestKartet:
             )
         )
         assert uten_styrke and uten_styrke < med_styrke, (uten_styrke, med_styrke)
+        # Gruppens svar 05.11 kl. 14:29, 4: bredden for en stor rute, regnet
+        # av teksten og ringen slik de står på siden.
+        bredder = {}
+        for symbol, endring, styrke in re.findall(
+            r'<span class="ticker">([A-Z0-9]+)</span>\s*<span class="endring">([^<]*)</span>\s*'
+            r'(?:<span class="skjult">, </span><span class="(styrke[^"]*)">[^<]*</span>)?',
+            html,
+        ):
+            tekst = re.search(
+                rf'<span class="ticker">{symbol}</span>.*?<span class="{re.escape(styrke)}">([^<]*)</span>', html, re.S
+            )
+            bredder[symbol] = boersometer.stor_bredde(
+                symbol, tekst.group(1) if styrke else None, "pille" in styrke, endring
+            )
+        assert len(bredder) == 15
         sett = set()
         for flate in (BRED, SMAL):
             n = flate.navn
@@ -1678,7 +1703,7 @@ class TestKartet:
                     kropp = fh * (1 - f["topp"][n] / 100)
                     for symbol, p in f["ruter"].items():
                         rb, rh = p[n][2] / 100 * fb, p[n][3] / 100 * kropp
-                        ventet = _nivaaet(rb - 2 * KANT, rh - 2 * KANT, symbol)
+                        ventet = _nivaaet(rb - 2 * KANT, rh - 2 * KANT, symbol, klasse, bredder[symbol])
                         funnet = re.findall(rf"\bnivaa-{klasse}-(\d)\b", klasser[symbol])
                         assert funnet == [str(ventet)], (klasse, symbol, rb, rh)
                         sett.add((klasse, ventet))

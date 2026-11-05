@@ -97,12 +97,38 @@ def test_grensen_for_store_ruter_er_regnet_fra_stilen():
     assert b.STOR[0] > b.NIVAA_3[0] and b.STOR[1] >= b.NIVAA_3[1]
 
 
-@pytest.mark.parametrize(("b", "h", "ventet"), [(193, 107, True), (192, 107, False), (193, 106, False)])
-def test_storplass(b, h, ventet):
-    """Svar 1. Ville feilet hvis grensen ikke var STOR, (193, 107)."""
-    from boersometer import storplass
+@pytest.mark.parametrize(("b", "h", "ventet"), [(155, 107, True), (154.9, 107, False), (155, 106.9, False)])
+def test_storplass_regnes_for_hver_rute(b, h, ventet):
+    """Gruppens svar 05.11 kl. 14:29, 4: grensen regnes for hver rute. HVDO
+    i demoen, 2 av 3 i ringen og -1,67 %: øverst 32 + 0,62 × 22 × 4 + 8 +
+    0,5 × 14 × 6 + ringen 2 × 2 + 2 × 7,2 = 154,96 px, og nederst 32 +
+    0,62 × 28 × 7 = 153,52 px, så HVDO er stor fra 155 px, ikke fra 193 px.
+    Ville feilet med den faste grensen STOR, eller uten ringen eller
+    endringen i bredden."""
+    from boersometer import MOERK, _stor_bredde, storplass
 
-    assert storplass(b, h) is ventet
+    hvdo = _rute(aksje=_aksje("HVDO", "Havdyp Olje"), styrke=2, siste_styrke=2, endring=-1.67, er_siste=True)
+    assert hvdo.ramme == MOERK
+    assert _stor_bredde(hvdo) == pytest.approx(154.96)
+    assert storplass(hvdo, b, h) is ventet
+
+
+def test_stor_den_bredeste_er_stor_bredde():
+    """Svar 4: STOR[0] er den største bredden en rute med en endring på
+    høyst ni tegn kan trenge, AKRBP med «ikke vurdert», og ringen gjør
+    ikke en rute bredere enn det. Ville feilet hvis stor_bredde og STOR
+    regnet ulikt."""
+    from boersometer import STOR, stor_bredde
+
+    bredest = stor_bredde("AKRBP", "ikke vurdert", False, "Uten data")
+    assert bredest <= STOR[0] < bredest + 1
+    assert stor_bredde("AKRBP", "3 av 3", True, "-12,34 %") < bredest
+
+
+def _aksje(symbol, navn):
+    from kursdata import Aksje
+
+    return Aksje(symbol, f"{symbol}.OL", navn, "Energi")
 
 
 def _rute(**kw):
@@ -275,6 +301,25 @@ def test_nivaa_4_staar_i_grensen_klassen_er_regnet_for():
     for klasse, (media, container) in grenser.items():
         der = [(m, c) for m, c, innhold in _container_blokker() if f".rute.nivaa-{klasse}-4" in innhold]
         assert der == [(media, container)], (klasse, der)
+
+
+def test_hoeye_smale_ruter_er_store_i_demoen(klient):
+    """Gruppens svar 05.11 kl. 14:29, 4: HVDO og BRFE er 175 og 173 px brede
+    ved 1280 px, siste børsdag, og blir store når alt deres får plass. Svar 2:
+    store ruter bare fra 1079 px, så KVST er ikke stor i klassen bred, selv
+    om bredden for KVST er under 160 px. Ville feilet med den faste grensen
+    193 px, eller med store ruter under 1079 px."""
+    from boersometer import STORE_KLASSER
+
+    assert STORE_KLASSER == frozenset({"bredest"})
+    html = _html(klient, "/boersometer")
+    klasser = dict(
+        (s, k.split())
+        for k, s in re.findall(r'<a class="rute ([^"]*)"[^>]*>\s*<span class="ticker">([A-Z]+)</span>', html)
+    )
+    for symbol in ("HVDO", "BRFE", "KVST"):
+        assert "nivaa-bredest-4" in klasser[symbol], (symbol, klasser[symbol])
+    assert not [s for s, k in klasser.items() if {f"nivaa-{n}-4" for n in ("bred", "smal", "smalest")} & set(k)]
 
 
 def test_en_stor_rute_i_demoen(klient):
