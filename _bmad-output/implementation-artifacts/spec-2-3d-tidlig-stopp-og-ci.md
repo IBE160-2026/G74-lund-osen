@@ -68,4 +68,6 @@ Blind Hunter (10 funn), Edge Case Hunter (7) og Verification Gap (9) på `9706d1
 | ECH7 | lav | Står: en demobase kan gi FERDIG, men hentingen stopper ved `nekt_demobase` som før. |
 | VG4 | lav | Står: nettsperren i `tests/conftest.py` (AD-8) er vernet mot kall. |
 
+*Rettet 2026-11-05 (gruppens svar kl. 21:01):* ECH1 i PR #114 er middels, ikke lav, for graden skal ikke settes ned. Funnet godtas: hovedindeksen blir i «ferdig», og en kveld der den feiler, går kjøringene som i dag. PR #114 ble flettet med ECH1 åpent, mot steg 4 i instruksjonen kl. 19:41, og flettingen står. Raden for ECH1 over sier «lav i triagen». Det gjelder ikke: graden er middels (regel 25).
+
 Hele settet alene før `7ebc9aca`: 4084 bestått, 24 hoppet over, de 6 porttestene og `test_hver_story_som_deles_har_egen_merkelapp`, fordi denne spesifikasjonen manglet merkelapp. Den ble lagt inn («2.3d, tidlig stopp»), og settet kjørt på nytt: 4088 bestått, 24 hoppet over og 3 porttester for `start.ps1` som feilet (ledig minne 4,1 og 4,2 GB). CI var grønn på `3d53ca36` (42091407924).

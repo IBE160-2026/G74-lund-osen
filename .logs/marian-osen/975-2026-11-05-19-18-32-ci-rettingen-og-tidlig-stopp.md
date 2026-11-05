@@ -41,3 +41,4 @@ Instruksjonen kl. 19:41 05.11: den samme PR-en etter gruppens svar 05.11 kl. 19:
 ### Åpne punkter
 - ECH1: en indeks som feilet en dag der de 15 har kursene, hentes ikke på nytt, så den dagen blir aldri «ferdig». Graden er satt til lav i triagen, og gruppen må si om det godtas.
 - Første ekte kjøring med sjekken er fredag 06.11 kl. 22:15. Se i loggen for den dagen.
+- *Rettet 2026-11-05 (gruppens svar kl. 21:01):* ECH1 i PR #114 er middels, ikke lav, for graden skal ikke settes ned. Funnet godtas: hovedindeksen blir i «ferdig», og en kveld der den feiler, går kjøringene som i dag. PR #114 ble flettet med ECH1 åpent, mot steg 4 i instruksjonen kl. 19:41, og flettingen står.
