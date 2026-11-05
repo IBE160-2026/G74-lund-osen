@@ -265,7 +265,7 @@ def _oppsett(tmp_path: Path, start: str, etter: str = "") -> dict[str, Path | st
     return {"hoved": hoved, "jobb": jobb, "foer": foer, "etter": nyeste}
 
 
-def _kjoer(tmp_path: Path, skript: Path, hoved: Path, *ekstra: str) -> tuple[int, str]:
+def _kjoer(tmp_path: Path, skript: Path, hoved: Path, *ekstra: str, sjekk: str = "mangler") -> tuple[int, str]:
     """Windows PowerShell 5.1 med den falske docker og den falske uv foerst
     paa PATH, saa git og System32. ProgramFiles peker paa en tom mappe, saa
     Docker Desktop aldri startes.
@@ -274,14 +274,29 @@ def _kjoer(tmp_path: Path, skript: Path, hoved: Path, *ekstra: str) -> tuple[int
     har en docker paa PATH som svarte innen fristen, saa skriptet startet og
     stoppet Ollama. Den falske docker feiler alltid, saa svaret er det samme
     med og uten Docker paa maskinen. Den skriver hvert kall til docker.txt.
+
+    Gruppens svar 05.11 kl. 12:33 og 19:33: den falske uv svarer ogsaa for
+    sjekken src/dagen_ferdig.py, etter sjekk: "mangler" (kode 1), "ferdig"
+    (FERDIG og kode 0), "feil" (kode 2), "ferdig-kode-1" (FERDIG, men kode 1)
+    og "henger" (svarer ikke foer -Sjekkgrense). Hvert kall til sjekken
+    skrives til sjekk.txt.
     """
+    svar_fra_sjekken = {
+        "mangler": "echo Boersdagen mangler 1: KI-tekst EQNR.\r\nexit /b 1",
+        "ferdig": "echo FERDIG 2026-09-22: alt er der.\r\nexit /b 0",
+        "feil": "echo Sjekken feilet (OperationalError).\r\nexit /b 2",
+        "ferdig-kode-1": "echo FERDIG 2026-09-22: alt er der.\r\nexit /b 1",
+        "henger": "ping -n 30 127.0.0.1 >nul\r\necho FERDIG 2026-09-22: for sent.\r\nexit /b 0",
+    }[sjekk]
     systemrot = os.environ["SYSTEMROOT"]
     powershell = Path(systemrot) / "System32" / "WindowsPowerShell" / "v1.0" / "powershell.exe"
     falsk = tmp_path / "falsk"
     falsk.mkdir(exist_ok=True)
     (falsk / "uv.cmd").write_text(
-        "@echo off\r\necho falsk henting %*\r\necho tjeneste=%OSE_KI_TJENESTE%\r\necho mappe=%CD%\r\n"
-        'if "%~4"=="--maal-omsetning" exit /b 5\r\nexit /b 3\r\n',
+        '@echo off\r\nif "%~3"=="src/dagen_ferdig.py" goto sjekk\r\n'
+        "echo falsk henting %*\r\necho tjeneste=%OSE_KI_TJENESTE%\r\necho mappe=%CD%\r\n"
+        'if "%~4"=="--maal-omsetning" exit /b 5\r\nexit /b 3\r\n'
+        f':sjekk\r\necho falsk sjekk %*>>"%~dp0sjekk.txt"\r\n{svar_fra_sjekken}\r\n',
         encoding="ascii",
     )
     (falsk / "docker.cmd").write_text(
@@ -399,6 +414,55 @@ def test_hele_jobben_uten_docker_henter_uten_ki_og_gir_koden_fra_hentingen(tmp_p
     assert "Stopper Ollama." not in loggen and "Starter Ollama." not in loggen
     for tekst in (utskrift, loggen):
         assert NOEKKELEN not in tekst and MILJOEET not in tekst
+
+
+@paa_windows
+def test_en_ferdig_dag_spoer_ikke_docker_men_henter_og_maaler(tmp_path):
+    """Gruppens svar 05.11 kl. 12:33 og 19:33 (forslag a). Ville feilet hvis
+    jobben spurte Docker (den falske docker skriver hvert kall til
+    docker.txt) eller startet Ollama naar sjekken sier FERDIG med kode 0,
+    hentet med KI paa, eller hoppet over hentingen eller maalingen."""
+    oppsett = _oppsett(tmp_path, "nyeste")
+    jobb = oppsett["jobb"]
+    kode, utskrift = _kjoer(tmp_path, jobb / "start" / "kveldshenting.ps1", oppsett["hoved"], sjekk="ferdig")
+    loggen = _loggen(oppsett["hoved"])
+    assert kode == 3, utskrift
+    assert not (tmp_path / "falsk" / "docker.txt").exists(), loggen
+    assert loggen.count("Dagen er ferdig (FERDIG 2026-09-22") == 1, loggen
+    assert "falsk sjekk run python src/dagen_ferdig.py" in (tmp_path / "falsk" / "sjekk.txt").read_text(
+        encoding="ascii"
+    )
+    assert "tjeneste=av" in loggen and "tjeneste=lokal" not in loggen
+    assert "falsk henting run python src/fetch_prices.py" in loggen
+    assert "Hentingen avsluttet med kode 3." in loggen and "Målingen avsluttet med kode 5." in loggen
+    assert "Starter Ollama." not in loggen and "Docker svarte ikke" not in loggen
+    assert loggen.index("Dagen er ferdig") < loggen.index("Hentingen avsluttet med kode 3.")
+    for tekst in (utskrift, loggen):
+        assert NOEKKELEN not in tekst and MILJOEET not in tekst
+
+
+@paa_windows
+@pytest.mark.parametrize("sjekk", ["mangler", "feil", "ferdig-kode-1", "henger"])
+def test_alt_annet_enn_ferdig_gir_kjoeringen_som_foer(tmp_path, sjekk):
+    """Ville feilet hvis en dag uten KI-tekster eller uten indeksen (kode 1),
+    en feil i sjekken (kode 2), FERDIG med en annen kode enn 0, eller en
+    sjekk som ikke svarer innen -Sjekkgrense, hoppet over Docker: den falske
+    docker er spurt, og jobben gaar som foer."""
+    oppsett = _oppsett(tmp_path, "nyeste")
+    jobb = oppsett["jobb"]
+    kode, utskrift = _kjoer(
+        tmp_path, jobb / "start" / "kveldshenting.ps1", oppsett["hoved"], "-Sjekkgrense", "2", sjekk=sjekk
+    )
+    loggen = _loggen(oppsett["hoved"])
+    assert kode == 3, utskrift
+    assert "Dagen er ferdig" not in loggen
+    assert "falsk docker info" in (tmp_path / "falsk" / "docker.txt").read_text(encoding="ascii")
+    assert "Henter uten KI-tekst (NFR-04)" in loggen
+    assert "Hentingen avsluttet med kode 3." in loggen and "Målingen avsluttet med kode 5." in loggen
+    if sjekk == "henger":
+        assert "Sjekken av dagen svarte ikke innen 2 s." in loggen, loggen
+    else:
+        assert f"Sjekken av dagen ga kode {2 if sjekk == 'feil' else 1}." in loggen, loggen
 
 
 @paa_windows
