@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-05T18:24
+updated: 2026-11-05T18:39
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -5911,7 +5911,7 @@ Klassifiseringen er ikke gjort av en person.
 **Resultat.** Kontrollen stoppet ingen av de 15, så det er ingen grunner å
 føre, og alle 15 ville blitt vist. Alle 15 sier mer enn regelforklaringen: de
 forklarer sjekkene først, som versjon 3, og har så en setning om
-dagen, som sier at hovedindeksen falt, om bransjen steg eller falt, og hvor
+dagen, som sier hva hovedindeksen og bransjen gjorde, og hvor
 mange aksjer i lista som steg og falt. Hver tekst er lest mot grunnlaget:
 hovedindeksen, bransjen og antallene stemmer i alle 15, hver sjekk er
 beskrevet slik fortegnet er, ingen nevner dagene, og ingen sier at
@@ -5929,5 +5929,30 @@ ble stoppet. Antallene i de 15 tekstene er riktige, lest for hånd. Om
 kontrollen skal lese de formene, avgjør gruppen, fordi kontrollen ikke skulle
 endres i denne instruksjonen.
 
-Det er én kjøring, for én dag, der hovedindeksen falt for alle 15. Tellingen
+Det er én kjøring, for én dag, med samme retning på hovedindeksen for alle 15. Tellingen
 gjentas etter noen dager med versjon 4 i driften (svaret 5.11 kl. 16:05).
+
+**Kjørt på nytt etter gjennomgangen av 10.2i.** Edge Case Hunter og Blind
+Hunter fant at linja krevde hovedindeksen og bransjen også når feltet mangler,
+mot reglene om at teksten ikke sier noe om et felt som mangler (ECH1, BH3).
+Linja sier nå «når feltet står i opplysningene», og versjonen står som 4,
+fordi ingen tekst i `ose.db` har versjon 4. Prompten hadde avtrykket
+`0df61d8f…c825` (commit `c9dbb342`). Kjørt på samme måte som over, kl.
+18:29:56–18:30:23, etter at Ollama ble startet kl. 18:29:44: 15 besto, 0 ble
+stoppet, modellen feilet for 0, og alle 15 ville blitt vist. Median 0,93 s per
+tekst og lengste kall 14,08 s (kall nr. 1). Alle 15 radene har
+`promptversjon` 4, `maskinvare` `gpu`, `gemma4:e4b` med `modell_id`
+`dc35e8d9c606` og Ollama 0.35.1. 2 av de 15 er ordrett de samme som over, og
+13 er endret. Klassene: 0 gjentar, 15 sier mer og 0 usikre. Hver tekst er lest
+mot grunnlaget: hovedindeksen, bransjen og antallene stemmer i alle 15, hver
+sjekk er beskrevet slik fortegnet er, ingen nevner dagene, og ingen sier at
+hovedindeksen eller bransjen forklarer signalet. Setningen om dagen har nå
+flere former. sha256 for `ose.db` var den samme før og etter.
+
+I samme kjøring fikk fem av grunnlagene (AKRBP, DNB, DNO, EQNR og FRO) gå
+gjennom modellen og kontrollen tre ganger til, uten hovedindeksen, uten
+bransjen og uten begge. Grunnlagene ble laget i skriptet og står ikke i
+basen. 13 av 15 besto. De 2 som ble stoppet, hadde begge feltene tatt ut og
+sa likevel noe om dem: DNB om hovedindeksen og DNO om bransjen, og kontrollen
+stoppet dem på punkt 1 («grunnlaget sier ingenting»). Ingen av de 13 som
+besto, sier noe om et felt som mangler.
