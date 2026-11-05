@@ -1659,6 +1659,8 @@ Som **gruppe som henter for hånd hver kveld**, vil vi at hentingen går av seg 
 
 *Ferdig 2026-10-28:* squash-flettet i `817b331`, PR #104, låst til head-en `ad8ec4a` (spesifikasjonen `spec-2-3d-hentingen-hver-kveld.md`). Hele settet på `c852bbd`: 3806 bestått og 24 hoppet over, og CI var grønn på head-en (40673689106), med testene for kveldshentingen på `windows-latest`. Mutanten, `origin/main` i stedet for commiten fra midnatt, ble fanget. Jobben legges inn på PC-en i samme instruksjon og går første gang torsdag 29.10.
 
+*Avgjort 2026-11-05 kl. 12:33 (gruppens svar):* kjøringene kl. 22:45, 23:15 og 23:45 stopper med en gang, før Docker og Ollama startes, når dagen alt er ferdig hentet, og feiler kjøringen kl. 22:15, prøver de senere som før.
+
 ### Story 2.4: Etterfylling av hull i kursserien
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
@@ -3010,6 +3012,8 @@ uten KI. 5B.4 måler KI-tillegget. Blandes de, vet ingen hva som ble målt.
 *Lagt til 2026-11-05 (loggdelen, svarene kl. 12:23 og 12:24):* loggdelen er talt for uka 29.10–04.11 i `spec-10-4-loggdelen.md`. Av 75 KI-tekster som besto kontrollen, gjentar alle 75 regelforklaringen, 0 sier mer og 0 er usikre. Det er et funn til refleksjonsrapporten, ikke en feil. Delen med en person venter på brukertesten, så 10-4 står som `in-progress`.
 
 *Avgjort 2026-11-05 kl. 16:05 (gruppens svar):* alle 75 KI-tekstene i uka 29.10–04.11 gjentar regelforklaringen, så en ny promptversjon lages før brukertesten, der modellen bes bruke bransjen, hovedindeksen og antallene med ord, innenfor kontrollen, og tellingen gjentas etter noen dager med den.
+
+*Avgjort 2026-11-05 kl. 19:13 (gruppens svar):* på spørsmål 1 i PR #113: appen skriver setningen om hovedindeksen, bransjen og antallene, alltid riktig, som setningen om dagene, og modellen sier bare med faste ord om aksjen gikk samme vei som børsen, og det sjekker kontrollen. Det bygges 6.11, og 10.6 bygges etter det med samme løsning.
 
 ### Story 10.5: Lenke til selskapets side på NewsWeb
 
