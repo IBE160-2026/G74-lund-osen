@@ -273,3 +273,43 @@ Blind Hunter (bare diffen), Edge Case Hunter og Verification Gap på `main..84e4
 **Spørsmål til gruppen:**
 1. **Fotnoten** (BH3, ECH2, middels): ruta sier nå «ikke vurdert» også når grunnen er en annen, som VRDS med «for kort historikk» (svar 2). Fotnoten om «ikke vurdert» står fortsatt bare når grunnen er at signalet ikke er lagret, og forklarer bare det. Skal fotnoten også stå for de andre grunnene, med en annen tekst, eller står det som bygget?
 2. **«ikke vurdert» i en gul rute en annen dag** (VG3, ECH4, BH4, lav): svar 1 er brukt også for «ikke vurdert», så linja står der bare på nivå 3, med merket. Skal «ikke vurdert» stå på nivå 2 i en gul rute en annen dag, uten merket?
+
+*Besvart 2026-11-05 kl. 09:34 (gruppens svar, under story 8.2 i `epics.md`):* spørsmål 1: fotnoten står under kartet når en rute sier «ikke vurdert» av en annen grunn. Spørsmål 2: «ikke vurdert» i en gul rute en annen dag står bare med merket, som bygget.
+
+## Svar 1 kl. 09:34, bygget 05.11
+
+- Main flettet inn i grenen i `2f777ff6`.
+- `74134ae6`: `Rute.annen_grunn` er sann for en rute med kurs, men uten styrke, med en annen grunn enn at signalet ikke er lagret. Børsometeret får en egen fotnote under kartet, med teksten `«Ikke vurdert» kan også ha en annen grunn, som for kort kurshistorikk. Grunnen står i tabellen og på aksjesiden.` Den står rett etter den gamle når begge finnes. Hjelpen ved «?» og `docs/hjelp.md` sier det samme. Hjelperen `_fotnoten` i `test_boersometer.py` finner nå bare den gamle fotnoten, som begynner med «Ikke vurdert»: og kolon.
+- `26330bb5`: rettingene etter gjennomgangen (under).
+- `2de6679f`: test for klassene til fotnoten, etter mutanten N5.
+
+Ingen dag i demoen har begge grunnene; 97 dager ble skannet. Testen for begge fotnotene gir derfor VRDS 18.09 en annen grunn med monkeypatch.
+
+**Målt i Edge** i en iframe ved 320, 390, 760, 761, 1080 og 1280 px, for siste børsdag og 01.10: fotnoten står for øyet ved 1080 og 1280 px, der VRDS viser «ikke vurdert», og er skjult for øyet ved de fire andre breddene, der VRDS bare viser symbolet eller endringen. Beholderen er like bred som kartet ved alle seks, og ingen side ruller vannrett. Bildet ved 1280 px er på `pr-8-2b-bilder` (`fe068e8c`), bare fra demoen. Bildene i `docs/appen/` ble tatt på nytt og er byte for byte de samme; bare avtrykkene er endret.
+
+**Mutanter**, med kopi før og fila lik HEAD etter (git-bloben og sha256 av innholdet):
+- N4: `annen_grunn` uten `and bool(self.grunn)`. Fanget av `test_annen_grunn_bare_for_en_rute_med_kurs_og_en_annen_grunn`.
+- N5: `nivaa >= 2` i `annen_grunn_i_kartet`. Overlevde først, fordi VRDS står på nivå 2 med plass til linja. Fanget etter `2de6679f`.
+
+**Hele settet** alene før hver commit med kode: 4024 (`74134ae6`), 4026 (`26330bb5`) og 4027 (`2de6679f`) bestått, 24 hoppet over, og bare de 7 porttestene for `start.ps1` som feilet (svaret 29.10 kl. 21:02). Før `74134ae6` feilet også `test_ingen_fotnote_uten_en_rute_som_sier_ikke_vurdert`, fordi hjelperen fant den nye fotnoten. Den ble rettet, og settet ble kjørt på nytt (svaret 4.11 kl. 09:48).
+
+### Gjennomgangen 05.11 av svar 1
+
+Blind Hunter (bare diffen), Edge Case Hunter og Verification Gap på `2f777ff6..74134ae6`, uten pytest eller demo samtidig. Ingen funn på høy.
+
+**Rettet i `26330bb5` og `2de6679f`:**
+- ECH1 og BH7 (middels): fotnoten sto også når ingen rute viste «ikke vurdert» for øyet, for eksempel VRDS ved 390 px, og når kartet ikke kunne regnes. Nå regnes den av rutene i kartet (`annen_grunn_i_kartet`). Den får klassene `vis-N` der en slik rute viser «ikke vurdert», og stilen skjuler den bare for øyet i de andre klassene, med de samme `@container`-grensene som rutene. Skjermleseren leser både ruta og fotnoten. Et tomt kart gir ingen fotnote.
+- VG1 (middels): en test viser at den nye fotnoten mangler 18.09, der grunnen er at signalet ikke er lagret.
+- VG2 (middels): hjelpetesten sjekker «fotnote under kartet» i alle tre tekstene, og «står begge fotnotene» i `docs/hjelp.md`.
+- VG3 (lav): en rute med styrke og en tekst gir ingen fotnote.
+- BH3 (lav): fotnoten står etter tabellen.
+- BH4, VG4 og ECH4 (lav): den nye fotnoten står rett etter den gamle, og testen går nå gjennom `annen_grunn_i_kartet`.
+
+**Står, med grunnen:**
+- BH1 (middels, avvist): «hentingen feilet» er en lagret grunn (`Art.GRUNN`), og den står i tabellen. «Ikke lagret» er `Art.IKKE_KJOERT` (`markedsoversikt.les_tilstand`).
+- BH2 (lav): fotnoten står under både kartet og den lukkede tabellen, som den gamle. «Under kartet» er ordet i svaret.
+- BH5 (lav): den ekte og demoteksten i den gamle fotnoten begynner begge med «Ikke vurdert»: og kolon, og `test_den_ekte_versjonen_har_den_ekte_teksten` sjekker hele teksten.
+- BH6 (lav): «også» står i svaret.
+- BH8 (lav): avtrykket for oversikten dekker `hjelpetekster.py` og `stil.css`, men ikke `app.py`. Kommentarene nevner filene hvert avtrykk dekker.
+- ECH2 (lav): hjelperne i `test_app.py` og `test_demo.py` brukes ikke på børsometeret.
+- ECH3 (lav): som ECH3 over. En rute har alltid kurs den dagen, så «ikke børsdag» skjer ikke.
