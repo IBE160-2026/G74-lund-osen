@@ -10,7 +10,12 @@
 # 2. data/ og .env må være lenker til hovedkopien, så basen og nøkkelen er de
 #    samme, og nøkkelen ikke kopieres.
 # 3. Docker Desktop og Ollama startes, med én felles tidsgrense. Svarer de
-#    ikke innen den, hentes det uten KI-tekst (NFR-04).
+#    ikke innen den, hentes det uten KI-tekst (NFR-04). Gruppens svar 05.11
+#    kl. 12:33 og 19:33 (forslag a): først sjekker src/dagen_ferdig.py, med
+#    basen bare for lesing og med -Sjekkgrense, om børsdagen er ferdig
+#    (kursene og vurderingene for de 15, hovedindeksen og KI-tekstene). Bare
+#    kode 0 med FERDIG hopper over steget: KI er av, og steg 4 går som før.
+#    Alt annet, også en feil eller tidsgrensen, gir kjøringen som før.
 # 4. uv run python src/fetch_prices.py, uten flagg, med OSE_KI_TJENESTE=lokal
 #    og OSE_KI_OLLAMA_URL satt bare for kjøringen. Så målingen av omsetning,
 #    uv run python src/fetch_prices.py --maal-omsetning (story 2.13).
@@ -26,6 +31,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$Hovedkopi,
     [int]$Tidsgrense = 180,
+    [int]$Sjekkgrense = 120,
     [switch]$BareUtsjekk,
     [switch]$EtterUtsjekk
 )
@@ -148,7 +154,7 @@ try {
     if (-not $EtterUtsjekk -and (Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash -ne $foer) {
         Logg 'Skriptet ble endret av utsjekken. Kjører den nye versjonen.'
         $argumenter = @('-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', $PSCommandPath,
-            '-Hovedkopi', $Hovedkopi, '-Tidsgrense', $Tidsgrense, '-EtterUtsjekk')
+            '-Hovedkopi', $Hovedkopi, '-Tidsgrense', $Tidsgrense, '-Sjekkgrense', $Sjekkgrense, '-EtterUtsjekk')
         if ($BareUtsjekk) { $argumenter += '-BareUtsjekk' }
         & (Join-Path $PSHOME 'powershell.exe') @argumenter
         exit $LASTEXITCODE
@@ -184,8 +190,13 @@ try {
     Stopp "Uventet feil: $($_.Exception.Message)"
 }
 
+$uv = Get-Command uv -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+$uvSti = if ($uv) { $uv.Source } else { Join-Path $env:USERPROFILE '.local\bin\uv.exe' }
+
 # Steg 3: Docker Desktop og Ollama, med én felles frist for begge
 # (gjennomgangen, BH2): kjøringen kl. 23:45 når hentingen før kl. 23:50.
+# Sjekken av dagen bruker av den samme fristen (gjennomgangen 05.11, BH1,
+# VG1, ECH2), så hentingen starter ikke senere enn før.
 function Vent-Paa([scriptblock]$Svarer) {
     while ($true) {
         if (& $Svarer) { return $true }
@@ -201,11 +212,45 @@ $startetOllama = $false
 $kiKlar = $false
 $kode = 1
 $frist = (Get-Date).AddSeconds($Tidsgrense)
+
+# Gruppens svar 05.11 kl. 12:33 og 19:33: er børsdagen ferdig, startes verken
+# Docker eller Ollama. Bare kode 0 og én linje som begynner med FERDIG og
+# datoen (store bokstaver, gjennomgangen BH4), regnes som ferdig.
+$ferdig = $false
 try {
-    $docker = Get-Command docker -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+    if (Test-Path -LiteralPath $uvSti -PathType Leaf) {
+        $grense = [Math]::Min($Sjekkgrense, (Igjen))
+        # Gjennomgangen (BH2, ECH5): --no-sync, så sjekken aldri drepes midt i
+        # en synkronisering. Er miljøet ikke synket, feiler sjekken, og
+        # kjøringen går som før, med synkroniseringen i steg 4.
+        $sjekk = Kjoer-Med-Grense $uvSti @('run', '--no-sync', 'python', 'src/dagen_ferdig.py') $grense
+        $linjer = @($sjekk.Ut -split "`r?`n" | Where-Object { $_.Trim() })
+        $linje = @($linjer | Where-Object { $_ -cmatch '^FERDIG \d{4}-\d{2}-\d{2}' })
+        if ($sjekk.Kode -eq 0 -and $linje.Count -eq 1) {
+            $ferdig = $true
+            Logg "Dagen er ferdig ($($linje[0])) Starter verken Docker Desktop eller Ollama, og henter og måler som før uten KI-tekst."
+        } elseif ($sjekk.Kode -eq -1) {
+            Logg "Sjekken av dagen svarte ikke innen $grense s. Kjøringen går som før."
+        } else {
+            # Gjennomgangen (BH6): det som mangler, står i loggen.
+            $hva = if ($linjer.Count -gt 0) { " $($linjer[0])" } else { '' }
+            Logg "Sjekken av dagen ga kode $($sjekk.Kode).$hva Kjøringen går som før."
+        }
+    } else {
+        Logg 'Fant ikke uv. Sjekken av dagen er ikke kjørt.'
+    }
+} catch {
+    $ferdig = $false
+    Logg "Sjekken av dagen feilet: $($_.Exception.Message) Kjøringen går som før."
+}
+
+try {
+    $docker = if ($ferdig) { $null } else { Get-Command docker -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1 }
     $dockerSvarer = { $docker -and (Kjoer-Med-Grense $docker.Source @('info') ([Math]::Min(30, (Igjen)))).Kode -eq 0 }
 
-    if (-not $docker) {
+    if ($ferdig) {
+        # Dagen er ferdig: steg 3 hoppes over.
+    } elseif (-not $docker) {
         Logg 'Fant ikke docker.'
     } elseif (-not (& $dockerSvarer)) {
         if (-not (Get-Process -Name 'Docker Desktop' -ErrorAction SilentlyContinue)) {
@@ -238,7 +283,9 @@ try {
         Logg "Docker svarte ikke innen $Tidsgrense s."
     }
 
-    if ($kiKlar) {
+    if ($ferdig) {
+        $env:OSE_KI_TJENESTE = 'av'
+    } elseif ($kiKlar) {
         Logg "Ollama svarer med $Modell."
         $env:OSE_KI_TJENESTE = 'lokal'
         $env:OSE_KI_OLLAMA_URL = $OllamaUrl
@@ -248,8 +295,6 @@ try {
     }
 
     # Steg 4: hentingen, uten flagg.
-    $uv = Get-Command uv -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
-    $uvSti = if ($uv) { $uv.Source } else { Join-Path $env:USERPROFILE '.local\bin\uv.exe' }
     if (Test-Path -LiteralPath $uvSti -PathType Leaf) {
         Logg 'uv run python src/fetch_prices.py'
         Set-Location -LiteralPath $Arbeidskopi

@@ -393,6 +393,10 @@ jobs:
             if (-not $ut.Contains($t)) { Write-Error "Utskriften fra Start demoen mangler «$t»"; exit 1 }
           }
           Write-Host "Start demoen svarte 200 med Eksempeltall etter $i s"
+          # Svaret 03.11 kl. 20:48 (1): en kode fra taskkill som ikke er 0,
+          # ga steget kode 1 selv om kontrollen besto (41664214196), så steget
+          # slutter med 0 etter siste kontroll, som steget for den ekte versjonen.
+          exit 0
 
       - name: Start demoen på Mac
         if: runner.os == 'macOS'

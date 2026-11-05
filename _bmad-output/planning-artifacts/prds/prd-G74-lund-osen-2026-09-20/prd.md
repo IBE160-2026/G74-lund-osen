@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-11-05T16:11
+updated: 2026-11-05T19:50
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -932,6 +932,8 @@ helst, og etter 2.5 er en dag uten henting en vurdering som mangler for alltid
 *Lagt til 2026-10-24 (story 3.5a, gruppens svar 23.10 kl. 23:31):* regelen står. «Start den ekte versjonen» kjører hentekommandoen før webserveren, og dobbeltklikket er den bevisste handlingen. Webserveren henter aldri. Er det ingenting nytt å hente, gir dobbeltklikket 0 kall (FR-402): hentekommandoen stopper ved sjekken av basen, før første kall. I en mappe med `.git` starter ikke den ekte versjonen, så et dobbeltklikk i en klon aldri henter med gruppens nøkkel.
 
 *Lagt til 2026-10-28 (story 2.3d, flettet i `817b331`, gruppens svar kl. 11:34):* beslutningen 29.09 gjelder fra torsdag 29.10. Hentekommandoen startes av jobben «OSE Signal kveldshenting» i Oppgaveplanlegging på Marians PC, hver dag kl. 22:15 og igjen hver halvtime til 23:45, fra en egen arbeidskopi av main på commiten main hadde ved midnatt. Tapte kjøringer tas ikke igjen, og loggen er `data/logg/kveldshenting-<dato>.log`. Instruksjonen for hentingen brukes bare når loggen viser at jobben feilet. Webserveren henter fortsatt aldri. README-en, «Hentingen hver kveld», sier hvordan jobben legges inn og tas bort.
+
+*Lagt til 2026-11-05 (story 2.3d, gruppens svar 05.11 kl. 12:33 og 19:33, forslag a):* før Docker Desktop og Ollama startes, sjekker hver kjøring med `src/dagen_ferdig.py`, med basen bare for lesing og uten nøkkel eller kall, om børsdagen hentingen gjelder, er ferdig: kursene og vurderingene for de 15, hovedindeksen og KI-tekstene. Er den det, startes verken Docker Desktop eller Ollama, og `fetch_prices.py` (0 kall) og `--maal-omsetning` kjøres som før, med reglene for kvoten og kl. 23:45 der. Mangler noe, eller feiler sjekken eller går over tidsgrensen, går kjøringen som før.
 
 #### FR-402 — Kontroll mot forventet børsdag, ikke mot klokkeslett
 
