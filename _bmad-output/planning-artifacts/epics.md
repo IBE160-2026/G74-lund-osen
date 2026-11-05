@@ -3617,6 +3617,8 @@ Tidligere avgjørelser som sier noe annet, har fått en datert linje: `designreg
 - Sier en rute i børsometeret «ikke vurdert» av en annen grunn enn at signalet ikke er lagret, står en kort fotnote under kartet om at grunnen står i tabellen og på aksjesiden (BH3 og ECH2 i `spec-8-2b-funnene-fra-ux-loggen.md`).
 - «ikke vurdert» i en gul rute en annen dag står bare med merket, på nivå 3, som bygget (VG3 og ECH4).
 
+*Lagt til 2026-11-05 kl. 10:49:* PR #111 er squash-flettet i `ab18d375`, låst til head-en `cac5e721`, med svarene 04.11 kl. 20:53 og 20:56 og 05.11 kl. 09:34 (spesifikasjonen `spec-8-2b-funnene-fra-ux-loggen.md`). En gul rute en annen dag viser styrken bare med merket, en rute uten styrke sier «ikke vurdert» der styrken ellers står, og børsometeret har en egen fotnote under kartet når en rute sier «ikke vurdert» av en annen grunn. Fotnoten står for øyet bare der en slik rute viser det. Hele settet på `2de6679f`, siste commit med kode: 4027 bestått, 24 hoppet over og 7 porttester for `start.ps1` som feilet (svaret 29.10 kl. 21:02). CI var grønn på head-en (42004977696). Mutantene N1–N5 ble fanget; N5 først etter `2de6679f`. Gjennomgangene 05.11 ga ingen funn på høy, og alle på middels er rettet eller avvist med grunnen. CI på flettecommiten står i Utført-linja i dagsfila 05.11.
+
 ### Story 8.2c: Kursgrafen på smal skjerm
 
 *Lagt til 2026-11-04 (gruppens svar kl. 09:48, spørsmål 8 i `spec-8-2b-funnene-fra-ux-loggen.md`):* «Ekstra, hvis tiden rekker», som 8.4–8.19 (svaret 19.10 kl. 15:43). Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt.

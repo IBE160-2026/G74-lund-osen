@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-11-04T20:29
+updated: 2026-11-05T10:49
 ---
 
 # UX-loggen
@@ -672,3 +672,5 @@ Talt: løst 7, delvis 3, står 34, må ses på siden 1, i alt 45.
 *Lagt til 2026-11-04 kl. 11:34 (8.2b flettet i `6f62f564`, PR #109, etter svarene kl. 09:48–10:04 under story 8.2 i `epics.md`):* bygget er U2, U6, U16, U20–U22, U24–U26, U29, U31, U37, U39, U41, U44, U47, U59, U62–U64, U66, U68 og U69, og U57 med forklaringen under søylene, tickeren vannrett på bred skjerm og lyse og mørke søyler. U33, U46 og U67 er delvis bygget: bryteren står i rammen, i blekk og ikke i stripa, og tallene i KI-teksten har prikket strek. U58 og U65 står, etter svaret kl. 09:58. Summen på aksjesiden har styrken først (09:48), og grafen ved 390 px er story 8.2c. «?» ved «Ga» og «Målt mot» står nå i alle tre sjekkortene, så avvisningen 15.10 i tabellen over gjelder ikke lenger (09:58). De ni som sto 03.11, står fortsatt, med grunnen over.
 
 *Lagt til 2026-11-04 kl. 20:29 (rettingen av 8.2b flettet i `e45d04a9`, PR #110, etter svaret kl. 19:21 under story 8.2 i `epics.md`):* styrken står nå i alle rutene i børsometeret med plass til én linje til under symbolet og endringen, og «?» står midt på periodeknappene på oversikten, i Min liste og i børsometeret, også ved 390 px. Aksjesiden får ingen egen «?» for periodene.
+
+*Lagt til 2026-11-05 kl. 10:49 (PR #111 flettet i `ab18d375`, etter svarene 04.11 kl. 20:53 og 20:56 og 05.11 kl. 09:34 under story 8.2 i `epics.md`):* en gul rute en annen dag viser styrken bare med merket, en rute uten styrke sier «ikke vurdert» der styrken ellers står, og en fotnote under kartet sier at «ikke vurdert» også kan ha en annen grunn, som for kort kurshistorikk, og at grunnen står i tabellen og på aksjesiden.
