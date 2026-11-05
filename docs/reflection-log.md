@@ -3196,6 +3196,8 @@ Det vi lærte: å se på appen selv fant det testene og gjennomgangene ikke fant
 
 Svaret kl. 10:01 førte størrelsene fra originalen (`c33e8032`), og PR #111, med fotnoten og «ikke vurdert» i børsometeret, ble squash-flettet kl. 10:47 i `ab18d375`. PR #112, fire ting som i designforslaget, ble squash-flettet kl. 17:44 i `eb492502`: store ruter i børsometeret, lenken «Se perioden i Børsometer» under søylene, «<navnet> kort fortalt» og ikonene i menyen. Etter svarene kl. 12:14 og 12:20 står toppen av oversikten synlig i README-en, og de hele bildene står bak knappen «Bilder av appen (demoen)» (`42088949`).
 
+*Rettet 2026-11-05:* størrelsene fra originalen kom fra svarene 04.11 kl. 22:23 og 05.11 kl. 09:34, ført i `c33e8032`. Svaret kl. 10:01 er fra 04.11, og `c33e8032` la bare til en datert linje ved 14 px i det, og én i spesifikasjonen 8.6b.
+
 PRD-en er låst i taggen `prd-ferdig-2026-11-03`, som står på `045ddeb1` og ble pushet før `prd.md` ble endret igjen. Samme ettermiddag talte vi uka 29.10–04.11 for R29. Kl. 15:50 sto det 105 rader i `prd.md` (`6c45588a`), men `ki_logg` har 15 rader på hver av de fem børsdagene, til sammen 75. 105 er 7 × 15, de sju dagene i uka. Det ble rettet samme dag i `398b29f4`.
 
 Promptversjon 4 ble bygget i PR #113, som stoppet før flettingen, se utfordring 1. Vi svarte kl. 19:13 på spørsmål 1 der, og kl. 19:33 på hva «ferdig» er for kveldsjobben, se utfordring 2. PR #114, med `exit 0` i CI og sjekken før Docker og Ollama i kveldsjobben, ble squash-flettet kl. 20:40 i `0955f796`, og CI var grønn på flettecommiten. Kl. 21:01 svarte vi på hvordan PR #114 ble flettet, se utfordring 3.
