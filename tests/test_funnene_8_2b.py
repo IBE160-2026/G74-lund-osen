@@ -798,9 +798,10 @@ def test_aksjesiden_har_ingen_egen_spoersmaalstegn_for_periodene(klient):
 
 def test_klassen_for_styrken_bare_paa_ruter_med_styrke(klient):
     """Gjennomgangen av rettingen 04.11 (ECH5): ville feilet hvis en rute uten
-    styrke, «Uten data» eller ikke vurdert, fikk klassen styrke-N.
-    Rettet 05.11 (gruppens svar 04.11 kl. 20:53 og 20:56, 2): en rute med
-    kurs, men uten styrke, har «ikke vurdert» på linja og kan få klassen."""
+    linja for styrken fikk klassen styrke-N. Rettet 05.11 (gruppens svar
+    04.11 kl. 20:53 og 20:56, 2): en rute med kurs, men uten styrke, har
+    «ikke vurdert» på linja og kan få klassen; en rute med «Uten data» har
+    ingen linje og får den aldri (gjennomgangen av svar 2, BH1)."""
     for adresse in ("/boersometer", "/boersometer?periode=velg&dag=2026-10-01"):
         ruter = _ruter(_html(klient, adresse))
         for symbol, rute in ruter.items():
@@ -827,6 +828,30 @@ def test_styrkelinje_en_annen_dag_med_gul_ramme():
     assert styrkelinje(Rute(aksje, 1.0, 1.0, 3, None, siste_styrke=3), 125, 105)
     assert styrkelinje(Rute(aksje, 1.0, 1.0, 1, None, siste_styrke=2, er_siste=False), 125, 105)
     assert not styrkelinje(Rute(aksje, 1.0, 1.0, 3, None, siste_styrke=3), 80, 105)
+
+
+def test_styrkelinje_uten_styrke_og_uten_data():
+    """Svar 2 (gjennomgangen, VG2 og VG4): en rute uten styrke har sin egen
+    grense, IKKE_VURDERT_PLASS, og en rute uten data har ingen linje. Ville
+    feilet hvis «ikke vurdert» brukte grensen for styrken (90 × 80 er nok for
+    «3 av 3», ikke for «ikke vurdert»), eller hvis en rute uten data fikk
+    linja."""
+    from boersometer import Rute, styrkelinje
+    from kursdata import Aksje
+
+    aksje = Aksje("VRDS", "VRDS.OL", "Varde", "Industri")
+    uten_styrke = Rute(aksje, 1.0, None, None, "signalet kunne ikke regnes")
+    assert uten_styrke.uten_styrke == "ikke vurdert"
+    assert not styrkelinje(uten_styrke, 90, 80)
+    assert styrkelinje(uten_styrke, 104, 69)
+    assert styrkelinje(Rute(aksje, 1.0, 1.0, 1, None), 90, 80)
+    uten_data = Rute(aksje, None, None, None, "Uten data", uten_data=True)
+    assert uten_data.uten_styrke is None and not styrkelinje(uten_data, 200, 200)
+    # Spørsmål til gruppen (gjennomgangen, VG3 og ECH4): en annen dag gjelder
+    # svar 1 også «ikke vurdert» i en gul rute, så linja står der på nivå 3,
+    # med merket.
+    gul = Rute(aksje, 1.0, None, None, "ikke vurdert", siste_styrke=3, er_siste=False)
+    assert not styrkelinje(gul, 110, 80)
 
 
 def test_gul_rute_en_annen_dag_uten_plass_til_merket_viser_ikke_styrken(klient):
@@ -942,3 +967,66 @@ def test_ikke_vurdert_staar_en_gang_og_uten_data_er_som_foer(klient, adresse):
     assert uten_styrke >= 1
     if adresse.endswith("2026-09-18"):
         assert uten_styrke == 14
+
+
+def test_grunnplass_er_regnet_fra_stilen():
+    """Gjennomgangen av svar 2 (ECH1): tallene grunnplass regner med, er de i
+    stil.css. Ville feilet hvis skriften, linjehøyden, mellomrommet, luften
+    eller rammen i ruta ble endret uten grunnplass."""
+    import boersometer
+
+    rute = re.search(r"side-oversikt\) \.rute \{([^}]*)\}", STIL).group(1)
+    assert int(re.search(r"font-size: (\d+)px", rute).group(1)) == boersometer.RUTESKRIFT
+    assert float(re.search(r"line-height: ([\d.]+)", rute).group(1)) == boersometer.RUTELINJE
+    assert int(re.search(r"gap: (\d+)px", rute).group(1)) == boersometer.RUTEGAP
+    luft = tuple(int(v) for v in re.search(r"padding: (\d+)px (\d+)px", rute).groups())
+    assert luft == boersometer.RUTELUFT
+    gul = _regel(".rute.ramme-gul, :where(.side-oversikt) .proeve.ramme-gul")
+    assert int(re.search(r"border: (\d+)px solid", gul).group(1)) == boersometer.RUTERAMME
+    assert int(re.search(r"font-size: (\d+)px", _regel(".rute .tekst")).group(1)) == boersometer.RUTESKRIFT
+
+
+@pytest.mark.parametrize(
+    ("tekst", "bredde", "ventet"),
+    [("hentingen feilet", 200, 1), ("hentingen feilet", 100, 2), ("for kort historikk: 24 av 51 dager", 112, 3)],
+)
+def test_linjer(tekst, bredde, ventet):
+    """Gjennomgangen av svar 2 (ECH1): ord for ord, 7 px per tegn. Ville
+    feilet hvis teksten ble regnet uten å brytes, eller midt i et ord."""
+    from boersometer import _linjer
+
+    assert _linjer(tekst, bredde) == ventet
+
+
+def test_grunnplass():
+    """Gjennomgangen av svar 2 (ECH1): en gul rute en annen dag uten styrke,
+    med «hentingen feilet», har symbolet, endringen, «ikke vurdert», merket
+    på to linjer og grunnen: 8 + 8 + 6 × 16,8 + 5 = 121,8 px. Ved 126 × 106,
+    den minste ruta på nivå 3, ble grunnen kuttet. Ville feilet hvis grunnen
+    sto der den ikke får plass, eller manglet der den gjør det."""
+    from boersometer import Rute, grunnplass
+    from kursdata import Aksje
+
+    aksje = Aksje("VRDS", "VRDS.OL", "Varde", "Industri")
+    gul = Rute(aksje, 1.0, None, None, "hentingen feilet", siste_styrke=3, er_siste=False)
+    assert gul.grunn == "hentingen feilet"
+    assert not grunnplass(gul, 126, 106)
+    assert not grunnplass(gul, 300, 121)
+    assert grunnplass(gul, 300, 122)
+    vanlig = Rute(aksje, 1.0, None, None, "for kort historikk: 24 av 51 dager")
+    assert grunnplass(vanlig, 132, 199)
+    assert not grunnplass(Rute(aksje, 1.0, None, None, "ikke vurdert"), 300, 300)
+
+
+def test_grunnen_staar_paa_nivaa_3_bare_med_plass(klient):
+    """Gjennomgangen av svar 2 (ECH1): på nivå 3 skjuler stilen grunnen for
+    øyet uten klassen grunn-N, i alle fire spennene. VRDS 01.10 er 132 × 199 px
+    ved 1280 px og har plass. Ville feilet uten regelen, eller hvis VRDS
+    mistet grunnen ved 1280 px."""
+    for klasse in ("bredest", "bred", "smal", "smalest"):
+        assert f".rute.nivaa-{klasse}-3:not(.grunn-{klasse}) > .tekst" in STIL, klasse
+    klasser = re.search(
+        r'<a class="rute ([^"]*)"[^>]*>\s*<span class="ticker">VRDS</span>',
+        _html(klient, "/boersometer?periode=velg&dag=2026-10-01"),
+    ).group(1)
+    assert "nivaa-bredest-3" in klasser.split() and "grunn-bredest" in klasser.split(), klasser

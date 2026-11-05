@@ -1671,6 +1671,8 @@ class TestKartet:
                         sett.add((klasse, ventet))
                         # Gjennomgangen av rettingen 04.11 (VG1): styrke-N står
                         # på siden der ruta har styrke og plass på nivå 2.
+                        # Gjennomgangen av svar 2 (VG5): siden er siste
+                        # børsdag, så svar 1 om en annen dag gjelder ikke her.
                         plass = ikke_vurdert_plass if symbol in uten_styrke else styrkeplass
                         med = ventet == 2 and plass(rb - 2 * KANT, rh - 2 * KANT) and symbol in med_styrke
                         assert (f"styrke-{klasse}" in klasser[symbol].split()) == med, (klasse, symbol, rb, rh)

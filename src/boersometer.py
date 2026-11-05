@@ -129,7 +129,7 @@ class Rute:
     def grunn(self) -> str | None:
         """Teksten under linja for styrken. Svar 2: «ikke vurdert» står bare
         én gang i ruta, så teksten står ikke når den er det samme."""
-        if self.uten_data or self.tekst == IKKE_VURDERT:
+        if self.uten_data or self.ikke_vurdert:
             return None
         return self.tekst
 
@@ -411,13 +411,16 @@ class Kartrute:
     er klassene der ruta står på nivå 2 og har plass til styrken under
     endringen (gruppens svar 04.11 kl. 19:21), og en annen dag ikke har gul
     ramme (svaret kl. 20:53 og 20:56, 1). For en rute uten styrke er det
-    klassene der «ikke vurdert» har plass (svar 2)."""
+    klassene der «ikke vurdert» har plass (svar 2). grunn er klassene der
+    ruta står på nivå 3 og har plass til hele grunnen (gjennomgangen av
+    svar 2, ECH1)."""
 
     rute: Rute
     vekt: float
     plass: dict[str, Plass]
     nivaa: dict[str, int]
     styrke: frozenset[str] = frozenset()
+    grunn: frozenset[str] = frozenset()
 
 
 @dataclass(frozen=True)
@@ -516,13 +519,14 @@ def squarify(
     return ut
 
 
-def _nivaa_ved(flate: Flate, bredde: float, rb: float, rh: float, rute: Rute) -> tuple[int, bool]:
+def _nivaa_ved(flate: Flate, bredde: float, rb: float, rh: float, rute: Rute) -> tuple[int, bool, bool]:
     """Tekstnivået for plassen rb × rh ved flate.bredde, regnet for den
-    synlige ruta når kartet er bredde px bredt, og om styrken står på nivå 2."""
+    synlige ruta når kartet er bredde px bredt, om styrken står på nivå 2,
+    og om hele grunnen står på nivå 3."""
     skala = bredde / flate.bredde
     b, h = rb * skala - 2 * KANT, rh * skala - 2 * KANT
     nivaa = tekstnivaa(b, h, rute.aksje.symbol)
-    return nivaa, nivaa == 2 and styrkelinje(rute, b, h)
+    return nivaa, nivaa == 2 and styrkelinje(rute, b, h), nivaa == 3 and grunnplass(rute, b, h)
 
 
 # Bredden og høyden ruta må ha for nivå 3, med teksten på 14 px.
@@ -537,6 +541,10 @@ STYRKE = (81, 75)
 # rammen, luften, symbolet, endringen og teksten uten ring
 # (test_grensen_for_ikke_vurdert_er_regnet_fra_stilen).
 IKKE_VURDERT_PLASS = (104, 69)
+# Gjennomgangen av svar 2 (ECH1): tallene fra stil.css som grunnplass regner
+# med: skriften i px, linjehøyden, mellomrommet, luften over og til siden,
+# rammen og bredden per tegn i em (test_grunnplass_er_regnet_fra_stilen).
+RUTESKRIFT, RUTELINJE, RUTEGAP, RUTELUFT, RUTERAMME, EM_PER_TEGN = 14, 1.2, 1, (4, 6), 4, 0.5
 
 
 def tekstnivaa(b: float, h: float, symbol: str) -> int:
@@ -567,6 +575,32 @@ def ikke_vurdert_plass(b: float, h: float) -> bool:
     """Om ruta har plass til «ikke vurdert» under symbolet og endringen
     (gruppens svar 04.11 kl. 20:53 og 20:56, 2)."""
     return b >= IKKE_VURDERT_PLASS[0] and h >= IKKE_VURDERT_PLASS[1]
+
+
+def _linjer(tekst: str, bredde: float) -> int:
+    """Hvor mange linjer teksten brytes til i bredde px, ord for ord, med
+    EM_PER_TEGN per tegn. Et ord som er bredere enn linja, får en linje."""
+    per_linje = max(1, int(bredde // (EM_PER_TEGN * RUTESKRIFT)))
+    linjer, brukt = 1, 0
+    for ord_ in tekst.split():
+        if brukt and brukt + 1 + len(ord_) > per_linje:
+            linjer, brukt = linjer + 1, len(ord_)
+        else:
+            brukt += (1 if brukt else 0) + len(ord_)
+    return linjer
+
+
+def grunnplass(rute: Rute, b: float, h: float) -> bool:
+    """Om hele grunnen får plass i ruta, som er b × h px: under symbolet,
+    endringen, «ikke vurdert» og merket for en annen dag på to linjer, med
+    rammen. Gruppens svar 04.11 kl. 20:53 og 20:56, 2: hele grunnen der den
+    får plass. Gjennomgangen (ECH1): med «ikke vurdert» i tillegg kunne
+    grunnen kuttes på nivå 3 i en gul rute en annen dag."""
+    if not rute.grunn:
+        return False
+    merke = 2 if rute.ramme == GUL and not rute.er_siste else 0
+    linjer = 3 + merke + _linjer(rute.grunn, b - 2 * RUTERAMME - 2 * RUTELUFT[1])
+    return 2 * RUTERAMME + 2 * RUTELUFT[0] + linjer * RUTESKRIFT * RUTELINJE + (linjer - 1) * RUTEGAP <= h
 
 
 def styrkelinje(rute: Rute, b: float, h: float) -> bool:
@@ -626,6 +660,7 @@ def kart(bransjer: list[Bransje], flatene: tuple[Flate, ...] = FLATENE) -> Kart:
         ruteplass: list[dict[str, Plass]] = [{} for _ in bransje.ruter]
         nivaa: list[dict[str, int]] = [{} for _ in bransje.ruter]
         styrke: list[set[str]] = [set() for _ in bransje.ruter]
+        grunn: list[set[str]] = [set() for _ in bransje.ruter]
         for flate in flatene:
             hoeyde = forhold[flate.navn] * flate.bredde
             (fx, fy, fb, fh), ruter = lagt[flate.navn][n]
@@ -643,11 +678,20 @@ def kart(bransjer: list[Bransje], flatene: tuple[Flate, ...] = FLATENE) -> Kart:
                     (rx - fx) / fb * 100, (ry - start) / kropp * 100, rb / fb * 100, rh / kropp * 100
                 )
                 for klasse, bredde in flate.tekst:
-                    nivaa[i][klasse], med_styrke = _nivaa_ved(flate, bredde, rb, rh, bransje.ruter[i])
+                    nivaa[i][klasse], med_styrke, med_grunn = _nivaa_ved(flate, bredde, rb, rh, bransje.ruter[i])
                     if med_styrke:
                         styrke[i].add(klasse)
+                    if med_grunn:
+                        grunn[i].add(klasse)
         kartruter = [
-            Kartrute(rute=r, vekt=vekt(r), plass=ruteplass[i], nivaa=nivaa[i], styrke=frozenset(styrke[i]))
+            Kartrute(
+                rute=r,
+                vekt=vekt(r),
+                plass=ruteplass[i],
+                nivaa=nivaa[i],
+                styrke=frozenset(styrke[i]),
+                grunn=frozenset(grunn[i]),
+            )
             for i, r in enumerate(bransje.ruter)
         ]
         felt.append(
