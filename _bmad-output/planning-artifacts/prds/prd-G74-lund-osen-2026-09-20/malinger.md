@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-02T22:26
+updated: 2026-11-06T02:01
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -5862,3 +5862,185 @@ foran.
 
 Målingen endrer ikke universet. Parametrene i signalet er låst og målt på de
 15 (AD-13).
+
+## 54. Prøvekjøringen av prompten versjon 4, for 04.11 (2026-11-05)
+
+**Metode.** Etter gruppens svar 5.11 kl. 16:05 (story 10.4 i `epics.md`, og
+spesifikasjonen 10.2i): alle 75 KI-tekstene i uka 29.10–04.11 gjentok
+regelforklaringen (`spec-10-4-loggdelen.md`), så versjon 4 har én linje til
+blant reglene: «- I tillegg til sjekkene skal teksten si med ord hvordan dagen
+var rundt aksjen: om hovedindeksen og bransjen steg, falt eller var uendret,
+og hvor mange av aksjene i lista som steg og som falt.» Den står foran linja om
+at hovedindeksen og bransjen ikke forklarer signalet, som står. Grunnlaget,
+kontrollen (FR-603) og vakta (NFR-06) er ikke endret. Prompten hadde avtrykket
+`e0306762…d3f7` (`AVTRYKK["4"]`, commit `37fb7c9c`).
+
+Ulikt §43–§49 ble basen ikke kopiert, og ingenting ble skrevet. `data/db/ose.db`
+ble åpnet med `mode=ro`, og de 15 radene i `ki_logg` for 04.11 ga grunnlaget og
+regelforklaringen for hver aksje, de samme som versjon 3 fikk i
+kveldshentingen. Hvert grunnlag gikk gjennom `lag_ki_rad` med Gemma i Ollama
+(modellen, prompten og kontrollen), og så gjennom `bygg_ki_visning` med
+vurderingen fra basen (samsvaret i FR-602 og vakta), fra et skript utenfor
+repoet. Tekstene står bare i scratchpad. Tiden per kall ble tatt med
+`time.monotonic()`. Ingen kall til EODHD: kvoten sto på 0 brukt i dag (GMT) kl.
+18:01. sha256 for `data/db/ose.db` var den samme før og etter
+(`58b893eb…c1be`).
+
+Versjon 3 i uka er de 75 radene fra driften 29.10–04.11, talt og klassifisert
+i `spec-10-4-loggdelen.md`. Klassene i versjon 4 er satt etter regelen der, av
+Claude, ved å lese hver tekst ved siden av regelforklaringen og grunnlaget.
+Klassifiseringen er ikke gjort av en person.
+
+| | Versjon 3, uka 29.10–04.11 (driften) | Versjon 3, 04.11 (driften) | §54, versjon 4, 04.11 |
+|---|---:|---:|---:|
+| Kjørt | kveldshentingene | kveldshentingen | 18:06:36–18:07:08 |
+| Tekster | 75 | 15 | 15 |
+| Besto kontrollen | 75 | 15 | 15 |
+| Stoppet av kontrollen | 0 | 0 | 0 |
+| Modellen feilet | 0 | 0 | 0 |
+| Ville blitt vist (samsvar og vakta) | 75 | 15 | 15 |
+| gjentar | 75 | 15 | 0 |
+| sier mer | 0 | 0 | 15 |
+| usikker | 0 | 0 | 0 |
+| Median tid per tekst | ikke målt | ikke målt | 0,91 s |
+| Lengste kall | ikke målt | ikke målt | 19,07 s (kall nr. 1, det første etter at Ollama ble startet kl. 18:05:45) |
+
+§54: `maskinvare` `gpu` for alle 15, `gemma4:e4b` med `modell_id`
+`dc35e8d9c606`, og Ollama 0.35.1. Alle 15 radene har `promptversjon` 4.
+
+**Resultat.** Kontrollen stoppet ingen av de 15, så det er ingen grunner å
+føre, og alle 15 ville blitt vist. Alle 15 sier mer enn regelforklaringen: de
+forklarer sjekkene først, som versjon 3, og har så en setning om
+dagen, som sier hva hovedindeksen og bransjen gjorde, og hvor
+mange aksjer i lista som steg og falt. Hver tekst er lest mot grunnlaget:
+hovedindeksen, bransjen og antallene stemmer i alle 15, hver sjekk er
+beskrevet slik fortegnet er, ingen nevner dagene, og ingen sier at
+hovedindeksen eller bransjen forklarer signalet. Åtte skriver antallene med
+sifre og sju med ord. Ingen gir råd eller gjetter på en årsak. 14 av de 15
+bruker den samme formen for setningen om dagen, så teksten er nesten lik for
+aksjene med samme bransje og samme sjekker.
+
+Kontrollen leser «N aksjer steg», men ikke formene modellen brukte, «N aksjer
+som steg» og «falt åtte og steg syv». Der sjekkes bare at tallet er et av
+antallene i grunnlaget (punkt 2), ikke at det står ved riktig felt. Prøvd med
+`kontroller` på grenen: «Det var 8 aksjer som steg og 7 som falt.» besto med
+7 som steg og 8 som falt i grunnlaget, mens «Åtte aksjer steg og syv falt.»
+ble stoppet. Antallene i de 15 tekstene er riktige, lest for hånd. Om
+kontrollen skal lese de formene, avgjør gruppen, fordi kontrollen ikke skulle
+endres i denne instruksjonen.
+
+Det er én kjøring, for én dag, med samme retning på hovedindeksen for alle 15. Tellingen
+gjentas etter noen dager med versjon 4 i driften (svaret 5.11 kl. 16:05).
+
+**Kjørt på nytt etter gjennomgangen av 10.2i.** Edge Case Hunter og Blind
+Hunter fant at linja krevde hovedindeksen og bransjen også når feltet mangler,
+mot reglene om at teksten ikke sier noe om et felt som mangler (ECH1, BH3).
+Linja sier nå «når feltet står i opplysningene», og versjonen står som 4,
+fordi ingen tekst i `ose.db` har versjon 4. Prompten hadde avtrykket
+`0df61d8f…c825` (commit `c9dbb342`). Kjørt på samme måte som over, kl.
+18:29:56–18:30:23, etter at Ollama ble startet kl. 18:29:44: 15 besto, 0 ble
+stoppet, modellen feilet for 0, og alle 15 ville blitt vist. Median 0,93 s per
+tekst og lengste kall 14,08 s (kall nr. 1). Alle 15 radene har
+`promptversjon` 4, `maskinvare` `gpu`, `gemma4:e4b` med `modell_id`
+`dc35e8d9c606` og Ollama 0.35.1. 2 av de 15 er ordrett de samme som over, og
+13 er endret. Klassene: 0 gjentar, 15 sier mer og 0 usikre. Hver tekst er lest
+mot grunnlaget: hovedindeksen, bransjen og antallene stemmer i alle 15, hver
+sjekk er beskrevet slik fortegnet er, ingen nevner dagene, og ingen sier at
+hovedindeksen eller bransjen forklarer signalet. Setningen om dagen har nå
+flere former. sha256 for `ose.db` var den samme før og etter.
+
+I samme kjøring fikk fem av grunnlagene (AKRBP, DNB, DNO, EQNR og FRO) gå
+gjennom modellen og kontrollen tre ganger til, uten hovedindeksen, uten
+bransjen og uten begge. Grunnlagene ble laget i skriptet og står ikke i
+basen. 13 av 15 besto. De 2 som ble stoppet, hadde begge feltene tatt ut og
+sa likevel noe om dem: DNB om hovedindeksen og DNO om bransjen, og kontrollen
+stoppet dem på punkt 1 («grunnlaget sier ingenting»). Ingen av de 13 som
+besto, sier noe om et felt som mangler.
+
+## 55. Prøvekjøringen etter svarene 5.11 kl. 19:13 og 23:36, for 05.11 (2026-11-06)
+
+**Metode.** Etter gruppens svar 5.11 kl. 19:13 og 23:36 (story 10.4 i
+`epics.md`, og spesifikasjonen 10.2i): appen skriver selv hva hovedindeksen,
+bransjen og antallene gjorde samme dag, under KI-teksten
+(`setning_om_samme_dag` i `dagene.py`), og modellen skriver ikke om dagen.
+Grunnlaget har retningen på aksjen selv i stedet for bransjen og antallene,
+modellen får ferdig ordlyd om aksjen gikk samme vei som hovedindeksen eller
+motsatt når begge steg eller falt, og kontrollen (FR-603) stopper alt annet om
+hovedindeksen, bransjen, børsen og antallet aksjer. `PROMPTVERSJON` står som 4,
+og prompten hadde avtrykket `a864e4c3…4aef` (commit `c986d07c`), med
+kontrollen fra `281a8f84`.
+
+Kjørt som §54, fra et skript utenfor repoet, med koden på grenen: `data/db/ose.db`
+ble åpnet med `mode=ro`, og ingenting ble skrevet. Ulikt §54 er grunnlaget regnet
+på nytt fra basen med `_grunnlagene` i `ki_tekst.py`, den samme veien som
+kveldshentingen, fordi grunnlaget i `ki_logg` er fra versjon 3 og ikke har
+aksjen. Dagen er siste børsdag i basen, 05.11, for de 15 aksjene med vurdering.
+Hvert grunnlag gikk gjennom `lag_ki_rad` med Gemma i Ollama (modellen, prompten
+og kontrollen) og så gjennom `bygg_ki_visning` med vurderingen fra basen
+(samsvaret i FR-602 og vakta). Tekstene står bare i scratchpad. Tiden per kall
+ble tatt med `time.monotonic()`. Ingen kall til EODHD: kvoten ble lest med
+`/api/user` kl. 23:53 5.11. sha256 for `data/db/ose.db` var den samme før og
+etter (`53951403…0097`). Lista over aksjer og bransjer i `aksje` i basen, som
+siden leser, var den samme som `AKSJEUNIVERS`, som hentingen bruker, så
+setningen på siden og grunnlaget er regnet av de samme verdiene.
+
+Klassene er satt etter regelen i `spec-10-4-loggdelen.md`, av Claude, ved å
+lese hver tekst som besto ved siden av regelforklaringen og grunnlaget.
+Klassifiseringen er ikke gjort av en person.
+
+| | §54 rettet, versjon 4, 04.11 | §55, versjon 4 etter svarene, 05.11 |
+|---|---:|---:|
+| Kjørt | 18:29:56–18:30:23 | 01:32:06–01:32:33 |
+| Tekster | 15 | 15 |
+| Besto kontrollen | 15 | 14 |
+| Stoppet av kontrollen | 0 | 1 |
+| Modellen feilet | 0 | 0 |
+| Ville blitt vist (samsvar og vakta) | 15 | 14 |
+| gjentar | 0 | 0 |
+| sier mer | 15 | 14 |
+| usikker | 0 | 0 |
+| Median tid per tekst | 0,93 s | 0,54 s |
+| Lengste kall | 14,08 s (kall nr. 1) | 19,86 s (kall nr. 1, det første etter at Ollama ble startet kl. 01:31:52) |
+
+§55: `maskinvare` `gpu` for alle 15, `gemma4:e4b` med `modell_id`
+`dc35e8d9c606`, og Ollama 0.35.1. Alle 15 radene har `promptversjon` 4.
+Ordlyden var «samme vei» for 8 aksjer og «motsatt vei» for 7, og alle 15 fikk
+en ordlyd.
+
+**Resultat.** 14 av 15 besto og ville blitt vist. Kontrollen stoppet 1, YAR,
+på punkt 1 med to grunner av samme slag, «om dagen»: teksten brukte ordlyden
+inne i en annen setning («…, og aksjen gikk …»), ikke ordrett som egen setning,
+så «motsatt vei» og «hovedindeksen» ble stoppet. Ordlyden sto ellers riktig, så
+kontrollen stoppet en tekst som ikke sa noe galt, fordi den leser ord og ikke
+mening (FR-603). Den samme formen ble stoppet i demoen (HVDO).
+
+Alle 14 som besto, er «sier mer» etter regelen, men bare fordi de har
+ordlyden om hovedindeksen, ordrett som siste setning. Utenom den gjentar alle
+14 regelforklaringen, som versjon 3 i uka 29.10–04.11. Ingen nevner bransjen,
+børsen, antallet aksjer eller dagene, ingen gir råd eller gjetter på en årsak,
+og ingen sier at hovedindeksen forklarer signalet. Hver tekst er lest mot
+grunnlaget: hver sjekk er beskrevet slik fortegnet er, og ordlyden er den
+grunnlaget gir i alle 14. At «sier mer» her er appens egne ord, er et funn til
+10.4 og refleksjonsrapporten: med svaret kl. 19:13 er det siden, ikke modellen,
+som sier hvordan dagen var.
+
+Det er én kjøring, for én dag, med samme retning på hovedindeksen for alle 15.
+Tellingen gjentas etter noen dager i driften, når versjon 4 er flettet (svaret
+5.11 kl. 16:05).
+
+**Kjørt på nytt etter gjennomgangen av svarene.** Blind Hunter, Edge Case
+Hunter og Verification Gap fant blant annet at linja om hovedindeksen i
+prompten kunne leses som at teksten kan nevne den når feltet er der (BH8,
+ECH5), at utsagn om aksjen selv ikke ble sjekket (BH1, VG1, ECH1), og at
+sammensatte ord slapp gjennom kontrollen (BH2, VG4, ECH4). Rettet i `2602f1e4`.
+Versjonen står som 4, og prompten hadde avtrykket `ec084a52…e251`. Kjørt på
+samme måte som over, kl. 02:00:26–02:00:50, etter at Ollama ble startet kl.
+02:00:08: 15 besto, 0 ble stoppet, modellen feilet for 0, og alle 15 ville
+blitt vist. Median 0,53 s per tekst og lengste kall 16,04 s (kall nr. 1). Alle
+15 radene har `promptversjon` 4, `maskinvare` `gpu`, `gemma4:e4b` med
+`modell_id` `dc35e8d9c606` og Ollama 0.35.1. Grunnlaget var det samme som over.
+Klassene: 0 gjentar, 15 sier mer (bare ordlyden, som over) og 0 usikre. Alle 15
+har ordlyden ordrett som siste setning, også YAR, som ble stoppet over. Hver
+tekst er lest mot grunnlaget: hver sjekk er beskrevet slik fortegnet er, eller
+ikke nevnt, og ingen nevner bransjen, børsen, antallet aksjer eller dagene.
+sha256 for `ose.db` var den samme før og etter.

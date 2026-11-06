@@ -433,6 +433,172 @@ class TestDagsbildet:
         indeks = [Kursrad(dato=d, slutt=k, justert_slutt=k, volum=0) for d, k in ((UKA[-3], 1500.0), (FREDAG, 1510.0))]
         assert self._bildet({}, indeks).hovedindeksen is None
 
+    def test_aksjen_regnes_som_i_tabellen(self):
+        """Gruppens svar 6.11 kl. 09:55, 1 (BH4, ECH9): retningen paa aksjen
+        selv er endringen mot forrige rad, som i tabellen (endring_i_prosent
+        paa de to siste radene) og antallene. Ville feilet hvis aksjen fikk en
+        annen retning enn endringen i tabellen, eller fikk retningen uten rad
+        paa dagen."""
+        from markedsoversikt import endring_i_prosent
+
+        for kurser in (_kurser(100.0, 101.0), _kurser(100.0, 99.0), _kurser(100.0, 100.001)):
+            bildet = self._bildet({"EQNR": kurser})
+            assert bildet.aksjen == bevegelse(endring_i_prosent(kurser[-2:]))
+        assert self._bildet({"EQNR": _kurser(100.0, 101.0)}).aksjen == STEG
+        assert self._bildet({"EQNR": _kurser(100.0, 99.0)}).aksjen == FALT
+        assert self._bildet({"EQNR": _kurser(100.0, 100.001)}).aksjen == UENDRET
+        assert self._bildet({"EQNR": _kurser(100.0, 101.0, siste=UKA[-2])}).aksjen is None
+        assert self._bildet({"EQNR": _kurser(100.0)}).aksjen is None
+
+    def test_aksjen_paa_en_dag_med_hull(self):
+        """Svaret 6.11 kl. 09:55, 1: ogsaa paa en dag med hull, der aksjen
+        mangler kurs forrige boersdag, regnes aksjen mot forrige rad, som i
+        tabellen og antallene, mens hovedindeksen med det samme hullet ikke
+        faar retning. Ville feilet hvis aksjen ble regnet som hovedindeksen,
+        mot forrige boersdag (da var den None), eller ikke ble talt likt i
+        antallene og retningen."""
+        hull = [Kursrad(dato=d, slutt=k, justert_slutt=k, volum=0) for d, k in ((UKA[-3], 100.0), (FREDAG, 101.0))]
+        bildet = self._bildet({"EQNR": hull}, hull)
+        assert bildet.hovedindeksen is None
+        assert bildet.aksjen == STEG
+        assert (bildet.aksjer_steg, bildet.aksjer_falt) == (1, 0)
+        fall = [Kursrad(dato=d, slutt=k, justert_slutt=k, volum=0) for d, k in ((UKA[-4], 100.0), (FREDAG, 98.0))]
+        bildet = self._bildet({"EQNR": fall})
+        assert bildet.aksjen == FALT
+        assert (bildet.aksjer_steg, bildet.aksjer_falt) == (0, 1)
+
+    def test_aksjen_som_tabellraden_paa_en_dag_med_hull(self):
+        """Gjennomgangen (BH12, VG1): aksjen sammenlignes med endringen
+        tabellen selv viser for dagen (bygg_rad_for_dag), ikke med en kopi av
+        utregningen. Ville feilet hvis tabellen og dagsbildet regnet en dag
+        med hull ulikt."""
+        from markedsoversikt import bygg_rad_for_dag
+        from oversiktsdata import Oversiktspost
+
+        for slutt in (101.0, 99.0, 100.001):
+            hull = [Kursrad(dato=d, slutt=k, justert_slutt=k, volum=0) for d, k in ((UKA[-4], 100.0), (FREDAG, slutt))]
+            post = Oversiktspost(aksje=self.LISTA[0], nyeste=hull[-1], forrige=hull[0], hentet=None, innhold=None)
+            rad = bygg_rad_for_dag(post, hull, FREDAG, None, FREDAG, False)
+            assert self._bildet({"EQNR": hull}).aksjen == bevegelse(rad.endring_prosent)
+
+    def test_ingen_ordlyd_paa_en_dag_med_hull(self):
+        """Gruppens svar 6.11 kl. 11:15, 2 (BH3, ECH2, VG2): paa en dag med
+        hull regnes aksjen fortsatt som i tabellen, men grunnlaget faar ikke
+        hovedindeksen, saa prompten gir ingen ordlyd om aksjen gikk samme vei.
+        Appens setning har fortsatt hovedindeksen, som er regnet over én dag.
+        Ville feilet hvis ordlyden ble gitt naar aksjen er regnet over flere
+        boersdager og hovedindeksen over én, eller hvis aksjen mistet
+        retningen fra tabellen."""
+        from dagene import setning_om_samme_dag
+        from ki_prompt import MOTSATT_VEI, ORDLYDEN, SAMME_VEI, lag_prompt
+        from markedsoversikt import bygg_rad_for_dag
+        from oversiktsdata import Oversiktspost
+
+        indeks = _kurser(1000.0, 1010.0)
+        hull = [Kursrad(dato=d, slutt=k, justert_slutt=k, volum=0) for d, k in ((UKA[-3], 100.0), (FREDAG, 101.0))]
+        post = Oversiktspost(aksje=self.LISTA[0], nyeste=hull[-1], forrige=hull[0], hentet=None, innhold=None)
+        rad = bygg_rad_for_dag(post, hull, FREDAG, None, FREDAG, False)
+        bildet = self._bildet({"EQNR": hull}, indeks)
+        assert bildet.aksjen == bevegelse(rad.endring_prosent) == STEG
+        assert bildet.hovedindeksen == STEG
+        assert bildet.samme_periode is False
+        grunnlag = ki_grunnlag(_v("Positiv", 1), utenfor_maalingen=False, dagen=bildet)
+        assert grunnlag["aksjen"] == STEG and "hovedindeksen" not in grunnlag
+        prompt = lag_prompt(grunnlag)
+        # Gjennomgangen (BH9): heller ikke rammen rundt ordlyden.
+        assert ORDLYDEN.split("{")[0] not in prompt
+        assert SAMME_VEI not in prompt and MOTSATT_VEI not in prompt
+        assert "steg hovedindeksen" in setning_om_samme_dag(bildet)
+        # Uten hull: den samme retningen gir ordlyden.
+        uten_hull = self._bildet({"EQNR": _kurser(100.0, 101.0)}, indeks)
+        assert uten_hull.samme_periode is True
+        grunnlag = ki_grunnlag(_v("Positiv", 1), utenfor_maalingen=False, dagen=uten_hull)
+        assert grunnlag["hovedindeksen"] == STEG and SAMME_VEI in lag_prompt(grunnlag)
+
+    def test_samme_periode_bare_med_rad_paa_dagen_og_forrige_boersdag(self):
+        """Svaret 6.11 kl. 11:15, 2: ville feilet hvis samme_periode var True
+        uten rad paa dagen, med bare én rad, eller med forrige rad foer
+        forrige boersdag, eller False naar aksjen har begge radene."""
+        assert self._bildet({"EQNR": _kurser(100.0, 101.0)}).samme_periode is True
+        assert self._bildet({"EQNR": _kurser(100.0, 101.0, siste=UKA[-2])}).samme_periode is False
+        assert self._bildet({"EQNR": _kurser(100.0)}).samme_periode is False
+        assert self._bildet({}).samme_periode is False
+        # Over helgen: fredag 16.10 er forrige boersdag foer mandag 19.10.
+        helg = lag_dagsbilde(
+            self.LISTA[0], UKA[1], _v("Positiv", 1), {}, self.LISTA, {"EQNR": _kurser(100.0, 101.0, siste=UKA[1])}, None
+        )
+        assert helg.samme_periode is True
+        # Gjennomgangen (VG1): basen kan ha rader etter dagen som regnes.
+        etter = {"EQNR": _kurser(100.0, 101.0, 102.0)}
+        torsdag = lag_dagsbilde(self.LISTA[0], UKA[-2], _v("Positiv", 1), {}, self.LISTA, etter, None)
+        assert torsdag.samme_periode is True
+        hull_foer = [
+            Kursrad(dato=d, slutt=k, justert_slutt=k, volum=0) for d, k in ((UKA[-4], 100.0), (UKA[-2], 101.0))
+        ]
+        hull_foer.append(Kursrad(dato=FREDAG, slutt=102.0, justert_slutt=102.0, volum=0))
+        torsdag = lag_dagsbilde(self.LISTA[0], UKA[-2], _v("Positiv", 1), {}, self.LISTA, {"EQNR": hull_foer}, None)
+        assert torsdag.samme_periode is False
+
+    def test_bransje_med_en_aksje_i_lista(self):
+        """Gruppens svar 6.11 kl. 09:55, 2 (ECH6, BH11): bransjen staar bare
+        naar den har minst to aksjer i lista. Ville feilet hvis DNB, alene i
+        Finans, fikk «bransjen ... i snitt», som da bare sier hva DNB gjorde."""
+        from dagene import setning_om_samme_dag
+
+        bildet = self._bildet({"DNB": _kurser(50.0, 49.0), "EQNR": _kurser(100.0, 101.0)}, aksje=2)
+        assert bildet.aksjen == FALT
+        assert bildet.bransjen is None
+        assert "bransjen" not in setning_om_samme_dag(bildet)
+        # Svaret 6.11 kl. 11:15, 1: AKRBP har ogsaa en endring, saa Energi staar.
+        energi = self._bildet(
+            {"DNB": _kurser(50.0, 49.0), "EQNR": _kurser(100.0, 101.0), "AKRBP": _kurser(200.0, 202.0)}, aksje=0
+        )
+        assert energi.bransjen == STEG
+        assert "steg bransjen i snitt" in setning_om_samme_dag(energi)
+
+    def test_bransje_med_to_der_bare_den_ene_har_endring(self):
+        """Gruppens svar 6.11 kl. 11:15, 1 (BH1, ECH1, BH2): bransjen staar
+        bare naar minst to aksjer i bransjen har en endring den dagen. EQNR og
+        AKRBP er begge i Energi, men AKRBP har ingen kurs paa dagen. Ville
+        feilet hvis bransjen fortsatt sto med snittet av EQNR alene, som da
+        bare sier hva EQNR selv gjorde, for EQNR eller for AKRBP."""
+        from dagene import setning_om_samme_dag
+
+        serier = {"EQNR": _kurser(100.0, 98.0), "AKRBP": _kurser(200.0, 201.0, siste=UKA[-2])}
+        for aksje in (0, 1):
+            bildet = self._bildet(serier, aksje=aksje)
+            assert bildet.bransjen is None
+            assert "bransjen" not in (setning_om_samme_dag(bildet) or "")
+        assert self._bildet(serier, aksje=0).aksjen == FALT
+
+    def test_bransjen_med_to_med_endring_er_snittet_i_boersometeret(self):
+        """Svaret 6.11 kl. 09:55, 2: snittet er det samme som i
+        boersometeret, av aksjene i bransjen som har en endring. Ville feilet
+        hvis bransjen falt bort naar begge har en endring, eller snittet ble
+        regnet annerledes enn snitt i boersometeret."""
+        from boersometer import bygg_rute, snitt
+
+        serier = {"EQNR": _kurser(100.0, 98.0), "AKRBP": _kurser(200.0, 201.0)}
+        bildet = self._bildet(serier, aksje=0)
+        ruter = [bygg_rute(a, serier[a.symbol], _v("Positiv", 1), FREDAG, FREDAG) for a in self.LISTA[:2]]
+        assert bildet.bransjen == bevegelse(snitt(ruter)) == FALT
+
+    def test_kog_tel_og_ork_faar_ikke_bransjen(self):
+        """Svaret 6.11 kl. 09:55, 2: i lista over de 15 er KOG, TEL og ORK
+        alene i bransjen sin og faar ikke delen om bransjen. Ville feilet hvis
+        en av dem fikk bransjen, eller en aksje med andre i bransjen mistet den."""
+        from kursdata import AKSJEUNIVERS
+
+        serier = {a.symbol: _kurser(100.0, 101.0) for a in AKSJEUNIVERS}
+        alene = set()
+        for aksje in AKSJEUNIVERS:
+            bildet = lag_dagsbilde(aksje, FREDAG, _v("Positiv", 1), {}, AKSJEUNIVERS, serier, None)
+            if bildet.bransjen is None:
+                alene.add(aksje.symbol)
+            else:
+                assert bildet.bransjen == STEG
+        assert alene == {"KOG", "TEL", "ORK"}
+
     def test_ingen_bransje_uten_endring(self):
         bildet = self._bildet({"NY": _kurser(10.0)}, aksje=4)
         assert bildet.bransjen is None
@@ -440,9 +606,21 @@ class TestDagsbildet:
 
 
 class TestGrunnlagetMedDagen:
-    BILDET = Dagsbilde(dager=4, dager_minst=True, hovedindeksen=STEG, aksjer_steg=9, aksjer_falt=5, bransjen=FALT)
+    BILDET = Dagsbilde(
+        dager=4,
+        dager_minst=True,
+        hovedindeksen=STEG,
+        aksjer_steg=9,
+        aksjer_falt=5,
+        bransjen=FALT,
+        aksjen=FALT,
+        samme_periode=True,
+    )
 
     def test_feltene(self):
+        """Story 10.2i (svarene 5.11 kl. 19:13 og 23:36): hovedindeksen og
+        aksjen selv, ikke bransjen og antallene, som appen skriver. Ville
+        feilet hvis bransjen eller antallene kom med, eller aksjen manglet."""
         grunnlag = ki_grunnlag(_v("Positiv", 2), utenfor_maalingen=False, dagen=self.BILDET)
         assert dict(grunnlag) == {
             "trend": 1,
@@ -451,10 +629,16 @@ class TestGrunnlagetMedDagen:
             "styrke": 2,
             "retning": "Positiv",
             "hovedindeksen": STEG,
-            "aksjer_steg": 9,
-            "aksjer_falt": 5,
-            "bransjen": FALT,
+            "aksjen": FALT,
         }
+
+    def test_uten_aksjen_naar_den_ikke_kan_regnes(self):
+        """Ville feilet hvis grunnlaget fikk aksjen naar dagsbildet ikke har
+        den, som for hovedindeksen."""
+        import dataclasses
+
+        bildet = dataclasses.replace(self.BILDET, aksjen=None, hovedindeksen=None)
+        assert set(ki_grunnlag(_v("Positiv", 2), utenfor_maalingen=False, dagen=bildet)) == NOEKLENE
 
     def test_ingen_desimaltall_med_dagen(self):
         """Ville feilet hvis dagen sendte en prosent, et snitt eller en kurs
@@ -471,12 +655,13 @@ class TestGrunnlagetMedDagen:
                 dager=1, dager_minst=minst, hovedindeksen=None, aksjer_steg=0, aksjer_falt=0, bransjen=None
             )
             grunnlag = ki_grunnlag(_v("Ingen", 0), utenfor_maalingen=False, dagen=bildet)
-            assert set(grunnlag) == NOEKLENE | {"aksjer_steg", "aksjer_falt"}
+            assert set(grunnlag) == NOEKLENE
 
-    @pytest.mark.parametrize("felt", ["dager", "dager_merke"])
+    @pytest.mark.parametrize("felt", ["dager", "dager_merke", "bransjen", "aksjer_steg", "aksjer_falt"])
     def test_et_grunnlag_med_dagene_avvises(self, felt):
         """Gjennomgangen 25.10 kl. 11 (VG12, BH8): ville feilet hvis et
-        grunnlag med dager eller dager_merke ble godtatt."""
+        grunnlag med dager eller dager_merke ble godtatt. Story 10.2i: heller
+        ikke bransjen eller antallene, som appen skriver selv."""
         from ki_grunnlag import _kontroller
 
         bildet = Dagsbilde(dager=1, dager_minst=False, hovedindeksen=None, aksjer_steg=0, aksjer_falt=0, bransjen=None)
@@ -488,10 +673,9 @@ class TestGrunnlagetMedDagen:
     @pytest.mark.parametrize(
         "felt, verdi",
         [
-            ("aksjer_steg", -1),
-            ("aksjer_falt", True),
             ("hovedindeksen", "opp"),
-            ("bransjen", "Positiv"),
+            ("aksjen", "Positiv"),
+            ("aksjen", 1),
         ],
     )
     def test_ugyldige_verdier_avvises(self, felt, verdi):

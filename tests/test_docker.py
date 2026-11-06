@@ -1139,7 +1139,24 @@ HOEYDE_PAA_BILDET = 1864
 # bunnen av raden er fortsatt 1864 px, maalt i Edge.
 # Gjennomgangen av svarene 05.11 kl. 14:29: kommentaren om grensen i stil.css og
 # hjelpen om 1079 px i hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "ef7f45bcc548ce44c5497a2d25d01bf53109d5eb36f0ec80e34b19c381a82cda"
+# Story 10.2i b: hjelpen «Kort fortalt» i hjelpetekster.py sier hva modellen faar.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 10.2i c: hjelpen «Kort fortalt» nevner ordlyden. Bildet ble tatt paa nytt
+# og er byte for byte det samme.
+# Story 10.2i d: hjelpen «Kort fortalt» sier hva kontrollen stopper. Bildet ble
+# tatt paa nytt og er byte for byte det samme.
+# Gjennomgangen av 10.2i (andre runde): hjelpetekster.py. Bildet ble tatt paa
+# nytt og er byte for byte det samme.
+# Gruppens svar 6.11 kl. 09:55, 1: hjelpen «Kort fortalt» i hjelpetekster.py sier
+# at aksjen regnes som endringen i tabellen. Bildet ble tatt paa nytt og er byte
+# for byte det samme.
+# Gjennomgangen av svarene 6.11 kl. 09:55: hjelpen «Kort fortalt» i hjelpetekster.py.
+# Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gruppens svar 6.11 kl. 11:15, 2: hjelpen «Kort fortalt» i hjelpetekster.py. Bildet
+# ble tatt paa nytt og er byte for byte det samme.
+# Gjennomgangen av svarene 6.11 kl. 11:15 (BH2): hjelpen «Kort fortalt». Bildet ble
+# tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "a8ed73178842e0f6371daa7dcd6e8fd0dd18c3866fe98a9841cbc45195d64560"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1215,7 +1232,18 @@ IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py", "src/boersometer.py
 # grafen og teksten. Maalt i Edge uten vindu. Var 1882.
 # Gruppens svar 04.11 kl. 09:58: 2198, fordi «?» ved «Ga» og «Målt mot» står i
 # alle tre sjekkortene. Maalt paa samme maate. Var 2192.
-HOEYDE_PAA_AKSJESIDEN = 2198
+# Story 10.2i, promptversjon 4: KI-teksten for BRFE har en setning til om
+# dagen, og bunnen av p.dagene er 2224,5 px, maalt i Edge uten vindu og
+# rundet opp. Var 2198.
+# Story 10.2i, gruppens svar 5.11 kl. 19:13 og 23:36: setningen om samme dag
+# (p.samme-dag) staar under setningen om dagene, saa bildet slutter ved bunnen
+# av den, 2260,5 px maalt i Edge uten vindu og rundet opp. Var 2225.
+# Story 10.2i b: demotekstene laget paa nytt uten setningen om dagen, saa
+# teksten for BRFE er én linje kortere. Bunnen av p.samme-dag er 2234,2 px,
+# maalt paa samme maate. Var 2261.
+# Story 10.2i c: teksten for BRFE har ordlyden om hovedindeksen, saa den er én
+# linje lengre. Bunnen av p.samme-dag er 2260,5 px, maalt paa samme maate. Var 2235.
+HOEYDE_PAA_AKSJESIDEN = 2261
 # Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
 # Story 10.5: lenken til investorsiden står under grafen, ved 1980 px målt i
 # Edge uten vindu, så bildet, som slutter ved bunnen av grafen (1872 px), ble
@@ -1423,14 +1451,44 @@ HOEYDE_PAA_AKSJESIDEN = 2198
 # Bildet ble tatt paa nytt og er byte for byte det samme.
 # Gjennomgangen av svarene 05.11 kl. 14:29: kommentaren om grensen i stil.css og
 # hjelpen om 1079 px i hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "695e3666c5936d79a0ceadb88cfe1b6f0b5a203810fb987661910183134c7dcb"
+# Story 10.2i: demotekstene med promptversjon 4, i demo_ki_tekster.json. Bildet ble
+# tatt paa nytt med den nye teksten for BRFE og er 2225 px hoeyt. Gjennomgangen av
+# 10.2i (ECH1): demotekstene laget paa nytt; teksten for BRFE er den samme, og
+# bildet ble tatt paa nytt og er byte for byte det samme.
+# Story 10.2i, svarene 5.11 kl. 19:13 og 23:36: setningen om samme dag i
+# dagene.py, app.py og aksje.html. Bildet ble tatt paa nytt og er 2261 px hoeyt.
+# Story 10.2i b: aksjen i dagene.py, hjelpen i hjelpetekster.py og demotekstene.
+# Bildet ble tatt paa nytt og er 2235 px hoeyt.
+# Story 10.2i c: ordlyden om hovedindeksen i demo_ki.py, hjelpetekster.py og
+# demotekstene. Bildet ble tatt paa nytt og er 2261 px hoeyt.
+# Story 10.2i d: hjelpen i hjelpetekster.py og demotekstene (HVDO stoppet av
+# kontrollen). Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gjennomgangen av 10.2i (andre runde): dagene.py, app.py, hjelpetekster.py og
+# demotekstene. Bildet ble tatt paa nytt med den nye teksten for BRFE, og er
+# fortsatt 2261 px hoeyt.
+# Gruppens svar 6.11 kl. 09:55, 1: aksjen mot forrige rad i dagene.py, og hjelpen
+# i hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gruppens svar 6.11 kl. 09:55, 2: bransjen bare med minst to aksjer i lista, i
+# dagene.py. BRFE er i Energi med tre andre, og bildet ble tatt paa nytt og er byte
+# for byte det samme.
+# Gjennomgangen av svarene 6.11 kl. 09:55: hjelpetekster.py. Bildet ble tatt paa
+# nytt og er byte for byte det samme.
+# Gruppens svar 6.11 kl. 11:15, 1: bransjen bare med minst to aksjer med en endring,
+# i dagene.py. Ingen aksjedag i demoen faar en annen setning, og bildet ble tatt paa
+# nytt og er byte for byte det samme.
+# Gruppens svar 6.11 kl. 11:15, 2: ordlyden bare over samme periode, i dagene.py, og
+# hjelpen i hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gjennomgangen av svarene 6.11 kl. 11:15 (BH2): hjelpetekster.py. Bildet ble tatt
+# paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "c71d05a391103d0182415c188117290a402484d103e96fe4af986aac1217d28d"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
     "demobasen i en midlertidig mappe (lagring_sqlite.BASE_STI dit), OSE_DEMO=1, "
     "waitress på en ledig port, og msedge --headless --disable-gpu --hide-scrollbars "
     f"--window-size=1280,{HOEYDE_PAA_AKSJESIDEN} med egen --user-data-dir. Bildet skal slutte "
-    "ved bunnen av setningen om dagene (p.dagene), under KI-teksten etter grafen: mål den og endre "
+    "ved bunnen av setningen om samme dag (p.samme-dag), under setningen om dagene og KI-teksten "
+    "etter grafen: mål den og endre "
     "HOEYDE_PAA_AKSJESIDEN hvis den har flyttet seg. Oppdater så "
     "AVTRYKK_BAK_AKSJESIDEN til {avtrykk} i samme commit."
 )
@@ -1456,12 +1514,38 @@ DE_NYE_BILDENE = {
 }
 # Gjennomgangen av svarene 05.11 kl. 14:29: stil.css, hjelpetekster.py og
 # boersometer.py (STORSYMBOL_EM). Bildene ble tatt paa nytt og er byte for byte de samme.
+# Story 10.2i: demotekstene med promptversjon 4, i demo_ki_tekster.json. Bildene ble tatt
+# paa nytt: ved 1280 px byte for byte de samme, og ved 390 px piksel for piksel.
+# Gjennomgangen av 10.2i (ECH1): demotekstene laget paa nytt. Bildene ved 1280 px
+# ble tatt paa nytt og er byte for byte de samme; 390 px er samme side og ikke tatt paa nytt.
+# Story 10.2i, svarene 5.11 kl. 19:13 og 23:36: dagene.py og app.py. Alle bildene
+# ble tatt paa nytt og er byte for byte de samme.
+# Story 10.2i b: dagene.py, hjelpetekster.py og demotekstene. Alle bildene ble tatt
+# paa nytt og er byte for byte de samme.
+# Story 10.2i c: demo_ki.py, hjelpetekster.py og demotekstene. Alle bildene ble
+# tatt paa nytt og er byte for byte de samme.
+# Story 10.2i d: hjelpetekster.py og demotekstene. Alle bildene ble tatt paa nytt
+# og er byte for byte de samme.
+# Gjennomgangen av 10.2i (andre runde): dagene.py, app.py, hjelpetekster.py og
+# demotekstene. Alle bildene ble tatt paa nytt og er byte for byte de samme.
+# Gruppens svar 6.11 kl. 09:55, 1: dagene.py og hjelpetekster.py. Alle bildene ble
+# tatt paa nytt: ved 1280 px byte for byte de samme, og ved 390 px piksel for piksel.
+# Gruppens svar 6.11 kl. 09:55, 2: dagene.py. Bildene av børsometeret og Min liste
+# ble tatt paa nytt: ved 1280 px byte for byte de samme, og ved 390 px piksel for piksel.
+# Gjennomgangen av svarene 6.11 kl. 09:55: hjelpetekster.py. Alle bildene ble tatt paa
+# nytt: ved 1280 px byte for byte de samme, og ved 390 px piksel for piksel.
+# Gruppens svar 6.11 kl. 11:15, 1: dagene.py. Bildene av børsometeret og Min liste
+# ble tatt paa nytt og er byte for byte de samme, ogsaa ved 390 px.
+# Gruppens svar 6.11 kl. 11:15, 2: dagene.py og hjelpetekster.py. Alle bildene ble
+# tatt paa nytt og er byte for byte de samme, ogsaa ved 390 px.
+# Gjennomgangen av svarene 6.11 kl. 11:15 (BH2): hjelpetekster.py. Alle bildene ble
+# tatt paa nytt og er byte for byte de samme, ogsaa ved 390 px.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "ef7f45bcc548ce44c5497a2d25d01bf53109d5eb36f0ec80e34b19c381a82cda",
-    "docs/appen/boersometeret-demo.png": "2a42a1a94cbe36e66f47d6288c1b34d0ab88c6ef6c393fb07b21998121428f6f",
-    "docs/appen/min-liste-demo.png": "95a66e9c1a24d016a5bfd154f13af9ae0e62b6ed92e4a9e918a3f025d785ade8",
-    "docs/appen/oversikten-390-demo.png": "ef7f45bcc548ce44c5497a2d25d01bf53109d5eb36f0ec80e34b19c381a82cda",
-    "docs/appen/boersometeret-390-demo.png": "2a42a1a94cbe36e66f47d6288c1b34d0ab88c6ef6c393fb07b21998121428f6f",
+    TOPPEN_AV_OVERSIKTEN: "a8ed73178842e0f6371daa7dcd6e8fd0dd18c3866fe98a9841cbc45195d64560",
+    "docs/appen/boersometeret-demo.png": "059d28a3103be52f2e631a77ba5f9a3162df782be14e234728fc39cb2b1c2e51",
+    "docs/appen/min-liste-demo.png": "3e863627d988753b9fc63572393aec71f960f19084a05369822b7ace87470ee7",
+    "docs/appen/oversikten-390-demo.png": "a8ed73178842e0f6371daa7dcd6e8fd0dd18c3866fe98a9841cbc45195d64560",
+    "docs/appen/boersometeret-390-demo.png": "059d28a3103be52f2e631a77ba5f9a3162df782be14e234728fc39cb2b1c2e51",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "

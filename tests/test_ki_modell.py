@@ -15,7 +15,16 @@ import pytest
 
 from ki_kontroll import AARSAKER, GJETNING, RAAD, kontroller
 from ki_modell import Modell, ModellFeilet, Modellsvar, lag_ki_rad
-from ki_prompt import PROMPTVERSJON, REGLER, UTENFOR, lag_prompt
+from ki_prompt import (
+    MOTSATT_VEI,
+    ORDLYDEN,
+    PROMPTVERSJON,
+    REGLER,
+    SAMME_VEI,
+    UTENFOR,
+    lag_prompt,
+    ordlyd_om_hovedindeksen,
+)
 from kilogg import Emne
 
 EMNE = Emne.aksje("EQNR", date(2026, 10, 15))
@@ -52,14 +61,37 @@ AVTRYKK = {
     # Story 10.2h, gruppens svar 25.10 kl. 20:54: ordstillingen etter «fordi»
     # og rekkefoelgen paa sjekkene, og versjonen staar som 3. Var 0d427725....
     "3": "ec16642676123e3730c7e8dbd66c03f282a6f77b9ac8fa121b8dc023f97522d5",
+    # Story 10.2i, gruppens svar 5.11 kl. 16:05: linja om hvordan dagen var
+    # rundt aksjen. Teksten til versjon 3 staar i src/ki_prompt.py paa 72250544.
+    # Gjennomgangen av 10.2i (ECH1, BH3): «når feltet står i opplysningene», og
+    # versjonen staar som 4 (ingen tekst i ose.db med versjon 4). Var e0306762....
+    # Story 10.2i, svarene 5.11 kl. 19:13 og 23:36 (b): aksjen i opplysningene,
+    # og linja om dagen rundt aksjen er tatt ut. Versjonen staar som 4, fordi
+    # versjon 4 ikke er flettet. Var 0df61d8f....
+    # Story 10.2i, svaret 5.11 kl. 19:13 (c): ordlyden om hovedindeksen, med
+    # funksjonen som velger den, og to linjer i reglene. Versjonen staar som 4.
+    # Var 50a0ec0e....
+    # Gjennomgangen av svarene (BH8, ECH5): linjene om hovedindeksen og aksjen.
+    # Versjonen staar som 4. Var a864e4c3....
+    "4": "ec084a5215ac05389e96d63ecb21c826a326caecabc59f8d2bbc7cf7d526e251",
 }
 
 
 def _promptteksten() -> str:
     """Det avtrykket for versjon 3 dekker: reglene, merket og koden i
     lag_prompt (inspect leser kildeteksten med LF). Svaret 25.10 kl. 00:51:
-    ordlyden for dagene er tatt ut av prompten, og dermed av avtrykket."""
-    return REGLER + UTENFOR + inspect.getsource(lag_prompt)
+    ordlyden for dagene er tatt ut av prompten, og dermed av avtrykket.
+    Story 10.2i: ordlyden om hovedindeksen og funksjonen som velger den er
+    med, som i demo_ki.promptavtrykk."""
+    return (
+        REGLER
+        + UTENFOR
+        + inspect.getsource(lag_prompt)
+        + SAMME_VEI
+        + MOTSATT_VEI
+        + ORDLYDEN
+        + inspect.getsource(ordlyd_om_hovedindeksen)
+    )
 
 
 class FalskModell:
@@ -147,9 +179,113 @@ class TestPrompten:
         stedet for at prompten fikk en ny versjon."""
         assert AVTRYKK["3"] == "ec16642676123e3730c7e8dbd66c03f282a6f77b9ac8fa121b8dc023f97522d5"
 
-    def test_versjon_3(self):
-        """Story 10.2e, gruppens svar 24.10 kl. 15:50."""
-        assert PROMPTVERSJON == "3"
+    def test_versjon_4(self):
+        """Story 10.2i, gruppens svar 5.11 kl. 16:05 (var versjon 3 fra
+        10.2e). Ville feilet hvis versjonen ikke var 4, eller avtrykket for
+        versjon 4 var det samme som for versjon 3. At en endret prompt faar ny
+        versjon, fanger test_versjonen_foelger_teksten (gjennomgangen, BH12,
+        ECH7)."""
+        assert PROMPTVERSJON == "4"
+        assert AVTRYKK["4"] == "ec084a5215ac05389e96d63ecb21c826a326caecabc59f8d2bbc7cf7d526e251"
+        assert AVTRYKK["4"] != AVTRYKK["3"]
+
+    def test_modellen_skriver_ikke_om_dagen(self):
+        """Story 10.2i, gruppens svar 5.11 kl. 19:13 og 23:36 (BH6, BH7):
+        appen skriver hovedindeksen, bransjen og antallene, saa linja fra
+        svaret kl. 16:05 om hvordan dagen var rundt aksjen er tatt ut, og
+        reglene forklarer ikke bransjen og antallene. Ville feilet hvis linja
+        sto igjen, eller reglene forklarte aksjer_steg, aksjer_falt eller
+        bransjen. Linja om at hovedindeksen og bransjen ikke forklarer
+        signalet, staar."""
+        assert "I tillegg til sjekkene skal teksten si med ord hvordan dagen var" not in REGLER
+        assert not any(linje.startswith(("- aksjer_steg", "- bransjen")) for linje in REGLER.splitlines())
+        assert (
+            "- aksjen: om aksjen selv steg, falt eller var uendret i dag. Mangler feltet, skal du ikke si noe "
+            "om hvordan aksjen gikk." in REGLER.splitlines()
+        )
+        # Gjennomgangen (BH8, ECH5): linja om hovedindeksen sier at den bare
+        # nevnes med ordlyden, ikke at den kan nevnes naar feltet er der.
+        assert "Mangler feltet, skal du ikke si noe om hovedindeksen." not in REGLER
+        assert (
+            "- hovedindeksen: om hovedindeksen på Oslo Børs steg, falt eller var uendret i dag. Feltet er med "
+            "for ordlyden under, og teksten nevner hovedindeksen bare med den." in REGLER.splitlines()
+        )
+        ikke_forklarer = "- Hovedindeksen og bransjen er ikke en del av regelen. Ikke si at de forklarer signalet."
+        reglene = REGLER.split("Regler for teksten:", 1)[1].splitlines()
+        assert reglene.count(ikke_forklarer) == 1
+
+    @pytest.mark.parametrize(
+        "aksjen, indeksen, ordlyd",
+        [
+            ("steg", "steg", SAMME_VEI),
+            ("falt", "falt", SAMME_VEI),
+            ("steg", "falt", MOTSATT_VEI),
+            ("falt", "steg", MOTSATT_VEI),
+            ("uendret", "steg", None),
+            ("falt", "uendret", None),
+            ("uendret", "uendret", None),
+            (None, "steg", None),
+            ("steg", None, None),
+            (None, None, None),
+        ],
+    )
+    def test_ordlyden_om_hovedindeksen(self, aksjen, indeksen, ordlyd):
+        """Story 10.2i, gruppens svar 5.11 kl. 19:13: appen gir ferdig ordlyd
+        om aksjen gikk samme vei som hovedindeksen eller motsatt, bare naar
+        begge steg eller falt. Ville feilet hvis retningene ble byttet (steg
+        og falt ga samme vei), eller en ordlyd ble gitt naar en av dem var
+        uendret eller mangler."""
+        grunnlag = dict(BLANDET)
+        for felt, verdi in (("aksjen", aksjen), ("hovedindeksen", indeksen)):
+            if verdi is not None:
+                grunnlag[felt] = verdi
+        assert ordlyd_om_hovedindeksen(grunnlag) == ordlyd
+
+    def test_ordlyden_er_hele_setninger(self):
+        """Laerdommen fra tredje forsoek av versjon 3 (§44): ordlyden ble satt
+        inn midt i en setning. Ville feilet hvis ordlyden ikke var en hel
+        setning med stor forbokstav og punktum, eller de to var like."""
+        for ordlyd in (SAMME_VEI, MOTSATT_VEI):
+            assert ordlyd[0].isupper() and ordlyd.endswith(".") and ordlyd.count(".") == 1
+            assert "hovedindeksen" in ordlyd
+        assert SAMME_VEI != MOTSATT_VEI
+
+    def test_ordlyden_staar_i_prompten_bare_naar_den_finnes(self):
+        """Ville feilet hvis prompten manglet linja med ordlyden naar
+        grunnlaget gir den, hadde den naar det ikke gjoer det, eller hadde
+        den andre ordlyden enn den grunnlaget gir."""
+        samme = {**BLANDET, "hovedindeksen": "falt", "aksjen": "falt"}
+        motsatt = {**BLANDET, "hovedindeksen": "falt", "aksjen": "steg"}
+        prompt = lag_prompt(samme)
+        assert prompt.endswith(ORDLYDEN.format(ordlyd=SAMME_VEI))
+        assert ORDLYDEN.format(ordlyd=SAMME_VEI) == f"\nOrdlyden om hovedindeksen: {SAMME_VEI}\n"
+        assert MOTSATT_VEI not in prompt
+        assert lag_prompt(motsatt).endswith(ORDLYDEN.format(ordlyd=MOTSATT_VEI))
+        assert SAMME_VEI not in lag_prompt(motsatt)
+        for grunnlag in (BLANDET, {**BLANDET, "hovedindeksen": "steg", "aksjen": "uendret"}):
+            etter = lag_prompt(grunnlag).split("Opplysningene:", 1)[1]
+            assert "Ordlyden om hovedindeksen" not in etter
+            assert SAMME_VEI not in lag_prompt(grunnlag) and MOTSATT_VEI not in lag_prompt(grunnlag)
+        # Med merket kommer ordlyden fortsatt etter opplysningene.
+        med_merket = lag_prompt({**samme, "merke": "Utenfor målingen"})
+        assert med_merket.endswith(ORDLYDEN.format(ordlyd=SAMME_VEI))
+
+    def test_reglene_sier_ordrett_eller_ikke(self):
+        """Ville feilet hvis reglene ikke sa at hovedindeksen bare nevnes med
+        ordlyden, ordrett, og at bransjen, boersen og antallet aksjer ikke
+        nevnes, eller linjene ikke kom med i prompten."""
+        reglene = REGLER.split("Regler for teksten:", 1)[1].splitlines()
+        ordrett = (
+            "- Om hovedindeksen kan teksten bare bruke setningen etter «Ordlyden om hovedindeksen:» under "
+            "opplysningene, ordrett og som en egen setning, eller ikke si noe om hovedindeksen. Står det ingen "
+            "ordlyd, skal teksten ikke si noe om hovedindeksen."
+        )
+        ikke = (
+            "- Ikke si noe om bransjen, børsen eller hvor mange aksjer som steg eller falt. "
+            "Appen skriver det selv under teksten."
+        )
+        assert reglene.count(ordrett) == 1 and reglene.count(ikke) == 1
+        assert ordrett in lag_prompt(BLANDET) and ikke in lag_prompt(BLANDET)
 
     def test_reglene_forklarer_hvert_felt_i_grunnlaget(self):
         """Story 10.2e: ville feilet hvis grunnlaget hadde et felt reglene
@@ -171,7 +307,15 @@ class TestPrompten:
             volumforhold=1.73,
         )
         dagen = Dagsbilde(
-            dager=3, dager_minst=True, hovedindeksen="falt", aksjer_steg=4, aksjer_falt=11, bransjen="steg"
+            dager=3,
+            dager_minst=True,
+            hovedindeksen="falt",
+            aksjer_steg=4,
+            aksjer_falt=11,
+            bransjen="steg",
+            aksjen="steg",
+            # Svaret 6.11 kl. 11:15, 2: ellers kommer ikke hovedindeksen med.
+            samme_periode=True,
         )
         grunnlag = ki_grunnlag(vurdering, utenfor_maalingen=True, dagen=dagen)
         forklaringen = REGLER.split("Regler for teksten:")[0]
@@ -181,6 +325,8 @@ class TestPrompten:
                 assert felt in forklaringen.lower(), felt
         # Gruppens svar 25.10 kl. 00:51: dagene er ikke i grunnlaget.
         assert "dager" not in grunnlag and "dager_merke" not in grunnlag
+        # Story 10.2i: aksjen er med, og ogsaa den er forklart over.
+        assert "aksjen" in grunnlag
         assert UTENFOR in lag_prompt(grunnlag)
 
     def test_teksten_kan_vise_til_tallene_paa_siden(self):
@@ -867,23 +1013,29 @@ class TestKontrollenVersjon3:
         "tekst",
         [
             # «i minst 4 børsdager» stoppes fra svaret 25.10 kl. 00:51
-            # (TestDageneStoppes).
-            "Ni aksjer i lista steg, og fem falt.",
-            "9 av aksjene steg.",
+            # (TestDageneStoppes). Story 10.2i: antallene er tatt ut av
+            # grunnlaget (test_tallene_fra_dagen_er_ikke_lov).
             "Hovedindeksen falt i dag, mens bransjen steg i snitt.",
             "I dag falt hovedindeksen.",
             "Hovedindeksen på Oslo Børs falt.",
             "Aksjene i samme bransje steg i snitt.",
             "Bransjen falt ikke.",
-            "Se endringen i tabellen.",
             "Aksjen på Oslo Børs steg.",
             "Hovedindeksen er ikke en del av regelen.",
         ],
     )
-    def test_det_grunnlaget_sier_bestaar(self, tekst):
-        """Ville feilet hvis kontrollen stoppet et antall fra grunnlaget, eller
-        en riktig retning paa hovedindeksen eller bransjen."""
+    def test_det_grunnlaget_sier_stoppes_fra_10_2i(self, tekst):
+        """Besto fra 10.2e naar retningen stemte. Story 10.2i (svarene 5.11
+        kl. 19:13 og 23:36): appen skriver hovedindeksen og bransjen, og alt om
+        dem utenom ordlyden stoppes, ogsaa naar det stemmer med grunnlaget.
+        Ville feilet hvis et riktig utsagn om hovedindeksen eller bransjen
+        besto."""
         svar = kontroller(tekst, DAGEN)
+        assert not svar.besto and any(g.startswith("1: om dagen") for g in svar.grunner), svar.grunner
+
+    def test_en_henvisning_til_siden_bestaar(self):
+        """Ville feilet hvis «Se endringen i tabellen» ble stoppet."""
+        svar = kontroller("Se endringen i tabellen.", DAGEN)
         assert svar.besto, svar.grunner
 
     @pytest.mark.parametrize(
@@ -895,11 +1047,14 @@ class TestKontrollenVersjon3:
         svar = kontroller(tekst, DAGEN)
         assert not svar.besto and any(g.startswith("2:") for g in svar.grunner), svar.grunner
 
-    def test_tallene_fra_dagen_er_ikke_lov_uten_dagen(self):
-        """Ville feilet hvis antallene var lov ogsaa naar grunnlaget ikke har
-        dem: 9 er ikke et tall i grunnlaget fra versjon 2."""
-        assert kontroller("Ni aksjer.", DAGEN).besto
-        assert not kontroller("Ni aksjer.", BLANDET).besto
+    @pytest.mark.parametrize("tekst", ["Ni aksjer.", "Ni aksjer i lista steg, og fem falt.", "9 av aksjene steg."])
+    def test_tallene_fra_dagen_er_ikke_lov(self, tekst):
+        """Story 10.2i (svarene 5.11 kl. 19:13 og 23:36): antallene er ikke
+        lenger i ANTALLENE, fordi appen skriver dem. Ville feilet hvis et
+        antall aksjer var lov, ogsaa i et grunnlag fra foer 10.2i som har dem
+        (var lov fra 10.2e)."""
+        assert not kontroller(tekst, DAGEN).besto
+        assert not kontroller(tekst, BLANDET).besto
 
     @pytest.mark.parametrize(
         "tekst",
@@ -915,9 +1070,11 @@ class TestKontrollenVersjon3:
     )
     def test_feil_retning_paa_hovedindeksen(self, tekst):
         """Grunnlaget sier at hovedindeksen falt. Ville feilet hvis en tekst
-        som sier noe annet, besto."""
+        som sier noe annet, besto. Fra 10.2i stoppes alt om hovedindeksen
+        utenom ordlyden, ogsaa det som stemmer (gjennomgangen, VG7)."""
         svar = kontroller(tekst, DAGEN)
-        assert not svar.besto and any(g.startswith("1: hovedindeksen") for g in svar.grunner), svar.grunner
+        # Story 10.2i: stoppes som noe om dagen.
+        assert not svar.besto and any(g.startswith("1: om dagen") for g in svar.grunner), svar.grunner
 
     @pytest.mark.parametrize(
         "tekst",
@@ -925,7 +1082,7 @@ class TestKontrollenVersjon3:
     )
     def test_feil_retning_paa_bransjen(self, tekst):
         svar = kontroller(tekst, DAGEN)
-        assert not svar.besto and any(g.startswith("1: bransjen") for g in svar.grunner), svar.grunner
+        assert not svar.besto and any(g.startswith("1: om dagen") for g in svar.grunner), svar.grunner
 
     def test_hovedindeksen_naar_feltet_mangler(self):
         """Ville feilet hvis teksten kunne si noe om hovedindeksen eller
@@ -936,35 +1093,39 @@ class TestKontrollenVersjon3:
 
     @pytest.mark.parametrize("tekst", ["Fem aksjer steg.", "9 aksjer falt.", "Ni av aksjene i lista falt."])
     def test_antallene_byttet(self, tekst):
-        """Ville feilet hvis et antall fra grunnlaget kunne staa om det andre
-        antallet, som bare punkt 2 ikke fanger."""
+        """Ville feilet hvis et antall aksjer besto. Fra 10.2i er antallene
+        ikke i grunnlaget, og alt om antallet aksjer stoppes (VG7)."""
         svar = kontroller(tekst, DAGEN)
-        assert not svar.besto and any(g.startswith("1: antallet") for g in svar.grunner), svar.grunner
+        # Story 10.2i: stoppes som noe om dagen.
+        assert not svar.besto and any(g.startswith("1: om dagen") for g in svar.grunner), svar.grunner
 
     @pytest.mark.parametrize(
         "tekst, grunn",
         [
-            ("Hovedindeksen har steget.", "1: hovedindeksen"),
-            ("Børsen har gått opp i dag.", "1: hovedindeksen"),
-            ("Bransjen har sunket.", "1: bransjen"),
-            ("Alle aksjene i lista steg.", "1: antallet"),
-            ("Begge aksjene falt.", "1: antallet"),
+            ("Hovedindeksen har steget.", "1: om dagen"),
+            ("Børsen har gått opp i dag.", "1: om dagen"),
+            ("Bransjen har sunket.", "1: om dagen"),
+            ("Alle aksjene i lista steg.", "1: om dagen"),
+            ("Begge aksjene falt.", "1: om dagen"),
         ],
     )
     def test_formene_fra_gjennomgangen_stoppes(self, tekst, grunn):
         """Gjennomgangen av 10.2e (BH3, BH4, ECH1, ECH3): ville feilet hvis
         perfektum slapp gjennom med feil retning, eller «alle» og «begge» ble
         lest som styrkens 3 og 2. Grunnlaget har ikke antallet i lista, saa
-        «alle aksjene» kan ikke sjekkes og stoppes."""
+        «alle aksjene» kan ikke sjekkes og stoppes. Story 10.2i: alle stoppes
+        som noe om dagen."""
         svar = kontroller(tekst, DAGEN)
         assert not svar.besto and any(g.startswith(grunn) for g in svar.grunner), svar.grunner
 
     @pytest.mark.parametrize("tekst", ["Aksjen på børsen steg.", "Hovedindeksen har sunket.", "Bransjen har økt."])
-    def test_formene_fra_gjennomgangen_bestaar(self, tekst):
-        """Gjennomgangen av 10.2e (BH5, VG3): «Aksjen på børsen steg» gjelder
-        aksjen, ikke hovedindeksen."""
+    def test_formene_fra_gjennomgangen_stoppes_fra_10_2i(self, tekst):
+        """Gjennomgangen av 10.2e (BH5, VG3): besto, fordi «Aksjen på børsen
+        steg» gjelder aksjen. Story 10.2i: boersen, hovedindeksen og bransjen
+        nevnes bare med ordlyden, saa alle tre stoppes. Ville feilet hvis en
+        av dem besto."""
         svar = kontroller(tekst, DAGEN)
-        assert svar.besto, svar.grunner
+        assert not svar.besto and any(g.startswith("1: om dagen") for g in svar.grunner), svar.grunner
 
     def test_dagene_byttet_med_styrken(self):
         """Grunnlaget sier styrke 2 og 4 dager. Ville feilet hvis «to børsdager
@@ -1422,9 +1583,14 @@ class TestDageneStoppes:
         ],
     )
     def test_riktige_tekster_bestaar(self, tekst, grunnlag):
-        """Ville feilet hvis en riktig tekst ble stoppet som dagene."""
+        """Ville feilet hvis en riktig tekst ble stoppet som dagene. Story
+        10.2i: tekstene om hovedindeksen og aksjene stoppes naa som noe om
+        dagen (TestOmDagen), saa for dem sjekkes bare at de ikke stoppes som
+        dagene."""
         svar = kontroller(tekst, grunnlag)
-        assert svar.besto, svar.grunner
+        om_dagene = [g for g in svar.grunner if not g.startswith("1: om dagen")]
+        assert not om_dagene, svar.grunner
+        assert svar.besto or any(g.startswith("1: om dagen") for g in svar.grunner)
 
     def test_prompten_har_ikke_dagene(self):
         """Ville feilet hvis prompten forklarte dagene, hadde ordlyden fra
@@ -1446,3 +1612,207 @@ class TestDageneStoppes:
         aksjesiden viste en demoaksje der KI-teksten ble stoppet."""
         radene = json.loads((Path(__file__).parents[1] / "src" / "demo_ki_tekster.json").read_text("utf-8"))["radene"]
         assert next(r for r in radene if r["symbol"] == BILDEAKSJEN)["besto"] is True
+
+
+class TestOmDagen:
+    """Story 10.2i, gruppens svar 5.11 kl. 19:13 og 23:36: appen skriver
+    hovedindeksen, bransjen og antallene, og kontrollen (FR-603) stopper alt
+    annet om hovedindeksen, bransjen, boersen og antallet aksjer enn
+    ordlyden fra prompten, ordrett og som en hel setning."""
+
+    SAMME = {**BLANDET, "hovedindeksen": "falt", "aksjen": "falt"}
+    MOTSATT = {**BLANDET, "hovedindeksen": "falt", "aksjen": "steg"}
+    UENDRET = {**BLANDET, "hovedindeksen": "falt", "aksjen": "uendret"}
+    FORKLARING = "Trenden ga et positivt utslag, og interessen ga et negativt utslag."
+
+    @pytest.mark.parametrize("grunnlag, ordlyd", [(SAMME, SAMME_VEI), (MOTSATT, MOTSATT_VEI)])
+    def test_ordlyden_ordrett_bestaar(self, grunnlag, ordlyd):
+        """Ville feilet hvis kontrollen stoppet ordlyden grunnlaget gir, som
+        egen setning foerst, sist eller alene."""
+        for tekst in (f"{self.FORKLARING} {ordlyd}", f"{ordlyd} {self.FORKLARING}", ordlyd):
+            svar = kontroller(tekst, grunnlag)
+            assert svar.besto, (tekst, svar.grunner)
+
+    @pytest.mark.parametrize("grunnlag, feil", [(SAMME, MOTSATT_VEI), (MOTSATT, SAMME_VEI)])
+    def test_byttede_retninger_stoppes(self, grunnlag, feil):
+        """Ville feilet hvis den andre ordlyden enn den grunnlaget gir,
+        besto: aksjen og hovedindeksen byttet om."""
+        svar = kontroller(f"{self.FORKLARING} {feil}", grunnlag)
+        assert not svar.besto and any("om dagen" in g for g in svar.grunner), svar.grunner
+
+    @pytest.mark.parametrize("grunnlag", [BLANDET, UENDRET, {**BLANDET, "aksjen": "steg"}])
+    def test_ordlyden_uten_ordlyd_i_grunnlaget_stoppes(self, grunnlag):
+        """Ville feilet hvis ordlyden besto naar grunnlaget ikke gir den:
+        uten hovedindeksen, med aksjen uendret, eller uten dagen."""
+        for ordlyd in (SAMME_VEI, MOTSATT_VEI):
+            assert not kontroller(f"{self.FORKLARING} {ordlyd}", grunnlag).besto
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            # Ordlyden inne i en annen setning eller endret (HVDO i demoen 6.11).
+            "Interessen ga et negativt utslag, og aksjen gikk samme vei som hovedindeksen.",
+            "Aksjen gikk ikke samme vei som hovedindeksen.",
+            "Aksjen gikk samme vei som hovedindeksen i dag.",
+            "«Aksjen gikk samme vei som hovedindeksen.»",
+            "aksjen gikk samme vei som hovedindeksen.",
+        ],
+    )
+    def test_ordlyden_bare_ordrett_som_egen_setning(self, tekst):
+        """Laerdommen fra §44: ordlyden ble satt inn i en annen setning. Ville
+        feilet hvis ordlyden besto inne i en setning, nektet, med noe lagt
+        til, i anfoerselstegn eller med liten forbokstav."""
+        assert not kontroller(tekst, self.SAMME).besto
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            "Hovedindeksen falt.",
+            "I dag falt hovedindeksen.",
+            "Hovedindeksen er ikke en del av regelen.",
+            "OSEBX falt.",
+            "Indeksen falt.",
+            "Bransjen steg i snitt.",
+            "Aksjene i samme bransje steg i snitt.",
+            "Sektoren falt.",
+            "Børsen falt.",
+            "Oslo Børs falt.",
+            "Aksjen på Oslo Børs steg.",
+            "Markedet falt.",
+            "Ni aksjer i lista steg.",
+            "Sju aksjer steg og sju falt.",
+            "Flere aksjer falt enn steg.",
+            "De fleste aksjene falt.",
+            "Aksjen fulgte ikke lista.",
+            "Aksjen gikk i takt med resten.",
+            "Aksjen gikk motsatt vei.",
+            "Aksjen gikk samme vei som de andre.",
+        ],
+    )
+    def test_alt_annet_om_dagen_stoppes(self, tekst):
+        """Ville feilet hvis kontrollen slapp noe om hovedindeksen, indeksen,
+        bransjen, sektoren, boersen, markedet eller antallet aksjer som ikke
+        er ordlyden, ogsaa naar det stemmer med dagen, som «Hovedindeksen
+        falt» med hovedindeksen falt i grunnlaget."""
+        svar = kontroller(tekst, self.SAMME)
+        assert not svar.besto and any("om dagen" in g for g in svar.grunner), (tekst, svar.grunner)
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            "Kursen ligger under snittet for de siste 50 børsdagene.",
+            "Bevegelsen måles mot de siste 20 børsdagene.",
+            "Se endringen i tabellen.",
+            UTENFOR.strip(),
+        ],
+    )
+    def test_regelens_vinduer_og_merket_bestaar(self, tekst):
+        """Ville feilet hvis «børsdagene» i regelens vinduer eller «aksjene
+        grensene er målt på» i merket ble stoppet som noe om dagen."""
+        svar = kontroller(tekst, {**self.SAMME, "merke": "Utenfor målingen"})
+        assert svar.besto, svar.grunner
+
+    def test_kontrollen_og_prompten_bruker_samme_ordlyd(self):
+        """VG1 i 10.2e: ville feilet hvis kontrollen godtok en annen ordlyd
+        enn prompten gir for det samme grunnlaget."""
+        for grunnlag in (self.SAMME, self.MOTSATT):
+            ordlyd = ordlyd_om_hovedindeksen(grunnlag)
+            assert ORDLYDEN.format(ordlyd=ordlyd) in lag_prompt(grunnlag)
+            assert kontroller(ordlyd, grunnlag).besto
+
+
+class TestOmDagenEtterGjennomgangen:
+    """Gjennomgangen av svarene 5.11 kl. 19:13 og 23:36 (BH1-BH3, BH7, VG1,
+    VG4, VG5, ECH1-ECH4, ECH7)."""
+
+    GRUNNLAG = {**BLANDET, "hovedindeksen": "steg", "aksjen": "steg"}
+    FORKLARING = "Trenden ga et positivt utslag, og interessen ga et negativt utslag."
+
+    @pytest.mark.parametrize(
+        "tekst, aksjen, besto",
+        [
+            ("Aksjen steg i dag.", "steg", True),
+            ("Aksjen falt i dag.", "steg", False),
+            ("Aksjen steg i dag.", "falt", False),
+            ("Aksjen var uendret.", "falt", False),
+            ("Aksjen gikk ned.", "falt", True),
+            ("Aksjen steg i dag.", None, False),
+        ],
+    )
+    def test_aksjen_stemmer_med_feltet(self, tekst, aksjen, besto):
+        """BH1, VG1, ECH1: ville feilet hvis teksten kunne si en annen
+        retning paa aksjen enn feltet aksjen, blant dem byttede retninger,
+        eller en retning naar feltet mangler."""
+        grunnlag = {k: v for k, v in self.GRUNNLAG.items() if k != "aksjen"}
+        if aksjen is not None:
+            grunnlag["aksjen"] = aksjen
+        assert kontroller(tekst, grunnlag).besto is besto
+
+    def test_regelens_ord_om_kursen_bestaar(self):
+        """Ville feilet hvis «på en dag kursen falt», regelens ord for
+        interessen, ble stoppet som noe om dagen."""
+        svar = kontroller("Det ble handlet mye på en dag kursen falt.", self.GRUNNLAG)
+        assert svar.besto, svar.grunner
+
+    @pytest.mark.parametrize("etter", ["Begge falt i dag.", "De steg sammen.", "Den falt også."])
+    def test_retningen_etter_ordlyden_stoppes(self, etter):
+        """ECH2: ville feilet hvis teksten kunne gjenta eller snu retningen
+        med et pronomen etter ordlyden."""
+        assert not kontroller(f"{SAMME_VEI} {etter}", self.GRUNNLAG).besto
+
+    @pytest.mark.parametrize(
+        "etter, besto",
+        [
+            ("Derfor er signalet blandet.", False),
+            ("Dermed er retningen blandet.", False),
+            ("Det forklarer signalet.", False),
+            ("Dette henger sammen med signalet.", False),
+            ("Det er ikke en del av regelen.", True),
+            ("Trenden ga et positivt utslag.", True),
+        ],
+    )
+    def test_ingen_aarsak_rett_etter_ordlyden(self, etter, besto):
+        """BH3, VG5, ECH3: dagen forklarer ikke signalet (BH7 i PR #113).
+        Ville feilet hvis en slutning eller en kobling til signalet rett
+        etter ordlyden besto, eller en vanlig setning etter den ble stoppet."""
+        assert kontroller(f"{SAMME_VEI} {etter}", self.GRUNNLAG).besto is besto
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            "OSEBX-indeksen steg.",
+            "Oslo-børsen steg.",
+            "Energisektoren steg i snitt.",
+            "Oljebransjen steg.",
+            "Aksjemarkedet steg.",
+            "Referanseindeksen steg.",
+            "OBX var høyere.",
+            "Euronext Oslo var sterk.",
+            "Mange selskaper var opp.",
+            "De fleste selskapene var opp.",
+            "Resten av listen var opp.",
+            "Flertallet var opp.",
+            "Aksjen gikk i samme retning som resten.",
+        ],
+    )
+    def test_sammensatte_ord_og_bindestrek_stoppes(self, tekst):
+        """BH2, VG4, ECH4: ville feilet hvis et sammensatt ord, et ord med
+        bindestrek eller et ord om lista slapp gjennom."""
+        svar = kontroller(tekst, self.GRUNNLAG)
+        assert not svar.besto and any(g.startswith("1: om dagen") for g in svar.grunner), svar.grunner
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            f"{FORKLARING}\n{SAMME_VEI}",
+            f"{FORKLARING} {SAMME_VEI.replace(' ', '  ')}",
+            f"{FORKLARING} {SAMME_VEI.replace(' hovedindeksen', chr(160) + 'hovedindeksen')}",
+            "Aksjen er ikke blant aksjene som grensene er målt på.",
+        ],
+    )
+    def test_ordlyden_med_annet_hvitt_rom_og_merket_bestaar(self, tekst):
+        """ECH7, BH7: ville feilet hvis ordlyden etter et linjeskift eller
+        med dobbelt eller hardt mellomrom ble stoppet, eller merket med «som»
+        ble stoppet som et antall."""
+        svar = kontroller(tekst, {**self.GRUNNLAG, "merke": "Utenfor målingen"})
+        assert svar.besto, svar.grunner

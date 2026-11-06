@@ -7,6 +7,7 @@ testene som lager rader, gir en falsk modell. Demobasene ligger i tmp_path
 """
 
 import json
+import re
 import sqlite3
 import subprocess
 import sys
@@ -358,6 +359,45 @@ class TestAksjesiden:
         assert tekst not in av and 'role="switch" aria-checked="false"' in av
         klient.post("/ki", data={"til": "paa", "tilbake": adresse})
         assert tekst in klient.get(adresse).data.decode("utf-8")
+
+    def test_setningen_om_samme_dag_er_regnet_som_grunnlaget(self, klient, radene, dagene):
+        """Story 10.2i, gruppens svar 5.11 kl. 19:13: setningen om samme dag
+        paa siden og grunnlaget til modellen er regnet av det samme
+        dagsbildet (lag_dagsbilde i dagene.py). Ville feilet hvis siden leste
+        en annen liste, andre kurser eller en annen indeks enn hentingen, saa
+        setningen og grunnlaget kunne si ulikt om hovedindeksen."""
+        from dagene import setning_om_samme_dag
+
+        demo.lag_demobase(demo_sti(), skriv=lambda _: None)
+        assert radene
+        for rad in radene:
+            bildet = dagene[rad.emne.symbol]
+            side = klient.get(f"/aksje/{rad.emne.symbol}").data.decode("utf-8")
+            assert f'<p class="samme-dag">{escape(setning_om_samme_dag(bildet))}</p>' in side, rad.emne.symbol
+            assert rad.grunnlag.get("hovedindeksen") == bildet.hovedindeksen, rad.emne.symbol
+            # Gjennomgangen (BH12, VG2): ogsaa aksjen.
+            assert rad.grunnlag.get("aksjen") == bildet.aksjen, rad.emne.symbol
+
+    def test_bransjen_bare_med_minst_to_aksjer_i_lista(self, klient, dagene):
+        """Gruppens svar 6.11 kl. 09:55, 2: paa aksjesiden i demoen har
+        setningen om samme dag delen om bransjen bare naar bransjen har minst
+        to aksjer i lista. Ville feilet hvis en demoaksje alene i bransjen sin
+        (VRDS, SGNT og MTFJ) fikk «bransjen ... i snitt», eller BRFE mistet den."""
+        from collections import Counter
+
+        demo.lag_demobase(demo_sti(), skriv=lambda _: None)
+        antall = Counter(a.sektor for a in demo.DEMOUNIVERS)
+        alene = {a.symbol for a in demo.DEMOUNIVERS if antall[a.sektor] < 2}
+        assert alene == {"VRDS", "SGNT", "MTFJ"}
+        assert "BRFE" in dagene and alene & set(dagene)
+        for symbol, bildet in dagene.items():
+            side = klient.get(f"/aksje/{symbol}").data.decode("utf-8")
+            samme_dag = re.search(r'<p class="samme-dag">([^<]*)</p>', side)
+            assert samme_dag, symbol
+            # Gjennomgangen (ECH3): bransjen kan ogsaa mangle uten endring.
+            assert ("bransjen" in samme_dag.group(1)) == (bildet.bransjen is not None), symbol
+            if symbol in alene:
+                assert bildet.bransjen is None, symbol
 
 
 class _Falsk:

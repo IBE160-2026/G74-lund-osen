@@ -15,8 +15,8 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 ![Oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/oversikten-demo.png)
 *Oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»).*
 
-![Aksjesiden for Brattfjell Energi (BRFE) i demoen, med kursgrafen, KI-teksten og setningen om hvor lenge signalet har vært slik, med oppdiktede tall («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/aksjesiden-brfe-demo.png)
-*Aksjesiden for BRFE i demoen, med grafen, KI-teksten og setningen om dagene under den, med oppdiktede tall («Eksempeltall»).*
+![Aksjesiden for Brattfjell Energi (BRFE) i demoen, med kursgrafen, KI-teksten, setningen om hvor lenge signalet har vært slik og setningen om hva hovedindeksen, bransjen og aksjene i lista gjorde samme dag, med oppdiktede tall («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/aksjesiden-brfe-demo.png)
+*Aksjesiden for BRFE i demoen, med grafen, KI-teksten og setningene om dagene og om samme dag under den, med oppdiktede tall («Eksempeltall»).*
 
 ![Børsometeret i demoen, et kart med én rute per aksje etter bransje, farget etter endringen, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/boersometeret-demo.png)
 *Børsometeret i demoen, der de største rutene har navnet og endringen i stor skrift, med oppdiktede tall («Eksempeltall»).*
@@ -418,7 +418,7 @@ Slå den på: sett for eksempel `OSE_KI_TJENESTE=gemini` i `.env`, og lim inn n�
 
 Det du bør vite før du slår den på:
 
-- **Grunnlaget sendes til tjenesten du har valgt.** Det er reglene for teksten og bare våre egne resultater for hver aksje, uten navnet: fortegnet for de tre sjekkene, styrken og retningen. Fra prompten versjon 3 kommer også om hovedindeksen og bransjen til aksjen steg eller falt, når basen har dem, og hvor mange aksjer i lista som steg og falt. Hvor mange børsdager på rad signalet har vært slik, sendes ikke: det ble tatt ut 25.10, og appen skriver det selv under teksten. Ingen kurser, volumer, prosenter eller tekster fra EODHD sendes. Med den lokale modellen sendes ingenting ut.
+- **Grunnlaget sendes til tjenesten du har valgt.** Det er reglene for teksten og bare våre egne resultater for hver aksje, uten navnet: fortegnet for de tre sjekkene, styrken og retningen. Fra prompten versjon 4 kommer også om hovedindeksen og aksjen selv steg, falt eller var uendret den dagen, når basen har dem, med aksjen regnet mot forrige kurs, som endringen i tabellen, og en ferdig setning om aksjen gikk samme vei som hovedindeksen eller motsatt, som modellen bruker ordrett eller ikke. Hovedindeksen og setningen kommer bare med når aksjens forrige kurs er fra forrige børsdag, så de er regnet over den samme dagen. Bransjen og hvor mange aksjer i lista som steg og falt, sendes ikke: appen skriver dem selv under teksten, bransjen bare når minst to aksjer i bransjen har en endring den dagen. Hvor mange børsdager på rad signalet har vært slik, sendes ikke: det ble tatt ut 25.10, og appen skriver det selv under teksten. Ingen kurser, volumer, prosenter eller tekster fra EODHD sendes. Med den lokale modellen sendes ingenting ut.
 - **Det kan koste hos dem.** Hver henting gir ett kall per aksje med vurdering, opptil 15. Prisen og grensene står hos tjenesten.
 - **Nøkkelen skal aldri deles.** Den står bare i `.env`, som aldri committes, og sendes bare til tjenesten den hører til, i en header. Appen skriver den aldri ut.
 - **Du må ikke ha sagt ja til at tjenesten trener på innholdet.** Vilkårene vi har lest, sier at det som sendes gjennom API-et, ikke brukes til trening uten samtykke. For Gemini gjelder det i EØS også gratisnøkkelen. Sitatene står i [`docs/kilder-og-rettigheter.md`](docs/kilder-og-rettigheter.md), «Betingelse 4 og KI-tjenestene (2026-10-04)».

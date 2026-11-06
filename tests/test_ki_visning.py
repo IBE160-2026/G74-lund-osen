@@ -757,3 +757,181 @@ class TestSetningenOmDagene:
         skriv_kirad(kirad(aksje))
         html = side(klient)
         assert 'class="dagene"' not in html and TEKST in html
+
+
+class TestSetningenOmSammeDag:
+    """Story 10.2i, gruppens svar 5.11 kl. 19:13 og 23:36: appen skriver hva
+    hovedindeksen, bransjen og antallene gjorde samme dag, for seg selv under
+    KI-teksten som setningen om dagene (BH6), og setningen sier aldri at
+    dagen forklarer signalet (BH7)."""
+
+    @pytest.fixture
+    def akrbp(self):
+        """Svaret 6.11 kl. 11:15, 1: bransjen staar bare naar minst to aksjer
+        i bransjen har en endring, saa AKRBP, ogsaa i Energi, har den samme
+        kursen hver dag som EQNR."""
+        rader = serie([200.0] * 61)
+        # Gjennomgangen (BH11): AKRBP har kurs den samme dagen som EQNR i aksje.
+        assert rader[-1].dato == serie([100.0] * 61)[-1].dato
+        skriv_serie("AKRBP", rader, datetime.fromisoformat(HENTET), vurdert=False)
+
+    @staticmethod
+    def _bildet(hovedindeksen="steg", bransjen="falt", steg=9, falt=5):
+        from dagene import Dagsbilde
+
+        return Dagsbilde(
+            dager=1,
+            dager_minst=False,
+            hovedindeksen=hovedindeksen,
+            aksjer_steg=steg,
+            aksjer_falt=falt,
+            bransjen=bransjen,
+        )
+
+    @pytest.mark.parametrize(
+        "hovedindeksen, bransjen, steg, falt, setning",
+        [
+            (
+                "steg",
+                "falt",
+                9,
+                5,
+                "Samme dag steg hovedindeksen, bransjen falt i snitt, og 9 aksjer i lista steg og 5 falt.",
+            ),
+            (
+                "falt",
+                "steg",
+                5,
+                9,
+                "Samme dag falt hovedindeksen, bransjen steg i snitt, og 5 aksjer i lista steg og 9 falt.",
+            ),
+            # Gjennomgangen (BH5, VG3, ECH10): 0 og 0 staar ikke, fordi kursene
+            # ofte mangler da.
+            ("uendret", "uendret", 0, 0, "Samme dag var hovedindeksen uendret, og bransjen var uendret i snitt."),
+            (None, None, 0, 3, "Samme dag steg 0 aksjer i lista og 3 falt."),
+            (None, "steg", 1, 14, "Samme dag steg bransjen i snitt, og 1 aksje i lista steg og 14 falt."),
+            ("falt", None, 7, 7, "Samme dag falt hovedindeksen, og 7 aksjer i lista steg og 7 falt."),
+            (None, None, 3, 12, "Samme dag steg 3 aksjer i lista og 12 falt."),
+            # Regel 21: tusenskille som i setningen om dagene.
+            (None, None, 1234, 0, "Samme dag steg 1 234 aksjer i lista og 0 falt."),
+        ],
+    )
+    def test_setningen(self, hovedindeksen, bransjen, steg, falt, setning):
+        """Ville feilet hvis setningen sa noe annet enn verdiene i
+        dagsbildet, tok med et felt som mangler (None), eller ikke fulgte
+        regel 21. Blant dem byttede retninger og byttede antall: steg og
+        falt for hovedindeksen og bransjen, og 9 og 5 mot 5 og 9."""
+        from dagene import setning_om_samme_dag
+
+        assert setning_om_samme_dag(self._bildet(hovedindeksen, bransjen, steg, falt)) == setning
+
+    def test_ingen_setning_uten_noe_aa_si(self):
+        """Gjennomgangen (BH5, VG3, ECH10): ville feilet hvis en dag uten
+        hovedindeksen, bransjen og antallene ga «0 aksjer i lista steg og 0
+        falt» i stedet for ingen setning."""
+        from dagene import setning_om_samme_dag
+
+        assert setning_om_samme_dag(self._bildet(None, None, 0, 0)) is None
+
+    @pytest.mark.parametrize("hovedindeksen", ["steg", "falt", "uendret", None])
+    @pytest.mark.parametrize("bransjen", ["steg", "falt", "uendret", None])
+    def test_sier_aldri_at_dagen_forklarer_signalet(self, hovedindeksen, bransjen):
+        """BH7: ville feilet hvis setningen nevnte signalet, en grunn eller
+        en sammenheng, som «fordi», «derfor», «preget» eller «forklar»."""
+        from dagene import setning_om_samme_dag
+
+        setning = setning_om_samme_dag(self._bildet(hovedindeksen, bransjen)).lower()
+        for ord_ in ("signal", "fordi", "derfor", "preget", "forklar", "grunn", "på grunn av", "så "):
+            assert ord_ not in setning, (ord_, setning)
+
+    @pytest.mark.parametrize(
+        "endret",
+        [
+            dict(hovedindeksen="opp"),
+            dict(bransjen="Positiv"),
+            dict(steg=-1),
+            dict(falt=True),
+            dict(steg=2.0),
+        ],
+    )
+    def test_ugyldige_verdier_avvises(self, endret):
+        """Ville feilet hvis en verdi utenfor de lukkede listene, et negativt
+        antall, en bool eller et flyttall ga en setning."""
+        from dagene import setning_om_samme_dag
+
+        with pytest.raises(ValueError):
+            setning_om_samme_dag(self._bildet(**endret))
+
+    def test_paa_siden_rett_under_setningen_om_dagene(self, klient, aksje, akrbp):
+        """Ville feilet hvis setningen manglet, sto et annet sted enn rett
+        under setningen om dagene, eller ikke var regnet av lag_dagsbilde med
+        lista, kursene og indeksen i basen. EQNR og AKRBP har samme kurs hver
+        dag, og basen har ingen indeks, saa hovedindeksen mangler."""
+        skriv_kirad(kirad(aksje))
+        html = side(klient)
+        setning = '<p class="samme-dag">Samme dag var bransjen uendret i snitt.</p>'
+        assert setning in html
+        assert html.index(TEKST) < html.index('<p class="dagene">') < html.index(setning)
+        assert "hovedindeksen" not in setning
+
+    @pytest.mark.parametrize("kapsel", ["av", None])
+    def test_ogsaa_med_ki_av(self, klient, aksje, akrbp, kapsel):
+        """Som setningen om dagene: ogsaa med KI av og uten KI-rad. Ville
+        feilet hvis setningen bare sto naar KI-teksten ble vist."""
+        html = side(klient, kapsel)
+        assert TEKST not in html and '<p class="samme-dag">Samme dag ' in html
+
+    def test_ingen_setning_uten_vurdering(self, klient):
+        """En dag med en grunn har ikke noe signal. Ville feilet hvis siden
+        likevel skrev dagen."""
+        rader = serie([100.0] * 61)
+        skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET), vurdert=False)
+        skriv_vurdering("EQNR", rader[-1].dato, Grunn.KURS_IKKE_FRA_DAGEN)
+        assert 'class="samme-dag"' not in side(klient)
+
+    def test_uten_setning_naar_lista_ikke_kan_leses(self, klient, aksje, monkeypatch):
+        """Ville feilet hvis siden feilet, eller skrev antall den ikke har
+        lest, naar lista ikke kan leses. Setningen om dagene staar."""
+
+        def feiler(self):
+            raise sqlite3.OperationalError("database is locked")
+
+        monkeypatch.setattr(lagring_sqlite.SqliteOversiktsleser, "oversikt", feiler)
+        html = side(klient)
+        assert 'class="samme-dag"' not in html and '<p class="dagene">' in html
+
+    @pytest.mark.parametrize("feil", [ZeroDivisionError("kurs 0"), ValueError("verdi")])
+    def test_uten_setning_naar_dagen_ikke_kan_regnes(self, klient, aksje, monkeypatch, feil):
+        """Gjennomgangen (BH10, ECH12): ville feilet hvis siden ga 500 naar
+        dagsbildet ikke kunne regnes, i stedet for siden med setningen om
+        dagene og uten setningen om samme dag."""
+
+        def lag(*_):
+            raise feil
+
+        monkeypatch.setattr(app_modul, "lag_dagsbilde", lag)
+        html = side(klient)
+        assert '<p class="dagene">' in html and 'class="samme-dag"' not in html
+
+    def test_med_setning_naar_indeksen_ikke_kan_leses(self, klient, aksje, akrbp, monkeypatch):
+        """Gjennomgangen (BH9): ville feilet hvis en RuntimeError fra
+        indeksen ga 500 i stedet for setningen uten hovedindeksen."""
+
+        def symboler(self):
+            raise RuntimeError("versjonen")
+
+        monkeypatch.setattr(lagring_sqlite.SqliteIndekslager, "symboler", symboler)
+        html = side(klient)
+        assert '<p class="samme-dag">Samme dag var bransjen uendret i snitt.</p>' in html
+
+    def test_uten_bransjen_naar_bare_aksjen_har_endring(self, klient, aksje):
+        """Svaret 6.11 kl. 11:15, 1 (BH1, ECH1, BH2): AKRBP er i Energi, men
+        har ingen kurs paa dagen, saa bare EQNR har en endring. Ville feilet
+        hvis siden skrev «bransjen ... i snitt» av EQNR alene. EQNR var
+        uendret, og basen har ingen indeks, saa uten bransjen er det ingen
+        setning; med AKRBP paa dagen staar den (testen over)."""
+        rader = serie([200.0] * 60)
+        assert rader[-1].dato < aksje
+        skriv_serie("AKRBP", rader, datetime.fromisoformat(HENTET), vurdert=False)
+        html = side(klient)
+        assert '<p class="dagene">' in html and 'class="samme-dag"' not in html

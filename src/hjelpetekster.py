@@ -55,6 +55,7 @@ PERIODE_MAL = "src/templates/_perioder.html"
 HISTORIKK = "src/historikk.py"
 # Gruppens svar 04.11 kl. 22:23, 3: hjelpen ved KI-delen, slått opp her.
 KI_GRUNNLAG = "src/ki_grunnlag.py"
+DAGENE = "src/dagene.py"
 KI_KONTROLL = "src/ki_kontroll.py"
 KI_VISNING = "src/ki_visning.py"
 
@@ -576,19 +577,30 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "Kort fortalt:",
             "en kort tekst om signalet for aksjen den dagen, skrevet av en språkmodell og merket "
             "«Laget av KI» med navnet på modellen. Modellen fikk bare det appen har regnet ut: om hver "
-            "av sjekkene ga +1, 0 eller -1, styrken og retningen, hvor mange aksjer i lista som steg og "
-            "falt, om hovedindeksen og bransjen steg eller falt når det kan regnes, og et merke når aksjen "
+            "av sjekkene ga +1, 0 eller -1, styrken og retningen, om aksjen selv steg, "
+            "falt eller var uendret den dagen når det kan regnes, regnet mot forrige kurs, som endringen i tabellen, "
+            "og når aksjens forrige kurs er fra forrige børsdag, også om hovedindeksen steg, falt eller var uendret, "
+            "med en ferdig setning om aksjen gikk samme vei som "
+            "hovedindeksen eller motsatt, og et merke når aksjen "
             "er utenfor de 15 grensene er målt på, men ingen kurser, prosenter eller volumer. Tallene med prikket strek er sjekket mot det før teksten vises, "
-            "og teksten gir ikke råd.",
+            "og teksten som vises, gir ikke råd og sier ikke noe annet om hovedindeksen, bransjen, børsen "
+            "eller antallet aksjer enn den ferdige setningen.",
             (
                 (KI_GRUNNLAG, "def ki_grunnlag("),
                 (KI_GRUNNLAG, "kurser, volumer, prosenter eller forholdstall, og ingen maalinger"),
-                (KI_GRUNNLAG, 'ANTALLENE = ("styrke", "aksjer_steg", "aksjer_falt")'),
-                (KI_GRUNNLAG, 'VALGFRIE = frozenset(("merke", "hovedindeksen", "bransjen"))'),
+                (KI_GRUNNLAG, 'ANTALLENE = ("styrke",)'),
+                (KI_GRUNNLAG, 'DAGFELTENE = ("hovedindeksen", "aksjen")'),
+                # Gruppens svar 6.11 kl. 09:55, 1: aksjen som endringen i tabellen.
+                (MARKEDSOVERSIKT, "def endring_i_prosent("),
+                (DAGENE, "aksjen=bevegelse(_endringen("),
+                # Gruppens svar 6.11 kl. 11:15, 2: ordlyden bare over samme periode.
+                (DAGENE, "return til[-2] == indeksens_forrige_boersdag(dag)"),
+                (KI_GRUNNLAG, 'if felt == "hovedindeksen" and not dagen.samme_periode:'),
                 (KI_GRUNNLAG, 'UTENFOR_MAALINGEN = "Utenfor målingen"'),
                 (KI_GRUNNLAG, "fortegnet for hver av de"),
                 (KI_VISNING, "def prikkede_tall("),
                 (KI_KONTROLL, "3. Raad."),
+                (KI_KONTROLL, "def _om_dagen("),
                 (AKSJE_MAL, "Laget av KI ·"),
             ),
         ),
