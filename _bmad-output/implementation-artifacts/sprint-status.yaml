@@ -189,7 +189,8 @@ development_status:
   9-1-docs-kvalitetssikring-md: done
   # 2026-11-06 (svaret kl. 14:55): de 122 meldingene fra 21.-24.09 skrives ordrett i utkast i _privat/,
   # og gruppen leser dem foer noe committes. Derfor in-progress.
-  9-2-docs-ai-prompts-bygging: in-progress
+  # 2026-11-06 (svaret kl. 19:47): utvalget, 15 ordrett og 107 referatlinjer, staar i dagsfilene for 21.-24.09.
+  9-2-docs-ai-prompts-bygging: done
   9-3-arbeidsmønsteret: done
   9-4-relevanseksperimentet-del-1-utvalg-innsamling-og-merking: done
   # Utgaar fra 2026-10-06 (Marians beslutning kl. 21:11). Del 2 kjoeres ikke.

@@ -58,6 +58,13 @@ Formatet:
   `prompt-log-template.md`, `docs/reflection-log.md` og de fire utkastene i
   `product-brief/`. Regel 4 krever frontmatter for nye dokumenter.
 - Filnavnkonvensjonen under gjelder andre prompts og samtaler, ikke disse.
+- *Lagt til 2026-11-06 (story 9.2):* `2026-09-21.md`, `2026-09-22.md` og
+  `2026-09-23.md` er nye, og `2026-09-24.md` har fått meldingene fra før
+  kl. 22:05. De er hentet inn fra øktloggene til Claude Code og er et utvalg:
+  15 av 122 meldinger står ordrett, og hver av de 107 andre har én linje i et
+  referat (gruppens svar 06.11 kl. 15:13, 15:21, 17:25 og 19:47). Klokkeslettet
+  i dem er når meldingen ble sendt, ikke når den ble lagret. Gruppen leste
+  utvalget før commit, kl. 19:27, og resten ligger bare i øktloggene.
 
 ## Arbeidsmønsteret
 
