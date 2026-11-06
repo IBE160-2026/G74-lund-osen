@@ -580,7 +580,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "eller falt den dagen når det kan regnes, med en ferdig setning om aksjen gikk samme vei som "
             "hovedindeksen eller motsatt, og et merke når aksjen "
             "er utenfor de 15 grensene er målt på, men ingen kurser, prosenter eller volumer. Tallene med prikket strek er sjekket mot det før teksten vises, "
-            "og teksten gir ikke råd.",
+            "og teksten som vises, gir ikke råd og sier ikke noe annet om hovedindeksen, bransjen, børsen "
+            "eller antallet aksjer enn den ferdige setningen.",
             (
                 (KI_GRUNNLAG, "def ki_grunnlag("),
                 (KI_GRUNNLAG, "kurser, volumer, prosenter eller forholdstall, og ingen maalinger"),
@@ -590,6 +591,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (KI_GRUNNLAG, "fortegnet for hver av de"),
                 (KI_VISNING, "def prikkede_tall("),
                 (KI_KONTROLL, "3. Raad."),
+                (KI_KONTROLL, "def _om_dagen("),
                 (AKSJE_MAL, "Laget av KI ·"),
             ),
         ),

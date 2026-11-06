@@ -48,7 +48,8 @@ sikkerhetsscore fra modellen. Fire punkter:
 Story 10.2e, under punkt 1: sier teksten at hovedindeksen eller bransjen
 steg, falt eller var uendret, skal det stemme med grunnlaget, og mangler
 feltet, stoppes utsagnet. Det samme gjelder antallet aksjer som steg eller
-falt («ni aksjer steg»), og dagene («tre børsdager på rad»).
+falt («ni aksjer steg»), og dagene («tre børsdager på rad»). (Hovedindeksen,
+bransjen og antallet er erstattet av svarene 5.11 kl. 19:13 og 23:36, nederst.)
 
 Gruppens svar 24.10 kl. 21:49, under punkt 1: et utsagn om én sjekk, med
 navnet og utslaget («interessen ga et positivt utslag», «bevegelse og
@@ -69,6 +70,17 @@ nevner dem ikke. Appen skriver dem under KI-teksten. Kontrollen stopper
 dagene i enhver form, ogsaa ordenstall, «for første gang», «fortsatt» og
 «nytt signal», uansett hva grunnlaget har.
 
+Story 10.2i, gruppens svar 5.11 kl. 19:13 og 23:36, under punkt 1: appen
+skriver hovedindeksen, bransjen og antallene selv under teksten. Om
+hovedindeksen er bare ordlyden fra prompten lov (ordlyd_om_hovedindeksen i
+ki_prompt.py, den samme funksjonen), ordrett og som en hel setning, og bare
+naar grunnlaget gir den. Alt annet om hovedindeksen, indeksen, bransjen,
+sektoren, børsen (ogsaa «Oslo Børs»), markedet og antallet aksjer stoppes, og
+ogsaa «samme vei» og «motsatt vei» utenfor ordlyden. Den andre ordlyden enn
+den grunnlaget gir, stoppes, saa byttede retninger ikke bestaar. Regelens
+vinduer («de siste 50 børsdagene») og merket om aksjene grensene er maalt paa
+staar som foer.
+
 Kontrollen er grov: den fanger ord, ikke mening (FR-603). Teksten
 normaliseres (NFC, uten myk bindestrek og usynlige tegn) foer den leses, saa
 et ord ikke slipper gjennom fordi det er skrevet med andre tegn.
@@ -79,7 +91,8 @@ import unicodedata
 from collections.abc import Mapping
 from dataclasses import dataclass
 
-from ki_grunnlag import ANTALLENE, FALT, STEG, UENDRET
+from ki_grunnlag import ANTALLENE
+from ki_prompt import ordlyd_om_hovedindeksen
 from signalberegning import MA_VINDU, TERSKEL, VOLATILITET_VINDU, VOLUM_VINDU
 
 ANTALL_SJEKKER = 3
@@ -241,59 +254,28 @@ _STYRKE_UTSAGN = (
     ),
 )
 
-# Story 10.2e: hovedindeksen og bransjen, og verbene for steg, falt og uendret.
-_BEVEGELSESVERB = {
-    "steg": STEG,
-    "stiger": STEG,
-    "økte": STEG,
-    "øker": STEG,
-    "gikk opp": STEG,
-    # Gjennomgangen av 10.2e (BH4, ECH3): perfektum, «har steget».
-    "steget": STEG,
-    "økt": STEG,
-    "gått opp": STEG,
-    "falt": FALT,
-    "faller": FALT,
-    "sank": FALT,
-    "synker": FALT,
-    "gikk ned": FALT,
-    "sunket": FALT,
-    "gått ned": FALT,
-    "var uendret": UENDRET,
-    "er uendret": UENDRET,
-    "sto stille": UENDRET,
-    "endret seg ikke": UENDRET,
-}
-_VERB = "|".join(sorted((v.replace(" ", r"\s+") for v in _BEVEGELSESVERB), key=len, reverse=True))
-_FELTET = {
-    # «Aksjen på Oslo Børs steg» og «Aksjen på børsen steg» gjelder aksjen,
-    # ikke børsen (gjennomgangen av 10.2e, BH5, VG3).
-    "hovedindeksen": r"(?:hovedindeks(?:en)?|indeksen|osebx|(?<!på\s)oslo\s+børs|(?<!på\s)børsen)",
-    "bransjen": r"(?:bransjen|sektoren|aksjene\s+i\s+(?:samme\s+)?bransje(?:n)?(?:\s+som\s+denne)?)",
-}
-# Inntil fire ord mellom feltet og verbet: «Hovedindeksen på Oslo Børs steg»,
-# «Bransjen i snitt falt». Ikke over et skilletegn.
-_MELLOM = r"(?:\s+[\w-]+){0,4}?"
-_BEVEGELSE_UTSAGN = {
-    felt: (
-        re.compile(
-            r"(?<![\w-])" + uttrykk + _MELLOM + r"\s+(ikke\s+)?(" + _VERB + r")(?![\w-])(\s+ikke(?![\w-]))?",
-            re.IGNORECASE,
-        ),
-        # Omvendt ordstilling: «I dag steg hovedindeksen», «falt også bransjen».
-        re.compile(
-            r"(?<![\w-])()(" + _VERB + r")\s+(?:(?:også|derimot|samtidig|i\s+dag)\s+)?" + uttrykk + r"(?![\w-])"
-            r"(\s+ikke(?![\w-]))?",
-            re.IGNORECASE,
-        ),
-    )
-    for felt, uttrykk in _FELTET.items()
-}
-# «ni aksjer steg», «9 av aksjene i lista falt», og «tre børsdager på rad».
-_AKSJER_UTSAGN = re.compile(
-    r"(?<![\w-])(\w+)\s+(?:av\s+(?:de\s+)?(?:\w+\s+)?)?aksje(?:r|ne)?(?:\s+i\s+lista)?\s+(" + _VERB + r")(?![\w-])",
+# Story 10.2i (svarene 5.11 kl. 19:13 og 23:36): ord om hovedindeksen,
+# bransjen, boersen og antallet aksjer. «børs» foran «dag» er dagene eller
+# regelens vinduer, som leses i _dagene. «aksjene grensene er målt på» er
+# merket fra prompten (UTENFOR), ikke et antall.
+_OM_DAGEN = re.compile(
+    r"(?<![\w-])(?:hovedindeks\w*|indeks\w*|osebx|børs(?!dag)\w*|marked\w*|bransje\w*|sektor\w*"
+    r"|aksjer|aksjene(?!\s+grensene)|lista|samme\s+vei|motsatt\s+vei|i\s+takt\s+med)(?![\w-])",
     re.IGNORECASE,
 )
+
+
+def _om_dagen(tekst: str, grunnlag: Mapping[str, object]) -> list[str]:
+    """Svarene 5.11 kl. 19:13 og 23:36: ordlyden om hovedindeksen tas ut naar
+    den staar ordrett som en hel setning og grunnlaget gir den. Alt som staar
+    igjen om hovedindeksen, bransjen, boersen og antallet aksjer, stoppes."""
+    ordlyd = ordlyd_om_hovedindeksen(grunnlag)
+    if ordlyd:
+        tekst = re.sub(r"(?:^|(?<=[.!?]))\s*" + re.escape(ordlyd) + r"(?=\s|$)", " ", tekst)
+    om = "bare appen skriver om hovedindeksen, bransjen, børsen og antallet aksjer"
+    return [f"1: om dagen «{treff.group(0)}», {om}" for treff in _OM_DAGEN.finditer(tekst)]
+
+
 # Gruppens svar 24.10 kl. 21:49: dagene ogsaa i «i to børsdager», «har vært
 # minst én børsdag» og «tre børsdager med samme retning». Gjennomgangen
 # (BH7, ECH1, ECH2): et antall dager leses ogsaa uten «i» foran («har holdt
@@ -486,10 +468,6 @@ def _antall(ord_: str) -> int | None:
     if ord_.isdecimal() and len(ord_) <= _LENGSTE_TALL:
         return int(ord_)
     return ANTALLORD.get(ord_)
-
-
-def _bevegelsen(verb: str) -> str:
-    return _BEVEGELSESVERB[" ".join(verb.lower().split())]
 
 
 def _sjekkene(liste: str) -> list[str]:
@@ -736,24 +714,9 @@ def kontroller(tekst: str, grunnlag: Mapping[str, object]) -> Kontrollsvar:
                 start = len(treff.group(1)) if moenster.groups == 2 else 0
                 grunner.append(f"1: styrken «{treff.group(0)[start:]}», regelen sier {styrke}")
 
-    # Story 10.2e: hovedindeksen og bransjen, antallet aksjer og dagene.
-    for felt, moenstrene in _BEVEGELSE_UTSAGN.items():
-        for moenster in moenstrene:
-            for treff in moenster.finditer(tekst):
-                ikke, sagt = bool(treff.group(1) or treff.group(3)), _bevegelsen(treff.group(2))
-                fasit = grunnlag.get(felt)
-                if fasit is None or (sagt == fasit) == ikke:
-                    grunner.append(f"1: {felt} «{treff.group(0)}», grunnlaget sier {fasit or 'ingenting'}")
-    for treff in _AKSJER_UTSAGN.finditer(tekst):
-        # «alle» eller «begge» aksjene kan ikke sjekkes: grunnlaget har ikke
-        # hvor mange aksjer lista har, saa utsagnet stoppes.
-        if treff.group(1).lower() in ("alle", "begge"):
-            grunner.append(f"1: antallet «{treff.group(0)}», grunnlaget har ikke antallet i lista")
-            continue
-        tall = _antall(treff.group(1))
-        felt = {STEG: "aksjer_steg", FALT: "aksjer_falt"}.get(_bevegelsen(treff.group(2)))
-        if tall is not None and (felt is None or tall != grunnlag.get(felt)):
-            grunner.append(f"1: antallet «{treff.group(0)}», grunnlaget sier {grunnlag.get(felt, 'ingenting')}")
+    # Story 10.2e: dagene. Story 10.2i: hovedindeksen, bransjen, boersen og
+    # antallet aksjer.
+    grunner += _om_dagen(tekst, grunnlag)
     grunner += _dagene(tekst)
     grunner += _en_sjekk(tekst, grunnlag)
 
