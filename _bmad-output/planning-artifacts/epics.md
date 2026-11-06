@@ -4304,6 +4304,8 @@ lesingen før commit som før.
 
 *Avgjort 2026-11-06 kl. 14:55 (gruppens svar):* alle de 122 meldingene fra brukeren i øktloggene 21.–24.09, før 24.09 kl. 22:05, skrives ordrett i utkast utenfor repoet, merket med om de har sluttmarkøren, og det som ikke bør stå offentlig, flagges. Ingenting committes før gruppen har lest utkastene og sagt hva som kan stå i repoet.
 
+*Avgjort 2026-11-06 kl. 15:13 og 15:21 (gruppens svar):* i stedet for alle de 122 meldingene kommer 15 instruksjoner fra 21.–24.09 ordrett, de som satte en regel eller avgjorde noe, og én kort linje om hver av de andre. I meldingen 23.09 kl. 21:07 byttes de rå EODHD-tallene med [tall fjernet] (regel 16). Gruppen leser utvalget og linjene før noe committes, og resten blir bare i øktloggene og i `_privat/`.
+
 ### Story 9.3: Arbeidsmønsteret
 
 Som **sensor**, vil jeg forstå hvem som bestemte hva, så jeg kan vurdere hvordan
