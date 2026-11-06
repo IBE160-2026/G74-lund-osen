@@ -4,7 +4,7 @@ type: 'feature'
 created: '2026-11-06'
 status: 'in-progress'
 route: 'dispatch'
-review_loop_iteration: 0
+review_loop_iteration: 1
 baseline_commit: 'abf65895'
 context:
   - '{project-root}/CLAUDE.md'
@@ -45,7 +45,7 @@ Det samme for siste børsdag, en annen dag (01.10) og 1 uke. Ingen tekst utenfor
 
 *Valget gruppen kan se på:* mellom 690 og 373 px i figuren, altså et vindu på om lag 451–767 px, er den smale grafen 373 px bred og midtstilt, med luft på sidene. Alternativet var å la den brede stå der, med tekst under 11,5 px.
 
-*Utfallet:* `ccbbe0df`. `tests/test_kursgrafen_smal.py` sjekker at den smale grafen har de samme linjene, merkene, tallene, punktet og navnene som den brede, at navnene står under datoene med et stykke av linja, at stilarket viser den smale under 690 px, og i Edge ved 1280, 390 og 320 px hvilken graf som vises, at ingen tekst står utenfor grafen eller oppå en annen, at siden ikke ruller vannrett, og ved 390 px at teksten i grafen er minst like stor som den minste teksten ellers. To tester i `test_app.py` (`test_maanedsmerkene_staar_i_grafen` og `test_merkene_paa_aksen_passer_perioden`) leser nå bare den brede grafen, fordi de gjelder den. Den første kjøringen av hele settet feilet i dem og i `test_velgere_med_ulik_kropp_er_avgrenset_til_hver_sin_side`, som krever én regel for `figure` på aksjesiden, fordi endringene ikke var ferdige. `container-type` står nå i regelen for `figure`, og settet ble kjørt på nytt (svaret 4.11 kl. 09:48). Alle sju bildene i `docs/appen/` ble tatt på nytt og er byte for byte de samme.
+*Utfallet:* `ccbbe0df`. `tests/test_kursgrafen_smal.py` sjekker at den smale grafen har de samme linjene, merkene, tallene, punktet og navnene som den brede, at navnene står under datoene med et stykke av linja, at stilarket viser den smale under 690 px, og i Edge ved 1280, 390 og 320 px hvilken graf som vises, at ingen tekst står utenfor grafen eller oppå en annen, at siden ikke ruller vannrett, og ved 390 px at teksten i grafen er minst like stor som den minste teksten ellers. To tester i `test_app.py` (`test_maanedsmerkene_staar_i_grafen` og `test_merkene_paa_aksen_passer_perioden`) leser nå bare den brede grafen, fordi de gjelder den. Den første kjøringen av hele settet feilet i dem og i `test_velgere_med_ulik_kropp_er_avgrenset_til_hver_sin_side`, som krever én regel for `figure` på aksjesiden, fordi endringene ikke var ferdige. *Lagt til etter gjennomgangen (BH13):* de sju var `TestStory80c::test_maanedsmerkene_staar_i_grafen`, `TestPeriodeneIKursgrafen::test_merkene_paa_aksen_passer_perioden` for 1 uke, 1 mnd, 6 mnd, 1 år og I år, og `TestStilarket::test_velgere_med_ulik_kropp_er_avgrenset_til_hver_sin_side`. De fire andre var porttester for `start.ps1`. `container-type` står nå i regelen for `figure`, og settet ble kjørt på nytt (svaret 4.11 kl. 09:48). Alle sju bildene i `docs/appen/` ble tatt på nytt og er byte for byte de samme.
 
 **3) Hjelpen.** «?» ved «Kursutvikling» sier nå at navnene står til høyre, ved enden av linjene, og på smal skjerm under grafen (`hjelpetekster.py`). `docs/hjelp.md` nevner ikke hvor navnene står, og README-en sier ingenting om grafen på smal skjerm, så de er ikke endret.
 
@@ -68,10 +68,38 @@ Hele settet alene før hver commit med kode eller tester, i en egen worktree:
 - `8bfc9885`: 4231 bestått, 24 hoppet over og 7 porttester for `start.ps1` som feilet (svaret 29.10 kl. 21:02), 8 min 30 s.
 - `ccbbe0df`: først 4233 bestått og 11 som feilet, 4 av dem porttester, fordi endringene ikke var ferdige (over). Etter rettingen: 4237 bestått, 24 hoppet over og 7 porttester som feilet, 7 min 39 s.
 
-**Mutantene**, med kopi før og sha256 mot HEAD etter (lik HEAD etter begge):
+**Mutantene**, én per commit med kode, med kopi før og sha256 mot HEAD etter (lik HEAD etter alle). Hjelpeteksten og forklaringen er i samme commit som M2 (BH13):
 
 - M1, kl. 15:30:19 på `8bfc9885`: `_uten_overlapp` gir merkene tilbake uendret. Fanget av `test_navnene_paa_aksen_kommer_ikke_borti_hverandre` for 1 uke, 1 mnd, 6 mnd, I år og 1 år.
 - M2, kl. 15:55:53 på `ccbbe0df`: grensen i `@container` satt til 1 px, så den smale grafen aldri vises. Fanget av `test_stilarket_viser_den_smale_naar_figuren_er_smal` og `test_teksten_i_grafen_i_nettleseren` ved 390 og 320 px.
+
+## Gjennomgangen
+
+På diffen `abf65895..b4cc5c44`, etter hele settet, med Blind Hunter (BH, 13 funn), Edge Case Hunter (ECH, 5) og Verification Gap (VG, 3), hver for seg. Ingen funn på høy. Rettingene står i `67596cb8`.
+
+| Funn | Grad | Hva | Utfall |
+|---|---|---|---|
+| ECH1 | middels | Ved 1 mnd tok `DATOBREDDE` i `_dagmerker` bort datoen nærmest sluttdagen før `_uten_overlapp`, mot påstanden over | Rettet: på smal skjerm tynnes datoene bare i `_uten_overlapp`, fra høyre (`tynn=False`). Testene for 1 mnd til 09.04 og 30.12 |
+| BH1, ECH2 | middels, lav | Et siste navn som «september» kunne gå forbi høyre kant, fordi grensen `NAVNEBREDDE` er for den brede grafen | Rettet: et navn som ville gått forbi kanten, står til venstre for streken. Testene for 3 mnd til 23.09 og 6 mnd til 30.11 |
+| BH2, VG3 | middels, lav | Nettlesertesten tok bare standardperioden | Rettet: 1 uke, 1 mnd, 1 år og en annen dag (01.10) ved 390 og 320 px |
+| BH4 | middels | Testen av navnene på aksen bruker samme anslag som koden, og sjekket ikke feltet med tallene | Rettet: `VENSTRE <= fra`, og den virkelige plassen sjekkes i nettleseren for fire perioder og en annen dag |
+| VG1 | middels | Nettlesertesten ble hoppet over i CI uten nettleser | Rettet: samme vakt som `test_hjelpefeltet.py`, så den feiler i CI |
+| VG2 | middels | Dagen som er merket, var ikke sjekket i høyden eller på siden | Rettet: punktet ligger på kurslinja innenfor tegneflaten, og dagstreken og dagpunktet står én gang i hver graf ved en valgt dag |
+| BH3 | middels | `container-type` på `figure` kunne klippe posisjonerte elementer | Avvist med oppslag: figuren har bare SVG-ene, `figcaption` og tre `span`, ingen posisjonert og ingen hjelpevindu, og alle sju bildene er byte for byte de samme |
+| BH5 | lav | Malen krevde `graf_smal` | Rettet: `{% for g in (graf, graf_smal) if g %}` |
+| BH6 | lav | Valgene ble skrevet to ganger i `app.py` | Rettet: én ordbok, `grafvalg` |
+| BH7, ECH4 | lav | `smal` var utledet av feltet til høyre | Rettet: eget felt i `Graf` |
+| BH8, ECH3 | lav | `bredde` og `hoyde` overstyres med `smal` | Rettet: docstringen sier det |
+| BH9 | lav | Testen av grensene regnet bare konstanter | Rettet: 690 og 280 regnes av `BREDDE` og `SMAL_BREDDE` |
+| BH11 | lav | Plassen til forklaringen var ikke sjekket | Rettet: det lengste navnet, også med tre sifre, og den nederste linja |
+| BH13 | lav | Mutantene og den første kjøringen var ikke helt forklart | Rettet over |
+| BH10 | lav | Ved 320 px er teksten 10,37 px | Står: kravet gjelder 390 px, og tallet står over |
+| BH12 | lav | Forklaringen bruker klassene til linjene | Står: med vilje, så stykket har samme farge og strek. Testene teller `<polyline class=…>` |
+| ECH5 | lav | Uten stilark vises begge grafene | Står: stilarket lastes alltid, og uten det vises ingen andre regler på siden heller |
+
+Hele settet før `67596cb8`: 4254 bestått, 24 hoppet over og 3 porttester for `start.ps1` som feilet. Alle sju bildene i `docs/appen/` ble tatt på nytt og er byte for byte de samme, og de 30 målingene og de 14 for de andre periodene ble gjort på nytt, med de samme tallene og ingen avvik.
+
+- M3, kl. 16:13:47 på `67596cb8`: `tynn=True` igjen i `bygg_graf`, som før ECH1. Fanget av `test_navnene_paa_aksen_kommer_ikke_borti_hverandre` for 1 mnd til 09.04 og 30.12.
 
 ## Kontroll
 
