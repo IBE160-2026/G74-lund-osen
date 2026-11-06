@@ -795,13 +795,10 @@ class TestSetningenOmSammeDag:
                 9,
                 "Samme dag falt hovedindeksen, bransjen steg i snitt, og 5 aksjer i lista steg og 9 falt.",
             ),
-            (
-                "uendret",
-                "uendret",
-                0,
-                0,
-                "Samme dag var hovedindeksen uendret, bransjen var uendret i snitt, og 0 aksjer i lista steg og 0 falt.",
-            ),
+            # Gjennomgangen (BH5, VG3, ECH10): 0 og 0 staar ikke, fordi kursene
+            # ofte mangler da.
+            ("uendret", "uendret", 0, 0, "Samme dag var hovedindeksen uendret, og bransjen var uendret i snitt."),
+            (None, None, 0, 3, "Samme dag steg 0 aksjer i lista og 3 falt."),
             (None, "steg", 1, 14, "Samme dag steg bransjen i snitt, og 1 aksje i lista steg og 14 falt."),
             ("falt", None, 7, 7, "Samme dag falt hovedindeksen, og 7 aksjer i lista steg og 7 falt."),
             (None, None, 3, 12, "Samme dag steg 3 aksjer i lista og 12 falt."),
@@ -817,6 +814,14 @@ class TestSetningenOmSammeDag:
         from dagene import setning_om_samme_dag
 
         assert setning_om_samme_dag(self._bildet(hovedindeksen, bransjen, steg, falt)) == setning
+
+    def test_ingen_setning_uten_noe_aa_si(self):
+        """Gjennomgangen (BH5, VG3, ECH10): ville feilet hvis en dag uten
+        hovedindeksen, bransjen og antallene ga «0 aksjer i lista steg og 0
+        falt» i stedet for ingen setning."""
+        from dagene import setning_om_samme_dag
+
+        assert setning_om_samme_dag(self._bildet(None, None, 0, 0)) is None
 
     @pytest.mark.parametrize("hovedindeksen", ["steg", "falt", "uendret", None])
     @pytest.mark.parametrize("bransjen", ["steg", "falt", "uendret", None])
@@ -854,7 +859,7 @@ class TestSetningenOmSammeDag:
         basen har ingen indeks, saa hovedindeksen mangler."""
         skriv_kirad(kirad(aksje))
         html = side(klient)
-        setning = '<p class="samme-dag">Samme dag var bransjen uendret i snitt, og 0 aksjer i lista steg og 0 falt.</p>'
+        setning = '<p class="samme-dag">Samme dag var bransjen uendret i snitt.</p>'
         assert setning in html
         assert html.index(TEKST) < html.index('<p class="dagene">') < html.index(setning)
         assert "hovedindeksen" not in setning
@@ -884,3 +889,27 @@ class TestSetningenOmSammeDag:
         monkeypatch.setattr(lagring_sqlite.SqliteOversiktsleser, "oversikt", feiler)
         html = side(klient)
         assert 'class="samme-dag"' not in html and '<p class="dagene">' in html
+
+    @pytest.mark.parametrize("feil", [ZeroDivisionError("kurs 0"), ValueError("verdi")])
+    def test_uten_setning_naar_dagen_ikke_kan_regnes(self, klient, aksje, monkeypatch, feil):
+        """Gjennomgangen (BH10, ECH12): ville feilet hvis siden ga 500 naar
+        dagsbildet ikke kunne regnes, i stedet for siden med setningen om
+        dagene og uten setningen om samme dag."""
+
+        def lag(*_):
+            raise feil
+
+        monkeypatch.setattr(app_modul, "lag_dagsbilde", lag)
+        html = side(klient)
+        assert '<p class="dagene">' in html and 'class="samme-dag"' not in html
+
+    def test_med_setning_naar_indeksen_ikke_kan_leses(self, klient, aksje, monkeypatch):
+        """Gjennomgangen (BH9): ville feilet hvis en RuntimeError fra
+        indeksen ga 500 i stedet for setningen uten hovedindeksen."""
+
+        def symboler(self):
+            raise RuntimeError("versjonen")
+
+        monkeypatch.setattr(lagring_sqlite.SqliteIndekslager, "symboler", symboler)
+        html = side(klient)
+        assert '<p class="samme-dag">Samme dag var bransjen uendret i snitt.</p>' in html

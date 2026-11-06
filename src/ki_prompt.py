@@ -116,6 +116,12 @@ gis bare naar baade aksjen og hovedindeksen steg eller falt, og reglene sier
 at teksten bruker den ordrett eller ikke sier noe om hovedindeksen.
 Kontrollen i FR-603 bruker den samme funksjonen. Ordlyden og funksjonen er
 med i avtrykket (VG2 i 10.2e). Versjonen staar som 4, av samme grunn som over.
+
+Versjon 4, gjennomgangen av svarene (BH8, ECH5): linja om hovedindeksen sa
+«Mangler feltet, skal du ikke si noe om hovedindeksen», som kunne leses som at
+teksten kan nevne den naar feltet er der. Den sier naa at feltet er med for
+ordlyden, og linja om aksjen har forbeholdet om at feltet kan mangle.
+Versjonen staar som 4, av samme grunn som over.
 """
 
 import json
@@ -134,8 +140,8 @@ Styrken er hvor mange av sjekkene som ga utslag. Retningen er Positiv, Negativ, 
 I opplysningene under står 1 for positivt utslag, -1 for negativt og 0 for ikke noe utslag.
 
 Opplysningene sier også hvordan dagen var:
-- hovedindeksen: om hovedindeksen på Oslo Børs steg, falt eller var uendret i dag. Mangler feltet, skal du ikke si noe om hovedindeksen.
-- aksjen: om aksjen selv steg, falt eller var uendret i dag.
+- hovedindeksen: om hovedindeksen på Oslo Børs steg, falt eller var uendret i dag. Feltet er med for ordlyden under, og teksten nevner hovedindeksen bare med den.
+- aksjen: om aksjen selv steg, falt eller var uendret i dag. Mangler feltet, skal du ikke si noe om hvordan aksjen gikk.
 
 Regler for teksten:
 - Beskriv hver sjekk slik fortegnet står i opplysningene: et positivt utslag, et negativt utslag eller ikke noe utslag. Ikke si at en sjekk ga utslag når den ikke ga det, eller at den ga et annet utslag enn det som står.

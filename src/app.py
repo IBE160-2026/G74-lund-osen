@@ -54,7 +54,7 @@ from boersometer import (
 from boersometer import (
     med_perioden as rute_med_perioden,
 )
-from dagene import lag_dagsbilde, setning_om_dagene, setning_om_samme_dag
+from dagene import lag_dagsbilde, setning_om_dagene, setning_om_samme_dag, tell_dagene
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
 from graf import bygg_graf
 from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
@@ -1233,7 +1233,7 @@ def _setningene_om_dagen(post, detalj, leser, oversiktsleser, annen_dag: bool) -
         indekser = SqliteIndekslager(g.tilkobling)
         symboler = indekser.symboler()
         indeksserie = indekser.serie(valgt_indeks(symboler)) if symboler else None
-    except (sqlite3.Error, ValueError):
+    except (sqlite3.Error, ValueError, RuntimeError):
         indeksserie = None
     try:
         lista = tuple(p.aksje for p in oversiktsleser.oversikt())
@@ -1241,14 +1241,19 @@ def _setningene_om_dagen(post, detalj, leser, oversiktsleser, annen_dag: bool) -
     except (sqlite3.Error, ValueError, RuntimeError) as feil:
         app.logger.warning("Dagen kunne ikke leses: %s: %s", type(feil).__name__, feil)
         lista, serier = None, None
+    dager, minst = tell_dagene(detalj.dato, detalj.vurdering, tidligere)
+    dagene = setning_om_dagene(dager, minst, annen_dag=annen_dag)
     if lista is None:
-        bildet = lag_dagsbilde(post.aksje, detalj.dato, detalj.vurdering, tidligere, (), {}, None)
-        return setning_om_dagene(bildet.dager, bildet.dager_minst, annen_dag=annen_dag), None
-    bildet = lag_dagsbilde(post.aksje, detalj.dato, detalj.vurdering, tidligere, lista, serier, indeksserie)
-    return (
-        setning_om_dagene(bildet.dager, bildet.dager_minst, annen_dag=annen_dag),
-        setning_om_samme_dag(bildet),
-    )
+        return dagene, None
+    # Gjennomgangen (BH9, BH10, ECH12): en feil i utregningen av dagen, som en
+    # dag utenfor kalenderen eller en kurs paa 0, gir siden uten setningen om
+    # samme dag, ikke 500.
+    try:
+        bildet = lag_dagsbilde(post.aksje, detalj.dato, detalj.vurdering, tidligere, lista, serier, indeksserie)
+        return dagene, setning_om_samme_dag(bildet)
+    except (UtenforKalenderen, ValueError, ArithmeticError) as feil:
+        app.logger.warning("Dagen kunne ikke regnes: %s: %s", type(feil).__name__, feil)
+        return dagene, None
 
 
 def _ki_visning(post, detalj, siste: date) -> KIVisning:

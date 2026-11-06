@@ -374,6 +374,8 @@ class TestAksjesiden:
             side = klient.get(f"/aksje/{rad.emne.symbol}").data.decode("utf-8")
             assert f'<p class="samme-dag">{escape(setning_om_samme_dag(bildet))}</p>' in side, rad.emne.symbol
             assert rad.grunnlag.get("hovedindeksen") == bildet.hovedindeksen, rad.emne.symbol
+            # Gjennomgangen (BH12, VG2): ogsaa aksjen.
+            assert rad.grunnlag.get("aksjen") == bildet.aksjen, rad.emne.symbol
 
 
 class _Falsk:

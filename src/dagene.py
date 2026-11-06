@@ -159,13 +159,17 @@ def lag_dagsbilde(
 _VERBET = {STEG: ("steg", ""), FALT: ("falt", ""), UENDRET: ("var", " uendret")}
 
 
-def setning_om_samme_dag(bildet: Dagsbilde) -> str:
+def setning_om_samme_dag(bildet: Dagsbilde) -> str | None:
     """Setningen under KI-teksten om hva hovedindeksen, bransjen og antallene
     gjorde samme dag (gruppens svar 5.11 kl. 19:13 og 23:36). Av de samme
     verdiene som grunnlaget, og uten det som mangler. «Samme dag» passer
     baade i dag og for en valgt dag. Setningen nevner ikke signalet og sier
     ingen grunn, saa den ikke kan leses som at dagen forklarer det (BH7).
-    Tallene vises etter regel 21 (tallformat.tall)."""
+    Tallene vises etter regel 21 (tallformat.tall).
+
+    Gjennomgangen (BH5, VG3, ECH10): naar ingen aksje steg eller falt, er
+    antallene ofte ikke regnet, fordi kursene mangler, og da staar de ikke.
+    Uten noe aa si er det ingen setning (None)."""
     for verdi in (bildet.hovedindeksen, bildet.bransjen):
         if verdi is not None and verdi not in BEVEGELSER:
             raise ValueError(f"hovedindeksen og bransjen maa vaere en av {BEVEGELSER} eller None")
@@ -179,14 +183,17 @@ def setning_om_samme_dag(bildet: Dagsbilde) -> str:
     if bildet.bransjen is not None:
         verb, hale = _VERBET[bildet.bransjen]
         deler.append((verb, "bransjen", hale + " i snitt"))
-    aksjer = "aksje" if bildet.aksjer_steg == 1 else "aksjer"
-    deler.append(
-        (
-            "steg",
-            f"{tall(bildet.aksjer_steg, 'heltall')} {aksjer} i lista",
-            f" og {tall(bildet.aksjer_falt, 'heltall')} falt",
+    if bildet.aksjer_steg or bildet.aksjer_falt:
+        aksjer = "aksje" if bildet.aksjer_steg == 1 else "aksjer"
+        deler.append(
+            (
+                "steg",
+                f"{tall(bildet.aksjer_steg, 'heltall')} {aksjer} i lista",
+                f" og {tall(bildet.aksjer_falt, 'heltall')} falt",
+            )
         )
-    )
+    if not deler:
+        return None
     # Foerste ledd med verbet foerst etter «Samme dag», de andre som vanlig.
     ledd = [f"{v} {s}{h}" if i == 0 else f"{s} {v}{h}" for i, (v, s, h) in enumerate(deler)]
     if len(ledd) == 1:

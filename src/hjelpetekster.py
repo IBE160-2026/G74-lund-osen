@@ -576,8 +576,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "Kort fortalt:",
             "en kort tekst om signalet for aksjen den dagen, skrevet av en språkmodell og merket "
             "«Laget av KI» med navnet på modellen. Modellen fikk bare det appen har regnet ut: om hver "
-            "av sjekkene ga +1, 0 eller -1, styrken og retningen, om hovedindeksen og aksjen selv steg "
-            "eller falt den dagen når det kan regnes, med en ferdig setning om aksjen gikk samme vei som "
+            "av sjekkene ga +1, 0 eller -1, styrken og retningen, om hovedindeksen og aksjen selv steg, "
+            "falt eller var uendret den dagen når det kan regnes, med en ferdig setning om aksjen gikk samme vei som "
             "hovedindeksen eller motsatt, og et merke når aksjen "
             "er utenfor de 15 grensene er målt på, men ingen kurser, prosenter eller volumer. Tallene med prikket strek er sjekket mot det før teksten vises, "
             "og teksten som vises, gir ikke råd og sier ikke noe annet om hovedindeksen, bransjen, børsen "

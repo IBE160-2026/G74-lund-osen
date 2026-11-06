@@ -36,8 +36,8 @@ sikkerhetsscore fra modellen. Fire punkter:
    «dobbelt» er aldri lov, fordi grunnlaget ikke har dem. Fortegnene (+1, 0
    og -1) er ikke antall, og prompten ber modellen skrive dem med ord.
    Story 10.2e: et tall er lov bare naar det er et av antallene i
-   grunnlaget (ANTALLENE i ki_grunnlag.py: styrken, dagene og hvor mange
-   aksjer som steg og falt) eller et av regelens faste tall.
+   grunnlaget (ANTALLENE i ki_grunnlag.py) eller et av regelens faste tall.
+   Fra 10.2i er styrken det eneste antallet i grunnlaget (gjennomgangen, VG6).
 3. Raad. Ingen ord som gir raad (NFR-06), ogsaa «alternativ for investorer»,
    «investerings-» og «raadgiver» fra malinger.md §19, og raad om aa holde.
 4. Gjetning. Ingen ord som gjetter eller spaar, og ingen aarsak som ikke staar
@@ -256,24 +256,77 @@ _STYRKE_UTSAGN = (
 
 # Story 10.2i (svarene 5.11 kl. 19:13 og 23:36): ord om hovedindeksen,
 # bransjen, boersen og antallet aksjer. «børs» foran «dag» er dagene eller
-# regelens vinduer, som leses i _dagene. «aksjene grensene er målt på» er
-# merket fra prompten (UTENFOR), ikke et antall.
+# regelens vinduer, som leses i _dagene. «aksjene (som) grensene er målt på»
+# er merket fra prompten (UTENFOR), ikke et antall. Gjennomgangen (BH2, VG4,
+# ECH4): ogsaa sammensatte ord og ord med bindestrek, som «Aksjemarkedet»,
+# «Energisektoren», «OSEBX-indeksen» og «Oslo-børsen», og «OBX», «Euronext»,
+# «listen», «selskapene», «flertallet», «de fleste» og «resten».
 _OM_DAGEN = re.compile(
-    r"(?<![\w-])(?:hovedindeks\w*|indeks\w*|osebx|børs(?!dag)\w*|marked\w*|bransje\w*|sektor\w*"
-    r"|aksjer|aksjene(?!\s+grensene)|lista|samme\s+vei|motsatt\s+vei|i\s+takt\s+med)(?![\w-])",
+    r"(?<!\w)(?:[\w-]*?(?:indeks|marked|bransje|sektor|børs(?!dag))[\w-]*|[\w-]*?osebx[\w-]*|obx|euronext"
+    r"|oslo\s+bors|aksjer|aksjene(?!\s+(?:som\s+)?grensene)|list(?:a|en|e|ene)|selskaper|selskapene"
+    r"|flertallet|de\s+fleste|resten|samme\s+vei|motsatt\s+vei|samme\s+retning\s+som|motsatt\s+retning"
+    r"|i\s+takt\s+med)(?![\w-])",
     re.IGNORECASE,
 )
+# Gjennomgangen (BH1, VG1, ECH1, ECH2): et verb om retningen paa en dag. Med
+# «aksjen» foran skal det stemme med feltet aksjen. Med «kursen» foran er det
+# regelens ord for interessen («stor handel på en dag kursen steg»). Ellers,
+# som «Begge falt» etter ordlyden, er det noe om dagen, og stoppes.
+_DAGSVERB = re.compile(
+    r"(?<![\w-])(steg|stiger|steget|falt|faller|sank|synker|sunket|gikk\s+opp|gikk\s+ned|gått\s+opp|gått\s+ned"
+    r"|var\s+uendret|er\s+uendret)(?![\w-])",
+    re.IGNORECASE,
+)
+_RETNINGEN = {"opp": "steg", "ned": "falt", "uendret": "uendret"}
+_FORAN_VERBET = re.compile(r"(?:^|[.!?;:,]\s*)?((?:[\w-]+\s+){0,3})$")
+# Gjennomgangen (BH3, VG5, ECH3): en setning rett etter ordlyden som kobler den
+# til signalet, som «Derfor er signalet positivt» og «Det forklarer signalet».
+_SLUTNING = re.compile(r"\s*(?:derfor|dermed|følgelig|så)(?![\w-])", re.IGNORECASE)
+_DET = re.compile(r"\s*(?:det|dette)(?![\w-])", re.IGNORECASE)
+_KOBLER = re.compile(r"(?<![\w-])(?:forklar\w*|henger\s+sammen|skyld\w*|årsak\w*)(?![\w-])", re.IGNORECASE)
+
+
+def _retningen_i(verb: str) -> str:
+    """steg, falt eller uendret for et verb i _DAGSVERB."""
+    verb = " ".join(verb.lower().split())
+    if verb.endswith("uendret"):
+        return "uendret"
+    if verb.startswith(("gikk", "gått")):
+        return _RETNINGEN[verb.split()[-1]]
+    return "steg" if verb in ("steg", "stiger", "steget") else "falt"
 
 
 def _om_dagen(tekst: str, grunnlag: Mapping[str, object]) -> list[str]:
     """Svarene 5.11 kl. 19:13 og 23:36: ordlyden om hovedindeksen tas ut naar
     den staar ordrett som en hel setning og grunnlaget gir den. Alt som staar
-    igjen om hovedindeksen, bransjen, boersen og antallet aksjer, stoppes."""
+    igjen om hovedindeksen, bransjen, boersen og antallet aksjer, stoppes.
+    Gjennomgangen: et verb om retningen er lov bare om aksjen, og da som i
+    feltet aksjen, eller om kursen i regelens ord (BH1, ECH2). Hvitt rom leses
+    som ett mellomrom, og ordlyden kan staa foerst paa en linje (ECH7)."""
+    om = "bare appen skriver om hovedindeksen, bransjen, børsen og antallet aksjer"
+    tekst = re.sub(r"\s+", " ", tekst)
+    grunner: list[str] = []
     ordlyd = ordlyd_om_hovedindeksen(grunnlag)
     if ordlyd:
-        tekst = re.sub(r"(?:^|(?<=[.!?]))\s*" + re.escape(ordlyd) + r"(?=\s|$)", " ", tekst)
-    om = "bare appen skriver om hovedindeksen, bransjen, børsen og antallet aksjer"
-    return [f"1: om dagen «{treff.group(0)}», {om}" for treff in _OM_DAGEN.finditer(tekst)]
+        moenster = re.compile(r"(?:^|(?<=[.!?]))\s*" + re.escape(ordlyd) + r"(?=\s|$)")
+        for treff in moenster.finditer(tekst):
+            etter = tekst[treff.end() :]
+            setning = _setningen(etter, len(etter) - len(etter.lstrip())) if etter.strip() else ""
+            if _SLUTNING.match(etter) or (_DET.match(etter) and _KOBLER.search(setning)):
+                grunner.append(f"1: om dagen «{setning.strip()}» etter ordlyden, dagen forklarer ikke signalet")
+        tekst = moenster.sub(" ", tekst)
+    grunner += [f"1: om dagen «{treff.group(0)}», {om}" for treff in _OM_DAGEN.finditer(tekst)]
+    for treff in _DAGSVERB.finditer(tekst):
+        foran = _FORAN_VERBET.search(tekst[: treff.start()]).group(1).lower().split()
+        if "kursen" in foran:
+            continue
+        if "aksjen" in foran:
+            if grunnlag.get("aksjen") == _retningen_i(treff.group(1)):
+                continue
+            grunner.append(f"1: aksjen «{treff.group(0)}», grunnlaget sier {grunnlag.get('aksjen') or 'ingenting'}")
+            continue
+        grunner.append(f"1: om dagen «{treff.group(0)}», {om}")
+    return grunner
 
 
 # Gruppens svar 24.10 kl. 21:49: dagene ogsaa i «i to børsdager», «har vært
