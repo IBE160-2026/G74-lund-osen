@@ -3675,6 +3675,8 @@ ikke bare er en strek der.
 
 *Ferdig 2026-11-06 kl. 16:29:* PR #115 er squash-flettet i `b38617f9`, låst til head-en `25fa0b35` (spesifikasjonen `spec-8-2c-kursgrafen-paa-smal-skjerm.md`). Kursgrafen har egne mål på smal skjerm, 280 × 250, med de samme dataene, linjene og merkene, og navnene på linjene i en forklaring under datoene. Stilarket viser den når figuren er smalere enn 690 px. Teksten i grafen ved 390 px er 13,37 px, mot 11,5 px for den minste teksten ellers på siden (var 5,2). Navn på aksen som ville kommet borti hverandre, har bare streken. Brede vinduer er som før, og bildene i `docs/appen/` er byte for byte de samme. Hele settet før den siste commiten med tester (`b93bc5da`): 4257 bestått, 24 hoppet over og 2 porttester for `start.ps1` som feilet (svaret 29.10 kl. 21:02). CI var grønn på head-en (42243101765) og på flettecommiten (42243561704).
 
+*Avgjort 2026-11-06 kl. 17:24 (gruppens svar):* begge valgene i spesifikasjonen for 8.2c godtas som bygget. I vinduer på om lag 451–767 px er den smale grafen 373 px bred og midtstilt, fordi den brede ville gitt tekst under 11,5 px. Ved 320 px er teksten i grafen 10,37 px, fordi kravet gjaldt 390 px.
+
 ### Story 8.3: Min liste: eget skjermbilde med stjerne og filter
 
 *Lagt til 2026-09-30, Marians beslutning.*
