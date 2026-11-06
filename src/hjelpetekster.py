@@ -577,7 +577,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "en kort tekst om signalet for aksjen den dagen, skrevet av en språkmodell og merket "
             "«Laget av KI» med navnet på modellen. Modellen fikk bare det appen har regnet ut: om hver "
             "av sjekkene ga +1, 0 eller -1, styrken og retningen, om hovedindeksen og aksjen selv steg, "
-            "falt eller var uendret den dagen når det kan regnes, med en ferdig setning om aksjen gikk samme vei som "
+            "falt eller var uendret den dagen når det kan regnes, aksjen mot kursen før som endringen i tabellen, "
+            "med en ferdig setning om aksjen gikk samme vei som "
             "hovedindeksen eller motsatt, og et merke når aksjen "
             "er utenfor de 15 grensene er målt på, men ingen kurser, prosenter eller volumer. Tallene med prikket strek er sjekket mot det før teksten vises, "
             "og teksten som vises, gir ikke råd og sier ikke noe annet om hovedindeksen, bransjen, børsen "
@@ -587,6 +588,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (KI_GRUNNLAG, "kurser, volumer, prosenter eller forholdstall, og ingen maalinger"),
                 (KI_GRUNNLAG, 'ANTALLENE = ("styrke",)'),
                 (KI_GRUNNLAG, 'DAGFELTENE = ("hovedindeksen", "aksjen")'),
+                # Gruppens svar 6.11 kl. 09:55, 1: aksjen som endringen i tabellen.
+                (MARKEDSOVERSIKT, "def endring_i_prosent("),
                 (KI_GRUNNLAG, 'UTENFOR_MAALINGEN = "Utenfor målingen"'),
                 (KI_GRUNNLAG, "fortegnet for hver av de"),
                 (KI_VISNING, "def prikkede_tall("),

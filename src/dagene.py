@@ -14,6 +14,11 @@ modellen skriver ikke om dagen. Dagsbildet ble derfor flyttet hit fra
 ki_grunnlag.py, saa siden og grunnlaget til modellen regnes av den samme
 funksjonen (lag_dagsbilde), og webserveren fortsatt ikke importerer KI-laget.
 Setningen sier aldri at dagen forklarer signalet (BH7 i PR #113).
+
+Gruppens svar 6.11 kl. 09:55, 1 (BH4, ECH9 i PR #113): retningen paa aksjen
+selv regnes som i tabellen, mot forrige rad, ogsaa paa en dag med hull, med
+den samme endringen som antallene (_endringen). Hovedindeksen regnes
+fortsatt mot forrige boersdag.
 """
 
 from collections.abc import Mapping
@@ -96,7 +101,8 @@ class Dagsbilde:
     aksjer_falt: int
     bransjen: str | None
     # Story 10.2i (svarene 5.11 kl. 19:13 og 23:36): retningen paa aksjen selv
-    # den dagen, regnet som for hovedindeksen (_retningen_paa_dagen).
+    # den dagen. Svaret 6.11 kl. 09:55, 1: regnet som i tabellen, mot forrige
+    # rad (_endringen), ikke som hovedindeksen.
     aksjen: str | None = None
 
 
@@ -118,9 +124,9 @@ def _endringen(serie: list[Kursrad], dag: date) -> float | None:
 
 
 def _retningen_paa_dagen(serie: list[Kursrad], dag: date) -> str | None:
-    """steg, falt eller uendret for dag, regnet som for hovedindeksen:
-    indeksendring paa radene til og med dag, mot forrige boersdag. None uten
-    rad paa dag eller paa forrige boersdag."""
+    """steg, falt eller uendret for hovedindeksen paa dag: indeksendring paa
+    radene til og med dag, mot forrige boersdag. None uten rad paa dag eller
+    paa forrige boersdag."""
     til = [rad for rad in serie if rad.dato <= dag]
     if not til or til[-1].dato != dag:
         return None
@@ -142,7 +148,6 @@ def lag_dagsbilde(
     endringer = {a.symbol: _endringen(serier.get(a.symbol, []), dag) for a in lista}
     retninger = [bevegelse(e) for e in endringer.values()]
     i_bransjen = [endringer[a.symbol] for a in lista if a.sektor == aksje.sektor and endringer[a.symbol] is not None]
-    # Story 10.2i: aksjen selv regnes med den samme funksjonen som indeksen.
     indeks = _retningen_paa_dagen(indeksserie or [], dag)
     return Dagsbilde(
         dager=dager,
@@ -151,7 +156,9 @@ def lag_dagsbilde(
         aksjer_steg=retninger.count(STEG),
         aksjer_falt=retninger.count(FALT),
         bransjen=bevegelse(sum(i_bransjen) / len(i_bransjen)) if i_bransjen else None,
-        aksjen=_retningen_paa_dagen(serier.get(aksje.symbol, []), dag),
+        # Svaret 6.11 kl. 09:55, 1: aksjen som i tabellen og antallene, mot
+        # forrige rad, ogsaa paa en dag med hull.
+        aksjen=bevegelse(_endringen(serier.get(aksje.symbol, []), dag)),
     )
 
 

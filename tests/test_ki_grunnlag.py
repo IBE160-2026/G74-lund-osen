@@ -433,19 +433,39 @@ class TestDagsbildet:
         indeks = [Kursrad(dato=d, slutt=k, justert_slutt=k, volum=0) for d, k in ((UKA[-3], 1500.0), (FREDAG, 1510.0))]
         assert self._bildet({}, indeks).hovedindeksen is None
 
-    def test_aksjen_regnes_som_hovedindeksen(self):
-        """Story 10.2i: retningen paa aksjen selv den dagen, med den samme
-        funksjonen som hovedindeksen. Ville feilet hvis aksjen fikk en annen
-        retning enn indeksen faar av den samme serien, eller fikk retningen
-        uten rad paa forrige boersdag, som indeksen ikke faar."""
+    def test_aksjen_regnes_som_i_tabellen(self):
+        """Gruppens svar 6.11 kl. 09:55, 1 (BH4, ECH9): retningen paa aksjen
+        selv er endringen mot forrige rad, som i tabellen (endring_i_prosent
+        paa de to siste radene) og antallene. Ville feilet hvis aksjen fikk en
+        annen retning enn endringen i tabellen, eller fikk retningen uten rad
+        paa dagen."""
+        from markedsoversikt import endring_i_prosent
+
         for kurser in (_kurser(100.0, 101.0), _kurser(100.0, 99.0), _kurser(100.0, 100.001)):
-            bildet = self._bildet({"EQNR": kurser}, kurser)
-            assert bildet.aksjen == bildet.hovedindeksen
+            bildet = self._bildet({"EQNR": kurser})
+            assert bildet.aksjen == bevegelse(endring_i_prosent(kurser[-2:]))
         assert self._bildet({"EQNR": _kurser(100.0, 101.0)}).aksjen == STEG
         assert self._bildet({"EQNR": _kurser(100.0, 99.0)}).aksjen == FALT
-        hull = [Kursrad(dato=d, slutt=k, justert_slutt=k, volum=0) for d, k in ((UKA[-3], 100.0), (FREDAG, 101.0))]
-        assert self._bildet({"EQNR": hull}).aksjen is None
+        assert self._bildet({"EQNR": _kurser(100.0, 100.001)}).aksjen == UENDRET
         assert self._bildet({"EQNR": _kurser(100.0, 101.0, siste=UKA[-2])}).aksjen is None
+        assert self._bildet({"EQNR": _kurser(100.0)}).aksjen is None
+
+    def test_aksjen_paa_en_dag_med_hull(self):
+        """Svaret 6.11 kl. 09:55, 1: ogsaa paa en dag med hull, der aksjen
+        mangler kurs forrige boersdag, regnes aksjen mot forrige rad, som i
+        tabellen og antallene, mens hovedindeksen med det samme hullet ikke
+        faar retning. Ville feilet hvis aksjen ble regnet som hovedindeksen,
+        mot forrige boersdag (da var den None), eller ikke ble talt likt i
+        antallene og retningen."""
+        hull = [Kursrad(dato=d, slutt=k, justert_slutt=k, volum=0) for d, k in ((UKA[-3], 100.0), (FREDAG, 101.0))]
+        bildet = self._bildet({"EQNR": hull}, hull)
+        assert bildet.hovedindeksen is None
+        assert bildet.aksjen == STEG
+        assert (bildet.aksjer_steg, bildet.aksjer_falt) == (1, 0)
+        fall = [Kursrad(dato=d, slutt=k, justert_slutt=k, volum=0) for d, k in ((UKA[-4], 100.0), (FREDAG, 98.0))]
+        bildet = self._bildet({"EQNR": fall})
+        assert bildet.aksjen == FALT
+        assert (bildet.aksjer_steg, bildet.aksjer_falt) == (0, 1)
 
     def test_ingen_bransje_uten_endring(self):
         bildet = self._bildet({"NY": _kurser(10.0)}, aksje=4)

@@ -41,6 +41,10 @@ dagen. Grunnlaget faar retningen paa aksjen selv den dagen (aksjen), regnet
 som for hovedindeksen, og mister bransjen og antallene, som appen skriver selv
 under teksten (setning_om_samme_dag i dagene.py). Hovedindeksen staar, saa
 prompten kan gi ferdig ordlyd om aksjen gikk samme vei som den.
+
+Gruppens svar 6.11 kl. 09:55, 1 (BH4, ECH9 i PR #113): aksjen regnes som i
+tabellen, mot forrige rad, ogsaa paa en dag med hull, ikke som hovedindeksen
+(lag_dagsbilde i dagene.py).
 """
 
 from types import MappingProxyType
