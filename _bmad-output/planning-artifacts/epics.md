@@ -4294,6 +4294,8 @@ lesingen før commit som før.
 
 **Én økt:** ja.
 
+*Avgjort 2026-11-06 kl. 11:50 (gruppens svar):* før 9.2 bygges, sjekkes det bare med lesing om kildene til instruksjonene fra 21.–24.09 finnes, og så velger gruppen hvordan storyen gjøres.
+
 ### Story 9.3: Arbeidsmønsteret
 
 Som **sensor**, vil jeg forstå hvem som bestemte hva, så jeg kan vurdere hvordan
