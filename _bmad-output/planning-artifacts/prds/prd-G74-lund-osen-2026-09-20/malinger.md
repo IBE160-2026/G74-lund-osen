@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-05T18:39
+updated: 2026-11-06T01:33
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -5956,3 +5956,74 @@ basen. 13 av 15 besto. De 2 som ble stoppet, hadde begge feltene tatt ut og
 sa likevel noe om dem: DNB om hovedindeksen og DNO om bransjen, og kontrollen
 stoppet dem på punkt 1 («grunnlaget sier ingenting»). Ingen av de 13 som
 besto, sier noe om et felt som mangler.
+
+## 55. Prøvekjøringen etter svarene 5.11 kl. 19:13 og 23:36, for 05.11 (2026-11-06)
+
+**Metode.** Etter gruppens svar 5.11 kl. 19:13 og 23:36 (story 10.4 i
+`epics.md`, og spesifikasjonen 10.2i): appen skriver selv hva hovedindeksen,
+bransjen og antallene gjorde samme dag, under KI-teksten
+(`setning_om_samme_dag` i `dagene.py`), og modellen skriver ikke om dagen.
+Grunnlaget har retningen på aksjen selv i stedet for bransjen og antallene,
+modellen får ferdig ordlyd om aksjen gikk samme vei som hovedindeksen eller
+motsatt når begge steg eller falt, og kontrollen (FR-603) stopper alt annet om
+hovedindeksen, bransjen, børsen og antallet aksjer. `PROMPTVERSJON` står som 4,
+og prompten hadde avtrykket `a864e4c3…4aef` (commit `c986d07c`), med
+kontrollen fra `281a8f84`.
+
+Kjørt som §54, fra et skript utenfor repoet, med koden på grenen: `data/db/ose.db`
+ble åpnet med `mode=ro`, og ingenting ble skrevet. Ulikt §54 er grunnlaget regnet
+på nytt fra basen med `_grunnlagene` i `ki_tekst.py`, den samme veien som
+kveldshentingen, fordi grunnlaget i `ki_logg` er fra versjon 3 og ikke har
+aksjen. Dagen er siste børsdag i basen, 05.11, for de 15 aksjene med vurdering.
+Hvert grunnlag gikk gjennom `lag_ki_rad` med Gemma i Ollama (modellen, prompten
+og kontrollen) og så gjennom `bygg_ki_visning` med vurderingen fra basen
+(samsvaret i FR-602 og vakta). Tekstene står bare i scratchpad. Tiden per kall
+ble tatt med `time.monotonic()`. Ingen kall til EODHD: kvoten ble lest med
+`/api/user` kl. 23:53 5.11. sha256 for `data/db/ose.db` var den samme før og
+etter (`53951403…0097`). Lista over aksjer og bransjer i `aksje` i basen, som
+siden leser, var den samme som `AKSJEUNIVERS`, som hentingen bruker, så
+setningen på siden og grunnlaget er regnet av de samme verdiene.
+
+Klassene er satt etter regelen i `spec-10-4-loggdelen.md`, av Claude, ved å
+lese hver tekst som besto ved siden av regelforklaringen og grunnlaget.
+Klassifiseringen er ikke gjort av en person.
+
+| | §54 rettet, versjon 4, 04.11 | §55, versjon 4 etter svarene, 05.11 |
+|---|---:|---:|
+| Kjørt | 18:29:56–18:30:23 | 01:32:06–01:32:33 |
+| Tekster | 15 | 15 |
+| Besto kontrollen | 15 | 14 |
+| Stoppet av kontrollen | 0 | 1 |
+| Modellen feilet | 0 | 0 |
+| Ville blitt vist (samsvar og vakta) | 15 | 14 |
+| gjentar | 0 | 0 |
+| sier mer | 15 | 14 |
+| usikker | 0 | 0 |
+| Median tid per tekst | 0,93 s | 0,54 s |
+| Lengste kall | 14,08 s (kall nr. 1) | 19,86 s (kall nr. 1, det første etter at Ollama ble startet kl. 01:31:52) |
+
+§55: `maskinvare` `gpu` for alle 15, `gemma4:e4b` med `modell_id`
+`dc35e8d9c606`, og Ollama 0.35.1. Alle 15 radene har `promptversjon` 4.
+Ordlyden var «samme vei» for 8 aksjer og «motsatt vei» for 7, og alle 15 fikk
+en ordlyd.
+
+**Resultat.** 14 av 15 besto og ville blitt vist. Kontrollen stoppet 1, YAR,
+på punkt 1 med to grunner av samme slag, «om dagen»: teksten brukte ordlyden
+inne i en annen setning («…, og aksjen gikk …»), ikke ordrett som egen setning,
+så «motsatt vei» og «hovedindeksen» ble stoppet. Ordlyden sto ellers riktig, så
+kontrollen stoppet en tekst som ikke sa noe galt, fordi den leser ord og ikke
+mening (FR-603). Den samme formen ble stoppet i demoen (HVDO).
+
+Alle 14 som besto, er «sier mer» etter regelen, men bare fordi de har
+ordlyden om hovedindeksen, ordrett som siste setning. Utenom den gjentar alle
+14 regelforklaringen, som versjon 3 i uka 29.10–04.11. Ingen nevner bransjen,
+børsen, antallet aksjer eller dagene, ingen gir råd eller gjetter på en årsak,
+og ingen sier at hovedindeksen forklarer signalet. Hver tekst er lest mot
+grunnlaget: hver sjekk er beskrevet slik fortegnet er, og ordlyden er den
+grunnlaget gir i alle 14. At «sier mer» her er appens egne ord, er et funn til
+10.4 og refleksjonsrapporten: med svaret kl. 19:13 er det siden, ikke modellen,
+som sier hvordan dagen var.
+
+Det er én kjøring, for én dag, med samme retning på hovedindeksen for alle 15.
+Tellingen gjentas etter noen dager i driften, når versjon 4 er flettet (svaret
+5.11 kl. 16:05).
