@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-11-05T21:19
+updated: 2026-11-06T20:14
 ---
 
 # Vurderingsmatrise for del 1
@@ -21,6 +21,20 @@ Status per kriterium for del 1 av mappen i IBE160 høsten 2026: hva vi leverer, 
 **Kilden for kriteriene:** «Sensorveiledning – Del 1» for IBE160 høsten 2026, som gruppen har fått. Den ligger ikke i repoet og er ikke lest i økta som laget matrisen, så ingenting her siteres fra den. Kriteriene og vektene står i instruksjonen 16.10 kl. 00:17 ([`ai-prompts/2026-10-16.md`](ai-prompts/2026-10-16.md)), og de samme sju med de samme vektene står i [tilbakemeldingen på briefen](../_bmad-output/planning-artifacts/tilbakemelding-product-brief.md), del 2.
 
 «Hva vi leverer» bygger på [briefen v8](../_bmad-output/planning-artifacts/product-brief.md) (taggen `arbeidskrav-product-brief-v8`) og [PRD-en](../_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md).
+
+## Status 06.11.2026
+
+Tallene er talt 06.11 kl. 20:13 på `c2c77cb7`, slik de ble talt 05.11: 111 flettede pull requests (`gh pr list --state merged`), 45 dagsfiler i `docs/ai-prompts/` og 636 Utført-linjer i dem (linjer som begynner med **Utført:**). Flettet etter tellingen 05.11: PR #113 (`374f1bdb`), etter tre runder med regel 25, og PR #115 (`b38617f9`). Tre av de fire nye dagsfilene, for 21.–23.09, er hentet inn i story 9.2. Testtallene er fra Utført-linja for instruksjonen kl. 15:10 i [`ai-prompts/2026-11-06.md`](ai-prompts/2026-11-06.md): hele settet ga 4257 bestått, 24 hoppet over og 2 porttester for `start.ps1` som feilet, på `b93bc5da` i PR #115. CI var grønn på main etter `8be8c9c0` (kjøring 42276728703). Storyene er ført som i [sprintstatusen](../_bmad-output/implementation-artifacts/sprint-status.yaml) på `c2c77cb7`. Hver celle er sjekket mot main, og hvert testnavn finnes.
+
+| Kriterium (vekt) | Hva vi leverer | Bevis i repoet | Status | Neste tiltak |
+|---|---|---|---|---|
+| **Prosess og KI-styring** (30 %) | Som 05.11. Story 9.2 er gjort: instruksjonene fra 21.–24.09, fra før regel 18, står i dagsfilene som et utvalg, 15 ordrett og én linje om hver av de 107 andre. PR #113 ble flettet først da ingen funn på middels eller over sto åpne, etter tre runder med regel 25 | Som 05.11. [`ai-prompts/2026-09-21.md`](ai-prompts/2026-09-21.md), [`ai-prompts/2026-09-22.md`](ai-prompts/2026-09-22.md), [`ai-prompts/2026-09-23.md`](ai-prompts/2026-09-23.md) og [`ai-prompts/2026-09-24.md`](ai-prompts/2026-09-24.md), fra instruksjonen kl. 19:50 i [`ai-prompts/2026-11-06.md`](ai-prompts/2026-11-06.md): `df617b18`, `9a6a26d5`, `3bbb1dbd` og `bf63527c`. Story 9.2 er done i sprintstatusen. Svarene kl. 09:55, 11:15 og 12:16 i [`spec-10-2i-prompten-versjon-4.md`](../_bmad-output/implementation-artifacts/spec-10-2i-prompten-versjon-4.md). Oppføringen for 06.11 i [refleksjonsloggen](reflection-log.md) (`848c616f`, rettet i `bf63527c`) | oppfylt | Holdes ved like: hver instruksjon lagres ordrett med Utført-linje (regel 18) og sesjonslogg (regel 24) |
+| **Funksjonalitet og omfang** (20 %) | Som 05.11, og promptversjon 4 for KI-teksten, som sier hvordan dagen var rundt aksjen (10.2i), og kursgrafen på smal skjerm (8.2c) | Som 05.11. Promptversjon 4: PR #113 (`374f1bdb`) og `tests/test_ki_grunnlag.py::TestDagsbildet::test_aksjen_som_tabellraden_paa_en_dag_med_hull`. Kursgrafen: PR #115 (`b38617f9`) og `tests/test_graf.py::TestSmalSkjerm::test_navnene_paa_aksen_kommer_ikke_borti_hverandre`. Story 8.2c er done i sprintstatusen | delvis | Story 3.4 (demoversjonen) står i review i sprintstatusen til README-prøven er tatt. Kveldshentingen bruker promptversjon 4 første gang lørdag 07.11 kl. 22:15 |
+| **Kvalitetssikring og testing** (15 %) | Som 05.11. PR #113 stoppet før flettingen med funnene som fulgte av svarene åpne, og ble flettet da ingen på middels eller over sto åpne | Som 05.11. Testtallene og CI over. Mutantene og triagen i [`spec-10-2i-prompten-versjon-4.md`](../_bmad-output/implementation-artifacts/spec-10-2i-prompten-versjon-4.md) og [`spec-8-2c-kursgrafen-paa-smal-skjerm.md`](../_bmad-output/implementation-artifacts/spec-8-2c-kursgrafen-paa-smal-skjerm.md). Teksten i grafen målt i nettleseren: `tests/test_kursgrafen_smal.py::test_teksten_i_grafen_i_nettleseren` | delvis | Målingen av bidraget (story 10.4, in-progress) i del B av [brukertesten](brukertest.md), som ikke er tatt. De 2 porttestene for `start.ps1` som feilet i hele settet |
+| **Design og brukeropplevelse** (10 %) | Som 05.11, og kursgrafen på smal skjerm: ved 390 px er teksten i grafen 13,37 px, mot 5,2 px før | Som 05.11. PR #115 (`b38617f9`) med [`spec-8-2c-kursgrafen-paa-smal-skjerm.md`](../_bmad-output/implementation-artifacts/spec-8-2c-kursgrafen-paa-smal-skjerm.md). «Avgjort 2026-11-06 kl. 17:24» under story 8.2c i [epics.md](../_bmad-output/planning-artifacts/epics.md) (`fa06ce5d`) | delvis | Brukertesten (story 8.1, ready-for-dev) er ikke tatt, og 8.2 står som in-progress i sprintstatusen |
+| **Kodekvalitet og arkitektur** (10 %) | Som 05.11 | Som 05.11 | oppfylt | Gjennomgangen med tre linser og mutantene fortsetter for hver story |
+| **README og kjørbarhet** (10 %) | Som 05.11 | Som 05.11 | delvis | README-prøven på en ren maskin er ikke tatt, og story 3.4 står i review til den er tatt |
+| **Ryddighet i repoet** (5 %) | Som 05.11 | Som 05.11 | oppfylt | Holdes ved like med regel 19 |
 
 ## Status 05.11.2026
 
