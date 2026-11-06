@@ -491,18 +491,36 @@ class TestDagsbildet:
         assert bildet.aksjen == FALT
         assert bildet.bransjen is None
         assert "bransjen" not in setning_om_samme_dag(bildet)
-        energi = self._bildet({"DNB": _kurser(50.0, 49.0), "EQNR": _kurser(100.0, 101.0)}, aksje=0)
+        # Svaret 6.11 kl. 11:15, 1: AKRBP har ogsaa en endring, saa Energi staar.
+        energi = self._bildet(
+            {"DNB": _kurser(50.0, 49.0), "EQNR": _kurser(100.0, 101.0), "AKRBP": _kurser(200.0, 202.0)}, aksje=0
+        )
         assert energi.bransjen == STEG
         assert "steg bransjen i snitt" in setning_om_samme_dag(energi)
 
-    def test_bransjen_med_to_naar_bare_den_ene_har_kurs(self):
-        """Svaret 6.11 kl. 09:55, 2: snittet er det samme som i
-        boersometeret, av aksjene i bransjen som har en endring. Ville feilet
-        hvis bransjen falt bort fordi bare én av to i lista hadde kurs, eller
-        snittet ble regnet annerledes enn snitt i boersometeret."""
-        from boersometer import bygg_rute, snitt
+    def test_bransje_med_to_der_bare_den_ene_har_endring(self):
+        """Gruppens svar 6.11 kl. 11:15, 1 (BH1, ECH1, BH2): bransjen staar
+        bare naar minst to aksjer i bransjen har en endring den dagen. EQNR og
+        AKRBP er begge i Energi, men AKRBP har ingen kurs paa dagen. Ville
+        feilet hvis bransjen fortsatt sto med snittet av EQNR alene, som da
+        bare sier hva EQNR selv gjorde, for EQNR eller for AKRBP."""
+        from dagene import setning_om_samme_dag
 
         serier = {"EQNR": _kurser(100.0, 98.0), "AKRBP": _kurser(200.0, 201.0, siste=UKA[-2])}
+        for aksje in (0, 1):
+            bildet = self._bildet(serier, aksje=aksje)
+            assert bildet.bransjen is None
+            assert "bransjen" not in (setning_om_samme_dag(bildet) or "")
+        assert self._bildet(serier, aksje=0).aksjen == FALT
+
+    def test_bransjen_med_to_med_endring_er_snittet_i_boersometeret(self):
+        """Svaret 6.11 kl. 09:55, 2: snittet er det samme som i
+        boersometeret, av aksjene i bransjen som har en endring. Ville feilet
+        hvis bransjen falt bort naar begge har en endring, eller snittet ble
+        regnet annerledes enn snitt i boersometeret."""
+        from boersometer import bygg_rute, snitt
+
+        serier = {"EQNR": _kurser(100.0, 98.0), "AKRBP": _kurser(200.0, 201.0)}
         bildet = self._bildet(serier, aksje=0)
         ruter = [bygg_rute(a, serier[a.symbol], _v("Positiv", 1), FREDAG, FREDAG) for a in self.LISTA[:2]]
         assert bildet.bransjen == bevegelse(snitt(ruter)) == FALT

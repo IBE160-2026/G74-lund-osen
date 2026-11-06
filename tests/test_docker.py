@@ -1469,7 +1469,10 @@ HOEYDE_PAA_AKSJESIDEN = 2261
 # for byte det samme.
 # Gjennomgangen av svarene 6.11 kl. 09:55: hjelpetekster.py. Bildet ble tatt paa
 # nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "2089b0e8e136d5fe36788bd9653da54d80174bae9fe46162fdb0bc4b3bb3646a"
+# Gruppens svar 6.11 kl. 11:15, 1: bransjen bare med minst to aksjer med en endring,
+# i dagene.py. Ingen aksjedag i demoen faar en annen setning, og bildet ble tatt paa
+# nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "6b08bbb14fcdcdbe12e867b00e3949524240cbb07f8561058d690d9a6f24706a"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1523,12 +1526,14 @@ DE_NYE_BILDENE = {
 # ble tatt paa nytt: ved 1280 px byte for byte de samme, og ved 390 px piksel for piksel.
 # Gjennomgangen av svarene 6.11 kl. 09:55: hjelpetekster.py. Alle bildene ble tatt paa
 # nytt: ved 1280 px byte for byte de samme, og ved 390 px piksel for piksel.
+# Gruppens svar 6.11 kl. 11:15, 1: dagene.py. Bildene av børsometeret og Min liste
+# ble tatt paa nytt og er byte for byte de samme, ogsaa ved 390 px.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
     TOPPEN_AV_OVERSIKTEN: "1ca0e03dfe8b4dd92b7ce521dbbbec82ca1d0fdd71fcb3cc180114768390692d",
-    "docs/appen/boersometeret-demo.png": "1197ddd6dc3dd2c5ffea69ed6ec880b372034e8a0e02d5fff9a45575451b1089",
-    "docs/appen/min-liste-demo.png": "652b0dc1c6092838acae773f20c18c2f37f358a1760bd407d2da22a2011267cb",
+    "docs/appen/boersometeret-demo.png": "dc2eb3f2d8aec1bf4ff3c0cacaa5fa9812340a57102f2b1501b616bbe0bf30f5",
+    "docs/appen/min-liste-demo.png": "39f0788f2c92508fac7843a86ccd8570f96860afd3160d1f7b052f690e677565",
     "docs/appen/oversikten-390-demo.png": "1ca0e03dfe8b4dd92b7ce521dbbbec82ca1d0fdd71fcb3cc180114768390692d",
-    "docs/appen/boersometeret-390-demo.png": "1197ddd6dc3dd2c5ffea69ed6ec880b372034e8a0e02d5fff9a45575451b1089",
+    "docs/appen/boersometeret-390-demo.png": "dc2eb3f2d8aec1bf4ff3c0cacaa5fa9812340a57102f2b1501b616bbe0bf30f5",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "

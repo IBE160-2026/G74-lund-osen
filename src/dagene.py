@@ -24,6 +24,10 @@ Gruppens svar 6.11 kl. 09:55, 2 (ECH6, BH11 i PR #113): bransjen staar bare
 naar den har minst to aksjer i lista (MINST_I_BRANSJEN). Med én aksje ville
 «bransjen i snitt» bare si hva aksjen selv gjorde. Snittet er det samme som i
 boersometeret: endringen for aksjene i bransjen som har en endring.
+
+Gruppens svar 6.11 kl. 11:15, 1 (BH1, ECH1, BH2 i PR #113): bransjen staar
+bare naar minst to aksjer i bransjen har en endring den dagen. Med to i lista,
+der bare én har endring, ville snittet ogsaa bare si hva den ene gjorde.
 """
 
 from collections.abc import Mapping
@@ -41,6 +45,7 @@ from vurderingsdata import Grunn, Vurdering
 STEG, FALT, UENDRET = "steg", "falt", "uendret"
 BEVEGELSER = (STEG, FALT, UENDRET)
 # Svaret 6.11 kl. 09:55, 2: bransjen staar bare med minst to aksjer i lista.
+# Svaret 6.11 kl. 11:15, 1: minst to av dem med en endring den dagen.
 MINST_I_BRANSJEN = 2
 
 # Uten «for første gang», fordi tellingen gjelder dagene paa rad (gruppens
@@ -100,8 +105,9 @@ def setning_om_dagene(dager: int, minst: bool, annen_dag: bool = False) -> str:
 class Dagsbilde:
     """Dagen rundt aksjen. hovedindeksen og bransjen er None naar de ikke
     kan regnes, og da sier verken grunnlaget eller setningen noe om dem.
-    bransjen er ogsaa None naar bransjen har faerre enn MINST_I_BRANSJEN
-    aksjer i lista (svaret 6.11 kl. 09:55, 2)."""
+    bransjen er ogsaa None naar faerre enn MINST_I_BRANSJEN aksjer i
+    bransjen har en endring den dagen (svarene 6.11 kl. 09:55, 2 og
+    kl. 11:15, 1)."""
 
     dager: int
     dager_minst: bool
@@ -156,10 +162,10 @@ def lag_dagsbilde(
     dager, minst = tell_dagene(dag, vurdering, tidligere)
     endringer = {a.symbol: _endringen(serier.get(a.symbol, []), dag) for a in lista}
     retninger = [bevegelse(e) for e in endringer.values()]
-    i_lista = [a for a in lista if a.sektor == aksje.sektor]
-    i_bransjen = [endringer[a.symbol] for a in i_lista if endringer[a.symbol] is not None]
-    # Svaret 6.11 kl. 09:55, 2: ingen bransje med bare én aksje i lista.
-    if len(i_lista) < MINST_I_BRANSJEN:
+    i_bransjen = [endringer[a.symbol] for a in lista if a.sektor == aksje.sektor and endringer[a.symbol] is not None]
+    # Svaret 6.11 kl. 11:15, 1: ingen bransje med faerre enn to aksjer med en
+    # endring den dagen, ogsaa naar bransjen har flere i lista.
+    if len(i_bransjen) < MINST_I_BRANSJEN:
         i_bransjen = []
     indeks = _retningen_paa_dagen(indeksserie or [], dag)
     return Dagsbilde(
