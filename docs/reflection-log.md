@@ -3252,6 +3252,10 @@ Story 9.2 skal vise instruksjonene fra 21.–24.09. Kl. 11:50 avgjorde vi at kil
 
 Det vi lærte: å velge samme regning som resten av siden lukket rundene, mens hvert unntak for et kanttilfelle ga et nytt funn. Et utvalg ordrett, lest før det committes, gir sensor kildene uten at alle 122 meldingene publiseres. Og også rådets instruksjoner må slås opp før de føres, som våre egne.
 
+*Rettet 2026-11-06 (svaret kl. 19:47):* vi hadde lest `utvalg.md` kl. 19:27, mens instruksjonen kl. 19:26 gikk, så «venter på at vi leser den» stemte ikke. Merket om lesingen ble aldri lagret i fila (svaret kl. 19:54 i dagsfila). Utvalget står nå i dagsfilene for 21.–24.09 (`3bbb1dbd`).
+
+*Rettet 2026-11-06 (svaret kl. 19:47), med rådet selv som kilde i instruksjonen kl. 19:50 i dagsfila:* kl. 09:55 anbefalte rådet «Behold som bygget», altså ingen ordlyd på en dag med hull, og vi valgte «Regn aksjen som i tabellen». Utvalget på 15 ordrett var rådets forslag, som vi valgte kl. 15:13 og 15:21. Det er det utfordring 2 og 3 sier ikke er ført i repoet.
+
 ---
 
 # Joakims oppføringer
