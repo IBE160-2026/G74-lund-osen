@@ -370,7 +370,7 @@ class TestSmalSkjerm:
         from graf import FORKLARING, SMAL_BREDDE, SMAL_HOEYRE, SMAL_HOYDE
 
         _, smal = self._par()
-        assert (smal.bredde, smal.hoyde) == (SMAL_BREDDE, SMAL_HOYDE) and smal.smal
+        assert (smal.bredde, smal.hoyde) == (SMAL_BREDDE, SMAL_HOYDE) and smal.smal is True
         assert smal.hoeyre == SMAL_BREDDE - SMAL_HOEYRE and smal.bunn == SMAL_HOYDE - BUNN - FORKLARING
         for linje in (smal.kurslinje, smal.ma50linje, smal.indekslinje):
             for x, y in koordinater(linje):
@@ -394,10 +394,24 @@ class TestSmalSkjerm:
             assert bool(bred.siste) == bool(smal.siste)
 
     def test_den_merkede_dagen_er_med(self):
-        """Ville feilet hvis dagen som er merket, manglet paa smal skjerm."""
+        """Ville feilet hvis dagen som er merket, manglet paa smal skjerm, eller
+        hvis punktet sto under tegneflaten, i forklaringen, i stedet for paa
+        kurslinja (gjennomgangen av 8.2c, VG2)."""
         bred, smal = self._par(merket=date(2026, 6, 1))
         assert bred.merket and smal.merket
         assert VENSTRE <= smal.merket.x <= smal.hoeyre
+        assert MARG_Y <= smal.merket.y <= smal.bunn
+        assert (round(smal.merket.x, 1), round(smal.merket.y, 1)) in koordinater(smal.kurslinje)
+
+    def test_forklaringen_faar_plass(self):
+        """Gjennomgangen av 8.2c (BH11): ville feilet hvis det lengste navnet,
+        ogsaa med et snitt paa tre sifre, gikk forbi hoeyre kant, eller hvis
+        den nederste linja i forklaringen gikk under grafen."""
+        from graf import SMAL_BREDDE, TEGNBREDDE
+
+        _, smal = self._par()
+        assert VENSTRE + 26 + len("999-dagers snitt (sjekk 1)") * TEGNBREDDE <= SMAL_BREDDE
+        assert smal.forklaring[-1].y + 4 <= smal.hoyde
 
     def test_navnene_paa_linjene_staar_i_forklaringen(self):
         """Ville feilet hvis navnene sto i feltet til hoeyre, som paa smal
@@ -415,15 +429,31 @@ class TestSmalSkjerm:
         _, uten_indeks = self._par(indeks=False)
         assert [f.klasse for f in uten_indeks.forklaring] == ["kurs", "snitt"]
 
-    @pytest.mark.parametrize("periode", ["1-uke", "1-mnd", "3-mnd", "6-mnd", "i-aar", "1-aar"])
-    def test_navnene_paa_aksen_kommer_ikke_borti_hverandre(self, periode):
+    @pytest.mark.parametrize(
+        "periode, slutt",
+        [
+            ("1-uke", date(2026, 10, 30)),
+            ("1-mnd", date(2026, 10, 30)),
+            ("3-mnd", date(2026, 10, 30)),
+            ("6-mnd", date(2026, 10, 30)),
+            ("i-aar", date(2026, 10, 30)),
+            ("1-aar", date(2026, 10, 30)),
+            # Gjennomgangen av 8.2c: ECH1 (datoen naermest slutten ble tatt
+            # bort av DATOBREDDE) og BH1, ECH2 («september» forbi kanten).
+            ("1-mnd", date(2026, 4, 9)),
+            ("1-mnd", date(2026, 12, 30)),
+            ("3-mnd", date(2026, 9, 23)),
+            ("6-mnd", date(2026, 11, 30)),
+        ],
+    )
+    def test_navnene_paa_aksen_kommer_ikke_borti_hverandre(self, periode, slutt):
         """Ville feilet hvis to navn paa aksen overlappet paa den smale
-        flaten, hvis et navn gikk utenfor grafen, eller hvis det siste navnet,
-        naermest dagen grafen slutter paa, var tatt bort."""
+        flaten, hvis et navn gikk utenfor flaten eller inn i feltet med
+        tallene, eller hvis det siste navnet, naermest dagen grafen slutter
+        paa, var tatt bort."""
         from graf import NAVNELUFT, SMAL_BREDDE, SMAL_HOEYRE, aksemerker, navneplass
         from perioder import AKSEMERKER, MAANEDER, MAANEDSNAVN
 
-        slutt = date(2026, 10, 30)
         start = max(
             date(2026, 1, 2),
             slutt - timedelta(days={"1-uke": 7, "i-aar": 400}.get(periode, 31 * MAANEDER.get(periode, 12))),
@@ -432,8 +462,8 @@ class TestSmalSkjerm:
         hvilke = AKSEMERKER.get(periode, MAANEDSNAVN)
         merker = bygg_graf(ps, merker=hvilke, smal=True).maanedsmerker
         navngitt = [m for m in merker if m.navn]
-        foer = [m for m in aksemerker(ps, SMAL_BREDDE, hvilke, SMAL_HOEYRE) if m.navn]
-        assert len(navngitt) >= 2 and navngitt[-1] == foer[-1]
+        foer = [m for m in aksemerker(ps, SMAL_BREDDE, hvilke, SMAL_HOEYRE, tynn=False) if m.navn]
+        assert len(navngitt) >= 2 and (navngitt[-1].x, navngitt[-1].navn) == (foer[-1].x, foer[-1].navn)
         plass = [navneplass(m) for m in navngitt]
-        assert all(0 <= fra and til <= SMAL_BREDDE for fra, til in plass)
+        assert all(VENSTRE <= fra and til <= SMAL_BREDDE for fra, til in plass)
         assert all(a[1] + NAVNELUFT <= b[0] for a, b in zip(plass, plass[1:]))

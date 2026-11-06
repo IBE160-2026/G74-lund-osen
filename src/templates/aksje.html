@@ -159,7 +159,8 @@
           Stilarket viser den ene av dem, etter bredden på figuren. #}
       {%- set linjenavn = {"kurs": "Utbyttejustert kurs", "snitt": parametre.ma_vindu ~ "-dagers snitt (sjekk 1)", "indeks": "Hovedindeksen"} %}
       {%- set linjeklasse = {"kurs": "kurslinje", "snitt": "ma50linje", "indeks": "indekslinje"} %}
-      {% for g in (graf, graf_smal) %}
+      {#- Gjennomgangen av 8.2c (BH5): bare grafene som finnes. #}
+      {% for g in (graf, graf_smal) if g %}
       <svg class="graf{% if g.smal %} smal{% endif %}" viewBox="0 0 {{ g.bredde }} {{ g.hoyde }}" role="img"
            aria-label="Kursutvikling for {{ detalj.aksje.navn }}: den tykke linja er utbyttejustert kurs{% if g.har_ma50 %}, og den tynne er {{ parametre.ma_vindu }}-dagers snitt (sjekk 1){% endif %}{% if g.har_indeks %}. Den stiplede er hovedindeksen {{ indeks_symbol }}, regnet om så den starter på aksjens kurs {{ g.indeksstart|dato }}{% elif indeks_feilet %}. Hovedindeksen kunne ikke leses{% else %}. Hovedindeksen mangler for perioden{% endif %}">
         {% for linje in g.rutenett %}

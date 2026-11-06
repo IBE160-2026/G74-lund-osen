@@ -1147,27 +1147,23 @@ def aksjedetalj(symbol: str):
     def pil(maaned: date) -> str:
         return adresse(post.aksje.symbol, maaned, dag=dag, periode=periode)
 
+    # Story 8.2c: den brede og den smale grafen av de samme valgene
+    # (gjennomgangen, BH6).
+    grafvalg = dict(
+        indeks=indeks,
+        merker=AKSEMERKER.get(valg.periode, MAANEDSNAVN),
+        merket=dagen.dato if dagen else None,
+    )
     svar = app.make_response(
         render_template(
             "aksje.html",
             # Story 8.2b, b (U2): siden hører til Markedsoversikt i stripa.
             aktiv="aksje",
             detalj=detalj,
-            graf=bygg_graf(
-                detalj.punkter,
-                indeks=indeks,
-                merker=AKSEMERKER.get(valg.periode, MAANEDSNAVN),
-                merket=dagen.dato if dagen else None,
-            ),
+            graf=bygg_graf(detalj.punkter, **grafvalg),
             # Story 8.2c: den samme grafen med egne mål, som stilarket viser
             # i stedet når figuren er smal.
-            graf_smal=bygg_graf(
-                detalj.punkter,
-                indeks=indeks,
-                merker=AKSEMERKER.get(valg.periode, MAANEDSNAVN),
-                merket=dagen.dato if dagen else None,
-                smal=True,
-            ),
+            graf_smal=bygg_graf(detalj.punkter, smal=True, **grafvalg),
             valg=valg,
             dagen=dagen,
             # Story 8.16b: merket øverst bare for en dag før siste børsdag.

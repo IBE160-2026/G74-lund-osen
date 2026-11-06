@@ -7,6 +7,7 @@ stor som den minste teksten ellers på siden. Testene i nettleseren bruker
 fremgangsmåten i test_hjelpefeltet.py: ingen server og ingenting fra nettet.
 """
 
+import os
 import re
 from pathlib import Path
 
@@ -19,10 +20,18 @@ STIL = (Path(__file__).resolve().parent.parent / "src" / "static" / "stil.css").
 
 
 @pytest.fixture
-def aksjesiden(klient, base):  # noqa: F811
-    svar = klient.get("/aksje/BRFE")
-    assert svar.status_code == 200
-    return svar.get_data(as_text=True)
+def side(klient, base):  # noqa: F811
+    def hent(adresse: str = "/aksje/BRFE") -> str:
+        svar = klient.get(adresse)
+        assert svar.status_code == 200, adresse
+        return svar.get_data(as_text=True)
+
+    return hent
+
+
+@pytest.fixture
+def aksjesiden(side):
+    return side()
 
 
 def _svg(html: str, klasse: str) -> str:
@@ -31,7 +40,7 @@ def _svg(html: str, klasse: str) -> str:
     return deler[1].split("</svg>", 1)[0]
 
 
-def test_den_smale_grafen_har_det_samme_som_den_brede(aksjesiden):
+def test_den_smale_grafen_har_det_samme_som_den_brede(aksjesiden, side):
     """Ville feilet hvis den smale grafen manglet en linje, et merke på
     aksen, rutenettet, punktet ved enden eller et navn på en linje, eller
     hvis den hadde de brede målene, så den ble skalert ned som før."""
@@ -48,6 +57,10 @@ def test_den_smale_grafen_har_det_samme_som_den_brede(aksjesiden):
         r'class="sistepunkt"',
     ):
         assert len(re.findall(teller, bred)) == len(re.findall(teller, smal)) > 0, teller
+    # Gjennomgangen (VG2): dagen som er merket, på en side med en valgt dag.
+    dagen = side("/aksje/BRFE?dag=2026-10-01")
+    for teller in (r'class="dagstrek"', r'class="dagpunkt"'):
+        assert len(re.findall(teller, _svg(dagen, "graf"))) == len(re.findall(teller, _svg(dagen, "graf smal"))) == 1
     navn = lambda svg: sorted(re.findall(r'<text class="linjenavn (\w+)"[^>]*>([^<]*)</text>', svg))  # noqa: E731
     assert navn(bred) == navn(smal) and len(navn(smal)) == 3
     etikett = re.compile(r'aria-label="([^"]*)"')
@@ -69,14 +82,18 @@ def test_navnene_staar_under_grafen_paa_smal_skjerm(aksjesiden):
 
 def test_stilarket_viser_den_smale_naar_figuren_er_smal():
     """Ville feilet hvis begge grafene ble vist, eller den smale aldri, eller
-    hvis grensen ikke var der teksten i den brede blir mindre enn 11,5 px."""
+    hvis grensen ikke var der teksten i den brede blir mindre enn 11,5 px.
+    Gjennomgangen (BH9): grensene regnes av målene i graf.py."""
+    from graf import BREDDE, SMAL_BREDDE
+
     figur = re.search(r":where\(\.side-aksje\) figure \{([^}]*)\}", STIL).group(1)
     assert "container-type: inline-size;" in figur
-    assert re.search(r":where\(\.side-aksje\) svg\.graf\.smal \{ display: none;", STIL)
-    blokk = STIL.split("@container (width < 690px) {", 1)[1].split("\n}", 1)[0]
+    smal = re.search(r":where\(\.side-aksje\) svg\.graf\.smal \{([^}]*)\}", STIL).group(1)
+    assert "display: none;" in smal and f"max-width: calc({SMAL_BREDDE}px * 4 / 3);" in smal
+    grense = round(BREDDE * 11.5 / 12)
+    blokk = STIL.split(f"@container (width < {grense}px) {{", 1)[1].split("\n}", 1)[0]
     assert "svg.graf:not(.smal) { display: none; }" in blokk
     assert "svg.graf.smal { display: block; }" in blokk
-    assert 12 * 690 / 720 == pytest.approx(11.5)
 
 
 MAAL = r"""
@@ -111,16 +128,34 @@ ferdig(r);
 """
 
 
-@pytest.mark.skipif(NETTLESER is None, reason="ingen Edge eller Chrome")
-@pytest.mark.parametrize("bredde", [1280, 390, 320])
-def test_teksten_i_grafen_i_nettleseren(aksjesiden, tmp_path, bredde):
+# Gjennomgangen (VG1): i CI feiler testen når nettleseren mangler, som i
+# test_hjelpefeltet.py, i stedet for å hoppes over uten at noen ser det.
+# Gjennomgangen (BH2, BH4, VG3): perioder med datoer og med annenhver måned,
+# og en annen dag, ved 390 og 320 px.
+@pytest.mark.skipif(NETTLESER is None and not os.environ.get("CI"), reason="ingen Edge eller Chrome")
+@pytest.mark.parametrize(
+    "adresse, bredde",
+    [("/aksje/BRFE", 1280)]
+    + [
+        (adresse, bredde)
+        for adresse in (
+            "/aksje/BRFE",
+            "/aksje/BRFE?periode=1-uke",
+            "/aksje/BRFE?periode=1-mnd",
+            "/aksje/BRFE?periode=1-aar",
+            "/aksje/BRFE?dag=2026-10-01",
+        )
+        for bredde in (390, 320)
+    ],
+)
+def test_teksten_i_grafen_i_nettleseren(side, tmp_path, adresse, bredde):
     """Kontrollpunktet: ved 390 px er teksten i grafen minst like stor som
     den minste teksten ellers på siden, uten vannrett rulling. Ville feilet
     hvis den brede grafen ble vist ved 390 px (om lag 5 px), hvis den smale
     ble vist ved 1280 px, eller hvis en tekst i grafen sto utenfor den eller
     oppå en annen. Ved 320 px er teksten mindre (10,4 px, i spesifikasjonen),
     så der sjekkes bare plassen."""
-    r = _kjoer(aksjesiden, tmp_path, bredde, MAAL)
+    r = _kjoer(side(adresse), tmp_path, bredde, MAAL)
     assert r["synlige"] == (["graf"] if bredde == 1280 else ["graf smal"]), r
     assert r["utenfor"] == [] and r["overlapp"] == [] and r["rulling"] is False, r
     if bredde == 390:

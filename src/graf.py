@@ -163,6 +163,9 @@ class Graf:
     hoeyrefelt: int = HOEYRE
     bunnfelt: int = BUNN
     forklaring: tuple[Forklaring, ...] = ()
+    # Gjennomgangen av 8.2c (BH7, ECH4): et eget felt, ikke utledet av feltet
+    # til hoeyre, saa klassen i malen ikke avhenger av maalene.
+    smal: bool = False
 
     # Story 8.2b, b (U41): kantene paa tegneflaten, som malen tegner
     # rutenettet og merkene etter.
@@ -181,10 +184,6 @@ class Graf:
     @property
     def bunn(self) -> float:
         return self.hoyde - self.bunnfelt
-
-    @property
-    def smal(self) -> bool:
-        return self.hoeyrefelt != HOEYRE
 
     @property
     def har_ma50(self) -> bool:
@@ -288,7 +287,9 @@ def _maanedsmerker(punkter: tuple[Punkt, ...], bredde: int, hoeyre: int = HOEYRE
     return tuple(merker)
 
 
-def _dagmerker(punkter: tuple[Punkt, ...], bredde: int, hvilke: str, hoeyre: int = HOEYRE) -> tuple[Maanedsmerke, ...]:
+def _dagmerker(
+    punkter: tuple[Punkt, ...], bredde: int, hvilke: str, hoeyre: int = HOEYRE, tynn: bool = True
+) -> tuple[Maanedsmerke, ...]:
     """Story 8.16: merkene for de korte periodene. DAGER gir et merke ved
     hver dag (1 uke), UKER ved foerste dag i hver uke serien har (1 mnd).
     Navnet er datoen, som «02.10» (designregler §4)."""
@@ -304,7 +305,7 @@ def _dagmerker(punkter: tuple[Punkt, ...], bredde: int, hvilke: str, hoeyre: int
         forrige_uke = uke
         x = _x(i, len(punkter), bredde, hoeyre)
         navn = f"{p.dato.day:02d}.{p.dato.month:02d}"
-        if forrige_navn is not None and x - forrige_navn < DATOBREDDE:
+        if tynn and forrige_navn is not None and x - forrige_navn < DATOBREDDE:
             navn = ""
         else:
             forrige_navn = x
@@ -313,14 +314,22 @@ def _dagmerker(punkter: tuple[Punkt, ...], bredde: int, hvilke: str, hoeyre: int
 
 
 def aksemerker(
-    punkter: tuple[Punkt, ...], bredde: int, hvilke: str = MAANEDSNAVN, hoeyre: int = HOEYRE
+    punkter: tuple[Punkt, ...],
+    bredde: int,
+    hvilke: str = MAANEDSNAVN,
+    hoeyre: int = HOEYRE,
+    tynn: bool = True,
 ) -> tuple[Maanedsmerke, ...]:
     """Merkene paa aksen etter perioden (story 8.16): dagene, ukene,
     maanedene, eller maanedene med navn paa annenhver for 1 aar og for alle
     perioder med flere enn MAKS_MAANEDSNAVN maaneder, som I aar fra september
-    (gjennomgangen, BH4)."""
+    (gjennomgangen, BH4).
+
+    Gjennomgangen av 8.2c (ECH1): tynn=False lar datoene staa, saa den smale
+    grafen tynner dem i _uten_overlapp fra hoeyre, og datoen naermest
+    dagen grafen slutter paa, ikke tas bort foerst."""
     if hvilke in (DAGER, UKER):
-        return _dagmerker(punkter, bredde, hvilke, hoeyre)
+        return _dagmerker(punkter, bredde, hvilke, hoeyre, tynn)
     merker = _maanedsmerker(punkter, bredde, hoeyre)
     if hvilke == ANNENHVER_MAANED or len(merker) > MAKS_MAANEDSNAVN:
         merker = tuple(m if i % 2 == 0 else Maanedsmerke(m.x, "", m.til_venstre) for i, m in enumerate(merker))
@@ -337,11 +346,15 @@ def navneplass(merke: Maanedsmerke) -> tuple[float, float]:
     return merke.x + 3, merke.x + 3 + lengde
 
 
-def _uten_overlapp(merker: tuple[Maanedsmerke, ...]) -> tuple[Maanedsmerke, ...]:
+def _uten_overlapp(merker: tuple[Maanedsmerke, ...], bredde: int) -> tuple[Maanedsmerke, ...]:
     """Story 8.2c: navnene paa aksen som ville kommet borti hverandre paa
     smal skjerm, mister navnet, men ikke streken. Det regnes fra hoeyre, saa
-    det siste navnet, naermest dagen grafen slutter paa, alltid staar."""
-    ut = list(merker)
+    det siste navnet, naermest dagen grafen slutter paa, alltid staar.
+
+    Gjennomgangen av 8.2c (BH1, ECH2): et navn som ville gaatt forbi hoeyre
+    kant, staar til venstre for streken. Grensen NAVNEBREDDE er for den
+    brede grafen og holder ikke for «september» paa den smale."""
+    ut = [Maanedsmerke(m.x, m.navn, m.x + 3 + len(m.navn) * TEGNBREDDE > bredde) if m.navn else m for m in merker]
     grense = None
     for i in range(len(ut) - 1, -1, -1):
         if not ut[i].navn:
@@ -420,7 +433,8 @@ def bygg_graf(
     er dagen som merkes, naar grafen har den.
 
     Story 8.2c: smal gir grafen paa smal skjerm, med SMAL_BREDDE og
-    SMAL_HOYDE, og navnene paa linjene i forklaringen under datoene."""
+    SMAL_HOYDE, og navnene paa linjene i forklaringen under datoene. Da
+    gjelder ikke bredde og hoyde (gjennomgangen, BH8, ECH3)."""
     if len(punkter) < 2:
         return None
 
@@ -436,7 +450,7 @@ def bygg_graf(
     if smal:
         kursnavn = snittnavn = indeksnavn = None
         forklaring = _forklaringen((("kurs", kurslinje), ("snitt", ma50linje), ("indeks", indekslinje)), hoyde)
-        aksen = _uten_overlapp(aksemerker(punkter, bredde, merker, hoeyre))
+        aksen = _uten_overlapp(aksemerker(punkter, bredde, merker, hoeyre, tynn=False), bredde)
     else:
         kursnavn, snittnavn, indeksnavn = _navnene((kurslinje, ma50linje, indekslinje), bredde, hoyde)
         forklaring = ()
@@ -472,4 +486,5 @@ def bygg_graf(
         hoeyrefelt=hoeyre,
         bunnfelt=bunn,
         forklaring=forklaring,
+        smal=smal,
     )
