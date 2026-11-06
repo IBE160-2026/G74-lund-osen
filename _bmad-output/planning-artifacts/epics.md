@@ -3215,6 +3215,16 @@ så KI-teksten bruker abonnementet jeg har.
 
 **Avhenger av:** 10.7. **Én økt:** avgjøres i planen.
 
+### Story 10.9: KI-teksten forklarer det siden viser
+
+*Lagt til 2026-11-07 kl. 00:06, etter gruppens svar 06.11 kl. 20:35 og 20:38.* Svarene og rådets anbefaling er ført etter instruksjonen kl. 00:04 i `docs/ai-prompts/2026-11-07.md` og instruksjonen kl. 21:47 i `docs/ai-prompts/2026-11-06.md`; de står ikke andre steder i repoet. Storyen har foreløpig bare dette, og resten skrives med spesifikasjonen.
+
+*Avgjort 2026-11-06 kl. 20:35 (gruppens svar):* KI-teksten forklarer hver sjekk med vanlige ord, og setningen om dagene får datoen signalet skiftet.
+
+*Avgjort 2026-11-06 kl. 20:38 (gruppens svar):* i tillegg mønstre som appen regner ut, bare om det som har skjedd, og som modellen forklarer. Rådet anbefalte å vente med mønstrene. Modellen finner aldri mønstre selv: en liten modell med få tall ser mønstre som ikke finnes, og kontrollen kan ikke sjekke dem; og et mønster leses som et varsel, nær en anbefaling.
+
+**Målet:** aksjesiden forstås på første lesning, målt med del B i brukertesten (`docs/brukertest.md`).
+
 ---
 
 ## Epic 6: Børsmeldinger i oversikten 🔒
