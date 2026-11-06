@@ -347,3 +347,93 @@ class TestDatoeneEtterGjennomgangen:
         assert len(navngitt) >= 4
         assert all(b - a >= DATOBREDDE for a, b in zip(navngitt, navngitt[1:]))
         assert len(merker) > len(navngitt)
+
+
+class TestSmalSkjerm:
+    """Story 8.2c: kursgrafen har egne maal paa smal skjerm, saa teksten i den
+    ikke skaleres ned til om lag 5 px ved 390 px."""
+
+    @staticmethod
+    def _par(merker=None, merket=None, indeks=True):
+        from perioder import MAANEDSNAVN
+
+        ps = boersdagspunkter(date(2026, 1, 2), date(2026, 10, 30))
+        ps = tuple(Punkt(p.dato, p.kurs, p.kurs - 1 if i > 3 else None) for i, p in enumerate(ps))
+        indekser = {p.dato: 1000.0 + i for i, p in enumerate(ps)} if indeks else None
+        valg = dict(indeks=indekser, merker=merker or MAANEDSNAVN, merket=merket)
+        return bygg_graf(ps, **valg), bygg_graf(ps, smal=True, **valg)
+
+    def test_egne_maal_og_ingen_linje_i_feltene(self):
+        """Ville feilet hvis den smale grafen hadde de brede maalene, saa den
+        ble skalert ned med vinduet, eller hvis en linje gikk inn i feltet
+        til hoeyre eller i forklaringen nederst."""
+        from graf import FORKLARING, SMAL_BREDDE, SMAL_HOEYRE, SMAL_HOYDE
+
+        _, smal = self._par()
+        assert (smal.bredde, smal.hoyde) == (SMAL_BREDDE, SMAL_HOYDE) and smal.smal
+        assert smal.hoeyre == SMAL_BREDDE - SMAL_HOEYRE and smal.bunn == SMAL_HOYDE - BUNN - FORKLARING
+        for linje in (smal.kurslinje, smal.ma50linje, smal.indekslinje):
+            for x, y in koordinater(linje):
+                assert VENSTRE <= x <= smal.hoeyre and MARG_Y <= y <= smal.bunn
+        assert all(MARG_Y <= r.y <= smal.bunn for r in smal.rutenett)
+
+    def test_samme_data_linjer_og_merker_som_den_brede(self):
+        """Ville feilet hvis den smale grafen hadde faerre punkter, en linje
+        mindre, en annen skala, et annet rutenett eller faerre streker paa
+        aksen enn den brede."""
+        from perioder import DAGER, UKER
+
+        for merker in (None, UKER, DAGER):
+            bred, smal = self._par(merker=merker)
+            for a, b in ((bred.kurslinje, smal.kurslinje), (bred.ma50linje, smal.ma50linje)):
+                assert len(koordinater(a)) == len(koordinater(b)) > 0
+            assert len(koordinater(bred.indekslinje)) == len(koordinater(smal.indekslinje)) > 0
+            assert (bred.lav, bred.hoy) == (smal.lav, smal.hoy)
+            assert [r.verdi for r in bred.rutenett] == [r.verdi for r in smal.rutenett]
+            assert len(bred.maanedsmerker) == len(smal.maanedsmerker)
+            assert bool(bred.siste) == bool(smal.siste)
+
+    def test_den_merkede_dagen_er_med(self):
+        """Ville feilet hvis dagen som er merket, manglet paa smal skjerm."""
+        bred, smal = self._par(merket=date(2026, 6, 1))
+        assert bred.merket and smal.merket
+        assert VENSTRE <= smal.merket.x <= smal.hoeyre
+
+    def test_navnene_paa_linjene_staar_i_forklaringen(self):
+        """Ville feilet hvis navnene sto i feltet til hoeyre, som paa smal
+        skjerm ville tatt over halve flaten, eller hvis en linje manglet navn,
+        eller fikk navn uten aa vaere tegnet."""
+        from graf import FORKLARINGSLINJE
+
+        bred, smal = self._par()
+        assert bred.forklaring == () and bred.kursnavn and not bred.smal
+        assert smal.kursnavn is None and smal.snittnavn is None and smal.indeksnavn is None
+        assert [f.klasse for f in smal.forklaring] == ["kurs", "snitt", "indeks"]
+        ys = [f.y for f in smal.forklaring]
+        assert ys[0] > smal.bunn + 16 and ys[-1] <= smal.hoyde - 4
+        assert all(b - a == FORKLARINGSLINJE for a, b in zip(ys, ys[1:]))
+        _, uten_indeks = self._par(indeks=False)
+        assert [f.klasse for f in uten_indeks.forklaring] == ["kurs", "snitt"]
+
+    @pytest.mark.parametrize("periode", ["1-uke", "1-mnd", "3-mnd", "6-mnd", "i-aar", "1-aar"])
+    def test_navnene_paa_aksen_kommer_ikke_borti_hverandre(self, periode):
+        """Ville feilet hvis to navn paa aksen overlappet paa den smale
+        flaten, hvis et navn gikk utenfor grafen, eller hvis det siste navnet,
+        naermest dagen grafen slutter paa, var tatt bort."""
+        from graf import NAVNELUFT, SMAL_BREDDE, SMAL_HOEYRE, aksemerker, navneplass
+        from perioder import AKSEMERKER, MAANEDER, MAANEDSNAVN
+
+        slutt = date(2026, 10, 30)
+        start = max(
+            date(2026, 1, 2),
+            slutt - timedelta(days={"1-uke": 7, "i-aar": 400}.get(periode, 31 * MAANEDER.get(periode, 12))),
+        )
+        ps = boersdagspunkter(start, slutt)
+        hvilke = AKSEMERKER.get(periode, MAANEDSNAVN)
+        merker = bygg_graf(ps, merker=hvilke, smal=True).maanedsmerker
+        navngitt = [m for m in merker if m.navn]
+        foer = [m for m in aksemerker(ps, SMAL_BREDDE, hvilke, SMAL_HOEYRE) if m.navn]
+        assert len(navngitt) >= 2 and navngitt[-1] == foer[-1]
+        plass = [navneplass(m) for m in navngitt]
+        assert all(0 <= fra and til <= SMAL_BREDDE for fra, til in plass)
+        assert all(a[1] + NAVNELUFT <= b[0] for a, b in zip(plass, plass[1:]))

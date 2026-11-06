@@ -1480,7 +1480,8 @@ HOEYDE_PAA_AKSJESIDEN = 2261
 # hjelpen i hjelpetekster.py. Bildet ble tatt paa nytt og er byte for byte det samme.
 # Gjennomgangen av svarene 6.11 kl. 11:15 (BH2): hjelpetekster.py. Bildet ble tatt
 # paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "c71d05a391103d0182415c188117290a402484d103e96fe4af986aac1217d28d"
+# Story 8.2c: graf.py, den smale grafen. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "feae436223391f372bba0591c0252dc86f0358bfc0697242f0de99c71ae3ad6c"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1540,12 +1541,14 @@ DE_NYE_BILDENE = {
 # tatt paa nytt og er byte for byte de samme, ogsaa ved 390 px.
 # Gjennomgangen av svarene 6.11 kl. 11:15 (BH2): hjelpetekster.py. Alle bildene ble
 # tatt paa nytt og er byte for byte de samme, ogsaa ved 390 px.
+# Story 8.2c: graf.py, den smale grafen. Bildene av børsometeret og Min liste ble tatt
+# paa nytt og er byte for byte de samme, ogsaa ved 390 px.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
     TOPPEN_AV_OVERSIKTEN: "a8ed73178842e0f6371daa7dcd6e8fd0dd18c3866fe98a9841cbc45195d64560",
-    "docs/appen/boersometeret-demo.png": "059d28a3103be52f2e631a77ba5f9a3162df782be14e234728fc39cb2b1c2e51",
-    "docs/appen/min-liste-demo.png": "3e863627d988753b9fc63572393aec71f960f19084a05369822b7ace87470ee7",
+    "docs/appen/boersometeret-demo.png": "ae2cb0d1c431862ce9329d338d57483eba80ce518761a561834f76b0c4041b3b",
+    "docs/appen/min-liste-demo.png": "6f8c17eec320b0b8ec2cb7b7c36a9f215850a86891776ddc3a001542701dee40",
     "docs/appen/oversikten-390-demo.png": "a8ed73178842e0f6371daa7dcd6e8fd0dd18c3866fe98a9841cbc45195d64560",
-    "docs/appen/boersometeret-390-demo.png": "059d28a3103be52f2e631a77ba5f9a3162df782be14e234728fc39cb2b1c2e51",
+    "docs/appen/boersometeret-390-demo.png": "ae2cb0d1c431862ce9329d338d57483eba80ce518761a561834f76b0c4041b3b",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
