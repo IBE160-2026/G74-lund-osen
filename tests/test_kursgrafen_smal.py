@@ -140,6 +140,8 @@ ferdig(r);
         (adresse, bredde)
         for adresse in (
             "/aksje/BRFE",
+            # Siste børsdag, med dagen merket i grafen.
+            "/aksje/BRFE?periode=siste",
             "/aksje/BRFE?periode=1-uke",
             "/aksje/BRFE?periode=1-mnd",
             "/aksje/BRFE?periode=1-aar",
