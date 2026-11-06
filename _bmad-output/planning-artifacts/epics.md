@@ -3671,6 +3671,8 @@ ikke bare er en strek der.
 
 **Avhenger av:** 8.2b. **Én økt:** ja.
 
+*Avgjort 2026-11-06 kl. 15:08 (gruppens svar):* 8.2c bygges nå på egen gren og flettes før kl. 21:20 hvis alt er grønt og ingen funn på middels eller over står åpne.
+
 ### Story 8.3: Min liste: eget skjermbilde med stjerne og filter
 
 *Lagt til 2026-09-30, Marians beslutning.*
