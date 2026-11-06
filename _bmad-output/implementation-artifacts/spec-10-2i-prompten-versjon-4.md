@@ -254,3 +254,5 @@ Gjennomgang 06.11 etter hele settet for svar 2, av diffen `7f579d0b..911103ef`, 
 Spørsmål til gruppen:
 
 1. **BH4 (middels, følger av svaret kl. 09:55, 2 og svar 1 kl. 11:15):** bransjen og antallene regnes mot forrige rad, som i børsometeret og tabellen. En aksje i bransjen med hull teller da som en endring «samme dag», selv om endringen er over flere børsdager. Skal bare aksjer med forrige rad på forrige børsdag telle i snittet for bransjen (og i antallene), eller står det som i børsometeret?
+
+*Lagt til 2026-11-06 kl. 12:19:* BH4 er lukket med gruppens svar kl. 12:16 (under story 10.4 i `epics.md`, `4d1ae5e1`): bransjen og antallene i appens setning regnes mot forrige rad, som tabellen og børsometeret, også når en aksje har hull og endringen dens går over flere børsdager. Setningen viser de samme tallene som resten av siden, og den eneste sammenligningen, ordlyden om hovedindeksen, gis bare uten hull (svaret kl. 11:15). Koden og testene er ikke endret. Ingen funn på middels eller over står åpne.
