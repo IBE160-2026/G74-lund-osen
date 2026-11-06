@@ -209,3 +209,48 @@ Spørsmål til gruppen:
 
 1. **BH1, ECH1, BH2 (middels, følger av svaret):** en bransje med minst to aksjer i lista, der bare én har en endring den dagen, får «bransjen i snitt» av den ene. Er det aksjen selv, sier setningen bare hva aksjen gjorde. Skal bransjen også kreve minst to aksjer med endring den dagen, eller står det som i børsometeret?
 2. **BH3, ECH2, VG2 (middels, følger av svar 1):** på en dag med hull er aksjen regnet over flere børsdager og hovedindeksen over én, og ordlyden sier likevel «samme vei» eller «motsatt vei». Skal ordlyden bare gis når aksjens forrige rad er forrige børsdag, eller står den?
+
+## Svarene 6.11 kl. 11:15 (instruksjonen kl. 11:17)
+
+**Beslutningen** (under story 10.4 i `epics.md`, `86585356`): på de to spørsmålene over: 1) delen om bransjen i appens setning står bare når minst to aksjer i bransjen har en endring den dagen (BH1/ECH1/BH2); 2) aksjen regnes fortsatt som i tabellen, men ordlyden om hovedindeksen gis bare når aksjens forrige rad er forrige børsdag, så teksten aldri sammenligner to ulike perioder (BH3/ECH2/VG2).
+
+Main ble flettet inn i grenen i `7f579d0b`.
+
+**Svar 1** (`b5e0fb05`): `lag_dagsbilde` teller `MINST_I_BRANSJEN` (2) på aksjene i bransjen som har en endring den dagen, ikke på aksjene i lista. Snittet er som før. `test_bransjen_med_to_naar_bare_den_ene_har_kurs` er erstattet av `test_bransje_med_to_der_bare_den_ene_har_endring` og `test_bransjen_med_to_med_endring_er_snittet_i_boersometeret`, og siden har `test_uten_bransjen_naar_bare_aksjen_har_endring`. Testene på siden som venter bransjen, har AKRBP i Energi ved siden av EQNR. I demoen får ingen aksjedag en annen setning (0 av 2 925, regnet med `lag_dagsbilde` før og etter). README-en og `docs/hjelp.md` sier at bransjen bare står når minst to aksjer i bransjen har en endring den dagen. Mutant 1 (grensen talt på aksjene i lista igjen) kl. 11:36:18 ble fanget av `test_bransje_med_to_der_bare_den_ene_har_endring` og `test_uten_bransjen_naar_bare_aksjen_har_endring`.
+
+**Svar 2** (`911103ef`): `Dagsbilde.samme_periode` sier om aksjen har rad på dagen og forrige rad er forrige børsdag (`forrige_boersdag` i `hovedindeks.py`, den dagen `indeksendring` regner mot). `ki_grunnlag` tar med hovedindeksen bare når den er sann, så prompten gir ingen ordlyd ellers. Feltet er False som standard. Aksjen regnes fortsatt som i tabellen, og appens setning om samme dag og prompten er uendret. I demoen har ingen aksje med retning et hull: de 359 aksjedagene der `samme_periode` er usann og hovedindeksen er regnet, er MTFJ (uten kurser) og VRDS (nylig notert), uten retning på aksjen. Grunnlaget for de 13 demotekstene er altså det samme, så tekstene er ikke laget på nytt med Gemma, og ingen ny prøvekjøring er gjort, fordi alle 15 fikk ordlyd i §55. README-en, `docs/hjelp.md` og hjelpen «Kort fortalt» sier at hovedindeksen og setningen bare kommer med når aksjens forrige kurs er fra forrige børsdag. Testene er `test_ingen_ordlyd_paa_en_dag_med_hull` (retningen som i tabellen, ingen ordlyd, og ordlyden uten hull) og `test_samme_periode_bare_med_rad_paa_dagen_og_forrige_boersdag`. Mutant 2 (sjekken av `samme_periode` tatt ut av `ki_grunnlag`) kl. 11:51:47 ble fanget av `test_ingen_ordlyd_paa_en_dag_med_hull`.
+
+**Bildene** ble tatt på nytt fra demoen etter hver commit, fordi avtrykkene dekker `dagene.py` og `hjelpetekster.py`: alle sju (oversikten, toppen av oversikten, aksjesiden, børsometeret, Min liste og de to ved 390 px) er byte for byte de samme, så ingen PNG er endret. Bare avtrykkene er satt på nytt.
+
+**Mutantene** ble kjørt med kopi før og fila lik HEAD etter (sha256 uten CR): 1 på `b5e0fb05` og 2 på `911103ef`.
+
+**Hele settet**, alene og uten Ollama, før hver commit med kode eller tester: 4220 (svar 1), 4222 (svar 2) og 4221 (rettingene) bestått, 24 hoppet over hver gang, og bare porttester for `start.ps1` som feilet (6, 6 og 7).
+
+### Gjennomgangen av svarene kl. 11:15
+
+Gjennomgang 06.11 etter hele settet for svar 2, av diffen `7f579d0b..911103ef`, med Blind Hunter (BH, 14 funn), Edge Case Hunter (ECH, 0) og Verification Gap (VG, 2). Triagen følger regel 25. Rettet i `e6b6d294`.
+
+| # | Funn | Grad | Rute |
+|---|---|---|---|
+| BH4 | Snittet for bransjen og antallene regnes mot forrige rad, så en aksje i bransjen med hull teller som endring «samme dag», over flere børsdager. Det er den samme blandingen av perioder som svar 2 tar bort for hovedindeksen | middels | **åpent, spørsmål til gruppen:** følger av svaret kl. 09:55, 2 («snittet er det samme som i børsometeret») og svar 1 kl. 11:15, så graden settes ikke ned (regel 25) |
+| BH1 | `_samme_periode` fanger ikke `UtenforKalenderen` | middels | **avvist:** `forrige_boersdag` i `hovedindeks.py` fanger den selv og gir None, og None er aldri lik en dato. ECH og VG kom til det samme |
+| BH2 | Hjelpen sa at modellen fikk hovedindeksen «når det kan regnes», og la vilkåret bare på setningen | middels | **rettet** i `docs/hjelp.md` og `hjelpetekster.py`. README-en sa det riktig |
+| BH3 | Grunnlaget endres uten ny promptversjon | middels | **avvist:** versjon 4 er ikke flettet, main har `PROMPTVERSJON = "3"`, og jobben kjører fra main, så ingen tekst i `ose.db` har versjon 4 |
+| BH9 | Testen sjekket ikke rammen rundt ordlyden | lav | **rettet:** `ORDLYDEN.split("{")[0]` står ikke i prompten |
+| BH11 | Om AKRBP har kurs på dagen, hang på lengden 61 eller 60 | lav | **rettet:** testene sjekker datoen |
+| VG1 | Ingen test med rader etter dagen som regnes | lav | **rettet:** to tilfeller i `test_samme_periode_bare_med_rad_paa_dagen_og_forrige_boersdag` |
+| VG2 | Ingen test gjennom `lag_ki_tekster` på en dag med hull | lav | **står:** `ki_tekst.py` kaller `lag_dagsbilde` og `ki_grunnlag` med de samme argumentene som enhetstestene |
+| BH5 | To funksjoner for forrige børsdag i `dagene.py` | lav | **står:** docstringen sier at det er den `indeksendring` regner mot, og navnet skiller dem |
+| BH6 | `samme_periode` er False som standard | lav | **står:** valgt, så ingen ordlyd gis uten at perioden er sjekket. I `src/` lages `Dagsbilde` bare av `lag_dagsbilde` |
+| BH7 | Hull i hovedindeksen | lav | **avvist:** `indeksendring` gir None uten rad på forrige børsdag, og da har grunnlaget ikke feltet |
+| BH8 | Seriene antas sortert | lav | **står:** lageret leser med `ORDER BY dato`, som `_endringen` alt forutsetter |
+| BH10 | Ingen test for helligdag eller første dag i kalenderen | lav | **står:** kalenderen har egne tester, og utenfor kalenderen gir None (BH1) |
+| BH12 | En aksje uten kurs på dagen kan få bransjen av to andre | lav | **står:** setningen står bare med en vurdering for dagen, og den krever kurs på dagen |
+| BH13 | At demoen er uendret, står bare i kommentarene | lav | **står:** regnet før og etter med `lag_dagsbilde`, ført her, og `test_demo_ki.py` regner grunnlaget for demoradene på nytt |
+| BH14 | Hjelpen er ankret til hele kodelinjer | lav | **står:** slik er ankrene i `hjelpetekster.py` ellers |
+
+### Åpent etter svarene kl. 11:15
+
+Spørsmål til gruppen:
+
+1. **BH4 (middels, følger av svaret kl. 09:55, 2 og svar 1 kl. 11:15):** bransjen og antallene regnes mot forrige rad, som i børsometeret og tabellen. En aksje i bransjen med hull teller da som en endring «samme dag», selv om endringen er over flere børsdager. Skal bare aksjer med forrige rad på forrige børsdag telle i snittet for bransjen (og i antallene), eller står det som i børsometeret?
