@@ -2,7 +2,7 @@
 title: 'Story 10.2, 10.2i: promptversjon 4, teksten sier hvordan dagen var rundt aksjen'
 type: 'feature'
 created: '2026-11-05'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 1
 baseline_commit: '72250544'

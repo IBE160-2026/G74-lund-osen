@@ -3029,6 +3029,8 @@ uten KI. 5B.4 måler KI-tillegget. Blandes de, vet ingen hva som ble målt.
 
 *Avgjort 2026-11-06 kl. 12:16 (gruppens svar):* på BH4 i PR #113: bransjen og antallene i appens setning regnes mot forrige rad, som tabellen og børsometeret, også når en aksje har hull og endringen dens går over flere børsdager. Setningen viser de samme tallene som resten av siden, og den eneste sammenligningen, ordlyden om hovedindeksen, gis bare uten hull (svaret kl. 11:15).
 
+*Ferdig 2026-11-06:* squash-flettet kl. 12:57 i `374f1bdb`, PR #113, låst til head-en `400646fb` (spesifikasjonen `spec-10-2i-prompten-versjon-4.md`). Promptversjon 4: appen skriver setningen om hva hovedindeksen, bransjen og antallene gjorde samme dag, og modellen gir bare den faste ordlyden om aksjen gikk samme vei som hovedindeksen, når aksjens forrige rad er forrige børsdag. CI var grønn på head-en (42209406759) og på flettecommiten (42214053328). Hele settet før de siste commitene med kode og tester (Utført-linja kl. 11:17): 4220, 4222 og 4221 bestått, 24 hoppet over, og bare 6, 6 og 7 porttester for `start.ps1` som feilet. Jobben tar main fra midnatt, så den bruker versjon 4 fra kjøringen lørdag 07.11 kl. 22:15. Tellingen i 10.4 gjentas etter noen dager med versjon 4 i driften.
+
 ### Story 10.5: Lenke til selskapets side på NewsWeb
 
 *Lagt til 2026-09-28, med plan B.*
