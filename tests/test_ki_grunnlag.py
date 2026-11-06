@@ -505,8 +505,9 @@ class TestDagsbildet:
         grunnlag = ki_grunnlag(_v("Positiv", 1), utenfor_maalingen=False, dagen=bildet)
         assert grunnlag["aksjen"] == STEG and "hovedindeksen" not in grunnlag
         prompt = lag_prompt(grunnlag)
-        assert not prompt.endswith(ORDLYDEN.format(ordlyd=SAMME_VEI)) and SAMME_VEI not in prompt
-        assert MOTSATT_VEI not in prompt
+        # Gjennomgangen (BH9): heller ikke rammen rundt ordlyden.
+        assert ORDLYDEN.split("{")[0] not in prompt
+        assert SAMME_VEI not in prompt and MOTSATT_VEI not in prompt
         assert "steg hovedindeksen" in setning_om_samme_dag(bildet)
         # Uten hull: den samme retningen gir ordlyden.
         uten_hull = self._bildet({"EQNR": _kurser(100.0, 101.0)}, indeks)
@@ -527,6 +528,16 @@ class TestDagsbildet:
             self.LISTA[0], UKA[1], _v("Positiv", 1), {}, self.LISTA, {"EQNR": _kurser(100.0, 101.0, siste=UKA[1])}, None
         )
         assert helg.samme_periode is True
+        # Gjennomgangen (VG1): basen kan ha rader etter dagen som regnes.
+        etter = {"EQNR": _kurser(100.0, 101.0, 102.0)}
+        torsdag = lag_dagsbilde(self.LISTA[0], UKA[-2], _v("Positiv", 1), {}, self.LISTA, etter, None)
+        assert torsdag.samme_periode is True
+        hull_foer = [
+            Kursrad(dato=d, slutt=k, justert_slutt=k, volum=0) for d, k in ((UKA[-4], 100.0), (UKA[-2], 101.0))
+        ]
+        hull_foer.append(Kursrad(dato=FREDAG, slutt=102.0, justert_slutt=102.0, volum=0))
+        torsdag = lag_dagsbilde(self.LISTA[0], UKA[-2], _v("Positiv", 1), {}, self.LISTA, {"EQNR": hull_foer}, None)
+        assert torsdag.samme_periode is False
 
     def test_bransje_med_en_aksje_i_lista(self):
         """Gruppens svar 6.11 kl. 09:55, 2 (ECH6, BH11): bransjen staar bare

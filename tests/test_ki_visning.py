@@ -770,7 +770,10 @@ class TestSetningenOmSammeDag:
         """Svaret 6.11 kl. 11:15, 1: bransjen staar bare naar minst to aksjer
         i bransjen har en endring, saa AKRBP, ogsaa i Energi, har den samme
         kursen hver dag som EQNR."""
-        skriv_serie("AKRBP", serie([200.0] * 61), datetime.fromisoformat(HENTET), vurdert=False)
+        rader = serie([200.0] * 61)
+        # Gjennomgangen (BH11): AKRBP har kurs den samme dagen som EQNR i aksje.
+        assert rader[-1].dato == serie([100.0] * 61)[-1].dato
+        skriv_serie("AKRBP", rader, datetime.fromisoformat(HENTET), vurdert=False)
 
     @staticmethod
     def _bildet(hovedindeksen="steg", bransjen="falt", steg=9, falt=5):
@@ -927,6 +930,8 @@ class TestSetningenOmSammeDag:
         hvis siden skrev «bransjen ... i snitt» av EQNR alene. EQNR var
         uendret, og basen har ingen indeks, saa uten bransjen er det ingen
         setning; med AKRBP paa dagen staar den (testen over)."""
-        skriv_serie("AKRBP", serie([200.0] * 60), datetime.fromisoformat(HENTET), vurdert=False)
+        rader = serie([200.0] * 60)
+        assert rader[-1].dato < aksje
+        skriv_serie("AKRBP", rader, datetime.fromisoformat(HENTET), vurdert=False)
         html = side(klient)
         assert '<p class="dagene">' in html and 'class="samme-dag"' not in html
