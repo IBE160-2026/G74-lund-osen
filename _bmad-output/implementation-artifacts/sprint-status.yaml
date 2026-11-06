@@ -101,6 +101,7 @@ development_status:
   3-3e-bildet-uv-og-variablene: done
   3-4-demoversjonen: review
   3-4b-ki-tekstene-i-demoen: done
+  3-4h-investorsidene-i-demoen: backlog
   # Lagt til 2026-11-03 (gjennomgangen av PRD-en 02.11, spørsmål 11): status fra epics.md og git log.
   # 3-5a afbc0af9 (#92), 3-5d 5e01a4f5 (#94), 3-5e dbfa0b97 (#100), 3-5f 8cd20b3d (#101),
   # 3-5g 27ccf827 (#103) og 3-5h a3e60577 (#107) er flettet.

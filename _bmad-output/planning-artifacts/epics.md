@@ -2466,6 +2466,33 @@ FR-604, FR-605, `AD-8`, `AD-9`
 
 *Lagt til 2026-10-18 kl. 20:55:* KI-tekstene i demoen er flettet i `ab81d3f`, PR #69 (spesifikasjonen `spec-3-4b-ki-tekstene-i-demoen.md`). 13 rader for siste demodag, laget én gang med `gemma4:e4b`, og alle besto kontrollen. Ordlista gjelder ikke KI-teksten før prompten versjon 3 (gruppens svar kl. 20:08). CI var grønn på head-en `8d632b0` (kjøring 39156153956) og på main (39156267219).
 
+### Story 3.4h: Investorsidene i demoen
+
+*Lagt til 2026-11-06 kl. 23:54, etter svarene 24.10 under story 3.4.* Navnet 3.4h er fra instruksjonen 24.10 kl. 15:30 i `docs/ai-prompts/2026-10-24.md` og `docs/bilder/investorsider/LESMEG.md`, men storyen sto ikke her eller i `sprint-status.yaml` før nå.
+
+Som **faglærer eller sensor**, vil jeg kunne følge lenken til investorsiden i demoen til en side for det oppdiktede selskapet, så jeg ser hva lenken gjør uten at den går til et selskap som ikke finnes.
+
+**Oppfyller:** FR-411 for lenken til investorsiden (10.5) · **Begrenses av:** NFR-06
+
+Oppsettet, de 15 tegningene, skriftene og plassen til snakkeboblene står i `docs/bilder/investorsider/LESMEG.md`. Kontrollpunktene settes i spesifikasjonen.
+
+**Bygger på svarene 24.10 under story 3.4** (ført der i `408c15e` og `2025f2e`):
+- *Avgjort 2026-10-24 kl. 11:48 (gruppens svar):* alle lenker ut av appen åpnes i en ny fane.
+- *Avgjort 2026-10-24 kl. 11:58 (gruppens svar):* i demoen går knappen til investorsiden til en egen side i appen, med en logo med tekst i en sirkel og en tegning laget av KI, fordi selskapene er oppdiktet. I den ekte versjonen går den til selskapets egen side.
+- *Avgjort 2026-10-24 kl. 12:01 (gruppens svar):* både logoen og tegningen, med litt nerdehumor om navnet eller bransjen, ikke grov.
+- *Avgjort 2026-10-24 kl. 12:37 (gruppens svar):* bransjesymbolet fra appen står i logoen, og navnene har ulike skrifter.
+- *Avgjort 2026-10-24 kl. 12:39 (gruppens svar):* tegneserieaktig strek, men ikke for mye.
+- *Avgjort 2026-10-24 kl. 12:51 (gruppens svar):* ikke vannmerke.
+- *Avgjort 2026-10-24 kl. 13:02 (gruppens svar):* «Illustrasjon laget av KI» rett under tegningen, snakkeboblen nær den som snakker, tegningen på samme sted på alle sidene, ingen tekst som overlapper, og en lenke tilbake til aksjesiden øverst.
+- *Avgjort 2026-10-24 kl. 13:03 (gruppens svar):* navnene skrives aldri med små bokstaver.
+- *Godkjent 2026-10-24 kl. 13:43 (gruppens svar):* de 15 tegningene i `docs/bilder/investorsider/`.
+- *Avgjort 2026-10-24 kl. 15:21 (gruppens svar):* på aksjesiden er lenken til investorsiden et kort, «Mer om ‹navn›», med den samme logoen i 64 px og grå ring, fordi gul betyr «skilte seg ut». Logoen står ikke i lista på forsiden.
+- *Rettet 2026-10-24:* kanten for dem som skilte seg ut er oransje, ikke gul, som linja kl. 15:21 sier: sterk oransje (`--oransje`, #F2B53A) ved 3 av 3 og lys oransje (`--lys-oransje`, #F8DE9C) ved 2 av 3. Den grå ringen står: ringen i logoen har samme farge som kanten ved 3 av 3, og gult (`--gul-symbol`) betyr 3 av 3.
+
+**Avhenger av:** 3.4 og 10.5.
+
+*Avgjort 2026-11-06 kl. 23:51 (gruppens svar):* investorsidene med tegningene bygges i demoen, og lenken til investorsiden nederst på aksjesiden går dit i demoen, i samme fane og uten pil.
+
 ---
 
 ### Story 3.5: Start med dobbeltklikk
