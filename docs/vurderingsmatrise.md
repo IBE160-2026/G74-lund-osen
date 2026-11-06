@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-11-06T20:14
+updated: 2026-11-07T00:26
 ---
 
 # Vurderingsmatrise for del 1
@@ -35,6 +35,8 @@ Tallene er talt 06.11 kl. 20:13 på `c2c77cb7`, slik de ble talt 05.11: 111 flet
 | **Kodekvalitet og arkitektur** (10 %) | Som 05.11 | Som 05.11 | oppfylt | Gjennomgangen med tre linser og mutantene fortsetter for hver story |
 | **README og kjørbarhet** (10 %) | Som 05.11 | Som 05.11 | delvis | README-prøven på en ren maskin er ikke tatt, og story 3.4 står i review til den er tatt |
 | **Ryddighet i repoet** (5 %) | Som 05.11 | Som 05.11 | oppfylt | Holdes ved like med regel 19 |
+
+*Presisert 2026-11-07 (instruksjonen kl. 00:20 i `docs/ai-prompts/2026-11-07.md`):* kjøringen lørdag 07.11 kl. 22:15 bruker main fra midnatt, med promptversjon 4, men lager ingen KI-tekster. Lørdag er børsdagen den skal hente 06.11 (`innevaerende_boersdag` i `src/boersdag.py`), og loggen for kveldsjobben 06.11 viser at sjekken ga FERDIG for 06.11 kl. 22:45, 23:15 og 23:45. Da gir `src/dagen_ferdig.py` kode 0 med FERDIG, og jobben starter verken Docker eller Ollama og setter `OSE_KI_TJENESTE` til `av` (`start/kveldshenting.ps1`). Det samme gjelder søndag 08.11. Tekstene for 06.11 ble laget med versjon 3, fordi jobben 06.11 sto på `894b55e5`, der `PROMPTVERSJON` er «3», før PR #113 (`374f1bdb`). De første tekstene med versjon 4 kommer dermed mandag 09.11, den neste børsdagen, når main fortsatt har versjon 4 ved midnatt og Docker og Ollama svarer.
 
 ## Status 05.11.2026
 

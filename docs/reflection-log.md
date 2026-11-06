@@ -3258,6 +3258,8 @@ Det vi lærte: å velge samme regning som resten av siden lukket rundene, mens h
 
 *Lagt til 2026-11-07, fra loggen for kveldsjobben 06.11 (`data/logg/kveldshenting-2026-11-06.log`):* fire kjøringer. Kl. 22:15 (start 22:15:02, og på nytt 22:15:04 fordi skriptet ble endret av utsjekken): sjekken av dagen ga ikke FERDIG, men kode 1, Docker og Ollama ble startet og stoppet igjen, og hentingen avsluttet med kode 0. Kl. 22:45, 23:15 og 23:45 (start 22:45:03, 23:15:03 og 23:45:03): sjekken ga FERDIG, Docker og Ollama ble hoppet over, og hentingen avsluttet med kode 0. Loggen har ingen egen linje for sluttkoden. Skriptet avslutter med koden fra hentingen (`exit $kode` i `start/kveldshenting.ps1`) når det ikke har skrevet en FEIL-linje, og loggen har ingen, så sluttkoden var 0 i alle fire. Oppgaveplanleggeren viser 0 for den siste, kl. 23:45 (`LastTaskResult`).
 
+*Presisert 2026-11-07 (instruksjonen kl. 00:20 i `docs/ai-prompts/2026-11-07.md`):* kjøringen lørdag 07.11 kl. 22:15 bruker main fra midnatt, med promptversjon 4, men lager ingen KI-tekster. Lørdag er børsdagen den skal hente 06.11 (`innevaerende_boersdag` i `src/boersdag.py`), og loggen for kveldsjobben 06.11 viser at sjekken ga FERDIG for 06.11 kl. 22:45, 23:15 og 23:45. Da gir `src/dagen_ferdig.py` kode 0 med FERDIG, og jobben starter verken Docker eller Ollama og setter `OSE_KI_TJENESTE` til `av` (`start/kveldshenting.ps1`). Det samme gjelder søndag 08.11. Tekstene for 06.11 ble laget med versjon 3, fordi jobben 06.11 sto på `894b55e5`, der `PROMPTVERSJON` er «3», før PR #113 (`374f1bdb`). De første tekstene med versjon 4 kommer dermed mandag 09.11, den neste børsdagen, når main fortsatt har versjon 4 ved midnatt og Docker og Ollama svarer.
+
 ---
 
 # Joakims oppføringer
