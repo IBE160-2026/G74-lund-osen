@@ -3023,6 +3023,8 @@ uten KI. 5B.4 måler KI-tillegget. Blandes de, vet ingen hva som ble målt.
 
 *Avgjort 2026-11-05 kl. 23:36 (gruppens svar):* spørsmål 2 og 3 i PR #113 er besvart av svaret kl. 19:13: appen lager setningen om dagen (BH6), og modellen skriver ikke om dagen; appens setning står for seg selv under teksten, som setningen om dagene, og sier aldri at dagen forklarer signalet (BH7).
 
+*Avgjort 2026-11-06 kl. 09:55 (gruppens svar):* på spørsmålene i PR #113: 1) retningen på aksjen regnes som i tabellen, mot forrige rad, også på en dag med hull (BH4/ECH9); 2) delen om bransjen i appens setning står bare når bransjen har minst to aksjer i lista, så KOG, TEL og ORK får den ikke, og snittet er det samme som i børsometeret (ECH6/BH11).
+
 ### Story 10.5: Lenke til selskapets side på NewsWeb
 
 *Lagt til 2026-09-28, med plan B.*
