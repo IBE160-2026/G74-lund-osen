@@ -106,6 +106,16 @@ selv under teksten (setning_om_samme_dag i dagene.py). Versjonen staar som 4,
 fordi versjon 4 ikke er flettet og ingen tekst i ose.db har versjon 4, som
 unntaket i 10.2f-10.2h foer versjon 3 var i bruk. Avtrykket og demotekstene
 er laget paa nytt.
+
+Versjon 4, ordlyden om hovedindeksen (gruppens svar 5.11 kl. 19:13): modellen
+faar ferdig ordlyd, laget her av grunnlaget (ordlyd_om_hovedindeksen), om
+aksjen gikk samme vei som hovedindeksen eller motsatt, som ordlyden for
+dagene i tredje forsoek av versjon 3. Ordlyden er en hel setning, saa den
+ikke settes inn i en annen setning, slik ordlyden for dagene ble (§44). Den
+gis bare naar baade aksjen og hovedindeksen steg eller falt, og reglene sier
+at teksten bruker den ordrett eller ikke sier noe om hovedindeksen.
+Kontrollen i FR-603 bruker den samme funksjonen. Ordlyden og funksjonen er
+med i avtrykket (VG2 i 10.2e). Versjonen staar som 4, av samme grunn som over.
 """
 
 import json
@@ -134,6 +144,8 @@ Regler for teksten:
 - Når retningen er Ingen, skriv at signalet ikke har noen retning.
 - Bruk bare opplysningene under. Skriv utslagene med ord, ikke som tall. Ikke nevn kurser, prosenter eller andre tall enn antallene i opplysningene og regelens faste tall.
 - Siden viser kursen, endringen og målingene. Du kan vise til dem, for eksempel «se endringen i tabellen», men ikke gjenta tallene.
+- Om hovedindeksen kan teksten bare bruke setningen etter «Ordlyden om hovedindeksen:» under opplysningene, ordrett og som en egen setning, eller ikke si noe om hovedindeksen. Står det ingen ordlyd, skal teksten ikke si noe om hovedindeksen.
+- Ikke si noe om bransjen, børsen eller hvor mange aksjer som steg eller falt. Appen skriver det selv under teksten.
 - Hovedindeksen og bransjen er ikke en del av regelen. Ikke si at de forklarer signalet.
 - Ikke si hvor lenge signalet har vart, om det er nytt, eller om det er første gang. Siden sier under teksten hvor lenge signalet har vart.
 - Ikke gi råd om å kjøpe, selge eller holde, og ikke si noe om hva som vil skje.
@@ -144,10 +156,31 @@ Regler for teksten:
 
 UTENFOR = "\nAksjen er ikke blant aksjene grensene er målt på. Si at grensene ikke er målt på denne aksjen.\n"
 
+# Story 10.2i (gruppens svar 5.11 kl. 19:13): ordlyden appen gir om
+# hovedindeksen, som en hel setning, og linja den staar paa i prompten.
+SAMME_VEI = "Aksjen gikk samme vei som hovedindeksen."
+MOTSATT_VEI = "Aksjen gikk motsatt vei av hovedindeksen."
+ORDLYDEN = "\nOrdlyden om hovedindeksen: {ordlyd}\n"
+
+
+def ordlyd_om_hovedindeksen(grunnlag: Mapping[str, object]) -> str | None:
+    """SAMME_VEI naar aksjen og hovedindeksen begge steg eller begge falt,
+    MOTSATT_VEI naar den ene steg og den andre falt, og ellers None: ogsaa
+    naar en av dem var uendret eller mangler."""
+    aksjen, indeksen = grunnlag.get("aksjen"), grunnlag.get("hovedindeksen")
+    if aksjen not in ("steg", "falt") or indeksen not in ("steg", "falt"):
+        return None
+    return SAMME_VEI if aksjen == indeksen else MOTSATT_VEI
+
 
 def lag_prompt(grunnlag: Mapping[str, object]) -> str:
-    """Reglene og grunnlaget som JSON. Ingenting annet kommer med."""
+    """Reglene, grunnlaget som JSON og ordlyden om hovedindeksen naar den
+    finnes. Ingenting annet kommer med."""
     prompt = REGLER
     if grunnlag.get("merke"):
         prompt += UTENFOR
-    return prompt + "\nOpplysningene:\n" + json.dumps(dict(grunnlag), ensure_ascii=False, sort_keys=True) + "\n"
+    prompt += "\nOpplysningene:\n" + json.dumps(dict(grunnlag), ensure_ascii=False, sort_keys=True) + "\n"
+    ordlyd = ordlyd_om_hovedindeksen(grunnlag)
+    if ordlyd:
+        prompt += ORDLYDEN.format(ordlyd=ordlyd)
+    return prompt

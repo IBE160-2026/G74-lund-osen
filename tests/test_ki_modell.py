@@ -15,7 +15,16 @@ import pytest
 
 from ki_kontroll import AARSAKER, GJETNING, RAAD, kontroller
 from ki_modell import Modell, ModellFeilet, Modellsvar, lag_ki_rad
-from ki_prompt import PROMPTVERSJON, REGLER, UTENFOR, lag_prompt
+from ki_prompt import (
+    MOTSATT_VEI,
+    ORDLYDEN,
+    PROMPTVERSJON,
+    REGLER,
+    SAMME_VEI,
+    UTENFOR,
+    lag_prompt,
+    ordlyd_om_hovedindeksen,
+)
 from kilogg import Emne
 
 EMNE = Emne.aksje("EQNR", date(2026, 10, 15))
@@ -59,15 +68,28 @@ AVTRYKK = {
     # Story 10.2i, svarene 5.11 kl. 19:13 og 23:36 (b): aksjen i opplysningene,
     # og linja om dagen rundt aksjen er tatt ut. Versjonen staar som 4, fordi
     # versjon 4 ikke er flettet. Var 0df61d8f....
-    "4": "50a0ec0ed786cbad6be47ad45469dec818276c3d3dd5b1f0bd4d6e8bedd7df31",
+    # Story 10.2i, svaret 5.11 kl. 19:13 (c): ordlyden om hovedindeksen, med
+    # funksjonen som velger den, og to linjer i reglene. Versjonen staar som 4.
+    # Var 50a0ec0e....
+    "4": "a864e4c3d7af51597ad29fd11857ec3854c7a342bd0ca3d5c382795585a34aef",
 }
 
 
 def _promptteksten() -> str:
     """Det avtrykket for versjon 3 dekker: reglene, merket og koden i
     lag_prompt (inspect leser kildeteksten med LF). Svaret 25.10 kl. 00:51:
-    ordlyden for dagene er tatt ut av prompten, og dermed av avtrykket."""
-    return REGLER + UTENFOR + inspect.getsource(lag_prompt)
+    ordlyden for dagene er tatt ut av prompten, og dermed av avtrykket.
+    Story 10.2i: ordlyden om hovedindeksen og funksjonen som velger den er
+    med, som i demo_ki.promptavtrykk."""
+    return (
+        REGLER
+        + UTENFOR
+        + inspect.getsource(lag_prompt)
+        + SAMME_VEI
+        + MOTSATT_VEI
+        + ORDLYDEN
+        + inspect.getsource(ordlyd_om_hovedindeksen)
+    )
 
 
 class FalskModell:
@@ -162,7 +184,7 @@ class TestPrompten:
         versjon, fanger test_versjonen_foelger_teksten (gjennomgangen, BH12,
         ECH7)."""
         assert PROMPTVERSJON == "4"
-        assert AVTRYKK["4"] == "50a0ec0ed786cbad6be47ad45469dec818276c3d3dd5b1f0bd4d6e8bedd7df31"
+        assert AVTRYKK["4"] == "a864e4c3d7af51597ad29fd11857ec3854c7a342bd0ca3d5c382795585a34aef"
         assert AVTRYKK["4"] != AVTRYKK["3"]
 
     def test_modellen_skriver_ikke_om_dagen(self):
@@ -179,6 +201,79 @@ class TestPrompten:
         ikke_forklarer = "- Hovedindeksen og bransjen er ikke en del av regelen. Ikke si at de forklarer signalet."
         reglene = REGLER.split("Regler for teksten:", 1)[1].splitlines()
         assert reglene.count(ikke_forklarer) == 1
+
+    @pytest.mark.parametrize(
+        "aksjen, indeksen, ordlyd",
+        [
+            ("steg", "steg", SAMME_VEI),
+            ("falt", "falt", SAMME_VEI),
+            ("steg", "falt", MOTSATT_VEI),
+            ("falt", "steg", MOTSATT_VEI),
+            ("uendret", "steg", None),
+            ("falt", "uendret", None),
+            ("uendret", "uendret", None),
+            (None, "steg", None),
+            ("steg", None, None),
+            (None, None, None),
+        ],
+    )
+    def test_ordlyden_om_hovedindeksen(self, aksjen, indeksen, ordlyd):
+        """Story 10.2i, gruppens svar 5.11 kl. 19:13: appen gir ferdig ordlyd
+        om aksjen gikk samme vei som hovedindeksen eller motsatt, bare naar
+        begge steg eller falt. Ville feilet hvis retningene ble byttet (steg
+        og falt ga samme vei), eller en ordlyd ble gitt naar en av dem var
+        uendret eller mangler."""
+        grunnlag = dict(BLANDET)
+        for felt, verdi in (("aksjen", aksjen), ("hovedindeksen", indeksen)):
+            if verdi is not None:
+                grunnlag[felt] = verdi
+        assert ordlyd_om_hovedindeksen(grunnlag) == ordlyd
+
+    def test_ordlyden_er_hele_setninger(self):
+        """Laerdommen fra tredje forsoek av versjon 3 (§44): ordlyden ble satt
+        inn midt i en setning. Ville feilet hvis ordlyden ikke var en hel
+        setning med stor forbokstav og punktum, eller de to var like."""
+        for ordlyd in (SAMME_VEI, MOTSATT_VEI):
+            assert ordlyd[0].isupper() and ordlyd.endswith(".") and ordlyd.count(".") == 1
+            assert "hovedindeksen" in ordlyd
+        assert SAMME_VEI != MOTSATT_VEI
+
+    def test_ordlyden_staar_i_prompten_bare_naar_den_finnes(self):
+        """Ville feilet hvis prompten manglet linja med ordlyden naar
+        grunnlaget gir den, hadde den naar det ikke gjoer det, eller hadde
+        den andre ordlyden enn den grunnlaget gir."""
+        samme = {**BLANDET, "hovedindeksen": "falt", "aksjen": "falt"}
+        motsatt = {**BLANDET, "hovedindeksen": "falt", "aksjen": "steg"}
+        prompt = lag_prompt(samme)
+        assert prompt.endswith(ORDLYDEN.format(ordlyd=SAMME_VEI))
+        assert ORDLYDEN.format(ordlyd=SAMME_VEI) == f"\nOrdlyden om hovedindeksen: {SAMME_VEI}\n"
+        assert MOTSATT_VEI not in prompt
+        assert lag_prompt(motsatt).endswith(ORDLYDEN.format(ordlyd=MOTSATT_VEI))
+        assert SAMME_VEI not in lag_prompt(motsatt)
+        for grunnlag in (BLANDET, {**BLANDET, "hovedindeksen": "steg", "aksjen": "uendret"}):
+            etter = lag_prompt(grunnlag).split("Opplysningene:", 1)[1]
+            assert "Ordlyden om hovedindeksen" not in etter
+            assert SAMME_VEI not in lag_prompt(grunnlag) and MOTSATT_VEI not in lag_prompt(grunnlag)
+        # Med merket kommer ordlyden fortsatt etter opplysningene.
+        med_merket = lag_prompt({**samme, "merke": "Utenfor målingen"})
+        assert med_merket.endswith(ORDLYDEN.format(ordlyd=SAMME_VEI))
+
+    def test_reglene_sier_ordrett_eller_ikke(self):
+        """Ville feilet hvis reglene ikke sa at hovedindeksen bare nevnes med
+        ordlyden, ordrett, og at bransjen, boersen og antallet aksjer ikke
+        nevnes, eller linjene ikke kom med i prompten."""
+        reglene = REGLER.split("Regler for teksten:", 1)[1].splitlines()
+        ordrett = (
+            "- Om hovedindeksen kan teksten bare bruke setningen etter «Ordlyden om hovedindeksen:» under "
+            "opplysningene, ordrett og som en egen setning, eller ikke si noe om hovedindeksen. Står det ingen "
+            "ordlyd, skal teksten ikke si noe om hovedindeksen."
+        )
+        ikke = (
+            "- Ikke si noe om bransjen, børsen eller hvor mange aksjer som steg eller falt. "
+            "Appen skriver det selv under teksten."
+        )
+        assert reglene.count(ordrett) == 1 and reglene.count(ikke) == 1
+        assert ordrett in lag_prompt(BLANDET) and ikke in lag_prompt(BLANDET)
 
     def test_reglene_forklarer_hvert_felt_i_grunnlaget(self):
         """Story 10.2e: ville feilet hvis grunnlaget hadde et felt reglene

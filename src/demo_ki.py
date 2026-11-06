@@ -92,15 +92,25 @@ _SHA256 = re.compile(r"[0-9a-f]{64}")
 
 
 def promptavtrykk() -> str:
-    """sha256 av prompten slik den er naa: reglene, merket og koden i
-    lag_prompt (inspect leser kildeteksten med LF), det samme som avtrykket
+    """sha256 av prompten slik den er naa: reglene, merket, koden i
+    lag_prompt, og fra 10.2i ordlyden om hovedindeksen med koden som velger
+    den (inspect leser kildeteksten med LF), det samme som avtrykket
     for versjonen i tests/test_ki_modell.py dekker. ki_prompt importeres her,
     ikke oeverst, saa webserveren ikke laster den (AD-10)."""
     import inspect
 
     import ki_prompt
 
-    tekst = ki_prompt.REGLER + ki_prompt.UTENFOR + inspect.getsource(ki_prompt.lag_prompt)
+    # Story 10.2i: ogsaa ordlyden om hovedindeksen og funksjonen som velger den.
+    tekst = (
+        ki_prompt.REGLER
+        + ki_prompt.UTENFOR
+        + inspect.getsource(ki_prompt.lag_prompt)
+        + ki_prompt.SAMME_VEI
+        + ki_prompt.MOTSATT_VEI
+        + ki_prompt.ORDLYDEN
+        + inspect.getsource(ki_prompt.ordlyd_om_hovedindeksen)
+    )
     return hashlib.sha256(tekst.encode("utf-8")).hexdigest()
 
 
