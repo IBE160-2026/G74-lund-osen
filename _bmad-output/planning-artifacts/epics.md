@@ -4306,6 +4306,8 @@ lesingen før commit som før.
 
 *Avgjort 2026-11-06 kl. 15:13 og 15:21 (gruppens svar):* i stedet for alle de 122 meldingene kommer 15 instruksjoner fra 21.–24.09 ordrett, de som satte en regel eller avgjorde noe, og én kort linje om hver av de andre. I meldingen 23.09 kl. 21:07 byttes de rå EODHD-tallene med [tall fjernet] (regel 16). Gruppen leser utvalget og linjene før noe committes, og resten blir bare i øktloggene og i `_privat/`.
 
+*Rettet 2026-11-06 (gruppens svar kl. 17:25):* de rå EODHD-tallene sto i meldingen 23.09 kl. 21:35, ikke kl. 21:07, som linja over sier. Feilen kom fra instruksjonen, og svaret kl. 17:25 gjelder: kl. 21:07 tas med ordrett som den er, fordi den avgjorde plan B, og kl. 21:35 får bare en kort referatlinje uten tall. Utvalget er fortsatt 15. I 24.09 kl. 18:37 byttes medianvolumet med [tall fjernet]. Sitatene fra faglærerstaben, navnet på faglæreren, domenene og navnene i brevet 22.09 kl. 17:25 står alt i sporede filer på main, og står ordrett.
+
 ### Story 9.3: Arbeidsmønsteret
 
 Som **sensor**, vil jeg forstå hvem som bestemte hva, så jeg kan vurdere hvordan
