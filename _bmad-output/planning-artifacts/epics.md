@@ -3025,6 +3025,8 @@ uten KI. 5B.4 måler KI-tillegget. Blandes de, vet ingen hva som ble målt.
 
 *Avgjort 2026-11-06 kl. 09:55 (gruppens svar):* på spørsmålene i PR #113: 1) retningen på aksjen regnes som i tabellen, mot forrige rad, også på en dag med hull (BH4/ECH9); 2) delen om bransjen i appens setning står bare når bransjen har minst to aksjer i lista, så KOG, TEL og ORK får den ikke, og snittet er det samme som i børsometeret (ECH6/BH11).
 
+*Avgjort 2026-11-06 kl. 11:15 (gruppens svar):* på de to spørsmålene i PR #113: 1) delen om bransjen i appens setning står bare når minst to aksjer i bransjen har en endring den dagen (BH1/ECH1/BH2); 2) aksjen regnes fortsatt som i tabellen, men ordlyden om hovedindeksen gis bare når aksjens forrige rad er forrige børsdag, så teksten aldri sammenligner to ulike perioder (BH3/ECH2/VG2).
+
 ### Story 10.5: Lenke til selskapets side på NewsWeb
 
 *Lagt til 2026-09-28, med plan B.*
