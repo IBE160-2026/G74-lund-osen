@@ -99,3 +99,69 @@ Gjennomgang 05.11 etter hele settet (4069 bestått, 24 hoppet over, 6 porttester
   1. Skal kontrollen lese antallene i formene modellen bruker («N aksjer som steg», «steg 8 og falt 7», «flere aksjer steg enn falt») og flere former for retningen på hovedindeksen og bransjen (BH1, VG1, ECH2, ECH3, ECH8)? Til da kan et byttet antall vises med prikket strek.
   2. Skal setningen om dagen lages av koden i stedet for av modellen (BH6)?
   3. Er «Dagen var preget av …» rett etter forklaringen av signalet greit, eller skal prompten be om en nøytral innledning (BH7)?
+
+
+## Svarene 5.11 kl. 19:13 og 23:36 (instruksjonen kl. 23:53)
+
+**Beslutningen** (under story 10.4 i `epics.md`): spørsmål 1 i PR #113 er besvart kl. 19:13: appen skriver setningen om hovedindeksen, bransjen og antallene, alltid riktig, som setningen om dagene, og modellen sier bare med faste ord om aksjen gikk samme vei som børsen, og det sjekker kontrollen. Kl. 23:36: spørsmål 2 og 3 er besvart av det samme svaret: appen lager setningen om dagen (BH6), modellen skriver ikke om dagen, og appens setning står for seg selv under teksten og sier aldri at dagen forklarer signalet (BH7).
+
+Main ble flettet inn i grenen i `62b412ee`, og hele settet ga 4086 bestått, 24 hoppet over og 6 porttester for `start.ps1` som feilet.
+
+**a) Setningen om samme dag** (`28302119`): `setning_om_samme_dag` i `src/dagene.py` er en ren funksjon som `setning_om_dagene`. Den sier hva hovedindeksen, bransjen og antallene gjorde samme dag, for eksempel «Samme dag falt hovedindeksen, bransjen falt i snitt, og 7 aksjer i lista steg og 7 falt.», og tar ikke med det som mangler. `Dagsbilde` og `lag_dagsbilde` er flyttet fra `ki_grunnlag.py` til `dagene.py`, så siden og grunnlaget regnes av den samme funksjonen, og webserveren importerer fortsatt ikke KI-laget (AD-10). Setningen står i `p.samme-dag` rett under `p.dagene`, også med KI av. Siden leser lista fra `aksje` i basen, kursene og indeksen som i `ki_tekst._grunnlagene`. Mutant A (`steg` og `falt` byttet i `_VERBET`) ble fanget av 4 tester.
+
+**b) Grunnlaget** (`59ab436a`): `Dagsbilde` har `aksjen`, regnet med `_retningen_paa_dagen`, den samme funksjonen som hovedindeksen. Grunnlaget har `hovedindeksen` og `aksjen` (`DAGFELTENE`), og ikke `bransjen`, `aksjer_steg` og `aksjer_falt`. `ANTALLENE` er bare styrken. Prompten forklarer `aksjen`, og linja om dagen rundt aksjen fra kl. 16:05 er tatt ut. Mutant B (aksjen regnet av indeksserien) ble fanget av 2 tester.
+
+**c) Ordlyden** (`c986d07c`): `ordlyd_om_hovedindeksen` i `ki_prompt.py` gir «Aksjen gikk samme vei som hovedindeksen.» når aksjen og hovedindeksen begge steg eller begge falt, og «Aksjen gikk motsatt vei av hovedindeksen.» når den ene steg og den andre falt. Ellers, også ved uendret eller et felt som mangler, er det ingen ordlyd. Den er en hel setning, så den ikke settes inn i en annen setning, slik ordlyden for dagene ble i §44. Den står på en egen linje etter opplysningene, og reglene sier at teksten bruker den ordrett eller ikke sier noe om hovedindeksen. Avtrykket dekker ordlyden og funksjonen. Mutant C (`==` til `!=`, byttede retninger) ble fanget av 7 tester, og oppsettet for demotestene feilet.
+
+**d) Kontrollen** (`281a8f84`): `_om_dagen` i `ki_kontroll.py` tar ut ordlyden fra den samme funksjonen når den står ordrett som en hel setning, og stopper alt annet om hovedindeksen, bransjen, børsen og antallet aksjer. Sjekkene fra 10.2e av retningen og antallene er erstattet, og testene som godtok dem, er snudd. Mutant D (kontrollen godtar alltid «samme vei») ble fanget av 5 tester.
+
+**`PROMPTVERSJON`** står som 4, fordi versjon 4 ikke er flettet og ingen tekst i `ose.db` har versjon 4. Grunnen står i docstringen, og avtrykket i `AVTRYKK["4"]` er nå `ec084a52…e251`.
+
+**Demotekstene** er laget på nytt med Gemma etter b, c og d og etter rettingene. Etter d besto 12 av 13: HVDO brukte ordlyden inne i en setning og ble stoppet, og vises ikke. Etter rettingene besto 13 av 13. Bildet av BRFE er tatt på nytt med fremgangsmåten i 3.3b etter hver endring (2261 px), og de andre seks bildene ble tatt på nytt og er byte for byte de samme. Bare avtrykkene er satt på nytt.
+
+**Mutantene** ble kjørt med kopi før og fila lik HEAD etter (samme blob, og samme sha256 uten CR): A kl. 00:33:33 på `28302119`, B kl. 00:56:17 på `59ab436a`, C kl. 01:14:55 på `c986d07c` og D kl. 01:31:24 på `281a8f84`.
+
+**Hele settet**, alene og med Ollama stoppet, før hver commit med kode eller tester: 4119 (a), 4123 (b), 4136 (c), 4176 (d) og 4212 (rettingene) bestått, 24 hoppet over hver gang, og bare 4–7 porttester for `start.ps1` som feilet.
+
+**Prøvekjøringen** (§55 i `malinger.md`): grunnlaget for de 15 for 05.11, regnet på nytt fra `ose.db` med `mode=ro`. Før rettingene besto 14 av 15. YAR brukte ordlyden inne i en setning og ble stoppet. Etter rettingene besto 15 av 15, og alle 15 ville blitt vist. Klassene: 0 gjentar, 15 sier mer (bare ordlyden) og 0 usikre. Lista i `aksje` i basen var den samme som `AKSJEUNIVERS`.
+
+### Demotekstene før og etter
+
+Tre av de 13, fra `src/demo_ki_tekster.json` (oppdiktede selskaper). «Før» er teksten etter `c9dbb342`. «Etter» er teksten nå, med setningen appen skriver under den.
+
+- **BRFE.** Før: «Signalet er negativt fordi trenden ga et negativt utslag, bevegelsen ga et negativt utslag, og interessen ga et negativt utslag. Dagen var preget av at hovedindeksen falt, bransjen falt, og det var syv aksjer som steg og syv aksjer som falt.» Etter: «Signalet er Negativt fordi trenden ga et negativt utslag, bevegelsen ga et negativt utslag, og interessen ga et negativt utslag. Aksjen gikk samme vei som hovedindeksen.» Under: «Samme dag falt hovedindeksen, bransjen falt i snitt, og 7 aksjer i lista steg og 7 falt.»
+- **SLVP.** Før: «Signalet har ingen retning fordi trenden ikke ga utslag, bevegelsen ikke ga utslag og interessen ikke ga utslag. Dagen var preget av at hovedindeksen falt, bransjen falt, og det var syv aksjer som steg og syv aksjer som falt.» Etter: «Signalet har ingen retning fordi trenden ikke ga utslag, bevegelsen ikke ga utslag og interessen ikke ga utslag. Aksjen gikk motsatt vei av hovedindeksen.» Under: «Samme dag falt hovedindeksen, bransjen falt i snitt, og 7 aksjer i lista steg og 7 falt.»
+- **KVST.** Før: «Signalet er positivt fordi trenden ga et positivt utslag, bevegelsen ga et positivt utslag, og interessen ga et positivt utslag. Rundt aksjen falt hovedindeksen, og i lista steg syv aksjer mens syv falt, og bransjen steg.» Etter: «Signalet er Positivt fordi trenden ga et positivt utslag, bevegelsen ga et positivt utslag, og interessen ga et positivt utslag. Aksjen gikk motsatt vei av hovedindeksen.» Under: «Samme dag falt hovedindeksen, bransjen steg i snitt, og 7 aksjer i lista steg og 7 falt.»
+
+### Gjennomgangen av svarene
+
+Gjennomgang 06.11 etter hele settet for d, av diffen `62b412ee..64337644` uten PNG-filene, med Blind Hunter (BH, 13 funn), Edge Case Hunter (ECH, 12) og Verification Gap (VG, 11). Triagen følger regel 25: et funn på middels eller over som følger av et svar eller av instruksjonen, står åpent til gruppen har svart, og graden settes ikke ned. Rettet i `2602f1e4`.
+
+| # | Funn | Grad | Rute |
+|---|---|---|---|
+| BH1, VG1, ECH1 | Utsagn om aksjen selv ble ikke sjekket mot feltet `aksjen` («Aksjen steg» med `aksjen` falt besto) | høy | **rettet:** et verb om retningen med «aksjen» foran skal stemme med feltet, og uten feltet stoppes det |
+| ECH2 | Retningen kunne gjentas eller snus med et pronomen etter ordlyden («Begge falt i dag.») | høy | **rettet:** et verb om retningen uten «aksjen» eller «kursen» foran stoppes |
+| BH2, VG4, ECH4 | Sammensatte ord, ord med bindestrek og ord om lista slapp gjennom («Aksjemarkedet», «OSEBX-indeksen», «Oslo-børsen», «listen», «selskapene») | høy (BH), middels (VG, ECH) | **rettet**, med testene i `TestOmDagenEtterGjennomgangen` |
+| BH3, VG5, ECH3 | En slutning eller kobling til signalet rett etter ordlyden besto («Det forklarer signalet.») | middels | **rettet:** «Derfor», «Dermed», «Følgelig» og «Så» rett etter ordlyden stoppes, og «Det» og «Dette» med et ord som kobler |
+| BH4, ECH9 | Aksjen regnes mot forrige børsdag, som hovedindeksen, mens antallene og tabellen regnes mot forrige rad. På en dag med hull kan aksjen telles i antallene uten å få en ordlyd | middels | **åpent, spørsmål 1 til gruppen:** følger av instruksjonen («regnet som for hovedindeksen»), så graden settes ikke ned (regel 25) |
+| BH5, VG3, ECH10 | «0 aksjer i lista steg og 0 falt» når kursene mangler | middels | **rettet:** antallene står ikke når begge er 0, og uten noe å si er det ingen setning |
+| BH8, ECH5 | Linja om hovedindeksen i prompten kunne leses som at teksten kan nevne den når feltet er der, og linja om aksjen manglet forbeholdet | middels | **rettet:** avtrykket er satt på nytt, og versjonen står som 4 |
+| VG2, ECH11 | Siden leser lista fra `aksje` i basen, og hentingen fra `AKSJEUNIVERS` | middels (VG), lav (ECH) | **står:** `test_aksje_er_lik_aksjeuniverset_felt_for_felt_og_i_samme_rekkefoelge` binder `aksje` i en ny base til `AKSJEUNIVERS`, og §55 målte at de var like i `ose.db`. Demotesten sammenligner nå også `aksjen` (BH12) |
+| BH9, BH10, ECH12 | En feil i indeksen (RuntimeError) eller i utregningen av dagen ga 500 | lav | **rettet**, med tester |
+| BH6 | Visningen kunne kjøre kontrollen på nytt på tekster fra versjon 3 | middels | **avvist:** `ki_visning.py` kjører ikke kontrollen, og `prikkede_tall` leser ikke `ANTALLENE` |
+| BH7, ECH8 | Merket med «som» («aksjene som grensene er målt på») ble stoppet | lav | **rettet**. «Markedet for aksjen», «andre aksjer» og «på Oslo Børs» stoppes fortsatt: kontrollen leser ord, ikke mening (FR-603) |
+| ECH6, BH11 | Snittet for bransjen tar med aksjen selv, så i en bransje med én aksje i lista er «bransjen» aksjen | lav | **står, spørsmål 2 til gruppen:** slik bransjen er regnet fra 10.2e |
+| ECH7 | Ordlyden etter linjeskift eller med annet hvitt rom ble stoppet | lav | **rettet** |
+| VG6, VG7 | Docstringer som ikke stemte lenger | lav | **rettet** |
+| VG8 | Avtrykket dekker ikke feltene i grunnlaget | lav | **står:** `test_feltene` og `test_reglene_forklarer_hvert_felt_i_grunnlaget` låser feltene |
+| VG9 | En dag der hovedindeksen steg, er bare enhetstestet | lav | **står:** `test_ordlyden_om_hovedindeksen` og `TestOmDagen` dekker begge retningene. Demodagen er fast |
+| VG10, BH13 | Hjelpen sa «steg eller falt», og feltene kan være uendret | lav | **rettet** i README-en, `docs/hjelp.md` og `hjelpetekster.py` |
+| VG11 | Et grunnlag med bare `aksjen` eller bare `hovedindeksen` godtas | lav | **står:** begge kan mangle hver for seg, og da er det ingen ordlyd |
+| BH12 | Demotesten sammenlignet bare hovedindeksen | lav | **rettet:** også `aksjen` |
+
+### Åpent etter svarene
+
+Spørsmål til gruppen:
+
+1. **BH4, ECH9 (middels, følger av instruksjonen):** aksjen regnes mot forrige børsdag, som hovedindeksen, men endringen i tabellen og antallene regnes mot forrige rad. På en dag der aksjen mangler kurs dagen før, får den ingen ordlyd, men telles i antallene. Skal aksjen regnes som i tabellen i stedet?
+2. **ECH6, BH11 (lav):** «bransjen i snitt» tar med aksjen selv, så for en aksje alene i bransjen i lista sier setningen bare hva aksjen gjorde. Skal bransjen regnes uten aksjen, eller bare stå når den har minst to?
