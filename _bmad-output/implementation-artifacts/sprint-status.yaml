@@ -160,7 +160,8 @@ development_status:
   8-2-ux-gjennomgang-av-de-to-skjermbildene-med-cu-bmad-ux: in-progress
   # 8.2c, ekstra, fra 2026-11-04 (gruppens svar kl. 09:48): grafen ved 390 px.
   # 2026-11-06 (svaret kl. 15:08): bygges nå på egen gren og flettes foer kl. 21:20 hvis alt er groent.
-  8-2c-kursgrafen-på-smal-skjerm: in-progress
+  # Flettet 2026-11-06 i b38617f9 (PR #115).
+  8-2c-kursgrafen-på-smal-skjerm: done
   8-3-min-liste-eget-skjermbilde-med-stjerne-og-filter: done
   # Ekstra, hvis tiden rekker, fra 2026-10-19 (endringsforslaget 2026-10-19, gruppens svar kl. 15:43): 8-4 til 8-14,
   # 8-10b, 8-17, 8-18 og 8-19. Briefen v8 lover dem ikke. 8-1, 8-2 og 8-3 er v1.

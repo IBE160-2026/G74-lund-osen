@@ -2,7 +2,7 @@
 title: 'Story 8.2c: kursgrafen på smal skjerm'
 type: 'feature'
 created: '2026-11-06'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 1
 baseline_commit: 'abf65895'
