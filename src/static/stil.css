@@ -622,8 +622,20 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 
 /* Kursgrafen (utdraget §8): kurslinja 2,5 px, snittet 1,75 px og
    heltrukket, og navnene ved enden av linjene (svar 19). */
-:where(.side-aksje) figure { margin: 0; background: var(--kort); border: 1px solid var(--strek); border-radius: 16px; padding: 20px 22px; }
+:where(.side-aksje) figure { margin: 0; background: var(--kort); border: 1px solid var(--strek); border-radius: 16px; padding: 20px 22px;
+                             container-type: inline-size; }
 :where(.side-aksje) svg.graf { width: 100%; height: auto; display: block; }
+/* Story 8.2c: grafen med egne mål på smal skjerm. Den brede skaleres ned med
+   figuren, og teksten på 12 i den blir mindre enn 11,5 px, den minste teksten
+   ellers på siden, når figuren er smalere enn 690 px (12 × 690 / 720). Da
+   står den smale i stedet. Den er høyst 4/3 av sine 280, så teksten i den
+   ikke blir større enn 16 px, som i den brede ved 1280 px. Figuren er
+   containeren (container-type i regelen for figure over). */
+:where(.side-aksje) svg.graf.smal { display: none; max-width: calc(280px * 4 / 3); margin-inline: auto; }
+@container (width < 690px) {
+  :where(.side-aksje) svg.graf:not(.smal) { display: none; }
+  :where(.side-aksje) svg.graf.smal { display: block; }
+}
 :where(.side-aksje) .rute { stroke: var(--rutenett); stroke-width: 1; }
 :where(.side-aksje) .rutetekst { fill: var(--dempet); font-size: 12px; }
 /* Story 10.3: KI-teksten under regelforklaringen, som et tillegg. */

@@ -1842,11 +1842,14 @@ class TestStory80c:
         boersdag i maaneden, i SVG-en."""
         monter(monkeypatch, snapshot({"EQNR": serie([100.0 + i for i in range(80)])}))
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
-        navn = re.findall(r'<text class="maanedstekst"[^>]*>([a-zæøå]+)</text>', html)
+        # Story 8.2c: den brede grafen. Den smale har egne tester
+        # (test_kursgrafen_smal.py og TestSmalSkjerm i test_graf.py).
+        svg = html.split('<svg class="graf"', 1)[1].split("</svg>", 1)[0]
+        navn = re.findall(r'<text class="maanedstekst"[^>]*>([a-zæøå]+)</text>', svg)
         assert navn and all(n in ("september", "oktober", "november") for n in navn), navn
         # BH9: en strek per navn, og streken under kurslinja (ECH7).
-        assert html.count('<line class="maanedsstrek"') == len(navn)
-        assert html.index('class="maanedsstrek"') < html.index('class="kurslinje" points')
+        assert svg.count('<line class="maanedsstrek"') == len(navn)
+        assert svg.index('class="maanedsstrek"') < svg.index('class="kurslinje" points')
         assert "01.09 til" in html
 
 
@@ -3681,7 +3684,10 @@ class TestPeriodeneIKursgrafen:
         maanedene for 1 år, der de ikke faar plass."""
         self._aksjen()
         html = klient.get(f"/aksje/EQNR?periode={periode}").data.decode("utf-8")
-        assert re.findall(r'class="maanedstekst"[^>]*>([^<]*)<', html) == ventet
+        # Story 8.2c: den brede grafen. Den smale tynner navnene etter plassen
+        # (TestSmalSkjerm i test_graf.py).
+        svg = html.split('<svg class="graf"', 1)[1].split("</svg>", 1)[0]
+        assert re.findall(r'class="maanedstekst"[^>]*>([^<]*)<', svg) == ventet
 
     def test_overskriften_passer_perioden(self, klient):
         """Ville feilet hvis overskriften sto paa 6 måneder for en annen periode.

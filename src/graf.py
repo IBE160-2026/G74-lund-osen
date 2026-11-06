@@ -19,6 +19,13 @@ Story 8.2b, b (U41, U47): tegneflaten har et felt til venstre for tallene,
 et nederst for datoene og et til hoeyre for navnene paa linjene, saa ingen
 linje krysser en tekst. Navnene staar ved enden av linjene, i linjefargen
 (utdraget §8), ogsaa «Hovedindeksen» ved den stiplede.
+
+Story 8.2c: kursgrafen har egne maal paa smal skjerm (bygg_graf med
+smal=True). Den brede grafen skaleres ned med vinduet, saa teksten i den ble
+om lag 5 px ved 390 px. Den smale er SMAL_BREDDE bred, har de samme dataene,
+linjene og merkene, og navnene paa linjene staar i en forklaring under
+datoene i stedet for i feltet til hoeyre, som ville tatt over halve flaten.
+Navn paa aksen som ville kommet borti hverandre, faar streken, men ikke navnet.
 """
 
 from dataclasses import dataclass
@@ -40,6 +47,21 @@ HOEYRE = 170
 BUNN = 22
 # Avstanden fra enden av linja til navnet.
 NAVNEMARG = 8
+
+# Story 8.2c: maalene paa smal skjerm. Ved 390 px er grafen 312 px bred
+# (maalt i Edge), saa teksten paa 12 blir 12 x 312 / 280, om lag 13,4 px, mer
+# enn den minste teksten ellers paa siden (11,5 px). HOEYRE er bare plass til
+# punktet ved enden, og navnene paa linjene staar i FORKLARING under datoene,
+# en linje paa FORKLARINGSLINJE per navn.
+SMAL_BREDDE = 280
+SMAL_HOYDE = 250
+SMAL_HOEYRE = 8
+FORKLARING = 52
+FORKLARINGSLINJE = 16
+# Plassen et tegn i 12 px trenger, anslaatt litt romslig for IBM Plex Sans,
+# og luften mellom to navn paa aksen.
+TEGNBREDDE = 7
+NAVNELUFT = 4
 
 # Litt luft over og under, saa kurven ikke klistrer seg til kanten.
 LUFT = 0.04
@@ -105,6 +127,14 @@ class Navn:
     y: float
 
 
+# Story 8.2c: en linje i forklaringen paa smal skjerm. klasse er kurs, snitt
+# eller indeks, som navnene paa bred skjerm, og y er grunnlinja til navnet.
+@dataclass(frozen=True)
+class Forklaring:
+    klasse: str
+    y: float
+
+
 @dataclass(frozen=True)
 class Graf:
     bredde: int
@@ -128,6 +158,14 @@ class Graf:
     merket: Navn | None = None
     # Story 8.2b, b (U47): navnet ved enden av den stiplede linja.
     indeksnavn: Navn | None = None
+    # Story 8.2c: feltene til hoeyre og nederst, og forklaringen, som bare
+    # den smale grafen har.
+    hoeyrefelt: int = HOEYRE
+    bunnfelt: int = BUNN
+    forklaring: tuple[Forklaring, ...] = ()
+    # Gjennomgangen av 8.2c (BH7, ECH4): et eget felt, ikke utledet av feltet
+    # til hoeyre, saa klassen i malen ikke avhenger av maalene.
+    smal: bool = False
 
     # Story 8.2b, b (U41): kantene paa tegneflaten, som malen tegner
     # rutenettet og merkene etter.
@@ -137,7 +175,7 @@ class Graf:
 
     @property
     def hoeyre(self) -> float:
-        return self.bredde - HOEYRE
+        return self.bredde - self.hoeyrefelt
 
     @property
     def topp(self) -> float:
@@ -145,7 +183,7 @@ class Graf:
 
     @property
     def bunn(self) -> float:
-        return self.hoyde - BUNN
+        return self.hoyde - self.bunnfelt
 
     @property
     def har_ma50(self) -> bool:
@@ -189,17 +227,17 @@ def _spenn(punkter: tuple[Punkt, ...], ekstra: tuple[float, ...] = ()) -> tuple[
     return lav - luft, hoy + luft
 
 
-def _x(i: int, antall: int, bredde: int) -> float:
+def _x(i: int, antall: int, bredde: int, hoeyre: int = HOEYRE) -> float:
     """x for punkt nummer i av antall, innenfor tegneflaten (8.2b, b)."""
-    return VENSTRE + (bredde - VENSTRE - HOEYRE) * i / (antall - 1)
+    return VENSTRE + (bredde - VENSTRE - hoeyre) * i / (antall - 1)
 
 
-def _y(verdi: float, lav: float, hoy: float, hoyde: int) -> float:
+def _y(verdi: float, lav: float, hoy: float, hoyde: int, bunn: int = BUNN) -> float:
     """y for verdien, innenfor tegneflaten, over feltet nederst (8.2b, b)."""
-    return MARG_Y + (hoyde - MARG_Y - BUNN) * (1 - (verdi - lav) / (hoy - lav))
+    return MARG_Y + (hoyde - MARG_Y - bunn) * (1 - (verdi - lav) / (hoy - lav))
 
 
-def _koordinater(punkter, hent, lav, hoy, bredde, hoyde) -> str:
+def _koordinater(punkter, hent, lav, hoy, bredde, hoyde, hoeyre=HOEYRE, bunn=BUNN) -> str:
     """Punktstreng til SVG. Hopper over punkter der verdien mangler."""
     if len(punkter) < 2:
         return ""
@@ -209,7 +247,7 @@ def _koordinater(punkter, hent, lav, hoy, bredde, hoyde) -> str:
         verdi = hent(punkt)
         if verdi is None:
             continue
-        deler.append(f"{_x(i, len(punkter), bredde):.1f},{_y(verdi, lav, hoy, hoyde):.1f}")
+        deler.append(f"{_x(i, len(punkter), bredde, hoeyre):.1f},{_y(verdi, lav, hoy, hoyde, bunn):.1f}")
 
     return " ".join(deler) if len(deler) >= 2 else ""
 
@@ -226,7 +264,7 @@ def _foerste_boersdag(aar: int, maaned: int) -> date | None:
     return dag
 
 
-def _maanedsmerker(punkter: tuple[Punkt, ...], bredde: int) -> tuple[Maanedsmerke, ...]:
+def _maanedsmerker(punkter: tuple[Punkt, ...], bredde: int, hoeyre: int = HOEYRE) -> tuple[Maanedsmerke, ...]:
     """Et merke ved foerste boersdag i hver maaned som finnes i serien - story
     8.0c. x er samme x som punktet for dagen, altsaa etter indeks og ikke
     etter kalenderen, fordi linja har lik avstand per boersdag. Mangler dagen
@@ -244,12 +282,14 @@ def _maanedsmerker(punkter: tuple[Punkt, ...], bredde: int) -> tuple[Maanedsmerk
         foerste = _foerste_boersdag(*maaned)
         if foerste is None or foerste not in indeks:
             continue
-        x = _x(indeks[foerste], len(punkter), bredde)
+        x = _x(indeks[foerste], len(punkter), bredde, hoeyre)
         merker.append(Maanedsmerke(x=x, navn=MAANEDER[foerste.month - 1], til_venstre=x > bredde - NAVNEBREDDE))
     return tuple(merker)
 
 
-def _dagmerker(punkter: tuple[Punkt, ...], bredde: int, hvilke: str) -> tuple[Maanedsmerke, ...]:
+def _dagmerker(
+    punkter: tuple[Punkt, ...], bredde: int, hvilke: str, hoeyre: int = HOEYRE, tynn: bool = True
+) -> tuple[Maanedsmerke, ...]:
     """Story 8.16: merkene for de korte periodene. DAGER gir et merke ved
     hver dag (1 uke), UKER ved foerste dag i hver uke serien har (1 mnd).
     Navnet er datoen, som «02.10» (designregler §4)."""
@@ -263,9 +303,9 @@ def _dagmerker(punkter: tuple[Punkt, ...], bredde: int, hvilke: str) -> tuple[Ma
         if hvilke == UKER and uke == forrige_uke:
             continue
         forrige_uke = uke
-        x = _x(i, len(punkter), bredde)
+        x = _x(i, len(punkter), bredde, hoeyre)
         navn = f"{p.dato.day:02d}.{p.dato.month:02d}"
-        if forrige_navn is not None and x - forrige_navn < DATOBREDDE:
+        if tynn and forrige_navn is not None and x - forrige_navn < DATOBREDDE:
             navn = ""
         else:
             forrige_navn = x
@@ -273,17 +313,58 @@ def _dagmerker(punkter: tuple[Punkt, ...], bredde: int, hvilke: str) -> tuple[Ma
     return tuple(merker)
 
 
-def aksemerker(punkter: tuple[Punkt, ...], bredde: int, hvilke: str = MAANEDSNAVN) -> tuple[Maanedsmerke, ...]:
+def aksemerker(
+    punkter: tuple[Punkt, ...],
+    bredde: int,
+    hvilke: str = MAANEDSNAVN,
+    hoeyre: int = HOEYRE,
+    tynn: bool = True,
+) -> tuple[Maanedsmerke, ...]:
     """Merkene paa aksen etter perioden (story 8.16): dagene, ukene,
     maanedene, eller maanedene med navn paa annenhver for 1 aar og for alle
     perioder med flere enn MAKS_MAANEDSNAVN maaneder, som I aar fra september
-    (gjennomgangen, BH4)."""
+    (gjennomgangen, BH4).
+
+    Gjennomgangen av 8.2c (ECH1): tynn=False lar datoene staa, saa den smale
+    grafen tynner dem i _uten_overlapp fra hoeyre, og datoen naermest
+    dagen grafen slutter paa, ikke tas bort foerst."""
     if hvilke in (DAGER, UKER):
-        return _dagmerker(punkter, bredde, hvilke)
-    merker = _maanedsmerker(punkter, bredde)
+        return _dagmerker(punkter, bredde, hvilke, hoeyre, tynn)
+    merker = _maanedsmerker(punkter, bredde, hoeyre)
     if hvilke == ANNENHVER_MAANED or len(merker) > MAKS_MAANEDSNAVN:
         merker = tuple(m if i % 2 == 0 else Maanedsmerke(m.x, "", m.til_venstre) for i, m in enumerate(merker))
     return merker
+
+
+def navneplass(merke: Maanedsmerke) -> tuple[float, float]:
+    """Story 8.2c: fra og til x for navnet ved merket, med TEGNBREDDE per
+    tegn. Navnet staar 3 til hoeyre for streken, eller 3 til venstre naar
+    det staar til venstre (malen)."""
+    lengde = len(merke.navn) * TEGNBREDDE
+    if merke.til_venstre:
+        return merke.x - 3 - lengde, merke.x - 3
+    return merke.x + 3, merke.x + 3 + lengde
+
+
+def _uten_overlapp(merker: tuple[Maanedsmerke, ...], bredde: int) -> tuple[Maanedsmerke, ...]:
+    """Story 8.2c: navnene paa aksen som ville kommet borti hverandre paa
+    smal skjerm, mister navnet, men ikke streken. Det regnes fra hoeyre, saa
+    det siste navnet, naermest dagen grafen slutter paa, alltid staar.
+
+    Gjennomgangen av 8.2c (BH1, ECH2): et navn som ville gaatt forbi hoeyre
+    kant, staar til venstre for streken. Grensen NAVNEBREDDE er for den
+    brede grafen og holder ikke for «september» paa den smale."""
+    ut = [Maanedsmerke(m.x, m.navn, m.x + 3 + len(m.navn) * TEGNBREDDE > bredde) if m.navn else m for m in merker]
+    grense = None
+    for i in range(len(ut) - 1, -1, -1):
+        if not ut[i].navn:
+            continue
+        fra, til = navneplass(ut[i])
+        if grense is not None and til + NAVNELUFT > grense:
+            ut[i] = Maanedsmerke(ut[i].x, "", ut[i].til_venstre)
+        else:
+            grense = fra
+    return tuple(ut)
 
 
 def _siste(punkter: str) -> tuple[float, float] | None:
@@ -320,12 +401,20 @@ def _navnene(linjer: tuple[str, ...], bredde: int, hoyde: int) -> tuple[Navn | N
     return tuple(ut)
 
 
-def _rutenett(lav: float, hoy: float, hoyde: int, linjer: int = 3) -> tuple[Rutelinje, ...]:
+def _rutenett(lav: float, hoy: float, hoyde: int, linjer: int = 3, bunn: int = BUNN) -> tuple[Rutelinje, ...]:
     ut = []
     for i in range(linjer):
         verdi = lav + (hoy - lav) * i / (linjer - 1)
-        ut.append(Rutelinje(y=_y(verdi, lav, hoy, hoyde), verdi=verdi))
+        ut.append(Rutelinje(y=_y(verdi, lav, hoy, hoyde, bunn), verdi=verdi))
     return tuple(ut)
+
+
+def _forklaringen(linjer: tuple[tuple[str, str], ...], hoyde: int) -> tuple[Forklaring, ...]:
+    """Story 8.2c: en linje i forklaringen for hver linje grafen har, i
+    samme rekkefoelge som navnene staar i malen, i feltet under datoene."""
+    foerste = hoyde - FORKLARING + FORKLARINGSLINJE - 4
+    klasser = [klasse for klasse, punkter in linjer if punkter]
+    return tuple(Forklaring(klasse, foerste + FORKLARINGSLINJE * i) for i, klasse in enumerate(klasser))
 
 
 def bygg_graf(
@@ -335,21 +424,37 @@ def bygg_graf(
     indeks: dict[date, float] | None = None,
     merker: str = MAANEDSNAVN,
     merket: date | None = None,
+    smal: bool = False,
 ) -> Graf | None:
     """Koordinatene for kurs og MA50, og for indeksen naar den er gitt som
     {dato: verdi} (story 2.9c). None naar det ikke er noe aa tegne.
 
     Story 8.16: merker sier hvilke merker aksen faar (aksemerker), og merket
-    er dagen som merkes, naar grafen har den."""
+    er dagen som merkes, naar grafen har den.
+
+    Story 8.2c: smal gir grafen paa smal skjerm, med SMAL_BREDDE og
+    SMAL_HOYDE, og navnene paa linjene i forklaringen under datoene. Da
+    gjelder ikke bredde og hoyde (gjennomgangen, BH8, ECH3)."""
     if len(punkter) < 2:
         return None
 
+    hoeyre, bunn = HOEYRE, BUNN
+    if smal:
+        bredde, hoyde = SMAL_BREDDE, SMAL_HOYDE
+        hoeyre, bunn = SMAL_HOEYRE, BUNN + FORKLARING
     omregnet = indeksverdier(punkter, indeks)
     lav, hoy = _spenn(punkter, tuple(omregnet.values()))
-    kurslinje = _koordinater(punkter, lambda p: p.kurs, lav, hoy, bredde, hoyde)
-    ma50linje = _koordinater(punkter, lambda p: p.ma50, lav, hoy, bredde, hoyde)
-    indekslinje = _koordinater(punkter, lambda p: omregnet.get(p.dato), lav, hoy, bredde, hoyde)
-    kursnavn, snittnavn, indeksnavn = _navnene((kurslinje, ma50linje, indekslinje), bredde, hoyde)
+    kurslinje = _koordinater(punkter, lambda p: p.kurs, lav, hoy, bredde, hoyde, hoeyre, bunn)
+    ma50linje = _koordinater(punkter, lambda p: p.ma50, lav, hoy, bredde, hoyde, hoeyre, bunn)
+    indekslinje = _koordinater(punkter, lambda p: omregnet.get(p.dato), lav, hoy, bredde, hoyde, hoeyre, bunn)
+    if smal:
+        kursnavn = snittnavn = indeksnavn = None
+        forklaring = _forklaringen((("kurs", kurslinje), ("snitt", ma50linje), ("indeks", indekslinje)), hoyde)
+        aksen = _uten_overlapp(aksemerker(punkter, bredde, merker, hoeyre, tynn=False), bredde)
+    else:
+        kursnavn, snittnavn, indeksnavn = _navnene((kurslinje, ma50linje, indekslinje), bredde, hoyde)
+        forklaring = ()
+        aksen = aksemerker(punkter, bredde, merker)
     siste = _siste(kurslinje)
     # Story 8.16: punktet for dagen, regnet fra indeksen som de andre
     # punktene (gjennomgangen, BH11).
@@ -357,7 +462,7 @@ def bygg_graf(
     datoene = [p.dato for p in punkter]
     if merket in datoene:
         i = datoene.index(merket)
-        punktet = Navn(_x(i, len(punkter), bredde), _y(punkter[i].kurs, lav, hoy, hoyde))
+        punktet = Navn(_x(i, len(punkter), bredde, hoeyre), _y(punkter[i].kurs, lav, hoy, hoyde, bunn))
 
     return Graf(
         bredde=bredde,
@@ -371,11 +476,15 @@ def bygg_graf(
         hoy=hoy,
         forste_dato=punkter[0].dato,
         siste_dato=punkter[-1].dato,
-        maanedsmerker=aksemerker(punkter, bredde, merker),
-        rutenett=_rutenett(lav, hoy, hoyde),
+        maanedsmerker=aksen,
+        rutenett=_rutenett(lav, hoy, hoyde, bunn=bunn),
         indekslinje=indekslinje,
         indeksstart=min(omregnet) if omregnet else None,
         indeksslutt=max(omregnet) if omregnet else None,
         merket=punktet,
         indeksnavn=indeksnavn,
+        hoeyrefelt=hoeyre,
+        bunnfelt=bunn,
+        forklaring=forklaring,
+        smal=smal,
     )
