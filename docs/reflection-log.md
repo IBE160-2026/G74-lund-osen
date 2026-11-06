@@ -3256,6 +3256,8 @@ Det vi lærte: å velge samme regning som resten av siden lukket rundene, mens h
 
 *Rettet 2026-11-06 (svaret kl. 19:47), med rådet selv som kilde i instruksjonen kl. 19:50 i dagsfila:* kl. 09:55 anbefalte rådet «Behold som bygget», altså ingen ordlyd på en dag med hull, og vi valgte «Regn aksjen som i tabellen». Utvalget på 15 ordrett var rådets forslag, som vi valgte kl. 15:13 og 15:21. Det er det utfordring 2 og 3 sier ikke er ført i repoet.
 
+*Lagt til 2026-11-07, fra loggen for kveldsjobben 06.11 (`data/logg/kveldshenting-2026-11-06.log`):* fire kjøringer. Kl. 22:15 (start 22:15:02, og på nytt 22:15:04 fordi skriptet ble endret av utsjekken): sjekken av dagen ga ikke FERDIG, men kode 1, Docker og Ollama ble startet og stoppet igjen, og hentingen avsluttet med kode 0. Kl. 22:45, 23:15 og 23:45 (start 22:45:03, 23:15:03 og 23:45:03): sjekken ga FERDIG, Docker og Ollama ble hoppet over, og hentingen avsluttet med kode 0. Loggen har ingen egen linje for sluttkoden. Skriptet avslutter med koden fra hentingen (`exit $kode` i `start/kveldshenting.ps1`) når det ikke har skrevet en FEIL-linje, og loggen har ingen, så sluttkoden var 0 i alle fire. Oppgaveplanleggeren viser 0 for den siste, kl. 23:45 (`LastTaskResult`).
+
 ---
 
 # Joakims oppføringer
