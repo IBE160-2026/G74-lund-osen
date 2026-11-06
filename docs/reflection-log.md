@@ -3223,6 +3223,37 @@ Det vi lærte: en kontroll må sjekke hva et tall gjelder, ikke bare at det finn
 
 ---
 
+## 06.11.2026 – PR #113 flettet etter tre runder, kursgrafen på smal skjerm, og kildene til 9.2
+
+*Joakim og Marian.*
+
+PC-en ble startet på nytt etter Windows-oppdateringen, før pausen i Windows Update gikk ut kl. 12:22. Steg 0 i instruksjonen kl. 10:01 fant siste oppstart 06.11 kl. 09:59. Hvilken oppdatering som ble installert, er ikke slått opp.
+
+PR #113, promptversjon 4, ble squash-flettet kl. 12:57 i `374f1bdb`, etter tre runder med regel 25 og svarene kl. 09:55, 11:15 og 12:16, se utfordring 1 og 2. Jobben tar main fra midnatt, så den bruker versjon 4 fra kjøringen lørdag 07.11 kl. 22:15. PR #115, kursgrafen på smal skjerm (8.2c), ble squash-flettet kl. 16:29 i `b38617f9`. Ved 390 px er teksten i grafen 13,37 px, mot 5,2 px før, og den minste teksten ellers på aksjesiden er 11,5 px. Kl. 17:24 godtok vi begge valgene i spesifikasjonen som bygget: den smale grafen midtstilt i vinduer på om lag 451–767 px, og 10,37 px ved 320 px (`fa06ce5d`).
+
+Story 9.2 skal vise instruksjonene fra 21.–24.09. Kl. 11:50 avgjorde vi at kildene først sjekkes bare med lesing. Kl. 14:13 var de funnet: fem øktlogger dekker dagene, med 122 meldinger fra brukeren før 24.09 kl. 22:05, mens bare dagsfila for 24.09 har instruksjoner ordrett, 14 fra kl. 22:05. Etter svaret kl. 14:55 (`1eff3c40`) ble alle 122 skrevet i utkast i `_privat/`, med 73 flagg, og ingenting fra dem ble committet. Svarene kl. 15:13 og 15:21 valgte et utvalg, se utfordring 3, og etter svaret kl. 17:25 ble `utvalg.md` skrevet: 15 ordrett (4, 4, 4 og 3 per dag) og 107 referatlinjer. Den ligger i `_privat/` og venter på at vi leser den.
+
+**Utfordringer**
+
+1. **Hvert svar på et kanttilfelle i PR #113 ga et nytt funn på middels.**
+   *Problem:* gjennomgangen natt til 06.11 fant BH4/ECH9 (middels): aksjen ble regnet mot forrige børsdag, men tabellen og antallene mot forrige rad. Svaret kl. 09:55 ga to nye funn på middels, se utfordring 2. Svarene kl. 11:15 ga BH4 (middels): bransjen og antallene teller en aksje med hull som en endring «samme dag», selv om endringen går over flere børsdager. Regel 25 holdt: PR-en stoppet før flettingen kl. 10:45 og 12:08, med funnene åpne.
+   *Løsning:* kl. 12:16 valgte vi at bransjen og antallene regnes mot forrige rad, som tabellen og børsometeret, og at den eneste sammenligningen, ordlyden om hovedindeksen, bare gis uten hull (`4d1ae5e1`). Da sto ingen funn på middels eller over åpne, og PR-en ble flettet.
+   *KI sin rolle:* Blind Hunter, Edge Case Hunter og Verification Gap fant funnene. Claude Code bygget hvert svar, holdt funnene som fulgte av svarene åpne og stoppet før flettingen. Gruppen avgjorde hvert kanttilfelle.
+
+2. **Svaret kl. 09:55 ga en ny runde.**
+   *Problem:* i svaret kl. 09:55 valgte vi annerledes enn rådet anbefalte. Hva rådet anbefalte, er ikke ført i repoet; at vi valgte annerledes, står i instruksjonen kl. 19:26 i dagsfila. Svar 1 regnet aksjen som i tabellen, mot forrige rad, også på en dag med hull, og svar 2 lot delen om bransjen stå bare når bransjen har minst to aksjer i lista (`08e527c2`). Det ga BH3/ECH2/VG2 (middels): på en dag med hull sammenlignet ordlyden flere børsdager for aksjen med én for hovedindeksen. Og det ga BH1/ECH1/BH2 (middels): i en bransje der bare én aksje har endring den dagen, er «bransjen i snitt» den ene. PR-en stoppet kl. 10:45.
+   *Løsning:* kl. 11:15 svarte vi: delen om bransjen står bare når minst to aksjer i bransjen har en endring den dagen, og ordlyden om hovedindeksen gis bare når aksjens forrige rad er forrige børsdag (`86585356`). Det ga runden kl. 12:16, se utfordring 1.
+   *KI sin rolle:* rådet anbefalte, og vi valgte noe annet. Linsene fant det svaret førte til, og Claude Code la funnene fram som spørsmål (spesifikasjonen 10.2i, «Åpent etter svaret kl. 09:55»). Gruppen avgjorde.
+
+3. **122 meldinger var for mye å lese, og klokkeslettet for meldingen med rå tall var feil.**
+   *Problem:* utkastene til 9.2 hadde 122 meldinger fra 21.–24.09 og 73 flagg å lese. Svarene kl. 15:13 og 15:21 sa at de rå EODHD-tallene sto i meldingen 23.09 kl. 21:07, men de sto i meldingen kl. 21:35.
+   *Løsning:* vi valgte 15 instruksjoner ordrett, de som satte en regel eller avgjorde noe, og én kort linje om hver av de andre (`01061e70`), og vi leser utvalget før noe committes. Claude Code stoppet i steg 2 i instruksjonen kl. 17:04, og kl. 17:25 svarte vi: kl. 21:07 står ordrett, kl. 21:35 får en referatlinje uten tall, og utvalget er fortsatt 15. Rettelsen står under story 9.2 (`eb7e3cc4`).
+   *KI sin rolle:* det feile klokkeslettet kom fra rådet, i instruksjonen. Claude Code gjentok det først uten oppslag i `01061e70`, fant feilen da meldingen kl. 21:07 ble slått opp i utkastet, og stoppet. Hvem som foreslo 15 ordrett, er ikke ført i repoet. Gruppen avgjorde utvalget og rettelsen.
+
+Det vi lærte: å velge samme regning som resten av siden lukket rundene, mens hvert unntak for et kanttilfelle ga et nytt funn. Et utvalg ordrett, lest før det committes, gir sensor kildene uten at alle 122 meldingene publiseres. Og også rådets instruksjoner må slås opp før de føres, som våre egne.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
