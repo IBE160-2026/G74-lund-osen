@@ -467,6 +467,48 @@ class TestDagsbildet:
         assert bildet.aksjen == FALT
         assert (bildet.aksjer_steg, bildet.aksjer_falt) == (0, 1)
 
+    def test_bransje_med_en_aksje_i_lista(self):
+        """Gruppens svar 6.11 kl. 09:55, 2 (ECH6, BH11): bransjen staar bare
+        naar den har minst to aksjer i lista. Ville feilet hvis DNB, alene i
+        Finans, fikk «bransjen ... i snitt», som da bare sier hva DNB gjorde."""
+        from dagene import setning_om_samme_dag
+
+        bildet = self._bildet({"DNB": _kurser(50.0, 49.0), "EQNR": _kurser(100.0, 101.0)}, aksje=2)
+        assert bildet.aksjen == FALT
+        assert bildet.bransjen is None
+        assert "bransjen" not in setning_om_samme_dag(bildet)
+        energi = self._bildet({"DNB": _kurser(50.0, 49.0), "EQNR": _kurser(100.0, 101.0)}, aksje=0)
+        assert energi.bransjen == STEG
+        assert "steg bransjen i snitt" in setning_om_samme_dag(energi)
+
+    def test_bransjen_med_to_naar_bare_den_ene_har_kurs(self):
+        """Svaret 6.11 kl. 09:55, 2: snittet er det samme som i
+        boersometeret, av aksjene i bransjen som har en endring. Ville feilet
+        hvis bransjen falt bort fordi bare én av to i lista hadde kurs, eller
+        snittet ble regnet annerledes enn snitt i boersometeret."""
+        from boersometer import bygg_rute, snitt
+
+        serier = {"EQNR": _kurser(100.0, 98.0), "AKRBP": _kurser(200.0, 201.0, siste=UKA[-2])}
+        bildet = self._bildet(serier, aksje=0)
+        ruter = [bygg_rute(a, serier[a.symbol], _v("Positiv", 1), FREDAG, FREDAG) for a in self.LISTA[:2]]
+        assert bildet.bransjen == bevegelse(snitt(ruter)) == FALT
+
+    def test_kog_tel_og_ork_faar_ikke_bransjen(self):
+        """Svaret 6.11 kl. 09:55, 2: i lista over de 15 er KOG, TEL og ORK
+        alene i bransjen sin og faar ikke delen om bransjen. Ville feilet hvis
+        en av dem fikk bransjen, eller en aksje med andre i bransjen mistet den."""
+        from kursdata import AKSJEUNIVERS
+
+        serier = {a.symbol: _kurser(100.0, 101.0) for a in AKSJEUNIVERS}
+        alene = set()
+        for aksje in AKSJEUNIVERS:
+            bildet = lag_dagsbilde(aksje, FREDAG, _v("Positiv", 1), {}, AKSJEUNIVERS, serier, None)
+            if bildet.bransjen is None:
+                alene.add(aksje.symbol)
+            else:
+                assert bildet.bransjen == STEG
+        assert alene == {"KOG", "TEL", "ORK"}
+
     def test_ingen_bransje_uten_endring(self):
         bildet = self._bildet({"NY": _kurser(10.0)}, aksje=4)
         assert bildet.bransjen is None

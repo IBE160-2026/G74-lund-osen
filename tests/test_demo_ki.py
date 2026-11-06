@@ -7,6 +7,7 @@ testene som lager rader, gir en falsk modell. Demobasene ligger i tmp_path
 """
 
 import json
+import re
 import sqlite3
 import subprocess
 import sys
@@ -376,6 +377,24 @@ class TestAksjesiden:
             assert rad.grunnlag.get("hovedindeksen") == bildet.hovedindeksen, rad.emne.symbol
             # Gjennomgangen (BH12, VG2): ogsaa aksjen.
             assert rad.grunnlag.get("aksjen") == bildet.aksjen, rad.emne.symbol
+
+    def test_bransjen_bare_med_minst_to_aksjer_i_lista(self, klient, dagene):
+        """Gruppens svar 6.11 kl. 09:55, 2: paa aksjesiden i demoen har
+        setningen om samme dag delen om bransjen bare naar bransjen har minst
+        to aksjer i lista. Ville feilet hvis en demoaksje alene i bransjen sin
+        (VRDS, SGNT og MTFJ) fikk «bransjen ... i snitt», eller BRFE mistet den."""
+        from collections import Counter
+
+        demo.lag_demobase(demo_sti(), skriv=lambda _: None)
+        antall = Counter(a.sektor for a in demo.DEMOUNIVERS)
+        alene = {a.symbol for a in demo.DEMOUNIVERS if antall[a.sektor] < 2}
+        assert alene == {"VRDS", "SGNT", "MTFJ"}
+        for symbol in dagene:
+            side = klient.get(f"/aksje/{symbol}").data.decode("utf-8")
+            samme_dag = re.search(r'<p class="samme-dag">([^<]*)</p>', side)
+            assert samme_dag, symbol
+            assert ("bransjen" in samme_dag.group(1)) == (symbol not in alene), symbol
+        assert "BRFE" in dagene and alene & set(dagene)
 
 
 class _Falsk:
