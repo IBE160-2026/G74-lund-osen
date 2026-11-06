@@ -580,7 +580,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "av sjekkene ga +1, 0 eller -1, styrken og retningen, om hovedindeksen og aksjen selv steg, "
             "falt eller var uendret den dagen når det kan regnes, aksjen regnet mot forrige kurs, som endringen i tabellen, "
             "med en ferdig setning om aksjen gikk samme vei som "
-            "hovedindeksen eller motsatt, og et merke når aksjen "
+            "hovedindeksen eller motsatt når aksjens forrige kurs er fra forrige børsdag, og et merke når aksjen "
             "er utenfor de 15 grensene er målt på, men ingen kurser, prosenter eller volumer. Tallene med prikket strek er sjekket mot det før teksten vises, "
             "og teksten som vises, gir ikke råd og sier ikke noe annet om hovedindeksen, bransjen, børsen "
             "eller antallet aksjer enn den ferdige setningen.",
@@ -592,6 +592,9 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 # Gruppens svar 6.11 kl. 09:55, 1: aksjen som endringen i tabellen.
                 (MARKEDSOVERSIKT, "def endring_i_prosent("),
                 (DAGENE, "aksjen=bevegelse(_endringen("),
+                # Gruppens svar 6.11 kl. 11:15, 2: ordlyden bare over samme periode.
+                (DAGENE, "return til[-2] == indeksens_forrige_boersdag(dag)"),
+                (KI_GRUNNLAG, 'if felt == "hovedindeksen" and not dagen.samme_periode:'),
                 (KI_GRUNNLAG, 'UTENFOR_MAALINGEN = "Utenfor målingen"'),
                 (KI_GRUNNLAG, "fortegnet for hver av de"),
                 (KI_VISNING, "def prikkede_tall("),

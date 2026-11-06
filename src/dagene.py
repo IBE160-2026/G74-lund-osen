@@ -28,6 +28,12 @@ boersometeret: endringen for aksjene i bransjen som har en endring.
 Gruppens svar 6.11 kl. 11:15, 1 (BH1, ECH1, BH2 i PR #113): bransjen staar
 bare naar minst to aksjer i bransjen har en endring den dagen. Med to i lista,
 der bare én har endring, ville snittet ogsaa bare si hva den ene gjorde.
+
+Gruppens svar 6.11 kl. 11:15, 2 (BH3, ECH2, VG2 i PR #113): aksjen regnes
+fortsatt som i tabellen, men samme_periode sier om aksjens forrige rad er
+forrige boersdag, den dagen hovedindeksen regnes mot. Bare da faar grunnlaget
+hovedindeksen, og dermed ordlyden om aksjen gikk samme vei (ki_grunnlag.py),
+saa teksten aldri sammenligner to ulike perioder.
 """
 
 from collections.abc import Mapping
@@ -35,6 +41,7 @@ from dataclasses import dataclass
 from datetime import date
 
 from boersdag import UtenforKalenderen, forrige_boersdag
+from hovedindeks import forrige_boersdag as indeksens_forrige_boersdag
 from hovedindeks import indeksendring
 from kursdata import Aksje, Kursrad
 from markedsoversikt import endring_i_prosent
@@ -119,6 +126,10 @@ class Dagsbilde:
     # den dagen. Svaret 6.11 kl. 09:55, 1: regnet som i tabellen, mot forrige
     # rad (_endringen), ikke som hovedindeksen.
     aksjen: str | None = None
+    # Svaret 6.11 kl. 11:15, 2: om aksjens forrige rad er forrige boersdag, saa
+    # aksjen og hovedindeksen er regnet over den samme dagen. False uten det,
+    # ogsaa naar aksjen mangler, saa ingen ordlyd gis uten at det er sjekket.
+    samme_periode: bool = False
 
 
 def bevegelse(endring: float | None) -> str | None:
@@ -136,6 +147,16 @@ def _endringen(serie: list[Kursrad], dag: date) -> float | None:
     if not til or til[-1].dato != dag:
         return None
     return endring_i_prosent(til[-2:])
+
+
+def _samme_periode(serie: list[Kursrad], dag: date) -> bool:
+    """Svaret 6.11 kl. 11:15, 2: om aksjen har rad paa dag og forrige rad er
+    forrige boersdag, den dagen hovedindeksen regnes mot (indeksendring).
+    False ogsaa naar forrige boersdag ligger utenfor kalenderen."""
+    til = [rad.dato for rad in serie if rad.dato <= dag]
+    if len(til) < 2 or til[-1] != dag:
+        return False
+    return til[-2] == indeksens_forrige_boersdag(dag)
 
 
 def _retningen_paa_dagen(serie: list[Kursrad], dag: date) -> str | None:
@@ -178,6 +199,7 @@ def lag_dagsbilde(
         # Svaret 6.11 kl. 09:55, 1: aksjen som i tabellen og antallene, mot
         # forrige rad, ogsaa paa en dag med hull.
         aksjen=bevegelse(_endringen(serier.get(aksje.symbol, []), dag)),
+        samme_periode=_samme_periode(serier.get(aksje.symbol, []), dag),
     )
 
 

@@ -45,6 +45,12 @@ prompten kan gi ferdig ordlyd om aksjen gikk samme vei som den.
 Gruppens svar 6.11 kl. 09:55, 1 (BH4, ECH9 i PR #113): aksjen regnes som i
 tabellen, mot forrige rad, ogsaa paa en dag med hull, ikke som hovedindeksen
 (lag_dagsbilde i dagene.py).
+
+Gruppens svar 6.11 kl. 11:15, 2 (BH3, ECH2, VG2 i PR #113): hovedindeksen er
+med bare naar aksjen er regnet over den samme dagen (Dagsbilde.samme_periode),
+fordi feltet bare er med for ordlyden om aksjen gikk samme vei
+(ordlyd_om_hovedindeksen i ki_prompt.py). Paa en dag med hull faar grunnlaget
+aksjen, men ikke hovedindeksen, og dermed ingen ordlyd.
 """
 
 from types import MappingProxyType
@@ -114,6 +120,9 @@ def ki_grunnlag(
         grunnlag["merke"] = UTENFOR_MAALINGEN
     if dagen is not None:
         for felt in DAGFELTENE:
+            # Svaret 6.11 kl. 11:15, 2: hovedindeksen bare over samme periode.
+            if felt == "hovedindeksen" and not dagen.samme_periode:
+                continue
             if getattr(dagen, felt) is not None:
                 grunnlag[felt] = getattr(dagen, felt)
     _kontroller(grunnlag)

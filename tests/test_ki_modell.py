@@ -314,6 +314,8 @@ class TestPrompten:
             aksjer_falt=11,
             bransjen="steg",
             aksjen="steg",
+            # Svaret 6.11 kl. 11:15, 2: ellers kommer ikke hovedindeksen med.
+            samme_periode=True,
         )
         grunnlag = ki_grunnlag(vurdering, utenfor_maalingen=True, dagen=dagen)
         forklaringen = REGLER.split("Regler for teksten:")[0]

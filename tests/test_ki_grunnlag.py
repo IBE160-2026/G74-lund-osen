@@ -481,6 +481,53 @@ class TestDagsbildet:
             rad = bygg_rad_for_dag(post, hull, FREDAG, None, FREDAG, False)
             assert self._bildet({"EQNR": hull}).aksjen == bevegelse(rad.endring_prosent)
 
+    def test_ingen_ordlyd_paa_en_dag_med_hull(self):
+        """Gruppens svar 6.11 kl. 11:15, 2 (BH3, ECH2, VG2): paa en dag med
+        hull regnes aksjen fortsatt som i tabellen, men grunnlaget faar ikke
+        hovedindeksen, saa prompten gir ingen ordlyd om aksjen gikk samme vei.
+        Appens setning har fortsatt hovedindeksen, som er regnet over én dag.
+        Ville feilet hvis ordlyden ble gitt naar aksjen er regnet over flere
+        boersdager og hovedindeksen over én, eller hvis aksjen mistet
+        retningen fra tabellen."""
+        from dagene import setning_om_samme_dag
+        from ki_prompt import MOTSATT_VEI, ORDLYDEN, SAMME_VEI, lag_prompt
+        from markedsoversikt import bygg_rad_for_dag
+        from oversiktsdata import Oversiktspost
+
+        indeks = _kurser(1000.0, 1010.0)
+        hull = [Kursrad(dato=d, slutt=k, justert_slutt=k, volum=0) for d, k in ((UKA[-3], 100.0), (FREDAG, 101.0))]
+        post = Oversiktspost(aksje=self.LISTA[0], nyeste=hull[-1], forrige=hull[0], hentet=None, innhold=None)
+        rad = bygg_rad_for_dag(post, hull, FREDAG, None, FREDAG, False)
+        bildet = self._bildet({"EQNR": hull}, indeks)
+        assert bildet.aksjen == bevegelse(rad.endring_prosent) == STEG
+        assert bildet.hovedindeksen == STEG
+        assert bildet.samme_periode is False
+        grunnlag = ki_grunnlag(_v("Positiv", 1), utenfor_maalingen=False, dagen=bildet)
+        assert grunnlag["aksjen"] == STEG and "hovedindeksen" not in grunnlag
+        prompt = lag_prompt(grunnlag)
+        assert not prompt.endswith(ORDLYDEN.format(ordlyd=SAMME_VEI)) and SAMME_VEI not in prompt
+        assert MOTSATT_VEI not in prompt
+        assert "steg hovedindeksen" in setning_om_samme_dag(bildet)
+        # Uten hull: den samme retningen gir ordlyden.
+        uten_hull = self._bildet({"EQNR": _kurser(100.0, 101.0)}, indeks)
+        assert uten_hull.samme_periode is True
+        grunnlag = ki_grunnlag(_v("Positiv", 1), utenfor_maalingen=False, dagen=uten_hull)
+        assert grunnlag["hovedindeksen"] == STEG and SAMME_VEI in lag_prompt(grunnlag)
+
+    def test_samme_periode_bare_med_rad_paa_dagen_og_forrige_boersdag(self):
+        """Svaret 6.11 kl. 11:15, 2: ville feilet hvis samme_periode var True
+        uten rad paa dagen, med bare én rad, eller med forrige rad foer
+        forrige boersdag, eller False naar aksjen har begge radene."""
+        assert self._bildet({"EQNR": _kurser(100.0, 101.0)}).samme_periode is True
+        assert self._bildet({"EQNR": _kurser(100.0, 101.0, siste=UKA[-2])}).samme_periode is False
+        assert self._bildet({"EQNR": _kurser(100.0)}).samme_periode is False
+        assert self._bildet({}).samme_periode is False
+        # Over helgen: fredag 16.10 er forrige boersdag foer mandag 19.10.
+        helg = lag_dagsbilde(
+            self.LISTA[0], UKA[1], _v("Positiv", 1), {}, self.LISTA, {"EQNR": _kurser(100.0, 101.0, siste=UKA[1])}, None
+        )
+        assert helg.samme_periode is True
+
     def test_bransje_med_en_aksje_i_lista(self):
         """Gruppens svar 6.11 kl. 09:55, 2 (ECH6, BH11): bransjen staar bare
         naar den har minst to aksjer i lista. Ville feilet hvis DNB, alene i
@@ -549,7 +596,14 @@ class TestDagsbildet:
 
 class TestGrunnlagetMedDagen:
     BILDET = Dagsbilde(
-        dager=4, dager_minst=True, hovedindeksen=STEG, aksjer_steg=9, aksjer_falt=5, bransjen=FALT, aksjen=FALT
+        dager=4,
+        dager_minst=True,
+        hovedindeksen=STEG,
+        aksjer_steg=9,
+        aksjer_falt=5,
+        bransjen=FALT,
+        aksjen=FALT,
+        samme_periode=True,
     )
 
     def test_feltene(self):
