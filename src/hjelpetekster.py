@@ -477,8 +477,14 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             f"den tykke linja er utbyttejustert kurs, og den tynne er "
             f"snittet av de siste {ma} børsdagene, som trendsjekken måler mot. "
             # Story 8.2b, b (U41, U47): navnene står i feltet til høyre.
-            f"Navnene står til høyre, ved enden av linjene. Sjekk 2 og 3 står i kortene over.",
-            ((AKSJE_MAL, "Sjekk 2 og 3 tegnes ikke"), (AKSJEDETALJ, "glidende_snitt(kurser, p.ma_vindu)")),
+            # Story 8.2c: på smal skjerm står de under grafen.
+            f"Navnene står til høyre, ved enden av linjene, og på smal skjerm under grafen. "
+            f"Sjekk 2 og 3 står i kortene over.",
+            (
+                (AKSJE_MAL, "Sjekk 2 og 3 tegnes ikke"),
+                (AKSJEDETALJ, "glidende_snitt(kurser, p.ma_vindu)"),
+                (GRAF, "def _forklaringen("),
+            ),
         ),
         # Story 8.17a: periodevalget i oversikten, med søylene og linja.
         "perioden_oversikten": Hjelpetekst(

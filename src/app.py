@@ -1159,6 +1159,15 @@ def aksjedetalj(symbol: str):
                 merker=AKSEMERKER.get(valg.periode, MAANEDSNAVN),
                 merket=dagen.dato if dagen else None,
             ),
+            # Story 8.2c: den samme grafen med egne mål, som stilarket viser
+            # i stedet når figuren er smal.
+            graf_smal=bygg_graf(
+                detalj.punkter,
+                indeks=indeks,
+                merker=AKSEMERKER.get(valg.periode, MAANEDSNAVN),
+                merket=dagen.dato if dagen else None,
+                smal=True,
+            ),
             valg=valg,
             dagen=dagen,
             # Story 8.16b: merket øverst bare for en dag før siste børsdag.

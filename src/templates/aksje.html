@@ -153,48 +153,61 @@
   {% if graf %}
     <figure>
       {#- Svar 19: navnene står ved enden av linjene, og etiketten sier
-          hvilken linje som er hva for skjermleseren. #}
-      <svg class="graf" viewBox="0 0 {{ graf.bredde }} {{ graf.hoyde }}" role="img"
-           aria-label="Kursutvikling for {{ detalj.aksje.navn }}: den tykke linja er utbyttejustert kurs{% if graf.har_ma50 %}, og den tynne er {{ parametre.ma_vindu }}-dagers snitt (sjekk 1){% endif %}{% if graf.har_indeks %}. Den stiplede er hovedindeksen {{ indeks_symbol }}, regnet om så den starter på aksjens kurs {{ graf.indeksstart|dato }}{% elif indeks_feilet %}. Hovedindeksen kunne ikke leses{% else %}. Hovedindeksen mangler for perioden{% endif %}">
-        {% for linje in graf.rutenett %}
+          hvilken linje som er hva for skjermleseren.
+          Story 8.2c: den samme grafen med egne mål på smal skjerm
+          (graf_smal), med navnene i en forklaring under datoene.
+          Stilarket viser den ene av dem, etter bredden på figuren. #}
+      {%- set linjenavn = {"kurs": "Utbyttejustert kurs", "snitt": parametre.ma_vindu ~ "-dagers snitt (sjekk 1)", "indeks": "Hovedindeksen"} %}
+      {%- set linjeklasse = {"kurs": "kurslinje", "snitt": "ma50linje", "indeks": "indekslinje"} %}
+      {% for g in (graf, graf_smal) %}
+      <svg class="graf{% if g.smal %} smal{% endif %}" viewBox="0 0 {{ g.bredde }} {{ g.hoyde }}" role="img"
+           aria-label="Kursutvikling for {{ detalj.aksje.navn }}: den tykke linja er utbyttejustert kurs{% if g.har_ma50 %}, og den tynne er {{ parametre.ma_vindu }}-dagers snitt (sjekk 1){% endif %}{% if g.har_indeks %}. Den stiplede er hovedindeksen {{ indeks_symbol }}, regnet om så den starter på aksjens kurs {{ g.indeksstart|dato }}{% elif indeks_feilet %}. Hovedindeksen kunne ikke leses{% else %}. Hovedindeksen mangler for perioden{% endif %}">
+        {% for linje in g.rutenett %}
           {#- Story 8.2b, b (U41): tallene står i feltet til venstre, ikke
               inne i grafen. #}
-          <line class="rute" x1="{{ graf.venstre }}" y1="{{ "%.1f"|format(linje.y) }}"
-                x2="{{ graf.hoeyre }}" y2="{{ "%.1f"|format(linje.y) }}"></line>
-          <text class="rutetekst" text-anchor="end" x="{{ graf.venstre - 6 }}" y="{{ "%.1f"|format(linje.y + 4) }}">
+          <line class="rute" x1="{{ g.venstre }}" y1="{{ "%.1f"|format(linje.y) }}"
+                x2="{{ g.hoeyre }}" y2="{{ "%.1f"|format(linje.y) }}"></line>
+          <text class="rutetekst" text-anchor="end" x="{{ g.venstre - 6 }}" y="{{ "%.1f"|format(linje.y + 4) }}">
             {{ linje.verdi|tall('akse') }}
           </text>
         {% endfor %}
         {#- Story 8.0c: et merke ved foerste boersdag i hver maaned, tegnet foer
             linjene saa streken ligger under kurslinja. #}
-        {% for merke in graf.maanedsmerker %}
+        {% for merke in g.maanedsmerker %}
           {#- Story 8.2b, b (U41): datoene står i feltet nederst, under
               tegneflaten. #}
-          <line class="maanedsstrek" x1="{{ "%.1f"|format(merke.x) }}" y1="{{ graf.topp }}"
-                x2="{{ "%.1f"|format(merke.x) }}" y2="{{ graf.bunn }}"></line>
+          <line class="maanedsstrek" x1="{{ "%.1f"|format(merke.x) }}" y1="{{ g.topp }}"
+                x2="{{ "%.1f"|format(merke.x) }}" y2="{{ g.bunn }}"></line>
           {% if merke.til_venstre %}
-            <text class="maanedstekst" text-anchor="end" x="{{ "%.1f"|format(merke.x - 3) }}" y="{{ graf.hoyde - 6 }}">{{ merke.navn }}</text>
+            <text class="maanedstekst" text-anchor="end" x="{{ "%.1f"|format(merke.x - 3) }}" y="{{ g.bunn + 16 }}">{{ merke.navn }}</text>
           {% else %}
-            <text class="maanedstekst" x="{{ "%.1f"|format(merke.x + 3) }}" y="{{ graf.hoyde - 6 }}">{{ merke.navn }}</text>
+            <text class="maanedstekst" x="{{ "%.1f"|format(merke.x + 3) }}" y="{{ g.bunn + 16 }}">{{ merke.navn }}</text>
           {% endif %}
         {% endfor %}
         {#- Story 2.9c: indeksen under kurslinja og snittet. #}
-        {% if graf.har_indeks %}
-          <polyline class="indekslinje" points="{{ graf.indekslinje }}"></polyline>
+        {% if g.har_indeks %}
+          <polyline class="indekslinje" points="{{ g.indekslinje }}"></polyline>
         {% endif %}
-        {% if graf.ma50linje %}
-          <polyline class="ma50linje" points="{{ graf.ma50linje }}"></polyline>
+        {% if g.ma50linje %}
+          <polyline class="ma50linje" points="{{ g.ma50linje }}"></polyline>
         {% endif %}
-        <polyline class="kurslinje" points="{{ graf.kurslinje }}"></polyline>
-        {% if graf.merket %}<line class="dagstrek" x1="{{ "%.1f"|format(graf.merket.x) }}" y1="{{ graf.topp }}" x2="{{ "%.1f"|format(graf.merket.x) }}" y2="{{ graf.bunn }}"></line>{% endif %}
-        {% if graf.siste %}<circle class="sistepunkt" cx="{{ "%.1f"|format(graf.siste.x) }}" cy="{{ "%.1f"|format(graf.siste.y) }}" r="4.5"></circle>{% endif %}
-        {% if graf.merket %}<circle class="dagpunkt" cx="{{ "%.1f"|format(graf.merket.x) }}" cy="{{ "%.1f"|format(graf.merket.y) }}" r="5.5"></circle>{% endif %}
+        <polyline class="kurslinje" points="{{ g.kurslinje }}"></polyline>
+        {% if g.merket %}<line class="dagstrek" x1="{{ "%.1f"|format(g.merket.x) }}" y1="{{ g.topp }}" x2="{{ "%.1f"|format(g.merket.x) }}" y2="{{ g.bunn }}"></line>{% endif %}
+        {% if g.siste %}<circle class="sistepunkt" cx="{{ "%.1f"|format(g.siste.x) }}" cy="{{ "%.1f"|format(g.siste.y) }}" r="4.5"></circle>{% endif %}
+        {% if g.merket %}<circle class="dagpunkt" cx="{{ "%.1f"|format(g.merket.x) }}" cy="{{ "%.1f"|format(g.merket.y) }}" r="5.5"></circle>{% endif %}
         {#- Story 8.2b, b (U41, U47): navnene står i feltet til høyre, ved
             enden av linjene, og den stiplede linja har også navn. #}
-        {% if graf.kursnavn %}<text class="linjenavn kurs" x="{{ "%.1f"|format(graf.kursnavn.x) }}" y="{{ "%.1f"|format(graf.kursnavn.y) }}">Utbyttejustert kurs</text>{% endif %}
-        {% if graf.snittnavn %}<text class="linjenavn snitt" x="{{ "%.1f"|format(graf.snittnavn.x) }}" y="{{ "%.1f"|format(graf.snittnavn.y) }}">{{ parametre.ma_vindu }}-dagers snitt (sjekk 1)</text>{% endif %}
-        {% if graf.indeksnavn %}<text class="linjenavn indeks" x="{{ "%.1f"|format(graf.indeksnavn.x) }}" y="{{ "%.1f"|format(graf.indeksnavn.y) }}">Hovedindeksen</text>{% endif %}
+        {% if g.kursnavn %}<text class="linjenavn kurs" x="{{ "%.1f"|format(g.kursnavn.x) }}" y="{{ "%.1f"|format(g.kursnavn.y) }}">{{ linjenavn.kurs }}</text>{% endif %}
+        {% if g.snittnavn %}<text class="linjenavn snitt" x="{{ "%.1f"|format(g.snittnavn.x) }}" y="{{ "%.1f"|format(g.snittnavn.y) }}">{{ linjenavn.snitt }}</text>{% endif %}
+        {% if g.indeksnavn %}<text class="linjenavn indeks" x="{{ "%.1f"|format(g.indeksnavn.x) }}" y="{{ "%.1f"|format(g.indeksnavn.y) }}">{{ linjenavn.indeks }}</text>{% endif %}
+        {#- Story 8.2c: på smal skjerm står navnene under datoene, hvert
+            med et stykke av linja det hører til. #}
+        {% for f in g.forklaring %}
+          <line class="{{ linjeklasse[f.klasse] }}" x1="{{ g.venstre }}" y1="{{ f.y - 4 }}" x2="{{ g.venstre + 20 }}" y2="{{ f.y - 4 }}"></line>
+          <text class="linjenavn {{ f.klasse }}" x="{{ g.venstre + 26 }}" y="{{ f.y }}">{{ linjenavn[f.klasse] }}</text>
+        {% endfor %}
       </svg>
+      {% endfor %}
 
       <figcaption>
         {{ graf.forste_dato|dato }} til {{ graf.siste_dato|dato }}.
