@@ -29,7 +29,9 @@ I Edge, på main (`abf65895`), aksjesiden for BRFE i demoen, i en iframe med nø
 | SVG-en, px | 962 | 962 | 962 | 822 | 683 | 682 | 522 | 312 | 282 | 242 |
 | Teksten i grafen, px | 16,03 | 16,03 | 16,03 | 13,7 | 11,38 | 11,37 | 8,7 | 5,2 | 4,7 | 4,03 |
 
-Det samme for siste børsdag, en annen dag (01.10) og 1 uke. Ingen tekst utenfor grafen og ingen vannrett rulling i noen av de 30.
+Det samme for standardsiden (`/aksje/BRFE`), en annen dag (01.10) og 1 uke. Ingen tekst utenfor grafen og ingen vannrett rulling i noen av de 30.
+
+*Rettet 2026-11-06:* standardsiden for en aksje er 6 mnd, ikke siste børsdag, som det sto her og under «Målt etter endringen». Siste børsdag (`?periode=siste`, 6 mnd fram til fredag 09.10, med dagen merket) er målt etterpå, på main (`abf65895`), og ga de samme tallene som tabellen over, uten tekst utenfor og uten rulling.
 
 ## Approach
 
@@ -37,7 +39,7 @@ Det samme for siste børsdag, en annen dag (01.10) og 1 uke. Ingen tekst utenfor
 
 - **Navnene på linjene** står i en forklaring under datoene (`FORKLARING`, 52), én linje per navn med et stykke av linja det hører til, i samme farge og strek. *Grunnen:* i feltet til høyre ville det lengste navnet, «50-dagers snitt (sjekk 1)», tatt over halve flaten. Navnene er de samme, og bare linjer som er tegnet, får navn.
 - **Navn på aksen** som ville kommet borti hverandre, mister navnet, men ikke streken (`_uten_overlapp`). Plassen regnes med 7 per tegn (`TEGNBREDDE`) og 4 mellom navnene, fra høyre, så det siste navnet, nærmest dagen grafen slutter på, alltid står. *Grunnen:* på 228 i bredden får ikke alle månedsnavnene eller datoene plass. Ved 6 mnd for BRFE står mai, juni, juli og oktober, og august og september har bare streken. Dette er det eneste som utelates.
-- Den brede grafen regnes som før. Alle 135 aksjesidene i demoen (15 aksjer, siste børsdag, to andre dager og seks perioder) ga byte for byte samme HTML før og etter.
+- Den brede grafen regnes som før. Alle 135 aksjesidene i demoen (15 aksjer, standardsiden, to andre dager og seks perioder) ga byte for byte samme HTML før og etter.
 
 *Utfallet:* `8bfc9885`. `TestSmalSkjerm` i `tests/test_graf.py` har fem tester med «Ville feilet hvis» (de samme punktene, linjene, skalaen, rutenettet og strekene som den brede; ingen linje i feltene; dagen som er merket; navnene i forklaringen; navnene på aksen uten overlapp for 1 uke, 1 mnd, 3 mnd, 6 mnd, I år og 1 år, med det siste navnet beholdt). Bildene i `docs/appen/` ble tatt på nytt og er byte for byte de samme, så bare avtrykkene i `test_docker.py` er satt.
 
@@ -51,7 +53,7 @@ Det samme for siste børsdag, en annen dag (01.10) og 1 uke. Ingen tekst utenfor
 
 ## Målt etter endringen
 
-Som før, på `ccbbe0df`, for siste børsdag, en annen dag (01.10) og 1 uke:
+Som før, på `ccbbe0df`, for standardsiden, en annen dag (01.10) og 1 uke, og på nytt etter rettingene i `67596cb8`, med de samme tallene. Siste børsdag (`?periode=siste`) er målt på `67596cb8` og ga de samme tallene:
 
 | Vindu | 1280 | 1100 | 1079 | 900 | 761 | 760 | 600 | 390 | 360 | 320 |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -59,7 +61,7 @@ Som før, på `ccbbe0df`, for siste børsdag, en annen dag (01.10) og 1 uke:
 | SVG-en, px | 962 | 962 | 962 | 822 | 373,3 | 373,3 | 373,3 | 312 | 282 | 242 |
 | Teksten i grafen, px | 16,03 | 16,03 | 16,03 | 13,7 | 16 | 16 | 16 | 13,37 | 12,09 | 10,37 |
 
-Ingen tekst utenfor grafen, ingen tekst i grafen oppå en annen og ingen vannrett rulling i noen av de 30. Den minste teksten ellers er 11,5 px. Ved 320 px er teksten i grafen 10,37 px, under 11,5, men kravet gjelder 390 px. 1 mnd, 3 mnd, 6 mnd, I år og 1 år for BRFE, siste børsdag for VRDS og 1 år for KVST ved 390 og 320 px ga det samme: ingen tekst utenfor, ingen overlapp og ingen rulling.
+Ingen tekst utenfor grafen, ingen tekst i grafen oppå en annen og ingen vannrett rulling i noen av de 30. Den minste teksten ellers er 11,5 px. Ved 320 px er teksten i grafen 10,37 px, under 11,5, men kravet gjelder 390 px. 1 mnd, 3 mnd, 6 mnd, I år og 1 år for BRFE, standardsiden for VRDS og 1 år for KVST ved 390 og 320 px ga det samme: ingen tekst utenfor, ingen overlapp og ingen rulling.
 
 ## Testene
 
@@ -81,7 +83,7 @@ På diffen `abf65895..b4cc5c44`, etter hele settet, med Blind Hunter (BH, 13 fun
 |---|---|---|---|
 | ECH1 | middels | Ved 1 mnd tok `DATOBREDDE` i `_dagmerker` bort datoen nærmest sluttdagen før `_uten_overlapp`, mot påstanden over | Rettet: på smal skjerm tynnes datoene bare i `_uten_overlapp`, fra høyre (`tynn=False`). Testene for 1 mnd til 09.04 og 30.12 |
 | BH1, ECH2 | middels, lav | Et siste navn som «september» kunne gå forbi høyre kant, fordi grensen `NAVNEBREDDE` er for den brede grafen | Rettet: et navn som ville gått forbi kanten, står til venstre for streken. Testene for 3 mnd til 23.09 og 6 mnd til 30.11 |
-| BH2, VG3 | middels, lav | Nettlesertesten tok bare standardperioden | Rettet: 1 uke, 1 mnd, 1 år og en annen dag (01.10) ved 390 og 320 px |
+| BH2, VG3 | middels, lav | Nettlesertesten tok bare standardperioden | Rettet: 1 uke, 1 mnd, 1 år og en annen dag (01.10) ved 390 og 320 px, og siste børsdag i `b93bc5da` |
 | BH4 | middels | Testen av navnene på aksen bruker samme anslag som koden, og sjekket ikke feltet med tallene | Rettet: `VENSTRE <= fra`, og den virkelige plassen sjekkes i nettleseren for fire perioder og en annen dag |
 | VG1 | middels | Nettlesertesten ble hoppet over i CI uten nettleser | Rettet: samme vakt som `test_hjelpefeltet.py`, så den feiler i CI |
 | VG2 | middels | Dagen som er merket, var ikke sjekket i høyden eller på siden | Rettet: punktet ligger på kurslinja innenfor tegneflaten, og dagstreken og dagpunktet står én gang i hver graf ved en valgt dag |
@@ -98,6 +100,8 @@ På diffen `abf65895..b4cc5c44`, etter hele settet, med Blind Hunter (BH, 13 fun
 | ECH5 | lav | Uten stilark vises begge grafene | Står: stilarket lastes alltid, og uten det vises ingen andre regler på siden heller |
 
 Hele settet før `67596cb8`: 4254 bestått, 24 hoppet over og 3 porttester for `start.ps1` som feilet. Alle sju bildene i `docs/appen/` ble tatt på nytt og er byte for byte de samme, og de 30 målingene og de 14 for de andre periodene ble gjort på nytt, med de samme tallene og ingen avvik.
+
+Hele settet før `b93bc5da` (siste børsdag i testen i nettleseren): 4257 bestått, 24 hoppet over og 2 porttester for `start.ps1` som feilet.
 
 - M3, kl. 16:13:47 på `67596cb8`: `tynn=True` igjen i `bygg_graf`, som før ECH1. Fanget av `test_navnene_paa_aksen_kommer_ikke_borti_hverandre` for 1 mnd til 09.04 og 30.12.
 
