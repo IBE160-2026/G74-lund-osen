@@ -2,7 +2,7 @@
 title: "Brukertesten"
 status: aktiv
 created: 2026-10-23
-updated: 2026-11-03T15:05
+updated: 2026-11-07T00:07
 ---
 
 # Brukertesten
@@ -26,6 +26,8 @@ Ingen navn eller annet som kan kjenne personen igjen, står her. En kurs eller e
 | KI av: knappen sier «Vis KI-teksten» | |
 | Bare oversikten åpen, øverst på siden | |
 | Det som ble sagt, ordrett | |
+
+*Rettet 2026-11-07:* knappen «Skjul KI-teksten» og «Vis KI-teksten» finnes ikke lenger. Den er nå bryteren «KI-tekst» med «På» og «Av» (`role="switch"` i makroen `ki_bryter` i `src/templates/aksje.html`), inne i rammen «‹navn› kort fortalt» øverst til høyre når teksten vises, og alene når KI er av. Den kom med story 8.2b (U33, U46 og U67), squash-flettet i `6f62f564`, PR #109, og svaret 04.11 kl. 09:58 på spørsmål 5 og 6 i `spec-8-2b-funnene-fra-ux-loggen.md` holdt den i blekk og utenfor stripa. KI av før del A betyr at bryteren viser «Av», og i del B slås den til «På». Raden «KI av: knappen sier «Vis KI-teksten»» over gjelder bryteren som viser «Av».
 
 ## Del A (story 8.1): KI av
 
