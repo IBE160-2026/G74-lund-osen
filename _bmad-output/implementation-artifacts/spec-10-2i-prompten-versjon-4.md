@@ -165,3 +165,47 @@ Spørsmål til gruppen:
 
 1. **BH4, ECH9 (middels, følger av instruksjonen):** aksjen regnes mot forrige børsdag, som hovedindeksen, men endringen i tabellen og antallene regnes mot forrige rad. På en dag der aksjen mangler kurs dagen før, får den ingen ordlyd, men telles i antallene. Skal aksjen regnes som i tabellen i stedet?
 2. **ECH6, BH11 (lav):** «bransjen i snitt» tar med aksjen selv, så for en aksje alene i bransjen i lista sier setningen bare hva aksjen gjorde. Skal bransjen regnes uten aksjen, eller bare stå når den har minst to?
+
+
+## Svaret 6.11 kl. 09:55 (instruksjonen kl. 10:01)
+
+**Beslutningen** (under story 10.4 i `epics.md`, `08e527c2`): på spørsmålene i PR #113: 1) retningen på aksjen regnes som i tabellen, mot forrige rad, også på en dag med hull (BH4/ECH9); 2) delen om bransjen i appens setning står bare når bransjen har minst to aksjer i lista, så KOG, TEL og ORK får den ikke, og snittet er det samme som i børsometeret (ECH6/BH11).
+
+Main ble flettet inn i grenen i `583f5c7e`.
+
+**Svar 1** (`d472a544`): `aksjen` i `lag_dagsbilde` er `bevegelse(_endringen(...))`, den samme endringen som antallene og tabellen (`endring_i_prosent` på de to siste radene til og med dagen). Hovedindeksen regnes fortsatt mot forrige børsdag (`_retningen_paa_dagen`). Det som står under b) og c) over om at aksjen regnes som hovedindeksen, gjelder ikke lenger. `test_aksjen_regnes_som_hovedindeksen` er erstattet av `test_aksjen_regnes_som_i_tabellen` og `test_aksjen_paa_en_dag_med_hull`. README-en, `docs/hjelp.md` og hjelpen «Kort fortalt» sier at aksjen regnes mot forrige kurs, som endringen i tabellen. Grunnlaget i demoen er det samme (`test_setningen_om_samme_dag_er_regnet_som_grunnlaget` sammenligner `aksjen` i hver demorad), så demotekstene er ikke laget på nytt, og ingen ny prøvekjøring er gjort, fordi alle 15 fikk ordlyd i §55. Mutant 1 (`aksjen` regnet med `_retningen_paa_dagen` igjen) ble fanget av `test_aksjen_paa_en_dag_med_hull`.
+
+**Svar 2** (`04a267f4`): `lag_dagsbilde` gir `bransjen` None når bransjen har færre enn `MINST_I_BRANSJEN` (2) aksjer i lista. Snittet er som før, av aksjene i bransjen som har en endring, som `snitt` i børsometeret. I lista over de 15 er KOG, TEL og ORK alene i bransjen sin, og i demoen VRDS, SGNT og MTFJ. Grunnlaget har ikke bransjen, så prompten, avtrykket og demotekstene er de samme. README-en og `docs/hjelp.md` sier at bransjen bare står med minst to aksjer i lista. Mutant 2 (grensen satt til 1) ble fanget av `test_bransje_med_en_aksje_i_lista`, `test_kog_tel_og_ork_faar_ikke_bransjen` og `test_bransjen_bare_med_minst_to_aksjer_i_lista`.
+
+**Bildene** er tatt på nytt fra demoen etter hver endring, fordi avtrykkene dekker `dagene.py` og `hjelpetekster.py`. Ved 1280 px er alle fem byte for byte de samme, og ved 390 px er begge piksel for piksel de samme, så ingen PNG er endret. Bare avtrykkene er satt på nytt.
+
+**Mutantene** ble kjørt med kopi før og fila lik HEAD etter (samme blob, og samme sha256 uten CR): 1 kl. 10:16:11 på `d472a544` og 2 kl. 10:27:11 på `04a267f4`.
+
+**Hele settet**, alene og med Ollama stoppet, før hver commit med kode eller tester: 4212 (svar 1), 4217 (svar 2) og 4217 (rettingene) bestått, 24 hoppet over hver gang, og bare porttester for `start.ps1` som feilet (7, 6 og 7).
+
+### Gjennomgangen av svaret kl. 09:55
+
+Gjennomgang 06.11 etter hele settet for svar 2, av diffen `583f5c7e..04a267f4` uten PNG-filene, med Blind Hunter (BH, 14 funn), Edge Case Hunter (ECH, 5) og Verification Gap (VG, 3). Triagen følger regel 25. Rettet i `631021a0`.
+
+| # | Funn | Grad | Rute |
+|---|---|---|---|
+| BH1, ECH1, BH2 | Bransjen har minst to aksjer i lista, men bare én har en endring den dagen, så «bransjen i snitt» er bare den ene. Er det aksjen selv, sier setningen bare hva aksjen gjorde, som svaret skulle hindre. Kontrolltilfellet i `test_bransje_med_en_aksje_i_lista` er et slikt tilfelle | middels | **åpent, spørsmål 1 til gruppen:** følger av svaret («minst to aksjer i lista», «snittet det samme som i børsometeret»), så graden settes ikke ned (regel 25) |
+| BH3, ECH2, VG2 | På en dag med hull er `aksjen` endringen over flere børsdager, mens hovedindeksen er én dag, og ordlyden «samme vei» eller «motsatt vei» sammenligner dem. Prompten sier «i dag» om feltet | middels (BH, ECH), lav (VG) | **åpent, spørsmål 2 til gruppen:** følger av svar 1 («også på en dag med hull»), så graden settes ikke ned (regel 25) |
+| BH4 | Betydningen av `aksjen` endres uten ny promptversjon | middels | **avvist:** versjon 4 er ikke flettet, og jobben bruker main, så ingen tekst i `ose.db` har versjon 4. Avtrykket dekker prompten, ikke utregningen i `dagene.py` |
+| BH12, VG1 | Testen for aksjen sammenlignet med en kopi av utregningen, ikke med tabellen | lav | **rettet:** `test_aksjen_som_tabellraden_paa_en_dag_med_hull` sammenligner med `bygg_rad_for_dag` |
+| BH8, ECH4 | Hjelpen sa «som har kurs», men snittet tar med aksjene som har en endring. «Mot kursen før som endringen i tabellen» var tungt å lese | lav | **rettet** i `docs/hjelp.md`, README-en og `hjelpetekster.py` |
+| BH9, ECH5 | Docstringen i `ki_grunnlag.py` sa fortsatt «regnet som for hovedindeksen» over det nye avsnittet | lav | **rettet:** viser til svaret og avsnittet under |
+| BH6 | Ankeret for hjelpen viste bare til `endring_i_prosent` | lav | **rettet:** også `aksjen=bevegelse(_endringen(` i `dagene.py` (`DAGENE`) |
+| ECH3, BH11 | Demotesten krevde bransjen for hver aksje som ikke er alene, også uten endring, og sjekket forutsetningen etter løkka | lav | **rettet:** sammenligner med `bildet.bransjen`, og forutsetningen står før løkka. Kallet til `lag_demobase` står, som i testen over |
+| BH7 | Hjelpen «?» sier ikke at bransjen krever to aksjer | lav | **står:** setningen om samme dag har ingen «?», bare `docs/hjelp.md` |
+| BH5 | En aksje utenfor lista | lav | **står:** siden leser lista fra `aksje` i basen, og alle aksjene på siden er i den |
+| BH10 | Kommentarene om bildene sier ikke hvilke PNG-filer som er committet | lav | **står:** ingen PNG er endret, og kommentarene sier «byte for byte» og «piksel for piksel». Oversikten er ikke bak svar 2 |
+| BH13 | En aksje uten sektor | lav | **står:** `sektor` er satt for alle i `AKSJEUNIVERS` og `DEMOUNIVERS` |
+| BH14 | Settene KOG, TEL og ORK og VRDS, SGNT og MTFJ er skrevet inn for hånd | lav | **står:** svaret nevner dem, og demotesten regner settet ut fra lista før den sammenligner |
+
+### Åpent etter svaret kl. 09:55
+
+Spørsmål til gruppen:
+
+1. **BH1, ECH1, BH2 (middels, følger av svaret):** en bransje med minst to aksjer i lista, der bare én har en endring den dagen, får «bransjen i snitt» av den ene. Er det aksjen selv, sier setningen bare hva aksjen gjorde. Skal bransjen også kreve minst to aksjer med endring den dagen, eller står det som i børsometeret?
+2. **BH3, ECH2, VG2 (middels, følger av svar 1):** på en dag med hull er aksjen regnet over flere børsdager og hovedindeksen over én, og ordlyden sier likevel «samme vei» eller «motsatt vei». Skal ordlyden bare gis når aksjens forrige rad er forrige børsdag, eller står den?
