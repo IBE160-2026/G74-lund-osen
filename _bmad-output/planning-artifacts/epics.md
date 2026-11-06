@@ -609,6 +609,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-10-23 kl. 16:37 (gruppens svar):* tre veier prøves, hver på sin gren: dobbeltklikk med uv (3.5a), dobbeltklikk med Docker (3.5b) og et installasjonsprogram for Windows (3.5c), ikke for Mac. Gruppen velger hovedveien i «Kom i gang» før README-prøven, med Docker som reserve.
 
+*Lagt til 2026-11-07 (svaret 06.11 kl. 22:05 under story 10.9):* rekkefølgen er story 10.9, KI-teksten forklarer det siden viser, så UX-rettingene fra gruppens gjennomgang 06.11 (U75–U102 i `docs/ux-logg.md`). Rådet anbefalte UX-rettingene først.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -3116,6 +3118,8 @@ brevet 21.09 og purringen 22.09 ikke er besvart. Tittelen står.
 
 *Lagt til 2026-10-21 kl. 11:20:* lenken til investorsiden er squash-flettet i `bd19380`, PR #81, låst til head-en `4cb9266` (spesifikasjonen `spec-10-5-investorsiden.md`). Adressene står i `INVESTORSIDER` i `src/kursdata.py`, knyttet til symbolet, og demoen har teksten fra svaret kl. 19:49. Hele settet: 2797 bestått og 17 hoppet over, og CI var grønn på head-en (39575824580). Alle seks mutantene ble fanget. Spesifikasjonen er `done`.
 
+*Lagt til 2026-11-07:* i demoen går lenken til investorsiden til siden for selskapet i story 3.4h (svaret 06.11 kl. 23:51 under 3.4h). Hvordan lenken ser ut, og at NewsWeb ikke nevnes, står under story 10.9 (svarene 06.11 kl. 22:16 og 22:23).
+
 ### Story 10.6: KI-teksten om dagen på forsiden
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
@@ -3226,6 +3230,10 @@ så KI-teksten bruker abonnementet jeg har.
 *Avgjort 2026-11-06 kl. 20:38 (gruppens svar):* i tillegg mønstre som appen regner ut, bare om det som har skjedd, og som modellen forklarer. Rådet anbefalte å vente med mønstrene. Modellen finner aldri mønstre selv: en liten modell med få tall ser mønstre som ikke finnes, og kontrollen kan ikke sjekke dem; og et mønster leses som et varsel, nær en anbefaling.
 
 **Målet:** aksjesiden forstås på første lesning, målt med del B i brukertesten (`docs/brukertest.md`).
+
+*Avgjort 2026-11-06 kl. 22:05 (gruppens svar):* appen regner ut tre mønstre: hvor ofte signalet hadde hver retning de siste 20 børsdagene, hvor ofte aksjen gikk samme vei som hovedindeksen de siste 5 børsdagene, og hvor mange ganger retningen skiftet den siste måneden. Det tredje la gruppen til; rådet foreslo de to første. KI-teksten har én setning per sjekk og én om mønstrene. Storyen bygges før UX-rettingene fra 06.11 (U75–U102 i `docs/ux-logg.md`); rådet anbefalte UX-rettingene først.
+
+*Avgjort 2026-11-06 kl. 22:16 og 22:23 (gruppens svar):* KI-teksten står i rammen «Signalet forklart», med appens setninger først og bryteren fast øverst til høyre, både med KI på og av. Lenken til investorsiden står som en boble nederst, og NewsWeb nevnes ikke. Det endrer beslutningen 06.10 under story 10.5, der aksjedetaljen nevner NewsWeb uten lenke. Svarene og rådets anbefaling er ført etter instruksjonen kl. 00:20 i `docs/ai-prompts/2026-11-07.md`.
 
 ---
 
@@ -3493,6 +3501,8 @@ Som **bruker**, vil jeg se med en gang hvilke aksjer som skiller seg ut, lese hv
 *Lagt til 2026-10-13:* PR 1 flettet i `82271fb`, PR #35. PR 2 med datoene og månedsmerkene gjenstår.
 
 *Lagt til 2026-10-13:* PR 2 flettet i `16e18d8`, PR #36. Begge PR-ene er flettet, og 8.0c er ferdig.
+
+*Avgjort 2026-11-06 kl. 23:07 (gruppens svar):* på aksjesiden ett «?» per kort og del, så «Ga» og «Målt mot» forklares ved «Hvorfor signalet ble …», og hvert hjelpevindu har høyst 60 ord. Det endrer regelen fra 13.10 over, om at hver tekst bak «?» har høyst 3 setninger. Rådet anbefalte begge.
 
 ### Story 8.0e: Oversikten fra designforslaget
 
