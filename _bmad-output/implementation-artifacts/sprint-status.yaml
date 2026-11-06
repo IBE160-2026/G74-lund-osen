@@ -185,7 +185,9 @@ development_status:
   epic-9: in-progress
   9-0-fem-tester-sjekker-det-de-lover: done
   9-1-docs-kvalitetssikring-md: done
-  9-2-docs-ai-prompts-bygging: backlog
+  # 2026-11-06 (svaret kl. 14:55): de 122 meldingene fra 21.-24.09 skrives ordrett i utkast i _privat/,
+  # og gruppen leser dem foer noe committes. Derfor in-progress.
+  9-2-docs-ai-prompts-bygging: in-progress
   9-3-arbeidsmønsteret: done
   9-4-relevanseksperimentet-del-1-utvalg-innsamling-og-merking: done
   # Utgaar fra 2026-10-06 (Marians beslutning kl. 21:11). Del 2 kjoeres ikke.
