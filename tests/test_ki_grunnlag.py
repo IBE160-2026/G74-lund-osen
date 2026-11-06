@@ -467,6 +467,20 @@ class TestDagsbildet:
         assert bildet.aksjen == FALT
         assert (bildet.aksjer_steg, bildet.aksjer_falt) == (0, 1)
 
+    def test_aksjen_som_tabellraden_paa_en_dag_med_hull(self):
+        """Gjennomgangen (BH12, VG1): aksjen sammenlignes med endringen
+        tabellen selv viser for dagen (bygg_rad_for_dag), ikke med en kopi av
+        utregningen. Ville feilet hvis tabellen og dagsbildet regnet en dag
+        med hull ulikt."""
+        from markedsoversikt import bygg_rad_for_dag
+        from oversiktsdata import Oversiktspost
+
+        for slutt in (101.0, 99.0, 100.001):
+            hull = [Kursrad(dato=d, slutt=k, justert_slutt=k, volum=0) for d, k in ((UKA[-4], 100.0), (FREDAG, slutt))]
+            post = Oversiktspost(aksje=self.LISTA[0], nyeste=hull[-1], forrige=hull[0], hentet=None, innhold=None)
+            rad = bygg_rad_for_dag(post, hull, FREDAG, None, FREDAG, False)
+            assert self._bildet({"EQNR": hull}).aksjen == bevegelse(rad.endring_prosent)
+
     def test_bransje_med_en_aksje_i_lista(self):
         """Gruppens svar 6.11 kl. 09:55, 2 (ECH6, BH11): bransjen staar bare
         naar den har minst to aksjer i lista. Ville feilet hvis DNB, alene i

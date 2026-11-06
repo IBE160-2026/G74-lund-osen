@@ -389,12 +389,15 @@ class TestAksjesiden:
         antall = Counter(a.sektor for a in demo.DEMOUNIVERS)
         alene = {a.symbol for a in demo.DEMOUNIVERS if antall[a.sektor] < 2}
         assert alene == {"VRDS", "SGNT", "MTFJ"}
-        for symbol in dagene:
+        assert "BRFE" in dagene and alene & set(dagene)
+        for symbol, bildet in dagene.items():
             side = klient.get(f"/aksje/{symbol}").data.decode("utf-8")
             samme_dag = re.search(r'<p class="samme-dag">([^<]*)</p>', side)
             assert samme_dag, symbol
-            assert ("bransjen" in samme_dag.group(1)) == (symbol not in alene), symbol
-        assert "BRFE" in dagene and alene & set(dagene)
+            # Gjennomgangen (ECH3): bransjen kan ogsaa mangle uten endring.
+            assert ("bransjen" in samme_dag.group(1)) == (bildet.bransjen is not None), symbol
+            if symbol in alene:
+                assert bildet.bransjen is None, symbol
 
 
 class _Falsk:

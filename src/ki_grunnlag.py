@@ -38,7 +38,7 @@ samme verdiene som grunnlaget. De importeres her, saa ingenting annet endres.
 
 Story 10.2i, gruppens svar 5.11 kl. 19:13 og 23:36: modellen skriver ikke om
 dagen. Grunnlaget faar retningen paa aksjen selv den dagen (aksjen), regnet
-som for hovedindeksen, og mister bransjen og antallene, som appen skriver selv
+som for hovedindeksen (fra svaret 6.11 kl. 09:55 som i tabellen, se under), og mister bransjen og antallene, som appen skriver selv
 under teksten (setning_om_samme_dag i dagene.py). Hovedindeksen staar, saa
 prompten kan gi ferdig ordlyd om aksjen gikk samme vei som den.
 

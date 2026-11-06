@@ -55,6 +55,7 @@ PERIODE_MAL = "src/templates/_perioder.html"
 HISTORIKK = "src/historikk.py"
 # Gruppens svar 04.11 kl. 22:23, 3: hjelpen ved KI-delen, slått opp her.
 KI_GRUNNLAG = "src/ki_grunnlag.py"
+DAGENE = "src/dagene.py"
 KI_KONTROLL = "src/ki_kontroll.py"
 KI_VISNING = "src/ki_visning.py"
 
@@ -577,7 +578,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "en kort tekst om signalet for aksjen den dagen, skrevet av en språkmodell og merket "
             "«Laget av KI» med navnet på modellen. Modellen fikk bare det appen har regnet ut: om hver "
             "av sjekkene ga +1, 0 eller -1, styrken og retningen, om hovedindeksen og aksjen selv steg, "
-            "falt eller var uendret den dagen når det kan regnes, aksjen mot kursen før som endringen i tabellen, "
+            "falt eller var uendret den dagen når det kan regnes, aksjen regnet mot forrige kurs, som endringen i tabellen, "
             "med en ferdig setning om aksjen gikk samme vei som "
             "hovedindeksen eller motsatt, og et merke når aksjen "
             "er utenfor de 15 grensene er målt på, men ingen kurser, prosenter eller volumer. Tallene med prikket strek er sjekket mot det før teksten vises, "
@@ -590,6 +591,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (KI_GRUNNLAG, 'DAGFELTENE = ("hovedindeksen", "aksjen")'),
                 # Gruppens svar 6.11 kl. 09:55, 1: aksjen som endringen i tabellen.
                 (MARKEDSOVERSIKT, "def endring_i_prosent("),
+                (DAGENE, "aksjen=bevegelse(_endringen("),
                 (KI_GRUNNLAG, 'UTENFOR_MAALINGEN = "Utenfor målingen"'),
                 (KI_GRUNNLAG, "fortegnet for hver av de"),
                 (KI_VISNING, "def prikkede_tall("),
