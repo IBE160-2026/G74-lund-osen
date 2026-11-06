@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-06T01:33
+updated: 2026-11-06T02:01
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -6027,3 +6027,20 @@ som sier hvordan dagen var.
 Det er én kjøring, for én dag, med samme retning på hovedindeksen for alle 15.
 Tellingen gjentas etter noen dager i driften, når versjon 4 er flettet (svaret
 5.11 kl. 16:05).
+
+**Kjørt på nytt etter gjennomgangen av svarene.** Blind Hunter, Edge Case
+Hunter og Verification Gap fant blant annet at linja om hovedindeksen i
+prompten kunne leses som at teksten kan nevne den når feltet er der (BH8,
+ECH5), at utsagn om aksjen selv ikke ble sjekket (BH1, VG1, ECH1), og at
+sammensatte ord slapp gjennom kontrollen (BH2, VG4, ECH4). Rettet i `2602f1e4`.
+Versjonen står som 4, og prompten hadde avtrykket `ec084a52…e251`. Kjørt på
+samme måte som over, kl. 02:00:26–02:00:50, etter at Ollama ble startet kl.
+02:00:08: 15 besto, 0 ble stoppet, modellen feilet for 0, og alle 15 ville
+blitt vist. Median 0,53 s per tekst og lengste kall 16,04 s (kall nr. 1). Alle
+15 radene har `promptversjon` 4, `maskinvare` `gpu`, `gemma4:e4b` med
+`modell_id` `dc35e8d9c606` og Ollama 0.35.1. Grunnlaget var det samme som over.
+Klassene: 0 gjentar, 15 sier mer (bare ordlyden, som over) og 0 usikre. Alle 15
+har ordlyden ordrett som siste setning, også YAR, som ble stoppet over. Hver
+tekst er lest mot grunnlaget: hver sjekk er beskrevet slik fortegnet er, eller
+ikke nevnt, og ingen nevner bransjen, børsen, antallet aksjer eller dagene.
+sha256 for `ose.db` var den samme før og etter.
