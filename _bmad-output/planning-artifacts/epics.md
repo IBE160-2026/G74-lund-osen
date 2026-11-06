@@ -3027,6 +3027,8 @@ uten KI. 5B.4 måler KI-tillegget. Blandes de, vet ingen hva som ble målt.
 
 *Avgjort 2026-11-06 kl. 11:15 (gruppens svar):* på de to spørsmålene i PR #113: 1) delen om bransjen i appens setning står bare når minst to aksjer i bransjen har en endring den dagen (BH1/ECH1/BH2); 2) aksjen regnes fortsatt som i tabellen, men ordlyden om hovedindeksen gis bare når aksjens forrige rad er forrige børsdag, så teksten aldri sammenligner to ulike perioder (BH3/ECH2/VG2).
 
+*Avgjort 2026-11-06 kl. 12:16 (gruppens svar):* på BH4 i PR #113: bransjen og antallene i appens setning regnes mot forrige rad, som tabellen og børsometeret, også når en aksje har hull og endringen dens går over flere børsdager. Setningen viser de samme tallene som resten av siden, og den eneste sammenligningen, ordlyden om hovedindeksen, gis bare uten hull (svaret kl. 11:15).
+
 ### Story 10.5: Lenke til selskapets side på NewsWeb
 
 *Lagt til 2026-09-28, med plan B.*
