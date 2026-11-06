@@ -4310,6 +4310,12 @@ lesingen før commit som før.
 
 *Rettet 2026-11-06 (gruppens svar kl. 17:25):* de rå EODHD-tallene sto i meldingen 23.09 kl. 21:35, ikke kl. 21:07, som linja over sier. Feilen kom fra instruksjonen, og svaret kl. 17:25 gjelder: kl. 21:07 tas med ordrett som den er, fordi den avgjorde plan B, og kl. 21:35 får bare en kort referatlinje uten tall. Utvalget er fortsatt 15. I 24.09 kl. 18:37 byttes medianvolumet med [tall fjernet]. Sitatene fra faglærerstaben, navnet på faglæreren, domenene og navnene i brevet 22.09 kl. 17:25 står alt i sporede filer på main, og står ordrett.
 
+*Lest 2026-11-06 kl. 19:27 (gruppen):* `_privat/9-2-utkast/utvalg.md`. Det står ikke noe merke om lesingen i fila; se svaret kl. 19:54 under instruksjonen kl. 19:50 i `docs/ai-prompts/2026-11-06.md`.
+
+*Avgjort 2026-11-06 kl. 19:47 (gruppens svar):* linja «Avgjorde» under 23.09 kl. 21:07 rettes før commit til «Det hentes ikke fra NewsWeb før Euronext har svart, og faglærer kontaktes ikke direkte. Product Brief skal si det og beskrive plan B, som ble avgjort kl. 19:57. Forslagene ble godkjent kl. 21:26.» Meldingen står ordrett.
+
+*Rettet 2026-11-06 (gruppens svar kl. 19:47):* plan B ble avgjort 23.09 kl. 19:57, så «fordi den avgjorde plan B» i linja om svaret kl. 17:25 over stemmer ikke. Feilen kom fra rådet, som skrev svaret, og utvalget er det samme. Slått opp i utkastet for 23.09 uten å skrive ut tekst: meldingen kl. 19:57 sier at plan B er avgjort, og meldingen kl. 21:26 godkjenner forslagene med rettelser, og én av dem retter ordet «stoppet». Av de 122 meldingene er 3 linjer 22.09 satt inn av Claude Code da et svar ble avbrutt.
+
 ### Story 9.3: Arbeidsmønsteret
 
 Som **sensor**, vil jeg forstå hvem som bestemte hva, så jeg kan vurdere hvordan
