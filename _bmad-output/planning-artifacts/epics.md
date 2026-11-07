@@ -4264,6 +4264,20 @@ NFR-08, `AD-10`
 
 ---
 
+### Story 8.20: UX-rettingene etter gjennomgangen 06.11
+
+*Lagt til 2026-11-07, etter instruksjonen kl. 09:45 i `docs/ai-prompts/2026-11-07.md`.* Storyen gjelder U75–U102 i `docs/ux-logg.md`, utenom U77 (rettet i `7fc49f84`), U82 (story 10.9) og U84 (story 3.4h). Skissene rådet laget etter gjennomgangen, og hva i dem som er avgjort og hva som bare er ønsker, står i `docs/skisser/2026-11-06/LESMEG.md`. Rekkefølgen er 10.9 først og så denne storyen (svaret 06.11 kl. 22:05 under 10.9). Storyen har foreløpig bare dette og gruppens svar til rådet 06.11, og resten skrives med spesifikasjonen.
+
+*Avgjort 2026-11-06 kl. 22:25 (gruppens svar):* toppen av aksjesiden står som i dag, med overskriften, de fire kortene, sjekkortene og summen, og fotnoten under summen flyttes.
+
+*Avgjort 2026-11-06 kl. 22:24, 23:23 og 23:30 (gruppens svar):* periodeknappene og så datoen med «Vis dagen», samlet på én linje; er det for smalt, står datoen og knappen sammen på egen linje til venstre.
+
+*Avgjort 2026-11-06 kl. 22:57 (gruppens svar):* for én dag følger størrelsen på rutene volumet, som avgjort 22.10 kl. 23:19, og for en periode er de like store. Gult har to nyanser som i appen.
+
+*Avgjort 2026-11-06 kl. 23:34 og 23:42 (gruppens svar):* datofeltet viser dagen ved «I går» og ved en valgt dag, og er tomt i en periode, på alle sidene med datovelger. Rådet anbefalte det.
+
+---
+
 ## Epic 9: Dokumentasjon av prosessen
 
 ### Story 9.0: Fem tester sjekker det de lover
