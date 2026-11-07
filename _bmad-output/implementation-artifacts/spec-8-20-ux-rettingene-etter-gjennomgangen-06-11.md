@@ -232,3 +232,36 @@ Avtrykkene settes på nytt med en kommentar, som før.
 - **K:** alle sju bildene i `docs/appen/` er tatt på nytt med DevTools-protokollen i Edge uten vindu, som i 10.9 og 2.16. `oversikten-topp-demo.png` er byte for byte den samme, som delen sa. De seks andre er nye. Aksjesiden er 2300 px høy til bunnen av rammen (var 2345), og oversikten ved 390 px 3509 px (var 3524). Ved 390 px er bildene tatt med bredden 390 i protokollen, ikke med en iframe. Ved 1280, 390 og 320 px er `scrollWidth` lik bredden på aksjesiden, oversikten, Min liste og børsometeret, med siste børsdag, en periode og en valgt dag, og datoen står på samme linje som knappene ved 1280 px og på egen linje ved 390 og 320 px. Avtrykkene i `tests/test_docker.py` er satt på nytt med en kommentar.
 
 **Testene og mutantene.** Hele settet ble kjørt alene før hver commit med kode eller tester, med ledig minne 4,4–4,6 GB av 15,7 GB. Første kjøring (16:14:57–16:27:24) ga 57 feilet, fordi testene ventet de gamle ordene og malene, og fordi klassen `dagene` på feltene i grafen kolliderte med setningen om dagene (den heter nå `musefelt`). Etter rettingene ga den andre (16:37:53–16:45:51) 2 feilet i `test_hjelpefeltet.py`, som brukte vinduet for «Ga» med tre knapper; testen legger nå en kopi av knappen ved «Trend» i de to andre kortene. Før `5bc2689c` (16:46:41–16:54:29) og `1c11844a` (16:56:01–17:04:05): 4434 bestått, 24 hoppet over og 0 feilet. Én mutant per del, med kopi før og sha256 mot HEAD etter, på `5bc2689c`: B, C, D, E, U88, BH10 og J ble fanget. A (2 av 3 uten ring) overlevde, fordi testen brukte symbolene fra skissen, og i demoen fantes bare BRFE med 3 av 3. Testen leser nå symbolene fra oversikten og krever både 2 av 3 og 3 av 3 (`1c11844a`), og A ble fanget. Hver fil var lik HEAD etterpå.
+
+### Gjennomgangen av 8.20a
+
+*Lagt til 2026-11-07:* gjennomgangen gikk på diffen `main...32648845` uten bildene, etter at hele settet var kjørt. Blind Hunter ga 14 funn (BH1–BH14), Edge Case Hunter 8 (ECH1–ECH8) og Verification Gap 1 hull og 2 andre funn (VG1–VG3). Hvert funn er sjekket i koden. Ingen er satt til høy.
+
+| Funn | Grad | Utfall |
+|---|---|---|
+| BH11, ECH1: 2 av 3 fikk svart ring også en tidligere dag, mot `designregler.md` §3 og overskriften | middels | rettet: `and not tidligere_dag`, med testen `test_to_av_tre_har_ingen_ring_en_tidligere_dag` |
+| ECH2: i børsometeret, som viser nærmeste dag med kurs, gikk neste-pila til et hull og ga samme dag tilbake | middels | rettet: børsometeret gir `kursdager`, og pilene går til forrige og neste dag med kurs (`test_med_kursdagene_hoppes_et_hull_over`) |
+| ECH3: i den smale grafen ble lappen skjøvet inn over punktet den gjelder | middels | rettet: lappen står over eller under punktet når den ikke får plass ved siden av (`test_lappen_dekker_aldri_punktet`) |
+| BH1: fire setninger falt ut av vinduene (indekslinja om framtida, «ikke en femte retning», signalet som er lagret for en valgt dag, og «eller hvorfor det mangler») | middels | rettet: de tre første står i `docs/hjelp.md`, fordi vinduene ellers går over 60 ord. Den fjerde står i ingressen på siden |
+| ECH4, VG2: en dag uten vurdering har snittlinja, men hjelpen nevnte den ikke | lav | rettet: teksten følger `graf.har_ma50` |
+| ECH5: vinduet nevnte streken med datoen også i en periode, der den ikke vises | lav | rettet: egen tekst `streken`, bare når grafen har en dag merket |
+| ECH8: navn og tall i lappen kunne overlappe | lav | rettet: `LAPPBREDDE` 176, og nettlesertesten sjekker navn og tall i hver lapp |
+| VG1: regelen før 2026 i `pilene` ble ikke prøvd | lav | rettet: `test_foer_2026_er_en_hverdag_en_boersdag` |
+| BH5: testen for feltet sammenlignet med `max` i samme felt | lav | rettet: sammenlignes med siste børsdag i kortene på aksjesiden |
+| BH3: `updated` i `docs/hjelp.md` var ikke satt | lav | rettet (regel 4) |
+| ECH6: «trendsjekken» og «trend-sjekken» ble ikke fete | lav | rettet: mønsteret tar dem som hele ord (`test_sjekken_i_navnet`) |
+| BH12: kommentarene sa «ingen vekting», teksten «uten vekting» | lav | rettet |
+| BH7: siden vokser med lappene | lav | målt: aksjesiden er 401,6 kB ved «1 år» og 295,1 kB ved 6 mnd i demoen. Ikke endret |
+| BH9: den svarte lappen øverst på streken kan dekke toppen av kurslinja den siste dagen | lav | avvist: lappen er 18 px, og punktet ved enden tegnes over den. Å flytte den over tegneflaten endrer målene på grafen og alle bildene |
+| BH6: tallene i lappen er bare for mus | lav | avvist: lappen er et tillegg, uten skript etter svaret kl. 10:33, og tallene for dagen står i kortene og tabellen |
+| BH8: målene på lappen står både i `graf.py` og malen | lav | avvist: ingen feil i dag, og nettlesertesten fanger en lapp utenfor grafen |
+| BH10, ECH7: et vanlig «interessen for aksjen» før sjekknavnet ville blitt fett | lav | avvist: versjon 5 skriver «Interessen ga …» (svaret kl. 12:32, 3), og en vakt ville lagt til regler |
+| BH13: forklaringen av kursgrafen står under spørsmålet om knappene | lav | avvist: der står regelen for perioden allerede, og spørsmålet sier at kursgrafen har de samme knappene |
+| BH14: `test_velg_dag_i_historikken_godtar_bare_dager_siden_viser` gjelder nå feltet ved grafen | lav | avvist: navnet står fordi `docs/kvalitetssikring.md` viser til det, og docstringen sier hva testen gjør nå |
+| VG3: fra 02.01.2026 går forrige-pila til 31.12.2025, som er stengt | lav | avvist: regelen for dager før 2026 er hverdager, som `foerste_boersdag_fra`, og siden sier at dagen ikke har kurs |
+| BH2: målingen står bare i `docs/hjelp.md` | – | ikke en feil: svaret kl. 10:33, 2 |
+| BH4: datoen kan vise aksjens siste dag, ikke børsens | – | ikke en feil: den første knappen på aksjesiden heter også etter aksjens siste dag (`knappene(rader[-1].dato, …)`) |
+
+Rettingene er i `4cfdff78`. Hele settet alene før den, 17:16:51–17:25:03, med ledig minne 4,3 GB av 15,7 GB: 4440 bestått, 24 hoppet over og 0 feilet. Tre mutanter for rettingene, BH11, ECH2 og ECH3, ble fanget, og hver fil var lik HEAD etterpå. Bildene ble tatt på nytt og er byte for byte de samme, og avtrykkene er satt på nytt. CI var grønn på `32648845` (run 42389466402).
+
+Ingen funn på middels eller over står åpne, og det er ingen spørsmål til gruppen før flettingen utover avvisningene over.
