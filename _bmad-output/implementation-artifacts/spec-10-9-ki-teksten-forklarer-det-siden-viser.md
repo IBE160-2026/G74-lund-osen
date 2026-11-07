@@ -2,7 +2,7 @@
 title: 'Story 10.9: KI-teksten forklarer det siden viser, med promptversjon 5 og tre mønstre appen regner ut'
 type: 'feature'
 created: '2026-11-07'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'c411cc5d'
 context:
