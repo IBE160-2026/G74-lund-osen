@@ -2,7 +2,7 @@
 title: 'Story 2.16: Børskalenderen for alle år'
 type: 'feature'
 created: '2026-11-07'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '5b1e2778'
 context:

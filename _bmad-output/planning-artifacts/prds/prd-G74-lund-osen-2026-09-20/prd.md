@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-11-07T13:40
+updated: 2026-11-07T15:47
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1191,6 +1191,9 @@ som aksjene. Daglig henting koster da 16 kall (NFR-01).
   *Lagt til 2026-11-07 (gruppens svar kl. 11:05, story 2.16):* appen skal regne ut de stengte
   hverdagene for hvert år etter reglene Oslo Børs følger, med påsken regnet ut, så kalenderen
   dekker alle år. Hvordan `DEKKEDE_AAR` endres, avgjøres i spesifikasjonen for 2.16.
+  *Lagt til 2026-11-07 (story 2.16, flettet i `a1c67c1a`):* `DEKKEDE_AAR` er borte. Kalenderen
+  dekker 2026 og hvert år etter (`FOERSTE_AAR = 2026` i `boersdag.py`, uten øvre grense), og 2025
+  står utenfor (gruppens svar kl. 15:34).
 - Webserveren henter aldri indeksen (`AD-10`).
 - Feiler indekskallet, lagres og vurderes aksjene som vanlig. Indeksen føres i
   `feil` og får ingen ny sjanse (`AD-15`), og den gir aldri en rad i `vurdering`.
@@ -2115,6 +2118,8 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 *Lagt til 2026-11-03 (gruppens svar 02.11 kl. 22:15, spørsmål 4):* punkt 22: i stedet for én gjennomgang per epic tas én samlet `bmad-code-review` av v1-koden før README-prøven, eier Gruppen. Gjennomgangene per PR står som det de er (`docs/kvalitetssikring.md` §5).
 
 *Lagt til 2026-11-07 (gruppens svar kl. 11:05 og 11:10, story 2.16):* punkt 25: Euronexts kalender for 2027 (IF261106CADE, 06.11.2026) er lastet ned for hånd, lest ut av rådet og sjekket av gruppen: stengt 2027-01-01, 03-25, 03-26, 03-29, 05-06, 05-17, 12-24 og 12-31, og 2027-03-24 er halv handelsdag og regnes som børsdag. Dagene står i seksjonen Handelskalenderen i `docs/kilder-og-rettigheter.md`, med SHA-256. I stedet for å føre inn dagene for hvert år regner appen ut de stengte hverdagene etter reglene Oslo Børs følger, og listene for 2026 og 2027 blir tester regelen må stemme med (story 2.16). Punktet lukkes når 2.16 er flettet.
+
+*Lukket 2026-11-07 (story 2.16, PR #117, flettet i `a1c67c1a`):* punkt 25: appen regner ut de stengte hverdagene for hvert år fra 2026 etter reglene, og listene for 2026 og 2027 fra Euronext er tester. `STENGT` og `DEKKEDE_AAR` er borte, så ingenting må føres inn for 2027, og kveldshentingen stopper ikke 01.01.2027. Etter gruppens svar kl. 15:34 er det ingen øvre grense og ingen ny kontroll av klokka.
 
 ### Utenfor v1
 

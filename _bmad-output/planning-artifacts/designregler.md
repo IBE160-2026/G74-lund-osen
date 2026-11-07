@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-11-04T10:09
+updated: 2026-11-07T15:47
 ---
 
 # Designregler
@@ -42,6 +42,7 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
   - I år starter på årets første børsdag.
   - Siste børsdag og «Velg dag» viser 6 mnd fram til dagen, med samme regel, og dagen er merket.
   - Ligger datoen i et år børskalenderen ikke dekker (`boersdag.DEKKEDE_AAR`), er startdagen første hverdag på eller etter den, og I år starter på første hverdag etter 1. januar. Grafen starter uansett på første dag kursserien har fra startdagen, og serien har bare børsdager.
+    *Lagt til 2026-11-07 (story 2.16, flettet i `a1c67c1a`):* `DEKKEDE_AAR` er borte, og `boersdag.dekker` er sann fra `FOERSTE_AAR = 2026`, uten øvre grense. Regelen over gjelder nå bare en dato før 2026.
   - Har serien ikke dager tilbake til startdagen, viser grafen det serien har, og sier det.
   - Én funksjon gir startdagen for hver periode: `startdag` i `src/perioder.py`.
 

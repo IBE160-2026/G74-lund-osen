@@ -1788,6 +1788,7 @@ tall kan sammenlignes med børsen som helhet.
 - Rådata står i samme øyeblikksbilde som aksjene, under en egen nøkkel og ikke blant aksjeseriene
 - Indeksen lagres i tabellen `indeks` fra migrering `0006`, aldri i `aksje`, `kurs`, `kursserie` eller `vurdering`
 - Bare børsdager lagres, i årene `DEKKEDE_AAR` dekker, uten et fast årstall i koden. Datoene fra `malinger.md` §14 som aksjene ikke har, lagres ikke
+  *Lagt til 2026-11-07 (story 2.16, flettet i `a1c67c1a`):* `DEKKEDE_AAR` er borte. Kalenderen dekker 2026 og hvert år etter (`FOERSTE_AAR = 2026` i `src/boersdag.py`, uten øvre grense), og 2025 står utenfor (svaret kl. 15:34).
 - Feiler indekskallet, lagres og vurderes aksjene som vanlig. Indeksen står i `feil` og får ingen ny sjanse (`AD-15`), og `vurdering` får ingen rad for den
 - Testen i 2.3 er utvidet med indekskallet: en andre kjøring samme børsdag gjør null kall
 - README (linje 82, «15 kall») og diagrammet i spinen («15 kall, bevisst») rettes til 16 i samme commit som koden (regel 19)
@@ -2088,6 +2089,8 @@ så appen kan vise dem uten en kilde vi ikke har.
 *Sjekket 2026-11-07 kl. 11:10 (gruppens svar):* Euronexts kalender for 2027 (IF261106CADE, 06.11.2026), lastet ned for hånd, lest ut av rådet og sjekket av gruppen: stengt 2027-01-01, 03-25, 03-26, 03-29, 05-06, 05-17, 12-24 og 12-31, og 2027-03-24 er halv handelsdag og regnes som børsdag.
 
 *Svar 2026-11-07 kl. 15:34 (gruppens svar):* forslagene i spørsmål 1–4 under «Spørsmål til gruppen før flettingen» i `spec-2-16-boerskalenderen-for-alle-aar.md` er godtatt: 1) kalenderen dekker 2026 og hvert år etter, og 2025 står utenfor, som avgjort 30.10 kl. 10:45; svaret kl. 11:05 gjaldt årene framover; 2) for en dag utenfor kalenderen står «utenfor børskalenderen, som begynner i 2026», og «ikke vurdert» står som før (spørsmål 18 i 8.20); 3) `Lyttere` i `start/start.ps1` spør først som før, så `Get-NetTCPConnection` uten tilstand etter raden med fjernport 0, og så netstat, fordi netstat alene så lytteren 0 og 4 av 30 ganger; 4) ingen øvre grense og ingen ny kontroll av klokka, og risikoen ved en klokke langt fram i tid er godtatt (BH1, ECH1). Rådet anbefalte alle fire. Svaret er ført etter instruksjonen kl. 15:37 i `docs/ai-prompts/2026-11-07.md`.
+
+*Ferdig 2026-11-07 kl. 15:43:* PR #117 er squash-flettet i `a1c67c1a`, låst til head-en `20571270` (spesifikasjonen [`spec-2-16-boerskalenderen-for-alle-aar.md`](../implementation-artifacts/spec-2-16-boerskalenderen-for-alle-aar.md)). Kalenderen regner ut de stengte hverdagene for 2026 og hvert år etter, `DEKKEDE_AAR` og `STENGT` er borte, 8.20c (U75, U76, U100 og U101) er med, og `start.ps1` finner lytteren på port 8000 også når Windows melder feil tilstand. CI var grønn på head-en (run 42382704962) og på flettecommiten (run 42382919357). Hele settet alene på grenen før den siste kodecommiten `c140e607`: 4387 bestått, 24 hoppet over og 0 feilet.
 
 ---
 
