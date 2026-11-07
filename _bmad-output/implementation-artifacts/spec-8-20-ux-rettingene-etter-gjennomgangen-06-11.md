@@ -2,7 +2,7 @@
 title: 'Story 8.20: UX-rettingene etter gjennomgangen 06.11'
 type: 'feature'
 created: '2026-11-07'
-status: 'draft'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '93140a71'
 context:
@@ -323,6 +323,8 @@ Ingen funn på middels eller over står åpne, og det er ingen spørsmål til gr
 | ECH3: M i børsometeret er ikke M i oversikten | lav | ikke en feil: børsometeret teller aksjene med en endring for dagen eller perioden, og sier det i `docs/hjelp.md` |
 
 Rettingene er i `2aba7d25`. CI var grønn på `54a7cc50` (run 42400409007).
+
+*Lagt til 2026-11-07:* 8.20b er flettet med PR #119 i `8d89cf8c` kl. 20:08, låst til head-en `3266e7b2` (main flettet inn i `73de46d1`, og svaret kl. 20:01 med BH9 lukket), etter instruksjonen kl. 20:03 i `docs/ai-prompts/2026-11-07.md`. CI var grønn på head-en (run 42404496878) og på flettecommiten (run 42404752485), med 4463 bestått og 31 hoppet over i jobben `pytest` begge gangene. Med 8.20c (#117), 8.20a (#118) og 8.20b (#119) er 8.20 done; U84 står til 3.4h.
 
 ## Spørsmål til gruppen før flettingen av 8.20b
 

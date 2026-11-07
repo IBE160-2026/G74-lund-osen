@@ -4313,6 +4313,8 @@ NFR-08, `AD-10`
 
 *Svar 2026-11-07 kl. 20:01 (gruppens svar):* børsometeret står som bygget, også 3327 px høyt ved 390 px, fordi linja med antallet og snittet under hver bransje aldri skjules (spørsmål 14 d); BH9 i gjennomgangen av 8.20b er dermed besvart (regel 25). Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 20:03 i `docs/ai-prompts/2026-11-07.md`.
 
+*Lagt til 2026-11-07:* 8.20b er flettet med PR #119 i `8d89cf8c` kl. 20:08, låst til head-en `3266e7b2` (main flettet inn i `73de46d1`, og svaret kl. 20:01 med BH9 lukket i spesifikasjonen), etter instruksjonen kl. 20:03 i `docs/ai-prompts/2026-11-07.md`. CI var grønn på head-en (run 42404496878) og på flettecommiten (run 42404752485), med 4463 bestått og 31 hoppet over i jobben `pytest` begge gangene. Hele settet lokalt før `2aba7d25`: 4470 bestått, 24 hoppet over og 0 feilet. Med 8.20c (#117), 8.20a (#118) og 8.20b (#119) er 8.20 done; U84 bygges i 3.4h.
+
 ---
 
 ## Epic 9: Dokumentasjon av prosessen

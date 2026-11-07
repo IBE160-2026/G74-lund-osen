@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-07T15:47
+updated: 2026-11-07T20:12
 ---
 
 # Kvalitetssikring
@@ -394,6 +394,7 @@ sist i dokumentet.
 | 8.2c Kursgrafen på smal skjerm: svaret 6.11 kl. 15:08 | `b38617f` (#115) | 1 (3, M1–M3) | – | `S/spec-8-2c-kursgrafen-paa-smal-skjerm.md` |
 | 10.9 KI-teksten forklarer det siden viser: promptversjon 5 og tre mønstre, svarene 6.11 kl. 20:35, 20:38, 22:05, 22:16 og 22:23 og 7.11 kl. 08:58 og 12:32 | `03bd75c` (#116) | 1 (17, A–H på `ba68533` og A–H og F2 på `c7159bb`) | – | `S/spec-10-9-ki-teksten-forklarer-det-siden-viser.md` |
 | 2.16 Børskalenderen for alle år, 8.20c og porttestene: svarene 7.11 kl. 11:05, 11:10, 11:47 og 15:34 | `a1c67c1` (#117) | 1 (14, A–D og 8.20c på `fea11d4` og fem på `c140e60`) | C, som ventet: demoen slår ikke opp dager etter 09.10.2026, og B fanger den | `S/spec-2-16-boerskalenderen-for-alle-aar.md` |
+| 8.20 UX-rettingene etter gjennomgangen 06.11: 8.20a og 8.20b, svarene 7.11 kl. 10:33, 17:36 og 20:01 (8.20c står i raden for 2.16) | `427a1de` (#118), `8d89cf8` (#119) | – (29 mutanter i spesifikasjonen: 8 på `5bc2689` og 3 på `4cfdff7` for 8.20a, 12 på `d95dcc4` og 6 på `2aba7d2` for 8.20b) | A i 8.20a overlevde først, fanget etter `1c11844`; BH9 i 8.20b overlevde først, fanget etter `54a7cc5` | `S/spec-8-20-ux-rettingene-etter-gjennomgangen-06-11.md` |
 | 8.2a Seks funn fra prøven av demoen 24.10 | `e4d1ba4` (#93) | 1 (5, M1–M5) | – kjørt på `7ca19d9` 24.10 | `S/spec-8-2a-funn-fra-proeven-av-demoen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
@@ -650,6 +651,8 @@ funn. Antall rader i loggen:
 | 8.2c, gjennomgangen 06.11 | 17 | 13 | 1 | 3 |
 | 10.9, gjennomgangen 07.11 | 36 | 30 | 3 | 3 |
 | 2.16, gjennomgangen 07.11 (BH1 og ECH1 avvist med gruppens svar kl. 15:34, VG6 rettet ved flettingen) | 29 | 22 | 6 | 1 |
+| 8.20, gjennomgangen av 8.20a 07.11 (BH9 avvist der og rettet i 8.20b) | 22 | 12 | 10 | – |
+| 8.20, gjennomgangen av 8.20b 07.11 (BH9 lukket med gruppens svar kl. 20:01) | 26 | 17 | 9 | – |
 | 8.2a | 21 | 15 | 6 | – |
 | 9.1, oppdatering 17.10 | 19 | 17 | 2 | – |
 | 9.7 | 19 | 13 | 6 | – |
