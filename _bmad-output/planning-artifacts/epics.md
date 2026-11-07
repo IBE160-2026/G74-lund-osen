@@ -4311,6 +4311,8 @@ NFR-08, `AD-10`
 
 *Lagt til 2026-11-07:* 8.20a er flettet med PR #118 i `427a1de2` kl. 18:09, låst til head-en `8f740b7e` (main flettet inn), etter instruksjonen kl. 18:04 i `docs/ai-prompts/2026-11-07.md`. CI var grønn på head-en (run 42394650968) og på flettecommiten (run 42394909599), med 4433 bestått og 31 hoppet over i jobben `pytest` begge gangene. Hele settet lokalt før `4cfdff78`: 4440 bestått, 24 hoppet over og 0 feilet. BH9 tas med 8.20b (instruksjonen kl. 18:04).
 
+*Svar 2026-11-07 kl. 20:01 (gruppens svar):* børsometeret står som bygget, også 3327 px høyt ved 390 px, fordi linja med antallet og snittet under hver bransje aldri skjules (spørsmål 14 d); BH9 i gjennomgangen av 8.20b er dermed besvart (regel 25). Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 20:03 i `docs/ai-prompts/2026-11-07.md`.
+
 ---
 
 ## Epic 9: Dokumentasjon av prosessen
