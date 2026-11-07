@@ -17,7 +17,7 @@ from dataclasses import dataclass, replace
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
-from boersdag import UtenforKalenderen
+from boersdag import FOERSTE_AAR, UtenforKalenderen
 from kursdata import Aksje, Kursrad
 from oversiktsdata import Oversiktspost
 from signalberegning import BLANDET, INGEN, NEGATIV, POSITIV, STANDARD, Parametre, nodvendige_dager
@@ -74,7 +74,10 @@ GRUNNTEKST: dict[Grunn, str] = {
 }
 IKKE_VURDERT = "ikke vurdert"
 IKKE_BOERSDAG = "ikke børsdag"
-UTENFOR_KALENDEREN = "utenfor børskalenderen"
+# Story 2.16, spoersmaal 2 i spesifikasjonen (spoersmaal 18 i 8.20, U100): med
+# aaret kalenderen begynner i, lest fra boersdag.py, saa teksten sier hva som
+# skiller den fra «ikke vurdert».
+UTENFOR_KALENDEREN = f"utenfor børskalenderen, som begynner i {FOERSTE_AAR}"
 # Datoen til nyeste kurs er etter dagens dato. Skjer bare med en klokke eller
 # en kilde som tar feil, og vises da i stedet for en feilside.
 ETTER_I_DAG = "datoen er etter i dag"

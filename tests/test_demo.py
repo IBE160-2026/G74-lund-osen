@@ -1143,3 +1143,31 @@ class TestFotnotenIDemoen:
         Ville feilet hvis året aldri sto, slik det var etter VG2."""
         monkeypatch.setattr(app_modul, "naa", lambda: datetime(2027, 1, 5, 12, 0, tzinfo=timezone.utc))
         assert app_modul.demo_startdag() == "mandag 21.09.2026"
+
+
+# Story 2.16: sidene i demoen med klokka i januar 2027.
+SIDENE_I_DEMOEN = ["/", "/min-liste", "/boersometer", "/aksje/BRFE", "/aksje/BRFE?periode=iaar", "/?periode=iaar"]
+
+
+class TestDemoenIJanuar2027:
+    @pytest.mark.parametrize("side", SIDENE_I_DEMOEN)
+    def test_siden_er_lik_bortsett_fra_aaret(self, klient, monkeypatch, demobase, side):
+        """Story 2.16: demoen ser lik ut med klokka i januar 2027. Det eneste
+        som skiller, er året bak datoene i 2026 (story 8.0c). Ville feilet hvis
+        en side feilet i 2027, eller viste noe annet enn årstallet. Demoen slår
+        ikke opp dager etter 09.10.2026, så den var lik også før 2.16 (prøvd
+        07.11 med kalenderen bare for 2026)."""
+        import re
+
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        sidene = {}
+        for naa in (
+            datetime(2026, 10, 13, 12, 0, tzinfo=timezone.utc),
+            datetime(2027, 1, 15, 12, 0, tzinfo=timezone.utc),
+        ):
+            monkeypatch.setattr(app_modul, "naa", lambda naa=naa: naa)
+            svar = klient.get(side)
+            assert svar.status_code == 200, (side, naa)
+            sidene[naa.year] = svar.data.decode("utf-8")
+        assert re.search(r"\d\d\.\d\d\.2026", sidene[2027])
+        assert re.sub(r"(\d\d\.\d\d)\.2026", lambda m: m.group(1), sidene[2027]) == sidene[2026]

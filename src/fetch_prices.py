@@ -86,8 +86,8 @@ from urllib.parse import quote, quote_plus
 import requests
 from dotenv import load_dotenv
 
-# Modulen, ikke DEKKEDE_AAR alene: aarene leses naar indeksen skrives, slik
-# porten gjoer, saa en test som bytter ut boersdag.DEKKEDE_AAR, gjelder ogsaa her.
+# Modulen, ikke FOERSTE_AAR alene: aaret leses naar indeksen skrives, slik
+# porten gjoer, saa en test som bytter ut boersdag.FOERSTE_AAR, gjelder ogsaa her.
 import boersdag
 import lagring_fil
 import lagring_sqlite
@@ -589,7 +589,7 @@ def skriv_indeksen_til_basen(
     """Indeksens serie til tabellen indeks - story 2.8, AD-5, AD-21.
 
     Gjennom SqliteIndekslager, aldri kurs eller vurdering. Porten tar bort
-    dagene som ikke er boersdager i aarene DEKKEDE_AAR dekker, og utskriften
+    dagene som ikke er boersdager, eller ligger foer FOERSTE_AAR, og utskriften
     sier hvor mange som ble lagret og tatt bort (BH2 i 2.8a), regnet med samme
     funksjon. En eldre fil skriver ikke over en nyere serie, som for aksjene.
     Returnerer False hvis indeksen feilet: serien ble avvist, eller basen
@@ -597,7 +597,7 @@ def skriv_indeksen_til_basen(
     serie som ble lagret. En feil her stopper ikke aksjene (AD-15).
     """
     lagret = len(bare_boersdager(rader))
-    aarene = ", ".join(str(aar) for aar in sorted(boersdag.DEKKEDE_AAR))
+    foerste = boersdag.FOERSTE_AAR
     try:
         tilkobling = aapne_base(base_sti)
     except BASEFEIL as feil:
@@ -626,8 +626,8 @@ def skriv_indeksen_til_basen(
     # lagres. Gjennomgangen av 3.5d (BH11): de er ikke «ikke børsdager».
     skriv(
         f"{indeks.navn} {indeks.symbol}: lagret {lagret} dager og tok bort "
-        f"{len(rader) - lagret}, som er dager utenfor {aarene} eller dager børsen var "
-        f"stengt. Børskalenderen i appen gjelder bare {aarene}, så andre dager lagres ikke."
+        f"{len(rader) - lagret}, som er dager før {foerste} eller dager børsen var "
+        f"stengt. Børskalenderen i appen begynner i {foerste}, så dager før lagres ikke."
     )
     return True
 
@@ -945,11 +945,7 @@ def kjoer(
     try:
         dato = innevaerende_boersdag(dag)
     except UtenforKalenderen as feil:
-        skriv(
-            f"{feil}. Før inn dagene Oslo Børs er stengt for året som mangler, "
-            "i boersdag.py, før hentingen kjøres. Hentingen gjetter ikke på "
-            "børsdagen (NFR-08). 0 kall brukt."
-        )
+        skriv(f"{feil}. Sjekk klokka på maskinen. Hentingen gjetter ikke på børsdagen (NFR-08). 0 kall brukt.")
         sys.exit(1)
     if klokke is None:
 

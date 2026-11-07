@@ -11,6 +11,7 @@ from datetime import date, datetime, timedelta, timezone
 
 import pytest
 
+import boersdag
 from kursdata import Aksje, Kursrad
 from markedsoversikt import (
     ETTER_I_DAG,
@@ -413,11 +414,13 @@ class TestTilstandene:
         assert rad.tekst == IKKE_BOERSDAG
 
     def test_utenfor_boerskalenderen_gir_tekst_ikke_feil(self):
-        """Ville feilet hvis UtenforKalenderen ikke ble fanget (M9)."""
-        rader = [Kursrad(dato=date(2027, 3, 1), slutt=100.0, justert_slutt=100.0, volum=1)]
-        rad = bygg_rad(post(EQNR, rader, innhold=None), date(2027, 3, 2), KORT)
+        """Ville feilet hvis UtenforKalenderen ikke ble fanget (M9). Story
+        2.16, spørsmål 2 (U100): teksten sier året kalenderen begynner i, lest
+        fra boersdag.py. Ville feilet hvis året var borte."""
+        rader = [Kursrad(dato=date(2025, 3, 3), slutt=100.0, justert_slutt=100.0, volum=1)]
+        rad = bygg_rad(post(EQNR, rader, innhold=None), date(2025, 3, 4), KORT)
         assert rad.tilstand is None
-        assert rad.tekst == UTENFOR_KALENDEREN
+        assert rad.tekst == UTENFOR_KALENDEREN == f"utenfor børskalenderen, som begynner i {boersdag.FOERSTE_AAR}"
 
     def test_dato_etter_i_dag_gir_tekst_ikke_feil(self):
         rader = serie([100.0, 101.0], fra_dato=17)

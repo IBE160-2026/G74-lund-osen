@@ -131,13 +131,18 @@ class TestKalenderen:
         "dag, idag",
         [
             (date(2025, 12, 31), IDAG),
-            (date(2027, 1, 4), date(2027, 1, 5)),
+            (date(2025, 6, 2), date(2025, 6, 3)),
         ],
-        ids=["2025", "2027"],
+        ids=["2025-12", "2025-06"],
     )
     def test_ingen_rad_utenfor_lista_reiser(self, dag, idag):
         with pytest.raises(UtenforKalenderen):
             tilstand(None, dag, idag)
+
+    def test_ingen_rad_i_2027_er_ikke_kjoert(self):
+        """Story 2.16: kalenderen dekker 2027. Ville feilet hvis den sluttet
+        i 2026, som før 2.16: da reiste en dag i 2027."""
+        assert tilstand(None, date(2027, 1, 4), date(2027, 1, 5)).art is Art.IKKE_KJOERT
 
 
 class TestTyper:

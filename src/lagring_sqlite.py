@@ -244,7 +244,7 @@ class SqliteIndekslager:
     """Indekslager i SQLite, tabellene indeks og indeksserie fra 0006 (story
     2.8). Samme kontrakt som MinneIndekslager, og samme transaksjon som
     SqliteKurslager: radene byttes ut og hentet settes i ett (AD-5). Dager
-    som ikke er boersdager i DEKKEDE_AAR, tas bort i porten foer noe lagres."""
+    som ikke er boersdager fra FOERSTE_AAR, tas bort i porten foer noe lagres."""
 
     def __init__(self, tilkobling: sqlite3.Connection, indekser: tuple[Indeks, ...] = (HOVEDINDEKS,)):
         _krev_siste_versjon(tilkobling)

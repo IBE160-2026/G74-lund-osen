@@ -179,7 +179,7 @@ class TestTilstandene:
             "grunn": "mandag 05.10 – hentingen feilet",
             "manglende rad": "onsdag 07.10 – ikke vurdert",
             "ikke børsdag": "torsdag 14.05 – ikke børsdag",
-            "utenfor kalenderen": "tirsdag 02.12.2025 – utenfor børskalenderen",
+            "utenfor kalenderen": "tirsdag 02.12.2025 – utenfor børskalenderen, som begynner i 2026",
         }
         uten_dato = [" ".join(t.split()[2:]) for t in tekstene.values()]
         assert len(set(uten_dato)) == len(uten_dato)

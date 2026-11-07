@@ -7,10 +7,11 @@ Porten har samme form som Kursleser og Kurslager: Indeksleser leser, og
 Indekslager bytter ut hele serien i ett (AD-5). En dag er en Kursrad, fordi
 indeksen har de samme feltene for en dag.
 
-Bare boersdager i aarene DEKKEDE_AAR dekker, lagres. Serien fra EODHD gaar
+Bare boersdager fra FOERSTE_AAR i boersdag.py, lagres. Serien fra EODHD gaar
 ett aar bakover, og indeksen har dager aksjene ikke har (malinger.md §14).
 Porten tar dem bort foer noe lagres, uten feil, og leser aarene fra
 boersdag.py naar serien skrives, saa koden har ikke noe fast aarstall.
+Story 2.16: kalenderen dekker hvert aar fra FOERSTE_AAR, uten oevre grense.
 
 Adapteren i basen er SqliteIndekslager i lagring_sqlite.py. Kallet i
 hentingen kommer i PR 2.
@@ -37,10 +38,10 @@ HOVEDINDEKS = Indeks("OSEBX", "OSEBX.OL", "Hovedindeksen")
 
 
 def bare_boersdager(rader: list[Kursrad]) -> list[Kursrad]:
-    """Radene for boersdager i aarene DEKKEDE_AAR dekker. De andre tas bort
-    uten feil: en dag i et annet aar kan ikke slaas opp i kalenderen, og en
-    stengt dag er ikke en dag aksjene har kurs."""
-    return [rad for rad in rader if rad.dato.year in boersdag.DEKKEDE_AAR and boersdag.er_boersdag(rad.dato)]
+    """Radene for boersdager fra FOERSTE_AAR. De andre tas bort uten feil:
+    en dag foer FOERSTE_AAR kan ikke slaas opp i kalenderen, og en stengt
+    dag er ikke en dag aksjene har kurs."""
+    return [rad for rad in rader if boersdag.dekker(rad.dato.year) and boersdag.er_boersdag(rad.dato)]
 
 
 @runtime_checkable
@@ -68,7 +69,7 @@ class Indekslager(Indeksleser, Protocol):
     def erstatt_serie(self, symbol: str, rader: list[Kursrad], hentet: datetime) -> None:
         """Bytt ut hele indeksens serie, og sett sist_hentet, i ett.
 
-        Dager som ikke er boersdager i DEKKEDE_AAR, tas bort foerst. Et symbol
+        Dager som ikke er boersdager fra FOERSTE_AAR, tas bort foerst. Et symbol
         som ikke er en kjent indeks, en serie som er tom etter det, en feil
         radtype, to rader med samme dato eller en tid uten sone avvises, og
         da endres ingenting.

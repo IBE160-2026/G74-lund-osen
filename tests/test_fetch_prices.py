@@ -1733,9 +1733,10 @@ class TestVurderingenISammeKjoering:
         assert any("sto fra før" in l and "EQNR" in l for l in linjer)
 
     def test_utenfor_kalenderen_stopper_foer_foerste_kall(self, stier):
-        """K13, svar 2: 2027 er ikke foert inn. Kjoeringen stopper med 0 kall,
-        uten fil og uten base, og sier at dagene maa foeres inn. Ville feilet
-        hvis datoen ble regnet etter kallene (M13)."""
+        """K13, svar 2, og story 2.16: en dag foer FOERSTE_AAR. Kjoeringen
+        stopper med 0 kall, uten fil og uten base, og sier hvilket aar
+        kalenderen begynner i. Ville feilet hvis datoen ble regnet etter
+        kallene (M13)."""
         raa, base = stier
         kall = []
         linjer = []
@@ -1744,7 +1745,7 @@ class TestVurderingenISammeKjoering:
             fp.kjoer(
                 raa,
                 base,
-                _utc(2027, 1, 4, 21, 0),
+                _utc(2025, 12, 15, 21, 0),
                 NOEKKEL,
                 lambda *a: kall.append(a),
                 linjer.append,
@@ -1755,7 +1756,7 @@ class TestVurderingenISammeKjoering:
         assert kall == []
         assert not base.exists()
         assert not raa.exists() or list(raa.iterdir()) == []
-        assert any("2027" in l and "stengt" in l and "0 kall" in l for l in linjer)
+        assert any("2025-12-15" in l and "begynner i 2026" in l and "0 kall" in l for l in linjer)
 
 
 # Story 2.3: boersdagskontrollen foer kvoten brukes. Rekkefoelgen foer foerste
@@ -3374,22 +3375,21 @@ class TestHovedindeksen:
         """BH2 i 2.8a: 300 dager bakover fra 22.09.2026 gir dager i 2025, helger
         og stengte dager, og alle telles. Antallet regnes her med kalenderen,
         ikke med funksjonen hentingen bruker."""
-        from boersdag import DEKKEDE_AAR, er_boersdag
+        from boersdag import FOERSTE_AAR, er_boersdag
 
         raa, base = stier
         raadata = serie_til(TIRSDAG_22_09, dager=300)
         _, _, ut = kjoer_23(raa, base, OEYEBLIKK_22_09, lambda *_: copy.deepcopy(raadata))
         datoer = [date.fromisoformat(r["date"]) for r in raadata]
-        lagret = sum(1 for d in datoer if d.year in DEKKEDE_AAR and er_boersdag(d))
-        assert any(d.year not in DEKKEDE_AAR for d in datoer)
+        lagret = sum(1 for d in datoer if d.year >= FOERSTE_AAR and er_boersdag(d))
+        assert any(d.year < FOERSTE_AAR for d in datoer)
         assert len(indeksen_i(base)[0]) == lagret
-        aarene = ", ".join(str(aar) for aar in sorted(DEKKEDE_AAR))
         assert (
-            f"lagret {lagret} dager og tok bort {300 - lagret}, som er dager utenfor {aarene} eller dager børsen var stengt."
+            f"lagret {lagret} dager og tok bort {300 - lagret}, som er dager før {FOERSTE_AAR} eller dager børsen var stengt."
             in ut
         )
         # Forproeven 24.10 (funn 5, U4): linja sier hvorfor andre dager ikke lagres.
-        assert f"Børskalenderen i appen gjelder bare {aarene}, så andre dager lagres ikke." in ut
+        assert f"Børskalenderen i appen begynner i {FOERSTE_AAR}, så dager før lagres ikke." in ut
 
     @pytest.mark.parametrize("svaret", ["feil", "tomt", "form"])
     def test_et_feilet_indekskall_stopper_ikke_aksjene(self, stier, svaret):
@@ -3476,24 +3476,37 @@ class TestHovedindeksen:
 
 
 class TestAarsskiftet:
-    """Story 2.8, punkt c (BH1 i 2.8a): ligger dagen utenfor DEKKEDE_AAR,
+    """Story 2.8, punkt c (BH1 i 2.8a): ligger dagen utenfor kalenderen,
     stopper hentingen med 0 kall foer noekkelen og kvoten, saa indeksen aldri
     faar en fersk hentet uten rader. Porten ville ellers tatt bort alle de
-    nye dagene og satt en ny tid paa serien."""
+    nye dagene og satt en ny tid paa serien. Story 2.16: kalenderen har ingen
+    oevre grense, saa aarsskiftet gir nye dager."""
 
-    def test_en_dag_utenfor_kalenderen_gir_0_kall_og_indeksen_staar(self, stier):
-        from boersdag import DEKKEDE_AAR
+    def test_aarsskiftet_gir_nye_dager_i_indeksen(self, stier):
+        """Story 2.16. Ville feilet hvis kalenderen sluttet i 2026, som foer
+        2.16: da stoppet hentingen 05.01.2027 med 0 kall."""
+        raa, base = stier
+        kjoer_23(raa, base, _utc(2026, 12, 30, 21, 0), lambda *_: serie_til(date(2026, 12, 30)))
+        _, kall, _ = kjoer_23(raa, base, _utc(2027, 1, 5, 21, 0), lambda *_: serie_til(date(2027, 1, 5)))
+        assert len(kall) == len(AKSJEUNIVERS) + 1
+        datoer = [rad.dato for rad in indeksen_i(base)[0]]
+        assert {date(2027, 1, 4), date(2027, 1, 5)} <= set(datoer)
+        assert not {date(2026, 12, 31), date(2027, 1, 1)} & set(datoer)
+
+    def test_en_dag_utenfor_kalenderen_gir_0_kall_og_indeksen_staar(self, stier, monkeypatch):
+        import boersdag
 
         raa, base = stier
-        siste_aar = max(DEKKEDE_AAR)
-        siste_dag = innevaerende_boersdag(date(siste_aar, 12, 31))
+        siste_dag = date(2026, 12, 30)
         foerste_kjoering = datetime(siste_dag.year, siste_dag.month, siste_dag.day, 21, 0, tzinfo=timezone.utc)
         kjoer_23(raa, base, foerste_kjoering, lambda *_: serie_til(siste_dag))
         foer = indeksen_i(base)
         assert foer[1] == foerste_kjoering
         filene = raa_filer(raa)
 
-        neste_aar = datetime(siste_aar + 1, 1, 5, 21, 0, tzinfo=timezone.utc)
+        # Kalenderen begynner etter dagen, som om klokka sto foer FOERSTE_AAR.
+        monkeypatch.setattr(boersdag, "FOERSTE_AAR", 2028)
+        neste_aar = datetime(2027, 1, 5, 21, 0, tzinfo=timezone.utc)
         kode, kall, ut = kjoer_23_kode(raa, base, neste_aar, ingen_kall, ingen_noekkel, ingen_kall)
         assert kode == 1 and kall == []
         assert "0 kall brukt" in ut and "NFR-08" in ut

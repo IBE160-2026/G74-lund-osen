@@ -254,7 +254,7 @@ def _koordinater(punkter, hent, lav, hoy, bredde, hoyde, hoeyre=HOEYRE, bunn=BUN
 
 def _foerste_boersdag(aar: int, maaned: int) -> date | None:
     """Foerste boersdag i maaneden etter er_boersdag, eller None naar
-    kalenderen ikke dekker aaret (boersdag.DEKKEDE_AAR)."""
+    kalenderen ikke dekker aaret (foer boersdag.FOERSTE_AAR)."""
     dag = date(aar, maaned, 1)
     try:
         while not er_boersdag(dag):

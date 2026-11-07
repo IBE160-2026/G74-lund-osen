@@ -150,12 +150,20 @@ class TestDatoavvisning:
         assert rader(tilkobling) == []
 
     def test_dag_utenfor_kalenderen_reiser(self, tilkobling):
-        """Punkt 25 i prd.md §8: fra 2027-01-01 reiser skriv til dagene for
-        2027 er foert inn. Den gjetter ikke paa en boersdag."""
-        vurderinger = lager(tilkobling, "2027-01-04T10:00:00+00:00")
+        """Story 2.16: foer FOERSTE_AAR reiser skriv. Den gjetter ikke paa en
+        boersdag."""
+        vurderinger = lager(tilkobling, "2025-12-15T10:00:00+00:00")
         with pytest.raises(UtenforKalenderen):
-            vurderinger.skriv("EQNR", date(2027, 1, 4), vurdering())
+            vurderinger.skriv("EQNR", date(2025, 12, 15), vurdering())
         assert rader(tilkobling) == []
+
+    def test_2027_skrives(self, tilkobling):
+        """Story 2.16, punkt 25 i prd.md §8: mandag 04.01.2027 er inneværende
+        børsdag og skrives. Ville feilet hvis kalenderen sluttet i 2026, som
+        før 2.16."""
+        vurderinger = lager(tilkobling, "2027-01-04T10:00:00+00:00")
+        vurderinger.skriv("EQNR", date(2027, 1, 4), vurdering())
+        assert len(rader(tilkobling)) == 1
 
     def test_tidspunkt_som_dato_reiser(self, tilkobling):
         with pytest.raises(TypeError, match="date"):
