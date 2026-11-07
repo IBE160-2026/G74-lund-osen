@@ -3243,6 +3243,8 @@ så KI-teksten bruker abonnementet jeg har.
 
 *Svar 2026-11-07 kl. 08:58 (gruppens svar):* forslagene i spørsmål 1–10 i [`spec-10-9-ki-teksten-forklarer-det-siden-viser.md`](../implementation-artifacts/spec-10-9-ki-teksten-forklarer-det-siden-viser.md) er godtatt, med ordstillingen «minst siden ‹dato›» i spørsmål 2, ikke «siden minst ‹dato›» som i forslaget. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 09:10 i `docs/ai-prompts/2026-11-07.md`.
 
+*Svar 2026-11-07 kl. 12:32 (gruppens svar):* forslagene i spørsmål 1–4 under «Spørsmål til gruppen før flettingen» i [`spec-10-9-ki-teksten-forklarer-det-siden-viser.md`](../implementation-artifacts/spec-10-9-ki-teksten-forklarer-det-siden-viser.md) er godtatt: 1) kontrollen stopper ikke en tekst som deler mønstrene i to setninger; prompten ber fortsatt om én, og hjelpen sier «en setning eller to» (VG4); 2) tellingene godtas bare i formene, ved feltet sitt, ikke i `ANTALLENE` (BH2, ECH5); 3) de faste formene for sjekkene står til tellingen for 10.4 etter fem kvelder med versjon 5, og tas opp igjen da; 4) de fete navnene på sjekkene bygges i 8.20a. Rådet anbefalte alle fire. Svaret er ført etter instruksjonen kl. 12:47 i `docs/ai-prompts/2026-11-07.md`.
+
 ---
 
 ## Epic 6: Børsmeldinger i oversikten 🔒
@@ -4281,6 +4283,8 @@ NFR-08, `AD-10`
 *Avgjort 2026-11-06 kl. 23:34 og 23:42 (gruppens svar):* datofeltet viser dagen ved «I går» og ved en valgt dag, og er tomt i en periode, på alle sidene med datovelger. Rådet anbefalte det.
 
 *Svar 2026-11-07 kl. 10:33 (gruppens svar):* forslagene i spørsmål 1–21 i `spec-8-20-ux-rettingene-etter-gjennomgangen-06-11.md` er godtatt, med fire endringer. 7: pilene står bare når datofeltet viser en dag, og er borte i en periode. 12: verdiene ved musepekeren står i en lapp i appens stil, som i skissen `aksjesiden-ki-paa.png`, som vises straks og følger musa, med CSS og uten skript, ikke med `<title>`. 2: én kort setning om hvorfor retningen oftere er positiv blir i vinduet for retningen, under 60 ord, og målingen står i `docs/hjelp.md` med grensene. 21: rekkefølgen er 10.9, 8.20c, 8.20a, 3.4h og 8.20b, fordi README-prøven er et suksessmål i briefen («Kjørbar for andre» i `product-brief.md`). Svaret er ført etter instruksjonen kl. 10:38 i `docs/ai-prompts/2026-11-07.md`.
+
+*Lagt til 2026-11-07 (svaret kl. 12:32 under story 10.9, svar 4):* de fete navnene på sjekkene i KI-teksten (spørsmål 16) bygges i 8.20a, med resten av utseendet på aksjesiden; spesifikasjonen for 10.9 har dem ikke.
 
 ---
 
