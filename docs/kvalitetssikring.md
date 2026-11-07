@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-06T16:52
+updated: 2026-11-07T12:59
 ---
 
 # Kvalitetssikring
@@ -386,6 +386,7 @@ sist i dokumentet.
 | 2.3d, tidlig stopp: svarene 03.11 kl. 20:48 (1), 05.11 kl. 12:33 og 19:33, `exit 0` i CI og sjekken før steg 3 i kveldsjobben | `0955f79` (#114) | 1 (2, A og B) | – | `S/spec-2-3d-tidlig-stopp-og-ci.md` |
 | 10.2i, promptversjon 4: svarene 5.11 kl. 16:05, 19:13 og 23:36 og 6.11 kl. 09:55, 11:15 og 12:16, appens setning om samme dag og ordlyden om hovedindeksen | `374f1bd` (#113) | 1 (9, mutanten, A–D, 1–2 kl. 09:55 og 1–2 kl. 11:15) | – | `S/spec-10-2i-prompten-versjon-4.md` |
 | 8.2c Kursgrafen på smal skjerm: svaret 6.11 kl. 15:08 | `b38617f` (#115) | 1 (3, M1–M3) | – | `S/spec-8-2c-kursgrafen-paa-smal-skjerm.md` |
+| 10.9 KI-teksten forklarer det siden viser: promptversjon 5 og tre mønstre, svarene 6.11 kl. 20:35, 20:38, 22:05, 22:16 og 22:23 og 7.11 kl. 08:58 og 12:32 | `03bd75c` (#116) | 1 (17, A–H på `ba68533` og A–H og F2 på `c7159bb`) | – | `S/spec-10-9-ki-teksten-forklarer-det-siden-viser.md` |
 | 8.2a Seks funn fra prøven av demoen 24.10 | `e4d1ba4` (#93) | 1 (5, M1–M5) | – kjørt på `7ca19d9` 24.10 | `S/spec-8-2a-funn-fra-proeven-av-demoen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
@@ -640,6 +641,7 @@ funn. Antall rader i loggen:
 | 10.2i, promptversjon 4: gjennomgangen 06.11 av svaret kl. 09:55 | 13 | 5 | 1 | 7 |
 | 10.2i, promptversjon 4: gjennomgangen 06.11 av svarene kl. 11:15 | 16 | 4 | 3 | 9 |
 | 8.2c, gjennomgangen 06.11 | 17 | 13 | 1 | 3 |
+| 10.9, gjennomgangen 07.11 | 36 | 30 | 3 | 3 |
 | 8.2a | 21 | 15 | 6 | – |
 | 9.1, oppdatering 17.10 | 19 | 17 | 2 | – |
 | 9.7 | 19 | 13 | 6 | – |
@@ -1462,6 +1464,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 2.3d, tidlig stopp: svarene 03.11 kl. 20:48 (1), 05.11 kl. 12:33 og 19:33 | A, B | A (`exit 0` tatt ut av «Start demoen på Windows») `test_start_demoen_paa_windows_slutter_med_exit_0_etter_siste_kontroll`; B (`$sjekk.Kode -eq 0 -and` tatt ut av `start/kveldshenting.ps1`) `test_alt_annet_enn_ferdig_gir_kjoeringen_som_foer[ferdig-kode-1]`. Fila var lik HEAD etter begge (git-bloben og sha256 uten CR) | `S/spec-2-3d-tidlig-stopp-og-ci.md` |
 | 10.2i, promptversjon 4: svarene 5.11 kl. 16:05, 19:13 og 23:36 og 6.11 kl. 09:55 og 11:15 | mutanten, A–D, 1–2 (09:55), 1–2 (11:15) | mutanten (den nye linja tatt ut av prompten, kjørt to ganger) `test_versjonen_foelger_teksten`, `test_hver_rad_har_promptens_avtrykk_ved_promptversjonen` og testen for linja, som ble tatt ut med linja etter svaret kl. 19:13; A (`steg` og `falt` byttet i `_VERBET`) 4 tester; B (aksjen regnet av indeksserien) 2 tester; C (`==` til `!=`, byttede retninger) 7 tester; D (kontrollen godtar alltid «samme vei») 5 tester; 1 kl. 09:55 (aksjen regnet som hovedindeksen igjen) `test_aksjen_paa_en_dag_med_hull`; 2 kl. 09:55 (grensen for bransjen satt til 1) 3 tester; 1 kl. 11:15 (grensen talt på aksjene i lista) `test_bransje_med_to_der_bare_den_ene_har_endring` og `test_uten_bransjen_naar_bare_aksjen_har_endring`; 2 kl. 11:15 (sjekken av `samme_periode` tatt ut av `ki_grunnlag`) `test_ingen_ordlyd_paa_en_dag_med_hull`. Fila var lik HEAD etter hver (sha256 uten CR) | `S/spec-10-2i-prompten-versjon-4.md` |
 | 8.2c, svaret 6.11 kl. 15:08 | M1–M3 | M1 (`_uten_overlapp` gir merkene uendret) `test_navnene_paa_aksen_kommer_ikke_borti_hverandre` for 1 uke, 1 mnd, 6 mnd, I år og 1 år; M2 (grensen i `@container` satt til 1 px) `test_stilarket_viser_den_smale_naar_figuren_er_smal` og `test_teksten_i_grafen_i_nettleseren` ved 390 og 320 px; M3 (`tynn=True` igjen i `bygg_graf`) `test_navnene_paa_aksen_kommer_ikke_borti_hverandre` for 1 mnd til 09.04 og 30.12. Fila var lik HEAD etter hver (sha256 uten CR) | `S/spec-8-2c-kursgrafen-paa-smal-skjerm.md` |
+| 10.9, svarene 7.11 kl. 08:58 og 12:32 | A–H, A–H og F2 | på `ba68533`: A (`foerste_dag_i_rekka` én børsdag for langt tilbake) 7 tester i `tests/test_ki_visning.py`; B (en dag med hull telles i mønster 2) `test_en_dag_med_hull_telles_ikke`; C (appens setninger tatt ut av rammen) 23 tester; D (hjelpen ved rammen får en setning til) `test_hjelpen_ved_rammen_har_hoeyst_60_ord`; E (linja om én setning per sjekk tatt ut av prompten) 3 tester, også `test_versjonen_foelger_teksten`; F (tallet ved feltet sjekkes ikke i mønster 1) 2 tester i `TestKontrollen`; G (demotekstene med versjon 4 tilbake) `test_demotekstene_har_versjon_5_og_moenstrene`; H (grunnlaget kontrollerer ikke mønstrene) 6 tester i `TestGrunnlaget`. På nytt på `c7159bb`, med F oppdatert og F2 (setningen om mønstrene sier mer enn formene): A 7, B 1, C 23, D 1, E 3, F 2, F2 4, G 1 og H 6 tester. Hver fil var lik HEAD etterpå | `S/spec-10-9-ki-teksten-forklarer-det-siden-viser.md` |
 | 8.2b | Ma1–Md1, Me1–Me5, Mg1 | Ma1 `test_stjernen_sender_til_tabellen_naar_raden_er_borte`, Ma2 `test_hovedindeksen_og_soeylene_har_hvert_sitt_vindu`, Mb1 `test_grafen_har_felt_til_tallene_datoene_og_navnene`, Mb2 `test_demoen_sier_at_ki_teksten_bare_er_for_siste_boersdag`, Mc1 `test_tallene_i_ki_teksten_har_prikket_strek`, Mc2 `test_kortet_retning_sier_hva_sjekkene_ga`, Md1 `test_min_liste_har_tittelen_med_antallet` (etter at testen fikk med «Alle»), Me1 `test_summen_under_sjekkene`, Me2 `test_grensen_for_moerk_soeyle_er_tallet_slik_det_vises`, Me3 `test_hvert_spoersmaalstegn_staar_ved_det_det_forklarer`, Me4 `test_styrken_staar_i_rutene_som_i_tabellen`, Me5 `test_spoersmaalstegnet_for_periodene_staar_foerst`, Mg1 `test_feltet_flytter_til_knappen_i_et_annet_kort`, med `-x` 03.11–04.11 | `S/spec-8-2b-…` |
 | 8.2a | M1–M5 | M1 `test_periodeknappene_og_velg_dag_gaar_til_kursgrafen`, M2 `test_aksjen_uten_kurser_har_en_rad_nederst_og_ingen_fotnote`, M3 `test_symbolene_over_soeylene_lenker_til_aksjesiden[/]`, M4 `test_raden_sier_hvorfor_med_samme_tall_som_aksjesiden[/]`, M5 `test_sortert_er_hele_lista_en_liste_uten_delene[synkende]` | `S/spec-8-2a-…` |
 | 9.1 | Q1–Q4 | Q1, Q3 og Q4 `test_hver_ferdige_spesifikasjon_har_en_rad`, Q2 `test_hver_test_dokumentene_nevner_finnes` | `S/spec-9-1-…` |
