@@ -148,3 +148,39 @@ Investorsiden og aksjesiden med boblen ved 390 og 320 px: tegningen i full bredd
 - Liberation Mono 400 og 700: Liberation 2.1.5, `liberation-fonts-ttf-2.1.5.tar.gz`, lenket fra utgivelsen 2.1.5 hos liberationfonts. Lisensen er OFL 1.1, `LICENSE` i arkivet, med de reserverte navnene «Liberation», «Arimo», «Tinos» og «Cousine».
 
 **Testene og mutantene.** Kjøringen kl. 20:43 ga 19 feilet: 17 fordi ruff og git ikke startet da minnet var nesten brukt opp (0xC0000142), og 2 som ventet fotnoten og ble rettet (stoppen kl. 20:53 i dagsfila). Hele settet ble kjørt alene på nytt før `ac0944f9`, 21:03:09–21:15:01 med 3,9 GB ledig av 15,7 GB: 4568 bestått, 24 hoppet over og 0 feilet. Én mutant per del på `ac0944f9`, med kopi før og sha256 mot HEAD etter: A (KI-merket), B (ruta i den ekte versjonen), C (toppen av boblen regnet mot bredden), D (vekten til Lora 700 i `@font-face`), E (ny fane i demoen), F (tegningen 560 px på smal skjerm) og G (en endret kopi av `brfe.svg`). Alle ble fanget, og hver fil var lik HEAD etterpå (med LF, som git lagrer den).
+
+### Gjennomgangen av 3.4h
+
+*Lagt til 2026-11-07:* Blind Hunter, Edge Case Hunter og Verification Gap gikk gjennom diffen mot main etter `5cb46117`, uten de 15 SVG-kopiene og de tre `OFL.txt`, som er kontrollert byte for byte mot kildene. Acceptance Auditor ble ikke kjørt, fordi instruksjonen ber om de tre. Det kom 16 funn fra Blind Hunter, 7 fra Edge Case Hunter og 2 fra Verification Gap, pluss ett annet funn, som er det samme som ECH7. Ingen er på høy. Rettingene er `72efb6e8`.
+
+| Funn | Hva | Dom | Utfall |
+|---|---|---|---|
+| VG1, BH4 | Boblen på en ekte aksje uten kurser (spørsmål 5) var ikke testet | middels | rettet: `test_boblen_i_den_ekte_versjonen_uten_kurser` |
+| VG2, BH5 | `/investorside/BRFE` med en ulesbar eller manglende demobase var ikke testet | middels | rettet: ruta er med i de to 503-testene og testen for en demobase som mangler, i `tests/test_demo.py` |
+| BH2 | Rammetestene i `tests/test_utseende.py` hentet ikke den nye siden | middels | rettet: «investorsiden i demoen» i `sidene`, og `side-demoselskap` i testen for klassen på `<body>` |
+| BH3 | Testen for skriftene sammenlignet bare med sjekksummen i samme fil, som et verktøy skriver på nytt | middels | rettet: sha256 for de ti filene som ble kontrollert mot kilden, i `KONTROLLERTE_SKRIFTFILER` |
+| BH8 | Testen for del G leste ikke README-en | lav | rettet: testen leser steg 6 i «Demoen» |
+| ECH5 | Testen for den ekte versjonen ga AttributeError uten boble | lav | rettet: `assert boble is not None` |
+| ECH6 | `DEMO_UTEN_KURSER` i `tests/test_investorsiden.py` var ubrukt | lav | rettet: fjernet |
+| BH14 | «før settet ble kjørt» var uklart | lav | rettet med denne raden: «før settet ble kjørt» betyr før kjøringen kl. 21:03, ikke kl. 20:43 |
+| ECH7, VG (annet funn) | Kommentaren om U66 i `aksje.html` sier at KI-teksten står etter lenken til investorsiden | lav | utsatt: `aksje.html` er med i avtrykket bak bildene i `docs/appen/`, så en kommentar tar alle bildene på nytt. Rettes neste gang malen endres (`issues.md`) |
+| BH16 | Kommentaren ved `_RUTER_MED_BASE` sier «merket», som også er merkingen i Min liste | lav | utsatt, som ECH7: `src/app.py` er med i avtrykket |
+| BH7 | Mutantene for 3.4h står ikke i vedlegget i `docs/kvalitetssikring.md` | lav | utsatt til etter flettingen, som for 8.20 (`fd1979b9`) |
+| BH15 | U84 og vedlegget har ingen eier etter flettingen | lav | rettet: står i `issues.md` |
+| BH6 | Tre tester i `tests/test_investorsiden.py` har navn fra 10.5 | lav | avvist: navnene står fordi `docs/kvalitetssikring.md` og spesifikasjonen for 10.5 viser til dem. Docstringene sier hva de tester nå, og 10.5 har en datert linje |
+| BH9 | `a.tilbake` er ikke lenger avgrenset til én side | lav | avvist: bare aksjesidene og sidene for selskapene bruker klassen, og en velger med to sider bryter regelen i `test_hver_side_har_klassen_reglene_er_avgrenset_med` (ECH5) om én side per del av velgerlista |
+| BH10 | «Tilbake til ‹navn›» glemmer perioden | lav | avvist: spesifikasjonen sier lenken går til aksjesiden, og boblen dit har heller ingen periode |
+| BH11 | Bredden der oppsettet skifter, rundt 928 px, er ikke testet | lav | avvist: over 896 px er flaten fast 560 px og feltet høyst 896 px, så boblen står i prosent av en flate som ikke endres |
+| BH13 | `_beskrivelse` gir `""` uten `<desc>` | lav | avvist: `test_hvert_av_de_15_har_sin_side_i_demoen` krever at `alt` er teksten i `<desc>` og ikke tom, og kopiene er låst til de godkjente filene |
+| ECH1 | Ruta åpner og migrerer den ekte basen før 404 | lav | avvist: alle rutene som leser basen, gjør det samme ved første forespørsel, og ruta skriver ingenting |
+| ECH2 | En låst ekte base gir 503, ikke 404 | lav | avvist: ruta må lese demomerket for å vite om basen er en demobase, og svarer som de andre sidene når basen ikke kan leses |
+| ECH4 | Et selskap uten rad i `bobler.json` eller `SKRIFTER` gir 500 | lav | avvist: `test_kopiene_er_byte_for_byte_de_godkjente` og `test_skriften_er_den_i_lesmeg` krever alle 15 |
+| BH1 | Diffen utelot 18 filer | falsk | bevisst: SVG-ene og lisensene er kontrollert byte for byte mot kildene |
+| BH12 | Kommentaren ved `HOEYDE_PAA_AKSJESIDEN` er utdatert | falsk | kommentarene der er historikk med «Var», og 3.4h har sin egen linje |
+| ECH3 | Boblen i demoen kan gå til en side som ikke finnes | falsk | demobasen har bare de 15 i tabellen `aksje` (`lag_demobase` i `src/demo.py`), og alle 15 har en side |
+
+**Testene og mutantene etter gjennomgangen.** Ledig minne var 2,8 GB av 15,7 GB, mindre enn ved stoppen kl. 20:53, så settet ble kjørt fil for fil før `72efb6e8`: 62 filer, 21:27:38–21:40:04, til sammen 4569 bestått, 24 hoppet over og 0 feilet. Ingen fil måtte kjøres på nytt. Fem mutanter på `72efb6e8`, med kopi før og sha256 mot HEAD etter: VG1 (boblen uten adresse i `aksje_uten_kurser.html`), VG2 (sjekken av `basefeil` i ruta), BH2 (klassen på `<body>`), BH3 (én byte i `Lora-Bold.woff`) og BH8 (steg 6 i README-en). Alle ble fanget, og hver fil var lik HEAD etterpå.
+
+## Spørsmål til gruppen før flettingen
+
+Ingen. Ingen funn på middels eller over står åpne.
