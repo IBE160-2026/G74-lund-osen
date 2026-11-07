@@ -2087,6 +2087,8 @@ så appen kan vise dem uten en kilde vi ikke har.
 
 *Sjekket 2026-11-07 kl. 11:10 (gruppens svar):* Euronexts kalender for 2027 (IF261106CADE, 06.11.2026), lastet ned for hånd, lest ut av rådet og sjekket av gruppen: stengt 2027-01-01, 03-25, 03-26, 03-29, 05-06, 05-17, 12-24 og 12-31, og 2027-03-24 er halv handelsdag og regnes som børsdag.
 
+*Svar 2026-11-07 kl. 15:34 (gruppens svar):* forslagene i spørsmål 1–4 under «Spørsmål til gruppen før flettingen» i `spec-2-16-boerskalenderen-for-alle-aar.md` er godtatt: 1) kalenderen dekker 2026 og hvert år etter, og 2025 står utenfor, som avgjort 30.10 kl. 10:45; svaret kl. 11:05 gjaldt årene framover; 2) for en dag utenfor kalenderen står «utenfor børskalenderen, som begynner i 2026», og «ikke vurdert» står som før (spørsmål 18 i 8.20); 3) `Lyttere` i `start/start.ps1` spør først som før, så `Get-NetTCPConnection` uten tilstand etter raden med fjernport 0, og så netstat, fordi netstat alene så lytteren 0 og 4 av 30 ganger; 4) ingen øvre grense og ingen ny kontroll av klokka, og risikoen ved en klokke langt fram i tid er godtatt (BH1, ECH1). Rådet anbefalte alle fire. Svaret er ført etter instruksjonen kl. 15:37 i `docs/ai-prompts/2026-11-07.md`.
+
 ---
 
 ## Epic 3: Løsningen kan kjøres av andre enn oss
@@ -4297,6 +4299,8 @@ NFR-08, `AD-10`
 *Svar 2026-11-07 kl. 10:33 (gruppens svar):* forslagene i spørsmål 1–21 i `spec-8-20-ux-rettingene-etter-gjennomgangen-06-11.md` er godtatt, med fire endringer. 7: pilene står bare når datofeltet viser en dag, og er borte i en periode. 12: verdiene ved musepekeren står i en lapp i appens stil, som i skissen `aksjesiden-ki-paa.png`, som vises straks og følger musa, med CSS og uten skript, ikke med `<title>`. 2: én kort setning om hvorfor retningen oftere er positiv blir i vinduet for retningen, under 60 ord, og målingen står i `docs/hjelp.md` med grensene. 21: rekkefølgen er 10.9, 8.20c, 8.20a, 3.4h og 8.20b, fordi README-prøven er et suksessmål i briefen («Kjørbar for andre» i `product-brief.md`). Svaret er ført etter instruksjonen kl. 10:38 i `docs/ai-prompts/2026-11-07.md`.
 
 *Lagt til 2026-11-07 (svaret kl. 12:32 under story 10.9, svar 4):* de fete navnene på sjekkene i KI-teksten (spørsmål 16) bygges i 8.20a, med resten av utseendet på aksjesiden; spesifikasjonen for 10.9 har dem ikke.
+
+*Lagt til 2026-11-07 (svaret kl. 15:34 under story 2.16, svar 2):* for spørsmål 18 står «utenfor børskalenderen, som begynner i 2026», ikke «som bare har 2026», fordi kalenderen fra 2.16 ikke har noe siste år. «ikke vurdert» står som før.
 
 ---
 
